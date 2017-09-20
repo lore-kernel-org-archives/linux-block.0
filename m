@@ -1,68 +1,26 @@
-Return-Path: <prvs=4336ae8ff=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V4 03/16] scsi: sd_zbc: Rearrange code
-Date: Sun, 24 Sep 2017 16:02:34 +0900
-Message-Id: <20170924070247.25560-4-damien.lemoal@wdc.com>
-In-Reply-To: <20170924070247.25560-1-damien.lemoal@wdc.com>
-References: <20170924070247.25560-1-damien.lemoal@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] loop: remove union of use_aio and ref in struct loop_cmd
+To: Omar Sandoval <osandov@osandov.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com, Shaohua Li <shli@fb.com>
+References: <f1805518db399aa091aaada51de4d9153963d77f.1505942666.git.osandov@fb.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <8d8d9fac-363d-0e06-250e-db915293978b@kernel.dk>
+Date: Wed, 20 Sep 2017 15:27:51 -0600
+MIME-Version: 1.0
+In-Reply-To: <f1805518db399aa091aaada51de4d9153963d77f.1505942666.git.osandov@fb.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Rearrange sd_zbc_setup() to include use_16_for_rw and use_10_for_rw
-assignments and move the calculation of sdkp->zone_shift together
-with the assignment of the verified zone_blocks value in
-sd_zbc_check_zone_size().
+On 09/20/2017 03:24 PM, Omar Sandoval wrote:
+> From: Omar Sandoval <osandov@fb.com>
+> 
+> When the request is completed, lo_complete_rq() checks cmd->use_aio.
+> However, if this is in fact an aio request, cmd->use_aio will have
+> already been reused as cmd->ref by lo_rw_aio*. Fix it by not using a
+> union. On x86_64, there's a hole after the union anyways, so this
+> doesn't make struct loop_cmd any bigger.
 
-No functional change is introduced by this patch.
+Thanks Omar, applied.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- drivers/scsi/sd_zbc.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index 023f705ae235..7dbaf920679e 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -584,6 +584,7 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
- 	}
- 
- 	sdkp->zone_blocks = zone_blocks;
-+	sdkp->zone_shift = ilog2(zone_blocks);
- 
- 	return 0;
- }
-@@ -591,10 +592,13 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
- static int sd_zbc_setup(struct scsi_disk *sdkp)
- {
- 
-+	/* READ16/WRITE16 is mandatory for ZBC disks */
-+	sdkp->device->use_16_for_rw = 1;
-+	sdkp->device->use_10_for_rw = 0;
-+
- 	/* chunk_sectors indicates the zone size */
- 	blk_queue_chunk_sectors(sdkp->disk->queue,
- 			logical_to_sectors(sdkp->device, sdkp->zone_blocks));
--	sdkp->zone_shift = ilog2(sdkp->zone_blocks);
- 	sdkp->nr_zones = sdkp->capacity >> sdkp->zone_shift;
- 	if (sdkp->capacity & (sdkp->zone_blocks - 1))
- 		sdkp->nr_zones++;
-@@ -657,10 +661,6 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
- 	if (ret)
- 		goto err;
- 
--	/* READ16/WRITE16 is mandatory for ZBC disks */
--	sdkp->device->use_16_for_rw = 1;
--	sdkp->device->use_10_for_rw = 0;
--
- 	return 0;
- 
- err:
 -- 
-2.13.5
+Jens Axboe
