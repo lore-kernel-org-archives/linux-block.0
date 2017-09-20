@@ -1,81 +1,75 @@
-Return-Path: <prvs=430e6b2f0=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	=Oleksandr Natalenko <oleksandr@natalenko.name>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v2 2/4] block: Add the QUEUE_PREEMPT_ONLY request queue flag
-Date: Thu, 21 Sep 2017 14:22:53 -0700
-Message-Id: <20170921212255.12788-3-bart.vanassche@wdc.com>
-In-Reply-To: <20170921212255.12788-1-bart.vanassche@wdc.com>
-References: <20170921212255.12788-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:59483 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751095AbdITTrC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Sep 2017 15:47:02 -0400
+Subject: Re: [PATCHv2] bcache: option for allow stale data on read failure
+To: Michael Lyle <mlyle@lyle.org>
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Nix <nix@esperi.org.uk>, Kai Krakow <hurikhan77@gmail.com>,
+        Eric Wheeler <bcache@lists.ewheeler.net>,
+        Junhui Tang <tang.junhui@zte.com.cn>, stable@vger.kernel.org
+References: <20170919222433.24336-1-colyli@suse.de>
+ <CAJ+L6qeLMsCAVsdNkertg2BzwVHcq4ZZ==E8gojo9O2cutWrVQ@mail.gmail.com>
+ <db997d70-9d0d-fd27-1c7c-7f602499aea4@suse.de>
+ <CAJ+L6qc_U_37Jn=wzcXoLU6dHWHQyRJGTACDtmctAn1Gg08keA@mail.gmail.com>
+From: Coly Li <colyli@suse.de>
+Message-ID: <09a40334-1749-1cbf-63ae-716a25ec96b3@suse.de>
+Date: Wed, 20 Sep 2017 21:46:54 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAJ+L6qc_U_37Jn=wzcXoLU6dHWHQyRJGTACDtmctAn1Gg08keA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This flag will be used in the next patch to let the block layer
-core know whether or not a SCSI request queue has been quiesced.
-A quiesced SCSI queue namely only processes RQF_PREEMPT requests.
+On 2017/9/20 下午5:40, Michael Lyle wrote:
+> On Wed, Sep 20, 2017 at 3:28 AM, Coly Li <colyli@suse.de> wrote:
+>> Even the read request failed on file system meta data, because finally a
+>> stale data will be provided to kernel file system code, it is probably
+>> file system won't complain as well.
+> 
+> The scary case is when filesystem data that points to other filesystem
+> data is cached.  E.g. the data structures representing what space is
+> free on disk, or a directory, or a database btree.  Some examples:
+> 
+> Free space handling-- if a big file /foo is created, and the active
+> free-space datastructures are in cache (and this is likely, because
+> actively written places can have their writeback-writes
+> cancelled/deferred indefinitely)-- and then later the caching disk
+> fails, an old version of this will be read from disk.  Later, an
+> effort to write a file /bar allocates the space used by /foo, and
+> writes over it.
+> 
+> Directory entity handling-- if /var/spool/foo is an active directory
+> (associated data structures in cache), and has the directory
+> /var/spool/foo/bar under it, and then /bar is removed... the backing
+> disk will still have a reference to bar.  If the space for bar is then
+> used for something else, the kernel may end up reading something very
+> different from what it expects for a directory later after a cache
+> device failure.
+> 
+> Btrees, etc-- the same thing.  If a tree shrinks, old tree entitys can
+> end up pointing to other kinds of data.
+> 
+> I think this change is harmful-- it is not a good idea to
+> automatically, at runtime, decide to start returning data that
+> violates the guarantees a block device is supposed to obey about
+> ordering and persistence.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- block/blk-core.c       | 13 +++++++++++++
- include/linux/blkdev.h |  5 +++++
- 2 files changed, 18 insertions(+)
+Hi Mike,
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index d709c0e3a2ac..1ac337712bbd 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -346,6 +346,19 @@ void blk_sync_queue(struct request_queue *q)
- }
- EXPORT_SYMBOL(blk_sync_queue);
- 
-+void blk_set_preempt_only(struct request_queue *q, bool preempt_only)
-+{
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	if (preempt_only)
-+		queue_flag_set(QUEUE_FLAG_PREEMPT_ONLY, q);
-+	else
-+		queue_flag_clear(QUEUE_FLAG_PREEMPT_ONLY, q);
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+}
-+EXPORT_SYMBOL(blk_set_preempt_only);
-+
- /**
-  * __blk_run_queue_uncond - run a queue whether or not it has been stopped
-  * @q:	The queue to run
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index cd26901a6e25..5bd87599eed0 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -627,6 +627,7 @@ struct request_queue {
- #define QUEUE_FLAG_REGISTERED  26	/* queue has been registered to a disk */
- #define QUEUE_FLAG_SCSI_PASSTHROUGH 27	/* queue supports SCSI commands */
- #define QUEUE_FLAG_QUIESCED    28	/* queue has been quiesced */
-+#define QUEUE_FLAG_PREEMPT_ONLY	29	/* only process REQ_PREEMPT requests */
- 
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_STACKABLE)	|	\
-@@ -731,6 +732,10 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
- 			     REQ_FAILFAST_DRIVER))
- #define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
-+#define blk_queue_preempt_only(q)				\
-+	test_bit(QUEUE_FLAG_PREEMPT_ONLY, &(q)->queue_flags)
-+
-+extern void blk_set_preempt_only(struct request_queue *q, bool preempt_only);
- 
- static inline bool blk_account_rq(struct request *rq)
- {
--- 
-2.14.1
+I totally agree with you. It is my fault for the misleading commit log,
+if you read it again you may find we stand on same side, this is what I
+feel from your response :-)
+
+Current bcache code does provide stale data from read failure recovery.
+In v1 patch discussion people wanted to keep this behavior then in v2
+version I add an option to permit this "harmful" behavior, and disable
+this behavior by default.
+
+And good to know Kent does not like an option, then we can disable this
+"harmful" behavior by default.
+
+Thanks.
+
+Coly
