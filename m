@@ -1,36 +1,25 @@
-Return-Path: <BATV+6636317d514c48d079a8+5127+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH 2/2] bsg-lib: don't free job in bsg_prepare_job
-Date: Wed,  6 Sep 2017 12:11:09 +0200
-Message-Id: <20170906101109.9270-3-hch@lst.de>
-In-Reply-To: <20170906101109.9270-1-hch@lst.de>
-References: <20170906101109.9270-1-hch@lst.de>
+Return-Path: <jthumshirn@suse.de>
+Date: Wed, 20 Sep 2017 10:27:16 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 7/9] nvme: introduce a nvme_ns_ids structure
+Message-ID: <20170920082716.tpezpxw4opfr4f2w@linux-x5ow.site>
+References: <20170918231453.27128-1-hch@lst.de>
+ <20170918231453.27128-8-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20170918231453.27128-8-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-The job structure is allocated as part of the request, so we should not
-free it in the error path of bsg_prepare_job.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Cc: stable@vger.kernel.org
----
- block/bsg-lib.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-index c82408c7cc3c..dbddff8174e5 100644
---- a/block/bsg-lib.c
-+++ b/block/bsg-lib.c
-@@ -154,7 +154,6 @@ static int bsg_prepare_job(struct device *dev, struct request *req)
- failjob_rls_rqst_payload:
- 	kfree(job->request_payload.sg_list);
- failjob_rls_job:
--	kfree(job);
- 	return -ENOMEM;
- }
- 
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.11.0
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
