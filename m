@@ -1,46 +1,34 @@
 Return-Path: <jthumshirn@suse.de>
-Date: Wed, 20 Sep 2017 11:42:33 +0200
+Date: Wed, 20 Sep 2017 10:15:45 +0200
 From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
+To: Tony Yang <yyt168@gmail.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
 Subject: Re: [PATCH 9/9] nvme: implement multipath access to nvme subsystems
-Message-ID: <20170920094232.fxzar6op4v3d3ezl@linux-x5ow.site>
+Message-ID: <20170920081545.p2a6x4qar3zbz4kw@linux-x5ow.site>
 References: <20170918231453.27128-1-hch@lst.de>
  <20170918231453.27128-10-hch@lst.de>
+ <CADL4p-pcUCoibEWxfFeLHoYhsM3nuSedoe2QTK-ahys+1+TXbg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20170918231453.27128-10-hch@lst.de>
+In-Reply-To: <CADL4p-pcUCoibEWxfFeLHoYhsM3nuSedoe2QTK-ahys+1+TXbg@mail.gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Sep 18, 2017 at 04:14:53PM -0700, Christoph Hellwig wrote:
-> This patch adds initial multipath support to the nvme driver.  For each
-> namespace we create a new block device node, which can be used to access
-> that namespace through any of the controllers that refer to it.
+On Wed, Sep 20, 2017 at 08:18:41AM +0800, Tony Yang wrote:
+> Hi , Christoph
 > 
-> Currently we will always send I/O to the first available path, this will
-> be changed once the NVMe Asynchronous Namespace Access (ANA) TP is
-> ratified and implemented, at which point we will look at the ANA state
-> for each namespace.  Another possibility that was prototyped is to
-> use the path that is closes to the submitting NUMA code, which will be
-> mostly interesting for PCI, but might also be useful for RDMA or FC
-> transports in the future.  There is not plan to implement round robin
-                                    no ^
-> or I/O service time path selectors, as those are not scalable with
-> the performance rates provided by NVMe.
-> 
-> The multipath device will go away once all paths to it disappear,
-> any delay to keep it alive needs to be implemented at the controller
-> level.
+>      I use the above code to recompile the kernel. The following error
+> occurred. I can't find the blk_steal_bios function. What's the reason
+> for that? Hope to get your help, thank you
 
-Sorry for the typo only mail, I'll be going around a real review soon but I
-wanted to test the patchset in my nvme-rdma setup and just hit a panic in
-ib_core with your branched merged into -rc1.
+Hi Ton,
+
+have you puled it from Christoph's git? I just did a git pull and it builds
+fine.
 
 Byte,
 	Johannes
-
 -- 
 Johannes Thumshirn                                          Storage
 jthumshirn@suse.de                                +49 911 74053 689
