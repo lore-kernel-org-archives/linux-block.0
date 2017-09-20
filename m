@@ -1,34 +1,29 @@
-Return-Path: <keith.busch@intel.com>
-Date: Thu, 21 Sep 2017 17:12:46 -0400
-From: Keith Busch <keith.busch@intel.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+Return-Path: <hch@lst.de>
+Date: Thu, 21 Sep 2017 01:52:50 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
 Subject: Re: [PATCH 9/9] nvme: implement multipath access to nvme subsystems
-Message-ID: <20170921211246.GB10713@localhost.localdomain>
-References: <20170918231453.27128-1-hch@lst.de>
- <20170918231453.27128-10-hch@lst.de>
- <20170920225822.GE1379@localhost.localdomain>
- <20170920235250.GA28865@lst.de>
+Message-ID: <20170920235250.GA28865@lst.de>
+References: <20170918231453.27128-1-hch@lst.de> <20170918231453.27128-10-hch@lst.de> <20170920225822.GE1379@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170920235250.GA28865@lst.de>
+In-Reply-To: <20170920225822.GE1379@localhost.localdomain>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Sep 21, 2017 at 01:52:50AM +0200, Christoph Hellwig wrote:
-> I noticed the odd renaming in sysfs and though about gettind rid
-> of the /dev/nvme/ directory.  I just need to come up with a good
-> name for the device nodes - the name can't contain /dev/nvme* as
-> nvme-cli would break if it sees files that start with nvme in /dev/.
+On Wed, Sep 20, 2017 at 06:58:22PM -0400, Keith Busch wrote:
+> > +	sprintf(head->disk->disk_name, "nvme/ns%d", head->instance);
+> 
+> Naming it 'nvme/ns<#>', kobject_set_name_vargs is going to change that
+> '/' into a '!', so the sysfs entry is named 'nvme!ns<#>'. Not a big
+> deal I suppose, but I just thought it looked odd since '!' has special
+> meaning in shells.
 
-Ah, didn't know that. I'll fix nvme-cli to handle this.
+I noticed the odd renaming in sysfs and though about gettind rid
+of the /dev/nvme/ directory.  I just need to come up with a good
+name for the device nodes - the name can't contain /dev/nvme* as
+nvme-cli would break if it sees files that start with nvme in /dev/.
 
-We can still use a different naming convention for the multipath handles.
-
-> /dev/nvmN ?
-
-Looks safe.
-
-BTW, considered persistent nameing rules to symlink these from
-/dev/disk/by-id/? May need to add an attribute to the multipath object
-to assist that.
+/dev/nvmN ?  
