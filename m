@@ -1,66 +1,22 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out1.zte.com.cn ([202.103.147.172]:60948 "EHLO mxct.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S966992AbdI0D21 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Sep 2017 23:28:27 -0400
-From: tang.junhui@zte.com.cn
-To: mlyle@lyle.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Tang Junhui <tang.junhui@zte.com.cn>
-Subject: Re: [PATCH 1/5] bcache: don't write back data if reading it failed 
-Date: Wed, 27 Sep 2017 11:27:54 +0800
-Message-Id: <1506482874-6530-1-git-send-email-tang.junhui@zte.com.cn>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: fix a crash caused by wrong API
+To: Shaohua Li <shli@fb.com>, linux-block@vger.kernel.org
+Cc: Kernel-team@fb.com, Bart Van Assche <bart.vanassche@wdc.com>,
+ Omar Sandoval <osandov@fb.com>
+References: <bbf02e9095a5e8d5d71c7001881aa6d5c765bda2.1506021255.git.shli@fb.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <6dce7f4a-5837-8bd7-a5a5-e2564dc8ac52@kernel.dk>
+Date: Thu, 21 Sep 2017 13:19:24 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <bbf02e9095a5e8d5d71c7001881aa6d5c765bda2.1506021255.git.shli@fb.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+On 09/21/2017 01:17 PM, Shaohua Li wrote:
+> part_stat_show takes a part device not a disk, so we should use
+> part_to_disk.
 
-It looks good to me,
-I have noted this issue before.
-Thanks.
+Oops, thanks Shaohua! Applied.
 
--------
-Tang Junhui
-
-> If an IO operation fails, and we didn't successfully read data from the
-> cache, don't writeback invalid/partial data to the backing disk.
-> 
-> Signed-off-by: Michael Lyle <mlyle@lyle.org>
-> ---
->  drivers/md/bcache/writeback.c | 19 +++++++++++++------
->  1 file changed, 13 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-> index e663ca082183..eea49bf36401 100644
-> --- a/drivers/md/bcache/writeback.c
-> +++ b/drivers/md/bcache/writeback.c
-> @@ -179,13 +179,20 @@ static void write_dirty(struct closure *cl)
->  		 struct dirty_io *io = container_of(cl, struct dirty_io, cl);
->  		 struct keybuf_key *w = io->bio.bi_private;
->  
-> -		 dirty_init(w);
-> -		 bio_set_op_attrs(&io->bio, REQ_OP_WRITE, 0);
-> -		 io->bio.bi_iter.bi_sector = KEY_START(&w->key);
-> -		 bio_set_dev(&io->bio, io->dc->bdev);
-> -		 io->bio.bi_end_io		 = dirty_endio;
-> +		 /* IO errors are signalled using the dirty bit on the key.
-> +		  * If we failed to read, we should not attempt to write to the
-> +		  * backing device.  Instead, immediately go to write_dirty_finish
-> +		  * to clean up.
-> +		  */
-> +		 if (KEY_DIRTY(&w->key)) {
-> +		 		 dirty_init(w);
-> +		 		 bio_set_op_attrs(&io->bio, REQ_OP_WRITE, 0);
-> +		 		 io->bio.bi_iter.bi_sector = KEY_START(&w->key);
-> +		 		 bio_set_dev(&io->bio, io->dc->bdev);
-> +		 		 io->bio.bi_end_io		 = dirty_endio;
->  
-> -		 closure_bio_submit(&io->bio, cl);
-> +		 		 closure_bio_submit(&io->bio, cl);
-> +		 }
->  
->  		 continue_at(cl, write_dirty_finish, io->dc->writeback_write_wq);
->  }
-> -- 
+-- 
+Jens Axboe
