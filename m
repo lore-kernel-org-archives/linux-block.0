@@ -1,42 +1,109 @@
-Return-Path: <anish.jhaveri@paviliondata.com>
-Date: Mon, 11 Sep 2017 21:22:26 -0700
-From: Anish M Jhaveri <anish.jhaveri@paviliondata.com>
-To: sagi@grimberg.me, hch@lst.de, keith.busch@intel.com, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [PATCH 02/10] RDMA timeout triggers failover.
-Message-ID: <20170912042226.bwdalyhvqd5xc24n@haynes>
+Return-Path: <zwp10758@gmail.com>
+Return-Path: <zwp10758@gmail.com>
+From: weiping zhang <zwp10758@gmail.com>
+Date: Thu, 21 Sep 2017 23:14:16 +0800
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] blk-mq: fix nr_requests wrong value when modify it from
+ sysfs
+Message-ID: <20170921151416.GA10870@localhost.didichuxing.com>
+References: <20170903134634.GA27411@localhost.didichuxing.com>
+ <1504626163.4135.33.camel@wdc.com>
+ <20170906073355.GA37455@localhost.didichuxing.com>
+ <1504702843.7750.0.camel@wdc.com>
+ <20170912135732.GA7025@bogon.didichuxing.com>
+ <20170921130312.GA11537@localhost.didichuxing.com>
+ <b3c8fa23-d8d4-36ae-5e86-2aa55d7f2675@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Return-Path: anish.jhaveri@paviliondata.com
+In-Reply-To: <b3c8fa23-d8d4-36ae-5e86-2aa55d7f2675@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Trigger failover functionality will be called on any RDMA timeout. This timeout can occur due failure for an IO to be returned from Target. This could be caused due to interface going down while leads to failover functionality being triggered.
-
-Signed-off-by: Anish M Jhaveri <anish.jhaveri@paviliondata.com>
----
- drivers/nvme/host/rdma.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index a03299d..cb6a5f8 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -174,6 +174,7 @@ static void nvme_rdma_free_qe(struct ib_device *ibdev, struct nvme_rdma_qe *qe,
- {
- 	ib_dma_unmap_single(ibdev, qe->dma, capsule_size, dir);
- 	kfree(qe->data);
-+	qe->data = NULL;
- }
- 
- static int nvme_rdma_alloc_qe(struct ib_device *ibdev, struct nvme_rdma_qe *qe,
-@@ -766,6 +767,8 @@ static void nvme_rdma_error_recovery_work(struct work_struct *work)
- 
- 	nvme_stop_ctrl(&ctrl->ctrl);
- 
-+	nvme_trigger_failover(&ctrl->ctrl);
-+
- 	for (i = 0; i < ctrl->ctrl.queue_count; i++)
- 		clear_bit(NVME_RDMA_Q_LIVE, &ctrl->queues[i].flags);
- 
--- 
-2.9.3
+On Thu, Sep 21, 2017 at 08:09:47AM -0600, Jens Axboe wrote:
+> On 09/21/2017 07:03 AM, weiping zhang wrote:
+> > On Tue, Sep 12, 2017 at 09:57:32PM +0800, weiping zhang wrote:
+> >> On Wed, Sep 06, 2017 at 01:00:44PM +0000, Bart Van Assche wrote:
+> >>> On Wed, 2017-09-06 at 15:34 +0800, weiping zhang wrote:
+> >>>> On Tue, Sep 05, 2017 at 03:42:45PM +0000, Bart Van Assche wrote:
+> >>>>> On Sun, 2017-09-03 at 21:46 +0800, weiping zhang wrote:
+> >>>>>> if blk-mq use "none" io scheduler, nr_request get a wrong value when
+> >>>>>> input a number > tag_set->queue_depth. blk_mq_tag_update_depth will get
+> >>>>>> the smaller one min(nr, set->queue_depth), and then q->nr_request get a
+> >>>>>> wrong value.
+> >>>>>>
+> >>>>>> Reproduce:
+> >>>>>>
+> >>>>>> echo none > /sys/block/nvme0n1/queue/ioscheduler
+> >>>>>> echo 1000000 > /sys/block/nvme0n1/queue/nr_requests
+> >>>>>> cat /sys/block/nvme0n1/queue/nr_requests
+> >>>>>> 1000000
+> >>>>>>
+> >>>>>> Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+> >>>>>> ---
+> >>>>>>  block/blk-mq.c | 7 +++++--
+> >>>>>>  1 file changed, 5 insertions(+), 2 deletions(-)
+> >>>>>>
+> >>>>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> >>>>>> index f84d145..8303e5e 100644
+> >>>>>> --- a/block/blk-mq.c
+> >>>>>> +++ b/block/blk-mq.c
+> >>>>>> @@ -2622,8 +2622,11 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+> >>>>>>  		 * queue depth. This is similar to what the old code would do.
+> >>>>>>  		 */
+> >>>>>>  		if (!hctx->sched_tags) {
+> >>>>>> -			ret = blk_mq_tag_update_depth(hctx, &hctx->tags,
+> >>>>>> -							min(nr, set->queue_depth),
+> >>>>>> +			if (nr > set->queue_depth) {
+> >>>>>> +				nr = set->queue_depth;
+> >>>>>> +				pr_warn("reduce nr_request to %u\n", nr);
+> >>>>>> +			}
+> >>>>>> +			ret = blk_mq_tag_update_depth(hctx, &hctx->tags, nr,
+> >>>>>>  							false);
+> >>>>>>  		} else {
+> >>>>>>  			ret = blk_mq_tag_update_depth(hctx, &hctx->sched_tags,
+> >>>>>
+> >>>>> Shouldn't this code return -EINVAL or -ERANGE if 'nr' is too large? That will help to
+> >>>>> keep user space code simple that updates the queue depth.
+> >>>>
+> >>>> Hi Bart,
+> >>>>
+> >>>> The reason why not return -EINVAL is keeping alin with minimum checking in queue_requests_store,
+> >>>> if you insist return -EINVAL/-ERANGE, minimum checking should also keep
+> >>>> same behavior. Both return error meesage and quietly changing are okey
+> >>>> for me. Which way do you prefer ?
+> >>>>
+> >>>> static ssize_t
+> >>>> queue_requests_store(struct request_queue *q, const char *page, size_t count)
+> >>>> {
+> >>>> 	unsigned long nr;
+> >>>> 	int ret, err;
+> >>>>
+> >>>> 	if (!q->request_fn && !q->mq_ops)
+> >>>> 		return -EINVAL;
+> >>>>
+> >>>> 	ret = queue_var_store(&nr, page, count);
+> >>>> 	if (ret < 0)
+> >>>> 		return ret;
+> >>>>
+> >>>> 	if (nr < BLKDEV_MIN_RQ)
+> >>>> 		nr = BLKDEV_MIN_RQ;
+> >>>
+> >>> Hello Jens,
+> >>>
+> >>> Do you perhaps have a preference for one of the approaches that have been discussed
+> >>> in this e-mail thread?
+> >>>
+> >>> Thanks,
+> >>>
+> >>> Bart.
+> >>
+> > Hello Jens,
+> > 
+> > Would you please give some comments about this patch,
+> 
+> If someone writes a value that's too large, return -EINVAL and
+> don't set it. Don't add weird debug printks.
+> 
+> 
+OK, I send patch V2 soon.
