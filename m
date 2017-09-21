@@ -1,136 +1,42 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:40386 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750933AbdI3K2X (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Sep 2017 06:28:23 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 3/7] sbitmap: introduce __sbitmap_for_each_set()
-Date: Sat, 30 Sep 2017 18:27:16 +0800
-Message-Id: <20170930102720.30219-4-ming.lei@redhat.com>
-In-Reply-To: <20170930102720.30219-1-ming.lei@redhat.com>
-References: <20170930102720.30219-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <zhangweiping@didichuxing.com>
+Date: Fri, 22 Sep 2017 01:12:31 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>
+Subject: Re: [PATCH v2 2/2] blk-sysfs: return EINVAL when user modify
+ nr_request less than BLKDEV_MIN_RQ
+Message-ID: <20170921171231.GB2009@localhost.didichuxing.com>
+References: <cover.1506006064.git.zhangweiping@didichuxing.com>
+ <da25b8d7b8ddd34e6e5f62f8c001f551ff3f1e04.1506006064.git.zhangweiping@didichuxing.com>
+ <efeb86f4-2752-975b-a5c9-bd08deb7fd21@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <efeb86f4-2752-975b-a5c9-bd08deb7fd21@kernel.dk>
+Return-Path: zhangweiping@didichuxing.com
+List-ID: <linux-block@vger.kernel.org>
 
-We need to iterate ctx starting from any ctx in round robin
-way, so introduce this helper.
+On Thu, Sep 21, 2017 at 10:38:22AM -0600, Jens Axboe wrote:
+> On 09/21/2017 09:17 AM, weiping zhang wrote:
+> > Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+> > ---
+> >  block/blk-sysfs.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> > index b8362c0..03a6e19 100644
+> > --- a/block/blk-sysfs.c
+> > +++ b/block/blk-sysfs.c
+> > @@ -75,7 +75,7 @@ queue_requests_store(struct request_queue *q, const char *page, size_t count)
+> >  		return ret;
+> >  
+> >  	if (nr < BLKDEV_MIN_RQ)
+> > -		nr = BLKDEV_MIN_RQ;
+> > +		return -EINVAL;
+> 
+> This is potentially breaking existing scripts.
+> 
+I just want this keep same behavior with the too larger case, If this
+may make other side effect, I drop this patch.
 
-Cc: Omar Sandoval <osandov@fb.com>
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Tested-by: Tom Nguyen <tom81094@gmail.com>
-Tested-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- include/linux/sbitmap.h | 64 ++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 47 insertions(+), 17 deletions(-)
-
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index a1904aadbc45..0dcc60e820de 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -211,10 +211,14 @@ bool sbitmap_any_bit_set(const struct sbitmap *sb);
-  */
- bool sbitmap_any_bit_clear(const struct sbitmap *sb);
- 
-+#define SB_NR_TO_INDEX(sb, bitnr) ((bitnr) >> (sb)->shift)
-+#define SB_NR_TO_BIT(sb, bitnr) ((bitnr) & ((1U << (sb)->shift) - 1U))
-+
- typedef bool (*sb_for_each_fn)(struct sbitmap *, unsigned int, void *);
- 
- /**
-- * sbitmap_for_each_set() - Iterate over each set bit in a &struct sbitmap.
-+ * __sbitmap_for_each_set() - Iterate over each set bit in a &struct sbitmap.
-+ * @start: Where to start the iteration.
-  * @sb: Bitmap to iterate over.
-  * @fn: Callback. Should return true to continue or false to break early.
-  * @data: Pointer to pass to callback.
-@@ -222,35 +226,61 @@ typedef bool (*sb_for_each_fn)(struct sbitmap *, unsigned int, void *);
-  * This is inline even though it's non-trivial so that the function calls to the
-  * callback will hopefully get optimized away.
-  */
--static inline void sbitmap_for_each_set(struct sbitmap *sb, sb_for_each_fn fn,
--					void *data)
-+static inline void __sbitmap_for_each_set(struct sbitmap *sb,
-+					  unsigned int start,
-+					  sb_for_each_fn fn, void *data)
- {
--	unsigned int i;
-+	unsigned int index;
-+	unsigned int nr;
-+	unsigned int scanned = 0;
- 
--	for (i = 0; i < sb->map_nr; i++) {
--		struct sbitmap_word *word = &sb->map[i];
--		unsigned int off, nr;
-+	if (start >= sb->depth)
-+		start = 0;
-+	index = SB_NR_TO_INDEX(sb, start);
-+	nr = SB_NR_TO_BIT(sb, start);
- 
--		if (!word->word)
--			continue;
-+	while (scanned < sb->depth) {
-+		struct sbitmap_word *word = &sb->map[index];
-+		unsigned int depth = min_t(unsigned int, word->depth - nr,
-+					   sb->depth - scanned);
- 
--		nr = 0;
--		off = i << sb->shift;
-+		scanned += depth;
-+		if (!word->word)
-+			goto next;
-+
-+		/*
-+		 * On the first iteration of the outer loop, we need to add the
-+		 * bit offset back to the size of the word for find_next_bit().
-+		 * On all other iterations, nr is zero, so this is a noop.
-+		 */
-+		depth += nr;
- 		while (1) {
--			nr = find_next_bit(&word->word, word->depth, nr);
--			if (nr >= word->depth)
-+			nr = find_next_bit(&word->word, depth, nr);
-+			if (nr >= depth)
- 				break;
--
--			if (!fn(sb, off + nr, data))
-+			if (!fn(sb, (index << sb->shift) + nr, data))
- 				return;
- 
- 			nr++;
- 		}
-+next:
-+		nr = 0;
-+		if (++index >= sb->map_nr)
-+			index = 0;
- 	}
- }
- 
--#define SB_NR_TO_INDEX(sb, bitnr) ((bitnr) >> (sb)->shift)
--#define SB_NR_TO_BIT(sb, bitnr) ((bitnr) & ((1U << (sb)->shift) - 1U))
-+/**
-+ * sbitmap_for_each_set() - Iterate over each set bit in a &struct sbitmap.
-+ * @sb: Bitmap to iterate over.
-+ * @fn: Callback. Should return true to continue or false to break early.
-+ * @data: Pointer to pass to callback.
-+ */
-+static inline void sbitmap_for_each_set(struct sbitmap *sb, sb_for_each_fn fn,
-+					void *data)
-+{
-+	__sbitmap_for_each_set(sb, 0, fn, data);
-+}
- 
- static inline unsigned long *__sbitmap_word(struct sbitmap *sb,
- 					    unsigned int bitnr)
--- 
-2.9.5
+Thanks
+weiping
