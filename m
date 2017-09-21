@@ -1,90 +1,86 @@
-Return-Path: <prvs=41667da50=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V2 01/12] block: Fix declaration of blk-mq debugfs functions
-Date: Fri,  8 Sep 2017 01:16:29 +0900
-Message-Id: <20170907161640.30465-2-damien.lemoal@wdc.com>
-In-Reply-To: <20170907161640.30465-1-damien.lemoal@wdc.com>
-References: <20170907161640.30465-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga04.intel.com ([192.55.52.120]:63935 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751804AbdIULYJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Sep 2017 07:24:09 -0400
+Subject: Re: [PATCH V8 12/14] mmc: block: Add CQE and blk-mq support
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <1505302814-19313-1-git-send-email-adrian.hunter@intel.com>
+ <1505302814-19313-13-git-send-email-adrian.hunter@intel.com>
+ <CAPDyKFrJSsF-QLBe13c6huOvJngirm5D1m=JJSkbX2n9ruoFQg@mail.gmail.com>
+From: Adrian Hunter <adrian.hunter@intel.com>
+Message-ID: <013d1177-7c6e-4d32-bacb-5912d9e66753@intel.com>
+Date: Thu, 21 Sep 2017 14:17:24 +0300
+MIME-Version: 1.0
+In-Reply-To: <CAPDyKFrJSsF-QLBe13c6huOvJngirm5D1m=JJSkbX2n9ruoFQg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-__blk_mq_debugfs_rq_show() and blk_mq_debugfs_rq_show() are exported
-symbols but ar eonly declared in the block internal file
-block/blk-mq-debugfs.h. which is not cleanly accessible to files outside
-of the block directory.
-Move the declaration of these functions to the new file
-include/linux/blk-mq-debugfs.h file to make the declarations cleanly
-available to other modules.
+On 21/09/17 12:59, Ulf Hansson wrote:
+> On 13 September 2017 at 13:40, Adrian Hunter <adrian.hunter@intel.com> wrote:
+>> Add CQE support to the block driver, including:
+>>     - optionally using DCMD for flush requests
+>>     - "manually" issuing discard requests
+>>     - issuing read / write requests to the CQE
+>>     - supporting block-layer timeouts
+>>     - handling recovery
+>>     - supporting re-tuning
+>>
+>> CQE offers 25% - 50% better random multi-threaded I/O.  There is a slight
+>> (e.g. 2%) drop in sequential read speed but no observable change to sequential
+>> write.
+>>
+>> CQE automatically sends the commands to complete requests.  However it only
+>> supports reads / writes and so-called "direct commands" (DCMD).  Furthermore
+>> DCMD is limited to one command at a time, but discards require 3 commands.
+>> That makes issuing discards through CQE very awkward, but some CQE's don't
+>> support DCMD anyway.  So for discards, the existing non-CQE approach is
+>> taken, where the mmc core code issues the 3 commands one at a time i.e.
+>> mmc_erase(). Where DCMD is used, is for issuing flushes.
+>>
+>> For host controllers without CQE support, blk-mq support is extended to
+>> synchronous reads/writes or, if the host supports CAP_WAIT_WHILE_BUSY,
+>> asynchonous reads/writes.  The advantage of asynchronous reads/writes is
+>> that it allows the preparation of the next request while the current
+>> request is in progress.
+>>
+>> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+>> ---
+>>  drivers/mmc/core/block.c | 734 ++++++++++++++++++++++++++++++++++++++++++++++-
+>>  drivers/mmc/core/block.h |   8 +
+>>  drivers/mmc/core/queue.c | 428 +++++++++++++++++++++++++--
+>>  drivers/mmc/core/queue.h |  54 +++-
+>>  4 files changed, 1192 insertions(+), 32 deletions(-)
+> 
+> Adrian, this is just too hard for me to review. Please, can you split this up?
+> 
+> At least enabling mq support should be done in a separate and first
+> step, then you could add the CQE bits on top.
+> 
+> I think that is important, because we want to make sure the mq
+> deployment is done correctly first. Otherwise it becomes impossible to
+> narrow down problems, because those could then be either CQE related
+> or mq related.
 
-While at it, also move the definition of the blk_mq_debugfs_attr
-structure to allow scheduler modules outside of the block directory to
-define debugfs attributes.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/blk-mq-debugfs.h         | 14 +-------------
- include/linux/blk-mq-debugfs.h | 23 +++++++++++++++++++++++
- 2 files changed, 24 insertions(+), 13 deletions(-)
- create mode 100644 include/linux/blk-mq-debugfs.h
-
-diff --git a/block/blk-mq-debugfs.h b/block/blk-mq-debugfs.h
-index a182e6f97565..4ffeae84b83a 100644
---- a/block/blk-mq-debugfs.h
-+++ b/block/blk-mq-debugfs.h
-@@ -3,19 +3,7 @@
- 
- #ifdef CONFIG_BLK_DEBUG_FS
- 
--#include <linux/seq_file.h>
--
--struct blk_mq_debugfs_attr {
--	const char *name;
--	umode_t mode;
--	int (*show)(void *, struct seq_file *);
--	ssize_t (*write)(void *, const char __user *, size_t, loff_t *);
--	/* Set either .show or .seq_ops. */
--	const struct seq_operations *seq_ops;
--};
--
--int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq);
--int blk_mq_debugfs_rq_show(struct seq_file *m, void *v);
-+#include <linux/blk-mq-debugfs.h>
- 
- int blk_mq_debugfs_register(struct request_queue *q);
- void blk_mq_debugfs_unregister(struct request_queue *q);
-diff --git a/include/linux/blk-mq-debugfs.h b/include/linux/blk-mq-debugfs.h
-new file mode 100644
-index 000000000000..211537f61dce
---- /dev/null
-+++ b/include/linux/blk-mq-debugfs.h
-@@ -0,0 +1,23 @@
-+#ifndef BLK_MQ_DEBUGFS_H
-+#define BLK_MQ_DEBUGFS_H
-+
-+#ifdef CONFIG_BLK_DEBUG_FS
-+
-+#include <linux/blkdev.h>
-+#include <linux/seq_file.h>
-+
-+struct blk_mq_debugfs_attr {
-+	const char *name;
-+	umode_t mode;
-+	int (*show)(void *, struct seq_file *);
-+	ssize_t (*write)(void *, const char __user *, size_t, loff_t *);
-+	/* Set either .show or .seq_ops. */
-+	const struct seq_operations *seq_ops;
-+};
-+
-+int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq);
-+int blk_mq_debugfs_rq_show(struct seq_file *m, void *v);
-+
-+#endif
-+
-+#endif
--- 
-2.13.5
+I looked at splitting it up, but it makes more sense together.  Things are
+the way they are to support all the different issue types.  It reads much
+better together.  The CQE functions are named appropriately and practically
+all the code is new, so it is not as though there are any intermediate steps.
