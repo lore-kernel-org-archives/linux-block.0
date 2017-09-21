@@ -1,95 +1,84 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:35944 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752249AbdIMLr0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Sep 2017 07:47:26 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V8 06/14] mmc: block: Prepare CQE data
-Date: Wed, 13 Sep 2017 14:40:06 +0300
-Message-Id: <1505302814-19313-7-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1505302814-19313-1-git-send-email-adrian.hunter@intel.com>
-References: <1505302814-19313-1-git-send-email-adrian.hunter@intel.com>
+Received: from mail-wm0-f51.google.com ([74.125.82.51]:49807 "EHLO
+        mail-wm0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751706AbdIULOG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Sep 2017 07:14:06 -0400
+Received: by mail-wm0-f51.google.com with SMTP id r74so772800wme.4
+        for <linux-block@vger.kernel.org>; Thu, 21 Sep 2017 04:14:05 -0700 (PDT)
+Subject: Re: [PATCH V2] lightnvm: protect target type list with correct locks
+To: =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <jg@lightnvm.io>,
+        Rakesh Pandit <rakesh@tuxera.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20170916183931.GA2824@hercules.tuxera.com>
+ <3891AF6A-D87D-4727-BF9C-E6689C232BC9@lightnvm.io>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <dbbfb813-714b-c0cf-9ecd-454ccbee24ad@lightnvm.io>
+Date: Thu, 21 Sep 2017 13:14:03 +0200
+MIME-Version: 1.0
+In-Reply-To: <3891AF6A-D87D-4727-BF9C-E6689C232BC9@lightnvm.io>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Enhance mmc_blk_data_prep() to support CQE requests. That means adding
-some things that for non-CQE requests would be encoded into the command
-arguments - such as the block address, reliable-write flag, and data tag
-flag. Also the request tag is needed to provide the command queue task id,
-and a comment is added to explain the future possibility of defining a
-priority.
+On 09/18/2017 09:53 AM, Javier González wrote:
+>> On 16 Sep 2017, at 20.39, Rakesh Pandit <rakesh@tuxera.com> wrote:
+>>
+>> nvm_tgt_types list was protected by wrong lock for NVM_INFO ioctl call
+>> and can race with addition or removal of target types.  Also
+>> unregistering target type was not protected correctly.
+>>
+>> Fixes: 5cd907853 ("lightnvm: remove nested lock conflict with mm")
+>> Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+>> ---
+>>
+>> V2: also add correct lock while unregistering and fix "Fixes" tag at
+>> end.  Note I found these while investigating another issue and
+>> skimming the core code but worth fixing.
+>>
+>> drivers/lightnvm/core.c | 8 ++++----
+>> 1 file changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+>> index 9f9a137..1b8338d 100644
+>> --- a/drivers/lightnvm/core.c
+>> +++ b/drivers/lightnvm/core.c
+>> @@ -589,9 +589,9 @@ void nvm_unregister_tgt_type(struct nvm_tgt_type *tt)
+>> 	if (!tt)
+>> 		return;
+>>
+>> -	down_write(&nvm_lock);
+>> +	down_write(&nvm_tgtt_lock);
+>> 	list_del(&tt->list);
+>> -	up_write(&nvm_lock);
+>> +	up_write(&nvm_tgtt_lock);
+>> }
+>> EXPORT_SYMBOL(nvm_unregister_tgt_type);
+>>
+>> @@ -1190,7 +1190,7 @@ static long nvm_ioctl_info(struct file *file, void __user *arg)
+>> 	info->version[1] = NVM_VERSION_MINOR;
+>> 	info->version[2] = NVM_VERSION_PATCH;
+>>
+>> -	down_write(&nvm_lock);
+>> +	down_write(&nvm_tgtt_lock);
+>> 	list_for_each_entry(tt, &nvm_tgt_types, list) {
+>> 		struct nvm_ioctl_info_tgt *tgt = &info->tgts[tgt_iter];
+>>
+>> @@ -1203,7 +1203,7 @@ static long nvm_ioctl_info(struct file *file, void __user *arg)
+>> 	}
+>>
+>> 	info->tgtsize = tgt_iter;
+>> -	up_write(&nvm_lock);
+>> +	up_write(&nvm_tgtt_lock);
+>>
+>> 	if (copy_to_user(arg, info, sizeof(struct nvm_ioctl_info))) {
+>> 		kfree(info);
+>> --
+>> 2.7.4
+> 
+> LGTM.
+> 
+> Reviewed-by: Javier González <javier@cnexlabs.com>
+> 
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/core/block.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index 1ec5f0bc98d2..2424c7360687 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -1554,6 +1554,7 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
- 	memset(brq, 0, sizeof(struct mmc_blk_request));
- 
- 	brq->mrq.data = &brq->data;
-+	brq->mrq.tag = req->tag;
- 
- 	brq->stop.opcode = MMC_STOP_TRANSMISSION;
- 	brq->stop.arg = 0;
-@@ -1568,6 +1569,14 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
- 
- 	brq->data.blksz = 512;
- 	brq->data.blocks = blk_rq_sectors(req);
-+	brq->data.blk_addr = blk_rq_pos(req);
-+
-+	/*
-+	 * The command queue supports 2 priorities: "high" (1) and "simple" (0).
-+	 * The eMMC will give "high" priority tasks priority over "simple"
-+	 * priority tasks. Here we always set "simple" priority by not setting
-+	 * MMC_DATA_PRIO.
-+	 */
- 
- 	/*
- 	 * The block layer doesn't support all sector count
-@@ -1597,8 +1606,10 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
- 						brq->data.blocks);
- 	}
- 
--	if (do_rel_wr)
-+	if (do_rel_wr) {
- 		mmc_apply_rel_rw(brq, card, req);
-+		brq->data.flags |= MMC_DATA_REL_WR;
-+	}
- 
- 	/*
- 	 * Data tag is used only during writing meta data to speed
-@@ -1610,6 +1621,9 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
- 		      ((brq->data.blocks * brq->data.blksz) >=
- 		       card->ext_csd.data_tag_unit_size);
- 
-+	if (do_data_tag)
-+		brq->data.flags |= MMC_DATA_DAT_TAG;
-+
- 	mmc_set_data_timeout(&brq->data, card);
- 
- 	brq->data.sg = mqrq->sg;
--- 
-1.9.1
+Thanks Rakesh.
