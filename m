@@ -1,130 +1,81 @@
-Return-Path: <prvs=4336ae8ff=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
+Return-Path: <prvs=430e6b2f0=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
 	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V4 01/16] scsi: sd_zbc: Move ZBC declarations to scsi_proto.h
-Date: Sun, 24 Sep 2017 16:02:32 +0900
-Message-Id: <20170924070247.25560-2-damien.lemoal@wdc.com>
-In-Reply-To: <20170924070247.25560-1-damien.lemoal@wdc.com>
-References: <20170924070247.25560-1-damien.lemoal@wdc.com>
+	=Oleksandr Natalenko <oleksandr@natalenko.name>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH v2 2/4] block: Add the QUEUE_PREEMPT_ONLY request queue flag
+Date: Thu, 21 Sep 2017 14:22:53 -0700
+Message-Id: <20170921212255.12788-3-bart.vanassche@wdc.com>
+In-Reply-To: <20170921212255.12788-1-bart.vanassche@wdc.com>
+References: <20170921212255.12788-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Move standard macro definitions for the zone types and zone conditions
-to scsi_proto.h together with the definitions related to the
-REPORT ZONES command. While at it, define all values in the enums to
-be clear.
+This flag will be used in the next patch to let the block layer
+core know whether or not a SCSI request queue has been quiesced.
+A quiesced SCSI queue namely only processes RQF_PREEMPT requests.
 
-Also remove unnecessary includes in sd_zbc.c.
-
-No functional change is introduced by this patch.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Bart Van Assche <Bart.VanAssche@wdc.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/scsi/sd_zbc.c     | 24 ------------------------
- include/scsi/scsi_proto.h | 45 ++++++++++++++++++++++++++++++++++-----------
- 2 files changed, 34 insertions(+), 35 deletions(-)
+ block/blk-core.c       | 13 +++++++++++++
+ include/linux/blkdev.h |  5 +++++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index 8aa54779aac1..692c8cbc7ed8 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -28,32 +28,8 @@
+diff --git a/block/blk-core.c b/block/blk-core.c
+index d709c0e3a2ac..1ac337712bbd 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -346,6 +346,19 @@ void blk_sync_queue(struct request_queue *q)
+ }
+ EXPORT_SYMBOL(blk_sync_queue);
  
- #include <scsi/scsi.h>
- #include <scsi/scsi_cmnd.h>
--#include <scsi/scsi_dbg.h>
--#include <scsi/scsi_device.h>
--#include <scsi/scsi_driver.h>
--#include <scsi/scsi_host.h>
--#include <scsi/scsi_eh.h>
- 
- #include "sd.h"
--#include "scsi_priv.h"
--
--enum zbc_zone_type {
--	ZBC_ZONE_TYPE_CONV = 0x1,
--	ZBC_ZONE_TYPE_SEQWRITE_REQ,
--	ZBC_ZONE_TYPE_SEQWRITE_PREF,
--	ZBC_ZONE_TYPE_RESERVED,
--};
--
--enum zbc_zone_cond {
--	ZBC_ZONE_COND_NO_WP,
--	ZBC_ZONE_COND_EMPTY,
--	ZBC_ZONE_COND_IMP_OPEN,
--	ZBC_ZONE_COND_EXP_OPEN,
--	ZBC_ZONE_COND_CLOSED,
--	ZBC_ZONE_COND_READONLY = 0xd,
--	ZBC_ZONE_COND_FULL,
--	ZBC_ZONE_COND_OFFLINE,
--};
- 
++void blk_set_preempt_only(struct request_queue *q, bool preempt_only)
++{
++	unsigned long flags;
++
++	spin_lock_irqsave(q->queue_lock, flags);
++	if (preempt_only)
++		queue_flag_set(QUEUE_FLAG_PREEMPT_ONLY, q);
++	else
++		queue_flag_clear(QUEUE_FLAG_PREEMPT_ONLY, q);
++	spin_unlock_irqrestore(q->queue_lock, flags);
++}
++EXPORT_SYMBOL(blk_set_preempt_only);
++
  /**
-  * Convert a zone descriptor to a zone struct.
-diff --git a/include/scsi/scsi_proto.h b/include/scsi/scsi_proto.h
-index 8c285d9a06d8..39130a9c05bf 100644
---- a/include/scsi/scsi_proto.h
-+++ b/include/scsi/scsi_proto.h
-@@ -301,19 +301,42 @@ struct scsi_lun {
+  * __blk_run_queue_uncond - run a queue whether or not it has been stopped
+  * @q:	The queue to run
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index cd26901a6e25..5bd87599eed0 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -627,6 +627,7 @@ struct request_queue {
+ #define QUEUE_FLAG_REGISTERED  26	/* queue has been registered to a disk */
+ #define QUEUE_FLAG_SCSI_PASSTHROUGH 27	/* queue supports SCSI commands */
+ #define QUEUE_FLAG_QUIESCED    28	/* queue has been quiesced */
++#define QUEUE_FLAG_PREEMPT_ONLY	29	/* only process REQ_PREEMPT requests */
  
- /* Reporting options for REPORT ZONES */
- enum zbc_zone_reporting_options {
--	ZBC_ZONE_REPORTING_OPTION_ALL = 0,
--	ZBC_ZONE_REPORTING_OPTION_EMPTY,
--	ZBC_ZONE_REPORTING_OPTION_IMPLICIT_OPEN,
--	ZBC_ZONE_REPORTING_OPTION_EXPLICIT_OPEN,
--	ZBC_ZONE_REPORTING_OPTION_CLOSED,
--	ZBC_ZONE_REPORTING_OPTION_FULL,
--	ZBC_ZONE_REPORTING_OPTION_READONLY,
--	ZBC_ZONE_REPORTING_OPTION_OFFLINE,
--	ZBC_ZONE_REPORTING_OPTION_NEED_RESET_WP = 0x10,
--	ZBC_ZONE_REPORTING_OPTION_NON_SEQWRITE,
--	ZBC_ZONE_REPORTING_OPTION_NON_WP = 0x3f,
-+	ZBC_ZONE_REPORTING_OPTION_ALL		= 0x00,
-+	ZBC_ZONE_REPORTING_OPTION_EMPTY		= 0x01,
-+	ZBC_ZONE_REPORTING_OPTION_IMPLICIT_OPEN	= 0x02,
-+	ZBC_ZONE_REPORTING_OPTION_EXPLICIT_OPEN	= 0x03,
-+	ZBC_ZONE_REPORTING_OPTION_CLOSED	= 0x04,
-+	ZBC_ZONE_REPORTING_OPTION_FULL		= 0x05,
-+	ZBC_ZONE_REPORTING_OPTION_READONLY	= 0x06,
-+	ZBC_ZONE_REPORTING_OPTION_OFFLINE	= 0x07,
-+	/* 0x08 to 0x0f are reserved */
-+	ZBC_ZONE_REPORTING_OPTION_NEED_RESET_WP	= 0x10,
-+	ZBC_ZONE_REPORTING_OPTION_NON_SEQWRITE	= 0x11,
-+	/* 0x12 to 0x3e are reserved */
-+	ZBC_ZONE_REPORTING_OPTION_NON_WP	= 0x3f,
- };
- 
- #define ZBC_REPORT_ZONE_PARTIAL 0x80
- 
-+/* Zone types of REPORT ZONES zone descriptors */
-+enum zbc_zone_type {
-+	ZBC_ZONE_TYPE_CONV		= 0x1,
-+	ZBC_ZONE_TYPE_SEQWRITE_REQ	= 0x2,
-+	ZBC_ZONE_TYPE_SEQWRITE_PREF	= 0x3,
-+	/* 0x4 to 0xf are reserved */
-+};
+ #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
+ 				 (1 << QUEUE_FLAG_STACKABLE)	|	\
+@@ -731,6 +732,10 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
+ 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
+ 			     REQ_FAILFAST_DRIVER))
+ #define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
++#define blk_queue_preempt_only(q)				\
++	test_bit(QUEUE_FLAG_PREEMPT_ONLY, &(q)->queue_flags)
 +
-+/* Zone conditions of REPORT ZONES zone descriptors */
-+enum zbc_zone_cond {
-+	ZBC_ZONE_COND_NO_WP		= 0x0,
-+	ZBC_ZONE_COND_EMPTY		= 0x1,
-+	ZBC_ZONE_COND_IMP_OPEN		= 0x2,
-+	ZBC_ZONE_COND_EXP_OPEN		= 0x3,
-+	ZBC_ZONE_COND_CLOSED		= 0x4,
-+	/* 0x5 to 0xc are reserved */
-+	ZBC_ZONE_COND_READONLY		= 0xd,
-+	ZBC_ZONE_COND_FULL		= 0xe,
-+	ZBC_ZONE_COND_OFFLINE		= 0xf,
-+};
-+
- #endif /* _SCSI_PROTO_H_ */
++extern void blk_set_preempt_only(struct request_queue *q, bool preempt_only);
+ 
+ static inline bool blk_account_rq(struct request *rq)
+ {
 -- 
-2.13.5
+2.14.1
