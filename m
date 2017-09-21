@@ -1,45 +1,71 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	axboe@kernel.dk
-Cc: bcache@lists.ewheeler.net,
-	Coly Li <colyli@suse.de>
-Subject: [PATCH 00/13] bcache: fixes and update for 4.14
-Date: Wed,  6 Sep 2017 14:25:50 +0800
-Message-Id: <20170906062602.50497-1-colyli@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f52.google.com ([74.125.82.52]:49933 "EHLO
+        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751810AbdIULOZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Sep 2017 07:14:25 -0400
+Received: by mail-wm0-f52.google.com with SMTP id r74so775280wme.4
+        for <linux-block@vger.kernel.org>; Thu, 21 Sep 2017 04:14:25 -0700 (PDT)
+Subject: Re: [PATCH] lightnvm: remove already calculated nr_chnls
+To: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <m@bjorling.me>,
+        Javier Gonzalez <jg@lightnvm.io>
+Cc: Rakesh Pandit <rakesh@tuxera.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <20170917210412.GA2879@hercules.tuxera.com>
+ <C22FF934-D7A2-4B1F-8172-011E596A5EE8@lightnvm.io>
+ <CAOu_J6nFO1iqGvZgDQxPdgoAKhoOAvgR6e7gSeKhS9yq=orZqg@mail.gmail.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <8daba9d7-30a3-2c92-764c-a01b6d85572c@lightnvm.io>
+Date: Thu, 21 Sep 2017 13:14:23 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAOu_J6nFO1iqGvZgDQxPdgoAKhoOAvgR6e7gSeKhS9yq=orZqg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Jens,
+On 09/18/2017 12:56 PM, Matias Bjørling wrote:
+> 
+> 
+> Den 18. sep. 2017 09.56 skrev "Javier González" <jg@lightnvm.io 
+> <mailto:jg@lightnvm.io>>:
+> 
+>      > On 17 Sep 2017, at 23.04, Rakesh Pandit <rakesh@tuxera.com
+>     <mailto:rakesh@tuxera.com>> wrote:
+>      >
+>      > Remove repeated calculation for number of channels while creating a
+>      > target device.
+>      >
+>      > Signed-off-by: Rakesh Pandit <rakesh@tuxera.com
+>     <mailto:rakesh@tuxera.com>>
+>      > ---
+>      >
+>      > This is also a trivial change I found while investigating/working on
+>      > other issue.
+>      >
+>      > drivers/lightnvm/core.c | 1 -
+>      > 1 file changed, 1 deletion(-)
+>      >
+>      > diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+>      > index 1b8338d..01536b8 100644
+>      > --- a/drivers/lightnvm/core.c
+>      > +++ b/drivers/lightnvm/core.c
+>      > @@ -139,7 +139,6 @@ static struct nvm_tgt_dev
+>     *nvm_create_tgt_dev(struct nvm_dev *dev,
+>      >       int prev_nr_luns;
+>      >       int i, j;
+>      >
+>      > -     nr_chnls = nr_luns / dev->geo.luns_per_chnl;
+>      >       nr_chnls = (nr_chnls_mod == 0) ? nr_chnls : nr_chnls + 1;
+>      >
+>      >       dev_map = kmalloc(sizeof(struct nvm_dev_map), GFP_KERNEL);
+>      > --
+>      > 2.7.4
+> 
+>     We wanted to make sure that nr_chnls was really, really set :)
+> 
+>     Reviewed-by: Javier González <javier@cnexlabs.com
+>     <mailto:javier@cnexlabs.com>>
+> 
+> What the hell... must have been a patch or merge that went wrong.
 
-Here are 12 patchs for bcache fixes and updates, most of them were posted
-by Eric Wheeler in 4.13 merge window, but delayed due to lack of code
-review.
-
-The following patches are reviewed or acked by peer developers,
-	0001-bcache-Fix-leak-of-bdev-reference.patch
-	0002-bcache-fix-sequential-large-write-IO-bypass.patch
-	0003-bcache-do-not-subtract-sectors_to_gc-for-bypassed-IO.patch
-	0004-bcache-Don-t-reinvent-the-wheel-but-use-existing-lli.patch
-	0005-bcache-gc-does-not-work-when-triggering-by-manual-co.patch
-	0006-bcache-correct-cache_dirty_target-in-__update_writeb.patch
-	0007-bcache-Correct-return-value-for-sysfs-attach-errors.patch
-	0008-bcache-increase-the-number-of-open-buckets.patch
-	0009-bcache-fix-for-gc-and-write-back-race.patch
-	0010-bcache-silence-static-checker-warning.patch
-	0011-bcache-Update-continue_at-documentation.patch
-	0012-bcache-fix-bch_hprint-crash-and-improve-output.patch
-You may consider to pick them up if no other comments come up, especially
-0012-bcache-fix-bch_hprint-crash-and-improve-output.patch which fixes a
-potential serious security issue as author declears.
-
-I do basic test on the whole patch set, bcache works and behaves as
-expected. For futher bcache bug reports, I will follow up them.
-
-There are some other patches which does not pass my test currently,
-once they are fixed and reviewed by peer developers I will send them
-to you for 4.14 merge window.
-
-Thanks in advance.
-
-Coly Li
+Thanks Rakesh. I pulled it in for 4.15.
