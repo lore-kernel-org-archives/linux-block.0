@@ -1,47 +1,56 @@
-Return-Path: <prvs=410ad2225=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH 7/8] scsi: sd_zbc: Disable zone write locking with scsi-mq
-Date: Fri,  1 Sep 2017 20:36:30 +0900
-Message-Id: <20170901113631.12323-8-damien.lemoal@wdc.com>
-In-Reply-To: <20170901113631.12323-1-damien.lemoal@wdc.com>
-References: <20170901113631.12323-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:37852 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751707AbdIUNlw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Sep 2017 09:41:52 -0400
+Received: by mail-wm0-f65.google.com with SMTP id f4so5248955wmh.4
+        for <linux-block@vger.kernel.org>; Thu, 21 Sep 2017 06:41:51 -0700 (PDT)
+Subject: Re: [PATCH V2] lightnvm: include NVM Express driver if OCSSD is
+ selected for build
+To: Rakesh Pandit <rakesh@tuxera.com>,
+        =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <jg@lightnvm.io>
+References: <20170921134123.GA29325@dhcp-216.srv.tuxera.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <m@bjorling.me>
+Message-ID: <5259c471-285d-c361-ac68-2907e69aba79@bjorling.me>
+Date: Thu, 21 Sep 2017 15:41:49 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170921134123.GA29325@dhcp-216.srv.tuxera.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-In the case of a ZBC disk used with scsi-mq, zone write locking does
-not prevent write reordering in sequential zones. Unlike the legacy
-case, zone locking can only be done after the command request is
-removed from the scheduler dispatch queue. That is, at the time of
-zone locking, the write command may already be out of order.
 
-Disable zone write locking in sd_zbc_write_lock_zone() if the disk is
-used with scsi-mq. Write order guarantees can be provided by an
-adapted I/O scheduler.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- drivers/scsi/sd_zbc.c | 4 ++++
- 1 file changed, 4 insertions(+)
+On 09/21/2017 03:41 PM, Rakesh Pandit wrote:
+> Because NVM needs BLK_DEV_NVME, select it automatically if we mark NVM
+> in config file before building kernel.  Also append PCI to depends as
+> select doesn't automatically add dependencies.
+> 
+> Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+> ---
+> 
+> V2: appends 'depends' with PCI
+> 
+>   drivers/lightnvm/Kconfig | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/lightnvm/Kconfig b/drivers/lightnvm/Kconfig
+> index ead61a9..2a953ef 100644
+> --- a/drivers/lightnvm/Kconfig
+> +++ b/drivers/lightnvm/Kconfig
+> @@ -4,7 +4,8 @@
+>   
+>   menuconfig NVM
+>   	bool "Open-Channel SSD target support"
+> -	depends on BLOCK && HAS_DMA
+> +	depends on BLOCK && HAS_DMA && PCI
+> +	select BLK_DEV_NVME
+>   	help
+>   	  Say Y here to get to enable Open-channel SSDs.
+>   
+> 
 
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index 3a9feadcc133..0f0a74fbd9c5 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -258,6 +258,10 @@ int sd_zbc_write_lock_zone(struct scsi_cmnd *cmd)
- 	    (sector & (zone_sectors - 1)) + blk_rq_sectors(rq) > zone_sectors)
- 		return BLKPREP_KILL;
- 
-+	/* No write locking with scsi-mq */
-+	if (rq->q->mq_ops)
-+		return BLKPREP_OK;
-+
- 	/*
- 	 * There is no write constraint on conventional zones, but do not issue
- 	 * more than one write at a time per sequential zone. This avoids write
--- 
-2.13.5
+Thanks Rakesh.
