@@ -1,106 +1,106 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from 22.17.110.36.static.bjtelecom.net ([36.110.17.22]:23228 "EHLO
+        BJEXCAS008.didichuxing.com" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1751724AbdIUNDZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Sep 2017 09:03:25 -0400
+Date: Thu, 21 Sep 2017 21:03:12 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: <axboe@kernel.dk>, Bart Van Assche <Bart.VanAssche@wdc.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: [PATCH] blk-mq: fix nr_requests wrong value when modify it from
  sysfs
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Message-ID: <20170921130312.GA11537@localhost.didichuxing.com>
 References: <20170903134634.GA27411@localhost.didichuxing.com>
  <1504626163.4135.33.camel@wdc.com>
  <20170906073355.GA37455@localhost.didichuxing.com>
  <1504702843.7750.0.camel@wdc.com>
  <20170912135732.GA7025@bogon.didichuxing.com>
- <20170921130312.GA11537@localhost.didichuxing.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <b3c8fa23-d8d4-36ae-5e86-2aa55d7f2675@kernel.dk>
-Date: Thu, 21 Sep 2017 08:09:47 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170921130312.GA11537@localhost.didichuxing.com>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <20170912135732.GA7025@bogon.didichuxing.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 09/21/2017 07:03 AM, weiping zhang wrote:
-> On Tue, Sep 12, 2017 at 09:57:32PM +0800, weiping zhang wrote:
->> On Wed, Sep 06, 2017 at 01:00:44PM +0000, Bart Van Assche wrote:
->>> On Wed, 2017-09-06 at 15:34 +0800, weiping zhang wrote:
->>>> On Tue, Sep 05, 2017 at 03:42:45PM +0000, Bart Van Assche wrote:
->>>>> On Sun, 2017-09-03 at 21:46 +0800, weiping zhang wrote:
->>>>>> if blk-mq use "none" io scheduler, nr_request get a wrong value when
->>>>>> input a number > tag_set->queue_depth. blk_mq_tag_update_depth will get
->>>>>> the smaller one min(nr, set->queue_depth), and then q->nr_request get a
->>>>>> wrong value.
->>>>>>
->>>>>> Reproduce:
->>>>>>
->>>>>> echo none > /sys/block/nvme0n1/queue/ioscheduler
->>>>>> echo 1000000 > /sys/block/nvme0n1/queue/nr_requests
->>>>>> cat /sys/block/nvme0n1/queue/nr_requests
->>>>>> 1000000
->>>>>>
->>>>>> Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
->>>>>> ---
->>>>>>  block/blk-mq.c | 7 +++++--
->>>>>>  1 file changed, 5 insertions(+), 2 deletions(-)
->>>>>>
->>>>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>>>>> index f84d145..8303e5e 100644
->>>>>> --- a/block/blk-mq.c
->>>>>> +++ b/block/blk-mq.c
->>>>>> @@ -2622,8 +2622,11 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
->>>>>>  		 * queue depth. This is similar to what the old code would do.
->>>>>>  		 */
->>>>>>  		if (!hctx->sched_tags) {
->>>>>> -			ret = blk_mq_tag_update_depth(hctx, &hctx->tags,
->>>>>> -							min(nr, set->queue_depth),
->>>>>> +			if (nr > set->queue_depth) {
->>>>>> +				nr = set->queue_depth;
->>>>>> +				pr_warn("reduce nr_request to %u\n", nr);
->>>>>> +			}
->>>>>> +			ret = blk_mq_tag_update_depth(hctx, &hctx->tags, nr,
->>>>>>  							false);
->>>>>>  		} else {
->>>>>>  			ret = blk_mq_tag_update_depth(hctx, &hctx->sched_tags,
->>>>>
->>>>> Shouldn't this code return -EINVAL or -ERANGE if 'nr' is too large? That will help to
->>>>> keep user space code simple that updates the queue depth.
->>>>
->>>> Hi Bart,
->>>>
->>>> The reason why not return -EINVAL is keeping alin with minimum checking in queue_requests_store,
->>>> if you insist return -EINVAL/-ERANGE, minimum checking should also keep
->>>> same behavior. Both return error meesage and quietly changing are okey
->>>> for me. Which way do you prefer ?
->>>>
->>>> static ssize_t
->>>> queue_requests_store(struct request_queue *q, const char *page, size_t count)
->>>> {
->>>> 	unsigned long nr;
->>>> 	int ret, err;
->>>>
->>>> 	if (!q->request_fn && !q->mq_ops)
->>>> 		return -EINVAL;
->>>>
->>>> 	ret = queue_var_store(&nr, page, count);
->>>> 	if (ret < 0)
->>>> 		return ret;
->>>>
->>>> 	if (nr < BLKDEV_MIN_RQ)
->>>> 		nr = BLKDEV_MIN_RQ;
->>>
->>> Hello Jens,
->>>
->>> Do you perhaps have a preference for one of the approaches that have been discussed
->>> in this e-mail thread?
->>>
->>> Thanks,
->>>
->>> Bart.
->>
-> Hello Jens,
+On Tue, Sep 12, 2017 at 09:57:32PM +0800, weiping zhang wrote:
+> On Wed, Sep 06, 2017 at 01:00:44PM +0000, Bart Van Assche wrote:
+> > On Wed, 2017-09-06 at 15:34 +0800, weiping zhang wrote:
+> > > On Tue, Sep 05, 2017 at 03:42:45PM +0000, Bart Van Assche wrote:
+> > > > On Sun, 2017-09-03 at 21:46 +0800, weiping zhang wrote:
+> > > > > if blk-mq use "none" io scheduler, nr_request get a wrong value when
+> > > > > input a number > tag_set->queue_depth. blk_mq_tag_update_depth will get
+> > > > > the smaller one min(nr, set->queue_depth), and then q->nr_request get a
+> > > > > wrong value.
+> > > > > 
+> > > > > Reproduce:
+> > > > > 
+> > > > > echo none > /sys/block/nvme0n1/queue/ioscheduler
+> > > > > echo 1000000 > /sys/block/nvme0n1/queue/nr_requests
+> > > > > cat /sys/block/nvme0n1/queue/nr_requests
+> > > > > 1000000
+> > > > > 
+> > > > > Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+> > > > > ---
+> > > > >  block/blk-mq.c | 7 +++++--
+> > > > >  1 file changed, 5 insertions(+), 2 deletions(-)
+> > > > > 
+> > > > > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > > > > index f84d145..8303e5e 100644
+> > > > > --- a/block/blk-mq.c
+> > > > > +++ b/block/blk-mq.c
+> > > > > @@ -2622,8 +2622,11 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+> > > > >  		 * queue depth. This is similar to what the old code would do.
+> > > > >  		 */
+> > > > >  		if (!hctx->sched_tags) {
+> > > > > -			ret = blk_mq_tag_update_depth(hctx, &hctx->tags,
+> > > > > -							min(nr, set->queue_depth),
+> > > > > +			if (nr > set->queue_depth) {
+> > > > > +				nr = set->queue_depth;
+> > > > > +				pr_warn("reduce nr_request to %u\n", nr);
+> > > > > +			}
+> > > > > +			ret = blk_mq_tag_update_depth(hctx, &hctx->tags, nr,
+> > > > >  							false);
+> > > > >  		} else {
+> > > > >  			ret = blk_mq_tag_update_depth(hctx, &hctx->sched_tags,
+> > > > 
+> > > > Shouldn't this code return -EINVAL or -ERANGE if 'nr' is too large? That will help to
+> > > > keep user space code simple that updates the queue depth.
+> > > 
+> > > Hi Bart,
+> > > 
+> > > The reason why not return -EINVAL is keeping alin with minimum checking in queue_requests_store,
+> > > if you insist return -EINVAL/-ERANGE, minimum checking should also keep
+> > > same behavior. Both return error meesage and quietly changing are okey
+> > > for me. Which way do you prefer ?
+> > > 
+> > > static ssize_t
+> > > queue_requests_store(struct request_queue *q, const char *page, size_t count)
+> > > {
+> > > 	unsigned long nr;
+> > > 	int ret, err;
+> > > 
+> > > 	if (!q->request_fn && !q->mq_ops)
+> > > 		return -EINVAL;
+> > > 
+> > > 	ret = queue_var_store(&nr, page, count);
+> > > 	if (ret < 0)
+> > > 		return ret;
+> > > 
+> > > 	if (nr < BLKDEV_MIN_RQ)
+> > > 		nr = BLKDEV_MIN_RQ;
+> > 
+> > Hello Jens,
+> > 
+> > Do you perhaps have a preference for one of the approaches that have been discussed
+> > in this e-mail thread?
+> > 
+> > Thanks,
+> > 
+> > Bart.
 > 
-> Would you please give some comments about this patch,
+Hello Jens,
 
-If someone writes a value that's too large, return -EINVAL and
-don't set it. Don't add weird debug printks.
+Would you please give some comments about this patch,
 
-
--- 
-Jens Axboe
+Thanks
+Weiping.
