@@ -1,56 +1,159 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <Bart.VanAssche@wdc.com>,
-        stable@vger.kernel.org
-Subject: [PATCH V4 05/16] scsi: sd_zbc: Fix sd_zbc_read_zoned_characteristics()
-Date: Sun, 24 Sep 2017 16:02:36 +0900
-Message-Id: <20170924070247.25560-6-damien.lemoal@wdc.com>
-In-Reply-To: <20170924070247.25560-1-damien.lemoal@wdc.com>
-References: <20170924070247.25560-1-damien.lemoal@wdc.com>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	lee.tibbert@gmail.com,
+	oleksandr@natalenko.name,
+	mirkomontanari91@gmail.com,
+	angeloruocco90@gmail.com,
+	mauro.andreolini@unimore.it,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENT 1/4] block, bfq: fix wrong init of saved start time for weight raising
+Date: Thu, 21 Sep 2017 11:04:00 +0200
+Message-Id: <20170921090403.3217-2-paolo.valente@linaro.org>
+In-Reply-To: <20170921090403.3217-1-paolo.valente@linaro.org>
+References: <20170921090403.3217-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-The three values starting at byte 8 of the Zoned Block Device
-Characteristics VPD page B6h are 32 bits values, not 64bits. So use
-get_unaligned_be32() to retrieve the values and not get_unaligned_be64()
+This commit fixes a bug that causes bfq to fail to guarantee a high
+responsiveness on some drives, if there is heavy random read+write I/O
+in the background. More precisely, such a failure allowed this bug to
+be found [1], but the bug may well cause other yet unreported
+anomalies.
 
-Fixes: 89d947561077 ("sd: Implement support for ZBC devices")
-Cc: <stable@vger.kernel.org>
+BFQ raises the weight of the bfq_queues associated with soft real-time
+applications, to privilege the I/O, and thus reduce latency, for these
+applications. This mechanism is named soft-real-time weight raising in
+BFQ. A soft real-time period may happen to be nested into an
+interactive weight raising period, i.e., it may happen that, when a
+bfq_queue switches to a soft real-time weight-raised state, the
+bfq_queue is already being weight-raised because deemed interactive
+too. In this case, BFQ saves in a special variable
+wr_start_at_switch_to_srt, the time instant when the interactive
+weight-raising period started for the bfq_queue, i.e., the time
+instant when BFQ started to deem the bfq_queue interactive. This value
+is then used to check whether the interactive weight-raising period
+would still be in progress when the soft real-time weight-raising
+period ends.  If so, interactive weight raising is restored for the
+bfq_queue. This restore is useful, in particular, because it prevents
+bfq_queues from losing their interactive weight raising prematurely,
+as a consequence of spurious, short-lived soft real-time
+weight-raising periods caused by wrong detections as soft real-time.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Bart Van Assche <Bart.VanAssche@wdc.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+If, instead, a bfq_queue switches to soft-real-time weight raising
+while it *is not* already in an interactive weight-raising period,
+then the variable wr_start_at_switch_to_srt has no meaning during the
+following soft real-time weight-raising period. Unfortunately the
+handling of this case is wrong in BFQ: not only the variable is not
+flagged somehow as meaningless, but it is also set to the time when
+the switch to soft real-time weight-raising occurs. This may cause an
+interactive weight-raising period to be considered mistakenly as still
+in progress, and thus a spurious interactive weight-raising period to
+start for the bfq_queue, at the end of the soft-real-time
+weight-raising period. In particular the spurious interactive
+weight-raising period will be considered as still in progress, if the
+soft-real-time weight-raising period does not last very long. The
+bfq_queue will then be wrongly privileged and, if I/O bound, will
+unjustly steal bandwidth to truly interactive or soft real-time
+bfq_queues, harming responsiveness and low latency.
+
+This commit fixes this issue by just setting wr_start_at_switch_to_srt
+to minus infinity (farthest past time instant according to jiffies
+macros): when the soft-real-time weight-raising period ends, certainly
+no interactive weight-raising period will be considered as still in
+progress.
+
+[1] Background I/O Type: Random - Background I/O mix: Reads and writes
+- Application to start: LibreOffice Writer in
+http://www.phoronix.com/scan.php?page=news_item&px=Linux-4.13-IO-Laptop
+
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Angelo Ruocco <angeloruocco90@gmail.com>
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Tested-by: Lee Tibbert <lee.tibbert@gmail.com>
+Tested-by: Mirko Montanari <mirkomontanari91@gmail.com>
 ---
- drivers/scsi/sd_zbc.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ block/bfq-iosched.c | 50 +++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 31 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index bbad851c1789..27793b9f54c0 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -423,15 +423,15 @@ static int sd_zbc_read_zoned_characteristics(struct scsi_disk *sdkp,
- 	if (sdkp->device->type != TYPE_ZBC) {
- 		/* Host-aware */
- 		sdkp->urswrz = 1;
--		sdkp->zones_optimal_open = get_unaligned_be64(&buf[8]);
--		sdkp->zones_optimal_nonseq = get_unaligned_be64(&buf[12]);
-+		sdkp->zones_optimal_open = get_unaligned_be32(&buf[8]);
-+		sdkp->zones_optimal_nonseq = get_unaligned_be32(&buf[12]);
- 		sdkp->zones_max_open = 0;
- 	} else {
- 		/* Host-managed */
- 		sdkp->urswrz = buf[4] & 1;
- 		sdkp->zones_optimal_open = 0;
- 		sdkp->zones_optimal_nonseq = 0;
--		sdkp->zones_max_open = get_unaligned_be64(&buf[16]);
-+		sdkp->zones_max_open = get_unaligned_be32(&buf[16]);
- 	}
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index a4783da..c25955c 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -1202,6 +1202,24 @@ static unsigned int bfq_wr_duration(struct bfq_data *bfqd)
+ 	return dur;
+ }
  
- 	return 0;
++/*
++ * Return the farthest future time instant according to jiffies
++ * macros.
++ */
++static unsigned long bfq_greatest_from_now(void)
++{
++	return jiffies + MAX_JIFFY_OFFSET;
++}
++
++/*
++ * Return the farthest past time instant according to jiffies
++ * macros.
++ */
++static unsigned long bfq_smallest_from_now(void)
++{
++	return jiffies - MAX_JIFFY_OFFSET;
++}
++
+ static void bfq_update_bfqq_wr_on_rq_arrival(struct bfq_data *bfqd,
+ 					     struct bfq_queue *bfqq,
+ 					     unsigned int old_wr_coeff,
+@@ -1216,7 +1234,19 @@ static void bfq_update_bfqq_wr_on_rq_arrival(struct bfq_data *bfqd,
+ 			bfqq->wr_coeff = bfqd->bfq_wr_coeff;
+ 			bfqq->wr_cur_max_time = bfq_wr_duration(bfqd);
+ 		} else {
+-			bfqq->wr_start_at_switch_to_srt = jiffies;
++			/*
++			 * No interactive weight raising in progress
++			 * here: assign minus infinity to
++			 * wr_start_at_switch_to_srt, to make sure
++			 * that, at the end of the soft-real-time
++			 * weight raising periods that is starting
++			 * now, no interactive weight-raising period
++			 * may be wrongly considered as still in
++			 * progress (and thus actually started by
++			 * mistake).
++			 */
++			bfqq->wr_start_at_switch_to_srt =
++				bfq_smallest_from_now();
+ 			bfqq->wr_coeff = bfqd->bfq_wr_coeff *
+ 				BFQ_SOFTRT_WEIGHT_FACTOR;
+ 			bfqq->wr_cur_max_time =
+@@ -2897,24 +2927,6 @@ static unsigned long bfq_bfqq_softrt_next_start(struct bfq_data *bfqd,
+ 		   jiffies + nsecs_to_jiffies(bfqq->bfqd->bfq_slice_idle) + 4);
+ }
+ 
+-/*
+- * Return the farthest future time instant according to jiffies
+- * macros.
+- */
+-static unsigned long bfq_greatest_from_now(void)
+-{
+-	return jiffies + MAX_JIFFY_OFFSET;
+-}
+-
+-/*
+- * Return the farthest past time instant according to jiffies
+- * macros.
+- */
+-static unsigned long bfq_smallest_from_now(void)
+-{
+-	return jiffies - MAX_JIFFY_OFFSET;
+-}
+-
+ /**
+  * bfq_bfqq_expire - expire a queue.
+  * @bfqd: device owning the queue.
 -- 
-2.13.5
+2.10.0
