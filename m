@@ -1,62 +1,42 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Fri, 22 Sep 2017 07:53:28 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@lst.de" <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"hare@suse.com" <hare@suse.com>,
-	"jthumshirn@suse.de" <jthumshirn@suse.de>,
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "hch@lst.de" <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"hare@suse.com" <hare@suse.com>, "jthumshirn@suse.de" <jthumshirn@suse.de>,
 	"oleksandr@natalenko.name" <oleksandr@natalenko.name>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	"martin.petersen@oracle.com" <martin.petersen@oracle.com>
 Subject: Re: [PATCH v2 4/4] scsi-mq: Reduce suspend latency
-Message-ID: <20170921235327.GH6854@ming.t460p>
+Date: Thu, 21 Sep 2017 23:32:33 +0000
+Message-ID: <1506036752.2521.32.camel@wdc.com>
 References: <20170921212255.12788-1-bart.vanassche@wdc.com>
- <20170921212255.12788-5-bart.vanassche@wdc.com>
- <20170921220652.GD6854@ming.t460p>
- <1506033805.2521.27.camel@wdc.com>
- <20170921232543.GG6854@ming.t460p>
- <1506036752.2521.32.camel@wdc.com>
+	 <20170921212255.12788-5-bart.vanassche@wdc.com>
+	 <20170921220652.GD6854@ming.t460p> <1506033805.2521.27.camel@wdc.com>
+	 <20170921232543.GG6854@ming.t460p>
+In-Reply-To: <20170921232543.GG6854@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1506036752.2521.32.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Sep 21, 2017 at 11:32:33PM +0000, Bart Van Assche wrote:
-> On Fri, 2017-09-22 at 07:25 +0800, Ming Lei wrote:
-> > On Thu, Sep 21, 2017 at 10:43:26PM +0000, Bart Van Assche wrote:
-> > > On Fri, 2017-09-22 at 06:06 +0800, Ming Lei wrote:
-> > > > On Thu, Sep 21, 2017 at 02:22:55PM -0700, Bart Van Assche wrote:
-> > > > > +	} else {
-> > > > >  		scsi_run_queue(q);
-> > > > > +		while (atomic_read(&sdev->device_busy)) {
-> > > > > +			msleep_interruptible(200);
-> > > > > +			scsi_run_queue(q);
-> > > > > +		}
-> > > > 
-> > > > Are you sure only blk-mq need to drain queue? We need
-> > > > to do that for block legacy too.
-> > > 
-> > > The code above your comment drains the queue for the legacy block layer.
-> > 
-> > That is just draining the requests dispatched to SCSI layer, and there
-> > might be lots of requests in block I/O scheduler queue or requeue or
-> > whatever.
-> 
-> There is no requeue list for the legacy block layer. There is only a requeue
-> list for blk-mq.
-> 
-> Waiting for I/O requests that are in scheduler queues is not the purpose of
-> scsi_quiesce_device(). The purpose of that function is to wait for requests
-> that have already been started. The sdev->device_busy counter represents the
-> number of started requests so waiting until that counter has reached zero is
-> sufficient.
-
-Then that is simply not enough since the issue is that request pool can
-be used up easily when SCSI device is quiesced, then no request is left
-for RQF_PREEMPT(PM), and I/O hang is triggered.
-
-It has been discussed for long time, I am sorry you still don't
-understand it.
-
--- 
-Ming
+T24gRnJpLCAyMDE3LTA5LTIyIGF0IDA3OjI1ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
+VGh1LCBTZXAgMjEsIDIwMTcgYXQgMTA6NDM6MjZQTSArMDAwMCwgQmFydCBWYW4gQXNzY2hlIHdy
+b3RlOg0KPiA+IE9uIEZyaSwgMjAxNy0wOS0yMiBhdCAwNjowNiArMDgwMCwgTWluZyBMZWkgd3Jv
+dGU6DQo+ID4gPiBPbiBUaHUsIFNlcCAyMSwgMjAxNyBhdCAwMjoyMjo1NVBNIC0wNzAwLCBCYXJ0
+IFZhbiBBc3NjaGUgd3JvdGU6DQo+ID4gPiA+ICsJfSBlbHNlIHsNCj4gPiA+ID4gIAkJc2NzaV9y
+dW5fcXVldWUocSk7DQo+ID4gPiA+ICsJCXdoaWxlIChhdG9taWNfcmVhZCgmc2Rldi0+ZGV2aWNl
+X2J1c3kpKSB7DQo+ID4gPiA+ICsJCQltc2xlZXBfaW50ZXJydXB0aWJsZSgyMDApOw0KPiA+ID4g
+PiArCQkJc2NzaV9ydW5fcXVldWUocSk7DQo+ID4gPiA+ICsJCX0NCj4gPiA+IA0KPiA+ID4gQXJl
+IHlvdSBzdXJlIG9ubHkgYmxrLW1xIG5lZWQgdG8gZHJhaW4gcXVldWU/IFdlIG5lZWQNCj4gPiA+
+IHRvIGRvIHRoYXQgZm9yIGJsb2NrIGxlZ2FjeSB0b28uDQo+ID4gDQo+ID4gVGhlIGNvZGUgYWJv
+dmUgeW91ciBjb21tZW50IGRyYWlucyB0aGUgcXVldWUgZm9yIHRoZSBsZWdhY3kgYmxvY2sgbGF5
+ZXIuDQo+IA0KPiBUaGF0IGlzIGp1c3QgZHJhaW5pbmcgdGhlIHJlcXVlc3RzIGRpc3BhdGNoZWQg
+dG8gU0NTSSBsYXllciwgYW5kIHRoZXJlDQo+IG1pZ2h0IGJlIGxvdHMgb2YgcmVxdWVzdHMgaW4g
+YmxvY2sgSS9PIHNjaGVkdWxlciBxdWV1ZSBvciByZXF1ZXVlIG9yDQo+IHdoYXRldmVyLg0KDQpU
+aGVyZSBpcyBubyByZXF1ZXVlIGxpc3QgZm9yIHRoZSBsZWdhY3kgYmxvY2sgbGF5ZXIuIFRoZXJl
+IGlzIG9ubHkgYSByZXF1ZXVlDQpsaXN0IGZvciBibGstbXEuDQoNCldhaXRpbmcgZm9yIEkvTyBy
+ZXF1ZXN0cyB0aGF0IGFyZSBpbiBzY2hlZHVsZXIgcXVldWVzIGlzIG5vdCB0aGUgcHVycG9zZSBv
+Zg0Kc2NzaV9xdWllc2NlX2RldmljZSgpLiBUaGUgcHVycG9zZSBvZiB0aGF0IGZ1bmN0aW9uIGlz
+IHRvIHdhaXQgZm9yIHJlcXVlc3RzDQp0aGF0IGhhdmUgYWxyZWFkeSBiZWVuIHN0YXJ0ZWQuIFRo
+ZSBzZGV2LT5kZXZpY2VfYnVzeSBjb3VudGVyIHJlcHJlc2VudHMgdGhlDQpudW1iZXIgb2Ygc3Rh
+cnRlZCByZXF1ZXN0cyBzbyB3YWl0aW5nIHVudGlsIHRoYXQgY291bnRlciBoYXMgcmVhY2hlZCB6
+ZXJvIGlzDQpzdWZmaWNpZW50Lg0KDQpCYXJ0Lg==
