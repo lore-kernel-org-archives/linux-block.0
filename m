@@ -1,161 +1,183 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:34496 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752974AbdI3Lsa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Sep 2017 07:48:30 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 5/5] dm-rq: improve I/O merge by dealing with underlying STS_RESOURCE
-Date: Sat, 30 Sep 2017 19:46:52 +0800
-Message-Id: <20170930114652.32441-6-ming.lei@redhat.com>
-In-Reply-To: <20170930114652.32441-1-ming.lei@redhat.com>
-References: <20170930114652.32441-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jianchao.w.wang@oracle.com>
+From: Jianchao Wang <jianchao.w.wang@oracle.com>
+To: Jens Axboe <axboe@kernel.dk>, hch@infradead.org
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jianchao Wang <jianchao.w.wang@oracle.com>
+Subject: [PATCH v2] block: consider merge of segments when merge bio into rq
+Date: Fri, 22 Sep 2017 02:57:31 +0800
+Message-Id: <1506020251-24768-1-git-send-email-jianchao.w.wang@oracle.com>
+List-ID: <linux-block@vger.kernel.org>
 
-If the underlying queue returns BLK_STS_RESOURCE, we let dm-rq
-handle the requeue instead of blk-mq, then I/O merge can be
-improved because underlying's out-of-resource can be perceived
-and handled by dm-rq now.
+When account the nr_phys_segments during merging bios into rq,
+only consider segments merging in individual bio but not all
+the bios in a rq. This leads to the bigger nr_phys_segments of
+rq than the real one when the segments of bios in rq are
+contiguous and mergeable. The nr_phys_segments of rq will exceed
+max_segmets of q and stop merging while the sectors of rq maybe
+far away from the max_sectors of q.
 
-Follows IOPS test of mpath on lpfc, fio(libaio, bs:4k, dio,
-queue_depth:64, 8 jobs).
+In practice, the merging will stop due to max_segmets limit while
+the segments in the rq are contiguous and mergeable during the
+mkfs.ext4 workload on my local. This could be harmful to the
+performance of sequential operations.
 
-1) blk-mq none scheduler
------------------------------------------------------
- IOPS(K)  |v4.14-rc2    |v4.14-rc2 with| v4.14-rc2 with
-          |             |[1][2]        | [1] [2] [3]
------------------------------------------------------
-read      |       53.69 |       40.26  |       94.61
------------------------------------------------------
-randread  |       24.64 |       30.08  |       35.57
------------------------------------------------------
-write     |       39.55 |       41.51  |      216.84
------------------------------------------------------
-randwrite |       33.97 |       34.27  |       33.98
------------------------------------------------------
+To fix it, consider the segments merge when account nr_phys_segments
+of rq during merging bio into rq. Decrease the nr_phys_segments of rq
+by 1 when the adjacent segments in bio and rq are contiguous and
+mergeable. Consequently get more fully merging and better performance
+in sequential operations. In addition, it could eliminate the wasting of
+scatterlist structure.
 
-2) blk-mq mq-deadline scheduler
------------------------------------------------------
- IOPS(K)  |v4.14-rc2    |v4.14-rc2 with| v4.14-rc2 with
-          |             |[1][2]        | [1] [2] [3]
------------------------------------------------------
- IOPS(K)  |MQ-DEADLINE  |MQ-DEADLINE  |MQ-DEADLINE
------------------------------------------------------
-read      |       23.81 |       21.91 |       89.94
------------------------------------------------------
-randread  |       38.47 |       38.96 |       38.02
------------------------------------------------------
-write     |       39.52 |        40.2 |      225.75
------------------------------------------------------
-randwrite |        34.8 |       33.73 |       33.44
------------------------------------------------------
+On my local mkfs.ext4 workload, the final size of rq issued raise from
+168 sectors (max_segmets is 168) to 2560 sectors (max_sector_kb is 1280).
 
-[1] [PATCH V5 0/7] blk-mq-sched: improve sequential I/O performance(part 1)
+V2 : Add more comment to elaborate how this issue found and result after
+apply the patch.
 
-	https://marc.info/?l=linux-block&m=150676854821077&w=2
-
-[2] [PATCH V5 0/8] blk-mq: improve bio merge for none scheduler
-
-	https://marc.info/?l=linux-block&m=150677085521416&w=2
-
-[3] this patchset
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
 ---
- block/blk-mq.c     | 17 +----------------
- drivers/md/dm-rq.c | 14 ++++++++++++--
- 2 files changed, 13 insertions(+), 18 deletions(-)
+ block/blk-merge.c | 98 ++++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 64 insertions(+), 34 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9a3a561a63b5..58d2268f9733 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1467,17 +1467,6 @@ void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 	blk_mq_hctx_mark_pending(hctx, ctx);
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 14b6e37..b2f54fd 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -472,54 +472,60 @@ int blk_rq_map_sg(struct request_queue *q, struct request *rq,
  }
+ EXPORT_SYMBOL(blk_rq_map_sg);
  
--static void blk_mq_request_direct_insert(struct blk_mq_hw_ctx *hctx,
--					 struct request *rq)
+-static inline int ll_new_hw_segment(struct request_queue *q,
+-				    struct request *req,
+-				    struct bio *bio)
 -{
--	spin_lock(&hctx->lock);
--	list_add_tail(&rq->queuelist, &hctx->dispatch);
--	set_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
--	spin_unlock(&hctx->lock);
+-	int nr_phys_segs = bio_phys_segments(q, bio);
 -
--	blk_mq_run_hw_queue(hctx, false);
+-	if (req->nr_phys_segments + nr_phys_segs > queue_max_segments(q))
+-		goto no_merge;
+-
+-	if (blk_integrity_merge_bio(q, req, bio) == false)
+-		goto no_merge;
+-
+-	/*
+-	 * This will form the start of a new hw segment.  Bump both
+-	 * counters.
+-	 */
+-	req->nr_phys_segments += nr_phys_segs;
+-	return 1;
+-
+-no_merge:
+-	req_set_nomerge(q, req);
+-	return 0;
 -}
 -
- /*
-  * Should only be used carefully, when the caller knows we want to
-  * bypass a potential IO scheduler on the target device.
-@@ -1487,12 +1476,8 @@ blk_status_t blk_mq_request_bypass_insert(struct request *rq)
- 	struct blk_mq_ctx *ctx = rq->mq_ctx;
- 	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(rq->q, ctx->cpu);
- 	blk_qc_t cookie;
--	blk_status_t ret;
- 
--	ret = blk_mq_try_issue_directly(hctx, rq, &cookie, true);
--	if (ret == BLK_STS_RESOURCE)
--		blk_mq_request_direct_insert(hctx, rq);
--	return ret;
-+	return blk_mq_try_issue_directly(hctx, rq, &cookie, true);
- }
- 
- void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index 2ef524bddd38..feb49c4d6fa2 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -405,7 +405,7 @@ static void end_clone_request(struct request *clone, blk_status_t error)
- 	dm_complete_request(tio->orig, error);
- }
- 
--static void dm_dispatch_clone_request(struct request *clone, struct request *rq)
-+static blk_status_t dm_dispatch_clone_request(struct request *clone, struct request *rq)
+ int ll_back_merge_fn(struct request_queue *q, struct request *req,
+ 		     struct bio *bio)
  {
- 	blk_status_t r;
++	unsigned int seg_size;
++	int total_nr_phys_segs;
++	bool contig;
++
+ 	if (req_gap_back_merge(req, bio))
+ 		return 0;
+ 	if (blk_integrity_rq(req) &&
+ 	    integrity_req_gap_back_merge(req, bio))
+ 		return 0;
+ 	if (blk_rq_sectors(req) + bio_sectors(bio) >
+-	    blk_rq_get_max_sectors(req, blk_rq_pos(req))) {
+-		req_set_nomerge(q, req);
+-		return 0;
+-	}
++	    blk_rq_get_max_sectors(req, blk_rq_pos(req)))
++		goto no_merge;
++
+ 	if (!bio_flagged(req->biotail, BIO_SEG_VALID))
+ 		blk_recount_segments(q, req->biotail);
+ 	if (!bio_flagged(bio, BIO_SEG_VALID))
+ 		blk_recount_segments(q, bio);
  
-@@ -417,6 +417,7 @@ static void dm_dispatch_clone_request(struct request *clone, struct request *rq)
- 	if (r != BLK_STS_OK && r != BLK_STS_RESOURCE)
- 		/* must complete clone in terms of original request */
- 		dm_complete_request(rq, r);
-+	return r;
+-	return ll_new_hw_segment(q, req, bio);
++	if (blk_integrity_merge_bio(q, req, bio) == false)
++		goto no_merge;
++
++	seg_size = req->biotail->bi_seg_back_size + bio->bi_seg_front_size;
++	total_nr_phys_segs = req->nr_phys_segments + bio_phys_segments(q, bio);
++
++	contig = blk_phys_contig_segment(q, req->biotail, bio);
++	if (contig)
++		total_nr_phys_segs--;
++
++	if (unlikely(total_nr_phys_segs > queue_max_segments(q)))
++		goto no_merge;
++
++	if (contig) {
++		if (req->nr_phys_segments == 1)
++			req->bio->bi_seg_front_size = seg_size;
++		if (bio->bi_phys_segments == 1)
++			bio->bi_seg_back_size = seg_size;
++	}
++	req->nr_phys_segments = total_nr_phys_segs;
++	return 1;
++
++no_merge:
++	req_set_nomerge(q, req);
++	return 0;
  }
  
- static int dm_rq_bio_constructor(struct bio *bio, struct bio *bio_orig,
-@@ -490,8 +491,10 @@ static int map_request(struct dm_rq_target_io *tio)
- 	struct request *rq = tio->orig;
- 	struct request *cache = tio->clone;
- 	struct request *clone = cache;
-+	blk_status_t ret;
+ int ll_front_merge_fn(struct request_queue *q, struct request *req,
+ 		      struct bio *bio)
+ {
++	unsigned int seg_size;
++	int total_nr_phys_segs;
++	bool contig;
  
- 	r = ti->type->clone_and_map_rq(ti, rq, &tio->info, &clone);
-+ again:
- 	switch (r) {
- 	case DM_MAPIO_SUBMITTED:
- 		/* The target has taken the I/O to submit by itself later */
-@@ -509,7 +512,14 @@ static int map_request(struct dm_rq_target_io *tio)
- 		/* The target has remapped the I/O so dispatch it */
- 		trace_block_rq_remap(clone->q, clone, disk_devt(dm_disk(md)),
- 				     blk_rq_pos(rq));
--		dm_dispatch_clone_request(clone, rq);
-+		ret = dm_dispatch_clone_request(clone, rq);
-+		if (ret == BLK_STS_RESOURCE) {
-+			if (!rq->q->mq_ops)
-+				r = DM_MAPIO_DELAY_REQUEUE;
-+			else
-+				r = DM_MAPIO_REQUEUE;
-+			goto again;
-+		}
- 		break;
- 	case DM_MAPIO_REQUEUE:
- 		/* The target wants to requeue the I/O */
+ 	if (req_gap_front_merge(req, bio))
+ 		return 0;
+@@ -527,16 +533,40 @@ int ll_front_merge_fn(struct request_queue *q, struct request *req,
+ 	    integrity_req_gap_front_merge(req, bio))
+ 		return 0;
+ 	if (blk_rq_sectors(req) + bio_sectors(bio) >
+-	    blk_rq_get_max_sectors(req, bio->bi_iter.bi_sector)) {
+-		req_set_nomerge(q, req);
+-		return 0;
+-	}
++	    blk_rq_get_max_sectors(req, bio->bi_iter.bi_sector))
++		goto no_merge;
++
+ 	if (!bio_flagged(bio, BIO_SEG_VALID))
+ 		blk_recount_segments(q, bio);
+ 	if (!bio_flagged(req->bio, BIO_SEG_VALID))
+ 		blk_recount_segments(q, req->bio);
+ 
+-	return ll_new_hw_segment(q, req, bio);
++	if (blk_integrity_merge_bio(q, req, bio) == false)
++		goto no_merge;
++
++	seg_size = req->bio->bi_seg_front_size + bio->bi_seg_back_size;
++	total_nr_phys_segs = req->nr_phys_segments + bio_phys_segments(q, bio);
++
++	contig = blk_phys_contig_segment(q, bio, req->bio);
++	if (contig)
++		total_nr_phys_segs--;
++
++	if (unlikely(total_nr_phys_segs > queue_max_segments(q)))
++		goto no_merge;
++
++	if (contig) {
++		if (req->nr_phys_segments == 1)
++			req->biotail->bi_seg_back_size = seg_size;
++		if (bio->bi_phys_segments == 1)
++			bio->bi_seg_front_size = seg_size;
++	}
++
++	req->nr_phys_segments = total_nr_phys_segs;
++	return 1;
++
++no_merge:
++	req_set_nomerge(q, req);
++	return 0;
+ }
+ 
+ /*
 -- 
-2.9.5
+2.7.4
