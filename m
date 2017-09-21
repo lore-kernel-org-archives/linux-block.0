@@ -1,51 +1,42 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:51396 "EHLO mx1.redhat.com"
+Received: from verein.lst.de ([213.95.11.211]:50437 "EHLO newverein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752267AbdHHIwj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Aug 2017 04:52:39 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Ming Lei <ming.lei@redhat.com>, Shaohua Li <shli@kernel.org>,
-        linux-raid@vger.kernel.org
-Subject: [PATCH v3 34/49] md: raid1: convert to bio_for_each_segment_all_sp()
-Date: Tue,  8 Aug 2017 16:45:33 +0800
-Message-Id: <20170808084548.18963-35-ming.lei@redhat.com>
-In-Reply-To: <20170808084548.18963-1-ming.lei@redhat.com>
-References: <20170808084548.18963-1-ming.lei@redhat.com>
+        id S1751881AbdIUOHb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Sep 2017 10:07:31 -0400
+Date: Thu, 21 Sep 2017 16:07:29 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH V8 00/14] mmc: Add Command Queue support
+Message-ID: <20170921140729.GA17333@lst.de>
+References: <1505302814-19313-1-git-send-email-adrian.hunter@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1505302814-19313-1-git-send-email-adrian.hunter@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Cc: Shaohua Li <shli@kernel.org>
-Cc: linux-raid@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/md/raid1.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On Wed, Sep 13, 2017 at 02:40:00PM +0300, Adrian Hunter wrote:
+> Non-CQE blk-mq showed a 3% decrease in sequential read performance.  This
+> seemed to be coming from the inferior latency of running work items compared
+> with a dedicated thread.  Hacking blk-mq workqueue to be unbound reduced the
+> performance degradation from 3% to 1%.
 
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index f50958ded9f0..e34080bd91cb 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -2107,13 +2107,14 @@ static void process_checks(struct r1bio *r1_bio)
- 		struct page **spages = get_resync_pages(sbio)->pages;
- 		struct bio_vec *bi;
- 		int page_len[RESYNC_PAGES] = { 0 };
-+		struct bvec_iter_all bia;
- 
- 		if (sbio->bi_end_io != end_sync_read)
- 			continue;
- 		/* Now we can 'fixup' the error value */
- 		sbio->bi_status = 0;
- 
--		bio_for_each_segment_all(bi, sbio, j)
-+		bio_for_each_segment_all_sp(bi, sbio, j, bia)
- 			page_len[j] = bi->bv_len;
- 
- 		if (!status) {
--- 
-2.9.4
+Can you start a discussion on just this on the linux-block lists?
