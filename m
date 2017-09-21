@@ -3,9 +3,9 @@ From: Jianchao Wang <jianchao.w.wang@oracle.com>
 To: Jens Axboe <axboe@kernel.dk>, hch@infradead.org
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Jianchao Wang <jianchao.w.wang@oracle.com>
-Subject: [PATCH v2] block: consider merge of segments when merge bio into rq
-Date: Fri, 22 Sep 2017 02:57:31 +0800
-Message-Id: <1506020251-24768-1-git-send-email-jianchao.w.wang@oracle.com>
+Subject: [V2] block: consider merge of segments when merge bio into rq
+Date: Fri, 22 Sep 2017 01:29:09 +0800
+Message-Id: <1506014949-24184-1-git-send-email-jianchao.w.wang@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
 When account the nr_phys_segments during merging bios into rq,
