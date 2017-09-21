@@ -1,125 +1,57 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:42080 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751351AbdI3GNe (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Sep 2017 02:13:34 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Cathy Avery <cavery@redhat.com>,
-        Martin Steigerwald <martin@lichtvoll.de>,
-        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V7 5/6] block: support PREEMPT_ONLY
-Date: Sat, 30 Sep 2017 14:12:13 +0800
-Message-Id: <20170930061214.10622-6-ming.lei@redhat.com>
-In-Reply-To: <20170930061214.10622-1-ming.lei@redhat.com>
-References: <20170930061214.10622-1-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	lee.tibbert@gmail.com,
+	oleksandr@natalenko.name,
+	mirkomontanari91@gmail.com,
+	angeloruocco90@gmail.com,
+	mauro.andreolini@unimore.it,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENT 0/4] block, bfq: series of fixes of bugs affecting service guarantees
+Date: Thu, 21 Sep 2017 11:03:59 +0200
+Message-Id: <20170921090403.3217-1-paolo.valente@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-When queue is in PREEMPT_ONLY mode, only RQF_PREEMPT request
-can be allocated and dispatched, other requests won't be allowed
-to enter I/O path.
+Hi,
+the first patch in this series fixes a bug that causes bfq to fail to
+guarantee a high responsiveness on some drives, if there is heavy
+random read+write I/O in the background. More precisely, such a
+failure allowed this bug to be found [1], but the bug may well cause
+other yet unreported anomalies.
 
-This is useful for supporting safe SCSI quiesce.
+This fix uncovered other bugs that were concealed by the fixed bug,
+for rather subtle reasons. These further bugs caused similar
+responsiveness failures, but with sequential reaad+write workloads in
+the background. The remaining three patches fix these further bugs.
 
-Part of this patch is from Bart's '[PATCH v4 4∕7] block: Add the QUEUE_FLAG_PREEMPT_ONLY
-request queue flag'.
+The sum of these fixes makes responsiveness much stabler with BFQ. In
+the presence of write hogs, it is however still impossible for an I/O
+scheduler to guarantee perfect responsiveness in any circustance,
+because of throttling issues in the virtual-memory management
+subsystem, and in other higher-level components.
 
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Tested-by: Martin Steigerwald <martin@lichtvoll.de>
-Cc: Bart Van Assche <Bart.VanAssche@wdc.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-core.c       | 26 ++++++++++++++++++++++++--
- include/linux/blkdev.h |  5 +++++
- 2 files changed, 29 insertions(+), 2 deletions(-)
+Thanks,
+Paolo
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 95b1c5e50be3..bb683bfe37b2 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -346,6 +346,17 @@ void blk_sync_queue(struct request_queue *q)
- }
- EXPORT_SYMBOL(blk_sync_queue);
- 
-+void blk_set_preempt_only(struct request_queue *q, bool preempt_only)
-+{
-+	blk_mq_freeze_queue(q);
-+	if (preempt_only)
-+		queue_flag_set_unlocked(QUEUE_FLAG_PREEMPT_ONLY, q);
-+	else
-+		queue_flag_clear_unlocked(QUEUE_FLAG_PREEMPT_ONLY, q);
-+	blk_mq_unfreeze_queue(q);
-+}
-+EXPORT_SYMBOL(blk_set_preempt_only);
-+
- /**
-  * __blk_run_queue_uncond - run a queue whether or not it has been stopped
-  * @q:	The queue to run
-@@ -771,9 +782,18 @@ int blk_queue_enter(struct request_queue *q, unsigned flags)
- 	while (true) {
- 		int ret;
- 
-+		/*
-+		 * preempt_only flag has to be set after queue is frozen,
-+		 * so it can be checked here lockless and safely
-+		 */
-+		if (blk_queue_preempt_only(q)) {
-+			if (!(flags & BLK_REQ_PREEMPT))
-+				goto slow_path;
-+		}
-+
- 		if (percpu_ref_tryget_live(&q->q_usage_counter))
- 			return 0;
--
-+ slow_path:
- 		if (flags & BLK_REQ_NOWAIT)
- 			return -EBUSY;
- 
-@@ -787,7 +807,9 @@ int blk_queue_enter(struct request_queue *q, unsigned flags)
- 		smp_rmb();
- 
- 		ret = wait_event_interruptible(q->mq_freeze_wq,
--				!atomic_read(&q->mq_freeze_depth) ||
-+				(!atomic_read(&q->mq_freeze_depth) &&
-+				((flags & BLK_REQ_PREEMPT) ||
-+				 !blk_queue_preempt_only(q))) ||
- 				blk_queue_dying(q));
- 		if (blk_queue_dying(q))
- 			return -ENODEV;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 68445adc8765..b01a0c6bb1f0 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -631,6 +631,7 @@ struct request_queue {
- #define QUEUE_FLAG_REGISTERED  26	/* queue has been registered to a disk */
- #define QUEUE_FLAG_SCSI_PASSTHROUGH 27	/* queue supports SCSI commands */
- #define QUEUE_FLAG_QUIESCED    28	/* queue has been quiesced */
-+#define QUEUE_FLAG_PREEMPT_ONLY	29	/* only process REQ_PREEMPT requests */
- 
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_STACKABLE)	|	\
-@@ -735,6 +736,10 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
- 			     REQ_FAILFAST_DRIVER))
- #define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
-+#define blk_queue_preempt_only(q)				\
-+	test_bit(QUEUE_FLAG_PREEMPT_ONLY, &(q)->queue_flags)
-+
-+extern void blk_set_preempt_only(struct request_queue *q, bool preempt_only);
- 
- static inline bool blk_account_rq(struct request *rq)
- {
--- 
-2.9.5
+[1] Background I/O Type: Random - Background I/O mix: Reads and writes
+- Application to start: LibreOffice Writer in
+http://www.phoronix.com/scan.php?page=news_item&px=Linux-4.13-IO-Laptop
+
+
+Paolo Valente (4):
+  block, bfq: fix wrong init of saved start time for weight raising
+  block, bfq: check and switch back to interactive wr also on queue
+    split
+  block, bfq: let early-merged queues be weight-raised on split too
+  block, bfq: decrease burst size when queues in burst exit
+
+ block/bfq-iosched.c | 169 +++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 102 insertions(+), 67 deletions(-)
+
+--
+2.10.0
