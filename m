@@ -1,72 +1,39 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga06.intel.com ([134.134.136.31]:56322 "EHLO mga06.intel.com"
+Received: from mx2.mpynet.fi ([82.197.21.85]:10677 "EHLO mx2.mpynet.fi"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752282AbdIVMnz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Sep 2017 08:43:55 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V9 01/15] mmc: core: Remove unnecessary host claim
-Date: Fri, 22 Sep 2017 15:36:50 +0300
-Message-Id: <1506083824-4024-2-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com>
-References: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com>
+        id S1751629AbdIULZG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Sep 2017 07:25:06 -0400
+Date: Thu, 21 Sep 2017 14:25:04 +0300
+From: Rakesh Pandit <rakesh@tuxera.com>
+To: Matias =?iso-8859-1?Q?Bj=F8rling?= <mb@lightnvm.io>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
+Subject: [PATCH 0/6] misc patches mostly for pblk
+Message-ID: <20170921112502.GA28488@dhcp-216.srv.tuxera.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Callers already have the host claimed, so remove the unnecessary
-calls to mmc_claim_host() and mmc_release_host().
+These are trivial changes up for review.  Most of them I made while
+skimming through the code base.  They are mostly cleanups and they are
+at random places.
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/core/mmc_ops.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+Rakesh Pandit (6):
+  lightnvm: pblk: reuse pblk_gc_should_kick
+  lightnvm: pblk: protect line bitmap while submitting meta io
+  lightnvm: pblk: fix message if L2P MAP is in device
+  lightnvm: pblk: improve error message if down_timeout fails
+  lightnvm: pblk: print incompatible line version correctly
+  lightnvm: include NVM Express driver if OCSSD is selected for build
 
-diff --git a/drivers/mmc/core/mmc_ops.c b/drivers/mmc/core/mmc_ops.c
-index 54686ca4bfb7..a6b0a232f24a 100644
---- a/drivers/mmc/core/mmc_ops.c
-+++ b/drivers/mmc/core/mmc_ops.c
-@@ -977,7 +977,6 @@ void mmc_start_bkops(struct mmc_card *card, bool from_exception)
- 	    from_exception)
- 		return;
- 
--	mmc_claim_host(card->host);
- 	if (card->ext_csd.raw_bkops_status >= EXT_CSD_BKOPS_LEVEL_2) {
- 		timeout = MMC_OPS_TIMEOUT_MS;
- 		use_busy_signal = true;
-@@ -995,7 +994,7 @@ void mmc_start_bkops(struct mmc_card *card, bool from_exception)
- 		pr_warn("%s: Error %d starting bkops\n",
- 			mmc_hostname(card->host), err);
- 		mmc_retune_release(card->host);
--		goto out;
-+		return;
- 	}
- 
- 	/*
-@@ -1007,8 +1006,6 @@ void mmc_start_bkops(struct mmc_card *card, bool from_exception)
- 		mmc_card_set_doing_bkops(card);
- 	else
- 		mmc_retune_release(card->host);
--out:
--	mmc_release_host(card->host);
- }
- 
- /*
+ drivers/lightnvm/Kconfig         |  1 +
+ drivers/lightnvm/pblk-core.c     | 17 ++++++-----------
+ drivers/lightnvm/pblk-init.c     |  2 +-
+ drivers/lightnvm/pblk-recovery.c |  4 ++--
+ drivers/lightnvm/pblk-rl.c       |  9 ---------
+ drivers/lightnvm/pblk.h          |  1 +
+ 6 files changed, 11 insertions(+), 23 deletions(-)
+
 -- 
-1.9.1
+2.5.0
