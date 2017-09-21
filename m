@@ -1,51 +1,40 @@
-Return-Path: <SRS0=TWoo=AP=fb.com=shli@kernel.org>
-From: Shaohua Li <shli@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: tj@kernel.org,
-	lizefan@huawei.com,
-	tglx@linutronix.de,
-	kernel-team@fb.com,
-	axboe@kernel.dk,
-	Shaohua Li <shli@fb.com>
-Subject: [PATCH V3 0/4] block: make loop block device cgroup aware
-Date: Thu, 14 Sep 2017 14:02:03 -0700
-Message-Id: <cover.1505422351.git.shli@fb.com>
-List-ID: <linux-block@vger.kernel.org>
-
-From: Shaohua Li <shli@fb.com>
-
-Hi,
-
-The IO dispatched to under layer disk by loop block device isn't cloned from
-original bio, so the IO loses cgroup information of original bio. These IO
-escapes from cgroup control. The patches try to address this issue. The idea is
-quite generic, but we currently only make it work for blkcg.
-
-Thanks,
-Shaohua
-
-V2->V3:
-- Make the API more robust pointed out by Tejun
-
-V1->V2:
-- Address a couple of issues pointed out by Tejun
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from userp1040.oracle.com ([156.151.31.81]:20523 "EHLO
+        userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750912AbdIUEnL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Sep 2017 00:43:11 -0400
+To: Christoph Hellwig <hch@lst.de>
+Cc: Ilya Dryomov <idryomov@gmail.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Hannes Reinecke <hare@suse.com>, Jens Axboe <axboe@fb.com>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: cope with WRITE SAME failing in blkdev_issue_zeroout()
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <1504719490-7523-1-git-send-email-idryomov@gmail.com>
+        <20170919203258.GB7347@lst.de>
+Date: Thu, 21 Sep 2017 00:42:58 -0400
+In-Reply-To: <20170919203258.GB7347@lst.de> (Christoph Hellwig's message of
+        "Tue, 19 Sep 2017 22:32:58 +0200")
+Message-ID: <yq1vakck6gd.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 
-Shaohua Li (4):
-  kthread: add a mechanism to store cgroup info
-  blkcg: delete unused APIs
-  block: make blkcg aware of kthread stored original cgroup info
-  block/loop: make loop cgroup aware
+Christoph,
 
- block/bio.c                | 31 ----------------------
- drivers/block/loop.c       | 13 +++++++++
- drivers/block/loop.h       |  1 +
- include/linux/bio.h        |  2 --
- include/linux/blk-cgroup.h | 25 +++++-------------
- include/linux/kthread.h    | 11 ++++++++
- kernel/kthread.c           | 66 ++++++++++++++++++++++++++++++++++++++++++++--
- 7 files changed, 96 insertions(+), 53 deletions(-)
+> I'm really not sure we should check for -EREMOTEIO specifically, but
+> Martin who is more familiar with the SCSI code might be able to
+> correct me, I'd feel safer about checking for any error which is
+> what the old code did.
+>
+> Except for that the patch looks fine to me.
+
+We explicitly return -EREMOTEIO when the device reports ILLEGAL
+REQUEST. But I agree that we should fall back to manually zeroing for
+any error.
 
 -- 
-2.9.5
+Martin K. Petersen	Oracle Linux Engineering
