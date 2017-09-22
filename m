@@ -1,47 +1,49 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:35710 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751370AbdINQmz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Sep 2017 12:42:55 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 3/6] blk-flush: use blk_mq_request_bypass_insert()
-Date: Fri, 15 Sep 2017 00:42:10 +0800
-Message-Id: <20170914164213.17859-4-ming.lei@redhat.com>
-In-Reply-To: <20170914164213.17859-1-ming.lei@redhat.com>
-References: <20170914164213.17859-1-ming.lei@redhat.com>
+Received: from mail-it0-f53.google.com ([209.85.214.53]:49091 "EHLO
+        mail-it0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752274AbdIVODR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Sep 2017 10:03:17 -0400
+Received: by mail-it0-f53.google.com with SMTP id m123so1449579ita.3
+        for <linux-block@vger.kernel.org>; Fri, 22 Sep 2017 07:03:17 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1506083824-4024-2-git-send-email-adrian.hunter@intel.com>
+References: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com> <1506083824-4024-2-git-send-email-adrian.hunter@intel.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Fri, 22 Sep 2017 16:03:16 +0200
+Message-ID: <CACRpkdaV86WeJ3VgmXP0+1Z8mVv1oo4bsijYOhES0TkXL-=eAg@mail.gmail.com>
+Subject: Re: [PATCH V9 01/15] mmc: core: Remove unnecessary host claim
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-In the following patch, we will use RQF_FLUSH_SEQ
-to decide:
+On Fri, Sep 22, 2017 at 2:36 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
 
-- if the flag isn't set, the flush rq need to be inserted
-via blk_insert_flush()
-- otherwise, the flush rq need to be dispatched directly
-since it is in flush machinery now.
+> Callers already have the host claimed, so remove the unnecessary
+> calls to mmc_claim_host() and mmc_release_host().
+>
+> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 
-So we use blk_mq_request_bypass_insert() for requsts
-of bypassing flush machinery, like what the legacy did.
+Good catch.
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-flush.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 81bd1a843043..a9773d2075ac 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -463,7 +463,7 @@ void blk_insert_flush(struct request *rq)
- 	if ((policy & REQ_FSEQ_DATA) &&
- 	    !(policy & (REQ_FSEQ_PREFLUSH | REQ_FSEQ_POSTFLUSH))) {
- 		if (q->mq_ops)
--			blk_mq_sched_insert_request(rq, false, false, false, false);
-+			blk_mq_request_bypass_insert(rq, false);
- 		else
- 			list_add_tail(&rq->queuelist, &q->queue_head);
- 		return;
--- 
-2.9.5
+Yours,
+Linus Walleij
