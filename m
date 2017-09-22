@@ -1,61 +1,73 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V4 09/16] scsi: sd_zbc: Disable zone write locking with scsi-mq
-Date: Sun, 24 Sep 2017 16:02:40 +0900
-Message-Id: <20170924070247.25560-10-damien.lemoal@wdc.com>
-In-Reply-To: <20170924070247.25560-1-damien.lemoal@wdc.com>
-References: <20170924070247.25560-1-damien.lemoal@wdc.com>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-it0-f47.google.com ([209.85.214.47]:55265 "EHLO
+        mail-it0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751931AbdIVLXt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Sep 2017 07:23:49 -0400
+Received: by mail-it0-f47.google.com with SMTP id e134so993381ite.3
+        for <linux-block@vger.kernel.org>; Fri, 22 Sep 2017 04:23:49 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1505302814-19313-2-git-send-email-adrian.hunter@intel.com>
+References: <1505302814-19313-1-git-send-email-adrian.hunter@intel.com> <1505302814-19313-2-git-send-email-adrian.hunter@intel.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Fri, 22 Sep 2017 13:23:48 +0200
+Message-ID: <CACRpkdbf3vvaXQchKws-0vhKh6dL66u_tU4itP1Yx0AKeD+FDg@mail.gmail.com>
+Subject: Re: [PATCH V8 01/14] mmc: core: Introduce host claiming by context
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-In the case of a ZBC disk used with scsi-mq, zone write locking does
-not prevent write reordering in sequential zones. Unlike the legacy
-case, zone locking is done after the command request is removed from
-the scheduler dispatch queue. That is, at the time of zone locking,
-the write command may already be out of order, making locking
-ineffective. Write order guarantees can only be provided by an
-adapted I/O scheduler.
+On Wed, Sep 13, 2017 at 1:40 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
 
-Disable zone write locking in sd_zbc_write_lock_zone() if the disk is
-used with scsi-mq. As the disk zones_wlock bitmap is not necessry,
-do not allocate it.
+> Currently the host can be claimed by a task.  Change this so that the host
+> can be claimed by a context that may or may not be a task.  This provides
+> for the host to be claimed by a block driver queue to support blk-mq, while
+> maintaining compatibility with the existing use of mmc_claim_host().
+>
+> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Bart Van Assche <Bart.VanAssche@wdc.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/scsi/sd_zbc.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+I think this is a reasonable intermediate step as well.
+I am working to kill off the "big MMC host lock" by the following
+plan:
 
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index 9bc0bde596e3..34576fb31f3a 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -314,6 +314,10 @@ int sd_zbc_write_lock_zone(struct scsi_cmnd *cmd)
- 	    (sector & (zone_sectors - 1)) + blk_rq_sectors(rq) > zone_sectors)
- 		return BLKPREP_KILL;
- 
-+	/* No write locking with scsi-mq */
-+	if (q->mq_ops)
-+		return BLKPREP_OK;
-+
- 	/*
- 	 * There is no write constraints on conventional zones. So any write
- 	 * command can be sent. But do not issue more than one write command
-@@ -713,7 +717,8 @@ static int sd_zbc_setup(struct scsi_disk *sdkp)
- 	if (sdkp->first_scan)
- 		return 0;
- 
--	if (!sdkp->zones_wlock || q->nr_zones != sdkp->nr_zones) {
-+	if (!q->mq_ops &&
-+	    (!sdkp->zones_wlock || q->nr_zones != sdkp->nr_zones)) {
- 		kfree(sdkp->zones_wlock);
- 		sdkp->zones_wlock = sd_zbc_alloc_zone_bitmap(sdkp);
- 		if (!sdkp->zones_wlock)
--- 
-2.13.5
+DONE:
+- Convert all ioctl() ops to custom block layer requests (done)
+- Convert all debugfs ops to custom block layer requests (done)
+- Convert RPMB access to a character device to avoid one
+  partition switch (just merged)
+
+REMAINS:
+- Convert boot and "general" partitions to be part of the main
+  block device. Because they are. (This is really tricky and
+  may require changes in the core kernel partition handling.)
+- Delete the dual mode card support. (No-one seems to be
+  using it.)
+- Split the world in block access and SDIO with something
+  like a simple mutex: either the host is a block device OR
+  it is SDIO, and that state has the same lifetime as a card,
+  since they are now either block devices or SDIO not both
+  at the same time.
+- Implement a lighter lock for SDIO host claiming.
+- Now the lock should be gone...
+
+As you can see it is not entirely trivial :/
+
+Linus
