@@ -1,59 +1,49 @@
-Return-Path: <prvs=430e6b2f0=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	=Oleksandr Natalenko <oleksandr@natalenko.name>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v2 0/4] Make SCSI device suspend and resume work reliably
-Date: Thu, 21 Sep 2017 14:22:51 -0700
-Message-Id: <20170921212255.12788-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:47594 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751748AbdIVAgi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Sep 2017 20:36:38 -0400
+Date: Fri, 22 Sep 2017 08:36:20 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Omar Sandoval <osandov@fb.com>
+Subject: Re: [PATCH V2 0/7] blk-mq: don't allocate driver tag beforehand for
+ flush rq
+Message-ID: <20170922003619.GK6854@ming.t460p>
+References: <20170916030351.28019-1-ming.lei@redhat.com>
+ <20170916030351.28019-2-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170916030351.28019-2-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hello Jens,
+On Sat, Sep 16, 2017 at 11:03:44AM +0800, Ming Lei wrote:
+> Hi,
+> 
+> This patchset avoids to allocate driver tag beforehand for flush rq
+> in case of I/O scheduler, then flush rq isn't treated specially
+> wrt. get/put driver tag, code gets cleanup much, such as,
+> reorder_tags_to_front() is removed, and we needn't to worry
+> about request order in dispatch list for avoiding I/O deadlock.
+> 
+> 'dbench -t 30 -s -F 64' has been run on different devices(shared tag,
+> multi-queue, singele queue, ...), and no issues are observed,
+> even very low queue depth(1) test are run, debench still works
+> well.
+> 
+> Any comments are welcome!
+> 
+> V2:
+> 	- release driver tag before requeue
+> 	- warning on inserting a req with driver tag
 
-It is known that during the resume following a hibernate sometimes the
-system hangs instead of coming up properly. This patch series fixes this
-problem. This patch series is an alternative for Ming Lei's "[PATCH V5
-0/10] block/scsi: safe SCSI quiescing" patch series. The advantages of
-this patch series are:
-- No new freeze states and hence no new freeze state variables.
-- Easier to review because no new race conditions are introduced between
-  queue freezing and blk_cleanup_queue(). As the discussion that followed
-  Ming's patch series shows the correctness of the new code is hard to
-  verify.
+Hi Jens,
 
-These patches have been tested on top of a merge of the block layer
-for-next branch and Linus' master tree. Linus' master tree includes
-patch "KVM: x86: Fix the NULL pointer parameter in check_cr_write()"
-but the block layer for-next branch not yet.
+Did V2 pass your test?
 
-Please consider these changes for kernel v4.15.
-
-Thanks,
-
-Bart.
-
-Changes compared to v1 of this patch series:
-- Changed the approach and rewrote the patch series.
-
-
-Bart Van Assche (4):
-  block: Convert RQF_PREEMPT into REQ_PREEMPT
-  block: Add the QUEUE_PREEMPT_ONLY request queue flag
-  block, scsi: Make SCSI device suspend and resume work reliably
-  scsi-mq: Reduce suspend latency
-
- block/blk-core.c          | 26 +++++++++++++++++++++++---
- block/blk-mq-debugfs.c    |  2 +-
- drivers/ide/ide-atapi.c   |  3 +--
- drivers/ide/ide-io.c      |  2 +-
- drivers/ide/ide-pm.c      |  4 ++--
- drivers/scsi/scsi_lib.c   | 31 +++++++++++++++++++++----------
- include/linux/blk_types.h |  6 ++++++
- include/linux/blkdev.h    |  8 +++++---
- 8 files changed, 60 insertions(+), 22 deletions(-)
+If yes and you are fine with this patchset, could you
+move on and make it land in your for-next?
 
 -- 
-2.14.1
+Ming
