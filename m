@@ -1,85 +1,39 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:40422 "EHLO mx1.redhat.com"
+Received: from latin.grep.be ([46.4.76.168]:52847 "EHLO latin.grep.be"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752944AbdI3LcD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Sep 2017 07:32:03 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 5/8] block: add check on elevator for supporting bio merge via hashtable from blk-mq sw queue
-Date: Sat, 30 Sep 2017 19:26:52 +0800
-Message-Id: <20170930112655.31451-6-ming.lei@redhat.com>
-In-Reply-To: <20170930112655.31451-1-ming.lei@redhat.com>
-References: <20170930112655.31451-1-ming.lei@redhat.com>
+        id S1751903AbdIVKts (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Sep 2017 06:49:48 -0400
+Date: Fri, 22 Sep 2017 12:09:54 +0200
+From: Wouter Verhelst <w@uter.be>
+To: nbd@other.debian.org, jbacik@fb.com, linux-block@vger.kernel.org
+Subject: [Nbd] [PATCH] MAINTAINERS: update list for NBD
+Message-ID: <20170922100954.2kxokpys5onj32ef@grep.be>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-blk_mq_sched_try_merge() will be reused in following patches
-to support bio merge to blk-mq sw queue, so add checkes to
-related functions which are called from blk_mq_sched_try_merge().
+nbd-general@sourceforge.net becomes nbd@other.debian.org, because
+sourceforge is just a spamtrap these days.
 
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Tested-by: Tom Nguyen <tom81094@gmail.com>
-Tested-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Wouter Verhelst <w@uter.be>
+Reviewed-by: Josef Bacik <jbacik@fb.com>
 ---
- block/elevator.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/elevator.c b/block/elevator.c
-index e11c7873fc21..2424aea85393 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -71,6 +71,10 @@ bool elv_bio_merge_ok(struct request *rq, struct bio *bio)
- 	if (!blk_rq_merge_ok(rq, bio))
- 		return false;
- 
-+	/* We need to support to merge bio from sw queue */
-+	if (!rq->q->elevator)
-+		return true;
-+
- 	if (!elv_iosched_allow_bio_merge(rq, bio))
- 		return false;
- 
-@@ -449,6 +453,10 @@ static enum elv_merge __elv_merge(struct request_queue *q,
- 		return ELEVATOR_BACK_MERGE;
- 	}
- 
-+	/* no elevator when merging bio to blk-mq sw queue */
-+	if (!e)
-+		return ELEVATOR_NO_MERGE;
-+
- 	if (e->uses_mq && e->type->ops.mq.request_merge)
- 		return e->type->ops.mq.request_merge(q, req, bio);
- 	else if (!e->uses_mq && e->type->ops.sq.elevator_merge_fn)
-@@ -711,6 +719,10 @@ struct request *elv_latter_request(struct request_queue *q, struct request *rq)
- {
- 	struct elevator_queue *e = q->elevator;
- 
-+	/* no elevator when merging bio to blk-mq sw queue */
-+	if (!e)
-+		return NULL;
-+
- 	if (e->uses_mq && e->type->ops.mq.next_request)
- 		return e->type->ops.mq.next_request(q, rq);
- 	else if (!e->uses_mq && e->type->ops.sq.elevator_latter_req_fn)
-@@ -723,6 +735,10 @@ struct request *elv_former_request(struct request_queue *q, struct request *rq)
- {
- 	struct elevator_queue *e = q->elevator;
- 
-+	/* no elevator when merging bio to blk-mq sw queue */
-+	if (!e)
-+		return NULL;
-+
- 	if (e->uses_mq && e->type->ops.mq.former_request)
- 		return e->type->ops.mq.former_request(q, rq);
- 	if (!e->uses_mq && e->type->ops.sq.elevator_former_req_fn)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index fbb269415f06..2f8824995a93 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -9326,7 +9326,7 @@ NETWORK BLOCK DEVICE (NBD)
+ M:	Josef Bacik <jbacik@fb.com>
+ S:	Maintained
+ L:	linux-block@vger.kernel.org
+-L:	nbd-general@lists.sourceforge.net
++L:	nbd@other.debian.org
+ F:	Documentation/blockdev/nbd.txt
+ F:	drivers/block/nbd.c
+ F:	include/uapi/linux/nbd.h
 -- 
-2.9.5
+2.14.1
