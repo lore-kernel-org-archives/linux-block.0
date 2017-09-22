@@ -1,67 +1,46 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:43342 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752402AbdIVRo5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Sep 2017 13:44:57 -0400
-Date: Sat, 23 Sep 2017 01:44:37 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "dm-devel@redhat.com" <dm-devel@redhat.com>,
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:8900 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751909AbdIVPGU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Sep 2017 11:06:20 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "dm-devel@redhat.com" <dm-devel@redhat.com>,
         "axboe@fb.com" <axboe@fb.com>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>
+CC: Bart Van Assche <Bart.VanAssche@wdc.com>,
         "hch@infradead.org" <hch@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "loberman@redhat.com" <loberman@redhat.com>
 Subject: Re: [PATCH] dm-mpath: return DM_MAPIO_REQUEUE in case of rq
  allocation failure
-Message-ID: <20170922174431.GA21108@ming.t460p>
+Date: Fri, 22 Sep 2017 15:06:16 +0000
+Message-ID: <1506092775.2512.5.camel@wdc.com>
 References: <20170922013506.22510-1-ming.lei@redhat.com>
- <1506092775.2512.5.camel@wdc.com>
+In-Reply-To: <20170922013506.22510-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1506092775.2512.5.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Sep 22, 2017 at 03:06:16PM +0000, Bart Van Assche wrote:
-> On Fri, 2017-09-22 at 09:35 +0800, Ming Lei wrote:
-> > +		/*
-> > +		 * blk-mq's SCHED_RESTART can cover this requeue, so
-> > +		 * we needn't to deal with it by DELAY_REQUEUE. More
-> > +		 * importantly, we have to return DM_MAPIO_REQUEUE
-> > +		 * so that blk-mq can get the queue busy feedback,
-> > +		 * otherwise I/O merge can be hurt.
-> > +		 */
-> > +		if (q->mq_ops)
-> > +			return DM_MAPIO_REQUEUE;
-> > +		else
-> > +			return DM_MAPIO_DELAY_REQUEUE;
-> >  	}
-> 
-> This patch is inferior to what I posted because this patch does not avoid
-> the delay if multiple LUNs are associated with the same SCSI host. Consider
-> e.g. the following configuration:
-> * A single SCSI host with two SCSI LUNs associated to that host, e.g. /dev/sda
->   and /dev/sdb.
-> * A dm-mpath instance has been created on top of /dev/sda.
-> If all tags are in use by requests queued to /dev/sdb, no dm requests are in
-> progress and a request is submitted against the dm-mpath device then the
-> blk_get_request(q, GFP_ATOMIC) call will fail. The request will be requeued
-> and the queue will be rerun after a delay.
-> 
-> My patch does not introduce a delay in this case.
-
-That delay may not matter because SCHED_RESTART will run queue just
-after one request is completed.
-
-There is at least one issue with get_request(GFP_NOIO): AIO
-performance regression may not be caused, or even AIO may not
-be possible. For example, user runs fio(libaio, randread, single
-job, queue depth: 64, device: dm-mpath disk), if get_request(GFP_NOIO)
-often blocks because of shared tags or out of tag, the actual queue
-depth won't reach 64 at all, and may be just 1 in the worst case.
-Once the actual queue depth is decreased much, random I/O performance
-should be hurt a lot.
-
--- 
-Ming
+T24gRnJpLCAyMDE3LTA5LTIyIGF0IDA5OjM1ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gKwkJ
+LyoNCj4gKwkJICogYmxrLW1xJ3MgU0NIRURfUkVTVEFSVCBjYW4gY292ZXIgdGhpcyByZXF1ZXVl
+LCBzbw0KPiArCQkgKiB3ZSBuZWVkbid0IHRvIGRlYWwgd2l0aCBpdCBieSBERUxBWV9SRVFVRVVF
+LiBNb3JlDQo+ICsJCSAqIGltcG9ydGFudGx5LCB3ZSBoYXZlIHRvIHJldHVybiBETV9NQVBJT19S
+RVFVRVVFDQo+ICsJCSAqIHNvIHRoYXQgYmxrLW1xIGNhbiBnZXQgdGhlIHF1ZXVlIGJ1c3kgZmVl
+ZGJhY2ssDQo+ICsJCSAqIG90aGVyd2lzZSBJL08gbWVyZ2UgY2FuIGJlIGh1cnQuDQo+ICsJCSAq
+Lw0KPiArCQlpZiAocS0+bXFfb3BzKQ0KPiArCQkJcmV0dXJuIERNX01BUElPX1JFUVVFVUU7DQo+
+ICsJCWVsc2UNCj4gKwkJCXJldHVybiBETV9NQVBJT19ERUxBWV9SRVFVRVVFOw0KPiAgCX0NCg0K
+VGhpcyBwYXRjaCBpcyBpbmZlcmlvciB0byB3aGF0IEkgcG9zdGVkIGJlY2F1c2UgdGhpcyBwYXRj
+aCBkb2VzIG5vdCBhdm9pZA0KdGhlIGRlbGF5IGlmIG11bHRpcGxlIExVTnMgYXJlIGFzc29jaWF0
+ZWQgd2l0aCB0aGUgc2FtZSBTQ1NJIGhvc3QuIENvbnNpZGVyDQplLmcuIHRoZSBmb2xsb3dpbmcg
+Y29uZmlndXJhdGlvbjoNCiogQSBzaW5nbGUgU0NTSSBob3N0IHdpdGggdHdvIFNDU0kgTFVOcyBh
+c3NvY2lhdGVkIHRvIHRoYXQgaG9zdCwgZS5nLiAvZGV2L3NkYQ0KICBhbmQgL2Rldi9zZGIuDQoq
+IEEgZG0tbXBhdGggaW5zdGFuY2UgaGFzIGJlZW4gY3JlYXRlZCBvbiB0b3Agb2YgL2Rldi9zZGEu
+DQpJZiBhbGwgdGFncyBhcmUgaW4gdXNlIGJ5IHJlcXVlc3RzIHF1ZXVlZCB0byAvZGV2L3NkYiwg
+bm8gZG0gcmVxdWVzdHMgYXJlIGluDQpwcm9ncmVzcyBhbmQgYSByZXF1ZXN0IGlzIHN1Ym1pdHRl
+ZCBhZ2FpbnN0IHRoZSBkbS1tcGF0aCBkZXZpY2UgdGhlbiB0aGUNCmJsa19nZXRfcmVxdWVzdChx
+LCBHRlBfQVRPTUlDKSBjYWxsIHdpbGwgZmFpbC4gVGhlIHJlcXVlc3Qgd2lsbCBiZSByZXF1ZXVl
+ZA0KYW5kIHRoZSBxdWV1ZSB3aWxsIGJlIHJlcnVuIGFmdGVyIGEgZGVsYXkuDQoNCk15IHBhdGNo
+IGRvZXMgbm90IGludHJvZHVjZSBhIGRlbGF5IGluIHRoaXMgY2FzZS4NCg0KQmFydC4=
