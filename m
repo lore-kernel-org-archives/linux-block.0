@@ -1,46 +1,59 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:8900 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751909AbdIVPGU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Sep 2017 11:06:20 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "snitzer@redhat.com" <snitzer@redhat.com>
-CC: Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "loberman@redhat.com" <loberman@redhat.com>
-Subject: Re: [PATCH] dm-mpath: return DM_MAPIO_REQUEUE in case of rq
- allocation failure
-Date: Fri, 22 Sep 2017 15:06:16 +0000
-Message-ID: <1506092775.2512.5.camel@wdc.com>
-References: <20170922013506.22510-1-ming.lei@redhat.com>
-In-Reply-To: <20170922013506.22510-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Received: from mx1.redhat.com ([209.132.183.28]:48374 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751781AbdIVBf1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Sep 2017 21:35:27 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        Jens Axboe <axboe@fb.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] dm-mpath: return DM_MAPIO_REQUEUE in case of rq allocation failure
+Date: Fri, 22 Sep 2017 09:35:06 +0800
+Message-Id: <20170922013506.22510-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gRnJpLCAyMDE3LTA5LTIyIGF0IDA5OjM1ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gKwkJ
-LyoNCj4gKwkJICogYmxrLW1xJ3MgU0NIRURfUkVTVEFSVCBjYW4gY292ZXIgdGhpcyByZXF1ZXVl
-LCBzbw0KPiArCQkgKiB3ZSBuZWVkbid0IHRvIGRlYWwgd2l0aCBpdCBieSBERUxBWV9SRVFVRVVF
-LiBNb3JlDQo+ICsJCSAqIGltcG9ydGFudGx5LCB3ZSBoYXZlIHRvIHJldHVybiBETV9NQVBJT19S
-RVFVRVVFDQo+ICsJCSAqIHNvIHRoYXQgYmxrLW1xIGNhbiBnZXQgdGhlIHF1ZXVlIGJ1c3kgZmVl
-ZGJhY2ssDQo+ICsJCSAqIG90aGVyd2lzZSBJL08gbWVyZ2UgY2FuIGJlIGh1cnQuDQo+ICsJCSAq
-Lw0KPiArCQlpZiAocS0+bXFfb3BzKQ0KPiArCQkJcmV0dXJuIERNX01BUElPX1JFUVVFVUU7DQo+
-ICsJCWVsc2UNCj4gKwkJCXJldHVybiBETV9NQVBJT19ERUxBWV9SRVFVRVVFOw0KPiAgCX0NCg0K
-VGhpcyBwYXRjaCBpcyBpbmZlcmlvciB0byB3aGF0IEkgcG9zdGVkIGJlY2F1c2UgdGhpcyBwYXRj
-aCBkb2VzIG5vdCBhdm9pZA0KdGhlIGRlbGF5IGlmIG11bHRpcGxlIExVTnMgYXJlIGFzc29jaWF0
-ZWQgd2l0aCB0aGUgc2FtZSBTQ1NJIGhvc3QuIENvbnNpZGVyDQplLmcuIHRoZSBmb2xsb3dpbmcg
-Y29uZmlndXJhdGlvbjoNCiogQSBzaW5nbGUgU0NTSSBob3N0IHdpdGggdHdvIFNDU0kgTFVOcyBh
-c3NvY2lhdGVkIHRvIHRoYXQgaG9zdCwgZS5nLiAvZGV2L3NkYQ0KICBhbmQgL2Rldi9zZGIuDQoq
-IEEgZG0tbXBhdGggaW5zdGFuY2UgaGFzIGJlZW4gY3JlYXRlZCBvbiB0b3Agb2YgL2Rldi9zZGEu
-DQpJZiBhbGwgdGFncyBhcmUgaW4gdXNlIGJ5IHJlcXVlc3RzIHF1ZXVlZCB0byAvZGV2L3NkYiwg
-bm8gZG0gcmVxdWVzdHMgYXJlIGluDQpwcm9ncmVzcyBhbmQgYSByZXF1ZXN0IGlzIHN1Ym1pdHRl
-ZCBhZ2FpbnN0IHRoZSBkbS1tcGF0aCBkZXZpY2UgdGhlbiB0aGUNCmJsa19nZXRfcmVxdWVzdChx
-LCBHRlBfQVRPTUlDKSBjYWxsIHdpbGwgZmFpbC4gVGhlIHJlcXVlc3Qgd2lsbCBiZSByZXF1ZXVl
-ZA0KYW5kIHRoZSBxdWV1ZSB3aWxsIGJlIHJlcnVuIGFmdGVyIGEgZGVsYXkuDQoNCk15IHBhdGNo
-IGRvZXMgbm90IGludHJvZHVjZSBhIGRlbGF5IGluIHRoaXMgY2FzZS4NCg0KQmFydC4=
+blk-mq will rerun queue via RESTART after one request is completed,
+so not necessary to wait random time for requeuing, we should trust
+blk-mq to do it.
+
+More importantly, we need return BLK_STS_RESOURCE to blk-mq
+so that dequeue from I/O scheduler can be stopped, then
+I/O merge gets improved.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/md/dm-mpath.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
+index 11f273d2f018..0902f7762306 100644
+--- a/drivers/md/dm-mpath.c
++++ b/drivers/md/dm-mpath.c
+@@ -504,8 +504,20 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
+ 		if (queue_dying) {
+ 			atomic_inc(&m->pg_init_in_progress);
+ 			activate_or_offline_path(pgpath);
++			return DM_MAPIO_DELAY_REQUEUE;
+ 		}
+-		return DM_MAPIO_DELAY_REQUEUE;
++
++		/*
++		 * blk-mq's SCHED_RESTART can cover this requeue, so
++		 * we needn't to deal with it by DELAY_REQUEUE. More
++		 * importantly, we have to return DM_MAPIO_REQUEUE
++		 * so that blk-mq can get the queue busy feedback,
++		 * otherwise I/O merge can be hurt.
++		 */
++		if (q->mq_ops)
++			return DM_MAPIO_REQUEUE;
++		else
++			return DM_MAPIO_DELAY_REQUEUE;
+ 	}
+ 	clone->bio = clone->biotail = NULL;
+ 	clone->rq_disk = bdev->bd_disk;
+-- 
+2.9.5
