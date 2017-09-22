@@ -1,21 +1,11 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-it0-f46.google.com ([209.85.214.46]:55600 "EHLO
-        mail-it0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S937074AbdIZPhT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Sep 2017 11:37:19 -0400
-Received: by mail-it0-f46.google.com with SMTP id 4so3334886itv.4
-        for <linux-block@vger.kernel.org>; Tue, 26 Sep 2017 08:37:18 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1506083824-4024-8-git-send-email-adrian.hunter@intel.com>
-References: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com> <1506083824-4024-8-git-send-email-adrian.hunter@intel.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 26 Sep 2017 17:37:17 +0200
-Message-ID: <CACRpkdaeAnAV6GeC14PzyYWzSY0kd6ixHsdDdRR_6K5z-iNz_Q@mail.gmail.com>
-Subject: Re: [PATCH V9 07/15] mmc: block: Prepare CQE data
-To: Adrian Hunter <adrian.hunter@intel.com>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
+Received: from mga07.intel.com ([134.134.136.100]:64063 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752435AbdIVMo1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Sep 2017 08:44:27 -0400
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
         linux-kernel <linux-kernel@vger.kernel.org>,
         Bough Chen <haibo.chen@nxp.com>,
@@ -29,24 +19,77 @@ Cc: Ulf Hansson <ulf.hansson@linaro.org>,
         Sahitya Tummala <stummala@codeaurora.org>,
         Harjani Ritesh <riteshh@codeaurora.org>,
         Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
         Shawn Lin <shawn.lin@rock-chips.com>,
         Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH V9 07/15] mmc: block: Prepare CQE data
+Date: Fri, 22 Sep 2017 15:36:56 +0300
+Message-Id: <1506083824-4024-8-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com>
+References: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Sep 22, 2017 at 2:36 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
+Enhance mmc_blk_data_prep() to support CQE requests. That means adding
+some things that for non-CQE requests would be encoded into the command
+arguments - such as the block address, reliable-write flag, and data tag
+flag. Also the request tag is needed to provide the command queue task id,
+and a comment is added to explain the future possibility of defining a
+priority.
 
-> Enhance mmc_blk_data_prep() to support CQE requests. That means adding
-> some things that for non-CQE requests would be encoded into the command
-> arguments - such as the block address, reliable-write flag, and data tag
-> flag. Also the request tag is needed to provide the command queue task id,
-> and a comment is added to explain the future possibility of defining a
-> priority.
->
-> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+---
+ drivers/mmc/core/block.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-
-Yours,
-Linus Walleij
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index a52653ce2d3a..c29dbcec7c61 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -1595,6 +1595,7 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
+ 	memset(brq, 0, sizeof(struct mmc_blk_request));
+ 
+ 	brq->mrq.data = &brq->data;
++	brq->mrq.tag = req->tag;
+ 
+ 	brq->stop.opcode = MMC_STOP_TRANSMISSION;
+ 	brq->stop.arg = 0;
+@@ -1609,6 +1610,14 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
+ 
+ 	brq->data.blksz = 512;
+ 	brq->data.blocks = blk_rq_sectors(req);
++	brq->data.blk_addr = blk_rq_pos(req);
++
++	/*
++	 * The command queue supports 2 priorities: "high" (1) and "simple" (0).
++	 * The eMMC will give "high" priority tasks priority over "simple"
++	 * priority tasks. Here we always set "simple" priority by not setting
++	 * MMC_DATA_PRIO.
++	 */
+ 
+ 	/*
+ 	 * The block layer doesn't support all sector count
+@@ -1638,8 +1647,10 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
+ 						brq->data.blocks);
+ 	}
+ 
+-	if (do_rel_wr)
++	if (do_rel_wr) {
+ 		mmc_apply_rel_rw(brq, card, req);
++		brq->data.flags |= MMC_DATA_REL_WR;
++	}
+ 
+ 	/*
+ 	 * Data tag is used only during writing meta data to speed
+@@ -1651,6 +1662,9 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
+ 		      ((brq->data.blocks * brq->data.blksz) >=
+ 		       card->ext_csd.data_tag_unit_size);
+ 
++	if (do_data_tag)
++		brq->data.flags |= MMC_DATA_DAT_TAG;
++
+ 	mmc_set_data_timeout(&brq->data, card);
+ 
+ 	brq->data.sg = mqrq->sg;
+-- 
+1.9.1
