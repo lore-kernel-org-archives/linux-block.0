@@ -1,43 +1,74 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.mpynet.fi ([82.197.21.84]:40749 "EHLO mx1.mpynet.fi"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751611AbdIQVER (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 Sep 2017 17:04:17 -0400
-Date: Mon, 18 Sep 2017 00:04:14 +0300
-From: Rakesh Pandit <rakesh@tuxera.com>
-To: Matias =?iso-8859-1?Q?Bj=F8rling?= <mb@lightnvm.io>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
-Subject: [PATCH] lightnvm: remove already calculated nr_chnls
-Message-ID: <20170917210412.GA2879@hercules.tuxera.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=431df6ef2=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	=Oleksandr Natalenko <oleksandr@natalenko.name>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH v3 4/6] scsi: Set QUEUE_FLAG_PREEMPT_ONLY while quiesced
+Date: Fri, 22 Sep 2017 15:14:03 -0700
+Message-Id: <20170922221405.22091-5-bart.vanassche@wdc.com>
+In-Reply-To: <20170922221405.22091-1-bart.vanassche@wdc.com>
+References: <20170922221405.22091-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Remove repeated calculation for number of channels while creating a
-target device.
+Make the quiesce state visible to the block layer for the next
+patch in this series.
 
-Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
+ drivers/scsi/scsi_lib.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-This is also a trivial change I found while investigating/working on
-other issue.
-
- drivers/lightnvm/core.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 1b8338d..01536b8 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -139,7 +139,6 @@ static struct nvm_tgt_dev *nvm_create_tgt_dev(struct nvm_dev *dev,
- 	int prev_nr_luns;
- 	int i, j;
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 62f905b22821..ca84fd2d93ea 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -2927,19 +2927,22 @@ static void scsi_wait_for_queuecommand(struct scsi_device *sdev)
+ int
+ scsi_device_quiesce(struct scsi_device *sdev)
+ {
++	struct request_queue *q = sdev->request_queue;
+ 	int err;
  
--	nr_chnls = nr_luns / dev->geo.luns_per_chnl;
- 	nr_chnls = (nr_chnls_mod == 0) ? nr_chnls : nr_chnls + 1;
+ 	mutex_lock(&sdev->state_mutex);
+ 	err = scsi_device_set_state(sdev, SDEV_QUIESCE);
++	if (err == 0)
++		blk_set_preempt_only(q, true);
+ 	mutex_unlock(&sdev->state_mutex);
  
- 	dev_map = kmalloc(sizeof(struct nvm_dev_map), GFP_KERNEL);
+ 	if (err)
+ 		return err;
+ 
+-	scsi_run_queue(sdev->request_queue);
++	scsi_run_queue(q);
+ 	while (atomic_read(&sdev->device_busy)) {
+ 		msleep_interruptible(200);
+-		scsi_run_queue(sdev->request_queue);
++		scsi_run_queue(q);
+ 	}
+ 	return 0;
+ }
+@@ -2962,8 +2965,10 @@ void scsi_device_resume(struct scsi_device *sdev)
+ 	 */
+ 	mutex_lock(&sdev->state_mutex);
+ 	if (sdev->sdev_state == SDEV_QUIESCE &&
+-	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0)
++	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0) {
++		blk_set_preempt_only(sdev->request_queue, false);
+ 		scsi_run_queue(sdev->request_queue);
++	}
+ 	mutex_unlock(&sdev->state_mutex);
+ }
+ EXPORT_SYMBOL(scsi_device_resume);
 -- 
-2.7.4
+2.14.1
