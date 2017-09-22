@@ -1,104 +1,63 @@
 Return-Path: <kkolasa@winsoft.pl>
-Subject: Re: Oops on the system startup in the function part_in_flight()
 To: linux-block@vger.kernel.org
 Cc: axboe@kernel.dk
-References: <964a2654-3b86-c9f6-1522-0854d1e4ab0d@winsoft.pl>
 From: Krzysztof Kolasa <kkolasa@winsoft.pl>
-Message-ID: <89aa304b-9ebe-3d2f-3898-edfb4e0e4b87@winsoft.pl>
-Date: Sat, 23 Sep 2017 20:36:30 +0200
+Subject: Oops on the system startup in the function part_in_flight()
+Message-ID: <964a2654-3b86-c9f6-1522-0854d1e4ab0d@winsoft.pl>
+Date: Fri, 22 Sep 2017 10:25:04 +0200
 MIME-Version: 1.0
-In-Reply-To: <964a2654-3b86-c9f6-1522-0854d1e4ab0d@winsoft.pl>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256; boundary="------------ms030909070805050904060400"
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This is a cryptographically signed message in MIME format.
+Hi all,
 
---------------ms030909070805050904060400
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Language: pl
+This error stops my system (daily build, linux-next) :
 
-bisected bad commit:
+---------
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189584] BUG: unable to handle kernel NULL pointer dereference at 00000000000000f8
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189592] IP: part_in_flight+0x5/0x60
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189593] PGD 0 P4D 0
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189595] Oops: 0000 [#1] SMP
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189596] Modules linked in: rfcomm ccm bnep binfmt_misc snd_soc_skl snd_soc_skl_ipc snd_soc_sst_ipc snd_soc_sst_dsp snd_hda_ext_core snd_hda_codec_hdmi snd_soc_sst_match snd_hda_codec_conexant snd_hda_codec_generic snd_soc_core asus_nb_wmi asus_wmi sparse_keymap snd_hda_intel arc4 snd_hda_codec snd_hda_core snd_pcm snd_hwdep intel_rapl x86_pkg_temp_thermal intel_powerclamp kvm_intel kvm uvcvideo videobuf2_vmalloc cdc_mbim cdc_wdm snd_seq_midi videobuf2_memops irqbypass videobuf2_v4l2 cdc_ncm videobuf2_core snd_seq_midi_event usbnet crct10dif_pclmul videodev crc32_pclmul btusb media snd_rawmidi btrtl btbcm mii ghash_clmulni_intel pcbc snd_seq aesni_intel iwlmvm aes_x86_64 crypto_simd cryptd glue_helper mac80211 intel_cstate snd_timer intel_rapl_perf snd_seq_device iwlwifi snd cfg80211 input_leds
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189623]  joydev serio_raw soundcore shpchp mei_me mei hci_uart btqca btintel intel_pch_thermal processor_thermal_device intel_soc_dts_iosf wmi int3403_thermal bluetooth intel_lpss_acpi ecdh_generic dell_smo8800 intel_lpss int3400_thermal int3402_thermal acpi_thermal_rel acpi_als int3406_thermal int340x_thermal_zone kfifo_buf tpm_crb asus_wireless acpi_pad industrialio mac_hid cuse coretemp parport_pc ppdev lp parport ip_tables x_tables autofs4 i915 i2c_algo_bit drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops e1000e drm psmouse ahci ptp pps_core libahci i2c_hid hid pinctrl_sunrisepoint video pinctrl_intel
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189648] CPU: 0 PID: 3299 Comm: gnome-shell Not tainted 4.14.0-rc1-winsoft-x64+ #4
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189649] Hardware name: ASUSTeK COMPUTER INC. BU403UA/BU403UA, BIOS BU403UA.305 09/12/2016
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189650] task: ffff9843e0ef2e80 task.stack: ffffbcd102a88000
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189652] RIP: 0010:part_in_flight+0x5/0x60
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189653] RSP: 0018:ffffbcd102a8bc88 EFLAGS: 00010297
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189654] RAX: ffff9844261fb070 RBX: ffff9844261e7000 RCX: ffff984425f67cc0
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189655] RDX: ffffbcd102a8bc90 RSI: ffff9844261e7000 RDI: 0000000000000000
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189656] RBP: ffffbcd102a8bcc8 R08: ffff9844261e7038 R09: ffff984414eb1e40
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189657] R10: ffff9843c2867938 R11: ffff9843e0ef2e80 R12: 00000000fffef9ae
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189658] R13: ffff9844261fb000 R14: 0000000000000000 R15: 0000000000000001
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189659] FS:  00007fac2e5a4100(0000) GS:ffff984433c00000(0000) knlGS:0000000000000000
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189660] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189661] CR2: 00000000000000f8 CR3: 0000000214fe2004 CR4: 00000000003606f0
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189662] Call Trace:
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189665]  ? part_round_stats+0xf6/0x170
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189668]  ? mntput+0x24/0x40
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189670]  part_stat_show+0x49/0x330
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189673]  dev_attr_show+0x20/0x50
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189675]  sysfs_kf_seq_show+0xb8/0x120
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189677]  kernfs_seq_show+0x21/0x30
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189678]  seq_read+0xc9/0x3f0
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189680]  kernfs_fop_read+0x134/0x180
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189682]  __vfs_read+0x37/0x160
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189684]  ? security_file_permission+0x9b/0xc0
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189686]  vfs_read+0x8e/0x130
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189687]  SyS_read+0x55/0xc0
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189689]  entry_SYSCALL_64_fastpath+0x1e/0xa9
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189691] RIP: 0033:0x7fac2b9a0d5d
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189691] RSP: 002b:00007fffffe44790 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189693] RAX: ffffffffffffffda RBX: 000055ce744db1d0 RCX: 00007fac2b9a0d5d
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189694] RDX: 0000000000001fff RSI: 00007fffffe45910 RDI: 0000000000000046
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189694] RBP: 00007fac2b9863e0 R08: 0000000000000000 R09: 0000000000000018
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189695] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189696] R13: 00007fabc4b8e3e0 R14: 000055ce7350a9e0 R15: 000055ce74640240
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189697] Code: 85 d2 74 e5 48 85 f6 74 0f 48 8b 56 28 48 83 ea 70 f0 ff 4c 02 48 5d c3 31 d2 eb f5 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 <48> 83 bf f8 00 00 00 00 75 3b 8b 8e 28 03 00 00 8b 86 2c 03 00
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189719] RIP: part_in_flight+0x5/0x60 RSP: ffffbcd102a8bc88
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189720] CR2: 00000000000000f8
+Sep 21 22:09:00 krzysiek-asus1 kernel: [   31.189722] ---[ end trace 501f2c2fbb4c9161 ]---
+---------
 
-# first bad commit: [f299b7c7a9dee64425e5965bd4f56dc024c1befc] blk-mq: pr=
-ovide internal in-flight variant
-
-Krzysztof
-
-
---------------ms030909070805050904060400
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: Kryptograficzna sygnatura S/MIME
-
-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
-Y3JsMGEGCCsGAQUFBwEBBFUwUzAhBggrBgEFBQcwAYYVaHR0cDovL29jc3AuY2VydHVtLnBs
-MC4GCCsGAQUFBzAChiJodHRwOi8vcmVwb3NpdG9yeS5jZXJ0dW0ucGwvbDMuY2VyMB8GA1Ud
-IwQYMBaAFATJ2prcSkl3rzADBGYux87y+Bd9MB0GA1UdDgQWBBRmQ6eI2gsUQTBYq36znG2i
-ibOjIjAOBgNVHQ8BAf8EBAMCBPAwggE9BgNVHSAEggE0MIIBMDCCASwGCiqEaAGG9ncCAgMw
-ggEcMCUGCCsGAQUFBwIBFhlodHRwczovL3d3dy5jZXJ0dW0ucGwvQ1BTMIHyBggrBgEFBQcC
-AjCB5TAgFhlVbml6ZXRvIFRlY2hub2xvZ2llcyBTLkEuMAMCAQEagcBVc2FnZSBvZiB0aGlz
-IGNlcnRpZmljYXRlIGlzIHN0cmljdGx5IHN1YmplY3RlZCB0byB0aGUgQ0VSVFVNIENlcnRp
-ZmljYXRpb24gUHJhY3RpY2UgU3RhdGVtZW50IChDUFMpIGluY29ycG9yYXRlZCBieSByZWZl
-cmVuY2UgaGVyZWluIGFuZCBpbiB0aGUgcmVwb3NpdG9yeSBhdCBodHRwczovL3d3dy5jZXJ0
-dW0ucGwvcmVwb3NpdG9yeS4wHQYDVR0lBBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMEMBEGCWCG
-SAGG+EIBAQQEAwIFoDAdBgNVHREEFjAUgRJra29sYXNhQHdpbnNvZnQucGwwDQYJKoZIhvcN
-AQEFBQADggEBAEi6Ck4A4bJwpFrhUr3P13g1X3u+dz9MysS6sg8Vp2Pq4xJr2mQxVpkVo/pK
-98QNuAxPTh76E6Pv/WpwrZ6PDNruGwmsEtc5ZPbPET0o9E8k1w9AOOiz9uB4svCREYfYXfvF
-OE5CdqCfUavtWejqE+ut1/QBlMpsZSw+J9CVp7SzqtAvJpcGOjCxpRpAqf3Ub4evltHOJ9m9
-2riH6yNDozJjy58DrGnN9GylnuNalmUBLymhX9PNHv/9ChplLLK+nrg2N/fwJUmaRCmdcPPX
-M0sxVRwZXPjE/3RcX+2hWx7DYWE9Owb2Oy5cSX4QaRMNwms3bSbc5Yngnbfg4bSH0/sxggPV
-MIID0QIBATCBjDB4MQswCQYDVQQGEwJQTDEiMCAGA1UEChMZVW5pemV0byBUZWNobm9sb2dp
-ZXMgUy5BLjEnMCUGA1UECxMeQ2VydHVtIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MRwwGgYD
-VQQDExNDZXJ0dW0gTGV2ZWwgSUlJIENBAhAKoBfDfi9j1q92n0I6jVhyMA0GCWCGSAFlAwQC
-AQUAoIICGTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0xNzA5
-MjMxODM2MzBaMC8GCSqGSIb3DQEJBDEiBCAp3+Dr1//ZyUnwy56wzcEM2CjgC1FtD2Zpsmae
-Nx+DNzBsBgkqhkiG9w0BCQ8xXzBdMAsGCWCGSAFlAwQBKjALBglghkgBZQMEAQIwCgYIKoZI
-hvcNAwcwDgYIKoZIhvcNAwICAgCAMA0GCCqGSIb3DQMCAgFAMAcGBSsOAwIHMA0GCCqGSIb3
-DQMCAgEoMIGdBgkrBgEEAYI3EAQxgY8wgYwweDELMAkGA1UEBhMCUEwxIjAgBgNVBAoTGVVu
-aXpldG8gVGVjaG5vbG9naWVzIFMuQS4xJzAlBgNVBAsTHkNlcnR1bSBDZXJ0aWZpY2F0aW9u
-IEF1dGhvcml0eTEcMBoGA1UEAxMTQ2VydHVtIExldmVsIElJSSBDQQIQCqAXw34vY9avdp9C
-Oo1YcjCBnwYLKoZIhvcNAQkQAgsxgY+ggYwweDELMAkGA1UEBhMCUEwxIjAgBgNVBAoTGVVu
-aXpldG8gVGVjaG5vbG9naWVzIFMuQS4xJzAlBgNVBAsTHkNlcnR1bSBDZXJ0aWZpY2F0aW9u
-IEF1dGhvcml0eTEcMBoGA1UEAxMTQ2VydHVtIExldmVsIElJSSBDQQIQCqAXw34vY9avdp9C
-Oo1YcjANBgkqhkiG9w0BAQEFAASCAQBtIfXzdofaSUcR9Jaog16ZcyLfv655nSHzBzoJ2ipB
-M0bfb7RoKKUzu8J+3G6y56QfbaQrTEKnYYGKL8ciIplMePXnl+setqOhTHf/B/dEj/qeUJrk
-Q1zqF2/lmUXlscGSvQmjxGfKS9WsF5+gnwQiJxYt+zU5Is3ckzQOiPC+mMC3ioeR0hzeR9w+
-BO1jJI9vfsAuwVZpiOJV7ilYha4M/pgf9S1Ic0wKiSKiRcAb36yl1GjbmcVWxYVslSvixQhR
-VBKaSUfITNiLNUphYfMV57mKlDOHK3Hiw6cWzvmTZHffOd+VlMx6iAwuHaGBLDZ4JChOYe2e
-eLFCK0QWTb6DAAAAAAAA
---------------ms030909070805050904060400--
+Krzysztof Kolasa
