@@ -1,68 +1,49 @@
-Return-Path: <prvs=4336ae8ff=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V4 04/16] scsi: sd_zbc: Use well defined macros
-Date: Sun, 24 Sep 2017 16:02:35 +0900
-Message-Id: <20170924070247.25560-5-damien.lemoal@wdc.com>
-In-Reply-To: <20170924070247.25560-1-damien.lemoal@wdc.com>
-References: <20170924070247.25560-1-damien.lemoal@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [GIT PULL] another set of nvme fixes for 4.14-rc2
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+ Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
+References: <20170922175537.z5gvxcbckoli6vn5@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <ca4e3765-6d56-b963-3525-a1a67a0769fd@kernel.dk>
+Date: Fri, 22 Sep 2017 12:33:18 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170922175537.z5gvxcbckoli6vn5@infradead.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-instead of open coding, use the min() macro to calculate a report zones
-reply buffer length in sd_zbc_check_zone_size() and the round_up()
-macro for calculating the number of zones in sd_zbc_setup().
+On 09/22/2017 11:55 AM, Christoph Hellwig wrote:
+> The fix for the target sqhdr fix is the critical one that we really want
+> before -rc2.  But we've also accumulated a fair batch of small FC and
+> RDMA fixes as well.
+> 
+> 
+> The following changes since commit cd9e0a08e4f6173f9d7a469cabd09938fc4f0e25:
+> 
+>   block: fix a crash caused by wrong API (2017-09-21 13:20:40 -0600)
+> 
+> are available in the git repository at:
+> 
+>   git://git.infradead.org/nvme.git nvme-4.14
+> 
+> for you to fetch changes up to 4384e7ae7686aa914ee4f163be1790d03e2e8f28:
+> 
+>   nvme-fcloop: fix port deletes and callbacks (2017-09-22 07:27:08 -0700)
+> 
+> ----------------------------------------------------------------
+> James Smart (5):
+>       nvme: fix sqhd reference when admin queue connect fails
+>       nvmet-fc: on port remove call put outside lock
+>       nvmet-fc: ensure target queue id within range.
+>       nvmet-fc: sync header templates with comments
+>       nvme-fcloop: fix port deletes and callbacks
+> 
+> Sagi Grimberg (3):
+>       nvme-core: Use nvme_wq to queue async events and fw activation
+>       nvme-rdma: give up reconnect if state change fails
+>       nvme-rdma: don't fully stop the controller in error recovery
 
-No functional change is introduced by this patch.
+Pulled, thanks.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- drivers/scsi/sd_zbc.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index 7dbaf920679e..bbad851c1789 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -475,7 +475,7 @@ static int sd_zbc_check_capacity(struct scsi_disk *sdkp, unsigned char *buf)
- 	return 0;
- }
- 
--#define SD_ZBC_BUF_SIZE 131072
-+#define SD_ZBC_BUF_SIZE 131072U
- 
- /**
-  * sd_zbc_check_zone_size - Check the device zone sizes
-@@ -526,10 +526,7 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
- 		/* Parse REPORT ZONES header */
- 		list_length = get_unaligned_be32(&buf[0]) + 64;
- 		rec = buf + 64;
--		if (list_length < SD_ZBC_BUF_SIZE)
--			buf_len = list_length;
--		else
--			buf_len = SD_ZBC_BUF_SIZE;
-+		buf_len = min(list_length, SD_ZBC_BUF_SIZE);
- 
- 		/* Parse zone descriptors */
- 		while (rec < buf + buf_len) {
-@@ -599,9 +596,8 @@ static int sd_zbc_setup(struct scsi_disk *sdkp)
- 	/* chunk_sectors indicates the zone size */
- 	blk_queue_chunk_sectors(sdkp->disk->queue,
- 			logical_to_sectors(sdkp->device, sdkp->zone_blocks));
--	sdkp->nr_zones = sdkp->capacity >> sdkp->zone_shift;
--	if (sdkp->capacity & (sdkp->zone_blocks - 1))
--		sdkp->nr_zones++;
-+	sdkp->nr_zones =
-+		round_up(sdkp->capacity, sdkp->zone_blocks) >> sdkp->zone_shift;
- 
- 	if (!sdkp->zones_wlock) {
- 		sdkp->zones_wlock = kcalloc(BITS_TO_LONGS(sdkp->nr_zones),
 -- 
-2.13.5
+Jens Axboe
