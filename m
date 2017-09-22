@@ -1,21 +1,11 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-io0-f169.google.com ([209.85.223.169]:56027 "EHLO
-        mail-io0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752270AbdIZPdt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Sep 2017 11:33:49 -0400
-Received: by mail-io0-f169.google.com with SMTP id z187so13104985ioz.12
-        for <linux-block@vger.kernel.org>; Tue, 26 Sep 2017 08:33:48 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1506083824-4024-6-git-send-email-adrian.hunter@intel.com>
-References: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com> <1506083824-4024-6-git-send-email-adrian.hunter@intel.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 26 Sep 2017 17:33:47 +0200
-Message-ID: <CACRpkdYLT7padANzsDSQjCZUu2ib-zT97DXD+L8ur+PjnqmKhw@mail.gmail.com>
-Subject: Re: [PATCH V9 05/15] mmc: mmc: Enable CQE's
-To: Adrian Hunter <adrian.hunter@intel.com>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
+Received: from mga14.intel.com ([192.55.52.115]:36798 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752448AbdIVMoR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Sep 2017 08:44:17 -0400
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
         linux-kernel <linux-kernel@vger.kernel.org>,
         Bough Chen <haibo.chen@nxp.com>,
@@ -29,19 +19,69 @@ Cc: Ulf Hansson <ulf.hansson@linaro.org>,
         Sahitya Tummala <stummala@codeaurora.org>,
         Harjani Ritesh <riteshh@codeaurora.org>,
         Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
         Shawn Lin <shawn.lin@rock-chips.com>,
         Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH V9 05/15] mmc: mmc: Enable CQE's
+Date: Fri, 22 Sep 2017 15:36:54 +0300
+Message-Id: <1506083824-4024-6-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com>
+References: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Sep 22, 2017 at 2:36 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
+Enable or disable CQE when a card is added or removed respectively.
 
-> Enable or disable CQE when a card is added or removed respectively.
->
-> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+---
+ drivers/mmc/core/bus.c |  7 +++++++
+ drivers/mmc/core/mmc.c | 12 ++++++++++++
+ 2 files changed, 19 insertions(+)
 
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-
-Yours,
-Linus Walleij
+diff --git a/drivers/mmc/core/bus.c b/drivers/mmc/core/bus.c
+index 301246513a37..a4b49e25fe96 100644
+--- a/drivers/mmc/core/bus.c
++++ b/drivers/mmc/core/bus.c
+@@ -369,10 +369,17 @@ int mmc_add_card(struct mmc_card *card)
+  */
+ void mmc_remove_card(struct mmc_card *card)
+ {
++	struct mmc_host *host = card->host;
++
+ #ifdef CONFIG_DEBUG_FS
+ 	mmc_remove_card_debugfs(card);
+ #endif
+ 
++	if (host->cqe_enabled) {
++		host->cqe_ops->cqe_disable(host);
++		host->cqe_enabled = false;
++	}
++
+ 	if (mmc_card_present(card)) {
+ 		if (mmc_host_is_spi(card->host)) {
+ 			pr_info("%s: SPI card removed\n",
+diff --git a/drivers/mmc/core/mmc.c b/drivers/mmc/core/mmc.c
+index 454a5079a90f..de817ac80383 100644
+--- a/drivers/mmc/core/mmc.c
++++ b/drivers/mmc/core/mmc.c
+@@ -1807,6 +1807,18 @@ static int mmc_init_card(struct mmc_host *host, u32 ocr,
+ 	 */
+ 	card->reenable_cmdq = card->ext_csd.cmdq_en;
+ 
++	if (card->ext_csd.cmdq_en && !host->cqe_enabled) {
++		err = host->cqe_ops->cqe_enable(host, card);
++		if (err) {
++			pr_err("%s: Failed to enable CQE, error %d\n",
++				mmc_hostname(host), err);
++		} else {
++			host->cqe_enabled = true;
++			pr_info("%s: Command Queue Engine enabled\n",
++				mmc_hostname(host));
++		}
++	}
++
+ 	if (!oldcard)
+ 		host->card = card;
+ 
+-- 
+1.9.1
