@@ -1,177 +1,116 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:55648 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752950AbdI3K3l (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Sep 2017 06:29:41 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 7/7] blk-mq-sched: don't dequeue request until all in ->dispatch are flushed
-Date: Sat, 30 Sep 2017 18:27:20 +0800
-Message-Id: <20170930102720.30219-8-ming.lei@redhat.com>
-In-Reply-To: <20170930102720.30219-1-ming.lei@redhat.com>
-References: <20170930102720.30219-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <horvatmate@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20170914081757.c64qa6pp2zi5hmda@linux-x5ow.site>
+References: <1505317073-22567-1-git-send-email-philipp.guendisch@fau.de> <20170914081757.c64qa6pp2zi5hmda@linux-x5ow.site>
+From: =?UTF-8?B?TcOhdMOpIEhvcnbDoXRo?= <horvatmate@gmail.com>
+Date: Fri, 22 Sep 2017 11:54:36 +0200
+Message-ID: <CA+3umMVAc1LiuHsY=Sj6p-5d6ubyZJW1gMoYi0d5gYOQEgrCfg@mail.gmail.com>
+Subject: Re: [PATCH] Support for secure erase functionality
+To: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Philipp Guendisch <philipp.guendisch@fau.de>, linux-kernel@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	damien.lemoal@wdc.com, axboe@kernel.dk, viro@zeniv.linux.org.uk,
+	bart.vanassche@sandisk.com, martin.petersen@oracle.com, hare@suse.de,
+	osandov@fb.com, dan.j.williams@intel.com, ming.lei@redhat.com,
+	linux-kernel@i4.cs.fau.de
+Content-Type: text/plain; charset="UTF-8"
+List-ID: <linux-block@vger.kernel.org>
 
-During dispatching, we moved all requests from hctx->dispatch to
-one temporary list, then dispatch them one by one from this list.
-Unfortunately during this period, run queue from other contexts
-may think the queue is idle, then start to dequeue from sw/scheduler
-queue and still try to dispatch because ->dispatch is empty. This way
-hurts sequential I/O performance because requests are dequeued when
-lld queue is busy.
+Dear Johannes Thumshirn,
 
-This patch introduces the state of BLK_MQ_S_DISPATCH_BUSY to
-make sure that request isn't dequeued until ->dispatch is
-flushed.
+> How can this work with CoW filesystems?
 
-Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Tested-by: Tom Nguyen <tom81094@gmail.com>
-Tested-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-debugfs.c |  1 +
- block/blk-mq-sched.c   | 53 +++++++++++++++++++++++++++++++++-----------------
- block/blk-mq.c         |  6 ++++++
- include/linux/blk-mq.h |  1 +
- 4 files changed, 43 insertions(+), 18 deletions(-)
+Because we are a layer below filesystems, that depends on the actual
+implementation.
+If the discards are issued to the right sectors on the drive, we write
+into those sectors.
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 813ca3bbbefc..f1a62c0d1acc 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -182,6 +182,7 @@ static const char *const hctx_state_name[] = {
- 	HCTX_STATE_NAME(SCHED_RESTART),
- 	HCTX_STATE_NAME(TAG_WAITING),
- 	HCTX_STATE_NAME(START_ON_RUN),
-+	HCTX_STATE_NAME(DISPATCH_BUSY),
- };
- #undef HCTX_STATE_NAME
- 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 3ba112d9dc15..c5eac1eee442 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -146,7 +146,6 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	struct request_queue *q = hctx->queue;
- 	struct elevator_queue *e = q->elevator;
- 	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
--	bool do_sched_dispatch = true;
- 	LIST_HEAD(rq_list);
- 
- 	/* RCU or SRCU read lock is needed before checking quiesced flag */
-@@ -177,8 +176,33 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	 */
- 	if (!list_empty(&rq_list)) {
- 		blk_mq_sched_mark_restart_hctx(hctx);
--		do_sched_dispatch = blk_mq_dispatch_rq_list(q, &rq_list);
--	} else if (!has_sched_dispatch && !q->queue_depth) {
-+		blk_mq_dispatch_rq_list(q, &rq_list);
-+
-+		/*
-+		 * We may clear DISPATCH_BUSY just after it
-+		 * is set from another context, the only cost
-+		 * is that one request is dequeued a bit early,
-+		 * we can survive that. Given the window is
-+		 * small enough, no need to worry about performance
-+		 * effect.
-+		 */
-+		if (list_empty_careful(&hctx->dispatch))
-+			clear_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
-+	}
-+
-+	/*
-+	 * If DISPATCH_BUSY is set, that means hw queue is busy
-+	 * and requests in the list of hctx->dispatch need to
-+	 * be flushed first, so return early.
-+	 *
-+	 * Wherever DISPATCH_BUSY is set, blk_mq_run_hw_queue()
-+	 * will be run to try to make progress, so it is always
-+	 * safe to check the state here.
-+	 */
-+	if (test_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state))
-+		return;
-+
-+	if (!has_sched_dispatch) {
- 		/*
- 		 * If there is no per-request_queue depth, we
- 		 * flush all requests in this hw queue, otherwise
-@@ -187,22 +211,15 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 		 * run out of resource, which can be triggered
- 		 * easily by per-request_queue queue depth
- 		 */
--		blk_mq_flush_busy_ctxs(hctx, &rq_list);
--		blk_mq_dispatch_rq_list(q, &rq_list);
--	}
--
--	if (!do_sched_dispatch)
--		return;
--
--	/*
--	 * We want to dispatch from the scheduler if there was nothing
--	 * on the dispatch list or we were able to dispatch from the
--	 * dispatch list.
--	 */
--	if (has_sched_dispatch)
-+		if (!q->queue_depth) {
-+			blk_mq_flush_busy_ctxs(hctx, &rq_list);
-+			blk_mq_dispatch_rq_list(q, &rq_list);
-+		} else {
-+			blk_mq_do_dispatch_ctx(q, hctx);
-+		}
-+	} else {
- 		blk_mq_do_dispatch_sched(q, e, hctx);
--	else
--		blk_mq_do_dispatch_ctx(q, hctx);
-+	}
- }
- 
- bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8b49af1ade7f..7cb3f87334c0 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1142,6 +1142,11 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
- 
- 		spin_lock(&hctx->lock);
- 		list_splice_init(list, &hctx->dispatch);
-+		/*
-+		 * DISPATCH_BUSY won't be cleared until all requests
-+		 * in hctx->dispatch are dispatched successfully
-+		 */
-+		set_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
- 		spin_unlock(&hctx->lock);
- 
- 		/*
-@@ -1446,6 +1451,7 @@ static void blk_mq_request_direct_insert(struct blk_mq_hw_ctx *hctx,
- {
- 	spin_lock(&hctx->lock);
- 	list_add_tail(&rq->queuelist, &hctx->dispatch);
-+	set_bit(BLK_MQ_S_DISPATCH_BUSY, &hctx->state);
- 	spin_unlock(&hctx->lock);
- 
- 	blk_mq_run_hw_queue(hctx, false);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index fccabe00fb55..aa9853ada8b8 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -172,6 +172,7 @@ enum {
- 	BLK_MQ_S_SCHED_RESTART	= 2,
- 	BLK_MQ_S_TAG_WAITING	= 3,
- 	BLK_MQ_S_START_ON_RUN	= 4,
-+	BLK_MQ_S_DISPATCH_BUSY	= 5,
- 
- 	BLK_MQ_MAX_DEPTH	= 10240,
- 
--- 
-2.9.5
+
+>> Built against torvalds/linux
+>
+> This should go below the '---' so git am doesn't write it into the change=
+log.
+
+Thanks for the hint, we messed that up.
+
+
+> Which filesystems commonly used in production are left afterwards?
+
+The list of filesystems you see in the code are the working ones
+(except btrfs, that apparently
+doesn't mount a block device, so it doesn't run into our code - we
+have to look into that).
+Which other filesystems do you miss?
+
+> I'm sorry, but while I get that this sounds like a nice feature for a pap=
+er or
+> reasearch project, I don't see why it should be used on production system=
+s at
+> all.
+
+This feature could be used, if you can't afford to use a full disk
+encryption, but still want to
+erase sensitive data on the fly. As you probably read in the other
+mails, this solution is
+not forensic-proof, but with a normal data recovery tool, you
+shouldn't be able to recover
+more than the file name
+
+Best regards,
+M=C3=A1t=C3=A9 Horv=C3=A1th
+
+
+2017-09-14 10:17 GMT+02:00 Johannes Thumshirn <jthumshirn@suse.de>:
+> On Wed, Sep 13, 2017 at 05:37:53PM +0200, Philipp Guendisch wrote:
+>> This patch adds a software based secure erase option to improve data
+>> confidentiality. The CONFIG_BLK_DEV_SECURE_ERASE option enables a mount
+>> flag called 'sw_secure_erase'. When you mount a volume with this flag,
+>> every discard call is prepended by an explicit write command to overwrit=
+e
+>> the data before it is discarded. A volume without a discard compatibilit=
+y
+>> can be used as well but the discard calls will be enabled for this devic=
+e
+>> and suppressed after the write call is made.
+>
+> How can this work with CoW filesystems?
+>
+>>
+>> Built against torvalds/linux
+>
+> This should go below the '---' so git am doesn't write it into the change=
+log.
+>
+>
+> [...]
+>
+>> +     if (strcmp(fs_type->name, "ext4") !=3D 0 &&
+>> +         strcmp(fs_type->name, "btrfs") !=3D 0 &&
+>> +         strcmp(fs_type->name, "gfs2") !=3D 0 &&
+>> +         strcmp(fs_type->name, "gfs2meta") !=3D 0 &&
+>> +         strcmp(fs_type->name, "xfs") !=3D 0 &&
+>> +         strcmp(fs_type->name, "jfs") !=3D 0) {
+>> +             pr_warn("fs: The mounted %s filesystem on drive %s does no=
+t generate discards, secure erase won't work",
+>> +                             fs_type->name, dev_name);
+>> +     }
+>> +skip:
+>> +#endif
+>
+> Which filesystems commonly used in production are left afterwards?
+>
+> I'm sorry, but while I get that this sounds like a nice feature for a pap=
+er or
+> reasearch project, I don't see why it should be used on production system=
+s at
+> all.
+>
+> Byte,
+>         Johannes
+> --
+> Johannes Thumshirn                                          Storage
+> jthumshirn@suse.de                                +49 911 74053 689
+> SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
+> GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
+> HRB 21284 (AG N=C3=BCrnberg)
+> Key fingerprint =3D EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
