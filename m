@@ -1,21 +1,11 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-it0-f54.google.com ([209.85.214.54]:44811 "EHLO
-        mail-it0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935920AbdIZXtB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Sep 2017 19:49:01 -0400
-Received: by mail-it0-f54.google.com with SMTP id d192so9663114itd.1
-        for <linux-block@vger.kernel.org>; Tue, 26 Sep 2017 16:49:01 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1506083824-4024-13-git-send-email-adrian.hunter@intel.com>
-References: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com> <1506083824-4024-13-git-send-email-adrian.hunter@intel.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Wed, 27 Sep 2017 01:49:00 +0200
-Message-ID: <CACRpkdbjFJoZNCe5EJdOHEircO_Cvt6LOsoQcXcY9wBS8NNWjA@mail.gmail.com>
-Subject: Re: [PATCH V9 12/15] mmc: core: Export mmc_retune_hold_now() and mmc_retune_release()
-To: Adrian Hunter <adrian.hunter@intel.com>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
+Received: from mga09.intel.com ([134.134.136.24]:36143 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752564AbdIVMoz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Sep 2017 08:44:55 -0400
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
         linux-kernel <linux-kernel@vger.kernel.org>,
         Bough Chen <haibo.chen@nxp.com>,
@@ -29,22 +19,73 @@ Cc: Ulf Hansson <ulf.hansson@linaro.org>,
         Sahitya Tummala <stummala@codeaurora.org>,
         Harjani Ritesh <riteshh@codeaurora.org>,
         Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
         Shawn Lin <shawn.lin@rock-chips.com>,
         Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH V9 12/15] mmc: core: Export mmc_retune_hold_now() and mmc_retune_release()
+Date: Fri, 22 Sep 2017 15:37:01 +0300
+Message-Id: <1506083824-4024-13-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com>
+References: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Sep 22, 2017 at 2:37 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
+Export mmc_retune_hold_now() and mmc_retune_release() so they can be used
+by the block driver.
 
-> Export mmc_retune_hold_now() and mmc_retune_release() so they can be used
-> by the block driver.
->
-> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+---
+ drivers/mmc/core/host.c | 7 +------
+ drivers/mmc/core/host.h | 7 ++++++-
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
-Actually you convert mmc_retune_hold_now() into a static inline, so the commit
-message is a bit ambigous but who cares.
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-
-Yours,
-Linus Walleij
+diff --git a/drivers/mmc/core/host.c b/drivers/mmc/core/host.c
+index b624dbb6cd15..1539ce0da196 100644
+--- a/drivers/mmc/core/host.c
++++ b/drivers/mmc/core/host.c
+@@ -111,12 +111,6 @@ void mmc_retune_hold(struct mmc_host *host)
+ 	host->hold_retune += 1;
+ }
+ 
+-void mmc_retune_hold_now(struct mmc_host *host)
+-{
+-	host->retune_now = 0;
+-	host->hold_retune += 1;
+-}
+-
+ void mmc_retune_release(struct mmc_host *host)
+ {
+ 	if (host->hold_retune)
+@@ -124,6 +118,7 @@ void mmc_retune_release(struct mmc_host *host)
+ 	else
+ 		WARN_ON(1);
+ }
++EXPORT_SYMBOL(mmc_retune_release);
+ 
+ int mmc_retune(struct mmc_host *host)
+ {
+diff --git a/drivers/mmc/core/host.h b/drivers/mmc/core/host.h
+index 170fe5947087..6eaf558e62d6 100644
+--- a/drivers/mmc/core/host.h
++++ b/drivers/mmc/core/host.h
+@@ -19,12 +19,17 @@
+ void mmc_retune_enable(struct mmc_host *host);
+ void mmc_retune_disable(struct mmc_host *host);
+ void mmc_retune_hold(struct mmc_host *host);
+-void mmc_retune_hold_now(struct mmc_host *host);
+ void mmc_retune_release(struct mmc_host *host);
+ int mmc_retune(struct mmc_host *host);
+ void mmc_retune_pause(struct mmc_host *host);
+ void mmc_retune_unpause(struct mmc_host *host);
+ 
++static inline void mmc_retune_hold_now(struct mmc_host *host)
++{
++	host->retune_now = 0;
++	host->hold_retune += 1;
++}
++
+ static inline void mmc_retune_recheck(struct mmc_host *host)
+ {
+ 	if (host->hold_retune <= 1)
+-- 
+1.9.1
