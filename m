@@ -1,68 +1,76 @@
-Return-Path: <prvs=434c021e3=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V5 03/14] scsi: sd_zbc: Rearrange code
-Date: Mon, 25 Sep 2017 15:14:43 +0900
-Message-Id: <20170925061454.5533-4-damien.lemoal@wdc.com>
-In-Reply-To: <20170925061454.5533-1-damien.lemoal@wdc.com>
-References: <20170925061454.5533-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:39558 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751653AbdIVCP4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Sep 2017 22:15:56 -0400
+Date: Fri, 22 Sep 2017 10:15:41 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Mel Gorman <mgorman@techsingularity.net>
+Subject: Re: [PATCH V4 05/14] blk-mq-sched: improve dispatching from sw queue
+Message-ID: <20170922021539.GL6854@ming.t460p>
+References: <20170902151729.6162-1-ming.lei@redhat.com>
+ <20170902151729.6162-6-ming.lei@redhat.com>
+ <937c6abf-8438-5e04-76a6-8485eb8be141@kernel.dk>
+ <20170920122057.GA27867@ming.t460p>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170920122057.GA27867@ming.t460p>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Rearrange sd_zbc_setup() to include use_16_for_rw and use_10_for_rw
-assignments and move the calculation of sdkp->zone_shift together
-with the assignment of the verified zone_blocks value in
-sd_zbc_check_zone_size().
+On Wed, Sep 20, 2017 at 08:20:58PM +0800, Ming Lei wrote:
+> On Tue, Sep 19, 2017 at 02:37:50PM -0600, Jens Axboe wrote:
+> > On 09/02/2017 09:17 AM, Ming Lei wrote:
+> > > @@ -142,18 +178,31 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+> > >  	if (!list_empty(&rq_list)) {
+> > >  		blk_mq_sched_mark_restart_hctx(hctx);
+> > >  		do_sched_dispatch = blk_mq_dispatch_rq_list(q, &rq_list);
+> > > -	} else if (!has_sched_dispatch) {
+> > > +	} else if (!has_sched_dispatch && !q->queue_depth) {
+> > > +		/*
+> > > +		 * If there is no per-request_queue depth, we
+> > > +		 * flush all requests in this hw queue, otherwise
+> > > +		 * pick up request one by one from sw queue for
+> > > +		 * avoiding to mess up I/O merge when dispatch
+> > > +		 * is busy, which can be triggered easily by
+> > > +		 * per-request_queue queue depth
+> > > +		 */
+> > >  		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+> > >  		blk_mq_dispatch_rq_list(q, &rq_list);
+> > >  	}
+> > 
+> > I don't like this part at all. It's a heuristic, and on top of that,
+> > it's a heuristic based on a weak assumption that if q->queue_depth == 0,
+> > then we never run into BUSY constraints. I think that would be stronger
+> > if it was based on "is this using shared tags", but even that is not
+> > great at all. It's perfectly possible to have a shared tags setup and
+> > never run into resource constraints. The opposite condition is also true
+> > - you can run without shared tags, and yet hit resource constraints
+> > constantly. Hence this is NOT a good test for deciding whether to flush
+> > everything at once or not. In short, I think a much better test case
+> > would be "has this device ever returned BLK_STS_RESOURCE. As it so
+> > happens, that's easy enough to keep track of and base this test on.
+> 
+> Hi Jens,
+> 
+> The attached patch follows your suggestion, and uses EWMA to
+> compute the average length of hctx->dispatch, then only flush
+> all requests from ctxs if the average length is zero, what do
+> you think about this approach? Or other suggestions?
 
-No functional change is introduced by this patch.
+Hi Jens,
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- drivers/scsi/sd_zbc.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+I am going to prepare for V5, as suggested by Omar.
 
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index 023f705ae235..7dbaf920679e 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -584,6 +584,7 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
- 	}
- 
- 	sdkp->zone_blocks = zone_blocks;
-+	sdkp->zone_shift = ilog2(zone_blocks);
- 
- 	return 0;
- }
-@@ -591,10 +592,13 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
- static int sd_zbc_setup(struct scsi_disk *sdkp)
- {
- 
-+	/* READ16/WRITE16 is mandatory for ZBC disks */
-+	sdkp->device->use_16_for_rw = 1;
-+	sdkp->device->use_10_for_rw = 0;
-+
- 	/* chunk_sectors indicates the zone size */
- 	blk_queue_chunk_sectors(sdkp->disk->queue,
- 			logical_to_sectors(sdkp->device, sdkp->zone_blocks));
--	sdkp->zone_shift = ilog2(sdkp->zone_blocks);
- 	sdkp->nr_zones = sdkp->capacity >> sdkp->zone_shift;
- 	if (sdkp->capacity & (sdkp->zone_blocks - 1))
- 		sdkp->nr_zones++;
-@@ -657,10 +661,6 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
- 	if (ret)
- 		goto err;
- 
--	/* READ16/WRITE16 is mandatory for ZBC disks */
--	sdkp->device->use_16_for_rw = 1;
--	sdkp->device->use_10_for_rw = 0;
--
- 	return 0;
- 
- err:
+Could you suggest which way you prefer to?  Keeping to check
+q->queue_depth, or the approach of using average length of
+hctx->dispath, or others? 
+
+
 -- 
-2.13.5
+Ming
