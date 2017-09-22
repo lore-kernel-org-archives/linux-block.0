@@ -1,21 +1,11 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-it0-f51.google.com ([209.85.214.51]:44362 "EHLO
-        mail-it0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1030485AbdIZPdC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Sep 2017 11:33:02 -0400
-Received: by mail-it0-f51.google.com with SMTP id d192so8739384itd.1
-        for <linux-block@vger.kernel.org>; Tue, 26 Sep 2017 08:33:02 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1506083824-4024-5-git-send-email-adrian.hunter@intel.com>
-References: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com> <1506083824-4024-5-git-send-email-adrian.hunter@intel.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 26 Sep 2017 17:33:01 +0200
-Message-ID: <CACRpkda06Q++dvYspU7vRdB=5qY11ec+LjwnpeG=mUm4G2EAwg@mail.gmail.com>
-Subject: Re: [PATCH V9 04/15] mmc: mmc: Enable Command Queuing
-To: Adrian Hunter <adrian.hunter@intel.com>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
+Received: from mga14.intel.com ([192.55.52.115]:36798 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752448AbdIVMoM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Sep 2017 08:44:12 -0400
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
         linux-kernel <linux-kernel@vger.kernel.org>,
         Bough Chen <haibo.chen@nxp.com>,
@@ -29,21 +19,53 @@ Cc: Ulf Hansson <ulf.hansson@linaro.org>,
         Sahitya Tummala <stummala@codeaurora.org>,
         Harjani Ritesh <riteshh@codeaurora.org>,
         Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
         Shawn Lin <shawn.lin@rock-chips.com>,
         Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH V9 04/15] mmc: mmc: Enable Command Queuing
+Date: Fri, 22 Sep 2017 15:36:53 +0300
+Message-Id: <1506083824-4024-5-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com>
+References: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Sep 22, 2017 at 2:36 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
+Enable the Command Queue if the host controller supports a command queue
+engine. It is not compatible with Packed Commands, so make a note of that in the
+comment.
 
-> Enable the Command Queue if the host controller supports a command queue
-> engine. It is not compatible with Packed Commands, so make a note of that in the
-> comment.
->
-> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+---
+ drivers/mmc/core/mmc.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-
-Yours,
-Linus Walleij
+diff --git a/drivers/mmc/core/mmc.c b/drivers/mmc/core/mmc.c
+index 3927157207b9..454a5079a90f 100644
+--- a/drivers/mmc/core/mmc.c
++++ b/drivers/mmc/core/mmc.c
+@@ -1784,6 +1784,23 @@ static int mmc_init_card(struct mmc_host *host, u32 ocr,
+ 	}
+ 
+ 	/*
++	 * Enable Command Queue if supported. Note that Packed Commands cannot
++	 * be used with Command Queue.
++	 */
++	card->ext_csd.cmdq_en = false;
++	if (card->ext_csd.cmdq_support && host->caps2 & MMC_CAP2_CQE) {
++		err = mmc_cmdq_enable(card);
++		if (err && err != -EBADMSG)
++			goto free_card;
++		if (err) {
++			pr_warn("%s: Enabling CMDQ failed\n",
++				mmc_hostname(card->host));
++			card->ext_csd.cmdq_support = false;
++			card->ext_csd.cmdq_depth = 0;
++			err = 0;
++		}
++	}
++	/*
+ 	 * In some cases (e.g. RPMB or mmc_test), the Command Queue must be
+ 	 * disabled for a time, so a flag is needed to indicate to re-enable the
+ 	 * Command Queue.
+-- 
+1.9.1
