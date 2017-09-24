@@ -1,4 +1,4 @@
-Return-Path: <prvs=434c021e3=damien.lemoal@wdc.com>
+Return-Path: <prvs=4336ae8ff=damien.lemoal@wdc.com>
 From: Damien Le Moal <damien.lemoal@wdc.com>
 To: linux-scsi@vger.kernel.org,
 	"Martin K . Petersen" <martin.petersen@oracle.com>,
@@ -6,57 +6,63 @@ To: linux-scsi@vger.kernel.org,
 	Jens Axboe <axboe@kernel.dk>
 Cc: Christoph Hellwig <hch@lst.de>,
 	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V5 14/14] block: do not set mq default scheduler
-Date: Mon, 25 Sep 2017 15:14:54 +0900
-Message-Id: <20170925061454.5533-15-damien.lemoal@wdc.com>
-In-Reply-To: <20170925061454.5533-1-damien.lemoal@wdc.com>
-References: <20170925061454.5533-1-damien.lemoal@wdc.com>
+Subject: [PATCH V4 04/16] scsi: sd_zbc: Use well defined macros
+Date: Sun, 24 Sep 2017 16:02:35 +0900
+Message-Id: <20170924070247.25560-5-damien.lemoal@wdc.com>
+In-Reply-To: <20170924070247.25560-1-damien.lemoal@wdc.com>
+References: <20170924070247.25560-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-For blk-mq disks with a single hardware queue, setting by default the
-disk scheduler to mq-deadline early during the queue initialization
-prevents properly setting zone write locking for host managed zoned
-block device as the disk type is not yet known.
+instead of open coding, use the min() macro to calculate a report zones
+reply buffer length in sd_zbc_check_zone_size() and the round_up()
+macro for calculating the number of zones in sd_zbc_setup().
 
-Fix this by simply not setting the default scheduler to mq-deadline for
-single hardware queue disks. A udev rule can be used to easily do the
-same later in the system initialization sequence, when the device
-characteristics are known.
+No functional change is introduced by this patch.
 
 Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- block/elevator.c | 17 ++++++-----------
- 1 file changed, 6 insertions(+), 11 deletions(-)
+ drivers/scsi/sd_zbc.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/block/elevator.c b/block/elevator.c
-index 153926a90901..8b65a757f726 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -222,19 +222,14 @@ int elevator_init(struct request_queue *q, char *name)
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index 7dbaf920679e..bbad851c1789 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -475,7 +475,7 @@ static int sd_zbc_check_capacity(struct scsi_disk *sdkp, unsigned char *buf)
+ 	return 0;
+ }
  
- 	if (!e) {
- 		/*
--		 * For blk-mq devices, we default to using mq-deadline,
--		 * if available, for single queue devices. If deadline
--		 * isn't available OR we have multiple queues, default
--		 * to "none".
-+		 * For blk-mq devices, default to "none". udev can later set
-+		 * an appropriate default scheduler based on the disk
-+		 * characteristics which we do not yet have here.
- 		 */
--		if (q->mq_ops) {
--			if (q->nr_hw_queues == 1)
--				e = elevator_get("mq-deadline", false);
--			if (!e)
--				return 0;
--		} else
--			e = elevator_get(CONFIG_DEFAULT_IOSCHED, false);
-+		if (q->mq_ops)
-+			return 0;
+-#define SD_ZBC_BUF_SIZE 131072
++#define SD_ZBC_BUF_SIZE 131072U
  
-+		e = elevator_get(CONFIG_DEFAULT_IOSCHED, false);
- 		if (!e) {
- 			printk(KERN_ERR
- 				"Default I/O scheduler not found. " \
+ /**
+  * sd_zbc_check_zone_size - Check the device zone sizes
+@@ -526,10 +526,7 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
+ 		/* Parse REPORT ZONES header */
+ 		list_length = get_unaligned_be32(&buf[0]) + 64;
+ 		rec = buf + 64;
+-		if (list_length < SD_ZBC_BUF_SIZE)
+-			buf_len = list_length;
+-		else
+-			buf_len = SD_ZBC_BUF_SIZE;
++		buf_len = min(list_length, SD_ZBC_BUF_SIZE);
+ 
+ 		/* Parse zone descriptors */
+ 		while (rec < buf + buf_len) {
+@@ -599,9 +596,8 @@ static int sd_zbc_setup(struct scsi_disk *sdkp)
+ 	/* chunk_sectors indicates the zone size */
+ 	blk_queue_chunk_sectors(sdkp->disk->queue,
+ 			logical_to_sectors(sdkp->device, sdkp->zone_blocks));
+-	sdkp->nr_zones = sdkp->capacity >> sdkp->zone_shift;
+-	if (sdkp->capacity & (sdkp->zone_blocks - 1))
+-		sdkp->nr_zones++;
++	sdkp->nr_zones =
++		round_up(sdkp->capacity, sdkp->zone_blocks) >> sdkp->zone_shift;
+ 
+ 	if (!sdkp->zones_wlock) {
+ 		sdkp->zones_wlock = kcalloc(BITS_TO_LONGS(sdkp->nr_zones),
 -- 
 2.13.5
