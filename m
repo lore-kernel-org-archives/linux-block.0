@@ -1,27 +1,62 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:38530 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750907AbdIEGbj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Sep 2017 02:31:39 -0400
-Date: Mon, 4 Sep 2017 23:31:39 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Chandan Rajendra <chandan@linux.vnet.ibm.com>
-Cc: linux-xfs@vger.kernel.org, sandeen@sandeen.net,
-        Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
-Subject: Re: [PATCH] mkfs: Remove messages printed when blocksize < physical
- sectorsize
-Message-ID: <20170905063139.GA679@infradead.org>
-References: <20170905054442.28615-1-chandan@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170905054442.28615-1-chandan@linux.vnet.ibm.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=4336ae8ff=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V4 15/16] block: do not set mq defaulte scheduler
+Date: Sun, 24 Sep 2017 16:02:46 +0900
+Message-Id: <20170924070247.25560-16-damien.lemoal@wdc.com>
+In-Reply-To: <20170924070247.25560-1-damien.lemoal@wdc.com>
+References: <20170924070247.25560-1-damien.lemoal@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Sep 05, 2017 at 11:14:42AM +0530, Chandan Rajendra wrote:
-> Linux kernel commit 6c6b6f28b3335fd85ec833ee0005d9c9dca6c003 (loop: set
-> physical block size to PAGE_SIZE) now sets PAGE_SIZE as the default
-> physical sector size of loop devices. On ppc64, this causes loop devices
-> to have 64k as the physical sector size.
+For blk-mq disks with a single hardware queue, setting by default the
+disk scheduler to mq-deadline early during the queue initialization
+prevents properly setting zone write locking for zoned block device as
+the fact that the disk is zoned is not yet known.
 
-Eek.  We'll need to revert the loop change ASAP!
+Fix this by simply not setting the default scheduler to mq-deadline for
+single hardware queue disks. udev can be used to easily do the same
+later in the system initialization sequence, when the device
+characteristics are known.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+---
+ block/elevator.c | 17 ++++++-----------
+ 1 file changed, 6 insertions(+), 11 deletions(-)
+
+diff --git a/block/elevator.c b/block/elevator.c
+index 153926a90901..8b65a757f726 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -222,19 +222,14 @@ int elevator_init(struct request_queue *q, char *name)
+ 
+ 	if (!e) {
+ 		/*
+-		 * For blk-mq devices, we default to using mq-deadline,
+-		 * if available, for single queue devices. If deadline
+-		 * isn't available OR we have multiple queues, default
+-		 * to "none".
++		 * For blk-mq devices, default to "none". udev can later set
++		 * an appropriate default scheduler based on the disk
++		 * characteristics which we do not yet have here.
+ 		 */
+-		if (q->mq_ops) {
+-			if (q->nr_hw_queues == 1)
+-				e = elevator_get("mq-deadline", false);
+-			if (!e)
+-				return 0;
+-		} else
+-			e = elevator_get(CONFIG_DEFAULT_IOSCHED, false);
++		if (q->mq_ops)
++			return 0;
+ 
++		e = elevator_get(CONFIG_DEFAULT_IOSCHED, false);
+ 		if (!e) {
+ 			printk(KERN_ERR
+ 				"Default I/O scheduler not found. " \
+-- 
+2.13.5
