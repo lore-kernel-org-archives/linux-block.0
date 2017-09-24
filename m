@@ -1,47 +1,107 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:15464 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752202AbdIASUN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Sep 2017 14:20:13 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "mgorman@techsingularity.net" <mgorman@techsingularity.net>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "loberman@redhat.com" <loberman@redhat.com>,
-        "paolo.valente@linaro.org" <paolo.valente@linaro.org>
-Subject: Re: [PATCH V3 06/14] blk-mq-sched: don't dequeue request until all in
- ->dispatch are flushed
-Date: Fri, 1 Sep 2017 18:19:24 +0000
-Message-ID: <1504289962.14386.56.camel@wdc.com>
-References: <20170826163332.28971-1-ming.lei@redhat.com>
-         <20170826163332.28971-7-ming.lei@redhat.com>
-         <1504113058.2526.54.camel@wdc.com> <20170831040123.GE12246@ming.t460p>
-         <1504213218.31872.55.camel@wdc.com> <20170901030236.GC16525@ming.t460p>
-In-Reply-To: <20170901030236.GC16525@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=4336ae8ff=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V4 00/16] scsi-mq support for ZBC disks
+Date: Mon, 25 Sep 2017 01:33:41 +0900
+Message-Id: <20170924163341.26377-1-damien.lemoal@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-T24gRnJpLCAyMDE3LTA5LTAxIGF0IDExOjAyICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gVGhh
-dCBpcyBhIGdvb2QgcXVlc3Rpb24sIGJ1dCBpdCBoYXMgYmVlbiBhbnN3ZXJlZCBieSB0aGUgY29t
-bWVudA0KPiBiZWZvcmUgY2hlY2tpbmcgdGhlIERJU1BBVENIX0JVU1kgc3RhdGUgaW4gYmxrX21x
-X3NjaGVkX2Rpc3BhdGNoX3JlcXVlc3RzKCk6DQo+IA0KPiAJLyoNCj4gCSAqIElmIERJU1BBVENI
-X0JVU1kgaXMgc2V0LCB0aGF0IG1lYW5zIGh3IHF1ZXVlIGlzIGJ1c3kNCj4gCSAqIGFuZCByZXF1
-ZXN0cyBpbiB0aGUgbGlzdCBvZiBoY3R4LT5kaXNwYXRjaCBuZWVkIHRvDQo+IAkgKiBiZSBmbHVz
-aGVkIGZpcnN0LCBzbyByZXR1cm4gZWFybHkuDQo+IAkgKg0KPiAJICogV2hlcmV2ZXIgRElTUEFU
-Q0hfQlVTWSBpcyBzZXQsIGJsa19tcV9ydW5faHdfcXVldWUoKQ0KPiAJICogd2lsbCBiZSBydW4g
-dG8gdHJ5IHRvIG1ha2UgcHJvZ3Jlc3MsIHNvIGl0IGlzIGFsd2F5cw0KPiAJICogc2FmZSB0byBj
-aGVjayB0aGUgc3RhdGUgaGVyZS4NCj4gCSAqLw0KPiANCj4gU3VwcG9zZSB0aGUgdHdvIHdyaXRl
-cyBhcmUgcmVvcmRlcmVkLCBzb29uZXIgb3IgbGF0dGVyLCB0aGUNCj4gbGlzdF9lbXB0eV9jYXJl
-ZnVsKCZoY3R4LT5kaXNwYXRjaCkgd2lsbCBiZSBvYnNlcnZlZCwgYW5kDQo+IHdpbGwgZGlzcGF0
-Y2ggcmVxdWVzdCBmcm9tIHRoaXMgaHcgcXVldWUgYWZ0ZXIgJy0+ZGlzcGF0Y2gnDQo+IGlzIGZs
-dXNoZWQuDQo+IA0KPiBTaW5jZSBub3cgdGhlIHNldHRpbmcgb2YgRElTUEFUQ0hfQlVTWSByZXF1
-aXJlcyB0byBob2xkDQo+IGhjdHgtPmxvY2ssIHdlIHNob3VsZCBhdm9pZCB0byBhZGQgYmFycmll
-ciB0aGVyZS4NCg0KQWx0aG91Z2ggaXQgaXMgbm90IGNsZWFyIHRvIG1lIGhvdyBhbnlvbmUgd2hv
-IGhhcyBub3QgZm9sbG93ZWQgdGhpcyBkaXNjdXNzaW9uDQppcyBhc3N1bWVkIHRvIGZpZ3VyZSBv
-dXQgYWxsIHRoZXNlIHN1YnRsZXRpZXMsIGlmIHRoZSBvdGhlciBjb21tZW50cyBnZXQNCmFkZHJl
-c3NlZDoNCg0KUmV2aWV3ZWQtYnk6IEJhcnQgVmFuIEFzc2NoZSA8YmFydC52YW5hc3NjaGVAd2Rj
-LmNvbT4NCg0K
+This series implements support for ZBC disks used through the scsi-mq I/O path.
+
+The current scsi level support of ZBC disks guarantees write request ordering
+using a per-zone write lock which prevents issuing simultaneously multiple
+write commands to a zone, doing so avoid reordering of sequential writes to
+sequential zones. This method is however ineffective when scsi-mq is used with
+zoned block devices. This is due to the different execution model of blk-mq
+which passes a request to the scsi layer for dispatching after the request has
+been removed from the I/O scheduler queue. That is, when the scsi layer tries
+to lock the target zone of the request, the request may already be out of
+order and zone write locking fails to prevent that.
+
+Various approaches have been tried to solve this problem. All of them had the
+serious disadvantage of cluttering blk-mq code with zoned block device specific
+conditions and processing. As such extensive changes can only turn into a
+maintenance nightmares, a radically different solution is proposed here.
+
+This series proposes implementing scsi-mq support for zoned block devices at
+the I/O scheduler level with simple modifications of the mq-deadline scheduler.
+the modifications are the addition of a per zone write locking mechanism
+similar to that implemented in sd_zbc.c for the legacy scsi path. The zone
+write locking mechanism is used for the exact same purpose, that is, to limit
+writes per zone to at most one request to avoid reordering. The locking context
+however changes from that of scsi-sq and is moved to the dispatch_request
+method of the scheduler. Within this context, under a spin lock guaranteeing
+atomicity against other dispatch contexts, target zones of write requests can
+be locked before write requests removal from the scheduler. In effect, this
+results in the same behavior as the legacy scsi path. Sequential write ordering
+is preserved.
+
+The changes to mq-deadline do not affect regular disks: the same scheduling
+behavior is maintained for these. The modification are also optimized to not
+lock conventional zones. To do so, additional data is introduced in the
+request queue structure so that the low level scsi code can pass upward
+information such as the total number of zones and zone types of the device.
+The availability of this new data avoids difficulties in accessing this
+information from the I/O scheduler initialization method (init_queue() method)
+context.
+
+Of note is that patch 15 of this series removes setting mq-deadline as the
+default scheduler for block devices with a single hardware queue. The reason for
+this is that setting the default scheduler is done very early in the device
+initialization sequence, when the disk characteristics are not yet known. This
+results in mq-deadline not correctly setting the default zones write locking
+behavior nased on the device zoning model. Setting of a default I/O scheduler
+can be done easily with udev rules later in the system initialization process,
+leading to correct default settings for zoned block devices.
+
+Comments are as always very much appreciated.
+
+Changes from v3:
+* Integrated support directly into mq-deadline instead of creating a new I/O
+  scheduler.
+* Disable setting of default mq scheduler for single queue devices
+
+Changes from v2:
+* Introduced blk_zoned structure
+* Moved I/O scheduler from drivers/scsi to block 
+
+Changes from v1:
+* Addressed Bart's comments for the blk-mq patches (declarations files)
+* Split (former) patch 4 into multiple patches to facilitate review
+* Fixed scsi disk lookup from io scheduler by introducing
+  scsi_disk_from_queue()
+
+Damien Le Moal (16):
+  scsi: sd_zbc: Move ZBC declarations to scsi_proto.h
+  scsi: sd_zbc: Fix comments and indentation
+  scsi: sd_zbc: Rearrange code
+  scsi: sd_zbc: Use well defined macros
+  scsi: sd_zbc: Fix sd_zbc_read_zoned_characteristics()
+  block: Add zoned block device information to request queue
+  scsi: sd_zbc: Initialize device request queue zoned data
+  scsi: sd_zbc: Limit zone write locking to sequential zones
+  scsi: sd_zbc: Disable zone write locking with scsi-mq
+  block: mq-deadline: Add zoned block device data
+  block: mq-deadline: Introduce zones_wlock attribute
+  blokc: mq-deadline: Introduce dispatch helpers
+  block: mq-deadline: Introduce zone locking support
+  block: mq-deadline: Limit write dispatch for zoned block devices
+  block: do not set mq defaulte scheduler
+  block: mq-deadline: Update documentation
+
+ Documentation/block/deadline-iosched.txt |  17 ++
+ block/elevator.c                         |  17 +-
+ block/mq-deadline.c                      | 302 +++++++++++++++++++++++++++-
+ drivers/scsi/scsi_lib.c                  |   5 +-
+ drivers/scsi/sd_zbc.c                    | 325 ++++++++++++++++++++++++-------
+ include/linux/blkdev.h                   |  48 +++++
+ include/scsi/scsi_proto.h                |  45 +++--
+ 7 files changed, 656 insertions(+), 103 deletions(-)
+
+-- 
+2.13.5
