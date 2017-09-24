@@ -1,46 +1,36 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f44.google.com ([74.125.82.44]:36228 "EHLO
-        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753347AbdIFKwt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Sep 2017 06:52:49 -0400
-Received: by mail-wm0-f44.google.com with SMTP id i145so28015665wmf.1
-        for <linux-block@vger.kernel.org>; Wed, 06 Sep 2017 03:52:49 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io, axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>
-Subject: [PATCH 13/18] lightnvm: pblk: fix write I/O sync stat
-Date: Wed,  6 Sep 2017 12:51:06 +0200
-Message-Id: <1504695071-25928-14-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1504695071-25928-1-git-send-email-javier@cnexlabs.com>
-References: <1504695071-25928-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <hch@lst.de>
+Date: Sun, 24 Sep 2017 16:48:31 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 9/9] nvme: implement multipath access to nvme subsystems
+Message-ID: <20170924144831.GC13681@lst.de>
+References: <20170918231453.27128-1-hch@lst.de> <20170918231453.27128-10-hch@lst.de> <20170922150915.GA1294@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170922150915.GA1294@localhost.localdomain>
+List-ID: <linux-block@vger.kernel.org>
 
-Fix stat counter to collect the right number of I/Os being synced on the
-completion path.
+On Fri, Sep 22, 2017 at 11:09:16AM -0400, Keith Busch wrote:
+> On Mon, Sep 18, 2017 at 04:14:53PM -0700, Christoph Hellwig wrote:
+> > +static void nvme_failover_req(struct request *req)
+> > +{
+> > +	struct nvme_ns *ns = req->q->queuedata;
+> > +	unsigned long flags;
+> > +
+> > +	spin_lock_irqsave(&ns->head->requeue_lock, flags);
+> > +	blk_steal_bios(&ns->head->requeue_list, req);
+> > +	spin_unlock_irqrestore(&ns->head->requeue_lock, flags);
+> > +
+> > +	nvme_reset_ctrl(ns->ctrl);
+> > +	kblockd_schedule_work(&ns->head->requeue_work);
+> > +}
+> 
+> Need to call blk_mq_free_req after stealing all its bios to prevent
+> leaking that entered request.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <matias@cnexlabs.com>
----
- drivers/lightnvm/pblk-write.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 33dd90251a60..fb4d9c3983db 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -41,7 +41,7 @@ static unsigned long pblk_end_w_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 							c_ctx->nr_padded);
- 
- #ifdef CONFIG_NVM_DEBUG
--	atomic_long_add(c_ctx->nr_valid, &pblk->sync_writes);
-+	atomic_long_add(rqd->nr_ppas, &pblk->sync_writes);
- #endif
- 
- 	ret = pblk_rb_sync_advance(&pblk->rwb, c_ctx->nr_valid);
--- 
-2.7.4
+I think this should be a blk_mq_end_request actually.  The difference
+is that blk_mq_end_request will get the I/O accounting right, and
+treats the case of having and ->end_io handler correctly as well.
