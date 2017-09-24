@@ -1,261 +1,185 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:35944 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751148AbdIMLrB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Sep 2017 07:47:01 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V8 01/14] mmc: core: Introduce host claiming by context
-Date: Wed, 13 Sep 2017 14:40:01 +0300
-Message-Id: <1505302814-19313-2-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1505302814-19313-1-git-send-email-adrian.hunter@intel.com>
-References: <1505302814-19313-1-git-send-email-adrian.hunter@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=4336ae8ff=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V4 13/16] block: mq-deadline: Introduce zone locking support
+Date: Sun, 24 Sep 2017 16:02:44 +0900
+Message-Id: <20170924070247.25560-14-damien.lemoal@wdc.com>
+In-Reply-To: <20170924070247.25560-1-damien.lemoal@wdc.com>
+References: <20170924070247.25560-1-damien.lemoal@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Currently the host can be claimed by a task.  Change this so that the host
-can be claimed by a context that may or may not be a task.  This provides
-for the host to be claimed by a block driver queue to support blk-mq, while
-maintaining compatibility with the existing use of mmc_claim_host().
+For a write request to a zoned block device, lock the request target
+zone upon request displatch. The zone is unlocked either when the
+request completes or when the request is requeued (inserted).
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+To indicate that a request has locked its target zone, use the first
+pointer of the request elevator private data to store the value
+RQ_ZONE_WLOCKED. Testing for this value allows quick decision in
+dd_insert_request() and dd_completed_request() regarding the need for
+unlocking the target zone of a request.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
- drivers/mmc/core/core.c  | 92 ++++++++++++++++++++++++++++++++++++++++++++----
- drivers/mmc/core/core.h  |  6 ++++
- include/linux/mmc/host.h |  7 +++-
- 3 files changed, 97 insertions(+), 8 deletions(-)
+ block/mq-deadline.c | 114 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 114 insertions(+)
 
-diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
-index 66c9cf49ad2f..09fdc467b804 100644
---- a/drivers/mmc/core/core.c
-+++ b/drivers/mmc/core/core.c
-@@ -832,9 +832,38 @@ unsigned int mmc_align_data_size(struct mmc_card *card, unsigned int sz)
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index 1236a464b547..2de1a36c34f5 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -179,6 +179,93 @@ deadline_move_request(struct deadline_data *dd, struct request *rq)
  }
- EXPORT_SYMBOL(mmc_align_data_size);
  
-+/*
-+ * Allow claiming an already claimed host if the context is the same or there is
-+ * no context but the task is the same.
+ /*
++ * Return true if a request is a write requests that needs zone
++ * write locking.
 + */
-+static inline bool mmc_ctx_matches(struct mmc_host *host, struct mmc_ctx *ctx,
-+				   struct task_struct *task)
++static inline bool deadline_request_needs_zone_wlock(struct deadline_data *dd,
++						     struct request *rq)
 +{
-+	return host->claimer == ctx ||
-+	       (!ctx && task && host->claimer->task == task);
-+}
 +
-+static inline void mmc_ctx_set_claimer(struct mmc_host *host,
-+				       struct mmc_ctx *ctx,
-+				       struct task_struct *task)
-+{
-+	if (!host->claimer) {
-+		if (ctx)
-+			host->claimer = ctx;
-+		else
-+			host->claimer = &host->default_ctx;
++	if (!dd->zones_wlock)
++		return false;
++
++	if (blk_rq_is_passthrough(rq))
++		return false;
++
++	switch (req_op(rq)) {
++	case REQ_OP_WRITE_ZEROES:
++	case REQ_OP_WRITE_SAME:
++	case REQ_OP_WRITE:
++		return blk_rq_zone_is_seq(rq);
++	default:
++		return false;
 +	}
-+	if (task)
-+		host->claimer->task = task;
 +}
-+
- /**
-- *	__mmc_claim_host - exclusively claim a host
-+ *	__mmc_ctx_task_claim_host - exclusively claim a host
-  *	@host: mmc host to claim
-+ *	@ctx: context that claims the host or NULL in which case the default
-+ *	context will be used
-+ *	@task: task that claims the host or NULL in which case @ctx must be
-+ *	provided
-  *	@abort: whether or not the operation should be aborted
-  *
-  *	Claim a host for a set of operations.  If @abort is non null and
-@@ -842,7 +871,8 @@ unsigned int mmc_align_data_size(struct mmc_card *card, unsigned int sz)
-  *	that non-zero value without acquiring the lock.  Returns zero
-  *	with the lock held otherwise.
-  */
--int __mmc_claim_host(struct mmc_host *host, atomic_t *abort)
-+static int __mmc_ctx_task_claim_host(struct mmc_host *host, struct mmc_ctx *ctx,
-+				     struct task_struct *task, atomic_t *abort)
- {
- 	DECLARE_WAITQUEUE(wait, current);
- 	unsigned long flags;
-@@ -856,7 +886,7 @@ int __mmc_claim_host(struct mmc_host *host, atomic_t *abort)
- 	while (1) {
- 		set_current_state(TASK_UNINTERRUPTIBLE);
- 		stop = abort ? atomic_read(abort) : 0;
--		if (stop || !host->claimed || host->claimer == current)
-+		if (stop || !host->claimed || mmc_ctx_matches(host, ctx, task))
- 			break;
- 		spin_unlock_irqrestore(&host->lock, flags);
- 		schedule();
-@@ -865,7 +895,7 @@ int __mmc_claim_host(struct mmc_host *host, atomic_t *abort)
- 	set_current_state(TASK_RUNNING);
- 	if (!stop) {
- 		host->claimed = 1;
--		host->claimer = current;
-+		mmc_ctx_set_claimer(host, ctx, task);
- 		host->claim_cnt += 1;
- 		if (host->claim_cnt == 1)
- 			pm = true;
-@@ -879,8 +909,19 @@ int __mmc_claim_host(struct mmc_host *host, atomic_t *abort)
- 
- 	return stop;
- }
-+
-+int __mmc_claim_host(struct mmc_host *host, atomic_t *abort)
-+{
-+	return __mmc_ctx_task_claim_host(host, NULL, current, abort);
-+}
- EXPORT_SYMBOL(__mmc_claim_host);
- 
-+void mmc_ctx_claim_host(struct mmc_host *host, struct mmc_ctx *ctx)
-+{
-+	__mmc_ctx_task_claim_host(host, ctx, NULL, NULL);
-+}
-+EXPORT_SYMBOL(mmc_ctx_claim_host);
-+
- /**
-  *	mmc_release_host - release a host
-  *	@host: mmc host to release
-@@ -888,18 +929,17 @@ int __mmc_claim_host(struct mmc_host *host, atomic_t *abort)
-  *	Release a MMC host, allowing others to claim the host
-  *	for their operations.
-  */
--void mmc_release_host(struct mmc_host *host)
-+static void __mmc_release_host(struct mmc_host *host)
- {
- 	unsigned long flags;
- 
--	WARN_ON(!host->claimed);
--
- 	spin_lock_irqsave(&host->lock, flags);
- 	if (--host->claim_cnt) {
- 		/* Release for nested claim */
- 		spin_unlock_irqrestore(&host->lock, flags);
- 	} else {
- 		host->claimed = 0;
-+		host->claimer->task = NULL;
- 		host->claimer = NULL;
- 		spin_unlock_irqrestore(&host->lock, flags);
- 		wake_up(&host->wq);
-@@ -907,8 +947,23 @@ void mmc_release_host(struct mmc_host *host)
- 		pm_runtime_put_autosuspend(mmc_dev(host));
- 	}
- }
-+
-+void mmc_release_host(struct mmc_host *host)
-+{
-+	WARN_ON(!host->claimed);
-+
-+	__mmc_release_host(host);
-+}
- EXPORT_SYMBOL(mmc_release_host);
- 
-+void mmc_ctx_release_host(struct mmc_host *host, struct mmc_ctx *ctx)
-+{
-+	WARN_ON(!host->claimed || host->claimer != ctx);
-+
-+	__mmc_release_host(host);
-+}
-+EXPORT_SYMBOL(mmc_ctx_release_host);
-+
- /*
-  * This is a helper function, which fetches a runtime pm reference for the
-  * card device and also claims the host.
-@@ -921,6 +976,17 @@ void mmc_get_card(struct mmc_card *card)
- EXPORT_SYMBOL(mmc_get_card);
- 
- /*
-+ * This is a helper function, which fetches a runtime pm reference for the
-+ * card device and also claims the host for the mmc context.
-+ */
-+void mmc_ctx_get_card(struct mmc_card *card, struct mmc_ctx *ctx)
-+{
-+	pm_runtime_get_sync(&card->dev);
-+	mmc_ctx_claim_host(card->host, ctx);
-+}
-+EXPORT_SYMBOL(mmc_ctx_get_card);
 +
 +/*
-  * This is a helper function, which releases the host and drops the runtime
-  * pm reference for the card device.
-  */
-@@ -933,6 +999,18 @@ void mmc_put_card(struct mmc_card *card)
- EXPORT_SYMBOL(mmc_put_card);
- 
- /*
-+ * This is a helper function, which releases the host and drops the runtime
-+ * pm reference for the card device.
++ * Abuse the elv.priv[0] pointer to indicate if a request has write
++ * locked its target zone. Only write request to a zoned block device
++ * can own a zone write lock.
 + */
-+void mmc_ctx_put_card(struct mmc_card *card, struct mmc_ctx *ctx)
++#define RQ_ZONE_WLOCKED		((void *)1UL)
++static inline void deadline_set_request_zone_wlock(struct request *rq)
 +{
-+	mmc_ctx_release_host(card->host, ctx);
-+	pm_runtime_mark_last_busy(&card->dev);
-+	pm_runtime_put_autosuspend(&card->dev);
++	rq->elv.priv[0] = RQ_ZONE_WLOCKED;
 +}
-+EXPORT_SYMBOL(mmc_ctx_put_card);
++
++#define RQ_ZONE_NO_WLOCK	((void *)0UL)
++static inline void deadline_clear_request_zone_wlock(struct request *rq)
++{
++	rq->elv.priv[0] = RQ_ZONE_NO_WLOCK;
++}
++
++static inline bool deadline_request_has_zone_wlock(struct request *rq)
++{
++	return rq->elv.priv[0] == RQ_ZONE_WLOCKED;
++}
 +
 +/*
-  * Internal function that does the actual ios call to the host driver,
-  * optionally printing some debug output.
++ * Write lock the target zone of a write request.
++ */
++static void deadline_wlock_zone(struct deadline_data *dd,
++				struct request *rq)
++{
++	unsigned int zno = blk_rq_zone_no(rq);
++
++	WARN_ON_ONCE(deadline_request_has_zone_wlock(rq));
++	WARN_ON_ONCE(test_and_set_bit(zno, dd->zones_wlock));
++	deadline_set_request_zone_wlock(rq);
++}
++
++/*
++ * Write unlock the target zone of a write request.
++ */
++static void deadline_wunlock_zone(struct deadline_data *dd,
++				  struct request *rq)
++{
++	unsigned int zno = blk_rq_zone_no(rq);
++	unsigned long flags;
++
++	spin_lock_irqsave(&dd->zone_lock, flags);
++
++	WARN_ON_ONCE(!test_and_clear_bit(zno, dd->zones_wlock));
++	deadline_clear_request_zone_wlock(rq);
++
++	spin_unlock_irqrestore(&dd->zone_lock, flags);
++}
++
++/*
++ * Test the write lock state of the target zone of a write request.
++ */
++static inline bool deadline_zone_is_wlocked(struct deadline_data *dd,
++					    struct request *rq)
++{
++	unsigned int zno = blk_rq_zone_no(rq);
++
++	return test_bit(zno, dd->zones_wlock);
++}
++
++/*
+  * deadline_check_fifo returns 0 if there are no expired requests on the fifo,
+  * 1 otherwise. Requires !list_empty(&dd->fifo_list[data_dir])
   */
-diff --git a/drivers/mmc/core/core.h b/drivers/mmc/core/core.h
-index ca861091a776..a294c836a143 100644
---- a/drivers/mmc/core/core.h
-+++ b/drivers/mmc/core/core.h
-@@ -144,4 +144,10 @@ static inline void mmc_claim_host(struct mmc_host *host)
- 	__mmc_claim_host(host, NULL);
+@@ -311,6 +398,11 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	dd->batching++;
+ 	deadline_move_request(dd, rq);
+ done:
++	/*
++	 * If the request needs its target zone locked, do it.
++	 */
++	if (deadline_request_needs_zone_wlock(dd, rq))
++		deadline_wlock_zone(dd, rq);
+ 	rq->rq_flags |= RQF_STARTED;
+ 	return rq;
+ }
+@@ -472,6 +564,13 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ 	struct deadline_data *dd = q->elevator->elevator_data;
+ 	const int data_dir = rq_data_dir(rq);
+ 
++	/*
++	 * This may be a requeue of a request that has locked its
++	 * target zone. If this is the case, release the request zone lock.
++	 */
++	if (deadline_request_has_zone_wlock(rq))
++		deadline_wunlock_zone(dd, rq);
++
+ 	if (blk_mq_sched_try_insert_merge(q, rq))
+ 		return;
+ 
+@@ -516,6 +615,20 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
+ 	spin_unlock(&dd->lock);
  }
  
-+void mmc_ctx_claim_host(struct mmc_host *host, struct mmc_ctx *ctx);
-+void mmc_ctx_release_host(struct mmc_host *host, struct mmc_ctx *ctx);
++/*
++ * For zoned block devices, write unlock the target zone of
++ * completed write requests.
++ */
++static void dd_completed_request(struct request *rq)
++{
 +
-+void mmc_ctx_get_card(struct mmc_card *card, struct mmc_ctx *ctx);
-+void mmc_ctx_put_card(struct mmc_card *card, struct mmc_ctx *ctx);
++	if (deadline_request_has_zone_wlock(rq)) {
++		struct deadline_data *dd = rq->q->elevator->elevator_data;
 +
- #endif
-diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
-index f3f2d07feb2a..228a493c3b25 100644
---- a/include/linux/mmc/host.h
-+++ b/include/linux/mmc/host.h
-@@ -255,6 +255,10 @@ struct mmc_supply {
- 	struct regulator *vqmmc;	/* Optional Vccq supply */
- };
- 
-+struct mmc_ctx {
-+	struct task_struct *task;
-+};
++		deadline_wunlock_zone(dd, rq);
++	}
++}
 +
- struct mmc_host {
- 	struct device		*parent;
- 	struct device		class_dev;
-@@ -388,8 +392,9 @@ struct mmc_host {
- 	struct mmc_card		*card;		/* device attached to this host */
- 
- 	wait_queue_head_t	wq;
--	struct task_struct	*claimer;	/* task that has host claimed */
-+	struct mmc_ctx		*claimer;	/* context that has host claimed */
- 	int			claim_cnt;	/* "claim" nesting count */
-+	struct mmc_ctx		default_ctx;	/* default context */
- 
- 	struct delayed_work	detect;
- 	int			detect_change;	/* card detect flag */
+ static bool dd_has_work(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
+@@ -757,6 +870,7 @@ static struct elevator_type mq_deadline = {
+ 	.ops.mq = {
+ 		.insert_requests	= dd_insert_requests,
+ 		.dispatch_request	= dd_dispatch_request,
++		.completed_request	= dd_completed_request,
+ 		.next_request		= elv_rb_latter_request,
+ 		.former_request		= elv_rb_former_request,
+ 		.bio_merge		= dd_bio_merge,
 -- 
-1.9.1
+2.13.5
