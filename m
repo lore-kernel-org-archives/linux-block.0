@@ -1,74 +1,27 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:33852 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752660AbdIBPSz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 2 Sep 2017 11:18:55 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 07/14] blk-mq-sched: introduce blk_mq_sched_queue_depth()
-Date: Sat,  2 Sep 2017 23:17:22 +0800
-Message-Id: <20170902151729.6162-8-ming.lei@redhat.com>
-In-Reply-To: <20170902151729.6162-1-ming.lei@redhat.com>
-References: <20170902151729.6162-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hch@lst.de>
+Date: Sun, 24 Sep 2017 17:25:31 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Christoph Hellwig <hch@lst.de>, Johannes Thumshirn <jthumshirn@suse.de>,
+	Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 8/9] nvme: track shared namespaces
+Message-ID: <20170924152531.GA16753@lst.de>
+References: <20170918231453.27128-1-hch@lst.de> <20170918231453.27128-9-hch@lst.de> <20170920083643.xe6dbr4iu53hhm5t@linux-x5ow.site> <20170920145436.GA4709@lst.de> <20170921052217.kmrcmsf4gttubsyd@linux-x5ow.site> <20170921143748.GB18424@lst.de> <20170921151631.GA10713@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170921151631.GA10713@localhost.localdomain>
+List-ID: <linux-block@vger.kernel.org>
 
-The following patch will use one hint to figure out
-default queue depth for scheduler queue, so introduce
-the helper of blk_mq_sched_queue_depth() for this purpose.
+On Thu, Sep 21, 2017 at 11:16:31AM -0400, Keith Busch wrote:
+> If there weren't resistence to renaming structs, it would be more
+> aligned to how the specification calls these if we rename nvme_ns to
+> nvme_ns_path, and what you're calling nvme_ns_head is should just be
+> the nvme_ns.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c |  8 +-------
- block/blk-mq-sched.h | 11 +++++++++++
- 2 files changed, 12 insertions(+), 7 deletions(-)
+Then we'd still need a good name for what's now nvme_ns :)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 97e7a4fe3a32..1ff6f9bedd1a 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -595,13 +595,7 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
- 		return 0;
- 	}
- 
--	/*
--	 * Default to double of smaller one between hw queue_depth and 128,
--	 * since we don't split into sync/async like the old code did.
--	 * Additionally, this is a per-hw queue depth.
--	 */
--	q->nr_requests = 2 * min_t(unsigned int, q->tag_set->queue_depth,
--				   BLKDEV_MAX_RQ);
-+	q->nr_requests = blk_mq_sched_queue_depth(q);
- 
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		ret = blk_mq_sched_alloc_tags(q, hctx, i);
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 9267d0b7c197..1d47f3fda1d0 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -96,4 +96,15 @@ static inline bool blk_mq_sched_needs_restart(struct blk_mq_hw_ctx *hctx)
- 	return test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
- }
- 
-+static inline unsigned blk_mq_sched_queue_depth(struct request_queue *q)
-+{
-+	/*
-+	 * Default to double of smaller one between hw queue_depth and 128,
-+	 * since we don't split into sync/async like the old code did.
-+	 * Additionally, this is a per-hw queue depth.
-+	 */
-+	return 2 * min_t(unsigned int, q->tag_set->queue_depth,
-+				   BLKDEV_MAX_RQ);
-+}
-+
- #endif
--- 
-2.9.5
+But seriously speaking - I'm a little worried because Linus is really
+pissed at me for doing major refactoring in block land (by proxy of
+Jens who gets all the heat).  I just don't feel comfortable with a
+rename at the moment, even if it's the right thing.
