@@ -1,49 +1,56 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:56106 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751407AbdINQmZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Sep 2017 12:42:25 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 0/6] blk-mq: don't allocate driver tag beforehand for flush rq
-Date: Fri, 15 Sep 2017 00:42:07 +0800
-Message-Id: <20170914164213.17859-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>,
+        stable@vger.kernel.org
+Subject: [PATCH V4 05/16] scsi: sd_zbc: Fix sd_zbc_read_zoned_characteristics()
+Date: Sun, 24 Sep 2017 16:02:36 +0900
+Message-Id: <20170924070247.25560-6-damien.lemoal@wdc.com>
+In-Reply-To: <20170924070247.25560-1-damien.lemoal@wdc.com>
+References: <20170924070247.25560-1-damien.lemoal@wdc.com>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+The three values starting at byte 8 of the Zoned Block Device
+Characteristics VPD page B6h are 32 bits values, not 64bits. So use
+get_unaligned_be32() to retrieve the values and not get_unaligned_be64()
 
-This patchset avoids to allocate driver tag beforehand for flush rq
-in case of I/O scheduler, then flush rq isn't treated specially
-wrt. get/put driver tag, code gets cleanup much, such as,
-reorder_tags_to_front() is removed, and we needn't to worry
-about request order in dispatch list for avoiding I/O deadlock.
+Fixes: 89d947561077 ("sd: Implement support for ZBC devices")
+Cc: <stable@vger.kernel.org>
 
-'dbench -t 30 -s -F 64' has been run on different devices(shared tag,
-multi-queue, singele queue, ...), and no issues are observed,
-even very low queue depth(1) test are run, debench still works
-well.
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Bart Van Assche <Bart.VanAssche@wdc.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/scsi/sd_zbc.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Any comments are welcome!
-
-Thanks,
-Ming
-
-Ming Lei (6):
-  blk-flush: don't run queue for requests of bypassing flush
-  block: pass 'run_queue' to blk_mq_request_bypass_insert
-  blk-flush: use blk_mq_request_bypass_insert()
-  blk-mq: decide how to handle flush rq via RQF_FLUSH_SEQ
-  blk-mq: move __blk_mq_put_driver_tag() into blk-mq.h
-  blk-mq: don't allocate driver tag beforehand for flush rq
-
- block/blk-core.c     |  2 +-
- block/blk-flush.c    | 43 +++++++++++++++++++++++++++++------
- block/blk-mq-sched.c | 64 ++++++++++++++--------------------------------------
- block/blk-mq.c       | 55 ++++++--------------------------------------
- block/blk-mq.h       | 15 +++++++++++-
- 5 files changed, 75 insertions(+), 104 deletions(-)
-
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index bbad851c1789..27793b9f54c0 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -423,15 +423,15 @@ static int sd_zbc_read_zoned_characteristics(struct scsi_disk *sdkp,
+ 	if (sdkp->device->type != TYPE_ZBC) {
+ 		/* Host-aware */
+ 		sdkp->urswrz = 1;
+-		sdkp->zones_optimal_open = get_unaligned_be64(&buf[8]);
+-		sdkp->zones_optimal_nonseq = get_unaligned_be64(&buf[12]);
++		sdkp->zones_optimal_open = get_unaligned_be32(&buf[8]);
++		sdkp->zones_optimal_nonseq = get_unaligned_be32(&buf[12]);
+ 		sdkp->zones_max_open = 0;
+ 	} else {
+ 		/* Host-managed */
+ 		sdkp->urswrz = buf[4] & 1;
+ 		sdkp->zones_optimal_open = 0;
+ 		sdkp->zones_optimal_nonseq = 0;
+-		sdkp->zones_max_open = get_unaligned_be64(&buf[16]);
++		sdkp->zones_max_open = get_unaligned_be32(&buf[16]);
+ 	}
+ 
+ 	return 0;
 -- 
-2.9.5
+2.13.5
