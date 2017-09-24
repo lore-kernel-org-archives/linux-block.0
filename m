@@ -1,57 +1,72 @@
-Return-Path: <prvs=430e6b2f0=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	=Oleksandr Natalenko <oleksandr@natalenko.name>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v2 4/4] scsi-mq: Reduce suspend latency
-Date: Thu, 21 Sep 2017 14:22:55 -0700
-Message-Id: <20170921212255.12788-5-bart.vanassche@wdc.com>
-In-Reply-To: <20170921212255.12788-1-bart.vanassche@wdc.com>
-References: <20170921212255.12788-1-bart.vanassche@wdc.com>
+Return-Path: <Damien.LeMoal@wdc.com>
+Subject: Re: [PATCH V4 10/16] block: mq-deadline: Add zoned block device data
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-scsi@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ Bart Van Assche <Bart.VanAssche@wdc.com>
+References: <20170924070247.25560-1-damien.lemoal@wdc.com>
+ <20170924070247.25560-11-damien.lemoal@wdc.com>
+ <20170924151452.GG14806@lst.de>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+Message-ID: <23ed2822-74e5-b562-7666-767e730947c1@wdc.com>
+Date: Sun, 24 Sep 2017 18:48:54 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170924151452.GG14806@lst.de>
+Content-Type: text/plain; charset=utf-8
+Return-Path: damien.lemoal@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-Avoid that it can take 200 ms too long to wait for ongoing requests
-to finish. Note: blk_mq_freeze_queue() uses a wait queue to wait
-for ongoing requests to finish.
+On 9/24/17 17:14, Christoph Hellwig wrote:
+>> +
+>> +	struct request_queue *q;
+> 
+> Do you really need the queue backpointer?  At least as far as this
+> patch is concerned we could just pass the queue on to
+> deadline_enable_zones_wlock and be fine.  And in general we should
+> always passing the q, as we can trivial go from queue to deadline_data
+> using queue->elevator->elevator_data.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/scsi/scsi_lib.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+This is for the sysfs zones_wlock store function which does not give the
+queue. Instead of this backpointer, I can copy the queue node, number of
+zones and zone model so that cdeadline_enable_zones_wlock() can be
+called equally from init_queue context and from the sysfs zones_wlock
+store context.
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index e76fd6e89a81..34e5f0f95d01 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2901,10 +2901,15 @@ scsi_device_quiesce(struct scsi_device *sdev)
- 	if (err)
- 		return err;
- 
--	scsi_run_queue(q);
--	while (atomic_read(&sdev->device_busy)) {
--		msleep_interruptible(200);
-+	if (q->mq_ops) {
-+		blk_mq_freeze_queue(q);
-+		blk_mq_unfreeze_queue(q);
-+	} else {
- 		scsi_run_queue(q);
-+		while (atomic_read(&sdev->device_busy)) {
-+			msleep_interruptible(200);
-+			scsi_run_queue(q);
-+		}
- 	}
- 	return 0;
- }
+>> +static int deadline_zoned_init_queue(struct request_queue *q,
+>> +				     struct deadline_data *dd)
+>> +{
+>> +	if (!blk_queue_is_zoned(q) ||
+>> +	    !blk_queue_nr_zones(q)) {
+> 
+> Shouldn't !blk_queue_nr_zones(q) be enough?  If not both conditionals
+> could easily fit into the same line, and I'd be tempted to move them
+> to the caller and call deadline_enable_zones_wlock straight from there.
+
+OK. Will update.
+
+>> @@ -341,6 +387,15 @@ static int dd_init_queue(struct request_queue *q, struct elevator_type *e)
+>>  	spin_lock_init(&dd->lock);
+>>  	INIT_LIST_HEAD(&dd->dispatch);
+>>  
+>> +	dd->q = q;
+>> +	spin_lock_init(&dd->zone_lock);
+>> +	ret = deadline_zoned_init_queue(q, dd);
+>> +	if (ret) {
+>> +		kfree(dd);
+>> +		kobject_put(&eq->kobj);
+>> +		return ret;
+>> +	}
+>> +
+>>  	q->elevator = eq;
+>>  	return 0;
+> 
+> This should probably grow goto based unwinding, e.g.
+
+OK. Will update.
+
+Thanks !
+
 -- 
-2.14.1
+Damien Le Moal
+Western Digital Research
