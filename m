@@ -1,247 +1,42 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f52.google.com ([74.125.82.52]:43771 "EHLO
-        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751876AbdINKeU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Sep 2017 06:34:20 -0400
-Received: by mail-wm0-f52.google.com with SMTP id a137so4907392wma.0
-        for <linux-block@vger.kernel.org>; Thu, 14 Sep 2017 03:34:19 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 4/5] lightnvm: pblk: do not use a mempool for line bitmaps
-Date: Thu, 14 Sep 2017 12:33:46 +0200
-Message-Id: <1505385227-28706-5-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1505385227-28706-1-git-send-email-javier@cnexlabs.com>
-References: <1505385227-28706-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <Damien.LeMoal@wdc.com>
+Subject: Re: [PATCH V4 08/16] scsi: sd_zbc: Limit zone write locking to
+ sequential zones
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-scsi@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ Bart Van Assche <Bart.VanAssche@wdc.com>
+References: <20170924070247.25560-1-damien.lemoal@wdc.com>
+ <20170924070247.25560-9-damien.lemoal@wdc.com>
+ <20170924151804.GB16608@lst.de>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+Message-ID: <ef17e904-b0a2-f51c-d144-bbc91c732848@wdc.com>
+Date: Sun, 24 Sep 2017 18:51:47 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20170924151804.GB16608@lst.de>
+Content-Type: text/plain; charset=utf-8
+Return-Path: damien.lemoal@wdc.com
+List-ID: <linux-block@vger.kernel.org>
 
-pblk holds two sector bitmaps: one to keep track of the mapped sectors
-while the line is active and another one to keep track of the invalid
-sectors. The latter is kept during the whole live of the line, until it
-is recycled. Since we cannot guarantee forward progress for the mempool
-in this case, get rid of the mempool and simply allocate memory through
-kmalloc.
+On 9/24/17 17:18, Christoph Hellwig wrote:
+>> +	if (q->seq_zones && test_bit(zno, q->seq_zones))
+>> +		return BLKPREP_OK;
+> 
+> Isn't the check above inverted?  Also shouldn't it use blk_rq_zone_is_seq?
+> E.g.
+> 
+> 	if (!blk_rq_zone_is_seq(cmd->request))
+> 		return BLKPREP_OK;
+> ?
 
-Reported-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/pblk-core.c     | 26 ++++++++++----------------
- drivers/lightnvm/pblk-init.c     | 29 ++---------------------------
- drivers/lightnvm/pblk-recovery.c |  2 +-
- drivers/lightnvm/pblk-write.c    |  4 +---
- drivers/lightnvm/pblk.h          |  3 ---
- 5 files changed, 14 insertions(+), 50 deletions(-)
+Arrg ! Good catch. I tested only the scsi-mq case which does not use
+this path anymore (same test used, but at the scheduler level). Silly of
+me. I should have properly tested all cases.
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 9e35ec7c1d9f..bb53fe416d4e 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -1093,25 +1093,21 @@ static int pblk_line_prepare(struct pblk *pblk, struct pblk_line *line)
- 	struct pblk_line_meta *lm = &pblk->lm;
- 	int blk_in_line = atomic_read(&line->blk_in_line);
- 
--	line->map_bitmap = mempool_alloc(pblk->line_meta_pool, GFP_ATOMIC);
-+	line->map_bitmap = kzalloc(lm->sec_bitmap_len, GFP_ATOMIC);
- 	if (!line->map_bitmap)
- 		return -ENOMEM;
--	memset(line->map_bitmap, 0, lm->sec_bitmap_len);
- 
--	/* invalid_bitmap is special since it is used when line is closed. No
--	 * need to zeroized; it will be initialized using bb info form
--	 * map_bitmap
--	 */
--	line->invalid_bitmap = mempool_alloc(pblk->line_meta_pool, GFP_ATOMIC);
-+	/* will be initialized using bb info from map_bitmap */
-+	line->invalid_bitmap = kmalloc(lm->sec_bitmap_len, GFP_ATOMIC);
- 	if (!line->invalid_bitmap) {
--		mempool_free(line->map_bitmap, pblk->line_meta_pool);
-+		kfree(line->map_bitmap);
- 		return -ENOMEM;
- 	}
- 
- 	spin_lock(&line->lock);
- 	if (line->state != PBLK_LINESTATE_FREE) {
--		mempool_free(line->invalid_bitmap, pblk->line_meta_pool);
--		mempool_free(line->map_bitmap, pblk->line_meta_pool);
-+		kfree(line->map_bitmap);
-+		kfree(line->invalid_bitmap);
- 		spin_unlock(&line->lock);
- 		WARN(1, "pblk: corrupted line %d, state %d\n",
- 							line->id, line->state);
-@@ -1163,7 +1159,7 @@ int pblk_line_recov_alloc(struct pblk *pblk, struct pblk_line *line)
- 
- void pblk_line_recov_close(struct pblk *pblk, struct pblk_line *line)
- {
--	mempool_free(line->map_bitmap, pblk->line_meta_pool);
-+	kfree(line->map_bitmap);
- 	line->map_bitmap = NULL;
- 	line->smeta = NULL;
- 	line->emeta = NULL;
-@@ -1438,10 +1434,8 @@ void pblk_line_replace_data(struct pblk *pblk)
- 
- void pblk_line_free(struct pblk *pblk, struct pblk_line *line)
- {
--	if (line->map_bitmap)
--		mempool_free(line->map_bitmap, pblk->line_meta_pool);
--	if (line->invalid_bitmap)
--		mempool_free(line->invalid_bitmap, pblk->line_meta_pool);
-+	kfree(line->map_bitmap);
-+	kfree(line->invalid_bitmap);
- 
- 	*line->vsc = cpu_to_le32(EMPTY_ENTRY);
- 
-@@ -1582,7 +1576,7 @@ void pblk_line_close(struct pblk *pblk, struct pblk_line *line)
- 
- 	list_add_tail(&line->list, move_list);
- 
--	mempool_free(line->map_bitmap, pblk->line_meta_pool);
-+	kfree(line->map_bitmap);
- 	line->map_bitmap = NULL;
- 	line->smeta = NULL;
- 	line->emeta = NULL;
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 5f8a9fd2f29a..df86cf98ef4d 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -21,7 +21,7 @@
- #include "pblk.h"
- 
- static struct kmem_cache *pblk_ws_cache, *pblk_rec_cache, *pblk_g_rq_cache,
--				*pblk_w_rq_cache, *pblk_line_meta_cache;
-+				*pblk_w_rq_cache;
- static DECLARE_RWSEM(pblk_lock);
- struct bio_set *pblk_bio_set;
- 
-@@ -181,8 +181,6 @@ static int pblk_set_ppaf(struct pblk *pblk)
- 
- static int pblk_init_global_caches(struct pblk *pblk)
- {
--	char cache_name[PBLK_CACHE_NAME_LEN];
--
- 	down_write(&pblk_lock);
- 	pblk_ws_cache = kmem_cache_create("pblk_blk_ws",
- 				sizeof(struct pblk_line_ws), 0, 0, NULL);
-@@ -217,19 +215,6 @@ static int pblk_init_global_caches(struct pblk *pblk)
- 		up_write(&pblk_lock);
- 		return -ENOMEM;
- 	}
--
--	snprintf(cache_name, sizeof(cache_name), "pblk_line_m_%s",
--							pblk->disk->disk_name);
--	pblk_line_meta_cache = kmem_cache_create(cache_name,
--				pblk->lm.sec_bitmap_len, 0, 0, NULL);
--	if (!pblk_line_meta_cache) {
--		kmem_cache_destroy(pblk_ws_cache);
--		kmem_cache_destroy(pblk_rec_cache);
--		kmem_cache_destroy(pblk_g_rq_cache);
--		kmem_cache_destroy(pblk_w_rq_cache);
--		up_write(&pblk_lock);
--		return -ENOMEM;
--	}
- 	up_write(&pblk_lock);
- 
- 	return 0;
-@@ -276,16 +261,10 @@ static int pblk_core_init(struct pblk *pblk)
- 	if (!pblk->w_rq_pool)
- 		goto free_e_rq_pool;
- 
--	pblk->line_meta_pool =
--			mempool_create_slab_pool(PBLK_META_POOL_SIZE,
--							pblk_line_meta_cache);
--	if (!pblk->line_meta_pool)
--		goto free_w_rq_pool;
--
- 	pblk->close_wq = alloc_workqueue("pblk-close-wq",
- 			WQ_MEM_RECLAIM | WQ_UNBOUND, PBLK_NR_CLOSE_JOBS);
- 	if (!pblk->close_wq)
--		goto free_line_meta_pool;
-+		goto free_w_rq_pool;
- 
- 	pblk->bb_wq = alloc_workqueue("pblk-bb-wq",
- 			WQ_MEM_RECLAIM | WQ_UNBOUND, 0);
-@@ -305,8 +284,6 @@ static int pblk_core_init(struct pblk *pblk)
- 	destroy_workqueue(pblk->bb_wq);
- free_close_wq:
- 	destroy_workqueue(pblk->close_wq);
--free_line_meta_pool:
--	mempool_destroy(pblk->line_meta_pool);
- free_w_rq_pool:
- 	mempool_destroy(pblk->w_rq_pool);
- free_e_rq_pool:
-@@ -336,13 +313,11 @@ static void pblk_core_free(struct pblk *pblk)
- 	mempool_destroy(pblk->r_rq_pool);
- 	mempool_destroy(pblk->e_rq_pool);
- 	mempool_destroy(pblk->w_rq_pool);
--	mempool_destroy(pblk->line_meta_pool);
- 
- 	kmem_cache_destroy(pblk_ws_cache);
- 	kmem_cache_destroy(pblk_rec_cache);
- 	kmem_cache_destroy(pblk_g_rq_cache);
- 	kmem_cache_destroy(pblk_w_rq_cache);
--	kmem_cache_destroy(pblk_line_meta_cache);
- }
- 
- static void pblk_luns_free(struct pblk *pblk)
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index cb556e06673e..10eef9281a27 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -987,7 +987,7 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
- 			list_move_tail(&line->list, move_list);
- 			spin_unlock(&l_mg->gc_lock);
- 
--			mempool_free(line->map_bitmap, pblk->line_meta_pool);
-+			kfree(line->map_bitmap);
- 			line->map_bitmap = NULL;
- 			line->smeta = NULL;
- 			line->emeta = NULL;
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 81d1f1035fa3..3277cee36784 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -414,8 +414,6 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
- 	if (emeta->mem >= lm->emeta_len[0]) {
- 		spin_lock(&l_mg->close_lock);
- 		list_del(&meta_line->list);
--		WARN(!bitmap_full(meta_line->map_bitmap, lm->sec_per_line),
--				"pblk: corrupt meta line %d\n", meta_line->id);
- 		spin_unlock(&l_mg->close_lock);
- 	}
- 
-@@ -459,7 +457,7 @@ static int pblk_sched_meta_io(struct pblk *pblk, struct ppa_addr *prev_list,
- 		return 0;
- 	}
- 	meta_line = list_first_entry(&l_mg->emeta_list, struct pblk_line, list);
--	if (bitmap_full(meta_line->map_bitmap, lm->sec_per_line))
-+	if (meta_line->emeta->mem >= lm->emeta_len[0])
- 		goto retry;
- 	spin_unlock(&l_mg->close_lock);
- 
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 0120e0ade703..469976a20421 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -40,8 +40,6 @@
- #define PBLK_MAX_REQ_ADDRS (64)
- #define PBLK_MAX_REQ_ADDRS_PW (6)
- 
--#define PBLK_META_POOL_SIZE (128)
--
- #define PBLK_NR_CLOSE_JOBS (4)
- 
- #define PBLK_CACHE_NAME_LEN (DISK_NAME_LEN + 16)
-@@ -626,7 +624,6 @@ struct pblk {
- 	mempool_t *r_rq_pool;
- 	mempool_t *w_rq_pool;
- 	mempool_t *e_rq_pool;
--	mempool_t *line_meta_pool;
- 
- 	struct workqueue_struct *close_wq;
- 	struct workqueue_struct *bb_wq;
+Will fix this.
+
+Thanks.
+
 -- 
-2.7.4
+Damien Le Moal
+Western Digital Research
