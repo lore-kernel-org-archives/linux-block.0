@@ -1,98 +1,52 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Avri Altman <Avri.Altman@sandisk.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Tomas Winkler <tomas.winkler@intel.com>
-Subject: [PATCH 2/2 v6] mmc: block: Delete mmc_access_rpmb()
-Date: Wed, 20 Sep 2017 10:02:01 +0200
-Message-Id: <20170920080201.32438-2-linus.walleij@linaro.org>
-In-Reply-To: <20170920080201.32438-1-linus.walleij@linaro.org>
-References: <20170920080201.32438-1-linus.walleij@linaro.org>
+Return-Path: <prvs=4336ae8ff=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V4 16/16] block: mq-deadline: Update documentation
+Date: Sun, 24 Sep 2017 16:02:47 +0900
+Message-Id: <20170924070247.25560-17-damien.lemoal@wdc.com>
+In-Reply-To: <20170924070247.25560-1-damien.lemoal@wdc.com>
+References: <20170924070247.25560-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This function is used by the block layer queue to bail out of
-requests if the current request is towards an RPMB
-"block device".
+Added description of the zones_wlock tunable attribute.
 
-This was done to avoid boot time scanning of this "block
-device" which was never really a block device, thus duct-taping
-over the fact that it was badly engineered.
-
-This problem is now gone as we removed the offending RPMB block
-device in another patch and replaced it with a character
-device.
-
-Cc: Tomas Winkler <tomas.winkler@intel.com>
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
-ChangeLov v5->v6:
-- Update the commit description with an accurate description
-  of why this was done in the first place, and why it can now
-  be removed.
-ChangeLog v1->v5:
-- Renumber to keep together with the rest of the series.
----
- drivers/mmc/core/block.c | 12 ------------
- drivers/mmc/core/queue.c |  2 +-
- drivers/mmc/core/queue.h |  2 --
- 3 files changed, 1 insertion(+), 15 deletions(-)
+ Documentation/block/deadline-iosched.txt | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index 6421d06b66bb..48521376b17e 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -1203,18 +1203,6 @@ static inline void mmc_blk_reset_success(struct mmc_blk_data *md, int type)
- 	md->reset_done &= ~type;
- }
+diff --git a/Documentation/block/deadline-iosched.txt b/Documentation/block/deadline-iosched.txt
+index 2d82c80322cb..b532304d2bf4 100644
+--- a/Documentation/block/deadline-iosched.txt
++++ b/Documentation/block/deadline-iosched.txt
+@@ -69,6 +69,23 @@ Front merges may still occur due to the cached last_merge hint, but since
+ that comes at basically 0 cost we leave that on. We simply disable the
+ rbtree front sector lookup when the io scheduler merge function is called.
  
--int mmc_access_rpmb(struct mmc_queue *mq)
--{
--	struct mmc_blk_data *md = mq->blkdata;
--	/*
--	 * If this is a RPMB partition access, return ture
--	 */
--	if (md && md->part_type == EXT_CSD_PART_CONFIG_ACC_RPMB)
--		return true;
--
--	return false;
--}
--
- /*
-  * The non-block commands come back from the block layer after it queued it and
-  * processed it with all other requests and then they get issued in this
-diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-index affa7370ba82..3baccbf16f3d 100644
---- a/drivers/mmc/core/queue.c
-+++ b/drivers/mmc/core/queue.c
-@@ -32,7 +32,7 @@ static int mmc_prep_request(struct request_queue *q, struct request *req)
- {
- 	struct mmc_queue *mq = q->queuedata;
++zones_wlock	(bool)
++-----------
++
++(mq-deadlines only)
++The blk-mq version of the deadline I/O scheduler, mq-deadline, introduced
++support for zoned block devices. This added support prevents dispatching of more
++than one write command per zone of the device to avoid write sequence reordering
++due to the possible concurrent execution of many blk-mq operations, in
++particular request dispatching. This is achieved using a per zone lock
++implemented as a bitmap. When a write request is dispatched, the target zone of
++the  request is locked, preventing further dispatch of write requests to it
++(there are no limitations on read commands). The zones_wlock tunable allows
++disabling zone write locking for host aware zoned block devices as these drive
++can handle random writes to zones in firmware. This tunable default setting
++cannot be changed for host managed disks (always enabled) and regular disks
++(always disabled).
++
  
--	if (mq && (mmc_card_removed(mq->card) || mmc_access_rpmb(mq)))
-+	if (mq && mmc_card_removed(mq->card))
- 		return BLKPREP_KILL;
+ Nov 11 2002, Jens Axboe <jens.axboe@oracle.com>
  
- 	req->rq_flags |= RQF_DONTPREP;
-diff --git a/drivers/mmc/core/queue.h b/drivers/mmc/core/queue.h
-index a2b6a9fcab01..7649ed6cbef7 100644
---- a/drivers/mmc/core/queue.h
-+++ b/drivers/mmc/core/queue.h
-@@ -89,6 +89,4 @@ extern unsigned int mmc_queue_map_sg(struct mmc_queue *,
- extern void mmc_queue_bounce_pre(struct mmc_queue_req *);
- extern void mmc_queue_bounce_post(struct mmc_queue_req *);
- 
--extern int mmc_access_rpmb(struct mmc_queue *);
--
- #endif
 -- 
 2.13.5
