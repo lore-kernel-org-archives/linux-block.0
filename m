@@ -1,8 +1,8 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <prvs=0441863fad=clm@fb.com>
 Subject: Re: [GIT PULL] Block fixes for 4.14-rc2
-To: Linus Torvalds <torvalds@linux-foundation.org>, Chris Mason <clm@fb.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+CC: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 References: <bb904bc0-e73e-2920-29a2-283380676296@kernel.dk>
  <CA+55aFzXDzoMqHic3RxUzyYzxDkHB1sr_oHJTEv2k4V1wjOa=g@mail.gmail.com>
  <20170924130304.GA21904@infradead.org>
@@ -13,19 +13,17 @@ References: <bb904bc0-e73e-2920-29a2-283380676296@kernel.dk>
  <CA+55aFzyMoTV5Be1xQeOkgW7PwSu0j=dZFiQ_rDQp7FaQY44-w@mail.gmail.com>
  <7a7a141e-b756-72f9-ece6-1dc229267068@fb.com>
  <CA+55aFwfQkksqSC9UiUE2g-nGKi+=MoYtE3oh3Fxx=b_zKK_AA@mail.gmail.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <a530c31b-93ed-c00f-ebf6-8c229740b7be@kernel.dk>
-Date: Wed, 27 Sep 2017 14:41:01 +0200
+From: Chris Mason <clm@fb.com>
+Message-ID: <f2c45794-be20-1d96-3192-12718dab1581@fb.com>
+Date: Mon, 25 Sep 2017 18:48:57 -0400
 MIME-Version: 1.0
 In-Reply-To: <CA+55aFwfQkksqSC9UiUE2g-nGKi+=MoYtE3oh3Fxx=b_zKK_AA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
 
-Travel stable again, catching up. Chris did a great job explaining what
-our issues were, so thanks for that.
 
-On 09/26/2017 12:21 AM, Linus Torvalds wrote:
+On 09/25/2017 06:21 PM, Linus Torvalds wrote:
 > On Mon, Sep 25, 2017 at 2:17 PM, Chris Mason <clm@fb.com> wrote:
 >>
 >> My understanding is that for order-0 page allocations and
@@ -36,8 +34,15 @@ On 09/26/2017 12:21 AM, Linus Torvalds wrote:
 > VM, so an explicit GFP_NOFAIL would definitely be best if we then
 > remove the looping in fs/buffer.c.
 
-Reworked to include that. More below.
+Right, I wouldn't remove the looping without the NOFAIL.  But in the 
+normal case, it shouldn't be possible for free_more_memory() to be 
+called without an OOM and without already having triggered the full flush.
 
+That's why using the full flush in free_more_memory() felt like a small 
+change to me.  But if you'd rather see GFP_NOFAIL in the next merge 
+window I don't have any objections to that method either.
+
+> 
 >>> What is it that triggers that many buffer heads in the first place?
 >>> Because I thought we'd gotten to the point where all normal file IO
 >>> can avoid the buffer heads entirely, and just directly work with
@@ -52,15 +57,12 @@ Reworked to include that. More below.
 > So the two things I reacted to in that patch series were apparently
 > things that you guys don't even care about.
 
-Right. But I'd like to stress that my development practice is to engineer
-things that make sense in general, AND that fix the specific issue at
-hand. This is never about making the general case worse, while fixing
-some FB specific issue.
+Yes and no.  fs/buffer.c didn't explode in prod recently, but we do 
+exercise the OOM code often.  Even though I haven't seen it happen, I'd 
+rather not leave fs/buffer.c able to trigger the same work explosion 
+during an OOM spiral.  I know it's really unlikely, but java.
 
-I'm very sure that others hit this case as well. Maybe not to the
-extent of getting softlockups, but abysmal behavior happens long before
-that. It just doesn't trigger any dmesg complaints.
-
+> 
 > I reacted to the fs/buffer.c code, and to the change in laptop mode to
 > not do circular writeback.
 > 
@@ -75,20 +77,8 @@ that. It just doesn't trigger any dmesg complaints.
 > regular timed writeback model, so it's not quite as insane as it
 > sounds).
 
-So I reworked the series, to include three prep patches that end up
-killing off free_more_memory(). This means that we don't have to do the
-1024 -> 0 change in there. On top of that, I added a separate bit to
-manage range cyclic vs non range cyclic flush all work. This means that
-we don't have to worry about the laptop case either.
+I'd honestly have to do a query to make sure we aren't using it in some 
+dark corner.  I sometimes think people try things just to see how long 
+it takes Jens to notice.
 
-I think that should quell any of the concerns in the patchset, you can
-find the new series here:
-
-http://git.kernel.dk/cgit/linux-block/log/?h=wb-start-all
-
-Unless you feel comfortable taking it for 4.14, I'm going to push this
-to 4.15. In any case, it won't be ready until tomorrow, I need to push
-this through the test machinery just in case.
-
--- 
-Jens Axboe
+-chris
