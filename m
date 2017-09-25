@@ -1,84 +1,29 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:60554 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751697AbdIUTzF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Sep 2017 15:55:05 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: Coly Li <colyli@suse.de>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Michael Lyle <mlyle@lyle.org>, Nix <nix@esperi.org.uk>,
-        Kai Krakow <hurikhan77@gmail.com>,
-        Eric Wheeler <bcache@lists.ewheeler.net>,
-        Junhui Tang <tang.junhui@zte.com.cn>, stable@vger.kernel.org
-Subject: [PATCHv3] bcache: only permit to recovery read error when cache device is clean
-Date: Fri, 22 Sep 2017 03:54:58 +0800
-Message-Id: <20170921195458.53890-1-colyli@suse.de>
+Received: from mga04.intel.com ([192.55.52.120]:41928 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S964842AbdIYQI4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Sep 2017 12:08:56 -0400
+Date: Mon, 25 Sep 2017 10:08:12 -0600
+From: Keith Busch <keith.busch@intel.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 6/9] nvme: introduce a nvme_ns_ids structure
+Message-ID: <20170925160812.GB8463@localhost.localdomain>
+References: <20170925134031.10548-1-hch@lst.de>
+ <20170925134031.10548-7-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170925134031.10548-7-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-When bcache does read I/Os, for example in writeback or writethrough mode,
-if a read request on cache device is failed, bcache will try to recovery
-the request by reading from cached device. If the data on cached device is
-not synced with cache device, then requester will get a stale data.
+On Mon, Sep 25, 2017 at 03:40:28PM +0200, Christoph Hellwig wrote:
+> This allows us to manage the various uniqueue namespace identifiers
+> together instead needing various variables and arguments.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-For critical storage system like database, providing stale data from
-recovery may result an application level data corruption, which is
-unacceptible.
+Looks good.
 
-With this patch, for a failed read request in writeback or writethrough
-mode, recovery a recoverable read request only happens when cache device
-is clean. That is to say, all data on cached device is up to update.
-
-For other cache modes in bcache, read request will never hit
-cached_dev_read_error(), they don't need this patch.
-
-Please note, because cache mode can be switched arbitrarily in run time, a
-writethrough mode might be switched from a writeback mode. Therefore
-checking dc->has_data in writethrough mode still makes sense.
-
-Changelog:
-v3: By response from Kent Oversteet, he thinks recovering stale data is a
-    bug to fix, and option to permit it is unneccessary. So this version
-    the sysfs file is removed.
-v2: rename sysfs entry from allow_stale_data_on_failure  to
-    allow_stale_data_on_failure, and fix the confusing commit log.
-v1: initial patch posted.
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Reported-by: Arne Wolf <awolf@lenovo.com>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Michael Lyle <mlyle@lyle.org>
-Cc: Nix <nix@esperi.org.uk>
-Cc: Kai Krakow <hurikhan77@gmail.com>
-Cc: Eric Wheeler <bcache@lists.ewheeler.net>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
-Cc: stable@vger.kernel.org
----
- drivers/md/bcache/request.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 681b4f12b05a..e7f769ff7234 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -697,8 +697,16 @@ static void cached_dev_read_error(struct closure *cl)
- {
- 	struct search *s = container_of(cl, struct search, cl);
- 	struct bio *bio = &s->bio.bio;
-+	struct cached_dev *dc = container_of(s->d, struct cached_dev, disk);
- 
--	if (s->recoverable) {
-+	/*
-+	 * If cache device is dirty (dc->has_dirty is non-zero), then
-+	 * recovery a failed read request from cached device may get a
-+	 * stale data back. So read failure recovery is only permitted
-+	 * when cache device is clean.
-+	 */
-+	if (s->recoverable &&
-+	    (dc && !atomic_read(&dc->has_dirty)) {
- 		/* Retry from the backing device: */
- 		trace_bcache_read_retry(s->orig_bio);
- 
--- 
-2.13.5
+Reviewed-by: Keith Busch <keith.busch@intel.com>
