@@ -1,75 +1,278 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:34074 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752157AbdI3LrQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Sep 2017 07:47:16 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 0/5] dm-rq: improve sequential I/O performance
-Date: Sat, 30 Sep 2017 19:46:47 +0800
-Message-Id: <20170930114652.32441-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=434c021e3=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V5 02/14] scsi: sd_zbc: Fix comments and indentation
+Date: Mon, 25 Sep 2017 15:14:42 +0900
+Message-Id: <20170925061454.5533-3-damien.lemoal@wdc.com>
+In-Reply-To: <20170925061454.5533-1-damien.lemoal@wdc.com>
+References: <20170925061454.5533-1-damien.lemoal@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+Fix comments style (use kernel-doc style) and content to clarify some
+functions. Also fix some functions signature indentation and remove a
+useless blank line in sd_zbc_read_zones().
 
-This 1st one patch removes one log message which can be triggered
-very easily.
+No functional change is introduced by this patch.
 
-The 2nd patch removes the workaround of blk_mq_delay_run_hw_queue()
-in case of requeue, this way isn't necessary, and more worse, it
-makes BLK_MQ_S_SCHED_RESTART not working, and degarde I/O performance.
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/scsi/scsi_lib.c |   5 ++-
+ drivers/scsi/sd_zbc.c   | 117 +++++++++++++++++++++++++++++++++++++++++-------
+ 2 files changed, 104 insertions(+), 18 deletions(-)
 
-The 3rd patch return DM_MAPIO_REQUEUE to dm-rq if underlying request
-allocation fails, then we can return BLK_STS_RESOURCE from dm-rq
-to blk-mq, so that blk-mq can hold the requests to be dequeued.
-
-The 4th patch is a pre-patch for the 5th one, becasue even though
-underlying request allocation succeeds, its queue may be
-busy and we can get this feedback from blk_insert_cloned_request()
-now. This patch trys to cache the allocated request so that
-it may be reused in next dispatch to underlying queue.
-
-The 5th patch improves sequential I/O performance by returning
-STS_RESOURCE if underlying queue is busy.
-
-In the commit log of the 5th patch, I/O IOPS data is provided and
-we can see sequential I/O performance is improved a lot with this
-patchset.
-
-This patchset depends on the following two patchset:
-
-[1] [PATCH V5 0/7] blk-mq-sched: improve sequential I/O performance(part 1)
-    
-	https://marc.info/?l=linux-block&m=150676854821077&w=2
-    
-[2] [PATCH V5 0/8] blk-mq: improve bio merge for none scheduler
-    
-	https://marc.info/?l=linux-block&m=150677085521416&w=2
-
-Any comments are welcome! 
-
-Thanks,
-Ming
-
-Ming Lei (5):
-  dm-mpath: remove annoying message of 'blk_get_request() returned -11'
-  dm-mpath: don't call blk_mq_delay_run_hw_queue() in case of
-    BLK_STS_RESOURCE
-  dm-mpath: return DM_MAPIO_REQUEUE in case of rq allocation failure
-  dm-mpath: cache ti->clone during requeue
-  dm-rq: improve I/O merge by dealing with underlying STS_RESOURCE
-
- block/blk-mq.c        | 17 +---------------
- drivers/md/dm-mpath.c | 51 ++++++++++++++++++++++++++++++++++------------
- drivers/md/dm-rq.c    | 56 +++++++++++++++++++++++++++++++++++++--------------
- 3 files changed, 80 insertions(+), 44 deletions(-)
-
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 9cf6a80fe297..c72b97a74906 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1752,7 +1752,10 @@ static void scsi_done(struct scsi_cmnd *cmd)
+  *
+  * Returns:     Nothing
+  *
+- * Lock status: IO request lock assumed to be held when called.
++ * Lock status: request queue lock assumed to be held when called.
++ *
++ * Note: See sd_zbc.c sd_zbc_write_lock_zone() for write order
++ * protection for ZBC disks.
+  */
+ static void scsi_request_fn(struct request_queue *q)
+ 	__releases(q->queue_lock)
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index 692c8cbc7ed8..023f705ae235 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -32,10 +32,14 @@
+ #include "sd.h"
+ 
+ /**
+- * Convert a zone descriptor to a zone struct.
++ * sd_zbc_parse_report - Convert a zone descriptor to a struct blk_zone,
++ * @sdkp: The disk the report originated from
++ * @buf: Address of the report zone descriptor
++ * @zone: the destination zone structure
++ *
++ * All LBA sized values are converted to 512B sectors unit.
+  */
+-static void sd_zbc_parse_report(struct scsi_disk *sdkp,
+-				u8 *buf,
++static void sd_zbc_parse_report(struct scsi_disk *sdkp, u8 *buf,
+ 				struct blk_zone *zone)
+ {
+ 	struct scsi_device *sdp = sdkp->device;
+@@ -58,7 +62,13 @@ static void sd_zbc_parse_report(struct scsi_disk *sdkp,
+ }
+ 
+ /**
+- * Issue a REPORT ZONES scsi command.
++ * sd_zbc_report_zones - Issue a REPORT ZONES scsi command.
++ * @sdkp: The target disk
++ * @buf: Buffer to use for the reply
++ * @buflen: the buffer size
++ * @lba: Start LBA of the report
++ *
++ * For internal use during device validation.
+  */
+ static int sd_zbc_report_zones(struct scsi_disk *sdkp, unsigned char *buf,
+ 			       unsigned int buflen, sector_t lba)
+@@ -99,6 +109,12 @@ static int sd_zbc_report_zones(struct scsi_disk *sdkp, unsigned char *buf,
+ 	return 0;
+ }
+ 
++/**
++ * sd_zbc_setup_report_cmnd - Prepare a REPORT ZONES scsi command
++ * @cmd: The command to setup
++ *
++ * Call in sd_init_command() for a REQ_OP_ZONE_REPORT request.
++ */
+ int sd_zbc_setup_report_cmnd(struct scsi_cmnd *cmd)
+ {
+ 	struct request *rq = cmd->request;
+@@ -141,6 +157,14 @@ int sd_zbc_setup_report_cmnd(struct scsi_cmnd *cmd)
+ 	return BLKPREP_OK;
+ }
+ 
++/**
++ * sd_zbc_report_zones_complete - Process a REPORT ZONES scsi command reply.
++ * @scmd: The completed report zones command
++ * @good_bytes: reply size in bytes
++ *
++ * Convert all reported zone descriptors to struct blk_zone. The conversion
++ * is done in-place, directly in the request specified sg buffer.
++ */
+ static void sd_zbc_report_zones_complete(struct scsi_cmnd *scmd,
+ 					 unsigned int good_bytes)
+ {
+@@ -196,17 +220,32 @@ static void sd_zbc_report_zones_complete(struct scsi_cmnd *scmd,
+ 	local_irq_restore(flags);
+ }
+ 
++/**
++ * sd_zbc_zone_sectors - Get the device zone size in number of 512B sectors.
++ * @sdkp: The target disk
++ */
+ static inline sector_t sd_zbc_zone_sectors(struct scsi_disk *sdkp)
+ {
+ 	return logical_to_sectors(sdkp->device, sdkp->zone_blocks);
+ }
+ 
++/**
++ * sd_zbc_zone_no - Get the number of the zone conataining a sector.
++ * @sdkp: The target disk
++ * @sector: 512B sector address contained in the zone
++ */
+ static inline unsigned int sd_zbc_zone_no(struct scsi_disk *sdkp,
+ 					  sector_t sector)
+ {
+ 	return sectors_to_logical(sdkp->device, sector) >> sdkp->zone_shift;
+ }
+ 
++/**
++ * sd_zbc_setup_reset_cmnd - Prepare a RESET WRITE POINTER scsi command.
++ * @cmd: the command to setup
++ *
++ * Called from sd_init_command() for a REQ_OP_ZONE_RESET request.
++ */
+ int sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd)
+ {
+ 	struct request *rq = cmd->request;
+@@ -239,6 +278,23 @@ int sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd)
+ 	return BLKPREP_OK;
+ }
+ 
++/**
++ * sd_zbc_write_lock_zone - Write lock a sequential zone.
++ * @cmd: write command
++ *
++ * Called from sd_init_cmd() for write requests (standard write, write same or
++ * write zeroes operations). If the request target zone is not already locked,
++ * the zone is locked and BLKPREP_OK returned, allowing the request to proceed
++ * through dispatch in scsi_request_fn(). Otherwise, BLKPREP_DEFER is returned,
++ * forcing the request to wait for the zone to be unlocked, that is, for the
++ * previously issued write request targeting the same zone to complete.
++ *
++ * This is called from blk_peek_request() context with the queue lock held and
++ * before the request is removed from the scheduler. As a result, multiple
++ * contexts executing concurrently scsi_request_fn() cannot result in write
++ * sequence reordering as only a single write request per zone is allowed to
++ * proceed.
++ */
+ int sd_zbc_write_lock_zone(struct scsi_cmnd *cmd)
+ {
+ 	struct request *rq = cmd->request;
+@@ -261,10 +317,7 @@ int sd_zbc_write_lock_zone(struct scsi_cmnd *cmd)
+ 	 * Do not issue more than one write at a time per
+ 	 * zone. This solves write ordering problems due to
+ 	 * the unlocking of the request queue in the dispatch
+-	 * path in the non scsi-mq case. For scsi-mq, this
+-	 * also avoids potential write reordering when multiple
+-	 * threads running on different CPUs write to the same
+-	 * zone (with a synchronized sequential pattern).
++	 * path in the non scsi-mq case.
+ 	 */
+ 	if (sdkp->zones_wlock &&
+ 	    test_and_set_bit(zno, sdkp->zones_wlock))
+@@ -276,6 +329,13 @@ int sd_zbc_write_lock_zone(struct scsi_cmnd *cmd)
+ 	return BLKPREP_OK;
+ }
+ 
++/**
++ * sd_zbc_write_unlock_zone - Write unlock a sequential zone.
++ * @cmd: write command
++ *
++ * Called from sd_uninit_cmd(). Unlocking the request target zone will allow
++ * dispatching the next write request for the zone.
++ */
+ void sd_zbc_write_unlock_zone(struct scsi_cmnd *cmd)
+ {
+ 	struct request *rq = cmd->request;
+@@ -290,8 +350,16 @@ void sd_zbc_write_unlock_zone(struct scsi_cmnd *cmd)
+ 	}
+ }
+ 
+-void sd_zbc_complete(struct scsi_cmnd *cmd,
+-		     unsigned int good_bytes,
++/**
++ * sd_zbc_complete - ZBC command post processing.
++ * @cmd: Completed command
++ * @good_bytes: Command reply bytes
++ * @sshdr: command sense header
++ *
++ * Called from sd_done(). Process report zones reply and handle reset zone
++ * and write commands errors.
++ */
++void sd_zbc_complete(struct scsi_cmnd *cmd, unsigned int good_bytes,
+ 		     struct scsi_sense_hdr *sshdr)
+ {
+ 	int result = cmd->result;
+@@ -336,7 +404,11 @@ void sd_zbc_complete(struct scsi_cmnd *cmd,
+ }
+ 
+ /**
+- * Read zoned block device characteristics (VPD page B6).
++ * sd_zbc_read_zoned_characteristics - Read zoned block device characteristics
++ * @sdkp: Target disk
++ * @buf: Buffer where to store the VPD page data
++ *
++ * Read VPD page B6.
+  */
+ static int sd_zbc_read_zoned_characteristics(struct scsi_disk *sdkp,
+ 					     unsigned char *buf)
+@@ -366,10 +438,16 @@ static int sd_zbc_read_zoned_characteristics(struct scsi_disk *sdkp,
+ }
+ 
+ /**
+- * Check reported capacity.
++ * sd_zbc_check_capacity - Check reported capacity.
++ * @sdkp: Target disk
++ * @buf: Buffer to use for commands
++ *
++ * ZBC drive may report only the capacity of the first conventional zones at
++ * LBA 0. This is indicated by the RC_BASIS field of the read capacity reply.
++ * Check this here. If the disk reported only its conventional zones capacity,
++ * get the total capacity by doing a report zones.
+  */
+-static int sd_zbc_check_capacity(struct scsi_disk *sdkp,
+-				 unsigned char *buf)
++static int sd_zbc_check_capacity(struct scsi_disk *sdkp, unsigned char *buf)
+ {
+ 	sector_t lba;
+ 	int ret;
+@@ -399,6 +477,13 @@ static int sd_zbc_check_capacity(struct scsi_disk *sdkp,
+ 
+ #define SD_ZBC_BUF_SIZE 131072
+ 
++/**
++ * sd_zbc_check_zone_size - Check the device zone sizes
++ * @sdkp: Target disk
++ *
++ * Check that all zones of the device are equal. The last zone can however
++ * be smaller. The zone size must also be a power of two number of LBAs.
++ */
+ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
+ {
+ 	u64 zone_blocks;
+@@ -525,8 +610,7 @@ static int sd_zbc_setup(struct scsi_disk *sdkp)
+ 	return 0;
+ }
+ 
+-int sd_zbc_read_zones(struct scsi_disk *sdkp,
+-		      unsigned char *buf)
++int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
+ {
+ 	int ret;
+ 
+@@ -537,7 +621,6 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp,
+ 		 */
+ 		return 0;
+ 
+-
+ 	/* Get zoned block device characteristics */
+ 	ret = sd_zbc_read_zoned_characteristics(sdkp, buf);
+ 	if (ret)
 -- 
-2.9.5
+2.13.5
