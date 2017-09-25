@@ -1,66 +1,60 @@
-Return-Path: <prvs=4242a8d18=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V3 07/12] scsi: sd_zbc: Use well defined macros
-Date: Fri, 15 Sep 2017 19:06:40 +0900
-Message-Id: <20170915100645.17999-8-damien.lemoal@wdc.com>
-In-Reply-To: <20170915100645.17999-1-damien.lemoal@wdc.com>
-References: <20170915100645.17999-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f49.google.com ([74.125.82.49]:47624 "EHLO
+        mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932716AbdIYKPE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Sep 2017 06:15:04 -0400
+Received: by mail-wm0-f49.google.com with SMTP id r136so17886521wmf.2
+        for <linux-block@vger.kernel.org>; Mon, 25 Sep 2017 03:15:04 -0700 (PDT)
+Subject: Re: [PATCH 3/6] lightnvm: pblk: fix message if L2P MAP is in device
+To: =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <jg@lightnvm.io>,
+        Rakesh Pandit <rakesh@tuxera.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20170921112655.GA28539@dhcp-216.srv.tuxera.com>
+ <D3D2476A-E07C-4012-A731-27552AFFCD5D@lightnvm.io>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <89391d08-1439-76bc-3c9b-fbfd9b31131c@lightnvm.io>
+Date: Mon, 25 Sep 2017 12:15:02 +0200
+MIME-Version: 1.0
+In-Reply-To: <D3D2476A-E07C-4012-A731-27552AFFCD5D@lightnvm.io>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-instead of open coding, use the min() macro to calculate a report zones
-reply buffer length in sd_zbc_check_zone_size() and the round_up()
-macro for calculating the number of zones in sd_zbc_setup().
-
-No functional change is introduced by this patch.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/scsi/sd_zbc.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index 081bf5a3b10b..37b33adbb2ef 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -430,7 +430,7 @@ static int sd_zbc_check_capacity(struct scsi_disk *sdkp, unsigned char *buf)
- 	return 0;
- }
- 
--#define SD_ZBC_BUF_SIZE 131072
-+#define SD_ZBC_BUF_SIZE 131072U
- 
- static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
- {
-@@ -474,10 +474,7 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
- 		/* Parse REPORT ZONES header */
- 		list_length = get_unaligned_be32(&buf[0]) + 64;
- 		rec = buf + 64;
--		if (list_length < SD_ZBC_BUF_SIZE)
--			buf_len = list_length;
--		else
--			buf_len = SD_ZBC_BUF_SIZE;
-+		buf_len = min(list_length, SD_ZBC_BUF_SIZE);
- 
- 		/* Parse zone descriptors */
- 		while (rec < buf + buf_len) {
-@@ -547,9 +544,8 @@ static int sd_zbc_setup(struct scsi_disk *sdkp)
- 	/* chunk_sectors indicates the zone size */
- 	blk_queue_chunk_sectors(sdkp->disk->queue,
- 			logical_to_sectors(sdkp->device, sdkp->zone_blocks));
--	sdkp->nr_zones = sdkp->capacity >> sdkp->zone_shift;
--	if (sdkp->capacity & (sdkp->zone_blocks - 1))
--		sdkp->nr_zones++;
-+	sdkp->nr_zones =
-+		round_up(sdkp->capacity, sdkp->zone_blocks) >> sdkp->zone_shift;
- 
- 	if (!sdkp->zones_wlock) {
- 		sdkp->zones_wlock = kcalloc(BITS_TO_LONGS(sdkp->nr_zones),
--- 
-2.13.5
+On 09/22/2017 10:52 AM, Javier Gonz�lez wrote:
+>> On 21 Sep 2017, at 13.26, Rakesh Pandit <rakesh@tuxera.com> wrote:
+>>
+>> This usually happens if we are developing with qemu and ll2pmode has
+>> default value.  Even in that case message seems wrong.
+>>
+>> Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+>> ---
+>> drivers/lightnvm/pblk-init.c | 2 +-
+>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+>> index 470ef04..c5c1337 100644
+>> --- a/drivers/lightnvm/pblk-init.c
+>> +++ b/drivers/lightnvm/pblk-init.c
+>> @@ -913,7 +913,7 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
+>> 	int ret;
+>>
+>> 	if (dev->identity.dom & NVM_RSP_L2P) {
+>> -		pr_err("pblk: device-side L2P table not supported. (%x)\n",
+>> +		pr_err("pblk: device-side L2P table supported. (%x)\n",
+>> 							dev->identity.dom);
+>> 		return ERR_PTR(-EINVAL);
+>> 	}
+>> --
+>> 2.5.0
+> 
+> You're right. This is inherited from rrpc.
+> 
+> Can we instead write "pblk: full host-side L2P table not supported"?
+> People will not know about the hybrid device/host L2P as time goes by
+> and it will just be confusing. I'm not even sure this will be part of
+> the 2.0 spec, so it will probably go away with time...
+> 
+> Javier
+> 
+Thanks, I picked it up.
