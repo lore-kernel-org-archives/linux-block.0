@@ -1,75 +1,130 @@
-Return-Path: <jiangqi903@gmail.com>
-Return-Path: <jiangqi903@gmail.com>
-To: linux-block <linux-block@vger.kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Shaohua Li <shli@fb.com>,
- boyu.mt@taobao.com, wenqing.lz@taobao.com, qijiang.qj@alibaba-inc.com
-From: Joseph Qi <jiangqi903@gmail.com>
-Subject: [PATCH v2] blk-throttle: fix possible io stall when upgrade to max
-Message-ID: <526810b1-72e3-859f-aeaa-b5192144c589@gmail.com>
-Date: Sat, 30 Sep 2017 14:38:49 +0800
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <prvs=434c021e3=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V5 01/14] scsi: sd_zbc: Move ZBC declarations to scsi_proto.h
+Date: Mon, 25 Sep 2017 15:14:41 +0900
+Message-Id: <20170925061454.5533-2-damien.lemoal@wdc.com>
+In-Reply-To: <20170925061454.5533-1-damien.lemoal@wdc.com>
+References: <20170925061454.5533-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Joseph Qi <qijiang.qj@alibaba-inc.com>
+Move standard macro definitions for the zone types and zone conditions
+to scsi_proto.h together with the definitions related to the
+REPORT ZONES command. While at it, define all values in the enums to
+be clear.
 
-There is a case which will lead to io stall. The case is described as
-follows. 
-/test1
-  |-subtest1
-/test2
-  |-subtest2
-And subtest1 and subtest2 each has 32 queued bios already.
+Also remove unnecessary includes in sd_zbc.c.
 
-Now upgrade to max. In throtl_upgrade_state, it will try to dispatch
-bios as follows:
-1) tg=subtest1, do nothing;
-2) tg=test1, transfer 32 queued bios from subtest1 to test1; no pending
-left, no need to schedule next dispatch;
-3) tg=subtest2, do nothing;
-4) tg=test2, transfer 32 queued bios from subtest2 to test2; no pending
-left, no need to schedule next dispatch;
-5) tg=/, transfer 8 queued bios from test1 to /, 8 queued bios from
-test2 to /, 8 queued bios from test1 to /, and 8 queued bios from test2
-to /; note that test1 and test2 each still has 16 queued bios left;
-6) tg=/, try to schedule next dispatch, but since disptime is now
-(update in tg_update_disptime, wait=0), pending timer is not scheduled
-in fact;
-7) In throtl_upgrade_state it totally dispatches 32 queued bios and with
-32 left. test1 and test2 each has 16 queued bios;
-8) throtl_pending_timer_fn sees the left over bios, but could do
-nothing, because throtl_select_dispatch returns 0, and test1/test2 has
-no pending tg.
+No functional change is introduced by this patch.
 
-The blktrace shows the following:
-8,32   0        0     2.539007641     0  m   N throtl upgrade to max
-8,32   0        0     2.539072267     0  m   N throtl /test2 dispatch nr_queued=16 read=0 write=16
-8,32   7        0     2.539077142     0  m   N throtl /test1 dispatch nr_queued=16 read=0 write=16
-
-So force schedule dispatch if there are pending children.
-
-Signed-off-by: Joseph Qi <qijiang.qj@alibaba-inc.com>
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Bart Van Assche <Bart.VanAssche@wdc.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-throttle.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/scsi/sd_zbc.c     | 24 ------------------------
+ include/scsi/scsi_proto.h | 45 ++++++++++++++++++++++++++++++++++-----------
+ 2 files changed, 34 insertions(+), 35 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 0fea76a..17816a0 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -1911,11 +1911,11 @@ static void throtl_upgrade_state(struct throtl_data *td)
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index 8aa54779aac1..692c8cbc7ed8 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -28,32 +28,8 @@
  
- 		tg->disptime = jiffies - 1;
- 		throtl_select_dispatch(sq);
--		throtl_schedule_next_dispatch(sq, false);
-+		throtl_schedule_next_dispatch(sq, true);
- 	}
- 	rcu_read_unlock();
- 	throtl_select_dispatch(&td->service_queue);
--	throtl_schedule_next_dispatch(&td->service_queue, false);
-+	throtl_schedule_next_dispatch(&td->service_queue, true);
- 	queue_work(kthrotld_workqueue, &td->dispatch_work);
- }
+ #include <scsi/scsi.h>
+ #include <scsi/scsi_cmnd.h>
+-#include <scsi/scsi_dbg.h>
+-#include <scsi/scsi_device.h>
+-#include <scsi/scsi_driver.h>
+-#include <scsi/scsi_host.h>
+-#include <scsi/scsi_eh.h>
  
+ #include "sd.h"
+-#include "scsi_priv.h"
+-
+-enum zbc_zone_type {
+-	ZBC_ZONE_TYPE_CONV = 0x1,
+-	ZBC_ZONE_TYPE_SEQWRITE_REQ,
+-	ZBC_ZONE_TYPE_SEQWRITE_PREF,
+-	ZBC_ZONE_TYPE_RESERVED,
+-};
+-
+-enum zbc_zone_cond {
+-	ZBC_ZONE_COND_NO_WP,
+-	ZBC_ZONE_COND_EMPTY,
+-	ZBC_ZONE_COND_IMP_OPEN,
+-	ZBC_ZONE_COND_EXP_OPEN,
+-	ZBC_ZONE_COND_CLOSED,
+-	ZBC_ZONE_COND_READONLY = 0xd,
+-	ZBC_ZONE_COND_FULL,
+-	ZBC_ZONE_COND_OFFLINE,
+-};
+ 
+ /**
+  * Convert a zone descriptor to a zone struct.
+diff --git a/include/scsi/scsi_proto.h b/include/scsi/scsi_proto.h
+index 8c285d9a06d8..39130a9c05bf 100644
+--- a/include/scsi/scsi_proto.h
++++ b/include/scsi/scsi_proto.h
+@@ -301,19 +301,42 @@ struct scsi_lun {
+ 
+ /* Reporting options for REPORT ZONES */
+ enum zbc_zone_reporting_options {
+-	ZBC_ZONE_REPORTING_OPTION_ALL = 0,
+-	ZBC_ZONE_REPORTING_OPTION_EMPTY,
+-	ZBC_ZONE_REPORTING_OPTION_IMPLICIT_OPEN,
+-	ZBC_ZONE_REPORTING_OPTION_EXPLICIT_OPEN,
+-	ZBC_ZONE_REPORTING_OPTION_CLOSED,
+-	ZBC_ZONE_REPORTING_OPTION_FULL,
+-	ZBC_ZONE_REPORTING_OPTION_READONLY,
+-	ZBC_ZONE_REPORTING_OPTION_OFFLINE,
+-	ZBC_ZONE_REPORTING_OPTION_NEED_RESET_WP = 0x10,
+-	ZBC_ZONE_REPORTING_OPTION_NON_SEQWRITE,
+-	ZBC_ZONE_REPORTING_OPTION_NON_WP = 0x3f,
++	ZBC_ZONE_REPORTING_OPTION_ALL		= 0x00,
++	ZBC_ZONE_REPORTING_OPTION_EMPTY		= 0x01,
++	ZBC_ZONE_REPORTING_OPTION_IMPLICIT_OPEN	= 0x02,
++	ZBC_ZONE_REPORTING_OPTION_EXPLICIT_OPEN	= 0x03,
++	ZBC_ZONE_REPORTING_OPTION_CLOSED	= 0x04,
++	ZBC_ZONE_REPORTING_OPTION_FULL		= 0x05,
++	ZBC_ZONE_REPORTING_OPTION_READONLY	= 0x06,
++	ZBC_ZONE_REPORTING_OPTION_OFFLINE	= 0x07,
++	/* 0x08 to 0x0f are reserved */
++	ZBC_ZONE_REPORTING_OPTION_NEED_RESET_WP	= 0x10,
++	ZBC_ZONE_REPORTING_OPTION_NON_SEQWRITE	= 0x11,
++	/* 0x12 to 0x3e are reserved */
++	ZBC_ZONE_REPORTING_OPTION_NON_WP	= 0x3f,
+ };
+ 
+ #define ZBC_REPORT_ZONE_PARTIAL 0x80
+ 
++/* Zone types of REPORT ZONES zone descriptors */
++enum zbc_zone_type {
++	ZBC_ZONE_TYPE_CONV		= 0x1,
++	ZBC_ZONE_TYPE_SEQWRITE_REQ	= 0x2,
++	ZBC_ZONE_TYPE_SEQWRITE_PREF	= 0x3,
++	/* 0x4 to 0xf are reserved */
++};
++
++/* Zone conditions of REPORT ZONES zone descriptors */
++enum zbc_zone_cond {
++	ZBC_ZONE_COND_NO_WP		= 0x0,
++	ZBC_ZONE_COND_EMPTY		= 0x1,
++	ZBC_ZONE_COND_IMP_OPEN		= 0x2,
++	ZBC_ZONE_COND_EXP_OPEN		= 0x3,
++	ZBC_ZONE_COND_CLOSED		= 0x4,
++	/* 0x5 to 0xc are reserved */
++	ZBC_ZONE_COND_READONLY		= 0xd,
++	ZBC_ZONE_COND_FULL		= 0xe,
++	ZBC_ZONE_COND_OFFLINE		= 0xf,
++};
++
+ #endif /* _SCSI_PROTO_H_ */
 -- 
-1.9.4
+2.13.5
