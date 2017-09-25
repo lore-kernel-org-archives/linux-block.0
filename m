@@ -1,36 +1,128 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
-	<Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "hch@lst.de" <hch@lst.de>
-Subject: Re: [PATCH V5 10/14] block: mq-deadline: Add zoned block device data
-Date: Mon, 25 Sep 2017 21:34:15 +0000
-Message-ID: <1506375254.2641.26.camel@wdc.com>
+Return-Path: <prvs=434c021e3=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V5 10/14] block: mq-deadline: Add zoned block device data
+Date: Mon, 25 Sep 2017 15:14:50 +0900
+Message-Id: <20170925061454.5533-11-damien.lemoal@wdc.com>
+In-Reply-To: <20170925061454.5533-1-damien.lemoal@wdc.com>
 References: <20170925061454.5533-1-damien.lemoal@wdc.com>
-	 <20170925061454.5533-11-damien.lemoal@wdc.com>
-In-Reply-To: <20170925061454.5533-11-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE3LTA5LTI1IGF0IDE1OjE0ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
-Cj4gTW9kaWZ5IG1xLWRlYWxpbmUgaW5pdF9xdWV1ZSBhbmQgZXhpdF9xdWV1ZSBlbGV2YXRvciBt
-ZXRob2RzIHRvIGhhbmRsZQ0KICAgICAgICAgXl5eXl5eXl5eXg0KICAgICAgICAgbXEtZGVhZGxp
-bmUgPw0KDQo+ICtzdGF0aWMgaW50IGRlYWRsaW5lX2luaXRfem9uZXNfd2xvY2soc3RydWN0IHJl
-cXVlc3RfcXVldWUgKnEsDQo+ICsJCQkJICAgICBzdHJ1Y3QgZGVhZGxpbmVfZGF0YSAqZGQpDQo+
-ICt7DQo+ICsJLyoNCj4gKwkgKiBGb3IgcmVndWxhciBkcml2ZXMgb3Igbm9uLWNvbmZvcm1pbmcg
-em9uZWQgYmxvY2sgZGV2aWNlLA0KPiArCSAqIGRvIG5vdCB1c2Ugem9uZSB3cml0ZSBsb2NraW5n
-Lg0KPiArCSAqLw0KPiArCWlmICghYmxrX3F1ZXVlX25yX3pvbmVzKHEpKQ0KPiArCQlyZXR1cm4g
-MDsNCj4gKw0KPiArCS8qDQo+ICsJICogVHJlYXQgaG9zdCBhd2FyZSBkcml2ZXMgYXMgcmVndWxh
-ciBkaXNrcy4NCj4gKwkgKi8NCj4gKwlpZiAoYmxrX3F1ZXVlX3pvbmVkX21vZGVsKHEpICE9IEJM
-S19aT05FRF9ITSkNCj4gKwkJcmV0dXJuIDA7DQo+ICsNCj4gKwlkZC0+em9uZXNfd2xvY2sgPSBr
-emFsbG9jX25vZGUoQklUU19UT19MT05HUyhibGtfcXVldWVfbnJfem9uZXMocSkpDQo+ICsJCQkJ
-ICAgICAgICogc2l6ZW9mKHVuc2lnbmVkIGxvbmcpLA0KPiArCQkJCSAgICAgICBHRlBfS0VSTkVM
-LCBxLT5ub2RlKTsNCg0KQSByZXF1ZXN0IHF1ZXVlIGlzIGNyZWF0ZWQgYmVmb3JlIGRpc2sgdmFs
-aWRhdGlvbiBvY2N1cnMgYW5kIGJlZm9yZSB0aGUNCm51bWJlciBvZiB6b25lcyBpcyBpbml0aWFs
-aXplZCAoc2RfcHJvYmVfYXN5bmMoKSkuIElmIGEgc2NoZWR1bGVyIGlzDQphc3NpZ25lZCB0byBh
-IFpCQyBkcml2ZSB0aHJvdWdoIGEgdWRldiBydWxlLCBjYW4gaXQgaGFwcGVuIHRoYXQNCmRlYWRs
-aW5lX2luaXRfem9uZXNfd2xvY2soKSBpcyBjYWxsZWQgYmVmb3JlIHRoZSBudW1iZXIgb2Ygem9u
-ZXMgaGFzIGJlZW4NCmluaXRpYWxpemVkPw0KDQpCYXJ0Lg==
+Introduce new fields to mq-deadline private data to support zoned block
+devices. The fields are a zone bitmap used to implement zone write
+locking and a spinlock to atomically handle zone write locking with
+other processing.
+
+Modify mq-dealine init_queue and exit_queue elevator methods to handle
+initialization and cleanup of the zone write lock bitmap.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+---
+ block/mq-deadline.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 46 insertions(+), 4 deletions(-)
+
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index a1cad4331edd..af2eb9b3936e 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -60,6 +60,9 @@ struct deadline_data {
+ 
+ 	spinlock_t lock;
+ 	struct list_head dispatch;
++
++	spinlock_t zone_lock;
++	unsigned long *zones_wlock;
+ };
+ 
+ static inline struct rb_root *
+@@ -300,6 +303,34 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	return rq;
+ }
+ 
++static int deadline_init_zones_wlock(struct request_queue *q,
++				     struct deadline_data *dd)
++{
++	/*
++	 * For regular drives or non-conforming zoned block device,
++	 * do not use zone write locking.
++	 */
++	if (!blk_queue_nr_zones(q))
++		return 0;
++
++	/*
++	 * Treat host aware drives as regular disks.
++	 */
++	if (blk_queue_zoned_model(q) != BLK_ZONED_HM)
++		return 0;
++
++	dd->zones_wlock = kzalloc_node(BITS_TO_LONGS(blk_queue_nr_zones(q))
++				       * sizeof(unsigned long),
++				       GFP_KERNEL, q->node);
++	if (!dd->zones_wlock)
++		return -ENOMEM;
++
++	pr_info("mq-deadline: %s: zones write locking enabled\n",
++		dev_name(q->backing_dev_info->dev));
++
++	return 0;
++}
++
+ static void dd_exit_queue(struct elevator_queue *e)
+ {
+ 	struct deadline_data *dd = e->elevator_data;
+@@ -307,6 +338,7 @@ static void dd_exit_queue(struct elevator_queue *e)
+ 	BUG_ON(!list_empty(&dd->fifo_list[READ]));
+ 	BUG_ON(!list_empty(&dd->fifo_list[WRITE]));
+ 
++	kfree(dd->zones_wlock);
+ 	kfree(dd);
+ }
+ 
+@@ -317,16 +349,15 @@ static int dd_init_queue(struct request_queue *q, struct elevator_type *e)
+ {
+ 	struct deadline_data *dd;
+ 	struct elevator_queue *eq;
++	int ret = -ENOMEM;
+ 
+ 	eq = elevator_alloc(q, e);
+ 	if (!eq)
+ 		return -ENOMEM;
+ 
+ 	dd = kzalloc_node(sizeof(*dd), GFP_KERNEL, q->node);
+-	if (!dd) {
+-		kobject_put(&eq->kobj);
+-		return -ENOMEM;
+-	}
++	if (!dd)
++		goto out_put_elv;
+ 	eq->elevator_data = dd;
+ 
+ 	INIT_LIST_HEAD(&dd->fifo_list[READ]);
+@@ -340,9 +371,20 @@ static int dd_init_queue(struct request_queue *q, struct elevator_type *e)
+ 	dd->fifo_batch = fifo_batch;
+ 	spin_lock_init(&dd->lock);
+ 	INIT_LIST_HEAD(&dd->dispatch);
++	spin_lock_init(&dd->zone_lock);
++
++	ret = deadline_init_zones_wlock(q, dd);
++	if (ret)
++		goto out_free_dd;
+ 
+ 	q->elevator = eq;
+ 	return 0;
++
++out_free_dd:
++	kfree(dd);
++out_put_elv:
++	kobject_put(&eq->kobj);
++	return ret;
+ }
+ 
+ static int dd_request_merge(struct request_queue *q, struct request **rq,
+-- 
+2.13.5
