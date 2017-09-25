@@ -1,51 +1,71 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.mpynet.fi ([82.197.21.85]:64969 "EHLO mx2.mpynet.fi"
+Received: from mx1.redhat.com ([209.132.183.28]:55800 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751781AbdIUL1d (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Sep 2017 07:27:33 -0400
-Date: Thu, 21 Sep 2017 14:27:31 +0300
-From: Rakesh Pandit <rakesh@tuxera.com>
-To: Matias =?iso-8859-1?Q?Bj=F8rling?= <mb@lightnvm.io>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
-Subject: [PATCH 4/6] lightnvm: pblk: improve error message if down_timeout
- fails
-Message-ID: <20170921112729.GA28553@dhcp-216.srv.tuxera.com>
+        id S1753200AbdIYC2a (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 24 Sep 2017 22:28:30 -0400
+Date: Mon, 25 Sep 2017 10:28:16 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        =Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Hannes Reinecke <hare@suse.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>
+Subject: Re: [PATCH v3 6/6] scsi-mq: Reduce suspend latency
+Message-ID: <20170925022816.GC6434@ming.t460p>
+References: <20170922221405.22091-1-bart.vanassche@wdc.com>
+ <20170922221405.22091-7-bart.vanassche@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170922221405.22091-7-bart.vanassche@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The two pr_err messages are useless as they don't even differentiate
-error code.
+On Fri, Sep 22, 2017 at 03:14:05PM -0700, Bart Van Assche wrote:
+> Avoid that it can take 200 ms too long to wait for requests to
+> finish. Note: blk_mq_freeze_queue() uses a wait queue to wait
+> for ongoing requests to finish.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
+>  drivers/scsi/scsi_lib.c | 16 +++++++++++++---
+>  1 file changed, 13 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> index ca84fd2d93ea..c5e66bb0c94d 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -2939,10 +2939,20 @@ scsi_device_quiesce(struct scsi_device *sdev)
+>  	if (err)
+>  		return err;
+>  
+> -	scsi_run_queue(q);
+> -	while (atomic_read(&sdev->device_busy)) {
+> -		msleep_interruptible(200);
+> +	if (q->mq_ops) {
+> +		/*
+> +		 * Ensure write order of the PREEMPT_ONLY queue flag and
+> +		 * q_usage_counter. See also blk_queue_enter().
+> +		 */
+> +		smp_wmb();
+> +		blk_mq_freeze_queue(q);
+> +		blk_mq_unfreeze_queue(q);
+> +	} else {
+>  		scsi_run_queue(q);
+> +		while (atomic_read(&sdev->device_busy)) {
+> +			msleep_interruptible(200);
+> +			scsi_run_queue(q);
+> +		}
 
-Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
----
- drivers/lightnvm/pblk-core.c | 12 ++----------
- 1 file changed, 2 insertions(+), 10 deletions(-)
+Again, your patch doesn't fix scsi quiesce issue
+on block legacy, either on suspend path or revalidate
+path of transport spi.
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index b92eabc..74ddb30 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -1734,16 +1734,8 @@ static void __pblk_down_page(struct pblk *pblk, struct ppa_addr *ppa_list,
- #endif
- 
- 	ret = down_timeout(&rlun->wr_sem, msecs_to_jiffies(30000));
--	if (ret) {
--		switch (ret) {
--		case -ETIME:
--			pr_err("pblk: lun semaphore timed out\n");
--			break;
--		case -EINTR:
--			pr_err("pblk: lun semaphore timed out\n");
--			break;
--		}
--	}
-+	if (ret == -ETIME || ret == -EINTR)
-+		pr_err("pblk: taking lun semaphore timed out: err %d\n", -ret);
- }
- 
- void pblk_down_page(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas)
 -- 
-2.5.0
+Ming
