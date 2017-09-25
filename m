@@ -1,123 +1,32 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:45802 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S966243AbdIYU3q (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Sep 2017 16:29:46 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        =Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v4 1/7] md: Make md resync and reshape threads freezable
-Date: Mon, 25 Sep 2017 13:29:18 -0700
-Message-Id: <20170925202924.16603-2-bart.vanassche@wdc.com>
-In-Reply-To: <20170925202924.16603-1-bart.vanassche@wdc.com>
-References: <20170925202924.16603-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"jthumshirn@suse.de" <jthumshirn@suse.de>, "linux-raid@vger.kernel.org"
+	<linux-raid@vger.kernel.org>, "hch@lst.de" <hch@lst.de>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+	"hare@suse.com" <hare@suse.com>, "shli@kernel.org" <shli@kernel.org>
+Subject: Re: [PATCH v3 1/6] md: Make md resync and reshape threads freezable
+Date: Mon, 25 Sep 2017 16:22:29 +0000
+Message-ID: <1506356548.2641.13.camel@wdc.com>
+References: <20170922221405.22091-1-bart.vanassche@wdc.com>
+	 <20170922221405.22091-2-bart.vanassche@wdc.com>
+	 <20170925023804.GD6434@ming.t460p>
+In-Reply-To: <20170925023804.GD6434@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-Some people use the md driver on laptops and use the suspend and
-resume functionality. Since it is essential that submitting of
-new I/O requests stops before device quiescing starts, make the
-md resync and reshape threads freezable.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Shaohua Li <shli@kernel.org>
-Cc: linux-raid@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/md/md.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 08fcaebc61bd..26a12bd0db65 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -66,6 +66,7 @@
- #include <linux/raid/md_u.h>
- #include <linux/slab.h>
- #include <linux/percpu-refcount.h>
-+#include <linux/freezer.h>
- 
- #include <trace/events/block.h>
- #include "md.h"
-@@ -7424,6 +7425,7 @@ static int md_thread(void *arg)
- 	 */
- 
- 	allow_signal(SIGKILL);
-+	set_freezable();
- 	while (!kthread_should_stop()) {
- 
- 		/* We need to wait INTERRUPTIBLE so that
-@@ -7434,7 +7436,7 @@ static int md_thread(void *arg)
- 		if (signal_pending(current))
- 			flush_signals(current);
- 
--		wait_event_interruptible_timeout
-+		wait_event_freezable_timeout
- 			(thread->wqueue,
- 			 test_bit(THREAD_WAKEUP, &thread->flags)
- 			 || kthread_should_stop() || kthread_should_park(),
-@@ -8133,6 +8135,8 @@ void md_do_sync(struct md_thread *thread)
- 		return;
- 	}
- 
-+	set_freezable();
-+
- 	if (mddev_is_clustered(mddev)) {
- 		ret = md_cluster_ops->resync_start(mddev);
- 		if (ret)
-@@ -8324,7 +8328,7 @@ void md_do_sync(struct md_thread *thread)
- 		     mddev->curr_resync_completed > mddev->resync_max
- 			    )) {
- 			/* time to update curr_resync_completed */
--			wait_event(mddev->recovery_wait,
-+			wait_event_freezable(mddev->recovery_wait,
- 				   atomic_read(&mddev->recovery_active) == 0);
- 			mddev->curr_resync_completed = j;
- 			if (test_bit(MD_RECOVERY_SYNC, &mddev->recovery) &&
-@@ -8342,10 +8346,10 @@ void md_do_sync(struct md_thread *thread)
- 			 * to avoid triggering warnings.
- 			 */
- 			flush_signals(current); /* just in case */
--			wait_event_interruptible(mddev->recovery_wait,
--						 mddev->resync_max > j
--						 || test_bit(MD_RECOVERY_INTR,
--							     &mddev->recovery));
-+			wait_event_freezable(mddev->recovery_wait,
-+					     mddev->resync_max > j ||
-+					     test_bit(MD_RECOVERY_INTR,
-+						      &mddev->recovery));
- 		}
- 
- 		if (test_bit(MD_RECOVERY_INTR, &mddev->recovery))
-@@ -8421,7 +8425,7 @@ void md_do_sync(struct md_thread *thread)
- 				 * Give other IO more of a chance.
- 				 * The faster the devices, the less we wait.
- 				 */
--				wait_event(mddev->recovery_wait,
-+				wait_event_freezable(mddev->recovery_wait,
- 					   !atomic_read(&mddev->recovery_active));
- 			}
- 		}
-@@ -8433,7 +8437,8 @@ void md_do_sync(struct md_thread *thread)
- 	 * this also signals 'finished resyncing' to md_stop
- 	 */
- 	blk_finish_plug(&plug);
--	wait_event(mddev->recovery_wait, !atomic_read(&mddev->recovery_active));
-+	wait_event_freezable(mddev->recovery_wait,
-+			     !atomic_read(&mddev->recovery_active));
- 
- 	if (!test_bit(MD_RECOVERY_RESHAPE, &mddev->recovery) &&
- 	    !test_bit(MD_RECOVERY_INTR, &mddev->recovery) &&
--- 
-2.14.1
+T24gTW9uLCAyMDE3LTA5LTI1IGF0IDEwOjM4ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
+RnJpLCBTZXAgMjIsIDIwMTcgYXQgMDM6MTQ6MDBQTSAtMDcwMCwgQmFydCBWYW4gQXNzY2hlIHdy
+b3RlOg0KPiA+IFNvbWUgcGVvcGxlIHVzZSB0aGUgbWQgZHJpdmVyIG9uIGxhcHRvcHMgYW5kIHVz
+ZSB0aGUgc3VzcGVuZCBhbmQNCj4gPiByZXN1bWUgZnVuY3Rpb25hbGl0eS4gU2luY2UgaXQgaXMg
+ZXNzZW50aWFsIHRoYXQgc3VibWl0dGluZyBvZg0KPiA+IG5ldyBJL08gcmVxdWVzdHMgc3RvcHMg
+YmVmb3JlIGRldmljZSBxdWllc2Npbmcgc3RhcnRzLCBtYWtlIHRoZQ0KPiA+IG1kIHJlc3luYyBh
+bmQgcmVzaGFwZSB0aHJlYWRzIGZyZWV6YWJsZS4NCj4gDQo+IFdoeSBpcyB0aGlzIHBhdGNoIHBh
+cnQgb2YgdGhpcyBwYXRjaHNldD8gSSBkb24ndCB0aGluaw0KPiBNRCBpcyBzcGVjaWFsIGVub3Vn
+aCB3cnQuIHRoZSBTQ1NJIHF1aWVzY2UgaXNzdWUuDQoNCkJlY2F1c2UgdGhlIHNjb3BlIG9mIHRo
+aXMgcGF0Y2ggc2VyaWVzIGlzIG5vdCBvbmx5IHRvIG1ha2UgU0NTSSBxdWllc2NlIHNhZmUNCmJ1
+dCBhbHNvIHRvIGF2b2lkIHRoYXQgc3VzcGVuZCBhbmQgcmVzdW1lIGxvY2sgdXAgd2l0aCBhIHN0
+b3JhZ2Ugc3RhY2sgdGhhdA0KdXNlcyB0aGUgbWQgZHJpdmVyLg0KDQpCYXJ0Lg==
