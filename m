@@ -1,54 +1,77 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:60318 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751719AbdI3GMp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Sep 2017 02:12:45 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Cathy Avery <cavery@redhat.com>,
-        Martin Steigerwald <martin@lichtvoll.de>,
-        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V7 1/6] blk-mq: only run hw queues for blk-mq
-Date: Sat, 30 Sep 2017 14:12:09 +0800
-Message-Id: <20170930061214.10622-2-ming.lei@redhat.com>
-In-Reply-To: <20170930061214.10622-1-ming.lei@redhat.com>
-References: <20170930061214.10622-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+21c581e1042956a70a85+5146+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: nvme multipath support V3
+Date: Mon, 25 Sep 2017 15:40:22 +0200
+Message-Id: <20170925134031.10548-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-This patch just makes it explicitely.
+Hi all,
 
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Tested-by: Martin Steigerwald <martin@lichtvoll.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Bart Van Assche <Bart.VanAssche@wdc.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+this series adds support for multipathing, that is accessing nvme
+namespaces through multiple controllers to the nvme core driver.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 98a18609755e..6fd9f86fc86d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -125,7 +125,8 @@ void blk_freeze_queue_start(struct request_queue *q)
- 	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
- 	if (freeze_depth == 1) {
- 		percpu_ref_kill(&q->q_usage_counter);
--		blk_mq_run_hw_queues(q, false);
-+		if (q->mq_ops)
-+			blk_mq_run_hw_queues(q, false);
- 	}
- }
- EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
--- 
-2.9.5
+It is a very thin and efficient implementation that relies on
+close cooperation with other bits of the nvme driver, and few small
+and simple block helpers.
+
+Compared to dm-multipath the important differences are how management
+of the paths is done, and how the I/O path works.
+
+Management of the paths is fully integrated into the nvme driver,
+for each newly found nvme controller we check if there are other
+controllers that refer to the same subsystem, and if so we link them
+up in the nvme driver.  Then for each namespace found we check if
+the namespace id and identifiers match to check if we have multiple
+controllers that refer to the same namespaces.  For now path
+availability is based entirely on the controller status, which at
+least for fabrics will be continuously updated based on the mandatory
+keep alive timer.  Once the Asynchronous Namespace Access (ANA)
+proposal passes in NVMe we will also get per-namespace states in
+addition to that, but for now any details of that remain confidential
+to NVMe members.
+
+The I/O path is very different from the existing multipath drivers,
+which is enabled by the fact that NVMe (unlike SCSI) does not support
+partial completions - a controller will either complete a whole
+command or not, but never only complete parts of it.  Because of that
+there is no need to clone bios or requests - the I/O path simply
+redirects the I/O to a suitable path.  For successful commands
+multipath is not in the completion stack at all.  For failed commands
+we decide if the error could be a path failure, and if yes remove
+the bios from the request structure and requeue them before completing
+the request.  All together this means there is no performance
+degradation compared to normal nvme operation when using the multipath
+device node (at least not until I find a dual ported DRAM backed
+device :))
+
+There are a couple questions left in the individual patches, comments
+welcome.
+
+A git tree is available at:
+
+   git://git.infradead.org/users/hch/block.git nvme-mpath
+
+gitweb:
+
+   http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/nvme-mpath
+
+Changes since V2:
+  - don't create duplicate subsystems on reset (Keith Bush)
+  - free requests properly when failing over in I/O completion (Keith Bush)
+  - new devices names: /dev/nvm-sub%dn%d
+  - expose the namespace identification sysfs files for the mpath nodes
+
+Changes since V1:
+  - introduce new nvme_ns_ids structure to clean up identifier handling
+  - generic_make_request_fast is now named direct_make_request and calls
+    generic_make_request_checks
+  - reset bi_disk on resubmission
+  - create sysfs links between the existing nvme namespace block devices and
+    the new share mpath device
+  - temporarily added the timeout patches from James, this should go into
+    nvme-4.14, though
