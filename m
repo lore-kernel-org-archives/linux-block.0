@@ -1,51 +1,26 @@
-Return-Path: <BATV+21c581e1042956a70a85+5146+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 1/9] block: move REQ_NOWAIT
-Date: Mon, 25 Sep 2017 15:40:23 +0200
-Message-Id: <20170925134031.10548-2-hch@lst.de>
-In-Reply-To: <20170925134031.10548-1-hch@lst.de>
-References: <20170925134031.10548-1-hch@lst.de>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
+	<Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>
+Subject: Re: [PATCH V5 03/14] scsi: sd_zbc: Rearrange code
+Date: Mon, 25 Sep 2017 21:02:28 +0000
+Message-ID: <1506373347.2641.15.camel@wdc.com>
+References: <20170925061454.5533-1-damien.lemoal@wdc.com>
+	 <20170925061454.5533-4-damien.lemoal@wdc.com>
+In-Reply-To: <20170925061454.5533-4-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-This flag should be before the operation-specific REQ_NOUNMAP bit.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/blk_types.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index a2d2aa709cef..acc2f3cdc2fc 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -224,11 +224,11 @@ enum req_flag_bits {
- 	__REQ_PREFLUSH,		/* request for cache flush */
- 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
- 	__REQ_BACKGROUND,	/* background IO */
-+	__REQ_NOWAIT,           /* Don't wait if request will block */
- 
- 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
- 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
- 
--	__REQ_NOWAIT,           /* Don't wait if request will block */
- 	__REQ_NR_BITS,		/* stops here */
- };
- 
-@@ -245,9 +245,9 @@ enum req_flag_bits {
- #define REQ_PREFLUSH		(1ULL << __REQ_PREFLUSH)
- #define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
- #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
-+#define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
- 
- #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
--#define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
- 
- #define REQ_FAILFAST_MASK \
- 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
--- 
-2.14.1
+T24gTW9uLCAyMDE3LTA5LTI1IGF0IDE1OjE0ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
+Cj4gUmVhcnJhbmdlIHNkX3piY19zZXR1cCgpIHRvIGluY2x1ZGUgdXNlXzE2X2Zvcl9ydyBhbmQg
+dXNlXzEwX2Zvcl9ydw0KPiBhc3NpZ25tZW50cyBhbmQgbW92ZSB0aGUgY2FsY3VsYXRpb24gb2Yg
+c2RrcC0+em9uZV9zaGlmdCB0b2dldGhlcg0KPiB3aXRoIHRoZSBhc3NpZ25tZW50IG9mIHRoZSB2
+ZXJpZmllZCB6b25lX2Jsb2NrcyB2YWx1ZSBpbg0KPiBzZF96YmNfY2hlY2tfem9uZV9zaXplKCku
+DQo+IA0KPiBObyBmdW5jdGlvbmFsIGNoYW5nZSBpcyBpbnRyb2R1Y2VkIGJ5IHRoaXMgcGF0Y2gu
+DQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBEYW1pZW4gTGUgTW9hbCA8ZGFtaWVuLmxlbW9hbEB3ZGMu
+Y29tPg0KPiBSZXZpZXdlZC1ieTogQ2hyaXN0b3BoIEhlbGx3aWcgPGhjaEBsc3QuZGU+DQoNClJl
+dmlld2VkLWJ5OiBCYXJ0IFZhbiBBc3NjaGUgPEJhcnQuVmFuQXNzY2hlQHdkYy5jb20+DQoNCg==
