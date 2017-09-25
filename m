@@ -1,71 +1,68 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f51.google.com ([74.125.82.51]:50965 "EHLO
-        mail-wm0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751278AbdIOMZy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Sep 2017 08:25:54 -0400
-Received: by mail-wm0-f51.google.com with SMTP id v142so7818883wmv.5
-        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2017 05:25:54 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 11/11] lightnvm: pblk: use rqd->end_io for completion
-Date: Fri, 15 Sep 2017 14:25:39 +0200
-Message-Id: <1505478339-13089-12-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1505478339-13089-1-git-send-email-javier@cnexlabs.com>
-References: <1505478339-13089-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=434c021e3=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V5 04/14] scsi: sd_zbc: Use well defined macros
+Date: Mon, 25 Sep 2017 15:14:44 +0900
+Message-Id: <20170925061454.5533-5-damien.lemoal@wdc.com>
+In-Reply-To: <20170925061454.5533-1-damien.lemoal@wdc.com>
+References: <20170925061454.5533-1-damien.lemoal@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-For consistency with the rest of pblk, use rqd->end_io to point to the
-function taking care of ending the request on the completion path.
+instead of open coding, use the min() macro to calculate a report zones
+reply buffer length in sd_zbc_check_zone_size() and the round_up()
+macro for calculating the number of zones in sd_zbc_setup().
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
+No functional change is introduced by this patch.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/lightnvm/pblk-core.c | 7 -------
- drivers/lightnvm/pblk-read.c | 5 ++---
- 2 files changed, 2 insertions(+), 10 deletions(-)
+ drivers/scsi/sd_zbc.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 76c3b20dc3d5..5e6a881e3434 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -261,13 +261,6 @@ void pblk_write_should_kick(struct pblk *pblk)
- 		pblk_write_kick(pblk);
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index 7dbaf920679e..bbad851c1789 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -475,7 +475,7 @@ static int sd_zbc_check_capacity(struct scsi_disk *sdkp, unsigned char *buf)
+ 	return 0;
  }
  
--void pblk_end_bio_sync(struct bio *bio)
--{
--	struct completion *waiting = bio->bi_private;
--
--	complete(waiting);
--}
--
- void pblk_end_io_sync(struct nvm_rq *rqd)
- {
- 	struct completion *waiting = rqd->private;
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index d7c90c303540..0299fc08291d 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -170,13 +170,12 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+-#define SD_ZBC_BUF_SIZE 131072
++#define SD_ZBC_BUF_SIZE 131072U
  
- 	new_bio->bi_iter.bi_sector = 0; /* internal bio */
- 	bio_set_op_attrs(new_bio, REQ_OP_READ, 0);
--	new_bio->bi_private = &wait;
--	new_bio->bi_end_io = pblk_end_bio_sync;
+ /**
+  * sd_zbc_check_zone_size - Check the device zone sizes
+@@ -526,10 +526,7 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
+ 		/* Parse REPORT ZONES header */
+ 		list_length = get_unaligned_be32(&buf[0]) + 64;
+ 		rec = buf + 64;
+-		if (list_length < SD_ZBC_BUF_SIZE)
+-			buf_len = list_length;
+-		else
+-			buf_len = SD_ZBC_BUF_SIZE;
++		buf_len = min(list_length, SD_ZBC_BUF_SIZE);
  
- 	rqd->bio = new_bio;
- 	rqd->nr_ppas = nr_holes;
- 	rqd->flags = pblk_set_read_mode(pblk, PBLK_READ_RANDOM);
--	rqd->end_io = NULL;
-+	rqd->end_io = pblk_end_io_sync;
-+	rqd->private = &wait;
+ 		/* Parse zone descriptors */
+ 		while (rec < buf + buf_len) {
+@@ -599,9 +596,8 @@ static int sd_zbc_setup(struct scsi_disk *sdkp)
+ 	/* chunk_sectors indicates the zone size */
+ 	blk_queue_chunk_sectors(sdkp->disk->queue,
+ 			logical_to_sectors(sdkp->device, sdkp->zone_blocks));
+-	sdkp->nr_zones = sdkp->capacity >> sdkp->zone_shift;
+-	if (sdkp->capacity & (sdkp->zone_blocks - 1))
+-		sdkp->nr_zones++;
++	sdkp->nr_zones =
++		round_up(sdkp->capacity, sdkp->zone_blocks) >> sdkp->zone_shift;
  
- 	if (unlikely(nr_secs > 1 && nr_holes == 1)) {
- 		ppa_ptr = rqd->ppa_list;
+ 	if (!sdkp->zones_wlock) {
+ 		sdkp->zones_wlock = kcalloc(BITS_TO_LONGS(sdkp->nr_zones),
 -- 
-2.7.4
+2.13.5
