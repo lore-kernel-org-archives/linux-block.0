@@ -1,39 +1,131 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "hch@lst.de" <hch@lst.de>, "hare@suse.com" <hare@suse.com>,
-	"jthumshirn@suse.de" <jthumshirn@suse.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "oleksandr@natalenko.name"
-	<oleksandr@natalenko.name>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <ming.lei@redhat.com>
+Date: Mon, 25 Sep 2017 10:26:29 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	=Oleksandr Natalenko <oleksandr@natalenko.name>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>
 Subject: Re: [PATCH v3 5/6] block: Make SCSI device suspend and resume work
  reliably
-Date: Mon, 25 Sep 2017 16:20:20 +0000
-Message-ID: <1506356419.2641.11.camel@wdc.com>
+Message-ID: <20170925022621.GB6434@ming.t460p>
 References: <20170922221405.22091-1-bart.vanassche@wdc.com>
-	 <20170922221405.22091-6-bart.vanassche@wdc.com>
-	 <20170925022621.GB6434@ming.t460p>
-In-Reply-To: <20170925022621.GB6434@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
+ <20170922221405.22091-6-bart.vanassche@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170922221405.22091-6-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE3LTA5LTI1IGF0IDEwOjI2ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
-RnJpLCBTZXAgMjIsIDIwMTcgYXQgMDM6MTQ6MDRQTSAtMDcwMCwgQmFydCBWYW4gQXNzY2hlIHdy
-b3RlOg0KPiA+ICtpbnQgYmxrX3F1ZXVlX2VudGVyKHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxLCBi
-b29sIG5vd2FpdCwgYm9vbCBwcmVlbXB0KQ0KPiA+ICB7DQo+ID4gIAl3aGlsZSAodHJ1ZSkgew0K
-PiA+ICAJCWludCByZXQ7DQo+ID4gIA0KPiA+IC0JCWlmIChwZXJjcHVfcmVmX3RyeWdldF9saXZl
-KCZxLT5xX3VzYWdlX2NvdW50ZXIpKQ0KPiA+IC0JCQlyZXR1cm4gMDsNCj4gPiArCQlpZiAocGVy
-Y3B1X3JlZl90cnlnZXRfbGl2ZSgmcS0+cV91c2FnZV9jb3VudGVyKSkgew0KPiA+ICsJCQkvKg0K
-PiA+ICsJCQkgKiBFbnN1cmUgcmVhZCBvcmRlciBvZiBxX3VzYWdlX2NvdW50ZXIgYW5kIHRoZQ0K
-PiA+ICsJCQkgKiBQUkVFTVBUX09OTFkgcXVldWUgZmxhZy4NCj4gPiArCQkJICovDQo+ID4gKwkJ
-CXNtcF9ybWIoKTsNCj4gPiArCQkJaWYgKHByZWVtcHQgfHwgIWJsa19xdWV1ZV9wcmVlbXB0X29u
-bHkocSkpDQo+ID4gKwkJCQlyZXR1cm4gMDsNCj4gPiArCQkJZWxzZQ0KPiA+ICsJCQkJcGVyY3B1
-X3JlZl9wdXQoJnEtPnFfdXNhZ2VfY291bnRlcik7DQo+ID4gKwkJfQ0KPiANCj4gTm93IHlvdSBp
-bnRyb2R1Y2Ugb25lIHNtcF9ybWIoKSBhbmQgdGVzdCBvbiBwcmVlbXB0IGZsYWcgb24NCj4gYmxr
-LW1xJ3MgZmFzdCBwYXRoLCB3aGljaCBzaG91bGQgaGF2ZSBiZWVuIGF2b2lkZWQsIHNvIEkNCj4g
-dGhpbmsgdGhpcyB3YXkgaXMgd29yc2UgdGhhbiBteSBwYXRjaHNldC4NCg0KU28gdGhhdCBtZWFu
-cyB0aGF0IHlvdSBoYXZlIG5vdCBub3RpY2VkIHRoYXQgaXQgaXMgc2FmZSB0byBsZWF2ZSBvdXQg
-dGhhdA0Kc21wX3JtcCgpIGNhbGwgYmVjYXVzZSBibGstbXEgcXVldWUgZnJlZXppbmcgYW5kIHVu
-ZnJlZXppbmcgd2FpdHMgZm9yIGEgZ3JhY2UNCnBlcmlvZCBhbmQgaGVuY2Ugd2FpdHMgdW50aWwg
-YWxsIENQVXMgaGF2ZSBleGVjdXRlZCBhIGZ1bGwgbWVtb3J5IGJhcnJpZXI/DQoNCkJhcnQu
+On Fri, Sep 22, 2017 at 03:14:04PM -0700, Bart Van Assche wrote:
+> It is essential during suspend and resume that neither the filesystem
+> state nor the filesystem metadata in RAM changes. This is why while
+> the hibernation image is being written or restored that SCSI devices
+> are quiesced. The SCSI core quiesces devices through scsi_device_quiesce()
+> and scsi_device_resume(). In the SDEV_QUIESCE state execution of
+> non-preempt requests is deferred. This is realized by returning
+> BLKPREP_DEFER from inside scsi_prep_state_check() for quiesced SCSI
+> devices. Avoid that a full queue prevents power management requests
+> to be submitted by deferring allocation of non-preempt requests for
+> devices in the quiesced state. This patch has been tested by running
+> the following commands and by verifying that after resume the fio job
+> is still running:
+> 
+> for d in /sys/class/block/sd*[a-z]; do
+>   hcil=$(readlink "$d/device")
+>   hcil=${hcil#../../../}
+>   echo 4 > "$d/queue/nr_requests"
+>   echo 1 > "/sys/class/scsi_device/$hcil/device/queue_depth"
+> done
+> bdev=$(readlink /dev/disk/by-uuid/5217d83f-213e-4b42-b86e-20013325ba6c)
+> bdev=${bdev#../../}
+> hcil=$(readlink "/sys/block/$bdev/device")
+> hcil=${hcil#../../../}
+> fio --name="$bdev" --filename="/dev/$bdev" --buffered=0 --bs=512 --rw=randread \
+>   --ioengine=libaio --numjobs=4 --iodepth=16 --iodepth_batch=1 --thread \
+>   --loops=$((2**31)) &
+> pid=$!
+> sleep 1
+> systemctl hibernate
+> sleep 10
+> kill $pid
+> 
+> Reported-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+> References: "I/O hangs after resuming from suspend-to-ram" (https://marc.info/?l=linux-block&m=150340235201348).
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
+>  block/blk-core.c       | 37 ++++++++++++++++++++++++++++---------
+>  block/blk-mq.c         |  4 ++--
+>  block/blk-timeout.c    |  2 +-
+>  fs/block_dev.c         |  4 ++--
+>  include/linux/blkdev.h |  2 +-
+>  5 files changed, 34 insertions(+), 15 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 45cf3f56a730..971825bd4462 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -351,10 +351,12 @@ void blk_set_preempt_only(struct request_queue *q, bool preempt_only)
+>  	unsigned long flags;
+>  
+>  	spin_lock_irqsave(q->queue_lock, flags);
+> -	if (preempt_only)
+> +	if (preempt_only) {
+>  		queue_flag_set(QUEUE_FLAG_PREEMPT_ONLY, q);
+> -	else
+> +	} else {
+>  		queue_flag_clear(QUEUE_FLAG_PREEMPT_ONLY, q);
+> +		wake_up_all(&q->mq_freeze_wq);
+> +	}
+>  	spin_unlock_irqrestore(q->queue_lock, flags);
+>  }
+>  EXPORT_SYMBOL(blk_set_preempt_only);
+> @@ -773,13 +775,29 @@ struct request_queue *blk_alloc_queue(gfp_t gfp_mask)
+>  }
+>  EXPORT_SYMBOL(blk_alloc_queue);
+>  
+> -int blk_queue_enter(struct request_queue *q, bool nowait)
+> +/**
+> + * blk_queue_enter() - try to increase q->q_usage_counter
+> + * @q: request queue pointer
+> + * @nowait: if the queue is frozen, do not wait until it is unfrozen
+> + * @preempt: if QUEUE_FLAG_PREEMPT_ONLY has been set, do not wait until that
+> + *	flag has been cleared
+> + */
+> +int blk_queue_enter(struct request_queue *q, bool nowait, bool preempt)
+>  {
+>  	while (true) {
+>  		int ret;
+>  
+> -		if (percpu_ref_tryget_live(&q->q_usage_counter))
+> -			return 0;
+> +		if (percpu_ref_tryget_live(&q->q_usage_counter)) {
+> +			/*
+> +			 * Ensure read order of q_usage_counter and the
+> +			 * PREEMPT_ONLY queue flag.
+> +			 */
+> +			smp_rmb();
+> +			if (preempt || !blk_queue_preempt_only(q))
+> +				return 0;
+> +			else
+> +				percpu_ref_put(&q->q_usage_counter);
+> +		}
+
+Now you introduce one smp_rmb() and test on preempt flag on
+blk-mq's fast path, which should have been avoided, so I
+think this way is worse than my patchset.
+
+On some systems(even a system with SCSI, or system without
+SCSI), SCSI quiesce may never be used at all, so it is unfair
+to introduce the cost in fast path for this system.
+
+We can avoid that, why not do that?
+
+-- 
+Ming
