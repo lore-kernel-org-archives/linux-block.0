@@ -1,36 +1,43 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "tom.leiming@gmail.com" <tom.leiming@gmail.com>
-CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "oleksandr@natalenko.name"
-	<oleksandr@natalenko.name>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: [PATCH v3 0/6] Make SCSI device suspend and resume work reliably
-Date: Mon, 25 Sep 2017 16:17:27 +0000
-Message-ID: <1506356246.2641.8.camel@wdc.com>
-References: <20170922221405.22091-1-bart.vanassche@wdc.com>
-	 <CACVXFVNCcij6RNNxZ77iDMc_82j_qpfso+g+NqpfgN3Cs9=FpQ@mail.gmail.com>
-In-Reply-To: <CACVXFVNCcij6RNNxZ77iDMc_82j_qpfso+g+NqpfgN3Cs9=FpQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <tom.leiming@gmail.com>
 MIME-Version: 1.0
+In-Reply-To: <20170922221405.22091-1-bart.vanassche@wdc.com>
+References: <20170922221405.22091-1-bart.vanassche@wdc.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Mon, 25 Sep 2017 10:36:04 +0800
+Message-ID: <CACVXFVNCcij6RNNxZ77iDMc_82j_qpfso+g+NqpfgN3Cs9=FpQ@mail.gmail.com>
+Subject: Re: [PATCH v3 0/6] Make SCSI device suspend and resume work reliably
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block <linux-block@vger.kernel.org>,
+	Christoph Hellwig <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
+	"=Oleksandr Natalenko" <oleksandr@natalenko.name>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE3LTA5LTI1IGF0IDEwOjM2ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
-U2F0LCBTZXAgMjMsIDIwMTcgYXQgNjoxMyBBTSwgQmFydCBWYW4gQXNzY2hlIDxiYXJ0LnZhbmFz
-c2NoZUB3ZGMuY29tPiB3cm90ZToNCj4gPiBJdCBpcyBrbm93biB0aGF0IGR1cmluZyB0aGUgcmVz
-dW1lIGZvbGxvd2luZyBhIGhpYmVybmF0ZSBzb21ldGltZXMgdGhlDQo+ID4gc3lzdGVtIGhhbmdz
-IGluc3RlYWQgb2YgY29taW5nIHVwIHByb3Blcmx5LiBUaGlzIHBhdGNoIHNlcmllcyBmaXhlcyB0
-aGlzDQo+ID4gcHJvYmxlbS4gVGhpcyBwYXRjaCBzZXJpZXMgaXMgYW4gYWx0ZXJuYXRpdmUgZm9y
-IE1pbmcgTGVpJ3MgIltQQVRDSCBWNQ0KPiA+IDAvMTBdIGJsb2NrL3Njc2k6IHNhZmUgU0NTSSBx
-dWllc2NpbmciIHBhdGNoIHNlcmllcy4gVGhlIGFkdmFudGFnZXMgb2YNCj4gPiB0aGlzIHBhdGNo
-IHNlcmllcyBhcmU6DQo+IA0KPiBObywgeW91ciBwYXRjaCBkb2Vzbid0IGZpeCBzY3NpIHF1aWVz
-Y2Ugb24gYmxvY2sgbGVnYWN5LCBzbyBub3QgYW4gYWx0ZXJuYXRpdmUNCj4gb2YgbXkgcGF0Y2hz
-ZXQgYXQgYWxsLg0KDQpUaGlzIHBhdGNoIHNlcmllcyBkZWZpbml0ZWx5IGlzIGFuIGFsdGVybmF0
-aXZlIGZvciBibGstbXEvc2NzaS1tcS4gQW5kIGFzIHlvdQ0Ka25vdyBteSBhcHByb2FjaCBjYW4g
-YmUgZXh0ZW5kZWQgZWFzaWx5IHRvIHRoZSBsZWdhY3kgU0NTSSBjb3JlIGJ5IGFkZGluZw0KYmxr
-X3F1ZXVlX2VudGVyKCkgLyBibGtfcXVldWVfZXhpdCgpIGNhbGxzIHdoZXJlIG5lY2Vzc2FyeSBp
-biB0aGUgbGVnYWN5IGJsb2NrDQpsYXllci4gSSBoYXZlIG5vdCBkb25lIHRoaXMgYmVjYXVzZSB0
-aGUgYnVnIHJlcG9ydCB3YXMgYWdhaW5zdCBzY3NpLW1xIGFuZCBub3QNCmFnYWluc3QgdGhlIGxl
-Z2FjeSBTQ1NJIGNvcmUuIEFkZGl0aW9uYWxseSwgc2luY2UgdGhlIGxlZ2FjeSBibG9jayBsYXll
-ciBhbmQNClNDU0kgY29yZSBhcmUgb24gdGhlaXIgd2F5IG91dCBJIGRpZCBub3Qgd2FudCB0byBz
-cGVuZCB0aW1lIG9uIG1vZGlmeWluZyB0aGVzZS4NCg0KQmFydC4=
+On Sat, Sep 23, 2017 at 6:13 AM, Bart Van Assche <bart.vanassche@wdc.com> wrote:
+> Hello Jens,
+>
+> It is known that during the resume following a hibernate sometimes the
+> system hangs instead of coming up properly. This patch series fixes this
+> problem. This patch series is an alternative for Ming Lei's "[PATCH V5
+> 0/10] block/scsi: safe SCSI quiescing" patch series. The advantages of
+> this patch series are:
+
+No, your patch doesn't fix scsi quiesce on block legacy, so not an alternative
+of my patchset at all.
+
+> - Easier to review because no new race conditions are introduced between
+>   queue freezing and blk_cleanup_queue(). As the discussion that followed
+>   Ming's patch series shows the correctness of the new code is hard to
+>   verify.
+
+I don't agree that my code is hard to verify. I have replied all your comments,
+and the only thing you pay special attention to is that the race between preempt
+quiesce and blk_cleanup_queue():
+
+    - that is simply not a race
+    - we have depended on drivers(legacy or blk-mq) to handle request correctly
+   after queue is set as dying for long long time
+
+
+-- 
+Ming Lei
