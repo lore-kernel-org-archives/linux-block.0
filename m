@@ -1,116 +1,26 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:52184 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751186AbdISDuI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Sep 2017 23:50:08 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Cathy Avery <cavery@redhat.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 02/10] block: tracking request allocation with q_usage_counter
-Date: Tue, 19 Sep 2017 11:49:17 +0800
-Message-Id: <20170919034925.9894-3-ming.lei@redhat.com>
-In-Reply-To: <20170919034925.9894-1-ming.lei@redhat.com>
-References: <20170919034925.9894-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <keith.busch@intel.com>
+Date: Mon, 25 Sep 2017 10:19:09 -0600
+From: Keith Busch <keith.busch@intel.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 9/9] nvme: also expose the namespace identification sysfs
+ files for mpath nodes
+Message-ID: <20170925161908.GE8463@localhost.localdomain>
+References: <20170925134031.10548-1-hch@lst.de>
+ <20170925134031.10548-10-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170925134031.10548-10-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-This usage is basically same with blk-mq, so that we can
-support to freeze legacy queue easily.
+On Mon, Sep 25, 2017 at 03:40:31PM +0200, Christoph Hellwig wrote:
+> We do this by adding a helper that returns the ns_head for a device that
+> can belong to either the per-controller or per-subsystem block device
+> nodes, and otherwise reuse all the existing code.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Also 'wake_up_all(&q->mq_freeze_wq)' has to be moved
-into blk_set_queue_dying() since both legacy and blk-mq
-may wait on the wait queue of .mq_freeze_wq.
+Looks good.
 
-Tested-by: Cathy Avery <cavery@redhat.com>
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-core.c | 14 ++++++++++++++
- block/blk-mq.c   |  7 -------
- 2 files changed, 14 insertions(+), 7 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index aebe676225e6..abfba798ee03 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -610,6 +610,12 @@ void blk_set_queue_dying(struct request_queue *q)
- 		}
- 		spin_unlock_irq(q->queue_lock);
- 	}
-+
-+	/*
-+	 * We need to ensure that processes currently waiting on
-+	 * the queue are notified as well.
-+	 */
-+	wake_up_all(&q->mq_freeze_wq);
- }
- EXPORT_SYMBOL_GPL(blk_set_queue_dying);
- 
-@@ -1392,16 +1398,21 @@ static struct request *blk_old_get_request(struct request_queue *q,
- 					   unsigned int op, gfp_t gfp_mask)
- {
- 	struct request *rq;
-+	int ret = 0;
- 
- 	WARN_ON_ONCE(q->mq_ops);
- 
- 	/* create ioc upfront */
- 	create_io_context(gfp_mask, q->node);
- 
-+	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM));
-+	if (ret)
-+		return ERR_PTR(ret);
- 	spin_lock_irq(q->queue_lock);
- 	rq = get_request(q, op, NULL, gfp_mask);
- 	if (IS_ERR(rq)) {
- 		spin_unlock_irq(q->queue_lock);
-+		blk_queue_exit(q);
- 		return rq;
- 	}
- 
-@@ -1573,6 +1584,7 @@ void __blk_put_request(struct request_queue *q, struct request *req)
- 		blk_free_request(rl, req);
- 		freed_request(rl, sync, rq_flags);
- 		blk_put_rl(rl);
-+		blk_queue_exit(q);
- 	}
- }
- EXPORT_SYMBOL_GPL(__blk_put_request);
-@@ -1854,8 +1866,10 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
- 	 * Grab a free request. This is might sleep but can not fail.
- 	 * Returns with the queue unlocked.
- 	 */
-+	blk_queue_enter_live(q);
- 	req = get_request(q, bio->bi_opf, bio, GFP_NOIO);
- 	if (IS_ERR(req)) {
-+		blk_queue_exit(q);
- 		__wbt_done(q->rq_wb, wb_acct);
- 		if (PTR_ERR(req) == -ENOMEM)
- 			bio->bi_status = BLK_STS_RESOURCE;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 6fd9f86fc86d..10c1f49f663d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -256,13 +256,6 @@ void blk_mq_wake_waiters(struct request_queue *q)
- 	queue_for_each_hw_ctx(q, hctx, i)
- 		if (blk_mq_hw_queue_mapped(hctx))
- 			blk_mq_tag_wakeup_all(hctx->tags, true);
--
--	/*
--	 * If we are called because the queue has now been marked as
--	 * dying, we need to ensure that processes currently waiting on
--	 * the queue are notified as well.
--	 */
--	wake_up_all(&q->mq_freeze_wq);
- }
- 
- bool blk_mq_can_queue(struct blk_mq_hw_ctx *hctx)
--- 
-2.9.5
+Reviewed-by: Keith Busch <keith.busch@intel.com>
