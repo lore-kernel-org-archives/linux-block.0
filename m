@@ -1,156 +1,73 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:42274 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751677AbdI3LbU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Sep 2017 07:31:20 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 2/8] blk-mq-sched: use q->queue_depth as hint for q->nr_requests
-Date: Sat, 30 Sep 2017 19:26:49 +0800
-Message-Id: <20170930112655.31451-3-ming.lei@redhat.com>
-In-Reply-To: <20170930112655.31451-1-ming.lei@redhat.com>
-References: <20170930112655.31451-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
+	<Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>
+Subject: Re: [PATCH V5 12/14] block: mq-deadline: Introduce zone locking
+ support
+Date: Mon, 25 Sep 2017 22:00:36 +0000
+Message-ID: <1506376835.2641.34.camel@wdc.com>
+References: <20170925061454.5533-1-damien.lemoal@wdc.com>
+	 <20170925061454.5533-13-damien.lemoal@wdc.com>
+In-Reply-To: <20170925061454.5533-13-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-SCSI sets q->queue_depth from shost->cmd_per_lun, and
-q->queue_depth is per request_queue and more related to
-scheduler queue compared with hw queue depth, which can be
-shared by queues, such as TAG_SHARED.
-
-This patch tries to use q->queue_depth as hint for computing
-q->nr_requests, which should be more effective than
-current way.
-
-Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Tested-by: Tom Nguyen <tom81094@gmail.com>
-Tested-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.h | 18 +++++++++++++++---
- block/blk-mq.c       | 27 +++++++++++++++++++++++++--
- block/blk-mq.h       |  1 +
- block/blk-settings.c |  2 ++
- 4 files changed, 43 insertions(+), 5 deletions(-)
-
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 1d47f3fda1d0..906b10c54f78 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -99,12 +99,24 @@ static inline bool blk_mq_sched_needs_restart(struct blk_mq_hw_ctx *hctx)
- static inline unsigned blk_mq_sched_queue_depth(struct request_queue *q)
- {
- 	/*
--	 * Default to double of smaller one between hw queue_depth and 128,
-+	 * q->queue_depth is more close to scheduler queue, so use it
-+	 * as hint for computing scheduler queue depth if it is valid
-+	 */
-+	unsigned q_depth = q->queue_depth ?: q->tag_set->queue_depth;
-+
-+	/*
-+	 * Default to double of smaller one between queue depth and 128,
- 	 * since we don't split into sync/async like the old code did.
- 	 * Additionally, this is a per-hw queue depth.
- 	 */
--	return 2 * min_t(unsigned int, q->tag_set->queue_depth,
--				   BLKDEV_MAX_RQ);
-+	q_depth = 2 * min_t(unsigned int, q_depth, BLKDEV_MAX_RQ);
-+
-+	/*
-+	 * when queue depth of driver is too small, we set queue depth
-+	 * of scheduler queue as 128 which is the default setting of
-+	 * block legacy code.
-+	 */
-+	return max_t(unsigned, q_depth, BLKDEV_MAX_RQ);
- }
- 
- #endif
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 7cb3f87334c0..561a663cdd0e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2694,7 +2694,9 @@ void blk_mq_free_tag_set(struct blk_mq_tag_set *set)
- }
- EXPORT_SYMBOL(blk_mq_free_tag_set);
- 
--int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
-+static int __blk_mq_update_nr_requests(struct request_queue *q,
-+				       bool sched_only,
-+				       unsigned int nr)
- {
- 	struct blk_mq_tag_set *set = q->tag_set;
- 	struct blk_mq_hw_ctx *hctx;
-@@ -2713,7 +2715,7 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
- 		 * If we're using an MQ scheduler, just update the scheduler
- 		 * queue depth. This is similar to what the old code would do.
- 		 */
--		if (!hctx->sched_tags) {
-+		if (!sched_only && !hctx->sched_tags) {
- 			ret = blk_mq_tag_update_depth(hctx, &hctx->tags,
- 							min(nr, set->queue_depth),
- 							false);
-@@ -2733,6 +2735,27 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
- 	return ret;
- }
- 
-+int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
-+{
-+	return __blk_mq_update_nr_requests(q, false, nr);
-+}
-+
-+/*
-+ * When drivers update q->queue_depth, this API is called so that
-+ * we can use this queue depth as hint for adjusting scheduler
-+ * queue depth.
-+ */
-+int blk_mq_update_sched_queue_depth(struct request_queue *q)
-+{
-+	unsigned nr;
-+
-+	if (!q->mq_ops || !q->elevator)
-+		return 0;
-+
-+	nr = blk_mq_sched_queue_depth(q);
-+	return __blk_mq_update_nr_requests(q, true, nr);
-+}
-+
- static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 							int nr_hw_queues)
- {
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 915de58572e7..5bca6ce1f01d 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -37,6 +37,7 @@ bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
- 				bool wait);
- struct request *blk_mq_dequeue_from_ctx(struct blk_mq_hw_ctx *hctx,
- 					struct blk_mq_ctx *start);
-+int blk_mq_update_sched_queue_depth(struct request_queue *q);
- 
- /*
-  * Internal helpers for allocating/freeing the request map
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 8559e9563c52..c2db38d2ec2b 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -878,6 +878,8 @@ void blk_set_queue_depth(struct request_queue *q, unsigned int depth)
- {
- 	q->queue_depth = depth;
- 	wbt_set_queue_depth(q->rq_wb, depth);
-+
-+	WARN_ON(blk_mq_update_sched_queue_depth(q));
- }
- EXPORT_SYMBOL(blk_set_queue_depth);
- 
--- 
-2.9.5
+T24gTW9uLCAyMDE3LTA5LTI1IGF0IDE1OjE0ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
+Cj4gK3N0YXRpYyBpbmxpbmUgYm9vbCBkZWFkbGluZV9yZXF1ZXN0X25lZWRzX3pvbmVfd2xvY2so
+c3RydWN0IGRlYWRsaW5lX2RhdGEgKmRkLA0KPiArCQkJCQkJICAgICBzdHJ1Y3QgcmVxdWVzdCAq
+cnEpDQo+ICt7DQo+ICsNCj4gKwlpZiAoIWRkLT56b25lc193bG9jaykNCj4gKwkJcmV0dXJuIGZh
+bHNlOw0KPiArDQo+ICsJaWYgKGJsa19ycV9pc19wYXNzdGhyb3VnaChycSkpDQo+ICsJCXJldHVy
+biBmYWxzZTsNCj4gKw0KPiArCXN3aXRjaCAocmVxX29wKHJxKSkgew0KPiArCWNhc2UgUkVRX09Q
+X1dSSVRFX1pFUk9FUzoNCj4gKwljYXNlIFJFUV9PUF9XUklURV9TQU1FOg0KPiArCWNhc2UgUkVR
+X09QX1dSSVRFOg0KPiArCQlyZXR1cm4gYmxrX3JxX3pvbmVfaXNfc2VxKHJxKTsNCj4gKwlkZWZh
+dWx0Og0KPiArCQlyZXR1cm4gZmFsc2U7DQo+ICsJfQ0KDQpJZiBhbnlvbmUgZXZlciBhZGRzIGEg
+bmV3IHdyaXRlIHJlcXVlc3QgdHlwZSBpdCB3aWxsIGJlIGVhc3kgdG8gb3Zlcmxvb2sgdGhpcw0K
+ZnVuY3Rpb24uIFNob3VsZCB0aGUgJ2RlZmF1bHQnIGNhc2UgYmUgbGVmdCBvdXQgYW5kIHNob3Vs
+ZCBhbGwgcmVxdWVzdCB0eXBlcw0KYmUgbWVudGlvbmVkIGluIHRoZSBzd2l0Y2gvY2FzZSBzdGF0
+ZW1lbnQgc3VjaCB0aGF0IHRoZSBjb21waWxlciB3aWxsIGlzc3VlIGENCndhcm5pbmcgaWYgYSBu
+ZXcgcmVxdWVzdCBvcGVyYXRpb24gdHlwZSBpcyBhZGRlZCB0byBlbnVtIHJlcV9vcGY/DQoNCj4g
+Ky8qDQo+ICsgKiBBYnVzZSB0aGUgZWx2LnByaXZbMF0gcG9pbnRlciB0byBpbmRpY2F0ZSBpZiBh
+IHJlcXVlc3QgaGFzIHdyaXRlDQo+ICsgKiBsb2NrZWQgaXRzIHRhcmdldCB6b25lLiBPbmx5IHdy
+aXRlIHJlcXVlc3QgdG8gYSB6b25lZCBibG9jayBkZXZpY2UNCj4gKyAqIGNhbiBvd24gYSB6b25l
+IHdyaXRlIGxvY2suDQo+ICsgKi8NCj4gKyNkZWZpbmUgUlFfWk9ORV9XTE9DS0VECQkoKHZvaWQg
+KikxVUwpDQo+ICtzdGF0aWMgaW5saW5lIHZvaWQgZGVhZGxpbmVfc2V0X3JlcXVlc3Rfem9uZV93
+bG9jayhzdHJ1Y3QgcmVxdWVzdCAqcnEpDQo+ICt7DQo+ICsJcnEtPmVsdi5wcml2WzBdID0gUlFf
+Wk9ORV9XTE9DS0VEOw0KPiArfQ0KPiArDQo+ICsjZGVmaW5lIFJRX1pPTkVfTk9fV0xPQ0sJKCh2
+b2lkICopMFVMKQ0KPiArc3RhdGljIGlubGluZSB2b2lkIGRlYWRsaW5lX2NsZWFyX3JlcXVlc3Rf
+em9uZV93bG9jayhzdHJ1Y3QgcmVxdWVzdCAqcnEpDQo+ICt7DQo+ICsJcnEtPmVsdi5wcml2WzBd
+ID0gUlFfWk9ORV9OT19XTE9DSzsNCj4gK30NCg0KU2hvdWxkIGFuIGVudW1lcmF0aW9uIHR5cGUg
+YmUgaW50cm9kdWNlZCBmb3IgUlFfWk9ORV9XTE9DS0VEIGFuZCBSUV9aT05FX05PX1dMT0NLPw0K
+DQo+ICsvKg0KPiArICogV3JpdGUgbG9jayB0aGUgdGFyZ2V0IHpvbmUgb2YgYSB3cml0ZSByZXF1
+ZXN0Lg0KPiArICovDQo+ICtzdGF0aWMgdm9pZCBkZWFkbGluZV93bG9ja196b25lKHN0cnVjdCBk
+ZWFkbGluZV9kYXRhICpkZCwNCj4gKwkJCQlzdHJ1Y3QgcmVxdWVzdCAqcnEpDQo+ICt7DQo+ICsJ
+dW5zaWduZWQgaW50IHpubyA9IGJsa19ycV96b25lX25vKHJxKTsNCj4gKw0KPiArCVdBUk5fT05f
+T05DRShkZWFkbGluZV9yZXF1ZXN0X2hhc196b25lX3dsb2NrKHJxKSk7DQo+ICsJV0FSTl9PTl9P
+TkNFKHRlc3RfYW5kX3NldF9iaXQoem5vLCBkZC0+em9uZXNfd2xvY2spKTsNCj4gKwlkZWFkbGlu
+ZV9zZXRfcmVxdWVzdF96b25lX3dsb2NrKHJxKTsNCj4gK30NCj4gKw0KPiArLyoNCj4gKyAqIFdy
+aXRlIHVubG9jayB0aGUgdGFyZ2V0IHpvbmUgb2YgYSB3cml0ZSByZXF1ZXN0Lg0KPiArICovDQo+
+ICtzdGF0aWMgdm9pZCBkZWFkbGluZV93dW5sb2NrX3pvbmUoc3RydWN0IGRlYWRsaW5lX2RhdGEg
+KmRkLA0KPiArCQkJCSAgc3RydWN0IHJlcXVlc3QgKnJxKQ0KPiArew0KPiArCXVuc2lnbmVkIGlu
+dCB6bm8gPSBibGtfcnFfem9uZV9ubyhycSk7DQo+ICsJdW5zaWduZWQgbG9uZyBmbGFnczsNCj4g
+Kw0KPiArCXNwaW5fbG9ja19pcnFzYXZlKCZkZC0+em9uZV9sb2NrLCBmbGFncyk7DQo+ICsNCj4g
+KwlXQVJOX09OX09OQ0UoIXRlc3RfYW5kX2NsZWFyX2JpdCh6bm8sIGRkLT56b25lc193bG9jaykp
+Ow0KPiArCWRlYWRsaW5lX2NsZWFyX3JlcXVlc3Rfem9uZV93bG9jayhycSk7DQo+ICsNCj4gKwlz
+cGluX3VubG9ja19pcnFyZXN0b3JlKCZkZC0+em9uZV9sb2NrLCBmbGFncyk7DQo+ICt9DQoNCldo
+eSBkb2VzIGRlYWRsaW5lX3d1bmxvY2tfem9uZSgpIHByb3RlY3QgbW9kaWZpY2F0aW9ucyB3aXRo
+IGRkLT56b25lX2xvY2sgYnV0DQpkZWFkbGluZV93bG9ja196b25lKCkgbm90PyBJZiB0aGlzIGNv
+ZGUgaXMgY29ycmVjdCwgcGxlYXNlIGFkZCBhDQpsb2NrZGVwX2Fzc2VydF9oZWxkKCkgc3RhdGVt
+ZW50IGluIHRoZSBmaXJzdCBmdW5jdGlvbi4NCg0KPiArLyoNCj4gKyAqIFRlc3QgdGhlIHdyaXRl
+IGxvY2sgc3RhdGUgb2YgdGhlIHRhcmdldCB6b25lIG9mIGEgd3JpdGUgcmVxdWVzdC4NCj4gKyAq
+Lw0KPiArc3RhdGljIGlubGluZSBib29sIGRlYWRsaW5lX3pvbmVfaXNfd2xvY2tlZChzdHJ1Y3Qg
+ZGVhZGxpbmVfZGF0YSAqZGQsDQo+ICsJCQkJCSAgICBzdHJ1Y3QgcmVxdWVzdCAqcnEpDQo+ICt7
+DQo+ICsJdW5zaWduZWQgaW50IHpubyA9IGJsa19ycV96b25lX25vKHJxKTsNCj4gKw0KPiArCXJl
+dHVybiB0ZXN0X2JpdCh6bm8sIGRkLT56b25lc193bG9jayk7DQo+ICt9DQoNCkRvIHdlIHJlYWxs
+eSBuZWVkIHRoZSBsb2NhbCB2YXJpYWJsZSAnem5vJz8NCg0KPiArLyoNCj4gKyAqIEZvciB6b25l
+ZCBibG9jayBkZXZpY2VzLCB3cml0ZSB1bmxvY2sgdGhlIHRhcmdldCB6b25lIG9mDQo+ICsgKiBj
+b21wbGV0ZWQgd3JpdGUgcmVxdWVzdHMuDQo+ICsgKi8NCj4gK3N0YXRpYyB2b2lkIGRkX2NvbXBs
+ZXRlZF9yZXF1ZXN0KHN0cnVjdCByZXF1ZXN0ICpycSkNCj4gK3sNCj4gKw0KDQpQbGVhc2UgbGVh
+dmUgb3V0IHRoZSBibGFuayBsaW5lIGF0IHRoZSBzdGFydCBvZiB0aGlzIGZ1bmN0aW9uLg0KDQpU
+aGFua3MsDQoNCkJhcnQu
