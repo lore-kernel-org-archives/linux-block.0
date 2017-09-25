@@ -1,22 +1,44 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] block: cryptoloop - Fix build warning
-To: Corentin Labbe <clabbe.montjoie@gmail.com>, herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20170925171007.4660-1-clabbe.montjoie@gmail.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <d9bed3f0-637d-8003-de09-c382f00f9e1e@kernel.dk>
-Date: Mon, 25 Sep 2017 13:24:22 -0600
-MIME-Version: 1.0
-In-Reply-To: <20170925171007.4660-1-clabbe.montjoie@gmail.com>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <clabbe.montjoie@gmail.com>
+Return-Path: <clabbe.montjoie@gmail.com>
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+To: axboe@kernel.dk,
+	herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: [PATCH] block: cryptoloop - Fix build warning
+Date: Mon, 25 Sep 2017 19:10:07 +0200
+Message-Id: <20170925171007.4660-1-clabbe.montjoie@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 09/25/2017 11:10 AM, Corentin Labbe wrote:
-> This patch fix the following build warning:
-> drivers/block/cryptoloop.c:46:8: warning: variable 'cipher' set but not used [-Wunused-but-set-variable]
+This patch fix the following build warning:
+drivers/block/cryptoloop.c:46:8: warning: variable 'cipher' set but not used [-Wunused-but-set-variable]
 
-Thanks, added for 4.15.
+Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+---
+ drivers/block/cryptoloop.c | 2 --
+ 1 file changed, 2 deletions(-)
 
+diff --git a/drivers/block/cryptoloop.c b/drivers/block/cryptoloop.c
+index 74e03aa537ad..7033a4beda66 100644
+--- a/drivers/block/cryptoloop.c
++++ b/drivers/block/cryptoloop.c
+@@ -43,7 +43,6 @@ cryptoloop_init(struct loop_device *lo, const struct loop_info64 *info)
+ 	int cipher_len;
+ 	int mode_len;
+ 	char cms[LO_NAME_SIZE];			/* cipher-mode string */
+-	char *cipher;
+ 	char *mode;
+ 	char *cmsp = cms;			/* c-m string pointer */
+ 	struct crypto_skcipher *tfm;
+@@ -56,7 +55,6 @@ cryptoloop_init(struct loop_device *lo, const struct loop_info64 *info)
+ 	strncpy(cms, info->lo_crypt_name, LO_NAME_SIZE);
+ 	cms[LO_NAME_SIZE - 1] = 0;
+ 
+-	cipher = cmsp;
+ 	cipher_len = strcspn(cmsp, "-");
+ 
+ 	mode = cmsp + cipher_len;
 -- 
-Jens Axboe
+2.13.5
