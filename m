@@ -1,116 +1,87 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:55336 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752065AbdI0FvW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Sep 2017 01:51:22 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Cathy Avery <cavery@redhat.com>,
-        Martin Steigerwald <martin@lichtvoll.de>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 2/6] block: tracking request allocation with q_usage_counter
-Date: Wed, 27 Sep 2017 13:48:49 +0800
-Message-Id: <20170927054853.6647-3-ming.lei@redhat.com>
-In-Reply-To: <20170927054853.6647-1-ming.lei@redhat.com>
-References: <20170927054853.6647-1-ming.lei@redhat.com>
+Received: from mail-wm0-f49.google.com ([74.125.82.49]:51043 "EHLO
+        mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933521AbdIYKPY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Sep 2017 06:15:24 -0400
+Received: by mail-wm0-f49.google.com with SMTP id b195so17877774wmb.5
+        for <linux-block@vger.kernel.org>; Mon, 25 Sep 2017 03:15:24 -0700 (PDT)
+Subject: Re: [PATCH 5/6] lightnvm: pblk: print incompatible line version
+ correctly
+To: =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <jg@lightnvm.io>,
+        Rakesh Pandit <rakesh@tuxera.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20170921112801.GA28567@dhcp-216.srv.tuxera.com>
+ <3814BFB5-5966-4737-8B98-7A2762E409FD@lightnvm.io>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <7dcd786f-f5da-a70f-9a78-a5ccc5fe321b@lightnvm.io>
+Date: Mon, 25 Sep 2017 12:15:22 +0200
+MIME-Version: 1.0
+In-Reply-To: <3814BFB5-5966-4737-8B98-7A2762E409FD@lightnvm.io>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This usage is basically same with blk-mq, so that we can
-support to freeze legacy queue easily.
+On 09/22/2017 11:01 AM, Javier González wrote:
+>> On 21 Sep 2017, at 13.28, Rakesh Pandit <rakesh@tuxera.com> wrote:
+>>
+>> Correct it by coverting little endian to cpu endian and also define a
+>> macro for line version so that maintenance is easy.
+>>
+>> Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+>> ---
+>> drivers/lightnvm/pblk-core.c     | 2 +-
+>> drivers/lightnvm/pblk-recovery.c | 4 ++--
+>> drivers/lightnvm/pblk.h          | 1 +
+>> 3 files changed, 4 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+>> index 74ddb30..57583a1 100644
+>> --- a/drivers/lightnvm/pblk-core.c
+>> +++ b/drivers/lightnvm/pblk-core.c
+>> @@ -991,7 +991,7 @@ static int pblk_line_init_metadata(struct pblk *pblk, struct pblk_line *line,
+>> 	memcpy(smeta_buf->header.uuid, pblk->instance_uuid, 16);
+>> 	smeta_buf->header.id = cpu_to_le32(line->id);
+>> 	smeta_buf->header.type = cpu_to_le16(line->type);
+>> -	smeta_buf->header.version = cpu_to_le16(1);
+>> +	smeta_buf->header.version = SMETA_VERSION;
+>>
+>> 	/* Start metadata */
+>> 	smeta_buf->seq_nr = cpu_to_le64(line->seq_nr);
+>> diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+>> index 1869eef..686bc17 100644
+>> --- a/drivers/lightnvm/pblk-recovery.c
+>> +++ b/drivers/lightnvm/pblk-recovery.c
+>> @@ -876,9 +876,9 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+>> 		if (le32_to_cpu(smeta_buf->header.identifier) != PBLK_MAGIC)
+>> 			continue;
+>>
+>> -		if (le16_to_cpu(smeta_buf->header.version) != 1) {
+>> +		if (smeta_buf->header.version != SMETA_VERSION) {
+>> 			pr_err("pblk: found incompatible line version %u\n",
+>> -					smeta_buf->header.version);
+>> +					le16_to_cpu(smeta_buf->header.version));
+>> 			return ERR_PTR(-EINVAL);
+>> 		}
+>>
+>> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+>> index eaf5397..87b1d7f 100644
+>> --- a/drivers/lightnvm/pblk.h
+>> +++ b/drivers/lightnvm/pblk.h
+>> @@ -318,6 +318,7 @@ enum {
+>> };
+>>
+>> #define PBLK_MAGIC 0x70626c6b /*pblk*/
+>> +#define SMETA_VERSION cpu_to_le16(1)
+>>
+>> struct line_header {
+>> 	__le32 crc;
+>> --
+>> 2.5.0
+> 
+> It's a different way of doing it, and it's fine to have a macro.
+> 
+> Reviewed-by: Javier González <javier@cnexlabs.com>
+> 
 
-Also 'wake_up_all(&q->mq_freeze_wq)' has to be moved
-into blk_set_queue_dying() since both legacy and blk-mq
-may wait on the wait queue of .mq_freeze_wq.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-core.c | 14 ++++++++++++++
- block/blk-mq.c   |  7 -------
- 2 files changed, 14 insertions(+), 7 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index aebe676225e6..abfba798ee03 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -610,6 +610,12 @@ void blk_set_queue_dying(struct request_queue *q)
- 		}
- 		spin_unlock_irq(q->queue_lock);
- 	}
-+
-+	/*
-+	 * We need to ensure that processes currently waiting on
-+	 * the queue are notified as well.
-+	 */
-+	wake_up_all(&q->mq_freeze_wq);
- }
- EXPORT_SYMBOL_GPL(blk_set_queue_dying);
- 
-@@ -1392,16 +1398,21 @@ static struct request *blk_old_get_request(struct request_queue *q,
- 					   unsigned int op, gfp_t gfp_mask)
- {
- 	struct request *rq;
-+	int ret = 0;
- 
- 	WARN_ON_ONCE(q->mq_ops);
- 
- 	/* create ioc upfront */
- 	create_io_context(gfp_mask, q->node);
- 
-+	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM));
-+	if (ret)
-+		return ERR_PTR(ret);
- 	spin_lock_irq(q->queue_lock);
- 	rq = get_request(q, op, NULL, gfp_mask);
- 	if (IS_ERR(rq)) {
- 		spin_unlock_irq(q->queue_lock);
-+		blk_queue_exit(q);
- 		return rq;
- 	}
- 
-@@ -1573,6 +1584,7 @@ void __blk_put_request(struct request_queue *q, struct request *req)
- 		blk_free_request(rl, req);
- 		freed_request(rl, sync, rq_flags);
- 		blk_put_rl(rl);
-+		blk_queue_exit(q);
- 	}
- }
- EXPORT_SYMBOL_GPL(__blk_put_request);
-@@ -1854,8 +1866,10 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
- 	 * Grab a free request. This is might sleep but can not fail.
- 	 * Returns with the queue unlocked.
- 	 */
-+	blk_queue_enter_live(q);
- 	req = get_request(q, bio->bi_opf, bio, GFP_NOIO);
- 	if (IS_ERR(req)) {
-+		blk_queue_exit(q);
- 		__wbt_done(q->rq_wb, wb_acct);
- 		if (PTR_ERR(req) == -ENOMEM)
- 			bio->bi_status = BLK_STS_RESOURCE;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 6fd9f86fc86d..10c1f49f663d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -256,13 +256,6 @@ void blk_mq_wake_waiters(struct request_queue *q)
- 	queue_for_each_hw_ctx(q, hctx, i)
- 		if (blk_mq_hw_queue_mapped(hctx))
- 			blk_mq_tag_wakeup_all(hctx->tags, true);
--
--	/*
--	 * If we are called because the queue has now been marked as
--	 * dying, we need to ensure that processes currently waiting on
--	 * the queue are notified as well.
--	 */
--	wake_up_all(&q->mq_freeze_wq);
- }
- 
- bool blk_mq_can_queue(struct blk_mq_hw_ctx *hctx)
--- 
-2.9.5
+Thanks, I picked it up.
