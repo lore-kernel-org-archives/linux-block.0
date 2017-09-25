@@ -1,36 +1,42 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
-	<Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "hch@lst.de" <hch@lst.de>
+Return-Path: <ming.lei@redhat.com>
+Date: Mon, 25 Sep 2017 18:05:50 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
 Subject: Re: [PATCH V5 06/14] block: Add zoned block device information to
  request queue
-Date: Mon, 25 Sep 2017 21:06:11 +0000
-Message-ID: <1506373570.2641.16.camel@wdc.com>
+Message-ID: <20170925100549.GA13400@ming.t460p>
 References: <20170925061454.5533-1-damien.lemoal@wdc.com>
-	 <20170925061454.5533-7-damien.lemoal@wdc.com>
-In-Reply-To: <20170925061454.5533-7-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset="utf-8"
+ <20170925061454.5533-7-damien.lemoal@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170925061454.5533-7-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE3LTA5LTI1IGF0IDE1OjE0ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
-Cj4gQ29tcG9uZW50cyByZWx5aW5nIG9ubHkgb24gdGhlIHJlcXVldWVzdF9xdWV1ZSBzdHJ1Y3R1
-cmUgZm9yIGFjY2Vzc2luZw0KPiBibG9jayBkZXZpY2VzIChlLmcuIEkvTyBzY2hlZHVsZXJzKSBo
-YXZlIGEgbGltaXRlZCBrbm93bGVkZ2VkIG9mIHRoZQ0KPiBkZXZpY2UgY2hhcmFjdGVyaXN0aWNz
-LiBJbiBwYXJ0aWN1bGFyLCB0aGUgZGV2aWNlIGNhcGFjaXR5IGNhbm5vdCBiZQ0KPiBlYXNpbHkg
-ZGlzY292ZXJlZCwgd2hpY2ggZm9yIGEgem9uZWQgYmxvY2sgZGV2aWNlIGFsc28gcmVzdWx0IGlu
-IHRoZQ0KPiBpbmFiaWxpdHkgdG8gZWFzaWx5IGtub3cgdGhlIG51bWJlciBvZiB6b25lcyBvZiB0
-aGUgZGV2aWNlICh0aGUgem9uZQ0KPiBzaXplIGlzIGluZGljYXRlZCBieSB0aGUgY2h1bmtfc2Vj
-dG9ycyBmaWVsZCBvZiB0aGUgcXVldWUgbGltaXRzKS4NCj4gDQo+IEludHJvZHVjZSB0aGUgbnJf
-em9uZXMgZmllbGQgdG8gdGhlIHJlcXVlc3RfcXVldWUgc3R1cmN0dXJlIHRvIHNpbXBsaWZ5DQo+
-IGFjY2VzcyB0byB0aGlzIGluZm9ybWF0aW9uLiBBbHNvLCBhZGQgdGhlIGJpdG1hcCBzZXFfem9u
-ZV9iaXRtYXAgd2hpY2gNCj4gaW5kaWNhdGVzIHdoaWNoIHpvbmVzIG9mIHRoZSBkZXZpY2UgYXJl
-IHNlcXVlbnRpYWwgem9uZXMgKHdyaXRlDQo+IHByZWZlcnJlZCBvciB3cml0ZSByZXF1aXJlZCku
-IFRoZXNlIHR3byBmaWVsZHMgYXJlIGluaXRpYWxpemVkIGJ5IHRoZQ0KPiBsb3cgbGV2ZWwgYmxv
-Y2sgZGV2aWNlIGRyaXZlciAoc2QuYyBmb3IgWkJDL1pBQyBkaXNrcykuIFRoZXkgYXJlIG5vdA0K
-PiBpbml0aWFsaXplZCBieSBzdGFja2luZyBkcml2ZXJzIChkZXZpY2UgbWFwcGVycykgaGFuZGxp
-bmcgem9uZWQgYmxvY2sNCj4gZGV2aWNlcyAoZS5nLiBkbS1saW5lYXIpLg0KDQpSZXZpZXdlZC1i
-eTogQmFydCBWYW4gQXNzY2hlIDxCYXJ0LlZhbkFzc2NoZUB3ZGMuY29tPg0KDQo=
+On Mon, Sep 25, 2017 at 03:14:46PM +0900, Damien Le Moal wrote:
+> Components relying only on the requeuest_queue structure for accessing
+> block devices (e.g. I/O schedulers) have a limited knowledged of the
+> device characteristics. In particular, the device capacity cannot be
+> easily discovered, which for a zoned block device also result in the
+> inability to easily know the number of zones of the device (the zone
+> size is indicated by the chunk_sectors field of the queue limits).
+> 
+> Introduce the nr_zones field to the request_queue sturcture to simplify
+> access to this information. Also, add the bitmap seq_zone_bitmap which
+> indicates which zones of the device are sequential zones (write
+> preferred or write required). These two fields are initialized by the
+> low level block device driver (sd.c for ZBC/ZAC disks). They are not
+> initialized by stacking drivers (device mappers) handling zoned block
+> devices (e.g. dm-linear).
+> 
+> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+-- 
+Ming
