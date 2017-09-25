@@ -1,175 +1,34 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	lee.tibbert@gmail.com,
-	oleksandr@natalenko.name,
-	mirkomontanari91@gmail.com,
-	angeloruocco90@gmail.com,
-	mauro.andreolini@unimore.it,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX/IMPROVEMENT 2/4] block, bfq: check and switch back to interactive wr also on queue split
-Date: Thu, 21 Sep 2017 11:04:01 +0200
-Message-Id: <20170921090403.3217-3-paolo.valente@linaro.org>
-In-Reply-To: <20170921090403.3217-1-paolo.valente@linaro.org>
-References: <20170921090403.3217-1-paolo.valente@linaro.org>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
+	<Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>
+Subject: Re: [PATCH V5 07/14] scsi: sd_zbc: Initialize device request queue
+ zoned data
+Date: Mon, 25 Sep 2017 21:17:22 +0000
+Message-ID: <1506374241.2641.20.camel@wdc.com>
+References: <20170925061454.5533-1-damien.lemoal@wdc.com>
+	 <20170925061454.5533-8-damien.lemoal@wdc.com>
+In-Reply-To: <20170925061454.5533-8-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-As already explained in the message of commit "block, bfq: fix
-wrong init of saved start time for weight raising", if a soft
-real-time weight-raising period happens to be nested in a larger
-interactive weight-raising period, then BFQ restores the interactive
-weight raising at the end of the soft real-time weight raising. In
-particular, BFQ checks whether the latter has ended only on request
-dispatches.
-
-Unfortunately, the above scheme fails to restore interactive weight
-raising in the following corner case: if a bfq_queue, say Q,
-1) Is merged with another bfq_queue while it is in a nested soft
-real-time weight-raising period. The weight-raising state of Q is
-then saved, and not considered any longer until a split occurs.
-2) Is split from the other bfq_queue(s) at a time instant when its
-soft real-time weight raising is already finished.
-On the split, while resuming the previous, soft real-time
-weight-raised state of the bfq_queue Q, BFQ checks whether the
-current soft real-time weight-raising period is actually over. If so,
-BFQ switches weight raising off for Q, *without* checking whether the
-soft real-time period was actually nested in a non-yet-finished
-interactive weight-raising period.
-
-This commit addresses this issue by adding the above missing check in
-bfq_queue splits, and restoring interactive weight raising if needed.
-
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Tested-by: Angelo Ruocco <angeloruocco90@gmail.com>
-Tested-by: Mirko Montanari <mirkomontanari91@gmail.com>
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
----
- block/bfq-iosched.c | 87 ++++++++++++++++++++++++++++++-----------------------
- 1 file changed, 49 insertions(+), 38 deletions(-)
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index c25955c..33b63bc 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -724,6 +724,44 @@ static void bfq_updated_next_req(struct bfq_data *bfqd,
- 	}
- }
- 
-+static unsigned int bfq_wr_duration(struct bfq_data *bfqd)
-+{
-+	u64 dur;
-+
-+	if (bfqd->bfq_wr_max_time > 0)
-+		return bfqd->bfq_wr_max_time;
-+
-+	dur = bfqd->RT_prod;
-+	do_div(dur, bfqd->peak_rate);
-+
-+	/*
-+	 * Limit duration between 3 and 13 seconds. Tests show that
-+	 * higher values than 13 seconds often yield the opposite of
-+	 * the desired result, i.e., worsen responsiveness by letting
-+	 * non-interactive and non-soft-real-time applications
-+	 * preserve weight raising for a too long time interval.
-+	 *
-+	 * On the other end, lower values than 3 seconds make it
-+	 * difficult for most interactive tasks to complete their jobs
-+	 * before weight-raising finishes.
-+	 */
-+	if (dur > msecs_to_jiffies(13000))
-+		dur = msecs_to_jiffies(13000);
-+	else if (dur < msecs_to_jiffies(3000))
-+		dur = msecs_to_jiffies(3000);
-+
-+	return dur;
-+}
-+
-+/* switch back from soft real-time to interactive weight raising */
-+static void switch_back_to_interactive_wr(struct bfq_queue *bfqq,
-+					  struct bfq_data *bfqd)
-+{
-+	bfqq->wr_coeff = bfqd->bfq_wr_coeff;
-+	bfqq->wr_cur_max_time = bfq_wr_duration(bfqd);
-+	bfqq->last_wr_start_finish = bfqq->wr_start_at_switch_to_srt;
-+}
-+
- static void
- bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_data *bfqd,
- 		      struct bfq_io_cq *bic, bool bfq_already_existing)
-@@ -750,10 +788,16 @@ bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_data *bfqd,
- 	if (bfqq->wr_coeff > 1 && (bfq_bfqq_in_large_burst(bfqq) ||
- 	    time_is_before_jiffies(bfqq->last_wr_start_finish +
- 				   bfqq->wr_cur_max_time))) {
--		bfq_log_bfqq(bfqq->bfqd, bfqq,
--		    "resume state: switching off wr");
--
--		bfqq->wr_coeff = 1;
-+		if (bfqq->wr_cur_max_time == bfqd->bfq_wr_rt_max_time &&
-+		    !bfq_bfqq_in_large_burst(bfqq) &&
-+		    time_is_after_eq_jiffies(bfqq->wr_start_at_switch_to_srt +
-+					     bfq_wr_duration(bfqd))) {
-+			switch_back_to_interactive_wr(bfqq, bfqd);
-+		} else {
-+			bfqq->wr_coeff = 1;
-+			bfq_log_bfqq(bfqq->bfqd, bfqq,
-+				     "resume state: switching off wr");
-+		}
- 	}
- 
- 	/* make sure weight will be updated, however we got here */
-@@ -1173,35 +1217,6 @@ static bool bfq_bfqq_update_budg_for_activation(struct bfq_data *bfqd,
- 	return wr_or_deserves_wr;
- }
- 
--static unsigned int bfq_wr_duration(struct bfq_data *bfqd)
--{
--	u64 dur;
--
--	if (bfqd->bfq_wr_max_time > 0)
--		return bfqd->bfq_wr_max_time;
--
--	dur = bfqd->RT_prod;
--	do_div(dur, bfqd->peak_rate);
--
--	/*
--	 * Limit duration between 3 and 13 seconds. Tests show that
--	 * higher values than 13 seconds often yield the opposite of
--	 * the desired result, i.e., worsen responsiveness by letting
--	 * non-interactive and non-soft-real-time applications
--	 * preserve weight raising for a too long time interval.
--	 *
--	 * On the other end, lower values than 3 seconds make it
--	 * difficult for most interactive tasks to complete their jobs
--	 * before weight-raising finishes.
--	 */
--	if (dur > msecs_to_jiffies(13000))
--		dur = msecs_to_jiffies(13000);
--	else if (dur < msecs_to_jiffies(3000))
--		dur = msecs_to_jiffies(3000);
--
--	return dur;
--}
--
- /*
-  * Return the farthest future time instant according to jiffies
-  * macros.
-@@ -3501,11 +3516,7 @@ static void bfq_update_wr_data(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- 					       bfq_wr_duration(bfqd)))
- 				bfq_bfqq_end_wr(bfqq);
- 			else {
--				/* switch back to interactive wr */
--				bfqq->wr_coeff = bfqd->bfq_wr_coeff;
--				bfqq->wr_cur_max_time = bfq_wr_duration(bfqd);
--				bfqq->last_wr_start_finish =
--					bfqq->wr_start_at_switch_to_srt;
-+				switch_back_to_interactive_wr(bfqq, bfqd);
- 				bfqq->entity.prio_changed = 1;
- 			}
- 		}
--- 
-2.10.0
+T24gTW9uLCAyMDE3LTA5LTI1IGF0IDE1OjE0ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
+Cj4gKwlyZXR1cm4ga3phbGxvY19ub2RlKEJJVFNfVE9fTE9OR1Moc2RrcC0+bnJfem9uZXMpDQo+
+ICsJCQkgICAgKiBzaXplb2YodW5zaWduZWQgbG9uZyksDQoNCkRvZXMgdGhpcyBwZXJoYXBzIGZp
+dCBvbiBvbmUgbGluZT8NCg0KPiArLyoqDQo+ICsgKiBzZF96YmNfZ2V0X3NlcV96b25lcyAtIFBh
+cnNlIHJlcG9ydCB6b25lcyByZXBseSB0byBpZGVudGlmeSBzZXF1ZW50aWFsIHpvbmVzDQo+ICsg
+KiBAc2RrcDogZGlzayB1c2VkDQo+ICsgKiBAYnVmOiByZXBvcnQgcmVwbHkgYnVmZmVyDQo+ICsg
+KiBAc2VxX3pvbmVfYml0YW1wOiBiaXRtYXAgb2Ygc2VxdWVudGlhbCB6b25lcyB0byBzZXQNCj4g
+KyAqIEB6bm86IFpvbmUgbnVtYmVyIG9mIHRoZSBmaXJzdCB6b25lIGluIHRoZSByZXBvcnQNCg0K
+J3pubycgaXMgYW4gaW5wdXQgYW5kIG91dHB1dCBwYXJhbWV0ZXIgYnV0IHRoZSBhYm92ZSBsaW5l
+IG9ubHkgZGVzY3JpYmVzIHdoYXQNCmhhcHBlbnMgd2l0aCB0aGUgdmFsdWUgcGFzc2VkIHRvIHNk
+X3piY19nZXRfc2VxX3pvbmVzKCkuIEkgdGhpbmsgd2UgYWxzbyBuZWVkIGENCmRlc2NyaXB0aW9u
+IGZvciB0aGUgdmFsdWUgb2YgJ3pubycgdXBvbiByZXR1cm4uDQoNCj4gKyAqIFBhcnNlIHJlcG9y
+dGVkIHpvbmUgZGVzY3JpcHRvcnMgdG8gZmluZCBzZXF1aWVudGlhbCB6b25lcy4NCiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeXl5eXl5eXl5eXg0KICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNlcXVlbnRpYWw/DQoNCk90
+aGVyd2lzZSB0aGlzIHBhdGNoIGxvb2tzIGZpbmUgdG8gbWUuDQoNCkJhcnQu
