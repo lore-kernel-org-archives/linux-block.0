@@ -1,32 +1,36 @@
-Return-Path: <hch@lst.de>
-Date: Mon, 25 Sep 2017 18:20:44 +0200
-From: "hch@lst.de" <hch@lst.de>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "tom.leiming@gmail.com" <tom.leiming@gmail.com>,
-	"hch@lst.de" <hch@lst.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"oleksandr@natalenko.name" <oleksandr@natalenko.name>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: [PATCH v3 0/6] Make SCSI device suspend and resume work
-	reliably
-Message-ID: <20170925162044.GB12952@lst.de>
-References: <20170922221405.22091-1-bart.vanassche@wdc.com> <CACVXFVNCcij6RNNxZ77iDMc_82j_qpfso+g+NqpfgN3Cs9=FpQ@mail.gmail.com> <1506356246.2641.8.camel@wdc.com>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "tom.leiming@gmail.com" <tom.leiming@gmail.com>
+CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "oleksandr@natalenko.name"
+	<oleksandr@natalenko.name>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH v3 0/6] Make SCSI device suspend and resume work reliably
+Date: Mon, 25 Sep 2017 16:17:27 +0000
+Message-ID: <1506356246.2641.8.camel@wdc.com>
+References: <20170922221405.22091-1-bart.vanassche@wdc.com>
+	 <CACVXFVNCcij6RNNxZ77iDMc_82j_qpfso+g+NqpfgN3Cs9=FpQ@mail.gmail.com>
+In-Reply-To: <CACVXFVNCcij6RNNxZ77iDMc_82j_qpfso+g+NqpfgN3Cs9=FpQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1506356246.2641.8.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Sep 25, 2017 at 04:17:27PM +0000, Bart Van Assche wrote:
-> This patch series definitely is an alternative for blk-mq/scsi-mq. And as you
-> know my approach can be extended easily to the legacy SCSI core by adding
-> blk_queue_enter() / blk_queue_exit() calls where necessary in the legacy block
-> layer. I have not done this because the bug report was against scsi-mq and not
-> against the legacy SCSI core. Additionally, since the legacy block layer and
-> SCSI core are on their way out I did not want to spend time on modifying these.
-
-For now we'll have to fix both paths to have equal functionality.  Even
-if scsi might be on it's way out there still are many drivers that
-use the legacy request path, and with mmc we'll probably grow another
-dual block layer driver soon, although hopefully the transition
-period will be much shorter.
+T24gTW9uLCAyMDE3LTA5LTI1IGF0IDEwOjM2ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
+U2F0LCBTZXAgMjMsIDIwMTcgYXQgNjoxMyBBTSwgQmFydCBWYW4gQXNzY2hlIDxiYXJ0LnZhbmFz
+c2NoZUB3ZGMuY29tPiB3cm90ZToNCj4gPiBJdCBpcyBrbm93biB0aGF0IGR1cmluZyB0aGUgcmVz
+dW1lIGZvbGxvd2luZyBhIGhpYmVybmF0ZSBzb21ldGltZXMgdGhlDQo+ID4gc3lzdGVtIGhhbmdz
+IGluc3RlYWQgb2YgY29taW5nIHVwIHByb3Blcmx5LiBUaGlzIHBhdGNoIHNlcmllcyBmaXhlcyB0
+aGlzDQo+ID4gcHJvYmxlbS4gVGhpcyBwYXRjaCBzZXJpZXMgaXMgYW4gYWx0ZXJuYXRpdmUgZm9y
+IE1pbmcgTGVpJ3MgIltQQVRDSCBWNQ0KPiA+IDAvMTBdIGJsb2NrL3Njc2k6IHNhZmUgU0NTSSBx
+dWllc2NpbmciIHBhdGNoIHNlcmllcy4gVGhlIGFkdmFudGFnZXMgb2YNCj4gPiB0aGlzIHBhdGNo
+IHNlcmllcyBhcmU6DQo+IA0KPiBObywgeW91ciBwYXRjaCBkb2Vzbid0IGZpeCBzY3NpIHF1aWVz
+Y2Ugb24gYmxvY2sgbGVnYWN5LCBzbyBub3QgYW4gYWx0ZXJuYXRpdmUNCj4gb2YgbXkgcGF0Y2hz
+ZXQgYXQgYWxsLg0KDQpUaGlzIHBhdGNoIHNlcmllcyBkZWZpbml0ZWx5IGlzIGFuIGFsdGVybmF0
+aXZlIGZvciBibGstbXEvc2NzaS1tcS4gQW5kIGFzIHlvdQ0Ka25vdyBteSBhcHByb2FjaCBjYW4g
+YmUgZXh0ZW5kZWQgZWFzaWx5IHRvIHRoZSBsZWdhY3kgU0NTSSBjb3JlIGJ5IGFkZGluZw0KYmxr
+X3F1ZXVlX2VudGVyKCkgLyBibGtfcXVldWVfZXhpdCgpIGNhbGxzIHdoZXJlIG5lY2Vzc2FyeSBp
+biB0aGUgbGVnYWN5IGJsb2NrDQpsYXllci4gSSBoYXZlIG5vdCBkb25lIHRoaXMgYmVjYXVzZSB0
+aGUgYnVnIHJlcG9ydCB3YXMgYWdhaW5zdCBzY3NpLW1xIGFuZCBub3QNCmFnYWluc3QgdGhlIGxl
+Z2FjeSBTQ1NJIGNvcmUuIEFkZGl0aW9uYWxseSwgc2luY2UgdGhlIGxlZ2FjeSBibG9jayBsYXll
+ciBhbmQNClNDU0kgY29yZSBhcmUgb24gdGhlaXIgd2F5IG91dCBJIGRpZCBub3Qgd2FudCB0byBz
+cGVuZCB0aW1lIG9uIG1vZGlmeWluZyB0aGVzZS4NCg0KQmFydC4=
