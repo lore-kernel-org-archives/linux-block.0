@@ -1,44 +1,63 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:60638 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752157AbdI3Lrc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Sep 2017 07:47:32 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 1/5] dm-mpath: remove annoying message of 'blk_get_request() returned -11'
-Date: Sat, 30 Sep 2017 19:46:48 +0800
-Message-Id: <20170930114652.32441-2-ming.lei@redhat.com>
-In-Reply-To: <20170930114652.32441-1-ming.lei@redhat.com>
-References: <20170930114652.32441-1-ming.lei@redhat.com>
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:14298 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S966239AbdIYU3q (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Sep 2017 16:29:46 -0400
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        =Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH v4 6/7] scsi: Set QUEUE_FLAG_PREEMPT_ONLY while quiesced
+Date: Mon, 25 Sep 2017 13:29:23 -0700
+Message-Id: <20170925202924.16603-7-bart.vanassche@wdc.com>
+In-Reply-To: <20170925202924.16603-1-bart.vanassche@wdc.com>
+References: <20170925202924.16603-1-bart.vanassche@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-It is very normal to see allocation failure, so not necessary
-to dump it and annoy people.
+Make the quiesce state visible to the block layer for the next
+patch in this series.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/md/dm-mpath.c | 2 --
- 1 file changed, 2 deletions(-)
+ drivers/scsi/scsi_lib.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-index 11f273d2f018..e8094d8fbe0d 100644
---- a/drivers/md/dm-mpath.c
-+++ b/drivers/md/dm-mpath.c
-@@ -499,8 +499,6 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
- 	if (IS_ERR(clone)) {
- 		/* EBUSY, ENODEV or EWOULDBLOCK: requeue */
- 		bool queue_dying = blk_queue_dying(q);
--		DMERR_LIMIT("blk_get_request() returned %ld%s - requeuing",
--			    PTR_ERR(clone), queue_dying ? " (path offline)" : "");
- 		if (queue_dying) {
- 			atomic_inc(&m->pg_init_in_progress);
- 			activate_or_offline_path(pgpath);
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index c261498606c4..309369d8fe01 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -2932,6 +2932,8 @@ scsi_device_quiesce(struct scsi_device *sdev)
+ 
+ 	mutex_lock(&sdev->state_mutex);
+ 	err = scsi_device_set_state(sdev, SDEV_QUIESCE);
++	if (err == 0)
++		blk_set_preempt_only(q, true);
+ 	mutex_unlock(&sdev->state_mutex);
+ 
+ 	if (err)
+@@ -2960,8 +2962,10 @@ void scsi_device_resume(struct scsi_device *sdev)
+ 	 */
+ 	mutex_lock(&sdev->state_mutex);
+ 	if (sdev->sdev_state == SDEV_QUIESCE &&
+-	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0)
++	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0) {
++		blk_set_preempt_only(sdev->request_queue, false);
+ 		scsi_run_queue(sdev->request_queue);
++	}
+ 	mutex_unlock(&sdev->state_mutex);
+ }
+ EXPORT_SYMBOL(scsi_device_resume);
 -- 
-2.9.5
+2.14.1
