@@ -1,47 +1,47 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:46108 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752328AbdIASvK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 1 Sep 2017 14:51:10 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Tejun Heo <tj@kernel.org>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 3/8] blk-mq: only run hw queues for blk-mq
-Date: Sat,  2 Sep 2017 02:49:53 +0800
-Message-Id: <20170901184958.19452-5-ming.lei@redhat.com>
-In-Reply-To: <20170901184958.19452-1-ming.lei@redhat.com>
-References: <20170901184958.19452-1-ming.lei@redhat.com>
+Received: from mail-it0-f46.google.com ([209.85.214.46]:45907 "EHLO
+        mail-it0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S967767AbdIZXqy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 26 Sep 2017 19:46:54 -0400
+Received: by mail-it0-f46.google.com with SMTP id x15so5138132itb.0
+        for <linux-block@vger.kernel.org>; Tue, 26 Sep 2017 16:46:54 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1506083824-4024-11-git-send-email-adrian.hunter@intel.com>
+References: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com> <1506083824-4024-11-git-send-email-adrian.hunter@intel.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Wed, 27 Sep 2017 01:46:52 +0200
+Message-ID: <CACRpkdbxPsC+78OFM1QGshcpbVPLpPHesCBPv5K5KXUOm8-vRA@mail.gmail.com>
+Subject: Re: [PATCH V9 10/15] mmc: core: Export mmc_start_bkops()
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This patch just makes it explicitely.
+On Fri, Sep 22, 2017 at 2:36 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
 
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> Export mmc_start_bkops() so that the block driver can use it.
+>
+> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8cf1f7cbef2b..4c532d8612e1 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -125,7 +125,8 @@ void blk_freeze_queue_start(struct request_queue *q)
- 	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
- 	if (freeze_depth == 1) {
- 		percpu_ref_kill(&q->q_usage_counter);
--		blk_mq_run_hw_queues(q, false);
-+		if (q->mq_ops)
-+			blk_mq_run_hw_queues(q, false);
- 	}
- }
- EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
--- 
-2.9.5
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+
+Yours,
+Linus Walleij
