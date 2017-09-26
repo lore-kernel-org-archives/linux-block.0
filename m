@@ -1,59 +1,42 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Wed, 27 Sep 2017 06:47:57 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@lst.de" <hch@lst.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"oleksandr@natalenko.name" <oleksandr@natalenko.name>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "oleksandr@natalenko.name"
+	<oleksandr@natalenko.name>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH v4 0/7] Make suspend and resume safe for md-on-SCSI
-Message-ID: <20170926224756.GB8050@ming.t460p>
+Date: Tue, 26 Sep 2017 20:17:59 +0000
+Message-ID: <1506457074.3063.22.camel@wdc.com>
 References: <20170925202924.16603-1-bart.vanassche@wdc.com>
- <20170926091539.GF518@ming.t460p>
- <1506436145.3787.15.camel@wdc.com>
- <20170926145404.GB31449@ming.t460p>
- <1506457074.3063.22.camel@wdc.com>
+	 <20170926091539.GF518@ming.t460p> <1506436145.3787.15.camel@wdc.com>
+	 <20170926145404.GB31449@ming.t460p>
+In-Reply-To: <20170926145404.GB31449@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1506457074.3063.22.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Sep 26, 2017 at 08:17:59PM +0000, Bart Van Assche wrote:
-> On Tue, 2017-09-26 at 22:54 +0800, Ming Lei wrote:
-> > On Tue, Sep 26, 2017 at 02:29:06PM +0000, Bart Van Assche wrote:
-> > > On Tue, 2017-09-26 at 17:15 +0800, Ming Lei wrote:
-> > > > No, if you only address issue on MD device, that is definitely not
-> > > > alternative of my patchset.
-> > > 
-> > > A clarification: my patch series not only fixes suspend and resume for md-on-SCSI
-> > > but also for all other scenario's in which resume locks up due to no tag being
-> > > available when the SCSI core tries to execute a power management command.> 
-> > I do care about if this patchset can fix non-MD cases, like
-> > btrfs/raid, or transport_spi, both are real reports. Could you
-> > make sure if your patchset can cover this non-MD devices?
-> 
-> Yes, I'm sure this patch series covers non-MD devices.
-> 
-> It is easy to see that this patch series also covers SCSI parallel domain
-> validation.
-
-Now I don't believe this patchset can do that, see my comment on your
-patch 5:
-
-https://www.mail-archive.com/linux-block@vger.kernel.org/msg13624.html
-
-More worse, your patch introduces a new I/O hang inside SCSI quiesce.
-
-> 
-> Regarding BTRFS RAID: you should know that filesystems are responsible for
-> implementing freeze / thaw support themselves. I think a filesystem must
-> surround metadata operations by sb_start_write() / sb_end_write() and that
-> it optionally can provide freeze_super / thaw_super callbacks in
-> struct super_operations. In the BTRFS changelog there are several fixes
-> with regard to freeze / thaw so I think this aspect of BTRFS has been tested.
-> 
-> Bart.
-
--- 
-Ming
+T24gVHVlLCAyMDE3LTA5LTI2IGF0IDIyOjU0ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
+VHVlLCBTZXAgMjYsIDIwMTcgYXQgMDI6Mjk6MDZQTSArMDAwMCwgQmFydCBWYW4gQXNzY2hlIHdy
+b3RlOg0KPiA+IE9uIFR1ZSwgMjAxNy0wOS0yNiBhdCAxNzoxNSArMDgwMCwgTWluZyBMZWkgd3Jv
+dGU6DQo+ID4gPiBObywgaWYgeW91IG9ubHkgYWRkcmVzcyBpc3N1ZSBvbiBNRCBkZXZpY2UsIHRo
+YXQgaXMgZGVmaW5pdGVseSBub3QNCj4gPiA+IGFsdGVybmF0aXZlIG9mIG15IHBhdGNoc2V0Lg0K
+PiA+IA0KPiA+IEEgY2xhcmlmaWNhdGlvbjogbXkgcGF0Y2ggc2VyaWVzIG5vdCBvbmx5IGZpeGVz
+IHN1c3BlbmQgYW5kIHJlc3VtZSBmb3IgbWQtb24tU0NTSQ0KPiA+IGJ1dCBhbHNvIGZvciBhbGwg
+b3RoZXIgc2NlbmFyaW8ncyBpbiB3aGljaCByZXN1bWUgbG9ja3MgdXAgZHVlIHRvIG5vIHRhZyBi
+ZWluZw0KPiA+IGF2YWlsYWJsZSB3aGVuIHRoZSBTQ1NJIGNvcmUgdHJpZXMgdG8gZXhlY3V0ZSBh
+IHBvd2VyIG1hbmFnZW1lbnQgY29tbWFuZC4+IA0KPiBJIGRvIGNhcmUgYWJvdXQgaWYgdGhpcyBw
+YXRjaHNldCBjYW4gZml4IG5vbi1NRCBjYXNlcywgbGlrZQ0KPiBidHJmcy9yYWlkLCBvciB0cmFu
+c3BvcnRfc3BpLCBib3RoIGFyZSByZWFsIHJlcG9ydHMuIENvdWxkIHlvdQ0KPiBtYWtlIHN1cmUg
+aWYgeW91ciBwYXRjaHNldCBjYW4gY292ZXIgdGhpcyBub24tTUQgZGV2aWNlcz8NCg0KWWVzLCBJ
+J20gc3VyZSB0aGlzIHBhdGNoIHNlcmllcyBjb3ZlcnMgbm9uLU1EIGRldmljZXMuDQoNCkl0IGlz
+IGVhc3kgdG8gc2VlIHRoYXQgdGhpcyBwYXRjaCBzZXJpZXMgYWxzbyBjb3ZlcnMgU0NTSSBwYXJh
+bGxlbCBkb21haW4NCnZhbGlkYXRpb24uDQoNClJlZ2FyZGluZyBCVFJGUyBSQUlEOiB5b3Ugc2hv
+dWxkIGtub3cgdGhhdCBmaWxlc3lzdGVtcyBhcmUgcmVzcG9uc2libGUgZm9yDQppbXBsZW1lbnRp
+bmcgZnJlZXplIC8gdGhhdyBzdXBwb3J0IHRoZW1zZWx2ZXMuIEkgdGhpbmsgYSBmaWxlc3lzdGVt
+IG11c3QNCnN1cnJvdW5kIG1ldGFkYXRhIG9wZXJhdGlvbnMgYnkgc2Jfc3RhcnRfd3JpdGUoKSAv
+IHNiX2VuZF93cml0ZSgpIGFuZCB0aGF0DQppdCBvcHRpb25hbGx5IGNhbiBwcm92aWRlIGZyZWV6
+ZV9zdXBlciAvIHRoYXdfc3VwZXIgY2FsbGJhY2tzIGluDQpzdHJ1Y3Qgc3VwZXJfb3BlcmF0aW9u
+cy4gSW4gdGhlIEJUUkZTIGNoYW5nZWxvZyB0aGVyZSBhcmUgc2V2ZXJhbCBmaXhlcw0Kd2l0aCBy
+ZWdhcmQgdG8gZnJlZXplIC8gdGhhdyBzbyBJIHRoaW5rIHRoaXMgYXNwZWN0IG9mIEJUUkZTIGhh
+cyBiZWVuIHRlc3RlZC4NCg0KQmFydC4=
