@@ -1,60 +1,47 @@
-Return-Path: <prvs=4341bde3a=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	=Oleksandr Natalenko <oleksandr@natalenko.name>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v4 5/7] scsi: Reduce suspend latency
-Date: Mon, 25 Sep 2017 13:29:22 -0700
-Message-Id: <20170925202924.16603-6-bart.vanassche@wdc.com>
-In-Reply-To: <20170925202924.16603-1-bart.vanassche@wdc.com>
-References: <20170925202924.16603-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-io0-f169.google.com ([209.85.223.169]:56467 "EHLO
+        mail-io0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S968370AbdIZXri (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 26 Sep 2017 19:47:38 -0400
+Received: by mail-io0-f169.google.com with SMTP id m103so14194373iod.13
+        for <linux-block@vger.kernel.org>; Tue, 26 Sep 2017 16:47:38 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1506083824-4024-12-git-send-email-adrian.hunter@intel.com>
+References: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com> <1506083824-4024-12-git-send-email-adrian.hunter@intel.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Wed, 27 Sep 2017 01:47:37 +0200
+Message-ID: <CACRpkdbbbgOJ6RmCNa8EV9WzbY1RsurJgnrT0MqYTZ+ZkprhhQ@mail.gmail.com>
+Subject: Re: [PATCH V9 11/15] mmc: core: Export mmc_start_request()
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Avoid that it can take 200 ms too long to wait for requests to
-finish. Note: blk_mq_freeze_queue() uses a wait queue to wait
-for ongoing requests to finish.
+On Fri, Sep 22, 2017 at 2:37 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/scsi/scsi_lib.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+> Export mmc_start_request() so that the block driver can use it.
+>
+> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 62f905b22821..c261498606c4 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2927,6 +2927,7 @@ static void scsi_wait_for_queuecommand(struct scsi_device *sdev)
- int
- scsi_device_quiesce(struct scsi_device *sdev)
- {
-+	struct request_queue *q = sdev->request_queue;
- 	int err;
- 
- 	mutex_lock(&sdev->state_mutex);
-@@ -2936,11 +2937,8 @@ scsi_device_quiesce(struct scsi_device *sdev)
- 	if (err)
- 		return err;
- 
--	scsi_run_queue(sdev->request_queue);
--	while (atomic_read(&sdev->device_busy)) {
--		msleep_interruptible(200);
--		scsi_run_queue(sdev->request_queue);
--	}
-+	blk_mq_freeze_queue(q);
-+	blk_mq_unfreeze_queue(q);
- 	return 0;
- }
- EXPORT_SYMBOL(scsi_device_quiesce);
--- 
-2.14.1
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+
+Yours,
+Linus Walleij
