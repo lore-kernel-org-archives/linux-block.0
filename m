@@ -1,52 +1,39 @@
-Return-Path: <prvs=4336ae8ff=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V4 16/16] block: mq-deadline: Update documentation
-Date: Sun, 24 Sep 2017 16:02:47 +0900
-Message-Id: <20170924070247.25560-17-damien.lemoal@wdc.com>
-In-Reply-To: <20170924070247.25560-1-damien.lemoal@wdc.com>
-References: <20170924070247.25560-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:37165 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S968134AbdIZNzQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 26 Sep 2017 09:55:16 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>
+CC: "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "loberman@redhat.com" <loberman@redhat.com>
+Subject: Re: dm-mpath: return DM_MAPIO_REQUEUE in case of rq allocation
+ failure
+Date: Tue, 26 Sep 2017 13:55:13 +0000
+Message-ID: <1506434112.3787.4.camel@wdc.com>
+References: <20170922013506.22510-1-ming.lei@redhat.com>
+         <1506092775.2512.5.camel@wdc.com> <20170922174431.GA21108@ming.t460p>
+         <1506102888.2512.9.camel@wdc.com> <20170925030641.GB7090@ming.t460p>
+         <1506352994.2641.4.camel@wdc.com> <20170925161014.GB16470@ming.t460p>
+         <20170925161702.GA29036@redhat.com> <20170926085007.GD518@ming.t460p>
+In-Reply-To: <20170926085007.GD518@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Added description of the zones_wlock tunable attribute.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- Documentation/block/deadline-iosched.txt | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
-
-diff --git a/Documentation/block/deadline-iosched.txt b/Documentation/block/deadline-iosched.txt
-index 2d82c80322cb..b532304d2bf4 100644
---- a/Documentation/block/deadline-iosched.txt
-+++ b/Documentation/block/deadline-iosched.txt
-@@ -69,6 +69,23 @@ Front merges may still occur due to the cached last_merge hint, but since
- that comes at basically 0 cost we leave that on. We simply disable the
- rbtree front sector lookup when the io scheduler merge function is called.
- 
-+zones_wlock	(bool)
-+-----------
-+
-+(mq-deadlines only)
-+The blk-mq version of the deadline I/O scheduler, mq-deadline, introduced
-+support for zoned block devices. This added support prevents dispatching of more
-+than one write command per zone of the device to avoid write sequence reordering
-+due to the possible concurrent execution of many blk-mq operations, in
-+particular request dispatching. This is achieved using a per zone lock
-+implemented as a bitmap. When a write request is dispatched, the target zone of
-+the  request is locked, preventing further dispatch of write requests to it
-+(there are no limitations on read commands). The zones_wlock tunable allows
-+disabling zone write locking for host aware zoned block devices as these drive
-+can handle random writes to zones in firmware. This tunable default setting
-+cannot be changed for host managed disks (always enabled) and regular disks
-+(always disabled).
-+
- 
- Nov 11 2002, Jens Axboe <jens.axboe@oracle.com>
- 
--- 
-2.13.5
+T24gVHVlLCAyMDE3LTA5LTI2IGF0IDE2OjUwICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gSWYg
+eW91IGRvbid0IGNvbnNpZGVyIHRvIGNoYW5nZSBtcGF0aCBpbnRvIGJsb2NrIGluIC5xdWV1ZV9y
+cSgpIG5vdywNCj4gcGxlYXNlIHRha2UgdGhpcyBwYXRjaCBmaXJzdCwgYW5kIEkgYW0gc3VyZSB0
+aGlzIHdheSBpcyBjb3JyZWN0LCBhbmQNCj4gZXZlbiBpdCBjYW4gYmUgdGhvdWdodCBhcyBhIGZp
+eC4NCg0KQXMgSSBleHBsYWluZWQgZWFybGllciwgaXQgd291bGQgYmUgd3JvbmcgdG8gdGFrZSB0
+aGlzIHBhdGNoIHVwc3RyZWFtIHdpdGhvdXQNCmhhdmluZyB0ZXN0ZWQgYW5kIG1lYXN1cmVkIHRo
+ZSBhbHRlcm5hdGl2ZSBJIGhhZCBwcm9wb3NlZCBmaXJzdA0KKGh0dHBzOi8vd3d3LnNwaW5pY3Mu
+bmV0L2xpc3RzL2RtLWRldmVsL21zZzMyMjgyLmh0bWwpLiBNeSBhbHRlcm5hdGl2ZSBoYW5kbGVz
+DQpTQ1NJIGhvc3RzIHdpdGggbXVsdGlwbGUgTFVOcyBwcm9wZXJseSBidXQgdGhlIHBhdGNoIGF0
+IHRoZSBzdGFydCBvZiB0aGlzDQplLW1haWwgdGhyZWFkIG5vdC4NCg0KQmFydC4=
