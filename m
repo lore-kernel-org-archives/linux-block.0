@@ -12,52 +12,72 @@ Cc: "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
 References: <20170906062602.50497-1-colyli@suse.de>
  <20170906062602.50497-5-colyli@suse.de>
  <CAJ+L6qfHB7vAAXUrnjXUQqLE6k+v4yukL58DDzRBBKA+aONLmA@mail.gmail.com>
- <761ebe34-99c3-8865-3fc6-c4f7e6e3b29a@coly.li>
- <F6531D8286A0B34FBC858F176F70796281EEB2@LGEVEXMBHQSVC1.LGE.NET>
+ <F6531D8286A0B34FBC858F176F70796281EEAA@LGEVEXMBHQSVC1.LGE.NET>
+ <6901224d-cee2-463b-c0bf-da83ea98598c@coly.li>
+ <F6531D8286A0B34FBC858F176F70796281EEB1@LGEVEXMBHQSVC1.LGE.NET>
 From: Coly Li <i@coly.li>
-Message-ID: <2997427b-f920-bf70-39d2-81f3d1f99d10@coly.li>
-Date: Tue, 26 Sep 2017 15:24:15 +0800
+Message-ID: <f35b2096-d1c1-bf58-bd67-ddf1597ae0fe@coly.li>
+Date: Tue, 26 Sep 2017 15:22:58 +0800
 MIME-Version: 1.0
-In-Reply-To: <F6531D8286A0B34FBC858F176F70796281EEB2@LGEVEXMBHQSVC1.LGE.NET>
+In-Reply-To: <F6531D8286A0B34FBC858F176F70796281EEB1@LGEVEXMBHQSVC1.LGE.NET>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 2017/9/26 下午3:16, 박병철/선임연구원/SW
+On 2017/9/26 下午3:15, 박병철/선임연구원/SW
 Platform(연)AOT팀(byungchul.park@lge.com) wrote:
 >> -----Original Message-----
 >> From: Coly Li [mailto:i@coly.li]
 >> Sent: Tuesday, September 26, 2017 4:09 PM
->> To: Michael Lyle; Coly Li
+>> To: 박병철/선임연구원/SW Platform(연)AOT팀(byungchul.park@lge.com);
+>> Michael Lyle; Coly Li
 >> Cc: linux-bcache@vger.kernel.org; linux-block@vger.kernel.org;
->> axboe@kernel.dk; Eric Wheeler; Byungchul Park; Kent Overstreet
+>> axboe@kernel.dk; Eric Wheeler; Kent Overstreet; kernel-team@lge.com
 >> Subject: Re: [PATCH 04/12] bcache: Don't reinvent the wheel but use existing
 >> llist API
 >>
->> On 2017/9/26 下午12:38, Michael Lyle wrote:
->>> I believe this introduces a critical bug.
+>> On 2017/9/26 下午2:39, 박병철/선임연구원/SW
+>> Platform(연)AOT팀(byungchul.park@lge.com) wrote:
+>>>> -----Original Message-----
+>>>> From: Michael Lyle [mailto:mlyle@lyle.org]
+>>>> Sent: Tuesday, September 26, 2017 1:38 PM
+>>>> To: Coly Li
+>>>> Cc: linux-bcache@vger.kernel.org; linux-block@vger.kernel.org;
+>>>> axboe@kernel.dk; Eric Wheeler; Byungchul Park; Kent Overstreet
+>>>> Subject: Re: [PATCH 04/12] bcache: Don't reinvent the wheel but use existing
+>>>> llist API
+>>>>
+>>>> I believe this introduces a critical bug.
+>>>>
+>>>> cl->list is used to link together the llists for both things waiting,
+>>>> and for things that are being woken.
+>>>>
+>>>> If a closure that is woken decides to wait again, it will corrupt the
+>>>> llist that __closure_wake_up is using.
+>>>>
+>>>> The previous iteration structure gets the next element of the list
+>>>> before waking and is therefore safe.
 >>>
->>> cl->list is used to link together the llists for both things waiting,
->>> and for things that are being woken.
->>>
->>> If a closure that is woken decides to wait again, it will corrupt the
->>> llist that __closure_wake_up is using.
->>>
->>> The previous iteration structure gets the next element of the list
->>> before waking and is therefore safe.
->>>
+>>> Do you mean we have to use llist_for_each_entry_safe() instead of non-safe
+>> version?
+>>> Is it ok if we use it instead?
 >>
->> Hi Mike,
->>
->> Good catch! I see llist_del_all() but forget cl->list can be modified in
->> closure_wait(). Yes there is potential chance to mislead
->> llist_for_each_entry() to iterate wrong list.
->> llist_for_each_entry_safe() should be used here. I will send a fix to
->> Jens, hope to catch up 4.14 still.
+>> Yes, we should use llist_for_each_entry_safe(), there is a quite
+>> implicit race here.
 > 
-> I see. You have a plan to do it. Please fix it.
+> Hi coly,
+> 
+> As you know, my first patch used the safe version, but you suggested to replace
+> It with non-safe one. :(
 
-Oh, I just see this email, when I replied your last one.
-Sure, let me fix my fault.
+No doubt, it's my fault. I didn't find the implicit potential race.
+
+> I will change it so it does the same as the original patch did. :)
+
+Yes, please. Because the original patch is merged into Linux upstream,
+post a fix to replace llist_for_each_entry() by
+llist_for_each_entry_safe(). We still have chance to catch up 4.14.
+
+Thank you !
 
 -- 
 Coly Li
