@@ -1,64 +1,28 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Tue, 26 Sep 2017 22:59:20 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"jthumshirn@suse.de" <jthumshirn@suse.de>,
-	"linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
-	"hch@lst.de" <hch@lst.de>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"oleksandr@natalenko.name" <oleksandr@natalenko.name>,
-	"hare@suse.com" <hare@suse.com>,
-	"shli@kernel.org" <shli@kernel.org>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"jthumshirn@suse.de" <jthumshirn@suse.de>, "linux-raid@vger.kernel.org"
+	<linux-raid@vger.kernel.org>, "hch@lst.de" <hch@lst.de>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+	"hare@suse.com" <hare@suse.com>, "shli@kernel.org" <shli@kernel.org>
 Subject: Re: [PATCH v4 1/7] md: Make md resync and reshape threads freezable
-Message-ID: <20170926145919.GC31449@ming.t460p>
+Date: Tue, 26 Sep 2017 14:42:07 +0000
+Message-ID: <1506436926.3787.24.camel@wdc.com>
 References: <20170925202924.16603-1-bart.vanassche@wdc.com>
- <20170925202924.16603-2-bart.vanassche@wdc.com>
- <20170926111747.GA16794@ming.t460p>
- <1506436926.3787.24.camel@wdc.com>
+	 <20170925202924.16603-2-bart.vanassche@wdc.com>
+	 <20170926111747.GA16794@ming.t460p>
+In-Reply-To: <20170926111747.GA16794@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1506436926.3787.24.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Sep 26, 2017 at 02:42:07PM +0000, Bart Van Assche wrote:
-> On Tue, 2017-09-26 at 19:17 +0800, Ming Lei wrote:
-> > Just test this patch a bit and the following failure of freezing task
-> > is triggered during suspend: [ ... ]
-> 
-> What kernel version did you start from and which patches were applied on top of
-> that kernel? Only patch 1/7 or all seven patches? What storage configuration did
-
-It is v4.14-rc1+, and top commit is 8d93c7a43157, with all your 7 patches
-applied.
-
-> you use in your test and what command(s) did you use to trigger suspend?
-
-Follows my pm test script:
-
-	#!/bin/sh
-	
-	echo check > /sys/block/md127/md/sync_action
-	
-	mkfs.ext4 -F /dev/md127
-	
-	mount /dev/md0 /mnt/data
-	
-	dd if=/dev/zero of=/mnt/data/d1.img bs=4k count=128k&
-	
-	echo 9 > /proc/sys/kernel/printk
-	echo devices > /sys/power/pm_test
-	echo mem > /sys/power/state
-	
-	wait
-	umount /mnt/data
-
-Storage setting:
-
-	sudo mdadm --create /dev/md/test /dev/sda /dev/sdb --level=1 --raid-devices=2
-	both /dev/sda and /dev/sdb are virtio-scsi.
-
-
--- 
-Ming
+T24gVHVlLCAyMDE3LTA5LTI2IGF0IDE5OjE3ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gSnVz
+dCB0ZXN0IHRoaXMgcGF0Y2ggYSBiaXQgYW5kIHRoZSBmb2xsb3dpbmcgZmFpbHVyZSBvZiBmcmVl
+emluZyB0YXNrDQo+IGlzIHRyaWdnZXJlZCBkdXJpbmcgc3VzcGVuZDogWyAuLi4gXQ0KDQpXaGF0
+IGtlcm5lbCB2ZXJzaW9uIGRpZCB5b3Ugc3RhcnQgZnJvbSBhbmQgd2hpY2ggcGF0Y2hlcyB3ZXJl
+IGFwcGxpZWQgb24gdG9wIG9mDQp0aGF0IGtlcm5lbD8gT25seSBwYXRjaCAxLzcgb3IgYWxsIHNl
+dmVuIHBhdGNoZXM/IFdoYXQgc3RvcmFnZSBjb25maWd1cmF0aW9uIGRpZA0KeW91IHVzZSBpbiB5
+b3VyIHRlc3QgYW5kIHdoYXQgY29tbWFuZChzKSBkaWQgeW91IHVzZSB0byB0cmlnZ2VyIHN1c3Bl
+bmQ/DQoNCkJhcnQu
