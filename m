@@ -1,77 +1,49 @@
-Return-Path: <BATV+21c581e1042956a70a85+5146+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: nvme multipath support V3
-Date: Mon, 25 Sep 2017 15:40:22 +0200
-Message-Id: <20170925134031.10548-1-hch@lst.de>
+Return-Path: <mlyle@lyle.org>
+MIME-Version: 1.0
+In-Reply-To: <1433ecdd-3394-c65f-9588-4d2a20df25d5@coly.li>
+References: <20170906062602.50497-1-colyli@suse.de> <20170906062602.50497-5-colyli@suse.de>
+ <CAJ+L6qfHB7vAAXUrnjXUQqLE6k+v4yukL58DDzRBBKA+aONLmA@mail.gmail.com> <1433ecdd-3394-c65f-9588-4d2a20df25d5@coly.li>
+From: Michael Lyle <mlyle@lyle.org>
+Date: Tue, 26 Sep 2017 12:55:54 -0700
+Message-ID: <CAJ+L6qc1KAMrj6bpp2R7A=O1HmT=Gq_Wt6f4LVc6rAxQ=O8kwQ@mail.gmail.com>
+Subject: Re: [PATCH 04/12] bcache: Don't reinvent the wheel but use existing
+ llist API
+To: Coly Li <i@coly.li>
+Cc: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org, axboe@kernel.dk,
+	Eric Wheeler <bcache@lists.ewheeler.net>, Byungchul Park <byungchul.park@lge.com>,
+	Kent Overstreet <kent.overstreet@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-Hi all,
+Thanks everyone--
 
-this series adds support for multipathing, that is accessing nvme
-namespaces through multiple controllers to the nvme core driver.
+Yes, this looks good to me and works in testing.
 
-It is a very thin and efficient implementation that relies on
-close cooperation with other bits of the nvme driver, and few small
-and simple block helpers.
+Mike
 
-Compared to dm-multipath the important differences are how management
-of the paths is done, and how the I/O path works.
-
-Management of the paths is fully integrated into the nvme driver,
-for each newly found nvme controller we check if there are other
-controllers that refer to the same subsystem, and if so we link them
-up in the nvme driver.  Then for each namespace found we check if
-the namespace id and identifiers match to check if we have multiple
-controllers that refer to the same namespaces.  For now path
-availability is based entirely on the controller status, which at
-least for fabrics will be continuously updated based on the mandatory
-keep alive timer.  Once the Asynchronous Namespace Access (ANA)
-proposal passes in NVMe we will also get per-namespace states in
-addition to that, but for now any details of that remain confidential
-to NVMe members.
-
-The I/O path is very different from the existing multipath drivers,
-which is enabled by the fact that NVMe (unlike SCSI) does not support
-partial completions - a controller will either complete a whole
-command or not, but never only complete parts of it.  Because of that
-there is no need to clone bios or requests - the I/O path simply
-redirects the I/O to a suitable path.  For successful commands
-multipath is not in the completion stack at all.  For failed commands
-we decide if the error could be a path failure, and if yes remove
-the bios from the request structure and requeue them before completing
-the request.  All together this means there is no performance
-degradation compared to normal nvme operation when using the multipath
-device node (at least not until I find a dual ported DRAM backed
-device :))
-
-There are a couple questions left in the individual patches, comments
-welcome.
-
-A git tree is available at:
-
-   git://git.infradead.org/users/hch/block.git nvme-mpath
-
-gitweb:
-
-   http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/nvme-mpath
-
-Changes since V2:
-  - don't create duplicate subsystems on reset (Keith Bush)
-  - free requests properly when failing over in I/O completion (Keith Bush)
-  - new devices names: /dev/nvm-sub%dn%d
-  - expose the namespace identification sysfs files for the mpath nodes
-
-Changes since V1:
-  - introduce new nvme_ns_ids structure to clean up identifier handling
-  - generic_make_request_fast is now named direct_make_request and calls
-    generic_make_request_checks
-  - reset bi_disk on resubmission
-  - create sysfs links between the existing nvme namespace block devices and
-    the new share mpath device
-  - temporarily added the timeout patches from James, this should go into
-    nvme-4.14, though
+On Tue, Sep 26, 2017 at 12:46 AM, Coly Li <i@coly.li> wrote:
+> On 2017/9/26 =E4=B8=8B=E5=8D=8812:38, Michael Lyle wrote:
+>> I believe this introduces a critical bug.
+>>
+>> cl->list is used to link together the llists for both things waiting,
+>> and for things that are being woken.
+>>
+>> If a closure that is woken decides to wait again, it will corrupt the
+>> llist that __closure_wake_up is using.
+>>
+>> The previous iteration structure gets the next element of the list
+>> before waking and is therefore safe.
+>
+>
+> Hi Michael and Byungchul,
+>
+> This is my fault to suggest Byungchul to change his correct patch into
+> wrong one. But it's good to learn such an implicit race behind bcache
+> code. I just post a patch to explain how this race may happen and
+> corrupt the reverse list iteration. Could you please to review the fix ?
+>
+> And thanks to Michael again to catch this bug.
+>
+> --
+> Coly Li
