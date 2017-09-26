@@ -1,76 +1,46 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:38292 "EHLO mga11.intel.com"
+Received: from mxhk.zte.com.cn ([63.217.80.70]:64978 "EHLO mxhk.zte.com.cn"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752545AbdIVMou (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Sep 2017 08:44:50 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V9 11/15] mmc: core: Export mmc_start_request()
-Date: Fri, 22 Sep 2017 15:37:00 +0300
-Message-Id: <1506083824-4024-12-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com>
-References: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com>
+        id S1752130AbdIZLUb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 26 Sep 2017 07:20:31 -0400
+From: tang.junhui@zte.com.cn
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: 10074136 <tang.junhui@zte.com.cn>
+Subject: Re: [PATCH] bcache: fix a comments typo in bch_alloc_sectors() 
+Date: Tue, 26 Sep 2017 19:20:23 +0800
+Message-Id: <1506424823-11603-1-git-send-email-tang.junhui@zte.com.cn>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Export mmc_start_request() so that the block driver can use it.
+From: 10074136 <tang.junhui@zte.com.cn>
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/core/core.c | 3 ++-
- drivers/mmc/core/core.h | 2 ++
- 2 files changed, 4 insertions(+), 1 deletion(-)
+> Code comments in alloc.c:bch_alloc_sectors() mentions a function
+> name find_data_bucket(), the correct function name should be
+> pick_data_bucket() indeed. bch_alloc_sectors() is a quite important
+> function in bcache allocation code, fixing the typo may help
+> other people to have less confusion.
+> 
+> Signed-off-by: Coly Li <colyli@suse.de>
+> ---
+>  drivers/md/bcache/alloc.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
+> index cacbe2dbd5c3..071ff28be912 100644
+> --- a/drivers/md/bcache/alloc.c
+> +++ b/drivers/md/bcache/alloc.c
+> @@ -600,7 +600,7 @@ bool bch_alloc_sectors(struct cache_set *c, struct bkey *k, unsigned sectors,
+>  
+>  		 /*
+>  		  * If we had to allocate, we might race and not need to allocate the
+> -		  * second time we call find_data_bucket(). If we allocated a bucket but
+> +		  * second time we call pick_data_bucket(). If we allocated a bucket but
+>  		  * didn't use it, drop the refcount bch_bucket_alloc_set() took:
+>  		  */
+>  		 if (KEY_PTRS(&alloc.key))
 
-diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
-index 10d7101164e4..eaa6ece946b2 100644
---- a/drivers/mmc/core/core.c
-+++ b/drivers/mmc/core/core.c
-@@ -344,7 +344,7 @@ static int mmc_mrq_prep(struct mmc_host *host, struct mmc_request *mrq)
- 	return 0;
- }
- 
--static int mmc_start_request(struct mmc_host *host, struct mmc_request *mrq)
-+int mmc_start_request(struct mmc_host *host, struct mmc_request *mrq)
- {
- 	int err;
- 
-@@ -366,6 +366,7 @@ static int mmc_start_request(struct mmc_host *host, struct mmc_request *mrq)
- 
- 	return 0;
- }
-+EXPORT_SYMBOL(mmc_start_request);
- 
- /*
-  * mmc_wait_data_done() - done callback for data request
-diff --git a/drivers/mmc/core/core.h b/drivers/mmc/core/core.h
-index 159b2ca301ec..92d157246271 100644
---- a/drivers/mmc/core/core.h
-+++ b/drivers/mmc/core/core.h
-@@ -109,6 +109,8 @@ static inline void mmc_unregister_pm_notifier(struct mmc_host *host) { }
- void mmc_wait_for_req_done(struct mmc_host *host, struct mmc_request *mrq);
- bool mmc_is_req_done(struct mmc_host *host, struct mmc_request *mrq);
- 
-+int mmc_start_request(struct mmc_host *host, struct mmc_request *mrq);
-+
- struct mmc_async_req;
- 
- struct mmc_async_req *mmc_start_areq(struct mmc_host *host,
--- 
-1.9.1
+Yes, It's useful for code reading, Thanks.
+
+Reviewed-by: Tang Junhui <tang.junhui@zte.com.cn>
