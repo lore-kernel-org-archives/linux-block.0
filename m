@@ -1,70 +1,52 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.mpynet.fi ([82.197.21.85]:46693 "EHLO mx2.mpynet.fi"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751581AbdIUL2F (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Sep 2017 07:28:05 -0400
-Date: Thu, 21 Sep 2017 14:28:03 +0300
-From: Rakesh Pandit <rakesh@tuxera.com>
-To: Matias =?iso-8859-1?Q?Bj=F8rling?= <mb@lightnvm.io>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
-Subject: [PATCH 5/6] lightnvm: pblk: print incompatible line version correctly
-Message-ID: <20170921112801.GA28567@dhcp-216.srv.tuxera.com>
+Received: from mail-it0-f46.google.com ([209.85.214.46]:55600 "EHLO
+        mail-it0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S937074AbdIZPhT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 26 Sep 2017 11:37:19 -0400
+Received: by mail-it0-f46.google.com with SMTP id 4so3334886itv.4
+        for <linux-block@vger.kernel.org>; Tue, 26 Sep 2017 08:37:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <1506083824-4024-8-git-send-email-adrian.hunter@intel.com>
+References: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com> <1506083824-4024-8-git-send-email-adrian.hunter@intel.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Tue, 26 Sep 2017 17:37:17 +0200
+Message-ID: <CACRpkdaeAnAV6GeC14PzyYWzSY0kd6ixHsdDdRR_6K5z-iNz_Q@mail.gmail.com>
+Subject: Re: [PATCH V9 07/15] mmc: block: Prepare CQE data
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Correct it by coverting little endian to cpu endian and also define a
-macro for line version so that maintenance is easy.
+On Fri, Sep 22, 2017 at 2:36 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
 
-Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
----
- drivers/lightnvm/pblk-core.c     | 2 +-
- drivers/lightnvm/pblk-recovery.c | 4 ++--
- drivers/lightnvm/pblk.h          | 1 +
- 3 files changed, 4 insertions(+), 3 deletions(-)
+> Enhance mmc_blk_data_prep() to support CQE requests. That means adding
+> some things that for non-CQE requests would be encoded into the command
+> arguments - such as the block address, reliable-write flag, and data tag
+> flag. Also the request tag is needed to provide the command queue task id,
+> and a comment is added to explain the future possibility of defining a
+> priority.
+>
+> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 74ddb30..57583a1 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -991,7 +991,7 @@ static int pblk_line_init_metadata(struct pblk *pblk, struct pblk_line *line,
- 	memcpy(smeta_buf->header.uuid, pblk->instance_uuid, 16);
- 	smeta_buf->header.id = cpu_to_le32(line->id);
- 	smeta_buf->header.type = cpu_to_le16(line->type);
--	smeta_buf->header.version = cpu_to_le16(1);
-+	smeta_buf->header.version = SMETA_VERSION;
- 
- 	/* Start metadata */
- 	smeta_buf->seq_nr = cpu_to_le64(line->seq_nr);
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index 1869eef..686bc17 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -876,9 +876,9 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
- 		if (le32_to_cpu(smeta_buf->header.identifier) != PBLK_MAGIC)
- 			continue;
- 
--		if (le16_to_cpu(smeta_buf->header.version) != 1) {
-+		if (smeta_buf->header.version != SMETA_VERSION) {
- 			pr_err("pblk: found incompatible line version %u\n",
--					smeta_buf->header.version);
-+					le16_to_cpu(smeta_buf->header.version));
- 			return ERR_PTR(-EINVAL);
- 		}
- 
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index eaf5397..87b1d7f 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -318,6 +318,7 @@ enum {
- };
- 
- #define PBLK_MAGIC 0x70626c6b /*pblk*/
-+#define SMETA_VERSION cpu_to_le16(1)
- 
- struct line_header {
- 	__le32 crc;
--- 
-2.5.0
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+
+Yours,
+Linus Walleij
