@@ -1,91 +1,36 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:36143 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752564AbdIVMoz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Sep 2017 08:44:55 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V9 12/15] mmc: core: Export mmc_retune_hold_now() and mmc_retune_release()
-Date: Fri, 22 Sep 2017 15:37:01 +0300
-Message-Id: <1506083824-4024-13-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com>
-References: <1506083824-4024-1-git-send-email-adrian.hunter@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "hch@lst.de" <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"hare@suse.com" <hare@suse.com>, "jthumshirn@suse.de" <jthumshirn@suse.de>,
+	"oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>
+Subject: Re: [PATCH v4 7/7] block: Make SCSI device suspend and resume work
+ reliably
+Date: Tue, 26 Sep 2017 14:44:53 +0000
+Message-ID: <1506437092.3787.27.camel@wdc.com>
+References: <20170925202924.16603-1-bart.vanassche@wdc.com>
+	 <20170925202924.16603-8-bart.vanassche@wdc.com>
+	 <20170925225911.GC18137@ming.t460p> <1506381226.2641.60.camel@wdc.com>
+	 <20170926083252.GB518@ming.t460p>
+In-Reply-To: <20170926083252.GB518@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-Export mmc_retune_hold_now() and mmc_retune_release() so they can be used
-by the block driver.
-
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/core/host.c | 7 +------
- drivers/mmc/core/host.h | 7 ++++++-
- 2 files changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/mmc/core/host.c b/drivers/mmc/core/host.c
-index b624dbb6cd15..1539ce0da196 100644
---- a/drivers/mmc/core/host.c
-+++ b/drivers/mmc/core/host.c
-@@ -111,12 +111,6 @@ void mmc_retune_hold(struct mmc_host *host)
- 	host->hold_retune += 1;
- }
- 
--void mmc_retune_hold_now(struct mmc_host *host)
--{
--	host->retune_now = 0;
--	host->hold_retune += 1;
--}
--
- void mmc_retune_release(struct mmc_host *host)
- {
- 	if (host->hold_retune)
-@@ -124,6 +118,7 @@ void mmc_retune_release(struct mmc_host *host)
- 	else
- 		WARN_ON(1);
- }
-+EXPORT_SYMBOL(mmc_retune_release);
- 
- int mmc_retune(struct mmc_host *host)
- {
-diff --git a/drivers/mmc/core/host.h b/drivers/mmc/core/host.h
-index 170fe5947087..6eaf558e62d6 100644
---- a/drivers/mmc/core/host.h
-+++ b/drivers/mmc/core/host.h
-@@ -19,12 +19,17 @@
- void mmc_retune_enable(struct mmc_host *host);
- void mmc_retune_disable(struct mmc_host *host);
- void mmc_retune_hold(struct mmc_host *host);
--void mmc_retune_hold_now(struct mmc_host *host);
- void mmc_retune_release(struct mmc_host *host);
- int mmc_retune(struct mmc_host *host);
- void mmc_retune_pause(struct mmc_host *host);
- void mmc_retune_unpause(struct mmc_host *host);
- 
-+static inline void mmc_retune_hold_now(struct mmc_host *host)
-+{
-+	host->retune_now = 0;
-+	host->hold_retune += 1;
-+}
-+
- static inline void mmc_retune_recheck(struct mmc_host *host)
- {
- 	if (host->hold_retune <= 1)
--- 
-1.9.1
+T24gVHVlLCAyMDE3LTA5LTI2IGF0IDE2OjMyICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
+TW9uLCBTZXAgMjUsIDIwMTcgYXQgMTE6MTM6NDdQTSArMDAwMCwgQmFydCBWYW4gQXNzY2hlIHdy
+b3RlOg0KPiA+IFNvcnJ5IGJ1dCBJIGRpc2FncmVlLiBJJ20gdXNpbmcgUkNVIHRvIGFjaGlldmUg
+dGhlIHNhbWUgZWZmZWN0IGFzIGEgYmFycmllcg0KPiA+IGFuZCB0byBtb3ZlIHRoZSBjb3N0IG9m
+IHRoZSBiYXJyaWVyIGZyb20gdGhlIHJlYWRlciB0byB0aGUgdXBkYXRlci4gU2VlIGFsc28NCj4g
+PiBQYXVsIEUuIE1jS2VubmV5LCBNYXRoaWV1IERlc25veWVycywgTGFpIEppYW5nc2hhbiwgYW5k
+IEpvc2ggVHJpcGxldHQsDQo+ID4gVGhlIFJDVS1iYXJyaWVyIG1lbmFnZXJpZSwgTFdOLm5ldCwg
+Tm92ZW1iZXIgMTIsIDIwMTMNCj4gPiAoaHR0cHM6Ly9sd24ubmV0L0FydGljbGVzLzU3MzQ5Ny8p
+Lg0KPiANCj4gTGV0IG1lIGV4cGxhaW4gaXQgaW4gYSBiaXQgZGV0YWlsczogWyAuLi4gXQ0KDQpU
+aGUgYXBwcm9hY2ggSSB1c2VkIGluIHBhdGNoIDcvNyBpcyBpZGVudGljYWwgdG8gb25lIG9mIHRo
+ZSBhcHByb2FjaGVzIGV4cGxhaW5lZA0KaW4gdGhlIGFydGljbGUgSSByZWZlcnJlZCB0by4gSWYg
+eW91IGRvIG5vdCBhZ3JlZSB0aGF0IHRoYXQgYXBwcm9hY2ggaXMgc2FmZSB0aGF0DQptZWFucyB0
+aGF0IHlvdSBkbyBub3QgbmVpdGhlciBhZ3JlZSB3aXRoIFBhdWwgTWNLZW5uZXkncyB2aWV3IG9u
+IGhvdyBSQ1Ugd29ya3MuDQpEbyB5b3UgcmVhbGx5IHRoaW5rIHRoYXQgeW91IGtub3cgbW9yZSBh
+Ym91dCBSQ1UgdGhhbiBQYXVsIE1jS2VubmV5Pw0KDQpCYXJ0Lg==
