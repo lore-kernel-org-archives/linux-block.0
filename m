@@ -1,8 +1,4 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:41300 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750933AbdI3GMg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Sep 2017 02:12:36 -0400
+Return-Path: <linux-scsi-owner@vger.kernel.org>
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
@@ -14,108 +10,152 @@ Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
         Johannes Thumshirn <jthumshirn@suse.de>,
         Cathy Avery <cavery@redhat.com>,
         Martin Steigerwald <martin@lichtvoll.de>,
-        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V7 0/6] block/scsi: safe SCSI quiescing
-Date: Sat, 30 Sep 2017 14:12:08 +0800
-Message-Id: <20170930061214.10622-1-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Subject: [PATCH V6 3/6] block: pass flags to blk_queue_enter()
+Date: Wed, 27 Sep 2017 13:48:50 +0800
+Message-Id: <20170927054853.6647-4-ming.lei@redhat.com>
+In-Reply-To: <20170927054853.6647-1-ming.lei@redhat.com>
+References: <20170927054853.6647-1-ming.lei@redhat.com>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+We need to pass PREEMPT flags to blk_queue_enter()
+for allocating request with RQF_PREEMPT in the
+following patch.
 
-Please consider this patchset for V4.15, and it fixes one
-kind of long-term I/O hang issue in either block legacy path
-or blk-mq.
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-core.c       | 10 ++++++----
+ block/blk-mq.c         |  5 +++--
+ block/blk-timeout.c    |  2 +-
+ fs/block_dev.c         |  4 ++--
+ include/linux/blkdev.h |  7 ++++++-
+ 5 files changed, 18 insertions(+), 10 deletions(-)
 
-The current SCSI quiesce isn't safe and easy to trigger I/O deadlock.
-
-Once SCSI device is put into QUIESCE, no new request except for
-RQF_PREEMPT can be dispatched to SCSI successfully, and
-scsi_device_quiesce() just simply waits for completion of I/Os
-dispatched to SCSI stack. It isn't enough at all.
-
-Because new request still can be comming, but all the allocated
-requests can't be dispatched successfully, so request pool can be
-consumed up easily.
-
-Then request with RQF_PREEMPT can't be allocated and wait forever,
-then system hangs forever, such as during system suspend or
-sending SCSI domain alidation in case of transport_spi.
-
-Both IO hang inside system suspend[1] or SCSI domain validation
-were reported before.
-
-This patch introduces preempt only mode, and solves the issue
-by allowing RQF_PREEMP only during SCSI quiesce.
-
-Both SCSI and SCSI_MQ have this IO deadlock issue, this patch fixes
-them all.
-
-V7:
-	- add Reviewed-by & Tested-by
-	- one line change in patch 5 for checking preempt request
-
-V6:
-	- borrow Bart's idea of preempt only, with clean
-	  implementation(patch 5/patch 6)
-	- needn't any external driver's dependency, such as MD's
-	change
-
-V5:
-	- fix one tiny race by introducing blk_queue_enter_preempt_freeze()
-	given this change is small enough compared with V4, I added
-	tested-by directly
-
-V4:
-	- reorganize patch order to make it more reasonable
-	- support nested preempt freeze, as required by SCSI transport spi
-	- check preempt freezing in slow path of of blk_queue_enter()
-	- add "SCSI: transport_spi: resume a quiesced device"
-	- wake up freeze queue in setting dying for both blk-mq and legacy
-	- rename blk_mq_[freeze|unfreeze]_queue() in one patch
-	- rename .mq_freeze_wq and .mq_freeze_depth
-	- improve comment
-
-V3:
-	- introduce q->preempt_unfreezing to fix one bug of preempt freeze
-	- call blk_queue_enter_live() only when queue is preempt frozen
-	- cleanup a bit on the implementation of preempt freeze
-	- only patch 6 and 7 are changed
-
-V2:
-	- drop the 1st patch in V1 because percpu_ref_is_dying() is
-	enough as pointed by Tejun
-	- introduce preempt version of blk_[freeze|unfreeze]_queue
-	- sync between preempt freeze and normal freeze
-	- fix warning from percpu-refcount as reported by Oleksandr
-
-
-[1] https://marc.info/?t=150340250100013&r=3&w=2
-
-
-Thanks,
-Ming
-
-Ming Lei (6):
-  blk-mq: only run hw queues for blk-mq
-  block: tracking request allocation with q_usage_counter
-  block: pass flags to blk_queue_enter()
-  block: prepare for passing RQF_PREEMPT to request allocation
-  block: support PREEMPT_ONLY
-  SCSI: set block queue at preempt only when SCSI device is put into
-    quiesce
-
- block/blk-core.c        | 63 +++++++++++++++++++++++++++++++++++++++----------
- block/blk-mq.c          | 14 ++++-------
- block/blk-timeout.c     |  2 +-
- drivers/scsi/scsi_lib.c | 25 +++++++++++++++++---
- fs/block_dev.c          |  4 ++--
- include/linux/blk-mq.h  |  7 +++---
- include/linux/blkdev.h  | 27 ++++++++++++++++++---
- 7 files changed, 107 insertions(+), 35 deletions(-)
-
+diff --git a/block/blk-core.c b/block/blk-core.c
+index abfba798ee03..be17b5bcf6e7 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -766,7 +766,7 @@ struct request_queue *blk_alloc_queue(gfp_t gfp_mask)
+ }
+ EXPORT_SYMBOL(blk_alloc_queue);
+ 
+-int blk_queue_enter(struct request_queue *q, bool nowait)
++int blk_queue_enter(struct request_queue *q, unsigned flags)
+ {
+ 	while (true) {
+ 		int ret;
+@@ -774,7 +774,7 @@ int blk_queue_enter(struct request_queue *q, bool nowait)
+ 		if (percpu_ref_tryget_live(&q->q_usage_counter))
+ 			return 0;
+ 
+-		if (nowait)
++		if (flags & BLK_REQ_NOWAIT)
+ 			return -EBUSY;
+ 
+ 		/*
+@@ -1405,7 +1405,8 @@ static struct request *blk_old_get_request(struct request_queue *q,
+ 	/* create ioc upfront */
+ 	create_io_context(gfp_mask, q->node);
+ 
+-	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM));
++	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM) ?
++			BLK_REQ_NOWAIT : 0);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 	spin_lock_irq(q->queue_lock);
+@@ -2212,7 +2213,8 @@ blk_qc_t generic_make_request(struct bio *bio)
+ 	do {
+ 		struct request_queue *q = bio->bi_disk->queue;
+ 
+-		if (likely(blk_queue_enter(q, bio->bi_opf & REQ_NOWAIT) == 0)) {
++		if (likely(blk_queue_enter(q, (bio->bi_opf & REQ_NOWAIT) ?
++						BLK_REQ_NOWAIT : 0) == 0)) {
+ 			struct bio_list lower, same;
+ 
+ 			/* Create a fresh bio_list for all subordinate requests */
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 10c1f49f663d..45bff90e08f7 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -384,7 +384,8 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ 	struct request *rq;
+ 	int ret;
+ 
+-	ret = blk_queue_enter(q, flags & BLK_MQ_REQ_NOWAIT);
++	ret = blk_queue_enter(q, (flags & BLK_MQ_REQ_NOWAIT) ?
++			BLK_REQ_NOWAIT : 0);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 
+@@ -423,7 +424,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ 	if (hctx_idx >= q->nr_hw_queues)
+ 		return ERR_PTR(-EIO);
+ 
+-	ret = blk_queue_enter(q, true);
++	ret = blk_queue_enter(q, BLK_REQ_NOWAIT);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 
+diff --git a/block/blk-timeout.c b/block/blk-timeout.c
+index 17ec83bb0900..e803106a5e5b 100644
+--- a/block/blk-timeout.c
++++ b/block/blk-timeout.c
+@@ -134,7 +134,7 @@ void blk_timeout_work(struct work_struct *work)
+ 	struct request *rq, *tmp;
+ 	int next_set = 0;
+ 
+-	if (blk_queue_enter(q, true))
++	if (blk_queue_enter(q, BLK_REQ_NOWAIT))
+ 		return;
+ 	spin_lock_irqsave(q->queue_lock, flags);
+ 
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 93d088ffc05c..98cf2d7ee9d3 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -674,7 +674,7 @@ int bdev_read_page(struct block_device *bdev, sector_t sector,
+ 	if (!ops->rw_page || bdev_get_integrity(bdev))
+ 		return result;
+ 
+-	result = blk_queue_enter(bdev->bd_queue, false);
++	result = blk_queue_enter(bdev->bd_queue, 0);
+ 	if (result)
+ 		return result;
+ 	result = ops->rw_page(bdev, sector + get_start_sect(bdev), page, false);
+@@ -710,7 +710,7 @@ int bdev_write_page(struct block_device *bdev, sector_t sector,
+ 
+ 	if (!ops->rw_page || bdev_get_integrity(bdev))
+ 		return -EOPNOTSUPP;
+-	result = blk_queue_enter(bdev->bd_queue, false);
++	result = blk_queue_enter(bdev->bd_queue, 0);
+ 	if (result)
+ 		return result;
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 460294bb0fa5..107e2fd48486 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -857,6 +857,11 @@ enum {
+ 	BLKPREP_INVALID,	/* invalid command, kill, return -EREMOTEIO */
+ };
+ 
++/* passed to blk_queue_enter */
++enum {
++	BLK_REQ_NOWAIT = (1 << 0),
++};
++
+ extern unsigned long blk_max_low_pfn, blk_max_pfn;
+ 
+ /*
+@@ -962,7 +967,7 @@ extern int scsi_cmd_ioctl(struct request_queue *, struct gendisk *, fmode_t,
+ extern int sg_scsi_ioctl(struct request_queue *, struct gendisk *, fmode_t,
+ 			 struct scsi_ioctl_command __user *);
+ 
+-extern int blk_queue_enter(struct request_queue *q, bool nowait);
++extern int blk_queue_enter(struct request_queue *q, unsigned flags);
+ extern void blk_queue_exit(struct request_queue *q);
+ extern void blk_start_queue(struct request_queue *q);
+ extern void blk_start_queue_async(struct request_queue *q);
 -- 
 2.9.5
