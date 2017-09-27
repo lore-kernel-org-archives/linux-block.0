@@ -1,192 +1,119 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:56842 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751396AbdI0Fvy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Sep 2017 01:51:54 -0400
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
         linux-scsi@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
         Johannes Thumshirn <jthumshirn@suse.de>,
-        Tejun Heo <tj@kernel.org>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 1/8] blk-mq: rename blk_mq_unfreeze_queue as blk_unfreeze_queue
-Date: Sat,  2 Sep 2017 21:08:33 +0800
-Message-Id: <20170902130840.24609-2-ming.lei@redhat.com>
-In-Reply-To: <20170902130840.24609-1-ming.lei@redhat.com>
-References: <20170902130840.24609-1-ming.lei@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+        Cathy Avery <cavery@redhat.com>,
+        Martin Steigerwald <martin@lichtvoll.de>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V6 5/6] block: support PREEMPT_ONLY
+Date: Wed, 27 Sep 2017 13:48:52 +0800
+Message-Id: <20170927054853.6647-6-ming.lei@redhat.com>
+In-Reply-To: <20170927054853.6647-1-ming.lei@redhat.com>
+References: <20170927054853.6647-1-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We will support to freeze queue on block legacy path too.
+When queue is in PREEMPT_ONLY mode, only RQF_PREEMPT request
+can be allocated and dispatched, other requests won't be allowed
+to enter I/O path.
+
+This is useful for supporting safe SCSI quiesce.
+
+Part of this patch is from Bart's '[PATCH v4 4∕7] block: Add the QUEUE_FLAG_PREEMPT_ONLY
+request queue flag'.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-cgroup.c       |  4 ++--
- block/blk-mq.c           | 10 +++++-----
- block/elevator.c         |  2 +-
- drivers/block/loop.c     |  8 ++++----
- drivers/nvme/host/core.c |  4 ++--
- include/linux/blk-mq.h   |  2 +-
- 6 files changed, 15 insertions(+), 15 deletions(-)
+ block/blk-core.c       | 25 +++++++++++++++++++++++--
+ include/linux/blkdev.h |  5 +++++
+ 2 files changed, 28 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 0480892e97e5..02e8a47ac77c 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1337,7 +1337,7 @@ int blkcg_activate_policy(struct request_queue *q,
- 	spin_unlock_irq(q->queue_lock);
- out_bypass_end:
- 	if (q->mq_ops)
--		blk_mq_unfreeze_queue(q);
-+		blk_unfreeze_queue(q);
- 	else
- 		blk_queue_bypass_end(q);
- 	if (pd_prealloc)
-@@ -1388,7 +1388,7 @@ void blkcg_deactivate_policy(struct request_queue *q,
- 	spin_unlock_irq(q->queue_lock);
- 
- 	if (q->mq_ops)
--		blk_mq_unfreeze_queue(q);
-+		blk_unfreeze_queue(q);
- 	else
- 		blk_queue_bypass_end(q);
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 0a8396e8e4ff..3c0a7e7f172f 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -346,6 +346,17 @@ void blk_sync_queue(struct request_queue *q)
  }
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d935f15c54da..82136e83951d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -172,7 +172,7 @@ void blk_mq_freeze_queue(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_mq_freeze_queue);
+ EXPORT_SYMBOL(blk_sync_queue);
  
--void blk_mq_unfreeze_queue(struct request_queue *q)
-+void blk_unfreeze_queue(struct request_queue *q)
++void blk_set_preempt_only(struct request_queue *q, bool preempt_only)
++{
++	blk_mq_freeze_queue(q);
++	if (preempt_only)
++		queue_flag_set_unlocked(QUEUE_FLAG_PREEMPT_ONLY, q);
++	else
++		queue_flag_clear_unlocked(QUEUE_FLAG_PREEMPT_ONLY, q);
++	blk_mq_unfreeze_queue(q);
++}
++EXPORT_SYMBOL(blk_set_preempt_only);
++
+ /**
+  * __blk_run_queue_uncond - run a queue whether or not it has been stopped
+  * @q:	The queue to run
+@@ -771,9 +782,18 @@ int blk_queue_enter(struct request_queue *q, unsigned flags)
+ 	while (true) {
+ 		int ret;
+ 
++		/*
++		 * preempt_only flag has to be set after queue is frozen,
++		 * so it can be checked here lockless and safely
++		 */
++		if (blk_queue_preempt_only(q)) {
++			if (!(flags & BLK_REQ_PREEMPT))
++				goto slow_path;
++		}
++
+ 		if (percpu_ref_tryget_live(&q->q_usage_counter))
+ 			return 0;
+-
++ slow_path:
+ 		if (flags & BLK_REQ_NOWAIT)
+ 			return -EBUSY;
+ 
+@@ -787,7 +807,8 @@ int blk_queue_enter(struct request_queue *q, unsigned flags)
+ 		smp_rmb();
+ 
+ 		ret = wait_event_interruptible(q->mq_freeze_wq,
+-				!atomic_read(&q->mq_freeze_depth) ||
++				(!atomic_read(&q->mq_freeze_depth) &&
++				!blk_queue_preempt_only(q)) ||
+ 				blk_queue_dying(q));
+ 		if (blk_queue_dying(q))
+ 			return -ENODEV;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index d1ab950a7f72..8f5b15b2bf06 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -630,6 +630,7 @@ struct request_queue {
+ #define QUEUE_FLAG_REGISTERED  26	/* queue has been registered to a disk */
+ #define QUEUE_FLAG_SCSI_PASSTHROUGH 27	/* queue supports SCSI commands */
+ #define QUEUE_FLAG_QUIESCED    28	/* queue has been quiesced */
++#define QUEUE_FLAG_PREEMPT_ONLY	29	/* only process REQ_PREEMPT requests */
+ 
+ #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
+ 				 (1 << QUEUE_FLAG_STACKABLE)	|	\
+@@ -734,6 +735,10 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
+ 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
+ 			     REQ_FAILFAST_DRIVER))
+ #define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
++#define blk_queue_preempt_only(q)				\
++	test_bit(QUEUE_FLAG_PREEMPT_ONLY, &(q)->queue_flags)
++
++extern void blk_set_preempt_only(struct request_queue *q, bool preempt_only);
+ 
+ static inline bool blk_account_rq(struct request *rq)
  {
- 	int freeze_depth;
- 
-@@ -183,7 +183,7 @@ void blk_mq_unfreeze_queue(struct request_queue *q)
- 		wake_up_all(&q->mq_freeze_wq);
- 	}
- }
--EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
-+EXPORT_SYMBOL_GPL(blk_unfreeze_queue);
- 
- /*
-  * FIXME: replace the scsi_internal_device_*block_nowait() calls in the
-@@ -2250,7 +2250,7 @@ static void blk_mq_update_tag_set_depth(struct blk_mq_tag_set *set,
- 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
- 		blk_mq_freeze_queue(q);
- 		queue_set_hctx_shared(q, shared);
--		blk_mq_unfreeze_queue(q);
-+		blk_unfreeze_queue(q);
- 	}
- }
- 
-@@ -2708,7 +2708,7 @@ static int __blk_mq_update_nr_requests(struct request_queue *q,
- 	if (!ret)
- 		q->nr_requests = nr;
- 
--	blk_mq_unfreeze_queue(q);
-+	blk_unfreeze_queue(q);
- 
- 	return ret;
- }
-@@ -2757,7 +2757,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 	}
- 
- 	list_for_each_entry(q, &set->tag_list, tag_set_list)
--		blk_mq_unfreeze_queue(q);
-+		blk_unfreeze_queue(q);
- }
- 
- void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
-diff --git a/block/elevator.c b/block/elevator.c
-index 0e465809d3f3..371c8165c9e8 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -994,7 +994,7 @@ static int elevator_switch_mq(struct request_queue *q,
- 		blk_add_trace_msg(q, "elv switch: none");
- 
- out:
--	blk_mq_unfreeze_queue(q);
-+	blk_unfreeze_queue(q);
- 	return ret;
- }
- 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 2fbd4089c20e..5c11ea44d470 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -217,7 +217,7 @@ static void __loop_update_dio(struct loop_device *lo, bool dio)
- 		lo->lo_flags |= LO_FLAGS_DIRECT_IO;
- 	else
- 		lo->lo_flags &= ~LO_FLAGS_DIRECT_IO;
--	blk_mq_unfreeze_queue(lo->lo_queue);
-+	blk_unfreeze_queue(lo->lo_queue);
- }
- 
- static int
-@@ -605,7 +605,7 @@ static int loop_switch(struct loop_device *lo, struct file *file)
- 	do_loop_switch(lo, &w);
- 
- 	/* unfreeze */
--	blk_mq_unfreeze_queue(lo->lo_queue);
-+	blk_unfreeze_queue(lo->lo_queue);
- 
- 	return 0;
- }
-@@ -1079,7 +1079,7 @@ static int loop_clr_fd(struct loop_device *lo)
- 	lo->lo_state = Lo_unbound;
- 	/* This is safe: open() is still holding a reference. */
- 	module_put(THIS_MODULE);
--	blk_mq_unfreeze_queue(lo->lo_queue);
-+	blk_unfreeze_queue(lo->lo_queue);
- 
- 	if (lo->lo_flags & LO_FLAGS_PARTSCAN && bdev)
- 		loop_reread_partitions(lo, bdev);
-@@ -1191,7 +1191,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	__loop_update_dio(lo, lo->use_dio);
- 
-  exit:
--	blk_mq_unfreeze_queue(lo->lo_queue);
-+	blk_unfreeze_queue(lo->lo_queue);
- 
- 	if (!err && (info->lo_flags & LO_FLAGS_PARTSCAN) &&
- 	     !(lo->lo_flags & LO_FLAGS_PARTSCAN)) {
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 37046ac2c441..5c76b0a96be2 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1226,7 +1226,7 @@ static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
- 
- 	if (ctrl->oncs & NVME_CTRL_ONCS_DSM)
- 		nvme_config_discard(ns);
--	blk_mq_unfreeze_queue(disk->queue);
-+	blk_unfreeze_queue(disk->queue);
- }
- 
- static int nvme_revalidate_disk(struct gendisk *disk)
-@@ -2753,7 +2753,7 @@ void nvme_unfreeze(struct nvme_ctrl *ctrl)
- 
- 	mutex_lock(&ctrl->namespaces_mutex);
- 	list_for_each_entry(ns, &ctrl->namespaces, list)
--		blk_mq_unfreeze_queue(ns->queue);
-+		blk_unfreeze_queue(ns->queue);
- 	mutex_unlock(&ctrl->namespaces_mutex);
- }
- EXPORT_SYMBOL_GPL(nvme_unfreeze);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 13f6c25fa461..2572e5641568 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -257,7 +257,7 @@ void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
- void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- 		busy_tag_iter_fn *fn, void *priv);
- void blk_mq_freeze_queue(struct request_queue *q);
--void blk_mq_unfreeze_queue(struct request_queue *q);
-+void blk_unfreeze_queue(struct request_queue *q);
- void blk_freeze_queue_start(struct request_queue *q);
- void blk_mq_freeze_queue_wait(struct request_queue *q);
- int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
 -- 
 2.9.5
