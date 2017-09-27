@@ -1,49 +1,90 @@
-Return-Path: <BATV+d5010c6038c0d824b081+5143+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Fri, 22 Sep 2017 10:55:37 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
-Subject: [GIT PULL] another set of nvme fixes for 4.14-rc2
-Message-ID: <20170922175537.z5gvxcbckoli6vn5@infradead.org>
+Return-Path: <ming.lei@redhat.com>
+Date: Wed, 27 Sep 2017 19:00:09 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"jthumshirn@suse.de" <jthumshirn@suse.de>,
+	"linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+	"hch@lst.de" <hch@lst.de>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+	"hare@suse.com" <hare@suse.com>,
+	"shli@kernel.org" <shli@kernel.org>
+Subject: Re: [PATCH v4 1/7] md: Make md resync and reshape threads freezable
+Message-ID: <20170927110006.GB1994@ming.t460p>
+References: <20170925202924.16603-1-bart.vanassche@wdc.com>
+ <20170925202924.16603-2-bart.vanassche@wdc.com>
+ <20170926111747.GA16794@ming.t460p>
+ <1506436926.3787.24.camel@wdc.com>
+ <20170926145919.GC31449@ming.t460p>
+ <1506481915.2822.9.camel@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1506481915.2822.9.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The fix for the target sqhdr fix is the critical one that we really want
-before -rc2.  But we've also accumulated a fair batch of small FC and
-RDMA fixes as well.
+On Wed, Sep 27, 2017 at 03:12:47AM +0000, Bart Van Assche wrote:
+> On Tue, 2017-09-26 at 22:59 +0800, Ming Lei wrote:
+> > On Tue, Sep 26, 2017 at 02:42:07PM +0000, Bart Van Assche wrote:
+> > > On Tue, 2017-09-26 at 19:17 +0800, Ming Lei wrote:
+> > > > Just test this patch a bit and the following failure of freezing task
+> > > > is triggered during suspend: [ ... ]
+> > > 
+> > > What kernel version did you start from and which patches were applied on top of
+> > > that kernel? Only patch 1/7 or all seven patches? What storage configuration did
+> > 
+> > It is v4.14-rc1+, and top commit is 8d93c7a43157, with all your 7 patches
+> > applied.
+> > 
+> > > you use in your test and what command(s) did you use to trigger suspend?
+> > 
+> > Follows my pm test script:
+> > 
+> > 	#!/bin/sh
+> > 	
+> > 	echo check > /sys/block/md127/md/sync_action
+> > 	
+> > 	mkfs.ext4 -F /dev/md127
+> > 	
+> > 	mount /dev/md0 /mnt/data
+> > 	
+> > 	dd if=/dev/zero of=/mnt/data/d1.img bs=4k count=128k&
+> > 	
+> > 	echo 9 > /proc/sys/kernel/printk
+> > 	echo devices > /sys/power/pm_test
+> > 	echo mem > /sys/power/state
+> > 	
+> > 	wait
+> > 	umount /mnt/data
+> > 
+> > Storage setting:
+> > 
+> > 	sudo mdadm --create /dev/md/test /dev/sda /dev/sdb --level=1 --raid-devices=2
+> > 	both /dev/sda and /dev/sdb are virtio-scsi.
+> 
+> Thanks for the detailed reply. I have been able to reproduce the freeze failure
+> you reported. The output of SysRq-t learned me that the md reboot notifier was
+> waiting for the frozen md sync thread and that this caused the freeze failure. So
+> I have started testing the patch below instead of the patch at the start of this
+> e-mail thread:
+
+OK, thanks for figuring out the reason.
+
+With current linus tree, SCSI I/O is prevented from being dispatch to
+device during suspend by SCSI quiesce, and will be dispatched again
+in resume. With Safe SCSI quiesce[1], any underlying IO request will
+stop at blk_queue_enter() during suspend, and restart from there during
+resume.
+
+For other non-SCSI driver, their .suspend/.resume often
+handles I/O in similar way, for example, NVMe queue will
+be frozen in .suspend, and unfreeze in .resume.
+
+So could you explain a bit which kind of bug this patch fixes?
+
+[1] https://marc.info/?l=linux-block&m=150649136519281&w=2
 
 
-The following changes since commit cd9e0a08e4f6173f9d7a469cabd09938fc4f0e25:
-
-  block: fix a crash caused by wrong API (2017-09-21 13:20:40 -0600)
-
-are available in the git repository at:
-
-  git://git.infradead.org/nvme.git nvme-4.14
-
-for you to fetch changes up to 4384e7ae7686aa914ee4f163be1790d03e2e8f28:
-
-  nvme-fcloop: fix port deletes and callbacks (2017-09-22 07:27:08 -0700)
-
-----------------------------------------------------------------
-James Smart (5):
-      nvme: fix sqhd reference when admin queue connect fails
-      nvmet-fc: on port remove call put outside lock
-      nvmet-fc: ensure target queue id within range.
-      nvmet-fc: sync header templates with comments
-      nvme-fcloop: fix port deletes and callbacks
-
-Sagi Grimberg (3):
-      nvme-core: Use nvme_wq to queue async events and fw activation
-      nvme-rdma: give up reconnect if state change fails
-      nvme-rdma: don't fully stop the controller in error recovery
-
- drivers/nvme/host/core.c       |   4 +-
- drivers/nvme/host/rdma.c       |   9 +++-
- drivers/nvme/target/core.c     |   3 +-
- drivers/nvme/target/fc.c       |   9 +++-
- drivers/nvme/target/fcloop.c   | 102 +++++++++++++++--------------------------
- include/linux/nvme-fc-driver.h |  13 ++++--
- 6 files changed, 65 insertions(+), 75 deletions(-)
+-- 
+Ming
