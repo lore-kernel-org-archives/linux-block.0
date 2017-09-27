@@ -1,255 +1,325 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out1.zte.com.cn ([202.103.147.172]:57800 "EHLO mxct.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750763AbdI2DiL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Sep 2017 23:38:11 -0400
-From: tang.junhui@zte.com.cn
-To: i@coly.li, mlyle@lyle.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Tang Junhui <tang.junhui@zte.com.cn>
-Subject: Re: [PATCH 4/5] bcache: writeback: collapse contiguous IO better 
-Date: Fri, 29 Sep 2017 11:37:51 +0800
-Message-Id: <1506656271-22665-1-git-send-email-tang.junhui@zte.com.cn>
+Received: from mail-qk0-f196.google.com ([209.85.220.196]:33264 "EHLO
+        mail-qk0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751936AbdI0H6e (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Sep 2017 03:58:34 -0400
+Received: by mail-qk0-f196.google.com with SMTP id g128so8321216qke.0
+        for <linux-block@vger.kernel.org>; Wed, 27 Sep 2017 00:58:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CAJ+L6qcuzq9eAT8_Hg20jsi+Vj1XDC58dYSSVo7Pvwd0CEGZtw@mail.gmail.com>
+References: <1506497553-12552-1-git-send-email-tang.junhui@zte.com.cn> <CAJ+L6qcuzq9eAT8_Hg20jsi+Vj1XDC58dYSSVo7Pvwd0CEGZtw@mail.gmail.com>
+From: Michael Lyle <mlyle@lyle.org>
+Date: Wed, 27 Sep 2017 00:58:33 -0700
+Message-ID: <CAJ+L6qeC_NkXUrHe=6xX4XF1=nF255-x=vWtQHsk9anW4CC5=A@mail.gmail.com>
+Subject: Re: [PATCH 4/5] bcache: writeback: collapse contiguous IO better
+To: Junhui Tang <tang.junhui@zte.com.cn>
+Cc: Coly Li <i@coly.li>, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+I just fixed the problem you pointed out, and ran a test where I did
 
-Hello Mike:
+sync;fio --randrepeat=1 --ioengine=libaio --direct=1 --gtod_reduce=1
+--name=test --filename=test --bs=8k --iodepth=256 --size=25G
+--readwrite=randwrite --ramp_time=4
 
-> +	if (KEY_INODE(&second->key) != KEY_INODE(&first->key))
-> +	 return false;
-Please remove these redundant codes, all the keys in dc->writeback_keys 
-have the same KEY_INODE. it is guaranted by refill_dirty().
+to generate a lot of 8k extents.
 
-Regards,
-Tang Junhui
+After letting things quiet down, writeback looks like this:
 
-> Previously, there was some logic that attempted to immediately issue
-> writeback of backing-contiguous blocks when the writeback rate was
-> fast.
-> 
-> The previous logic did not have any limits on the aggregate size it
-> would issue, nor the number of keys it would combine at once.  It
-> would also discard the chance to do a contiguous write when the
-> writeback rate was low-- e.g. at "background" writeback of target
-> rate = 8, it would not combine two adjacent 4k writes and would
-> instead seek the disk twice.
-> 
-> This patch imposes limits and explicitly understands the size of
-> contiguous I/O during issue.  It also will combine contiguous I/O
-> in all circumstances, not just when writeback is requested to be
-> relatively fast.
-> 
-> It is a win on its own, but also lays the groundwork for skip writes to
-> short keys to make the I/O more sequential/contiguous.  It also gets
-> ready to start using blk_*_plug, and to allow issuing of non-contig
-> I/O in parallel if requested by the user (to make use of disk
-> throughput benefits available from higher queue depths).
-> 
-> This patch fixes a previous version where the contiguous information
-> was not calculated properly.
-> 
-> Signed-off-by: Michael Lyle <mlyle@lyle.org>
-> ---
->  drivers/md/bcache/bcache.h    |   6 --
->  drivers/md/bcache/writeback.c | 133 ++++++++++++++++++++++++++++++------------
->  drivers/md/bcache/writeback.h |   3 +
->  3 files changed, 98 insertions(+), 44 deletions(-)
-> 
-> diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-> index eb83be693d60..da803a3b1981 100644
-> --- a/drivers/md/bcache/bcache.h
-> +++ b/drivers/md/bcache/bcache.h
-> @@ -321,12 +321,6 @@ struct cached_dev {
->  		 struct bch_ratelimit		 writeback_rate;
->  		 struct delayed_work		 writeback_rate_update;
->  
-> -		 /*
-> -		  * Internal to the writeback code, so read_dirty() can keep track of
-> -		  * where it's at.
-> -		  */
-> -		 sector_t		 		 last_read;
-> -
->  		 /* Limit number of writeback bios in flight */
->  		 struct semaphore		 in_flight;
->  		 struct task_struct		 *writeback_thread;
-> diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-> index 8deb721c355e..13c2142ea82f 100644
-> --- a/drivers/md/bcache/writeback.c
-> +++ b/drivers/md/bcache/writeback.c
-> @@ -232,10 +232,25 @@ static void read_dirty_submit(struct closure *cl)
->  		 continue_at(cl, write_dirty, io->dc->writeback_write_wq);
->  }
->  
-> +static inline bool keys_contiguous(struct cached_dev *dc,
-> +		 		 struct keybuf_key *first, struct keybuf_key *second)
-> +{
-> +		 if (KEY_INODE(&second->key) != KEY_INODE(&first->key))
-> +		 		 return false;
-> +
-> +		 if (KEY_OFFSET(&second->key) !=
-> +		 		 		 KEY_OFFSET(&first->key) + KEY_SIZE(&first->key))
-> +		 		 return false;
-> +
-> +		 return true;
-> +}
-> +
->  static void read_dirty(struct cached_dev *dc)
->  {
->  		 unsigned delay = 0;
-> -		 struct keybuf_key *w;
-> +		 struct keybuf_key *next, *keys[MAX_WRITEBACKS_IN_PASS], *w;
-> +		 size_t size;
-> +		 int nk, i;
->  		 struct dirty_io *io;
->  		 struct closure cl;
->  
-> @@ -246,45 +261,87 @@ static void read_dirty(struct cached_dev *dc)
->  		  * mempools.
->  		  */
->  
-> -		 while (!kthread_should_stop()) {
-> -
-> -		 		 w = bch_keybuf_next(&dc->writeback_keys);
-> -		 		 if (!w)
-> -		 		 		 break;
-> -
-> -		 		 BUG_ON(ptr_stale(dc->disk.c, &w->key, 0));
-> -
-> -		 		 if (KEY_START(&w->key) != dc->last_read ||
-> -		 		     jiffies_to_msecs(delay) > 50)
-> -		 		 		 while (!kthread_should_stop() && delay)
-> -		 		 		 		 delay = schedule_timeout_interruptible(delay);
-> -
-> -		 		 dc->last_read		 = KEY_OFFSET(&w->key);
-> -
-> -		 		 io = kzalloc(sizeof(struct dirty_io) + sizeof(struct bio_vec)
-> -		 		 		      * DIV_ROUND_UP(KEY_SIZE(&w->key), PAGE_SECTORS),
-> -		 		 		      GFP_KERNEL);
-> -		 		 if (!io)
-> -		 		 		 goto err;
-> -
-> -		 		 w->private		 = io;
-> -		 		 io->dc		 		 = dc;
-> -
-> -		 		 dirty_init(w);
-> -		 		 bio_set_op_attrs(&io->bio, REQ_OP_READ, 0);
-> -		 		 io->bio.bi_iter.bi_sector = PTR_OFFSET(&w->key, 0);
-> -		 		 bio_set_dev(&io->bio, PTR_CACHE(dc->disk.c, &w->key, 0)->bdev);
-> -		 		 io->bio.bi_end_io		 = read_dirty_endio;
-> -
-> -		 		 if (bio_alloc_pages(&io->bio, GFP_KERNEL))
-> -		 		 		 goto err_free;
-> -
-> -		 		 trace_bcache_writeback(&w->key);
-> +		 next = bch_keybuf_next(&dc->writeback_keys);
-> +
-> +		 while (!kthread_should_stop() && next) {
-> +		 		 size = 0;
-> +		 		 nk = 0;
-> +
-> +		 		 do {
-> +		 		 		 BUG_ON(ptr_stale(dc->disk.c, &next->key, 0));
-> +
-> +		 		 		 /*
-> +		 		 		  * Don't combine too many operations, even if they
-> +		 		 		  * are all small.
-> +		 		 		  */
-> +		 		 		 if (nk >= MAX_WRITEBACKS_IN_PASS)
-> +		 		 		 		 break;
-> +
-> +		 		 		 /*
-> +		 		 		  * If the current operation is very large, don't
-> +		 		 		  * further combine operations.
-> +		 		 		  */
-> +		 		 		 if (size >= MAX_WRITESIZE_IN_PASS)
-> +		 		 		 		 break;
-> +
-> +		 		 		 /*
-> +		 		 		  * Operations are only eligible to be combined
-> +		 		 		  * if they are contiguous.
-> +		 		 		  *
-> +		 		 		  * TODO: add a heuristic willing to fire a
-> +		 		 		  * certain amount of non-contiguous IO per pass,
-> +		 		 		  * so that we can benefit from backing device
-> +		 		 		  * command queueing.
-> +		 		 		  */
-> +		 		 		 if (nk != 0 && !keys_contiguous(dc, keys[nk-1], next))
-> +		 		 		 		 break;
-> +
-> +		 		 		 size += KEY_SIZE(&next->key);
-> +		 		 		 keys[nk++] = next;
-> +		 		 } while ((next = bch_keybuf_next(&dc->writeback_keys)));
-> +
-> +		 		 /* Now we have gathered a set of 1..5 keys to write back. */
-> +
-> +		 		 for (i = 0; i < nk; i++) {
-> +		 		 		 w = keys[i];
-> +
-> +		 		 		 io = kzalloc(sizeof(struct dirty_io) +
-> +		 		 		 		      sizeof(struct bio_vec) *
-> +		 		 		 		      DIV_ROUND_UP(KEY_SIZE(&w->key), PAGE_SECTORS),
-> +		 		 		 		      GFP_KERNEL);
-> +		 		 		 if (!io)
-> +		 		 		 		 goto err;
-> +
-> +		 		 		 w->private		 = io;
-> +		 		 		 io->dc		 		 = dc;
-> +
-> +		 		 		 dirty_init(w);
-> +		 		 		 bio_set_op_attrs(&io->bio, REQ_OP_READ, 0);
-> +		 		 		 io->bio.bi_iter.bi_sector = PTR_OFFSET(&w->key, 0);
-> +		 		 		 bio_set_dev(&io->bio,
-> +		 		 		 		     PTR_CACHE(dc->disk.c, &w->key, 0)->bdev);
-> +		 		 		 io->bio.bi_end_io		 = read_dirty_endio;
-> +
-> +		 		 		 if (bio_alloc_pages(&io->bio, GFP_KERNEL))
-> +		 		 		 		 goto err_free;
-> +
-> +		 		 		 trace_bcache_writeback(&w->key);
-> +
-> +		 		 		 down(&dc->in_flight);
-> +
-> +		 		 		 /* We've acquired a semaphore for the maximum
-> +		 		 		  * simultaneous number of writebacks; from here
-> +		 		 		  * everything happens asynchronously.
-> +		 		 		  */
-> +		 		 		 closure_call(&io->cl, read_dirty_submit, NULL, &cl);
-> +		 		 }
->  
-> -		 		 down(&dc->in_flight);
-> -		 		 closure_call(&io->cl, read_dirty_submit, NULL, &cl);
-> +		 		 delay = writeback_delay(dc, size);
->  
-> -		 		 delay = writeback_delay(dc, KEY_SIZE(&w->key));
-> +		 		 while (!kthread_should_stop() && delay) {
-> +		 		 		 schedule_timeout_interruptible(delay);
-> +		 		 		 delay = writeback_delay(dc, 0);
-> +		 		 }
->  		 }
->  
->  		 if (0) {
-> diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
-> index e35421d20d2e..efee2be88df9 100644
-> --- a/drivers/md/bcache/writeback.h
-> +++ b/drivers/md/bcache/writeback.h
-> @@ -4,6 +4,9 @@
->  #define CUTOFF_WRITEBACK		 40
->  #define CUTOFF_WRITEBACK_SYNC		 70
->  
-> +#define MAX_WRITEBACKS_IN_PASS  5
-> +#define MAX_WRITESIZE_IN_PASS   5000		 /* *512b */
-> +
->  static inline uint64_t bcache_dev_sectors_dirty(struct bcache_device *d)
->  {
->  		 uint64_t i, ret = 0;
-> -- 
-> 2.11.0
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bcache" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+$ iostat 1 | grep sdb
+sdb               3.00         0.00        40.00          0         40
+sdb               0.00         0.00         0.00          0          0
+sdb               0.00         0.00         0.00          0          0
+sdb               2.00         0.00        16.00          0         16
+sdb               0.00         0.00         0.00          0          0
+sdb               3.00         0.00        40.00          0         40
+sdb               0.00         0.00         0.00          0          0
+sdb               0.00         0.00         0.00          0          0
+sdb               3.00         0.00        40.00          0         40
+
+So this is proven to be nicely grouping contiguous extents for
+writeback in less frequent, mostly-40k chunks.
+
+Mike
+
+On Wed, Sep 27, 2017 at 12:47 AM, Michael Lyle <mlyle@lyle.org> wrote:
+> Tang--
+>
+> This is a first step towards further stuff I want to do--
+>
+> 1. I want to allow blk_plug-- but to do that, a request needs to know
+> there are subsequent contiguous requests after it when issuing the
+> write.  The new structure allows that.
+> 2. I want to allow tuning to issue multiple requests and control IO
+> priorities for them, so that we can make use of queue depth on backing
+> devices.  The new code structure allows for inserting heuristics to do
+> that very easily.  When 4 operations are issued at a time, latency
+> doesn't suffer very much and throughput can be 30-40% higher.
+> 3. There's a small change to the delay calculation that will allow the
+> actual inner delay controller to be improved to do lower rates for
+> laptops and allow backing disk spindown.
+>
+> But I need more testing and more time to complete those, and there's
+> already a benefit with the current structure.
+>
+> Mike
+>
+> On Wed, Sep 27, 2017 at 12:32 AM,  <tang.junhui@zte.com.cn> wrote:
+>> From: Tang Junhui <tang.junhui@zte.com.cn>
+>>
+>> Hello Mike:
+>>
+>> For the second question, I thinks this modification is somewhat complex,
+>> cannot we do something simple to resolve it? I remember there were some
+>> patches trying to avoid too small writeback rate, Coly, is there any
+>> progress now?
+>>
+>> -------
+>> Tang Junhui
+>>
+>>> Ah-- re #1 -- I was investigating earlier why not as much was combined
+>>> as I thought should be when idle.  This is surely a factor.  Thanks
+>>> for the catch-- KEY_OFFSET is correct.  I will fix and retest.
+>>>
+>>> (Under heavy load, the correct thing still happens, but not under
+>>> light or intermediate load0.
+>>>
+>>> About #2-- I wanted to attain a bounded amount of "combining" of
+>>> operations.  If we have 5 4k extents in a row to dispatch, it seems
+>>> really wasteful to issue them as 5 IOs 60ms apart, which the existing
+>>> code would be willing to do-- I'd rather do a 20k write IO (basically
+>>> the same cost as a 4k write IO) and then sleep 300ms.  It is dependent
+>>> on the elevator/IO scheduler merging the requests.  At the same time,
+>>> I'd rather not combine a really large request.
+>>>
+>>> It would be really neat to blk_plug the backing device during the
+>>> write issuance, but that requires further work.
+>>>
+>>> Thanks
+>>>
+>>> Mike
+>>>
+>>> On Tue, Sep 26, 2017 at 11:51 PM,  <tang.junhui@zte.com.cn> wrote:
+>>> > From: Tang Junhui <tang.junhui@zte.com.cn>
+>>> >
+>>> > Hello Lyle:
+>>> >
+>>> > Two questions:
+>>> > 1) In keys_contiguous(), you judge I/O contiguous in cache device, but not
+>>> > in backing device. I think you should judge it by backing device (remove
+>>> > PTR_CACHE() and use KEY_OFFSET() instead of PTR_OFFSET()?).
+>>> >
+>>> > 2) I did not see you combine samll contiguous I/Os to big I/O, so I think
+>>> > it is useful when writeback rate was low by avoiding single I/O write, but
+>>> > have no sense in high writeback rate, since previously it is also write
+>>> > I/Os asynchronously.
+>>> >
+>>> > -----------
+>>> > Tang Junhui
+>>> >
+>>> >> Previously, there was some logic that attempted to immediately issue
+>>> >> writeback of backing-contiguous blocks when the writeback rate was
+>>> >> fast.
+>>> >>
+>>> >> The previous logic did not have any limits on the aggregate size it
+>>> >> would issue, nor the number of keys it would combine at once.  It
+>>> >> would also discard the chance to do a contiguous write when the
+>>> >> writeback rate was low-- e.g. at "background" writeback of target
+>>> >> rate = 8, it would not combine two adjacent 4k writes and would
+>>> >> instead seek the disk twice.
+>>> >>
+>>> >> This patch imposes limits and explicitly understands the size of
+>>> >> contiguous I/O during issue.  It also will combine contiguous I/O
+>>> >> in all circumstances, not just when writeback is requested to be
+>>> >> relatively fast.
+>>> >>
+>>> >> It is a win on its own, but also lays the groundwork for skip writes to
+>>> >> short keys to make the I/O more sequential/contiguous.
+>>> >>
+>>> >> Signed-off-by: Michael Lyle <mlyle@lyle.org>
+>>> >> ---
+>>> >>  drivers/md/bcache/bcache.h    |   6 --
+>>> >>  drivers/md/bcache/writeback.c | 131 ++++++++++++++++++++++++++++++------------
+>>> >>  2 files changed, 93 insertions(+), 44 deletions(-)
+>>> >>
+>>> >> diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+>>> >> index eb83be693d60..da803a3b1981 100644
+>>> >> --- a/drivers/md/bcache/bcache.h
+>>> >> +++ b/drivers/md/bcache/bcache.h
+>>> >> @@ -321,12 +321,6 @@ struct cached_dev {
+>>> >>                struct bch_ratelimit            writeback_rate;
+>>> >>                struct delayed_work             writeback_rate_update;
+>>> >>
+>>> >> -              /*
+>>> >> -               * Internal to the writeback code, so read_dirty() can keep track of
+>>> >> -               * where it's at.
+>>> >> -               */
+>>> >> -              sector_t                                last_read;
+>>> >> -
+>>> >>                /* Limit number of writeback bios in flight */
+>>> >>                struct semaphore                in_flight;
+>>> >>                struct task_struct              *writeback_thread;
+>>> >> diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+>>> >> index 0b7c89813635..cf29c44605b9 100644
+>>> >> --- a/drivers/md/bcache/writeback.c
+>>> >> +++ b/drivers/md/bcache/writeback.c
+>>> >> @@ -229,10 +229,26 @@ static void read_dirty_submit(struct closure *cl)
+>>> >>                continue_at(cl, write_dirty, io->dc->writeback_write_wq);
+>>> >>  }
+>>> >>
+>>> >> +static inline bool keys_contiguous(struct cached_dev *dc,
+>>> >> +                              struct keybuf_key *first, struct keybuf_key *second)
+>>> >> +{
+>>> >> +              if (PTR_CACHE(dc->disk.c, &second->key, 0)->bdev !=
+>>> >> +                                              PTR_CACHE(dc->disk.c, &first->key, 0)->bdev)
+>>> >> +                              return false;
+>>> >> +
+>>> >> +              if (PTR_OFFSET(&second->key, 0) !=
+>>> >> +                                              (PTR_OFFSET(&first->key, 0) + KEY_SIZE(&first->key)))
+>>> >> +                              return false;
+>>> >> +
+>>> >> +              return true;
+>>> >> +}
+>>> >> +
+>>> >>  static void read_dirty(struct cached_dev *dc)
+>>> >>  {
+>>> >>                unsigned delay = 0;
+>>> >> -              struct keybuf_key *w;
+>>> >> +              struct keybuf_key *next, *keys[5], *w;
+>>> >> +              size_t size;
+>>> >> +              int nk, i;
+>>> >>                struct dirty_io *io;
+>>> >>                struct closure cl;
+>>> >>
+>>> >> @@ -243,45 +259,84 @@ static void read_dirty(struct cached_dev *dc)
+>>> >>                 * mempools.
+>>> >>                 */
+>>> >>
+>>> >> -              while (!kthread_should_stop()) {
+>>> >> -
+>>> >> -                              w = bch_keybuf_next(&dc->writeback_keys);
+>>> >> -                              if (!w)
+>>> >> -                                              break;
+>>> >> -
+>>> >> -                              BUG_ON(ptr_stale(dc->disk.c, &w->key, 0));
+>>> >> -
+>>> >> -                              if (KEY_START(&w->key) != dc->last_read ||
+>>> >> -                                  jiffies_to_msecs(delay) > 50)
+>>> >> -                                              while (!kthread_should_stop() && delay)
+>>> >> -                                                              delay = schedule_timeout_interruptible(delay);
+>>> >> -
+>>> >> -                              dc->last_read           = KEY_OFFSET(&w->key);
+>>> >> -
+>>> >> -                              io = kzalloc(sizeof(struct dirty_io) + sizeof(struct bio_vec)
+>>> >> -                                                   * DIV_ROUND_UP(KEY_SIZE(&w->key), PAGE_SECTORS),
+>>> >> -                                                   GFP_KERNEL);
+>>> >> -                              if (!io)
+>>> >> -                                              goto err;
+>>> >> -
+>>> >> -                              w->private              = io;
+>>> >> -                              io->dc                          = dc;
+>>> >> -
+>>> >> -                              dirty_init(w);
+>>> >> -                              bio_set_op_attrs(&io->bio, REQ_OP_READ, 0);
+>>> >> -                              io->bio.bi_iter.bi_sector = PTR_OFFSET(&w->key, 0);
+>>> >> -                              bio_set_dev(&io->bio, PTR_CACHE(dc->disk.c, &w->key, 0)->bdev);
+>>> >> -                              io->bio.bi_end_io               = read_dirty_endio;
+>>> >> -
+>>> >> -                              if (bio_alloc_pages(&io->bio, GFP_KERNEL))
+>>> >> -                                              goto err_free;
+>>> >> -
+>>> >> -                              trace_bcache_writeback(&w->key);
+>>> >> +              next = bch_keybuf_next(&dc->writeback_keys);
+>>> >> +
+>>> >> +              while (!kthread_should_stop() && next) {
+>>> >> +                              size = 0;
+>>> >> +                              nk = 0;
+>>> >> +
+>>> >> +                              do {
+>>> >> +                                              BUG_ON(ptr_stale(dc->disk.c, &next->key, 0));
+>>> >> +
+>>> >> +                                              /* Don't combine too many operations, even if they
+>>> >> +                                               * are all small.
+>>> >> +                                               */
+>>> >> +                                              if (nk >= 5)
+>>> >> +                                                              break;
+>>> >> +
+>>> >> +                                              /* If the current operation is very large, don't
+>>> >> +                                               * further combine operations.
+>>> >> +                                               */
+>>> >> +                                              if (size > 5000)
+>>> >> +                                                              break;
+>>> >> +
+>>> >> +                                              /* Operations are only eligible to be combined
+>>> >> +                                               * if they are contiguous.
+>>> >> +                                               *
+>>> >> +                                               * TODO: add a heuristic willing to fire a
+>>> >> +                                               * certain amount of non-contiguous IO per pass,
+>>> >> +                                               * so that we can benefit from backing device
+>>> >> +                                               * command queueing.
+>>> >> +                                               */
+>>> >> +                                              if (nk != 0 && !keys_contiguous(dc, keys[nk-1], next))
+>>> >> +                                                              break;
+>>> >> +
+>>> >> +                                              size += KEY_SIZE(&next->key);
+>>> >> +                                              keys[nk++] = next;
+>>> >> +                              } while ((next = bch_keybuf_next(&dc->writeback_keys)));
+>>> >> +
+>>> >> +                              /* Now we have gathered a set of 1..5 keys to write back. */
+>>> >> +
+>>> >> +                              for (i = 0; i < nk; i++) {
+>>> >> +                                              w = keys[i];
+>>> >> +
+>>> >> +                                              io = kzalloc(sizeof(struct dirty_io) +
+>>> >> +                                                                   sizeof(struct bio_vec) *
+>>> >> +                                                                   DIV_ROUND_UP(KEY_SIZE(&w->key), PAGE_SECTORS),
+>>> >> +                                                                   GFP_KERNEL);
+>>> >> +                                              if (!io)
+>>> >> +                                                              goto err;
+>>> >> +
+>>> >> +                                              w->private              = io;
+>>> >> +                                              io->dc                          = dc;
+>>> >> +
+>>> >> +                                              dirty_init(w);
+>>> >> +                                              bio_set_op_attrs(&io->bio, REQ_OP_READ, 0);
+>>> >> +                                              io->bio.bi_iter.bi_sector = PTR_OFFSET(&w->key, 0);
+>>> >> +                                              bio_set_dev(&io->bio,
+>>> >> +                                                                  PTR_CACHE(dc->disk.c, &w->key, 0)->bdev);
+>>> >> +                                              io->bio.bi_end_io               = read_dirty_endio;
+>>> >> +
+>>> >> +                                              if (bio_alloc_pages(&io->bio, GFP_KERNEL))
+>>> >> +                                                              goto err_free;
+>>> >> +
+>>> >> +                                              trace_bcache_writeback(&w->key);
+>>> >> +
+>>> >> +                                              down(&dc->in_flight);
+>>> >> +
+>>> >> +                                              /* We've acquired a semaphore for the maximum
+>>> >> +                                               * simultaneous number of writebacks; from here
+>>> >> +                                               * everything happens asynchronously.
+>>> >> +                                               */
+>>> >> +                                              closure_call(&io->cl, read_dirty_submit, NULL, &cl);
+>>> >> +                              }
+>>> >>
+>>> >> -                              down(&dc->in_flight);
+>>> >> -                              closure_call(&io->cl, read_dirty_submit, NULL, &cl);
+>>> >> +                              delay = writeback_delay(dc, size);
+>>> >>
+>>> >> -                              delay = writeback_delay(dc, KEY_SIZE(&w->key));
+>>> >> +                              while (!kthread_should_stop() && delay) {
+>>> >> +                                              schedule_timeout_interruptible(delay);
+>>> >> +                                              delay = writeback_delay(dc, 0);
+>>> >> +                              }
+>>> >>                }
+>>> >>
+>>> >>                if (0) {
+>>> >> --
+>>> > --
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bcache" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
