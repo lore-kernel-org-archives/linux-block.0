@@ -1,47 +1,42 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f44.google.com ([74.125.82.44]:46721 "EHLO
-        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751787AbdINKeQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Sep 2017 06:34:16 -0400
-Received: by mail-wm0-f44.google.com with SMTP id i189so10116230wmf.1
-        for <linux-block@vger.kernel.org>; Thu, 14 Sep 2017 03:34:15 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 0/5] lightnvm: pblk: audit mempool usage
-Date: Thu, 14 Sep 2017 12:33:42 +0200
-Message-Id: <1505385227-28706-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <i@coly.li>
+Subject: Re: [PATCH 1/1] bcache: use llist_for_each_entry_safe() in
+ __closure_wake_up()
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Michael Lyle <mlyle@lyle.org>, linux-bcache@vger.kernel.org,
+ linux-block@vger.kernel.org
+References: <20170926095412.74028-1-colyli@suse.de>
+ <20170926095412.74028-2-colyli@suse.de>
+ <4c14e77e-577f-b7b7-d63a-b4b3a4d9e757@coly.li>
+ <5986f13b-013d-5252-fc70-51dcd40e7335@kernel.dk>
+ <CAJ+L6qeQu0A17gGb1RVu8g_JvzcvJ2uSDj+9vC-hsUEFqM-fAw@mail.gmail.com>
+ <90e74638-c396-a04f-da5c-72ae387f677d@kernel.dk>
+From: Coly Li <i@coly.li>
+Message-ID: <4d5dbd25-e1f3-9dc1-1124-26ba9bd7d8c1@coly.li>
+Date: Thu, 28 Sep 2017 08:46:04 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <90e74638-c396-a04f-da5c-72ae387f677d@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-As suggested by Jens [1], I audited all mempools on pblk.
+On 2017/9/28 上午4:52, Jens Axboe wrote:
+> On 09/27/2017 10:48 PM, Michael Lyle wrote:
+>> Jens--
+>>
+>> I think it's a race condition-- the individual closures remain valid.
+>> It's just that the list element has different meanings-- it's either a
+>> list actively being used to wake, or a linkage on one of several lists
+>> that is being used to await wake.  If a closure goes back to wait very
+>> quickly after being woken, it can end up connecting its new wait-list
+>> with the being-woken list.
+> 
+> Reading it a second time, looks like you are right. OK, then let's just
+> queue it up as-is, I'll add the Fixes line this time.
+> 
+Hi Jens,
 
-This patche series (i) fixes bad mempool allocations that did not
-guarantee forward progress and downsizes the sizes of some overused
-mempools, (ii) removes unnecessary checks, and (iii) eliminates some
-mempools that where introduced in early versions of pblk.
+Copied, next time for similar situation, Fixes will be there.
 
-[1] https://patchwork.kernel.org/patch/9940973/
-
-Javier González (5):
-  lightnvm: pblk: fix min size for page mempool
-  lightnvm: pblk: simplify work_queue mempool
-  lightnvm: pblk: decouple read/erase mempools
-  lightnvm: pblk: do not use a mempool for line bitmaps
-  lightnvm: pblk: remove checks on mempool alloc.
-
- drivers/lightnvm/pblk-core.c     | 61 ++++++++++----------------
- drivers/lightnvm/pblk-gc.c       | 32 +++++++-------
- drivers/lightnvm/pblk-init.c     | 94 +++++++++++++++++-----------------------
- drivers/lightnvm/pblk-read.c     | 10 +----
- drivers/lightnvm/pblk-recovery.c | 37 ++++------------
- drivers/lightnvm/pblk-write.c    | 32 ++++----------
- drivers/lightnvm/pblk.h          | 21 +++++----
- 7 files changed, 106 insertions(+), 181 deletions(-)
+Thanks for doing this.
 
 -- 
-2.7.4
+Coly Li
