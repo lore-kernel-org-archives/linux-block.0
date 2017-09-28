@@ -1,40 +1,37 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:60868 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751636AbdIUUBS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Sep 2017 16:01:18 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: Coly Li <colyli@suse.de>
-Subject: [PATCH] bcache: fix a comments typo in bch_alloc_sectors()
-Date: Fri, 22 Sep 2017 04:01:14 +0800
-Message-Id: <20170921200114.54014-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Jisheng.Zhang@synaptics.com>
+Date: Thu, 28 Sep 2017 14:00:44 +0800
+From: Jisheng Zhang <Jisheng.Zhang@synaptics.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Adrian Hunter <adrian.hunter@intel.com>, "linux-mmc@vger.kernel.org"
+ <linux-mmc@vger.kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
+ linux-block <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwig <hch@lst.de>, Arnd Bergmann <arnd@arndb.de>, Bartlomiej
+ Zolnierkiewicz <b.zolnierkie@samsung.com>, Paolo Valente
+ <paolo.valente@linaro.org>, Avri Altman <Avri.Altman@sandisk.com>, Tomas
+ Winkler <tomas.winkler@intel.com>
+Subject: Re: [PATCH 1/2 v6] mmc: block: Convert RPMB to a character device
+Message-ID: <20170928140044.1de53a75@xhacker.debian>
+In-Reply-To: <CACRpkdabXNgCz+mtOOAZR1OqbCT0VgpxKT=FPh_99DTnsnCcSQ@mail.gmail.com>
+References: <20170920080201.32438-1-linus.walleij@linaro.org>
+	<b4a75994-1556-56ac-499c-8527988ee70f@intel.com>
+	<CACRpkdabXNgCz+mtOOAZR1OqbCT0VgpxKT=FPh_99DTnsnCcSQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Return-Path: Jisheng.Zhang@synaptics.com
+List-ID: <linux-block@vger.kernel.org>
 
-Code comments in alloc.c:bch_alloc_sectors() mentions a function
-name find_data_bucket(), the correct function name should be
-pick_data_bucket() indeed. bch_alloc_sectors() is a quite important
-function in bcache allocation code, fixing the typo may help
-other people to have less confusion.
+On Wed, 27 Sep 2017 21:45:58 +0200 Linus Walleij wrote:
 
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/alloc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> On Wed, Sep 27, 2017 at 1:35 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
+> >
+> > BUG when removing, fixed by reverting this patch.
+> >
+> > [  346.548512] mmc1: card 0001 removed
+> > [  346.552782] BUG: unable to handle kernel NULL pointer dereference at 0000000000000070  
+> 
+> How did you achieve this? I need to reproduce it.
+> 
+> RPMB is only available on eMMC cards and I don't have a removable eMMC
+> card since by definition they are soldered on.
 
-diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
-index cacbe2dbd5c3..071ff28be912 100644
---- a/drivers/md/bcache/alloc.c
-+++ b/drivers/md/bcache/alloc.c
-@@ -600,7 +600,7 @@ bool bch_alloc_sectors(struct cache_set *c, struct bkey *k, unsigned sectors,
- 
- 	/*
- 	 * If we had to allocate, we might race and not need to allocate the
--	 * second time we call find_data_bucket(). If we allocated a bucket but
-+	 * second time we call pick_data_bucket(). If we allocated a bucket but
- 	 * didn't use it, drop the refcount bch_bucket_alloc_set() took:
- 	 */
- 	if (KEY_PTRS(&alloc.key))
--- 
-2.13.5
+Maybe unbind the sdhci host.
