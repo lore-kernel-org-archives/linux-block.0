@@ -1,33 +1,31 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:48515 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752448AbdI2XAm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Sep 2017 19:00:42 -0400
-Date: Fri, 29 Sep 2017 17:00:07 -0600
-From: Keith Busch <keith.busch@intel.com>
-To: Martin Wilck <mwilck@suse.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>, linux-nvme@lists.infradead.org,
-        Martin Wilck <mwilck@suse.de>
-Subject: Re: [PATCH 2/2] nvme: use device_add_disk_with_groups()
-Message-ID: <20170929230006.GQ8463@localhost.localdomain>
+Return-Path: <Steve.Schremmer@netapp.com>
+From: "Schremmer, Steven" <Steve.Schremmer@netapp.com>
+To: Martin Wilck <mwilck@suse.com>, Jens Axboe <axboe@kernel.dk>, "Christoph
+ Hellwig" <hch@lst.de>, Johannes Thumshirn <jthumshirn@suse.de>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Martin Wilck
+	<mwilck@suse.de>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, Hannes Reinecke <hare@suse.de>
+Subject: RE: [PATCH 2/2] nvme: use device_add_disk_with_groups()
+Date: Fri, 29 Sep 2017 19:27:57 +0000
+Message-ID: <BN6PR06MB2481721314222F0625734DB48C7E0@BN6PR06MB2481.namprd06.prod.outlook.com>
 References: <20170928193637.24707-1-mwilck@suse.com>
  <20170928193637.24707-2-mwilck@suse.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20170928193637.24707-2-mwilck@suse.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Return-Path: Steve.Schremmer@netapp.com
+List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Sep 28, 2017 at 09:36:37PM +0200, Martin Wilck wrote:
-> By using device_add_disk_with_groups(), we can avoid the race
-> condition with udev rule processing, because no udev event will
-> be triggered before all attributes are available.
-> 
-> Signed-off-by: Martin Wilck <mwilck@suse.com>
+> From: Linux-nvme [mailto:linux-nvme-bounces@lists.infradead.org] On Behal=
+f Of Martin Wilck
+> Sent: Thursday, September 28, 2017 2:37 PM
+> To: Jens Axboe <axboe@kernel.dk>; Christoph Hellwig <hch@lst.de>; Johanne=
+s Thumshirn <jthumshirn@suse.de>
+> Cc: linux-block@vger.kernel.org; Martin Wilck <mwilck@suse.de>; linux-ker=
+nel@vger.kernel.org; linux-nvme@lists.infradead.org;
+> Hannes Reinecke <hare@suse.de>
+> Subject: [PATCH 2/2] nvme: use device_add_disk_with_groups()
+>=20
 
-Looks good.
-
-Reviewed-by: Keith Busch <keith.busch@intel.com>
+Tested-by: Steve Schremmer <steve.schremmer@netapp.com>
