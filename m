@@ -1,45 +1,33 @@
-Return-Path: <zhangweiping@didichuxing.com>
-Date: Sat, 30 Sep 2017 01:09:57 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>
-Subject: [PATCH] null_blk: add "no_sched" module parameter
-Message-ID: <20170929170951.GA18535@localhost.didichuxing.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga03.intel.com ([134.134.136.65]:48515 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752448AbdI2XAm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 29 Sep 2017 19:00:42 -0400
+Date: Fri, 29 Sep 2017 17:00:07 -0600
+From: Keith Busch <keith.busch@intel.com>
+To: Martin Wilck <mwilck@suse.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>, linux-nvme@lists.infradead.org,
+        Martin Wilck <mwilck@suse.de>
+Subject: Re: [PATCH 2/2] nvme: use device_add_disk_with_groups()
+Message-ID: <20170929230006.GQ8463@localhost.localdomain>
+References: <20170928193637.24707-1-mwilck@suse.com>
+ <20170928193637.24707-2-mwilck@suse.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Return-Path: zhangweiping@didichuxing.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170928193637.24707-2-mwilck@suse.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-add an option that disable io scheduler for null block device.
+On Thu, Sep 28, 2017 at 09:36:37PM +0200, Martin Wilck wrote:
+> By using device_add_disk_with_groups(), we can avoid the race
+> condition with udev rule processing, because no udev event will
+> be triggered before all attributes are available.
+> 
+> Signed-off-by: Martin Wilck <mwilck@suse.com>
 
-Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
----
- drivers/block/null_blk.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Looks good.
 
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index bd92286..3c63863 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -154,6 +154,10 @@ enum {
- 	NULL_Q_MQ		= 2,
- };
- 
-+static int g_no_sched;
-+module_param_named(no_sched, g_no_sched, int, S_IRUGO);
-+MODULE_PARM_DESC(no_sched, "No io scheduler");
-+
- static int g_submit_queues = 1;
- module_param_named(submit_queues, g_submit_queues, int, S_IRUGO);
- MODULE_PARM_DESC(submit_queues, "Number of submission queues");
-@@ -1753,7 +1757,7 @@ static int null_init_tag_set(struct nullb *nullb, struct blk_mq_tag_set *set)
- 						g_hw_queue_depth;
- 	set->numa_node = nullb ? nullb->dev->home_node : g_home_node;
- 	set->cmd_size	= sizeof(struct nullb_cmd);
--	set->flags = BLK_MQ_F_SHOULD_MERGE;
-+	set->flags = g_no_sched ? BLK_MQ_F_NO_SCHED : BLK_MQ_F_SHOULD_MERGE;
- 	set->driver_data = NULL;
- 
- 	if ((nullb && nullb->dev->blocking) || g_blocking)
--- 
-2.9.4
+Reviewed-by: Keith Busch <keith.busch@intel.com>
