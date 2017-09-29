@@ -1,118 +1,34 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from server.coly.li ([162.144.45.48]:42980 "EHLO server.coly.li"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752652AbdI3CZe (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Sep 2017 22:25:34 -0400
-Subject: Re: [PATCH 4/5] bcache: writeback: collapse contiguous IO better
-To: tang.junhui@zte.com.cn, mlyle@lyle.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-References: <1506497553-12552-1-git-send-email-tang.junhui@zte.com.cn>
-From: Coly Li <i@coly.li>
-Message-ID: <477dc501-bbb3-f864-c637-1f19f787448a@coly.li>
-Date: Sat, 30 Sep 2017 10:25:29 +0800
+Received: from mail-qt0-f169.google.com ([209.85.216.169]:51893 "EHLO
+        mail-qt0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750709AbdI2E1a (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 29 Sep 2017 00:27:30 -0400
+Received: by mail-qt0-f169.google.com with SMTP id q4so207460qtq.8
+        for <linux-block@vger.kernel.org>; Thu, 28 Sep 2017 21:27:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1506497553-12552-1-git-send-email-tang.junhui@zte.com.cn>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <e90f6574-89b5-34f8-c05c-f7e6199c1f92@coly.li>
+References: <1506656271-22665-1-git-send-email-tang.junhui@zte.com.cn>
+ <CAJ+L6qeyOHvNUZzWrukGWAGqkmUza0S49DYEm+H_VgpPYKjwZA@mail.gmail.com> <e90f6574-89b5-34f8-c05c-f7e6199c1f92@coly.li>
+From: Michael Lyle <mlyle@lyle.org>
+Date: Thu, 28 Sep 2017 21:27:28 -0700
+Message-ID: <CAJ+L6qcGAFUjrPh-CpdZpXd=SODYZRMtuLjqFHnwGjiXb_XpaQ@mail.gmail.com>
+Subject: Re: [PATCH 4/5] bcache: writeback: collapse contiguous IO better
+To: Coly Li <i@coly.li>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 2017/9/27 下午3:32, tang.junhui@zte.com.cn wrote:
-> From: Tang Junhui <tang.junhui@zte.com.cn>
-> 
-> Hello Mike:
-> 
-> For the second question, I thinks this modification is somewhat complex, 
-> cannot we do something simple to resolve it? I remember there were some
-> patches trying to avoid too small writeback rate, Coly, is there any 
-> progress now?
-> 
-Junhui,
+Ah.  I will copy linux-block in the future, then.  Thanks! -mpl
 
-That patch works well, but before I solve the latency of calculating
-dirty stripe numbers, I won't push it upstream so far.
-
-This patch does not conflict with my max-writeback-rate-when-idle, this
-patch tries to fetch more dirty keys from cache device which are
-continuous on cached device, and assume they can be continuously written
-back to cached device.
-
-For the above purpose, if writeback_rate is high, dc->last_read just
-works well. But when dc->writeback_rate is low, e.g. 8, event
-KEY_START(&w->key) == dc->last_read, the continuous key will only be
-submit in next delay cycle. I feel Micheal wants to make larger
-writeback I/O and delay more, then backing cached device may be woke up
-less chance.
-
-This policy only works better then current dc->last_read when
-writeback_rate is low, that's say, when front write I/O is low or no
-front write. I hesitate whether it is worthy to modify general writeback
-logic for it.
-
-
-> -------
-> Tang Junhui
->                        
->> Ah-- re #1 -- I was investigating earlier why not as much was combined
->> as I thought should be when idle.  This is surely a factor.  Thanks
->> for the catch-- KEY_OFFSET is correct.  I will fix and retest.
->>
->> (Under heavy load, the correct thing still happens, but not under
->> light or intermediate load0.
->>
->> About #2-- I wanted to attain a bounded amount of "combining" of
->> operations.  If we have 5 4k extents in a row to dispatch, it seems
->> really wasteful to issue them as 5 IOs 60ms apart, which the existing
->> code would be willing to do-- I'd rather do a 20k write IO (basically
->> the same cost as a 4k write IO) and then sleep 300ms.  It is dependent
->> on the elevator/IO scheduler merging the requests.  At the same time,
->> I'd rather not combine a really large request.
->>
->> It would be really neat to blk_plug the backing device during the
->> write issuance, but that requires further work.
->>
->> Thanks
->>
->> Mike
->>
->> On Tue, Sep 26, 2017 at 11:51 PM,  <tang.junhui@zte.com.cn> wrote:
->>> From: Tang Junhui <tang.junhui@zte.com.cn>
->>>
->>> Hello Lyle:
->>>
->>> Two questions:
->>> 1) In keys_contiguous(), you judge I/O contiguous in cache device, but not
->>> in backing device. I think you should judge it by backing device (remove
->>> PTR_CACHE() and use KEY_OFFSET() instead of PTR_OFFSET()?).
->>>
->>> 2) I did not see you combine samll contiguous I/Os to big I/O, so I think
->>> it is useful when writeback rate was low by avoiding single I/O write, but
->>> have no sense in high writeback rate, since previously it is also write
->>> I/Os asynchronously.
->>>
->>> -----------
->>> Tang Junhui
->>>
->>>> Previously, there was some logic that attempted to immediately issue
->>>> writeback of backing-contiguous blocks when the writeback rate was
->>>> fast.
->>>>
->>>> The previous logic did not have any limits on the aggregate size it
->>>> would issue, nor the number of keys it would combine at once.  It
->>>> would also discard the chance to do a contiguous write when the
->>>> writeback rate was low-- e.g. at "background" writeback of target
->>>> rate = 8, it would not combine two adjacent 4k writes and would
->>>> instead seek the disk twice.
->>>>
->>>> This patch imposes limits and explicitly understands the size of
->>>> contiguous I/O during issue.  It also will combine contiguous I/O
->>>> in all circumstances, not just when writeback is requested to be
->>>> relatively fast.
->>>>
->>>> It is a win on its own, but also lays the groundwork for skip writes to
->>>> short keys to make the I/O more sequential/contiguous.
->>>>
->>>> Signed-off-by: Michael Lyle <mlyle@lyle.org>
-[snip code]
-
--- 
-Coly Li
+On Thu, Sep 28, 2017 at 9:22 PM, Coly Li <i@coly.li> wrote:
+> Oh, it is because Christoph Hellwig suggested to Cc linux-block when
+> posting bcache patches to linux-bcache list, then patches may have more
+> eyes on them.
+>
+> Thanks.
+>
+> Coly Li
+>
