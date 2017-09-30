@@ -1,77 +1,166 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:50458 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752998AbdI3Lcc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Sep 2017 07:32:32 -0400
+Return-Path: <linux-scsi-owner@vger.kernel.org>
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
 Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
         Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 7/8] blk-mq-sched: refactor blk_mq_sched_try_merge()
-Date: Sat, 30 Sep 2017 19:26:54 +0800
-Message-Id: <20170930112655.31451-8-ming.lei@redhat.com>
-In-Reply-To: <20170930112655.31451-1-ming.lei@redhat.com>
-References: <20170930112655.31451-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Cathy Avery <cavery@redhat.com>,
+        Martin Steigerwald <martin@lichtvoll.de>,
+        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V7 3/6] block: pass flags to blk_queue_enter()
+Date: Sat, 30 Sep 2017 14:12:11 +0800
+Message-Id: <20170930061214.10622-4-ming.lei@redhat.com>
+In-Reply-To: <20170930061214.10622-1-ming.lei@redhat.com>
+References: <20170930061214.10622-1-ming.lei@redhat.com>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-This patch introduces one function __blk_mq_try_merge()
-which will be resued for bio merge to sw queue in
-the following patch.
-
-No functional change.
+We need to pass PREEMPT flags to blk_queue_enter()
+for allocating request with RQF_PREEMPT in the
+following patch.
 
 Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Tested-by: Tom Nguyen <tom81094@gmail.com>
-Tested-by: Paolo Valente <paolo.valente@linaro.org>
-Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+Tested-by: Martin Steigerwald <martin@lichtvoll.de>
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq-sched.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+ block/blk-core.c       | 10 ++++++----
+ block/blk-mq.c         |  5 +++--
+ block/blk-timeout.c    |  2 +-
+ fs/block_dev.c         |  4 ++--
+ include/linux/blkdev.h |  7 ++++++-
+ 5 files changed, 18 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 8c09959bc0d0..a58f4746317c 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -222,12 +222,11 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	}
+diff --git a/block/blk-core.c b/block/blk-core.c
+index a5011c824ac6..7d5040a6d5a4 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -766,7 +766,7 @@ struct request_queue *blk_alloc_queue(gfp_t gfp_mask)
  }
+ EXPORT_SYMBOL(blk_alloc_queue);
  
--bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
--			    struct request **merged_request)
-+static bool __blk_mq_try_merge(struct request_queue *q,
-+		struct bio *bio, struct request **merged_request,
-+		struct request *rq, enum elv_merge type)
+-int blk_queue_enter(struct request_queue *q, bool nowait)
++int blk_queue_enter(struct request_queue *q, unsigned flags)
  {
--	struct request *rq;
--
--	switch (elv_merge(q, &rq, bio)) {
-+	switch (type) {
- 	case ELEVATOR_BACK_MERGE:
- 		if (!blk_mq_sched_allow_merge(q, rq, bio))
- 			return false;
-@@ -250,6 +249,15 @@ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
- 		return false;
- 	}
- }
+ 	while (true) {
+ 		int ret;
+@@ -774,7 +774,7 @@ int blk_queue_enter(struct request_queue *q, bool nowait)
+ 		if (percpu_ref_tryget_live(&q->q_usage_counter))
+ 			return 0;
+ 
+-		if (nowait)
++		if (flags & BLK_REQ_NOWAIT)
+ 			return -EBUSY;
+ 
+ 		/*
+@@ -1408,7 +1408,8 @@ static struct request *blk_old_get_request(struct request_queue *q,
+ 	/* create ioc upfront */
+ 	create_io_context(gfp_mask, q->node);
+ 
+-	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM));
++	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM) ?
++			BLK_REQ_NOWAIT : 0);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 	spin_lock_irq(q->queue_lock);
+@@ -2215,7 +2216,8 @@ blk_qc_t generic_make_request(struct bio *bio)
+ 	do {
+ 		struct request_queue *q = bio->bi_disk->queue;
+ 
+-		if (likely(blk_queue_enter(q, bio->bi_opf & REQ_NOWAIT) == 0)) {
++		if (likely(blk_queue_enter(q, (bio->bi_opf & REQ_NOWAIT) ?
++						BLK_REQ_NOWAIT : 0) == 0)) {
+ 			struct bio_list lower, same;
+ 
+ 			/* Create a fresh bio_list for all subordinate requests */
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 10c1f49f663d..45bff90e08f7 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -384,7 +384,8 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ 	struct request *rq;
+ 	int ret;
+ 
+-	ret = blk_queue_enter(q, flags & BLK_MQ_REQ_NOWAIT);
++	ret = blk_queue_enter(q, (flags & BLK_MQ_REQ_NOWAIT) ?
++			BLK_REQ_NOWAIT : 0);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 
+@@ -423,7 +424,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ 	if (hctx_idx >= q->nr_hw_queues)
+ 		return ERR_PTR(-EIO);
+ 
+-	ret = blk_queue_enter(q, true);
++	ret = blk_queue_enter(q, BLK_REQ_NOWAIT);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 
+diff --git a/block/blk-timeout.c b/block/blk-timeout.c
+index 17ec83bb0900..e803106a5e5b 100644
+--- a/block/blk-timeout.c
++++ b/block/blk-timeout.c
+@@ -134,7 +134,7 @@ void blk_timeout_work(struct work_struct *work)
+ 	struct request *rq, *tmp;
+ 	int next_set = 0;
+ 
+-	if (blk_queue_enter(q, true))
++	if (blk_queue_enter(q, BLK_REQ_NOWAIT))
+ 		return;
+ 	spin_lock_irqsave(q->queue_lock, flags);
+ 
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 93d088ffc05c..98cf2d7ee9d3 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -674,7 +674,7 @@ int bdev_read_page(struct block_device *bdev, sector_t sector,
+ 	if (!ops->rw_page || bdev_get_integrity(bdev))
+ 		return result;
+ 
+-	result = blk_queue_enter(bdev->bd_queue, false);
++	result = blk_queue_enter(bdev->bd_queue, 0);
+ 	if (result)
+ 		return result;
+ 	result = ops->rw_page(bdev, sector + get_start_sect(bdev), page, false);
+@@ -710,7 +710,7 @@ int bdev_write_page(struct block_device *bdev, sector_t sector,
+ 
+ 	if (!ops->rw_page || bdev_get_integrity(bdev))
+ 		return -EOPNOTSUPP;
+-	result = blk_queue_enter(bdev->bd_queue, false);
++	result = blk_queue_enter(bdev->bd_queue, 0);
+ 	if (result)
+ 		return result;
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 02fa42d24b52..127f64c7012c 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -858,6 +858,11 @@ enum {
+ 	BLKPREP_INVALID,	/* invalid command, kill, return -EREMOTEIO */
+ };
+ 
++/* passed to blk_queue_enter */
++enum {
++	BLK_REQ_NOWAIT = (1 << 0),
++};
 +
-+bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
-+		struct request **merged_request)
-+{
-+	struct request *rq;
-+	enum elv_merge type = elv_merge(q, &rq, bio);
-+
-+	return __blk_mq_try_merge(q, bio, merged_request, rq, type);
-+}
- EXPORT_SYMBOL_GPL(blk_mq_sched_try_merge);
+ extern unsigned long blk_max_low_pfn, blk_max_pfn;
  
  /*
+@@ -963,7 +968,7 @@ extern int scsi_cmd_ioctl(struct request_queue *, struct gendisk *, fmode_t,
+ extern int sg_scsi_ioctl(struct request_queue *, struct gendisk *, fmode_t,
+ 			 struct scsi_ioctl_command __user *);
+ 
+-extern int blk_queue_enter(struct request_queue *q, bool nowait);
++extern int blk_queue_enter(struct request_queue *q, unsigned flags);
+ extern void blk_queue_exit(struct request_queue *q);
+ extern void blk_start_queue(struct request_queue *q);
+ extern void blk_start_queue_async(struct request_queue *q);
 -- 
 2.9.5
