@@ -1,107 +1,178 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:49012 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752795AbdI3Lbf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 Sep 2017 07:31:35 -0400
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
 Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
         Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Cathy Avery <cavery@redhat.com>,
-        Martin Steigerwald <martin@lichtvoll.de>,
-        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
-        Ming Lei <ming.lei@redhat.com>, stable@vger.kernel.org,
-        Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V7 6/6] SCSI: set block queue at preempt only when SCSI device is put into quiesce
-Date: Sat, 30 Sep 2017 14:12:14 +0800
-Message-Id: <20170930061214.10622-7-ming.lei@redhat.com>
-In-Reply-To: <20170930061214.10622-1-ming.lei@redhat.com>
-References: <20170930061214.10622-1-ming.lei@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 3/8] block: introduce rqhash helpers
+Date: Sat, 30 Sep 2017 19:26:50 +0800
+Message-Id: <20170930112655.31451-4-ming.lei@redhat.com>
+In-Reply-To: <20170930112655.31451-1-ming.lei@redhat.com>
+References: <20170930112655.31451-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Simply quiesing SCSI device and waiting for completeion of IO
-dispatched to SCSI queue isn't safe, it is easy to use up
-request pool because all allocated requests before can't
-be dispatched when device is put in QIUESCE. Then no request
-can be allocated for RQF_PREEMPT, and system may hang somewhere,
-such as When sending commands of sync_cache or start_stop during
-system suspend path.
+We need this helpers for supporting to use hashtable to improve
+bio merge from sw queue in the following patches.
 
-Before quiesing SCSI, this patch sets block queue in preempt
-mode first, so no new normal request can enter queue any more,
-and all pending requests are drained too once blk_set_preempt_only(true)
-is returned. Then RQF_PREEMPT can be allocated successfully duirng
-SCSI quiescing.
-
-This patch fixes one long term issue of IO hang, in either block legacy
-and blk-mq.
+No functional change.
 
 Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Tested-by: Martin Steigerwald <martin@lichtvoll.de>
-Cc: stable@vger.kernel.org
-Cc: Bart Van Assche <Bart.VanAssche@wdc.com>
+Tested-by: Tom Nguyen <tom81094@gmail.com>
+Tested-by: Paolo Valente <paolo.valente@linaro.org>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/scsi/scsi_lib.c | 25 ++++++++++++++++++++++---
- 1 file changed, 22 insertions(+), 3 deletions(-)
+ block/blk.h      | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ block/elevator.c | 36 +++++++-----------------------------
+ 2 files changed, 59 insertions(+), 29 deletions(-)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 9cf6a80fe297..82c51619f1b7 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -252,9 +252,10 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
- 	struct scsi_request *rq;
- 	int ret = DRIVER_ERROR << 24;
+diff --git a/block/blk.h b/block/blk.h
+index fcb9775b997d..eb3436d4a73f 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -146,6 +146,58 @@ static inline void blk_clear_rq_complete(struct request *rq)
+  */
+ #define ELV_ON_HASH(rq) ((rq)->rq_flags & RQF_HASHED)
  
--	req = blk_get_request(sdev->request_queue,
-+	req = __blk_get_request(sdev->request_queue,
- 			data_direction == DMA_TO_DEVICE ?
--			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM);
-+			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM,
-+			BLK_REQ_PREEMPT);
- 	if (IS_ERR(req))
- 		return ret;
- 	rq = scsi_req(req);
-@@ -2928,12 +2929,28 @@ scsi_device_quiesce(struct scsi_device *sdev)
- {
- 	int err;
- 
-+	/*
-+	 * Simply quiesing SCSI device isn't safe, it is easy
-+	 * to use up requests because all these allocated requests
-+	 * can't be dispatched when device is put in QIUESCE.
-+	 * Then no request can be allocated and we may hang
-+	 * somewhere, such as system suspend/resume.
-+	 *
-+	 * So we set block queue in preempt only first, no new
-+	 * normal request can enter queue any more, and all pending
-+	 * requests are drained once blk_set_preempt_only()
-+	 * returns. Only RQF_PREEMPT is allowed in preempt only mode.
-+	 */
-+	blk_set_preempt_only(sdev->request_queue, true);
++/*
++ * Merge hash stuff.
++ */
++#define rq_hash_key(rq)		(blk_rq_pos(rq) + blk_rq_sectors(rq))
 +
- 	mutex_lock(&sdev->state_mutex);
- 	err = scsi_device_set_state(sdev, SDEV_QUIESCE);
- 	mutex_unlock(&sdev->state_mutex);
- 
--	if (err)
-+	if (err) {
-+		blk_set_preempt_only(sdev->request_queue, false);
- 		return err;
++#define bucket(head, key)	&((head)[hash_min((key), ELV_HASH_BITS)])
++
++static inline void __rqhash_del(struct request *rq)
++{
++	hash_del(&rq->hash);
++	rq->rq_flags &= ~RQF_HASHED;
++}
++
++static inline void rqhash_del(struct request *rq)
++{
++	if (ELV_ON_HASH(rq))
++		__rqhash_del(rq);
++}
++
++static inline void rqhash_add(struct hlist_head *hash, struct request *rq)
++{
++	BUG_ON(ELV_ON_HASH(rq));
++	hlist_add_head(&rq->hash, bucket(hash, rq_hash_key(rq)));
++	rq->rq_flags |= RQF_HASHED;
++}
++
++static inline void rqhash_reposition(struct hlist_head *hash, struct request *rq)
++{
++	__rqhash_del(rq);
++	rqhash_add(hash, rq);
++}
++
++static inline struct request *rqhash_find(struct hlist_head *hash, sector_t offset)
++{
++	struct hlist_node *next;
++	struct request *rq = NULL;
++
++	hlist_for_each_entry_safe(rq, next, bucket(hash, offset), hash) {
++		BUG_ON(!ELV_ON_HASH(rq));
++
++		if (unlikely(!rq_mergeable(rq))) {
++			__rqhash_del(rq);
++			continue;
++		}
++
++		if (rq_hash_key(rq) == offset)
++			return rq;
 +	}
- 
- 	scsi_run_queue(sdev->request_queue);
- 	while (atomic_read(&sdev->device_busy)) {
-@@ -2964,6 +2981,8 @@ void scsi_device_resume(struct scsi_device *sdev)
- 	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0)
- 		scsi_run_queue(sdev->request_queue);
- 	mutex_unlock(&sdev->state_mutex);
 +
-+	blk_set_preempt_only(sdev->request_queue, false);
- }
- EXPORT_SYMBOL(scsi_device_resume);
++	return NULL;
++}
++
+ void blk_insert_flush(struct request *rq);
  
+ static inline struct request *__elv_next_request(struct request_queue *q)
+diff --git a/block/elevator.c b/block/elevator.c
+index 153926a90901..824cc3e69ac3 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -47,11 +47,6 @@ static DEFINE_SPINLOCK(elv_list_lock);
+ static LIST_HEAD(elv_list);
+ 
+ /*
+- * Merge hash stuff.
+- */
+-#define rq_hash_key(rq)		(blk_rq_pos(rq) + blk_rq_sectors(rq))
+-
+-/*
+  * Query io scheduler to see if the current process issuing bio may be
+  * merged with rq.
+  */
+@@ -268,14 +263,12 @@ EXPORT_SYMBOL(elevator_exit);
+ 
+ static inline void __elv_rqhash_del(struct request *rq)
+ {
+-	hash_del(&rq->hash);
+-	rq->rq_flags &= ~RQF_HASHED;
++	__rqhash_del(rq);
+ }
+ 
+ void elv_rqhash_del(struct request_queue *q, struct request *rq)
+ {
+-	if (ELV_ON_HASH(rq))
+-		__elv_rqhash_del(rq);
++	rqhash_del(rq);
+ }
+ EXPORT_SYMBOL_GPL(elv_rqhash_del);
+ 
+@@ -283,37 +276,22 @@ void elv_rqhash_add(struct request_queue *q, struct request *rq)
+ {
+ 	struct elevator_queue *e = q->elevator;
+ 
+-	BUG_ON(ELV_ON_HASH(rq));
+-	hash_add(e->hash, &rq->hash, rq_hash_key(rq));
+-	rq->rq_flags |= RQF_HASHED;
++	rqhash_add(e->hash, rq);
+ }
+ EXPORT_SYMBOL_GPL(elv_rqhash_add);
+ 
+ void elv_rqhash_reposition(struct request_queue *q, struct request *rq)
+ {
+-	__elv_rqhash_del(rq);
+-	elv_rqhash_add(q, rq);
++	struct elevator_queue *e = q->elevator;
++
++	rqhash_reposition(e->hash, rq);
+ }
+ 
+ struct request *elv_rqhash_find(struct request_queue *q, sector_t offset)
+ {
+ 	struct elevator_queue *e = q->elevator;
+-	struct hlist_node *next;
+-	struct request *rq;
+-
+-	hash_for_each_possible_safe(e->hash, rq, next, hash, offset) {
+-		BUG_ON(!ELV_ON_HASH(rq));
+ 
+-		if (unlikely(!rq_mergeable(rq))) {
+-			__elv_rqhash_del(rq);
+-			continue;
+-		}
+-
+-		if (rq_hash_key(rq) == offset)
+-			return rq;
+-	}
+-
+-	return NULL;
++	return rqhash_find(e->hash, offset);
+ }
+ 
+ /*
 -- 
 2.9.5
