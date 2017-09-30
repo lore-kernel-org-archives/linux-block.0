@@ -1,48 +1,77 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.mpynet.fi ([82.197.21.85]:39806 "EHLO mx2.mpynet.fi"
+Received: from mx1.redhat.com ([209.132.183.28]:50458 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751728AbdIUL0Y (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Sep 2017 07:26:24 -0400
-Date: Thu, 21 Sep 2017 14:26:22 +0300
-From: Rakesh Pandit <rakesh@tuxera.com>
-To: Matias =?iso-8859-1?Q?Bj=F8rling?= <mb@lightnvm.io>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
-Subject: [PATCH 2/6] lightnvm: pblk: protect line bitmap while submitting
- meta io
-Message-ID: <20170921112620.GA28524@dhcp-216.srv.tuxera.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+        id S1752998AbdI3Lcc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 Sep 2017 07:32:32 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 7/8] blk-mq-sched: refactor blk_mq_sched_try_merge()
+Date: Sat, 30 Sep 2017 19:26:54 +0800
+Message-Id: <20170930112655.31451-8-ming.lei@redhat.com>
+In-Reply-To: <20170930112655.31451-1-ming.lei@redhat.com>
+References: <20170930112655.31451-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-It seems pblk_dealloc_page would race against pblk_alloc_pages for
-line bitmap for sector allocation.  The chances are very low but might
-as well protect the bitmap properly.  It's not even in fast path.
+This patch introduces one function __blk_mq_try_merge()
+which will be resued for bio merge to sw queue in
+the following patch.
 
-Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+No functional change.
+
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Tested-by: Tom Nguyen <tom81094@gmail.com>
+Tested-by: Paolo Valente <paolo.valente@linaro.org>
+Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/pblk-core.c | 2 ++
- 1 file changed, 2 insertions(+)
+ block/blk-mq-sched.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index a230125..b92eabc 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -502,12 +502,14 @@ void pblk_dealloc_page(struct pblk *pblk, struct pblk_line *line, int nr_secs)
- 	u64 addr;
- 	int i;
- 
-+	spin_lock(&line->lock);
- 	addr = find_next_zero_bit(line->map_bitmap,
- 					pblk->lm.sec_per_line, line->cur_sec);
- 	line->cur_sec = addr - nr_secs;
- 
- 	for (i = 0; i < nr_secs; i++, line->cur_sec--)
- 		WARN_ON(!test_and_clear_bit(line->cur_sec, line->map_bitmap));
-+	spin_lock(&line->lock);
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 8c09959bc0d0..a58f4746317c 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -222,12 +222,11 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	}
  }
  
- u64 __pblk_alloc_page(struct pblk *pblk, struct pblk_line *line, int nr_secs)
+-bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+-			    struct request **merged_request)
++static bool __blk_mq_try_merge(struct request_queue *q,
++		struct bio *bio, struct request **merged_request,
++		struct request *rq, enum elv_merge type)
+ {
+-	struct request *rq;
+-
+-	switch (elv_merge(q, &rq, bio)) {
++	switch (type) {
+ 	case ELEVATOR_BACK_MERGE:
+ 		if (!blk_mq_sched_allow_merge(q, rq, bio))
+ 			return false;
+@@ -250,6 +249,15 @@ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+ 		return false;
+ 	}
+ }
++
++bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
++		struct request **merged_request)
++{
++	struct request *rq;
++	enum elv_merge type = elv_merge(q, &rq, bio);
++
++	return __blk_mq_try_merge(q, bio, merged_request, rq, type);
++}
+ EXPORT_SYMBOL_GPL(blk_mq_sched_try_merge);
+ 
+ /*
 -- 
-2.5.0
+2.9.5
