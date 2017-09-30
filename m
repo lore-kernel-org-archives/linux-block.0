@@ -1,4 +1,8 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:40422 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752944AbdI3LcD (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 Sep 2017 07:32:03 -0400
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
@@ -8,98 +12,74 @@ Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
         Paolo Valente <paolo.valente@linaro.org>,
         Oleksandr Natalenko <oleksandr@natalenko.name>,
         Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 4/7] blk-mq: introduce blk_mq_dequeue_from_ctx()
-Date: Sat, 30 Sep 2017 18:27:17 +0800
-Message-Id: <20170930102720.30219-5-ming.lei@redhat.com>
-In-Reply-To: <20170930102720.30219-1-ming.lei@redhat.com>
-References: <20170930102720.30219-1-ming.lei@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 5/8] block: add check on elevator for supporting bio merge via hashtable from blk-mq sw queue
+Date: Sat, 30 Sep 2017 19:26:52 +0800
+Message-Id: <20170930112655.31451-6-ming.lei@redhat.com>
+In-Reply-To: <20170930112655.31451-1-ming.lei@redhat.com>
+References: <20170930112655.31451-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This function is introduced for dequeuing request
-from sw queue so that we can dispatch it in
-scheduler's way.
-
-More importantly, some SCSI devices may set
-q->queue_depth, which is a per-request_queue limit,
-and applied on pending I/O from all hctxs. This
-function is introduced for avoiding to dequeue too
-many requests from sw queue when ->dispatch isn't
-flushed completely.
+blk_mq_sched_try_merge() will be reused in following patches
+to support bio merge to blk-mq sw queue, so add checkes to
+related functions which are called from blk_mq_sched_try_merge().
 
 Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
 Tested-by: Tom Nguyen <tom81094@gmail.com>
 Tested-by: Paolo Valente <paolo.valente@linaro.org>
-Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 38 ++++++++++++++++++++++++++++++++++++++
- block/blk-mq.h |  2 ++
- 2 files changed, 40 insertions(+)
+ block/elevator.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d1b9fb539eba..8b49af1ade7f 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -882,6 +882,44 @@ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list)
- }
- EXPORT_SYMBOL_GPL(blk_mq_flush_busy_ctxs);
+diff --git a/block/elevator.c b/block/elevator.c
+index e11c7873fc21..2424aea85393 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -71,6 +71,10 @@ bool elv_bio_merge_ok(struct request *rq, struct bio *bio)
+ 	if (!blk_rq_merge_ok(rq, bio))
+ 		return false;
  
-+struct dispatch_rq_data {
-+	struct blk_mq_hw_ctx *hctx;
-+	struct request *rq;
-+};
++	/* We need to support to merge bio from sw queue */
++	if (!rq->q->elevator)
++		return true;
 +
-+static bool dispatch_rq_from_ctx(struct sbitmap *sb, unsigned int bitnr, void *data)
-+{
-+	struct dispatch_rq_data *dispatch_data = data;
-+	struct blk_mq_hw_ctx *hctx = dispatch_data->hctx;
-+	struct blk_mq_ctx *ctx = hctx->ctxs[bitnr];
+ 	if (!elv_iosched_allow_bio_merge(rq, bio))
+ 		return false;
+ 
+@@ -449,6 +453,10 @@ static enum elv_merge __elv_merge(struct request_queue *q,
+ 		return ELEVATOR_BACK_MERGE;
+ 	}
+ 
++	/* no elevator when merging bio to blk-mq sw queue */
++	if (!e)
++		return ELEVATOR_NO_MERGE;
 +
-+	spin_lock(&ctx->lock);
-+	if (unlikely(!list_empty(&ctx->rq_list))) {
-+		dispatch_data->rq = list_entry_rq(ctx->rq_list.next);
-+		list_del_init(&dispatch_data->rq->queuelist);
-+		if (list_empty(&ctx->rq_list))
-+			sbitmap_clear_bit(sb, bitnr);
-+	}
-+	spin_unlock(&ctx->lock);
-+
-+	return !dispatch_data->rq;
-+}
-+
-+struct request *blk_mq_dequeue_from_ctx(struct blk_mq_hw_ctx *hctx,
-+					struct blk_mq_ctx *start)
-+{
-+	unsigned off = start ? start->index_hw : 0;
-+	struct dispatch_rq_data data = {
-+		.hctx = hctx,
-+		.rq   = NULL,
-+	};
-+
-+	__sbitmap_for_each_set(&hctx->ctx_map, off,
-+			       dispatch_rq_from_ctx, &data);
-+
-+	return data.rq;
-+}
-+
- static inline unsigned int queued_to_index(unsigned int queued)
+ 	if (e->uses_mq && e->type->ops.mq.request_merge)
+ 		return e->type->ops.mq.request_merge(q, req, bio);
+ 	else if (!e->uses_mq && e->type->ops.sq.elevator_merge_fn)
+@@ -711,6 +719,10 @@ struct request *elv_latter_request(struct request_queue *q, struct request *rq)
  {
- 	if (!queued)
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 61aecf398a4b..915de58572e7 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -35,6 +35,8 @@ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list);
- bool blk_mq_hctx_has_pending(struct blk_mq_hw_ctx *hctx);
- bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
- 				bool wait);
-+struct request *blk_mq_dequeue_from_ctx(struct blk_mq_hw_ctx *hctx,
-+					struct blk_mq_ctx *start);
+ 	struct elevator_queue *e = q->elevator;
  
- /*
-  * Internal helpers for allocating/freeing the request map
++	/* no elevator when merging bio to blk-mq sw queue */
++	if (!e)
++		return NULL;
++
+ 	if (e->uses_mq && e->type->ops.mq.next_request)
+ 		return e->type->ops.mq.next_request(q, rq);
+ 	else if (!e->uses_mq && e->type->ops.sq.elevator_latter_req_fn)
+@@ -723,6 +735,10 @@ struct request *elv_former_request(struct request_queue *q, struct request *rq)
+ {
+ 	struct elevator_queue *e = q->elevator;
+ 
++	/* no elevator when merging bio to blk-mq sw queue */
++	if (!e)
++		return NULL;
++
+ 	if (e->uses_mq && e->type->ops.mq.former_request)
+ 		return e->type->ops.mq.former_request(q, rq);
+ 	if (!e->uses_mq && e->type->ops.sq.elevator_former_req_fn)
 -- 
 2.9.5
