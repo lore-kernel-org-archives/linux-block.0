@@ -1,101 +1,77 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:51344 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750865AbdIOQpr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Sep 2017 12:45:47 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
-        Jens Axboe <axboe@fb.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org,
-        "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org
-Subject: [PATCH 1/5] block: don't call blk_mq_delay_run_hw_queue() in case of BLK_STS_RESOURCE
-Date: Sat, 16 Sep 2017 00:44:52 +0800
-Message-Id: <20170915164456.9803-2-ming.lei@redhat.com>
-In-Reply-To: <20170915164456.9803-1-ming.lei@redhat.com>
-References: <20170915164456.9803-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <zhangweiping@didichuxing.com>
+Date: Sat, 30 Sep 2017 22:57:31 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>
+Subject: Re: [PATCH v4] blk-mq: fix nr_requests wrong value when modify it
+ from sysfs
+Message-ID: <20170930145727.GA34288@source.didichuxing.com>
+References: <20170922153624.GA15873@localhost.didichuxing.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <20170922153624.GA15873@localhost.didichuxing.com>
+Return-Path: zhangweiping@didichuxing.com
+List-ID: <linux-block@vger.kernel.org>
 
-If .queue_rq() returns BLK_STS_RESOURCE, blk-mq will rerun
-the queue in the three situations:
+On Fri, Sep 22, 2017 at 11:36:28PM +0800, weiping zhang wrote:
+> if blk-mq use "none" io scheduler, nr_request get a wrong value when
+> input a number > tag_set->queue_depth. blk_mq_tag_update_depth will get
+> the smaller one min(nr, set->queue_depth), and then q->nr_request get a
+> wrong value.
+> 
+> Reproduce:
+> 
+> echo none > /sys/block/nvme0n1/queue/scheduler
+> echo 1000000 > /sys/block/nvme0n1/queue/nr_requests
+> cat /sys/block/nvme0n1/queue/nr_requests
+> 1000000
+> 
+> Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+> ---
+> 
+> Changes since v4:
+>  * fix typo in commit message(queue/ioscheduler => queue/scheduler)
+> 
+> Changes since v3:
+>  * remove compare nr with tags->qdepth, pass nr to blk_mq_tag_update_depth
+> directly
+> 
+>  * remove return EINVAL when user modify nr_request less than BLKDEV_MIN_RQ
+> 
+> Changes since v2:
+>  * add return EINVAL when user modify nr_request less than BLKDEV_MIN_RQ
+>  * remove pr_warn, and return EINVAL, if input number is too large
+> 
+>  block/blk-mq.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 98a1860..491e336 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2642,8 +2642,7 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+>  		 * queue depth. This is similar to what the old code would do.
+>  		 */
+>  		if (!hctx->sched_tags) {
+> -			ret = blk_mq_tag_update_depth(hctx, &hctx->tags,
+> -							min(nr, set->queue_depth),
+> +			ret = blk_mq_tag_update_depth(hctx, &hctx->tags, nr,
+>  							false);
+>  		} else {
+>  			ret = blk_mq_tag_update_depth(hctx, &hctx->sched_tags,
+> -- 
+> 2.9.4
+> 
 
-1) if BLK_MQ_S_SCHED_RESTART is set
-- queue is rerun after one rq is completed, see blk_mq_sched_restart()
-which is run from blk_mq_free_request()
+Hi Jens,
 
-2) BLK_MQ_S_TAG_WAITING is set
-- queue is rerun after one tag is freed
+As you say before:
+> blk_mq_tag_update_depth() should already return
+> -EINVAL for the case where we can't grow the tags. Looks like this patch
+> should simply remove the min(nr, set->queue_depth) and just pass in 'nr'.
+I also find that hctx->tags->nr_tags equal to tag_set->queue_depth no matter use
+hctx->sched_tags or not. So I think it's safe to verify 'nr' by
+hctx->tags->nr_tags.
 
-3) otherwise
-- queue is run immediately in blk_mq_dispatch_rq_list()
-
-So calling blk_mq_delay_run_hw_queue() inside .queue_rq() doesn't make
-sense because no matter it is called or not, the queue still will be
-rerun soon in above three situations, and the busy req can be dispatched
-again.
-
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: dm-devel@redhat.com
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org
-Cc: "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/md/dm-rq.c      | 1 -
- drivers/nvme/host/fc.c  | 3 ---
- drivers/scsi/scsi_lib.c | 4 ----
- 3 files changed, 8 deletions(-)
-
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index c6ebc5b1e00e..71422cea1c4a 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -761,7 +761,6 @@ static blk_status_t dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		/* Undo dm_start_request() before requeuing */
- 		rq_end_stats(md, rq);
- 		rq_completed(md, rq_data_dir(rq), false);
--		blk_mq_delay_run_hw_queue(hctx, 100/*ms*/);
- 		return BLK_STS_RESOURCE;
- 	}
- 
-diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index d2e882c0f496..17727eee5d5f 100644
---- a/drivers/nvme/host/fc.c
-+++ b/drivers/nvme/host/fc.c
-@@ -2041,9 +2041,6 @@ nvme_fc_start_fcp_op(struct nvme_fc_ctrl *ctrl, struct nvme_fc_queue *queue,
- 	return BLK_STS_OK;
- 
- busy:
--	if (!(op->flags & FCOP_FLAGS_AEN) && queue->hctx)
--		blk_mq_delay_run_hw_queue(queue->hctx, NVMEFC_QUEUE_DELAY);
--
- 	return BLK_STS_RESOURCE;
- }
- 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 9cf6a80fe297..71d5bf1345c9 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2010,11 +2010,7 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
- out:
- 	switch (ret) {
- 	case BLK_STS_OK:
--		break;
- 	case BLK_STS_RESOURCE:
--		if (atomic_read(&sdev->device_busy) == 0 &&
--		    !scsi_device_blocked(sdev))
--			blk_mq_delay_run_hw_queue(hctx, SCSI_QUEUE_DELAY);
- 		break;
- 	default:
- 		/*
--- 
-2.9.5
+Thanks
+weiping
