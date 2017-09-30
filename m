@@ -1,25 +1,39 @@
-Return-Path: <tom.leiming@gmail.com>
+Return-Path: <zhangweiping@didichuxing.com>
+Date: Sat, 30 Sep 2017 15:01:48 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>
+Subject: [PATCH] blk-mq: remove unused function hctx_allow_merges
+Message-ID: <20170930070143.GA14515@localhost.didichuxing.com>
 MIME-Version: 1.0
-In-Reply-To: <20170930070143.GA14515@localhost.didichuxing.com>
-References: <20170930070143.GA14515@localhost.didichuxing.com>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Sat, 30 Sep 2017 15:53:23 +0800
-Message-ID: <CACVXFVO_knG2NV-ND1tOsOG6iun_SzWST_bDWVgiAjo9QyHsXw@mail.gmail.com>
-Subject: Re: [PATCH] blk-mq: remove unused function hctx_allow_merges
-To: Jens Axboe <axboe@kernel.dk>, linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Return-Path: zhangweiping@didichuxing.com
 List-ID: <linux-block@vger.kernel.org>
 
-On Sat, Sep 30, 2017 at 3:01 PM, weiping zhang
-<zhangweiping@didichuxing.com> wrote:
-> since 9bddeb2a5b981 "blk-mq: make per-sw-queue bio merge as default .bio_merge"
-> there is no caller for this function.
->
-> Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+since 9bddeb2a5b981 "blk-mq: make per-sw-queue bio merge as default .bio_merge"
+there is no caller for this function.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+---
+ block/blk-mq.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f84d145..520d257 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1484,12 +1484,6 @@ static void blk_mq_bio_to_request(struct request *rq, struct bio *bio)
+ 	blk_account_io_start(rq, true);
+ }
+ 
+-static inline bool hctx_allow_merges(struct blk_mq_hw_ctx *hctx)
+-{
+-	return (hctx->flags & BLK_MQ_F_SHOULD_MERGE) &&
+-		!blk_queue_nomerges(hctx->queue);
+-}
+-
+ static inline void blk_mq_queue_io(struct blk_mq_hw_ctx *hctx,
+ 				   struct blk_mq_ctx *ctx,
+ 				   struct request *rq)
 -- 
-Ming Lei
+2.9.4
