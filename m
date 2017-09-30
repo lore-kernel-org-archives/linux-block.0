@@ -1,76 +1,51 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:29880 "EHLO mga01.intel.com"
+Received: from mx1.redhat.com ([209.132.183.28]:54680 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752459AbdIMLrw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Sep 2017 07:47:52 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V8 11/14] mmc: core: Export mmc_start_request()
-Date: Wed, 13 Sep 2017 14:40:11 +0300
-Message-Id: <1505302814-19313-12-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1505302814-19313-1-git-send-email-adrian.hunter@intel.com>
-References: <1505302814-19313-1-git-send-email-adrian.hunter@intel.com>
+        id S1750991AbdI3JwP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 Sep 2017 05:52:15 -0400
+Date: Sat, 30 Sep 2017 17:51:58 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Martin Steigerwald <martin@lichtvoll.de>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Cathy Avery <cavery@redhat.com>, linux-kernel@vger.kernel.org,
+        Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH V7 0/6] block/scsi: safe SCSI quiescing
+Message-ID: <20170930095157.GA28985@ming.t460p>
+References: <20170930061214.10622-1-ming.lei@redhat.com>
+ <8017332.HWsC7yeG6s@merkaba>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <8017332.HWsC7yeG6s@merkaba>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Export mmc_start_request() so that the block driver can use it.
+Hi Martin,
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/core/core.c | 3 ++-
- drivers/mmc/core/core.h | 2 ++
- 2 files changed, 4 insertions(+), 1 deletion(-)
+On Sat, Sep 30, 2017 at 11:47:10AM +0200, Martin Steigerwald wrote:
+> Hi Ming.
+> 
+> Ming Lei - 30.09.17, 14:12:
+> > Please consider this patchset for V4.15, and it fixes one
+> > kind of long-term I/O hang issue in either block legacy path
+> > or blk-mq.
+> >
+> > The current SCSI quiesce isn't safe and easy to trigger I/O deadlock.
+> 
+> Isn�t that material for -stable as well?
 
-diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
-index 3638ed4f0f9e..24a73f387482 100644
---- a/drivers/mmc/core/core.c
-+++ b/drivers/mmc/core/core.c
-@@ -344,7 +344,7 @@ static int mmc_mrq_prep(struct mmc_host *host, struct mmc_request *mrq)
- 	return 0;
- }
- 
--static int mmc_start_request(struct mmc_host *host, struct mmc_request *mrq)
-+int mmc_start_request(struct mmc_host *host, struct mmc_request *mrq)
- {
- 	int err;
- 
-@@ -366,6 +366,7 @@ static int mmc_start_request(struct mmc_host *host, struct mmc_request *mrq)
- 
- 	return 0;
- }
-+EXPORT_SYMBOL(mmc_start_request);
- 
- /*
-  * mmc_wait_data_done() - done callback for data request
-diff --git a/drivers/mmc/core/core.h b/drivers/mmc/core/core.h
-index 535539a9e7eb..03e0f8384b1c 100644
---- a/drivers/mmc/core/core.h
-+++ b/drivers/mmc/core/core.h
-@@ -109,6 +109,8 @@ static inline void mmc_unregister_pm_notifier(struct mmc_host *host) { }
- void mmc_wait_for_req_done(struct mmc_host *host, struct mmc_request *mrq);
- bool mmc_is_req_done(struct mmc_host *host, struct mmc_request *mrq);
- 
-+int mmc_start_request(struct mmc_host *host, struct mmc_request *mrq);
-+
- struct mmc_async_req;
- 
- struct mmc_async_req *mmc_start_areq(struct mmc_host *host,
--- 
-1.9.1
+Yeah, the patch 6 is CCed to -stable.
+
+> 
+> I�d love to see this go into 4.14. Especially as its an LTS release.
+
+I am fine with either 4.14 or 4.15, and it is up to Jens.
+
+Thanks
+Ming
