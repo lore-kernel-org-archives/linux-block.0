@@ -1,375 +1,121 @@
-Return-Path: <anish.jhaveri@paviliondata.com>
-Date: Mon, 11 Sep 2017 21:25:45 -0700
-From: Anish M Jhaveri <anish.jhaveri@paviliondata.com>
-To: sagi@grimberg.me, hch@lst.de, keith.busch@intel.com, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [PATCH 05/10] Init multipath head controller.
-Message-ID: <20170912042544.z7iufguhozjimmty@haynes>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:53460 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750991AbdI3Kcc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 Sep 2017 06:32:32 -0400
+Date: Sat, 30 Sep 2017 18:32:12 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>
+Subject: Re: [PATCH V5 00/14] blk-mq-sched: improve sequential I/O
+ performance(part 1)
+Message-ID: <20170930103211.GA29093@ming.t460p>
+References: <20170930102720.30219-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Return-Path: anish.jhaveri@paviliondata.com
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20170930102720.30219-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Initialize the multipath head controller. This multipath head controller is created as soon as we identify a namespace which can be shared. It will be added to global multipath controller list. Memory pool is created to allocate private structure to maintain bio data between head device and child devices. Retrieve block device handle for future communication through generic_make_request function if device is shared.
+On Sat, Sep 30, 2017 at 06:27:13PM +0800, Ming Lei wrote:
+> Hi Jens,
+> 
+> In Red Hat internal storage test wrt. blk-mq scheduler, we
+> found that I/O performance is much bad with mq-deadline, especially
+> about sequential I/O on some multi-queue SCSI devcies(lpfc, qla2xxx,
+> SRP...)
+> 
+> Turns out one big issue causes the performance regression: requests
+> are still dequeued from sw queue/scheduler queue even when ldd's
+> queue is busy, so I/O merge becomes quite difficult to make, then
+> sequential IO degrades a lot.
+> 
+> This issue becomes one of mains reasons for reverting default SCSI_MQ
+> in V4.13.
+> 
+> The 1st patch takes direct issue in blk_mq_request_bypass_insert(),
+> then we can improve dm-mpath's performance in part 2, which will
+> be posted out soon.
+> 
+> The 2nd six patches improve this situation, and brings back
+> some performance loss.
+> 
+> With this change, SCSI-MQ sequential I/O performance is
+> improved much, Paolo reported that mq-deadline performance
+> improved much[2] in his dbench test wrt V2. Also performanc
+> improvement on lpfc/qla2xx was observed with V1.[1]
+> 
+> Please consider it for V4.15.
+> 
+> [1] http://marc.info/?l=linux-block&m=150151989915776&w=2
+> [2] https://marc.info/?l=linux-block&m=150217980602843&w=2
+> 
+> V5:
+> 	- address some comments from Omar
+> 	- add Tested-by & Reveiewed-by tag
+> 	- use direct issue for blk_mq_request_bypass_insert(), and
+> 	start to consider to improve sequential I/O for dm-mpath
+> 	- only include part 1(the original patch 1 ~ 6), as suggested
+> 	by Omar
+> 
+> V4:
+> 	- add Reviewed-by tag
+> 	- some trival change: typo fix in commit log or comment,
+> 	variable name, no actual functional change
+> 
+> V3:
+> 	- totally round robin for picking req from ctx, as suggested
+> 	by Bart
+> 	- remove one local variable in __sbitmap_for_each_set()
+> 	- drop patches of single dispatch list, which can improve
+> 	performance on mq-deadline, but cause a bit degrade on
+> 	none because all hctxs need to be checked after ->dispatch
+> 	is flushed. Will post it again once it is mature.
+> 	- rebase on v4.13-rc6 with block for-next
+> 
+> V2:
+> 	- dequeue request from sw queues in round roubin's style
+> 	as suggested by Bart, and introduces one helper in sbitmap
+> 	for this purpose
+> 	- improve bio merge via hash table from sw queue
+> 	- add comments about using DISPATCH_BUSY state in lockless way,
+> 	simplifying handling on busy state,
+> 	- hold ctx->lock when clearing ctx busy bit as suggested
+> 	by Bart
+> 
+> 
+> Ming Lei (7):
+>   blk-mq: issue rq directly in blk_mq_request_bypass_insert()
+>   blk-mq-sched: fix scheduler bad performance
+>   sbitmap: introduce __sbitmap_for_each_set()
+>   blk-mq: introduce blk_mq_dequeue_from_ctx()
+>   blk-mq-sched: move actual dispatching into one helper
+>   blk-mq-sched: improve dispatching from sw queue
+>   blk-mq-sched: don't dequeue request until all in ->dispatch are
+>     flushed
+> 
+>  block/blk-core.c        |   3 +-
+>  block/blk-mq-debugfs.c  |   1 +
+>  block/blk-mq-sched.c    | 104 ++++++++++++++++++++++++++++++++++++-------
+>  block/blk-mq.c          | 114 +++++++++++++++++++++++++++++++++++++++---------
+>  block/blk-mq.h          |   4 +-
+>  drivers/md/dm-rq.c      |   2 +-
+>  include/linux/blk-mq.h  |   3 ++
+>  include/linux/sbitmap.h |  64 +++++++++++++++++++--------
+>  8 files changed, 238 insertions(+), 57 deletions(-)
 
-Signed-off-by: Anish M Jhaveri <anish.jhaveri@paviliondata.com>
----
- drivers/nvme/host/core.c | 229 ++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 208 insertions(+), 21 deletions(-)
+Oops, the title should have been:
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 3839d1c..2987e0a 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -750,6 +750,7 @@ static void nvme_keep_alive_end_io(struct request *rq, blk_status_t status)
- 		dev_err(ctrl->device,
- 			"failed nvme_keep_alive_end_io error=%d\n",
- 				status);
-+		schedule_work(&ctrl->failover_work);
- 		return;
- 	}
- 
-@@ -2435,17 +2436,19 @@ static int nvme_setup_streams_ns(struct nvme_ctrl *ctrl, struct nvme_ns *ns)
- 	return 0;
- }
- 
--static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
-+static struct nvme_ns *nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- {
- 	struct nvme_ns *ns;
- 	struct gendisk *disk;
- 	struct nvme_id_ns *id;
- 	char disk_name[DISK_NAME_LEN];
-+	char devpath[DISK_NAME_LEN+4];
- 	int node = dev_to_node(ctrl->dev);
-+	static char *_claim_ptr = "I belong to mpath device";
- 
- 	ns = kzalloc_node(sizeof(*ns), GFP_KERNEL, node);
- 	if (!ns)
--		return;
-+		return NULL;
- 
- 	ns->instance = ida_simple_get(&ctrl->ns_ida, 1, 0, GFP_KERNEL);
- 	if (ns->instance < 0)
-@@ -2465,8 +2468,10 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 	blk_queue_logical_block_size(ns->queue, 1 << ns->lba_shift);
- 	nvme_set_queue_limits(ctrl, ns->queue);
- 	nvme_setup_streams_ns(ctrl, ns);
-+	blk_queue_rq_timeout(ns->queue, nvme_io_timeout * HZ);
- 
- 	sprintf(disk_name, "nvme%dn%d", ctrl->instance, ns->instance);
-+	sprintf(devpath, "/dev/nvme%dn%d", ctrl->instance, ns->instance);
- 
- 	if (nvme_revalidate_ns(ns, &id))
- 		goto out_free_queue;
-@@ -2496,17 +2501,36 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 
- 	kref_get(&ctrl->kref);
- 
--	kfree(id);
--
- 	device_add_disk(ctrl->device, ns->disk);
- 	if (sysfs_create_group(&disk_to_dev(ns->disk)->kobj,
--					&nvme_ns_attr_group))
-+					&nvme_ns_attr_group)) {
- 		pr_warn("%s: failed to create sysfs group for identification\n",
- 			ns->disk->disk_name);
-+		goto out_del_gendisk;
-+	}
-+
- 	if (ns->ndev && nvme_nvm_register_sysfs(ns))
- 		pr_warn("%s: failed to register lightnvm sysfs group for identification\n",
- 			ns->disk->disk_name);
--	return;
-+
-+	if (ns->nmic &  0x1) {
-+		ns->bdev = blkdev_get_by_path(devpath,
-+				 FMODE_READ | FMODE_WRITE | FMODE_EXCL, _claim_ptr);
-+		if (IS_ERR(ns->bdev)) {
-+			goto out_sysfs_remove_group;
-+		}
-+	}
-+
-+	kfree(id);
-+
-+	return ns;
-+ out_sysfs_remove_group:
-+	pr_err("%s: failed to get block device handle %p\n",
-+			ns->disk->disk_name, ns->bdev);
-+	sysfs_remove_group(&disk_to_dev(ns->disk)->kobj,
-+			&nvme_ns_attr_group);
-+ out_del_gendisk:
-+	del_gendisk(ns->disk);
-  out_free_id:
- 	kfree(id);
-  out_free_queue:
-@@ -2515,22 +2539,50 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 	ida_simple_remove(&ctrl->ns_ida, ns->instance);
-  out_free_ns:
- 	kfree(ns);
-+	return NULL;
- }
- 
- static void nvme_ns_remove(struct nvme_ns *ns)
- {
-+	struct nvme_ctrl *mpath_ctrl = NULL;
- 	if (test_and_set_bit(NVME_NS_REMOVING, &ns->flags))
- 		return;
- 
--	if (ns->disk && ns->disk->flags & GENHD_FL_UP) {
--		if (blk_get_integrity(ns->disk))
--			blk_integrity_unregister(ns->disk);
--		sysfs_remove_group(&disk_to_dev(ns->disk)->kobj,
--					&nvme_ns_attr_group);
--		if (ns->ndev)
--			nvme_nvm_unregister_sysfs(ns);
--		del_gendisk(ns->disk);
--		blk_cleanup_queue(ns->queue);
-+	if (test_bit(NVME_NS_ROOT, &ns->flags))
-+		nvme_mpath_cancel_ios(ns);
-+
-+	if (ns->active)
-+		nvme_trigger_failover(ns->ctrl);
-+	if (ns->mpath_ctrl) {
-+		mpath_ctrl = ns->mpath_ctrl;
-+		if (nvme_del_ns_mpath_ctrl(ns) == NVME_NO_MPATH_NS_AVAIL) {
-+			mpath_ctrl = NULL;
-+		}
-+		if (ns->disk && ns->disk->flags & GENHD_FL_UP) {
-+			if (blk_get_integrity(ns->disk))
-+				blk_integrity_unregister(ns->disk);
-+			sysfs_remove_group(&disk_to_dev(ns->disk)->kobj,
-+						&nvme_ns_attr_group);
-+			if (ns->nmic &  0x1)
-+				blkdev_put(ns->bdev, FMODE_READ | FMODE_WRITE | FMODE_EXCL);
-+			del_gendisk(ns->disk);
-+			blk_cleanup_queue(ns->queue);
-+		}
-+
-+	} else {
-+		if (ns->disk && ns->disk->flags & GENHD_FL_UP) {
-+			if (blk_get_integrity(ns->disk))
-+				blk_integrity_unregister(ns->disk);
-+
-+			sysfs_remove_group(&disk_to_dev(ns->disk)->kobj,
-+				&nvme_ns_attr_group);
-+			if (ns->ndev)
-+				nvme_nvm_unregister_sysfs(ns);
-+			if (ns->bdev)
-+				blkdev_put(ns->bdev, FMODE_READ | FMODE_WRITE);
-+			del_gendisk(ns->disk);
-+			blk_cleanup_queue(ns->queue);
-+		}
- 	}
- 
- 	mutex_lock(&ns->ctrl->namespaces_mutex);
-@@ -2538,6 +2590,20 @@ static void nvme_ns_remove(struct nvme_ns *ns)
- 	mutex_unlock(&ns->ctrl->namespaces_mutex);
- 
- 	nvme_put_ns(ns);
-+	if (mpath_ctrl) {
-+		mpath_ctrl->cleanup_done = 1;
-+	}
-+}
-+
-+void nvme_mpath_ns_remove(struct nvme_ns *ns)
-+{
-+	struct nvme_ctrl *ctrl = ns->ctrl;
-+	nvme_ns_remove(ns);
-+	device_destroy(nvme_class, MKDEV(nvme_char_major, ctrl->instance));
-+	spin_lock(&dev_list_lock);
-+	list_del(&ctrl->node);
-+	spin_unlock(&dev_list_lock);
-+	nvme_put_ctrl(ctrl);
- }
- 
- static void nvme_validate_ns(struct nvme_ctrl *ctrl, unsigned nsid)
-@@ -2549,8 +2615,12 @@ static void nvme_validate_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 		if (ns->disk && revalidate_disk(ns->disk))
- 			nvme_ns_remove(ns);
- 		nvme_put_ns(ns);
--	} else
--		nvme_alloc_ns(ctrl, nsid);
-+	} else {
-+		ns = nvme_alloc_ns(ctrl, nsid);
-+		if (ns && (ns->nmic &  0x1)) {
-+			nvme_shared_ns(ns);
-+		}
-+	}
- }
- 
- static void nvme_remove_invalid_namespaces(struct nvme_ctrl *ctrl,
-@@ -2761,9 +2831,11 @@ static void nvme_release_instance(struct nvme_ctrl *ctrl)
- 
- void nvme_stop_ctrl(struct nvme_ctrl *ctrl)
- {
--	nvme_stop_keep_alive(ctrl);
--	flush_work(&ctrl->async_event_work);
--	flush_work(&ctrl->scan_work);
-+	if (!test_bit(NVME_CTRL_MULTIPATH, &ctrl->flags)) {
-+		nvme_stop_keep_alive(ctrl);
-+		flush_work(&ctrl->async_event_work);
-+		flush_work(&ctrl->scan_work);
-+	}
- }
- EXPORT_SYMBOL_GPL(nvme_stop_ctrl);
- 
-@@ -2782,11 +2854,19 @@ EXPORT_SYMBOL_GPL(nvme_start_ctrl);
- 
- void nvme_uninit_ctrl(struct nvme_ctrl *ctrl)
- {
-+	struct task_struct *tmp = NULL;
- 	device_destroy(nvme_class, MKDEV(nvme_char_major, ctrl->instance));
- 
- 	spin_lock(&dev_list_lock);
- 	list_del(&ctrl->node);
-+	if (list_empty(&nvme_mpath_ctrl_list) && !IS_ERR_OR_NULL(nvme_mpath_thread)) {
-+		tmp = nvme_mpath_thread;
-+		nvme_mpath_thread = NULL;
-+	}
- 	spin_unlock(&dev_list_lock);
-+	if (tmp) {
-+		kthread_stop(tmp);
-+	}
- }
- EXPORT_SYMBOL_GPL(nvme_uninit_ctrl);
- 
-@@ -2798,7 +2878,15 @@ static void nvme_free_ctrl(struct kref *kref)
- 	nvme_release_instance(ctrl);
- 	ida_destroy(&ctrl->ns_ida);
- 
--	ctrl->ops->free_ctrl(ctrl);
-+	if (test_bit(NVME_CTRL_MULTIPATH, &ctrl->flags)) {
-+		if (ctrl->mpath_req_pool) {
-+			mempool_destroy(ctrl->mpath_req_pool);
-+			kmem_cache_destroy(ctrl->mpath_req_slab);
-+		}
-+		kfree(ctrl);
-+	} else {
-+		ctrl->ops->free_ctrl(ctrl);
-+	}
- }
- 
- void nvme_put_ctrl(struct nvme_ctrl *ctrl)
-@@ -2825,6 +2913,7 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
- 	ctrl->dev = dev;
- 	ctrl->ops = ops;
- 	ctrl->quirks = quirks;
-+	INIT_WORK(&ctrl->failover_work, nvme_trigger_failover_work);
- 	INIT_WORK(&ctrl->scan_work, nvme_scan_work);
- 	INIT_WORK(&ctrl->async_event_work, nvme_async_event_work);
- 
-@@ -2863,6 +2952,103 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
- }
- EXPORT_SYMBOL_GPL(nvme_init_ctrl);
- 
-+struct nvme_ctrl *nvme_init_mpath_ctrl(struct nvme_ctrl *ctrl)
-+{
-+	struct nvme_ctrl *mpath_ctrl;
-+	bool changed;
-+	int ret;
-+	bool start_thread = false;
-+
-+	mpath_ctrl = kzalloc(sizeof(*mpath_ctrl), GFP_KERNEL);
-+	if (!mpath_ctrl)
-+		return ERR_PTR(-ENOMEM);
-+
-+	set_bit(NVME_CTRL_MULTIPATH, &mpath_ctrl->flags);
-+	mpath_ctrl->state = NVME_CTRL_NEW;
-+	mpath_ctrl->cleanup_done = 1;
-+	spin_lock_init(&mpath_ctrl->lock);
-+	INIT_LIST_HEAD(&mpath_ctrl->namespaces);
-+	INIT_LIST_HEAD(&mpath_ctrl->mpath_namespace);
-+	mutex_init(&mpath_ctrl->namespaces_mutex);
-+	kref_init(&mpath_ctrl->kref);
-+	mpath_ctrl->dev = ctrl->dev;
-+	mpath_ctrl->ops = ctrl->ops;
-+
-+	ret = nvme_set_instance(mpath_ctrl);
-+	if (ret)
-+		goto out;
-+
-+	mpath_ctrl->device = device_create_with_groups(nvme_class, mpath_ctrl->dev,
-+		MKDEV(nvme_char_major, mpath_ctrl->instance),
-+		mpath_ctrl, nvme_dev_attr_groups,
-+		"nvme%d", mpath_ctrl->instance);
-+
-+	if (IS_ERR(mpath_ctrl->device)) {
-+		goto out_release_instance;
-+	}
-+
-+	get_device(mpath_ctrl->device);
-+	ida_init(&mpath_ctrl->ns_ida);
-+
-+	if (list_empty(&nvme_mpath_ctrl_list) && IS_ERR_OR_NULL(nvme_mpath_thread)) {
-+		start_thread = true;
-+		nvme_mpath_thread = NULL;
-+	}
-+	spin_lock(&dev_list_lock);
-+	list_add_tail(&mpath_ctrl->node, &nvme_mpath_ctrl_list);
-+	spin_unlock(&dev_list_lock);
-+
-+	changed = nvme_change_ctrl_state(mpath_ctrl, NVME_CTRL_LIVE);
-+
-+	sprintf(mpath_ctrl->mpath_req_cache_name, "mpath_req%d", mpath_ctrl->instance);
-+
-+	/* allocate a slab cache for priv structure to maintain bio data*/
-+	mpath_ctrl->mpath_req_slab = kmem_cache_create(
-+		mpath_ctrl->mpath_req_cache_name,
-+		 sizeof(struct nvme_mpath_priv),
-+		 0, SLAB_HWCACHE_ALIGN, NULL);
-+	if (mpath_ctrl->mpath_req_slab == NULL) {
-+		dev_err(mpath_ctrl->device,
-+			"failed allocating mpath request cache\n");
-+		goto out_release_instance;
-+	}
-+
-+	/* allocate a memory pool which uses the slab cache */
-+	mpath_ctrl->mpath_req_pool = mempool_create(NVME_MAX_MPATH_PRIV,
-+		mempool_alloc_slab,
-+		mempool_free_slab,
-+		mpath_ctrl->mpath_req_slab);
-+	if (mpath_ctrl->mpath_req_pool == NULL) {
-+		dev_err(mpath_ctrl->device,
-+			"failed allocating mpath request pool\n");
-+		goto out_release_req_slab;
-+	}
-+
-+	if (start_thread) {
-+		nvme_mpath_thread = kthread_run(nvme_mpath_kthread, NULL, "nvme_mpath");
-+	} else
-+		wait_event_killable(nvme_mpath_kthread_wait, nvme_mpath_thread);
-+
-+	if (IS_ERR_OR_NULL(nvme_mpath_thread)) {
-+		ret = nvme_mpath_thread ? PTR_ERR(nvme_mpath_thread) : -EINTR;
-+		goto out_release_req_pool;
-+	}
-+	dev_info(mpath_ctrl->device, "multipath request pool allocated\n");
-+
-+	return mpath_ctrl;
-+ out_release_req_pool:
-+	mempool_destroy(mpath_ctrl->mpath_req_pool);
-+ out_release_req_slab:
-+	kmem_cache_destroy(mpath_ctrl->mpath_req_slab);
-+	mpath_ctrl->mpath_req_slab = NULL;
-+ out_release_instance:
-+	nvme_release_instance(mpath_ctrl);
-+ out:
-+	kfree(mpath_ctrl);
-+	return NULL;
-+}
-+EXPORT_SYMBOL_GPL(nvme_init_mpath_ctrl);
-+
- /**
-  * nvme_kill_queues(): Ends all namespace queues
-  * @ctrl: the dead controller that needs to end
-@@ -2970,6 +3156,7 @@ int __init nvme_core_init(void)
- {
- 	int result;
- 
-+	init_waitqueue_head(&nvme_mpath_kthread_wait);
- 	nvme_wq = alloc_workqueue("nvme-wq",
- 			WQ_UNBOUND | WQ_MEM_RECLAIM | WQ_SYSFS, 0);
- 	if (!nvme_wq)
+[PATCH V5 0/7] blk-mq-sched: improve sequential I/O performance(part 1)
+
+Sorry for that.
+
 -- 
-2.9.3
+Ming
