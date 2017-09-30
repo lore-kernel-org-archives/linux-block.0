@@ -1,20 +1,20 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <shli@kernel.org>
+Date: Fri, 29 Sep 2017 23:02:35 -0700
+From: Shaohua Li <shli@kernel.org>
+To: Joseph Qi <jiangqi903@gmail.com>
+Cc: linux-block <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Shaohua Li <shli@fb.com>, boyu.mt@taobao.com, wenqing.lz@taobao.com,
+	qijiang.qj@alibaba-inc.com
 Subject: Re: [PATCH v2] blk-throttle: fix possible io stall when upgrade to
  max
-To: Joseph Qi <jiangqi903@gmail.com>,
- linux-block <linux-block@vger.kernel.org>
-Cc: Shaohua Li <shli@fb.com>, boyu.mt@taobao.com, wenqing.lz@taobao.com,
- qijiang.qj@alibaba-inc.com
+Message-ID: <20170930060235.sx5lbs25xrgqp5rg@kernel.org>
 References: <526810b1-72e3-859f-aeaa-b5192144c589@gmail.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <a943b083-541c-60f4-290a-9608f89f76e4@kernel.dk>
-Date: Tue, 3 Oct 2017 15:42:21 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <526810b1-72e3-859f-aeaa-b5192144c589@gmail.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 09/30/2017 12:38 AM, Joseph Qi wrote:
+On Sat, Sep 30, 2017 at 02:38:49PM +0800, Joseph Qi wrote:
 > From: Joseph Qi <qijiang.qj@alibaba-inc.com>
 > 
 > There is a case which will lead to io stall. The case is described as
@@ -51,8 +51,28 @@ On 09/30/2017 12:38 AM, Joseph Qi wrote:
 > 8,32   7        0     2.539077142     0  m   N throtl /test1 dispatch nr_queued=16 read=0 write=16
 > 
 > So force schedule dispatch if there are pending children.
+>
+> Signed-off-by: Joseph Qi <qijiang.qj@alibaba-inc.com>
+> ---
+>  block/blk-throttle.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+> index 0fea76a..17816a0 100644
+> --- a/block/blk-throttle.c
+> +++ b/block/blk-throttle.c
+> @@ -1911,11 +1911,11 @@ static void throtl_upgrade_state(struct throtl_data *td)
+>  
+>  		tg->disptime = jiffies - 1;
+>  		throtl_select_dispatch(sq);
+> -		throtl_schedule_next_dispatch(sq, false);
+> +		throtl_schedule_next_dispatch(sq, true);
+>  	}
+>  	rcu_read_unlock();
+>  	throtl_select_dispatch(&td->service_queue);
+> -	throtl_schedule_next_dispatch(&td->service_queue, false);
+> +	throtl_schedule_next_dispatch(&td->service_queue, true);
+>  	queue_work(kthrotld_workqueue, &td->dispatch_work);
+>  }
 
-Applied for 4.14, thanks.
-
--- 
-Jens Axboe
+Reviewed-by: Shaohua Li <shli@fb.com> 
