@@ -1,103 +1,79 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:43882 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:46422 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752660AbdIBPSP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 2 Sep 2017 11:18:15 -0400
+        id S1751677AbdI3LbG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 Sep 2017 07:31:06 -0400
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
+        Christoph Hellwig <hch@infradead.org>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
 Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
         Laurence Oberman <loberman@redhat.com>,
         Paolo Valente <paolo.valente@linaro.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 03/14] blk-mq: introduce blk_mq_dispatch_rq_from_ctx()
-Date: Sat,  2 Sep 2017 23:17:18 +0800
-Message-Id: <20170902151729.6162-4-ming.lei@redhat.com>
-In-Reply-To: <20170902151729.6162-1-ming.lei@redhat.com>
-References: <20170902151729.6162-1-ming.lei@redhat.com>
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 1/8] blk-mq-sched: introduce blk_mq_sched_queue_depth()
+Date: Sat, 30 Sep 2017 19:26:48 +0800
+Message-Id: <20170930112655.31451-2-ming.lei@redhat.com>
+In-Reply-To: <20170930112655.31451-1-ming.lei@redhat.com>
+References: <20170930112655.31451-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This function is introduced for dequeuing request
-from sw queue so that we can dispatch it in
-scheduler's way.
+The following patch will use one hint to figure out
+default queue depth for scheduler queue, so introduce
+the helper of blk_mq_sched_queue_depth() for this purpose.
 
-More importantly, some SCSI devices may set
-q->queue_depth, which is a per-request_queue limit,
-and applied on pending I/O from all hctxs. This
-function is introduced for avoiding to dequeue too
-many requests from sw queue when ->dispatch isn't
-flushed completely.
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Tested-by: Tom Nguyen <tom81094@gmail.com>
+Tested-by: Paolo Valente <paolo.valente@linaro.org>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 38 ++++++++++++++++++++++++++++++++++++++
- block/blk-mq.h |  2 ++
- 2 files changed, 40 insertions(+)
+ block/blk-mq-sched.c |  8 +-------
+ block/blk-mq-sched.h | 11 +++++++++++
+ 2 files changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3f18cff80050..f063dd0f197f 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -880,6 +880,44 @@ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list)
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index c5eac1eee442..8c09959bc0d0 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -588,13 +588,7 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+ 		return 0;
+ 	}
+ 
+-	/*
+-	 * Default to double of smaller one between hw queue_depth and 128,
+-	 * since we don't split into sync/async like the old code did.
+-	 * Additionally, this is a per-hw queue depth.
+-	 */
+-	q->nr_requests = 2 * min_t(unsigned int, q->tag_set->queue_depth,
+-				   BLKDEV_MAX_RQ);
++	q->nr_requests = blk_mq_sched_queue_depth(q);
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		ret = blk_mq_sched_alloc_tags(q, hctx, i);
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index 9267d0b7c197..1d47f3fda1d0 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -96,4 +96,15 @@ static inline bool blk_mq_sched_needs_restart(struct blk_mq_hw_ctx *hctx)
+ 	return test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
  }
- EXPORT_SYMBOL_GPL(blk_mq_flush_busy_ctxs);
  
-+struct dispatch_rq_data {
-+	struct blk_mq_hw_ctx *hctx;
-+	struct request *rq;
-+};
-+
-+static bool dispatch_rq_from_ctx(struct sbitmap *sb, unsigned int bitnr, void *data)
++static inline unsigned blk_mq_sched_queue_depth(struct request_queue *q)
 +{
-+	struct dispatch_rq_data *dispatch_data = data;
-+	struct blk_mq_hw_ctx *hctx = dispatch_data->hctx;
-+	struct blk_mq_ctx *ctx = hctx->ctxs[bitnr];
-+
-+	spin_lock(&ctx->lock);
-+	if (unlikely(!list_empty(&ctx->rq_list))) {
-+		dispatch_data->rq = list_entry_rq(ctx->rq_list.next);
-+		list_del_init(&dispatch_data->rq->queuelist);
-+		if (list_empty(&ctx->rq_list))
-+			sbitmap_clear_bit(sb, bitnr);
-+	}
-+	spin_unlock(&ctx->lock);
-+
-+	return !dispatch_data->rq;
++	/*
++	 * Default to double of smaller one between hw queue_depth and 128,
++	 * since we don't split into sync/async like the old code did.
++	 * Additionally, this is a per-hw queue depth.
++	 */
++	return 2 * min_t(unsigned int, q->tag_set->queue_depth,
++				   BLKDEV_MAX_RQ);
 +}
 +
-+struct request *blk_mq_dispatch_rq_from_ctx(struct blk_mq_hw_ctx *hctx,
-+					    struct blk_mq_ctx *start)
-+{
-+	unsigned off = start ? start->index_hw : 0;
-+	struct dispatch_rq_data data = {
-+		.hctx = hctx,
-+		.rq   = NULL,
-+	};
-+
-+	__sbitmap_for_each_set(&hctx->ctx_map, off,
-+			       dispatch_rq_from_ctx, &data);
-+
-+	return data.rq;
-+}
-+
- static inline unsigned int queued_to_index(unsigned int queued)
- {
- 	if (!queued)
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 98252b79b80b..e42748bfb959 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -35,6 +35,8 @@ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list);
- bool blk_mq_hctx_has_pending(struct blk_mq_hw_ctx *hctx);
- bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
- 				bool wait);
-+struct request *blk_mq_dispatch_rq_from_ctx(struct blk_mq_hw_ctx *hctx,
-+					    struct blk_mq_ctx *start);
- 
- /*
-  * Internal helpers for allocating/freeing the request map
+ #endif
 -- 
 2.9.5
