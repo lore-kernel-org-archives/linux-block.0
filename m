@@ -1,62 +1,196 @@
-Return-Path: <prvs=4336ae8ff=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V4 15/16] block: do not set mq defaulte scheduler
-Date: Sun, 24 Sep 2017 16:02:46 +0900
-Message-Id: <20170924070247.25560-16-damien.lemoal@wdc.com>
-In-Reply-To: <20170924070247.25560-1-damien.lemoal@wdc.com>
-References: <20170924070247.25560-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:50606 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753031AbdI3Lcq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 Sep 2017 07:32:46 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 8/8] blk-mq: improve bio merge from blk-mq sw queue
+Date: Sat, 30 Sep 2017 19:26:55 +0800
+Message-Id: <20170930112655.31451-9-ming.lei@redhat.com>
+In-Reply-To: <20170930112655.31451-1-ming.lei@redhat.com>
+References: <20170930112655.31451-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-For blk-mq disks with a single hardware queue, setting by default the
-disk scheduler to mq-deadline early during the queue initialization
-prevents properly setting zone write locking for zoned block device as
-the fact that the disk is zoned is not yet known.
+This patch uses hash table to do bio merge from sw queue,
+then we can align to blk-mq scheduler/block legacy's way
+for bio merge.
 
-Fix this by simply not setting the default scheduler to mq-deadline for
-single hardware queue disks. udev can be used to easily do the same
-later in the system initialization sequence, when the device
-characteristics are known.
+Turns out bio merge via hash table is more efficient than
+simple merge on the last 8 requests in sw queue. On SCSI SRP,
+it is observed ~10% IOPS is increased in sequential IO test
+with this patch.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+It is also one step forward to real 'none' scheduler, in which
+way the blk-mq scheduler framework can be more clean.
+
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Tested-by: Tom Nguyen <tom81094@gmail.com>
+Tested-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/elevator.c | 17 ++++++-----------
- 1 file changed, 6 insertions(+), 11 deletions(-)
+ block/blk-mq-sched.c | 49 ++++++++++++-------------------------------------
+ block/blk-mq.c       | 28 +++++++++++++++++++++++++---
+ 2 files changed, 37 insertions(+), 40 deletions(-)
 
-diff --git a/block/elevator.c b/block/elevator.c
-index 153926a90901..8b65a757f726 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -222,19 +222,14 @@ int elevator_init(struct request_queue *q, char *name)
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index a58f4746317c..8262ae71e0cd 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -260,50 +260,25 @@ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_sched_try_merge);
  
- 	if (!e) {
- 		/*
--		 * For blk-mq devices, we default to using mq-deadline,
--		 * if available, for single queue devices. If deadline
--		 * isn't available OR we have multiple queues, default
--		 * to "none".
-+		 * For blk-mq devices, default to "none". udev can later set
-+		 * an appropriate default scheduler based on the disk
-+		 * characteristics which we do not yet have here.
- 		 */
--		if (q->mq_ops) {
--			if (q->nr_hw_queues == 1)
--				e = elevator_get("mq-deadline", false);
--			if (!e)
--				return 0;
--		} else
--			e = elevator_get(CONFIG_DEFAULT_IOSCHED, false);
-+		if (q->mq_ops)
-+			return 0;
+-/*
+- * Reverse check our software queue for entries that we could potentially
+- * merge with. Currently includes a hand-wavy stop count of 8, to not spend
+- * too much time checking for merges.
+- */
+-static bool blk_mq_attempt_merge(struct request_queue *q,
++static bool blk_mq_ctx_try_merge(struct request_queue *q,
+ 				 struct blk_mq_ctx *ctx, struct bio *bio)
+ {
+-	struct request *rq;
+-	int checked = 8;
++	struct request *rq, *free = NULL;
++	enum elv_merge type;
++	bool merged;
  
-+		e = elevator_get(CONFIG_DEFAULT_IOSCHED, false);
- 		if (!e) {
- 			printk(KERN_ERR
- 				"Default I/O scheduler not found. " \
+ 	lockdep_assert_held(&ctx->lock);
+ 
+-	list_for_each_entry_reverse(rq, &ctx->rq_list, queuelist) {
+-		bool merged = false;
+-
+-		if (!checked--)
+-			break;
+-
+-		if (!blk_rq_merge_ok(rq, bio))
+-			continue;
++	type = elv_merge_ctx(q, &rq, bio, ctx);
++	merged = __blk_mq_try_merge(q, bio, &free, rq, type);
+ 
+-		switch (blk_try_merge(rq, bio)) {
+-		case ELEVATOR_BACK_MERGE:
+-			if (blk_mq_sched_allow_merge(q, rq, bio))
+-				merged = bio_attempt_back_merge(q, rq, bio);
+-			break;
+-		case ELEVATOR_FRONT_MERGE:
+-			if (blk_mq_sched_allow_merge(q, rq, bio))
+-				merged = bio_attempt_front_merge(q, rq, bio);
+-			break;
+-		case ELEVATOR_DISCARD_MERGE:
+-			merged = bio_attempt_discard_merge(q, rq, bio);
+-			break;
+-		default:
+-			continue;
+-		}
++	if (free)
++		blk_mq_free_request(free);
+ 
+-		if (merged)
+-			ctx->rq_merged++;
+-		return merged;
+-	}
++	if (merged)
++		ctx->rq_merged++;
+ 
+-	return false;
++	return merged;
+ }
+ 
+ bool __blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
+@@ -321,7 +296,7 @@ bool __blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio)
+ 	if (hctx->flags & BLK_MQ_F_SHOULD_MERGE) {
+ 		/* default per sw-queue merge */
+ 		spin_lock(&ctx->lock);
+-		ret = blk_mq_attempt_merge(q, ctx, bio);
++		ret = blk_mq_ctx_try_merge(q, ctx, bio);
+ 		spin_unlock(&ctx->lock);
+ 	}
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 561a663cdd0e..9a3a561a63b5 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -849,6 +849,18 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ 	blk_queue_exit(q);
+ }
+ 
++static void blk_mq_ctx_remove_rq_list(struct blk_mq_ctx *ctx,
++		struct list_head *head)
++{
++	struct request *rq;
++
++	lockdep_assert_held(&ctx->lock);
++
++	list_for_each_entry(rq, head, queuelist)
++		rqhash_del(rq);
++	ctx->last_merge = NULL;
++}
++
+ struct flush_busy_ctx_data {
+ 	struct blk_mq_hw_ctx *hctx;
+ 	struct list_head *list;
+@@ -863,6 +875,7 @@ static bool flush_busy_ctx(struct sbitmap *sb, unsigned int bitnr, void *data)
+ 	sbitmap_clear_bit(sb, bitnr);
+ 	spin_lock(&ctx->lock);
+ 	list_splice_tail_init(&ctx->rq_list, flush_data->list);
++	blk_mq_ctx_remove_rq_list(ctx, flush_data->list);
+ 	spin_unlock(&ctx->lock);
+ 	return true;
+ }
+@@ -892,17 +905,23 @@ static bool dispatch_rq_from_ctx(struct sbitmap *sb, unsigned int bitnr, void *d
+ 	struct dispatch_rq_data *dispatch_data = data;
+ 	struct blk_mq_hw_ctx *hctx = dispatch_data->hctx;
+ 	struct blk_mq_ctx *ctx = hctx->ctxs[bitnr];
++	struct request *rq = NULL;
+ 
+ 	spin_lock(&ctx->lock);
+ 	if (unlikely(!list_empty(&ctx->rq_list))) {
+-		dispatch_data->rq = list_entry_rq(ctx->rq_list.next);
+-		list_del_init(&dispatch_data->rq->queuelist);
++		rq = list_entry_rq(ctx->rq_list.next);
++		list_del_init(&rq->queuelist);
++		rqhash_del(rq);
+ 		if (list_empty(&ctx->rq_list))
+ 			sbitmap_clear_bit(sb, bitnr);
+ 	}
++	if (ctx->last_merge == rq)
++		ctx->last_merge = NULL;
+ 	spin_unlock(&ctx->lock);
+ 
+-	return !dispatch_data->rq;
++	dispatch_data->rq = rq;
++
++	return !rq;
+ }
+ 
+ struct request *blk_mq_dequeue_from_ctx(struct blk_mq_hw_ctx *hctx,
+@@ -1433,6 +1452,8 @@ static inline void __blk_mq_insert_req_list(struct blk_mq_hw_ctx *hctx,
+ 		list_add(&rq->queuelist, &ctx->rq_list);
+ 	else
+ 		list_add_tail(&rq->queuelist, &ctx->rq_list);
++
++	rqhash_add(ctx->hash, rq);
+ }
+ 
+ void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+@@ -1968,6 +1989,7 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
+ 	spin_lock(&ctx->lock);
+ 	if (!list_empty(&ctx->rq_list)) {
+ 		list_splice_init(&ctx->rq_list, &tmp);
++		blk_mq_ctx_remove_rq_list(ctx, &tmp);
+ 		blk_mq_hctx_clear_pending(hctx, ctx);
+ 	}
+ 	spin_unlock(&ctx->lock);
 -- 
-2.13.5
+2.9.5
