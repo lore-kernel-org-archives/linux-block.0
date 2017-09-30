@@ -1,103 +1,43 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:16623 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S966239AbdIYU3o (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Sep 2017 16:29:44 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+Received: from mx1.redhat.com ([209.132.183.28]:60318 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751719AbdI3GMp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 Sep 2017 02:12:45 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-scsi@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
-        =Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Cathy Avery <cavery@redhat.com>,
+        Martin Steigerwald <martin@lichtvoll.de>,
+        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
         Ming Lei <ming.lei@redhat.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v4 2/7] block: Make q_usage_counter also track legacy requests
-Date: Mon, 25 Sep 2017 13:29:19 -0700
-Message-Id: <20170925202924.16603-3-bart.vanassche@wdc.com>
-In-Reply-To: <20170925202924.16603-1-bart.vanassche@wdc.com>
-References: <20170925202924.16603-1-bart.vanassche@wdc.com>
+        Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V7 1/6] blk-mq: only run hw queues for blk-mq
+Date: Sat, 30 Sep 2017 14:12:09 +0800
+Message-Id: <20170930061214.10622-2-ming.lei@redhat.com>
+In-Reply-To: <20170930061214.10622-1-ming.lei@redhat.com>
+References: <20170930061214.10622-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Ming Lei <ming.lei@redhat.com>
+This patch just makes it explicitely.
 
-This patch makes it possible to pause request allocation for
-the legacy block layer by calling blk_mq_freeze_queue() and
-blk_mq_unfreeze_queue().
-
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Tested-by: Martin Steigerwald <martin@lichtvoll.de>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
-[ bvanassche: Combined two patches into one, edited a comment and made sure
-  REQ_NOWAIT is handled properly in blk_old_get_request() ]
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- block/blk-core.c | 12 ++++++++++++
- block/blk-mq.c   | 10 ++--------
- 2 files changed, 14 insertions(+), 8 deletions(-)
+ block/blk-mq.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index aebe676225e6..fef7133f8b0e 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -610,6 +610,9 @@ void blk_set_queue_dying(struct request_queue *q)
- 		}
- 		spin_unlock_irq(q->queue_lock);
- 	}
-+
-+	/* Make blk_queue_enter() reexamine the DYING flag. */
-+	wake_up_all(&q->mq_freeze_wq);
- }
- EXPORT_SYMBOL_GPL(blk_set_queue_dying);
- 
-@@ -1392,16 +1395,22 @@ static struct request *blk_old_get_request(struct request_queue *q,
- 					   unsigned int op, gfp_t gfp_mask)
- {
- 	struct request *rq;
-+	int ret = 0;
- 
- 	WARN_ON_ONCE(q->mq_ops);
- 
- 	/* create ioc upfront */
- 	create_io_context(gfp_mask, q->node);
- 
-+	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM) ||
-+			      (op & REQ_NOWAIT));
-+	if (ret)
-+		return ERR_PTR(ret);
- 	spin_lock_irq(q->queue_lock);
- 	rq = get_request(q, op, NULL, gfp_mask);
- 	if (IS_ERR(rq)) {
- 		spin_unlock_irq(q->queue_lock);
-+		blk_queue_exit(q);
- 		return rq;
- 	}
- 
-@@ -1573,6 +1582,7 @@ void __blk_put_request(struct request_queue *q, struct request *req)
- 		blk_free_request(rl, req);
- 		freed_request(rl, sync, rq_flags);
- 		blk_put_rl(rl);
-+		blk_queue_exit(q);
- 	}
- }
- EXPORT_SYMBOL_GPL(__blk_put_request);
-@@ -1854,8 +1864,10 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
- 	 * Grab a free request. This is might sleep but can not fail.
- 	 * Returns with the queue unlocked.
- 	 */
-+	blk_queue_enter_live(q);
- 	req = get_request(q, bio->bi_opf, bio, GFP_NOIO);
- 	if (IS_ERR(req)) {
-+		blk_queue_exit(q);
- 		__wbt_done(q->rq_wb, wb_acct);
- 		if (PTR_ERR(req) == -ENOMEM)
- 			bio->bi_status = BLK_STS_RESOURCE;
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 98a18609755e..10c1f49f663d 100644
+index 98a18609755e..6fd9f86fc86d 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
 @@ -125,7 +125,8 @@ void blk_freeze_queue_start(struct request_queue *q)
@@ -110,19 +50,5 @@ index 98a18609755e..10c1f49f663d 100644
  	}
  }
  EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
-@@ -255,13 +256,6 @@ void blk_mq_wake_waiters(struct request_queue *q)
- 	queue_for_each_hw_ctx(q, hctx, i)
- 		if (blk_mq_hw_queue_mapped(hctx))
- 			blk_mq_tag_wakeup_all(hctx->tags, true);
--
--	/*
--	 * If we are called because the queue has now been marked as
--	 * dying, we need to ensure that processes currently waiting on
--	 * the queue are notified as well.
--	 */
--	wake_up_all(&q->mq_freeze_wq);
- }
- 
- bool blk_mq_can_queue(struct blk_mq_hw_ctx *hctx)
 -- 
-2.14.1
+2.9.5
