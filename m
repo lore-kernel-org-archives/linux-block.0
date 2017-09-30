@@ -1,71 +1,199 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f45.google.com ([74.125.82.45]:33624 "EHLO
-        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753354AbdIDJSR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Sep 2017 05:18:17 -0400
-Received: by mail-wm0-f45.google.com with SMTP id f145so3146785wme.0
-        for <linux-block@vger.kernel.org>; Mon, 04 Sep 2017 02:18:16 -0700 (PDT)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: Memory leak in BFQ?
-From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <1504212121.31872.44.camel@wdc.com>
-Date: Mon, 4 Sep 2017 11:18:13 +0200
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Message-Id: <3009D2F3-D230-4A7B-A7CE-2CC4374F53BE@linaro.org>
-References: <1504212121.31872.44.camel@wdc.com>
-To: Bart Van Assche <bart.vanassche@wdc.com>
+Received: from mx1.redhat.com ([209.132.183.28]:57984 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752783AbdI3LsP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 Sep 2017 07:48:15 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 4/5] dm-mpath: cache ti->clone during requeue
+Date: Sat, 30 Sep 2017 19:46:51 +0800
+Message-Id: <20170930114652.32441-5-ming.lei@redhat.com>
+In-Reply-To: <20170930114652.32441-1-ming.lei@redhat.com>
+References: <20170930114652.32441-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+During requeue, block layer won't change the request any
+more, such as no merge, so we can cache ti->clone and
+let .clone_and_map_rq check if the cache can be hit.
 
-> Il giorno 31 ago 2017, alle ore 22:42, Bart Van Assche =
-<bart.vanassche@wdc.com> ha scritto:
->=20
-> Hello Paolo,
->=20
-> If I run the following commands:
->=20
-> # echo bfq > /sys/block/sda/queue/scheduler=20
-> # echo 3 >/proc/sys/vm/drop_caches; find / -xdev >/dev/null
-> # echo none > /sys/block/sda/queue/scheduler
-> # echo scan > /sys/kernel/debug/kmemleak
->=20
-> Then kmemleak reports the following:
->=20
-> unreferenced object 0xffff880405149158 (size 4096):
->  comm "bash", pid 1716, jiffies 4294960386 (age 75256.970s)
->  hex dump (first 32 bytes):
->    48 a5 f4 a3 04 88 ff ff 01 00 00 00 00 00 00 00  H...............
->    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->  backtrace:
->    [<ffffffff8165a50a>] kmemleak_alloc+0x4a/0xa0
->    [<ffffffff811f5114>] kmem_cache_alloc_node_trace+0x154/0x310
->    [<ffffffffa07087bc>] bfq_pd_alloc+0x3c/0x3f0 [bfq]
->    [<ffffffff8130e4bc>] blkcg_activate_policy+0xac/0x170
->    [<ffffffffa0709b4c>] bfq_create_group_hierarchy+0x1c/0x66 [bfq]
->    [<ffffffffa070277b>] bfq_init_queue+0x28b/0x350 [bfq]
->    [<ffffffff8130223b>] blk_mq_init_sched+0xbb/0x150
->    [<ffffffff812e6b42>] elevator_switch+0x62/0x210
->    [<ffffffff812e7ca2>] elv_iosched_store+0xe2/0x180
->    [<ffffffff812f23a9>] queue_attr_store+0x59/0x90
->    [<ffffffff812ac715>] sysfs_kf_write+0x45/0x60
->    [<ffffffff812abfd4>] kernfs_fop_write+0x124/0x1c0
->    [<ffffffff8121d218>] __vfs_write+0x28/0x150
->    [<ffffffff8121e7e7>] vfs_write+0xc7/0x1b0
->    [<ffffffff8121fd69>] SyS_write+0x49/0xa0
->    [<ffffffff81667c2a>] entry_SYSCALL_64_fastpath+0x18/0xad
->=20
-> Could this indicate a memory leak in the BFQ code?
->=20
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/md/dm-mpath.c | 31 ++++++++++++++++++++++++-------
+ drivers/md/dm-rq.c    | 41 +++++++++++++++++++++++++++++------------
+ 2 files changed, 53 insertions(+), 19 deletions(-)
 
-I guess so.  But I've been trying to reproduce it at no avail.  Is it
-readily reproducible in your system?  If so, did you happen, by chance,
-to find also some other way to reproduce it?
-
-Thanks,
-Paolo
-
-> Thanks,
->=20
-> Bart.
+diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
+index 9ee223170ee9..52e4730541fd 100644
+--- a/drivers/md/dm-mpath.c
++++ b/drivers/md/dm-mpath.c
+@@ -457,6 +457,11 @@ do {									\
+ 		 dm_noflush_suspending((m)->ti));			\
+ } while (0)
+ 
++static void multipath_release_clone(struct request *clone)
++{
++	blk_put_request(clone);
++}
++
+ /*
+  * Map cloned requests (request-based multipath)
+  */
+@@ -470,7 +475,7 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
+ 	struct block_device *bdev;
+ 	struct dm_mpath_io *mpio = get_mpio(map_context);
+ 	struct request_queue *q;
+-	struct request *clone;
++	struct request *clone = *__clone;
+ 
+ 	/* Do we need to select a new pgpath? */
+ 	pgpath = lockless_dereference(m->current_pgpath);
+@@ -493,7 +498,23 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
+ 
+ 	bdev = pgpath->path.dev->bdev;
+ 	q = bdev_get_queue(bdev);
+-	clone = blk_get_request(q, rq->cmd_flags | REQ_NOMERGE, GFP_ATOMIC);
++
++	/*
++	 * This request may be from requeue path, and its clone
++	 * may have been allocated before. We need to check
++	 * if the cached clone can be hit.
++	 */
++	if (clone) {
++		if (clone->q != q) {
++			blk_rq_unprep_clone(clone);
++			multipath_release_clone(clone);
++			clone = NULL;
++		} else
++			goto start_io;
++	}
++
++	if (!clone)
++		clone = blk_get_request(q, rq->cmd_flags | REQ_NOMERGE, GFP_ATOMIC);
+ 	if (IS_ERR(clone)) {
+ 		/* EBUSY, ENODEV or EWOULDBLOCK: requeue */
+ 		bool queue_dying = blk_queue_dying(q);
+@@ -520,6 +541,7 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
+ 	clone->cmd_flags |= REQ_FAILFAST_TRANSPORT;
+ 	*__clone = clone;
+ 
++ start_io:
+ 	if (pgpath->pg->ps.type->start_io)
+ 		pgpath->pg->ps.type->start_io(&pgpath->pg->ps,
+ 					      &pgpath->path,
+@@ -527,11 +549,6 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
+ 	return DM_MAPIO_REMAPPED;
+ }
+ 
+-static void multipath_release_clone(struct request *clone)
+-{
+-	blk_put_request(clone);
+-}
+-
+ /*
+  * Map cloned bios (bio-based multipath)
+  */
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index 46f012185b43..2ef524bddd38 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -221,6 +221,12 @@ static void dm_end_request(struct request *clone, blk_status_t error)
+ 	blk_rq_unprep_clone(clone);
+ 	tio->ti->type->release_clone_rq(clone);
+ 
++	/*
++	 * We move the clearing from tio_init in .queue_rq to here because
++	 * tio->clone may be cached during requeue
++	 */
++	tio->clone = NULL;
++
+ 	rq_end_stats(md, rq);
+ 	if (!rq->q->mq_ops)
+ 		blk_end_request_all(rq, error);
+@@ -267,11 +273,15 @@ static void dm_requeue_original_request(struct dm_rq_target_io *tio, bool delay_
+ 	int rw = rq_data_dir(rq);
+ 	unsigned long delay_ms = delay_requeue ? 100 : 0;
+ 
++	/*
++	 * This request won't be changed any more during requeue,
++	 * so we cache tio->clone and let .clone_and_map_rq decide
++	 * to use the cached clone or allocate a new clone, and
++	 * the cached clone has to be freed before allocating a
++	 * new one.
++	 */
++
+ 	rq_end_stats(md, rq);
+-	if (tio->clone) {
+-		blk_rq_unprep_clone(tio->clone);
+-		tio->ti->type->release_clone_rq(tio->clone);
+-	}
+ 
+ 	if (!rq->q->mq_ops)
+ 		dm_old_requeue_request(rq, delay_ms);
+@@ -448,7 +458,6 @@ static void init_tio(struct dm_rq_target_io *tio, struct request *rq,
+ {
+ 	tio->md = md;
+ 	tio->ti = NULL;
+-	tio->clone = NULL;
+ 	tio->orig = rq;
+ 	tio->error = 0;
+ 	tio->completed = 0;
+@@ -456,8 +465,12 @@ static void init_tio(struct dm_rq_target_io *tio, struct request *rq,
+ 	 * Avoid initializing info for blk-mq; it passes
+ 	 * target-specific data through info.ptr
+ 	 * (see: dm_mq_init_request)
++	 *
++	 * If tio->clone is cached during requeue, we don't
++	 * clear tio->info, and delay the initialization
++	 * to .clone_and_map_rq if the cache isn't hit.
+ 	 */
+-	if (!md->init_tio_pdu)
++	if (!md->init_tio_pdu && !tio->clone)
+ 		memset(&tio->info, 0, sizeof(tio->info));
+ 	if (md->kworker_task)
+ 		kthread_init_work(&tio->work, map_tio_request);
+@@ -475,7 +488,8 @@ static int map_request(struct dm_rq_target_io *tio)
+ 	struct dm_target *ti = tio->ti;
+ 	struct mapped_device *md = tio->md;
+ 	struct request *rq = tio->orig;
+-	struct request *clone = NULL;
++	struct request *cache = tio->clone;
++	struct request *clone = cache;
+ 
+ 	r = ti->type->clone_and_map_rq(ti, rq, &tio->info, &clone);
+ 	switch (r) {
+@@ -483,10 +497,13 @@ static int map_request(struct dm_rq_target_io *tio)
+ 		/* The target has taken the I/O to submit by itself later */
+ 		break;
+ 	case DM_MAPIO_REMAPPED:
+-		if (setup_clone(clone, rq, tio, GFP_ATOMIC)) {
+-			/* -ENOMEM */
+-			ti->type->release_clone_rq(clone);
+-			return DM_MAPIO_REQUEUE;
++		/* cache not hit or not cached */
++		if (!cache || clone != cache) {
++			if (setup_clone(clone, rq, tio, GFP_ATOMIC)) {
++				/* -ENOMEM */
++				ti->type->release_clone_rq(clone);
++				return DM_MAPIO_REQUEUE;
++			}
+ 		}
+ 
+ 		/* The target has remapped the I/O so dispatch it */
+@@ -555,7 +572,7 @@ static int __dm_rq_init_rq(struct mapped_device *md, struct request *rq)
+ 	 * be available in dm_mq_queue_rq.
+ 	 */
+ 	tio->md = md;
+-
++	tio->clone = NULL;
+ 	if (md->init_tio_pdu) {
+ 		/* target-specific per-io data is immediately after the tio */
+ 		tio->info.ptr = tio + 1;
+-- 
+2.9.5
