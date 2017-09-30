@@ -1,48 +1,85 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH 5/5] bfq: Use icq_to_bic() consistently
-From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20170830184211.12471-6-bart.vanassche@wdc.com>
-Date: Fri, 1 Sep 2017 19:15:06 +0200
-Cc: Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org
-Message-Id: <14F050D7-2A93-444F-825D-F99D9A04DD37@linaro.org>
-References: <20170830184211.12471-1-bart.vanassche@wdc.com> <20170830184211.12471-6-bart.vanassche@wdc.com>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:60752 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752157AbdI3Lrq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 Sep 2017 07:47:46 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 2/5] dm-mpath: don't call blk_mq_delay_run_hw_queue() in case of BLK_STS_RESOURCE
+Date: Sat, 30 Sep 2017 19:46:49 +0800
+Message-Id: <20170930114652.32441-3-ming.lei@redhat.com>
+In-Reply-To: <20170930114652.32441-1-ming.lei@redhat.com>
+References: <20170930114652.32441-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
+If .queue_rq() returns BLK_STS_RESOURCE, blk-mq will rerun
+the queue in the three situations:
 
-> Il giorno 30 ago 2017, alle ore 20:42, Bart Van Assche =
-<bart.vanassche@wdc.com> ha scritto:
->=20
-> Some code uses icq_to_bic() to convert an io_cq pointer to a
-> bfq_io_cq pointer while other code uses a direct cast. Convert
-> the code that uses a direct cast such that it uses icq_to_bic().
->=20
-> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-> Cc: Paolo Valente <paolo.valente@linaro.org>
+1) if BLK_MQ_S_SCHED_RESTART is set
+- queue is rerun after one rq is completed, see blk_mq_sched_restart()
+which is run from blk_mq_free_request()
 
-Acked-by: Paolo Valente <paolo.valente@linaro.org>
+2) BLK_MQ_S_TAG_WAITING is set
+- queue is rerun after one tag is freed
 
-> ---
-> block/bfq-iosched.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index d375b29ad085..7d1b85e393b2 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -239,7 +239,7 @@ static int T_slow[2];
-> static int T_fast[2];
-> static int device_speed_thresh[2];
->=20
-> -#define RQ_BIC(rq)		((struct bfq_io_cq *) (rq)->elv.priv[0])
-> +#define RQ_BIC(rq)		icq_to_bic((rq)->elv.priv[0])
-> #define RQ_BFQQ(rq)		((rq)->elv.priv[1])
->=20
-> struct bfq_queue *bic_to_bfqq(struct bfq_io_cq *bic, bool is_sync)
-> --=20
-> 2.14.1
->=20
+3) otherwise
+- queue is run immediately in blk_mq_dispatch_rq_list()
+
+This random dealy of running hw queue is introduced by commit
+6077c2d706097c0(dm rq: Avoid that request processing stalls sporadically),
+which claimed one request processing stalling is fixed,
+but never explained the behind idea, and it is a workaound at most.
+Even the question isn't explained by anyone in recent discussion.
+
+Also calling blk_mq_delay_run_hw_queue() inside .queue_rq() is
+a horrible hack because it makes BLK_MQ_S_SCHED_RESTART not
+working, and will degrade I/O peformance a lot.
+
+Finally this patch makes sure that dm-rq returns
+BLK_STS_RESOURCE to blk-mq only when underlying queue is
+out of resource, so we switch to return DM_MAPIO_DELAY_REQUEU
+if either MPATHF_QUEUE_IO or MPATHF_PG_INIT_REQUIRED is set in
+multipath_clone_and_map().
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/md/dm-mpath.c | 4 +---
+ drivers/md/dm-rq.c    | 1 -
+ 2 files changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
+index e8094d8fbe0d..97e4bd100fa1 100644
+--- a/drivers/md/dm-mpath.c
++++ b/drivers/md/dm-mpath.c
+@@ -484,9 +484,7 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
+ 		return DM_MAPIO_KILL;
+ 	} else if (test_bit(MPATHF_QUEUE_IO, &m->flags) ||
+ 		   test_bit(MPATHF_PG_INIT_REQUIRED, &m->flags)) {
+-		if (pg_init_all_paths(m))
+-			return DM_MAPIO_DELAY_REQUEUE;
+-		return DM_MAPIO_REQUEUE;
++		return DM_MAPIO_DELAY_REQUEUE;
+ 	}
+ 
+ 	memset(mpio, 0, sizeof(*mpio));
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index f5e2b6967357..46f012185b43 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -758,7 +758,6 @@ static blk_status_t dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 		/* Undo dm_start_request() before requeuing */
+ 		rq_end_stats(md, rq);
+ 		rq_completed(md, rq_data_dir(rq), false);
+-		blk_mq_delay_run_hw_queue(hctx, 100/*ms*/);
+ 		return BLK_STS_RESOURCE;
+ 	}
+ 
+-- 
+2.9.5
