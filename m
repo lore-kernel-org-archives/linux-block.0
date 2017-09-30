@@ -1,53 +1,87 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:39506 "EHLO
-        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752455AbdI0XQJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Sep 2017 19:16:09 -0400
-Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
-        by aserp1040.oracle.com (Sentrion-MTA-4.3.2/Sentrion-MTA-4.3.2) with ESMTP id v8RNG8XY015482
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
-        for <linux-block@vger.kernel.org>; Wed, 27 Sep 2017 23:16:08 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id v8RNG7vX009514
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
-        for <linux-block@vger.kernel.org>; Wed, 27 Sep 2017 23:16:08 GMT
-Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id v8RNG7Z2016677
-        for <linux-block@vger.kernel.org>; Wed, 27 Sep 2017 23:16:07 GMT
-From: Liu Bo <bo.li.liu@oracle.com>
-To: linux-block@vger.kernel.org
-Subject: [PATCH] badblocks: fix wrong return value in badblocks_set if badblocks are disabled
-Date: Wed, 27 Sep 2017 16:13:17 -0600
-Message-Id: <20170927221317.31237-1-bo.li.liu@oracle.com>
+Received: from mx1.redhat.com ([209.132.183.28]:41600 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752745AbdI3K3M (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 Sep 2017 06:29:12 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 5/7] blk-mq-sched: move actual dispatching into one helper
+Date: Sat, 30 Sep 2017 18:27:18 +0800
+Message-Id: <20170930102720.30219-6-ming.lei@redhat.com>
+In-Reply-To: <20170930102720.30219-1-ming.lei@redhat.com>
+References: <20170930102720.30219-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-MD's rdev_set_badblocks() expects that badblocks_set() returns 1 if
-badblocks are disabled, otherwise, rdev_set_badblocks() will record
-superblock changes and return success in that case and md will fail to
-report an IO error which it should.
+So that it becomes easy to support to dispatch from
+sw queue in the following patch.
 
-This bug has existed since badblocks were introduced in commit
-9e0e252a048b ("badblocks: Add core badblock management code").
+No functional change.
 
-Signed-off-by: Liu Bo <bo.li.liu@oracle.com>
+Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Tested-by: Tom Nguyen <tom81094@gmail.com>
+Tested-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/badblocks.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-mq-sched.c | 28 ++++++++++++++++++----------
+ 1 file changed, 18 insertions(+), 10 deletions(-)
 
-diff --git a/block/badblocks.c b/block/badblocks.c
-index 43c7116..91f7bcf 100644
---- a/block/badblocks.c
-+++ b/block/badblocks.c
-@@ -178,7 +178,7 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index eca011fdfa0e..538f363f39ca 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -89,6 +89,22 @@ static bool blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
+ 	return false;
+ }
  
- 	if (bb->shift < 0)
- 		/* badblocks are disabled */
--		return 0;
-+		return 1;
++static void blk_mq_do_dispatch_sched(struct request_queue *q,
++				     struct elevator_queue *e,
++				     struct blk_mq_hw_ctx *hctx)
++{
++	LIST_HEAD(rq_list);
++
++	do {
++		struct request *rq;
++
++		rq = e->type->ops.mq.dispatch_request(hctx);
++		if (!rq)
++			break;
++		list_add(&rq->queuelist, &rq_list);
++	} while (blk_mq_dispatch_rq_list(q, &rq_list));
++}
++
+ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct request_queue *q = hctx->queue;
+@@ -136,16 +152,8 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	 * on the dispatch list or we were able to dispatch from the
+ 	 * dispatch list.
+ 	 */
+-	if (do_sched_dispatch && has_sched_dispatch) {
+-		do {
+-			struct request *rq;
+-
+-			rq = e->type->ops.mq.dispatch_request(hctx);
+-			if (!rq)
+-				break;
+-			list_add(&rq->queuelist, &rq_list);
+-		} while (blk_mq_dispatch_rq_list(q, &rq_list));
+-	}
++	if (do_sched_dispatch && has_sched_dispatch)
++		blk_mq_do_dispatch_sched(q, e, hctx);
+ }
  
- 	if (bb->shift) {
- 		/* round the start down, and the end up */
+ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
 -- 
-2.9.4
+2.9.5
