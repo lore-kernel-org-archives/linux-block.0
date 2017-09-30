@@ -1,119 +1,48 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <jthumshirn@suse.de>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Christoph Hellwig <hch@lst.de>,  Jens Axboe <axboe@kernel.dk>,  linux-block@vger.kernel.org,  Sagi Grimberg <sagi@grimberg.me>,  linux-nvme@lists.infradead.org, Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH 8/9] nvme: implement multipath access to nvme subsystems
+References: <20170925134031.10548-1-hch@lst.de>
+	<20170925134031.10548-9-hch@lst.de>
+	<20170928155315.GK8463@localhost.localdomain>
+Date: Sat, 30 Sep 2017 21:37:38 +0200
+In-Reply-To: <20170928155315.GK8463@localhost.localdomain> (Keith Busch's
+	message of "Thu, 28 Sep 2017 09:53:16 -0600")
+Message-ID: <mqdk20ghta5.fsf@linux-x5ow.site>
 MIME-Version: 1.0
-In-Reply-To: <20170926042421.GP10955@dastard>
-References: <CAOQ4uxixLMRU2YT-3csTr_684vNUZ=2CazKKD-ojO68fC4f6tA@mail.gmail.com>
- <20170926042421.GP10955@dastard>
-From: Amir Goldstein <amir73il@gmail.com>
-Date: Tue, 26 Sep 2017 11:35:46 +0300
-Message-ID: <CAOQ4uxhybgUmfk_voNxgx+NVT2JabKdcgtmKxSSGRF5LS+_C+g@mail.gmail.com>
-Subject: Re: false positive lockdep splat with loop device
-To: Dave Chinner <david@fromorbit.com>
-Cc: "Darrick J. Wong" <darrick.wong@oracle.com>,
-        xfs <linux-xfs@vger.kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Byungchul Park <byungchul.park@lge.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-fsdevel-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Sep 26, 2017 at 7:24 AM, Dave Chinner <david@fromorbit.com> wrote:
-> On Thu, Sep 21, 2017 at 09:43:41AM +0300, Amir Goldstein wrote:
->> On Thu, Sep 21, 2017 at 1:22 AM, Dave Chinner <david@fromorbit.com> wrote:
->> > [cc lkml, PeterZ and Byungchul]
->> ...
->> > The thing is, this IO completion has nothing to do with the lower
->> > filesystem - it's the IO completion for the filesystem on the loop
->> > device (the upper filesystem) and is not in any way related to the
->> > IO completion from the dax device the lower filesystem is waiting
->> > on.
->> >
->> > IOWs, this is a false positive.
->> >
->> > Peter, this is the sort of false positive I mentioned were likely to
->> > occur without some serious work to annotate the IO stack to prevent
->> > them.  We can nest multiple layers of IO completions and locking in
->> > the IO stack via things like loop and RAID devices.  They can be
->> > nested to arbitrary depths, too (e.g. loop on fs on loop on fs on
->> > dm-raid on n * (loop on fs) on bdev) so this new completion lockdep
->> > checking is going to be a source of false positives until there is
->> > an effective (and simple!) way of providing context based completion
->> > annotations to avoid them...
->> >
->>
->> IMO, the way to handle this is to add 'nesting_depth' information
->> on blockdev (or bdi?). 'nesting' in the sense of blockdev->fs->blockdev->fs.
->> AFAIK, the only blockdev drivers that need to bump nesting_depth
->> are loop and nbd??
+
+[+Cc Hannes ]
+
+Keith Busch <keith.busch@intel.com> writes:
+
+> On Mon, Sep 25, 2017 at 03:40:30PM +0200, Christoph Hellwig wrote:
+>> The new block devices nodes for multipath access will show up as
+>>=20
+>> 	/dev/nvm-subXnZ
 >
-> You're assumming that this sort of "completion inversion" can only
-> happen with bdev->fs->bdev, and that submit_bio_wait() is the only
-> place where completions are used in stackable block devices.
->
-> AFAICT, this could happen on with any block device that can be
-> stacked multiple times that uses completions. e.g. MD has a function
-> sync_page_io() that calls submit_bio_wait(), and that is called from
-> places in the raid 5, raid 10, raid 1 and bitmap layers (plus others
-> in DM). These can get stacked anywhere - even on top of loop devices
-> - and so I think the issue has a much wider scope than just loop and
-> nbd devices.
+> Just thinking ahead ... Once this goes in, someone will want to boot their
+> OS from a multipath target. It was a pain getting installers to recognize
+> /dev/nvmeXnY as an install destination. I'm not sure if installers have
+> gotten any better in the last 5 years about recognizing new block names.
 
-True. We can probably duplicate the struct file_system_type pattern,
-something like:
+We discussed (Hannes, Christoph and me) this as well offline this week
+and it should eithr be possible with some udev magic (fake a
+/dev/mapper/WWID symlink) or a shim device-mapper target that prevents
+dm-mpath from attaching to the underlying block devices and creates a
+real /dev/mapper/WWID device node (Christoph especially dislikes
+this). None of them are pretty, but probably all we can do so far.
 
-struct block_device_type = loop_blkdev_type = {
-        .owner          = THIS_MODULE,
-        .name           = "loop",
-        .devt             = MKDEV(LOOP_MAJOR, 0),
-        .probe           = loop_probe,
-        .lock              = NULL,
-};
+Byte,
+        Johannes
 
-...
-blk_register_region(&loop_blkdev_type, range, NULL);
-
-And then we have a static place holder for lock_class_key address
-to be used when annotating bio completions.
-I realize same block device types can be nested via raid/dm/loop,
-but as we can see in the splat so do same file system types via loop/nbd,
-so we can think of similar solution to both cases.
-
->
->> Not sure if the kernel should limit loop blockdev nesting depth??
->
-> There's no way we should do that just because new lockdep
-> functionality is unable to express such constructs.
->
-
-Of course not. I was just wondering if there should be a limit to
-blockdev nesting regardless (e.g. too much queuing in the io stack).
-
-But even if there is no limit to blockdev nesting, we can define
-CONFIG_LOCKDEP_MAX_NESTING and:
-
-struct lock_class_nested_key {
-        struct lock_class_key     keys[CONFIG_LOCKDEP_MAX_NESTING];
-};
-
-Then struct file_system_type and struct block_device_type keys
-could be of type struct lock_class_nested_key.
-
-nested_depth should be carried in struct gendisk and the it is the
-responsibility of  the blockdev driver to bump nested_depth if it
-is a nested blockdev.
-
-Callers of lockdep_set_class() ,like lockdep_annotate_inode_mutex_key()
-should use a variant lockdep_set_class_nested(lock, ket, nested_depth)
-if appropriate.
-
-For any depth greater than CONFIG_LOCKDEP_MAX_NESTING,
-lockdep_set_class_nested() will overload the last key in the
-array, so we don't solve false positives for infinite nesting depth,
-but we solve them for a defined max nesting depth.
-
-Alas, even if this is workable, it will not be anytime soon that I can
-backup this scribble with tested patches.
-
-Amir.
+--=20
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
+GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N=C3=BCrnberg)
+Key fingerprint =3D EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
