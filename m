@@ -1,63 +1,59 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:14298 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S966239AbdIYU3q (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Sep 2017 16:29:46 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        =Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v4 6/7] scsi: Set QUEUE_FLAG_PREEMPT_ONLY while quiesced
-Date: Mon, 25 Sep 2017 13:29:23 -0700
-Message-Id: <20170925202924.16603-7-bart.vanassche@wdc.com>
-In-Reply-To: <20170925202924.16603-1-bart.vanassche@wdc.com>
-References: <20170925202924.16603-1-bart.vanassche@wdc.com>
+Received: from mx1.redhat.com ([209.132.183.28]:57328 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751677AbdI3L1Y (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 Sep 2017 07:27:24 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 0/8] blk-mq: improve bio merge for none scheduler
+Date: Sat, 30 Sep 2017 19:26:47 +0800
+Message-Id: <20170930112655.31451-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Make the quiesce state visible to the block layer for the next
-patch in this series.
+Hi,
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/scsi/scsi_lib.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Patch 1 ~ 2 uses q->queue_depth as hint for setting up
+scheduler queue depth.
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index c261498606c4..309369d8fe01 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2932,6 +2932,8 @@ scsi_device_quiesce(struct scsi_device *sdev)
- 
- 	mutex_lock(&sdev->state_mutex);
- 	err = scsi_device_set_state(sdev, SDEV_QUIESCE);
-+	if (err == 0)
-+		blk_set_preempt_only(q, true);
- 	mutex_unlock(&sdev->state_mutex);
- 
- 	if (err)
-@@ -2960,8 +2962,10 @@ void scsi_device_resume(struct scsi_device *sdev)
- 	 */
- 	mutex_lock(&sdev->state_mutex);
- 	if (sdev->sdev_state == SDEV_QUIESCE &&
--	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0)
-+	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0) {
-+		blk_set_preempt_only(sdev->request_queue, false);
- 		scsi_run_queue(sdev->request_queue);
-+	}
- 	mutex_unlock(&sdev->state_mutex);
- }
- EXPORT_SYMBOL(scsi_device_resume);
+Patch 3 ~ 8 improve bio merge via hash table in sw queue,
+which makes bio merge more efficient than current approch
+in which only the last 8 requests in sw queue are checked.
+
+Also this way has been used in block legacy path for long time,
+and blk-mq scheduler uses hash table to do bio merge too.
+
+V5:
+	- splitted from previous patchset of 'blk-mq-sched: improve
+	SCSI-MQ performance V4'
+
+Ming Lei (8):
+  blk-mq-sched: introduce blk_mq_sched_queue_depth()
+  blk-mq-sched: use q->queue_depth as hint for q->nr_requests
+  block: introduce rqhash helpers
+  block: move actual bio merge code into __elv_merge
+  block: add check on elevator for supporting bio merge via hashtable
+    from blk-mq sw queue
+  block: introduce .last_merge and .hash to blk_mq_ctx
+  blk-mq-sched: refactor blk_mq_sched_try_merge()
+  blk-mq: improve bio merge from blk-mq sw queue
+
+ block/blk-mq-sched.c | 75 +++++++++++++++---------------------------
+ block/blk-mq-sched.h | 23 +++++++++++++
+ block/blk-mq.c       | 55 ++++++++++++++++++++++++++++---
+ block/blk-mq.h       |  5 +++
+ block/blk-settings.c |  2 ++
+ block/blk.h          | 55 +++++++++++++++++++++++++++++++
+ block/elevator.c     | 93 +++++++++++++++++++++++++++++++---------------------
+ 7 files changed, 216 insertions(+), 92 deletions(-)
+
 -- 
-2.14.1
+2.9.5
