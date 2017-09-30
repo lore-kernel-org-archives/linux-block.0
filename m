@@ -1,73 +1,44 @@
-Return-Path: <colyli@suse.de>
-From: Coly Li <colyli@suse.de>
-To: axboe@kernel.dk,
-	linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: Coly Li <colyli@suse.de>
-Subject: [PATCH 1/1] bcache: use llist_for_each_entry_safe() in __closure_wake_up()
-Date: Tue, 26 Sep 2017 17:54:12 +0800
-Message-Id: <20170926095412.74028-2-colyli@suse.de>
-In-Reply-To: <20170926095412.74028-1-colyli@suse.de>
-References: <20170926095412.74028-1-colyli@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:60638 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752157AbdI3Lrc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 Sep 2017 07:47:32 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 1/5] dm-mpath: remove annoying message of 'blk_get_request() returned -11'
+Date: Sat, 30 Sep 2017 19:46:48 +0800
+Message-Id: <20170930114652.32441-2-ming.lei@redhat.com>
+In-Reply-To: <20170930114652.32441-1-ming.lei@redhat.com>
+References: <20170930114652.32441-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Commit 09b3efec ("bcache: Don't reinvent the wheel but use existing llist
-API") replaces the following while loop by llist_for_each_entry(),
+It is very normal to see allocation failure, so not necessary
+to dump it and annoy people.
 
--
--	while (reverse) {
--		cl = container_of(reverse, struct closure, list);
--		reverse = llist_next(reverse);
--
-+	llist_for_each_entry(cl, reverse, list) {
- 		closure_set_waiting(cl, 0);
- 		closure_sub(cl, CLOSURE_WAITING + 1);
- 	}
-
-This modification introduces a potential race by iterating a corrupted
-list. Here is how it happens.
-
-In the above modification, closure_sub() may wake up a process which is
-waiting on reverse list. If this process decides to wait again by calling
-closure_wait(), its cl->list will be added to another wait list. Then
-when llist_for_each_entry() continues to iterate next node, it will travel
-on another new wait list which is added in closure_wait(), not the
-original reverse list in __closure_wake_up(). It is more probably to
-happen on UP machine because the waked up process may preempt the process
-which wakes up it.
-
-Use llist_for_each_entry_safe() will fix the issue, the safe version fetch
-next node before waking up a process. Then the copy of next node will make
-sure list iteration stays on original reverse list.
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Reported-by: Michael Lyle <mlyle@lyle.org>
-Reviewed-by: Byungchul Park <byungchul.park@lge.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/bcache/closure.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/md/dm-mpath.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/drivers/md/bcache/closure.c b/drivers/md/bcache/closure.c
-index 7d5286b05036..1841d0359bac 100644
---- a/drivers/md/bcache/closure.c
-+++ b/drivers/md/bcache/closure.c
-@@ -64,7 +64,7 @@ EXPORT_SYMBOL(closure_put);
- void __closure_wake_up(struct closure_waitlist *wait_list)
- {
- 	struct llist_node *list;
--	struct closure *cl;
-+	struct closure *cl, *t;
- 	struct llist_node *reverse = NULL;
- 
- 	list = llist_del_all(&wait_list->list);
-@@ -73,7 +73,7 @@ void __closure_wake_up(struct closure_waitlist *wait_list)
- 	reverse = llist_reverse_order(list);
- 
- 	/* Then do the wakeups */
--	llist_for_each_entry(cl, reverse, list) {
-+	llist_for_each_entry_safe(cl, t, reverse, list) {
- 		closure_set_waiting(cl, 0);
- 		closure_sub(cl, CLOSURE_WAITING + 1);
- 	}
+diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
+index 11f273d2f018..e8094d8fbe0d 100644
+--- a/drivers/md/dm-mpath.c
++++ b/drivers/md/dm-mpath.c
+@@ -499,8 +499,6 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
+ 	if (IS_ERR(clone)) {
+ 		/* EBUSY, ENODEV or EWOULDBLOCK: requeue */
+ 		bool queue_dying = blk_queue_dying(q);
+-		DMERR_LIMIT("blk_get_request() returned %ld%s - requeuing",
+-			    PTR_ERR(clone), queue_dying ? " (path offline)" : "");
+ 		if (queue_dying) {
+ 			atomic_inc(&m->pg_init_in_progress);
+ 			activate_or_offline_path(pgpath);
 -- 
-2.13.5
+2.9.5
