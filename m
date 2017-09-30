@@ -1,123 +1,75 @@
-Return-Path: <prvs=434c021e3=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V5 06/14] block: Add zoned block device information to request queue
-Date: Mon, 25 Sep 2017 15:14:46 +0900
-Message-Id: <20170925061454.5533-7-damien.lemoal@wdc.com>
-In-Reply-To: <20170925061454.5533-1-damien.lemoal@wdc.com>
-References: <20170925061454.5533-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:34074 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752157AbdI3LrQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 Sep 2017 07:47:16 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        linux-kernel@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 0/5] dm-rq: improve sequential I/O performance
+Date: Sat, 30 Sep 2017 19:46:47 +0800
+Message-Id: <20170930114652.32441-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Components relying only on the requeuest_queue structure for accessing
-block devices (e.g. I/O schedulers) have a limited knowledged of the
-device characteristics. In particular, the device capacity cannot be
-easily discovered, which for a zoned block device also result in the
-inability to easily know the number of zones of the device (the zone
-size is indicated by the chunk_sectors field of the queue limits).
+Hi,
 
-Introduce the nr_zones field to the request_queue sturcture to simplify
-access to this information. Also, add the bitmap seq_zone_bitmap which
-indicates which zones of the device are sequential zones (write
-preferred or write required). These two fields are initialized by the
-low level block device driver (sd.c for ZBC/ZAC disks). They are not
-initialized by stacking drivers (device mappers) handling zoned block
-devices (e.g. dm-linear).
+This 1st one patch removes one log message which can be triggered
+very easily.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/blkdev.h | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+The 2nd patch removes the workaround of blk_mq_delay_run_hw_queue()
+in case of requeue, this way isn't necessary, and more worse, it
+makes BLK_MQ_S_SCHED_RESTART not working, and degarde I/O performance.
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 460294bb0fa5..90285f39030d 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -544,6 +544,18 @@ struct request_queue {
- 	struct queue_limits	limits;
- 
- 	/*
-+	 * Zoned block device information for mq I/O schedulers.
-+	 * nr_zones is the total number of zones of the device. This is always
-+	 * 0 for regular block devices. seq_zone_bitmap is a bitmap of nr_zones
-+	 * bits which indicates if a zone is conventional (bit clear) or
-+	 * sequential (bit set). Both nr_zones and seq_zone_bitmap are set
-+	 * by the low level device driver. Stacking drivers (device mappers)
-+	 * may or may not initialize these fields.
-+	 */
-+	unsigned int	nr_zones;
-+	unsigned long	*seq_zone_bitmap;
-+
-+	/*
- 	 * sg stuff
- 	 */
- 	unsigned int		sg_timeout;
-@@ -785,6 +797,27 @@ static inline unsigned int blk_queue_zone_sectors(struct request_queue *q)
- 	return blk_queue_is_zoned(q) ? q->limits.chunk_sectors : 0;
- }
- 
-+static inline unsigned int blk_queue_nr_zones(struct request_queue *q)
-+{
-+	return q->nr_zones;
-+}
-+
-+static inline unsigned int blk_queue_zone_no(struct request_queue *q,
-+					     sector_t sector)
-+{
-+	if (!blk_queue_is_zoned(q))
-+		return 0;
-+	return sector >> ilog2(q->limits.chunk_sectors);
-+}
-+
-+static inline bool blk_queue_zone_is_seq(struct request_queue *q,
-+					 sector_t sector)
-+{
-+	if (!blk_queue_is_zoned(q) || !q->seq_zone_bitmap)
-+		return false;
-+	return test_bit(blk_queue_zone_no(q, sector), q->seq_zone_bitmap);
-+}
-+
- static inline bool rq_is_sync(struct request *rq)
- {
- 	return op_is_sync(rq->cmd_flags);
-@@ -1031,6 +1064,16 @@ static inline unsigned int blk_rq_cur_sectors(const struct request *rq)
- 	return blk_rq_cur_bytes(rq) >> 9;
- }
- 
-+static inline unsigned int blk_rq_zone_no(struct request *rq)
-+{
-+	return blk_queue_zone_no(rq->q, blk_rq_pos(rq));
-+}
-+
-+static inline unsigned int blk_rq_zone_is_seq(struct request *rq)
-+{
-+	return blk_queue_zone_is_seq(rq->q, blk_rq_pos(rq));
-+}
-+
- /*
-  * Some commands like WRITE SAME have a payload or data transfer size which
-  * is different from the size of the request.  Any driver that supports such
-@@ -1582,6 +1625,16 @@ static inline unsigned int bdev_zone_sectors(struct block_device *bdev)
- 	return 0;
- }
- 
-+static inline unsigned int bdev_nr_zones(struct block_device *bdev)
-+{
-+	struct request_queue *q = bdev_get_queue(bdev);
-+
-+	if (q)
-+		return blk_queue_nr_zones(q);
-+
-+	return 0;
-+}
-+
- static inline int queue_dma_alignment(struct request_queue *q)
- {
- 	return q ? q->dma_alignment : 511;
+The 3rd patch return DM_MAPIO_REQUEUE to dm-rq if underlying request
+allocation fails, then we can return BLK_STS_RESOURCE from dm-rq
+to blk-mq, so that blk-mq can hold the requests to be dequeued.
+
+The 4th patch is a pre-patch for the 5th one, becasue even though
+underlying request allocation succeeds, its queue may be
+busy and we can get this feedback from blk_insert_cloned_request()
+now. This patch trys to cache the allocated request so that
+it may be reused in next dispatch to underlying queue.
+
+The 5th patch improves sequential I/O performance by returning
+STS_RESOURCE if underlying queue is busy.
+
+In the commit log of the 5th patch, I/O IOPS data is provided and
+we can see sequential I/O performance is improved a lot with this
+patchset.
+
+This patchset depends on the following two patchset:
+
+[1] [PATCH V5 0/7] blk-mq-sched: improve sequential I/O performance(part 1)
+    
+	https://marc.info/?l=linux-block&m=150676854821077&w=2
+    
+[2] [PATCH V5 0/8] blk-mq: improve bio merge for none scheduler
+    
+	https://marc.info/?l=linux-block&m=150677085521416&w=2
+
+Any comments are welcome! 
+
+Thanks,
+Ming
+
+Ming Lei (5):
+  dm-mpath: remove annoying message of 'blk_get_request() returned -11'
+  dm-mpath: don't call blk_mq_delay_run_hw_queue() in case of
+    BLK_STS_RESOURCE
+  dm-mpath: return DM_MAPIO_REQUEUE in case of rq allocation failure
+  dm-mpath: cache ti->clone during requeue
+  dm-rq: improve I/O merge by dealing with underlying STS_RESOURCE
+
+ block/blk-mq.c        | 17 +---------------
+ drivers/md/dm-mpath.c | 51 ++++++++++++++++++++++++++++++++++------------
+ drivers/md/dm-rq.c    | 56 +++++++++++++++++++++++++++++++++++++--------------
+ 3 files changed, 80 insertions(+), 44 deletions(-)
+
 -- 
-2.13.5
+2.9.5
