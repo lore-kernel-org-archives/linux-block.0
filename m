@@ -1,185 +1,122 @@
-Return-Path: <prvs=434c021e3=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V5 12/14] block: mq-deadline: Introduce zone locking support
-Date: Mon, 25 Sep 2017 15:14:52 +0900
-Message-Id: <20170925061454.5533-13-damien.lemoal@wdc.com>
-In-Reply-To: <20170925061454.5533-1-damien.lemoal@wdc.com>
-References: <20170925061454.5533-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:55408 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751720AbdI3GMy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 Sep 2017 02:12:54 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Cathy Avery <cavery@redhat.com>,
+        Martin Steigerwald <martin@lichtvoll.de>,
+        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V7 2/6] block: tracking request allocation with q_usage_counter
+Date: Sat, 30 Sep 2017 14:12:10 +0800
+Message-Id: <20170930061214.10622-3-ming.lei@redhat.com>
+In-Reply-To: <20170930061214.10622-1-ming.lei@redhat.com>
+References: <20170930061214.10622-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-For a write request to a zoned block device, lock the request target
-zone upon request displatch. The zone is unlocked either when the
-request completes or when the request is requeued (inserted).
+This usage is basically same with blk-mq, so that we can
+support to freeze legacy queue easily.
 
-To indicate that a request has locked its target zone, use the first
-pointer of the request elevator private data to store the value
-RQ_ZONE_WLOCKED. Testing for this value allows quick decision in
-dd_insert_request() and dd_completed_request() regarding the need for
-unlocking the target zone of a request.
+Also 'wake_up_all(&q->mq_freeze_wq)' has to be moved
+into blk_set_queue_dying() since both legacy and blk-mq
+may wait on the wait queue of .mq_freeze_wq.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Tested-by: Martin Steigerwald <martin@lichtvoll.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/mq-deadline.c | 114 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 114 insertions(+)
+ block/blk-core.c | 14 ++++++++++++++
+ block/blk-mq.c   |  7 -------
+ 2 files changed, 14 insertions(+), 7 deletions(-)
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 296880e2471f..186c32099845 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -178,6 +178,93 @@ deadline_move_request(struct deadline_data *dd, struct request *rq)
- }
- 
- /*
-+ * Return true if a request is a write requests that needs zone
-+ * write locking.
-+ */
-+static inline bool deadline_request_needs_zone_wlock(struct deadline_data *dd,
-+						     struct request *rq)
-+{
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 048be4aa6024..a5011c824ac6 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -610,6 +610,12 @@ void blk_set_queue_dying(struct request_queue *q)
+ 		}
+ 		spin_unlock_irq(q->queue_lock);
+ 	}
 +
-+	if (!dd->zones_wlock)
-+		return false;
-+
-+	if (blk_rq_is_passthrough(rq))
-+		return false;
-+
-+	switch (req_op(rq)) {
-+	case REQ_OP_WRITE_ZEROES:
-+	case REQ_OP_WRITE_SAME:
-+	case REQ_OP_WRITE:
-+		return blk_rq_zone_is_seq(rq);
-+	default:
-+		return false;
-+	}
-+}
-+
-+/*
-+ * Abuse the elv.priv[0] pointer to indicate if a request has write
-+ * locked its target zone. Only write request to a zoned block device
-+ * can own a zone write lock.
-+ */
-+#define RQ_ZONE_WLOCKED		((void *)1UL)
-+static inline void deadline_set_request_zone_wlock(struct request *rq)
-+{
-+	rq->elv.priv[0] = RQ_ZONE_WLOCKED;
-+}
-+
-+#define RQ_ZONE_NO_WLOCK	((void *)0UL)
-+static inline void deadline_clear_request_zone_wlock(struct request *rq)
-+{
-+	rq->elv.priv[0] = RQ_ZONE_NO_WLOCK;
-+}
-+
-+static inline bool deadline_request_has_zone_wlock(struct request *rq)
-+{
-+	return rq->elv.priv[0] == RQ_ZONE_WLOCKED;
-+}
-+
-+/*
-+ * Write lock the target zone of a write request.
-+ */
-+static void deadline_wlock_zone(struct deadline_data *dd,
-+				struct request *rq)
-+{
-+	unsigned int zno = blk_rq_zone_no(rq);
-+
-+	WARN_ON_ONCE(deadline_request_has_zone_wlock(rq));
-+	WARN_ON_ONCE(test_and_set_bit(zno, dd->zones_wlock));
-+	deadline_set_request_zone_wlock(rq);
-+}
-+
-+/*
-+ * Write unlock the target zone of a write request.
-+ */
-+static void deadline_wunlock_zone(struct deadline_data *dd,
-+				  struct request *rq)
-+{
-+	unsigned int zno = blk_rq_zone_no(rq);
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&dd->zone_lock, flags);
-+
-+	WARN_ON_ONCE(!test_and_clear_bit(zno, dd->zones_wlock));
-+	deadline_clear_request_zone_wlock(rq);
-+
-+	spin_unlock_irqrestore(&dd->zone_lock, flags);
-+}
-+
-+/*
-+ * Test the write lock state of the target zone of a write request.
-+ */
-+static inline bool deadline_zone_is_wlocked(struct deadline_data *dd,
-+					    struct request *rq)
-+{
-+	unsigned int zno = blk_rq_zone_no(rq);
-+
-+	return test_bit(zno, dd->zones_wlock);
-+}
-+
-+/*
-  * deadline_check_fifo returns 0 if there are no expired requests on the fifo,
-  * 1 otherwise. Requires !list_empty(&dd->fifo_list[data_dir])
-  */
-@@ -316,6 +403,11 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	dd->batching++;
- 	deadline_move_request(dd, rq);
- done:
 +	/*
-+	 * If the request needs its target zone locked, do it.
++	 * We need to ensure that processes currently waiting on
++	 * the queue are notified as well.
 +	 */
-+	if (deadline_request_needs_zone_wlock(dd, rq))
-+		deadline_wlock_zone(dd, rq);
- 	rq->rq_flags |= RQF_STARTED;
- 	return rq;
++	wake_up_all(&q->mq_freeze_wq);
  }
-@@ -466,6 +558,13 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 	struct deadline_data *dd = q->elevator->elevator_data;
- 	const int data_dir = rq_data_dir(rq);
+ EXPORT_SYMBOL_GPL(blk_set_queue_dying);
  
-+	/*
-+	 * This may be a requeue of a request that has locked its
-+	 * target zone. If this is the case, release the request zone lock.
-+	 */
-+	if (deadline_request_has_zone_wlock(rq))
-+		deadline_wunlock_zone(dd, rq);
-+
- 	if (blk_mq_sched_try_insert_merge(q, rq))
- 		return;
- 
-@@ -510,6 +609,20 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
- 	spin_unlock(&dd->lock);
- }
- 
-+/*
-+ * For zoned block devices, write unlock the target zone of
-+ * completed write requests.
-+ */
-+static void dd_completed_request(struct request *rq)
-+{
-+
-+	if (deadline_request_has_zone_wlock(rq)) {
-+		struct deadline_data *dd = rq->q->elevator->elevator_data;
-+
-+		deadline_wunlock_zone(dd, rq);
-+	}
-+}
-+
- static bool dd_has_work(struct blk_mq_hw_ctx *hctx)
+@@ -1395,16 +1401,21 @@ static struct request *blk_old_get_request(struct request_queue *q,
+ 					   unsigned int op, gfp_t gfp_mask)
  {
- 	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
-@@ -711,6 +824,7 @@ static struct elevator_type mq_deadline = {
- 	.ops.mq = {
- 		.insert_requests	= dd_insert_requests,
- 		.dispatch_request	= dd_dispatch_request,
-+		.completed_request	= dd_completed_request,
- 		.next_request		= elv_rb_latter_request,
- 		.former_request		= elv_rb_former_request,
- 		.bio_merge		= dd_bio_merge,
+ 	struct request *rq;
++	int ret = 0;
+ 
+ 	WARN_ON_ONCE(q->mq_ops);
+ 
+ 	/* create ioc upfront */
+ 	create_io_context(gfp_mask, q->node);
+ 
++	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM));
++	if (ret)
++		return ERR_PTR(ret);
+ 	spin_lock_irq(q->queue_lock);
+ 	rq = get_request(q, op, NULL, gfp_mask);
+ 	if (IS_ERR(rq)) {
+ 		spin_unlock_irq(q->queue_lock);
++		blk_queue_exit(q);
+ 		return rq;
+ 	}
+ 
+@@ -1576,6 +1587,7 @@ void __blk_put_request(struct request_queue *q, struct request *req)
+ 		blk_free_request(rl, req);
+ 		freed_request(rl, sync, rq_flags);
+ 		blk_put_rl(rl);
++		blk_queue_exit(q);
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(__blk_put_request);
+@@ -1857,8 +1869,10 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
+ 	 * Grab a free request. This is might sleep but can not fail.
+ 	 * Returns with the queue unlocked.
+ 	 */
++	blk_queue_enter_live(q);
+ 	req = get_request(q, bio->bi_opf, bio, GFP_NOIO);
+ 	if (IS_ERR(req)) {
++		blk_queue_exit(q);
+ 		__wbt_done(q->rq_wb, wb_acct);
+ 		if (PTR_ERR(req) == -ENOMEM)
+ 			bio->bi_status = BLK_STS_RESOURCE;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 6fd9f86fc86d..10c1f49f663d 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -256,13 +256,6 @@ void blk_mq_wake_waiters(struct request_queue *q)
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		if (blk_mq_hw_queue_mapped(hctx))
+ 			blk_mq_tag_wakeup_all(hctx->tags, true);
+-
+-	/*
+-	 * If we are called because the queue has now been marked as
+-	 * dying, we need to ensure that processes currently waiting on
+-	 * the queue are notified as well.
+-	 */
+-	wake_up_all(&q->mq_freeze_wq);
+ }
+ 
+ bool blk_mq_can_queue(struct blk_mq_hw_ctx *hctx)
 -- 
-2.13.5
+2.9.5
