@@ -1,39 +1,107 @@
-Return-Path: <zhangweiping@didichuxing.com>
-Date: Sat, 30 Sep 2017 15:01:48 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>
-Subject: [PATCH] blk-mq: remove unused function hctx_allow_merges
-Message-ID: <20170930070143.GA14515@localhost.didichuxing.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Return-Path: zhangweiping@didichuxing.com
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Cathy Avery <cavery@redhat.com>,
+        Martin Steigerwald <martin@lichtvoll.de>,
+        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
+        Ming Lei <ming.lei@redhat.com>, stable@vger.kernel.org,
+        Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V7 6/6] SCSI: set block queue at preempt only when SCSI device is put into quiesce
+Date: Sat, 30 Sep 2017 14:12:14 +0800
+Message-Id: <20170930061214.10622-7-ming.lei@redhat.com>
+In-Reply-To: <20170930061214.10622-1-ming.lei@redhat.com>
+References: <20170930061214.10622-1-ming.lei@redhat.com>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-since 9bddeb2a5b981 "blk-mq: make per-sw-queue bio merge as default .bio_merge"
-there is no caller for this function.
+Simply quiesing SCSI device and waiting for completeion of IO
+dispatched to SCSI queue isn't safe, it is easy to use up
+request pool because all allocated requests before can't
+be dispatched when device is put in QIUESCE. Then no request
+can be allocated for RQF_PREEMPT, and system may hang somewhere,
+such as When sending commands of sync_cache or start_stop during
+system suspend path.
 
-Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+Before quiesing SCSI, this patch sets block queue in preempt
+mode first, so no new normal request can enter queue any more,
+and all pending requests are drained too once blk_set_preempt_only(true)
+is returned. Then RQF_PREEMPT can be allocated successfully duirng
+SCSI quiescing.
+
+This patch fixes one long term issue of IO hang, in either block legacy
+and blk-mq.
+
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Tested-by: Martin Steigerwald <martin@lichtvoll.de>
+Cc: stable@vger.kernel.org
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 6 ------
- 1 file changed, 6 deletions(-)
+ drivers/scsi/scsi_lib.c | 25 ++++++++++++++++++++++---
+ 1 file changed, 22 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f84d145..520d257 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1484,12 +1484,6 @@ static void blk_mq_bio_to_request(struct request *rq, struct bio *bio)
- 	blk_account_io_start(rq, true);
- }
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 9cf6a80fe297..82c51619f1b7 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -252,9 +252,10 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 	struct scsi_request *rq;
+ 	int ret = DRIVER_ERROR << 24;
  
--static inline bool hctx_allow_merges(struct blk_mq_hw_ctx *hctx)
--{
--	return (hctx->flags & BLK_MQ_F_SHOULD_MERGE) &&
--		!blk_queue_nomerges(hctx->queue);
--}
--
- static inline void blk_mq_queue_io(struct blk_mq_hw_ctx *hctx,
- 				   struct blk_mq_ctx *ctx,
- 				   struct request *rq)
+-	req = blk_get_request(sdev->request_queue,
++	req = __blk_get_request(sdev->request_queue,
+ 			data_direction == DMA_TO_DEVICE ?
+-			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM);
++			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM,
++			BLK_REQ_PREEMPT);
+ 	if (IS_ERR(req))
+ 		return ret;
+ 	rq = scsi_req(req);
+@@ -2928,12 +2929,28 @@ scsi_device_quiesce(struct scsi_device *sdev)
+ {
+ 	int err;
+ 
++	/*
++	 * Simply quiesing SCSI device isn't safe, it is easy
++	 * to use up requests because all these allocated requests
++	 * can't be dispatched when device is put in QIUESCE.
++	 * Then no request can be allocated and we may hang
++	 * somewhere, such as system suspend/resume.
++	 *
++	 * So we set block queue in preempt only first, no new
++	 * normal request can enter queue any more, and all pending
++	 * requests are drained once blk_set_preempt_only()
++	 * returns. Only RQF_PREEMPT is allowed in preempt only mode.
++	 */
++	blk_set_preempt_only(sdev->request_queue, true);
++
+ 	mutex_lock(&sdev->state_mutex);
+ 	err = scsi_device_set_state(sdev, SDEV_QUIESCE);
+ 	mutex_unlock(&sdev->state_mutex);
+ 
+-	if (err)
++	if (err) {
++		blk_set_preempt_only(sdev->request_queue, false);
+ 		return err;
++	}
+ 
+ 	scsi_run_queue(sdev->request_queue);
+ 	while (atomic_read(&sdev->device_busy)) {
+@@ -2964,6 +2981,8 @@ void scsi_device_resume(struct scsi_device *sdev)
+ 	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0)
+ 		scsi_run_queue(sdev->request_queue);
+ 	mutex_unlock(&sdev->state_mutex);
++
++	blk_set_preempt_only(sdev->request_queue, false);
+ }
+ EXPORT_SYMBOL(scsi_device_resume);
+ 
 -- 
-2.9.4
+2.9.5
