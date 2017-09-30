@@ -1,126 +1,175 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f44.google.com ([74.125.82.44]:48293 "EHLO
-        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751484AbdIOMZu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Sep 2017 08:25:50 -0400
-Received: by mail-wm0-f44.google.com with SMTP id r68so7877897wmg.3
-        for <linux-block@vger.kernel.org>; Fri, 15 Sep 2017 05:25:49 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 06/11] lightnvm: pblk: put bio on bio completion
-Date: Fri, 15 Sep 2017 14:25:34 +0200
-Message-Id: <1505478339-13089-7-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1505478339-13089-1-git-send-email-javier@cnexlabs.com>
-References: <1505478339-13089-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Cathy Avery <cavery@redhat.com>,
+        Martin Steigerwald <martin@lichtvoll.de>,
+        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V7 4/6] block: prepare for passing RQF_PREEMPT to request allocation
+Date: Sat, 30 Sep 2017 14:12:12 +0800
+Message-Id: <20170930061214.10622-5-ming.lei@redhat.com>
+In-Reply-To: <20170930061214.10622-1-ming.lei@redhat.com>
+References: <20170930061214.10622-1-ming.lei@redhat.com>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Simplify put bio by doing it on bio end_io instead of manually putting
-it on the completion path.
+REQF_PREEMPT is a bit special because the request is required
+to be dispatched to lld even when SCSI device is quiesced.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
+So this patch introduces __blk_get_request() and allows users to pass
+RQF_PREEMPT flag in, then we can allow to allocate request of RQF_PREEMPT
+when queue is in mode of PREEMPT ONLY which will be introduced
+in the following patch.
+
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Tested-by: Martin Steigerwald <martin@lichtvoll.de>
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/pblk-core.c     | 10 +++++++---
- drivers/lightnvm/pblk-read.c     |  1 -
- drivers/lightnvm/pblk-recovery.c |  1 -
- drivers/lightnvm/pblk-write.c    |  8 +-------
- 4 files changed, 8 insertions(+), 12 deletions(-)
+ block/blk-core.c       | 19 +++++++++----------
+ block/blk-mq.c         |  3 +--
+ include/linux/blk-mq.h |  7 ++++---
+ include/linux/blkdev.h | 17 ++++++++++++++---
+ 4 files changed, 28 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 2c9b3a5bf3c2..55d472beee24 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -417,6 +417,11 @@ int pblk_submit_io(struct pblk *pblk, struct nvm_rq *rqd)
- 	return nvm_submit_io(dev, rqd);
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 7d5040a6d5a4..95b1c5e50be3 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1398,7 +1398,8 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
  }
  
-+static void pblk_bio_map_addr_endio(struct bio *bio)
+ static struct request *blk_old_get_request(struct request_queue *q,
+-					   unsigned int op, gfp_t gfp_mask)
++					   unsigned int op, gfp_t gfp_mask,
++					   unsigned int flags)
+ {
+ 	struct request *rq;
+ 	int ret = 0;
+@@ -1408,8 +1409,7 @@ static struct request *blk_old_get_request(struct request_queue *q,
+ 	/* create ioc upfront */
+ 	create_io_context(gfp_mask, q->node);
+ 
+-	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM) ?
+-			BLK_REQ_NOWAIT : 0);
++	ret = blk_queue_enter(q, flags & BLK_REQ_BITS_MASK);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 	spin_lock_irq(q->queue_lock);
+@@ -1427,26 +1427,25 @@ static struct request *blk_old_get_request(struct request_queue *q,
+ 	return rq;
+ }
+ 
+-struct request *blk_get_request(struct request_queue *q, unsigned int op,
+-				gfp_t gfp_mask)
++struct request *__blk_get_request(struct request_queue *q, unsigned int op,
++				  gfp_t gfp_mask, unsigned int flags)
+ {
+ 	struct request *req;
+ 
++	flags |= gfp_mask & __GFP_DIRECT_RECLAIM ? 0 : BLK_REQ_NOWAIT;
+ 	if (q->mq_ops) {
+-		req = blk_mq_alloc_request(q, op,
+-			(gfp_mask & __GFP_DIRECT_RECLAIM) ?
+-				0 : BLK_MQ_REQ_NOWAIT);
++		req = blk_mq_alloc_request(q, op, flags);
+ 		if (!IS_ERR(req) && q->mq_ops->initialize_rq_fn)
+ 			q->mq_ops->initialize_rq_fn(req);
+ 	} else {
+-		req = blk_old_get_request(q, op, gfp_mask);
++		req = blk_old_get_request(q, op, gfp_mask, flags);
+ 		if (!IS_ERR(req) && q->initialize_rq_fn)
+ 			q->initialize_rq_fn(req);
+ 	}
+ 
+ 	return req;
+ }
+-EXPORT_SYMBOL(blk_get_request);
++EXPORT_SYMBOL(__blk_get_request);
+ 
+ /**
+  * blk_requeue_request - put a request back on queue
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 45bff90e08f7..90b43f607e3c 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -384,8 +384,7 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ 	struct request *rq;
+ 	int ret;
+ 
+-	ret = blk_queue_enter(q, (flags & BLK_MQ_REQ_NOWAIT) ?
+-			BLK_REQ_NOWAIT : 0);
++	ret = blk_queue_enter(q, flags & BLK_REQ_BITS_MASK);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 50c6485cb04f..066a676d7749 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -197,9 +197,10 @@ void blk_mq_free_request(struct request *rq);
+ bool blk_mq_can_queue(struct blk_mq_hw_ctx *);
+ 
+ enum {
+-	BLK_MQ_REQ_NOWAIT	= (1 << 0), /* return when out of requests */
+-	BLK_MQ_REQ_RESERVED	= (1 << 1), /* allocate from reserved pool */
+-	BLK_MQ_REQ_INTERNAL	= (1 << 2), /* allocate internal/sched tag */
++	BLK_MQ_REQ_NOWAIT	= BLK_REQ_NOWAIT, /* return when out of requests */
++	BLK_MQ_REQ_PREEMPT	= BLK_REQ_PREEMPT, /* allocate for RQF_PREEMPT */
++	BLK_MQ_REQ_RESERVED	= (1 << BLK_REQ_MQ_START_BIT), /* allocate from reserved pool */
++	BLK_MQ_REQ_INTERNAL	= (1 << (BLK_REQ_MQ_START_BIT + 1)), /* allocate internal/sched tag */
+ };
+ 
+ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 127f64c7012c..68445adc8765 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -860,7 +860,10 @@ enum {
+ 
+ /* passed to blk_queue_enter */
+ enum {
+-	BLK_REQ_NOWAIT = (1 << 0),
++	BLK_REQ_NOWAIT		= (1 << 0),
++	BLK_REQ_PREEMPT		= (1 << 1),
++	BLK_REQ_MQ_START_BIT	= 2,
++	BLK_REQ_BITS_MASK	= (1U << BLK_REQ_MQ_START_BIT) - 1,
+ };
+ 
+ extern unsigned long blk_max_low_pfn, blk_max_pfn;
+@@ -945,8 +948,9 @@ extern void blk_rq_init(struct request_queue *q, struct request *rq);
+ extern void blk_init_request_from_bio(struct request *req, struct bio *bio);
+ extern void blk_put_request(struct request *);
+ extern void __blk_put_request(struct request_queue *, struct request *);
+-extern struct request *blk_get_request(struct request_queue *, unsigned int op,
+-				       gfp_t gfp_mask);
++extern struct request *__blk_get_request(struct request_queue *,
++					 unsigned int op, gfp_t gfp_mask,
++					 unsigned int flags);
+ extern void blk_requeue_request(struct request_queue *, struct request *);
+ extern int blk_lld_busy(struct request_queue *q);
+ extern int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
+@@ -997,6 +1001,13 @@ blk_status_t errno_to_blk_status(int errno);
+ 
+ bool blk_mq_poll(struct request_queue *q, blk_qc_t cookie);
+ 
++static inline struct request *blk_get_request(struct request_queue *q,
++					      unsigned int op,
++					      gfp_t gfp_mask)
 +{
-+	bio_put(bio);
++	return __blk_get_request(q, op, gfp_mask, 0);
 +}
 +
- struct bio *pblk_bio_map_addr(struct pblk *pblk, void *data,
- 			      unsigned int nr_secs, unsigned int len,
- 			      int alloc_type, gfp_t gfp_mask)
-@@ -453,6 +458,8 @@ struct bio *pblk_bio_map_addr(struct pblk *pblk, void *data,
- 
- 		kaddr += PAGE_SIZE;
- 	}
-+
-+	bio->bi_end_io = pblk_bio_map_addr_endio;
- out:
- 	return bio;
- }
-@@ -669,9 +676,6 @@ static int pblk_line_submit_emeta_io(struct pblk *pblk, struct pblk_line *line,
- 	atomic_dec(&pblk->inflight_io);
- 	reinit_completion(&wait);
- 
--	if (likely(pblk->l_mg.emeta_alloc_type == PBLK_VMALLOC_META))
--		bio_put(bio);
--
- 	if (rqd.error) {
- 		if (dir == WRITE)
- 			pblk_log_write_err(pblk, &rqd);
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index c28d6509312e..e7141b1aaded 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -531,7 +531,6 @@ int pblk_submit_read_gc(struct pblk *pblk, struct pblk_gc_rq *gc_rq)
- 	atomic_long_sub(gc_rq->secs_to_gc, &pblk->inflight_reads);
- #endif
- 
--	bio_put(bio);
- out:
- 	nvm_dev_dma_free(dev->parent, rqd.meta_list, rqd.dma_meta_list);
- 	return ret;
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index 573085bdb7e5..b3950ab862f9 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -333,7 +333,6 @@ static void pblk_end_io_recov(struct nvm_rq *rqd)
- 
- 	pblk_up_page(pblk, rqd->ppa_list, rqd->nr_ppas);
- 
--	bio_put(rqd->bio);
- 	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
- 	pblk_free_rqd(pblk, rqd, WRITE);
- 
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 939eb6df2265..4cea2f76d4e2 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -191,17 +191,12 @@ static void pblk_end_io_write_meta(struct nvm_rq *rqd)
- 		pblk_log_write_err(pblk, rqd);
- 		pr_err("pblk: metadata I/O failed. Line %d\n", line->id);
- 	}
--#ifdef CONFIG_NVM_DEBUG
--	else
--		WARN_ONCE(rqd->bio->bi_status, "pblk: corrupted write error\n");
--#endif
- 
- 	sync = atomic_add_return(rqd->nr_ppas, &emeta->sync);
- 	if (sync == emeta->nr_entries)
- 		pblk_gen_run_ws(pblk, line, NULL, pblk_line_close_ws,
- 						GFP_ATOMIC, pblk->close_wq);
- 
--	bio_put(rqd->bio);
- 	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
- 	pblk_free_rqd(pblk, rqd, READ);
- 
-@@ -430,8 +425,7 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
- 
- 	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
- fail_free_bio:
--	if (likely(l_mg->emeta_alloc_type == PBLK_VMALLOC_META))
--		bio_put(bio);
-+	bio_put(bio);
- fail_free_rqd:
- 	pblk_free_rqd(pblk, rqd, READ);
- 	return ret;
+ static inline struct request_queue *bdev_get_queue(struct block_device *bdev)
+ {
+ 	return bdev->bd_disk->queue;	/* this is never NULL */
 -- 
-2.7.4
+2.9.5
