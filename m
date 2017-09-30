@@ -1,68 +1,102 @@
-Return-Path: <prvs=434c021e3=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
+Return-Path: <jeffy.chen@rock-chips.com>
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+To: linux-kernel@vger.kernel.org
+Cc: Jeffy Chen <jeffy.chen@rock-chips.com>,
 	linux-block@vger.kernel.org,
 	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V5 04/14] scsi: sd_zbc: Use well defined macros
-Date: Mon, 25 Sep 2017 15:14:44 +0900
-Message-Id: <20170925061454.5533-5-damien.lemoal@wdc.com>
-In-Reply-To: <20170925061454.5533-1-damien.lemoal@wdc.com>
-References: <20170925061454.5533-1-damien.lemoal@wdc.com>
+Subject: [RFC PATCH 2/2] block/cfq: Fix memory leak of async cfqq
+Date: Sat, 30 Sep 2017 16:13:36 +0800
+Message-Id: <20170930081336.8769-2-jeffy.chen@rock-chips.com>
+In-Reply-To: <20170930081336.8769-1-jeffy.chen@rock-chips.com>
+References: <20170930081336.8769-1-jeffy.chen@rock-chips.com>
 List-ID: <linux-block@vger.kernel.org>
 
-instead of open coding, use the min() macro to calculate a report zones
-reply buffer length in sd_zbc_check_zone_size() and the round_up()
-macro for calculating the number of zones in sd_zbc_setup().
+Currently we only unref the async cfqqs in cfq_pd_offline, which would
+not be called when CONFIG_CFQ_GROUP_IOSCHED is disabled.
 
-No functional change is introduced by this patch.
+Kmemleak reported:
+unreferenced object 0xffffffc0cd9fc000 (size 240):
+  comm "kworker/3:1", pid 52, jiffies 4294673527 (age 97.149s)
+  hex dump (first 32 bytes):
+    01 00 00 00 00 00 00 00 80 55 13 cf c0 ff ff ff  .........U......
+    10 c0 9f cd c0 ff ff ff 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffff9008c6f720>] kmemleak_alloc+0x58/0x8c
+    [<ffffff900828f87c>] kmem_cache_alloc+0x184/0x268
+    [<ffffff90084ce300>] cfq_get_queue.isra.11+0x144/0x2e0
+    [<ffffff90084ce8b0>] cfq_set_request+0x1bc/0x444
+    [<ffffff9008495730>] elv_set_request+0x88/0x9c
+    [<ffffff900849d690>] get_request+0x494/0x914
+    [<ffffff900849de34>] blk_get_request+0xdc/0x160
+    [<ffffff90086e8054>] scsi_execute+0x70/0x23c
+    [<ffffff90086e8314>] scsi_test_unit_ready+0xf4/0x1ec
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- drivers/scsi/sd_zbc.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index 7dbaf920679e..bbad851c1789 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -475,7 +475,7 @@ static int sd_zbc_check_capacity(struct scsi_disk *sdkp, unsigned char *buf)
- 	return 0;
+ block/cfq-iosched.c | 28 ++++++++++++++++++----------
+ 1 file changed, 18 insertions(+), 10 deletions(-)
+
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index 9f342ef1ad42..75773eabecc7 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -401,6 +401,7 @@ struct cfq_data {
+ 
+ static struct cfq_group *cfq_get_next_cfqg(struct cfq_data *cfqd);
+ static void cfq_put_queue(struct cfq_queue *cfqq);
++static void cfqg_offline(struct cfq_group *cfqg);
+ 
+ static struct cfq_rb_root *st_for(struct cfq_group *cfqg,
+ 					    enum wl_class_t class,
+@@ -1638,17 +1639,8 @@ static void cfq_pd_init(struct blkg_policy_data *pd)
+ static void cfq_pd_offline(struct blkg_policy_data *pd)
+ {
+ 	struct cfq_group *cfqg = pd_to_cfqg(pd);
+-	int i;
+-
+-	for (i = 0; i < IOPRIO_BE_NR; i++) {
+-		if (cfqg->async_cfqq[0][i])
+-			cfq_put_queue(cfqg->async_cfqq[0][i]);
+-		if (cfqg->async_cfqq[1][i])
+-			cfq_put_queue(cfqg->async_cfqq[1][i]);
+-	}
+ 
+-	if (cfqg->async_idle_cfqq)
+-		cfq_put_queue(cfqg->async_idle_cfqq);
++	cfqg_offline(cfqg);
+ 
+ 	/*
+ 	 * @blkg is going offline and will be ignored by
+@@ -3741,6 +3733,21 @@ static void cfq_init_cfqq(struct cfq_data *cfqd, struct cfq_queue *cfqq,
+ 	cfqq->pid = pid;
  }
  
--#define SD_ZBC_BUF_SIZE 131072
-+#define SD_ZBC_BUF_SIZE 131072U
- 
- /**
-  * sd_zbc_check_zone_size - Check the device zone sizes
-@@ -526,10 +526,7 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
- 		/* Parse REPORT ZONES header */
- 		list_length = get_unaligned_be32(&buf[0]) + 64;
- 		rec = buf + 64;
--		if (list_length < SD_ZBC_BUF_SIZE)
--			buf_len = list_length;
--		else
--			buf_len = SD_ZBC_BUF_SIZE;
-+		buf_len = min(list_length, SD_ZBC_BUF_SIZE);
- 
- 		/* Parse zone descriptors */
- 		while (rec < buf + buf_len) {
-@@ -599,9 +596,8 @@ static int sd_zbc_setup(struct scsi_disk *sdkp)
- 	/* chunk_sectors indicates the zone size */
- 	blk_queue_chunk_sectors(sdkp->disk->queue,
- 			logical_to_sectors(sdkp->device, sdkp->zone_blocks));
--	sdkp->nr_zones = sdkp->capacity >> sdkp->zone_shift;
--	if (sdkp->capacity & (sdkp->zone_blocks - 1))
--		sdkp->nr_zones++;
-+	sdkp->nr_zones =
-+		round_up(sdkp->capacity, sdkp->zone_blocks) >> sdkp->zone_shift;
- 
- 	if (!sdkp->zones_wlock) {
- 		sdkp->zones_wlock = kcalloc(BITS_TO_LONGS(sdkp->nr_zones),
++static void cfqg_offline(struct cfq_group *cfqg)
++{
++	int i;
++
++	for (i = 0; i < IOPRIO_BE_NR; i++) {
++		if (cfqg->async_cfqq[0][i])
++			cfq_put_queue(cfqg->async_cfqq[0][i]);
++		if (cfqg->async_cfqq[1][i])
++			cfq_put_queue(cfqg->async_cfqq[1][i]);
++	}
++
++	if (cfqg->async_idle_cfqq)
++		cfq_put_queue(cfqg->async_idle_cfqq);
++}
++
+ #ifdef CONFIG_CFQ_GROUP_IOSCHED
+ static void check_blkcg_changed(struct cfq_io_cq *cic, struct bio *bio)
+ {
+@@ -4564,6 +4571,7 @@ static void cfq_exit_queue(struct elevator_queue *e)
+ #ifdef CONFIG_CFQ_GROUP_IOSCHED
+ 	blkcg_deactivate_policy(q, &blkcg_policy_cfq);
+ #else
++	cfqg_offline(cfqd->root_group);
+ 	kfree(cfqd->root_group);
+ #endif
+ 	kfree(cfqd);
 -- 
-2.13.5
+2.11.0
