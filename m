@@ -1,113 +1,49 @@
-Return-Path: <prvs=469d6a95f=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, "Christoph
- Hellwig" <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Oleksandr Natalenko <oleksandr@natalenko.name>, Ming Lei
-	<ming.lei@redhat.com>, Martin Steigerwald <martin@lichtvoll.de>, "Bart Van
- Assche" <bart.vanassche@wdc.com>, Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v11 5/7] block: Add the QUEUE_FLAG_PREEMPT_ONLY request queue flag
-Date: Mon, 30 Oct 2017 15:42:03 -0700
-Message-ID: <20171030224205.25212-6-bart.vanassche@wdc.com>
-In-Reply-To: <20171030224205.25212-1-bart.vanassche@wdc.com>
-References: <20171030224205.25212-1-bart.vanassche@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.mpynet.fi ([82.197.21.84]:47356 "EHLO mx1.mpynet.fi"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751005AbdJANWT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 1 Oct 2017 09:22:19 -0400
+Date: Sun, 1 Oct 2017 16:22:17 +0300
+From: Rakesh Pandit <rakesh@tuxera.com>
+To: Matias =?iso-8859-1?Q?Bj=F8rling?= <mb@lightnvm.io>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
+Subject: [PATCH 0/6] misc cleanups and error path fixes
+Message-ID: <20171001132216.GA5456@hercules.tuxera.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This flag will be used in the next patch to let the block layer
-core know whether or not a SCSI request queue has been quiesced.
-A quiesced SCSI queue namely only processes RQF_PREEMPT requests.
+For 4.15.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Tested-by: Martin Steigerwald <martin@lichtvoll.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- block/blk-core.c       | 30 ++++++++++++++++++++++++++++++
- block/blk-mq-debugfs.c |  1 +
- include/linux/blkdev.h |  6 ++++++
- 3 files changed, 37 insertions(+)
+These are last set of cleanups, error path fixes most likely and also
+some memory leak.  Also removes stale symbols from lightnvm.h.  In
+addition remove exported symbols which are no where used (except
+locally in core).
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 48f18f5e2e16..16ddd52e6408 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -347,6 +347,36 @@ void blk_sync_queue(struct request_queue *q)
- }
- EXPORT_SYMBOL(blk_sync_queue);
- 
-+/**
-+ * blk_set_preempt_only - set QUEUE_FLAG_PREEMPT_ONLY
-+ * @q: request queue pointer
-+ *
-+ * Returns the previous value of the PREEMPT_ONLY flag - 0 if the flag was not
-+ * set and 1 if the flag was already set.
-+ */
-+int blk_set_preempt_only(struct request_queue *q)
-+{
-+	unsigned long flags;
-+	int res;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	res = queue_flag_test_and_set(QUEUE_FLAG_PREEMPT_ONLY, q);
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+
-+	return res;
-+}
-+EXPORT_SYMBOL_GPL(blk_set_preempt_only);
-+
-+void blk_clear_preempt_only(struct request_queue *q)
-+{
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	queue_flag_clear(QUEUE_FLAG_PREEMPT_ONLY, q);
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+}
-+EXPORT_SYMBOL_GPL(blk_clear_preempt_only);
-+
- /**
-  * __blk_run_queue_uncond - run a queue whether or not it has been stopped
-  * @q:	The queue to run
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 7f4a1ba532af..75f31535f280 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -74,6 +74,7 @@ static const char *const blk_queue_flag_name[] = {
- 	QUEUE_FLAG_NAME(REGISTERED),
- 	QUEUE_FLAG_NAME(SCSI_PASSTHROUGH),
- 	QUEUE_FLAG_NAME(QUIESCED),
-+	QUEUE_FLAG_NAME(PREEMPT_ONLY),
- };
- #undef QUEUE_FLAG_NAME
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 05203175eb9c..864ad2e4a58c 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -630,6 +630,7 @@ struct request_queue {
- #define QUEUE_FLAG_REGISTERED  26	/* queue has been registered to a disk */
- #define QUEUE_FLAG_SCSI_PASSTHROUGH 27	/* queue supports SCSI commands */
- #define QUEUE_FLAG_QUIESCED    28	/* queue has been quiesced */
-+#define QUEUE_FLAG_PREEMPT_ONLY	29	/* only process REQ_PREEMPT requests */
- 
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_SAME_COMP)	|	\
-@@ -730,6 +731,11 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
- 			     REQ_FAILFAST_DRIVER))
- #define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
-+#define blk_queue_preempt_only(q)				\
-+	test_bit(QUEUE_FLAG_PREEMPT_ONLY, &(q)->queue_flags)
-+
-+extern int blk_set_preempt_only(struct request_queue *q);
-+extern void blk_clear_preempt_only(struct request_queue *q);
- 
- static inline bool blk_account_rq(struct request *rq)
- {
+Everything is based on top of:
+https://github.com/OpenChannelSSD/linux branch for-4.15/pblk
+
+So, they can be queued on top of patches already submitted earlier for
+4.15.  Most of them are trivial found while reading algorithms used
+during ALPSS yesterday or day before.
+
+Rakesh Pandit (6):
+  lightnvm: pblk: remove useless line
+  lightnvm: pblk: reduce arguments in __pblk_rb_update_l2p
+  lightnvm: remove unused argument from nvm_set_tgt_bb_tbl
+  lightnvm: remove stable extern and unused exported symbols
+  lightnvm: pblk: free up mempool allocation for erases correctly
+  lightnvm: pblk: fix releases of kmem cache in error path
+
+ drivers/lightnvm/core.c      | 138 +++++++++++++++++++++----------------------
+ drivers/lightnvm/pblk-core.c |   1 -
+ drivers/lightnvm/pblk-init.c |  24 +++++++-
+ drivers/lightnvm/pblk-rb.c   |  12 ++--
+ drivers/lightnvm/pblk.h      |   1 +
+ include/linux/lightnvm.h     |   7 ---
+ 6 files changed, 94 insertions(+), 89 deletions(-)
+
 -- 
-2.14.2
+2.7.4
