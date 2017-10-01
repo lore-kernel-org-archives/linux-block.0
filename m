@@ -1,19 +1,21 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <BATV+17fc60db2b26bb61bafd+5152+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Sun, 1 Oct 2017 01:37:07 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: [PATCH] blk-mq: wire up completion notifier for laptop mode
-Date: Mon, 2 Oct 2017 15:44:29 +0000
-Message-ID: <1506959068.3368.14.camel@wdc.com>
+Message-ID: <20171001083707.GA32648@infradead.org>
 References: <05155e41-caab-0ff4-8520-5eff59c9cf7a@kernel.dk>
-In-Reply-To: <05155e41-caab-0ff4-8520-5eff59c9cf7a@kernel.dk>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <05155e41-caab-0ff4-8520-5eff59c9cf7a@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gU2F0LCAyMDE3LTA5LTMwIGF0IDEwOjA2ICswMjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBG
-b3Igc29tZSByZWFzb24sIHRoZSBsYXB0b3AgbW9kZSBJTyBjb21wbGV0aW9uIG5vdGlmaWVkIHdh
-cyBuZXZlciB3aXJlZA0KPiB1cCBmb3IgYmxrLW1xLiBFbnN1cmUgdGhhdCB3ZSB0cmlnZ2VyIHRo
-ZSBjYWxsYmFjayBhcHByb3ByaWF0ZWx5LCB0byBhcm0NCj4gdGhlIGxhcHRvcCBtb2RlIGZsdXNo
-IHRpbWVyLg0KDQpSZXZpZXdlZC1ieTogQmFydCBWYW4gQXNzY2hlIDxiYXJ0LnZhbmFzc2NoZUB3
-ZGMuY29tPg0K
+On Sat, Sep 30, 2017 at 10:06:45AM +0200, Jens Axboe wrote:
+> For some reason, the laptop mode IO completion notified was never wired
+> up for blk-mq. Ensure that we trigger the callback appropriately, to arm
+> the laptop mode flush timer.
+
+Looks fine:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
