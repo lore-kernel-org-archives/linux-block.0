@@ -1,89 +1,103 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f44.google.com ([74.125.82.44]:44982 "EHLO
-        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750957AbdJBMJi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Oct 2017 08:09:38 -0400
-Received: by mail-wm0-f44.google.com with SMTP id 196so2362713wma.1
-        for <linux-block@vger.kernel.org>; Mon, 02 Oct 2017 05:09:37 -0700 (PDT)
-From: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
-Message-Id: <5E8B439C-5971-49DF-BDC4-3B53268F8FF4@lightnvm.io>
-Content-Type: multipart/signed;
- boundary="Apple-Mail=_36C3D052-5364-46D3-AE8B-19732AC1EBAA";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH 5/6] lightnvm: pblk: free up mempool allocation for erases
+Received: from mx1.mpynet.fi ([82.197.21.84]:50333 "EHLO mx1.mpynet.fi"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751035AbdJANZ7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 1 Oct 2017 09:25:59 -0400
+Date: Sun, 1 Oct 2017 16:25:56 +0300
+From: Rakesh Pandit <rakesh@tuxera.com>
+To: Matias =?iso-8859-1?Q?Bj=F8rling?= <mb@lightnvm.io>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
+Subject: [PATCH 5/6] lightnvm: pblk: free up mempool allocation for erases
  correctly
-Date: Mon, 2 Oct 2017 14:09:35 +0200
-In-Reply-To: <20171001132555.GA5763@hercules.tuxera.com>
-Cc: =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Rakesh Pandit <rakesh@tuxera.com>
-References: <20171001132555.GA5763@hercules.tuxera.com>
+Message-ID: <20171001132555.GA5763@hercules.tuxera.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+While separating read and erase mempools in 22da65a1b pblk_g_rq_cache
+was used two times to set aside memory both for erase and read
+requests.  Because same kmem cache is used repeatedly a single call to
+kmem_cache_destroy wouldn't deallocate everything.  Repeatedly doing
+loading and unloading of pblk modules would eventually result in some
+leak.
 
---Apple-Mail=_36C3D052-5364-46D3-AE8B-19732AC1EBAA
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain;
-	charset=us-ascii
+The fix is to really use separate kmem cache and track it
+appropriately.
 
-> On 1 Oct 2017, at 15.25, Rakesh Pandit <rakesh@tuxera.com> wrote:
-> 
-> While separating read and erase mempools in 22da65a1b pblk_g_rq_cache
-> was used two times to set aside memory both for erase and read
-> requests.  Because same kmem cache is used repeatedly a single call to
-> kmem_cache_destroy wouldn't deallocate everything.  Repeatedly doing
-> loading and unloading of pblk modules would eventually result in some
-> leak.
-> 
-> The fix is to really use separate kmem cache and track it
-> appropriately.
-> 
-> Fixes: 22da65a1b ("lightnvm: pblk: decouple read/erase mempools")
-> Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
-> 
+Fixes: 22da65a1b ("lightnvm: pblk: decouple read/erase mempools")
+Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+---
+ drivers/lightnvm/pblk-init.c | 16 ++++++++++++++--
+ drivers/lightnvm/pblk.h      |  1 +
+ 2 files changed, 15 insertions(+), 2 deletions(-)
 
-I'm not sure I follow this logic. I assume that you're thinking of the
-refcount on kmem_cache. During cache creation, all is good; if a
-different cache creation fails, destruction is guaranteed, since the
-refcount is 0. On tear down (pblk_core_free), we destroy the mempools
-associated to the caches. In this case, the refcount goes to 0 too, as
-we destroy the 2 mempools. So I don't see where the leak can happen. Am
-I missing something?
-
-In any case, Jens reported some bugs on the mempools, where we did not
-guarantee forward progress. Here you can find the original discussion
-and the mempool audit [1]. Would be good if you reviewed these.
-
-[1] https://www.spinics.net/lists/kernel/msg2602274.html
-
-Thanks,
-Javier
-
---Apple-Mail=_36C3D052-5364-46D3-AE8B-19732AC1EBAA
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEm1mT7zen+vs9+T8kYx8FO3WZGMoFAlnSLH8ACgkQYx8FO3WZ
-GMos1xAAy2LtMnOqkyamFKZV1yPsn8YNiW+g1TfSSUFxBHrWs5gAtn88GHSD2Bxm
-4VEUoNEfFy8vv+E0+ypPuYzzdF7eOFN152ltX+Z7eQVpjuPhMFoCBVjHwmet160X
-v41rO/zhJfrC+rE1+c8o6saHKTLHnByRmmQI85kjUZ99eu/OwX/qEgXzsu5vQ2hs
-joV0eykzJ5GZxStmtBy8CWUhgbqYqkR0w5WMphJ9CRkisDZE+zFlR5Dh+4UeYNyb
-BcWJb1xOVXR8Af2ozP3FMumBoTUgpvtw737WQUQFP1ucYHBqGnfkI7+EoOrLNST3
-wLiqxvzbjXNaAlHRAoPme0uim6Vlyt/mUQk+v1WtCFFHUoiC7KneVo1JLEfymYWF
-nESyyZ9mOgjhMBQJyNXaUwPxCYoFIKp0cS1OV00hvLp2Z8fbgII+oCLbVY+LLfBt
-MjELJesjJyviCcCg5bTRn/3hjGrWqGOGVWkweQtcLIGlTZEbRwoAYFkmKVWb28S8
-xcncWCkpsL/s5y/8dki8dhIq9VzyUZ/eDZszCC+IRxWgdECvACNmM18J03mo04Af
-PICmSXTne9ahNONMD4oOlkD1FbCgxgtVLyMEwsUDPdEV5OxDk4lGhwxYl71pcvGs
-KHlj5311pOzFI+wLcxdRq0pkTjC2DkcectX4+3pjjUBMSFnlkJw=
-=XwQv
------END PGP SIGNATURE-----
-
---Apple-Mail=_36C3D052-5364-46D3-AE8B-19732AC1EBAA--
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 9d9adcf..519e5cf 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -21,7 +21,7 @@
+ #include "pblk.h"
+ 
+ static struct kmem_cache *pblk_ws_cache, *pblk_rec_cache, *pblk_g_rq_cache,
+-				*pblk_w_rq_cache;
++				*pblk_w_rq_cache, *pblk_e_rq_cache;
+ static DECLARE_RWSEM(pblk_lock);
+ struct bio_set *pblk_bio_set;
+ 
+@@ -206,12 +206,23 @@ static int pblk_init_global_caches(struct pblk *pblk)
+ 		return -ENOMEM;
+ 	}
+ 
++	pblk_e_rq_cache = kmem_cache_create("pblk_e_rq", pblk_e_rq_size,
++				0, 0, NULL);
++	if (!pblk_e_rq_cache) {
++		kmem_cache_destroy(pblk_ws_cache);
++		kmem_cache_destroy(pblk_rec_cache);
++		kmem_cache_destroy(pblk_g_rq_cache);
++		up_write(&pblk_lock);
++		return -ENOMEM;
++	}
++
+ 	pblk_w_rq_cache = kmem_cache_create("pblk_w_rq", pblk_w_rq_size,
+ 				0, 0, NULL);
+ 	if (!pblk_w_rq_cache) {
+ 		kmem_cache_destroy(pblk_ws_cache);
+ 		kmem_cache_destroy(pblk_rec_cache);
+ 		kmem_cache_destroy(pblk_g_rq_cache);
++		kmem_cache_destroy(pblk_e_rq_cache);
+ 		up_write(&pblk_lock);
+ 		return -ENOMEM;
+ 	}
+@@ -252,7 +263,7 @@ static int pblk_core_init(struct pblk *pblk)
+ 		goto free_rec_pool;
+ 
+ 	pblk->e_rq_pool = mempool_create_slab_pool(geo->nr_luns,
+-							pblk_g_rq_cache);
++							pblk_e_rq_cache);
+ 	if (!pblk->e_rq_pool)
+ 		goto free_r_rq_pool;
+ 
+@@ -327,6 +338,7 @@ static void pblk_core_free(struct pblk *pblk)
+ 	kmem_cache_destroy(pblk_ws_cache);
+ 	kmem_cache_destroy(pblk_rec_cache);
+ 	kmem_cache_destroy(pblk_g_rq_cache);
++	kmem_cache_destroy(pblk_e_rq_cache);
+ 	kmem_cache_destroy(pblk_w_rq_cache);
+ }
+ 
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index fcac246..03834d1 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -651,6 +651,7 @@ struct pblk_line_ws {
+ 
+ #define pblk_g_rq_size (sizeof(struct nvm_rq) + sizeof(struct pblk_g_ctx))
+ #define pblk_w_rq_size (sizeof(struct nvm_rq) + sizeof(struct pblk_c_ctx))
++#define pblk_e_rq_size pblk_g_rq_size
+ 
+ /*
+  * pblk ring buffer operations
+-- 
+2.7.4
