@@ -1,186 +1,83 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:22502 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751251AbdJBHPv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Oct 2017 03:15:51 -0400
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V6 12/14] block: mq-deadline: Introduce zone locking support
-Date: Mon,  2 Oct 2017 16:15:33 +0900
-Message-Id: <20171002071535.8007-13-damien.lemoal@wdc.com>
-In-Reply-To: <20171002071535.8007-1-damien.lemoal@wdc.com>
-References: <20171002071535.8007-1-damien.lemoal@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Damien.LeMoal@wdc.com>
+From: Damien Le Moal <Damien.LeMoal@wdc.com>
+To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Bart Van Assche
+	<Bart.VanAssche@wdc.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>
+Subject: Re: [PATCH V5 12/14] block: mq-deadline: Introduce zone locking
+ support
+Date: Mon, 2 Oct 2017 04:36:11 +0000
+Message-ID: <1506918970.24488.7.camel@wdc.com>
+References: <20170925061454.5533-1-damien.lemoal@wdc.com>
+	 <20170925061454.5533-13-damien.lemoal@wdc.com>
+	 <1506376835.2641.34.camel@wdc.com>
+In-Reply-To: <1506376835.2641.34.camel@wdc.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-For a write request to a zoned block device, lock the request target
-zone upon request displatch. The zone is unlocked either when the
-request completes or when the request is requeued (inserted).
-
-To indicate that a request has locked its target zone, use the first
-pointer of the request elevator private data to store the value
-RQ_ZONE_WLOCKED. Testing for this value allows quick decision in
-dd_insert_request() and dd_completed_request() regarding the need for
-unlocking the target zone of a request.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/mq-deadline.c | 111 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 111 insertions(+)
-
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 6b7b84ee8f82..93a1aede5dd0 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -177,6 +177,91 @@ deadline_move_request(struct deadline_data *dd, struct request *rq)
- }
- 
- /*
-+ * Return true if a request is a write requests that needs zone
-+ * write locking.
-+ */
-+static inline bool deadline_request_needs_zone_wlock(struct deadline_data *dd,
-+						     struct request *rq)
-+{
-+
-+	if (!dd->zones_wlock)
-+		return false;
-+
-+	if (blk_rq_is_passthrough(rq))
-+		return false;
-+
-+	/*
-+	 * REQ_OP_SCSI_* and REQ_OP_DRV_* are already handled with
-+	 * the previous check. Add them again here so that all request
-+	 * operations defined by enum req_off are handled (so that a compiler
-+	 * warning shows up if/when request operation definitions change.
-+	 */
-+	switch (req_op(rq)) {
-+	case REQ_OP_WRITE_ZEROES:
-+	case REQ_OP_WRITE_SAME:
-+	case REQ_OP_WRITE:
-+		return blk_rq_zone_is_seq(rq);
-+	default:
-+		return false;
-+	}
-+}
-+
-+/*
-+ * Abuse the elv.priv[0] pointer to indicate if a request has write
-+ * locked its target zone. Only write request to a zoned block device
-+ * can own a zone write lock.
-+ */
-+enum rq_zone_lock {
-+	RQ_ZONE_NO_WLOCK = 0UL,
-+	RQ_ZONE_WLOCKED  = 1UL,
-+};
-+
-+static inline void deadline_set_request_zone_wlock(struct request *rq)
-+{
-+	rq->elv.priv[0] = (void *)RQ_ZONE_WLOCKED;
-+}
-+
-+static inline void deadline_clear_request_zone_wlock(struct request *rq)
-+{
-+	rq->elv.priv[0] = (void *)RQ_ZONE_NO_WLOCK;
-+}
-+
-+static inline bool deadline_request_has_zone_wlock(struct request *rq)
-+{
-+	return rq->elv.priv[0] == (void *)RQ_ZONE_WLOCKED;
-+}
-+
-+/*
-+ * Write lock the target zone of a write request.
-+ */
-+static void deadline_wlock_zone(struct deadline_data *dd,
-+				struct request *rq)
-+{
-+	WARN_ON_ONCE(deadline_request_has_zone_wlock(rq));
-+	WARN_ON_ONCE(test_and_set_bit(blk_rq_zone_no(rq), dd->zones_wlock));
-+	deadline_set_request_zone_wlock(rq);
-+}
-+
-+/*
-+ * Write unlock the target zone of a write request.
-+ */
-+static void deadline_wunlock_zone(struct deadline_data *dd,
-+				  struct request *rq)
-+{
-+	WARN_ON_ONCE(!test_and_clear_bit(blk_rq_zone_no(rq), dd->zones_wlock));
-+	deadline_clear_request_zone_wlock(rq);
-+}
-+
-+/*
-+ * Test the write lock state of the target zone of a write request.
-+ */
-+static inline bool deadline_zone_is_wlocked(struct deadline_data *dd,
-+					    struct request *rq)
-+{
-+	return test_bit(blk_rq_zone_no(rq), dd->zones_wlock);
-+}
-+
-+/*
-  * deadline_check_fifo returns 0 if there are no expired requests on the fifo,
-  * 1 otherwise. Requires !list_empty(&dd->fifo_list[data_dir])
-  */
-@@ -315,6 +400,11 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	dd->batching++;
- 	deadline_move_request(dd, rq);
- done:
-+	/*
-+	 * If the request needs its target zone locked, do it.
-+	 */
-+	if (deadline_request_needs_zone_wlock(dd, rq))
-+		deadline_wlock_zone(dd, rq);
- 	rq->rq_flags |= RQF_STARTED;
- 	return rq;
- }
-@@ -464,6 +554,13 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 	struct deadline_data *dd = q->elevator->elevator_data;
- 	const int data_dir = rq_data_dir(rq);
- 
-+	/*
-+	 * This may be a requeue of a write request that has locked its
-+	 * target zone. If this is the case, release the zone lock.
-+	 */
-+	if (deadline_request_has_zone_wlock(rq))
-+		deadline_wunlock_zone(dd, rq);
-+
- 	if (blk_mq_sched_try_insert_merge(q, rq))
- 		return;
- 
-@@ -508,6 +605,19 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
- 	spin_unlock(&dd->lock);
- }
- 
-+/*
-+ * For zoned block devices, write unlock the target zone of
-+ * completed write requests.
-+ */
-+static void dd_completed_request(struct request *rq)
-+{
-+	if (deadline_request_has_zone_wlock(rq)) {
-+		struct deadline_data *dd = rq->q->elevator->elevator_data;
-+
-+		deadline_wunlock_zone(dd, rq);
-+	}
-+}
-+
- static bool dd_has_work(struct blk_mq_hw_ctx *hctx)
- {
- 	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
-@@ -709,6 +819,7 @@ static struct elevator_type mq_deadline = {
- 	.ops.mq = {
- 		.insert_requests	= dd_insert_requests,
- 		.dispatch_request	= dd_dispatch_request,
-+		.completed_request	= dd_completed_request,
- 		.next_request		= elv_rb_latter_request,
- 		.former_request		= elv_rb_former_request,
- 		.bio_merge		= dd_bio_merge,
--- 
-2.13.6
+QmFydCwNCg0KT24gTW9uLCAyMDE3LTA5LTI1IGF0IDIyOjAwICswMDAwLCBCYXJ0IFZhbiBBc3Nj
+aGUgd3JvdGU6DQo+IE9uIE1vbiwgMjAxNy0wOS0yNSBhdCAxNToxNCArMDkwMCwgRGFtaWVuIExl
+IE1vYWwgd3JvdGU6DQo+ID4gK3N0YXRpYyBpbmxpbmUgYm9vbCBkZWFkbGluZV9yZXF1ZXN0X25l
+ZWRzX3pvbmVfd2xvY2soc3RydWN0IGRlYWRsaW5lX2RhdGENCj4gPiAqZGQsDQo+ID4gKwkJCQkJ
+CSAgICAgc3RydWN0IHJlcXVlc3QgKnJxKQ0KPiA+ICt7DQo+ID4gKw0KPiA+ICsJaWYgKCFkZC0+
+em9uZXNfd2xvY2spDQo+ID4gKwkJcmV0dXJuIGZhbHNlOw0KPiA+ICsNCj4gPiArCWlmIChibGtf
+cnFfaXNfcGFzc3Rocm91Z2gocnEpKQ0KPiA+ICsJCXJldHVybiBmYWxzZTsNCj4gPiArDQo+ID4g
+Kwlzd2l0Y2ggKHJlcV9vcChycSkpIHsNCj4gPiArCWNhc2UgUkVRX09QX1dSSVRFX1pFUk9FUzoN
+Cj4gPiArCWNhc2UgUkVRX09QX1dSSVRFX1NBTUU6DQo+ID4gKwljYXNlIFJFUV9PUF9XUklURToN
+Cj4gPiArCQlyZXR1cm4gYmxrX3JxX3pvbmVfaXNfc2VxKHJxKTsNCj4gPiArCWRlZmF1bHQ6DQo+
+ID4gKwkJcmV0dXJuIGZhbHNlOw0KPiA+ICsJfQ0KPiANCj4gSWYgYW55b25lIGV2ZXIgYWRkcyBh
+IG5ldyB3cml0ZSByZXF1ZXN0IHR5cGUgaXQgd2lsbCBiZSBlYXN5IHRvIG92ZXJsb29rDQo+IHRo
+aXMNCj4gZnVuY3Rpb24uIFNob3VsZCB0aGUgJ2RlZmF1bHQnIGNhc2UgYmUgbGVmdCBvdXQgYW5k
+IHNob3VsZCBhbGwgcmVxdWVzdCB0eXBlcw0KPiBiZSBtZW50aW9uZWQgaW4gdGhlIHN3aXRjaC9j
+YXNlIHN0YXRlbWVudCBzdWNoIHRoYXQgdGhlIGNvbXBpbGVyIHdpbGwgaXNzdWUNCj4gYQ0KPiB3
+YXJuaW5nIGlmIGEgbmV3IHJlcXVlc3Qgb3BlcmF0aW9uIHR5cGUgaXMgYWRkZWQgdG8gZW51bSBy
+ZXFfb3BmPw0KDQpJIHRyaWVkLCBidXQgdGhhdCBkb2VzIG5vdCB3b3JrLiBUaGUgc3dpdGNoLWNh
+c2UgbmVlZHMgZWl0aGVyIGEgZGVmYXVsdCBjYXNlDQpvciBhIHJldHVybiBhZnRlciBpdC4gT3Ro
+ZXJ3aXNlIEkgZ2V0IGEgY29tcGlsYXRpb24gd2FybmluZyAocmVhY2hlZCBlbmQgb2YNCm5vbi12
+b2lkIGZ1bmN0aW9uKS4NCg0KPiA+ICsvKg0KPiA+ICsgKiBBYnVzZSB0aGUgZWx2LnByaXZbMF0g
+cG9pbnRlciB0byBpbmRpY2F0ZSBpZiBhIHJlcXVlc3QgaGFzIHdyaXRlDQo+ID4gKyAqIGxvY2tl
+ZCBpdHMgdGFyZ2V0IHpvbmUuIE9ubHkgd3JpdGUgcmVxdWVzdCB0byBhIHpvbmVkIGJsb2NrIGRl
+dmljZQ0KPiA+ICsgKiBjYW4gb3duIGEgem9uZSB3cml0ZSBsb2NrLg0KPiA+ICsgKi8NCj4gPiAr
+I2RlZmluZSBSUV9aT05FX1dMT0NLRUQJCSgodm9pZCAqKTFVTCkNCj4gPiArc3RhdGljIGlubGlu
+ZSB2b2lkIGRlYWRsaW5lX3NldF9yZXF1ZXN0X3pvbmVfd2xvY2soc3RydWN0IHJlcXVlc3QgKnJx
+KQ0KPiA+ICt7DQo+ID4gKwlycS0+ZWx2LnByaXZbMF0gPSBSUV9aT05FX1dMT0NLRUQ7DQo+ID4g
+K30NCj4gPiArDQo+ID4gKyNkZWZpbmUgUlFfWk9ORV9OT19XTE9DSwkoKHZvaWQgKikwVUwpDQo+
+ID4gK3N0YXRpYyBpbmxpbmUgdm9pZCBkZWFkbGluZV9jbGVhcl9yZXF1ZXN0X3pvbmVfd2xvY2so
+c3RydWN0IHJlcXVlc3QgKnJxKQ0KPiA+ICt7DQo+ID4gKwlycS0+ZWx2LnByaXZbMF0gPSBSUV9a
+T05FX05PX1dMT0NLOw0KPiA+ICt9DQo+IA0KPiBTaG91bGQgYW4gZW51bWVyYXRpb24gdHlwZSBi
+ZSBpbnRyb2R1Y2VkIGZvciBSUV9aT05FX1dMT0NLRUQgYW5kDQo+IFJRX1pPTkVfTk9fV0xPQ0s/
+DQoNClN1cmUuIEFkZGVkIGluIFY2Lg0KDQo+ID4gKy8qDQo+ID4gKyAqIFdyaXRlIGxvY2sgdGhl
+IHRhcmdldCB6b25lIG9mIGEgd3JpdGUgcmVxdWVzdC4NCj4gPiArICovDQo+ID4gK3N0YXRpYyB2
+b2lkIGRlYWRsaW5lX3dsb2NrX3pvbmUoc3RydWN0IGRlYWRsaW5lX2RhdGEgKmRkLA0KPiA+ICsJ
+CQkJc3RydWN0IHJlcXVlc3QgKnJxKQ0KPiA+ICt7DQo+ID4gKwl1bnNpZ25lZCBpbnQgem5vID0g
+YmxrX3JxX3pvbmVfbm8ocnEpOw0KPiA+ICsNCj4gPiArCVdBUk5fT05fT05DRShkZWFkbGluZV9y
+ZXF1ZXN0X2hhc196b25lX3dsb2NrKHJxKSk7DQo+ID4gKwlXQVJOX09OX09OQ0UodGVzdF9hbmRf
+c2V0X2JpdCh6bm8sIGRkLT56b25lc193bG9jaykpOw0KPiA+ICsJZGVhZGxpbmVfc2V0X3JlcXVl
+c3Rfem9uZV93bG9jayhycSk7DQo+ID4gK30NCj4gPiArDQo+ID4gKy8qDQo+ID4gKyAqIFdyaXRl
+IHVubG9jayB0aGUgdGFyZ2V0IHpvbmUgb2YgYSB3cml0ZSByZXF1ZXN0Lg0KPiA+ICsgKi8NCj4g
+PiArc3RhdGljIHZvaWQgZGVhZGxpbmVfd3VubG9ja196b25lKHN0cnVjdCBkZWFkbGluZV9kYXRh
+ICpkZCwNCj4gPiArCQkJCSAgc3RydWN0IHJlcXVlc3QgKnJxKQ0KPiA+ICt7DQo+ID4gKwl1bnNp
+Z25lZCBpbnQgem5vID0gYmxrX3JxX3pvbmVfbm8ocnEpOw0KPiA+ICsJdW5zaWduZWQgbG9uZyBm
+bGFnczsNCj4gPiArDQo+ID4gKwlzcGluX2xvY2tfaXJxc2F2ZSgmZGQtPnpvbmVfbG9jaywgZmxh
+Z3MpOw0KPiA+ICsNCj4gPiArCVdBUk5fT05fT05DRSghdGVzdF9hbmRfY2xlYXJfYml0KHpubywg
+ZGQtPnpvbmVzX3dsb2NrKSk7DQo+ID4gKwlkZWFkbGluZV9jbGVhcl9yZXF1ZXN0X3pvbmVfd2xv
+Y2socnEpOw0KPiA+ICsNCj4gPiArCXNwaW5fdW5sb2NrX2lycXJlc3RvcmUoJmRkLT56b25lX2xv
+Y2ssIGZsYWdzKTsNCj4gPiArfQ0KPiANCj4gV2h5IGRvZXMgZGVhZGxpbmVfd3VubG9ja196b25l
+KCkgcHJvdGVjdCBtb2RpZmljYXRpb25zIHdpdGggZGQtPnpvbmVfbG9jaw0KPiBidXQNCj4gZGVh
+ZGxpbmVfd2xvY2tfem9uZSgpIG5vdD8gSWYgdGhpcyBjb2RlIGlzIGNvcnJlY3QsIHBsZWFzZSBh
+ZGQgYQ0KPiBsb2NrZGVwX2Fzc2VydF9oZWxkKCkgc3RhdGVtZW50IGluIHRoZSBmaXJzdCBmdW5j
+dGlvbi4NCg0KWWVzLCB0aGF0IHdhcyBhIGxpdHRsZSBjb25mdXNpbmcuIEluIFY2LCBJIG1vdmUg
+dGhlIGludHJvZHVjdGlvbiBvZiB0aGUNCnpvbmVfbG9jayBzcGlubG9jayB0byB3aGVuIGl0IGlz
+IGFjdHVhbGx5IG5lZWRlZCwgdGhhdCBpcyB0aGUgcGF0Y2ggZm9sbG93aW5nDQp0aGlzIG9uZS4g
+QW5kIEkgYWRkZWQgbW9yZSBjb21tZW50cyBpbiBib3RoIHRoZSBjb21taXQgbWVzc2FnZSBhbmQg
+aW4gdGhlIGNvZGUNCnRvIGV4cGxhaW4gd2h5IHRoZSBzcGlubG9jayBpcyBuZWVkZWQuDQoNCj4g
+PiArLyoNCj4gPiArICogVGVzdCB0aGUgd3JpdGUgbG9jayBzdGF0ZSBvZiB0aGUgdGFyZ2V0IHpv
+bmUgb2YgYSB3cml0ZSByZXF1ZXN0Lg0KPiA+ICsgKi8NCj4gPiArc3RhdGljIGlubGluZSBib29s
+IGRlYWRsaW5lX3pvbmVfaXNfd2xvY2tlZChzdHJ1Y3QgZGVhZGxpbmVfZGF0YSAqZGQsDQo+ID4g
+KwkJCQkJICAgIHN0cnVjdCByZXF1ZXN0ICpycSkNCj4gPiArew0KPiA+ICsJdW5zaWduZWQgaW50
+IHpubyA9IGJsa19ycV96b25lX25vKHJxKTsNCj4gPiArDQo+ID4gKwlyZXR1cm4gdGVzdF9iaXQo
+em5vLCBkZC0+em9uZXNfd2xvY2spOw0KPiA+ICt9DQo+IA0KPiBEbyB3ZSByZWFsbHkgbmVlZCB0
+aGUgbG9jYWwgdmFyaWFibGUgJ3pubyc/DQoNCk5vIHdlIGRvbid0LiBGaXhlZC4NCg0KQmVzdCBy
+ZWdhcmRzLg0KDQotLSANCkRhbWllbiBMZSBNb2FsDQpXZXN0ZXJuIERpZ2l0YWw=
