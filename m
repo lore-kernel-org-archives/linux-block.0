@@ -1,75 +1,114 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:53863 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1758273AbdJMMri (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 08:47:38 -0400
-Received: by mail-wm0-f65.google.com with SMTP id q132so21530049wmd.2
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:37 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 32/58] lightnvm: pblk: use rqd->end_io for completion
-Date: Fri, 13 Oct 2017 14:46:21 +0200
-Message-Id: <20171013124647.32668-33-m@bjorling.me>
-In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
-References: <20171013124647.32668-1-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=441412a59=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V6 11/14] blokc: mq-deadline: Introduce dispatch helpers
+Date: Mon,  2 Oct 2017 16:15:32 +0900
+Message-Id: <20171002071535.8007-12-damien.lemoal@wdc.com>
+In-Reply-To: <20171002071535.8007-1-damien.lemoal@wdc.com>
+References: <20171002071535.8007-1-damien.lemoal@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <javier@cnexlabs.com>
+Avoid directly referencing the next_rq and fifo_list arrays using the
+helper functions deadline_next_request() and deadline_fifo_request() to
+facilitate changes in the dispatch request selection in
+__dd_dispatch_request().
 
-For consistency with the rest of pblk, use rqd->end_io to point to the
-function taking care of ending the request on the completion path.
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Bart Van Assche <Bart.VanAssche@wdc.com>
 ---
- drivers/lightnvm/pblk-core.c | 7 -------
- drivers/lightnvm/pblk-read.c | 5 ++---
- 2 files changed, 2 insertions(+), 10 deletions(-)
+ block/mq-deadline.c | 45 +++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 37 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 0de3875..08d166a 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -261,13 +261,6 @@ void pblk_write_should_kick(struct pblk *pblk)
- 		pblk_write_kick(pblk);
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index f0c01ef934b4..6b7b84ee8f82 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -194,13 +194,42 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
  }
  
--void pblk_end_bio_sync(struct bio *bio)
--{
--	struct completion *waiting = bio->bi_private;
--
--	complete(waiting);
--}
--
- void pblk_end_io_sync(struct nvm_rq *rqd)
+ /*
++ * For the specified data direction, return the next request to
++ * dispatch using arrival ordered lists.
++ */
++static struct request *
++deadline_fifo_request(struct deadline_data *dd, int data_dir)
++{
++	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
++		return NULL;
++
++	if (list_empty(&dd->fifo_list[data_dir]))
++		return NULL;
++
++	return rq_entry_fifo(dd->fifo_list[data_dir].next);
++}
++
++/*
++ * For the specified data direction, return the next request to
++ * dispatch using sector position sorted lists.
++ */
++static struct request *
++deadline_next_request(struct deadline_data *dd, int data_dir)
++{
++	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
++		return NULL;
++
++	return dd->next_rq[data_dir];
++}
++
++/*
+  * deadline_dispatch_requests selects the best request according to
+  * read/write expire, fifo_batch, etc
+  */
+ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
  {
- 	struct completion *waiting = rqd->private;
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index d7c90c3..0299fc0 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -170,13 +170,12 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
+-	struct request *rq;
++	struct request *rq, *next_rq;
+ 	bool reads, writes;
+ 	int data_dir;
  
- 	new_bio->bi_iter.bi_sector = 0; /* internal bio */
- 	bio_set_op_attrs(new_bio, REQ_OP_READ, 0);
--	new_bio->bi_private = &wait;
--	new_bio->bi_end_io = pblk_end_bio_sync;
+@@ -216,10 +245,9 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	/*
+ 	 * batches are currently reads XOR writes
+ 	 */
+-	if (dd->next_rq[WRITE])
+-		rq = dd->next_rq[WRITE];
+-	else
+-		rq = dd->next_rq[READ];
++	rq = deadline_next_request(dd, WRITE);
++	if (!rq)
++		rq = deadline_next_request(dd, READ);
  
- 	rqd->bio = new_bio;
- 	rqd->nr_ppas = nr_holes;
- 	rqd->flags = pblk_set_read_mode(pblk, PBLK_READ_RANDOM);
--	rqd->end_io = NULL;
-+	rqd->end_io = pblk_end_io_sync;
-+	rqd->private = &wait;
+ 	if (rq && dd->batching < dd->fifo_batch)
+ 		/* we have a next request are still entitled to batch */
+@@ -262,19 +290,20 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	/*
+ 	 * we are not running a batch, find best request for selected data_dir
+ 	 */
+-	if (deadline_check_fifo(dd, data_dir) || !dd->next_rq[data_dir]) {
++	next_rq = deadline_next_request(dd, data_dir);
++	if (deadline_check_fifo(dd, data_dir) || !next_rq) {
+ 		/*
+ 		 * A deadline has expired, the last request was in the other
+ 		 * direction, or we have run out of higher-sectored requests.
+ 		 * Start again from the request with the earliest expiry time.
+ 		 */
+-		rq = rq_entry_fifo(dd->fifo_list[data_dir].next);
++		rq = deadline_fifo_request(dd, data_dir);
+ 	} else {
+ 		/*
+ 		 * The last req was the same dir and we have a next request in
+ 		 * sort order. No expired requests so continue on from here.
+ 		 */
+-		rq = dd->next_rq[data_dir];
++		rq = next_rq;
+ 	}
  
- 	if (unlikely(nr_secs > 1 && nr_holes == 1)) {
- 		ppa_ptr = rqd->ppa_list;
+ 	dd->batching = 0;
 -- 
-2.9.3
+2.13.6
