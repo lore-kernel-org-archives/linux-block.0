@@ -1,84 +1,28 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:45150 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932176AbdJMMru (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 08:47:50 -0400
-Received: by mail-wm0-f65.google.com with SMTP id q124so21262944wmb.0
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:49 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Rakesh Pandit <rakesh@tuxera.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 44/58] lightnvm: pblk: fix releases of kmem cache in error path
-Date: Fri, 13 Oct 2017 14:46:33 +0200
-Message-Id: <20171013124647.32668-45-m@bjorling.me>
-In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
-References: <20171013124647.32668-1-m@bjorling.me>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
+	<Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>
+Subject: Re: [PATCH V6 07/14] scsi: sd_zbc: Initialize device request queue
+ zoned data
+Date: Mon, 2 Oct 2017 16:57:24 +0000
+Message-ID: <1506963443.3368.37.camel@wdc.com>
+References: <20171002071535.8007-1-damien.lemoal@wdc.com>
+	 <20171002071535.8007-8-damien.lemoal@wdc.com>
+In-Reply-To: <20171002071535.8007-8-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Rakesh Pandit <rakesh@tuxera.com>
-
-If pblk_core_init fails lets destroy all global caches.
-
-Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/lightnvm/pblk-init.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 56ece7d..2e59973 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -220,6 +220,14 @@ static int pblk_init_global_caches(struct pblk *pblk)
- 	return 0;
- }
- 
-+static void pblk_free_global_caches(struct pblk *pblk)
-+{
-+	kmem_cache_destroy(pblk_ws_cache);
-+	kmem_cache_destroy(pblk_rec_cache);
-+	kmem_cache_destroy(pblk_g_rq_cache);
-+	kmem_cache_destroy(pblk_w_rq_cache);
-+}
-+
- static int pblk_core_init(struct pblk *pblk)
- {
- 	struct nvm_tgt_dev *dev = pblk->dev;
-@@ -235,7 +243,7 @@ static int pblk_core_init(struct pblk *pblk)
- 	pblk->page_bio_pool = mempool_create_page_pool(nvm_max_phys_sects(dev),
- 									0);
- 	if (!pblk->page_bio_pool)
--		return -ENOMEM;
-+		goto free_global_caches;
- 
- 	pblk->gen_ws_pool = mempool_create_slab_pool(PBLK_GEN_WS_POOL_SIZE,
- 							pblk_ws_cache);
-@@ -303,6 +311,8 @@ static int pblk_core_init(struct pblk *pblk)
- 	mempool_destroy(pblk->gen_ws_pool);
- free_page_bio_pool:
- 	mempool_destroy(pblk->page_bio_pool);
-+free_global_caches:
-+	pblk_free_global_caches(pblk);
- 	return -ENOMEM;
- }
- 
-@@ -324,10 +334,7 @@ static void pblk_core_free(struct pblk *pblk)
- 	mempool_destroy(pblk->e_rq_pool);
- 	mempool_destroy(pblk->w_rq_pool);
- 
--	kmem_cache_destroy(pblk_ws_cache);
--	kmem_cache_destroy(pblk_rec_cache);
--	kmem_cache_destroy(pblk_g_rq_cache);
--	kmem_cache_destroy(pblk_w_rq_cache);
-+	pblk_free_global_caches(pblk);
- }
- 
- static void pblk_luns_free(struct pblk *pblk)
--- 
-2.9.3
+T24gTW9uLCAyMDE3LTEwLTAyIGF0IDE2OjE1ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
+Cj4gSW5pdGlhbGl6ZSB0aGUgc2VxX3pvbmVfYml0bWFwIGFuZCBucl96b25lcyBmaWVsZHMgb2Yg
+dGhlIGRpc2sgcmVxdWVzdA0KPiBxdWV1ZSBvbiBkaXNrIHJldmFsaWRhdGUuIEFzIHRoZSBzZXFf
+em9uZV9iaXRtYXAgYWxsb2NhdGlvbiBpcw0KPiBpZGVudGljYWwgdG8gdGhlIGFsbG9jYXRpb24g
+b2YgdGhlIHpvbmUgd3JpdGUgbG9jayBiaXRtYXAsIGludHJvZHVjZQ0KPiB0aGUgaGVscGVyIHNk
+X3piY19hbGxvY196b25lX2JpdG1hcCgpLiBVc2luZyB0aGlzIGhlbHBlciwgd2FpdCBmb3IgdGhl
+DQo+IGRpc2sgY2FwYWNpdHkgYW5kIG51bWJlciBvZiB6b25lcyB0byBzdGFiaWxpemUgb24gdGhl
+IHNlY29uZA0KPiByZXZhbGlkYXRpb24gcGFzcyB0byBhbGxvY2F0ZSBhbmQgaW5pdGlhbGl6ZSB0
+aGUgYml0bWFwcy4NCg0KUmV2aWV3ZWQtYnk6IEJhcnQgVmFuIEFzc2NoZSA8QmFydC5WYW5Bc3Nj
+aGVAd2RjLmNvbT4=
