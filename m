@@ -1,81 +1,68 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:55024 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932089AbdJMMrv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 08:47:51 -0400
-Received: by mail-wm0-f66.google.com with SMTP id i124so21518541wmf.3
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:50 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 45/58] lightnvm: pblk: prevent gc kicks when gc is not operational
-Date: Fri, 13 Oct 2017 14:46:34 +0200
-Message-Id: <20171013124647.32668-46-m@bjorling.me>
-In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
-References: <20171013124647.32668-1-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=441412a59=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V6 04/14] scsi: sd_zbc: Use well defined macros
+Date: Mon,  2 Oct 2017 16:15:25 +0900
+Message-Id: <20171002071535.8007-5-damien.lemoal@wdc.com>
+In-Reply-To: <20171002071535.8007-1-damien.lemoal@wdc.com>
+References: <20171002071535.8007-1-damien.lemoal@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+instead of open coding, use the min() macro to calculate a report zones
+reply buffer length in sd_zbc_check_zone_size() and the round_up()
+macro for calculating the number of zones in sd_zbc_setup().
 
-GC can be kicked after it has been shut down when closing the last
-line during exit, resulting in accesses to freed structures.
+No functional change is introduced by this patch.
 
-Make sure that GC is not triggered while it is not operational.
-Also make sure that GC won't be re-activated during exit when
-running on another processor by using timer_del_sync.
-
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/lightnvm/pblk-gc.c   | 9 +++++----
- drivers/lightnvm/pblk-init.c | 1 +
- 2 files changed, 6 insertions(+), 4 deletions(-)
+ drivers/scsi/sd_zbc.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-index 7b103bc..81efac1 100644
---- a/drivers/lightnvm/pblk-gc.c
-+++ b/drivers/lightnvm/pblk-gc.c
-@@ -478,10 +478,10 @@ void pblk_gc_should_start(struct pblk *pblk)
- {
- 	struct pblk_gc *gc = &pblk->gc;
- 
--	if (gc->gc_enabled && !gc->gc_active)
-+	if (gc->gc_enabled && !gc->gc_active) {
- 		pblk_gc_start(pblk);
--
--	pblk_gc_kick(pblk);
-+		pblk_gc_kick(pblk);
-+	}
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index 7dbaf920679e..bbad851c1789 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -475,7 +475,7 @@ static int sd_zbc_check_capacity(struct scsi_disk *sdkp, unsigned char *buf)
+ 	return 0;
  }
  
- /*
-@@ -620,7 +620,8 @@ void pblk_gc_exit(struct pblk *pblk)
- 	flush_workqueue(gc->gc_reader_wq);
- 	flush_workqueue(gc->gc_line_reader_wq);
+-#define SD_ZBC_BUF_SIZE 131072
++#define SD_ZBC_BUF_SIZE 131072U
  
--	del_timer(&gc->gc_timer);
-+	gc->gc_enabled = 0;
-+	del_timer_sync(&gc->gc_timer);
- 	pblk_gc_stop(pblk, 1);
+ /**
+  * sd_zbc_check_zone_size - Check the device zone sizes
+@@ -526,10 +526,7 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
+ 		/* Parse REPORT ZONES header */
+ 		list_length = get_unaligned_be32(&buf[0]) + 64;
+ 		rec = buf + 64;
+-		if (list_length < SD_ZBC_BUF_SIZE)
+-			buf_len = list_length;
+-		else
+-			buf_len = SD_ZBC_BUF_SIZE;
++		buf_len = min(list_length, SD_ZBC_BUF_SIZE);
  
- 	if (gc->gc_ts)
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 2e59973..27eb430 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -931,6 +931,7 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
- 	pblk->dev = dev;
- 	pblk->disk = tdisk;
- 	pblk->state = PBLK_STATE_RUNNING;
-+	pblk->gc.gc_enabled = 0;
+ 		/* Parse zone descriptors */
+ 		while (rec < buf + buf_len) {
+@@ -599,9 +596,8 @@ static int sd_zbc_setup(struct scsi_disk *sdkp)
+ 	/* chunk_sectors indicates the zone size */
+ 	blk_queue_chunk_sectors(sdkp->disk->queue,
+ 			logical_to_sectors(sdkp->device, sdkp->zone_blocks));
+-	sdkp->nr_zones = sdkp->capacity >> sdkp->zone_shift;
+-	if (sdkp->capacity & (sdkp->zone_blocks - 1))
+-		sdkp->nr_zones++;
++	sdkp->nr_zones =
++		round_up(sdkp->capacity, sdkp->zone_blocks) >> sdkp->zone_shift;
  
- 	spin_lock_init(&pblk->trans_lock);
- 	spin_lock_init(&pblk->lock);
+ 	if (!sdkp->zones_wlock) {
+ 		sdkp->zones_wlock = kcalloc(BITS_TO_LONGS(sdkp->nr_zones),
 -- 
-2.9.3
+2.13.6
