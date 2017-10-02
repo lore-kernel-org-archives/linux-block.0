@@ -1,28 +1,25 @@
-Return-Path: <lucmiccio@gmail.com>
-Return-Path: <lucmiccio@gmail.com>
-From: Luca Miccio <lucmiccio@gmail.com>
-To: axboe@kernel.dk
-Cc: paolo.valente@linaro.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 0/1] block,bfq: Disable writeback throttling
-Date: Mon,  9 Oct 2017 16:27:20 +0200
-Message-Id: <20171009142721.4262-1-lucmiccio@gmail.com>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
+	<Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>
+Subject: Re: [PATCH V6 12/14] block: mq-deadline: Introduce zone locking
+ support
+Date: Mon, 2 Oct 2017 23:12:44 +0000
+Message-ID: <1506985963.3368.60.camel@wdc.com>
+References: <20171002071535.8007-1-damien.lemoal@wdc.com>
+	 <20171002071535.8007-13-damien.lemoal@wdc.com>
+In-Reply-To: <20171002071535.8007-13-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-This is the v2 of the previous patch[1]. There are
-no functional changes. The only difference from v1 to
-v2 is the fix of the wbt_disable_default's comment,
-thanks to Lee Tibbert who pointed me out that mistake.
-
-[1]:https://www.mail-archive.com/linux-block@vger.kernel.org/msg12806.html
-
-Luca Miccio (1):
-  block,bfq: Disable writeback throttling
-
- block/bfq-iosched.c | 3 ++-
- block/blk-wbt.c     | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
-
--- 
-2.11.0
+T24gTW9uLCAyMDE3LTEwLTAyIGF0IDE2OjE1ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
+Cj4gRm9yIGEgd3JpdGUgcmVxdWVzdCB0byBhIHpvbmVkIGJsb2NrIGRldmljZSwgbG9jayB0aGUg
+cmVxdWVzdCB0YXJnZXQNCj4gem9uZSB1cG9uIHJlcXVlc3QgZGlzcGxhdGNoLiBUaGUgem9uZSBp
+cyB1bmxvY2tlZCBlaXRoZXIgd2hlbiB0aGUNCiAgICAgICAgICAgICAgICAgICAgXl5eXl5eXl5e
+DQogICAgICAgICAgICAgICAgICAgIGRpc3BhdGNoPw0KPiByZXF1ZXN0IGNvbXBsZXRlcyBvciB3
+aGVuIHRoZSByZXF1ZXN0IGlzIHJlcXVldWVkIChpbnNlcnRlZCkuDQoNCkFueXdheToNCg0KUmV2
+aWV3ZWQtYnk6IEJhcnQgVmFuIEFzc2NoZSA8QmFydC5WYW5Bc3NjaGVAd2RjLmNvbT4NCg==
