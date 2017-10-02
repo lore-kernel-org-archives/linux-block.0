@@ -1,53 +1,24 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"jthumshirn@suse.de" <jthumshirn@suse.de>, "linux-raid@vger.kernel.org"
-	<linux-raid@vger.kernel.org>, "hch@lst.de" <hch@lst.de>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
-	"hare@suse.com" <hare@suse.com>, "shli@kernel.org" <shli@kernel.org>
+Return-Path: <hch@lst.de>
+Date: Mon, 2 Oct 2017 15:26:38 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	=Oleksandr Natalenko <oleksandr@natalenko.name>,
+	Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>
 Subject: Re: [PATCH v4 1/7] md: Make md resync and reshape threads freezable
-Date: Mon, 2 Oct 2017 15:39:35 +0000
-Message-ID: <1506958773.3368.12.camel@wdc.com>
-References: <20170925202924.16603-1-bart.vanassche@wdc.com>
-	 <20170925202924.16603-2-bart.vanassche@wdc.com>
-	 <20170926111747.GA16794@ming.t460p> <1506436926.3787.24.camel@wdc.com>
-	 <20170926145919.GC31449@ming.t460p> <1506481915.2822.9.camel@wdc.com>
-	 <20170927110006.GB1994@ming.t460p>
-In-Reply-To: <20170927110006.GB1994@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <20171002132638.GA7129@lst.de>
+References: <20170925202924.16603-1-bart.vanassche@wdc.com> <20170925202924.16603-2-bart.vanassche@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170925202924.16603-2-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gV2VkLCAyMDE3LTA5LTI3IGF0IDE5OjAwICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gV2l0
-aCBjdXJyZW50IGxpbnVzIHRyZWUsIFNDU0kgSS9PIGlzIHByZXZlbnRlZCBmcm9tIGJlaW5nIGRp
-c3BhdGNoIHRvDQo+IGRldmljZSBkdXJpbmcgc3VzcGVuZCBieSBTQ1NJIHF1aWVzY2UsIGFuZCB3
-aWxsIGJlIGRpc3BhdGNoZWQgYWdhaW4NCj4gaW4gcmVzdW1lLiBXaXRoIFNhZmUgU0NTSSBxdWll
-c2NlWzFdLCBhbnkgdW5kZXJseWluZyBJTyByZXF1ZXN0IHdpbGwNCj4gc3RvcCBhdCBibGtfcXVl
-dWVfZW50ZXIoKSBkdXJpbmcgc3VzcGVuZCwgYW5kIHJlc3RhcnQgZnJvbSB0aGVyZSBkdXJpbmcN
-Cj4gcmVzdW1lLg0KPiANCj4gRm9yIG90aGVyIG5vbi1TQ1NJIGRyaXZlciwgdGhlaXIgLnN1c3Bl
-bmQvLnJlc3VtZSBvZnRlbg0KPiBoYW5kbGVzIEkvTyBpbiBzaW1pbGFyIHdheSwgZm9yIGV4YW1w
-bGUsIE5WTWUgcXVldWUgd2lsbA0KPiBiZSBmcm96ZW4gaW4gLnN1c3BlbmQsIGFuZCB1bmZyZWV6
-ZSBpbiAucmVzdW1lLg0KPiANCj4gU28gY291bGQgeW91IGV4cGxhaW4gYSBiaXQgd2hpY2gga2lu
-ZCBvZiBidWcgdGhpcyBwYXRjaCBmaXhlcz8NCg0KSXQgc2VlbXMgbGlrZSB5b3UgZG8gbm90IGZ1
-bGx5IHVuZGVyc3RhbmQgdGhlIG1vdGl2YXRpb24gYmVoaW5kIHF1aWVzY2luZyBhbmQNCnJlc3Vt
-aW5nIEkvTyBmcm9tIGluc2lkZSB0aGUgU0NTSSBhbmQgTlZNZSBmcmVlemUgYW5kIHRoYXcgcG93
-ZXIgbWFuYWdlbWVudA0KY2FsbGJhY2tzLiBIaWJlcm5hdGlvbiBjYW4gb25seSB3b3JrIHJlbGlh
-Ymx5IGlmIG5vIEkvTyBpcyBzdWJtaXR0ZWQgYWZ0ZXINCmNyZWF0aW9uIG9mIHRoZSBoaWJlcm5h
-dGlvbiBpbWFnZSBoYXMgYmVlbiBzdGFydGVkLiBJZiBhbnkgSS9PIGlzIHN1Ym1pdHRlZA0KdGhh
-dCBpcyBub3QgcmVsYXRlZCB0byB0aGUgaGliZXJuYXRpb24gcHJvY2VzcyBpdHNlbGYgYnkgYW55
-IGRyaXZlciBhZnRlcg0KdXNlciBzcGFjZSBwcm9jZXNzZXMgYW5kIGtlcm5lbCB0aHJlYWRzIGhh
-dmUgYmVlbiBmcm96ZW4gdGhlbiB0aGF0J3MgYSAqYnVnKg0KaW4gdGhlIGNvbXBvbmVudCB0aGF0
-IHN1Ym1pdHRlZCB0aGUgSS9PLiBUaGUgZnJlZXppbmcgYW5kIHN1c3BlbmRpbmcgb2YgSS9PDQpm
-cm9tIGluc2lkZSB0aGUgU0NTSSBhbmQgTlZNZSBkcml2ZXJzIGlzIGEgKndvcmthcm91bmQqIGZv
-ciB0aGVzZSBidWdzIGJ1dCBpcw0Kbm90IGEgZnVsbCBzb2x1dGlvbi4gQmVmb3JlIHRoZSBoaWJl
-cm5hdGlvbiBpbWFnZSBpcyB3cml0dGVuIHRvIGRpc2sgSS9PIGlzDQpyZXN1bWVkIGFuZCB0aGUg
-SS9PIHJlcXVlc3RzIHRoYXQgZ290IGRlZmVycmVkIHdpbGwgYmUgZXhlY3V0ZWQgYXQgdGhhdCB0
-aW1lLg0KSW4gb3RoZXIgd29yZHMsIHN1c3BlbmRpbmcgYW5kIHJlc3VtaW5nIEkvTyBmcm9tIGlu
-c2lkZSB0aGUgU0NTSSBhbmQgTlZNZQ0KZHJpdmVycyBpcyBhIHdvcmthcm91bmQgYW5kIG5vdCBh
-IGZ1bGwgc29sdXRpb24uIFRoZSBmb2xsb3dpbmcgcXVvdGUgZnJvbQ0KRG9jdW1lbnRhdGlvbi9w
-b3dlci9zd3N1c3AudHh0IGlsbHVzdHJhdGVzIHRoaXM6DQoNCiAqIEJJRyBGQVQgV0FSTklORyAq
-KioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioN
-CiAqDQogKiBJZiB5b3UgdG91Y2ggYW55dGhpbmcgb24gZGlzayBiZXR3ZWVuIHN1c3BlbmQgYW5k
-IHJlc3VtZS4uLg0KICoJCQkJLi4ua2lzcyB5b3VyIGRhdGEgZ29vZGJ5ZS4NCg0KQmFydC4=
+Independent of whether this should be required to make scsi quience
+safe or not making the dm thread freeze aware is the right thing
+to do, and this patch looks correct to me:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
