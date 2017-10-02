@@ -1,51 +1,23 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Cathy Avery <cavery@redhat.com>,
-        Martin Steigerwald <martin@lichtvoll.de>,
-        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V8 1/8] blk-mq: only run hw queues for blk-mq
-Date: Tue,  3 Oct 2017 22:03:59 +0800
-Message-Id: <20171003140406.26060-2-ming.lei@redhat.com>
-In-Reply-To: <20171003140406.26060-1-ming.lei@redhat.com>
-References: <20171003140406.26060-1-ming.lei@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
+	<Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>
+Subject: Re: [PATCH V6 08/14] scsi: sd_zbc: Limit zone write locking to
+ sequential zones
+Date: Mon, 2 Oct 2017 17:00:17 +0000
+Message-ID: <1506963616.3368.38.camel@wdc.com>
+References: <20171002071535.8007-1-damien.lemoal@wdc.com>
+	 <20171002071535.8007-9-damien.lemoal@wdc.com>
+In-Reply-To: <20171002071535.8007-9-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-This patch just makes it explicitely.
-
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Tested-by: Martin Steigerwald <martin@lichtvoll.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Bart Van Assche <Bart.VanAssche@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 98a18609755e..6fd9f86fc86d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -125,7 +125,8 @@ void blk_freeze_queue_start(struct request_queue *q)
- 	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
- 	if (freeze_depth == 1) {
- 		percpu_ref_kill(&q->q_usage_counter);
--		blk_mq_run_hw_queues(q, false);
-+		if (q->mq_ops)
-+			blk_mq_run_hw_queues(q, false);
- 	}
- }
- EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
--- 
-2.9.5
+T24gTW9uLCAyMDE3LTEwLTAyIGF0IDE2OjE1ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
+Cj4gKwkgKiBUaGVyZSBpcyBubyB3cml0ZSBjb25zdHJhaW50cyBvbiBjb252ZW50aW9uYWwgem9u
+ZXMuIFNvIGFueSB3cml0ZQ0KICAgICAgICAgICAgICAgICBeXg0KICAgICAgICAgICAgICAgICBh
+cmU/DQoNCkFueXdheToNCg0KUmV2aWV3ZWQtYnk6IEJhcnQgVmFuIEFzc2NoZSA8QmFydC5WYW5B
+c3NjaGVAd2RjLmNvbT4NCg==
