@@ -1,35 +1,69 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:55387 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750957AbdJBNcU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Oct 2017 09:32:20 -0400
-Date: Mon, 2 Oct 2017 06:32:19 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Cathy Avery <cavery@redhat.com>,
-        Martin Steigerwald <martin@lichtvoll.de>,
-        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
-        Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: Re: [PATCH V7 2/6] block: tracking request allocation with
- q_usage_counter
-Message-ID: <20171002133219.GB19119@infradead.org>
-References: <20170930061214.10622-1-ming.lei@redhat.com>
- <20170930061214.10622-3-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170930061214.10622-3-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=441412a59=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V6 03/14] scsi: sd_zbc: Rearrange code
+Date: Mon,  2 Oct 2017 16:15:24 +0900
+Message-Id: <20171002071535.8007-4-damien.lemoal@wdc.com>
+In-Reply-To: <20171002071535.8007-1-damien.lemoal@wdc.com>
+References: <20171002071535.8007-1-damien.lemoal@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-I think I already gate it to basically the same patch as queued
-up by Bart, but here again:
+Rearrange sd_zbc_setup() to include use_16_for_rw and use_10_for_rw
+assignments and move the calculation of sdkp->zone_shift together
+with the assignment of the verified zone_blocks value in
+sd_zbc_check_zone_size().
 
+No functional change is introduced by this patch.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Bart Van Assche <Bart.VanAssche@wdc.com>
+---
+ drivers/scsi/sd_zbc.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index 023f705ae235..7dbaf920679e 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -584,6 +584,7 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
+ 	}
+ 
+ 	sdkp->zone_blocks = zone_blocks;
++	sdkp->zone_shift = ilog2(zone_blocks);
+ 
+ 	return 0;
+ }
+@@ -591,10 +592,13 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
+ static int sd_zbc_setup(struct scsi_disk *sdkp)
+ {
+ 
++	/* READ16/WRITE16 is mandatory for ZBC disks */
++	sdkp->device->use_16_for_rw = 1;
++	sdkp->device->use_10_for_rw = 0;
++
+ 	/* chunk_sectors indicates the zone size */
+ 	blk_queue_chunk_sectors(sdkp->disk->queue,
+ 			logical_to_sectors(sdkp->device, sdkp->zone_blocks));
+-	sdkp->zone_shift = ilog2(sdkp->zone_blocks);
+ 	sdkp->nr_zones = sdkp->capacity >> sdkp->zone_shift;
+ 	if (sdkp->capacity & (sdkp->zone_blocks - 1))
+ 		sdkp->nr_zones++;
+@@ -657,10 +661,6 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
+ 	if (ret)
+ 		goto err;
+ 
+-	/* READ16/WRITE16 is mandatory for ZBC disks */
+-	sdkp->device->use_16_for_rw = 1;
+-	sdkp->device->use_10_for_rw = 0;
+-
+ 	return 0;
+ 
+ err:
+-- 
+2.13.6
