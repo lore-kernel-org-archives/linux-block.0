@@ -1,33 +1,56 @@
-Return-Path: <axboe@kernel.dk>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: Shaohua Li <shli@fb.com>, Omar Sandoval <osandov@fb.com>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] null_blk: change configfs dependency to select
-Message-ID: <5aa79539-200c-c67b-5a28-d1d557036317@kernel.dk>
-Date: Tue, 3 Oct 2017 15:50:16 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <prvs=441412a59=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>,
+	stable@vger.kernel.org
+Subject: [PATCH V6 05/14] scsi: sd_zbc: Fix sd_zbc_read_zoned_characteristics()
+Date: Mon,  2 Oct 2017 16:15:26 +0900
+Message-Id: <20171002071535.8007-6-damien.lemoal@wdc.com>
+In-Reply-To: <20171002071535.8007-1-damien.lemoal@wdc.com>
+References: <20171002071535.8007-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-A recent commit made null_blk depend on configfs, which is kind of
-annoying since you now have to find this dependency and enable that
-as well. Discovered this since I no longer had null_blk available
-on a box I needed to debug, since it got killed when the config
-updated after the configfs change was merged.
+The three values starting at byte 8 of the Zoned Block Device
+Characteristics VPD page B6h are 32 bits values, not 64bits. So use
+get_unaligned_be32() to retrieve the values and not get_unaligned_be64()
 
-Fixes: 3bf2bd20734e ("nullb: add configfs interface")
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Fixes: 89d947561077 ("sd: Implement support for ZBC devices")
+Cc: <stable@vger.kernel.org>
 
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index 4a438b8abe27..2dfe99b328f8 100644
---- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -17,7 +17,7 @@ if BLK_DEV
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Bart Van Assche <Bart.VanAssche@wdc.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/scsi/sd_zbc.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index bbad851c1789..27793b9f54c0 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -423,15 +423,15 @@ static int sd_zbc_read_zoned_characteristics(struct scsi_disk *sdkp,
+ 	if (sdkp->device->type != TYPE_ZBC) {
+ 		/* Host-aware */
+ 		sdkp->urswrz = 1;
+-		sdkp->zones_optimal_open = get_unaligned_be64(&buf[8]);
+-		sdkp->zones_optimal_nonseq = get_unaligned_be64(&buf[12]);
++		sdkp->zones_optimal_open = get_unaligned_be32(&buf[8]);
++		sdkp->zones_optimal_nonseq = get_unaligned_be32(&buf[12]);
+ 		sdkp->zones_max_open = 0;
+ 	} else {
+ 		/* Host-managed */
+ 		sdkp->urswrz = buf[4] & 1;
+ 		sdkp->zones_optimal_open = 0;
+ 		sdkp->zones_optimal_nonseq = 0;
+-		sdkp->zones_max_open = get_unaligned_be64(&buf[16]);
++		sdkp->zones_max_open = get_unaligned_be32(&buf[16]);
+ 	}
  
- config BLK_DEV_NULL_BLK
- 	tristate "Null test block driver"
--	depends on CONFIGFS_FS
-+	select CONFIGFS_FS
- 
- config BLK_DEV_FD
- 	tristate "Normal floppy disk support"
+ 	return 0;
+-- 
+2.13.6
