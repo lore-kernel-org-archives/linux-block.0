@@ -1,23 +1,43 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] nbd: fix -ERESTARTSYS handling
-To: Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
- linux-block@vger.kernel.org
-References: <1506975728-30910-1-git-send-email-jbacik@fb.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <ee3c62f9-eaaf-0364-6f4a-d7d14e5037e1@kernel.dk>
-Date: Mon, 2 Oct 2017 14:29:31 -0600
-MIME-Version: 1.0
-In-Reply-To: <1506975728-30910-1-git-send-email-jbacik@fb.com>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: axboe@kernel.dk,
+	kernel-team@fb.com,
+	linux-block@vger.kernel.org
+Subject: [PATCH] nbd: fix -ERESTARTSYS handling
+Date: Mon,  2 Oct 2017 16:22:08 -0400
+Message-Id: <1506975728-30910-1-git-send-email-jbacik@fb.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/02/2017 02:22 PM, Josef Bacik wrote:
-> Christoph made it so that if we return'ed BLK_STS_RESOURCE whenever we
-> got ERESTARTSYS from sending our packets we'd return BLK_STS_OK, which
-> means we'd never requeue and just hang.  We really need to return the
-> right value from the upper layer.
+Christoph made it so that if we return'ed BLK_STS_RESOURCE whenever we
+got ERESTARTSYS from sending our packets we'd return BLK_STS_OK, which
+means we'd never requeue and just hang.  We really need to return the
+right value from the upper layer.
 
-Applied for 4.14, thanks.
+Fixes: fc17b6534eb8 ("blk-mq: switch ->queue_rq return value to blk_status_t")
+Signed-off-by: Josef Bacik <jbacik@fb.com>
+---
+ drivers/block/nbd.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 3684e21d543f..883dfebd3014 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -820,9 +820,13 @@ static blk_status_t nbd_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	 * appropriate.
+ 	 */
+ 	ret = nbd_handle_cmd(cmd, hctx->queue_num);
++	if (ret < 0)
++		ret = BLK_STS_IOERR;
++	else if (!ret)
++		ret = BLK_STS_OK;
+ 	complete(&cmd->send_complete);
+ 
+-	return ret < 0 ? BLK_STS_IOERR : BLK_STS_OK;
++	return ret;
+ }
+ 
+ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
 -- 
-Jens Axboe
+2.7.4
