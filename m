@@ -1,132 +1,74 @@
-Return-Path: <BATV+69bb01a06caa5cf26dd3+5154+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 1/2] block: move __elv_next_request to blk-core.c
-Date: Tue,  3 Oct 2017 10:47:00 +0200
-Message-Id: <20171003084701.19346-2-hch@lst.de>
-In-Reply-To: <20171003084701.19346-1-hch@lst.de>
-References: <20171003084701.19346-1-hch@lst.de>
+Return-Path: <prvs=441412a59=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V6 09/14] scsi: sd_zbc: Disable zone write locking with scsi-mq
+Date: Mon,  2 Oct 2017 16:15:30 +0900
+Message-Id: <20171002071535.8007-10-damien.lemoal@wdc.com>
+In-Reply-To: <20171002071535.8007-1-damien.lemoal@wdc.com>
+References: <20171002071535.8007-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-No need to have this helper inline in a header.  Also drop the __ prefix.
+In the case of a ZBC disk used with scsi-mq, zone write locking does
+not prevent write reordering in sequential zones. Unlike the legacy
+case, zone locking is done after the command request is removed from
+the scheduler dispatch queue. That is, at the time of zone locking,
+the write command may already be out of order, making locking
+ineffective. Write order guarantees can only be provided by an
+adapted I/O scheduler.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Disable zone write locking in sd_zbc_write_lock_zone() if the disk is
+used with scsi-mq. As the disk zones_wlock bitmap is not necessry,
+do not allocate it.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Bart Van Assche <Bart.VanAssche@wdc.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-core.c | 42 ++++++++++++++++++++++++++++++++++++++++--
- block/blk.h      | 39 ---------------------------------------
- 2 files changed, 40 insertions(+), 41 deletions(-)
+ drivers/scsi/sd_zbc.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 048be4aa6024..14f7674fa0b1 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2517,6 +2517,45 @@ void blk_account_io_start(struct request *rq, bool new_io)
- 	part_stat_unlock();
- }
- 
-+static struct request *elv_next_request(struct request_queue *q)
-+{
-+	struct request *rq;
-+	struct blk_flush_queue *fq = blk_get_flush_queue(q, NULL);
-+
-+	WARN_ON_ONCE(q->mq_ops);
-+
-+	while (1) {
-+		if (!list_empty(&q->queue_head)) {
-+			rq = list_entry_rq(q->queue_head.next);
-+			return rq;
-+		}
-+
-+		/*
-+		 * Flush request is running and flush request isn't queueable
-+		 * in the drive, we can hold the queue till flush request is
-+		 * finished. Even we don't do this, driver can't dispatch next
-+		 * requests and will requeue them. And this can improve
-+		 * throughput too. For example, we have request flush1, write1,
-+		 * flush 2. flush1 is dispatched, then queue is hold, write1
-+		 * isn't inserted to queue. After flush1 is finished, flush2
-+		 * will be dispatched. Since disk cache is already clean,
-+		 * flush2 will be finished very soon, so looks like flush2 is
-+		 * folded to flush1.
-+		 * Since the queue is hold, a flag is set to indicate the queue
-+		 * should be restarted later. Please see flush_end_io() for
-+		 * details.
-+		 */
-+		if (fq->flush_pending_idx != fq->flush_running_idx &&
-+				!queue_flush_queueable(q)) {
-+			fq->flush_queue_delayed = 1;
-+			return NULL;
-+		}
-+		if (unlikely(blk_queue_bypass(q)) ||
-+		    !q->elevator->type->ops.sq.elevator_dispatch_fn(q, 0))
-+			return NULL;
-+	}
-+}
-+
- /**
-  * blk_peek_request - peek at the top of a request queue
-  * @q: request queue to peek at
-@@ -2538,8 +2577,7 @@ struct request *blk_peek_request(struct request_queue *q)
- 	lockdep_assert_held(q->queue_lock);
- 	WARN_ON_ONCE(q->mq_ops);
- 
--	while ((rq = __elv_next_request(q)) != NULL) {
--
-+	while ((rq = elv_next_request(q)) != NULL) {
- 		rq = blk_pm_peek_request(q, rq);
- 		if (!rq)
- 			break;
-diff --git a/block/blk.h b/block/blk.h
-index fcb9775b997d..fda5a4632aba 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -148,45 +148,6 @@ static inline void blk_clear_rq_complete(struct request *rq)
- 
- void blk_insert_flush(struct request *rq);
- 
--static inline struct request *__elv_next_request(struct request_queue *q)
--{
--	struct request *rq;
--	struct blk_flush_queue *fq = blk_get_flush_queue(q, NULL);
--
--	WARN_ON_ONCE(q->mq_ops);
--
--	while (1) {
--		if (!list_empty(&q->queue_head)) {
--			rq = list_entry_rq(q->queue_head.next);
--			return rq;
--		}
--
--		/*
--		 * Flush request is running and flush request isn't queueable
--		 * in the drive, we can hold the queue till flush request is
--		 * finished. Even we don't do this, driver can't dispatch next
--		 * requests and will requeue them. And this can improve
--		 * throughput too. For example, we have request flush1, write1,
--		 * flush 2. flush1 is dispatched, then queue is hold, write1
--		 * isn't inserted to queue. After flush1 is finished, flush2
--		 * will be dispatched. Since disk cache is already clean,
--		 * flush2 will be finished very soon, so looks like flush2 is
--		 * folded to flush1.
--		 * Since the queue is hold, a flag is set to indicate the queue
--		 * should be restarted later. Please see flush_end_io() for
--		 * details.
--		 */
--		if (fq->flush_pending_idx != fq->flush_running_idx &&
--				!queue_flush_queueable(q)) {
--			fq->flush_queue_delayed = 1;
--			return NULL;
--		}
--		if (unlikely(blk_queue_bypass(q)) ||
--		    !q->elevator->type->ops.sq.elevator_dispatch_fn(q, 0))
--			return NULL;
--	}
--}
--
- static inline void elv_activate_rq(struct request_queue *q, struct request *rq)
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index 4cb271619fc6..f56ed1bc3eaa 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -287,6 +287,7 @@ int sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd)
+ int sd_zbc_write_lock_zone(struct scsi_cmnd *cmd)
  {
- 	struct elevator_queue *e = q->elevator;
+ 	struct request *rq = cmd->request;
++	struct request_queue *q = rq->q;
+ 	struct scsi_disk *sdkp = scsi_disk(rq->rq_disk);
+ 	sector_t sector = blk_rq_pos(rq);
+ 	sector_t zone_sectors = sd_zbc_zone_sectors(sdkp);
+@@ -297,10 +298,14 @@ int sd_zbc_write_lock_zone(struct scsi_cmnd *cmd)
+ 	 */
+ 
+ 	/* Do not allow zone boundaries crossing on host-managed drives */
+-	if (blk_queue_zoned_model(rq->q) == BLK_ZONED_HM &&
++	if (blk_queue_zoned_model(q) == BLK_ZONED_HM &&
+ 	    (sector & (zone_sectors - 1)) + blk_rq_sectors(rq) > zone_sectors)
+ 		return BLKPREP_KILL;
+ 
++	/* No write locking with scsi-mq */
++	if (q->mq_ops)
++		return BLKPREP_OK;
++
+ 	/*
+ 	 * There is no write constraints on conventional zones. So any write
+ 	 * command can be sent. But do not issue more than one write command
+@@ -711,7 +716,7 @@ static int sd_zbc_setup(struct scsi_disk *sdkp)
+ 	if (sdkp->first_scan)
+ 		return 0;
+ 
+-	if (!sdkp->zones_wlock) {
++	if (!q->mq_ops && !sdkp->zones_wlock) {
+ 		sdkp->zones_wlock = sd_zbc_alloc_zone_bitmap(sdkp);
+ 		if (!sdkp->zones_wlock)
+ 			return -ENOMEM;
 -- 
-2.14.1
+2.13.6
