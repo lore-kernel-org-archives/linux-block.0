@@ -1,222 +1,44 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.mpynet.fi ([82.197.21.84]:55393 "EHLO mx1.mpynet.fi"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751167AbdJANZU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 1 Oct 2017 09:25:20 -0400
-Date: Sun, 1 Oct 2017 16:25:18 +0300
-From: Rakesh Pandit <rakesh@tuxera.com>
-To: Matias =?iso-8859-1?Q?Bj=F8rling?= <mb@lightnvm.io>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
-Subject: [PATCH 4/6] lightnvm: remove stable extern and unused exported
- symbols
-Message-ID: <20171001132516.GA5743@hercules.tuxera.com>
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:38842 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751785AbdJBQBj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Oct 2017 12:01:39 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+CC: Bart Van Assche <Bart.VanAssche@wdc.com>,
+        "martin@lichtvoll.de" <martin@lichtvoll.de>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "jthumshirn@suse.de" <jthumshirn@suse.de>,
+        "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+        "hare@suse.com" <hare@suse.com>,
+        "cavery@redhat.com" <cavery@redhat.com>
+Subject: Re: [PATCH V7 2/6] block: tracking request allocation with
+ q_usage_counter
+Date: Mon, 2 Oct 2017 16:01:34 +0000
+Message-ID: <1506960093.3368.21.camel@wdc.com>
+References: <20170930061214.10622-1-ming.lei@redhat.com>
+         <20170930061214.10622-3-ming.lei@redhat.com>
+In-Reply-To: <20170930061214.10622-3-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Not all exported symbols are being used outside core and there were
-some stable entries in lightnvm.h
-
-Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
----
- drivers/lightnvm/core.c  | 129 +++++++++++++++++++++++------------------------
- include/linux/lightnvm.h |   7 ---
- 2 files changed, 64 insertions(+), 72 deletions(-)
-
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 9cd1c4b..2817b37 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -226,6 +226,24 @@ static const struct block_device_operations nvm_fops = {
- 	.owner		= THIS_MODULE,
- };
- 
-+struct nvm_tgt_type *nvm_find_target_type(const char *name, int lock)
-+{
-+	struct nvm_tgt_type *tmp, *tt = NULL;
-+
-+	if (lock)
-+		down_write(&nvm_tgtt_lock);
-+
-+	list_for_each_entry(tmp, &nvm_tgt_types, list)
-+		if (!strcmp(name, tmp->name)) {
-+			tt = tmp;
-+			break;
-+		}
-+
-+	if (lock)
-+		up_write(&nvm_tgtt_lock);
-+	return tt;
-+}
-+
- static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- {
- 	struct nvm_ioctl_create_simple *s = &create->conf.s;
-@@ -532,25 +550,6 @@ void nvm_part_to_tgt(struct nvm_dev *dev, sector_t *entries,
- }
- EXPORT_SYMBOL(nvm_part_to_tgt);
- 
--struct nvm_tgt_type *nvm_find_target_type(const char *name, int lock)
--{
--	struct nvm_tgt_type *tmp, *tt = NULL;
--
--	if (lock)
--		down_write(&nvm_tgtt_lock);
--
--	list_for_each_entry(tmp, &nvm_tgt_types, list)
--		if (!strcmp(name, tmp->name)) {
--			tt = tmp;
--			break;
--		}
--
--	if (lock)
--		up_write(&nvm_tgtt_lock);
--	return tt;
--}
--EXPORT_SYMBOL(nvm_find_target_type);
--
- int nvm_register_tgt_type(struct nvm_tgt_type *tt)
- {
- 	int ret = 0;
-@@ -602,6 +601,52 @@ static struct nvm_dev *nvm_find_nvm_dev(const char *name)
- 	return NULL;
- }
- 
-+static int nvm_set_rqd_ppalist(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd,
-+			const struct ppa_addr *ppas, int nr_ppas)
-+{
-+	struct nvm_dev *dev = tgt_dev->parent;
-+	struct nvm_geo *geo = &tgt_dev->geo;
-+	int i, plane_cnt, pl_idx;
-+	struct ppa_addr ppa;
-+
-+	if (geo->plane_mode == NVM_PLANE_SINGLE && nr_ppas == 1) {
-+		rqd->nr_ppas = nr_ppas;
-+		rqd->ppa_addr = ppas[0];
-+
-+		return 0;
-+	}
-+
-+	rqd->nr_ppas = nr_ppas;
-+	rqd->ppa_list = nvm_dev_dma_alloc(dev, GFP_KERNEL, &rqd->dma_ppa_list);
-+	if (!rqd->ppa_list) {
-+		pr_err("nvm: failed to allocate dma memory\n");
-+		return -ENOMEM;
-+	}
-+
-+	plane_cnt = geo->plane_mode;
-+	rqd->nr_ppas *= plane_cnt;
-+
-+	for (i = 0; i < nr_ppas; i++) {
-+		for (pl_idx = 0; pl_idx < plane_cnt; pl_idx++) {
-+			ppa = ppas[i];
-+			ppa.g.pl = pl_idx;
-+			rqd->ppa_list[(pl_idx * nr_ppas) + i] = ppa;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static void nvm_free_rqd_ppalist(struct nvm_tgt_dev *tgt_dev,
-+			struct nvm_rq *rqd)
-+{
-+	if (!rqd->ppa_list)
-+		return;
-+
-+	nvm_dev_dma_free(tgt_dev->parent, rqd->ppa_list, rqd->dma_ppa_list);
-+}
-+
-+
- int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas,
- 		       int nr_ppas, int type)
- {
-@@ -775,52 +820,6 @@ void nvm_put_area(struct nvm_tgt_dev *tgt_dev, sector_t begin)
- }
- EXPORT_SYMBOL(nvm_put_area);
- 
--int nvm_set_rqd_ppalist(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd,
--			const struct ppa_addr *ppas, int nr_ppas)
--{
--	struct nvm_dev *dev = tgt_dev->parent;
--	struct nvm_geo *geo = &tgt_dev->geo;
--	int i, plane_cnt, pl_idx;
--	struct ppa_addr ppa;
--
--	if (geo->plane_mode == NVM_PLANE_SINGLE && nr_ppas == 1) {
--		rqd->nr_ppas = nr_ppas;
--		rqd->ppa_addr = ppas[0];
--
--		return 0;
--	}
--
--	rqd->nr_ppas = nr_ppas;
--	rqd->ppa_list = nvm_dev_dma_alloc(dev, GFP_KERNEL, &rqd->dma_ppa_list);
--	if (!rqd->ppa_list) {
--		pr_err("nvm: failed to allocate dma memory\n");
--		return -ENOMEM;
--	}
--
--	plane_cnt = geo->plane_mode;
--	rqd->nr_ppas *= plane_cnt;
--
--	for (i = 0; i < nr_ppas; i++) {
--		for (pl_idx = 0; pl_idx < plane_cnt; pl_idx++) {
--			ppa = ppas[i];
--			ppa.g.pl = pl_idx;
--			rqd->ppa_list[(pl_idx * nr_ppas) + i] = ppa;
--		}
--	}
--
--	return 0;
--}
--EXPORT_SYMBOL(nvm_set_rqd_ppalist);
--
--void nvm_free_rqd_ppalist(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
--{
--	if (!rqd->ppa_list)
--		return;
--
--	nvm_dev_dma_free(tgt_dev->parent, rqd->ppa_list, rqd->dma_ppa_list);
--}
--EXPORT_SYMBOL(nvm_free_rqd_ppalist);
--
- void nvm_end_io(struct nvm_rq *rqd)
- {
- 	struct nvm_tgt_dev *tgt_dev = rqd->dev;
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index c8c014b..dfd4829 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -463,8 +463,6 @@ struct nvm_tgt_type {
- 	struct list_head list;
- };
- 
--extern struct nvm_tgt_type *nvm_find_target_type(const char *, int);
--
- extern int nvm_register_tgt_type(struct nvm_tgt_type *);
- extern void nvm_unregister_tgt_type(struct nvm_tgt_type *);
- 
-@@ -480,9 +478,6 @@ extern int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr *,
- extern int nvm_max_phys_sects(struct nvm_tgt_dev *);
- extern int nvm_submit_io(struct nvm_tgt_dev *, struct nvm_rq *);
- extern int nvm_erase_sync(struct nvm_tgt_dev *, struct ppa_addr *, int);
--extern int nvm_set_rqd_ppalist(struct nvm_tgt_dev *, struct nvm_rq *,
--					const struct ppa_addr *, int);
--extern void nvm_free_rqd_ppalist(struct nvm_tgt_dev *, struct nvm_rq *);
- extern int nvm_get_l2p_tbl(struct nvm_tgt_dev *, u64, u32, nvm_l2p_update_fn *,
- 			   void *);
- extern int nvm_get_area(struct nvm_tgt_dev *, sector_t *, sector_t);
-@@ -491,8 +486,6 @@ extern void nvm_end_io(struct nvm_rq *);
- extern int nvm_bb_tbl_fold(struct nvm_dev *, u8 *, int);
- extern int nvm_get_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr, u8 *);
- 
--extern int nvm_dev_factory(struct nvm_dev *, int flags);
--
- extern void nvm_part_to_tgt(struct nvm_dev *, sector_t *, int);
- 
- #else /* CONFIG_NVM */
--- 
-2.7.4
+T24gU2F0LCAyMDE3LTA5LTMwIGF0IDE0OjEyICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gQEAg
+LTEzOTUsMTYgKzE0MDEsMjEgQEAgc3RhdGljIHN0cnVjdCByZXF1ZXN0ICpibGtfb2xkX2dldF9y
+ZXF1ZXN0KHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxLA0KPiAgCQkJCQkgICB1bnNpZ25lZCBpbnQg
+b3AsIGdmcF90IGdmcF9tYXNrKQ0KPiAgew0KPiAgCXN0cnVjdCByZXF1ZXN0ICpycTsNCj4gKwlp
+bnQgcmV0ID0gMDsNCj4gIA0KPiAgCVdBUk5fT05fT05DRShxLT5tcV9vcHMpOw0KPiAgDQo+ICAJ
+LyogY3JlYXRlIGlvYyB1cGZyb250ICovDQo+ICAJY3JlYXRlX2lvX2NvbnRleHQoZ2ZwX21hc2ss
+IHEtPm5vZGUpOw0KPiAgDQo+ICsJcmV0ID0gYmxrX3F1ZXVlX2VudGVyKHEsICEoZ2ZwX21hc2sg
+JiBfX0dGUF9ESVJFQ1RfUkVDTEFJTSkpOw0KPiArCWlmIChyZXQpDQo+ICsJCXJldHVybiBFUlJf
+UFRSKHJldCk7DQoNCkNhbiB0aGUgYWJvdmUgYmxrX3F1ZXVlX2VudGVyKCkgY2FsbCBibG9jayBp
+ZiB0aGUgUkVRX05PV0FJVCBmbGFnIGhhcyBiZWVuDQpzZXQgaW4gdGhlIG9wIGFyZ3VtZW50IGFu
+ZCBlLmcuIGdmcF9tYXNrID09IEdGUF9LRVJORUw/IElmIHNvLCBpc24ndCB0aGF0IGENCmJ1Zz8N
+Cg0KQmFydC4=
