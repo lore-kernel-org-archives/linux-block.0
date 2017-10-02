@@ -1,50 +1,53 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f46.google.com ([74.125.82.46]:45055 "EHLO
-        mail-wm0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751746AbdJCKGu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2017 06:06:50 -0400
-Received: by mail-wm0-f46.google.com with SMTP id 196so5454422wma.1
-        for <linux-block@vger.kernel.org>; Tue, 03 Oct 2017 03:06:49 -0700 (PDT)
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Javier Gonzales <jg@lightnvm.io>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH 0/9] recovery robustness improvements
-Date: Tue,  3 Oct 2017 12:05:04 +0200
-Message-Id: <1507025113-13351-1-git-send-email-hans.ml.holmberg@owltronix.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"jthumshirn@suse.de" <jthumshirn@suse.de>, "linux-raid@vger.kernel.org"
+	<linux-raid@vger.kernel.org>, "hch@lst.de" <hch@lst.de>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+	"hare@suse.com" <hare@suse.com>, "shli@kernel.org" <shli@kernel.org>
+Subject: Re: [PATCH v4 1/7] md: Make md resync and reshape threads freezable
+Date: Mon, 2 Oct 2017 15:39:35 +0000
+Message-ID: <1506958773.3368.12.camel@wdc.com>
+References: <20170925202924.16603-1-bart.vanassche@wdc.com>
+	 <20170925202924.16603-2-bart.vanassche@wdc.com>
+	 <20170926111747.GA16794@ming.t460p> <1506436926.3787.24.camel@wdc.com>
+	 <20170926145919.GC31449@ming.t460p> <1506481915.2822.9.camel@wdc.com>
+	 <20170927110006.GB1994@ming.t460p>
+In-Reply-To: <20170927110006.GB1994@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
-
-This patchset improves the robustness of recovery - fixing a bunch of
-issues that occurs when removing and re-creating a pblk instance.
-It also adds a couple of debug-only prints to facilitate detection
-of L2P table corruptions.
-
-The patches apply on top of:
-https://github.com/OpenChannelSSD/linux branch for-4.15/pblk
-
-Hans Holmberg (9):
-  lightnvm: pblk: prevent gc kicks when gc is not operational
-  lightnvm: pblk: recover partially written lines correctly
-  lightnvm: pblk: free full lines during recovery
-  lightnvm: pblk: start gc if needed during init
-  lightnvm: pblk: consider bad sectors in emeta during recovery
-  lightnvm: pblk: shut down gc gracefully during exit
-  lightnvm: pblk: add l2p crc debug printouts
-  lightnvm: pblk: gc all lines in the pipeline before exit
-  lightnvm: pblk: correct valid lba count calculation
-
- drivers/lightnvm/pblk-core.c     |  3 ++
- drivers/lightnvm/pblk-gc.c       | 88 +++++++++++++++++++++++++++-------------
- drivers/lightnvm/pblk-init.c     | 47 ++++++++++++++++++---
- drivers/lightnvm/pblk-map.c      |  7 ++--
- drivers/lightnvm/pblk-recovery.c | 46 ++++++++++++++-------
- drivers/lightnvm/pblk-sysfs.c    |  2 +-
- drivers/lightnvm/pblk.h          |  6 ++-
- 7 files changed, 145 insertions(+), 54 deletions(-)
-
--- 
-2.7.4
+T24gV2VkLCAyMDE3LTA5LTI3IGF0IDE5OjAwICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gV2l0
+aCBjdXJyZW50IGxpbnVzIHRyZWUsIFNDU0kgSS9PIGlzIHByZXZlbnRlZCBmcm9tIGJlaW5nIGRp
+c3BhdGNoIHRvDQo+IGRldmljZSBkdXJpbmcgc3VzcGVuZCBieSBTQ1NJIHF1aWVzY2UsIGFuZCB3
+aWxsIGJlIGRpc3BhdGNoZWQgYWdhaW4NCj4gaW4gcmVzdW1lLiBXaXRoIFNhZmUgU0NTSSBxdWll
+c2NlWzFdLCBhbnkgdW5kZXJseWluZyBJTyByZXF1ZXN0IHdpbGwNCj4gc3RvcCBhdCBibGtfcXVl
+dWVfZW50ZXIoKSBkdXJpbmcgc3VzcGVuZCwgYW5kIHJlc3RhcnQgZnJvbSB0aGVyZSBkdXJpbmcN
+Cj4gcmVzdW1lLg0KPiANCj4gRm9yIG90aGVyIG5vbi1TQ1NJIGRyaXZlciwgdGhlaXIgLnN1c3Bl
+bmQvLnJlc3VtZSBvZnRlbg0KPiBoYW5kbGVzIEkvTyBpbiBzaW1pbGFyIHdheSwgZm9yIGV4YW1w
+bGUsIE5WTWUgcXVldWUgd2lsbA0KPiBiZSBmcm96ZW4gaW4gLnN1c3BlbmQsIGFuZCB1bmZyZWV6
+ZSBpbiAucmVzdW1lLg0KPiANCj4gU28gY291bGQgeW91IGV4cGxhaW4gYSBiaXQgd2hpY2gga2lu
+ZCBvZiBidWcgdGhpcyBwYXRjaCBmaXhlcz8NCg0KSXQgc2VlbXMgbGlrZSB5b3UgZG8gbm90IGZ1
+bGx5IHVuZGVyc3RhbmQgdGhlIG1vdGl2YXRpb24gYmVoaW5kIHF1aWVzY2luZyBhbmQNCnJlc3Vt
+aW5nIEkvTyBmcm9tIGluc2lkZSB0aGUgU0NTSSBhbmQgTlZNZSBmcmVlemUgYW5kIHRoYXcgcG93
+ZXIgbWFuYWdlbWVudA0KY2FsbGJhY2tzLiBIaWJlcm5hdGlvbiBjYW4gb25seSB3b3JrIHJlbGlh
+Ymx5IGlmIG5vIEkvTyBpcyBzdWJtaXR0ZWQgYWZ0ZXINCmNyZWF0aW9uIG9mIHRoZSBoaWJlcm5h
+dGlvbiBpbWFnZSBoYXMgYmVlbiBzdGFydGVkLiBJZiBhbnkgSS9PIGlzIHN1Ym1pdHRlZA0KdGhh
+dCBpcyBub3QgcmVsYXRlZCB0byB0aGUgaGliZXJuYXRpb24gcHJvY2VzcyBpdHNlbGYgYnkgYW55
+IGRyaXZlciBhZnRlcg0KdXNlciBzcGFjZSBwcm9jZXNzZXMgYW5kIGtlcm5lbCB0aHJlYWRzIGhh
+dmUgYmVlbiBmcm96ZW4gdGhlbiB0aGF0J3MgYSAqYnVnKg0KaW4gdGhlIGNvbXBvbmVudCB0aGF0
+IHN1Ym1pdHRlZCB0aGUgSS9PLiBUaGUgZnJlZXppbmcgYW5kIHN1c3BlbmRpbmcgb2YgSS9PDQpm
+cm9tIGluc2lkZSB0aGUgU0NTSSBhbmQgTlZNZSBkcml2ZXJzIGlzIGEgKndvcmthcm91bmQqIGZv
+ciB0aGVzZSBidWdzIGJ1dCBpcw0Kbm90IGEgZnVsbCBzb2x1dGlvbi4gQmVmb3JlIHRoZSBoaWJl
+cm5hdGlvbiBpbWFnZSBpcyB3cml0dGVuIHRvIGRpc2sgSS9PIGlzDQpyZXN1bWVkIGFuZCB0aGUg
+SS9PIHJlcXVlc3RzIHRoYXQgZ290IGRlZmVycmVkIHdpbGwgYmUgZXhlY3V0ZWQgYXQgdGhhdCB0
+aW1lLg0KSW4gb3RoZXIgd29yZHMsIHN1c3BlbmRpbmcgYW5kIHJlc3VtaW5nIEkvTyBmcm9tIGlu
+c2lkZSB0aGUgU0NTSSBhbmQgTlZNZQ0KZHJpdmVycyBpcyBhIHdvcmthcm91bmQgYW5kIG5vdCBh
+IGZ1bGwgc29sdXRpb24uIFRoZSBmb2xsb3dpbmcgcXVvdGUgZnJvbQ0KRG9jdW1lbnRhdGlvbi9w
+b3dlci9zd3N1c3AudHh0IGlsbHVzdHJhdGVzIHRoaXM6DQoNCiAqIEJJRyBGQVQgV0FSTklORyAq
+KioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioN
+CiAqDQogKiBJZiB5b3UgdG91Y2ggYW55dGhpbmcgb24gZGlzayBiZXR3ZWVuIHN1c3BlbmQgYW5k
+IHJlc3VtZS4uLg0KICoJCQkJLi4ua2lzcyB5b3VyIGRhdGEgZ29vZGJ5ZS4NCg0KQmFydC4=
