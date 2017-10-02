@@ -1,75 +1,74 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        John Garry <john.garry@huawei.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V9 1/7] blk-mq-sched: dispatch from scheduler only after progress is made on ->dispatch
-Date: Sat, 14 Oct 2017 02:05:26 +0800
-Message-Id: <20171013180532.29304-2-ming.lei@redhat.com>
-In-Reply-To: <20171013180532.29304-1-ming.lei@redhat.com>
-References: <20171013180532.29304-1-ming.lei@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.mpynet.fi ([82.197.21.85]:46957 "EHLO mx2.mpynet.fi"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751082AbdJBRVG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 2 Oct 2017 13:21:06 -0400
+Date: Mon, 2 Oct 2017 20:21:04 +0300
+From: Rakesh Pandit <rakesh@tuxera.com>
+To: Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
+CC: Matias =?iso-8859-1?Q?Bj=F8rling?= <mb@lightnvm.io>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 6/6] lightnvm: pblk: fix releases of kmem cache in error
+ path
+Message-ID: <20171002172104.GB6008@hercules.tuxera.com>
+References: <20171001132633.GA5783@hercules.tuxera.com>
+ <13AC8182-29EB-4601-980E-FC8B59A83CFC@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+In-Reply-To: <13AC8182-29EB-4601-980E-FC8B59A83CFC@lightnvm.io>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When hw queue is busy, we shouldn't take requests from
-scheduler queue any more, otherwise it is difficult to do
-IO merge.
+On Mon, Oct 02, 2017 at 02:44:23PM +0200, Javier Gonz�lez wrote:
+> > On 1 Oct 2017, at 15.26, Rakesh Pandit <rakesh@tuxera.com> wrote:
+> > 
+> > If pblk_core_init fails lets destroy all global caches.
+> > 
+> > Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+> > ---
+> > drivers/lightnvm/pblk-init.c | 8 +++++++-
+> > 1 file changed, 7 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+> > index 519e5cf..9f39800 100644
+> > --- a/drivers/lightnvm/pblk-init.c
+> > +++ b/drivers/lightnvm/pblk-init.c
+> > @@ -246,7 +246,7 @@ static int pblk_core_init(struct pblk *pblk)
+> > 	pblk->page_bio_pool = mempool_create_page_pool(nvm_max_phys_sects(dev),
+> > 									0);
+> > 	if (!pblk->page_bio_pool)
+> > -		return -ENOMEM;
+> > +		goto free_global_caches;
+> > 
+> > 	pblk->gen_ws_pool = mempool_create_slab_pool(PBLK_GEN_WS_POOL_SIZE,
+> > 							pblk_ws_cache);
+> > @@ -314,6 +314,12 @@ static int pblk_core_init(struct pblk *pblk)
+> > 	mempool_destroy(pblk->gen_ws_pool);
+> > free_page_bio_pool:
+> > 	mempool_destroy(pblk->page_bio_pool);
+> > +free_global_caches:
+> > +	kmem_cache_destroy(pblk_ws_cache);
+> > +	kmem_cache_destroy(pblk_rec_cache);
+> > +	kmem_cache_destroy(pblk_g_rq_cache);
+> > +	kmem_cache_destroy(pblk_e_rq_cache);
+> > +	kmem_cache_destroy(pblk_w_rq_cache);
+> > 	return -ENOMEM;
+> > }
+> > 
+> > --
+> > 2.7.4
+> 
+> Looks good. I'll refactor it on a single function so that we can reuse
+> it on tear down. It will also be simpler to add/remove caches in the
+> future.
+> 
+> Since it depends on the last patch, I'll wait until you reply to it
+> before making the changes.
 
-This patch fixes the awful IO performance on some
-SCSI devices(lpfc, qla2xxx, ...) when mq-deadline/kyber
-is used by not taking requests if hw queue is busy.
+Please go ahead.  Now that previous patch is can be ignored, you can
+adjust accordingly.
 
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Thank you.
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 4ab69435708c..eca011fdfa0e 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -94,7 +94,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	struct request_queue *q = hctx->queue;
- 	struct elevator_queue *e = q->elevator;
- 	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
--	bool did_work = false;
-+	bool do_sched_dispatch = true;
- 	LIST_HEAD(rq_list);
- 
- 	/* RCU or SRCU read lock is needed before checking quiesced flag */
-@@ -125,18 +125,18 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	 */
- 	if (!list_empty(&rq_list)) {
- 		blk_mq_sched_mark_restart_hctx(hctx);
--		did_work = blk_mq_dispatch_rq_list(q, &rq_list);
-+		do_sched_dispatch = blk_mq_dispatch_rq_list(q, &rq_list);
- 	} else if (!has_sched_dispatch) {
- 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
- 		blk_mq_dispatch_rq_list(q, &rq_list);
- 	}
- 
- 	/*
--	 * We want to dispatch from the scheduler if we had no work left
--	 * on the dispatch list, OR if we did have work but weren't able
--	 * to make progress.
-+	 * We want to dispatch from the scheduler if there was nothing
-+	 * on the dispatch list or we were able to dispatch from the
-+	 * dispatch list.
- 	 */
--	if (!did_work && has_sched_dispatch) {
-+	if (do_sched_dispatch && has_sched_dispatch) {
- 		do {
- 			struct request *rq;
- 
--- 
-2.9.5
+> 
+> Javier
