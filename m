@@ -1,107 +1,123 @@
-Return-Path: <lurodriguez@suse.de>
-Date: Wed, 4 Oct 2017 03:16:10 +0200
-From: "Luis R. Rodriguez" <mcgrof@kernel.org>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+Return-Path: <prvs=4411c008b=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
 	"Martin K . Petersen" <martin.petersen@oracle.com>,
 	=Oleksandr Natalenko <oleksandr@natalenko.name>,
 	"Luis R . Rodriguez" <mcgrof@kernel.org>,
-	Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Shaohua Li <shli@kernel.org>,
+	linux-raid@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Hannes Reinecke <hare@suse.com>,
 	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: Re: [PATCH v5 2/8] md: Neither resync nor reshape while the system
- is frozen
-Message-ID: <20171004011610.GP2294@wotan.suse.de>
+Subject: [PATCH v5 2/8] md: Neither resync nor reshape while the system is frozen
+Date: Mon,  2 Oct 2017 15:52:12 -0700
+Message-Id: <20171002225218.18548-3-bart.vanassche@wdc.com>
+In-Reply-To: <20171002225218.18548-1-bart.vanassche@wdc.com>
 References: <20171002225218.18548-1-bart.vanassche@wdc.com>
- <20171002225218.18548-3-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171002225218.18548-3-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Oct 02, 2017 at 03:52:12PM -0700, Bart Van Assche wrote:
-> diff --git a/drivers/md/md.c b/drivers/md/md.c
-> index 3f7426120a3b..a2cf2a93b0cb 100644
-> --- a/drivers/md/md.c
-> +++ b/drivers/md/md.c
-> @@ -8961,6 +8963,37 @@ static void md_stop_all_writes(void)
->  		mdelay(1000*1);
->  }
->  
-> +/*
-> + * Ensure that neither resyncing nor reshaping occurs while the system is
-> + * frozen.
-> + */
-> +static int md_notify_pm(struct notifier_block *bl, unsigned long state,
-> +			void *unused)
-> +{
-> +	struct mddev *mddev;
-> +	struct list_head *tmp;
-> +
-> +	pr_debug("%s: state = %ld; system_freezing_cnt = %d\n", __func__, state,
-> +		 atomic_read(&system_freezing_cnt));
-> +
-> +	switch (state) {
-> +	case PM_HIBERNATION_PREPARE:
+Some people use the md driver on laptops and use the suspend and
+resume functionality. Since it is essential that submitting of
+new I/O requests stops before a hibernation image is created,
+interrupt the md resync and reshape actions if the system is
+being frozen. Note: the resync and reshape will restart after
+the system is resumed and a message similar to the following
+will appear in the system log:
 
-Hm, why not also include and use this for PM_SUSPEND_PREPARE and/or
-a PM_RESTORE_PREPARE.
+md: md0: data-check interrupted.
 
-        case PM_HIBERNATION_PREPARE:
-        case PM_SUSPEND_PREPARE:
-        case PM_RESTORE_PREPARE:
+Additionally, only allow resync or reshape activity to be
+started after system freezing is over.
 
-> +		md_stop_all_writes();
-> +		break;
-> +	case PM_POST_HIBERNATION:
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Shaohua Li <shli@kernel.org>
+Cc: linux-raid@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ drivers/md/md.c | 37 ++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 36 insertions(+), 1 deletion(-)
 
-Likewise here:
-
-        case PM_POST_SUSPEND:
-        case PM_POST_HIBERNATION:
-        case PM_POST_RESTORE:
-
-I have revised the kernel suspend ordering and indeed things issued
-with the pm notifier should suffice to be processed given we actually
-call the pm ops (dpm_prepare()) for device drivers *after* the notifier
-is called and then after userspace is frozen. That is:
-
-   pm_suspend() --> enter_state() -->
-     sys_sync()
-     suspend_prepare() -->
-             __pm_notifier_call_chain(PM_SUSPEND_PREPARE, ...);
-             suspend_freeze_processes() -->
-                     freeze_processes() -->
-                             __usermodehelper_set_disable_depth(UMH_DISABLED);
-                             freeze all tasks ...
-                     freeze_kernel_threads()
-     suspend_devices_and_enter() -->
-             dpm_suspend_start() -->
-                             dpm_prepare()
-                             dpm_suspend()
-             suspend_enter()  -->
-                     platform_suspend_prepare()
-                     dpm_suspend_late()
-                     freeze_enter()
-                     syscore_suspend()
-
-On our way back up:
-
-     enter_state() -->
-     suspend_devices_and_enter() --> (bail from loop)
-             dpm_resume_end() -->
-                     dpm_resume()
-                     dpm_complete()
-     suspend_finish() -->
-             suspend_thaw_processes() -->
-                     thaw_processes() -->
-                             __usermodehelper_set_disable_depth(UMH_FREEZING);
-                             thaw_workqueues();
-                             thaw all processes ...
-                             usermodehelper_enable();
-             pm_notifier_call_chain(PM_POST_SUSPEND);
-
-So notifier would indeed be the right tooling to use here.
-
-  Luis
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 3f7426120a3b..a2cf2a93b0cb 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -66,6 +66,7 @@
+ #include <linux/raid/md_u.h>
+ #include <linux/slab.h>
+ #include <linux/percpu-refcount.h>
++#include <linux/suspend.h>
+ 
+ #include <trace/events/block.h>
+ #include "md.h"
+@@ -7450,7 +7451,8 @@ static int md_thread(void *arg)
+ 
+ 		wait_event_interruptible_timeout
+ 			(thread->wqueue,
+-			 test_bit(THREAD_WAKEUP, &thread->flags)
++			 (test_bit(THREAD_WAKEUP, &thread->flags) &&
++			  atomic_read(&system_freezing_cnt) == 0)
+ 			 || kthread_should_stop() || kthread_should_park(),
+ 			 thread->timeout);
+ 
+@@ -8961,6 +8963,37 @@ static void md_stop_all_writes(void)
+ 		mdelay(1000*1);
+ }
+ 
++/*
++ * Ensure that neither resyncing nor reshaping occurs while the system is
++ * frozen.
++ */
++static int md_notify_pm(struct notifier_block *bl, unsigned long state,
++			void *unused)
++{
++	struct mddev *mddev;
++	struct list_head *tmp;
++
++	pr_debug("%s: state = %ld; system_freezing_cnt = %d\n", __func__, state,
++		 atomic_read(&system_freezing_cnt));
++
++	switch (state) {
++	case PM_HIBERNATION_PREPARE:
++		md_stop_all_writes();
++		break;
++	case PM_POST_HIBERNATION:
++		rcu_read_lock();
++		for_each_mddev(mddev, tmp)
++			wake_up(&mddev->thread->wqueue);
++		rcu_read_unlock();
++		break;
++	}
++	return NOTIFY_DONE;
++}
++
++static struct notifier_block md_pm_notifier = {
++	.notifier_call	= md_notify_pm,
++};
++
+ static int md_notify_reboot(struct notifier_block *this,
+ 			    unsigned long code, void *x)
+ {
+@@ -9007,6 +9040,7 @@ static int __init md_init(void)
+ 			    md_probe, NULL, NULL);
+ 
+ 	register_reboot_notifier(&md_reboot_notifier);
++	register_pm_notifier(&md_pm_notifier);
+ 	raid_table_header = register_sysctl_table(raid_root_table);
+ 
+ 	md_geninit();
+@@ -9246,6 +9280,7 @@ static __exit void md_exit(void)
+ 
+ 	unregister_blkdev(MD_MAJOR,"md");
+ 	unregister_blkdev(mdp_major, "mdp");
++	unregister_pm_notifier(&md_pm_notifier);
+ 	unregister_reboot_notifier(&md_reboot_notifier);
+ 	unregister_sysctl_table(raid_table_header);
+ 
+-- 
+2.14.1
