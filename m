@@ -1,28 +1,19 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qk0-f176.google.com ([209.85.220.176]:56071 "EHLO
-        mail-qk0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751823AbdJGVmG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 7 Oct 2017 17:42:06 -0400
-Received: by mail-qk0-f176.google.com with SMTP id x82so10888059qkb.12
-        for <linux-block@vger.kernel.org>; Sat, 07 Oct 2017 14:42:06 -0700 (PDT)
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH] blk-mq: wire up completion notifier for laptop mode
+Date: Mon, 2 Oct 2017 15:44:29 +0000
+Message-ID: <1506959068.3368.14.camel@wdc.com>
+References: <05155e41-caab-0ff4-8520-5eff59c9cf7a@kernel.dk>
+In-Reply-To: <05155e41-caab-0ff4-8520-5eff59c9cf7a@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20170909184147.10458-1-colyli@suse.de>
-References: <20170909184147.10458-1-colyli@suse.de>
-From: Michael Lyle <mlyle@lyle.org>
-Date: Sat, 7 Oct 2017 14:42:05 -0700
-Message-ID: <CAJ+L6qc6xReHHwHnZx6oRL_H3u2JCEY+zaBhJ88-tzUrHhZUMg@mail.gmail.com>
-Subject: Re: [PATCH] bcache: rewrite multiple partitions support
-To: Coly Li <colyli@suse.de>
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Indeed fixes a bug where minors and indices are interchanged on
-cleanup-- good catch.  Factoring out the index conversion is nice.
-
-Hopefully no one is adversely affected by the stride change (16->128)
-and different naming, but they should be using udev + labels/uuids
-anyways.
-
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
+T24gU2F0LCAyMDE3LTA5LTMwIGF0IDEwOjA2ICswMjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBG
+b3Igc29tZSByZWFzb24sIHRoZSBsYXB0b3AgbW9kZSBJTyBjb21wbGV0aW9uIG5vdGlmaWVkIHdh
+cyBuZXZlciB3aXJlZA0KPiB1cCBmb3IgYmxrLW1xLiBFbnN1cmUgdGhhdCB3ZSB0cmlnZ2VyIHRo
+ZSBjYWxsYmFjayBhcHByb3ByaWF0ZWx5LCB0byBhcm0NCj4gdGhlIGxhcHRvcCBtb2RlIGZsdXNo
+IHRpbWVyLg0KDQpSZXZpZXdlZC1ieTogQmFydCBWYW4gQXNzY2hlIDxiYXJ0LnZhbmFzc2NoZUB3
+ZGMuY29tPg0K
