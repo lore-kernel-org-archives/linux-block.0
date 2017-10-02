@@ -1,70 +1,130 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.didichuxing.com ([111.202.154.82]:5856 "EHLO
-        BJEXCAS005.didichuxing.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751399AbdJaKiA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Oct 2017 06:38:00 -0400
-Date: Tue, 31 Oct 2017 18:37:54 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>, <jack@suse.cz>
-CC: <linux-block@vger.kernel.org>, <linux-mm@kvack.org>
-Subject: [PATCH v2 1/3] bdi: convert bdi_debug_register to int
-Message-ID: <8f8d9678f5843f7fd01588d2cc4f4dc3f21dd50b.1509415695.git.zhangweiping@didichuxing.com>
-References: <cover.1509415695.git.zhangweiping@didichuxing.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <cover.1509415695.git.zhangweiping@didichuxing.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=441412a59=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V6 01/14] scsi: sd_zbc: Move ZBC declarations to scsi_proto.h
+Date: Mon,  2 Oct 2017 16:15:22 +0900
+Message-Id: <20171002071535.8007-2-damien.lemoal@wdc.com>
+In-Reply-To: <20171002071535.8007-1-damien.lemoal@wdc.com>
+References: <20171002071535.8007-1-damien.lemoal@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Convert bdi_debug_register to int and then do error handle for it.
+Move standard macro definitions for the zone types and zone conditions
+to scsi_proto.h together with the definitions related to the
+REPORT ZONES command. While at it, define all values in the enums to
+be clear.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+Also remove unnecessary includes in sd_zbc.c.
+
+No functional change is introduced by this patch.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Bart Van Assche <Bart.VanAssche@wdc.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- mm/backing-dev.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+ drivers/scsi/sd_zbc.c     | 24 ------------------------
+ include/scsi/scsi_proto.h | 45 ++++++++++++++++++++++++++++++++++-----------
+ 2 files changed, 34 insertions(+), 35 deletions(-)
 
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index 74b52dfd5852..b5f940ce0143 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -113,11 +113,23 @@ static const struct file_operations bdi_debug_stats_fops = {
- 	.release	= single_release,
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index 8aa54779aac1..692c8cbc7ed8 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -28,32 +28,8 @@
+ 
+ #include <scsi/scsi.h>
+ #include <scsi/scsi_cmnd.h>
+-#include <scsi/scsi_dbg.h>
+-#include <scsi/scsi_device.h>
+-#include <scsi/scsi_driver.h>
+-#include <scsi/scsi_host.h>
+-#include <scsi/scsi_eh.h>
+ 
+ #include "sd.h"
+-#include "scsi_priv.h"
+-
+-enum zbc_zone_type {
+-	ZBC_ZONE_TYPE_CONV = 0x1,
+-	ZBC_ZONE_TYPE_SEQWRITE_REQ,
+-	ZBC_ZONE_TYPE_SEQWRITE_PREF,
+-	ZBC_ZONE_TYPE_RESERVED,
+-};
+-
+-enum zbc_zone_cond {
+-	ZBC_ZONE_COND_NO_WP,
+-	ZBC_ZONE_COND_EMPTY,
+-	ZBC_ZONE_COND_IMP_OPEN,
+-	ZBC_ZONE_COND_EXP_OPEN,
+-	ZBC_ZONE_COND_CLOSED,
+-	ZBC_ZONE_COND_READONLY = 0xd,
+-	ZBC_ZONE_COND_FULL,
+-	ZBC_ZONE_COND_OFFLINE,
+-};
+ 
+ /**
+  * Convert a zone descriptor to a zone struct.
+diff --git a/include/scsi/scsi_proto.h b/include/scsi/scsi_proto.h
+index 8c285d9a06d8..39130a9c05bf 100644
+--- a/include/scsi/scsi_proto.h
++++ b/include/scsi/scsi_proto.h
+@@ -301,19 +301,42 @@ struct scsi_lun {
+ 
+ /* Reporting options for REPORT ZONES */
+ enum zbc_zone_reporting_options {
+-	ZBC_ZONE_REPORTING_OPTION_ALL = 0,
+-	ZBC_ZONE_REPORTING_OPTION_EMPTY,
+-	ZBC_ZONE_REPORTING_OPTION_IMPLICIT_OPEN,
+-	ZBC_ZONE_REPORTING_OPTION_EXPLICIT_OPEN,
+-	ZBC_ZONE_REPORTING_OPTION_CLOSED,
+-	ZBC_ZONE_REPORTING_OPTION_FULL,
+-	ZBC_ZONE_REPORTING_OPTION_READONLY,
+-	ZBC_ZONE_REPORTING_OPTION_OFFLINE,
+-	ZBC_ZONE_REPORTING_OPTION_NEED_RESET_WP = 0x10,
+-	ZBC_ZONE_REPORTING_OPTION_NON_SEQWRITE,
+-	ZBC_ZONE_REPORTING_OPTION_NON_WP = 0x3f,
++	ZBC_ZONE_REPORTING_OPTION_ALL		= 0x00,
++	ZBC_ZONE_REPORTING_OPTION_EMPTY		= 0x01,
++	ZBC_ZONE_REPORTING_OPTION_IMPLICIT_OPEN	= 0x02,
++	ZBC_ZONE_REPORTING_OPTION_EXPLICIT_OPEN	= 0x03,
++	ZBC_ZONE_REPORTING_OPTION_CLOSED	= 0x04,
++	ZBC_ZONE_REPORTING_OPTION_FULL		= 0x05,
++	ZBC_ZONE_REPORTING_OPTION_READONLY	= 0x06,
++	ZBC_ZONE_REPORTING_OPTION_OFFLINE	= 0x07,
++	/* 0x08 to 0x0f are reserved */
++	ZBC_ZONE_REPORTING_OPTION_NEED_RESET_WP	= 0x10,
++	ZBC_ZONE_REPORTING_OPTION_NON_SEQWRITE	= 0x11,
++	/* 0x12 to 0x3e are reserved */
++	ZBC_ZONE_REPORTING_OPTION_NON_WP	= 0x3f,
  };
  
--static void bdi_debug_register(struct backing_dev_info *bdi, const char *name)
-+static int bdi_debug_register(struct backing_dev_info *bdi, const char *name)
- {
-+	if (!bdi_debug_root)
-+		return -ENOMEM;
-+
- 	bdi->debug_dir = debugfs_create_dir(name, bdi_debug_root);
-+	if (!bdi->debug_dir)
-+		return -ENOMEM;
-+
- 	bdi->debug_stats = debugfs_create_file("stats", 0444, bdi->debug_dir,
- 					       bdi, &bdi_debug_stats_fops);
-+	if (!bdi->debug_stats) {
-+		debugfs_remove(bdi->debug_dir);
-+		return -ENOMEM;
-+	}
-+
-+	return 0;
- }
+ #define ZBC_REPORT_ZONE_PARTIAL 0x80
  
- static void bdi_debug_unregister(struct backing_dev_info *bdi)
-@@ -129,9 +141,10 @@ static void bdi_debug_unregister(struct backing_dev_info *bdi)
- static inline void bdi_debug_init(void)
- {
- }
--static inline void bdi_debug_register(struct backing_dev_info *bdi,
-+static inline int bdi_debug_register(struct backing_dev_info *bdi,
- 				      const char *name)
- {
-+	return 0;
- }
- static inline void bdi_debug_unregister(struct backing_dev_info *bdi)
- {
++/* Zone types of REPORT ZONES zone descriptors */
++enum zbc_zone_type {
++	ZBC_ZONE_TYPE_CONV		= 0x1,
++	ZBC_ZONE_TYPE_SEQWRITE_REQ	= 0x2,
++	ZBC_ZONE_TYPE_SEQWRITE_PREF	= 0x3,
++	/* 0x4 to 0xf are reserved */
++};
++
++/* Zone conditions of REPORT ZONES zone descriptors */
++enum zbc_zone_cond {
++	ZBC_ZONE_COND_NO_WP		= 0x0,
++	ZBC_ZONE_COND_EMPTY		= 0x1,
++	ZBC_ZONE_COND_IMP_OPEN		= 0x2,
++	ZBC_ZONE_COND_EXP_OPEN		= 0x3,
++	ZBC_ZONE_COND_CLOSED		= 0x4,
++	/* 0x5 to 0xc are reserved */
++	ZBC_ZONE_COND_READONLY		= 0xd,
++	ZBC_ZONE_COND_FULL		= 0xe,
++	ZBC_ZONE_COND_OFFLINE		= 0xf,
++};
++
+ #endif /* _SCSI_PROTO_H_ */
 -- 
-2.14.2
+2.13.6
