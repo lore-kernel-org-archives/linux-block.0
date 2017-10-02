@@ -1,86 +1,124 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:47278 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753238AbdJMXgG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 19:36:06 -0400
-Received: by mail-pg0-f66.google.com with SMTP id r25so2338769pgn.4
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 16:36:06 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Yijing Wang <wangyijing@huawei.com>
-Subject: [PATCH 07/15] bcache: remove unused parameter
-Date: Fri, 13 Oct 2017 16:35:34 -0700
-Message-Id: <20171013233542.20938-8-mlyle@lyle.org>
-In-Reply-To: <20171013233542.20938-1-mlyle@lyle.org>
-References: <20171013233542.20938-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V6 06/14] block: Add zoned block device information to request queue
+Date: Mon,  2 Oct 2017 16:15:27 +0900
+Message-Id: <20171002071535.8007-7-damien.lemoal@wdc.com>
+In-Reply-To: <20171002071535.8007-1-damien.lemoal@wdc.com>
+References: <20171002071535.8007-1-damien.lemoal@wdc.com>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Yijing Wang <wangyijing@huawei.com>
+Components relying only on the requeuest_queue structure for accessing
+block devices (e.g. I/O schedulers) have a limited knowledged of the
+device characteristics. In particular, the device capacity cannot be
+easily discovered, which for a zoned block device also result in the
+inability to easily know the number of zones of the device (the zone
+size is indicated by the chunk_sectors field of the queue limits).
 
-Parameter bio is no longer used, clean it.
+Introduce the nr_zones field to the request_queue sturcture to simplify
+access to this information. Also, add the bitmap seq_zone_bitmap which
+indicates which zones of the device are sequential zones (write
+preferred or write required). These two fields are initialized by the
+low level block device driver (sd.c for ZBC/ZAC disks). They are not
+initialized by stacking drivers (device mappers) handling zoned block
+devices (e.g. dm-linear).
 
-Signed-off-by: Yijing Wang <wangyijing@huawei.com>
-Reviewed-by: Coly Li <colyli@suse.de>
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Bart Van Assche <Bart.VanAssche@wdc.com>
 ---
- drivers/md/bcache/request.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ include/linux/blkdev.h | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 9ee137e8d387..163a17a80874 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -26,12 +26,12 @@ struct kmem_cache *bch_search_cache;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 02fa42d24b52..a44807c502f0 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -544,6 +544,18 @@ struct request_queue {
+ 	struct queue_limits	limits;
  
- static void bch_data_insert_start(struct closure *);
- 
--static unsigned cache_mode(struct cached_dev *dc, struct bio *bio)
-+static unsigned cache_mode(struct cached_dev *dc)
- {
- 	return BDEV_CACHE_MODE(&dc->sb);
+ 	/*
++	 * Zoned block device information for mq I/O schedulers.
++	 * nr_zones is the total number of zones of the device. This is always
++	 * 0 for regular block devices. seq_zone_bitmap is a bitmap of nr_zones
++	 * bits which indicates if a zone is conventional (bit clear) or
++	 * sequential (bit set). Both nr_zones and seq_zone_bitmap are set
++	 * by the low level device driver. Stacking drivers (device mappers)
++	 * may or may not initialize these fields.
++	 */
++	unsigned int	nr_zones;
++	unsigned long	*seq_zone_bitmap;
++
++	/*
+ 	 * sg stuff
+ 	 */
+ 	unsigned int		sg_timeout;
+@@ -786,6 +798,27 @@ static inline unsigned int blk_queue_zone_sectors(struct request_queue *q)
+ 	return blk_queue_is_zoned(q) ? q->limits.chunk_sectors : 0;
  }
  
--static bool verify(struct cached_dev *dc, struct bio *bio)
-+static bool verify(struct cached_dev *dc)
++static inline unsigned int blk_queue_nr_zones(struct request_queue *q)
++{
++	return q->nr_zones;
++}
++
++static inline unsigned int blk_queue_zone_no(struct request_queue *q,
++					     sector_t sector)
++{
++	if (!blk_queue_is_zoned(q))
++		return 0;
++	return sector >> ilog2(q->limits.chunk_sectors);
++}
++
++static inline bool blk_queue_zone_is_seq(struct request_queue *q,
++					 sector_t sector)
++{
++	if (!blk_queue_is_zoned(q) || !q->seq_zone_bitmap)
++		return false;
++	return test_bit(blk_queue_zone_no(q, sector), q->seq_zone_bitmap);
++}
++
+ static inline bool rq_is_sync(struct request *rq)
  {
- 	return dc->verify;
+ 	return op_is_sync(rq->cmd_flags);
+@@ -1032,6 +1065,16 @@ static inline unsigned int blk_rq_cur_sectors(const struct request *rq)
+ 	return blk_rq_cur_bytes(rq) >> 9;
  }
-@@ -369,7 +369,7 @@ static struct hlist_head *iohash(struct cached_dev *dc, uint64_t k)
- static bool check_should_bypass(struct cached_dev *dc, struct bio *bio)
+ 
++static inline unsigned int blk_rq_zone_no(struct request *rq)
++{
++	return blk_queue_zone_no(rq->q, blk_rq_pos(rq));
++}
++
++static inline unsigned int blk_rq_zone_is_seq(struct request *rq)
++{
++	return blk_queue_zone_is_seq(rq->q, blk_rq_pos(rq));
++}
++
+ /*
+  * Some commands like WRITE SAME have a payload or data transfer size which
+  * is different from the size of the request.  Any driver that supports such
+@@ -1583,6 +1626,16 @@ static inline unsigned int bdev_zone_sectors(struct block_device *bdev)
+ 	return 0;
+ }
+ 
++static inline unsigned int bdev_nr_zones(struct block_device *bdev)
++{
++	struct request_queue *q = bdev_get_queue(bdev);
++
++	if (q)
++		return blk_queue_nr_zones(q);
++
++	return 0;
++}
++
+ static inline int queue_dma_alignment(struct request_queue *q)
  {
- 	struct cache_set *c = dc->disk.c;
--	unsigned mode = cache_mode(dc, bio);
-+	unsigned mode = cache_mode(dc);
- 	unsigned sectors, congested = bch_get_congested(c);
- 	struct task_struct *task = current;
- 	struct io *i;
-@@ -747,7 +747,7 @@ static void cached_dev_read_done(struct closure *cl)
- 		s->cache_miss = NULL;
- 	}
- 
--	if (verify(dc, &s->bio.bio) && s->recoverable && !s->read_dirty_data)
-+	if (verify(dc) && s->recoverable && !s->read_dirty_data)
- 		bch_data_verify(dc, s->orig_bio);
- 
- 	bio_complete(s);
-@@ -772,7 +772,7 @@ static void cached_dev_read_done_bh(struct closure *cl)
- 
- 	if (s->iop.status)
- 		continue_at_nobarrier(cl, cached_dev_read_error, bcache_wq);
--	else if (s->iop.bio || verify(dc, &s->bio.bio))
-+	else if (s->iop.bio || verify(dc))
- 		continue_at_nobarrier(cl, cached_dev_read_done, bcache_wq);
- 	else
- 		continue_at_nobarrier(cl, cached_dev_bio_complete, NULL);
-@@ -899,7 +899,7 @@ static void cached_dev_write(struct cached_dev *dc, struct search *s)
- 		s->iop.bypass = true;
- 
- 	if (should_writeback(dc, s->orig_bio,
--			     cache_mode(dc, bio),
-+			     cache_mode(dc),
- 			     s->iop.bypass)) {
- 		s->iop.bypass = false;
- 		s->iop.writeback = true;
+ 	return q ? q->dma_alignment : 511;
 -- 
-2.11.0
+2.13.6
