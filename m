@@ -1,235 +1,289 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Avri Altman <Avri.Altman@sandisk.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 00/12 v4] multiqueue for MMC/SD
-Date: Thu, 26 Oct 2017 14:57:45 +0200
-Message-Id: <20171026125757.10200-1-linus.walleij@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
-
-This switches the MMC/SD stack over to unconditionally
-using the multiqueue block interface for block access.
-This modernizes the MMC/SD stack and makes it possible
-to enable BFQ scheduling on these single-queue devices.
-
-This is the v4 version of this v3 patch set from february:
-https://marc.info/?l=linux-mmc&m=148665788227015&w=2
-
-The patches are available in a git branch:
-https://git.kernel.org/pub/scm/linux/kernel/git/linusw/linux-stericsson.git/log/?h=mmc-mq-v4.14-rc4
-
-You can pull it to a clean kernel tree like this:
-git checkout -b mmc-test v4.14-rc4
-git pull git://git.kernel.org/pub/scm/linux/kernel/git/linusw/linux-stericsson.git mmc-mq-v4.14-rc4
-
-I have now worked on it for more than a year. I was side
-tracked to clean up some code, move request allocation to
-be handled by the block layer, delete bounce buffer handling
-and refactoring the RPMB support. With the changes to request
-allocation, the patch set is a better fit and has shrunk
-from 16 to 12 patches as a result.
-
-It is still quite invasive. Yet it is something I think would
-be nice to merge for v4.16...
-
-The rationale for this approach was Arnd's suggestion to try to
-switch the MMC/SD stack around so as to complete requests as
-quickly as possible when they return from the device driver
-so that new requests can be issued. We are doing this now:
-the polling loop that was pulling NULL out of the request
-queue and driving the pipeline with a loop is gone with
-the next-to last patch ("block: issue requests in massive
-parallel"). This sets the stage for MQ to go in and hammer
-requests on the asynchronous issuing layer.
-
-We use the trick to set the queue depth to 2 to get two
-parallel requests pushed down to the host. I tried to set this
-to 4, the code survives it, the queue just have three items
-waiting to be submitted all the time.
-
-In my opinion this is also a better fit for command queueuing.
-Handling command queueing needs to happen in the asynchronous
-submission codepath, so instead of waiting on a pending
-areq, we just stack up requests in the command queue.
-
-It sounds simple but I bet this drives a truck through Adrians
-patch series. Sorry. :(
-
-We are not issueing new requests from interrupt context: I still
-have to post a work on a workqueue for it. Since there is the
-retune and background operations that need to be checked after
-every command and yeah, it needs to happen in blocking context
-as far as I know.
-
-I might make a hack trying to strip out the retune (etc) and
-instead run request until something fail and report requests
-back to the block layer in interrupt context. It would be an
-interesting experiment, but for later.
-
-We have parallelism in pre/post hooks also with multiqueue.
-All asynchronous optimization that was there for the old block
-layer is now also there for multiqueue.
-
-Last time I followed up with some open questions
-https://marc.info/?l=linux-mmc&m=149075698610224&w=2
-I think these are now resolved.
-
-As a result, the last patch is no longer in RFC state. I
-think this works. (Famous last words, OK there WILL be
-regressions but hey, we need to do this.)
-You can see there are three steps:
-
-- I do some necessary refactoring and need to move postprocessing
-  to after the requests have been completed. This clearly, as you
-  can see, introduce a performance regression in the dd test with
-  the patch:
-  "mmc: core: move the asynchronous post-processing"
-  It seems the random seek with find isn't much affected.
-
-- I continue the refactoring and get to the point of issueing
-  requests immediately after every successful transfer, and the
-  dd performance is restored with patch
-  "mmc: queue: issue requests in massive parallel"
-
-- Then I add multiqueue on top of the cake. So before the change
-  we have the nice performance we want so we can study the effect
-  of just introducing multiqueueing in the last patch
-  "mmc: switch MMC/SD to use blk-mq multiqueueing v4"
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f50.google.com ([74.125.82.50]:52397 "EHLO
+        mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751160AbdJBLmg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Oct 2017 07:42:36 -0400
+Received: by mail-wm0-f50.google.com with SMTP id k4so7863951wmc.1
+        for <linux-block@vger.kernel.org>; Mon, 02 Oct 2017 04:42:36 -0700 (PDT)
+From: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
+Message-Id: <66FF3618-BAF0-4E32-A0D2-B5959D08D696@lightnvm.io>
+Content-Type: multipart/signed;
+ boundary="Apple-Mail=_345B0CD2-FDDB-4E6E-90D5-F93276DC7E94";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH 4/6] lightnvm: remove stable extern and unused exported
+ symbols
+Date: Mon, 2 Oct 2017 13:42:33 +0200
+In-Reply-To: <20171001132516.GA5743@hercules.tuxera.com>
+Cc: =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Rakesh Pandit <rakesh@tuxera.com>
+References: <20171001132516.GA5743@hercules.tuxera.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 
-PERFORMANCE BEFORE AND AFTER:
+--Apple-Mail=_345B0CD2-FDDB-4E6E-90D5-F93276DC7E94
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-BEFORE this patch series, on Ulf's next branch ending with
-commit cf653c788a29fa70e07b86492a7599c471c705de (mmc-next)
-Merge: 4dda8e1f70f8 eb701ce16a45 ("Merge branch 'fixes' into next")
+> On 1 Oct 2017, at 15.25, Rakesh Pandit <rakesh@tuxera.com> wrote:
+>=20
+> Not all exported symbols are being used outside core and there were
+> some stable entries in lightnvm.h
+>=20
+> Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+> ---
+> drivers/lightnvm/core.c  | 129 =
++++++++++++++++++++++++------------------------
+> include/linux/lightnvm.h |   7 ---
+> 2 files changed, 64 insertions(+), 72 deletions(-)
+>=20
+> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+> index 9cd1c4b..2817b37 100644
+> --- a/drivers/lightnvm/core.c
+> +++ b/drivers/lightnvm/core.c
+> @@ -226,6 +226,24 @@ static const struct block_device_operations =
+nvm_fops =3D {
+> 	.owner		=3D THIS_MODULE,
+> };
+>=20
+> +struct nvm_tgt_type *nvm_find_target_type(const char *name, int lock)
+> +{
+> +	struct nvm_tgt_type *tmp, *tt =3D NULL;
+> +
+> +	if (lock)
+> +		down_write(&nvm_tgtt_lock);
+> +
+> +	list_for_each_entry(tmp, &nvm_tgt_types, list)
+> +		if (!strcmp(name, tmp->name)) {
+> +			tt =3D tmp;
+> +			break;
+> +		}
+> +
+> +	if (lock)
+> +		up_write(&nvm_tgtt_lock);
+> +	return tt;
+> +}
+> +
+> static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create =
+*create)
+> {
+> 	struct nvm_ioctl_create_simple *s =3D &create->conf.s;
+> @@ -532,25 +550,6 @@ void nvm_part_to_tgt(struct nvm_dev *dev, =
+sector_t *entries,
+> }
+> EXPORT_SYMBOL(nvm_part_to_tgt);
+>=20
+> -struct nvm_tgt_type *nvm_find_target_type(const char *name, int lock)
+> -{
+> -	struct nvm_tgt_type *tmp, *tt =3D NULL;
+> -
+> -	if (lock)
+> -		down_write(&nvm_tgtt_lock);
+> -
+> -	list_for_each_entry(tmp, &nvm_tgt_types, list)
+> -		if (!strcmp(name, tmp->name)) {
+> -			tt =3D tmp;
+> -			break;
+> -		}
+> -
+> -	if (lock)
+> -		up_write(&nvm_tgtt_lock);
+> -	return tt;
+> -}
+> -EXPORT_SYMBOL(nvm_find_target_type);
+> -
+> int nvm_register_tgt_type(struct nvm_tgt_type *tt)
+> {
+> 	int ret =3D 0;
+> @@ -602,6 +601,52 @@ static struct nvm_dev *nvm_find_nvm_dev(const =
+char *name)
+> 	return NULL;
+> }
+>=20
+> +static int nvm_set_rqd_ppalist(struct nvm_tgt_dev *tgt_dev, struct =
+nvm_rq *rqd,
+> +			const struct ppa_addr *ppas, int nr_ppas)
+> +{
+> +	struct nvm_dev *dev =3D tgt_dev->parent;
+> +	struct nvm_geo *geo =3D &tgt_dev->geo;
+> +	int i, plane_cnt, pl_idx;
+> +	struct ppa_addr ppa;
+> +
+> +	if (geo->plane_mode =3D=3D NVM_PLANE_SINGLE && nr_ppas =3D=3D 1) =
+{
+> +		rqd->nr_ppas =3D nr_ppas;
+> +		rqd->ppa_addr =3D ppas[0];
+> +
+> +		return 0;
+> +	}
+> +
+> +	rqd->nr_ppas =3D nr_ppas;
+> +	rqd->ppa_list =3D nvm_dev_dma_alloc(dev, GFP_KERNEL, =
+&rqd->dma_ppa_list);
+> +	if (!rqd->ppa_list) {
+> +		pr_err("nvm: failed to allocate dma memory\n");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	plane_cnt =3D geo->plane_mode;
+> +	rqd->nr_ppas *=3D plane_cnt;
+> +
+> +	for (i =3D 0; i < nr_ppas; i++) {
+> +		for (pl_idx =3D 0; pl_idx < plane_cnt; pl_idx++) {
+> +			ppa =3D ppas[i];
+> +			ppa.g.pl =3D pl_idx;
+> +			rqd->ppa_list[(pl_idx * nr_ppas) + i] =3D ppa;
+> +		}
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void nvm_free_rqd_ppalist(struct nvm_tgt_dev *tgt_dev,
+> +			struct nvm_rq *rqd)
+> +{
+> +	if (!rqd->ppa_list)
+> +		return;
+> +
+> +	nvm_dev_dma_free(tgt_dev->parent, rqd->ppa_list, =
+rqd->dma_ppa_list);
+> +}
+> +
+> +
+> int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *tgt_dev, struct ppa_addr =
+*ppas,
+> 		       int nr_ppas, int type)
+> {
+> @@ -775,52 +820,6 @@ void nvm_put_area(struct nvm_tgt_dev *tgt_dev, =
+sector_t begin)
+> }
+> EXPORT_SYMBOL(nvm_put_area);
+>=20
+> -int nvm_set_rqd_ppalist(struct nvm_tgt_dev *tgt_dev, struct nvm_rq =
+*rqd,
+> -			const struct ppa_addr *ppas, int nr_ppas)
+> -{
+> -	struct nvm_dev *dev =3D tgt_dev->parent;
+> -	struct nvm_geo *geo =3D &tgt_dev->geo;
+> -	int i, plane_cnt, pl_idx;
+> -	struct ppa_addr ppa;
+> -
+> -	if (geo->plane_mode =3D=3D NVM_PLANE_SINGLE && nr_ppas =3D=3D 1) =
+{
+> -		rqd->nr_ppas =3D nr_ppas;
+> -		rqd->ppa_addr =3D ppas[0];
+> -
+> -		return 0;
+> -	}
+> -
+> -	rqd->nr_ppas =3D nr_ppas;
+> -	rqd->ppa_list =3D nvm_dev_dma_alloc(dev, GFP_KERNEL, =
+&rqd->dma_ppa_list);
+> -	if (!rqd->ppa_list) {
+> -		pr_err("nvm: failed to allocate dma memory\n");
+> -		return -ENOMEM;
+> -	}
+> -
+> -	plane_cnt =3D geo->plane_mode;
+> -	rqd->nr_ppas *=3D plane_cnt;
+> -
+> -	for (i =3D 0; i < nr_ppas; i++) {
+> -		for (pl_idx =3D 0; pl_idx < plane_cnt; pl_idx++) {
+> -			ppa =3D ppas[i];
+> -			ppa.g.pl =3D pl_idx;
+> -			rqd->ppa_list[(pl_idx * nr_ppas) + i] =3D ppa;
+> -		}
+> -	}
+> -
+> -	return 0;
+> -}
+> -EXPORT_SYMBOL(nvm_set_rqd_ppalist);
+> -
+> -void nvm_free_rqd_ppalist(struct nvm_tgt_dev *tgt_dev, struct nvm_rq =
+*rqd)
+> -{
+> -	if (!rqd->ppa_list)
+> -		return;
+> -
+> -	nvm_dev_dma_free(tgt_dev->parent, rqd->ppa_list, =
+rqd->dma_ppa_list);
+> -}
+> -EXPORT_SYMBOL(nvm_free_rqd_ppalist);
+> -
+> void nvm_end_io(struct nvm_rq *rqd)
+> {
+> 	struct nvm_tgt_dev *tgt_dev =3D rqd->dev;
+> diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+> index c8c014b..dfd4829 100644
+> --- a/include/linux/lightnvm.h
+> +++ b/include/linux/lightnvm.h
+> @@ -463,8 +463,6 @@ struct nvm_tgt_type {
+> 	struct list_head list;
+> };
+>=20
+> -extern struct nvm_tgt_type *nvm_find_target_type(const char *, int);
+> -
+> extern int nvm_register_tgt_type(struct nvm_tgt_type *);
+> extern void nvm_unregister_tgt_type(struct nvm_tgt_type *);
+>=20
+> @@ -480,9 +478,6 @@ extern int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev =
+*, struct ppa_addr *,
+> extern int nvm_max_phys_sects(struct nvm_tgt_dev *);
+> extern int nvm_submit_io(struct nvm_tgt_dev *, struct nvm_rq *);
+> extern int nvm_erase_sync(struct nvm_tgt_dev *, struct ppa_addr *, =
+int);
+> -extern int nvm_set_rqd_ppalist(struct nvm_tgt_dev *, struct nvm_rq *,
+> -					const struct ppa_addr *, int);
+> -extern void nvm_free_rqd_ppalist(struct nvm_tgt_dev *, struct nvm_rq =
+*);
+> extern int nvm_get_l2p_tbl(struct nvm_tgt_dev *, u64, u32, =
+nvm_l2p_update_fn *,
+> 			   void *);
+> extern int nvm_get_area(struct nvm_tgt_dev *, sector_t *, sector_t);
+> @@ -491,8 +486,6 @@ extern void nvm_end_io(struct nvm_rq *);
+> extern int nvm_bb_tbl_fold(struct nvm_dev *, u8 *, int);
+> extern int nvm_get_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr, =
+u8 *);
+>=20
+> -extern int nvm_dev_factory(struct nvm_dev *, int flags);
+> -
+> extern void nvm_part_to_tgt(struct nvm_dev *, sector_t *, int);
+>=20
+> #else /* CONFIG_NVM */
+> --
+> 2.7.4
 
-sync
-echo 3 > /proc/sys/vm/drop_caches
-sync
-time dd if=/dev/mmcblk3 of=/dev/null bs=1M count=1024
-1024+0 records in
-1024+0 records out
-1073741824 bytes (1.0GB) copied, 23.966583 seconds, 42.7MB/s
-real    0m 23.97s
-user    0m 0.01s
-sys     0m 3.74s
+LGTM (also stable > stale)
 
-mount /dev/mmcblk3p1 /mnt/
-cd /mnt/
-sync
-echo 3 > /proc/sys/vm/drop_caches
-sync
-time find . > /dev/null
-real    0m 3.24s
-user    0m 0.22s
-sys     0m 1.23s
-
-sync
-echo 3 > /proc/sys/vm/drop_caches
-sync
-iozone -az -i0 -i1 -i2 -s 20m -I -f /mnt/foo.test
-
-                                                   random    random
-   kB  reclen    write  rewrite    read    reread    read     write
-20480       4     1598     1559     6782     6740     6751      536
-20480       8     2134     2281    11449    11449    11407     1145
-20480      16     3695     4171    17676    17677    17638     1234
-20480      32     5751     7475    23622    23622    23584     3004
-20480      64     6778     8648    27937    27950    27914     3445
-20480     128     6073     8115    29091    29080    29070     4892
-20480     256     7106     7208    29658    29670    29657     6743
-20480     512     8828     9953    29911    29905    29901     7424
-20480    1024     6566     7199    27233    27236    27209     6808
-20480    2048     7370     7403    27492    27490    27475     7428
-20480    4096     7352     7456    28124    28123    28109     7411
-20480    8192     7271     7462    28371    28369    28359     7458
-20480   16384     7097     7478    28540    28538    28528     7464
-
-AFTER this patch series ending with
-"mmc: switch MMC/SD to use blk-mq multiqueueing v4":
-
-sync
-echo 3 > /proc/sys/vm/drop_caches
-sync
-time dd if=/dev/mmcblk3 of=/dev/null bs=1M count=1024
-1024+0 records in
-1024+0 records out
-1073741824 bytes (1.0GB) copied, 24.358276 seconds, 42.0MB/s
-real    0m 24.36s
-user    0m 0.00s
-sys     0m 3.92s
-
-mount /dev/mmcblk3p1 /mnt/
-cd /mnt/
-sync
-echo 3 > /proc/sys/vm/drop_caches
-sync
-time find . > /dev/null
-real    0m 3.92s
-user    0m 0.26s
-sys     0m 1.21s
-
-sync
-echo 3 > /proc/sys/vm/drop_caches
-sync
-iozone -az -i0 -i1 -i2 -s 20m -I -f /mnt/foo.test
-
-                                                   random    random
-   kB  reclen    write  rewrite    read    reread    read     write
-20480       4     1614     1569     6913     6889     6876      531
-20480       8     2147     2301    11628    11625    11581     1165
-20480      16     3820     4256    17760    17764    17725     1549
-20480      32     5814     7508    23148    23145    23123     3561
-20480      64     7396     8161    27513    27527    27500     4177
-20480     128     6707     9025    29160    29166    29139     5199
-20480     256     7902     7860    29459    29456    29462     7307
-20480     512     8061    11343    29888    29891    29881     6800
-20480    1024     7076     7442    27702    27704    27700     7445
-20480    2048     6846     8194    27417    27419    27418     6781
-20480    4096     8115     6810    28113    28113    28109     8191
-20480    8192     7254     7434    28413    28419    28414     7476
-20480   16384     7090     7481    28623    28619    28625     7454
+Reviewed-by: Javier Gonz=C3=A1lez <javier@cnexlabs.com>
 
 
-As you can see, performance is not affected, errors are in the noise
-margin.
+--Apple-Mail=_345B0CD2-FDDB-4E6E-90D5-F93276DC7E94
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
 
-Linus Walleij (12):
-  mmc: core: move the asynchronous post-processing
-  mmc: core: add a workqueue for completing requests
-  mmc: core: replace waitqueue with worker
-  mmc: core: do away with is_done_rcv
-  mmc: core: do away with is_new_req
-  mmc: core: kill off the context info
-  mmc: queue: simplify queue logic
-  mmc: block: shuffle retry and error handling
-  mmc: queue: stop flushing the pipeline with NULL
-  mmc: queue/block: pass around struct mmc_queue_req*s
-  mmc: block: issue requests in massive parallel
-  mmc: switch MMC/SD to use blk-mq multiqueueing v4
+-----BEGIN PGP SIGNATURE-----
 
- drivers/mmc/core/block.c    | 539 ++++++++++++++++++++++----------------------
- drivers/mmc/core/block.h    |   5 +-
- drivers/mmc/core/bus.c      |   1 -
- drivers/mmc/core/core.c     | 194 +++++++++-------
- drivers/mmc/core/core.h     |  11 +-
- drivers/mmc/core/host.c     |   1 -
- drivers/mmc/core/mmc_test.c |  31 +--
- drivers/mmc/core/queue.c    | 238 ++++++++-----------
- drivers/mmc/core/queue.h    |  16 +-
- include/linux/mmc/core.h    |   3 +-
- include/linux/mmc/host.h    |  27 +--
- 11 files changed, 503 insertions(+), 563 deletions(-)
+iQIzBAEBCgAdFiEEm1mT7zen+vs9+T8kYx8FO3WZGMoFAlnSJikACgkQYx8FO3WZ
+GMpV1RAAt7jHpoKlpjPqiK/0448nXUM/49P68BaDoT/HWwAECseQqBaqnT9KFz+L
+QfA7IdjkFKB91JuLRDnuT+Nofxg/B36L2WBbkeJ9bqtpgip7HlEMxLiLmdtzo80p
+QFdwBTklXCFWIKHVvlAh9eaWi40/uYLJaPmyIjVuqlk9cNwUEp812ELt1Df5xQXS
+r/wwoa0qB0LKLGWvxIV7bMc59NernRtLBVHnMVdrsmRG4NOwpPwgq3pnOvHbTB7A
+Xckv1Mn1pKR5BWxLTD/ApgVDtBazCB9P6zyzjTZDT2+9Rp3gVM3QQbx3MOQBxKPA
+QGDmEyYNFQD4VqTPr4MqtFbj+xsbEhA1yPeAkaFVJedTRakYCnoQ8yGNiycERpft
+hjRwOqcgNTXFMKv3X8gU3q+FLTk4Sz160+WyFsBkw6EH7+a+wH6cxI5if8flrMgn
+1EoP8ONpGbF2SOsX85d+SOIZudOxwlrv5n4JKu7KMlZvGIVhOdqZAErj6tbFRWm3
+BHnuMLTf4/bAr0+gAoS+WYMyD0ht/v+2sHYpChcW40zQMuK0u3MNV9fVrYSCbtCx
++V2pssh20Xv/wnPamvBRqyMdkV18TipLiqzoKujmmBNdGz4GgbOUDBf9DIqyF+bC
+gPlusRp96g3AfD8pooaOriacMt7e0ygNlf/us+IinYmn8WYRPck=
+=LiSe
+-----END PGP SIGNATURE-----
 
--- 
-2.13.6
+--Apple-Mail=_345B0CD2-FDDB-4E6E-90D5-F93276DC7E94--
