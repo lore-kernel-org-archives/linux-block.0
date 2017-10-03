@@ -1,16 +1,16 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-oi0-f65.google.com ([209.85.218.65]:45469 "EHLO
-        mail-oi0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751831AbdJCOEH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2017 10:04:07 -0400
-Received: by mail-oi0-f65.google.com with SMTP id f3so14441056oia.2
-        for <linux-block@vger.kernel.org>; Tue, 03 Oct 2017 07:04:07 -0700 (PDT)
-From: lee.tibbert@gmail.com
+Received: from mail-qt0-f195.google.com ([209.85.216.195]:35301 "EHLO
+        mail-qt0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750879AbdJCNmq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2017 09:42:46 -0400
+Received: by mail-qt0-f195.google.com with SMTP id e19so1869013qta.2
+        for <linux-block@vger.kernel.org>; Tue, 03 Oct 2017 06:42:45 -0700 (PDT)
+From: Lee Tibbert <lee.tibbert@gmail.com>
 To: linux-block@vger.kernel.org
 Cc: lee.tibbert@gmail.com
 Subject: Re: [PATCH BUGFIX/IMPROVEMENT 0/4] block, bfq: series of fixes of bugs affecting service guarantees
-Date: Tue,  3 Oct 2017 10:03:57 -0400
-Message-Id: <20171003140357.4076-1-lee.tibbert@gmail.com>
+Date: Tue,  3 Oct 2017 09:42:36 -0400
+Message-Id: <20171003134236.1273-1-lee49@ashlar.local>
 In-Reply-To: <20170921090403.3217-1-paolo.valente@linaro.org>
 References: <20170921090403.3217-1-paolo.valente@linaro.org>
 Sender: linux-block-owner@vger.kernel.org
