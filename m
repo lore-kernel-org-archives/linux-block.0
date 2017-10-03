@@ -1,141 +1,98 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:22351 "EHLO mga14.intel.com"
+Received: from mx1.redhat.com ([209.132.183.28]:36364 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752082AbdJXIra (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Oct 2017 04:47:30 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V12 1/5] mmc: core: Add parameter use_blk_mq
-Date: Tue, 24 Oct 2017 11:40:24 +0300
-Message-Id: <1508834428-4360-2-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1508834428-4360-1-git-send-email-adrian.hunter@intel.com>
-References: <1508834428-4360-1-git-send-email-adrian.hunter@intel.com>
+        id S1751894AbdJCOFq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Oct 2017 10:05:46 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Cathy Avery <cavery@redhat.com>,
+        Martin Steigerwald <martin@lichtvoll.de>,
+        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
+        Ming Lei <ming.lei@redhat.com>, stable@vger.kernel.org,
+        Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V8 8/8] SCSI: set block queue at preempt only when SCSI device is put into quiesce
+Date: Tue,  3 Oct 2017 22:04:06 +0800
+Message-Id: <20171003140406.26060-9-ming.lei@redhat.com>
+In-Reply-To: <20171003140406.26060-1-ming.lei@redhat.com>
+References: <20171003140406.26060-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Until mmc has blk-mq support fully implemented and tested, add a
-parameter use_blk_mq, default to false unless config option MMC_MQ_DEFAULT
-is selected.
+Simply quiesing SCSI device and waiting for completeion of IO
+dispatched to SCSI queue isn't safe, it is easy to use up
+request pool because all allocated requests before can't
+be dispatched when device is put in QIUESCE. Then no request
+can be allocated for RQF_PREEMPT, and system may hang somewhere,
+such as When sending commands of sync_cache or start_stop during
+system suspend path.
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+Before quiesing SCSI, this patch sets block queue in preempt
+mode first, so no new normal request can enter queue any more,
+and all pending requests are drained too once blk_set_preempt_only(true)
+is returned. Then RQF_PREEMPT can be allocated successfully duirng
+SCSI quiescing.
+
+This patch fixes one long term issue of IO hang, in either block legacy
+and blk-mq.
+
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Tested-by: Martin Steigerwald <martin@lichtvoll.de>
+Cc: stable@vger.kernel.org
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/mmc/Kconfig      | 11 +++++++++++
- drivers/mmc/core/core.c  |  7 +++++++
- drivers/mmc/core/core.h  |  2 ++
- drivers/mmc/core/host.c  |  2 ++
- drivers/mmc/core/host.h  |  4 ++++
- include/linux/mmc/host.h |  1 +
- 6 files changed, 27 insertions(+)
+ drivers/scsi/scsi_lib.c | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/mmc/Kconfig b/drivers/mmc/Kconfig
-index ec21388311db..98202934bd29 100644
---- a/drivers/mmc/Kconfig
-+++ b/drivers/mmc/Kconfig
-@@ -12,6 +12,17 @@ menuconfig MMC
- 	  If you want MMC/SD/SDIO support, you should say Y here and
- 	  also to your specific host controller driver.
- 
-+config MMC_MQ_DEFAULT
-+	bool "MMC: use blk-mq I/O path by default"
-+	depends on MMC && BLOCK
-+	---help---
-+	  This option enables the new blk-mq based I/O path for MMC block
-+	  devices by default.  With the option the mmc_core.use_blk_mq
-+	  module/boot option defaults to Y, without it to N, but it can
-+	  still be overridden either way.
-+
-+	  If unsure say N.
-+
- if MMC
- 
- source "drivers/mmc/core/Kconfig"
-diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
-index 1f0f44f4dd5f..5df03cb73be7 100644
---- a/drivers/mmc/core/core.c
-+++ b/drivers/mmc/core/core.c
-@@ -66,6 +66,13 @@
- bool use_spi_crc = 1;
- module_param(use_spi_crc, bool, 0);
- 
-+#ifdef CONFIG_MMC_MQ_DEFAULT
-+bool mmc_use_blk_mq = true;
-+#else
-+bool mmc_use_blk_mq = false;
-+#endif
-+module_param_named(use_blk_mq, mmc_use_blk_mq, bool, S_IWUSR | S_IRUGO);
-+
- static int mmc_schedule_delayed_work(struct delayed_work *work,
- 				     unsigned long delay)
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 62f905b22821..f7ffd33a283c 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -2929,12 +2929,28 @@ scsi_device_quiesce(struct scsi_device *sdev)
  {
-diff --git a/drivers/mmc/core/core.h b/drivers/mmc/core/core.h
-index 71e6c6d7ceb7..8c5dd8d31400 100644
---- a/drivers/mmc/core/core.h
-+++ b/drivers/mmc/core/core.h
-@@ -35,6 +35,8 @@ struct mmc_bus_ops {
- 	int (*reset)(struct mmc_host *);
- };
+ 	int err;
  
-+extern bool mmc_use_blk_mq;
++	/*
++	 * Simply quiesing SCSI device isn't safe, it is easy
++	 * to use up requests because all these allocated requests
++	 * can't be dispatched when device is put in QIUESCE.
++	 * Then no request can be allocated and we may hang
++	 * somewhere, such as system suspend/resume.
++	 *
++	 * So we set block queue in preempt only first, no new
++	 * normal request can enter queue any more, and all pending
++	 * requests are drained once blk_set_preempt_only()
++	 * returns. Only RQF_PREEMPT is allowed in preempt only mode.
++	 */
++	blk_set_preempt_only(sdev->request_queue, true);
 +
- void mmc_attach_bus(struct mmc_host *host, const struct mmc_bus_ops *ops);
- void mmc_detach_bus(struct mmc_host *host);
+ 	mutex_lock(&sdev->state_mutex);
+ 	err = scsi_device_set_state(sdev, SDEV_QUIESCE);
+ 	mutex_unlock(&sdev->state_mutex);
  
-diff --git a/drivers/mmc/core/host.c b/drivers/mmc/core/host.c
-index 35a9e4fd1a9f..62ef6cb0ece4 100644
---- a/drivers/mmc/core/host.c
-+++ b/drivers/mmc/core/host.c
-@@ -404,6 +404,8 @@ struct mmc_host *mmc_alloc_host(int extra, struct device *dev)
+-	if (err)
++	if (err) {
++		blk_set_preempt_only(sdev->request_queue, false);
+ 		return err;
++	}
  
- 	host->fixed_drv_type = -EINVAL;
- 
-+	host->use_blk_mq = mmc_use_blk_mq;
+ 	scsi_run_queue(sdev->request_queue);
+ 	while (atomic_read(&sdev->device_busy)) {
+@@ -2965,6 +2981,8 @@ void scsi_device_resume(struct scsi_device *sdev)
+ 	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0)
+ 		scsi_run_queue(sdev->request_queue);
+ 	mutex_unlock(&sdev->state_mutex);
 +
- 	return host;
++	blk_set_preempt_only(sdev->request_queue, false);
  }
+ EXPORT_SYMBOL(scsi_device_resume);
  
-diff --git a/drivers/mmc/core/host.h b/drivers/mmc/core/host.h
-index fb689a1065ed..6eaf558e62d6 100644
---- a/drivers/mmc/core/host.h
-+++ b/drivers/mmc/core/host.h
-@@ -74,6 +74,10 @@ static inline bool mmc_card_hs400es(struct mmc_card *card)
- 	return card->host->ios.enhanced_strobe;
- }
- 
-+static inline bool mmc_host_use_blk_mq(struct mmc_host *host)
-+{
-+	return host->use_blk_mq;
-+}
- 
- #endif
- 
-diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
-index e7743eca1021..ce2075d6f429 100644
---- a/include/linux/mmc/host.h
-+++ b/include/linux/mmc/host.h
-@@ -380,6 +380,7 @@ struct mmc_host {
- 	unsigned int		doing_retune:1;	/* re-tuning in progress */
- 	unsigned int		retune_now:1;	/* do re-tuning at next req */
- 	unsigned int		retune_paused:1; /* re-tuning is temporarily disabled */
-+	unsigned int		use_blk_mq:1;	/* use blk-mq */
- 
- 	int			rescan_disable;	/* disable card detection */
- 	int			rescan_entered;	/* used with nonremovable devices */
 -- 
-1.9.1
+2.9.5
