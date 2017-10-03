@@ -1,46 +1,41 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Tue, 3 Oct 2017 22:17:00 +0200 (CEST)
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:42095 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751742AbdJCUPD (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Oct 2017 16:15:03 -0400
+Date: Tue, 3 Oct 2017 22:15:00 +0200 (CEST)
 From: Jiri Kosina <jikos@kernel.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-cc: "pavel@ucw.cz" <pavel@ucw.cz>,
-        "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "rjw@rjwysocki.net" <rjw@rjwysocki.net>,
-        "mcgrof@kernel.org" <mcgrof@kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "len.brown@intel.com" <len.brown@intel.com>,
-        "tytso@mit.edu" <tytso@mit.edu>,
-        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
-        "ONeukum@suse.com" <ONeukum@suse.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "nborisov@suse.com" <nborisov@suse.com>,
-        "oleg.b.antonyan@gmail.com" <oleg.b.antonyan@gmail.com>,
-        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        "jgross@suse.com" <jgross@suse.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
-        "todd.e.brandt@linux.intel.com" <todd.e.brandt@linux.intel.com>,
-        "jack@suse.cz" <jack@suse.cz>
+To: Pavel Machek <pavel@ucw.cz>
+cc: "Luis R. Rodriguez" <mcgrof@kernel.org>, viro@zeniv.linux.org.uk,
+        bart.vanassche@wdc.com, ming.lei@redhat.com, tytso@mit.edu,
+        darrick.wong@oracle.com, rjw@rjwysocki.net, len.brown@intel.com,
+        linux-fsdevel@vger.kernel.org, boris.ostrovsky@oracle.com,
+        jgross@suse.com, todd.e.brandt@linux.intel.com, nborisov@suse.com,
+        jack@suse.cz, martin.petersen@oracle.com, ONeukum@suse.com,
+        oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
+        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [RFC 5/5] pm: remove kernel thread freezing
-In-Reply-To: <1507061605.2567.13.camel@wdc.com>
-Message-ID: <nycvar.YFH.7.76.1710032215140.17517@jbgna.fhfr.qr>
-References: <20171003185313.1017-1-mcgrof@kernel.org>  <20171003185313.1017-6-mcgrof@kernel.org> <1507061605.2567.13.camel@wdc.com>
+In-Reply-To: <20171003201204.GA23521@amd>
+Message-ID: <nycvar.YFH.7.76.1710032213430.17517@jbgna.fhfr.qr>
+References: <20171003185313.1017-1-mcgrof@kernel.org> <20171003185313.1017-6-mcgrof@kernel.org> <20171003201204.GA23521@amd>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Tue, 3 Oct 2017, Bart Van Assche wrote:
+On Tue, 3 Oct 2017, Pavel Machek wrote:
 
-> What about the many drivers outside filesystems that use the 
-> set_freezable() / try_to_freeze() / wait_event_freezable() API?
+> Can knfsd be a problem?
 
-Many/most of them are just completely bogus and pointless. I've killed a 
-lot of those in the past, but the copy/paste programming is just too 
-strong enemy to fight against.
+It'd actually be useful to walk through all the 'try_to_freeze()' 
+instances in kthreads, and analyze those. I've started this effort, and as 
+a result I removed most of them; but there are still quite a few 
+remaining. And knfsd is one of those.
+
+> Can memory management doing background writes be a problem?
+
+This point I don't understand. What exactly do you mean?
 
 -- 
 Jiri Kosina
