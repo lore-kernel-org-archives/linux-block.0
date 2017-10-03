@@ -1,30 +1,36 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-Date: Tue, 3 Oct 2017 16:22:12 +0800
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:34392 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751102AbdJCINo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Oct 2017 04:13:44 -0400
+Date: Tue, 3 Oct 2017 16:13:33 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Cathy Avery <cavery@redhat.com>,
-        Martin Steigerwald <martin@lichtvoll.de>,
-        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
-        Bart Van Assche <Bart.VanAssche@wdc.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "martin@lichtvoll.de" <martin@lichtvoll.de>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "jthumshirn@suse.de" <jthumshirn@suse.de>,
+        "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+        "hare@suse.com" <hare@suse.com>,
+        "cavery@redhat.com" <cavery@redhat.com>
 Subject: Re: [PATCH V7 5/6] block: support PREEMPT_ONLY
-Message-ID: <20171003082211.GC23564@ming.t460p>
+Message-ID: <20171003081333.GA23564@ming.t460p>
 References: <20170930061214.10622-1-ming.lei@redhat.com>
  <20170930061214.10622-6-ming.lei@redhat.com>
- <20171002135024.GE19119@infradead.org>
+ <1506961678.3368.29.camel@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171002135024.GE19119@infradead.org>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <1506961678.3368.29.camel@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Mon, Oct 02, 2017 at 06:50:24AM -0700, Christoph Hellwig wrote:
+On Mon, Oct 02, 2017 at 04:27:59PM +0000, Bart Van Assche wrote:
+> On Sat, 2017-09-30 at 14:12 +0800, Ming Lei wrote:
 > > +void blk_set_preempt_only(struct request_queue *q, bool preempt_only)
 > > +{
 > > +	blk_mq_freeze_queue(q);
@@ -35,39 +41,35 @@ On Mon, Oct 02, 2017 at 06:50:24AM -0700, Christoph Hellwig wrote:
 > > +	blk_mq_unfreeze_queue(q);
 > > +}
 > > +EXPORT_SYMBOL(blk_set_preempt_only);
-> 
-> What do you need the queue freeze for?
-
-The main reason is for draining requests in queue before setting PREEMP_ONLY.
-
-> 
+> > +
+> >  /**
+> >   * __blk_run_queue_uncond - run a queue whether or not it has been stopped
+> >   * @q:	The queue to run
+> > @@ -771,9 +782,18 @@ int blk_queue_enter(struct request_queue *q, unsigned flags)
+> >  	while (true) {
+> >  		int ret;
+> >  
 > > +		/*
 > > +		 * preempt_only flag has to be set after queue is frozen,
 > > +		 * so it can be checked here lockless and safely
 > > +		 */
 > > +		if (blk_queue_preempt_only(q)) {
-> 
-> We can always check a single bit flag safely, so I really don't
-> understand that comment.
-> 
 > > +			if (!(flags & BLK_REQ_PREEMPT))
 > > +				goto slow_path;
 > > +		}
 > > +
 > >  		if (percpu_ref_tryget_live(&q->q_usage_counter))
 > >  			return 0;
-> > -
-> > + slow_path:
 > 
-> Also this looks a very spaghetti, why not:
-> 
-> 
-> 	if (!blk_queue_preempt_only(q) || (flags & BLK_MQ_REQ_PREEMPT)) {
-> 		if (percpu_ref_tryget_live(&q->q_usage_counter))
-> 			return 0;
-> 	}
+> Sorry but I don't think that it is possible with these changes to prevent
+> that a non-preempt request gets allocated after a (SCSI) queue has been
+> quiesced. If the CPU that calls blk_queue_enter() observes the set of the
+> PREEMPT_ONLY flag after the queue has been unfrozen and after the SCSI
+> device state has been changed into QUIESCED then blk_queue_enter() can
+> succeed for a non-preempt request. I think this is exactly the scenario
 
-Looks fine, will do it in next version.
+OK, looks one issue, will address it in next version.
+
 
 -- 
 Ming
