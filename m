@@ -1,98 +1,63 @@
-Return-Path: <prvs=4428b70f3=damien.lemoal@wdc.com>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Damien Le Moal
+	<Damien.LeMoal@wdc.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>
 Subject: Re: [PATCH V6 13/14] block: mq-deadline: Limit write request dispatch
  for zoned block devices
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
- "axboe@kernel.dk" <axboe@kernel.dk>
-Cc: "hch@lst.de" <hch@lst.de>
+Date: Tue, 3 Oct 2017 20:56:09 +0000
+Message-ID: <1507064168.2567.33.camel@wdc.com>
 References: <20171002071535.8007-1-damien.lemoal@wdc.com>
- <20171002071535.8007-14-damien.lemoal@wdc.com>
- <1506987846.3368.69.camel@wdc.com>
- <c506126b-a491-30bc-11f1-cd1df29f78c3@wdc.com>
- <1507064168.2567.33.camel@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-Message-ID: <dd8953a0-b28c-3a0f-cc9c-2ce207cf4063@wdc.com>
-Date: Wed, 4 Oct 2017 08:03:34 +0900
+	 <20171002071535.8007-14-damien.lemoal@wdc.com>
+	 <1506987846.3368.69.camel@wdc.com>
+	 <c506126b-a491-30bc-11f1-cd1df29f78c3@wdc.com>
+In-Reply-To: <c506126b-a491-30bc-11f1-cd1df29f78c3@wdc.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1507064168.2567.33.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Bart,
-
-On 10/4/17 05:56, Bart Van Assche wrote:
-> On Tue, 2017-10-03 at 09:19 +0900, Damien Le Moal wrote:
->> On 10/3/17 08:44, Bart Van Assche wrote:
->>> On Mon, 2017-10-02 at 16:15 +0900, Damien Le Moal wrote:
->>>>  static void deadline_wunlock_zone(struct deadline_data *dd,
->>>>  				  struct request *rq)
->>>>  {
->>>> +	unsigned long flags;
->>>> +
->>>> +	spin_lock_irqsave(&dd->zone_lock, flags);
->>>> +
->>>>  	WARN_ON_ONCE(!test_and_clear_bit(blk_rq_zone_no(rq), dd->zones_wlock));
->>>>  	deadline_clear_request_zone_wlock(rq);
->>>> +
->>>> +	spin_unlock_irqrestore(&dd->zone_lock, flags);
->>>>  }
->>>
->>> Is a request removed from the sort and fifo lists before being dispatched? If so,
->>> does that mean that obtaining zone_lock in the above function is not necessary?
->>
->> Yes, a request is removed from the sort tree and fifo list before
->> dispatching. But the dd->zone_lock spinlock is not there to protect
->> that, dd->lock protects the sort tree and fifo list. dd->zone_lock was
->> added to prevent the completed_request() method from changing a zone
->> lock state while deadline_fifo_requests() or deadline_next_request() are
->> running. Ex:
->>
->> Imagine this case: write request A for a zone Z is being executed (it
->> was dispatched) so Z is locked. Dispatch runs and inspects the next
->> requests in sort order. Let say we have the sequential writes B, C, D, E
->> queued for the same zone Z. First B is inspected and cannot be
->> dispatched (zone locked). Inspection move on to C, but before the that,
->> A completes and Z is unlocked. Then C will be OK to go as the zone is
->> now unlocked. But it is the wrong choice as it will result in out of
->> order write. B must be the next request dispatched after A.
->>
->> dd->zone_lock prevents this from happening. Without this spinlock, the
->> bad example case above happens very easily.
-> 
-> Hello Damien,
-> 
-> Thanks for the detailed and really clear reply. I hope you do not mind that I
-> have a few further questions about this patch?
-> - Does the zone_lock spinlock have to be acquired by both deadline_wunlock_zone()
->   callers or only by the call from the request completion path?
-
-Not really. Only the completion path is strongly needed as the insert
-path unlock is under dd->lock, which prevents concurrent execution of
-the sort or fifo request search. So the zone_lock lock/unlock could be
-moved out of deadline_wunlock_zone() and done directly in
-dd_completed_request().
-
-> - Why do both the mq-deadline and the sd driver each have their own instance of
->   the zones_wlock bitmap? Has it been considered to convert both bitmaps into a
->   single bitmap that is shared by both kernel components and that exists e.g. at
->   the request queue level?
-
-The sd driver level zone locking handles only the legacy path. Hence the
-zone lock bitmap attached to the scsi disk struct. For scsi-mq/blk-mq,
-mq-deadline does the zone locking. Both bitmaps do not exist at the same
-time.
-
-Indeed we could move the zone lock bitmap in the request queue so that
-it is common between legacy and mq cases. Christoph has a series doing
-that, and going further by doing the zone locking directly within the
-block layer dispatch code for both legacy and mq path. So the scsi level
-locking and mq-deadline locking become unnecessary. Working on that new
-series right now.
-
-Best regards.
-
--- 
-Damien Le Moal,
-Western Digital
+T24gVHVlLCAyMDE3LTEwLTAzIGF0IDA5OjE5ICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToN
+Cj4gT24gMTAvMy8xNyAwODo0NCwgQmFydCBWYW4gQXNzY2hlIHdyb3RlOg0KPiA+IE9uIE1vbiwg
+MjAxNy0xMC0wMiBhdCAxNjoxNSArMDkwMCwgRGFtaWVuIExlIE1vYWwgd3JvdGU6DQo+ID4gPiAg
+c3RhdGljIHZvaWQgZGVhZGxpbmVfd3VubG9ja196b25lKHN0cnVjdCBkZWFkbGluZV9kYXRhICpk
+ZCwNCj4gPiA+ICAJCQkJICBzdHJ1Y3QgcmVxdWVzdCAqcnEpDQo+ID4gPiAgew0KPiA+ID4gKwl1
+bnNpZ25lZCBsb25nIGZsYWdzOw0KPiA+ID4gKw0KPiA+ID4gKwlzcGluX2xvY2tfaXJxc2F2ZSgm
+ZGQtPnpvbmVfbG9jaywgZmxhZ3MpOw0KPiA+ID4gKw0KPiA+ID4gIAlXQVJOX09OX09OQ0UoIXRl
+c3RfYW5kX2NsZWFyX2JpdChibGtfcnFfem9uZV9ubyhycSksIGRkLT56b25lc193bG9jaykpOw0K
+PiA+ID4gIAlkZWFkbGluZV9jbGVhcl9yZXF1ZXN0X3pvbmVfd2xvY2socnEpOw0KPiA+ID4gKw0K
+PiA+ID4gKwlzcGluX3VubG9ja19pcnFyZXN0b3JlKCZkZC0+em9uZV9sb2NrLCBmbGFncyk7DQo+
+ID4gPiAgfQ0KPiA+IA0KPiA+IElzIGEgcmVxdWVzdCByZW1vdmVkIGZyb20gdGhlIHNvcnQgYW5k
+IGZpZm8gbGlzdHMgYmVmb3JlIGJlaW5nIGRpc3BhdGNoZWQ/IElmIHNvLA0KPiA+IGRvZXMgdGhh
+dCBtZWFuIHRoYXQgb2J0YWluaW5nIHpvbmVfbG9jayBpbiB0aGUgYWJvdmUgZnVuY3Rpb24gaXMg
+bm90IG5lY2Vzc2FyeT8NCj4gDQo+IFllcywgYSByZXF1ZXN0IGlzIHJlbW92ZWQgZnJvbSB0aGUg
+c29ydCB0cmVlIGFuZCBmaWZvIGxpc3QgYmVmb3JlDQo+IGRpc3BhdGNoaW5nLiBCdXQgdGhlIGRk
+LT56b25lX2xvY2sgc3BpbmxvY2sgaXMgbm90IHRoZXJlIHRvIHByb3RlY3QNCj4gdGhhdCwgZGQt
+PmxvY2sgcHJvdGVjdHMgdGhlIHNvcnQgdHJlZSBhbmQgZmlmbyBsaXN0LiBkZC0+em9uZV9sb2Nr
+IHdhcw0KPiBhZGRlZCB0byBwcmV2ZW50IHRoZSBjb21wbGV0ZWRfcmVxdWVzdCgpIG1ldGhvZCBm
+cm9tIGNoYW5naW5nIGEgem9uZQ0KPiBsb2NrIHN0YXRlIHdoaWxlIGRlYWRsaW5lX2ZpZm9fcmVx
+dWVzdHMoKSBvciBkZWFkbGluZV9uZXh0X3JlcXVlc3QoKSBhcmUNCj4gcnVubmluZy4gRXg6DQo+
+IA0KPiBJbWFnaW5lIHRoaXMgY2FzZTogd3JpdGUgcmVxdWVzdCBBIGZvciBhIHpvbmUgWiBpcyBi
+ZWluZyBleGVjdXRlZCAoaXQNCj4gd2FzIGRpc3BhdGNoZWQpIHNvIFogaXMgbG9ja2VkLiBEaXNw
+YXRjaCBydW5zIGFuZCBpbnNwZWN0cyB0aGUgbmV4dA0KPiByZXF1ZXN0cyBpbiBzb3J0IG9yZGVy
+LiBMZXQgc2F5IHdlIGhhdmUgdGhlIHNlcXVlbnRpYWwgd3JpdGVzIEIsIEMsIEQsIEUNCj4gcXVl
+dWVkIGZvciB0aGUgc2FtZSB6b25lIFouIEZpcnN0IEIgaXMgaW5zcGVjdGVkIGFuZCBjYW5ub3Qg
+YmUNCj4gZGlzcGF0Y2hlZCAoem9uZSBsb2NrZWQpLiBJbnNwZWN0aW9uIG1vdmUgb24gdG8gQywg
+YnV0IGJlZm9yZSB0aGUgdGhhdCwNCj4gQSBjb21wbGV0ZXMgYW5kIFogaXMgdW5sb2NrZWQuIFRo
+ZW4gQyB3aWxsIGJlIE9LIHRvIGdvIGFzIHRoZSB6b25lIGlzDQo+IG5vdyB1bmxvY2tlZC4gQnV0
+IGl0IGlzIHRoZSB3cm9uZyBjaG9pY2UgYXMgaXQgd2lsbCByZXN1bHQgaW4gb3V0IG9mDQo+IG9y
+ZGVyIHdyaXRlLiBCIG11c3QgYmUgdGhlIG5leHQgcmVxdWVzdCBkaXNwYXRjaGVkIGFmdGVyIEEu
+DQo+IA0KPiBkZC0+em9uZV9sb2NrIHByZXZlbnRzIHRoaXMgZnJvbSBoYXBwZW5pbmcuIFdpdGhv
+dXQgdGhpcyBzcGlubG9jaywgdGhlDQo+IGJhZCBleGFtcGxlIGNhc2UgYWJvdmUgaGFwcGVucyB2
+ZXJ5IGVhc2lseS4NCg0KSGVsbG8gRGFtaWVuLA0KDQpUaGFua3MgZm9yIHRoZSBkZXRhaWxlZCBh
+bmQgcmVhbGx5IGNsZWFyIHJlcGx5LiBJIGhvcGUgeW91IGRvIG5vdCBtaW5kIHRoYXQgSQ0KaGF2
+ZSBhIGZldyBmdXJ0aGVyIHF1ZXN0aW9ucyBhYm91dCB0aGlzIHBhdGNoPw0KLSBEb2VzIHRoZSB6
+b25lX2xvY2sgc3BpbmxvY2sgaGF2ZSB0byBiZSBhY3F1aXJlZCBieSBib3RoIGRlYWRsaW5lX3d1
+bmxvY2tfem9uZSgpDQogIGNhbGxlcnMgb3Igb25seSBieSB0aGUgY2FsbCBmcm9tIHRoZSByZXF1
+ZXN0IGNvbXBsZXRpb24gcGF0aD8NCi0gV2h5IGRvIGJvdGggdGhlIG1xLWRlYWRsaW5lIGFuZCB0
+aGUgc2QgZHJpdmVyIGVhY2ggaGF2ZSB0aGVpciBvd24gaW5zdGFuY2Ugb2YNCiAgdGhlIHpvbmVz
+X3dsb2NrIGJpdG1hcD8gSGFzIGl0IGJlZW4gY29uc2lkZXJlZCB0byBjb252ZXJ0IGJvdGggYml0
+bWFwcyBpbnRvIGENCiAgc2luZ2xlIGJpdG1hcCB0aGF0IGlzIHNoYXJlZCBieSBib3RoIGtlcm5l
+bCBjb21wb25lbnRzIGFuZCB0aGF0IGV4aXN0cyBlLmcuIGF0DQogIHRoZSByZXF1ZXN0IHF1ZXVl
+IGxldmVsPw0KDQpUaGFua3MsDQoNCkJhcnQu
