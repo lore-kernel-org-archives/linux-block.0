@@ -1,124 +1,80 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V6 06/14] block: Add zoned block device information to request queue
-Date: Mon,  2 Oct 2017 16:15:27 +0900
-Message-Id: <20171002071535.8007-7-damien.lemoal@wdc.com>
-In-Reply-To: <20171002071535.8007-1-damien.lemoal@wdc.com>
-References: <20171002071535.8007-1-damien.lemoal@wdc.com>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+To: viro@zeniv.linux.org.uk, bart.vanassche@wdc.com,
+        ming.lei@redhat.com, tytso@mit.edu, darrick.wong@oracle.com,
+        jikos@kernel.org, rjw@rjwysocki.net, pavel@ucw.cz,
+        len.brown@intel.com, linux-fsdevel@vger.kernel.org
+Cc: boris.ostrovsky@oracle.com, jgross@suse.com,
+        todd.e.brandt@linux.intel.com, nborisov@suse.com, jack@suse.cz,
+        martin.petersen@oracle.com, ONeukum@suse.com,
+        oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
+        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Luis R. Rodriguez" <mcgrof@kernel.org>
+Subject: [RFC 3/5] xfs: allow fs freeze on suspend/hibernation
+Date: Tue,  3 Oct 2017 11:53:11 -0700
+Message-Id: <20171003185313.1017-4-mcgrof@kernel.org>
+In-Reply-To: <20171003185313.1017-1-mcgrof@kernel.org>
+References: <20171003185313.1017-1-mcgrof@kernel.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Components relying only on the requeuest_queue structure for accessing
-block devices (e.g. I/O schedulers) have a limited knowledged of the
-device characteristics. In particular, the device capacity cannot be
-easily discovered, which for a zoned block device also result in the
-inability to easily know the number of zones of the device (the zone
-size is indicated by the chunk_sectors field of the queue limits).
+This also removes the freezer calls on the XFS kthread as they are
+no longer needed.
 
-Introduce the nr_zones field to the request_queue sturcture to simplify
-access to this information. Also, add the bitmap seq_zone_bitmap which
-indicates which zones of the device are sequential zones (write
-preferred or write required). These two fields are initialized by the
-low level block device driver (sd.c for ZBC/ZAC disks). They are not
-initialized by stacking drivers (device mappers) handling zoned block
-devices (e.g. dm-linear).
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Bart Van Assche <Bart.VanAssche@wdc.com>
+Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
 ---
- include/linux/blkdev.h | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+ fs/xfs/xfs_super.c     | 3 ++-
+ fs/xfs/xfs_trans_ail.c | 7 ++-----
+ 2 files changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 02fa42d24b52..a44807c502f0 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -544,6 +544,18 @@ struct request_queue {
- 	struct queue_limits	limits;
+diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
+index 64013b2db8e0..75c3415657eb 100644
+--- a/fs/xfs/xfs_super.c
++++ b/fs/xfs/xfs_super.c
+@@ -1775,7 +1775,8 @@ static struct file_system_type xfs_fs_type = {
+ 	.name			= "xfs",
+ 	.mount			= xfs_fs_mount,
+ 	.kill_sb		= kill_block_super,
+-	.fs_flags		= FS_REQUIRES_DEV,
++	.fs_flags		= FS_REQUIRES_DEV |
++				  FS_FREEZE_ON_SUSPEND,
+ };
+ MODULE_ALIAS_FS("xfs");
  
- 	/*
-+	 * Zoned block device information for mq I/O schedulers.
-+	 * nr_zones is the total number of zones of the device. This is always
-+	 * 0 for regular block devices. seq_zone_bitmap is a bitmap of nr_zones
-+	 * bits which indicates if a zone is conventional (bit clear) or
-+	 * sequential (bit set). Both nr_zones and seq_zone_bitmap are set
-+	 * by the low level device driver. Stacking drivers (device mappers)
-+	 * may or may not initialize these fields.
-+	 */
-+	unsigned int	nr_zones;
-+	unsigned long	*seq_zone_bitmap;
-+
-+	/*
- 	 * sg stuff
- 	 */
- 	unsigned int		sg_timeout;
-@@ -786,6 +798,27 @@ static inline unsigned int blk_queue_zone_sectors(struct request_queue *q)
- 	return blk_queue_is_zoned(q) ? q->limits.chunk_sectors : 0;
- }
+diff --git a/fs/xfs/xfs_trans_ail.c b/fs/xfs/xfs_trans_ail.c
+index 354368a906e5..8cebda88e91a 100644
+--- a/fs/xfs/xfs_trans_ail.c
++++ b/fs/xfs/xfs_trans_ail.c
+@@ -512,7 +512,6 @@ xfsaild(
+ 	long		tout = 0;	/* milliseconds */
  
-+static inline unsigned int blk_queue_nr_zones(struct request_queue *q)
-+{
-+	return q->nr_zones;
-+}
-+
-+static inline unsigned int blk_queue_zone_no(struct request_queue *q,
-+					     sector_t sector)
-+{
-+	if (!blk_queue_is_zoned(q))
-+		return 0;
-+	return sector >> ilog2(q->limits.chunk_sectors);
-+}
-+
-+static inline bool blk_queue_zone_is_seq(struct request_queue *q,
-+					 sector_t sector)
-+{
-+	if (!blk_queue_is_zoned(q) || !q->seq_zone_bitmap)
-+		return false;
-+	return test_bit(blk_queue_zone_no(q, sector), q->seq_zone_bitmap);
-+}
-+
- static inline bool rq_is_sync(struct request *rq)
- {
- 	return op_is_sync(rq->cmd_flags);
-@@ -1032,6 +1065,16 @@ static inline unsigned int blk_rq_cur_sectors(const struct request *rq)
- 	return blk_rq_cur_bytes(rq) >> 9;
- }
+ 	current->flags |= PF_MEMALLOC;
+-	set_freezable();
  
-+static inline unsigned int blk_rq_zone_no(struct request *rq)
-+{
-+	return blk_queue_zone_no(rq->q, blk_rq_pos(rq));
-+}
-+
-+static inline unsigned int blk_rq_zone_is_seq(struct request *rq)
-+{
-+	return blk_queue_zone_is_seq(rq->q, blk_rq_pos(rq));
-+}
-+
- /*
-  * Some commands like WRITE SAME have a payload or data transfer size which
-  * is different from the size of the request.  Any driver that supports such
-@@ -1583,6 +1626,16 @@ static inline unsigned int bdev_zone_sectors(struct block_device *bdev)
- 	return 0;
- }
+ 	while (!kthread_should_stop()) {
+ 		if (tout && tout <= 20)
+@@ -535,19 +534,17 @@ xfsaild(
+ 		if (!xfs_ail_min(ailp) &&
+ 		    ailp->xa_target == ailp->xa_target_prev) {
+ 			spin_unlock(&ailp->xa_lock);
+-			freezable_schedule();
++			schedule();
+ 			tout = 0;
+ 			continue;
+ 		}
+ 		spin_unlock(&ailp->xa_lock);
  
-+static inline unsigned int bdev_nr_zones(struct block_device *bdev)
-+{
-+	struct request_queue *q = bdev_get_queue(bdev);
-+
-+	if (q)
-+		return blk_queue_nr_zones(q);
-+
-+	return 0;
-+}
-+
- static inline int queue_dma_alignment(struct request_queue *q)
- {
- 	return q ? q->dma_alignment : 511;
+ 		if (tout)
+-			freezable_schedule_timeout(msecs_to_jiffies(tout));
++			schedule_timeout(msecs_to_jiffies(tout));
+ 
+ 		__set_current_state(TASK_RUNNING);
+ 
+-		try_to_freeze();
+-
+ 		tout = xfsaild_push(ailp);
+ 	}
+ 
 -- 
-2.13.6
+2.14.0
