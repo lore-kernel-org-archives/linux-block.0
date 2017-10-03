@@ -1,39 +1,136 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-block@vger.kernel.org
-Cc: axboe@kernel.dk,
-	shli@kernel.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 8/9] dm: Add nowait support to dm-delay
-Date: Wed,  4 Oct 2017 08:55:10 -0500
-Message-Id: <20171004135511.26110-9-rgoldwyn@suse.de>
-In-Reply-To: <20171004135511.26110-1-rgoldwyn@suse.de>
-References: <20171004135511.26110-1-rgoldwyn@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:42466 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751156AbdJCOF3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Oct 2017 10:05:29 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Cathy Avery <cavery@redhat.com>,
+        Martin Steigerwald <martin@lichtvoll.de>,
+        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V8 6/8] blk-mq: return if queue is frozen via current blk_freeze_queue_start
+Date: Tue,  3 Oct 2017 22:04:04 +0800
+Message-Id: <20171003140406.26060-7-ming.lei@redhat.com>
+In-Reply-To: <20171003140406.26060-1-ming.lei@redhat.com>
+References: <20171003140406.26060-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+We need this return value in the following patch to decide
+if a explicit synchronize_rcu() is needed.
 
-I/O should bail out if any value for delay is set.
-
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/dm-delay.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ block/blk-mq.c         | 13 ++++++++-----
+ block/blk-mq.h         |  1 -
+ block/blk.h            |  2 +-
+ include/linux/blk-mq.h |  4 ++--
+ 4 files changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/md/dm-delay.c b/drivers/md/dm-delay.c
-index 2209a9700acd..e67a7042ae68 100644
---- a/drivers/md/dm-delay.c
-+++ b/drivers/md/dm-delay.c
-@@ -240,6 +240,10 @@ static int delay_bio(struct delay_c *dc, int delay, struct bio *bio)
- 	if (!delay || !atomic_read(&dc->may_delay))
- 		return DM_MAPIO_REMAPPED;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index bf89549074bb..80d6dd99d7f1 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -118,7 +118,7 @@ void blk_mq_in_flight(struct request_queue *q, struct hd_struct *part,
+ 	blk_mq_queue_tag_busy_iter(q, blk_mq_check_inflight, &mi);
+ }
  
-+	if (bio->bi_opf & REQ_NOWAIT) {
-+		bio_wouldblock_error(bio);
-+		return DM_MAPIO_SUBMITTED;
-+	}
- 	delayed = dm_per_bio_data(bio, sizeof(struct dm_delay_info));
+-void blk_freeze_queue_start(struct request_queue *q)
++bool blk_freeze_queue_start(struct request_queue *q)
+ {
+ 	int freeze_depth;
  
- 	delayed->context = dc;
+@@ -127,7 +127,9 @@ void blk_freeze_queue_start(struct request_queue *q)
+ 		percpu_ref_kill(&q->q_usage_counter);
+ 		if (q->mq_ops)
+ 			blk_mq_run_hw_queues(q, false);
++		return true;
+ 	}
++	return false;
+ }
+ EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
+ 
+@@ -150,7 +152,7 @@ EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_wait_timeout);
+  * Guarantee no request is in use, so we can change any data structure of
+  * the queue afterward.
+  */
+-void blk_freeze_queue(struct request_queue *q)
++bool blk_freeze_queue(struct request_queue *q)
+ {
+ 	/*
+ 	 * In the !blk_mq case we are only calling this to kill the
+@@ -159,17 +161,18 @@ void blk_freeze_queue(struct request_queue *q)
+ 	 * no blk_unfreeze_queue(), and blk_freeze_queue() is not
+ 	 * exported to drivers as the only user for unfreeze is blk_mq.
+ 	 */
+-	blk_freeze_queue_start(q);
++	bool ret = blk_freeze_queue_start(q);
+ 	blk_mq_freeze_queue_wait(q);
++	return ret;
+ }
+ 
+-void blk_mq_freeze_queue(struct request_queue *q)
++bool blk_mq_freeze_queue(struct request_queue *q)
+ {
+ 	/*
+ 	 * ...just an alias to keep freeze and unfreeze actions balanced
+ 	 * in the blk_mq_* namespace
+ 	 */
+-	blk_freeze_queue(q);
++	return blk_freeze_queue(q);
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_freeze_queue);
+ 
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index ef15b3414da5..41044a8662ca 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -26,7 +26,6 @@ struct blk_mq_ctx {
+ } ____cacheline_aligned_in_smp;
+ 
+ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
+-void blk_mq_freeze_queue(struct request_queue *q);
+ void blk_mq_free_queue(struct request_queue *q);
+ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr);
+ void blk_mq_wake_waiters(struct request_queue *q);
+diff --git a/block/blk.h b/block/blk.h
+index fcb9775b997d..fa1b33d3fcbd 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -65,7 +65,7 @@ void blk_rq_bio_prep(struct request_queue *q, struct request *rq,
+ void blk_queue_bypass_start(struct request_queue *q);
+ void blk_queue_bypass_end(struct request_queue *q);
+ void __blk_queue_free_tags(struct request_queue *q);
+-void blk_freeze_queue(struct request_queue *q);
++bool blk_freeze_queue(struct request_queue *q);
+ 
+ static inline void blk_queue_enter_live(struct request_queue *q)
+ {
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 50c6485cb04f..d6195925e6c3 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -253,9 +253,9 @@ void blk_mq_run_hw_queues(struct request_queue *q, bool async);
+ void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
+ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+ 		busy_tag_iter_fn *fn, void *priv);
+-void blk_mq_freeze_queue(struct request_queue *q);
++bool blk_mq_freeze_queue(struct request_queue *q);
+ void blk_mq_unfreeze_queue(struct request_queue *q);
+-void blk_freeze_queue_start(struct request_queue *q);
++bool blk_freeze_queue_start(struct request_queue *q);
+ void blk_mq_freeze_queue_wait(struct request_queue *q);
+ int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
+ 				     unsigned long timeout);
 -- 
-2.14.2
+2.9.5
