@@ -1,54 +1,95 @@
-Return-Path: <Damien.LeMoal@wdc.com>
-From: Damien Le Moal <Damien.LeMoal@wdc.com>
-To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Bart Van Assche
-	<Bart.VanAssche@wdc.com>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "hch@lst.de" <hch@lst.de>
-Subject: Re: [PATCH V5 13/14] block: mq-deadline: Limit write request dispatch
- for zoned block devices
-Date: Mon, 2 Oct 2017 04:38:01 +0000
-Message-ID: <1506919078.24488.9.camel@wdc.com>
-References: <20170925061454.5533-1-damien.lemoal@wdc.com>
-	 <20170925061454.5533-14-damien.lemoal@wdc.com>
-	 <1506377218.2641.37.camel@wdc.com>
-In-Reply-To: <1506377218.2641.37.camel@wdc.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-oi0-f68.google.com ([209.85.218.68]:34290 "EHLO
+        mail-oi0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753561AbdJCMaa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2017 08:30:30 -0400
+Received: by mail-oi0-f68.google.com with SMTP id q133so3084742oic.1
+        for <linux-block@vger.kernel.org>; Tue, 03 Oct 2017 05:30:30 -0700 (PDT)
+Received: from ashlar.local (72-184-120-81.res.bhn.net. [72.184.120.81])
+        by smtp.gmail.com with ESMTPSA id t197sm6614190oih.16.2017.10.03.05.30.28
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 03 Oct 2017 05:30:29 -0700 (PDT)
+From: Lee Tibbert <lee.tibbert@gmail.com>
+To: linux-block@vger.kernel.org
+Subject: Re: [PATCH BUGFIX/IMPROVEMENT 0/4] block, bfq: series of fixes of bugs
+Date: Tue,  3 Oct 2017 08:30:21 -0400
+Message-Id: <20171003123021.25626-1-lee49@ashlar.local>
+In-Reply-To: <20170921090403.3217-1-paolo.valente@linaro.org>
+References: <20170921090403.3217-1-paolo.valente@linaro.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-T24gTW9uLCAyMDE3LTA5LTI1IGF0IDIyOjA2ICswMDAwLCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6
-DQo+IE9uIE1vbiwgMjAxNy0wOS0yNSBhdCAxNToxNCArMDkwMCwgRGFtaWVuIExlIE1vYWwgd3Jv
-dGU6DQo+ID4gLQlyZXR1cm4gcnFfZW50cnlfZmlmbyhkZC0+Zmlmb19saXN0W2RhdGFfZGlyXS5u
-ZXh0KTsNCj4gPiArCWlmICghZGQtPnpvbmVzX3dsb2NrIHx8IGRhdGFfZGlyID09IFJFQUQpDQo+
-ID4gKwkJcmV0dXJuIHJxX2VudHJ5X2ZpZm8oZGQtPmZpZm9fbGlzdFtkYXRhX2Rpcl0ubmV4dCk7
-DQo+ID4gKw0KPiA+ICsJc3Bpbl9sb2NrX2lycXNhdmUoJmRkLT56b25lX2xvY2ssIGZsYWdzKTsN
-Cj4gPiArDQo+ID4gKwlsaXN0X2Zvcl9lYWNoX2VudHJ5KHJxLCAmZGQtPmZpZm9fbGlzdFtXUklU
-RV0sIHF1ZXVlbGlzdCkgew0KPiA+ICsJCWlmIChkZWFkbGluZV9jYW5fZGlzcGF0Y2hfcmVxdWVz
-dChkZCwgcnEpKQ0KPiA+ICsJCQlnb3RvIG91dDsNCj4gPiArCX0NCj4gPiArCXJxID0gTlVMTDsN
-Cj4gPiArDQo+ID4gK291dDoNCj4gPiArCXNwaW5fdW5sb2NrX2lycXJlc3RvcmUoJmRkLT56b25l
-X2xvY2ssIGZsYWdzKTsNCj4gDQo+IElzIGl0IGRvY3VtZW50ZWQgc29tZXdoZXJlIHdoYXQgZGQt
-PnpvbmVfbG9jayBwcm90ZWN0cyBhbmQgd2hlbiB0aGF0IGxvY2sNCj4gc2hvdWxkIGJlDQo+IGFj
-cXVpcmVkPw0KDQpJdCB3YXMgbm90IHdlbGwgZXhwbGFpbmVkLiBJIGFkZGVkIGNvbW1lbnRzIGlu
-IFY2Lg0KDQo+IA0KPiA+IAkvKg0KPiA+ICAJICogVGhpcyBtYXkgYmUgYSByZXF1ZXVlIG9mIGEg
-cmVxdWVzdCB0aGF0IGhhcyBsb2NrZWQgaXRzDQo+ID4gLQkgKiB0YXJnZXQgem9uZS4gSWYgdGhp
-cyBpcyB0aGUgY2FzZSwgcmVsZWFzZSB0aGUgcmVxdWVzdCB6b25lDQo+ID4gbG9jay4NCj4gPiAr
-CSAqIHRhcmdldCB6b25lLiBJZiB0aGlzIGlzIHRoZSBjYXNlLCByZWxlYXNlIHRoZSB6b25lIGxv
-Y2suDQo+ID4gIAkgKi8NCj4gPiAgCWlmIChkZWFkbGluZV9yZXF1ZXN0X2hhc196b25lX3dsb2Nr
-KHJxKSkNCj4gPiAgCQlkZWFkbGluZV93dW5sb2NrX3pvbmUoZGQsIHJxKTsNCj4gDQo+IENhbiB0
-aGlzIGNoYW5nZSBiZSBmb2xkZWQgaW50byB0aGUgcGF0Y2ggdGhhdCBpbnRyb2R1Y2VkIHRoYXQg
-Y29tbWVudD8NCg0KT2YgY291cnNlLiBGaXhlZCBpbiBWNi4NCg0KPiA+IEBAIC01NzAsNiArNjIx
-LDkgQEAgc3RhdGljIHZvaWQgZGRfaW5zZXJ0X3JlcXVlc3Qoc3RydWN0IGJsa19tcV9od19jdHgN
-Cj4gPiAqaGN0eCwgc3RydWN0IHJlcXVlc3QgKnJxLA0KPiA+ICANCj4gPiAgCWJsa19tcV9zY2hl
-ZF9yZXF1ZXN0X2luc2VydGVkKHJxKTsNCj4gPiAgDQo+ID4gKwlpZiAoYXRfaGVhZCAmJiBkZWFk
-bGluZV9yZXF1ZXN0X25lZWRzX3pvbmVfd2xvY2soZGQsIHJxKSkNCj4gPiArCQlwcl9pbmZvKCIj
-IyMjIyMjIyBXcml0ZSBhdCBoZWFkICFcbiIpOw0KPiA+ICsNCj4gPiAgCWlmIChhdF9oZWFkIHx8
-IGJsa19ycV9pc19wYXNzdGhyb3VnaChycSkpIHsNCj4gPiAgCQlpZiAoYXRfaGVhZCkNCj4gPiAg
-CQkJbGlzdF9hZGQoJnJxLT5xdWV1ZWxpc3QsICZkZC0+ZGlzcGF0Y2gpOw0KPiANCj4gV2lsbCBp
-dCBiZSBlYXN5IHRvIHVzZXJzIHdobyBhbmFseXplIGEga2VybmVsIGxvZyB0byBmaWd1cmUgb3V0
-IHdoeSB0aGF0DQo+IG1lc3NhZ2UgaGFzIGJlZW4gZ2VuZXJhdGVkPyBTaG91bGQgdGhhdCBtZXNz
-YWdlIHBlcmhhcHMgaW5jbHVkZSB0aGUgYmxvY2sNCj4gZGV2aWNlIG5hbWUsIHpvbmUgbnVtYmVy
-IGFuZCByZXF1ZXN0IHNlY3RvciBudW1iZXI/DQoNClRoaXMgd2FzIGp1c3QgYSBkZWJ1ZyBtZXNz
-YWdlIGZvciBtZSB0aGF0IEkgZm9yZ290IHRvIHJlbW92ZS4gSSBkaWQgaW4gVjYuDQpUaGFua3Mg
-Zm9yIGNhdGNoaW5nIHRoaXMuDQoNCkJlc3QgcmVnYXJkcy4NCg0KLS0gDQpEYW1pZW4gTGUgTW9h
-bA0KV2VzdGVybiBEaWdpdGFs
+On Thu, Sep 21, 2017 at 5:03 AM, Paolo Valente <paolo.valente@linaro.org>
+wrote:
+
+> Hi,
+> the first patch in this series fixes a bug that causes bfq to fail to
+> guarantee a high responsiveness on some drives, if there is heavy
+> random read+write I/O in the background. More precisely, such a
+> failure allowed this bug to be found [1], but the bug may well cause
+> other yet unreported anomalies.
+>
+> This fix uncovered other bugs that were concealed by the fixed bug,
+> for rather subtle reasons. These further bugs caused similar
+> responsiveness failures, but with sequential reaad+write workloads in
+> the background. The remaining three patches fix these further bugs.
+>
+> The sum of these fixes makes responsiveness much stabler with BFQ. In
+> the presence of write hogs, it is however still impossible for an I/O
+> scheduler to guarantee perfect responsiveness in any circustance,
+> because of throttling issues in the virtual-memory management
+> subsystem, and in other higher-level components.
+>
+> Thanks,
+> Paolo
+>
+> [1] Background I/O Type: Random - Background I/O mix: Reads and writes
+> - Application to start: LibreOffice Writer in
+> http://www.phoronix.com/scan.php?page=news_item&px=Linux-4.13-IO-Laptop
+>
+>
+> Paolo Valente (4):
+>   block, bfq: fix wrong init of saved start time for weight raising
+>   block, bfq: check and switch back to interactive wr also on queue
+>     split
+>   block, bfq: let early-merged queues be weight-raised on split too
+>   block, bfq: decrease burst size when queues in burst exit
+>
+>  block/bfq-iosched.c | 169 ++++++++++++++++++++++++++++++
+> +---------------------
+>  1 file changed, 102 insertions(+), 67 deletions(-)
+>
+> --
+> 2.10.0
+>
+
+Paolo,
+
+Please feel free to add:
+
+  Tested-by: Lee Tibbert <lee.tibbert@gmail.com>
+
+I thought that you and linux-block readers might be interested
+in a data point. I have been running the algodev variant of these
+patches for about two weeks. Now I am running these exact patches.
+
+At one point, I had firefox running in my main windows, and, in other
+windows, a full linux build, a full scala-native build, and a git gc. I
+barely noticed the builds going on.  The variance of latency in
+firefox was well within my normal network variance. Usually any
+one of the build jobs would have made firefox useless.
+
+Pretty amazing!  In fact, it was so amazing that I did not trust my
+memory several days later, so I repeated the full test.
+Same result:  great reduced latency.
+
+There being no such thing as a free lunch, the build jobs did
+take longer than if executed standalone. However, I did not mind
+because I was able to continue getting work done on the tasks
+I needed in interactive time.
+
+I hope these patches are accepted into linux mainline & will
+I will continue to exercise them.
+
+Lee
