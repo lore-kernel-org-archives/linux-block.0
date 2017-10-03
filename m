@@ -1,52 +1,120 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.mpynet.fi ([82.197.21.84]:25536 "EHLO mx1.mpynet.fi"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751118AbdJAN0h (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 1 Oct 2017 09:26:37 -0400
-Date: Sun, 1 Oct 2017 16:26:35 +0300
-From: Rakesh Pandit <rakesh@tuxera.com>
-To: Matias =?iso-8859-1?Q?Bj=F8rling?= <mb@lightnvm.io>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
-Subject: [PATCH 6/6] lightnvm: pblk: fix releases of kmem cache in error path
-Message-ID: <20171001132633.GA5783@hercules.tuxera.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Cathy Avery <cavery@redhat.com>,
+        Martin Steigerwald <martin@lichtvoll.de>,
+        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V8 2/8] block: tracking request allocation with q_usage_counter
+Date: Tue,  3 Oct 2017 22:04:00 +0800
+Message-Id: <20171003140406.26060-3-ming.lei@redhat.com>
+In-Reply-To: <20171003140406.26060-1-ming.lei@redhat.com>
+References: <20171003140406.26060-1-ming.lei@redhat.com>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-If pblk_core_init fails lets destroy all global caches.
+This usage is basically same with blk-mq, so that we can
+support to freeze legacy queue easily.
 
-Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+Also 'wake_up_all(&q->mq_freeze_wq)' has to be moved
+into blk_set_queue_dying() since both legacy and blk-mq
+may wait on the wait queue of .mq_freeze_wq.
+
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Tested-by: Martin Steigerwald <martin@lichtvoll.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/pblk-init.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ block/blk-core.c | 15 +++++++++++++++
+ block/blk-mq.c   |  7 -------
+ 2 files changed, 15 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 519e5cf..9f39800 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -246,7 +246,7 @@ static int pblk_core_init(struct pblk *pblk)
- 	pblk->page_bio_pool = mempool_create_page_pool(nvm_max_phys_sects(dev),
- 									0);
- 	if (!pblk->page_bio_pool)
--		return -ENOMEM;
-+		goto free_global_caches;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 048be4aa6024..900eaa8eefa6 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -610,6 +610,12 @@ void blk_set_queue_dying(struct request_queue *q)
+ 		}
+ 		spin_unlock_irq(q->queue_lock);
+ 	}
++
++	/*
++	 * We need to ensure that processes currently waiting on
++	 * the queue are notified as well.
++	 */
++	wake_up_all(&q->mq_freeze_wq);
+ }
+ EXPORT_SYMBOL_GPL(blk_set_queue_dying);
  
- 	pblk->gen_ws_pool = mempool_create_slab_pool(PBLK_GEN_WS_POOL_SIZE,
- 							pblk_ws_cache);
-@@ -314,6 +314,12 @@ static int pblk_core_init(struct pblk *pblk)
- 	mempool_destroy(pblk->gen_ws_pool);
- free_page_bio_pool:
- 	mempool_destroy(pblk->page_bio_pool);
-+free_global_caches:
-+	kmem_cache_destroy(pblk_ws_cache);
-+	kmem_cache_destroy(pblk_rec_cache);
-+	kmem_cache_destroy(pblk_g_rq_cache);
-+	kmem_cache_destroy(pblk_e_rq_cache);
-+	kmem_cache_destroy(pblk_w_rq_cache);
- 	return -ENOMEM;
+@@ -1395,16 +1401,22 @@ static struct request *blk_old_get_request(struct request_queue *q,
+ 					   unsigned int op, gfp_t gfp_mask)
+ {
+ 	struct request *rq;
++	int ret = 0;
+ 
+ 	WARN_ON_ONCE(q->mq_ops);
+ 
+ 	/* create ioc upfront */
+ 	create_io_context(gfp_mask, q->node);
+ 
++	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM) ||
++			(op & REQ_NOWAIT));
++	if (ret)
++		return ERR_PTR(ret);
+ 	spin_lock_irq(q->queue_lock);
+ 	rq = get_request(q, op, NULL, gfp_mask);
+ 	if (IS_ERR(rq)) {
+ 		spin_unlock_irq(q->queue_lock);
++		blk_queue_exit(q);
+ 		return rq;
+ 	}
+ 
+@@ -1576,6 +1588,7 @@ void __blk_put_request(struct request_queue *q, struct request *req)
+ 		blk_free_request(rl, req);
+ 		freed_request(rl, sync, rq_flags);
+ 		blk_put_rl(rl);
++		blk_queue_exit(q);
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(__blk_put_request);
+@@ -1857,8 +1870,10 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
+ 	 * Grab a free request. This is might sleep but can not fail.
+ 	 * Returns with the queue unlocked.
+ 	 */
++	blk_queue_enter_live(q);
+ 	req = get_request(q, bio->bi_opf, bio, GFP_NOIO);
+ 	if (IS_ERR(req)) {
++		blk_queue_exit(q);
+ 		__wbt_done(q->rq_wb, wb_acct);
+ 		if (PTR_ERR(req) == -ENOMEM)
+ 			bio->bi_status = BLK_STS_RESOURCE;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 6fd9f86fc86d..10c1f49f663d 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -256,13 +256,6 @@ void blk_mq_wake_waiters(struct request_queue *q)
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		if (blk_mq_hw_queue_mapped(hctx))
+ 			blk_mq_tag_wakeup_all(hctx->tags, true);
+-
+-	/*
+-	 * If we are called because the queue has now been marked as
+-	 * dying, we need to ensure that processes currently waiting on
+-	 * the queue are notified as well.
+-	 */
+-	wake_up_all(&q->mq_freeze_wq);
  }
  
+ bool blk_mq_can_queue(struct blk_mq_hw_ctx *hctx)
 -- 
-2.7.4
+2.9.5
