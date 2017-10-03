@@ -1,77 +1,116 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44730 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750951AbdJDGQO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 4 Oct 2017 02:16:14 -0400
-Subject: Re: [PATCH 1/9] bsg-lib: fix use-after-free under memory-pressure
-To: Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org
+Received: from bombadil.infradead.org ([65.50.211.133]:40492 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751121AbdJCKsv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2017 06:48:51 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
 Cc: Johannes Thumshirn <jthumshirn@suse.de>,
         Benjamin Block <bblock@linux.vnet.ibm.com>,
         stable@vger.kernel.org
+Subject: [PATCH 1/9] bsg-lib: fix use-after-free under memory-pressure
+Date: Tue,  3 Oct 2017 12:48:37 +0200
+Message-Id: <20171003104845.10417-2-hch@lst.de>
+In-Reply-To: <20171003104845.10417-1-hch@lst.de>
 References: <20171003104845.10417-1-hch@lst.de>
- <20171003104845.10417-2-hch@lst.de>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <c87d75ff-9b6c-df5a-e2b3-b6e747a15679@suse.de>
-Date: Wed, 4 Oct 2017 08:16:11 +0200
-MIME-Version: 1.0
-In-Reply-To: <20171003104845.10417-2-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 10/03/2017 12:48 PM, Christoph Hellwig wrote:
-> From: Benjamin Block <bblock@linux.vnet.ibm.com>
-> 
-> When under memory-pressure it is possible that the mempool which backs
-> the 'struct request_queue' will make use of up to BLKDEV_MIN_RQ count
-> emergency buffers - in case it can't get a regular allocation. These
-> buffers are preallocated and once they are also used, they are
-> re-supplied with old finished requests from the same request_queue (see
-> mempool_free()).
-> 
-> The bug is, when re-supplying the emergency pool, the old requests are
-> not again ran through the callback mempool_t->alloc(), and thus also not
-> through the callback bsg_init_rq(). Thus we skip initialization, and
-> while the sense-buffer still should be good, scsi_request->cmd might
-> have become to be an invalid pointer in the meantime. When the request
-> is initialized in bsg.c, and the user's CDB is larger than BLK_MAX_CDB,
-> bsg will replace it with a custom allocated buffer, which is freed when
-> the user's command is finished, thus it dangles afterwards. When next a
-> command is sent by the user that has a smaller/similar CDB as
-> BLK_MAX_CDB, bsg will assume that scsi_request->cmd is backed by
-> scsi_request->__cmd, will not make a custom allocation, and write into
-> undefined memory.
-> 
-> Fix this by splitting bsg_init_rq() into two functions:
->  - bsg_init_rq() is changed to only do the allocation of the
->    sense-buffer, which is used to back the bsg job's reply buffer. This
->    pointer should never change during the lifetime of a scsi_request, so
->    it doesn't need re-initialization.
->  - bsg_initialize_rq() is a new function that makes use of
->    'struct request_queue's initialize_rq_fn callback (which was
->    introduced in v4.12). This is always called before the request is
->    given out via blk_get_request(). This function does the remaining
->    initialization that was previously done in bsg_init_rq(), and will
->    also do it when the request is taken from the emergency-pool of the
->    backing mempool.
-> 
-> Fixes: 50b4d485528d ("bsg-lib: fix kernel panic resulting from missing allocation of reply-buffer")
-> Cc: <stable@vger.kernel.org> # 4.11+
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Benjamin Block <bblock@linux.vnet.ibm.com>
-> ---
->  block/bsg-lib.c | 27 +++++++++++++++++++++------
->  1 file changed, 21 insertions(+), 6 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+From: Benjamin Block <bblock@linux.vnet.ibm.com>
 
-Cheers,
+When under memory-pressure it is possible that the mempool which backs
+the 'struct request_queue' will make use of up to BLKDEV_MIN_RQ count
+emergency buffers - in case it can't get a regular allocation. These
+buffers are preallocated and once they are also used, they are
+re-supplied with old finished requests from the same request_queue (see
+mempool_free()).
 
-Hannes
+The bug is, when re-supplying the emergency pool, the old requests are
+not again ran through the callback mempool_t->alloc(), and thus also not
+through the callback bsg_init_rq(). Thus we skip initialization, and
+while the sense-buffer still should be good, scsi_request->cmd might
+have become to be an invalid pointer in the meantime. When the request
+is initialized in bsg.c, and the user's CDB is larger than BLK_MAX_CDB,
+bsg will replace it with a custom allocated buffer, which is freed when
+the user's command is finished, thus it dangles afterwards. When next a
+command is sent by the user that has a smaller/similar CDB as
+BLK_MAX_CDB, bsg will assume that scsi_request->cmd is backed by
+scsi_request->__cmd, will not make a custom allocation, and write into
+undefined memory.
+
+Fix this by splitting bsg_init_rq() into two functions:
+ - bsg_init_rq() is changed to only do the allocation of the
+   sense-buffer, which is used to back the bsg job's reply buffer. This
+   pointer should never change during the lifetime of a scsi_request, so
+   it doesn't need re-initialization.
+ - bsg_initialize_rq() is a new function that makes use of
+   'struct request_queue's initialize_rq_fn callback (which was
+   introduced in v4.12). This is always called before the request is
+   given out via blk_get_request(). This function does the remaining
+   initialization that was previously done in bsg_init_rq(), and will
+   also do it when the request is taken from the emergency-pool of the
+   backing mempool.
+
+Fixes: 50b4d485528d ("bsg-lib: fix kernel panic resulting from missing allocation of reply-buffer")
+Cc: <stable@vger.kernel.org> # 4.11+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Benjamin Block <bblock@linux.vnet.ibm.com>
+---
+ block/bsg-lib.c | 27 +++++++++++++++++++++------
+ 1 file changed, 21 insertions(+), 6 deletions(-)
+
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index dbddff8174e5..15d25ccd51a5 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -207,20 +207,34 @@ static int bsg_init_rq(struct request_queue *q, struct request *req, gfp_t gfp)
+ 	struct bsg_job *job = blk_mq_rq_to_pdu(req);
+ 	struct scsi_request *sreq = &job->sreq;
+ 
++	/* called right after the request is allocated for the request_queue */
++
++	sreq->sense = kzalloc(SCSI_SENSE_BUFFERSIZE, gfp);
++	if (!sreq->sense)
++		return -ENOMEM;
++
++	return 0;
++}
++
++static void bsg_initialize_rq(struct request *req)
++{
++	struct bsg_job *job = blk_mq_rq_to_pdu(req);
++	struct scsi_request *sreq = &job->sreq;
++	void *sense = sreq->sense;
++
++	/* called right before the request is given to the request_queue user */
++
+ 	memset(job, 0, sizeof(*job));
+ 
+ 	scsi_req_init(sreq);
++
++	sreq->sense = sense;
+ 	sreq->sense_len = SCSI_SENSE_BUFFERSIZE;
+-	sreq->sense = kzalloc(sreq->sense_len, gfp);
+-	if (!sreq->sense)
+-		return -ENOMEM;
+ 
+ 	job->req = req;
+-	job->reply = sreq->sense;
++	job->reply = sense;
+ 	job->reply_len = sreq->sense_len;
+ 	job->dd_data = job + 1;
+-
+-	return 0;
+ }
+ 
+ static void bsg_exit_rq(struct request_queue *q, struct request *req)
+@@ -251,6 +265,7 @@ struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
+ 	q->cmd_size = sizeof(struct bsg_job) + dd_job_size;
+ 	q->init_rq_fn = bsg_init_rq;
+ 	q->exit_rq_fn = bsg_exit_rq;
++	q->initialize_rq_fn = bsg_initialize_rq;
+ 	q->request_fn = bsg_request_fn;
+ 
+ 	ret = blk_init_allocated_queue(q);
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.14.1
