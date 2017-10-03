@@ -1,9 +1,7 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Tue, 3 Oct 2017 22:39:36 +0200
-From: "Luis R. Rodriguez" <mcgrof@kernel.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "mcgrof@kernel.org" <mcgrof@kernel.org>,
-        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "mcgrof@kernel.org" <mcgrof@kernel.org>
+CC: "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
         "ONeukum@suse.com" <ONeukum@suse.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
@@ -25,62 +23,43 @@ Cc: "mcgrof@kernel.org" <mcgrof@kernel.org>,
         "len.brown@intel.com" <len.brown@intel.com>,
         "tytso@mit.edu" <tytso@mit.edu>, "jack@suse.cz" <jack@suse.cz>
 Subject: Re: [RFC 2/5] fs: freeze on suspend and thaw on resume
-Message-ID: <20171003203936.GH2294@wotan.suse.de>
+Date: Tue, 3 Oct 2017 20:32:39 +0000
+Message-ID: <1507062758.2567.22.camel@wdc.com>
 References: <20171003185313.1017-1-mcgrof@kernel.org>
- <20171003185313.1017-3-mcgrof@kernel.org>
- <1507060941.2567.6.camel@wdc.com>
- <20171003202335.GF2294@wotan.suse.de>
- <1507062758.2567.22.camel@wdc.com>
+         <20171003185313.1017-3-mcgrof@kernel.org> <1507060941.2567.6.camel@wdc.com>
+         <20171003202335.GF2294@wotan.suse.de>
+In-Reply-To: <20171003202335.GF2294@wotan.suse.de>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1507062758.2567.22.camel@wdc.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Oct 03, 2017 at 08:32:39PM +0000, Bart Van Assche wrote:
-> On Tue, 2017-10-03 at 22:23 +0200, Luis R. Rodriguez wrote:
-> > On Tue, Oct 03, 2017 at 08:02:22PM +0000, Bart Van Assche wrote:
-> > > On Tue, 2017-10-03 at 11:53 -0700, Luis R. Rodriguez wrote:
-> > > > +static bool super_allows_freeze(struct super_block *sb)
-> > > > +{
-> > > > +	return !!(sb->s_type->fs_flags & FS_FREEZE_ON_SUSPEND);
-> > > > +}
-> > > 
-> > > A minor comment: if "!!" would be left out the compiler will perform the
-> > > conversion from int to bool implicitly
-> > 
-> > For all compilers?
-> 
-> Let's have a look at the output of the following commands:
-> 
-> $ PAGER= git grep 'typedef.*[[:blank:]]bool;' include
-> include/linux/types.h:typedef _Bool                     bool;
-> $ PAGER= git grep std= Makefile
-> Makefile:               -fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS)
-> Makefile:                  -std=gnu89 $(call cc-option,-fno-PIE)
-> 
-> From https://gcc.gnu.org/onlinedocs/gcc-7.2.0/gcc/C-Dialect-Options.html#C-Dialect-Options:
-> ‘gnu89’
-> GNU dialect of ISO C90 (including some C99 features).
-> 
-> I think this means that the Linux kernel tree can only be compiled correctly
-> by compilers that support the C11 type _Bool.
-
-:*) beautiful, thanks.
-
-> > > Anyway, I agree with the approach of this patch and I think
-> > > that freezing filesystems before processes are frozen would be a big step
-> > > forward.
-> > 
-> > Great! But please note, the current implementation calls fs_suspend_freeze()
-> > *after* try_to_freeze_tasks(), ie: this implementation freezes userspace and
-> > only after then filesystems.
-> 
-> What will the impact be of that choice on filesystems implemented in userspace?
-
-Depends on what kernel hooks those use? Also now is a good time for those working
-on userspace filesystems to chime in :) Its why I am stating -- I am not saying
-I have found the right order, I have find the right order that works for me, and
-we need consensus on what the right order should be.
-
-  Luis
+T24gVHVlLCAyMDE3LTEwLTAzIGF0IDIyOjIzICswMjAwLCBMdWlzIFIuIFJvZHJpZ3VleiB3cm90
+ZToNCj4gT24gVHVlLCBPY3QgMDMsIDIwMTcgYXQgMDg6MDI6MjJQTSArMDAwMCwgQmFydCBWYW4g
+QXNzY2hlIHdyb3RlOg0KPiA+IE9uIFR1ZSwgMjAxNy0xMC0wMyBhdCAxMTo1MyAtMDcwMCwgTHVp
+cyBSLiBSb2RyaWd1ZXogd3JvdGU6DQo+ID4gPiArc3RhdGljIGJvb2wgc3VwZXJfYWxsb3dzX2Zy
+ZWV6ZShzdHJ1Y3Qgc3VwZXJfYmxvY2sgKnNiKQ0KPiA+ID4gK3sNCj4gPiA+ICsJcmV0dXJuICEh
+KHNiLT5zX3R5cGUtPmZzX2ZsYWdzICYgRlNfRlJFRVpFX09OX1NVU1BFTkQpOw0KPiA+ID4gK30N
+Cj4gPiANCj4gPiBBIG1pbm9yIGNvbW1lbnQ6IGlmICIhISIgd291bGQgYmUgbGVmdCBvdXQgdGhl
+IGNvbXBpbGVyIHdpbGwgcGVyZm9ybSB0aGUNCj4gPiBjb252ZXJzaW9uIGZyb20gaW50IHRvIGJv
+b2wgaW1wbGljaXRseQ0KPiANCj4gRm9yIGFsbCBjb21waWxlcnM/DQoNCkxldCdzIGhhdmUgYSBs
+b29rIGF0IHRoZSBvdXRwdXQgb2YgdGhlIGZvbGxvd2luZyBjb21tYW5kczoNCg0KJCBQQUdFUj0g
+Z2l0IGdyZXAgJ3R5cGVkZWYuKltbOmJsYW5rOl1dYm9vbDsnIGluY2x1ZGUNCmluY2x1ZGUvbGlu
+dXgvdHlwZXMuaDp0eXBlZGVmIF9Cb29sICAgICAgICAgICAgICAgICAgICAgYm9vbDsNCiQgUEFH
+RVI9IGdpdCBncmVwIHN0ZD0gTWFrZWZpbGUNCk1ha2VmaWxlOiAgICAgICAgICAgICAgIC1mb21p
+dC1mcmFtZS1wb2ludGVyIC1zdGQ9Z251ODkgJChIT1NUX0xGU19DRkxBR1MpDQpNYWtlZmlsZTog
+ICAgICAgICAgICAgICAgICAtc3RkPWdudTg5ICQoY2FsbCBjYy1vcHRpb24sLWZuby1QSUUpDQoN
+CkZyb20gaHR0cHM6Ly9nY2MuZ251Lm9yZy9vbmxpbmVkb2NzL2djYy03LjIuMC9nY2MvQy1EaWFs
+ZWN0LU9wdGlvbnMuaHRtbCNDLURpYWxlY3QtT3B0aW9uczoNCuKAmGdudTg54oCZDQpHTlUgZGlh
+bGVjdCBvZiBJU08gQzkwIChpbmNsdWRpbmcgc29tZSBDOTkgZmVhdHVyZXMpLg0KDQpJIHRoaW5r
+IHRoaXMgbWVhbnMgdGhhdCB0aGUgTGludXgga2VybmVsIHRyZWUgY2FuIG9ubHkgYmUgY29tcGls
+ZWQgY29ycmVjdGx5DQpieSBjb21waWxlcnMgdGhhdCBzdXBwb3J0IHRoZSBDMTEgdHlwZSBfQm9v
+bC4NCg0KPiA+IEFueXdheSwgSSBhZ3JlZSB3aXRoIHRoZSBhcHByb2FjaCBvZiB0aGlzIHBhdGNo
+IGFuZCBJIHRoaW5rDQo+ID4gdGhhdCBmcmVlemluZyBmaWxlc3lzdGVtcyBiZWZvcmUgcHJvY2Vz
+c2VzIGFyZSBmcm96ZW4gd291bGQgYmUgYSBiaWcgc3RlcA0KPiA+IGZvcndhcmQuDQo+IA0KPiBH
+cmVhdCEgQnV0IHBsZWFzZSBub3RlLCB0aGUgY3VycmVudCBpbXBsZW1lbnRhdGlvbiBjYWxscyBm
+c19zdXNwZW5kX2ZyZWV6ZSgpDQo+ICphZnRlciogdHJ5X3RvX2ZyZWV6ZV90YXNrcygpLCBpZTog
+dGhpcyBpbXBsZW1lbnRhdGlvbiBmcmVlemVzIHVzZXJzcGFjZSBhbmQNCj4gb25seSBhZnRlciB0
+aGVuIGZpbGVzeXN0ZW1zLg0KDQpXaGF0IHdpbGwgdGhlIGltcGFjdCBiZSBvZiB0aGF0IGNob2lj
+ZSBvbiBmaWxlc3lzdGVtcyBpbXBsZW1lbnRlZCBpbiB1c2Vyc3BhY2U/DQoNClRoYW5rcywNCg0K
+QmFydC4=
