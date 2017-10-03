@@ -1,48 +1,72 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "pavel@ucw.cz" <pavel@ucw.cz>,
-        "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "rjw@rjwysocki.net" <rjw@rjwysocki.net>,
-        "mcgrof@kernel.org" <mcgrof@kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "jikos@kernel.org" <jikos@kernel.org>,
-        "len.brown@intel.com" <len.brown@intel.com>,
-        "tytso@mit.edu" <tytso@mit.edu>
-CC: "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
-        "ONeukum@suse.com" <ONeukum@suse.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "nborisov@suse.com" <nborisov@suse.com>,
-        "oleg.b.antonyan@gmail.com" <oleg.b.antonyan@gmail.com>,
-        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        "jgross@suse.com" <jgross@suse.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
-        "todd.e.brandt@linux.intel.com" <todd.e.brandt@linux.intel.com>,
-        "jack@suse.cz" <jack@suse.cz>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:45811 "EHLO
+        atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751115AbdJCUMH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2017 16:12:07 -0400
+Date: Tue, 3 Oct 2017 22:12:04 +0200
+From: Pavel Machek <pavel@ucw.cz>
+To: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Cc: viro@zeniv.linux.org.uk, bart.vanassche@wdc.com,
+        ming.lei@redhat.com, tytso@mit.edu, darrick.wong@oracle.com,
+        jikos@kernel.org, rjw@rjwysocki.net, len.brown@intel.com,
+        linux-fsdevel@vger.kernel.org, boris.ostrovsky@oracle.com,
+        jgross@suse.com, todd.e.brandt@linux.intel.com, nborisov@suse.com,
+        jack@suse.cz, martin.petersen@oracle.com, ONeukum@suse.com,
+        oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
+        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [RFC 5/5] pm: remove kernel thread freezing
-Date: Tue, 3 Oct 2017 20:13:26 +0000
-Message-ID: <1507061605.2567.13.camel@wdc.com>
+Message-ID: <20171003201204.GA23521@amd>
 References: <20171003185313.1017-1-mcgrof@kernel.org>
-         <20171003185313.1017-6-mcgrof@kernel.org>
-In-Reply-To: <20171003185313.1017-6-mcgrof@kernel.org>
-Content-Type: text/plain; charset="utf-8"
+ <20171003185313.1017-6-mcgrof@kernel.org>
 MIME-Version: 1.0
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="AqsLC8rIMeq19msA"
+In-Reply-To: <20171003185313.1017-6-mcgrof@kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-T24gVHVlLCAyMDE3LTEwLTAzIGF0IDExOjUzIC0wNzAwLCBMdWlzIFIuIFJvZHJpZ3VleiB3cm90
-ZToNCj4gTm93IHRoYXQgYWxsIGZpbGVzeXN0ZW1zIHdoaWNoIHVzZWQgdG8gcmVseSBvbiBrdGhy
-ZWFkDQo+IGZyZWV6aW5nIGhhdmUgYmVlbiBjb252ZXJ0ZWQgdG8gZmlsZXN5c3RlbSBmcmVlemUv
-dGhhd2luZw0KPiB3ZSBjYW4gcmVtb3ZlIHRoZSBrZXJuZWwga3RocmVhZCBmcmVlemVyLg0KDQpN
-YW55IHN1YnN5c3RlbXMgdXNlIHN5c3RlbV9mcmVlemFibGVfd3EgYW5kL29yDQpzeXN0ZW1fZnJl
-ZXphYmxlX3Bvd2VyX2VmZmljaWVudF93cSB0byBxdWV1ZSB3b3JrIHRoYXQgc2hvdWxkIG5vdCBy
-dW4gd2hpbGUNCnByb2Nlc3NlcyBhcmUgZnJvemVuLiBTaG91bGQgaXQgYmUgbWVudGlvbmVkIGlu
-IHRoZSBwYXRjaCBkZXNjcmlwdGlvbiB0aGF0DQp0aGlzIHBhdGNoIGRvZXMgbm90IGFmZmVjdCB3
-b3JrcXVldWVzIGZvciB3aGljaCBXUV9GUkVFWkFCTEUgaGFzIGJlZW4gc2V0Pw0KDQpXaGF0IGFi
-b3V0IHRoZSBtYW55IGRyaXZlcnMgb3V0c2lkZSBmaWxlc3lzdGVtcyB0aGF0IHVzZSB0aGUgc2V0
-X2ZyZWV6YWJsZSgpIC8NCnRyeV90b19mcmVlemUoKSAvIHdhaXRfZXZlbnRfZnJlZXphYmxlKCkg
-QVBJPw0KDQpUaGFua3MsDQoNCkJhcnQu
+
+--AqsLC8rIMeq19msA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue 2017-10-03 11:53:13, Luis R. Rodriguez wrote:
+> Now that all filesystems which used to rely on kthread
+> freezing have been converted to filesystem freeze/thawing
+> we can remove the kernel kthread freezer.
+
+Are you surely-sure? You mentioned other in kernel sources of writes;
+what about those?
+
+Can knfsd be a problem?
+
+Can memory management doing background writes be a problem?
+
+Did you do some hibernation testing?
+
+> Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
+
+Please don't apply this just yet.
+
+									Pavel
+
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html
+
+--AqsLC8rIMeq19msA
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlnT7xQACgkQMOfwapXb+vK4qgCcDxGX3eUe+PcZPHNiVxFML35E
+slcAoJNxB4zJFlTZarJuhrPcwJiZQFAx
+=eLRH
+-----END PGP SIGNATURE-----
+
+--AqsLC8rIMeq19msA--
