@@ -1,68 +1,40 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:51686 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751128AbdJBNuZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Oct 2017 09:50:25 -0400
-Date: Mon, 2 Oct 2017 06:50:24 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Cathy Avery <cavery@redhat.com>,
-        Martin Steigerwald <martin@lichtvoll.de>,
-        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
-        Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: Re: [PATCH V7 5/6] block: support PREEMPT_ONLY
-Message-ID: <20171002135024.GE19119@infradead.org>
-References: <20170930061214.10622-1-ming.lei@redhat.com>
- <20170930061214.10622-6-ming.lei@redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH BUGFIX/IMPROVEMENT 0/4] block, bfq: series of fixes of
+ bugs affecting service guarantees
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ulf.hansson@linaro.org, broonie@kernel.org, lee.tibbert@gmail.com,
+ oleksandr@natalenko.name, mirkomontanari91@gmail.com,
+ angeloruocco90@gmail.com, mauro.andreolini@unimore.it
+References: <20170921090403.3217-1-paolo.valente@linaro.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <f5649ee2-a807-6a9e-fb16-d9e14c40ab6f@kernel.dk>
+Date: Tue, 3 Oct 2017 08:41:10 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170930061214.10622-6-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20170921090403.3217-1-paolo.valente@linaro.org>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-> +void blk_set_preempt_only(struct request_queue *q, bool preempt_only)
-> +{
-> +	blk_mq_freeze_queue(q);
-> +	if (preempt_only)
-> +		queue_flag_set_unlocked(QUEUE_FLAG_PREEMPT_ONLY, q);
-> +	else
-> +		queue_flag_clear_unlocked(QUEUE_FLAG_PREEMPT_ONLY, q);
-> +	blk_mq_unfreeze_queue(q);
-> +}
-> +EXPORT_SYMBOL(blk_set_preempt_only);
+On 09/21/2017 03:03 AM, Paolo Valente wrote:
+> Hi,
+> the first patch in this series fixes a bug that causes bfq to fail to
+> guarantee a high responsiveness on some drives, if there is heavy
+> random read+write I/O in the background. More precisely, such a
+> failure allowed this bug to be found [1], but the bug may well cause
+> other yet unreported anomalies.
+> 
+> This fix uncovered other bugs that were concealed by the fixed bug,
+> for rather subtle reasons. These further bugs caused similar
+> responsiveness failures, but with sequential reaad+write workloads in
+> the background. The remaining three patches fix these further bugs.
+> 
+> The sum of these fixes makes responsiveness much stabler with BFQ. In
+> the presence of write hogs, it is however still impossible for an I/O
+> scheduler to guarantee perfect responsiveness in any circustance,
+> because of throttling issues in the virtual-memory management
+> subsystem, and in other higher-level components.
 
-What do you need the queue freeze for?
+Added for 4.15, thanks.
 
-> +		/*
-> +		 * preempt_only flag has to be set after queue is frozen,
-> +		 * so it can be checked here lockless and safely
-> +		 */
-> +		if (blk_queue_preempt_only(q)) {
-
-We can always check a single bit flag safely, so I really don't
-understand that comment.
-
-> +			if (!(flags & BLK_REQ_PREEMPT))
-> +				goto slow_path;
-> +		}
-> +
->  		if (percpu_ref_tryget_live(&q->q_usage_counter))
->  			return 0;
-> -
-> + slow_path:
-
-Also this looks a very spaghetti, why not:
-
-
-	if (!blk_queue_preempt_only(q) || (flags & BLK_MQ_REQ_PREEMPT)) {
-		if (percpu_ref_tryget_live(&q->q_usage_counter))
-			return 0;
-	}
+-- 
+Jens Axboe
