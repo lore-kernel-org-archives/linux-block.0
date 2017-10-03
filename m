@@ -1,184 +1,35 @@
-Return-Path: <prvs=45557a1c1=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-crypto@vger.kernel.org,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v2 1/8] lib/scatterlist: Introduce sgl_alloc() and sgl_free()
-Date: Mon, 16 Oct 2017 15:49:33 -0700
-Message-Id: <20171016224940.1332-2-bart.vanassche@wdc.com>
-In-Reply-To: <20171016224940.1332-1-bart.vanassche@wdc.com>
-References: <20171016224940.1332-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:59015 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751195AbdJCJQh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2017 05:16:37 -0400
+Date: Tue, 3 Oct 2017 02:16:34 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>
+Subject: Re: [PATCH V5 4/8] block: move actual bio merge code into __elv_merge
+Message-ID: <20171003091634.GB2771@infradead.org>
+References: <20170930112655.31451-1-ming.lei@redhat.com>
+ <20170930112655.31451-5-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170930112655.31451-5-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Many kernel drivers contain code that allocates and frees both a
-scatterlist and the pages that populate that scatterlist.
-Introduce functions in lib/scatterlist.c that perform these tasks
-instead of duplicating this functionality in multiple drivers.
-Only include these functions in the build if CONFIG_SGL_ALLOC=y
-to avoid that the kernel size increases if this functionality is
-not used.
+On Sat, Sep 30, 2017 at 07:26:51PM +0800, Ming Lei wrote:
+> So that we can reuse __elv_merge() to merge bio
+> into requests from sw queue in the following patches.
+> 
+> No functional change.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
----
- include/linux/scatterlist.h |  10 +++++
- lib/Kconfig                 |   4 ++
- lib/scatterlist.c           | 105 ++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 119 insertions(+)
-
-diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
-index 4b3286ac60c8..3642511918d5 100644
---- a/include/linux/scatterlist.h
-+++ b/include/linux/scatterlist.h
-@@ -266,6 +266,16 @@ int sg_alloc_table_from_pages(struct sg_table *sgt,
- 	unsigned long offset, unsigned long size,
- 	gfp_t gfp_mask);
- 
-+#ifdef CONFIG_SGL_ALLOC
-+struct scatterlist *sgl_alloc_order(unsigned long long length,
-+				    unsigned int order, bool chainable,
-+				    gfp_t gfp, unsigned int *nent_p);
-+struct scatterlist *sgl_alloc(unsigned long long length, gfp_t gfp,
-+			      unsigned int *nent_p);
-+void sgl_free_order(struct scatterlist *sgl, int order);
-+void sgl_free(struct scatterlist *sgl);
-+#endif /* CONFIG_SGL_ALLOC */
-+
- size_t sg_copy_buffer(struct scatterlist *sgl, unsigned int nents, void *buf,
- 		      size_t buflen, off_t skip, bool to_buffer);
- 
-diff --git a/lib/Kconfig b/lib/Kconfig
-index b1445b22a6de..8396c4cfa1ab 100644
---- a/lib/Kconfig
-+++ b/lib/Kconfig
-@@ -413,6 +413,10 @@ config HAS_DMA
- 	depends on !NO_DMA
- 	default y
- 
-+config SGL_ALLOC
-+	bool
-+	default n
-+
- config DMA_NOOP_OPS
- 	bool
- 	depends on HAS_DMA && (!64BIT || ARCH_DMA_ADDR_T_64BIT)
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index be7b4dd6b68d..e2b5a78ceb44 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -433,6 +433,111 @@ int sg_alloc_table_from_pages(struct sg_table *sgt,
- }
- EXPORT_SYMBOL(sg_alloc_table_from_pages);
- 
-+#ifdef CONFIG_SGL_ALLOC
-+
-+/**
-+ * sgl_alloc_order - allocate a scatterlist and its pages
-+ * @length: Length in bytes of the scatterlist. Must be at least one
-+ * @order: Second argument for alloc_pages()
-+ * @chainable: Whether or not to allocate an extra element in the scatterlist
-+ *	for scatterlist chaining purposes
-+ * @gfp: Memory allocation flags
-+ * @nent_p: [out] Number of entries in the scatterlist that have pages
-+ *
-+ * Returns: A pointer to an initialized scatterlist or %NULL upon failure.
-+ */
-+struct scatterlist *sgl_alloc_order(unsigned long long length,
-+				    unsigned int order, bool chainable,
-+				    gfp_t gfp, unsigned int *nent_p)
-+{
-+	struct scatterlist *sgl, *sg;
-+	struct page *page;
-+	unsigned int nent, nalloc;
-+	u32 elem_len;
-+
-+	nent = round_up(length, PAGE_SIZE << order) >> (PAGE_SHIFT + order);
-+	/* Check for integer overflow */
-+	if (length > (nent << (PAGE_SHIFT + order)))
-+		return NULL;
-+	nalloc = nent;
-+	if (chainable) {
-+		/* Check for integer overflow */
-+		if (nalloc + 1 < nalloc)
-+			return NULL;
-+		nalloc++;
-+	}
-+	sgl = kmalloc_array(nalloc, sizeof(struct scatterlist),
-+			    (gfp & ~GFP_DMA) | __GFP_ZERO);
-+	if (!sgl)
-+		return NULL;
-+
-+	sg_init_table(sgl, nent);
-+	sg = sgl;
-+	while (length) {
-+		elem_len = min_t(u64, length, PAGE_SIZE << order);
-+		page = alloc_pages(gfp, order);
-+		if (!page) {
-+			sgl_free(sgl);
-+			return NULL;
-+		}
-+
-+		sg_set_page(sg, page, elem_len, 0);
-+		length -= elem_len;
-+		sg = sg_next(sg);
-+	}
-+	WARN_ON_ONCE(sg);
-+	if (nent_p)
-+		*nent_p = nent;
-+	return sgl;
-+}
-+EXPORT_SYMBOL(sgl_alloc_order);
-+
-+/**
-+ * sgl_alloc - allocate a scatterlist and its pages
-+ * @length: Length in bytes of the scatterlist
-+ * @gfp: Memory allocation flags
-+ * @nent_p: [out] Number of entries in the scatterlist
-+ *
-+ * Returns: A pointer to an initialized scatterlist or %NULL upon failure.
-+ */
-+struct scatterlist *sgl_alloc(unsigned long long length, gfp_t gfp,
-+			      unsigned int *nent_p)
-+{
-+	return sgl_alloc_order(length, 0, false, gfp, nent_p);
-+}
-+EXPORT_SYMBOL(sgl_alloc);
-+
-+/**
-+ * sgl_free_order - free a scatterlist and its pages
-+ * @sgl: Scatterlist with one or more elements
-+ * @order: Second argument for __free_pages()
-+ */
-+void sgl_free_order(struct scatterlist *sgl, int order)
-+{
-+	struct scatterlist *sg;
-+	struct page *page;
-+
-+	for (sg = sgl; sg; sg = sg_next(sg)) {
-+		page = sg_page(sg);
-+		if (page)
-+			__free_pages(page, order);
-+	}
-+	kfree(sgl);
-+}
-+EXPORT_SYMBOL(sgl_free_order);
-+
-+/**
-+ * sgl_free - free a scatterlist and its pages
-+ * @sgl: Scatterlist with one or more elements
-+ */
-+void sgl_free(struct scatterlist *sgl)
-+{
-+	sgl_free_order(sgl, 0);
-+}
-+EXPORT_SYMBOL(sgl_free);
-+
-+#endif /* CONFIG_SGL_ALLOC */
-+
- void __sg_page_iter_start(struct sg_page_iter *piter,
- 			  struct scatterlist *sglist, unsigned int nents,
- 			  unsigned long pgoffset)
--- 
-2.14.2
+There are very few callers of elv_merge, just update the function
+with the new parameters instead of introducing __elv_merge.
