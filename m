@@ -1,132 +1,156 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:55886 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932294AbdJ3Vq5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Oct 2017 17:46:57 -0400
-Received: by mail-pf0-f193.google.com with SMTP id 17so12058484pfn.12
-        for <linux-block@vger.kernel.org>; Mon, 30 Oct 2017 14:46:57 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Elena Reshetova <elena.reshetova@intel.com>
-Subject: [PATCH 2/5] bcache: convert cached_dev.count from atomic_t to refcount_t
-Date: Mon, 30 Oct 2017 14:46:32 -0700
-Message-Id: <20171030214635.29888-3-mlyle@lyle.org>
-In-Reply-To: <20171030214635.29888-1-mlyle@lyle.org>
-References: <20171030214635.29888-1-mlyle@lyle.org>
+Received: from mx1.redhat.com ([209.132.183.28]:43718 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751888AbdJCOFE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Oct 2017 10:05:04 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Cathy Avery <cavery@redhat.com>,
+        Martin Steigerwald <martin@lichtvoll.de>,
+        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V8 4/8] block: pass 'op' to blk_queue_enter()
+Date: Tue,  3 Oct 2017 22:04:02 +0800
+Message-Id: <20171003140406.26060-5-ming.lei@redhat.com>
+In-Reply-To: <20171003140406.26060-1-ming.lei@redhat.com>
+References: <20171003140406.26060-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Elena Reshetova <elena.reshetova@intel.com>
+We need to check if the request to be allocated is PREEMPT_ONLY,
+and have to pass REQ_PREEEMPT flag to blk_queue_eneter(), so pass
+'op' to blk_queue_enter() directly.
 
-atomic_t variables are currently used to implement reference
-counters with the following properties:
- - counter is initialized to 1 using atomic_set()
- - a resource is freed upon counter reaching zero
- - once counter reaches zero, its further
-   increments aren't allowed
- - counter schema uses basic atomic operations
-   (set, inc, inc_not_zero, dec_and_test, etc.)
-
-Such atomic variables should be converted to a newly provided
-refcount_t type and API that prevents accidental counter overflows
-and underflows. This is important since overflows and underflows
-can lead to use-after-free situation and be exploitable.
-
-The variable cached_dev.count is used as pure reference counter.
-Convert it to refcount_t and fix up the operations.
-
-Suggested-by: Kees Cook <keescook@chromium.org>
-Reviewed-by: David Windsor <dwindsor@gmail.com>
-Reviewed-by: Hans Liljestrand <ishkamiel@gmail.com>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
-Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>
+Suggested-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/bcache/bcache.h    | 7 ++++---
- drivers/md/bcache/super.c     | 6 +++---
- drivers/md/bcache/writeback.h | 2 +-
- 3 files changed, 8 insertions(+), 7 deletions(-)
+ block/blk-core.c       | 11 ++++++-----
+ block/blk-mq.c         |  3 ++-
+ block/blk-timeout.c    |  2 +-
+ fs/block_dev.c         |  4 ++--
+ include/linux/blkdev.h |  2 +-
+ 5 files changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index d77c4829c497..363ea6256b39 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -184,6 +184,7 @@
- #include <linux/mutex.h>
- #include <linux/rbtree.h>
- #include <linux/rwsem.h>
-+#include <linux/refcount.h>
- #include <linux/types.h>
- #include <linux/workqueue.h>
- 
-@@ -296,7 +297,7 @@ struct cached_dev {
- 	struct semaphore	sb_write_mutex;
- 
- 	/* Refcount on the cache set. Always nonzero when we're caching. */
--	atomic_t		count;
-+	refcount_t		count;
- 	struct work_struct	detach;
- 
- 	/*
-@@ -805,13 +806,13 @@ do {									\
- 
- static inline void cached_dev_put(struct cached_dev *dc)
- {
--	if (atomic_dec_and_test(&dc->count))
-+	if (refcount_dec_and_test(&dc->count))
- 		schedule_work(&dc->detach);
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 900eaa8eefa6..1bb566245d37 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -766,7 +766,7 @@ struct request_queue *blk_alloc_queue(gfp_t gfp_mask)
  }
+ EXPORT_SYMBOL(blk_alloc_queue);
  
- static inline bool cached_dev_get(struct cached_dev *dc)
+-int blk_queue_enter(struct request_queue *q, bool nowait)
++int blk_queue_enter(struct request_queue *q, unsigned int op)
  {
--	if (!atomic_inc_not_zero(&dc->count))
-+	if (!refcount_inc_not_zero(&dc->count))
- 		return false;
+ 	while (true) {
+ 		int ret;
+@@ -774,7 +774,7 @@ int blk_queue_enter(struct request_queue *q, bool nowait)
+ 		if (percpu_ref_tryget_live(&q->q_usage_counter))
+ 			return 0;
  
- 	/* Paired with the mb in cached_dev_attach */
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 72c3b2929ef0..46134c45c6f6 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -902,7 +902,7 @@ static void cached_dev_detach_finish(struct work_struct *w)
- 	closure_init_stack(&cl);
+-		if (nowait)
++		if (op & REQ_NOWAIT)
+ 			return -EBUSY;
  
- 	BUG_ON(!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags));
--	BUG_ON(atomic_read(&dc->count));
-+	BUG_ON(refcount_read(&dc->count));
+ 		/*
+@@ -1408,8 +1408,8 @@ static struct request *blk_old_get_request(struct request_queue *q,
+ 	/* create ioc upfront */
+ 	create_io_context(gfp_mask, q->node);
  
- 	mutex_lock(&bch_register_lock);
+-	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM) ||
+-			(op & REQ_NOWAIT));
++	ret = blk_queue_enter(q, (gfp_mask & __GFP_DIRECT_RECLAIM) ? op :
++			op | REQ_NOWAIT);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 	spin_lock_irq(q->queue_lock);
+@@ -1436,6 +1436,7 @@ struct request *blk_get_request(struct request_queue *q, unsigned int op,
+ 		req = blk_mq_alloc_request(q, op,
+ 			(gfp_mask & __GFP_DIRECT_RECLAIM) ?
+ 				0 : BLK_MQ_REQ_NOWAIT);
++
+ 		if (!IS_ERR(req) && q->mq_ops->initialize_rq_fn)
+ 			q->mq_ops->initialize_rq_fn(req);
+ 	} else {
+@@ -2216,7 +2217,7 @@ blk_qc_t generic_make_request(struct bio *bio)
+ 	do {
+ 		struct request_queue *q = bio->bi_disk->queue;
  
-@@ -1029,7 +1029,7 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c)
- 	 * dc->c must be set before dc->count != 0 - paired with the mb in
- 	 * cached_dev_get()
- 	 */
--	atomic_set(&dc->count, 1);
-+	refcount_set(&dc->count, 1);
+-		if (likely(blk_queue_enter(q, bio->bi_opf & REQ_NOWAIT) == 0)) {
++		if (likely(blk_queue_enter(q, bio->bi_opf) == 0)) {
+ 			struct bio_list lower, same;
  
- 	/* Block writeback thread, but spawn it */
- 	down_write(&dc->writeback_lock);
-@@ -1041,7 +1041,7 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c)
- 	if (BDEV_STATE(&dc->sb) == BDEV_STATE_DIRTY) {
- 		bch_sectors_dirty_init(&dc->disk);
- 		atomic_set(&dc->has_dirty, 1);
--		atomic_inc(&dc->count);
-+		refcount_inc(&dc->count);
- 		bch_writeback_queue(dc);
- 	}
+ 			/* Create a fresh bio_list for all subordinate requests */
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 10c1f49f663d..bf89549074bb 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -384,7 +384,8 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ 	struct request *rq;
+ 	int ret;
  
-diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
-index 34bcf49d737b..7d25bff37a9b 100644
---- a/drivers/md/bcache/writeback.h
-+++ b/drivers/md/bcache/writeback.h
-@@ -91,7 +91,7 @@ static inline void bch_writeback_add(struct cached_dev *dc)
- {
- 	if (!atomic_read(&dc->has_dirty) &&
- 	    !atomic_xchg(&dc->has_dirty, 1)) {
--		atomic_inc(&dc->count);
-+		refcount_inc(&dc->count);
+-	ret = blk_queue_enter(q, flags & BLK_MQ_REQ_NOWAIT);
++	ret = blk_queue_enter(q, !(flags & BLK_MQ_REQ_NOWAIT) ? op :
++			op | REQ_NOWAIT);
+ 	if (ret)
+ 		return ERR_PTR(ret);
  
- 		if (BDEV_STATE(&dc->sb) != BDEV_STATE_DIRTY) {
- 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_DIRTY);
+diff --git a/block/blk-timeout.c b/block/blk-timeout.c
+index 17ec83bb0900..071c6de9154d 100644
+--- a/block/blk-timeout.c
++++ b/block/blk-timeout.c
+@@ -134,7 +134,7 @@ void blk_timeout_work(struct work_struct *work)
+ 	struct request *rq, *tmp;
+ 	int next_set = 0;
+ 
+-	if (blk_queue_enter(q, true))
++	if (blk_queue_enter(q, REQ_NOWAIT))
+ 		return;
+ 	spin_lock_irqsave(q->queue_lock, flags);
+ 
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 93d088ffc05c..98cf2d7ee9d3 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -674,7 +674,7 @@ int bdev_read_page(struct block_device *bdev, sector_t sector,
+ 	if (!ops->rw_page || bdev_get_integrity(bdev))
+ 		return result;
+ 
+-	result = blk_queue_enter(bdev->bd_queue, false);
++	result = blk_queue_enter(bdev->bd_queue, 0);
+ 	if (result)
+ 		return result;
+ 	result = ops->rw_page(bdev, sector + get_start_sect(bdev), page, false);
+@@ -710,7 +710,7 @@ int bdev_write_page(struct block_device *bdev, sector_t sector,
+ 
+ 	if (!ops->rw_page || bdev_get_integrity(bdev))
+ 		return -EOPNOTSUPP;
+-	result = blk_queue_enter(bdev->bd_queue, false);
++	result = blk_queue_enter(bdev->bd_queue, 0);
+ 	if (result)
+ 		return result;
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index ab6b6c0392c2..4c688385d866 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -960,7 +960,7 @@ extern int scsi_cmd_ioctl(struct request_queue *, struct gendisk *, fmode_t,
+ extern int sg_scsi_ioctl(struct request_queue *, struct gendisk *, fmode_t,
+ 			 struct scsi_ioctl_command __user *);
+ 
+-extern int blk_queue_enter(struct request_queue *q, bool nowait);
++extern int blk_queue_enter(struct request_queue *q, unsigned int op);
+ extern void blk_queue_exit(struct request_queue *q);
+ extern void blk_start_queue(struct request_queue *q);
+ extern void blk_start_queue_async(struct request_queue *q);
 -- 
-2.11.0
+2.9.5
