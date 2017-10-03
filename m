@@ -1,40 +1,47 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44831 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750951AbdJDGRQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 4 Oct 2017 02:17:16 -0400
-Subject: Re: [PATCH 3/9] libfc: don't assign resid_len in fc_lport_bsg_request
-To: Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org
+Received: from bombadil.infradead.org ([65.50.211.133]:42881 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751277AbdJCKs4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2017 06:48:56 -0400
+From: Christoph Hellwig <hch@lst.de>
+To: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
 Cc: Johannes Thumshirn <jthumshirn@suse.de>,
         Benjamin Block <bblock@linux.vnet.ibm.com>
+Subject: [PATCH 3/9] libfc: don't assign resid_len in fc_lport_bsg_request
+Date: Tue,  3 Oct 2017 12:48:39 +0200
+Message-Id: <20171003104845.10417-4-hch@lst.de>
+In-Reply-To: <20171003104845.10417-1-hch@lst.de>
 References: <20171003104845.10417-1-hch@lst.de>
- <20171003104845.10417-4-hch@lst.de>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <341172a3-1444-b368-9f5c-1c94b8f413f0@suse.de>
-Date: Wed, 4 Oct 2017 08:17:14 +0200
-MIME-Version: 1.0
-In-Reply-To: <20171003104845.10417-4-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 10/03/2017 12:48 PM, Christoph Hellwig wrote:
-> bsg_job_done takes care of updating the scsi_request structure fields.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/scsi/libfc/fc_lport.c | 3 ---
->  1 file changed, 3 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+bsg_job_done takes care of updating the scsi_request structure fields.
 
-Cheers,
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/scsi/libfc/fc_lport.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-Hannes
+diff --git a/drivers/scsi/libfc/fc_lport.c b/drivers/scsi/libfc/fc_lport.c
+index 2fd0ec651170..5da46052e179 100644
+--- a/drivers/scsi/libfc/fc_lport.c
++++ b/drivers/scsi/libfc/fc_lport.c
+@@ -2083,7 +2083,6 @@ int fc_lport_bsg_request(struct bsg_job *job)
+ {
+ 	struct fc_bsg_request *bsg_request = job->request;
+ 	struct fc_bsg_reply *bsg_reply = job->reply;
+-	struct request *rsp = job->req->next_rq;
+ 	struct Scsi_Host *shost = fc_bsg_to_shost(job);
+ 	struct fc_lport *lport = shost_priv(shost);
+ 	struct fc_rport *rport;
+@@ -2092,8 +2091,6 @@ int fc_lport_bsg_request(struct bsg_job *job)
+ 	u32 did, tov;
+ 
+ 	bsg_reply->reply_payload_rcv_len = 0;
+-	if (rsp)
+-		scsi_req(rsp)->resid_len = job->reply_payload.payload_len;
+ 
+ 	mutex_lock(&lport->lp_mutex);
+ 
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.14.1
