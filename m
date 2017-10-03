@@ -1,109 +1,117 @@
-Return-Path: <prvs=44825b072=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	=Oleksandr Natalenko <oleksandr@natalenko.name>,
-	"Luis R . Rodriguez" <mcgrof@kernel.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v7 0/9] Hello Jens,
-Date: Mon,  9 Oct 2017 16:13:51 -0700
-Message-Id: <20171009231400.562-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f48.google.com ([74.125.82.48]:50781 "EHLO
+        mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750720AbdJCGmj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2017 02:42:39 -0400
+Received: by mail-wm0-f48.google.com with SMTP id u138so14410036wmu.5
+        for <linux-block@vger.kernel.org>; Mon, 02 Oct 2017 23:42:38 -0700 (PDT)
+From: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
+Message-Id: <79741F33-8191-4121-96BE-51385BCD1F3D@lightnvm.io>
+Content-Type: multipart/signed;
+ boundary="Apple-Mail=_EC0A209F-5285-4DED-9F4C-41E7F07B20AD";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH 5/6] lightnvm: pblk: free up mempool allocation for erases
+ correctly
+Date: Tue, 3 Oct 2017 08:42:34 +0200
+In-Reply-To: <20171002171842.GA6008@hercules.tuxera.com>
+Cc: =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Rakesh Pandit <rakesh@tuxera.com>
+References: <20171001132555.GA5763@hercules.tuxera.com>
+ <5E8B439C-5971-49DF-BDC4-3B53268F8FF4@lightnvm.io>
+ <20171002122510.GA3946@hercules.tuxera.com>
+ <20171002171842.GA6008@hercules.tuxera.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-It is known that during the resume following a hibernate, especially when
-using an md RAID1 array created on top of SCSI devices, sometimes the
-system hangs instead of coming up properly. This patch series fixes this
-problem. This patch series is an alternative for Ming Lei's "block/scsi:
-safe SCSI quiescing" patch series. The advantage of this patch series is
-that a fix for the md driver has been included.
 
-These patches have been tested on top of the block layer for-next branch.
+--Apple-Mail=_EC0A209F-5285-4DED-9F4C-41E7F07B20AD
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-Please consider these changes for kernel v4.15.
+> On 2 Oct 2017, at 19.18, Rakesh Pandit <rakesh@tuxera.com> wrote:
+>=20
+> On Mon, Oct 02, 2017 at 03:25:10PM +0300, Rakesh Pandit wrote:
+>> On Mon, Oct 02, 2017 at 02:09:35PM +0200, Javier Gonz=C3=A1lez wrote:
+>>>> On 1 Oct 2017, at 15.25, Rakesh Pandit <rakesh@tuxera.com> wrote:
+>>>>=20
+>>>> While separating read and erase mempools in 22da65a1b =
+pblk_g_rq_cache
+>>>> was used two times to set aside memory both for erase and read
+>>>> requests.  Because same kmem cache is used repeatedly a single call =
+to
+>>>> kmem_cache_destroy wouldn't deallocate everything.  Repeatedly =
+doing
+>>>> loading and unloading of pblk modules would eventually result in =
+some
+>>>> leak.
+>>>>=20
+>>>> The fix is to really use separate kmem cache and track it
+>>>> appropriately.
+>>>>=20
+>>>> Fixes: 22da65a1b ("lightnvm: pblk: decouple read/erase mempools")
+>>>> Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+>>>=20
+>>> I'm not sure I follow this logic. I assume that you're thinking of =
+the
+>>> refcount on kmem_cache. During cache creation, all is good; if a
+>>> different cache creation fails, destruction is guaranteed, since the
+>>> refcount is 0. On tear down (pblk_core_free), we destroy the =
+mempools
+>>> associated to the caches. In this case, the refcount goes to 0 too, =
+as
+>>> we destroy the 2 mempools. So I don't see where the leak can happen. =
+Am
+>>> I missing something?
+>>>=20
+>>> In any case, Jens reported some bugs on the mempools, where we did =
+not
+>>> guarantee forward progress. Here you can find the original =
+discussion
+>>> and the mempool audit [1]. Would be good if you reviewed these.
+>>>=20
+>>> [1] https://www.spinics.net/lists/kernel/msg2602274.html
+>>=20
+>> Thanks, yes makes sense to follow up in patch thread.  I will respond
+>> to above questions there later today.
+>=20
+> I wasn't thinking it right in addition to looking at test results from
+> a incorrectly instrumented debugged version.
+>=20
+> I went through the series you pointed and all seem okay to me now.
+>=20
+> Please drop this patch.
+>=20
 
-Thanks,
+Cool.
 
-Bart.
+Javier
 
-Changes between v6 and v7:
-- Added support for the PREEMPT_ONLY flag in blk-mq-debugfs.c.
-- Fixed kerneldoc header of blk_queue_enter().
-- Added a rcu_read_lock_sched() / rcu_read_unlock_sched() pair in
-  blk_set_preempt_only().
-- Removed a synchronize_rcu() call from scsi_device_quiesce().
-- Modified the description of patch 9/9 in this series.
-- Removed scsi_run_queue() call from scsi_device_resume().
+--Apple-Mail=_EC0A209F-5285-4DED-9F4C-41E7F07B20AD
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
 
-Changes between v5 and v6:
-- Split an md patch into two patches to make it easier to review the changes.
-- For the md patch that suspends I/O while the system is frozen, switched back
-  to the freezer mechanism because this makes the code shorter and easier to
-  review.
-- Changed blk_set/clear_preempt_only() from EXPORT_SYMBOL() into
-  EXPORT_SYMBOL_GPL().
-- Made blk_set_preempt_only() behave as a test-and-set operation.
-- Introduced blk_get_request_flags() and BLK_MQ_REQ_PREEMPT as requested by
-  Christoph and reduced the number of arguments of blk_queue_enter() back from
-  three to two.
-- In scsi_device_quiesce(), moved the blk_mq_freeze_queue() call out of a
-  critical section. Made the explanation of why the synchronize_rcu() call
-  is necessary more detailed.
+-----BEGIN PGP SIGNATURE-----
 
-Changes between v4 and v5:
-- Split blk_set_preempt_only() into two functions as requested by Christoph.
-- Made blk_get_request() trigger WARN_ONCE() if it is attempted to allocate
-  a request while the system is frozen. This is a big help to identify drivers
-  that submit I/O while the system is frozen.
-- Since kernel thread freezing is on its way out, reworked the approach for
-  avoiding that the md driver submits I/O while the system is frozen such that
-  the approach no longer depends on the kernel thread freeze mechanism.
-- Fixed the (theoretical) deadlock in scsi_device_quiesce() that was identified
-  by Ming.
+iQIzBAEBCgAdFiEEm1mT7zen+vs9+T8kYx8FO3WZGMoFAlnTMVoACgkQYx8FO3WZ
+GMqNhQ/+Pqz0NjY/3TrhfNsS56sMMyr+VqCW7kRk5zKITArDCb2g7XnXhGpMq30L
+9nk+jAEz0CmxFoIJSWVYUe9P65YgMkIklAnEI3KrCsbiGseUvQUieYoUtnF35EB5
+frBnokRrJvXiVpCRq/CGXxVKUaGK5MRr+p7ia+0q/MADMWCVHW6UcFca1dTwGVqq
+K/3ZzWuFSPDKllc7W7pHm1rFjhdIB29qiFSoAcJC4rECxdkr0zht0Wvx3Fa701qZ
+hMDxy0utxMokEOkKUyOIU9j70Eagin2TUT26SOVcuFJzYJp2FG8Job5RecSHTuxL
+G2NDjV7vzoDw3rEuTICUe9YaST/fksI4KOEWQHxxDXCuzXg4mKlQcf0j95zL/e8m
+2I06XSle6GbscbbXqQITIq0LKiv/23TPPrXdHUgP0ffNc7/N+EIP5ivs6fJYe20e
+R4O+/ePKdbF7bs5A5kvkqh7TO+anvyCJHd7bN717oAkbEZ9IbddOt135jwou4Cs/
+zOeRVvQCJcuikp7xLLjU2rmLhjp9dWqp0LGXbsfL2ZVvqsHNN/H2PvhUZXDsLn1s
+rhvjIfkHgK5iIopZaSoRe0rmUYIBRuQ1CW1fShg551o3fbwWpwmXMsGkaUG4N7f0
+sfaGTklkqLbHhjUDoXDGIM8SudMhldAm148qz70tsXXSR1IVmlc=
+=9lIa
+-----END PGP SIGNATURE-----
 
-Changes between v3 and v4:
-- Made sure that this patch series not only works for scsi-mq but also for
-  the legacy SCSI stack.
-- Removed an smp_rmb()/smp_wmb() pair from the hot path and added a comment
-  that explains why that is safe.
-- Reordered the patches in this patch series.
-
-Changes between v2 and v3:
-- Made md kernel threads freezable.
-- Changed the approach for quiescing SCSI devices again.
-- Addressed Ming's review comments.
-
-Changes compared to v1 of this patch series:
-- Changed the approach and rewrote the patch series.
-
-Bart Van Assche (8):
-  md: Rename md_notifier into md_reboot_notifier
-  md: Introduce md_stop_all_writes()
-  md: Neither resync nor reshape while the system is frozen
-  block: Introduce blk_get_request_flags()
-  block: Introduce BLK_MQ_REQ_PREEMPT
-  ide, scsi: Tell the block layer at request allocation time about
-    preempt requests
-  block: Add the QUEUE_FLAG_PREEMPT_ONLY request queue flag
-  block, scsi: Make SCSI quiesce and resume work reliably
-
-Ming Lei (1):
-  block: Make q_usage_counter also track legacy requests
-
- block/blk-core.c        | 132 ++++++++++++++++++++++++++++++++++++++++--------
- block/blk-mq-debugfs.c  |   1 +
- block/blk-mq.c          |  16 +++---
- block/blk-timeout.c     |   2 +-
- drivers/ide/ide-pm.c    |   4 +-
- drivers/md/md.c         |  45 ++++++++++++++---
- drivers/scsi/scsi_lib.c |  34 ++++++++-----
- fs/block_dev.c          |   4 +-
- include/linux/blk-mq.h  |   1 +
- include/linux/blkdev.h  |  11 +++-
- 10 files changed, 195 insertions(+), 55 deletions(-)
-
--- 
-2.14.2
+--Apple-Mail=_EC0A209F-5285-4DED-9F4C-41E7F07B20AD--
