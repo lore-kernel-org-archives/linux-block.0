@@ -1,45 +1,43 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Tue, 3 Oct 2017 22:49:40 +0200
-From: "Luis R. Rodriguez" <mcgrof@kernel.org>
-To: Pavel Machek <pavel@ucw.cz>
-Cc: "Luis R. Rodriguez" <mcgrof@kernel.org>, viro@zeniv.linux.org.uk,
-        bart.vanassche@wdc.com, ming.lei@redhat.com, tytso@mit.edu,
-        darrick.wong@oracle.com, jikos@kernel.org, rjw@rjwysocki.net,
-        len.brown@intel.com, linux-fsdevel@vger.kernel.org,
-        boris.ostrovsky@oracle.com, jgross@suse.com,
-        todd.e.brandt@linux.intel.com, nborisov@suse.com, jack@suse.cz,
-        martin.petersen@oracle.com, ONeukum@suse.com,
-        oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
-        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC 5/5] pm: remove kernel thread freezing
-Message-ID: <20171003204940.GA5659@wotan.suse.de>
-References: <20171003185313.1017-1-mcgrof@kernel.org>
- <20171003185313.1017-6-mcgrof@kernel.org>
- <20171003201204.GA23521@amd>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171003201204.GA23521@amd>
+In-Reply-To: <nycvar.YFH.7.76.1710032230450.17517@jbgna.fhfr.qr>
+References: <20171003185313.1017-1-mcgrof@kernel.org> <20171003185313.1017-6-mcgrof@kernel.org>
+ <20171003201204.GA23521@amd> <nycvar.YFH.7.76.1710032213430.17517@jbgna.fhfr.qr>
+ <20171003202121.GB23521@amd> <nycvar.YFH.7.76.1710032230450.17517@jbgna.fhfr.qr>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Tue, 3 Oct 2017 22:41:02 +0200
+Message-ID: <CAJZ5v0gSqZAKXHD0DBCv2967LddgNtpC5NTs6UvO8C=q5p2VKw@mail.gmail.com>
+Subject: Re: [RFC 5/5] pm: remove kernel thread freezing
+To: Jiri Kosina <jikos@kernel.org>
+Cc: Pavel Machek <pavel@ucw.cz>,
+        "Luis R. Rodriguez" <mcgrof@kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>, bart.vanassche@wdc.com,
+        ming.lei@redhat.com, "Ted Ts'o" <tytso@mit.edu>,
+        darrick.wong@oracle.com, "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <len.brown@intel.com>, linux-fsdevel@vger.kernel.org,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>,
+        Todd Brandt <todd.e.brandt@linux.intel.com>, nborisov@suse.com,
+        Jan Kara <jack@suse.cz>, martin.petersen@oracle.com,
+        Oliver Neukum <ONeukum@suse.com>, oleksandr@natalenko.name,
+        oleg.b.antonyan@gmail.com, Linux PM <linux-pm@vger.kernel.org>,
+        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Oct 03, 2017 at 10:12:04PM +0200, Pavel Machek wrote:
-> On Tue 2017-10-03 11:53:13, Luis R. Rodriguez wrote:
-> > Now that all filesystems which used to rely on kthread
-> > freezing have been converted to filesystem freeze/thawing
-> > we can remove the kernel kthread freezer.
-> 
-> Are you surely-sure? You mentioned other in kernel sources of writes;
-> what about those?
+On Tue, Oct 3, 2017 at 10:38 PM, Jiri Kosina <jikos@kernel.org> wrote:
+> On Tue, 3 Oct 2017, Pavel Machek wrote:
+>
+>> > This point I don't understand. What exactly do you mean?
+>>
+>> Hibernation:
+>>
+>> We freeze, do system snapshot, unfreeze, and write image to
+>> disk.
+>
+> Where/why do you unfreeze between creating the snapshot and writing it
+> out?
 
-You perhaps did not read the cover letter, it describes this patch will very
-likely take time to *ever* apply. We must cover tons of grounds first, to
-address precisely what you say.
-
-In fact other than kthreads that generate IO we may have now even crazy stupid
-kthreads using the freezer API which *do not generate IO* which are totally
-bogus but now acts as "features". We'll need to carefully carve out all freezer 
-API uses on all kthreads. This should be done atomically to avoid regressions
-and ensure bisectability.
-
-  Luis
+We do not unfreeze then.
