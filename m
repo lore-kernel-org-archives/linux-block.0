@@ -1,58 +1,29 @@
-Return-Path: <SRS0=lAXC=BD=fb.com=shli@kernel.org>
-From: Shaohua Li <shli@kernel.org>
-To: linux-block@vger.kernel.org
-Cc: ming.lei@redhat.com,
-	axboe@kernel.dk,
-	Shaohua Li <shli@fb.com>
-Subject: [PATCH V3 1/3] block/loop: don't hijack error number
-Date: Wed,  4 Oct 2017 07:52:43 -0700
-Message-Id: <d3e3e3bc5992554fe8476eabc9a06b1c9e844e5e.1507072136.git.shli@fb.com>
-In-Reply-To: <cover.1507072136.git.shli@fb.com>
-References: <cover.1507072136.git.shli@fb.com>
-In-Reply-To: <cover.1507072136.git.shli@fb.com>
-References: <cover.1507072136.git.shli@fb.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-ua0-f181.google.com ([209.85.217.181]:49122 "EHLO
+        mail-ua0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751132AbdJCPAz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2017 11:00:55 -0400
+Received: by mail-ua0-f181.google.com with SMTP id v12so5369407uaf.5
+        for <linux-block@vger.kernel.org>; Tue, 03 Oct 2017 08:00:55 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <6DF6EE74-01FC-4C86-98E1-E437A41D3CB7@lightnvm.io>
+References: <1507038524-24587-1-git-send-email-hans.ml.holmberg@owltronix.com>
+ <5f64209d-ba28-a642-ed44-66a5eced9a99@virtuozzo.com> <9AF41216-3CB7-4AFA-B461-0957074AF0A5@lightnvm.io>
+ <2aa049d5-3c31-eabc-a995-499807837a19@virtuozzo.com> <A9B2CD92-C7CE-478F-B361-704D1EFE7532@lightnvm.io>
+ <6DF6EE74-01FC-4C86-98E1-E437A41D3CB7@lightnvm.io>
+From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
+Date: Tue, 3 Oct 2017 17:00:52 +0200
+Message-ID: <CANr-nt2L-4y0jj1xV2y8vg=JjbXXBvoLL=o_npqB9WHQDJm4uQ@mail.gmail.com>
+Subject: Re: [PATCH] lightnvm: pblk: use vfree_atomic when freeing line metadata
+To: =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>,
+        =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Shaohua Li <shli@fb.com>
-
-If the bio returns -EOPNOTSUPP, we shouldn't hijack it and return -EIO
-
-Signed-off-by: Shaohua Li <shli@fb.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/loop.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index bc8e615..6aa739f 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -460,7 +460,7 @@ static void lo_complete_rq(struct request *rq)
- 		zero_fill_bio(bio);
- 	}
- 
--	blk_mq_end_request(rq, cmd->ret < 0 ? BLK_STS_IOERR : BLK_STS_OK);
-+	blk_mq_end_request(rq, errno_to_blk_status(cmd->ret));
- }
- 
- static void lo_rw_aio_do_completion(struct loop_cmd *cmd)
-@@ -478,7 +478,7 @@ static void lo_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
- 
- 	if (cmd->css)
- 		css_put(cmd->css);
--	cmd->ret = ret;
-+	cmd->ret = ret > 0 ? 0 : ret;
- 	lo_rw_aio_do_completion(cmd);
- }
- 
-@@ -1719,7 +1719,7 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
-  failed:
- 	/* complete non-aio request */
- 	if (!cmd->use_aio || ret) {
--		cmd->ret = ret ? -EIO : 0;
-+		cmd->ret = ret;
- 		blk_mq_complete_request(cmd->rq);
- 	}
- }
--- 
-2.9.5
+Thanks for the review Andrey, i'll send a new patch removing the lock.
