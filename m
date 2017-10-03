@@ -1,73 +1,98 @@
-Return-Path: <prvs=4411c008b=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	=Oleksandr Natalenko <oleksandr@natalenko.name>,
-	"Luis R . Rodriguez" <mcgrof@kernel.org>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v5 6/8] scsi: Reduce suspend latency
-Date: Mon,  2 Oct 2017 15:52:16 -0700
-Message-Id: <20171002225218.18548-7-bart.vanassche@wdc.com>
-In-Reply-To: <20171002225218.18548-1-bart.vanassche@wdc.com>
-References: <20171002225218.18548-1-bart.vanassche@wdc.com>
+Return-Path: <prvs=4428b70f3=damien.lemoal@wdc.com>
+Subject: Re: [PATCH V6 13/14] block: mq-deadline: Limit write request dispatch
+ for zoned block devices
+To: Bart Van Assche <Bart.VanAssche@wdc.com>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+ "axboe@kernel.dk" <axboe@kernel.dk>
+Cc: "hch@lst.de" <hch@lst.de>
+References: <20171002071535.8007-1-damien.lemoal@wdc.com>
+ <20171002071535.8007-14-damien.lemoal@wdc.com>
+ <1506987846.3368.69.camel@wdc.com>
+ <c506126b-a491-30bc-11f1-cd1df29f78c3@wdc.com>
+ <1507064168.2567.33.camel@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+Message-ID: <dd8953a0-b28c-3a0f-cc9c-2ce207cf4063@wdc.com>
+Date: Wed, 4 Oct 2017 08:03:34 +0900
+MIME-Version: 1.0
+In-Reply-To: <1507064168.2567.33.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Avoid that it can take 200 ms too long to wait for requests to
-finish. Note: blk_mq_freeze_queue() uses a wait queue to wait
-for ongoing requests to finish.
+Bart,
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/scsi/scsi_lib.c | 20 ++++++++++++--------
- 1 file changed, 12 insertions(+), 8 deletions(-)
+On 10/4/17 05:56, Bart Van Assche wrote:
+> On Tue, 2017-10-03 at 09:19 +0900, Damien Le Moal wrote:
+>> On 10/3/17 08:44, Bart Van Assche wrote:
+>>> On Mon, 2017-10-02 at 16:15 +0900, Damien Le Moal wrote:
+>>>>  static void deadline_wunlock_zone(struct deadline_data *dd,
+>>>>  				  struct request *rq)
+>>>>  {
+>>>> +	unsigned long flags;
+>>>> +
+>>>> +	spin_lock_irqsave(&dd->zone_lock, flags);
+>>>> +
+>>>>  	WARN_ON_ONCE(!test_and_clear_bit(blk_rq_zone_no(rq), dd->zones_wlock));
+>>>>  	deadline_clear_request_zone_wlock(rq);
+>>>> +
+>>>> +	spin_unlock_irqrestore(&dd->zone_lock, flags);
+>>>>  }
+>>>
+>>> Is a request removed from the sort and fifo lists before being dispatched? If so,
+>>> does that mean that obtaining zone_lock in the above function is not necessary?
+>>
+>> Yes, a request is removed from the sort tree and fifo list before
+>> dispatching. But the dd->zone_lock spinlock is not there to protect
+>> that, dd->lock protects the sort tree and fifo list. dd->zone_lock was
+>> added to prevent the completed_request() method from changing a zone
+>> lock state while deadline_fifo_requests() or deadline_next_request() are
+>> running. Ex:
+>>
+>> Imagine this case: write request A for a zone Z is being executed (it
+>> was dispatched) so Z is locked. Dispatch runs and inspects the next
+>> requests in sort order. Let say we have the sequential writes B, C, D, E
+>> queued for the same zone Z. First B is inspected and cannot be
+>> dispatched (zone locked). Inspection move on to C, but before the that,
+>> A completes and Z is unlocked. Then C will be OK to go as the zone is
+>> now unlocked. But it is the wrong choice as it will result in out of
+>> order write. B must be the next request dispatched after A.
+>>
+>> dd->zone_lock prevents this from happening. Without this spinlock, the
+>> bad example case above happens very easily.
+> 
+> Hello Damien,
+> 
+> Thanks for the detailed and really clear reply. I hope you do not mind that I
+> have a few further questions about this patch?
+> - Does the zone_lock spinlock have to be acquired by both deadline_wunlock_zone()
+>   callers or only by the call from the request completion path?
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 62f905b22821..e0bef5c9dd14 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2927,21 +2927,25 @@ static void scsi_wait_for_queuecommand(struct scsi_device *sdev)
- int
- scsi_device_quiesce(struct scsi_device *sdev)
- {
-+	struct request_queue *q = sdev->request_queue;
-+	bool freeze;
- 	int err;
- 
- 	mutex_lock(&sdev->state_mutex);
-+	/*
-+	 * Do not attempt to freeze the queue of an already quiesced device
-+	 * because that could result in a deadlock.
-+	 */
-+	freeze = sdev->sdev_state == SDEV_RUNNING;
-+	if (freeze)
-+		blk_mq_freeze_queue(q);
- 	err = scsi_device_set_state(sdev, SDEV_QUIESCE);
- 	mutex_unlock(&sdev->state_mutex);
- 
--	if (err)
--		return err;
-+	if (freeze)
-+		blk_mq_unfreeze_queue(q);
- 
--	scsi_run_queue(sdev->request_queue);
--	while (atomic_read(&sdev->device_busy)) {
--		msleep_interruptible(200);
--		scsi_run_queue(sdev->request_queue);
--	}
--	return 0;
-+	return err;
- }
- EXPORT_SYMBOL(scsi_device_quiesce);
- 
+Not really. Only the completion path is strongly needed as the insert
+path unlock is under dd->lock, which prevents concurrent execution of
+the sort or fifo request search. So the zone_lock lock/unlock could be
+moved out of deadline_wunlock_zone() and done directly in
+dd_completed_request().
+
+> - Why do both the mq-deadline and the sd driver each have their own instance of
+>   the zones_wlock bitmap? Has it been considered to convert both bitmaps into a
+>   single bitmap that is shared by both kernel components and that exists e.g. at
+>   the request queue level?
+
+The sd driver level zone locking handles only the legacy path. Hence the
+zone lock bitmap attached to the scsi disk struct. For scsi-mq/blk-mq,
+mq-deadline does the zone locking. Both bitmaps do not exist at the same
+time.
+
+Indeed we could move the zone lock bitmap in the request queue so that
+it is common between legacy and mq cases. Christoph has a series doing
+that, and going further by doing the zone locking directly within the
+block layer dispatch code for both legacy and mq path. So the scsi level
+locking and mq-deadline locking become unnecessary. Working on that new
+series right now.
+
+Best regards.
+
 -- 
-2.14.1
+Damien Le Moal,
+Western Digital
