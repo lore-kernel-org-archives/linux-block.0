@@ -1,87 +1,132 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:56177 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751235AbdJKJxO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Oct 2017 05:53:14 -0400
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [PATCH v2 1/3] block: introduce blk_mq_tagset_iter
-Date: Wed, 11 Oct 2017 12:53:06 +0300
-Message-Id: <1507715588-1041-2-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1507715588-1041-1-git-send-email-sagi@grimberg.me>
-References: <1507715588-1041-1-git-send-email-sagi@grimberg.me>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+69bb01a06caa5cf26dd3+5154+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>,
+	linux-block@vger.kernel.org
+Subject: [PATCH 1/2] block: move __elv_next_request to blk-core.c
+Date: Tue,  3 Oct 2017 10:47:00 +0200
+Message-Id: <20171003084701.19346-2-hch@lst.de>
+In-Reply-To: <20171003084701.19346-1-hch@lst.de>
+References: <20171003084701.19346-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Iterator helper to apply a function on all the
-tags in a given tagset. export it as it will be used
-outside the block layer later on.
+No need to have this helper inline in a header.  Also drop the __ prefix.
 
-Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Max Gurtovoy <maxg@mellanox.com>
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq-tag.c     | 16 +++++++++++-----
- include/linux/blk-mq.h |  2 ++
- 2 files changed, 13 insertions(+), 5 deletions(-)
+ block/blk-core.c | 42 ++++++++++++++++++++++++++++++++++++++++--
+ block/blk.h      | 39 ---------------------------------------
+ 2 files changed, 40 insertions(+), 41 deletions(-)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 6714507aa6c7..bce1c76fc768 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -298,12 +298,12 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 048be4aa6024..14f7674fa0b1 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2517,6 +2517,45 @@ void blk_account_io_start(struct request *rq, bool new_io)
+ 	part_stat_unlock();
  }
- EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
  
--int blk_mq_reinit_tagset(struct blk_mq_tag_set *set,
--			 int (reinit_request)(void *, struct request *))
-+int blk_mq_tagset_iter(struct blk_mq_tag_set *set, void *data,
-+			 int (fn)(void *, struct request *))
- {
- 	int i, j, ret = 0;
- 
--	if (WARN_ON_ONCE(!reinit_request))
-+	if (WARN_ON_ONCE(!fn))
- 		goto out;
- 
- 	for (i = 0; i < set->nr_hw_queues; i++) {
-@@ -316,8 +316,7 @@ int blk_mq_reinit_tagset(struct blk_mq_tag_set *set,
- 			if (!tags->static_rqs[j])
- 				continue;
- 
--			ret = reinit_request(set->driver_data,
--					     tags->static_rqs[j]);
-+			ret = fn(data, tags->static_rqs[j]);
- 			if (ret)
- 				goto out;
- 		}
-@@ -326,6 +325,13 @@ int blk_mq_reinit_tagset(struct blk_mq_tag_set *set,
- out:
- 	return ret;
- }
-+EXPORT_SYMBOL_GPL(blk_mq_tagset_iter);
-+
-+int blk_mq_reinit_tagset(struct blk_mq_tag_set *set,
-+			 int (reinit_request)(void *, struct request *))
++static struct request *elv_next_request(struct request_queue *q)
 +{
-+	return blk_mq_tagset_iter(set, set->driver_data, reinit_request);
++	struct request *rq;
++	struct blk_flush_queue *fq = blk_get_flush_queue(q, NULL);
++
++	WARN_ON_ONCE(q->mq_ops);
++
++	while (1) {
++		if (!list_empty(&q->queue_head)) {
++			rq = list_entry_rq(q->queue_head.next);
++			return rq;
++		}
++
++		/*
++		 * Flush request is running and flush request isn't queueable
++		 * in the drive, we can hold the queue till flush request is
++		 * finished. Even we don't do this, driver can't dispatch next
++		 * requests and will requeue them. And this can improve
++		 * throughput too. For example, we have request flush1, write1,
++		 * flush 2. flush1 is dispatched, then queue is hold, write1
++		 * isn't inserted to queue. After flush1 is finished, flush2
++		 * will be dispatched. Since disk cache is already clean,
++		 * flush2 will be finished very soon, so looks like flush2 is
++		 * folded to flush1.
++		 * Since the queue is hold, a flag is set to indicate the queue
++		 * should be restarted later. Please see flush_end_io() for
++		 * details.
++		 */
++		if (fq->flush_pending_idx != fq->flush_running_idx &&
++				!queue_flush_queueable(q)) {
++			fq->flush_queue_delayed = 1;
++			return NULL;
++		}
++		if (unlikely(blk_queue_bypass(q)) ||
++		    !q->elevator->type->ops.sq.elevator_dispatch_fn(q, 0))
++			return NULL;
++	}
 +}
- EXPORT_SYMBOL_GPL(blk_mq_reinit_tagset);
++
+ /**
+  * blk_peek_request - peek at the top of a request queue
+  * @q: request queue to peek at
+@@ -2538,8 +2577,7 @@ struct request *blk_peek_request(struct request_queue *q)
+ 	lockdep_assert_held(q->queue_lock);
+ 	WARN_ON_ONCE(q->mq_ops);
  
- void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 50c6485cb04f..6bc29f73a9aa 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -259,6 +259,8 @@ void blk_freeze_queue_start(struct request_queue *q);
- void blk_mq_freeze_queue_wait(struct request_queue *q);
- int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
- 				     unsigned long timeout);
-+int blk_mq_tagset_iter(struct blk_mq_tag_set *set, void *data,
-+		int (reinit_request)(void *, struct request *));
- int blk_mq_reinit_tagset(struct blk_mq_tag_set *set,
- 			 int (reinit_request)(void *, struct request *));
+-	while ((rq = __elv_next_request(q)) != NULL) {
+-
++	while ((rq = elv_next_request(q)) != NULL) {
+ 		rq = blk_pm_peek_request(q, rq);
+ 		if (!rq)
+ 			break;
+diff --git a/block/blk.h b/block/blk.h
+index fcb9775b997d..fda5a4632aba 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -148,45 +148,6 @@ static inline void blk_clear_rq_complete(struct request *rq)
  
+ void blk_insert_flush(struct request *rq);
+ 
+-static inline struct request *__elv_next_request(struct request_queue *q)
+-{
+-	struct request *rq;
+-	struct blk_flush_queue *fq = blk_get_flush_queue(q, NULL);
+-
+-	WARN_ON_ONCE(q->mq_ops);
+-
+-	while (1) {
+-		if (!list_empty(&q->queue_head)) {
+-			rq = list_entry_rq(q->queue_head.next);
+-			return rq;
+-		}
+-
+-		/*
+-		 * Flush request is running and flush request isn't queueable
+-		 * in the drive, we can hold the queue till flush request is
+-		 * finished. Even we don't do this, driver can't dispatch next
+-		 * requests and will requeue them. And this can improve
+-		 * throughput too. For example, we have request flush1, write1,
+-		 * flush 2. flush1 is dispatched, then queue is hold, write1
+-		 * isn't inserted to queue. After flush1 is finished, flush2
+-		 * will be dispatched. Since disk cache is already clean,
+-		 * flush2 will be finished very soon, so looks like flush2 is
+-		 * folded to flush1.
+-		 * Since the queue is hold, a flag is set to indicate the queue
+-		 * should be restarted later. Please see flush_end_io() for
+-		 * details.
+-		 */
+-		if (fq->flush_pending_idx != fq->flush_running_idx &&
+-				!queue_flush_queueable(q)) {
+-			fq->flush_queue_delayed = 1;
+-			return NULL;
+-		}
+-		if (unlikely(blk_queue_bypass(q)) ||
+-		    !q->elevator->type->ops.sq.elevator_dispatch_fn(q, 0))
+-			return NULL;
+-	}
+-}
+-
+ static inline void elv_activate_rq(struct request_queue *q, struct request *rq)
+ {
+ 	struct elevator_queue *e = q->elevator;
 -- 
-2.7.4
+2.14.1
