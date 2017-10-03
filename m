@@ -1,77 +1,54 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:47671 "EHLO
-        atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751208AbdJCU5m (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2017 16:57:42 -0400
-Date: Tue, 3 Oct 2017 22:57:40 +0200
-From: Pavel Machek <pavel@ucw.cz>
-To: Jiri Kosina <jikos@kernel.org>
-Cc: "Luis R. Rodriguez" <mcgrof@kernel.org>, viro@zeniv.linux.org.uk,
-        bart.vanassche@wdc.com, ming.lei@redhat.com, tytso@mit.edu,
-        darrick.wong@oracle.com, rjw@rjwysocki.net, len.brown@intel.com,
-        linux-fsdevel@vger.kernel.org, boris.ostrovsky@oracle.com,
-        jgross@suse.com, todd.e.brandt@linux.intel.com, nborisov@suse.com,
-        jack@suse.cz, martin.petersen@oracle.com, ONeukum@suse.com,
-        oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
-        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Tue, 3 Oct 2017 22:51:50 +0200 (CEST)
+From: Jiri Kosina <jikos@kernel.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+cc: "pavel@ucw.cz" <pavel@ucw.cz>,
+        "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "rjw@rjwysocki.net" <rjw@rjwysocki.net>,
+        "mcgrof@kernel.org" <mcgrof@kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "len.brown@intel.com" <len.brown@intel.com>,
+        "tytso@mit.edu" <tytso@mit.edu>,
+        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
+        "ONeukum@suse.com" <ONeukum@suse.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "nborisov@suse.com" <nborisov@suse.com>,
+        "oleg.b.antonyan@gmail.com" <oleg.b.antonyan@gmail.com>,
+        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        "jgross@suse.com" <jgross@suse.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+        "todd.e.brandt@linux.intel.com" <todd.e.brandt@linux.intel.com>,
+        "jack@suse.cz" <jack@suse.cz>
 Subject: Re: [RFC 5/5] pm: remove kernel thread freezing
-Message-ID: <20171003205739.GA30569@amd>
-References: <20171003185313.1017-1-mcgrof@kernel.org>
- <20171003185313.1017-6-mcgrof@kernel.org>
- <20171003201204.GA23521@amd>
- <nycvar.YFH.7.76.1710032213430.17517@jbgna.fhfr.qr>
- <20171003202121.GB23521@amd>
- <nycvar.YFH.7.76.1710032230450.17517@jbgna.fhfr.qr>
+In-Reply-To: <nycvar.YFH.7.76.1710032215140.17517@jbgna.fhfr.qr>
+Message-ID: <nycvar.YFH.7.76.1710032248470.17517@jbgna.fhfr.qr>
+References: <20171003185313.1017-1-mcgrof@kernel.org>  <20171003185313.1017-6-mcgrof@kernel.org> <1507061605.2567.13.camel@wdc.com> <nycvar.YFH.7.76.1710032215140.17517@jbgna.fhfr.qr>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="xHFwDpU9dbj6ez1V"
-In-Reply-To: <nycvar.YFH.7.76.1710032230450.17517@jbgna.fhfr.qr>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
+On Tue, 3 Oct 2017, Jiri Kosina wrote:
 
---xHFwDpU9dbj6ez1V
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> > What about the many drivers outside filesystems that use the 
+> > set_freezable() / try_to_freeze() / wait_event_freezable() API?
+> 
+> Many/most of them are just completely bogus and pointless. 
 
-On Tue 2017-10-03 22:38:33, Jiri Kosina wrote:
-> On Tue, 3 Oct 2017, Pavel Machek wrote:
->=20
-> > > This point I don't understand. What exactly do you mean?
-> >=20
-> > Hibernation:
-> >=20
-> > We freeze, do system snapshot, unfreeze, and write image to
-> > disk.=20
->=20
-> Where/why do you unfreeze between creating the snapshot and writing it=20
-> out?
+More specifically -- they don't really care at all whether they get 
+scheduled out exactly at the try_to_freeze() point; they are perfectly 
+happy being scheduled out at any other scheduling point, and land on 
+runqueue after the resume has been completed.
 
-Yep, sorry, we don't unfreeze.
+Sure, certain drivers need to take action when system is undergoing 
+hibernation/suspend. But that's what PM callbacks are for, not kthread 
+hibernation.
 
-> Again, I agree that the (rare) kthreads that are actually "creating" new=
-=20
-> I/O have to be somehow frozen and require special care.
-
-Agreed. Was any effort made to identify those special kernel threads?
-									Pavel
---=20
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
-g.html
-
---xHFwDpU9dbj6ez1V
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iEYEARECAAYFAlnT+cMACgkQMOfwapXb+vJZRACgnK0rPBu5eEwrtu4Z/M0CeMvv
-bwYAnj03qFiTPP6ma8EI5saORXD+8emK
-=jpug
------END PGP SIGNATURE-----
-
---xHFwDpU9dbj6ez1V--
+-- 
+Jiri Kosina
+SUSE Labs
