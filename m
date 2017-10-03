@@ -1,153 +1,86 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from ipmail06.adl2.internode.on.net ([150.101.137.129]:26251 "EHLO
-        ipmail06.adl2.internode.on.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751522AbdJCU6q (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 3 Oct 2017 16:58:46 -0400
-Date: Wed, 4 Oct 2017 07:58:41 +1100
-From: Dave Chinner <david@fromorbit.com>
-To: "Luis R. Rodriguez" <mcgrof@kernel.org>
-Cc: viro@zeniv.linux.org.uk, bart.vanassche@wdc.com,
-        ming.lei@redhat.com, tytso@mit.edu, darrick.wong@oracle.com,
-        jikos@kernel.org, rjw@rjwysocki.net, pavel@ucw.cz,
-        len.brown@intel.com, linux-fsdevel@vger.kernel.org,
-        boris.ostrovsky@oracle.com, jgross@suse.com,
-        todd.e.brandt@linux.intel.com, nborisov@suse.com, jack@suse.cz,
-        martin.petersen@oracle.com, ONeukum@suse.com,
-        oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
-        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Tue, 3 Oct 2017 22:39:36 +0200
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "mcgrof@kernel.org" <mcgrof@kernel.org>,
+        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
+        "ONeukum@suse.com" <ONeukum@suse.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "nborisov@suse.com" <nborisov@suse.com>,
+        "oleg.b.antonyan@gmail.com" <oleg.b.antonyan@gmail.com>,
+        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        "pavel@ucw.cz" <pavel@ucw.cz>,
+        "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "rjw@rjwysocki.net" <rjw@rjwysocki.net>,
+        "jgross@suse.com" <jgross@suse.com>,
+        "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+        "todd.e.brandt@linux.intel.com" <todd.e.brandt@linux.intel.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "jikos@kernel.org" <jikos@kernel.org>,
+        "len.brown@intel.com" <len.brown@intel.com>,
+        "tytso@mit.edu" <tytso@mit.edu>, "jack@suse.cz" <jack@suse.cz>
 Subject: Re: [RFC 2/5] fs: freeze on suspend and thaw on resume
-Message-ID: <20171003205841.GN3666@dastard>
+Message-ID: <20171003203936.GH2294@wotan.suse.de>
 References: <20171003185313.1017-1-mcgrof@kernel.org>
  <20171003185313.1017-3-mcgrof@kernel.org>
+ <1507060941.2567.6.camel@wdc.com>
+ <20171003202335.GF2294@wotan.suse.de>
+ <1507062758.2567.22.camel@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171003185313.1017-3-mcgrof@kernel.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1507062758.2567.22.camel@wdc.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Oct 03, 2017 at 11:53:10AM -0700, Luis R. Rodriguez wrote:
-> This uses the existing filesystem freeze and thaw callbacks to
-> freeze each filesystem on suspend/hibernation and thaw upon resume.
+On Tue, Oct 03, 2017 at 08:32:39PM +0000, Bart Van Assche wrote:
+> On Tue, 2017-10-03 at 22:23 +0200, Luis R. Rodriguez wrote:
+> > On Tue, Oct 03, 2017 at 08:02:22PM +0000, Bart Van Assche wrote:
+> > > On Tue, 2017-10-03 at 11:53 -0700, Luis R. Rodriguez wrote:
+> > > > +static bool super_allows_freeze(struct super_block *sb)
+> > > > +{
+> > > > +	return !!(sb->s_type->fs_flags & FS_FREEZE_ON_SUSPEND);
+> > > > +}
+> > > 
+> > > A minor comment: if "!!" would be left out the compiler will perform the
+> > > conversion from int to bool implicitly
+> > 
+> > For all compilers?
 > 
-> This is needed so that we properly really stop IO in flight without
-> races after userspace has been frozen. Without this we rely on
-> kthread freezing and its semantics are loose and error prone.
-> For instance, even though a kthread may use try_to_freeze() and end
-> up being frozen we have no way of being sure that everything that
-> has been spawned asynchronously from it (such as timers) have also
-> been stopped as well.
+> Let's have a look at the output of the following commands:
 > 
-> A long term advantage of also adding filesystem freeze / thawing
-> supporting durign suspend / hibernation is that long term we may
-> be able to eventually drop the kernel's thread freezing completely
-> as it was originally added to stop disk IO in flight as we hibernate
-> or suspend.
+> $ PAGER= git grep 'typedef.*[[:blank:]]bool;' include
+> include/linux/types.h:typedef _Bool                     bool;
+> $ PAGER= git grep std= Makefile
+> Makefile:               -fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS)
+> Makefile:                  -std=gnu89 $(call cc-option,-fno-PIE)
 > 
-> This also implies that many kthread users exist which have been
-> adding freezer semantics onto its kthreads without need. These also
-> will need to be reviewed later.
+> From https://gcc.gnu.org/onlinedocs/gcc-7.2.0/gcc/C-Dialect-Options.html#C-Dialect-Options:
+> ‘gnu89’
+> GNU dialect of ISO C90 (including some C99 features).
 > 
-> This is based on prior work originally by Rafael Wysocki and later by
-> Jiri Kosina.
+> I think this means that the Linux kernel tree can only be compiled correctly
+> by compilers that support the C11 type _Bool.
+
+:*) beautiful, thanks.
+
+> > > Anyway, I agree with the approach of this patch and I think
+> > > that freezing filesystems before processes are frozen would be a big step
+> > > forward.
+> > 
+> > Great! But please note, the current implementation calls fs_suspend_freeze()
+> > *after* try_to_freeze_tasks(), ie: this implementation freezes userspace and
+> > only after then filesystems.
 > 
-> Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
-> ---
->  fs/super.c             | 79 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  include/linux/fs.h     | 13 +++++++++
->  kernel/power/process.c | 14 ++++++++-
->  3 files changed, 105 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/super.c b/fs/super.c
-> index d45e92d9a38f..ce8da8b187b1 100644
-> --- a/fs/super.c
-> +++ b/fs/super.c
-> @@ -1572,3 +1572,82 @@ int thaw_super(struct super_block *sb)
->  	return 0;
->  }
->  EXPORT_SYMBOL(thaw_super);
-> +
-> +#ifdef CONFIG_PM_SLEEP
-> +static bool super_allows_freeze(struct super_block *sb)
-> +{
-> +	return !!(sb->s_type->fs_flags & FS_FREEZE_ON_SUSPEND);
-> +}
+> What will the impact be of that choice on filesystems implemented in userspace?
 
-That's a completely misleading function name. All superblocks can be
-frozen - freeze_super() is filesystem independent. And given that, I
-don't see why these super_should_freeze() hoops need to be jumped
-through...
+Depends on what kernel hooks those use? Also now is a good time for those working
+on userspace filesystems to chime in :) Its why I am stating -- I am not saying
+I have found the right order, I have find the right order that works for me, and
+we need consensus on what the right order should be.
 
-> +
-> +static bool super_should_freeze(struct super_block *sb)
-> +{
-> +	if (!sb->s_root)
-> +		return false;
-> +	if (!(sb->s_flags & MS_BORN))
-> +		return false;
-> +	/*
-> +	 * We don't freeze virtual filesystems, we skip those filesystems with
-> +	 * no backing device.
-> +	 */
-> +	if (sb->s_bdi == &noop_backing_dev_info)
-> +		return false;
-> +	/* No need to freeze read-only filesystems */
-> +	if (sb->s_flags & MS_RDONLY)
-> +		return false;
-> +	if (!super_allows_freeze(sb))
-> +		return false;
-> +
-> +	return true;
-> +}
-
-> +
-> +int fs_suspend_freeze_sb(struct super_block *sb, void *priv)
-> +{
-> +	int error = 0;
-> +
-> +	spin_lock(&sb_lock);
-> +	if (!super_should_freeze(sb))
-> +		goto out;
-> +
-> +	up_read(&sb->s_umount);
-> +	pr_info("%s (%s): freezing\n", sb->s_type->name, sb->s_id);
-> +	error = freeze_super(sb);
-> +	down_read(&sb->s_umount);
-> +out:
-> +	if (error && error != -EBUSY)
-> +		pr_notice("%s (%s): Unable to freeze, error=%d",
-> +			  sb->s_type->name, sb->s_id, error);
-> +	spin_unlock(&sb_lock);
-> +	return error;
-> +}
-
-I don't think this was ever tested.  Calling freeze_super() with a
-spinlock held with through "sleeping in atomic" errors all over the
-place.
-
-Also, the s_umount lock juggling is nasty. Your new copy+pasted
-iterate_supers_reverse() takes the lock in read mode, yet all the
-freeze/thaw callers here want to take it in write mode. So, really,
-iterate_supers_reverse() needs to be iterate_supers_reverse_excl()
-and take the write lock, and freeze_super/thaw_super need to be
-factored into locked and unlocked versions.
-
-In which case, we end up with:
-
-int fs_suspend_freeze_sb(struct super_block *sb, void *priv)
-{
-	return freeze_locked_super(sb);
-}
-
-int fs_suspend_thaw_sb(struct super_block *sb, void *priv)
-{
-	return thaw_locked_super(sb);
-}
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+  Luis
