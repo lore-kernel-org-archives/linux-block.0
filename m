@@ -1,141 +1,73 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:57712 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751156AbdJCOFi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 3 Oct 2017 10:05:38 -0400
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Tue, 3 Oct 2017 16:22:12 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         linux-scsi@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
         Oleksandr Natalenko <oleksandr@natalenko.name>,
         Johannes Thumshirn <jthumshirn@suse.de>,
         Cathy Avery <cavery@redhat.com>,
         Martin Steigerwald <martin@lichtvoll.de>,
         linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
-        Ming Lei <ming.lei@redhat.com>,
         Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V8 7/8] block: support PREEMPT_ONLY
-Date: Tue,  3 Oct 2017 22:04:05 +0800
-Message-Id: <20171003140406.26060-8-ming.lei@redhat.com>
-In-Reply-To: <20171003140406.26060-1-ming.lei@redhat.com>
-References: <20171003140406.26060-1-ming.lei@redhat.com>
+Subject: Re: [PATCH V7 5/6] block: support PREEMPT_ONLY
+Message-ID: <20171003082211.GC23564@ming.t460p>
+References: <20170930061214.10622-1-ming.lei@redhat.com>
+ <20170930061214.10622-6-ming.lei@redhat.com>
+ <20171002135024.GE19119@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171002135024.GE19119@infradead.org>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-When queue is in PREEMPT_ONLY mode, only REQ_PREEMPT request
-can be allocated and dispatched, other requests won't be allowed
-to enter I/O path.
+On Mon, Oct 02, 2017 at 06:50:24AM -0700, Christoph Hellwig wrote:
+> > +void blk_set_preempt_only(struct request_queue *q, bool preempt_only)
+> > +{
+> > +	blk_mq_freeze_queue(q);
+> > +	if (preempt_only)
+> > +		queue_flag_set_unlocked(QUEUE_FLAG_PREEMPT_ONLY, q);
+> > +	else
+> > +		queue_flag_clear_unlocked(QUEUE_FLAG_PREEMPT_ONLY, q);
+> > +	blk_mq_unfreeze_queue(q);
+> > +}
+> > +EXPORT_SYMBOL(blk_set_preempt_only);
+> 
+> What do you need the queue freeze for?
 
-This is useful for supporting safe SCSI quiesce.
+The main reason is for draining requests in queue before setting PREEMP_ONLY.
 
-Part of this patch is from Bart's '[PATCH v4 4∕7] block: Add the QUEUE_FLAG_PREEMPT_ONLY
-request queue flag'.
+> 
+> > +		/*
+> > +		 * preempt_only flag has to be set after queue is frozen,
+> > +		 * so it can be checked here lockless and safely
+> > +		 */
+> > +		if (blk_queue_preempt_only(q)) {
+> 
+> We can always check a single bit flag safely, so I really don't
+> understand that comment.
+> 
+> > +			if (!(flags & BLK_REQ_PREEMPT))
+> > +				goto slow_path;
+> > +		}
+> > +
+> >  		if (percpu_ref_tryget_live(&q->q_usage_counter))
+> >  			return 0;
+> > -
+> > + slow_path:
+> 
+> Also this looks a very spaghetti, why not:
+> 
+> 
+> 	if (!blk_queue_preempt_only(q) || (flags & BLK_MQ_REQ_PREEMPT)) {
+> 		if (percpu_ref_tryget_live(&q->q_usage_counter))
+> 			return 0;
+> 	}
 
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Tested-by: Martin Steigerwald <martin@lichtvoll.de>
-Cc: Bart Van Assche <Bart.VanAssche@wdc.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-core.c       | 44 +++++++++++++++++++++++++++++++++++++++++---
- include/linux/blkdev.h |  5 +++++
- 2 files changed, 46 insertions(+), 3 deletions(-)
+Looks fine, will do it in next version.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 1bb566245d37..7849cc1687bc 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -346,6 +346,34 @@ void blk_sync_queue(struct request_queue *q)
- }
- EXPORT_SYMBOL(blk_sync_queue);
- 
-+void blk_set_preempt_only(struct request_queue *q, bool preempt_only)
-+{
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	if (preempt_only)
-+		queue_flag_set(QUEUE_FLAG_PREEMPT_ONLY, q);
-+	else
-+		queue_flag_clear(QUEUE_FLAG_PREEMPT_ONLY, q);
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+
-+	/*
-+	 * The synchronize_rcu() implicied in blk_mq_freeze_queue()
-+	 * or the explicit one will make sure the above write on
-+	 * PREEMPT_ONLY is observed in blk_queue_enter() before
-+	 * running blk_mq_unfreeze_queue().
-+	 *
-+	 * blk_mq_freeze_queue() also drains up any request in queue,
-+	 * so blk_queue_enter() will see the above updated value of
-+	 * PREEMPT flag before any new allocation.
-+	 */
-+	if (!blk_mq_freeze_queue(q))
-+		synchronize_rcu();
-+
-+	blk_mq_unfreeze_queue(q);
-+}
-+EXPORT_SYMBOL(blk_set_preempt_only);
-+
- /**
-  * __blk_run_queue_uncond - run a queue whether or not it has been stopped
-  * @q:	The queue to run
-@@ -771,8 +799,16 @@ int blk_queue_enter(struct request_queue *q, unsigned int op)
- 	while (true) {
- 		int ret;
- 
--		if (percpu_ref_tryget_live(&q->q_usage_counter))
--			return 0;
-+		rcu_read_lock_sched();
-+		if (__percpu_ref_tryget_live(&q->q_usage_counter)) {
-+			if (likely((op & REQ_PREEMPT) ||
-+						!blk_queue_preempt_only(q))) {
-+				rcu_read_unlock_sched();
-+				return 0;
-+			} else
-+				percpu_ref_put(&q->q_usage_counter);
-+		}
-+		rcu_read_unlock_sched();
- 
- 		if (op & REQ_NOWAIT)
- 			return -EBUSY;
-@@ -787,7 +823,9 @@ int blk_queue_enter(struct request_queue *q, unsigned int op)
- 		smp_rmb();
- 
- 		ret = wait_event_interruptible(q->mq_freeze_wq,
--				!atomic_read(&q->mq_freeze_depth) ||
-+				(!atomic_read(&q->mq_freeze_depth) &&
-+				((op & REQ_PREEMPT) ||
-+				 !blk_queue_preempt_only(q))) ||
- 				blk_queue_dying(q));
- 		if (blk_queue_dying(q))
- 			return -ENODEV;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 4c688385d866..66d46d9eac29 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -628,6 +628,7 @@ struct request_queue {
- #define QUEUE_FLAG_REGISTERED  26	/* queue has been registered to a disk */
- #define QUEUE_FLAG_SCSI_PASSTHROUGH 27	/* queue supports SCSI commands */
- #define QUEUE_FLAG_QUIESCED    28	/* queue has been quiesced */
-+#define QUEUE_FLAG_PREEMPT_ONLY	29	/* only process REQ_PREEMPT requests */
- 
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_STACKABLE)	|	\
-@@ -732,6 +733,10 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
- 			     REQ_FAILFAST_DRIVER))
- #define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
-+#define blk_queue_preempt_only(q)				\
-+	test_bit(QUEUE_FLAG_PREEMPT_ONLY, &(q)->queue_flags)
-+
-+extern void blk_set_preempt_only(struct request_queue *q, bool preempt_only);
- 
- static inline bool blk_account_rq(struct request *rq)
- {
 -- 
-2.9.5
+Ming
