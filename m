@@ -1,104 +1,103 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-block@vger.kernel.org
-Cc: axboe@kernel.dk,
-	shli@kernel.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 2/9] md: Add nowait support to md
-Date: Wed,  4 Oct 2017 08:55:04 -0500
-Message-Id: <20171004135511.26110-3-rgoldwyn@suse.de>
-In-Reply-To: <20171004135511.26110-1-rgoldwyn@suse.de>
-References: <20171004135511.26110-1-rgoldwyn@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:59836 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750812AbdJCSxU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 3 Oct 2017 14:53:20 -0400
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+To: viro@zeniv.linux.org.uk, bart.vanassche@wdc.com,
+        ming.lei@redhat.com, tytso@mit.edu, darrick.wong@oracle.com,
+        jikos@kernel.org, rjw@rjwysocki.net, pavel@ucw.cz,
+        len.brown@intel.com, linux-fsdevel@vger.kernel.org
+Cc: boris.ostrovsky@oracle.com, jgross@suse.com,
+        todd.e.brandt@linux.intel.com, nborisov@suse.com, jack@suse.cz,
+        martin.petersen@oracle.com, ONeukum@suse.com,
+        oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
+        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Luis R. Rodriguez" <mcgrof@kernel.org>
+Subject: [RFC 1/5] fs: add iterate_supers_reverse()
+Date: Tue,  3 Oct 2017 11:53:09 -0700
+Message-Id: <20171003185313.1017-2-mcgrof@kernel.org>
+In-Reply-To: <20171003185313.1017-1-mcgrof@kernel.org>
+References: <20171003185313.1017-1-mcgrof@kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+There are use cases where we wish to traverse the superblock list
+in reverse order. This particular implementation will also enable
+to capture errors.
 
-Set queue flags to QUEUE_FLAG_NOWAIT to indicate REQ_NOWAIT
-will be handled. If any of the underlying devices do not support
-NOWAIT feature, we do not set the flag.
-
-If the device is suspended, it returns -EWOULDBLOCK.
-
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
 ---
- drivers/md/md.c | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+ fs/super.c         | 43 +++++++++++++++++++++++++++++++++++++++++++
+ include/linux/fs.h |  1 +
+ 2 files changed, 44 insertions(+)
 
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 0ff1bbf6c90e..7325f8be36b4 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -237,6 +237,19 @@ EXPORT_SYMBOL_GPL(md_new_event);
- static LIST_HEAD(all_mddevs);
- static DEFINE_SPINLOCK(all_mddevs_lock);
+diff --git a/fs/super.c b/fs/super.c
+index 02da00410de8..d45e92d9a38f 100644
+--- a/fs/super.c
++++ b/fs/super.c
+@@ -609,6 +609,49 @@ void iterate_supers(void (*f)(struct super_block *, void *), void *arg)
+ 	spin_unlock(&sb_lock);
+ }
  
-+static bool is_suspended(struct mddev *mddev, struct bio *bio)
++/**
++ *	iterate_supers_reverse - call function for active superblocks in reverse
++ *	@f: function to call
++ *	@arg: argument to pass to it
++ *
++ *	Scans the superblock list and calls given function, passing it
++ *	locked superblock and given argument, in reverse order. Returns if
++ *	an error occurred.
++ */
++int iterate_supers_reverse(int (*f)(struct super_block *, void *), void *arg)
 +{
-+	/* We can serve READ requests when device is suspended */
-+	if (bio_data_dir(bio) == READ)
-+		return false;
++	struct super_block *sb, *p = NULL;
++	int error = 0;
 +
-+	if (mddev->suspended)
-+		return true;
++	spin_lock(&sb_lock);
++	list_for_each_entry_reverse(sb, &super_blocks, s_list) {
++		if (hlist_unhashed(&sb->s_instances))
++			continue;
++		sb->s_count++;
++		spin_unlock(&sb_lock);
 +
-+	return  (mddev->suspend_lo < bio_end_sector(bio) &&
-+			mddev->suspend_hi > bio->bi_iter.bi_sector);
++		down_read(&sb->s_umount);
++		if (sb->s_root && (sb->s_flags & SB_BORN)) {
++			error = f(sb, arg);
++			if (error) {
++				spin_lock(&sb_lock);
++				break;
++			}
++		}
++		up_read(&sb->s_umount);
++
++		spin_lock(&sb_lock);
++		if (p)
++			__put_super(p);
++		p = sb;
++	}
++	if (p)
++		__put_super(p);
++	spin_unlock(&sb_lock);
++
++	return error;
 +}
 +
- /*
-  * iterates through all used mddevs in the system.
-  * We take care to grab the all_mddevs_lock whenever navigating
-@@ -316,6 +329,11 @@ static blk_qc_t md_make_request(struct request_queue *q, struct bio *bio)
- 		bio_endio(bio);
- 		return BLK_QC_T_NONE;
- 	}
-+	/* Bail out if we would have to wait for suspended device */
-+	if ((bio->bi_opf & REQ_NOWAIT) && is_suspended(mddev, bio)) {
-+		bio_wouldblock_error(bio);
-+		return BLK_QC_T_NONE;
-+	}
+ /**
+  *	iterate_supers_type - call function for superblocks of given type
+  *	@type: fs type
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 46796b2f956b..cd084792cf39 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -3097,6 +3097,7 @@ extern struct super_block *get_active_super(struct block_device *bdev);
+ extern void drop_super(struct super_block *sb);
+ extern void drop_super_exclusive(struct super_block *sb);
+ extern void iterate_supers(void (*)(struct super_block *, void *), void *);
++extern int iterate_supers_reverse(int (*)(struct super_block *, void *), void *);
+ extern void iterate_supers_type(struct file_system_type *,
+ 			        void (*)(struct super_block *, void *), void *);
  
- 	/*
- 	 * save the sectors now since our bio can
-@@ -5404,6 +5422,7 @@ int md_run(struct mddev *mddev)
- 	int err;
- 	struct md_rdev *rdev;
- 	struct md_personality *pers;
-+	bool nowait = true;
- 
- 	if (list_empty(&mddev->disks))
- 		/* cannot run an array with no devices.. */
-@@ -5470,8 +5489,15 @@ int md_run(struct mddev *mddev)
- 			}
- 		}
- 		sysfs_notify_dirent_safe(rdev->sysfs_state);
-+		if (!blk_queue_supports_nowait(rdev->bdev->bd_queue))
-+			nowait = false;
- 	}
- 
-+	/* Set the NOWAIT flags if all underlying devices support it */
-+	if (nowait)
-+		queue_flag_set_unlocked(QUEUE_FLAG_NOWAIT, mddev->queue);
-+
-+
- 	if (mddev->bio_set == NULL) {
- 		mddev->bio_set = bioset_create(BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
- 		if (!mddev->bio_set)
-@@ -6554,6 +6580,15 @@ static int hot_add_disk(struct mddev *mddev, dev_t dev)
- 	set_bit(MD_SB_CHANGE_DEVS, &mddev->sb_flags);
- 	if (!mddev->thread)
- 		md_update_sb(mddev, 1);
-+
-+	/* If the new disk does not support REQ_NOWAIT,
-+	   disable on whole MD */
-+	if (!blk_queue_supports_nowait(rdev->bdev->bd_queue)) {
-+		pr_info("%s: Disabling nowait because %s does not support nowait\n",
-+				mdname(mddev), bdevname(rdev->bdev,b));
-+		queue_flag_clear_unlocked(QUEUE_FLAG_NOWAIT, mddev->queue);
-+	}
-+
- 	/*
- 	 * Kick recovery, maybe this spare has to be added to the
- 	 * array immediately.
 -- 
-2.14.2
+2.14.0
