@@ -1,85 +1,58 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:41744 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752479AbdJSWvn (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Oct 2017 18:51:43 -0400
-Date: Fri, 20 Oct 2017 06:51:10 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@fb.com>, Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-bcache@vger.kernel.org
-Subject: Re: [PATCH v3 07/49] bcache: comment on direct access to bvec table
-Message-ID: <20171019225109.GA27130@ming.t460p>
-References: <20170808084548.18963-1-ming.lei@redhat.com>
- <20170808084548.18963-8-ming.lei@redhat.com>
- <20170810112603.GD20308@infradead.org>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v2] blk-throttle: fix possible io stall when upgrade to
+ max
+To: Joseph Qi <jiangqi903@gmail.com>,
+ linux-block <linux-block@vger.kernel.org>
+Cc: Shaohua Li <shli@fb.com>, boyu.mt@taobao.com, wenqing.lz@taobao.com,
+ qijiang.qj@alibaba-inc.com
+References: <526810b1-72e3-859f-aeaa-b5192144c589@gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <a943b083-541c-60f4-290a-9608f89f76e4@kernel.dk>
+Date: Tue, 3 Oct 2017 15:42:21 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170810112603.GD20308@infradead.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <526810b1-72e3-859f-aeaa-b5192144c589@gmail.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Aug 10, 2017 at 04:26:03AM -0700, Christoph Hellwig wrote:
-> I think all this bcache code needs bigger attention.  For one
-> bio_alloc_pages is only used in bcache, so we should move it in there.
-
-Looks a good idea.
-
+On 09/30/2017 12:38 AM, Joseph Qi wrote:
+> From: Joseph Qi <qijiang.qj@alibaba-inc.com>
 > 
-> Second the way  bio_alloc_pages is currently written looks potentially
-> dangerous for multi-page biovecs, so we should think about a better
-> calling convention.  The way bcache seems to generally use it is by
-> allocating a bio, then calling bch_bio_map on it and then calling
-> bio_alloc_pages.  I think it just needs a new bio_alloc_pages calling
-> convention that passes the size to be allocated and stop looking into
-> the segment count.
-
-Looks a good idea, will try to do in this way.
-
+> There is a case which will lead to io stall. The case is described as
+> follows. 
+> /test1
+>   |-subtest1
+> /test2
+>   |-subtest2
+> And subtest1 and subtest2 each has 32 queued bios already.
 > 
-> Second bch_bio_map isn't something we should be doing in a driver,
-> it should be rewritten using bio_add_page.
-
-Yes, the idea way is to use bio_add_page always, but given
-bch_bio_map() is used on a fresh bio, it is safe, and this
-work can be done in another bcache cleanup patch.
-
+> Now upgrade to max. In throtl_upgrade_state, it will try to dispatch
+> bios as follows:
+> 1) tg=subtest1, do nothing;
+> 2) tg=test1, transfer 32 queued bios from subtest1 to test1; no pending
+> left, no need to schedule next dispatch;
+> 3) tg=subtest2, do nothing;
+> 4) tg=test2, transfer 32 queued bios from subtest2 to test2; no pending
+> left, no need to schedule next dispatch;
+> 5) tg=/, transfer 8 queued bios from test1 to /, 8 queued bios from
+> test2 to /, 8 queued bios from test1 to /, and 8 queued bios from test2
+> to /; note that test1 and test2 each still has 16 queued bios left;
+> 6) tg=/, try to schedule next dispatch, but since disptime is now
+> (update in tg_update_disptime, wait=0), pending timer is not scheduled
+> in fact;
+> 7) In throtl_upgrade_state it totally dispatches 32 queued bios and with
+> 32 left. test1 and test2 each has 16 queued bios;
+> 8) throtl_pending_timer_fn sees the left over bios, but could do
+> nothing, because throtl_select_dispatch returns 0, and test1/test2 has
+> no pending tg.
 > 
-> > diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-> > index 866dcf78ff8e..3da595ae565b 100644
-> > --- a/drivers/md/bcache/btree.c
-> > +++ b/drivers/md/bcache/btree.c
-> > @@ -431,6 +431,7 @@ static void do_btree_node_write(struct btree *b)
-> >  
-> >  		continue_at(cl, btree_node_write_done, NULL);
-> >  	} else {
-> > +		/* No harm for multipage bvec since the new is just allocated */
-> >  		b->bio->bi_vcnt = 0;
+> The blktrace shows the following:
+> 8,32   0        0     2.539007641     0  m   N throtl upgrade to max
+> 8,32   0        0     2.539072267     0  m   N throtl /test2 dispatch nr_queued=16 read=0 write=16
+> 8,32   7        0     2.539077142     0  m   N throtl /test1 dispatch nr_queued=16 read=0 write=16
 > 
-> This should go away - bio_alloc_pages or it's replacement should not
-> modify bi_vcnt on failure.
+> So force schedule dispatch if there are pending children.
 
-OK.
-
-> 
-> > +	/* single page bio, safe for multipage bvec */
-> >  	dc->sb_bio.bi_io_vec[0].bv_page = sb_page;
-> 
-> needs to use bio_add_page.
-
-OK.
-
-> 
-> > +	/* single page bio, safe for multipage bvec */
-> >  	ca->sb_bio.bi_io_vec[0].bv_page = sb_page;
-> 
-> needs to use bio_add_page.
-
-OK.
+Applied for 4.14, thanks.
 
 -- 
-Ming
+Jens Axboe
