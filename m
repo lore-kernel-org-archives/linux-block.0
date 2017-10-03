@@ -1,12 +1,13 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:47098 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751184AbdJIE3A (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 9 Oct 2017 00:29:00 -0400
-Date: Mon, 9 Oct 2017 12:28:37 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@infradead.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:58476 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751710AbdJCJVp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2017 05:21:45 -0400
+Date: Tue, 3 Oct 2017 02:21:43 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Ming Lei <ming.lei@redhat.com>
 Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
         Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
         Bart Van Assche <bart.vanassche@sandisk.com>,
         Laurence Oberman <loberman@redhat.com>,
@@ -15,37 +16,15 @@ Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
         Omar Sandoval <osandov@fb.com>
 Subject: Re: [PATCH V5 8/8] blk-mq: improve bio merge from blk-mq sw queue
-Message-ID: <20171009042835.GA19029@ming.t460p>
+Message-ID: <20171003092143.GF2771@infradead.org>
 References: <20170930112655.31451-1-ming.lei@redhat.com>
  <20170930112655.31451-9-ming.lei@redhat.com>
- <20171003092143.GF2771@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171003092143.GF2771@infradead.org>
+In-Reply-To: <20170930112655.31451-9-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, Oct 03, 2017 at 02:21:43AM -0700, Christoph Hellwig wrote:
-> This looks generally good to me, but I really worry about the impact
-> on very high iops devices.  Did you try this e.g. for random reads
-> from unallocated blocks on an enterprise NVMe SSD?
-
-Looks no such impact, please see the following data
-in the fio test(libaio, direct, bs=4k, 64jobs, randread, none scheduler)
-
-[root@storageqe-62 results]# ../parse_fio 4.14.0-rc2.no_blk_mq_perf+-nvme-64jobs-mq-none.log 4.14.0-rc2.BLK_MQ_PERF_V5+-nvme-64jobs-mq-none.log
----------------------------------------
- IOPS(K)  |    NONE     |    NONE
----------------------------------------
-randread  |      650.98 |      653.15
----------------------------------------
-
-OR:
-
-If you worry about this impact, can we simply disable merge on NVMe
-for none scheduler? It is basically impossible to merge NVMe's
-request/bio when none is used, but it can be doable in case of kyber
-scheduler.
-
--- 
-Ming
+This looks generally good to me, but I really worry about the impact
+on very high iops devices.  Did you try this e.g. for random reads
+from unallocated blocks on an enterprise NVMe SSD?
