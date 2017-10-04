@@ -1,121 +1,83 @@
-Return-Path: <prvs=44825b072=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	=Oleksandr Natalenko <oleksandr@natalenko.name>,
-	"Luis R . Rodriguez" <mcgrof@kernel.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Shaohua Li <shli@kernel.org>,
-	linux-raid@vger.kernel.org,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v7 3/9] md: Neither resync nor reshape while the system is frozen
-Date: Mon,  9 Oct 2017 16:13:54 -0700
-Message-Id: <20171009231400.562-4-bart.vanassche@wdc.com>
-In-Reply-To: <20171009231400.562-1-bart.vanassche@wdc.com>
-References: <20171009231400.562-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from ipmail03.adl6.internode.on.net ([150.101.137.143]:55860 "EHLO
+        ipmail03.adl6.internode.on.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751220AbdJDWWl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 4 Oct 2017 18:22:41 -0400
+Date: Thu, 5 Oct 2017 09:22:33 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: Theodore Ts'o <tytso@mit.edu>,
+        "Luis R. Rodriguez" <mcgrof@kernel.org>, viro@zeniv.linux.org.uk,
+        bart.vanassche@wdc.com, ming.lei@redhat.com,
+        darrick.wong@oracle.com, jikos@kernel.org, rjw@rjwysocki.net,
+        pavel@ucw.cz, len.brown@intel.com, linux-fsdevel@vger.kernel.org,
+        boris.ostrovsky@oracle.com, jgross@suse.com,
+        todd.e.brandt@linux.intel.com, nborisov@suse.com, jack@suse.cz,
+        martin.petersen@oracle.com, ONeukum@suse.com,
+        oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
+        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC 4/5] ext4: add fs freezing support on suspend/hibernation
+Message-ID: <20171004222233.GH3666@dastard>
+References: <20171003185313.1017-1-mcgrof@kernel.org>
+ <20171003185313.1017-5-mcgrof@kernel.org>
+ <20171003195930.ivgaccdabxczar62@thunk.org>
+ <20171003201321.GE2294@wotan.suse.de>
+ <20171004014204.mztkdnm7wb7r6sl2@thunk.org>
+ <20171004070523.GE3666@dastard>
+ <20171004164839.zyfpx64qmmfv2jtx@thunk.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171004164839.zyfpx64qmmfv2jtx@thunk.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Some people use the md driver on laptops and use the suspend and
-resume functionality. Since it is essential that submitting of
-new I/O requests stops before a hibernation image is created,
-interrupt the md resync and reshape actions if the system is
-being frozen. Note: the resync and reshape will restart after
-the system is resumed and a message similar to the following
-will appear in the system log:
+On Wed, Oct 04, 2017 at 12:48:39PM -0400, Theodore Ts'o wrote:
+> On Wed, Oct 04, 2017 at 06:05:23PM +1100, Dave Chinner wrote:
+> > Basically, before thawing filesystems the rest of the kernel
+> > infrastructure needs to have been restarted. i.e. the order
+> > needs to be:
+> > 
+> > freeze userspace
+> > freeze filesystems
+> > freeze kernel threads
+> > freeze workqueues
+> > 
+> > thaw workqueues
+> > thaw kernel threads
+> > thaw filesystems
+> > thaw userspace
+> > 
+> > and it should end up that way.
+> > 
+> > > Or if we have a network block device, or
+> > > something else in the storage stack that needs to run a kernel thread
+> > > context (or a workqueue, etc.) --- is the fact that userspace is
+> > > frozen mean the scheduler is going to refuse to schedule()?
+> > 
+> > No.
+> 
+> Well, that's what the answer *should* be.  I was asking what this
+> patch series does, and given that Luis reported that with this patch
+> series ext4_commit_super(sb, 1) is hanging, I have my suspicions about
+> what the answer might be with this patch set.  (Especially since the
+> claimed goal of the patch set is, "kthread freezing with filesystem
+> freeze/thaw".
 
-md: md0: data-check interrupted.
+There are know bugs in the patchset w.r.t.  workqueues and kernel
+threads, and IO completion requires workqueues and kernel threads to
+be running correctly. Hence filesystem thaw needs to occur after
+workqueues and kernel threads are thawed.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Shaohua Li <shli@kernel.org>
-Cc: linux-raid@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/md/md.c | 30 +++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+The existing code has this assumption - that filesystem will start
+working again the moment workqueues and kernel threads are thawed,
+but trying to do IO before that will not work. So it's the same
+with freeze/thaw of filesystems - thaw of filesystems will not work
+if the rest of the kernel machinery is still frozen...
 
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index b99584e5d6b1..d712d3320c1d 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -66,6 +66,8 @@
- #include <linux/raid/md_u.h>
- #include <linux/slab.h>
- #include <linux/percpu-refcount.h>
-+#include <linux/freezer.h>
-+#include <linux/suspend.h>
- 
- #include <trace/events/block.h>
- #include "md.h"
-@@ -7439,6 +7441,7 @@ static int md_thread(void *arg)
- 	 */
- 
- 	allow_signal(SIGKILL);
-+	set_freezable();
- 	while (!kthread_should_stop()) {
- 
- 		/* We need to wait INTERRUPTIBLE so that
-@@ -7449,7 +7452,7 @@ static int md_thread(void *arg)
- 		if (signal_pending(current))
- 			flush_signals(current);
- 
--		wait_event_interruptible_timeout
-+		wait_event_freezable_timeout
- 			(thread->wqueue,
- 			 test_bit(THREAD_WAKEUP, &thread->flags)
- 			 || kthread_should_stop() || kthread_should_park(),
-@@ -8963,6 +8966,29 @@ static void md_stop_all_writes(void)
- 		mdelay(1000*1);
- }
- 
-+/*
-+ * Ensure that neither resyncing nor reshaping occurs while the system is
-+ * frozen.
-+ */
-+static int md_notify_pm(struct notifier_block *bl, unsigned long state,
-+			void *unused)
-+{
-+	pr_debug("%s: state = %ld\n", __func__, state);
-+
-+	switch (state) {
-+	case PM_HIBERNATION_PREPARE:
-+	case PM_SUSPEND_PREPARE:
-+	case PM_RESTORE_PREPARE:
-+		md_stop_all_writes();
-+		break;
-+	}
-+	return NOTIFY_DONE;
-+}
-+
-+static struct notifier_block md_pm_notifier = {
-+	.notifier_call	= md_notify_pm,
-+};
-+
- static int md_notify_reboot(struct notifier_block *this,
- 			    unsigned long code, void *x)
- {
-@@ -9009,6 +9035,7 @@ static int __init md_init(void)
- 			    md_probe, NULL, NULL);
- 
- 	register_reboot_notifier(&md_reboot_notifier);
-+	register_pm_notifier(&md_pm_notifier);
- 	raid_table_header = register_sysctl_table(raid_root_table);
- 
- 	md_geninit();
-@@ -9248,6 +9275,7 @@ static __exit void md_exit(void)
- 
- 	unregister_blkdev(MD_MAJOR,"md");
- 	unregister_blkdev(mdp_major, "mdp");
-+	unregister_pm_notifier(&md_pm_notifier);
- 	unregister_reboot_notifier(&md_reboot_notifier);
- 	unregister_sysctl_table(raid_table_header);
- 
+Cheers,
+
+Dave.
 -- 
-2.14.2
+Dave Chinner
+david@fromorbit.com
