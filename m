@@ -1,58 +1,27 @@
-Return-Path: <BATV+33c0a560d8cf4f6c9bdc+5169+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 05/17] block: don't look at the struct device dev_t in disk_devt
-Date: Wed, 18 Oct 2017 18:52:46 +0200
-Message-Id: <20171018165258.23212-6-hch@lst.de>
-In-Reply-To: <20171018165258.23212-1-hch@lst.de>
-References: <20171018165258.23212-1-hch@lst.de>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>
+CC: "jthumshirn@suse.de" <jthumshirn@suse.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "oleksandr@natalenko.name"
+	<oleksandr@natalenko.name>, "hare@suse.com" <hare@suse.com>,
+	"mcgrof@kernel.org" <mcgrof@kernel.org>
+Subject: Re: [PATCH v5 8/8] block: Make SCSI device suspend and resume work
+ reliably
+Date: Wed, 4 Oct 2017 15:45:27 +0000
+Message-ID: <1507131926.3583.30.camel@wdc.com>
+References: <20171002225218.18548-1-bart.vanassche@wdc.com>
+	 <20171002225218.18548-9-bart.vanassche@wdc.com>
+	 <20171004070642.GF20879@lst.de>
+In-Reply-To: <20171004070642.GF20879@lst.de>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-The hidden gendisks introduced in the next patch need to keep the dev
-field in their struct device empty so that udev won't try to create
-block device nodes for them.  To support that rewrite disk_devt to
-look at the major and first_minor fields in the gendisk itself instead
-of looking into the struct device.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/genhd.c         | 4 ----
- include/linux/genhd.h | 2 +-
- 2 files changed, 1 insertion(+), 5 deletions(-)
-
-diff --git a/block/genhd.c b/block/genhd.c
-index dd305c65ffb0..1174d24e405e 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -649,10 +649,6 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
- 		return;
- 	}
- 	disk_to_dev(disk)->devt = devt;
--
--	/* ->major and ->first_minor aren't supposed to be
--	 * dereferenced from here on, but set them just in case.
--	 */
- 	disk->major = MAJOR(devt);
- 	disk->first_minor = MINOR(devt);
- 
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index ea652bfcd675..5c0ed5db33c2 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -234,7 +234,7 @@ static inline bool disk_part_scan_enabled(struct gendisk *disk)
- 
- static inline dev_t disk_devt(struct gendisk *disk)
- {
--	return disk_to_dev(disk)->devt;
-+	return MKDEV(disk->major, disk->first_minor);
- }
- 
- static inline dev_t part_devt(struct hd_struct *part)
--- 
-2.14.1
+T24gV2VkLCAyMDE3LTEwLTA0IGF0IDA5OjA2ICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
+ZToNCj4gQXMgbWVudGlvbmVkIGJlZm9yZSAtIGlmIHlvdSBwYXNzIEJMS19NUV9SRVFfKiB0byBi
+bGtfcXVldWVfZW50ZXINCj4gdGhpcyBzaG91bGQgYmVjb21lIGEgYml0IG5pY2VyIHdpdGhvdXQg
+dGhlIG5lZWQgZm9yIHR3byBtYWdpYyBib29sDQo+IHBhcmFtZXRlcnMuDQoNCkhlbGxvIENocmlz
+dG9waCwNCg0KSSB3aWxsIG1ha2UgdGhhdCBjaGFuZ2UuIFNvcnJ5IHRoYXQgSSBtaXNzZWQgaXQg
+aW4gdjUgb2YgdGhpcyBwYXRjaCBzZXJpZXMuDQoNCkJhcnQu
