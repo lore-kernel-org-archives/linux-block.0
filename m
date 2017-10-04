@@ -1,141 +1,26 @@
-Return-Path: <SRS0=uvfw=BG=fb.com=shli@kernel.org>
-From: Shaohua Li <shli@kernel.org>
-To: linux-block@vger.kernel.org
-Cc: vgoyal@redhat.com,
-	tj@kernel.org,
-	axboe@kernel.dk,
-	Kernel-team@fb.com,
-	Shaohua Li <shli@fb.com>,
-	Omar Sandoval <osandov@fb.com>
-Subject: [PATCH V2 1/3] blk-stat: delete useless code
-Date: Fri,  6 Oct 2017 17:55:59 -0700
-Message-Id: <74821887899a7d05c6429e03f0dc49a079c446b9.1507337347.git.shli@fb.com>
-In-Reply-To: <cover.1507337347.git.shli@fb.com>
-References: <cover.1507337347.git.shli@fb.com>
-In-Reply-To: <cover.1507337347.git.shli@fb.com>
-References: <cover.1507337347.git.shli@fb.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Wed, 4 Oct 2017 10:54:50 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Benjamin Block <bblock@linux.vnet.ibm.com>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH 1/9] bsg-lib: fix use-after-free under memory-pressure
+Message-ID: <20171004085450.2rhexkd66tjcfnwz@linux-x5ow.site>
+References: <20171003104845.10417-1-hch@lst.de>
+ <20171003104845.10417-2-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20171003104845.10417-2-hch@lst.de>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
 
-Fix two issues:
-- the per-cpu stat flush is unnecessary, nobody uses per-cpu stat except
-  sum it to global stat. We can do the calculation there. The flush just
-  wastes cpu time.
-- some fields are signed int/s64. I don't see the point.
-
-Cc: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/blk-stat.c          | 45 +++++++--------------------------------------
- include/linux/blk_types.h |  5 ++---
- 2 files changed, 9 insertions(+), 41 deletions(-)
-
-diff --git a/block/blk-stat.c b/block/blk-stat.c
-index c52356d..3a2f3c9 100644
---- a/block/blk-stat.c
-+++ b/block/blk-stat.c
-@@ -11,8 +11,6 @@
- #include "blk-mq.h"
- #include "blk.h"
- 
--#define BLK_RQ_STAT_BATCH	64
--
- struct blk_queue_stats {
- 	struct list_head callbacks;
- 	spinlock_t lock;
-@@ -23,45 +21,21 @@ static void blk_stat_init(struct blk_rq_stat *stat)
- {
- 	stat->min = -1ULL;
- 	stat->max = stat->nr_samples = stat->mean = 0;
--	stat->batch = stat->nr_batch = 0;
--}
--
--static void blk_stat_flush_batch(struct blk_rq_stat *stat)
--{
--	const s32 nr_batch = READ_ONCE(stat->nr_batch);
--	const s32 nr_samples = READ_ONCE(stat->nr_samples);
--
--	if (!nr_batch)
--		return;
--	if (!nr_samples)
--		stat->mean = div64_s64(stat->batch, nr_batch);
--	else {
--		stat->mean = div64_s64((stat->mean * nr_samples) +
--					stat->batch,
--					nr_batch + nr_samples);
--	}
--
--	stat->nr_samples += nr_batch;
--	stat->nr_batch = stat->batch = 0;
-+	stat->batch = 0;
- }
- 
-+/* src is a per-cpu stat, mean isn't initialized */
- static void blk_stat_sum(struct blk_rq_stat *dst, struct blk_rq_stat *src)
- {
--	blk_stat_flush_batch(src);
--
- 	if (!src->nr_samples)
- 		return;
- 
- 	dst->min = min(dst->min, src->min);
- 	dst->max = max(dst->max, src->max);
- 
--	if (!dst->nr_samples)
--		dst->mean = src->mean;
--	else {
--		dst->mean = div64_s64((src->mean * src->nr_samples) +
--					(dst->mean * dst->nr_samples),
--					dst->nr_samples + src->nr_samples);
--	}
-+	dst->mean = div_u64(src->batch + dst->mean * dst->nr_samples,
-+				dst->nr_samples + src->nr_samples);
-+
- 	dst->nr_samples += src->nr_samples;
- }
- 
-@@ -69,13 +43,8 @@ static void __blk_stat_add(struct blk_rq_stat *stat, u64 value)
- {
- 	stat->min = min(stat->min, value);
- 	stat->max = max(stat->max, value);
--
--	if (stat->batch + value < stat->batch ||
--	    stat->nr_batch + 1 == BLK_RQ_STAT_BATCH)
--		blk_stat_flush_batch(stat);
--
- 	stat->batch += value;
--	stat->nr_batch++;
-+	stat->nr_samples++;
- }
- 
- void blk_stat_add(struct request *rq)
-@@ -84,7 +53,7 @@ void blk_stat_add(struct request *rq)
- 	struct blk_stat_callback *cb;
- 	struct blk_rq_stat *stat;
- 	int bucket;
--	s64 now, value;
-+	u64 now, value;
- 
- 	now = __blk_stat_time(ktime_to_ns(ktime_get()));
- 	if (now < blk_stat_time(&rq->issue_stat))
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index a2d2aa7..3385c89 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -329,11 +329,10 @@ static inline bool blk_qc_t_is_internal(blk_qc_t cookie)
- }
- 
- struct blk_rq_stat {
--	s64 mean;
-+	u64 mean;
- 	u64 min;
- 	u64 max;
--	s32 nr_samples;
--	s32 nr_batch;
-+	u32 nr_samples;
- 	u64 batch;
- };
- 
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.9.5
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
