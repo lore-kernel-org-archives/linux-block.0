@@ -1,80 +1,58 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:43886 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753232AbdJMXgK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 19:36:10 -0400
-Received: by mail-pg0-f66.google.com with SMTP id s75so1499478pgs.0
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 16:36:10 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Michael Lyle <mlyle@lyle.org>
-Subject: [PATCH 10/15] bcache: smooth writeback rate control
-Date: Fri, 13 Oct 2017 16:35:37 -0700
-Message-Id: <20171013233542.20938-11-mlyle@lyle.org>
-In-Reply-To: <20171013233542.20938-1-mlyle@lyle.org>
-References: <20171013233542.20938-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <SRS0=lAXC=BD=fb.com=shli@kernel.org>
+From: Shaohua Li <shli@kernel.org>
+To: linux-block@vger.kernel.org
+Cc: ming.lei@redhat.com,
+	axboe@kernel.dk,
+	Shaohua Li <shli@fb.com>
+Subject: [PATCH V3 1/3] block/loop: don't hijack error number
+Date: Wed,  4 Oct 2017 07:52:43 -0700
+Message-Id: <d3e3e3bc5992554fe8476eabc9a06b1c9e844e5e.1507072136.git.shli@fb.com>
+In-Reply-To: <cover.1507072136.git.shli@fb.com>
+References: <cover.1507072136.git.shli@fb.com>
+In-Reply-To: <cover.1507072136.git.shli@fb.com>
+References: <cover.1507072136.git.shli@fb.com>
+List-ID: <linux-block@vger.kernel.org>
 
-This works in conjunction with the new PI controller.  Currently, in
-real-world workloads, the rate controller attempts to write back 1
-sector per second.  In practice, these minimum-rate writebacks are
-between 4k and 60k in test scenarios, since bcache aggregates and
-attempts to do contiguous writes and because filesystems on top of
-bcachefs typically write 4k or more.
+From: Shaohua Li <shli@fb.com>
 
-Previously, bcache used to guarantee to write at least once per second.
-This means that the actual writeback rate would exceed the configured
-amount by a factor of 8-120 or more.
+If the bio returns -EOPNOTSUPP, we shouldn't hijack it and return -EIO
 
-This patch adjusts to be willing to sleep up to 2.5 seconds, and to
-target writing 4k/second.  On the smallest writes, it will sleep 1
-second like before, but many times it will sleep longer and load the
-backing device less.  This keeps the loading on the cache and backing
-device related to writeback more consistent when writing back at low
-rates.
-
-Signed-off-by: Michael Lyle <mlyle@lyle.org>
-Reviewed-by: Coly Li <colyli@suse.de>
+Signed-off-by: Shaohua Li <shli@fb.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/bcache/util.c      | 10 ++++++++--
- drivers/md/bcache/writeback.c |  2 +-
- 2 files changed, 9 insertions(+), 3 deletions(-)
+ drivers/block/loop.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
-index 176d3c2ef5f5..4dbe37e82877 100644
---- a/drivers/md/bcache/util.c
-+++ b/drivers/md/bcache/util.c
-@@ -232,8 +232,14 @@ uint64_t bch_next_delay(struct bch_ratelimit *d, uint64_t done)
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index bc8e615..6aa739f 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -460,7 +460,7 @@ static void lo_complete_rq(struct request *rq)
+ 		zero_fill_bio(bio);
+ 	}
  
- 	d->next += div_u64(done * NSEC_PER_SEC, d->rate);
+-	blk_mq_end_request(rq, cmd->ret < 0 ? BLK_STS_IOERR : BLK_STS_OK);
++	blk_mq_end_request(rq, errno_to_blk_status(cmd->ret));
+ }
  
--	if (time_before64(now + NSEC_PER_SEC, d->next))
--		d->next = now + NSEC_PER_SEC;
-+	/* Bound the time.  Don't let us fall further than 2 seconds behind
-+	 * (this prevents unnecessary backlog that would make it impossible
-+	 * to catch up).  If we're ahead of the desired writeback rate,
-+	 * don't let us sleep more than 2.5 seconds (so we can notice/respond
-+	 * if the control system tells us to speed up!).
-+	 */
-+	if (time_before64(now + NSEC_PER_SEC * 5 / 2, d->next))
-+		d->next = now + NSEC_PER_SEC * 5 / 2;
+ static void lo_rw_aio_do_completion(struct loop_cmd *cmd)
+@@ -478,7 +478,7 @@ static void lo_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
  
- 	if (time_after64(now - NSEC_PER_SEC * 2, d->next))
- 		d->next = now - NSEC_PER_SEC * 2;
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index cac8678da5d0..8deb721c355e 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -526,7 +526,7 @@ void bch_cached_dev_writeback_init(struct cached_dev *dc)
- 	dc->writeback_percent		= 10;
- 	dc->writeback_delay		= 30;
- 	dc->writeback_rate.rate		= 1024;
--	dc->writeback_rate_minimum	= 1;
-+	dc->writeback_rate_minimum	= 8;
+ 	if (cmd->css)
+ 		css_put(cmd->css);
+-	cmd->ret = ret;
++	cmd->ret = ret > 0 ? 0 : ret;
+ 	lo_rw_aio_do_completion(cmd);
+ }
  
- 	dc->writeback_rate_update_seconds = 5;
- 	dc->writeback_rate_p_term_inverse = 40;
+@@ -1719,7 +1719,7 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
+  failed:
+ 	/* complete non-aio request */
+ 	if (!cmd->use_aio || ret) {
+-		cmd->ret = ret ? -EIO : 0;
++		cmd->ret = ret;
+ 		blk_mq_complete_request(cmd->rq);
+ 	}
+ }
 -- 
-2.11.0
+2.9.5
