@@ -1,53 +1,45 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from latin.grep.be ([46.4.76.168]:58595 "EHLO latin.grep.be"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751817AbdJCQq2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 3 Oct 2017 12:46:28 -0400
-Date: Tue, 3 Oct 2017 18:46:17 +0200
-From: Wouter Verhelst <w@uter.be>
-To: nbd@other.debian.org, jbacik@fb.com, linux-block@vger.kernel.org,
-        axboe@fb.com
-Subject: Re: [Nbd] [PATCH] MAINTAINERS: update list for NBD
-Message-ID: <20171003164617.ryrljc3i5x3urrig@grep.be>
-References: <20170922100954.2kxokpys5onj32ef@grep.be>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170922100954.2kxokpys5onj32ef@grep.be>
+Received: from mx2.suse.de ([195.135.220.15]:33935 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752247AbdJDNzh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 4 Oct 2017 09:55:37 -0400
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-block@vger.kernel.org
+Cc: axboe@kernel.dk, shli@kernel.org,
+        Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 9/9] dm-mpath: Add nowait support
+Date: Wed,  4 Oct 2017 08:55:11 -0500
+Message-Id: <20171004135511.26110-10-rgoldwyn@suse.de>
+In-Reply-To: <20171004135511.26110-1-rgoldwyn@suse.de>
+References: <20171004135511.26110-1-rgoldwyn@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-ping?
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-On Fri, Sep 22, 2017 at 12:09:54PM +0200, Wouter Verhelst wrote:
-> nbd-general@sourceforge.net becomes nbd@other.debian.org, because
-> sourceforge is just a spamtrap these days.
-> 
-> Signed-off-by: Wouter Verhelst <w@uter.be>
-> Reviewed-by: Josef Bacik <jbacik@fb.com>
-> ---
->  MAINTAINERS | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index fbb269415f06..2f8824995a93 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -9326,7 +9326,7 @@ NETWORK BLOCK DEVICE (NBD)
->  M:	Josef Bacik <jbacik@fb.com>
->  S:	Maintained
->  L:	linux-block@vger.kernel.org
-> -L:	nbd-general@lists.sourceforge.net
-> +L:	nbd@other.debian.org
->  F:	Documentation/blockdev/nbd.txt
->  F:	drivers/block/nbd.c
->  F:	include/uapi/linux/nbd.h
-> -- 
-> 2.14.1
-> 
-> 
+If there are no queues, bail if REQ_NOWAIT is set instead
+of queueing up I/O.
 
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+---
+ drivers/md/dm-mpath.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
+index 11f273d2f018..d714c1b1b066 100644
+--- a/drivers/md/dm-mpath.c
++++ b/drivers/md/dm-mpath.c
+@@ -542,6 +542,11 @@ static int __multipath_map_bio(struct multipath *m, struct bio *bio, struct dm_m
+ 
+ 	if ((pgpath && queue_io) ||
+ 	    (!pgpath && test_bit(MPATHF_QUEUE_IF_NO_PATH, &m->flags))) {
++		/* Bail if nowait is set */
++		if (bio->bi_opf & REQ_NOWAIT) {
++			bio_wouldblock_error(bio);
++			return DM_MAPIO_SUBMITTED;
++		}
+ 		/* Queue for the daemon to resubmit */
+ 		spin_lock_irqsave(&m->lock, flags);
+ 		bio_list_add(&m->queued_bios, bio);
 -- 
-Could you people please use IRC like normal people?!?
-
-  -- Amaya Rodrigo Sastre, trying to quiet down the buzz in the DebConf 2008
-     Hacklab
+2.14.2
