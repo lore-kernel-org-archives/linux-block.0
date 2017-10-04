@@ -1,91 +1,83 @@
-Return-Path: <prvs=4411c008b=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	=Oleksandr Natalenko <oleksandr@natalenko.name>,
-	"Luis R . Rodriguez" <mcgrof@kernel.org>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Shaohua Li <shli@kernel.org>,
-	linux-raid@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v5 1/8] md: Introduce md_stop_all_writes()
-Date: Mon,  2 Oct 2017 15:52:11 -0700
-Message-Id: <20171002225218.18548-2-bart.vanassche@wdc.com>
-In-Reply-To: <20171002225218.18548-1-bart.vanassche@wdc.com>
-References: <20171002225218.18548-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:33901 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752267AbdJDNzb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 4 Oct 2017 09:55:31 -0400
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-block@vger.kernel.org
+Cc: axboe@kernel.dk, shli@kernel.org,
+        Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 6/9] dm: add nowait support
+Date: Wed,  4 Oct 2017 08:55:08 -0500
+Message-Id: <20171004135511.26110-7-rgoldwyn@suse.de>
+In-Reply-To: <20171004135511.26110-1-rgoldwyn@suse.de>
+References: <20171004135511.26110-1-rgoldwyn@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Introduce md_stop_all_writes() because the next patch will add
-a second caller for this function. Rename md_notifier into
-md_reboot_notifier to avoid that the name of this notifier will
-become confusing due to the next patch. This patch does not
-change any functionality.
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Shaohua Li <shli@kernel.org>
-Cc: linux-raid@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Add support for bio based dm devices, which exclusively
+sets a make_request_fn(). Request based devices are supported
+by default.
+
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- drivers/md/md.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+ drivers/md/dm.c | 28 +++++++++++++++++++++++++++-
+ 1 file changed, 27 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 0ff1bbf6c90e..3f7426120a3b 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -8935,8 +8935,7 @@ int rdev_clear_badblocks(struct md_rdev *rdev, sector_t s, int sectors,
- }
- EXPORT_SYMBOL_GPL(rdev_clear_badblocks);
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 6e54145969c5..b721716862a2 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1522,6 +1522,8 @@ static blk_qc_t dm_make_request(struct request_queue *q, struct bio *bio)
  
--static int md_notify_reboot(struct notifier_block *this,
--			    unsigned long code, void *x)
-+static void md_stop_all_writes(void)
- {
- 	struct list_head *tmp;
- 	struct mddev *mddev;
-@@ -8960,11 +8959,17 @@ static int md_notify_reboot(struct notifier_block *this,
- 	 */
- 	if (need_delay)
- 		mdelay(1000*1);
+ 		if (!(bio->bi_opf & REQ_RAHEAD))
+ 			queue_io(md, bio);
++		else if (bio->bi_opf & REQ_NOWAIT)
++			bio_wouldblock_error(bio);
+ 		else
+ 			bio_io_error(bio);
+ 		return BLK_QC_T_NONE;
+@@ -2011,6 +2013,29 @@ struct queue_limits *dm_get_queue_limits(struct mapped_device *md)
+ }
+ EXPORT_SYMBOL_GPL(dm_get_queue_limits);
+ 
++static int device_supports_nowait(struct dm_target *ti, struct dm_dev *dev,
++				  sector_t start, sector_t len, void *data)
++{
++	struct request_queue *q = bdev_get_queue(dev->bdev);
++	return q && blk_queue_supports_nowait(q);
 +}
 +
-+static int md_notify_reboot(struct notifier_block *this,
-+			    unsigned long code, void *x)
++static bool dm_table_supports_nowait(struct dm_table *t)
 +{
-+	md_stop_all_writes();
- 
- 	return NOTIFY_DONE;
- }
- 
--static struct notifier_block md_notifier = {
-+static struct notifier_block md_reboot_notifier = {
- 	.notifier_call	= md_notify_reboot,
- 	.next		= NULL,
- 	.priority	= INT_MAX, /* before any real devices */
-@@ -9001,7 +9006,7 @@ static int __init md_init(void)
- 	blk_register_region(MKDEV(mdp_major, 0), 1UL<<MINORBITS, THIS_MODULE,
- 			    md_probe, NULL, NULL);
- 
--	register_reboot_notifier(&md_notifier);
-+	register_reboot_notifier(&md_reboot_notifier);
- 	raid_table_header = register_sysctl_table(raid_root_table);
- 
- 	md_geninit();
-@@ -9241,7 +9246,7 @@ static __exit void md_exit(void)
- 
- 	unregister_blkdev(MD_MAJOR,"md");
- 	unregister_blkdev(mdp_major, "mdp");
--	unregister_reboot_notifier(&md_notifier);
-+	unregister_reboot_notifier(&md_reboot_notifier);
- 	unregister_sysctl_table(raid_table_header);
- 
- 	/* We cannot unload the modules while some process is
++	struct dm_target *ti;
++	unsigned i;
++
++	for (i = 0; i < dm_table_get_num_targets(t); i++) {
++		ti = dm_table_get_target(t, i);
++
++		if (!ti->type->iterate_devices ||
++		    !ti->type->iterate_devices(ti, device_supports_nowait, NULL))
++			return false;
++	}
++
++	return true;
++}
++
+ /*
+  * Setup the DM device's queue based on md's type
+  */
+@@ -2044,7 +2069,8 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t)
+ 		 */
+ 		bioset_free(md->queue->bio_split);
+ 		md->queue->bio_split = NULL;
+-
++		if (dm_table_supports_nowait(t))
++			queue_flag_set_unlocked(QUEUE_FLAG_NOWAIT, md->queue);
+ 		if (type == DM_TYPE_DAX_BIO_BASED)
+ 			queue_flag_set_unlocked(QUEUE_FLAG_DAX, md->queue);
+ 		break;
 -- 
-2.14.1
+2.14.2
