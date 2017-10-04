@@ -1,25 +1,40 @@
 Return-Path: <Bart.VanAssche@wdc.com>
 From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@lst.de" <hch@lst.de>
-CC: "ming.lei@redhat.com" <ming.lei@redhat.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "oleksandr@natalenko.name"
-	<oleksandr@natalenko.name>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"mcgrof@kernel.org" <mcgrof@kernel.org>
+To: "hch@lst.de" <hch@lst.de>, "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "mcgrof@kernel.org" <mcgrof@kernel.org>
 Subject: Re: [PATCH v5 0/8] block, scsi, md: Improve suspend and resume
-Date: Wed, 4 Oct 2017 15:21:32 +0000
-Message-ID: <1507130490.3583.12.camel@wdc.com>
+Date: Wed, 4 Oct 2017 15:18:45 +0000
+Message-ID: <1507130324.3583.9.camel@wdc.com>
 References: <20171002225218.18548-1-bart.vanassche@wdc.com>
-	 <20171004065607.GA20879@lst.de>
-In-Reply-To: <20171004065607.GA20879@lst.de>
+	 <20171004065607.GA20879@lst.de> <20171004075326.GA17729@ming.t460p>
+In-Reply-To: <20171004075326.GA17729@ming.t460p>
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-T24gV2VkLCAyMDE3LTEwLTA0IGF0IDA4OjU2ICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
-ZToNCj4gY2FuIHlvdSBndXlzIHBsZWFzZSB3b3JrIGEgbGl0dGxlIGJldHRlciB0b2dldGhlcj8g
-IFdlJ3ZlIG5vdyBnb3QgdHdvDQo+IHBhdGNoc2V0cyB0aGF0IGFyZSBnZXR0aW5nIHZlcnkgc2lt
-aWxhci4NCj4gDQo+IEJhcnQsIHBsZWFzZSBhdCBsZWFzdCBDQyBNaW5nIHdoZW4geW91IHNlbmQg
-b3V0IHRoZSBwYXRjaGVzLg0KDQpIZWxsbyBDaHJpc3RvcGgsDQoNClNvcnJ5IGZvciB0aGUgbG93
-IGxldmVsIG9mIGNvbGxhYm9yYXRpb24gc28gZmFyLiBBbnl3YXksIEkgd2lsbCBDYyBNaW5nIGlm
-IEkgcmVwb3N0DQp0aGlzIHBhdGNoIHNlcmllcy4NCg0KQmFydC4=
+T24gV2VkLCAyMDE3LTEwLTA0IGF0IDE1OjUzICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gSSBo
+YXZlIGNvbW1lbnRlZCBvbiBCYXJ0J3MgcGF0Y2hzZXQgYmVmb3JlLCBidXQgbXkgY29tbWVudHMN
+Cj4gbmV2ZXIgZ2V0cyBhZGRyZXNzZWQ6DQo+IA0KPiAxKSBubyBNRCBjaGFuZ2VzIHJlcXVpcmVk
+IG9uIHRoaXMgaXNzdWUNCg0KSSBkaWQgbm90IGFkZHJlc3MgdGhhdCBjb21tZW50IGJlY2F1c2Ug
+eW91IGhhdmUgYW5vdGhlciB2aWV3IG9uIGhvdyBzdXNwZW5kDQphbmQgcmVzdW1lIHNob3VsZCB3
+b3JrIHRoYW4gdGhlIHJlc3Qgb2YgdGhlIGtlcm5lbCBjb21tdW5pdHkuIFNlZSBhbHNvIHRoZQ0K
+ZGV0YWlsZWQgZXhwbGFuYXRpb24gaW4gaHR0cHM6Ly9tYXJjLmluZm8vP2w9bGludXgtYmxvY2sm
+bT0xNTA2OTU4NzkzMDk2MDYuDQpTZWUgYWxzbyBMdWlzJyBjb3ZlciBsZXR0ZXIgIltSRkMgMC81
+XSBmczogcmVwbGFjZSBrdGhyZWFkIGZyZWV6aW5nIHdpdGgNCmZpbGVzeXN0ZW0gZnJlZXplL3Ro
+YXciIChodHRwczovL21hcmMuaW5mby8/bD1saW51eC1ibG9jayZtPTE1MDcwNTY5MDMwMjQyMCku
+DQoNCj4gMikgUkNVIHJlYWQgbG9jayBpcyBtaXNzZWQgaW4gZmFzdCBwYXRoDQoNCkRpZCB5b3Ug
+cmVhbGx5IHBvc3QgdGhpcyBhcyBhIHJldmlldyBjb21tZW50IG9uIG15IHBhdGNoIHNlcmllcz8g
+QW55d2F5LCB0aGlzDQppcyBlYXN5IHRvIGFkZHJlc3MuDQoNCj4gMykgYmFkIHBhdGNoIHRpdGxl
+Og0KPiANCj4gLSBzdWNoIGFzIDogICdzY3NpLW1xOiBSZWR1Y2Ugc3VzcGVuZCBsYXRlbmN5Jw0K
+PiAJdGhpcyBpcyB2ZXJ5IG1pc2xlYWRpbmcgc2luY2UgaXQgaXMgYWN0dWFsbHkgYnVnIGZpeA0K
+PiANCj4gLSBzdWNoIGFzIDogIk1ha2UgU0NTSSBkZXZpY2Ugc3VzcGVuZCBhbmQgcmVzdW1lIHdv
+cmsgcmVsaWFibHkiDQo+IAlhbHNvIGEgYml0IG5vdCBhY2N1cmF0ZQ0KDQpTYW1lIGhlcmUgLSBo
+YWQgeW91IHBvc3RlZCB0aGlzIGFzIGEgcmV2aWV3IGNvbW1lbnQgYmVmb3JlPyBBbnl3YXksIHRo
+aXMgaXMNCmFsc28gZWFzeSB0byBhZGRyZXNzLg0KDQo+IEFsc28gaG9sZGluZyBzZGV2LT5zdGF0
+ZV9tdXRleCBiZWZvcmUgZnJlZXppbmcgcXVldWUgbWlnaHQNCj4gY2F1c2UgZGVhZGxvY2sgc2lu
+Y2UgdGhpcyBsb2NrIGNhbiBiZSBhY3F1aXJlZCBpbiBlaCBoYW5kbGVyKA0KPiBzY3NpX2VoX29m
+ZmxpbmVfc2RldnMoKSkNCg0KSGFkIHlvdSBwb3N0ZWQgdGhpcyBhcyBhIGNvbW1lbnQgYmVmb3Jl
+PyBBbnl3YXksIEkgd2lsbCBhZGRyZXNzIHRoaXMgY29tbWVudA0KdG9vLg0KDQpCYXJ0Lg==
