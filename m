@@ -1,19 +1,23 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:49732 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751156AbdJDHSc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 4 Oct 2017 03:18:32 -0400
 From: Johannes Thumshirn <jthumshirn@suse.de>
 To: Christoph Hellwig <hch@lst.de>
 Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
         Benjamin Block <bblock@linux.vnet.ibm.com>
 Subject: Re: [PATCH 9/9] bsg: split handling of SCSI CDBs vs transport requeues
-References: <20171003104845.10417-1-hch@lst.de>
-        <20171003104845.10417-10-hch@lst.de>
-Date: Wed, 04 Oct 2017 09:18:11 +0200
 In-Reply-To: <20171003104845.10417-10-hch@lst.de> (Christoph Hellwig's message
         of "Tue, 3 Oct 2017 12:48:45 +0200")
-Message-ID: <mqd7ewbidos.fsf@linux-x5ow.site>
+References: <20171003104845.10417-1-hch@lst.de>
+        <20171003104845.10417-10-hch@lst.de>
+Date: Wed, 04 Oct 2017 09:18:31 +0200
+Message-ID: <mqd60bvido8.fsf@linux-x5ow.site>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 Christoph Hellwig <hch@lst.de> writes:
 [...]
