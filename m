@@ -1,42 +1,63 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:49732 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:45484 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751156AbdJDHSc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 4 Oct 2017 03:18:32 -0400
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        id S1750871AbdJDG0j (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 4 Oct 2017 02:26:39 -0400
+Subject: Re: [PATCH 9/9] bsg: split handling of SCSI CDBs vs transport
+ requeues
+To: Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc: Johannes Thumshirn <jthumshirn@suse.de>,
         Benjamin Block <bblock@linux.vnet.ibm.com>
-Subject: Re: [PATCH 9/9] bsg: split handling of SCSI CDBs vs transport requeues
-In-Reply-To: <20171003104845.10417-10-hch@lst.de> (Christoph Hellwig's message
-        of "Tue, 3 Oct 2017 12:48:45 +0200")
 References: <20171003104845.10417-1-hch@lst.de>
-        <20171003104845.10417-10-hch@lst.de>
-Date: Wed, 04 Oct 2017 09:18:31 +0200
-Message-ID: <mqd60bvido8.fsf@linux-x5ow.site>
+ <20171003104845.10417-10-hch@lst.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <0f42d858-57a0-a499-eb56-6d1b8bd46218@suse.de>
+Date: Wed, 4 Oct 2017 08:26:36 +0200
 MIME-Version: 1.0
+In-Reply-To: <20171003104845.10417-10-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Christoph Hellwig <hch@lst.de> writes:
-[...]
-> @@ -965,7 +932,8 @@ void bsg_unregister_queue(struct request_queue *q)
->  EXPORT_SYMBOL_GPL(bsg_unregister_queue);
->  
->  int bsg_register_queue(struct request_queue *q, struct device *parent,
-> -		       const char *name, void (*release)(struct device *))
-> +		const char *name, const struct bsg_ops *ops,
-> +		void (*release)(struct device *))
+On 10/03/2017 12:48 PM, Christoph Hellwig wrote:
+> The current BSG design tries to shoe-horn the transport-specific passthrough
+> commands into the overall framework for SCSI passthrough requests.  This
+> has a couple problems:
+> 
+>  - each passthrough queue has to set the QUEUE_FLAG_SCSI_PASSTHROUGH flag
+>    despite not dealing with SCSI commands at all.  Because of that these
+>    queues could also incorrectly accept SCSI commands from in-kernel
+>    users or through the legacy SCSI_IOCTL_SEND_COMMAND ioctl.
+>  - the real SCSI bsg queues also incorrectly accept bsg requests of the
+>    BSG_SUB_PROTOCOL_SCSI_TRANSPORT type
+>  - the bsg transport code is almost unredable because it tries to reuse
+>    different SCSI concepts for its own purpose.
+> 
+> This patch instead adds a new bsg_ops structure to handle the two cases
+> differently, and thus solves all of the above problems.  Another side
+> effect is that the bsg-lib queues also don't need to embedd a
+> struct scsi_request anymore.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/bsg-lib.c                   | 158 +++++++++++++++--------
+>  block/bsg.c                       | 257 +++++++++++++++++---------------------
+>  drivers/scsi/scsi_lib.c           |   4 +-
+>  drivers/scsi/scsi_sysfs.c         |   3 +-
+>  drivers/scsi/scsi_transport_sas.c |   1 -
+>  include/linux/bsg-lib.h           |   4 +-
+>  include/linux/bsg.h               |  35 ++++--
+>  7 files changed, 251 insertions(+), 211 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Wouldn't it make sense to put the ->release() method into bsg_ops as
-well? The current prototype of bsg_register_queue isn't exactly what I
-would call a sane API.
+Cheers,
 
+Hannes
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
 SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
 HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
