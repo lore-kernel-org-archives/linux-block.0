@@ -1,103 +1,34 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:62848 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751278AbdJEABQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Oct 2017 20:01:16 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        =Oleksandr Natalenko <oleksandr@natalenko.name>,
-        "Luis R . Rodriguez" <mcgrof@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v6 8/9] block: Add the QUEUE_FLAG_PREEMPT_ONLY request queue flag
-Date: Wed,  4 Oct 2017 17:01:09 -0700
-Message-Id: <20171005000110.15904-9-bart.vanassche@wdc.com>
-In-Reply-To: <20171005000110.15904-1-bart.vanassche@wdc.com>
-References: <20171005000110.15904-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>
+CC: "jthumshirn@suse.de" <jthumshirn@suse.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "oleksandr@natalenko.name"
+	<oleksandr@natalenko.name>, "hare@suse.com" <hare@suse.com>,
+	"mcgrof@kernel.org" <mcgrof@kernel.org>
+Subject: Re: [PATCH v5 6/8] scsi: Reduce suspend latency
+Date: Wed, 4 Oct 2017 15:41:30 +0000
+Message-ID: <1507131688.3583.26.camel@wdc.com>
+References: <20171002225218.18548-1-bart.vanassche@wdc.com>
+	 <20171002225218.18548-7-bart.vanassche@wdc.com>
+	 <20171004070444.GD20879@lst.de>
+In-Reply-To: <20171004070444.GD20879@lst.de>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-This flag will be used in the next patch to let the block layer
-core know whether or not a SCSI request queue has been quiesced.
-A quiesced SCSI queue namely only processes RQF_PREEMPT requests.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- block/blk-core.c       | 29 +++++++++++++++++++++++++++++
- include/linux/blkdev.h |  6 ++++++
- 2 files changed, 35 insertions(+)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 842e67e0b7ab..b8d90fc29b35 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -346,6 +346,35 @@ void blk_sync_queue(struct request_queue *q)
- }
- EXPORT_SYMBOL(blk_sync_queue);
- 
-+/**
-+ * blk_set_preempt_only - set QUEUE_FLAG_PREEMPT_ONLY.
-+ *
-+ * Returns the previous value of the PREEMPT_ONLY flag - 0 if the flag was not
-+ * set and 1 if the flag was already set.
-+ */
-+int blk_set_preempt_only(struct request_queue *q)
-+{
-+	unsigned long flags;
-+	int res;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	res = queue_flag_test_and_set(QUEUE_FLAG_PREEMPT_ONLY, q);
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+
-+	return res;
-+}
-+EXPORT_SYMBOL_GPL(blk_set_preempt_only);
-+
-+void blk_clear_preempt_only(struct request_queue *q)
-+{
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	queue_flag_clear(QUEUE_FLAG_PREEMPT_ONLY, q);
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+}
-+EXPORT_SYMBOL_GPL(blk_clear_preempt_only);
-+
- /**
-  * __blk_run_queue_uncond - run a queue whether or not it has been stopped
-  * @q:	The queue to run
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 9a85f6ad4f89..c4174f78c6eb 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -631,6 +631,7 @@ struct request_queue {
- #define QUEUE_FLAG_REGISTERED  26	/* queue has been registered to a disk */
- #define QUEUE_FLAG_SCSI_PASSTHROUGH 27	/* queue supports SCSI commands */
- #define QUEUE_FLAG_QUIESCED    28	/* queue has been quiesced */
-+#define QUEUE_FLAG_PREEMPT_ONLY	29	/* only process REQ_PREEMPT requests */
- 
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_STACKABLE)	|	\
-@@ -735,6 +736,11 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
- 			     REQ_FAILFAST_DRIVER))
- #define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
-+#define blk_queue_preempt_only(q)				\
-+	test_bit(QUEUE_FLAG_PREEMPT_ONLY, &(q)->queue_flags)
-+
-+extern int blk_set_preempt_only(struct request_queue *q);
-+extern void blk_clear_preempt_only(struct request_queue *q);
- 
- static inline bool blk_account_rq(struct request *rq)
- {
--- 
-2.14.2
+T24gV2VkLCAyMDE3LTEwLTA0IGF0IDA5OjA0ICswMjAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
+ZToNCj4gPiArCS8qDQo+ID4gKwkgKiBEbyBub3QgYXR0ZW1wdCB0byBmcmVlemUgdGhlIHF1ZXVl
+IG9mIGFuIGFscmVhZHkgcXVpZXNjZWQgZGV2aWNlDQo+ID4gKwkgKiBiZWNhdXNlIHRoYXQgY291
+bGQgcmVzdWx0IGluIGEgZGVhZGxvY2suDQo+ID4gKwkgKi8NCj4gPiArCWZyZWV6ZSA9IHNkZXYt
+PnNkZXZfc3RhdGUgPT0gU0RFVl9SVU5OSU5HOw0KPiA+ICsJaWYgKGZyZWV6ZSkNCj4gPiArCQli
+bGtfbXFfZnJlZXplX3F1ZXVlKHEpOw0KPiA+ICAJZXJyID0gc2NzaV9kZXZpY2Vfc2V0X3N0YXRl
+KHNkZXYsIFNERVZfUVVJRVNDRSk7DQo+IA0KPiBJIGRvbid0IHJlYWxseSBsaWtlIHRoaXMgbWFn
+aWMgd2l0aCBhIGZyZWV6ZSBpbnNpZGUgdGhlIGxvY2sNCj4gYW5kIHRoZSBtYWdpYyBkZXBlbmRl
+bmN5IG9uIHRoZSBwcmV2aW91cy4gIEJ1dCBJIGNhbid0IHJlYWxseSBjb21lIHVwDQo+IHdpdGgg
+YSBiZXR0ZXIgaWRlYSBlaXRoZXIuDQoNClRoZSBkZWFkbG9jayBJIHJlZmVycmVkIHRvIGluIG15
+IGNvbW1lbnQgY2FuIG9ubHkgb2NjdXIgaWYgYW55IGNvZGUgd291bGQgY2hhbmdlDQp0aGUgU0NT
+SSBkZXZpY2Ugc3RhdGUgaW50byBTREVWX1FVSUVTQ0Ugd2l0aG91dCBmcmVlemluZyB0aGUgcmVx
+dWVzdCBxdWV1ZSBmaXJzdC4NCkkgd2lsbCBsb29rIGludG8gZnJlZXppbmcgdGhlIHF1ZXVlIHdp
+dGhvdXQgaG9sZGluZyB0aGUgc2RldiBzdGF0ZSBtdXRleC4NCg0KQmFydC4=
