@@ -1,6 +1,6 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Wed, 4 Oct 2017 19:30:22 +0800
-From: Ming Lei <ming.lei@redhat.com>
+Return-Path: <lurodriguez@suse.de>
+Date: Wed, 4 Oct 2017 03:16:10 +0200
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
 To: Bart Van Assche <bart.vanassche@wdc.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
@@ -8,11 +8,11 @@ Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	=Oleksandr Natalenko <oleksandr@natalenko.name>,
 	"Luis R . Rodriguez" <mcgrof@kernel.org>,
 	Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
-	Hannes Reinecke <hare@suse.com>,
+	Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.com>,
 	Johannes Thumshirn <jthumshirn@suse.de>
 Subject: Re: [PATCH v5 2/8] md: Neither resync nor reshape while the system
  is frozen
-Message-ID: <20171004113021.GC17729@ming.t460p>
+Message-ID: <20171004011610.GP2294@wotan.suse.de>
 References: <20171002225218.18548-1-bart.vanassche@wdc.com>
  <20171002225218.18548-3-bart.vanassche@wdc.com>
 MIME-Version: 1.0
@@ -21,29 +21,87 @@ In-Reply-To: <20171002225218.18548-3-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
 On Mon, Oct 02, 2017 at 03:52:12PM -0700, Bart Van Assche wrote:
-> Some people use the md driver on laptops and use the suspend and
-> resume functionality. Since it is essential that submitting of
-> new I/O requests stops before a hibernation image is created,
-> interrupt the md resync and reshape actions if the system is
-> being frozen. Note: the resync and reshape will restart after
-> the system is resumed and a message similar to the following
-> will appear in the system log:
-> 
-> md: md0: data-check interrupted.
-> 
-> Additionally, only allow resync or reshape activity to be
-> started after system freezing is over.
+> diff --git a/drivers/md/md.c b/drivers/md/md.c
+> index 3f7426120a3b..a2cf2a93b0cb 100644
+> --- a/drivers/md/md.c
+> +++ b/drivers/md/md.c
+> @@ -8961,6 +8963,37 @@ static void md_stop_all_writes(void)
+>  		mdelay(1000*1);
+>  }
+>  
+> +/*
+> + * Ensure that neither resyncing nor reshaping occurs while the system is
+> + * frozen.
+> + */
+> +static int md_notify_pm(struct notifier_block *bl, unsigned long state,
+> +			void *unused)
+> +{
+> +	struct mddev *mddev;
+> +	struct list_head *tmp;
+> +
+> +	pr_debug("%s: state = %ld; system_freezing_cnt = %d\n", __func__, state,
+> +		 atomic_read(&system_freezing_cnt));
+> +
+> +	switch (state) {
+> +	case PM_HIBERNATION_PREPARE:
 
-Last time, I asked which issue is fixed by this patch, but
-never get answered, so again, what is issue fixed by
-this patch?
+Hm, why not also include and use this for PM_SUSPEND_PREPARE and/or
+a PM_RESTORE_PREPARE.
 
-Given the following patches for making SCSI quiesce safe
-is required in either PM suspend/resume or other path
-of transport_spi revalidate. So once theses patches are
-in, I don't see any I/O hang in suspend/resume given
-the SCSI quiesce issue is very specific one, and not
-see this issue on other kind of device.
+        case PM_HIBERNATION_PREPARE:
+        case PM_SUSPEND_PREPARE:
+        case PM_RESTORE_PREPARE:
 
-Thanks,
-Ming
+> +		md_stop_all_writes();
+> +		break;
+> +	case PM_POST_HIBERNATION:
+
+Likewise here:
+
+        case PM_POST_SUSPEND:
+        case PM_POST_HIBERNATION:
+        case PM_POST_RESTORE:
+
+I have revised the kernel suspend ordering and indeed things issued
+with the pm notifier should suffice to be processed given we actually
+call the pm ops (dpm_prepare()) for device drivers *after* the notifier
+is called and then after userspace is frozen. That is:
+
+   pm_suspend() --> enter_state() -->
+     sys_sync()
+     suspend_prepare() -->
+             __pm_notifier_call_chain(PM_SUSPEND_PREPARE, ...);
+             suspend_freeze_processes() -->
+                     freeze_processes() -->
+                             __usermodehelper_set_disable_depth(UMH_DISABLED);
+                             freeze all tasks ...
+                     freeze_kernel_threads()
+     suspend_devices_and_enter() -->
+             dpm_suspend_start() -->
+                             dpm_prepare()
+                             dpm_suspend()
+             suspend_enter()  -->
+                     platform_suspend_prepare()
+                     dpm_suspend_late()
+                     freeze_enter()
+                     syscore_suspend()
+
+On our way back up:
+
+     enter_state() -->
+     suspend_devices_and_enter() --> (bail from loop)
+             dpm_resume_end() -->
+                     dpm_resume()
+                     dpm_complete()
+     suspend_finish() -->
+             suspend_thaw_processes() -->
+                     thaw_processes() -->
+                             __usermodehelper_set_disable_depth(UMH_FREEZING);
+                             thaw_workqueues();
+                             thaw all processes ...
+                             usermodehelper_enable();
+             pm_notifier_call_chain(PM_POST_SUSPEND);
+
+So notifier would indeed be the right tooling to use here.
+
+  Luis
