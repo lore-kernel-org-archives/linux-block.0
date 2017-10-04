@@ -1,26 +1,38 @@
 Return-Path: <linux-scsi-owner@vger.kernel.org>
-Date: Wed, 4 Oct 2017 10:53:45 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Benjamin Block <bblock@linux.vnet.ibm.com>
 Subject: Re: [PATCH 5/9] scsi_transport_sas: check reply payload length
  instead of bidi request
-Message-ID: <20171004085345.d5bvbf7ky4dj6xig@linux-x5ow.site>
+To: Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc: Johannes Thumshirn <jthumshirn@suse.de>,
+        Benjamin Block <bblock@linux.vnet.ibm.com>
 References: <20171003104845.10417-1-hch@lst.de>
  <20171003104845.10417-6-hch@lst.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <a8397313-43ed-279c-2cb1-a8880d949c4d@suse.de>
+Date: Wed, 4 Oct 2017 08:21:03 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
 In-Reply-To: <20171003104845.10417-6-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
+On 10/03/2017 12:48 PM, Christoph Hellwig wrote:
+> As a user of bsg-lib the SAS transport should not poke into request
+> internals but use the bsg_job fields instead.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/scsi/scsi_transport_sas.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Cheers,
+
+Hannes
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
