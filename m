@@ -1,23 +1,21 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Benjamin Block <bblock@linux.vnet.ibm.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [RFC] bsg-lib interface cleanup
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
+To: Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org,
+ linux-block@vger.kernel.org
+Cc: Johannes Thumshirn <jthumshirn@suse.de>,
+ Benjamin Block <bblock@linux.vnet.ibm.com>
 References: <20171003104845.10417-1-hch@lst.de>
-Date: Mon, 16 Oct 2017 23:50:49 -0400
-In-Reply-To: <20171003104845.10417-1-hch@lst.de> (Christoph Hellwig's message
-        of "Tue, 3 Oct 2017 12:48:36 +0200")
-Message-ID: <yq1d15mzb3a.fsf@oracle.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <4c1113f7-64f0-98a2-9997-9f6a8666acdb@kernel.dk>
+Date: Wed, 4 Oct 2017 08:35:44 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-scsi-owner@vger.kernel.org
+In-Reply-To: <20171003104845.10417-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-
-Christoph,
-
+On 10/03/2017 04:48 AM, Christoph Hellwig wrote:
+> Hi all,
+> 
 > this series cleans up various abuses of the bsg interfaces, and then
 > splits bsg for SCSI passthrough from bsg for arbitrary transport
 > passthrough.  This removes the scsi_request abuse in bsg-lib that is
@@ -25,8 +23,11 @@ Christoph,
 > we get.  The current code will happily execute scsi commands against
 > bsg-lib queues, and transport pass through against scsi nodes, without
 > any indication to the driver that we are doing the wrong thing.
+> 
+> The series includes the fix from Bejamin as the first patch as I
+> rebased on top of it, but that one really needs to got into 4.14 ASAP.
 
-I applied patches 2-5 to 4.15/scsi-queue.
+I added patch 1 for 4.14.
 
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+Jens Axboe
