@@ -1,100 +1,28 @@
-Return-Path: <prvs=44404dd03=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	=Oleksandr Natalenko <oleksandr@natalenko.name>,
-	"Luis R . Rodriguez" <mcgrof@kernel.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v6 0/9] block, scsi, md: Improve suspend and resume
-Date: Wed,  4 Oct 2017 17:01:01 -0700
-Message-Id: <20171005000110.15904-1-bart.vanassche@wdc.com>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "oleksandr@natalenko.name"
+	<oleksandr@natalenko.name>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"mcgrof@kernel.org" <mcgrof@kernel.org>
+Subject: Re: [PATCH v5 0/8] block, scsi, md: Improve suspend and resume
+Date: Wed, 4 Oct 2017 22:36:18 +0000
+Message-ID: <1507156577.32131.3.camel@wdc.com>
+References: <20171002225218.18548-1-bart.vanassche@wdc.com>
+	 <20171004065607.GA20879@lst.de> <20171004075326.GA17729@ming.t460p>
+	 <1507130324.3583.9.camel@wdc.com> <20171004153149.GD9713@ming.t460p>
+In-Reply-To: <20171004153149.GD9713@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Hello Jens,
-
-It is known that during the resume following a hibernate, especially when
-using an md RAID1 array created on top of SCSI devices, sometimes the
-system hangs instead of coming up properly. This patch series fixes this
-problem. This patch series is an alternative for Ming Lei's "block/scsi:
-safe SCSI quiescing" patch series. The advantage of this patch series is
-that a fix for the md driver has been included.
-
-These patches have been tested on top of the block layer for-next branch.
-
-Please consider these changes for kernel v4.15.
-
-Thanks,
-
-Bart.
-
-Changes between v5 and v6:
-- Split an md patch into two patches to make it easier to review the changes.
-- For the md patch that suspends I/O while the system is frozen, switched back
-  to the freezer mechanism because this makes the code shorter and easier to
-  review.
-- Changed blk_set/clear_preempt_only() from EXPORT_SYMBOL() into
-  EXPORT_SYMBOL_GPL().
-- Made blk_set_preempt_only() behave as a test-and-set operation.
-- Introduced blk_get_request_flags() and BLK_MQ_REQ_PREEMPT as requested by
-  Christoph and reduced the number of arguments of blk_queue_enter() back from
-  three to two.
-- In scsi_device_quiesce(), moved the blk_mq_freeze_queue() call out of a
-  critical section. Made the explanation of why the synchronize_rcu() call
-  is necessary more detailed.
-
-Changes between v4 and v5:
-- Split blk_set_preempt_only() into two functions as requested by Christoph.
-- Made blk_get_request() trigger WARN_ONCE() if it is attempted to allocate
-  a request while the system is frozen. This is a big help to identify drivers
-  that submit I/O while the system is frozen.
-- Since kernel thread freezing is on its way out, reworked the approach for
-  avoiding that the md driver submits I/O while the system is frozen such that
-  the approach no longer depends on the kernel thread freeze mechanism.
-- Fixed the (theoretical) deadlock in scsi_device_quiesce() that was identified
-  by Ming.
-
-Changes between v3 and v4:
-- Made sure that this patch series not only works for scsi-mq but also for
-  the legacy SCSI stack.
-- Removed an smp_rmb()/smp_wmb() pair from the hot path and added a comment
-  that explains why that is safe.
-- Reordered the patches in this patch series.
-
-Changes between v2 and v3:
-- Made md kernel threads freezable.
-- Changed the approach for quiescing SCSI devices again.
-- Addressed Ming's review comments.
-
-Changes compared to v1 of this patch series:
-- Changed the approach and rewrote the patch series.
-
-Bart Van Assche (8):
-  md: Rename md_notifier into md_reboot_notifier
-  md: Introduce md_stop_all_writes()
-  md: Neither resync nor reshape while the system is frozen
-  block: Introduce blk_get_request_flags()
-  block: Introduce BLK_MQ_REQ_PREEMPT
-  ide, scsi: Tell the block layer at request allocation time about
-    preempt requests
-  block: Add the QUEUE_FLAG_PREEMPT_ONLY request queue flag
-  block, scsi: Make SCSI device suspend and resume work reliably
-
-Ming Lei (1):
-  block: Make q_usage_counter also track legacy requests
-
- block/blk-core.c        | 127 ++++++++++++++++++++++++++++++++++++++++--------
- block/blk-mq.c          |  16 +++---
- block/blk-timeout.c     |   2 +-
- drivers/ide/ide-pm.c    |   4 +-
- drivers/md/md.c         |  45 ++++++++++++++---
- drivers/scsi/scsi_lib.c |  33 ++++++++-----
- fs/block_dev.c          |   4 +-
- include/linux/blk-mq.h  |   1 +
- include/linux/blkdev.h  |  11 ++++-
- 9 files changed, 189 insertions(+), 54 deletions(-)
-
--- 
-2.14.2
+T24gV2VkLCAyMDE3LTEwLTA0IGF0IDIzOjMxICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
+V2VkLCBPY3QgMDQsIDIwMTcgYXQgMDM6MTg6NDVQTSArMDAwMCwgQmFydCBWYW4gQXNzY2hlIHdy
+b3RlOg0KPiA+IE9uIFdlZCwgMjAxNy0xMC0wNCBhdCAxNTo1MyArMDgwMCwgTWluZyBMZWkgd3Jv
+dGU6DQo+ID4gPiAyKSBSQ1UgcmVhZCBsb2NrIGlzIG1pc3NlZCBpbiBmYXN0IHBhdGgNCj4gPiAN
+Cj4gPiBEaWQgeW91IHJlYWxseSBwb3N0IHRoaXMgYXMgYSByZXZpZXcgY29tbWVudCBvbiBteSBw
+YXRjaCBzZXJpZXM/IEFueXdheSwgdGhpcw0KPiA+IGlzIGVhc3kgdG8gYWRkcmVzcy4NCj4gDQo+
+IGh0dHBzOi8vbWFyYy5pbmZvLz9sPWxpbnV4LWJsb2NrJm09MTUwNjQxNDgxNzMyNTcyJnc9Mg0K
+DQpUaGUgZS1tYWlsIHlvdSByZWZlciB0byBpcyBhIHJlcGx5IHRvIGEgcGF0Y2ggaW4gdjQgb2Yg
+dGhpcyBwYXRjaCBzZXJpZXMgaW5zdGVhZA0Kb2YgdjUuDQoNCkJhcnQu
