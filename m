@@ -1,29 +1,42 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:34191 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:45203 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751755AbdJDIw7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 4 Oct 2017 04:52:59 -0400
-Date: Wed, 4 Oct 2017 10:52:57 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Benjamin Block <bblock@linux.vnet.ibm.com>
+        id S1750779AbdJDGW4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 4 Oct 2017 02:22:56 -0400
 Subject: Re: [PATCH 7/9] bsg-lib: remove bsg_job.req
-Message-ID: <20171004085257.cguqfketwkagch35@linux-x5ow.site>
+To: Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc: Johannes Thumshirn <jthumshirn@suse.de>,
+        Benjamin Block <bblock@linux.vnet.ibm.com>
 References: <20171003104845.10417-1-hch@lst.de>
  <20171003104845.10417-8-hch@lst.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <d40e2f7d-7d11-df80-9890-e2197f5ca672@suse.de>
+Date: Wed, 4 Oct 2017 08:22:54 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
 In-Reply-To: <20171003104845.10417-8-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+On 10/03/2017 12:48 PM, Christoph Hellwig wrote:
+> Users of the bsg-lib interface should only use the bsg_job data structure
+> and not know about implementation details of it.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/bsg-lib.c         | 14 ++++++--------
+>  include/linux/bsg-lib.h |  1 -
+>  2 files changed, 6 insertions(+), 9 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Cheers,
+
+Hannes
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
