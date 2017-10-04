@@ -1,134 +1,43 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f45.google.com ([74.125.82.45]:53767 "EHLO
-        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750820AbdJCKGy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2017 06:06:54 -0400
-Received: by mail-wm0-f45.google.com with SMTP id q132so15704847wmd.2
-        for <linux-block@vger.kernel.org>; Tue, 03 Oct 2017 03:06:54 -0700 (PDT)
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Javier Gonzales <jg@lightnvm.io>,
-        Hans Holmberg <hans.ml.holmberg@owltronix.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH 5/9] lightnvm: pblk: consider bad sectors in emeta during recovery
-Date: Tue,  3 Oct 2017 12:05:09 +0200
-Message-Id: <1507025113-13351-6-git-send-email-hans.ml.holmberg@owltronix.com>
-In-Reply-To: <1507025113-13351-1-git-send-email-hans.ml.holmberg@owltronix.com>
-References: <1507025113-13351-1-git-send-email-hans.ml.holmberg@owltronix.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <rgoldwyn@suse.de>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-block@vger.kernel.org
+Cc: axboe@kernel.dk,
+	shli@kernel.org,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH 5/9] md: raid5 nowait support
+Date: Wed,  4 Oct 2017 08:55:07 -0500
+Message-Id: <20171004135511.26110-6-rgoldwyn@suse.de>
+In-Reply-To: <20171004135511.26110-1-rgoldwyn@suse.de>
+References: <20171004135511.26110-1-rgoldwyn@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-When recovering lines we need to consider that bad blocks in a line
-affects the emeta area size.
+Return EAGAIN in case RAID5 would block because of waiting due to
+reshaping.
 
-Previously it was assumed that the emeta area would grow by the
-number of sectors per page * number of bad blocks in the line.
-
-This assumtion not correct - the number of "extra" pages that are
-consumed could be both smaller (depending on emeta size) and bigger
-(depending on the placement of the bad blocks).
-
-Fix this by calculating the emeta start by iterating backwards
-through the line, skipping ppas that map to bad blocks.
-
-Also fix the data types used for ppa indices/counts in
-pblk_recov_l2p_from_emeta - we should use u64.
-
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 ---
- drivers/lightnvm/pblk-recovery.c | 44 +++++++++++++++++++++++++++-------------
- 1 file changed, 30 insertions(+), 14 deletions(-)
+ drivers/md/raid5.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index 74b3b86..b5a2275 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -133,16 +133,16 @@ static int pblk_recov_l2p_from_emeta(struct pblk *pblk, struct pblk_line *line)
- 	struct pblk_emeta *emeta = line->emeta;
- 	struct line_emeta *emeta_buf = emeta->buf;
- 	__le64 *lba_list;
--	int data_start, data_end;
--	int nr_valid_lbas, nr_lbas = 0;
--	int i;
-+	u64 data_start, data_end;
-+	u64 nr_valid_lbas, nr_lbas = 0;
-+	u64 i;
+diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
+index 928e24a07133..707a3907d100 100644
+--- a/drivers/md/raid5.c
++++ b/drivers/md/raid5.c
+@@ -5601,6 +5601,13 @@ static bool raid5_make_request(struct mddev *mddev, struct bio * bi)
+ 	last_sector = bio_end_sector(bi);
+ 	bi->bi_next = NULL;
  
- 	lba_list = pblk_recov_get_lba_list(pblk, emeta_buf);
- 	if (!lba_list)
- 		return 1;
- 
- 	data_start = pblk_line_smeta_start(pblk, line) + lm->smeta_sec;
--	data_end = lm->sec_per_line - lm->emeta_sec[0];
-+	data_end = line->emeta_ssec;
- 	nr_valid_lbas = le64_to_cpu(emeta_buf->nr_valid_lbas);
- 
- 	for (i = data_start; i < data_end; i++) {
-@@ -172,8 +172,8 @@ static int pblk_recov_l2p_from_emeta(struct pblk *pblk, struct pblk_line *line)
- 	}
- 
- 	if (nr_valid_lbas != nr_lbas)
--		pr_err("pblk: line %d - inconsistent lba list(%llu/%d)\n",
--				line->id, emeta_buf->nr_valid_lbas, nr_lbas);
-+		pr_err("pblk: line %d - inconsistent lba list(%llu/%llu)\n",
-+				line->id, nr_valid_lbas, nr_lbas);
- 
- 	line->left_msecs = 0;
- 
-@@ -827,11 +827,33 @@ static void pblk_recov_line_add_ordered(struct list_head *head,
- 	__list_add(&line->list, t->list.prev, &t->list);
- }
- 
--struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
-+static u64 pblk_line_emeta_start(struct pblk *pblk, struct pblk_line *line)
- {
- 	struct nvm_tgt_dev *dev = pblk->dev;
- 	struct nvm_geo *geo = &dev->geo;
- 	struct pblk_line_meta *lm = &pblk->lm;
-+	unsigned int emeta_secs;
-+	u64 emeta_start;
-+	struct ppa_addr ppa;
-+	int pos;
-+
-+	emeta_secs = lm->emeta_sec[0];
-+	emeta_start = lm->sec_per_line;
-+
-+	while (emeta_secs) {
-+		emeta_start--;
-+		ppa = addr_to_pblk_ppa(pblk, emeta_start, line->id);
-+		pos = pblk_ppa_to_pos(geo, ppa);
-+		if (!test_bit(pos, line->blk_bitmap))
-+			emeta_secs--;
++	if ((bi->bi_opf & REQ_NOWAIT) &&
++	    conf->reshape_progress != MaxSector &&
++	    (mddev->reshape_backwards ? logical_sector < conf->reshape_safe : last_sector >= conf->reshape_safe)) {
++		bio_wouldblock_error(bi);
++		return true;
 +	}
 +
-+	return emeta_start;
-+}
-+
-+struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
-+{
-+	struct pblk_line_meta *lm = &pblk->lm;
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
- 	struct pblk_line *line, *tline, *data_line = NULL;
- 	struct pblk_smeta *smeta;
-@@ -930,15 +952,9 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
- 
- 	/* Verify closed blocks and recover this portion of L2P table*/
- 	list_for_each_entry_safe(line, tline, &recov_list, list) {
--		int off, nr_bb;
--
- 		recovered_lines++;
--		/* Calculate where emeta starts based on the line bb */
--		off = lm->sec_per_line - lm->emeta_sec[0];
--		nr_bb = bitmap_weight(line->blk_bitmap, lm->blk_per_line);
--		off -= nr_bb * geo->sec_per_pl;
- 
--		line->emeta_ssec = off;
-+		line->emeta_ssec = pblk_line_emeta_start(pblk, line);
- 		line->emeta = emeta;
- 		memset(line->emeta->buf, 0, lm->emeta_len[0]);
- 
+ 	prepare_to_wait(&conf->wait_for_overlap, &w, TASK_UNINTERRUPTIBLE);
+ 	for (;logical_sector < last_sector; logical_sector += STRIPE_SECTORS) {
+ 		int previous;
 -- 
-2.7.4
+2.14.2
