@@ -1,40 +1,60 @@
-Return-Path: <Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@lst.de" <hch@lst.de>, "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"oleksandr@natalenko.name" <oleksandr@natalenko.name>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "mcgrof@kernel.org" <mcgrof@kernel.org>
+Return-Path: <ming.lei@redhat.com>
+Date: Wed, 4 Oct 2017 15:56:02 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	=Oleksandr Natalenko <oleksandr@natalenko.name>,
+	"Luis R . Rodriguez" <mcgrof@kernel.org>
 Subject: Re: [PATCH v5 0/8] block, scsi, md: Improve suspend and resume
-Date: Wed, 4 Oct 2017 15:18:45 +0000
-Message-ID: <1507130324.3583.9.camel@wdc.com>
+Message-ID: <20171004075601.GB17729@ming.t460p>
 References: <20171002225218.18548-1-bart.vanassche@wdc.com>
-	 <20171004065607.GA20879@lst.de> <20171004075326.GA17729@ming.t460p>
-In-Reply-To: <20171004075326.GA17729@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
+ <20171004065607.GA20879@lst.de>
+ <20171004075326.GA17729@ming.t460p>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171004075326.GA17729@ming.t460p>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gV2VkLCAyMDE3LTEwLTA0IGF0IDE1OjUzICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gSSBo
-YXZlIGNvbW1lbnRlZCBvbiBCYXJ0J3MgcGF0Y2hzZXQgYmVmb3JlLCBidXQgbXkgY29tbWVudHMN
-Cj4gbmV2ZXIgZ2V0cyBhZGRyZXNzZWQ6DQo+IA0KPiAxKSBubyBNRCBjaGFuZ2VzIHJlcXVpcmVk
-IG9uIHRoaXMgaXNzdWUNCg0KSSBkaWQgbm90IGFkZHJlc3MgdGhhdCBjb21tZW50IGJlY2F1c2Ug
-eW91IGhhdmUgYW5vdGhlciB2aWV3IG9uIGhvdyBzdXNwZW5kDQphbmQgcmVzdW1lIHNob3VsZCB3
-b3JrIHRoYW4gdGhlIHJlc3Qgb2YgdGhlIGtlcm5lbCBjb21tdW5pdHkuIFNlZSBhbHNvIHRoZQ0K
-ZGV0YWlsZWQgZXhwbGFuYXRpb24gaW4gaHR0cHM6Ly9tYXJjLmluZm8vP2w9bGludXgtYmxvY2sm
-bT0xNTA2OTU4NzkzMDk2MDYuDQpTZWUgYWxzbyBMdWlzJyBjb3ZlciBsZXR0ZXIgIltSRkMgMC81
-XSBmczogcmVwbGFjZSBrdGhyZWFkIGZyZWV6aW5nIHdpdGgNCmZpbGVzeXN0ZW0gZnJlZXplL3Ro
-YXciIChodHRwczovL21hcmMuaW5mby8/bD1saW51eC1ibG9jayZtPTE1MDcwNTY5MDMwMjQyMCku
-DQoNCj4gMikgUkNVIHJlYWQgbG9jayBpcyBtaXNzZWQgaW4gZmFzdCBwYXRoDQoNCkRpZCB5b3Ug
-cmVhbGx5IHBvc3QgdGhpcyBhcyBhIHJldmlldyBjb21tZW50IG9uIG15IHBhdGNoIHNlcmllcz8g
-QW55d2F5LCB0aGlzDQppcyBlYXN5IHRvIGFkZHJlc3MuDQoNCj4gMykgYmFkIHBhdGNoIHRpdGxl
-Og0KPiANCj4gLSBzdWNoIGFzIDogICdzY3NpLW1xOiBSZWR1Y2Ugc3VzcGVuZCBsYXRlbmN5Jw0K
-PiAJdGhpcyBpcyB2ZXJ5IG1pc2xlYWRpbmcgc2luY2UgaXQgaXMgYWN0dWFsbHkgYnVnIGZpeA0K
-PiANCj4gLSBzdWNoIGFzIDogIk1ha2UgU0NTSSBkZXZpY2Ugc3VzcGVuZCBhbmQgcmVzdW1lIHdv
-cmsgcmVsaWFibHkiDQo+IAlhbHNvIGEgYml0IG5vdCBhY2N1cmF0ZQ0KDQpTYW1lIGhlcmUgLSBo
-YWQgeW91IHBvc3RlZCB0aGlzIGFzIGEgcmV2aWV3IGNvbW1lbnQgYmVmb3JlPyBBbnl3YXksIHRo
-aXMgaXMNCmFsc28gZWFzeSB0byBhZGRyZXNzLg0KDQo+IEFsc28gaG9sZGluZyBzZGV2LT5zdGF0
-ZV9tdXRleCBiZWZvcmUgZnJlZXppbmcgcXVldWUgbWlnaHQNCj4gY2F1c2UgZGVhZGxvY2sgc2lu
-Y2UgdGhpcyBsb2NrIGNhbiBiZSBhY3F1aXJlZCBpbiBlaCBoYW5kbGVyKA0KPiBzY3NpX2VoX29m
-ZmxpbmVfc2RldnMoKSkNCg0KSGFkIHlvdSBwb3N0ZWQgdGhpcyBhcyBhIGNvbW1lbnQgYmVmb3Jl
-PyBBbnl3YXksIEkgd2lsbCBhZGRyZXNzIHRoaXMgY29tbWVudA0KdG9vLg0KDQpCYXJ0Lg==
+On Wed, Oct 04, 2017 at 03:53:28PM +0800, Ming Lei wrote:
+> On Wed, Oct 04, 2017 at 08:56:08AM +0200, Christoph Hellwig wrote:
+> > Bart, Ming:
+> > 
+> > can you guys please work a little better together?  We've now got two
+> > patchsets that are getting very similar.
+> > 
+> > Bart, please at least CC Ming when you send out the patches.
+> > 
+> > Ming - instead of sending a separate series right after Bart a
+> > differential series would be nice.  This also applies the other way
+> > around if Ming is the first after a while.
+> 
+> Hi Chritoph,
+> 
+> Could you take a look at my yesterday's post V8? Which should
+> address all previous issues? Except for Tejun's comment
+> about document __percpu_ref_tryget_live() a bit, and I will
+> do it in V9.
+> 
+> I have commented on Bart's patchset before, but my comments
+> never gets addressed:
+> 
+> 1) no MD changes required on this issue
+> 
+> 2) RCU read lock is missed in fast path
+> 
+> 3) bad patch title:
+> 
+> - such as :  'scsi-mq: Reduce suspend latency'
+> 	this is very misleading since it is actually bug fix
+> 
+> - such as : "Make SCSI device suspend and resume work reliably"
+> 	also a bit not accurate
+
+Not mention 'block, scsi, md: Improve suspend and resume' in this cover
+letter, which is really misleading, since this patchset is really
+bug fix.
+
+-- 
+Ming
