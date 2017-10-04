@@ -1,120 +1,44 @@
-Return-Path: <prvs=44404dd03=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	=Oleksandr Natalenko <oleksandr@natalenko.name>,
-	"Luis R . Rodriguez" <mcgrof@kernel.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Shaohua Li <shli@kernel.org>,
-	linux-raid@vger.kernel.org,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v6 3/9] md: Neither resync nor reshape while the system is frozen
-Date: Wed,  4 Oct 2017 17:01:04 -0700
-Message-Id: <20171005000110.15904-4-bart.vanassche@wdc.com>
-In-Reply-To: <20171005000110.15904-1-bart.vanassche@wdc.com>
-References: <20171005000110.15904-1-bart.vanassche@wdc.com>
+Return-Path: <Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "mcgrof@kernel.org" <mcgrof@kernel.org>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"jthumshirn@suse.de" <jthumshirn@suse.de>, "linux-raid@vger.kernel.org"
+	<linux-raid@vger.kernel.org>, "hch@lst.de" <hch@lst.de>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
+	"oleksandr@natalenko.name" <oleksandr@natalenko.name>, "hare@suse.com"
+	<hare@suse.com>, "shli@kernel.org" <shli@kernel.org>
+Subject: Re: [PATCH v5 2/8] md: Neither resync nor reshape while the system is
+ frozen
+Date: Wed, 4 Oct 2017 16:58:33 +0000
+Message-ID: <1507136311.3583.35.camel@wdc.com>
+References: <20171002225218.18548-1-bart.vanassche@wdc.com>
+	 <20171002225218.18548-3-bart.vanassche@wdc.com>
+	 <20171004011610.GP2294@wotan.suse.de>
+In-Reply-To: <20171004011610.GP2294@wotan.suse.de>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Some people use the md driver on laptops and use the suspend and
-resume functionality. Since it is essential that submitting of
-new I/O requests stops before a hibernation image is created,
-interrupt the md resync and reshape actions if the system is
-being frozen. Note: the resync and reshape will restart after
-the system is resumed and a message similar to the following
-will appear in the system log:
-
-md: md0: data-check interrupted.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Shaohua Li <shli@kernel.org>
-Cc: linux-raid@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/md/md.c | 30 +++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index b99584e5d6b1..d712d3320c1d 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -66,6 +66,8 @@
- #include <linux/raid/md_u.h>
- #include <linux/slab.h>
- #include <linux/percpu-refcount.h>
-+#include <linux/freezer.h>
-+#include <linux/suspend.h>
- 
- #include <trace/events/block.h>
- #include "md.h"
-@@ -7439,6 +7441,7 @@ static int md_thread(void *arg)
- 	 */
- 
- 	allow_signal(SIGKILL);
-+	set_freezable();
- 	while (!kthread_should_stop()) {
- 
- 		/* We need to wait INTERRUPTIBLE so that
-@@ -7449,7 +7452,7 @@ static int md_thread(void *arg)
- 		if (signal_pending(current))
- 			flush_signals(current);
- 
--		wait_event_interruptible_timeout
-+		wait_event_freezable_timeout
- 			(thread->wqueue,
- 			 test_bit(THREAD_WAKEUP, &thread->flags)
- 			 || kthread_should_stop() || kthread_should_park(),
-@@ -8963,6 +8966,29 @@ static void md_stop_all_writes(void)
- 		mdelay(1000*1);
- }
- 
-+/*
-+ * Ensure that neither resyncing nor reshaping occurs while the system is
-+ * frozen.
-+ */
-+static int md_notify_pm(struct notifier_block *bl, unsigned long state,
-+			void *unused)
-+{
-+	pr_debug("%s: state = %ld\n", __func__, state);
-+
-+	switch (state) {
-+	case PM_HIBERNATION_PREPARE:
-+	case PM_SUSPEND_PREPARE:
-+	case PM_RESTORE_PREPARE:
-+		md_stop_all_writes();
-+		break;
-+	}
-+	return NOTIFY_DONE;
-+}
-+
-+static struct notifier_block md_pm_notifier = {
-+	.notifier_call	= md_notify_pm,
-+};
-+
- static int md_notify_reboot(struct notifier_block *this,
- 			    unsigned long code, void *x)
- {
-@@ -9009,6 +9035,7 @@ static int __init md_init(void)
- 			    md_probe, NULL, NULL);
- 
- 	register_reboot_notifier(&md_reboot_notifier);
-+	register_pm_notifier(&md_pm_notifier);
- 	raid_table_header = register_sysctl_table(raid_root_table);
- 
- 	md_geninit();
-@@ -9248,6 +9275,7 @@ static __exit void md_exit(void)
- 
- 	unregister_blkdev(MD_MAJOR,"md");
- 	unregister_blkdev(mdp_major, "mdp");
-+	unregister_pm_notifier(&md_pm_notifier);
- 	unregister_reboot_notifier(&md_reboot_notifier);
- 	unregister_sysctl_table(raid_table_header);
- 
--- 
-2.14.2
+T24gV2VkLCAyMDE3LTEwLTA0IGF0IDAzOjE2ICswMjAwLCBMdWlzIFIuIFJvZHJpZ3VleiB3cm90
+ZToNCj4gT24gTW9uLCBPY3QgMDIsIDIwMTcgYXQgMDM6NTI6MTJQTSAtMDcwMCwgQmFydCBWYW4g
+QXNzY2hlIHdyb3RlOg0KPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJzL21kL21kLmMgYi9kcml2ZXJz
+L21kL21kLmMNCj4gPiBpbmRleCAzZjc0MjYxMjBhM2IuLmEyY2YyYTkzYjBjYiAxMDA2NDQNCj4g
+PiAtLS0gYS9kcml2ZXJzL21kL21kLmMNCj4gPiArKysgYi9kcml2ZXJzL21kL21kLmMNCj4gPiBA
+QCAtODk2MSw2ICs4OTYzLDM3IEBAIHN0YXRpYyB2b2lkIG1kX3N0b3BfYWxsX3dyaXRlcyh2b2lk
+KQ0KPiA+ICAJCW1kZWxheSgxMDAwKjEpOw0KPiA+ICB9DQo+ID4gIA0KPiA+ICsvKg0KPiA+ICsg
+KiBFbnN1cmUgdGhhdCBuZWl0aGVyIHJlc3luY2luZyBub3IgcmVzaGFwaW5nIG9jY3VycyB3aGls
+ZSB0aGUgc3lzdGVtIGlzDQo+ID4gKyAqIGZyb3plbi4NCj4gPiArICovDQo+ID4gK3N0YXRpYyBp
+bnQgbWRfbm90aWZ5X3BtKHN0cnVjdCBub3RpZmllcl9ibG9jayAqYmwsIHVuc2lnbmVkIGxvbmcg
+c3RhdGUsDQo+ID4gKwkJCXZvaWQgKnVudXNlZCkNCj4gPiArew0KPiA+ICsJc3RydWN0IG1kZGV2
+ICptZGRldjsNCj4gPiArCXN0cnVjdCBsaXN0X2hlYWQgKnRtcDsNCj4gPiArDQo+ID4gKwlwcl9k
+ZWJ1ZygiJXM6IHN0YXRlID0gJWxkOyBzeXN0ZW1fZnJlZXppbmdfY250ID0gJWRcbiIsIF9fZnVu
+Y19fLCBzdGF0ZSwNCj4gPiArCQkgYXRvbWljX3JlYWQoJnN5c3RlbV9mcmVlemluZ19jbnQpKTsN
+Cj4gPiArDQo+ID4gKwlzd2l0Y2ggKHN0YXRlKSB7DQo+ID4gKwljYXNlIFBNX0hJQkVSTkFUSU9O
+X1BSRVBBUkU6DQo+IA0KPiBIbSwgd2h5IG5vdCBhbHNvIGluY2x1ZGUgYW5kIHVzZSB0aGlzIGZv
+ciBQTV9TVVNQRU5EX1BSRVBBUkUgYW5kL29yDQo+IGEgUE1fUkVTVE9SRV9QUkVQQVJFLg0KPiAN
+Cj4gICAgICAgICBjYXNlIFBNX0hJQkVSTkFUSU9OX1BSRVBBUkU6DQo+ICAgICAgICAgY2FzZSBQ
+TV9TVVNQRU5EX1BSRVBBUkU6DQo+ICAgICAgICAgY2FzZSBQTV9SRVNUT1JFX1BSRVBBUkU6DQoN
+ClRoYW5rcyBmb3IgdGhlIGZlZWRiYWNrIEx1aXMuIEkgd2lsbCBtYWtlIHN1cmUgdGhhdCByZXN5
+bmMgYWN0aXZpdHkgaXMgYWxzbw0Kc3RvcHBlZCBmb3IgdGhlIFBNX1NVU1BFTkRfUFJFUEFSRSBh
+bmQgUE1fUkVTVE9SRV9QUkVQQVJFIGNhc2VzLg0KDQpCYXJ0Lg==
