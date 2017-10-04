@@ -1,44 +1,43 @@
 Return-Path: <Bart.VanAssche@wdc.com>
 From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "mcgrof@kernel.org" <mcgrof@kernel.org>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
 CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	"jthumshirn@suse.de" <jthumshirn@suse.de>, "linux-raid@vger.kernel.org"
 	<linux-raid@vger.kernel.org>, "hch@lst.de" <hch@lst.de>,
 	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
-	"oleksandr@natalenko.name" <oleksandr@natalenko.name>, "hare@suse.com"
-	<hare@suse.com>, "shli@kernel.org" <shli@kernel.org>
+	<axboe@kernel.dk>, "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+	"hare@suse.com" <hare@suse.com>, "mcgrof@kernel.org" <mcgrof@kernel.org>,
+	"shli@kernel.org" <shli@kernel.org>
 Subject: Re: [PATCH v5 2/8] md: Neither resync nor reshape while the system is
  frozen
-Date: Wed, 4 Oct 2017 16:58:33 +0000
-Message-ID: <1507136311.3583.35.camel@wdc.com>
+Date: Wed, 4 Oct 2017 15:38:25 +0000
+Message-ID: <1507131503.3583.24.camel@wdc.com>
 References: <20171002225218.18548-1-bart.vanassche@wdc.com>
 	 <20171002225218.18548-3-bart.vanassche@wdc.com>
-	 <20171004011610.GP2294@wotan.suse.de>
-In-Reply-To: <20171004011610.GP2294@wotan.suse.de>
+	 <20171004113021.GC17729@ming.t460p>
+In-Reply-To: <20171004113021.GC17729@ming.t460p>
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-T24gV2VkLCAyMDE3LTEwLTA0IGF0IDAzOjE2ICswMjAwLCBMdWlzIFIuIFJvZHJpZ3VleiB3cm90
-ZToNCj4gT24gTW9uLCBPY3QgMDIsIDIwMTcgYXQgMDM6NTI6MTJQTSAtMDcwMCwgQmFydCBWYW4g
-QXNzY2hlIHdyb3RlOg0KPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJzL21kL21kLmMgYi9kcml2ZXJz
-L21kL21kLmMNCj4gPiBpbmRleCAzZjc0MjYxMjBhM2IuLmEyY2YyYTkzYjBjYiAxMDA2NDQNCj4g
-PiAtLS0gYS9kcml2ZXJzL21kL21kLmMNCj4gPiArKysgYi9kcml2ZXJzL21kL21kLmMNCj4gPiBA
-QCAtODk2MSw2ICs4OTYzLDM3IEBAIHN0YXRpYyB2b2lkIG1kX3N0b3BfYWxsX3dyaXRlcyh2b2lk
-KQ0KPiA+ICAJCW1kZWxheSgxMDAwKjEpOw0KPiA+ICB9DQo+ID4gIA0KPiA+ICsvKg0KPiA+ICsg
-KiBFbnN1cmUgdGhhdCBuZWl0aGVyIHJlc3luY2luZyBub3IgcmVzaGFwaW5nIG9jY3VycyB3aGls
-ZSB0aGUgc3lzdGVtIGlzDQo+ID4gKyAqIGZyb3plbi4NCj4gPiArICovDQo+ID4gK3N0YXRpYyBp
-bnQgbWRfbm90aWZ5X3BtKHN0cnVjdCBub3RpZmllcl9ibG9jayAqYmwsIHVuc2lnbmVkIGxvbmcg
-c3RhdGUsDQo+ID4gKwkJCXZvaWQgKnVudXNlZCkNCj4gPiArew0KPiA+ICsJc3RydWN0IG1kZGV2
-ICptZGRldjsNCj4gPiArCXN0cnVjdCBsaXN0X2hlYWQgKnRtcDsNCj4gPiArDQo+ID4gKwlwcl9k
-ZWJ1ZygiJXM6IHN0YXRlID0gJWxkOyBzeXN0ZW1fZnJlZXppbmdfY250ID0gJWRcbiIsIF9fZnVu
-Y19fLCBzdGF0ZSwNCj4gPiArCQkgYXRvbWljX3JlYWQoJnN5c3RlbV9mcmVlemluZ19jbnQpKTsN
-Cj4gPiArDQo+ID4gKwlzd2l0Y2ggKHN0YXRlKSB7DQo+ID4gKwljYXNlIFBNX0hJQkVSTkFUSU9O
-X1BSRVBBUkU6DQo+IA0KPiBIbSwgd2h5IG5vdCBhbHNvIGluY2x1ZGUgYW5kIHVzZSB0aGlzIGZv
-ciBQTV9TVVNQRU5EX1BSRVBBUkUgYW5kL29yDQo+IGEgUE1fUkVTVE9SRV9QUkVQQVJFLg0KPiAN
-Cj4gICAgICAgICBjYXNlIFBNX0hJQkVSTkFUSU9OX1BSRVBBUkU6DQo+ICAgICAgICAgY2FzZSBQ
-TV9TVVNQRU5EX1BSRVBBUkU6DQo+ICAgICAgICAgY2FzZSBQTV9SRVNUT1JFX1BSRVBBUkU6DQoN
-ClRoYW5rcyBmb3IgdGhlIGZlZWRiYWNrIEx1aXMuIEkgd2lsbCBtYWtlIHN1cmUgdGhhdCByZXN5
-bmMgYWN0aXZpdHkgaXMgYWxzbw0Kc3RvcHBlZCBmb3IgdGhlIFBNX1NVU1BFTkRfUFJFUEFSRSBh
-bmQgUE1fUkVTVE9SRV9QUkVQQVJFIGNhc2VzLg0KDQpCYXJ0Lg==
+T24gV2VkLCAyMDE3LTEwLTA0IGF0IDE5OjMwICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gTGFz
+dCB0aW1lLCBJIGFza2VkIHdoaWNoIGlzc3VlIGlzIGZpeGVkIGJ5IHRoaXMgcGF0Y2gsIGJ1dA0K
+PiBuZXZlciBnZXQgYW5zd2VyZWQsIHNvIGFnYWluLCB3aGF0IGlzIGlzc3VlIGZpeGVkIGJ5DQo+
+IHRoaXMgcGF0Y2g/DQoNClRoYXQncyBub3QgY29ycmVjdC4gSSBkaWQgYW5zd2VyIHlvdXIgcXVl
+c3Rpb24uIFNlZSBlLmcuDQpodHRwczovL21hcmMuaW5mby8/bD1saW51eC1ibG9jayZtPTE1MDY5
+NTg3OTMwOTYwNi4NCg0KPiBHaXZlbiB0aGUgZm9sbG93aW5nIHBhdGNoZXMgZm9yIG1ha2luZyBT
+Q1NJIHF1aWVzY2Ugc2FmZQ0KPiBpcyByZXF1aXJlZCBpbiBlaXRoZXIgUE0gc3VzcGVuZC9yZXN1
+bWUgb3Igb3RoZXIgcGF0aA0KPiBvZiB0cmFuc3BvcnRfc3BpIHJldmFsaWRhdGUuIFNvIG9uY2Ug
+dGhlc2VzIHBhdGNoZXMgYXJlDQo+IGluLCBJIGRvbid0IHNlZSBhbnkgSS9PIGhhbmcgaW4gc3Vz
+cGVuZC9yZXN1bWUgZ2l2ZW4NCj4gdGhlIFNDU0kgcXVpZXNjZSBpc3N1ZSBpcyB2ZXJ5IHNwZWNp
+ZmljIG9uZSwgYW5kIG5vdA0KPiBzZWUgdGhpcyBpc3N1ZSBvbiBvdGhlciBraW5kIG9mIGRldmlj
+ZS4NCg0KVGhlcmUgYXJlIG1hbnkgbW9yZSBzdG9yYWdlIGRyaXZlcnMgYW5kIGZpbGVzeXN0ZW1z
+IHRoYW4gdGhlIG1kIGRyaXZlciB0aGF0DQpjYW4gc3VibWl0IEkvTyBhZnRlciB1c2VyIHNwYWNl
+IHByb2Nlc3NlcyBoYXZlIGJlZW4gZnJvemVuLCBlLmcuIHRoZSBCVFJGUw0KUkFJRCBhbmQgc2Ny
+dWIgZnVuY3Rpb25hbGl0aWVzLiBJdCB3aWxsIHRha2UgdGltZSB0byBmaXggYWxsIHRoZXNlIGRy
+aXZlcnMNCmFuZCBhbHNvIHRvIGFkZCBmaWxlc3lzdGVtIGZyZWV6ZS90aGF3IGZ1bmN0aW9uYWxp
+dHkgdG8gdGhlIHN1c3BlbmQgYW5kDQpyZXN1bWUgc2VxdWVuY2VzLiBBcyBsb25nIGFzIG5vdCBh
+bGwgZHJpdmVycyBoYXZlIGJlZW4gZml4ZWQgd2Ugd2lsbCBuZWVkDQpTQ1NJIGRldmljZSBxdWll
+c2NpbmcgYW5kIHJlc3VtaW5nIGFzIGEgd29ya2Fyb3VuZCB0byBhdm9pZCB0aGF0IGFueSBJL08N
+Cm9jY3VycyB3aGlsZSBhIGhpYmVybmF0aW9uIGltYWdlIGlzIGJlaW5nIGNyZWF0ZWQuDQoNCkJh
+cnQu
