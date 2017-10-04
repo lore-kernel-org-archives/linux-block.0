@@ -1,46 +1,60 @@
-Return-Path: <Damien.LeMoal@wdc.com>
-From: Damien Le Moal <Damien.LeMoal@wdc.com>
-To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Bart Van Assche
-	<Bart.VanAssche@wdc.com>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "hch@lst.de" <hch@lst.de>
-Subject: Re: [PATCH V5 10/14] block: mq-deadline: Add zoned block device data
-Date: Mon, 2 Oct 2017 04:32:01 +0000
-Message-ID: <1506918719.24488.3.camel@wdc.com>
-References: <20170925061454.5533-1-damien.lemoal@wdc.com>
-	 <20170925061454.5533-11-damien.lemoal@wdc.com>
-	 <1506375254.2641.26.camel@wdc.com>
-In-Reply-To: <1506375254.2641.26.camel@wdc.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Return-Path: <mwilck@suse.com>
+Message-ID: <1507114002.22324.12.camel@suse.com>
+Subject: Re: [PATCH 1/2] block: genhd: add device_add_disk_with_groups
+From: Martin Wilck <mwilck@suse.com>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Johannes
+ Thumshirn <jthumshirn@suse.de>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
+ linux-nvme@lists.infradead.org
+Date: Wed, 04 Oct 2017 12:46:42 +0200
+In-Reply-To: <20170929225949.GP8463@localhost.localdomain>
+References: <20170928193637.24707-1-mwilck@suse.com>
+	 <20170929225949.GP8463@localhost.localdomain>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-QmFydCwNCg0KT24gTW9uLCAyMDE3LTA5LTI1IGF0IDIxOjM0ICswMDAwLCBCYXJ0IFZhbiBBc3Nj
-aGUgd3JvdGU6DQo+IE9uIE1vbiwgMjAxNy0wOS0yNSBhdCAxNToxNCArMDkwMCwgRGFtaWVuIExl
-IE1vYWwgd3JvdGU6DQo+ID4gTW9kaWZ5IG1xLWRlYWxpbmUgaW5pdF9xdWV1ZSBhbmQgZXhpdF9x
-dWV1ZSBlbGV2YXRvciBtZXRob2RzIHRvIGhhbmRsZQ0KPiANCj4gICAgICAgICAgXl5eXl5eXl5e
-Xg0KPiAgICAgICAgICBtcS1kZWFkbGluZSA/DQo+IA0KPiA+ICtzdGF0aWMgaW50IGRlYWRsaW5l
-X2luaXRfem9uZXNfd2xvY2soc3RydWN0IHJlcXVlc3RfcXVldWUgKnEsDQo+ID4gKwkJCQkgICAg
-IHN0cnVjdCBkZWFkbGluZV9kYXRhICpkZCkNCj4gPiArew0KPiA+ICsJLyoNCj4gPiArCSAqIEZv
-ciByZWd1bGFyIGRyaXZlcyBvciBub24tY29uZm9ybWluZyB6b25lZCBibG9jayBkZXZpY2UsDQo+
-ID4gKwkgKiBkbyBub3QgdXNlIHpvbmUgd3JpdGUgbG9ja2luZy4NCj4gPiArCSAqLw0KPiA+ICsJ
-aWYgKCFibGtfcXVldWVfbnJfem9uZXMocSkpDQo+ID4gKwkJcmV0dXJuIDA7DQo+ID4gKw0KPiA+
-ICsJLyoNCj4gPiArCSAqIFRyZWF0IGhvc3QgYXdhcmUgZHJpdmVzIGFzIHJlZ3VsYXIgZGlza3Mu
-DQo+ID4gKwkgKi8NCj4gPiArCWlmIChibGtfcXVldWVfem9uZWRfbW9kZWwocSkgIT0gQkxLX1pP
-TkVEX0hNKQ0KPiA+ICsJCXJldHVybiAwOw0KPiA+ICsNCj4gPiArCWRkLT56b25lc193bG9jayA9
-DQo+ID4ga3phbGxvY19ub2RlKEJJVFNfVE9fTE9OR1MoYmxrX3F1ZXVlX25yX3pvbmVzKHEpKQ0K
-PiA+ICsJCQkJICAgICAgICogc2l6ZW9mKHVuc2lnbmVkIGxvbmcpLA0KPiA+ICsJCQkJICAgICAg
-IEdGUF9LRVJORUwsIHEtPm5vZGUpOw0KPiANCj4gQSByZXF1ZXN0IHF1ZXVlIGlzIGNyZWF0ZWQg
-YmVmb3JlIGRpc2sgdmFsaWRhdGlvbiBvY2N1cnMgYW5kIGJlZm9yZSB0aGUNCj4gbnVtYmVyIG9m
-IHpvbmVzIGlzIGluaXRpYWxpemVkIChzZF9wcm9iZV9hc3luYygpKS4gSWYgYSBzY2hlZHVsZXIg
-aXMNCj4gYXNzaWduZWQgdG8gYSBaQkMgZHJpdmUgdGhyb3VnaCBhIHVkZXYgcnVsZSwgY2FuIGl0
-IGhhcHBlbiB0aGF0DQo+IGRlYWRsaW5lX2luaXRfem9uZXNfd2xvY2soKSBpcyBjYWxsZWQgYmVm
-b3JlIHRoZSBudW1iZXIgb2Ygem9uZXMgaGFzIGJlZW4NCj4gaW5pdGlhbGl6ZWQ/DQoNClllcyBp
-bmRlZWQuIEkgYW0gYXdhcmUgb2YgdGhpcywgaGVuY2UgdGhlIGxhc3QgcGF0Y2ggb2YgdGhlIHNl
-cmllcyB3aGljaA0KZGlzYWJsZXMgc2V0dGluZyBhIGRlZmF1bHQgc2NoZWR1bGVyIGZvciBibGst
-bXEgZGV2aWNlcy4NCg0KVGhhdCBpcyBob3dldmVyIGEgbGl0dGxlIGV4dHJlbWUuIFNvIGZvciBW
-NiwgSSBhbSBsb29raW5nIGF0IGRpZmVycmluZyB0aGUNCmRlZmF1bHQgZWxldmF0b3Igc2V0dXAg
-YWZ0ZXIgZGV2aWNlIGluZm9ybWF0aW9uIGlzIGdhdGhlcmVkLiBOb3Qgc3VyZSB3aGVyZQ0KdGhl
-IHJpZ2h0IHBsYWNlIHRvIGRvIHNvIGlzIHRob3VnaC4gTG9va2luZy4NCg0KQmVzdCByZWdhcmRz
-Lg0KDQotLSANCkRhbWllbiBMZSBNb2FsDQpXZXN0ZXJuIERpZ2l0YWw=
+On Fri, 2017-09-29 at 16:59 -0600, Keith Busch wrote:
+> On Thu, Sep 28, 2017 at 09:36:36PM +0200, Martin Wilck wrote:
+> > In the NVME subsystem, we're seeing a race condition with udev
+> > where
+> > device_add_disk() is called (which triggers an "add" uevent), and a
+> > sysfs attribute group is added to the disk device afterwards.
+> > If udev rules access these attributes before they are created,
+> > udev processing of the device is incomplete, in particular, device
+> > WWIDs may not be determined correctly.
+> > 
+> > To fix this, this patch introduces a new function
+> > device_add_disk_with_groups(), which takes a list of attribute
+> > groups
+> > and adds them to the device before sending out uevents.
+> > 
+> > Signed-off-by: Martin Wilck <mwilck@suse.com>
+> 
+> Is NVMe the only one having this problem?
+
+There are other devices that follow the same programming pattern
+(device_add_disk followed by sysfs_create_group), but I haven't tested
+them all, nor reviewed whether these devices need the disk's sysfs
+attributes for udev processing. If they don't, the problem will just go
+unnoticed.
+
+SCSI obviously takes a very different approach to sysfs layout.
+
+> Was putting our attributes in the disk's kobj a bad choice?
+
+Well, it would make sense to separate the block (disk) device from the
+device representing the NVMe subsys/namespace in sysfs. But I guess
+it's too late for that now. Actually, the first attempt I made to solve
+this problem was exactly that, and it proved to "work", too, but only
+at the cost of changing the path of the NVMe block device in sysfs,
+which I considered a no-go. Thus I came up with the approach I posted.
+
+Regards,
+Martin
+
+-- 
+Dr. Martin Wilck <mwilck@suse.com>, Tel. +49 (0)911 74053 2107
+SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
