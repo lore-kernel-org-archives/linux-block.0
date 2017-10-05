@@ -1,45 +1,43 @@
-Return-Path: <devtimhansen@gmail.com>
-Return-Path: <devtimhansen@gmail.com>
-Date: Fri, 6 Oct 2017 14:45:13 -0400
-From: Tim Hansen <devtimhansen@gmail.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	alexander.levin@one.verizon.com, devtimhansen@gmail.com
-Subject: [PATCH] block/bio: Remove null checks before mempool_destroy in
- bioset_free
-Message-ID: <20171006184513.GA78611@debian>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [GIT PULL] nvme fixes for Linux 4.14-rc4
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+ Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
+References: <20171005163654.walnk7642obfyjp6@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <8f1e6bc2-f511-7209-bc28-3876ed806755@kernel.dk>
+Date: Thu, 5 Oct 2017 10:45:12 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171005163654.walnk7642obfyjp6@infradead.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This patch removes redundant checks for null values on bio_pool and bvec_pool.
+On 10/05/2017 10:36 AM, Christoph Hellwig wrote:
+> A trivial one-liner from Martin to fix the visible of the uuid attr,
+> and another one (originally from Abhishek Shah, rewritten by me) to
+> fix the CMB addresses passed back to the controller in case of a system
+> that remaps BAR addresses between host and device.
+> 
+> The following changes since commit a5f3d8a5eaaf917878f07998e6f1ea46024e6bab:
+> 
+>   bcache: use llist_for_each_entry_safe() in __closure_wake_up() (2017-09-27 14:54:49 -0600)
+> 
+> are available in the git repository at:
+> 
+>   git://git.infradead.org/nvme.git nvme-4.14
+> 
+> for you to fetch changes up to 8969f1f8291762c13147c1ba89d46238af01675b:
+> 
+>   nvme-pci: Use PCI bus address for data/queues in CMB (2017-10-04 11:42:53 +0200)
+> 
+> ----------------------------------------------------------------
+> Christoph Hellwig (1):
+>       nvme-pci: Use PCI bus address for data/queues in CMB
+> 
+> Martin Wilck (1):
+>       nvme: fix visibility of "uuid" ns attribute
 
-Found using make coccicheck M=block/ on linux-net tree on the next-20170929 tag.
+Pulled, thanks.
 
-Related to patch 9987695 that removed similar checks in bio-integrity. 
-
-Signed-off-by: Tim Hansen <devtimhansen@gmail.com>
----
- block/bio.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 8338304..bf0dbe8 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1928,11 +1928,8 @@ void bioset_free(struct bio_set *bs)
- 	if (bs->rescue_workqueue)
- 		destroy_workqueue(bs->rescue_workqueue);
- 
--	if (bs->bio_pool)
--		mempool_destroy(bs->bio_pool);
--
--	if (bs->bvec_pool)
--		mempool_destroy(bs->bvec_pool);
-+	mempool_destroy(bs->bio_pool);
-+	mempool_destroy(bs->bvec_pool);
- 
- 	bioset_integrity_free(bs);
- 	bio_put_slab(bs);
 -- 
-2.1.4
+Jens Axboe
