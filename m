@@ -1,83 +1,132 @@
-Return-Path: <Damien.LeMoal@wdc.com>
-From: Damien Le Moal <Damien.LeMoal@wdc.com>
-To: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Bart Van Assche
-	<Bart.VanAssche@wdc.com>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "hch@lst.de" <hch@lst.de>
-Subject: Re: [PATCH V5 12/14] block: mq-deadline: Introduce zone locking
- support
-Date: Mon, 2 Oct 2017 04:36:11 +0000
-Message-ID: <1506918970.24488.7.camel@wdc.com>
-References: <20170925061454.5533-1-damien.lemoal@wdc.com>
-	 <20170925061454.5533-13-damien.lemoal@wdc.com>
-	 <1506376835.2641.34.camel@wdc.com>
-In-Reply-To: <1506376835.2641.34.camel@wdc.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <prvs=14519fb91f=shli@fb.com>
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>
+CC: <axboe@kernel.dk>, <Kernel-team@fb.com>, Omar Sandoval <osandov@fb.com>
+Subject: [PATCH] blk-stat: delete useless code
+Date: Thu, 5 Oct 2017 14:55:33 -0700
+Message-ID: <53167e7f908d54f480b2ee62b5bb01279bf156db.1507240437.git.shli@fb.com>
 MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-QmFydCwNCg0KT24gTW9uLCAyMDE3LTA5LTI1IGF0IDIyOjAwICswMDAwLCBCYXJ0IFZhbiBBc3Nj
-aGUgd3JvdGU6DQo+IE9uIE1vbiwgMjAxNy0wOS0yNSBhdCAxNToxNCArMDkwMCwgRGFtaWVuIExl
-IE1vYWwgd3JvdGU6DQo+ID4gK3N0YXRpYyBpbmxpbmUgYm9vbCBkZWFkbGluZV9yZXF1ZXN0X25l
-ZWRzX3pvbmVfd2xvY2soc3RydWN0IGRlYWRsaW5lX2RhdGENCj4gPiAqZGQsDQo+ID4gKwkJCQkJ
-CSAgICAgc3RydWN0IHJlcXVlc3QgKnJxKQ0KPiA+ICt7DQo+ID4gKw0KPiA+ICsJaWYgKCFkZC0+
-em9uZXNfd2xvY2spDQo+ID4gKwkJcmV0dXJuIGZhbHNlOw0KPiA+ICsNCj4gPiArCWlmIChibGtf
-cnFfaXNfcGFzc3Rocm91Z2gocnEpKQ0KPiA+ICsJCXJldHVybiBmYWxzZTsNCj4gPiArDQo+ID4g
-Kwlzd2l0Y2ggKHJlcV9vcChycSkpIHsNCj4gPiArCWNhc2UgUkVRX09QX1dSSVRFX1pFUk9FUzoN
-Cj4gPiArCWNhc2UgUkVRX09QX1dSSVRFX1NBTUU6DQo+ID4gKwljYXNlIFJFUV9PUF9XUklURToN
-Cj4gPiArCQlyZXR1cm4gYmxrX3JxX3pvbmVfaXNfc2VxKHJxKTsNCj4gPiArCWRlZmF1bHQ6DQo+
-ID4gKwkJcmV0dXJuIGZhbHNlOw0KPiA+ICsJfQ0KPiANCj4gSWYgYW55b25lIGV2ZXIgYWRkcyBh
-IG5ldyB3cml0ZSByZXF1ZXN0IHR5cGUgaXQgd2lsbCBiZSBlYXN5IHRvIG92ZXJsb29rDQo+IHRo
-aXMNCj4gZnVuY3Rpb24uIFNob3VsZCB0aGUgJ2RlZmF1bHQnIGNhc2UgYmUgbGVmdCBvdXQgYW5k
-IHNob3VsZCBhbGwgcmVxdWVzdCB0eXBlcw0KPiBiZSBtZW50aW9uZWQgaW4gdGhlIHN3aXRjaC9j
-YXNlIHN0YXRlbWVudCBzdWNoIHRoYXQgdGhlIGNvbXBpbGVyIHdpbGwgaXNzdWUNCj4gYQ0KPiB3
-YXJuaW5nIGlmIGEgbmV3IHJlcXVlc3Qgb3BlcmF0aW9uIHR5cGUgaXMgYWRkZWQgdG8gZW51bSBy
-ZXFfb3BmPw0KDQpJIHRyaWVkLCBidXQgdGhhdCBkb2VzIG5vdCB3b3JrLiBUaGUgc3dpdGNoLWNh
-c2UgbmVlZHMgZWl0aGVyIGEgZGVmYXVsdCBjYXNlDQpvciBhIHJldHVybiBhZnRlciBpdC4gT3Ro
-ZXJ3aXNlIEkgZ2V0IGEgY29tcGlsYXRpb24gd2FybmluZyAocmVhY2hlZCBlbmQgb2YNCm5vbi12
-b2lkIGZ1bmN0aW9uKS4NCg0KPiA+ICsvKg0KPiA+ICsgKiBBYnVzZSB0aGUgZWx2LnByaXZbMF0g
-cG9pbnRlciB0byBpbmRpY2F0ZSBpZiBhIHJlcXVlc3QgaGFzIHdyaXRlDQo+ID4gKyAqIGxvY2tl
-ZCBpdHMgdGFyZ2V0IHpvbmUuIE9ubHkgd3JpdGUgcmVxdWVzdCB0byBhIHpvbmVkIGJsb2NrIGRl
-dmljZQ0KPiA+ICsgKiBjYW4gb3duIGEgem9uZSB3cml0ZSBsb2NrLg0KPiA+ICsgKi8NCj4gPiAr
-I2RlZmluZSBSUV9aT05FX1dMT0NLRUQJCSgodm9pZCAqKTFVTCkNCj4gPiArc3RhdGljIGlubGlu
-ZSB2b2lkIGRlYWRsaW5lX3NldF9yZXF1ZXN0X3pvbmVfd2xvY2soc3RydWN0IHJlcXVlc3QgKnJx
-KQ0KPiA+ICt7DQo+ID4gKwlycS0+ZWx2LnByaXZbMF0gPSBSUV9aT05FX1dMT0NLRUQ7DQo+ID4g
-K30NCj4gPiArDQo+ID4gKyNkZWZpbmUgUlFfWk9ORV9OT19XTE9DSwkoKHZvaWQgKikwVUwpDQo+
-ID4gK3N0YXRpYyBpbmxpbmUgdm9pZCBkZWFkbGluZV9jbGVhcl9yZXF1ZXN0X3pvbmVfd2xvY2so
-c3RydWN0IHJlcXVlc3QgKnJxKQ0KPiA+ICt7DQo+ID4gKwlycS0+ZWx2LnByaXZbMF0gPSBSUV9a
-T05FX05PX1dMT0NLOw0KPiA+ICt9DQo+IA0KPiBTaG91bGQgYW4gZW51bWVyYXRpb24gdHlwZSBi
-ZSBpbnRyb2R1Y2VkIGZvciBSUV9aT05FX1dMT0NLRUQgYW5kDQo+IFJRX1pPTkVfTk9fV0xPQ0s/
-DQoNClN1cmUuIEFkZGVkIGluIFY2Lg0KDQo+ID4gKy8qDQo+ID4gKyAqIFdyaXRlIGxvY2sgdGhl
-IHRhcmdldCB6b25lIG9mIGEgd3JpdGUgcmVxdWVzdC4NCj4gPiArICovDQo+ID4gK3N0YXRpYyB2
-b2lkIGRlYWRsaW5lX3dsb2NrX3pvbmUoc3RydWN0IGRlYWRsaW5lX2RhdGEgKmRkLA0KPiA+ICsJ
-CQkJc3RydWN0IHJlcXVlc3QgKnJxKQ0KPiA+ICt7DQo+ID4gKwl1bnNpZ25lZCBpbnQgem5vID0g
-YmxrX3JxX3pvbmVfbm8ocnEpOw0KPiA+ICsNCj4gPiArCVdBUk5fT05fT05DRShkZWFkbGluZV9y
-ZXF1ZXN0X2hhc196b25lX3dsb2NrKHJxKSk7DQo+ID4gKwlXQVJOX09OX09OQ0UodGVzdF9hbmRf
-c2V0X2JpdCh6bm8sIGRkLT56b25lc193bG9jaykpOw0KPiA+ICsJZGVhZGxpbmVfc2V0X3JlcXVl
-c3Rfem9uZV93bG9jayhycSk7DQo+ID4gK30NCj4gPiArDQo+ID4gKy8qDQo+ID4gKyAqIFdyaXRl
-IHVubG9jayB0aGUgdGFyZ2V0IHpvbmUgb2YgYSB3cml0ZSByZXF1ZXN0Lg0KPiA+ICsgKi8NCj4g
-PiArc3RhdGljIHZvaWQgZGVhZGxpbmVfd3VubG9ja196b25lKHN0cnVjdCBkZWFkbGluZV9kYXRh
-ICpkZCwNCj4gPiArCQkJCSAgc3RydWN0IHJlcXVlc3QgKnJxKQ0KPiA+ICt7DQo+ID4gKwl1bnNp
-Z25lZCBpbnQgem5vID0gYmxrX3JxX3pvbmVfbm8ocnEpOw0KPiA+ICsJdW5zaWduZWQgbG9uZyBm
-bGFnczsNCj4gPiArDQo+ID4gKwlzcGluX2xvY2tfaXJxc2F2ZSgmZGQtPnpvbmVfbG9jaywgZmxh
-Z3MpOw0KPiA+ICsNCj4gPiArCVdBUk5fT05fT05DRSghdGVzdF9hbmRfY2xlYXJfYml0KHpubywg
-ZGQtPnpvbmVzX3dsb2NrKSk7DQo+ID4gKwlkZWFkbGluZV9jbGVhcl9yZXF1ZXN0X3pvbmVfd2xv
-Y2socnEpOw0KPiA+ICsNCj4gPiArCXNwaW5fdW5sb2NrX2lycXJlc3RvcmUoJmRkLT56b25lX2xv
-Y2ssIGZsYWdzKTsNCj4gPiArfQ0KPiANCj4gV2h5IGRvZXMgZGVhZGxpbmVfd3VubG9ja196b25l
-KCkgcHJvdGVjdCBtb2RpZmljYXRpb25zIHdpdGggZGQtPnpvbmVfbG9jaw0KPiBidXQNCj4gZGVh
-ZGxpbmVfd2xvY2tfem9uZSgpIG5vdD8gSWYgdGhpcyBjb2RlIGlzIGNvcnJlY3QsIHBsZWFzZSBh
-ZGQgYQ0KPiBsb2NrZGVwX2Fzc2VydF9oZWxkKCkgc3RhdGVtZW50IGluIHRoZSBmaXJzdCBmdW5j
-dGlvbi4NCg0KWWVzLCB0aGF0IHdhcyBhIGxpdHRsZSBjb25mdXNpbmcuIEluIFY2LCBJIG1vdmUg
-dGhlIGludHJvZHVjdGlvbiBvZiB0aGUNCnpvbmVfbG9jayBzcGlubG9jayB0byB3aGVuIGl0IGlz
-IGFjdHVhbGx5IG5lZWRlZCwgdGhhdCBpcyB0aGUgcGF0Y2ggZm9sbG93aW5nDQp0aGlzIG9uZS4g
-QW5kIEkgYWRkZWQgbW9yZSBjb21tZW50cyBpbiBib3RoIHRoZSBjb21taXQgbWVzc2FnZSBhbmQg
-aW4gdGhlIGNvZGUNCnRvIGV4cGxhaW4gd2h5IHRoZSBzcGlubG9jayBpcyBuZWVkZWQuDQoNCj4g
-PiArLyoNCj4gPiArICogVGVzdCB0aGUgd3JpdGUgbG9jayBzdGF0ZSBvZiB0aGUgdGFyZ2V0IHpv
-bmUgb2YgYSB3cml0ZSByZXF1ZXN0Lg0KPiA+ICsgKi8NCj4gPiArc3RhdGljIGlubGluZSBib29s
-IGRlYWRsaW5lX3pvbmVfaXNfd2xvY2tlZChzdHJ1Y3QgZGVhZGxpbmVfZGF0YSAqZGQsDQo+ID4g
-KwkJCQkJICAgIHN0cnVjdCByZXF1ZXN0ICpycSkNCj4gPiArew0KPiA+ICsJdW5zaWduZWQgaW50
-IHpubyA9IGJsa19ycV96b25lX25vKHJxKTsNCj4gPiArDQo+ID4gKwlyZXR1cm4gdGVzdF9iaXQo
-em5vLCBkZC0+em9uZXNfd2xvY2spOw0KPiA+ICt9DQo+IA0KPiBEbyB3ZSByZWFsbHkgbmVlZCB0
-aGUgbG9jYWwgdmFyaWFibGUgJ3pubyc/DQoNCk5vIHdlIGRvbid0LiBGaXhlZC4NCg0KQmVzdCBy
-ZWdhcmRzLg0KDQotLSANCkRhbWllbiBMZSBNb2FsDQpXZXN0ZXJuIERpZ2l0YWw=
+Fix two issues:
+- the per-cpu stat flush is unnecessary, nobody uses per-cpu stat except
+  sum it to global stat. We can do the calculation there. The flush just
+  wastes cpu time.
+- some fields are signed int/s64. I don't see the point.
+
+Cc: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Shaohua Li <shli@fb.com>
+---
+ block/blk-stat.c          | 45 +++++++--------------------------------------
+ include/linux/blk_types.h |  5 ++---
+ 2 files changed, 9 insertions(+), 41 deletions(-)
+
+diff --git a/block/blk-stat.c b/block/blk-stat.c
+index c52356d..3a2f3c9 100644
+--- a/block/blk-stat.c
++++ b/block/blk-stat.c
+@@ -11,8 +11,6 @@
+ #include "blk-mq.h"
+ #include "blk.h"
+ 
+-#define BLK_RQ_STAT_BATCH	64
+-
+ struct blk_queue_stats {
+ 	struct list_head callbacks;
+ 	spinlock_t lock;
+@@ -23,45 +21,21 @@ static void blk_stat_init(struct blk_rq_stat *stat)
+ {
+ 	stat->min = -1ULL;
+ 	stat->max = stat->nr_samples = stat->mean = 0;
+-	stat->batch = stat->nr_batch = 0;
+-}
+-
+-static void blk_stat_flush_batch(struct blk_rq_stat *stat)
+-{
+-	const s32 nr_batch = READ_ONCE(stat->nr_batch);
+-	const s32 nr_samples = READ_ONCE(stat->nr_samples);
+-
+-	if (!nr_batch)
+-		return;
+-	if (!nr_samples)
+-		stat->mean = div64_s64(stat->batch, nr_batch);
+-	else {
+-		stat->mean = div64_s64((stat->mean * nr_samples) +
+-					stat->batch,
+-					nr_batch + nr_samples);
+-	}
+-
+-	stat->nr_samples += nr_batch;
+-	stat->nr_batch = stat->batch = 0;
++	stat->batch = 0;
+ }
+ 
++/* src is a per-cpu stat, mean isn't initialized */
+ static void blk_stat_sum(struct blk_rq_stat *dst, struct blk_rq_stat *src)
+ {
+-	blk_stat_flush_batch(src);
+-
+ 	if (!src->nr_samples)
+ 		return;
+ 
+ 	dst->min = min(dst->min, src->min);
+ 	dst->max = max(dst->max, src->max);
+ 
+-	if (!dst->nr_samples)
+-		dst->mean = src->mean;
+-	else {
+-		dst->mean = div64_s64((src->mean * src->nr_samples) +
+-					(dst->mean * dst->nr_samples),
+-					dst->nr_samples + src->nr_samples);
+-	}
++	dst->mean = div_u64(src->batch + dst->mean * dst->nr_samples,
++				dst->nr_samples + src->nr_samples);
++
+ 	dst->nr_samples += src->nr_samples;
+ }
+ 
+@@ -69,13 +43,8 @@ static void __blk_stat_add(struct blk_rq_stat *stat, u64 value)
+ {
+ 	stat->min = min(stat->min, value);
+ 	stat->max = max(stat->max, value);
+-
+-	if (stat->batch + value < stat->batch ||
+-	    stat->nr_batch + 1 == BLK_RQ_STAT_BATCH)
+-		blk_stat_flush_batch(stat);
+-
+ 	stat->batch += value;
+-	stat->nr_batch++;
++	stat->nr_samples++;
+ }
+ 
+ void blk_stat_add(struct request *rq)
+@@ -84,7 +53,7 @@ void blk_stat_add(struct request *rq)
+ 	struct blk_stat_callback *cb;
+ 	struct blk_rq_stat *stat;
+ 	int bucket;
+-	s64 now, value;
++	u64 now, value;
+ 
+ 	now = __blk_stat_time(ktime_to_ns(ktime_get()));
+ 	if (now < blk_stat_time(&rq->issue_stat))
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index a2d2aa7..3385c89 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -329,11 +329,10 @@ static inline bool blk_qc_t_is_internal(blk_qc_t cookie)
+ }
+ 
+ struct blk_rq_stat {
+-	s64 mean;
++	u64 mean;
+ 	u64 min;
+ 	u64 max;
+-	s32 nr_samples;
+-	s32 nr_batch;
++	u32 nr_samples;
+ 	u64 batch;
+ };
+ 
+-- 
+2.9.5
