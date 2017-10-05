@@ -1,43 +1,71 @@
-Return-Path: <zhangweiping@didichuxing.com>
-Date: Tue, 10 Oct 2017 22:53:46 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>
-Subject: [PATCH] blkcg: check pol->cpd_free_fn before free cpd
-Message-ID: <20171010145342.GA24247@localhost.didichuxing.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Return-Path: zhangweiping@didichuxing.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:44036 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751297AbdJEABR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Oct 2017 20:01:17 -0400
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        =Oleksandr Natalenko <oleksandr@natalenko.name>,
+        "Luis R . Rodriguez" <mcgrof@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
+        Hannes Reinecke <hare@suse.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH v6 1/9] md: Rename md_notifier into md_reboot_notifier
+Date: Wed,  4 Oct 2017 17:01:02 -0700
+Message-Id: <20171005000110.15904-2-bart.vanassche@wdc.com>
+In-Reply-To: <20171005000110.15904-1-bart.vanassche@wdc.com>
+References: <20171005000110.15904-1-bart.vanassche@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-check pol->cpd_free_fn() instead of pol->cpd_alloc_fn() when free cpd.
+This avoids confusion with the pm notifier that will be added
+through a later patch.
 
-Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Shaohua Li <shli@kernel.org>
+Cc: linux-raid@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- block/blk-cgroup.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/md/md.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index d3f56ba..e7ec676 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1452,7 +1452,7 @@ int blkcg_policy_register(struct blkcg_policy *pol)
- 	return 0;
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 5d61049e7417..8933cafc212d 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -8966,7 +8966,7 @@ static int md_notify_reboot(struct notifier_block *this,
+ 	return NOTIFY_DONE;
+ }
  
- err_free_cpds:
--	if (pol->cpd_alloc_fn) {
-+	if (pol->cpd_free_fn) {
- 		list_for_each_entry(blkcg, &all_blkcgs, all_blkcgs_node) {
- 			if (blkcg->cpd[pol->plid]) {
- 				pol->cpd_free_fn(blkcg->cpd[pol->plid]);
-@@ -1492,7 +1492,7 @@ void blkcg_policy_unregister(struct blkcg_policy *pol)
- 	/* remove cpds and unregister */
- 	mutex_lock(&blkcg_pol_mutex);
+-static struct notifier_block md_notifier = {
++static struct notifier_block md_reboot_notifier = {
+ 	.notifier_call	= md_notify_reboot,
+ 	.next		= NULL,
+ 	.priority	= INT_MAX, /* before any real devices */
+@@ -9003,7 +9003,7 @@ static int __init md_init(void)
+ 	blk_register_region(MKDEV(mdp_major, 0), 1UL<<MINORBITS, THIS_MODULE,
+ 			    md_probe, NULL, NULL);
  
--	if (pol->cpd_alloc_fn) {
-+	if (pol->cpd_free_fn) {
- 		list_for_each_entry(blkcg, &all_blkcgs, all_blkcgs_node) {
- 			if (blkcg->cpd[pol->plid]) {
- 				pol->cpd_free_fn(blkcg->cpd[pol->plid]);
+-	register_reboot_notifier(&md_notifier);
++	register_reboot_notifier(&md_reboot_notifier);
+ 	raid_table_header = register_sysctl_table(raid_root_table);
+ 
+ 	md_geninit();
+@@ -9243,7 +9243,7 @@ static __exit void md_exit(void)
+ 
+ 	unregister_blkdev(MD_MAJOR,"md");
+ 	unregister_blkdev(mdp_major, "mdp");
+-	unregister_reboot_notifier(&md_notifier);
++	unregister_reboot_notifier(&md_reboot_notifier);
+ 	unregister_sysctl_table(raid_table_header);
+ 
+ 	/* We cannot unload the modules while some process is
 -- 
-2.9.4
+2.14.2
