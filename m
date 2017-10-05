@@ -1,197 +1,65 @@
-Return-Path: <prvs=44825b072=bart.vanassche@wdc.com>
+Return-Path: <prvs=44404dd03=bart.vanassche@wdc.com>
 From: Bart Van Assche <bart.vanassche@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
 	"Martin K . Petersen" <martin.petersen@oracle.com>,
 	=Oleksandr Natalenko <oleksandr@natalenko.name>,
 	"Luis R . Rodriguez" <mcgrof@kernel.org>,
 	Ming Lei <ming.lei@redhat.com>,
 	Bart Van Assche <bart.vanassche@wdc.com>,
+	Shaohua Li <shli@kernel.org>,
+	linux-raid@vger.kernel.org,
 	Hannes Reinecke <hare@suse.com>,
 	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v7 5/9] block: Introduce blk_get_request_flags()
-Date: Mon,  9 Oct 2017 16:13:56 -0700
-Message-Id: <20171009231400.562-6-bart.vanassche@wdc.com>
-In-Reply-To: <20171009231400.562-1-bart.vanassche@wdc.com>
-References: <20171009231400.562-1-bart.vanassche@wdc.com>
+Subject: [PATCH v6 2/9] md: Introduce md_stop_all_writes()
+Date: Wed,  4 Oct 2017 17:01:03 -0700
+Message-Id: <20171005000110.15904-3-bart.vanassche@wdc.com>
+In-Reply-To: <20171005000110.15904-1-bart.vanassche@wdc.com>
+References: <20171005000110.15904-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-A side effect of this patch is that the GFP mask that is passed to
-several allocation functions in the legacy block layer is changed
-from GFP_KERNEL into __GFP_DIRECT_RECLAIM.
+Introduce md_stop_all_writes() because the next patch will add
+a second caller for this function. This patch does not change
+any functionality.
 
 Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
+Cc: Shaohua Li <shli@kernel.org>
+Cc: linux-raid@vger.kernel.org
 Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
 Cc: Hannes Reinecke <hare@suse.com>
 Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- block/blk-core.c       | 50 +++++++++++++++++++++++++++++++++++---------------
- include/linux/blkdev.h |  3 +++
- 2 files changed, 38 insertions(+), 15 deletions(-)
+ drivers/md/md.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 265a69511c47..03156d9ede94 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1157,7 +1157,7 @@ int blk_update_nr_requests(struct request_queue *q, unsigned int nr)
-  * @rl: request list to allocate from
-  * @op: operation and flags
-  * @bio: bio to allocate request for (can be %NULL)
-- * @gfp_mask: allocation mask
-+ * @flags: BLQ_MQ_REQ_* flags
-  *
-  * Get a free request from @q.  This function may fail under memory
-  * pressure or if @q is dead.
-@@ -1167,7 +1167,7 @@ int blk_update_nr_requests(struct request_queue *q, unsigned int nr)
-  * Returns request pointer on success, with @q->queue_lock *not held*.
-  */
- static struct request *__get_request(struct request_list *rl, unsigned int op,
--		struct bio *bio, gfp_t gfp_mask)
-+				     struct bio *bio, unsigned int flags)
- {
- 	struct request_queue *q = rl->q;
- 	struct request *rq;
-@@ -1176,6 +1176,8 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
- 	struct io_cq *icq = NULL;
- 	const bool is_sync = op_is_sync(op);
- 	int may_queue;
-+	gfp_t gfp_mask = flags & BLK_MQ_REQ_NOWAIT ? GFP_ATOMIC :
-+			 __GFP_DIRECT_RECLAIM;
- 	req_flags_t rq_flags = RQF_ALLOCED;
- 
- 	lockdep_assert_held(q->queue_lock);
-@@ -1336,7 +1338,7 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
-  * @q: request_queue to allocate request from
-  * @op: operation and flags
-  * @bio: bio to allocate request for (can be %NULL)
-- * @gfp_mask: allocation mask
-+ * @flags: BLK_MQ_REQ_* flags.
-  *
-  * Get a free request from @q.  If %__GFP_DIRECT_RECLAIM is set in @gfp_mask,
-  * this function keeps retrying under memory pressure and fails iff @q is dead.
-@@ -1346,7 +1348,7 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
-  * Returns request pointer on success, with @q->queue_lock *not held*.
-  */
- static struct request *get_request(struct request_queue *q, unsigned int op,
--		struct bio *bio, gfp_t gfp_mask)
-+				   struct bio *bio, unsigned int flags)
- {
- 	const bool is_sync = op_is_sync(op);
- 	DEFINE_WAIT(wait);
-@@ -1358,7 +1360,7 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
- 
- 	rl = blk_get_rl(q, bio);	/* transferred to @rq on success */
- retry:
--	rq = __get_request(rl, op, bio, gfp_mask);
-+	rq = __get_request(rl, op, bio, flags);
- 	if (!IS_ERR(rq))
- 		return rq;
- 
-@@ -1367,7 +1369,7 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
- 		return ERR_PTR(-EAGAIN);
- 	}
- 
--	if (!gfpflags_allow_blocking(gfp_mask) || unlikely(blk_queue_dying(q))) {
-+	if ((flags & BLK_MQ_REQ_NOWAIT) || unlikely(blk_queue_dying(q))) {
- 		blk_put_rl(rl);
- 		return rq;
- 	}
-@@ -1394,10 +1396,13 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
- 	goto retry;
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 8933cafc212d..b99584e5d6b1 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -8937,8 +8937,7 @@ int rdev_clear_badblocks(struct md_rdev *rdev, sector_t s, int sectors,
  }
+ EXPORT_SYMBOL_GPL(rdev_clear_badblocks);
  
-+/* flags: BLK_MQ_REQ_PREEMPT and/or BLK_MQ_REQ_NOWAIT. */
- static struct request *blk_old_get_request(struct request_queue *q,
--					   unsigned int op, gfp_t gfp_mask)
-+					   unsigned int op, unsigned int flags)
+-static int md_notify_reboot(struct notifier_block *this,
+-			    unsigned long code, void *x)
++static void md_stop_all_writes(void)
  {
- 	struct request *rq;
-+	gfp_t gfp_mask = flags & BLK_MQ_REQ_NOWAIT ? GFP_ATOMIC :
-+			 __GFP_DIRECT_RECLAIM;
- 	int ret = 0;
- 
- 	WARN_ON_ONCE(q->mq_ops);
-@@ -1410,7 +1415,7 @@ static struct request *blk_old_get_request(struct request_queue *q,
- 	if (ret)
- 		return ERR_PTR(ret);
- 	spin_lock_irq(q->queue_lock);
--	rq = get_request(q, op, NULL, gfp_mask);
-+	rq = get_request(q, op, NULL, flags);
- 	if (IS_ERR(rq)) {
- 		spin_unlock_irq(q->queue_lock);
- 		blk_queue_exit(q);
-@@ -1424,25 +1429,40 @@ static struct request *blk_old_get_request(struct request_queue *q,
- 	return rq;
- }
- 
--struct request *blk_get_request(struct request_queue *q, unsigned int op,
--				gfp_t gfp_mask)
-+/**
-+ * blk_get_request_flags - allocate a request
-+ * @q: request queue to allocate a request for
-+ * @op: operation (REQ_OP_*) and REQ_* flags, e.g. REQ_SYNC.
-+ * @flags: BLK_MQ_REQ_* flags, e.g. BLK_MQ_REQ_NOWAIT.
-+ */
-+struct request *blk_get_request_flags(struct request_queue *q, unsigned int op,
-+				      unsigned int flags)
- {
- 	struct request *req;
- 
-+	WARN_ON_ONCE(op & REQ_NOWAIT);
-+	WARN_ON_ONCE(flags & ~BLK_MQ_REQ_NOWAIT);
-+
- 	if (q->mq_ops) {
--		req = blk_mq_alloc_request(q, op,
--			(gfp_mask & __GFP_DIRECT_RECLAIM) ?
--				0 : BLK_MQ_REQ_NOWAIT);
-+		req = blk_mq_alloc_request(q, op, flags);
- 		if (!IS_ERR(req) && q->mq_ops->initialize_rq_fn)
- 			q->mq_ops->initialize_rq_fn(req);
- 	} else {
--		req = blk_old_get_request(q, op, gfp_mask);
-+		req = blk_old_get_request(q, op, flags);
- 		if (!IS_ERR(req) && q->initialize_rq_fn)
- 			q->initialize_rq_fn(req);
- 	}
- 
- 	return req;
- }
-+EXPORT_SYMBOL(blk_get_request_flags);
-+
-+struct request *blk_get_request(struct request_queue *q, unsigned int op,
-+				gfp_t gfp_mask)
-+{
-+	return blk_get_request_flags(q, op, gfp_mask & __GFP_DIRECT_RECLAIM ?
-+				     0 : BLK_MQ_REQ_NOWAIT);
-+}
- EXPORT_SYMBOL(blk_get_request);
- 
- /**
-@@ -1868,7 +1888,7 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
- 	 * Returns with the queue unlocked.
+ 	struct list_head *tmp;
+ 	struct mddev *mddev;
+@@ -8962,6 +8961,12 @@ static int md_notify_reboot(struct notifier_block *this,
  	 */
- 	blk_queue_enter_live(q);
--	req = get_request(q, bio->bi_opf, bio, GFP_NOIO);
-+	req = get_request(q, bio->bi_opf, bio, 0);
- 	if (IS_ERR(req)) {
- 		blk_queue_exit(q);
- 		__wbt_done(q->rq_wb, wb_acct);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 9fb71fc7d0e8..3f7b08a9b9ae 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -935,6 +935,9 @@ extern void blk_rq_init(struct request_queue *q, struct request *rq);
- extern void blk_init_request_from_bio(struct request *req, struct bio *bio);
- extern void blk_put_request(struct request *);
- extern void __blk_put_request(struct request_queue *, struct request *);
-+extern struct request *blk_get_request_flags(struct request_queue *,
-+					     unsigned int op,
-+					     unsigned int flags);
- extern struct request *blk_get_request(struct request_queue *, unsigned int op,
- 				       gfp_t gfp_mask);
- extern void blk_requeue_request(struct request_queue *, struct request *);
+ 	if (need_delay)
+ 		mdelay(1000*1);
++}
++
++static int md_notify_reboot(struct notifier_block *this,
++			    unsigned long code, void *x)
++{
++	md_stop_all_writes();
+ 
+ 	return NOTIFY_DONE;
+ }
 -- 
 2.14.2
