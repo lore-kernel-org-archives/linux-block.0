@@ -1,47 +1,34 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:42881 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751277AbdJCKs4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2017 06:48:56 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Cc: Johannes Thumshirn <jthumshirn@suse.de>,
-        Benjamin Block <bblock@linux.vnet.ibm.com>
-Subject: [PATCH 3/9] libfc: don't assign resid_len in fc_lport_bsg_request
-Date: Tue,  3 Oct 2017 12:48:39 +0200
-Message-Id: <20171003104845.10417-4-hch@lst.de>
-In-Reply-To: <20171003104845.10417-1-hch@lst.de>
-References: <20171003104845.10417-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <davem@davemloft.net>
+Date: Wed, 04 Oct 2017 17:42:55 -0700 (PDT)
+Message-Id: <20171004.174255.1064054103427287818.davem@davemloft.net>
+To: bart.vanassche@wdc.com
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, hch@lst.de,
+ martin.petersen@oracle.com, oleksandr@natalenko.name, mcgrof@kernel.org,
+ ming.lei@redhat.com, hare@suse.com, jthumshirn@suse.de
+Subject: Re: [PATCH v6 7/9] ide, scsi: Tell the block layer at request
+ allocation time about preempt requests
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20171005000110.15904-8-bart.vanassche@wdc.com>
+References: <20171005000110.15904-1-bart.vanassche@wdc.com>
+	<20171005000110.15904-8-bart.vanassche@wdc.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+List-ID: <linux-block@vger.kernel.org>
 
-bsg_job_done takes care of updating the scsi_request structure fields.
+From: Bart Van Assche <bart.vanassche@wdc.com>
+Date: Wed,  4 Oct 2017 17:01:08 -0700
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/scsi/libfc/fc_lport.c | 3 ---
- 1 file changed, 3 deletions(-)
+> Convert blk_get_request(q, op, __GFP_RECLAIM) into blk_get_request(q,
+> op, BLK_MQ_PREEMPT). This patch does not change any functionality.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
 
-diff --git a/drivers/scsi/libfc/fc_lport.c b/drivers/scsi/libfc/fc_lport.c
-index 2fd0ec651170..5da46052e179 100644
---- a/drivers/scsi/libfc/fc_lport.c
-+++ b/drivers/scsi/libfc/fc_lport.c
-@@ -2083,7 +2083,6 @@ int fc_lport_bsg_request(struct bsg_job *job)
- {
- 	struct fc_bsg_request *bsg_request = job->request;
- 	struct fc_bsg_reply *bsg_reply = job->reply;
--	struct request *rsp = job->req->next_rq;
- 	struct Scsi_Host *shost = fc_bsg_to_shost(job);
- 	struct fc_lport *lport = shost_priv(shost);
- 	struct fc_rport *rport;
-@@ -2092,8 +2091,6 @@ int fc_lport_bsg_request(struct bsg_job *job)
- 	u32 did, tov;
- 
- 	bsg_reply->reply_payload_rcv_len = 0;
--	if (rsp)
--		scsi_req(rsp)->resid_len = job->reply_payload.payload_len;
- 
- 	mutex_lock(&lport->lp_mutex);
- 
--- 
-2.14.1
+For IDE:
+
+Acked-by: David S. Miller <davem@davemloft.net>
