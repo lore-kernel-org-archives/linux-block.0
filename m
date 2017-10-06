@@ -1,59 +1,212 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <BATV+9050b3976399226c7322+5157+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Fri, 6 Oct 2017 01:20:20 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+	Michal Hocko <mhocko@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>, Jan Kara <jack@suse.cz>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Vladimir Davydov <vdavydov.dev@gmail.com>,
+	Matthew Wilcox <mawilcox@microsoft.com>,
+	Jeff Layton <jlayton@redhat.com>, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, Thomas Gleixner <tglx@linutronix.de>
 Subject: Re: [PATCH v2] block/laptop_mode: Convert timers to use timer_setup()
-To: Christoph Hellwig <hch@infradead.org>, Kees Cook <keescook@chromium.org>
-Cc: linux-kernel@vger.kernel.org, Michal Hocko <mhocko@suse.com>,
- Andrew Morton <akpm@linux-foundation.org>, Jan Kara <jack@suse.cz>,
- Johannes Weiner <hannes@cmpxchg.org>, Nicholas Piggin <npiggin@gmail.com>,
- Vladimir Davydov <vdavydov.dev@gmail.com>,
- Matthew Wilcox <mawilcox@microsoft.com>, Jeff Layton <jlayton@redhat.com>,
- linux-block@vger.kernel.org, linux-mm@kvack.org,
- Thomas Gleixner <tglx@linutronix.de>
+Message-ID: <20171006082020.GA12192@infradead.org>
 References: <20171005231623.GA109154@beast>
- <20171006082020.GA12192@infradead.org>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <6471888d-60a6-bba6-0c3d-a967ff9442c4@kernel.dk>
-Date: Fri, 6 Oct 2017 08:28:43 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171006082020.GA12192@infradead.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171005231623.GA109154@beast>
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/06/2017 02:20 AM, Christoph Hellwig wrote:
->> -static void blk_rq_timed_out_timer(unsigned long data)
->> +static void blk_rq_timed_out_timer(struct timer_list *t)
->>  {
->> -	struct request_queue *q = (struct request_queue *)data;
->> +	struct request_queue *q = from_timer(q, t, timeout);
->>  
->>  	kblockd_schedule_work(&q->timeout_work);
->>  }
-> 
-> This isn't the laptop_mode timer, although the change itself looks fine.
-> 
->> +	timer_setup(&q->backing_dev_info->laptop_mode_wb_timer,
->> +		    laptop_mode_timer_fn, 0);
-> 
-> And I already pointed out to Jens when he did the previous changes
-> to this one that it has no business being in the block code, it
-> really should move to mm/page-writeback.c with the rest of the
-> handling of this timer.  Once that is fixed up your automated script
-> should pick it up, so we wouldn't need the manual change.
-
-Looks reasonable to me, one comment:
-
-> @@ -916,6 +950,8 @@ EXPORT_SYMBOL(bdi_register_owner);
->   */
->  static void bdi_remove_from_list(struct backing_dev_info *bdi)
+> -static void blk_rq_timed_out_timer(unsigned long data)
+> +static void blk_rq_timed_out_timer(struct timer_list *t)
 >  {
-> +	del_timer_sync(&bdi->laptop_mode_wb_timer);
-> +
->  	spin_lock_bh(&bdi_lock);
->  	list_del_rcu(&bdi->bdi_list);
->  	spin_unlock_bh(&bdi_lock);
+> -	struct request_queue *q = (struct request_queue *)data;
+> +	struct request_queue *q = from_timer(q, t, timeout);
+>  
+>  	kblockd_schedule_work(&q->timeout_work);
+>  }
 
-This should go into bdi_unregister() instead.
+This isn't the laptop_mode timer, although the change itself looks fine.
 
-The rest is mostly mechanical and looks fine to me.
+> +	timer_setup(&q->backing_dev_info->laptop_mode_wb_timer,
+> +		    laptop_mode_timer_fn, 0);
 
+And I already pointed out to Jens when he did the previous changes
+to this one that it has no business being in the block code, it
+really should move to mm/page-writeback.c with the rest of the
+handling of this timer.  Once that is fixed up your automated script
+should pick it up, so we wouldn't need the manual change.
+
+Untested patch for that below:
+
+---
+>From 77881bd72b5fb1219fc74625b0380930f9c580df Mon Sep 17 00:00:00 2001
+From: Christoph Hellwig <hch@lst.de>
+Date: Fri, 6 Oct 2017 10:18:53 +0200
+Subject: mm: move all laptop_mode handling to backing-dev.c
+
+It isn't block-device specific and oddly spread over multiple files
+at the moment:
+
+TODO: audit that the unregistration changes are fine
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-core.c          |  3 ---
+ include/linux/writeback.h |  6 ------
+ mm/backing-dev.c          | 36 ++++++++++++++++++++++++++++++++++++
+ mm/page-writeback.c       | 36 ------------------------------------
+ 4 files changed, 36 insertions(+), 45 deletions(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 14f7674fa0b1..f5f916b28c40 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -662,7 +662,6 @@ void blk_cleanup_queue(struct request_queue *q)
+ 	blk_flush_integrity();
+ 
+ 	/* @q won't process any more request, flush async actions */
+-	del_timer_sync(&q->backing_dev_info->laptop_mode_wb_timer);
+ 	blk_sync_queue(q);
+ 
+ 	if (q->mq_ops)
+@@ -841,8 +840,6 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
+ 	q->backing_dev_info->name = "block";
+ 	q->node = node_id;
+ 
+-	setup_timer(&q->backing_dev_info->laptop_mode_wb_timer,
+-		    laptop_mode_timer_fn, (unsigned long) q);
+ 	setup_timer(&q->timeout, blk_rq_timed_out_timer, (unsigned long) q);
+ 	INIT_LIST_HEAD(&q->queue_head);
+ 	INIT_LIST_HEAD(&q->timeout_list);
+diff --git a/include/linux/writeback.h b/include/linux/writeback.h
+index 9c0091678af4..e6ba35a5e1f7 100644
+--- a/include/linux/writeback.h
++++ b/include/linux/writeback.h
+@@ -327,14 +327,8 @@ static inline void cgroup_writeback_umount(void)
+ /*
+  * mm/page-writeback.c
+  */
+-#ifdef CONFIG_BLOCK
+ void laptop_io_completion(struct backing_dev_info *info);
+ void laptop_sync_completion(void);
+-void laptop_mode_sync(struct work_struct *work);
+-void laptop_mode_timer_fn(unsigned long data);
+-#else
+-static inline void laptop_sync_completion(void) { }
+-#endif
+ bool node_dirty_ok(struct pglist_data *pgdat);
+ int wb_domain_init(struct wb_domain *dom, gfp_t gfp);
+ #ifdef CONFIG_CGROUP_WRITEBACK
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index e19606bb41a0..cb36f07f2af2 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -822,6 +822,38 @@ static void cgwb_remove_from_bdi_list(struct bdi_writeback *wb)
+ 
+ #endif	/* CONFIG_CGROUP_WRITEBACK */
+ 
++static void laptop_mode_timer_fn(unsigned long data)
++{
++	struct backing_dev_info *bdi = (struct backing_dev_info *)data;
++
++	wakeup_flusher_threads_bdi(bdi, WB_REASON_LAPTOP_TIMER);
++}
++
++/*
++ * We've spun up the disk and we're in laptop mode: schedule writeback
++ * of all dirty data a few seconds from now.  If the flush is already scheduled
++ * then push it back - the user is still using the disk.
++ */
++void laptop_io_completion(struct backing_dev_info *bdi)
++{
++	mod_timer(&bdi->laptop_mode_wb_timer, jiffies + laptop_mode);
++}
++
++/*
++ * We're in laptop mode and we've just synced. The sync's writes will have
++ * caused another writeback to be scheduled by laptop_io_completion.
++ * Nothing needs to be written back anymore, so we unschedule the writeback.
++ */
++void laptop_sync_completion(void)
++{
++	struct backing_dev_info *bdi;
++
++	rcu_read_lock();
++	list_for_each_entry_rcu(bdi, &bdi_list, bdi_list)
++		del_timer(&bdi->laptop_mode_wb_timer);
++	rcu_read_unlock();
++}
++
+ static int bdi_init(struct backing_dev_info *bdi)
+ {
+ 	int ret;
+@@ -835,6 +867,8 @@ static int bdi_init(struct backing_dev_info *bdi)
+ 	INIT_LIST_HEAD(&bdi->bdi_list);
+ 	INIT_LIST_HEAD(&bdi->wb_list);
+ 	init_waitqueue_head(&bdi->wb_waitq);
++	setup_timer(&bdi->laptop_mode_wb_timer,
++		    laptop_mode_timer_fn, (unsigned long)bdi);
+ 
+ 	ret = cgwb_bdi_init(bdi);
+ 
+@@ -916,6 +950,8 @@ EXPORT_SYMBOL(bdi_register_owner);
+  */
+ static void bdi_remove_from_list(struct backing_dev_info *bdi)
+ {
++	del_timer_sync(&bdi->laptop_mode_wb_timer);
++
+ 	spin_lock_bh(&bdi_lock);
+ 	list_del_rcu(&bdi->bdi_list);
+ 	spin_unlock_bh(&bdi_lock);
+diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+index 8d1fc593bce8..f8fe90dc529d 100644
+--- a/mm/page-writeback.c
++++ b/mm/page-writeback.c
+@@ -1976,42 +1976,6 @@ int dirty_writeback_centisecs_handler(struct ctl_table *table, int write,
+ 	return 0;
+ }
+ 
+-#ifdef CONFIG_BLOCK
+-void laptop_mode_timer_fn(unsigned long data)
+-{
+-	struct request_queue *q = (struct request_queue *)data;
+-
+-	wakeup_flusher_threads_bdi(q->backing_dev_info, WB_REASON_LAPTOP_TIMER);
+-}
+-
+-/*
+- * We've spun up the disk and we're in laptop mode: schedule writeback
+- * of all dirty data a few seconds from now.  If the flush is already scheduled
+- * then push it back - the user is still using the disk.
+- */
+-void laptop_io_completion(struct backing_dev_info *info)
+-{
+-	mod_timer(&info->laptop_mode_wb_timer, jiffies + laptop_mode);
+-}
+-
+-/*
+- * We're in laptop mode and we've just synced. The sync's writes will have
+- * caused another writeback to be scheduled by laptop_io_completion.
+- * Nothing needs to be written back anymore, so we unschedule the writeback.
+- */
+-void laptop_sync_completion(void)
+-{
+-	struct backing_dev_info *bdi;
+-
+-	rcu_read_lock();
+-
+-	list_for_each_entry_rcu(bdi, &bdi_list, bdi_list)
+-		del_timer(&bdi->laptop_mode_wb_timer);
+-
+-	rcu_read_unlock();
+-}
+-#endif
+-
+ /*
+  * If ratelimit_pages is too high then we can get into dirty-data overload
+  * if a large number of processes all perform writes at the same time.
 -- 
-Jens Axboe
+2.14.1
