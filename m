@@ -1,107 +1,85 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        John Garry <john.garry@huawei.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V7 6/6] SCSI: implement .get_budget and .put_budget for blk-mq
-Date: Fri, 13 Oct 2017 02:37:04 +0800
-Message-Id: <20171012183704.22326-7-ming.lei@redhat.com>
-In-Reply-To: <20171012183704.22326-1-ming.lei@redhat.com>
-References: <20171012183704.22326-1-ming.lei@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 4.14-rc4
+Message-ID: <c15e011d-868c-d49c-73ea-dfbf6390202c@kernel.dk>
+Date: Fri, 6 Oct 2017 13:00:50 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-We need to tell blk-mq to reserve resource before queuing
-one request, so implement these two callbacks. Then blk-mq
-can avoid to dequeue request earlier, and IO merge can
-be improved a lot.
+Hi Linus,
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/scsi_lib.c | 42 ++++++++++++++++++++++++++++++++----------
- 1 file changed, 32 insertions(+), 10 deletions(-)
+A collection of fixes for this series. This pull request contains:
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 9cf6a80fe297..d6273954a3b4 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1946,6 +1946,33 @@ static void scsi_mq_done(struct scsi_cmnd *cmd)
- 	blk_mq_complete_request(cmd->request);
- }
- 
-+static void scsi_mq_put_budget(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct request_queue *q = hctx->queue;
-+	struct scsi_device *sdev = q->queuedata;
-+
-+	atomic_dec(&sdev->device_busy);
-+	put_device(&sdev->sdev_gendev);
-+}
-+
-+static bool scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct request_queue *q = hctx->queue;
-+	struct scsi_device *sdev = q->queuedata;
-+
-+	if (!get_device(&sdev->sdev_gendev))
-+		goto out;
-+	if (!scsi_dev_queue_ready(q, sdev))
-+		goto out_put_device;
-+
-+	return true;
-+
-+out_put_device:
-+	put_device(&sdev->sdev_gendev);
-+out:
-+	return false;
-+}
-+
- static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
- 			 const struct blk_mq_queue_data *bd)
- {
-@@ -1962,13 +1989,8 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		goto out;
- 
- 	ret = BLK_STS_RESOURCE;
--	if (!get_device(&sdev->sdev_gendev))
--		goto out;
--
--	if (!scsi_dev_queue_ready(q, sdev))
--		goto out_put_device;
- 	if (!scsi_target_queue_ready(shost, sdev))
--		goto out_dec_device_busy;
-+		goto out_put_budget;
- 	if (!scsi_host_queue_ready(q, shost, sdev))
- 		goto out_dec_target_busy;
- 
-@@ -2003,10 +2025,8 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
- out_dec_target_busy:
- 	if (scsi_target(sdev)->can_queue > 0)
- 		atomic_dec(&scsi_target(sdev)->target_busy);
--out_dec_device_busy:
--	atomic_dec(&sdev->device_busy);
--out_put_device:
--	put_device(&sdev->sdev_gendev);
-+out_put_budget:
-+	scsi_mq_put_budget(hctx);
- out:
- 	switch (ret) {
- 	case BLK_STS_OK:
-@@ -2211,6 +2231,8 @@ struct request_queue *scsi_old_alloc_queue(struct scsi_device *sdev)
- }
- 
- static const struct blk_mq_ops scsi_mq_ops = {
-+	.get_budget	= scsi_mq_get_budget,
-+	.put_budget	= scsi_mq_put_budget,
- 	.queue_rq	= scsi_queue_rq,
- 	.complete	= scsi_softirq_done,
- 	.timeout	= scsi_timeout,
+- NVMe pull request from Christoph, one uuid attribute fix, and one fix
+  for the controller memory buffer address for remapped BARs.
+
+- use-after-free fix for bsg, from Benjamin Block.
+
+- bcache race/use-after-free fix for a list traversal, fixing a
+  regression in this merge window. From Coly Li.
+
+- null_blk change configfs dependency change from a 'depends' to a
+  'select'. This is a change from this merge window as well. From me.
+
+- nbd signal fix from Josef, fixing a regression introduced with the
+  status code changes.
+
+- nbd MAINTAINERS mailing list entry update.
+
+- blk-throttle stall fix from Joseph Qi.
+
+- blk-mq-debugfs fix from Omar, fixing an issue where we don't register
+  the IO scheduler debugfs directory, if the driver is loaded with it.
+  Only shows up if you switch through the sysfs interface.
+
+Please pull!
+
+
+  git://git.kernel.dk/linux-block.git for-linus
+
+
+----------------------------------------------------------------
+Benjamin Block (1):
+      bsg-lib: fix use-after-free under memory-pressure
+
+Christoph Hellwig (1):
+      nvme-pci: Use PCI bus address for data/queues in CMB
+
+Coly Li (1):
+      bcache: use llist_for_each_entry_safe() in __closure_wake_up()
+
+Jens Axboe (2):
+      null_blk: change configfs dependency to select
+      Merge branch 'nvme-4.14' of git://git.infradead.org/nvme into for-linus
+
+Josef Bacik (1):
+      nbd: fix -ERESTARTSYS handling
+
+Joseph Qi (1):
+      blk-throttle: fix possible io stall when upgrade to max
+
+Martin Wilck (1):
+      nvme: fix visibility of "uuid" ns attribute
+
+Omar Sandoval (1):
+      blk-mq-debugfs: fix device sched directory for default scheduler
+
+Wouter Verhelst (1):
+      MAINTAINERS: update list for NBD
+
+ MAINTAINERS                 |  2 +-
+ block/blk-mq-debugfs.c      |  6 +++++-
+ block/blk-throttle.c        |  4 ++--
+ block/bsg-lib.c             | 27 +++++++++++++++++++++------
+ drivers/block/Kconfig       |  2 +-
+ drivers/block/nbd.c         |  6 +++++-
+ drivers/md/bcache/closure.c |  4 ++--
+ drivers/nvme/host/core.c    |  2 +-
+ drivers/nvme/host/pci.c     | 14 +++++++-------
+ 9 files changed, 45 insertions(+), 22 deletions(-)
+
 -- 
-2.9.5
+Jens Axboe
