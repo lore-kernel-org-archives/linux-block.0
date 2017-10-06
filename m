@@ -1,181 +1,219 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from server.coly.li ([162.144.45.48]:40762 "EHLO server.coly.li"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751557AbdJFMUl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 6 Oct 2017 08:20:41 -0400
-Subject: Re: [PATCH 4/5] bcache: writeback: collapse contiguous IO better
-To: Michael Lyle <mlyle@lyle.org>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>, linux-bcache@vger.kernel.org,
-        linux-block@vger.kernel.org,
-        Kent Overstreet <kent.overstreet@gmail.com>
+Received: from mail-qk0-f175.google.com ([209.85.220.175]:43881 "EHLO
+        mail-qk0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751663AbdJFL5I (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Oct 2017 07:57:08 -0400
+Received: by mail-qk0-f175.google.com with SMTP id w134so17602960qkb.0
+        for <linux-block@vger.kernel.org>; Fri, 06 Oct 2017 04:57:08 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAJ+L6qf7NtkqKFbKsEjr8noqG94nPQnj1z3doMh10DYH-vMniw@mail.gmail.com>
 References: <1506497553-12552-1-git-send-email-tang.junhui@zte.com.cn>
  <CAJ+L6qcyq-E4MrWNfB9kGA8DMD_U1HMxJii-=-qPfv0LeRL45w@mail.gmail.com>
  <CAJ+L6qdc8YqO5B3Cv0h4QQ+4P06FbtsT10Jqt5=Fx8iRh1UGwQ@mail.gmail.com>
- <96f34768-2b02-7849-c034-e1bb83b0fa0d@coly.li>
- <CAJ+L6qdTB6DyhD8UwHaVtN-THXwanBXrQK3EvmvLhuoXgYyzrA@mail.gmail.com>
- <05c1aa86-5fc8-f330-5cd1-46f9ba7cd3e0@coly.li>
- <CAJ+L6qfTDkgrLEUSRX2Pv2qvB7Ns=Hb3nBVz0SDoDn_m9RC8hg@mail.gmail.com>
- <2c39cd9c-34bd-5982-9fd7-ceb61305c13d@coly.li>
- <CAJ+L6qe7C=FyPFya8y0HV8SCc7VSEEuUApcqEUnouVDUByfZ5w@mail.gmail.com>
- <6a2052da-6b52-9c06-b85e-e3ea29e3f8e8@coly.li>
- <CAJ+L6qdqQn4tpFdkPZ-zhxss9O8axBEarMBJA5X6f9i+K8SLGg@mail.gmail.com>
+ <96f34768-2b02-7849-c034-e1bb83b0fa0d@coly.li> <CAJ+L6qdTB6DyhD8UwHaVtN-THXwanBXrQK3EvmvLhuoXgYyzrA@mail.gmail.com>
+ <05c1aa86-5fc8-f330-5cd1-46f9ba7cd3e0@coly.li> <CAJ+L6qfTDkgrLEUSRX2Pv2qvB7Ns=Hb3nBVz0SDoDn_m9RC8hg@mail.gmail.com>
+ <2c39cd9c-34bd-5982-9fd7-ceb61305c13d@coly.li> <CAJ+L6qe7C=FyPFya8y0HV8SCc7VSEEuUApcqEUnouVDUByfZ5w@mail.gmail.com>
+ <6a2052da-6b52-9c06-b85e-e3ea29e3f8e8@coly.li> <CAJ+L6qdqQn4tpFdkPZ-zhxss9O8axBEarMBJA5X6f9i+K8SLGg@mail.gmail.com>
  <CAJ+L6qe8rwbtO6tR-QNQBUApbeGQ9NGD=P9t5gtN9j0kzacJEQ@mail.gmail.com>
- <cb6db7c0-eaf7-f4a8-5584-8ce512575d74@coly.li>
- <CAJ+L6qdG70ExM7cnwYFLmCDBXY8SBErLhnMNeFVscXYemb_1SQ@mail.gmail.com>
- <18f2271b-87c2-530d-12da-dc2b4a5af1fd@coly.li>
- <CAJ+L6qcLc-=bbDJuaToDFPUWG=c4JKhKBQkivaw3tYWdjERmZw@mail.gmail.com>
-From: Coly Li <i@coly.li>
-Message-ID: <8c7574ae-f520-bb7b-a974-ad747f9555cf@coly.li>
-Date: Fri, 6 Oct 2017 20:20:32 +0800
-MIME-Version: 1.0
-In-Reply-To: <CAJ+L6qcLc-=bbDJuaToDFPUWG=c4JKhKBQkivaw3tYWdjERmZw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+ <cb6db7c0-eaf7-f4a8-5584-8ce512575d74@coly.li> <CAJ+L6qdG70ExM7cnwYFLmCDBXY8SBErLhnMNeFVscXYemb_1SQ@mail.gmail.com>
+ <18f2271b-87c2-530d-12da-dc2b4a5af1fd@coly.li> <CAJ+L6qcLc-=bbDJuaToDFPUWG=c4JKhKBQkivaw3tYWdjERmZw@mail.gmail.com>
+ <b654ae09-b9f1-295f-b45a-6688c7fa4e0d@suse.de> <CAJ+L6qf7NtkqKFbKsEjr8noqG94nPQnj1z3doMh10DYH-vMniw@mail.gmail.com>
+From: Michael Lyle <mlyle@lyle.org>
+Date: Fri, 6 Oct 2017 04:57:07 -0700
+Message-ID: <CAJ+L6qdQG27JpDTPxPrgYgeVC8qq-hYHq85U1zHQJDUneT8trA@mail.gmail.com>
+Subject: Re: [PATCH 4/5] bcache: writeback: collapse contiguous IO better
+To: Hannes Reinecke <hare@suse.de>
+Cc: Coly Li <i@coly.li>, Junhui Tang <tang.junhui@zte.com.cn>,
+        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 2017/10/6 下午6:42, Michael Lyle wrote:
-> Coly--
-> 
-> Holy crap, I'm not surprised you don't see a difference if you're
-> writing with 512K size!  The potential benefit from merging is much
-> less, and the odds of missing a merge is much smaller.  512KB is 5ms
-> sequential by itself on a 100MB/sec disk--- lots more time to wait to
-> get the next chunks in order, and even if you fail to merge the
-> potential benefit is much less-- if the difference is mostly
-> rotational latency from failing to merge then we're talking 5ms vs
-> 5+2ms.
-> 
+OK, here's some data:  http://jar.lyle.org/~mlyle/writeback/
 
-Hi Mike,
+The complete test script is there to automate running writeback
+scenarios--- NOTE DONT RUN WITHOUT EDITING THE DEVICES FOR YOUR
+HARDWARE.
 
-This is how wars happend LOL :-)
+Only one run each way, but they take 8-9 minutes to run, we can easily
+get more ;)  I compared patches 1-3 (which are uncontroversial) to
+1-5.
 
-> Do you even understand what you are trying to test?
+Concerns I've heard:
 
-When I read patch 4/5, I saw you mentioned 4KB writes:
-"e.g. at "background" writeback of target rate = 8, it would not combine
-two adjacent 4k writes and would instead seek the disk twice."
+- The new patches will contend for I/O bandwidth with front-end writes:
 
-And when we talked about patch 5/5, you mentioned 1MB writes:
-"- When writeback rate is medium, it does I/O more efficiently.  e.g.
-if the current writeback rate is 10MB/sec, and there are two
-contiguous 1MB segments, they would not presently be combined.  A 1MB
-write would occur, then we would increase the delay counter by 100ms,
-and then the next write would wait; this new code would issue 2 1MB
-writes one after the other, and then sleep 200ms.  On a disk that does
-150MB/sec sequential, and has a 7ms seek time, this uses the disk for
-13ms + 7ms, compared to the old code that does 13ms + 7ms * 2.  This
-is the difference between using 10% of the disk's I/O throughput and
-13% of the disk's throughput to do the same work."
+No:
+ 3 PATCHES: write: io=3D29703MB, bw=3D83191KB/s, iops=3D10398, runt=3D36561=
+8msec
+vs
+ 5 PATCHES: write: io=3D29746MB, bw=3D86177KB/s, iops=3D10771, runt=3D35346=
+1msec
 
-Then I assume the bio reorder patches should work well for write size
-from 4KB to 1MB. Also I think "hmm, if the write size is smaller, there
-will be less chance for dirty blocks to be contiguous on cached device",
-then I choose 512KB.
+It may actually be slightly better-- 3% or so.
 
-Here is my command line to setup the bcache:
+- The new patches will not improve writeback rate.
 
-make-bcache -B <cached device> -C <cache device>
-echo <cache device> > /sys/fs/bcache/register
-echo <cached device> > /sys/fs/bcache/register
-sleep 1
-echo 0 > /sys/block/bcache0/bcache/cache/congested_read_threshold_us
-echo 0 > /sys/block/bcache0/bcache/cache/congested_write_threshold_us
-echo writeback > /sys/block/bcache0/bcache/cache_mode
-echo 0 > /sys/block/bcache0/bcache/writeback_running
+No:
 
-Now writeback is disabled, I start to use fio to write dirty data on
-cache device. The following is fio job file.
-[global]
-direct=1
-thread=1
-ioengine=libaio
+3 PATCHES: the active period of the test was 366+100=3D466 seconds, and
+at the end there was 33.4G dirty.
+5 PATCHES: the active period of the test was 353+100=3D453 seconds, and
+at the end there was 32.7G dirty.
 
-[job]
-filename=/dev/bcache0
-readwrite=randwrite
-numjobs=8
-;blocksize=64k
-blocksize=512k
-;blocksize=1M
-iodepth=128
-size=3000G
-time_based=1
-;runtime=10m
-ramp_time=4
-gtod_reduce=1
-randrepeat=1
+This is a moderate improvement.
 
-ramp_time, gtod_reduce and randrepeat are what I copied from your fio
-example.
+- The IO scheduler can combine the writes anyways so this type of
+patch will not increase write queue merge.
 
-Then I watch the dirty data amount, when the dirty increases to a target
-number (half full example), I kill fio process.
+No:
 
-Then I start writeback by
-echo 1 > /sys/block/bcache0/bcache/writeback_running
+Average wrqm/s is 1525.4 in the 3 PATCHES dataset; average wrqm/s is
+1643.7 in the 5 PATCHES dataset.
 
-and immediately run 2 bash scripts to collect performance data:
-1) writeback_rate.sh
-  while [ 1 ];do
-        cat /sys/block/bcache0/bcache/writeback_rate_debug
-        echo -e "\n\n"
-        sleep 60
-  done
-2) iostat command line
-  iostat -x 1 <cache device> <cached device> <more disks compose md
-device> | tee iostat.log
+During the last 100 seconds, when ONLY WRITEBACK is occurring, wrqm is
+1398.0 in 3 PATCHES, and 1811.6 with 5 PATCHES.
 
-The writeback rate debug information is collected every 1 minute, iostat
-information is collected every 1 seconds. They are all dedicated disks
-for testing, just raw disks without any file system.
+- Front-end latency will suffer:
 
-Thanks.
+No:
 
-Coly
+The datasets look the same to my eye.  By far the worst thing is the
+occasional 1000ms+ times the bcache goes to sleep in both scenarios,
+contending for the writeback lock (not affected by these patches, but
+an item for future work if I ever get to move on to a new topic).
 
+Conclusion:
 
-> On Fri, Oct 6, 2017 at 3:36 AM, Coly Li <i@coly.li> wrote:
->> On 2017/10/6 下午5:20, Michael Lyle wrote:
+These patches provide a small but significant improvement in writeback
+rates, that can be seen with careful testing that produces actual
+sequential writeback.  They lay the groundwork for further
+improvements, through the use of plugging the block layer and to allow
+accelerated writeback when the device is idle.
+
+Mike
+
+On Fri, Oct 6, 2017 at 4:09 AM, Michael Lyle <mlyle@lyle.org> wrote:
+> Hannes--
+>
+> Thanks for your input.
+>
+> Assuming there's contiguous data to writeback, the dataset size is
+> immaterial; writeback gathers 500 extents from a btree, and writes
+> back up to 64 of them at a time.  With 8k extents, the amount of data
+> the writeback code is juggling at a time is about 4 megabytes at
+> maximum.
+>
+> Optimizing writeback only does something significant when the chunks
+> to write back are relatively small, and when there's actual extents
+> next to each other to write back.
+>
+> If there's big chunks, the spinning disk takes a long time to write
+> each one; and that time allows both the drive itself with native
+> command queueing and the IO scheduler lots of time to combine the
+> write.  Not to mention that even if there is a small delay due to
+> non-sequential / short-seek the difference in performance is minimal,
+> because 512k extents tie up the disk for a long time.
+>
+> Also, I think the test scenario doesn't really have any adjacent
+> extents to writeback, which doesn't help.
+>
+> I will forward performance data and complete scripts to run a
+> reasonable scenario.
+>
+> Mike
+>
+> On Fri, Oct 6, 2017 at 4:00 AM, Hannes Reinecke <hare@suse.de> wrote:
+>> On 10/06/2017 12:42 PM, Michael Lyle wrote:
 >>> Coly--
 >>>
->>> I did not say the result from the changes will be random.
+>>> Holy crap, I'm not surprised you don't see a difference if you're
+>>> writing with 512K size!  The potential benefit from merging is much
+>>> less, and the odds of missing a merge is much smaller.  512KB is 5ms
+>>> sequential by itself on a 100MB/sec disk--- lots more time to wait to
+>>> get the next chunks in order, and even if you fail to merge the
+>>> potential benefit is much less-- if the difference is mostly
+>>> rotational latency from failing to merge then we're talking 5ms vs
+>>> 5+2ms.
 >>>
->>> I said the result from your test will be random, because where the
->>> writeback position is making non-contiguous holes in the data is
->>> nondeterministic-- it depends where it is on the disk at the instant
->>> that writeback begins.  There is a high degree of dispersion in the
->>> test scenario you are running that is likely to exceed the differences
->>> from my patch.
+>>> Do you even understand what you are trying to test?
+>>>
+>>> Mike
+>>>
+>>> On Fri, Oct 6, 2017 at 3:36 AM, Coly Li <i@coly.li> wrote:
+>>>> On 2017/10/6 =E4=B8=8B=E5=8D=885:20, Michael Lyle wrote:
+>>>>> Coly--
+>>>>>
+>>>>> I did not say the result from the changes will be random.
+>>>>>
+>>>>> I said the result from your test will be random, because where the
+>>>>> writeback position is making non-contiguous holes in the data is
+>>>>> nondeterministic-- it depends where it is on the disk at the instant
+>>>>> that writeback begins.  There is a high degree of dispersion in the
+>>>>> test scenario you are running that is likely to exceed the difference=
+s
+>>>>> from my patch.
+>>>>
+>>>> Hi Mike,
+>>>>
+>>>> I did the test quite carefully. Here is how I ran the test,
+>>>> - disable writeback by echo 0 to writeback_runing.
+>>>> - write random data into cache to full or half size, then stop the I/O
+>>>> immediately.
+>>>> - echo 1 to writeback_runing to start writeback
+>>>> - and record performance data at once
+>>>>
+>>>> It might be random position where the writeback starts, but there shou=
+ld
+>>>> not be too much difference of statistical number of the continuous
+>>>> blocks (on cached device). Because fio just send random 512KB blocks
+>>>> onto cache device, the statistical number of contiguous blocks depends
+>>>> on cache device vs. cached device size, and how full the cache device =
+is
+>>>> occupied.
+>>>>
+>>>> Indeed, I repeated some tests more than once (except the md raid5 and =
+md
+>>>> raid0 configurations), the results are quite sable when I see the data
+>>>> charts, no big difference.
+>>>>
+>>>> If you feel the performance result I provided is problematic, it would
+>>>> be better to let the data talk. You need to show your performance test
+>>>> number to prove that the bio reorder patches are helpful for general
+>>>> workloads, or at least helpful to many typical workloads.
+>>>>
+>>>> Let the data talk.
+>>>>
 >>
->> Hi Mike,
+>> I think it would be easier for everyone concerned if Coly could attach
+>> the fio script / cmdline and the bcache setup here.
+>> There still is a chance that both are correct, as different hardware
+>> setups are being used.
+>> We've seen this many times trying to establish workable performance
+>> regression metrics for I/O; depending on the hardware one set of
+>> optimisations fail to deliver the expected benefit on other platforms.
+>> Just look at the discussion we're having currently with Ming Lei on the
+>> SCSI mailing list trying to improve sequential I/O performance.
 >>
->> I did the test quite carefully. Here is how I ran the test,
->> - disable writeback by echo 0 to writeback_runing.
->> - write random data into cache to full or half size, then stop the I/O
->> immediately.
->> - echo 1 to writeback_runing to start writeback
->> - and record performance data at once
+>> But please try to calm down everyone. It's not that Coly is deliberately
+>> blocking your patches, it's just that he doesn't see the performance
+>> benefit on his side.
+>> Might be that he's using the wrong parameters, but than that should be
+>> clarified once the fio script is posted.
 >>
->> It might be random position where the writeback starts, but there should
->> not be too much difference of statistical number of the continuous
->> blocks (on cached device). Because fio just send random 512KB blocks
->> onto cache device, the statistical number of contiguous blocks depends
->> on cache device vs. cached device size, and how full the cache device is
->> occupied.
+>> At the same time I don't think that the size of the dataset is
+>> immaterial. Larger datasets take up more space, and inevitably add more
+>> overhead just for looking up the data in memory. Plus Coly has some
+>> quite high-powered NVMe for the caching device, which will affect
+>> writeback patterns, too.
 >>
->> Indeed, I repeated some tests more than once (except the md raid5 and md
->> raid0 configurations), the results are quite sable when I see the data
->> charts, no big difference.
+>> Cheers,
 >>
->> If you feel the performance result I provided is problematic, it would
->> be better to let the data talk. You need to show your performance test
->> number to prove that the bio reorder patches are helpful for general
->> workloads, or at least helpful to many typical workloads.
->>
->> Let the data talk.
->>
->> Thanks.
->>
+>> Hannes
 >> --
->> Coly Li
+>> Dr. Hannes Reinecke                Teamlead Storage & Networking
+>> hare@suse.de                                   +49 911 74053 688
+>> SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
+>> GF: F. Imend=C3=B6rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+>> HRB 21284 (AG N=C3=BCrnberg)
