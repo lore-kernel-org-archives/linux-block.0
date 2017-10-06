@@ -1,169 +1,370 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Luis R. Rodriguez" <mcgrof@kernel.org>
-To: viro@zeniv.linux.org.uk, bart.vanassche@wdc.com,
-        ming.lei@redhat.com, tytso@mit.edu, darrick.wong@oracle.com,
-        jikos@kernel.org, rjw@rjwysocki.net, pavel@ucw.cz,
-        len.brown@intel.com, linux-fsdevel@vger.kernel.org
-Cc: boris.ostrovsky@oracle.com, jgross@suse.com,
-        todd.e.brandt@linux.intel.com, nborisov@suse.com, jack@suse.cz,
-        martin.petersen@oracle.com, ONeukum@suse.com,
-        oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
-        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Luis R. Rodriguez" <mcgrof@kernel.org>
-Subject: [RFC 0/5] fs: replace kthread freezing with filesystem freeze/thaw
-Date: Tue,  3 Oct 2017 11:53:08 -0700
-Message-Id: <20171003185313.1017-1-mcgrof@kernel.org>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f54.google.com ([74.125.82.54]:46945 "EHLO
+        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751901AbdJFLwj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Oct 2017 07:52:39 -0400
+Received: by mail-wm0-f54.google.com with SMTP id m72so7163719wmc.1
+        for <linux-block@vger.kernel.org>; Fri, 06 Oct 2017 04:52:38 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 1/2] lightnvm: pblk: cleanup unused and static functions
+Date: Fri,  6 Oct 2017 13:52:21 +0200
+Message-Id: <1507290742-8970-2-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1507290742-8970-1-git-send-email-javier@cnexlabs.com>
+References: <1507290742-8970-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-At the 2015 South Korea kernel summit Jiri Kosina had pointd out the issue of
-the sloppy semantics of the kthread freezer, lwn covered this pretty well [0].
-In short, he explained how the original purpose of the freezer was to aid
-in going to suspend to ensure no uwanted IO activity would cause filesystem
-corruption. Kernel kthreads require special freezer handling though, the call
-try_to_freeze() is often sprinkled at strategic places, but sometimes this is
-done without set_freezable() making try_to_freeze() useless. Other helpers such
-as freezable_schedule_timeout() exist, and very likely they are not used in any
-consistent and proper way either all over the kernel. Dealing with these
-helpers alone also does not and cannot ensure that everything that has been
-spawned asynchronously from a kthread (such as timers) are stopped as well,
-these are left to the kthread user implementation, and chances are pretty high
-there are many bugs lurking here. There are even non-IO bounds kthreads now
-using the freezer APIs, where this is not even needed!
+Cleanup up unused and static functions across the whole codebase.
 
-Jiri suggested we can easily replace the complexities of the kthread freezer
-by just using the existing filesystem freeze/thaw callbacks on hibernation and
-suspend.
+Signed-off-by: Javier González <javier@cnexlabs.com>
+---
+ drivers/lightnvm/pblk-core.c | 133 ++++++++++++++++++++-----------------------
+ drivers/lightnvm/pblk-gc.c   |  40 ++++++-------
+ drivers/lightnvm/pblk-rl.c   |  10 ----
+ drivers/lightnvm/pblk.h      |  14 ++---
+ 4 files changed, 86 insertions(+), 111 deletions(-)
 
-I've picked up Jiri's work given there are bugs which after inspection don't
-see like real bugs, but just random IO loosely waiting to be completed and the
-kernel not really being able to tell me who the culprit is. In fact even if one
-plugs a fix, one ends up in another random place and its really unclear who is
-to blaim for next.
-
-For instance, to reproduce a simple suspend bug on what may at first seem to be
-an XFS bug, one can issue a dd onto disk prior to suspend, and we'll get a
-stall on our way to suspend, claiming the issue was the SCSI layer not being
-able to quiesce the disk. This was reported on OpenSUSE and reproduced on
-linux-next easily [1]. The following script can be run while we loop on
-systemctl suspend and qemu system_wakeup calls to resume:
-
-	while true; do
-		dd if=/dev/zero of=crap bs=1M count=1024 &> /dev/null
-	done
-
-You end up with with a hung suspend attempt, and eventually a splat
-as follows with a hunk task notification:
-
-INFO: task kworker/u8:8:1320 blocked for more than 10 seconds.
-      Tainted: G            E   4.13.0-next-20170907+ #88
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-kworker/u8:8    D    0  1320      2 0x80000000
-Workqueue: events_unbound async_run_entry_fn
-Call Trace:
- __schedule+0x2ec/0x7a0
- schedule+0x36/0x80
- io_schedule+0x16/0x40
- get_request+0x278/0x780
- ? remove_wait_queue+0x70/0x70
- blk_get_request+0x9c/0x110
- scsi_execute+0x7a/0x310 [scsi_mod]
- sd_sync_cache+0xa3/0x190 [sd_mod]
- ? blk_run_queue+0x3f/0x50
- sd_suspend_common+0x7b/0x130 [sd_mod]
- ? scsi_print_result+0x270/0x270 [scsi_mod]
- sd_suspend_system+0x13/0x20 [sd_mod]
- do_scsi_suspend+0x1b/0x30 [scsi_mod]
- scsi_bus_suspend_common+0xb1/0xd0 [scsi_mod]
- ? device_for_each_child+0x69/0x90
- scsi_bus_suspend+0x15/0x20 [scsi_mod]
- dpm_run_callback+0x56/0x140
- ? scsi_bus_freeze+0x20/0x20 [scsi_mod]
- __device_suspend+0xf1/0x340
- async_suspend+0x1f/0xa0
- async_run_entry_fn+0x38/0x160
- process_one_work+0x191/0x380
- worker_thread+0x4e/0x3c0
- kthread+0x109/0x140
- ? process_one_work+0x380/0x380
- ? kthread_create_on_node+0x70/0x70
- ret_from_fork+0x25/0x30
-
-Sprinkling freezer_do_not_count() on scsi_execute() *iff* we're going to
-suspend is one way to fix this splat, however this just pushes the bug
-elsewhere, and we keep doing this ever on. The right thing to do here is ensure
-that after userpsace is frozen we also freeze all filesystem behaviour.
-
-Its possible other symptoms have been observed elsewhere, and similar work
-arounds are being devised. Perhaps this work can help put a stop gap for such
-work arounds and complexities.
-
-While this all seems trivial, well discussed, and so it should be well accepted
-for us to go full swing with a replacement of the kthread freezer with
-filesystem suspend / thaw -- not all filesystems have a respective freeze/thaw
-call. Also in practice it would seem some thaw'ing calls need some revision.
-For instance thawing with a sync call on ext4 currently issues a bio_submit(),
-which in turn stalls on resume. Each call/filesystem then should be vetted
-manually, as I've done for ext4 in this series.
-
-Likewise while kthread freezing may have been designed to help with avoiding IO
-on disk, its sloppy use on kthreads may now be providing buggy functionality
-which *helps* somehow now. The removal of freezer helpers on kthreads which are
-not IO bound should also be carefully vetted for to avoid potential
-regressions.
-
-Then we have the few areas in the kernel which may generate disk IO which do
-not come from filesystems -- this was mentioned recently the the Alpine Linux
-Persistence and Storage Summit [2] -- such drivers would need to get proper
-suspend calls eventually.
-
-Given all the above then I'd like to move *carefully* with the kthread freezer
-replacement with filesystem freeze/thawing instead of doing it all in one shot,
-as Jiri had originally intended.
-
-Filesystmes which have been vetted to work properly can use the super block
-FS_FREEZE_ON_SUSPEND flag when things are ready as a transitional flag. I hope
-we can get to the point we can rely on all filesystmes supporting it, so that
-once all filesystem code is vetted for, and all non-IO bound kthread callers
-have been cleared of the freezer call we can just remove the
-FS_FREEZE_ON_SUSPEND flag and then kill the kthread freezer completely (the
-last patch in this series).
-
-The way this would be merged then is, only the first four patches would
-be considered for upstream at first. We'd then move on to do the same with
-other filesystems. Then or in parallel move on to tackle vetting removal
-of all disk non-IO bounds kthread freezer callers. Only once this is all
-done should we consider the last patch to put final nail on the kthread
-freezer coffin.
-
-[0] https://lwn.net/Articles/662703/
-[1] https://bugzilla.suse.com/show_bug.cgi?id=1043449
-[2] http://alpss.at/
-
-Thoughts? Rants?
-
-Luis R. Rodriguez (5):
-  fs: add iterate_supers_reverse()
-  fs: freeze on suspend and thaw on resume
-  xfs: allow fs freeze on suspend/hibernation
-  ext4: add fs freezing support on suspend/hibernation
-  pm: remove kernel thread freezing
-
- Documentation/power/freezing-of-tasks.txt |   9 ---
- drivers/xen/manage.c                      |   6 --
- fs/ext4/super.c                           |  13 ++--
- fs/super.c                                | 122 ++++++++++++++++++++++++++++++
- fs/xfs/xfs_super.c                        |   3 +-
- fs/xfs/xfs_trans_ail.c                    |   7 +-
- include/linux/freezer.h                   |   4 -
- include/linux/fs.h                        |  14 ++++
- kernel/power/hibernate.c                  |  10 +--
- kernel/power/power.h                      |  20 +----
- kernel/power/process.c                    |  61 ++++-----------
- kernel/power/user.c                       |   9 ---
- tools/power/pm-graph/analyze_suspend.py   |   1 -
- 13 files changed, 163 insertions(+), 116 deletions(-)
-
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 1cd27e38fc46..4199119a0754 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -18,6 +18,31 @@
+ 
+ #include "pblk.h"
+ 
++static void pblk_line_mark_bb(struct work_struct *work)
++{
++	struct pblk_line_ws *line_ws = container_of(work, struct pblk_line_ws,
++									ws);
++	struct pblk *pblk = line_ws->pblk;
++	struct nvm_tgt_dev *dev = pblk->dev;
++	struct ppa_addr *ppa = line_ws->priv;
++	int ret;
++
++	ret = nvm_set_tgt_bb_tbl(dev, ppa, 1, NVM_BLK_T_GRWN_BAD);
++	if (ret) {
++		struct pblk_line *line;
++		int pos;
++
++		line = &pblk->lines[pblk_dev_ppa_to_line(*ppa)];
++		pos = pblk_dev_ppa_to_pos(&dev->geo, *ppa);
++
++		pr_err("pblk: failed to mark bb, line:%d, pos:%d\n",
++				line->id, pos);
++	}
++
++	kfree(ppa);
++	mempool_free(line_ws, pblk->gen_ws_pool);
++}
++
+ static void pblk_mark_bb(struct pblk *pblk, struct pblk_line *line,
+ 			 struct ppa_addr *ppa)
+ {
+@@ -268,7 +293,7 @@ void pblk_end_io_sync(struct nvm_rq *rqd)
+ 	complete(waiting);
+ }
+ 
+-void pblk_wait_for_meta(struct pblk *pblk)
++static void pblk_wait_for_meta(struct pblk *pblk)
+ {
+ 	do {
+ 		if (!atomic_read(&pblk->inflight_io))
+@@ -345,17 +370,6 @@ void pblk_discard(struct pblk *pblk, struct bio *bio)
+ 	pblk_invalidate_range(pblk, slba, nr_secs);
+ }
+ 
+-struct ppa_addr pblk_get_lba_map(struct pblk *pblk, sector_t lba)
+-{
+-	struct ppa_addr ppa;
+-
+-	spin_lock(&pblk->trans_lock);
+-	ppa = pblk_trans_map_get(pblk, lba);
+-	spin_unlock(&pblk->trans_lock);
+-
+-	return ppa;
+-}
+-
+ void pblk_log_write_err(struct pblk *pblk, struct nvm_rq *rqd)
+ {
+ 	atomic_long_inc(&pblk->write_failed);
+@@ -1338,6 +1352,41 @@ static void pblk_stop_writes(struct pblk *pblk, struct pblk_line *line)
+ 	pblk->state = PBLK_STATE_STOPPING;
+ }
+ 
++static void pblk_line_close_meta_sync(struct pblk *pblk)
++{
++	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
++	struct pblk_line_meta *lm = &pblk->lm;
++	struct pblk_line *line, *tline;
++	LIST_HEAD(list);
++
++	spin_lock(&l_mg->close_lock);
++	if (list_empty(&l_mg->emeta_list)) {
++		spin_unlock(&l_mg->close_lock);
++		return;
++	}
++
++	list_cut_position(&list, &l_mg->emeta_list, l_mg->emeta_list.prev);
++	spin_unlock(&l_mg->close_lock);
++
++	list_for_each_entry_safe(line, tline, &list, list) {
++		struct pblk_emeta *emeta = line->emeta;
++
++		while (emeta->mem < lm->emeta_len[0]) {
++			int ret;
++
++			ret = pblk_submit_meta_io(pblk, line);
++			if (ret) {
++				pr_err("pblk: sync meta line %d failed (%d)\n",
++							line->id, ret);
++				return;
++			}
++		}
++	}
++
++	pblk_wait_for_meta(pblk);
++	flush_workqueue(pblk->close_wq);
++}
++
+ void pblk_pipeline_stop(struct pblk *pblk)
+ {
+ 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+@@ -1565,41 +1614,6 @@ int pblk_line_is_full(struct pblk_line *line)
+ 	return (line->left_msecs == 0);
+ }
+ 
+-void pblk_line_close_meta_sync(struct pblk *pblk)
+-{
+-	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+-	struct pblk_line_meta *lm = &pblk->lm;
+-	struct pblk_line *line, *tline;
+-	LIST_HEAD(list);
+-
+-	spin_lock(&l_mg->close_lock);
+-	if (list_empty(&l_mg->emeta_list)) {
+-		spin_unlock(&l_mg->close_lock);
+-		return;
+-	}
+-
+-	list_cut_position(&list, &l_mg->emeta_list, l_mg->emeta_list.prev);
+-	spin_unlock(&l_mg->close_lock);
+-
+-	list_for_each_entry_safe(line, tline, &list, list) {
+-		struct pblk_emeta *emeta = line->emeta;
+-
+-		while (emeta->mem < lm->emeta_len[0]) {
+-			int ret;
+-
+-			ret = pblk_submit_meta_io(pblk, line);
+-			if (ret) {
+-				pr_err("pblk: sync meta line %d failed (%d)\n",
+-							line->id, ret);
+-				return;
+-			}
+-		}
+-	}
+-
+-	pblk_wait_for_meta(pblk);
+-	flush_workqueue(pblk->close_wq);
+-}
+-
+ static void pblk_line_should_sync_meta(struct pblk *pblk)
+ {
+ 	if (pblk_rl_is_limit(&pblk->rl))
+@@ -1673,31 +1687,6 @@ void pblk_line_close_ws(struct work_struct *work)
+ 	mempool_free(line_ws, pblk->gen_ws_pool);
+ }
+ 
+-void pblk_line_mark_bb(struct work_struct *work)
+-{
+-	struct pblk_line_ws *line_ws = container_of(work, struct pblk_line_ws,
+-									ws);
+-	struct pblk *pblk = line_ws->pblk;
+-	struct nvm_tgt_dev *dev = pblk->dev;
+-	struct ppa_addr *ppa = line_ws->priv;
+-	int ret;
+-
+-	ret = nvm_set_tgt_bb_tbl(dev, ppa, 1, NVM_BLK_T_GRWN_BAD);
+-	if (ret) {
+-		struct pblk_line *line;
+-		int pos;
+-
+-		line = &pblk->lines[pblk_dev_ppa_to_line(*ppa)];
+-		pos = pblk_dev_ppa_to_pos(&dev->geo, *ppa);
+-
+-		pr_err("pblk: failed to mark bb, line:%d, pos:%d\n",
+-				line->id, pos);
+-	}
+-
+-	kfree(ppa);
+-	mempool_free(line_ws, pblk->gen_ws_pool);
+-}
+-
+ void pblk_gen_run_ws(struct pblk *pblk, struct pblk_line *line, void *priv,
+ 		      void (*work)(struct work_struct *), gfp_t gfp_mask,
+ 		      struct workqueue_struct *wq)
+diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
+index e6fae1959e25..b8323e34d1bc 100644
+--- a/drivers/lightnvm/pblk-gc.c
++++ b/drivers/lightnvm/pblk-gc.c
+@@ -275,6 +275,26 @@ static int pblk_gc_line(struct pblk *pblk, struct pblk_line *line)
+ 	return 0;
+ }
+ 
++static void pblk_gc_reader_kick(struct pblk_gc *gc)
++{
++	wake_up_process(gc->gc_reader_ts);
++}
++
++static void pblk_gc_kick(struct pblk *pblk)
++{
++	struct pblk_gc *gc = &pblk->gc;
++
++	pblk_gc_writer_kick(gc);
++	pblk_gc_reader_kick(gc);
++
++	/* If we're shutting down GC, let's not start it up again */
++	if (gc->gc_enabled) {
++		wake_up_process(gc->gc_ts);
++		mod_timer(&gc->gc_timer,
++			  jiffies + msecs_to_jiffies(GC_TIME_MSECS));
++	}
++}
++
+ static int pblk_gc_read(struct pblk *pblk)
+ {
+ 	struct pblk_gc *gc = &pblk->gc;
+@@ -298,11 +318,6 @@ static int pblk_gc_read(struct pblk *pblk)
+ 	return 0;
+ }
+ 
+-static void pblk_gc_reader_kick(struct pblk_gc *gc)
+-{
+-	wake_up_process(gc->gc_reader_ts);
+-}
+-
+ static struct pblk_line *pblk_gc_get_victim_line(struct pblk *pblk,
+ 						 struct list_head *group_list)
+ {
+@@ -421,21 +436,6 @@ static void pblk_gc_run(struct pblk *pblk)
+ 		goto next_gc_group;
+ }
+ 
+-void pblk_gc_kick(struct pblk *pblk)
+-{
+-	struct pblk_gc *gc = &pblk->gc;
+-
+-	pblk_gc_writer_kick(gc);
+-	pblk_gc_reader_kick(gc);
+-
+-	/* If we're shutting down GC, let's not start it up again */
+-	if (gc->gc_enabled) {
+-		wake_up_process(gc->gc_ts);
+-		mod_timer(&gc->gc_timer,
+-			  jiffies + msecs_to_jiffies(GC_TIME_MSECS));
+-	}
+-}
+-
+ static void pblk_gc_timer(unsigned long data)
+ {
+ 	struct pblk *pblk = (struct pblk *)data;
+diff --git a/drivers/lightnvm/pblk-rl.c b/drivers/lightnvm/pblk-rl.c
+index 739f855d4216..abae31fd434e 100644
+--- a/drivers/lightnvm/pblk-rl.c
++++ b/drivers/lightnvm/pblk-rl.c
+@@ -153,16 +153,6 @@ int pblk_rl_high_thrs(struct pblk_rl *rl)
+ 	return rl->high;
+ }
+ 
+-int pblk_rl_low_thrs(struct pblk_rl *rl)
+-{
+-	return rl->low;
+-}
+-
+-int pblk_rl_sysfs_rate_show(struct pblk_rl *rl)
+-{
+-	return rl->rb_user_max;
+-}
+-
+ int pblk_rl_max_io(struct pblk_rl *rl)
+ {
+ 	return rl->rb_max_io;
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index c6f8841973a0..6c9ea9a93704 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -710,8 +710,6 @@ void pblk_free_rqd(struct pblk *pblk, struct nvm_rq *rqd, int type);
+ void pblk_set_sec_per_write(struct pblk *pblk, int sec_per_write);
+ int pblk_setup_w_rec_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 			struct pblk_c_ctx *c_ctx);
+-void pblk_wait_for_meta(struct pblk *pblk);
+-struct ppa_addr pblk_get_lba_map(struct pblk *pblk, sector_t lba);
+ void pblk_discard(struct pblk *pblk, struct bio *bio);
+ void pblk_log_write_err(struct pblk *pblk, struct nvm_rq *rqd);
+ void pblk_log_read_err(struct pblk *pblk, struct nvm_rq *rqd);
+@@ -732,10 +730,8 @@ int pblk_line_is_full(struct pblk_line *line);
+ void pblk_line_free(struct pblk *pblk, struct pblk_line *line);
+ void pblk_line_close_meta(struct pblk *pblk, struct pblk_line *line);
+ void pblk_line_close(struct pblk *pblk, struct pblk_line *line);
+-void pblk_line_close_meta_sync(struct pblk *pblk);
+ void pblk_line_close_ws(struct work_struct *work);
+ void pblk_pipeline_stop(struct pblk *pblk);
+-void pblk_line_mark_bb(struct work_struct *work);
+ void pblk_gen_run_ws(struct pblk *pblk, struct pblk_line *line, void *priv,
+ 		     void (*work)(struct work_struct *), gfp_t gfp_mask,
+ 		     struct workqueue_struct *wq);
+@@ -759,7 +755,6 @@ void pblk_down_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
+ void pblk_down_page(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas);
+ void pblk_up_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
+ 		unsigned long *lun_bitmap);
+-void pblk_end_bio_sync(struct bio *bio);
+ void pblk_end_io_sync(struct nvm_rq *rqd);
+ int pblk_bio_add_pages(struct pblk *pblk, struct bio *bio, gfp_t flags,
+ 		       int nr_pages);
+@@ -834,7 +829,6 @@ void pblk_gc_exit(struct pblk *pblk);
+ void pblk_gc_should_start(struct pblk *pblk);
+ void pblk_gc_should_stop(struct pblk *pblk);
+ void pblk_gc_should_kick(struct pblk *pblk);
+-void pblk_gc_kick(struct pblk *pblk);
+ void pblk_gc_free_full_lines(struct pblk *pblk);
+ void pblk_gc_sysfs_state_show(struct pblk *pblk, int *gc_enabled,
+ 			      int *gc_active);
+@@ -847,7 +841,6 @@ void pblk_rl_init(struct pblk_rl *rl, int budget);
+ void pblk_rl_free(struct pblk_rl *rl);
+ void pblk_rl_update_rates(struct pblk_rl *rl);
+ int pblk_rl_high_thrs(struct pblk_rl *rl);
+-int pblk_rl_low_thrs(struct pblk_rl *rl);
+ unsigned long pblk_rl_nr_free_blks(struct pblk_rl *rl);
+ int pblk_rl_user_may_insert(struct pblk_rl *rl, int nr_entries);
+ void pblk_rl_inserted(struct pblk_rl *rl, int nr_entries);
+@@ -855,11 +848,9 @@ void pblk_rl_user_in(struct pblk_rl *rl, int nr_entries);
+ int pblk_rl_gc_may_insert(struct pblk_rl *rl, int nr_entries);
+ void pblk_rl_gc_in(struct pblk_rl *rl, int nr_entries);
+ void pblk_rl_out(struct pblk_rl *rl, int nr_user, int nr_gc);
+-int pblk_rl_sysfs_rate_show(struct pblk_rl *rl);
+ int pblk_rl_max_io(struct pblk_rl *rl);
+ void pblk_rl_free_lines_inc(struct pblk_rl *rl, struct pblk_line *line);
+ void pblk_rl_free_lines_dec(struct pblk_rl *rl, struct pblk_line *line);
+-void pblk_rl_set_space_limit(struct pblk_rl *rl, int entries_left);
+ int pblk_rl_is_limit(struct pblk_rl *rl);
+ 
+ /*
+@@ -868,6 +859,11 @@ int pblk_rl_is_limit(struct pblk_rl *rl);
+ int pblk_sysfs_init(struct gendisk *tdisk);
+ void pblk_sysfs_exit(struct gendisk *tdisk);
+ 
++static inline void test(size_t a)
++{
++	a += 1;
++}
++
+ static inline void *pblk_malloc(size_t size, int type, gfp_t flags)
+ {
+ 	if (type == PBLK_KMALLOC_META)
 -- 
-2.14.0
+2.7.4
