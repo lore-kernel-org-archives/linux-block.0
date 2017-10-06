@@ -1,86 +1,120 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:44036 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751133AbdJEABP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Oct 2017 20:01:15 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        =Oleksandr Natalenko <oleksandr@natalenko.name>,
-        "Luis R . Rodriguez" <mcgrof@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v6 6/9] block: Introduce BLK_MQ_REQ_PREEMPT
-Date: Wed,  4 Oct 2017 17:01:07 -0700
-Message-Id: <20171005000110.15904-7-bart.vanassche@wdc.com>
-In-Reply-To: <20171005000110.15904-1-bart.vanassche@wdc.com>
-References: <20171005000110.15904-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <khlebnikov@yandex-team.ru>
+Subject: [PATCH RFC] blk-throttle: add feedback to cgroup writeback about
+ throttled writes
+From: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ linux-kernel@vger.kernel.org
+Cc: Tejun Heo <tj@kernel.org>, linux-mm@kvack.org,
+ Andrew Morton <akpm@linux-foundation.org>
+Date: Fri, 06 Oct 2017 14:45:26 +0300
+Message-ID: <150729032600.744699.6582090880216248200.stgit@buzz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+List-ID: <linux-block@vger.kernel.org>
 
-Set RQF_PREEMPT if BLK_MQ_REQ_PREEMPT is passed to
-blk_get_request_flags().
+Throttler steals bio before allocating requests for them,
+thus throttled writeback never reaches congestion.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+This adds bit WB_write_throttled into per-cgroup bdi congestion control.
+It's set when write bandwidth limit is exceeded and throttler has at least
+one bio inside and cleared when last throttled bio is gone.
+
+Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
 ---
- block/blk-core.c       | 4 +++-
- block/blk-mq.c         | 2 ++
- include/linux/blk-mq.h | 1 +
- 3 files changed, 6 insertions(+), 1 deletion(-)
+ block/blk-throttle.c             |    8 ++++++++
+ include/linux/backing-dev-defs.h |   19 +++++++++++++++++++
+ include/linux/backing-dev.h      |    6 ++++--
+ 3 files changed, 31 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 03156d9ede94..842e67e0b7ab 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1260,6 +1260,8 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
- 	blk_rq_set_rl(rq, rl);
- 	rq->cmd_flags = op;
- 	rq->rq_flags = rq_flags;
-+	if (flags & BLK_MQ_REQ_PREEMPT)
-+		rq->rq_flags |= RQF_PREEMPT;
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 0fea76aa0f3f..7ec0aaf9efa7 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1145,6 +1145,10 @@ static void tg_dispatch_one_bio(struct throtl_grp *tg, bool rw)
+ 	bio = throtl_pop_queued(&sq->queued[rw], &tg_to_put);
+ 	sq->nr_queued[rw]--;
  
- 	/* init elvpriv */
- 	if (rq_flags & RQF_ELVPRIV) {
-@@ -1441,7 +1443,7 @@ struct request *blk_get_request_flags(struct request_queue *q, unsigned int op,
- 	struct request *req;
++	/* Last throttled @bio is gone, clear congestion bit. */
++	if (rw && !sq->nr_queued[rw])
++		clear_wb_throttled(tg_to_blkg(tg)->wb_congested);
++
+ 	throtl_charge_bio(tg, bio);
  
- 	WARN_ON_ONCE(op & REQ_NOWAIT);
--	WARN_ON_ONCE(flags & ~BLK_MQ_REQ_NOWAIT);
-+	WARN_ON_ONCE(flags & ~(BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_PREEMPT));
- 
- 	if (q->mq_ops) {
- 		req = blk_mq_alloc_request(q, op, flags);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ebf85e270509..271657992d1a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -290,6 +290,8 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 	rq->q = data->q;
- 	rq->mq_ctx = data->ctx;
- 	rq->cmd_flags = op;
-+	if (data->flags & BLK_MQ_REQ_PREEMPT)
-+		rq->rq_flags |= RQF_PREEMPT;
- 	if (blk_queue_io_stat(data->q))
- 		rq->rq_flags |= RQF_IO_STAT;
- 	/* do not touch atomic flags, it needs atomic ops against the timer */
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 50c6485cb04f..ee9fc3fb7fca 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -200,6 +200,7 @@ enum {
- 	BLK_MQ_REQ_NOWAIT	= (1 << 0), /* return when out of requests */
- 	BLK_MQ_REQ_RESERVED	= (1 << 1), /* allocate from reserved pool */
- 	BLK_MQ_REQ_INTERNAL	= (1 << 2), /* allocate internal/sched tag */
-+	BLK_MQ_REQ_PREEMPT	= (1 << 3), /* set RQF_PREEMPT */
+ 	/*
+@@ -2215,6 +2219,10 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 	 * its @tg's disptime is not in the future.
+ 	 */
+ 	if (tg->flags & THROTL_TG_WAS_EMPTY) {
++		/* Next write will be throttled, set congestion bit. */
++		if (rw && blkg)
++			set_wb_throttled(blkg->wb_congested);
++
+ 		tg_update_disptime(tg);
+ 		throtl_schedule_next_dispatch(tg->service_queue.parent_sq, true);
+ 	}
+diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
+index 866c433e7d32..343107fd4eff 100644
+--- a/include/linux/backing-dev-defs.h
++++ b/include/linux/backing-dev-defs.h
+@@ -29,6 +29,7 @@ enum wb_state {
+ enum wb_congested_state {
+ 	WB_async_congested,	/* The async (write) queue is getting full */
+ 	WB_sync_congested,	/* The sync queue is getting full */
++	WB_write_throttled,	/* Associated blkcg is throttled */
  };
  
- struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
--- 
-2.14.2
+ typedef int (congested_fn)(void *, int);
+@@ -200,6 +201,16 @@ static inline void set_bdi_congested(struct backing_dev_info *bdi, int sync)
+ 
+ #ifdef CONFIG_CGROUP_WRITEBACK
+ 
++static inline void set_wb_throttled(struct bdi_writeback_congested *congested)
++{
++	set_bit(WB_write_throttled, &congested->state);
++}
++
++static inline void clear_wb_throttled(struct bdi_writeback_congested *congested)
++{
++	clear_bit(WB_write_throttled, &congested->state);
++}
++
+ /**
+  * wb_tryget - try to increment a wb's refcount
+  * @wb: bdi_writeback to get
+@@ -244,6 +255,14 @@ static inline bool wb_dying(struct bdi_writeback *wb)
+ 
+ #else	/* CONFIG_CGROUP_WRITEBACK */
+ 
++static inline void set_wb_throttled(struct bdi_writeback_congested *congested)
++{
++}
++
++static inline void clear_wb_throttled(struct bdi_writeback_congested *congested)
++{
++}
++
+ static inline bool wb_tryget(struct bdi_writeback *wb)
+ {
+ 	return true;
+diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
+index 854e1bdd0b2a..3619641b5ec5 100644
+--- a/include/linux/backing-dev.h
++++ b/include/linux/backing-dev.h
+@@ -460,13 +460,15 @@ static inline int inode_read_congested(struct inode *inode)
+ 
+ static inline int inode_write_congested(struct inode *inode)
+ {
+-	return inode_congested(inode, 1 << WB_async_congested);
++	return inode_congested(inode, (1 << WB_async_congested) |
++				      (1 << WB_write_throttled));
+ }
+ 
+ static inline int inode_rw_congested(struct inode *inode)
+ {
+ 	return inode_congested(inode, (1 << WB_sync_congested) |
+-				      (1 << WB_async_congested));
++				      (1 << WB_async_congested) |
++				      (1 << WB_write_throttled));
+ }
+ 
+ static inline int bdi_congested(struct backing_dev_info *bdi, int cong_bits)
