@@ -1,60 +1,57 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.mpynet.fi ([82.197.21.85]:37966 "EHLO mx2.mpynet.fi"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751774AbdJBR6y (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 2 Oct 2017 13:58:54 -0400
-Date: Mon, 2 Oct 2017 20:58:52 +0300
-From: Rakesh Pandit <rakesh@tuxera.com>
-To: Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
-CC: <axboe@fb.com>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@cnexlabs.com>
-Subject: Re: [PATCH 0/5] lightnvm: pblk: audit mempool usage
-Message-ID: <20171002175851.GA6874@hercules.tuxera.com>
-References: <1505385227-28706-1-git-send-email-javier@cnexlabs.com>
+Received: from mail-wm0-f44.google.com ([74.125.82.44]:54894 "EHLO
+        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751883AbdJFLwj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Oct 2017 07:52:39 -0400
+Received: by mail-wm0-f44.google.com with SMTP id i124so7420222wmf.3
+        for <linux-block@vger.kernel.org>; Fri, 06 Oct 2017 04:52:39 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 2/2] lightnvm: pblk: avoid being reported as hung on rated GC
+Date: Fri,  6 Oct 2017 13:52:22 +0200
+Message-Id: <1507290742-8970-3-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1507290742-8970-1-git-send-email-javier@cnexlabs.com>
+References: <1507290742-8970-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-In-Reply-To: <1505385227-28706-1-git-send-email-javier@cnexlabs.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Sep 14, 2017 at 12:33:42PM +0200, Javier Gonz�lez wrote:
-> As suggested by Jens [1], I audited all mempools on pblk.
-> 
-> This patche series (i) fixes bad mempool allocations that did not
-> guarantee forward progress and downsizes the sizes of some overused
-> mempools, (ii) removes unnecessary checks, and (iii) eliminates some
-> mempools that where introduced in early versions of pblk.
+The amount of GC I/O on the write buffer is managed by the rate-limiter,
+which is calculated as a function of the number of available free
+blocks. When reaching the stable point, we risk having scheduled more
+I/Os for GC than are allowed on the write buffer. This would result on
+the GC semaphore balancing the outstanding read GC I/Os to be reported
+as "hung", though the behavior is normal.
 
-All claims made above seem to be addressed in patches correctly to me.
+Solve this by allowing to schedule when we detect that the read GC path
+is not moving forward.
 
-I also did some functional testing of pblk after reviewing.
+Signed-off-by: Javier González <javier@cnexlabs.com>
+---
+ drivers/lightnvm/pblk-gc.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-Feel free to use tag for all patches in this series even though I am
-not aware of some aspects of subsystem yet. This series doesn't seem
-to touch those.
-
-Reviewed-by: Rakesh Pandit <rakesh@tuxera.com>
-
-> 
-> [1] https://patchwork.kernel.org/patch/9940973/
-> 
-> Javier Gonz�lez (5):
->   lightnvm: pblk: fix min size for page mempool
->   lightnvm: pblk: simplify work_queue mempool
->   lightnvm: pblk: decouple read/erase mempools
->   lightnvm: pblk: do not use a mempool for line bitmaps
->   lightnvm: pblk: remove checks on mempool alloc.
-> 
->  drivers/lightnvm/pblk-core.c     | 61 ++++++++++----------------
->  drivers/lightnvm/pblk-gc.c       | 32 +++++++-------
->  drivers/lightnvm/pblk-init.c     | 94 +++++++++++++++++-----------------------
->  drivers/lightnvm/pblk-read.c     | 10 +----
->  drivers/lightnvm/pblk-recovery.c | 37 ++++------------
->  drivers/lightnvm/pblk-write.c    | 32 ++++----------
->  drivers/lightnvm/pblk.h          | 21 +++++----
->  7 files changed, 106 insertions(+), 181 deletions(-)
-> 
-> -- 
-> 2.7.4
-> 
+diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
+index b8323e34d1bc..00d5698d64a9 100644
+--- a/drivers/lightnvm/pblk-gc.c
++++ b/drivers/lightnvm/pblk-gc.c
+@@ -218,7 +218,13 @@ static void pblk_gc_line_prepare_ws(struct work_struct *work)
+ 	gc_rq_ws->line = line;
+ 	gc_rq_ws->priv = gc_rq;
+ 
+-	down(&gc->gc_sem);
++	/* The write GC path can be much slower than the read GC one due to
++	 * the budget imposed by the rate-limiter. Balance in case that we get
++	 * back pressure from the write GC path.
++	 */
++	while (down_timeout(&gc->gc_sem, msecs_to_jiffies(30000)))
++		io_schedule();
++
+ 	kref_get(&line->ref);
+ 
+ 	INIT_WORK(&gc_rq_ws->ws, pblk_gc_line_ws);
+-- 
+2.7.4
