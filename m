@@ -1,209 +1,673 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:55718 "EHLO
-        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751801AbdJCKG6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2017 06:06:58 -0400
-Received: by mail-wm0-f54.google.com with SMTP id u138so15696470wmu.4
-        for <linux-block@vger.kernel.org>; Tue, 03 Oct 2017 03:06:57 -0700 (PDT)
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
+Received: from mail-wm0-f48.google.com ([74.125.82.48]:52044 "EHLO
+        mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752188AbdJFN0k (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Oct 2017 09:26:40 -0400
+Received: by mail-wm0-f48.google.com with SMTP id f4so7957120wme.0
+        for <linux-block@vger.kernel.org>; Fri, 06 Oct 2017 06:26:38 -0700 (PDT)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Javier Gonzales <jg@lightnvm.io>,
-        Hans Holmberg <hans.ml.holmberg@owltronix.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH 8/9] lightnvm: pblk: gc all lines in the pipeline before exit
-Date: Tue,  3 Oct 2017 12:05:12 +0200
-Message-Id: <1507025113-13351-9-git-send-email-hans.ml.holmberg@owltronix.com>
-In-Reply-To: <1507025113-13351-1-git-send-email-hans.ml.holmberg@owltronix.com>
-References: <1507025113-13351-1-git-send-email-hans.ml.holmberg@owltronix.com>
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 2/2] lightnvm: implement generic path for sync I/O
+Date: Fri,  6 Oct 2017 15:26:25 +0200
+Message-Id: <1507296385-6045-3-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1507296385-6045-1-git-send-email-javier@cnexlabs.com>
+References: <1507296385-6045-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Implement a generic path for sending sync I/O on LightNVM. This allows
+to reuse the standard synchronous path trough blk_execute_rq(), instead
+of implementing a wait_for_completion on the target side (e.g., pblk).
 
-Finish garbage collect of the lines that are in the gc pipeline
-before exiting. Ensure that all lines already in in the pipeline
-goes through, from read to write.
-
-Do this by keeping track of how many lines are in the pipeline
-and waiting for that number to reach zero before exiting the gc
-reader task.
-
-Since we're adding a new gc line counter, change the name of
-inflight_gc to read_inflight_gc to make the distinction clear.
-
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- drivers/lightnvm/pblk-core.c  |  3 +++
- drivers/lightnvm/pblk-gc.c    | 31 ++++++++++++++++++++++++-------
- drivers/lightnvm/pblk-sysfs.c |  2 +-
- drivers/lightnvm/pblk.h       |  5 ++++-
- 4 files changed, 32 insertions(+), 9 deletions(-)
+ drivers/lightnvm/core.c          | 25 ++++++++-----
+ drivers/lightnvm/pblk-core.c     | 78 +++++++++++++---------------------------
+ drivers/lightnvm/pblk-read.c     | 21 ++---------
+ drivers/lightnvm/pblk-recovery.c | 31 ++--------------
+ drivers/lightnvm/pblk.h          | 42 ++++++++++++++++++++--
+ drivers/nvme/host/lightnvm.c     | 70 ++++++++++++++++++++++++++++--------
+ include/linux/lightnvm.h         |  3 ++
+ 7 files changed, 145 insertions(+), 125 deletions(-)
 
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 0e5f77234c79..fe21f4dd33e9 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -720,12 +720,25 @@ int nvm_submit_io(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
+ }
+ EXPORT_SYMBOL(nvm_submit_io);
+ 
+-static void nvm_end_io_sync(struct nvm_rq *rqd)
++int nvm_submit_io_sync(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
+ {
+-	struct completion *waiting = rqd->private;
++	struct nvm_dev *dev = tgt_dev->parent;
++	int ret;
+ 
+-	complete(waiting);
++	if (!dev->ops->submit_io_sync)
++		return -ENODEV;
++
++	nvm_rq_tgt_to_dev(tgt_dev, rqd);
++
++	rqd->dev = tgt_dev;
++
++	/* In case of error, fail with right address format */
++	ret = dev->ops->submit_io_sync(dev, rqd);
++	nvm_rq_dev_to_tgt(tgt_dev, rqd);
++
++	return ret;
+ }
++EXPORT_SYMBOL(nvm_submit_io_sync);
+ 
+ int nvm_erase_sync(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas,
+ 								int nr_ppas)
+@@ -733,25 +746,21 @@ int nvm_erase_sync(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas,
+ 	struct nvm_geo *geo = &tgt_dev->geo;
+ 	struct nvm_rq rqd;
+ 	int ret;
+-	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+ 	memset(&rqd, 0, sizeof(struct nvm_rq));
+ 
+ 	rqd.opcode = NVM_OP_ERASE;
+-	rqd.end_io = nvm_end_io_sync;
+-	rqd.private = &wait;
+ 	rqd.flags = geo->plane_mode >> 1;
+ 
+ 	ret = nvm_set_rqd_ppalist(tgt_dev, &rqd, ppas, nr_ppas);
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = nvm_submit_io(tgt_dev, &rqd);
++	ret = nvm_submit_io_sync(tgt_dev, &rqd);
+ 	if (ret) {
+ 		pr_err("rrpr: erase I/O submission failed: %d\n", ret);
+ 		goto free_ppa_list;
+ 	}
+-	wait_for_completion_io(&wait);
+ 
+ free_ppa_list:
+ 	nvm_free_rqd_ppalist(tgt_dev, &rqd);
 diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 15e1e28..e62e6eb 100644
+index 4199119a0754..ce90213a42fa 100644
 --- a/drivers/lightnvm/pblk-core.c
 +++ b/drivers/lightnvm/pblk-core.c
-@@ -1463,6 +1463,7 @@ void pblk_line_free(struct pblk *pblk, struct pblk_line *line)
- static void __pblk_line_put(struct pblk *pblk, struct pblk_line *line)
- {
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
-+	struct pblk_gc *gc = &pblk->gc;
+@@ -412,34 +412,11 @@ int pblk_submit_io(struct pblk *pblk, struct nvm_rq *rqd)
+ 	struct nvm_tgt_dev *dev = pblk->dev;
  
- 	spin_lock(&line->lock);
- 	WARN_ON(line->state != PBLK_LINESTATE_GC);
-@@ -1471,6 +1472,8 @@ static void __pblk_line_put(struct pblk *pblk, struct pblk_line *line)
- 	pblk_line_free(pblk, line);
- 	spin_unlock(&line->lock);
+ #ifdef CONFIG_NVM_DEBUG
+-	struct ppa_addr *ppa_list;
++	int ret;
  
-+	atomic_dec(&gc->pipeline_gc);
+-	ppa_list = (rqd->nr_ppas > 1) ? rqd->ppa_list : &rqd->ppa_addr;
+-	if (pblk_boundary_ppa_checks(dev, ppa_list, rqd->nr_ppas)) {
+-		WARN_ON(1);
+-		return -EINVAL;
+-	}
+-
+-	if (rqd->opcode == NVM_OP_PWRITE) {
+-		struct pblk_line *line;
+-		struct ppa_addr ppa;
+-		int i;
+-
+-		for (i = 0; i < rqd->nr_ppas; i++) {
+-			ppa = ppa_list[i];
+-			line = &pblk->lines[pblk_dev_ppa_to_line(ppa)];
+-
+-			spin_lock(&line->lock);
+-			if (line->state != PBLK_LINESTATE_OPEN) {
+-				pr_err("pblk: bad ppa: line:%d,state:%d\n",
+-							line->id, line->state);
+-				WARN_ON(1);
+-				spin_unlock(&line->lock);
+-				return -EINVAL;
+-			}
+-			spin_unlock(&line->lock);
+-		}
+-	}
++	ret = pblk_check_io(pblk, rqd);
++	if (ret)
++		return ret;
+ #endif
+ 
+ 	atomic_inc(&pblk->inflight_io);
+@@ -447,6 +424,23 @@ int pblk_submit_io(struct pblk *pblk, struct nvm_rq *rqd)
+ 	return nvm_submit_io(dev, rqd);
+ }
+ 
++int pblk_submit_io_sync(struct pblk *pblk, struct nvm_rq *rqd)
++{
++	struct nvm_tgt_dev *dev = pblk->dev;
 +
- 	spin_lock(&l_mg->free_lock);
- 	list_add_tail(&line->list, &l_mg->free_list);
- 	l_mg->nr_free_lines++;
-diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-index f343f90..475a13e 100644
---- a/drivers/lightnvm/pblk-gc.c
-+++ b/drivers/lightnvm/pblk-gc.c
-@@ -234,7 +234,7 @@ static void pblk_gc_line_prepare_ws(struct work_struct *work)
- 	kfree(invalid_bitmap);
- 
- 	kref_put(&line->ref, pblk_line_put);
--	atomic_dec(&gc->inflight_gc);
-+	atomic_dec(&gc->read_inflight_gc);
- 
- 	return;
- 
-@@ -249,7 +249,7 @@ static void pblk_gc_line_prepare_ws(struct work_struct *work)
- 
- 	pblk_put_line_back(pblk, line);
- 	kref_put(&line->ref, pblk_line_put);
--	atomic_dec(&gc->inflight_gc);
-+	atomic_dec(&gc->read_inflight_gc);
- 
- 	pr_err("pblk: Failed to GC line %d\n", line->id);
- }
-@@ -268,6 +268,7 @@ static int pblk_gc_line(struct pblk *pblk, struct pblk_line *line)
- 	line_ws->pblk = pblk;
- 	line_ws->line = line;
- 
-+	atomic_inc(&gc->pipeline_gc);
- 	INIT_WORK(&line_ws->ws, pblk_gc_line_prepare_ws);
- 	queue_work(gc->gc_reader_wq, &line_ws->ws);
- 
-@@ -333,6 +334,7 @@ static bool pblk_gc_should_run(struct pblk_gc *gc, struct pblk_rl *rl)
- void pblk_gc_free_full_lines(struct pblk *pblk)
- {
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
-+	struct pblk_gc *gc = &pblk->gc;
- 	struct pblk_line *line;
- 
- 	do {
-@@ -353,6 +355,7 @@ void pblk_gc_free_full_lines(struct pblk *pblk)
- 		list_del(&line->list);
- 		spin_unlock(&l_mg->gc_lock);
- 
-+		atomic_inc(&gc->pipeline_gc);
- 		kref_put(&line->ref, pblk_line_put);
- 	} while (1);
- }
-@@ -370,12 +373,12 @@ static void pblk_gc_run(struct pblk *pblk)
- 	struct pblk_line *line;
- 	struct list_head *group_list;
- 	bool run_gc;
--	int inflight_gc, gc_group = 0, prev_group = 0;
-+	int read_inflight_gc, gc_group = 0, prev_group = 0;
- 
- 	pblk_gc_free_full_lines(pblk);
- 
- 	run_gc = pblk_gc_should_run(&pblk->gc, &pblk->rl);
--	if (!run_gc || (atomic_read(&gc->inflight_gc) >= PBLK_GC_L_QD))
-+	if (!run_gc || (atomic_read(&gc->read_inflight_gc) >= PBLK_GC_L_QD))
- 		return;
- 
- next_gc_group:
-@@ -402,14 +405,14 @@ static void pblk_gc_run(struct pblk *pblk)
- 		list_add_tail(&line->list, &gc->r_list);
- 		spin_unlock(&gc->r_lock);
- 
--		inflight_gc = atomic_inc_return(&gc->inflight_gc);
-+		read_inflight_gc = atomic_inc_return(&gc->read_inflight_gc);
- 		pblk_gc_reader_kick(gc);
- 
- 		prev_group = 1;
- 
- 		/* No need to queue up more GC lines than we can handle */
- 		run_gc = pblk_gc_should_run(&pblk->gc, &pblk->rl);
--		if (!run_gc || inflight_gc >= PBLK_GC_L_QD)
-+		if (!run_gc || read_inflight_gc >= PBLK_GC_L_QD)
- 			break;
- 	} while (1);
- 
-@@ -470,6 +473,7 @@ static int pblk_gc_writer_ts(void *data)
- static int pblk_gc_reader_ts(void *data)
- {
- 	struct pblk *pblk = data;
-+	struct pblk_gc *gc = &pblk->gc;
- 
- 	while (!kthread_should_stop()) {
- 		if (!pblk_gc_read(pblk))
-@@ -478,6 +482,18 @@ static int pblk_gc_reader_ts(void *data)
- 		io_schedule();
- 	}
- 
 +#ifdef CONFIG_NVM_DEBUG
-+	pr_info("pblk: flushing gc pipeline, %d lines left\n",
-+		atomic_read(&gc->pipeline_gc));
++	int ret;
++
++	ret = pblk_check_io(pblk, rqd);
++	if (ret)
++		return ret;
 +#endif
 +
-+	do {
-+		if (!atomic_read(&gc->pipeline_gc))
-+			break;
++	atomic_inc(&pblk->inflight_io);
 +
-+		schedule();
-+	} while (1);
++	return nvm_submit_io_sync(dev, rqd);
++}
 +
+ static void pblk_bio_map_addr_endio(struct bio *bio)
+ {
+ 	bio_put(bio);
+@@ -597,7 +591,6 @@ static int pblk_line_submit_emeta_io(struct pblk *pblk, struct pblk_line *line,
+ 	int cmd_op, bio_op;
+ 	int i, j;
+ 	int ret;
+-	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+ 	if (dir == PBLK_WRITE) {
+ 		bio_op = REQ_OP_WRITE;
+@@ -639,8 +632,6 @@ static int pblk_line_submit_emeta_io(struct pblk *pblk, struct pblk_line *line,
+ 	rqd.dma_ppa_list = dma_ppa_list;
+ 	rqd.opcode = cmd_op;
+ 	rqd.nr_ppas = rq_ppas;
+-	rqd.end_io = pblk_end_io_sync;
+-	rqd.private = &wait;
+ 
+ 	if (dir == PBLK_WRITE) {
+ 		struct pblk_sec_meta *meta_list = rqd.meta_list;
+@@ -694,19 +685,14 @@ static int pblk_line_submit_emeta_io(struct pblk *pblk, struct pblk_line *line,
+ 		}
+ 	}
+ 
+-	ret = pblk_submit_io(pblk, &rqd);
++	ret = pblk_submit_io_sync(pblk, &rqd);
+ 	if (ret) {
+ 		pr_err("pblk: emeta I/O submission failed: %d\n", ret);
+ 		bio_put(bio);
+ 		goto free_rqd_dma;
+ 	}
+ 
+-	if (!wait_for_completion_io_timeout(&wait,
+-				msecs_to_jiffies(PBLK_COMMAND_TIMEOUT_MS))) {
+-		pr_err("pblk: emeta I/O timed out\n");
+-	}
+ 	atomic_dec(&pblk->inflight_io);
+-	reinit_completion(&wait);
+ 
+ 	if (rqd.error) {
+ 		if (dir == PBLK_WRITE)
+@@ -750,7 +736,6 @@ static int pblk_line_submit_smeta_io(struct pblk *pblk, struct pblk_line *line,
+ 	int i, ret;
+ 	int cmd_op, bio_op;
+ 	int flags;
+-	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+ 	if (dir == PBLK_WRITE) {
+ 		bio_op = REQ_OP_WRITE;
+@@ -787,8 +772,6 @@ static int pblk_line_submit_smeta_io(struct pblk *pblk, struct pblk_line *line,
+ 	rqd.opcode = cmd_op;
+ 	rqd.flags = flags;
+ 	rqd.nr_ppas = lm->smeta_sec;
+-	rqd.end_io = pblk_end_io_sync;
+-	rqd.private = &wait;
+ 
+ 	for (i = 0; i < lm->smeta_sec; i++, paddr++) {
+ 		struct pblk_sec_meta *meta_list = rqd.meta_list;
+@@ -807,17 +790,13 @@ static int pblk_line_submit_smeta_io(struct pblk *pblk, struct pblk_line *line,
+ 	 * the write thread is the only one sending write and erase commands,
+ 	 * there is no need to take the LUN semaphore.
+ 	 */
+-	ret = pblk_submit_io(pblk, &rqd);
++	ret = pblk_submit_io_sync(pblk, &rqd);
+ 	if (ret) {
+ 		pr_err("pblk: smeta I/O submission failed: %d\n", ret);
+ 		bio_put(bio);
+ 		goto free_ppa_list;
+ 	}
+ 
+-	if (!wait_for_completion_io_timeout(&wait,
+-				msecs_to_jiffies(PBLK_COMMAND_TIMEOUT_MS))) {
+-		pr_err("pblk: smeta I/O timed out\n");
+-	}
+ 	atomic_dec(&pblk->inflight_io);
+ 
+ 	if (rqd.error) {
+@@ -861,19 +840,15 @@ static int pblk_blk_erase_sync(struct pblk *pblk, struct ppa_addr ppa)
+ {
+ 	struct nvm_rq rqd;
+ 	int ret = 0;
+-	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+ 	memset(&rqd, 0, sizeof(struct nvm_rq));
+ 
+ 	pblk_setup_e_rq(pblk, &rqd, ppa);
+ 
+-	rqd.end_io = pblk_end_io_sync;
+-	rqd.private = &wait;
+-
+ 	/* The write thread schedules erases so that it minimizes disturbances
+ 	 * with writes. Thus, there is no need to take the LUN semaphore.
+ 	 */
+-	ret = pblk_submit_io(pblk, &rqd);
++	ret = pblk_submit_io_sync(pblk, &rqd);
+ 	if (ret) {
+ 		struct nvm_tgt_dev *dev = pblk->dev;
+ 		struct nvm_geo *geo = &dev->geo;
+@@ -886,11 +861,6 @@ static int pblk_blk_erase_sync(struct pblk *pblk, struct ppa_addr ppa)
+ 		goto out;
+ 	}
+ 
+-	if (!wait_for_completion_io_timeout(&wait,
+-				msecs_to_jiffies(PBLK_COMMAND_TIMEOUT_MS))) {
+-		pr_err("pblk: sync erase timed out\n");
+-	}
+-
+ out:
+ 	rqd.private = pblk;
+ 	__pblk_end_io_erase(pblk, &rqd);
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index 71c58503f1a4..ca79d8fb3e60 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -207,7 +207,6 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 	int nr_secs = rqd->nr_ppas;
+ 	int nr_holes = nr_secs - bitmap_weight(read_bitmap, nr_secs);
+ 	int i, ret, hole;
+-	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+ 	/* Re-use allocated memory for intermediate lbas */
+ 	lba_list_mem = (((void *)rqd->ppa_list) + pblk_dma_ppa_size);
+@@ -232,8 +231,6 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 	rqd->bio = new_bio;
+ 	rqd->nr_ppas = nr_holes;
+ 	rqd->flags = pblk_set_read_mode(pblk, PBLK_READ_RANDOM);
+-	rqd->end_io = pblk_end_io_sync;
+-	rqd->private = &wait;
+ 
+ 	if (unlikely(nr_holes == 1)) {
+ 		ppa_ptr = rqd->ppa_list;
+@@ -241,18 +238,13 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 		rqd->ppa_addr = rqd->ppa_list[0];
+ 	}
+ 
+-	ret = pblk_submit_read_io(pblk, rqd);
++	ret = pblk_submit_io_sync(pblk, rqd);
+ 	if (ret) {
+ 		bio_put(rqd->bio);
+-		pr_err("pblk: read IO submission failed\n");
++		pr_err("pblk: sync read IO submission failed\n");
+ 		goto err;
+ 	}
+ 
+-	if (!wait_for_completion_io_timeout(&wait,
+-				msecs_to_jiffies(PBLK_COMMAND_TIMEOUT_MS))) {
+-		pr_err("pblk: partial read I/O timed out\n");
+-	}
+-
+ 	if (rqd->error) {
+ 		atomic_long_inc(&pblk->read_failed);
+ #ifdef CONFIG_NVM_DEBUG
+@@ -537,7 +529,6 @@ int pblk_submit_read_gc(struct pblk *pblk, struct pblk_gc_rq *gc_rq)
+ 	struct nvm_rq rqd;
+ 	int data_len;
+ 	int ret = NVM_IO_OK;
+-	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+ 	memset(&rqd, 0, sizeof(struct nvm_rq));
+ 
+@@ -577,22 +568,16 @@ int pblk_submit_read_gc(struct pblk *pblk, struct pblk_gc_rq *gc_rq)
+ 	bio_set_op_attrs(bio, REQ_OP_READ, 0);
+ 
+ 	rqd.opcode = NVM_OP_PREAD;
+-	rqd.end_io = pblk_end_io_sync;
+-	rqd.private = &wait;
+ 	rqd.nr_ppas = gc_rq->secs_to_gc;
+ 	rqd.flags = pblk_set_read_mode(pblk, PBLK_READ_RANDOM);
+ 	rqd.bio = bio;
+ 
+-	if (pblk_submit_read_io(pblk, &rqd)) {
++	if (pblk_submit_io_sync(pblk, &rqd)) {
+ 		ret = -EIO;
+ 		pr_err("pblk: GC read request failed\n");
+ 		goto err_free_bio;
+ 	}
+ 
+-	if (!wait_for_completion_io_timeout(&wait,
+-				msecs_to_jiffies(PBLK_COMMAND_TIMEOUT_MS))) {
+-		pr_err("pblk: GC read I/O timed out\n");
+-	}
+ 	atomic_dec(&pblk->inflight_io);
+ 
+ 	if (rqd.error) {
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index 9772a947ca4f..eadb3eb5d4dc 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -216,7 +216,6 @@ static int pblk_recov_read_oob(struct pblk *pblk, struct pblk_line *line,
+ 	int rq_ppas, rq_len;
+ 	int i, j;
+ 	int ret = 0;
+-	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+ 	ppa_list = p.ppa_list;
+ 	meta_list = p.meta_list;
+@@ -253,8 +252,6 @@ static int pblk_recov_read_oob(struct pblk *pblk, struct pblk_line *line,
+ 	rqd->ppa_list = ppa_list;
+ 	rqd->dma_ppa_list = dma_ppa_list;
+ 	rqd->dma_meta_list = dma_meta_list;
+-	rqd->end_io = pblk_end_io_sync;
+-	rqd->private = &wait;
+ 
+ 	if (pblk_io_aligned(pblk, rq_ppas))
+ 		rqd->flags = pblk_set_read_mode(pblk, PBLK_READ_SEQUENTIAL);
+@@ -280,19 +277,13 @@ static int pblk_recov_read_oob(struct pblk *pblk, struct pblk_line *line,
+ 	}
+ 
+ 	/* If read fails, more padding is needed */
+-	ret = pblk_submit_io(pblk, rqd);
++	ret = pblk_submit_io_sync(pblk, rqd);
+ 	if (ret) {
+ 		pr_err("pblk: I/O submission failed: %d\n", ret);
+ 		return ret;
+ 	}
+ 
+-	if (!wait_for_completion_io_timeout(&wait,
+-				msecs_to_jiffies(PBLK_COMMAND_TIMEOUT_MS))) {
+-		pr_err("pblk: L2P recovery read timed out\n");
+-		return -EINTR;
+-	}
+ 	atomic_dec(&pblk->inflight_io);
+-	reinit_completion(&wait);
+ 
+ 	/* At this point, the read should not fail. If it does, it is a problem
+ 	 * we cannot recover from here. Need FTL log.
+@@ -504,7 +495,6 @@ static int pblk_recov_scan_all_oob(struct pblk *pblk, struct pblk_line *line,
+ 	int ret = 0;
+ 	int rec_round;
+ 	int left_ppas = pblk_calc_sec_in_line(pblk, line) - line->cur_sec;
+-	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+ 	ppa_list = p.ppa_list;
+ 	meta_list = p.meta_list;
+@@ -539,8 +529,6 @@ static int pblk_recov_scan_all_oob(struct pblk *pblk, struct pblk_line *line,
+ 	rqd->ppa_list = ppa_list;
+ 	rqd->dma_ppa_list = dma_ppa_list;
+ 	rqd->dma_meta_list = dma_meta_list;
+-	rqd->end_io = pblk_end_io_sync;
+-	rqd->private = &wait;
+ 
+ 	if (pblk_io_aligned(pblk, rq_ppas))
+ 		rqd->flags = pblk_set_read_mode(pblk, PBLK_READ_SEQUENTIAL);
+@@ -566,18 +554,13 @@ static int pblk_recov_scan_all_oob(struct pblk *pblk, struct pblk_line *line,
+ 				addr_to_gen_ppa(pblk, w_ptr, line->id);
+ 	}
+ 
+-	ret = pblk_submit_io(pblk, rqd);
++	ret = pblk_submit_io_sync(pblk, rqd);
+ 	if (ret) {
+ 		pr_err("pblk: I/O submission failed: %d\n", ret);
+ 		return ret;
+ 	}
+ 
+-	if (!wait_for_completion_io_timeout(&wait,
+-				msecs_to_jiffies(PBLK_COMMAND_TIMEOUT_MS))) {
+-		pr_err("pblk: L2P recovery read timed out\n");
+-	}
+ 	atomic_dec(&pblk->inflight_io);
+-	reinit_completion(&wait);
+ 
+ 	/* This should not happen since the read failed during normal recovery,
+ 	 * but the media works funny sometimes...
+@@ -645,7 +628,6 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
+ 	int i, j;
+ 	int ret = 0;
+ 	int left_ppas = pblk_calc_sec_in_line(pblk, line);
+-	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+ 	ppa_list = p.ppa_list;
+ 	meta_list = p.meta_list;
+@@ -678,8 +660,6 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
+ 	rqd->ppa_list = ppa_list;
+ 	rqd->dma_ppa_list = dma_ppa_list;
+ 	rqd->dma_meta_list = dma_meta_list;
+-	rqd->end_io = pblk_end_io_sync;
+-	rqd->private = &wait;
+ 
+ 	if (pblk_io_aligned(pblk, rq_ppas))
+ 		rqd->flags = pblk_set_read_mode(pblk, PBLK_READ_SEQUENTIAL);
+@@ -705,19 +685,14 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
+ 				addr_to_gen_ppa(pblk, paddr, line->id);
+ 	}
+ 
+-	ret = pblk_submit_io(pblk, rqd);
++	ret = pblk_submit_io_sync(pblk, rqd);
+ 	if (ret) {
+ 		pr_err("pblk: I/O submission failed: %d\n", ret);
+ 		bio_put(bio);
+ 		return ret;
+ 	}
+ 
+-	if (!wait_for_completion_io_timeout(&wait,
+-				msecs_to_jiffies(PBLK_COMMAND_TIMEOUT_MS))) {
+-		pr_err("pblk: L2P recovery read timed out\n");
+-	}
+ 	atomic_dec(&pblk->inflight_io);
+-	reinit_completion(&wait);
+ 
+ 	/* Reached the end of the written line */
+ 	if (rqd->error) {
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 6c9ea9a93704..6b64288de6f7 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -714,6 +714,7 @@ void pblk_discard(struct pblk *pblk, struct bio *bio);
+ void pblk_log_write_err(struct pblk *pblk, struct nvm_rq *rqd);
+ void pblk_log_read_err(struct pblk *pblk, struct nvm_rq *rqd);
+ int pblk_submit_io(struct pblk *pblk, struct nvm_rq *rqd);
++int pblk_submit_io_sync(struct pblk *pblk, struct nvm_rq *rqd);
+ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line);
+ struct bio *pblk_bio_map_addr(struct pblk *pblk, void *data,
+ 			      unsigned int nr_secs, unsigned int len,
+@@ -1203,7 +1204,6 @@ static inline void pblk_print_failed_rqd(struct pblk *pblk, struct nvm_rq *rqd,
+ 
+ 	pr_err("error:%d, ppa_status:%llx\n", error, rqd->ppa_status);
+ }
+-#endif
+ 
+ static inline int pblk_boundary_ppa_checks(struct nvm_tgt_dev *tgt_dev,
+ 				       struct ppa_addr *ppas, int nr_ppas)
+@@ -1224,14 +1224,50 @@ static inline int pblk_boundary_ppa_checks(struct nvm_tgt_dev *tgt_dev,
+ 				ppa->g.sec < geo->sec_per_pg)
+ 			continue;
+ 
+-#ifdef CONFIG_NVM_DEBUG
+ 		print_ppa(ppa, "boundary", i);
+-#endif
++
+ 		return 1;
+ 	}
  	return 0;
  }
  
-@@ -581,7 +597,8 @@ int pblk_gc_init(struct pblk *pblk)
- 	gc->gc_forced = 0;
- 	gc->gc_enabled = 1;
- 	gc->w_entries = 0;
--	atomic_set(&gc->inflight_gc, 0);
-+	atomic_set(&gc->read_inflight_gc, 0);
-+	atomic_set(&gc->pipeline_gc, 0);
++static inline int pblk_check_io(struct pblk *pblk, struct nvm_rq *rqd)
++{
++	struct nvm_tgt_dev *dev = pblk->dev;
++	struct ppa_addr *ppa_list;
++
++	ppa_list = (rqd->nr_ppas > 1) ? rqd->ppa_list : &rqd->ppa_addr;
++
++	if (pblk_boundary_ppa_checks(dev, ppa_list, rqd->nr_ppas)) {
++		WARN_ON(1);
++		return -EINVAL;
++	}
++
++	if (rqd->opcode == NVM_OP_PWRITE) {
++		struct pblk_line *line;
++		struct ppa_addr ppa;
++		int i;
++
++		for (i = 0; i < rqd->nr_ppas; i++) {
++			ppa = ppa_list[i];
++			line = &pblk->lines[pblk_dev_ppa_to_line(ppa)];
++
++			spin_lock(&line->lock);
++			if (line->state != PBLK_LINESTATE_OPEN) {
++				pr_err("pblk: bad ppa: line:%d,state:%d\n",
++							line->id, line->state);
++				WARN_ON(1);
++				spin_unlock(&line->lock);
++				return -EINVAL;
++			}
++			spin_unlock(&line->lock);
++		}
++	}
++
++	return 0;
++}
++#endif
++
+ static inline int pblk_boundary_paddr_checks(struct pblk *pblk, u64 paddr)
+ {
+ 	struct pblk_line_meta *lm = &pblk->lm;
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index 6017153c2439..8fc949c5b49b 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -492,34 +492,47 @@ static void nvme_nvm_end_io(struct request *rq, blk_status_t status)
+ 	blk_mq_free_request(rq);
+ }
  
- 	/* Workqueue that reads valid sectors from a line and submit them to the
- 	 * GC writer to be recycled.
-diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
-index 95fb434..cd49e88 100644
---- a/drivers/lightnvm/pblk-sysfs.c
-+++ b/drivers/lightnvm/pblk-sysfs.c
-@@ -253,7 +253,7 @@ static ssize_t pblk_sysfs_lines(struct pblk *pblk, char *page)
- 	sz += snprintf(page + sz, PAGE_SIZE - sz,
- 		"GC: full:%d, high:%d, mid:%d, low:%d, empty:%d, queue:%d\n",
- 			gc_full, gc_high, gc_mid, gc_low, gc_empty,
--			atomic_read(&pblk->gc.inflight_gc));
-+			atomic_read(&pblk->gc.read_inflight_gc));
+-static int nvme_nvm_submit_io(struct nvm_dev *dev, struct nvm_rq *rqd)
++static struct request *nvme_nvm_alloc_request(struct request_queue *q,
++					      struct nvm_rq *rqd,
++					      struct nvme_nvm_command *cmd)
+ {
+-	struct request_queue *q = dev->q;
+ 	struct nvme_ns *ns = q->queuedata;
+ 	struct request *rq;
+-	struct bio *bio = rqd->bio;
+-	struct nvme_nvm_command *cmd;
+-
+-	cmd = kzalloc(sizeof(struct nvme_nvm_command), GFP_KERNEL);
+-	if (!cmd)
+-		return -ENOMEM;
  
- 	sz += snprintf(page + sz, PAGE_SIZE - sz,
- 		"data (%d) cur:%d, left:%d, vsc:%d, s:%d, map:%d/%d (%d)\n",
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index f76583b..03965da 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -238,7 +238,10 @@ struct pblk_gc {
- 	struct timer_list gc_timer;
+ 	nvme_nvm_rqtocmd(rqd, ns, cmd);
  
- 	struct semaphore gc_sem;
--	atomic_t inflight_gc;
-+	atomic_t read_inflight_gc; /* Number of lines with inflight GC reads */
-+	atomic_t pipeline_gc;	   /* Number of lines in the GC pipeline -
-+				    * started reads to finished writes
-+				    */
- 	int w_entries;
+ 	rq = nvme_alloc_request(q, (struct nvme_command *)cmd, 0, NVME_QID_ANY);
+-	if (IS_ERR(rq)) {
+-		kfree(cmd);
+-		return PTR_ERR(rq);
+-	}
++	if (IS_ERR(rq))
++		return rq;
++
+ 	rq->cmd_flags &= ~REQ_FAILFAST_DRIVER;
  
- 	struct list_head w_list;
+-	if (bio) {
+-		blk_init_request_from_bio(rq, bio);
++	if (rqd->bio) {
++		blk_init_request_from_bio(rq, rqd->bio);
+ 	} else {
+ 		rq->ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, IOPRIO_NORM);
+ 		rq->__data_len = 0;
+ 	}
+ 
++	return rq;
++}
++
++static int nvme_nvm_submit_io(struct nvm_dev *dev, struct nvm_rq *rqd)
++{
++	struct request_queue *q = dev->q;
++	struct nvme_nvm_command *cmd;
++	struct request *rq;
++
++	cmd = kzalloc(sizeof(struct nvme_nvm_command), GFP_KERNEL);
++	if (!cmd)
++		return -ENOMEM;
++
++	rq = nvme_nvm_alloc_request(q, rqd, cmd);
++	if (IS_ERR(rq)) {
++		kfree(cmd);
++		return PTR_ERR(rq);
++	}
++
+ 	rq->end_io_data = rqd;
+ 
+ 	blk_execute_rq_nowait(q, NULL, rq, 0, nvme_nvm_end_io);
+@@ -527,6 +540,34 @@ static int nvme_nvm_submit_io(struct nvm_dev *dev, struct nvm_rq *rqd)
+ 	return 0;
+ }
+ 
++static int nvme_nvm_submit_io_sync(struct nvm_dev *dev, struct nvm_rq *rqd)
++{
++	struct request_queue *q = dev->q;
++	struct request *rq;
++	struct nvme_nvm_command cmd;
++	int ret = 0;
++
++	memset(&cmd, 0, sizeof(struct nvme_nvm_command));
++
++	rq = nvme_nvm_alloc_request(q, rqd, &cmd);
++	if (IS_ERR(rq))
++		return PTR_ERR(rq);
++
++	/* I/Os can fail and the error is signaled through rqd. Callers must
++	 * handle the error accordingly.
++	 */
++	blk_execute_rq(q, NULL, rq, 0);
++	if (nvme_req(rq)->flags & NVME_REQ_CANCELLED)
++		ret = -EINTR;
++
++	rqd->ppa_status = le64_to_cpu(nvme_req(rq)->result.u64);
++	rqd->error = nvme_req(rq)->status;
++
++	blk_mq_free_request(rq);
++
++	return ret;
++}
++
+ static void *nvme_nvm_create_dma_pool(struct nvm_dev *nvmdev, char *name)
+ {
+ 	struct nvme_ns *ns = nvmdev->q->queuedata;
+@@ -562,6 +603,7 @@ static struct nvm_dev_ops nvme_nvm_dev_ops = {
+ 	.set_bb_tbl		= nvme_nvm_set_bb_tbl,
+ 
+ 	.submit_io		= nvme_nvm_submit_io,
++	.submit_io_sync		= nvme_nvm_submit_io_sync,
+ 
+ 	.create_dma_pool	= nvme_nvm_create_dma_pool,
+ 	.destroy_dma_pool	= nvme_nvm_destroy_dma_pool,
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 4f0e4a0fd204..b7f111ff4d3b 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -56,6 +56,7 @@ typedef int (nvm_get_l2p_tbl_fn)(struct nvm_dev *, u64, u32,
+ typedef int (nvm_op_bb_tbl_fn)(struct nvm_dev *, struct ppa_addr, u8 *);
+ typedef int (nvm_op_set_bb_fn)(struct nvm_dev *, struct ppa_addr *, int, int);
+ typedef int (nvm_submit_io_fn)(struct nvm_dev *, struct nvm_rq *);
++typedef int (nvm_submit_io_sync_fn)(struct nvm_dev *, struct nvm_rq *);
+ typedef void *(nvm_create_dma_pool_fn)(struct nvm_dev *, char *);
+ typedef void (nvm_destroy_dma_pool_fn)(void *);
+ typedef void *(nvm_dev_dma_alloc_fn)(struct nvm_dev *, void *, gfp_t,
+@@ -69,6 +70,7 @@ struct nvm_dev_ops {
+ 	nvm_op_set_bb_fn	*set_bb_tbl;
+ 
+ 	nvm_submit_io_fn	*submit_io;
++	nvm_submit_io_sync_fn	*submit_io_sync;
+ 
+ 	nvm_create_dma_pool_fn	*create_dma_pool;
+ 	nvm_destroy_dma_pool_fn	*destroy_dma_pool;
+@@ -477,6 +479,7 @@ extern int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr *,
+ 			      int, int);
+ extern int nvm_max_phys_sects(struct nvm_tgt_dev *);
+ extern int nvm_submit_io(struct nvm_tgt_dev *, struct nvm_rq *);
++extern int nvm_submit_io_sync(struct nvm_tgt_dev *, struct nvm_rq *);
+ extern int nvm_erase_sync(struct nvm_tgt_dev *, struct ppa_addr *, int);
+ extern int nvm_get_l2p_tbl(struct nvm_tgt_dev *, u64, u32, nvm_l2p_update_fn *,
+ 			   void *);
 -- 
 2.7.4
