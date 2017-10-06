@@ -1,12 +1,12 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qt0-f170.google.com ([209.85.216.170]:46395 "EHLO
-        mail-qt0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751841AbdJFK4F (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Oct 2017 06:56:05 -0400
-Received: by mail-qt0-f170.google.com with SMTP id 6so21506544qtw.3
-        for <linux-block@vger.kernel.org>; Fri, 06 Oct 2017 03:56:05 -0700 (PDT)
+Received: from mail-qt0-f180.google.com ([209.85.216.180]:52656 "EHLO
+        mail-qt0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750915AbdJFKmm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Oct 2017 06:42:42 -0400
+Received: by mail-qt0-f180.google.com with SMTP id o52so30542191qtc.9
+        for <linux-block@vger.kernel.org>; Fri, 06 Oct 2017 03:42:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAJ+L6qcLc-=bbDJuaToDFPUWG=c4JKhKBQkivaw3tYWdjERmZw@mail.gmail.com>
+In-Reply-To: <18f2271b-87c2-530d-12da-dc2b4a5af1fd@coly.li>
 References: <1506497553-12552-1-git-send-email-tang.junhui@zte.com.cn>
  <CAJ+L6qcU+Db5TP1Q2J-V8angdzeW9DFGwc7KQqc4di9CSxusLg@mail.gmail.com>
  <CAJ+L6qdu4OSRh7Qdkk-5XBgd4W_N29Y6-wVLf-jFAMKEhQrTbQ@mail.gmail.com>
@@ -18,10 +18,10 @@ References: <1506497553-12552-1-git-send-email-tang.junhui@zte.com.cn>
  <6a2052da-6b52-9c06-b85e-e3ea29e3f8e8@coly.li> <CAJ+L6qdqQn4tpFdkPZ-zhxss9O8axBEarMBJA5X6f9i+K8SLGg@mail.gmail.com>
  <CAJ+L6qe8rwbtO6tR-QNQBUApbeGQ9NGD=P9t5gtN9j0kzacJEQ@mail.gmail.com>
  <cb6db7c0-eaf7-f4a8-5584-8ce512575d74@coly.li> <CAJ+L6qdG70ExM7cnwYFLmCDBXY8SBErLhnMNeFVscXYemb_1SQ@mail.gmail.com>
- <18f2271b-87c2-530d-12da-dc2b4a5af1fd@coly.li> <CAJ+L6qcLc-=bbDJuaToDFPUWG=c4JKhKBQkivaw3tYWdjERmZw@mail.gmail.com>
+ <18f2271b-87c2-530d-12da-dc2b4a5af1fd@coly.li>
 From: Michael Lyle <mlyle@lyle.org>
-Date: Fri, 6 Oct 2017 03:56:03 -0700
-Message-ID: <CAJ+L6qfHHKT4T8y=6ygmd2e+tj=XScZ9y1fX+=iKFtXip3hrRw@mail.gmail.com>
+Date: Fri, 6 Oct 2017 03:42:40 -0700
+Message-ID: <CAJ+L6qcLc-=bbDJuaToDFPUWG=c4JKhKBQkivaw3tYWdjERmZw@mail.gmail.com>
 Subject: Re: [PATCH 4/5] bcache: writeback: collapse contiguous IO better
 To: Coly Li <i@coly.li>
 Cc: Junhui Tang <tang.junhui@zte.com.cn>, linux-bcache@vger.kernel.org,
@@ -31,73 +31,62 @@ Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-I will write a test bench and send results soon.
+Coly--
 
-Just please note-- you've crafted a test where there's not likely to
-be sequential data to writeback, and chosen a block size where there
-is limited difference between sequential and nonsequential writeback.
-Not surprisingly, you don't see a real difference with code that is
-trying to optimize sequential writeback :P
+Holy crap, I'm not surprised you don't see a difference if you're
+writing with 512K size!  The potential benefit from merging is much
+less, and the odds of missing a merge is much smaller.  512KB is 5ms
+sequential by itself on a 100MB/sec disk--- lots more time to wait to
+get the next chunks in order, and even if you fail to merge the
+potential benefit is much less-- if the difference is mostly
+rotational latency from failing to merge then we're talking 5ms vs
+5+2ms.
+
+Do you even understand what you are trying to test?
 
 Mike
 
-On Fri, Oct 6, 2017 at 3:42 AM, Michael Lyle <mlyle@lyle.org> wrote:
-> Coly--
+On Fri, Oct 6, 2017 at 3:36 AM, Coly Li <i@coly.li> wrote:
+> On 2017/10/6 =E4=B8=8B=E5=8D=885:20, Michael Lyle wrote:
+>> Coly--
+>>
+>> I did not say the result from the changes will be random.
+>>
+>> I said the result from your test will be random, because where the
+>> writeback position is making non-contiguous holes in the data is
+>> nondeterministic-- it depends where it is on the disk at the instant
+>> that writeback begins.  There is a high degree of dispersion in the
+>> test scenario you are running that is likely to exceed the differences
+>> from my patch.
 >
-> Holy crap, I'm not surprised you don't see a difference if you're
-> writing with 512K size!  The potential benefit from merging is much
-> less, and the odds of missing a merge is much smaller.  512KB is 5ms
-> sequential by itself on a 100MB/sec disk--- lots more time to wait to
-> get the next chunks in order, and even if you fail to merge the
-> potential benefit is much less-- if the difference is mostly
-> rotational latency from failing to merge then we're talking 5ms vs
-> 5+2ms.
+> Hi Mike,
 >
-> Do you even understand what you are trying to test?
+> I did the test quite carefully. Here is how I ran the test,
+> - disable writeback by echo 0 to writeback_runing.
+> - write random data into cache to full or half size, then stop the I/O
+> immediately.
+> - echo 1 to writeback_runing to start writeback
+> - and record performance data at once
 >
-> Mike
+> It might be random position where the writeback starts, but there should
+> not be too much difference of statistical number of the continuous
+> blocks (on cached device). Because fio just send random 512KB blocks
+> onto cache device, the statistical number of contiguous blocks depends
+> on cache device vs. cached device size, and how full the cache device is
+> occupied.
 >
-> On Fri, Oct 6, 2017 at 3:36 AM, Coly Li <i@coly.li> wrote:
->> On 2017/10/6 =E4=B8=8B=E5=8D=885:20, Michael Lyle wrote:
->>> Coly--
->>>
->>> I did not say the result from the changes will be random.
->>>
->>> I said the result from your test will be random, because where the
->>> writeback position is making non-contiguous holes in the data is
->>> nondeterministic-- it depends where it is on the disk at the instant
->>> that writeback begins.  There is a high degree of dispersion in the
->>> test scenario you are running that is likely to exceed the differences
->>> from my patch.
->>
->> Hi Mike,
->>
->> I did the test quite carefully. Here is how I ran the test,
->> - disable writeback by echo 0 to writeback_runing.
->> - write random data into cache to full or half size, then stop the I/O
->> immediately.
->> - echo 1 to writeback_runing to start writeback
->> - and record performance data at once
->>
->> It might be random position where the writeback starts, but there should
->> not be too much difference of statistical number of the continuous
->> blocks (on cached device). Because fio just send random 512KB blocks
->> onto cache device, the statistical number of contiguous blocks depends
->> on cache device vs. cached device size, and how full the cache device is
->> occupied.
->>
->> Indeed, I repeated some tests more than once (except the md raid5 and md
->> raid0 configurations), the results are quite sable when I see the data
->> charts, no big difference.
->>
->> If you feel the performance result I provided is problematic, it would
->> be better to let the data talk. You need to show your performance test
->> number to prove that the bio reorder patches are helpful for general
->> workloads, or at least helpful to many typical workloads.
->>
->> Let the data talk.
->>
->> Thanks.
->>
->> --
->> Coly Li
+> Indeed, I repeated some tests more than once (except the md raid5 and md
+> raid0 configurations), the results are quite sable when I see the data
+> charts, no big difference.
+>
+> If you feel the performance result I provided is problematic, it would
+> be better to let the data talk. You need to show your performance test
+> number to prove that the bio reorder patches are helpful for general
+> workloads, or at least helpful to many typical workloads.
+>
+> Let the data talk.
+>
+> Thanks.
+>
+> --
+> Coly Li
