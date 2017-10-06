@@ -1,10 +1,10 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qt0-f174.google.com ([209.85.216.174]:53626 "EHLO
-        mail-qt0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751654AbdJFSgi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Oct 2017 14:36:38 -0400
-Received: by mail-qt0-f174.google.com with SMTP id n61so5131279qte.10
-        for <linux-block@vger.kernel.org>; Fri, 06 Oct 2017 11:36:37 -0700 (PDT)
+Received: from mail-qk0-f181.google.com ([209.85.220.181]:48447 "EHLO
+        mail-qk0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752079AbdJFSXz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Oct 2017 14:23:55 -0400
+Received: by mail-qk0-f181.google.com with SMTP id d67so15313726qkg.5
+        for <linux-block@vger.kernel.org>; Fri, 06 Oct 2017 11:23:55 -0700 (PDT)
 MIME-Version: 1.0
 In-Reply-To: <33e52793-251d-ed58-fb59-5432946efb56@coly.li>
 References: <1506497553-12552-1-git-send-email-tang.junhui@zte.com.cn>
@@ -19,8 +19,8 @@ References: <1506497553-12552-1-git-send-email-tang.junhui@zte.com.cn>
  <dca3c016-bb3f-7d8c-1509-f042628d7fd6@coly.li> <CAJ+L6qcY=_vTaqZDLvif_3pqwujo24NUZhGG9ebp6z5+uWqwQQ@mail.gmail.com>
  <33e52793-251d-ed58-fb59-5432946efb56@coly.li>
 From: Michael Lyle <mlyle@lyle.org>
-Date: Fri, 6 Oct 2017 11:36:36 -0700
-Message-ID: <CAJ+L6qdnzocZRvcExwFBJPmVJnHWNJXY8j3NioUaekAp06QzXg@mail.gmail.com>
+Date: Fri, 6 Oct 2017 11:23:53 -0700
+Message-ID: <CAJ+L6qfm-LYY37YOSHWv-P0Tt++kpQ7cK30cD2VJMKnm09RAow@mail.gmail.com>
 Subject: Re: [PATCH 4/5] bcache: writeback: collapse contiguous IO better
 To: Coly Li <i@coly.li>
 Cc: Hannes Reinecke <hare@suse.de>,
@@ -31,19 +31,29 @@ Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Sorry I missed this question:
+On Fri, Oct 6, 2017 at 11:09 AM, Coly Li <i@coly.li> wrote:
+> If I use a 1.8T hard disk as cached device, and 1TB SSD as cache device,
+> and set fio to write 500G dirty data in total. Is this configuration
+> close to the working set and cache size you suggested ?
 
-> Is it the time from writeback starts to dirty reaches dirty target, or
-> the time from writeback starts to dirty reaches 0 ?
+I think it's quicker and easier (and meaningful) to write 125-200G of
+small blocks. (1/8 to 1/5)
 
-Not quite either.  I monitor the machine with zabbix; it's the time to
-when the backing disk reaches its background rate of activity / when
-writeback hits its minimum rate (writeback with the PI controller
-writes a little past the target because of the integral term).
+Once you exceed 70% (CUTOFF_WRITEBACK_SYNC) you will get a **lot of
+holes** because of write data skipping the cache.  And please note--
+something I don't quite understand-- there is some kind of "write
+amplification" happening somewhere.  When I write 30G, I get 38G of
+dirty data; I wouldn't expect filesystem creation and metadata updates
+to do this much.  At some point I need to trace and understand why
+this is happening.
 
-Viewed one way: 5/80 is just a few percent of difference (6%).  But:
-I'm hopeful that further improvement can be made along this patch
-series, and in any event it's 5 minutes earlier that I/O will have an
-unencumbered response time after a pulse of load.
+500G is probably still OK (1/2), but there starts to be a random
+factor the more you write:
+
+Basically, the more you write, the less-contiguous the data gets,
+because writeback may have scanned through the volume once and written
+out extents that are now "holes" in the middle of the data.  It'll
+still be mostly contiguous but the effect is random.  (This is an
+effect of the test scenario, not any of the code change).
 
 Mike
