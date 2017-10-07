@@ -1,78 +1,35 @@
-Return-Path: <shli@kernel.org>
-Date: Fri, 29 Sep 2017 23:02:35 -0700
-From: Shaohua Li <shli@kernel.org>
-To: Joseph Qi <jiangqi903@gmail.com>
-Cc: linux-block <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Shaohua Li <shli@fb.com>, boyu.mt@taobao.com, wenqing.lz@taobao.com,
-	qijiang.qj@alibaba-inc.com
-Subject: Re: [PATCH v2] blk-throttle: fix possible io stall when upgrade to
- max
-Message-ID: <20170930060235.sx5lbs25xrgqp5rg@kernel.org>
-References: <526810b1-72e3-859f-aeaa-b5192144c589@gmail.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-qt0-f194.google.com ([209.85.216.194]:49525 "EHLO
+        mail-qt0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751823AbdJGVqv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 7 Oct 2017 17:46:51 -0400
+Received: by mail-qt0-f194.google.com with SMTP id k31so1866708qta.6
+        for <linux-block@vger.kernel.org>; Sat, 07 Oct 2017 14:46:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <526810b1-72e3-859f-aeaa-b5192144c589@gmail.com>
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20170919221111.18549-1-colyli@suse.de>
+References: <20170919221111.18549-1-colyli@suse.de>
+From: Michael Lyle <mlyle@lyle.org>
+Date: Sat, 7 Oct 2017 14:46:50 -0700
+Message-ID: <CAJ+L6qdpS8ncKTB+5HS1yuHijd6gK_KfdqvDNEgPypYOnfatgA@mail.gmail.com>
+Subject: Re: [PATCH] bcache: check ca->alloc_thread initialized before wake up it
+To: Coly Li <colyli@suse.de>
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Sat, Sep 30, 2017 at 02:38:49PM +0800, Joseph Qi wrote:
-> From: Joseph Qi <qijiang.qj@alibaba-inc.com>
-> 
-> There is a case which will lead to io stall. The case is described as
-> follows. 
-> /test1
->   |-subtest1
-> /test2
->   |-subtest2
-> And subtest1 and subtest2 each has 32 queued bios already.
-> 
-> Now upgrade to max. In throtl_upgrade_state, it will try to dispatch
-> bios as follows:
-> 1) tg=subtest1, do nothing;
-> 2) tg=test1, transfer 32 queued bios from subtest1 to test1; no pending
-> left, no need to schedule next dispatch;
-> 3) tg=subtest2, do nothing;
-> 4) tg=test2, transfer 32 queued bios from subtest2 to test2; no pending
-> left, no need to schedule next dispatch;
-> 5) tg=/, transfer 8 queued bios from test1 to /, 8 queued bios from
-> test2 to /, 8 queued bios from test1 to /, and 8 queued bios from test2
-> to /; note that test1 and test2 each still has 16 queued bios left;
-> 6) tg=/, try to schedule next dispatch, but since disptime is now
-> (update in tg_update_disptime, wait=0), pending timer is not scheduled
-> in fact;
-> 7) In throtl_upgrade_state it totally dispatches 32 queued bios and with
-> 32 left. test1 and test2 each has 16 queued bios;
-> 8) throtl_pending_timer_fn sees the left over bios, but could do
-> nothing, because throtl_select_dispatch returns 0, and test1/test2 has
-> no pending tg.
-> 
-> The blktrace shows the following:
-> 8,32   0        0     2.539007641     0  m   N throtl upgrade to max
-> 8,32   0        0     2.539072267     0  m   N throtl /test2 dispatch nr_queued=16 read=0 write=16
-> 8,32   7        0     2.539077142     0  m   N throtl /test1 dispatch nr_queued=16 read=0 write=16
-> 
-> So force schedule dispatch if there are pending children.
+On Tue, Sep 19, 2017 at 3:11 PM, Coly Li <colyli@suse.de> wrote:
+> In bcache code, sysfs entries are created before all resources get
+> allocated, e.g. allocation thread of a cache set.
 >
-> Signed-off-by: Joseph Qi <qijiang.qj@alibaba-inc.com>
-> ---
->  block/blk-throttle.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index 0fea76a..17816a0 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -1911,11 +1911,11 @@ static void throtl_upgrade_state(struct throtl_data *td)
->  
->  		tg->disptime = jiffies - 1;
->  		throtl_select_dispatch(sq);
-> -		throtl_schedule_next_dispatch(sq, false);
-> +		throtl_schedule_next_dispatch(sq, true);
->  	}
->  	rcu_read_unlock();
->  	throtl_select_dispatch(&td->service_queue);
-> -	throtl_schedule_next_dispatch(&td->service_queue, false);
-> +	throtl_schedule_next_dispatch(&td->service_queue, true);
->  	queue_work(kthrotld_workqueue, &td->dispatch_work);
->  }
+> There is posibility for NULL pointer deference if a resource is accessed
+> but which is not initialized yet. Indeed Jorg Bornschein catches one on
+> cache set allocation thread and gets a kernel oops.
+> Signed-off-by: Coly Li <colyli@suse.de>
+> Reported-by: Jorg Bornschein <jb@capsec.org>
+> Cc: Kent Overstreet <kent.overstreet@gmail.com>
+> Cc: stable@vger.kernel.org
 
-Reviewed-by: Shaohua Li <shli@fb.com> 
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
