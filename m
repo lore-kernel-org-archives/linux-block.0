@@ -1,87 +1,272 @@
-Return-Path: <prvs=4484e8038=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "jthumshirn@suse.de" <jthumshirn@suse.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "hch@lst.de" <hch@lst.de>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
-	"hare@suse.com" <hare@suse.com>, "mcgrof@kernel.org" <mcgrof@kernel.org>
+Return-Path: <ming.lei@redhat.com>
+Date: Sat, 7 Oct 2017 12:33:15 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	=Oleksandr Natalenko <oleksandr@natalenko.name>,
+	"Luis R . Rodriguez" <mcgrof@kernel.org>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>
 Subject: Re: [PATCH v6 9/9] block, scsi: Make SCSI device suspend and resume
  work reliably
-Date: Mon, 9 Oct 2017 21:16:53 +0000
-Message-ID: <1507583812.2674.52.camel@wdc.com>
+Message-ID: <20171007043314.GA16732@ming.t460p>
 References: <20171005000110.15904-1-bart.vanassche@wdc.com>
-	 <20171005000110.15904-10-bart.vanassche@wdc.com>
-	 <20171007043314.GA16732@ming.t460p>
-In-Reply-To: <20171007043314.GA16732@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
+ <20171005000110.15904-10-bart.vanassche@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171005000110.15904-10-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gU2F0LCAyMDE3LTEwLTA3IGF0IDEyOjMzICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
-V2VkLCBPY3QgMDQsIDIwMTcgYXQgMDU6MDE6MTBQTSAtMDcwMCwgQmFydCBWYW4gQXNzY2hlIHdy
-b3RlOg0KPiA+IEl0IGlzIGVzc2VudGlhbCBkdXJpbmcgc3VzcGVuZCBhbmQgcmVzdW1lIHRoYXQg
-bmVpdGhlciB0aGUgZmlsZXN5c3RlbQ0KPiA+IHN0YXRlIG5vciB0aGUgZmlsZXN5c3RlbSBtZXRh
-ZGF0YSBpbiBSQU0gY2hhbmdlcy4gVGhpcyBpcyB3aHkgd2hpbGUNCj4gPiB0aGUgaGliZXJuYXRp
-b24gaW1hZ2UgaXMgYmVpbmcgd3JpdHRlbiBvciByZXN0b3JlZCB0aGF0IFNDU0kgZGV2aWNlcw0K
-PiANCj4gcXVpZXNjZSBpc24ndCB1c2VkIG9ubHkgZm9yIHN1c3BlbmQgYW5kIHJlc3VtZSwgQW5k
-IHRoZSBpc3N1ZSBpc24ndA0KPiBzdXNwZW5kL3Jlc3VtZSBzcGVjaWZpYyB0b28uIFNvIHBsZWFz
-ZSBjaGFuZ2UgdGhlIHRpdGxlL2NvbW1pdCBsb2cNCj4gYXMgc29ydCBvZiAnbWFrZSBTQ1NJIHF1
-aWVzY2UgbW9yZSByZWxpYWJsZS9zYWZlJy4gDQoNCk9LLCBJIHdpbGwgbW9kaWZ5IHRoZSBwYXRj
-aCB0aXRsZS4NCg0KPiA+IC0JCWlmIChwZXJjcHVfcmVmX3RyeWdldF9saXZlKCZxLT5xX3VzYWdl
-X2NvdW50ZXIpKQ0KPiA+IC0JCQlyZXR1cm4gMDsNCj4gPiArCQlpZiAocGVyY3B1X3JlZl90cnln
-ZXRfbGl2ZSgmcS0+cV91c2FnZV9jb3VudGVyKSkgew0KPiA+ICsJCQkvKg0KPiA+ICsJCQkgKiBU
-aGUgY29kZSB0aGF0IHNldHMgdGhlIFBSRUVNUFRfT05MWSBmbGFnIGlzDQo+ID4gKwkJCSAqIHJl
-c3BvbnNpYmxlIGZvciBlbnN1cmluZyB0aGF0IHRoYXQgZmxhZyBpcyBnbG9iYWxseQ0KPiA+ICsJ
-CQkgKiB2aXNpYmxlIGJlZm9yZSB0aGUgcXVldWUgaXMgdW5mcm96ZW4uDQo+ID4gKwkJCSAqLw0K
-PiA+ICsJCQlpZiAocHJlZW1wdCB8fCAhYmxrX3F1ZXVlX3ByZWVtcHRfb25seShxKSkgew0KPiAN
-Cj4gUFJFRU1QVF9PTkxZIGZsYWcgaXMgY2hlY2tlZCB3aXRob3V0IFJDVSByZWFkIGxvY2sgaGVs
-ZCwgc28gdGhlDQo+IHN5bmNocm9uaXplX3JjdSgpIG1heSBqdXN0IHdhaXQgZm9yIGNvbXBsZXRp
-b24gb2YgcHJlLWV4aXQNCj4gcGVyY3B1X3JlZl90cnlnZXRfbGl2ZSgpLCB3aGljaCBjYW4gYmUg
-cmVvcmRlcmVkIHdpdGggdGhlDQo+IHJlYWRpbmcgb24gYmxrX3F1ZXVlX3ByZWVtcHRfb25seSgp
-Lg0KDQpPSywgSSB3aWxsIGFkZCByY3VfcmVhZF9sb2NrX3NjaGVkL3VubG9ja19zY2hlZCgpIGNh
-bGxzIGFyb3VuZCB0aGlzIGNvZGUuDQoNCj4gPiAgaW50DQo+ID4gIHNjc2lfZGV2aWNlX3F1aWVz
-Y2Uoc3RydWN0IHNjc2lfZGV2aWNlICpzZGV2KQ0KPiA+ICB7DQo+ID4gKwlzdHJ1Y3QgcmVxdWVz
-dF9xdWV1ZSAqcSA9IHNkZXYtPnJlcXVlc3RfcXVldWU7DQo+ID4gIAlpbnQgZXJyOw0KPiA+ICAN
-Cj4gPiArCWJsa19tcV9mcmVlemVfcXVldWUocSk7DQo+ID4gKwlpZiAoYmxrX3NldF9wcmVlbXB0
-X29ubHkocSkpIHsNCj4gPiArCQlibGtfbXFfdW5mcmVlemVfcXVldWUocSk7DQo+ID4gKwkJcmV0
-dXJuIC1FSU5WQUw7DQo+ID4gKwl9DQo+IA0KPiBUaGlzIHdheSBpcyB3cm9uZywgaWYgYmxrX3Nl
-dF9wcmVlbXB0X29ubHkoKSByZXR1cm5zIHRydWUNCj4gaXQgbWVhbnMgdGhlIHF1ZXVlIGhhcyBi
-ZWVuIGluIFBSRUVNUFRfT05MWSBhbHJlYWR5LA0KPiBhbmQgZmFpbGluZyBzY3NpX2RldmljZV9x
-dWllc2NlKCkgY2FuIGJyZWFrIHN1c3BlbmQvcmVzdW1lIG9yDQo+IHNlbmRpbmcgU0NTSSBkb21h
-aW4gdmFsaWRhdGlvbiBjb21tYW5kLg0KDQpUaGF0J3MgYW4gaW50ZXJlc3RpbmcgY29tbWVudCBi
-dXQgSSBwcm9wb3NlIHRoYXQgd2hhdCB5b3Ugc3VnZ2VzdCBpcyBpbXBsZW1lbnRlZA0KdGhyb3Vn
-aCBhIHNlcGFyYXRlIHBhdGNoLiBUaGUgYWJvdmUgY29kZSBwcmVzZXJ2ZXMgdGhlIGV4aXN0aW5n
-IGJlaGF2aW9yLCBuYW1lbHkNCnRoYXQgc2NzaV9kZXZpY2VfcXVpZXNjZSgpIHJldHVybnMgYW4g
-ZXJyb3IgY29kZSBpZiBjYWxsZWQgd2hlbiBhIFNDU0kgZGV2aWNlIGhhcw0KYWxyZWFkeSBiZWVu
-IHF1aWVzY2VkLiBTZWUgYWxzbyBzY3NpX2RldmljZV9zZXRfc3RhdGUoKS4gQlRXLCBJIGRvbid0
-IHRoaW5rIHRoYXQNCml0IGlzIGxpa2VseSB0aGF0IHRoaXMgd2lsbCBvY2N1ci4gVGhlIG9ubHkg
-Y29kZSBvdGhlciB0aGFuIHRoZSBwb3dlciBtYW5hZ2VtZW50DQpjb2RlIEkga25vdyBvZiB0aGF0
-IHNldHMgdGhlIFNDU0kgUVVJRVNDRSBzdGF0ZSBpcyB0aGUgU0NTSSBzeXNmcyBzdGF0ZSBzdG9y
-ZQ0KbWV0aG9kIGFuZCB0aGUgU0NTSSBwYXJhbGxlbCBjb2RlLiBJIGRvbid0IGtub3cgYW55IHNv
-ZnR3YXJlIHRoYXQgc2V0cyB0aGUgU0NTSQ0KUVVJRVNDRSBzdGF0ZSB0aHJvdWdoIHN5c2ZzLiBB
-bmQgSSdtIG5vdCBzdXJlIHRoZSBTQ1NJIHBhcmFsbGVsIGNvZGUgaGFzIGENCnNpZ25pZmljYW50
-IG51bWJlciBvZiB1c2Vycy4NCg0KPiA+ICsJLyoNCj4gPiArCSAqIEVuc3VyZSB0aGF0IHRoZSBl
-ZmZlY3Qgb2YgYmxrX3NldF9wcmVlbXB0X29ubHkoKSB3aWxsIGJlIHZpc2libGUNCj4gPiArCSAq
-IGZvciBwZXJjcHVfcmVmX3RyeWdldCgpIGNhbGxlcnMgdGhhdCBvY2N1ciBhZnRlciB0aGUgcXVl
-dWUNCj4gPiArCSAqIHVuZnJlZXplLiBTZWUgYWxzbyBodHRwczovL2x3bi5uZXQvQXJ0aWNsZXMv
-NTczNDk3Ly4NCj4gPiArCSAqLw0KPiA+ICsJc3luY2hyb25pemVfcmN1KCk7DQo+IA0KPiBUaGlz
-IHN5bmNocm9uaXplX3JjdSBtYXkgYmUgc2F2ZWQgaWYgd2Ugc2V0IHRoZSBQUkVFTVBUX09OTFkg
-ZmxhZw0KPiBiZWZvcmUgZnJlZXppbmcgcXVldWUgc2luY2UgYmxrX21xX2ZyZWV6ZV9xdWV1ZSgp
-IG1heSBpbXBsaWNhdGUNCj4gb25lIHN5bmNocm9uaXplX3JjdSgpLg0KDQpUaGF0J3MgYW4gaW50
-ZXJlc3RpbmcgY29tbWVudC4gSSB3aWxsIGxvb2sgZnVydGhlciBpbnRvIHRoaXMuDQoNCj4gPiBA
-QCAtMjk2MSw4ICsyOTcwLDEwIEBAIHZvaWQgc2NzaV9kZXZpY2VfcmVzdW1lKHN0cnVjdCBzY3Np
-X2RldmljZSAqc2RldikNCj4gPiAgCSAqLw0KPiA+ICAJbXV0ZXhfbG9jaygmc2Rldi0+c3RhdGVf
-bXV0ZXgpOw0KPiA+ICAJaWYgKHNkZXYtPnNkZXZfc3RhdGUgPT0gU0RFVl9RVUlFU0NFICYmDQo+
-ID4gLQkgICAgc2NzaV9kZXZpY2Vfc2V0X3N0YXRlKHNkZXYsIFNERVZfUlVOTklORykgPT0gMCkN
-Cj4gPiArCSAgICBzY3NpX2RldmljZV9zZXRfc3RhdGUoc2RldiwgU0RFVl9SVU5OSU5HKSA9PSAw
-KSB7DQo+ID4gKwkJYmxrX2NsZWFyX3ByZWVtcHRfb25seShzZGV2LT5yZXF1ZXN0X3F1ZXVlKTsN
-Cj4gPiAgCQlzY3NpX3J1bl9xdWV1ZShzZGV2LT5yZXF1ZXN0X3F1ZXVlKTsNCj4gPiArCX0NCj4g
-PiAgCW11dGV4X3VubG9jaygmc2Rldi0+c3RhdGVfbXV0ZXgpOw0KPiANCj4gc2NzaV9ydW5fcXVl
-dWUoKSBjYW4gYmUgcmVtb3ZlZCwgYW5kIGJsa19jbGVhcl9wcmVlbXB0X29ubHkoKSBuZWVkbid0
-DQo+IHRvIGJlIHJ1biB3aXRoIGhvbGRpbmcgc2Rldi0+c3RhdGVfbXV0ZXgsIGp1c3QgbGlrZSBp
-biBxdWllc2NlIHBhdGguDQoNCkkgd2lsbCBsb29rIGludG8gcmVtb3ZpbmcgdGhlIHNjc2lfcnVu
-X3F1ZXVlKCkgY2FsbC4gQnV0IEkgcHJlZmVyIHRvIGtlZXANCnRoZSBibGtfY2xlYXJfcHJlZW1w
-dF9vbmx5KCkgaW5zaWRlIHRoZSBjcml0aWNhbCBzZWN0aW9uIGJlY2F1c2UgdGhhdCBjYWxsDQpk
-b2Vzbid0IHNsZWVwIGFuZCBiZWNhdXNlIGl0IGNoYW5nZXMgc3RhdGUgaW5mb3JtYXRpb24gdGhh
-dCBpcyByZWxhdGVkIHRvDQp0aGUgU0NTSSBzdGF0ZS4NCg0KQmFydC4=
+On Wed, Oct 04, 2017 at 05:01:10PM -0700, Bart Van Assche wrote:
+> It is essential during suspend and resume that neither the filesystem
+> state nor the filesystem metadata in RAM changes. This is why while
+> the hibernation image is being written or restored that SCSI devices
+
+quiesce isn't used only for suspend and resume, And the issue isn't
+suspend/resume specific too. So please change the title/commit log
+as sort of 'make SCSI quiesce more reliable/safe'. 
+
+> are quiesced. The SCSI core quiesces devices through scsi_device_quiesce()
+> and scsi_device_resume(). In the SDEV_QUIESCE state execution of
+> non-preempt requests is deferred. This is realized by returning
+> BLKPREP_DEFER from inside scsi_prep_state_check() for quiesced SCSI
+> devices. Avoid that a full queue prevents power management requests
+> to be submitted by deferring allocation of non-preempt requests for
+> devices in the quiesced state. This patch has been tested by running
+> the following commands and by verifying that after resume the fio job
+> is still running:
+> 
+> for d in /sys/class/block/sd*[a-z]; do
+>   hcil=$(readlink "$d/device")
+>   hcil=${hcil#../../../}
+>   echo 4 > "$d/queue/nr_requests"
+>   echo 1 > "/sys/class/scsi_device/$hcil/device/queue_depth"
+> done
+> bdev=$(readlink /dev/disk/by-uuid/5217d83f-213e-4b42-b86e-20013325ba6c)
+> bdev=${bdev#../../}
+> hcil=$(readlink "/sys/block/$bdev/device")
+> hcil=${hcil#../../../}
+> fio --name="$bdev" --filename="/dev/$bdev" --buffered=0 --bs=512 --rw=randread \
+>   --ioengine=libaio --numjobs=4 --iodepth=16 --iodepth_batch=1 --thread \
+>   --loops=$((2**31)) &
+> pid=$!
+> sleep 1
+> systemctl hibernate
+> sleep 10
+> kill $pid
+> 
+> Reported-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+> References: "I/O hangs after resuming from suspend-to-ram" (https://marc.info/?l=linux-block&m=150340235201348).
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
+>  block/blk-core.c        | 38 ++++++++++++++++++++++++++++++--------
+>  block/blk-mq.c          |  4 ++--
+>  block/blk-timeout.c     |  2 +-
+>  drivers/scsi/scsi_lib.c | 27 +++++++++++++++++++--------
+>  fs/block_dev.c          |  4 ++--
+>  include/linux/blkdev.h  |  2 +-
+>  6 files changed, 55 insertions(+), 22 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index b8d90fc29b35..81a4bb119d50 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -371,6 +371,7 @@ void blk_clear_preempt_only(struct request_queue *q)
+>  
+>  	spin_lock_irqsave(q->queue_lock, flags);
+>  	queue_flag_clear(QUEUE_FLAG_PREEMPT_ONLY, q);
+> +	wake_up_all(&q->mq_freeze_wq);
+>  	spin_unlock_irqrestore(q->queue_lock, flags);
+>  }
+>  EXPORT_SYMBOL_GPL(blk_clear_preempt_only);
+> @@ -792,15 +793,34 @@ struct request_queue *blk_alloc_queue(gfp_t gfp_mask)
+>  }
+>  EXPORT_SYMBOL(blk_alloc_queue);
+>  
+> -int blk_queue_enter(struct request_queue *q, bool nowait)
+> +/**
+> + * blk_queue_enter() - try to increase q->q_usage_counter
+> + * @q: request queue pointer
+> + * @flags: BLK_MQ_REQ_NOWAIT and/or BLK_MQ_REQ_PREEMPT
+> + */
+> +int blk_queue_enter(struct request_queue *q, unsigned int flags)
+>  {
+> +	const bool preempt = flags & BLK_MQ_REQ_PREEMPT;
+> +
+>  	while (true) {
+>  		int ret;
+>  
+> -		if (percpu_ref_tryget_live(&q->q_usage_counter))
+> -			return 0;
+> +		if (percpu_ref_tryget_live(&q->q_usage_counter)) {
+> +			/*
+> +			 * The code that sets the PREEMPT_ONLY flag is
+> +			 * responsible for ensuring that that flag is globally
+> +			 * visible before the queue is unfrozen.
+> +			 */
+> +			if (preempt || !blk_queue_preempt_only(q)) {
+
+PREEMPT_ONLY flag is checked without RCU read lock held, so the
+synchronize_rcu() may just wait for completion of pre-exit
+percpu_ref_tryget_live(), which can be reordered with the
+reading on blk_queue_preempt_only().
+
+> +				return 0;
+> +			} else {
+> +				percpu_ref_put(&q->q_usage_counter);
+> +				WARN_ONCE("%s: Attempt to allocate non-preempt request in preempt-only mode.\n",
+> +					  kobject_name(q->kobj.parent));
+> +			}
+> +		}
+>  
+> -		if (nowait)
+> +		if (flags & BLK_MQ_REQ_NOWAIT)
+>  			return -EBUSY;
+>  
+>  		/*
+> @@ -813,7 +833,8 @@ int blk_queue_enter(struct request_queue *q, bool nowait)
+>  		smp_rmb();
+>  
+>  		ret = wait_event_interruptible(q->mq_freeze_wq,
+> -				!atomic_read(&q->mq_freeze_depth) ||
+> +				(atomic_read(&q->mq_freeze_depth) == 0 &&
+> +				 (preempt || !blk_queue_preempt_only(q))) ||
+>  				blk_queue_dying(q));
+>  		if (blk_queue_dying(q))
+>  			return -ENODEV;
+> @@ -1441,8 +1462,7 @@ static struct request *blk_old_get_request(struct request_queue *q,
+>  	/* create ioc upfront */
+>  	create_io_context(gfp_mask, q->node);
+>  
+> -	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM) ||
+> -			      (op & REQ_NOWAIT));
+> +	ret = blk_queue_enter(q, flags);
+>  	if (ret)
+>  		return ERR_PTR(ret);
+>  	spin_lock_irq(q->queue_lock);
+> @@ -2263,8 +2283,10 @@ blk_qc_t generic_make_request(struct bio *bio)
+>  	current->bio_list = bio_list_on_stack;
+>  	do {
+>  		struct request_queue *q = bio->bi_disk->queue;
+> +		unsigned int flags = bio->bi_opf & REQ_NOWAIT ?
+> +			BLK_MQ_REQ_NOWAIT : 0;
+>  
+> -		if (likely(blk_queue_enter(q, bio->bi_opf & REQ_NOWAIT) == 0)) {
+> +		if (likely(blk_queue_enter(q, flags) == 0)) {
+>  			struct bio_list lower, same;
+>  
+>  			/* Create a fresh bio_list for all subordinate requests */
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 271657992d1a..1604bc2d4a57 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -386,7 +386,7 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+>  	struct request *rq;
+>  	int ret;
+>  
+> -	ret = blk_queue_enter(q, flags & BLK_MQ_REQ_NOWAIT);
+> +	ret = blk_queue_enter(q, flags);
+>  	if (ret)
+>  		return ERR_PTR(ret);
+>  
+> @@ -425,7 +425,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+>  	if (hctx_idx >= q->nr_hw_queues)
+>  		return ERR_PTR(-EIO);
+>  
+> -	ret = blk_queue_enter(q, true);
+> +	ret = blk_queue_enter(q, flags);
+>  	if (ret)
+>  		return ERR_PTR(ret);
+>  
+> diff --git a/block/blk-timeout.c b/block/blk-timeout.c
+> index 17ec83bb0900..b75d975cc5a5 100644
+> --- a/block/blk-timeout.c
+> +++ b/block/blk-timeout.c
+> @@ -134,7 +134,7 @@ void blk_timeout_work(struct work_struct *work)
+>  	struct request *rq, *tmp;
+>  	int next_set = 0;
+>  
+> -	if (blk_queue_enter(q, true))
+> +	if (blk_queue_enter(q, BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_PREEMPT))
+>  		return;
+>  	spin_lock_irqsave(q->queue_lock, flags);
+>  
+> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> index 1c16a247fae6..0ba7af5debc7 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -2926,21 +2926,30 @@ static void scsi_wait_for_queuecommand(struct scsi_device *sdev)
+>  int
+>  scsi_device_quiesce(struct scsi_device *sdev)
+>  {
+> +	struct request_queue *q = sdev->request_queue;
+>  	int err;
+>  
+> +	blk_mq_freeze_queue(q);
+> +	if (blk_set_preempt_only(q)) {
+> +		blk_mq_unfreeze_queue(q);
+> +		return -EINVAL;
+> +	}
+
+This way is wrong, if blk_set_preempt_only() returns true
+it means the queue has been in PREEMPT_ONLY already,
+and failing scsi_device_quiesce() can break suspend/resume or
+sending SCSI domain validation command.
+
+The reasonable handling should be just going ahead if queue
+is in PREEMPT_ONLY already.
+
+> +	/*
+> +	 * Ensure that the effect of blk_set_preempt_only() will be visible
+> +	 * for percpu_ref_tryget() callers that occur after the queue
+> +	 * unfreeze. See also https://lwn.net/Articles/573497/.
+> +	 */
+> +	synchronize_rcu();
+
+This synchronize_rcu may be saved if we set the PREEMPT_ONLY flag
+before freezing queue since blk_mq_freeze_queue() may implicate
+one synchronize_rcu().
+
+> +	blk_mq_unfreeze_queue(q);
+> +
+>  	mutex_lock(&sdev->state_mutex);
+>  	err = scsi_device_set_state(sdev, SDEV_QUIESCE);
+>  	mutex_unlock(&sdev->state_mutex);
+>  
+>  	if (err)
+> -		return err;
+> +		blk_clear_preempt_only(q);
+>  
+> -	scsi_run_queue(sdev->request_queue);
+> -	while (atomic_read(&sdev->device_busy)) {
+> -		msleep_interruptible(200);
+> -		scsi_run_queue(sdev->request_queue);
+> -	}
+> -	return 0;
+> +	return err;
+>  }
+>  EXPORT_SYMBOL(scsi_device_quiesce);
+>  
+> @@ -2961,8 +2970,10 @@ void scsi_device_resume(struct scsi_device *sdev)
+>  	 */
+>  	mutex_lock(&sdev->state_mutex);
+>  	if (sdev->sdev_state == SDEV_QUIESCE &&
+> -	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0)
+> +	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0) {
+> +		blk_clear_preempt_only(sdev->request_queue);
+>  		scsi_run_queue(sdev->request_queue);
+> +	}
+>  	mutex_unlock(&sdev->state_mutex);
+
+scsi_run_queue() can be removed, and blk_clear_preempt_only() needn't
+to be run with holding sdev->state_mutex, just like in quiesce path.
+
+-- 
+Ming
