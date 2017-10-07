@@ -1,144 +1,80 @@
-Return-Path: <byungchul.park@lge.com>
-From: Byungchul Park <byungchul.park@lge.com>
-To: peterz@infradead.org,
-	mingo@kernel.org,
-	axboe@kernel.dk
-Cc: johan@kernel.org,
-	tglx@linutronix.de,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	tj@kernel.org,
-	johannes.berg@intel.com,
-	oleg@redhat.com,
-	amir73il@gmail.com,
-	david@fromorbit.com,
-	darrick.wong@oracle.com,
-	linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	hch@infradead.org,
-	idryomov@gmail.com,
-	kernel-team@lge.com
-Subject: [PATCH v4 2/7] locking/lockdep: Add a boot parameter allowing unwind in cross-release and disable it by default
-Date: Wed, 25 Oct 2017 14:11:07 +0900
-Message-Id: <1508908272-15757-3-git-send-email-byungchul.park@lge.com>
-In-Reply-To: <1508908272-15757-1-git-send-email-byungchul.park@lge.com>
-References: <1508908272-15757-1-git-send-email-byungchul.park@lge.com>
+Return-Path: <zhangweiping@didichuxing.com>
+Date: Sat, 7 Oct 2017 16:46:23 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>
+Subject: Re: [PATCH v4] blk-mq: fix nr_requests wrong value when modify it
+ from sysfs
+Message-ID: <20171007084623.GA6035@source.didichuxing.com>
+References: <20170922153624.GA15873@localhost.didichuxing.com>
+ <20170930145727.GA34288@source.didichuxing.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <20170930145727.GA34288@source.didichuxing.com>
+Return-Path: zhangweiping@didichuxing.com
 List-ID: <linux-block@vger.kernel.org>
 
-Johan Hovold reported a heavy performance regression caused by lockdep
-cross-release:
+On Sat, Sep 30, 2017 at 10:57:31PM +0800, weiping zhang wrote:
+> On Fri, Sep 22, 2017 at 11:36:28PM +0800, weiping zhang wrote:
+> > if blk-mq use "none" io scheduler, nr_request get a wrong value when
+> > input a number > tag_set->queue_depth. blk_mq_tag_update_depth will get
+> > the smaller one min(nr, set->queue_depth), and then q->nr_request get a
+> > wrong value.
+> > 
+> > Reproduce:
+> > 
+> > echo none > /sys/block/nvme0n1/queue/scheduler
+> > echo 1000000 > /sys/block/nvme0n1/queue/nr_requests
+> > cat /sys/block/nvme0n1/queue/nr_requests
+> > 1000000
+> > 
+> > Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+> > ---
+> > 
+> > Changes since v4:
+> >  * fix typo in commit message(queue/ioscheduler => queue/scheduler)
+> > 
+> > Changes since v3:
+> >  * remove compare nr with tags->qdepth, pass nr to blk_mq_tag_update_depth
+> > directly
+> > 
+> >  * remove return EINVAL when user modify nr_request less than BLKDEV_MIN_RQ
+> > 
+> > Changes since v2:
+> >  * add return EINVAL when user modify nr_request less than BLKDEV_MIN_RQ
+> >  * remove pr_warn, and return EINVAL, if input number is too large
+> > 
+> >  block/blk-mq.c | 3 +--
+> >  1 file changed, 1 insertion(+), 2 deletions(-)
+> > 
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index 98a1860..491e336 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -2642,8 +2642,7 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+> >  		 * queue depth. This is similar to what the old code would do.
+> >  		 */
+> >  		if (!hctx->sched_tags) {
+> > -			ret = blk_mq_tag_update_depth(hctx, &hctx->tags,
+> > -							min(nr, set->queue_depth),
+> > +			ret = blk_mq_tag_update_depth(hctx, &hctx->tags, nr,
+> >  							false);
+> >  		} else {
+> >  			ret = blk_mq_tag_update_depth(hctx, &hctx->sched_tags,
+> > -- 
+> > 2.9.4
+> > 
+> 
+> Hi Jens,
+> 
+> As you say before:
+> > blk_mq_tag_update_depth() should already return
+> > -EINVAL for the case where we can't grow the tags. Looks like this patch
+> > should simply remove the min(nr, set->queue_depth) and just pass in 'nr'.
+> I also find that hctx->tags->nr_tags equal to tag_set->queue_depth no matter use
+> hctx->sched_tags or not. So I think it's safe to verify 'nr' by
+> hctx->tags->nr_tags.
+> 
+Hello Jens,
 
- > Boot time (from "Linux version" to login prompt) had in fact doubled
- > since 4.13 where it took 17 seconds (with my current config) compared to
- > the 35 seconds I now see with 4.14-rc4.
- >
- > I quick bisect pointed to lockdep and specifically the following commit:
- >
- >	28a903f63ec0 ("locking/lockdep: Handle non(or multi)-acquisition
- >	               of a crosslock")
- >
- > which I've verified is the commit which doubled the boot time (compared
- > to 28a903f63ec0^) (added by lockdep crossrelease series [1]).
-
-Currently cross-release performs unwind on every acquisition, but that
-is very expensive.
-
-This patch makes unwind optional and disables it by default and only
-records acquire_ip.
-
-Full stack traces are sometimes required for full analysis, in which
-case a boot paramter, crossrelease_fullstack, can be specified.
-
-On my qemu Ubuntu machine (x86_64, 4 cores, 512M), the regression was
-fixed. We measure boot times with 'perf stat --null --repeat 10 $QEMU',
-where $QEMU launches a kernel with init=/bin/true:
-
-1. No lockdep enabled:
-
- Performance counter stats for 'qemu_booting_time.sh bzImage' (10 runs):
-
-       2.756558155 seconds time elapsed                    ( +-  0.09% )
-
-2. Lockdep enabled:
-
- Performance counter stats for 'qemu_booting_time.sh bzImage' (10 runs):
-
-       2.968710420 seconds time elapsed                    ( +-  0.12% )
-
-3. Lockdep enabled + cross-release enabled:
-
- Performance counter stats for 'qemu_booting_time.sh bzImage' (10 runs):
-
-       3.153839636 seconds time elapsed                    ( +-  0.31% )
-
-4. Lockdep enabled + cross-release enabled + this patch applied:
-
- Performance counter stats for 'qemu_booting_time.sh bzImage' (10 runs):
-
-       2.963669551 seconds time elapsed                    ( +-  0.11% )
-
-I.e. lockdep cross-release performance is now indistinguishable from
-vanilla lockdep.
-
-Reported-by: Johan Hovold <johan@kernel.org>
-Suggested-by: Thomas Gleixner <tglx@linutronix.de>
-Signed-off-by: Byungchul Park <byungchul.park@lge.com>
----
- Documentation/admin-guide/kernel-parameters.txt |  3 +++
- kernel/locking/lockdep.c                        | 19 +++++++++++++++++--
- 2 files changed, 20 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index ead7f40..4107b01 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -709,6 +709,9 @@
- 			It will be ignored when crashkernel=X,high is not used
- 			or memory reserved is below 4G.
- 
-+	crossrelease_fullstack
-+			[KNL] Allow to record full stack trace in cross-release
-+
- 	cryptomgr.notests
-                         [KNL] Disable crypto self-tests
- 
-diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
-index e36e652..160b5d6 100644
---- a/kernel/locking/lockdep.c
-+++ b/kernel/locking/lockdep.c
-@@ -76,6 +76,15 @@
- #define lock_stat 0
- #endif
- 
-+static int crossrelease_fullstack;
-+static int __init allow_crossrelease_fullstack(char *str)
-+{
-+	crossrelease_fullstack = 1;
-+	return 0;
-+}
-+
-+early_param("crossrelease_fullstack", allow_crossrelease_fullstack);
-+
- /*
-  * lockdep_lock: protects the lockdep graph, the hashes and the
-  *               class/list/hash allocators.
-@@ -4863,8 +4872,14 @@ static void add_xhlock(struct held_lock *hlock)
- 	xhlock->trace.nr_entries = 0;
- 	xhlock->trace.max_entries = MAX_XHLOCK_TRACE_ENTRIES;
- 	xhlock->trace.entries = xhlock->trace_entries;
--	xhlock->trace.skip = 3;
--	save_stack_trace(&xhlock->trace);
-+
-+	if (crossrelease_fullstack) {
-+		xhlock->trace.skip = 3;
-+		save_stack_trace(&xhlock->trace);
-+	} else {
-+		xhlock->trace.nr_entries = 1;
-+		xhlock->trace.entries[0] = hlock->acquire_ip;
-+	}
- }
- 
- static inline int same_context_xhlock(struct hist_lock *xhlock)
--- 
-1.9.1
+ping
