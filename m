@@ -1,47 +1,31 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.14-rc
-Message-ID: <7b276f5c-fd88-c037-5797-d64411951de5@kernel.dk>
-Date: Thu, 26 Oct 2017 07:37:47 -0700
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <thomas@m3y3r.de>
+Subject: [PATCH] bfq: Fix bool initialization/comparison
+From: Thomas Meyer <thomas@m3y3r.de>
+To: paolo.valente@linaro.org, axboe@kernel.dk, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Message-ID: <1507383097082-1668690714-1-diffsplit-thomas@m3y3r.de>
+References: <1507383097081-778026979-0-diffsplit-thomas@m3y3r.de>
+In-Reply-To: <1507383097081-778026979-0-diffsplit-thomas@m3y3r.de>
+Date: Sat, 07 Oct 2017 16:02:21 +0200
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+Bool initializations should use true and false. Bool tests don't need
+comparisons.
 
-A few select fixes that should go into this series. Mainly for NVMe, but
-also a single stable fix for nbd from Josef.
+Signed-off-by: Thomas Meyer <thomas@m3y3r.de>
+---
 
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-James Smart (3):
-      nvme-fc: fix iowait hang
-      nvme-fc: retry initial controller connections 3 times
-      nvmet: synchronize sqhd update
-
-Jens Axboe (1):
-      Merge branch 'nvme-4.14' of git://git.infradead.org/nvme into for-linus
-
-Josef Bacik (1):
-      nbd: handle interrupted sendmsg with a sndtimeo set
-
-Sagi Grimberg (2):
-      nvme-rdma: Fix possible double free in reconnect flow
-      nvme-rdma: Fix error status return in tagset allocation failure
-
- drivers/block/nbd.c         | 13 +++++++++++--
- drivers/nvme/host/fc.c      | 37 +++++++++++++++++++++++++++++++++----
- drivers/nvme/host/rdma.c    | 16 ++++++++++++----
- drivers/nvme/target/core.c  | 15 ++++++++++++---
- drivers/nvme/target/nvmet.h |  2 +-
- 5 files changed, 69 insertions(+), 14 deletions(-)
-
--- 
-Jens Axboe
+diff -u -p a/block/bfq-iosched.c b/block/bfq-iosched.c
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -4986,7 +4986,7 @@ static ssize_t bfq_low_latency_store(str
+ 
+ 	if (__data > 1)
+ 		__data = 1;
+-	if (__data == 0 && bfqd->low_latency != 0)
++	if (__data == 0 && bfqd->low_latency)
+ 		bfq_end_wr(bfqd);
+ 	bfqd->low_latency = __data;
+ 
