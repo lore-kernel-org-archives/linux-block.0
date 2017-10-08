@@ -1,45 +1,72 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mxhk.zte.com.cn ([63.217.80.70]:65340 "EHLO mxhk.zte.com.cn"
+Received: from server.coly.li ([162.144.45.48]:47284 "EHLO server.coly.li"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755853AbdJJDKe (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 9 Oct 2017 23:10:34 -0400
-From: tang.junhui@zte.com.cn
-To: colyli@suse.de, mlyle@lyle.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        tang.junhui@zte.com.cn
-Subject: [PATCH] bcache: fix race in setting bdev state
-Date: Tue, 10 Oct 2017 11:07:53 +0800
-Message-Id: <1507604873-31352-1-git-send-email-tang.junhui@zte.com.cn>
+        id S1750997AbdJHFI5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 8 Oct 2017 01:08:57 -0400
+Subject: Re: [PATCH v3 2/5] bcache: implement PI controller for writeback rate
+To: Michael Lyle <mlyle@lyle.org>
+Cc: linux-bcache@vger.kernel.org,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20170927174122.30341-1-mlyle@lyle.org>
+ <20170927174122.30341-3-mlyle@lyle.org>
+ <6d3709a2-96a7-100e-a966-eeefc11dfd39@coly.li>
+ <b8d88e54-a6cd-337f-f46b-19109a6d48fb@lyle.org>
+From: Coly Li <i@coly.li>
+Message-ID: <488db429-50f1-2854-73bf-fcca49d1f5b2@coly.li>
+Date: Sun, 8 Oct 2017 13:08:50 +0800
+MIME-Version: 1.0
+In-Reply-To: <b8d88e54-a6cd-337f-f46b-19109a6d48fb@lyle.org>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+On 2017/10/8 下午12:57, Michael Lyle wrote:
+> Coly--
+> 
+> 
+> On 10/07/2017 09:22 PM, Coly Li wrote:
+> [snip]
+>> rate:        488.2M/sec
+>> dirty:        91.7G
+>> target:        152.3G
+>> proportional:    -1.5G
+>> integral:    10.9G
+>> change:        0.0k/sec
+>> next io:    0ms
+> [snip]
+> 
+>> The backing cached device size is 7.2TB, cache device is 1.4TB, block
+>> size is 8kB only. I write 700G (50% of cache device size) dirty data
+>> onto the cache device, and start writeback by echo 1 to
+>> writeback_running file.
+>>
+>> In my test, writeback spent 89 minutes to decrease dirty number from
+>> 700G to 147G (dirty target number is 152G). At this moment writeback
+>> rate was still displayed as 488.2M/sec. And after 22 minutes writeback
+>> rate jumped to 4.0k/sec. During the 22 minutes, (147-15.8=) 131.2G dirty
+>> data written out.
+> 
+> I see it-- if we can write faster than 488MB/sec, we inappropriately
+> clamp the write rate to 488MB/sec-- this is from the old code.  In turn,
+> if we're keeping up at that speed, the integral term can wind up.  I
+> will fix this and clean up a couple related things.
+> 
+>> Is it as expected ?
+> 
+> It is supposed to overshoot the target, but not by this much.
+> 
+> I think the implementation must have changed at some point in the past
+> for bch_ratelimit, because the clamping doesn't match. bch_ratelimit
+> really needs a rewrite for other reasons, but I'll send the minimal fix
+> now.
 
-cached_dev_put() is called before setting and writing bdev to
-BDEV_STATE_CLEAN state, but after calling cached_dev_put(),
-detach work queue works, and bdev is also set to
-BDEV_STATE_NONE state in cached_dev_detach_finish(),
-it may cause race condition, and the state of bdev is uncertain.
+Hi Mike,
 
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
----
- drivers/md/bcache/writeback.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Copied, I will continue my test. And when the new version comes, I will
+run same workload again to confirm.
 
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 69e1ae5..3d134cb 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -436,9 +436,9 @@ static int bch_writeback_thread(void *arg)
- 		if (searched_full_index &&
- 		    RB_EMPTY_ROOT(&dc->writeback_keys.keys)) {
- 			atomic_set(&dc->has_dirty, 0);
--			cached_dev_put(dc);
- 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_CLEAN);
- 			bch_write_bdev_super(dc, NULL);
-+			cached_dev_put(dc);
- 		}
- 
- 		up_write(&dc->writeback_lock);
+Thanks.
+
+
 -- 
-2.8.1.windows.1
+Coly Li
