@@ -1,62 +1,54 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:49065 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932548AbdJMMsB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 08:48:01 -0400
-Received: by mail-wm0-f67.google.com with SMTP id i124so21107809wmf.3
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:48:00 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 56/58] lightnvm: pblk: avoid being reported as hung on rated GC
-Date: Fri, 13 Oct 2017 14:46:45 +0200
-Message-Id: <20171013124647.32668-57-m@bjorling.me>
-In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
-References: <20171013124647.32668-1-m@bjorling.me>
+Received: from mail-qt0-f176.google.com ([209.85.216.176]:48640 "EHLO
+        mail-qt0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753250AbdJHSKJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Oct 2017 14:10:09 -0400
+Received: by mail-qt0-f176.google.com with SMTP id f8so4531107qta.5
+        for <linux-block@vger.kernel.org>; Sun, 08 Oct 2017 11:10:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <C6C056E1-713E-4E3C-910D-5737463C2F95@profihost.ag>
+References: <20171008052520.17068-1-mlyle@lyle.org> <fe817f47-89d6-8543-ded6-7ffa46fd52d0@coly.li>
+ <C6C056E1-713E-4E3C-910D-5737463C2F95@profihost.ag>
+From: Michael Lyle <mlyle@lyle.org>
+Date: Sun, 8 Oct 2017 11:10:07 -0700
+Message-ID: <CAJ+L6qf7W_vjr-X3EKnC5TYMvcXgR357d0Pdu7UZ4f3vGb-Z1w@mail.gmail.com>
+Subject: Re: [PATCH] bcache: writeback rate shouldn't artifically clamp
+To: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
+Cc: Coly Li <i@coly.li>, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Javier González <javier@cnexlabs.com>
+Stefan--
 
-The amount of GC I/O on the write buffer is managed by the rate-limiter,
-which is calculated as a function of the number of available free
-blocks. When reaching the stable point, we risk having scheduled more
-I/Os for GC than are allowed on the write buffer. This would result on
-the GC semaphore balancing the outstanding read GC I/Os to be reported
-as "hung", though the behavior is normal.
+On Sun, Oct 8, 2017 at 12:50 AM, Stefan Priebe - Profihost AG
+<s.priebe@profihost.ag> wrote:
+> Is there a branch with all patches available?
 
-Solve this by allowing to schedule when we detect that the read GC path
-is not moving forward.
+I have a github repository up of linux-next, with commits currently
+being staged for next on top, at https://github.com/mlyle/linux/ .
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/lightnvm/pblk-gc.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+The specific branch contents can be seen at
+https://github.com/mlyle/linux/commits/bcache-for-next ; the contents
+are Coly's current list of patches for inclusion in next staged on top
+of the present version of the next tree.  All the caveats that apply
+to tracking linux-next apply to this branch.
 
-diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-index b8323e3..00d5698 100644
---- a/drivers/lightnvm/pblk-gc.c
-+++ b/drivers/lightnvm/pblk-gc.c
-@@ -218,7 +218,13 @@ static void pblk_gc_line_prepare_ws(struct work_struct *work)
- 	gc_rq_ws->line = line;
- 	gc_rq_ws->priv = gc_rq;
- 
--	down(&gc->gc_sem);
-+	/* The write GC path can be much slower than the read GC one due to
-+	 * the budget imposed by the rate-limiter. Balance in case that we get
-+	 * back pressure from the write GC path.
-+	 */
-+	while (down_timeout(&gc->gc_sem, msecs_to_jiffies(30000)))
-+		io_schedule();
-+
- 	kref_get(&line->ref);
- 
- 	INIT_WORK(&gc_rq_ws->ws, pblk_gc_line_ws);
--- 
-2.9.3
+This branch is ephemeral and used for staging and verification--
+history will be rewritten (I'll rebase it on top of linux-next rather
+than have lots of merge commits).  I'm getting together some
+continuous integration infrastructure to aid automated test and
+verification.
+
+There will probably be other important branches on here.. e.g. a
+"kitchensink" branch that includes all submitted patches, including
+controversial ones / and ones with only light review.  Probably
+sometimes it will make sense to be based on Linus's master, too.  I am
+still figuring out my workflow.
+
+> Stefan
+>
+> Excuse my typo sent from my mobile phone.
+
+Mike
