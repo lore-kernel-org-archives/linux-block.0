@@ -1,182 +1,107 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from server.coly.li ([162.144.45.48]:47164 "EHLO server.coly.li"
+Received: from server.coly.li ([162.144.45.48]:52608 "EHLO server.coly.li"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750892AbdJHEWv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 8 Oct 2017 00:22:51 -0400
-Subject: Re: [PATCH v3 2/5] bcache: implement PI controller for writeback rate
+        id S1751598AbdJIK7l (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 9 Oct 2017 06:59:41 -0400
+Subject: Re: [PATCH v2 1/2] bcache: writeback rate shouldn't artifically clamp
 To: Michael Lyle <mlyle@lyle.org>
-References: <20170927174122.30341-1-mlyle@lyle.org>
- <20170927174122.30341-3-mlyle@lyle.org>
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        colyli@suse.de
+References: <20171009073730.8939-1-mlyle@lyle.org>
+ <20171009073730.8939-2-mlyle@lyle.org>
 From: Coly Li <i@coly.li>
-Cc: linux-bcache@vger.kernel.org,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Message-ID: <6d3709a2-96a7-100e-a966-eeefc11dfd39@coly.li>
-Date: Sun, 8 Oct 2017 12:22:43 +0800
+Message-ID: <e6903153-aae6-b9f0-dea7-73e7b6246908@coly.li>
+Date: Mon, 9 Oct 2017 18:59:34 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170927174122.30341-3-mlyle@lyle.org>
+In-Reply-To: <20171009073730.8939-2-mlyle@lyle.org>
 Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 2017/9/28 上午1:41, Michael Lyle wrote:
-> bcache uses a control system to attempt to keep the amount of dirty data
-> in cache at a user-configured level, while not responding excessively to
-> transients and variations in write rate.  Previously, the system was a
-> PD controller; but the output from it was integrated, turning the
-> Proportional term into an Integral term, and turning the Derivative term
-> into a crude Proportional term.  Performance of the controller has been
-> uneven in production, and it has tended to respond slowly, oscillate,
-> and overshoot.
+On 2017/10/9 下午3:37, Michael Lyle wrote:
+> The previous code artificially limited writeback rate to 1000000
+> blocks/second (NSEC_PER_MSEC), which is a rate that can be met on fast
+> hardware.  The rate limiting code works fine (though with decreased
+> precision) up to 3 orders of magnitude faster, so use NSEC_PER_SEC.
 > 
-> This patch set replaces the current control system with an explicit PI
-> controller and tuning that should be correct for most hardware.  By
-> default, it attempts to write at a rate that would retire 1/40th of the
-> current excess blocks per second.  An integral term in turn works to
-> remove steady state errors.
+> Additionally, ensure that uint32_t is used as a type for rate throughout
+> the rate management so that type checking/clamp_t can work properly.
 > 
-> IMO, this yields benefits in simplicity (removing weighted average
-> filtering, etc) and system performance.
-> 
-> Another small change is a tunable parameter is introduced to allow the
-> user to specify a minimum rate at which dirty blocks are retired.
-> 
-> There is a slight difference from earlier versions of the patch in
-> integral handling to prevent excessive negative integral windup.
+> bch_next_delay should be rewritten for increased precision and better
+> handling of high rates and long sleep periods, but this is adequate for
+> now.
 > 
 > Signed-off-by: Michael Lyle <mlyle@lyle.org>
-> Reviewed-by: Coly Li <colyli@suse.de>
+> Reported-by: Coly Li <colyli@suse.de>
 
+Current maximum rate number is around 488.2M/sec, it could be easily a
+bottleneck for md raid0 deivce with SATA SSD or more hard drives. The
+new maximum rate (476G/sec) should be enough for most of common hardware
+configurations :-)
 
-Hi Mike,
-
-I am testing all the 5 patches these days for the writeback performance.
-I just find when dirty number is much smaller then dirty target,
-writeback rate is still maximum as 488.2M/sec.
-
-Here is part of the output:
-
-rate:		488.2M/sec
-dirty:		91.7G
-target:		152.3G
-proportional:	-1.5G
-integral:	10.9G
-change:		0.0k/sec
-next io:	0ms
-
-
-
-rate:		488.2M/sec
-dirty:		85.3G
-target:		152.3G
-proportional:	-1.6G
-integral:	10.6G
-change:		0.0k/sec
-next io:	-7ms
-
-
-
-rate:		488.2M/sec
-dirty:		79.3G
-target:		152.3G
-proportional:	-1.8G
-integral:	10.1G
-change:		0.0k/sec
-next io:	-26ms
-
-
-
-rate:		488.2M/sec
-dirty:		73.1G
-target:		152.3G
-proportional:	-1.9G
-integral:	9.7G
-change:		0.0k/sec
-next io:	-1ms
-
-
-
-rate:		488.2M/sec
-dirty:		66.9G
-target:		152.3G
-proportional:	-2.1G
-integral:	9.2G
-change:		0.0k/sec
-next io:	-66ms
-
-
-
-rate:		488.2M/sec
-dirty:		61.1G
-target:		152.3G
-proportional:	-2.2G
-integral:	8.7G
-change:		0.0k/sec
-next io:	-6ms
-
-
-
-rate:		488.2M/sec
-dirty:		55.6G
-target:		152.3G
-proportional:	-2.4G
-integral:	8.1G
-change:		0.0k/sec
-next io:	-5ms
-
-
-
-rate:		488.2M/sec
-dirty:		49.4G
-target:		152.3G
-proportional:	-2.5G
-integral:	7.5G
-change:		0.0k/sec
-next io:	0ms
-
-
-
-rate:		488.2M/sec
-dirty:		43.1G
-target:		152.3G
-proportional:	-2.7G
-integral:	7.0G
-change:		0.0k/sec
-next io:	-1ms
-
-
-
-rate:		488.2M/sec
-dirty:		37.3G
-target:		152.3G
-proportional:	-2.8G
-integral:	6.3G
-change:		0.0k/sec
-next io:	-2ms
-
-
-
-rate:		488.2M/sec
-dirty:		31.7G
-target:		152.3G
-proportional:	-3.0G
-integral:	5.6G
-change:		0.0k/sec
-next io:	-17ms
-
-The backing cached device size is 7.2TB, cache device is 1.4TB, block
-size is 8kB only. I write 700G (50% of cache device size) dirty data
-onto the cache device, and start writeback by echo 1 to
-writeback_running file.
-
-In my test, writeback spent 89 minutes to decrease dirty number from
-700G to 147G (dirty target number is 152G). At this moment writeback
-rate was still displayed as 488.2M/sec. And after 22 minutes writeback
-rate jumped to 4.0k/sec. During the 22 minutes, (147-15.8=) 131.2G dirty
-data written out.
-
-Is it as expected ?
+Reviewed-by: Coly Li <colyli@suse.de>
 
 Thanks.
 
--- 
 Coly Li
+> ---
+>  drivers/md/bcache/bcache.h    | 2 +-
+>  drivers/md/bcache/util.h      | 4 ++--
+>  drivers/md/bcache/writeback.c | 7 ++++---
+>  3 files changed, 7 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+> index df0b2ccfca8d..2f9c380c4692 100644
+> --- a/drivers/md/bcache/bcache.h
+> +++ b/drivers/md/bcache/bcache.h
+> @@ -363,7 +363,7 @@ struct cached_dev {
+>  	int64_t			writeback_rate_proportional;
+>  	int64_t			writeback_rate_integral;
+>  	int64_t			writeback_rate_integral_scaled;
+> -	int64_t			writeback_rate_change;
+> +	int32_t			writeback_rate_change;
+>  
+>  	unsigned		writeback_rate_update_seconds;
+>  	unsigned		writeback_rate_i_term_inverse;
+> diff --git a/drivers/md/bcache/util.h b/drivers/md/bcache/util.h
+> index cb8d2ccbb6c6..8f509290bb02 100644
+> --- a/drivers/md/bcache/util.h
+> +++ b/drivers/md/bcache/util.h
+> @@ -441,10 +441,10 @@ struct bch_ratelimit {
+>  	uint64_t		next;
+>  
+>  	/*
+> -	 * Rate at which we want to do work, in units per nanosecond
+> +	 * Rate at which we want to do work, in units per second
+>  	 * The units here correspond to the units passed to bch_next_delay()
+>  	 */
+> -	unsigned		rate;
+> +	uint32_t		rate;
+>  };
+>  
+>  static inline void bch_ratelimit_reset(struct bch_ratelimit *d)
+> diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+> index d63356a60001..42d087b9fb56 100644
+> --- a/drivers/md/bcache/writeback.c
+> +++ b/drivers/md/bcache/writeback.c
+> @@ -52,7 +52,8 @@ static void __update_writeback_rate(struct cached_dev *dc)
+>  	int64_t error = dirty - target;
+>  	int64_t proportional_scaled =
+>  		div_s64(error, dc->writeback_rate_p_term_inverse);
+> -	int64_t integral_scaled, new_rate;
+> +	int64_t integral_scaled;
+> +	uint32_t new_rate;
+>  
+>  	if ((error < 0 && dc->writeback_rate_integral > 0) ||
+>  	    (error > 0 && time_before64(local_clock(),
+> @@ -74,8 +75,8 @@ static void __update_writeback_rate(struct cached_dev *dc)
+>  	integral_scaled = div_s64(dc->writeback_rate_integral,
+>  			dc->writeback_rate_i_term_inverse);
+>  
+> -	new_rate = clamp_t(int64_t, (proportional_scaled + integral_scaled),
+> -			dc->writeback_rate_minimum, NSEC_PER_MSEC);
+> +	new_rate = clamp_t(int32_t, (proportional_scaled + integral_scaled),
+> +			dc->writeback_rate_minimum, NSEC_PER_SEC);
+>  
+>  	dc->writeback_rate_proportional = proportional_scaled;
+>  	dc->writeback_rate_integral_scaled = integral_scaled;
