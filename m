@@ -1,40 +1,24 @@
-Return-Path: <me@tobin.cc>
-From: "Tobin C. Harding" <me@tobin.cc>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "Tobin C. Harding" <me@tobin.cc>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] block: add NULL argument check to bioset_free()
-Date: Mon,  2 Oct 2017 18:06:03 +1100
-Message-Id: <1506927963-27865-1-git-send-email-me@tobin.cc>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v2 0/1] block,bfq: Disable writeback throttling
+To: Luca Miccio <lucmiccio@gmail.com>
+Cc: paolo.valente@linaro.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20171009142721.4262-1-lucmiccio@gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <c2b7d032-7306-ea2b-01b4-d61acf6cf3b4@kernel.dk>
+Date: Mon, 9 Oct 2017 08:29:43 -0600
+MIME-Version: 1.0
+In-Reply-To: <20171009142721.4262-1-lucmiccio@gmail.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Currently bioset_free() will oops if passed a NULL argument. Other
-kernel 'free' functions typically check for NULL arguments and
-return. The rule of least surprise dictates that bioset_free() should
-behave safely even if passed a NULL argument.
+On 10/09/2017 08:27 AM, Luca Miccio wrote:
+> This is the v2 of the previous patch[1]. There are
+> no functional changes. The only difference from v1 to
+> v2 is the fix of the wbt_disable_default's comment,
+> thanks to Lee Tibbert who pointed me out that mistake.
 
-Add NULL argument check to bioset_free().
+Applied, thanks.
 
-Signed-off-by: Tobin C. Harding <me@tobin.cc>
----
-
- block/bio.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/block/bio.c b/block/bio.c
-index b38e962..780aecc 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1925,6 +1925,9 @@ mempool_t *biovec_create_pool(int pool_entries)
- 
- void bioset_free(struct bio_set *bs)
- {
-+	if (unlikely(!bs))
-+		return;
-+
- 	if (bs->rescue_workqueue)
- 		destroy_workqueue(bs->rescue_workqueue);
- 
 -- 
-2.7.4
+Jens Axboe
