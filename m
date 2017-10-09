@@ -1,44 +1,152 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from szxga04-in.huawei.com ([45.249.212.190]:7495 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751280AbdJEN3B (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Oct 2017 09:29:01 -0400
-From: John Garry <john.garry@huawei.com>
-Subject: [Question] on blk_mq_map_queues()
-To: <linux-block@vger.kernel.org>, <axboe@kernel.dk>, <hch@lst.de>,
-        <maxg@mellanox.com>
-CC: Linuxarm <linuxarm@huawei.com>
-Message-ID: <f5280c3c-ffd9-bc3a-7e0b-226c4a1232c9@huawei.com>
-Date: Thu, 5 Oct 2017 14:28:43 +0100
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	lee.tibbert@gmail.com,
+	oleksandr@natalenko.name,
+	angeloruocco90@gmail.com,
+	philm@manjaro.org,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX] block, bfq: fix unbalanced decrements of burst size
+Date: Mon,  9 Oct 2017 13:11:23 +0200
+Message-Id: <20171009111123.2961-2-paolo.valente@linaro.org>
+In-Reply-To: <20171009111123.2961-1-paolo.valente@linaro.org>
+References: <20171009111123.2961-1-paolo.valente@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+List-ID: <linux-block@vger.kernel.org>
 
-Hi All,
+The commit "block, bfq: decrease burst size when queues in burst
+exit" introduced the decrement of burst_size on the removal of a
+bfq_queue from the burst list. Unfortunately, this decrement can
+happen to be performed even when burst size is already equal to 0,
+because of unbalanced decrements. A description follows of the cause
+of these unbalanced decrements, namely a wrong assumption, and of the
+way how this wrong assumption leads to unbalanced decrements.
 
-I have a question on the core-to-hw queue mapping in 
-blk_mq_map_queues(). In looking at the latest version, we map the first 
-$nr_queues cores to separate queues, and then map sibling threaded-cores 
-to the same queue. First off, I am just curious why we always map the 
-first batch of cores to separate queues.
+The wrong assumption is that a bfq_queue can exit only if the process
+associated with the bfq_queue has exited. This is false, because a
+bfq_queue, say Q, may exit also as a consequence of a merge with
+another bfq_queue. In this case, Q exits because the I/O of its
+associated process has been redirected to another bfq_queue.
 
-As I understand for blk mq, we try to map cores which are physically 
-close to the same hw queue (in the case of more cores than hw queues). 
-So, by this rationale, we would not map the first $nr_queues cores to 
-each separate queue, but would rather map core [0, $nr_cores/$nr_queues) 
-to q0, [$nr_cores/$nr_queues, 2*$nr_cores/$nr_queues) to q1, and so on 
-(assuming $nr_queues is evenly divisible into $nr_cores, for simplicity).
+The decrement unbalance occurs because Q may then be re-created after
+a split, and added back to the current burst list, *without*
+incrementing burst_size. burst_size is not incremented because Q is
+not a new bfq_queue added to the burst list, but a bfq_queue only
+temporarily removed from the list, and, before the commit "bfq-sq,
+bfq-mq: decrease burst size when queues in burst exit", burst_size was
+not decremented when Q was removed.
 
-So what is the full desired mapping behaviour?
+This commit addresses this issue by just checking whether the exiting
+bfq_queue is a merged bfq_queue, and, in that case, not decrementing
+burst_size. Unfortunately, this still leaves room for unbalanced
+decrements, in the following rarer case: on a split, the bfq_queue
+happens to be inserted into a different burst list than that it was
+removed from when merged. If this happens, the number of elements in
+the new burst list becomes higher than burst_size (by one). When the
+bfq_queue then exits, it is of course not in a merged state any
+longer, thus burst_size is decremented, which results in an unbalanced
+decrement.  To handle this sporadic, unlucky case in a simple way,
+this commit also checks that burst_size is larger than 0 before
+decrementing it.
 
-The specific problem I see is that for my 64-core system (no 
-hyperthreading) and 16 hw queues, I see cores per 4-core cluster being 
-mapped to different queues, when I would expect them to be mapped to 
-same queue.
+Finally, this commit removes an useless, extra check: the check that
+the bfq_queue is sync, performed before checking whether the bfq_queue
+is in the burst list. This extra check is redundant, because only sync
+bfq_queues can be inserted into the burst list.
 
-I know that we can add our own per-driver mapping function to solve, but 
-I would expect that that generic mapper would cover a generic platform.
+Reported-by: Philip Müller <philm@manjaro.org>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Angelo Ruocco <angeloruocco90@gmail.com>
+Tested-by: Philip Müller <philm@manjaro.org>
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Tested-by: Lee Tibbert <lee.tibbert@gmail.com>
+---
+ block/bfq-iosched.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 57 insertions(+), 2 deletions(-)
 
-Thanks in advance,
-John
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 0d7272a..8689b24 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -3685,9 +3685,36 @@ void bfq_put_queue(struct bfq_queue *bfqq)
+ 	if (bfqq->ref)
+ 		return;
+ 
+-	if (bfq_bfqq_sync(bfqq) && !hlist_unhashed(&bfqq->burst_list_node)) {
++	if (!hlist_unhashed(&bfqq->burst_list_node)) {
+ 		hlist_del_init(&bfqq->burst_list_node);
+-		bfqq->bfqd->burst_size--;
++		/*
++		 * Decrement also burst size after the removal, if the
++		 * process associated with bfqq is exiting, and thus
++		 * does not contribute to the burst any longer. This
++		 * decrement helps filter out false positives of large
++		 * bursts, when some short-lived process (often due to
++		 * the execution of commands by some service) happens
++		 * to start and exit while a complex application is
++		 * starting, and thus spawning several processes that
++		 * do I/O (and that *must not* be treated as a large
++		 * burst, see comments on bfq_handle_burst).
++		 *
++		 * In particular, the decrement is performed only if:
++		 * 1) bfqq is not a merged queue, because, if it is,
++		 * then this free of bfqq is not triggered by the exit
++		 * of the process bfqq is associated with, but exactly
++		 * by the fact that bfqq has just been merged.
++		 * 2) burst_size is greater than 0, to handle
++		 * unbalanced decrements. Unbalanced decrements may
++		 * happen in te following case: bfqq is inserted into
++		 * the current burst list--without incrementing
++		 * bust_size--because of a split, but the current
++		 * burst list is not the burst list bfqq belonged to
++		 * (see comments on the case of a split in
++		 * bfq_set_request).
++		 */
++		if (bfqq->bic && bfqq->bfqd->burst_size > 0)
++			bfqq->bfqd->burst_size--;
+ 	}
+ 
+ 	kmem_cache_free(bfq_pool, bfqq);
+@@ -4418,6 +4445,34 @@ static struct bfq_queue *bfq_get_bfqq_handle_split(struct bfq_data *bfqd,
+ 		else {
+ 			bfq_clear_bfqq_in_large_burst(bfqq);
+ 			if (bic->was_in_burst_list)
++				/*
++				 * If bfqq was in the current
++				 * burst list before being
++				 * merged, then we have to add
++				 * it back. And we do not need
++				 * to increase burst_size, as
++				 * we did not decrement
++				 * burst_size when we removed
++				 * bfqq from the burst list as
++				 * a consequence of a merge
++				 * (see comments in
++				 * bfq_put_queue). In this
++				 * respect, it would be rather
++				 * costly to know whether the
++				 * current burst list is still
++				 * the same burst list from
++				 * which bfqq was removed on
++				 * the merge. To avoid this
++				 * cost, if bfqq was in a
++				 * burst list, then we add
++				 * bfqq to the current burst
++				 * list without any further
++				 * check. This can cause
++				 * inappropriate insertions,
++				 * but rarely enough to not
++				 * harm the detection of large
++				 * bursts significantly.
++				 */
+ 				hlist_add_head(&bfqq->burst_list_node,
+ 					       &bfqd->burst_list);
+ 		}
+-- 
+2.10.0
