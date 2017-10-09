@@ -1,158 +1,79 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:53042 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1758233AbdJMMrd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 08:47:33 -0400
-Received: by mail-wm0-f65.google.com with SMTP id k4so21549977wmc.1
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:32 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 26/58] lightnvm: pblk: refactor read path on GC
-Date: Fri, 13 Oct 2017 14:46:15 +0200
-Message-Id: <20171013124647.32668-27-m@bjorling.me>
-In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
-References: <20171013124647.32668-1-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=44825b072=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	=Oleksandr Natalenko <oleksandr@natalenko.name>,
+	"Luis R . Rodriguez" <mcgrof@kernel.org>,
+	Ming Lei <ming.lei@redhat.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH v7 7/9] ide, scsi: Tell the block layer at request allocation time about preempt requests
+Date: Mon,  9 Oct 2017 16:13:58 -0700
+Message-Id: <20171009231400.562-8-bart.vanassche@wdc.com>
+In-Reply-To: <20171009231400.562-1-bart.vanassche@wdc.com>
+References: <20171009231400.562-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <javier@cnexlabs.com>
+Convert blk_get_request(q, op, __GFP_RECLAIM) into
+blk_get_request_flags(q, op, BLK_MQ_PREEMPT). This patch does not
+change any functionality.
 
-Simplify the part of the garbage collector where data is read from the
-line being recycled and moved into an internal queue before being copied
-to the memory buffer. This allows to get rid of a dedicated function,
-which introduces an unnecessary dependency on the code.
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Acked-by: David S. Miller <davem@davemloft.net> [ for IDE ]
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/lightnvm/pblk-gc.c | 94 +++++++++++++++++++---------------------------
- 1 file changed, 39 insertions(+), 55 deletions(-)
+ drivers/ide/ide-pm.c    | 4 ++--
+ drivers/scsi/scsi_lib.c | 6 +++---
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-index 7ad0cfe..7b103bc 100644
---- a/drivers/lightnvm/pblk-gc.c
-+++ b/drivers/lightnvm/pblk-gc.c
-@@ -56,57 +56,6 @@ static void pblk_gc_writer_kick(struct pblk_gc *gc)
- 	wake_up_process(gc->gc_writer_ts);
- }
- 
--/*
-- * Responsible for managing all memory related to a gc request. Also in case of
-- * failure
-- */
--static int pblk_gc_move_valid_secs(struct pblk *pblk, struct pblk_gc_rq *gc_rq)
--{
--	struct nvm_tgt_dev *dev = pblk->dev;
--	struct nvm_geo *geo = &dev->geo;
--	struct pblk_gc *gc = &pblk->gc;
--	struct pblk_line *line = gc_rq->line;
--	void *data;
--	int ret = 0;
--
--	data = vmalloc(gc_rq->nr_secs * geo->sec_size);
--	if (!data) {
--		ret = -ENOMEM;
--		goto fail;
--	}
--
--	gc_rq->data = data;
--
--	/* Read from GC victim block */
--	ret = pblk_submit_read_gc(pblk, gc_rq);
--	if (ret)
--		goto fail;
--
--	if (!gc_rq->secs_to_gc)
--		goto fail;
--
--retry:
--	spin_lock(&gc->w_lock);
--	if (gc->w_entries >= PBLK_GC_RQ_QD) {
--		spin_unlock(&gc->w_lock);
--		pblk_gc_writer_kick(&pblk->gc);
--		usleep_range(128, 256);
--		goto retry;
--	}
--	gc->w_entries++;
--	list_add_tail(&gc_rq->list, &gc->w_list);
--	spin_unlock(&gc->w_lock);
--
--	pblk_gc_writer_kick(&pblk->gc);
--
--	return 0;
--
--fail:
--	pblk_gc_free_gc_rq(gc_rq);
--	kref_put(&line->ref, pblk_line_put);
--	return ret;
--}
--
- static void pblk_put_line_back(struct pblk *pblk, struct pblk_line *line)
- {
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
-@@ -130,18 +79,53 @@ static void pblk_gc_line_ws(struct work_struct *work)
- 	struct pblk_line_ws *gc_rq_ws = container_of(work,
- 						struct pblk_line_ws, ws);
- 	struct pblk *pblk = gc_rq_ws->pblk;
-+	struct nvm_tgt_dev *dev = pblk->dev;
-+	struct nvm_geo *geo = &dev->geo;
- 	struct pblk_gc *gc = &pblk->gc;
- 	struct pblk_line *line = gc_rq_ws->line;
- 	struct pblk_gc_rq *gc_rq = gc_rq_ws->priv;
-+	int ret;
- 
- 	up(&gc->gc_sem);
- 
--	if (pblk_gc_move_valid_secs(pblk, gc_rq)) {
--		pr_err("pblk: could not GC all sectors: line:%d (%d/%d)\n",
--						line->id, *line->vsc,
--						gc_rq->nr_secs);
-+	gc_rq->data = vmalloc(gc_rq->nr_secs * geo->sec_size);
-+	if (!gc_rq->data) {
-+		pr_err("pblk: could not GC line:%d (%d/%d)\n",
-+					line->id, *line->vsc, gc_rq->nr_secs);
-+		goto out;
+diff --git a/drivers/ide/ide-pm.c b/drivers/ide/ide-pm.c
+index 544f02d673ca..f56d742908df 100644
+--- a/drivers/ide/ide-pm.c
++++ b/drivers/ide/ide-pm.c
+@@ -89,9 +89,9 @@ int generic_ide_resume(struct device *dev)
  	}
  
-+	/* Read from GC victim block */
-+	ret = pblk_submit_read_gc(pblk, gc_rq);
-+	if (ret) {
-+		pr_err("pblk: failed GC read in line:%d (err:%d)\n",
-+								line->id, ret);
-+		goto out;
-+	}
-+
-+	if (!gc_rq->secs_to_gc)
-+		goto out;
-+
-+retry:
-+	spin_lock(&gc->w_lock);
-+	if (gc->w_entries >= PBLK_GC_RQ_QD) {
-+		spin_unlock(&gc->w_lock);
-+		pblk_gc_writer_kick(&pblk->gc);
-+		usleep_range(128, 256);
-+		goto retry;
-+	}
-+	gc->w_entries++;
-+	list_add_tail(&gc_rq->list, &gc->w_list);
-+	spin_unlock(&gc->w_lock);
-+
-+	pblk_gc_writer_kick(&pblk->gc);
-+
-+	kfree(gc_rq_ws);
-+	return;
-+
-+out:
-+	pblk_gc_free_gc_rq(gc_rq);
-+	kref_put(&line->ref, pblk_line_put);
- 	kfree(gc_rq_ws);
- }
+ 	memset(&rqpm, 0, sizeof(rqpm));
+-	rq = blk_get_request(drive->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
++	rq = blk_get_request_flags(drive->queue, REQ_OP_DRV_IN,
++				   BLK_MQ_REQ_PREEMPT);
+ 	ide_req(rq)->type = ATA_PRIV_PM_RESUME;
+-	rq->rq_flags |= RQF_PREEMPT;
+ 	rq->special = &rqpm;
+ 	rqpm.pm_step = IDE_PM_START_RESUME;
+ 	rqpm.pm_state = PM_EVENT_ON;
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 9cf6a80fe297..1c16a247fae6 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -252,9 +252,9 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 	struct scsi_request *rq;
+ 	int ret = DRIVER_ERROR << 24;
  
+-	req = blk_get_request(sdev->request_queue,
++	req = blk_get_request_flags(sdev->request_queue,
+ 			data_direction == DMA_TO_DEVICE ?
+-			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM);
++			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, BLK_MQ_REQ_PREEMPT);
+ 	if (IS_ERR(req))
+ 		return ret;
+ 	rq = scsi_req(req);
+@@ -268,7 +268,7 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 	rq->retries = retries;
+ 	req->timeout = timeout;
+ 	req->cmd_flags |= flags;
+-	req->rq_flags |= rq_flags | RQF_QUIET | RQF_PREEMPT;
++	req->rq_flags |= rq_flags | RQF_QUIET;
+ 
+ 	/*
+ 	 * head injection *required* here otherwise quiesce won't work
 -- 
-2.9.3
+2.14.2
