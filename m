@@ -1,79 +1,62 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:32777 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750892AbdJHFZp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Oct 2017 01:25:45 -0400
-Received: by mail-pf0-f193.google.com with SMTP id m28so20630334pfi.0
-        for <linux-block@vger.kernel.org>; Sat, 07 Oct 2017 22:25:45 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: colyli@suse.de, Michael Lyle <mlyle@lyle.org>
-Subject: [PATCH] bcache: writeback rate shouldn't artifically clamp
-Date: Sat,  7 Oct 2017 22:25:20 -0700
-Message-Id: <20171008052520.17068-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Mon, 9 Oct 2017 12:36:51 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>
+Subject: Re: [PATCH V5 4/7] blk-mq: introduce blk_mq_dequeue_from_ctx()
+Message-ID: <20171009043650.GB19029@ming.t460p>
+References: <20170930102720.30219-1-ming.lei@redhat.com>
+ <20170930102720.30219-5-ming.lei@redhat.com>
+ <20171003090109.GB21184@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171003090109.GB21184@infradead.org>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-The previous code artificially limited writeback rate to 1000000
-blocks/second (NSEC_PER_MSEC), which is a rate that can be met on fast
-hardware.  The rate limiting code works fine (though with decreased
-precision) up to 3 orders of magnitude faster, so use NSEC_PER_SEC.
+On Tue, Oct 03, 2017 at 02:01:09AM -0700, Christoph Hellwig wrote:
+> On Sat, Sep 30, 2017 at 06:27:17PM +0800, Ming Lei wrote:
+> > This function is introduced for dequeuing request
+> > from sw queue so that we can dispatch it in
+> > scheduler's way.
+> > 
+> > More importantly, some SCSI devices may set
+> > q->queue_depth, which is a per-request_queue limit,
+> > and applied on pending I/O from all hctxs. This
+> > function is introduced for avoiding to dequeue too
+> > many requests from sw queue when ->dispatch isn't
+> > flushed completely.
+> 
+> Weird commit log formatting, please use your 70+ chacters to format the
+> text.
 
-Additionally, ensure that uint32_t is used as a type for rate throughout
-the rate management so that type checking/clamp_t can work properly.
+OK.
 
-bch_next_delay should be rewritten for increased precision and better
-handling of high rates and long sleep periods, but this is adequate for
-now.
+> 
+> > @@ -882,6 +882,44 @@ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list)
+> >  }
+> >  EXPORT_SYMBOL_GPL(blk_mq_flush_busy_ctxs);
+> >  
+> > +struct dispatch_rq_data {
+> > +	struct blk_mq_hw_ctx *hctx;
+> > +	struct request *rq;
+> > +};
+> > +
+> > +static bool dispatch_rq_from_ctx(struct sbitmap *sb, unsigned int bitnr, void *data)
+> 
+> Overly long line.
+> 
+> But except for that this looks ok to me except for the fact that you
+> just add an unused function.
 
-Signed-off-by: Michael Lyle <mlyle@lyle.org>
-Reported-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/util.h      | 4 ++--
- drivers/md/bcache/writeback.c | 7 ++++---
- 2 files changed, 6 insertions(+), 5 deletions(-)
+OK
 
-diff --git a/drivers/md/bcache/util.h b/drivers/md/bcache/util.h
-index cb8d2ccbb6c6..8f509290bb02 100644
---- a/drivers/md/bcache/util.h
-+++ b/drivers/md/bcache/util.h
-@@ -441,10 +441,10 @@ struct bch_ratelimit {
- 	uint64_t		next;
- 
- 	/*
--	 * Rate at which we want to do work, in units per nanosecond
-+	 * Rate at which we want to do work, in units per second
- 	 * The units here correspond to the units passed to bch_next_delay()
- 	 */
--	unsigned		rate;
-+	uint32_t		rate;
- };
- 
- static inline void bch_ratelimit_reset(struct bch_ratelimit *d)
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 3f8c4c6bee03..a1608c45bb12 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -46,7 +46,8 @@ static void __update_writeback_rate(struct cached_dev *dc)
- 	int64_t error = dirty - target;
- 	int64_t proportional_scaled =
- 		div_s64(error, dc->writeback_rate_p_term_inverse);
--	int64_t integral_scaled, new_rate;
-+	int64_t integral_scaled;
-+	uint32_t new_rate;
- 
- 	if ((error < 0 && dc->writeback_rate_integral > 0) ||
- 	    time_before64(local_clock(),
-@@ -67,8 +68,8 @@ static void __update_writeback_rate(struct cached_dev *dc)
- 	integral_scaled = div_s64(dc->writeback_rate_integral,
- 			dc->writeback_rate_i_term_inverse);
- 
--	new_rate = clamp_t(int64_t, (proportional_scaled + integral_scaled),
--			dc->writeback_rate_minimum, NSEC_PER_MSEC);
-+	new_rate = clamp_t(uint32_t, (proportional_scaled + integral_scaled),
-+			dc->writeback_rate_minimum, NSEC_PER_SEC);
- 
- 	dc->writeback_rate_proportional = proportional_scaled;
- 	dc->writeback_rate_integral_scaled = integral_scaled;
 -- 
-2.11.0
+Ming
