@@ -1,29 +1,125 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Tue, 10 Oct 2017 09:22:14 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+Return-Path: <prvs=44825b072=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
 	"Martin K . Petersen" <martin.petersen@oracle.com>,
 	=Oleksandr Natalenko <oleksandr@natalenko.name>,
 	"Luis R . Rodriguez" <mcgrof@kernel.org>,
-	Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.com>
-Subject: Re: [PATCH v7 4/9] block: Make q_usage_counter also track legacy
- requests
-Message-ID: <20171010072214.2ls7xl5wz3idmqkw@linux-x5ow.site>
+	Ming Lei <ming.lei@redhat.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH v7 4/9] block: Make q_usage_counter also track legacy requests
+Date: Mon,  9 Oct 2017 16:13:55 -0700
+Message-Id: <20171009231400.562-5-bart.vanassche@wdc.com>
+In-Reply-To: <20171009231400.562-1-bart.vanassche@wdc.com>
 References: <20171009231400.562-1-bart.vanassche@wdc.com>
- <20171009231400.562-5-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20171009231400.562-5-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+From: Ming Lei <ming.lei@redhat.com>
+
+This patch makes it possible to pause request allocation for
+the legacy block layer by calling blk_mq_freeze_queue() and
+blk_mq_unfreeze_queue().
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+[ bvanassche: Combined two patches into one, edited a comment and made sure
+  REQ_NOWAIT is handled properly in blk_old_get_request() ]
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ block/blk-core.c | 12 ++++++++++++
+ block/blk-mq.c   | 10 ++--------
+ 2 files changed, 14 insertions(+), 8 deletions(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 14f7674fa0b1..265a69511c47 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -610,6 +610,9 @@ void blk_set_queue_dying(struct request_queue *q)
+ 		}
+ 		spin_unlock_irq(q->queue_lock);
+ 	}
++
++	/* Make blk_queue_enter() reexamine the DYING flag. */
++	wake_up_all(&q->mq_freeze_wq);
+ }
+ EXPORT_SYMBOL_GPL(blk_set_queue_dying);
+ 
+@@ -1395,16 +1398,22 @@ static struct request *blk_old_get_request(struct request_queue *q,
+ 					   unsigned int op, gfp_t gfp_mask)
+ {
+ 	struct request *rq;
++	int ret = 0;
+ 
+ 	WARN_ON_ONCE(q->mq_ops);
+ 
+ 	/* create ioc upfront */
+ 	create_io_context(gfp_mask, q->node);
+ 
++	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM) ||
++			      (op & REQ_NOWAIT));
++	if (ret)
++		return ERR_PTR(ret);
+ 	spin_lock_irq(q->queue_lock);
+ 	rq = get_request(q, op, NULL, gfp_mask);
+ 	if (IS_ERR(rq)) {
+ 		spin_unlock_irq(q->queue_lock);
++		blk_queue_exit(q);
+ 		return rq;
+ 	}
+ 
+@@ -1576,6 +1585,7 @@ void __blk_put_request(struct request_queue *q, struct request *req)
+ 		blk_free_request(rl, req);
+ 		freed_request(rl, sync, rq_flags);
+ 		blk_put_rl(rl);
++		blk_queue_exit(q);
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(__blk_put_request);
+@@ -1857,8 +1867,10 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
+ 	 * Grab a free request. This is might sleep but can not fail.
+ 	 * Returns with the queue unlocked.
+ 	 */
++	blk_queue_enter_live(q);
+ 	req = get_request(q, bio->bi_opf, bio, GFP_NOIO);
+ 	if (IS_ERR(req)) {
++		blk_queue_exit(q);
+ 		__wbt_done(q->rq_wb, wb_acct);
+ 		if (PTR_ERR(req) == -ENOMEM)
+ 			bio->bi_status = BLK_STS_RESOURCE;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 076cbab9c3e0..8766587ae8b8 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -125,7 +125,8 @@ void blk_freeze_queue_start(struct request_queue *q)
+ 	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
+ 	if (freeze_depth == 1) {
+ 		percpu_ref_kill(&q->q_usage_counter);
+-		blk_mq_run_hw_queues(q, false);
++		if (q->mq_ops)
++			blk_mq_run_hw_queues(q, false);
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
+@@ -255,13 +256,6 @@ void blk_mq_wake_waiters(struct request_queue *q)
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		if (blk_mq_hw_queue_mapped(hctx))
+ 			blk_mq_tag_wakeup_all(hctx->tags, true);
+-
+-	/*
+-	 * If we are called because the queue has now been marked as
+-	 * dying, we need to ensure that processes currently waiting on
+-	 * the queue are notified as well.
+-	 */
+-	wake_up_all(&q->mq_freeze_wq);
+ }
+ 
+ bool blk_mq_can_queue(struct blk_mq_hw_ctx *hctx)
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.14.2
