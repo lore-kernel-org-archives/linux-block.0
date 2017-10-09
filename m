@@ -1,24 +1,65 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH v2 0/1] block,bfq: Disable writeback throttling
-To: Luca Miccio <lucmiccio@gmail.com>
-Cc: paolo.valente@linaro.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20171009142721.4262-1-lucmiccio@gmail.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <c2b7d032-7306-ea2b-01b4-d61acf6cf3b4@kernel.dk>
-Date: Mon, 9 Oct 2017 08:29:43 -0600
-MIME-Version: 1.0
+Return-Path: <lucmiccio@gmail.com>
+Return-Path: <lucmiccio@gmail.com>
+From: Luca Miccio <lucmiccio@gmail.com>
+To: axboe@kernel.dk
+Cc: paolo.valente@linaro.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH V2 1/1] block,bfq: Disable writeback throttling
+Date: Mon,  9 Oct 2017 16:27:21 +0200
+Message-Id: <20171009142721.4262-2-lucmiccio@gmail.com>
 In-Reply-To: <20171009142721.4262-1-lucmiccio@gmail.com>
-Content-Type: text/plain; charset=utf-8
+References: <20171009142721.4262-1-lucmiccio@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/09/2017 08:27 AM, Luca Miccio wrote:
-> This is the v2 of the previous patch[1]. There are
-> no functional changes. The only difference from v1 to
-> v2 is the fix of the wbt_disable_default's comment,
-> thanks to Lee Tibbert who pointed me out that mistake.
+Similarly to CFQ, BFQ has its write-throttling heuristics, and it
+is better not to combine them with further write-throttling
+heuristics of a different nature.
+So this commit disables write-back throttling for a device if BFQ
+is used as I/O scheduler for that device.
 
-Applied, thanks.
+Signed-off-by: Luca Miccio <lucmiccio@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Tested-by: Lee Tibbert <lee.tibbert@gmail.com>
+---
+ block/bfq-iosched.c | 3 ++-
+ block/blk-wbt.c     | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index a4783da90ba8..0f860cf0d56d 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -108,6 +108,7 @@
+ #include "blk-mq-tag.h"
+ #include "blk-mq-sched.h"
+ #include "bfq-iosched.h"
++#include "blk-wbt.h"
+ 
+ #define BFQ_BFQQ_FNS(name)						\
+ void bfq_mark_bfqq_##name(struct bfq_queue *bfqq)			\
+@@ -4775,7 +4776,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+ 	bfq_init_root_group(bfqd->root_group, bfqd);
+ 	bfq_init_entity(&bfqd->oom_bfqq.entity, bfqd->root_group);
+ 
+-
++	wbt_disable_default(q);
+ 	return 0;
+ 
+ out_free:
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 6a9a0f03a67b..e59d59c11ebb 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -654,7 +654,7 @@ void wbt_set_write_cache(struct rq_wb *rwb, bool write_cache_on)
+ }
+ 
+ /*
+- * Disable wbt, if enabled by default. Only called from CFQ.
++ * Disable wbt, if enabled by default.
+  */
+ void wbt_disable_default(struct request_queue *q)
+ {
 -- 
-Jens Axboe
+2.11.0
