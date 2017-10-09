@@ -1,73 +1,38 @@
-Return-Path: <elena.reshetova@intel.com>
-From: Elena Reshetova <elena.reshetova@intel.com>
-To: axboe@kernel.dk
-Cc: james.bottomley@hansenpartnership.com,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	peterz@infradead.org,
-	gregkh@linuxfoundation.org,
-	fujita.tomonori@lab.ntt.co.jp,
-	mingo@redhat.com,
-	clm@fb.com,
-	jbacik@fb.com,
-	dsterba@suse.com,
-	keescook@chromium.org,
-	Elena Reshetova <elena.reshetova@intel.com>
-Subject: [PATCH 0/6] v4 block refcount conversion patches
-Date: Fri, 20 Oct 2017 11:15:56 +0300
-Message-Id: <1508487362-26663-1-git-send-email-elena.reshetova@intel.com>
+Return-Path: <kyle.fortin@oracle.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: [PATCH] block: remove unnecessary NULL checks in bioset_integrity_free()
+From: Kyle Fortin <kyle.fortin@oracle.com>
+In-Reply-To: <20171006222629.GA30627@debian>
+Date: Mon, 9 Oct 2017 14:34:18 -0400
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, alexander.levin@one.verizon.com
+Message-Id: <F0FE45F7-5B2F-4028-A38A-865A58FE8529@oracle.com>
+References: <20171005180920.GA121296@debian> <a1d52c34-6d06-1142-0d3e-2604e15ed993@kernel.dk> <20171006222629.GA30627@debian>
+To: Tim Hansen <devtimhansen@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Changes in v4:
- - Improved commit messages and signoff info.
- - Rebase on top of linux-next as of yesterday.
- - WARN_ONs are restored since x86 refcount_t does not WARN on zero
+On Oct 6, 2017, at 6:26 PM, Tim Hansen <devtimhansen@gmail.com> wrote:
+> On Fri, Oct 06, 2017 at 01:04:25PM -0600, Jens Axboe wrote:
+>> On 10/05/2017 12:09 PM, Tim Hansen wrote:
+>>> mempool_destroy() already checks for a NULL value being passed in, =
+this eliminates duplicate checks.
+>>>=20
+>>> This was caught by running make coccicheck M=3Dblock/ on linus' tree =
+on commit 77ede3a014a32746002f7889211f0cecf4803163 (current head as of =
+this patch).
+>>=20
+>> Applied, but I had to fix up your commit message. Please line wrap at
+>> 72 chars, otherwise it turns into an unreadable mess when people
+>> try to view them.
+>>=20
+>> --=20
+>> Jens Axboe
+>>=20
+>=20
+> Noted! Thanks for the heads up on the char limit.
 
-Changes in v3:
-No changes in patches apart from trivial rebases, but now by
-default refcount_t = atomic_t and uses all atomic standard operations
-unless CONFIG_REFCOUNT_FULL is enabled. This is a compromize for the
-systems that are critical on performance and cannot accept even
-slight delay on the refcounter operations.
+scripts/checkpatch.pl would have caught it too
 
-Changes in v2:
-Not needed WARNs are removed since refcount_t warns by itself.
-BUG_ONs are left as it is, since refcount_t doesn't bug by default.
-
-This series, for block subsystem, replaces atomic_t reference
-counters with the new refcount_t type and API (see include/linux/refcount.h).
-By doing this we prevent intentional or accidental
-underflows or overflows that can lead to use-after-free vulnerabilities.
-
-The patches are fully independent and can be cherry-picked separately.
-If there are no objections to the patches, please merge them via respective trees.
-
-Elena Reshetova (6):
-  block: convert bio.__bi_cnt from atomic_t to refcount_t
-  block: convert blk_queue_tag.refcnt from atomic_t to refcount_t
-  block: convert blkcg_gq.refcnt from atomic_t to refcount_t
-  block: convert io_context.active_ref from atomic_t to refcount_t
-  block: convert bsg_device.ref_count from atomic_t to refcount_t
-  drivers, block: convert xen_blkif.refcnt from atomic_t to refcount_t
-
- block/bfq-iosched.c                |  2 +-
- block/bio.c                        |  6 +++---
- block/blk-cgroup.c                 |  2 +-
- block/blk-ioc.c                    |  4 ++--
- block/blk-tag.c                    |  8 ++++----
- block/bsg.c                        |  9 +++++----
- block/cfq-iosched.c                |  4 ++--
- drivers/block/xen-blkback/common.h |  7 ++++---
- drivers/block/xen-blkback/xenbus.c |  2 +-
- fs/btrfs/volumes.c                 |  2 +-
- include/linux/bio.h                |  4 ++--
- include/linux/blk-cgroup.h         | 11 ++++++-----
- include/linux/blk_types.h          |  3 ++-
- include/linux/blkdev.h             |  3 ++-
- include/linux/iocontext.h          |  7 ++++---
- 15 files changed, 40 insertions(+), 34 deletions(-)
-
--- 
-2.7.4
+--
+Kyle Fortin - Oracle Linux Engineering
