@@ -1,114 +1,67 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Tue, 10 Oct 2017 08:09:20 +1100
-From: Dave Chinner <david@fromorbit.com>
+Date: Mon, 9 Oct 2017 11:14:49 -0400
+From: Theodore Ts'o <tytso@mit.edu>
 To: Josef Bacik <josef@toxicpanda.com>
-Cc: linux-fsdevel@vger.kernel.org, kernel-team@fb.com,
-        linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+Cc: Dave Chinner <david@fromorbit.com>, linux-fsdevel@vger.kernel.org,
+        kernel-team@fb.com, linux-btrfs@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [ANNOUNCE] fsperf: a simple fs/block performance testing
  framework
-Message-ID: <20171009210920.GO3666@dastard>
+Message-ID: <20171009151449.u2j57ifaoqke3hx2@thunk.org>
 References: <20171006210956.vf326sydjiphsefo@destiny>
  <20171009005137.GA3666@dastard>
  <20171009022509.rz6goq3sec5ppxrr@destiny>
- <20171009051731.GK3666@dastard>
- <20171009130050.ufnmdhslc53bwpgc@destiny>
+ <20171009034335.pwehn4kz3cwjy6o7@thunk.org>
+ <20171009125415.wrfd5rp5zlf4qsgm@destiny>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171009130050.ufnmdhslc53bwpgc@destiny>
+In-Reply-To: <20171009125415.wrfd5rp5zlf4qsgm@destiny>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Oct 09, 2017 at 09:00:51AM -0400, Josef Bacik wrote:
-> On Mon, Oct 09, 2017 at 04:17:31PM +1100, Dave Chinner wrote:
-> > On Sun, Oct 08, 2017 at 10:25:10PM -0400, Josef Bacik wrote:
-> > > > Integrating into fstests means it will be immediately available to
-> > > > all fs developers, it'll run on everything that everyone already has
-> > > > setup for filesystem testing, and it will have familiar mkfs/mount
-> > > > option setup behaviour so there's no new hoops for everyone to jump
-> > > > through to run it...
-> > > > 
-> > > 
-> > > TBF I specifically made it as easy as possible because I know we all hate trying
-> > > to learn new shit.
-> > 
-> > Yeah, it's also hard to get people to change their workflows to add
-> > a whole new test harness into them. It's easy if it's just a new
-> > command to an existing workflow :P
-> > 
+On Mon, Oct 09, 2017 at 08:54:16AM -0400, Josef Bacik wrote:
+> I purposefully used as little as possible, just json and sqlite, and I tried to
+> use as little python3 isms as possible.  Any rpm based systems should have these
+> libraries already installed, I agree that using any of the PyPI stuff is a pain
+> and is a non-starter for me as I want to make it as easy as possible to get
+> running.
 > 
-> Agreed, so if you probably won't run this outside of fstests then I'll add it to
-> xfstests.  I envision this tool as being run by maintainers to verify their pull
-> requests haven't regressed since the last set of patches, as well as by anybody
-> trying to fix performance problems.  So it's way more important to me that you,
-> Ted, and all the various btrfs maintainers will run it than anybody else.
-> 
-> > > I figured this was different enough to warrant a separate
-> > > project, especially since I'm going to add block device jobs so Jens can test
-> > > block layer things.  If we all agree we'd rather see this in fstests then I'm
-> > > happy to do that too.  Thanks,
-> > 
-> > I'm not fussed either way - it's a good discussion to have, though.
-> > 
-> > If I want to add tests (e.g. my time-honoured fsmark tests), where
-> > should I send patches?
-> > 
-> 
-> I beat you to that!  I wanted to avoid adding fs_mark to the suite because it
-> means parsing another different set of outputs, so I added a new ioengine to fio
-> for this
-> 
-> http://www.spinics.net/lists/fio/msg06367.html
-> 
-> and added a fio job to do 500k files
-> 
-> https://github.com/josefbacik/fsperf/blob/master/tests/500kemptyfiles.fio
-> 
-> The test is disabled by default for now because obviously the fio support hasn't
-> landed yet.
+> Where do you fall on the including it in xfstests question?  I expect that the
+> perf stuff would be run more as maintainers put their pull requests together to
+> make sure things haven't regressed.  To that end I was going to wire up
+> xfstests-bld to run this as well.  Whatever you and Dave prefer is what I'll do,
+> I'll use it wherever it ends up so you two are the ones that get to decide.
 
-That seems .... misguided. fio is good, but it's not a universal
-solution.
+I'm currently using Python 2.7 mainly because the LTM subsystem in
+gce-xfstests was implemented using that version of Python, and my
+initial efforts to port it to Python 3 were... not smooth.  (Because
+it was doing authentication, I got bit by the Python 2 vs Python 3
+"bytes vs. strings vs. unicode" transition especially hard.)
 
-> I'd _like_ to expand fio for cases we come up with that aren't possible, as
-> there's already a ton of measurements that are taken, especially around
-> latencies.
+So I'm going to be annoyed by needing to package Python 2.7 and Python
+3.5 in my test VM's, but I can deal, and this will probably be the
+forcing function for me to figure out how make that jump.  To be
+honest, the bigger issue I'm going to have to figure out is how to
+manage the state in the sqlite database across disposable VM's running
+in parallel.  And the assumption being made with having a static
+sqllite database on a test machine is that the hardware capabilities
+of the are static, and that's not true with a VM, whether it's running
+via Qemu or in some cloud environment.
 
-To be properly useful it needs to support more than just fio to run
-tests. Indeed, it's largely useless to me if that's all it can do or
-it's a major pain to add support for different tools like fsmark.
+I'm not going to care that much about Python 3 not being available on
+enterprise distro's, but I could see that being annoying for some
+folks.  I'll let them worry about that.
 
-e.g.  my typical perf regression test that you see the concurrnet
-fsmark create workload is actually a lot more. It does:
+The main thing I think we'll need to worry about once we let Python
+into xfstests is to be pretty careful about specifying what version of
+Python the scripts need to be portable against (Python 3.3?  3.4?
+3.5?) and what versions of python packages get imported.
 
-	fsmark to create 50m zero length files
-	umount,
-	run parallel xfs_repair (excellent mmap_sem/page fault punisher)
-	mount
-	run parallel find -ctime (readdir + lookup traversal)
-	unmount, mount
-	run parallel ls -R (readdir + dtype traversal)
-	unmount, mount
-	parallel rm -rf of 50m files
+The bottom line is that I'm personally supportive of adding Python and
+fsperf to xfstests.  We just need to be careful about the portability
+concerns, not just now, but any time we check in new Python code.  And
+having some documented Python style guidelines, and adding unit tests
+so we can notice potential portability breakages would be a good idea.
 
-I have variants that use small 4k files or large files rather than
-empty files, taht use different fsync patterns to stress the
-log, use grep -R to traverse the data as well as
-the directory/inode structure instead of find, etc.
-
-> That said I'm not opposed to throwing new stuff in there, it just
-> means we have to add stuff to parse the output and store it in the database in a
-> consistent way, which seems like more of a pain than just making fio do what we
-> need it to.  Thanks,
-
-fio is not going to be able to replace the sort of perf tests I run
-from week to week. If that's all it's going to do then it's not
-directly useful to me...
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+	      	   	    	     - Ted
