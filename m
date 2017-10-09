@@ -1,224 +1,83 @@
-Return-Path: <BATV+e774f35f755d74bf45df+5174+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
+Return-Path: <prvs=44825b072=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 11/17] nvme: get rid of nvme_ctrl_list
-Date: Mon, 23 Oct 2017 16:51:20 +0200
-Message-Id: <20171023145126.2471-12-hch@lst.de>
-In-Reply-To: <20171023145126.2471-1-hch@lst.de>
-References: <20171023145126.2471-1-hch@lst.de>
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	=Oleksandr Natalenko <oleksandr@natalenko.name>,
+	"Luis R . Rodriguez" <mcgrof@kernel.org>,
+	Ming Lei <ming.lei@redhat.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH v7 6/9] block: Introduce BLK_MQ_REQ_PREEMPT
+Date: Mon,  9 Oct 2017 16:13:57 -0700
+Message-Id: <20171009231400.562-7-bart.vanassche@wdc.com>
+In-Reply-To: <20171009231400.562-1-bart.vanassche@wdc.com>
+References: <20171009231400.562-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Use the core chrdev code to set up the link between the character device
-and the nvme controller.  This allows us to get rid of the global list
-of all controllers, and also ensures that we have both a reference to
-the controller and the transport module before the open method of the
-character device is called.
+Set RQF_PREEMPT if BLK_MQ_REQ_PREEMPT is passed to
+blk_get_request_flags().
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Sagi Grimberg <sgi@grimberg.me>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/nvme/host/core.c | 76 ++++++++++--------------------------------------
- drivers/nvme/host/nvme.h |  3 +-
- 2 files changed, 18 insertions(+), 61 deletions(-)
+ block/blk-core.c       | 4 +++-
+ block/blk-mq.c         | 2 ++
+ include/linux/blk-mq.h | 1 +
+ 3 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 3a97daa163f6..a56a1e0432e7 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -52,9 +52,6 @@ static u8 nvme_max_retries = 5;
- module_param_named(max_retries, nvme_max_retries, byte, 0644);
- MODULE_PARM_DESC(max_retries, "max number of retries a command may have");
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 03156d9ede94..842e67e0b7ab 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1260,6 +1260,8 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
+ 	blk_rq_set_rl(rq, rl);
+ 	rq->cmd_flags = op;
+ 	rq->rq_flags = rq_flags;
++	if (flags & BLK_MQ_REQ_PREEMPT)
++		rq->rq_flags |= RQF_PREEMPT;
  
--static int nvme_char_major;
--module_param(nvme_char_major, int, 0);
--
- static unsigned long default_ps_max_latency_us = 100000;
- module_param(default_ps_max_latency_us, ulong, 0644);
- MODULE_PARM_DESC(default_ps_max_latency_us,
-@@ -71,11 +68,8 @@ MODULE_PARM_DESC(streams, "turn on support for Streams write directives");
- struct workqueue_struct *nvme_wq;
- EXPORT_SYMBOL_GPL(nvme_wq);
+ 	/* init elvpriv */
+ 	if (rq_flags & RQF_ELVPRIV) {
+@@ -1441,7 +1443,7 @@ struct request *blk_get_request_flags(struct request_queue *q, unsigned int op,
+ 	struct request *req;
  
--static LIST_HEAD(nvme_ctrl_list);
--static DEFINE_SPINLOCK(dev_list_lock);
--
- static DEFINE_IDA(nvme_instance_ida);
--
-+static dev_t nvme_chr_devt;
- static struct class *nvme_class;
+ 	WARN_ON_ONCE(op & REQ_NOWAIT);
+-	WARN_ON_ONCE(flags & ~BLK_MQ_REQ_NOWAIT);
++	WARN_ON_ONCE(flags & ~(BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_PREEMPT));
  
- static __le32 nvme_get_log_dw10(u8 lid, size_t size)
-@@ -1031,20 +1025,12 @@ static int nvme_open(struct block_device *bdev, fmode_t mode)
- 
- 	if (!kref_get_unless_zero(&ns->kref))
- 		return -ENXIO;
--	if (!try_module_get(ns->ctrl->ops->module)) {
--		kref_put(&ns->kref, nvme_free_ns);
--		return -ENXIO;
--	}
--
- 	return 0;
- }
- 
- static void nvme_release(struct gendisk *disk, fmode_t mode)
- {
--	struct nvme_ns *ns = disk->private_data;
--
--	module_put(ns->ctrl->ops->module);
--	nvme_put_ns(ns);
-+	nvme_put_ns(disk->private_data);
- }
- 
- static int nvme_getgeo(struct block_device *bdev, struct hd_geometry *geo)
-@@ -1902,33 +1888,12 @@ EXPORT_SYMBOL_GPL(nvme_init_identify);
- 
- static int nvme_dev_open(struct inode *inode, struct file *file)
- {
--	struct nvme_ctrl *ctrl;
--	int instance = iminor(inode);
--	int ret = -ENODEV;
--
--	spin_lock(&dev_list_lock);
--	list_for_each_entry(ctrl, &nvme_ctrl_list, node) {
--		if (ctrl->instance != instance)
--			continue;
--
--		if (!ctrl->admin_q) {
--			ret = -EWOULDBLOCK;
--			break;
--		}
--		if (!kobject_get_unless_zero(&ctrl->device->kobj))
--			break;
--		file->private_data = ctrl;
--		ret = 0;
--		break;
--	}
--	spin_unlock(&dev_list_lock);
--
--	return ret;
--}
-+	struct nvme_ctrl *ctrl =
-+		container_of(inode->i_cdev, struct nvme_ctrl, cdev);
- 
--static int nvme_dev_release(struct inode *inode, struct file *file)
--{
--	nvme_put_ctrl(file->private_data);
-+	if (!ctrl->admin_q)
-+		return -EWOULDBLOCK;
-+	file->private_data = ctrl;
- 	return 0;
- }
- 
-@@ -1992,7 +1957,6 @@ static long nvme_dev_ioctl(struct file *file, unsigned int cmd,
- static const struct file_operations nvme_dev_fops = {
- 	.owner		= THIS_MODULE,
- 	.open		= nvme_dev_open,
--	.release	= nvme_dev_release,
- 	.unlocked_ioctl	= nvme_dev_ioctl,
- 	.compat_ioctl	= nvme_dev_ioctl,
+ 	if (q->mq_ops) {
+ 		req = blk_mq_alloc_request(q, op, flags);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 8766587ae8b8..bdbfe760bda0 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -290,6 +290,8 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	rq->q = data->q;
+ 	rq->mq_ctx = data->ctx;
+ 	rq->cmd_flags = op;
++	if (data->flags & BLK_MQ_REQ_PREEMPT)
++		rq->rq_flags |= RQF_PREEMPT;
+ 	if (blk_queue_io_stat(data->q))
+ 		rq->rq_flags |= RQF_IO_STAT;
+ 	/* do not touch atomic flags, it needs atomic ops against the timer */
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 50c6485cb04f..ee9fc3fb7fca 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -200,6 +200,7 @@ enum {
+ 	BLK_MQ_REQ_NOWAIT	= (1 << 0), /* return when out of requests */
+ 	BLK_MQ_REQ_RESERVED	= (1 << 1), /* allocate from reserved pool */
+ 	BLK_MQ_REQ_INTERNAL	= (1 << 2), /* allocate internal/sched tag */
++	BLK_MQ_REQ_PREEMPT	= (1 << 3), /* set RQF_PREEMPT */
  };
-@@ -2703,11 +2667,7 @@ EXPORT_SYMBOL_GPL(nvme_start_ctrl);
  
- void nvme_uninit_ctrl(struct nvme_ctrl *ctrl)
- {
--	device_del(ctrl->device);
--
--	spin_lock(&dev_list_lock);
--	list_del(&ctrl->node);
--	spin_unlock(&dev_list_lock);
-+	cdev_device_del(&ctrl->cdev, ctrl->device);
- }
- EXPORT_SYMBOL_GPL(nvme_uninit_ctrl);
- 
-@@ -2750,7 +2710,7 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
- 
- 	device_initialize(&ctrl->ctrl_device);
- 	ctrl->device = &ctrl->ctrl_device;
--	ctrl->device->devt = MKDEV(nvme_char_major, ctrl->instance);
-+	ctrl->device->devt = MKDEV(MAJOR(nvme_chr_devt), ctrl->instance);
- 	ctrl->device->class = nvme_class;
- 	ctrl->device->parent = ctrl->dev;
- 	ctrl->device->groups = nvme_dev_attr_groups;
-@@ -2759,16 +2719,15 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
- 	ret = dev_set_name(ctrl->device, "nvme%d", ctrl->instance);
- 	if (ret)
- 		goto out_release_instance;
--	ret = device_add(ctrl->device);
-+
-+	cdev_init(&ctrl->cdev, &nvme_dev_fops);
-+	ctrl->cdev.owner = ops->module;
-+	ret = cdev_device_add(&ctrl->cdev, ctrl->device);
- 	if (ret)
- 		goto out_free_name;
- 
- 	ida_init(&ctrl->ns_ida);
- 
--	spin_lock(&dev_list_lock);
--	list_add_tail(&ctrl->node, &nvme_ctrl_list);
--	spin_unlock(&dev_list_lock);
--
- 	/*
- 	 * Initialize latency tolerance controls.  The sysfs files won't
- 	 * be visible to userspace unless the device actually supports APST.
-@@ -2909,12 +2868,9 @@ int __init nvme_core_init(void)
- 	if (!nvme_wq)
- 		return -ENOMEM;
- 
--	result = __register_chrdev(nvme_char_major, 0, NVME_MINORS, "nvme",
--							&nvme_dev_fops);
-+	result = alloc_chrdev_region(&nvme_chr_devt, 0, NVME_MINORS, "nvme");
- 	if (result < 0)
- 		goto destroy_wq;
--	else if (result > 0)
--		nvme_char_major = result;
- 
- 	nvme_class = class_create(THIS_MODULE, "nvme");
- 	if (IS_ERR(nvme_class)) {
-@@ -2925,7 +2881,7 @@ int __init nvme_core_init(void)
- 	return 0;
- 
- unregister_chrdev:
--	__unregister_chrdev(nvme_char_major, 0, NVME_MINORS, "nvme");
-+	unregister_chrdev_region(nvme_chr_devt, NVME_MINORS);
- destroy_wq:
- 	destroy_workqueue(nvme_wq);
- 	return result;
-@@ -2934,7 +2890,7 @@ int __init nvme_core_init(void)
- void nvme_core_exit(void)
- {
- 	class_destroy(nvme_class);
--	__unregister_chrdev(nvme_char_major, 0, NVME_MINORS, "nvme");
-+	unregister_chrdev_region(nvme_chr_devt, NVME_MINORS);
- 	destroy_workqueue(nvme_wq);
- }
- 
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index ae60d8342e60..1bb2bc165e54 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -15,6 +15,7 @@
- #define _NVME_H
- 
- #include <linux/nvme.h>
-+#include <linux/cdev.h>
- #include <linux/pci.h>
- #include <linux/kref.h>
- #include <linux/blk-mq.h>
-@@ -134,7 +135,7 @@ struct nvme_ctrl {
- 	struct mutex namespaces_mutex;
- 	struct device ctrl_device;
- 	struct device *device;	/* char device */
--	struct list_head node;
-+	struct cdev cdev;
- 	struct ida ns_ida;
- 	struct work_struct reset_work;
- 
+ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
 -- 
 2.14.2
