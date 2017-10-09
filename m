@@ -1,72 +1,210 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f44.google.com ([74.125.82.44]:56175 "EHLO
-        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752952AbdJFJTO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Oct 2017 05:19:14 -0400
-Received: by mail-wm0-f44.google.com with SMTP id u138so6656401wmu.4
-        for <linux-block@vger.kernel.org>; Fri, 06 Oct 2017 02:19:14 -0700 (PDT)
-From: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
-Content-Type: multipart/signed;
- boundary="Apple-Mail=_EC8FC98A-2CCC-4AB7-B29C-6DD121BAA665";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Why removing REQ_FAILFAST_DRIVER in LightNVM?
-Message-Id: <216FF7C0-4B2A-438A-BC63-88A9BBDC77CC@lightnvm.io>
-Date: Fri, 6 Oct 2017 11:19:09 +0200
-Cc: =?utf-8?Q?Matias_Bj=C3=B8rling?= <m@bjorling.me>,
-        linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+Date: Mon, 9 Oct 2017 11:14:15 +0200
+From: Jan Kara <jack@suse.cz>
 To: Christoph Hellwig <hch@infradead.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Cc: Kees Cook <keescook@chromium.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-kernel@vger.kernel.org, Michal Hocko <mhocko@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>, Jan Kara <jack@suse.cz>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Vladimir Davydov <vdavydov.dev@gmail.com>,
+	Matthew Wilcox <mawilcox@microsoft.com>,
+	Jeff Layton <jlayton@redhat.com>, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH v2] block/laptop_mode: Convert timers to use timer_setup()
+Message-ID: <20171009091415.GD17917@quack2.suse.cz>
+References: <20171005231623.GA109154@beast>
+ <20171006082020.GA12192@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171006082020.GA12192@infradead.org>
+List-ID: <linux-block@vger.kernel.org>
 
+On Fri 06-10-17 01:20:20, Christoph Hellwig wrote:
+> From 77881bd72b5fb1219fc74625b0380930f9c580df Mon Sep 17 00:00:00 2001
+> From: Christoph Hellwig <hch@lst.de>
+> Date: Fri, 6 Oct 2017 10:18:53 +0200
+> Subject: mm: move all laptop_mode handling to backing-dev.c
+> 
+> It isn't block-device specific and oddly spread over multiple files
+> at the moment:
+> 
+> TODO: audit that the unregistration changes are fine
 
---Apple-Mail=_EC8FC98A-2CCC-4AB7-B29C-6DD121BAA665
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain;
-	charset=us-ascii
+Yeah, I'm a bit concerned about those. You cleanup the timer in
+bdi_unregister() which pairs with bdi_register(). However you don't have to
+call bdi_register() (and thus consequently call bdi_unregister() on
+device shutdown) in order to do IO to a device. bdi_register() is only
+needed to setup flusher threads and similar stuff. Also
+laptop_io_completion(), which arms the timer, is called when any IO request
+is completed again independently of BDI registration / unregistration.
 
-Hi Christoph,
+But maybe we could just make laptop_io_completion() not arm the timer for
+unregistered BDIs (calling wakeup_flusher_threads_bdi() won't have any
+effect anyway) and then cleaning up the timer in bdi_unregister() would be
+a safe thing to do?
 
-I'm cleaning up lightnvm.c to use as much as possible the nvme helpers.
-
-I see that in Commit: d49187e97e94 "nvme: introduce struct nvme_request"
-
-you introduced:
-  rq->cmd_flags &= ~REQ_FAILFAST_DRIVER
-
-on the lightnvm I/O path and that has propagated through the code as we
-added more functionality. Can you explain why this is necessary? If I
-can just remove it, it is much easier to do the cleanup.
-
-I have tested on or HW and all works fine without it.
-
-Thanks,
-Javier
-
-
---Apple-Mail=_EC8FC98A-2CCC-4AB7-B29C-6DD121BAA665
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEm1mT7zen+vs9+T8kYx8FO3WZGMoFAlnXSo0ACgkQYx8FO3WZ
-GMrkVxAA5EZzKjjuqasdIqzjK41v/DH6dSSzEfvyi0jiDjW6lDL4q3ahwlAnbMVz
-k64kYknRFK38XNfW1dirxxIuF+J0jmJqO6NEGtTRNOmyTgbyQ/dhIpA5jvxhf9PV
-ednjGk3S0hK3aMMOM7MigKvrQ3/RD0VDvcuU+2SSS+d8UX3KGKu8OoIf3uQ9k/1/
-mJWMIgRVBvsEuJem/quMryEIOAxL3B1roCXrqO9gIkniX0yKw4XibYTTl+/utoF5
-PfNyQgBp2oXySGXIxCA++z4lBUHsigYeVafu6fYv+J52MTqMakmjImWQsPefmkAT
-smwh+SFHx0oewwXnajzYC5j6LTg2Gy70BmiGVMFzn6bKUcxhFLi1jOoHfkXNMRj7
-jCr+T/jmfWK22G9ygncAK8gi0u6/ik96s52GQuYPKsZKalRBWu3uUNvkhlAWozp7
-q5S15/+7RcSsbEf4xRZQjOjNzUbx2J/9xoEFlron7w7So2hpqJCOj+Bnhj6VEZa4
-nVxUlJy9oMxJGUuTFnLy4vSQuaAJxKBliJ16rKb9jBTwzEEGIivvK8YMXTmnp/+A
-EaBDPTlac9hKcVfpgTGa6ASSyJNbgxzqZv1iwP3TDuPt/hv2uP+uecAjRSi8WxYw
-Z4Bco0X20Mp9Q010F6vFJQt/yg3LkBiZt2b6FdDTT54GWGOzEPw=
-=itA5
------END PGP SIGNATURE-----
-
---Apple-Mail=_EC8FC98A-2CCC-4AB7-B29C-6DD121BAA665--
+								Honza
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-core.c          |  3 ---
+>  include/linux/writeback.h |  6 ------
+>  mm/backing-dev.c          | 36 ++++++++++++++++++++++++++++++++++++
+>  mm/page-writeback.c       | 36 ------------------------------------
+>  4 files changed, 36 insertions(+), 45 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 14f7674fa0b1..f5f916b28c40 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -662,7 +662,6 @@ void blk_cleanup_queue(struct request_queue *q)
+>  	blk_flush_integrity();
+>  
+>  	/* @q won't process any more request, flush async actions */
+> -	del_timer_sync(&q->backing_dev_info->laptop_mode_wb_timer);
+>  	blk_sync_queue(q);
+>  
+>  	if (q->mq_ops)
+> @@ -841,8 +840,6 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
+>  	q->backing_dev_info->name = "block";
+>  	q->node = node_id;
+>  
+> -	setup_timer(&q->backing_dev_info->laptop_mode_wb_timer,
+> -		    laptop_mode_timer_fn, (unsigned long) q);
+>  	setup_timer(&q->timeout, blk_rq_timed_out_timer, (unsigned long) q);
+>  	INIT_LIST_HEAD(&q->queue_head);
+>  	INIT_LIST_HEAD(&q->timeout_list);
+> diff --git a/include/linux/writeback.h b/include/linux/writeback.h
+> index 9c0091678af4..e6ba35a5e1f7 100644
+> --- a/include/linux/writeback.h
+> +++ b/include/linux/writeback.h
+> @@ -327,14 +327,8 @@ static inline void cgroup_writeback_umount(void)
+>  /*
+>   * mm/page-writeback.c
+>   */
+> -#ifdef CONFIG_BLOCK
+>  void laptop_io_completion(struct backing_dev_info *info);
+>  void laptop_sync_completion(void);
+> -void laptop_mode_sync(struct work_struct *work);
+> -void laptop_mode_timer_fn(unsigned long data);
+> -#else
+> -static inline void laptop_sync_completion(void) { }
+> -#endif
+>  bool node_dirty_ok(struct pglist_data *pgdat);
+>  int wb_domain_init(struct wb_domain *dom, gfp_t gfp);
+>  #ifdef CONFIG_CGROUP_WRITEBACK
+> diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+> index e19606bb41a0..cb36f07f2af2 100644
+> --- a/mm/backing-dev.c
+> +++ b/mm/backing-dev.c
+> @@ -822,6 +822,38 @@ static void cgwb_remove_from_bdi_list(struct bdi_writeback *wb)
+>  
+>  #endif	/* CONFIG_CGROUP_WRITEBACK */
+>  
+> +static void laptop_mode_timer_fn(unsigned long data)
+> +{
+> +	struct backing_dev_info *bdi = (struct backing_dev_info *)data;
+> +
+> +	wakeup_flusher_threads_bdi(bdi, WB_REASON_LAPTOP_TIMER);
+> +}
+> +
+> +/*
+> + * We've spun up the disk and we're in laptop mode: schedule writeback
+> + * of all dirty data a few seconds from now.  If the flush is already scheduled
+> + * then push it back - the user is still using the disk.
+> + */
+> +void laptop_io_completion(struct backing_dev_info *bdi)
+> +{
+> +	mod_timer(&bdi->laptop_mode_wb_timer, jiffies + laptop_mode);
+> +}
+> +
+> +/*
+> + * We're in laptop mode and we've just synced. The sync's writes will have
+> + * caused another writeback to be scheduled by laptop_io_completion.
+> + * Nothing needs to be written back anymore, so we unschedule the writeback.
+> + */
+> +void laptop_sync_completion(void)
+> +{
+> +	struct backing_dev_info *bdi;
+> +
+> +	rcu_read_lock();
+> +	list_for_each_entry_rcu(bdi, &bdi_list, bdi_list)
+> +		del_timer(&bdi->laptop_mode_wb_timer);
+> +	rcu_read_unlock();
+> +}
+> +
+>  static int bdi_init(struct backing_dev_info *bdi)
+>  {
+>  	int ret;
+> @@ -835,6 +867,8 @@ static int bdi_init(struct backing_dev_info *bdi)
+>  	INIT_LIST_HEAD(&bdi->bdi_list);
+>  	INIT_LIST_HEAD(&bdi->wb_list);
+>  	init_waitqueue_head(&bdi->wb_waitq);
+> +	setup_timer(&bdi->laptop_mode_wb_timer,
+> +		    laptop_mode_timer_fn, (unsigned long)bdi);
+>  
+>  	ret = cgwb_bdi_init(bdi);
+>  
+> @@ -916,6 +950,8 @@ EXPORT_SYMBOL(bdi_register_owner);
+>   */
+>  static void bdi_remove_from_list(struct backing_dev_info *bdi)
+>  {
+> +	del_timer_sync(&bdi->laptop_mode_wb_timer);
+> +
+>  	spin_lock_bh(&bdi_lock);
+>  	list_del_rcu(&bdi->bdi_list);
+>  	spin_unlock_bh(&bdi_lock);
+> diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+> index 8d1fc593bce8..f8fe90dc529d 100644
+> --- a/mm/page-writeback.c
+> +++ b/mm/page-writeback.c
+> @@ -1976,42 +1976,6 @@ int dirty_writeback_centisecs_handler(struct ctl_table *table, int write,
+>  	return 0;
+>  }
+>  
+> -#ifdef CONFIG_BLOCK
+> -void laptop_mode_timer_fn(unsigned long data)
+> -{
+> -	struct request_queue *q = (struct request_queue *)data;
+> -
+> -	wakeup_flusher_threads_bdi(q->backing_dev_info, WB_REASON_LAPTOP_TIMER);
+> -}
+> -
+> -/*
+> - * We've spun up the disk and we're in laptop mode: schedule writeback
+> - * of all dirty data a few seconds from now.  If the flush is already scheduled
+> - * then push it back - the user is still using the disk.
+> - */
+> -void laptop_io_completion(struct backing_dev_info *info)
+> -{
+> -	mod_timer(&info->laptop_mode_wb_timer, jiffies + laptop_mode);
+> -}
+> -
+> -/*
+> - * We're in laptop mode and we've just synced. The sync's writes will have
+> - * caused another writeback to be scheduled by laptop_io_completion.
+> - * Nothing needs to be written back anymore, so we unschedule the writeback.
+> - */
+> -void laptop_sync_completion(void)
+> -{
+> -	struct backing_dev_info *bdi;
+> -
+> -	rcu_read_lock();
+> -
+> -	list_for_each_entry_rcu(bdi, &bdi_list, bdi_list)
+> -		del_timer(&bdi->laptop_mode_wb_timer);
+> -
+> -	rcu_read_unlock();
+> -}
+> -#endif
+> -
+>  /*
+>   * If ratelimit_pages is too high then we can get into dirty-data overload
+>   * if a large number of processes all perform writes at the same time.
+> -- 
+> 2.14.1
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
