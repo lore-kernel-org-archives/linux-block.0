@@ -1,99 +1,199 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from outbound-smtp10.blacknight.com ([46.22.139.15]:59303 "EHLO
-        outbound-smtp10.blacknight.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1750828AbdJIKCP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 9 Oct 2017 06:02:15 -0400
-Received: from mail.blacknight.com (pemlinmail06.blacknight.ie [81.17.255.152])
-        by outbound-smtp10.blacknight.com (Postfix) with ESMTPS id 5E9621C2763
-        for <linux-block@vger.kernel.org>; Mon,  9 Oct 2017 11:02:14 +0100 (IST)
-Date: Mon, 9 Oct 2017 11:02:13 +0100
-From: Mel Gorman <mgorman@techsingularity.net>
-To: Paolo Valente <paolo.valente@linaro.org>
+Received: from mail-wm0-f41.google.com ([74.125.82.41]:53384 "EHLO
+        mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751738AbdJIJjR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Oct 2017 05:39:17 -0400
+Received: by mail-wm0-f41.google.com with SMTP id q132so21648509wmd.2
+        for <linux-block@vger.kernel.org>; Mon, 09 Oct 2017 02:39:17 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: fio-based responsiveness test for MMTests
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <20171009084513.gkk5s3iag463s5sq@techsingularity.net>
+Date: Mon, 9 Oct 2017 11:39:13 +0200
 Cc: linux-block <linux-block@vger.kernel.org>,
         DANIELE TOSCHI <187580@studenti.unimore.it>,
         Ulf Hansson <ulf.hansson@linaro.org>,
         Linus Walleij <linus.walleij@linaro.org>,
         Mark Brown <broonie@linaro.org>
-Subject: Re: fio-based responsiveness test for MMTests
-Message-ID: <20171009100213.lyhqmjk4ipu64b7n@techsingularity.net>
-References: <A89EA513-DC34-4096-B20D-2AB5B2C2B695@linaro.org>
- <20171009084513.gkk5s3iag463s5sq@techsingularity.net>
- <58BD1F31-627A-4789-8878-CFFBDB383642@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-In-Reply-To: <58BD1F31-627A-4789-8878-CFFBDB383642@linaro.org>
+Message-Id: <58BD1F31-627A-4789-8878-CFFBDB383642@linaro.org>
+References: <A89EA513-DC34-4096-B20D-2AB5B2C2B695@linaro.org> <20171009084513.gkk5s3iag463s5sq@techsingularity.net>
+To: Mel Gorman <mgorman@techsingularity.net>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, Oct 09, 2017 at 11:39:13AM +0200, Paolo Valente wrote:
-> > Also agreed. However, in general I only rely on those fio configurations to
-> > detect major problems in the IO scheduler. There are too many boot-to-boot
-> > variances in the throughput and iops figures to make accurate conclusions
-> > on the headline figures. For the most part, if I'm looking at those
-> > configurations then I'm looking at the iostats to see if there are anomalies
-> > in await times, queue sizes, merges, major starvations etc.
-> > 
-> 
-> Ok, probably this is the piece of information that I stretched too much,
-> looking at it through my "responsiveness glasses".
-> 
 
-Completely understandable. We all have our biases :)
+> Il giorno 09 ott 2017, alle ore 10:45, Mel Gorman =
+<mgorman@techsingularity.net> ha scritto:
+>=20
+> On Fri, Oct 06, 2017 at 06:42:24PM +0200, Paolo Valente wrote:
+>> Hi Mel,
+>> I have been thinking of our (sub)discussion, in [1], on possible =
+tests
+>> to measure responsiveness.
+>>=20
+>> First let me sum up that discuss in terms of the two main facts that
+>> we highlighted.
+>>=20
+>> On one side,
+>> - it is actually possible to measure the start-up time of some =
+popular
+>> applications automatically and precisely (my claim),
+>=20
+> Agreed, albeit my understanding that this is mainly due to using =
+manual
+> testing, looking at the screen and a stopwatch.
+>=20
+>> - but to accomplish such a task one needs a desktop environment, =
+which
+>> is not available and/or not so easy to handle on a battery of
+>> server-like test machines;
+>>=20
+>=20
+> Also agreed and it's not something that scales. It's highly subjective
+> although I'm aware of anecdotal evidence that the desktop experience =
+is
+> indeed better than CFQ.
+>=20
+>> On the other side,
+>> - you did perform some tests to estimate responsiveness,
+>=20
+> Not exactly. For the most part I was concerned with server-class =
+workloads
+> in general and not responsiveness in particular or application startup
+> times. If nothing else, there is often a tradeoff between response =
+times
+> for a particular IO request and overall throughpug and it's a balance. =
+The
+> mail you initially linked quoted results from a database simulator and
+> the initialisation step for it. The initialisation step is a very =
+basic
+> IO pattern and so regressions there are a concern under the heading of
+> "if the basics are broken then the complex case probably is too".
+>=20
 
-> > However, I'm not aware of a reliable
-> > synthetic representation of such workloads. I also am not aware of a
-> > synthetic methodology that can simulate both the IO pattern itself, the
-> > think time of the application and crucially link the "think time" to when
-> > IO is initiated but it's also been a long time since I looked.
-> 
-> That's exactly the contribution I would like to provide.  In the past
-> 10 years, we have analyzed probably thousands of traces of workloads
-> generated exactly by applications starting.
-> 
-> > About the
-> > closest I had in the past was generating patterns like you suggest and then
-> > timing how long it took an X window to appear once an application started
-> > and this was years ago. The effort was abandoned because the time for the
-> > window to appear was irrelevant. What mattered was how long it took the
-> > application to be ready for use. Evolution was a particular example that
-> > eventually caused me to abandon the effort (that and IO performance was not
-> > my primary concern at the time). Evolution displaed a window relatively
-> > quickly but then had a tendency to freeze while opening inboxes which I
-> > didn't find a means of automatically detecting that would scale.
-> > 
-> 
-> I do remember this concern of yours.  My reply was mainly that,
-> unfortunately, you looked at one of the most difficult (if ever
-> possible) applications to benchmark automatically. Fortunately, there
-> are other, as popular applications, which are naturally suitable to
-> automatic measurement of their start-up time.  The simplest and
-> probably most popular example is any terminal: it stops doing I/O
-> right after its window is displayed, i.e., right after it is ready for
-> user input.  To be more precise, the amount of I/O the terminal still
-> does after its window appears is below 1% of the total amount of I/O
-> it does from the beginning of its startup.  Another popular and very
-> easy to benchmark application is libreoffice.
-> 
-> For these applications, we have a detailed database of their I/O:
-> size, position and inter-arrival time (thinktime) of every I/O
-> request, measured on different storage devices and CPU/memory
-> platforms.
-> 
-> The idea is then to write a set of tests in which (some of) these
-> workloads are replayed, together with varying, additional background
-> workloads.  The total time needed to serve each workload under test
-> will be equal to the start-up time, in exactly the same conditions, of
-> the application it mimics, except for a very low tolerance.  We will
-> write this information in the documentation of the test.
-> 
-> If you have no further concerns, we will get back in touch when we
-> have something ready.
-> 
+ok, see my reply to your next point
 
-I have no further concerns. What you propose is ambitious but it would
-be extremely valuable if it existed.
+> Very broadly speaking, I'd be more than happy if the performance of =
+such
+> workloads was within a reasonable percentage of CFQ and classify the =
+rest
+> as a tradeoff, particularly if disabling low_latency is enough to get
+> performance within the noise.
+>=20
+>> - but the workloads for which you measured latency, namely the I/O
+>> generated by a set of independent random readers, is rather too =
+simple
+>> to be able to model the much more complex workloads generated by any
+>> non-trivial application while starting.  The latter, in fact, spawns
+>> or wakes up a set of processes that synchronize among each other, and
+>> that do I/O that varies over time, ranging from sequential to random
+>> with large block sizes.  In addition, not only the number of =
+processes
+>> doing I/O, but also the total amount of I/O varies greatly with the
+>> type of the application.
+>=20
+> Also agreed. However, in general I only rely on those fio =
+configurations to
+> detect major problems in the IO scheduler. There are too many =
+boot-to-boot
+> variances in the throughput and iops figures to make accurate =
+conclusions
+> on the headline figures. For the most part, if I'm looking at those
+> configurations then I'm looking at the iostats to see if there are =
+anomalies
+> in await times, queue sizes, merges, major starvations etc.
+>=20
 
--- 
-Mel Gorman
-SUSE Labs
+Ok, probably this is the piece of information that I stretched too much,
+looking at it through my "responsiveness glasses".
+
+>> In view of these contrasting facts, here is my proposal to have a
+>> feasible yet accurate responsiveness test in your MMTests suite: add =
+a
+>> synthetic test like yours, i.e., in which the workload is generated
+>> using fio, but in which appropriate workloads are generated to mimic
+>> real application-start-up workloads.  In more detail, in which
+>> appropriate classes of workloads are generated, with each class
+>> modeling, in any of the above respect (locality of I/O, number of
+>> processes, total amount of I/O, ...), a popular type of application.
+>> I think/hope should be able to build these workloads accurately, =
+after
+>> years of analysis of traces of the I/O generated by applications =
+while
+>> starting.  Or, in any case, we can then discuss the workloads I would
+>> propose.
+>>=20
+>> What do you think?
+>>=20
+>=20
+> If it can be done then sure.
+
+Great!
+
+> However, I'm not aware of a reliable
+> synthetic representation of such workloads. I also am not aware of a
+> synthetic methodology that can simulate both the IO pattern itself, =
+the
+> think time of the application and crucially link the "think time" to =
+when
+> IO is initiated but it's also been a long time since I looked.
+
+That's exactly the contribution I would like to provide.  In the past
+10 years, we have analyzed probably thousands of traces of workloads
+generated exactly by applications starting.
+
+> About the
+> closest I had in the past was generating patterns like you suggest and =
+then
+> timing how long it took an X window to appear once an application =
+started
+> and this was years ago. The effort was abandoned because the time for =
+the
+> window to appear was irrelevant. What mattered was how long it took =
+the
+> application to be ready for use. Evolution was a particular example =
+that
+> eventually caused me to abandon the effort (that and IO performance =
+was not
+> my primary concern at the time). Evolution displaed a window =
+relatively
+> quickly but then had a tendency to freeze while opening inboxes which =
+I
+> didn't find a means of automatically detecting that would scale.
+>=20
+
+I do remember this concern of yours.  My reply was mainly that,
+unfortunately, you looked at one of the most difficult (if ever
+possible) applications to benchmark automatically.  Fortunately, there
+are other, as popular applications, which are naturally suitable to
+automatic measurement of their start-up time.  The simplest and
+probably most popular example is any terminal: it stops doing I/O
+right after its window is displayed, i.e., right after it is ready for
+user input.  To be more precise, the amount of I/O the terminal still
+does after its window appears is below 1% of the total amount of I/O
+it does from the beginning of its startup.  Another popular and very
+easy to benchmark application is libreoffice.
+
+For these applications, we have a detailed database of their I/O:
+size, position and inter-arrival time (thinktime) of every I/O
+request, measured on different storage devices and CPU/memory
+platforms.
+
+The idea is then to write a set of tests in which (some of) these
+workloads are replayed, together with varying, additional background
+workloads.  The total time needed to serve each workload under test
+will be equal to the start-up time, in exactly the same conditions, of
+the application it mimics, except for a very low tolerance.  We will
+write this information in the documentation of the test.
+
+If you have no further concerns, we will get back in touch when we
+have something ready.
+
+Thanks,
+Paolo
+
+
+> --=20
+> Mel Gorman
+> SUSE Labs
