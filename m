@@ -1,230 +1,186 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:53101 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1758284AbdJMMrs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 08:47:48 -0400
-Received: by mail-wm0-f67.google.com with SMTP id k4so21552158wmc.1
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:47 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Rakesh Pandit <rakesh@tuxera.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 42/58] lightnvm: remove stale extern and unused exported symbols
-Date: Fri, 13 Oct 2017 14:46:31 +0200
-Message-Id: <20171013124647.32668-43-m@bjorling.me>
-In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
-References: <20171013124647.32668-1-m@bjorling.me>
+Received: from aserp1040.oracle.com ([141.146.126.69]:48189 "EHLO
+        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751184AbdJITEL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Oct 2017 15:04:11 -0400
+Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
+        by aserp1040.oracle.com (Sentrion-MTA-4.3.2/Sentrion-MTA-4.3.2) with ESMTP id v99J4ACi021897
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+        for <linux-block@vger.kernel.org>; Mon, 9 Oct 2017 19:04:10 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id v99J49AD014030
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+        for <linux-block@vger.kernel.org>; Mon, 9 Oct 2017 19:04:10 GMT
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id v99J49up032082
+        for <linux-block@vger.kernel.org>; Mon, 9 Oct 2017 19:04:09 GMT
+Date: Mon, 9 Oct 2017 12:02:34 -0600
+From: Liu Bo <bo.li.liu@oracle.com>
+To: linux-block@vger.kernel.org
+Subject: Re: [PATCH] Btrfs: avoid losing data raid profile when deleting a
+ device
+Message-ID: <20171009180234.GA16478@dhcp-10-211-47-181.usdhcp.oraclecorp.com>
+Reply-To: bo.li.liu@oracle.com
+References: <20171009173809.11982-1-bo.li.liu@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171009173809.11982-1-bo.li.liu@oracle.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Rakesh Pandit <rakesh@tuxera.com>
+Please ignore this, I put the wrong ML.
 
-Not all exported symbols are being used outside core and there were
-some stale entries in lightnvm.h
+Thanks,
 
-Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/lightnvm/core.c  | 129 +++++++++++++++++++++++------------------------
- include/linux/lightnvm.h |   7 ---
- 2 files changed, 64 insertions(+), 72 deletions(-)
+-liubo
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 231c928..0e5f772 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -226,6 +226,24 @@ static const struct block_device_operations nvm_fops = {
- 	.owner		= THIS_MODULE,
- };
- 
-+static struct nvm_tgt_type *nvm_find_target_type(const char *name, int lock)
-+{
-+	struct nvm_tgt_type *tmp, *tt = NULL;
-+
-+	if (lock)
-+		down_write(&nvm_tgtt_lock);
-+
-+	list_for_each_entry(tmp, &nvm_tgt_types, list)
-+		if (!strcmp(name, tmp->name)) {
-+			tt = tmp;
-+			break;
-+		}
-+
-+	if (lock)
-+		up_write(&nvm_tgtt_lock);
-+	return tt;
-+}
-+
- static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- {
- 	struct nvm_ioctl_create_simple *s = &create->conf.s;
-@@ -549,25 +567,6 @@ void nvm_part_to_tgt(struct nvm_dev *dev, sector_t *entries,
- }
- EXPORT_SYMBOL(nvm_part_to_tgt);
- 
--struct nvm_tgt_type *nvm_find_target_type(const char *name, int lock)
--{
--	struct nvm_tgt_type *tmp, *tt = NULL;
--
--	if (lock)
--		down_write(&nvm_tgtt_lock);
--
--	list_for_each_entry(tmp, &nvm_tgt_types, list)
--		if (!strcmp(name, tmp->name)) {
--			tt = tmp;
--			break;
--		}
--
--	if (lock)
--		up_write(&nvm_tgtt_lock);
--	return tt;
--}
--EXPORT_SYMBOL(nvm_find_target_type);
--
- int nvm_register_tgt_type(struct nvm_tgt_type *tt)
- {
- 	int ret = 0;
-@@ -619,6 +618,52 @@ static struct nvm_dev *nvm_find_nvm_dev(const char *name)
- 	return NULL;
- }
- 
-+static int nvm_set_rqd_ppalist(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd,
-+			const struct ppa_addr *ppas, int nr_ppas)
-+{
-+	struct nvm_dev *dev = tgt_dev->parent;
-+	struct nvm_geo *geo = &tgt_dev->geo;
-+	int i, plane_cnt, pl_idx;
-+	struct ppa_addr ppa;
-+
-+	if (geo->plane_mode == NVM_PLANE_SINGLE && nr_ppas == 1) {
-+		rqd->nr_ppas = nr_ppas;
-+		rqd->ppa_addr = ppas[0];
-+
-+		return 0;
-+	}
-+
-+	rqd->nr_ppas = nr_ppas;
-+	rqd->ppa_list = nvm_dev_dma_alloc(dev, GFP_KERNEL, &rqd->dma_ppa_list);
-+	if (!rqd->ppa_list) {
-+		pr_err("nvm: failed to allocate dma memory\n");
-+		return -ENOMEM;
-+	}
-+
-+	plane_cnt = geo->plane_mode;
-+	rqd->nr_ppas *= plane_cnt;
-+
-+	for (i = 0; i < nr_ppas; i++) {
-+		for (pl_idx = 0; pl_idx < plane_cnt; pl_idx++) {
-+			ppa = ppas[i];
-+			ppa.g.pl = pl_idx;
-+			rqd->ppa_list[(pl_idx * nr_ppas) + i] = ppa;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static void nvm_free_rqd_ppalist(struct nvm_tgt_dev *tgt_dev,
-+			struct nvm_rq *rqd)
-+{
-+	if (!rqd->ppa_list)
-+		return;
-+
-+	nvm_dev_dma_free(tgt_dev->parent, rqd->ppa_list, rqd->dma_ppa_list);
-+}
-+
-+
- int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas,
- 		       int nr_ppas, int type)
- {
-@@ -792,52 +837,6 @@ void nvm_put_area(struct nvm_tgt_dev *tgt_dev, sector_t begin)
- }
- EXPORT_SYMBOL(nvm_put_area);
- 
--int nvm_set_rqd_ppalist(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd,
--			const struct ppa_addr *ppas, int nr_ppas)
--{
--	struct nvm_dev *dev = tgt_dev->parent;
--	struct nvm_geo *geo = &tgt_dev->geo;
--	int i, plane_cnt, pl_idx;
--	struct ppa_addr ppa;
--
--	if (geo->plane_mode == NVM_PLANE_SINGLE && nr_ppas == 1) {
--		rqd->nr_ppas = nr_ppas;
--		rqd->ppa_addr = ppas[0];
--
--		return 0;
--	}
--
--	rqd->nr_ppas = nr_ppas;
--	rqd->ppa_list = nvm_dev_dma_alloc(dev, GFP_KERNEL, &rqd->dma_ppa_list);
--	if (!rqd->ppa_list) {
--		pr_err("nvm: failed to allocate dma memory\n");
--		return -ENOMEM;
--	}
--
--	plane_cnt = geo->plane_mode;
--	rqd->nr_ppas *= plane_cnt;
--
--	for (i = 0; i < nr_ppas; i++) {
--		for (pl_idx = 0; pl_idx < plane_cnt; pl_idx++) {
--			ppa = ppas[i];
--			ppa.g.pl = pl_idx;
--			rqd->ppa_list[(pl_idx * nr_ppas) + i] = ppa;
--		}
--	}
--
--	return 0;
--}
--EXPORT_SYMBOL(nvm_set_rqd_ppalist);
--
--void nvm_free_rqd_ppalist(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
--{
--	if (!rqd->ppa_list)
--		return;
--
--	nvm_dev_dma_free(tgt_dev->parent, rqd->ppa_list, rqd->dma_ppa_list);
--}
--EXPORT_SYMBOL(nvm_free_rqd_ppalist);
--
- void nvm_end_io(struct nvm_rq *rqd)
- {
- 	struct nvm_tgt_dev *tgt_dev = rqd->dev;
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 32ec35b..4f0e4a0 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -463,8 +463,6 @@ struct nvm_tgt_type {
- 	struct module *owner;
- };
- 
--extern struct nvm_tgt_type *nvm_find_target_type(const char *, int);
--
- extern int nvm_register_tgt_type(struct nvm_tgt_type *);
- extern void nvm_unregister_tgt_type(struct nvm_tgt_type *);
- 
-@@ -480,9 +478,6 @@ extern int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr *,
- extern int nvm_max_phys_sects(struct nvm_tgt_dev *);
- extern int nvm_submit_io(struct nvm_tgt_dev *, struct nvm_rq *);
- extern int nvm_erase_sync(struct nvm_tgt_dev *, struct ppa_addr *, int);
--extern int nvm_set_rqd_ppalist(struct nvm_tgt_dev *, struct nvm_rq *,
--					const struct ppa_addr *, int);
--extern void nvm_free_rqd_ppalist(struct nvm_tgt_dev *, struct nvm_rq *);
- extern int nvm_get_l2p_tbl(struct nvm_tgt_dev *, u64, u32, nvm_l2p_update_fn *,
- 			   void *);
- extern int nvm_get_area(struct nvm_tgt_dev *, sector_t *, sector_t);
-@@ -491,8 +486,6 @@ extern void nvm_end_io(struct nvm_rq *);
- extern int nvm_bb_tbl_fold(struct nvm_dev *, u8 *, int);
- extern int nvm_get_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr, u8 *);
- 
--extern int nvm_dev_factory(struct nvm_dev *, int flags);
--
- extern void nvm_part_to_tgt(struct nvm_dev *, sector_t *, int);
- 
- #else /* CONFIG_NVM */
--- 
-2.9.3
+On Mon, Oct 09, 2017 at 11:38:09AM -0600, Liu Bo wrote:
+> We've avoided data losing raid profile when doing balance, but it
+> turns out that deleting a device could also result in the same
+> problem.
+> 
+> This fixes the problem by creating an empty data chunk before
+> relocating the data chunk.
+> 
+> Metadata/System chunk are supposed to have non-zero bytes all the time
+> so their raid profile is persistent.
+> 
+> Reported-by: James Alandt <James.Alandt@wdc.com>
+> Signed-off-by: Liu Bo <bo.li.liu@oracle.com>
+> ---
+>  fs/btrfs/volumes.c | 87 ++++++++++++++++++++++++++++++++++++++++++------------
+>  1 file changed, 68 insertions(+), 19 deletions(-)
+> 
+> diff --git a/fs/btrfs/volumes.c b/fs/btrfs/volumes.c
+> index 4a72c45..3f48bcd 100644
+> --- a/fs/btrfs/volumes.c
+> +++ b/fs/btrfs/volumes.c
+> @@ -144,6 +144,8 @@ static int __btrfs_map_block(struct btrfs_fs_info *fs_info,
+>  			     u64 logical, u64 *length,
+>  			     struct btrfs_bio **bbio_ret,
+>  			     int mirror_num, int need_raid_map);
+> +static int btrfs_may_alloc_data_chunk(struct btrfs_fs_info *fs_info,
+> +				      u64 chunk_offset);
+>  
+>  DEFINE_MUTEX(uuid_mutex);
+>  static LIST_HEAD(fs_uuids);
+> @@ -3476,7 +3478,6 @@ static int __btrfs_balance(struct btrfs_fs_info *fs_info)
+>  	u32 count_meta = 0;
+>  	u32 count_sys = 0;
+>  	int chunk_reserved = 0;
+> -	u64 bytes_used = 0;
+>  
+>  	/* step one make some room on all the devices */
+>  	devices = &fs_info->fs_devices->devices;
+> @@ -3635,28 +3636,22 @@ static int __btrfs_balance(struct btrfs_fs_info *fs_info)
+>  			goto loop;
+>  		}
+>  
+> -		ASSERT(fs_info->data_sinfo);
+> -		spin_lock(&fs_info->data_sinfo->lock);
+> -		bytes_used = fs_info->data_sinfo->bytes_used;
+> -		spin_unlock(&fs_info->data_sinfo->lock);
+> -
+> -		if ((chunk_type & BTRFS_BLOCK_GROUP_DATA) &&
+> -		    !chunk_reserved && !bytes_used) {
+> -			trans = btrfs_start_transaction(chunk_root, 0);
+> -			if (IS_ERR(trans)) {
+> -				mutex_unlock(&fs_info->delete_unused_bgs_mutex);
+> -				ret = PTR_ERR(trans);
+> -				goto error;
+> -			}
+> -
+> -			ret = btrfs_force_chunk_alloc(trans, fs_info,
+> -						      BTRFS_BLOCK_GROUP_DATA);
+> -			btrfs_end_transaction(trans);
+> +		if (!chunk_reserved) {
+> +			/*
+> +			 * We may be relocating the only data chunk we have,
+> +			 * which could potentially end up with losing data's
+> +			 * raid profile, so lets allocate an empty one in
+> +			 * advance.
+> +			 */
+> +			ret = btrfs_may_alloc_data_chunk(fs_info,
+> +							 found_key.offset);
+>  			if (ret < 0) {
+>  				mutex_unlock(&fs_info->delete_unused_bgs_mutex);
+> +				ret = PTR_ERR(trans);
+>  				goto error;
+> +			} else if (ret == 1) {
+> +				chunk_reserved = 1;
+>  			}
+> -			chunk_reserved = 1;
+>  		}
+>  
+>  		ret = btrfs_relocate_chunk(fs_info, found_key.offset);
+> @@ -4327,6 +4322,48 @@ int btrfs_check_uuid_tree(struct btrfs_fs_info *fs_info)
+>  }
+>  
+>  /*
+> + * return 1 : allocate a data chunk successfully,
+> + * return <0: errors during allocating a data chunk,
+> + * return 0 : no need to allocate a data chunk.
+> + */
+> +static int btrfs_may_alloc_data_chunk(struct btrfs_fs_info *fs_info,
+> +				      u64 chunk_offset)
+> +{
+> +	struct btrfs_block_group_cache *cache;
+> +	u64 bytes_used;
+> +	u64 chunk_type;
+> +
+> +	cache = btrfs_lookup_block_group(fs_info, chunk_offset);
+> +	ASSERT(cache);
+> +	chunk_type = cache->flags;
+> +	btrfs_put_block_group(cache);
+> +
+> +	if (chunk_type & BTRFS_BLOCK_GROUP_DATA) {
+> +		spin_lock(&fs_info->data_sinfo->lock);
+> +		bytes_used = fs_info->data_sinfo->bytes_used;
+> +		spin_unlock(&fs_info->data_sinfo->lock);
+> +
+> +		if (!bytes_used) {
+> +			struct btrfs_trans_handle *trans;
+> +			int ret;
+> +
+> +			trans =	btrfs_join_transaction(fs_info->tree_root);
+> +			if (IS_ERR(trans))
+> +				return PTR_ERR(trans);
+> +
+> +			ret = btrfs_force_chunk_alloc(trans, fs_info,
+> +						      BTRFS_BLOCK_GROUP_DATA);
+> +			btrfs_end_transaction(trans);
+> +			if (ret < 0)
+> +				return ret;
+> +
+> +			return 1;
+> +		}
+> +	}
+> +	return 0;
+> +}
+> +
+> +/*
+>   * shrinking a device means finding all of the device extents past
+>   * the new size, and then following the back refs to the chunks.
+>   * The chunk relocation code actually frees the device extent
+> @@ -4419,6 +4456,18 @@ int btrfs_shrink_device(struct btrfs_device *device, u64 new_size)
+>  		chunk_offset = btrfs_dev_extent_chunk_offset(l, dev_extent);
+>  		btrfs_release_path(path);
+>  
+> +		/*
+> +		 * We may be relocating the only data chunk we have,
+> +		 * which could potentially end up with losing data's
+> +		 * raid profile, so lets allocate an empty one in
+> +		 * advance.
+> +		 */
+> +		ret = btrfs_may_alloc_data_chunk(fs_info, chunk_offset);
+> +		if (ret < 0) {
+> +			mutex_unlock(&fs_info->delete_unused_bgs_mutex);
+> +			goto done;
+> +		}
+> +
+>  		ret = btrfs_relocate_chunk(fs_info, chunk_offset);
+>  		mutex_unlock(&fs_info->delete_unused_bgs_mutex);
+>  		if (ret && ret != -ENOSPC)
+> -- 
+> 2.9.4
+> 
