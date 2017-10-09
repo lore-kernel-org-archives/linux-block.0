@@ -1,95 +1,36 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:33063 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753856AbdJIHhq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Oct 2017 03:37:46 -0400
-Received: by mail-pf0-f193.google.com with SMTP id m28so25512377pfi.0
-        for <linux-block@vger.kernel.org>; Mon, 09 Oct 2017 00:37:46 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: colyli@suse.de, Michael Lyle <mlyle@lyle.org>
-Subject: [PATCH v2 1/2] bcache: writeback rate shouldn't artifically clamp
-Date: Mon,  9 Oct 2017 00:37:29 -0700
-Message-Id: <20171009073730.8939-2-mlyle@lyle.org>
-In-Reply-To: <20171009073730.8939-1-mlyle@lyle.org>
-References: <20171009073730.8939-1-mlyle@lyle.org>
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:23630 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754079AbdJIRd5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Oct 2017 13:33:57 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "himanshujha199640@gmail.com" <himanshujha199640@gmail.com>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] skd: Use kmem_cache_free
+Date: Mon, 9 Oct 2017 17:33:54 +0000
+Message-ID: <1507570433.2674.18.camel@wdc.com>
+References: <1507498228-11878-1-git-send-email-himanshujha199640@gmail.com>
+In-Reply-To: <1507498228-11878-1-git-send-email-himanshujha199640@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The previous code artificially limited writeback rate to 1000000
-blocks/second (NSEC_PER_MSEC), which is a rate that can be met on fast
-hardware.  The rate limiting code works fine (though with decreased
-precision) up to 3 orders of magnitude faster, so use NSEC_PER_SEC.
-
-Additionally, ensure that uint32_t is used as a type for rate throughout
-the rate management so that type checking/clamp_t can work properly.
-
-bch_next_delay should be rewritten for increased precision and better
-handling of high rates and long sleep periods, but this is adequate for
-now.
-
-Signed-off-by: Michael Lyle <mlyle@lyle.org>
-Reported-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/bcache.h    | 2 +-
- drivers/md/bcache/util.h      | 4 ++--
- drivers/md/bcache/writeback.c | 7 ++++---
- 3 files changed, 7 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index df0b2ccfca8d..2f9c380c4692 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -363,7 +363,7 @@ struct cached_dev {
- 	int64_t			writeback_rate_proportional;
- 	int64_t			writeback_rate_integral;
- 	int64_t			writeback_rate_integral_scaled;
--	int64_t			writeback_rate_change;
-+	int32_t			writeback_rate_change;
- 
- 	unsigned		writeback_rate_update_seconds;
- 	unsigned		writeback_rate_i_term_inverse;
-diff --git a/drivers/md/bcache/util.h b/drivers/md/bcache/util.h
-index cb8d2ccbb6c6..8f509290bb02 100644
---- a/drivers/md/bcache/util.h
-+++ b/drivers/md/bcache/util.h
-@@ -441,10 +441,10 @@ struct bch_ratelimit {
- 	uint64_t		next;
- 
- 	/*
--	 * Rate at which we want to do work, in units per nanosecond
-+	 * Rate at which we want to do work, in units per second
- 	 * The units here correspond to the units passed to bch_next_delay()
- 	 */
--	unsigned		rate;
-+	uint32_t		rate;
- };
- 
- static inline void bch_ratelimit_reset(struct bch_ratelimit *d)
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index d63356a60001..42d087b9fb56 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -52,7 +52,8 @@ static void __update_writeback_rate(struct cached_dev *dc)
- 	int64_t error = dirty - target;
- 	int64_t proportional_scaled =
- 		div_s64(error, dc->writeback_rate_p_term_inverse);
--	int64_t integral_scaled, new_rate;
-+	int64_t integral_scaled;
-+	uint32_t new_rate;
- 
- 	if ((error < 0 && dc->writeback_rate_integral > 0) ||
- 	    (error > 0 && time_before64(local_clock(),
-@@ -74,8 +75,8 @@ static void __update_writeback_rate(struct cached_dev *dc)
- 	integral_scaled = div_s64(dc->writeback_rate_integral,
- 			dc->writeback_rate_i_term_inverse);
- 
--	new_rate = clamp_t(int64_t, (proportional_scaled + integral_scaled),
--			dc->writeback_rate_minimum, NSEC_PER_MSEC);
-+	new_rate = clamp_t(int32_t, (proportional_scaled + integral_scaled),
-+			dc->writeback_rate_minimum, NSEC_PER_SEC);
- 
- 	dc->writeback_rate_proportional = proportional_scaled;
- 	dc->writeback_rate_integral_scaled = integral_scaled;
--- 
-2.11.0
+T24gTW9uLCAyMDE3LTEwLTA5IGF0IDAzOjAwICswNTMwLCBIaW1hbnNodSBKaGEgd3JvdGU6DQo+
+IFVzZSBrbWVtX2NhY2hlX2ZyZWUgaW5zdGVhZCBvZiBrZnJlZSBmb3IgZnJlZWluZyB0aGUgbWVt
+b3J5IHByZXZpb3VzbHkNCj4gYWxsb2NhdGVkIHdpdGgga21lbV9jYWNoZV96YWxsb2Mva21lbV9j
+YWNoZV9hbGxvYy9rbWVtX2NhY2hlX25vZGUuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBIaW1hbnNo
+dSBKaGEgPGhpbWFuc2h1amhhMTk5NjQwQGdtYWlsLmNvbT4NCj4gLS0tDQo+ICBkcml2ZXJzL2Js
+b2NrL3NrZF9tYWluLmMgfCAyICstDQo+ICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyks
+IDEgZGVsZXRpb24oLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2Jsb2NrL3NrZF9tYWlu
+LmMgYi9kcml2ZXJzL2Jsb2NrL3NrZF9tYWluLmMNCj4gaW5kZXggN2NlZGI0Mi4uNjRkMGZjMSAx
+MDA2NDQNCj4gLS0tIGEvZHJpdmVycy9ibG9jay9za2RfbWFpbi5jDQo+ICsrKyBiL2RyaXZlcnMv
+YmxvY2svc2tkX21haW4uYw0KPiBAQCAtMjYwNCw3ICsyNjA0LDcgQEAgc3RhdGljIHZvaWQgKnNr
+ZF9hbGxvY19kbWEoc3RydWN0IHNrZF9kZXZpY2UgKnNrZGV2LCBzdHJ1Y3Qga21lbV9jYWNoZSAq
+cywNCj4gIAkJcmV0dXJuIE5VTEw7DQo+ICAJKmRtYV9oYW5kbGUgPSBkbWFfbWFwX3NpbmdsZShk
+ZXYsIGJ1Ziwgcy0+c2l6ZSwgZGlyKTsNCj4gIAlpZiAoZG1hX21hcHBpbmdfZXJyb3IoZGV2LCAq
+ZG1hX2hhbmRsZSkpIHsNCj4gLQkJa2ZyZWUoYnVmKTsNCj4gKwkJa21lbV9jYWNoZV9mcmVlKHMs
+IGJ1Zik7DQo+ICAJCWJ1ZiA9IE5VTEw7DQo+ICAJfQ0KPiAgCXJldHVybiBidWY7DQoNClRoYW5r
+cyBmb3IgdGhpcyBwYXRjaC4NCg0KUmV2aWV3ZWQtYnk6IEJhcnQgVmFuIEFzc2NoZSA8YmFydC52
+YW5hc3NjaGVAd2RjLmNvbT4NCg0K
