@@ -1,15 +1,15 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from server.coly.li ([162.144.45.48]:53892 "EHLO server.coly.li"
+Received: from mx2.suse.de ([195.135.220.15]:34182 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752504AbdJIS6q (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 9 Oct 2017 14:58:46 -0400
+        id S1751530AbdJIF7H (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 9 Oct 2017 01:59:07 -0400
 Subject: Re: [PATCH 4/5] bcache: writeback: collapse contiguous IO better
-To: Michael Lyle <mlyle@lyle.org>
-Cc: Hannes Reinecke <hare@suse.de>,
-        Junhui Tang <tang.junhui@zte.com.cn>,
-        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+To: Coly Li <i@coly.li>, Michael Lyle <mlyle@lyle.org>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org,
         Kent Overstreet <kent.overstreet@gmail.com>
 References: <1506497553-12552-1-git-send-email-tang.junhui@zte.com.cn>
+ <2c39cd9c-34bd-5982-9fd7-ceb61305c13d@coly.li>
  <CAJ+L6qe7C=FyPFya8y0HV8SCc7VSEEuUApcqEUnouVDUByfZ5w@mail.gmail.com>
  <6a2052da-6b52-9c06-b85e-e3ea29e3f8e8@coly.li>
  <CAJ+L6qdqQn4tpFdkPZ-zhxss9O8axBEarMBJA5X6f9i+K8SLGg@mail.gmail.com>
@@ -24,138 +24,89 @@ References: <1506497553-12552-1-git-send-email-tang.junhui@zte.com.cn>
  <dca3c016-bb3f-7d8c-1509-f042628d7fd6@coly.li>
  <CAJ+L6qcY=_vTaqZDLvif_3pqwujo24NUZhGG9ebp6z5+uWqwQQ@mail.gmail.com>
  <33e52793-251d-ed58-fb59-5432946efb56@coly.li>
- <CAJ+L6qdnzocZRvcExwFBJPmVJnHWNJXY8j3NioUaekAp06QzXg@mail.gmail.com>
-From: Coly Li <i@coly.li>
-Message-ID: <058dc73f-a36f-c3c2-8dc3-833545979693@coly.li>
-Date: Tue, 10 Oct 2017 02:58:26 +0800
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <25f4cd06-c71c-c468-4ab2-c0a62285f2b8@suse.de>
+Date: Mon, 9 Oct 2017 07:59:03 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAJ+L6qdnzocZRvcExwFBJPmVJnHWNJXY8j3NioUaekAp06QzXg@mail.gmail.com>
+In-Reply-To: <33e52793-251d-ed58-fb59-5432946efb56@coly.li>
 Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 2017/10/7 上午2:36, Michael Lyle wrote:
-> Sorry I missed this question:
+On 10/06/2017 08:09 PM, Coly Li wrote:
+> Hi Mike,
 > 
->> Is it the time from writeback starts to dirty reaches dirty target, or
->> the time from writeback starts to dirty reaches 0 ?
+> On 2017/10/7 上午1:36, Michael Lyle wrote:
+>> It's 240GB (half of a Samsung 850) in front of a 1TB 5400RPM disk.
+>>
 > 
-> Not quite either.  I monitor the machine with zabbix; it's the time to
-> when the backing disk reaches its background rate of activity / when
-> writeback hits its minimum rate (writeback with the PI controller
-> writes a little past the target because of the integral term).
+> Copied.
 > 
-> Viewed one way: 5/80 is just a few percent of difference (6%).  But:
-> I'm hopeful that further improvement can be made along this patch
-> series, and in any event it's 5 minutes earlier that I/O will have an
-> unencumbered response time after a pulse of load.
+>> The size isn't critical.  1/8 is chosen to exceed 10% (default
+>> writeback dirty data thresh), it might need to be 1/6 on really big
+>> environments.  It needs to be big enough that it takes more than 100
+>> seconds to write back, but less than 40% of the cache[1].
+>>
+> 
+> OK, I will do similar thing.
+> 
+>> I am also running this on "mountain", which is my virtualization
+>> server.  It has 2x Samsung 950 PRO 512GB NVMe disks (MD raid1) in
+>> front of 2x Seagate Ironwolf 6TB (MD raid1) drivers.  I can't run
+>> benchmarks on it, but it runs nightly builds and is otherwise lightly
+>> loaded in the middle of night.  It does writeback for about 75 minutes
+>> on average after a set of nightly builds of my repositories (last 5
+>> days 75, 79, 77, 72, 76); without this patch set it was more like 80
+>> (77, 80, 74, 85, 84, 76, 82, 84).  It has 128GB of RAM and doesn't do
+> 
+> Is it the time from writeback starts to dirty reaches dirty target, or
+> the time from writeback starts to dirty reaches 0 ?
+> 
+>> many reads-- most of its hottest working set hits the page cache--
+>> bcache serves to accelerate the random writes its workloads generate.
+>> This is the workload that I sought to improve with the writeback
+>> changes.
+>>
+>> When you ran the tests, did you compare 1-5 to 1-3?  Because
+> 
+> Yes, we did same thing. I only add/remove the last 2 patches about bio
+> reorder, the first 3 patches are always applied in my testing kernels.
+> 
+>> otherwise, another uncontrolled factor is the writeback tuning is
+>> drastically different with patch 2.  (On most systems patch 2 makes
+>> writeback less aggressive overall by default).
+> 
+> I observe this behavior :-) I always use the new PI controller in my
+> testings, it works fine.
+> 
+>> [1]: If you don't think this is fair--- this would match how I've been
+>> suggesting enterprise users set up bcache for various workloads-- a
+>> writeback cache isn't going to be very effective at lowering write
+>> workload if the size of the most active write working set doesn't fit
+>> nicely in the cache.  so e.g. if you deploy under a SQL database the
+>> cache should be double the size of the indices to get a real write
+>> aggregation benefit; if you deploy under an environment doing builds
+>> the cache should be double the size of the amount written during
+>> builds; if you deploy under an environment doing rapid VM provisioning
+>> the cache should be double the size of the images blitted per
+>> provisioning cycle, etc.
+>>
+> 
+> If I use a 1.8T hard disk as cached device, and 1TB SSD as cache device,
+> and set fio to write 500G dirty data in total. Is this configuration
+> close to the working set and cache size you suggested ?
+> 
+Weell, for a realistic scenario you should be aiming for having about
+one order of magnitude difference between the cache and the cached device.
+So for your setup you'd be needing about 4TB of cached device, or using
+only parts of the caching device (say around 500G).
 
-Hi Mike,
+Cheers,
 
-Finally, finally I finish all my test in the ideal situation which you
-suggested to make dirty blocks to be contiguous better.
-
-And it come to be clear why we had such a big difference in opinion: we
-just looked at different part of a cow, you looked at tail, I looked at
-head.
-
-Here is the configurations I covered,
-fio blocksize: 8kB, 16kB, 32kB, 64kB, 128kB, 256kB, 512kB, 1024kB
-dirty data size:, 110GB, 500GB, 700GB
-cache device size: 220GB, 1TB, 1.5TB, 1.8TB
-cached device size: 1.8TB, 4TB, 7.2TB
-
-(md linear is used to combine large device with multiple hard drives, so
-large bio won't be split unless it goes across hard drive size boundary )
-
-I don't test all the above combinations, my test cases are very limited
-(still spent me several days), but most important ones are covered.
-
-I use the following items to measure writeback performance:
-- decreased dirty data amount (a.k.a throughput)
-- writeback write requests per-second
-- writeback write request merge numbers per-second
-
-It turns out, in the ideal situation, bio reorder patches performance
-drops if: 1) write I/O size increased 2) amount of dirty data increased
-
-I do observe the perfect side of your patches, when I/O blocksize
-<=256kB, I see great advantage of writeback performance when bio
-reordered. Especially when blocksiz is 8K, writeback performance is 3x
-at least (because without your patch the writeback is too slow and I
-gave up after hours).
-
-The performance regression happens when fio blocksize increased to 512K
-and dirty data increased to 900GB. And when fio blocksize increased to
-1MB and dirty data on cache increased to 900, writeback performance
-regression becomes easily recognized.
-
-An interesting behavior I observed is, for large blocksize and dirty
-data, without bio reorder patches, writeback performance is much higher
-than the bio reorder one. An example is,
-http://blog.coly.li/wp-content/uploads/2017/10/writeback_throughput_on_linear_900_1800G_cache_half.png
-
-The first 15 minutes, bcache without bio reorder performs much higher
-than the reorder one. 15 minutes later, all the writeback rate decreased
-to a similar level. That's said, most of the performance regression
-happens at the beginning when writeback starts.
-
-All the tests are under ideal situations, no writeback happens when fio
-writes dirty data onto cache device. If in more generic situations when
-less LBA contiguous dirty blocks on cache, I guess the writeback
-regression might be more obvious.
-
-When dirty blocks are not LBA contiguous on cache device, for small
-dirty block size, I don't worry. Because you explained in previous
-emails clearly, the worst case is the performance backing to the numbers
-which has no bio reorder patch. But for large blocksize and large dirty
-data, that's the common case when bcache is used for distributed
-computing/storage systems like Ceph or Hadoop (multiple hard drives
-attached to a large SSD cache, normally object file sizes are from 4MB
-to 128MB).
-
-Here is the command line I used to initialize bcache device:
-#ake-bcache -B /dev/md0 -C /dev/nvme1n1p1
-echo /dev/nvme1n1p1 > /sys/fs/bcache/register
-echo /dev/md0 > /sys/fs/bcache/register
-sleep 1
-echo 0 > /sys/block/bcache0/bcache/cache/congested_read_threshold_us
-echo 0 > /sys/block/bcache0/bcache/cache/congested_write_threshold_us
-echo writeback > /sys/block/bcache0/bcache/cache_mode
-echo 0 > /sys/block/bcache0/bcache/writeback_running
-
-After fio writes enough dirty data onto cache device, I write 1 into
-writeback_runing.
-
-Here is the fio job file I used,
-[global]
-direct=1
-thread=1
-ioengine=libaio
-
-[job]
-filename=/dev/bcache0
-readwrite=randwrite
-numjobs=1
-blocksize=<test block size>
-iodepth=256
-size=<dirty data amount>
-
-I see the writeback performance advantage in ideal situation, it is
-desired :-) But I also worry about the performance regression for large
-dirty block size and dirty data.
-
-I raise a green flag to your bio reorder patches :-) I do hope I could
-have seen such performance data at first time :P
-
-*Last one question*: Could you please to consider an option to
-enable/disable the bio reorder code in sysfs? It can be enabled as
-default. When people cares about large dirty data size writeback, they
-can choose to disable the bio reorder policy.
-
-I hope we can get an agreement and make this patch move forward.
-
-Thanks for your patience, and continuous following up the discussion.
-
+Hannes
 -- 
-Coly Li
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
