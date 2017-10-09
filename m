@@ -1,42 +1,129 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f179.google.com ([209.85.192.179]:47854 "EHLO
-        mail-pf0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932619AbdJJSPb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Oct 2017 14:15:31 -0400
-Received: by mail-pf0-f179.google.com with SMTP id z11so8124650pfk.4
-        for <linux-block@vger.kernel.org>; Tue, 10 Oct 2017 11:15:31 -0700 (PDT)
-Date: Tue, 10 Oct 2017 11:15:29 -0700
-From: Omar Sandoval <osandov@osandov.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
         Laurence Oberman <loberman@redhat.com>,
         Paolo Valente <paolo.valente@linaro.org>,
         Oleksandr Natalenko <oleksandr@natalenko.name>,
         Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>
-Subject: Re: [PATCH V6 3/5] sbitmap: introduce __sbitmap_for_each_set()
-Message-ID: <20171010181529.GC30738@vader.DHCP.thefacebook.com>
+        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V6 3/5] sbitmap: introduce __sbitmap_for_each_set()
+Date: Mon,  9 Oct 2017 19:24:22 +0800
+Message-Id: <20171009112424.30524-4-ming.lei@redhat.com>
+In-Reply-To: <20171009112424.30524-1-ming.lei@redhat.com>
 References: <20171009112424.30524-1-ming.lei@redhat.com>
- <20171009112424.30524-4-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171009112424.30524-4-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Oct 09, 2017 at 07:24:22PM +0800, Ming Lei wrote:
-> We need to iterate ctx starting from any ctx in round robin
-> way, so introduce this helper.
-> 
-> Cc: Omar Sandoval <osandov@fb.com>
+We need to iterate ctx starting from any ctx in round robin
+way, so introduce this helper.
 
-Reviewed-by: Omar Sandoval <osandov@fb.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ include/linux/sbitmap.h | 64 ++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 47 insertions(+), 17 deletions(-)
 
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  include/linux/sbitmap.h | 64 ++++++++++++++++++++++++++++++++++++-------------
->  1 file changed, 47 insertions(+), 17 deletions(-)
+diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
+index a1904aadbc45..0dcc60e820de 100644
+--- a/include/linux/sbitmap.h
++++ b/include/linux/sbitmap.h
+@@ -211,10 +211,14 @@ bool sbitmap_any_bit_set(const struct sbitmap *sb);
+  */
+ bool sbitmap_any_bit_clear(const struct sbitmap *sb);
+ 
++#define SB_NR_TO_INDEX(sb, bitnr) ((bitnr) >> (sb)->shift)
++#define SB_NR_TO_BIT(sb, bitnr) ((bitnr) & ((1U << (sb)->shift) - 1U))
++
+ typedef bool (*sb_for_each_fn)(struct sbitmap *, unsigned int, void *);
+ 
+ /**
+- * sbitmap_for_each_set() - Iterate over each set bit in a &struct sbitmap.
++ * __sbitmap_for_each_set() - Iterate over each set bit in a &struct sbitmap.
++ * @start: Where to start the iteration.
+  * @sb: Bitmap to iterate over.
+  * @fn: Callback. Should return true to continue or false to break early.
+  * @data: Pointer to pass to callback.
+@@ -222,35 +226,61 @@ typedef bool (*sb_for_each_fn)(struct sbitmap *, unsigned int, void *);
+  * This is inline even though it's non-trivial so that the function calls to the
+  * callback will hopefully get optimized away.
+  */
+-static inline void sbitmap_for_each_set(struct sbitmap *sb, sb_for_each_fn fn,
+-					void *data)
++static inline void __sbitmap_for_each_set(struct sbitmap *sb,
++					  unsigned int start,
++					  sb_for_each_fn fn, void *data)
+ {
+-	unsigned int i;
++	unsigned int index;
++	unsigned int nr;
++	unsigned int scanned = 0;
+ 
+-	for (i = 0; i < sb->map_nr; i++) {
+-		struct sbitmap_word *word = &sb->map[i];
+-		unsigned int off, nr;
++	if (start >= sb->depth)
++		start = 0;
++	index = SB_NR_TO_INDEX(sb, start);
++	nr = SB_NR_TO_BIT(sb, start);
+ 
+-		if (!word->word)
+-			continue;
++	while (scanned < sb->depth) {
++		struct sbitmap_word *word = &sb->map[index];
++		unsigned int depth = min_t(unsigned int, word->depth - nr,
++					   sb->depth - scanned);
+ 
+-		nr = 0;
+-		off = i << sb->shift;
++		scanned += depth;
++		if (!word->word)
++			goto next;
++
++		/*
++		 * On the first iteration of the outer loop, we need to add the
++		 * bit offset back to the size of the word for find_next_bit().
++		 * On all other iterations, nr is zero, so this is a noop.
++		 */
++		depth += nr;
+ 		while (1) {
+-			nr = find_next_bit(&word->word, word->depth, nr);
+-			if (nr >= word->depth)
++			nr = find_next_bit(&word->word, depth, nr);
++			if (nr >= depth)
+ 				break;
+-
+-			if (!fn(sb, off + nr, data))
++			if (!fn(sb, (index << sb->shift) + nr, data))
+ 				return;
+ 
+ 			nr++;
+ 		}
++next:
++		nr = 0;
++		if (++index >= sb->map_nr)
++			index = 0;
+ 	}
+ }
+ 
+-#define SB_NR_TO_INDEX(sb, bitnr) ((bitnr) >> (sb)->shift)
+-#define SB_NR_TO_BIT(sb, bitnr) ((bitnr) & ((1U << (sb)->shift) - 1U))
++/**
++ * sbitmap_for_each_set() - Iterate over each set bit in a &struct sbitmap.
++ * @sb: Bitmap to iterate over.
++ * @fn: Callback. Should return true to continue or false to break early.
++ * @data: Pointer to pass to callback.
++ */
++static inline void sbitmap_for_each_set(struct sbitmap *sb, sb_for_each_fn fn,
++					void *data)
++{
++	__sbitmap_for_each_set(sb, 0, fn, data);
++}
+ 
+ static inline unsigned long *__sbitmap_word(struct sbitmap *sb,
+ 					    unsigned int bitnr)
+-- 
+2.9.5
