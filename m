@@ -1,267 +1,82 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:40842 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1757998AbdJMLTc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 07:19:32 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V11 4/4] mmc: sdhci-pci: Add CQHCI support for Intel GLK
-Date: Fri, 13 Oct 2017 14:12:19 +0300
-Message-Id: <1507893139-11969-5-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1507893139-11969-1-git-send-email-adrian.hunter@intel.com>
-References: <1507893139-11969-1-git-send-email-adrian.hunter@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=449916f6d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Oleksandr Natalenko <oleksandr@natalenko.name>,
+	Ming Lei <ming.lei@redhat.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH v8 06/10] block: Introduce BLK_MQ_REQ_PREEMPT
+Date: Tue, 10 Oct 2017 14:03:42 -0700
+Message-Id: <20171010210346.14574-7-bart.vanassche@wdc.com>
+In-Reply-To: <20171010210346.14574-1-bart.vanassche@wdc.com>
+References: <20171010210346.14574-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Add CQHCI initialization and implement CQHCI operations for Intel GLK.
+Set RQF_PREEMPT if BLK_MQ_REQ_PREEMPT is passed to
+blk_get_request_flags().
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/mmc/host/Kconfig          |   1 +
- drivers/mmc/host/sdhci-pci-core.c | 155 +++++++++++++++++++++++++++++++++++++-
- 2 files changed, 155 insertions(+), 1 deletion(-)
+ block/blk-core.c       | 4 +++-
+ block/blk-mq.c         | 2 ++
+ include/linux/blk-mq.h | 1 +
+ 3 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/mmc/host/Kconfig b/drivers/mmc/host/Kconfig
-index 3092b7085cb5..2b02a9788bb6 100644
---- a/drivers/mmc/host/Kconfig
-+++ b/drivers/mmc/host/Kconfig
-@@ -81,6 +81,7 @@ config MMC_SDHCI_BIG_ENDIAN_32BIT_BYTE_SWAPPER
- config MMC_SDHCI_PCI
- 	tristate "SDHCI support on PCI bus"
- 	depends on MMC_SDHCI && PCI
-+	select MMC_CQHCI
- 	help
- 	  This selects the PCI Secure Digital Host Controller Interface.
- 	  Most controllers found today are PCI devices.
-diff --git a/drivers/mmc/host/sdhci-pci-core.c b/drivers/mmc/host/sdhci-pci-core.c
-index e854ee5d7f4a..dfa40bc60c13 100644
---- a/drivers/mmc/host/sdhci-pci-core.c
-+++ b/drivers/mmc/host/sdhci-pci-core.c
-@@ -30,6 +30,8 @@
- #include <linux/mmc/sdhci-pci-data.h>
- #include <linux/acpi.h>
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 03156d9ede94..842e67e0b7ab 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1260,6 +1260,8 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
+ 	blk_rq_set_rl(rq, rl);
+ 	rq->cmd_flags = op;
+ 	rq->rq_flags = rq_flags;
++	if (flags & BLK_MQ_REQ_PREEMPT)
++		rq->rq_flags |= RQF_PREEMPT;
  
-+#include "cqhci.h"
-+
- #include "sdhci.h"
- #include "sdhci-pci.h"
- #include "sdhci-pci-o2micro.h"
-@@ -117,6 +119,28 @@ int sdhci_pci_resume_host(struct sdhci_pci_chip *chip)
+ 	/* init elvpriv */
+ 	if (rq_flags & RQF_ELVPRIV) {
+@@ -1441,7 +1443,7 @@ struct request *blk_get_request_flags(struct request_queue *q, unsigned int op,
+ 	struct request *req;
  
- 	return 0;
- }
-+
-+static int sdhci_cqhci_suspend(struct sdhci_pci_chip *chip)
-+{
-+	int ret;
-+
-+	ret = cqhci_suspend(chip->slots[0]->host->mmc);
-+	if (ret)
-+		return ret;
-+
-+	return sdhci_pci_suspend_host(chip);
-+}
-+
-+static int sdhci_cqhci_resume(struct sdhci_pci_chip *chip)
-+{
-+	int ret;
-+
-+	ret = sdhci_pci_resume_host(chip);
-+	if (ret)
-+		return ret;
-+
-+	return cqhci_resume(chip->slots[0]->host->mmc);
-+}
- #endif
+ 	WARN_ON_ONCE(op & REQ_NOWAIT);
+-	WARN_ON_ONCE(flags & ~BLK_MQ_REQ_NOWAIT);
++	WARN_ON_ONCE(flags & ~(BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_PREEMPT));
  
- #ifdef CONFIG_PM
-@@ -167,8 +191,48 @@ static int sdhci_pci_runtime_resume_host(struct sdhci_pci_chip *chip)
- 
- 	return 0;
- }
-+
-+static int sdhci_cqhci_runtime_suspend(struct sdhci_pci_chip *chip)
-+{
-+	int ret;
-+
-+	ret = cqhci_suspend(chip->slots[0]->host->mmc);
-+	if (ret)
-+		return ret;
-+
-+	return sdhci_pci_runtime_suspend_host(chip);
-+}
-+
-+static int sdhci_cqhci_runtime_resume(struct sdhci_pci_chip *chip)
-+{
-+	int ret;
-+
-+	ret = sdhci_pci_runtime_resume_host(chip);
-+	if (ret)
-+		return ret;
-+
-+	return cqhci_resume(chip->slots[0]->host->mmc);
-+}
- #endif
- 
-+static u32 sdhci_cqhci_irq(struct sdhci_host *host, u32 intmask)
-+{
-+	int cmd_error = 0;
-+	int data_error = 0;
-+
-+	if (!sdhci_cqe_irq(host, intmask, &cmd_error, &data_error))
-+		return intmask;
-+
-+	cqhci_irq(host->mmc, intmask, cmd_error, data_error);
-+
-+	return 0;
-+}
-+
-+static void sdhci_pci_dumpregs(struct mmc_host *mmc)
-+{
-+	sdhci_dumpregs(mmc_priv(mmc));
-+}
-+
- /*****************************************************************************\
-  *                                                                           *
-  * Hardware specific quirk handling                                          *
-@@ -584,6 +648,18 @@ static void sdhci_intel_voltage_switch(struct sdhci_host *host)
- 	.voltage_switch		= sdhci_intel_voltage_switch,
+ 	if (q->mq_ops) {
+ 		req = blk_mq_alloc_request(q, op, flags);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 8766587ae8b8..bdbfe760bda0 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -290,6 +290,8 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	rq->q = data->q;
+ 	rq->mq_ctx = data->ctx;
+ 	rq->cmd_flags = op;
++	if (data->flags & BLK_MQ_REQ_PREEMPT)
++		rq->rq_flags |= RQF_PREEMPT;
+ 	if (blk_queue_io_stat(data->q))
+ 		rq->rq_flags |= RQF_IO_STAT;
+ 	/* do not touch atomic flags, it needs atomic ops against the timer */
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 50c6485cb04f..ee9fc3fb7fca 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -200,6 +200,7 @@ enum {
+ 	BLK_MQ_REQ_NOWAIT	= (1 << 0), /* return when out of requests */
+ 	BLK_MQ_REQ_RESERVED	= (1 << 1), /* allocate from reserved pool */
+ 	BLK_MQ_REQ_INTERNAL	= (1 << 2), /* allocate internal/sched tag */
++	BLK_MQ_REQ_PREEMPT	= (1 << 3), /* set RQF_PREEMPT */
  };
  
-+static const struct sdhci_ops sdhci_intel_glk_ops = {
-+	.set_clock		= sdhci_set_clock,
-+	.set_power		= sdhci_intel_set_power,
-+	.enable_dma		= sdhci_pci_enable_dma,
-+	.set_bus_width		= sdhci_set_bus_width,
-+	.reset			= sdhci_reset,
-+	.set_uhs_signaling	= sdhci_set_uhs_signaling,
-+	.hw_reset		= sdhci_pci_hw_reset,
-+	.voltage_switch		= sdhci_intel_voltage_switch,
-+	.irq			= sdhci_cqhci_irq,
-+};
-+
- static void byt_read_dsm(struct sdhci_pci_slot *slot)
- {
- 	struct intel_host *intel_host = sdhci_pci_priv(slot);
-@@ -613,12 +689,80 @@ static int glk_emmc_probe_slot(struct sdhci_pci_slot *slot)
- {
- 	int ret = byt_emmc_probe_slot(slot);
- 
-+	slot->host->mmc->caps2 |= MMC_CAP2_CQE;
-+
- 	if (slot->chip->pdev->device != PCI_DEVICE_ID_INTEL_GLK_EMMC) {
- 		slot->host->mmc->caps2 |= MMC_CAP2_HS400_ES,
- 		slot->host->mmc_host_ops.hs400_enhanced_strobe =
- 						intel_hs400_enhanced_strobe;
-+		slot->host->mmc->caps2 |= MMC_CAP2_CQE_DCMD;
-+	}
-+
-+	return ret;
-+}
-+
-+static void glk_cqe_enable(struct mmc_host *mmc)
-+{
-+	struct sdhci_host *host = mmc_priv(mmc);
-+	u32 reg;
-+
-+	/*
-+	 * CQE gets stuck if it sees Buffer Read Enable bit set, which can be
-+	 * the case after tuning, so ensure the buffer is drained.
-+	 */
-+	reg = sdhci_readl(host, SDHCI_PRESENT_STATE);
-+	while (reg & SDHCI_DATA_AVAILABLE) {
-+		sdhci_readl(host, SDHCI_BUFFER);
-+		reg = sdhci_readl(host, SDHCI_PRESENT_STATE);
-+	}
-+
-+	sdhci_cqe_enable(mmc);
-+}
-+
-+static const struct cqhci_host_ops glk_cqhci_ops = {
-+	.enable		= glk_cqe_enable,
-+	.disable	= sdhci_cqe_disable,
-+	.dumpregs	= sdhci_pci_dumpregs,
-+};
-+
-+static int glk_emmc_add_host(struct sdhci_pci_slot *slot)
-+{
-+	struct device *dev = &slot->chip->pdev->dev;
-+	struct sdhci_host *host = slot->host;
-+	struct cqhci_host *cq_host;
-+	bool dma64;
-+	int ret;
-+
-+	ret = sdhci_setup_host(host);
-+	if (ret)
-+		return ret;
-+
-+	cq_host = devm_kzalloc(dev, sizeof(*cq_host), GFP_KERNEL);
-+	if (!cq_host) {
-+		ret = -ENOMEM;
-+		goto cleanup;
- 	}
- 
-+	cq_host->mmio = host->ioaddr + 0x200;
-+	cq_host->quirks |= CQHCI_QUIRK_SHORT_TXFR_DESC_SZ;
-+	cq_host->ops = &glk_cqhci_ops;
-+
-+	dma64 = host->flags & SDHCI_USE_64_BIT_DMA;
-+	if (dma64)
-+		cq_host->caps |= CQHCI_TASK_DESC_SZ_128;
-+
-+	ret = cqhci_init(cq_host, host->mmc, dma64);
-+	if (ret)
-+		goto cleanup;
-+
-+	ret = __sdhci_add_host(host);
-+	if (ret)
-+		goto cleanup;
-+
-+	return 0;
-+
-+cleanup:
-+	sdhci_cleanup_host(host);
- 	return ret;
- }
- 
-@@ -700,11 +844,20 @@ static int byt_sd_probe_slot(struct sdhci_pci_slot *slot)
- static const struct sdhci_pci_fixes sdhci_intel_glk_emmc = {
- 	.allow_runtime_pm	= true,
- 	.probe_slot		= glk_emmc_probe_slot,
-+	.add_host		= glk_emmc_add_host,
-+#ifdef CONFIG_PM_SLEEP
-+	.suspend		= sdhci_cqhci_suspend,
-+	.resume			= sdhci_cqhci_resume,
-+#endif
-+#ifdef CONFIG_PM
-+	.runtime_suspend	= sdhci_cqhci_runtime_suspend,
-+	.runtime_resume		= sdhci_cqhci_runtime_resume,
-+#endif
- 	.quirks			= SDHCI_QUIRK_NO_ENDATTR_IN_NOPDESC,
- 	.quirks2		= SDHCI_QUIRK2_PRESET_VALUE_BROKEN |
- 				  SDHCI_QUIRK2_CAPS_BIT63_FOR_HS400 |
- 				  SDHCI_QUIRK2_STOP_WITH_TC,
--	.ops			= &sdhci_intel_byt_ops,
-+	.ops			= &sdhci_intel_glk_ops,
- 	.priv_size		= sizeof(struct intel_host),
- };
- 
+ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
 -- 
-1.9.1
+2.14.2
