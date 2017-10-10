@@ -1,152 +1,86 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from szxga05-in.huawei.com ([45.249.212.191]:7527 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751068AbdJIMLi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Oct 2017 08:11:38 -0400
-Subject: Re: [PATCH V5 00/14] blk-mq-sched: improve sequential I/O
- performance(part 1)
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@fb.com>,
-        <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        "Mike Snitzer" <snitzer@redhat.com>, <dm-devel@redhat.com>
-References: <20170930102720.30219-1-ming.lei@redhat.com>
-CC: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        "Oleksandr Natalenko" <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>,
-        <linux-kernel@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        Omar Sandoval <osandov@fb.com>, Linuxarm <linuxarm@huawei.com>
-From: John Garry <john.garry@huawei.com>
-Message-ID: <1e56f7e1-2a2f-26c9-9c74-97e0d22bc98b@huawei.com>
-Date: Mon, 9 Oct 2017 13:09:22 +0100
+Received: from server.coly.li ([162.144.45.48]:55926 "EHLO server.coly.li"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750950AbdJJGMQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Oct 2017 02:12:16 -0400
+Subject: Re: [PATCH] [PATCH v3] bcache: gc does not work when triggering by
+ manual
+To: tang.junhui@zte.com.cn
+Cc: colyli@suse.de, mlyle@lyle.org, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <1507603489-30999-1-git-send-email-tang.junhui@zte.com.cn>
+From: Coly Li <i@coly.li>
+Message-ID: <e3b2975e-f371-fcfc-b941-1e4a8ab999be@coly.li>
+Date: Tue, 10 Oct 2017 14:12:05 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170930102720.30219-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+In-Reply-To: <1507603489-30999-1-git-send-email-tang.junhui@zte.com.cn>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 30/09/2017 11:27, Ming Lei wrote:
-> Hi Jens,
->
-> In Red Hat internal storage test wrt. blk-mq scheduler, we
-> found that I/O performance is much bad with mq-deadline, especially
-> about sequential I/O on some multi-queue SCSI devcies(lpfc, qla2xxx,
-> SRP...)
->
-> Turns out one big issue causes the performance regression: requests
-> are still dequeued from sw queue/scheduler queue even when ldd's
-> queue is busy, so I/O merge becomes quite difficult to make, then
-> sequential IO degrades a lot.
->
-> This issue becomes one of mains reasons for reverting default SCSI_MQ
-> in V4.13.
->
-> The 1st patch takes direct issue in blk_mq_request_bypass_insert(),
-> then we can improve dm-mpath's performance in part 2, which will
-> be posted out soon.
->
-> The 2nd six patches improve this situation, and brings back
-> some performance loss.
->
-> With this change, SCSI-MQ sequential I/O performance is
-> improved much, Paolo reported that mq-deadline performance
-> improved much[2] in his dbench test wrt V2. Also performanc
-> improvement on lpfc/qla2xx was observed with V1.[1]
->
-> Please consider it for V4.15.
->
-> [1] http://marc.info/?l=linux-block&m=150151989915776&w=2
-> [2] https://marc.info/?l=linux-block&m=150217980602843&w=2
->
+On 2017/10/10 上午10:44, tang.junhui@zte.com.cn wrote:
+> From: Tang Junhui <tang.junhui@zte.com.cn>
+> 
+> I try to execute the following command to trigger gc thread:
+> [root@localhost internal]# echo 1 > trigger_gc
+> But it does not work, I debug the code in gc_should_run(), It works only
+> if in invalidating or sectors_to_gc < 0. So set sectors_to_gc to -1 to
+> meet the condition when we trigger gc by manual command.
+> 
+> Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
 
-I tested this series for the SAS controller on HiSilicon hip07 platform 
-as I am interested in enabling MQ for this driver. Driver is 
-./drivers/scsi/hisi_sas/.
+Hi Junhui,
 
-So I found that that performance is improved when enabling default 
-SCSI_MQ with this series vs baseline. However, it is still not as a good 
-as when default SCSI_MQ is disabled.
+This patch is in mainline kernel v4.14 already, there is the upstream
+patch head,
 
-Here are some figures I got with fio:
-4.14-rc2 without default SCSI_MQ
-read, rw, write IOPS	
-952K, 133K/133K, 800K
+commit 0b43f49dc4d6d3789e936731dc16af94cb57d568
+Author: Tang Junhui <tang.junhui@zte.com.cn>
+Date:   Wed Sep 6 14:25:55 2017 +0800
 
-4.14-rc2 with default SCSI_MQ
-read, rw, write IOPS	
-311K, 117K/117K, 320K
+    bcache: gc does not work when triggering by manual command
 
-This series* without default SCSI_MQ
-read, rw, write IOPS	
-975K, 132K/132K, 790K
+    I try to execute the following command to trigger gc thread:
+    [root@localhost internal]# echo 1 > trigger_gc
+    But it does not work, I debug the code in gc_should_run(), It works only
+    if in invalidating or sectors_to_gc < 0. So set sectors_to_gc to -1 to
+    meet the condition when we trigger gc by manual command.
 
-This series* with default SCSI_MQ
-read, rw, write IOPS	
-770K, 164K/164K, 594K
+    (Code comments aded by Coly Li)
 
-Please note that hisi_sas driver does not enable mq by exposing multiple 
-queues to upper layer (even though it has multiple queues). I have been 
-playing with enabling it, but my performance is always worse...
+    Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+    Reviewed-by: Coly Li <colyli@suse.de>
+    Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-* I'm using 
-https://github.com/ming1/linux/commits/blk_mq_improve_scsi_mpath_perf_V5.1, 
-as advised by Ming Lei.
 
-Thanks,
-John
+> ---
+>  drivers/md/bcache/sysfs.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+> index b3ff57d..bef776d 100644
+> --- a/drivers/md/bcache/sysfs.c
+> +++ b/drivers/md/bcache/sysfs.c
+> @@ -614,8 +614,16 @@ STORE(__bch_cache_set)
+>  		bch_cache_accounting_clear(&c->accounting);
+>  	}
+>  
+> -	if (attr == &sysfs_trigger_gc)
+> +	if (attr == &sysfs_trigger_gc) {
+> +		/* 
+> +		  * Satisfy the gc condition by setting sectors_to_gc under 0,
+> +		  * sectors_to_gc may also be decreased under 0 in 
+> +		  * bch_data_insert_start() and gc would be triggered again,
+> +		  * but the race is rare, and harmless, so we can ignore it
+> +		  */
+> +		atomic_set(&c->sectors_to_gc, -1);
+>  		wake_up_gc(c);
+> +	}
+>  
+>  	if (attr == &sysfs_prune_cache) {
+>  		struct shrink_control sc;
+> 
 
-> V5:
-> 	- address some comments from Omar
-> 	- add Tested-by & Reveiewed-by tag
-> 	- use direct issue for blk_mq_request_bypass_insert(), and
-> 	start to consider to improve sequential I/O for dm-mpath
-> 	- only include part 1(the original patch 1 ~ 6), as suggested
-> 	by Omar
->
-> V4:
-> 	- add Reviewed-by tag
-> 	- some trival change: typo fix in commit log or comment,
-> 	variable name, no actual functional change
->
-> V3:
-> 	- totally round robin for picking req from ctx, as suggested
-> 	by Bart
-> 	- remove one local variable in __sbitmap_for_each_set()
-> 	- drop patches of single dispatch list, which can improve
-> 	performance on mq-deadline, but cause a bit degrade on
-> 	none because all hctxs need to be checked after ->dispatch
-> 	is flushed. Will post it again once it is mature.
-> 	- rebase on v4.13-rc6 with block for-next
->
-> V2:
-> 	- dequeue request from sw queues in round roubin's style
-> 	as suggested by Bart, and introduces one helper in sbitmap
-> 	for this purpose
-> 	- improve bio merge via hash table from sw queue
-> 	- add comments about using DISPATCH_BUSY state in lockless way,
-> 	simplifying handling on busy state,
-> 	- hold ctx->lock when clearing ctx busy bit as suggested
-> 	by Bart
->
->
-> Ming Lei (7):
->   blk-mq: issue rq directly in blk_mq_request_bypass_insert()
->   blk-mq-sched: fix scheduler bad performance
->   sbitmap: introduce __sbitmap_for_each_set()
->   blk-mq: introduce blk_mq_dequeue_from_ctx()
->   blk-mq-sched: move actual dispatching into one helper
->   blk-mq-sched: improve dispatching from sw queue
->   blk-mq-sched: don't dequeue request until all in ->dispatch are
->     flushed
->
->  block/blk-core.c        |   3 +-
->  block/blk-mq-debugfs.c  |   1 +
->  block/blk-mq-sched.c    | 104 ++++++++++++++++++++++++++++++++++++-------
->  block/blk-mq.c          | 114 +++++++++++++++++++++++++++++++++++++++---------
->  block/blk-mq.h          |   4 +-
->  drivers/md/dm-rq.c      |   2 +-
->  include/linux/blk-mq.h  |   3 ++
->  include/linux/sbitmap.h |  64 +++++++++++++++++++--------
->  8 files changed, 238 insertions(+), 57 deletions(-)
->
+
+-- 
+Coly Li
