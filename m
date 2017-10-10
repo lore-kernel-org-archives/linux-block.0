@@ -1,68 +1,78 @@
-Return-Path: <SRS0=uvfw=BG=fb.com=shli@kernel.org>
-From: Shaohua Li <shli@kernel.org>
-To: linux-block@vger.kernel.org
-Cc: vgoyal@redhat.com,
-	tj@kernel.org,
-	axboe@kernel.dk,
-	Kernel-team@fb.com,
-	Shaohua Li <shli@fb.com>
-Subject: [PATCH V2 2/3] block: set request_list for request
-Date: Fri,  6 Oct 2017 17:56:00 -0700
-Message-Id: <39caee250aa6d115c0505d629a76281b84369f8e.1507337347.git.shli@fb.com>
-In-Reply-To: <cover.1507337347.git.shli@fb.com>
-References: <cover.1507337347.git.shli@fb.com>
-In-Reply-To: <cover.1507337347.git.shli@fb.com>
-References: <cover.1507337347.git.shli@fb.com>
+Return-Path: <prvs=449916f6d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Oleksandr Natalenko <oleksandr@natalenko.name>,
+	Ming Lei <ming.lei@redhat.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH v8 07/10] ide, scsi: Tell the block layer at request allocation time about preempt requests
+Date: Tue, 10 Oct 2017 14:03:43 -0700
+Message-Id: <20171010210346.14574-8-bart.vanassche@wdc.com>
+In-Reply-To: <20171010210346.14574-1-bart.vanassche@wdc.com>
+References: <20171010210346.14574-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Shaohua Li <shli@fb.com>
+Convert blk_get_request(q, op, __GFP_RECLAIM) into
+blk_get_request_flags(q, op, BLK_MQ_PREEMPT). This patch does not
+change any functionality.
 
-Legacy queue sets request's request_list, mq doesn't. This makes mq does
-the same thing, so we can find cgroup of a request. Note, we really
-only use blkg field of request_list, it's pointless to allocate mempool
-for request_list in mq case.
-
-Signed-off-by: Shaohua Li <shli@fb.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Acked-by: David S. Miller <davem@davemloft.net> [ for IDE ]
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- block/blk-core.c | 2 +-
- block/blk-mq.c   | 5 +++++
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ drivers/ide/ide-pm.c    | 4 ++--
+ drivers/scsi/scsi_lib.c | 6 +++---
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index adb064a..f88afd1 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -718,7 +718,7 @@ static void free_request_size(void *element, void *data)
- int blk_init_rl(struct request_list *rl, struct request_queue *q,
- 		gfp_t gfp_mask)
- {
--	if (unlikely(rl->rq_pool))
-+	if (unlikely(rl->rq_pool) || q->mq_ops)
- 		return 0;
+diff --git a/drivers/ide/ide-pm.c b/drivers/ide/ide-pm.c
+index 544f02d673ca..f56d742908df 100644
+--- a/drivers/ide/ide-pm.c
++++ b/drivers/ide/ide-pm.c
+@@ -89,9 +89,9 @@ int generic_ide_resume(struct device *dev)
+ 	}
  
- 	rl->q = q;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 7f01d69..c3b5876 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -481,6 +481,9 @@ void blk_mq_free_request(struct request *rq)
+ 	memset(&rqpm, 0, sizeof(rqpm));
+-	rq = blk_get_request(drive->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
++	rq = blk_get_request_flags(drive->queue, REQ_OP_DRV_IN,
++				   BLK_MQ_REQ_PREEMPT);
+ 	ide_req(rq)->type = ATA_PRIV_PM_RESUME;
+-	rq->rq_flags |= RQF_PREEMPT;
+ 	rq->special = &rqpm;
+ 	rqpm.pm_step = IDE_PM_START_RESUME;
+ 	rqpm.pm_state = PM_EVENT_ON;
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 9cf6a80fe297..1c16a247fae6 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -252,9 +252,9 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 	struct scsi_request *rq;
+ 	int ret = DRIVER_ERROR << 24;
  
- 	wbt_done(q->rq_wb, &rq->issue_stat);
+-	req = blk_get_request(sdev->request_queue,
++	req = blk_get_request_flags(sdev->request_queue,
+ 			data_direction == DMA_TO_DEVICE ?
+-			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM);
++			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, BLK_MQ_REQ_PREEMPT);
+ 	if (IS_ERR(req))
+ 		return ret;
+ 	rq = scsi_req(req);
+@@ -268,7 +268,7 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 	rq->retries = retries;
+ 	req->timeout = timeout;
+ 	req->cmd_flags |= flags;
+-	req->rq_flags |= rq_flags | RQF_QUIET | RQF_PREEMPT;
++	req->rq_flags |= rq_flags | RQF_QUIET;
  
-+	if (blk_rq_rl(rq))
-+		blk_put_rl(blk_rq_rl(rq));
-+
- 	clear_bit(REQ_ATOM_STARTED, &rq->atomic_flags);
- 	clear_bit(REQ_ATOM_POLL_SLEPT, &rq->atomic_flags);
- 	if (rq->tag != -1)
-@@ -1504,6 +1507,8 @@ static void blk_mq_bio_to_request(struct request *rq, struct bio *bio)
- {
- 	blk_init_request_from_bio(rq, bio);
- 
-+	blk_rq_set_rl(rq, blk_get_rl(rq->q, bio));
-+
- 	blk_account_io_start(rq, true);
- }
- 
+ 	/*
+ 	 * head injection *required* here otherwise quiesce won't work
 -- 
-2.9.5
+2.14.2
