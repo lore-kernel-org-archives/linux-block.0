@@ -1,79 +1,48 @@
-Return-Path: <prvs=44825b072=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	=Oleksandr Natalenko <oleksandr@natalenko.name>,
-	"Luis R . Rodriguez" <mcgrof@kernel.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v7 7/9] ide, scsi: Tell the block layer at request allocation time about preempt requests
-Date: Mon,  9 Oct 2017 16:13:58 -0700
-Message-Id: <20171009231400.562-8-bart.vanassche@wdc.com>
-In-Reply-To: <20171009231400.562-1-bart.vanassche@wdc.com>
-References: <20171009231400.562-1-bart.vanassche@wdc.com>
+Return-Path: <kyle.fortin@oracle.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: [PATCH] block: add partition uuid into uevent as "PARTUUID"
+From: Kyle Fortin <kyle.fortin@oracle.com>
+In-Reply-To: <150729013610.744480.1644359289262914898.stgit@buzz>
+Date: Tue, 10 Oct 2017 16:57:07 -0400
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-kernel@vger.kernel.org
+Message-Id: <B8DD6C03-B98F-4B74-A6A5-39219C470575@oracle.com>
+References: <150729013610.744480.1644359289262914898.stgit@buzz>
+To: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
 List-ID: <linux-block@vger.kernel.org>
 
-Convert blk_get_request(q, op, __GFP_RECLAIM) into
-blk_get_request_flags(q, op, BLK_MQ_PREEMPT). This patch does not
-change any functionality.
+Hi Konstantin,
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Acked-by: David S. Miller <davem@davemloft.net> [ for IDE ]
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/ide/ide-pm.c    | 4 ++--
- drivers/scsi/scsi_lib.c | 6 +++---
- 2 files changed, 5 insertions(+), 5 deletions(-)
+> On Oct 6, 2017, at 7:42 AM, Konstantin Khlebnikov =
+<khlebnikov@yandex-team.ru> wrote:
+>=20
+> Both most common formats have uuid in addition to partition name:
+> GPT: standard uuid xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+> DOS: 4 byte disk signature and 1 byte partition xxxxxxxx-xx
+>=20
+> Tools from util-linux use the same notation for them.
+>=20
+> Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+> ---
+> block/partition-generic.c |    2 ++
+> 1 file changed, 2 insertions(+)
+>=20
+> diff --git a/block/partition-generic.c b/block/partition-generic.c
+> index 88c555db4e5d..8f8b580aee16 100644
+> --- a/block/partition-generic.c
+> +++ b/block/partition-generic.c
+> @@ -226,6 +226,8 @@ static int part_uevent(struct device *dev, struct =
+kobj_uevent_env *env)
+> 	add_uevent_var(env, "PARTN=3D%u", part->partno);
+> 	if (part->info && part->info->volname[0])
+> 		add_uevent_var(env, "PARTNAME=3D%s", =
+part->info->volname);
+> +	if (part->info && part->info->uuid[0])
+> +		add_uevent_var(env, "PARTUUID=3D%s", part->info->uuid);
+> 	return 0;
+> }
 
-diff --git a/drivers/ide/ide-pm.c b/drivers/ide/ide-pm.c
-index 544f02d673ca..f56d742908df 100644
---- a/drivers/ide/ide-pm.c
-+++ b/drivers/ide/ide-pm.c
-@@ -89,9 +89,9 @@ int generic_ide_resume(struct device *dev)
- 	}
- 
- 	memset(&rqpm, 0, sizeof(rqpm));
--	rq = blk_get_request(drive->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
-+	rq = blk_get_request_flags(drive->queue, REQ_OP_DRV_IN,
-+				   BLK_MQ_REQ_PREEMPT);
- 	ide_req(rq)->type = ATA_PRIV_PM_RESUME;
--	rq->rq_flags |= RQF_PREEMPT;
- 	rq->special = &rqpm;
- 	rqpm.pm_step = IDE_PM_START_RESUME;
- 	rqpm.pm_state = PM_EVENT_ON;
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 9cf6a80fe297..1c16a247fae6 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -252,9 +252,9 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
- 	struct scsi_request *rq;
- 	int ret = DRIVER_ERROR << 24;
- 
--	req = blk_get_request(sdev->request_queue,
-+	req = blk_get_request_flags(sdev->request_queue,
- 			data_direction == DMA_TO_DEVICE ?
--			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM);
-+			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, BLK_MQ_REQ_PREEMPT);
- 	if (IS_ERR(req))
- 		return ret;
- 	rq = scsi_req(req);
-@@ -268,7 +268,7 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
- 	rq->retries = retries;
- 	req->timeout = timeout;
- 	req->cmd_flags |= flags;
--	req->rq_flags |= rq_flags | RQF_QUIET | RQF_PREEMPT;
-+	req->rq_flags |= rq_flags | RQF_QUIET;
- 
- 	/*
- 	 * head injection *required* here otherwise quiesce won't work
--- 
-2.14.2
+Looks fine.
+
+Reviewed-by: Kyle Fortin <kyle.fortin@oracle.com>
