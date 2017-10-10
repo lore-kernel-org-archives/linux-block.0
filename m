@@ -1,104 +1,125 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Byungchul Park <byungchul.park@lge.com>
-To: peterz@infradead.org, mingo@kernel.org
-Cc: tglx@linutronix.de, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, tj@kernel.org, johannes.berg@intel.com,
-        oleg@redhat.com, amir73il@gmail.com, david@fromorbit.com,
-        darrick.wong@oracle.com, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        hch@infradead.org, idryomov@gmail.com, kernel-team@lge.com
-Subject: [PATCH v2 2/4] lockdep: Remove unnecessary acquisitions wrt workqueue flush
-Date: Thu, 19 Oct 2017 16:03:25 +0900
-Message-Id: <1508396607-25362-3-git-send-email-byungchul.park@lge.com>
-In-Reply-To: <1508396607-25362-1-git-send-email-byungchul.park@lge.com>
-References: <1508392531-11284-1-git-send-email-byungchul.park@lge.com>
- <1508396607-25362-1-git-send-email-byungchul.park@lge.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-qt0-f170.google.com ([209.85.216.170]:54088 "EHLO
+        mail-qt0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755424AbdJJAAS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Oct 2017 20:00:18 -0400
+Received: by mail-qt0-f170.google.com with SMTP id n61so18611211qte.10
+        for <linux-block@vger.kernel.org>; Mon, 09 Oct 2017 17:00:18 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <058dc73f-a36f-c3c2-8dc3-833545979693@coly.li>
+References: <1506497553-12552-1-git-send-email-tang.junhui@zte.com.cn>
+ <CAJ+L6qe7C=FyPFya8y0HV8SCc7VSEEuUApcqEUnouVDUByfZ5w@mail.gmail.com>
+ <6a2052da-6b52-9c06-b85e-e3ea29e3f8e8@coly.li> <CAJ+L6qdqQn4tpFdkPZ-zhxss9O8axBEarMBJA5X6f9i+K8SLGg@mail.gmail.com>
+ <CAJ+L6qe8rwbtO6tR-QNQBUApbeGQ9NGD=P9t5gtN9j0kzacJEQ@mail.gmail.com>
+ <cb6db7c0-eaf7-f4a8-5584-8ce512575d74@coly.li> <CAJ+L6qdG70ExM7cnwYFLmCDBXY8SBErLhnMNeFVscXYemb_1SQ@mail.gmail.com>
+ <18f2271b-87c2-530d-12da-dc2b4a5af1fd@coly.li> <CAJ+L6qcLc-=bbDJuaToDFPUWG=c4JKhKBQkivaw3tYWdjERmZw@mail.gmail.com>
+ <b654ae09-b9f1-295f-b45a-6688c7fa4e0d@suse.de> <CAJ+L6qf7NtkqKFbKsEjr8noqG94nPQnj1z3doMh10DYH-vMniw@mail.gmail.com>
+ <CAJ+L6qdQG27JpDTPxPrgYgeVC8qq-hYHq85U1zHQJDUneT8trA@mail.gmail.com>
+ <dca3c016-bb3f-7d8c-1509-f042628d7fd6@coly.li> <CAJ+L6qcY=_vTaqZDLvif_3pqwujo24NUZhGG9ebp6z5+uWqwQQ@mail.gmail.com>
+ <33e52793-251d-ed58-fb59-5432946efb56@coly.li> <CAJ+L6qdnzocZRvcExwFBJPmVJnHWNJXY8j3NioUaekAp06QzXg@mail.gmail.com>
+ <058dc73f-a36f-c3c2-8dc3-833545979693@coly.li>
+From: Michael Lyle <mlyle@lyle.org>
+Date: Mon, 9 Oct 2017 17:00:15 -0700
+Message-ID: <CAJ+L6qeAbWXUu5BA94NBew+FYGcKV9S2957=aT10xGrkD2F4iA@mail.gmail.com>
+Subject: Re: [PATCH 4/5] bcache: writeback: collapse contiguous IO better
+To: Coly Li <i@coly.li>
+Cc: Hannes Reinecke <hare@suse.de>,
+        Junhui Tang <tang.junhui@zte.com.cn>,
+        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The workqueue added manual acquisitions to catch deadlock cases.
-Now crossrelease was introduced, some of those are redundant, since
-wait_for_completion() already includes the acquisition for itself.
-Removed it.
+Hi Coly--
 
-Signed-off-by: Byungchul Park <byungchul.park@lge.com>
----
- include/linux/workqueue.h |  4 ++--
- kernel/workqueue.c        | 20 ++++----------------
- 2 files changed, 6 insertions(+), 18 deletions(-)
+We talked a bunch on IRC, so I'd just like to answer a couple of the
+things again here for the benefit of everyone else / further
+discussion.
 
-diff --git a/include/linux/workqueue.h b/include/linux/workqueue.h
-index f3c47a0..1455b5e 100644
---- a/include/linux/workqueue.h
-+++ b/include/linux/workqueue.h
-@@ -218,7 +218,7 @@ static inline void destroy_delayed_work_on_stack(struct delayed_work *work) { }
- 									\
- 		__init_work((_work), _onstack);				\
- 		(_work)->data = (atomic_long_t) WORK_DATA_INIT();	\
--		lockdep_init_map(&(_work)->lockdep_map, #_work, &__key, 0); \
-+		lockdep_init_map(&(_work)->lockdep_map, "(complete)"#_work, &__key, 0); \
- 		INIT_LIST_HEAD(&(_work)->entry);			\
- 		(_work)->func = (_func);				\
- 	} while (0)
-@@ -399,7 +399,7 @@ enum {
- 	static struct lock_class_key __key;				\
- 	const char *__lock_name;					\
- 									\
--	__lock_name = #fmt#args;					\
-+	__lock_name = "(complete)"#fmt#args;				\
- 									\
- 	__alloc_workqueue_key((fmt), (flags), (max_active),		\
- 			      &__key, __lock_name, ##args);		\
-diff --git a/kernel/workqueue.c b/kernel/workqueue.c
-index c77fdf6..8cef533 100644
---- a/kernel/workqueue.c
-+++ b/kernel/workqueue.c
-@@ -2496,15 +2496,8 @@ static void insert_wq_barrier(struct pool_workqueue *pwq,
- 	INIT_WORK_ONSTACK(&barr->work, wq_barrier_func);
- 	__set_bit(WORK_STRUCT_PENDING_BIT, work_data_bits(&barr->work));
- 
--	/*
--	 * Explicitly init the crosslock for wq_barrier::done, make its lock
--	 * key a subkey of the corresponding work. As a result we won't
--	 * build a dependency between wq_barrier::done and unrelated work.
--	 */
--	lockdep_init_map_crosslock((struct lockdep_map *)&barr->done.map,
--				   "(complete)wq_barr::done",
--				   target->lockdep_map.key, 1);
--	__init_completion(&barr->done);
-+	init_completion_with_map(&barr->done, &target->lockdep_map);
-+
- 	barr->task = current;
- 
- 	/*
-@@ -2610,16 +2603,14 @@ void flush_workqueue(struct workqueue_struct *wq)
- 	struct wq_flusher this_flusher = {
- 		.list = LIST_HEAD_INIT(this_flusher.list),
- 		.flush_color = -1,
--		.done = COMPLETION_INITIALIZER_ONSTACK(this_flusher.done),
- 	};
- 	int next_color;
- 
-+	init_completion_with_map(&this_flusher.done, &wq->lockdep_map);
-+
- 	if (WARN_ON(!wq_online))
- 		return;
- 
--	lock_map_acquire(&wq->lockdep_map);
--	lock_map_release(&wq->lockdep_map);
--
- 	mutex_lock(&wq->mutex);
- 
- 	/*
-@@ -2882,9 +2873,6 @@ bool flush_work(struct work_struct *work)
- 	if (WARN_ON(!wq_online))
- 		return false;
- 
--	lock_map_acquire(&work->lockdep_map);
--	lock_map_release(&work->lockdep_map);
--
- 	if (start_flush_work(work, &barr)) {
- 		wait_for_completion(&barr.done);
- 		destroy_work_on_stack(&barr.work);
--- 
-1.9.1
+On Mon, Oct 9, 2017 at 11:58 AM, Coly Li <i@coly.li> wrote:
+> I do observe the perfect side of your patches, when I/O blocksize
+> <=256kB, I see great advantage of writeback performance when bio
+> reordered. Especially when blocksiz is 8K, writeback performance is 3x
+> at least (because without your patch the writeback is too slow and I
+> gave up after hours).
+>
+> The performance regression happens when fio blocksize increased to 512K
+> and dirty data increased to 900GB. And when fio blocksize increased to
+> 1MB and dirty data on cache increased to 900, writeback performance
+> regression becomes easily recognized.
+>
+> An interesting behavior I observed is, for large blocksize and dirty
+> data, without bio reorder patches, writeback performance is much higher
+> than the bio reorder one. An example is,
+> http://blog.coly.li/wp-content/uploads/2017/10/writeback_throughput_on_linear_900_1800G_cache_half.png
+>
+> The first 15 minutes, bcache without bio reorder performs much higher
+> than the reorder one. 15 minutes later, all the writeback rate decreased
+> to a similar level. That's said, most of the performance regression
+> happens at the beginning when writeback starts.
+
+I have looked at this and I believe I understand why.  Patch 4 changes
+the issuance of sequential I/O.  It limits how much writeback will be
+issued at a time, as opposed to being willing to issue any amount in
+the previous code:
+
++                       if (size >= MAX_WRITESIZE_IN_PASS)
++                               break;
+
+MAX_WRITESIZE_IN_PASS corresponds to 2500 KBytes, or it'll hit the
+limit with 2 1MB blocks issued and then go back to delay.
+
+The reason I put these lines here is to prevent from issuing a set of
+writebacks that are so large that they tie up the backing disk for a
+very long time and hurt interactive performance.  We could make it
+tunable, though I'm hesitant to have too many tunables as it'll make
+testing and verifying all this difficult.
+
+> All the tests are under ideal situations, no writeback happens when fio
+> writes dirty data onto cache device. If in more generic situations when
+> less LBA contiguous dirty blocks on cache, I guess the writeback
+> regression might be more obvious.
+
+I think it is because of this conditional which is confined to only
+LBA contiguous things.  We could remove the conditional but it's there
+to try and preserve interactive/frontend performance during writeback.
+
+> When dirty blocks are not LBA contiguous on cache device, for small
+> dirty block size, I don't worry. Because you explained in previous
+> emails clearly, the worst case is the performance backing to the numbers
+> which has no bio reorder patch. But for large blocksize and large dirty
+> data, that's the common case when bcache is used for distributed
+> computing/storage systems like Ceph or Hadoop (multiple hard drives
+> attached to a large SSD cache, normally object file sizes are from 4MB
+> to 128MB).
+
+I don't think a SSD cache will help the big block portion of workloads
+like this much, as they're not access-time constrained but instead
+bandwidth constrained.  That's why, default configuration of bcache is
+for >=4MB sequential stuff to bypass the cache and go directly to the
+spinning disks.
+
+Even if the SSD has twice the bandwidth of the spinning disk array,
+everything written back needs to be written to the SSD and then later
+read for writeback, so it's no quicker at steady state.
+
+[snip]
+> I raise a green flag to your bio reorder patches :-) I do hope I could
+> have seen such performance data at first time :P
+>
+> *Last one question*: Could you please to consider an option to
+> enable/disable the bio reorder code in sysfs? It can be enabled as
+> default. When people cares about large dirty data size writeback, they
+> can choose to disable the bio reorder policy.
+
+I don't think it's the bio reorder code itself, but instead a change
+in how we delay for writeback.  I wrote the new stuff to try and be a
+better compromise between writeback rate and interactive performance.
+
+My biggest concern is, that both the old code and the new code-- seems
+to be writing back at about only 25-33% of the speed that your disks
+should be capable of in this case.  I think that's a bigger issue than
+the small difference in performance in this specific case.
+
+Mike
