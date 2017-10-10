@@ -1,30 +1,154 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Tue, 10 Oct 2017 10:57:14 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Shaohua Li <shli@kernel.org>
+Cc: linux-block@vger.kernel.org, vgoyal@redhat.com, tj@kernel.org,
+	axboe@kernel.dk, Kernel-team@fb.com, Shaohua Li <shli@fb.com>,
+	Omar Sandoval <osandov@fb.com>
 Subject: Re: [PATCH V2 1/3] blk-stat: delete useless code
-To: Shaohua Li <shli@kernel.org>, linux-block@vger.kernel.org
-Cc: vgoyal@redhat.com, tj@kernel.org, Kernel-team@fb.com,
- Shaohua Li <shli@fb.com>, Omar Sandoval <osandov@fb.com>
+Message-ID: <20171010175714.GA30738@vader.DHCP.thefacebook.com>
 References: <cover.1507337347.git.shli@fb.com>
  <74821887899a7d05c6429e03f0dc49a079c446b9.1507337347.git.shli@fb.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <4b4db306-01a3-a138-26dd-38133703a8c3@kernel.dk>
-Date: Tue, 10 Oct 2017 12:02:42 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <74821887899a7d05c6429e03f0dc49a079c446b9.1507337347.git.shli@fb.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/06/2017 06:55 PM, Shaohua Li wrote:
+On Fri, Oct 06, 2017 at 05:55:59PM -0700, Shaohua Li wrote:
 > From: Shaohua Li <shli@fb.com>
 > 
 > Fix two issues:
 > - the per-cpu stat flush is unnecessary, nobody uses per-cpu stat except
 >   sum it to global stat. We can do the calculation there. The flush just
 >   wastes cpu time.
+
+One thing that the stat flushing avoids is overflowing the batch
+counter, but with the current windows we're using, that seems really
+unlikely, so I think this is okay.
+
+Since they diverged, I would kind of like to separate the types for the
+per-cpu buffer and the final stats, but this is fine for now.
+
 > - some fields are signed int/s64. I don't see the point.
 
-Anecdotal, I had issues with the div yielding wrong results with
-an unsigned type. But I don't remember what or why right now,
-unfortunately, and this was before it was merged...
+I like this part.
 
--- 
-Jens Axboe
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+
+> Cc: Omar Sandoval <osandov@fb.com>
+> Signed-off-by: Shaohua Li <shli@fb.com>
+> ---
+>  block/blk-stat.c          | 45 +++++++--------------------------------------
+>  include/linux/blk_types.h |  5 ++---
+>  2 files changed, 9 insertions(+), 41 deletions(-)
+> 
+> diff --git a/block/blk-stat.c b/block/blk-stat.c
+> index c52356d..3a2f3c9 100644
+> --- a/block/blk-stat.c
+> +++ b/block/blk-stat.c
+> @@ -11,8 +11,6 @@
+>  #include "blk-mq.h"
+>  #include "blk.h"
+>  
+> -#define BLK_RQ_STAT_BATCH	64
+> -
+>  struct blk_queue_stats {
+>  	struct list_head callbacks;
+>  	spinlock_t lock;
+> @@ -23,45 +21,21 @@ static void blk_stat_init(struct blk_rq_stat *stat)
+>  {
+>  	stat->min = -1ULL;
+>  	stat->max = stat->nr_samples = stat->mean = 0;
+> -	stat->batch = stat->nr_batch = 0;
+> -}
+> -
+> -static void blk_stat_flush_batch(struct blk_rq_stat *stat)
+> -{
+> -	const s32 nr_batch = READ_ONCE(stat->nr_batch);
+> -	const s32 nr_samples = READ_ONCE(stat->nr_samples);
+> -
+> -	if (!nr_batch)
+> -		return;
+> -	if (!nr_samples)
+> -		stat->mean = div64_s64(stat->batch, nr_batch);
+> -	else {
+> -		stat->mean = div64_s64((stat->mean * nr_samples) +
+> -					stat->batch,
+> -					nr_batch + nr_samples);
+> -	}
+> -
+> -	stat->nr_samples += nr_batch;
+> -	stat->nr_batch = stat->batch = 0;
+> +	stat->batch = 0;
+>  }
+>  
+> +/* src is a per-cpu stat, mean isn't initialized */
+>  static void blk_stat_sum(struct blk_rq_stat *dst, struct blk_rq_stat *src)
+>  {
+> -	blk_stat_flush_batch(src);
+> -
+>  	if (!src->nr_samples)
+>  		return;
+>  
+>  	dst->min = min(dst->min, src->min);
+>  	dst->max = max(dst->max, src->max);
+>  
+> -	if (!dst->nr_samples)
+> -		dst->mean = src->mean;
+> -	else {
+> -		dst->mean = div64_s64((src->mean * src->nr_samples) +
+> -					(dst->mean * dst->nr_samples),
+> -					dst->nr_samples + src->nr_samples);
+> -	}
+> +	dst->mean = div_u64(src->batch + dst->mean * dst->nr_samples,
+> +				dst->nr_samples + src->nr_samples);
+> +
+>  	dst->nr_samples += src->nr_samples;
+>  }
+>  
+> @@ -69,13 +43,8 @@ static void __blk_stat_add(struct blk_rq_stat *stat, u64 value)
+>  {
+>  	stat->min = min(stat->min, value);
+>  	stat->max = max(stat->max, value);
+> -
+> -	if (stat->batch + value < stat->batch ||
+> -	    stat->nr_batch + 1 == BLK_RQ_STAT_BATCH)
+> -		blk_stat_flush_batch(stat);
+> -
+>  	stat->batch += value;
+> -	stat->nr_batch++;
+> +	stat->nr_samples++;
+>  }
+>  
+>  void blk_stat_add(struct request *rq)
+> @@ -84,7 +53,7 @@ void blk_stat_add(struct request *rq)
+>  	struct blk_stat_callback *cb;
+>  	struct blk_rq_stat *stat;
+>  	int bucket;
+> -	s64 now, value;
+> +	u64 now, value;
+>  
+>  	now = __blk_stat_time(ktime_to_ns(ktime_get()));
+>  	if (now < blk_stat_time(&rq->issue_stat))
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index a2d2aa7..3385c89 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -329,11 +329,10 @@ static inline bool blk_qc_t_is_internal(blk_qc_t cookie)
+>  }
+>  
+>  struct blk_rq_stat {
+> -	s64 mean;
+> +	u64 mean;
+>  	u64 min;
+>  	u64 max;
+> -	s32 nr_samples;
+> -	s32 nr_batch;
+> +	u32 nr_samples;
+>  	u64 batch;
+>  };
+>  
+> -- 
+> 2.9.5
+> 
