@@ -1,130 +1,67 @@
-Return-Path: <prvs=441412a59=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
+Return-Path: <prvs=449916f6d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
 	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V6 01/14] scsi: sd_zbc: Move ZBC declarations to scsi_proto.h
-Date: Mon,  2 Oct 2017 16:15:22 +0900
-Message-Id: <20171002071535.8007-2-damien.lemoal@wdc.com>
-In-Reply-To: <20171002071535.8007-1-damien.lemoal@wdc.com>
-References: <20171002071535.8007-1-damien.lemoal@wdc.com>
+	Oleksandr Natalenko <oleksandr@natalenko.name>,
+	Ming Lei <ming.lei@redhat.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Shaohua Li <shli@kernel.org>,
+	linux-raid@vger.kernel.org,
+	Hannes Reinecke <hare@suse.com>
+Subject: [PATCH v8 01/10] md: Rename md_notifier into md_reboot_notifier
+Date: Tue, 10 Oct 2017 14:03:37 -0700
+Message-Id: <20171010210346.14574-2-bart.vanassche@wdc.com>
+In-Reply-To: <20171010210346.14574-1-bart.vanassche@wdc.com>
+References: <20171010210346.14574-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Move standard macro definitions for the zone types and zone conditions
-to scsi_proto.h together with the definitions related to the
-REPORT ZONES command. While at it, define all values in the enums to
-be clear.
+This avoids confusion with the pm notifier that will be added
+through a later patch.
 
-Also remove unnecessary includes in sd_zbc.c.
-
-No functional change is introduced by this patch.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Bart Van Assche <Bart.VanAssche@wdc.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
 Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: Shaohua Li <shli@kernel.org>
+Cc: linux-raid@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
 ---
- drivers/scsi/sd_zbc.c     | 24 ------------------------
- include/scsi/scsi_proto.h | 45 ++++++++++++++++++++++++++++++++++-----------
- 2 files changed, 34 insertions(+), 35 deletions(-)
+ drivers/md/md.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index 8aa54779aac1..692c8cbc7ed8 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -28,32 +28,8 @@
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 5d61049e7417..8933cafc212d 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -8966,7 +8966,7 @@ static int md_notify_reboot(struct notifier_block *this,
+ 	return NOTIFY_DONE;
+ }
  
- #include <scsi/scsi.h>
- #include <scsi/scsi_cmnd.h>
--#include <scsi/scsi_dbg.h>
--#include <scsi/scsi_device.h>
--#include <scsi/scsi_driver.h>
--#include <scsi/scsi_host.h>
--#include <scsi/scsi_eh.h>
+-static struct notifier_block md_notifier = {
++static struct notifier_block md_reboot_notifier = {
+ 	.notifier_call	= md_notify_reboot,
+ 	.next		= NULL,
+ 	.priority	= INT_MAX, /* before any real devices */
+@@ -9003,7 +9003,7 @@ static int __init md_init(void)
+ 	blk_register_region(MKDEV(mdp_major, 0), 1UL<<MINORBITS, THIS_MODULE,
+ 			    md_probe, NULL, NULL);
  
- #include "sd.h"
--#include "scsi_priv.h"
--
--enum zbc_zone_type {
--	ZBC_ZONE_TYPE_CONV = 0x1,
--	ZBC_ZONE_TYPE_SEQWRITE_REQ,
--	ZBC_ZONE_TYPE_SEQWRITE_PREF,
--	ZBC_ZONE_TYPE_RESERVED,
--};
--
--enum zbc_zone_cond {
--	ZBC_ZONE_COND_NO_WP,
--	ZBC_ZONE_COND_EMPTY,
--	ZBC_ZONE_COND_IMP_OPEN,
--	ZBC_ZONE_COND_EXP_OPEN,
--	ZBC_ZONE_COND_CLOSED,
--	ZBC_ZONE_COND_READONLY = 0xd,
--	ZBC_ZONE_COND_FULL,
--	ZBC_ZONE_COND_OFFLINE,
--};
+-	register_reboot_notifier(&md_notifier);
++	register_reboot_notifier(&md_reboot_notifier);
+ 	raid_table_header = register_sysctl_table(raid_root_table);
  
- /**
-  * Convert a zone descriptor to a zone struct.
-diff --git a/include/scsi/scsi_proto.h b/include/scsi/scsi_proto.h
-index 8c285d9a06d8..39130a9c05bf 100644
---- a/include/scsi/scsi_proto.h
-+++ b/include/scsi/scsi_proto.h
-@@ -301,19 +301,42 @@ struct scsi_lun {
+ 	md_geninit();
+@@ -9243,7 +9243,7 @@ static __exit void md_exit(void)
  
- /* Reporting options for REPORT ZONES */
- enum zbc_zone_reporting_options {
--	ZBC_ZONE_REPORTING_OPTION_ALL = 0,
--	ZBC_ZONE_REPORTING_OPTION_EMPTY,
--	ZBC_ZONE_REPORTING_OPTION_IMPLICIT_OPEN,
--	ZBC_ZONE_REPORTING_OPTION_EXPLICIT_OPEN,
--	ZBC_ZONE_REPORTING_OPTION_CLOSED,
--	ZBC_ZONE_REPORTING_OPTION_FULL,
--	ZBC_ZONE_REPORTING_OPTION_READONLY,
--	ZBC_ZONE_REPORTING_OPTION_OFFLINE,
--	ZBC_ZONE_REPORTING_OPTION_NEED_RESET_WP = 0x10,
--	ZBC_ZONE_REPORTING_OPTION_NON_SEQWRITE,
--	ZBC_ZONE_REPORTING_OPTION_NON_WP = 0x3f,
-+	ZBC_ZONE_REPORTING_OPTION_ALL		= 0x00,
-+	ZBC_ZONE_REPORTING_OPTION_EMPTY		= 0x01,
-+	ZBC_ZONE_REPORTING_OPTION_IMPLICIT_OPEN	= 0x02,
-+	ZBC_ZONE_REPORTING_OPTION_EXPLICIT_OPEN	= 0x03,
-+	ZBC_ZONE_REPORTING_OPTION_CLOSED	= 0x04,
-+	ZBC_ZONE_REPORTING_OPTION_FULL		= 0x05,
-+	ZBC_ZONE_REPORTING_OPTION_READONLY	= 0x06,
-+	ZBC_ZONE_REPORTING_OPTION_OFFLINE	= 0x07,
-+	/* 0x08 to 0x0f are reserved */
-+	ZBC_ZONE_REPORTING_OPTION_NEED_RESET_WP	= 0x10,
-+	ZBC_ZONE_REPORTING_OPTION_NON_SEQWRITE	= 0x11,
-+	/* 0x12 to 0x3e are reserved */
-+	ZBC_ZONE_REPORTING_OPTION_NON_WP	= 0x3f,
- };
+ 	unregister_blkdev(MD_MAJOR,"md");
+ 	unregister_blkdev(mdp_major, "mdp");
+-	unregister_reboot_notifier(&md_notifier);
++	unregister_reboot_notifier(&md_reboot_notifier);
+ 	unregister_sysctl_table(raid_table_header);
  
- #define ZBC_REPORT_ZONE_PARTIAL 0x80
- 
-+/* Zone types of REPORT ZONES zone descriptors */
-+enum zbc_zone_type {
-+	ZBC_ZONE_TYPE_CONV		= 0x1,
-+	ZBC_ZONE_TYPE_SEQWRITE_REQ	= 0x2,
-+	ZBC_ZONE_TYPE_SEQWRITE_PREF	= 0x3,
-+	/* 0x4 to 0xf are reserved */
-+};
-+
-+/* Zone conditions of REPORT ZONES zone descriptors */
-+enum zbc_zone_cond {
-+	ZBC_ZONE_COND_NO_WP		= 0x0,
-+	ZBC_ZONE_COND_EMPTY		= 0x1,
-+	ZBC_ZONE_COND_IMP_OPEN		= 0x2,
-+	ZBC_ZONE_COND_EXP_OPEN		= 0x3,
-+	ZBC_ZONE_COND_CLOSED		= 0x4,
-+	/* 0x5 to 0xc are reserved */
-+	ZBC_ZONE_COND_READONLY		= 0xd,
-+	ZBC_ZONE_COND_FULL		= 0xe,
-+	ZBC_ZONE_COND_OFFLINE		= 0xf,
-+};
-+
- #endif /* _SCSI_PROTO_H_ */
+ 	/* We cannot unload the modules while some process is
 -- 
-2.13.6
+2.14.2
