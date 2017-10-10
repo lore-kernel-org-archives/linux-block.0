@@ -1,112 +1,51 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:57310 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1758252AbdJMMrf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 08:47:35 -0400
-Received: by mail-wm0-f67.google.com with SMTP id l68so21511572wmd.5
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:35 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 29/58] lightnvm: pblk: allocate bio size more accurately
-Date: Fri, 13 Oct 2017 14:46:18 +0200
-Message-Id: <20171013124647.32668-30-m@bjorling.me>
-In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
-References: <20171013124647.32668-1-m@bjorling.me>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH V2] writeback: merge try_to_writeback_inodes_sb_nr() into
+ caller
+To: Rakesh Pandit <rakesh@tuxera.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+ Alexander Viro <viro@zeniv.linux.org.uk>, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Jan Kara <jack@suse.cz>,
+ linux-block@vger.kernel.org
+References: <20171009103440.GA29114@dhcp-216.srv.tuxera.com>
+ <20171009120029.GL17917@quack2.suse.cz>
+ <20171010094306.GA32628@dhcp-216.srv.tuxera.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <2730ed85-a0a8-7da2-d91a-fe82fe215b75@kernel.dk>
+Date: Tue, 10 Oct 2017 08:15:02 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20171010094306.GA32628@dhcp-216.srv.tuxera.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <javier@cnexlabs.com>
+On 10/10/2017 03:43 AM, Rakesh Pandit wrote:
+> Hi Jens,
+> 
+> On Mon, Oct 09, 2017 at 02:00:29PM +0200, Jan Kara wrote:
+>> On Mon 09-10-17 13:34:41, Rakesh Pandit wrote:
+>>> Since commit 925a6efb8ff0c ("Btrfs: stop using
+>>> try_to_writeback_inodes_sb_nr to flush delalloc") this function hasn't
+>>> been used outside so stop exporting it.
+>>>
+>>> In addition we merge it into try_to_writeback_inodes_sb() which is the
+>>> only caller.  Also change return type of try_to_writeback_inodes_sb to
+>>> void as the only user ext4 doesn't care.
+>>>
+>>> Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+>>
+>> Looks good. You can add:
+>>
+>> Reviewed-by: Jan Kara <jack@suse.cz>
+>>
+>> 								Honza
+> 
+> As there are many writeback related changes on your tree would you be
+> okay queuing this up as well for-4.15 with above reviewed-by tag ?
+> 
+> This should apply fine on your tree for-4.15.
+> 
+> Let me know if that isn't okay.
 
-Wait until we know the exact number of ppas to be sent to the device,
-before allocating the bio.
+That's fine, I'll queue it up.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/lightnvm/pblk-rb.c    |  5 +++--
- drivers/lightnvm/pblk-write.c | 20 ++++++++++----------
- drivers/lightnvm/pblk.h       |  4 ++--
- 3 files changed, 15 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
-index 05e6b2e..1173e23 100644
---- a/drivers/lightnvm/pblk-rb.c
-+++ b/drivers/lightnvm/pblk-rb.c
-@@ -552,12 +552,13 @@ unsigned int pblk_rb_read_to_bio_list(struct pblk_rb *rb, struct bio *bio,
-  * persist data on the write buffer to the media.
-  */
- unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
--				 struct bio *bio, unsigned int pos,
--				 unsigned int nr_entries, unsigned int count)
-+				 unsigned int pos, unsigned int nr_entries,
-+				 unsigned int count)
- {
- 	struct pblk *pblk = container_of(rb, struct pblk, rwb);
- 	struct request_queue *q = pblk->dev->q;
- 	struct pblk_c_ctx *c_ctx = nvm_rq_to_pdu(rqd);
-+	struct bio *bio = rqd->bio;
- 	struct pblk_rb_entry *entry;
- 	struct page *page;
- 	unsigned int pad = 0, to_read = nr_entries;
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 0c0481c..140a26e 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -534,24 +534,24 @@ static int pblk_submit_write(struct pblk *pblk)
- 	if (!secs_to_flush && secs_avail < pblk->min_write_pgs)
- 		return 1;
- 
--	bio = bio_alloc(GFP_KERNEL, pblk->max_write_pgs);
--
--	bio->bi_iter.bi_sector = 0; /* internal bio */
--	bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
--
--	rqd = pblk_alloc_rqd(pblk, WRITE);
--	rqd->bio = bio;
--
- 	secs_to_sync = pblk_calc_secs_to_sync(pblk, secs_avail, secs_to_flush);
- 	if (secs_to_sync > pblk->max_write_pgs) {
- 		pr_err("pblk: bad buffer sync calculation\n");
--		goto fail_put_bio;
-+		return 1;
- 	}
- 
- 	secs_to_com = (secs_to_sync > secs_avail) ? secs_avail : secs_to_sync;
- 	pos = pblk_rb_read_commit(&pblk->rwb, secs_to_com);
- 
--	if (pblk_rb_read_to_bio(&pblk->rwb, rqd, bio, pos, secs_to_sync,
-+	bio = bio_alloc(GFP_KERNEL, secs_to_sync);
-+
-+	bio->bi_iter.bi_sector = 0; /* internal bio */
-+	bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
-+
-+	rqd = pblk_alloc_rqd(pblk, WRITE);
-+	rqd->bio = bio;
-+
-+	if (pblk_rb_read_to_bio(&pblk->rwb, rqd, pos, secs_to_sync,
- 								secs_avail)) {
- 		pr_err("pblk: corrupted write bio\n");
- 		goto fail_put_bio;
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 876b50f..9f16205 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -666,8 +666,8 @@ void pblk_rb_flush(struct pblk_rb *rb);
- 
- void pblk_rb_sync_l2p(struct pblk_rb *rb);
- unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
--				 struct bio *bio, unsigned int pos,
--				 unsigned int nr_entries, unsigned int count);
-+				 unsigned int pos, unsigned int nr_entries,
-+				 unsigned int count);
- unsigned int pblk_rb_read_to_bio_list(struct pblk_rb *rb, struct bio *bio,
- 				      struct list_head *list,
- 				      unsigned int max);
 -- 
-2.9.3
+Jens Axboe
