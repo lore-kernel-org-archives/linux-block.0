@@ -1,37 +1,49 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out1.zte.com.cn ([202.103.147.172]:49962 "EHLO mxct.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751156AbdJJFiz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Oct 2017 01:38:55 -0400
-From: tang.junhui@zte.com.cn
-To: mlyle@lyle.org
-Cc: colyli@suse.de, linux-bcache@vger.kernel.org,
-        linux-block@vger.kernel.org, tang.junhui@zte.com.cn
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:38484 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751329AbdJJEOh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Oct 2017 00:14:37 -0400
+Received: by mail-pf0-f195.google.com with SMTP id a7so32548053pfj.5
+        for <linux-block@vger.kernel.org>; Mon, 09 Oct 2017 21:14:37 -0700 (PDT)
 Subject: Re: [PATCH] bcache: fix race in setting bdev state
-Date: Tue, 10 Oct 2017 13:38:30 +0800
-Message-Id: <1507613910-1156-1-git-send-email-tang.junhui@zte.com.cn>
+To: tang.junhui@zte.com.cn, colyli@suse.de
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <1507604873-31352-1-git-send-email-tang.junhui@zte.com.cn>
+From: Michael Lyle <mlyle@lyle.org>
+Message-ID: <87d7ba70-35cd-0a05-250a-1af7526d66b6@lyle.org>
+Date: Mon, 9 Oct 2017 21:14:34 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1507604873-31352-1-git-send-email-tang.junhui@zte.com.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+Tang,
 
-Hello Mike:
+Thanks for the patch.
 
-> How did you find this?  Did the race trigger at detach or was it through 
-> code inspection?
-I find this through code inspection.
-
-> I need to analyze this more.  It looks correct on its own, but there are 
-> a lot of atomic variables and the way they are used is complicated.
+On 10/09/2017 08:07 PM, tang.junhui@zte.com.cn wrote:
+> From: Tang Junhui <tang.junhui@zte.com.cn>
 > 
-> I'm inclined to think that detach should traverse the writeback lock for 
-> safety.  It would be a lot less complicated to analyze what would 
-> happen.  What do you think?
-As Far as now, except this issue, I can't see any more race during detach,
-so I don't think we need to take a writeback lock. Could you please show me 
-what problem you worried about?
+> cached_dev_put() is called before setting and writing bdev to
+> BDEV_STATE_CLEAN state, but after calling cached_dev_put(),
+> detach work queue works, and bdev is also set to
+> BDEV_STATE_NONE state in cached_dev_detach_finish(),
+> it may cause race condition, and the state of bdev is uncertain.
+> 
+> Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
 
-Regards,
-Tang
+How did you find this?  Did the race trigger at detach or was it through 
+code inspection?
+
+I need to analyze this more.  It looks correct on its own, but there are 
+a lot of atomic variables and the way they are used is complicated.
+
+I'm inclined to think that detach should traverse the writeback lock for 
+safety.  It would be a lot less complicated to analyze what would 
+happen.  What do you think?
+
+Thanks,
+
+Mike
