@@ -1,85 +1,30 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.14-rc4
-Message-ID: <c15e011d-868c-d49c-73ea-dfbf6390202c@kernel.dk>
-Date: Fri, 6 Oct 2017 13:00:50 -0600
+Return-Path: <zwp10758@gmail.com>
+Return-Path: <zwp10758@gmail.com>
+From: weiping zhang <zwp10758@gmail.com>
+Date: Tue, 10 Oct 2017 23:44:17 +0800
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Subject: Re: [PATCH] blkcg: check pol->cpd_free_fn before free cpd
+Message-ID: <20171010154417.GA38613@localhost.didichuxing.com>
+References: <20171010145342.GA24247@localhost.didichuxing.com>
+ <e161a324-40ba-fac8-d0e0-65b63ea8ceaf@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <e161a324-40ba-fac8-d0e0-65b63ea8ceaf@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
-
-A collection of fixes for this series. This pull request contains:
-
-- NVMe pull request from Christoph, one uuid attribute fix, and one fix
-  for the controller memory buffer address for remapped BARs.
-
-- use-after-free fix for bsg, from Benjamin Block.
-
-- bcache race/use-after-free fix for a list traversal, fixing a
-  regression in this merge window. From Coly Li.
-
-- null_blk change configfs dependency change from a 'depends' to a
-  'select'. This is a change from this merge window as well. From me.
-
-- nbd signal fix from Josef, fixing a regression introduced with the
-  status code changes.
-
-- nbd MAINTAINERS mailing list entry update.
-
-- blk-throttle stall fix from Joseph Qi.
-
-- blk-mq-debugfs fix from Omar, fixing an issue where we don't register
-  the IO scheduler debugfs directory, if the driver is loaded with it.
-  Only shows up if you switch through the sysfs interface.
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-Benjamin Block (1):
-      bsg-lib: fix use-after-free under memory-pressure
-
-Christoph Hellwig (1):
-      nvme-pci: Use PCI bus address for data/queues in CMB
-
-Coly Li (1):
-      bcache: use llist_for_each_entry_safe() in __closure_wake_up()
-
-Jens Axboe (2):
-      null_blk: change configfs dependency to select
-      Merge branch 'nvme-4.14' of git://git.infradead.org/nvme into for-linus
-
-Josef Bacik (1):
-      nbd: fix -ERESTARTSYS handling
-
-Joseph Qi (1):
-      blk-throttle: fix possible io stall when upgrade to max
-
-Martin Wilck (1):
-      nvme: fix visibility of "uuid" ns attribute
-
-Omar Sandoval (1):
-      blk-mq-debugfs: fix device sched directory for default scheduler
-
-Wouter Verhelst (1):
-      MAINTAINERS: update list for NBD
-
- MAINTAINERS                 |  2 +-
- block/blk-mq-debugfs.c      |  6 +++++-
- block/blk-throttle.c        |  4 ++--
- block/bsg-lib.c             | 27 +++++++++++++++++++++------
- drivers/block/Kconfig       |  2 +-
- drivers/block/nbd.c         |  6 +++++-
- drivers/md/bcache/closure.c |  4 ++--
- drivers/nvme/host/core.c    |  2 +-
- drivers/nvme/host/pci.c     | 14 +++++++-------
- 9 files changed, 45 insertions(+), 22 deletions(-)
-
--- 
-Jens Axboe
+On Tue, Oct 10, 2017 at 09:04:39AM -0600, Jens Axboe wrote:
+> On 10/10/2017 08:53 AM, weiping zhang wrote:
+> > check pol->cpd_free_fn() instead of pol->cpd_alloc_fn() when free cpd.
+> 
+> In practice this shouldn't make a difference, since if you have an
+> alloc_fn, you better also have a free_fn. I'd argue a better
+> patch would be ensuring that's the case, since the current situation
+> would at least oops and show you there's an issue, but with the patch
+> we'll just leak the memory.
+> 
+> I'll apply it, but would be nice if this was handled a bit more
+> proactively.
+> 
+Thanks your comments, I'll add a sanity check in blkcg_policy_register
+function.
