@@ -1,49 +1,45 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:38484 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751329AbdJJEOh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Oct 2017 00:14:37 -0400
-Received: by mail-pf0-f195.google.com with SMTP id a7so32548053pfj.5
-        for <linux-block@vger.kernel.org>; Mon, 09 Oct 2017 21:14:37 -0700 (PDT)
-Subject: Re: [PATCH] bcache: fix race in setting bdev state
-To: tang.junhui@zte.com.cn, colyli@suse.de
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-References: <1507604873-31352-1-git-send-email-tang.junhui@zte.com.cn>
-From: Michael Lyle <mlyle@lyle.org>
-Message-ID: <87d7ba70-35cd-0a05-250a-1af7526d66b6@lyle.org>
-Date: Mon, 9 Oct 2017 21:14:34 -0700
-MIME-Version: 1.0
-In-Reply-To: <1507604873-31352-1-git-send-email-tang.junhui@zte.com.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Received: from mxhk.zte.com.cn ([63.217.80.70]:65340 "EHLO mxhk.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755853AbdJJDKe (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 9 Oct 2017 23:10:34 -0400
+From: tang.junhui@zte.com.cn
+To: colyli@suse.de, mlyle@lyle.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        tang.junhui@zte.com.cn
+Subject: [PATCH] bcache: fix race in setting bdev state
+Date: Tue, 10 Oct 2017 11:07:53 +0800
+Message-Id: <1507604873-31352-1-git-send-email-tang.junhui@zte.com.cn>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Tang,
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-Thanks for the patch.
+cached_dev_put() is called before setting and writing bdev to
+BDEV_STATE_CLEAN state, but after calling cached_dev_put(),
+detach work queue works, and bdev is also set to
+BDEV_STATE_NONE state in cached_dev_detach_finish(),
+it may cause race condition, and the state of bdev is uncertain.
 
-On 10/09/2017 08:07 PM, tang.junhui@zte.com.cn wrote:
-> From: Tang Junhui <tang.junhui@zte.com.cn>
-> 
-> cached_dev_put() is called before setting and writing bdev to
-> BDEV_STATE_CLEAN state, but after calling cached_dev_put(),
-> detach work queue works, and bdev is also set to
-> BDEV_STATE_NONE state in cached_dev_detach_finish(),
-> it may cause race condition, and the state of bdev is uncertain.
-> 
-> Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+---
+ drivers/md/bcache/writeback.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-How did you find this?  Did the race trigger at detach or was it through 
-code inspection?
-
-I need to analyze this more.  It looks correct on its own, but there are 
-a lot of atomic variables and the way they are used is complicated.
-
-I'm inclined to think that detach should traverse the writeback lock for 
-safety.  It would be a lot less complicated to analyze what would 
-happen.  What do you think?
-
-Thanks,
-
-Mike
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index 69e1ae5..3d134cb 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -436,9 +436,9 @@ static int bch_writeback_thread(void *arg)
+ 		if (searched_full_index &&
+ 		    RB_EMPTY_ROOT(&dc->writeback_keys.keys)) {
+ 			atomic_set(&dc->has_dirty, 0);
+-			cached_dev_put(dc);
+ 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_CLEAN);
+ 			bch_write_bdev_super(dc, NULL);
++			cached_dev_put(dc);
+ 		}
+ 
+ 		up_write(&dc->writeback_lock);
+-- 
+2.8.1.windows.1
