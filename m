@@ -1,69 +1,55 @@
-Return-Path: <shli@kernel.org>
-Date: Tue, 10 Oct 2017 18:48:30 -0700
-From: Shaohua Li <shli@kernel.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"jthumshirn@suse.de" <jthumshirn@suse.de>,
-	"linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
-	"hch@lst.de" <hch@lst.de>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>,
+Return-Path: <prvs=44983f28c=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "shli@kernel.org" <shli@kernel.org>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"jthumshirn@suse.de" <jthumshirn@suse.de>, "linux-raid@vger.kernel.org"
+	<linux-raid@vger.kernel.org>, "hch@lst.de" <hch@lst.de>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
 	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"oleksandr@natalenko.name" <oleksandr@natalenko.name>,
-	"hare@suse.com" <hare@suse.com>
+	"oleksandr@natalenko.name" <oleksandr@natalenko.name>, "hare@suse.com"
+	<hare@suse.com>
 Subject: Re: [PATCH v8 03/10] md: Neither resync nor reshape while the system
  is frozen
-Message-ID: <20171011014830.ps3v3yxny27wv7mc@kernel.org>
+Date: Tue, 10 Oct 2017 23:33:06 +0000
+Message-ID: <1507678384.2815.80.camel@wdc.com>
 References: <20171010210346.14574-1-bart.vanassche@wdc.com>
- <20171010210346.14574-4-bart.vanassche@wdc.com>
- <20171010223025.tda3lx64rdmugm54@kernel.org>
- <1507678384.2815.80.camel@wdc.com>
+	 <20171010210346.14574-4-bart.vanassche@wdc.com>
+	 <20171010223025.tda3lx64rdmugm54@kernel.org>
+In-Reply-To: <20171010223025.tda3lx64rdmugm54@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1507678384.2815.80.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Oct 10, 2017 at 11:33:06PM +0000, Bart Van Assche wrote:
-> On Tue, 2017-10-10 at 15:30 -0700, Shaohua Li wrote:
-> > On Tue, Oct 10, 2017 at 02:03:39PM -0700, Bart Van Assche wrote:
-> > > Some people use the md driver on laptops and use the suspend and
-> > > resume functionality. Since it is essential that submitting of
-> > > new I/O requests stops before a hibernation image is created,
-> > > interrupt the md resync and reshape actions if the system is
-> > > being frozen. Note: the resync and reshape will restart after
-> > > the system is resumed and a message similar to the following
-> > > will appear in the system log:
-> > > 
-> > > md: md0: data-check interrupted.
-> > 
-> > Where do we restart resync and reshape?
-> 
-> Hello Shaohua,
-> 
-> My understanding of the md driver is as follows:
-> - Before any write occurs, md_write_start() is called. That function clears
->   mddev->safemode and checks mddev->in_sync. If that variable is set, it is
->   cleared and md_write_start() wakes up mddev->thread and waits until the
->   superblock has been written to disk.
-> - All mddev->thread implementations call md_check_recovery(). That function
->   updates the superblock by calling md_update_sb() if needed.
->   md_check_recovery() also starts a resync thread if the array is not in
->   sync. See also the comment block above md_check_recovery().
-> - md_do_sync() performs the resync. If it completes successfully the
->   "in_sync" state is set (set_in_sync()). If it is interrupted the "in_sync"
->   state is not modified.
-> - super_90_sync() sets the MD_SB_CLEAN flag in the on-disk superblock if the
->   "in_sync" flag is set.
-> 
-> In other words: if the array is in sync the MD_SB_CLEAN flag is set in the
-> on-disk superblock. If a resync is needed that flag is not set. The
-> MD_SB_CLEAN flag is checked when the superblock is loaded. If that flag is
-> not set a resync is started.
-
-The problem is __md_stop_writes set some bit like MD_RECOVERY_FROZEN, which
-will prevent md_check_recovery restarting resync/reshape. I think we need
-preserve mddev->recovery in suspend prepare and restore after resume
-
-Thanks,
-Shaohua
+T24gVHVlLCAyMDE3LTEwLTEwIGF0IDE1OjMwIC0wNzAwLCBTaGFvaHVhIExpIHdyb3RlOg0KPiBP
+biBUdWUsIE9jdCAxMCwgMjAxNyBhdCAwMjowMzozOVBNIC0wNzAwLCBCYXJ0IFZhbiBBc3NjaGUg
+d3JvdGU6DQo+ID4gU29tZSBwZW9wbGUgdXNlIHRoZSBtZCBkcml2ZXIgb24gbGFwdG9wcyBhbmQg
+dXNlIHRoZSBzdXNwZW5kIGFuZA0KPiA+IHJlc3VtZSBmdW5jdGlvbmFsaXR5LiBTaW5jZSBpdCBp
+cyBlc3NlbnRpYWwgdGhhdCBzdWJtaXR0aW5nIG9mDQo+ID4gbmV3IEkvTyByZXF1ZXN0cyBzdG9w
+cyBiZWZvcmUgYSBoaWJlcm5hdGlvbiBpbWFnZSBpcyBjcmVhdGVkLA0KPiA+IGludGVycnVwdCB0
+aGUgbWQgcmVzeW5jIGFuZCByZXNoYXBlIGFjdGlvbnMgaWYgdGhlIHN5c3RlbSBpcw0KPiA+IGJl
+aW5nIGZyb3plbi4gTm90ZTogdGhlIHJlc3luYyBhbmQgcmVzaGFwZSB3aWxsIHJlc3RhcnQgYWZ0
+ZXINCj4gPiB0aGUgc3lzdGVtIGlzIHJlc3VtZWQgYW5kIGEgbWVzc2FnZSBzaW1pbGFyIHRvIHRo
+ZSBmb2xsb3dpbmcNCj4gPiB3aWxsIGFwcGVhciBpbiB0aGUgc3lzdGVtIGxvZzoNCj4gPiANCj4g
+PiBtZDogbWQwOiBkYXRhLWNoZWNrIGludGVycnVwdGVkLg0KPiANCj4gV2hlcmUgZG8gd2UgcmVz
+dGFydCByZXN5bmMgYW5kIHJlc2hhcGU/DQoNCkhlbGxvIFNoYW9odWEsDQoNCk15IHVuZGVyc3Rh
+bmRpbmcgb2YgdGhlIG1kIGRyaXZlciBpcyBhcyBmb2xsb3dzOg0KLSBCZWZvcmUgYW55IHdyaXRl
+IG9jY3VycywgbWRfd3JpdGVfc3RhcnQoKSBpcyBjYWxsZWQuIFRoYXQgZnVuY3Rpb24gY2xlYXJz
+DQogIG1kZGV2LT5zYWZlbW9kZSBhbmQgY2hlY2tzIG1kZGV2LT5pbl9zeW5jLiBJZiB0aGF0IHZh
+cmlhYmxlIGlzIHNldCwgaXQgaXMNCiAgY2xlYXJlZCBhbmQgbWRfd3JpdGVfc3RhcnQoKSB3YWtl
+cyB1cCBtZGRldi0+dGhyZWFkIGFuZCB3YWl0cyB1bnRpbCB0aGUNCiAgc3VwZXJibG9jayBoYXMg
+YmVlbiB3cml0dGVuIHRvIGRpc2suDQotIEFsbCBtZGRldi0+dGhyZWFkIGltcGxlbWVudGF0aW9u
+cyBjYWxsIG1kX2NoZWNrX3JlY292ZXJ5KCkuIFRoYXQgZnVuY3Rpb24NCiAgdXBkYXRlcyB0aGUg
+c3VwZXJibG9jayBieSBjYWxsaW5nIG1kX3VwZGF0ZV9zYigpIGlmIG5lZWRlZC4NCiAgbWRfY2hl
+Y2tfcmVjb3ZlcnkoKSBhbHNvIHN0YXJ0cyBhIHJlc3luYyB0aHJlYWQgaWYgdGhlIGFycmF5IGlz
+IG5vdCBpbg0KICBzeW5jLiBTZWUgYWxzbyB0aGUgY29tbWVudCBibG9jayBhYm92ZSBtZF9jaGVj
+a19yZWNvdmVyeSgpLg0KLSBtZF9kb19zeW5jKCkgcGVyZm9ybXMgdGhlIHJlc3luYy4gSWYgaXQg
+Y29tcGxldGVzIHN1Y2Nlc3NmdWxseSB0aGUNCiAgImluX3N5bmMiIHN0YXRlIGlzIHNldCAoc2V0
+X2luX3N5bmMoKSkuIElmIGl0IGlzIGludGVycnVwdGVkIHRoZSAiaW5fc3luYyINCiAgc3RhdGUg
+aXMgbm90IG1vZGlmaWVkLg0KLSBzdXBlcl85MF9zeW5jKCkgc2V0cyB0aGUgTURfU0JfQ0xFQU4g
+ZmxhZyBpbiB0aGUgb24tZGlzayBzdXBlcmJsb2NrIGlmIHRoZQ0KICAiaW5fc3luYyIgZmxhZyBp
+cyBzZXQuDQoNCkluIG90aGVyIHdvcmRzOiBpZiB0aGUgYXJyYXkgaXMgaW4gc3luYyB0aGUgTURf
+U0JfQ0xFQU4gZmxhZyBpcyBzZXQgaW4gdGhlDQpvbi1kaXNrIHN1cGVyYmxvY2suIElmIGEgcmVz
+eW5jIGlzIG5lZWRlZCB0aGF0IGZsYWcgaXMgbm90IHNldC4gVGhlDQpNRF9TQl9DTEVBTiBmbGFn
+IGlzIGNoZWNrZWQgd2hlbiB0aGUgc3VwZXJibG9jayBpcyBsb2FkZWQuIElmIHRoYXQgZmxhZyBp
+cw0Kbm90IHNldCBhIHJlc3luYyBpcyBzdGFydGVkLg0KDQpCYXJ0Lg0K
