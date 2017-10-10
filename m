@@ -1,99 +1,55 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Avri Altman <Avri.Altman@sandisk.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 02/12 v4] mmc: core: add a workqueue for completing requests
-Date: Thu, 26 Oct 2017 14:57:47 +0200
-Message-Id: <20171026125757.10200-3-linus.walleij@linaro.org>
-In-Reply-To: <20171026125757.10200-1-linus.walleij@linaro.org>
-References: <20171026125757.10200-1-linus.walleij@linaro.org>
+Return-Path: <shli@kernel.org>
+Date: Tue, 10 Oct 2017 15:36:56 -0700
+From: Shaohua Li <shli@kernel.org>
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Cc: linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: Re: [PATCH v2 0/9] Nowait support for stacked block devices
+Message-ID: <20171010223656.uv5t4oigfmjutj7u@kernel.org>
+References: <20171004135511.26110-1-rgoldwyn@suse.de>
+ <20171005171938.hob45bzeebvaigu2@kernel.org>
+ <0bf484f7-1e95-86c4-c00d-125e22f73a8d@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <0bf484f7-1e95-86c4-c00d-125e22f73a8d@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-As we want to complete requests autonomously from feeding the
-host with new requests, we create a workqueue to deal with
-this specifically in response to the callback from a host driver.
-This is necessary to exploit parallelism properly.
+On Fri, Oct 06, 2017 at 07:01:19AM -0500, Goldwyn Rodrigues wrote:
+> 
+> 
+> On 10/05/2017 12:19 PM, Shaohua Li wrote:
+> > On Wed, Oct 04, 2017 at 08:55:02AM -0500, Goldwyn Rodrigues wrote:
+> >> This is a continuation of the nowait support which was incorporated
+> >> a while back. We introduced REQ_NOWAIT which would return immediately
+> >> if the call would block at the block layer. Request based-devices
+> >> do not wait. However, bio based devices (the ones which exclusively
+> >> call make_request_fn) need to be trained to handle REQ_NOWAIT.
+> >>
+> >> This effort covers the devices under MD and DM which would block
+> >> for any reason. If there should be more devices or situations
+> >> which need to be covered, please let me know.
+> >>
+> >> The problem with partial writes discussed during v1 turned out
+> >> to be a bug in partial writes during direct I/O and is fixed
+> >> by the submitted patch[1].
+> >>
+> >> Changes since v1:
+> >>  - mddev to return early in case the device is suspended, within the md code as opposed to ->make_request()
+> >>  - Check for nowait support with all the lower devices. Same with if adding a device which does not support nowait.
+> >>  - Nowait under each raid is checked before the final I/O submission for the entire I/O.
+> >>
+> >> [1] https://patchwork.kernel.org/patch/9979887/
+> > 
+> > Does this fix the partial IO issue we discussed before? It looks not to me. The
+> > partial IO bailed out could be any part of an IO, so simply returning the
+> > successed size doesn't help. Am I missing anything? I didn't follow the
+> > discussion, maybe Jens knew.
+> > 
+> 
+> If the partial IO bailed out is any part of IO, isn't it supposed to
+> return the size of the IO succeeded _so far_? If a latter part of the IO
+> succeeds (with a failure in between) what are you supposed to return to
+> user in case of direct write()s? Would that even be correct in case it
+> is a file overwrite?
 
-This patch just adds the workqueu, later patches will make use of
-it.
-
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
- drivers/mmc/core/core.c  | 9 +++++++++
- drivers/mmc/core/host.c  | 1 -
- include/linux/mmc/host.h | 4 ++++
- 3 files changed, 13 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
-index 3d1270b9aec4..9c3baaddb1bd 100644
---- a/drivers/mmc/core/core.c
-+++ b/drivers/mmc/core/core.c
-@@ -2828,6 +2828,14 @@ void mmc_start_host(struct mmc_host *host)
- 	host->f_init = max(freqs[0], host->f_min);
- 	host->rescan_disable = 0;
- 	host->ios.power_mode = MMC_POWER_UNDEFINED;
-+	/* Workqueue for completing requests */
-+	host->req_done_wq = alloc_workqueue("mmc%d-reqdone",
-+				WQ_FREEZABLE | WQ_HIGHPRI | WQ_MEM_RECLAIM,
-+				0, host->index);
-+	if (!host->req_done_wq) {
-+		dev_err(mmc_dev(host), "could not allocate workqueue\n");
-+		return;
-+	}
- 
- 	if (!(host->caps2 & MMC_CAP2_NO_PRESCAN_POWERUP)) {
- 		mmc_claim_host(host);
-@@ -2849,6 +2857,7 @@ void mmc_stop_host(struct mmc_host *host)
- 
- 	host->rescan_disable = 1;
- 	cancel_delayed_work_sync(&host->detect);
-+	destroy_workqueue(host->req_done_wq);
- 
- 	/* clear pm flags now and let card drivers set them as needed */
- 	host->pm_flags = 0;
-diff --git a/drivers/mmc/core/host.c b/drivers/mmc/core/host.c
-index e58be39b1568..8193363a5a46 100644
---- a/drivers/mmc/core/host.c
-+++ b/drivers/mmc/core/host.c
-@@ -381,7 +381,6 @@ struct mmc_host *mmc_alloc_host(int extra, struct device *dev)
- 	INIT_DELAYED_WORK(&host->detect, mmc_rescan);
- 	INIT_DELAYED_WORK(&host->sdio_irq_work, sdio_irq_work);
- 	setup_timer(&host->retune_timer, mmc_retune_timer, (unsigned long)host);
--
- 	/*
- 	 * By default, hosts do not support SGIO or large requests.
- 	 * They have to set these according to their abilities.
-diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
-index c296f4351c1d..94a646eebf05 100644
---- a/include/linux/mmc/host.h
-+++ b/include/linux/mmc/host.h
-@@ -13,6 +13,7 @@
- #include <linux/sched.h>
- #include <linux/device.h>
- #include <linux/fault-inject.h>
-+#include <linux/workqueue.h>
- 
- #include <linux/mmc/core.h>
- #include <linux/mmc/card.h>
-@@ -423,6 +424,9 @@ struct mmc_host {
- 	struct mmc_async_req	*areq;		/* active async req */
- 	struct mmc_context_info	context_info;	/* async synchronization info */
- 
-+	/* finalization workqueue, handles finalizing requests */
-+	struct workqueue_struct	*req_done_wq;
-+
- 	/* Ongoing data transfer that allows commands during transfer */
- 	struct mmc_request	*ongoing_mrq;
- 
--- 
-2.13.6
+I didn't argue about the return value. To me the partial IO issue can't be
+fixed simply by whatever 'return value'.
