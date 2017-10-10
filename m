@@ -1,59 +1,37 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f174.google.com ([209.85.192.174]:47624 "EHLO
-        mail-pf0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751810AbdJJGEb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 Oct 2017 02:04:31 -0400
-Received: by mail-pf0-f174.google.com with SMTP id z11so6237077pfk.4
-        for <linux-block@vger.kernel.org>; Mon, 09 Oct 2017 23:04:31 -0700 (PDT)
-Subject: Re: [PATCH] bcache: fix race in setting bdev state
-To: tang.junhui@zte.com.cn
+Received: from out1.zte.com.cn ([202.103.147.172]:49962 "EHLO mxct.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751156AbdJJFiz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 10 Oct 2017 01:38:55 -0400
+From: tang.junhui@zte.com.cn
+To: mlyle@lyle.org
 Cc: colyli@suse.de, linux-bcache@vger.kernel.org,
-        linux-block@vger.kernel.org
-References: <1507613910-1156-1-git-send-email-tang.junhui@zte.com.cn>
-From: Michael Lyle <mlyle@lyle.org>
-Message-ID: <6869122b-7310-c90b-f9bb-5fbd89e17422@lyle.org>
-Date: Mon, 9 Oct 2017 23:04:28 -0700
+        linux-block@vger.kernel.org, tang.junhui@zte.com.cn
+Subject: Re: [PATCH] bcache: fix race in setting bdev state
+Date: Tue, 10 Oct 2017 13:38:30 +0800
+Message-Id: <1507613910-1156-1-git-send-email-tang.junhui@zte.com.cn>
 MIME-Version: 1.0
-In-Reply-To: <1507613910-1156-1-git-send-email-tang.junhui@zte.com.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Tang,
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-On 10/09/2017 10:38 PM, tang.junhui@zte.com.cn wrote:
-> [snip]
+Hello Mike:
+
+> How did you find this?  Did the race trigger at detach or was it through 
+> code inspection?
+I find this through code inspection.
+
+> I need to analyze this more.  It looks correct on its own, but there are 
+> a lot of atomic variables and the way they are used is complicated.
 > 
-> As Far as now, except this issue, I can't see any more race during detach,
-> so I don't think we need to take a writeback lock. Could you please show me
-> what problem you worried about?
+> I'm inclined to think that detach should traverse the writeback lock for 
+> safety.  It would be a lot less complicated to analyze what would 
+> happen.  What do you think?
+As Far as now, except this issue, I can't see any more race during detach,
+so I don't think we need to take a writeback lock. Could you please show me 
+what problem you worried about?
 
-Ugh, this is partially my fault for not knowing the code path well. 
-keep confusing myself.
-
-One race I think I see: we unset the dirty bit before setting ourselves 
-interruptible.  Can bch_writeback_add/queue wake writeback before then 
-(and then writeback sets itself interruptible and never wakes up)?
-
-bch_writeback_add usually holds the writeback lock, but the writeback 
-lock is already released at this time (and bch_writeback_queue as used 
-by bch_cached_dev_detach doesn't traverse the writeback lock).
-
-There's a pretty intricate set of dependencies between the dirty bit, 
-the state in the superblock, the refcount, the writeback lock, and the 
-runnable state of the writeback thread.  It feels dangerous, but maybe 
-after I draw graphs of all the dependencies I'll feel better.
-
-Writeback locking needs refactoring for performance anyways-- maybe this 
-can simplified at the same time.
-
-Mike
-
-
-> Regards,
-> Tang
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bcache" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Regards,
+Tang
