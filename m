@@ -1,47 +1,115 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:41920 "EHLO
-        mx0b-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752275AbdJKUW4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Oct 2017 16:22:56 -0400
-Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v9BKI9B3017741
-        for <linux-block@vger.kernel.org>; Wed, 11 Oct 2017 13:22:56 -0700
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 2dhr6qrh2v-2
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Wed, 11 Oct 2017 13:22:56 -0700
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: Jens Axboe <axboe@kernel.dk>, <Kernel-team@fb.com>
-Subject: [PATCH] blk-throttle: allow configure 0 for some settings
-Date: Wed, 11 Oct 2017 13:22:08 -0700
-Message-ID: <8113e6416a121db19c9c80212c63be960f3a45df.1507753200.git.shli@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=449916f6d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Oleksandr Natalenko <oleksandr@natalenko.name>,
+	Ming Lei <ming.lei@redhat.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH v8 00/10] block, scsi, md: Improve suspend and resume
+Date: Tue, 10 Oct 2017 14:03:36 -0700
+Message-Id: <20171010210346.14574-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-For io.low, latency target 0 is legit. 0 for rbps/wbps/rios/wios is ok
-too as long as not all of them are 0.
+Hello Jens,
 
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/blk-throttle.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+It is known that during the resume following a hibernate, especially when
+using an md RAID1 array created on top of SCSI devices, sometimes the system
+hangs instead of coming up properly. This patch series fixes that
+problem. These patches have been tested on top of the block layer for-next
+branch. Please consider these changes for kernel v4.15.
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 0fea76a..ee6d7b0 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -1632,7 +1632,7 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
- 			goto out_finish;
- 
- 		ret = -ERANGE;
--		if (!val)
-+		if (!val && off != LIMIT_LOW)
- 			goto out_finish;
- 
- 		ret = -EINVAL;
+Thanks,
+
+Bart.
+
+Changes between v7 and v8:
+- Fixed a (theoretical?) race identified by Ming Lei.
+- Added a tenth patch that checks whether the proper type of flags has been
+  passed to a range of block layer functions.
+
+Changes between v6 and v7:
+- Added support for the PREEMPT_ONLY flag in blk-mq-debugfs.c.
+- Fixed kerneldoc header of blk_queue_enter().
+- Added a rcu_read_lock_sched() / rcu_read_unlock_sched() pair in
+  blk_set_preempt_only().
+- Removed a synchronize_rcu() call from scsi_device_quiesce().
+- Modified the description of patch 9/9 in this series.
+- Removed scsi_run_queue() call from scsi_device_resume().
+
+Changes between v5 and v6:
+- Split an md patch into two patches to make it easier to review the changes.
+- For the md patch that suspends I/O while the system is frozen, switched back
+  to the freezer mechanism because this makes the code shorter and easier to
+  review.
+- Changed blk_set/clear_preempt_only() from EXPORT_SYMBOL() into
+  EXPORT_SYMBOL_GPL().
+- Made blk_set_preempt_only() behave as a test-and-set operation.
+- Introduced blk_get_request_flags() and BLK_MQ_REQ_PREEMPT as requested by
+  Christoph and reduced the number of arguments of blk_queue_enter() back from
+  three to two.
+- In scsi_device_quiesce(), moved the blk_mq_freeze_queue() call out of a
+  critical section. Made the explanation of why the synchronize_rcu() call
+  is necessary more detailed.
+
+Changes between v4 and v5:
+- Split blk_set_preempt_only() into two functions as requested by Christoph.
+- Made blk_get_request() trigger WARN_ONCE() if it is attempted to allocate
+  a request while the system is frozen. This is a big help to identify drivers
+  that submit I/O while the system is frozen.
+- Since kernel thread freezing is on its way out, reworked the approach for
+  avoiding that the md driver submits I/O while the system is frozen such that
+  the approach no longer depends on the kernel thread freeze mechanism.
+- Fixed the (theoretical) deadlock in scsi_device_quiesce() that was identified
+  by Ming.
+
+Changes between v3 and v4:
+- Made sure that this patch series not only works for scsi-mq but also for
+  the legacy SCSI stack.
+- Removed an smp_rmb()/smp_wmb() pair from the hot path and added a comment
+  that explains why that is safe.
+- Reordered the patches in this patch series.
+
+Changes between v2 and v3:
+- Made md kernel threads freezable.
+- Changed the approach for quiescing SCSI devices again.
+- Addressed Ming's review comments.
+
+Changes compared to v1 of this patch series:
+- Changed the approach and rewrote the patch series.
+
+Bart Van Assche (9):
+  md: Rename md_notifier into md_reboot_notifier
+  md: Introduce md_stop_all_writes()
+  md: Neither resync nor reshape while the system is frozen
+  block: Introduce blk_get_request_flags()
+  block: Introduce BLK_MQ_REQ_PREEMPT
+  ide, scsi: Tell the block layer at request allocation time about
+    preempt requests
+  block: Add the QUEUE_FLAG_PREEMPT_ONLY request queue flag
+  block, scsi: Make SCSI quiesce and resume work reliably
+  block, nvme: Introduce blk_mq_req_flags_t
+
+Ming Lei (1):
+  block: Make q_usage_counter also track legacy requests
+
+ block/blk-core.c          | 132 +++++++++++++++++++++++++++++++++++++++-------
+ block/blk-mq-debugfs.c    |   1 +
+ block/blk-mq.c            |  20 +++----
+ block/blk-mq.h            |   2 +-
+ block/blk-timeout.c       |   2 +-
+ drivers/ide/ide-pm.c      |   4 +-
+ drivers/md/md.c           |  45 +++++++++++++---
+ drivers/nvme/host/core.c  |   5 +-
+ drivers/nvme/host/nvme.h  |   5 +-
+ drivers/scsi/scsi_lib.c   |  35 +++++++-----
+ fs/block_dev.c            |   4 +-
+ include/linux/blk-mq.h    |  16 ++++--
+ include/linux/blk_types.h |   2 +
+ include/linux/blkdev.h    |  11 +++-
+ 14 files changed, 217 insertions(+), 67 deletions(-)
+
 -- 
-2.9.5
+2.14.2
