@@ -1,36 +1,28 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:49393 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751441AbdJCJTX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2017 05:19:23 -0400
-Date: Tue, 3 Oct 2017 02:19:22 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>
-Subject: Re: [PATCH V5 6/8] block: introduce .last_merge and .hash to
- blk_mq_ctx
-Message-ID: <20171003091922.GD2771@infradead.org>
-References: <20170930112655.31451-1-ming.lei@redhat.com>
- <20170930112655.31451-7-ming.lei@redhat.com>
+Received: from mx2.suse.de ([195.135.220.15]:57005 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753268AbdJKK2w (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Oct 2017 06:28:52 -0400
+Date: Wed, 11 Oct 2017 12:28:50 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH v2 1/3] block: introduce blk_mq_tagset_iter
+Message-ID: <20171011102850.jfu4h6eizdqcza2n@linux-x5ow.site>
+References: <1507715588-1041-1-git-send-email-sagi@grimberg.me>
+ <1507715588-1041-2-git-send-email-sagi@grimberg.me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170930112655.31451-7-ming.lei@redhat.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1507715588-1041-2-git-send-email-sagi@grimberg.me>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-> +enum elv_merge elv_merge_ctx(struct request_queue *q, struct request **req,
-> +		struct bio *bio, struct blk_mq_ctx *ctx)
-> +{
-> +	WARN_ON_ONCE(!q->mq_ops);
-> +	return __elv_merge(q, req, bio, ctx->hash, ctx->last_merge);
-> +}
-
-This function only has a single caller, just open code it.
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
