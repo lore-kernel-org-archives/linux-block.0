@@ -1,74 +1,47 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 1/5] blk-mq-sched: fix scheduler bad performance
-Date: Mon,  9 Oct 2017 19:24:20 +0800
-Message-Id: <20171009112424.30524-2-ming.lei@redhat.com>
-In-Reply-To: <20171009112424.30524-1-ming.lei@redhat.com>
-References: <20171009112424.30524-1-ming.lei@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:41920 "EHLO
+        mx0b-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752275AbdJKUW4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 11 Oct 2017 16:22:56 -0400
+Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v9BKI9B3017741
+        for <linux-block@vger.kernel.org>; Wed, 11 Oct 2017 13:22:56 -0700
+Received: from mail.thefacebook.com ([199.201.64.23])
+        by mx0a-00082601.pphosted.com with ESMTP id 2dhr6qrh2v-2
+        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Wed, 11 Oct 2017 13:22:56 -0700
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>
+CC: Jens Axboe <axboe@kernel.dk>, <Kernel-team@fb.com>
+Subject: [PATCH] blk-throttle: allow configure 0 for some settings
+Date: Wed, 11 Oct 2017 13:22:08 -0700
+Message-ID: <8113e6416a121db19c9c80212c63be960f3a45df.1507753200.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When hw queue is busy, we shouldn't take requests from
-scheduler queue any more, otherwise it is difficult to do
-IO merge.
+For io.low, latency target 0 is legit. 0 for rbps/wbps/rios/wios is ok
+too as long as not all of them are 0.
 
-This patch fixes the awful IO performance on some
-SCSI devices(lpfc, qla2xxx, ...) when mq-deadline/kyber
-is used by not taking requests if hw queue is busy.
-
-Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Shaohua Li <shli@fb.com>
 ---
- block/blk-mq-sched.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ block/blk-throttle.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 4ab69435708c..eca011fdfa0e 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -94,7 +94,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	struct request_queue *q = hctx->queue;
- 	struct elevator_queue *e = q->elevator;
- 	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
--	bool did_work = false;
-+	bool do_sched_dispatch = true;
- 	LIST_HEAD(rq_list);
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 0fea76a..ee6d7b0 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1632,7 +1632,7 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
+ 			goto out_finish;
  
- 	/* RCU or SRCU read lock is needed before checking quiesced flag */
-@@ -125,18 +125,18 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	 */
- 	if (!list_empty(&rq_list)) {
- 		blk_mq_sched_mark_restart_hctx(hctx);
--		did_work = blk_mq_dispatch_rq_list(q, &rq_list);
-+		do_sched_dispatch = blk_mq_dispatch_rq_list(q, &rq_list);
- 	} else if (!has_sched_dispatch) {
- 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
- 		blk_mq_dispatch_rq_list(q, &rq_list);
- 	}
+ 		ret = -ERANGE;
+-		if (!val)
++		if (!val && off != LIMIT_LOW)
+ 			goto out_finish;
  
- 	/*
--	 * We want to dispatch from the scheduler if we had no work left
--	 * on the dispatch list, OR if we did have work but weren't able
--	 * to make progress.
-+	 * We want to dispatch from the scheduler if there was nothing
-+	 * on the dispatch list or we were able to dispatch from the
-+	 * dispatch list.
- 	 */
--	if (!did_work && has_sched_dispatch) {
-+	if (do_sched_dispatch && has_sched_dispatch) {
- 		do {
- 			struct request *rq;
- 
+ 		ret = -EINVAL;
 -- 
 2.9.5
