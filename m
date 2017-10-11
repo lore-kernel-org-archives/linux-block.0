@@ -1,69 +1,19 @@
-Return-Path: <prvs=44825b072=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	=Oleksandr Natalenko <oleksandr@natalenko.name>,
-	"Luis R . Rodriguez" <mcgrof@kernel.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Shaohua Li <shli@kernel.org>,
-	linux-raid@vger.kernel.org,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v7 1/9] md: Rename md_notifier into md_reboot_notifier
-Date: Mon,  9 Oct 2017 16:13:52 -0700
-Message-Id: <20171009231400.562-2-bart.vanassche@wdc.com>
-In-Reply-To: <20171009231400.562-1-bart.vanassche@wdc.com>
-References: <20171009231400.562-1-bart.vanassche@wdc.com>
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
+Subject: Re: [PATCH 6/9] nvme: introduce a nvme_ns_ids structure
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>, linux-nvme@lists.infradead.org,
+ linux-block@vger.kernel.org
+References: <20170925134031.10548-1-hch@lst.de>
+ <20170925134031.10548-7-hch@lst.de>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <f4a9295a-1834-3a17-6090-203e8507e3ef@grimberg.me>
+Date: Wed, 11 Oct 2017 14:59:25 +0300
+MIME-Version: 1.0
+In-Reply-To: <20170925134031.10548-7-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-This avoids confusion with the pm notifier that will be added
-through a later patch.
+Looks good,
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Shaohua Li <shli@kernel.org>
-Cc: linux-raid@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/md/md.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 5d61049e7417..8933cafc212d 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -8966,7 +8966,7 @@ static int md_notify_reboot(struct notifier_block *this,
- 	return NOTIFY_DONE;
- }
- 
--static struct notifier_block md_notifier = {
-+static struct notifier_block md_reboot_notifier = {
- 	.notifier_call	= md_notify_reboot,
- 	.next		= NULL,
- 	.priority	= INT_MAX, /* before any real devices */
-@@ -9003,7 +9003,7 @@ static int __init md_init(void)
- 	blk_register_region(MKDEV(mdp_major, 0), 1UL<<MINORBITS, THIS_MODULE,
- 			    md_probe, NULL, NULL);
- 
--	register_reboot_notifier(&md_notifier);
-+	register_reboot_notifier(&md_reboot_notifier);
- 	raid_table_header = register_sysctl_table(raid_root_table);
- 
- 	md_geninit();
-@@ -9243,7 +9243,7 @@ static __exit void md_exit(void)
- 
- 	unregister_blkdev(MD_MAJOR,"md");
- 	unregister_blkdev(mdp_major, "mdp");
--	unregister_reboot_notifier(&md_notifier);
-+	unregister_reboot_notifier(&md_reboot_notifier);
- 	unregister_sysctl_table(raid_table_header);
- 
- 	/* We cannot unload the modules while some process is
--- 
-2.14.2
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
