@@ -1,44 +1,69 @@
-Return-Path: <prvs=450edcfce=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "shli@kernel.org" <shli@kernel.org>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"jthumshirn@suse.de" <jthumshirn@suse.de>, "linux-raid@vger.kernel.org"
-	<linux-raid@vger.kernel.org>, "hch@lst.de" <hch@lst.de>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
+Return-Path: <shli@kernel.org>
+Date: Tue, 10 Oct 2017 18:48:30 -0700
+From: Shaohua Li <shli@kernel.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"jthumshirn@suse.de" <jthumshirn@suse.de>,
+	"linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+	"hch@lst.de" <hch@lst.de>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>,
 	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"oleksandr@natalenko.name" <oleksandr@natalenko.name>, "hare@suse.com"
-	<hare@suse.com>
+	"oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+	"hare@suse.com" <hare@suse.com>
 Subject: Re: [PATCH v8 03/10] md: Neither resync nor reshape while the system
  is frozen
-Date: Wed, 11 Oct 2017 17:17:56 +0000
-Message-ID: <1507742275.2477.20.camel@wdc.com>
+Message-ID: <20171011014830.ps3v3yxny27wv7mc@kernel.org>
 References: <20171010210346.14574-1-bart.vanassche@wdc.com>
-	 <20171010210346.14574-4-bart.vanassche@wdc.com>
-	 <20171010223025.tda3lx64rdmugm54@kernel.org>
-	 <1507678384.2815.80.camel@wdc.com>
-	 <20171011014830.ps3v3yxny27wv7mc@kernel.org>
-In-Reply-To: <20171011014830.ps3v3yxny27wv7mc@kernel.org>
-Content-Type: text/plain; charset="utf-8"
+ <20171010210346.14574-4-bart.vanassche@wdc.com>
+ <20171010223025.tda3lx64rdmugm54@kernel.org>
+ <1507678384.2815.80.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1507678384.2815.80.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE3LTEwLTEwIGF0IDE4OjQ4IC0wNzAwLCBTaGFvaHVhIExpIHdyb3RlOg0KPiBU
-aGUgcHJvYmxlbSBpcyBfX21kX3N0b3Bfd3JpdGVzIHNldCBzb21lIGJpdCBsaWtlIE1EX1JFQ09W
-RVJZX0ZST1pFTiwgd2hpY2gNCj4gd2lsbCBwcmV2ZW50IG1kX2NoZWNrX3JlY292ZXJ5IHJlc3Rh
-cnRpbmcgcmVzeW5jL3Jlc2hhcGUuIEkgdGhpbmsgd2UgbmVlZA0KPiBwcmVzZXJ2ZSBtZGRldi0+
-cmVjb3ZlcnkgaW4gc3VzcGVuZCBwcmVwYXJlIGFuZCByZXN0b3JlIGFmdGVyIHJlc3VtZQ0KDQpI
-ZWxsbyBTaGFvaHVhLA0KDQpBcyBmYXIgYXMgSSBjYW4gc2VlIF9fbWRfc3RvcF93cml0ZXMoKSBz
-ZXRzIE1EX1JFQ09WRVJZX0ZST1pFTiBhbmQgY2FuIHNldA0KTURfUkVDT1ZFUllfSU5UUi4gU2lu
-Y2UgbWRfY2hlY2tfcmVjb3ZlcnkoKSBjbGVhcnMgTURfUkVDT1ZFUllfSU5UUiBJIHRoaW5rDQpp
-dCBzaG91bGQgYmUgc3VmZmljaWVudCB0byBzYXZlIGFuZCByZXN0b3JlIHRoZSBzdGF0ZSBvZiB0
-aGUNCk1EX1JFQ09WRVJZX0ZST1pFTiBmbGFnLiBIb3dldmVyLCB3aGVuIEkgcmFuIHRoZSBmb2xs
-b3dpbmcgdGVzdDoNCiogZWNobyBmcm96ZW4gPiAvc3lzL2Jsb2NrL21kMC9tZC9zeW5jX2FjdGlv
-bg0KKiBjYXQgL3N5cy9ibG9jay9tZDAvbWQvc3luY19hY3Rpb24NCiogc3lzdGVtY3RsIGhpYmVy
-bmF0ZQ0KKiAocG93ZXIgb24gc3lzdGVtIGFnYWluKQ0KKiBjYXQgL3N5cy9ibG9jay9tZDAvbWQv
-c3luY19hY3Rpb24NCg0KdGhlIG91dHB1dCB0aGF0IGFwcGVhcmVkIHdhcyBhcyBmb2xsb3dzOg0K
-DQpmcm96ZW4NCmlkbGUNCg0KRG9lcyB0aGF0IG1lYW4gdGhhdCBhIGhpYmVybmF0ZSBvciBzdXNw
-ZW5kIGZvbGxvd2VkIGJ5IGEgcmVzdW1lIGlzIHN1ZmZpY2llbnQNCnRvIGNsZWFyIHRoZSBNRF9S
-RUNPVkVSWV9GUk9aRU4gZmxhZyBmb3IgdGhlIG1kIGRyaXZlcnMgYW5kIGhlbmNlIHRoYXQgdGhl
-DQpwYXRjaCBhdCB0aGUgc3RhcnQgb2YgdGhpcyBlLW1haWwgdGhyZWFkIGRvZXMgbm90IG5lZWQg
-YW55IGZ1cnRoZXINCm1vZGlmaWNhdGlvbnM/DQoNClRoYW5rcywNCg0KQmFydC4=
+On Tue, Oct 10, 2017 at 11:33:06PM +0000, Bart Van Assche wrote:
+> On Tue, 2017-10-10 at 15:30 -0700, Shaohua Li wrote:
+> > On Tue, Oct 10, 2017 at 02:03:39PM -0700, Bart Van Assche wrote:
+> > > Some people use the md driver on laptops and use the suspend and
+> > > resume functionality. Since it is essential that submitting of
+> > > new I/O requests stops before a hibernation image is created,
+> > > interrupt the md resync and reshape actions if the system is
+> > > being frozen. Note: the resync and reshape will restart after
+> > > the system is resumed and a message similar to the following
+> > > will appear in the system log:
+> > > 
+> > > md: md0: data-check interrupted.
+> > 
+> > Where do we restart resync and reshape?
+> 
+> Hello Shaohua,
+> 
+> My understanding of the md driver is as follows:
+> - Before any write occurs, md_write_start() is called. That function clears
+>   mddev->safemode and checks mddev->in_sync. If that variable is set, it is
+>   cleared and md_write_start() wakes up mddev->thread and waits until the
+>   superblock has been written to disk.
+> - All mddev->thread implementations call md_check_recovery(). That function
+>   updates the superblock by calling md_update_sb() if needed.
+>   md_check_recovery() also starts a resync thread if the array is not in
+>   sync. See also the comment block above md_check_recovery().
+> - md_do_sync() performs the resync. If it completes successfully the
+>   "in_sync" state is set (set_in_sync()). If it is interrupted the "in_sync"
+>   state is not modified.
+> - super_90_sync() sets the MD_SB_CLEAN flag in the on-disk superblock if the
+>   "in_sync" flag is set.
+> 
+> In other words: if the array is in sync the MD_SB_CLEAN flag is set in the
+> on-disk superblock. If a resync is needed that flag is not set. The
+> MD_SB_CLEAN flag is checked when the superblock is loaded. If that flag is
+> not set a resync is started.
+
+The problem is __md_stop_writes set some bit like MD_RECOVERY_FROZEN, which
+will prevent md_check_recovery restarting resync/reshape. I think we need
+preserve mddev->recovery in suspend prepare and restore after resume
+
+Thanks,
+Shaohua
