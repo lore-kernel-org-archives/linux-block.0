@@ -1,78 +1,42 @@
-Return-Path: <prvs=469d6a95f=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, "Christoph
- Hellwig" <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Oleksandr Natalenko <oleksandr@natalenko.name>, Ming Lei
-	<ming.lei@redhat.com>, Martin Steigerwald <martin@lichtvoll.de>, "Bart Van
- Assche" <bart.vanassche@wdc.com>, Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v11 4/7] ide, scsi: Tell the block layer at request allocation time about preempt requests
-Date: Mon, 30 Oct 2017 15:42:02 -0700
-Message-ID: <20171030224205.25212-5-bart.vanassche@wdc.com>
-In-Reply-To: <20171030224205.25212-1-bart.vanassche@wdc.com>
-References: <20171030224205.25212-1-bart.vanassche@wdc.com>
+Return-Path: <zwp10758@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
+In-Reply-To: <20171010182340.rpqkzgx6pmmlplin@kernel.org>
+References: <cover.1507337347.git.shli@fb.com> <c8b704eb77e0b8d1792cde7ca1fefcca09b7684f.1507337347.git.shli@fb.com>
+ <20171010173551.GB2924@localhost.didichuxing.com> <20171010182340.rpqkzgx6pmmlplin@kernel.org>
+From: weiping zhang <zwp10758@gmail.com>
+Date: Wed, 11 Oct 2017 22:41:14 +0800
+Message-ID: <CAA70yB7fcx+KdfN_w7xofGLABeh9izEY8qmFMWm7JTOEYYkwUw@mail.gmail.com>
+Subject: Re: [PATCH V2 3/3] blockcg: export latency info for each cgroup
+To: Shaohua Li <shli@kernel.org>
+Cc: linux-block@vger.kernel.org, vgoyal@redhat.com, tj@kernel.org,
+	Jens Axboe <axboe@kernel.dk>, Kernel-team@fb.com, Shaohua Li <shli@fb.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-Convert blk_get_request(q, op, __GFP_RECLAIM) into
-blk_get_request_flags(q, op, BLK_MQ_PREEMPT). This patch does not
-change any functionality.
+2017-10-11 2:23 GMT+08:00 Shaohua Li <shli@kernel.org>:
+> On Wed, Oct 11, 2017 at 01:35:51AM +0800, weiping zhang wrote:
+>> On Fri, Oct 06, 2017 at 05:56:01PM -0700, Shaohua Li wrote:
+>> > From: Shaohua Li <shli@fb.com>
+>> >
+>> > Export the latency info to user. The latency is a good sign to indicate
+>> > if IO is congested or not. User can use the info to make decisions like
+>> > adjust cgroup settings.
+>> Hi Shaohua,
+>> How to check IO congested or not by latency ? Different SSD has
+>> different latency especially when mixed sequence and random IO
+>> operatons.
+>
+> There is no magic here, you should know the SSD characteristics first. The idea
+> is observing the latency when the system isn't overcommited, for example,
+> running the workload in a one-cgroup setup, then using the observed latency to
+> guide configuration for multi-cgroup settings or check if IO is healthy in
+> cgroups.
+>
+Could you please give more detail about how to get the SSD characteristics ?
+I cann't find a good way to get the reasonable latency at mixed
+sequence , random,
+read, and write. Is there a value or a range represent the reasonable latency at
+mixed circurmastance ?
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Tested-by: Martin Steigerwald <martin@lichtvoll.de>
-Acked-by: David S. Miller <davem@davemloft.net> [ for IDE ]
-Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/ide/ide-pm.c    | 4 ++--
- drivers/scsi/scsi_lib.c | 6 +++---
- 2 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/ide/ide-pm.c b/drivers/ide/ide-pm.c
-index 544f02d673ca..f56d742908df 100644
---- a/drivers/ide/ide-pm.c
-+++ b/drivers/ide/ide-pm.c
-@@ -89,9 +89,9 @@ int generic_ide_resume(struct device *dev)
- 	}
- 
- 	memset(&rqpm, 0, sizeof(rqpm));
--	rq = blk_get_request(drive->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
-+	rq = blk_get_request_flags(drive->queue, REQ_OP_DRV_IN,
-+				   BLK_MQ_REQ_PREEMPT);
- 	ide_req(rq)->type = ATA_PRIV_PM_RESUME;
--	rq->rq_flags |= RQF_PREEMPT;
- 	rq->special = &rqpm;
- 	rqpm.pm_step = IDE_PM_START_RESUME;
- 	rqpm.pm_state = PM_EVENT_ON;
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 6f10afaca25b..7c119696402c 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -252,9 +252,9 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
- 	struct scsi_request *rq;
- 	int ret = DRIVER_ERROR << 24;
- 
--	req = blk_get_request(sdev->request_queue,
-+	req = blk_get_request_flags(sdev->request_queue,
- 			data_direction == DMA_TO_DEVICE ?
--			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM);
-+			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, BLK_MQ_REQ_PREEMPT);
- 	if (IS_ERR(req))
- 		return ret;
- 	rq = scsi_req(req);
-@@ -268,7 +268,7 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
- 	rq->retries = retries;
- 	req->timeout = timeout;
- 	req->cmd_flags |= flags;
--	req->rq_flags |= rq_flags | RQF_QUIET | RQF_PREEMPT;
-+	req->rq_flags |= rq_flags | RQF_QUIET;
- 
- 	/*
- 	 * head injection *required* here otherwise quiesce won't work
--- 
-2.14.2
+Thanks
+Weiping
