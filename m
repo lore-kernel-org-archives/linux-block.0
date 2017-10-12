@@ -1,27 +1,136 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Fri, 13 Oct 2017 10:47:18 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
+Return-Path: <prvs=451f24578=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Bart Van Assche <bart.vanassche@wdc.com>,
 	"Martin K . Petersen" <martin.petersen@oracle.com>,
 	Anil Ravindranath <anil_ravindranath@pmc-sierra.com>
-Subject: Re: [PATCH 8/8] scsi/pmcraid: Use sgl_alloc_order() and
- sgl_free_order()
-Message-ID: <20171013084717.7odpun36aywlvbvd@linux-x5ow.site>
+Subject: [PATCH 8/8] scsi/pmcraid: Use sgl_alloc_order() and sgl_free_order()
+Date: Thu, 12 Oct 2017 15:45:50 -0700
+Message-Id: <20171012224550.25440-9-bart.vanassche@wdc.com>
+In-Reply-To: <20171012224550.25440-1-bart.vanassche@wdc.com>
 References: <20171012224550.25440-1-bart.vanassche@wdc.com>
- <20171012224550.25440-9-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20171012224550.25440-9-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Use the sgl_alloc_order() and sgl_free_order() functions instead
+of open coding these functions.
+
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-scsi@vger.kernel.org
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Anil Ravindranath <anil_ravindranath@pmc-sierra.com>
+---
+ drivers/scsi/Kconfig   |  1 +
+ drivers/scsi/pmcraid.c | 44 +++++---------------------------------------
+ drivers/scsi/pmcraid.h |  2 +-
+ 3 files changed, 7 insertions(+), 40 deletions(-)
+
+diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
+index d11e75e76195..632200ec36a6 100644
+--- a/drivers/scsi/Kconfig
++++ b/drivers/scsi/Kconfig
+@@ -1576,6 +1576,7 @@ config ZFCP
+ config SCSI_PMCRAID
+ 	tristate "PMC SIERRA Linux MaxRAID adapter support"
+ 	depends on PCI && SCSI && NET
++	select SGL_ALLOC
+ 	---help---
+ 	  This driver supports the PMC SIERRA MaxRAID adapters.
+ 
+diff --git a/drivers/scsi/pmcraid.c b/drivers/scsi/pmcraid.c
+index b4d6cd8cd1ad..5f3ea3f3dc64 100644
+--- a/drivers/scsi/pmcraid.c
++++ b/drivers/scsi/pmcraid.c
+@@ -46,6 +46,7 @@
+ #include <linux/libata.h>
+ #include <linux/mutex.h>
+ #include <linux/ktime.h>
++#include <linux/sgl_alloc.h>
+ #include <scsi/scsi.h>
+ #include <scsi/scsi_host.h>
+ #include <scsi/scsi_device.h>
+@@ -3232,12 +3233,7 @@ static int pmcraid_build_ioadl(
+  */
+ static void pmcraid_free_sglist(struct pmcraid_sglist *sglist)
+ {
+-	int i;
+-
+-	for (i = 0; i < sglist->num_sg; i++)
+-		__free_pages(sg_page(&(sglist->scatterlist[i])),
+-			     sglist->order);
+-
++	sgl_free_order(sglist->scatterlist, sglist->order);
+ 	kfree(sglist);
+ }
+ 
+@@ -3254,50 +3250,20 @@ static void pmcraid_free_sglist(struct pmcraid_sglist *sglist)
+ static struct pmcraid_sglist *pmcraid_alloc_sglist(int buflen)
+ {
+ 	struct pmcraid_sglist *sglist;
+-	struct scatterlist *scatterlist;
+-	struct page *page;
+-	int num_elem, i, j;
+ 	int sg_size;
+ 	int order;
+-	int bsize_elem;
+ 
+ 	sg_size = buflen / (PMCRAID_MAX_IOADLS - 1);
+ 	order = (sg_size > 0) ? get_order(sg_size) : 0;
+-	bsize_elem = PAGE_SIZE * (1 << order);
+-
+-	/* Determine the actual number of sg entries needed */
+-	if (buflen % bsize_elem)
+-		num_elem = (buflen / bsize_elem) + 1;
+-	else
+-		num_elem = buflen / bsize_elem;
+ 
+ 	/* Allocate a scatter/gather list for the DMA */
+-	sglist = kzalloc(sizeof(struct pmcraid_sglist) +
+-			 (sizeof(struct scatterlist) * (num_elem - 1)),
+-			 GFP_KERNEL);
+-
++	sglist = kzalloc(sizeof(struct pmcraid_sglist), GFP_KERNEL);
+ 	if (sglist == NULL)
+ 		return NULL;
+ 
+-	scatterlist = sglist->scatterlist;
+-	sg_init_table(scatterlist, num_elem);
+ 	sglist->order = order;
+-	sglist->num_sg = num_elem;
+-	sg_size = buflen;
+-
+-	for (i = 0; i < num_elem; i++) {
+-		page = alloc_pages(GFP_KERNEL|GFP_DMA|__GFP_ZERO, order);
+-		if (!page) {
+-			for (j = i - 1; j >= 0; j--)
+-				__free_pages(sg_page(&scatterlist[j]), order);
+-			kfree(sglist);
+-			return NULL;
+-		}
+-
+-		sg_set_page(&scatterlist[i], page,
+-			sg_size < bsize_elem ? sg_size : bsize_elem, 0);
+-		sg_size -= bsize_elem;
+-	}
++	sgl_alloc_order(buflen, order, &sglist->num_sg,
++			GFP_KERNEL | GFP_DMA | __GFP_ZERO, false);
+ 
+ 	return sglist;
+ }
+diff --git a/drivers/scsi/pmcraid.h b/drivers/scsi/pmcraid.h
+index 44da91712115..754ef30927e2 100644
+--- a/drivers/scsi/pmcraid.h
++++ b/drivers/scsi/pmcraid.h
+@@ -542,7 +542,7 @@ struct pmcraid_sglist {
+ 	u32 order;
+ 	u32 num_sg;
+ 	u32 num_dma_sg;
+-	struct scatterlist scatterlist[1];
++	struct scatterlist *scatterlist;
+ };
+ 
+ /* page D0 inquiry data of focal point resource */
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.14.2
