@@ -1,56 +1,48 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f43.google.com ([74.125.82.43]:45742 "EHLO
-        mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751278AbdJEIgz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 Oct 2017 04:36:55 -0400
-Received: by mail-wm0-f43.google.com with SMTP id q124so640648wmb.0
-        for <linux-block@vger.kernel.org>; Thu, 05 Oct 2017 01:36:54 -0700 (PDT)
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Javier Gonzales <jg@lightnvm.io>,
-        Andrey Ryabinin <aryabinin@virtuozzo.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH] lightnvm: pblk: remove spinlock when freeing line metadata
-Date: Thu,  5 Oct 2017 10:35:46 +0200
-Message-Id: <1507192546-12156-1-git-send-email-hans.ml.holmberg@owltronix.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <zwp10758@gmail.com>
+Return-Path: <zwp10758@gmail.com>
+From: weiping zhang <zwp10758@gmail.com>
+Date: Thu, 12 Oct 2017 14:26:08 +0800
+To: Jens Axboe <axboe@kernel.dk>
+Cc: jthumshirn@suse.de, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2] blkcg: add sanity check for blkcg policy operations
+Message-ID: <20171012062608.GA11125@source.didichuxing.com>
+References: <20171011094619.GA37417@localhost.didichuxing.com>
+ <3397954d-e59d-09d5-7aab-cb5f5ac4ce63@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <3397954d-e59d-09d5-7aab-cb5f5ac4ce63@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+On Wed, Oct 11, 2017 at 10:51:32AM -0600, Jens Axboe wrote:
+> On 10/11/2017 03:46 AM, weiping zhang wrote:
+> > blkcg policy should keep cpd/pd's alloc_fn and free_fn in pairs,
+> > otherwise policy would register fail.
+> > 
+> > Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+> > ---
+> >  block/blk-cgroup.c | 10 ++++++++++
+> >  1 file changed, 10 insertions(+)
+> > 
+> > diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> > index e7ec676..67b01c5 100644
+> > --- a/block/blk-cgroup.c
+> > +++ b/block/blk-cgroup.c
+> > @@ -1419,6 +1419,16 @@ int blkcg_policy_register(struct blkcg_policy *pol)
+> >  	if (i >= BLKCG_MAX_POLS)
+> >  		goto err_unlock;
+> >  
+> > +	/* Make sure cpd_alloc_fn and cpd_free_fn in pairs */
+> > +	if ((pol->cpd_alloc_fn && !pol->cpd_free_fn) ||
+> > +		(!pol->cpd_alloc_fn && pol->cpd_free_fn))
+> > +		goto err_unlock;
+> 
+> This might be cleaner (and more readable) as:
+> 
+>         if (!pol->cpd_alloc_fn ^ !pol->cpd_free_fn)
+>                 goto err_unlock;
+> 
+> Ditto for the pd part.
+> 
+Really nice, I'll send v3.
 
-Lockdep complains about being in atomic context while freeing line
-metadata - and rightly so as we take a spinlock and end up calling
-vfree that might sleep(in pblk_mfree).
-
-There is no need for holding the line manager free_lock while
-freeing line metadata, so remove the lock.
-
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
----
-This patch is for:
-https://github.com/OpenChannelSSD/linux branch for-4.15/pblk
-
- drivers/lightnvm/pblk-init.c | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index c452478..a645117 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -393,13 +393,11 @@ static void pblk_line_meta_free(struct pblk *pblk)
- 	kfree(l_mg->bb_aux);
- 	kfree(l_mg->vsc_list);
- 
--	spin_lock(&l_mg->free_lock);
- 	for (i = 0; i < PBLK_DATA_LINES; i++) {
- 		kfree(l_mg->sline_meta[i]);
- 		pblk_mfree(l_mg->eline_meta[i]->buf, l_mg->emeta_alloc_type);
- 		kfree(l_mg->eline_meta[i]);
- 	}
--	spin_unlock(&l_mg->free_lock);
- 
- 	kfree(pblk->lines);
- }
--- 
-2.7.4
+Thanks
