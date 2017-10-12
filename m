@@ -1,127 +1,79 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:43444 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752385AbdJKJxQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Oct 2017 05:53:16 -0400
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [PATCH v2 2/3] nvme: introduce nvme_reinit_tagset
-Date: Wed, 11 Oct 2017 12:53:07 +0300
-Message-Id: <1507715588-1041-3-git-send-email-sagi@grimberg.me>
-In-Reply-To: <1507715588-1041-1-git-send-email-sagi@grimberg.me>
-References: <1507715588-1041-1-git-send-email-sagi@grimberg.me>
+Received: from mx1.redhat.com ([209.132.183.28]:38840 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753078AbdJLShj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Oct 2017 14:37:39 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        John Garry <john.garry@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V7 1/6] blk-mq-sched: fix scheduler bad performance
+Date: Fri, 13 Oct 2017 02:36:59 +0800
+Message-Id: <20171012183704.22326-2-ming.lei@redhat.com>
+In-Reply-To: <20171012183704.22326-1-ming.lei@redhat.com>
+References: <20171012183704.22326-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Move blk_mq_reinit_tagset from blk-mq to nvme core
-as the only user of it. Current transports that use
-it (rdma, fc) simply implement .reinit_request op.
+When hw queue is busy, we shouldn't take requests from
+scheduler queue any more, otherwise it is difficult to do
+IO merge.
 
-This patch does not change any functionality.
+This patch fixes the awful IO performance on some
+SCSI devices(lpfc, qla2xxx, ...) when mq-deadline/kyber
+is used by not taking requests if hw queue is busy.
 
-Reviewed-by: Max Gurtovoy <maxg@mellanox.com>
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/nvme/host/core.c | 10 ++++++++++
- drivers/nvme/host/fc.c   |  3 ++-
- drivers/nvme/host/nvme.h |  2 ++
- drivers/nvme/host/rdma.c |  7 +++----
- 4 files changed, 17 insertions(+), 5 deletions(-)
+ block/blk-mq-sched.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 26c8913435b2..7414e25a75f0 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2944,6 +2944,16 @@ void nvme_start_queues(struct nvme_ctrl *ctrl)
- }
- EXPORT_SYMBOL_GPL(nvme_start_queues);
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 4ab69435708c..eca011fdfa0e 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -94,7 +94,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	struct request_queue *q = hctx->queue;
+ 	struct elevator_queue *e = q->elevator;
+ 	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
+-	bool did_work = false;
++	bool do_sched_dispatch = true;
+ 	LIST_HEAD(rq_list);
  
-+int nvme_reinit_tagset(struct nvme_ctrl *ctrl, struct blk_mq_tag_set *set)
-+{
-+	if (!ctrl->ops->reinit_request)
-+		return 0;
-+
-+	return blk_mq_tagset_iter(set, set->driver_data,
-+			ctrl->ops->reinit_request);
-+}
-+EXPORT_SYMBOL_GPL(nvme_reinit_tagset);
-+
- int __init nvme_core_init(void)
- {
- 	int result;
-diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index b8e0822127c1..372a0685b12a 100644
---- a/drivers/nvme/host/fc.c
-+++ b/drivers/nvme/host/fc.c
-@@ -2393,7 +2393,7 @@ nvme_fc_reinit_io_queues(struct nvme_fc_ctrl *ctrl)
- 
- 	nvme_fc_init_io_queues(ctrl);
- 
--	ret = blk_mq_reinit_tagset(&ctrl->tag_set, nvme_fc_reinit_request);
-+	ret = nvme_reinit_tagset(&ctrl->ctrl, ctrl->ctrl.tagset);
- 	if (ret)
- 		goto out_free_io_queues;
- 
-@@ -2753,6 +2753,7 @@ static const struct nvme_ctrl_ops nvme_fc_ctrl_ops = {
- 	.submit_async_event	= nvme_fc_submit_async_event,
- 	.delete_ctrl		= nvme_fc_del_nvme_ctrl,
- 	.get_address		= nvmf_get_address,
-+	.reinit_request		= nvme_fc_reinit_request,
- };
- 
- static void
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index df787f39f4c1..cb9d93048f3d 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -237,6 +237,7 @@ struct nvme_ctrl_ops {
- 	void (*submit_async_event)(struct nvme_ctrl *ctrl, int aer_idx);
- 	int (*delete_ctrl)(struct nvme_ctrl *ctrl);
- 	int (*get_address)(struct nvme_ctrl *ctrl, char *buf, int size);
-+	int (*reinit_request)(void *data, struct request *rq);
- };
- 
- static inline bool nvme_ctrl_ready(struct nvme_ctrl *ctrl)
-@@ -311,6 +312,7 @@ void nvme_unfreeze(struct nvme_ctrl *ctrl);
- void nvme_wait_freeze(struct nvme_ctrl *ctrl);
- void nvme_wait_freeze_timeout(struct nvme_ctrl *ctrl, long timeout);
- void nvme_start_freeze(struct nvme_ctrl *ctrl);
-+int nvme_reinit_tagset(struct nvme_ctrl *ctrl, struct blk_mq_tag_set *set);
- 
- #define NVME_QID_ANY -1
- struct request *nvme_alloc_request(struct request_queue *q,
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index 92a03ff5fb4d..039f38cb6987 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -774,8 +774,7 @@ static int nvme_rdma_configure_admin_queue(struct nvme_rdma_ctrl *ctrl,
- 			goto out_free_tagset;
- 		}
- 	} else {
--		error = blk_mq_reinit_tagset(&ctrl->admin_tag_set,
--					     nvme_rdma_reinit_request);
-+		error = nvme_reinit_tagset(&ctrl->ctrl, ctrl->ctrl.admin_tagset);
- 		if (error)
- 			goto out_free_queue;
+ 	/* RCU or SRCU read lock is needed before checking quiesced flag */
+@@ -125,18 +125,18 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	 */
+ 	if (!list_empty(&rq_list)) {
+ 		blk_mq_sched_mark_restart_hctx(hctx);
+-		did_work = blk_mq_dispatch_rq_list(q, &rq_list);
++		do_sched_dispatch = blk_mq_dispatch_rq_list(q, &rq_list);
+ 	} else if (!has_sched_dispatch) {
+ 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+ 		blk_mq_dispatch_rq_list(q, &rq_list);
  	}
-@@ -855,8 +854,7 @@ static int nvme_rdma_configure_io_queues(struct nvme_rdma_ctrl *ctrl, bool new)
- 			goto out_free_tag_set;
- 		}
- 	} else {
--		ret = blk_mq_reinit_tagset(&ctrl->tag_set,
--					   nvme_rdma_reinit_request);
-+		ret = nvme_reinit_tagset(&ctrl->ctrl, ctrl->ctrl.tagset);
- 		if (ret)
- 			goto out_free_io_queues;
  
-@@ -1845,6 +1843,7 @@ static const struct nvme_ctrl_ops nvme_rdma_ctrl_ops = {
- 	.submit_async_event	= nvme_rdma_submit_async_event,
- 	.delete_ctrl		= nvme_rdma_del_ctrl,
- 	.get_address		= nvmf_get_address,
-+	.reinit_request		= nvme_rdma_reinit_request,
- };
+ 	/*
+-	 * We want to dispatch from the scheduler if we had no work left
+-	 * on the dispatch list, OR if we did have work but weren't able
+-	 * to make progress.
++	 * We want to dispatch from the scheduler if there was nothing
++	 * on the dispatch list or we were able to dispatch from the
++	 * dispatch list.
+ 	 */
+-	if (!did_work && has_sched_dispatch) {
++	if (do_sched_dispatch && has_sched_dispatch) {
+ 		do {
+ 			struct request *rq;
  
- static struct nvme_ctrl *nvme_rdma_create_ctrl(struct device *dev,
 -- 
-2.7.4
+2.9.5
