@@ -1,21 +1,40 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Thu, 12 Oct 2017 09:58:48 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: axboe@kernel.dk, linux-block@vger.kernel.org
-Subject: Re: [PATCH v3] blkcg: add sanity check for blkcg policy operations
-Message-ID: <20171012075848.qb5jcklrqwim5cwd@linux-x5ow.site>
-References: <20171012064714.GA3069@bogon.didichuxing.com>
+Return-Path: <zhangweiping@didichuxing.com>
+Date: Thu, 12 Oct 2017 14:47:24 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: <axboe@kernel.dk>, <jthumshirn@suse.de>
+CC: <linux-block@vger.kernel.org>
+Subject: [PATCH v3] blkcg: add sanity check for blkcg policy operations
+Message-ID: <20171012064714.GA3069@bogon.didichuxing.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20171012064714.GA3069@bogon.didichuxing.com>
+Content-Type: text/plain; charset="us-ascii"
+Return-Path: zhangweiping@didichuxing.com
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+blkcg policy should keep cpd/pd's alloc_fn and free_fn in pairs,
+otherwise policy would register fail.
+
+Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+---
+ block/blk-cgroup.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index e7ec676..6c5f5f3 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1419,6 +1419,13 @@ int blkcg_policy_register(struct blkcg_policy *pol)
+ 	if (i >= BLKCG_MAX_POLS)
+ 		goto err_unlock;
+ 
++	/* Make sure cpd_alloc_fn and cpd_free_fn in pairs */
++	if (!pol->cpd_alloc_fn ^ !pol->cpd_free_fn)
++		goto err_unlock;
++
++	if (!pol->pd_alloc_fn ^ !pol->pd_free_fn)
++		goto err_unlock;
++
+ 	/* register @pol */
+ 	pol->plid = i;
+ 	blkcg_policy[pol->plid] = pol;
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.9.4
