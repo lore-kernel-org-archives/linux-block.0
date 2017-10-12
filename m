@@ -1,132 +1,53 @@
-Return-Path: <prvs=14519fb91f=shli@fb.com>
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: <axboe@kernel.dk>, <Kernel-team@fb.com>, Omar Sandoval <osandov@fb.com>
-Subject: [PATCH] blk-stat: delete useless code
-Date: Thu, 5 Oct 2017 14:55:33 -0700
-Message-ID: <53167e7f908d54f480b2ee62b5bb01279bf156db.1507240437.git.shli@fb.com>
+Return-Path: <martin@lichtvoll.de>
+From: Martin Steigerwald <martin@lichtvoll.de>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "jthumshirn@suse.de" <jthumshirn@suse.de>, "hch@lst.de" <hch@lst.de>, "martin.petersen@oracle.com" <martin.petersen@oracle.com>, "ming.lei@redhat.com" <ming.lei@redhat.com>, "axboe@kernel.dk" <axboe@kernel.dk>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, "oleksandr@natalenko.name" <oleksandr@natalenko.name>, "hare@suse.com" <hare@suse.com>, "mcgrof@kernel.org" <mcgrof@kernel.org>
+Subject: Re: [PATCH v7 9/9] block, scsi: Make SCSI quiesce and resume work reliably
+Date: Thu, 12 Oct 2017 21:53:57 +0200
+Message-ID: <3970766.W9abtXnTZN@merkaba>
+In-Reply-To: <1507649241.2815.9.camel@wdc.com>
+References: <20171009231400.562-1-bart.vanassche@wdc.com> <2538545.nE4DvSpPT1@merkaba> <1507649241.2815.9.camel@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="iso-8859-1"
 List-ID: <linux-block@vger.kernel.org>
 
-Fix two issues:
-- the per-cpu stat flush is unnecessary, nobody uses per-cpu stat except
-  sum it to global stat. We can do the calculation there. The flush just
-  wastes cpu time.
-- some fields are signed int/s64. I don't see the point.
+Bart Van Assche - 10.10.17, 15:27:
+> On Tue, 2017-10-10 at 09:57 +0200, Martin Steigerwald wrote:
+>=20
+> > Bart Van Assche - 09.10.17, 16:14:
+> >=20
+> > > The contexts from which a SCSI device can be quiesced or resumed are:
+> > > [ ... ]
+> >=20
+> >=20
+> > Does this as reliably fix the issue as the patches from Ming? I mean in
+> > *real world* scenarios? Or is it just about the same approach as Ming
+> > has taken.=20
+> > I ask cause I don=B4t see any Tested-By:=B4s here? I know I tested Ming=
+=B4s
+> > patch series and I know it fixes the hang after resume from suspend
+> > with blk-mq + BFQ issue for me. I have an uptime of 7 days and I didn=
+=B4t
+> > see any uptime even remotely like that in a long time (before that issue
+> > Intel gfx drivers caused hangs, but thankfully that seems fixed
+> > meanwhile).
+> >=20
+> > I=B4d be willing to test. Do you have a 4.14.x tree available with these
+> > patches applied I can just add as a remote and fetch from?
 
-Cc: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/blk-stat.c          | 45 +++++++--------------------------------------
- include/linux/blk_types.h |  5 ++---
- 2 files changed, 9 insertions(+), 41 deletions(-)
+> A previous version of this patch series passed Oleksandr's tests. This
+> series is close to that previous version so I think it is safe to assume
+> that this version will also pass Oleksandr's tests. Anyway, more testing =
+is
+> definitely welcome so if you want to verify this series please start from
+> the following tree (Jens' for-next branch + this series):
+> https://github.com/bvanassche/linux/tree/blk-mq-pm-v7=20
 
-diff --git a/block/blk-stat.c b/block/blk-stat.c
-index c52356d..3a2f3c9 100644
---- a/block/blk-stat.c
-+++ b/block/blk-stat.c
-@@ -11,8 +11,6 @@
- #include "blk-mq.h"
- #include "blk.h"
- 
--#define BLK_RQ_STAT_BATCH	64
--
- struct blk_queue_stats {
- 	struct list_head callbacks;
- 	spinlock_t lock;
-@@ -23,45 +21,21 @@ static void blk_stat_init(struct blk_rq_stat *stat)
- {
- 	stat->min = -1ULL;
- 	stat->max = stat->nr_samples = stat->mean = 0;
--	stat->batch = stat->nr_batch = 0;
--}
--
--static void blk_stat_flush_batch(struct blk_rq_stat *stat)
--{
--	const s32 nr_batch = READ_ONCE(stat->nr_batch);
--	const s32 nr_samples = READ_ONCE(stat->nr_samples);
--
--	if (!nr_batch)
--		return;
--	if (!nr_samples)
--		stat->mean = div64_s64(stat->batch, nr_batch);
--	else {
--		stat->mean = div64_s64((stat->mean * nr_samples) +
--					stat->batch,
--					nr_batch + nr_samples);
--	}
--
--	stat->nr_samples += nr_batch;
--	stat->nr_batch = stat->batch = 0;
-+	stat->batch = 0;
- }
- 
-+/* src is a per-cpu stat, mean isn't initialized */
- static void blk_stat_sum(struct blk_rq_stat *dst, struct blk_rq_stat *src)
- {
--	blk_stat_flush_batch(src);
--
- 	if (!src->nr_samples)
- 		return;
- 
- 	dst->min = min(dst->min, src->min);
- 	dst->max = max(dst->max, src->max);
- 
--	if (!dst->nr_samples)
--		dst->mean = src->mean;
--	else {
--		dst->mean = div64_s64((src->mean * src->nr_samples) +
--					(dst->mean * dst->nr_samples),
--					dst->nr_samples + src->nr_samples);
--	}
-+	dst->mean = div_u64(src->batch + dst->mean * dst->nr_samples,
-+				dst->nr_samples + src->nr_samples);
-+
- 	dst->nr_samples += src->nr_samples;
- }
- 
-@@ -69,13 +43,8 @@ static void __blk_stat_add(struct blk_rq_stat *stat, u64 value)
- {
- 	stat->min = min(stat->min, value);
- 	stat->max = max(stat->max, value);
--
--	if (stat->batch + value < stat->batch ||
--	    stat->nr_batch + 1 == BLK_RQ_STAT_BATCH)
--		blk_stat_flush_batch(stat);
--
- 	stat->batch += value;
--	stat->nr_batch++;
-+	stat->nr_samples++;
- }
- 
- void blk_stat_add(struct request *rq)
-@@ -84,7 +53,7 @@ void blk_stat_add(struct request *rq)
- 	struct blk_stat_callback *cb;
- 	struct blk_rq_stat *stat;
- 	int bucket;
--	s64 now, value;
-+	u64 now, value;
- 
- 	now = __blk_stat_time(ktime_to_ns(ktime_get()));
- 	if (now < blk_stat_time(&rq->issue_stat))
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index a2d2aa7..3385c89 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -329,11 +329,10 @@ static inline bool blk_qc_t_is_internal(blk_qc_t cookie)
- }
- 
- struct blk_rq_stat {
--	s64 mean;
-+	u64 mean;
- 	u64 min;
- 	u64 max;
--	s32 nr_samples;
--	s32 nr_batch;
-+	u32 nr_samples;
- 	u64 batch;
- };
- 
--- 
-2.9.5
+Several suspend to ram and resume, and suspend to disk and resume cycles=20
+without issues. So I think this is good.
+
+Tested-By: Martin Steigerwald <martin@lichtvoll.de>
+
+Thanks,
+=2D-=20
+Martin
