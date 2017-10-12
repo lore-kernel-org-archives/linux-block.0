@@ -1,106 +1,111 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:47448 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932248AbdJMMrx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 08:47:53 -0400
-Received: by mail-wm0-f68.google.com with SMTP id t69so21256092wmt.2
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:53 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 48/58] lightnvm: pblk: start gc if needed during init
-Date: Fri, 13 Oct 2017 14:46:37 +0200
-Message-Id: <20171013124647.32668-49-m@bjorling.me>
-In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
-References: <20171013124647.32668-1-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mx1.redhat.com ([209.132.183.28]:35990 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752246AbdJLSiA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Oct 2017 14:38:00 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        John Garry <john.garry@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V7 2/6] blk-mq-sched: move actual dispatching into one helper
+Date: Fri, 13 Oct 2017 02:37:00 +0800
+Message-Id: <20171012183704.22326-3-ming.lei@redhat.com>
+In-Reply-To: <20171012183704.22326-1-ming.lei@redhat.com>
+References: <20171012183704.22326-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+So that it becomes easy to support to dispatch from sw queue in the
+following patch.
 
-Start GC if needed, directly after init, as we might
-need to garbage collect in order to make room for user writes.
+No functional change.
 
-Create a helper function that allows to kick GC without exposing the
-internals of the GC/rate-limiter interaction.
-
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+Suggested-by: Christoph Hellwig <hch@lst.de> # for simplifying dispatch logic
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/pblk-gc.c   | 5 +++++
- drivers/lightnvm/pblk-init.c | 4 ++++
- drivers/lightnvm/pblk-rl.c   | 2 +-
- drivers/lightnvm/pblk.h      | 2 ++
- 4 files changed, 12 insertions(+), 1 deletion(-)
+ block/blk-mq-sched.c | 43 ++++++++++++++++++++++++-------------------
+ 1 file changed, 24 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-index 374089f..4bac9e1 100644
---- a/drivers/lightnvm/pblk-gc.c
-+++ b/drivers/lightnvm/pblk-gc.c
-@@ -510,6 +510,11 @@ void pblk_gc_should_stop(struct pblk *pblk)
- 		pblk_gc_stop(pblk, 0);
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index eca011fdfa0e..be29ba849408 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -89,12 +89,26 @@ static bool blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
+ 	return false;
  }
  
-+void pblk_gc_should_kick(struct pblk *pblk)
++static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
 +{
-+	pblk_rl_update_rates(&pblk->rl);
++	struct request_queue *q = hctx->queue;
++	struct elevator_queue *e = q->elevator;
++	LIST_HEAD(rq_list);
++
++	do {
++		struct request *rq = e->type->ops.mq.dispatch_request(hctx);
++
++		if (!rq)
++			break;
++		list_add(&rq->queuelist, &rq_list);
++	} while (blk_mq_dispatch_rq_list(q, &rq_list));
 +}
 +
- void pblk_gc_sysfs_state_show(struct pblk *pblk, int *gc_enabled,
- 			      int *gc_active)
+ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
  {
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index f08fa20..ad9f014 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -1025,6 +1025,10 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
- 			pblk->rwb.nr_entries);
+ 	struct request_queue *q = hctx->queue;
+ 	struct elevator_queue *e = q->elevator;
+ 	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
+-	bool do_sched_dispatch = true;
+ 	LIST_HEAD(rq_list);
  
- 	wake_up_process(pblk->writer_ts);
-+
-+	/* Check if we need to start GC */
-+	pblk_gc_should_kick(pblk);
-+
- 	return pblk;
+ 	/* RCU or SRCU read lock is needed before checking quiesced flag */
+@@ -122,30 +136,21 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	 * scheduler, we can no longer merge or sort them. So it's best to
+ 	 * leave them there for as long as we can. Mark the hw queue as
+ 	 * needing a restart in that case.
++	 *
++	 * We want to dispatch from the scheduler if there was nothing
++	 * on the dispatch list or we were able to dispatch from the
++	 * dispatch list.
+ 	 */
+ 	if (!list_empty(&rq_list)) {
+ 		blk_mq_sched_mark_restart_hctx(hctx);
+-		do_sched_dispatch = blk_mq_dispatch_rq_list(q, &rq_list);
+-	} else if (!has_sched_dispatch) {
++		if (blk_mq_dispatch_rq_list(q, &rq_list) && has_sched_dispatch)
++			blk_mq_do_dispatch_sched(hctx);
++	} else if (has_sched_dispatch) {
++		blk_mq_do_dispatch_sched(hctx);
++	} else {
+ 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+ 		blk_mq_dispatch_rq_list(q, &rq_list);
+ 	}
+-
+-	/*
+-	 * We want to dispatch from the scheduler if there was nothing
+-	 * on the dispatch list or we were able to dispatch from the
+-	 * dispatch list.
+-	 */
+-	if (do_sched_dispatch && has_sched_dispatch) {
+-		do {
+-			struct request *rq;
+-
+-			rq = e->type->ops.mq.dispatch_request(hctx);
+-			if (!rq)
+-				break;
+-			list_add(&rq->queuelist, &rq_list);
+-		} while (blk_mq_dispatch_rq_list(q, &rq_list));
+-	}
+ }
  
- fail_stop_writer:
-diff --git a/drivers/lightnvm/pblk-rl.c b/drivers/lightnvm/pblk-rl.c
-index 0896439..739f855 100644
---- a/drivers/lightnvm/pblk-rl.c
-+++ b/drivers/lightnvm/pblk-rl.c
-@@ -96,7 +96,7 @@ unsigned long pblk_rl_nr_free_blks(struct pblk_rl *rl)
-  *
-  * Only the total number of free blocks is used to configure the rate limiter.
-  */
--static void pblk_rl_update_rates(struct pblk_rl *rl)
-+void pblk_rl_update_rates(struct pblk_rl *rl)
- {
- 	struct pblk *pblk = container_of(rl, struct pblk, rl);
- 	unsigned long free_blocks = pblk_rl_nr_free_blks(rl);
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 21438d1..29ba7ec 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -830,6 +830,7 @@ int pblk_gc_init(struct pblk *pblk);
- void pblk_gc_exit(struct pblk *pblk);
- void pblk_gc_should_start(struct pblk *pblk);
- void pblk_gc_should_stop(struct pblk *pblk);
-+void pblk_gc_should_kick(struct pblk *pblk);
- void pblk_gc_kick(struct pblk *pblk);
- void pblk_gc_free_full_lines(struct pblk *pblk);
- void pblk_gc_sysfs_state_show(struct pblk *pblk, int *gc_enabled,
-@@ -841,6 +842,7 @@ int pblk_gc_sysfs_force(struct pblk *pblk, int force);
-  */
- void pblk_rl_init(struct pblk_rl *rl, int budget);
- void pblk_rl_free(struct pblk_rl *rl);
-+void pblk_rl_update_rates(struct pblk_rl *rl);
- int pblk_rl_high_thrs(struct pblk_rl *rl);
- int pblk_rl_low_thrs(struct pblk_rl *rl);
- unsigned long pblk_rl_nr_free_blks(struct pblk_rl *rl);
+ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
 -- 
-2.9.3
+2.9.5
