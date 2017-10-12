@@ -1,31 +1,107 @@
-Return-Path: <thomas@m3y3r.de>
-Subject: [PATCH] bfq: Fix bool initialization/comparison
-From: Thomas Meyer <thomas@m3y3r.de>
-To: paolo.valente@linaro.org, axboe@kernel.dk, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Message-ID: <1507383097082-1668690714-1-diffsplit-thomas@m3y3r.de>
-References: <1507383097081-778026979-0-diffsplit-thomas@m3y3r.de>
-In-Reply-To: <1507383097081-778026979-0-diffsplit-thomas@m3y3r.de>
-Date: Sat, 07 Oct 2017 16:02:21 +0200
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        John Garry <john.garry@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V7 6/6] SCSI: implement .get_budget and .put_budget for blk-mq
+Date: Fri, 13 Oct 2017 02:37:04 +0800
+Message-Id: <20171012183704.22326-7-ming.lei@redhat.com>
+In-Reply-To: <20171012183704.22326-1-ming.lei@redhat.com>
+References: <20171012183704.22326-1-ming.lei@redhat.com>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Bool initializations should use true and false. Bool tests don't need
-comparisons.
+We need to tell blk-mq to reserve resource before queuing
+one request, so implement these two callbacks. Then blk-mq
+can avoid to dequeue request earlier, and IO merge can
+be improved a lot.
 
-Signed-off-by: Thomas Meyer <thomas@m3y3r.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
+ drivers/scsi/scsi_lib.c | 42 ++++++++++++++++++++++++++++++++----------
+ 1 file changed, 32 insertions(+), 10 deletions(-)
 
-diff -u -p a/block/bfq-iosched.c b/block/bfq-iosched.c
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -4986,7 +4986,7 @@ static ssize_t bfq_low_latency_store(str
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 9cf6a80fe297..d6273954a3b4 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1946,6 +1946,33 @@ static void scsi_mq_done(struct scsi_cmnd *cmd)
+ 	blk_mq_complete_request(cmd->request);
+ }
  
- 	if (__data > 1)
- 		__data = 1;
--	if (__data == 0 && bfqd->low_latency != 0)
-+	if (__data == 0 && bfqd->low_latency)
- 		bfq_end_wr(bfqd);
- 	bfqd->low_latency = __data;
++static void scsi_mq_put_budget(struct blk_mq_hw_ctx *hctx)
++{
++	struct request_queue *q = hctx->queue;
++	struct scsi_device *sdev = q->queuedata;
++
++	atomic_dec(&sdev->device_busy);
++	put_device(&sdev->sdev_gendev);
++}
++
++static bool scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
++{
++	struct request_queue *q = hctx->queue;
++	struct scsi_device *sdev = q->queuedata;
++
++	if (!get_device(&sdev->sdev_gendev))
++		goto out;
++	if (!scsi_dev_queue_ready(q, sdev))
++		goto out_put_device;
++
++	return true;
++
++out_put_device:
++	put_device(&sdev->sdev_gendev);
++out:
++	return false;
++}
++
+ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 			 const struct blk_mq_queue_data *bd)
+ {
+@@ -1962,13 +1989,8 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 		goto out;
  
+ 	ret = BLK_STS_RESOURCE;
+-	if (!get_device(&sdev->sdev_gendev))
+-		goto out;
+-
+-	if (!scsi_dev_queue_ready(q, sdev))
+-		goto out_put_device;
+ 	if (!scsi_target_queue_ready(shost, sdev))
+-		goto out_dec_device_busy;
++		goto out_put_budget;
+ 	if (!scsi_host_queue_ready(q, shost, sdev))
+ 		goto out_dec_target_busy;
+ 
+@@ -2003,10 +2025,8 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+ out_dec_target_busy:
+ 	if (scsi_target(sdev)->can_queue > 0)
+ 		atomic_dec(&scsi_target(sdev)->target_busy);
+-out_dec_device_busy:
+-	atomic_dec(&sdev->device_busy);
+-out_put_device:
+-	put_device(&sdev->sdev_gendev);
++out_put_budget:
++	scsi_mq_put_budget(hctx);
+ out:
+ 	switch (ret) {
+ 	case BLK_STS_OK:
+@@ -2211,6 +2231,8 @@ struct request_queue *scsi_old_alloc_queue(struct scsi_device *sdev)
+ }
+ 
+ static const struct blk_mq_ops scsi_mq_ops = {
++	.get_budget	= scsi_mq_get_budget,
++	.put_budget	= scsi_mq_put_budget,
+ 	.queue_rq	= scsi_queue_rq,
+ 	.complete	= scsi_softirq_done,
+ 	.timeout	= scsi_timeout,
+-- 
+2.9.5
