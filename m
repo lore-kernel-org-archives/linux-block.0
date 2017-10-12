@@ -1,222 +1,118 @@
-Return-Path: <BATV+33c0a560d8cf4f6c9bdc+5169+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
+Return-Path: <prvs=451f24578=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
 	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 11/17] nvme: get rid of nvme_ctrl_list
-Date: Wed, 18 Oct 2017 18:52:52 +0200
-Message-Id: <20171018165258.23212-12-hch@lst.de>
-In-Reply-To: <20171018165258.23212-1-hch@lst.de>
-References: <20171018165258.23212-1-hch@lst.de>
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	"Nicholas A . Bellinger" <nab@linux-iscsi.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Hannes Reinecke <hare@suse.com>,
+	Sagi Grimberg <sagi@grimberg.me>
+Subject: [PATCH 5/8] target: Use sgl_alloc_order() and sgl_free()
+Date: Thu, 12 Oct 2017 15:45:47 -0700
+Message-Id: <20171012224550.25440-6-bart.vanassche@wdc.com>
+In-Reply-To: <20171012224550.25440-1-bart.vanassche@wdc.com>
+References: <20171012224550.25440-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Use the core chrdev code to set up the link between the character device
-and the nvme controller.  This allows us to get rid of the global list
-of all controllers, and also ensures that we have both a reference to
-the controller and the transport module before the open method of the
-character device is called.
+Use the sgl_alloc_order() and sgl_free() functions instead of open
+coding these functions.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Nicholas A. Bellinger <nab@linux-iscsi.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Sagi Grimberg <sagi@grimberg.me>
 ---
- drivers/nvme/host/core.c | 76 ++++++++++--------------------------------------
- drivers/nvme/host/nvme.h |  3 +-
- 2 files changed, 18 insertions(+), 61 deletions(-)
+ drivers/target/Kconfig                 |  1 +
+ drivers/target/target_core_transport.c | 47 ++++------------------------------
+ 2 files changed, 6 insertions(+), 42 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 7c1d1c4f93fc..3757f5695de2 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -52,9 +52,6 @@ static u8 nvme_max_retries = 5;
- module_param_named(max_retries, nvme_max_retries, byte, 0644);
- MODULE_PARM_DESC(max_retries, "max number of retries a command may have");
+diff --git a/drivers/target/Kconfig b/drivers/target/Kconfig
+index e2bc99980f75..4c44d7bed01a 100644
+--- a/drivers/target/Kconfig
++++ b/drivers/target/Kconfig
+@@ -5,6 +5,7 @@ menuconfig TARGET_CORE
+ 	select CONFIGFS_FS
+ 	select CRC_T10DIF
+ 	select BLK_SCSI_REQUEST # only for scsi_command_size_tbl..
++	select SGL_ALLOC
+ 	default n
+ 	help
+ 	Say Y or M here to enable the TCM Storage Engine and ConfigFS enabled
+diff --git a/drivers/target/target_core_transport.c b/drivers/target/target_core_transport.c
+index 836d552b0385..e8f0eabd25ab 100644
+--- a/drivers/target/target_core_transport.c
++++ b/drivers/target/target_core_transport.c
+@@ -34,6 +34,7 @@
+ #include <linux/cdrom.h>
+ #include <linux/module.h>
+ #include <linux/ratelimit.h>
++#include <linux/sgl_alloc.h>
+ #include <linux/vmalloc.h>
+ #include <asm/unaligned.h>
+ #include <net/sock.h>
+@@ -2293,13 +2294,7 @@ static void target_complete_ok_work(struct work_struct *work)
  
--static int nvme_char_major;
--module_param(nvme_char_major, int, 0);
+ void target_free_sgl(struct scatterlist *sgl, int nents)
+ {
+-	struct scatterlist *sg;
+-	int count;
 -
- static unsigned long default_ps_max_latency_us = 100000;
- module_param(default_ps_max_latency_us, ulong, 0644);
- MODULE_PARM_DESC(default_ps_max_latency_us,
-@@ -71,11 +68,8 @@ MODULE_PARM_DESC(streams, "turn on support for Streams write directives");
- struct workqueue_struct *nvme_wq;
- EXPORT_SYMBOL_GPL(nvme_wq);
- 
--static LIST_HEAD(nvme_ctrl_list);
--static DEFINE_SPINLOCK(dev_list_lock);
+-	for_each_sg(sgl, sg, nents, count)
+-		__free_page(sg_page(sg));
 -
- static DEFINE_IDA(nvme_instance_ida);
+-	kfree(sgl);
++	sgl_free(sgl);
+ }
+ EXPORT_SYMBOL(target_free_sgl);
+ 
+@@ -2423,42 +2418,10 @@ int
+ target_alloc_sgl(struct scatterlist **sgl, unsigned int *nents, u32 length,
+ 		 bool zero_page, bool chainable)
+ {
+-	struct scatterlist *sg;
+-	struct page *page;
+-	gfp_t zero_flag = (zero_page) ? __GFP_ZERO : 0;
+-	unsigned int nalloc, nent;
+-	int i = 0;
 -
-+static dev_t nvme_chr_devt;
- static struct class *nvme_class;
+-	nalloc = nent = DIV_ROUND_UP(length, PAGE_SIZE);
+-	if (chainable)
+-		nalloc++;
+-	sg = kmalloc_array(nalloc, sizeof(struct scatterlist), GFP_KERNEL);
+-	if (!sg)
+-		return -ENOMEM;
++	gfp_t gfp = GFP_KERNEL | (zero_page ? __GFP_ZERO : 0);
  
- static __le32 nvme_get_log_dw10(u8 lid, size_t size)
-@@ -1031,20 +1025,12 @@ static int nvme_open(struct block_device *bdev, fmode_t mode)
- 
- 	if (!kref_get_unless_zero(&ns->kref))
- 		return -ENXIO;
--	if (!try_module_get(ns->ctrl->ops->module)) {
--		kref_put(&ns->kref, nvme_free_ns);
--		return -ENXIO;
+-	sg_init_table(sg, nalloc);
+-
+-	while (length) {
+-		u32 page_len = min_t(u32, length, PAGE_SIZE);
+-		page = alloc_page(GFP_KERNEL | zero_flag);
+-		if (!page)
+-			goto out;
+-
+-		sg_set_page(&sg[i], page, page_len, 0);
+-		length -= page_len;
+-		i++;
 -	}
+-	*sgl = sg;
+-	*nents = nent;
+-	return 0;
 -
- 	return 0;
- }
- 
- static void nvme_release(struct gendisk *disk, fmode_t mode)
- {
--	struct nvme_ns *ns = disk->private_data;
--
--	module_put(ns->ctrl->ops->module);
--	nvme_put_ns(ns);
-+	nvme_put_ns(disk->private_data);
- }
- 
- static int nvme_getgeo(struct block_device *bdev, struct hd_geometry *geo)
-@@ -1902,33 +1888,12 @@ EXPORT_SYMBOL_GPL(nvme_init_identify);
- 
- static int nvme_dev_open(struct inode *inode, struct file *file)
- {
--	struct nvme_ctrl *ctrl;
--	int instance = iminor(inode);
--	int ret = -ENODEV;
--
--	spin_lock(&dev_list_lock);
--	list_for_each_entry(ctrl, &nvme_ctrl_list, node) {
--		if (ctrl->instance != instance)
--			continue;
--
--		if (!ctrl->admin_q) {
--			ret = -EWOULDBLOCK;
--			break;
--		}
--		if (!kobject_get_unless_zero(&ctrl->device->kobj))
--			break;
--		file->private_data = ctrl;
--		ret = 0;
--		break;
+-out:
+-	while (i > 0) {
+-		i--;
+-		__free_page(sg_page(&sg[i]));
 -	}
--	spin_unlock(&dev_list_lock);
--
--	return ret;
--}
-+	struct nvme_ctrl *ctrl =
-+		container_of(inode->i_cdev, struct nvme_ctrl, cdev);
- 
--static int nvme_dev_release(struct inode *inode, struct file *file)
--{
--	nvme_put_ctrl(file->private_data);
-+	if (!ctrl->admin_q)
-+		return -EWOULDBLOCK;
-+	file->private_data = ctrl;
- 	return 0;
+-	kfree(sg);
+-	return -ENOMEM;
++	*sgl = sgl_alloc_order(length, 0, nents, gfp, chainable);
++	return *sgl ? 0 : -ENOMEM;
  }
- 
-@@ -1992,7 +1957,6 @@ static long nvme_dev_ioctl(struct file *file, unsigned int cmd,
- static const struct file_operations nvme_dev_fops = {
- 	.owner		= THIS_MODULE,
- 	.open		= nvme_dev_open,
--	.release	= nvme_dev_release,
- 	.unlocked_ioctl	= nvme_dev_ioctl,
- 	.compat_ioctl	= nvme_dev_ioctl,
- };
-@@ -2703,11 +2667,7 @@ EXPORT_SYMBOL_GPL(nvme_start_ctrl);
- 
- void nvme_uninit_ctrl(struct nvme_ctrl *ctrl)
- {
--	device_del(ctrl->device);
--
--	spin_lock(&dev_list_lock);
--	list_del(&ctrl->node);
--	spin_unlock(&dev_list_lock);
-+	cdev_device_del(&ctrl->cdev, ctrl->device);
- }
- EXPORT_SYMBOL_GPL(nvme_uninit_ctrl);
- 
-@@ -2750,7 +2710,7 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
- 
- 	device_initialize(&ctrl->ctrl_device);
- 	ctrl->device = &ctrl->ctrl_device;
--	ctrl->device->devt = MKDEV(nvme_char_major, ctrl->instance);
-+	ctrl->device->devt = MKDEV(MAJOR(nvme_chr_devt), ctrl->instance);
- 	ctrl->device->class = nvme_class;
- 	ctrl->device->parent = ctrl->dev;
- 	ctrl->device->groups = nvme_dev_attr_groups;
-@@ -2759,16 +2719,15 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
- 	ret = dev_set_name(ctrl->device, "nvme%d", ctrl->instance);
- 	if (ret)
- 		goto out_release_instance;
--	ret = device_add(ctrl->device);
-+
-+	cdev_init(&ctrl->cdev, &nvme_dev_fops);
-+	ctrl->cdev.owner = ops->module;
-+	ret = cdev_device_add(&ctrl->cdev, ctrl->device);
- 	if (ret)
- 		goto out_free_name;
- 
- 	ida_init(&ctrl->ns_ida);
- 
--	spin_lock(&dev_list_lock);
--	list_add_tail(&ctrl->node, &nvme_ctrl_list);
--	spin_unlock(&dev_list_lock);
--
- 	/*
- 	 * Initialize latency tolerance controls.  The sysfs files won't
- 	 * be visible to userspace unless the device actually supports APST.
-@@ -2899,12 +2858,9 @@ int __init nvme_core_init(void)
- 	if (!nvme_wq)
- 		return -ENOMEM;
- 
--	result = __register_chrdev(nvme_char_major, 0, NVME_MINORS, "nvme",
--							&nvme_dev_fops);
-+	result = alloc_chrdev_region(&nvme_chr_devt, 0, NVME_MINORS, "nvme");
- 	if (result < 0)
- 		goto destroy_wq;
--	else if (result > 0)
--		nvme_char_major = result;
- 
- 	nvme_class = class_create(THIS_MODULE, "nvme");
- 	if (IS_ERR(nvme_class)) {
-@@ -2915,7 +2871,7 @@ int __init nvme_core_init(void)
- 	return 0;
- 
- unregister_chrdev:
--	__unregister_chrdev(nvme_char_major, 0, NVME_MINORS, "nvme");
-+	unregister_chrdev_region(nvme_chr_devt, NVME_MINORS);
- destroy_wq:
- 	destroy_workqueue(nvme_wq);
- 	return result;
-@@ -2924,7 +2880,7 @@ int __init nvme_core_init(void)
- void nvme_core_exit(void)
- {
- 	class_destroy(nvme_class);
--	__unregister_chrdev(nvme_char_major, 0, NVME_MINORS, "nvme");
-+	unregister_chrdev_region(nvme_chr_devt, NVME_MINORS);
- 	destroy_workqueue(nvme_wq);
- }
- 
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 55286acd5387..e16346048b73 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -15,6 +15,7 @@
- #define _NVME_H
- 
- #include <linux/nvme.h>
-+#include <linux/cdev.h>
- #include <linux/pci.h>
- #include <linux/kref.h>
- #include <linux/blk-mq.h>
-@@ -134,7 +135,7 @@ struct nvme_ctrl {
- 	struct mutex namespaces_mutex;
- 	struct device ctrl_device;
- 	struct device *device;	/* char device */
--	struct list_head node;
-+	struct cdev cdev;
- 	struct ida ns_ida;
- 	struct work_struct reset_work;
+ EXPORT_SYMBOL(target_alloc_sgl);
  
 -- 
-2.14.1
+2.14.2
