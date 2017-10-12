@@ -1,59 +1,35 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Fri, 13 Oct 2017 10:44:39 +0200
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "axboe@kernel.dk" <axboe@kernel.dk>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+Return-Path: <prvs=451bf847f=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
 Subject: Re: [PATCH 1/8] lib: Introduce sgl_alloc() and sgl_free()
-Message-ID: <20171013084439.mgidqaygf2kbuz5u@linux-x5ow.site>
+Date: Thu, 12 Oct 2017 23:00:10 +0000
+Message-ID: <1507849209.14112.1.camel@wdc.com>
 References: <20171012224550.25440-1-bart.vanassche@wdc.com>
- <20171012224550.25440-2-bart.vanassche@wdc.com>
- <ee12eeaf-9848-478d-4ebe-9d3497e248e0@kernel.dk>
- <1507849209.14112.1.camel@wdc.com>
+	 <20171012224550.25440-2-bart.vanassche@wdc.com>
+	 <ee12eeaf-9848-478d-4ebe-9d3497e248e0@kernel.dk>
+In-Reply-To: <ee12eeaf-9848-478d-4ebe-9d3497e248e0@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1507849209.14112.1.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Oct 12, 2017 at 11:00:10PM +0000, Bart Van Assche wrote:
-> On Thu, 2017-10-12 at 16:52 -0600, Jens Axboe wrote:
-> > On 10/12/2017 04:45 PM, Bart Van Assche wrote:
-> > > +++ b/include/linux/sgl_alloc.h
-> > > @@ -0,0 +1,16 @@
-> > > +#ifndef _SGL_ALLOC_H_
-> > > +#define _SGL_ALLOC_H_
-> > > +
-> > > +#include <linux/types.h> /* bool, gfp_t */
-> > > +
-> > > +struct scatterlist;
-> > > +
-> > > +struct scatterlist *sgl_alloc_order(unsigned long long length,
-> > > +				    unsigned int order, unsigned int *nent_p,
-> > > +				    gfp_t gfp, bool chainable);
-> > > +struct scatterlist *sgl_alloc(unsigned long long length, unsigned int *nent_p,
-> > > +			      gfp_t gfp);
-> > > +void sgl_free_order(struct scatterlist *sgl, int order);
-> > > +void sgl_free(struct scatterlist *sgl);
-> > > +
-> > > +#endif /* _SGL_ALLOC_H_ */
-> > 
-> > Should this just go into linux/scatterlist.h instead of creating a new header
-> > file?
-> 
-> That's something I can change. I don't have a strong opinion about whether
-> these declarations should go into a new header file or into linux/scatterlist.h.
-
-Yes please do (and the implementaion should go into lib/scatterlist.c).
-Additionally please get rid of the new CONFIG_SGL_ALLOC as well.
-
-Thanks,
-	Johannes
--- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+T24gVGh1LCAyMDE3LTEwLTEyIGF0IDE2OjUyIC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
+biAxMC8xMi8yMDE3IDA0OjQ1IFBNLCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6DQo+ID4gKysrIGIv
+aW5jbHVkZS9saW51eC9zZ2xfYWxsb2MuaA0KPiA+IEBAIC0wLDAgKzEsMTYgQEANCj4gPiArI2lm
+bmRlZiBfU0dMX0FMTE9DX0hfDQo+ID4gKyNkZWZpbmUgX1NHTF9BTExPQ19IXw0KPiA+ICsNCj4g
+PiArI2luY2x1ZGUgPGxpbnV4L3R5cGVzLmg+IC8qIGJvb2wsIGdmcF90ICovDQo+ID4gKw0KPiA+
+ICtzdHJ1Y3Qgc2NhdHRlcmxpc3Q7DQo+ID4gKw0KPiA+ICtzdHJ1Y3Qgc2NhdHRlcmxpc3QgKnNn
+bF9hbGxvY19vcmRlcih1bnNpZ25lZCBsb25nIGxvbmcgbGVuZ3RoLA0KPiA+ICsJCQkJICAgIHVu
+c2lnbmVkIGludCBvcmRlciwgdW5zaWduZWQgaW50ICpuZW50X3AsDQo+ID4gKwkJCQkgICAgZ2Zw
+X3QgZ2ZwLCBib29sIGNoYWluYWJsZSk7DQo+ID4gK3N0cnVjdCBzY2F0dGVybGlzdCAqc2dsX2Fs
+bG9jKHVuc2lnbmVkIGxvbmcgbG9uZyBsZW5ndGgsIHVuc2lnbmVkIGludCAqbmVudF9wLA0KPiA+
+ICsJCQkgICAgICBnZnBfdCBnZnApOw0KPiA+ICt2b2lkIHNnbF9mcmVlX29yZGVyKHN0cnVjdCBz
+Y2F0dGVybGlzdCAqc2dsLCBpbnQgb3JkZXIpOw0KPiA+ICt2b2lkIHNnbF9mcmVlKHN0cnVjdCBz
+Y2F0dGVybGlzdCAqc2dsKTsNCj4gPiArDQo+ID4gKyNlbmRpZiAvKiBfU0dMX0FMTE9DX0hfICov
+DQo+IA0KPiBTaG91bGQgdGhpcyBqdXN0IGdvIGludG8gbGludXgvc2NhdHRlcmxpc3QuaCBpbnN0
+ZWFkIG9mIGNyZWF0aW5nIGEgbmV3IGhlYWRlcg0KPiBmaWxlPw0KDQpUaGF0J3Mgc29tZXRoaW5n
+IEkgY2FuIGNoYW5nZS4gSSBkb24ndCBoYXZlIGEgc3Ryb25nIG9waW5pb24gYWJvdXQgd2hldGhl
+cg0KdGhlc2UgZGVjbGFyYXRpb25zIHNob3VsZCBnbyBpbnRvIGEgbmV3IGhlYWRlciBmaWxlIG9y
+IGludG8gbGludXgvc2NhdHRlcmxpc3QuaC4NCg0KQmFydC4=
