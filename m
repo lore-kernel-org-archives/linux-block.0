@@ -1,50 +1,63 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:48930 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1758161AbdJMMrW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 08:47:22 -0400
-Received: by mail-wm0-f68.google.com with SMTP id i124so21102974wmf.3
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:21 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 15/58] lightnvm: pblk: fix write I/O sync stat
-Date: Fri, 13 Oct 2017 14:46:04 +0200
-Message-Id: <20171013124647.32668-16-m@bjorling.me>
-In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
-References: <20171013124647.32668-1-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=451f24578=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH 0/8] Introduce sgl_alloc() and sgl_free()
+Date: Thu, 12 Oct 2017 15:45:42 -0700
+Message-Id: <20171012224550.25440-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <javier@cnexlabs.com>
+Hello Jens,
 
-Fix stat counter to collect the right number of I/Os being synced on the
-completion path.
+As you probably know there are multiple drivers that both allocate a
+scatter/gather list and populate that list with pages. This patch series moves
+the code for allocating and freeing such scatterlists from these drivers into
+a new source file, namely lib/sgl_alloc. Please consider this patch series for
+kernel v4.15.
 
-Fixes: 0880a9aa2d91f ("lightnvm: pblk: delete redundant buffer pointer")
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/lightnvm/pblk-write.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Notes:
+- Only the ib_srpt driver changes have been tested but none of the other
+  drivers have been retested.
+- The next step is to introduce a caching mechanism for these scatterlists
+  and make the nvmet/rdma and SCSI target drivers use that caching mechanism
+  since for these drivers sgl allocation occurs in the hot path.
 
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index d89ac57..d82ca8b 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -38,7 +38,7 @@ static unsigned long pblk_end_w_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 							c_ctx->nr_padded);
- 
- #ifdef CONFIG_NVM_DEBUG
--	atomic_long_add(c_ctx->nr_valid, &pblk->sync_writes);
-+	atomic_long_add(rqd->nr_ppas, &pblk->sync_writes);
- #endif
- 
- 	ret = pblk_rb_sync_advance(&pblk->rwb, c_ctx->nr_valid);
+Thanks,
+
+Bart.
+
+Bart Van Assche (8):
+  lib: Introduce sgl_alloc() and sgl_free()
+  crypto: scompress - use sgl_alloc() and sgl_free()
+  nvmet/fc: Use sgl_alloc() and sgl_free()
+  nvmet/rdma: Use sgl_alloc() and sgl_free()
+  target: Use sgl_alloc_order() and sgl_free()
+  scsi/ipr: Use sgl_alloc_order() and sgl_free_order()
+  scsi/pmcraid: Remove an unused structure member
+  scsi/pmcraid: Use sgl_alloc_order() and sgl_free_order()
+
+ crypto/Kconfig                         |   1 +
+ crypto/scompress.c                     |  52 +----------------
+ drivers/nvme/target/Kconfig            |   2 +
+ drivers/nvme/target/fc.c               |  37 +-----------
+ drivers/nvme/target/rdma.c             |  64 ++-------------------
+ drivers/scsi/Kconfig                   |   2 +
+ drivers/scsi/ipr.c                     |  50 +++-------------
+ drivers/scsi/ipr.h                     |   2 +-
+ drivers/scsi/pmcraid.c                 |  44 ++------------
+ drivers/scsi/pmcraid.h                 |   3 +-
+ drivers/target/Kconfig                 |   1 +
+ drivers/target/target_core_transport.c |  47 ++-------------
+ include/linux/sgl_alloc.h              |  16 ++++++
+ lib/Kconfig                            |   4 ++
+ lib/Makefile                           |   1 +
+ lib/sgl_alloc.c                        | 102 +++++++++++++++++++++++++++++++++
+ 16 files changed, 161 insertions(+), 267 deletions(-)
+ create mode 100644 include/linux/sgl_alloc.h
+ create mode 100644 lib/sgl_alloc.c
+
 -- 
-2.9.3
+2.14.2
