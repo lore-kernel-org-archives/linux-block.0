@@ -1,84 +1,26 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Avri Altman <Avri.Altman@sandisk.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 05/12 v4] mmc: core: do away with is_new_req
-Date: Thu, 26 Oct 2017 14:57:50 +0200
-Message-Id: <20171026125757.10200-6-linus.walleij@linaro.org>
-In-Reply-To: <20171026125757.10200-1-linus.walleij@linaro.org>
-References: <20171026125757.10200-1-linus.walleij@linaro.org>
+Return-Path: <jthumshirn@suse.de>
+Date: Fri, 13 Oct 2017 10:45:57 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Anil Ravindranath <anil_ravindranath@pmc-sierra.com>
+Subject: Re: [PATCH 7/8] scsi/pmcraid: Remove an unused structure member
+Message-ID: <20171013084556.nm74pesdsn6aejfb@linux-x5ow.site>
+References: <20171012224550.25440-1-bart.vanassche@wdc.com>
+ <20171012224550.25440-8-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20171012224550.25440-8-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The host context member "is_new_req" is only assigned values,
-never checked. Delete it.
-
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
- drivers/mmc/core/core.c  | 1 -
- drivers/mmc/core/queue.c | 5 -----
- include/linux/mmc/host.h | 2 --
- 3 files changed, 8 deletions(-)
-
-diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
-index 68125360a078..ad832317f25b 100644
---- a/drivers/mmc/core/core.c
-+++ b/drivers/mmc/core/core.c
-@@ -2997,7 +2997,6 @@ void mmc_unregister_pm_notifier(struct mmc_host *host)
-  */
- void mmc_init_context_info(struct mmc_host *host)
- {
--	host->context_info.is_new_req = false;
- 	host->context_info.is_waiting_last_req = false;
- }
- 
-diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-index c46be4402803..4a0752ef6154 100644
---- a/drivers/mmc/core/queue.c
-+++ b/drivers/mmc/core/queue.c
-@@ -55,7 +55,6 @@ static int mmc_queue_thread(void *d)
- 		req = blk_fetch_request(q);
- 		mq->asleep = false;
- 		cntx->is_waiting_last_req = false;
--		cntx->is_new_req = false;
- 		if (!req) {
- 			/*
- 			 * Dispatch queue is empty so set flags for
-@@ -109,10 +108,6 @@ static void mmc_request_fn(struct request_queue *q)
- 
- 	cntx = &mq->card->host->context_info;
- 
--	if (cntx->is_waiting_last_req) {
--		cntx->is_new_req = true;
--	}
--
- 	if (mq->asleep)
- 		wake_up_process(mq->thread);
- }
-diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
-index d536325a9640..ceb58b27f402 100644
---- a/include/linux/mmc/host.h
-+++ b/include/linux/mmc/host.h
-@@ -241,11 +241,9 @@ struct mmc_slot {
- 
- /**
-  * mmc_context_info - synchronization details for mmc context
-- * @is_new_req		wake up reason was new request
-  * @is_waiting_last_req	mmc context waiting for single running request
-  */
- struct mmc_context_info {
--	bool			is_new_req;
- 	bool			is_waiting_last_req;
- };
- 
+Fair enough,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.13.6
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
