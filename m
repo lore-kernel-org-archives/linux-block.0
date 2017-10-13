@@ -1,30 +1,375 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:52786 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751067AbdJBOTy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Oct 2017 10:19:54 -0400
-Date: Mon, 2 Oct 2017 07:19:53 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>
-Subject: Re: [PATCH V5 2/7] blk-mq-sched: fix scheduler bad performance
-Message-ID: <20171002141953.GA16855@infradead.org>
-References: <20170930102720.30219-1-ming.lei@redhat.com>
- <20170930102720.30219-3-ming.lei@redhat.com>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:45186 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932132AbdJMMsA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 08:48:00 -0400
+Received: by mail-wm0-f66.google.com with SMTP id q124so21264225wmb.0
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:48:00 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 55/58] lightnvm: pblk: cleanup unused and static functions
+Date: Fri, 13 Oct 2017 14:46:44 +0200
+Message-Id: <20171013124647.32668-56-m@bjorling.me>
+In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
+References: <20171013124647.32668-1-m@bjorling.me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170930102720.30219-3-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Looks fine,
+From: Javier González <javier@cnexlabs.com>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cleanup up unused and static functions across the whole codebase.
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
+---
+ drivers/lightnvm/pblk-core.c | 133 ++++++++++++++++++++-----------------------
+ drivers/lightnvm/pblk-gc.c   |  40 ++++++-------
+ drivers/lightnvm/pblk-rl.c   |  10 ----
+ drivers/lightnvm/pblk.h      |  14 ++---
+ 4 files changed, 86 insertions(+), 111 deletions(-)
+
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 1cd27e3..4199119 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -18,6 +18,31 @@
+ 
+ #include "pblk.h"
+ 
++static void pblk_line_mark_bb(struct work_struct *work)
++{
++	struct pblk_line_ws *line_ws = container_of(work, struct pblk_line_ws,
++									ws);
++	struct pblk *pblk = line_ws->pblk;
++	struct nvm_tgt_dev *dev = pblk->dev;
++	struct ppa_addr *ppa = line_ws->priv;
++	int ret;
++
++	ret = nvm_set_tgt_bb_tbl(dev, ppa, 1, NVM_BLK_T_GRWN_BAD);
++	if (ret) {
++		struct pblk_line *line;
++		int pos;
++
++		line = &pblk->lines[pblk_dev_ppa_to_line(*ppa)];
++		pos = pblk_dev_ppa_to_pos(&dev->geo, *ppa);
++
++		pr_err("pblk: failed to mark bb, line:%d, pos:%d\n",
++				line->id, pos);
++	}
++
++	kfree(ppa);
++	mempool_free(line_ws, pblk->gen_ws_pool);
++}
++
+ static void pblk_mark_bb(struct pblk *pblk, struct pblk_line *line,
+ 			 struct ppa_addr *ppa)
+ {
+@@ -268,7 +293,7 @@ void pblk_end_io_sync(struct nvm_rq *rqd)
+ 	complete(waiting);
+ }
+ 
+-void pblk_wait_for_meta(struct pblk *pblk)
++static void pblk_wait_for_meta(struct pblk *pblk)
+ {
+ 	do {
+ 		if (!atomic_read(&pblk->inflight_io))
+@@ -345,17 +370,6 @@ void pblk_discard(struct pblk *pblk, struct bio *bio)
+ 	pblk_invalidate_range(pblk, slba, nr_secs);
+ }
+ 
+-struct ppa_addr pblk_get_lba_map(struct pblk *pblk, sector_t lba)
+-{
+-	struct ppa_addr ppa;
+-
+-	spin_lock(&pblk->trans_lock);
+-	ppa = pblk_trans_map_get(pblk, lba);
+-	spin_unlock(&pblk->trans_lock);
+-
+-	return ppa;
+-}
+-
+ void pblk_log_write_err(struct pblk *pblk, struct nvm_rq *rqd)
+ {
+ 	atomic_long_inc(&pblk->write_failed);
+@@ -1338,6 +1352,41 @@ static void pblk_stop_writes(struct pblk *pblk, struct pblk_line *line)
+ 	pblk->state = PBLK_STATE_STOPPING;
+ }
+ 
++static void pblk_line_close_meta_sync(struct pblk *pblk)
++{
++	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
++	struct pblk_line_meta *lm = &pblk->lm;
++	struct pblk_line *line, *tline;
++	LIST_HEAD(list);
++
++	spin_lock(&l_mg->close_lock);
++	if (list_empty(&l_mg->emeta_list)) {
++		spin_unlock(&l_mg->close_lock);
++		return;
++	}
++
++	list_cut_position(&list, &l_mg->emeta_list, l_mg->emeta_list.prev);
++	spin_unlock(&l_mg->close_lock);
++
++	list_for_each_entry_safe(line, tline, &list, list) {
++		struct pblk_emeta *emeta = line->emeta;
++
++		while (emeta->mem < lm->emeta_len[0]) {
++			int ret;
++
++			ret = pblk_submit_meta_io(pblk, line);
++			if (ret) {
++				pr_err("pblk: sync meta line %d failed (%d)\n",
++							line->id, ret);
++				return;
++			}
++		}
++	}
++
++	pblk_wait_for_meta(pblk);
++	flush_workqueue(pblk->close_wq);
++}
++
+ void pblk_pipeline_stop(struct pblk *pblk)
+ {
+ 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+@@ -1565,41 +1614,6 @@ int pblk_line_is_full(struct pblk_line *line)
+ 	return (line->left_msecs == 0);
+ }
+ 
+-void pblk_line_close_meta_sync(struct pblk *pblk)
+-{
+-	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+-	struct pblk_line_meta *lm = &pblk->lm;
+-	struct pblk_line *line, *tline;
+-	LIST_HEAD(list);
+-
+-	spin_lock(&l_mg->close_lock);
+-	if (list_empty(&l_mg->emeta_list)) {
+-		spin_unlock(&l_mg->close_lock);
+-		return;
+-	}
+-
+-	list_cut_position(&list, &l_mg->emeta_list, l_mg->emeta_list.prev);
+-	spin_unlock(&l_mg->close_lock);
+-
+-	list_for_each_entry_safe(line, tline, &list, list) {
+-		struct pblk_emeta *emeta = line->emeta;
+-
+-		while (emeta->mem < lm->emeta_len[0]) {
+-			int ret;
+-
+-			ret = pblk_submit_meta_io(pblk, line);
+-			if (ret) {
+-				pr_err("pblk: sync meta line %d failed (%d)\n",
+-							line->id, ret);
+-				return;
+-			}
+-		}
+-	}
+-
+-	pblk_wait_for_meta(pblk);
+-	flush_workqueue(pblk->close_wq);
+-}
+-
+ static void pblk_line_should_sync_meta(struct pblk *pblk)
+ {
+ 	if (pblk_rl_is_limit(&pblk->rl))
+@@ -1673,31 +1687,6 @@ void pblk_line_close_ws(struct work_struct *work)
+ 	mempool_free(line_ws, pblk->gen_ws_pool);
+ }
+ 
+-void pblk_line_mark_bb(struct work_struct *work)
+-{
+-	struct pblk_line_ws *line_ws = container_of(work, struct pblk_line_ws,
+-									ws);
+-	struct pblk *pblk = line_ws->pblk;
+-	struct nvm_tgt_dev *dev = pblk->dev;
+-	struct ppa_addr *ppa = line_ws->priv;
+-	int ret;
+-
+-	ret = nvm_set_tgt_bb_tbl(dev, ppa, 1, NVM_BLK_T_GRWN_BAD);
+-	if (ret) {
+-		struct pblk_line *line;
+-		int pos;
+-
+-		line = &pblk->lines[pblk_dev_ppa_to_line(*ppa)];
+-		pos = pblk_dev_ppa_to_pos(&dev->geo, *ppa);
+-
+-		pr_err("pblk: failed to mark bb, line:%d, pos:%d\n",
+-				line->id, pos);
+-	}
+-
+-	kfree(ppa);
+-	mempool_free(line_ws, pblk->gen_ws_pool);
+-}
+-
+ void pblk_gen_run_ws(struct pblk *pblk, struct pblk_line *line, void *priv,
+ 		      void (*work)(struct work_struct *), gfp_t gfp_mask,
+ 		      struct workqueue_struct *wq)
+diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
+index e6fae19..b8323e3 100644
+--- a/drivers/lightnvm/pblk-gc.c
++++ b/drivers/lightnvm/pblk-gc.c
+@@ -275,6 +275,26 @@ static int pblk_gc_line(struct pblk *pblk, struct pblk_line *line)
+ 	return 0;
+ }
+ 
++static void pblk_gc_reader_kick(struct pblk_gc *gc)
++{
++	wake_up_process(gc->gc_reader_ts);
++}
++
++static void pblk_gc_kick(struct pblk *pblk)
++{
++	struct pblk_gc *gc = &pblk->gc;
++
++	pblk_gc_writer_kick(gc);
++	pblk_gc_reader_kick(gc);
++
++	/* If we're shutting down GC, let's not start it up again */
++	if (gc->gc_enabled) {
++		wake_up_process(gc->gc_ts);
++		mod_timer(&gc->gc_timer,
++			  jiffies + msecs_to_jiffies(GC_TIME_MSECS));
++	}
++}
++
+ static int pblk_gc_read(struct pblk *pblk)
+ {
+ 	struct pblk_gc *gc = &pblk->gc;
+@@ -298,11 +318,6 @@ static int pblk_gc_read(struct pblk *pblk)
+ 	return 0;
+ }
+ 
+-static void pblk_gc_reader_kick(struct pblk_gc *gc)
+-{
+-	wake_up_process(gc->gc_reader_ts);
+-}
+-
+ static struct pblk_line *pblk_gc_get_victim_line(struct pblk *pblk,
+ 						 struct list_head *group_list)
+ {
+@@ -421,21 +436,6 @@ static void pblk_gc_run(struct pblk *pblk)
+ 		goto next_gc_group;
+ }
+ 
+-void pblk_gc_kick(struct pblk *pblk)
+-{
+-	struct pblk_gc *gc = &pblk->gc;
+-
+-	pblk_gc_writer_kick(gc);
+-	pblk_gc_reader_kick(gc);
+-
+-	/* If we're shutting down GC, let's not start it up again */
+-	if (gc->gc_enabled) {
+-		wake_up_process(gc->gc_ts);
+-		mod_timer(&gc->gc_timer,
+-			  jiffies + msecs_to_jiffies(GC_TIME_MSECS));
+-	}
+-}
+-
+ static void pblk_gc_timer(unsigned long data)
+ {
+ 	struct pblk *pblk = (struct pblk *)data;
+diff --git a/drivers/lightnvm/pblk-rl.c b/drivers/lightnvm/pblk-rl.c
+index 739f855..abae31f 100644
+--- a/drivers/lightnvm/pblk-rl.c
++++ b/drivers/lightnvm/pblk-rl.c
+@@ -153,16 +153,6 @@ int pblk_rl_high_thrs(struct pblk_rl *rl)
+ 	return rl->high;
+ }
+ 
+-int pblk_rl_low_thrs(struct pblk_rl *rl)
+-{
+-	return rl->low;
+-}
+-
+-int pblk_rl_sysfs_rate_show(struct pblk_rl *rl)
+-{
+-	return rl->rb_user_max;
+-}
+-
+ int pblk_rl_max_io(struct pblk_rl *rl)
+ {
+ 	return rl->rb_max_io;
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index c6f8841..6c9ea9a 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -710,8 +710,6 @@ void pblk_free_rqd(struct pblk *pblk, struct nvm_rq *rqd, int type);
+ void pblk_set_sec_per_write(struct pblk *pblk, int sec_per_write);
+ int pblk_setup_w_rec_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 			struct pblk_c_ctx *c_ctx);
+-void pblk_wait_for_meta(struct pblk *pblk);
+-struct ppa_addr pblk_get_lba_map(struct pblk *pblk, sector_t lba);
+ void pblk_discard(struct pblk *pblk, struct bio *bio);
+ void pblk_log_write_err(struct pblk *pblk, struct nvm_rq *rqd);
+ void pblk_log_read_err(struct pblk *pblk, struct nvm_rq *rqd);
+@@ -732,10 +730,8 @@ int pblk_line_is_full(struct pblk_line *line);
+ void pblk_line_free(struct pblk *pblk, struct pblk_line *line);
+ void pblk_line_close_meta(struct pblk *pblk, struct pblk_line *line);
+ void pblk_line_close(struct pblk *pblk, struct pblk_line *line);
+-void pblk_line_close_meta_sync(struct pblk *pblk);
+ void pblk_line_close_ws(struct work_struct *work);
+ void pblk_pipeline_stop(struct pblk *pblk);
+-void pblk_line_mark_bb(struct work_struct *work);
+ void pblk_gen_run_ws(struct pblk *pblk, struct pblk_line *line, void *priv,
+ 		     void (*work)(struct work_struct *), gfp_t gfp_mask,
+ 		     struct workqueue_struct *wq);
+@@ -759,7 +755,6 @@ void pblk_down_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
+ void pblk_down_page(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas);
+ void pblk_up_rq(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas,
+ 		unsigned long *lun_bitmap);
+-void pblk_end_bio_sync(struct bio *bio);
+ void pblk_end_io_sync(struct nvm_rq *rqd);
+ int pblk_bio_add_pages(struct pblk *pblk, struct bio *bio, gfp_t flags,
+ 		       int nr_pages);
+@@ -834,7 +829,6 @@ void pblk_gc_exit(struct pblk *pblk);
+ void pblk_gc_should_start(struct pblk *pblk);
+ void pblk_gc_should_stop(struct pblk *pblk);
+ void pblk_gc_should_kick(struct pblk *pblk);
+-void pblk_gc_kick(struct pblk *pblk);
+ void pblk_gc_free_full_lines(struct pblk *pblk);
+ void pblk_gc_sysfs_state_show(struct pblk *pblk, int *gc_enabled,
+ 			      int *gc_active);
+@@ -847,7 +841,6 @@ void pblk_rl_init(struct pblk_rl *rl, int budget);
+ void pblk_rl_free(struct pblk_rl *rl);
+ void pblk_rl_update_rates(struct pblk_rl *rl);
+ int pblk_rl_high_thrs(struct pblk_rl *rl);
+-int pblk_rl_low_thrs(struct pblk_rl *rl);
+ unsigned long pblk_rl_nr_free_blks(struct pblk_rl *rl);
+ int pblk_rl_user_may_insert(struct pblk_rl *rl, int nr_entries);
+ void pblk_rl_inserted(struct pblk_rl *rl, int nr_entries);
+@@ -855,11 +848,9 @@ void pblk_rl_user_in(struct pblk_rl *rl, int nr_entries);
+ int pblk_rl_gc_may_insert(struct pblk_rl *rl, int nr_entries);
+ void pblk_rl_gc_in(struct pblk_rl *rl, int nr_entries);
+ void pblk_rl_out(struct pblk_rl *rl, int nr_user, int nr_gc);
+-int pblk_rl_sysfs_rate_show(struct pblk_rl *rl);
+ int pblk_rl_max_io(struct pblk_rl *rl);
+ void pblk_rl_free_lines_inc(struct pblk_rl *rl, struct pblk_line *line);
+ void pblk_rl_free_lines_dec(struct pblk_rl *rl, struct pblk_line *line);
+-void pblk_rl_set_space_limit(struct pblk_rl *rl, int entries_left);
+ int pblk_rl_is_limit(struct pblk_rl *rl);
+ 
+ /*
+@@ -868,6 +859,11 @@ int pblk_rl_is_limit(struct pblk_rl *rl);
+ int pblk_sysfs_init(struct gendisk *tdisk);
+ void pblk_sysfs_exit(struct gendisk *tdisk);
+ 
++static inline void test(size_t a)
++{
++	a += 1;
++}
++
+ static inline void *pblk_malloc(size_t size, int type, gfp_t flags)
+ {
+ 	if (type == PBLK_KMALLOC_META)
+-- 
+2.9.3
