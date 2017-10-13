@@ -1,32 +1,62 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out1.zte.com.cn ([202.103.147.172]:34292 "EHLO mxct.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750915AbdJ1BxH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Oct 2017 21:53:07 -0400
-From: tang.junhui@zte.com.cn
-To: bcache@lists.ewheeler.net, colyli@suse.de, mlyle@lyle.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        tang.junhui@zte.com.cn
-Subject: Re: Re: [PATCH 11/19] bcache: Subtract dirty sectors of thin flash from cache_sectors in calculating writeback rate
-Date: Sat, 28 Oct 2017 09:52:49 +0800
-Message-Id: <1509155569-31338-1-git-send-email-tang.junhui@zte.com.cn>
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:48980 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752945AbdJMXgH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 19:36:07 -0400
+Received: by mail-pf0-f194.google.com with SMTP id b79so11515420pfk.5
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 16:36:07 -0700 (PDT)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Michael Lyle <mlyle@lyle.org>
+Subject: [PATCH 08/15] bcache: don't write back data if reading it failed
+Date: Fri, 13 Oct 2017 16:35:35 -0700
+Message-Id: <20171013233542.20938-9-mlyle@lyle.org>
+In-Reply-To: <20171013233542.20938-1-mlyle@lyle.org>
+References: <20171013233542.20938-1-mlyle@lyle.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+If an IO operation fails, and we didn't successfully read data from the
+cache, don't writeback invalid/partial data to the backing disk.
 
-Hello Eric
+Signed-off-by: Michael Lyle <mlyle@lyle.org>
+Reviewed-by: Coly Li <colyli@suse.de>
+---
+ drivers/md/bcache/writeback.c | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
 
-> > I discussed with Tang offline, this patch is correct. But the patch
-> > commit log should be improved. Now I help to work on it, should be done
-> > quite soon.
-> 
-> Has an updated commit log been made?  I've not seen this in the commit 
-> stream yet.
-
-It has been commited as
-bcache: correct cache_dirty_target in __update_writeback_rate()
-log: a8394090a9129b40f9d90dcb7f4a49d60c727ca6
-
-Regards,
-Tang
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index e663ca082183..5e65a392287d 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -179,13 +179,21 @@ static void write_dirty(struct closure *cl)
+ 	struct dirty_io *io = container_of(cl, struct dirty_io, cl);
+ 	struct keybuf_key *w = io->bio.bi_private;
+ 
+-	dirty_init(w);
+-	bio_set_op_attrs(&io->bio, REQ_OP_WRITE, 0);
+-	io->bio.bi_iter.bi_sector = KEY_START(&w->key);
+-	bio_set_dev(&io->bio, io->dc->bdev);
+-	io->bio.bi_end_io	= dirty_endio;
++	/*
++	 * IO errors are signalled using the dirty bit on the key.
++	 * If we failed to read, we should not attempt to write to the
++	 * backing device.  Instead, immediately go to write_dirty_finish
++	 * to clean up.
++	 */
++	if (KEY_DIRTY(&w->key)) {
++		dirty_init(w);
++		bio_set_op_attrs(&io->bio, REQ_OP_WRITE, 0);
++		io->bio.bi_iter.bi_sector = KEY_START(&w->key);
++		bio_set_dev(&io->bio, io->dc->bdev);
++		io->bio.bi_end_io	= dirty_endio;
+ 
+-	closure_bio_submit(&io->bio, cl);
++		closure_bio_submit(&io->bio, cl);
++	}
+ 
+ 	continue_at(cl, write_dirty_finish, io->dc->writeback_write_wq);
+ }
+-- 
+2.11.0
