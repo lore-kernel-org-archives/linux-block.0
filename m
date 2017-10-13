@@ -1,114 +1,678 @@
-Return-Path: <prvs=441412a59=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V6 00/14] scsi-mq support for ZBC disks
-Date: Mon,  2 Oct 2017 16:15:21 +0900
-Message-Id: <20171002071535.8007-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:47479 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756659AbdJMMsE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 08:48:04 -0400
+Received: by mail-wm0-f67.google.com with SMTP id t69so21257376wmt.2
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:48:03 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 58/58] lightnvm: implement generic path for sync I/O
+Date: Fri, 13 Oct 2017 14:46:47 +0200
+Message-Id: <20171013124647.32668-59-m@bjorling.me>
+In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
+References: <20171013124647.32668-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This series implements support for ZBC disks used through the scsi-mq I/O path.
+From: Javier González <javier@cnexlabs.com>
 
-The current scsi level support of ZBC disks guarantees write request ordering
-using a per-zone write lock which prevents issuing simultaneously multiple
-write commands to a zone, doing so avoid reordering of sequential writes to
-sequential zones. This method is however ineffective when scsi-mq is used with
-zoned block devices. This is due to the different execution model of blk-mq
-which passes a request to the scsi layer for dispatching after the request has
-been removed from the I/O scheduler queue. That is, when the scsi layer tries
-to lock the target zone of the request, the request may already be out of
-order and zone write locking fails to prevent that.
+Implement a generic path for sending sync I/O on LightNVM. This allows
+to reuse the standard synchronous path trough blk_execute_rq(), instead
+of implementing a wait_for_completion on the target side (e.g., pblk).
 
-Various approaches have been tried to solve this problem. All of them had the
-serious disadvantage of cluttering blk-mq code with zoned block device specific
-conditions and processing. As such extensive changes can only turn into a
-maintenance nightmares, a radically different solution is proposed here.
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
+---
+ drivers/lightnvm/core.c          | 25 ++++++++-----
+ drivers/lightnvm/pblk-core.c     | 78 +++++++++++++---------------------------
+ drivers/lightnvm/pblk-read.c     | 21 ++---------
+ drivers/lightnvm/pblk-recovery.c | 31 ++--------------
+ drivers/lightnvm/pblk.h          | 42 ++++++++++++++++++++--
+ drivers/nvme/host/lightnvm.c     | 70 ++++++++++++++++++++++++++++--------
+ include/linux/lightnvm.h         |  3 ++
+ 7 files changed, 145 insertions(+), 125 deletions(-)
 
-This series proposes implementing scsi-mq support for zoned block devices at
-the I/O scheduler level with simple modifications of the mq-deadline scheduler.
-the modifications are the addition of a per zone write locking mechanism
-similar to that implemented in sd_zbc.c for the legacy scsi path. The zone
-write locking mechanism is used for the exact same purpose, that is, to limit
-writes per zone to at most one request to avoid reordering. The locking context
-however changes from that of scsi-sq and is moved to the dispatch_request
-method of the scheduler. Within this context, under a spin lock guaranteeing
-atomicity against other dispatch contexts, target zones of write requests can
-be locked before write requests removal from the scheduler. In effect, this
-results in the same behavior as the legacy scsi path. Sequential write ordering
-is preserved.
-
-The changes to mq-deadline do not affect regular disks: the same scheduling
-behavior is maintained for these. The modification are also optimized to not
-lock conventional zones. To do so, additional data is introduced in the
-request queue structure so that the low level scsi code can pass upward
-information such as the total number of zones and zone types of the device.
-The availability of this new data avoids difficulties in accessing this
-information from the I/O scheduler initialization method (init_queue() method)
-context.
-
-Of note is that the last patch of this series removes setting mq-deadline as the
-default scheduler for block devices with a single hardware queue. The reason for
-this is that setting the default scheduler is done very early in the device
-initialization sequence, when the disk characteristics are not yet known. This
-results in mq-deadline not correctly setting the default zones write locking
-behavior nased on the device zoning model. Setting of a default I/O scheduler
-can be done easily with udev rules later in the system initialization process,
-leading to correct default settings for zoned block devices.
-
-Comments are as always very much appreciated.
-
-Changes from v5:
-* Refactor patches to introduce the zone_lock spinlock only when needed
-* Addressed Bart's comments (in particular explanations of the zone_lock
-  spinlock use)
-
-Changes from v4:
-* Various fixes and improvements (From Christoph's comments)
-* Dropped zones_wlock scheduler tunable attribute
-
-Changes from v3:
-* Integrated support directly into mq-deadline instead of creating a new I/O
-  scheduler.
-* Disable setting of default mq scheduler for single queue devices
-
-Changes from v2:
-* Introduced blk_zoned structure
-* Moved I/O scheduler from drivers/scsi to block 
-
-Changes from v1:
-* Addressed Bart's comments for the blk-mq patches (declarations files)
-* Split (former) patch 4 into multiple patches to facilitate review
-* Fixed scsi disk lookup from io scheduler by introducing
-  scsi_disk_from_queue()
-
-Damien Le Moal (14):
-  scsi: sd_zbc: Move ZBC declarations to scsi_proto.h
-  scsi: sd_zbc: Fix comments and indentation
-  scsi: sd_zbc: Rearrange code
-  scsi: sd_zbc: Use well defined macros
-  scsi: sd_zbc: Fix sd_zbc_read_zoned_characteristics()
-  block: Add zoned block device information to request queue
-  scsi: sd_zbc: Initialize device request queue zoned data
-  scsi: sd_zbc: Limit zone write locking to sequential zones
-  scsi: sd_zbc: Disable zone write locking with scsi-mq
-  block: mq-deadline: Add zoned block device data
-  blokc: mq-deadline: Introduce dispatch helpers
-  block: mq-deadline: Introduce zone locking support
-  block: mq-deadline: Limit write request dispatch for zoned block
-    devices
-  block: do not set mq default scheduler
-
- block/elevator.c          |  17 +--
- block/mq-deadline.c       | 271 +++++++++++++++++++++++++++++++++++--
- drivers/scsi/scsi_lib.c   |   5 +-
- drivers/scsi/sd_zbc.c     | 334 +++++++++++++++++++++++++++++++++++-----------
- include/linux/blkdev.h    |  53 ++++++++
- include/scsi/scsi_proto.h |  45 +++++--
- 6 files changed, 612 insertions(+), 113 deletions(-)
-
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 0e5f772..fe21f4d 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -720,12 +720,25 @@ int nvm_submit_io(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
+ }
+ EXPORT_SYMBOL(nvm_submit_io);
+ 
+-static void nvm_end_io_sync(struct nvm_rq *rqd)
++int nvm_submit_io_sync(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
+ {
+-	struct completion *waiting = rqd->private;
++	struct nvm_dev *dev = tgt_dev->parent;
++	int ret;
+ 
+-	complete(waiting);
++	if (!dev->ops->submit_io_sync)
++		return -ENODEV;
++
++	nvm_rq_tgt_to_dev(tgt_dev, rqd);
++
++	rqd->dev = tgt_dev;
++
++	/* In case of error, fail with right address format */
++	ret = dev->ops->submit_io_sync(dev, rqd);
++	nvm_rq_dev_to_tgt(tgt_dev, rqd);
++
++	return ret;
+ }
++EXPORT_SYMBOL(nvm_submit_io_sync);
+ 
+ int nvm_erase_sync(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas,
+ 								int nr_ppas)
+@@ -733,25 +746,21 @@ int nvm_erase_sync(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas,
+ 	struct nvm_geo *geo = &tgt_dev->geo;
+ 	struct nvm_rq rqd;
+ 	int ret;
+-	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+ 	memset(&rqd, 0, sizeof(struct nvm_rq));
+ 
+ 	rqd.opcode = NVM_OP_ERASE;
+-	rqd.end_io = nvm_end_io_sync;
+-	rqd.private = &wait;
+ 	rqd.flags = geo->plane_mode >> 1;
+ 
+ 	ret = nvm_set_rqd_ppalist(tgt_dev, &rqd, ppas, nr_ppas);
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = nvm_submit_io(tgt_dev, &rqd);
++	ret = nvm_submit_io_sync(tgt_dev, &rqd);
+ 	if (ret) {
+ 		pr_err("rrpr: erase I/O submission failed: %d\n", ret);
+ 		goto free_ppa_list;
+ 	}
+-	wait_for_completion_io(&wait);
+ 
+ free_ppa_list:
+ 	nvm_free_rqd_ppalist(tgt_dev, &rqd);
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 4199119..ce90213 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -412,34 +412,11 @@ int pblk_submit_io(struct pblk *pblk, struct nvm_rq *rqd)
+ 	struct nvm_tgt_dev *dev = pblk->dev;
+ 
+ #ifdef CONFIG_NVM_DEBUG
+-	struct ppa_addr *ppa_list;
++	int ret;
+ 
+-	ppa_list = (rqd->nr_ppas > 1) ? rqd->ppa_list : &rqd->ppa_addr;
+-	if (pblk_boundary_ppa_checks(dev, ppa_list, rqd->nr_ppas)) {
+-		WARN_ON(1);
+-		return -EINVAL;
+-	}
+-
+-	if (rqd->opcode == NVM_OP_PWRITE) {
+-		struct pblk_line *line;
+-		struct ppa_addr ppa;
+-		int i;
+-
+-		for (i = 0; i < rqd->nr_ppas; i++) {
+-			ppa = ppa_list[i];
+-			line = &pblk->lines[pblk_dev_ppa_to_line(ppa)];
+-
+-			spin_lock(&line->lock);
+-			if (line->state != PBLK_LINESTATE_OPEN) {
+-				pr_err("pblk: bad ppa: line:%d,state:%d\n",
+-							line->id, line->state);
+-				WARN_ON(1);
+-				spin_unlock(&line->lock);
+-				return -EINVAL;
+-			}
+-			spin_unlock(&line->lock);
+-		}
+-	}
++	ret = pblk_check_io(pblk, rqd);
++	if (ret)
++		return ret;
+ #endif
+ 
+ 	atomic_inc(&pblk->inflight_io);
+@@ -447,6 +424,23 @@ int pblk_submit_io(struct pblk *pblk, struct nvm_rq *rqd)
+ 	return nvm_submit_io(dev, rqd);
+ }
+ 
++int pblk_submit_io_sync(struct pblk *pblk, struct nvm_rq *rqd)
++{
++	struct nvm_tgt_dev *dev = pblk->dev;
++
++#ifdef CONFIG_NVM_DEBUG
++	int ret;
++
++	ret = pblk_check_io(pblk, rqd);
++	if (ret)
++		return ret;
++#endif
++
++	atomic_inc(&pblk->inflight_io);
++
++	return nvm_submit_io_sync(dev, rqd);
++}
++
+ static void pblk_bio_map_addr_endio(struct bio *bio)
+ {
+ 	bio_put(bio);
+@@ -597,7 +591,6 @@ static int pblk_line_submit_emeta_io(struct pblk *pblk, struct pblk_line *line,
+ 	int cmd_op, bio_op;
+ 	int i, j;
+ 	int ret;
+-	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+ 	if (dir == PBLK_WRITE) {
+ 		bio_op = REQ_OP_WRITE;
+@@ -639,8 +632,6 @@ static int pblk_line_submit_emeta_io(struct pblk *pblk, struct pblk_line *line,
+ 	rqd.dma_ppa_list = dma_ppa_list;
+ 	rqd.opcode = cmd_op;
+ 	rqd.nr_ppas = rq_ppas;
+-	rqd.end_io = pblk_end_io_sync;
+-	rqd.private = &wait;
+ 
+ 	if (dir == PBLK_WRITE) {
+ 		struct pblk_sec_meta *meta_list = rqd.meta_list;
+@@ -694,19 +685,14 @@ static int pblk_line_submit_emeta_io(struct pblk *pblk, struct pblk_line *line,
+ 		}
+ 	}
+ 
+-	ret = pblk_submit_io(pblk, &rqd);
++	ret = pblk_submit_io_sync(pblk, &rqd);
+ 	if (ret) {
+ 		pr_err("pblk: emeta I/O submission failed: %d\n", ret);
+ 		bio_put(bio);
+ 		goto free_rqd_dma;
+ 	}
+ 
+-	if (!wait_for_completion_io_timeout(&wait,
+-				msecs_to_jiffies(PBLK_COMMAND_TIMEOUT_MS))) {
+-		pr_err("pblk: emeta I/O timed out\n");
+-	}
+ 	atomic_dec(&pblk->inflight_io);
+-	reinit_completion(&wait);
+ 
+ 	if (rqd.error) {
+ 		if (dir == PBLK_WRITE)
+@@ -750,7 +736,6 @@ static int pblk_line_submit_smeta_io(struct pblk *pblk, struct pblk_line *line,
+ 	int i, ret;
+ 	int cmd_op, bio_op;
+ 	int flags;
+-	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+ 	if (dir == PBLK_WRITE) {
+ 		bio_op = REQ_OP_WRITE;
+@@ -787,8 +772,6 @@ static int pblk_line_submit_smeta_io(struct pblk *pblk, struct pblk_line *line,
+ 	rqd.opcode = cmd_op;
+ 	rqd.flags = flags;
+ 	rqd.nr_ppas = lm->smeta_sec;
+-	rqd.end_io = pblk_end_io_sync;
+-	rqd.private = &wait;
+ 
+ 	for (i = 0; i < lm->smeta_sec; i++, paddr++) {
+ 		struct pblk_sec_meta *meta_list = rqd.meta_list;
+@@ -807,17 +790,13 @@ static int pblk_line_submit_smeta_io(struct pblk *pblk, struct pblk_line *line,
+ 	 * the write thread is the only one sending write and erase commands,
+ 	 * there is no need to take the LUN semaphore.
+ 	 */
+-	ret = pblk_submit_io(pblk, &rqd);
++	ret = pblk_submit_io_sync(pblk, &rqd);
+ 	if (ret) {
+ 		pr_err("pblk: smeta I/O submission failed: %d\n", ret);
+ 		bio_put(bio);
+ 		goto free_ppa_list;
+ 	}
+ 
+-	if (!wait_for_completion_io_timeout(&wait,
+-				msecs_to_jiffies(PBLK_COMMAND_TIMEOUT_MS))) {
+-		pr_err("pblk: smeta I/O timed out\n");
+-	}
+ 	atomic_dec(&pblk->inflight_io);
+ 
+ 	if (rqd.error) {
+@@ -861,19 +840,15 @@ static int pblk_blk_erase_sync(struct pblk *pblk, struct ppa_addr ppa)
+ {
+ 	struct nvm_rq rqd;
+ 	int ret = 0;
+-	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+ 	memset(&rqd, 0, sizeof(struct nvm_rq));
+ 
+ 	pblk_setup_e_rq(pblk, &rqd, ppa);
+ 
+-	rqd.end_io = pblk_end_io_sync;
+-	rqd.private = &wait;
+-
+ 	/* The write thread schedules erases so that it minimizes disturbances
+ 	 * with writes. Thus, there is no need to take the LUN semaphore.
+ 	 */
+-	ret = pblk_submit_io(pblk, &rqd);
++	ret = pblk_submit_io_sync(pblk, &rqd);
+ 	if (ret) {
+ 		struct nvm_tgt_dev *dev = pblk->dev;
+ 		struct nvm_geo *geo = &dev->geo;
+@@ -886,11 +861,6 @@ static int pblk_blk_erase_sync(struct pblk *pblk, struct ppa_addr ppa)
+ 		goto out;
+ 	}
+ 
+-	if (!wait_for_completion_io_timeout(&wait,
+-				msecs_to_jiffies(PBLK_COMMAND_TIMEOUT_MS))) {
+-		pr_err("pblk: sync erase timed out\n");
+-	}
+-
+ out:
+ 	rqd.private = pblk;
+ 	__pblk_end_io_erase(pblk, &rqd);
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index 71c5850..ca79d8f 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -207,7 +207,6 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 	int nr_secs = rqd->nr_ppas;
+ 	int nr_holes = nr_secs - bitmap_weight(read_bitmap, nr_secs);
+ 	int i, ret, hole;
+-	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+ 	/* Re-use allocated memory for intermediate lbas */
+ 	lba_list_mem = (((void *)rqd->ppa_list) + pblk_dma_ppa_size);
+@@ -232,8 +231,6 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 	rqd->bio = new_bio;
+ 	rqd->nr_ppas = nr_holes;
+ 	rqd->flags = pblk_set_read_mode(pblk, PBLK_READ_RANDOM);
+-	rqd->end_io = pblk_end_io_sync;
+-	rqd->private = &wait;
+ 
+ 	if (unlikely(nr_holes == 1)) {
+ 		ppa_ptr = rqd->ppa_list;
+@@ -241,18 +238,13 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 		rqd->ppa_addr = rqd->ppa_list[0];
+ 	}
+ 
+-	ret = pblk_submit_read_io(pblk, rqd);
++	ret = pblk_submit_io_sync(pblk, rqd);
+ 	if (ret) {
+ 		bio_put(rqd->bio);
+-		pr_err("pblk: read IO submission failed\n");
++		pr_err("pblk: sync read IO submission failed\n");
+ 		goto err;
+ 	}
+ 
+-	if (!wait_for_completion_io_timeout(&wait,
+-				msecs_to_jiffies(PBLK_COMMAND_TIMEOUT_MS))) {
+-		pr_err("pblk: partial read I/O timed out\n");
+-	}
+-
+ 	if (rqd->error) {
+ 		atomic_long_inc(&pblk->read_failed);
+ #ifdef CONFIG_NVM_DEBUG
+@@ -537,7 +529,6 @@ int pblk_submit_read_gc(struct pblk *pblk, struct pblk_gc_rq *gc_rq)
+ 	struct nvm_rq rqd;
+ 	int data_len;
+ 	int ret = NVM_IO_OK;
+-	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+ 	memset(&rqd, 0, sizeof(struct nvm_rq));
+ 
+@@ -577,22 +568,16 @@ int pblk_submit_read_gc(struct pblk *pblk, struct pblk_gc_rq *gc_rq)
+ 	bio_set_op_attrs(bio, REQ_OP_READ, 0);
+ 
+ 	rqd.opcode = NVM_OP_PREAD;
+-	rqd.end_io = pblk_end_io_sync;
+-	rqd.private = &wait;
+ 	rqd.nr_ppas = gc_rq->secs_to_gc;
+ 	rqd.flags = pblk_set_read_mode(pblk, PBLK_READ_RANDOM);
+ 	rqd.bio = bio;
+ 
+-	if (pblk_submit_read_io(pblk, &rqd)) {
++	if (pblk_submit_io_sync(pblk, &rqd)) {
+ 		ret = -EIO;
+ 		pr_err("pblk: GC read request failed\n");
+ 		goto err_free_bio;
+ 	}
+ 
+-	if (!wait_for_completion_io_timeout(&wait,
+-				msecs_to_jiffies(PBLK_COMMAND_TIMEOUT_MS))) {
+-		pr_err("pblk: GC read I/O timed out\n");
+-	}
+ 	atomic_dec(&pblk->inflight_io);
+ 
+ 	if (rqd.error) {
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index 9772a94..eadb3eb 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -216,7 +216,6 @@ static int pblk_recov_read_oob(struct pblk *pblk, struct pblk_line *line,
+ 	int rq_ppas, rq_len;
+ 	int i, j;
+ 	int ret = 0;
+-	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+ 	ppa_list = p.ppa_list;
+ 	meta_list = p.meta_list;
+@@ -253,8 +252,6 @@ static int pblk_recov_read_oob(struct pblk *pblk, struct pblk_line *line,
+ 	rqd->ppa_list = ppa_list;
+ 	rqd->dma_ppa_list = dma_ppa_list;
+ 	rqd->dma_meta_list = dma_meta_list;
+-	rqd->end_io = pblk_end_io_sync;
+-	rqd->private = &wait;
+ 
+ 	if (pblk_io_aligned(pblk, rq_ppas))
+ 		rqd->flags = pblk_set_read_mode(pblk, PBLK_READ_SEQUENTIAL);
+@@ -280,19 +277,13 @@ static int pblk_recov_read_oob(struct pblk *pblk, struct pblk_line *line,
+ 	}
+ 
+ 	/* If read fails, more padding is needed */
+-	ret = pblk_submit_io(pblk, rqd);
++	ret = pblk_submit_io_sync(pblk, rqd);
+ 	if (ret) {
+ 		pr_err("pblk: I/O submission failed: %d\n", ret);
+ 		return ret;
+ 	}
+ 
+-	if (!wait_for_completion_io_timeout(&wait,
+-				msecs_to_jiffies(PBLK_COMMAND_TIMEOUT_MS))) {
+-		pr_err("pblk: L2P recovery read timed out\n");
+-		return -EINTR;
+-	}
+ 	atomic_dec(&pblk->inflight_io);
+-	reinit_completion(&wait);
+ 
+ 	/* At this point, the read should not fail. If it does, it is a problem
+ 	 * we cannot recover from here. Need FTL log.
+@@ -504,7 +495,6 @@ static int pblk_recov_scan_all_oob(struct pblk *pblk, struct pblk_line *line,
+ 	int ret = 0;
+ 	int rec_round;
+ 	int left_ppas = pblk_calc_sec_in_line(pblk, line) - line->cur_sec;
+-	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+ 	ppa_list = p.ppa_list;
+ 	meta_list = p.meta_list;
+@@ -539,8 +529,6 @@ static int pblk_recov_scan_all_oob(struct pblk *pblk, struct pblk_line *line,
+ 	rqd->ppa_list = ppa_list;
+ 	rqd->dma_ppa_list = dma_ppa_list;
+ 	rqd->dma_meta_list = dma_meta_list;
+-	rqd->end_io = pblk_end_io_sync;
+-	rqd->private = &wait;
+ 
+ 	if (pblk_io_aligned(pblk, rq_ppas))
+ 		rqd->flags = pblk_set_read_mode(pblk, PBLK_READ_SEQUENTIAL);
+@@ -566,18 +554,13 @@ static int pblk_recov_scan_all_oob(struct pblk *pblk, struct pblk_line *line,
+ 				addr_to_gen_ppa(pblk, w_ptr, line->id);
+ 	}
+ 
+-	ret = pblk_submit_io(pblk, rqd);
++	ret = pblk_submit_io_sync(pblk, rqd);
+ 	if (ret) {
+ 		pr_err("pblk: I/O submission failed: %d\n", ret);
+ 		return ret;
+ 	}
+ 
+-	if (!wait_for_completion_io_timeout(&wait,
+-				msecs_to_jiffies(PBLK_COMMAND_TIMEOUT_MS))) {
+-		pr_err("pblk: L2P recovery read timed out\n");
+-	}
+ 	atomic_dec(&pblk->inflight_io);
+-	reinit_completion(&wait);
+ 
+ 	/* This should not happen since the read failed during normal recovery,
+ 	 * but the media works funny sometimes...
+@@ -645,7 +628,6 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
+ 	int i, j;
+ 	int ret = 0;
+ 	int left_ppas = pblk_calc_sec_in_line(pblk, line);
+-	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+ 	ppa_list = p.ppa_list;
+ 	meta_list = p.meta_list;
+@@ -678,8 +660,6 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
+ 	rqd->ppa_list = ppa_list;
+ 	rqd->dma_ppa_list = dma_ppa_list;
+ 	rqd->dma_meta_list = dma_meta_list;
+-	rqd->end_io = pblk_end_io_sync;
+-	rqd->private = &wait;
+ 
+ 	if (pblk_io_aligned(pblk, rq_ppas))
+ 		rqd->flags = pblk_set_read_mode(pblk, PBLK_READ_SEQUENTIAL);
+@@ -705,19 +685,14 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
+ 				addr_to_gen_ppa(pblk, paddr, line->id);
+ 	}
+ 
+-	ret = pblk_submit_io(pblk, rqd);
++	ret = pblk_submit_io_sync(pblk, rqd);
+ 	if (ret) {
+ 		pr_err("pblk: I/O submission failed: %d\n", ret);
+ 		bio_put(bio);
+ 		return ret;
+ 	}
+ 
+-	if (!wait_for_completion_io_timeout(&wait,
+-				msecs_to_jiffies(PBLK_COMMAND_TIMEOUT_MS))) {
+-		pr_err("pblk: L2P recovery read timed out\n");
+-	}
+ 	atomic_dec(&pblk->inflight_io);
+-	reinit_completion(&wait);
+ 
+ 	/* Reached the end of the written line */
+ 	if (rqd->error) {
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 6c9ea9a..6b64288 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -714,6 +714,7 @@ void pblk_discard(struct pblk *pblk, struct bio *bio);
+ void pblk_log_write_err(struct pblk *pblk, struct nvm_rq *rqd);
+ void pblk_log_read_err(struct pblk *pblk, struct nvm_rq *rqd);
+ int pblk_submit_io(struct pblk *pblk, struct nvm_rq *rqd);
++int pblk_submit_io_sync(struct pblk *pblk, struct nvm_rq *rqd);
+ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line);
+ struct bio *pblk_bio_map_addr(struct pblk *pblk, void *data,
+ 			      unsigned int nr_secs, unsigned int len,
+@@ -1203,7 +1204,6 @@ static inline void pblk_print_failed_rqd(struct pblk *pblk, struct nvm_rq *rqd,
+ 
+ 	pr_err("error:%d, ppa_status:%llx\n", error, rqd->ppa_status);
+ }
+-#endif
+ 
+ static inline int pblk_boundary_ppa_checks(struct nvm_tgt_dev *tgt_dev,
+ 				       struct ppa_addr *ppas, int nr_ppas)
+@@ -1224,14 +1224,50 @@ static inline int pblk_boundary_ppa_checks(struct nvm_tgt_dev *tgt_dev,
+ 				ppa->g.sec < geo->sec_per_pg)
+ 			continue;
+ 
+-#ifdef CONFIG_NVM_DEBUG
+ 		print_ppa(ppa, "boundary", i);
+-#endif
++
+ 		return 1;
+ 	}
+ 	return 0;
+ }
+ 
++static inline int pblk_check_io(struct pblk *pblk, struct nvm_rq *rqd)
++{
++	struct nvm_tgt_dev *dev = pblk->dev;
++	struct ppa_addr *ppa_list;
++
++	ppa_list = (rqd->nr_ppas > 1) ? rqd->ppa_list : &rqd->ppa_addr;
++
++	if (pblk_boundary_ppa_checks(dev, ppa_list, rqd->nr_ppas)) {
++		WARN_ON(1);
++		return -EINVAL;
++	}
++
++	if (rqd->opcode == NVM_OP_PWRITE) {
++		struct pblk_line *line;
++		struct ppa_addr ppa;
++		int i;
++
++		for (i = 0; i < rqd->nr_ppas; i++) {
++			ppa = ppa_list[i];
++			line = &pblk->lines[pblk_dev_ppa_to_line(ppa)];
++
++			spin_lock(&line->lock);
++			if (line->state != PBLK_LINESTATE_OPEN) {
++				pr_err("pblk: bad ppa: line:%d,state:%d\n",
++							line->id, line->state);
++				WARN_ON(1);
++				spin_unlock(&line->lock);
++				return -EINVAL;
++			}
++			spin_unlock(&line->lock);
++		}
++	}
++
++	return 0;
++}
++#endif
++
+ static inline int pblk_boundary_paddr_checks(struct pblk *pblk, u64 paddr)
+ {
+ 	struct pblk_line_meta *lm = &pblk->lm;
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index 6017153..8fc949c 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -492,34 +492,47 @@ static void nvme_nvm_end_io(struct request *rq, blk_status_t status)
+ 	blk_mq_free_request(rq);
+ }
+ 
+-static int nvme_nvm_submit_io(struct nvm_dev *dev, struct nvm_rq *rqd)
++static struct request *nvme_nvm_alloc_request(struct request_queue *q,
++					      struct nvm_rq *rqd,
++					      struct nvme_nvm_command *cmd)
+ {
+-	struct request_queue *q = dev->q;
+ 	struct nvme_ns *ns = q->queuedata;
+ 	struct request *rq;
+-	struct bio *bio = rqd->bio;
+-	struct nvme_nvm_command *cmd;
+-
+-	cmd = kzalloc(sizeof(struct nvme_nvm_command), GFP_KERNEL);
+-	if (!cmd)
+-		return -ENOMEM;
+ 
+ 	nvme_nvm_rqtocmd(rqd, ns, cmd);
+ 
+ 	rq = nvme_alloc_request(q, (struct nvme_command *)cmd, 0, NVME_QID_ANY);
+-	if (IS_ERR(rq)) {
+-		kfree(cmd);
+-		return PTR_ERR(rq);
+-	}
++	if (IS_ERR(rq))
++		return rq;
++
+ 	rq->cmd_flags &= ~REQ_FAILFAST_DRIVER;
+ 
+-	if (bio) {
+-		blk_init_request_from_bio(rq, bio);
++	if (rqd->bio) {
++		blk_init_request_from_bio(rq, rqd->bio);
+ 	} else {
+ 		rq->ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, IOPRIO_NORM);
+ 		rq->__data_len = 0;
+ 	}
+ 
++	return rq;
++}
++
++static int nvme_nvm_submit_io(struct nvm_dev *dev, struct nvm_rq *rqd)
++{
++	struct request_queue *q = dev->q;
++	struct nvme_nvm_command *cmd;
++	struct request *rq;
++
++	cmd = kzalloc(sizeof(struct nvme_nvm_command), GFP_KERNEL);
++	if (!cmd)
++		return -ENOMEM;
++
++	rq = nvme_nvm_alloc_request(q, rqd, cmd);
++	if (IS_ERR(rq)) {
++		kfree(cmd);
++		return PTR_ERR(rq);
++	}
++
+ 	rq->end_io_data = rqd;
+ 
+ 	blk_execute_rq_nowait(q, NULL, rq, 0, nvme_nvm_end_io);
+@@ -527,6 +540,34 @@ static int nvme_nvm_submit_io(struct nvm_dev *dev, struct nvm_rq *rqd)
+ 	return 0;
+ }
+ 
++static int nvme_nvm_submit_io_sync(struct nvm_dev *dev, struct nvm_rq *rqd)
++{
++	struct request_queue *q = dev->q;
++	struct request *rq;
++	struct nvme_nvm_command cmd;
++	int ret = 0;
++
++	memset(&cmd, 0, sizeof(struct nvme_nvm_command));
++
++	rq = nvme_nvm_alloc_request(q, rqd, &cmd);
++	if (IS_ERR(rq))
++		return PTR_ERR(rq);
++
++	/* I/Os can fail and the error is signaled through rqd. Callers must
++	 * handle the error accordingly.
++	 */
++	blk_execute_rq(q, NULL, rq, 0);
++	if (nvme_req(rq)->flags & NVME_REQ_CANCELLED)
++		ret = -EINTR;
++
++	rqd->ppa_status = le64_to_cpu(nvme_req(rq)->result.u64);
++	rqd->error = nvme_req(rq)->status;
++
++	blk_mq_free_request(rq);
++
++	return ret;
++}
++
+ static void *nvme_nvm_create_dma_pool(struct nvm_dev *nvmdev, char *name)
+ {
+ 	struct nvme_ns *ns = nvmdev->q->queuedata;
+@@ -562,6 +603,7 @@ static struct nvm_dev_ops nvme_nvm_dev_ops = {
+ 	.set_bb_tbl		= nvme_nvm_set_bb_tbl,
+ 
+ 	.submit_io		= nvme_nvm_submit_io,
++	.submit_io_sync		= nvme_nvm_submit_io_sync,
+ 
+ 	.create_dma_pool	= nvme_nvm_create_dma_pool,
+ 	.destroy_dma_pool	= nvme_nvm_destroy_dma_pool,
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 4f0e4a0..b7f111f 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -56,6 +56,7 @@ typedef int (nvm_get_l2p_tbl_fn)(struct nvm_dev *, u64, u32,
+ typedef int (nvm_op_bb_tbl_fn)(struct nvm_dev *, struct ppa_addr, u8 *);
+ typedef int (nvm_op_set_bb_fn)(struct nvm_dev *, struct ppa_addr *, int, int);
+ typedef int (nvm_submit_io_fn)(struct nvm_dev *, struct nvm_rq *);
++typedef int (nvm_submit_io_sync_fn)(struct nvm_dev *, struct nvm_rq *);
+ typedef void *(nvm_create_dma_pool_fn)(struct nvm_dev *, char *);
+ typedef void (nvm_destroy_dma_pool_fn)(void *);
+ typedef void *(nvm_dev_dma_alloc_fn)(struct nvm_dev *, void *, gfp_t,
+@@ -69,6 +70,7 @@ struct nvm_dev_ops {
+ 	nvm_op_set_bb_fn	*set_bb_tbl;
+ 
+ 	nvm_submit_io_fn	*submit_io;
++	nvm_submit_io_sync_fn	*submit_io_sync;
+ 
+ 	nvm_create_dma_pool_fn	*create_dma_pool;
+ 	nvm_destroy_dma_pool_fn	*destroy_dma_pool;
+@@ -477,6 +479,7 @@ extern int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr *,
+ 			      int, int);
+ extern int nvm_max_phys_sects(struct nvm_tgt_dev *);
+ extern int nvm_submit_io(struct nvm_tgt_dev *, struct nvm_rq *);
++extern int nvm_submit_io_sync(struct nvm_tgt_dev *, struct nvm_rq *);
+ extern int nvm_erase_sync(struct nvm_tgt_dev *, struct ppa_addr *, int);
+ extern int nvm_get_l2p_tbl(struct nvm_tgt_dev *, u64, u32, nvm_l2p_update_fn *,
+ 			   void *);
 -- 
-2.13.6
+2.9.3
