@@ -1,139 +1,75 @@
-Return-Path: <prvs=45557a1c1=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-crypto@vger.kernel.org,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Brian King <brking@linux.vnet.ibm.com>
-Subject: [PATCH v2 6/8] scsi/ipr: Use sgl_alloc_order() and sgl_free_order()
-Date: Mon, 16 Oct 2017 15:49:38 -0700
-Message-Id: <20171016224940.1332-7-bart.vanassche@wdc.com>
-In-Reply-To: <20171016224940.1332-1-bart.vanassche@wdc.com>
-References: <20171016224940.1332-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-qk0-f193.google.com ([209.85.220.193]:45099 "EHLO
+        mail-qk0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751081AbdJMXUR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 19:20:17 -0400
+Date: Fri, 13 Oct 2017 19:20:13 -0400
+From: Kent Overstreet <kent.overstreet@gmail.com>
+To: Michael Lyle <mlyle@lyle.org>
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        colyli@suse.de
+Subject: Re: [PATCH v2 2/2] bcache: rearrange writeback main thread ratelimit
+Message-ID: <20171013232013.5bm4h5seuxhj7k25@kmo-pixel>
+References: <20171009073730.8939-1-mlyle@lyle.org>
+ <20171009073730.8939-3-mlyle@lyle.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171009073730.8939-3-mlyle@lyle.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Use the sgl_alloc_order() and sgl_free_order() functions instead
-of open coding these functions.
+On Mon, Oct 09, 2017 at 12:37:30AM -0700, Michael Lyle wrote:
+> The time spent searching for things to write back "counts" for the
+> actual rate achieved, so don't flush the accumulated rate with each
+> chunk.
+> 
+> This will maintain better fidelity to user-commanded rates, but it
+> may slightly increase the burstiness of writeback.  The writeback
+> lock needs improvement to help mitigate this.
+> 
+> Signed-off-by: Michael Lyle <mlyle@lyle.org>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: linux-scsi@vger.kernel.org
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Brian King <brking@linux.vnet.ibm.com>
----
- drivers/scsi/Kconfig |  1 +
- drivers/scsi/ipr.c   | 49 ++++++++-----------------------------------------
- drivers/scsi/ipr.h   |  2 +-
- 3 files changed, 10 insertions(+), 42 deletions(-)
+Reviewed-by: Kent Overstreet <kent.overstreet@gmail.com>
 
-diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
-index 41366339b950..d11e75e76195 100644
---- a/drivers/scsi/Kconfig
-+++ b/drivers/scsi/Kconfig
-@@ -1058,6 +1058,7 @@ config SCSI_IPR
- 	depends on PCI && SCSI && ATA
- 	select FW_LOADER
- 	select IRQ_POLL
-+	select SGL_ALLOC
- 	---help---
- 	  This driver supports the IBM Power Linux family RAID adapters.
- 	  This includes IBM pSeries 5712, 5703, 5709, and 570A, as well
-diff --git a/drivers/scsi/ipr.c b/drivers/scsi/ipr.c
-index f838bd73befa..6fed5db6255e 100644
---- a/drivers/scsi/ipr.c
-+++ b/drivers/scsi/ipr.c
-@@ -3815,10 +3815,8 @@ static struct device_attribute ipr_iopoll_weight_attr = {
-  **/
- static struct ipr_sglist *ipr_alloc_ucode_buffer(int buf_len)
- {
--	int sg_size, order, bsize_elem, num_elem, i, j;
-+	int sg_size, order;
- 	struct ipr_sglist *sglist;
--	struct scatterlist *scatterlist;
--	struct page *page;
- 
- 	/* Get the minimum size per scatter/gather element */
- 	sg_size = buf_len / (IPR_MAX_SGLIST - 1);
-@@ -3826,45 +3824,18 @@ static struct ipr_sglist *ipr_alloc_ucode_buffer(int buf_len)
- 	/* Get the actual size per element */
- 	order = get_order(sg_size);
- 
--	/* Determine the actual number of bytes per element */
--	bsize_elem = PAGE_SIZE * (1 << order);
--
--	/* Determine the actual number of sg entries needed */
--	if (buf_len % bsize_elem)
--		num_elem = (buf_len / bsize_elem) + 1;
--	else
--		num_elem = buf_len / bsize_elem;
--
- 	/* Allocate a scatter/gather list for the DMA */
--	sglist = kzalloc(sizeof(struct ipr_sglist) +
--			 (sizeof(struct scatterlist) * (num_elem - 1)),
--			 GFP_KERNEL);
--
-+	sglist = kzalloc(sizeof(struct ipr_sglist), GFP_KERNEL);
- 	if (sglist == NULL) {
- 		ipr_trace;
- 		return NULL;
- 	}
--
--	scatterlist = sglist->scatterlist;
--	sg_init_table(scatterlist, num_elem);
--
- 	sglist->order = order;
--	sglist->num_sg = num_elem;
--
--	/* Allocate a bunch of sg elements */
--	for (i = 0; i < num_elem; i++) {
--		page = alloc_pages(GFP_KERNEL, order);
--		if (!page) {
--			ipr_trace;
--
--			/* Free up what we already allocated */
--			for (j = i - 1; j >= 0; j--)
--				__free_pages(sg_page(&scatterlist[j]), order);
--			kfree(sglist);
--			return NULL;
--		}
--
--		sg_set_page(&scatterlist[i], page, 0, 0);
-+	sglist->scatterlist = sgl_alloc_order(buf_len, order, false, GFP_KERNEL,
-+					      &sglist->num_sg);
-+	if (!sglist->scatterlist) {
-+		kfree(sglist);
-+		return NULL;
- 	}
- 
- 	return sglist;
-@@ -3882,11 +3853,7 @@ static struct ipr_sglist *ipr_alloc_ucode_buffer(int buf_len)
-  **/
- static void ipr_free_ucode_buffer(struct ipr_sglist *sglist)
- {
--	int i;
--
--	for (i = 0; i < sglist->num_sg; i++)
--		__free_pages(sg_page(&sglist->scatterlist[i]), sglist->order);
--
-+	sgl_free_order(sglist->scatterlist, sglist->order);
- 	kfree(sglist);
- }
- 
-diff --git a/drivers/scsi/ipr.h b/drivers/scsi/ipr.h
-index c7f0e9e3cd7d..93570734cbfb 100644
---- a/drivers/scsi/ipr.h
-+++ b/drivers/scsi/ipr.h
-@@ -1454,7 +1454,7 @@ struct ipr_sglist {
- 	u32 num_sg;
- 	u32 num_dma_sg;
- 	u32 buffer_len;
--	struct scatterlist scatterlist[1];
-+	struct scatterlist *scatterlist;
- };
- 
- enum ipr_sdt_state {
--- 
-2.14.2
+> ---
+>  drivers/md/bcache/writeback.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+> index 42d087b9fb56..719b104db0cc 100644
+> --- a/drivers/md/bcache/writeback.c
+> +++ b/drivers/md/bcache/writeback.c
+> @@ -526,6 +526,8 @@ static int bch_writeback_thread(void *arg)
+>  	struct cached_dev *dc = arg;
+>  	bool searched_full_index;
+>  
+> +	bch_ratelimit_reset(&dc->writeback_rate);
+> +
+>  	while (!kthread_should_stop()) {
+>  		down_write(&dc->writeback_lock);
+>  		if (!atomic_read(&dc->has_dirty) ||
+> @@ -553,7 +555,6 @@ static int bch_writeback_thread(void *arg)
+>  
+>  		up_write(&dc->writeback_lock);
+>  
+> -		bch_ratelimit_reset(&dc->writeback_rate);
+>  		read_dirty(dc);
+>  
+>  		if (searched_full_index) {
+> @@ -563,6 +564,8 @@ static int bch_writeback_thread(void *arg)
+>  			       !kthread_should_stop() &&
+>  			       !test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags))
+>  				delay = schedule_timeout_interruptible(delay);
+> +
+> +			bch_ratelimit_reset(&dc->writeback_rate);
+>  		}
+>  	}
+>  
+> -- 
+> 2.11.0
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bcache" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
