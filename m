@@ -10,234 +10,145 @@ Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
         linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
         John Garry <john.garry@huawei.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V7 4/6] blk-mq: introduce .get_budget and .put_budget in blk_mq_ops
-Date: Fri, 13 Oct 2017 02:37:02 +0800
-Message-Id: <20171012183704.22326-5-ming.lei@redhat.com>
-In-Reply-To: <20171012183704.22326-1-ming.lei@redhat.com>
-References: <20171012183704.22326-1-ming.lei@redhat.com>
+Subject: [PATCH V9 7/7] SCSI: implement .get_budget and .put_budget for blk-mq
+Date: Sat, 14 Oct 2017 02:05:32 +0800
+Message-Id: <20171013180532.29304-8-ming.lei@redhat.com>
+In-Reply-To: <20171013180532.29304-1-ming.lei@redhat.com>
+References: <20171013180532.29304-1-ming.lei@redhat.com>
 Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-For SCSI devices, there is often per-request-queue depth, which need
-to be respected before queuing one request.
-
-The current blk-mq always dequeues one request first, then calls .queue_rq()
-to dispatch the request to lld. One obvious issue of this way is that I/O
-merge may not be good, because when the per-request-queue depth can't be
-respected,  .queue_rq() has to return BLK_STS_RESOURCE, then this request
-has to staty in hctx->dispatch list, and never got chance to participate
-into I/O merge.
-
-This patch introduces .get_budget and .put_budget callback in blk_mq_ops,
-then we can try to get reserved budget first before dequeuing request.
-Once we can't get budget for queueing I/O, we don't need to dequeue request
-at all, then I/O merge can get improved a lot.
+We need to tell blk-mq for reserving resource before queuing
+one request, so implement these two callbacks. Then blk-mq
+can avoid to dequeue request earlier, and IO merge can
+be improved a lot.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq-sched.c   | 39 +++++++++++++++++++++++++++++++--------
- block/blk-mq.c         | 35 ++++++++++++++++++++++++++++++++---
- block/blk-mq.h         |  2 +-
- include/linux/blk-mq.h | 10 ++++++++++
- 4 files changed, 74 insertions(+), 12 deletions(-)
+ drivers/scsi/scsi_lib.c | 75 ++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 52 insertions(+), 23 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index be29ba849408..bcf4773ee1ca 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -89,19 +89,32 @@ static bool blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
- 	return false;
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index d159bb085714..6f10afaca25b 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1946,25 +1946,32 @@ static void scsi_mq_done(struct scsi_cmnd *cmd)
+ 	blk_mq_complete_request(cmd->request);
  }
  
--static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-+static bool blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+-static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+-			 const struct blk_mq_queue_data *bd)
++static void scsi_mq_put_budget(struct blk_mq_hw_ctx *hctx)
  {
- 	struct request_queue *q = hctx->queue;
- 	struct elevator_queue *e = q->elevator;
- 	LIST_HEAD(rq_list);
- 
- 	do {
--		struct request *rq = e->type->ops.mq.dispatch_request(hctx);
-+		struct request *rq;
- 
--		if (!rq)
-+		if (e->type->ops.mq.has_work &&
-+				!e->type->ops.mq.has_work(hctx))
- 			break;
-+
-+		if (q->mq_ops->get_budget && !q->mq_ops->get_budget(hctx))
-+			return true;
-+
-+		rq = e->type->ops.mq.dispatch_request(hctx);
-+		if (!rq) {
-+			if (q->mq_ops->put_budget)
-+				q->mq_ops->put_budget(hctx);
-+			break;
-+		}
- 		list_add(&rq->queuelist, &rq_list);
--	} while (blk_mq_dispatch_rq_list(q, &rq_list));
-+	} while (blk_mq_dispatch_rq_list(q, &rq_list, true));
-+
-+	return false;
- }
- 
- void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
-@@ -110,6 +123,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	struct elevator_queue *e = q->elevator;
- 	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
- 	LIST_HEAD(rq_list);
-+	bool run_queue = false;
- 
- 	/* RCU or SRCU read lock is needed before checking quiesced flag */
- 	if (unlikely(blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)))
-@@ -143,13 +157,22 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	 */
- 	if (!list_empty(&rq_list)) {
- 		blk_mq_sched_mark_restart_hctx(hctx);
--		if (blk_mq_dispatch_rq_list(q, &rq_list) && has_sched_dispatch)
--			blk_mq_do_dispatch_sched(hctx);
-+		if (blk_mq_dispatch_rq_list(q, &rq_list, false) &&
-+				has_sched_dispatch)
-+			run_queue = blk_mq_do_dispatch_sched(hctx);
- 	} else if (has_sched_dispatch) {
--		blk_mq_do_dispatch_sched(hctx);
-+		run_queue = blk_mq_do_dispatch_sched(hctx);
- 	} else {
- 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
--		blk_mq_dispatch_rq_list(q, &rq_list);
-+		blk_mq_dispatch_rq_list(q, &rq_list, false);
-+	}
-+
-+	if (run_queue) {
-+		if (!blk_mq_sched_needs_restart(hctx) &&
-+		    !test_bit(BLK_MQ_S_TAG_WAITING, &hctx->state)) {
-+			blk_mq_sched_mark_restart_hctx(hctx);
-+			blk_mq_run_hw_queue(hctx, true);
-+		}
- 	}
- }
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 076cbab9c3e0..e6e50a91f170 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1045,7 +1045,16 @@ static bool blk_mq_dispatch_wait_add(struct blk_mq_hw_ctx *hctx)
- 	return true;
- }
- 
--bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
-+static void blk_mq_put_budget(struct blk_mq_hw_ctx *hctx, bool got_budget)
-+{
+-	struct request *req = bd->rq;
+-	struct request_queue *q = req->q;
 +	struct request_queue *q = hctx->queue;
++	struct scsi_device *sdev = q->queuedata;
++	struct Scsi_Host *shost = sdev->host;
 +
-+	if (q->mq_ops->put_budget && got_budget)
-+		q->mq_ops->put_budget(hctx);
++	atomic_dec(&shost->host_busy);
++	if (scsi_target(sdev)->can_queue > 0)
++		atomic_dec(&scsi_target(sdev)->target_busy);
++	atomic_dec(&sdev->device_busy);
++	put_device(&sdev->sdev_gendev);
 +}
 +
-+bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
-+		bool got_budget)
- {
- 	struct blk_mq_hw_ctx *hctx;
- 	struct request *rq;
-@@ -1054,6 +1063,8 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
- 	if (list_empty(list))
- 		return false;
++static blk_status_t scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
++{
++	struct request_queue *q = hctx->queue;
+ 	struct scsi_device *sdev = q->queuedata;
+ 	struct Scsi_Host *shost = sdev->host;
+-	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
+ 	blk_status_t ret;
+-	int reason;
  
-+	WARN_ON(!list_is_singular(list) && got_budget);
+-	ret = prep_to_mq(scsi_prep_state_check(sdev, req));
+-	if (ret != BLK_STS_OK)
+-		goto out;
++	ret = prep_to_mq(scsi_prep_state_check(sdev, NULL));
++	if (ret == BLK_STS_RESOURCE || ret != BLK_STS_OK)
++		return ret;
+ 
+-	ret = BLK_STS_RESOURCE;
+ 	if (!get_device(&sdev->sdev_gendev))
+ 		goto out;
+-
+ 	if (!scsi_dev_queue_ready(q, sdev))
+ 		goto out_put_device;
+ 	if (!scsi_target_queue_ready(shost, sdev))
+@@ -1972,10 +1979,38 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	if (!scsi_host_queue_ready(q, shost, sdev))
+ 		goto out_dec_target_busy;
+ 
++	return BLK_STS_OK;
 +
- 	/*
- 	 * Now process all the entries, sending them to the driver.
- 	 */
-@@ -1071,15 +1082,25 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
- 			 * The initial allocation attempt failed, so we need to
- 			 * rerun the hardware queue when a tag is freed.
- 			 */
--			if (!blk_mq_dispatch_wait_add(hctx))
-+			if (!blk_mq_dispatch_wait_add(hctx)) {
-+				blk_mq_put_budget(hctx, got_budget);
- 				break;
-+			}
- 
- 			/*
- 			 * It's possible that a tag was freed in the window
- 			 * between the allocation failure and adding the
- 			 * hardware queue to the wait queue.
- 			 */
--			if (!blk_mq_get_driver_tag(rq, &hctx, false))
-+			if (!blk_mq_get_driver_tag(rq, &hctx, false)) {
-+				blk_mq_put_budget(hctx, got_budget);
-+				break;
-+			}
-+		}
++out_dec_target_busy:
++	if (scsi_target(sdev)->can_queue > 0)
++		atomic_dec(&scsi_target(sdev)->target_busy);
++out_dec_device_busy:
++	atomic_dec(&sdev->device_busy);
++out_put_device:
++	put_device(&sdev->sdev_gendev);
++out:
++	return BLK_STS_RESOURCE;
++}
 +
-+		if (!got_budget) {
-+			if (q->mq_ops->get_budget &&
-+					!q->mq_ops->get_budget(hctx))
- 				break;
- 		}
- 
-@@ -1577,6 +1598,11 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	if (!blk_mq_get_driver_tag(rq, NULL, false))
- 		goto insert;
- 
-+	if (q->mq_ops->get_budget && !q->mq_ops->get_budget(hctx)) {
-+		blk_mq_put_driver_tag(rq);
-+		goto insert;
-+	}
++static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
++			 const struct blk_mq_queue_data *bd)
++{
++	struct request *req = bd->rq;
++	struct request_queue *q = req->q;
++	struct scsi_device *sdev = q->queuedata;
++	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
++	blk_status_t ret;
++	int reason;
 +
- 	new_cookie = request_to_qc_t(hctx, rq);
- 
- 	/*
-@@ -2577,6 +2603,9 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
- 	if (!set->ops->queue_rq)
- 		return -EINVAL;
- 
-+	if ((!!set->ops->get_budget) != (!!set->ops->put_budget))
-+		return -EINVAL;
++	ret = prep_to_mq(scsi_prep_state_check(sdev, req));
++	if (ret != BLK_STS_OK)
++		goto out_put_budget;
 +
- 	if (set->queue_depth > BLK_MQ_MAX_DEPTH) {
- 		pr_info("blk-mq: reduced tag depth to %u\n",
- 			BLK_MQ_MAX_DEPTH);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index ef15b3414da5..d1bfce3e69ad 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -30,7 +30,7 @@ void blk_mq_freeze_queue(struct request_queue *q);
- void blk_mq_free_queue(struct request_queue *q);
- int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr);
- void blk_mq_wake_waiters(struct request_queue *q);
--bool blk_mq_dispatch_rq_list(struct request_queue *, struct list_head *);
-+bool blk_mq_dispatch_rq_list(struct request_queue *, struct list_head *, bool);
- void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list);
- bool blk_mq_hctx_has_pending(struct blk_mq_hw_ctx *hctx);
- bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 50c6485cb04f..f8c4ba2682ec 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -90,6 +90,8 @@ struct blk_mq_queue_data {
++	ret = BLK_STS_RESOURCE;
+ 	if (!(req->rq_flags & RQF_DONTPREP)) {
+ 		ret = prep_to_mq(scsi_mq_prep_fn(req));
+ 		if (ret != BLK_STS_OK)
+-			goto out_dec_host_busy;
++			goto out_put_budget;
+ 		req->rq_flags |= RQF_DONTPREP;
+ 	} else {
+ 		blk_mq_start_request(req);
+@@ -1993,21 +2028,13 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	if (reason) {
+ 		scsi_set_blocked(cmd, reason);
+ 		ret = BLK_STS_RESOURCE;
+-		goto out_dec_host_busy;
++		goto out_put_budget;
+ 	}
  
- typedef blk_status_t (queue_rq_fn)(struct blk_mq_hw_ctx *,
- 		const struct blk_mq_queue_data *);
-+typedef bool (get_budget_fn)(struct blk_mq_hw_ctx *);
-+typedef void (put_budget_fn)(struct blk_mq_hw_ctx *);
- typedef enum blk_eh_timer_return (timeout_fn)(struct request *, bool);
- typedef int (init_hctx_fn)(struct blk_mq_hw_ctx *, void *, unsigned int);
- typedef void (exit_hctx_fn)(struct blk_mq_hw_ctx *, unsigned int);
-@@ -112,6 +114,14 @@ struct blk_mq_ops {
- 	queue_rq_fn		*queue_rq;
+ 	return BLK_STS_OK;
  
- 	/*
-+	 * Reserve budget before queue request, once .queue_rq is
-+	 * run, it is driver's responsibility to release the
-+	 * reserved budget.
-+	 */
-+	get_budget_fn		*get_budget;
-+	put_budget_fn		*put_budget;
-+
-+	/*
- 	 * Called on request timeout
- 	 */
- 	timeout_fn		*timeout;
+-out_dec_host_busy:
+-	atomic_dec(&shost->host_busy);
+-out_dec_target_busy:
+-	if (scsi_target(sdev)->can_queue > 0)
+-		atomic_dec(&scsi_target(sdev)->target_busy);
+-out_dec_device_busy:
+-	atomic_dec(&sdev->device_busy);
+-out_put_device:
+-	put_device(&sdev->sdev_gendev);
+-out:
++out_put_budget:
++	scsi_mq_put_budget(hctx);
+ 	switch (ret) {
+ 	case BLK_STS_OK:
+ 		break;
+@@ -2211,6 +2238,8 @@ struct request_queue *scsi_old_alloc_queue(struct scsi_device *sdev)
+ }
+ 
+ static const struct blk_mq_ops scsi_mq_ops = {
++	.get_budget	= scsi_mq_get_budget,
++	.put_budget	= scsi_mq_put_budget,
+ 	.queue_rq	= scsi_queue_rq,
+ 	.complete	= scsi_softirq_done,
+ 	.timeout	= scsi_timeout,
 -- 
 2.9.5
