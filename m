@@ -1,45 +1,75 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f42.google.com ([74.125.82.42]:55975 "EHLO
-        mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752124AbdJFN0i (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Oct 2017 09:26:38 -0400
-Received: by mail-wm0-f42.google.com with SMTP id u138so7928106wmu.4
-        for <linux-block@vger.kernel.org>; Fri, 06 Oct 2017 06:26:37 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 1/2] lightnvm: fail fast on passthrough commands
-Date: Fri,  6 Oct 2017 15:26:24 +0200
-Message-Id: <1507296385-6045-2-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1507296385-6045-1-git-send-email-javier@cnexlabs.com>
-References: <1507296385-6045-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        John Garry <john.garry@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V9 1/7] blk-mq-sched: dispatch from scheduler only after progress is made on ->dispatch
+Date: Sat, 14 Oct 2017 02:05:26 +0800
+Message-Id: <20171013180532.29304-2-ming.lei@redhat.com>
+In-Reply-To: <20171013180532.29304-1-ming.lei@redhat.com>
+References: <20171013180532.29304-1-ming.lei@redhat.com>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Make LightNVM passhtrough commands fail fast. User space will then take
-care of re-submitting.
+When hw queue is busy, we shouldn't take requests from
+scheduler queue any more, otherwise it is difficult to do
+IO merge.
 
-Fixes: 84d4add793c6 ('lightnvm: add ioctls for vector I/Os')
-Signed-off-by: Javier González <javier@cnexlabs.com>
+This patch fixes the awful IO performance on some
+SCSI devices(lpfc, qla2xxx, ...) when mq-deadline/kyber
+is used by not taking requests if hw queue is busy.
+
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/nvme/host/lightnvm.c | 2 --
- 1 file changed, 2 deletions(-)
+ block/blk-mq-sched.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index 1f79e3f141e6..6017153c2439 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -600,8 +600,6 @@ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 4ab69435708c..eca011fdfa0e 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -94,7 +94,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	struct request_queue *q = hctx->queue;
+ 	struct elevator_queue *e = q->elevator;
+ 	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
+-	bool did_work = false;
++	bool do_sched_dispatch = true;
+ 	LIST_HEAD(rq_list);
  
- 	rq->timeout = timeout ? timeout : ADMIN_TIMEOUT;
+ 	/* RCU or SRCU read lock is needed before checking quiesced flag */
+@@ -125,18 +125,18 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	 */
+ 	if (!list_empty(&rq_list)) {
+ 		blk_mq_sched_mark_restart_hctx(hctx);
+-		did_work = blk_mq_dispatch_rq_list(q, &rq_list);
++		do_sched_dispatch = blk_mq_dispatch_rq_list(q, &rq_list);
+ 	} else if (!has_sched_dispatch) {
+ 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+ 		blk_mq_dispatch_rq_list(q, &rq_list);
+ 	}
  
--	rq->cmd_flags &= ~REQ_FAILFAST_DRIVER;
--
- 	if (ppa_buf && ppa_len) {
- 		ppa_list = dma_pool_alloc(dev->dma_pool, GFP_KERNEL, &ppa_dma);
- 		if (!ppa_list) {
+ 	/*
+-	 * We want to dispatch from the scheduler if we had no work left
+-	 * on the dispatch list, OR if we did have work but weren't able
+-	 * to make progress.
++	 * We want to dispatch from the scheduler if there was nothing
++	 * on the dispatch list or we were able to dispatch from the
++	 * dispatch list.
+ 	 */
+-	if (!did_work && has_sched_dispatch) {
++	if (do_sched_dispatch && has_sched_dispatch) {
+ 		do {
+ 			struct request *rq;
+ 
 -- 
-2.7.4
+2.9.5
