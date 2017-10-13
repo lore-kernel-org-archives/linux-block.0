@@ -10,11 +10,11 @@ Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
         linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
         John Garry <john.garry@huawei.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V9 6/7] SCSI: allow to pass null rq to scsi_prep_state_check()
-Date: Sat, 14 Oct 2017 02:05:31 +0800
-Message-Id: <20171013180532.29304-7-ming.lei@redhat.com>
-In-Reply-To: <20171013180532.29304-1-ming.lei@redhat.com>
-References: <20171013180532.29304-1-ming.lei@redhat.com>
+Subject: [PATCH V8 6/7] SCSI: allow to pass null rq to scsi_prep_state_check()
+Date: Sat, 14 Oct 2017 01:24:58 +0800
+Message-Id: <20171013172459.1376-7-ming.lei@redhat.com>
+In-Reply-To: <20171013172459.1376-1-ming.lei@redhat.com>
+References: <20171013172459.1376-1-ming.lei@redhat.com>
 Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
