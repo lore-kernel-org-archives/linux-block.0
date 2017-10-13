@@ -1,19 +1,19 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:48953 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1758194AbdJMMr1 (ORCPT
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:51262 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753354AbdJMMrI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 08:47:27 -0400
-Received: by mail-wm0-f66.google.com with SMTP id i124so21103656wmf.3
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:27 -0700 (PDT)
+        Fri, 13 Oct 2017 08:47:08 -0400
+Received: by mail-wm0-f65.google.com with SMTP id f4so21572221wme.0
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:07 -0700 (PDT)
 From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
 To: axboe@fb.com
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        Rakesh Pandit <rakesh@tuxera.com>,
         =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 21/58] lightnvm: pblk: remove checks on mempool alloc.
-Date: Fri, 13 Oct 2017 14:46:10 +0200
-Message-Id: <20171013124647.32668-22-m@bjorling.me>
+Subject: [GIT PULL 01/58] lightnvm: prevent target type module removal when in use
+Date: Fri, 13 Oct 2017 14:45:50 +0200
+Message-Id: <20171013124647.32668-2-m@bjorling.me>
 In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
 References: <20171013124647.32668-1-m@bjorling.me>
 MIME-Version: 1.0
@@ -21,225 +21,72 @@ Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Javier González <javier@cnexlabs.com>
+From: Rakesh Pandit <rakesh@tuxera.com>
 
-As part of the mempool audit on pblk, remove unnecessary mempool
-allocation checks on mempools.
+If target type module e.g. pblk here is unloaded (rmmod) while module
+is in use (after creating target) system crashes.  We fix this by
+using module API refcnt.
 
-Reported-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
 Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- drivers/lightnvm/pblk-core.c     |  4 ----
- drivers/lightnvm/pblk-read.c     |  8 --------
- drivers/lightnvm/pblk-recovery.c | 35 +++++++----------------------------
- drivers/lightnvm/pblk-write.c    | 24 +++++-------------------
- 4 files changed, 12 insertions(+), 59 deletions(-)
+ drivers/lightnvm/core.c      | 4 ++++
+ drivers/lightnvm/pblk-init.c | 1 +
+ include/linux/lightnvm.h     | 1 +
+ 3 files changed, 6 insertions(+)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 215aadb..0da5886 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -206,8 +206,6 @@ int pblk_bio_add_pages(struct pblk *pblk, struct bio *bio, gfp_t flags,
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index ddae430..60e163b 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -22,6 +22,7 @@
+ #include <linux/types.h>
+ #include <linux/sem.h>
+ #include <linux/bitmap.h>
++#include <linux/module.h>
+ #include <linux/moduleparam.h>
+ #include <linux/miscdevice.h>
+ #include <linux/lightnvm.h>
+@@ -316,6 +317,8 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ 	list_add_tail(&t->list, &dev->targets);
+ 	mutex_unlock(&dev->mlock);
  
- 	for (i = 0; i < nr_pages; i++) {
- 		page = mempool_alloc(pblk->page_bio_pool, flags);
--		if (!page)
--			goto err;
- 
- 		ret = bio_add_pc_page(q, bio, page, PBLK_EXPOSED_PAGE_SIZE, 0);
- 		if (ret != PBLK_EXPOSED_PAGE_SIZE) {
-@@ -1653,8 +1651,6 @@ void pblk_gen_run_ws(struct pblk *pblk, struct pblk_line *line, void *priv,
- 	struct pblk_line_ws *line_ws;
- 
- 	line_ws = mempool_alloc(pblk->gen_ws_pool, gfp_mask);
--	if (!line_ws)
--		return;
- 
- 	line_ws->pblk = pblk;
- 	line_ws->line = line;
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index 402c732..d2b6e2a 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -168,10 +168,6 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 	DECLARE_COMPLETION_ONSTACK(wait);
- 
- 	new_bio = bio_alloc(GFP_KERNEL, nr_holes);
--	if (!new_bio) {
--		pr_err("pblk: could not alloc read bio\n");
--		return NVM_IO_ERR;
--	}
- 
- 	if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
- 		goto err;
-@@ -321,10 +317,6 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
- 	bitmap_zero(&read_bitmap, nr_secs);
- 
- 	rqd = pblk_alloc_rqd(pblk, READ);
--	if (IS_ERR(rqd)) {
--		pr_err_ratelimited("pblk: not able to alloc rqd");
--		return NVM_IO_ERR;
--	}
- 
- 	rqd->opcode = NVM_OP_PREAD;
- 	rqd->bio = bio;
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index de52707..6b6b418 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -34,10 +34,6 @@ void pblk_submit_rec(struct work_struct *work)
- 								max_secs);
- 
- 	bio = bio_alloc(GFP_KERNEL, nr_rec_secs);
--	if (!bio) {
--		pr_err("pblk: not able to create recovery bio\n");
--		return;
--	}
- 
- 	bio->bi_iter.bi_sector = 0;
- 	bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
-@@ -85,11 +81,6 @@ int pblk_recov_setup_rq(struct pblk *pblk, struct pblk_c_ctx *c_ctx,
- 	int nr_entries = c_ctx->nr_valid + c_ctx->nr_padded;
- 
- 	rec_rqd = pblk_alloc_rqd(pblk, WRITE);
--	if (IS_ERR(rec_rqd)) {
--		pr_err("pblk: could not create recovery req.\n");
--		return -ENOMEM;
--	}
--
- 	rec_ctx = nvm_rq_to_pdu(rec_rqd);
- 
- 	/* Copy completion bitmap, but exclude the first X completed entries */
-@@ -404,22 +395,18 @@ static int pblk_recov_pad_oob(struct pblk *pblk, struct pblk_line *line,
- 	ppa_list = (void *)(meta_list) + pblk_dma_meta_size;
- 	dma_ppa_list = dma_meta_list + pblk_dma_meta_size;
- 
--	rqd = pblk_alloc_rqd(pblk, WRITE);
--	if (IS_ERR(rqd)) {
--		ret = PTR_ERR(rqd);
--		goto fail_free_meta;
--	}
--
- 	bio = pblk_bio_map_addr(pblk, data, rq_ppas, rq_len,
- 						PBLK_VMALLOC_META, GFP_KERNEL);
- 	if (IS_ERR(bio)) {
- 		ret = PTR_ERR(bio);
--		goto fail_free_rqd;
-+		goto fail_free_meta;
- 	}
- 
- 	bio->bi_iter.bi_sector = 0; /* internal bio */
- 	bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
- 
-+	rqd = pblk_alloc_rqd(pblk, WRITE);
++	__module_get(tt->owner);
 +
- 	rqd->bio = bio;
- 	rqd->opcode = NVM_OP_PWRITE;
- 	rqd->flags = pblk_set_progr_mode(pblk, WRITE);
-@@ -490,8 +477,6 @@ static int pblk_recov_pad_oob(struct pblk *pblk, struct pblk_line *line,
+ 	return 0;
+ err_sysfs:
+ 	if (tt->exit)
+@@ -351,6 +354,7 @@ static void __nvm_remove_target(struct nvm_target *t)
  
- fail_free_bio:
- 	bio_put(bio);
--fail_free_rqd:
--	pblk_free_rqd(pblk, rqd, WRITE);
- fail_free_meta:
- 	nvm_dev_dma_free(dev->parent, meta_list, dma_meta_list);
- fail_free_pad:
-@@ -785,15 +770,9 @@ static int pblk_recov_l2p_from_oob(struct pblk *pblk, struct pblk_line *line)
- 	dma_addr_t dma_ppa_list, dma_meta_list;
- 	int done, ret = 0;
+ 	nvm_remove_tgt_dev(t->dev, 1);
+ 	put_disk(tdisk);
++	module_put(t->type->owner);
  
--	rqd = pblk_alloc_rqd(pblk, READ);
--	if (IS_ERR(rqd))
--		return PTR_ERR(rqd);
--
- 	meta_list = nvm_dev_dma_alloc(dev->parent, GFP_KERNEL, &dma_meta_list);
--	if (!meta_list) {
--		ret = -ENOMEM;
--		goto free_rqd;
--	}
-+	if (!meta_list)
-+		return -ENOMEM;
+ 	list_del(&t->list);
+ 	kfree(t);
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 1b0f612..6df65d1 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -1044,6 +1044,7 @@ static struct nvm_tgt_type tt_pblk = {
  
- 	ppa_list = (void *)(meta_list) + pblk_dma_meta_size;
- 	dma_ppa_list = dma_meta_list + pblk_dma_meta_size;
-@@ -804,6 +783,8 @@ static int pblk_recov_l2p_from_oob(struct pblk *pblk, struct pblk_line *line)
- 		goto free_meta_list;
- 	}
+ 	.sysfs_init	= pblk_sysfs_init,
+ 	.sysfs_exit	= pblk_sysfs_exit,
++	.owner		= THIS_MODULE,
+ };
  
-+	rqd = pblk_alloc_rqd(pblk, READ);
-+
- 	p.ppa_list = ppa_list;
- 	p.meta_list = meta_list;
- 	p.rqd = rqd;
-@@ -832,8 +813,6 @@ static int pblk_recov_l2p_from_oob(struct pblk *pblk, struct pblk_line *line)
- 	kfree(data);
- free_meta_list:
- 	nvm_dev_dma_free(dev->parent, meta_list, dma_meta_list);
--free_rqd:
--	pblk_free_rqd(pblk, rqd, READ);
+ static int __init pblk_module_init(void)
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 7dfa56e..7b80ac9 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -460,6 +460,7 @@ struct nvm_tgt_type {
  
- 	return ret;
- }
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 26c2b83..0fb8f26 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -111,10 +111,7 @@ static void pblk_end_w_fail(struct pblk *pblk, struct nvm_rq *rqd)
- 		ppa_list = &rqd->ppa_addr;
+ 	/* For internal use */
+ 	struct list_head list;
++	struct module *owner;
+ };
  
- 	recovery = mempool_alloc(pblk->rec_pool, GFP_ATOMIC);
--	if (!recovery) {
--		pr_err("pblk: could not allocate recovery context\n");
--		return;
--	}
-+
- 	INIT_LIST_HEAD(&recovery->failed);
- 
- 	bit = -1;
-@@ -375,10 +372,7 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
- 	int ret;
- 
- 	rqd = pblk_alloc_rqd(pblk, READ);
--	if (IS_ERR(rqd)) {
--		pr_err("pblk: cannot allocate write req.\n");
--		return PTR_ERR(rqd);
--	}
-+
- 	m_ctx = nvm_rq_to_pdu(rqd);
- 	m_ctx->private = meta_line;
- 
-@@ -546,19 +540,12 @@ static int pblk_submit_write(struct pblk *pblk)
- 	if (!secs_to_flush && secs_avail < pblk->min_write_pgs)
- 		return 1;
- 
--	rqd = pblk_alloc_rqd(pblk, WRITE);
--	if (IS_ERR(rqd)) {
--		pr_err("pblk: cannot allocate write req.\n");
--		return 1;
--	}
--
- 	bio = bio_alloc(GFP_KERNEL, pblk->max_write_pgs);
--	if (!bio) {
--		pr_err("pblk: cannot allocate write bio\n");
--		goto fail_free_rqd;
--	}
-+
- 	bio->bi_iter.bi_sector = 0; /* internal bio */
- 	bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
-+
-+	rqd = pblk_alloc_rqd(pblk, WRITE);
- 	rqd->bio = bio;
- 
- 	secs_to_sync = pblk_calc_secs_to_sync(pblk, secs_avail, secs_to_flush);
-@@ -589,7 +576,6 @@ static int pblk_submit_write(struct pblk *pblk)
- 	pblk_free_write_rqd(pblk, rqd);
- fail_put_bio:
- 	bio_put(bio);
--fail_free_rqd:
- 	pblk_free_rqd(pblk, rqd, WRITE);
- 
- 	return 1;
+ extern struct nvm_tgt_type *nvm_find_target_type(const char *, int);
 -- 
 2.9.3
