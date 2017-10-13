@@ -1,154 +1,51 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        John Garry <john.garry@huawei.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V10 8/8] SCSI: implement .get_budget and .put_budget for blk-mq
-Date: Sat, 14 Oct 2017 17:22:32 +0800
-Message-Id: <20171014092232.13943-9-ming.lei@redhat.com>
-In-Reply-To: <20171014092232.13943-1-ming.lei@redhat.com>
-References: <20171014092232.13943-1-ming.lei@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:54990 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1758302AbdJMMro (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 08:47:44 -0400
+Received: by mail-wm0-f66.google.com with SMTP id i124so21517571wmf.3
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:43 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 38/58] lightnvm: pblk: ensure right bad block calculation
+Date: Fri, 13 Oct 2017 14:46:27 +0200
+Message-Id: <20171013124647.32668-39-m@bjorling.me>
+In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
+References: <20171013124647.32668-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We need to tell blk-mq for reserving resource before queuing
-one request, so implement these two callbacks. Then blk-mq
-can avoid to dequeue request earlier, and IO merge can
-be improved a lot.
+From: Javier González <javier@cnexlabs.com>
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Make sure that the variable controlling block threshold for allocating
+extra metadata sectors in case of a line with bad blocks does not get a
+negative value. Otherwise, the line will be marked as corrupted and
+wasted.
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- drivers/scsi/scsi_lib.c | 75 ++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 52 insertions(+), 23 deletions(-)
+ drivers/lightnvm/pblk-init.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index d159bb085714..6f10afaca25b 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1946,25 +1946,32 @@ static void scsi_mq_done(struct scsi_cmnd *cmd)
- 	blk_mq_complete_request(cmd->request);
- }
- 
--static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
--			 const struct blk_mq_queue_data *bd)
-+static void scsi_mq_put_budget(struct blk_mq_hw_ctx *hctx)
- {
--	struct request *req = bd->rq;
--	struct request_queue *q = req->q;
-+	struct request_queue *q = hctx->queue;
-+	struct scsi_device *sdev = q->queuedata;
-+	struct Scsi_Host *shost = sdev->host;
-+
-+	atomic_dec(&shost->host_busy);
-+	if (scsi_target(sdev)->can_queue > 0)
-+		atomic_dec(&scsi_target(sdev)->target_busy);
-+	atomic_dec(&sdev->device_busy);
-+	put_device(&sdev->sdev_gendev);
-+}
-+
-+static blk_status_t scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct request_queue *q = hctx->queue;
- 	struct scsi_device *sdev = q->queuedata;
- 	struct Scsi_Host *shost = sdev->host;
--	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
- 	blk_status_t ret;
--	int reason;
- 
--	ret = prep_to_mq(scsi_prep_state_check(sdev, req));
--	if (ret != BLK_STS_OK)
--		goto out;
-+	ret = prep_to_mq(scsi_prep_state_check(sdev, NULL));
-+	if (ret == BLK_STS_RESOURCE || ret != BLK_STS_OK)
-+		return ret;
- 
--	ret = BLK_STS_RESOURCE;
- 	if (!get_device(&sdev->sdev_gendev))
- 		goto out;
--
- 	if (!scsi_dev_queue_ready(q, sdev))
- 		goto out_put_device;
- 	if (!scsi_target_queue_ready(shost, sdev))
-@@ -1972,10 +1979,38 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	if (!scsi_host_queue_ready(q, shost, sdev))
- 		goto out_dec_target_busy;
- 
-+	return BLK_STS_OK;
-+
-+out_dec_target_busy:
-+	if (scsi_target(sdev)->can_queue > 0)
-+		atomic_dec(&scsi_target(sdev)->target_busy);
-+out_dec_device_busy:
-+	atomic_dec(&sdev->device_busy);
-+out_put_device:
-+	put_device(&sdev->sdev_gendev);
-+out:
-+	return BLK_STS_RESOURCE;
-+}
-+
-+static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
-+			 const struct blk_mq_queue_data *bd)
-+{
-+	struct request *req = bd->rq;
-+	struct request_queue *q = req->q;
-+	struct scsi_device *sdev = q->queuedata;
-+	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
-+	blk_status_t ret;
-+	int reason;
-+
-+	ret = prep_to_mq(scsi_prep_state_check(sdev, req));
-+	if (ret != BLK_STS_OK)
-+		goto out_put_budget;
-+
-+	ret = BLK_STS_RESOURCE;
- 	if (!(req->rq_flags & RQF_DONTPREP)) {
- 		ret = prep_to_mq(scsi_mq_prep_fn(req));
- 		if (ret != BLK_STS_OK)
--			goto out_dec_host_busy;
-+			goto out_put_budget;
- 		req->rq_flags |= RQF_DONTPREP;
- 	} else {
- 		blk_mq_start_request(req);
-@@ -1993,21 +2028,13 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	if (reason) {
- 		scsi_set_blocked(cmd, reason);
- 		ret = BLK_STS_RESOURCE;
--		goto out_dec_host_busy;
-+		goto out_put_budget;
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 3c37491..c7239c4 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -710,7 +710,7 @@ static int pblk_lines_init(struct pblk *pblk)
+ 		goto add_emeta_page;
  	}
  
- 	return BLK_STS_OK;
+-	lm->emeta_bb = geo->nr_luns - i;
++	lm->emeta_bb = geo->nr_luns > i ? geo->nr_luns - i : 0;
  
--out_dec_host_busy:
--	atomic_dec(&shost->host_busy);
--out_dec_target_busy:
--	if (scsi_target(sdev)->can_queue > 0)
--		atomic_dec(&scsi_target(sdev)->target_busy);
--out_dec_device_busy:
--	atomic_dec(&sdev->device_busy);
--out_put_device:
--	put_device(&sdev->sdev_gendev);
--out:
-+out_put_budget:
-+	scsi_mq_put_budget(hctx);
- 	switch (ret) {
- 	case BLK_STS_OK:
- 		break;
-@@ -2211,6 +2238,8 @@ struct request_queue *scsi_old_alloc_queue(struct scsi_device *sdev)
- }
- 
- static const struct blk_mq_ops scsi_mq_ops = {
-+	.get_budget	= scsi_mq_get_budget,
-+	.put_budget	= scsi_mq_put_budget,
- 	.queue_rq	= scsi_queue_rq,
- 	.complete	= scsi_softirq_done,
- 	.timeout	= scsi_timeout,
+ 	lm->min_blk_line = 1;
+ 	if (geo->nr_luns > 1)
 -- 
-2.9.5
+2.9.3
