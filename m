@@ -1,48 +1,27 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:54317 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753089AbdJMXgB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 19:36:01 -0400
-Received: by mail-pf0-f196.google.com with SMTP id n89so3875993pfk.11
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 16:36:01 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Coly Li <colyli@suse.de>
-Subject: [PATCH 03/15] bcache: fix a comments typo in bch_alloc_sectors()
-Date: Fri, 13 Oct 2017 16:35:30 -0700
-Message-Id: <20171013233542.20938-4-mlyle@lyle.org>
-In-Reply-To: <20171013233542.20938-1-mlyle@lyle.org>
-References: <20171013233542.20938-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jthumshirn@suse.de>
+Date: Fri, 13 Oct 2017 10:47:18 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Anil Ravindranath <anil_ravindranath@pmc-sierra.com>
+Subject: Re: [PATCH 8/8] scsi/pmcraid: Use sgl_alloc_order() and
+ sgl_free_order()
+Message-ID: <20171013084717.7odpun36aywlvbvd@linux-x5ow.site>
+References: <20171012224550.25440-1-bart.vanassche@wdc.com>
+ <20171012224550.25440-9-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20171012224550.25440-9-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Coly Li <colyli@suse.de>
-
-Code comments in alloc.c:bch_alloc_sectors() mentions a function
-name find_data_bucket(), the correct function name should be
-pick_data_bucket() indeed. bch_alloc_sectors() is a quite important
-function in bcache allocation code, fixing the typo may help
-other people to have less confusion.
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Tang Junhui <tang.junhui@zte.com.cn>
----
- drivers/md/bcache/alloc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
-index e1a4205caa2e..4c40870e99f5 100644
---- a/drivers/md/bcache/alloc.c
-+++ b/drivers/md/bcache/alloc.c
-@@ -601,7 +601,7 @@ bool bch_alloc_sectors(struct cache_set *c, struct bkey *k, unsigned sectors,
- 
- 	/*
- 	 * If we had to allocate, we might race and not need to allocate the
--	 * second time we call find_data_bucket(). If we allocated a bucket but
-+	 * second time we call pick_data_bucket(). If we allocated a bucket but
- 	 * didn't use it, drop the refcount bch_bucket_alloc_set() took:
- 	 */
- 	if (KEY_PTRS(&alloc.key))
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.11.0
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
