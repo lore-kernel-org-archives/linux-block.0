@@ -1,8 +1,8 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:23428 "EHLO mga01.intel.com"
+Received: from mga05.intel.com ([192.55.52.43]:46344 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1760867AbdJRGXC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Oct 2017 02:23:02 -0400
+        id S1757463AbdJMMFE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 08:05:04 -0400
 Subject: Re: [PATCH V8 00/14] mmc: Add Command Queue support
 To: Ulf Hansson <ulf.hansson@linaro.org>
 Cc: linux-mmc <linux-mmc@vger.kernel.org>,
@@ -33,8 +33,8 @@ References: <1505302814-19313-1-git-send-email-adrian.hunter@intel.com>
  <1b8bec1b-7340-cb89-65c0-e09b17037ca4@intel.com>
  <CAPDyKFqoMVemtCSHBzfK5YTqLsGEr_v_z7o=HOKCwEdVz0tH_w@mail.gmail.com>
 From: Adrian Hunter <adrian.hunter@intel.com>
-Message-ID: <376e4bb9-cc86-36ae-91b6-48fef69e059a@intel.com>
-Date: Wed, 18 Oct 2017 09:16:07 +0300
+Message-ID: <008d5504-d5ae-06fc-5c3f-c39e14d49d50@intel.com>
+Date: Fri, 13 Oct 2017 14:58:11 +0300
 MIME-Version: 1.0
 In-Reply-To: <CAPDyKFqoMVemtCSHBzfK5YTqLsGEr_v_z7o=HOKCwEdVz0tH_w@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
@@ -167,6 +167,9 @@ On 11/10/17 16:58, Ulf Hansson wrote:
 > possible, because in principle it only needs to inform the other
 > prepared request that it may start, before it continues to post
 > process/completes the current one.
+
+It already does that.
+
 > 
 > However, by looking at for example how mmci.c works, it actually holds
 > its spinlock while it calls mmc_request_done(). The same spinlock is
@@ -175,10 +178,15 @@ On 11/10/17 16:58, Ulf Hansson wrote:
 > callback, would make mmci to keep the spinlock held throughout the
 > post processing cycle, which then prevents the next request from being
 > started.
+
+It is in interrupt context also. So if the block layer work is on the same
+CPU it will anyway wait.
+
 > 
 > So my conclusion is, let's start a as you suggested, by not completing
 > the request in ->done() as to maintain existing behavior. Then we can
 > address optimizations on top, which very likely will involve doing
 > changes to host drivers as well.
 
-Have you tested the latest version now?
+Ideally it should be possible to start the next already prepared request
+from the ->done() callback of the current request.  Perhaps add a new host API.
