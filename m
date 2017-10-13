@@ -1,281 +1,174 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:49569 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751280AbdJEABQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Oct 2017 20:01:16 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        =Oleksandr Natalenko <oleksandr@natalenko.name>,
-        "Luis R . Rodriguez" <mcgrof@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v6 9/9] block, scsi: Make SCSI device suspend and resume work reliably
-Date: Wed,  4 Oct 2017 17:01:10 -0700
-Message-Id: <20171005000110.15904-10-bart.vanassche@wdc.com>
-In-Reply-To: <20171005000110.15904-1-bart.vanassche@wdc.com>
-References: <20171005000110.15904-1-bart.vanassche@wdc.com>
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:46438 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753193AbdJMXgC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 19:36:02 -0400
+Received: by mail-pf0-f195.google.com with SMTP id p87so11515993pfj.3
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 16:36:02 -0700 (PDT)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Coly Li <colyli@suse.de>,
+        Eric Wheeler <bcache@lists.ewheeler.net>,
+        Junhui Tang <tang.junhui@zte.com.cn>,
+        Michael Lyle <mlyle@lyle.org>
+Subject: [PATCH 04/15] bcache: rewrite multiple partitions support
+Date: Fri, 13 Oct 2017 16:35:31 -0700
+Message-Id: <20171013233542.20938-5-mlyle@lyle.org>
+In-Reply-To: <20171013233542.20938-1-mlyle@lyle.org>
+References: <20171013233542.20938-1-mlyle@lyle.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-It is essential during suspend and resume that neither the filesystem
-state nor the filesystem metadata in RAM changes. This is why while
-the hibernation image is being written or restored that SCSI devices
-are quiesced. The SCSI core quiesces devices through scsi_device_quiesce()
-and scsi_device_resume(). In the SDEV_QUIESCE state execution of
-non-preempt requests is deferred. This is realized by returning
-BLKPREP_DEFER from inside scsi_prep_state_check() for quiesced SCSI
-devices. Avoid that a full queue prevents power management requests
-to be submitted by deferring allocation of non-preempt requests for
-devices in the quiesced state. This patch has been tested by running
-the following commands and by verifying that after resume the fio job
-is still running:
+From: Coly Li <colyli@suse.de>
 
-for d in /sys/class/block/sd*[a-z]; do
-  hcil=$(readlink "$d/device")
-  hcil=${hcil#../../../}
-  echo 4 > "$d/queue/nr_requests"
-  echo 1 > "/sys/class/scsi_device/$hcil/device/queue_depth"
-done
-bdev=$(readlink /dev/disk/by-uuid/5217d83f-213e-4b42-b86e-20013325ba6c)
-bdev=${bdev#../../}
-hcil=$(readlink "/sys/block/$bdev/device")
-hcil=${hcil#../../../}
-fio --name="$bdev" --filename="/dev/$bdev" --buffered=0 --bs=512 --rw=randread \
-  --ioengine=libaio --numjobs=4 --iodepth=16 --iodepth_batch=1 --thread \
-  --loops=$((2**31)) &
-pid=$!
-sleep 1
-systemctl hibernate
-sleep 10
-kill $pid
+Current partition support of bcache is confusing and buggy. It tries to
+trace non-continuous device minor numbers by an ida bit string, and
+mistakenly mixed bcache device index with minor numbers. This design
+generates several negative results,
+- Index of bcache device name is not consecutive under /dev/. If there are
+  3 bcache devices, they name will be,
+  /dev/bcache0, /dev/bcache16, /dev/bcache32
+  Only bcache code indexes bcache device name is such an interesting way.
+- First minor number of each bcache device is traced by ida bit string.
+  One bcache device will occupy 16 bits, this is not a good idea. Indeed
+  only one bit is enough.
+- Because minor number and bcache device index are mixed, a device index
+  is allocated by ida_simple_get(), but an first minor number is sent into
+  ida_simple_remove() to release the device. It confused original author
+  too.
 
-Reported-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-References: "I/O hangs after resuming from suspend-to-ram" (https://marc.info/?l=linux-block&m=150340235201348).
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Root cause of the above errors is, bcache code should not handle device
+minor numbers at all! A standard process to support multiple partitions in
+Linux kernel is,
+- Device driver provides major device number, and indexes multiple device
+  instances.
+- Device driver does not allocat nor trace device minor number, only
+  provides a first minor number of a given device instance, and sets how
+  many minor numbers (paritions) the device instance may have.
+All rested stuffs are handled by block layer code, most of the details can
+be found from block/{genhd, partition-generic}.c files.
+
+This patch re-writes multiple partitions support for bcache. It makes
+whole things to be more clear, and uses ida bit string in a more efficeint
+way.
+- Ida bit string only traces bcache device index, not minor number. For a
+  bcache device with 128 partitions, only one bit in ida bit string is
+  enough.
+- Device minor number and device index are separated in concept. Device
+  index is used for /dev node naming, and ida bit string trace. Minor
+  number is calculated from device index and only used to initialize
+  first_minor of a bcache device.
+- It does not follow any standard for 16 partitions on a bcache device.
+  This patch sets 128 partitions on single bcache device at max, this is
+  the limitation from GPT (GUID Partition Table) and supported by fdisk.
+
+Considering a typical device minor number is 20 bits width, each bcache
+device may have 128 partitions (7 bits), there can be 8192 bcache devices
+existing on system. For most common deployment for a single server in
+now days, it should be enough.
+
+[minor spelling fixes in commit message by Michael Lyle]
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Cc: Eric Wheeler <bcache@lists.ewheeler.net>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
+Signed-off-by: Michael Lyle <mlyle@lyle.org>
 ---
- block/blk-core.c        | 38 ++++++++++++++++++++++++++++++--------
- block/blk-mq.c          |  4 ++--
- block/blk-timeout.c     |  2 +-
- drivers/scsi/scsi_lib.c | 27 +++++++++++++++++++--------
- fs/block_dev.c          |  4 ++--
- include/linux/blkdev.h  |  2 +-
- 6 files changed, 55 insertions(+), 22 deletions(-)
+ drivers/md/bcache/super.c | 37 +++++++++++++++++++++++++------------
+ 1 file changed, 25 insertions(+), 12 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index b8d90fc29b35..81a4bb119d50 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -371,6 +371,7 @@ void blk_clear_preempt_only(struct request_queue *q)
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index fc0a31b13ac4..a478d1ac0480 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -53,12 +53,15 @@ LIST_HEAD(bch_cache_sets);
+ static LIST_HEAD(uncached_devices);
  
- 	spin_lock_irqsave(q->queue_lock, flags);
- 	queue_flag_clear(QUEUE_FLAG_PREEMPT_ONLY, q);
-+	wake_up_all(&q->mq_freeze_wq);
- 	spin_unlock_irqrestore(q->queue_lock, flags);
- }
- EXPORT_SYMBOL_GPL(blk_clear_preempt_only);
-@@ -792,15 +793,34 @@ struct request_queue *blk_alloc_queue(gfp_t gfp_mask)
- }
- EXPORT_SYMBOL(blk_alloc_queue);
+ static int bcache_major;
+-static DEFINE_IDA(bcache_minor);
++static DEFINE_IDA(bcache_device_idx);
+ static wait_queue_head_t unregister_wait;
+ struct workqueue_struct *bcache_wq;
  
--int blk_queue_enter(struct request_queue *q, bool nowait)
-+/**
-+ * blk_queue_enter() - try to increase q->q_usage_counter
-+ * @q: request queue pointer
-+ * @flags: BLK_MQ_REQ_NOWAIT and/or BLK_MQ_REQ_PREEMPT
-+ */
-+int blk_queue_enter(struct request_queue *q, unsigned int flags)
- {
-+	const bool preempt = flags & BLK_MQ_REQ_PREEMPT;
+ #define BTREE_MAX_PAGES		(256 * 1024 / PAGE_SIZE)
+-#define BCACHE_MINORS		16 /* partition support */
++/* limitation of partitions number on single bcache device */
++#define BCACHE_MINORS		128
++/* limitation of bcache devices number on single system */
++#define BCACHE_DEVICE_IDX_MAX	((1U << MINORBITS)/BCACHE_MINORS)
+ 
+ /* Superblock */
+ 
+@@ -721,6 +724,16 @@ static void bcache_device_attach(struct bcache_device *d, struct cache_set *c,
+ 	closure_get(&c->caching);
+ }
+ 
++static inline int first_minor_to_idx(int first_minor)
++{
++	return (first_minor/BCACHE_MINORS);
++}
 +
- 	while (true) {
- 		int ret;
- 
--		if (percpu_ref_tryget_live(&q->q_usage_counter))
--			return 0;
-+		if (percpu_ref_tryget_live(&q->q_usage_counter)) {
-+			/*
-+			 * The code that sets the PREEMPT_ONLY flag is
-+			 * responsible for ensuring that that flag is globally
-+			 * visible before the queue is unfrozen.
-+			 */
-+			if (preempt || !blk_queue_preempt_only(q)) {
-+				return 0;
-+			} else {
-+				percpu_ref_put(&q->q_usage_counter);
-+				WARN_ONCE("%s: Attempt to allocate non-preempt request in preempt-only mode.\n",
-+					  kobject_name(q->kobj.parent));
-+			}
-+		}
- 
--		if (nowait)
-+		if (flags & BLK_MQ_REQ_NOWAIT)
- 			return -EBUSY;
- 
- 		/*
-@@ -813,7 +833,8 @@ int blk_queue_enter(struct request_queue *q, bool nowait)
- 		smp_rmb();
- 
- 		ret = wait_event_interruptible(q->mq_freeze_wq,
--				!atomic_read(&q->mq_freeze_depth) ||
-+				(atomic_read(&q->mq_freeze_depth) == 0 &&
-+				 (preempt || !blk_queue_preempt_only(q))) ||
- 				blk_queue_dying(q));
- 		if (blk_queue_dying(q))
- 			return -ENODEV;
-@@ -1441,8 +1462,7 @@ static struct request *blk_old_get_request(struct request_queue *q,
- 	/* create ioc upfront */
- 	create_io_context(gfp_mask, q->node);
- 
--	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM) ||
--			      (op & REQ_NOWAIT));
-+	ret = blk_queue_enter(q, flags);
- 	if (ret)
- 		return ERR_PTR(ret);
- 	spin_lock_irq(q->queue_lock);
-@@ -2263,8 +2283,10 @@ blk_qc_t generic_make_request(struct bio *bio)
- 	current->bio_list = bio_list_on_stack;
- 	do {
- 		struct request_queue *q = bio->bi_disk->queue;
-+		unsigned int flags = bio->bi_opf & REQ_NOWAIT ?
-+			BLK_MQ_REQ_NOWAIT : 0;
- 
--		if (likely(blk_queue_enter(q, bio->bi_opf & REQ_NOWAIT) == 0)) {
-+		if (likely(blk_queue_enter(q, flags) == 0)) {
- 			struct bio_list lower, same;
- 
- 			/* Create a fresh bio_list for all subordinate requests */
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 271657992d1a..1604bc2d4a57 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -386,7 +386,7 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
- 	struct request *rq;
- 	int ret;
- 
--	ret = blk_queue_enter(q, flags & BLK_MQ_REQ_NOWAIT);
-+	ret = blk_queue_enter(q, flags);
- 	if (ret)
- 		return ERR_PTR(ret);
- 
-@@ -425,7 +425,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
- 	if (hctx_idx >= q->nr_hw_queues)
- 		return ERR_PTR(-EIO);
- 
--	ret = blk_queue_enter(q, true);
-+	ret = blk_queue_enter(q, flags);
- 	if (ret)
- 		return ERR_PTR(ret);
- 
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index 17ec83bb0900..b75d975cc5a5 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -134,7 +134,7 @@ void blk_timeout_work(struct work_struct *work)
- 	struct request *rq, *tmp;
- 	int next_set = 0;
- 
--	if (blk_queue_enter(q, true))
-+	if (blk_queue_enter(q, BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_PREEMPT))
- 		return;
- 	spin_lock_irqsave(q->queue_lock, flags);
- 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 1c16a247fae6..0ba7af5debc7 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2926,21 +2926,30 @@ static void scsi_wait_for_queuecommand(struct scsi_device *sdev)
- int
- scsi_device_quiesce(struct scsi_device *sdev)
- {
-+	struct request_queue *q = sdev->request_queue;
- 	int err;
- 
-+	blk_mq_freeze_queue(q);
-+	if (blk_set_preempt_only(q)) {
-+		blk_mq_unfreeze_queue(q);
-+		return -EINVAL;
-+	}
-+	/*
-+	 * Ensure that the effect of blk_set_preempt_only() will be visible
-+	 * for percpu_ref_tryget() callers that occur after the queue
-+	 * unfreeze. See also https://lwn.net/Articles/573497/.
-+	 */
-+	synchronize_rcu();
-+	blk_mq_unfreeze_queue(q);
++static inline int idx_to_first_minor(int idx)
++{
++	return (idx * BCACHE_MINORS);
++}
 +
- 	mutex_lock(&sdev->state_mutex);
- 	err = scsi_device_set_state(sdev, SDEV_QUIESCE);
- 	mutex_unlock(&sdev->state_mutex);
+ static void bcache_device_free(struct bcache_device *d)
+ {
+ 	lockdep_assert_held(&bch_register_lock);
+@@ -734,7 +747,8 @@ static void bcache_device_free(struct bcache_device *d)
+ 	if (d->disk && d->disk->queue)
+ 		blk_cleanup_queue(d->disk->queue);
+ 	if (d->disk) {
+-		ida_simple_remove(&bcache_minor, d->disk->first_minor);
++		ida_simple_remove(&bcache_device_idx,
++				  first_minor_to_idx(d->disk->first_minor));
+ 		put_disk(d->disk);
+ 	}
  
- 	if (err)
--		return err;
-+		blk_clear_preempt_only(q);
+@@ -751,7 +765,7 @@ static int bcache_device_init(struct bcache_device *d, unsigned block_size,
+ {
+ 	struct request_queue *q;
+ 	size_t n;
+-	int minor;
++	int idx;
  
--	scsi_run_queue(sdev->request_queue);
--	while (atomic_read(&sdev->device_busy)) {
--		msleep_interruptible(200);
--		scsi_run_queue(sdev->request_queue);
--	}
--	return 0;
-+	return err;
- }
- EXPORT_SYMBOL(scsi_device_quiesce);
+ 	if (!d->stripe_size)
+ 		d->stripe_size = 1 << 31;
+@@ -776,25 +790,24 @@ static int bcache_device_init(struct bcache_device *d, unsigned block_size,
+ 	if (!d->full_dirty_stripes)
+ 		return -ENOMEM;
  
-@@ -2961,8 +2970,10 @@ void scsi_device_resume(struct scsi_device *sdev)
- 	 */
- 	mutex_lock(&sdev->state_mutex);
- 	if (sdev->sdev_state == SDEV_QUIESCE &&
--	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0)
-+	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0) {
-+		blk_clear_preempt_only(sdev->request_queue);
- 		scsi_run_queue(sdev->request_queue);
-+	}
- 	mutex_unlock(&sdev->state_mutex);
- }
- EXPORT_SYMBOL(scsi_device_resume);
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 93d088ffc05c..98cf2d7ee9d3 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -674,7 +674,7 @@ int bdev_read_page(struct block_device *bdev, sector_t sector,
- 	if (!ops->rw_page || bdev_get_integrity(bdev))
- 		return result;
+-	minor = ida_simple_get(&bcache_minor, 0, MINORMASK + 1, GFP_KERNEL);
+-	if (minor < 0)
+-		return minor;
+-
+-	minor *= BCACHE_MINORS;
++	idx = ida_simple_get(&bcache_device_idx, 0,
++				BCACHE_DEVICE_IDX_MAX, GFP_KERNEL);
++	if (idx < 0)
++		return idx;
  
--	result = blk_queue_enter(bdev->bd_queue, false);
-+	result = blk_queue_enter(bdev->bd_queue, 0);
- 	if (result)
- 		return result;
- 	result = ops->rw_page(bdev, sector + get_start_sect(bdev), page, false);
-@@ -710,7 +710,7 @@ int bdev_write_page(struct block_device *bdev, sector_t sector,
+ 	if (!(d->bio_split = bioset_create(4, offsetof(struct bbio, bio),
+ 					   BIOSET_NEED_BVECS |
+ 					   BIOSET_NEED_RESCUER)) ||
+ 	    !(d->disk = alloc_disk(BCACHE_MINORS))) {
+-		ida_simple_remove(&bcache_minor, minor);
++		ida_simple_remove(&bcache_device_idx, idx);
+ 		return -ENOMEM;
+ 	}
  
- 	if (!ops->rw_page || bdev_get_integrity(bdev))
- 		return -EOPNOTSUPP;
--	result = blk_queue_enter(bdev->bd_queue, false);
-+	result = blk_queue_enter(bdev->bd_queue, 0);
- 	if (result)
- 		return result;
+ 	set_capacity(d->disk, sectors);
+-	snprintf(d->disk->disk_name, DISK_NAME_LEN, "bcache%i", minor);
++	snprintf(d->disk->disk_name, DISK_NAME_LEN, "bcache%i", idx);
  
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index c4174f78c6eb..9f21a8bbacc6 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -972,7 +972,7 @@ extern int scsi_cmd_ioctl(struct request_queue *, struct gendisk *, fmode_t,
- extern int sg_scsi_ioctl(struct request_queue *, struct gendisk *, fmode_t,
- 			 struct scsi_ioctl_command __user *);
+ 	d->disk->major		= bcache_major;
+-	d->disk->first_minor	= minor;
++	d->disk->first_minor	= idx_to_first_minor(idx);
+ 	d->disk->fops		= &bcache_ops;
+ 	d->disk->private_data	= d;
  
--extern int blk_queue_enter(struct request_queue *q, bool nowait);
-+extern int blk_queue_enter(struct request_queue *q, unsigned int flags);
- extern void blk_queue_exit(struct request_queue *q);
- extern void blk_start_queue(struct request_queue *q);
- extern void blk_start_queue_async(struct request_queue *q);
 -- 
-2.14.2
+2.11.0
