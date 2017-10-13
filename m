@@ -1,120 +1,245 @@
-Return-Path: <prvs=449916f6d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Oleksandr Natalenko <oleksandr@natalenko.name>,
-	Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Shaohua Li <shli@kernel.org>,
-	linux-raid@vger.kernel.org,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v8 03/10] md: Neither resync nor reshape while the system is frozen
-Date: Tue, 10 Oct 2017 14:03:39 -0700
-Message-Id: <20171010210346.14574-4-bart.vanassche@wdc.com>
-In-Reply-To: <20171010210346.14574-1-bart.vanassche@wdc.com>
-References: <20171010210346.14574-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:48953 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1758194AbdJMMr1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 08:47:27 -0400
+Received: by mail-wm0-f66.google.com with SMTP id i124so21103656wmf.3
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:27 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 21/58] lightnvm: pblk: remove checks on mempool alloc.
+Date: Fri, 13 Oct 2017 14:46:10 +0200
+Message-Id: <20171013124647.32668-22-m@bjorling.me>
+In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
+References: <20171013124647.32668-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Some people use the md driver on laptops and use the suspend and
-resume functionality. Since it is essential that submitting of
-new I/O requests stops before a hibernation image is created,
-interrupt the md resync and reshape actions if the system is
-being frozen. Note: the resync and reshape will restart after
-the system is resumed and a message similar to the following
-will appear in the system log:
+From: Javier González <javier@cnexlabs.com>
 
-md: md0: data-check interrupted.
+As part of the mempool audit on pblk, remove unnecessary mempool
+allocation checks on mempools.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Shaohua Li <shli@kernel.org>
-Cc: linux-raid@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Reported-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- drivers/md/md.c | 30 +++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+ drivers/lightnvm/pblk-core.c     |  4 ----
+ drivers/lightnvm/pblk-read.c     |  8 --------
+ drivers/lightnvm/pblk-recovery.c | 35 +++++++----------------------------
+ drivers/lightnvm/pblk-write.c    | 24 +++++-------------------
+ 4 files changed, 12 insertions(+), 59 deletions(-)
 
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index b99584e5d6b1..d712d3320c1d 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -66,6 +66,8 @@
- #include <linux/raid/md_u.h>
- #include <linux/slab.h>
- #include <linux/percpu-refcount.h>
-+#include <linux/freezer.h>
-+#include <linux/suspend.h>
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 215aadb..0da5886 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -206,8 +206,6 @@ int pblk_bio_add_pages(struct pblk *pblk, struct bio *bio, gfp_t flags,
  
- #include <trace/events/block.h>
- #include "md.h"
-@@ -7439,6 +7441,7 @@ static int md_thread(void *arg)
- 	 */
+ 	for (i = 0; i < nr_pages; i++) {
+ 		page = mempool_alloc(pblk->page_bio_pool, flags);
+-		if (!page)
+-			goto err;
  
- 	allow_signal(SIGKILL);
-+	set_freezable();
- 	while (!kthread_should_stop()) {
+ 		ret = bio_add_pc_page(q, bio, page, PBLK_EXPOSED_PAGE_SIZE, 0);
+ 		if (ret != PBLK_EXPOSED_PAGE_SIZE) {
+@@ -1653,8 +1651,6 @@ void pblk_gen_run_ws(struct pblk *pblk, struct pblk_line *line, void *priv,
+ 	struct pblk_line_ws *line_ws;
  
- 		/* We need to wait INTERRUPTIBLE so that
-@@ -7449,7 +7452,7 @@ static int md_thread(void *arg)
- 		if (signal_pending(current))
- 			flush_signals(current);
+ 	line_ws = mempool_alloc(pblk->gen_ws_pool, gfp_mask);
+-	if (!line_ws)
+-		return;
  
--		wait_event_interruptible_timeout
-+		wait_event_freezable_timeout
- 			(thread->wqueue,
- 			 test_bit(THREAD_WAKEUP, &thread->flags)
- 			 || kthread_should_stop() || kthread_should_park(),
-@@ -8963,6 +8966,29 @@ static void md_stop_all_writes(void)
- 		mdelay(1000*1);
+ 	line_ws->pblk = pblk;
+ 	line_ws->line = line;
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index 402c732..d2b6e2a 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -168,10 +168,6 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+ 	new_bio = bio_alloc(GFP_KERNEL, nr_holes);
+-	if (!new_bio) {
+-		pr_err("pblk: could not alloc read bio\n");
+-		return NVM_IO_ERR;
+-	}
+ 
+ 	if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
+ 		goto err;
+@@ -321,10 +317,6 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ 	bitmap_zero(&read_bitmap, nr_secs);
+ 
+ 	rqd = pblk_alloc_rqd(pblk, READ);
+-	if (IS_ERR(rqd)) {
+-		pr_err_ratelimited("pblk: not able to alloc rqd");
+-		return NVM_IO_ERR;
+-	}
+ 
+ 	rqd->opcode = NVM_OP_PREAD;
+ 	rqd->bio = bio;
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index de52707..6b6b418 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -34,10 +34,6 @@ void pblk_submit_rec(struct work_struct *work)
+ 								max_secs);
+ 
+ 	bio = bio_alloc(GFP_KERNEL, nr_rec_secs);
+-	if (!bio) {
+-		pr_err("pblk: not able to create recovery bio\n");
+-		return;
+-	}
+ 
+ 	bio->bi_iter.bi_sector = 0;
+ 	bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
+@@ -85,11 +81,6 @@ int pblk_recov_setup_rq(struct pblk *pblk, struct pblk_c_ctx *c_ctx,
+ 	int nr_entries = c_ctx->nr_valid + c_ctx->nr_padded;
+ 
+ 	rec_rqd = pblk_alloc_rqd(pblk, WRITE);
+-	if (IS_ERR(rec_rqd)) {
+-		pr_err("pblk: could not create recovery req.\n");
+-		return -ENOMEM;
+-	}
+-
+ 	rec_ctx = nvm_rq_to_pdu(rec_rqd);
+ 
+ 	/* Copy completion bitmap, but exclude the first X completed entries */
+@@ -404,22 +395,18 @@ static int pblk_recov_pad_oob(struct pblk *pblk, struct pblk_line *line,
+ 	ppa_list = (void *)(meta_list) + pblk_dma_meta_size;
+ 	dma_ppa_list = dma_meta_list + pblk_dma_meta_size;
+ 
+-	rqd = pblk_alloc_rqd(pblk, WRITE);
+-	if (IS_ERR(rqd)) {
+-		ret = PTR_ERR(rqd);
+-		goto fail_free_meta;
+-	}
+-
+ 	bio = pblk_bio_map_addr(pblk, data, rq_ppas, rq_len,
+ 						PBLK_VMALLOC_META, GFP_KERNEL);
+ 	if (IS_ERR(bio)) {
+ 		ret = PTR_ERR(bio);
+-		goto fail_free_rqd;
++		goto fail_free_meta;
+ 	}
+ 
+ 	bio->bi_iter.bi_sector = 0; /* internal bio */
+ 	bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
+ 
++	rqd = pblk_alloc_rqd(pblk, WRITE);
++
+ 	rqd->bio = bio;
+ 	rqd->opcode = NVM_OP_PWRITE;
+ 	rqd->flags = pblk_set_progr_mode(pblk, WRITE);
+@@ -490,8 +477,6 @@ static int pblk_recov_pad_oob(struct pblk *pblk, struct pblk_line *line,
+ 
+ fail_free_bio:
+ 	bio_put(bio);
+-fail_free_rqd:
+-	pblk_free_rqd(pblk, rqd, WRITE);
+ fail_free_meta:
+ 	nvm_dev_dma_free(dev->parent, meta_list, dma_meta_list);
+ fail_free_pad:
+@@ -785,15 +770,9 @@ static int pblk_recov_l2p_from_oob(struct pblk *pblk, struct pblk_line *line)
+ 	dma_addr_t dma_ppa_list, dma_meta_list;
+ 	int done, ret = 0;
+ 
+-	rqd = pblk_alloc_rqd(pblk, READ);
+-	if (IS_ERR(rqd))
+-		return PTR_ERR(rqd);
+-
+ 	meta_list = nvm_dev_dma_alloc(dev->parent, GFP_KERNEL, &dma_meta_list);
+-	if (!meta_list) {
+-		ret = -ENOMEM;
+-		goto free_rqd;
+-	}
++	if (!meta_list)
++		return -ENOMEM;
+ 
+ 	ppa_list = (void *)(meta_list) + pblk_dma_meta_size;
+ 	dma_ppa_list = dma_meta_list + pblk_dma_meta_size;
+@@ -804,6 +783,8 @@ static int pblk_recov_l2p_from_oob(struct pblk *pblk, struct pblk_line *line)
+ 		goto free_meta_list;
+ 	}
+ 
++	rqd = pblk_alloc_rqd(pblk, READ);
++
+ 	p.ppa_list = ppa_list;
+ 	p.meta_list = meta_list;
+ 	p.rqd = rqd;
+@@ -832,8 +813,6 @@ static int pblk_recov_l2p_from_oob(struct pblk *pblk, struct pblk_line *line)
+ 	kfree(data);
+ free_meta_list:
+ 	nvm_dev_dma_free(dev->parent, meta_list, dma_meta_list);
+-free_rqd:
+-	pblk_free_rqd(pblk, rqd, READ);
+ 
+ 	return ret;
  }
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index 26c2b83..0fb8f26 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -111,10 +111,7 @@ static void pblk_end_w_fail(struct pblk *pblk, struct nvm_rq *rqd)
+ 		ppa_list = &rqd->ppa_addr;
  
-+/*
-+ * Ensure that neither resyncing nor reshaping occurs while the system is
-+ * frozen.
-+ */
-+static int md_notify_pm(struct notifier_block *bl, unsigned long state,
-+			void *unused)
-+{
-+	pr_debug("%s: state = %ld\n", __func__, state);
+ 	recovery = mempool_alloc(pblk->rec_pool, GFP_ATOMIC);
+-	if (!recovery) {
+-		pr_err("pblk: could not allocate recovery context\n");
+-		return;
+-	}
 +
-+	switch (state) {
-+	case PM_HIBERNATION_PREPARE:
-+	case PM_SUSPEND_PREPARE:
-+	case PM_RESTORE_PREPARE:
-+		md_stop_all_writes();
-+		break;
-+	}
-+	return NOTIFY_DONE;
-+}
+ 	INIT_LIST_HEAD(&recovery->failed);
+ 
+ 	bit = -1;
+@@ -375,10 +372,7 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
+ 	int ret;
+ 
+ 	rqd = pblk_alloc_rqd(pblk, READ);
+-	if (IS_ERR(rqd)) {
+-		pr_err("pblk: cannot allocate write req.\n");
+-		return PTR_ERR(rqd);
+-	}
 +
-+static struct notifier_block md_pm_notifier = {
-+	.notifier_call	= md_notify_pm,
-+};
+ 	m_ctx = nvm_rq_to_pdu(rqd);
+ 	m_ctx->private = meta_line;
+ 
+@@ -546,19 +540,12 @@ static int pblk_submit_write(struct pblk *pblk)
+ 	if (!secs_to_flush && secs_avail < pblk->min_write_pgs)
+ 		return 1;
+ 
+-	rqd = pblk_alloc_rqd(pblk, WRITE);
+-	if (IS_ERR(rqd)) {
+-		pr_err("pblk: cannot allocate write req.\n");
+-		return 1;
+-	}
+-
+ 	bio = bio_alloc(GFP_KERNEL, pblk->max_write_pgs);
+-	if (!bio) {
+-		pr_err("pblk: cannot allocate write bio\n");
+-		goto fail_free_rqd;
+-	}
 +
- static int md_notify_reboot(struct notifier_block *this,
- 			    unsigned long code, void *x)
- {
-@@ -9009,6 +9035,7 @@ static int __init md_init(void)
- 			    md_probe, NULL, NULL);
+ 	bio->bi_iter.bi_sector = 0; /* internal bio */
+ 	bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
++
++	rqd = pblk_alloc_rqd(pblk, WRITE);
+ 	rqd->bio = bio;
  
- 	register_reboot_notifier(&md_reboot_notifier);
-+	register_pm_notifier(&md_pm_notifier);
- 	raid_table_header = register_sysctl_table(raid_root_table);
+ 	secs_to_sync = pblk_calc_secs_to_sync(pblk, secs_avail, secs_to_flush);
+@@ -589,7 +576,6 @@ static int pblk_submit_write(struct pblk *pblk)
+ 	pblk_free_write_rqd(pblk, rqd);
+ fail_put_bio:
+ 	bio_put(bio);
+-fail_free_rqd:
+ 	pblk_free_rqd(pblk, rqd, WRITE);
  
- 	md_geninit();
-@@ -9248,6 +9275,7 @@ static __exit void md_exit(void)
- 
- 	unregister_blkdev(MD_MAJOR,"md");
- 	unregister_blkdev(mdp_major, "mdp");
-+	unregister_pm_notifier(&md_pm_notifier);
- 	unregister_reboot_notifier(&md_reboot_notifier);
- 	unregister_sysctl_table(raid_table_header);
- 
+ 	return 1;
 -- 
-2.14.2
+2.9.3
