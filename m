@@ -1,71 +1,256 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:46125 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751194AbdJCJLa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2017 05:11:30 -0400
-Date: Tue, 3 Oct 2017 02:11:28 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>
-Subject: Re: [PATCH V5 7/7] blk-mq-sched: don't dequeue request until all in
- ->dispatch are flushed
-Message-ID: <20171003091128.GD21184@infradead.org>
-References: <20170930102720.30219-1-ming.lei@redhat.com>
- <20170930102720.30219-8-ming.lei@redhat.com>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:43450 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1758295AbdJMMrm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 08:47:42 -0400
+Received: by mail-wm0-f66.google.com with SMTP id m72so28050289wmc.0
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:42 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 36/58] lightnvm: pblk: remove I/O dependency on write path
+Date: Fri, 13 Oct 2017 14:46:25 +0200
+Message-Id: <20171013124647.32668-37-m@bjorling.me>
+In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
+References: <20171013124647.32668-1-m@bjorling.me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170930102720.30219-8-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This looks good in general:
+From: Javier González <javier@cnexlabs.com>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+pblk schedules user I/O, metadata I/O and erases on the write path in
+order to minimize collisions at the media level. Until now, there has
+been a dependency between user and metadata I/Os that could lead to a
+deadlock as both take the per-LUN semaphore to schedule submission.
 
-Minor nitpicks below:
+This path removes this dependency and guarantees forward progress at a
+per I/O granurality.
 
->  	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
+---
+ drivers/lightnvm/pblk-write.c | 145 +++++++++++++++++++-----------------------
+ 1 file changed, 65 insertions(+), 80 deletions(-)
 
-This is now only tested once, so you can remove the local variable
-for it.
-
-> +		/*
-> +		 * We may clear DISPATCH_BUSY just after it
-> +		 * is set from another context, the only cost
-> +		 * is that one request is dequeued a bit early,
-> +		 * we can survive that. Given the window is
-> +		 * small enough, no need to worry about performance
-> +		 * effect.
-> +		 */
-
-Use your 80 line real estate for comments please.
-
->  	if (!has_sched_dispatch)
-> +		if (!q->queue_depth) {
-> +			blk_mq_flush_busy_ctxs(hctx, &rq_list);
-> +			blk_mq_dispatch_rq_list(q, &rq_list);
-> +		} else {
-> +			blk_mq_do_dispatch_ctx(q, hctx);
-> +		}
-> +	} else {
->  		blk_mq_do_dispatch_sched(q, e, hctx);
-> +	}
-
-Maybe flatten this out to:
-
-	if (e && e->type->ops.mq.dispatch_request) {
-		blk_mq_do_dispatch_sched(q, e, hctx);
-	} else if (q->queue_depth) {
-		blk_mq_do_dispatch_ctx(q, hctx);
-	} else {
-		blk_mq_flush_busy_ctxs(hctx, &rq_list);
-		blk_mq_dispatch_rq_list(q, &rq_list);
-	}
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index f2e846f..6c1cafa 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -220,15 +220,16 @@ static int pblk_alloc_w_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ }
+ 
+ static int pblk_setup_w_rq(struct pblk *pblk, struct nvm_rq *rqd,
+-			   struct pblk_c_ctx *c_ctx, struct ppa_addr *erase_ppa)
++			   struct ppa_addr *erase_ppa)
+ {
+ 	struct pblk_line_meta *lm = &pblk->lm;
+ 	struct pblk_line *e_line = pblk_line_get_erase(pblk);
++	struct pblk_c_ctx *c_ctx = nvm_rq_to_pdu(rqd);
+ 	unsigned int valid = c_ctx->nr_valid;
+ 	unsigned int padded = c_ctx->nr_padded;
+ 	unsigned int nr_secs = valid + padded;
+ 	unsigned long *lun_bitmap;
+-	int ret = 0;
++	int ret;
+ 
+ 	lun_bitmap = kzalloc(lm->lun_bitmap_len, GFP_KERNEL);
+ 	if (!lun_bitmap)
+@@ -294,55 +295,6 @@ static int pblk_calc_secs_to_sync(struct pblk *pblk, unsigned int secs_avail,
+ 	return secs_to_sync;
+ }
+ 
+-static inline int pblk_valid_meta_ppa(struct pblk *pblk,
+-				      struct pblk_line *meta_line,
+-				      struct ppa_addr *ppa_list, int nr_ppas)
+-{
+-	struct nvm_tgt_dev *dev = pblk->dev;
+-	struct nvm_geo *geo = &dev->geo;
+-	struct pblk_line *data_line;
+-	struct ppa_addr ppa, ppa_opt;
+-	u64 paddr;
+-	int i;
+-
+-	data_line = &pblk->lines[pblk_dev_ppa_to_line(ppa_list[0])];
+-	paddr = pblk_lookup_page(pblk, meta_line);
+-	ppa = addr_to_gen_ppa(pblk, paddr, 0);
+-
+-	if (test_bit(pblk_ppa_to_pos(geo, ppa), data_line->blk_bitmap))
+-		return 1;
+-
+-	/* Schedule a metadata I/O that is half the distance from the data I/O
+-	 * with regards to the number of LUNs forming the pblk instance. This
+-	 * balances LUN conflicts across every I/O.
+-	 *
+-	 * When the LUN configuration changes (e.g., due to GC), this distance
+-	 * can align, which would result on a LUN deadlock. In this case, modify
+-	 * the distance to not be optimal, but allow metadata I/Os to succeed.
+-	 */
+-	ppa_opt = addr_to_gen_ppa(pblk, paddr + data_line->meta_distance, 0);
+-	if (unlikely(ppa_opt.ppa == ppa.ppa)) {
+-		data_line->meta_distance--;
+-		return 0;
+-	}
+-
+-	for (i = 0; i < nr_ppas; i += pblk->min_write_pgs)
+-		if (ppa_list[i].g.ch == ppa_opt.g.ch &&
+-					ppa_list[i].g.lun == ppa_opt.g.lun)
+-			return 1;
+-
+-	if (test_bit(pblk_ppa_to_pos(geo, ppa_opt), data_line->blk_bitmap)) {
+-		for (i = 0; i < nr_ppas; i += pblk->min_write_pgs)
+-			if (ppa_list[i].g.ch == ppa.g.ch &&
+-						ppa_list[i].g.lun == ppa.g.lun)
+-				return 0;
+-
+-		return 1;
+-	}
+-
+-	return 0;
+-}
+-
+ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
+ {
+ 	struct nvm_tgt_dev *dev = pblk->dev;
+@@ -421,8 +373,44 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
+ 	return ret;
+ }
+ 
+-static int pblk_sched_meta_io(struct pblk *pblk, struct ppa_addr *prev_list,
+-			       int prev_n)
++static inline bool pblk_valid_meta_ppa(struct pblk *pblk,
++				       struct pblk_line *meta_line,
++				       struct nvm_rq *data_rqd)
++{
++	struct nvm_tgt_dev *dev = pblk->dev;
++	struct nvm_geo *geo = &dev->geo;
++	struct pblk_c_ctx *data_c_ctx = nvm_rq_to_pdu(data_rqd);
++	struct pblk_line *data_line = pblk_line_get_data(pblk);
++	struct ppa_addr ppa, ppa_opt;
++	u64 paddr;
++	int pos_opt;
++
++	/* Schedule a metadata I/O that is half the distance from the data I/O
++	 * with regards to the number of LUNs forming the pblk instance. This
++	 * balances LUN conflicts across every I/O.
++	 *
++	 * When the LUN configuration changes (e.g., due to GC), this distance
++	 * can align, which would result on metadata and data I/Os colliding. In
++	 * this case, modify the distance to not be optimal, but move the
++	 * optimal in the right direction.
++	 */
++	paddr = pblk_lookup_page(pblk, meta_line);
++	ppa = addr_to_gen_ppa(pblk, paddr, 0);
++	ppa_opt = addr_to_gen_ppa(pblk, paddr + data_line->meta_distance, 0);
++	pos_opt = pblk_ppa_to_pos(geo, ppa_opt);
++
++	if (test_bit(pos_opt, data_c_ctx->lun_bitmap) ||
++				test_bit(pos_opt, data_line->blk_bitmap))
++		return true;
++
++	if (unlikely(pblk_ppa_comp(ppa_opt, ppa)))
++		data_line->meta_distance--;
++
++	return false;
++}
++
++static struct pblk_line *pblk_should_submit_meta_io(struct pblk *pblk,
++						    struct nvm_rq *data_rqd)
+ {
+ 	struct pblk_line_meta *lm = &pblk->lm;
+ 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+@@ -432,57 +420,45 @@ static int pblk_sched_meta_io(struct pblk *pblk, struct ppa_addr *prev_list,
+ retry:
+ 	if (list_empty(&l_mg->emeta_list)) {
+ 		spin_unlock(&l_mg->close_lock);
+-		return 0;
++		return NULL;
+ 	}
+ 	meta_line = list_first_entry(&l_mg->emeta_list, struct pblk_line, list);
+ 	if (meta_line->emeta->mem >= lm->emeta_len[0])
+ 		goto retry;
+ 	spin_unlock(&l_mg->close_lock);
+ 
+-	if (!pblk_valid_meta_ppa(pblk, meta_line, prev_list, prev_n))
+-		return 0;
++	if (!pblk_valid_meta_ppa(pblk, meta_line, data_rqd))
++		return NULL;
+ 
+-	return pblk_submit_meta_io(pblk, meta_line);
++	return meta_line;
+ }
+ 
+ static int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd)
+ {
+-	struct pblk_c_ctx *c_ctx = nvm_rq_to_pdu(rqd);
+ 	struct ppa_addr erase_ppa;
++	struct pblk_line *meta_line;
+ 	int err;
+ 
+ 	ppa_set_empty(&erase_ppa);
+ 
+ 	/* Assign lbas to ppas and populate request structure */
+-	err = pblk_setup_w_rq(pblk, rqd, c_ctx, &erase_ppa);
++	err = pblk_setup_w_rq(pblk, rqd, &erase_ppa);
+ 	if (err) {
+ 		pr_err("pblk: could not setup write request: %d\n", err);
+ 		return NVM_IO_ERR;
+ 	}
+ 
+-	if (likely(ppa_empty(erase_ppa))) {
+-		/* Submit metadata write for previous data line */
+-		err = pblk_sched_meta_io(pblk, rqd->ppa_list, rqd->nr_ppas);
+-		if (err) {
+-			pr_err("pblk: metadata I/O submission failed: %d", err);
+-			return NVM_IO_ERR;
+-		}
++	meta_line = pblk_should_submit_meta_io(pblk, rqd);
+ 
+-		/* Submit data write for current data line */
+-		err = pblk_submit_io(pblk, rqd);
+-		if (err) {
+-			pr_err("pblk: data I/O submission failed: %d\n", err);
+-			return NVM_IO_ERR;
+-		}
+-	} else {
+-		/* Submit data write for current data line */
+-		err = pblk_submit_io(pblk, rqd);
+-		if (err) {
+-			pr_err("pblk: data I/O submission failed: %d\n", err);
+-			return NVM_IO_ERR;
+-		}
++	/* Submit data write for current data line */
++	err = pblk_submit_io(pblk, rqd);
++	if (err) {
++		pr_err("pblk: data I/O submission failed: %d\n", err);
++		return NVM_IO_ERR;
++	}
+ 
+-		/* Submit available erase for next data line */
++	if (!ppa_empty(erase_ppa)) {
++		/* Submit erase for next data line */
+ 		if (pblk_blk_erase_async(pblk, erase_ppa)) {
+ 			struct pblk_line *e_line = pblk_line_get_erase(pblk);
+ 			struct nvm_tgt_dev *dev = pblk->dev;
+@@ -495,6 +471,15 @@ static int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd)
+ 		}
+ 	}
+ 
++	if (meta_line) {
++		/* Submit metadata write for previous data line */
++		err = pblk_submit_meta_io(pblk, meta_line);
++		if (err) {
++			pr_err("pblk: metadata I/O submission failed: %d", err);
++			return NVM_IO_ERR;
++		}
++	}
++
+ 	return NVM_IO_OK;
+ }
+ 
+-- 
+2.9.3
