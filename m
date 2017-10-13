@@ -1,111 +1,42 @@
-Return-Path: <prvs=45557a1c1=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-crypto@vger.kernel.org,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	"Nicholas A . Bellinger" <nab@linux-iscsi.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Hannes Reinecke <hare@suse.com>,
-	Sagi Grimberg <sagi@grimberg.me>
-Subject: [PATCH v2 5/8] target: Use sgl_alloc_order() and sgl_free()
-Date: Mon, 16 Oct 2017 15:49:37 -0700
-Message-Id: <20171016224940.1332-6-bart.vanassche@wdc.com>
-In-Reply-To: <20171016224940.1332-1-bart.vanassche@wdc.com>
-References: <20171016224940.1332-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:48323 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752468AbdJMXgS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 19:36:18 -0400
+Received: by mail-pg0-f66.google.com with SMTP id v78so2337075pgb.5
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 16:36:18 -0700 (PDT)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Michael Lyle <mlyle@lyle.org>
+Subject: [PATCH 15/15] bcache: MAINTAINERS: set bcache to MAINTAINED
+Date: Fri, 13 Oct 2017 16:35:42 -0700
+Message-Id: <20171013233542.20938-16-mlyle@lyle.org>
+In-Reply-To: <20171013233542.20938-1-mlyle@lyle.org>
+References: <20171013233542.20938-1-mlyle@lyle.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Use the sgl_alloc_order() and sgl_free() functions instead of open
-coding these functions.
+Also add URL for IRC channel.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Nicholas A. Bellinger <nab@linux-iscsi.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>
+Signed-off-by: Michael Lyle <mlyle@lyle.org>
 ---
- drivers/target/Kconfig                 |  1 +
- drivers/target/target_core_transport.c | 46 +++-------------------------------
- 2 files changed, 5 insertions(+), 42 deletions(-)
+ MAINTAINERS | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/target/Kconfig b/drivers/target/Kconfig
-index e2bc99980f75..4c44d7bed01a 100644
---- a/drivers/target/Kconfig
-+++ b/drivers/target/Kconfig
-@@ -5,6 +5,7 @@ menuconfig TARGET_CORE
- 	select CONFIGFS_FS
- 	select CRC_T10DIF
- 	select BLK_SCSI_REQUEST # only for scsi_command_size_tbl..
-+	select SGL_ALLOC
- 	default n
- 	help
- 	Say Y or M here to enable the TCM Storage Engine and ConfigFS enabled
-diff --git a/drivers/target/target_core_transport.c b/drivers/target/target_core_transport.c
-index 836d552b0385..9bbd08be9d60 100644
---- a/drivers/target/target_core_transport.c
-+++ b/drivers/target/target_core_transport.c
-@@ -2293,13 +2293,7 @@ static void target_complete_ok_work(struct work_struct *work)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 73213039bdb7..b3203e082a1e 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2568,7 +2568,8 @@ M:	Michael Lyle <mlyle@lyle.org>
+ M:	Kent Overstreet <kent.overstreet@gmail.com>
+ L:	linux-bcache@vger.kernel.org
+ W:	http://bcache.evilpiepirate.org
+-S:	Orphan
++C:	irc://irc.oftc.net/bcache
++S:	Maintained
+ F:	drivers/md/bcache/
  
- void target_free_sgl(struct scatterlist *sgl, int nents)
- {
--	struct scatterlist *sg;
--	int count;
--
--	for_each_sg(sgl, sg, nents, count)
--		__free_page(sg_page(sg));
--
--	kfree(sgl);
-+	sgl_free(sgl);
- }
- EXPORT_SYMBOL(target_free_sgl);
- 
-@@ -2423,42 +2417,10 @@ int
- target_alloc_sgl(struct scatterlist **sgl, unsigned int *nents, u32 length,
- 		 bool zero_page, bool chainable)
- {
--	struct scatterlist *sg;
--	struct page *page;
--	gfp_t zero_flag = (zero_page) ? __GFP_ZERO : 0;
--	unsigned int nalloc, nent;
--	int i = 0;
--
--	nalloc = nent = DIV_ROUND_UP(length, PAGE_SIZE);
--	if (chainable)
--		nalloc++;
--	sg = kmalloc_array(nalloc, sizeof(struct scatterlist), GFP_KERNEL);
--	if (!sg)
--		return -ENOMEM;
-+	gfp_t gfp = GFP_KERNEL | (zero_page ? __GFP_ZERO : 0);
- 
--	sg_init_table(sg, nalloc);
--
--	while (length) {
--		u32 page_len = min_t(u32, length, PAGE_SIZE);
--		page = alloc_page(GFP_KERNEL | zero_flag);
--		if (!page)
--			goto out;
--
--		sg_set_page(&sg[i], page, page_len, 0);
--		length -= page_len;
--		i++;
--	}
--	*sgl = sg;
--	*nents = nent;
--	return 0;
--
--out:
--	while (i > 0) {
--		i--;
--		__free_page(sg_page(&sg[i]));
--	}
--	kfree(sg);
--	return -ENOMEM;
-+	*sgl = sgl_alloc_order(length, 0, chainable, gfp, nents);
-+	return *sgl ? 0 : -ENOMEM;
- }
- EXPORT_SYMBOL(target_alloc_sgl);
- 
+ BDISP ST MEDIA DRIVER
 -- 
-2.14.2
+2.11.0
