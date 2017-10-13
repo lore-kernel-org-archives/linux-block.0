@@ -1,35 +1,75 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH V8 1/7] blk-mq-sched: fix scheduler bad performance
-To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
- Christoph Hellwig <hch@infradead.org>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
 Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
- Laurence Oberman <loberman@redhat.com>,
- Paolo Valente <paolo.valente@linaro.org>,
- Oleksandr Natalenko <oleksandr@natalenko.name>,
- Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
- linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
- John Garry <john.garry@huawei.com>
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        John Garry <john.garry@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V8 1/7] blk-mq-sched: fix scheduler bad performance
+Date: Sat, 14 Oct 2017 01:24:53 +0800
+Message-Id: <20171013172459.1376-2-ming.lei@redhat.com>
+In-Reply-To: <20171013172459.1376-1-ming.lei@redhat.com>
 References: <20171013172459.1376-1-ming.lei@redhat.com>
- <20171013172459.1376-2-ming.lei@redhat.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <a6bbbd2d-3469-129e-2bae-82fa7efb29f1@kernel.dk>
-Date: Fri, 13 Oct 2017 11:30:16 -0600
-MIME-Version: 1.0
-In-Reply-To: <20171013172459.1376-2-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/13/2017 11:24 AM, Ming Lei wrote:
-> When hw queue is busy, we shouldn't take requests from
-> scheduler queue any more, otherwise it is difficult to do
-> IO merge.
-> 
-> This patch fixes the awful IO performance on some
-> SCSI devices(lpfc, qla2xxx, ...) when mq-deadline/kyber
-> is used by not taking requests if hw queue is busy.
+When hw queue is busy, we shouldn't take requests from
+scheduler queue any more, otherwise it is difficult to do
+IO merge.
 
-This looks fine to me, but needs a much better patch title.
-"fix scheduler bad performance" tells you nothing.
+This patch fixes the awful IO performance on some
+SCSI devices(lpfc, qla2xxx, ...) when mq-deadline/kyber
+is used by not taking requests if hw queue is busy.
 
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-sched.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 4ab69435708c..eca011fdfa0e 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -94,7 +94,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	struct request_queue *q = hctx->queue;
+ 	struct elevator_queue *e = q->elevator;
+ 	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
+-	bool did_work = false;
++	bool do_sched_dispatch = true;
+ 	LIST_HEAD(rq_list);
+ 
+ 	/* RCU or SRCU read lock is needed before checking quiesced flag */
+@@ -125,18 +125,18 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	 */
+ 	if (!list_empty(&rq_list)) {
+ 		blk_mq_sched_mark_restart_hctx(hctx);
+-		did_work = blk_mq_dispatch_rq_list(q, &rq_list);
++		do_sched_dispatch = blk_mq_dispatch_rq_list(q, &rq_list);
+ 	} else if (!has_sched_dispatch) {
+ 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+ 		blk_mq_dispatch_rq_list(q, &rq_list);
+ 	}
+ 
+ 	/*
+-	 * We want to dispatch from the scheduler if we had no work left
+-	 * on the dispatch list, OR if we did have work but weren't able
+-	 * to make progress.
++	 * We want to dispatch from the scheduler if there was nothing
++	 * on the dispatch list or we were able to dispatch from the
++	 * dispatch list.
+ 	 */
+-	if (!did_work && has_sched_dispatch) {
++	if (do_sched_dispatch && has_sched_dispatch) {
+ 		do {
+ 			struct request *rq;
+ 
 -- 
-Jens Axboe
+2.9.5
