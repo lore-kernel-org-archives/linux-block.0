@@ -1,144 +1,88 @@
-Return-Path: <prvs=451f24578=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Keith Busch <keith.busch@intel.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>
-Subject: [PATCH 4/8] nvmet/rdma: Use sgl_alloc() and sgl_free()
-Date: Thu, 12 Oct 2017 15:45:46 -0700
-Message-Id: <20171012224550.25440-5-bart.vanassche@wdc.com>
-In-Reply-To: <20171012224550.25440-1-bart.vanassche@wdc.com>
-References: <20171012224550.25440-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:47454 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932292AbdJMMrz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 08:47:55 -0400
+Received: by mail-wm0-f65.google.com with SMTP id t69so21256306wmt.2
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:54 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 50/58] lightnvm: pblk: shut down gc gracefully during exit
+Date: Fri, 13 Oct 2017 14:46:39 +0200
+Message-Id: <20171013124647.32668-51-m@bjorling.me>
+In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
+References: <20171013124647.32668-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Use the sgl_alloc() and sgl_free() functions instead of open coding
-these functions.
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Keith Busch <keith.busch@intel.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
+Shut down the GC workqueues and tasks in the right order.
+
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- drivers/nvme/target/Kconfig |  1 +
- drivers/nvme/target/rdma.c  | 64 ++++-----------------------------------------
- 2 files changed, 6 insertions(+), 59 deletions(-)
+ drivers/lightnvm/pblk-gc.c | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/nvme/target/Kconfig b/drivers/nvme/target/Kconfig
-index 4d9715630e21..5f4f8b16685f 100644
---- a/drivers/nvme/target/Kconfig
-+++ b/drivers/nvme/target/Kconfig
-@@ -29,6 +29,7 @@ config NVME_TARGET_RDMA
- 	tristate "NVMe over Fabrics RDMA target support"
- 	depends on INFINIBAND
- 	depends on NVME_TARGET
-+	select SGL_ALLOC
- 	help
- 	  This enables the NVMe RDMA target support, which allows exporting NVMe
- 	  devices over RDMA.
-diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
-index 76d2bb793afe..bec0c8421b69 100644
---- a/drivers/nvme/target/rdma.c
-+++ b/drivers/nvme/target/rdma.c
-@@ -23,6 +23,7 @@
- #include <linux/string.h>
- #include <linux/wait.h>
- #include <linux/inet.h>
-+#include <linux/sgl_alloc.h>
- #include <asm/unaligned.h>
+diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
+index 4bac9e1..e00e5a0 100644
+--- a/drivers/lightnvm/pblk-gc.c
++++ b/drivers/lightnvm/pblk-gc.c
+@@ -422,10 +422,15 @@ void pblk_gc_kick(struct pblk *pblk)
+ {
+ 	struct pblk_gc *gc = &pblk->gc;
  
- #include <rdma/ib_verbs.h>
-@@ -185,59 +186,6 @@ nvmet_rdma_put_rsp(struct nvmet_rdma_rsp *rsp)
- 	spin_unlock_irqrestore(&rsp->queue->rsps_lock, flags);
+-	wake_up_process(gc->gc_ts);
+ 	pblk_gc_writer_kick(gc);
+ 	pblk_gc_reader_kick(gc);
+-	mod_timer(&gc->gc_timer, jiffies + msecs_to_jiffies(GC_TIME_MSECS));
++
++	/* If we're shutting down GC, let's not start it up again */
++	if (gc->gc_enabled) {
++		wake_up_process(gc->gc_ts);
++		mod_timer(&gc->gc_timer,
++			  jiffies + msecs_to_jiffies(GC_TIME_MSECS));
++	}
  }
  
--static void nvmet_rdma_free_sgl(struct scatterlist *sgl, unsigned int nents)
--{
--	struct scatterlist *sg;
--	int count;
--
--	if (!sgl || !nents)
--		return;
--
--	for_each_sg(sgl, sg, nents, count)
--		__free_page(sg_page(sg));
--	kfree(sgl);
--}
--
--static int nvmet_rdma_alloc_sgl(struct scatterlist **sgl, unsigned int *nents,
--		u32 length)
--{
--	struct scatterlist *sg;
--	struct page *page;
--	unsigned int nent;
--	int i = 0;
--
--	nent = DIV_ROUND_UP(length, PAGE_SIZE);
--	sg = kmalloc_array(nent, sizeof(struct scatterlist), GFP_KERNEL);
--	if (!sg)
--		goto out;
--
--	sg_init_table(sg, nent);
--
--	while (length) {
--		u32 page_len = min_t(u32, length, PAGE_SIZE);
--
--		page = alloc_page(GFP_KERNEL);
--		if (!page)
--			goto out_free_pages;
--
--		sg_set_page(&sg[i], page, page_len, 0);
--		length -= page_len;
--		i++;
--	}
--	*sgl = sg;
--	*nents = nent;
--	return 0;
--
--out_free_pages:
--	while (i > 0) {
--		i--;
--		__free_page(sg_page(&sg[i]));
--	}
--	kfree(sg);
--out:
--	return NVME_SC_INTERNAL;
--}
--
- static int nvmet_rdma_alloc_cmd(struct nvmet_rdma_device *ndev,
- 			struct nvmet_rdma_cmd *c, bool admin)
+ static void pblk_gc_timer(unsigned long data)
+@@ -630,9 +635,6 @@ void pblk_gc_exit(struct pblk *pblk)
  {
-@@ -484,7 +432,7 @@ static void nvmet_rdma_release_rsp(struct nvmet_rdma_rsp *rsp)
- 	}
+ 	struct pblk_gc *gc = &pblk->gc;
  
- 	if (rsp->req.sg != &rsp->cmd->inline_sg)
--		nvmet_rdma_free_sgl(rsp->req.sg, rsp->req.sg_cnt);
-+		sgl_free(rsp->req.sg);
+-	flush_workqueue(gc->gc_reader_wq);
+-	flush_workqueue(gc->gc_line_reader_wq);
+-
+ 	gc->gc_enabled = 0;
+ 	del_timer_sync(&gc->gc_timer);
+ 	pblk_gc_stop(pblk, 1);
+@@ -640,15 +642,17 @@ void pblk_gc_exit(struct pblk *pblk)
+ 	if (gc->gc_ts)
+ 		kthread_stop(gc->gc_ts);
  
- 	if (unlikely(!list_empty_careful(&queue->rsp_wr_wait_list)))
- 		nvmet_rdma_process_wr_wait_list(queue);
-@@ -620,16 +568,14 @@ static u16 nvmet_rdma_map_sgl_keyed(struct nvmet_rdma_rsp *rsp,
- 	u32 len = get_unaligned_le24(sgl->length);
- 	u32 key = get_unaligned_le32(sgl->key);
- 	int ret;
--	u16 status;
++	if (gc->gc_reader_ts)
++		kthread_stop(gc->gc_reader_ts);
++
++	flush_workqueue(gc->gc_reader_wq);
+ 	if (gc->gc_reader_wq)
+ 		destroy_workqueue(gc->gc_reader_wq);
  
- 	/* no data command? */
- 	if (!len)
- 		return 0;
++	flush_workqueue(gc->gc_line_reader_wq);
+ 	if (gc->gc_line_reader_wq)
+ 		destroy_workqueue(gc->gc_line_reader_wq);
  
--	status = nvmet_rdma_alloc_sgl(&rsp->req.sg, &rsp->req.sg_cnt,
--			len);
--	if (status)
--		return status;
-+	rsp->req.sg = sgl_alloc(len, &rsp->req.sg_cnt, GFP_KERNEL);
-+	if (!rsp->req.sg)
-+		return NVME_SC_INTERNAL;
- 
- 	ret = rdma_rw_ctx_init(&rsp->rw, cm_id->qp, cm_id->port_num,
- 			rsp->req.sg, rsp->req.sg_cnt, 0, addr, key,
+ 	if (gc->gc_writer_ts)
+ 		kthread_stop(gc->gc_writer_ts);
+-
+-	if (gc->gc_reader_ts)
+-		kthread_stop(gc->gc_reader_ts);
+ }
 -- 
-2.14.2
+2.9.3
