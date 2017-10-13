@@ -1,60 +1,74 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:57232 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1758088AbdJMMrQ (ORCPT
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:54852 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753010AbdJMXgF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 08:47:16 -0400
-Received: by mail-wm0-f68.google.com with SMTP id l68so21509010wmd.5
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:15 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Rakesh Pandit <rakesh@tuxera.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 09/58] lightnvm: pblk: improve error message if down_timeout fails
-Date: Fri, 13 Oct 2017 14:45:58 +0200
-Message-Id: <20171013124647.32668-10-m@bjorling.me>
-In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
-References: <20171013124647.32668-1-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+        Fri, 13 Oct 2017 19:36:05 -0400
+Received: by mail-pg0-f65.google.com with SMTP id l24so2285314pgu.11
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 16:36:05 -0700 (PDT)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Eric Wheeler <bcache@linux.ewheeler.net>
+Subject: [PATCH 06/15] bcache: update bio->bi_opf bypass/writeback REQ_ flag hints
+Date: Fri, 13 Oct 2017 16:35:33 -0700
+Message-Id: <20171013233542.20938-7-mlyle@lyle.org>
+In-Reply-To: <20171013233542.20938-1-mlyle@lyle.org>
+References: <20171013233542.20938-1-mlyle@lyle.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Rakesh Pandit <rakesh@tuxera.com>
+From: Eric Wheeler <bcache@linux.ewheeler.net>
 
-The two pr_err messages are useless as they don't differentiate
-error code.
+Flag for bypass if the IO is for read-ahead or background, unless the
+read-ahead request is for metadata (eg, from gfs2).
+        Bypass if:
+                bio->bi_opf & (REQ_RAHEAD|REQ_BACKGROUND) &&
+			!(bio->bi_opf & REQ_META))
 
-Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
-Reviewed-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+        Writeback if:
+                op_is_sync(bio->bi_opf) ||
+			bio->bi_opf & (REQ_META|REQ_PRIO)
+
+Signed-off-by: Eric Wheeler <bcache@linux.ewheeler.net>
+Reviewed-by: Coly Li <colyli@suse.de>
 ---
- drivers/lightnvm/pblk-core.c | 12 ++----------
- 1 file changed, 2 insertions(+), 10 deletions(-)
+ drivers/md/bcache/request.c   | 8 ++++++++
+ drivers/md/bcache/writeback.h | 4 +++-
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index b53bb00..027c42b 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -1691,16 +1691,8 @@ static void __pblk_down_page(struct pblk *pblk, struct ppa_addr *ppa_list,
- #endif
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 681b4f12b05a..9ee137e8d387 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -384,6 +384,14 @@ static bool check_should_bypass(struct cached_dev *dc, struct bio *bio)
+ 	     op_is_write(bio_op(bio))))
+ 		goto skip;
  
- 	ret = down_timeout(&rlun->wr_sem, msecs_to_jiffies(30000));
--	if (ret) {
--		switch (ret) {
--		case -ETIME:
--			pr_err("pblk: lun semaphore timed out\n");
--			break;
--		case -EINTR:
--			pr_err("pblk: lun semaphore timed out\n");
--			break;
--		}
--	}
-+	if (ret == -ETIME || ret == -EINTR)
-+		pr_err("pblk: taking lun semaphore timed out: err %d\n", -ret);
++	/*
++	 * Flag for bypass if the IO is for read-ahead or background,
++	 * unless the read-ahead request is for metadata (eg, for gfs2).
++	 */
++	if (bio->bi_opf & (REQ_RAHEAD|REQ_BACKGROUND) &&
++	    !(bio->bi_opf & REQ_META))
++		goto skip;
++
+ 	if (bio->bi_iter.bi_sector & (c->sb.block_size - 1) ||
+ 	    bio_sectors(bio) & (c->sb.block_size - 1)) {
+ 		pr_debug("skipping unaligned io");
+diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
+index e35421d20d2e..34bcf49d737b 100644
+--- a/drivers/md/bcache/writeback.h
++++ b/drivers/md/bcache/writeback.h
+@@ -76,7 +76,9 @@ static inline bool should_writeback(struct cached_dev *dc, struct bio *bio,
+ 	if (would_skip)
+ 		return false;
+ 
+-	return op_is_sync(bio->bi_opf) || in_use <= CUTOFF_WRITEBACK;
++	return (op_is_sync(bio->bi_opf) ||
++		bio->bi_opf & (REQ_META|REQ_PRIO) ||
++		in_use <= CUTOFF_WRITEBACK);
  }
  
- void pblk_down_page(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas)
+ static inline void bch_writeback_queue(struct cached_dev *dc)
 -- 
-2.9.3
+2.11.0
