@@ -1,68 +1,240 @@
-Return-Path: <prvs=441412a59=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V6 04/14] scsi: sd_zbc: Use well defined macros
-Date: Mon,  2 Oct 2017 16:15:25 +0900
-Message-Id: <20171002071535.8007-5-damien.lemoal@wdc.com>
-In-Reply-To: <20171002071535.8007-1-damien.lemoal@wdc.com>
-References: <20171002071535.8007-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:49757 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1758283AbdJMMrj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 08:47:39 -0400
+Received: by mail-wm0-f66.google.com with SMTP id b189so21115651wmd.4
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:39 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 33/58] lightnvm: pblk: check lba sanity on read path
+Date: Fri, 13 Oct 2017 14:46:22 +0200
+Message-Id: <20171013124647.32668-34-m@bjorling.me>
+In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
+References: <20171013124647.32668-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-instead of open coding, use the min() macro to calculate a report zones
-reply buffer length in sd_zbc_check_zone_size() and the round_up()
-macro for calculating the number of zones in sd_zbc_setup().
+From: Javier González <javier@cnexlabs.com>
 
-No functional change is introduced by this patch.
+As part of pblk's recovery scheme, we store the lba mapped to each
+physical sector on the device's out-of-bound (OOB) area.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+On the read path, we can use this information to validate that the data
+being delivered to the upper layers corresponds to the lba being
+requested. The cost of this check is an extra copy on the DMA region on
+the device and an extra comparison in the host, given that (i) the OOB
+area is being read together with the data in the media, and (ii) the DMA
+region allocated for the ppa list can be reused for the metadata stored
+on the OOB area.
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- drivers/scsi/sd_zbc.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+ drivers/lightnvm/pblk-read.c | 51 +++++++++++++++++++++++++++++++++++++++++---
+ drivers/lightnvm/pblk.h      |  4 +++-
+ 2 files changed, 51 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index 7dbaf920679e..bbad851c1789 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -475,7 +475,7 @@ static int sd_zbc_check_capacity(struct scsi_disk *sdkp, unsigned char *buf)
- 	return 0;
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index 0299fc0..a465d99 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -41,6 +41,7 @@ static int pblk_read_from_cache(struct pblk *pblk, struct bio *bio,
+ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 				 sector_t blba, unsigned long *read_bitmap)
+ {
++	struct pblk_sec_meta *meta_list = rqd->meta_list;
+ 	struct bio *bio = rqd->bio;
+ 	struct ppa_addr ppas[PBLK_MAX_REQ_ADDRS];
+ 	int nr_secs = rqd->nr_ppas;
+@@ -56,6 +57,7 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ retry:
+ 		if (pblk_ppa_empty(p)) {
+ 			WARN_ON(test_and_set_bit(i, read_bitmap));
++			meta_list[i].lba = cpu_to_le64(ADDR_EMPTY);
+ 
+ 			if (unlikely(!advanced_bio)) {
+ 				bio_advance(bio, (i) * PBLK_EXPOSED_PAGE_SIZE);
+@@ -75,6 +77,7 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 				goto retry;
+ 			}
+ 			WARN_ON(test_and_set_bit(i, read_bitmap));
++			meta_list[i].lba = cpu_to_le64(lba);
+ 			advanced_bio = true;
+ #ifdef CONFIG_NVM_DEBUG
+ 			atomic_long_inc(&pblk->cache_reads);
+@@ -110,10 +113,26 @@ static int pblk_submit_read_io(struct pblk *pblk, struct nvm_rq *rqd)
+ 	return NVM_IO_OK;
  }
  
--#define SD_ZBC_BUF_SIZE 131072
-+#define SD_ZBC_BUF_SIZE 131072U
++static void pblk_read_check(struct pblk *pblk, struct nvm_rq *rqd,
++			   sector_t blba)
++{
++	struct pblk_sec_meta *meta_list = rqd->meta_list;
++	int nr_lbas = rqd->nr_ppas;
++	int i;
++
++	for (i = 0; i < nr_lbas; i++) {
++		u64 lba = le64_to_cpu(meta_list[i].lba);
++
++		if (lba == ADDR_EMPTY)
++			continue;
++
++		WARN(lba != blba + i, "pblk: corrupted read LBA\n");
++	}
++}
++
+ static void pblk_end_io_read(struct nvm_rq *rqd)
+ {
+ 	struct pblk *pblk = rqd->private;
+-	struct nvm_tgt_dev *dev = pblk->dev;
+ 	struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
+ 	struct bio *bio = rqd->bio;
  
- /**
-  * sd_zbc_check_zone_size - Check the device zone sizes
-@@ -526,10 +526,7 @@ static int sd_zbc_check_zone_size(struct scsi_disk *sdkp)
- 		/* Parse REPORT ZONES header */
- 		list_length = get_unaligned_be32(&buf[0]) + 64;
- 		rec = buf + 64;
--		if (list_length < SD_ZBC_BUF_SIZE)
--			buf_len = list_length;
--		else
--			buf_len = SD_ZBC_BUF_SIZE;
-+		buf_len = min(list_length, SD_ZBC_BUF_SIZE);
+@@ -124,6 +143,8 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
+ 		WARN_ONCE(bio->bi_status, "pblk: corrupted read error\n");
+ #endif
  
- 		/* Parse zone descriptors */
- 		while (rec < buf + buf_len) {
-@@ -599,9 +596,8 @@ static int sd_zbc_setup(struct scsi_disk *sdkp)
- 	/* chunk_sectors indicates the zone size */
- 	blk_queue_chunk_sectors(sdkp->disk->queue,
- 			logical_to_sectors(sdkp->device, sdkp->zone_blocks));
--	sdkp->nr_zones = sdkp->capacity >> sdkp->zone_shift;
--	if (sdkp->capacity & (sdkp->zone_blocks - 1))
--		sdkp->nr_zones++;
-+	sdkp->nr_zones =
-+		round_up(sdkp->capacity, sdkp->zone_blocks) >> sdkp->zone_shift;
++	pblk_read_check(pblk, rqd, r_ctx->lba);
++
+ 	bio_put(bio);
+ 	if (r_ctx->private) {
+ 		struct bio *orig_bio = r_ctx->private;
+@@ -149,15 +170,21 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 				      unsigned long *read_bitmap)
+ {
+ 	struct bio *new_bio, *bio = rqd->bio;
++	struct pblk_sec_meta *meta_list = rqd->meta_list;
+ 	struct bio_vec src_bv, dst_bv;
+ 	void *ppa_ptr = NULL;
+ 	void *src_p, *dst_p;
+ 	dma_addr_t dma_ppa_list = 0;
++	__le64 *lba_list_mem, *lba_list_media;
+ 	int nr_secs = rqd->nr_ppas;
+ 	int nr_holes = nr_secs - bitmap_weight(read_bitmap, nr_secs);
+ 	int i, ret, hole;
+ 	DECLARE_COMPLETION_ONSTACK(wait);
  
- 	if (!sdkp->zones_wlock) {
- 		sdkp->zones_wlock = kcalloc(BITS_TO_LONGS(sdkp->nr_zones),
++	/* Re-use allocated memory for intermediate lbas */
++	lba_list_mem = (((void *)rqd->ppa_list) + pblk_dma_ppa_size);
++	lba_list_media = (((void *)rqd->ppa_list) + 2 * pblk_dma_ppa_size);
++
+ 	new_bio = bio_alloc(GFP_KERNEL, nr_holes);
+ 
+ 	if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
+@@ -168,6 +195,9 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 		goto err;
+ 	}
+ 
++	for (i = 0; i < nr_secs; i++)
++		lba_list_mem[i] = meta_list[i].lba;
++
+ 	new_bio->bi_iter.bi_sector = 0; /* internal bio */
+ 	bio_set_op_attrs(new_bio, REQ_OP_READ, 0);
+ 
+@@ -207,10 +237,17 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 		rqd->dma_ppa_list = dma_ppa_list;
+ 	}
+ 
++	for (i = 0; i < nr_secs; i++) {
++		lba_list_media[i] = meta_list[i].lba;
++		meta_list[i].lba = lba_list_mem[i];
++	}
++
+ 	/* Fill the holes in the original bio */
+ 	i = 0;
+ 	hole = find_first_zero_bit(read_bitmap, nr_secs);
+ 	do {
++		meta_list[hole].lba = lba_list_media[i];
++
+ 		src_bv = new_bio->bi_io_vec[i++];
+ 		dst_bv = bio->bi_io_vec[bio_init_idx + hole];
+ 
+@@ -251,6 +288,7 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 			 sector_t lba, unsigned long *read_bitmap)
+ {
++	struct pblk_sec_meta *meta_list = rqd->meta_list;
+ 	struct bio *bio = rqd->bio;
+ 	struct ppa_addr ppa;
+ 
+@@ -263,6 +301,7 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ retry:
+ 	if (pblk_ppa_empty(ppa)) {
+ 		WARN_ON(test_and_set_bit(0, read_bitmap));
++		meta_list[0].lba = cpu_to_le64(ADDR_EMPTY);
+ 		return;
+ 	}
+ 
+@@ -274,6 +313,9 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 			pblk_lookup_l2p_seq(pblk, &ppa, lba, 1);
+ 			goto retry;
+ 		}
++
++		meta_list[0].lba = cpu_to_le64(lba);
++
+ 		WARN_ON(test_and_set_bit(0, read_bitmap));
+ #ifdef CONFIG_NVM_DEBUG
+ 			atomic_long_inc(&pblk->cache_reads);
+@@ -290,9 +332,10 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ 	struct nvm_tgt_dev *dev = pblk->dev;
+ 	sector_t blba = pblk_get_lba(bio);
+ 	unsigned int nr_secs = pblk_get_secs(bio);
++	struct pblk_g_ctx *r_ctx;
+ 	struct nvm_rq *rqd;
+-	unsigned long read_bitmap; /* Max 64 ppas per request */
+ 	unsigned int bio_init_idx;
++	unsigned long read_bitmap; /* Max 64 ppas per request */
+ 	int ret = NVM_IO_ERR;
+ 
+ 	/* logic error: lba out-of-bounds. Ignore read request */
+@@ -312,6 +355,9 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ 	rqd->private = pblk;
+ 	rqd->end_io = pblk_end_io_read;
+ 
++	r_ctx = nvm_rq_to_pdu(rqd);
++	r_ctx->lba = blba;
++
+ 	/* Save the index for this bio's start. This is needed in case
+ 	 * we need to fill a partial read.
+ 	 */
+@@ -344,7 +390,6 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ 	/* All sectors are to be read from the device */
+ 	if (bitmap_empty(&read_bitmap, rqd->nr_ppas)) {
+ 		struct bio *int_bio = NULL;
+-		struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
+ 
+ 		/* Clone read bio to deal with read errors internally */
+ 		int_bio = bio_clone_fast(bio, GFP_KERNEL, pblk_bio_set);
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 12a20f8..4a51e6d 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -99,6 +99,7 @@ enum {
+ };
+ 
+ #define pblk_dma_meta_size (sizeof(struct pblk_sec_meta) * PBLK_MAX_REQ_ADDRS)
++#define pblk_dma_ppa_size (sizeof(u64) * PBLK_MAX_REQ_ADDRS)
+ 
+ /* write buffer completion context */
+ struct pblk_c_ctx {
+@@ -110,9 +111,10 @@ struct pblk_c_ctx {
+ 	unsigned int nr_padded;
+ };
+ 
+-/* generic context */
++/* read context */
+ struct pblk_g_ctx {
+ 	void *private;
++	u64 lba;
+ };
+ 
+ /* Pad context */
 -- 
-2.13.6
+2.9.3
