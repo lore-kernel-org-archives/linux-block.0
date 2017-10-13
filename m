@@ -1,53 +1,97 @@
-Return-Path: <byungchul.park@lge.com>
-From: Byungchul Park <byungchul.park@lge.com>
-To: peterz@infradead.org,
-	mingo@kernel.org,
-	axboe@kernel.dk
-Cc: johan@kernel.org,
-	tglx@linutronix.de,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	tj@kernel.org,
-	johannes.berg@intel.com,
-	oleg@redhat.com,
-	amir73il@gmail.com,
-	david@fromorbit.com,
-	darrick.wong@oracle.com,
-	linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	hch@infradead.org,
-	idryomov@gmail.com,
-	kernel-team@lge.com
-Subject: [PATCH v4 3/7] locking/lockdep: Remove the BROKEN flag from CONFIG_LOCKDEP_CROSSRELEASE and CONFIG_LOCKDEP_COMPLETIONS
-Date: Wed, 25 Oct 2017 14:11:08 +0900
-Message-Id: <1508908272-15757-4-git-send-email-byungchul.park@lge.com>
-In-Reply-To: <1508908272-15757-1-git-send-email-byungchul.park@lge.com>
-References: <1508908272-15757-1-git-send-email-byungchul.park@lge.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:50575 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752468AbdJMXgM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 19:36:12 -0400
+Received: by mail-pg0-f67.google.com with SMTP id y7so2337872pgb.7
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 16:36:12 -0700 (PDT)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Michael Lyle <mlyle@lyle.org>
+Subject: [PATCH 11/15] bcache: writeback rate shouldn't artifically clamp
+Date: Fri, 13 Oct 2017 16:35:38 -0700
+Message-Id: <20171013233542.20938-12-mlyle@lyle.org>
+In-Reply-To: <20171013233542.20938-1-mlyle@lyle.org>
+References: <20171013233542.20938-1-mlyle@lyle.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Now that the performance regression is fixed, re-enable
-CONFIG_LOCKDEP_CROSSRELEASE=y and CONFIG_LOCKDEP_COMPLETIONS=y.
+The previous code artificially limited writeback rate to 1000000
+blocks/second (NSEC_PER_MSEC), which is a rate that can be met on fast
+hardware.  The rate limiting code works fine (though with decreased
+precision) up to 3 orders of magnitude faster, so use NSEC_PER_SEC.
 
-Signed-off-by: Byungchul Park <byungchul.park@lge.com>
+Additionally, ensure that uint32_t is used as a type for rate throughout
+the rate management so that type checking/clamp_t can work properly.
+
+bch_next_delay should be rewritten for increased precision and better
+handling of high rates and long sleep periods, but this is adequate for
+now.
+
+Signed-off-by: Michael Lyle <mlyle@lyle.org>
+Reported-by: Coly Li <colyli@suse.de>
+Reviewed-by: Coly Li <colyli@suse.de>
 ---
- lib/Kconfig.debug | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/md/bcache/bcache.h    | 2 +-
+ drivers/md/bcache/util.h      | 4 ++--
+ drivers/md/bcache/writeback.c | 7 ++++---
+ 3 files changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 3db9167..4bef610 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -1138,8 +1138,8 @@ config PROVE_LOCKING
- 	select DEBUG_MUTEXES
- 	select DEBUG_RT_MUTEXES if RT_MUTEXES
- 	select DEBUG_LOCK_ALLOC
--	select LOCKDEP_CROSSRELEASE if BROKEN
--	select LOCKDEP_COMPLETIONS if BROKEN
-+	select LOCKDEP_CROSSRELEASE
-+	select LOCKDEP_COMPLETIONS
- 	select TRACE_IRQFLAGS
- 	default n
- 	help
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index eb83be693d60..d77c4829c497 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -361,7 +361,7 @@ struct cached_dev {
+ 	int64_t			writeback_rate_proportional;
+ 	int64_t			writeback_rate_integral;
+ 	int64_t			writeback_rate_integral_scaled;
+-	int64_t			writeback_rate_change;
++	int32_t			writeback_rate_change;
+ 
+ 	unsigned		writeback_rate_update_seconds;
+ 	unsigned		writeback_rate_i_term_inverse;
+diff --git a/drivers/md/bcache/util.h b/drivers/md/bcache/util.h
+index cb8d2ccbb6c6..8f509290bb02 100644
+--- a/drivers/md/bcache/util.h
++++ b/drivers/md/bcache/util.h
+@@ -441,10 +441,10 @@ struct bch_ratelimit {
+ 	uint64_t		next;
+ 
+ 	/*
+-	 * Rate at which we want to do work, in units per nanosecond
++	 * Rate at which we want to do work, in units per second
+ 	 * The units here correspond to the units passed to bch_next_delay()
+ 	 */
+-	unsigned		rate;
++	uint32_t		rate;
+ };
+ 
+ static inline void bch_ratelimit_reset(struct bch_ratelimit *d)
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index 8deb721c355e..897d28050656 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -52,7 +52,8 @@ static void __update_writeback_rate(struct cached_dev *dc)
+ 	int64_t error = dirty - target;
+ 	int64_t proportional_scaled =
+ 		div_s64(error, dc->writeback_rate_p_term_inverse);
+-	int64_t integral_scaled, new_rate;
++	int64_t integral_scaled;
++	uint32_t new_rate;
+ 
+ 	if ((error < 0 && dc->writeback_rate_integral > 0) ||
+ 	    (error > 0 && time_before64(local_clock(),
+@@ -74,8 +75,8 @@ static void __update_writeback_rate(struct cached_dev *dc)
+ 	integral_scaled = div_s64(dc->writeback_rate_integral,
+ 			dc->writeback_rate_i_term_inverse);
+ 
+-	new_rate = clamp_t(int64_t, (proportional_scaled + integral_scaled),
+-			dc->writeback_rate_minimum, NSEC_PER_MSEC);
++	new_rate = clamp_t(int32_t, (proportional_scaled + integral_scaled),
++			dc->writeback_rate_minimum, NSEC_PER_SEC);
+ 
+ 	dc->writeback_rate_proportional = proportional_scaled;
+ 	dc->writeback_rate_integral_scaled = integral_scaled;
 -- 
-1.9.1
+2.11.0
