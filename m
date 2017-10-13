@@ -1,102 +1,107 @@
-Return-Path: <prvs=441412a59=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V6 08/14] scsi: sd_zbc: Limit zone write locking to sequential zones
-Date: Mon,  2 Oct 2017 16:15:29 +0900
-Message-Id: <20171002071535.8007-9-damien.lemoal@wdc.com>
-In-Reply-To: <20171002071535.8007-1-damien.lemoal@wdc.com>
-References: <20171002071535.8007-1-damien.lemoal@wdc.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        John Garry <john.garry@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V9 2/7] blk-mq-sched: move actual dispatching into one helper
+Date: Sat, 14 Oct 2017 02:05:27 +0800
+Message-Id: <20171013180532.29304-3-ming.lei@redhat.com>
+In-Reply-To: <20171013180532.29304-1-ming.lei@redhat.com>
+References: <20171013180532.29304-1-ming.lei@redhat.com>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Conventional zones of zoned block devices have no write constraints.
-Write locking of conventional zones is thus not necessary and can even
-hurt performance by unnecessarily operating the disk under low queue
-depth. To avoid this, use the disk request queue seq_zone_bitmap to
-allow any write to be issued to conventional zones, locking only
-sequential zones.
+So that it becomes easy to support to dispatch from sw queue in the
+following patch.
 
-While at it, remove the helper sd_zbc_zone_no() and use
-blk_rq_zone_no() instead.
+No functional change.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+Suggested-by: Christoph Hellwig <hch@lst.de> # for simplifying dispatch logic
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/scsi/sd_zbc.c | 32 ++++++++++++--------------------
- 1 file changed, 12 insertions(+), 20 deletions(-)
+ block/blk-mq-sched.c | 43 ++++++++++++++++++++++++-------------------
+ 1 file changed, 24 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index 4ccb20074cb3..4cb271619fc6 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -230,17 +230,6 @@ static inline sector_t sd_zbc_zone_sectors(struct scsi_disk *sdkp)
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index eca011fdfa0e..be29ba849408 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -89,12 +89,26 @@ static bool blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
+ 	return false;
  }
  
- /**
-- * sd_zbc_zone_no - Get the number of the zone conataining a sector.
-- * @sdkp: The target disk
-- * @sector: 512B sector address contained in the zone
-- */
--static inline unsigned int sd_zbc_zone_no(struct scsi_disk *sdkp,
--					  sector_t sector)
--{
--	return sectors_to_logical(sdkp->device, sector) >> sdkp->zone_shift;
--}
--
--/**
-  * sd_zbc_setup_reset_cmnd - Prepare a RESET WRITE POINTER scsi command.
-  * @cmd: the command to setup
-  *
-@@ -301,7 +290,6 @@ int sd_zbc_write_lock_zone(struct scsi_cmnd *cmd)
- 	struct scsi_disk *sdkp = scsi_disk(rq->rq_disk);
- 	sector_t sector = blk_rq_pos(rq);
- 	sector_t zone_sectors = sd_zbc_zone_sectors(sdkp);
--	unsigned int zno = sd_zbc_zone_no(sdkp, sector);
- 
- 	/*
- 	 * Note: Checks of the alignment of the write command on
-@@ -309,18 +297,21 @@ int sd_zbc_write_lock_zone(struct scsi_cmnd *cmd)
- 	 */
- 
- 	/* Do not allow zone boundaries crossing on host-managed drives */
--	if (blk_queue_zoned_model(sdkp->disk->queue) == BLK_ZONED_HM &&
-+	if (blk_queue_zoned_model(rq->q) == BLK_ZONED_HM &&
- 	    (sector & (zone_sectors - 1)) + blk_rq_sectors(rq) > zone_sectors)
- 		return BLKPREP_KILL;
- 
- 	/*
--	 * Do not issue more than one write at a time per
--	 * zone. This solves write ordering problems due to
--	 * the unlocking of the request queue in the dispatch
--	 * path in the non scsi-mq case.
-+	 * There is no write constraints on conventional zones. So any write
-+	 * command can be sent. But do not issue more than one write command
-+	 * at a time per sequential zone. This avoids write ordering problems
-+	 * due to the unlocking of the request queue in the dispatch path of
-+	 * legacy scsi path, as well as at the HBA level (e.g. AHCI).
- 	 */
-+	if (!blk_rq_zone_is_seq(rq))
-+		return BLKPREP_OK;
- 	if (sdkp->zones_wlock &&
--	    test_and_set_bit(zno, sdkp->zones_wlock))
-+	    test_and_set_bit(blk_rq_zone_no(rq), sdkp->zones_wlock))
- 		return BLKPREP_DEFER;
- 
- 	WARN_ON_ONCE(cmd->flags & SCMD_ZONE_WRITE_LOCK);
-@@ -341,8 +332,9 @@ void sd_zbc_write_unlock_zone(struct scsi_cmnd *cmd)
- 	struct request *rq = cmd->request;
- 	struct scsi_disk *sdkp = scsi_disk(rq->rq_disk);
- 
--	if (sdkp->zones_wlock && cmd->flags & SCMD_ZONE_WRITE_LOCK) {
--		unsigned int zno = sd_zbc_zone_no(sdkp, blk_rq_pos(rq));
-+	if (cmd->flags & SCMD_ZONE_WRITE_LOCK) {
-+		unsigned int zno = blk_rq_zone_no(rq);
++static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
++{
++	struct request_queue *q = hctx->queue;
++	struct elevator_queue *e = q->elevator;
++	LIST_HEAD(rq_list);
 +
- 		WARN_ON_ONCE(!test_bit(zno, sdkp->zones_wlock));
- 		cmd->flags &= ~SCMD_ZONE_WRITE_LOCK;
- 		clear_bit_unlock(zno, sdkp->zones_wlock);
++	do {
++		struct request *rq = e->type->ops.mq.dispatch_request(hctx);
++
++		if (!rq)
++			break;
++		list_add(&rq->queuelist, &rq_list);
++	} while (blk_mq_dispatch_rq_list(q, &rq_list));
++}
++
+ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct request_queue *q = hctx->queue;
+ 	struct elevator_queue *e = q->elevator;
+ 	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
+-	bool do_sched_dispatch = true;
+ 	LIST_HEAD(rq_list);
+ 
+ 	/* RCU or SRCU read lock is needed before checking quiesced flag */
+@@ -122,30 +136,21 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	 * scheduler, we can no longer merge or sort them. So it's best to
+ 	 * leave them there for as long as we can. Mark the hw queue as
+ 	 * needing a restart in that case.
++	 *
++	 * We want to dispatch from the scheduler if there was nothing
++	 * on the dispatch list or we were able to dispatch from the
++	 * dispatch list.
+ 	 */
+ 	if (!list_empty(&rq_list)) {
+ 		blk_mq_sched_mark_restart_hctx(hctx);
+-		do_sched_dispatch = blk_mq_dispatch_rq_list(q, &rq_list);
+-	} else if (!has_sched_dispatch) {
++		if (blk_mq_dispatch_rq_list(q, &rq_list) && has_sched_dispatch)
++			blk_mq_do_dispatch_sched(hctx);
++	} else if (has_sched_dispatch) {
++		blk_mq_do_dispatch_sched(hctx);
++	} else {
+ 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+ 		blk_mq_dispatch_rq_list(q, &rq_list);
+ 	}
+-
+-	/*
+-	 * We want to dispatch from the scheduler if there was nothing
+-	 * on the dispatch list or we were able to dispatch from the
+-	 * dispatch list.
+-	 */
+-	if (do_sched_dispatch && has_sched_dispatch) {
+-		do {
+-			struct request *rq;
+-
+-			rq = e->type->ops.mq.dispatch_request(hctx);
+-			if (!rq)
+-				break;
+-			list_add(&rq->queuelist, &rq_list);
+-		} while (blk_mq_dispatch_rq_list(q, &rq_list));
+-	}
+ }
+ 
+ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
 -- 
-2.13.6
+2.9.5
