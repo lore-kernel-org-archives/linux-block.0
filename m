@@ -10,11 +10,11 @@ Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
         linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
         John Garry <john.garry@huawei.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V10 3/8] sbitmap: introduce __sbitmap_for_each_set()
-Date: Sat, 14 Oct 2017 17:22:27 +0800
-Message-Id: <20171014092232.13943-4-ming.lei@redhat.com>
-In-Reply-To: <20171014092232.13943-1-ming.lei@redhat.com>
-References: <20171014092232.13943-1-ming.lei@redhat.com>
+Subject: [PATCH V9 3/7] sbitmap: introduce __sbitmap_for_each_set()
+Date: Sat, 14 Oct 2017 02:05:28 +0800
+Message-Id: <20171013180532.29304-4-ming.lei@redhat.com>
+In-Reply-To: <20171013180532.29304-1-ming.lei@redhat.com>
+References: <20171013180532.29304-1-ming.lei@redhat.com>
 Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
