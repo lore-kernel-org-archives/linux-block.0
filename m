@@ -1,58 +1,251 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:37692 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750899AbdJSXhm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Oct 2017 19:37:42 -0400
-Date: Fri, 20 Oct 2017 07:37:32 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@fb.com>, Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v3 20/49] block: introduce bio_for_each_segment_mp()
-Message-ID: <20171019233731.GD27130@ming.t460p>
-References: <20170808084548.18963-1-ming.lei@redhat.com>
- <20170808084548.18963-21-ming.lei@redhat.com>
- <20170810121110.GC14607@infradead.org>
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:49712 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1758185AbdJMMr0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 08:47:26 -0400
+Received: by mail-wm0-f68.google.com with SMTP id b189so21114103wmd.4
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:26 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 20/58] lightnvm: pblk: do not use a mempool for line bitmaps
+Date: Fri, 13 Oct 2017 14:46:09 +0200
+Message-Id: <20171013124647.32668-21-m@bjorling.me>
+In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
+References: <20171013124647.32668-1-m@bjorling.me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170810121110.GC14607@infradead.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Aug 10, 2017 at 05:11:10AM -0700, Christoph Hellwig wrote:
-> First: as mentioned in the previous patches I really hate the name
-> scheme with the _sp and _mp postfixes.
-> 
-> To be clear and understandable we should always name the versions
-> that iterate over segments *segment* and the ones that iterate over
-> pages *page*.  To make sure we have a clean compile break for code
-> using the old _segment name I'd suggest to move to pass the bvec_iter
-> argument by reference, which is the right thing to do anyway.
+From: Javier González <javier@cnexlabs.com>
 
-The most confusing thing is that bio_for_each_segment() and
-bio_for_each_segment_all() has been used to iterate pages for long time.
-That is why I add _sp/_mp in this patchset to make the uses explicitly
-and avoid to confuse people.
+pblk holds two sector bitmaps: one to keep track of the mapped sectors
+while the line is active and another one to keep track of the invalid
+sectors. The latter is kept during the whole live of the line, until it
+is recycled. Since we cannot guarantee forward progress for the mempool
+in this case, get rid of the mempool and simply allocate memory through
+kmalloc.
 
-My plan is to switch to the real bio_for_each_segment() for iterating
-real segment and bio_for_each_page() for iterating page after we reach
-mutlipage bvec, and that is basically a mechanical change.
+Reported-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
+---
+ drivers/lightnvm/pblk-core.c     | 26 ++++++++++----------------
+ drivers/lightnvm/pblk-init.c     | 29 ++---------------------------
+ drivers/lightnvm/pblk-recovery.c |  2 +-
+ drivers/lightnvm/pblk-write.c    |  4 +---
+ drivers/lightnvm/pblk.h          |  3 ---
+ 5 files changed, 14 insertions(+), 50 deletions(-)
 
-> As far as the implementation goes I don't think we actually need
-> to pass the mp argument down.  Instead we always call the full-segment
-> version of  bvec_iter_len / __bvec_iter_advance and then have an
-> inner loop that moves the fake bvecs forward inside each full-segment
-> one - that is implement the per-page version on top of the per-segment
-> one.
-
-For iterating in way of real segment(multipage bvec) instead of page, we
-don't need the inner loop for moving page by page to the fake bvec, that
-is why the 'mp' argument is introduced. If this argument is dropped, we
-have to find another similar way to decide to fetch one segment or one
-page each time.
-
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 0c22e5c..215aadb 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -1095,25 +1095,21 @@ static int pblk_line_prepare(struct pblk *pblk, struct pblk_line *line)
+ 	struct pblk_line_meta *lm = &pblk->lm;
+ 	int blk_in_line = atomic_read(&line->blk_in_line);
+ 
+-	line->map_bitmap = mempool_alloc(pblk->line_meta_pool, GFP_ATOMIC);
++	line->map_bitmap = kzalloc(lm->sec_bitmap_len, GFP_ATOMIC);
+ 	if (!line->map_bitmap)
+ 		return -ENOMEM;
+-	memset(line->map_bitmap, 0, lm->sec_bitmap_len);
+ 
+-	/* invalid_bitmap is special since it is used when line is closed. No
+-	 * need to zeroized; it will be initialized using bb info form
+-	 * map_bitmap
+-	 */
+-	line->invalid_bitmap = mempool_alloc(pblk->line_meta_pool, GFP_ATOMIC);
++	/* will be initialized using bb info from map_bitmap */
++	line->invalid_bitmap = kmalloc(lm->sec_bitmap_len, GFP_ATOMIC);
+ 	if (!line->invalid_bitmap) {
+-		mempool_free(line->map_bitmap, pblk->line_meta_pool);
++		kfree(line->map_bitmap);
+ 		return -ENOMEM;
+ 	}
+ 
+ 	spin_lock(&line->lock);
+ 	if (line->state != PBLK_LINESTATE_FREE) {
+-		mempool_free(line->invalid_bitmap, pblk->line_meta_pool);
+-		mempool_free(line->map_bitmap, pblk->line_meta_pool);
++		kfree(line->map_bitmap);
++		kfree(line->invalid_bitmap);
+ 		spin_unlock(&line->lock);
+ 		WARN(1, "pblk: corrupted line %d, state %d\n",
+ 							line->id, line->state);
+@@ -1165,7 +1161,7 @@ int pblk_line_recov_alloc(struct pblk *pblk, struct pblk_line *line)
+ 
+ void pblk_line_recov_close(struct pblk *pblk, struct pblk_line *line)
+ {
+-	mempool_free(line->map_bitmap, pblk->line_meta_pool);
++	kfree(line->map_bitmap);
+ 	line->map_bitmap = NULL;
+ 	line->smeta = NULL;
+ 	line->emeta = NULL;
+@@ -1440,10 +1436,8 @@ void pblk_line_replace_data(struct pblk *pblk)
+ 
+ void pblk_line_free(struct pblk *pblk, struct pblk_line *line)
+ {
+-	if (line->map_bitmap)
+-		mempool_free(line->map_bitmap, pblk->line_meta_pool);
+-	if (line->invalid_bitmap)
+-		mempool_free(line->invalid_bitmap, pblk->line_meta_pool);
++	kfree(line->map_bitmap);
++	kfree(line->invalid_bitmap);
+ 
+ 	*line->vsc = cpu_to_le32(EMPTY_ENTRY);
+ 
+@@ -1584,7 +1578,7 @@ void pblk_line_close(struct pblk *pblk, struct pblk_line *line)
+ 
+ 	list_add_tail(&line->list, move_list);
+ 
+-	mempool_free(line->map_bitmap, pblk->line_meta_pool);
++	kfree(line->map_bitmap);
+ 	line->map_bitmap = NULL;
+ 	line->smeta = NULL;
+ 	line->emeta = NULL;
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 2f8d3f9..4d71978 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -21,7 +21,7 @@
+ #include "pblk.h"
+ 
+ static struct kmem_cache *pblk_ws_cache, *pblk_rec_cache, *pblk_g_rq_cache,
+-				*pblk_w_rq_cache, *pblk_line_meta_cache;
++				*pblk_w_rq_cache;
+ static DECLARE_RWSEM(pblk_lock);
+ struct bio_set *pblk_bio_set;
+ 
+@@ -181,8 +181,6 @@ static int pblk_set_ppaf(struct pblk *pblk)
+ 
+ static int pblk_init_global_caches(struct pblk *pblk)
+ {
+-	char cache_name[PBLK_CACHE_NAME_LEN];
+-
+ 	down_write(&pblk_lock);
+ 	pblk_ws_cache = kmem_cache_create("pblk_blk_ws",
+ 				sizeof(struct pblk_line_ws), 0, 0, NULL);
+@@ -217,19 +215,6 @@ static int pblk_init_global_caches(struct pblk *pblk)
+ 		up_write(&pblk_lock);
+ 		return -ENOMEM;
+ 	}
+-
+-	snprintf(cache_name, sizeof(cache_name), "pblk_line_m_%s",
+-							pblk->disk->disk_name);
+-	pblk_line_meta_cache = kmem_cache_create(cache_name,
+-				pblk->lm.sec_bitmap_len, 0, 0, NULL);
+-	if (!pblk_line_meta_cache) {
+-		kmem_cache_destroy(pblk_ws_cache);
+-		kmem_cache_destroy(pblk_rec_cache);
+-		kmem_cache_destroy(pblk_g_rq_cache);
+-		kmem_cache_destroy(pblk_w_rq_cache);
+-		up_write(&pblk_lock);
+-		return -ENOMEM;
+-	}
+ 	up_write(&pblk_lock);
+ 
+ 	return 0;
+@@ -276,16 +261,10 @@ static int pblk_core_init(struct pblk *pblk)
+ 	if (!pblk->w_rq_pool)
+ 		goto free_e_rq_pool;
+ 
+-	pblk->line_meta_pool =
+-			mempool_create_slab_pool(PBLK_META_POOL_SIZE,
+-							pblk_line_meta_cache);
+-	if (!pblk->line_meta_pool)
+-		goto free_w_rq_pool;
+-
+ 	pblk->close_wq = alloc_workqueue("pblk-close-wq",
+ 			WQ_MEM_RECLAIM | WQ_UNBOUND, PBLK_NR_CLOSE_JOBS);
+ 	if (!pblk->close_wq)
+-		goto free_line_meta_pool;
++		goto free_w_rq_pool;
+ 
+ 	pblk->bb_wq = alloc_workqueue("pblk-bb-wq",
+ 			WQ_MEM_RECLAIM | WQ_UNBOUND, 0);
+@@ -305,8 +284,6 @@ static int pblk_core_init(struct pblk *pblk)
+ 	destroy_workqueue(pblk->bb_wq);
+ free_close_wq:
+ 	destroy_workqueue(pblk->close_wq);
+-free_line_meta_pool:
+-	mempool_destroy(pblk->line_meta_pool);
+ free_w_rq_pool:
+ 	mempool_destroy(pblk->w_rq_pool);
+ free_e_rq_pool:
+@@ -336,13 +313,11 @@ static void pblk_core_free(struct pblk *pblk)
+ 	mempool_destroy(pblk->r_rq_pool);
+ 	mempool_destroy(pblk->e_rq_pool);
+ 	mempool_destroy(pblk->w_rq_pool);
+-	mempool_destroy(pblk->line_meta_pool);
+ 
+ 	kmem_cache_destroy(pblk_ws_cache);
+ 	kmem_cache_destroy(pblk_rec_cache);
+ 	kmem_cache_destroy(pblk_g_rq_cache);
+ 	kmem_cache_destroy(pblk_w_rq_cache);
+-	kmem_cache_destroy(pblk_line_meta_cache);
+ }
+ 
+ static void pblk_luns_free(struct pblk *pblk)
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index caf1242..de52707 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -987,7 +987,7 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+ 			list_move_tail(&line->list, move_list);
+ 			spin_unlock(&l_mg->gc_lock);
+ 
+-			mempool_free(line->map_bitmap, pblk->line_meta_pool);
++			kfree(line->map_bitmap);
+ 			line->map_bitmap = NULL;
+ 			line->smeta = NULL;
+ 			line->emeta = NULL;
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index c73b17b..26c2b83 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -411,8 +411,6 @@ int pblk_submit_meta_io(struct pblk *pblk, struct pblk_line *meta_line)
+ 	if (emeta->mem >= lm->emeta_len[0]) {
+ 		spin_lock(&l_mg->close_lock);
+ 		list_del(&meta_line->list);
+-		WARN(!bitmap_full(meta_line->map_bitmap, lm->sec_per_line),
+-				"pblk: corrupt meta line %d\n", meta_line->id);
+ 		spin_unlock(&l_mg->close_lock);
+ 	}
+ 
+@@ -456,7 +454,7 @@ static int pblk_sched_meta_io(struct pblk *pblk, struct ppa_addr *prev_list,
+ 		return 0;
+ 	}
+ 	meta_line = list_first_entry(&l_mg->emeta_list, struct pblk_line, list);
+-	if (bitmap_full(meta_line->map_bitmap, lm->sec_per_line))
++	if (meta_line->emeta->mem >= lm->emeta_len[0])
+ 		goto retry;
+ 	spin_unlock(&l_mg->close_lock);
+ 
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 419e1b7..60edcda 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -40,8 +40,6 @@
+ #define PBLK_MAX_REQ_ADDRS (64)
+ #define PBLK_MAX_REQ_ADDRS_PW (6)
+ 
+-#define PBLK_META_POOL_SIZE (128)
+-
+ #define PBLK_NR_CLOSE_JOBS (4)
+ 
+ #define PBLK_CACHE_NAME_LEN (DISK_NAME_LEN + 16)
+@@ -627,7 +625,6 @@ struct pblk {
+ 	mempool_t *r_rq_pool;
+ 	mempool_t *w_rq_pool;
+ 	mempool_t *e_rq_pool;
+-	mempool_t *line_meta_pool;
+ 
+ 	struct workqueue_struct *close_wq;
+ 	struct workqueue_struct *bb_wq;
 -- 
-Ming
+2.9.3
