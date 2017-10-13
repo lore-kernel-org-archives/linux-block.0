@@ -1,82 +1,86 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:44036 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751174AbdJEABQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 Oct 2017 20:01:16 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        =Oleksandr Natalenko <oleksandr@natalenko.name>,
-        "Luis R . Rodriguez" <mcgrof@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Hannes Reinecke <hare@suse.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v6 7/9] ide, scsi: Tell the block layer at request allocation time about preempt requests
-Date: Wed,  4 Oct 2017 17:01:08 -0700
-Message-Id: <20171005000110.15904-8-bart.vanassche@wdc.com>
-In-Reply-To: <20171005000110.15904-1-bart.vanassche@wdc.com>
-References: <20171005000110.15904-1-bart.vanassche@wdc.com>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:47278 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753238AbdJMXgG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 19:36:06 -0400
+Received: by mail-pg0-f66.google.com with SMTP id r25so2338769pgn.4
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 16:36:06 -0700 (PDT)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Yijing Wang <wangyijing@huawei.com>
+Subject: [PATCH 07/15] bcache: remove unused parameter
+Date: Fri, 13 Oct 2017 16:35:34 -0700
+Message-Id: <20171013233542.20938-8-mlyle@lyle.org>
+In-Reply-To: <20171013233542.20938-1-mlyle@lyle.org>
+References: <20171013233542.20938-1-mlyle@lyle.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Convert blk_get_request(q, op, __GFP_RECLAIM) into blk_get_request(q,
-op, BLK_MQ_PREEMPT). This patch does not change any functionality.
+From: Yijing Wang <wangyijing@huawei.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Parameter bio is no longer used, clean it.
+
+Signed-off-by: Yijing Wang <wangyijing@huawei.com>
+Reviewed-by: Coly Li <colyli@suse.de>
 ---
- drivers/ide/ide-pm.c    | 4 ++--
- drivers/scsi/scsi_lib.c | 6 +++---
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ drivers/md/bcache/request.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/ide/ide-pm.c b/drivers/ide/ide-pm.c
-index 544f02d673ca..f56d742908df 100644
---- a/drivers/ide/ide-pm.c
-+++ b/drivers/ide/ide-pm.c
-@@ -89,9 +89,9 @@ int generic_ide_resume(struct device *dev)
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 9ee137e8d387..163a17a80874 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -26,12 +26,12 @@ struct kmem_cache *bch_search_cache;
+ 
+ static void bch_data_insert_start(struct closure *);
+ 
+-static unsigned cache_mode(struct cached_dev *dc, struct bio *bio)
++static unsigned cache_mode(struct cached_dev *dc)
+ {
+ 	return BDEV_CACHE_MODE(&dc->sb);
+ }
+ 
+-static bool verify(struct cached_dev *dc, struct bio *bio)
++static bool verify(struct cached_dev *dc)
+ {
+ 	return dc->verify;
+ }
+@@ -369,7 +369,7 @@ static struct hlist_head *iohash(struct cached_dev *dc, uint64_t k)
+ static bool check_should_bypass(struct cached_dev *dc, struct bio *bio)
+ {
+ 	struct cache_set *c = dc->disk.c;
+-	unsigned mode = cache_mode(dc, bio);
++	unsigned mode = cache_mode(dc);
+ 	unsigned sectors, congested = bch_get_congested(c);
+ 	struct task_struct *task = current;
+ 	struct io *i;
+@@ -747,7 +747,7 @@ static void cached_dev_read_done(struct closure *cl)
+ 		s->cache_miss = NULL;
  	}
  
- 	memset(&rqpm, 0, sizeof(rqpm));
--	rq = blk_get_request(drive->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
-+	rq = blk_get_request_flags(drive->queue, REQ_OP_DRV_IN,
-+				   BLK_MQ_REQ_PREEMPT);
- 	ide_req(rq)->type = ATA_PRIV_PM_RESUME;
--	rq->rq_flags |= RQF_PREEMPT;
- 	rq->special = &rqpm;
- 	rqpm.pm_step = IDE_PM_START_RESUME;
- 	rqpm.pm_state = PM_EVENT_ON;
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 9cf6a80fe297..1c16a247fae6 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -252,9 +252,9 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
- 	struct scsi_request *rq;
- 	int ret = DRIVER_ERROR << 24;
+-	if (verify(dc, &s->bio.bio) && s->recoverable && !s->read_dirty_data)
++	if (verify(dc) && s->recoverable && !s->read_dirty_data)
+ 		bch_data_verify(dc, s->orig_bio);
  
--	req = blk_get_request(sdev->request_queue,
-+	req = blk_get_request_flags(sdev->request_queue,
- 			data_direction == DMA_TO_DEVICE ?
--			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM);
-+			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, BLK_MQ_REQ_PREEMPT);
- 	if (IS_ERR(req))
- 		return ret;
- 	rq = scsi_req(req);
-@@ -268,7 +268,7 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
- 	rq->retries = retries;
- 	req->timeout = timeout;
- 	req->cmd_flags |= flags;
--	req->rq_flags |= rq_flags | RQF_QUIET | RQF_PREEMPT;
-+	req->rq_flags |= rq_flags | RQF_QUIET;
+ 	bio_complete(s);
+@@ -772,7 +772,7 @@ static void cached_dev_read_done_bh(struct closure *cl)
  
- 	/*
- 	 * head injection *required* here otherwise quiesce won't work
+ 	if (s->iop.status)
+ 		continue_at_nobarrier(cl, cached_dev_read_error, bcache_wq);
+-	else if (s->iop.bio || verify(dc, &s->bio.bio))
++	else if (s->iop.bio || verify(dc))
+ 		continue_at_nobarrier(cl, cached_dev_read_done, bcache_wq);
+ 	else
+ 		continue_at_nobarrier(cl, cached_dev_bio_complete, NULL);
+@@ -899,7 +899,7 @@ static void cached_dev_write(struct cached_dev *dc, struct search *s)
+ 		s->iop.bypass = true;
+ 
+ 	if (should_writeback(dc, s->orig_bio,
+-			     cache_mode(dc, bio),
++			     cache_mode(dc),
+ 			     s->iop.bypass)) {
+ 		s->iop.bypass = false;
+ 		s->iop.writeback = true;
 -- 
-2.14.2
+2.11.0
