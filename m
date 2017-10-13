@@ -1,196 +1,229 @@
-Return-Path: <prvs=449916f6d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Oleksandr Natalenko <oleksandr@natalenko.name>,
-	Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v8 05/10] block: Introduce blk_get_request_flags()
-Date: Tue, 10 Oct 2017 14:03:41 -0700
-Message-Id: <20171010210346.14574-6-bart.vanassche@wdc.com>
-In-Reply-To: <20171010210346.14574-1-bart.vanassche@wdc.com>
-References: <20171010210346.14574-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga05.intel.com ([192.55.52.43]:11293 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753320AbdJMLTM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 07:19:12 -0400
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V11 0/4] mmc: Add Command Queue support
+Date: Fri, 13 Oct 2017 14:12:15 +0300
+Message-Id: <1507893139-11969-1-git-send-email-adrian.hunter@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-A side effect of this patch is that the GFP mask that is passed to
-several allocation functions in the legacy block layer is changed
-from GFP_KERNEL into __GFP_DIRECT_RECLAIM.
+Hi
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- block/blk-core.c       | 50 +++++++++++++++++++++++++++++++++++---------------
- include/linux/blkdev.h |  3 +++
- 2 files changed, 38 insertions(+), 15 deletions(-)
+Here is V11 of the hardware command queue patches without the software
+command queue patches, now using blk-mq and now with blk-mq support for
+non-CQE I/O.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 265a69511c47..03156d9ede94 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1157,7 +1157,7 @@ int blk_update_nr_requests(struct request_queue *q, unsigned int nr)
-  * @rl: request list to allocate from
-  * @op: operation and flags
-  * @bio: bio to allocate request for (can be %NULL)
-- * @gfp_mask: allocation mask
-+ * @flags: BLQ_MQ_REQ_* flags
-  *
-  * Get a free request from @q.  This function may fail under memory
-  * pressure or if @q is dead.
-@@ -1167,7 +1167,7 @@ int blk_update_nr_requests(struct request_queue *q, unsigned int nr)
-  * Returns request pointer on success, with @q->queue_lock *not held*.
-  */
- static struct request *__get_request(struct request_list *rl, unsigned int op,
--		struct bio *bio, gfp_t gfp_mask)
-+				     struct bio *bio, unsigned int flags)
- {
- 	struct request_queue *q = rl->q;
- 	struct request *rq;
-@@ -1176,6 +1176,8 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
- 	struct io_cq *icq = NULL;
- 	const bool is_sync = op_is_sync(op);
- 	int may_queue;
-+	gfp_t gfp_mask = flags & BLK_MQ_REQ_NOWAIT ? GFP_ATOMIC :
-+			 __GFP_DIRECT_RECLAIM;
- 	req_flags_t rq_flags = RQF_ALLOCED;
- 
- 	lockdep_assert_held(q->queue_lock);
-@@ -1336,7 +1338,7 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
-  * @q: request_queue to allocate request from
-  * @op: operation and flags
-  * @bio: bio to allocate request for (can be %NULL)
-- * @gfp_mask: allocation mask
-+ * @flags: BLK_MQ_REQ_* flags.
-  *
-  * Get a free request from @q.  If %__GFP_DIRECT_RECLAIM is set in @gfp_mask,
-  * this function keeps retrying under memory pressure and fails iff @q is dead.
-@@ -1346,7 +1348,7 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
-  * Returns request pointer on success, with @q->queue_lock *not held*.
-  */
- static struct request *get_request(struct request_queue *q, unsigned int op,
--		struct bio *bio, gfp_t gfp_mask)
-+				   struct bio *bio, unsigned int flags)
- {
- 	const bool is_sync = op_is_sync(op);
- 	DEFINE_WAIT(wait);
-@@ -1358,7 +1360,7 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
- 
- 	rl = blk_get_rl(q, bio);	/* transferred to @rq on success */
- retry:
--	rq = __get_request(rl, op, bio, gfp_mask);
-+	rq = __get_request(rl, op, bio, flags);
- 	if (!IS_ERR(rq))
- 		return rq;
- 
-@@ -1367,7 +1369,7 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
- 		return ERR_PTR(-EAGAIN);
- 	}
- 
--	if (!gfpflags_allow_blocking(gfp_mask) || unlikely(blk_queue_dying(q))) {
-+	if ((flags & BLK_MQ_REQ_NOWAIT) || unlikely(blk_queue_dying(q))) {
- 		blk_put_rl(rl);
- 		return rq;
- 	}
-@@ -1394,10 +1396,13 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
- 	goto retry;
- }
- 
-+/* flags: BLK_MQ_REQ_PREEMPT and/or BLK_MQ_REQ_NOWAIT. */
- static struct request *blk_old_get_request(struct request_queue *q,
--					   unsigned int op, gfp_t gfp_mask)
-+					   unsigned int op, unsigned int flags)
- {
- 	struct request *rq;
-+	gfp_t gfp_mask = flags & BLK_MQ_REQ_NOWAIT ? GFP_ATOMIC :
-+			 __GFP_DIRECT_RECLAIM;
- 	int ret = 0;
- 
- 	WARN_ON_ONCE(q->mq_ops);
-@@ -1410,7 +1415,7 @@ static struct request *blk_old_get_request(struct request_queue *q,
- 	if (ret)
- 		return ERR_PTR(ret);
- 	spin_lock_irq(q->queue_lock);
--	rq = get_request(q, op, NULL, gfp_mask);
-+	rq = get_request(q, op, NULL, flags);
- 	if (IS_ERR(rq)) {
- 		spin_unlock_irq(q->queue_lock);
- 		blk_queue_exit(q);
-@@ -1424,25 +1429,40 @@ static struct request *blk_old_get_request(struct request_queue *q,
- 	return rq;
- }
- 
--struct request *blk_get_request(struct request_queue *q, unsigned int op,
--				gfp_t gfp_mask)
-+/**
-+ * blk_get_request_flags - allocate a request
-+ * @q: request queue to allocate a request for
-+ * @op: operation (REQ_OP_*) and REQ_* flags, e.g. REQ_SYNC.
-+ * @flags: BLK_MQ_REQ_* flags, e.g. BLK_MQ_REQ_NOWAIT.
-+ */
-+struct request *blk_get_request_flags(struct request_queue *q, unsigned int op,
-+				      unsigned int flags)
- {
- 	struct request *req;
- 
-+	WARN_ON_ONCE(op & REQ_NOWAIT);
-+	WARN_ON_ONCE(flags & ~BLK_MQ_REQ_NOWAIT);
-+
- 	if (q->mq_ops) {
--		req = blk_mq_alloc_request(q, op,
--			(gfp_mask & __GFP_DIRECT_RECLAIM) ?
--				0 : BLK_MQ_REQ_NOWAIT);
-+		req = blk_mq_alloc_request(q, op, flags);
- 		if (!IS_ERR(req) && q->mq_ops->initialize_rq_fn)
- 			q->mq_ops->initialize_rq_fn(req);
- 	} else {
--		req = blk_old_get_request(q, op, gfp_mask);
-+		req = blk_old_get_request(q, op, flags);
- 		if (!IS_ERR(req) && q->initialize_rq_fn)
- 			q->initialize_rq_fn(req);
- 	}
- 
- 	return req;
- }
-+EXPORT_SYMBOL(blk_get_request_flags);
-+
-+struct request *blk_get_request(struct request_queue *q, unsigned int op,
-+				gfp_t gfp_mask)
-+{
-+	return blk_get_request_flags(q, op, gfp_mask & __GFP_DIRECT_RECLAIM ?
-+				     0 : BLK_MQ_REQ_NOWAIT);
-+}
- EXPORT_SYMBOL(blk_get_request);
- 
- /**
-@@ -1868,7 +1888,7 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
- 	 * Returns with the queue unlocked.
- 	 */
- 	blk_queue_enter_live(q);
--	req = get_request(q, bio->bi_opf, bio, GFP_NOIO);
-+	req = get_request(q, bio->bi_opf, bio, 0);
- 	if (IS_ERR(req)) {
- 		blk_queue_exit(q);
- 		__wbt_done(q->rq_wb, wb_acct);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 9fb71fc7d0e8..3f7b08a9b9ae 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -935,6 +935,9 @@ extern void blk_rq_init(struct request_queue *q, struct request *rq);
- extern void blk_init_request_from_bio(struct request *req, struct bio *bio);
- extern void blk_put_request(struct request *);
- extern void __blk_put_request(struct request_queue *, struct request *);
-+extern struct request *blk_get_request_flags(struct request_queue *,
-+					     unsigned int op,
-+					     unsigned int flags);
- extern struct request *blk_get_request(struct request_queue *, unsigned int op,
- 				       gfp_t gfp_mask);
- extern void blk_requeue_request(struct request_queue *, struct request *);
--- 
-2.14.2
+HW CMDQ offers 25% - 50% better random multi-threaded I/O.  I see a slight
+2% drop in sequential read speed but no change to sequential write.
+
+Non-CQE blk-mq showed a 3% decrease in sequential read performance.  This
+seemed to be coming from the inferior latency of running work items compared
+with a dedicated thread.  Hacking blk-mq workqueue to be unbound reduced the
+performance degradation from 3% to 1%.
+
+While we should look at changing blk-mq to give better workqueue performance,
+a bigger gain is likely to be made by adding a new host API to enable the
+next already-prepared request to be issued directly from within ->done()
+callback of the current request.
+
+
+Changes since V10:
+      mmc: core: Remove unnecessary host claim
+      mmc: core: Introduce host claiming by context
+      mmc: core: Add support for handling CQE requests
+      mmc: mmc: Enable Command Queuing
+      mmc: mmc: Enable CQE's
+      mmc: block: Use local variables in mmc_blk_data_prep()
+      mmc: block: Prepare CQE data
+      mmc: block: Factor out mmc_setup_queue()
+      mmc: core: Add parameter use_blk_mq
+      mmc: core: Export mmc_start_bkops()
+      mmc: core: Export mmc_start_request()
+      mmc: core: Export mmc_retune_hold_now() and mmc_retune_release()
+	Dropped because they have been applied
+      mmc: block: Add CQE and blk-mq support
+	Extend blk-mq support for asynchronous read / writes to all host
+	controllers including those that require polling. The direct
+	completion path is still available but depends on a new capability
+	flag.
+	Drop blk-mq support for synchronous read / writes.
+
+Venkat Gopalakrishnan (1):
+      mmc: cqhci: support for command queue enabled host
+
+Changes since V9:
+      mmc: block: Add CQE and blk-mq support
+	- reinstate mq support for REQ_OP_DRV_IN/OUT that was removed because
+	it was incorrectly assumed to be handled by the rpmb character device
+	- don't check for rpmb block device anymore
+      mmc: cqhci: support for command queue enabled host
+	Fix cqhci_set_irqs() as per Haibo Chen
+
+Changes since V8:
+	Re-based
+      mmc: core: Introduce host claiming by context
+	Slightly simplified as per Ulf
+      mmc: core: Export mmc_retune_hold_now() and mmc_retune_release()
+	New patch.
+      mmc: block: Add CQE and blk-mq support
+	Fix missing ->post_req() on the error path
+
+Changes since V7:
+	Re-based
+      mmc: core: Introduce host claiming by context
+	Slightly simplified
+      mmc: core: Add parameter use_blk_mq
+	New patch.
+      mmc: core: Remove unnecessary host claim
+	New patch.
+      mmc: core: Export mmc_start_bkops()
+	New patch.
+      mmc: core: Export mmc_start_request()
+	New patch.
+      mmc: block: Add CQE and blk-mq support
+	Add blk-mq support for non_CQE requests
+
+Changes since V6:
+      mmc: core: Introduce host claiming by context
+	New patch.
+      mmc: core: Move mmc_start_areq() declaration
+	Dropped because it has been applied
+      mmc: block: Fix block status codes
+	Dropped because it has been applied
+      mmc: host: Add CQE interface
+	Dropped because it has been applied
+      mmc: core: Turn off CQE before sending commands
+	Dropped because it has been applied
+      mmc: block: Factor out mmc_setup_queue()
+	New patch.
+      mmc: block: Add CQE support
+	Drop legacy support and add blk-mq support
+
+Changes since V5:
+	Re-based
+      mmc: core: Add mmc_retune_hold_now()
+	Dropped because it has been applied
+      mmc: core: Add members to mmc_request and mmc_data for CQE's
+	Dropped because it has been applied
+      mmc: core: Move mmc_start_areq() declaration
+	New patch at Ulf's request
+      mmc: block: Fix block status codes
+	Another un-related patch
+      mmc: host: Add CQE interface
+	Move recovery_notifier() callback to struct mmc_request
+      mmc: core: Add support for handling CQE requests
+	Roll __mmc_cqe_request_done() into mmc_cqe_request_done()
+	Move function declarations requested by Ulf
+      mmc: core: Remove unused MMC_CAP2_PACKED_CMD
+	Dropped because it has been applied
+      mmc: block: Add CQE support
+	Add explanation to commit message
+	Adjustment for changed recovery_notifier() callback
+      mmc: cqhci: support for command queue enabled host
+	Adjustment for changed recovery_notifier() callback
+      mmc: sdhci-pci: Add CQHCI support for Intel GLK
+	Add DCMD capability for Intel controllers except GLK
+
+Changes since V4:
+      mmc: core: Add mmc_retune_hold_now()
+	Add explanation to commit message.
+      mmc: host: Add CQE interface
+	Add comments to callback declarations.
+      mmc: core: Turn off CQE before sending commands
+	Add explanation to commit message.
+      mmc: core: Add support for handling CQE requests
+	Add comments as requested by Ulf.
+      mmc: core: Remove unused MMC_CAP2_PACKED_CMD
+	New patch.
+      mmc: mmc: Enable Command Queuing
+	Adjust for removal of MMC_CAP2_PACKED_CMD.
+	Add a comment about Packed Commands.
+      mmc: mmc: Enable CQE's
+	Remove un-necessary check for MMC_CAP2_CQE
+      mmc: block: Use local variables in mmc_blk_data_prep()
+	New patch.
+      mmc: block: Prepare CQE data
+	Adjust due to "mmc: block: Use local variables in mmc_blk_data_prep()"
+	Remove priority setting.
+	Add explanation to commit message.
+      mmc: cqhci: support for command queue enabled host
+	Fix transfer descriptor setting in cqhci_set_tran_desc() for 32-bit DMA
+
+Changes since V3:
+	Adjusted ...blk_end_request...() for new block status codes
+	Fixed CQHCI transaction descriptor for "no DCMD" case
+
+Changes since V2:
+	Dropped patches that have been applied.
+	Re-based
+	Added "mmc: sdhci-pci: Add CQHCI support for Intel GLK"
+
+Changes since V1:
+
+	"Share mmc request array between partitions" is dependent
+	on changes in "Introduce queue semantics", so added that
+	and block fixes:
+
+	Added "Fix is_waiting_last_req set incorrectly"
+	Added "Fix cmd error reset failure path"
+	Added "Use local var for mqrq_cur"
+	Added "Introduce queue semantics"
+
+Changes since RFC:
+
+	Re-based on next.
+	Added comment about command queue priority.
+	Added some acks and reviews.
+
+
+Adrian Hunter (3):
+      mmc: core: Add parameter use_blk_mq
+      mmc: block: Add CQE and blk-mq support
+      mmc: sdhci-pci: Add CQHCI support for Intel GLK
+
+Venkat Gopalakrishnan (1):
+      mmc: cqhci: support for command queue enabled host
+
+ drivers/mmc/Kconfig               |   11 +
+ drivers/mmc/core/block.c          |  801 +++++++++++++++++++++++++-
+ drivers/mmc/core/block.h          |   12 +
+ drivers/mmc/core/core.c           |    7 +
+ drivers/mmc/core/core.h           |    2 +
+ drivers/mmc/core/host.c           |    2 +
+ drivers/mmc/core/host.h           |    4 +
+ drivers/mmc/core/queue.c          |  426 +++++++++++++-
+ drivers/mmc/core/queue.h          |   61 ++
+ drivers/mmc/host/Kconfig          |   14 +
+ drivers/mmc/host/Makefile         |    1 +
+ drivers/mmc/host/cqhci.c          | 1150 +++++++++++++++++++++++++++++++++++++
+ drivers/mmc/host/cqhci.h          |  240 ++++++++
+ drivers/mmc/host/sdhci-pci-core.c |  155 ++++-
+ include/linux/mmc/host.h          |    2 +
+ 15 files changed, 2857 insertions(+), 31 deletions(-)
+ create mode 100644 drivers/mmc/host/cqhci.c
+ create mode 100644 drivers/mmc/host/cqhci.h
+
+
+Regards
+Adrian
