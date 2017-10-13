@@ -1,104 +1,111 @@
-Return-Path: <keescook@chromium.org>
-Return-Path: <keescook@chromium.org>
-Date: Thu, 5 Oct 2017 16:13:54 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org, "Ed L. Cashin" <ed.cashin@acm.org>,
-	linux-block@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
-Subject: [PATCH v2] block/aoe: Convert timers to use timer_setup()
-Message-ID: <20171005231354.GA109107@beast>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from regular1.263xmail.com ([211.150.99.141]:59244 "EHLO
+        regular1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753672AbdJMDpZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 12 Oct 2017 23:45:25 -0400
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+To: linux-kernel@vger.kernel.org, axboe@fb.com, hch@lst.de
+Cc: Jeffy Chen <jeffy.chen@rock-chips.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH v2 2/2] block/cfq: Fix memory leak without CFQ_GROUP_IOSCHED
+Date: Fri, 13 Oct 2017 11:45:07 +0800
+Message-Id: <20171013034507.30823-2-jeffy.chen@rock-chips.com>
+In-Reply-To: <20171013034507.30823-1-jeffy.chen@rock-chips.com>
+References: <20171013034507.30823-1-jeffy.chen@rock-chips.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-In preparation for unconditionally passing the struct timer_list pointer to
-all timer callbacks, switch to using the new timer_setup() and from_timer()
-to pass the timer pointer explicitly.
+Currently we only unref the async cfqqs in cfq_pd_offline, which would
+never be called without CONFIG_CFQ_GROUP_IOSCHED enabled.
 
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: "Ed L. Cashin" <ed.cashin@acm.org>
-Cc: linux-block@vger.kernel.org
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Signed-off-by: Kees Cook <keescook@chromium.org>
+Kmemleak reported:
+unreferenced object 0xffffffc0cd9fc000 (size 240):
+  comm "kworker/3:1", pid 52, jiffies 4294673527 (age 97.149s)
+  hex dump (first 32 bytes):
+    01 00 00 00 00 00 00 00 80 55 13 cf c0 ff ff ff  .........U......
+    10 c0 9f cd c0 ff ff ff 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffff9008c6f720>] kmemleak_alloc+0x58/0x8c
+    [<ffffff900828f87c>] kmem_cache_alloc+0x184/0x268
+    [<ffffff90084ce300>] cfq_get_queue.isra.11+0x144/0x2e0
+    [<ffffff90084ce8b0>] cfq_set_request+0x1bc/0x444
+    [<ffffff9008495730>] elv_set_request+0x88/0x9c
+    [<ffffff900849d690>] get_request+0x494/0x914
+    [<ffffff900849de34>] blk_get_request+0xdc/0x160
+    [<ffffff90086e8054>] scsi_execute+0x70/0x23c
+    [<ffffff90086e8314>] scsi_test_unit_ready+0xf4/0x1ec
+
+Fixes: 60a837077e2b ("cfq-iosched: charge async IOs to the appropriate blkcg's instead of the root")
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
-v2: Rebased to linux-block.git/for-4.15/timer
----
- drivers/block/aoe/aoecmd.c | 6 +++---
- drivers/block/aoe/aoedev.c | 9 +++------
- 2 files changed, 6 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/block/aoe/aoecmd.c b/drivers/block/aoe/aoecmd.c
-index dc43254e05a4..55ab25f79a08 100644
---- a/drivers/block/aoe/aoecmd.c
-+++ b/drivers/block/aoe/aoecmd.c
-@@ -744,7 +744,7 @@ count_targets(struct aoedev *d, int *untainted)
+Changes in v2:
+Rewrite commit message and rename api.
+
+ block/cfq-iosched.c | 28 ++++++++++++++++++----------
+ 1 file changed, 18 insertions(+), 10 deletions(-)
+
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index 9f342ef1ad42..d182e81a07af 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -401,6 +401,7 @@ struct cfq_data {
+ 
+ static struct cfq_group *cfq_get_next_cfqg(struct cfq_data *cfqd);
+ static void cfq_put_queue(struct cfq_queue *cfqq);
++static void cfq_put_async_queues(struct cfq_group *cfqg);
+ 
+ static struct cfq_rb_root *st_for(struct cfq_group *cfqg,
+ 					    enum wl_class_t class,
+@@ -1638,17 +1639,8 @@ static void cfq_pd_init(struct blkg_policy_data *pd)
+ static void cfq_pd_offline(struct blkg_policy_data *pd)
+ {
+ 	struct cfq_group *cfqg = pd_to_cfqg(pd);
+-	int i;
+-
+-	for (i = 0; i < IOPRIO_BE_NR; i++) {
+-		if (cfqg->async_cfqq[0][i])
+-			cfq_put_queue(cfqg->async_cfqq[0][i]);
+-		if (cfqg->async_cfqq[1][i])
+-			cfq_put_queue(cfqg->async_cfqq[1][i]);
+-	}
+ 
+-	if (cfqg->async_idle_cfqq)
+-		cfq_put_queue(cfqg->async_idle_cfqq);
++	cfq_put_async_queues(cfqg);
+ 
+ 	/*
+ 	 * @blkg is going offline and will be ignored by
+@@ -3741,6 +3733,21 @@ static void cfq_init_cfqq(struct cfq_data *cfqd, struct cfq_queue *cfqq,
+ 	cfqq->pid = pid;
  }
  
- static void
--rexmit_timer(ulong vp)
-+rexmit_timer(struct timer_list *timer)
++static void cfq_put_async_queues(struct cfq_group *cfqg)
++{
++	int i;
++
++	for (i = 0; i < IOPRIO_BE_NR; i++) {
++		if (cfqg->async_cfqq[0][i])
++			cfq_put_queue(cfqg->async_cfqq[0][i]);
++		if (cfqg->async_cfqq[1][i])
++			cfq_put_queue(cfqg->async_cfqq[1][i]);
++	}
++
++	if (cfqg->async_idle_cfqq)
++		cfq_put_queue(cfqg->async_idle_cfqq);
++}
++
+ #ifdef CONFIG_CFQ_GROUP_IOSCHED
+ static void check_blkcg_changed(struct cfq_io_cq *cic, struct bio *bio)
  {
- 	struct aoedev *d;
- 	struct aoetgt *t;
-@@ -758,7 +758,7 @@ rexmit_timer(ulong vp)
- 	int utgts;	/* number of aoetgt descriptors (not slots) */
- 	int since;
- 
--	d = (struct aoedev *) vp;
-+	d = from_timer(d, timer, timer);
- 
- 	spin_lock_irqsave(&d->lock, flags);
- 
-@@ -1429,7 +1429,7 @@ aoecmd_ata_id(struct aoedev *d)
- 
- 	d->rttavg = RTTAVG_INIT;
- 	d->rttdev = RTTDEV_INIT;
--	d->timer.function = rexmit_timer;
-+	d->timer.function = (TIMER_FUNC_TYPE)rexmit_timer;
- 
- 	skb = skb_clone(skb, GFP_ATOMIC);
- 	if (skb) {
-diff --git a/drivers/block/aoe/aoedev.c b/drivers/block/aoe/aoedev.c
-index b28fefb90391..697f735b07a4 100644
---- a/drivers/block/aoe/aoedev.c
-+++ b/drivers/block/aoe/aoedev.c
-@@ -15,7 +15,6 @@
- #include <linux/string.h>
- #include "aoe.h"
- 
--static void dummy_timer(ulong);
- static void freetgt(struct aoedev *d, struct aoetgt *t);
- static void skbpoolfree(struct aoedev *d);
- 
-@@ -146,11 +145,11 @@ aoedev_put(struct aoedev *d)
- }
- 
- static void
--dummy_timer(ulong vp)
-+dummy_timer(struct timer_list *t)
- {
- 	struct aoedev *d;
- 
--	d = (struct aoedev *)vp;
-+	d = from_timer(d, t, timer);
- 	if (d->flags & DEVFL_TKILL)
- 		return;
- 	d->timer.expires = jiffies + HZ;
-@@ -466,9 +465,7 @@ aoedev_by_aoeaddr(ulong maj, int min, int do_alloc)
- 	INIT_WORK(&d->work, aoecmd_sleepwork);
- 	spin_lock_init(&d->lock);
- 	skb_queue_head_init(&d->skbpool);
--	init_timer(&d->timer);
--	d->timer.data = (ulong) d;
--	d->timer.function = dummy_timer;
-+	timer_setup(&d->timer, dummy_timer, 0);
- 	d->timer.expires = jiffies + HZ;
- 	add_timer(&d->timer);
- 	d->bufpool = NULL;	/* defer to aoeblk_gdalloc */
+@@ -4564,6 +4571,7 @@ static void cfq_exit_queue(struct elevator_queue *e)
+ #ifdef CONFIG_CFQ_GROUP_IOSCHED
+ 	blkcg_deactivate_policy(q, &blkcg_policy_cfq);
+ #else
++	cfq_put_async_queues(cfqd->root_group);
+ 	kfree(cfqd->root_group);
+ #endif
+ 	kfree(cfqd);
 -- 
-2.7.4
-
-
--- 
-Kees Cook
-Pixel Security
+2.11.0
