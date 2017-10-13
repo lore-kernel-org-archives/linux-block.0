@@ -1,59 +1,215 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:53745 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751128AbdJBNw0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 Oct 2017 09:52:26 -0400
-Date: Mon, 2 Oct 2017 06:52:25 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
         Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Cathy Avery <cavery@redhat.com>,
-        Martin Steigerwald <martin@lichtvoll.de>,
-        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
-        stable@vger.kernel.org, Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: Re: [PATCH V7 6/6] SCSI: set block queue at preempt only when SCSI
- device is put into quiesce
-Message-ID: <20171002135225.GF19119@infradead.org>
-References: <20170930061214.10622-1-ming.lei@redhat.com>
- <20170930061214.10622-7-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170930061214.10622-7-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        John Garry <john.garry@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V9 5/7] blk-mq-sched: improve dispatching from sw queue
+Date: Sat, 14 Oct 2017 02:05:30 +0800
+Message-Id: <20171013180532.29304-6-ming.lei@redhat.com>
+In-Reply-To: <20171013180532.29304-1-ming.lei@redhat.com>
+References: <20171013180532.29304-1-ming.lei@redhat.com>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-> +	/*
-> +	 * Simply quiesing SCSI device isn't safe, it is easy
-> +	 * to use up requests because all these allocated requests
-> +	 * can't be dispatched when device is put in QIUESCE.
-> +	 * Then no request can be allocated and we may hang
-> +	 * somewhere, such as system suspend/resume.
-> +	 *
-> +	 * So we set block queue in preempt only first, no new
-> +	 * normal request can enter queue any more, and all pending
-> +	 * requests are drained once blk_set_preempt_only()
-> +	 * returns. Only RQF_PREEMPT is allowed in preempt only mode.
-> +	 */
-> +	blk_set_preempt_only(sdev->request_queue, true);
-> +
->  	mutex_lock(&sdev->state_mutex);
->  	err = scsi_device_set_state(sdev, SDEV_QUIESCE);
+SCSI devices use host-wide tagset, and the shared driver tag space is
+often quite big. Meantime there is also queue depth for each lun(
+.cmd_per_lun), which is often small, for example, on both lpfc and
+qla2xxx, .cmd_per_lun is just 3.
 
-Why is this not under state_mutex so that we guarantee it's atomic
-vs sdev state changes?
+So lots of requests may stay in sw queue, and we always flush all
+belonging to same hw queue and dispatch them all to driver, unfortunately
+it is easy to cause queue busy because of the small .cmd_per_lun.
+Once these requests are flushed out, they have to stay in hctx->dispatch,
+and no bio merge can participate into these requests, and sequential IO
+performance is hurt a lot.
 
-> @@ -2964,6 +2981,8 @@ void scsi_device_resume(struct scsi_device *sdev)
->  	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0)
->  		scsi_run_queue(sdev->request_queue);
->  	mutex_unlock(&sdev->state_mutex);
-> +
-> +	blk_set_preempt_only(sdev->request_queue, false);
+This patch introduces blk_mq_dequeue_from_ctx for dequeuing request from
+sw queue so that we can dispatch them in scheduler's way, then we can
+avoid to dequeue too many requests from sw queue when ->dispatch isn't
+flushed completely.
 
-Same here.
+This patch improves dispatching from sw queue by using the callback of
+.get_budget and .put_budget
+
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-sched.c   | 68 +++++++++++++++++++++++++++++++++++++++++++++++---
+ block/blk-mq.c         | 39 +++++++++++++++++++++++++++++
+ block/blk-mq.h         |  2 ++
+ include/linux/blk-mq.h |  2 ++
+ 4 files changed, 108 insertions(+), 3 deletions(-)
+
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 6bb92bbc3135..92df88351ad2 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -121,6 +121,55 @@ static bool blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+ 	return false;
+ }
+ 
++static struct blk_mq_ctx *blk_mq_next_ctx(struct blk_mq_hw_ctx *hctx,
++					  struct blk_mq_ctx *ctx)
++{
++	unsigned idx = ctx->index_hw;
++
++	if (++idx == hctx->nr_ctx)
++		idx = 0;
++
++	return hctx->ctxs[idx];
++}
++
++static bool blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
++{
++	struct request_queue *q = hctx->queue;
++	LIST_HEAD(rq_list);
++	struct blk_mq_ctx *ctx = READ_ONCE(hctx->dispatch_from);
++
++	do {
++		struct request *rq;
++		blk_status_t ret;
++
++		if (!sbitmap_any_bit_set(&hctx->ctx_map))
++			break;
++
++		ret = blk_mq_get_dispatch_budget(hctx);
++		if (ret == BLK_STS_RESOURCE)
++			return true;
++
++		rq = blk_mq_dequeue_from_ctx(hctx, ctx);
++		if (!rq) {
++			blk_mq_put_dispatch_budget(hctx, true);
++			break;
++		} else if (ret != BLK_STS_OK) {
++			blk_mq_end_request(rq, ret);
++			continue;
++		}
++
++		list_add(&rq->queuelist, &rq_list);
++
++		/* round robin for fair dispatch */
++		ctx = blk_mq_next_ctx(hctx, rq->mq_ctx);
++
++	} while (blk_mq_dispatch_rq_list(q, &rq_list, true));
++
++	WRITE_ONCE(hctx->dispatch_from, ctx);
++
++	return false;
++}
++
+ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct request_queue *q = hctx->queue;
+@@ -161,11 +210,24 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	 */
+ 	if (!list_empty(&rq_list)) {
+ 		blk_mq_sched_mark_restart_hctx(hctx);
+-		if (blk_mq_dispatch_rq_list(q, &rq_list, false) &&
+-				has_sched_dispatch)
+-			run_queue = blk_mq_do_dispatch_sched(hctx);
++		if (blk_mq_dispatch_rq_list(q, &rq_list, false)) {
++			if (has_sched_dispatch)
++				run_queue = blk_mq_do_dispatch_sched(hctx);
++			else
++				run_queue = blk_mq_do_dispatch_ctx(hctx);
++		}
+ 	} else if (has_sched_dispatch) {
+ 		run_queue = blk_mq_do_dispatch_sched(hctx);
++	} else if (q->mq_ops->get_budget) {
++		/*
++		 * If we need to get budget before queuing request, we
++		 * dequeue request one by one from sw queue for avoiding
++		 * to mess up I/O merge when dispatch runs out of resource.
++		 *
++		 * TODO: get more budgets, and dequeue more requests in
++		 * one time.
++		 */
++		run_queue = blk_mq_do_dispatch_ctx(hctx);
+ 	} else {
+ 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+ 		blk_mq_dispatch_rq_list(q, &rq_list, false);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index feb89f1fcc63..3fdc5662231e 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -914,6 +914,45 @@ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list)
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_flush_busy_ctxs);
+ 
++struct dispatch_rq_data {
++	struct blk_mq_hw_ctx *hctx;
++	struct request *rq;
++};
++
++static bool dispatch_rq_from_ctx(struct sbitmap *sb, unsigned int bitnr,
++		void *data)
++{
++	struct dispatch_rq_data *dispatch_data = data;
++	struct blk_mq_hw_ctx *hctx = dispatch_data->hctx;
++	struct blk_mq_ctx *ctx = hctx->ctxs[bitnr];
++
++	spin_lock(&ctx->lock);
++	if (unlikely(!list_empty(&ctx->rq_list))) {
++		dispatch_data->rq = list_entry_rq(ctx->rq_list.next);
++		list_del_init(&dispatch_data->rq->queuelist);
++		if (list_empty(&ctx->rq_list))
++			sbitmap_clear_bit(sb, bitnr);
++	}
++	spin_unlock(&ctx->lock);
++
++	return !dispatch_data->rq;
++}
++
++struct request *blk_mq_dequeue_from_ctx(struct blk_mq_hw_ctx *hctx,
++					struct blk_mq_ctx *start)
++{
++	unsigned off = start ? start->index_hw : 0;
++	struct dispatch_rq_data data = {
++		.hctx = hctx,
++		.rq   = NULL,
++	};
++
++	__sbitmap_for_each_set(&hctx->ctx_map, off,
++			       dispatch_rq_from_ctx, &data);
++
++	return data.rq;
++}
++
+ static inline unsigned int queued_to_index(unsigned int queued)
+ {
+ 	if (!queued)
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index fab566ce0bbf..97e97a59464a 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -35,6 +35,8 @@ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list);
+ bool blk_mq_hctx_has_pending(struct blk_mq_hw_ctx *hctx);
+ bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
+ 				bool wait);
++struct request *blk_mq_dequeue_from_ctx(struct blk_mq_hw_ctx *hctx,
++					struct blk_mq_ctx *start);
+ 
+ /*
+  * Internal helpers for allocating/freeing the request map
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 901457df3d64..e5e6becd57d3 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -30,6 +30,8 @@ struct blk_mq_hw_ctx {
+ 
+ 	struct sbitmap		ctx_map;
+ 
++	struct blk_mq_ctx	*dispatch_from;
++
+ 	struct blk_mq_ctx	**ctxs;
+ 	unsigned int		nr_ctx;
+ 
+-- 
+2.9.5
