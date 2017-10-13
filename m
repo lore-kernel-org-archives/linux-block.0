@@ -1,58 +1,59 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qt0-f176.google.com ([209.85.216.176]:55954 "EHLO
-        mail-qt0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751454AbdJCQK2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2017 12:10:28 -0400
-Received: by mail-qt0-f176.google.com with SMTP id x54so13847201qth.12
-        for <linux-block@vger.kernel.org>; Tue, 03 Oct 2017 09:10:27 -0700 (PDT)
-From: lee.tibbert@gmail.com
-To: linux-block@vger.kernel.org
-Cc: lucmiccio@gmail.com, paolo.valente@linaro.org,
-        lee.tibbert@gmail.com
-Subject: Re: [PATCH] block,bfq: Disable writeback throttling
-Date: Tue,  3 Oct 2017 12:10:18 -0400
-Message-Id: <20171003161018.18039-1-lee.tibbert@gmail.com>
-In-Reply-To: <20170913100356.3649-1-lucmiccio@gmail.com>
-References: <20170913100356.3649-1-lucmiccio@gmail.com>
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:49815 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932461AbdJMMr7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 08:47:59 -0400
+Received: by mail-wm0-f67.google.com with SMTP id b189so21118018wmd.4
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:58 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 54/58] lightnvm: pblk: remove spinlock when freeing line metadata
+Date: Fri, 13 Oct 2017 14:46:43 +0200
+Message-Id: <20171013124647.32668-55-m@bjorling.me>
+In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
+References: <20171013124647.32668-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-Luca,
+Lockdep complains about being in atomic context while freeing line
+metadata - and rightly so as we take a spinlock and end up calling
+vfree that might sleep(in pblk_mfree).
 
-Please feel free to add:
+There is no need for holding the line manager free_lock while
+freeing line metadata as the pipeline as stopped, so remove the lock.
 
-  Tested-by: Lee Tibbert <lee.tibbert@gmail.com>
+Fixes: 588726d3ec68 ("lightnvm: pblk: fail gracefully on irrec. error")
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
+---
+ drivers/lightnvm/pblk-init.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-The short story is that, with one small commenting issue, the patch is
-fine on my system.  The small issue is that block/blk-wbt.c line 657 says:
-
-    Disable wbt, if enabled by default. Only called from CFQ.
-
-As of this patch, that comment is no longer true.  Adding "& BFQ" is
-the obvious edit, but simply deleting the "Only" sentence is probably
-more robust. IMHO, that should not hold up acceptence of this patch.
-
-Longer story:
-
-      In addition to running this for almost three weeks now, I explicitly
-      tested a number of paths CONFIG_BLK_WBT enabled &
-      disabled, etc. Details upon request.
-
-      In particular, I tested that when CONFIG_BLK_WBT is enabled
-      sys/block/sda/queue/wbt_lat_usec is cleared when the elevator
-      is set to BFQ(BFQ-MQ). Patch does what it purports.
-
-      I also tested that wbt_lat_usec gets set back to its default when
-      an elevator other than BFQ is selected after BFQ is active. (Yeah,
-      the new elevator probably does this. There is no code in BFQ to do it).
-
-      This patch makes it easier to get write back settings right when using
-      cgroups.  With cgroup, on wants  CONFIG_BLK_DEV_THROTTLING on
-      but CONFIG_BLK_WBT off. This patch painlessly assures the latter
-      and reduces, at least my, confusion.
-
-Thank you for this patch. I hope that it is accepted for linux-block in
-as time allows.
-
-Lee
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 52c85f4..f62112b 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -393,13 +393,11 @@ static void pblk_line_meta_free(struct pblk *pblk)
+ 	kfree(l_mg->bb_aux);
+ 	kfree(l_mg->vsc_list);
+ 
+-	spin_lock(&l_mg->free_lock);
+ 	for (i = 0; i < PBLK_DATA_LINES; i++) {
+ 		kfree(l_mg->sline_meta[i]);
+ 		pblk_mfree(l_mg->eline_meta[i]->buf, l_mg->emeta_alloc_type);
+ 		kfree(l_mg->eline_meta[i]);
+ 	}
+-	spin_unlock(&l_mg->free_lock);
+ 
+ 	kfree(pblk->lines);
+ }
+-- 
+2.9.3
