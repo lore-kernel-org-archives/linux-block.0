@@ -1,115 +1,113 @@
-Return-Path: <prvs=449916f6d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Oleksandr Natalenko <oleksandr@natalenko.name>,
-	Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v8 00/10] block, scsi, md: Improve suspend and resume
-Date: Tue, 10 Oct 2017 14:03:36 -0700
-Message-Id: <20171010210346.14574-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:56357 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932368AbdJMMr4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 08:47:56 -0400
+Received: by mail-wm0-f66.google.com with SMTP id l68so21514260wmd.5
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:55 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 51/58] lightnvm: pblk: add l2p crc debug printouts
+Date: Fri, 13 Oct 2017 14:46:40 +0200
+Message-Id: <20171013124647.32668-52-m@bjorling.me>
+In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
+References: <20171013124647.32668-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hello Jens,
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-It is known that during the resume following a hibernate, especially when
-using an md RAID1 array created on top of SCSI devices, sometimes the system
-hangs instead of coming up properly. This patch series fixes that
-problem. These patches have been tested on top of the block layer for-next
-branch. Please consider these changes for kernel v4.15.
+Print the CRC of the logical-to-physical mapping during exit and
+after recovering the L2P table to facilitate detection of meta
+data corruption/recovery issues.
 
-Thanks,
+The CRC printed after recovery should match the CRC printed during
+the previous exit - if it doesn't this indicates that either the meta
+data written to the disk is corrupt or recovery failed.
 
-Bart.
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
+---
+ drivers/lightnvm/pblk-init.c | 39 ++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 34 insertions(+), 5 deletions(-)
 
-Changes between v7 and v8:
-- Fixed a (theoretical?) race identified by Ming Lei.
-- Added a tenth patch that checks whether the proper type of flags has been
-  passed to a range of block layer functions.
-
-Changes between v6 and v7:
-- Added support for the PREEMPT_ONLY flag in blk-mq-debugfs.c.
-- Fixed kerneldoc header of blk_queue_enter().
-- Added a rcu_read_lock_sched() / rcu_read_unlock_sched() pair in
-  blk_set_preempt_only().
-- Removed a synchronize_rcu() call from scsi_device_quiesce().
-- Modified the description of patch 9/9 in this series.
-- Removed scsi_run_queue() call from scsi_device_resume().
-
-Changes between v5 and v6:
-- Split an md patch into two patches to make it easier to review the changes.
-- For the md patch that suspends I/O while the system is frozen, switched back
-  to the freezer mechanism because this makes the code shorter and easier to
-  review.
-- Changed blk_set/clear_preempt_only() from EXPORT_SYMBOL() into
-  EXPORT_SYMBOL_GPL().
-- Made blk_set_preempt_only() behave as a test-and-set operation.
-- Introduced blk_get_request_flags() and BLK_MQ_REQ_PREEMPT as requested by
-  Christoph and reduced the number of arguments of blk_queue_enter() back from
-  three to two.
-- In scsi_device_quiesce(), moved the blk_mq_freeze_queue() call out of a
-  critical section. Made the explanation of why the synchronize_rcu() call
-  is necessary more detailed.
-
-Changes between v4 and v5:
-- Split blk_set_preempt_only() into two functions as requested by Christoph.
-- Made blk_get_request() trigger WARN_ONCE() if it is attempted to allocate
-  a request while the system is frozen. This is a big help to identify drivers
-  that submit I/O while the system is frozen.
-- Since kernel thread freezing is on its way out, reworked the approach for
-  avoiding that the md driver submits I/O while the system is frozen such that
-  the approach no longer depends on the kernel thread freeze mechanism.
-- Fixed the (theoretical) deadlock in scsi_device_quiesce() that was identified
-  by Ming.
-
-Changes between v3 and v4:
-- Made sure that this patch series not only works for scsi-mq but also for
-  the legacy SCSI stack.
-- Removed an smp_rmb()/smp_wmb() pair from the hot path and added a comment
-  that explains why that is safe.
-- Reordered the patches in this patch series.
-
-Changes between v2 and v3:
-- Made md kernel threads freezable.
-- Changed the approach for quiescing SCSI devices again.
-- Addressed Ming's review comments.
-
-Changes compared to v1 of this patch series:
-- Changed the approach and rewrote the patch series.
-
-Bart Van Assche (9):
-  md: Rename md_notifier into md_reboot_notifier
-  md: Introduce md_stop_all_writes()
-  md: Neither resync nor reshape while the system is frozen
-  block: Introduce blk_get_request_flags()
-  block: Introduce BLK_MQ_REQ_PREEMPT
-  ide, scsi: Tell the block layer at request allocation time about
-    preempt requests
-  block: Add the QUEUE_FLAG_PREEMPT_ONLY request queue flag
-  block, scsi: Make SCSI quiesce and resume work reliably
-  block, nvme: Introduce blk_mq_req_flags_t
-
-Ming Lei (1):
-  block: Make q_usage_counter also track legacy requests
-
- block/blk-core.c          | 132 +++++++++++++++++++++++++++++++++++++++-------
- block/blk-mq-debugfs.c    |   1 +
- block/blk-mq.c            |  20 +++----
- block/blk-mq.h            |   2 +-
- block/blk-timeout.c       |   2 +-
- drivers/ide/ide-pm.c      |   4 +-
- drivers/md/md.c           |  45 +++++++++++++---
- drivers/nvme/host/core.c  |   5 +-
- drivers/nvme/host/nvme.h  |   5 +-
- drivers/scsi/scsi_lib.c   |  35 +++++++-----
- fs/block_dev.c            |   4 +-
- include/linux/blk-mq.h    |  16 ++++--
- include/linux/blk_types.h |   2 +
- include/linux/blkdev.h    |  11 +++-
- 14 files changed, 217 insertions(+), 67 deletions(-)
-
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index ad9f014..52c85f4 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -76,6 +76,28 @@ static blk_qc_t pblk_make_rq(struct request_queue *q, struct bio *bio)
+ 	return BLK_QC_T_NONE;
+ }
+ 
++static size_t pblk_trans_map_size(struct pblk *pblk)
++{
++	int entry_size = 8;
++
++	if (pblk->ppaf_bitsize < 32)
++		entry_size = 4;
++
++	return entry_size * pblk->rl.nr_secs;
++}
++
++#ifdef CONFIG_NVM_DEBUG
++static u32 pblk_l2p_crc(struct pblk *pblk)
++{
++	size_t map_size;
++	u32 crc = ~(u32)0;
++
++	map_size = pblk_trans_map_size(pblk);
++	crc = crc32_le(crc, pblk->trans_map, map_size);
++	return crc;
++}
++#endif
++
+ static void pblk_l2p_free(struct pblk *pblk)
+ {
+ 	vfree(pblk->trans_map);
+@@ -85,12 +107,10 @@ static int pblk_l2p_init(struct pblk *pblk)
+ {
+ 	sector_t i;
+ 	struct ppa_addr ppa;
+-	int entry_size = 8;
++	size_t map_size;
+ 
+-	if (pblk->ppaf_bitsize < 32)
+-		entry_size = 4;
+-
+-	pblk->trans_map = vmalloc(entry_size * pblk->rl.nr_secs);
++	map_size = pblk_trans_map_size(pblk);
++	pblk->trans_map = vmalloc(map_size);
+ 	if (!pblk->trans_map)
+ 		return -ENOMEM;
+ 
+@@ -508,6 +528,10 @@ static int pblk_lines_configure(struct pblk *pblk, int flags)
+ 		}
+ 	}
+ 
++#ifdef CONFIG_NVM_DEBUG
++	pr_info("pblk init: L2P CRC: %x\n", pblk_l2p_crc(pblk));
++#endif
++
+ 	/* Free full lines directly as GC has not been started yet */
+ 	pblk_gc_free_full_lines(pblk);
+ 
+@@ -901,6 +925,11 @@ static void pblk_exit(void *private)
+ 	down_write(&pblk_lock);
+ 	pblk_gc_exit(pblk);
+ 	pblk_tear_down(pblk);
++
++#ifdef CONFIG_NVM_DEBUG
++	pr_info("pblk exit: L2P CRC: %x\n", pblk_l2p_crc(pblk));
++#endif
++
+ 	pblk_free(pblk);
+ 	up_write(&pblk_lock);
+ }
 -- 
-2.14.2
+2.9.3
