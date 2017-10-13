@@ -1,114 +1,84 @@
-Return-Path: <prvs=441412a59=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V6 11/14] blokc: mq-deadline: Introduce dispatch helpers
-Date: Mon,  2 Oct 2017 16:15:32 +0900
-Message-Id: <20171002071535.8007-12-damien.lemoal@wdc.com>
-In-Reply-To: <20171002071535.8007-1-damien.lemoal@wdc.com>
-References: <20171002071535.8007-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:45150 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932176AbdJMMru (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 08:47:50 -0400
+Received: by mail-wm0-f65.google.com with SMTP id q124so21262944wmb.0
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:49 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Rakesh Pandit <rakesh@tuxera.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 44/58] lightnvm: pblk: fix releases of kmem cache in error path
+Date: Fri, 13 Oct 2017 14:46:33 +0200
+Message-Id: <20171013124647.32668-45-m@bjorling.me>
+In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
+References: <20171013124647.32668-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Avoid directly referencing the next_rq and fifo_list arrays using the
-helper functions deadline_next_request() and deadline_fifo_request() to
-facilitate changes in the dispatch request selection in
-__dd_dispatch_request().
+From: Rakesh Pandit <rakesh@tuxera.com>
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Bart Van Assche <Bart.VanAssche@wdc.com>
+If pblk_core_init fails lets destroy all global caches.
+
+Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- block/mq-deadline.c | 45 +++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 37 insertions(+), 8 deletions(-)
+ drivers/lightnvm/pblk-init.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index f0c01ef934b4..6b7b84ee8f82 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -194,13 +194,42 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 56ece7d..2e59973 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -220,6 +220,14 @@ static int pblk_init_global_caches(struct pblk *pblk)
+ 	return 0;
  }
  
- /*
-+ * For the specified data direction, return the next request to
-+ * dispatch using arrival ordered lists.
-+ */
-+static struct request *
-+deadline_fifo_request(struct deadline_data *dd, int data_dir)
++static void pblk_free_global_caches(struct pblk *pblk)
 +{
-+	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
-+		return NULL;
-+
-+	if (list_empty(&dd->fifo_list[data_dir]))
-+		return NULL;
-+
-+	return rq_entry_fifo(dd->fifo_list[data_dir].next);
++	kmem_cache_destroy(pblk_ws_cache);
++	kmem_cache_destroy(pblk_rec_cache);
++	kmem_cache_destroy(pblk_g_rq_cache);
++	kmem_cache_destroy(pblk_w_rq_cache);
 +}
 +
-+/*
-+ * For the specified data direction, return the next request to
-+ * dispatch using sector position sorted lists.
-+ */
-+static struct request *
-+deadline_next_request(struct deadline_data *dd, int data_dir)
-+{
-+	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
-+		return NULL;
-+
-+	return dd->next_rq[data_dir];
-+}
-+
-+/*
-  * deadline_dispatch_requests selects the best request according to
-  * read/write expire, fifo_batch, etc
-  */
- static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ static int pblk_core_init(struct pblk *pblk)
  {
- 	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
--	struct request *rq;
-+	struct request *rq, *next_rq;
- 	bool reads, writes;
- 	int data_dir;
+ 	struct nvm_tgt_dev *dev = pblk->dev;
+@@ -235,7 +243,7 @@ static int pblk_core_init(struct pblk *pblk)
+ 	pblk->page_bio_pool = mempool_create_page_pool(nvm_max_phys_sects(dev),
+ 									0);
+ 	if (!pblk->page_bio_pool)
+-		return -ENOMEM;
++		goto free_global_caches;
  
-@@ -216,10 +245,9 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	/*
- 	 * batches are currently reads XOR writes
- 	 */
--	if (dd->next_rq[WRITE])
--		rq = dd->next_rq[WRITE];
--	else
--		rq = dd->next_rq[READ];
-+	rq = deadline_next_request(dd, WRITE);
-+	if (!rq)
-+		rq = deadline_next_request(dd, READ);
+ 	pblk->gen_ws_pool = mempool_create_slab_pool(PBLK_GEN_WS_POOL_SIZE,
+ 							pblk_ws_cache);
+@@ -303,6 +311,8 @@ static int pblk_core_init(struct pblk *pblk)
+ 	mempool_destroy(pblk->gen_ws_pool);
+ free_page_bio_pool:
+ 	mempool_destroy(pblk->page_bio_pool);
++free_global_caches:
++	pblk_free_global_caches(pblk);
+ 	return -ENOMEM;
+ }
  
- 	if (rq && dd->batching < dd->fifo_batch)
- 		/* we have a next request are still entitled to batch */
-@@ -262,19 +290,20 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	/*
- 	 * we are not running a batch, find best request for selected data_dir
- 	 */
--	if (deadline_check_fifo(dd, data_dir) || !dd->next_rq[data_dir]) {
-+	next_rq = deadline_next_request(dd, data_dir);
-+	if (deadline_check_fifo(dd, data_dir) || !next_rq) {
- 		/*
- 		 * A deadline has expired, the last request was in the other
- 		 * direction, or we have run out of higher-sectored requests.
- 		 * Start again from the request with the earliest expiry time.
- 		 */
--		rq = rq_entry_fifo(dd->fifo_list[data_dir].next);
-+		rq = deadline_fifo_request(dd, data_dir);
- 	} else {
- 		/*
- 		 * The last req was the same dir and we have a next request in
- 		 * sort order. No expired requests so continue on from here.
- 		 */
--		rq = dd->next_rq[data_dir];
-+		rq = next_rq;
- 	}
+@@ -324,10 +334,7 @@ static void pblk_core_free(struct pblk *pblk)
+ 	mempool_destroy(pblk->e_rq_pool);
+ 	mempool_destroy(pblk->w_rq_pool);
  
- 	dd->batching = 0;
+-	kmem_cache_destroy(pblk_ws_cache);
+-	kmem_cache_destroy(pblk_rec_cache);
+-	kmem_cache_destroy(pblk_g_rq_cache);
+-	kmem_cache_destroy(pblk_w_rq_cache);
++	pblk_free_global_caches(pblk);
+ }
+ 
+ static void pblk_luns_free(struct pblk *pblk)
 -- 
-2.13.6
+2.9.3
