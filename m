@@ -1,13 +1,18 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-Date: Sat, 14 Oct 2017 16:06:05 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:8062 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751081AbdJMXQP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 19:16:15 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@infradead.org" <hch@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "axboe@fb.com" <axboe@fb.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "tom81094@gmail.com" <tom81094@gmail.com>,
         "paolo.valente@linaro.org" <paolo.valente@linaro.org>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>,
         "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
         "john.garry@huawei.com" <john.garry@huawei.com>,
@@ -15,41 +20,26 @@ Cc: "hch@infradead.org" <hch@infradead.org>,
         "loberman@redhat.com" <loberman@redhat.com>
 Subject: Re: [PATCH V9 6/7] SCSI: allow to pass null rq to
  scsi_prep_state_check()
-Message-ID: <20171014080604.GA31736@ming.t460p>
+Date: Fri, 13 Oct 2017 23:16:12 +0000
+Message-ID: <1507936571.13345.51.camel@wdc.com>
 References: <20171013180532.29304-1-ming.lei@redhat.com>
- <20171013180532.29304-7-ming.lei@redhat.com>
- <1507936571.13345.51.camel@wdc.com>
+         <20171013180532.29304-7-ming.lei@redhat.com>
+In-Reply-To: <20171013180532.29304-7-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1507936571.13345.51.camel@wdc.com>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Fri, Oct 13, 2017 at 11:16:12PM +0000, Bart Van Assche wrote:
-> On Sat, 2017-10-14 at 02:05 +0800, Ming Lei wrote:
-> > In the following patch, we will implement scsi_get_budget()
-> > which need to call scsi_prep_state_check() when rq isn't
-> > dequeued yet.
-> 
-> My understanding is that this change is only needed because scsi_mq_get_budget()
-> calls scsi_prep_state_check() with the req argument set to NULL. Since
-> scsi_prep_state_check() tests for sdev states other than SDEV_RUNNING and since
-> the purpose of this series is to optimize performance for the case SDEV_RUNNING
-> I'm not sure it's a good idea to make scsi_mq_get_budget() call
-> scsi_prep_state_check(). And if scsi_mq_get_budget() wouldn't call
-> scsi_prep_state_check() then this patch is not necessary.
-
-The purpose is that I don't want to change the current SCSI logic of
-queuing request.
-
-For example, if sdev state becomes OFFLINE or DEL, the current
-logic is to fail the request immediately. If the state isn't checked
-in scsi_mq_get_budget(), we have to try to obtain budget first,
-if it isn't available in the state of OFFLINE of DEL, there might be
-risk of I/O hang.
-
-So I suggest to check the state in scsi_mq_get_budget(), just like
-what the current scsi_queue_rq() does.
-
--- 
-Ming
+T24gU2F0LCAyMDE3LTEwLTE0IGF0IDAyOjA1ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gSW4g
+dGhlIGZvbGxvd2luZyBwYXRjaCwgd2Ugd2lsbCBpbXBsZW1lbnQgc2NzaV9nZXRfYnVkZ2V0KCkN
+Cj4gd2hpY2ggbmVlZCB0byBjYWxsIHNjc2lfcHJlcF9zdGF0ZV9jaGVjaygpIHdoZW4gcnEgaXNu
+J3QNCj4gZGVxdWV1ZWQgeWV0Lg0KDQpNeSB1bmRlcnN0YW5kaW5nIGlzIHRoYXQgdGhpcyBjaGFu
+Z2UgaXMgb25seSBuZWVkZWQgYmVjYXVzZSBzY3NpX21xX2dldF9idWRnZXQoKQ0KY2FsbHMgc2Nz
+aV9wcmVwX3N0YXRlX2NoZWNrKCkgd2l0aCB0aGUgcmVxIGFyZ3VtZW50IHNldCB0byBOVUxMLiBT
+aW5jZQ0Kc2NzaV9wcmVwX3N0YXRlX2NoZWNrKCkgdGVzdHMgZm9yIHNkZXYgc3RhdGVzIG90aGVy
+IHRoYW4gU0RFVl9SVU5OSU5HIGFuZCBzaW5jZQ0KdGhlIHB1cnBvc2Ugb2YgdGhpcyBzZXJpZXMg
+aXMgdG8gb3B0aW1pemUgcGVyZm9ybWFuY2UgZm9yIHRoZSBjYXNlIFNERVZfUlVOTklORw0KSSdt
+IG5vdCBzdXJlIGl0J3MgYSBnb29kIGlkZWEgdG8gbWFrZSBzY3NpX21xX2dldF9idWRnZXQoKSBj
+YWxsDQpzY3NpX3ByZXBfc3RhdGVfY2hlY2soKS4gQW5kIGlmIHNjc2lfbXFfZ2V0X2J1ZGdldCgp
+IHdvdWxkbid0IGNhbGwNCnNjc2lfcHJlcF9zdGF0ZV9jaGVjaygpIHRoZW4gdGhpcyBwYXRjaCBp
+cyBub3QgbmVjZXNzYXJ5Lg0KDQpCYXJ0Lg==
