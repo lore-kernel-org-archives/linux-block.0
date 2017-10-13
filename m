@@ -1,78 +1,285 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:38193 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753276AbdJMXnt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 19:43:49 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "tom81094@gmail.com" <tom81094@gmail.com>,
-        "paolo.valente@linaro.org" <paolo.valente@linaro.org>,
-        Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
-        "john.garry@huawei.com" <john.garry@huawei.com>,
-        "osandov@fb.com" <osandov@fb.com>,
-        "loberman@redhat.com" <loberman@redhat.com>
-Subject: Re: [PATCH V9 4/7] blk-mq: introduce .get_budget and .put_budget in
- blk_mq_ops
-Date: Fri, 13 Oct 2017 23:43:44 +0000
-Message-ID: <1507938223.13345.66.camel@wdc.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        John Garry <john.garry@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V9 4/7] blk-mq: introduce .get_budget and .put_budget in blk_mq_ops
+Date: Sat, 14 Oct 2017 02:05:29 +0800
+Message-Id: <20171013180532.29304-5-ming.lei@redhat.com>
+In-Reply-To: <20171013180532.29304-1-ming.lei@redhat.com>
 References: <20171013180532.29304-1-ming.lei@redhat.com>
-         <20171013180532.29304-5-ming.lei@redhat.com>
-In-Reply-To: <20171013180532.29304-5-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-T24gU2F0LCAyMDE3LTEwLTE0IGF0IDAyOjA1ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gQEAg
-LTg5LDE5ICs4OSwzNiBAQCBzdGF0aWMgYm9vbCBibGtfbXFfc2NoZWRfcmVzdGFydF9oY3R4KHN0
-cnVjdCBibGtfbXFfaHdfY3R4ICpoY3R4KQ0KPiAgCXJldHVybiBmYWxzZTsNCj4gIH0NCj4gIA0K
-PiAtc3RhdGljIHZvaWQgYmxrX21xX2RvX2Rpc3BhdGNoX3NjaGVkKHN0cnVjdCBibGtfbXFfaHdf
-Y3R4ICpoY3R4KQ0KPiArc3RhdGljIGJvb2wgYmxrX21xX2RvX2Rpc3BhdGNoX3NjaGVkKHN0cnVj
-dCBibGtfbXFfaHdfY3R4ICpoY3R4KQ0KDQpTaG91bGRuJ3QgdGhlIG1lYW5pbmcgb2YgdGhlIHJl
-dHVybiB2YWx1ZSBvZiB0aGlzIGZ1bmN0aW9uIGJlIGRvY3VtZW50ZWQ/DQoNCj4gIHsNCj4gIAlz
-dHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSA9IGhjdHgtPnF1ZXVlOw0KPiAgCXN0cnVjdCBlbGV2YXRv
-cl9xdWV1ZSAqZSA9IHEtPmVsZXZhdG9yOw0KPiAgCUxJU1RfSEVBRChycV9saXN0KTsNCj4gIA0K
-PiAgCWRvIHsNCj4gLQkJc3RydWN0IHJlcXVlc3QgKnJxID0gZS0+dHlwZS0+b3BzLm1xLmRpc3Bh
-dGNoX3JlcXVlc3QoaGN0eCk7DQo+ICsJCXN0cnVjdCByZXF1ZXN0ICpycTsNCj4gKwkJYmxrX3N0
-YXR1c190IHJldDsNCj4gIA0KPiAtCQlpZiAoIXJxKQ0KPiArCQlpZiAoZS0+dHlwZS0+b3BzLm1x
-Lmhhc193b3JrICYmDQo+ICsJCQkJIWUtPnR5cGUtPm9wcy5tcS5oYXNfd29yayhoY3R4KSkNCj4g
-IAkJCWJyZWFrOw0KPiArDQo+ICsJCXJldCA9IGJsa19tcV9nZXRfZGlzcGF0Y2hfYnVkZ2V0KGhj
-dHgpOw0KPiArCQlpZiAocmV0ID09IEJMS19TVFNfUkVTT1VSQ0UpDQo+ICsJCQlyZXR1cm4gdHJ1
-ZTsNCj4gKw0KPiArCQlycSA9IGUtPnR5cGUtPm9wcy5tcS5kaXNwYXRjaF9yZXF1ZXN0KGhjdHgp
-Ow0KPiArCQlpZiAoIXJxKSB7DQo+ICsJCQlibGtfbXFfcHV0X2Rpc3BhdGNoX2J1ZGdldChoY3R4
-LCB0cnVlKTsNCj4gKwkJCWJyZWFrOw0KPiArCQl9IGVsc2UgaWYgKHJldCAhPSBCTEtfU1RTX09L
-KSB7DQo+ICsJCQlibGtfbXFfZW5kX3JlcXVlc3QocnEsIHJldCk7DQo+ICsJCQljb250aW51ZTsN
-Cj4gKwkJfQ0KPiAgCQlsaXN0X2FkZCgmcnEtPnF1ZXVlbGlzdCwgJnJxX2xpc3QpOw0KPiAtCX0g
-d2hpbGUgKGJsa19tcV9kaXNwYXRjaF9ycV9saXN0KHEsICZycV9saXN0KSk7DQo+ICsJfSB3aGls
-ZSAoYmxrX21xX2Rpc3BhdGNoX3JxX2xpc3QocSwgJnJxX2xpc3QsIHRydWUpKTsNCj4gKw0KPiAr
-CXJldHVybiBmYWxzZTsNCj4gIH0NCg0KVGhpcyBtZWFucyB0aGF0IHRoZSByZXF1ZXN0IGluIHJx
-X2xpc3QgYmVjb21lcyB0aGUgb3duZXIgb2YgdGhlIGJ1ZGdldCBhbGxvY2F0ZWQNCmJ5IGJsa19t
-cV9nZXRfZGlzcGF0Y2hfYnVkZ2V0KCkuIFNob3VsZG4ndCB0aGF0IGJlIG1lbnRpb25lZCBhcyBh
-IGNvbW1lbnQgYWJvdmUNCmJsa19tcV9kaXNwYXRjaF9ycV9saXN0KCk/DQoNCj4gKwlpZiAocnVu
-X3F1ZXVlKSB7DQo+ICsJCWlmICghYmxrX21xX3NjaGVkX25lZWRzX3Jlc3RhcnQoaGN0eCkgJiYN
-Cj4gKwkJICAgICF0ZXN0X2JpdChCTEtfTVFfU19UQUdfV0FJVElORywgJmhjdHgtPnN0YXRlKSkg
-ew0KPiArCQkJYmxrX21xX3NjaGVkX21hcmtfcmVzdGFydF9oY3R4KGhjdHgpOw0KPiArCQkJYmxr
-X21xX3J1bl9od19xdWV1ZShoY3R4LCB0cnVlKTsNCj4gKwkJfQ0KPiAgCX0NCj4gIH0NCg0KVGhl
-IGFib3ZlIGlmLXN0YXRlbWVudCBjYW4gYmUgY2hhbmdlZCBmcm9tIGEgbmVzdGVkIGlmIGludG8g
-YSBzaW5nbGUNCmlmLXN0YXRlbWVudC4NCiANCkFkZGl0aW9uYWxseSwgd2h5IGhhcyB0aGUgY29k
-ZSBiZWVuIGFkZGVkIHRvIGJsa19tcV9zY2hlZF9kaXNwYXRjaF9yZXF1ZXN0cygpDQp0aGF0IHJl
-cnVucyB0aGUgcXVldWUgaWYgYmxrX21xX2dldF9kaXNwYXRjaF9idWRnZXQoKSByZXR1cm5lZCBC
-TEtfU1RTX1JFU09VUkNFPw0KSXMgdGhhdCBjb2RlIG5lY2Vzc2FyeSBvciBjYW4gaXQgYmUgbGVm
-dCBvdXQ/DQoNCj4gK3N0YXRpYyBpbmxpbmUgdm9pZCBibGtfbXFfcHV0X2Rpc3BhdGNoX2J1ZGdl
-dChzdHJ1Y3QgYmxrX21xX2h3X2N0eCAqaGN0eCwNCj4gKwkJYm9vbCBnb3RfYnVkZ2V0KQ0KPiAr
-ew0KPiArCXN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxID0gaGN0eC0+cXVldWU7DQo+ICsNCj4gKwlp
-ZiAocS0+bXFfb3BzLT5wdXRfYnVkZ2V0ICYmIGdvdF9idWRnZXQpDQo+ICsJCXEtPm1xX29wcy0+
-cHV0X2J1ZGdldChoY3R4KTsNCj4gK30NCg0KU28gdGhlIGFib3ZlIGZ1bmN0aW9uIGlzIHBhc3Nl
-ZCBhIGJvb2xlYW4gYXMgc2Vjb25kIGFyZ3VtZW50IGFuZCBhbGwgd2hhdA0KdGhhdCBib29sZWFu
-IGlzIHVzZWQgZm9yIGlzIHRvIGRlY2lkZSB3aGV0aGVyIG9yIG5vdCB0aGUgZnVuY3Rpb24gaXMg
-ZXhlY3V0ZWQ/DQpTb3JyeSBidXQgSSB0aGluayB0aGF0J3Mgd3JvbmcgYW5kIHRoYXQgdGhlIHNl
-Y29uZCBhcmd1bWVudCBzaG91bGQgYmUgcmVtb3ZlZA0KYW5kIHRoYXQgaXQgc2hvdWxkIGJlIGV2
-YWx1YXRlZCBieSB0aGUgY2FsbGVyIGluc3RlYWQgb2YgaW5zaWRlDQpibGtfbXFfcHV0X2Rpc3Bh
-dGNoX2J1ZGdldCgpLg0KDQpCYXJ0Lg==
+For SCSI devices, there is often per-request-queue depth, which need
+to be respected before queuing one request.
+
+The current blk-mq always dequeues request first, then calls .queue_rq()
+to dispatch the request to lld. One obvious issue of this way is that I/O
+merge may not be good, because when the per-request-queue depth can't be
+respected, .queue_rq() has to return BLK_STS_RESOURCE, then this request
+has to stay in hctx->dispatch list, and never got chance to participate
+into I/O merge.
+
+This patch introduces .get_budget and .put_budget callback in blk_mq_ops,
+then we can try to get reserved budget first before dequeuing request.
+Once the budget for queueing I/O can't be satisfied, we don't need to
+dequeue request at all, then I/O merge can get improved a lot.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-sched.c   | 43 +++++++++++++++++++++++++++++++++++--------
+ block/blk-mq.c         | 33 ++++++++++++++++++++++++++++++---
+ block/blk-mq.h         | 21 ++++++++++++++++++++-
+ include/linux/blk-mq.h | 11 +++++++++++
+ 4 files changed, 96 insertions(+), 12 deletions(-)
+
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index be29ba849408..6bb92bbc3135 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -89,19 +89,36 @@ static bool blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
+ 	return false;
+ }
+ 
+-static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
++static bool blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct request_queue *q = hctx->queue;
+ 	struct elevator_queue *e = q->elevator;
+ 	LIST_HEAD(rq_list);
+ 
+ 	do {
+-		struct request *rq = e->type->ops.mq.dispatch_request(hctx);
++		struct request *rq;
++		blk_status_t ret;
+ 
+-		if (!rq)
++		if (e->type->ops.mq.has_work &&
++				!e->type->ops.mq.has_work(hctx))
+ 			break;
++
++		ret = blk_mq_get_dispatch_budget(hctx);
++		if (ret == BLK_STS_RESOURCE)
++			return true;
++
++		rq = e->type->ops.mq.dispatch_request(hctx);
++		if (!rq) {
++			blk_mq_put_dispatch_budget(hctx, true);
++			break;
++		} else if (ret != BLK_STS_OK) {
++			blk_mq_end_request(rq, ret);
++			continue;
++		}
+ 		list_add(&rq->queuelist, &rq_list);
+-	} while (blk_mq_dispatch_rq_list(q, &rq_list));
++	} while (blk_mq_dispatch_rq_list(q, &rq_list, true));
++
++	return false;
+ }
+ 
+ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+@@ -110,6 +127,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	struct elevator_queue *e = q->elevator;
+ 	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
+ 	LIST_HEAD(rq_list);
++	bool run_queue = false;
+ 
+ 	/* RCU or SRCU read lock is needed before checking quiesced flag */
+ 	if (unlikely(blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)))
+@@ -143,13 +161,22 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	 */
+ 	if (!list_empty(&rq_list)) {
+ 		blk_mq_sched_mark_restart_hctx(hctx);
+-		if (blk_mq_dispatch_rq_list(q, &rq_list) && has_sched_dispatch)
+-			blk_mq_do_dispatch_sched(hctx);
++		if (blk_mq_dispatch_rq_list(q, &rq_list, false) &&
++				has_sched_dispatch)
++			run_queue = blk_mq_do_dispatch_sched(hctx);
+ 	} else if (has_sched_dispatch) {
+-		blk_mq_do_dispatch_sched(hctx);
++		run_queue = blk_mq_do_dispatch_sched(hctx);
+ 	} else {
+ 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+-		blk_mq_dispatch_rq_list(q, &rq_list);
++		blk_mq_dispatch_rq_list(q, &rq_list, false);
++	}
++
++	if (run_queue) {
++		if (!blk_mq_sched_needs_restart(hctx) &&
++		    !test_bit(BLK_MQ_S_TAG_WAITING, &hctx->state)) {
++			blk_mq_sched_mark_restart_hctx(hctx);
++			blk_mq_run_hw_queue(hctx, true);
++		}
+ 	}
+ }
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 40cba1b1978f..feb89f1fcc63 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1048,7 +1048,8 @@ static bool blk_mq_dispatch_wait_add(struct blk_mq_hw_ctx *hctx)
+ 	return true;
+ }
+ 
+-bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
++bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
++		bool got_budget)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+ 	struct request *rq;
+@@ -1057,6 +1058,8 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
+ 	if (list_empty(list))
+ 		return false;
+ 
++	WARN_ON(!list_is_singular(list) && got_budget);
++
+ 	/*
+ 	 * Now process all the entries, sending them to the driver.
+ 	 */
+@@ -1074,16 +1077,28 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
+ 			 * The initial allocation attempt failed, so we need to
+ 			 * rerun the hardware queue when a tag is freed.
+ 			 */
+-			if (!blk_mq_dispatch_wait_add(hctx))
++			if (!blk_mq_dispatch_wait_add(hctx)) {
++				blk_mq_put_dispatch_budget(hctx, got_budget);
+ 				break;
++			}
+ 
+ 			/*
+ 			 * It's possible that a tag was freed in the window
+ 			 * between the allocation failure and adding the
+ 			 * hardware queue to the wait queue.
+ 			 */
+-			if (!blk_mq_get_driver_tag(rq, &hctx, false))
++			if (!blk_mq_get_driver_tag(rq, &hctx, false)) {
++				blk_mq_put_dispatch_budget(hctx, got_budget);
++				break;
++			}
++		}
++
++		if (!got_budget) {
++			ret = blk_mq_get_dispatch_budget(hctx);
++			if (ret == BLK_STS_RESOURCE)
+ 				break;
++			if (ret != BLK_STS_OK)
++				goto fail_rq;
+ 		}
+ 
+ 		list_del_init(&rq->queuelist);
+@@ -1111,6 +1126,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
+ 			break;
+ 		}
+ 
++ fail_rq:
+ 		if (unlikely(ret != BLK_STS_OK)) {
+ 			errors++;
+ 			blk_mq_end_request(rq, BLK_STS_IOERR);
+@@ -1582,6 +1598,13 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	if (!blk_mq_get_driver_tag(rq, NULL, false))
+ 		goto insert;
+ 
++	ret = blk_mq_get_dispatch_budget(hctx);
++	if (ret == BLK_STS_RESOURCE) {
++		blk_mq_put_driver_tag(rq);
++		goto insert;
++	} else if (ret != BLK_STS_OK)
++		goto fail_rq;
++
+ 	new_cookie = request_to_qc_t(hctx, rq);
+ 
+ 	/*
+@@ -1598,6 +1621,7 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 		__blk_mq_requeue_request(rq);
+ 		goto insert;
+ 	default:
++ fail_rq:
+ 		*cookie = BLK_QC_T_NONE;
+ 		blk_mq_end_request(rq, ret);
+ 		return;
+@@ -2582,6 +2606,9 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+ 	if (!set->ops->queue_rq)
+ 		return -EINVAL;
+ 
++	if (!set->ops->get_budget ^ !set->ops->put_budget)
++		return -EINVAL;
++
+ 	if (set->queue_depth > BLK_MQ_MAX_DEPTH) {
+ 		pr_info("blk-mq: reduced tag depth to %u\n",
+ 			BLK_MQ_MAX_DEPTH);
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index ef15b3414da5..fab566ce0bbf 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -30,7 +30,7 @@ void blk_mq_freeze_queue(struct request_queue *q);
+ void blk_mq_free_queue(struct request_queue *q);
+ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr);
+ void blk_mq_wake_waiters(struct request_queue *q);
+-bool blk_mq_dispatch_rq_list(struct request_queue *, struct list_head *);
++bool blk_mq_dispatch_rq_list(struct request_queue *, struct list_head *, bool);
+ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list);
+ bool blk_mq_hctx_has_pending(struct blk_mq_hw_ctx *hctx);
+ bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
+@@ -137,4 +137,23 @@ static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
+ void blk_mq_in_flight(struct request_queue *q, struct hd_struct *part,
+ 			unsigned int inflight[2]);
+ 
++static inline void blk_mq_put_dispatch_budget(struct blk_mq_hw_ctx *hctx,
++		bool got_budget)
++{
++	struct request_queue *q = hctx->queue;
++
++	if (q->mq_ops->put_budget && got_budget)
++		q->mq_ops->put_budget(hctx);
++}
++
++static inline blk_status_t blk_mq_get_dispatch_budget(
++		struct blk_mq_hw_ctx *hctx)
++{
++	struct request_queue *q = hctx->queue;
++
++	if (q->mq_ops->get_budget)
++		return q->mq_ops->get_budget(hctx);
++	return BLK_STS_OK;
++}
++
+ #endif
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 50c6485cb04f..901457df3d64 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -90,6 +90,8 @@ struct blk_mq_queue_data {
+ 
+ typedef blk_status_t (queue_rq_fn)(struct blk_mq_hw_ctx *,
+ 		const struct blk_mq_queue_data *);
++typedef blk_status_t (get_budget_fn)(struct blk_mq_hw_ctx *);
++typedef void (put_budget_fn)(struct blk_mq_hw_ctx *);
+ typedef enum blk_eh_timer_return (timeout_fn)(struct request *, bool);
+ typedef int (init_hctx_fn)(struct blk_mq_hw_ctx *, void *, unsigned int);
+ typedef void (exit_hctx_fn)(struct blk_mq_hw_ctx *, unsigned int);
+@@ -112,6 +114,15 @@ struct blk_mq_ops {
+ 	queue_rq_fn		*queue_rq;
+ 
+ 	/*
++	 * Reserve budget before queue request, once .queue_rq is
++	 * run, it is driver's responsibility to release the
++	 * reserved budget. Also we have to handle failure case
++	 * of .get_budget for avoiding I/O deadlock.
++	 */
++	get_budget_fn		*get_budget;
++	put_budget_fn		*put_budget;
++
++	/*
+ 	 * Called on request timeout
+ 	 */
+ 	timeout_fn		*timeout;
+-- 
+2.9.5
