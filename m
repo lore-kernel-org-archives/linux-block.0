@@ -10,11 +10,11 @@ Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
         linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
         John Garry <john.garry@huawei.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V9 5/7] blk-mq-sched: improve dispatching from sw queue
-Date: Sat, 14 Oct 2017 02:05:30 +0800
-Message-Id: <20171013180532.29304-6-ming.lei@redhat.com>
-In-Reply-To: <20171013180532.29304-1-ming.lei@redhat.com>
-References: <20171013180532.29304-1-ming.lei@redhat.com>
+Subject: [PATCH V8 5/7] blk-mq-sched: improve dispatching from sw queue
+Date: Sat, 14 Oct 2017 01:24:57 +0800
+Message-Id: <20171013172459.1376-6-ming.lei@redhat.com>
+In-Reply-To: <20171013172459.1376-1-ming.lei@redhat.com>
+References: <20171013172459.1376-1-ming.lei@redhat.com>
 Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
@@ -48,7 +48,7 @@ Signed-off-by: Ming Lei <ming.lei@redhat.com>
  4 files changed, 108 insertions(+), 3 deletions(-)
 
 diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 6bb92bbc3135..92df88351ad2 100644
+index cd1c0caae16a..78a862eabdec 100644
 --- a/block/blk-mq-sched.c
 +++ b/block/blk-mq-sched.c
 @@ -121,6 +121,55 @@ static bool blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
@@ -79,13 +79,13 @@ index 6bb92bbc3135..92df88351ad2 100644
 +		if (!sbitmap_any_bit_set(&hctx->ctx_map))
 +			break;
 +
-+		ret = blk_mq_get_dispatch_budget(hctx);
++		ret = blk_mq_get_budget(hctx);
 +		if (ret == BLK_STS_RESOURCE)
 +			return true;
 +
 +		rq = blk_mq_dequeue_from_ctx(hctx, ctx);
 +		if (!rq) {
-+			blk_mq_put_dispatch_budget(hctx, true);
++			blk_mq_put_budget(hctx, true);
 +			break;
 +		} else if (ret != BLK_STS_OK) {
 +			blk_mq_end_request(rq, ret);
@@ -136,7 +136,7 @@ index 6bb92bbc3135..92df88351ad2 100644
  		blk_mq_flush_busy_ctxs(hctx, &rq_list);
  		blk_mq_dispatch_rq_list(q, &rq_list, false);
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index feb89f1fcc63..3fdc5662231e 100644
+index 24c1b80d4312..2416db4dc98b 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
 @@ -914,6 +914,45 @@ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list)
@@ -186,7 +186,7 @@ index feb89f1fcc63..3fdc5662231e 100644
  {
  	if (!queued)
 diff --git a/block/blk-mq.h b/block/blk-mq.h
-index fab566ce0bbf..97e97a59464a 100644
+index cc7ee9ede3ae..80639cb69f31 100644
 --- a/block/blk-mq.h
 +++ b/block/blk-mq.h
 @@ -35,6 +35,8 @@ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list);
