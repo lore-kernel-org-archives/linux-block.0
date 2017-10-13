@@ -1,285 +1,212 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        John Garry <john.garry@huawei.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V9 4/7] blk-mq: introduce .get_budget and .put_budget in blk_mq_ops
-Date: Sat, 14 Oct 2017 02:05:29 +0800
-Message-Id: <20171013180532.29304-5-ming.lei@redhat.com>
-In-Reply-To: <20171013180532.29304-1-ming.lei@redhat.com>
-References: <20171013180532.29304-1-ming.lei@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:49809 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1758316AbdJMMr5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 08:47:57 -0400
+Received: by mail-wm0-f67.google.com with SMTP id b189so21117759wmd.4
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:56 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 52/58] lightnvm: pblk: gc all lines in the pipeline before exit
+Date: Fri, 13 Oct 2017 14:46:41 +0200
+Message-Id: <20171013124647.32668-53-m@bjorling.me>
+In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
+References: <20171013124647.32668-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-For SCSI devices, there is often per-request-queue depth, which need
-to be respected before queuing one request.
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-The current blk-mq always dequeues request first, then calls .queue_rq()
-to dispatch the request to lld. One obvious issue of this way is that I/O
-merge may not be good, because when the per-request-queue depth can't be
-respected, .queue_rq() has to return BLK_STS_RESOURCE, then this request
-has to stay in hctx->dispatch list, and never got chance to participate
-into I/O merge.
+Finish garbage collect of the lines that are in the gc pipeline
+before exiting. Ensure that all lines already in in the pipeline
+goes through, from read to write.
 
-This patch introduces .get_budget and .put_budget callback in blk_mq_ops,
-then we can try to get reserved budget first before dequeuing request.
-Once the budget for queueing I/O can't be satisfied, we don't need to
-dequeue request at all, then I/O merge can get improved a lot.
+Do this by keeping track of how many lines are in the pipeline
+and waiting for that number to reach zero before exiting the gc
+reader task.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Since we're adding a new gc line counter, change the name of
+inflight_gc to read_inflight_gc to make the distinction clear.
+
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- block/blk-mq-sched.c   | 43 +++++++++++++++++++++++++++++++++++--------
- block/blk-mq.c         | 33 ++++++++++++++++++++++++++++++---
- block/blk-mq.h         | 21 ++++++++++++++++++++-
- include/linux/blk-mq.h | 11 +++++++++++
- 4 files changed, 96 insertions(+), 12 deletions(-)
+ drivers/lightnvm/pblk-core.c  |  3 +++
+ drivers/lightnvm/pblk-gc.c    | 31 ++++++++++++++++++++++++-------
+ drivers/lightnvm/pblk-sysfs.c |  2 +-
+ drivers/lightnvm/pblk.h       |  5 ++++-
+ 4 files changed, 32 insertions(+), 9 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index be29ba849408..6bb92bbc3135 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -89,19 +89,36 @@ static bool blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
- 	return false;
- }
- 
--static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-+static bool blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 43866ad..1cd27e3 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -1465,6 +1465,7 @@ void pblk_line_free(struct pblk *pblk, struct pblk_line *line)
+ static void __pblk_line_put(struct pblk *pblk, struct pblk_line *line)
  {
- 	struct request_queue *q = hctx->queue;
- 	struct elevator_queue *e = q->elevator;
- 	LIST_HEAD(rq_list);
+ 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
++	struct pblk_gc *gc = &pblk->gc;
+ 
+ 	spin_lock(&line->lock);
+ 	WARN_ON(line->state != PBLK_LINESTATE_GC);
+@@ -1473,6 +1474,8 @@ static void __pblk_line_put(struct pblk *pblk, struct pblk_line *line)
+ 	pblk_line_free(pblk, line);
+ 	spin_unlock(&line->lock);
+ 
++	atomic_dec(&gc->pipeline_gc);
++
+ 	spin_lock(&l_mg->free_lock);
+ 	list_add_tail(&line->list, &l_mg->free_list);
+ 	l_mg->nr_free_lines++;
+diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
+index e00e5a0..e6fae19 100644
+--- a/drivers/lightnvm/pblk-gc.c
++++ b/drivers/lightnvm/pblk-gc.c
+@@ -234,7 +234,7 @@ static void pblk_gc_line_prepare_ws(struct work_struct *work)
+ 	kfree(invalid_bitmap);
+ 
+ 	kref_put(&line->ref, pblk_line_put);
+-	atomic_dec(&gc->inflight_gc);
++	atomic_dec(&gc->read_inflight_gc);
+ 
+ 	return;
+ 
+@@ -249,7 +249,7 @@ static void pblk_gc_line_prepare_ws(struct work_struct *work)
+ 
+ 	pblk_put_line_back(pblk, line);
+ 	kref_put(&line->ref, pblk_line_put);
+-	atomic_dec(&gc->inflight_gc);
++	atomic_dec(&gc->read_inflight_gc);
+ 
+ 	pr_err("pblk: Failed to GC line %d\n", line->id);
+ }
+@@ -268,6 +268,7 @@ static int pblk_gc_line(struct pblk *pblk, struct pblk_line *line)
+ 	line_ws->pblk = pblk;
+ 	line_ws->line = line;
+ 
++	atomic_inc(&gc->pipeline_gc);
+ 	INIT_WORK(&line_ws->ws, pblk_gc_line_prepare_ws);
+ 	queue_work(gc->gc_reader_wq, &line_ws->ws);
+ 
+@@ -333,6 +334,7 @@ static bool pblk_gc_should_run(struct pblk_gc *gc, struct pblk_rl *rl)
+ void pblk_gc_free_full_lines(struct pblk *pblk)
+ {
+ 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
++	struct pblk_gc *gc = &pblk->gc;
+ 	struct pblk_line *line;
  
  	do {
--		struct request *rq = e->type->ops.mq.dispatch_request(hctx);
-+		struct request *rq;
-+		blk_status_t ret;
+@@ -353,6 +355,7 @@ void pblk_gc_free_full_lines(struct pblk *pblk)
+ 		list_del(&line->list);
+ 		spin_unlock(&l_mg->gc_lock);
  
--		if (!rq)
-+		if (e->type->ops.mq.has_work &&
-+				!e->type->ops.mq.has_work(hctx))
- 			break;
-+
-+		ret = blk_mq_get_dispatch_budget(hctx);
-+		if (ret == BLK_STS_RESOURCE)
-+			return true;
-+
-+		rq = e->type->ops.mq.dispatch_request(hctx);
-+		if (!rq) {
-+			blk_mq_put_dispatch_budget(hctx, true);
-+			break;
-+		} else if (ret != BLK_STS_OK) {
-+			blk_mq_end_request(rq, ret);
-+			continue;
-+		}
- 		list_add(&rq->queuelist, &rq_list);
--	} while (blk_mq_dispatch_rq_list(q, &rq_list));
-+	} while (blk_mq_dispatch_rq_list(q, &rq_list, true));
-+
-+	return false;
++		atomic_inc(&gc->pipeline_gc);
+ 		kref_put(&line->ref, pblk_line_put);
+ 	} while (1);
  }
+@@ -370,12 +373,12 @@ static void pblk_gc_run(struct pblk *pblk)
+ 	struct pblk_line *line;
+ 	struct list_head *group_list;
+ 	bool run_gc;
+-	int inflight_gc, gc_group = 0, prev_group = 0;
++	int read_inflight_gc, gc_group = 0, prev_group = 0;
  
- void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
-@@ -110,6 +127,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	struct elevator_queue *e = q->elevator;
- 	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
- 	LIST_HEAD(rq_list);
-+	bool run_queue = false;
+ 	pblk_gc_free_full_lines(pblk);
  
- 	/* RCU or SRCU read lock is needed before checking quiesced flag */
- 	if (unlikely(blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)))
-@@ -143,13 +161,22 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	 */
- 	if (!list_empty(&rq_list)) {
- 		blk_mq_sched_mark_restart_hctx(hctx);
--		if (blk_mq_dispatch_rq_list(q, &rq_list) && has_sched_dispatch)
--			blk_mq_do_dispatch_sched(hctx);
-+		if (blk_mq_dispatch_rq_list(q, &rq_list, false) &&
-+				has_sched_dispatch)
-+			run_queue = blk_mq_do_dispatch_sched(hctx);
- 	} else if (has_sched_dispatch) {
--		blk_mq_do_dispatch_sched(hctx);
-+		run_queue = blk_mq_do_dispatch_sched(hctx);
- 	} else {
- 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
--		blk_mq_dispatch_rq_list(q, &rq_list);
-+		blk_mq_dispatch_rq_list(q, &rq_list, false);
-+	}
-+
-+	if (run_queue) {
-+		if (!blk_mq_sched_needs_restart(hctx) &&
-+		    !test_bit(BLK_MQ_S_TAG_WAITING, &hctx->state)) {
-+			blk_mq_sched_mark_restart_hctx(hctx);
-+			blk_mq_run_hw_queue(hctx, true);
-+		}
- 	}
- }
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 40cba1b1978f..feb89f1fcc63 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1048,7 +1048,8 @@ static bool blk_mq_dispatch_wait_add(struct blk_mq_hw_ctx *hctx)
- 	return true;
- }
- 
--bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
-+bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
-+		bool got_budget)
- {
- 	struct blk_mq_hw_ctx *hctx;
- 	struct request *rq;
-@@ -1057,6 +1058,8 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
- 	if (list_empty(list))
- 		return false;
- 
-+	WARN_ON(!list_is_singular(list) && got_budget);
-+
- 	/*
- 	 * Now process all the entries, sending them to the driver.
- 	 */
-@@ -1074,16 +1077,28 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
- 			 * The initial allocation attempt failed, so we need to
- 			 * rerun the hardware queue when a tag is freed.
- 			 */
--			if (!blk_mq_dispatch_wait_add(hctx))
-+			if (!blk_mq_dispatch_wait_add(hctx)) {
-+				blk_mq_put_dispatch_budget(hctx, got_budget);
- 				break;
-+			}
- 
- 			/*
- 			 * It's possible that a tag was freed in the window
- 			 * between the allocation failure and adding the
- 			 * hardware queue to the wait queue.
- 			 */
--			if (!blk_mq_get_driver_tag(rq, &hctx, false))
-+			if (!blk_mq_get_driver_tag(rq, &hctx, false)) {
-+				blk_mq_put_dispatch_budget(hctx, got_budget);
-+				break;
-+			}
-+		}
-+
-+		if (!got_budget) {
-+			ret = blk_mq_get_dispatch_budget(hctx);
-+			if (ret == BLK_STS_RESOURCE)
- 				break;
-+			if (ret != BLK_STS_OK)
-+				goto fail_rq;
- 		}
- 
- 		list_del_init(&rq->queuelist);
-@@ -1111,6 +1126,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list)
- 			break;
- 		}
- 
-+ fail_rq:
- 		if (unlikely(ret != BLK_STS_OK)) {
- 			errors++;
- 			blk_mq_end_request(rq, BLK_STS_IOERR);
-@@ -1582,6 +1598,13 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	if (!blk_mq_get_driver_tag(rq, NULL, false))
- 		goto insert;
- 
-+	ret = blk_mq_get_dispatch_budget(hctx);
-+	if (ret == BLK_STS_RESOURCE) {
-+		blk_mq_put_driver_tag(rq);
-+		goto insert;
-+	} else if (ret != BLK_STS_OK)
-+		goto fail_rq;
-+
- 	new_cookie = request_to_qc_t(hctx, rq);
- 
- 	/*
-@@ -1598,6 +1621,7 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 		__blk_mq_requeue_request(rq);
- 		goto insert;
- 	default:
-+ fail_rq:
- 		*cookie = BLK_QC_T_NONE;
- 		blk_mq_end_request(rq, ret);
+ 	run_gc = pblk_gc_should_run(&pblk->gc, &pblk->rl);
+-	if (!run_gc || (atomic_read(&gc->inflight_gc) >= PBLK_GC_L_QD))
++	if (!run_gc || (atomic_read(&gc->read_inflight_gc) >= PBLK_GC_L_QD))
  		return;
-@@ -2582,6 +2606,9 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
- 	if (!set->ops->queue_rq)
- 		return -EINVAL;
  
-+	if (!set->ops->get_budget ^ !set->ops->put_budget)
-+		return -EINVAL;
-+
- 	if (set->queue_depth > BLK_MQ_MAX_DEPTH) {
- 		pr_info("blk-mq: reduced tag depth to %u\n",
- 			BLK_MQ_MAX_DEPTH);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index ef15b3414da5..fab566ce0bbf 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -30,7 +30,7 @@ void blk_mq_freeze_queue(struct request_queue *q);
- void blk_mq_free_queue(struct request_queue *q);
- int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr);
- void blk_mq_wake_waiters(struct request_queue *q);
--bool blk_mq_dispatch_rq_list(struct request_queue *, struct list_head *);
-+bool blk_mq_dispatch_rq_list(struct request_queue *, struct list_head *, bool);
- void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list);
- bool blk_mq_hctx_has_pending(struct blk_mq_hw_ctx *hctx);
- bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
-@@ -137,4 +137,23 @@ static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
- void blk_mq_in_flight(struct request_queue *q, struct hd_struct *part,
- 			unsigned int inflight[2]);
+ next_gc_group:
+@@ -402,14 +405,14 @@ static void pblk_gc_run(struct pblk *pblk)
+ 		list_add_tail(&line->list, &gc->r_list);
+ 		spin_unlock(&gc->r_lock);
  
-+static inline void blk_mq_put_dispatch_budget(struct blk_mq_hw_ctx *hctx,
-+		bool got_budget)
-+{
-+	struct request_queue *q = hctx->queue;
-+
-+	if (q->mq_ops->put_budget && got_budget)
-+		q->mq_ops->put_budget(hctx);
-+}
-+
-+static inline blk_status_t blk_mq_get_dispatch_budget(
-+		struct blk_mq_hw_ctx *hctx)
-+{
-+	struct request_queue *q = hctx->queue;
-+
-+	if (q->mq_ops->get_budget)
-+		return q->mq_ops->get_budget(hctx);
-+	return BLK_STS_OK;
-+}
-+
- #endif
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 50c6485cb04f..901457df3d64 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -90,6 +90,8 @@ struct blk_mq_queue_data {
+-		inflight_gc = atomic_inc_return(&gc->inflight_gc);
++		read_inflight_gc = atomic_inc_return(&gc->read_inflight_gc);
+ 		pblk_gc_reader_kick(gc);
  
- typedef blk_status_t (queue_rq_fn)(struct blk_mq_hw_ctx *,
- 		const struct blk_mq_queue_data *);
-+typedef blk_status_t (get_budget_fn)(struct blk_mq_hw_ctx *);
-+typedef void (put_budget_fn)(struct blk_mq_hw_ctx *);
- typedef enum blk_eh_timer_return (timeout_fn)(struct request *, bool);
- typedef int (init_hctx_fn)(struct blk_mq_hw_ctx *, void *, unsigned int);
- typedef void (exit_hctx_fn)(struct blk_mq_hw_ctx *, unsigned int);
-@@ -112,6 +114,15 @@ struct blk_mq_ops {
- 	queue_rq_fn		*queue_rq;
+ 		prev_group = 1;
  
- 	/*
-+	 * Reserve budget before queue request, once .queue_rq is
-+	 * run, it is driver's responsibility to release the
-+	 * reserved budget. Also we have to handle failure case
-+	 * of .get_budget for avoiding I/O deadlock.
-+	 */
-+	get_budget_fn		*get_budget;
-+	put_budget_fn		*put_budget;
+ 		/* No need to queue up more GC lines than we can handle */
+ 		run_gc = pblk_gc_should_run(&pblk->gc, &pblk->rl);
+-		if (!run_gc || inflight_gc >= PBLK_GC_L_QD)
++		if (!run_gc || read_inflight_gc >= PBLK_GC_L_QD)
+ 			break;
+ 	} while (1);
+ 
+@@ -470,6 +473,7 @@ static int pblk_gc_writer_ts(void *data)
+ static int pblk_gc_reader_ts(void *data)
+ {
+ 	struct pblk *pblk = data;
++	struct pblk_gc *gc = &pblk->gc;
+ 
+ 	while (!kthread_should_stop()) {
+ 		if (!pblk_gc_read(pblk))
+@@ -478,6 +482,18 @@ static int pblk_gc_reader_ts(void *data)
+ 		io_schedule();
+ 	}
+ 
++#ifdef CONFIG_NVM_DEBUG
++	pr_info("pblk: flushing gc pipeline, %d lines left\n",
++		atomic_read(&gc->pipeline_gc));
++#endif
 +
-+	/*
- 	 * Called on request timeout
- 	 */
- 	timeout_fn		*timeout;
++	do {
++		if (!atomic_read(&gc->pipeline_gc))
++			break;
++
++		schedule();
++	} while (1);
++
+ 	return 0;
+ }
+ 
+@@ -586,7 +602,8 @@ int pblk_gc_init(struct pblk *pblk)
+ 	gc->gc_forced = 0;
+ 	gc->gc_enabled = 1;
+ 	gc->w_entries = 0;
+-	atomic_set(&gc->inflight_gc, 0);
++	atomic_set(&gc->read_inflight_gc, 0);
++	atomic_set(&gc->pipeline_gc, 0);
+ 
+ 	/* Workqueue that reads valid sectors from a line and submit them to the
+ 	 * GC writer to be recycled.
+diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
+index 95fb434..cd49e88 100644
+--- a/drivers/lightnvm/pblk-sysfs.c
++++ b/drivers/lightnvm/pblk-sysfs.c
+@@ -253,7 +253,7 @@ static ssize_t pblk_sysfs_lines(struct pblk *pblk, char *page)
+ 	sz += snprintf(page + sz, PAGE_SIZE - sz,
+ 		"GC: full:%d, high:%d, mid:%d, low:%d, empty:%d, queue:%d\n",
+ 			gc_full, gc_high, gc_mid, gc_low, gc_empty,
+-			atomic_read(&pblk->gc.inflight_gc));
++			atomic_read(&pblk->gc.read_inflight_gc));
+ 
+ 	sz += snprintf(page + sz, PAGE_SIZE - sz,
+ 		"data (%d) cur:%d, left:%d, vsc:%d, s:%d, map:%d/%d (%d)\n",
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 29ba7ec..c6f8841 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -238,7 +238,10 @@ struct pblk_gc {
+ 	struct timer_list gc_timer;
+ 
+ 	struct semaphore gc_sem;
+-	atomic_t inflight_gc;
++	atomic_t read_inflight_gc; /* Number of lines with inflight GC reads */
++	atomic_t pipeline_gc;	   /* Number of lines in the GC pipeline -
++				    * started reads to finished writes
++				    */
+ 	int w_entries;
+ 
+ 	struct list_head w_list;
 -- 
-2.9.5
+2.9.3
