@@ -1,73 +1,81 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-block@vger.kernel.org
-Cc: axboe@kernel.dk,
-	shli@kernel.org,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 1/9] QUEUE_FLAG_NOWAIT to indicate device supports nowait
-Date: Wed,  4 Oct 2017 08:55:03 -0500
-Message-Id: <20171004135511.26110-2-rgoldwyn@suse.de>
-In-Reply-To: <20171004135511.26110-1-rgoldwyn@suse.de>
-References: <20171004135511.26110-1-rgoldwyn@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:55024 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932089AbdJMMrv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 08:47:51 -0400
+Received: by mail-wm0-f66.google.com with SMTP id i124so21518541wmf.3
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:50 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 45/58] lightnvm: pblk: prevent gc kicks when gc is not operational
+Date: Fri, 13 Oct 2017 14:46:34 +0200
+Message-Id: <20171013124647.32668-46-m@bjorling.me>
+In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
+References: <20171013124647.32668-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-Nowait is a feature of direct AIO, where users can request
-to return immediately if the I/O is going to block. This translates
-to REQ_NOWAIT in bio.bi_opf flags. While request based devices
-don't wait, stacked devices such as md/dm will.
+GC can be kicked after it has been shut down when closing the last
+line during exit, resulting in accesses to freed structures.
 
-In order to explicitly mark stacked devices as supported, we
-set the QUEUE_FLAG_NOWAIT in the queue_flags and return -EAGAIN
-whenever the device would block.
+Make sure that GC is not triggered while it is not operational.
+Also make sure that GC won't be re-activated during exit when
+running on another processor by using timer_del_sync.
 
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- block/blk-core.c       | 4 ++--
- include/linux/blkdev.h | 6 ++++++
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ drivers/lightnvm/pblk-gc.c   | 9 +++++----
+ drivers/lightnvm/pblk-init.c | 1 +
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 048be4aa6024..8de633f8c633 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2044,10 +2044,10 @@ generic_make_request_checks(struct bio *bio)
+diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
+index 7b103bc..81efac1 100644
+--- a/drivers/lightnvm/pblk-gc.c
++++ b/drivers/lightnvm/pblk-gc.c
+@@ -478,10 +478,10 @@ void pblk_gc_should_start(struct pblk *pblk)
+ {
+ 	struct pblk_gc *gc = &pblk->gc;
  
- 	/*
- 	 * For a REQ_NOWAIT based request, return -EOPNOTSUPP
--	 * if queue is not a request based queue.
-+	 * if queue cannot handle nowait bio's
- 	 */
- 
--	if ((bio->bi_opf & REQ_NOWAIT) && !queue_is_rq_based(q))
-+	if ((bio->bi_opf & REQ_NOWAIT) && !blk_queue_supports_nowait(q))
- 		goto not_supported;
- 
- 	if (should_fail_request(&bio->bi_disk->part0, bio->bi_iter.bi_size))
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 02fa42d24b52..1d0da2a9cf46 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -631,6 +631,7 @@ struct request_queue {
- #define QUEUE_FLAG_REGISTERED  26	/* queue has been registered to a disk */
- #define QUEUE_FLAG_SCSI_PASSTHROUGH 27	/* queue supports SCSI commands */
- #define QUEUE_FLAG_QUIESCED    28	/* queue has been quiesced */
-+#define QUEUE_FLAG_NOWAIT      29	/* stack device driver supports REQ_NOWAIT */
- 
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_STACKABLE)	|	\
-@@ -759,6 +760,11 @@ static inline bool queue_is_rq_based(struct request_queue *q)
- 	return q->request_fn || q->mq_ops;
+-	if (gc->gc_enabled && !gc->gc_active)
++	if (gc->gc_enabled && !gc->gc_active) {
+ 		pblk_gc_start(pblk);
+-
+-	pblk_gc_kick(pblk);
++		pblk_gc_kick(pblk);
++	}
  }
  
-+static inline bool blk_queue_supports_nowait(struct request_queue *q)
-+{
-+	return queue_is_rq_based(q) || test_bit(QUEUE_FLAG_NOWAIT, &q->queue_flags);
-+}
-+
- static inline unsigned int blk_queue_cluster(struct request_queue *q)
- {
- 	return q->limits.cluster;
+ /*
+@@ -620,7 +620,8 @@ void pblk_gc_exit(struct pblk *pblk)
+ 	flush_workqueue(gc->gc_reader_wq);
+ 	flush_workqueue(gc->gc_line_reader_wq);
+ 
+-	del_timer(&gc->gc_timer);
++	gc->gc_enabled = 0;
++	del_timer_sync(&gc->gc_timer);
+ 	pblk_gc_stop(pblk, 1);
+ 
+ 	if (gc->gc_ts)
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 2e59973..27eb430 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -931,6 +931,7 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
+ 	pblk->dev = dev;
+ 	pblk->disk = tdisk;
+ 	pblk->state = PBLK_STATE_RUNNING;
++	pblk->gc.gc_enabled = 0;
+ 
+ 	spin_lock_init(&pblk->trans_lock);
+ 	spin_lock_init(&pblk->lock);
 -- 
-2.14.2
+2.9.3
