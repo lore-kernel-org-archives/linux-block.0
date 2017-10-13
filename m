@@ -1,79 +1,230 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-Date: Mon, 2 Oct 2017 07:19:56 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>
-Subject: Re: [PATCH V5 5/7] blk-mq-sched: move actual dispatching into one
- helper
-Message-ID: <20171002141956.GB16855@infradead.org>
-References: <20170930102720.30219-1-ming.lei@redhat.com>
- <20170930102720.30219-6-ming.lei@redhat.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:53101 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1758284AbdJMMrs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 08:47:48 -0400
+Received: by mail-wm0-f67.google.com with SMTP id k4so21552158wmc.1
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:47 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Rakesh Pandit <rakesh@tuxera.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 42/58] lightnvm: remove stale extern and unused exported symbols
+Date: Fri, 13 Oct 2017 14:46:31 +0200
+Message-Id: <20171013124647.32668-43-m@bjorling.me>
+In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
+References: <20171013124647.32668-1-m@bjorling.me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170930102720.30219-6-ming.lei@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Can you move this to the beginning of your series, just after
-the other edits to blk_mq_sched_dispatch_requests?
+From: Rakesh Pandit <rakesh@tuxera.com>
 
-> +static void blk_mq_do_dispatch_sched(struct request_queue *q,
-> +				     struct elevator_queue *e,
-> +				     struct blk_mq_hw_ctx *hctx)
+Not all exported symbols are being used outside core and there were
+some stale entries in lightnvm.h
 
-No need to pass anything but the hctx here, the other two can
-be trivially derived from it.
+Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
+---
+ drivers/lightnvm/core.c  | 129 +++++++++++++++++++++++------------------------
+ include/linux/lightnvm.h |   7 ---
+ 2 files changed, 64 insertions(+), 72 deletions(-)
 
-> +{
-> +	LIST_HEAD(rq_list);
-> +
-> +	do {
-> +		struct request *rq;
-> +
-> +		rq = e->type->ops.mq.dispatch_request(hctx);
-
-how about shortening this to:
-
-	struct request *rq = e->type->ops.mq.dispatch_request(hctx);
-
->  void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
->  {
->  	struct request_queue *q = hctx->queue;
-> @@ -136,16 +152,8 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
->  	 * on the dispatch list or we were able to dispatch from the
->  	 * dispatch list.
->  	 */
-> -	if (do_sched_dispatch && has_sched_dispatch) {
-> -		do {
-> -			struct request *rq;
-> -
-> -			rq = e->type->ops.mq.dispatch_request(hctx);
-> -			if (!rq)
-> -				break;
-> -			list_add(&rq->queuelist, &rq_list);
-> -		} while (blk_mq_dispatch_rq_list(q, &rq_list));
-> -	}
-> +	if (do_sched_dispatch && has_sched_dispatch)
-> +		blk_mq_do_dispatch_sched(q, e, hctx);
->  }
-
-Please use this new helper to simplify the logic. E.g.:
-
-	if (!list_empty(&rq_list)) {
-		blk_mq_sched_mark_restart_hctx(hctx);
-		if (blk_mq_dispatch_rq_list(q, &rq_list) && has_sched_dispatch)
-			blk_mq_do_dispatch_sched(hctx);
-	} else if (has_sched_dispatch) {
-		blk_mq_do_dispatch_sched(hctx);
-	} else {
-		blk_mq_flush_busy_ctxs(hctx, &rq_list);
-		blk_mq_dispatch_rq_list(q, &rq_list);
-	}
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 231c928..0e5f772 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -226,6 +226,24 @@ static const struct block_device_operations nvm_fops = {
+ 	.owner		= THIS_MODULE,
+ };
+ 
++static struct nvm_tgt_type *nvm_find_target_type(const char *name, int lock)
++{
++	struct nvm_tgt_type *tmp, *tt = NULL;
++
++	if (lock)
++		down_write(&nvm_tgtt_lock);
++
++	list_for_each_entry(tmp, &nvm_tgt_types, list)
++		if (!strcmp(name, tmp->name)) {
++			tt = tmp;
++			break;
++		}
++
++	if (lock)
++		up_write(&nvm_tgtt_lock);
++	return tt;
++}
++
+ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ {
+ 	struct nvm_ioctl_create_simple *s = &create->conf.s;
+@@ -549,25 +567,6 @@ void nvm_part_to_tgt(struct nvm_dev *dev, sector_t *entries,
+ }
+ EXPORT_SYMBOL(nvm_part_to_tgt);
+ 
+-struct nvm_tgt_type *nvm_find_target_type(const char *name, int lock)
+-{
+-	struct nvm_tgt_type *tmp, *tt = NULL;
+-
+-	if (lock)
+-		down_write(&nvm_tgtt_lock);
+-
+-	list_for_each_entry(tmp, &nvm_tgt_types, list)
+-		if (!strcmp(name, tmp->name)) {
+-			tt = tmp;
+-			break;
+-		}
+-
+-	if (lock)
+-		up_write(&nvm_tgtt_lock);
+-	return tt;
+-}
+-EXPORT_SYMBOL(nvm_find_target_type);
+-
+ int nvm_register_tgt_type(struct nvm_tgt_type *tt)
+ {
+ 	int ret = 0;
+@@ -619,6 +618,52 @@ static struct nvm_dev *nvm_find_nvm_dev(const char *name)
+ 	return NULL;
+ }
+ 
++static int nvm_set_rqd_ppalist(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd,
++			const struct ppa_addr *ppas, int nr_ppas)
++{
++	struct nvm_dev *dev = tgt_dev->parent;
++	struct nvm_geo *geo = &tgt_dev->geo;
++	int i, plane_cnt, pl_idx;
++	struct ppa_addr ppa;
++
++	if (geo->plane_mode == NVM_PLANE_SINGLE && nr_ppas == 1) {
++		rqd->nr_ppas = nr_ppas;
++		rqd->ppa_addr = ppas[0];
++
++		return 0;
++	}
++
++	rqd->nr_ppas = nr_ppas;
++	rqd->ppa_list = nvm_dev_dma_alloc(dev, GFP_KERNEL, &rqd->dma_ppa_list);
++	if (!rqd->ppa_list) {
++		pr_err("nvm: failed to allocate dma memory\n");
++		return -ENOMEM;
++	}
++
++	plane_cnt = geo->plane_mode;
++	rqd->nr_ppas *= plane_cnt;
++
++	for (i = 0; i < nr_ppas; i++) {
++		for (pl_idx = 0; pl_idx < plane_cnt; pl_idx++) {
++			ppa = ppas[i];
++			ppa.g.pl = pl_idx;
++			rqd->ppa_list[(pl_idx * nr_ppas) + i] = ppa;
++		}
++	}
++
++	return 0;
++}
++
++static void nvm_free_rqd_ppalist(struct nvm_tgt_dev *tgt_dev,
++			struct nvm_rq *rqd)
++{
++	if (!rqd->ppa_list)
++		return;
++
++	nvm_dev_dma_free(tgt_dev->parent, rqd->ppa_list, rqd->dma_ppa_list);
++}
++
++
+ int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas,
+ 		       int nr_ppas, int type)
+ {
+@@ -792,52 +837,6 @@ void nvm_put_area(struct nvm_tgt_dev *tgt_dev, sector_t begin)
+ }
+ EXPORT_SYMBOL(nvm_put_area);
+ 
+-int nvm_set_rqd_ppalist(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd,
+-			const struct ppa_addr *ppas, int nr_ppas)
+-{
+-	struct nvm_dev *dev = tgt_dev->parent;
+-	struct nvm_geo *geo = &tgt_dev->geo;
+-	int i, plane_cnt, pl_idx;
+-	struct ppa_addr ppa;
+-
+-	if (geo->plane_mode == NVM_PLANE_SINGLE && nr_ppas == 1) {
+-		rqd->nr_ppas = nr_ppas;
+-		rqd->ppa_addr = ppas[0];
+-
+-		return 0;
+-	}
+-
+-	rqd->nr_ppas = nr_ppas;
+-	rqd->ppa_list = nvm_dev_dma_alloc(dev, GFP_KERNEL, &rqd->dma_ppa_list);
+-	if (!rqd->ppa_list) {
+-		pr_err("nvm: failed to allocate dma memory\n");
+-		return -ENOMEM;
+-	}
+-
+-	plane_cnt = geo->plane_mode;
+-	rqd->nr_ppas *= plane_cnt;
+-
+-	for (i = 0; i < nr_ppas; i++) {
+-		for (pl_idx = 0; pl_idx < plane_cnt; pl_idx++) {
+-			ppa = ppas[i];
+-			ppa.g.pl = pl_idx;
+-			rqd->ppa_list[(pl_idx * nr_ppas) + i] = ppa;
+-		}
+-	}
+-
+-	return 0;
+-}
+-EXPORT_SYMBOL(nvm_set_rqd_ppalist);
+-
+-void nvm_free_rqd_ppalist(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
+-{
+-	if (!rqd->ppa_list)
+-		return;
+-
+-	nvm_dev_dma_free(tgt_dev->parent, rqd->ppa_list, rqd->dma_ppa_list);
+-}
+-EXPORT_SYMBOL(nvm_free_rqd_ppalist);
+-
+ void nvm_end_io(struct nvm_rq *rqd)
+ {
+ 	struct nvm_tgt_dev *tgt_dev = rqd->dev;
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 32ec35b..4f0e4a0 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -463,8 +463,6 @@ struct nvm_tgt_type {
+ 	struct module *owner;
+ };
+ 
+-extern struct nvm_tgt_type *nvm_find_target_type(const char *, int);
+-
+ extern int nvm_register_tgt_type(struct nvm_tgt_type *);
+ extern void nvm_unregister_tgt_type(struct nvm_tgt_type *);
+ 
+@@ -480,9 +478,6 @@ extern int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr *,
+ extern int nvm_max_phys_sects(struct nvm_tgt_dev *);
+ extern int nvm_submit_io(struct nvm_tgt_dev *, struct nvm_rq *);
+ extern int nvm_erase_sync(struct nvm_tgt_dev *, struct ppa_addr *, int);
+-extern int nvm_set_rqd_ppalist(struct nvm_tgt_dev *, struct nvm_rq *,
+-					const struct ppa_addr *, int);
+-extern void nvm_free_rqd_ppalist(struct nvm_tgt_dev *, struct nvm_rq *);
+ extern int nvm_get_l2p_tbl(struct nvm_tgt_dev *, u64, u32, nvm_l2p_update_fn *,
+ 			   void *);
+ extern int nvm_get_area(struct nvm_tgt_dev *, sector_t *, sector_t);
+@@ -491,8 +486,6 @@ extern void nvm_end_io(struct nvm_rq *);
+ extern int nvm_bb_tbl_fold(struct nvm_dev *, u8 *, int);
+ extern int nvm_get_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr, u8 *);
+ 
+-extern int nvm_dev_factory(struct nvm_dev *, int flags);
+-
+ extern void nvm_part_to_tgt(struct nvm_dev *, sector_t *, int);
+ 
+ #else /* CONFIG_NVM */
+-- 
+2.9.3
