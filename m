@@ -1,19 +1,19 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:49013 "EHLO
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:53034 "EHLO
         mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932069AbdJMMrp (ORCPT
+        with ESMTP id S1758215AbdJMMra (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 08:47:45 -0400
-Received: by mail-wm0-f65.google.com with SMTP id i124so21105798wmf.3
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:44 -0700 (PDT)
+        Fri, 13 Oct 2017 08:47:30 -0400
+Received: by mail-wm0-f65.google.com with SMTP id k4so21549676wmc.1
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:30 -0700 (PDT)
 From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
 To: axboe@fb.com
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Rakesh Pandit <rakesh@tuxera.com>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
         =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 39/58] lightnvm: pblk: fix changing GC group list for a line
-Date: Fri, 13 Oct 2017 14:46:28 +0200
-Message-Id: <20171013124647.32668-40-m@bjorling.me>
+Subject: [GIT PULL 24/58] lightnvm: pblk: refactor read lba sanity check
+Date: Fri, 13 Oct 2017 14:46:13 +0200
+Message-Id: <20171013124647.32668-25-m@bjorling.me>
 In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
 References: <20171013124647.32668-1-m@bjorling.me>
 MIME-Version: 1.0
@@ -21,35 +21,94 @@ Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Rakesh Pandit <rakesh@tuxera.com>
+From: Javier González <javier@cnexlabs.com>
 
-pblk_line_gc_list seems to had a bug since the introduction of pblk in
-getting GC list for a line. In b20ba1bc7 while redesigning the GC
-algorithm, the naming for the GC thresholds was altered, but the
-values for high_thrs and mid_thrs were not. The result is that when
-moving to the GC lists, the mid threshold is never evaluated.
+Refactor lba sanity check on read path to avoid code duplication.
 
-Fixes: a4bd217b4("lightnvm: physical block device (pblk) target")
-Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- drivers/lightnvm/pblk-init.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/lightnvm/pblk-read.c | 29 ++++++++++-------------------
+ 1 file changed, 10 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index c7239c4..56ece7d 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -678,8 +678,8 @@ static int pblk_lines_init(struct pblk *pblk)
- 	lm->blk_bitmap_len = BITS_TO_LONGS(geo->nr_luns) * sizeof(long);
- 	lm->sec_bitmap_len = BITS_TO_LONGS(lm->sec_per_line) * sizeof(long);
- 	lm->lun_bitmap_len = BITS_TO_LONGS(geo->nr_luns) * sizeof(long);
--	lm->high_thrs = lm->sec_per_line / 2;
--	lm->mid_thrs = lm->sec_per_line / 4;
-+	lm->mid_thrs = lm->sec_per_line / 2;
-+	lm->high_thrs = lm->sec_per_line / 4;
- 	lm->meta_distance = (geo->nr_luns / 2) * pblk->min_write_pgs;
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index d2b6e2a..eaaf9d5 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -39,21 +39,14 @@ static int pblk_read_from_cache(struct pblk *pblk, struct bio *bio,
+ }
  
- 	/* Calculate necessary pages for smeta. See comment over struct
+ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
+-				 unsigned long *read_bitmap)
++				 sector_t blba, unsigned long *read_bitmap)
+ {
+ 	struct bio *bio = rqd->bio;
+ 	struct ppa_addr ppas[PBLK_MAX_REQ_ADDRS];
+-	sector_t blba = pblk_get_lba(bio);
+ 	int nr_secs = rqd->nr_ppas;
+ 	bool advanced_bio = false;
+ 	int i, j = 0;
+ 
+-	/* logic error: lba out-of-bounds. Ignore read request */
+-	if (blba + nr_secs >= pblk->rl.nr_secs) {
+-		WARN(1, "pblk: read lbas out of bounds\n");
+-		return;
+-	}
+-
+ 	pblk_lookup_l2p_seq(pblk, ppas, blba, nr_secs);
+ 
+ 	for (i = 0; i < nr_secs; i++) {
+@@ -259,17 +252,10 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ }
+ 
+ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
+-			 unsigned long *read_bitmap)
++			 sector_t lba, unsigned long *read_bitmap)
+ {
+ 	struct bio *bio = rqd->bio;
+ 	struct ppa_addr ppa;
+-	sector_t lba = pblk_get_lba(bio);
+-
+-	/* logic error: lba out-of-bounds. Ignore read request */
+-	if (lba >= pblk->rl.nr_secs) {
+-		WARN(1, "pblk: read lba out of bounds\n");
+-		return;
+-	}
+ 
+ 	pblk_lookup_l2p_seq(pblk, &ppa, lba, 1);
+ 
+@@ -305,14 +291,19 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ {
+ 	struct nvm_tgt_dev *dev = pblk->dev;
++	sector_t blba = pblk_get_lba(bio);
+ 	unsigned int nr_secs = pblk_get_secs(bio);
+ 	struct nvm_rq *rqd;
+ 	unsigned long read_bitmap; /* Max 64 ppas per request */
+ 	unsigned int bio_init_idx;
+ 	int ret = NVM_IO_ERR;
+ 
+-	if (nr_secs > PBLK_MAX_REQ_ADDRS)
++	/* logic error: lba out-of-bounds. Ignore read request */
++	if (blba >= pblk->rl.nr_secs || nr_secs > PBLK_MAX_REQ_ADDRS) {
++		WARN(1, "pblk: read lba out of bounds (lba:%llu, nr:%d)\n",
++					(unsigned long long)blba, nr_secs);
+ 		return NVM_IO_ERR;
++	}
+ 
+ 	bitmap_zero(&read_bitmap, nr_secs);
+ 
+@@ -340,9 +331,9 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ 		rqd->ppa_list = rqd->meta_list + pblk_dma_meta_size;
+ 		rqd->dma_ppa_list = rqd->dma_meta_list + pblk_dma_meta_size;
+ 
+-		pblk_read_ppalist_rq(pblk, rqd, &read_bitmap);
++		pblk_read_ppalist_rq(pblk, rqd, blba, &read_bitmap);
+ 	} else {
+-		pblk_read_rq(pblk, rqd, &read_bitmap);
++		pblk_read_rq(pblk, rqd, blba, &read_bitmap);
+ 	}
+ 
+ 	bio_get(bio);
 -- 
 2.9.3
