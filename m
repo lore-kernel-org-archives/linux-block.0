@@ -1,240 +1,38 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:49757 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1758283AbdJMMrj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 08:47:39 -0400
-Received: by mail-wm0-f66.google.com with SMTP id b189so21115651wmd.4
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:39 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 33/58] lightnvm: pblk: check lba sanity on read path
-Date: Fri, 13 Oct 2017 14:46:22 +0200
-Message-Id: <20171013124647.32668-34-m@bjorling.me>
-In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
+Return-Path: <axboe@kernel.dk>
+Date: Fri, 13 Oct 2017 08:36:39 -0600
+From: Jens Axboe <axboe@kernel.dk>
+To: Matias =?iso-8859-1?Q?Bj=F8rling?= <m@bjorling.me>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [GIT PULL 00/58] LightNVM updates for 4.15
+Message-ID: <20171013143638.GA19833@kernel.dk>
 References: <20171013124647.32668-1-m@bjorling.me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <javier@cnexlabs.com>
+On Fri, Oct 13 2017, Matias Bj�rling wrote:
+> Hi Jens,
+> 
+> A couple of patches for 4.15.
+> 
+> Javier has improved garbage collection, statistics, memory pool usage,
+> and added support for single LUN configurations. He also made a lot of
+> bug fixes and cleanup patches.
+> 
+> Rakesh have been fixing up a lot of subsystem bugs with respect to
+> loading and unloading pblk, cleanup of memory pools, and a couple of
+> fixes spread across the lightnvm subsystem and pblk.
+> 
+> Hans has been looking into garbage collection, and shutting it
+> down gracefully when pblk is unloaded.
+> 
+> Please pull from the for-4.15/for-jens branch or apply the patches
+> posted with this thread:
+> 
+>    https://github.com/OpenChannelSSD/linux.git for-4.15/for-jens
 
-As part of pblk's recovery scheme, we store the lba mapped to each
-physical sector on the device's out-of-bound (OOB) area.
+Applied for 4.15, thanks.
 
-On the read path, we can use this information to validate that the data
-being delivered to the upper layers corresponds to the lba being
-requested. The cost of this check is an extra copy on the DMA region on
-the device and an extra comparison in the host, given that (i) the OOB
-area is being read together with the data in the media, and (ii) the DMA
-region allocated for the ppa list can be reused for the metadata stored
-on the OOB area.
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/lightnvm/pblk-read.c | 51 +++++++++++++++++++++++++++++++++++++++++---
- drivers/lightnvm/pblk.h      |  4 +++-
- 2 files changed, 51 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index 0299fc0..a465d99 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -41,6 +41,7 @@ static int pblk_read_from_cache(struct pblk *pblk, struct bio *bio,
- static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
- 				 sector_t blba, unsigned long *read_bitmap)
- {
-+	struct pblk_sec_meta *meta_list = rqd->meta_list;
- 	struct bio *bio = rqd->bio;
- 	struct ppa_addr ppas[PBLK_MAX_REQ_ADDRS];
- 	int nr_secs = rqd->nr_ppas;
-@@ -56,6 +57,7 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
- retry:
- 		if (pblk_ppa_empty(p)) {
- 			WARN_ON(test_and_set_bit(i, read_bitmap));
-+			meta_list[i].lba = cpu_to_le64(ADDR_EMPTY);
- 
- 			if (unlikely(!advanced_bio)) {
- 				bio_advance(bio, (i) * PBLK_EXPOSED_PAGE_SIZE);
-@@ -75,6 +77,7 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
- 				goto retry;
- 			}
- 			WARN_ON(test_and_set_bit(i, read_bitmap));
-+			meta_list[i].lba = cpu_to_le64(lba);
- 			advanced_bio = true;
- #ifdef CONFIG_NVM_DEBUG
- 			atomic_long_inc(&pblk->cache_reads);
-@@ -110,10 +113,26 @@ static int pblk_submit_read_io(struct pblk *pblk, struct nvm_rq *rqd)
- 	return NVM_IO_OK;
- }
- 
-+static void pblk_read_check(struct pblk *pblk, struct nvm_rq *rqd,
-+			   sector_t blba)
-+{
-+	struct pblk_sec_meta *meta_list = rqd->meta_list;
-+	int nr_lbas = rqd->nr_ppas;
-+	int i;
-+
-+	for (i = 0; i < nr_lbas; i++) {
-+		u64 lba = le64_to_cpu(meta_list[i].lba);
-+
-+		if (lba == ADDR_EMPTY)
-+			continue;
-+
-+		WARN(lba != blba + i, "pblk: corrupted read LBA\n");
-+	}
-+}
-+
- static void pblk_end_io_read(struct nvm_rq *rqd)
- {
- 	struct pblk *pblk = rqd->private;
--	struct nvm_tgt_dev *dev = pblk->dev;
- 	struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
- 	struct bio *bio = rqd->bio;
- 
-@@ -124,6 +143,8 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
- 		WARN_ONCE(bio->bi_status, "pblk: corrupted read error\n");
- #endif
- 
-+	pblk_read_check(pblk, rqd, r_ctx->lba);
-+
- 	bio_put(bio);
- 	if (r_ctx->private) {
- 		struct bio *orig_bio = r_ctx->private;
-@@ -149,15 +170,21 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 				      unsigned long *read_bitmap)
- {
- 	struct bio *new_bio, *bio = rqd->bio;
-+	struct pblk_sec_meta *meta_list = rqd->meta_list;
- 	struct bio_vec src_bv, dst_bv;
- 	void *ppa_ptr = NULL;
- 	void *src_p, *dst_p;
- 	dma_addr_t dma_ppa_list = 0;
-+	__le64 *lba_list_mem, *lba_list_media;
- 	int nr_secs = rqd->nr_ppas;
- 	int nr_holes = nr_secs - bitmap_weight(read_bitmap, nr_secs);
- 	int i, ret, hole;
- 	DECLARE_COMPLETION_ONSTACK(wait);
- 
-+	/* Re-use allocated memory for intermediate lbas */
-+	lba_list_mem = (((void *)rqd->ppa_list) + pblk_dma_ppa_size);
-+	lba_list_media = (((void *)rqd->ppa_list) + 2 * pblk_dma_ppa_size);
-+
- 	new_bio = bio_alloc(GFP_KERNEL, nr_holes);
- 
- 	if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
-@@ -168,6 +195,9 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 		goto err;
- 	}
- 
-+	for (i = 0; i < nr_secs; i++)
-+		lba_list_mem[i] = meta_list[i].lba;
-+
- 	new_bio->bi_iter.bi_sector = 0; /* internal bio */
- 	bio_set_op_attrs(new_bio, REQ_OP_READ, 0);
- 
-@@ -207,10 +237,17 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 		rqd->dma_ppa_list = dma_ppa_list;
- 	}
- 
-+	for (i = 0; i < nr_secs; i++) {
-+		lba_list_media[i] = meta_list[i].lba;
-+		meta_list[i].lba = lba_list_mem[i];
-+	}
-+
- 	/* Fill the holes in the original bio */
- 	i = 0;
- 	hole = find_first_zero_bit(read_bitmap, nr_secs);
- 	do {
-+		meta_list[hole].lba = lba_list_media[i];
-+
- 		src_bv = new_bio->bi_io_vec[i++];
- 		dst_bv = bio->bi_io_vec[bio_init_idx + hole];
- 
-@@ -251,6 +288,7 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
- static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
- 			 sector_t lba, unsigned long *read_bitmap)
- {
-+	struct pblk_sec_meta *meta_list = rqd->meta_list;
- 	struct bio *bio = rqd->bio;
- 	struct ppa_addr ppa;
- 
-@@ -263,6 +301,7 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
- retry:
- 	if (pblk_ppa_empty(ppa)) {
- 		WARN_ON(test_and_set_bit(0, read_bitmap));
-+		meta_list[0].lba = cpu_to_le64(ADDR_EMPTY);
- 		return;
- 	}
- 
-@@ -274,6 +313,9 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
- 			pblk_lookup_l2p_seq(pblk, &ppa, lba, 1);
- 			goto retry;
- 		}
-+
-+		meta_list[0].lba = cpu_to_le64(lba);
-+
- 		WARN_ON(test_and_set_bit(0, read_bitmap));
- #ifdef CONFIG_NVM_DEBUG
- 			atomic_long_inc(&pblk->cache_reads);
-@@ -290,9 +332,10 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
- 	struct nvm_tgt_dev *dev = pblk->dev;
- 	sector_t blba = pblk_get_lba(bio);
- 	unsigned int nr_secs = pblk_get_secs(bio);
-+	struct pblk_g_ctx *r_ctx;
- 	struct nvm_rq *rqd;
--	unsigned long read_bitmap; /* Max 64 ppas per request */
- 	unsigned int bio_init_idx;
-+	unsigned long read_bitmap; /* Max 64 ppas per request */
- 	int ret = NVM_IO_ERR;
- 
- 	/* logic error: lba out-of-bounds. Ignore read request */
-@@ -312,6 +355,9 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
- 	rqd->private = pblk;
- 	rqd->end_io = pblk_end_io_read;
- 
-+	r_ctx = nvm_rq_to_pdu(rqd);
-+	r_ctx->lba = blba;
-+
- 	/* Save the index for this bio's start. This is needed in case
- 	 * we need to fill a partial read.
- 	 */
-@@ -344,7 +390,6 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
- 	/* All sectors are to be read from the device */
- 	if (bitmap_empty(&read_bitmap, rqd->nr_ppas)) {
- 		struct bio *int_bio = NULL;
--		struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
- 
- 		/* Clone read bio to deal with read errors internally */
- 		int_bio = bio_clone_fast(bio, GFP_KERNEL, pblk_bio_set);
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 12a20f8..4a51e6d 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -99,6 +99,7 @@ enum {
- };
- 
- #define pblk_dma_meta_size (sizeof(struct pblk_sec_meta) * PBLK_MAX_REQ_ADDRS)
-+#define pblk_dma_ppa_size (sizeof(u64) * PBLK_MAX_REQ_ADDRS)
- 
- /* write buffer completion context */
- struct pblk_c_ctx {
-@@ -110,9 +111,10 @@ struct pblk_c_ctx {
- 	unsigned int nr_padded;
- };
- 
--/* generic context */
-+/* read context */
- struct pblk_g_ctx {
- 	void *private;
-+	u64 lba;
- };
- 
- /* Pad context */
 -- 
-2.9.3
+Jens Axboe
