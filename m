@@ -1,54 +1,50 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:47485 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752468AbdJMXgP (ORCPT
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:48930 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1758161AbdJMMrW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 19:36:15 -0400
-Received: by mail-pf0-f196.google.com with SMTP id z11so11520307pfk.4
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 16:36:15 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Liang Chen <liangchen.linux@gmail.com>
-Subject: [PATCH 13/15] bcache: safeguard a dangerous addressing in closure_queue
-Date: Fri, 13 Oct 2017 16:35:40 -0700
-Message-Id: <20171013233542.20938-14-mlyle@lyle.org>
-In-Reply-To: <20171013233542.20938-1-mlyle@lyle.org>
-References: <20171013233542.20938-1-mlyle@lyle.org>
+        Fri, 13 Oct 2017 08:47:22 -0400
+Received: by mail-wm0-f68.google.com with SMTP id i124so21102974wmf.3
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:21 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 15/58] lightnvm: pblk: fix write I/O sync stat
+Date: Fri, 13 Oct 2017 14:46:04 +0200
+Message-Id: <20171013124647.32668-16-m@bjorling.me>
+In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
+References: <20171013124647.32668-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Liang Chen <liangchen.linux@gmail.com>
+From: Javier González <javier@cnexlabs.com>
 
-The use of the union reduces the size of closure struct by taking advantage
-of the current size of its members. The offset of func in work_struct
-equals the size of the first three members, so that work.work_func will
-just reference the forth member - fn.
+Fix stat counter to collect the right number of I/Os being synced on the
+completion path.
 
-This is smart but dangerous. It can be broken if work_struct or the other
-structs get changed, and can be a bit difficult to debug.
-
-Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
+Fixes: 0880a9aa2d91f ("lightnvm: pblk: delete redundant buffer pointer")
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- drivers/md/bcache/closure.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/lightnvm/pblk-write.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/md/bcache/closure.h b/drivers/md/bcache/closure.h
-index 295b7e43f92c..00fb314cce57 100644
---- a/drivers/md/bcache/closure.h
-+++ b/drivers/md/bcache/closure.h
-@@ -251,6 +251,12 @@ static inline void set_closure_fn(struct closure *cl, closure_fn *fn,
- static inline void closure_queue(struct closure *cl)
- {
- 	struct workqueue_struct *wq = cl->wq;
-+	/**
-+	 * Changes made to closure, work_struct, or a couple of other structs
-+	 * may cause work.func not pointing to the right location.
-+	 */
-+	BUILD_BUG_ON(offsetof(struct closure, fn)
-+		     != offsetof(struct work_struct, func));
- 	if (wq) {
- 		INIT_WORK(&cl->work, cl->work.func);
- 		BUG_ON(!queue_work(wq, &cl->work));
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index d89ac57..d82ca8b 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -38,7 +38,7 @@ static unsigned long pblk_end_w_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 							c_ctx->nr_padded);
+ 
+ #ifdef CONFIG_NVM_DEBUG
+-	atomic_long_add(c_ctx->nr_valid, &pblk->sync_writes);
++	atomic_long_add(rqd->nr_ppas, &pblk->sync_writes);
+ #endif
+ 
+ 	ret = pblk_rb_sync_advance(&pblk->rwb, c_ctx->nr_valid);
 -- 
-2.11.0
+2.9.3
