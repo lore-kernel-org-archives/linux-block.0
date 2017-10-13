@@ -1,40 +1,77 @@
-Return-Path: <prvs=45557a1c1=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-crypto@vger.kernel.org,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Anil Ravindranath <anil_ravindranath@pmc-sierra.com>
-Subject: [PATCH v2 7/8] scsi/pmcraid: Remove an unused structure member
-Date: Mon, 16 Oct 2017 15:49:39 -0700
-Message-Id: <20171016224940.1332-8-bart.vanassche@wdc.com>
-In-Reply-To: <20171016224940.1332-1-bart.vanassche@wdc.com>
-References: <20171016224940.1332-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:52321 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751391AbdJMXf6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 19:35:58 -0400
+Received: by mail-pg0-f66.google.com with SMTP id a192so914678pge.9
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 16:35:58 -0700 (PDT)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Peter Foley <pefoley2@pefoley.com>
+Subject: [PATCH 01/15] bcache: Avoid nested function definition
+Date: Fri, 13 Oct 2017 16:35:28 -0700
+Message-Id: <20171013233542.20938-2-mlyle@lyle.org>
+In-Reply-To: <20171013233542.20938-1-mlyle@lyle.org>
+References: <20171013233542.20938-1-mlyle@lyle.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: linux-scsi@vger.kernel.org
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Anil Ravindranath <anil_ravindranath@pmc-sierra.com>
+From: Peter Foley <pefoley2@pefoley.com>
+
+Fixes below error with clang:
+../drivers/md/bcache/sysfs.c:759:3: error: function definition is not allowed here
+                {       return *((uint16_t *) r) - *((uint16_t *) l); }
+                ^
+../drivers/md/bcache/sysfs.c:789:32: error: use of undeclared identifier 'cmp'
+                sort(p, n, sizeof(uint16_t), cmp, NULL);
+                                             ^
+2 errors generated.
+
+v2:
+rename function to __bch_cache_cmp
+
+Signed-off-by: Peter Foley <pefoley2@pefoley.com>
+Reviewed-by: Coly Li <colyli@suse.de>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
 ---
- drivers/scsi/pmcraid.h | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/md/bcache/sysfs.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/scsi/pmcraid.h b/drivers/scsi/pmcraid.h
-index 8bfac72a242b..44da91712115 100644
---- a/drivers/scsi/pmcraid.h
-+++ b/drivers/scsi/pmcraid.h
-@@ -542,7 +542,6 @@ struct pmcraid_sglist {
- 	u32 order;
- 	u32 num_sg;
- 	u32 num_dma_sg;
--	u32 buffer_len;
- 	struct scatterlist scatterlist[1];
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index 104c57cd666c..69f355b9650c 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -745,6 +745,11 @@ static struct attribute *bch_cache_set_internal_files[] = {
  };
+ KTYPE(bch_cache_set_internal);
  
++static int __bch_cache_cmp(const void *l, const void *r)
++{
++	return *((uint16_t *)r) - *((uint16_t *)l);
++}
++
+ SHOW(__bch_cache)
+ {
+ 	struct cache *ca = container_of(kobj, struct cache, kobj);
+@@ -769,9 +774,6 @@ SHOW(__bch_cache)
+ 					       CACHE_REPLACEMENT(&ca->sb));
+ 
+ 	if (attr == &sysfs_priority_stats) {
+-		int cmp(const void *l, const void *r)
+-		{	return *((uint16_t *) r) - *((uint16_t *) l); }
+-
+ 		struct bucket *b;
+ 		size_t n = ca->sb.nbuckets, i;
+ 		size_t unused = 0, available = 0, dirty = 0, meta = 0;
+@@ -800,7 +802,7 @@ SHOW(__bch_cache)
+ 			p[i] = ca->buckets[i].prio;
+ 		mutex_unlock(&ca->set->bucket_lock);
+ 
+-		sort(p, n, sizeof(uint16_t), cmp, NULL);
++		sort(p, n, sizeof(uint16_t), __bch_cache_cmp, NULL);
+ 
+ 		while (n &&
+ 		       !cached[n - 1])
 -- 
-2.14.2
+2.11.0
