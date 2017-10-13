@@ -1,63 +1,73 @@
-Return-Path: <prvs=4560204ad=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Oleksandr Natalenko <oleksandr@natalenko.name>,
-	Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	linux-raid@vger.kernel.org
-Subject: [PATCH v10 02/10] md: Introduce md_stop_all_writes()
-Date: Tue, 17 Oct 2017 16:26:22 -0700
-Message-Id: <20171017232630.4264-3-bart.vanassche@wdc.com>
-In-Reply-To: <20171017232630.4264-1-bart.vanassche@wdc.com>
-References: <20171017232630.4264-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:46898 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757833AbdJMMrK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 08:47:10 -0400
+Received: by mail-wm0-f67.google.com with SMTP id m72so21262538wmc.1
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:10 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Rakesh Pandit <rakesh@tuxera.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 03/58] lightnvm: protect target type list with correct locks
+Date: Fri, 13 Oct 2017 14:45:52 +0200
+Message-Id: <20171013124647.32668-4-m@bjorling.me>
+In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
+References: <20171013124647.32668-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Introduce md_stop_all_writes() because the next patch will add
-a second caller for this function. This patch does not change
-any functionality.
+From: Rakesh Pandit <rakesh@tuxera.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Shaohua Li <shli@kernel.org>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Tested-by: Martin Steigerwald <martin@lichtvoll.de>
-Cc: linux-raid@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
+nvm_tgt_types list was protected by wrong lock for NVM_INFO ioctl call
+and can race with addition or removal of target types.  Also
+unregistering target type was not protected correctly.
+
+Fixes: 5cd907853 ("lightnvm: remove nested lock conflict with mm")
+Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+Reviewed-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- drivers/md/md.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ drivers/lightnvm/core.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 8933cafc212d..b99584e5d6b1 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -8937,8 +8937,7 @@ int rdev_clear_badblocks(struct md_rdev *rdev, sector_t s, int sectors,
- }
- EXPORT_SYMBOL_GPL(rdev_clear_badblocks);
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index c490711..ee2b6d7 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -589,9 +589,9 @@ void nvm_unregister_tgt_type(struct nvm_tgt_type *tt)
+ 	if (!tt)
+ 		return;
  
--static int md_notify_reboot(struct notifier_block *this,
--			    unsigned long code, void *x)
-+static void md_stop_all_writes(void)
- {
- 	struct list_head *tmp;
- 	struct mddev *mddev;
-@@ -8962,6 +8961,12 @@ static int md_notify_reboot(struct notifier_block *this,
- 	 */
- 	if (need_delay)
- 		mdelay(1000*1);
-+}
-+
-+static int md_notify_reboot(struct notifier_block *this,
-+			    unsigned long code, void *x)
-+{
-+	md_stop_all_writes();
- 
- 	return NOTIFY_DONE;
+-	down_write(&nvm_lock);
++	down_write(&nvm_tgtt_lock);
+ 	list_del(&tt->list);
+-	up_write(&nvm_lock);
++	up_write(&nvm_tgtt_lock);
  }
+ EXPORT_SYMBOL(nvm_unregister_tgt_type);
+ 
+@@ -1195,7 +1195,7 @@ static long nvm_ioctl_info(struct file *file, void __user *arg)
+ 	info->version[1] = NVM_VERSION_MINOR;
+ 	info->version[2] = NVM_VERSION_PATCH;
+ 
+-	down_write(&nvm_lock);
++	down_write(&nvm_tgtt_lock);
+ 	list_for_each_entry(tt, &nvm_tgt_types, list) {
+ 		struct nvm_ioctl_info_tgt *tgt = &info->tgts[tgt_iter];
+ 
+@@ -1208,7 +1208,7 @@ static long nvm_ioctl_info(struct file *file, void __user *arg)
+ 	}
+ 
+ 	info->tgtsize = tgt_iter;
+-	up_write(&nvm_lock);
++	up_write(&nvm_tgtt_lock);
+ 
+ 	if (copy_to_user(arg, info, sizeof(struct nvm_ioctl_info))) {
+ 		kfree(info);
 -- 
-2.14.2
+2.9.3
