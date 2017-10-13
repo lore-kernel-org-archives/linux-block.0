@@ -1,8 +1,8 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:51894 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:34504 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752626AbdJMSGN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 14:06:13 -0400
+        id S1752550AbdJMRZR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 13 Oct 2017 13:25:17 -0400
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>
@@ -14,9 +14,9 @@ Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
         linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
         John Garry <john.garry@huawei.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V9 0/7] blk-mq-sched: improve sequential I/O performance
-Date: Sat, 14 Oct 2017 02:05:25 +0800
-Message-Id: <20171013180532.29304-1-ming.lei@redhat.com>
+Subject: [PATCH V8 0/7] blk-mq-sched: improve sequential I/O performance
+Date: Sat, 14 Oct 2017 01:24:52 +0800
+Message-Id: <20171013172459.1376-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
@@ -44,13 +44,7 @@ wrt V2. Also performance improvement on lpfc/qla2xx was observed with V1.[1]
 [2] https://marc.info/?l=linux-block&m=150217980602843&w=2
 
 gitweb:
-	https://github.com/ming1/linux/commits/blk_mq_improve_scsi_mpath_perf_V9_part1
-
-V9:
-	- change title of patch1
-	- rename blk_mq_get_budget() as blk_mq_get_dispatch_budget()
-	- make check on .get_budget/.put_budget cleaner
-	- all are suggested by Jens, thank for review
+	https://github.com/ming1/linux/commits/blk_mq_improve_scsi_mpath_perf_V8_part1
 
 V8:
 	- introduce helper of blk_mq_get_budget
@@ -108,8 +102,7 @@ V2:
 	by Bart
 
 Ming Lei (7):
-  blk-mq-sched: dispatch from scheduler only after progress is made on
-    ->dispatch
+  blk-mq-sched: fix scheduler bad performance
   blk-mq-sched: move actual dispatching into one helper
   sbitmap: introduce __sbitmap_for_each_set()
   blk-mq: introduce .get_budget and .put_budget in blk_mq_ops
@@ -119,11 +112,11 @@ Ming Lei (7):
 
  block/blk-mq-sched.c    | 130 +++++++++++++++++++++++++++++++++++++++++-------
  block/blk-mq.c          |  72 +++++++++++++++++++++++++--
- block/blk-mq.h          |  23 ++++++++-
+ block/blk-mq.h          |  22 +++++++-
  drivers/scsi/scsi_lib.c |  79 +++++++++++++++++++----------
  include/linux/blk-mq.h  |  13 +++++
  include/linux/sbitmap.h |  64 +++++++++++++++++-------
- 6 files changed, 317 insertions(+), 64 deletions(-)
+ 6 files changed, 316 insertions(+), 64 deletions(-)
 
 -- 
 2.9.5
