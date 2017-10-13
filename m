@@ -1,38 +1,60 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:37739 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751235AbdJKJxM (ORCPT
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:57232 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1758088AbdJMMrQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 Oct 2017 05:53:12 -0400
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [PATCH v2 0/3] Move tagset reinit to its only current consumer, nvme-core
-Date: Wed, 11 Oct 2017 12:53:05 +0300
-Message-Id: <1507715588-1041-1-git-send-email-sagi@grimberg.me>
+        Fri, 13 Oct 2017 08:47:16 -0400
+Received: by mail-wm0-f68.google.com with SMTP id l68so21509010wmd.5
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:15 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Rakesh Pandit <rakesh@tuxera.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 09/58] lightnvm: pblk: improve error message if down_timeout fails
+Date: Fri, 13 Oct 2017 14:45:58 +0200
+Message-Id: <20171013124647.32668-10-m@bjorling.me>
+In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
+References: <20171013124647.32668-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-As suggested by Bart Van Assche, get rid of
-blk_mq_reinit_tagset and move it to nvme-core (its
-only current consumer).
+From: Rakesh Pandit <rakesh@tuxera.com>
 
-Instead, introduce a more generic tagset iterator helper.
+The two pr_err messages are useless as they don't differentiate
+error code.
 
-Changes from v1:
-- pass tagset to nvme_reinit_tagset (Bart)
+Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
+Reviewed-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
+---
+ drivers/lightnvm/pblk-core.c | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
 
-Sagi Grimberg (3):
-  block: introduce blk_mq_tagset_iter
-  nvme: introduce nvme_reinit_tagset
-  block: remove blk_mq_reinit_tagset
-
- block/blk-mq-tag.c       | 11 +++++------
- drivers/nvme/host/core.c | 10 ++++++++++
- drivers/nvme/host/fc.c   |  3 ++-
- drivers/nvme/host/nvme.h |  2 ++
- drivers/nvme/host/rdma.c |  7 +++----
- include/linux/blk-mq.h   |  4 ++--
- 6 files changed, 24 insertions(+), 13 deletions(-)
-
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index b53bb00..027c42b 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -1691,16 +1691,8 @@ static void __pblk_down_page(struct pblk *pblk, struct ppa_addr *ppa_list,
+ #endif
+ 
+ 	ret = down_timeout(&rlun->wr_sem, msecs_to_jiffies(30000));
+-	if (ret) {
+-		switch (ret) {
+-		case -ETIME:
+-			pr_err("pblk: lun semaphore timed out\n");
+-			break;
+-		case -EINTR:
+-			pr_err("pblk: lun semaphore timed out\n");
+-			break;
+-		}
+-	}
++	if (ret == -ETIME || ret == -EINTR)
++		pr_err("pblk: taking lun semaphore timed out: err %d\n", -ret);
+ }
+ 
+ void pblk_down_page(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas)
 -- 
-2.7.4
+2.9.3
