@@ -1,63 +1,52 @@
-Return-Path: <rdunlap@infradead.org>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH 1/8] lib: Introduce sgl_alloc() and sgl_free()
-To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-nvme@lists.infradead.org
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
 References: <20171012224550.25440-1-bart.vanassche@wdc.com>
  <20171012224550.25440-2-bart.vanassche@wdc.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <a249d319-83fa-d2c3-5723-21de238787d5@infradead.org>
-Date: Fri, 13 Oct 2017 10:43:43 -0700
+ <ee12eeaf-9848-478d-4ebe-9d3497e248e0@kernel.dk>
+ <1507849209.14112.1.camel@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <f8e331f3-d77c-0da2-208e-5d3f68d50565@kernel.dk>
+Date: Fri, 13 Oct 2017 08:20:57 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171012224550.25440-2-bart.vanassche@wdc.com>
+In-Reply-To: <1507849209.14112.1.camel@wdc.com>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/12/17 15:45, Bart Van Assche wrote:
-
-> diff --git a/lib/sgl_alloc.c b/lib/sgl_alloc.c
-> new file mode 100644
-> index 000000000000..d96b395dd5c8
-> --- /dev/null
-> +++ b/lib/sgl_alloc.c
-> @@ -0,0 +1,102 @@
-
-> +/**
-> + * sgl_free_order - free a scatterlist and its pages
-> + * @sg: Scatterlist with one or more elements
-
-      @sgl:
-
-> + * @order: Second argument for __free_pages()
-> + */
-> +void sgl_free_order(struct scatterlist *sgl, int order)
-> +{
-> +	struct scatterlist *sg;
-> +	struct page *page;
-> +
-> +	for (sg = sgl; sg; sg = sg_next(sg)) {
-> +		page = sg_page(sg);
-> +		if (page)
-> +			__free_pages(page, order);
-> +	}
-> +	kfree(sgl);
-> +}
-> +EXPORT_SYMBOL(sgl_free_order);
-> +
-> +/**
-> + * sgl_free - free a scatterlist and its pages
-> + * @sg: Scatterlist with one or more elements
-
-      @sgl:
-
-> + */
-> +void sgl_free(struct scatterlist *sgl)
-> +{
-> +	sgl_free_order(sgl, 0);
-> +}
-> +EXPORT_SYMBOL(sgl_free);
+On 10/12/2017 05:00 PM, Bart Van Assche wrote:
+> On Thu, 2017-10-12 at 16:52 -0600, Jens Axboe wrote:
+>> On 10/12/2017 04:45 PM, Bart Van Assche wrote:
+>>> +++ b/include/linux/sgl_alloc.h
+>>> @@ -0,0 +1,16 @@
+>>> +#ifndef _SGL_ALLOC_H_
+>>> +#define _SGL_ALLOC_H_
+>>> +
+>>> +#include <linux/types.h> /* bool, gfp_t */
+>>> +
+>>> +struct scatterlist;
+>>> +
+>>> +struct scatterlist *sgl_alloc_order(unsigned long long length,
+>>> +				    unsigned int order, unsigned int *nent_p,
+>>> +				    gfp_t gfp, bool chainable);
+>>> +struct scatterlist *sgl_alloc(unsigned long long length, unsigned int *nent_p,
+>>> +			      gfp_t gfp);
+>>> +void sgl_free_order(struct scatterlist *sgl, int order);
+>>> +void sgl_free(struct scatterlist *sgl);
+>>> +
+>>> +#endif /* _SGL_ALLOC_H_ */
+>>
+>> Should this just go into linux/scatterlist.h instead of creating a new header
+>> file?
 > 
+> That's something I can change. I don't have a strong opinion about whether
+> these declarations should go into a new header file or into linux/scatterlist.h.
 
-ta.
+I think you should make that change, keep things simpler. As Johannes
+suggested, you could move the code to lib/scatterlist.c as well. I would
+recommend keeping the kconfig option to only build it when needed, though.
+
 -- 
-~Randy
+Jens Axboe
