@@ -1,77 +1,46 @@
-Return-Path: <hare@suse.de>
+Return-Path: <prvs=452a633fe=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"hch@infradead.org" <hch@infradead.org>, "himanshu.madhani@cavium.com"
+	<himanshu.madhani@cavium.com>, "tom81094@gmail.com" <tom81094@gmail.com>,
+	"paolo.valente@linaro.org" <paolo.valente@linaro.org>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+	"john.garry@huawei.com" <john.garry@huawei.com>, "osandov@fb.com"
+	<osandov@fb.com>, "loberman@redhat.com" <loberman@redhat.com>,
+	"james.smart@broadcom.com" <james.smart@broadcom.com>
 Subject: Re: [PATCH V7 4/6] blk-mq: introduce .get_budget and .put_budget in
  blk_mq_ops
-To: Ming Lei <ming.lei@redhat.com>, Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "hch@infradead.org" <hch@infradead.org>,
- "tom81094@gmail.com" <tom81094@gmail.com>,
- "himanshu.madhani@cavium.com" <himanshu.madhani@cavium.com>,
- "paolo.valente@linaro.org" <paolo.valente@linaro.org>,
- "axboe@kernel.dk" <axboe@kernel.dk>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
- "john.garry@huawei.com" <john.garry@huawei.com>,
- "osandov@fb.com" <osandov@fb.com>, "loberman@redhat.com"
- <loberman@redhat.com>, "james.smart@broadcom.com" <james.smart@broadcom.com>
+Date: Fri, 13 Oct 2017 17:47:43 +0000
+Message-ID: <1507916862.13345.27.camel@wdc.com>
 References: <20171012183704.22326-1-ming.lei@redhat.com>
- <20171012183704.22326-5-ming.lei@redhat.com>
- <9a741c03-90a3-e583-ddde-0ed71c8570a2@kernel.dk>
- <20171013001919.GA24715@ming.t460p>
- <6efdb459-8746-562d-06dc-5b3e172076e1@kernel.dk>
- <20171013160731.GA30899@ming.t460p> <1507912260.13345.0.camel@wdc.com>
- <20171013164519.GF30899@ming.t460p> <1507914527.13345.17.camel@wdc.com>
- <20171013172950.GA32319@ming.t460p>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <515ca83f-5629-31e2-ef70-1869ae1b75ef@suse.de>
-Date: Mon, 16 Oct 2017 13:30:09 +0200
-MIME-Version: 1.0
+	 <20171012183704.22326-5-ming.lei@redhat.com>
+	 <9a741c03-90a3-e583-ddde-0ed71c8570a2@kernel.dk>
+	 <20171013001919.GA24715@ming.t460p>
+	 <6efdb459-8746-562d-06dc-5b3e172076e1@kernel.dk>
+	 <20171013160731.GA30899@ming.t460p> <1507912260.13345.0.camel@wdc.com>
+	 <20171013164519.GF30899@ming.t460p> <1507914527.13345.17.camel@wdc.com>
+	 <20171013172950.GA32319@ming.t460p>
 In-Reply-To: <20171013172950.GA32319@ming.t460p>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/13/2017 07:29 PM, Ming Lei wrote:
-> On Fri, Oct 13, 2017 at 05:08:52PM +0000, Bart Van Assche wrote:
->> On Sat, 2017-10-14 at 00:45 +0800, Ming Lei wrote:
->>> On Fri, Oct 13, 2017 at 04:31:04PM +0000, Bart Van Assche wrote:
->>>> On Sat, 2017-10-14 at 00:07 +0800, Ming Lei wrote:
->>>>> Actually it is in hot path, for example, lpfc and qla2xx's queue depth is 3,
->>>>
->>>> Sorry but I doubt whether that is correct. More in general, I don't know any modern
->>>> storage HBA for which the default queue depth is so low.
->>>
->>> You can grep:
->>>
->>> [ming@ming linux]$ git grep -n cmd_per_lun ./drivers/scsi/ | grep -E "qla2xxx|lpfc"
->>
->> Such a low queue depth will result in suboptimal performance for adapters
->> that communicate over a storage network. I think that's a bug and that both
->> adapters support much higher cmd_per_lun values.
->>
->> (+James Smart)
->>
->> James, can you explain us why commit 445cf4f4d2aa decreased LPFC_CMD_PER_LUN
->> from 30 to 3? Was that perhaps a workaround for a bug in a specific target
->> implementation?
->>
->> (+Himanshu Madhani)
->>
->> Himanshu, do you perhaps know whether it is safe to increase cmd_per_lun for
->> the qla2xxx initiator driver to the scsi_host->can_queue value?
-> 
-> ->can_queue is size of the whole tag space shared by all LUNs, looks it isn't
-> reasonable to increase cmd_per_lun to .can_queue.
-> 
-'3' is just a starting point; later on it'll be adjusted via
-scsi_change_depth().
-Looks like it's not working correctly with blk-mq, though.
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+T24gU2F0LCAyMDE3LTEwLTE0IGF0IDAxOjI5ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gLT5j
+YW5fcXVldWUgaXMgc2l6ZSBvZiB0aGUgd2hvbGUgdGFnIHNwYWNlIHNoYXJlZCBieSBhbGwgTFVO
+cywgbG9va3MgaXQgaXNuJ3QNCj4gcmVhc29uYWJsZSB0byBpbmNyZWFzZSBjbWRfcGVyX2x1biB0
+byAuY2FuX3F1ZXVlLg0KDQpTb3JyeSBidXQgSSBkaXNhZ3JlZS4gU2V0dGluZyBjbWRfcGVyX2x1
+biB0byBhIHZhbHVlIGxvd2VyIHRoYW4gY2FuX3F1ZXVlDQp3aWxsIHJlc3VsdCBpbiBzdWJvcHRp
+bWFsIHBlcmZvcm1hbmNlIGlmIHRoZXJlIGlzIG9ubHkgYSBzaW5nbGUgTFVOIHBlciBTQ1NJDQpo
+b3N0LiBJZiB0aGVyZSBhcmUgbXVsdGlwbGUgTFVOcyBwZXIgU0NTSSBob3N0IHRoZW4gdGhlIGJs
+ay1tcSBjb3JlIHRyYWNrcw0KdGhlIG51bWJlciBvZiBhY3RpdmUgTFVOcyB0aHJvdWdoIHRoZSBi
+bGtfbXFfdGFncy5hY3RpdmVfcXVldWVzIHZhcmlhYmxlLg0KU2VlIGFsc28gaGN0eF9tYXlfcXVl
+dWUoKS4gVGhlIGNvbW1lbnQgYWJvdmUgdGhhdCBmdW5jdGlvbiBpcyBhcyBmb2xsb3dzOg0KDQov
+Kg0KICogRm9yIHNoYXJlZCB0YWcgdXNlcnMsIHdlIHRyYWNrIHRoZSBudW1iZXIgb2YgY3VycmVu
+dGx5IGFjdGl2ZSB1c2Vycw0KICogYW5kIGF0dGVtcHQgdG8gcHJvdmlkZSBhIGZhaXIgc2hhcmUg
+b2YgdGhlIHRhZyBkZXB0aCBmb3IgZWFjaCBvZiB0aGVtLg0KICovDQoNCkJUVywgdGhlIGliX3Ny
+cCBpbml0aWF0b3IgZHJpdmVyIHNldHMgY21kX3Blcl9sdW4gdG8gY2FuX3F1ZXVlIGFuZCBpcyBh
+YmxlDQp0byBhY2hpZXZlIG1vcmUgdGhhbiBvbmUgbWlsbGlvbiBJT1BTIGV2ZW4gaW4gdGVzdHMg
+d2l0aCBtdWx0aXBsZSBMVU5zIHBlcg0KU0NTSSBob3N0Lg0KDQpCYXJ0Lg==
