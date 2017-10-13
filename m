@@ -1,46 +1,62 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.didichuxing.com ([111.202.154.82]:8011 "EHLO
-        BJEXCAS006.didichuxing.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1750973AbdJMQ0f (ORCPT
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:45835 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752942AbdJMXf7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 12:26:35 -0400
-Date: Sat, 14 Oct 2017 00:26:28 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>
-Subject: [PATCH 1/2] null_blk: update usage hints for submit_queues
-Message-ID: <a9cb7326db5e4aa4461289c0561f6af29efcbe70.1507911414.git.zhangweiping@didichuxing.com>
-References: <cover.1507911414.git.zhangweiping@didichuxing.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <cover.1507911414.git.zhangweiping@didichuxing.com>
+        Fri, 13 Oct 2017 19:35:59 -0400
+Received: by mail-pg0-f66.google.com with SMTP id b192so2339926pga.2
+        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 16:35:59 -0700 (PDT)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Coly Li <colyli@suse.de>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        stable@vger.kernel.org
+Subject: [PATCH 02/15] bcache: check ca->alloc_thread initialized before wake up it
+Date: Fri, 13 Oct 2017 16:35:29 -0700
+Message-Id: <20171013233542.20938-3-mlyle@lyle.org>
+In-Reply-To: <20171013233542.20938-1-mlyle@lyle.org>
+References: <20171013233542.20938-1-mlyle@lyle.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-update the range of submits_queues, and correct usage hints.
+From: Coly Li <colyli@suse.de>
 
-Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+In bcache code, sysfs entries are created before all resources get
+allocated, e.g. allocation thread of a cache set.
+
+There is posibility for NULL pointer deference if a resource is accessed
+but which is not initialized yet. Indeed Jorg Bornschein catches one on
+cache set allocation thread and gets a kernel oops.
+
+The reason for this bug is, when bch_bucket_alloc() is called during
+cache set registration and attaching, ca->alloc_thread is not properly
+allocated and initialized yet, call wake_up_process() on ca->alloc_thread
+triggers NULL pointer deference failure. A simple and fast fix is, before
+waking up ca->alloc_thread, checking whether it is allocated, and only
+wake up ca->alloc_thread when it is not NULL.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Reported-by: Jorg Bornschein <jb@capsec.org>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
+Cc: stable@vger.kernel.org
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
 ---
- Documentation/block/null_blk.txt | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/md/bcache/alloc.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/block/null_blk.txt b/Documentation/block/null_blk.txt
-index 3140dbd860d8..1f8d92c70458 100644
---- a/Documentation/block/null_blk.txt
-+++ b/Documentation/block/null_blk.txt
-@@ -55,10 +55,10 @@ irqmode=[0-2]: Default: 1-Soft-irq
- completion_nsec=[ns]: Default: 10.000ns
-   Combined with irqmode=2 (timer). The time each completion event must wait.
+diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
+index cacbe2dbd5c3..e1a4205caa2e 100644
+--- a/drivers/md/bcache/alloc.c
++++ b/drivers/md/bcache/alloc.c
+@@ -406,7 +406,8 @@ long bch_bucket_alloc(struct cache *ca, unsigned reserve, bool wait)
  
--submit_queues=[0..nr_cpus]:
-+submit_queues=[1..nr_cpus]:
-   The number of submission queues attached to the device driver. If unset, it
--  defaults to 1 on single-queue and bio-based instances. For multi-queue,
--  it is ignored when use_per_node_hctx module parameter is 1.
-+  defaults to 1. For multi-queue, it is ignored when use_per_node_hctx module
-+  parameter is 1.
+ 	finish_wait(&ca->set->bucket_wait, &w);
+ out:
+-	wake_up_process(ca->alloc_thread);
++	if (ca->alloc_thread)
++		wake_up_process(ca->alloc_thread);
  
- hw_queue_depth=[0..qdepth]: Default: 64
-   The hardware queue depth of the device.
+ 	trace_bcache_alloc(ca, reserve);
+ 
 -- 
-2.14.2
+2.11.0
