@@ -1,62 +1,53 @@
-Return-Path: <prvs=441412a59=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V6 14/14] block: do not set mq default scheduler
-Date: Mon,  2 Oct 2017 16:15:35 +0900
-Message-Id: <20171002071535.8007-15-damien.lemoal@wdc.com>
-In-Reply-To: <20171002071535.8007-1-damien.lemoal@wdc.com>
-References: <20171002071535.8007-1-damien.lemoal@wdc.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        John Garry <john.garry@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V10 7/8] SCSI: allow to pass null rq to scsi_prep_state_check()
+Date: Sat, 14 Oct 2017 17:22:31 +0800
+Message-Id: <20171014092232.13943-8-ming.lei@redhat.com>
+In-Reply-To: <20171014092232.13943-1-ming.lei@redhat.com>
+References: <20171014092232.13943-1-ming.lei@redhat.com>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-For blk-mq disks with a single hardware queue, setting by default the
-disk scheduler to mq-deadline early during the queue initialization
-prevents properly setting zone write locking for host managed zoned
-block device as the disk type is not yet known.
+In the following patch, we will implement scsi_get_budget()
+which need to call scsi_prep_state_check() when rq isn't
+dequeued yet.
 
-Fix this by simply not setting the default scheduler to mq-deadline for
-single hardware queue disks. A udev rule can be used to easily do the
-same later in the system initialization sequence, when the device
-characteristics are known.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/elevator.c | 17 ++++++-----------
- 1 file changed, 6 insertions(+), 11 deletions(-)
+ drivers/scsi/scsi_lib.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/elevator.c b/block/elevator.c
-index 153926a90901..8b65a757f726 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -222,19 +222,14 @@ int elevator_init(struct request_queue *q, char *name)
- 
- 	if (!e) {
- 		/*
--		 * For blk-mq devices, we default to using mq-deadline,
--		 * if available, for single queue devices. If deadline
--		 * isn't available OR we have multiple queues, default
--		 * to "none".
-+		 * For blk-mq devices, default to "none". udev can later set
-+		 * an appropriate default scheduler based on the disk
-+		 * characteristics which we do not yet have here.
- 		 */
--		if (q->mq_ops) {
--			if (q->nr_hw_queues == 1)
--				e = elevator_get("mq-deadline", false);
--			if (!e)
--				return 0;
--		} else
--			e = elevator_get(CONFIG_DEFAULT_IOSCHED, false);
-+		if (q->mq_ops)
-+			return 0;
- 
-+		e = elevator_get(CONFIG_DEFAULT_IOSCHED, false);
- 		if (!e) {
- 			printk(KERN_ERR
- 				"Default I/O scheduler not found. " \
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 9cf6a80fe297..d159bb085714 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1301,7 +1301,7 @@ scsi_prep_state_check(struct scsi_device *sdev, struct request *req)
+ 			/*
+ 			 * If the devices is blocked we defer normal commands.
+ 			 */
+-			if (!(req->rq_flags & RQF_PREEMPT))
++			if (req && !(req->rq_flags & RQF_PREEMPT))
+ 				ret = BLKPREP_DEFER;
+ 			break;
+ 		default:
+@@ -1310,7 +1310,7 @@ scsi_prep_state_check(struct scsi_device *sdev, struct request *req)
+ 			 * special commands.  In particular any user initiated
+ 			 * command is not allowed.
+ 			 */
+-			if (!(req->rq_flags & RQF_PREEMPT))
++			if (req && !(req->rq_flags & RQF_PREEMPT))
+ 				ret = BLKPREP_KILL;
+ 			break;
+ 		}
 -- 
-2.13.6
+2.9.5
