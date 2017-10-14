@@ -1,5 +1,5 @@
 Return-Path: <ming.lei@redhat.com>
-Date: Sat, 14 Oct 2017 15:10:48 +0800
+Date: Sat, 14 Oct 2017 13:23:27 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
@@ -11,7 +11,7 @@ Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
 	linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
 	John Garry <john.garry@huawei.com>
 Subject: Re: [PATCH V9 0/7] blk-mq-sched: improve sequential I/O performance
-Message-ID: <20171014071047.GA31154@ming.t460p>
+Message-ID: <20171014052321.GA21519@ming.t460p>
 References: <20171013180532.29304-1-ming.lei@redhat.com>
  <03fc0b94-8463-3f3d-9d75-be3e05d88987@kernel.dk>
  <95fe2831-12a9-3346-5fc7-9259ff988669@kernel.dk>
@@ -62,22 +62,8 @@ On Fri, Oct 13, 2017 at 02:23:07PM -0600, Jens Axboe wrote:
 > Verified that the laptop boots just fine if I remove the kyber udev
 > rule.
 
-This issue can be fixed by the following one line change:
-
----
-diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-index f58cab82105b..94df3ce99f2f 100644
---- a/block/kyber-iosched.c
-+++ b/block/kyber-iosched.c
-@@ -641,7 +641,7 @@ static bool kyber_has_work(struct blk_mq_hw_ctx *hctx)
- 		if (!list_empty_careful(&khd->rqs[i]))
- 			return true;
- 	}
--	return false;
-+	return sbitmap_any_bit_set(&hctx->ctx_map);
- }
- 
- #define KYBER_LAT_SHOW_STORE(op)					\
+I can reproduce this issue with kyber switched to, and will figure out
+it soon.
 
 -- 
 Ming
