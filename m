@@ -1,62 +1,46 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:48980 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752945AbdJMXgH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 19:36:07 -0400
-Received: by mail-pf0-f194.google.com with SMTP id b79so11515420pfk.5
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 16:36:07 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Michael Lyle <mlyle@lyle.org>
-Subject: [PATCH 08/15] bcache: don't write back data if reading it failed
-Date: Fri, 13 Oct 2017 16:35:35 -0700
-Message-Id: <20171013233542.20938-9-mlyle@lyle.org>
-In-Reply-To: <20171013233542.20938-1-mlyle@lyle.org>
-References: <20171013233542.20938-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH V10 0/8] blk-mq-sched: improve sequential I/O performance
+To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+ Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+ Laurence Oberman <loberman@redhat.com>,
+ Paolo Valente <paolo.valente@linaro.org>,
+ Oleksandr Natalenko <oleksandr@natalenko.name>,
+ Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+ linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+ John Garry <john.garry@huawei.com>
+References: <20171014092232.13943-1-ming.lei@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <1c643ef1-26d8-3fa4-2b65-7e299e6a5ceb@kernel.dk>
+Date: Sat, 14 Oct 2017 09:39:21 -0600
+MIME-Version: 1.0
+In-Reply-To: <20171014092232.13943-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-If an IO operation fails, and we didn't successfully read data from the
-cache, don't writeback invalid/partial data to the backing disk.
+On 10/14/2017 03:22 AM, Ming Lei wrote:
+> Hi Jens,
+> 
+> In Red Hat internal storage test wrt. blk-mq scheduler, we found that I/O
+> performance is much bad with mq-deadline, especially about sequential I/O
+> on some multi-queue SCSI devcies(lpfc, qla2xxx, SRP...)
+> 
+> Turns out one big issue causes the performance regression: requests are
+> still dequeued from sw queue/scheduler queue even when ldd's queue is
+> busy, so I/O merge becomes quite difficult to make, then sequential IO
+> performance degrades a lot.
+> 
+> This issue becomes one of mains reasons for reverting default SCSI_MQ
+> in V4.13.
+> 
+> This 8 patches improve this situation, and brings back performance loss.
+> 
+> With this change, SCSI-MQ sequential I/O performance is improved much, Paolo
+> reported that mq-deadline performance improved much[2] in his dbench test
+> wrt V2. Also performance improvement on lpfc/qla2xx was observed with V1.[1]
 
-Signed-off-by: Michael Lyle <mlyle@lyle.org>
-Reviewed-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/writeback.c | 20 ++++++++++++++------
- 1 file changed, 14 insertions(+), 6 deletions(-)
+Looks good to me, and the kyber fix looks obviously correct to me. I have
+applied this series for 4.15. Thanks Ming.
 
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index e663ca082183..5e65a392287d 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -179,13 +179,21 @@ static void write_dirty(struct closure *cl)
- 	struct dirty_io *io = container_of(cl, struct dirty_io, cl);
- 	struct keybuf_key *w = io->bio.bi_private;
- 
--	dirty_init(w);
--	bio_set_op_attrs(&io->bio, REQ_OP_WRITE, 0);
--	io->bio.bi_iter.bi_sector = KEY_START(&w->key);
--	bio_set_dev(&io->bio, io->dc->bdev);
--	io->bio.bi_end_io	= dirty_endio;
-+	/*
-+	 * IO errors are signalled using the dirty bit on the key.
-+	 * If we failed to read, we should not attempt to write to the
-+	 * backing device.  Instead, immediately go to write_dirty_finish
-+	 * to clean up.
-+	 */
-+	if (KEY_DIRTY(&w->key)) {
-+		dirty_init(w);
-+		bio_set_op_attrs(&io->bio, REQ_OP_WRITE, 0);
-+		io->bio.bi_iter.bi_sector = KEY_START(&w->key);
-+		bio_set_dev(&io->bio, io->dc->bdev);
-+		io->bio.bi_end_io	= dirty_endio;
- 
--	closure_bio_submit(&io->bio, cl);
-+		closure_bio_submit(&io->bio, cl);
-+	}
- 
- 	continue_at(cl, write_dirty_finish, io->dc->writeback_write_wq);
- }
 -- 
-2.11.0
+Jens Axboe
