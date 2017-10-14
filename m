@@ -1,56 +1,111 @@
-Return-Path: <BATV+e774f35f755d74bf45df+5174+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 01/17] block: move REQ_NOWAIT
-Date: Mon, 23 Oct 2017 16:51:10 +0200
-Message-Id: <20171023145126.2471-2-hch@lst.de>
-In-Reply-To: <20171023145126.2471-1-hch@lst.de>
-References: <20171023145126.2471-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:49194 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753134AbdJNJW6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 14 Oct 2017 05:22:58 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        John Garry <john.garry@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V10 2/8] blk-mq-sched: move actual dispatching into one helper
+Date: Sat, 14 Oct 2017 17:22:26 +0800
+Message-Id: <20171014092232.13943-3-ming.lei@redhat.com>
+In-Reply-To: <20171014092232.13943-1-ming.lei@redhat.com>
+References: <20171014092232.13943-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This flag should be before the operation-specific REQ_NOUNMAP bit.
+So that it becomes easy to support to dispatch from sw queue in the
+following patch.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+No functional change.
+
+Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+Suggested-by: Christoph Hellwig <hch@lst.de> # for simplifying dispatch logic
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- include/linux/blk_types.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ block/blk-mq-sched.c | 43 ++++++++++++++++++++++++-------------------
+ 1 file changed, 24 insertions(+), 19 deletions(-)
 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index a2d2aa709cef..acc2f3cdc2fc 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -224,11 +224,11 @@ enum req_flag_bits {
- 	__REQ_PREFLUSH,		/* request for cache flush */
- 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
- 	__REQ_BACKGROUND,	/* background IO */
-+	__REQ_NOWAIT,           /* Don't wait if request will block */
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index eca011fdfa0e..be29ba849408 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -89,12 +89,26 @@ static bool blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
+ 	return false;
+ }
  
- 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
- 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
++static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
++{
++	struct request_queue *q = hctx->queue;
++	struct elevator_queue *e = q->elevator;
++	LIST_HEAD(rq_list);
++
++	do {
++		struct request *rq = e->type->ops.mq.dispatch_request(hctx);
++
++		if (!rq)
++			break;
++		list_add(&rq->queuelist, &rq_list);
++	} while (blk_mq_dispatch_rq_list(q, &rq_list));
++}
++
+ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct request_queue *q = hctx->queue;
+ 	struct elevator_queue *e = q->elevator;
+ 	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
+-	bool do_sched_dispatch = true;
+ 	LIST_HEAD(rq_list);
  
--	__REQ_NOWAIT,           /* Don't wait if request will block */
- 	__REQ_NR_BITS,		/* stops here */
- };
+ 	/* RCU or SRCU read lock is needed before checking quiesced flag */
+@@ -122,30 +136,21 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	 * scheduler, we can no longer merge or sort them. So it's best to
+ 	 * leave them there for as long as we can. Mark the hw queue as
+ 	 * needing a restart in that case.
++	 *
++	 * We want to dispatch from the scheduler if there was nothing
++	 * on the dispatch list or we were able to dispatch from the
++	 * dispatch list.
+ 	 */
+ 	if (!list_empty(&rq_list)) {
+ 		blk_mq_sched_mark_restart_hctx(hctx);
+-		do_sched_dispatch = blk_mq_dispatch_rq_list(q, &rq_list);
+-	} else if (!has_sched_dispatch) {
++		if (blk_mq_dispatch_rq_list(q, &rq_list) && has_sched_dispatch)
++			blk_mq_do_dispatch_sched(hctx);
++	} else if (has_sched_dispatch) {
++		blk_mq_do_dispatch_sched(hctx);
++	} else {
+ 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+ 		blk_mq_dispatch_rq_list(q, &rq_list);
+ 	}
+-
+-	/*
+-	 * We want to dispatch from the scheduler if there was nothing
+-	 * on the dispatch list or we were able to dispatch from the
+-	 * dispatch list.
+-	 */
+-	if (do_sched_dispatch && has_sched_dispatch) {
+-		do {
+-			struct request *rq;
+-
+-			rq = e->type->ops.mq.dispatch_request(hctx);
+-			if (!rq)
+-				break;
+-			list_add(&rq->queuelist, &rq_list);
+-		} while (blk_mq_dispatch_rq_list(q, &rq_list));
+-	}
+ }
  
-@@ -245,9 +245,9 @@ enum req_flag_bits {
- #define REQ_PREFLUSH		(1ULL << __REQ_PREFLUSH)
- #define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
- #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
-+#define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
- 
- #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
--#define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
- 
- #define REQ_FAILFAST_MASK \
- 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
+ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
 -- 
-2.14.2
+2.9.5
