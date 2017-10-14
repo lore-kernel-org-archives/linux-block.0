@@ -1,124 +1,221 @@
-Return-Path: <prvs=45557a1c1=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Oleksandr Natalenko <oleksandr@natalenko.name>,
-	Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH v9 04/10] block: Make q_usage_counter also track legacy requests
-Date: Mon, 16 Oct 2017 16:28:59 -0700
-Message-Id: <20171016232905.5047-5-bart.vanassche@wdc.com>
-In-Reply-To: <20171016232905.5047-1-bart.vanassche@wdc.com>
-References: <20171016232905.5047-1-bart.vanassche@wdc.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        John Garry <john.garry@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V10 6/8] blk-mq-sched: improve dispatching from sw queue
+Date: Sat, 14 Oct 2017 17:22:30 +0800
+Message-Id: <20171014092232.13943-7-ming.lei@redhat.com>
+In-Reply-To: <20171014092232.13943-1-ming.lei@redhat.com>
+References: <20171014092232.13943-1-ming.lei@redhat.com>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Ming Lei <ming.lei@redhat.com>
+SCSI devices use host-wide tagset, and the shared driver tag space is
+often quite big. Meantime there is also queue depth for each lun(
+.cmd_per_lun), which is often small, for example, on both lpfc and
+qla2xxx, .cmd_per_lun is just 3.
 
-This patch makes it possible to pause request allocation for
-the legacy block layer by calling blk_mq_freeze_queue() and
-blk_mq_unfreeze_queue().
+So lots of requests may stay in sw queue, and we always flush all
+belonging to same hw queue and dispatch them all to driver, unfortunately
+it is easy to cause queue busy because of the small .cmd_per_lun.
+Once these requests are flushed out, they have to stay in hctx->dispatch,
+and no bio merge can participate into these requests, and sequential IO
+performance is hurt a lot.
 
+This patch introduces blk_mq_dequeue_from_ctx for dequeuing request from
+sw queue so that we can dispatch them in scheduler's way, then we can
+avoid to dequeue too many requests from sw queue when ->dispatch isn't
+flushed completely.
+
+This patch improves dispatching from sw queue by using the callback of
+.get_budget and .put_budget
+
+Reviewed-by: Omar Sandoval <osandov@fb.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
-[ bvanassche: Combined two patches into one, edited a comment and made sure
-  REQ_NOWAIT is handled properly in blk_old_get_request() ]
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Tested-by: Martin Steigerwald <martin@lichtvoll.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Hannes Reinecke <hare@suse.com>
 ---
- block/blk-core.c | 12 ++++++++++++
- block/blk-mq.c   | 10 ++--------
- 2 files changed, 14 insertions(+), 8 deletions(-)
+ block/blk-mq-sched.c   | 74 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ block/blk-mq.c         | 39 ++++++++++++++++++++++++++
+ block/blk-mq.h         |  2 ++
+ include/linux/blk-mq.h |  2 ++
+ 4 files changed, 114 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index e8e149ccc86b..23a0110fc62b 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -610,6 +610,9 @@ void blk_set_queue_dying(struct request_queue *q)
- 		}
- 		spin_unlock_irq(q->queue_lock);
- 	}
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 8e525e66a0d9..df8581bb0a37 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -128,6 +128,61 @@ static bool blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+ 	return false;
+ }
+ 
++static struct blk_mq_ctx *blk_mq_next_ctx(struct blk_mq_hw_ctx *hctx,
++					  struct blk_mq_ctx *ctx)
++{
++	unsigned idx = ctx->index_hw;
 +
-+	/* Make blk_queue_enter() reexamine the DYING flag. */
-+	wake_up_all(&q->mq_freeze_wq);
- }
- EXPORT_SYMBOL_GPL(blk_set_queue_dying);
- 
-@@ -1395,16 +1398,22 @@ static struct request *blk_old_get_request(struct request_queue *q,
- 					   unsigned int op, gfp_t gfp_mask)
++	if (++idx == hctx->nr_ctx)
++		idx = 0;
++
++	return hctx->ctxs[idx];
++}
++
++/* return true if hctx need to run again */
++static bool blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
++{
++	struct request_queue *q = hctx->queue;
++	LIST_HEAD(rq_list);
++	struct blk_mq_ctx *ctx = READ_ONCE(hctx->dispatch_from);
++
++	do {
++		struct request *rq;
++		blk_status_t ret;
++
++		if (!sbitmap_any_bit_set(&hctx->ctx_map))
++			break;
++
++		ret = blk_mq_get_dispatch_budget(hctx);
++		if (ret == BLK_STS_RESOURCE)
++			return true;
++
++		rq = blk_mq_dequeue_from_ctx(hctx, ctx);
++		if (!rq) {
++			blk_mq_put_dispatch_budget(hctx);
++			break;
++		} else if (ret != BLK_STS_OK) {
++			blk_mq_end_request(rq, ret);
++			continue;
++		}
++
++		/*
++		 * Now this rq owns the budget which has to be released
++		 * if this rq won't be queued to driver via .queue_rq()
++		 * in blk_mq_dispatch_rq_list().
++		 */
++		list_add(&rq->queuelist, &rq_list);
++
++		/* round robin for fair dispatch */
++		ctx = blk_mq_next_ctx(hctx, rq->mq_ctx);
++
++	} while (blk_mq_dispatch_rq_list(q, &rq_list, true));
++
++	WRITE_ONCE(hctx->dispatch_from, ctx);
++
++	return false;
++}
++
+ /* return true if hw queue need to be run again */
+ bool blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
  {
- 	struct request *rq;
-+	int ret = 0;
- 
- 	WARN_ON_ONCE(q->mq_ops);
- 
- 	/* create ioc upfront */
- 	create_io_context(gfp_mask, q->node);
- 
-+	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM) ||
-+			      (op & REQ_NOWAIT));
-+	if (ret)
-+		return ERR_PTR(ret);
- 	spin_lock_irq(q->queue_lock);
- 	rq = get_request(q, op, NULL, gfp_mask);
- 	if (IS_ERR(rq)) {
- 		spin_unlock_irq(q->queue_lock);
-+		blk_queue_exit(q);
- 		return rq;
- 	}
- 
-@@ -1576,6 +1585,7 @@ void __blk_put_request(struct request_queue *q, struct request *req)
- 		blk_free_request(rl, req);
- 		freed_request(rl, sync, rq_flags);
- 		blk_put_rl(rl);
-+		blk_queue_exit(q);
- 	}
- }
- EXPORT_SYMBOL_GPL(__blk_put_request);
-@@ -1857,8 +1867,10 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
- 	 * Grab a free request. This is might sleep but can not fail.
- 	 * Returns with the queue unlocked.
+@@ -169,11 +224,24 @@ bool blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
  	 */
-+	blk_queue_enter_live(q);
- 	req = get_request(q, bio->bi_opf, bio, GFP_NOIO);
- 	if (IS_ERR(req)) {
-+		blk_queue_exit(q);
- 		__wbt_done(q->rq_wb, wb_acct);
- 		if (PTR_ERR(req) == -ENOMEM)
- 			bio->bi_status = BLK_STS_RESOURCE;
+ 	if (!list_empty(&rq_list)) {
+ 		blk_mq_sched_mark_restart_hctx(hctx);
+-		if (blk_mq_dispatch_rq_list(q, &rq_list, false) &&
+-				has_sched_dispatch)
+-			run_queue = blk_mq_do_dispatch_sched(hctx);
++		if (blk_mq_dispatch_rq_list(q, &rq_list, false)) {
++			if (has_sched_dispatch)
++				run_queue = blk_mq_do_dispatch_sched(hctx);
++			else
++				run_queue = blk_mq_do_dispatch_ctx(hctx);
++		}
+ 	} else if (has_sched_dispatch) {
+ 		run_queue = blk_mq_do_dispatch_sched(hctx);
++	} else if (q->mq_ops->get_budget) {
++		/*
++		 * If we need to get budget before queuing request, we
++		 * dequeue request one by one from sw queue for avoiding
++		 * to mess up I/O merge when dispatch runs out of resource.
++		 *
++		 * TODO: get more budgets, and dequeue more requests in
++		 * one time.
++		 */
++		run_queue = blk_mq_do_dispatch_ctx(hctx);
+ 	} else {
+ 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+ 		blk_mq_dispatch_rq_list(q, &rq_list, false);
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 097ca3ece716..59b7de6b616b 100644
+index dcb467369999..097ca3ece716 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -125,7 +125,8 @@ void blk_freeze_queue_start(struct request_queue *q)
- 	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
- 	if (freeze_depth == 1) {
- 		percpu_ref_kill(&q->q_usage_counter);
--		blk_mq_run_hw_queues(q, false);
-+		if (q->mq_ops)
-+			blk_mq_run_hw_queues(q, false);
- 	}
+@@ -914,6 +914,45 @@ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list)
  }
- EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
-@@ -255,13 +256,6 @@ void blk_mq_wake_waiters(struct request_queue *q)
- 	queue_for_each_hw_ctx(q, hctx, i)
- 		if (blk_mq_hw_queue_mapped(hctx))
- 			blk_mq_tag_wakeup_all(hctx->tags, true);
--
--	/*
--	 * If we are called because the queue has now been marked as
--	 * dying, we need to ensure that processes currently waiting on
--	 * the queue are notified as well.
--	 */
--	wake_up_all(&q->mq_freeze_wq);
- }
+ EXPORT_SYMBOL_GPL(blk_mq_flush_busy_ctxs);
  
- bool blk_mq_can_queue(struct blk_mq_hw_ctx *hctx)
++struct dispatch_rq_data {
++	struct blk_mq_hw_ctx *hctx;
++	struct request *rq;
++};
++
++static bool dispatch_rq_from_ctx(struct sbitmap *sb, unsigned int bitnr,
++		void *data)
++{
++	struct dispatch_rq_data *dispatch_data = data;
++	struct blk_mq_hw_ctx *hctx = dispatch_data->hctx;
++	struct blk_mq_ctx *ctx = hctx->ctxs[bitnr];
++
++	spin_lock(&ctx->lock);
++	if (unlikely(!list_empty(&ctx->rq_list))) {
++		dispatch_data->rq = list_entry_rq(ctx->rq_list.next);
++		list_del_init(&dispatch_data->rq->queuelist);
++		if (list_empty(&ctx->rq_list))
++			sbitmap_clear_bit(sb, bitnr);
++	}
++	spin_unlock(&ctx->lock);
++
++	return !dispatch_data->rq;
++}
++
++struct request *blk_mq_dequeue_from_ctx(struct blk_mq_hw_ctx *hctx,
++					struct blk_mq_ctx *start)
++{
++	unsigned off = start ? start->index_hw : 0;
++	struct dispatch_rq_data data = {
++		.hctx = hctx,
++		.rq   = NULL,
++	};
++
++	__sbitmap_for_each_set(&hctx->ctx_map, off,
++			       dispatch_rq_from_ctx, &data);
++
++	return data.rq;
++}
++
+ static inline unsigned int queued_to_index(unsigned int queued)
+ {
+ 	if (!queued)
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index e413b732374e..522b420dedc0 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -35,6 +35,8 @@ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list);
+ bool blk_mq_hctx_has_pending(struct blk_mq_hw_ctx *hctx);
+ bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
+ 				bool wait);
++struct request *blk_mq_dequeue_from_ctx(struct blk_mq_hw_ctx *hctx,
++					struct blk_mq_ctx *start);
+ 
+ /*
+  * Internal helpers for allocating/freeing the request map
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 901457df3d64..e5e6becd57d3 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -30,6 +30,8 @@ struct blk_mq_hw_ctx {
+ 
+ 	struct sbitmap		ctx_map;
+ 
++	struct blk_mq_ctx	*dispatch_from;
++
+ 	struct blk_mq_ctx	**ctxs;
+ 	unsigned int		nr_ctx;
+ 
 -- 
-2.14.2
+2.9.5
