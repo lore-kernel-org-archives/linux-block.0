@@ -1,47 +1,154 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:50647 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753192AbdJMXgE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 19:36:04 -0400
-Received: by mail-pf0-f196.google.com with SMTP id b6so3103986pfh.7
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 16:36:03 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Yijing Wang <wangyijing@huawei.com>
-Subject: [PATCH 05/15] bcache: Remove redundant set_capacity
-Date: Fri, 13 Oct 2017 16:35:32 -0700
-Message-Id: <20171013233542.20938-6-mlyle@lyle.org>
-In-Reply-To: <20171013233542.20938-1-mlyle@lyle.org>
-References: <20171013233542.20938-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        John Garry <john.garry@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V10 8/8] SCSI: implement .get_budget and .put_budget for blk-mq
+Date: Sat, 14 Oct 2017 17:22:32 +0800
+Message-Id: <20171014092232.13943-9-ming.lei@redhat.com>
+In-Reply-To: <20171014092232.13943-1-ming.lei@redhat.com>
+References: <20171014092232.13943-1-ming.lei@redhat.com>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Yijing Wang <wangyijing@huawei.com>
+We need to tell blk-mq for reserving resource before queuing
+one request, so implement these two callbacks. Then blk-mq
+can avoid to dequeue request earlier, and IO merge can
+be improved a lot.
 
-set_capacity() has been called in bcache_device_init(),
-remove the redundant one.
-
-Signed-off-by: Yijing Wang <wangyijing@huawei.com>
-Reviewed-by: Eric Wheeler <bcache@linux.ewheeler.net>
-Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/bcache/super.c | 3 ---
- 1 file changed, 3 deletions(-)
+ drivers/scsi/scsi_lib.c | 75 ++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 52 insertions(+), 23 deletions(-)
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index a478d1ac0480..72c3b2929ef0 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1142,9 +1142,6 @@ static int cached_dev_init(struct cached_dev *dc, unsigned block_size)
- 	if (ret)
- 		return ret;
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index d159bb085714..6f10afaca25b 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1946,25 +1946,32 @@ static void scsi_mq_done(struct scsi_cmnd *cmd)
+ 	blk_mq_complete_request(cmd->request);
+ }
  
--	set_capacity(dc->disk.disk,
--		     dc->bdev->bd_part->nr_sects - dc->sb.data_offset);
+-static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+-			 const struct blk_mq_queue_data *bd)
++static void scsi_mq_put_budget(struct blk_mq_hw_ctx *hctx)
+ {
+-	struct request *req = bd->rq;
+-	struct request_queue *q = req->q;
++	struct request_queue *q = hctx->queue;
++	struct scsi_device *sdev = q->queuedata;
++	struct Scsi_Host *shost = sdev->host;
++
++	atomic_dec(&shost->host_busy);
++	if (scsi_target(sdev)->can_queue > 0)
++		atomic_dec(&scsi_target(sdev)->target_busy);
++	atomic_dec(&sdev->device_busy);
++	put_device(&sdev->sdev_gendev);
++}
++
++static blk_status_t scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
++{
++	struct request_queue *q = hctx->queue;
+ 	struct scsi_device *sdev = q->queuedata;
+ 	struct Scsi_Host *shost = sdev->host;
+-	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
+ 	blk_status_t ret;
+-	int reason;
+ 
+-	ret = prep_to_mq(scsi_prep_state_check(sdev, req));
+-	if (ret != BLK_STS_OK)
+-		goto out;
++	ret = prep_to_mq(scsi_prep_state_check(sdev, NULL));
++	if (ret == BLK_STS_RESOURCE || ret != BLK_STS_OK)
++		return ret;
+ 
+-	ret = BLK_STS_RESOURCE;
+ 	if (!get_device(&sdev->sdev_gendev))
+ 		goto out;
 -
- 	dc->disk.disk->queue->backing_dev_info->ra_pages =
- 		max(dc->disk.disk->queue->backing_dev_info->ra_pages,
- 		    q->backing_dev_info->ra_pages);
+ 	if (!scsi_dev_queue_ready(q, sdev))
+ 		goto out_put_device;
+ 	if (!scsi_target_queue_ready(shost, sdev))
+@@ -1972,10 +1979,38 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	if (!scsi_host_queue_ready(q, shost, sdev))
+ 		goto out_dec_target_busy;
+ 
++	return BLK_STS_OK;
++
++out_dec_target_busy:
++	if (scsi_target(sdev)->can_queue > 0)
++		atomic_dec(&scsi_target(sdev)->target_busy);
++out_dec_device_busy:
++	atomic_dec(&sdev->device_busy);
++out_put_device:
++	put_device(&sdev->sdev_gendev);
++out:
++	return BLK_STS_RESOURCE;
++}
++
++static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
++			 const struct blk_mq_queue_data *bd)
++{
++	struct request *req = bd->rq;
++	struct request_queue *q = req->q;
++	struct scsi_device *sdev = q->queuedata;
++	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
++	blk_status_t ret;
++	int reason;
++
++	ret = prep_to_mq(scsi_prep_state_check(sdev, req));
++	if (ret != BLK_STS_OK)
++		goto out_put_budget;
++
++	ret = BLK_STS_RESOURCE;
+ 	if (!(req->rq_flags & RQF_DONTPREP)) {
+ 		ret = prep_to_mq(scsi_mq_prep_fn(req));
+ 		if (ret != BLK_STS_OK)
+-			goto out_dec_host_busy;
++			goto out_put_budget;
+ 		req->rq_flags |= RQF_DONTPREP;
+ 	} else {
+ 		blk_mq_start_request(req);
+@@ -1993,21 +2028,13 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	if (reason) {
+ 		scsi_set_blocked(cmd, reason);
+ 		ret = BLK_STS_RESOURCE;
+-		goto out_dec_host_busy;
++		goto out_put_budget;
+ 	}
+ 
+ 	return BLK_STS_OK;
+ 
+-out_dec_host_busy:
+-	atomic_dec(&shost->host_busy);
+-out_dec_target_busy:
+-	if (scsi_target(sdev)->can_queue > 0)
+-		atomic_dec(&scsi_target(sdev)->target_busy);
+-out_dec_device_busy:
+-	atomic_dec(&sdev->device_busy);
+-out_put_device:
+-	put_device(&sdev->sdev_gendev);
+-out:
++out_put_budget:
++	scsi_mq_put_budget(hctx);
+ 	switch (ret) {
+ 	case BLK_STS_OK:
+ 		break;
+@@ -2211,6 +2238,8 @@ struct request_queue *scsi_old_alloc_queue(struct scsi_device *sdev)
+ }
+ 
+ static const struct blk_mq_ops scsi_mq_ops = {
++	.get_budget	= scsi_mq_get_budget,
++	.put_budget	= scsi_mq_put_budget,
+ 	.queue_rq	= scsi_queue_rq,
+ 	.complete	= scsi_softirq_done,
+ 	.timeout	= scsi_timeout,
 -- 
-2.11.0
+2.9.5
