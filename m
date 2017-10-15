@@ -1,108 +1,106 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	nbd@other.debian.org,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Cc: Josef Bacik <jbacik@fb.com>,
-	stable@vger.kernel.org
-Subject: [PATCH 2/2] nbd: don't start req until after the dead connection logic
-Date: Thu, 19 Oct 2017 16:21:59 -0400
-Message-Id: <1508444519-8751-2-git-send-email-josef@toxicpanda.com>
-In-Reply-To: <1508444519-8751-1-git-send-email-josef@toxicpanda.com>
-References: <1508444519-8751-1-git-send-email-josef@toxicpanda.com>
+Return-Path: <devtimhansen@gmail.com>
+Return-Path: <devtimhansen@gmail.com>
+Date: Sun, 15 Oct 2017 17:30:10 -0400
+From: Tim Hansen <devtimhansen@gmail.com>
+To: fujita.tomonori@lab.ntt.co.jp
+Cc: axboe@kernel.dk, linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org, alexander.levin@one.verizon.com
+Subject: Re: [PATCH] bsg: update bsg_device_list to utilize static hash table
+ implementation.
+Message-ID: <20171015213010.pw7tbxnndalmuoni@debian>
+References: <20171002161001.GA49685@debian>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171002161001.GA49685@debian>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Josef Bacik <jbacik@fb.com>
+Mon, Oct 02, 2017 at 12:10:01PM -0400, Tim Hansen wrote:
+> Updates bsg_device_list to utilize static hashtable implementation.
+> 
+> This is done in an effort to standarize the hashtables used across the
+> kernel.
+> 
+> Signed-off-by: Tim Hansen <devtimhansen@gmail.com>
+> ---
+>  block/bsg.c | 20 ++++++--------------
+>  1 file changed, 6 insertions(+), 14 deletions(-)
+> 
+> diff --git a/block/bsg.c b/block/bsg.c
+> index ee1335c68de7..ecb93d733b56 100644
+> --- a/block/bsg.c
+> +++ b/block/bsg.c
+> @@ -66,8 +66,8 @@ enum {
+>  static DEFINE_MUTEX(bsg_mutex);
+>  static DEFINE_IDR(bsg_minor_idr);
+>  
+> -#define BSG_LIST_ARRAY_SIZE	8
+> -static struct hlist_head bsg_device_list[BSG_LIST_ARRAY_SIZE];
+> +#define BSG_HASHTABLE_BIT_SIZE		3
+> +static DEFINE_HASHTABLE(bsg_device_list, BSG_HASHTABLE_BIT_SIZE);
+>  
+>  static struct class *bsg_class;
+>  static int bsg_major;
+> @@ -130,11 +130,6 @@ static struct bsg_command *bsg_alloc_command(struct bsg_device *bd)
+>  	return bc;
+>  }
+>  
+> -static inline struct hlist_head *bsg_dev_idx_hash(int index)
+> -{
+> -	return &bsg_device_list[index & (BSG_LIST_ARRAY_SIZE - 1)];
+> -}
+> -
+>  static int blk_fill_sgv4_hdr_rq(struct request_queue *q, struct request *rq,
+>  				struct sg_io_v4 *hdr, struct bsg_device *bd,
+>  				fmode_t has_write_perm)
+> @@ -716,7 +711,7 @@ static int bsg_put_device(struct bsg_device *bd)
+>  		goto out;
+>  	}
+>  
+> -	hlist_del(&bd->dev_list);
+> +	hash_del(&bd->dev_list);
+>  	mutex_unlock(&bsg_mutex);
+>  
+>  	dprintk("%s: tearing down\n", bd->name);
+> @@ -770,7 +765,7 @@ static struct bsg_device *bsg_add_device(struct inode *inode,
+>  
+>  	atomic_set(&bd->ref_count, 1);
+>  	mutex_lock(&bsg_mutex);
+> -	hlist_add_head(&bd->dev_list, bsg_dev_idx_hash(iminor(inode)));
+> +	hash_add(bsg_device_list, &bd->dev_list, iminor(inode));
+>  
+>  	strncpy(bd->name, dev_name(rq->bsg_dev.class_dev), sizeof(bd->name) - 1);
+>  	dprintk("bound to <%s>, max queue %d\n",
+> @@ -786,7 +781,7 @@ static struct bsg_device *__bsg_get_device(int minor, struct request_queue *q)
+>  
+>  	mutex_lock(&bsg_mutex);
+>  
+> -	hlist_for_each_entry(bd, bsg_dev_idx_hash(minor), dev_list) {
+> +	hash_for_each_possible(bsg_device_list, bd, dev_list, minor) {
+>  		if (bd->queue == q) {
+>  			atomic_inc(&bd->ref_count);
+>  			goto found;
+> @@ -1042,7 +1037,7 @@ static char *bsg_devnode(struct device *dev, umode_t *mode)
+>  
+>  static int __init bsg_init(void)
+>  {
+> -	int ret, i;
+> +	int ret;
+>  	dev_t devid;
+>  
+>  	bsg_cmd_cachep = kmem_cache_create("bsg_cmd",
+> @@ -1052,9 +1047,6 @@ static int __init bsg_init(void)
+>  		return -ENOMEM;
+>  	}
+>  
+> -	for (i = 0; i < BSG_LIST_ARRAY_SIZE; i++)
+> -		INIT_HLIST_HEAD(&bsg_device_list[i]);
+> -
+>  	bsg_class = class_create(THIS_MODULE, "bsg");
+>  	if (IS_ERR(bsg_class)) {
+>  		ret = PTR_ERR(bsg_class);
+> -- 
+> 2.14.2
 
-We can end up sleeping for a while waiting for the dead timeout, which
-means we could get the per request timer to fire.  We did handle this
-case, but if the dead timeout happened right after we submitted we'd
-either tear down the connection or possibly requeue as we're handling an
-error and race with the endio which can lead to panics and other
-hilarity.
+Pinging folks again kindly for review of this patch.
 
-Fixes: 560bc4b39952 ("nbd: handle dead connections")
-Cc: stable@vger.kernel.org
-Signed-off-by: Josef Bacik <jbacik@fb.com>
----
- drivers/block/nbd.c | 20 +++++++-------------
- 1 file changed, 7 insertions(+), 13 deletions(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index fd2f724462b6..528e6f6951cc 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -289,15 +289,6 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 		cmd->status = BLK_STS_TIMEOUT;
- 		return BLK_EH_HANDLED;
- 	}
--
--	/* If we are waiting on our dead timer then we could get timeout
--	 * callbacks for our request.  For this we just want to reset the timer
--	 * and let the queue side take care of everything.
--	 */
--	if (!completion_done(&cmd->send_complete)) {
--		nbd_config_put(nbd);
--		return BLK_EH_RESET_TIMER;
--	}
- 	config = nbd->config;
- 
- 	if (config->num_connections > 1) {
-@@ -732,6 +723,7 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
- 	if (!refcount_inc_not_zero(&nbd->config_refs)) {
- 		dev_err_ratelimited(disk_to_dev(nbd->disk),
- 				    "Socks array is empty\n");
-+		blk_mq_start_request(req);
- 		return -EINVAL;
- 	}
- 	config = nbd->config;
-@@ -740,6 +732,7 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
- 		dev_err_ratelimited(disk_to_dev(nbd->disk),
- 				    "Attempted send on invalid socket\n");
- 		nbd_config_put(nbd);
-+		blk_mq_start_request(req);
- 		return -EINVAL;
- 	}
- 	cmd->status = BLK_STS_OK;
-@@ -763,6 +756,7 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
- 			 */
- 			sock_shutdown(nbd);
- 			nbd_config_put(nbd);
-+			blk_mq_start_request(req);
- 			return -EIO;
- 		}
- 		goto again;
-@@ -773,6 +767,7 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
- 	 * here so that it gets put _after_ the request that is already on the
- 	 * dispatch list.
- 	 */
-+	blk_mq_start_request(req);
- 	if (unlikely(nsock->pending && nsock->pending != req)) {
- 		blk_mq_requeue_request(req, true);
- 		ret = 0;
-@@ -785,10 +780,10 @@ static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
- 	ret = nbd_send_cmd(nbd, cmd, index);
- 	if (ret == -EAGAIN) {
- 		dev_err_ratelimited(disk_to_dev(nbd->disk),
--				    "Request send failed trying another connection\n");
-+				    "Request send failed, requeueing\n");
- 		nbd_mark_nsock_dead(nbd, nsock, 1);
--		mutex_unlock(&nsock->tx_lock);
--		goto again;
-+		blk_mq_requeue_request(req, true);
-+		ret = 0;
- 	}
- out:
- 	mutex_unlock(&nsock->tx_lock);
-@@ -812,7 +807,6 @@ static blk_status_t nbd_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	 * done sending everything over the wire.
- 	 */
- 	init_completion(&cmd->send_complete);
--	blk_mq_start_request(bd->rq);
- 
- 	/* We can be called directly from the user space process, which means we
- 	 * could possibly have signals pending so our sendmsg will fail.  In
--- 
-2.7.5
+Thank you
