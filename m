@@ -1,25 +1,17 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <BATV+3ff110a13ecf88c993b6+5167+infradead.org+hch@bombadil.srs.infradead.org>
+Date: Mon, 16 Oct 2017 05:48:17 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
 Subject: Re: [PATCH v2 0/3] Move tagset reinit to its only current consumer,
  nvme-core
-To: Christoph Hellwig <hch@infradead.org>, Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Message-ID: <20171016124817.GB26833@infradead.org>
 References: <1507715588-1041-1-git-send-email-sagi@grimberg.me>
- <20171016124817.GB26833@infradead.org>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <718a34b5-b28e-fc4f-5b42-f961dde53482@kernel.dk>
-Date: Mon, 16 Oct 2017 08:47:38 -0600
 MIME-Version: 1.0
-In-Reply-To: <20171016124817.GB26833@infradead.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1507715588-1041-1-git-send-email-sagi@grimberg.me>
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/16/2017 06:48 AM, Christoph Hellwig wrote:
-> Jens, are you fine with picking this up throught the nvme tree?
-> I think Sagi's later changes rely on it, so that would make life
-> a littler easier.
-
-Yeah that's fine, you can add my reviewed-by to the patches
-as well.
-
--- 
-Jens Axboe
+Jens, are you fine with picking this up throught the nvme tree?
+I think Sagi's later changes rely on it, so that would make life
+a littler easier.
