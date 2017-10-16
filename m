@@ -1,45 +1,77 @@
-Return-Path: <prvs=4559d41ab=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hare@suse.de" <hare@suse.de>, "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"hch@infradead.org" <hch@infradead.org>, "himanshu.madhani@cavium.com"
-	<himanshu.madhani@cavium.com>, "tom81094@gmail.com" <tom81094@gmail.com>,
-	"paolo.valente@linaro.org" <paolo.valente@linaro.org>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"oleksandr@natalenko.name" <oleksandr@natalenko.name>,
-	"john.garry@huawei.com" <john.garry@huawei.com>, "osandov@fb.com"
-	<osandov@fb.com>, "loberman@redhat.com" <loberman@redhat.com>,
-	"james.smart@broadcom.com" <james.smart@broadcom.com>
+Return-Path: <hare@suse.de>
 Subject: Re: [PATCH V7 4/6] blk-mq: introduce .get_budget and .put_budget in
  blk_mq_ops
-Date: Mon, 16 Oct 2017 16:06:32 +0000
-Message-ID: <1508169991.2493.17.camel@wdc.com>
+To: Ming Lei <ming.lei@redhat.com>, Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "hch@infradead.org" <hch@infradead.org>,
+ "tom81094@gmail.com" <tom81094@gmail.com>,
+ "himanshu.madhani@cavium.com" <himanshu.madhani@cavium.com>,
+ "paolo.valente@linaro.org" <paolo.valente@linaro.org>,
+ "axboe@kernel.dk" <axboe@kernel.dk>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+ "john.garry@huawei.com" <john.garry@huawei.com>,
+ "osandov@fb.com" <osandov@fb.com>, "loberman@redhat.com"
+ <loberman@redhat.com>, "james.smart@broadcom.com" <james.smart@broadcom.com>
 References: <20171012183704.22326-1-ming.lei@redhat.com>
-	 <20171012183704.22326-5-ming.lei@redhat.com>
-	 <9a741c03-90a3-e583-ddde-0ed71c8570a2@kernel.dk>
-	 <20171013001919.GA24715@ming.t460p>
-	 <6efdb459-8746-562d-06dc-5b3e172076e1@kernel.dk>
-	 <20171013160731.GA30899@ming.t460p> <1507912260.13345.0.camel@wdc.com>
-	 <20171013164519.GF30899@ming.t460p> <1507914527.13345.17.camel@wdc.com>
-	 <20171013172950.GA32319@ming.t460p>
-	 <515ca83f-5629-31e2-ef70-1869ae1b75ef@suse.de>
-In-Reply-To: <515ca83f-5629-31e2-ef70-1869ae1b75ef@suse.de>
-Content-Type: text/plain; charset="utf-8"
+ <20171012183704.22326-5-ming.lei@redhat.com>
+ <9a741c03-90a3-e583-ddde-0ed71c8570a2@kernel.dk>
+ <20171013001919.GA24715@ming.t460p>
+ <6efdb459-8746-562d-06dc-5b3e172076e1@kernel.dk>
+ <20171013160731.GA30899@ming.t460p> <1507912260.13345.0.camel@wdc.com>
+ <20171013164519.GF30899@ming.t460p> <1507914527.13345.17.camel@wdc.com>
+ <20171013172950.GA32319@ming.t460p>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <515ca83f-5629-31e2-ef70-1869ae1b75ef@suse.de>
+Date: Mon, 16 Oct 2017 13:30:09 +0200
 MIME-Version: 1.0
+In-Reply-To: <20171013172950.GA32319@ming.t460p>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE3LTEwLTE2IGF0IDEzOjMwICswMjAwLCBIYW5uZXMgUmVpbmVja2Ugd3JvdGU6
-DQo+IE9uIEZyaSwgT2N0IDEzLCAyMDE3IGF0IDA1OjA4OjUyUE0gKzAwMDAsIEJhcnQgVmFuIEFz
-c2NoZSB3cm90ZToNCj4gPiAoK0hpbWFuc2h1IE1hZGhhbmkpDQo+ID4gDQo+ID4gSGltYW5zaHUs
-IGRvIHlvdSBwZXJoYXBzIGtub3cgd2hldGhlciBpdCBpcyBzYWZlIHRvIGluY3JlYXNlIGNtZF9w
-ZXJfbHVuIGZvcg0KPiA+IHRoZSBxbGEyeHh4IGluaXRpYXRvciBkcml2ZXIgdG8gdGhlIHNjc2lf
-aG9zdC0+Y2FuX3F1ZXVlIHZhbHVlPw0KPiANCj4gJzMnIGlzIGp1c3QgYSBzdGFydGluZyBwb2lu
-dDsgbGF0ZXIgb24gaXQnbGwgYmUgYWRqdXN0ZWQgdmlhIHNjc2lfY2hhbmdlX2RlcHRoKCkuDQo+
-IExvb2tzIGxpa2UgaXQncyBub3Qgd29ya2luZyBjb3JyZWN0bHkgd2l0aCBibGstbXEsIHRob3Vn
-aC4NCg0KSGVsbG8gSGFubmVzLA0KDQpJc24ndCB0aGUgcHVycG9zZSBvZiBzY3NpX2NoYW5nZV9x
-dWV1ZV9kZXB0aCgpIHRvIGNoYW5nZSB0aGUgc2RldiBxdWV1ZV9kZXB0aA0Kb25seT8gQXMgZmFy
-IGFzIEkga25vdyB0aGVyZSBpcyBvbmx5IG9uZSBhc3NpZ25tZW50IG9mIHNob3N0LT5jbWRfcGVy
-X2x1biBpbg0KdGhlIFNDU0kgY29yZSBhbmQgdGhhdCdzIHRoZSBmb2xsb3dpbmcgYXNzaWdubWVu
-dCBpbiBzY3NpX2hvc3RfYWxsb2MoKToNCg0KCXNob3N0LT5jbWRfcGVyX2x1biA9IHNodC0+Y21k
-X3Blcl9sdW47DQoNCkJhcnQu
+On 10/13/2017 07:29 PM, Ming Lei wrote:
+> On Fri, Oct 13, 2017 at 05:08:52PM +0000, Bart Van Assche wrote:
+>> On Sat, 2017-10-14 at 00:45 +0800, Ming Lei wrote:
+>>> On Fri, Oct 13, 2017 at 04:31:04PM +0000, Bart Van Assche wrote:
+>>>> On Sat, 2017-10-14 at 00:07 +0800, Ming Lei wrote:
+>>>>> Actually it is in hot path, for example, lpfc and qla2xx's queue depth is 3,
+>>>>
+>>>> Sorry but I doubt whether that is correct. More in general, I don't know any modern
+>>>> storage HBA for which the default queue depth is so low.
+>>>
+>>> You can grep:
+>>>
+>>> [ming@ming linux]$ git grep -n cmd_per_lun ./drivers/scsi/ | grep -E "qla2xxx|lpfc"
+>>
+>> Such a low queue depth will result in suboptimal performance for adapters
+>> that communicate over a storage network. I think that's a bug and that both
+>> adapters support much higher cmd_per_lun values.
+>>
+>> (+James Smart)
+>>
+>> James, can you explain us why commit 445cf4f4d2aa decreased LPFC_CMD_PER_LUN
+>> from 30 to 3? Was that perhaps a workaround for a bug in a specific target
+>> implementation?
+>>
+>> (+Himanshu Madhani)
+>>
+>> Himanshu, do you perhaps know whether it is safe to increase cmd_per_lun for
+>> the qla2xxx initiator driver to the scsi_host->can_queue value?
+> 
+> ->can_queue is size of the whole tag space shared by all LUNs, looks it isn't
+> reasonable to increase cmd_per_lun to .can_queue.
+> 
+'3' is just a starting point; later on it'll be adjusted via
+scsi_change_depth().
+Looks like it's not working correctly with blk-mq, though.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
