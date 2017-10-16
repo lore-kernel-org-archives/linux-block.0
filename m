@@ -1,174 +1,124 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:46438 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753193AbdJMXgC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 19:36:02 -0400
-Received: by mail-pf0-f195.google.com with SMTP id p87so11515993pfj.3
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 16:36:02 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Coly Li <colyli@suse.de>,
-        Eric Wheeler <bcache@lists.ewheeler.net>,
-        Junhui Tang <tang.junhui@zte.com.cn>,
-        Michael Lyle <mlyle@lyle.org>
-Subject: [PATCH 04/15] bcache: rewrite multiple partitions support
-Date: Fri, 13 Oct 2017 16:35:31 -0700
-Message-Id: <20171013233542.20938-5-mlyle@lyle.org>
-In-Reply-To: <20171013233542.20938-1-mlyle@lyle.org>
-References: <20171013233542.20938-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=45557a1c1=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Oleksandr Natalenko <oleksandr@natalenko.name>,
+	Ming Lei <ming.lei@redhat.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH v9 00/10] block, scsi, md: Improve suspend and resume
+Date: Mon, 16 Oct 2017 16:28:55 -0700
+Message-Id: <20171016232905.5047-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Coly Li <colyli@suse.de>
+Hello Jens,
 
-Current partition support of bcache is confusing and buggy. It tries to
-trace non-continuous device minor numbers by an ida bit string, and
-mistakenly mixed bcache device index with minor numbers. This design
-generates several negative results,
-- Index of bcache device name is not consecutive under /dev/. If there are
-  3 bcache devices, they name will be,
-  /dev/bcache0, /dev/bcache16, /dev/bcache32
-  Only bcache code indexes bcache device name is such an interesting way.
-- First minor number of each bcache device is traced by ida bit string.
-  One bcache device will occupy 16 bits, this is not a good idea. Indeed
-  only one bit is enough.
-- Because minor number and bcache device index are mixed, a device index
-  is allocated by ida_simple_get(), but an first minor number is sent into
-  ida_simple_remove() to release the device. It confused original author
-  too.
+It is known that during the resume following a hibernate, especially when
+using an md RAID1 array created on top of SCSI devices, sometimes the system
+hangs instead of coming up properly. This patch series fixes that
+problem. These patches have been tested on top of the block layer for-next
+branch. Please consider these changes for kernel v4.15.
 
-Root cause of the above errors is, bcache code should not handle device
-minor numbers at all! A standard process to support multiple partitions in
-Linux kernel is,
-- Device driver provides major device number, and indexes multiple device
-  instances.
-- Device driver does not allocat nor trace device minor number, only
-  provides a first minor number of a given device instance, and sets how
-  many minor numbers (paritions) the device instance may have.
-All rested stuffs are handled by block layer code, most of the details can
-be found from block/{genhd, partition-generic}.c files.
+Thanks,
 
-This patch re-writes multiple partitions support for bcache. It makes
-whole things to be more clear, and uses ida bit string in a more efficeint
-way.
-- Ida bit string only traces bcache device index, not minor number. For a
-  bcache device with 128 partitions, only one bit in ida bit string is
-  enough.
-- Device minor number and device index are separated in concept. Device
-  index is used for /dev node naming, and ida bit string trace. Minor
-  number is calculated from device index and only used to initialize
-  first_minor of a bcache device.
-- It does not follow any standard for 16 partitions on a bcache device.
-  This patch sets 128 partitions on single bcache device at max, this is
-  the limitation from GPT (GUID Partition Table) and supported by fdisk.
+Bart.
 
-Considering a typical device minor number is 20 bits width, each bcache
-device may have 128 partitions (7 bits), there can be 8192 bcache devices
-existing on system. For most common deployment for a single server in
-now days, it should be enough.
+Changes between v8 and v9:
+- Modified the third patch such that the MD_RECOVERY_FROZEN flag is restored
+  properly after a resume.
+- Modified the ninth patch such that a kernel warning is reported if it is
+  attempted to call scsi_device_quiesce() from multiple contexts concurrently.
+- Added Reviewed-by / Tested-by tags as appropriate.
+  
+Changes between v7 and v8:
+- Fixed a (theoretical?) race identified by Ming Lei.
+- Added a tenth patch that checks whether the proper type of flags has been
+  passed to a range of block layer functions.
 
-[minor spelling fixes in commit message by Michael Lyle]
+Changes between v6 and v7:
+- Added support for the PREEMPT_ONLY flag in blk-mq-debugfs.c.
+- Fixed kerneldoc header of blk_queue_enter().
+- Added a rcu_read_lock_sched() / rcu_read_unlock_sched() pair in
+  blk_set_preempt_only().
+- Removed a synchronize_rcu() call from scsi_device_quiesce().
+- Modified the description of patch 9/9 in this series.
+- Removed scsi_run_queue() call from scsi_device_resume().
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Eric Wheeler <bcache@lists.ewheeler.net>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
-Signed-off-by: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/super.c | 37 +++++++++++++++++++++++++------------
- 1 file changed, 25 insertions(+), 12 deletions(-)
+Changes between v5 and v6:
+- Split an md patch into two patches to make it easier to review the changes.
+- For the md patch that suspends I/O while the system is frozen, switched back
+  to the freezer mechanism because this makes the code shorter and easier to
+  review.
+- Changed blk_set/clear_preempt_only() from EXPORT_SYMBOL() into
+  EXPORT_SYMBOL_GPL().
+- Made blk_set_preempt_only() behave as a test-and-set operation.
+- Introduced blk_get_request_flags() and BLK_MQ_REQ_PREEMPT as requested by
+  Christoph and reduced the number of arguments of blk_queue_enter() back from
+  three to two.
+- In scsi_device_quiesce(), moved the blk_mq_freeze_queue() call out of a
+  critical section. Made the explanation of why the synchronize_rcu() call
+  is necessary more detailed.
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index fc0a31b13ac4..a478d1ac0480 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -53,12 +53,15 @@ LIST_HEAD(bch_cache_sets);
- static LIST_HEAD(uncached_devices);
- 
- static int bcache_major;
--static DEFINE_IDA(bcache_minor);
-+static DEFINE_IDA(bcache_device_idx);
- static wait_queue_head_t unregister_wait;
- struct workqueue_struct *bcache_wq;
- 
- #define BTREE_MAX_PAGES		(256 * 1024 / PAGE_SIZE)
--#define BCACHE_MINORS		16 /* partition support */
-+/* limitation of partitions number on single bcache device */
-+#define BCACHE_MINORS		128
-+/* limitation of bcache devices number on single system */
-+#define BCACHE_DEVICE_IDX_MAX	((1U << MINORBITS)/BCACHE_MINORS)
- 
- /* Superblock */
- 
-@@ -721,6 +724,16 @@ static void bcache_device_attach(struct bcache_device *d, struct cache_set *c,
- 	closure_get(&c->caching);
- }
- 
-+static inline int first_minor_to_idx(int first_minor)
-+{
-+	return (first_minor/BCACHE_MINORS);
-+}
-+
-+static inline int idx_to_first_minor(int idx)
-+{
-+	return (idx * BCACHE_MINORS);
-+}
-+
- static void bcache_device_free(struct bcache_device *d)
- {
- 	lockdep_assert_held(&bch_register_lock);
-@@ -734,7 +747,8 @@ static void bcache_device_free(struct bcache_device *d)
- 	if (d->disk && d->disk->queue)
- 		blk_cleanup_queue(d->disk->queue);
- 	if (d->disk) {
--		ida_simple_remove(&bcache_minor, d->disk->first_minor);
-+		ida_simple_remove(&bcache_device_idx,
-+				  first_minor_to_idx(d->disk->first_minor));
- 		put_disk(d->disk);
- 	}
- 
-@@ -751,7 +765,7 @@ static int bcache_device_init(struct bcache_device *d, unsigned block_size,
- {
- 	struct request_queue *q;
- 	size_t n;
--	int minor;
-+	int idx;
- 
- 	if (!d->stripe_size)
- 		d->stripe_size = 1 << 31;
-@@ -776,25 +790,24 @@ static int bcache_device_init(struct bcache_device *d, unsigned block_size,
- 	if (!d->full_dirty_stripes)
- 		return -ENOMEM;
- 
--	minor = ida_simple_get(&bcache_minor, 0, MINORMASK + 1, GFP_KERNEL);
--	if (minor < 0)
--		return minor;
--
--	minor *= BCACHE_MINORS;
-+	idx = ida_simple_get(&bcache_device_idx, 0,
-+				BCACHE_DEVICE_IDX_MAX, GFP_KERNEL);
-+	if (idx < 0)
-+		return idx;
- 
- 	if (!(d->bio_split = bioset_create(4, offsetof(struct bbio, bio),
- 					   BIOSET_NEED_BVECS |
- 					   BIOSET_NEED_RESCUER)) ||
- 	    !(d->disk = alloc_disk(BCACHE_MINORS))) {
--		ida_simple_remove(&bcache_minor, minor);
-+		ida_simple_remove(&bcache_device_idx, idx);
- 		return -ENOMEM;
- 	}
- 
- 	set_capacity(d->disk, sectors);
--	snprintf(d->disk->disk_name, DISK_NAME_LEN, "bcache%i", minor);
-+	snprintf(d->disk->disk_name, DISK_NAME_LEN, "bcache%i", idx);
- 
- 	d->disk->major		= bcache_major;
--	d->disk->first_minor	= minor;
-+	d->disk->first_minor	= idx_to_first_minor(idx);
- 	d->disk->fops		= &bcache_ops;
- 	d->disk->private_data	= d;
- 
+Changes between v4 and v5:
+- Split blk_set_preempt_only() into two functions as requested by Christoph.
+- Made blk_get_request() trigger WARN_ONCE() if it is attempted to allocate
+  a request while the system is frozen. This is a big help to identify drivers
+  that submit I/O while the system is frozen.
+- Since kernel thread freezing is on its way out, reworked the approach for
+  avoiding that the md driver submits I/O while the system is frozen such that
+  the approach no longer depends on the kernel thread freeze mechanism.
+- Fixed the (theoretical) deadlock in scsi_device_quiesce() that was identified
+  by Ming.
+
+Changes between v3 and v4:
+- Made sure that this patch series not only works for scsi-mq but also for
+  the legacy SCSI stack.
+- Removed an smp_rmb()/smp_wmb() pair from the hot path and added a comment
+  that explains why that is safe.
+- Reordered the patches in this patch series.
+
+Changes between v2 and v3:
+- Made md kernel threads freezable.
+- Changed the approach for quiescing SCSI devices again.
+- Addressed Ming's review comments.
+
+Changes compared to v1 of this patch series:
+- Changed the approach and rewrote the patch series.
+
+Bart Van Assche (9):
+  md: Rename md_notifier into md_reboot_notifier
+  md: Introduce md_stop_all_writes()
+  md: Neither resync nor reshape while the system is frozen
+  block: Introduce blk_get_request_flags()
+  block: Introduce BLK_MQ_REQ_PREEMPT
+  ide, scsi: Tell the block layer at request allocation time about
+    preempt requests
+  block: Add the QUEUE_FLAG_PREEMPT_ONLY request queue flag
+  block, scsi: Make SCSI quiesce and resume work reliably
+  block, nvme: Introduce blk_mq_req_flags_t
+
+Ming Lei (1):
+  block: Make q_usage_counter also track legacy requests
+
+ block/blk-core.c           | 132 ++++++++++++++++++++++++++++++++++++++-------
+ block/blk-mq-debugfs.c     |   1 +
+ block/blk-mq.c             |  20 +++----
+ block/blk-mq.h             |   2 +-
+ block/blk-timeout.c        |   2 +-
+ drivers/ide/ide-pm.c       |   4 +-
+ drivers/md/md.c            |  65 +++++++++++++++++++---
+ drivers/md/md.h            |   8 +++
+ drivers/nvme/host/core.c   |   5 +-
+ drivers/nvme/host/nvme.h   |   5 +-
+ drivers/scsi/scsi_lib.c    |  46 +++++++++++-----
+ fs/block_dev.c             |   4 +-
+ include/linux/blk-mq.h     |  16 ++++--
+ include/linux/blk_types.h  |   2 +
+ include/linux/blkdev.h     |  11 +++-
+ include/scsi/scsi_device.h |   1 +
+ 16 files changed, 256 insertions(+), 68 deletions(-)
+
 -- 
-2.11.0
+2.14.2
