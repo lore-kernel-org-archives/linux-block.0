@@ -1,145 +1,89 @@
-Return-Path: <prvs=451f24578=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Brian King <brking@linux.vnet.ibm.com>
-Subject: [PATCH 6/8] scsi/ipr: Use sgl_alloc_order() and sgl_free_order()
-Date: Thu, 12 Oct 2017 15:45:48 -0700
-Message-Id: <20171012224550.25440-7-bart.vanassche@wdc.com>
-In-Reply-To: <20171012224550.25440-1-bart.vanassche@wdc.com>
-References: <20171012224550.25440-1-bart.vanassche@wdc.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Mon, 16 Oct 2017 18:30:24 +0200
+From: Benjamin Block <bblock@linux.vnet.ibm.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Johannes Thumshirn <jthumshirn@suse.de>
+Subject: Re: [PATCH 6/9] bsg-lib: introduce a timeout field in struct bsg_job
+References: <20171003104845.10417-1-hch@lst.de>
+ <20171003104845.10417-7-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20171003104845.10417-7-hch@lst.de>
+Message-Id: <20171016163024.GB26185@bblock-ThinkPad-W530>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Use the sgl_alloc_order() and sgl_free_order() functions instead
-of open coding these functions.
+On Tue, Oct 03, 2017 at 12:48:42PM +0200, Christoph Hellwig wrote:
+> The zfcp driver wants to know the timeout for a bsg job, so add a field
+> to struct bsg_job for it in preparation of not exposing the request
+> to the bsg-lib users.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/bsg-lib.c             | 1 +
+>  drivers/s390/scsi/zfcp_fc.c | 4 ++--
+>  include/linux/bsg-lib.h     | 2 ++
+>  3 files changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+> index 15d25ccd51a5..0d5bbf6a2ddd 100644
+> --- a/block/bsg-lib.c
+> +++ b/block/bsg-lib.c
+> @@ -132,6 +132,7 @@ static int bsg_prepare_job(struct device *dev, struct request *req)
+>  	struct bsg_job *job = blk_mq_rq_to_pdu(req);
+>  	int ret;
+> 
+> +	job->timeout = req->timeout;
+>  	job->request = rq->cmd;
+>  	job->request_len = rq->cmd_len;
+> 
+> diff --git a/drivers/s390/scsi/zfcp_fc.c b/drivers/s390/scsi/zfcp_fc.c
+> index 8210645c2111..9d6f69b92c81 100644
+> --- a/drivers/s390/scsi/zfcp_fc.c
+> +++ b/drivers/s390/scsi/zfcp_fc.c
+> @@ -960,7 +960,7 @@ static int zfcp_fc_exec_els_job(struct bsg_job *job,
+>  		d_id = ntoh24(bsg_request->rqst_data.h_els.port_id);
+> 
+>  	els->handler = zfcp_fc_ct_els_job_handler;
+> -	return zfcp_fsf_send_els(adapter, d_id, els, job->req->timeout / HZ);
+> +	return zfcp_fsf_send_els(adapter, d_id, els, job->timeout / HZ);
+>  }
+> 
+>  static int zfcp_fc_exec_ct_job(struct bsg_job *job,
+> @@ -979,7 +979,7 @@ static int zfcp_fc_exec_ct_job(struct bsg_job *job,
+>  		return ret;
+> 
+>  	ct->handler = zfcp_fc_ct_job_handler;
+> -	ret = zfcp_fsf_send_ct(wka_port, ct, NULL, job->req->timeout / HZ);
+> +	ret = zfcp_fsf_send_ct(wka_port, ct, NULL, job->timeout / HZ);
+>  	if (ret)
+>  		zfcp_fc_wka_port_put(wka_port);
+> 
+> diff --git a/include/linux/bsg-lib.h b/include/linux/bsg-lib.h
+> index b1be0233ce35..402223c95ce1 100644
+> --- a/include/linux/bsg-lib.h
+> +++ b/include/linux/bsg-lib.h
+> @@ -44,6 +44,8 @@ struct bsg_job {
+> 
+>  	struct kref kref;
+> 
+> +	unsigned int timeout;
+> +
+>  	/* Transport/driver specific request/reply structs */
+>  	void *request;
+>  	void *reply;
+> -- 
+> 2.14.1
+> 
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: linux-scsi@vger.kernel.org
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Brian King <brking@linux.vnet.ibm.com>
----
- drivers/scsi/Kconfig |  1 +
- drivers/scsi/ipr.c   | 50 +++++++++-----------------------------------------
- drivers/scsi/ipr.h   |  2 +-
- 3 files changed, 11 insertions(+), 42 deletions(-)
+Reviewed-by: Benjamin Block <bblock@linux.vnet.ibm.com>
 
-diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
-index 41366339b950..d11e75e76195 100644
---- a/drivers/scsi/Kconfig
-+++ b/drivers/scsi/Kconfig
-@@ -1058,6 +1058,7 @@ config SCSI_IPR
- 	depends on PCI && SCSI && ATA
- 	select FW_LOADER
- 	select IRQ_POLL
-+	select SGL_ALLOC
- 	---help---
- 	  This driver supports the IBM Power Linux family RAID adapters.
- 	  This includes IBM pSeries 5712, 5703, 5709, and 570A, as well
-diff --git a/drivers/scsi/ipr.c b/drivers/scsi/ipr.c
-index f838bd73befa..b197995a6f34 100644
---- a/drivers/scsi/ipr.c
-+++ b/drivers/scsi/ipr.c
-@@ -76,6 +76,7 @@
- #include <linux/hdreg.h>
- #include <linux/reboot.h>
- #include <linux/stringify.h>
-+#include <linux/sgl_alloc.h>
- #include <asm/io.h>
- #include <asm/irq.h>
- #include <asm/processor.h>
-@@ -3815,10 +3816,8 @@ static struct device_attribute ipr_iopoll_weight_attr = {
-  **/
- static struct ipr_sglist *ipr_alloc_ucode_buffer(int buf_len)
- {
--	int sg_size, order, bsize_elem, num_elem, i, j;
-+	int sg_size, order;
- 	struct ipr_sglist *sglist;
--	struct scatterlist *scatterlist;
--	struct page *page;
- 
- 	/* Get the minimum size per scatter/gather element */
- 	sg_size = buf_len / (IPR_MAX_SGLIST - 1);
-@@ -3826,45 +3825,18 @@ static struct ipr_sglist *ipr_alloc_ucode_buffer(int buf_len)
- 	/* Get the actual size per element */
- 	order = get_order(sg_size);
- 
--	/* Determine the actual number of bytes per element */
--	bsize_elem = PAGE_SIZE * (1 << order);
--
--	/* Determine the actual number of sg entries needed */
--	if (buf_len % bsize_elem)
--		num_elem = (buf_len / bsize_elem) + 1;
--	else
--		num_elem = buf_len / bsize_elem;
--
- 	/* Allocate a scatter/gather list for the DMA */
--	sglist = kzalloc(sizeof(struct ipr_sglist) +
--			 (sizeof(struct scatterlist) * (num_elem - 1)),
--			 GFP_KERNEL);
--
-+	sglist = kzalloc(sizeof(struct ipr_sglist), GFP_KERNEL);
- 	if (sglist == NULL) {
- 		ipr_trace;
- 		return NULL;
- 	}
--
--	scatterlist = sglist->scatterlist;
--	sg_init_table(scatterlist, num_elem);
--
- 	sglist->order = order;
--	sglist->num_sg = num_elem;
--
--	/* Allocate a bunch of sg elements */
--	for (i = 0; i < num_elem; i++) {
--		page = alloc_pages(GFP_KERNEL, order);
--		if (!page) {
--			ipr_trace;
--
--			/* Free up what we already allocated */
--			for (j = i - 1; j >= 0; j--)
--				__free_pages(sg_page(&scatterlist[j]), order);
--			kfree(sglist);
--			return NULL;
--		}
--
--		sg_set_page(&scatterlist[i], page, 0, 0);
-+	sglist->scatterlist = sgl_alloc_order(buf_len, order, &sglist->num_sg,
-+					      GFP_KERNEL, false);
-+	if (!sglist->scatterlist) {
-+		kfree(sglist);
-+		return NULL;
- 	}
- 
- 	return sglist;
-@@ -3882,11 +3854,7 @@ static struct ipr_sglist *ipr_alloc_ucode_buffer(int buf_len)
-  **/
- static void ipr_free_ucode_buffer(struct ipr_sglist *sglist)
- {
--	int i;
--
--	for (i = 0; i < sglist->num_sg; i++)
--		__free_pages(sg_page(&sglist->scatterlist[i]), sglist->order);
--
-+	sgl_free_order(sglist->scatterlist, sglist->order);
- 	kfree(sglist);
- }
- 
-diff --git a/drivers/scsi/ipr.h b/drivers/scsi/ipr.h
-index c7f0e9e3cd7d..93570734cbfb 100644
---- a/drivers/scsi/ipr.h
-+++ b/drivers/scsi/ipr.h
-@@ -1454,7 +1454,7 @@ struct ipr_sglist {
- 	u32 num_sg;
- 	u32 num_dma_sg;
- 	u32 buffer_len;
--	struct scatterlist scatterlist[1];
-+	struct scatterlist *scatterlist;
- };
- 
- enum ipr_sdt_state {
+
+                                                    Beste Gr��e / Best regards,
+                                                      - Benjamin Block
 -- 
-2.14.2
+Linux on z Systems Development         /         IBM Systems & Technology Group
+		  IBM Deutschland Research & Development GmbH 
+Vorsitz. AufsR.: Martina Koederitz     /        Gesch�ftsf�hrung: Dirk Wittkopp
+Sitz der Gesellschaft: B�blingen / Registergericht: AmtsG Stuttgart, HRB 243294
