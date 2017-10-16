@@ -1,27 +1,47 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <i@coly.li>
 Subject: Re: [PATCH] bcache: writeback rate clamping: make 32 bit safe
-To: Michael Lyle <mlyle@lyle.org>, linux-bcache@vger.kernel.org,
- linux-block@vger.kernel.org
+To: Michael Lyle <mlyle@lyle.org>
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org, axboe@kernel.dk
 References: <20171016173447.27253-1-mlyle@lyle.org>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <20f5b753-1d5f-eb7d-cbb9-6ecaf43294f8@kernel.dk>
-Date: Mon, 16 Oct 2017 13:01:02 -0600
+From: Coly Li <i@coly.li>
+Message-ID: <4c2ec14d-112c-5f32-5860-b5ea1836785a@coly.li>
+Date: Tue, 17 Oct 2017 01:52:33 +0800
 MIME-Version: 1.0
 In-Reply-To: <20171016173447.27253-1-mlyle@lyle.org>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/16/2017 11:34 AM, Michael Lyle wrote:
+On 2017/10/17 上午1:34, Michael Lyle wrote:
 > Sorry this got through to linux-block, was detected by the kbuilds test
 > robot.  NSEC_PER_SEC is a long constant; 2.5 * 10^9 doesn't fit in a
 > signed long constant.
+> 
+> Signed-off-by: Michael Lyle <mlyle@lyle.org>
 
-Applied, but you should remember to add Fixes lines when a patch
-explicitly fixes a problem introduced by a previous patch. Ala:
+I forgot i386 config... sorry too...
 
-Fixes: e41166c5c44e ("bcache: writeback rate shouldn't artifically clamp")
+Reviewed-by: Coly Li <colyli@suse.de>
 
-so that backports have an easier time finding dependent fixes.
+Thanks to Michael for the fix.
 
--- 
-Jens Axboe
+Coly Li
+
+> ---
+>  drivers/md/bcache/util.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
+> index 4dbe37e82877..e548b8b51322 100644
+> --- a/drivers/md/bcache/util.c
+> +++ b/drivers/md/bcache/util.c
+> @@ -238,8 +238,8 @@ uint64_t bch_next_delay(struct bch_ratelimit *d, uint64_t done)
+>  	 * don't let us sleep more than 2.5 seconds (so we can notice/respond
+>  	 * if the control system tells us to speed up!).
+>  	 */
+> -	if (time_before64(now + NSEC_PER_SEC * 5 / 2, d->next))
+> -		d->next = now + NSEC_PER_SEC * 5 / 2;
+> +	if (time_before64(now + NSEC_PER_SEC * 5LLU / 2LLU, d->next))
+> +		d->next = now + NSEC_PER_SEC * 5LLU / 2LLU;
+>  
+>  	if (time_after64(now - NSEC_PER_SEC * 2, d->next))
+>  		d->next = now - NSEC_PER_SEC * 2;
