@@ -1,77 +1,66 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:52321 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751391AbdJMXf6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 19:35:58 -0400
-Received: by mail-pg0-f66.google.com with SMTP id a192so914678pge.9
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 16:35:58 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Peter Foley <pefoley2@pefoley.com>
-Subject: [PATCH 01/15] bcache: Avoid nested function definition
-Date: Fri, 13 Oct 2017 16:35:28 -0700
-Message-Id: <20171013233542.20938-2-mlyle@lyle.org>
-In-Reply-To: <20171013233542.20938-1-mlyle@lyle.org>
-References: <20171013233542.20938-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=45557a1c1=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-crypto@vger.kernel.org,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH v2 0/8] Introduce sgl_alloc() and sgl_free()
+Date: Mon, 16 Oct 2017 15:49:32 -0700
+Message-Id: <20171016224940.1332-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Peter Foley <pefoley2@pefoley.com>
+Hello Jens,
 
-Fixes below error with clang:
-../drivers/md/bcache/sysfs.c:759:3: error: function definition is not allowed here
-                {       return *((uint16_t *) r) - *((uint16_t *) l); }
-                ^
-../drivers/md/bcache/sysfs.c:789:32: error: use of undeclared identifier 'cmp'
-                sort(p, n, sizeof(uint16_t), cmp, NULL);
-                                             ^
-2 errors generated.
+As you know there are multiple drivers that both allocate a scatter/gather
+list and populate that list with pages. This patch series moves the code for
+allocating and freeing such scatterlists from these drivers into
+lib/scatterlist.c. Please consider this patch series for kernel v4.15.
 
-v2:
-rename function to __bch_cache_cmp
+Notes:
+- Only the ib_srpt driver changes have been tested but none of the other
+  drivers have been retested.
+- The next step is to introduce a caching mechanism for these scatterlists
+  and make the nvmet/rdma and SCSI target drivers use that caching mechanism
+  since for these drivers sgl allocation occurs in the hot path.
 
-Signed-off-by: Peter Foley <pefoley2@pefoley.com>
-Reviewed-by: Coly Li <colyli@suse.de>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/sysfs.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Changes compared to v1:
+- Moved the sgl_alloc*() and sgl_free() functions from a new source file into
+  lib/scatterlist.c.
+- Changed the argument order for the sgl_alloc*() functions such that the
+  (pointer to) the output argument comes last.
 
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index 104c57cd666c..69f355b9650c 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -745,6 +745,11 @@ static struct attribute *bch_cache_set_internal_files[] = {
- };
- KTYPE(bch_cache_set_internal);
- 
-+static int __bch_cache_cmp(const void *l, const void *r)
-+{
-+	return *((uint16_t *)r) - *((uint16_t *)l);
-+}
-+
- SHOW(__bch_cache)
- {
- 	struct cache *ca = container_of(kobj, struct cache, kobj);
-@@ -769,9 +774,6 @@ SHOW(__bch_cache)
- 					       CACHE_REPLACEMENT(&ca->sb));
- 
- 	if (attr == &sysfs_priority_stats) {
--		int cmp(const void *l, const void *r)
--		{	return *((uint16_t *) r) - *((uint16_t *) l); }
--
- 		struct bucket *b;
- 		size_t n = ca->sb.nbuckets, i;
- 		size_t unused = 0, available = 0, dirty = 0, meta = 0;
-@@ -800,7 +802,7 @@ SHOW(__bch_cache)
- 			p[i] = ca->buckets[i].prio;
- 		mutex_unlock(&ca->set->bucket_lock);
- 
--		sort(p, n, sizeof(uint16_t), cmp, NULL);
-+		sort(p, n, sizeof(uint16_t), __bch_cache_cmp, NULL);
- 
- 		while (n &&
- 		       !cached[n - 1])
+Thanks,
+
+Bart.
+
+Bart Van Assche (8):
+  lib/scatterlist: Introduce sgl_alloc() and sgl_free()
+  crypto: scompress - use sgl_alloc() and sgl_free()
+  nvmet/fc: Use sgl_alloc() and sgl_free()
+  nvmet/rdma: Use sgl_alloc() and sgl_free()
+  target: Use sgl_alloc_order() and sgl_free()
+  scsi/ipr: Use sgl_alloc_order() and sgl_free_order()
+  scsi/pmcraid: Remove an unused structure member
+  scsi/pmcraid: Use sgl_alloc_order() and sgl_free_order()
+
+ crypto/Kconfig                         |   1 +
+ crypto/scompress.c                     |  51 +---------------
+ drivers/nvme/target/Kconfig            |   2 +
+ drivers/nvme/target/fc.c               |  36 +----------
+ drivers/nvme/target/rdma.c             |  63 ++------------------
+ drivers/scsi/Kconfig                   |   2 +
+ drivers/scsi/ipr.c                     |  49 +++------------
+ drivers/scsi/ipr.h                     |   2 +-
+ drivers/scsi/pmcraid.c                 |  43 ++------------
+ drivers/scsi/pmcraid.h                 |   3 +-
+ drivers/target/Kconfig                 |   1 +
+ drivers/target/target_core_transport.c |  46 ++-------------
+ include/linux/scatterlist.h            |  10 ++++
+ lib/Kconfig                            |   4 ++
+ lib/scatterlist.c                      | 105 +++++++++++++++++++++++++++++++++
+ 15 files changed, 151 insertions(+), 267 deletions(-)
+
 -- 
-2.11.0
+2.14.2
