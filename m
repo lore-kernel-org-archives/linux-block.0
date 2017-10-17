@@ -1,74 +1,43 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:54852 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753010AbdJMXgF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 19:36:05 -0400
-Received: by mail-pg0-f65.google.com with SMTP id l24so2285314pgu.11
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 16:36:05 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Eric Wheeler <bcache@linux.ewheeler.net>
-Subject: [PATCH 06/15] bcache: update bio->bi_opf bypass/writeback REQ_ flag hints
-Date: Fri, 13 Oct 2017 16:35:33 -0700
-Message-Id: <20171013233542.20938-7-mlyle@lyle.org>
-In-Reply-To: <20171013233542.20938-1-mlyle@lyle.org>
-References: <20171013233542.20938-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v2 3/8] nvmet/fc: Use sgl_alloc() and sgl_free()
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org,
+ Keith Busch <keith.busch@intel.com>, Christoph Hellwig <hch@lst.de>,
+ James Smart <james.smart@broadcom.com>, Sagi Grimberg <sagi@grimberg.me>
+References: <20171016224940.1332-1-bart.vanassche@wdc.com>
+ <20171016224940.1332-4-bart.vanassche@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <97bcefd4-bff2-9b14-7981-21e238c2d2e6@suse.de>
+Date: Tue, 17 Oct 2017 08:07:48 +0200
+MIME-Version: 1.0
+In-Reply-To: <20171016224940.1332-4-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Eric Wheeler <bcache@linux.ewheeler.net>
+On 10/17/2017 12:49 AM, Bart Van Assche wrote:
+> Use the sgl_alloc() and sgl_free() functions instead of open coding
+> these functions.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+> Cc: Keith Busch <keith.busch@intel.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: James Smart <james.smart@broadcom.com>
+> Cc: Sagi Grimberg <sagi@grimberg.me>
+> ---
+>  drivers/nvme/target/Kconfig |  1 +
+>  drivers/nvme/target/fc.c    | 36 ++----------------------------------
+>  2 files changed, 3 insertions(+), 34 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Flag for bypass if the IO is for read-ahead or background, unless the
-read-ahead request is for metadata (eg, from gfs2).
-        Bypass if:
-                bio->bi_opf & (REQ_RAHEAD|REQ_BACKGROUND) &&
-			!(bio->bi_opf & REQ_META))
+Cheers,
 
-        Writeback if:
-                op_is_sync(bio->bi_opf) ||
-			bio->bi_opf & (REQ_META|REQ_PRIO)
-
-Signed-off-by: Eric Wheeler <bcache@linux.ewheeler.net>
-Reviewed-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/request.c   | 8 ++++++++
- drivers/md/bcache/writeback.h | 4 +++-
- 2 files changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 681b4f12b05a..9ee137e8d387 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -384,6 +384,14 @@ static bool check_should_bypass(struct cached_dev *dc, struct bio *bio)
- 	     op_is_write(bio_op(bio))))
- 		goto skip;
- 
-+	/*
-+	 * Flag for bypass if the IO is for read-ahead or background,
-+	 * unless the read-ahead request is for metadata (eg, for gfs2).
-+	 */
-+	if (bio->bi_opf & (REQ_RAHEAD|REQ_BACKGROUND) &&
-+	    !(bio->bi_opf & REQ_META))
-+		goto skip;
-+
- 	if (bio->bi_iter.bi_sector & (c->sb.block_size - 1) ||
- 	    bio_sectors(bio) & (c->sb.block_size - 1)) {
- 		pr_debug("skipping unaligned io");
-diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
-index e35421d20d2e..34bcf49d737b 100644
---- a/drivers/md/bcache/writeback.h
-+++ b/drivers/md/bcache/writeback.h
-@@ -76,7 +76,9 @@ static inline bool should_writeback(struct cached_dev *dc, struct bio *bio,
- 	if (would_skip)
- 		return false;
- 
--	return op_is_sync(bio->bi_opf) || in_use <= CUTOFF_WRITEBACK;
-+	return (op_is_sync(bio->bi_opf) ||
-+		bio->bi_opf & (REQ_META|REQ_PRIO) ||
-+		in_use <= CUTOFF_WRITEBACK);
- }
- 
- static inline void bch_writeback_queue(struct cached_dev *dc)
+Hannes
 -- 
-2.11.0
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
