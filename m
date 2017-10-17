@@ -1,40 +1,143 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:58863 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751172AbdJCKtC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2017 06:49:02 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Cc: Johannes Thumshirn <jthumshirn@suse.de>,
-        Benjamin Block <bblock@linux.vnet.ibm.com>
-Subject: [PATCH 5/9] scsi_transport_sas: check reply payload length instead of bidi request
-Date: Tue,  3 Oct 2017 12:48:41 +0200
-Message-Id: <20171003104845.10417-6-hch@lst.de>
-In-Reply-To: <20171003104845.10417-1-hch@lst.de>
-References: <20171003104845.10417-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v2 8/8] scsi/pmcraid: Use sgl_alloc_order() and
+ sgl_free_order()
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ Anil Ravindranath <anil_ravindranath@pmc-sierra.com>
+References: <20171016224940.1332-1-bart.vanassche@wdc.com>
+ <20171016224940.1332-9-bart.vanassche@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <00b49c32-505e-410a-40dd-9d6f793354be@suse.de>
+Date: Tue, 17 Oct 2017 08:22:18 +0200
+MIME-Version: 1.0
+In-Reply-To: <20171016224940.1332-9-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-As a user of bsg-lib the SAS transport should not poke into request
-internals but use the bsg_job fields instead.
+On 10/17/2017 12:49 AM, Bart Van Assche wrote:
+> Use the sgl_alloc_order() and sgl_free_order() functions instead
+> of open coding these functions.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+> Cc: linux-scsi@vger.kernel.org
+> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+> Cc: Anil Ravindranath <anil_ravindranath@pmc-sierra.com>
+> ---
+>  drivers/scsi/Kconfig   |  1 +
+>  drivers/scsi/pmcraid.c | 43 ++++---------------------------------------
+>  drivers/scsi/pmcraid.h |  2 +-
+>  3 files changed, 6 insertions(+), 40 deletions(-)
+> 
+> diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
+> index d11e75e76195..632200ec36a6 100644
+> --- a/drivers/scsi/Kconfig
+> +++ b/drivers/scsi/Kconfig
+> @@ -1576,6 +1576,7 @@ config ZFCP
+>  config SCSI_PMCRAID
+>  	tristate "PMC SIERRA Linux MaxRAID adapter support"
+>  	depends on PCI && SCSI && NET
+> +	select SGL_ALLOC
+>  	---help---
+>  	  This driver supports the PMC SIERRA MaxRAID adapters.
+>  
+> diff --git a/drivers/scsi/pmcraid.c b/drivers/scsi/pmcraid.c
+> index b4d6cd8cd1ad..95fc0352f9bb 100644
+> --- a/drivers/scsi/pmcraid.c
+> +++ b/drivers/scsi/pmcraid.c
+> @@ -3232,12 +3232,7 @@ static int pmcraid_build_ioadl(
+>   */
+>  static void pmcraid_free_sglist(struct pmcraid_sglist *sglist)
+>  {
+> -	int i;
+> -
+> -	for (i = 0; i < sglist->num_sg; i++)
+> -		__free_pages(sg_page(&(sglist->scatterlist[i])),
+> -			     sglist->order);
+> -
+> +	sgl_free_order(sglist->scatterlist, sglist->order);
+>  	kfree(sglist);
+>  }
+>  
+> @@ -3254,50 +3249,20 @@ static void pmcraid_free_sglist(struct pmcraid_sglist *sglist)
+>  static struct pmcraid_sglist *pmcraid_alloc_sglist(int buflen)
+>  {
+>  	struct pmcraid_sglist *sglist;
+> -	struct scatterlist *scatterlist;
+> -	struct page *page;
+> -	int num_elem, i, j;
+>  	int sg_size;
+>  	int order;
+> -	int bsize_elem;
+>  
+>  	sg_size = buflen / (PMCRAID_MAX_IOADLS - 1);
+>  	order = (sg_size > 0) ? get_order(sg_size) : 0;
+> -	bsize_elem = PAGE_SIZE * (1 << order);
+> -
+> -	/* Determine the actual number of sg entries needed */
+> -	if (buflen % bsize_elem)
+> -		num_elem = (buflen / bsize_elem) + 1;
+> -	else
+> -		num_elem = buflen / bsize_elem;
+>  
+>  	/* Allocate a scatter/gather list for the DMA */
+> -	sglist = kzalloc(sizeof(struct pmcraid_sglist) +
+> -			 (sizeof(struct scatterlist) * (num_elem - 1)),
+> -			 GFP_KERNEL);
+> -
+> +	sglist = kzalloc(sizeof(struct pmcraid_sglist), GFP_KERNEL);
+>  	if (sglist == NULL)
+>  		return NULL;
+>  
+> -	scatterlist = sglist->scatterlist;
+> -	sg_init_table(scatterlist, num_elem);
+>  	sglist->order = order;
+> -	sglist->num_sg = num_elem;
+> -	sg_size = buflen;
+> -
+> -	for (i = 0; i < num_elem; i++) {
+> -		page = alloc_pages(GFP_KERNEL|GFP_DMA|__GFP_ZERO, order);
+> -		if (!page) {
+> -			for (j = i - 1; j >= 0; j--)
+> -				__free_pages(sg_page(&scatterlist[j]), order);
+> -			kfree(sglist);
+> -			return NULL;
+> -		}
+> -
+> -		sg_set_page(&scatterlist[i], page,
+> -			sg_size < bsize_elem ? sg_size : bsize_elem, 0);
+> -		sg_size -= bsize_elem;
+> -	}
+> +	sgl_alloc_order(buflen, order, false,
+> +			GFP_KERNEL | GFP_DMA | __GFP_ZERO, &sglist->num_sg);
+>  
+>  	return sglist;
+>  }
+> diff --git a/drivers/scsi/pmcraid.h b/drivers/scsi/pmcraid.h
+> index 44da91712115..754ef30927e2 100644
+> --- a/drivers/scsi/pmcraid.h
+> +++ b/drivers/scsi/pmcraid.h
+> @@ -542,7 +542,7 @@ struct pmcraid_sglist {
+>  	u32 order;
+>  	u32 num_sg;
+>  	u32 num_dma_sg;
+> -	struct scatterlist scatterlist[1];
+> +	struct scatterlist *scatterlist;
+>  };
+>  
+>  /* page D0 inquiry data of focal point resource */
+> 
+The comment to ipr applied here, too.
+We need input from the pmcraid folks if this is a valid conversion.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/scsi/scsi_transport_sas.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Cheers,
 
-diff --git a/drivers/scsi/scsi_transport_sas.c b/drivers/scsi/scsi_transport_sas.c
-index 319dff970237..736a1f4f9676 100644
---- a/drivers/scsi/scsi_transport_sas.c
-+++ b/drivers/scsi/scsi_transport_sas.c
-@@ -177,7 +177,7 @@ static int sas_smp_dispatch(struct bsg_job *job)
- 	if (!scsi_is_host_device(job->dev))
- 		rphy = dev_to_rphy(job->dev);
- 
--	if (!job->req->next_rq) {
-+	if (!job->reply_payload.payload_len) {
- 		dev_warn(job->dev, "space for a smp response is missing\n");
- 		bsg_job_done(job, -EINVAL, 0);
- 		return 0;
+Hannes
 -- 
-2.14.1
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
