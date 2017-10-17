@@ -1,58 +1,58 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qk0-f170.google.com ([209.85.220.170]:53262 "EHLO
-        mail-qk0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750853AbdJRNTV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Oct 2017 09:19:21 -0400
-Received: by mail-qk0-f170.google.com with SMTP id y23so6130985qkb.10
-        for <linux-block@vger.kernel.org>; Wed, 18 Oct 2017 06:19:21 -0700 (PDT)
-Date: Wed, 18 Oct 2017 06:19:18 -0700
-From: Tejun Heo <tj@kernel.org>
-To: Paolo Valente <paolo.valente@linaro.org>
-Cc: linux-block <linux-block@vger.kernel.org>,
-        Luca Miccio <lucmiccio@gmail.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: high overhead of functions blkg_*stats_* in bfq
-Message-ID: <20171018131918.GB1302522@devbig577.frc2.facebook.com>
+To: Linus Walleij <linus.walleij@linaro.org>,
+ Paolo Valente <paolo.valente@linaro.org>, "H. Peter Anvin" <hpa@zytor.com>,
+ Akinobu Mita <akinobu.mita@gmail.com>, David Howells <dhowells@redhat.com>
+Cc: Tejun Heo <tj@kernel.org>, linux-block <linux-block@vger.kernel.org>,
+ Luca Miccio <lucmiccio@gmail.com>, Mark Brown <broonie@kernel.org>,
+ Ulf Hansson <ulf.hansson@linaro.org>
 References: <07DF24AB-9B62-4EE5-8B45-3E04C1CEA84C@linaro.org>
+ <AE364BB2-E347-4A5E-BFF7-AAAA32C512F5@linaro.org>
+ <CACRpkdZYMTqgPur_S1sFfpZfT3euzDLs=pxgs-fG=+3AtMSbig@mail.gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <e32acb12-729e-a407-d31b-16c0e0fd3e11@kernel.dk>
+Date: Tue, 17 Oct 2017 10:49:16 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <07DF24AB-9B62-4EE5-8B45-3E04C1CEA84C@linaro.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <CACRpkdZYMTqgPur_S1sFfpZfT3euzDLs=pxgs-fG=+3AtMSbig@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Hello, Paolo.
+On 10/17/2017 10:45 AM, Linus Walleij wrote:
+> On Tue, Oct 17, 2017 at 2:45 PM, Paolo Valente <paolo.valente@linaro.org> wrote:
+> 
+>> one of the most time-consuming operations needed by some blkg_*stats_*
+>> functions is, e.g., find_next_bit, for which we don't see any trivial
+>> replacement.
+> 
+> So this is one of the things that often falls down to a per-arch
+> assembly optimization, c.f. arch/arm/include/asm/bitops.h
+> 
+> On x86 I can't see any assembly optimization of this, so the
+> generic routines in lib/find_bit.c are used AFAICT.
+> 
+> This might be a silly question, but If you are testing this on x86,
+> do you think it would help if someone stepped in and slapped in
+> some optimized assembly for those functions?
+> 
+> (I guess that is like saying, "instead of a trivial replacement,
+> what about a really complicated one"?)
+> 
+> A simple git log arch/x86/include/asm/bitops.h doesn't show
+> any traces of anyone trying to optimize those for x86.
+> 
+> I paged in the x86 assembly people, they definately knows whether
+> that is a good idea or if it sucks. (And if it was done in the past.)
 
-On Tue, Oct 17, 2017 at 12:11:01PM +0200, Paolo Valente wrote:
-...
-> protected by a per-device scheduler lock.  To give you an idea, on an
-> Intel i7-4850HQ, and with 8 threads doing random I/O in parallel on
-> null_blk (configured with 0 latency), if the update of groups stats is
-> removed, then the throughput grows from 260 to 404 KIOPS.  This and
-> all the other results we might share in this thread can be reproduced
-> very easily with a (useful) script made by Luca Miccio [1].
+If the problem is as big as described, I don't think an optimized
+version will matter at all. Maybe it'll make things 10% faster,
+that's not solving the issue.
 
-I don't think the old request_queue is ever built for multiple CPUs
-hitting on a mem-backed device.
+It's probably more likely that a better data structure should be
+used, if we're spending a lot of time in find_bit. Maybe this
+happens when the space is mostly full? A bitmap of bitmaps
+might help for that.
 
-> We tried to understand the reason for this high overhead, and, in
-> particular, to find out whether whether there was some issue that we
-> could address on our own.  But the causes seem somehow substantial:
-> one of the most time-consuming operations needed by some blkg_*stats_*
-> functions is, e.g., find_next_bit, for which we don't see any trivial
-> replacement.
-
-Can you point to the specific ones?  I can't find find_next_bit usages
-in generic blkg code.
-
-> So, as a first attempt to reduce this severe slowdown, we have made a
-> patch that moves the invocation of blkg_*stats_* functions outside the
-> critical sections protected by the bfq lock.  Still, these functions
-> apparently need to be protected with the request_queue lock, because
-
-blkgs are already protected with RCU, so RCU protection should be
-enough.
-
-Thanks.
+But I'm just guessing here, as I haven't look into the problem.
 
 -- 
-tejun
+Jens Axboe
