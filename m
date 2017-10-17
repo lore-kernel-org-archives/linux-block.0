@@ -1,65 +1,34 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:58130 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933564AbdJQGdj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Oct 2017 02:33:39 -0400
-Subject: Re: [PATCH v9 09/10] block, scsi: Make SCSI quiesce and resume work
- reliably
-To: Bart Van Assche <bart.vanassche@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
+Return-Path: <martin.petersen@oracle.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Ming Lei <ming.lei@redhat.com>,
-        Hannes Reinecke <hare@suse.com>,
+        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.com>,
         Johannes Thumshirn <jthumshirn@suse.de>
+Subject: Re: [PATCH v9 09/10] block, scsi: Make SCSI quiesce and resume work reliably
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
 References: <20171016232905.5047-1-bart.vanassche@wdc.com>
- <20171016232905.5047-10-bart.vanassche@wdc.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <df8b960d-e65d-3e5e-9de7-4423aa65ad92@suse.de>
-Date: Tue, 17 Oct 2017 08:33:36 +0200
+	<20171016232905.5047-10-bart.vanassche@wdc.com>
+Date: Tue, 17 Oct 2017 00:17:32 -0400
+In-Reply-To: <20171016232905.5047-10-bart.vanassche@wdc.com> (Bart Van
+	Assche's message of "Mon, 16 Oct 2017 16:29:04 -0700")
+Message-ID: <yq11sm2xvab.fsf@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20171016232905.5047-10-bart.vanassche@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-On 10/17/2017 01:29 AM, Bart Van Assche wrote:
+
+Bart,
+
 > The contexts from which a SCSI device can be quiesced or resumed are:
 > * Writing into /sys/class/scsi_device/*/device/state.
 > * SCSI parallel (SPI) domain validation.
 > * The SCSI device power management methods. See also scsi_bus_pm_ops.
-> 
-> It is essential during suspend and resume that neither the filesystem
-> state nor the filesystem metadata in RAM changes. This is why while
-> the hibernation image is being written or restored that SCSI devices
-> are quiesced. The SCSI core quiesces devices through scsi_device_quiesce()
-> and scsi_device_resume(). In the SDEV_QUIESCE state execution of
-> non-preempt requests is deferred. This is realized by returning
-> BLKPREP_DEFER from inside scsi_prep_state_check() for quiesced SCSI
-> devices. Avoid that a full queue prevents power management requests
-> to be submitted by deferring allocation of non-preempt requests for
-> devices in the quiesced state. This patch has been tested by running
-> the following commands and by verifying that after resume the fio job
-> is still running:
-> 
-(We've discussed this at ALPSS already:)
 
-How do you ensure that PREEMPT requests are not stuck in the queue
-_behind_ non-PREEMPT requests?
-Once they are in the queue the request are already allocated, so your
-deferred allocation won't work.
-_And_ deferred requests will be re-inserted at the head of the queue.
-Consequently the PREEMPT request will never ever scheduled during quiesce.
-How do you avoid such a scenario?
+The SCSI bits look fine to me.
 
-Cheers,
+Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-Hannes
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+Martin K. Petersen	Oracle Linux Engineering
