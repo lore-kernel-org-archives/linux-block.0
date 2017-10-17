@@ -1,41 +1,67 @@
-Return-Path: <prvs=456029237=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"jthumshirn@suse.de" <jthumshirn@suse.de>, "hch@lst.de" <hch@lst.de>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"oleksandr@natalenko.name" <oleksandr@natalenko.name>, "hare@suse.com"
-	<hare@suse.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 17 Oct 2017 18:43:22 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Oleksandr Natalenko <oleksandr@natalenko.name>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>
 Subject: Re: [PATCH v9 09/10] block, scsi: Make SCSI quiesce and resume work
  reliably
-Date: Tue, 17 Oct 2017 20:08:18 +0000
-Message-ID: <1508270897.3457.7.camel@wdc.com>
+Message-ID: <20171017104321.GC17898@ming.t460p>
 References: <20171016232905.5047-1-bart.vanassche@wdc.com>
-	 <20171016232905.5047-10-bart.vanassche@wdc.com>
-	 <20171017004319.GB15996@ming.t460p>
-In-Reply-To: <20171017004319.GB15996@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
+ <20171016232905.5047-10-bart.vanassche@wdc.com>
+ <df8b960d-e65d-3e5e-9de7-4423aa65ad92@suse.de>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <df8b960d-e65d-3e5e-9de7-4423aa65ad92@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE3LTEwLTE3IGF0IDA4OjQzICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
-TW9uLCBPY3QgMTYsIDIwMTcgYXQgMDQ6Mjk6MDRQTSAtMDcwMCwgQmFydCBWYW4gQXNzY2hlIHdy
-b3RlOg0KPiA+IFsgLi4uIF0NCj4gPiAgaW50DQo+ID4gIHNjc2lfZGV2aWNlX3F1aWVzY2Uoc3Ry
-dWN0IHNjc2lfZGV2aWNlICpzZGV2KQ0KPiA+ICB7DQo+ID4gKwlzdHJ1Y3QgcmVxdWVzdF9xdWV1
-ZSAqcSA9IHNkZXYtPnJlcXVlc3RfcXVldWU7DQo+ID4gIAlpbnQgZXJyOw0KPiA+ICANCj4gPiAr
-CS8qDQo+ID4gKwkgKiBJdCBpcyBhbGxvd2VkIHRvIGNhbGwgc2NzaV9kZXZpY2VfcXVpZXNjZSgp
-IG11bHRpcGxlIHRpbWVzIGZyb20NCj4gPiArCSAqIHRoZSBzYW1lIGNvbnRleHQgYnV0IGNvbmN1
-cnJlbnQgc2NzaV9kZXZpY2VfcXVpZXNjZSgpIGNhbGxzIGFyZQ0KPiA+ICsJICogbm90IGFsbG93
-ZWQuDQo+ID4gKwkgKi8NCj4gPiArCVdBUk5fT05fT05DRShzZGV2LT5xdWllc2NlZF9ieSAmJiBz
-ZGV2LT5xdWllc2NlZF9ieSAhPSBjdXJyZW50KTsNCj4gDQo+IElmIHRoZSBhYm92ZSBsaW5lIGFu
-ZCBjb21tZW50IGlzIHJlbW92ZWQsIGV2ZXJ5dGhpbmcgaXMgc3RpbGwgZmluZSwNCj4gZWl0aGVy
-IG5lc3RlZCBjYWxsaW5nIG9yIGNvbmN1cnJlbnQgY2FsbGluZywgaXNuJ3QgaXQ/DQoNCklmIHNj
-c2lfZGV2aWNlX3F1aWVzY2UoKSBpcyBjYWxsZWQgY29uY3VycmVudGx5IGZyb20gdHdvIGRpZmZl
-cmVudCB0aHJlYWRzDQp0aGVuIHRoZSBmaXJzdCBzY3NpX2RldmljZV9yZXN1bWUoKSBjYWxsIHdp
-bGwgcmVzdW1lIEkvTyBmb3IgKmJvdGgqIGNvbnRleHRzLg0KVGhhdCdzIG5vdCB3aGF0IHRoZSBj
-YWxsZXJzIGV4cGVjdC4gSWYgc2NzaV9kZXZpY2VfcXVpZXNjZSgpIGFuZA0Kc2NzaV9kZXZpY2Vf
-cmVzdW1lKCkgYXJlIGNhbGxlZCBjb25jdXJyZW50bHkgdGhhdCB3b3VsZCBiZSBldmVuIHdvcnNl
-LiBJIHRoaW5rDQp3ZSAqcmVhbGx5KiBzaG91bGQga25vdyB3aGV0aGVyIGNhbGxlcnMgc2VyaWFs
-aXplIHNjc2lfZGV2aWNlX3F1aWVzY2UoKSBhbmQNCnNjc2lfZGV2aWNlX3Jlc3VtZSgpIGNhbGxz
-IHByb3Blcmx5LiBIZW5jZSB0aGUgV0FSTl9PTl9PTkNFKCkgc3RhdGVtZW50Lg0KDQpCYXJ0Lg==
+On Tue, Oct 17, 2017 at 08:33:36AM +0200, Hannes Reinecke wrote:
+> On 10/17/2017 01:29 AM, Bart Van Assche wrote:
+> > The contexts from which a SCSI device can be quiesced or resumed are:
+> > * Writing into /sys/class/scsi_device/*/device/state.
+> > * SCSI parallel (SPI) domain validation.
+> > * The SCSI device power management methods. See also scsi_bus_pm_ops.
+> > 
+> > It is essential during suspend and resume that neither the filesystem
+> > state nor the filesystem metadata in RAM changes. This is why while
+> > the hibernation image is being written or restored that SCSI devices
+> > are quiesced. The SCSI core quiesces devices through scsi_device_quiesce()
+> > and scsi_device_resume(). In the SDEV_QUIESCE state execution of
+> > non-preempt requests is deferred. This is realized by returning
+> > BLKPREP_DEFER from inside scsi_prep_state_check() for quiesced SCSI
+> > devices. Avoid that a full queue prevents power management requests
+> > to be submitted by deferring allocation of non-preempt requests for
+> > devices in the quiesced state. This patch has been tested by running
+> > the following commands and by verifying that after resume the fio job
+> > is still running:
+> > 
+> (We've discussed this at ALPSS already:)
+> 
+> How do you ensure that PREEMPT requests are not stuck in the queue
+> _behind_ non-PREEMPT requests?
+
+Once the PREEMP_ONLY flag is set, blk_mq_freeze_queue() is called for
+draining up all requests in queue first, and new requests are prevented
+from being allocated meantime.
+
+So looks no such issue?
+
+> Once they are in the queue the request are already allocated, so your
+> deferred allocation won't work.
+> _And_ deferred requests will be re-inserted at the head of the queue.
+> Consequently the PREEMPT request will never ever scheduled during quiesce.
+> How do you avoid such a scenario?
+
+>From the implementation, no any PREEMPT request can be allocated once
+scsi_device_quiesce() returns.
+
+Also not see deferred requests in this patch, could you explain it a bit?
+
+
+-- 
+Ming
