@@ -1,48 +1,47 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:34638 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:35174 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752563AbdJQFMb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Oct 2017 01:12:31 -0400
-Date: Tue, 17 Oct 2017 13:12:10 +0800
+        id S1753123AbdJQFEi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 17 Oct 2017 01:04:38 -0400
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>
 Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
         linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
         Omar Sandoval <osandov@fb.com>,
-        John Garry <john.garry@huawei.com>
-Subject: Re: [PATCH 0/2] block/SCSI MQ: two RESTART related patches
-Message-ID: <20171017051209.GF15996@ming.t460p>
-References: <20171017050418.22555-1-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171017050418.22555-1-ming.lei@redhat.com>
+        John Garry <john.garry@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 0/2] block/SCSI MQ: two RESTART related patches
+Date: Tue, 17 Oct 2017 13:04:16 +0800
+Message-Id: <20171017050418.22555-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, Oct 17, 2017 at 01:04:16PM +0800, Ming Lei wrote:
-> Hi Jens,
-> 
-> The 1st patch runs idle hctx after dealy in scsi_mq_get_budget(),
-> so that we can keep same behaviour with before, and it can be
-> thought as a fix.
-> 
-> The 2nd patch cleans up RESTART, and removes handling for TAG_SHARED
-> from current blk-mq's RESTART mechanism because SCSI_MQ can covers its
-> restart by itself, so that no need to handle TAG_SHARED in blk-mq
-> RESTART. And >20% IOPS boost is observed in my rand read test over
-> scsi_debug.
-> 
-> John, please test this two patches and see if it may improve your SAS
-> IO performance, and you can find the two patches in the following branch:
-> 
-> 	https://github.com/ming1/linux/commits/blk_mq_improve_restart_V1
+Hi Jens,
 
-Forget to mention, you need to either pull the above branch directly
-or apply the two patches against for-next branch of Jens' block
-tree:
+The 1st patch runs idle hctx after dealy in scsi_mq_get_budget(),
+so that we can keep same behaviour with before, and it can be
+thought as a fix.
 
-	git://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git #for-next
+The 2nd patch cleans up RESTART, and removes handling for TAG_SHARED
+from current blk-mq's RESTART mechanism because SCSI_MQ can covers its
+restart by itself, so that no need to handle TAG_SHARED in blk-mq
+RESTART. And >20% IOPS boost is observed in my rand read test over
+scsi_debug.
+
+John, please test this two patches and see if it may improve your SAS
+IO performance, and you can find the two patches in the following branch:
+
+	https://github.com/ming1/linux/commits/blk_mq_improve_restart_V1
+
+
+Ming Lei (2):
+  SCSI: run idle hctx after delay in scsi_mq_get_budget()
+  blk-mq: don't handle TAG_SHARED in restart
+
+ block/blk-mq-sched.c    | 78 +++----------------------------------------------
+ drivers/scsi/scsi_lib.c | 13 +++++++--
+ 2 files changed, 14 insertions(+), 77 deletions(-)
 
 -- 
-Ming
+2.9.5
