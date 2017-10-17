@@ -1,57 +1,46 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f44.google.com ([74.125.82.44]:54894 "EHLO
-        mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751883AbdJFLwj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 Oct 2017 07:52:39 -0400
-Received: by mail-wm0-f44.google.com with SMTP id i124so7420222wmf.3
-        for <linux-block@vger.kernel.org>; Fri, 06 Oct 2017 04:52:39 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 2/2] lightnvm: pblk: avoid being reported as hung on rated GC
-Date: Fri,  6 Oct 2017 13:52:22 +0200
-Message-Id: <1507290742-8970-3-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1507290742-8970-1-git-send-email-javier@cnexlabs.com>
-References: <1507290742-8970-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v9 06/10] block: Introduce BLK_MQ_REQ_PREEMPT
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ Oleksandr Natalenko <oleksandr@natalenko.name>,
+ Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.com>,
+ Johannes Thumshirn <jthumshirn@suse.de>
+References: <20171016232905.5047-1-bart.vanassche@wdc.com>
+ <20171016232905.5047-7-bart.vanassche@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <58fa4acf-7c6b-b71a-a898-b1457052ad6a@suse.de>
+Date: Tue, 17 Oct 2017 08:26:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20171016232905.5047-7-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-The amount of GC I/O on the write buffer is managed by the rate-limiter,
-which is calculated as a function of the number of available free
-blocks. When reaching the stable point, we risk having scheduled more
-I/Os for GC than are allowed on the write buffer. This would result on
-the GC semaphore balancing the outstanding read GC I/Os to be reported
-as "hung", though the behavior is normal.
+On 10/17/2017 01:29 AM, Bart Van Assche wrote:
+> Set RQF_PREEMPT if BLK_MQ_REQ_PREEMPT is passed to
+> blk_get_request_flags().
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Tested-by: Martin Steigerwald <martin@lichtvoll.de>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
+>  block/blk-core.c       | 4 +++-
+>  block/blk-mq.c         | 2 ++
+>  include/linux/blk-mq.h | 1 +
+>  3 files changed, 6 insertions(+), 1 deletion(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Solve this by allowing to schedule when we detect that the read GC path
-is not moving forward.
+Cheers,
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/pblk-gc.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-index b8323e34d1bc..00d5698d64a9 100644
---- a/drivers/lightnvm/pblk-gc.c
-+++ b/drivers/lightnvm/pblk-gc.c
-@@ -218,7 +218,13 @@ static void pblk_gc_line_prepare_ws(struct work_struct *work)
- 	gc_rq_ws->line = line;
- 	gc_rq_ws->priv = gc_rq;
- 
--	down(&gc->gc_sem);
-+	/* The write GC path can be much slower than the read GC one due to
-+	 * the budget imposed by the rate-limiter. Balance in case that we get
-+	 * back pressure from the write GC path.
-+	 */
-+	while (down_timeout(&gc->gc_sem, msecs_to_jiffies(30000)))
-+		io_schedule();
-+
- 	kref_get(&line->ref);
- 
- 	INIT_WORK(&gc_rq_ws->ws, pblk_gc_line_ws);
+Hannes
 -- 
-2.7.4
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
