@@ -1,71 +1,57 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:54338 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932353AbdJ3VrC (ORCPT
+Received: from mx1.didichuxing.com ([111.202.154.82]:7825 "EHLO
+        BJEXCAS005.didichuxing.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S965224AbdJQP4c (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Oct 2017 17:47:02 -0400
-Received: by mail-pf0-f194.google.com with SMTP id n89so12061786pfk.11
-        for <linux-block@vger.kernel.org>; Mon, 30 Oct 2017 14:47:01 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Liang Chen <liangchen.linux@gmail.com>
-Subject: [PATCH 5/5] bcache: explicitly destroy mutex while exiting
-Date: Mon, 30 Oct 2017 14:46:35 -0700
-Message-Id: <20171030214635.29888-6-mlyle@lyle.org>
-In-Reply-To: <20171030214635.29888-1-mlyle@lyle.org>
-References: <20171030214635.29888-1-mlyle@lyle.org>
+        Tue, 17 Oct 2017 11:56:32 -0400
+Date: Tue, 17 Oct 2017 23:56:21 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: <axboe@kernel.dk>
+CC: <jthumshirn@suse.de>, <linux-block@vger.kernel.org>
+Subject: [PATCH v4] blkcg: add sanity check for blkcg policy operations
+Message-ID: <20171017155621.GA38911@bogon.didichuxing.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Liang Chen <liangchen.linux@gmail.com>
+blkcg policy should keep cpd/pd's alloc_fn and free_fn in pairs,
+otherwise policy would register fail.
 
-mutex_destroy does nothing most of time, but it's better to call
-it to make the code future proof and it also has some meaning
-for like mutex debug.
-
-As Coly pointed out in a previous review, bcache_exit() may not be
-able to handle all the references properly if userspace registers
-cache and backing devices right before bch_debug_init runs and
-bch_debug_init failes later. So not exposing userspace interface
-until everything is ready to avoid that issue.
-
-Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
-Reviewed-by: Coly Li <colyli@suse.de>
-Reviewed-by: Eric Wheeler <bcache@linux.ewheeler.net>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
 ---
- drivers/md/bcache/super.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Changes since V4:
+ * merge "if(cpd->xxx)" and "if(pd->xxx)" together
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 46134c45c6f6..b4d28928dec5 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -2095,6 +2095,7 @@ static void bcache_exit(void)
- 	if (bcache_major)
- 		unregister_blkdev(bcache_major, "bcache");
- 	unregister_reboot_notifier(&reboot);
-+	mutex_destroy(&bch_register_lock);
- }
+Changes since V3:
+ * make if more cleaner by using !pold->cpd_alloc_fn ^ !pol->cpd_free_fn
+
+Chagnes since V2:
+ * merge blkcg_policy_check_ops into the caller blkcg_policy_register
+
+V1:
+ * add blkcg_policy_check_ops to check cpd/pd's alloc_fn and free_fn in
+ * pairs.
+
+ block/blk-cgroup.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index e7ec676..4117524 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1419,6 +1419,11 @@ int blkcg_policy_register(struct blkcg_policy *pol)
+ 	if (i >= BLKCG_MAX_POLS)
+ 		goto err_unlock;
  
- static int __init bcache_init(void)
-@@ -2113,14 +2114,15 @@ static int __init bcache_init(void)
- 	bcache_major = register_blkdev(0, "bcache");
- 	if (bcache_major < 0) {
- 		unregister_reboot_notifier(&reboot);
-+		mutex_destroy(&bch_register_lock);
- 		return bcache_major;
- 	}
- 
- 	if (!(bcache_wq = alloc_workqueue("bcache", WQ_MEM_RECLAIM, 0)) ||
- 	    !(bcache_kobj = kobject_create_and_add("bcache", fs_kobj)) ||
--	    sysfs_create_files(bcache_kobj, files) ||
- 	    bch_request_init() ||
--	    bch_debug_init(bcache_kobj))
-+	    bch_debug_init(bcache_kobj) ||
-+	    sysfs_create_files(bcache_kobj, files))
- 		goto err;
- 
- 	return 0;
++	/* Make sure cpd/pd_alloc_fn and cpd/pd_free_fn in pairs */
++	if ((!pol->cpd_alloc_fn ^ !pol->cpd_free_fn) ||
++		(!pol->pd_alloc_fn ^ !pol->pd_free_fn))
++		goto err_unlock;
++
+ 	/* register @pol */
+ 	pol->plid = i;
+ 	blkcg_policy[pol->plid] = pol;
 -- 
-2.11.0
+2.9.4
