@@ -1,60 +1,41 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from LGEAMRELO13.lge.com ([156.147.23.53]:45698 "EHLO
-        lgeamrelo13.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S967270AbdJRJjM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 Oct 2017 05:39:12 -0400
-From: Byungchul Park <byungchul.park@lge.com>
-To: peterz@infradead.org, mingo@kernel.org
-Cc: tglx@linutronix.de, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, tj@kernel.org, johannes.berg@intel.com,
-        oleg@redhat.com, amir73il@gmail.com, david@fromorbit.com,
-        darrick.wong@oracle.com, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        hch@infradead.org, idryomov@gmail.com, kernel-team@lge.com
-Subject: [RESEND PATCH 1/3] completion: Add support for initializing completion with lockdep_map
-Date: Wed, 18 Oct 2017 18:38:50 +0900
-Message-Id: <1508319532-24655-2-git-send-email-byungchul.park@lge.com>
-In-Reply-To: <1508319532-24655-1-git-send-email-byungchul.park@lge.com>
-References: <1508319532-24655-1-git-send-email-byungchul.park@lge.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=456029237=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hare@suse.de" <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"nab@linux-iscsi.org" <nab@linux-iscsi.org>, "sagi@grimberg.me"
+	<sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>, "hare@suse.com" <hare@suse.com>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH v2 5/8] target: Use sgl_alloc_order() and sgl_free()
+Date: Tue, 17 Oct 2017 14:31:11 +0000
+Message-ID: <1508250670.3596.2.camel@wdc.com>
+References: <20171016224940.1332-1-bart.vanassche@wdc.com>
+	 <20171016224940.1332-6-bart.vanassche@wdc.com>
+	 <c5e05f84-2602-5c3f-521e-6f35601011cf@suse.de>
+In-Reply-To: <c5e05f84-2602-5c3f-521e-6f35601011cf@suse.de>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-Sometimes, we want to initialize completions with sparate lockdep maps
-to assign lock classes under control. For example, the workqueue code
-manages lockdep maps, as it can classify lockdep maps properly.
-Provided a function for that purpose.
-
-Signed-off-by: Byungchul Park <byungchul.park@lge.com>
----
- include/linux/completion.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/include/linux/completion.h b/include/linux/completion.h
-index cae5400..182d56e 100644
---- a/include/linux/completion.h
-+++ b/include/linux/completion.h
-@@ -49,6 +49,13 @@ static inline void complete_release_commit(struct completion *x)
- 	lock_commit_crosslock((struct lockdep_map *)&x->map);
- }
- 
-+#define init_completion_with_map(x, m)					\
-+do {									\
-+	lockdep_init_map_crosslock((struct lockdep_map *)&(x)->map,	\
-+			(m)->name, (m)->key, 0);				\
-+	__init_completion(x);						\
-+} while (0)
-+
- #define init_completion(x)						\
- do {									\
- 	static struct lock_class_key __key;				\
-@@ -58,6 +65,7 @@ static inline void complete_release_commit(struct completion *x)
- 	__init_completion(x);						\
- } while (0)
- #else
-+#define init_completion_with_map(x, m) __init_completion(x)
- #define init_completion(x) __init_completion(x)
- static inline void complete_acquire(struct completion *x) {}
- static inline void complete_release(struct completion *x) {}
--- 
-1.9.1
+T24gVHVlLCAyMDE3LTEwLTE3IGF0IDA4OjE0ICswMjAwLCBIYW5uZXMgUmVpbmVja2Ugd3JvdGU6
+DQo+IE9uIDEwLzE3LzIwMTcgMTI6NDkgQU0sIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gPiBb
+IC4uLiBdDQo+ID4gIHZvaWQgdGFyZ2V0X2ZyZWVfc2dsKHN0cnVjdCBzY2F0dGVybGlzdCAqc2ds
+LCBpbnQgbmVudHMpDQo+ID4gIHsNCj4gPiAtCXN0cnVjdCBzY2F0dGVybGlzdCAqc2c7DQo+ID4g
+LQlpbnQgY291bnQ7DQo+ID4gLQ0KPiA+IC0JZm9yX2VhY2hfc2coc2dsLCBzZywgbmVudHMsIGNv
+dW50KQ0KPiA+IC0JCV9fZnJlZV9wYWdlKHNnX3BhZ2Uoc2cpKTsNCj4gPiAtDQo+ID4gLQlrZnJl
+ZShzZ2wpOw0KPiA+ICsJc2dsX2ZyZWUoc2dsKTsNCj4gPiAgfQ0KPiA+ICBFWFBPUlRfU1lNQk9M
+KHRhcmdldF9mcmVlX3NnbCk7DQo+ID4gIA0KPiA+IEBAIC0yNDIzLDQyICsyNDE3LDEwIEBAIGlu
+dA0KPiA+ICB0YXJnZXRfYWxsb2Nfc2dsKHN0cnVjdCBzY2F0dGVybGlzdCAqKnNnbCwgdW5zaWdu
+ZWQgaW50ICpuZW50cywgdTMyIGxlbmd0aCwNCj4gPiAgCQkgYm9vbCB6ZXJvX3BhZ2UsIGJvb2wg
+Y2hhaW5hYmxlKQ0KPiA+ICB7DQo+ID4gLQlbIC4uLiBdDQo+ID4gKwkqc2dsID0gc2dsX2FsbG9j
+X29yZGVyKGxlbmd0aCwgMCwgY2hhaW5hYmxlLCBnZnAsIG5lbnRzKTsNCj4gPiArCXJldHVybiAq
+c2dsID8gMCA6IC1FTk9NRU07DQo+ID4gIH0NCj4gPiAgRVhQT1JUX1NZTUJPTCh0YXJnZXRfYWxs
+b2Nfc2dsKTsNCj4gPiAgDQo+ID4gVGhlIGNhbGxpbmcgY29udmVudGlvbiBmcm9tIHRhcmdldF9h
+bGxvY19zZ2woKSBpcyBkZWNpZGVkbHkgZG9kZ3kuDQo+IA0KPiBDYW4ndCB3ZSBjb252ZXJ0IGl0
+IGludG8gcmV0dXJuaW5nIHRoZSBzZ2wsIGFuZCByZW1vdmUgdGhlIGZpcnN0IHBhcmFtZXRlcj8N
+Cg0KSGVsbG8gSGFubmVzLA0KDQpBbm90aGVyIG9wdGlvbiBpcyB0byByZW1vdmUgdGhlIHRhcmdl
+dF9hbGxvY19zZ2woKSBhbmQgdGFyZ2V0X2ZyZWVfc2dsKCkgZnVuY3Rpb25zDQphbmQgdG8gbWFr
+ZSBMSU8gdGFyZ2V0IGRyaXZlcnMgY2FsbCBzZ2xfYWxsb2Nfb3JkZXIoKSBhbmQgc2dsX2ZyZWVf
+b3JkZXIoKSBkaXJlY3RseS4NCkRvIHlvdSBwZXJoYXBzIGhhdmUgYSBwcmVmZXJlbmNlIGZvciBv
+bmUgb2YgdGhlc2UgdHdvIGFwcHJvYWNoZXM/DQoNClRoYW5rcywNCg0KQmFydC4=
