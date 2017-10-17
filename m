@@ -1,44 +1,55 @@
-Return-Path: <prvs=456029237=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hare@suse.de" <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-	"anil_ravindranath@pmc-sierra.com" <anil_ravindranath@pmc-sierra.com>
+Return-Path: <hare@suse.de>
 Subject: Re: [PATCH v2 7/8] scsi/pmcraid: Remove an unused structure member
-Date: Tue, 17 Oct 2017 14:28:29 +0000
-Message-ID: <1508250508.3596.0.camel@wdc.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ Anil Ravindranath <anil_ravindranath@pmc-sierra.com>
 References: <20171016224940.1332-1-bart.vanassche@wdc.com>
-	 <20171016224940.1332-8-bart.vanassche@wdc.com>
-	 <5ea64c10-aa3e-f0ee-cfba-e93b3d8e1428@suse.de>
-In-Reply-To: <5ea64c10-aa3e-f0ee-cfba-e93b3d8e1428@suse.de>
-Content-Type: text/plain; charset="utf-8"
+ <20171016224940.1332-8-bart.vanassche@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <5ea64c10-aa3e-f0ee-cfba-e93b3d8e1428@suse.de>
+Date: Tue, 17 Oct 2017 08:21:33 +0200
 MIME-Version: 1.0
+In-Reply-To: <20171016224940.1332-8-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE3LTEwLTE3IGF0IDA4OjIxICswMjAwLCBIYW5uZXMgUmVpbmVja2Ugd3JvdGU6
-DQo+IE9uIDEwLzE3LzIwMTcgMTI6NDkgQU0sIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gPiBT
-aWduZWQtb2ZmLWJ5OiBCYXJ0IFZhbiBBc3NjaGUgPGJhcnQudmFuYXNzY2hlQHdkYy5jb20+DQo+
-ID4gUmV2aWV3ZWQtYnk6IEpvaGFubmVzIFRodW1zaGlybiA8anRodW1zaGlybkBzdXNlLmRlPg0K
-PiA+IENjOiBsaW51eC1zY3NpQHZnZXIua2VybmVsLm9yZw0KPiA+IENjOiBNYXJ0aW4gSy4gUGV0
-ZXJzZW4gPG1hcnRpbi5wZXRlcnNlbkBvcmFjbGUuY29tPg0KPiA+IENjOiBBbmlsIFJhdmluZHJh
-bmF0aCA8YW5pbF9yYXZpbmRyYW5hdGhAcG1jLXNpZXJyYS5jb20+DQo+ID4gLS0tDQo+ID4gIGRy
-aXZlcnMvc2NzaS9wbWNyYWlkLmggfCAxIC0NCj4gPiAgMSBmaWxlIGNoYW5nZWQsIDEgZGVsZXRp
-b24oLSkNCj4gPiANCj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9zY3NpL3BtY3JhaWQuaCBiL2Ry
-aXZlcnMvc2NzaS9wbWNyYWlkLmgNCj4gPiBpbmRleCA4YmZhYzcyYTI0MmIuLjQ0ZGE5MTcxMjEx
-NSAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL3Njc2kvcG1jcmFpZC5oDQo+ID4gKysrIGIvZHJp
-dmVycy9zY3NpL3BtY3JhaWQuaA0KPiA+IEBAIC01NDIsNyArNTQyLDYgQEAgc3RydWN0IHBtY3Jh
-aWRfc2dsaXN0IHsNCj4gPiAgCXUzMiBvcmRlcjsNCj4gPiAgCXUzMiBudW1fc2c7DQo+ID4gIAl1
-MzIgbnVtX2RtYV9zZzsNCj4gPiAtCXUzMiBidWZmZXJfbGVuOw0KPiA+ICAJc3RydWN0IHNjYXR0
-ZXJsaXN0IHNjYXR0ZXJsaXN0WzFdOw0KPiA+ICB9Ow0KPiA+ICANCj4gPiANCj4gDQo+IFRoaXMg
-YWN0dWFsbHkgaXMgdGhlIHNhbWUgc3RvcnkgdGhhdCB3ZSd2ZSBoYWQgd2l0aCBpcHIgKGFuZCwg
-bG9va2luZyBhdA0KPiB0aGUgY29kZSwgdGhvc2UgdHdvIGRyaXZlcnMgbG9vayBhd2Z1bGx5IHNp
-bWlsYXIgLi4uKS4NCj4gcG1jcmFpZF9zZ2xpc3QgbG9va3MgYXMgaWYgaXQncyBhIGhhcmR3YXJl
-LWRlcGVuZGVudCBzdHJ1Y3R1cmUsIHNvIGp1c3QNCj4gcmVtb3Zpbmcgb25lIGVudHJ5IGZyb20g
-dGhlIG1pZGRsZSBvZiBhIHN0cnVjdHVyZSBtaWdodCBub3QgYmUgYSBnb29kIGlkZWEuDQo+IEJ1
-dCB0aGlzIGlzIHNvbWV0aGluZyBmb3IgdGhlIHBtY3JhaWQgZm9sa3MgdG8gY2xhcmlmeS4NCg0K
-SGVsbG8gSGFubmVzLA0KDQpTb3JyeSBidXQgSSBkb24ndCBzZWUgaG93IGEgc3RydWN0dXJlIHRo
-YXQgY29udGFpbnMgYSBzdHJ1Y3Qgc2NhdHRlcmxpc3QNCmNvdWxkIGJlIGhhcmR3YXJlLWRlcGVu
-ZGVudD8NCg0KVGhhbmtzLA0KDQpCYXJ0Lg==
+On 10/17/2017 12:49 AM, Bart Van Assche wrote:
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+> Cc: linux-scsi@vger.kernel.org
+> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+> Cc: Anil Ravindranath <anil_ravindranath@pmc-sierra.com>
+> ---
+>  drivers/scsi/pmcraid.h | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/scsi/pmcraid.h b/drivers/scsi/pmcraid.h
+> index 8bfac72a242b..44da91712115 100644
+> --- a/drivers/scsi/pmcraid.h
+> +++ b/drivers/scsi/pmcraid.h
+> @@ -542,7 +542,6 @@ struct pmcraid_sglist {
+>  	u32 order;
+>  	u32 num_sg;
+>  	u32 num_dma_sg;
+> -	u32 buffer_len;
+>  	struct scatterlist scatterlist[1];
+>  };
+>  
+> 
+This actually is the same story that we've had with ipr (and, looking at
+the code, those two drivers look awfully similar ...).
+pmcraid_sglist looks as if it's a hardware-dependent structure, so just
+removing one entry from the middle of a structure might not be a good idea.
+But this is something for the pmcraid folks to clarify.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
