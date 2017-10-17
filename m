@@ -1,42 +1,68 @@
-Return-Path: <BATV+33c0a560d8cf4f6c9bdc+5169+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 08/17] nvme: use kref_get_unless_zero in nvme_find_get_ns
-Date: Wed, 18 Oct 2017 18:52:49 +0200
-Message-Id: <20171018165258.23212-9-hch@lst.de>
-In-Reply-To: <20171018165258.23212-1-hch@lst.de>
-References: <20171018165258.23212-1-hch@lst.de>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>,
+        John Garry <john.garry@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 1/2] SCSI: run idle hctx after delay in scsi_mq_get_budget()
+Date: Tue, 17 Oct 2017 13:04:17 +0800
+Message-Id: <20171017050418.22555-2-ming.lei@redhat.com>
+In-Reply-To: <20171017050418.22555-1-ming.lei@redhat.com>
+References: <20171017050418.22555-1-ming.lei@redhat.com>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-For kref_get_unless_zero to protect against lookup vs free races we need
-to use it in all places where we aren't guaranteed to already hold a
-reference.  There is no such guarantee in nvme_find_get_ns, so switch to
-kref_get_unless_zero in this function.
+If there isn't any outstanding request in this queue, both
+blk-mq's RESTART and SCSI's builtin RESTART can't work,
+so we have to deal with this case by running this queue
+after delay.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Fixes: d04b6d97d0a1(scsi: implement .get_budget and .put_budget for blk-mq)
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/nvme/host/core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/scsi/scsi_lib.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index bdae1e4fcd0b..3f51bd0326b5 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2290,7 +2290,8 @@ static struct nvme_ns *nvme_find_get_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 	mutex_lock(&ctrl->namespaces_mutex);
- 	list_for_each_entry(ns, &ctrl->namespaces, list) {
- 		if (ns->ns_id == nsid) {
--			kref_get(&ns->kref);
-+			if (!kref_get_unless_zero(&ns->kref))
-+				continue;
- 			ret = ns;
- 			break;
- 		}
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 6f10afaca25b..08c495364b28 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1959,6 +1959,14 @@ static void scsi_mq_put_budget(struct blk_mq_hw_ctx *hctx)
+ 	put_device(&sdev->sdev_gendev);
+ }
+ 
++static void scsi_mq_run_idle_hctx(struct scsi_device *sdev,
++		struct blk_mq_hw_ctx *hctx)
++{
++	if (atomic_read(&sdev->device_busy) == 0 &&
++	    !scsi_device_blocked(sdev))
++		blk_mq_delay_run_hw_queue(hctx, SCSI_QUEUE_DELAY);
++}
++
+ static blk_status_t scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct request_queue *q = hctx->queue;
+@@ -1989,6 +1997,7 @@ static blk_status_t scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
+ out_put_device:
+ 	put_device(&sdev->sdev_gendev);
+ out:
++	scsi_mq_run_idle_hctx(sdev, hctx);
+ 	return BLK_STS_RESOURCE;
+ }
+ 
+@@ -2039,9 +2048,7 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	case BLK_STS_OK:
+ 		break;
+ 	case BLK_STS_RESOURCE:
+-		if (atomic_read(&sdev->device_busy) == 0 &&
+-		    !scsi_device_blocked(sdev))
+-			blk_mq_delay_run_hw_queue(hctx, SCSI_QUEUE_DELAY);
++		scsi_mq_run_idle_hctx(sdev, hctx);
+ 		break;
+ 	default:
+ 		/*
 -- 
-2.14.1
+2.9.5
