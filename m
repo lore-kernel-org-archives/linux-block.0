@@ -1,42 +1,66 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qk0-f177.google.com ([209.85.220.177]:55346 "EHLO
-        mail-qk0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753612AbdJPRj0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Oct 2017 13:39:26 -0400
-Received: by mail-qk0-f177.google.com with SMTP id x82so13852802qkb.12
-        for <linux-block@vger.kernel.org>; Mon, 16 Oct 2017 10:39:26 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170921195458.53890-1-colyli@suse.de>
-References: <20170921195458.53890-1-colyli@suse.de>
-From: Michael Lyle <mlyle@lyle.org>
-Date: Mon, 16 Oct 2017 10:39:25 -0700
-Message-ID: <CAJ+L6qdqn1i=UFJcaO+xQzgZj_o5RNm71XhnSznrtMqt0P5Tew@mail.gmail.com>
-Subject: Re: [PATCHv3] bcache: only permit to recovery read error when cache
- device is clean
-To: Coly Li <colyli@suse.de>
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Nix <nix@esperi.org.uk>, Kai Krakow <hurikhan77@gmail.com>,
-        Eric Wheeler <bcache@lists.ewheeler.net>,
-        Junhui Tang <tang.junhui@zte.com.cn>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=4560204ad=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Oleksandr Natalenko <oleksandr@natalenko.name>,
+	Ming Lei <ming.lei@redhat.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	linux-raid@vger.kernel.org
+Subject: [PATCH v10 01/10] md: Rename md_notifier into md_reboot_notifier
+Date: Tue, 17 Oct 2017 16:26:21 -0700
+Message-Id: <20171017232630.4264-2-bart.vanassche@wdc.com>
+In-Reply-To: <20171017232630.4264-1-bart.vanassche@wdc.com>
+References: <20171017232630.4264-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Hey Coly--
+This avoids confusion with the pm notifier that will be added
+through a later patch.
 
-On Thu, Sep 21, 2017 at 12:54 PM, Coly Li <colyli@suse.de> wrote:
-> When bcache does read I/Os, for example in writeback or writethrough mode,
-> if a read request on cache device is failed, bcache will try to recovery
-> the request by reading from cached device. If the data on cached device is
-> not synced with cache device, then requester will get a stale data.
-[...]
-> +       if (s->recoverable &&
-> +           (dc && !atomic_read(&dc->has_dirty)) {
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Shaohua Li <shli@kernel.org>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Tested-by: Martin Steigerwald <martin@lichtvoll.de>
+Cc: linux-raid@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+---
+ drivers/md/md.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Looks like this is missing a parens.
-
-Thx,
-
-Mike
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 5d61049e7417..8933cafc212d 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -8966,7 +8966,7 @@ static int md_notify_reboot(struct notifier_block *this,
+ 	return NOTIFY_DONE;
+ }
+ 
+-static struct notifier_block md_notifier = {
++static struct notifier_block md_reboot_notifier = {
+ 	.notifier_call	= md_notify_reboot,
+ 	.next		= NULL,
+ 	.priority	= INT_MAX, /* before any real devices */
+@@ -9003,7 +9003,7 @@ static int __init md_init(void)
+ 	blk_register_region(MKDEV(mdp_major, 0), 1UL<<MINORBITS, THIS_MODULE,
+ 			    md_probe, NULL, NULL);
+ 
+-	register_reboot_notifier(&md_notifier);
++	register_reboot_notifier(&md_reboot_notifier);
+ 	raid_table_header = register_sysctl_table(raid_root_table);
+ 
+ 	md_geninit();
+@@ -9243,7 +9243,7 @@ static __exit void md_exit(void)
+ 
+ 	unregister_blkdev(MD_MAJOR,"md");
+ 	unregister_blkdev(mdp_major, "mdp");
+-	unregister_reboot_notifier(&md_notifier);
++	unregister_reboot_notifier(&md_reboot_notifier);
+ 	unregister_sysctl_table(raid_table_header);
+ 
+ 	/* We cannot unload the modules while some process is
+-- 
+2.14.2
