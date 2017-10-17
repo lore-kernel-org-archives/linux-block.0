@@ -1,51 +1,87 @@
-Return-Path: <prvs=457ce5395=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "chenxiang66@hisilicon.com" <chenxiang66@hisilicon.com>,
-	"hch@infradead.org" <hch@infradead.org>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linuxarm@huawei.com" <linuxarm@huawei.com>
-Subject: Re: [bug report] A race between blk_cleanup_queue and
- blk_timeout_work
-Date: Wed, 18 Oct 2017 16:39:05 +0000
-Message-ID: <1508344743.2540.11.camel@wdc.com>
-References: <d96fa515-32cb-8064-93e3-ff405b1923f5@hisilicon.com>
-In-Reply-To: <d96fa515-32cb-8064-93e3-ff405b1923f5@hisilicon.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <chenxiang66@hisilicon.com>
+To: <hch@infradead.org>, <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Linuxarm <linuxarm@huawei.com>
+From: "chenxiang (M)" <chenxiang66@hisilicon.com>
+Subject: [bug report] A race between blk_cleanup_queue and blk_timeout_work
+Message-ID: <d96fa515-32cb-8064-93e3-ff405b1923f5@hisilicon.com>
+Date: Tue, 17 Oct 2017 09:55:58 +0800
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE3LTEwLTE3IGF0IDA5OjU1ICswODAwLCBjaGVueGlhbmcgKE0pIHdyb3RlOg0K
-PiBJIGZpbmQgdGhlcmUgaXMgYSByYWNlIGJldHdlZW4gYmxrX2NsZWFudXBfcXVldWUgYW5kIGJs
-a190aW1lb3V0X3dvcmsgDQoNClRoYW5rcyBmb3IgdGhlIGRldGFpbGVkIHJlcG9ydC4gV291bGQg
-aXQgYmUgcG9zc2libGUgdG8gdGVzdCB0aGUgcGF0Y2ggYmVsb3cNCihhcHBsaWVzIG9uIHRvcCBv
-ZiBodHRwczovL2dpdGh1Yi5jb20vYnZhbmFzc2NoZS9saW51eC90cmVlL2Jsay1tcS1wbS0yMDE3
-LTEwLTE4LXYxMCk/DQoNClRoYW5rcywNCg0KQmFydC4NCg0KDQpTdWJqZWN0OiBbUEFUQ0hdIGJs
-b2NrOiBGaXggcmFjZSBiZXR3ZWVuIGJsa19jbGVhbnVwX3F1ZXVlKCkgYW5kIHRpbWVvdXQgaGFu
-ZGxpbmcNCg0KTWFrZSBzdXJlIHRoYXQgaWYgdGhlIHRpbWVvdXQgdGltZXIgZmlyZXMgYWZ0ZXIg
-YSBxdWV1ZSBoYXMgYmVlbg0KbWFya2VkICJkeWluZyIgdGhhdCB0aGUgYWZmZWN0ZWQgcmVxdWVz
-dHMgYXJlIGZpbmlzaGVkLg0KDQpSZXBvcnRlZC1ieTogY2hlbnhpYW5nIChNKSA8Y2hlbnhpYW5n
-NjZAaGlzaWxpY29uLmNvbT4NClNpZ25lZC1vZmYtYnk6IEJhcnQgVmFuIEFzc2NoZSA8YmFydC52
-YW5hc3NjaGVAd2RjLmNvbT4NCkNjOiBDaHJpc3RvcGggSGVsbHdpZyA8aGNoQGxzdC5kZT4NCkNj
-OiBIYW5uZXMgUmVpbmVja2UgPGhhcmVAc3VzZS5jb20+DQpDYzogTWluZyBMZWkgPG1pbmcubGVp
-QHJlZGhhdC5jb20+DQpDYzogSm9oYW5uZXMgVGh1bXNoaXJuIDxqdGh1bXNoaXJuQHN1c2UuZGU+
-DQotLS0NCiBibG9jay9ibGstY29yZS5jICAgIHwgMSArDQogYmxvY2svYmxrLXRpbWVvdXQuYyB8
-IDMgLS0tDQogMiBmaWxlcyBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMyBkZWxldGlvbnMoLSkN
-Cg0KZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1jb3JlLmMgYi9ibG9jay9ibGstY29yZS5jDQppbmRl
-eCA0ZmM5ZDZkNDRlZGQuLjE2ZjJhYTczNjk2ZSAxMDA2NDQNCi0tLSBhL2Jsb2NrL2Jsay1jb3Jl
-LmMNCisrKyBiL2Jsb2NrL2Jsay1jb3JlLmMNCkBAIC0zMzMsNiArMzMzLDcgQEAgRVhQT1JUX1NZ
-TUJPTChibGtfc3RvcF9xdWV1ZSk7DQogdm9pZCBibGtfc3luY19xdWV1ZShzdHJ1Y3QgcmVxdWVz
-dF9xdWV1ZSAqcSkNCiB7DQogCWRlbF90aW1lcl9zeW5jKCZxLT50aW1lb3V0KTsNCisJY2FuY2Vs
-X3dvcmtfc3luYygmcS0+dGltZW91dF93b3JrKTsNCiANCiAJaWYgKHEtPm1xX29wcykgew0KIAkJ
-c3RydWN0IGJsa19tcV9od19jdHggKmhjdHg7DQpkaWZmIC0tZ2l0IGEvYmxvY2svYmxrLXRpbWVv
-dXQuYyBiL2Jsb2NrL2Jsay10aW1lb3V0LmMNCmluZGV4IDFlYmE3MTQ4NjcxNi4uNzY0ZWNmOWFl
-YjMwIDEwMDY0NA0KLS0tIGEvYmxvY2svYmxrLXRpbWVvdXQuYw0KKysrIGIvYmxvY2svYmxrLXRp
-bWVvdXQuYw0KQEAgLTEzNCw4ICsxMzQsNiBAQCB2b2lkIGJsa190aW1lb3V0X3dvcmsoc3RydWN0
-IHdvcmtfc3RydWN0ICp3b3JrKQ0KIAlzdHJ1Y3QgcmVxdWVzdCAqcnEsICp0bXA7DQogCWludCBu
-ZXh0X3NldCA9IDA7DQogDQotCWlmIChibGtfcXVldWVfZW50ZXIocSwgQkxLX01RX1JFUV9OT1dB
-SVQgfCBCTEtfTVFfUkVRX1BSRUVNUFQpKQ0KLQkJcmV0dXJuOw0KIAlzcGluX2xvY2tfaXJxc2F2
-ZShxLT5xdWV1ZV9sb2NrLCBmbGFncyk7DQogDQogCWxpc3RfZm9yX2VhY2hfZW50cnlfc2FmZShy
-cSwgdG1wLCAmcS0+dGltZW91dF9saXN0LCB0aW1lb3V0X2xpc3QpDQpAQCAtMTQ1LDcgKzE0Myw2
-IEBAIHZvaWQgYmxrX3RpbWVvdXRfd29yayhzdHJ1Y3Qgd29ya19zdHJ1Y3QgKndvcmspDQogCQlt
-b2RfdGltZXIoJnEtPnRpbWVvdXQsIHJvdW5kX2ppZmZpZXNfdXAobmV4dCkpOw0KIA0KIAlzcGlu
-X3VubG9ja19pcnFyZXN0b3JlKHEtPnF1ZXVlX2xvY2ssIGZsYWdzKTsNCi0JYmxrX3F1ZXVlX2V4
-aXQocSk7DQogfQ0KIA0KIC8qKg0K
+Hi Jens, Christoph,
+
+There is a scenario: unplug this disks when running IO in disk, we will 
+find IO is blocked all the times as follows:
+......
+Jobs: 3 (f=3): [M_MM__] [89.7% done] [0K/0K /s] [0 /0  iops] [eta 00m:36s]
+......
+I find there is a race between blk_cleanup_queue and blk_timeout_work 
+(kernel is 4.14.0-rc1):
+(1)Remove disks process
+When unplug disk, it will call scsi_remove_target to delete disk:
+scsi_remove_target------>
+      __scsi_remove_target---->
+         scsi_remove_device--->
+             __scsi_remove_device--->
+                 blk_cleanup_queue
+                     blk_freeze_queue
+                     .....
+                     __blk_drain_queue
+scsi_remove_target will call blk_cleanup_queue, and blk_cleanup_queue 
+will call blk_freeze_queue and __blk_drain_queue.
+In blk_freeze_queue, for !blk_mq (our driver satifies this) it will kill 
+q->q_usage_counter.
+In __blk_drain_queue, it is a loop with condition=true, only when 
+drain=0 can this function will be existed.If all the IOs
+are ended, it will be existed, or it will wait and query no-finished IOs 
+every 10ms.
+(2) Timeout process
+For every IO from block layer,if timeout, it will call blk_timeout_work. 
+In blk_timeout_work, it checks blk_queue_enter first.
+In blk_queue_enter, it trys to get q->q_usage_counter, so if failed, it 
+will return directly and will not enter timeout process.
+
+So when unplug disk, removing disk process will kill q->q_usage_counter 
+in blk_cleanup_queue, if there are IOs which are not finished,
+they will wait for timeout, when timeout, they will try to get 
+q->q_usage_counter in blk_timeout_work, as q->q_usage_counter is killed
+in blk_freeze_queue already at that time, so it failed, it will not 
+enter timeout process and this IO will be not processed.
+But in __blk_drain_queue it will loop forever as there are IOs which are 
+still not ended.
+
+I add printk in function blk_timeout_work as follows, . when this issue 
+occurs, i can see this printk happens:
+
+void blk_timeout_work(struct work_struct *work)
+{
+         struct request_queue *q =
+                 container_of(work, struct request_queue, timeout_work);
+         unsigned long flags, next = 0;
+         struct request *rq, *tmp;
+         int next_set = 0;
+
+         if (blk_queue_enter(q, true)) {
+                 pr_err("%s %d\n", __func__, 
+__LINE__);---------------------> i add printk here
+                 return;
+         }
+
+         spin_lock_irqsave(q->queue_lock, flags);
+
+
+         list_for_each_entry_safe(rq, tmp, &q->timeout_list, timeout_list)
+                 blk_rq_check_expired(rq, &next, &next_set);
+
+         if (next_set)
+                 mod_timer(&q->timeout, round_jiffies_up(next));
+
+         spin_unlock_irqrestore(q->queue_lock, flags);
+
+         blk_queue_exit(q);
+}
+
+
+regards,
+shawn
