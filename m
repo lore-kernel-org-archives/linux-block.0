@@ -1,63 +1,46 @@
-Return-Path: <prvs=45557a1c1=bart.vanassche@wdc.com>
+Return-Path: <prvs=4560204ad=bart.vanassche@wdc.com>
+Subject: Re: [PATCH V7 4/6] blk-mq: introduce .get_budget and .put_budget in
+ blk_mq_ops
+To: Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "hch@infradead.org" <hch@infradead.org>,
+ "tom81094@gmail.com" <tom81094@gmail.com>,
+ "himanshu.madhani@cavium.com" <himanshu.madhani@cavium.com>,
+ "paolo.valente@linaro.org" <paolo.valente@linaro.org>,
+ "axboe@kernel.dk" <axboe@kernel.dk>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+ "john.garry@huawei.com" <john.garry@huawei.com>,
+ "osandov@fb.com" <osandov@fb.com>, "loberman@redhat.com"
+ <loberman@redhat.com>, "james.smart@broadcom.com" <james.smart@broadcom.com>
+References: <20171012183704.22326-5-ming.lei@redhat.com>
+ <9a741c03-90a3-e583-ddde-0ed71c8570a2@kernel.dk>
+ <20171013001919.GA24715@ming.t460p>
+ <6efdb459-8746-562d-06dc-5b3e172076e1@kernel.dk>
+ <20171013160731.GA30899@ming.t460p> <1507912260.13345.0.camel@wdc.com>
+ <20171013164519.GF30899@ming.t460p> <1507914527.13345.17.camel@wdc.com>
+ <20171013172950.GA32319@ming.t460p>
+ <515ca83f-5629-31e2-ef70-1869ae1b75ef@suse.de>
+ <20171017012922.GD15996@ming.t460p>
+ <6e8162a0-6ff3-2691-af79-13548a8834c6@suse.de>
 From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2] blk-mq: Make blk_mq_get_request() error path less confusing
-Date: Mon, 16 Oct 2017 16:32:26 -0700
-Message-Id: <20171016233226.5488-1-bart.vanassche@wdc.com>
+Message-ID: <782e3b9b-2aae-e013-bedc-3c35cb0f7edd@wdc.com>
+Date: Tue, 17 Oct 2017 11:09:15 -0700
+MIME-Version: 1.0
+In-Reply-To: <6e8162a0-6ff3-2691-af79-13548a8834c6@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-blk_mq_get_tag() can modify data->ctx. This means that in the
-error path of blk_mq_get_request() data->ctx should be passed to
-blk_mq_put_ctx() instead of local_ctx. Note: since blk_mq_put_ctx()
-ignores its argument, this patch does not change any functionality.
+On 10/16/17 23:38, Hannes Reinecke wrote:
+> Again, these are just some pre-defined values to avoid I/O starvation
+> when having several LUNs. _if_ we can guarantee I/O fairness between
+> several (hundreds!) devices all sharing the same tagspace we wouldn't
+> need these variables.
 
-References: commit 1ad43c0078b7 ("blk-mq: don't leak preempt counter/q_usage_counter when allocating rq failed")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Ming Lei <ming.lei@redhat.com>
----
-Changes compared to v1:
-- Removed "Cc: <stable>"
-- Removed "bug fix" from the description.
+I think we already have two mechanisms for guaranteeing I/O fairness:
+* Scsi_Host.starved_list for both the legacy SCSI core and scsi-mq.
+* For scsi-mq, the active_queues counter in the blk-mq core. See also
+   hctx_may_queue().
 
- block/blk-mq.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 097ca3ece716..d9b3b5dc66ab 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -336,12 +336,14 @@ static struct request *blk_mq_get_request(struct request_queue *q,
- 	struct elevator_queue *e = q->elevator;
- 	struct request *rq;
- 	unsigned int tag;
--	struct blk_mq_ctx *local_ctx = NULL;
-+	bool put_ctx_on_error = false;
- 
- 	blk_queue_enter_live(q);
- 	data->q = q;
--	if (likely(!data->ctx))
--		data->ctx = local_ctx = blk_mq_get_ctx(q);
-+	if (likely(!data->ctx)) {
-+		data->ctx = blk_mq_get_ctx(q);
-+		put_ctx_on_error = true;
-+	}
- 	if (likely(!data->hctx))
- 		data->hctx = blk_mq_map_queue(q, data->ctx->cpu);
- 	if (op & REQ_NOWAIT)
-@@ -360,8 +362,8 @@ static struct request *blk_mq_get_request(struct request_queue *q,
- 
- 	tag = blk_mq_get_tag(data);
- 	if (tag == BLK_MQ_TAG_FAIL) {
--		if (local_ctx) {
--			blk_mq_put_ctx(local_ctx);
-+		if (put_ctx_on_error) {
-+			blk_mq_put_ctx(data->ctx);
- 			data->ctx = NULL;
- 		}
- 		blk_queue_exit(q);
--- 
-2.14.2
+Bart.
