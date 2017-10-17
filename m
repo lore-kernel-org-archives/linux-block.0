@@ -1,38 +1,42 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:35982 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751561AbdJHVay (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 8 Oct 2017 17:30:54 -0400
-From: Himanshu Jha <himanshujha199640@gmail.com>
-To: bart.vanassche@wdc.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Himanshu Jha <himanshujha199640@gmail.com>
-Subject: [PATCH] skd: Use kmem_cache_free
-Date: Mon,  9 Oct 2017 03:00:28 +0530
-Message-Id: <1507498228-11878-1-git-send-email-himanshujha199640@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v2 4/8] nvmet/rdma: Use sgl_alloc() and sgl_free()
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org,
+ Keith Busch <keith.busch@intel.com>, Christoph Hellwig <hch@lst.de>,
+ Sagi Grimberg <sagi@grimberg.me>
+References: <20171016224940.1332-1-bart.vanassche@wdc.com>
+ <20171016224940.1332-5-bart.vanassche@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <3169fd91-8a1c-5b9f-cdb0-2ffafe25f41e@suse.de>
+Date: Tue, 17 Oct 2017 08:08:23 +0200
+MIME-Version: 1.0
+In-Reply-To: <20171016224940.1332-5-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Use kmem_cache_free instead of kfree for freeing the memory previously
-allocated with kmem_cache_zalloc/kmem_cache_alloc/kmem_cache_node.
+On 10/17/2017 12:49 AM, Bart Van Assche wrote:
+> Use the sgl_alloc() and sgl_free() functions instead of open coding
+> these functions.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+> Cc: Keith Busch <keith.busch@intel.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Sagi Grimberg <sagi@grimberg.me>
+> ---
+>  drivers/nvme/target/Kconfig |  1 +
+>  drivers/nvme/target/rdma.c  | 63 +++------------------------------------------
+>  2 files changed, 5 insertions(+), 59 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Himanshu Jha <himanshujha199640@gmail.com>
----
- drivers/block/skd_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Cheers,
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 7cedb42..64d0fc1 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -2604,7 +2604,7 @@ static void *skd_alloc_dma(struct skd_device *skdev, struct kmem_cache *s,
- 		return NULL;
- 	*dma_handle = dma_map_single(dev, buf, s->size, dir);
- 	if (dma_mapping_error(dev, *dma_handle)) {
--		kfree(buf);
-+		kmem_cache_free(s, buf);
- 		buf = NULL;
- 	}
- 	return buf;
+Hannes
 -- 
-2.7.4
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
