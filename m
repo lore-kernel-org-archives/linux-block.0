@@ -1,154 +1,75 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        John Garry <john.garry@huawei.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V8 7/7] SCSI: implement .get_budget and .put_budget for blk-mq
-Date: Sat, 14 Oct 2017 01:24:59 +0800
-Message-Id: <20171013172459.1376-8-ming.lei@redhat.com>
-In-Reply-To: <20171013172459.1376-1-ming.lei@redhat.com>
-References: <20171013172459.1376-1-ming.lei@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v9 02/10] md: Introduce md_stop_all_writes()
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ Oleksandr Natalenko <oleksandr@natalenko.name>,
+ Ming Lei <ming.lei@redhat.com>, linux-raid@vger.kernel.org,
+ Hannes Reinecke <hare@suse.com>
+References: <20171016232905.5047-1-bart.vanassche@wdc.com>
+ <20171016232905.5047-3-bart.vanassche@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <e1cf7087-68d2-6bd6-a1c0-5447c9e081f7@suse.de>
+Date: Tue, 17 Oct 2017 08:23:35 +0200
+MIME-Version: 1.0
+In-Reply-To: <20171016232905.5047-3-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-We need to tell blk-mq for reserving resource before queuing
-one request, so implement these two callbacks. Then blk-mq
-can avoid to dequeue request earlier, and IO merge can
-be improved a lot.
+On 10/17/2017 01:28 AM, Bart Van Assche wrote:
+> Introduce md_stop_all_writes() because the next patch will add
+> a second caller for this function. This patch does not change
+> any functionality.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+> Reviewed-by: Shaohua Li <shli@kernel.org>
+> Tested-by: Martin Steigerwald <martin@lichtvoll.de>
+> Cc: linux-raid@vger.kernel.org
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> ---
+>  drivers/md/md.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/md/md.c b/drivers/md/md.c
+> index 8933cafc212d..b99584e5d6b1 100644
+> --- a/drivers/md/md.c
+> +++ b/drivers/md/md.c
+> @@ -8937,8 +8937,7 @@ int rdev_clear_badblocks(struct md_rdev *rdev, sector_t s, int sectors,
+>  }
+>  EXPORT_SYMBOL_GPL(rdev_clear_badblocks);
+>  
+> -static int md_notify_reboot(struct notifier_block *this,
+> -			    unsigned long code, void *x)
+> +static void md_stop_all_writes(void)
+>  {
+>  	struct list_head *tmp;
+>  	struct mddev *mddev;
+> @@ -8962,6 +8961,12 @@ static int md_notify_reboot(struct notifier_block *this,
+>  	 */
+>  	if (need_delay)
+>  		mdelay(1000*1);
+> +}
+> +
+> +static int md_notify_reboot(struct notifier_block *this,
+> +			    unsigned long code, void *x)
+> +{
+> +	md_stop_all_writes();
+>  
+>  	return NOTIFY_DONE;
+>  }
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/scsi_lib.c | 75 ++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 52 insertions(+), 23 deletions(-)
+Cheers,
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index d159bb085714..6f10afaca25b 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1946,25 +1946,32 @@ static void scsi_mq_done(struct scsi_cmnd *cmd)
- 	blk_mq_complete_request(cmd->request);
- }
- 
--static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
--			 const struct blk_mq_queue_data *bd)
-+static void scsi_mq_put_budget(struct blk_mq_hw_ctx *hctx)
- {
--	struct request *req = bd->rq;
--	struct request_queue *q = req->q;
-+	struct request_queue *q = hctx->queue;
-+	struct scsi_device *sdev = q->queuedata;
-+	struct Scsi_Host *shost = sdev->host;
-+
-+	atomic_dec(&shost->host_busy);
-+	if (scsi_target(sdev)->can_queue > 0)
-+		atomic_dec(&scsi_target(sdev)->target_busy);
-+	atomic_dec(&sdev->device_busy);
-+	put_device(&sdev->sdev_gendev);
-+}
-+
-+static blk_status_t scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct request_queue *q = hctx->queue;
- 	struct scsi_device *sdev = q->queuedata;
- 	struct Scsi_Host *shost = sdev->host;
--	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
- 	blk_status_t ret;
--	int reason;
- 
--	ret = prep_to_mq(scsi_prep_state_check(sdev, req));
--	if (ret != BLK_STS_OK)
--		goto out;
-+	ret = prep_to_mq(scsi_prep_state_check(sdev, NULL));
-+	if (ret == BLK_STS_RESOURCE || ret != BLK_STS_OK)
-+		return ret;
- 
--	ret = BLK_STS_RESOURCE;
- 	if (!get_device(&sdev->sdev_gendev))
- 		goto out;
--
- 	if (!scsi_dev_queue_ready(q, sdev))
- 		goto out_put_device;
- 	if (!scsi_target_queue_ready(shost, sdev))
-@@ -1972,10 +1979,38 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	if (!scsi_host_queue_ready(q, shost, sdev))
- 		goto out_dec_target_busy;
- 
-+	return BLK_STS_OK;
-+
-+out_dec_target_busy:
-+	if (scsi_target(sdev)->can_queue > 0)
-+		atomic_dec(&scsi_target(sdev)->target_busy);
-+out_dec_device_busy:
-+	atomic_dec(&sdev->device_busy);
-+out_put_device:
-+	put_device(&sdev->sdev_gendev);
-+out:
-+	return BLK_STS_RESOURCE;
-+}
-+
-+static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
-+			 const struct blk_mq_queue_data *bd)
-+{
-+	struct request *req = bd->rq;
-+	struct request_queue *q = req->q;
-+	struct scsi_device *sdev = q->queuedata;
-+	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
-+	blk_status_t ret;
-+	int reason;
-+
-+	ret = prep_to_mq(scsi_prep_state_check(sdev, req));
-+	if (ret != BLK_STS_OK)
-+		goto out_put_budget;
-+
-+	ret = BLK_STS_RESOURCE;
- 	if (!(req->rq_flags & RQF_DONTPREP)) {
- 		ret = prep_to_mq(scsi_mq_prep_fn(req));
- 		if (ret != BLK_STS_OK)
--			goto out_dec_host_busy;
-+			goto out_put_budget;
- 		req->rq_flags |= RQF_DONTPREP;
- 	} else {
- 		blk_mq_start_request(req);
-@@ -1993,21 +2028,13 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	if (reason) {
- 		scsi_set_blocked(cmd, reason);
- 		ret = BLK_STS_RESOURCE;
--		goto out_dec_host_busy;
-+		goto out_put_budget;
- 	}
- 
- 	return BLK_STS_OK;
- 
--out_dec_host_busy:
--	atomic_dec(&shost->host_busy);
--out_dec_target_busy:
--	if (scsi_target(sdev)->can_queue > 0)
--		atomic_dec(&scsi_target(sdev)->target_busy);
--out_dec_device_busy:
--	atomic_dec(&sdev->device_busy);
--out_put_device:
--	put_device(&sdev->sdev_gendev);
--out:
-+out_put_budget:
-+	scsi_mq_put_budget(hctx);
- 	switch (ret) {
- 	case BLK_STS_OK:
- 		break;
-@@ -2211,6 +2238,8 @@ struct request_queue *scsi_old_alloc_queue(struct scsi_device *sdev)
- }
- 
- static const struct blk_mq_ops scsi_mq_ops = {
-+	.get_budget	= scsi_mq_get_budget,
-+	.put_budget	= scsi_mq_put_budget,
- 	.queue_rq	= scsi_queue_rq,
- 	.complete	= scsi_softirq_done,
- 	.timeout	= scsi_timeout,
+Hannes
 -- 
-2.9.5
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
