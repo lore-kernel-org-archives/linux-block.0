@@ -1,111 +1,24 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:49194 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753134AbdJNJW6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 14 Oct 2017 05:22:58 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        John Garry <john.garry@huawei.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V10 2/8] blk-mq-sched: move actual dispatching into one helper
-Date: Sat, 14 Oct 2017 17:22:26 +0800
-Message-Id: <20171014092232.13943-3-ming.lei@redhat.com>
-In-Reply-To: <20171014092232.13943-1-ming.lei@redhat.com>
-References: <20171014092232.13943-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jthumshirn@suse.de>
+Date: Tue, 17 Oct 2017 11:21:54 +0200
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH v2] blk-mq: Make blk_mq_get_request() error path less
+ confusing
+Message-ID: <20171017092154.bgkqjwv4tpqvuvdb@linux-x5ow.site>
+References: <20171016233226.5488-1-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20171016233226.5488-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-So that it becomes easy to support to dispatch from sw queue in the
-following patch.
-
-No functional change.
-
-Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Suggested-by: Christoph Hellwig <hch@lst.de> # for simplifying dispatch logic
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c | 43 ++++++++++++++++++++++++-------------------
- 1 file changed, 24 insertions(+), 19 deletions(-)
-
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index eca011fdfa0e..be29ba849408 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -89,12 +89,26 @@ static bool blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
- 	return false;
- }
- 
-+static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct request_queue *q = hctx->queue;
-+	struct elevator_queue *e = q->elevator;
-+	LIST_HEAD(rq_list);
-+
-+	do {
-+		struct request *rq = e->type->ops.mq.dispatch_request(hctx);
-+
-+		if (!rq)
-+			break;
-+		list_add(&rq->queuelist, &rq_list);
-+	} while (blk_mq_dispatch_rq_list(q, &rq_list));
-+}
-+
- void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- {
- 	struct request_queue *q = hctx->queue;
- 	struct elevator_queue *e = q->elevator;
- 	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
--	bool do_sched_dispatch = true;
- 	LIST_HEAD(rq_list);
- 
- 	/* RCU or SRCU read lock is needed before checking quiesced flag */
-@@ -122,30 +136,21 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	 * scheduler, we can no longer merge or sort them. So it's best to
- 	 * leave them there for as long as we can. Mark the hw queue as
- 	 * needing a restart in that case.
-+	 *
-+	 * We want to dispatch from the scheduler if there was nothing
-+	 * on the dispatch list or we were able to dispatch from the
-+	 * dispatch list.
- 	 */
- 	if (!list_empty(&rq_list)) {
- 		blk_mq_sched_mark_restart_hctx(hctx);
--		do_sched_dispatch = blk_mq_dispatch_rq_list(q, &rq_list);
--	} else if (!has_sched_dispatch) {
-+		if (blk_mq_dispatch_rq_list(q, &rq_list) && has_sched_dispatch)
-+			blk_mq_do_dispatch_sched(hctx);
-+	} else if (has_sched_dispatch) {
-+		blk_mq_do_dispatch_sched(hctx);
-+	} else {
- 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
- 		blk_mq_dispatch_rq_list(q, &rq_list);
- 	}
--
--	/*
--	 * We want to dispatch from the scheduler if there was nothing
--	 * on the dispatch list or we were able to dispatch from the
--	 * dispatch list.
--	 */
--	if (do_sched_dispatch && has_sched_dispatch) {
--		do {
--			struct request *rq;
--
--			rq = e->type->ops.mq.dispatch_request(hctx);
--			if (!rq)
--				break;
--			list_add(&rq->queuelist, &rq_list);
--		} while (blk_mq_dispatch_rq_list(q, &rq_list));
--	}
- }
- 
- bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.9.5
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
