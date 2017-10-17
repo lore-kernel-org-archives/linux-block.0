@@ -1,122 +1,49 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:34504 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752550AbdJMRZR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 13:25:17 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        John Garry <john.garry@huawei.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V8 0/7] blk-mq-sched: improve sequential I/O performance
-Date: Sat, 14 Oct 2017 01:24:52 +0800
-Message-Id: <20171013172459.1376-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v9 07/10] ide, scsi: Tell the block layer at request
+ allocation time about preempt requests
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ Oleksandr Natalenko <oleksandr@natalenko.name>,
+ Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.com>,
+ Johannes Thumshirn <jthumshirn@suse.de>
+References: <20171016232905.5047-1-bart.vanassche@wdc.com>
+ <20171016232905.5047-8-bart.vanassche@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <08f79033-9eb5-71a8-bef8-44480e0ce2f0@suse.de>
+Date: Tue, 17 Oct 2017 08:27:07 +0200
+MIME-Version: 1.0
+In-Reply-To: <20171016232905.5047-8-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+On 10/17/2017 01:29 AM, Bart Van Assche wrote:
+> Convert blk_get_request(q, op, __GFP_RECLAIM) into
+> blk_get_request_flags(q, op, BLK_MQ_PREEMPT). This patch does not
+> change any functionality.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Tested-by: Martin Steigerwald <martin@lichtvoll.de>
+> Acked-by: David S. Miller <davem@davemloft.net> [ for IDE ]
+> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
+>  drivers/ide/ide-pm.c    | 4 ++--
+>  drivers/scsi/scsi_lib.c | 6 +++---
+>  2 files changed, 5 insertions(+), 5 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-In Red Hat internal storage test wrt. blk-mq scheduler, we found that I/O
-performance is much bad with mq-deadline, especially about sequential I/O
-on some multi-queue SCSI devcies(lpfc, qla2xxx, SRP...)
+Cheers,
 
-Turns out one big issue causes the performance regression: requests are
-still dequeued from sw queue/scheduler queue even when ldd's queue is
-busy, so I/O merge becomes quite difficult to make, then sequential IO
-performance degrades a lot.
-
-This issue becomes one of mains reasons for reverting default SCSI_MQ
-in V4.13.
-
-This 8 patches improve this situation, and brings back performance loss.
-
-With this change, SCSI-MQ sequential I/O performance is improved much, Paolo
-reported that mq-deadline performance improved much[2] in his dbench test
-wrt V2. Also performance improvement on lpfc/qla2xx was observed with V1.[1]
-
-[1] http://marc.info/?l=linux-block&m=150151989915776&w=2
-[2] https://marc.info/?l=linux-block&m=150217980602843&w=2
-
-gitweb:
-	https://github.com/ming1/linux/commits/blk_mq_improve_scsi_mpath_perf_V8_part1
-
-V8:
-	- introduce helper of blk_mq_get_budget
-	- handle failure path of get_budget
-
-V7:
-	- introduce .get_budget/.put_budget, and IO merge gets improved
-	compared with V6, and in theory this approach is better than the way
-	taken in block legacy
-
-	- drop patch of 'blk-mq-sched: don't dequeue request until all in ->dispatch are flushed'
-
-V6:
-	- address comments from Christoph
-	- drop the 1st patch which changes blk_mq_request_bypass_insert(),
-	which should belong to dm-mpath's improvement
-	- move ' blk-mq-sched: move actual dispatching into one helper'
-	as 2nd patch, and use the introduced helper to simplify dispatch
-	logic
-	- merge two previous patches into one for improving dispatch from sw queue
-	- make comment/commit log line width as ~70, as suggested by
-	  Christoph
-
-V5:
-	- address some comments from Omar
-	- add Tested-by & Reveiewed-by tag
-	- use direct issue for blk_mq_request_bypass_insert(), and
-	start to consider to improve sequential I/O for dm-mpath
-	- only include part 1(the original patch 1 ~ 6), as suggested
-	by Omar
-
-V4:
-	- add Reviewed-by tag
-	- some trival change: typo fix in commit log or comment,
-	variable name, no actual functional change
-
-V3:
-	- totally round robin for picking req from ctx, as suggested
-	by Bart
-	- remove one local variable in __sbitmap_for_each_set()
-	- drop patches of single dispatch list, which can improve
-	performance on mq-deadline, but cause a bit degrade on
-	none because all hctxs need to be checked after ->dispatch
-	is flushed. Will post it again once it is mature.
-	- rebase on v4.13-rc6 with block for-next
-
-V2:
-	- dequeue request from sw queues in round roubin's style
-	as suggested by Bart, and introduces one helper in sbitmap
-	for this purpose
-	- improve bio merge via hash table from sw queue
-	- add comments about using DISPATCH_BUSY state in lockless way,
-	simplifying handling on busy state,
-	- hold ctx->lock when clearing ctx busy bit as suggested
-	by Bart
-
-Ming Lei (7):
-  blk-mq-sched: fix scheduler bad performance
-  blk-mq-sched: move actual dispatching into one helper
-  sbitmap: introduce __sbitmap_for_each_set()
-  blk-mq: introduce .get_budget and .put_budget in blk_mq_ops
-  blk-mq-sched: improve dispatching from sw queue
-  SCSI: allow to pass null rq to scsi_prep_state_check()
-  SCSI: implement .get_budget and .put_budget for blk-mq
-
- block/blk-mq-sched.c    | 130 +++++++++++++++++++++++++++++++++++++++++-------
- block/blk-mq.c          |  72 +++++++++++++++++++++++++--
- block/blk-mq.h          |  22 +++++++-
- drivers/scsi/scsi_lib.c |  79 +++++++++++++++++++----------
- include/linux/blk-mq.h  |  13 +++++
- include/linux/sbitmap.h |  64 +++++++++++++++++-------
- 6 files changed, 316 insertions(+), 64 deletions(-)
-
+Hannes
 -- 
-2.9.5
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
