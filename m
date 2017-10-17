@@ -1,55 +1,74 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-it0-f44.google.com ([209.85.214.44]:43842 "EHLO
-        mail-it0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753209AbdJQQpj (ORCPT
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:54063 "EHLO
+        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754037AbdJQMpw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Oct 2017 12:45:39 -0400
-Received: by mail-it0-f44.google.com with SMTP id k70so6091475itk.0
-        for <linux-block@vger.kernel.org>; Tue, 17 Oct 2017 09:45:39 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <AE364BB2-E347-4A5E-BFF7-AAAA32C512F5@linaro.org>
-References: <07DF24AB-9B62-4EE5-8B45-3E04C1CEA84C@linaro.org> <AE364BB2-E347-4A5E-BFF7-AAAA32C512F5@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 17 Oct 2017 18:45:37 +0200
-Message-ID: <CACRpkdZYMTqgPur_S1sFfpZfT3euzDLs=pxgs-fG=+3AtMSbig@mail.gmail.com>
-Subject: Re: high overhead of functions blkg_*stats_* in bfq
-To: Paolo Valente <paolo.valente@linaro.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Akinobu Mita <akinobu.mita@gmail.com>,
-        David Howells <dhowells@redhat.com>
-Cc: Tejun Heo <tj@kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
+        Tue, 17 Oct 2017 08:45:52 -0400
+Received: by mail-wm0-f45.google.com with SMTP id q132so3701212wmd.2
+        for <linux-block@vger.kernel.org>; Tue, 17 Oct 2017 05:45:52 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: high overhead of functions blkg_*stats_* in bfq 
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <07DF24AB-9B62-4EE5-8B45-3E04C1CEA84C@linaro.org>
+Date: Tue, 17 Oct 2017 14:45:49 +0200
+Cc: linux-block <linux-block@vger.kernel.org>,
         Luca Miccio <lucmiccio@gmail.com>,
         Mark Brown <broonie@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>
+Message-Id: <AE364BB2-E347-4A5E-BFF7-AAAA32C512F5@linaro.org>
+References: <07DF24AB-9B62-4EE5-8B45-3E04C1CEA84C@linaro.org>
+To: Tejun Heo <tj@kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, Oct 17, 2017 at 2:45 PM, Paolo Valente <paolo.valente@linaro.org> wrote:
++Ulf Hansson, Mark Brown, Linus Walleij
 
+> Il giorno 17 ott 2017, alle ore 12:11, Paolo Valente =
+<paolo.valente@linaro.org> ha scritto:
+>=20
+> Hi Tejun, all,
+> in our work for reducing bfq overhead, we bumped into an unexpected
+> fact: the functions blkg_*stats_*, invoked in bfq to update cgroups
+> statistics as in cfq, take about 40% of the total execution time of
+> bfq.  This causes an additional serious slowdown on any multicore cpu,
+> as most bfq functions, from which blkg_*stats_* get invoked, are
+> protected by a per-device scheduler lock.  To give you an idea, on an
+> Intel i7-4850HQ, and with 8 threads doing random I/O in parallel on
+> null_blk (configured with 0 latency), if the update of groups stats is
+> removed, then the throughput grows from 260 to 404 KIOPS.  This and
+> all the other results we might share in this thread can be reproduced
+> very easily with a (useful) script made by Luca Miccio [1].
+>=20
+> We tried to understand the reason for this high overhead, and, in
+> particular, to find out whether whether there was some issue that we
+> could address on our own.  But the causes seem somehow substantial:
 > one of the most time-consuming operations needed by some blkg_*stats_*
 > functions is, e.g., find_next_bit, for which we don't see any trivial
 > replacement.
-
-So this is one of the things that often falls down to a per-arch
-assembly optimization, c.f. arch/arm/include/asm/bitops.h
-
-On x86 I can't see any assembly optimization of this, so the
-generic routines in lib/find_bit.c are used AFAICT.
-
-This might be a silly question, but If you are testing this on x86,
-do you think it would help if someone stepped in and slapped in
-some optimized assembly for those functions?
-
-(I guess that is like saying, "instead of a trivial replacement,
-what about a really complicated one"?)
-
-A simple git log arch/x86/include/asm/bitops.h doesn't show
-any traces of anyone trying to optimize those for x86.
-
-I paged in the x86 assembly people, they definately knows whether
-that is a good idea or if it sucks. (And if it was done in the past.)
-
-Yours,
-Linus Walleij
+>=20
+> So, as a first attempt to reduce this severe slowdown, we have made a
+> patch that moves the invocation of blkg_*stats_* functions outside the
+> critical sections protected by the bfq lock.  Still, these functions
+> apparently need to be protected with the request_queue lock, because
+> the group they are invoked on may otherwise disappear before or while
+> these functions are executed.  Fortunately, tests run without even
+> this lock have shown that the serialization caused by this lock has a
+> little impact (5% of throughput reduction).  As for results, moving
+> these functions outside the bfq lock does improve throughput: it
+> grows, e.g., from 260 to 316 KIOPS in the above test case.  But we are
+> still rather far from the optimum.
+>=20
+> Do you have any clue about possible solutions to reduce the overhead
+> of these functions?  If no relatively quick solution is available, we
+> are planning to prepare, in addition to the above patch to increase
+> parallelism, a further patch to give the user the possibility to
+> disable stats update, so as to gain a full throughput boost of up to
+> 55% (according to the tests we have run so far on a few different
+> systems).
+>=20
+> Thanks,
+> Paolo
+>=20
+> [1] https://github.com/Algodev-github/IOSpeed
