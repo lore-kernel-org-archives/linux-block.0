@@ -1,24 +1,162 @@
-Return-Path: <jthumshirn@suse.de>
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>,  linux-block@vger.kernel.org,  Sagi Grimberg <sagi@grimberg.me>,  linux-nvme@lists.infradead.org,  Keith Busch <keith.busch@intel.com>,  Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH 06/17] block: introduce GENHD_FL_HIDDEN
+Return-Path: <BATV+33c0a560d8cf4f6c9bdc+5169+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 06/17] block: introduce GENHD_FL_HIDDEN
+Date: Wed, 18 Oct 2017 18:52:47 +0200
+Message-Id: <20171018165258.23212-7-hch@lst.de>
+In-Reply-To: <20171018165258.23212-1-hch@lst.de>
 References: <20171018165258.23212-1-hch@lst.de>
-	<20171018165258.23212-7-hch@lst.de>
-Date: Thu, 19 Oct 2017 10:31:26 +0200
-In-Reply-To: <20171018165258.23212-7-hch@lst.de> (Christoph Hellwig's message
-	of "Wed, 18 Oct 2017 18:52:47 +0200")
-Message-ID: <mqdr2tz1qu9.fsf@linux-x5ow.site>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
---=20
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
-GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N=C3=BCrnberg)
-Key fingerprint =3D EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+With this flag a driver can create a gendisk that can be used for I/O
+submission inside the kernel, but which is not registered as user
+facing block device.  This will be useful for the NVMe multipath
+implementation.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/genhd.c         | 53 ++++++++++++++++++++++++++++++++++-----------------
+ include/linux/genhd.h |  1 +
+ 2 files changed, 36 insertions(+), 18 deletions(-)
+
+diff --git a/block/genhd.c b/block/genhd.c
+index 1174d24e405e..0b28cd491b1d 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -585,6 +585,11 @@ static void register_disk(struct device *parent, struct gendisk *disk)
+ 	 */
+ 	pm_runtime_set_memalloc_noio(ddev, true);
+ 
++	if (disk->flags & GENHD_FL_HIDDEN) {
++		dev_set_uevent_suppress(ddev, 0);
++		return;
++	}
++
+ 	disk->part0.holder_dir = kobject_create_and_add("holders", &ddev->kobj);
+ 	disk->slave_dir = kobject_create_and_add("slaves", &ddev->kobj);
+ 
+@@ -616,6 +621,11 @@ static void register_disk(struct device *parent, struct gendisk *disk)
+ 	while ((part = disk_part_iter_next(&piter)))
+ 		kobject_uevent(&part_to_dev(part)->kobj, KOBJ_ADD);
+ 	disk_part_iter_exit(&piter);
++
++	err = sysfs_create_link(&ddev->kobj,
++				&disk->queue->backing_dev_info->dev->kobj,
++				"bdi");
++	WARN_ON(err);
+ }
+ 
+ /**
+@@ -630,7 +640,6 @@ static void register_disk(struct device *parent, struct gendisk *disk)
+  */
+ void device_add_disk(struct device *parent, struct gendisk *disk)
+ {
+-	struct backing_dev_info *bdi;
+ 	dev_t devt;
+ 	int retval;
+ 
+@@ -639,7 +648,8 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
+ 	 * parameters make sense.
+ 	 */
+ 	WARN_ON(disk->minors && !(disk->major || disk->first_minor));
+-	WARN_ON(!disk->minors && !(disk->flags & GENHD_FL_EXT_DEVT));
++	WARN_ON(!disk->minors &&
++		!(disk->flags & (GENHD_FL_EXT_DEVT | GENHD_FL_HIDDEN)));
+ 
+ 	disk->flags |= GENHD_FL_UP;
+ 
+@@ -648,18 +658,26 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
+ 		WARN_ON(1);
+ 		return;
+ 	}
+-	disk_to_dev(disk)->devt = devt;
+ 	disk->major = MAJOR(devt);
+ 	disk->first_minor = MINOR(devt);
+ 
+ 	disk_alloc_events(disk);
+ 
+-	/* Register BDI before referencing it from bdev */
+-	bdi = disk->queue->backing_dev_info;
+-	bdi_register_owner(bdi, disk_to_dev(disk));
+-
+-	blk_register_region(disk_devt(disk), disk->minors, NULL,
+-			    exact_match, exact_lock, disk);
++	if (disk->flags & GENHD_FL_HIDDEN) {
++		/*
++		 * Don't let hidden disks show up in /proc/partitions,
++		 * and don't bother scanning for partitions either.
++		 */
++		disk->flags |= GENHD_FL_SUPPRESS_PARTITION_INFO;
++		disk->flags |= GENHD_FL_NO_PART_SCAN;
++	} else {
++		/* Register BDI before referencing it from bdev */
++		disk_to_dev(disk)->devt = devt;
++		bdi_register_owner(disk->queue->backing_dev_info,
++				disk_to_dev(disk));
++		blk_register_region(disk_devt(disk), disk->minors, NULL,
++				    exact_match, exact_lock, disk);
++	}
+ 	register_disk(parent, disk);
+ 	blk_register_queue(disk);
+ 
+@@ -669,10 +687,6 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
+ 	 */
+ 	WARN_ON_ONCE(!blk_get_queue(disk->queue));
+ 
+-	retval = sysfs_create_link(&disk_to_dev(disk)->kobj, &bdi->dev->kobj,
+-				   "bdi");
+-	WARN_ON(retval);
+-
+ 	disk_add_events(disk);
+ 	blk_integrity_add(disk);
+ }
+@@ -701,7 +715,8 @@ void del_gendisk(struct gendisk *disk)
+ 	set_capacity(disk, 0);
+ 	disk->flags &= ~GENHD_FL_UP;
+ 
+-	sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
++	if (!(disk->flags & GENHD_FL_HIDDEN))
++		sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
+ 	if (disk->queue) {
+ 		/*
+ 		 * Unregister bdi before releasing device numbers (as they can
+@@ -712,13 +727,15 @@ void del_gendisk(struct gendisk *disk)
+ 	} else {
+ 		WARN_ON(1);
+ 	}
+-	blk_unregister_region(disk_devt(disk), disk->minors);
++
++	if (!(disk->flags & GENHD_FL_HIDDEN)) {
++		blk_unregister_region(disk_devt(disk), disk->minors);
++		kobject_put(disk->part0.holder_dir);
++		kobject_put(disk->slave_dir);
++	}
+ 
+ 	part_stat_set_all(&disk->part0, 0);
+ 	disk->part0.stamp = 0;
+-
+-	kobject_put(disk->part0.holder_dir);
+-	kobject_put(disk->slave_dir);
+ 	if (!sysfs_deprecated)
+ 		sysfs_remove_link(block_depr, dev_name(disk_to_dev(disk)));
+ 	pm_runtime_set_memalloc_noio(disk_to_dev(disk), false);
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 5c0ed5db33c2..93aae3476f58 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -140,6 +140,7 @@ struct hd_struct {
+ #define GENHD_FL_NATIVE_CAPACITY		128
+ #define GENHD_FL_BLOCK_EVENTS_ON_EXCL_WRITE	256
+ #define GENHD_FL_NO_PART_SCAN			512
++#define GENHD_FL_HIDDEN				1024
+ 
+ enum {
+ 	DISK_EVENT_MEDIA_CHANGE			= 1 << 0, /* media changed */
+-- 
+2.14.1
