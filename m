@@ -1,92 +1,57 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from szxga05-in.huawei.com ([45.249.212.191]:8549 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751636AbdJSHCS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Oct 2017 03:02:18 -0400
+Return-Path: <prvs=457ce5395=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "chenxiang66@hisilicon.com" <chenxiang66@hisilicon.com>,
+	"hch@infradead.org" <hch@infradead.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linuxarm@huawei.com" <linuxarm@huawei.com>
 Subject: Re: [bug report] A race between blk_cleanup_queue and
  blk_timeout_work
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
+Date: Wed, 18 Oct 2017 18:09:32 +0000
+Message-ID: <1508350170.2540.18.camel@wdc.com>
 References: <d96fa515-32cb-8064-93e3-ff405b1923f5@hisilicon.com>
- <1508344743.2540.11.camel@wdc.com> <1508350170.2540.18.camel@wdc.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linuxarm@huawei.com" <linuxarm@huawei.com>
-From: "chenxiang (M)" <chenxiang66@hisilicon.com>
-Message-ID: <bce7466e-402b-1550-e4a6-1803fe56ee20@hisilicon.com>
-Date: Thu, 19 Oct 2017 15:01:17 +0800
+	 <1508344743.2540.11.camel@wdc.com>
+In-Reply-To: <1508344743.2540.11.camel@wdc.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1508350170.2540.18.camel@wdc.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-在 2017/10/19 2:09, Bart Van Assche 写道:
-> On Wed, 2017-10-18 at 09:39 -0700, Bart Van Assche wrote:
->> On Tue, 2017-10-17 at 09:55 +0800, chenxiang (M) wrote:
->>> I find there is a race between blk_cleanup_queue and blk_timeout_work
->> Thanks for the detailed report. Would it be possible to test the patch below
->> (applies on top of https://github.com/bvanassche/linux/tree/blk-mq-pm-2017-10-18-v10)?
-
-Hi Bart,
-I have tested this patch, and it solves the issue i reported.
-
-regards,
-shawn
-
-> Here is a better version of the patch included in the previous e-mail:
->
->
-> Subject: [PATCH] block: Fix race between blk_cleanup_queue() and timeout
->   handling
->
-> Make sure that if the timeout timer fires after a queue has been
-> marked "dying" that the affected requests are finished.
->
-> ---
->   block/blk-core.c    | 2 ++
->   block/blk-timeout.c | 3 ---
->   2 files changed, 2 insertions(+), 3 deletions(-)
->
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 4fc9d6d44edd..0a0fdaa474e3 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -333,6 +333,7 @@ EXPORT_SYMBOL(blk_stop_queue);
->   void blk_sync_queue(struct request_queue *q)
->   {
->   	del_timer_sync(&q->timeout);
-> +	cancel_work_sync(&q->timeout_work);
->   
->   	if (q->mq_ops) {
->   		struct blk_mq_hw_ctx *hctx;
-> @@ -905,6 +906,7 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
->   	setup_timer(&q->backing_dev_info->laptop_mode_wb_timer,
->   		    laptop_mode_timer_fn, (unsigned long) q);
->   	setup_timer(&q->timeout, blk_rq_timed_out_timer, (unsigned long) q);
-> +	INIT_WORK(&q->timeout_work, NULL);
->   	INIT_LIST_HEAD(&q->queue_head);
->   	INIT_LIST_HEAD(&q->timeout_list);
->   	INIT_LIST_HEAD(&q->icq_list);
-> diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-> index 1eba71486716..764ecf9aeb30 100644
-> --- a/block/blk-timeout.c
-> +++ b/block/blk-timeout.c
-> @@ -134,8 +134,6 @@ void blk_timeout_work(struct work_struct *work)
->   	struct request *rq, *tmp;
->   	int next_set = 0;
->   
-> -	if (blk_queue_enter(q, BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_PREEMPT))
-> -		return;
->   	spin_lock_irqsave(q->queue_lock, flags);
->   
->   	list_for_each_entry_safe(rq, tmp, &q->timeout_list, timeout_list)
-> @@ -145,7 +143,6 @@ void blk_timeout_work(struct work_struct *work)
->   		mod_timer(&q->timeout, round_jiffies_up(next));
->   
->   	spin_unlock_irqrestore(q->queue_lock, flags);
-> -	blk_queue_exit(q);
->   }
->   
->   /**
+T24gV2VkLCAyMDE3LTEwLTE4IGF0IDA5OjM5IC0wNzAwLCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6
+DQo+IE9uIFR1ZSwgMjAxNy0xMC0xNyBhdCAwOTo1NSArMDgwMCwgY2hlbnhpYW5nIChNKSB3cm90
+ZToNCj4gPiBJIGZpbmQgdGhlcmUgaXMgYSByYWNlIGJldHdlZW4gYmxrX2NsZWFudXBfcXVldWUg
+YW5kIGJsa190aW1lb3V0X3dvcmsgDQo+IA0KPiBUaGFua3MgZm9yIHRoZSBkZXRhaWxlZCByZXBv
+cnQuIFdvdWxkIGl0IGJlIHBvc3NpYmxlIHRvIHRlc3QgdGhlIHBhdGNoIGJlbG93DQo+IChhcHBs
+aWVzIG9uIHRvcCBvZiBodHRwczovL2dpdGh1Yi5jb20vYnZhbmFzc2NoZS9saW51eC90cmVlL2Js
+ay1tcS1wbS0yMDE3LTEwLTE4LXYxMCk/DQoNCkhlcmUgaXMgYSBiZXR0ZXIgdmVyc2lvbiBvZiB0
+aGUgcGF0Y2ggaW5jbHVkZWQgaW4gdGhlIHByZXZpb3VzIGUtbWFpbDoNCg0KDQpTdWJqZWN0OiBb
+UEFUQ0hdIGJsb2NrOiBGaXggcmFjZSBiZXR3ZWVuIGJsa19jbGVhbnVwX3F1ZXVlKCkgYW5kIHRp
+bWVvdXQNCiBoYW5kbGluZw0KDQpNYWtlIHN1cmUgdGhhdCBpZiB0aGUgdGltZW91dCB0aW1lciBm
+aXJlcyBhZnRlciBhIHF1ZXVlIGhhcyBiZWVuDQptYXJrZWQgImR5aW5nIiB0aGF0IHRoZSBhZmZl
+Y3RlZCByZXF1ZXN0cyBhcmUgZmluaXNoZWQuDQoNCi0tLQ0KIGJsb2NrL2Jsay1jb3JlLmMgICAg
+fCAyICsrDQogYmxvY2svYmxrLXRpbWVvdXQuYyB8IDMgLS0tDQogMiBmaWxlcyBjaGFuZ2VkLCAy
+IGluc2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS9ibG9jay9ibGst
+Y29yZS5jIGIvYmxvY2svYmxrLWNvcmUuYw0KaW5kZXggNGZjOWQ2ZDQ0ZWRkLi4wYTBmZGFhNDc0
+ZTMgMTAwNjQ0DQotLS0gYS9ibG9jay9ibGstY29yZS5jDQorKysgYi9ibG9jay9ibGstY29yZS5j
+DQpAQCAtMzMzLDYgKzMzMyw3IEBAIEVYUE9SVF9TWU1CT0woYmxrX3N0b3BfcXVldWUpOw0KIHZv
+aWQgYmxrX3N5bmNfcXVldWUoc3RydWN0IHJlcXVlc3RfcXVldWUgKnEpDQogew0KIAlkZWxfdGlt
+ZXJfc3luYygmcS0+dGltZW91dCk7DQorCWNhbmNlbF93b3JrX3N5bmMoJnEtPnRpbWVvdXRfd29y
+ayk7DQogDQogCWlmIChxLT5tcV9vcHMpIHsNCiAJCXN0cnVjdCBibGtfbXFfaHdfY3R4ICpoY3R4
+Ow0KQEAgLTkwNSw2ICs5MDYsNyBAQCBzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqYmxrX2FsbG9jX3F1
+ZXVlX25vZGUoZ2ZwX3QgZ2ZwX21hc2ssIGludCBub2RlX2lkKQ0KIAlzZXR1cF90aW1lcigmcS0+
+YmFja2luZ19kZXZfaW5mby0+bGFwdG9wX21vZGVfd2JfdGltZXIsDQogCQkgICAgbGFwdG9wX21v
+ZGVfdGltZXJfZm4sICh1bnNpZ25lZCBsb25nKSBxKTsNCiAJc2V0dXBfdGltZXIoJnEtPnRpbWVv
+dXQsIGJsa19ycV90aW1lZF9vdXRfdGltZXIsICh1bnNpZ25lZCBsb25nKSBxKTsNCisJSU5JVF9X
+T1JLKCZxLT50aW1lb3V0X3dvcmssIE5VTEwpOw0KIAlJTklUX0xJU1RfSEVBRCgmcS0+cXVldWVf
+aGVhZCk7DQogCUlOSVRfTElTVF9IRUFEKCZxLT50aW1lb3V0X2xpc3QpOw0KIAlJTklUX0xJU1Rf
+SEVBRCgmcS0+aWNxX2xpc3QpOw0KZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay10aW1lb3V0LmMgYi9i
+bG9jay9ibGstdGltZW91dC5jDQppbmRleCAxZWJhNzE0ODY3MTYuLjc2NGVjZjlhZWIzMCAxMDA2
+NDQNCi0tLSBhL2Jsb2NrL2Jsay10aW1lb3V0LmMNCisrKyBiL2Jsb2NrL2Jsay10aW1lb3V0LmMN
+CkBAIC0xMzQsOCArMTM0LDYgQEAgdm9pZCBibGtfdGltZW91dF93b3JrKHN0cnVjdCB3b3JrX3N0
+cnVjdCAqd29yaykNCiAJc3RydWN0IHJlcXVlc3QgKnJxLCAqdG1wOw0KIAlpbnQgbmV4dF9zZXQg
+PSAwOw0KIA0KLQlpZiAoYmxrX3F1ZXVlX2VudGVyKHEsIEJMS19NUV9SRVFfTk9XQUlUIHwgQkxL
+X01RX1JFUV9QUkVFTVBUKSkNCi0JCXJldHVybjsNCiAJc3Bpbl9sb2NrX2lycXNhdmUocS0+cXVl
+dWVfbG9jaywgZmxhZ3MpOw0KIA0KIAlsaXN0X2Zvcl9lYWNoX2VudHJ5X3NhZmUocnEsIHRtcCwg
+JnEtPnRpbWVvdXRfbGlzdCwgdGltZW91dF9saXN0KQ0KQEAgLTE0NSw3ICsxNDMsNiBAQCB2b2lk
+IGJsa190aW1lb3V0X3dvcmsoc3RydWN0IHdvcmtfc3RydWN0ICp3b3JrKQ0KIAkJbW9kX3RpbWVy
+KCZxLT50aW1lb3V0LCByb3VuZF9qaWZmaWVzX3VwKG5leHQpKTsNCiANCiAJc3Bpbl91bmxvY2tf
+aXJxcmVzdG9yZShxLT5xdWV1ZV9sb2NrLCBmbGFncyk7DQotCWJsa19xdWV1ZV9leGl0KHEpOw0K
+IH0NCiANCiAvKioNCi0tIA0KMi4xNC4yDQo=
