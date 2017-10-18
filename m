@@ -1,171 +1,72 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:50224 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932353AbdJ3Vq7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Oct 2017 17:46:59 -0400
-Received: by mail-pf0-f196.google.com with SMTP id b6so12071963pfh.7
-        for <linux-block@vger.kernel.org>; Mon, 30 Oct 2017 14:46:58 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Tang Junhui <tang.junhui@zte.com.cn>,
-        Michael Lyle <mlyle@lyle.org>
-Subject: [PATCH 3/5] bcache: update bucket_in_use in real time
-Date: Mon, 30 Oct 2017 14:46:33 -0700
-Message-Id: <20171030214635.29888-4-mlyle@lyle.org>
-In-Reply-To: <20171030214635.29888-1-mlyle@lyle.org>
-References: <20171030214635.29888-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+33c0a560d8cf4f6c9bdc+5169+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 04/17] block: add a blk_steal_bios helper
+Date: Wed, 18 Oct 2017 18:52:45 +0200
+Message-Id: <20171018165258.23212-5-hch@lst.de>
+In-Reply-To: <20171018165258.23212-1-hch@lst.de>
+References: <20171018165258.23212-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+This helpers allows to bounce steal the uncompleted bios from a request so
+that they can be reissued on another path.
 
-bucket_in_use is updated in gc thread which triggered by invalidating or
-writing sectors_to_gc dirty data, It's a long interval. Therefore, when we
-use it to compare with the threshold, it is often not timely, which leads
-to inaccurate judgment and often results in bucket depletion.
-
-We have send a patch before, by the means of updating bucket_in_use
-periodically In gc thread, which Coly thought that would lead high
-latency, In this patch, we add avail_nbuckets to record the count of
-available buckets, and we calculate bucket_in_use when alloc or free
-bucket in real time.
-
-[edited by ML: eliminated some whitespace errors]
-
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-Signed-off-by: Michael Lyle <mlyle@lyle.org>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
-Reviewed-by: Coly Li <colyli@suse.de>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- drivers/md/bcache/alloc.c  | 10 ++++++++++
- drivers/md/bcache/bcache.h |  1 +
- drivers/md/bcache/btree.c  | 17 ++++++++++-------
- drivers/md/bcache/btree.h  |  2 +-
- 4 files changed, 22 insertions(+), 8 deletions(-)
+ block/blk-core.c       | 20 ++++++++++++++++++++
+ include/linux/blkdev.h |  2 ++
+ 2 files changed, 22 insertions(+)
 
-diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
-index 4c40870e99f5..8c5a626343d4 100644
---- a/drivers/md/bcache/alloc.c
-+++ b/drivers/md/bcache/alloc.c
-@@ -442,6 +442,11 @@ long bch_bucket_alloc(struct cache *ca, unsigned reserve, bool wait)
- 		b->prio = INITIAL_PRIO;
- 	}
- 
-+	if (ca->set->avail_nbuckets > 0) {
-+		ca->set->avail_nbuckets--;
-+		bch_update_bucket_in_use(ca->set, &ca->set->gc_stats);
-+	}
-+
- 	return r;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index b8c80f39f5fe..e804529e65a5 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2767,6 +2767,26 @@ struct request *blk_fetch_request(struct request_queue *q)
  }
+ EXPORT_SYMBOL(blk_fetch_request);
  
-@@ -449,6 +454,11 @@ void __bch_bucket_free(struct cache *ca, struct bucket *b)
- {
- 	SET_GC_MARK(b, 0);
- 	SET_GC_SECTORS_USED(b, 0);
-+
-+	if (ca->set->avail_nbuckets < ca->set->nbuckets) {
-+		ca->set->avail_nbuckets++;
-+		bch_update_bucket_in_use(ca->set, &ca->set->gc_stats);
-+	}
- }
- 
- void bch_bucket_free(struct cache_set *c, struct bkey *k)
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 363ea6256b39..e274082330dc 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -581,6 +581,7 @@ struct cache_set {
- 	uint8_t			need_gc;
- 	struct gc_stat		gc_stats;
- 	size_t			nbuckets;
-+	size_t			avail_nbuckets;
- 
- 	struct task_struct	*gc_thread;
- 	/* Where in the btree gc currently is */
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index 866dcf78ff8e..d8865e6ead37 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -1240,6 +1240,11 @@ void bch_initial_mark_key(struct cache_set *c, int level, struct bkey *k)
- 	__bch_btree_mark_key(c, level, k);
- }
- 
-+void bch_update_bucket_in_use(struct cache_set *c, struct gc_stat *stats)
++/*
++ * Steal bios from a request.  The request must not have been partially
++ * completed before.
++ */
++void blk_steal_bios(struct bio_list *list, struct request *rq)
 +{
-+	stats->in_use = (c->nbuckets - c->avail_nbuckets) * 100 / c->nbuckets;
-+}
++	if (rq->bio) {
++		if (list->tail)
++			list->tail->bi_next = rq->bio;
++		else
++			list->head = rq->bio;
++		list->tail = rq->biotail;
++	}
 +
- static bool btree_gc_mark_node(struct btree *b, struct gc_stat *gc)
- {
- 	uint8_t stale = 0;
-@@ -1651,9 +1656,8 @@ static void btree_gc_start(struct cache_set *c)
- 	mutex_unlock(&c->bucket_lock);
- }
++	rq->bio = NULL;
++	rq->biotail = NULL;
++	rq->__data_len = 0;
++}
++EXPORT_SYMBOL_GPL(blk_steal_bios);
++
+ /**
+  * blk_update_request - Special helper function for request stacking drivers
+  * @req:      the request being processed
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 780f01db5899..45c63764a14e 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1110,6 +1110,8 @@ extern struct request *blk_peek_request(struct request_queue *q);
+ extern void blk_start_request(struct request *rq);
+ extern struct request *blk_fetch_request(struct request_queue *q);
  
--static size_t bch_btree_gc_finish(struct cache_set *c)
-+static void bch_btree_gc_finish(struct cache_set *c)
- {
--	size_t available = 0;
- 	struct bucket *b;
- 	struct cache *ca;
- 	unsigned i;
-@@ -1690,6 +1694,7 @@ static size_t bch_btree_gc_finish(struct cache_set *c)
- 	}
- 	rcu_read_unlock();
- 
-+	c->avail_nbuckets = 0;
- 	for_each_cache(ca, c, i) {
- 		uint64_t *i;
- 
-@@ -1711,18 +1716,16 @@ static size_t bch_btree_gc_finish(struct cache_set *c)
- 			BUG_ON(!GC_MARK(b) && GC_SECTORS_USED(b));
- 
- 			if (!GC_MARK(b) || GC_MARK(b) == GC_MARK_RECLAIMABLE)
--				available++;
-+				c->avail_nbuckets++;
- 		}
- 	}
- 
- 	mutex_unlock(&c->bucket_lock);
--	return available;
- }
- 
- static void bch_btree_gc(struct cache_set *c)
- {
- 	int ret;
--	unsigned long available;
- 	struct gc_stat stats;
- 	struct closure writes;
- 	struct btree_op op;
-@@ -1745,14 +1748,14 @@ static void bch_btree_gc(struct cache_set *c)
- 			pr_warn("gc failed!");
- 	} while (ret);
- 
--	available = bch_btree_gc_finish(c);
-+	bch_btree_gc_finish(c);
- 	wake_up_allocators(c);
- 
- 	bch_time_stats_update(&c->btree_gc_time, start_time);
- 
- 	stats.key_bytes *= sizeof(uint64_t);
- 	stats.data	<<= 9;
--	stats.in_use	= (c->nbuckets - available) * 100 / c->nbuckets;
-+	bch_update_bucket_in_use(c, &stats);
- 	memcpy(&c->gc_stats, &stats, sizeof(struct gc_stat));
- 
- 	trace_bcache_gc_end(c);
-diff --git a/drivers/md/bcache/btree.h b/drivers/md/bcache/btree.h
-index 73da1f5626cb..4073aca09a49 100644
---- a/drivers/md/bcache/btree.h
-+++ b/drivers/md/bcache/btree.h
-@@ -305,5 +305,5 @@ void bch_keybuf_del(struct keybuf *, struct keybuf_key *);
- struct keybuf_key *bch_keybuf_next(struct keybuf *);
- struct keybuf_key *bch_keybuf_next_rescan(struct cache_set *, struct keybuf *,
- 					  struct bkey *, keybuf_pred_fn *);
--
-+void bch_update_bucket_in_use(struct cache_set *c, struct gc_stat *stats);
- #endif
++void blk_steal_bios(struct bio_list *list, struct request *rq);
++
+ /*
+  * Request completion related functions.
+  *
 -- 
-2.11.0
+2.14.1
