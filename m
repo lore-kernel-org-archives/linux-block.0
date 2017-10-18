@@ -1,83 +1,61 @@
-Return-Path: <byungchul.park@lge.com>
-From: Byungchul Park <byungchul.park@lge.com>
-To: peterz@infradead.org,
-	mingo@kernel.org,
-	axboe@kernel.dk
-Cc: johan@kernel.org,
-	tglx@linutronix.de,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	tj@kernel.org,
-	johannes.berg@intel.com,
-	oleg@redhat.com,
-	amir73il@gmail.com,
-	david@fromorbit.com,
-	darrick.wong@oracle.com,
-	linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	hch@infradead.org,
-	idryomov@gmail.com,
-	kernel-team@lge.com
-Subject: [PATCH v4 4/7] locking/lockdep: Introduce CONFIG_BOOTPARAM_LOCKDEP_CROSSRELEASE_FULLSTACK
-Date: Wed, 25 Oct 2017 14:11:09 +0900
-Message-Id: <1508908272-15757-5-git-send-email-byungchul.park@lge.com>
-In-Reply-To: <1508908272-15757-1-git-send-email-byungchul.park@lge.com>
-References: <1508908272-15757-1-git-send-email-byungchul.park@lge.com>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v9 09/10] block, scsi: Make SCSI quiesce and resume work
+ reliably
+To: Bart Van Assche <Bart.VanAssche@wdc.com>,
+ "axboe@kernel.dk" <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "jthumshirn@suse.de" <jthumshirn@suse.de>, "hch@lst.de" <hch@lst.de>,
+ "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+ "ming.lei@redhat.com" <ming.lei@redhat.com>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+ "hare@suse.com" <hare@suse.com>
+References: <20171016232905.5047-1-bart.vanassche@wdc.com>
+ <20171016232905.5047-10-bart.vanassche@wdc.com>
+ <df8b960d-e65d-3e5e-9de7-4423aa65ad92@suse.de>
+ <1508271483.3457.15.camel@wdc.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <5d307b6d-a4dd-1681-5149-86e88849d835@suse.de>
+Date: Wed, 18 Oct 2017 07:58:44 +0200
+MIME-Version: 1.0
+In-Reply-To: <1508271483.3457.15.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-The boot parameter, crossrelease_fullstack, was introduced to control
-whether to enable unwind in cross-release or not. Add a Kconfig doing
-the same thing.
+On 10/17/2017 10:18 PM, Bart Van Assche wrote:
+> On Tue, 2017-10-17 at 08:33 +0200, Hannes Reinecke wrote:
+>> How do you ensure that PREEMPT requests are not stuck in the queue
+>> _behind_ non-PREEMPT requests?
+>> Once they are in the queue the request are already allocated, so your
+>> deferred allocation won't work.
+>> _And_ deferred requests will be re-inserted at the head of the queue.
+>> Consequently the PREEMPT request will never ever scheduled during quiesce.
+>> How do you avoid such a scenario?
+> 
+> Hello Hannes,
+> 
+> The blk_mq_freeze_queue() / blk_mq_unfreeze_queue() calls that have been
+> added through patch 9/10 to scsi_device_quiesce() will only succeed after all
+> outstanding requests have finished. That includes non-preempt requests and
+> requests that are about to be requeued. The changes in scsi_device_quiesce()
+> are such that blk_queue_enter() will fail for non-preempt requests after the
+> queue has been unfrozen. In other words, if a scsi_device_quiesce() call
+> succeeds, it is guaranteed that there are no non-preempt requests in the queue
+> and also that no new non-preempt requests will enter the queue until
+> scsi_device_resume() is called.
+> 
+Ah. Right.
 
-Suggested-by: Ingo Molnar <mingo@kernel.org>
-Signed-off-by: Byungchul Park <byungchul.park@lge.com>
----
- kernel/locking/lockdep.c |  4 ++++
- lib/Kconfig.debug        | 15 +++++++++++++++
- 2 files changed, 19 insertions(+)
+That was the explanation I was after.
 
-diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
-index 160b5d6..db933d0 100644
---- a/kernel/locking/lockdep.c
-+++ b/kernel/locking/lockdep.c
-@@ -76,7 +76,11 @@
- #define lock_stat 0
- #endif
- 
-+#ifdef CONFIG_BOOTPARAM_LOCKDEP_CROSSRELEASE_FULLSTACK
-+static int crossrelease_fullstack = 1;
-+#else
- static int crossrelease_fullstack;
-+#endif
- static int __init allow_crossrelease_fullstack(char *str)
- {
- 	crossrelease_fullstack = 1;
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 4bef610..e4b54a5 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -1225,6 +1225,21 @@ config LOCKDEP_COMPLETIONS
- 	 A deadlock caused by wait_for_completion() and complete() can be
- 	 detected by lockdep using crossrelease feature.
- 
-+config BOOTPARAM_LOCKDEP_CROSSRELEASE_FULLSTACK
-+	bool "Enable the boot parameter, crossrelease_fullstack"
-+	depends on LOCKDEP_CROSSRELEASE
-+	default n
-+	help
-+	 The lockdep "cross-release" feature needs to record stack traces
-+	 (of calling functions) for all acquisitions, for eventual later
-+	 use during analysis. By default only a single caller is recorded,
-+	 because the unwind operation can be very expensive with deeper
-+	 stack chains.
-+
-+	 However a boot parameter, crossrelease_fullstack, was
-+	 introduced since sometimes deeper traces are required for full
-+	 analysis. This option turns on the boot parameter.
-+
- config DEBUG_LOCKDEP
- 	bool "Lock dependency engine debugging"
- 	depends on DEBUG_KERNEL && LOCKDEP
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+
+Cheers,
+
+Hannes
 -- 
-1.9.1
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
