@@ -1,204 +1,47 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:33958 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750930AbdJ0EoC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Oct 2017 00:44:02 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Omar Sandoval <osandov@fb.com>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Roman Pen <roman.penyaev@profitbricks.com>,
-        Hannes Reinecke <hare@suse.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 2/2] blk-mq: don't restart queue when .get_budget returns BLK_STS_RESOURCE
-Date: Fri, 27 Oct 2017 12:43:30 +0800
-Message-Id: <20171027044330.11921-3-ming.lei@redhat.com>
-In-Reply-To: <20171027044330.11921-1-ming.lei@redhat.com>
-References: <20171027044330.11921-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 4.14-rc
+Message-ID: <3496e261-abbf-70fe-ea98-7bbbea28e3ce@kernel.dk>
+Date: Wed, 18 Oct 2017 12:22:09 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-SCSI restarts its queue in scsi_end_request() automatically, so we don't
-need to handle this case in blk-mq.
+Hi Linus,
 
-Especailly any request won't be dequeued in this case, we needn't to
-worry about IO hang caused by restart vs. dispatch.
+Three small fixes in this pull request:
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sched.c | 45 ++++++++++++++++++++-------------------------
- block/blk-mq-sched.h |  2 +-
- block/blk-mq.c       |  8 ++------
- 3 files changed, 23 insertions(+), 32 deletions(-)
+- A fix for skd, it was using kfree() to free a structure allocate with
+  kmem_cache_alloc().
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index daab27feb653..7775f6b12fa9 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -81,8 +81,12 @@ void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
- 	}
- }
- 
--/* return true if hctx need to run again */
--static bool blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-+/*
-+ * Only SCSI implements .get_budget and .put_budget, and SCSI restarts
-+ * its queue by itself in its completion handler, so we don't need to
-+ * restart queue if .get_budget() returns BLK_STS_NO_RESOURCE.
-+ */
-+static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
- {
- 	struct request_queue *q = hctx->queue;
- 	struct elevator_queue *e = q->elevator;
-@@ -98,7 +102,7 @@ static bool blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
- 
- 		ret = blk_mq_get_dispatch_budget(hctx);
- 		if (ret == BLK_STS_RESOURCE)
--			return true;
-+			break;
- 
- 		rq = e->type->ops.mq.dispatch_request(hctx);
- 		if (!rq) {
-@@ -116,8 +120,6 @@ static bool blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
- 		 */
- 		list_add(&rq->queuelist, &rq_list);
- 	} while (blk_mq_dispatch_rq_list(q, &rq_list, true));
--
--	return false;
- }
- 
- static struct blk_mq_ctx *blk_mq_next_ctx(struct blk_mq_hw_ctx *hctx,
-@@ -131,8 +133,12 @@ static struct blk_mq_ctx *blk_mq_next_ctx(struct blk_mq_hw_ctx *hctx,
- 	return hctx->ctxs[idx];
- }
- 
--/* return true if hctx need to run again */
--static bool blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
-+/*
-+ * Only SCSI implements .get_budget and .put_budget, and SCSI restarts
-+ * its queue by itself in its completion handler, so we don't need to
-+ * restart queue if .get_budget() returns BLK_STS_NO_RESOURCE.
-+ */
-+static void blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
- {
- 	struct request_queue *q = hctx->queue;
- 	LIST_HEAD(rq_list);
-@@ -147,7 +153,7 @@ static bool blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
- 
- 		ret = blk_mq_get_dispatch_budget(hctx);
- 		if (ret == BLK_STS_RESOURCE)
--			return true;
-+			break;
- 
- 		rq = blk_mq_dequeue_from_ctx(hctx, ctx);
- 		if (!rq) {
-@@ -171,22 +177,19 @@ static bool blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
- 	} while (blk_mq_dispatch_rq_list(q, &rq_list, true));
- 
- 	WRITE_ONCE(hctx->dispatch_from, ctx);
--
--	return false;
- }
- 
- /* return true if hw queue need to be run again */
--bool blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
-+void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- {
- 	struct request_queue *q = hctx->queue;
- 	struct elevator_queue *e = q->elevator;
- 	const bool has_sched_dispatch = e && e->type->ops.mq.dispatch_request;
- 	LIST_HEAD(rq_list);
--	bool run_queue = false;
- 
- 	/* RCU or SRCU read lock is needed before checking quiesced flag */
- 	if (unlikely(blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)))
--		return false;
-+		return;
- 
- 	hctx->run++;
- 
-@@ -218,12 +221,12 @@ bool blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 		blk_mq_sched_mark_restart_hctx(hctx);
- 		if (blk_mq_dispatch_rq_list(q, &rq_list, false)) {
- 			if (has_sched_dispatch)
--				run_queue = blk_mq_do_dispatch_sched(hctx);
-+				blk_mq_do_dispatch_sched(hctx);
- 			else
--				run_queue = blk_mq_do_dispatch_ctx(hctx);
-+				blk_mq_do_dispatch_ctx(hctx);
- 		}
- 	} else if (has_sched_dispatch) {
--		run_queue = blk_mq_do_dispatch_sched(hctx);
-+		blk_mq_do_dispatch_sched(hctx);
- 	} else if (q->mq_ops->get_budget) {
- 		/*
- 		 * If we need to get budget before queuing request, we
-@@ -233,19 +236,11 @@ bool blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 		 * TODO: get more budgets, and dequeue more requests in
- 		 * one time.
- 		 */
--		run_queue = blk_mq_do_dispatch_ctx(hctx);
-+		blk_mq_do_dispatch_ctx(hctx);
- 	} else {
- 		blk_mq_flush_busy_ctxs(hctx, &rq_list);
- 		blk_mq_dispatch_rq_list(q, &rq_list, false);
- 	}
--
--	if (run_queue && !blk_mq_sched_needs_restart(hctx) &&
--			!test_bit(BLK_MQ_S_TAG_WAITING, &hctx->state)) {
--		blk_mq_sched_mark_restart_hctx(hctx);
--		return true;
--	}
--
--	return false;
- }
- 
- bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 2434061cc5b7..9267d0b7c197 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -22,7 +22,7 @@ void blk_mq_sched_insert_requests(struct request_queue *q,
- 				  struct blk_mq_ctx *ctx,
- 				  struct list_head *list, bool run_queue_async);
- 
--bool blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx);
-+void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx);
- 
- int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e);
- void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 097ca3ece716..e4d2490f4e7e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1226,7 +1226,6 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
- {
- 	int srcu_idx;
--	bool run_queue;
- 
- 	/*
- 	 * We should be running this queue from one of the CPUs that
-@@ -1243,18 +1242,15 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
- 
- 	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
- 		rcu_read_lock();
--		run_queue = blk_mq_sched_dispatch_requests(hctx);
-+		blk_mq_sched_dispatch_requests(hctx);
- 		rcu_read_unlock();
- 	} else {
- 		might_sleep();
- 
- 		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
--		run_queue = blk_mq_sched_dispatch_requests(hctx);
-+		blk_mq_sched_dispatch_requests(hctx);
- 		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
- 	}
--
--	if (run_queue)
--		blk_mq_run_hw_queue(hctx, true);
- }
- 
- /*
+- Stable fix for nbd, fixing a regression using the normal ioctl based
+  tools.
+
+- Fix for a previous fix in this series, that fixed up inconsistencies
+  between buffered and direct IO.
+
+Please pull!
+
+
+  git://git.kernel.dk/linux-block.git for-linus
+
+
+----------------------------------------------------------------
+Himanshu Jha (1):
+      skd: Use kmem_cache_free
+
+Josef Bacik (1):
+      nbd: don't set the device size until we're connected
+
+Lukas Czerner (1):
+      fs: Avoid invalidation in interrupt context in dio_complete()
+
+ drivers/block/nbd.c      |  2 +-
+ drivers/block/skd_main.c |  2 +-
+ fs/direct-io.c           | 19 +++++++++++++------
+ 3 files changed, 15 insertions(+), 8 deletions(-)
+
 -- 
-2.9.5
+Jens Axboe
