@@ -1,24 +1,58 @@
-Return-Path: <jthumshirn@suse.de>
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>,  linux-block@vger.kernel.org,  Sagi Grimberg <sagi@grimberg.me>,  linux-nvme@lists.infradead.org,  Keith Busch <keith.busch@intel.com>,  Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH 05/17] block: don't look at the struct device dev_t in disk_devt
+Return-Path: <BATV+33c0a560d8cf4f6c9bdc+5169+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 05/17] block: don't look at the struct device dev_t in disk_devt
+Date: Wed, 18 Oct 2017 18:52:46 +0200
+Message-Id: <20171018165258.23212-6-hch@lst.de>
+In-Reply-To: <20171018165258.23212-1-hch@lst.de>
 References: <20171018165258.23212-1-hch@lst.de>
-	<20171018165258.23212-6-hch@lst.de>
-Date: Thu, 19 Oct 2017 10:32:18 +0200
-In-Reply-To: <20171018165258.23212-6-hch@lst.de> (Christoph Hellwig's message
-	of "Wed, 18 Oct 2017 18:52:46 +0200")
-Message-ID: <mqdlgk71qst.fsf@linux-x5ow.site>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
---=20
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
-GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N=C3=BCrnberg)
-Key fingerprint =3D EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+The hidden gendisks introduced in the next patch need to keep the dev
+field in their struct device empty so that udev won't try to create
+block device nodes for them.  To support that rewrite disk_devt to
+look at the major and first_minor fields in the gendisk itself instead
+of looking into the struct device.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/genhd.c         | 4 ----
+ include/linux/genhd.h | 2 +-
+ 2 files changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/block/genhd.c b/block/genhd.c
+index dd305c65ffb0..1174d24e405e 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -649,10 +649,6 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
+ 		return;
+ 	}
+ 	disk_to_dev(disk)->devt = devt;
+-
+-	/* ->major and ->first_minor aren't supposed to be
+-	 * dereferenced from here on, but set them just in case.
+-	 */
+ 	disk->major = MAJOR(devt);
+ 	disk->first_minor = MINOR(devt);
+ 
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index ea652bfcd675..5c0ed5db33c2 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -234,7 +234,7 @@ static inline bool disk_part_scan_enabled(struct gendisk *disk)
+ 
+ static inline dev_t disk_devt(struct gendisk *disk)
+ {
+-	return disk_to_dev(disk)->devt;
++	return MKDEV(disk->major, disk->first_minor);
+ }
+ 
+ static inline dev_t part_devt(struct hd_struct *part)
+-- 
+2.14.1
