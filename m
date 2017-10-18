@@ -1,36 +1,49 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH 02/17] block: add REQ_DRV bit
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
- Johannes Thumshirn <jthumshirn@suse.de>, linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org
+Return-Path: <BATV+33c0a560d8cf4f6c9bdc+5169+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 02/17] block: add REQ_DRV bit
+Date: Wed, 18 Oct 2017 18:52:43 +0200
+Message-Id: <20171018165258.23212-3-hch@lst.de>
+In-Reply-To: <20171018165258.23212-1-hch@lst.de>
 References: <20171018165258.23212-1-hch@lst.de>
- <20171018165258.23212-3-hch@lst.de>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <74620ec2-91ed-b76d-4bc3-46b5f5e03e14@suse.de>
-Date: Thu, 19 Oct 2017 07:48:29 +0200
-MIME-Version: 1.0
-In-Reply-To: <20171018165258.23212-3-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/18/2017 06:52 PM, Christoph Hellwig wrote:
-> Set aside a bit in the request/bio flags for driver use.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-> ---
->  include/linux/blk_types.h | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Set aside a bit in the request/bio flags for driver use.
 
-Cheers,
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+---
+ include/linux/blk_types.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Hannes
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index acc2f3cdc2fc..7ec2ed097a8a 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -229,6 +229,9 @@ enum req_flag_bits {
+ 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
+ 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
+ 
++	/* for driver use */
++	__REQ_DRV,
++
+ 	__REQ_NR_BITS,		/* stops here */
+ };
+ 
+@@ -249,6 +252,8 @@ enum req_flag_bits {
+ 
+ #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
+ 
++#define REQ_DRV			(1ULL << __REQ_DRV)
++
+ #define REQ_FAILFAST_MASK \
+ 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
+ 
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.14.1
