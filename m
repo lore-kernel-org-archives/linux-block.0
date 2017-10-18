@@ -1,36 +1,54 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH 01/17] block: move REQ_NOWAIT
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
- Johannes Thumshirn <jthumshirn@suse.de>, linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org
+Return-Path: <BATV+33c0a560d8cf4f6c9bdc+5169+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 01/17] block: move REQ_NOWAIT
+Date: Wed, 18 Oct 2017 18:52:42 +0200
+Message-Id: <20171018165258.23212-2-hch@lst.de>
+In-Reply-To: <20171018165258.23212-1-hch@lst.de>
 References: <20171018165258.23212-1-hch@lst.de>
- <20171018165258.23212-2-hch@lst.de>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <8895468d-a36a-9f9c-0086-22e058cf5b23@suse.de>
-Date: Thu, 19 Oct 2017 07:48:02 +0200
-MIME-Version: 1.0
-In-Reply-To: <20171018165258.23212-2-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/18/2017 06:52 PM, Christoph Hellwig wrote:
-> This flag should be before the operation-specific REQ_NOUNMAP bit.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-> ---
->  include/linux/blk_types.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+This flag should be before the operation-specific REQ_NOUNMAP bit.
 
-Cheers,
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+---
+ include/linux/blk_types.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Hannes
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index a2d2aa709cef..acc2f3cdc2fc 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -224,11 +224,11 @@ enum req_flag_bits {
+ 	__REQ_PREFLUSH,		/* request for cache flush */
+ 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
+ 	__REQ_BACKGROUND,	/* background IO */
++	__REQ_NOWAIT,           /* Don't wait if request will block */
+ 
+ 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
+ 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
+ 
+-	__REQ_NOWAIT,           /* Don't wait if request will block */
+ 	__REQ_NR_BITS,		/* stops here */
+ };
+ 
+@@ -245,9 +245,9 @@ enum req_flag_bits {
+ #define REQ_PREFLUSH		(1ULL << __REQ_PREFLUSH)
+ #define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
+ #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
++#define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
+ 
+ #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
+-#define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
+ 
+ #define REQ_FAILFAST_MASK \
+ 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.14.1
