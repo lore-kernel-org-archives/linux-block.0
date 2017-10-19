@@ -1,30 +1,24 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
+Return-Path: <jthumshirn@suse.de>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>,  Keith Busch <keith.busch@intel.com>,  Sagi Grimberg <sagi@grimberg.me>,  Hannes Reinecke <hare@suse.de>,  linux-nvme@lists.infradead.org,  linux-block@vger.kernel.org
 Subject: Re: [PATCH 15/17] nvme: track shared namespaces
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>, Hannes Reinecke <hare@suse.de>,
- Johannes Thumshirn <jthumshirn@suse.de>, linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org
 References: <20171018165258.23212-1-hch@lst.de>
- <20171018165258.23212-16-hch@lst.de>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <3c68d0c8-a063-44f9-a76b-0970c9e4ad5d@grimberg.me>
-Date: Thu, 19 Oct 2017 14:06:07 +0300
+	<20171018165258.23212-16-hch@lst.de>
+Date: Thu, 19 Oct 2017 09:36:02 +0200
+In-Reply-To: <20171018165258.23212-16-hch@lst.de> (Christoph Hellwig's message
+	of "Wed, 18 Oct 2017 18:52:56 +0200")
+Message-ID: <mqdk1zr613x.fsf@linux-x5ow.site>
 MIME-Version: 1.0
-In-Reply-To: <20171018165258.23212-16-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Christoph,
-
->   static void nvme_free_ns(struct kref *kref)
->   {
->   	struct nvme_ns *ns = container_of(kref, struct nvme_ns, kref);
->   
-> +	if (ns->head)
-> +		nvme_put_ns_head(ns->head);
-> +
-
-When can we not have a ns-head set?
-
-AFAICT, if nvme_alloc_ns succeeded, we have it set don't we?
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+--=20
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
+GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N=C3=BCrnberg)
+Key fingerprint =3D EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
