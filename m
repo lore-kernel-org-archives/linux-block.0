@@ -1,15 +1,9 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from LGEAMRELO11.lge.com ([156.147.23.51]:40890 "EHLO
-        lgeamrelo11.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751559AbdJTGOK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Oct 2017 02:14:10 -0400
-Date: Fri, 20 Oct 2017 15:14:06 +0900
-From: Byungchul Park <byungchul.park@lge.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "mingo@kernel.org" <mingo@kernel.org>,
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "mingo@kernel.org" <mingo@kernel.org>,
         "peterz@infradead.org" <peterz@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "byungchul.park@lge.com" <byungchul.park@lge.com>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "amir73il@gmail.com" <amir73il@gmail.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "hch@infradead.org" <hch@infradead.org>,
@@ -26,29 +20,35 @@ Cc: "mingo@kernel.org" <mingo@kernel.org>,
         "david@fromorbit.com" <david@fromorbit.com>
 Subject: Re: [RESEND PATCH 1/3] completion: Add support for initializing
  completion with lockdep_map
-Message-ID: <20171020061406.GF3310@X58A-UD3R>
+Date: Thu, 19 Oct 2017 23:24:00 +0000
+Message-ID: <1508455438.4542.4.camel@wdc.com>
 References: <1508319532-24655-1-git-send-email-byungchul.park@lge.com>
- <1508319532-24655-2-git-send-email-byungchul.park@lge.com>
- <1508455438.4542.4.camel@wdc.com>
+         <1508319532-24655-2-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <1508319532-24655-2-git-send-email-byungchul.park@lge.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1508455438.4542.4.camel@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Oct 19, 2017 at 11:24:00PM +0000, Bart Van Assche wrote:
-> Are there any completion objects for which the cross-release checking is
-> useful? Are there any wait_for_completion() callers that hold a mutex or
-> other locking object?
-
-Check /proc/lockdep, then you can find all dependencies wrt cross-lock.
-I named a lock class of wait_for_completion(), a sting starting with
-"(complete)".
-
-For example, in my machine:
-
-console_lock -> (complete)&req.done
-cpu_hotplug_lock.rw_sem -> (complete)&st->done_up
-cpuhp_state_mutex -> (complete)&st->done_up
-
-and so on.
+T24gV2VkLCAyMDE3LTEwLTE4IGF0IDE4OjM4ICswOTAwLCBCeXVuZ2NodWwgUGFyayB3cm90ZToN
+Cj4gU29tZXRpbWVzLCB3ZSB3YW50IHRvIGluaXRpYWxpemUgY29tcGxldGlvbnMgd2l0aCBzcGFy
+YXRlIGxvY2tkZXAgbWFwcw0KPiB0byBhc3NpZ24gbG9jayBjbGFzc2VzIHVuZGVyIGNvbnRyb2wu
+IEZvciBleGFtcGxlLCB0aGUgd29ya3F1ZXVlIGNvZGUNCj4gbWFuYWdlcyBsb2NrZGVwIG1hcHMs
+IGFzIGl0IGNhbiBjbGFzc2lmeSBsb2NrZGVwIG1hcHMgcHJvcGVybHkuDQo+IFByb3ZpZGVkIGEg
+ZnVuY3Rpb24gZm9yIHRoYXQgcHVycG9zZS4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEJ5dW5nY2h1
+bCBQYXJrIDxieXVuZ2NodWwucGFya0BsZ2UuY29tPg0KPiAtLS0NCj4gIGluY2x1ZGUvbGludXgv
+Y29tcGxldGlvbi5oIHwgOCArKysrKysrKw0KPiAgMSBmaWxlIGNoYW5nZWQsIDggaW5zZXJ0aW9u
+cygrKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGludXgvY29tcGxldGlvbi5oIGIvaW5j
+bHVkZS9saW51eC9jb21wbGV0aW9uLmgNCj4gaW5kZXggY2FlNTQwMC4uMTgyZDU2ZSAxMDA2NDQN
+Cj4gLS0tIGEvaW5jbHVkZS9saW51eC9jb21wbGV0aW9uLmgNCj4gKysrIGIvaW5jbHVkZS9saW51
+eC9jb21wbGV0aW9uLmgNCj4gQEAgLTQ5LDYgKzQ5LDEzIEBAIHN0YXRpYyBpbmxpbmUgdm9pZCBj
+b21wbGV0ZV9yZWxlYXNlX2NvbW1pdChzdHJ1Y3QgY29tcGxldGlvbiAqeCkNCj4gIAlsb2NrX2Nv
+bW1pdF9jcm9zc2xvY2soKHN0cnVjdCBsb2NrZGVwX21hcCAqKSZ4LT5tYXApOw0KPiAgfQ0KPiAg
+DQo+ICsjZGVmaW5lIGluaXRfY29tcGxldGlvbl93aXRoX21hcCh4LCBtKQkJCQkJXA0KPiArZG8g
+ewkJCQkJCQkJCVwNCj4gKwlsb2NrZGVwX2luaXRfbWFwX2Nyb3NzbG9jaygoc3RydWN0IGxvY2tk
+ZXBfbWFwICopJih4KS0+bWFwLAlcDQo+ICsJCQkobSktPm5hbWUsIChtKS0+a2V5LCAwKTsJCQkJ
+XA0KPiArCV9faW5pdF9jb21wbGV0aW9uKHgpOwkJCQkJCVwNCj4gK30gd2hpbGUgKDApDQoNCkFy
+ZSB0aGVyZSBhbnkgY29tcGxldGlvbiBvYmplY3RzIGZvciB3aGljaCB0aGUgY3Jvc3MtcmVsZWFz
+ZSBjaGVja2luZyBpcw0KdXNlZnVsPyBBcmUgdGhlcmUgYW55IHdhaXRfZm9yX2NvbXBsZXRpb24o
+KSBjYWxsZXJzIHRoYXQgaG9sZCBhIG11dGV4IG9yDQpvdGhlciBsb2NraW5nIG9iamVjdD8NCg0K
+VGhhbmtzLA0KDQpCYXJ0Lg==
