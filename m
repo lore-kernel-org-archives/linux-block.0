@@ -1,77 +1,24 @@
-Return-Path: <prvs=45882f7e6=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Keith Busch <keith.busch@intel.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	stable@vger.kernel.org
-Subject: [PATCH] block: Fix a race between blk_cleanup_queue() and timeout handling
-Date: Thu, 19 Oct 2017 10:00:48 -0700
-Message-Id: <20171019170048.16044-1-bart.vanassche@wdc.com>
+Return-Path: <jthumshirn@suse.de>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>,  Keith Busch <keith.busch@intel.com>,  Sagi Grimberg <sagi@grimberg.me>,  Hannes Reinecke <hare@suse.de>,  linux-nvme@lists.infradead.org,  linux-block@vger.kernel.org
+Subject: Re: [PATCH 12/17] nvme: check for a live controller in nvme_dev_open
+References: <20171018165258.23212-1-hch@lst.de>
+	<20171018165258.23212-13-hch@lst.de>
+Date: Thu, 19 Oct 2017 09:23:49 +0200
+In-Reply-To: <20171018165258.23212-13-hch@lst.de> (Christoph Hellwig's message
+	of "Wed, 18 Oct 2017 18:52:53 +0200")
+Message-ID: <mqdvajb61oa.fsf@linux-x5ow.site>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Make sure that if the timeout timer fires after a queue has been
-marked "dying" that the affected requests are finished.
-
-Reported-by: chenxiang (M) <chenxiang66@hisilicon.com>
-Fixes: commit 287922eb0b18 ("block: defer timeouts to a workqueue")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Tested-by: chenxiang (M) <chenxiang66@hisilicon.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <keith.busch@intel.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: <stable@vger.kernel.org>
----
- block/blk-core.c    | 2 ++
- block/blk-timeout.c | 3 ---
- 2 files changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index e8e149ccc86b..bb4fce694a60 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -333,6 +333,7 @@ EXPORT_SYMBOL(blk_stop_queue);
- void blk_sync_queue(struct request_queue *q)
- {
- 	del_timer_sync(&q->timeout);
-+	cancel_work_sync(&q->timeout_work);
- 
- 	if (q->mq_ops) {
- 		struct blk_mq_hw_ctx *hctx;
-@@ -844,6 +845,7 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
- 	setup_timer(&q->backing_dev_info->laptop_mode_wb_timer,
- 		    laptop_mode_timer_fn, (unsigned long) q);
- 	setup_timer(&q->timeout, blk_rq_timed_out_timer, (unsigned long) q);
-+	INIT_WORK(&q->timeout_work, NULL);
- 	INIT_LIST_HEAD(&q->queue_head);
- 	INIT_LIST_HEAD(&q->timeout_list);
- 	INIT_LIST_HEAD(&q->icq_list);
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index e3e9c9771d36..764ecf9aeb30 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -134,8 +134,6 @@ void blk_timeout_work(struct work_struct *work)
- 	struct request *rq, *tmp;
- 	int next_set = 0;
- 
--	if (blk_queue_enter(q, true))
--		return;
- 	spin_lock_irqsave(q->queue_lock, flags);
- 
- 	list_for_each_entry_safe(rq, tmp, &q->timeout_list, timeout_list)
-@@ -145,7 +143,6 @@ void blk_timeout_work(struct work_struct *work)
- 		mod_timer(&q->timeout, round_jiffies_up(next));
- 
- 	spin_unlock_irqrestore(q->queue_lock, flags);
--	blk_queue_exit(q);
- }
- 
- /**
--- 
-2.14.2
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+--=20
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
+GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N=C3=BCrnberg)
+Key fingerprint =3D EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
