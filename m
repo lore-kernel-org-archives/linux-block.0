@@ -1,72 +1,37 @@
-Return-Path: <BATV+33c0a560d8cf4f6c9bdc+5169+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 04/17] block: add a blk_steal_bios helper
-Date: Wed, 18 Oct 2017 18:52:45 +0200
-Message-Id: <20171018165258.23212-5-hch@lst.de>
-In-Reply-To: <20171018165258.23212-1-hch@lst.de>
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
+Subject: Re: [PATCH 03/17] block: provide a direct_make_request helper
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+ Hannes Reinecke <hare@suse.de>, Johannes Thumshirn <jthumshirn@suse.de>,
+ linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
 References: <20171018165258.23212-1-hch@lst.de>
+ <20171018165258.23212-4-hch@lst.de>
+ <d8605553-ef38-4aa2-1513-39ae49de3856@grimberg.me>
+ <20171019135430.GD21452@lst.de>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <254bc6d0-31ea-4719-baf5-2d847356db97@grimberg.me>
+Date: Thu, 19 Oct 2017 17:42:46 +0300
+MIME-Version: 1.0
+In-Reply-To: <20171019135430.GD21452@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-This helpers allows to bounce steal the uncompleted bios from a request so
-that they can be reissued on another path.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
----
- block/blk-core.c       | 20 ++++++++++++++++++++
- include/linux/blkdev.h |  2 ++
- 2 files changed, 22 insertions(+)
+>>> +/**
+>>> + * direct_make_request - hand a buffer directly to its device driver for I/O
+>>> + * @bio:  The bio describing the location in memory and on the device.
+>>> + *
+>>> + * This function behaves like generic_make_request(), but does not protect
+>>> + * against recursion.  Must only be used if the called driver is known
+>>> + * to not call generic_make_request (or direct_make_request) again from
+>>> + * its make_request function.  (Calling direct_make_request again from
+>>> + * a workqueue is perfectly fine as that doesn't recurse).
+>>
+>> Question: are the double spaces on purpose?
+> 
+> Yes.  It's a very common style, and especially useful with monospace fonts.
+> https://en.wikipedia.org/wiki/Sentence_spacing for reference.
+> 
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index b8c80f39f5fe..e804529e65a5 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2767,6 +2767,26 @@ struct request *blk_fetch_request(struct request_queue *q)
- }
- EXPORT_SYMBOL(blk_fetch_request);
- 
-+/*
-+ * Steal bios from a request.  The request must not have been partially
-+ * completed before.
-+ */
-+void blk_steal_bios(struct bio_list *list, struct request *rq)
-+{
-+	if (rq->bio) {
-+		if (list->tail)
-+			list->tail->bi_next = rq->bio;
-+		else
-+			list->head = rq->bio;
-+		list->tail = rq->biotail;
-+	}
-+
-+	rq->bio = NULL;
-+	rq->biotail = NULL;
-+	rq->__data_len = 0;
-+}
-+EXPORT_SYMBOL_GPL(blk_steal_bios);
-+
- /**
-  * blk_update_request - Special helper function for request stacking drivers
-  * @req:      the request being processed
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 780f01db5899..45c63764a14e 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1110,6 +1110,8 @@ extern struct request *blk_peek_request(struct request_queue *q);
- extern void blk_start_request(struct request *rq);
- extern struct request *blk_fetch_request(struct request_queue *q);
- 
-+void blk_steal_bios(struct bio_list *list, struct request *rq);
-+
- /*
-  * Request completion related functions.
-  *
--- 
-2.14.1
+Thanks.
