@@ -1,63 +1,46 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:44892 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751339AbdJMXfx (ORCPT
+Received: from LGEAMRELO12.lge.com ([156.147.23.52]:36948 "EHLO
+        lgeamrelo12.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751052AbdJSHDa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 19:35:53 -0400
-Received: by mail-pg0-f68.google.com with SMTP id j3so2341042pga.1
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 16:35:53 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com
-Subject: [PATCH 00/15] bcache: series of patches for 4.15
-Date: Fri, 13 Oct 2017 16:35:27 -0700
-Message-Id: <20171013233542.20938-1-mlyle@lyle.org>
+        Thu, 19 Oct 2017 03:03:30 -0400
+From: Byungchul Park <byungchul.park@lge.com>
+To: peterz@infradead.org, mingo@kernel.org
+Cc: tglx@linutronix.de, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, tj@kernel.org, johannes.berg@intel.com,
+        oleg@redhat.com, amir73il@gmail.com, david@fromorbit.com,
+        darrick.wong@oracle.com, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        hch@infradead.org, idryomov@gmail.com, kernel-team@lge.com
+Subject: [PATCH v2 0/4] Fix false positives by cross-release feature
+Date: Thu, 19 Oct 2017 16:03:23 +0900
+Message-Id: <1508396607-25362-1-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <1508392531-11284-1-git-send-email-byungchul.park@lge.com>
+References: <1508392531-11284-1-git-send-email-byungchul.park@lge.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Jens, and everyone:
+I attached this patchset into another thread for patches fixing a
+performance regression by cross-release, so that the cross-release can
+be re-enabled easily as the last, after fixing false positives as well.
 
-Here is the current series of work for inclusion in next and for 4.15's
-merge window.  We may get some additional fixes, but this is most of the
-work we expect.  All have been previously sent to these lists except the
-very last one.
+Changes from v1
+- Separate a patch removing white space
 
-There's a lot of small cleanup patches and fixes for race conditions.
+Byungchul Park (4):
+  completion: Add support for initializing completion with lockdep_map
+  lockdep: Remove unnecessary acquisitions wrt workqueue flush
+  genhd.h: Remove trailing white space
+  lockdep: Assign a lock_class per gendisk used for
+    wait_for_completion()
 
-Also included is my new rate controller which we've been measuring for
-some time, and other related changes to writeback rate management.
+ block/bio.c                |  2 +-
+ block/genhd.c              | 13 +++++--------
+ include/linux/completion.h |  8 ++++++++
+ include/linux/genhd.h      | 26 ++++++++++++++++++++++----
+ include/linux/workqueue.h  |  4 ++--
+ kernel/workqueue.c         | 20 ++++----------------
+ 6 files changed, 42 insertions(+), 31 deletions(-)
 
-Thanks,
-
-Mike
-
-Summaries below:
-
- MAINTAINERS                   |   4 +-
- drivers/md/bcache/alloc.c     |   5 ++-
- drivers/md/bcache/bcache.h    |  11 +++--
- drivers/md/bcache/closure.h   |   6 +++
- drivers/md/bcache/request.c   |  20 ++++++---
- drivers/md/bcache/super.c     |  40 ++++++++++-------
- drivers/md/bcache/sysfs.c     |  28 +++++++-----
- drivers/md/bcache/util.c      |  10 ++++-
- drivers/md/bcache/util.h      |   4 +-
- drivers/md/bcache/writeback.c | 117 +++++++++++++++++++++++++++++-------------------
- drivers/md/bcache/writeback.h |   4 +-
- 11 files changed, 156 insertions(+), 93 deletions(-)
-
-[PATCH 01/15] bcache: Avoid nested function definition
-[PATCH 02/15] bcache: check ca->alloc_thread initialized before wake
-[PATCH 03/15] bcache: fix a comments typo in bch_alloc_sectors()
-[PATCH 04/15] bcache: rewrite multiple partitions support
-[PATCH 05/15] bcache: Remove redundant set_capacity
-[PATCH 06/15] bcache: update bio->bi_opf bypass/writeback REQ_ flag
-[PATCH 07/15] bcache: remove unused parameter
-[PATCH 08/15] bcache: don't write back data if reading it failed
-[PATCH 09/15] bcache: implement PI controller for writeback rate
-[PATCH 10/15] bcache: smooth writeback rate control
-[PATCH 11/15] bcache: writeback rate shouldn't artifically clamp
-[PATCH 12/15] bcache: rearrange writeback main thread ratelimit
-[PATCH 13/15] bcache: safeguard a dangerous addressing in
-[PATCH 14/15] bcache: Add Michael Lyle to MAINTAINERS
-[PATCH 15/15] bcache: MAINTAINERS: set bcache to MAINTAINED
+-- 
+1.9.1
