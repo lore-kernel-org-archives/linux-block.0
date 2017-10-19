@@ -1,29 +1,20 @@
-Return-Path: <jthumshirn@suse.de>
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>,  Keith Busch <keith.busch@intel.com>,  Sagi Grimberg <sagi@grimberg.me>,  Hannes Reinecke <hare@suse.de>,  linux-nvme@lists.infradead.org,  linux-block@vger.kernel.org
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
 Subject: Re: [PATCH 11/17] nvme: get rid of nvme_ctrl_list
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>, Hannes Reinecke <hare@suse.de>,
+ Johannes Thumshirn <jthumshirn@suse.de>, linux-nvme@lists.infradead.org,
+ linux-block@vger.kernel.org
 References: <20171018165258.23212-1-hch@lst.de>
-	<20171018165258.23212-12-hch@lst.de>
-Date: Thu, 19 Oct 2017 09:22:09 +0200
-In-Reply-To: <20171018165258.23212-12-hch@lst.de> (Christoph Hellwig's message
-	of "Wed, 18 Oct 2017 18:52:52 +0200")
-Message-ID: <mqd60bb7gbi.fsf@linux-x5ow.site>
+ <20171018165258.23212-12-hch@lst.de>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <acd8acfe-5f9a-6b1e-67ff-22a7ba8c16c3@grimberg.me>
+Date: Thu, 19 Oct 2017 10:18:10 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20171018165258.23212-12-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-I'm not sure if the removel of the major number module_param is good
-from an ABI POV. This could lead to some unexpected results for those
-poor souls that used it.
+Looks good!
 
-Apart from that,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-
---=20
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
-GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N=C3=BCrnberg)
-Key fingerprint =3D EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Reviewed-by: Sagi Grimberg <sgi@grimberg.me>
