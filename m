@@ -1,85 +1,91 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f48.google.com ([74.125.82.48]:46138 "EHLO
-        mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751833AbdJCKGz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2017 06:06:55 -0400
-Received: by mail-wm0-f48.google.com with SMTP id m72so15604336wmc.1
-        for <linux-block@vger.kernel.org>; Tue, 03 Oct 2017 03:06:55 -0700 (PDT)
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Javier Gonzales <jg@lightnvm.io>,
-        Hans Holmberg <hans.ml.holmberg@owltronix.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH 6/9] lightnvm: pblk: shut down gc gracefully during exit
-Date: Tue,  3 Oct 2017 12:05:10 +0200
-Message-Id: <1507025113-13351-7-git-send-email-hans.ml.holmberg@owltronix.com>
-In-Reply-To: <1507025113-13351-1-git-send-email-hans.ml.holmberg@owltronix.com>
-References: <1507025113-13351-1-git-send-email-hans.ml.holmberg@owltronix.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Fri, 20 Oct 2017 07:52:02 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: "Darrick J. Wong" <darrick.wong@oracle.com>
+Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-xfs@vger.kernel.org
+Subject: Re: [PATCH v3 41/49] xfs: convert to bio_for_each_segment_all_sp()
+Message-ID: <20171019235201.GE27130@ming.t460p>
+References: <20170808084548.18963-1-ming.lei@redhat.com>
+ <20170808084548.18963-42-ming.lei@redhat.com>
+ <20170808163232.GO24087@magnolia>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20170808163232.GO24087@magnolia>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+On Tue, Aug 08, 2017 at 09:32:32AM -0700, Darrick J. Wong wrote:
+> On Tue, Aug 08, 2017 at 04:45:40PM +0800, Ming Lei wrote:
+> 
+> Sure would be nice to have a changelog explaining why we're doing this.
+> 
+> > Cc: "Darrick J. Wong" <darrick.wong@oracle.com>
+> > Cc: linux-xfs@vger.kernel.org
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  fs/xfs/xfs_aops.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+> > index 6bf120bb1a17..94df43dcae0b 100644
+> > --- a/fs/xfs/xfs_aops.c
+> > +++ b/fs/xfs/xfs_aops.c
+> > @@ -139,6 +139,7 @@ xfs_destroy_ioend(
+> >  	for (bio = &ioend->io_inline_bio; bio; bio = next) {
+> >  		struct bio_vec	*bvec;
+> >  		int		i;
+> > +		struct bvec_iter_all bia;
+> >  
+> >  		/*
+> >  		 * For the last bio, bi_private points to the ioend, so we
+> > @@ -150,7 +151,7 @@ xfs_destroy_ioend(
+> >  			next = bio->bi_private;
+> >  
+> >  		/* walk each page on bio, ending page IO on them */
+> > -		bio_for_each_segment_all(bvec, bio, i)
+> > +		bio_for_each_segment_all_sp(bvec, bio, i, bia)
+> 
+> It's confusing that you're splitting the old bio_for_each_segment_all
+> into multipage and singlepage variants, but bio_for_each_segment_all
+> continues to exist?
 
-Shut down the GC workqueues and tasks in the right order.
+No, it shouldn't, will remove it in V4.
 
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
----
- drivers/lightnvm/pblk-gc.c | 20 ++++++++++++--------
- 1 file changed, 12 insertions(+), 8 deletions(-)
+> 
+> Hmm, the new multipage variant aliases the name bio_for_each_segment_all,
+> so clearly the _all function's sematics have changed a bit, but its name
+> and signature haven't, which seems likely to trip up someone who didn't
+> notice the behavioral change.
 
-diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-index 374089f..f343f90 100644
---- a/drivers/lightnvm/pblk-gc.c
-+++ b/drivers/lightnvm/pblk-gc.c
-@@ -422,10 +422,15 @@ void pblk_gc_kick(struct pblk *pblk)
- {
- 	struct pblk_gc *gc = &pblk->gc;
- 
--	wake_up_process(gc->gc_ts);
- 	pblk_gc_writer_kick(gc);
- 	pblk_gc_reader_kick(gc);
--	mod_timer(&gc->gc_timer, jiffies + msecs_to_jiffies(GC_TIME_MSECS));
-+
-+	/* If we're shutting down GC, let's not start it up again */
-+	if (gc->gc_enabled) {
-+		wake_up_process(gc->gc_ts);
-+		mod_timer(&gc->gc_timer,
-+			  jiffies + msecs_to_jiffies(GC_TIME_MSECS));
-+	}
- }
- 
- static void pblk_gc_timer(unsigned long data)
-@@ -625,9 +630,6 @@ void pblk_gc_exit(struct pblk *pblk)
- {
- 	struct pblk_gc *gc = &pblk->gc;
- 
--	flush_workqueue(gc->gc_reader_wq);
--	flush_workqueue(gc->gc_line_reader_wq);
--
- 	gc->gc_enabled = 0;
- 	del_timer_sync(&gc->gc_timer);
- 	pblk_gc_stop(pblk, 1);
-@@ -635,15 +637,17 @@ void pblk_gc_exit(struct pblk *pblk)
- 	if (gc->gc_ts)
- 		kthread_stop(gc->gc_ts);
- 
-+	if (gc->gc_reader_ts)
-+		kthread_stop(gc->gc_reader_ts);
-+
-+	flush_workqueue(gc->gc_reader_wq);
- 	if (gc->gc_reader_wq)
- 		destroy_workqueue(gc->gc_reader_wq);
- 
-+	flush_workqueue(gc->gc_line_reader_wq);
- 	if (gc->gc_line_reader_wq)
- 		destroy_workqueue(gc->gc_line_reader_wq);
- 
- 	if (gc->gc_writer_ts)
- 		kthread_stop(gc->gc_writer_ts);
--
--	if (gc->gc_reader_ts)
--		kthread_stop(gc->gc_reader_ts);
- }
+bio_for_each_segment_all_mp() is introduced for providing previous
+sematics of bio_for_each_segment_all(), and there is few cases in
+which bvec table need to be updated.
+
+> 
+> Is it still valid to call bio_for_each_segment_all?  I get the feeling
+
+No, bio_for_each_segment_all_mp() should be used instead. But my plan is
+to rename bio_for_each_segment_all_mp() into bio_for_each_segment_all()
+and bio_for_each_segment_all_sp() into bio_for_each_page() once this
+patchset is merged.
+
+> from this patchset that you're really supposed to decide whether you
+> want one page at a time or more than one page at a time and choose _sp
+> or _mp?
+
+Yeah.
+
+> 
+> (And, seeing how this was the only patch sent to this list, the chances
+> are higher of someone missing out on these subtle changes...)
+
+OK, will CC you the cover letter next time.
+
 -- 
-2.7.4
+Ming
