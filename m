@@ -15,9 +15,9 @@ Cc: james.bottomley@hansenpartnership.com,
 	dsterba@suse.com,
 	keescook@chromium.org,
 	Elena Reshetova <elena.reshetova@intel.com>
-Subject: [PATCH 3/6] block: convert blkcg_gq.refcnt from atomic_t to refcount_t
-Date: Fri, 20 Oct 2017 11:15:59 +0300
-Message-Id: <1508487362-26663-4-git-send-email-elena.reshetova@intel.com>
+Subject: [PATCH 5/6] block: convert bsg_device.ref_count from atomic_t to refcount_t
+Date: Fri, 20 Oct 2017 11:16:01 +0300
+Message-Id: <1508487362-26663-6-git-send-email-elena.reshetova@intel.com>
 In-Reply-To: <1508487362-26663-1-git-send-email-elena.reshetova@intel.com>
 References: <1508487362-26663-1-git-send-email-elena.reshetova@intel.com>
 List-ID: <linux-block@vger.kernel.org>
@@ -36,7 +36,7 @@ refcount_t type and API that prevents accidental counter overflows
 and underflows. This is important since overflows and underflows
 can lead to use-after-free situation and be exploitable.
 
-The variable blkcg_gq.refcnt is used as pure reference counter.
+The variable bsg_device.ref_count is used as pure reference counter.
 Convert it to refcount_t and fix up the operations.
 
 Suggested-by: Kees Cook <keescook@chromium.org>
@@ -44,65 +44,56 @@ Reviewed-by: David Windsor <dwindsor@gmail.com>
 Reviewed-by: Hans Liljestrand <ishkamiel@gmail.com>
 Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
 ---
- block/blk-cgroup.c         |  2 +-
- include/linux/blk-cgroup.h | 11 ++++++-----
- 2 files changed, 7 insertions(+), 6 deletions(-)
+ block/bsg.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index d3f56ba..1e7cedc 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -107,7 +107,7 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
- 	blkg->q = q;
- 	INIT_LIST_HEAD(&blkg->q_node);
- 	blkg->blkcg = blkcg;
--	atomic_set(&blkg->refcnt, 1);
-+	refcount_set(&blkg->refcnt, 1);
- 
- 	/* root blkg uses @q->root_rl, init rl only for !root blkgs */
- 	if (blkcg != &blkcg_root) {
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 9d92153..c95d29d 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -19,6 +19,7 @@
- #include <linux/radix-tree.h>
- #include <linux/blkdev.h>
- #include <linux/atomic.h>
+diff --git a/block/bsg.c b/block/bsg.c
+index ee1335c..6c98422 100644
+--- a/block/bsg.c
++++ b/block/bsg.c
+@@ -21,6 +21,7 @@
+ #include <linux/idr.h>
+ #include <linux/bsg.h>
+ #include <linux/slab.h>
 +#include <linux/refcount.h>
  
- /* percpu_counter batch for blkg_[rw]stats, per-cpu drift doesn't matter */
- #define BLKG_STAT_CPU_BATCH	(INT_MAX / 2)
-@@ -122,7 +123,7 @@ struct blkcg_gq {
- 	struct request_list		rl;
+ #include <scsi/scsi.h>
+ #include <scsi/scsi_ioctl.h>
+@@ -38,7 +39,7 @@ struct bsg_device {
+ 	struct list_head busy_list;
+ 	struct list_head done_list;
+ 	struct hlist_node dev_list;
+-	atomic_t ref_count;
++	refcount_t ref_count;
+ 	int queued_cmds;
+ 	int done_cmds;
+ 	wait_queue_head_t wq_done;
+@@ -710,7 +711,7 @@ static int bsg_put_device(struct bsg_device *bd)
  
- 	/* reference count */
--	atomic_t			refcnt;
-+	refcount_t			refcnt;
+ 	mutex_lock(&bsg_mutex);
  
- 	/* is this blkg online? protected by both blkcg and q locks */
- 	bool				online;
-@@ -354,8 +355,8 @@ static inline int blkg_path(struct blkcg_gq *blkg, char *buf, int buflen)
-  */
- static inline void blkg_get(struct blkcg_gq *blkg)
- {
--	WARN_ON_ONCE(atomic_read(&blkg->refcnt) <= 0);
--	atomic_inc(&blkg->refcnt);
-+	WARN_ON_ONCE(refcount_read(&blkg->refcnt) == 0);
-+	refcount_inc(&blkg->refcnt);
- }
+-	do_free = atomic_dec_and_test(&bd->ref_count);
++	do_free = refcount_dec_and_test(&bd->ref_count);
+ 	if (!do_free) {
+ 		mutex_unlock(&bsg_mutex);
+ 		goto out;
+@@ -768,7 +769,7 @@ static struct bsg_device *bsg_add_device(struct inode *inode,
  
- void __blkg_release_rcu(struct rcu_head *rcu);
-@@ -366,8 +367,8 @@ void __blkg_release_rcu(struct rcu_head *rcu);
-  */
- static inline void blkg_put(struct blkcg_gq *blkg)
- {
--	WARN_ON_ONCE(atomic_read(&blkg->refcnt) <= 0);
--	if (atomic_dec_and_test(&blkg->refcnt))
-+	WARN_ON_ONCE(refcount_read(&blkg->refcnt) == 0);
-+	if (refcount_dec_and_test(&blkg->refcnt))
- 		call_rcu(&blkg->rcu_head, __blkg_release_rcu);
- }
+ 	bsg_set_block(bd, file);
  
+-	atomic_set(&bd->ref_count, 1);
++	refcount_set(&bd->ref_count, 1);
+ 	mutex_lock(&bsg_mutex);
+ 	hlist_add_head(&bd->dev_list, bsg_dev_idx_hash(iminor(inode)));
+ 
+@@ -788,7 +789,7 @@ static struct bsg_device *__bsg_get_device(int minor, struct request_queue *q)
+ 
+ 	hlist_for_each_entry(bd, bsg_dev_idx_hash(minor), dev_list) {
+ 		if (bd->queue == q) {
+-			atomic_inc(&bd->ref_count);
++			refcount_inc(&bd->ref_count);
+ 			goto found;
+ 		}
+ 	}
 -- 
 2.7.4
