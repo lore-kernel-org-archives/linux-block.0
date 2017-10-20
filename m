@@ -1,80 +1,40 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:48001 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752092AbdJTKZm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Oct 2017 06:25:42 -0400
-From: "Reshetova, Elena" <elena.reshetova@intel.com>
-To: Johannes Thumshirn <jthumshirn@suse.de>
-CC: "axboe@kernel.dk" <axboe@kernel.dk>,
-        "james.bottomley@hansenpartnership.com"
-        <james.bottomley@hansenpartnership.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "fujita.tomonori@lab.ntt.co.jp" <fujita.tomonori@lab.ntt.co.jp>,
-        "mingo@redhat.com" <mingo@redhat.com>, "clm@fb.com" <clm@fb.com>,
-        "jbacik@fb.com" <jbacik@fb.com>,
-        "dsterba@suse.com" <dsterba@suse.com>,
-        "keescook@chromium.org" <keescook@chromium.org>
-Subject: RE: [PATCH 0/6] v4 block refcount conversion patches
-Date: Fri, 20 Oct 2017 10:25:37 +0000
-Message-ID: <2236FBA76BA1254E88B949DDB74E612B802B37B3@IRSMSX102.ger.corp.intel.com>
+Return-Path: <jthumshirn@suse.de>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Elena Reshetova <elena.reshetova@intel.com>
+Cc: axboe@kernel.dk,  james.bottomley@hansenpartnership.com,  linux-kernel@vger.kernel.org,  linux-block@vger.kernel.org,  linux-scsi@vger.kernel.org,  linux-btrfs@vger.kernel.org,  peterz@infradead.org,  gregkh@linuxfoundation.org,  fujita.tomonori@lab.ntt.co.jp,  mingo@redhat.com,  clm@fb.com,  jbacik@fb.com,  dsterba@suse.com,  keescook@chromium.org
+Subject: Re: [PATCH 0/6] v4 block refcount conversion patches
+In-Reply-To: <1508487362-26663-1-git-send-email-elena.reshetova@intel.com>
+	(Elena Reshetova's message of "Fri, 20 Oct 2017 11:15:56 +0300")
 References: <1508487362-26663-1-git-send-email-elena.reshetova@intel.com>
- <mqdr2typ5uw.fsf@linux-x5ow.site>
-In-Reply-To: <mqdr2typ5uw.fsf@linux-x5ow.site>
-Content-Type: text/plain; charset="utf-8"
+Date: Fri, 20 Oct 2017 10:43:03 +0200
+Message-ID: <mqdr2typ5uw.fsf@linux-x5ow.site>
 MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-DQo+IEVsZW5hIFJlc2hldG92YSA8ZWxlbmEucmVzaGV0b3ZhQGludGVsLmNvbT4gd3JpdGVzOg0K
-PiA+IEVsZW5hIFJlc2hldG92YSAoNik6DQo+ID4gICBibG9jazogY29udmVydCBiaW8uX19iaV9j
-bnQgZnJvbSBhdG9taWNfdCB0byByZWZjb3VudF90DQo+ID4gICBibG9jazogY29udmVydCBibGtf
-cXVldWVfdGFnLnJlZmNudCBmcm9tIGF0b21pY190IHRvIHJlZmNvdW50X3QNCj4gPiAgIGJsb2Nr
-OiBjb252ZXJ0IGJsa2NnX2dxLnJlZmNudCBmcm9tIGF0b21pY190IHRvIHJlZmNvdW50X3QNCj4g
-PiAgIGJsb2NrOiBjb252ZXJ0IGlvX2NvbnRleHQuYWN0aXZlX3JlZiBmcm9tIGF0b21pY190IHRv
-IHJlZmNvdW50X3QNCj4gPiAgIGJsb2NrOiBjb252ZXJ0IGJzZ19kZXZpY2UucmVmX2NvdW50IGZy
-b20gYXRvbWljX3QgdG8gcmVmY291bnRfdA0KPiA+ICAgZHJpdmVycywgYmxvY2s6IGNvbnZlcnQg
-eGVuX2Jsa2lmLnJlZmNudCBmcm9tIGF0b21pY190IHRvIHJlZmNvdW50X3QNCj4gDQo+IEhpIEVs
-ZW5hLA0KPiANCj4gV2hpbGUgdGhlIGJzZyByZWZfY291bnQgaXMgY2hlYXAsIGRvIHlvdSBoYXZl
-IGFueSBudW1iZXJzIGhvdyB0aGUgb3RoZXINCj4gY29udmVyc2lvbnMgY29tcGFyZSBpbiBwZXJm
-b3JtYW5jZSAodGhyb3VnaHB1dCBhbmQgbGF0ZW5jeSkgdnMgYXRvbWljcz8NCkhpIEpvaGFubmVz
-LA0KDQpUaGUgcGVyZm9ybWFuY2Ugd291bGQgZGVwZW5kIG9uIHdoaWNoICJicmVlZCIgb2YgcmVm
-Y291bnRfdCBpcyB1c2VkIHVuZGVybmVhdGguIA0KV2UgY3VycmVudGx5IGhhdmUgMyB2ZXJzaW9u
-czoNCg0KLSByZWZjb3VudF90IGRlZmF1bHRzIHRvIGF0b21pY190IChubyBDT05GSUdfUkVGQ09V
-TlRfRlVMTCBlbmFibGVkLCBubyBhcmNoLiBzdXBwb3J0KQ0KICBJbXBhY3QgaXMgemVybyBpbiB0
-aGlzIGNhc2Ugc2luY2UgaXQgaXMganVzdCBhdG9taWMgZnVuY3Rpb25zIGFyZSB1c2VkLiANCi0g
-cmVmY291bnRfdCB1c2VzIGFyY2guIHNwZWNpZmljIGltcGxlbWVudGF0aW9uIChhcmNoLiBlbmFi
-bGVzIEFSQ0hfSEFTX1JFRkNPVU5UKQ0KIEltcGFjdCBkZXBlbmRzIG9uIGFyY2guIGltcGxlbWVu
-dGF0aW9uLiBDdXJyZW50bHkgb25seSB4ODYgcHJvdmlkZXMgb25lLiANCi0gcmVmY291bnRfdCB1
-c2VzICJmdWxsIiBhcmNoLiBpbmRlcGVuZGVudCBpbXBsZW1lbnRhdGlvbi4NCg0KSGVyZSBhcmUg
-Y3ljbGUgbnVtYmVycyBmb3IgY29tcGFyaW5nIHRoZXNlIDMgKGh0dHBzOi8vbHduLm5ldC9BcnRp
-Y2xlcy83Mjg2MjYvKToNCkp1c3QgY29weSBwYXN0aW5nIGZvciBjb252ZW5pZW5jZToNCg0KIj5U
-aGVzZSBhcmUgdGhlIGN5Y2xlIGNvdW50cyBjb21wYXJpbmcgYSBsb29wIG9mIHJlZmNvdW50X2lu
-YygpIGZyb20gMQ0KPnRvIElOVF9NQVggYW5kIGJhY2sgZG93biB0byAwICh2aWEgcmVmY291bnRf
-ZGVjX2FuZF90ZXN0KCkpLCBiZXR3ZWVuDQo+dW5wcm90ZWN0ZWQgcmVmY291bnRfdCAoYXRvbWlj
-X3QpLCBmdWxseSBwcm90ZWN0ZWQgUkVGQ09VTlRfRlVMTA0KPihyZWZjb3VudF90LWZ1bGwpLCBh
-bmQgdGhpcyBvdmVyZmxvdy1wcm90ZWN0ZWQgcmVmY291bnQgKHJlZmNvdW50X3QtZmFzdCk6DQoN
-Cj4yMTQ3NDgzNjQ2IHJlZmNvdW50X2luYygpcyBhbmQgMjE0NzQ4MzY0NyByZWZjb3VudF9kZWNf
-YW5kX3Rlc3QoKXM6DQoJCQljeWNsZXMJcHJvdGVjdGlvbnMNCj5hdG9taWNfdAkgICA4MjI0OTI2
-NzM4Nwlub25lDQo+cmVmY291bnRfdC1mYXN0ICAgIDgyMjExNDQ2ODkyCW92ZXJmbG93LCB1bnRl
-c3RlZCBkZWMtdG8temVybw0KPnJlZmNvdW50X3QtZnVsbCAgIDE0NDgxNDczNTE5MwlvdmVyZmxv
-dywgdW50ZXN0ZWQgZGVjLXRvLXplcm8sIGluYy1mcm9tLXplcm8iDQoNClNvLCB0aGUgbWlkZGxl
-IG9wdGlvbiAoY2FsbGVkIGhlcmUgcmVmY291bnRfdC1mYXN0KSB3aXRoIGFyY2guIHNwZWNpZmlj
-DQppbXBsZW1lbnRhdGlvbiBnaXZlcyBhIG5lZ2xpZ2libGUgaW1wYWN0LiBUaGUgImZ1bGwiIG9u
-ZSBpcyBtb3JlIHByaWNleSwgYnV0IGl0IGlzDQpkaXNhYmxlZCBieSBkZWZhdWx0IGFueXdheSwg
-c28gb25seSBwZW9wbGUgd2hvIHdhbnQgc3RyaWN0IHNlY3VyaXR5IGVuYWJsZSBpdC4gIA0KDQpB
-cmUgdGhlc2UgbnVtYmVycyBjb252aW5jaW5nIGVub3VnaCB0aGF0IHdlIGRvbid0IGhhdmUgdG8g
-bWVhc3VyZQ0KdGhlIGJsb2NrIGRldmljZXM/IDopDQoNCkJlc3QgUmVnYXJkcywNCkVsZW5hLg0K
-DQoNCj4gDQo+IEl0IHNob3VsZCBiZSBxdWl0ZSBlYXN5IHRvIG1lYXN1cmUgYWdhaW5zdCBhIG51
-bGxfYmxrIGRldmljZS4NCj4gDQo+IFRoYW5rcyBhIGxvdCwNCj4gICAgICAgIEpvaGFubmVzDQo+
-IA0KPiAtLQ0KPiBKb2hhbm5lcyBUaHVtc2hpcm4gICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBTdG9yYWdlDQo+IGp0aHVtc2hpcm5Ac3VzZS5kZSAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgKzQ5IDkxMSA3NDA1MyA2ODkNCj4gU1VTRSBMSU5VWCBHbWJILCBN
-YXhmZWxkc3RyLiA1LCA5MDQwOSBOw7xybmJlcmcNCj4gR0Y6IEZlbGl4IEltZW5kw7ZyZmZlciwg
-SmFuZSBTbWl0aGFyZCwgR3JhaGFtIE5vcnRvbg0KPiBIUkIgMjEyODQgKEFHIE7DvHJuYmVyZykN
-Cj4gS2V5IGZpbmdlcnByaW50ID0gRUMzOCA5Q0FCIEMyQzQgRjI1RCA4NjAwIEQwRDAgMDM5MyA5
-NjlEIDJENzYgMDg1MA0K
+Elena Reshetova <elena.reshetova@intel.com> writes:
+> Elena Reshetova (6):
+>   block: convert bio.__bi_cnt from atomic_t to refcount_t
+>   block: convert blk_queue_tag.refcnt from atomic_t to refcount_t
+>   block: convert blkcg_gq.refcnt from atomic_t to refcount_t
+>   block: convert io_context.active_ref from atomic_t to refcount_t
+>   block: convert bsg_device.ref_count from atomic_t to refcount_t
+>   drivers, block: convert xen_blkif.refcnt from atomic_t to refcount_t
+
+Hi Elena,
+
+While the bsg ref_count is cheap, do you have any numbers how the other
+conversions compare in performance (throughput and latency) vs atomics?
+
+It should be quite easy to measure against a null_blk device.
+
+Thanks a lot,
+       Johannes
+
+--=20
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
+GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N=C3=BCrnberg)
+Key fingerprint =3D EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
