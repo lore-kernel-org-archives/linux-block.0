@@ -1,257 +1,138 @@
-Return-Path: <BATV+33c0a560d8cf4f6c9bdc+5169+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 10/17] nvme: switch controller refcounting to use struct device
-Date: Wed, 18 Oct 2017 18:52:51 +0200
-Message-Id: <20171018165258.23212-11-hch@lst.de>
-In-Reply-To: <20171018165258.23212-1-hch@lst.de>
-References: <20171018165258.23212-1-hch@lst.de>
+Return-Path: <elena.reshetova@intel.com>
+From: Elena Reshetova <elena.reshetova@intel.com>
+To: axboe@kernel.dk
+Cc: james.bottomley@hansenpartnership.com,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	peterz@infradead.org,
+	gregkh@linuxfoundation.org,
+	fujita.tomonori@lab.ntt.co.jp,
+	mingo@redhat.com,
+	clm@fb.com,
+	jbacik@fb.com,
+	dsterba@suse.com,
+	keescook@chromium.org,
+	Elena Reshetova <elena.reshetova@intel.com>
+Subject: [PATCH 1/6] block: convert bio.__bi_cnt from atomic_t to refcount_t
+Date: Fri, 20 Oct 2017 11:15:57 +0300
+Message-Id: <1508487362-26663-2-git-send-email-elena.reshetova@intel.com>
+In-Reply-To: <1508487362-26663-1-git-send-email-elena.reshetova@intel.com>
+References: <1508487362-26663-1-git-send-email-elena.reshetova@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Instead of allocating a separate struct device for the character device
-handle embedd it into struct nvme_ctrl and use it for the main controller
-refcounting.  This removes double refcounting and gets us an automatic
-reference for the character device operations.  We keep ctrl->device as a
-pointer for now to avoid chaning printks all over, but in the future we
-could look into message printing helpers that take a controller structure
-similar to what other subsystems do.
+atomic_t variables are currently used to implement reference
+counters with the following properties:
+ - counter is initialized to 1 using atomic_set()
+ - a resource is freed upon counter reaching zero
+ - once counter reaches zero, its further
+   increments aren't allowed
+ - counter schema uses basic atomic operations
+   (set, inc, inc_not_zero, dec_and_test, etc.)
 
-Note the delete_ctrl operation always already has a reference when it
-is entered now, so we don't need to do the unless_zero variant there.
+Such atomic variables should be converted to a newly provided
+refcount_t type and API that prevents accidental counter overflows
+and underflows. This is important since overflows and underflows
+can lead to use-after-free situation and be exploitable.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+The variable bio.__bi_cnt is used as pure reference counter.
+Convert it to refcount_t and fix up the operations.
+
+Suggested-by: Kees Cook <keescook@chromium.org>
+Reviewed-by: David Windsor <dwindsor@gmail.com>
+Reviewed-by: Hans Liljestrand <ishkamiel@gmail.com>
+Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
 ---
- drivers/nvme/host/core.c   | 43 ++++++++++++++++++++++---------------------
- drivers/nvme/host/fc.c     |  8 ++------
- drivers/nvme/host/nvme.h   | 12 +++++++++++-
- drivers/nvme/host/pci.c    |  2 +-
- drivers/nvme/host/rdma.c   |  5 ++---
- drivers/nvme/target/loop.c |  2 +-
- 6 files changed, 39 insertions(+), 33 deletions(-)
+ block/bio.c               | 6 +++---
+ fs/btrfs/volumes.c        | 2 +-
+ include/linux/bio.h       | 4 ++--
+ include/linux/blk_types.h | 3 ++-
+ 4 files changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 05a6fad89352..7c1d1c4f93fc 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1915,7 +1915,7 @@ static int nvme_dev_open(struct inode *inode, struct file *file)
- 			ret = -EWOULDBLOCK;
- 			break;
- 		}
--		if (!kref_get_unless_zero(&ctrl->kref))
-+		if (!kobject_get_unless_zero(&ctrl->device->kobj))
- 			break;
- 		file->private_data = ctrl;
- 		ret = 0;
-@@ -2374,7 +2374,7 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 	list_add_tail(&ns->list, &ctrl->namespaces);
- 	mutex_unlock(&ctrl->namespaces_mutex);
- 
--	kref_get(&ctrl->kref);
-+	nvme_get_ctrl(ctrl);
- 
- 	kfree(id);
- 
-@@ -2703,7 +2703,7 @@ EXPORT_SYMBOL_GPL(nvme_start_ctrl);
- 
- void nvme_uninit_ctrl(struct nvme_ctrl *ctrl)
+diff --git a/block/bio.c b/block/bio.c
+index 101c2a9..58edc1b 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -279,7 +279,7 @@ void bio_init(struct bio *bio, struct bio_vec *table,
  {
--	device_destroy(nvme_class, MKDEV(nvme_char_major, ctrl->instance));
-+	device_del(ctrl->device);
+ 	memset(bio, 0, sizeof(*bio));
+ 	atomic_set(&bio->__bi_remaining, 1);
+-	atomic_set(&bio->__bi_cnt, 1);
++	refcount_set(&bio->__bi_cnt, 1);
  
- 	spin_lock(&dev_list_lock);
- 	list_del(&ctrl->node);
-@@ -2711,23 +2711,17 @@ void nvme_uninit_ctrl(struct nvme_ctrl *ctrl)
- }
- EXPORT_SYMBOL_GPL(nvme_uninit_ctrl);
+ 	bio->bi_io_vec = table;
+ 	bio->bi_max_vecs = max_vecs;
+@@ -557,12 +557,12 @@ void bio_put(struct bio *bio)
+ 	if (!bio_flagged(bio, BIO_REFFED))
+ 		bio_free(bio);
+ 	else {
+-		BIO_BUG_ON(!atomic_read(&bio->__bi_cnt));
++		BIO_BUG_ON(!refcount_read(&bio->__bi_cnt));
  
--static void nvme_free_ctrl(struct kref *kref)
-+static void nvme_free_ctrl(struct device *dev)
- {
--	struct nvme_ctrl *ctrl = container_of(kref, struct nvme_ctrl, kref);
-+	struct nvme_ctrl *ctrl =
-+		container_of(dev, struct nvme_ctrl, ctrl_device);
- 
--	put_device(ctrl->device);
- 	ida_simple_remove(&nvme_instance_ida, ctrl->instance);
- 	ida_destroy(&ctrl->ns_ida);
- 
- 	ctrl->ops->free_ctrl(ctrl);
- }
- 
--void nvme_put_ctrl(struct nvme_ctrl *ctrl)
--{
--	kref_put(&ctrl->kref, nvme_free_ctrl);
--}
--EXPORT_SYMBOL_GPL(nvme_put_ctrl);
--
- /*
-  * Initialize a NVMe controller structures.  This needs to be called during
-  * earliest initialization so that we have the initialized structured around
-@@ -2742,7 +2736,6 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
- 	spin_lock_init(&ctrl->lock);
- 	INIT_LIST_HEAD(&ctrl->namespaces);
- 	mutex_init(&ctrl->namespaces_mutex);
--	kref_init(&ctrl->kref);
- 	ctrl->dev = dev;
- 	ctrl->ops = ops;
- 	ctrl->quirks = quirks;
-@@ -2755,15 +2748,21 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
- 		goto out;
- 	ctrl->instance = ret;
- 
--	ctrl->device = device_create_with_groups(nvme_class, ctrl->dev,
--				MKDEV(nvme_char_major, ctrl->instance),
--				ctrl, nvme_dev_attr_groups,
--				"nvme%d", ctrl->instance);
--	if (IS_ERR(ctrl->device)) {
--		ret = PTR_ERR(ctrl->device);
-+	device_initialize(&ctrl->ctrl_device);
-+	ctrl->device = &ctrl->ctrl_device;
-+	ctrl->device->devt = MKDEV(nvme_char_major, ctrl->instance);
-+	ctrl->device->class = nvme_class;
-+	ctrl->device->parent = ctrl->dev;
-+	ctrl->device->groups = nvme_dev_attr_groups;
-+	ctrl->device->release = nvme_free_ctrl;
-+	dev_set_drvdata(ctrl->device, ctrl);
-+	ret = dev_set_name(ctrl->device, "nvme%d", ctrl->instance);
-+	if (ret)
- 		goto out_release_instance;
--	}
--	get_device(ctrl->device);
-+	ret = device_add(ctrl->device);
-+	if (ret)
-+		goto out_free_name;
-+
- 	ida_init(&ctrl->ns_ida);
- 
- 	spin_lock(&dev_list_lock);
-@@ -2779,6 +2778,8 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
- 		min(default_ps_max_latency_us, (unsigned long)S32_MAX));
- 
- 	return 0;
-+out_free_name:
-+	kfree_const(dev->kobj.name);
- out_release_instance:
- 	ida_simple_remove(&nvme_instance_ida, ctrl->instance);
- out:
-diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index b8e0822127c1..e45c6350e01c 100644
---- a/drivers/nvme/host/fc.c
-+++ b/drivers/nvme/host/fc.c
-@@ -2681,14 +2681,10 @@ nvme_fc_del_nvme_ctrl(struct nvme_ctrl *nctrl)
- 	struct nvme_fc_ctrl *ctrl = to_fc_ctrl(nctrl);
- 	int ret;
- 
--	if (!kref_get_unless_zero(&ctrl->ctrl.kref))
--		return -EBUSY;
--
-+	nvme_get_ctrl(&ctrl->ctrl);
- 	ret = __nvme_fc_del_ctrl(ctrl);
--
- 	if (!ret)
- 		flush_workqueue(nvme_wq);
--
- 	nvme_put_ctrl(&ctrl->ctrl);
- 
- 	return ret;
-@@ -2905,7 +2901,7 @@ nvme_fc_init_ctrl(struct device *dev, struct nvmf_ctrl_options *opts,
- 		return ERR_PTR(ret);
+ 		/*
+ 		 * last put frees it
+ 		 */
+-		if (atomic_dec_and_test(&bio->__bi_cnt))
++		if (refcount_dec_and_test(&bio->__bi_cnt))
+ 			bio_free(bio);
  	}
+ }
+diff --git a/fs/btrfs/volumes.c b/fs/btrfs/volumes.c
+index b397375..11812ee 100644
+--- a/fs/btrfs/volumes.c
++++ b/fs/btrfs/volumes.c
+@@ -450,7 +450,7 @@ static noinline void run_scheduled_bios(struct btrfs_device *device)
+ 		    waitqueue_active(&fs_info->async_submit_wait))
+ 			wake_up(&fs_info->async_submit_wait);
  
--	kref_get(&ctrl->ctrl.kref);
-+	nvme_get_ctrl(&ctrl->ctrl);
+-		BUG_ON(atomic_read(&cur->__bi_cnt) == 0);
++		BUG_ON(refcount_read(&cur->__bi_cnt) == 0);
  
- 	dev_info(ctrl->ctrl.device,
- 		"NVME-FC{%d}: new ctrl: NQN \"%s\"\n",
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index df787f39f4c1..55286acd5387 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -127,12 +127,12 @@ struct nvme_ctrl {
- 	struct request_queue *admin_q;
- 	struct request_queue *connect_q;
- 	struct device *dev;
--	struct kref kref;
- 	int instance;
- 	struct blk_mq_tag_set *tagset;
- 	struct blk_mq_tag_set *admin_tagset;
- 	struct list_head namespaces;
- 	struct mutex namespaces_mutex;
-+	struct device ctrl_device;
- 	struct device *device;	/* char device */
- 	struct list_head node;
- 	struct ida ns_ida;
-@@ -278,6 +278,16 @@ static inline void nvme_end_request(struct request *req, __le16 status,
- 	blk_mq_complete_request(req);
+ 		/*
+ 		 * if we're doing the sync list, record that our
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 275c91c..0fa4dd2 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -253,7 +253,7 @@ static inline void bio_get(struct bio *bio)
+ {
+ 	bio->bi_flags |= (1 << BIO_REFFED);
+ 	smp_mb__before_atomic();
+-	atomic_inc(&bio->__bi_cnt);
++	refcount_inc(&bio->__bi_cnt);
  }
  
-+static inline void nvme_get_ctrl(struct nvme_ctrl *ctrl)
-+{
-+	get_device(ctrl->device);
-+}
-+
-+static inline void nvme_put_ctrl(struct nvme_ctrl *ctrl)
-+{
-+	put_device(ctrl->device);
-+}
-+
- void nvme_complete_rq(struct request *req);
- void nvme_cancel_request(struct request *req, void *data, bool reserved);
- bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index cb73bc8cad3b..485f38558ba1 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -2132,7 +2132,7 @@ static void nvme_remove_dead_ctrl(struct nvme_dev *dev, int status)
- {
- 	dev_warn(dev->ctrl.device, "Removing after probe failure status: %d\n", status);
+ static inline void bio_cnt_set(struct bio *bio, unsigned int count)
+@@ -262,7 +262,7 @@ static inline void bio_cnt_set(struct bio *bio, unsigned int count)
+ 		bio->bi_flags |= (1 << BIO_REFFED);
+ 		smp_mb__before_atomic();
+ 	}
+-	atomic_set(&bio->__bi_cnt, count);
++	refcount_set(&bio->__bi_cnt, count);
+ }
  
--	kref_get(&dev->ctrl.kref);
-+	nvme_get_ctrl(&dev->ctrl);
- 	nvme_dev_disable(dev, false);
- 	if (!schedule_work(&dev->remove_work))
- 		nvme_put_ctrl(&dev->ctrl);
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index 92a03ff5fb4d..63f649c655f0 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -1793,8 +1793,7 @@ static int nvme_rdma_del_ctrl(struct nvme_ctrl *nctrl)
- 	 * Keep a reference until all work is flushed since
- 	 * __nvme_rdma_del_ctrl can free the ctrl mem
- 	 */
--	if (!kref_get_unless_zero(&ctrl->ctrl.kref))
--		return -EBUSY;
-+	nvme_get_ctrl(&ctrl->ctrl);
- 	ret = __nvme_rdma_del_ctrl(ctrl);
- 	if (!ret)
- 		flush_work(&ctrl->delete_work);
-@@ -1950,7 +1949,7 @@ static struct nvme_ctrl *nvme_rdma_create_ctrl(struct device *dev,
- 	dev_info(ctrl->ctrl.device, "new ctrl: NQN \"%s\", addr %pISpcs\n",
- 		ctrl->ctrl.opts->subsysnqn, &ctrl->addr);
+ static inline bool bio_flagged(struct bio *bio, unsigned int bit)
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index a2d2aa7..1ec370e 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -7,6 +7,7 @@
  
--	kref_get(&ctrl->ctrl.kref);
-+	nvme_get_ctrl(&ctrl->ctrl);
+ #include <linux/types.h>
+ #include <linux/bvec.h>
++#include <linux/refcount.h>
  
- 	mutex_lock(&nvme_rdma_ctrl_mutex);
- 	list_add_tail(&ctrl->list, &nvme_rdma_ctrl_list);
-diff --git a/drivers/nvme/target/loop.c b/drivers/nvme/target/loop.c
-index 92628c432926..818864c33979 100644
---- a/drivers/nvme/target/loop.c
-+++ b/drivers/nvme/target/loop.c
-@@ -641,7 +641,7 @@ static struct nvme_ctrl *nvme_loop_create_ctrl(struct device *dev,
- 	dev_info(ctrl->ctrl.device,
- 		 "new ctrl: \"%s\"\n", ctrl->ctrl.opts->subsysnqn);
+ struct bio_set;
+ struct bio;
+@@ -104,7 +105,7 @@ struct bio {
  
--	kref_get(&ctrl->ctrl.kref);
-+	nvme_get_ctrl(&ctrl->ctrl);
+ 	unsigned short		bi_max_vecs;	/* max bvl_vecs we can hold */
  
- 	changed = nvme_change_ctrl_state(&ctrl->ctrl, NVME_CTRL_LIVE);
- 	WARN_ON_ONCE(!changed);
+-	atomic_t		__bi_cnt;	/* pin count */
++	refcount_t		__bi_cnt;	/* pin count */
+ 
+ 	struct bio_vec		*bi_io_vec;	/* the actual vec list */
+ 
 -- 
-2.14.1
+2.7.4
