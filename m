@@ -1,87 +1,80 @@
-Return-Path: <chenxiang66@hisilicon.com>
-To: <hch@infradead.org>, <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Linuxarm <linuxarm@huawei.com>
-From: "chenxiang (M)" <chenxiang66@hisilicon.com>
-Subject: [bug report] A race between blk_cleanup_queue and blk_timeout_work
-Message-ID: <d96fa515-32cb-8064-93e3-ff405b1923f5@hisilicon.com>
-Date: Tue, 17 Oct 2017 09:55:58 +0800
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga14.intel.com ([192.55.52.115]:48001 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752092AbdJTKZm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Oct 2017 06:25:42 -0400
+From: "Reshetova, Elena" <elena.reshetova@intel.com>
+To: Johannes Thumshirn <jthumshirn@suse.de>
+CC: "axboe@kernel.dk" <axboe@kernel.dk>,
+        "james.bottomley@hansenpartnership.com"
+        <james.bottomley@hansenpartnership.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "fujita.tomonori@lab.ntt.co.jp" <fujita.tomonori@lab.ntt.co.jp>,
+        "mingo@redhat.com" <mingo@redhat.com>, "clm@fb.com" <clm@fb.com>,
+        "jbacik@fb.com" <jbacik@fb.com>,
+        "dsterba@suse.com" <dsterba@suse.com>,
+        "keescook@chromium.org" <keescook@chromium.org>
+Subject: RE: [PATCH 0/6] v4 block refcount conversion patches
+Date: Fri, 20 Oct 2017 10:25:37 +0000
+Message-ID: <2236FBA76BA1254E88B949DDB74E612B802B37B3@IRSMSX102.ger.corp.intel.com>
+References: <1508487362-26663-1-git-send-email-elena.reshetova@intel.com>
+ <mqdr2typ5uw.fsf@linux-x5ow.site>
+In-Reply-To: <mqdr2typ5uw.fsf@linux-x5ow.site>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Jens, Christoph,
-
-There is a scenario: unplug this disks when running IO in disk, we will 
-find IO is blocked all the times as follows:
-......
-Jobs: 3 (f=3): [M_MM__] [89.7% done] [0K/0K /s] [0 /0  iops] [eta 00m:36s]
-......
-I find there is a race between blk_cleanup_queue and blk_timeout_work 
-(kernel is 4.14.0-rc1):
-(1)Remove disks process
-When unplug disk, it will call scsi_remove_target to delete disk:
-scsi_remove_target------>
-      __scsi_remove_target---->
-         scsi_remove_device--->
-             __scsi_remove_device--->
-                 blk_cleanup_queue
-                     blk_freeze_queue
-                     .....
-                     __blk_drain_queue
-scsi_remove_target will call blk_cleanup_queue, and blk_cleanup_queue 
-will call blk_freeze_queue and __blk_drain_queue.
-In blk_freeze_queue, for !blk_mq (our driver satifies this) it will kill 
-q->q_usage_counter.
-In __blk_drain_queue, it is a loop with condition=true, only when 
-drain=0 can this function will be existed.If all the IOs
-are ended, it will be existed, or it will wait and query no-finished IOs 
-every 10ms.
-(2) Timeout process
-For every IO from block layer,if timeout, it will call blk_timeout_work. 
-In blk_timeout_work, it checks blk_queue_enter first.
-In blk_queue_enter, it trys to get q->q_usage_counter, so if failed, it 
-will return directly and will not enter timeout process.
-
-So when unplug disk, removing disk process will kill q->q_usage_counter 
-in blk_cleanup_queue, if there are IOs which are not finished,
-they will wait for timeout, when timeout, they will try to get 
-q->q_usage_counter in blk_timeout_work, as q->q_usage_counter is killed
-in blk_freeze_queue already at that time, so it failed, it will not 
-enter timeout process and this IO will be not processed.
-But in __blk_drain_queue it will loop forever as there are IOs which are 
-still not ended.
-
-I add printk in function blk_timeout_work as follows, . when this issue 
-occurs, i can see this printk happens:
-
-void blk_timeout_work(struct work_struct *work)
-{
-         struct request_queue *q =
-                 container_of(work, struct request_queue, timeout_work);
-         unsigned long flags, next = 0;
-         struct request *rq, *tmp;
-         int next_set = 0;
-
-         if (blk_queue_enter(q, true)) {
-                 pr_err("%s %d\n", __func__, 
-__LINE__);---------------------> i add printk here
-                 return;
-         }
-
-         spin_lock_irqsave(q->queue_lock, flags);
-
-
-         list_for_each_entry_safe(rq, tmp, &q->timeout_list, timeout_list)
-                 blk_rq_check_expired(rq, &next, &next_set);
-
-         if (next_set)
-                 mod_timer(&q->timeout, round_jiffies_up(next));
-
-         spin_unlock_irqrestore(q->queue_lock, flags);
-
-         blk_queue_exit(q);
-}
-
-
-regards,
-shawn
+DQo+IEVsZW5hIFJlc2hldG92YSA8ZWxlbmEucmVzaGV0b3ZhQGludGVsLmNvbT4gd3JpdGVzOg0K
+PiA+IEVsZW5hIFJlc2hldG92YSAoNik6DQo+ID4gICBibG9jazogY29udmVydCBiaW8uX19iaV9j
+bnQgZnJvbSBhdG9taWNfdCB0byByZWZjb3VudF90DQo+ID4gICBibG9jazogY29udmVydCBibGtf
+cXVldWVfdGFnLnJlZmNudCBmcm9tIGF0b21pY190IHRvIHJlZmNvdW50X3QNCj4gPiAgIGJsb2Nr
+OiBjb252ZXJ0IGJsa2NnX2dxLnJlZmNudCBmcm9tIGF0b21pY190IHRvIHJlZmNvdW50X3QNCj4g
+PiAgIGJsb2NrOiBjb252ZXJ0IGlvX2NvbnRleHQuYWN0aXZlX3JlZiBmcm9tIGF0b21pY190IHRv
+IHJlZmNvdW50X3QNCj4gPiAgIGJsb2NrOiBjb252ZXJ0IGJzZ19kZXZpY2UucmVmX2NvdW50IGZy
+b20gYXRvbWljX3QgdG8gcmVmY291bnRfdA0KPiA+ICAgZHJpdmVycywgYmxvY2s6IGNvbnZlcnQg
+eGVuX2Jsa2lmLnJlZmNudCBmcm9tIGF0b21pY190IHRvIHJlZmNvdW50X3QNCj4gDQo+IEhpIEVs
+ZW5hLA0KPiANCj4gV2hpbGUgdGhlIGJzZyByZWZfY291bnQgaXMgY2hlYXAsIGRvIHlvdSBoYXZl
+IGFueSBudW1iZXJzIGhvdyB0aGUgb3RoZXINCj4gY29udmVyc2lvbnMgY29tcGFyZSBpbiBwZXJm
+b3JtYW5jZSAodGhyb3VnaHB1dCBhbmQgbGF0ZW5jeSkgdnMgYXRvbWljcz8NCkhpIEpvaGFubmVz
+LA0KDQpUaGUgcGVyZm9ybWFuY2Ugd291bGQgZGVwZW5kIG9uIHdoaWNoICJicmVlZCIgb2YgcmVm
+Y291bnRfdCBpcyB1c2VkIHVuZGVybmVhdGguIA0KV2UgY3VycmVudGx5IGhhdmUgMyB2ZXJzaW9u
+czoNCg0KLSByZWZjb3VudF90IGRlZmF1bHRzIHRvIGF0b21pY190IChubyBDT05GSUdfUkVGQ09V
+TlRfRlVMTCBlbmFibGVkLCBubyBhcmNoLiBzdXBwb3J0KQ0KICBJbXBhY3QgaXMgemVybyBpbiB0
+aGlzIGNhc2Ugc2luY2UgaXQgaXMganVzdCBhdG9taWMgZnVuY3Rpb25zIGFyZSB1c2VkLiANCi0g
+cmVmY291bnRfdCB1c2VzIGFyY2guIHNwZWNpZmljIGltcGxlbWVudGF0aW9uIChhcmNoLiBlbmFi
+bGVzIEFSQ0hfSEFTX1JFRkNPVU5UKQ0KIEltcGFjdCBkZXBlbmRzIG9uIGFyY2guIGltcGxlbWVu
+dGF0aW9uLiBDdXJyZW50bHkgb25seSB4ODYgcHJvdmlkZXMgb25lLiANCi0gcmVmY291bnRfdCB1
+c2VzICJmdWxsIiBhcmNoLiBpbmRlcGVuZGVudCBpbXBsZW1lbnRhdGlvbi4NCg0KSGVyZSBhcmUg
+Y3ljbGUgbnVtYmVycyBmb3IgY29tcGFyaW5nIHRoZXNlIDMgKGh0dHBzOi8vbHduLm5ldC9BcnRp
+Y2xlcy83Mjg2MjYvKToNCkp1c3QgY29weSBwYXN0aW5nIGZvciBjb252ZW5pZW5jZToNCg0KIj5U
+aGVzZSBhcmUgdGhlIGN5Y2xlIGNvdW50cyBjb21wYXJpbmcgYSBsb29wIG9mIHJlZmNvdW50X2lu
+YygpIGZyb20gMQ0KPnRvIElOVF9NQVggYW5kIGJhY2sgZG93biB0byAwICh2aWEgcmVmY291bnRf
+ZGVjX2FuZF90ZXN0KCkpLCBiZXR3ZWVuDQo+dW5wcm90ZWN0ZWQgcmVmY291bnRfdCAoYXRvbWlj
+X3QpLCBmdWxseSBwcm90ZWN0ZWQgUkVGQ09VTlRfRlVMTA0KPihyZWZjb3VudF90LWZ1bGwpLCBh
+bmQgdGhpcyBvdmVyZmxvdy1wcm90ZWN0ZWQgcmVmY291bnQgKHJlZmNvdW50X3QtZmFzdCk6DQoN
+Cj4yMTQ3NDgzNjQ2IHJlZmNvdW50X2luYygpcyBhbmQgMjE0NzQ4MzY0NyByZWZjb3VudF9kZWNf
+YW5kX3Rlc3QoKXM6DQoJCQljeWNsZXMJcHJvdGVjdGlvbnMNCj5hdG9taWNfdAkgICA4MjI0OTI2
+NzM4Nwlub25lDQo+cmVmY291bnRfdC1mYXN0ICAgIDgyMjExNDQ2ODkyCW92ZXJmbG93LCB1bnRl
+c3RlZCBkZWMtdG8temVybw0KPnJlZmNvdW50X3QtZnVsbCAgIDE0NDgxNDczNTE5MwlvdmVyZmxv
+dywgdW50ZXN0ZWQgZGVjLXRvLXplcm8sIGluYy1mcm9tLXplcm8iDQoNClNvLCB0aGUgbWlkZGxl
+IG9wdGlvbiAoY2FsbGVkIGhlcmUgcmVmY291bnRfdC1mYXN0KSB3aXRoIGFyY2guIHNwZWNpZmlj
+DQppbXBsZW1lbnRhdGlvbiBnaXZlcyBhIG5lZ2xpZ2libGUgaW1wYWN0LiBUaGUgImZ1bGwiIG9u
+ZSBpcyBtb3JlIHByaWNleSwgYnV0IGl0IGlzDQpkaXNhYmxlZCBieSBkZWZhdWx0IGFueXdheSwg
+c28gb25seSBwZW9wbGUgd2hvIHdhbnQgc3RyaWN0IHNlY3VyaXR5IGVuYWJsZSBpdC4gIA0KDQpB
+cmUgdGhlc2UgbnVtYmVycyBjb252aW5jaW5nIGVub3VnaCB0aGF0IHdlIGRvbid0IGhhdmUgdG8g
+bWVhc3VyZQ0KdGhlIGJsb2NrIGRldmljZXM/IDopDQoNCkJlc3QgUmVnYXJkcywNCkVsZW5hLg0K
+DQoNCj4gDQo+IEl0IHNob3VsZCBiZSBxdWl0ZSBlYXN5IHRvIG1lYXN1cmUgYWdhaW5zdCBhIG51
+bGxfYmxrIGRldmljZS4NCj4gDQo+IFRoYW5rcyBhIGxvdCwNCj4gICAgICAgIEpvaGFubmVzDQo+
+IA0KPiAtLQ0KPiBKb2hhbm5lcyBUaHVtc2hpcm4gICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBTdG9yYWdlDQo+IGp0aHVtc2hpcm5Ac3VzZS5kZSAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgKzQ5IDkxMSA3NDA1MyA2ODkNCj4gU1VTRSBMSU5VWCBHbWJILCBN
+YXhmZWxkc3RyLiA1LCA5MDQwOSBOw7xybmJlcmcNCj4gR0Y6IEZlbGl4IEltZW5kw7ZyZmZlciwg
+SmFuZSBTbWl0aGFyZCwgR3JhaGFtIE5vcnRvbg0KPiBIUkIgMjEyODQgKEFHIE7DvHJuYmVyZykN
+Cj4gS2V5IGZpbmdlcnByaW50ID0gRUMzOCA5Q0FCIEMyQzQgRjI1RCA4NjAwIEQwRDAgMDM5MyA5
+NjlEIDJENzYgMDg1MA0K
