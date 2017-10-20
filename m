@@ -1,40 +1,73 @@
-Return-Path: <jthumshirn@suse.de>
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Elena Reshetova <elena.reshetova@intel.com>
-Cc: axboe@kernel.dk,  james.bottomley@hansenpartnership.com,  linux-kernel@vger.kernel.org,  linux-block@vger.kernel.org,  linux-scsi@vger.kernel.org,  linux-btrfs@vger.kernel.org,  peterz@infradead.org,  gregkh@linuxfoundation.org,  fujita.tomonori@lab.ntt.co.jp,  mingo@redhat.com,  clm@fb.com,  jbacik@fb.com,  dsterba@suse.com,  keescook@chromium.org
-Subject: Re: [PATCH 0/6] v4 block refcount conversion patches
-In-Reply-To: <1508487362-26663-1-git-send-email-elena.reshetova@intel.com>
-	(Elena Reshetova's message of "Fri, 20 Oct 2017 11:15:56 +0300")
-References: <1508487362-26663-1-git-send-email-elena.reshetova@intel.com>
-Date: Fri, 20 Oct 2017 10:43:03 +0200
-Message-ID: <mqdr2typ5uw.fsf@linux-x5ow.site>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <elena.reshetova@intel.com>
+From: Elena Reshetova <elena.reshetova@intel.com>
+To: axboe@kernel.dk
+Cc: james.bottomley@hansenpartnership.com,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	peterz@infradead.org,
+	gregkh@linuxfoundation.org,
+	fujita.tomonori@lab.ntt.co.jp,
+	mingo@redhat.com,
+	clm@fb.com,
+	jbacik@fb.com,
+	dsterba@suse.com,
+	keescook@chromium.org,
+	Elena Reshetova <elena.reshetova@intel.com>
+Subject: [PATCH 0/6] v4 block refcount conversion patches
+Date: Fri, 20 Oct 2017 11:15:56 +0300
+Message-Id: <1508487362-26663-1-git-send-email-elena.reshetova@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Elena Reshetova <elena.reshetova@intel.com> writes:
-> Elena Reshetova (6):
->   block: convert bio.__bi_cnt from atomic_t to refcount_t
->   block: convert blk_queue_tag.refcnt from atomic_t to refcount_t
->   block: convert blkcg_gq.refcnt from atomic_t to refcount_t
->   block: convert io_context.active_ref from atomic_t to refcount_t
->   block: convert bsg_device.ref_count from atomic_t to refcount_t
->   drivers, block: convert xen_blkif.refcnt from atomic_t to refcount_t
+Changes in v4:
+ - Improved commit messages and signoff info.
+ - Rebase on top of linux-next as of yesterday.
+ - WARN_ONs are restored since x86 refcount_t does not WARN on zero
 
-Hi Elena,
+Changes in v3:
+No changes in patches apart from trivial rebases, but now by
+default refcount_t = atomic_t and uses all atomic standard operations
+unless CONFIG_REFCOUNT_FULL is enabled. This is a compromize for the
+systems that are critical on performance and cannot accept even
+slight delay on the refcounter operations.
 
-While the bsg ref_count is cheap, do you have any numbers how the other
-conversions compare in performance (throughput and latency) vs atomics?
+Changes in v2:
+Not needed WARNs are removed since refcount_t warns by itself.
+BUG_ONs are left as it is, since refcount_t doesn't bug by default.
 
-It should be quite easy to measure against a null_blk device.
+This series, for block subsystem, replaces atomic_t reference
+counters with the new refcount_t type and API (see include/linux/refcount.h).
+By doing this we prevent intentional or accidental
+underflows or overflows that can lead to use-after-free vulnerabilities.
 
-Thanks a lot,
-       Johannes
+The patches are fully independent and can be cherry-picked separately.
+If there are no objections to the patches, please merge them via respective trees.
 
---=20
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
-GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N=C3=BCrnberg)
-Key fingerprint =3D EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Elena Reshetova (6):
+  block: convert bio.__bi_cnt from atomic_t to refcount_t
+  block: convert blk_queue_tag.refcnt from atomic_t to refcount_t
+  block: convert blkcg_gq.refcnt from atomic_t to refcount_t
+  block: convert io_context.active_ref from atomic_t to refcount_t
+  block: convert bsg_device.ref_count from atomic_t to refcount_t
+  drivers, block: convert xen_blkif.refcnt from atomic_t to refcount_t
+
+ block/bfq-iosched.c                |  2 +-
+ block/bio.c                        |  6 +++---
+ block/blk-cgroup.c                 |  2 +-
+ block/blk-ioc.c                    |  4 ++--
+ block/blk-tag.c                    |  8 ++++----
+ block/bsg.c                        |  9 +++++----
+ block/cfq-iosched.c                |  4 ++--
+ drivers/block/xen-blkback/common.h |  7 ++++---
+ drivers/block/xen-blkback/xenbus.c |  2 +-
+ fs/btrfs/volumes.c                 |  2 +-
+ include/linux/bio.h                |  4 ++--
+ include/linux/blk-cgroup.h         | 11 ++++++-----
+ include/linux/blk_types.h          |  3 ++-
+ include/linux/blkdev.h             |  3 ++-
+ include/linux/iocontext.h          |  7 ++++---
+ 15 files changed, 40 insertions(+), 34 deletions(-)
+
+-- 
+2.7.4
