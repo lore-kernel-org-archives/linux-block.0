@@ -1,22 +1,12 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:47183 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751959AbdJUCYB (ORCPT
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:3708 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752581AbdJTT67 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Oct 2017 22:24:01 -0400
-MIME-Version: 1.0
-In-Reply-To: <1508529532.3029.15.camel@wdc.com>
-References: <1508319532-24655-1-git-send-email-byungchul.park@lge.com>
- <1508319532-24655-2-git-send-email-byungchul.park@lge.com>
- <1508455438.4542.4.camel@wdc.com> <alpine.DEB.2.20.1710200829340.3083@nanos> <1508529532.3029.15.camel@wdc.com>
-From: Byungchul Park <max.byungchul.park@gmail.com>
-Date: Sat, 21 Oct 2017 11:23:58 +0900
-Message-ID: <CANrsvRNnOp_rgEWG2FGg7qaEQi=yEyhiZkpWSW62w21BvJ9Shg@mail.gmail.com>
-Subject: Re: [RESEND PATCH 1/3] completion: Add support for initializing
- completion with lockdep_map
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@kernel.org" <mingo@kernel.org>,
+        Fri, 20 Oct 2017 15:58:59 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "tglx@linutronix.de" <tglx@linutronix.de>
+CC: "mingo@kernel.org" <mingo@kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "peterz@infradead.org" <peterz@infradead.org>,
         "hch@infradead.org" <hch@infradead.org>,
@@ -33,51 +23,51 @@ Cc: "tglx@linutronix.de" <tglx@linutronix.de>,
         "tj@kernel.org" <tj@kernel.org>,
         "kernel-team@lge.com" <kernel-team@lge.com>,
         "david@fromorbit.com" <david@fromorbit.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [RESEND PATCH 1/3] completion: Add support for initializing
+ completion with lockdep_map
+Date: Fri, 20 Oct 2017 19:58:54 +0000
+Message-ID: <1508529532.3029.15.camel@wdc.com>
+References: <1508319532-24655-1-git-send-email-byungchul.park@lge.com>
+         <1508319532-24655-2-git-send-email-byungchul.park@lge.com>
+         <1508455438.4542.4.camel@wdc.com>
+         <alpine.DEB.2.20.1710200829340.3083@nanos>
+In-Reply-To: <alpine.DEB.2.20.1710200829340.3083@nanos>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Sat, Oct 21, 2017 at 4:58 AM, Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
-> Sorry but I'm not sure that's the best possible answer. In my opinion
-> avoiding that completion objects have dependencies on other lock objects,
-> e.g. by avoiding to wait on a completion object while holding a mutex, is a
-> far superior strategy over adding cross-release checking to completion
-> objects. The former strategy namely makes it unnecessary to add
-> cross-release checking to completion objects because that strategy ensures
-> that these completion objects cannot get involved in a deadlock. The latter
-
-It's true if we force it. But do you think it's possible?
-
-> strategy can lead to false positive deadlock reports by the lockdep code,
-
-What do you think false positives come from? It comes from assigning
-lock classes falsely where we should more care, rather than lockdep code
-itself. The same is applicable to cross-release.
-
-> something none of us wants.
->
-> A possible alternative strategy could be to enable cross-release checking
-> only for those completion objects for which waiting occurs inside a critical
-> section.
-
-Of course, it already did. Cross-release doesn't consider any waiting
-outside of critical sections at all, and it should do.
-
-> As explained in another e-mail thread, unlike the lock inversion checking
-> performed by the <= v4.13 lockdep code, cross-release checking is a heuristic
-> that does not have a sound theoretical basis. The lock validator is an
-
-It's not heuristic but based on the same theoretical basis as <=4.13
-lockdep. I mean, the key basis is:
-
-   1) What causes deadlock
-   2) What is a dependency
-   3) Build a dependency when identified
-
-> important tool for kernel developers. It is important that it produces as few
-> false positives as possible. Since the cross-release checks are enabled
-> automatically when enabling lockdep, I think it is normal that I, as a kernel
-> developer, care that the cross-release checks produce as few false positives
-> as possible.
-
-No doubt. That's why I proposed these patches.
+T24gRnJpLCAyMDE3LTEwLTIwIGF0IDA4OjM0ICswMjAwLCBUaG9tYXMgR2xlaXhuZXIgd3JvdGU6
+DQo+IE9uIFRodSwgMTkgT2N0IDIwMTcsIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gPiBBcmUg
+dGhlcmUgYW55IGNvbXBsZXRpb24gb2JqZWN0cyBmb3Igd2hpY2ggdGhlIGNyb3NzLXJlbGVhc2Ug
+Y2hlY2tpbmcgaXMNCj4gPiB1c2VmdWw/DQo+IA0KPiBBbGwgb2YgdGhlbSBieSBkZWZpbml0aW9u
+Lg0KDQpTb3JyeSBidXQgSSdtIG5vdCBzdXJlIHRoYXQncyB0aGUgYmVzdCBwb3NzaWJsZSBhbnN3
+ZXIuIEluIG15IG9waW5pb24NCmF2b2lkaW5nIHRoYXQgY29tcGxldGlvbiBvYmplY3RzIGhhdmUg
+ZGVwZW5kZW5jaWVzIG9uIG90aGVyIGxvY2sgb2JqZWN0cywNCmUuZy4gYnkgYXZvaWRpbmcgdG8g
+d2FpdCBvbiBhIGNvbXBsZXRpb24gb2JqZWN0IHdoaWxlIGhvbGRpbmcgYSBtdXRleCwgaXMgYQ0K
+ZmFyIHN1cGVyaW9yIHN0cmF0ZWd5IG92ZXIgYWRkaW5nIGNyb3NzLXJlbGVhc2UgY2hlY2tpbmcg
+dG8gY29tcGxldGlvbg0Kb2JqZWN0cy4gVGhlIGZvcm1lciBzdHJhdGVneSBuYW1lbHkgbWFrZXMg
+aXQgdW5uZWNlc3NhcnkgdG8gYWRkDQpjcm9zcy1yZWxlYXNlIGNoZWNraW5nIHRvIGNvbXBsZXRp
+b24gb2JqZWN0cyBiZWNhdXNlIHRoYXQgc3RyYXRlZ3kgZW5zdXJlcw0KdGhhdCB0aGVzZSBjb21w
+bGV0aW9uIG9iamVjdHMgY2Fubm90IGdldCBpbnZvbHZlZCBpbiBhIGRlYWRsb2NrLiBUaGUgbGF0
+dGVyDQpzdHJhdGVneSBjYW4gbGVhZCB0byBmYWxzZSBwb3NpdGl2ZSBkZWFkbG9jayByZXBvcnRz
+IGJ5IHRoZSBsb2NrZGVwIGNvZGUsDQpzb21ldGhpbmcgbm9uZSBvZiB1cyB3YW50cy4NCg0KQSBw
+b3NzaWJsZSBhbHRlcm5hdGl2ZSBzdHJhdGVneSBjb3VsZCBiZSB0byBlbmFibGUgY3Jvc3MtcmVs
+ZWFzZSBjaGVja2luZw0Kb25seSBmb3IgdGhvc2UgY29tcGxldGlvbiBvYmplY3RzIGZvciB3aGlj
+aCB3YWl0aW5nIG9jY3VycyBpbnNpZGUgYSBjcml0aWNhbA0Kc2VjdGlvbi4NCg0KPiA+IEFyZSB0
+aGVyZSBhbnkgd2FpdF9mb3JfY29tcGxldGlvbigpIGNhbGxlcnMgdGhhdCBob2xkIGEgbXV0ZXgg
+b3INCj4gPiBvdGhlciBsb2NraW5nIG9iamVjdD8NCj4gDQo+IFllcywgdGhlcmUgYXJlIGFsc28g
+Y3Jvc3MgY29tcGxldGlvbiBkZXBlbmRlbmNpZXMuIFRoZXJlIGhhdmUgYmVlbiBzdWNoDQo+IGJ1
+Z3MgYW5kIEkgZXhwZWN0IG1vcmUgdG8gYmUgdW5lYXJ0aGVkLg0KPiANCj4gSSByZWFsbHkgaGF2
+ZSB0byBhc2sgd2hhdCB5b3VyIG1vdGl2aWF0aW9uIGlzIHRvIGZpZ2h0IHRoZSBsb2NrZGVwIGNv
+dmVyYWdlDQo+IG9mIHN5bmNocm9uaXphdGlvbiBvYmplY3RzIHRvb3RoIGFuZCBuYWlsPw0KDQpB
+cyBleHBsYWluZWQgaW4gYW5vdGhlciBlLW1haWwgdGhyZWFkLCB1bmxpa2UgdGhlIGxvY2sgaW52
+ZXJzaW9uIGNoZWNraW5nDQpwZXJmb3JtZWQgYnkgdGhlIDw9IHY0LjEzIGxvY2tkZXAgY29kZSwg
+Y3Jvc3MtcmVsZWFzZSBjaGVja2luZyBpcyBhIGhldXJpc3RpYw0KdGhhdCBkb2VzIG5vdCBoYXZl
+IGEgc291bmQgdGhlb3JldGljYWwgYmFzaXMuIFRoZSBsb2NrIHZhbGlkYXRvciBpcyBhbg0KaW1w
+b3J0YW50IHRvb2wgZm9yIGtlcm5lbCBkZXZlbG9wZXJzLiBJdCBpcyBpbXBvcnRhbnQgdGhhdCBp
+dCBwcm9kdWNlcyBhcyBmZXcNCmZhbHNlIHBvc2l0aXZlcyBhcyBwb3NzaWJsZS4gU2luY2UgdGhl
+IGNyb3NzLXJlbGVhc2UgY2hlY2tzIGFyZSBlbmFibGVkDQphdXRvbWF0aWNhbGx5IHdoZW4gZW5h
+YmxpbmcgbG9ja2RlcCwgSSB0aGluayBpdCBpcyBub3JtYWwgdGhhdCBJLCBhcyBhIGtlcm5lbA0K
+ZGV2ZWxvcGVyLCBjYXJlIHRoYXQgdGhlIGNyb3NzLXJlbGVhc2UgY2hlY2tzIHByb2R1Y2UgYXMg
+ZmV3IGZhbHNlIHBvc2l0aXZlcw0KYXMgcG9zc2libGUuDQoNCkJhcnQu
