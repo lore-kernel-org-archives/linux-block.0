@@ -1,151 +1,137 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from complete.lackof.org ([198.49.126.79]:41546 "EHLO
-        complete.lackof.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932253AbdJWPle (ORCPT
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:6458 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752605AbdJTXbJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Oct 2017 11:41:34 -0400
-Date: Mon, 23 Oct 2017 09:41:29 -0600
-From: dann frazier <dann.frazier@canonical.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
+        Fri, 20 Oct 2017 19:31:09 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "dann.frazier@canonical.com" <dann.frazier@canonical.com>
+CC: "linux-arm-kernel@lists.infradead.org"
         <linux-arm-kernel@lists.infradead.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Subject: Re: [bug report] regression bisected to "block: Make most
  scsi_req_init() calls implicit"
-Message-ID: <20171023154129.iik3ic36i5fi7sqs@xps13.dannf>
+Date: Fri, 20 Oct 2017 23:30:55 +0000
+Message-ID: <1508542254.3029.24.camel@wdc.com>
 References: <20171020225420.utvoqmtwit2isalc@xps13.dannf>
- <1508542254.3029.24.camel@wdc.com>
+In-Reply-To: <20171020225420.utvoqmtwit2isalc@xps13.dannf>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1508542254.3029.24.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Oct 20, 2017 at 11:30:55PM +0000, Bart Van Assche wrote:
-> On Fri, 2017-10-20 at 16:54 -0600, dann frazier wrote:
-> > hey,
-> >   I'm seeing a regression when executing 'dmraid -r -c' in an arm64
-> > QEMU guest, which I've bisected to the following commit:
-> > 
-> >   ca18d6f7 "block: Make most scsi_req_init() calls implicit"
-> > 
-> > I haven't yet had time to try and debug it yet, but wanted to get
-> > the report out there before the weekend. Here's the crash:
-> > 
-> > [  138.519885] usercopy: kernel memory overwrite attempt detected to           (null) (<null>) (6 bytes)
-> > [  138.521562] kernel BUG at mm/usercopy.c:72!
-> > [  138.522294] Internal error: Oops - BUG: 0 [#1] SMP
-> > [  138.523105] Modules linked in: nls_utf8 isofs nls_iso8859_1 qemu_fw_cfg ib_iser rdma_cm iw_cm ib_cm ib_core iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi ip_tables
-> > x_tables autofs4 btrfs zstd_decompress zstd_compress xxhash raid10 raid456 async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq libcrc32c raid1 raid0
-> > multipath linear aes_ce_blk aes_ce_cipher crc32_ce crct10dif_ce ghash_ce sha2_ce sha256_arm64 sha1_ce virtio_net virtio_blk aes_neon_bs aes_neon_blk crypto_simd cryptd
-> > aes_arm64
-> > [  138.531307] CPU: 62 PID: 2271 Comm: dmraid Not tainted 4.14.0-rc5+ #20
-> > [  138.532512] Hardware name: QEMU KVM Virtual Machine, BIOS 0.0.0 02/06/2015
-> > [  138.533796] task: ffff8003cba2e900 task.stack: ffff0000110e8000
-> > [  138.534887] PC is at __check_object_size+0x114/0x200
-> > [  138.535800] LR is at __check_object_size+0x114/0x200
-> > [  138.536711] pc : [<ffff0000082c0e5c>] lr : [<ffff0000082c0e5c>] pstate: 00400145
-> > [  138.538073] sp : ffff0000110ebb00
-> > [  138.538682] x29: ffff0000110ebb00 x28: 0000000000000000 
-> > [  138.539658] x27: 0000ffffd88e1110 x26: ffff8003e8d3d800 
-> > [  138.540633] x25: 000000000802001d x24: ffff8003e1131920 
-> > [  138.541621] x23: 0000000000000006 x22: 0000000000000006 
-> > [  138.542596] x21: 0000000000000000 x20: 0000000000000006 
-> > [  138.543571] x19: 0000000000000000 x18: ffffffffffffffff 
-> > [  138.544548] x17: 0000ffff83380ce0 x16: ffff0000082dd3b0 
-> > [  138.545525] x15: ffff0000093c8c08 x14: 6c756e2820202020 
-> > [  138.546511] x13: 202020202020206f x12: 7420646574636574 
-> > [  138.547489] x11: ffff0000093c9658 x10: ffff0000086ae800 
-> > [  138.548466] x9 : 7265766f2079726f x8 : 0000000000000017 
-> > [  138.549445] x7 : 6c756e3c2820296c x6 : ffff8003eeb51c28 
-> > [  138.550434] x5 : ffff8003eeb51c28 x4 : 0000000000000000 
-> > [  138.551411] x3 : ffff8003eeb59ec8 x2 : d4a0cd0f45236000 
-> > [  138.552388] x1 : 0000000000000000 x0 : 0000000000000059 
-> > [  138.553364] Process dmraid (pid: 2271, stack limit = 0xffff0000110e8000)
-> > [  138.554593] Call trace:
-> > [  138.555043] Exception stack(0xffff0000110eb9c0 to 0xffff0000110ebb00)
-> > [  138.556214] b9c0: 0000000000000059 0000000000000000 d4a0cd0f45236000 ffff8003eeb59ec8
-> > [  138.557653] b9e0: 0000000000000000 ffff8003eeb51c28 ffff8003eeb51c28 6c756e3c2820296c
-> > [  138.559082] ba00: 0000000000000017 7265766f2079726f ffff0000086ae800 ffff0000093c9658
-> > [  138.560510] ba20: 7420646574636574 202020202020206f 6c756e2820202020 ffff0000093c8c08
-> > [  138.561950] ba40: ffff0000082dd3b0 0000ffff83380ce0 ffffffffffffffff 0000000000000000
-> > [  138.563379] ba60: 0000000000000006 0000000000000000 0000000000000006 0000000000000006
-> > [  138.564805] ba80: ffff8003e1131920 000000000802001d ffff8003e8d3d800 0000ffffd88e1110
-> > [  138.566238] baa0: 0000000000000000 ffff0000110ebb00 ffff0000082c0e5c ffff0000110ebb00
-> > [  138.567666] bac0: ffff0000082c0e5c 0000000000400145 ffff000008e25a80 0000000000000000
-> > [  138.569090] bae0: 0001000000000000 0000000000000006 ffff0000110ebb00 ffff0000082c0e5c
-> > [  138.570523] [<ffff0000082c0e5c>] __check_object_size+0x114/0x200
-> > [  138.571628] [<ffff0000084e71a8>] sg_io+0x120/0x438
-> > [  138.572507] [<ffff0000084e7c0c>] scsi_cmd_ioctl+0x594/0x728
-> > [  138.573531] [<ffff0000084e7df0>] scsi_cmd_blk_ioctl+0x50/0x60
-> > [  138.574594] [<ffff000000b7e798>] virtblk_ioctl+0x60/0x80 [virtio_blk]
-> > [  138.575769] [<ffff0000084d9144>] blkdev_ioctl+0x5e4/0xb50
-> > [  138.576756] [<ffff00000830d810>] block_ioctl+0x50/0x68
-> > [  138.577698] [<ffff0000082dcb34>] do_vfs_ioctl+0xc4/0x940
-> > [  138.578671] [<ffff0000082dd43c>] SyS_ioctl+0x8c/0xa8
-> > [  138.579581] Exception stack(0xffff0000110ebec0 to 0xffff0000110ec000)
-> > [  138.580752] bec0: 0000000000000005 0000000000002285 0000ffffd88e10b8 0000000000000006
-> > [  138.582199] bee0: 0000000000000000 0000000000000004 0000ffff83416648 0000000000000050
-> > [  138.583623] bf00: 000000000000001d 0003ffffffffffff 0000000000000012 0000000000000011
-> > [  138.585050] bf20: 0000ffff83409000 00000000000000ff 0000ffff8309dc70 0000000000000531
-> > [  138.586490] bf40: 0000ffff8344a360 0000ffff83380ce0 00000000000000dc 0000ffff83478948
-> > [  138.587918] bf60: 0000000000000004 0000000017ee7f90 0000000000000005 0000000017ede920
-> > [  138.589346] bf80: 0000000017ee7f60 0000000000000003 0000ffff83416648 0000000017ee7f60
-> > [  138.590785] bfa0: 0000ffffd88e1218 0000ffffd88e1090 0000ffff834166dc 0000ffffd88e1090
-> > [  138.592215] bfc0: 0000ffff83380cec 0000000080000000 0000000000000005 000000000000001d
-> > [  138.593649] bfe0: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> > [  138.595091] [<ffff000008083a30>] el0_svc_naked+0x24/0x28
-> > [  138.596071] Code: aa1403e5 aa1303e3 9119a0c0 97f9d96d (d4210000) 
-> > [  138.597193] ---[ end trace b7eecd0b21001177 ]---
-> > 
-> > Here's the ioctl as reported by strace:
-> > 
-> > 2277  openat(AT_FDCWD, "/dev/vdb", O_RDONLY) = 5
-> > 2277  ioctl(5, BLKSSZGET, [512])        = 0
-> > 2277  ioctl(5, SG_IO, {'S', SG_DXFER_FROM_DEV, cmd[6]=[12, 01, 80, 00, 04, 00], mx_sb_len=0, iovec_count=0, dxfer_len=4, timeout=6000, flags=0 <unfinished ...>) = ?
-> > 
-> >  $ qemu-system-aarch64 -enable-kvm -m 16384 \
-> >    -cpu host -smp 4 -M virt,gic_version=host -nographic \
-> >    -pflash flash0.img -pflash flash1.img \
-> >    -drive if=none,file=artful-server-cloudimg-arm64.img,id=hd0 \
-> >    -device virtio-blk-device,drive=hd0 -drive \
-> >    -if=none,file=my-seed.img,id=hd1 \
-> >    -device virtio-blk-device,drive=hd1 \
-> >    -netdev type=tap,id=net0 -device virtio-net-device,netdev=net0,mac=<omitted>
-> 
-> Hello Dann,
-> 
-> Since I do not have access to artful-server-cloudimg-arm64.img, can you
-> convert the crash address into a file name and line number for me (gdb list
-> *(${crash_address})? Can you do this for both __check_object_size+0x114 and
-> sg_io+0x120?
-
-Hi Bart - sure:
-
-(gdb) list *(__check_object_size+0x114)
-0xffff0000082c0e5c is in __check_object_size (mm/usercopy.c:72).
-67		/*
-68		 * For greater effect, it would be nice to do do_group_exit(),
-69		 * but BUG() actually hooks all the lock-breaking and per-arch
-70		 * Oops code, so that is used here instead.
-71		 */
-72		BUG();
-73	}
-74	
-75	/* Returns true if any portion of [ptr,ptr+n) over laps with [low,high). */
-76	static bool overlaps(const void *ptr, unsigned long n, unsigned long low,
-(gdb) list *(sg_io+0x120)
-0xffff0000084e71a8 is in sg_io (./include/linux/uaccess.h:113).
-108	static inline unsigned long
-109	_copy_from_user(void *to, const void __user *from, unsigned long n)
-110	{
-111		unsigned long res = n;
-112		might_fault();
-113		if (likely(access_ok(VERIFY_READ, from, n))) {
-114			kasan_check_write(to, n);
-115			res = raw_copy_from_user(to, from, n);
-116		}
-117		if (unlikely(res))
-
-  -dann
+T24gRnJpLCAyMDE3LTEwLTIwIGF0IDE2OjU0IC0wNjAwLCBkYW5uIGZyYXppZXIgd3JvdGU6DQo+
+IGhleSwNCj4gICBJJ20gc2VlaW5nIGEgcmVncmVzc2lvbiB3aGVuIGV4ZWN1dGluZyAnZG1yYWlk
+IC1yIC1jJyBpbiBhbiBhcm02NA0KPiBRRU1VIGd1ZXN0LCB3aGljaCBJJ3ZlIGJpc2VjdGVkIHRv
+IHRoZSBmb2xsb3dpbmcgY29tbWl0Og0KPiANCj4gICBjYTE4ZDZmNyAiYmxvY2s6IE1ha2UgbW9z
+dCBzY3NpX3JlcV9pbml0KCkgY2FsbHMgaW1wbGljaXQiDQo+IA0KPiBJIGhhdmVuJ3QgeWV0IGhh
+ZCB0aW1lIHRvIHRyeSBhbmQgZGVidWcgaXQgeWV0LCBidXQgd2FudGVkIHRvIGdldA0KPiB0aGUg
+cmVwb3J0IG91dCB0aGVyZSBiZWZvcmUgdGhlIHdlZWtlbmQuIEhlcmUncyB0aGUgY3Jhc2g6DQo+
+IA0KPiBbICAxMzguNTE5ODg1XSB1c2VyY29weToga2VybmVsIG1lbW9yeSBvdmVyd3JpdGUgYXR0
+ZW1wdCBkZXRlY3RlZCB0byAgICAgICAgICAgKG51bGwpICg8bnVsbD4pICg2IGJ5dGVzKQ0KPiBb
+ICAxMzguNTIxNTYyXSBrZXJuZWwgQlVHIGF0IG1tL3VzZXJjb3B5LmM6NzIhDQo+IFsgIDEzOC41
+MjIyOTRdIEludGVybmFsIGVycm9yOiBPb3BzIC0gQlVHOiAwIFsjMV0gU01QDQo+IFsgIDEzOC41
+MjMxMDVdIE1vZHVsZXMgbGlua2VkIGluOiBubHNfdXRmOCBpc29mcyBubHNfaXNvODg1OV8xIHFl
+bXVfZndfY2ZnIGliX2lzZXIgcmRtYV9jbSBpd19jbSBpYl9jbSBpYl9jb3JlIGlzY3NpX3RjcCBs
+aWJpc2NzaV90Y3AgbGliaXNjc2kgc2NzaV90cmFuc3BvcnRfaXNjc2kgaXBfdGFibGVzDQo+IHhf
+dGFibGVzIGF1dG9mczQgYnRyZnMgenN0ZF9kZWNvbXByZXNzIHpzdGRfY29tcHJlc3MgeHhoYXNo
+IHJhaWQxMCByYWlkNDU2IGFzeW5jX3JhaWQ2X3JlY292IGFzeW5jX21lbWNweSBhc3luY19wcSBh
+c3luY194b3IgYXN5bmNfdHggeG9yIHJhaWQ2X3BxIGxpYmNyYzMyYyByYWlkMSByYWlkMA0KPiBt
+dWx0aXBhdGggbGluZWFyIGFlc19jZV9ibGsgYWVzX2NlX2NpcGhlciBjcmMzMl9jZSBjcmN0MTBk
+aWZfY2UgZ2hhc2hfY2Ugc2hhMl9jZSBzaGEyNTZfYXJtNjQgc2hhMV9jZSB2aXJ0aW9fbmV0IHZp
+cnRpb19ibGsgYWVzX25lb25fYnMgYWVzX25lb25fYmxrIGNyeXB0b19zaW1kIGNyeXB0ZA0KPiBh
+ZXNfYXJtNjQNCj4gWyAgMTM4LjUzMTMwN10gQ1BVOiA2MiBQSUQ6IDIyNzEgQ29tbTogZG1yYWlk
+IE5vdCB0YWludGVkIDQuMTQuMC1yYzUrICMyMA0KPiBbICAxMzguNTMyNTEyXSBIYXJkd2FyZSBu
+YW1lOiBRRU1VIEtWTSBWaXJ0dWFsIE1hY2hpbmUsIEJJT1MgMC4wLjAgMDIvMDYvMjAxNQ0KPiBb
+ICAxMzguNTMzNzk2XSB0YXNrOiBmZmZmODAwM2NiYTJlOTAwIHRhc2suc3RhY2s6IGZmZmYwMDAw
+MTEwZTgwMDANCj4gWyAgMTM4LjUzNDg4N10gUEMgaXMgYXQgX19jaGVja19vYmplY3Rfc2l6ZSsw
+eDExNC8weDIwMA0KPiBbICAxMzguNTM1ODAwXSBMUiBpcyBhdCBfX2NoZWNrX29iamVjdF9zaXpl
+KzB4MTE0LzB4MjAwDQo+IFsgIDEzOC41MzY3MTFdIHBjIDogWzxmZmZmMDAwMDA4MmMwZTVjPl0g
+bHIgOiBbPGZmZmYwMDAwMDgyYzBlNWM+XSBwc3RhdGU6IDAwNDAwMTQ1DQo+IFsgIDEzOC41Mzgw
+NzNdIHNwIDogZmZmZjAwMDAxMTBlYmIwMA0KPiBbICAxMzguNTM4NjgyXSB4Mjk6IGZmZmYwMDAw
+MTEwZWJiMDAgeDI4OiAwMDAwMDAwMDAwMDAwMDAwIA0KPiBbICAxMzguNTM5NjU4XSB4Mjc6IDAw
+MDBmZmZmZDg4ZTExMTAgeDI2OiBmZmZmODAwM2U4ZDNkODAwIA0KPiBbICAxMzguNTQwNjMzXSB4
+MjU6IDAwMDAwMDAwMDgwMjAwMWQgeDI0OiBmZmZmODAwM2UxMTMxOTIwIA0KPiBbICAxMzguNTQx
+NjIxXSB4MjM6IDAwMDAwMDAwMDAwMDAwMDYgeDIyOiAwMDAwMDAwMDAwMDAwMDA2IA0KPiBbICAx
+MzguNTQyNTk2XSB4MjE6IDAwMDAwMDAwMDAwMDAwMDAgeDIwOiAwMDAwMDAwMDAwMDAwMDA2IA0K
+PiBbICAxMzguNTQzNTcxXSB4MTk6IDAwMDAwMDAwMDAwMDAwMDAgeDE4OiBmZmZmZmZmZmZmZmZm
+ZmZmIA0KPiBbICAxMzguNTQ0NTQ4XSB4MTc6IDAwMDBmZmZmODMzODBjZTAgeDE2OiBmZmZmMDAw
+MDA4MmRkM2IwIA0KPiBbICAxMzguNTQ1NTI1XSB4MTU6IGZmZmYwMDAwMDkzYzhjMDggeDE0OiA2
+Yzc1NmUyODIwMjAyMDIwIA0KPiBbICAxMzguNTQ2NTExXSB4MTM6IDIwMjAyMDIwMjAyMDIwNmYg
+eDEyOiA3NDIwNjQ2NTc0NjM2NTc0IA0KPiBbICAxMzguNTQ3NDg5XSB4MTE6IGZmZmYwMDAwMDkz
+Yzk2NTggeDEwOiBmZmZmMDAwMDA4NmFlODAwIA0KPiBbICAxMzguNTQ4NDY2XSB4OSA6IDcyNjU3
+NjZmMjA3OTcyNmYgeDggOiAwMDAwMDAwMDAwMDAwMDE3IA0KPiBbICAxMzguNTQ5NDQ1XSB4NyA6
+IDZjNzU2ZTNjMjgyMDI5NmMgeDYgOiBmZmZmODAwM2VlYjUxYzI4IA0KPiBbICAxMzguNTUwNDM0
+XSB4NSA6IGZmZmY4MDAzZWViNTFjMjggeDQgOiAwMDAwMDAwMDAwMDAwMDAwIA0KPiBbICAxMzgu
+NTUxNDExXSB4MyA6IGZmZmY4MDAzZWViNTllYzggeDIgOiBkNGEwY2QwZjQ1MjM2MDAwIA0KPiBb
+ICAxMzguNTUyMzg4XSB4MSA6IDAwMDAwMDAwMDAwMDAwMDAgeDAgOiAwMDAwMDAwMDAwMDAwMDU5
+IA0KPiBbICAxMzguNTUzMzY0XSBQcm9jZXNzIGRtcmFpZCAocGlkOiAyMjcxLCBzdGFjayBsaW1p
+dCA9IDB4ZmZmZjAwMDAxMTBlODAwMCkNCj4gWyAgMTM4LjU1NDU5M10gQ2FsbCB0cmFjZToNCj4g
+WyAgMTM4LjU1NTA0M10gRXhjZXB0aW9uIHN0YWNrKDB4ZmZmZjAwMDAxMTBlYjljMCB0byAweGZm
+ZmYwMDAwMTEwZWJiMDApDQo+IFsgIDEzOC41NTYyMTRdIGI5YzA6IDAwMDAwMDAwMDAwMDAwNTkg
+MDAwMDAwMDAwMDAwMDAwMCBkNGEwY2QwZjQ1MjM2MDAwIGZmZmY4MDAzZWViNTllYzgNCj4gWyAg
+MTM4LjU1NzY1M10gYjllMDogMDAwMDAwMDAwMDAwMDAwMCBmZmZmODAwM2VlYjUxYzI4IGZmZmY4
+MDAzZWViNTFjMjggNmM3NTZlM2MyODIwMjk2Yw0KPiBbICAxMzguNTU5MDgyXSBiYTAwOiAwMDAw
+MDAwMDAwMDAwMDE3IDcyNjU3NjZmMjA3OTcyNmYgZmZmZjAwMDAwODZhZTgwMCBmZmZmMDAwMDA5
+M2M5NjU4DQo+IFsgIDEzOC41NjA1MTBdIGJhMjA6IDc0MjA2NDY1NzQ2MzY1NzQgMjAyMDIwMjAy
+MDIwMjA2ZiA2Yzc1NmUyODIwMjAyMDIwIGZmZmYwMDAwMDkzYzhjMDgNCj4gWyAgMTM4LjU2MTk1
+MF0gYmE0MDogZmZmZjAwMDAwODJkZDNiMCAwMDAwZmZmZjgzMzgwY2UwIGZmZmZmZmZmZmZmZmZm
+ZmYgMDAwMDAwMDAwMDAwMDAwMA0KPiBbICAxMzguNTYzMzc5XSBiYTYwOiAwMDAwMDAwMDAwMDAw
+MDA2IDAwMDAwMDAwMDAwMDAwMDAgMDAwMDAwMDAwMDAwMDAwNiAwMDAwMDAwMDAwMDAwMDA2DQo+
+IFsgIDEzOC41NjQ4MDVdIGJhODA6IGZmZmY4MDAzZTExMzE5MjAgMDAwMDAwMDAwODAyMDAxZCBm
+ZmZmODAwM2U4ZDNkODAwIDAwMDBmZmZmZDg4ZTExMTANCj4gWyAgMTM4LjU2NjIzOF0gYmFhMDog
+MDAwMDAwMDAwMDAwMDAwMCBmZmZmMDAwMDExMGViYjAwIGZmZmYwMDAwMDgyYzBlNWMgZmZmZjAw
+MDAxMTBlYmIwMA0KPiBbICAxMzguNTY3NjY2XSBiYWMwOiBmZmZmMDAwMDA4MmMwZTVjIDAwMDAw
+MDAwMDA0MDAxNDUgZmZmZjAwMDAwOGUyNWE4MCAwMDAwMDAwMDAwMDAwMDAwDQo+IFsgIDEzOC41
+NjkwOTBdIGJhZTA6IDAwMDEwMDAwMDAwMDAwMDAgMDAwMDAwMDAwMDAwMDAwNiBmZmZmMDAwMDEx
+MGViYjAwIGZmZmYwMDAwMDgyYzBlNWMNCj4gWyAgMTM4LjU3MDUyM10gWzxmZmZmMDAwMDA4MmMw
+ZTVjPl0gX19jaGVja19vYmplY3Rfc2l6ZSsweDExNC8weDIwMA0KPiBbICAxMzguNTcxNjI4XSBb
+PGZmZmYwMDAwMDg0ZTcxYTg+XSBzZ19pbysweDEyMC8weDQzOA0KPiBbICAxMzguNTcyNTA3XSBb
+PGZmZmYwMDAwMDg0ZTdjMGM+XSBzY3NpX2NtZF9pb2N0bCsweDU5NC8weDcyOA0KPiBbICAxMzgu
+NTczNTMxXSBbPGZmZmYwMDAwMDg0ZTdkZjA+XSBzY3NpX2NtZF9ibGtfaW9jdGwrMHg1MC8weDYw
+DQo+IFsgIDEzOC41NzQ1OTRdIFs8ZmZmZjAwMDAwMGI3ZTc5OD5dIHZpcnRibGtfaW9jdGwrMHg2
+MC8weDgwIFt2aXJ0aW9fYmxrXQ0KPiBbICAxMzguNTc1NzY5XSBbPGZmZmYwMDAwMDg0ZDkxNDQ+
+XSBibGtkZXZfaW9jdGwrMHg1ZTQvMHhiNTANCj4gWyAgMTM4LjU3Njc1Nl0gWzxmZmZmMDAwMDA4
+MzBkODEwPl0gYmxvY2tfaW9jdGwrMHg1MC8weDY4DQo+IFsgIDEzOC41Nzc2OThdIFs8ZmZmZjAw
+MDAwODJkY2IzND5dIGRvX3Zmc19pb2N0bCsweGM0LzB4OTQwDQo+IFsgIDEzOC41Nzg2NzFdIFs8
+ZmZmZjAwMDAwODJkZDQzYz5dIFN5U19pb2N0bCsweDhjLzB4YTgNCj4gWyAgMTM4LjU3OTU4MV0g
+RXhjZXB0aW9uIHN0YWNrKDB4ZmZmZjAwMDAxMTBlYmVjMCB0byAweGZmZmYwMDAwMTEwZWMwMDAp
+DQo+IFsgIDEzOC41ODA3NTJdIGJlYzA6IDAwMDAwMDAwMDAwMDAwMDUgMDAwMDAwMDAwMDAwMjI4
+NSAwMDAwZmZmZmQ4OGUxMGI4IDAwMDAwMDAwMDAwMDAwMDYNCj4gWyAgMTM4LjU4MjE5OV0gYmVl
+MDogMDAwMDAwMDAwMDAwMDAwMCAwMDAwMDAwMDAwMDAwMDA0IDAwMDBmZmZmODM0MTY2NDggMDAw
+MDAwMDAwMDAwMDA1MA0KPiBbICAxMzguNTgzNjIzXSBiZjAwOiAwMDAwMDAwMDAwMDAwMDFkIDAw
+MDNmZmZmZmZmZmZmZmYgMDAwMDAwMDAwMDAwMDAxMiAwMDAwMDAwMDAwMDAwMDExDQo+IFsgIDEz
+OC41ODUwNTBdIGJmMjA6IDAwMDBmZmZmODM0MDkwMDAgMDAwMDAwMDAwMDAwMDBmZiAwMDAwZmZm
+ZjgzMDlkYzcwIDAwMDAwMDAwMDAwMDA1MzENCj4gWyAgMTM4LjU4NjQ5MF0gYmY0MDogMDAwMGZm
+ZmY4MzQ0YTM2MCAwMDAwZmZmZjgzMzgwY2UwIDAwMDAwMDAwMDAwMDAwZGMgMDAwMGZmZmY4MzQ3
+ODk0OA0KPiBbICAxMzguNTg3OTE4XSBiZjYwOiAwMDAwMDAwMDAwMDAwMDA0IDAwMDAwMDAwMTdl
+ZTdmOTAgMDAwMDAwMDAwMDAwMDAwNSAwMDAwMDAwMDE3ZWRlOTIwDQo+IFsgIDEzOC41ODkzNDZd
+IGJmODA6IDAwMDAwMDAwMTdlZTdmNjAgMDAwMDAwMDAwMDAwMDAwMyAwMDAwZmZmZjgzNDE2NjQ4
+IDAwMDAwMDAwMTdlZTdmNjANCj4gWyAgMTM4LjU5MDc4NV0gYmZhMDogMDAwMGZmZmZkODhlMTIx
+OCAwMDAwZmZmZmQ4OGUxMDkwIDAwMDBmZmZmODM0MTY2ZGMgMDAwMGZmZmZkODhlMTA5MA0KPiBb
+ICAxMzguNTkyMjE1XSBiZmMwOiAwMDAwZmZmZjgzMzgwY2VjIDAwMDAwMDAwODAwMDAwMDAgMDAw
+MDAwMDAwMDAwMDAwNSAwMDAwMDAwMDAwMDAwMDFkDQo+IFsgIDEzOC41OTM2NDldIGJmZTA6IDAw
+MDAwMDAwMDAwMDAwMDAgMDAwMDAwMDAwMDAwMDAwMCAwMDAwMDAwMDAwMDAwMDAwIDAwMDAwMDAw
+MDAwMDAwMDANCj4gWyAgMTM4LjU5NTA5MV0gWzxmZmZmMDAwMDA4MDgzYTMwPl0gZWwwX3N2Y19u
+YWtlZCsweDI0LzB4MjgNCj4gWyAgMTM4LjU5NjA3MV0gQ29kZTogYWExNDAzZTUgYWExMzAzZTMg
+OTExOWEwYzAgOTdmOWQ5NmQgKGQ0MjEwMDAwKSANCj4gWyAgMTM4LjU5NzE5M10gLS0tWyBlbmQg
+dHJhY2UgYjdlZWNkMGIyMTAwMTE3NyBdLS0tDQo+IA0KPiBIZXJlJ3MgdGhlIGlvY3RsIGFzIHJl
+cG9ydGVkIGJ5IHN0cmFjZToNCj4gDQo+IDIyNzcgIG9wZW5hdChBVF9GRENXRCwgIi9kZXYvdmRi
+IiwgT19SRE9OTFkpID0gNQ0KPiAyMjc3ICBpb2N0bCg1LCBCTEtTU1pHRVQsIFs1MTJdKSAgICAg
+ICAgPSAwDQo+IDIyNzcgIGlvY3RsKDUsIFNHX0lPLCB7J1MnLCBTR19EWEZFUl9GUk9NX0RFViwg
+Y21kWzZdPVsxMiwgMDEsIDgwLCAwMCwgMDQsIDAwXSwgbXhfc2JfbGVuPTAsIGlvdmVjX2NvdW50
+PTAsIGR4ZmVyX2xlbj00LCB0aW1lb3V0PTYwMDAsIGZsYWdzPTAgPHVuZmluaXNoZWQgLi4uPikg
+PSA/DQo+IA0KPiAgJCBxZW11LXN5c3RlbS1hYXJjaDY0IC1lbmFibGUta3ZtIC1tIDE2Mzg0IFwN
+Cj4gICAgLWNwdSBob3N0IC1zbXAgNCAtTSB2aXJ0LGdpY192ZXJzaW9uPWhvc3QgLW5vZ3JhcGhp
+YyBcDQo+ICAgIC1wZmxhc2ggZmxhc2gwLmltZyAtcGZsYXNoIGZsYXNoMS5pbWcgXA0KPiAgICAt
+ZHJpdmUgaWY9bm9uZSxmaWxlPWFydGZ1bC1zZXJ2ZXItY2xvdWRpbWctYXJtNjQuaW1nLGlkPWhk
+MCBcDQo+ICAgIC1kZXZpY2UgdmlydGlvLWJsay1kZXZpY2UsZHJpdmU9aGQwIC1kcml2ZSBcDQo+
+ICAgIC1pZj1ub25lLGZpbGU9bXktc2VlZC5pbWcsaWQ9aGQxIFwNCj4gICAgLWRldmljZSB2aXJ0
+aW8tYmxrLWRldmljZSxkcml2ZT1oZDEgXA0KPiAgICAtbmV0ZGV2IHR5cGU9dGFwLGlkPW5ldDAg
+LWRldmljZSB2aXJ0aW8tbmV0LWRldmljZSxuZXRkZXY9bmV0MCxtYWM9PG9taXR0ZWQ+DQoNCkhl
+bGxvIERhbm4sDQoNClNpbmNlIEkgZG8gbm90IGhhdmUgYWNjZXNzIHRvIGFydGZ1bC1zZXJ2ZXIt
+Y2xvdWRpbWctYXJtNjQuaW1nLCBjYW4geW91DQpjb252ZXJ0IHRoZSBjcmFzaCBhZGRyZXNzIGlu
+dG8gYSBmaWxlIG5hbWUgYW5kIGxpbmUgbnVtYmVyIGZvciBtZSAoZ2RiIGxpc3QNCiooJHtjcmFz
+aF9hZGRyZXNzfSk/IENhbiB5b3UgZG8gdGhpcyBmb3IgYm90aCBfX2NoZWNrX29iamVjdF9zaXpl
+KzB4MTE0IGFuZA0Kc2dfaW8rMHgxMjA/DQoNClRoYW5rcywNCg0KQmFydC4=
