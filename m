@@ -1,25 +1,52 @@
-Return-Path: <hch@lst.de>
-Date: Mon, 2 Oct 2017 15:42:44 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	=Oleksandr Natalenko <oleksandr@natalenko.name>,
-	Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: Re: [PATCH v4 3/7] block: Convert RQF_PREEMPT into REQ_PREEMPT
-Message-ID: <20171002134244.GC7129@lst.de>
-References: <20170925202924.16603-1-bart.vanassche@wdc.com> <20170925202924.16603-4-bart.vanassche@wdc.com>
+Return-Path: <prvs=4607da9fb=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "oleksandr@natalenko.name" <oleksandr@natalenko.name>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, "hch@lst.de"
+	<hch@lst.de>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "ming.lei@redhat.com" <ming.lei@redhat.com>
+Subject: Re: [PATCH v10 00/10] block, scsi, md: Improve suspend and resume
+Date: Sat, 21 Oct 2017 18:31:08 +0000
+Message-ID: <1508610667.9251.9.camel@wdc.com>
+References: <20171017232630.4264-1-bart.vanassche@wdc.com>
+	 <11010777.WJQNYl18e6@natalenko.name> <1508340432.2540.4.camel@wdc.com>
+	 <3006499.SSja2RFHbQ@natalenko.name> <1508608776.9251.6.camel@wdc.com>
+In-Reply-To: <1508608776.9251.6.camel@wdc.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170925202924.16603-4-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This looks ok to me, or at least better than the version from Ming to
-archive the same.  I kinda hate to add more REQ_* flags than
-really nessecary though.  Maybe instead of the mapping to REQ_* as
-suggested to ming blk_queue_enter should instead take the BLK_MQ_REQ_*
-flags and we'll add BLK_MQ_REQ_PREEMPT, and pass those to
-blk_get_request.  If it wasn't for Linus beeing angry due to block
-churn I'd be very tempted to suggest that.
+T24gU2F0LCAyMDE3LTEwLTIxIGF0IDE3OjU5ICswMDAwLCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6
+DQo+IE9uIFNhdCwgMjAxNy0xMC0yMSBhdCAxOToyMSArMDIwMCwgT2xla3NhbmRyIE5hdGFsZW5r
+byB3cm90ZToNCj4gPiBJJ3ZlIGNoZXJyeS1waWNrZWQgdGhpcyBzZXJpZXMgZm9yIGN1cnJlbnQg
+dXBzdHJlYW0vbWFzdGVyIGJyYW5jaCwgYW5kIGdvdA0KPiA+IHRoaXMgd2hpbGUgcGVyZm9ybWlu
+ZyBhbm90aGVyIHN1c3BlbmQgdHJ5Og0KPiA+IA0KPiA+ID09PQ0KPiA+IFsgICA2Mi40MTU4OTBd
+IEZyZWV6aW5nIG9mIHRhc2tzIGZhaWxlZCBhZnRlciAyMC4wMDcgc2Vjb25kcyAoMSB0YXNrcyBy
+ZWZ1c2luZyANCj4gPiB0byBmcmVlemUsIHdxX2J1c3k9MCk6DQo+ID4gWyAgIDYyLjQyMTE1MF0g
+eGZzYWlsZC9kbS03ICAgIEQgICAgMCAgIDI4OSAgICAgIDIgMHg4MDAwMDAwMA0KPiA+IFsgICA2
+Mi40MjU4MDBdIENhbGwgVHJhY2U6DQo+ID4gWyAgIDYyLjQyODkwMl0gIF9fc2NoZWR1bGUrMHgy
+MzkvMHg4NzANCj4gPiBbICAgNjIuNDMxODM0XSAgc2NoZWR1bGUrMHgzMy8weDkwDQo+ID4gWyAg
+IDYyLjQzNDE1Nl0gIF94ZnNfbG9nX2ZvcmNlKzB4MTQzLzB4MjgwIFt4ZnNdDQo+ID4gWyAgIDYy
+LjQzODc2N10gID8gc2NoZWR1bGVfdGltZW91dCsweDE4OC8weDM5MA0KPiA+IFsgICA2Mi40NDM1
+OTJdICA/IHdha2VfdXBfcSsweDgwLzB4ODANCj4gPiBbICAgNjIuNDQ2NTQ1XSAgPyB4ZnNhaWxk
+KzB4MThkLzB4NzgwIFt4ZnNdDQo+ID4gWyAgIDYyLjQ0OTcwMl0gIHhmc19sb2dfZm9yY2UrMHgy
+Yy8weDkwIFt4ZnNdDQo+ID4gWyAgIDYyLjQ1MzIxN10gIHhmc2FpbGQrMHgxOGQvMHg3ODAgW3hm
+c10NCj4gPiBbICAgNjIuNDU2NzE3XSAga3RocmVhZCsweDEyNC8weDE0MA0KPiA+IFsgICA2Mi40
+NTkyMzddICA/IGt0aHJlYWQrMHgxMjQvMHgxNDANCj4gPiBbICAgNjIuNDYxODE4XSAgPyB4ZnNf
+dHJhbnNfYWlsX2N1cnNvcl9maXJzdCsweDkwLzB4OTAgW3hmc10NCj4gPiBbICAgNjIuNDY1MTQ2
+XSAgPyBrdGhyZWFkX2NyZWF0ZV9vbl9ub2RlKzB4NzAvMHg3MA0KPiA+IFsgICA2Mi40NjczMzFd
+ICByZXRfZnJvbV9mb3JrKzB4MjUvMHgzMA0KPiA+IFsgICA2Mi40NzQzODZdIFJlc3RhcnRpbmcg
+a2VybmVsIHRocmVhZHMgLi4uIGRvbmUuDQo+ID4gPT09DQo+IA0KPiBUaGFuayB5b3UgZm9yIGhh
+dmluZyB0ZXN0ZWQgdjEwIG9mIHRoaXMgcGF0Y2ggc2VyaWVzLiBUaGlzIHBhdGNoIHNlcmllcyBv
+bmx5DQo+IGNoYW5nZXMgdGhlIGJlaGF2aW9yIG9mIHN1c3BlbmRpbmcgZGV2aWNlcyBidXQgbm90
+IHRoZSBiZWhhdmlvciBvZiBmcmVlemluZw0KPiB0aGUgWEZTIGtlcm5lbCB0aHJlYWRzLiBEdXJp
+bmcgc3VzcGVuZCB0YXNrIGZyZWV6aW5nIG9jY3VycyAqYmVmb3JlKg0KPiBzdXNwZW5kaW5nIGRl
+dmljZXMuIEluIG90aGVyIHdvcmRzLCB0aGUgbG9ja3VwIG9jY3VycmVkIGJlZm9yZSB0aGUgY29k
+ZSB3YXMNCj4gcmVhY2hlZCB0aGF0IGlzIG1vZGlmaWVkIGJ5IHRoaXMgcGF0Y2ggc2VyaWVzLiBT
+byBJIHRoaW5rIHlvdSByYW4gaW50byBhIGJ1Zw0KPiBpbiB0aGUgWEZTIGNvZGUgYW5kIG5vdCBp
+bnRvIGEgYnVnIGluIHRoaXMgcGF0Y2ggc2VyaWVzLg0KDQpPbiBzZWNvbmQgdGhvdWdodCwgSSB3
+YW50IHRvIHRha2UgYmFjayB3aGF0IEkgd3JvdGUgYWJvdXQgWEZTLiBTaW5jZSB4ZnNhaWxkKCkN
+CmNhbiBzdWJtaXQgSS9PLCB3aGF0IG1heSBoYXZlIGhhcHBlbmVkIGlzIHRoYXQgdGhlIG1kIGtl
+cm5lbCB0aHJlYWQgZ290IGZyb3plbg0KYmVmb3JlIHRoZSBYRlMga2VybmVsIHRocmVhZC4gSSB3
+aWxsIHNlZSB3aGF0IEkgY2FuIGRvIHRvIGF2b2lkIGZyZWV6ZSBmYWlsdXJlcw0KbGlrZSB0aGUg
+b25lIHlvdSByZXBvcnRlZC4NCg0KQmFydC4=
