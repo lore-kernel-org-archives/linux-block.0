@@ -1,21 +1,30 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:45501 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751003AbdJVOfE (ORCPT
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:47183 "EHLO
+        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751959AbdJUCYB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 22 Oct 2017 10:35:04 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "max.byungchul.park@gmail.com" <max.byungchul.park@gmail.com>
-CC: "mingo@kernel.org" <mingo@kernel.org>,
+        Fri, 20 Oct 2017 22:24:01 -0400
+MIME-Version: 1.0
+In-Reply-To: <1508529532.3029.15.camel@wdc.com>
+References: <1508319532-24655-1-git-send-email-byungchul.park@lge.com>
+ <1508319532-24655-2-git-send-email-byungchul.park@lge.com>
+ <1508455438.4542.4.camel@wdc.com> <alpine.DEB.2.20.1710200829340.3083@nanos> <1508529532.3029.15.camel@wdc.com>
+From: Byungchul Park <max.byungchul.park@gmail.com>
+Date: Sat, 21 Oct 2017 11:23:58 +0900
+Message-ID: <CANrsvRNnOp_rgEWG2FGg7qaEQi=yEyhiZkpWSW62w21BvJ9Shg@mail.gmail.com>
+Subject: Re: [RESEND PATCH 1/3] completion: Add support for initializing
+ completion with lockdep_map
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@kernel.org" <mingo@kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "peterz@infradead.org" <peterz@infradead.org>,
         "hch@infradead.org" <hch@infradead.org>,
         "amir73il@gmail.com" <amir73il@gmail.com>,
         "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
         "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "oleg@redhat.com" <oleg@redhat.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "oleg@redhat.com" <oleg@redhat.com>,
         "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
         "johannes.berg@intel.com" <johannes.berg@intel.com>,
         "byungchul.park@lge.com" <byungchul.park@lge.com>,
@@ -24,55 +33,51 @@ CC: "mingo@kernel.org" <mingo@kernel.org>,
         "tj@kernel.org" <tj@kernel.org>,
         "kernel-team@lge.com" <kernel-team@lge.com>,
         "david@fromorbit.com" <david@fromorbit.com>
-Subject: Re: [RESEND PATCH 1/3] completion: Add support for initializing
- completion with lockdep_map
-Date: Sun, 22 Oct 2017 14:34:56 +0000
-Message-ID: <1508682894.2564.8.camel@wdc.com>
-References: <1508319532-24655-1-git-send-email-byungchul.park@lge.com>
-         <1508319532-24655-2-git-send-email-byungchul.park@lge.com>
-         <1508455438.4542.4.camel@wdc.com>
-         <alpine.DEB.2.20.1710200829340.3083@nanos>
-         <1508529532.3029.15.camel@wdc.com>
-         <CANrsvRNnOp_rgEWG2FGg7qaEQi=yEyhiZkpWSW62w21BvJ9Shg@mail.gmail.com>
-In-Reply-To: <CANrsvRNnOp_rgEWG2FGg7qaEQi=yEyhiZkpWSW62w21BvJ9Shg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gU2F0LCAyMDE3LTEwLTIxIGF0IDExOjIzICswOTAwLCBCeXVuZ2NodWwgUGFyayB3cm90ZToN
-Cj4gT24gU2F0LCBPY3QgMjEsIDIwMTcgYXQgNDo1OCBBTSwgQmFydCBWYW4gQXNzY2hlIDxCYXJ0
-LlZhbkFzc2NoZUB3ZGMuY29tPiB3cm90ZToNCj4gPiBBcyBleHBsYWluZWQgaW4gYW5vdGhlciBl
-LW1haWwgdGhyZWFkLCB1bmxpa2UgdGhlIGxvY2sgaW52ZXJzaW9uIGNoZWNraW5nDQo+ID4gcGVy
-Zm9ybWVkIGJ5IHRoZSA8PSB2NC4xMyBsb2NrZGVwIGNvZGUsIGNyb3NzLXJlbGVhc2UgY2hlY2tp
-bmcgaXMgYSBoZXVyaXN0aWMNCj4gPiB0aGF0IGRvZXMgbm90IGhhdmUgYSBzb3VuZCB0aGVvcmV0
-aWNhbCBiYXNpcy4gVGhlIGxvY2sgdmFsaWRhdG9yIGlzIGFuDQo+IA0KPiBJdCdzIG5vdCBoZXVy
-aXN0aWMgYnV0IGJhc2VkIG9uIHRoZSBzYW1lIHRoZW9yZXRpY2FsIGJhc2lzIGFzIDw9NC4xMw0K
-PiBsb2NrZGVwLiBJIG1lYW4sIHRoZSBrZXkgYmFzaXMgaXM6DQo+IA0KPiAgICAxKSBXaGF0IGNh
-dXNlcyBkZWFkbG9jaw0KPiAgICAyKSBXaGF0IGlzIGEgZGVwZW5kZW5jeQ0KPiAgICAzKSBCdWls
-ZCBhIGRlcGVuZGVuY3kgd2hlbiBpZGVudGlmaWVkDQoNClNvcnJ5IGJ1dCBJIGRvdWJ0IHRoYXQg
-dGhhdCBzdGF0ZW1lbnQgaXMgY29ycmVjdC4gVGhlIHB1YmxpY2F0aW9uIFsxXSBjb250YWlucw0K
-YSBwcm9vZiB0aGF0IGFuIGFsZ29yaXRobSB0aGF0IGlzIGNsb3NlbHkgcmVsYXRlZCB0byB0aGUg
-dHJhZGl0aW9uYWwgbG9ja2RlcA0KbG9jayBpbnZlcnNpb24gZGV0ZWN0b3IgaXMgYWJsZSB0byBk
-ZXRlY3QgYWxsIGRlYWRsb2NrcyBhbmQgZG9lcyBub3QgcmVwb3J0DQpmYWxzZSBwb3NpdGl2ZXMg
-Zm9yIHByb2dyYW1zIHRoYXQgb25seSB1c2UgbXV0ZXhlcyBhcyBzeW5jaHJvbml6YXRpb24gb2Jq
-ZWN0cy4NClRoZSBjb21tZW50IG9mIHRoZSBhdXRob3JzIG9mIHRoYXQgcGFwZXIgZm9yIHByb2dy
-YW1zIHRoYXQgdXNlIG11dGV4ZXMsDQpjb25kaXRpb24gdmFyaWFibGVzIGFuZCBzZW1hcGhvcmVz
-IGlzIGFzIGZvbGxvd3M6ICJJdCBpcyB1bmNsZWFyIGhvdyB0byBleHRlbmQNCnRoZSBsb2NrLWdy
-YXBoLWJhc2VkIGFsZ29yaXRobSBpbiBTZWN0aW9uIDMgdG8gZWZmaWNpZW50bHkgY29uc2lkZXIg
-dGhlIGVmZmVjdHMNCm9mIGNvbmRpdGlvbiB2YXJpYWJsZXMgYW5kIHNlbWFwaG9yZXMuIFRoZXJl
-Zm9yZSwgd2hlbiBjb25zaWRlcmluZyBhbGwgdGhyZWUNCnN5bmNocm9uaXphdGlvbiBtZWNoYW5p
-c21zLCB3ZSBjdXJyZW50bHkgdXNlIGEgbmFpdmUgYWxnb3JpdGhtIHRoYXQgY2hlY2tzIGVhY2gN
-CmZlYXNpYmxlIHBlcm11dGF0aW9uIG9mIHRoZSB0cmFjZSBmb3IgZGVhZGxvY2suIiBJbiBvdGhl
-ciB3b3JkcywgaWYgeW91IGhhdmUNCmZvdW5kIGFuIGFwcHJvYWNoIGZvciBkZXRlY3RpbmcgcG90
-ZW50aWFsIGRlYWRsb2NrcyBmb3IgcHJvZ3JhbXMgdGhhdCB1c2UgdGhlc2UNCnRocmVlIGtpbmRz
-IG9mIHN5bmNocm9uaXphdGlvbiBvYmplY3RzIGFuZCB0aGF0IGRvZXMgbm90IHJlcG9ydCBmYWxz
-ZSBwb3NpdGl2ZXMNCnRoZW4gdGhhdCdzIGEgYnJlYWt0aHJvdWdoIHRoYXQncyB3b3J0aCBwdWJs
-aXNoaW5nIGluIGEgam91cm5hbCBvciBpbiB0aGUNCnByb2NlZWRpbmdzIG9mIGEgc2NpZW50aWZp
-YyBjb25mZXJlbmNlLg0KDQpCYXJ0Lg0KDQpbMV0gQWdhcndhbCwgUmFodWwsIGFuZCBTY290dCBE
-LiBTdG9sbGVyLiAiUnVuLXRpbWUgZGV0ZWN0aW9uIG9mIHBvdGVudGlhbA0KZGVhZGxvY2tzIGZv
-ciBwcm9ncmFtcyB3aXRoIGxvY2tzLCBzZW1hcGhvcmVzLCBhbmQgY29uZGl0aW9uIHZhcmlhYmxl
-cy4iIEluDQpQcm9jZWVkaW5ncyBvZiB0aGUgMjAwNiB3b3Jrc2hvcCBvbiBQYXJhbGxlbCBhbmQg
-ZGlzdHJpYnV0ZWQgc3lzdGVtczogdGVzdGluZw0KYW5kIGRlYnVnZ2luZywgcHAuIDUxLTYwLiBB
-Q00sIDIwMDYuDQooaHR0cHM6Ly9wZGZzLnNlbWFudGljc2Nob2xhci5vcmcvOTMyNC9mYzBiNWQ1
-Y2Q1ZTA1ZDU1MWEzZTk4NzU3MTIyMDM5OTQ2YTIucGRmKS4=
+On Sat, Oct 21, 2017 at 4:58 AM, Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
+> Sorry but I'm not sure that's the best possible answer. In my opinion
+> avoiding that completion objects have dependencies on other lock objects,
+> e.g. by avoiding to wait on a completion object while holding a mutex, is a
+> far superior strategy over adding cross-release checking to completion
+> objects. The former strategy namely makes it unnecessary to add
+> cross-release checking to completion objects because that strategy ensures
+> that these completion objects cannot get involved in a deadlock. The latter
+
+It's true if we force it. But do you think it's possible?
+
+> strategy can lead to false positive deadlock reports by the lockdep code,
+
+What do you think false positives come from? It comes from assigning
+lock classes falsely where we should more care, rather than lockdep code
+itself. The same is applicable to cross-release.
+
+> something none of us wants.
+>
+> A possible alternative strategy could be to enable cross-release checking
+> only for those completion objects for which waiting occurs inside a critical
+> section.
+
+Of course, it already did. Cross-release doesn't consider any waiting
+outside of critical sections at all, and it should do.
+
+> As explained in another e-mail thread, unlike the lock inversion checking
+> performed by the <= v4.13 lockdep code, cross-release checking is a heuristic
+> that does not have a sound theoretical basis. The lock validator is an
+
+It's not heuristic but based on the same theoretical basis as <=4.13
+lockdep. I mean, the key basis is:
+
+   1) What causes deadlock
+   2) What is a dependency
+   3) Build a dependency when identified
+
+> important tool for kernel developers. It is important that it produces as few
+> false positives as possible. Since the cross-release checks are enabled
+> automatically when enabling lockdep, I think it is normal that I, as a kernel
+> developer, care that the cross-release checks produce as few false positives
+> as possible.
+
+No doubt. That's why I proposed these patches.
