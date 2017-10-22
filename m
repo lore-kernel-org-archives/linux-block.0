@@ -1,14 +1,12 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from LGEAMRELO13.lge.com ([156.147.23.53]:56040 "EHLO
-        lgeamrelo13.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751082AbdJWCI2 (ORCPT
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:45501 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751003AbdJVOfE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 22 Oct 2017 22:08:28 -0400
-Date: Mon, 23 Oct 2017 11:08:22 +0900
-From: Byungchul Park <byungchul.park@lge.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "max.byungchul.park@gmail.com" <max.byungchul.park@gmail.com>,
-        "mingo@kernel.org" <mingo@kernel.org>,
+        Sun, 22 Oct 2017 10:35:04 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "max.byungchul.park@gmail.com" <max.byungchul.park@gmail.com>
+CC: "mingo@kernel.org" <mingo@kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "peterz@infradead.org" <peterz@infradead.org>,
         "hch@infradead.org" <hch@infradead.org>,
@@ -20,6 +18,7 @@ Cc: "max.byungchul.park@gmail.com" <max.byungchul.park@gmail.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
         "johannes.berg@intel.com" <johannes.berg@intel.com>,
+        "byungchul.park@lge.com" <byungchul.park@lge.com>,
         "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
         "idryomov@gmail.com" <idryomov@gmail.com>,
         "tj@kernel.org" <tj@kernel.org>,
@@ -27,74 +26,53 @@ Cc: "max.byungchul.park@gmail.com" <max.byungchul.park@gmail.com>,
         "david@fromorbit.com" <david@fromorbit.com>
 Subject: Re: [RESEND PATCH 1/3] completion: Add support for initializing
  completion with lockdep_map
-Message-ID: <20171023020822.GI3310@X58A-UD3R>
+Date: Sun, 22 Oct 2017 14:34:56 +0000
+Message-ID: <1508682894.2564.8.camel@wdc.com>
 References: <1508319532-24655-1-git-send-email-byungchul.park@lge.com>
- <1508319532-24655-2-git-send-email-byungchul.park@lge.com>
- <1508455438.4542.4.camel@wdc.com>
- <alpine.DEB.2.20.1710200829340.3083@nanos>
- <1508529532.3029.15.camel@wdc.com>
- <CANrsvRNnOp_rgEWG2FGg7qaEQi=yEyhiZkpWSW62w21BvJ9Shg@mail.gmail.com>
- <1508682894.2564.8.camel@wdc.com>
+         <1508319532-24655-2-git-send-email-byungchul.park@lge.com>
+         <1508455438.4542.4.camel@wdc.com>
+         <alpine.DEB.2.20.1710200829340.3083@nanos>
+         <1508529532.3029.15.camel@wdc.com>
+         <CANrsvRNnOp_rgEWG2FGg7qaEQi=yEyhiZkpWSW62w21BvJ9Shg@mail.gmail.com>
+In-Reply-To: <CANrsvRNnOp_rgEWG2FGg7qaEQi=yEyhiZkpWSW62w21BvJ9Shg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1508682894.2564.8.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Sun, Oct 22, 2017 at 02:34:56PM +0000, Bart Van Assche wrote:
-> On Sat, 2017-10-21 at 11:23 +0900, Byungchul Park wrote:
-> > On Sat, Oct 21, 2017 at 4:58 AM, Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
-> > > As explained in another e-mail thread, unlike the lock inversion checking
-> > > performed by the <= v4.13 lockdep code, cross-release checking is a heuristic
-> > > that does not have a sound theoretical basis. The lock validator is an
-> > 
-> > It's not heuristic but based on the same theoretical basis as <=4.13
-> > lockdep. I mean, the key basis is:
-> > 
-> >    1) What causes deadlock
-> >    2) What is a dependency
-> >    3) Build a dependency when identified
-> 
-> Sorry but I doubt that that statement is correct. The publication [1] contains
-
-IMHO, the paper is talking about totally different things wrt
-deadlocks by wait_for_event/event, that is, lost events.
-
-Furthermore, it doesn't rely on dependencies itself, but just lock
-ordering 'case by case', which is a subset of the more general concept.
-
-> a proof that an algorithm that is closely related to the traditional lockdep
-> lock inversion detector is able to detect all deadlocks and does not report
-
-I can admit this.
-
-> false positives for programs that only use mutexes as synchronization objects.
-
-I want to ask you. What makes false positives avoidable in the paper?
-
-> The comment of the authors of that paper for programs that use mutexes,
-> condition variables and semaphores is as follows: "It is unclear how to extend
-> the lock-graph-based algorithm in Section 3 to efficiently consider the effects
-> of condition variables and semaphores. Therefore, when considering all three
-> synchronization mechanisms, we currently use a naive algorithm that checks each
-
-Right. The paper seems to use a naive algorigm for that cases, not
-replying on dependencies, which they should.
-
-> feasible permutation of the trace for deadlock." In other words, if you have
-> found an approach for detecting potential deadlocks for programs that use these
-> three kinds of synchronization objects and that does not report false positives
-> then that's a breakthrough that's worth publishing in a journal or in the
-> proceedings of a scientific conference.
-
-Please, point out logical problems of cross-release than saying it's
-impossbile according to the paper. I think you'd better understand how
-cross-release works *first*. I'll do my best to help you do.
-
-> Bart.
-> 
-> [1] Agarwal, Rahul, and Scott D. Stoller. "Run-time detection of potential
-> deadlocks for programs with locks, semaphores, and condition variables." In
-> Proceedings of the 2006 workshop on Parallel and distributed systems: testing
-> and debugging, pp. 51-60. ACM, 2006.
-> (https://pdfs.semanticscholar.org/9324/fc0b5d5cd5e05d551a3e98757122039946a2.pdf).
+T24gU2F0LCAyMDE3LTEwLTIxIGF0IDExOjIzICswOTAwLCBCeXVuZ2NodWwgUGFyayB3cm90ZToN
+Cj4gT24gU2F0LCBPY3QgMjEsIDIwMTcgYXQgNDo1OCBBTSwgQmFydCBWYW4gQXNzY2hlIDxCYXJ0
+LlZhbkFzc2NoZUB3ZGMuY29tPiB3cm90ZToNCj4gPiBBcyBleHBsYWluZWQgaW4gYW5vdGhlciBl
+LW1haWwgdGhyZWFkLCB1bmxpa2UgdGhlIGxvY2sgaW52ZXJzaW9uIGNoZWNraW5nDQo+ID4gcGVy
+Zm9ybWVkIGJ5IHRoZSA8PSB2NC4xMyBsb2NrZGVwIGNvZGUsIGNyb3NzLXJlbGVhc2UgY2hlY2tp
+bmcgaXMgYSBoZXVyaXN0aWMNCj4gPiB0aGF0IGRvZXMgbm90IGhhdmUgYSBzb3VuZCB0aGVvcmV0
+aWNhbCBiYXNpcy4gVGhlIGxvY2sgdmFsaWRhdG9yIGlzIGFuDQo+IA0KPiBJdCdzIG5vdCBoZXVy
+aXN0aWMgYnV0IGJhc2VkIG9uIHRoZSBzYW1lIHRoZW9yZXRpY2FsIGJhc2lzIGFzIDw9NC4xMw0K
+PiBsb2NrZGVwLiBJIG1lYW4sIHRoZSBrZXkgYmFzaXMgaXM6DQo+IA0KPiAgICAxKSBXaGF0IGNh
+dXNlcyBkZWFkbG9jaw0KPiAgICAyKSBXaGF0IGlzIGEgZGVwZW5kZW5jeQ0KPiAgICAzKSBCdWls
+ZCBhIGRlcGVuZGVuY3kgd2hlbiBpZGVudGlmaWVkDQoNClNvcnJ5IGJ1dCBJIGRvdWJ0IHRoYXQg
+dGhhdCBzdGF0ZW1lbnQgaXMgY29ycmVjdC4gVGhlIHB1YmxpY2F0aW9uIFsxXSBjb250YWlucw0K
+YSBwcm9vZiB0aGF0IGFuIGFsZ29yaXRobSB0aGF0IGlzIGNsb3NlbHkgcmVsYXRlZCB0byB0aGUg
+dHJhZGl0aW9uYWwgbG9ja2RlcA0KbG9jayBpbnZlcnNpb24gZGV0ZWN0b3IgaXMgYWJsZSB0byBk
+ZXRlY3QgYWxsIGRlYWRsb2NrcyBhbmQgZG9lcyBub3QgcmVwb3J0DQpmYWxzZSBwb3NpdGl2ZXMg
+Zm9yIHByb2dyYW1zIHRoYXQgb25seSB1c2UgbXV0ZXhlcyBhcyBzeW5jaHJvbml6YXRpb24gb2Jq
+ZWN0cy4NClRoZSBjb21tZW50IG9mIHRoZSBhdXRob3JzIG9mIHRoYXQgcGFwZXIgZm9yIHByb2dy
+YW1zIHRoYXQgdXNlIG11dGV4ZXMsDQpjb25kaXRpb24gdmFyaWFibGVzIGFuZCBzZW1hcGhvcmVz
+IGlzIGFzIGZvbGxvd3M6ICJJdCBpcyB1bmNsZWFyIGhvdyB0byBleHRlbmQNCnRoZSBsb2NrLWdy
+YXBoLWJhc2VkIGFsZ29yaXRobSBpbiBTZWN0aW9uIDMgdG8gZWZmaWNpZW50bHkgY29uc2lkZXIg
+dGhlIGVmZmVjdHMNCm9mIGNvbmRpdGlvbiB2YXJpYWJsZXMgYW5kIHNlbWFwaG9yZXMuIFRoZXJl
+Zm9yZSwgd2hlbiBjb25zaWRlcmluZyBhbGwgdGhyZWUNCnN5bmNocm9uaXphdGlvbiBtZWNoYW5p
+c21zLCB3ZSBjdXJyZW50bHkgdXNlIGEgbmFpdmUgYWxnb3JpdGhtIHRoYXQgY2hlY2tzIGVhY2gN
+CmZlYXNpYmxlIHBlcm11dGF0aW9uIG9mIHRoZSB0cmFjZSBmb3IgZGVhZGxvY2suIiBJbiBvdGhl
+ciB3b3JkcywgaWYgeW91IGhhdmUNCmZvdW5kIGFuIGFwcHJvYWNoIGZvciBkZXRlY3RpbmcgcG90
+ZW50aWFsIGRlYWRsb2NrcyBmb3IgcHJvZ3JhbXMgdGhhdCB1c2UgdGhlc2UNCnRocmVlIGtpbmRz
+IG9mIHN5bmNocm9uaXphdGlvbiBvYmplY3RzIGFuZCB0aGF0IGRvZXMgbm90IHJlcG9ydCBmYWxz
+ZSBwb3NpdGl2ZXMNCnRoZW4gdGhhdCdzIGEgYnJlYWt0aHJvdWdoIHRoYXQncyB3b3J0aCBwdWJs
+aXNoaW5nIGluIGEgam91cm5hbCBvciBpbiB0aGUNCnByb2NlZWRpbmdzIG9mIGEgc2NpZW50aWZp
+YyBjb25mZXJlbmNlLg0KDQpCYXJ0Lg0KDQpbMV0gQWdhcndhbCwgUmFodWwsIGFuZCBTY290dCBE
+LiBTdG9sbGVyLiAiUnVuLXRpbWUgZGV0ZWN0aW9uIG9mIHBvdGVudGlhbA0KZGVhZGxvY2tzIGZv
+ciBwcm9ncmFtcyB3aXRoIGxvY2tzLCBzZW1hcGhvcmVzLCBhbmQgY29uZGl0aW9uIHZhcmlhYmxl
+cy4iIEluDQpQcm9jZWVkaW5ncyBvZiB0aGUgMjAwNiB3b3Jrc2hvcCBvbiBQYXJhbGxlbCBhbmQg
+ZGlzdHJpYnV0ZWQgc3lzdGVtczogdGVzdGluZw0KYW5kIGRlYnVnZ2luZywgcHAuIDUxLTYwLiBB
+Q00sIDIwMDYuDQooaHR0cHM6Ly9wZGZzLnNlbWFudGljc2Nob2xhci5vcmcvOTMyNC9mYzBiNWQ1
+Y2Q1ZTA1ZDU1MWEzZTk4NzU3MTIyMDM5OTQ2YTIucGRmKS4=
