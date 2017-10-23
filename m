@@ -1,51 +1,25 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
-Subject: Re: [PATCH 16/17] nvme: implement multipath access to nvme subsystems
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>, Hannes Reinecke <hare@suse.de>,
- Johannes Thumshirn <jthumshirn@suse.de>, linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org
-References: <20171023145126.2471-1-hch@lst.de>
- <20171023145126.2471-17-hch@lst.de>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <b975ad9e-a40a-0e89-1a8d-fc9e417ff681@grimberg.me>
-Date: Mon, 23 Oct 2017 20:43:13 +0300
+Return-Path: <hch@lst.de>
+Date: Mon, 23 Oct 2017 18:57:20 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>, Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 16/17] nvme: implement multipath access to nvme
+	subsystems
+Message-ID: <20171023165720.GA28944@lst.de>
+References: <20171023145126.2471-1-hch@lst.de> <20171023145126.2471-17-hch@lst.de> <68df1af0-7cc8-febc-e2f6-85251f120a76@grimberg.me>
 MIME-Version: 1.0
-In-Reply-To: <20171023145126.2471-17-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <68df1af0-7cc8-febc-e2f6-85251f120a76@grimberg.me>
 List-ID: <linux-block@vger.kernel.org>
 
+On Mon, Oct 23, 2017 at 06:32:47PM +0300, Sagi Grimberg wrote:
+>>   	struct nvme_queue *nvmeq = hctx->driver_data;
+>>   +	printk_ratelimited("%s: called\n", __func__);
+>> +
+>
+> This must be a left-over...
 
->   static inline bool nvme_req_needs_retry(struct request *req)
->   {
->   	if (blk_noretry_request(req))
-> @@ -143,6 +204,11 @@ static inline bool nvme_req_needs_retry(struct request *req)
->   void nvme_complete_rq(struct request *req)
->   {
->   	if (unlikely(nvme_req(req)->status && nvme_req_needs_retry(req))) {
-> +		if (nvme_req_needs_failover(req)) {
-> +			nvme_failover_req(req);
-> +			return;
-> +		}
-> +
->   		nvme_req(req)->retries++;
->   		blk_mq_requeue_request(req, true);
->   		return;
-
-Nit, consider having the !nvme_req_needs_failover() case in an else
-clause, just a suggestion though.
-
-
-
-> @@ -171,6 +237,18 @@ void nvme_cancel_request(struct request *req, void *data, bool reserved)
->   }
->   EXPORT_SYMBOL_GPL(nvme_cancel_request);
-
-Question,
-
-Does the statement in nvme_cancel_request:
-
-         if (blk_queue_dying(req->q))
-                 status |= NVME_SC_DNR;
-
-still holds?
+Indeed, it is a left-over debug statement..
