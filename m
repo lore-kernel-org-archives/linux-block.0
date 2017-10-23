@@ -1,46 +1,41 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
+Return-Path: <prvs=462c8f3ca=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "israelr@mellanox.com" <israelr@mellanox.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-nvme-bounces@lists.infradead.org"
+	<linux-nvme-bounces@lists.infradead.org>
+CC: "hch@lst.de" <hch@lst.de>, "maxg@mellanox.com" <maxg@mellanox.com>,
+	"sagi@grimberg.me" <sagi@grimberg.me>, "axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH] blk-mq: Iterate also over sched_tags requests at
  blk_mq_tagset_iter()
-To: Christoph Hellwig <hch@lst.de>
-Cc: Israel Rukshin <israelr@mellanox.com>,
- Linux-nvme <linux-nvme-bounces@lists.infradead.org>,
- linux-block@vger.kernel.org, Max Gurtovoy <maxg@mellanox.com>,
- Jens Axboe <axboe@kernel.dk>
+Date: Mon, 23 Oct 2017 06:38:23 +0000
+Message-ID: <1508740702.2634.4.camel@wdc.com>
 References: <1508680074-2417-1-git-send-email-israelr@mellanox.com>
- <2c27d643-a7d9-3077-2875-cea768cbf386@grimberg.me>
- <20171023062627.GD16899@lst.de>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <68bf7dff-d186-eb09-b853-254d0ae6f3e5@grimberg.me>
-Date: Mon, 23 Oct 2017 10:27:29 +0300
+In-Reply-To: <1508680074-2417-1-git-send-email-israelr@mellanox.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20171023062627.GD16899@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-
->>> Currently, blk_mq_tagset_iter() iterate over initial hctx tags only.
->>> In case scheduler is used, it doesn't iterate the hctx scheduler tags
->>> and the static request aren't been updated.
->>> For example, while using NVMe over Fabrics RDMA host, this cause us not to
->>> reinit the scheduler requests and thus not re-register all the memory regions
->>> during the tagset re-initialization in the reconnect flow.
->>
->> I think this is a sign that we should cease from embedding memory
->> regions on the pre-allocated requests. Its too much resources
->> that we waste. In our case, tags are not really cheap given
->> that they take a physical HW resource (rdma memory region).
->>
->> I think we should switch (again) to a pool design instead. I guess its
->> time for a generic MR pool that will serve nvmf, xprt, srp, iser and
->> friends.
-> 
-> Liks drivers/infiniband/core/mr_pool.c? :)
-
-Yea :)
-
-forgot we had that...
-
-Note that it does introduce a new spinlock to our hot-path, but given
-the current over-allocation scheme with schedulers, its probably better
-off.
+T24gU3VuLCAyMDE3LTEwLTIyIGF0IDEzOjQ3ICswMDAwLCBJc3JhZWwgUnVrc2hpbiB3cm90ZToN
+Cj4gQEAgLTQ0MSw2ICs0NDIsOCBAQCBzdGF0aWMgaW50IGJsa19tcV9zY2hlZF9hbGxvY190YWdz
+KHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxLA0KPiAgCWlmICghaGN0eC0+c2NoZWRfdGFncykNCj4g
+IAkJcmV0dXJuIC1FTk9NRU07DQo+ICANCj4gKwlzZXQtPnNjaGVkX3RhZ3NbaGN0eF9pZHhdID0g
+aGN0eC0+c2NoZWRfdGFnczsNCj4gKw0KPiAgCXJldCA9IGJsa19tcV9hbGxvY19ycXMoc2V0LCBo
+Y3R4LT5zY2hlZF90YWdzLCBoY3R4X2lkeCwgcS0+bnJfcmVxdWVzdHMpOw0KPiAgCWlmIChyZXQp
+DQo+ICAJCWJsa19tcV9zY2hlZF9mcmVlX3RhZ3Moc2V0LCBoY3R4LCBoY3R4X2lkeCk7DQoNCldp
+bGwgdGhpcyB3b3JrIGFzIGV4cGVjdGVkIGlmIGEgdGFnIHNldCBpcyBzaGFyZWQgYWNyb3NzIG11
+bHRpcGxlIHJlcXVlc3QgcXVldWVzPw0KDQo+IGRpZmYgLS1naXQgYS9ibG9jay9ibGstbXEtdGFn
+LmMgYi9ibG9jay9ibGstbXEtdGFnLmMNCj4gaW5kZXggYzgxYjQwZS4uYzI5MGRlMCAxMDA2NDQN
+Cj4gLS0tIGEvYmxvY2svYmxrLW1xLXRhZy5jDQo+ICsrKyBiL2Jsb2NrL2Jsay1tcS10YWcuYw0K
+PiBAQCAtMzIyLDYgKzMyMiwyMiBAQCBpbnQgYmxrX21xX3RhZ3NldF9pdGVyKHN0cnVjdCBibGtf
+bXFfdGFnX3NldCAqc2V0LCB2b2lkICpkYXRhLA0KPiAgCQl9DQo+ICAJfQ0KPiAgDQo+ICsJZm9y
+IChpID0gMDsgaSA8IHNldC0+bnJfaHdfcXVldWVzOyBpKyspIHsNCj4gKwkJc3RydWN0IGJsa19t
+cV90YWdzICpzY2hlZF90YWdzID0gc2V0LT5zY2hlZF90YWdzW2ldOw0KPiArDQo+ICsJCWlmICgh
+c2NoZWRfdGFncykNCj4gKwkJCWNvbnRpbnVlOw0KPiArDQo+ICsJCWZvciAoaiA9IDA7IGogPCBz
+Y2hlZF90YWdzLT5ucl90YWdzOyBqKyspIHsNCj4gKwkJCWlmICghc2NoZWRfdGFncy0+c3RhdGlj
+X3Jxc1tqXSkNCj4gKwkJCQljb250aW51ZTsNCj4gKw0KPiArCQkJcmV0ID0gZm4oZGF0YSwgc2No
+ZWRfdGFncy0+c3RhdGljX3Jxc1tqXSk7DQo+ICsJCQlpZiAocmV0KQ0KPiArCQkJCWdvdG8gb3V0
+Ow0KPiArCQl9DQo+ICsJfQ0KDQpJZiBib3RoIGEgc2NoZWR1bGVyIHRhZyBhbmQgYSBkcml2ZXIg
+dGFnIGhhdmUgYmVlbiBhc3NpZ25lZCB0byBhIHJlcXVlc3QsIGNhbiB0aGlzIGNhdXNlDQpibGtf
+bXFfdGFnc2V0X2l0ZXIoKSB0byBjYWxsIGZuKCkgdHdpY2UgZm9yIHRoZSBzYW1lIHJlcXVlc3Q/
+DQoNClRoYW5rcywNCg0KQmFydC4=
