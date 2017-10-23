@@ -1,39 +1,94 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH 09/17] nvme: simplify nvme_open
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
- Johannes Thumshirn <jthumshirn@suse.de>, linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org
+Return-Path: <BATV+e774f35f755d74bf45df+5174+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 09/17] nvme: simplify nvme_open
+Date: Mon, 23 Oct 2017 16:51:18 +0200
+Message-Id: <20171023145126.2471-10-hch@lst.de>
+In-Reply-To: <20171023145126.2471-1-hch@lst.de>
 References: <20171023145126.2471-1-hch@lst.de>
- <20171023145126.2471-10-hch@lst.de>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <da101acc-a8a8-0158-df84-4f01bea78a0d@suse.de>
-Date: Tue, 24 Oct 2017 09:21:48 +0200
-MIME-Version: 1.0
-In-Reply-To: <20171023145126.2471-10-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/23/2017 04:51 PM, Christoph Hellwig wrote:
-> Now that we are protected against lookup vs free races for the namespace
-> by using kref_get_unless_zero we don't need the hack of NULLing out the
-> disk private data during removal.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-> ---
->  drivers/nvme/host/core.c | 40 ++++++++++------------------------------
->  1 file changed, 10 insertions(+), 30 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Now that we are protected against lookup vs free races for the namespace
+by using kref_get_unless_zero we don't need the hack of NULLing out the
+disk private data during removal.
 
-Cheers,
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ drivers/nvme/host/core.c | 40 ++++++++++------------------------------
+ 1 file changed, 10 insertions(+), 30 deletions(-)
 
-Hannes
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 1d931deac83b..9f8ae15c9fe8 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -253,12 +253,6 @@ static void nvme_free_ns(struct kref *kref)
+ 	if (ns->ndev)
+ 		nvme_nvm_unregister(ns);
+ 
+-	if (ns->disk) {
+-		spin_lock(&dev_list_lock);
+-		ns->disk->private_data = NULL;
+-		spin_unlock(&dev_list_lock);
+-	}
+-
+ 	put_disk(ns->disk);
+ 	ida_simple_remove(&ns->ctrl->ns_ida, ns->instance);
+ 	nvme_put_ctrl(ns->ctrl);
+@@ -270,29 +264,6 @@ static void nvme_put_ns(struct nvme_ns *ns)
+ 	kref_put(&ns->kref, nvme_free_ns);
+ }
+ 
+-static struct nvme_ns *nvme_get_ns_from_disk(struct gendisk *disk)
+-{
+-	struct nvme_ns *ns;
+-
+-	spin_lock(&dev_list_lock);
+-	ns = disk->private_data;
+-	if (ns) {
+-		if (!kref_get_unless_zero(&ns->kref))
+-			goto fail;
+-		if (!try_module_get(ns->ctrl->ops->module))
+-			goto fail_put_ns;
+-	}
+-	spin_unlock(&dev_list_lock);
+-
+-	return ns;
+-
+-fail_put_ns:
+-	kref_put(&ns->kref, nvme_free_ns);
+-fail:
+-	spin_unlock(&dev_list_lock);
+-	return NULL;
+-}
+-
+ struct request *nvme_alloc_request(struct request_queue *q,
+ 		struct nvme_command *cmd, unsigned int flags, int qid)
+ {
+@@ -1056,7 +1027,16 @@ static int nvme_ioctl(struct block_device *bdev, fmode_t mode,
+ 
+ static int nvme_open(struct block_device *bdev, fmode_t mode)
+ {
+-	return nvme_get_ns_from_disk(bdev->bd_disk) ? 0 : -ENXIO;
++	struct nvme_ns *ns = bdev->bd_disk->private_data;
++
++	if (!kref_get_unless_zero(&ns->kref))
++		return -ENXIO;
++	if (!try_module_get(ns->ctrl->ops->module)) {
++		kref_put(&ns->kref, nvme_free_ns);
++		return -ENXIO;
++	}
++
++	return 0;
+ }
+ 
+ static void nvme_release(struct gendisk *disk, fmode_t mode)
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.14.2
