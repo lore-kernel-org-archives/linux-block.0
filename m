@@ -1,63 +1,51 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from youngberry.canonical.com ([91.189.89.112]:33680 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751278AbdJXBr5 (ORCPT
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:57466 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932192AbdJWVIi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Oct 2017 21:47:57 -0400
-Received: from mail-oi0-f71.google.com ([209.85.218.71])
-        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-        (Exim 4.76)
-        (envelope-from <dann.frazier@canonical.com>)
-        id 1e6oJw-0001JP-C8
-        for linux-block@vger.kernel.org; Tue, 24 Oct 2017 01:47:56 +0000
-Received: by mail-oi0-f71.google.com with SMTP id 82so20171501oid.11
-        for <linux-block@vger.kernel.org>; Mon, 23 Oct 2017 18:47:56 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1508792914.2634.6.camel@wdc.com>
-References: <20171020225420.utvoqmtwit2isalc@xps13.dannf> <1508542254.3029.24.camel@wdc.com>
- <20171023154129.iik3ic36i5fi7sqs@xps13.dannf> <1508792914.2634.6.camel@wdc.com>
-From: dann frazier <dann.frazier@canonical.com>
-Date: Mon, 23 Oct 2017 19:47:54 -0600
-Message-ID: <CALdTtnuL6_Tc5QF79xrGvxT+FAJrWN4MK++d7b4+QjPktcQdcA@mail.gmail.com>
-Subject: Re: [bug report] regression bisected to "block: Make most
- scsi_req_init() calls implicit"
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
+        Mon, 23 Oct 2017 17:08:38 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "dann.frazier@canonical.com" <dann.frazier@canonical.com>
+CC: "linux-arm-kernel@lists.infradead.org"
         <linux-arm-kernel@lists.infradead.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [bug report] regression bisected to "block: Make most
+ scsi_req_init() calls implicit"
+Date: Mon, 23 Oct 2017 21:08:36 +0000
+Message-ID: <1508792914.2634.6.camel@wdc.com>
+References: <20171020225420.utvoqmtwit2isalc@xps13.dannf>
+         <1508542254.3029.24.camel@wdc.com>
+         <20171023154129.iik3ic36i5fi7sqs@xps13.dannf>
+In-Reply-To: <20171023154129.iik3ic36i5fi7sqs@xps13.dannf>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, Oct 23, 2017 at 3:08 PM, Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
-> On Mon, 2017-10-23 at 09:41 -0600, dann frazier wrote:
->> (gdb) list *(sg_io+0x120)
->> 0xffff0000084e71a8 is in sg_io (./include/linux/uaccess.h:113).
->> 108   static inline unsigned long
->> 109   _copy_from_user(void *to, const void __user *from, unsigned long n)
->> 110   {
->> 111           unsigned long res = n;
->> 112           might_fault();
->> 113           if (likely(access_ok(VERIFY_READ, from, n))) {
->> 114                   kasan_check_write(to, n);
->> 115                   res = raw_copy_from_user(to, from, n);
->> 116           }
->> 117           if (unlikely(res))
->
-> Hello Dann,
->
-> Would it be possible to check whether the patch below is sufficient to fix this?
-
-hey Bart,
- Yes, it does appear to be sufficient:
-
-ubuntu@ubuntu:~$ sudo dmesg -c > /dev/null
-ubuntu@ubuntu:~$ sudo dmraid -r -c
-ERROR: isw: seeking device "/dev/vda" to 18446744073708843520
-ERROR: sil: seeking device "/dev/vda" to 18446744073709401600
-no raid disks
-ubuntu@ubuntu:~$ dmesg
-ubuntu@ubuntu:~$
-
-  -dann
+T24gTW9uLCAyMDE3LTEwLTIzIGF0IDA5OjQxIC0wNjAwLCBkYW5uIGZyYXppZXIgd3JvdGU6DQo+
+IChnZGIpIGxpc3QgKihzZ19pbysweDEyMCkNCj4gMHhmZmZmMDAwMDA4NGU3MWE4IGlzIGluIHNn
+X2lvICguL2luY2x1ZGUvbGludXgvdWFjY2Vzcy5oOjExMykuDQo+IDEwOAlzdGF0aWMgaW5saW5l
+IHVuc2lnbmVkIGxvbmcNCj4gMTA5CV9jb3B5X2Zyb21fdXNlcih2b2lkICp0bywgY29uc3Qgdm9p
+ZCBfX3VzZXIgKmZyb20sIHVuc2lnbmVkIGxvbmcgbikNCj4gMTEwCXsNCj4gMTExCQl1bnNpZ25l
+ZCBsb25nIHJlcyA9IG47DQo+IDExMgkJbWlnaHRfZmF1bHQoKTsNCj4gMTEzCQlpZiAobGlrZWx5
+KGFjY2Vzc19vayhWRVJJRllfUkVBRCwgZnJvbSwgbikpKSB7DQo+IDExNAkJCWthc2FuX2NoZWNr
+X3dyaXRlKHRvLCBuKTsNCj4gMTE1CQkJcmVzID0gcmF3X2NvcHlfZnJvbV91c2VyKHRvLCBmcm9t
+LCBuKTsNCj4gMTE2CQl9DQo+IDExNwkJaWYgKHVubGlrZWx5KHJlcykpDQoNCkhlbGxvIERhbm4s
+DQoNCldvdWxkIGl0IGJlIHBvc3NpYmxlIHRvIGNoZWNrIHdoZXRoZXIgdGhlIHBhdGNoIGJlbG93
+IGlzIHN1ZmZpY2llbnQgdG8gZml4IHRoaXM/DQoNClRoYW5rcywNCg0KQmFydC4NCg0KDQpkaWZm
+IC0tZ2l0IGEvZHJpdmVycy9ibG9jay92aXJ0aW9fYmxrLmMgYi9kcml2ZXJzL2Jsb2NrL3ZpcnRp
+b19ibGsuYw0KaW5kZXggMzRlMTdlZTc5OWJlLi4xNWUxMWE1MTk4MDEgMTAwNjQ0DQotLS0gYS9k
+cml2ZXJzL2Jsb2NrL3ZpcnRpb19ibGsuYw0KKysrIGIvZHJpdmVycy9ibG9jay92aXJ0aW9fYmxr
+LmMNCkBAIC01OTcsNiArNTk3LDcgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCBibGtfbXFfb3BzIHZp
+cnRpb19tcV9vcHMgPSB7DQogCS5xdWV1ZV9ycQk9IHZpcnRpb19xdWV1ZV9ycSwNCiAJLmNvbXBs
+ZXRlCT0gdmlydGJsa19yZXF1ZXN0X2RvbmUsDQogCS5pbml0X3JlcXVlc3QJPSB2aXJ0YmxrX2lu
+aXRfcmVxdWVzdCwNCisJLmluaXRpYWxpemVfcnFfZm4gPSBzY3NpX2luaXRpYWxpemVfcnEsDQog
+CS5tYXBfcXVldWVzCT0gdmlydGJsa19tYXBfcXVldWVzLA0KIH07DQogDQpkaWZmIC0tZ2l0IGEv
+ZHJpdmVycy9zY3NpL3NnLmMgYi9kcml2ZXJzL3Njc2kvc2cuYw0KaW5kZXggMDQxOWMyMjk4ZWFi
+Li4xNDA5NmY2N2VlYmIgMTAwNjQ0DQotLS0gYS9kcml2ZXJzL3Njc2kvc2cuYw0KKysrIGIvZHJp
+dmVycy9zY3NpL3NnLmMNCkBAIC0xNzIyLDYgKzE3MjIsOCBAQCBzZ19zdGFydF9yZXEoU2dfcmVx
+dWVzdCAqc3JwLCB1bnNpZ25lZCBjaGFyICpjbWQpDQogCX0NCiAJcmVxID0gc2NzaV9yZXEocnEp
+Ow0KIA0KKwlXQVJOX09OX09OQ0UoIXJlcS0+Y21kKTsNCisNCiAJaWYgKGhwLT5jbWRfbGVuID4g
+QkxLX01BWF9DREIpDQogCQlyZXEtPmNtZCA9IGxvbmdfY21kcDsNCiAJbWVtY3B5KHJlcS0+Y21k
+LCBjbWQsIGhwLT5jbWRfbGVuKTsNCg==
