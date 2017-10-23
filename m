@@ -1,59 +1,42 @@
-Return-Path: <BATV+e774f35f755d74bf45df+5174+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 05/17] block: don't look at the struct device dev_t in disk_devt
-Date: Mon, 23 Oct 2017 16:51:14 +0200
-Message-Id: <20171023145126.2471-6-hch@lst.de>
-In-Reply-To: <20171023145126.2471-1-hch@lst.de>
-References: <20171023145126.2471-1-hch@lst.de>
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
+Subject: Re: nvme multipath support V4
+To: Guan Junxiong <guanjunxiong@huawei.com>, Christoph Hellwig <hch@lst.de>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ Keith Busch <keith.busch@intel.com>, Hannes Reinecke <hare@suse.de>,
+ Johannes Thumshirn <jthumshirn@suse.de>, "Shenhong (C)"
+ <shenhong09@huawei.com>, niuhaoxin <niuhaoxin@huawei.com>
+References: <20171018165258.23212-1-hch@lst.de>
+ <fbccc0db-77cd-fabc-0225-4b515729f214@huawei.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <495580b5-2dcf-b547-4c08-8a10fa4844a1@grimberg.me>
+Date: Mon, 23 Oct 2017 09:33:35 +0300
+MIME-Version: 1.0
+In-Reply-To: <fbccc0db-77cd-fabc-0225-4b515729f214@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-The hidden gendisks introduced in the next patch need to keep the dev
-field in their struct device empty so that udev won't try to create
-block device nodes for them.  To support that rewrite disk_devt to
-look at the major and first_minor fields in the gendisk itself instead
-of looking into the struct device.
+Guan,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- block/genhd.c         | 4 ----
- include/linux/genhd.h | 2 +-
- 2 files changed, 1 insertion(+), 5 deletions(-)
+> If per-controller block device nodes are hidden, how can the user-space tools
+> such as multipath-tools and nvme-cli (if it supports) know status of each path of
+> the multipath device?
 
-diff --git a/block/genhd.c b/block/genhd.c
-index dd305c65ffb0..1174d24e405e 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -649,10 +649,6 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
- 		return;
- 	}
- 	disk_to_dev(disk)->devt = devt;
--
--	/* ->major and ->first_minor aren't supposed to be
--	 * dereferenced from here on, but set them just in case.
--	 */
- 	disk->major = MAJOR(devt);
- 	disk->first_minor = MINOR(devt);
- 
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index ea652bfcd675..5c0ed5db33c2 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -234,7 +234,7 @@ static inline bool disk_part_scan_enabled(struct gendisk *disk)
- 
- static inline dev_t disk_devt(struct gendisk *disk)
- {
--	return disk_to_dev(disk)->devt;
-+	return MKDEV(disk->major, disk->first_minor);
- }
- 
- static inline dev_t part_devt(struct hd_struct *part)
--- 
-2.14.2
+if at all, the path state is reflected on the controller class device
+node, not on the namespace block device node. However, this is not
+something user-space can rely on as well.
+
+> In some cases, the admin wants to know which path is in down state , in degraded
+> state such as suffering intermittent IO error because of shaky link and he can fix
+> the link or isolate such link from the normal path.
+
+We have a ctrl_loss_tmo that will remove such a degraded controller
+after timeout expiration (default is 600 seconds). When we remove
+this controller we log this information so its available for a sysadmin
+to fix this if needed/desired.
+
+What we would probably need to do, is either to add a nvme-cli "rescan"
+option to discover and connect to all unconnected controllers so the
+sysadmin can run after fixing an issue, or introduce a daemon that does
+this every say 60 seconds or something.
