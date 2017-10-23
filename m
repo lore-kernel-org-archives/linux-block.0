@@ -1,103 +1,95 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:59836 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750812AbdJCSxU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 3 Oct 2017 14:53:20 -0400
-From: "Luis R. Rodriguez" <mcgrof@kernel.org>
-To: viro@zeniv.linux.org.uk, bart.vanassche@wdc.com,
-        ming.lei@redhat.com, tytso@mit.edu, darrick.wong@oracle.com,
-        jikos@kernel.org, rjw@rjwysocki.net, pavel@ucw.cz,
-        len.brown@intel.com, linux-fsdevel@vger.kernel.org
-Cc: boris.ostrovsky@oracle.com, jgross@suse.com,
-        todd.e.brandt@linux.intel.com, nborisov@suse.com, jack@suse.cz,
-        martin.petersen@oracle.com, ONeukum@suse.com,
-        oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
-        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Luis R. Rodriguez" <mcgrof@kernel.org>
-Subject: [RFC 1/5] fs: add iterate_supers_reverse()
-Date: Tue,  3 Oct 2017 11:53:09 -0700
-Message-Id: <20171003185313.1017-2-mcgrof@kernel.org>
-In-Reply-To: <20171003185313.1017-1-mcgrof@kernel.org>
-References: <20171003185313.1017-1-mcgrof@kernel.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+e774f35f755d74bf45df+5174+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: nvme multipath support V5
+Date: Mon, 23 Oct 2017 16:51:09 +0200
+Message-Id: <20171023145126.2471-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-There are use cases where we wish to traverse the superblock list
-in reverse order. This particular implementation will also enable
-to capture errors.
+Hi all,
 
-Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
----
- fs/super.c         | 43 +++++++++++++++++++++++++++++++++++++++++++
- include/linux/fs.h |  1 +
- 2 files changed, 44 insertions(+)
+this series adds support for multipathing, that is accessing nvme
+namespaces through multiple controllers to the nvme core driver.
 
-diff --git a/fs/super.c b/fs/super.c
-index 02da00410de8..d45e92d9a38f 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -609,6 +609,49 @@ void iterate_supers(void (*f)(struct super_block *, void *), void *arg)
- 	spin_unlock(&sb_lock);
- }
- 
-+/**
-+ *	iterate_supers_reverse - call function for active superblocks in reverse
-+ *	@f: function to call
-+ *	@arg: argument to pass to it
-+ *
-+ *	Scans the superblock list and calls given function, passing it
-+ *	locked superblock and given argument, in reverse order. Returns if
-+ *	an error occurred.
-+ */
-+int iterate_supers_reverse(int (*f)(struct super_block *, void *), void *arg)
-+{
-+	struct super_block *sb, *p = NULL;
-+	int error = 0;
-+
-+	spin_lock(&sb_lock);
-+	list_for_each_entry_reverse(sb, &super_blocks, s_list) {
-+		if (hlist_unhashed(&sb->s_instances))
-+			continue;
-+		sb->s_count++;
-+		spin_unlock(&sb_lock);
-+
-+		down_read(&sb->s_umount);
-+		if (sb->s_root && (sb->s_flags & SB_BORN)) {
-+			error = f(sb, arg);
-+			if (error) {
-+				spin_lock(&sb_lock);
-+				break;
-+			}
-+		}
-+		up_read(&sb->s_umount);
-+
-+		spin_lock(&sb_lock);
-+		if (p)
-+			__put_super(p);
-+		p = sb;
-+	}
-+	if (p)
-+		__put_super(p);
-+	spin_unlock(&sb_lock);
-+
-+	return error;
-+}
-+
- /**
-  *	iterate_supers_type - call function for superblocks of given type
-  *	@type: fs type
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 46796b2f956b..cd084792cf39 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -3097,6 +3097,7 @@ extern struct super_block *get_active_super(struct block_device *bdev);
- extern void drop_super(struct super_block *sb);
- extern void drop_super_exclusive(struct super_block *sb);
- extern void iterate_supers(void (*)(struct super_block *, void *), void *);
-+extern int iterate_supers_reverse(int (*)(struct super_block *, void *), void *);
- extern void iterate_supers_type(struct file_system_type *,
- 			        void (*)(struct super_block *, void *), void *);
- 
--- 
-2.14.0
+It is a very thin and efficient implementation that relies on
+close cooperation with other bits of the nvme driver, and few small
+and simple block helpers.
+
+Compared to dm-multipath the important differences are how management
+of the paths is done, and how the I/O path works.
+
+Management of the paths is fully integrated into the nvme driver,
+for each newly found nvme controller we check if there are other
+controllers that refer to the same subsystem, and if so we link them
+up in the nvme driver.  Then for each namespace found we check if
+the namespace id and identifiers match to check if we have multiple
+controllers that refer to the same namespaces.  For now path
+availability is based entirely on the controller status, which at
+least for fabrics will be continuously updated based on the mandatory
+keep alive timer.  Once the Asynchronous Namespace Access (ANA)
+proposal passes in NVMe we will also get per-namespace states in
+addition to that, but for now any details of that remain confidential
+to NVMe members.
+
+The I/O path is very different from the existing multipath drivers,
+which is enabled by the fact that NVMe (unlike SCSI) does not support
+partial completions - a controller will either complete a whole
+command or not, but never only complete parts of it.  Because of that
+there is no need to clone bios or requests - the I/O path simply
+redirects the I/O to a suitable path.  For successful commands
+multipath is not in the completion stack at all.  For failed commands
+we decide if the error could be a path failure, and if yes remove
+the bios from the request structure and requeue them before completing
+the request.  All together this means there is no performance
+degradation compared to normal nvme operation when using the multipath
+device node (at least not until I find a dual ported DRAM backed
+device :))
+
+A git tree is available at:
+
+   git://git.infradead.org/users/hch/block.git nvme-mpath
+
+gitweb:
+
+   http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/nvme-mpath
+
+Changes since V4:
+  - add a refcount to release the device in struct nvme_subsystem
+  - use the instance to name the nvme_subsystems in sysfs
+  - remove a NULL check before nvme_put_ns_head
+  - take a ns_head reference in ->open
+  - improve open protection for GENHD_FL_HIDDEN
+  - add poll support for the mpath device
+
+Changes since V3:
+  - new block layer support for hidden gendisks
+  - a couple new patches to refactor device handling before the
+    actual multipath support
+  - don't expose per-controller block device nodes
+  - use /dev/nvmeXnZ as the device nodes for the whole subsystem.
+  - expose subsystems in sysfs (Hannes Reinecke)
+  - fix a subsystem leak when duplicate NQNs are found
+  - fix up some names
+  - don't clear current_path if freeing a different namespace
+
+Changes since V2:
+  - don't create duplicate subsystems on reset (Keith Bush)
+  - free requests properly when failing over in I/O completion (Keith Bush)
+  - new devices names: /dev/nvm-sub%dn%d
+  - expose the namespace identification sysfs files for the mpath nodes
+
+Changes since V1:
+  - introduce new nvme_ns_ids structure to clean up identifier handling
+  - generic_make_request_fast is now named direct_make_request and calls
+    generic_make_request_checks
+  - reset bi_disk on resubmission
+  - create sysfs links between the existing nvme namespace block devices and
+    the new share mpath device
+  - temporarily added the timeout patches from James, this should go into
+    nvme-4.14, though
