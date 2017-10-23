@@ -1,106 +1,105 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-io0-f195.google.com ([209.85.223.195]:52449 "EHLO
-        mail-io0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751260AbdJWQMu (ORCPT
+Received: from mail-it0-f67.google.com ([209.85.214.67]:56142 "EHLO
+        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751198AbdJWPNO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Oct 2017 12:12:50 -0400
-Received: by mail-io0-f195.google.com with SMTP id f20so20674896ioj.9
-        for <linux-block@vger.kernel.org>; Mon, 23 Oct 2017 09:12:50 -0700 (PDT)
+        Mon, 23 Oct 2017 11:13:14 -0400
+Received: by mail-it0-f67.google.com with SMTP id l196so6322999itl.4
+        for <linux-block@vger.kernel.org>; Mon, 23 Oct 2017 08:13:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20171020133943.GA31275@ming.t460p>
-References: <20171018102206.26020-1-roman.penyaev@profitbricks.com> <20171020133943.GA31275@ming.t460p>
+In-Reply-To: <1508529929.3029.20.camel@wdc.com>
+References: <20171018102206.26020-1-roman.penyaev@profitbricks.com>
+ <1508435243.2429.42.camel@wdc.com> <CAJrWOzCyLSNYAmEY6afoVjPYK8KaoH1HSs63iGpDuCwesjwBLQ@mail.gmail.com>
+ <1508529929.3029.20.camel@wdc.com>
 From: Roman Penyaev <roman.penyaev@profitbricks.com>
-Date: Mon, 23 Oct 2017 18:12:29 +0200
-Message-ID: <CAJrWOzBKTAsCrrg7nGp95ShDdZybKq6tGH9yA33GqwMXvfokCg@mail.gmail.com>
+Date: Mon, 23 Oct 2017 17:12:52 +0200
+Message-ID: <CAJrWOzAmPT_0jrYRi_U-fHHjOitk2XE461ZhL=aKFiY3iQjGMQ@mail.gmail.com>
 Subject: Re: [PATCH 1/1] [RFC] blk-mq: fix queue stalling on shared hctx restart
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Hannes Reinecke <hare@suse.com>, Jens Axboe <axboe@fb.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "hare@suse.com" <hare@suse.com>, "axboe@fb.com" <axboe@fb.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Ming,
+On Fri, Oct 20, 2017 at 10:05 PM, Bart Van Assche
+<Bart.VanAssche@wdc.com> wrote:
+> On Fri, 2017-10-20 at 11:39 +0200, Roman Penyaev wrote:
+>> But what bothers me is these looong loops inside blk_mq_sched_restart(),
+>> and since you are the author of the original 6d8c6c0f97ad ("blk-mq: Restart
+>> a single queue if tag sets are shared") I want to ask what was the original
+>> problem which you attempted to fix?  Likely I am missing some test scenario
+>> which would be great to know about.
+>
+> Long loops? How many queues share the same tag set on your setup? How many
+> hardware queues does your block driver create per request queue?
 
-On Fri, Oct 20, 2017 at 3:39 PM, Ming Lei <ming.lei@redhat.com> wrote:
-> On Wed, Oct 18, 2017 at 12:22:06PM +0200, Roman Pen wrote:
->> Hi all,
->>
->> the patch below fixes queue stalling when shared hctx marked for restart
->> (BLK_MQ_S_SCHED_RESTART bit) but q->shared_hctx_restart stays zero.  The
->> root cause is that hctxs are shared between queues, but 'shared_hctx_restart'
->> belongs to the particular queue, which in fact may not need to be restarted,
->> thus we return from blk_mq_sched_restart() and leave shared hctx of another
->> queue never restarted.
->>
->> The fix is to make shared_hctx_restart counter belong not to the queue, but
->> to tags, thereby counter will reflect real number of shared hctx needed to
->> be restarted.
->>
->> During tests 1 hctx (set->nr_hw_queues) was used and all stalled requests
->> were noticed in dd->fifo_list of mq-deadline scheduler.
->>
->> Seeming possible sequence of events:
->>
->> 1. Request A of queue A is inserted into dd->fifo_list of the scheduler.
->>
->> 2. Request B of queue A bypasses scheduler and goes directly to
->>    hctx->dispatch.
->>
->> 3. Request C of queue B is inserted.
->>
->> 4. blk_mq_sched_dispatch_requests() is invoked, since hctx->dispatch is not
->>    empty (request B is in the list) hctx is only marked for for next restart
->>    and request A is left in a list (see comment "So it's best to leave them
->>    there for as long as we can. Mark the hw queue as needing a restart in
->>    that case." in blk-mq-sched.c)
->>
->> 5. Eventually request B is completed/freed and blk_mq_sched_restart() is
->>    called, but by chance hctx from queue B is chosen for restart and request C
->>    gets a chance to be dispatched.
->>
->> 6. Eventually request C is completed/freed and blk_mq_sched_restart() is
->>    called, but shared_hctx_restart for queue B is zero and we return without
->>    attempt to restart hctx from queue A, thus request A is stuck forever.
->>
->> But stalling queue is not the only one problem with blk_mq_sched_restart().
->> My tests show that those loops thru all queues and hctxs can be very costly,
->> even with shared_hctx_restart counter, which aims to fix performance issue.
->> For my tests I create 128 devices with 64 hctx each, which share same tags
->> set.
->
-> Hi Roman,
->
-> I also find the performance issue with RESTART for TAG_SHARED.
->
-> But from my analysis, RESTART isn't needed for TAG_SHARED
-> because SCSI-MQ has handled the RESTART by itself already, so
-> could you test the patch in following link posted days ago to
-> see if it fixes your issue?
+Yeah, ok, my mistake. I had to split both issues and should not have described
+everything in one go in the first email.  So, take a look.
 
-I can say without any testing: it fixes all the issues :) You've
-reverted
+For my tests I create 128 queues (devices) with 64 hctx each, all queues share
+same tags set, then I start 128 fio jobs (1 job per 1 queue).
+
+The following is the fio and ftrace output for v4.14-rc4 kernel
+(without any changes):
+
+ READ: io=5630.3MB, aggrb=573208KB/s, minb=573208KB/s,
+maxb=573208KB/s, mint=10058msec, maxt=10058msec
+WRITE: io=5650.9MB, aggrb=575312KB/s, minb=575312KB/s,
+maxb=575312KB/s, mint=10058msec, maxt=10058msec
+
+root@pserver16:~/roman# cat /sys/kernel/debug/tracing/trace_stat/* | grep blk_mq
+  Function                  Hit     Time            Avg             s^2
+  --------                  ---     ----            ---             ---
+  blk_mq_sched_restart     16347    9540759 us      583.639 us      8804801 us
+  blk_mq_sched_restart      7884    6073471 us      770.354 us      8780054 us
+  blk_mq_sched_restart     14176    7586794 us      535.185 us      2822731 us
+  blk_mq_sched_restart      7843    6205435 us      791.206 us      12424960 us
+  blk_mq_sched_restart      1490    4786107 us      3212.153 us
+1949753 us    <<< !!! 3 ms in average !!!
+  blk_mq_sched_restart      7892    6039311 us      765.244 us      2994627 us
+  blk_mq_sched_restart     15382    7511126 us      488.306 us      3090912 us
+  [cut]
+
+
+And here are results with two patches reverted:
 
    8e8320c9315c ("blk-mq: fix performance regression with shared tags")
    6d8c6c0f97ad ("blk-mq: Restart a single queue if tag sets are shared")
 
-with one major difference: you do not handle shared tags in a special
-way and restart only requested hctx, instead of iterating over all hctxs
-in a queue.
+ READ: io=12884MB, aggrb=1284.3MB/s, minb=1284.3MB/s, maxb=1284.3MB/s,
+mint=10032msec, maxt=10032msec
+WRITE: io=12987MB, aggrb=1294.6MB/s, minb=1294.6MB/s, maxb=1294.6MB/s,
+mint=10032msec, maxt=10032msec
 
-Firstly I have to say that queue stalling issue(#1) and performance
-issue(#2) were observed on our in-house rdma driver IBNBD:
-https://lwn.net/Articles/718181/ and I've never tried to reproduce
-them on SCSI-MQ.
+root@pserver16:~/roman# cat /sys/kernel/debug/tracing/trace_stat/* | grep blk_mq
+  Function                  Hit      Time            Avg             s^2
+  --------                  ---      ----            ---             ---
+  blk_mq_sched_restart      50699    8802.349 us     0.173 us        121.771 us
+  blk_mq_sched_restart      50362    8740.470 us     0.173 us        161.494 us
+  blk_mq_sched_restart      50402    9066.337 us     0.179 us        113.009 us
+  blk_mq_sched_restart      50104    9366.197 us     0.186 us        188.645 us
+  blk_mq_sched_restart      50375    9317.727 us     0.184 us        54.218 us
+  blk_mq_sched_restart      50136    9311.657 us     0.185 us        446.790 us
+  blk_mq_sched_restart      50103    9179.625 us     0.183 us        114.472 us
+  [cut]
 
-Then your patch brakes RR restarts, which were introduced by this commit
-6d8c6c0f97ad ("blk-mq: Restart a single queue if tag sets are shared").
-Seems basic idea of that patch is nice, but because of possible big
-amount of queues and hctxs patch requires reimplementation.  Eventually
-you should get fast hctx restart but in RR fashion. According to my
-understanding that does not contradict with your patch.
+The difference is significant: 570MB/s vs 1280MB/s.  E.g. one cpu spent 3 ms in
+average iterating over all queues and hctxs in order to find out hctx
+to restart.
+In total CPUs spent *seconds* in loop.  That seems incredibly long.
+
+> Commit 6d8c6c0f97ad is something I came up with to fix queue lockups in the
+> SCSI and dm-mq drivers.
+
+You mean fairness? (some hctx get less amount of chances to be restarted).
+That's why you need to restart them in RR fashion, right?
+
+In IBNBD I also do hctx restarts in RR fashion and for that I put each hctx
+which is needed to be restarted in a separate percpu list.  Probably it makes
+sense to do the same here?
 
 --
 Roman
