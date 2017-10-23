@@ -1,40 +1,44 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH 08/17] nvme: use kref_get_unless_zero in nvme_find_get_ns
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
- Johannes Thumshirn <jthumshirn@suse.de>, linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org
+Return-Path: <BATV+e774f35f755d74bf45df+5174+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 08/17] nvme: use kref_get_unless_zero in nvme_find_get_ns
+Date: Mon, 23 Oct 2017 16:51:17 +0200
+Message-Id: <20171023145126.2471-9-hch@lst.de>
+In-Reply-To: <20171023145126.2471-1-hch@lst.de>
 References: <20171023145126.2471-1-hch@lst.de>
- <20171023145126.2471-9-hch@lst.de>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <e6c92822-7c64-b11b-8bb3-41c456ad4c8b@suse.de>
-Date: Tue, 24 Oct 2017 09:21:03 +0200
-MIME-Version: 1.0
-In-Reply-To: <20171023145126.2471-9-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/23/2017 04:51 PM, Christoph Hellwig wrote:
-> For kref_get_unless_zero to protect against lookup vs free races we need
-> to use it in all places where we aren't guaranteed to already hold a
-> reference.  There is no such guarantee in nvme_find_get_ns, so switch to
-> kref_get_unless_zero in this function.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-> ---
->  drivers/nvme/host/core.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+For kref_get_unless_zero to protect against lookup vs free races we need
+to use it in all places where we aren't guaranteed to already hold a
+reference.  There is no such guarantee in nvme_find_get_ns, so switch to
+kref_get_unless_zero in this function.
 
-Cheers,
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ drivers/nvme/host/core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Hannes
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 7fae42d595d5..1d931deac83b 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2290,7 +2290,8 @@ static struct nvme_ns *nvme_find_get_ns(struct nvme_ctrl *ctrl, unsigned nsid)
+ 	mutex_lock(&ctrl->namespaces_mutex);
+ 	list_for_each_entry(ns, &ctrl->namespaces, list) {
+ 		if (ns->ns_id == nsid) {
+-			kref_get(&ns->kref);
++			if (!kref_get_unless_zero(&ns->kref))
++				continue;
+ 			ret = ns;
+ 			break;
+ 		}
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.14.2
