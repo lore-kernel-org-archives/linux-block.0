@@ -1,62 +1,56 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:45835 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752942AbdJMXf7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 19:35:59 -0400
-Received: by mail-pg0-f66.google.com with SMTP id b192so2339926pga.2
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 16:35:59 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Coly Li <colyli@suse.de>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        stable@vger.kernel.org
-Subject: [PATCH 02/15] bcache: check ca->alloc_thread initialized before wake up it
-Date: Fri, 13 Oct 2017 16:35:29 -0700
-Message-Id: <20171013233542.20938-3-mlyle@lyle.org>
-In-Reply-To: <20171013233542.20938-1-mlyle@lyle.org>
-References: <20171013233542.20938-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+e774f35f755d74bf45df+5174+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 01/17] block: move REQ_NOWAIT
+Date: Mon, 23 Oct 2017 16:51:10 +0200
+Message-Id: <20171023145126.2471-2-hch@lst.de>
+In-Reply-To: <20171023145126.2471-1-hch@lst.de>
+References: <20171023145126.2471-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Coly Li <colyli@suse.de>
+This flag should be before the operation-specific REQ_NOUNMAP bit.
 
-In bcache code, sysfs entries are created before all resources get
-allocated, e.g. allocation thread of a cache set.
-
-There is posibility for NULL pointer deference if a resource is accessed
-but which is not initialized yet. Indeed Jorg Bornschein catches one on
-cache set allocation thread and gets a kernel oops.
-
-The reason for this bug is, when bch_bucket_alloc() is called during
-cache set registration and attaching, ca->alloc_thread is not properly
-allocated and initialized yet, call wake_up_process() on ca->alloc_thread
-triggers NULL pointer deference failure. A simple and fast fix is, before
-waking up ca->alloc_thread, checking whether it is allocated, and only
-wake up ca->alloc_thread when it is not NULL.
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Reported-by: Jorg Bornschein <jb@capsec.org>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Cc: stable@vger.kernel.org
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/md/bcache/alloc.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ include/linux/blk_types.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
-index cacbe2dbd5c3..e1a4205caa2e 100644
---- a/drivers/md/bcache/alloc.c
-+++ b/drivers/md/bcache/alloc.c
-@@ -406,7 +406,8 @@ long bch_bucket_alloc(struct cache *ca, unsigned reserve, bool wait)
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index a2d2aa709cef..acc2f3cdc2fc 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -224,11 +224,11 @@ enum req_flag_bits {
+ 	__REQ_PREFLUSH,		/* request for cache flush */
+ 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
+ 	__REQ_BACKGROUND,	/* background IO */
++	__REQ_NOWAIT,           /* Don't wait if request will block */
  
- 	finish_wait(&ca->set->bucket_wait, &w);
- out:
--	wake_up_process(ca->alloc_thread);
-+	if (ca->alloc_thread)
-+		wake_up_process(ca->alloc_thread);
+ 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
+ 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
  
- 	trace_bcache_alloc(ca, reserve);
+-	__REQ_NOWAIT,           /* Don't wait if request will block */
+ 	__REQ_NR_BITS,		/* stops here */
+ };
  
+@@ -245,9 +245,9 @@ enum req_flag_bits {
+ #define REQ_PREFLUSH		(1ULL << __REQ_PREFLUSH)
+ #define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
+ #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
++#define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
+ 
+ #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
+-#define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
+ 
+ #define REQ_FAILFAST_MASK \
+ 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
 -- 
-2.11.0
+2.14.2
