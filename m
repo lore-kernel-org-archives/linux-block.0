@@ -1,33 +1,144 @@
-Return-Path: <mingo.kernel.org@gmail.com>
-Return-Path: <mingo.kernel.org@gmail.com>
-Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
-Date: Tue, 24 Oct 2017 12:05:16 +0200
-From: Ingo Molnar <mingo@kernel.org>
-To: Byungchul Park <byungchul.park@lge.com>
-Cc: peterz@infradead.org, axboe@kernel.dk, tglx@linutronix.de,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, tj@kernel.org,
-	johannes.berg@intel.com, oleg@redhat.com, amir73il@gmail.com,
-	david@fromorbit.com, darrick.wong@oracle.com,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, hch@infradead.org, idryomov@gmail.com,
+Return-Path: <byungchul.park@lge.com>
+From: Byungchul Park <byungchul.park@lge.com>
+To: peterz@infradead.org,
+	mingo@kernel.org,
+	axboe@kernel.dk
+Cc: tglx@linutronix.de,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	tj@kernel.org,
+	johannes.berg@intel.com,
+	oleg@redhat.com,
+	amir73il@gmail.com,
+	david@fromorbit.com,
+	darrick.wong@oracle.com,
+	linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	hch@infradead.org,
+	idryomov@gmail.com,
 	kernel-team@lge.com
-Subject: Re: [PATCH v3 2/8] lockdep: Introduce CROSSRELEASE_STACK_TRACE and
- make it not unwind as default
-Message-ID: <20171024100516.f2a2uzknqfum77w2@gmail.com>
+Subject: [PATCH v3 2/8] lockdep: Introduce CROSSRELEASE_STACK_TRACE and make it not unwind as default
+Date: Tue, 24 Oct 2017 18:38:03 +0900
+Message-Id: <1508837889-16932-3-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <1508837889-16932-1-git-send-email-byungchul.park@lge.com>
 References: <1508837889-16932-1-git-send-email-byungchul.park@lge.com>
- <1508837889-16932-3-git-send-email-byungchul.park@lge.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1508837889-16932-3-git-send-email-byungchul.park@lge.com>
 List-ID: <linux-block@vger.kernel.org>
 
+Johan Hovold reported a performance regression by crossrelease like:
 
-* Byungchul Park <byungchul.park@lge.com> wrote:
+> Boot time (from "Linux version" to login prompt) had in fact doubled
+> since 4.13 where it took 17 seconds (with my current config) compared to
+> the 35 seconds I now see with 4.14-rc4.
+>
+> I quick bisect pointed to lockdep and specifically the following commit:
+>
+> 	28a903f63ec0 ("locking/lockdep: Handle non(or multi)-acquisition
+> 	               of a crosslock")
+>
+> which I've verified is the commit which doubled the boot time (compared
+> to 28a903f63ec0^) (added by lockdep crossrelease series [1]).
 
-> Johan Hovold reported a performance regression by crossrelease like:
+Currently crossrelease performs unwind on every acquisition. But, that
+overloads systems too much. So this patch makes unwind optional and set
+it to N as default. Instead, it records only acquire_ip normally. Of
+course, unwind is sometimes required for full analysis. In that case, we
+can set CROSSRELEASE_STACK_TRACE to Y and use it.
 
-Pplease add Reported-by and Analyzed-by tags - you didn't even Cc: Johan!
+In my qemu ubuntu machin (x86_64, 4 cores, 512M), the regression was
+fixed like, measuring booting times with 'perf stat --null --repeat 10
+$QEMU', where $QEMU launchs a kernel with init=/bin/true:
 
-Thanks,
+1. No lockdep enabled
 
-	Ingo
+ Performance counter stats for 'qemu_booting_time.sh bzImage' (10 runs):
+
+       2.756558155 seconds time elapsed                    ( +-  0.09% )
+
+2. Lockdep enabled
+
+ Performance counter stats for 'qemu_booting_time.sh bzImage' (10 runs):
+
+       2.968710420 seconds time elapsed                    ( +-  0.12% )
+
+3. Lockdep enabled + crossrelease enabled
+
+ Performance counter stats for 'qemu_booting_time.sh bzImage' (10 runs):
+
+       3.153839636 seconds time elapsed                    ( +-  0.31% )
+
+4. Lockdep enabled + crossrelease enabled + this patch applied
+
+ Performance counter stats for 'qemu_booting_time.sh bzImage' (10 runs):
+
+       2.963669551 seconds time elapsed                    ( +-  0.11% )
+
+Signed-off-by: Byungchul Park <byungchul.park@lge.com>
+---
+ include/linux/lockdep.h  |  4 ++++
+ kernel/locking/lockdep.c |  5 +++++
+ lib/Kconfig.debug        | 15 +++++++++++++++
+ 3 files changed, 24 insertions(+)
+
+diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
+index bfa8e0b..70358b5 100644
+--- a/include/linux/lockdep.h
++++ b/include/linux/lockdep.h
+@@ -278,7 +278,11 @@ struct held_lock {
+ };
+ 
+ #ifdef CONFIG_LOCKDEP_CROSSRELEASE
++#ifdef CONFIG_CROSSRELEASE_STACK_TRACE
+ #define MAX_XHLOCK_TRACE_ENTRIES 5
++#else
++#define MAX_XHLOCK_TRACE_ENTRIES 1
++#endif
+ 
+ /*
+  * This is for keeping locks waiting for commit so that true dependencies
+diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
+index e36e652..5c2ddf2 100644
+--- a/kernel/locking/lockdep.c
++++ b/kernel/locking/lockdep.c
+@@ -4863,8 +4863,13 @@ static void add_xhlock(struct held_lock *hlock)
+ 	xhlock->trace.nr_entries = 0;
+ 	xhlock->trace.max_entries = MAX_XHLOCK_TRACE_ENTRIES;
+ 	xhlock->trace.entries = xhlock->trace_entries;
++#ifdef CONFIG_CROSSRELEASE_STACK_TRACE
+ 	xhlock->trace.skip = 3;
+ 	save_stack_trace(&xhlock->trace);
++#else
++	xhlock->trace.nr_entries = 1;
++	xhlock->trace.entries[0] = hlock->acquire_ip;
++#endif
+ }
+ 
+ static inline int same_context_xhlock(struct hist_lock *xhlock)
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 3db9167..90ea784 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -1225,6 +1225,21 @@ config LOCKDEP_COMPLETIONS
+ 	 A deadlock caused by wait_for_completion() and complete() can be
+ 	 detected by lockdep using crossrelease feature.
+ 
++config CROSSRELEASE_STACK_TRACE
++	bool "Record more than one entity of stack trace in crossrelease"
++	depends on LOCKDEP_CROSSRELEASE
++	default n
++	help
++	 The lockdep "cross-release" feature needs to record stack traces
++	 (of calling functions) for all acquisitions, for eventual later
++	 use during analysis. By default only a single caller is recorded,
++	 because the unwind operation can be very expensive with deeper
++	 stack chains. However, sometimes deeper traces are required for
++	 full analysis. This option turns on the saving of the full stack
++	 trace entries.
++
++	 If unsure, say N.
++
+ config DEBUG_LOCKDEP
+ 	bool "Lock dependency engine debugging"
+ 	depends on DEBUG_KERNEL && LOCKDEP
+-- 
+1.9.1
