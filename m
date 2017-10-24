@@ -1,40 +1,63 @@
-Return-Path: <BATV+e774f35f755d74bf45df+5174+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 12/17] nvme: check for a live controller in nvme_dev_open
-Date: Mon, 23 Oct 2017 16:51:21 +0200
-Message-Id: <20171023145126.2471-13-hch@lst.de>
-In-Reply-To: <20171023145126.2471-1-hch@lst.de>
-References: <20171023145126.2471-1-hch@lst.de>
+Return-Path: <mingo.kernel.org@gmail.com>
+Return-Path: <mingo.kernel.org@gmail.com>
+Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
+Date: Tue, 24 Oct 2017 12:10:01 +0200
+From: Ingo Molnar <mingo@kernel.org>
+To: Byungchul Park <byungchul.park@lge.com>
+Cc: peterz@infradead.org, axboe@kernel.dk, tglx@linutronix.de,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, tj@kernel.org,
+	johannes.berg@intel.com, oleg@redhat.com, amir73il@gmail.com,
+	david@fromorbit.com, darrick.wong@oracle.com,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, hch@infradead.org, idryomov@gmail.com,
+	kernel-team@lge.com
+Subject: Re: [PATCH v3 7/8] genhd.h: Remove trailing white space
+Message-ID: <20171024101001.cv6e5llflnkzhuim@gmail.com>
+References: <1508837889-16932-1-git-send-email-byungchul.park@lge.com>
+ <1508837889-16932-8-git-send-email-byungchul.park@lge.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1508837889-16932-8-git-send-email-byungchul.park@lge.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This is a much more sensible check than just the admin queue.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Sagi Grimberg <sagi@rimbeg.me>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/nvme/host/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+* Byungchul Park <byungchul.park@lge.com> wrote:
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index a56a1e0432e7..df525ab42fcd 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1891,7 +1891,7 @@ static int nvme_dev_open(struct inode *inode, struct file *file)
- 	struct nvme_ctrl *ctrl =
- 		container_of(inode->i_cdev, struct nvme_ctrl, cdev);
- 
--	if (!ctrl->admin_q)
-+	if (ctrl->state != NVME_CTRL_LIVE)
- 		return -EWOULDBLOCK;
- 	file->private_data = ctrl;
- 	return 0;
--- 
-2.14.2
+> Trailing white space is not accepted in kernel coding style. Remove
+> them.
+> 
+> Signed-off-by: Byungchul Park <byungchul.park@lge.com>
+> ---
+>  include/linux/genhd.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+> index ea652bf..6d85a75 100644
+> --- a/include/linux/genhd.h
+> +++ b/include/linux/genhd.h
+> @@ -3,7 +3,7 @@
+>  
+>  /*
+>   * 	genhd.h Copyright (C) 1992 Drew Eckhardt
+> - *	Generic hard disk header file by  
+> + *	Generic hard disk header file by
+>   * 		Drew Eckhardt
+>   *
+>   *		<drew@colorado.edu>
+> @@ -471,7 +471,7 @@ struct bsd_disklabel {
+>  	__s16	d_type;			/* drive type */
+>  	__s16	d_subtype;		/* controller/d_type specific */
+>  	char	d_typename[16];		/* type name, e.g. "eagle" */
+> -	char	d_packname[16];			/* pack identifier */ 
+> +	char	d_packname[16];			/* pack identifier */
+>  	__u32	d_secsize;		/* # of bytes per sector */
+>  	__u32	d_nsectors;		/* # of data sectors per track */
+>  	__u32	d_ntracks;		/* # of tracks per cylinder */
+
+This patch should not be part of this lockdep series - please send it to Jens 
+separately - who might or might not apply it, depending on the subsystem's policy 
+regarding whitespace-only patches.
+
+Thanks,
+
+	Ingo
