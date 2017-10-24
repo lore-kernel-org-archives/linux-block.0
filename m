@@ -1,86 +1,63 @@
-Return-Path: <BATV+e774f35f755d74bf45df+5174+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 03/17] block: provide a direct_make_request helper
-Date: Mon, 23 Oct 2017 16:51:12 +0200
-Message-Id: <20171023145126.2471-4-hch@lst.de>
-In-Reply-To: <20171023145126.2471-1-hch@lst.de>
-References: <20171023145126.2471-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from youngberry.canonical.com ([91.189.89.112]:33680 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751278AbdJXBr5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Oct 2017 21:47:57 -0400
+Received: from mail-oi0-f71.google.com ([209.85.218.71])
+        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+        (Exim 4.76)
+        (envelope-from <dann.frazier@canonical.com>)
+        id 1e6oJw-0001JP-C8
+        for linux-block@vger.kernel.org; Tue, 24 Oct 2017 01:47:56 +0000
+Received: by mail-oi0-f71.google.com with SMTP id 82so20171501oid.11
+        for <linux-block@vger.kernel.org>; Mon, 23 Oct 2017 18:47:56 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1508792914.2634.6.camel@wdc.com>
+References: <20171020225420.utvoqmtwit2isalc@xps13.dannf> <1508542254.3029.24.camel@wdc.com>
+ <20171023154129.iik3ic36i5fi7sqs@xps13.dannf> <1508792914.2634.6.camel@wdc.com>
+From: dann frazier <dann.frazier@canonical.com>
+Date: Mon, 23 Oct 2017 19:47:54 -0600
+Message-ID: <CALdTtnuL6_Tc5QF79xrGvxT+FAJrWN4MK++d7b4+QjPktcQdcA@mail.gmail.com>
+Subject: Re: [bug report] regression bisected to "block: Make most
+ scsi_req_init() calls implicit"
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This helper allows reinserting a bio into a new queue without much
-overhead, but requires all queue limits to be the same for the upper
-and lower queues, and it does not provide any recursion preventions.
+On Mon, Oct 23, 2017 at 3:08 PM, Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
+> On Mon, 2017-10-23 at 09:41 -0600, dann frazier wrote:
+>> (gdb) list *(sg_io+0x120)
+>> 0xffff0000084e71a8 is in sg_io (./include/linux/uaccess.h:113).
+>> 108   static inline unsigned long
+>> 109   _copy_from_user(void *to, const void __user *from, unsigned long n)
+>> 110   {
+>> 111           unsigned long res = n;
+>> 112           might_fault();
+>> 113           if (likely(access_ok(VERIFY_READ, from, n))) {
+>> 114                   kasan_check_write(to, n);
+>> 115                   res = raw_copy_from_user(to, from, n);
+>> 116           }
+>> 117           if (unlikely(res))
+>
+> Hello Dann,
+>
+> Would it be possible to check whether the patch below is sufficient to fix this?
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
----
- block/blk-core.c       | 34 ++++++++++++++++++++++++++++++++++
- include/linux/blkdev.h |  1 +
- 2 files changed, 35 insertions(+)
+hey Bart,
+ Yes, it does appear to be sufficient:
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 14f7674fa0b1..b8c80f39f5fe 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2241,6 +2241,40 @@ blk_qc_t generic_make_request(struct bio *bio)
- }
- EXPORT_SYMBOL(generic_make_request);
- 
-+/**
-+ * direct_make_request - hand a buffer directly to its device driver for I/O
-+ * @bio:  The bio describing the location in memory and on the device.
-+ *
-+ * This function behaves like generic_make_request(), but does not protect
-+ * against recursion.  Must only be used if the called driver is known
-+ * to not call generic_make_request (or direct_make_request) again from
-+ * its make_request function.  (Calling direct_make_request again from
-+ * a workqueue is perfectly fine as that doesn't recurse).
-+ */
-+blk_qc_t direct_make_request(struct bio *bio)
-+{
-+	struct request_queue *q = bio->bi_disk->queue;
-+	bool nowait = bio->bi_opf & REQ_NOWAIT;
-+	blk_qc_t ret;
-+
-+	if (!generic_make_request_checks(bio))
-+		return BLK_QC_T_NONE;
-+
-+	if (unlikely(blk_queue_enter(q, nowait))) {
-+		if (nowait && !blk_queue_dying(q))
-+			bio->bi_status = BLK_STS_AGAIN;
-+		else
-+			bio->bi_status = BLK_STS_IOERR;
-+		bio_endio(bio);
-+		return BLK_QC_T_NONE;
-+	}
-+
-+	ret = q->make_request_fn(q, bio);
-+	blk_queue_exit(q);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(direct_make_request);
-+
- /**
-  * submit_bio - submit a bio to the block device layer for I/O
-  * @bio: The &struct bio which describes the I/O
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 02fa42d24b52..780f01db5899 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -936,6 +936,7 @@ do {								\
- extern int blk_register_queue(struct gendisk *disk);
- extern void blk_unregister_queue(struct gendisk *disk);
- extern blk_qc_t generic_make_request(struct bio *bio);
-+extern blk_qc_t direct_make_request(struct bio *bio);
- extern void blk_rq_init(struct request_queue *q, struct request *rq);
- extern void blk_init_request_from_bio(struct request *req, struct bio *bio);
- extern void blk_put_request(struct request *);
--- 
-2.14.2
+ubuntu@ubuntu:~$ sudo dmesg -c > /dev/null
+ubuntu@ubuntu:~$ sudo dmraid -r -c
+ERROR: isw: seeking device "/dev/vda" to 18446744073708843520
+ERROR: sil: seeking device "/dev/vda" to 18446744073709401600
+no raid disks
+ubuntu@ubuntu:~$ dmesg
+ubuntu@ubuntu:~$
+
+  -dann
