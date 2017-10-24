@@ -1,83 +1,29 @@
-Return-Path: <byungchul.park@lge.com>
-From: Byungchul Park <byungchul.park@lge.com>
-To: peterz@infradead.org,
-	mingo@kernel.org,
-	axboe@kernel.dk
-Cc: tglx@linutronix.de,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	tj@kernel.org,
-	johannes.berg@intel.com,
-	oleg@redhat.com,
-	amir73il@gmail.com,
-	david@fromorbit.com,
-	darrick.wong@oracle.com,
-	linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	hch@infradead.org,
-	idryomov@gmail.com,
-	kernel-team@lge.com,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v3 1/8] block: use DECLARE_COMPLETION_ONSTACK in submit_bio_wait
-Date: Tue, 24 Oct 2017 18:38:02 +0900
-Message-Id: <1508837889-16932-2-git-send-email-byungchul.park@lge.com>
-In-Reply-To: <1508837889-16932-1-git-send-email-byungchul.park@lge.com>
-References: <1508837889-16932-1-git-send-email-byungchul.park@lge.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] virtio_blk: Fix an SG_IO regression
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Dann Frazier <dann.frazier@canonical.com>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>, stable@vger.kernel.org
+References: <20171024060436.24954-1-bart.vanassche@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <322bcd13-699b-5616-124c-4d337d17ec3c@kernel.dk>
+Date: Tue, 24 Oct 2017 07:48:33 -0600
+MIME-Version: 1.0
+In-Reply-To: <20171024060436.24954-1-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Christoph Hellwig <hch@lst.de>
+On 10/24/2017 12:04 AM, Bart Van Assche wrote:
+> Avoid that submitting an SG_IO ioctl triggers a kernel oops that
+> is preceded by:
+> 
+> usercopy: kernel memory overwrite attempt detected to (null) (<null>) (6 bytes)
+> kernel BUG at mm/usercopy.c:72!
+> 
+> Additionally, make it easier to diagnose crashes like the one
+> fixed by this patch.
 
-Simplify the code by getting rid of the submit_bio_ret structure.
+This really should have been two patches... Anyway, applied for 4.14.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/bio.c | 19 +++++--------------
- 1 file changed, 5 insertions(+), 14 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 101c2a9..5e901bf 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -917,17 +917,9 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- }
- EXPORT_SYMBOL_GPL(bio_iov_iter_get_pages);
- 
--struct submit_bio_ret {
--	struct completion event;
--	int error;
--};
--
- static void submit_bio_wait_endio(struct bio *bio)
- {
--	struct submit_bio_ret *ret = bio->bi_private;
--
--	ret->error = blk_status_to_errno(bio->bi_status);
--	complete(&ret->event);
-+	complete(bio->bi_private);
- }
- 
- /**
-@@ -943,16 +935,15 @@ static void submit_bio_wait_endio(struct bio *bio)
-  */
- int submit_bio_wait(struct bio *bio)
- {
--	struct submit_bio_ret ret;
-+	DECLARE_COMPLETION_ONSTACK(done);
- 
--	init_completion(&ret.event);
--	bio->bi_private = &ret;
-+	bio->bi_private = &done;
- 	bio->bi_end_io = submit_bio_wait_endio;
- 	bio->bi_opf |= REQ_SYNC;
- 	submit_bio(bio);
--	wait_for_completion_io(&ret.event);
-+	wait_for_completion_io(&done);
- 
--	return ret.error;
-+	return blk_status_to_errno(bio->bi_status);
- }
- EXPORT_SYMBOL(submit_bio_wait);
- 
 -- 
-1.9.1
+Jens Axboe
