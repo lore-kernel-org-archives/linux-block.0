@@ -1,50 +1,89 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:34516 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751738AbdJSW55 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Oct 2017 18:57:57 -0400
-Date: Fri, 20 Oct 2017 06:57:44 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@fb.com>, Huang Ying <ying.huang@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Chris Mason <clm@fb.com>, Josef Bacik <jbacik@fb.com>,
-        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH v3 11/49] btrfs: avoid access to .bi_vcnt directly
-Message-ID: <20171019225743.GC27130@ming.t460p>
-References: <20170808084548.18963-1-ming.lei@redhat.com>
- <20170808084548.18963-12-ming.lei@redhat.com>
- <20170810112959.GG20308@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170810112959.GG20308@infradead.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <byungchul.park@lge.com>
+From: Byungchul Park <byungchul.park@lge.com>
+To: peterz@infradead.org,
+	mingo@kernel.org,
+	axboe@kernel.dk
+Cc: tglx@linutronix.de,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	tj@kernel.org,
+	johannes.berg@intel.com,
+	oleg@redhat.com,
+	amir73il@gmail.com,
+	david@fromorbit.com,
+	darrick.wong@oracle.com,
+	linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	hch@infradead.org,
+	idryomov@gmail.com,
+	kernel-team@lge.com
+Subject: [PATCH v3 5/8] completion: Add support for initializing completion with lockdep_map
+Date: Tue, 24 Oct 2017 18:38:06 +0900
+Message-Id: <1508837889-16932-6-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <1508837889-16932-1-git-send-email-byungchul.park@lge.com>
+References: <1508837889-16932-1-git-send-email-byungchul.park@lge.com>
+List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Aug 10, 2017 at 04:29:59AM -0700, Christoph Hellwig wrote:
-> > +static unsigned int get_bio_pages(struct bio *bio)
-> > +{
-> > +	unsigned i;
-> > +	struct bio_vec *bv;
-> > +
-> > +	bio_for_each_segment_all(bv, bio, i)
-> > +		;
-> > +
-> > +	return i;
-> > +}
-> 
-> s/get_bio_pages/bio_nr_pages/ ?
+Sometimes, we want to initialize completions with sparate lockdep maps
+to assign lock classes as desired. For example, the workqueue code
+needs to directly manage lockdep maps, since only the code is aware of
+how to classify lockdep maps properly.
 
-Yeah, the name of bio_nr_pages() is much better.
+Provide additional macros initializing completions in that way.
 
-> 
-> Also this seems like a useful helper for bio.h
+Signed-off-by: Byungchul Park <byungchul.park@lge.com>
+---
+ include/linux/completion.h | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-OK.
-
-
+diff --git a/include/linux/completion.h b/include/linux/completion.h
+index cae5400..02f8cde 100644
+--- a/include/linux/completion.h
++++ b/include/linux/completion.h
+@@ -49,6 +49,13 @@ static inline void complete_release_commit(struct completion *x)
+ 	lock_commit_crosslock((struct lockdep_map *)&x->map);
+ }
+ 
++#define init_completion_map(x, m)					\
++do {									\
++	lockdep_init_map_crosslock((struct lockdep_map *)&(x)->map,	\
++			(m)->name, (m)->key, 0);				\
++	__init_completion(x);						\
++} while (0)
++
+ #define init_completion(x)						\
+ do {									\
+ 	static struct lock_class_key __key;				\
+@@ -58,6 +65,7 @@ static inline void complete_release_commit(struct completion *x)
+ 	__init_completion(x);						\
+ } while (0)
+ #else
++#define init_completion_map(x, m) __init_completion(x)
+ #define init_completion(x) __init_completion(x)
+ static inline void complete_acquire(struct completion *x) {}
+ static inline void complete_release(struct completion *x) {}
+@@ -73,6 +81,9 @@ static inline void complete_release_commit(struct completion *x) {}
+ 	{ 0, __WAIT_QUEUE_HEAD_INITIALIZER((work).wait) }
+ #endif
+ 
++#define COMPLETION_INITIALIZER_ONSTACK_MAP(work, map) \
++	(*({ init_completion_map(&(work), &(map)); &(work); }))
++
+ #define COMPLETION_INITIALIZER_ONSTACK(work) \
+ 	(*({ init_completion(&work); &work; }))
+ 
+@@ -102,8 +113,11 @@ static inline void complete_release_commit(struct completion *x) {}
+ #ifdef CONFIG_LOCKDEP
+ # define DECLARE_COMPLETION_ONSTACK(work) \
+ 	struct completion work = COMPLETION_INITIALIZER_ONSTACK(work)
++# define DECLARE_COMPLETION_ONSTACK_MAP(work, map) \
++	struct completion work = COMPLETION_INITIALIZER_ONSTACK_MAP(work, map)
+ #else
+ # define DECLARE_COMPLETION_ONSTACK(work) DECLARE_COMPLETION(work)
++# define DECLARE_COMPLETION_ONSTACK_MAP(work, map) DECLARE_COMPLETION(work)
+ #endif
+ 
+ /**
 -- 
-Ming
+1.9.1
