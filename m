@@ -1,84 +1,53 @@
-Return-Path: <BATV+c96c7f713f0eb2402da4+5171+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH v2] block: fix peeking requests during PM
-Date: Fri, 20 Oct 2017 16:45:23 +0200
-Message-Id: <20171020144523.4585-1-hch@lst.de>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 10/17] nvme: switch controller refcounting to use struct
+ device
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+ Johannes Thumshirn <jthumshirn@suse.de>, linux-nvme@lists.infradead.org,
+ linux-block@vger.kernel.org
+References: <20171023145126.2471-1-hch@lst.de>
+ <20171023145126.2471-11-hch@lst.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <2be01004-39fb-01f9-b0b7-afbe4ee08739@suse.de>
+Date: Tue, 24 Oct 2017 09:23:55 +0200
+MIME-Version: 1.0
+In-Reply-To: <20171023145126.2471-11-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-We need to look for an active PM request until the next softbarrier
-instead of looking for the first non-PM request.  Otherwise any cause
-of request reordering might starve the PM request(s).
+On 10/23/2017 04:51 PM, Christoph Hellwig wrote:
+> Instead of allocating a separate struct device for the character device
+> handle embedd it into struct nvme_ctrl and use it for the main controller
+> refcounting.  This removes double refcounting and gets us an automatic
+> reference for the character device operations.  We keep ctrl->device as a
+> pointer for now to avoid chaning printks all over, but in the future we
+> could look into message printing helpers that take a controller structure
+> similar to what other subsystems do.
+> 
+> Note the delete_ctrl operation always already has a reference (either
+> through sysfs due this change, or because every open file on the
+> /dev/nvme-fabrics node has a refernece) when it is entered now, so we
+> don't need to do the unless_zero variant there.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/nvme/host/core.c   | 43 ++++++++++++++++++++++---------------------
+>  drivers/nvme/host/fc.c     |  8 ++------
+>  drivers/nvme/host/nvme.h   | 12 +++++++++++-
+>  drivers/nvme/host/pci.c    |  2 +-
+>  drivers/nvme/host/rdma.c   |  5 ++---
+>  drivers/nvme/target/loop.c |  2 +-
+>  6 files changed, 39 insertions(+), 33 deletions(-)
+> Round of applause for this :-)
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-core.c | 35 ++++++++++++++++++-----------------
- 1 file changed, 18 insertions(+), 17 deletions(-)
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 14f7674fa0b1..480029e4fb54 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2464,20 +2464,22 @@ void blk_account_io_done(struct request *req)
-  * Don't process normal requests when queue is suspended
-  * or in the process of suspending/resuming
-  */
--static struct request *blk_pm_peek_request(struct request_queue *q,
--					   struct request *rq)
-+static bool blk_pm_allow_request(struct request *rq)
- {
--	if (q->dev && (q->rpm_status == RPM_SUSPENDED ||
--	    (q->rpm_status != RPM_ACTIVE && !(rq->rq_flags & RQF_PM))))
--		return NULL;
--	else
--		return rq;
-+	switch (rq->q->rpm_status) {
-+	case RPM_RESUMING:
-+	case RPM_SUSPENDING:
-+		return rq->rq_flags & RQF_PM;
-+	case RPM_SUSPENDED:
-+		return false;
-+	}
-+
-+	return true;
- }
- #else
--static inline struct request *blk_pm_peek_request(struct request_queue *q,
--						  struct request *rq)
-+static bool blk_pm_allow_request(struct request *rq)
- {
--	return rq;
-+	return true;
- }
- #endif
- 
-@@ -2525,9 +2527,12 @@ static struct request *elv_next_request(struct request_queue *q)
- 	WARN_ON_ONCE(q->mq_ops);
- 
- 	while (1) {
--		if (!list_empty(&q->queue_head)) {
--			rq = list_entry_rq(q->queue_head.next);
--			return rq;
-+		list_for_each_entry(rq, &q->queue_head, queuelist) {
-+			if (blk_pm_allow_request(rq))
-+				return rq;
-+
-+			if (rq->rq_flags & RQF_SOFTBARRIER)
-+				break;
- 		}
- 
- 		/*
-@@ -2578,10 +2583,6 @@ struct request *blk_peek_request(struct request_queue *q)
- 	WARN_ON_ONCE(q->mq_ops);
- 
- 	while ((rq = elv_next_request(q)) != NULL) {
--		rq = blk_pm_peek_request(q, rq);
--		if (!rq)
--			break;
--
- 		if (!(rq->rq_flags & RQF_STARTED)) {
- 			/*
- 			 * This is the first time the device driver
+Cheers,
+
+Hannes
 -- 
-2.14.2
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
