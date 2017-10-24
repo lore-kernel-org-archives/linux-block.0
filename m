@@ -1,47 +1,51 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:35174 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753123AbdJQFEi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Oct 2017 01:04:38 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>,
-        John Garry <john.garry@huawei.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 0/2] block/SCSI MQ: two RESTART related patches
-Date: Tue, 17 Oct 2017 13:04:16 +0800
-Message-Id: <20171017050418.22555-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 12/17] nvme: check for a live controller in nvme_dev_open
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+ Johannes Thumshirn <jthumshirn@suse.de>, linux-nvme@lists.infradead.org,
+ linux-block@vger.kernel.org
+References: <20171023145126.2471-1-hch@lst.de>
+ <20171023145126.2471-13-hch@lst.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <8939bd97-0127-2f15-d243-c110f0e219cf@suse.de>
+Date: Tue, 24 Oct 2017 09:25:06 +0200
+MIME-Version: 1.0
+In-Reply-To: <20171023145126.2471-13-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+On 10/23/2017 04:51 PM, Christoph Hellwig wrote:
+> This is a much more sensible check than just the admin queue.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Sagi Grimberg <sagi@rimbeg.me>
+> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
+>  drivers/nvme/host/core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index a56a1e0432e7..df525ab42fcd 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -1891,7 +1891,7 @@ static int nvme_dev_open(struct inode *inode, struct file *file)
+>  	struct nvme_ctrl *ctrl =
+>  		container_of(inode->i_cdev, struct nvme_ctrl, cdev);
+>  
+> -	if (!ctrl->admin_q)
+> +	if (ctrl->state != NVME_CTRL_LIVE)
+>  		return -EWOULDBLOCK;
+>  	file->private_data = ctrl;
+>  	return 0;
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-The 1st patch runs idle hctx after dealy in scsi_mq_get_budget(),
-so that we can keep same behaviour with before, and it can be
-thought as a fix.
+Cheers,
 
-The 2nd patch cleans up RESTART, and removes handling for TAG_SHARED
-from current blk-mq's RESTART mechanism because SCSI_MQ can covers its
-restart by itself, so that no need to handle TAG_SHARED in blk-mq
-RESTART. And >20% IOPS boost is observed in my rand read test over
-scsi_debug.
-
-John, please test this two patches and see if it may improve your SAS
-IO performance, and you can find the two patches in the following branch:
-
-	https://github.com/ming1/linux/commits/blk_mq_improve_restart_V1
-
-
-Ming Lei (2):
-  SCSI: run idle hctx after delay in scsi_mq_get_budget()
-  blk-mq: don't handle TAG_SHARED in restart
-
- block/blk-mq-sched.c    | 78 +++----------------------------------------------
- drivers/scsi/scsi_lib.c | 13 +++++++--
- 2 files changed, 14 insertions(+), 77 deletions(-)
-
+Hannes
 -- 
-2.9.5
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
