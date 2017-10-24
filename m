@@ -1,7 +1,9 @@
-Return-Path: <byungchul.park@lge.com>
-Date: Wed, 25 Oct 2017 09:26:12 +0900
-From: Byungchul Park <byungchul.park@lge.com>
-To: Ingo Molnar <mingo@kernel.org>
+Return-Path: <mingo.kernel.org@gmail.com>
+Return-Path: <mingo.kernel.org@gmail.com>
+Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
+Date: Tue, 24 Oct 2017 12:15:51 +0200
+From: Ingo Molnar <mingo@kernel.org>
+To: Byungchul Park <byungchul.park@lge.com>
 Cc: peterz@infradead.org, axboe@kernel.dk, tglx@linutronix.de,
 	linux-kernel@vger.kernel.org, linux-mm@kvack.org, tj@kernel.org,
 	johannes.berg@intel.com, oleg@redhat.com, amir73il@gmail.com,
@@ -11,117 +13,219 @@ Cc: peterz@infradead.org, axboe@kernel.dk, tglx@linutronix.de,
 	kernel-team@lge.com
 Subject: Re: [PATCH v3 8/8] block: Assign a lock_class per gendisk used for
  wait_for_completion()
-Message-ID: <20171025002612.GN3310@X58A-UD3R>
+Message-ID: <20171024101551.sftqsy5mk34fxru7@gmail.com>
 References: <1508837889-16932-1-git-send-email-byungchul.park@lge.com>
  <1508837889-16932-9-git-send-email-byungchul.park@lge.com>
- <20171024101551.sftqsy5mk34fxru7@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171024101551.sftqsy5mk34fxru7@gmail.com>
+In-Reply-To: <1508837889-16932-9-git-send-email-byungchul.park@lge.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Oct 24, 2017 at 12:15:51PM +0200, Ingo Molnar wrote:
-> > @@ -1409,9 +1403,12 @@ struct gendisk *alloc_disk_node(int minors, int node_id)
-> >  		disk_to_dev(disk)->type = &disk_type;
-> >  		device_initialize(disk_to_dev(disk));
-> >  	}
-> > +
-> > +	lockdep_init_map(&disk->lockdep_map, lock_name, key, 0);
+
+* Byungchul Park <byungchul.park@lge.com> wrote:
+
+> Darrick and Dave Chinner posted the following warning:
 > 
-> lockdep_init_map() depends on CONFIG_DEBUG_LOCK_ALLOC IIRC, but the data structure 
-> change you made depends on CONFIG_LOCKDEP_COMPLETIONS:
-
-OMG, my mistake! I am very sorry. I will fix it.
-
-BTW, lockdep_init_map() seems to decide whether using lockdep_map or
-ignoring it, depending on CONFIG_LOCKDEP than CONFIG_DEBUG_LOCK_ALLOC.
-
-> >  	return disk;
-> >  }
-> > -EXPORT_SYMBOL(alloc_disk_node);
-> > +EXPORT_SYMBOL(__alloc_disk_node);
-> >  
-> >  struct kobject *get_disk(struct gendisk *disk)
-> >  {
-> > diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-> > index 6d85a75..9832e3c 100644
-> > --- a/include/linux/genhd.h
-> > +++ b/include/linux/genhd.h
-> > @@ -206,6 +206,9 @@ struct gendisk {
-> >  #endif	/* CONFIG_BLK_DEV_INTEGRITY */
-> >  	int node_id;
-> >  	struct badblocks *bb;
-> > +#ifdef CONFIG_LOCKDEP_COMPLETIONS
-> > +	struct lockdep_map lockdep_map;
-> > +#endif
-> >  };
+> > ======================================================
+> > WARNING: possible circular locking dependency detected
+> > 4.14.0-rc1-fixes #1 Tainted: G        W
+> > ------------------------------------------------------
+> > loop0/31693 is trying to acquire lock:
+> >  (&(&ip->i_mmaplock)->mr_lock){++++}, at: [<ffffffffa00f1b0c>] xfs_ilock+0x23c/0x330 [xfs]
+> >
+> > but now in release context of a crosslock acquired at the following:
+> >  ((complete)&ret.event){+.+.}, at: [<ffffffff81326c1f>] submit_bio_wait+0x7f/0xb0
+> >
+> > which lock already depends on the new lock.
+> >
+> > the existing dependency chain (in reverse order) is:
+> >
+> > -> #2 ((complete)&ret.event){+.+.}:
+> >        lock_acquire+0xab/0x200
+> >        wait_for_completion_io+0x4e/0x1a0
+> >        submit_bio_wait+0x7f/0xb0
+> >        blkdev_issue_zeroout+0x71/0xa0
+> >        xfs_bmapi_convert_unwritten+0x11f/0x1d0 [xfs]
+> >        xfs_bmapi_write+0x374/0x11f0 [xfs]
+> >        xfs_iomap_write_direct+0x2ac/0x430 [xfs]
+> >        xfs_file_iomap_begin+0x20d/0xd50 [xfs]
+> >        iomap_apply+0x43/0xe0
+> >        dax_iomap_rw+0x89/0xf0
+> >        xfs_file_dax_write+0xcc/0x220 [xfs]
+> >        xfs_file_write_iter+0xf0/0x130 [xfs]
+> >        __vfs_write+0xd9/0x150
+> >        vfs_write+0xc8/0x1c0
+> >        SyS_write+0x45/0xa0
+> >        entry_SYSCALL_64_fastpath+0x1f/0xbe
+> >
+> > -> #1 (&xfs_nondir_ilock_class){++++}:
+> >        lock_acquire+0xab/0x200
+> >        down_write_nested+0x4a/0xb0
+> >        xfs_ilock+0x263/0x330 [xfs]
+> >        xfs_setattr_size+0x152/0x370 [xfs]
+> >        xfs_vn_setattr+0x6b/0x90 [xfs]
+> >        notify_change+0x27d/0x3f0
+> >        do_truncate+0x5b/0x90
+> >        path_openat+0x237/0xa90
+> >        do_filp_open+0x8a/0xf0
+> >        do_sys_open+0x11c/0x1f0
+> >        entry_SYSCALL_64_fastpath+0x1f/0xbe
+> >
+> > -> #0 (&(&ip->i_mmaplock)->mr_lock){++++}:
+> >        up_write+0x1c/0x40
+> >        xfs_iunlock+0x1d0/0x310 [xfs]
+> >        xfs_file_fallocate+0x8a/0x310 [xfs]
+> >        loop_queue_work+0xb7/0x8d0
+> >        kthread_worker_fn+0xb9/0x1f0
+> >
+> > Chain exists of:
+> >   &(&ip->i_mmaplock)->mr_lock --> &xfs_nondir_ilock_class --> (complete)&ret.event
+> >
+> >  Possible unsafe locking scenario by crosslock:
+> >
+> >        CPU0                    CPU1
+> >        ----                    ----
+> >   lock(&xfs_nondir_ilock_class);
+> >   lock((complete)&ret.event);
+> >                                lock(&(&ip->i_mmaplock)->mr_lock);
+> >                                unlock((complete)&ret.event);
+> >
+> >                *** DEADLOCK ***
 > 
-> Which is risking a future build failure at minimum.
+> The warning is a false positive, caused by the fact that all
+> wait_for_completion()s in submit_bio_wait() are waiting with the same
+> lock class.
 > 
-> Isn't lockdep_map a zero size structure that is always defined? If yes then 
-> there's no need for an #ifdef.
-
-No, a zero size structure for lockdep_map is not provided yet.
-There are two options I can do:
-
-1. Add a zero size structure for lockdep_map and remove #ifdef
-2. Replace CONFIG_LOCKDEP_COMPLETIONS with CONFIG_LOCKDEP here.
-
-Or something else?
-
-Which one do you prefer?
-
-> Also:
+> However, some bios have nothing to do with others, for example, the case
+> might happen while using loop devices, between bios of an upper device
+> and a lower device(=loop device).
 > 
-> >  
-> >  static inline struct gendisk *part_to_disk(struct hd_struct *part)
-> > @@ -590,8 +593,7 @@ extern struct hd_struct * __must_check add_partition(struct gendisk *disk,
-> >  extern void delete_partition(struct gendisk *, int);
-> >  extern void printk_all_partitions(void);
-> >  
-> > -extern struct gendisk *alloc_disk_node(int minors, int node_id);
-> > -extern struct gendisk *alloc_disk(int minors);
-> > +extern struct gendisk *__alloc_disk_node(int minors, int node_id, struct lock_class_key *key, const char *lock_name);
-> >  extern struct kobject *get_disk(struct gendisk *disk);
-> >  extern void put_disk(struct gendisk *disk);
-> >  extern void blk_register_region(dev_t devt, unsigned long range,
-> > @@ -615,6 +617,22 @@ extern ssize_t part_fail_store(struct device *dev,
-> >  			       const char *buf, size_t count);
-> >  #endif /* CONFIG_FAIL_MAKE_REQUEST */
-> >  
-> > +#ifdef CONFIG_LOCKDEP_COMPLETIONS
-> > +#define alloc_disk_node(m, id) \
-> > +({									\
-> > +	static struct lock_class_key __key;				\
-> > +	const char *__lock_name;					\
-> > +									\
-> > +	__lock_name = "(complete)"#m"("#id")";				\
-> > +									\
-> > +	__alloc_disk_node(m, id, &__key, __lock_name);			\
-> > +})
-> > +#else
-> > +#define alloc_disk_node(m, id)	__alloc_disk_node(m, id, NULL, NULL)
-> > +#endif
-> > +
-> > +#define alloc_disk(m)		alloc_disk_node(m, NUMA_NO_NODE)
-> > +
-> >  static inline int hd_ref_init(struct hd_struct *part)
-> >  {
-> >  	if (percpu_ref_init(&part->ref, __delete_partition, 0,
+> The safest way to assign different lock classes to different devices is
+> to do it for each gendisk. In other words, this patch assigns a
+> lockdep_map per gendisk and uses it when initializing completion in
+> submit_bio_wait().
 > 
-> Why is the lockdep_map passed in to the init function? Since it's wrapped in an 
-> ugly fashion anyway, why not introduce a clean inline function that calls 
+> Of course, it might be too conservative. But, making it safest for now
+> and extended by block layer experts later is good, atm.
+> 
+> Signed-off-by: Byungchul Park <byungchul.park@lge.com>
+> ---
+>  block/bio.c           |  2 +-
+>  block/genhd.c         | 13 +++++--------
+>  include/linux/genhd.h | 22 ++++++++++++++++++++--
+>  3 files changed, 26 insertions(+), 11 deletions(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index 5e901bf..cc60213 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -935,7 +935,7 @@ static void submit_bio_wait_endio(struct bio *bio)
+>   */
+>  int submit_bio_wait(struct bio *bio)
+>  {
+> -	DECLARE_COMPLETION_ONSTACK(done);
+> +	DECLARE_COMPLETION_ONSTACK_MAP(done, bio->bi_disk->lockdep_map);
+>  
+>  	bio->bi_private = &done;
+>  	bio->bi_end_io = submit_bio_wait_endio;
+> diff --git a/block/genhd.c b/block/genhd.c
+> index dd305c6..f195d22 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -1354,13 +1354,7 @@ dev_t blk_lookup_devt(const char *name, int partno)
+>  }
+>  EXPORT_SYMBOL(blk_lookup_devt);
+>  
+> -struct gendisk *alloc_disk(int minors)
+> -{
+> -	return alloc_disk_node(minors, NUMA_NO_NODE);
+> -}
+> -EXPORT_SYMBOL(alloc_disk);
+> -
+> -struct gendisk *alloc_disk_node(int minors, int node_id)
+> +struct gendisk *__alloc_disk_node(int minors, int node_id, struct lock_class_key *key, const char *lock_name)
+>  {
+>  	struct gendisk *disk;
+>  	struct disk_part_tbl *ptbl;
+> @@ -1409,9 +1403,12 @@ struct gendisk *alloc_disk_node(int minors, int node_id)
+>  		disk_to_dev(disk)->type = &disk_type;
+>  		device_initialize(disk_to_dev(disk));
+>  	}
+> +
+> +	lockdep_init_map(&disk->lockdep_map, lock_name, key, 0);
 
-This is the way workqueue adopted for that purpose. BTW, can I make
-a lock_class_key distinguishable from another of a different gendisk,
-using inline function?
+lockdep_init_map() depends on CONFIG_DEBUG_LOCK_ALLOC IIRC, but the data structure 
+change you made depends on CONFIG_LOCKDEP_COMPLETIONS:
 
-> lockdep_init_map() on the returned structure.
+>  	return disk;
+>  }
+> -EXPORT_SYMBOL(alloc_disk_node);
+> +EXPORT_SYMBOL(__alloc_disk_node);
+>  
+>  struct kobject *get_disk(struct gendisk *disk)
+>  {
+> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+> index 6d85a75..9832e3c 100644
+> --- a/include/linux/genhd.h
+> +++ b/include/linux/genhd.h
+> @@ -206,6 +206,9 @@ struct gendisk {
+>  #endif	/* CONFIG_BLK_DEV_INTEGRITY */
+>  	int node_id;
+>  	struct badblocks *bb;
+> +#ifdef CONFIG_LOCKDEP_COMPLETIONS
+> +	struct lockdep_map lockdep_map;
+> +#endif
+>  };
 
-Ok. I will make it work on the returned structre instead of passing it.
+Which is risking a future build failure at minimum.
 
-> No #ifdefs required, and no uglification of the alloc_disk_node() interface.
+Isn't lockdep_map a zero size structure that is always defined? If yes then 
+there's no need for an #ifdef.
 
-Ok. I will remove this #ifdef.
+Also:
 
-Thank you very much.
+>  
+>  static inline struct gendisk *part_to_disk(struct hd_struct *part)
+> @@ -590,8 +593,7 @@ extern struct hd_struct * __must_check add_partition(struct gendisk *disk,
+>  extern void delete_partition(struct gendisk *, int);
+>  extern void printk_all_partitions(void);
+>  
+> -extern struct gendisk *alloc_disk_node(int minors, int node_id);
+> -extern struct gendisk *alloc_disk(int minors);
+> +extern struct gendisk *__alloc_disk_node(int minors, int node_id, struct lock_class_key *key, const char *lock_name);
+>  extern struct kobject *get_disk(struct gendisk *disk);
+>  extern void put_disk(struct gendisk *disk);
+>  extern void blk_register_region(dev_t devt, unsigned long range,
+> @@ -615,6 +617,22 @@ extern ssize_t part_fail_store(struct device *dev,
+>  			       const char *buf, size_t count);
+>  #endif /* CONFIG_FAIL_MAKE_REQUEST */
+>  
+> +#ifdef CONFIG_LOCKDEP_COMPLETIONS
+> +#define alloc_disk_node(m, id) \
+> +({									\
+> +	static struct lock_class_key __key;				\
+> +	const char *__lock_name;					\
+> +									\
+> +	__lock_name = "(complete)"#m"("#id")";				\
+> +									\
+> +	__alloc_disk_node(m, id, &__key, __lock_name);			\
+> +})
+> +#else
+> +#define alloc_disk_node(m, id)	__alloc_disk_node(m, id, NULL, NULL)
+> +#endif
+> +
+> +#define alloc_disk(m)		alloc_disk_node(m, NUMA_NO_NODE)
+> +
+>  static inline int hd_ref_init(struct hd_struct *part)
+>  {
+>  	if (percpu_ref_init(&part->ref, __delete_partition, 0,
+
+Why is the lockdep_map passed in to the init function? Since it's wrapped in an 
+ugly fashion anyway, why not introduce a clean inline function that calls 
+lockdep_init_map() on the returned structure.
+
+No #ifdefs required, and no uglification of the alloc_disk_node() interface.
+
+Thanks,
+
+	Ingo
