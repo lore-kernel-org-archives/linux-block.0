@@ -1,7 +1,9 @@
-Return-Path: <byungchul.park@lge.com>
-Date: Wed, 25 Oct 2017 08:45:38 +0900
-From: Byungchul Park <byungchul.park@lge.com>
-To: Ingo Molnar <mingo@kernel.org>
+Return-Path: <mingo.kernel.org@gmail.com>
+Return-Path: <mingo.kernel.org@gmail.com>
+Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
+Date: Tue, 24 Oct 2017 12:08:58 +0200
+From: Ingo Molnar <mingo@kernel.org>
+To: Byungchul Park <byungchul.park@lge.com>
 Cc: peterz@infradead.org, axboe@kernel.dk, tglx@linutronix.de,
 	linux-kernel@vger.kernel.org, linux-mm@kvack.org, tj@kernel.org,
 	johannes.berg@intel.com, oleg@redhat.com, amir73il@gmail.com,
@@ -11,33 +13,117 @@ Cc: peterz@infradead.org, axboe@kernel.dk, tglx@linutronix.de,
 	kernel-team@lge.com
 Subject: Re: [PATCH v3 4/8] lockdep: Add a kernel parameter,
  crossrelease_fullstack
-Message-ID: <20171024234538.GM3310@X58A-UD3R>
+Message-ID: <20171024100858.2rw7wnhtj7d3iyzk@gmail.com>
 References: <1508837889-16932-1-git-send-email-byungchul.park@lge.com>
  <1508837889-16932-5-git-send-email-byungchul.park@lge.com>
- <20171024100858.2rw7wnhtj7d3iyzk@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171024100858.2rw7wnhtj7d3iyzk@gmail.com>
+In-Reply-To: <1508837889-16932-5-git-send-email-byungchul.park@lge.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Oct 24, 2017 at 12:08:58PM +0200, Ingo Molnar wrote:
-> This is really unnecessarily complex.
 
-I mis-understood your suggestion. I will change it.
+* Byungchul Park <byungchul.park@lge.com> wrote:
 
-> The proper logic is to introduce the crossrelease_fullstack boot parameter, and to 
-> also have a Kconfig option that enables it: 
+> Make whether to allow recording full stack, in cross-release feature,
+> switchable at boot time via a kernel parameter, 'crossrelease_fullstack'.
+> In case of a splat with no stack trace, one could just reboot and set
+> the kernel parameter to get the full data without having to recompile
+> the kernel.
 > 
-> 	CONFIG_BOOTPARAM_LOCKDEP_CROSSRELEASE_FULLSTACK=y
+> Change CONFIG_CROSSRELEASE_STACK_TRACE default from N to Y, and
+> introduce the new kernel parameter.
 > 
-> No #ifdefs please - just an "if ()" branch dependent on the current value of 
-> crossrelease_fullstack.
+> Signed-off-by: Byungchul Park <byungchul.park@lge.com>
+> ---
+>  Documentation/admin-guide/kernel-parameters.txt |  3 +++
+>  kernel/locking/lockdep.c                        | 18 ++++++++++++++++--
+>  lib/Kconfig.debug                               |  5 +++--
+>  3 files changed, 22 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> index ead7f40..4107b01 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -709,6 +709,9 @@
+>  			It will be ignored when crashkernel=X,high is not used
+>  			or memory reserved is below 4G.
+>  
+> +	crossrelease_fullstack
+> +			[KNL] Allow to record full stack trace in cross-release
+> +
+>  	cryptomgr.notests
+>                          [KNL] Disable crypto self-tests
+>  
+> diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
+> index 5c2ddf2..feba887 100644
+> --- a/kernel/locking/lockdep.c
+> +++ b/kernel/locking/lockdep.c
+> @@ -76,6 +76,15 @@
+>  #define lock_stat 0
+>  #endif
+>  
+> +static int crossrelease_fullstack;
+> +static int __init allow_crossrelease_fullstack(char *str)
+> +{
+> +	crossrelease_fullstack = 1;
+> +	return 0;
+> +}
+> +
+> +early_param("crossrelease_fullstack", allow_crossrelease_fullstack);
+> +
+>  /*
+>   * lockdep_lock: protects the lockdep graph, the hashes and the
+>   *               class/list/hash allocators.
+> @@ -4864,8 +4873,13 @@ static void add_xhlock(struct held_lock *hlock)
+>  	xhlock->trace.max_entries = MAX_XHLOCK_TRACE_ENTRIES;
+>  	xhlock->trace.entries = xhlock->trace_entries;
+>  #ifdef CONFIG_CROSSRELEASE_STACK_TRACE
+> -	xhlock->trace.skip = 3;
+> -	save_stack_trace(&xhlock->trace);
+> +	if (crossrelease_fullstack) {
+> +		xhlock->trace.skip = 3;
+> +		save_stack_trace(&xhlock->trace);
+> +	} else {
+> +		xhlock->trace.nr_entries = 1;
+> +		xhlock->trace.entries[0] = hlock->acquire_ip;
+> +	}
+>  #else
+>  	xhlock->trace.nr_entries = 1;
+>  	xhlock->trace.entries[0] = hlock->acquire_ip;
+> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+> index fe8fceb..132536d 100644
+> --- a/lib/Kconfig.debug
+> +++ b/lib/Kconfig.debug
+> @@ -1228,7 +1228,7 @@ config LOCKDEP_COMPLETIONS
+>  config CROSSRELEASE_STACK_TRACE
+>  	bool "Record more than one entity of stack trace in crossrelease"
+>  	depends on LOCKDEP_CROSSRELEASE
+> -	default n
+> +	default y
+>  	help
+>  	 The lockdep "cross-release" feature needs to record stack traces
+>  	 (of calling functions) for all acquisitions, for eventual later
+> @@ -1238,7 +1238,8 @@ config CROSSRELEASE_STACK_TRACE
+>  	 full analysis. This option turns on the saving of the full stack
+>  	 trace entries.
+>  
+> -	 If unsure, say N.
+> +	 To make the feature actually on, set "crossrelease_fullstack"
+> +	 kernel parameter, too.
+>  
+>  config DEBUG_LOCKDEP
+>  	bool "Lock dependency engine debugging"
 
-Ok. I will.
+This is really unnecessarily complex.
+
+The proper logic is to introduce the crossrelease_fullstack boot parameter, and to 
+also have a Kconfig option that enables it: 
+
+	CONFIG_BOOTPARAM_LOCKDEP_CROSSRELEASE_FULLSTACK=y
+
+No #ifdefs please - just an "if ()" branch dependent on the current value of 
+crossrelease_fullstack.
 
 Thanks,
-Byungchul
 
-> Thanks,
-> 
-> 	Ingo
+	Ingo
