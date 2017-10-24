@@ -1,58 +1,71 @@
-Return-Path: <hch@lst.de>
-Date: Sat, 28 Oct 2017 08:13:42 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Max Gurtovoy <maxg@mellanox.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>, Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+Return-Path: <maxg@mellanox.com>
 Subject: Re: [PATCH 04/17] block: add a blk_steal_bios helper
-Message-ID: <20171028061342.GA13723@lst.de>
-References: <20171023145126.2471-1-hch@lst.de> <20171023145126.2471-5-hch@lst.de> <ac15137b-b1a4-3988-17cc-fd6c25749542@mellanox.com>
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+CC: Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>, Johannes Thumshirn <jthumshirn@suse.de>,
+	<linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>
+References: <20171023145126.2471-1-hch@lst.de>
+ <20171023145126.2471-5-hch@lst.de>
+From: Max Gurtovoy <maxg@mellanox.com>
+Message-ID: <ac15137b-b1a4-3988-17cc-fd6c25749542@mellanox.com>
+Date: Tue, 24 Oct 2017 11:44:26 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <ac15137b-b1a4-3988-17cc-fd6c25749542@mellanox.com>
+In-Reply-To: <20171023145126.2471-5-hch@lst.de>
+Content-Type: text/plain; charset="windows-1255"; format=flowed
+Return-Path: maxg@mellanox.com
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Oct 24, 2017 at 11:44:26AM +0300, Max Gurtovoy wrote:
->> + * Steal bios from a request.  The request must not have been partially
->> + * completed before.
->> + */
->
-> Maybe we can add to the comment that "list" is the destination for the 
-> stolen bio.
 
-Sure.
 
->> +void blk_steal_bios(struct bio_list *list, struct request *rq)
->> +{
->> +	if (rq->bio) {
->> +		if (list->tail)
->> +			list->tail->bi_next = rq->bio;
->> +		else
->> +			list->head = rq->bio;
->> +		list->tail = rq->biotail;
->
-> if list->tail != NULL don't we lose the "list->tail->bi_next = rq->bio;" 
-> assignment after assigning "list->tail = rq->biotail;" ?
+On 10/23/2017 5:51 PM, Christoph Hellwig wrote:
+> This helpers allows to bounce steal the uncompleted bios from a request so
+> that they can be reissued on another path.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+> ---
+>   block/blk-core.c       | 20 ++++++++++++++++++++
+>   include/linux/blkdev.h |  2 ++
+>   2 files changed, 22 insertions(+)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index b8c80f39f5fe..e804529e65a5 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -2767,6 +2767,26 @@ struct request *blk_fetch_request(struct request_queue *q)
+>   }
+>   EXPORT_SYMBOL(blk_fetch_request);
+>   
+> +/*
+> + * Steal bios from a request.  The request must not have been partially
+> + * completed before.
+> + */
 
-the biolists are a little weird, they are a single linked list of bi_next
-plus a tail pointer.
+Maybe we can add to the comment that "list" is the destination for the 
+stolen bio.
 
-So if the list is emptry (->tail == NULL) we assign the biolist
-to ->head and point ->tail to end of the list in the request.
+> +void blk_steal_bios(struct bio_list *list, struct request *rq)
+> +{
+> +	if (rq->bio) {
+> +		if (list->tail)
+> +			list->tail->bi_next = rq->bio;
+> +		else
+> +			list->head = rq->bio;
+> +		list->tail = rq->biotail;
 
-But if the list is not empty we let ->bi_next of the last entry
-(as found in ->tail) point to the list we splice on, and still update
-->tail to end of the list we spliced on.  So I think this looks all ok.
+if list->tail != NULL don't we lose the "list->tail->bi_next = rq->bio;" 
+assignment after assigning "list->tail = rq->biotail;" ?
 
->> +	}
->> +
->> +	rq->bio = NULL;
->
-> we can add this NULL assignment inside the big "if", but I'm not sure 
-> regarding the next 2 assignments.
-> Anyway not a big deal.
+> +	}
+> +
+> +	rq->bio = NULL;
 
-We can move both the ->bio and ->biotail assignments, and I've done it.
+we can add this NULL assignment inside the big "if", but I'm not sure 
+regarding the next 2 assignments.
+Anyway not a big deal.
+
+> +	rq->biotail = NULL;
+> +	rq->__data_len = 0;
+> +}
+> +EXPORT_SYMBOL_GPL(blk_steal_bios);
+> +
