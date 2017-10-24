@@ -1,51 +1,42 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:52968 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1758036AbdJMMrN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 08:47:13 -0400
-Received: by mail-wm0-f66.google.com with SMTP id k4so21547307wmc.1
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:12 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Rakesh Pandit <rakesh@tuxera.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 06/58] lightnvm: include NVM Express driver if OCSSD is selected for build
-Date: Fri, 13 Oct 2017 14:45:55 +0200
-Message-Id: <20171013124647.32668-7-m@bjorling.me>
-In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
-References: <20171013124647.32668-1-m@bjorling.me>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 11/17] nvme: get rid of nvme_ctrl_list
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+ Johannes Thumshirn <jthumshirn@suse.de>, linux-nvme@lists.infradead.org,
+ linux-block@vger.kernel.org
+References: <20171023145126.2471-1-hch@lst.de>
+ <20171023145126.2471-12-hch@lst.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <5b477087-d31d-43a1-2c1e-4d142f4786c3@suse.de>
+Date: Tue, 24 Oct 2017 09:24:41 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20171023145126.2471-12-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Rakesh Pandit <rakesh@tuxera.com>
+On 10/23/2017 04:51 PM, Christoph Hellwig wrote:
+> Use the core chrdev code to set up the link between the character device
+> and the nvme controller.  This allows us to get rid of the global list
+> of all controllers, and also ensures that we have both a reference to
+> the controller and the transport module before the open method of the
+> character device is called.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Sagi Grimberg <sgi@grimberg.me>
+> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
+>  drivers/nvme/host/core.c | 76 ++++++++++--------------------------------------
+>  drivers/nvme/host/nvme.h |  3 +-
+>  2 files changed, 18 insertions(+), 61 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Because NVM needs BLK_DEV_NVME, select it automatically if we mark NVM
-in config file before building kernel.  Also append PCI to depends as
-select doesn't automatically add dependencies.
+Cheers,
 
-Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/lightnvm/Kconfig | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/lightnvm/Kconfig b/drivers/lightnvm/Kconfig
-index ead61a9..2a953ef 100644
---- a/drivers/lightnvm/Kconfig
-+++ b/drivers/lightnvm/Kconfig
-@@ -4,7 +4,8 @@
- 
- menuconfig NVM
- 	bool "Open-Channel SSD target support"
--	depends on BLOCK && HAS_DMA
-+	depends on BLOCK && HAS_DMA && PCI
-+	select BLK_DEV_NVME
- 	help
- 	  Say Y here to get to enable Open-channel SSDs.
- 
+Hannes
 -- 
-2.9.3
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
