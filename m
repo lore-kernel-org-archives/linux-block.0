@@ -1,51 +1,65 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:54990 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1758302AbdJMMro (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 08:47:44 -0400
-Received: by mail-wm0-f66.google.com with SMTP id i124so21517571wmf.3
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:43 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 38/58] lightnvm: pblk: ensure right bad block calculation
-Date: Fri, 13 Oct 2017 14:46:27 +0200
-Message-Id: <20171013124647.32668-39-m@bjorling.me>
-In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
-References: <20171013124647.32668-1-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <byungchul.park@lge.com>
+From: Byungchul Park <byungchul.park@lge.com>
+To: peterz@infradead.org,
+	mingo@kernel.org,
+	axboe@kernel.dk
+Cc: tglx@linutronix.de,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	tj@kernel.org,
+	johannes.berg@intel.com,
+	oleg@redhat.com,
+	amir73il@gmail.com,
+	david@fromorbit.com,
+	darrick.wong@oracle.com,
+	linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	hch@infradead.org,
+	idryomov@gmail.com,
+	kernel-team@lge.com
+Subject: [PATCH v3 0/8] cross-release: enhence performance and fix false positives
+Date: Tue, 24 Oct 2017 18:38:01 +0900
+Message-Id: <1508837889-16932-1-git-send-email-byungchul.park@lge.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <javier@cnexlabs.com>
+Changes from v2
+- Combine 2 serises, fixing false positives and enhance performance
+- Add Christoph Hellwig's patch simplifying submit_bio_wait() code
+- Add 2 more 'init with lockdep map' macros for completionm
+- Rename init_completion_with_map() to init_completion_map()
 
-Make sure that the variable controlling block threshold for allocating
-extra metadata sectors in case of a line with bad blocks does not get a
-negative value. Otherwise, the line will be marked as corrupted and
-wasted.
+Changes from v1
+- Fix kconfig description as Ingo suggested
+- Fix commit message writing out CONFIG_ variable
+- Introduce a new kernel parameter, crossrelease_fullstack
+- Replace the number with the output of *perf*
+- Separate a patch removing white space
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/lightnvm/pblk-init.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Byungchul Park (7):
+  lockdep: Introduce CROSSRELEASE_STACK_TRACE and make it not unwind as
+    default
+  lockdep: Remove BROKEN flag of LOCKDEP_CROSSRELEASE
+  lockdep: Add a kernel parameter, crossrelease_fullstack
+  completion: Add support for initializing completion with lockdep_map
+  lockdep: Remove unnecessary acquisitions wrt workqueue flush
+  genhd.h: Remove trailing white space
+  block: Assign a lock_class per gendisk used for wait_for_completion()
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 3c37491..c7239c4 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -710,7 +710,7 @@ static int pblk_lines_init(struct pblk *pblk)
- 		goto add_emeta_page;
- 	}
- 
--	lm->emeta_bb = geo->nr_luns - i;
-+	lm->emeta_bb = geo->nr_luns > i ? geo->nr_luns - i : 0;
- 
- 	lm->min_blk_line = 1;
- 	if (geo->nr_luns > 1)
+Christoph Hellwig (1):
+  block: use DECLARE_COMPLETION_ONSTACK in submit_bio_wait
+
+ Documentation/admin-guide/kernel-parameters.txt |  3 +++
+ block/bio.c                                     | 19 +++++-------------
+ block/genhd.c                                   | 13 +++++--------
+ include/linux/completion.h                      | 14 +++++++++++++
+ include/linux/genhd.h                           | 26 +++++++++++++++++++++----
+ include/linux/lockdep.h                         |  4 ++++
+ include/linux/workqueue.h                       |  4 ++--
+ kernel/locking/lockdep.c                        | 23 ++++++++++++++++++++--
+ kernel/workqueue.c                              | 19 +++---------------
+ lib/Kconfig.debug                               | 20 +++++++++++++++++--
+ 10 files changed, 97 insertions(+), 48 deletions(-)
+
 -- 
-2.9.3
+1.9.1
