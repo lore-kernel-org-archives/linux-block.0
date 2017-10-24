@@ -1,27 +1,23 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:51488 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751277AbdJXSuh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Oct 2017 14:50:37 -0400
-Received: by mail-pf0-f194.google.com with SMTP id n14so20308823pfh.8
-        for <linux-block@vger.kernel.org>; Tue, 24 Oct 2017 11:50:37 -0700 (PDT)
+Received: from mx2.suse.de ([195.135.220.15]:53097 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752185AbdJXNMX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 24 Oct 2017 09:12:23 -0400
 Subject: Re: [PATCH] update bucket_in_use in real time
-To: tang.junhui@zte.com.cn, colyli@suse.de
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+To: tang.junhui@zte.com.cn
+Cc: mlyle@lyle.org, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org
 References: <1508835429-6977-1-git-send-email-tang.junhui@zte.com.cn>
-From: Michael Lyle <mlyle@lyle.org>
-Message-ID: <661da640-5093-a621-d18c-b81bc30d108c@lyle.org>
-Date: Tue, 24 Oct 2017 11:50:30 -0700
+From: Coly Li <colyli@suse.de>
+Message-ID: <39ec4670-667b-b4ce-75dc-713d119fc458@suse.de>
+Date: Tue, 24 Oct 2017 21:12:15 +0800
 MIME-Version: 1.0
 In-Reply-To: <1508835429-6977-1-git-send-email-tang.junhui@zte.com.cn>
 Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi---
-
-On 10/24/2017 01:57 AM, tang.junhui@zte.com.cn wrote:
+On 2017/10/24 下午4:57, tang.junhui@zte.com.cn wrote:
 > From: Tang Junhui <tang.junhui@zte.com.cn>
 > 
 > bucket_in_use is updated in gc thread which triggered by invalidating or
@@ -36,6 +32,13 @@ On 10/24/2017 01:57 AM, tang.junhui@zte.com.cn wrote:
 > bucket in real time.
 > 
 > Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+
+Hi Junhui,
+
+Thanks for the patch, this is a start to solve gc latency. Please check
+my comments in line.
+
+
 > ---
 >  drivers/md/bcache/alloc.c  | 10 ++++++++++
 >  drivers/md/bcache/bcache.h |  1 +
@@ -63,8 +66,20 @@ On 10/24/2017 01:57 AM, tang.junhui@zte.com.cn wrote:
 > +	}
 > +
 
-I am not sure this needs an atomic.  All accesses to this variable are
-done with the bucket_lock held, so that seems correct.  Is this right?
+ca->set->avai_nuckets-- is a read-modify-update operation, which means
+concurrent update will overwrite value update, imaging,
+       in-memory     thread 1             thread 2
+          n = 4
+v = n     n = 4       v <- 4
+          n = 4                            v <- 4
+v--       n = 4       v <- 3
+          n = 4                            v <- 3
+n = v     n = 3       n <- 3
+          n = 3                            n <- 3
+          n = 3
+
+In this case a correct n value should be 2, but n value in memory is 3.
+Use atomic routine atomc_dec() will solve such issue.
 
 >  	return r;
 >  }
@@ -78,6 +93,11 @@ done with the bucket_lock held, so that seems correct.  Is this right?
 > +		ca->set->avail_nbuckets++;
 > +		bch_update_bucket_in_use(ca->set);
 > +	}
+
+Here we should use atomic_inc() to avail_nbuckets, the reason is similar
+to bch_bucket_alloc().
+
+
 >  }
 >  
 >  void bch_bucket_free(struct cache_set *c, struct bkey *k)
@@ -92,7 +112,10 @@ done with the bucket_lock held, so that seems correct.  Is this right?
 >  	struct gc_stat		gc_stats;
 >  	size_t			nbuckets;
 > +	size_t			avail_nbuckets;
->  
+>
+
+Here avail_nbuckets should be atomic_t.
+
 >  	struct task_struct	*gc_thread;
 >  	/* Where in the btree gc currently is */
 > diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
@@ -109,6 +132,9 @@ done with the bucket_lock held, so that seems correct.  Is this right?
 > +{
 > +	c->gc_stats.in_use = (c->nbuckets - c->avail_nbuckets) * 100 / c->nbuckets;
 > +}
+
+Here should use atomic_read() to c->avail_nbuckets.
+
 > +
 >  static bool btree_gc_mark_node(struct btree *b, struct gc_stat *gc)
 >  {
@@ -139,13 +165,29 @@ done with the bucket_lock held, so that seems correct.  Is this right?
 > -				available++;
 > +				c->avail_nbuckets++;
 
-available should be removed and this function should return 0.
-
+In bch_bucket_alloc(), avail_nbuckets is decreased and
+GC_MARK_RECLAIMABLE might be marked to bucket. Because c->avail_nbuckets
+is updated without c->bucket_lock protect, it is possible that
+c->avail_nbuckets is decreased in bch_buckets_alloc() and increased in
+bch_btree_gc_finish(), which results an inaccurate available buckets value.
 >  		}
 >  	}
 >  
 >  	mutex_unlock(&c->bucket_lock);
 > -	return available;
+
+
+A solution is to still keep available++ in the above code, and use
+atomic_set(&c->avail_nbuckets, available) at the last line of this function.
+
+By this method, if a bucket is in a small window that just allocated
+(mark reclaimable) but not written (mark dirty), and
+bch_btree_gc_finish() is called, c->avail_nbuckets can be consistent by
+overwritten by atomic_set(&c->avail_nbuckets, available). Other wise we
+will lost 1 counter.
+
+How do you think about it ?
+
 >  }
 >  
 >  static void bch_btree_gc(struct cache_set *c)
@@ -170,7 +212,8 @@ available should be removed and this function should return 0.
 > -	stats.in_use	= (c->nbuckets - available) * 100 / c->nbuckets;
 > +	stats.in_use	= (c->nbuckets - c->avail_nbuckets) * 100 / c->nbuckets;
 
-This should instead call bch_update_bucket_in_use to avoid code duplication.
+atomic_read to c->avail_nbuckets should be used here.
+
 
 >  	memcpy(&c->gc_stats, &stats, sizeof(struct gc_stat));
 >  
@@ -188,11 +231,14 @@ This should instead call bch_update_bucket_in_use to avoid code duplication.
 > +void bch_update_bucket_in_use(struct cache_set *c);
 >  
 >  #endif
-> 
+>
 
+Available nbuckets should be counted when a clean bucket is set to
+dirty. Fortunately I find once a bucket is new allocated, it will be
+dirty and no error condition happens between the bucket is allocated and
+dirtied. So it works to count available bucket numbers in
+bch_bucket_alloc() and bch_bucket_free(), it is ok to me at this moment.
 
-Overall I think this is a good piece of progress.
+Thanks.
 
-Thanks--
-
-Mike
+Coly Li
