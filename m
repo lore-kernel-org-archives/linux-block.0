@@ -1,119 +1,148 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:45658 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751835AbdJMSKr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 14:10:47 -0400
-Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id v9DIA7DE011559
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 11:10:47 -0700
-Received: from mail.thefacebook.com ([199.201.64.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 2dk0y5gd9p-4
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 11:10:47 -0700
-From: Shaohua Li <shli@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: <axboe@kernel.dk>, <Kernel-team@fb.com>, Tejun Heo <tj@kernel.org>,
-        Vivek Goyal <vgoyal@redhat.com>
-Subject: [PATCH] block-throttle: avoid double charge
-Date: Fri, 13 Oct 2017 11:10:29 -0700
-Message-ID: <aac85300238aec9e310b5092260a6ec6e6f02e04.1507918159.git.shli@fb.com>
+Return-Path: <axboe@kernel.dk>
+Received: from [192.168.1.12] ([107.72.98.158])
+        by smtp.gmail.com with ESMTPSA id u6sm2259474pfg.175.2017.10.24.17.39.51
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 24 Oct 2017 17:39:52 -0700 (PDT)
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] elevator: lookup mq vs non-mq elevators
+Message-ID: <34b7f98c-9846-643c-34ef-609f341836fa@kernel.dk>
+Date: Tue, 24 Oct 2017 18:39:49 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-If a bio is throttled and splitted after throttling, the bio could be
-resubmited and enters the throttling again. This will cause part of the
-bio is charged multiple times. If the cgroup has an IO limit, the double
-charge will significantly harm the performance. The bio split becomes
-quite common after arbitrary bio size change.
+If an IO scheduler is selected via elevator= and it doesn't match
+the driver in question wrt blk-mq support, then we fail to boot.
 
-To fix this, we record the disk info a bio is throttled against. If a
-bio is throttled and issued, we record the info. We copy the info to
-cloned bio, so cloned bio (including splitted bio) will not be throttled
-again. Stacked block device driver will change cloned bio's bi_disk, if
-a bio's bi_disk is changed, the recorded throttle disk info is invalid,
-we should throttle again. That's the reason why we can't use a single
-bit to indicate if a cloned bio should be throttled.
+The elevator= parameter is deprecated and only supported for
+non-mq devices. Augment the elevator lookup API so that we
+pass in if we're looking for an mq capable scheduler or not,
+so that we only ever return a valid type for the queue in
+question.
 
-We only record gendisk here, if a cloned bio is remapped to other disk,
-it's very unlikely only partno is changed.
+Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=196695
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-Some sort of this patch probably should go into stable since v4.2
-
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Vivek Goyal <vgoyal@redhat.com>
-Signed-off-by: Shaohua Li <shli@fb.com>
----
- block/bio.c               |  3 +++
- block/blk-throttle.c      | 15 ++++++++++++---
- include/linux/blk_types.h |  4 ++++
- 3 files changed, 19 insertions(+), 3 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 8338304..dce8314 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -597,6 +597,9 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
- 	 * so we don't set nor calculate new physical/hw segment counts here
- 	 */
- 	bio->bi_disk = bio_src->bi_disk;
-+#ifdef CONFIG_BLK_DEV_THROTTLING
-+	bio->bi_throttled_disk = bio_src->bi_throttled_disk;
-+#endif
- 	bio_set_flag(bio, BIO_CLONED);
- 	bio->bi_opf = bio_src->bi_opf;
- 	bio->bi_write_hint = bio_src->bi_write_hint;
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index ee6d7b0..155549a 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -2130,9 +2130,15 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+diff --git a/block/elevator.c b/block/elevator.c
+index 153926a90901..318cf00ea213 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -83,12 +83,13 @@ bool elv_bio_merge_ok(struct request *rq, struct bio *bio)
+ }
+ EXPORT_SYMBOL(elv_bio_merge_ok);
  
- 	WARN_ON_ONCE(!rcu_read_lock_held());
+-static struct elevator_type *elevator_find(const char *name)
++static struct elevator_type *elevator_find(const char *name, bool mq)
+ {
+ 	struct elevator_type *e;
  
--	/* see throtl_charge_bio() */
--	if (bio_flagged(bio, BIO_THROTTLED) || !tg->has_rules[rw])
+ 	list_for_each_entry(e, &elv_list, list) {
+-		if (!strcmp(e->elevator_name, name))
++		if (!strcmp(e->elevator_name, name) &&
++		    !(mq ^ e->uses_mq))
+ 			return e;
+ 	}
+ 
+@@ -100,25 +101,25 @@ static void elevator_put(struct elevator_type *e)
+ 	module_put(e->elevator_owner);
+ }
+ 
+-static struct elevator_type *elevator_get(const char *name, bool try_loading)
++static struct elevator_type *elevator_get(struct request_queue *q,
++					  const char *name, bool try_loading)
+ {
+ 	struct elevator_type *e;
+ 
+ 	spin_lock(&elv_list_lock);
+ 
+-	e = elevator_find(name);
++	e = elevator_find(name, q->mq_ops != NULL);
+ 	if (!e && try_loading) {
+ 		spin_unlock(&elv_list_lock);
+ 		request_module("%s-iosched", name);
+ 		spin_lock(&elv_list_lock);
+-		e = elevator_find(name);
++		e = elevator_find(name, q->mq_ops != NULL);
+ 	}
+ 
+ 	if (e && !try_module_get(e->elevator_owner))
+ 		e = NULL;
+ 
+ 	spin_unlock(&elv_list_lock);
+-
+ 	return e;
+ }
+ 
+@@ -144,8 +145,12 @@ void __init load_default_elevator_module(void)
+ 	if (!chosen_elevator[0])
+ 		return;
+ 
 +	/*
-+	 * see throtl_charge_bio() for BIO_THROTTLED. If a bio is throttled
-+	 * against a disk but remapped to other disk, we should throttle it
-+	 * again
++	 * Boot parameter is deprecated, we haven't supported that for MQ
++	 * so only look for non-mq schedulers from here.
 +	 */
-+	if (bio_flagged(bio, BIO_THROTTLED) || !tg->has_rules[rw] ||
-+	    (bio->bi_throttled_disk && bio->bi_throttled_disk == bio->bi_disk))
- 		goto out;
-+	bio->bi_throttled_disk = NULL;
+ 	spin_lock(&elv_list_lock);
+-	e = elevator_find(chosen_elevator);
++	e = elevator_find(chosen_elevator, false);
+ 	spin_unlock(&elv_list_lock);
  
- 	spin_lock_irq(q->queue_lock);
+ 	if (!e)
+@@ -202,7 +207,7 @@ int elevator_init(struct request_queue *q, char *name)
+ 	q->boundary_rq = NULL;
  
-@@ -2227,8 +2233,11 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 	 * don't want bios to leave with the flag set.  Clear the flag if
- 	 * being issued.
+ 	if (name) {
+-		e = elevator_get(name, true);
++		e = elevator_get(q, name, true);
+ 		if (!e)
+ 			return -EINVAL;
+ 	}
+@@ -214,7 +219,7 @@ int elevator_init(struct request_queue *q, char *name)
+ 	 * allowed from async.
  	 */
--	if (!throttled)
-+	if (!throttled) {
- 		bio_clear_flag(bio, BIO_THROTTLED);
-+		/* if the bio is cloned, we don't throttle it again */
-+		bio->bi_throttled_disk = bio->bi_disk;
-+	}
+ 	if (!e && !q->mq_ops && *chosen_elevator) {
+-		e = elevator_get(chosen_elevator, false);
++		e = elevator_get(q, chosen_elevator, false);
+ 		if (!e)
+ 			printk(KERN_ERR "I/O scheduler %s not found\n",
+ 							chosen_elevator);
+@@ -229,17 +234,17 @@ int elevator_init(struct request_queue *q, char *name)
+ 		 */
+ 		if (q->mq_ops) {
+ 			if (q->nr_hw_queues == 1)
+-				e = elevator_get("mq-deadline", false);
++				e = elevator_get(q, "mq-deadline", false);
+ 			if (!e)
+ 				return 0;
+ 		} else
+-			e = elevator_get(CONFIG_DEFAULT_IOSCHED, false);
++			e = elevator_get(q, CONFIG_DEFAULT_IOSCHED, false);
  
- #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
- 	if (throttled || !td->track_bio_latency)
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 3385c89..2507566 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -89,6 +89,10 @@ struct bio {
- 	void			*bi_cg_private;
- 	struct blk_issue_stat	bi_issue_stat;
- #endif
-+#ifdef CONFIG_BLK_DEV_THROTTLING
-+	/* record which disk the bio is throttled against */
-+	struct gendisk		*bi_throttled_disk;
-+#endif
- #endif
- 	union {
- #if defined(CONFIG_BLK_DEV_INTEGRITY)
--- 
-2.9.5
+ 		if (!e) {
+ 			printk(KERN_ERR
+ 				"Default I/O scheduler not found. " \
+ 				"Using noop.\n");
+-			e = elevator_get("noop", false);
++			e = elevator_get(q, "noop", false);
+ 		}
+ 	}
+ 
+@@ -905,7 +910,7 @@ int elv_register(struct elevator_type *e)
+ 
+ 	/* register, don't allow duplicate names */
+ 	spin_lock(&elv_list_lock);
+-	if (elevator_find(e->elevator_name)) {
++	if (elevator_find(e->elevator_name, e->uses_mq)) {
+ 		spin_unlock(&elv_list_lock);
+ 		if (e->icq_cache)
+ 			kmem_cache_destroy(e->icq_cache);
+@@ -1066,7 +1071,7 @@ static int __elevator_change(struct request_queue *q, const char *name)
+ 		return elevator_switch(q, NULL);
+ 
+ 	strlcpy(elevator_name, name, sizeof(elevator_name));
+-	e = elevator_get(strstrip(elevator_name), true);
++	e = elevator_get(q, strstrip(elevator_name), true);
+ 	if (!e)
+ 		return -EINVAL;
+ 
