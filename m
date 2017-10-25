@@ -1,134 +1,90 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:50700 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751970AbdJMRZw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 13:25:52 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Tom Nguyen <tom81094@gmail.com>, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        John Garry <john.garry@huawei.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V8 3/7] sbitmap: introduce __sbitmap_for_each_set()
-Date: Sat, 14 Oct 2017 01:24:55 +0800
-Message-Id: <20171013172459.1376-4-ming.lei@redhat.com>
-In-Reply-To: <20171013172459.1376-1-ming.lei@redhat.com>
-References: <20171013172459.1376-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <byungchul.park@lge.com>
+From: Byungchul Park <byungchul.park@lge.com>
+To: peterz@infradead.org,
+	mingo@kernel.org,
+	axboe@kernel.dk
+Cc: johan@kernel.org,
+	tglx@linutronix.de,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	tj@kernel.org,
+	johannes.berg@intel.com,
+	oleg@redhat.com,
+	amir73il@gmail.com,
+	david@fromorbit.com,
+	darrick.wong@oracle.com,
+	linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	hch@infradead.org,
+	idryomov@gmail.com,
+	kernel-team@lge.com
+Subject: [PATCH v4 5/7] completion: Add support for initializing completion with lockdep_map
+Date: Wed, 25 Oct 2017 14:11:10 +0900
+Message-Id: <1508908272-15757-6-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <1508908272-15757-1-git-send-email-byungchul.park@lge.com>
+References: <1508908272-15757-1-git-send-email-byungchul.park@lge.com>
+List-ID: <linux-block@vger.kernel.org>
 
-We need to iterate ctx starting from any ctx in round robin
-way, so introduce this helper.
+Sometimes, we want to initialize completions with sparate lockdep maps
+to assign lock classes as desired. For example, the workqueue code
+needs to directly manage lockdep maps, since only the code is aware of
+how to classify lockdep maps properly.
 
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Provide additional macros initializing completions in that way.
+
+Signed-off-by: Byungchul Park <byungchul.park@lge.com>
 ---
- include/linux/sbitmap.h | 64 ++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 47 insertions(+), 17 deletions(-)
+ include/linux/completion.h | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index a1904aadbc45..0dcc60e820de 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -211,10 +211,14 @@ bool sbitmap_any_bit_set(const struct sbitmap *sb);
-  */
- bool sbitmap_any_bit_clear(const struct sbitmap *sb);
- 
-+#define SB_NR_TO_INDEX(sb, bitnr) ((bitnr) >> (sb)->shift)
-+#define SB_NR_TO_BIT(sb, bitnr) ((bitnr) & ((1U << (sb)->shift) - 1U))
-+
- typedef bool (*sb_for_each_fn)(struct sbitmap *, unsigned int, void *);
- 
- /**
-- * sbitmap_for_each_set() - Iterate over each set bit in a &struct sbitmap.
-+ * __sbitmap_for_each_set() - Iterate over each set bit in a &struct sbitmap.
-+ * @start: Where to start the iteration.
-  * @sb: Bitmap to iterate over.
-  * @fn: Callback. Should return true to continue or false to break early.
-  * @data: Pointer to pass to callback.
-@@ -222,35 +226,61 @@ typedef bool (*sb_for_each_fn)(struct sbitmap *, unsigned int, void *);
-  * This is inline even though it's non-trivial so that the function calls to the
-  * callback will hopefully get optimized away.
-  */
--static inline void sbitmap_for_each_set(struct sbitmap *sb, sb_for_each_fn fn,
--					void *data)
-+static inline void __sbitmap_for_each_set(struct sbitmap *sb,
-+					  unsigned int start,
-+					  sb_for_each_fn fn, void *data)
- {
--	unsigned int i;
-+	unsigned int index;
-+	unsigned int nr;
-+	unsigned int scanned = 0;
- 
--	for (i = 0; i < sb->map_nr; i++) {
--		struct sbitmap_word *word = &sb->map[i];
--		unsigned int off, nr;
-+	if (start >= sb->depth)
-+		start = 0;
-+	index = SB_NR_TO_INDEX(sb, start);
-+	nr = SB_NR_TO_BIT(sb, start);
- 
--		if (!word->word)
--			continue;
-+	while (scanned < sb->depth) {
-+		struct sbitmap_word *word = &sb->map[index];
-+		unsigned int depth = min_t(unsigned int, word->depth - nr,
-+					   sb->depth - scanned);
- 
--		nr = 0;
--		off = i << sb->shift;
-+		scanned += depth;
-+		if (!word->word)
-+			goto next;
-+
-+		/*
-+		 * On the first iteration of the outer loop, we need to add the
-+		 * bit offset back to the size of the word for find_next_bit().
-+		 * On all other iterations, nr is zero, so this is a noop.
-+		 */
-+		depth += nr;
- 		while (1) {
--			nr = find_next_bit(&word->word, word->depth, nr);
--			if (nr >= word->depth)
-+			nr = find_next_bit(&word->word, depth, nr);
-+			if (nr >= depth)
- 				break;
--
--			if (!fn(sb, off + nr, data))
-+			if (!fn(sb, (index << sb->shift) + nr, data))
- 				return;
- 
- 			nr++;
- 		}
-+next:
-+		nr = 0;
-+		if (++index >= sb->map_nr)
-+			index = 0;
- 	}
+diff --git a/include/linux/completion.h b/include/linux/completion.h
+index cae5400..02f8cde 100644
+--- a/include/linux/completion.h
++++ b/include/linux/completion.h
+@@ -49,6 +49,13 @@ static inline void complete_release_commit(struct completion *x)
+ 	lock_commit_crosslock((struct lockdep_map *)&x->map);
  }
  
--#define SB_NR_TO_INDEX(sb, bitnr) ((bitnr) >> (sb)->shift)
--#define SB_NR_TO_BIT(sb, bitnr) ((bitnr) & ((1U << (sb)->shift) - 1U))
-+/**
-+ * sbitmap_for_each_set() - Iterate over each set bit in a &struct sbitmap.
-+ * @sb: Bitmap to iterate over.
-+ * @fn: Callback. Should return true to continue or false to break early.
-+ * @data: Pointer to pass to callback.
-+ */
-+static inline void sbitmap_for_each_set(struct sbitmap *sb, sb_for_each_fn fn,
-+					void *data)
-+{
-+	__sbitmap_for_each_set(sb, 0, fn, data);
-+}
++#define init_completion_map(x, m)					\
++do {									\
++	lockdep_init_map_crosslock((struct lockdep_map *)&(x)->map,	\
++			(m)->name, (m)->key, 0);				\
++	__init_completion(x);						\
++} while (0)
++
+ #define init_completion(x)						\
+ do {									\
+ 	static struct lock_class_key __key;				\
+@@ -58,6 +65,7 @@ static inline void complete_release_commit(struct completion *x)
+ 	__init_completion(x);						\
+ } while (0)
+ #else
++#define init_completion_map(x, m) __init_completion(x)
+ #define init_completion(x) __init_completion(x)
+ static inline void complete_acquire(struct completion *x) {}
+ static inline void complete_release(struct completion *x) {}
+@@ -73,6 +81,9 @@ static inline void complete_release_commit(struct completion *x) {}
+ 	{ 0, __WAIT_QUEUE_HEAD_INITIALIZER((work).wait) }
+ #endif
  
- static inline unsigned long *__sbitmap_word(struct sbitmap *sb,
- 					    unsigned int bitnr)
++#define COMPLETION_INITIALIZER_ONSTACK_MAP(work, map) \
++	(*({ init_completion_map(&(work), &(map)); &(work); }))
++
+ #define COMPLETION_INITIALIZER_ONSTACK(work) \
+ 	(*({ init_completion(&work); &work; }))
+ 
+@@ -102,8 +113,11 @@ static inline void complete_release_commit(struct completion *x) {}
+ #ifdef CONFIG_LOCKDEP
+ # define DECLARE_COMPLETION_ONSTACK(work) \
+ 	struct completion work = COMPLETION_INITIALIZER_ONSTACK(work)
++# define DECLARE_COMPLETION_ONSTACK_MAP(work, map) \
++	struct completion work = COMPLETION_INITIALIZER_ONSTACK_MAP(work, map)
+ #else
+ # define DECLARE_COMPLETION_ONSTACK(work) DECLARE_COMPLETION(work)
++# define DECLARE_COMPLETION_ONSTACK_MAP(work, map) DECLARE_COMPLETION(work)
+ #endif
+ 
+ /**
 -- 
-2.9.5
+1.9.1
