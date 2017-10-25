@@ -1,63 +1,59 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:36082 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753856AbdJIHht (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 Oct 2017 03:37:49 -0400
-Received: by mail-pf0-f195.google.com with SMTP id z11so8256514pfk.3
-        for <linux-block@vger.kernel.org>; Mon, 09 Oct 2017 00:37:49 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: colyli@suse.de, Michael Lyle <mlyle@lyle.org>
-Subject: [PATCH v2 2/2] bcache: rearrange writeback main thread ratelimit
-Date: Mon,  9 Oct 2017 00:37:30 -0700
-Message-Id: <20171009073730.8939-3-mlyle@lyle.org>
-In-Reply-To: <20171009073730.8939-1-mlyle@lyle.org>
-References: <20171009073730.8939-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v3 0/2] block: cope with WRITE ZEROES failing in
+ blkdev_issue_zeroout()
+To: Ilya Dryomov <idryomov@gmail.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Hannes Reinecke <hare@suse.com>, linux-block <linux-block@vger.kernel.org>,
+ Christoph Hellwig <hch@infradead.org>
+References: <1508162350-21978-1-git-send-email-idryomov@gmail.com>
+ <CAOi1vP_-ycXO4hkedPmrdiZcUZchQzNE2gh-3Oq_F25Euv=ncQ@mail.gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <f117c9f6-47cc-93a2-b340-4a79fa0da5b5@kernel.dk>
+Date: Wed, 25 Oct 2017 11:28:55 -0700
+MIME-Version: 1.0
+In-Reply-To: <CAOi1vP_-ycXO4hkedPmrdiZcUZchQzNE2gh-3Oq_F25Euv=ncQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-The time spent searching for things to write back "counts" for the
-actual rate achieved, so don't flush the accumulated rate with each
-chunk.
+On 10/24/2017 11:27 PM, Ilya Dryomov wrote:
+> On Mon, Oct 16, 2017 at 3:59 PM, Ilya Dryomov <idryomov@gmail.com> wrote:
+>> Hi Christoph, Martin,
+>>
+>> blkdev_issue_zeroout() now checks for any error.  This required a minor
+>> refactor, so I dropped the stable tag, Jens can add it back if needed.
+>>
+>> v2 -> v3:
+>> - another code flow change in blkdev_issue_zeroout() suggested by
+>>   Christoph -- no functional changes
+>>
+>> v1 -> v2:
+>> - changed code flow in blkdev_issue_zeroout() according to Christoph's
+>>   suggestion
+>> - this required adding additional checks to blkdev_issue_zeroout() and
+>>   __blkdev_issue_zero_pages(), the latter is no longer void
+>>
+>> Previous version at
+>>
+>>   https://marc.info/?l=linux-block&m=150712940922089&w=2
+>>
+>> Thanks,
+>>
+>>                 Ilya
+>>
+>>
+>> Ilya Dryomov (2):
+>>   block: factor out __blkdev_issue_zero_pages()
+>>   block: cope with WRITE ZEROES failing in blkdev_issue_zeroout()
+>>
+>>  block/blk-lib.c | 108 +++++++++++++++++++++++++++++++++++++-------------------
+>>  1 file changed, 72 insertions(+), 36 deletions(-)
+> 
+> Jens, can you pick these up?  Technically this is a user-visible
+> regression (Fixes tag in 2/2), but we are late in the cycle so I'm not
+> sure what is the right thing to do here.
 
-This will maintain better fidelity to user-commanded rates, but it
-may slightly increase the burstiness of writeback.  The writeback
-lock needs improvement to help mitigate this.
+It wasn't introduced in this cycle, so there's little point in trying
+to rush it for 4.14. I have applied it for 4.15, thanks.
 
-Signed-off-by: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/writeback.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 42d087b9fb56..719b104db0cc 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -526,6 +526,8 @@ static int bch_writeback_thread(void *arg)
- 	struct cached_dev *dc = arg;
- 	bool searched_full_index;
- 
-+	bch_ratelimit_reset(&dc->writeback_rate);
-+
- 	while (!kthread_should_stop()) {
- 		down_write(&dc->writeback_lock);
- 		if (!atomic_read(&dc->has_dirty) ||
-@@ -553,7 +555,6 @@ static int bch_writeback_thread(void *arg)
- 
- 		up_write(&dc->writeback_lock);
- 
--		bch_ratelimit_reset(&dc->writeback_rate);
- 		read_dirty(dc);
- 
- 		if (searched_full_index) {
-@@ -563,6 +564,8 @@ static int bch_writeback_thread(void *arg)
- 			       !kthread_should_stop() &&
- 			       !test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags))
- 				delay = schedule_timeout_interruptible(delay);
-+
-+			bch_ratelimit_reset(&dc->writeback_rate);
- 		}
- 	}
- 
 -- 
-2.11.0
+Jens Axboe
