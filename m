@@ -1,94 +1,90 @@
-Return-Path: <BATV+e774f35f755d74bf45df+5174+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 09/17] nvme: simplify nvme_open
-Date: Mon, 23 Oct 2017 16:51:18 +0200
-Message-Id: <20171023145126.2471-10-hch@lst.de>
-In-Reply-To: <20171023145126.2471-1-hch@lst.de>
-References: <20171023145126.2471-1-hch@lst.de>
+Return-Path: <byungchul.park@lge.com>
+From: Byungchul Park <byungchul.park@lge.com>
+To: peterz@infradead.org,
+	mingo@kernel.org,
+	axboe@kernel.dk
+Cc: johan@kernel.org,
+	tglx@linutronix.de,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	tj@kernel.org,
+	johannes.berg@intel.com,
+	oleg@redhat.com,
+	amir73il@gmail.com,
+	david@fromorbit.com,
+	darrick.wong@oracle.com,
+	linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	hch@infradead.org,
+	idryomov@gmail.com,
+	kernel-team@lge.com
+Subject: [PATCH v5 7/9] completion: Add support for initializing completion with lockdep_map
+Date: Wed, 25 Oct 2017 17:56:03 +0900
+Message-Id: <1508921765-15396-8-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
+References: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Now that we are protected against lookup vs free races for the namespace
-by using kref_get_unless_zero we don't need the hack of NULLing out the
-disk private data during removal.
+Sometimes, we want to initialize completions with sparate lockdep maps
+to assign lock classes as desired. For example, the workqueue code
+needs to directly manage lockdep maps, since only the code is aware of
+how to classify lockdep maps properly.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Provide additional macros initializing completions in that way.
+
+Signed-off-by: Byungchul Park <byungchul.park@lge.com>
 ---
- drivers/nvme/host/core.c | 40 ++++++++++------------------------------
- 1 file changed, 10 insertions(+), 30 deletions(-)
+ include/linux/completion.h | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 1d931deac83b..9f8ae15c9fe8 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -253,12 +253,6 @@ static void nvme_free_ns(struct kref *kref)
- 	if (ns->ndev)
- 		nvme_nvm_unregister(ns);
- 
--	if (ns->disk) {
--		spin_lock(&dev_list_lock);
--		ns->disk->private_data = NULL;
--		spin_unlock(&dev_list_lock);
--	}
--
- 	put_disk(ns->disk);
- 	ida_simple_remove(&ns->ctrl->ns_ida, ns->instance);
- 	nvme_put_ctrl(ns->ctrl);
-@@ -270,29 +264,6 @@ static void nvme_put_ns(struct nvme_ns *ns)
- 	kref_put(&ns->kref, nvme_free_ns);
+diff --git a/include/linux/completion.h b/include/linux/completion.h
+index 9121803..4da4991 100644
+--- a/include/linux/completion.h
++++ b/include/linux/completion.h
+@@ -49,6 +49,13 @@ static inline void complete_release_commit(struct completion *x)
+ 	lock_commit_crosslock((struct lockdep_map *)&x->map);
  }
  
--static struct nvme_ns *nvme_get_ns_from_disk(struct gendisk *disk)
--{
--	struct nvme_ns *ns;
--
--	spin_lock(&dev_list_lock);
--	ns = disk->private_data;
--	if (ns) {
--		if (!kref_get_unless_zero(&ns->kref))
--			goto fail;
--		if (!try_module_get(ns->ctrl->ops->module))
--			goto fail_put_ns;
--	}
--	spin_unlock(&dev_list_lock);
--
--	return ns;
--
--fail_put_ns:
--	kref_put(&ns->kref, nvme_free_ns);
--fail:
--	spin_unlock(&dev_list_lock);
--	return NULL;
--}
--
- struct request *nvme_alloc_request(struct request_queue *q,
- 		struct nvme_command *cmd, unsigned int flags, int qid)
- {
-@@ -1056,7 +1027,16 @@ static int nvme_ioctl(struct block_device *bdev, fmode_t mode,
- 
- static int nvme_open(struct block_device *bdev, fmode_t mode)
- {
--	return nvme_get_ns_from_disk(bdev->bd_disk) ? 0 : -ENXIO;
-+	struct nvme_ns *ns = bdev->bd_disk->private_data;
++#define init_completion_map(x, m)					\
++do {									\
++	lockdep_init_map_crosslock((struct lockdep_map *)&(x)->map,	\
++			(m)->name, (m)->key, 0);				\
++	__init_completion(x);						\
++} while (0)
 +
-+	if (!kref_get_unless_zero(&ns->kref))
-+		return -ENXIO;
-+	if (!try_module_get(ns->ctrl->ops->module)) {
-+		kref_put(&ns->kref, nvme_free_ns);
-+		return -ENXIO;
-+	}
-+
-+	return 0;
- }
+ #define init_completion(x)						\
+ do {									\
+ 	static struct lock_class_key __key;				\
+@@ -58,6 +65,7 @@ static inline void complete_release_commit(struct completion *x)
+ 	__init_completion(x);						\
+ } while (0)
+ #else
++#define init_completion_map(x, m) __init_completion(x)
+ #define init_completion(x) __init_completion(x)
+ static inline void complete_acquire(struct completion *x) {}
+ static inline void complete_release(struct completion *x) {}
+@@ -73,6 +81,9 @@ static inline void complete_release_commit(struct completion *x) {}
+ 	{ 0, __WAIT_QUEUE_HEAD_INITIALIZER((work).wait) }
+ #endif
  
- static void nvme_release(struct gendisk *disk, fmode_t mode)
++#define COMPLETION_INITIALIZER_ONSTACK_MAP(work, map) \
++	(*({ init_completion_map(&(work), &(map)); &(work); }))
++
+ #define COMPLETION_INITIALIZER_ONSTACK(work) \
+ 	(*({ init_completion(&work); &work; }))
+ 
+@@ -102,8 +113,11 @@ static inline void complete_release_commit(struct completion *x) {}
+ #ifdef CONFIG_LOCKDEP
+ # define DECLARE_COMPLETION_ONSTACK(work) \
+ 	struct completion work = COMPLETION_INITIALIZER_ONSTACK(work)
++# define DECLARE_COMPLETION_ONSTACK_MAP(work, map) \
++	struct completion work = COMPLETION_INITIALIZER_ONSTACK_MAP(work, map)
+ #else
+ # define DECLARE_COMPLETION_ONSTACK(work) DECLARE_COMPLETION(work)
++# define DECLARE_COMPLETION_ONSTACK_MAP(work, map) DECLARE_COMPLETION(work)
+ #endif
+ 
+ /**
 -- 
-2.14.2
+1.9.1
