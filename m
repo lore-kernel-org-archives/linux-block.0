@@ -20,11 +20,11 @@ Cc: johan@kernel.org,
 	idryomov@gmail.com,
 	kernel-team@lge.com,
 	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v5 1/9] block: use DECLARE_COMPLETION_ONSTACK in submit_bio_wait
-Date: Wed, 25 Oct 2017 17:55:57 +0900
-Message-Id: <1508921765-15396-2-git-send-email-byungchul.park@lge.com>
-In-Reply-To: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
-References: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
+Subject: [PATCH v4 1/7] block: use DECLARE_COMPLETION_ONSTACK in submit_bio_wait
+Date: Wed, 25 Oct 2017 14:11:06 +0900
+Message-Id: <1508908272-15757-2-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <1508908272-15757-1-git-send-email-byungchul.park@lge.com>
+References: <1508908272-15757-1-git-send-email-byungchul.park@lge.com>
 List-ID: <linux-block@vger.kernel.org>
 
 From: Christoph Hellwig <hch@lst.de>
