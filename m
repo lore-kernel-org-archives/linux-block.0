@@ -1,169 +1,113 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:46462 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750930AbdJ0Enw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Oct 2017 00:43:52 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Omar Sandoval <osandov@fb.com>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Roman Pen <roman.penyaev@profitbricks.com>,
-        Hannes Reinecke <hare@suse.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 1/2] blk-mq: don't handle TAG_SHARED in restart
-Date: Fri, 27 Oct 2017 12:43:29 +0800
-Message-Id: <20171027044330.11921-2-ming.lei@redhat.com>
-In-Reply-To: <20171027044330.11921-1-ming.lei@redhat.com>
-References: <20171027044330.11921-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <byungchul.park@lge.com>
+From: Byungchul Park <byungchul.park@lge.com>
+To: peterz@infradead.org,
+	mingo@kernel.org,
+	axboe@kernel.dk
+Cc: johan@kernel.org,
+	tglx@linutronix.de,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	tj@kernel.org,
+	johannes.berg@intel.com,
+	oleg@redhat.com,
+	amir73il@gmail.com,
+	david@fromorbit.com,
+	darrick.wong@oracle.com,
+	linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	hch@infradead.org,
+	idryomov@gmail.com,
+	kernel-team@lge.com
+Subject: [PATCH v5 8/9] workqueue: Remove unnecessary acquisitions wrt workqueue flush
+Date: Wed, 25 Oct 2017 17:56:04 +0900
+Message-Id: <1508921765-15396-9-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
+References: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Now restart is used in the following cases, and TAG_SHARED is for
-SCSI only.
+The workqueue added manual acquisitions to catch deadlock cases.
+Now crossrelease was introduced, some of those are redundant, since
+wait_for_completion() already includes the acquisition for itself.
+Remove it.
 
-1) .get_budget() returns BLK_STS_RESOURCE
-- if resource in target/host level isn't satisfied, this SCSI device
-will be added in shost->starved_list, and the whole queue will be rerun
-(via SCSI's built-in RESTART) in scsi_end_request() after any request
-initiated from this host/targe is completed. Forget to mention, host level
-resource can't be an issue for blk-mq at all.
-
-- the same is true if resource in the queue level isn't satisfied.
-
-- if there isn't outstanding request on this queue, then SCSI's RESTART
-can't work(blk-mq's can't work too), and the queue will be run after
-SCSI_QUEUE_DELAY, and finally all starved sdevs will be handled by SCSI's
-RESTART when this request is finished
-
-2) scsi_dispatch_cmd() returns BLK_STS_RESOURCE
-- if there isn't onprogressing request on this queue, the queue
-will be run after SCSI_QUEUE_DELAY
-
-- otherwise, SCSI's RESTART covers the rerun.
-
-3) blk_mq_get_driver_tag() failed
-- BLK_MQ_S_TAG_WAITING covers the cross-queue RESTART for driver
-allocation.
-
-In one word, SCSI's built-in RESTART is enough to cover the queue
-rerun, and we don't need to pay special attention to TAG_SHARED wrt. restart.
-
-In my test on scsi_debug(8 luns), this patch improves IOPS by 20% ~ 30% when
-running I/O on these 8 luns concurrently.
-
-Aslo Roman Pen reported the current RESTART is very expensive especialy
-when there are lots of LUNs attached in one host, such as in his
-test, RESTART causes half of IOPS be cut.
-
-Fixes: https://marc.info/?l=linux-kernel&m=150832216727524&w=2
-Fixes: 6d8c6c0f97ad ("blk-mq: Restart a single queue if tag sets are shared")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Byungchul Park <byungchul.park@lge.com>
 ---
- block/blk-mq-sched.c | 78 +++-------------------------------------------------
- 1 file changed, 4 insertions(+), 74 deletions(-)
+ include/linux/workqueue.h |  4 ++--
+ kernel/workqueue.c        | 19 +++----------------
+ 2 files changed, 5 insertions(+), 18 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index df8581bb0a37..daab27feb653 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -68,25 +68,17 @@ static void blk_mq_sched_mark_restart_hctx(struct blk_mq_hw_ctx *hctx)
- 		set_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
- }
+diff --git a/include/linux/workqueue.h b/include/linux/workqueue.h
+index f3c47a0..0544ad3 100644
+--- a/include/linux/workqueue.h
++++ b/include/linux/workqueue.h
+@@ -218,7 +218,7 @@ static inline void destroy_delayed_work_on_stack(struct delayed_work *work) { }
+ 									\
+ 		__init_work((_work), _onstack);				\
+ 		(_work)->data = (atomic_long_t) WORK_DATA_INIT();	\
+-		lockdep_init_map(&(_work)->lockdep_map, #_work, &__key, 0); \
++		lockdep_init_map(&(_work)->lockdep_map, "(work_completion)"#_work, &__key, 0); \
+ 		INIT_LIST_HEAD(&(_work)->entry);			\
+ 		(_work)->func = (_func);				\
+ 	} while (0)
+@@ -399,7 +399,7 @@ enum {
+ 	static struct lock_class_key __key;				\
+ 	const char *__lock_name;					\
+ 									\
+-	__lock_name = #fmt#args;					\
++	__lock_name = "(wq_completion)"#fmt#args;			\
+ 									\
+ 	__alloc_workqueue_key((fmt), (flags), (max_active),		\
+ 			      &__key, __lock_name, ##args);		\
+diff --git a/kernel/workqueue.c b/kernel/workqueue.c
+index c77fdf6..ee05d19 100644
+--- a/kernel/workqueue.c
++++ b/kernel/workqueue.c
+@@ -2496,15 +2496,8 @@ static void insert_wq_barrier(struct pool_workqueue *pwq,
+ 	INIT_WORK_ONSTACK(&barr->work, wq_barrier_func);
+ 	__set_bit(WORK_STRUCT_PENDING_BIT, work_data_bits(&barr->work));
  
--static bool blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
-+void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
- {
- 	if (!test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
--		return false;
--
--	if (hctx->flags & BLK_MQ_F_TAG_SHARED) {
--		struct request_queue *q = hctx->queue;
-+		return;
+-	/*
+-	 * Explicitly init the crosslock for wq_barrier::done, make its lock
+-	 * key a subkey of the corresponding work. As a result we won't
+-	 * build a dependency between wq_barrier::done and unrelated work.
+-	 */
+-	lockdep_init_map_crosslock((struct lockdep_map *)&barr->done.map,
+-				   "(complete)wq_barr::done",
+-				   target->lockdep_map.key, 1);
+-	__init_completion(&barr->done);
++	init_completion_map(&barr->done, &target->lockdep_map);
++
+ 	barr->task = current;
  
--		if (test_and_clear_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
--			atomic_dec(&q->shared_hctx_restart);
--	} else
--		clear_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
-+	clear_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
+ 	/*
+@@ -2610,16 +2603,13 @@ void flush_workqueue(struct workqueue_struct *wq)
+ 	struct wq_flusher this_flusher = {
+ 		.list = LIST_HEAD_INIT(this_flusher.list),
+ 		.flush_color = -1,
+-		.done = COMPLETION_INITIALIZER_ONSTACK(this_flusher.done),
++		.done = COMPLETION_INITIALIZER_ONSTACK_MAP(this_flusher.done, wq->lockdep_map),
+ 	};
+ 	int next_color;
  
- 	if (blk_mq_hctx_has_pending(hctx)) {
- 		blk_mq_run_hw_queue(hctx, true);
--		return true;
-+		return;
- 	}
--
--	return false;
- }
+ 	if (WARN_ON(!wq_online))
+ 		return;
  
- /* return true if hctx need to run again */
-@@ -385,68 +377,6 @@ static bool blk_mq_sched_bypass_insert(struct blk_mq_hw_ctx *hctx,
- 	return true;
- }
+-	lock_map_acquire(&wq->lockdep_map);
+-	lock_map_release(&wq->lockdep_map);
+-
+ 	mutex_lock(&wq->mutex);
  
--/**
-- * list_for_each_entry_rcu_rr - iterate in a round-robin fashion over rcu list
-- * @pos:    loop cursor.
-- * @skip:   the list element that will not be examined. Iteration starts at
-- *          @skip->next.
-- * @head:   head of the list to examine. This list must have at least one
-- *          element, namely @skip.
-- * @member: name of the list_head structure within typeof(*pos).
-- */
--#define list_for_each_entry_rcu_rr(pos, skip, head, member)		\
--	for ((pos) = (skip);						\
--	     (pos = (pos)->member.next != (head) ? list_entry_rcu(	\
--			(pos)->member.next, typeof(*pos), member) :	\
--	      list_entry_rcu((pos)->member.next->next, typeof(*pos), member)), \
--	     (pos) != (skip); )
+ 	/*
+@@ -2882,9 +2872,6 @@ bool flush_work(struct work_struct *work)
+ 	if (WARN_ON(!wq_online))
+ 		return false;
+ 
+-	lock_map_acquire(&work->lockdep_map);
+-	lock_map_release(&work->lockdep_map);
 -
--/*
-- * Called after a driver tag has been freed to check whether a hctx needs to
-- * be restarted. Restarts @hctx if its tag set is not shared. Restarts hardware
-- * queues in a round-robin fashion if the tag set of @hctx is shared with other
-- * hardware queues.
-- */
--void blk_mq_sched_restart(struct blk_mq_hw_ctx *const hctx)
--{
--	struct blk_mq_tags *const tags = hctx->tags;
--	struct blk_mq_tag_set *const set = hctx->queue->tag_set;
--	struct request_queue *const queue = hctx->queue, *q;
--	struct blk_mq_hw_ctx *hctx2;
--	unsigned int i, j;
--
--	if (set->flags & BLK_MQ_F_TAG_SHARED) {
--		/*
--		 * If this is 0, then we know that no hardware queues
--		 * have RESTART marked. We're done.
--		 */
--		if (!atomic_read(&queue->shared_hctx_restart))
--			return;
--
--		rcu_read_lock();
--		list_for_each_entry_rcu_rr(q, queue, &set->tag_list,
--					   tag_set_list) {
--			queue_for_each_hw_ctx(q, hctx2, i)
--				if (hctx2->tags == tags &&
--				    blk_mq_sched_restart_hctx(hctx2))
--					goto done;
--		}
--		j = hctx->queue_num + 1;
--		for (i = 0; i < queue->nr_hw_queues; i++, j++) {
--			if (j == queue->nr_hw_queues)
--				j = 0;
--			hctx2 = queue->queue_hw_ctx[j];
--			if (hctx2->tags == tags &&
--			    blk_mq_sched_restart_hctx(hctx2))
--				break;
--		}
--done:
--		rcu_read_unlock();
--	} else {
--		blk_mq_sched_restart_hctx(hctx);
--	}
--}
--
- /*
-  * Add flush/fua to the queue. If we fail getting a driver tag, then
-  * punt to the requeue list. Requeue will re-invoke us from a context
+ 	if (start_flush_work(work, &barr)) {
+ 		wait_for_completion(&barr.done);
+ 		destroy_work_on_stack(&barr.work);
 -- 
-2.9.5
+1.9.1
