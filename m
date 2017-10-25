@@ -19,11 +19,11 @@ Cc: johan@kernel.org,
 	hch@infradead.org,
 	idryomov@gmail.com,
 	kernel-team@lge.com
-Subject: [PATCH v5 5/9] locking/lockdep: Remove the BROKEN flag from CONFIG_LOCKDEP_CROSSRELEASE and CONFIG_LOCKDEP_COMPLETIONS
-Date: Wed, 25 Oct 2017 17:56:01 +0900
-Message-Id: <1508921765-15396-6-git-send-email-byungchul.park@lge.com>
-In-Reply-To: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
-References: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
+Subject: [PATCH v4 3/7] locking/lockdep: Remove the BROKEN flag from CONFIG_LOCKDEP_CROSSRELEASE and CONFIG_LOCKDEP_COMPLETIONS
+Date: Wed, 25 Oct 2017 14:11:08 +0900
+Message-Id: <1508908272-15757-4-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <1508908272-15757-1-git-send-email-byungchul.park@lge.com>
+References: <1508908272-15757-1-git-send-email-byungchul.park@lge.com>
 List-ID: <linux-block@vger.kernel.org>
 
 Now that the performance regression is fixed, re-enable
