@@ -19,19 +19,18 @@ Cc: johan@kernel.org,
 	hch@infradead.org,
 	idryomov@gmail.com,
 	kernel-team@lge.com
-Subject: [PATCH v5 0/9] cross-release: Enhence performance and fix false positives
-Date: Wed, 25 Oct 2017 17:55:56 +0900
-Message-Id: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
+Subject: [PATCH v4 0/7] cross-release: Enhence performance and fix false positives
+Date: Wed, 25 Oct 2017 14:11:05 +0900
+Message-Id: <1508908272-15757-1-git-send-email-byungchul.park@lge.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Changes from v4
-- Use a prefix "(completion)" instead of "(complete)" for completions
-- Use a prefix "(wq_completion)" instead of "(complete)" for workqueue's map
-- Use a prefix "(work_completion)" instead of "(complete)" for work's map
-- Use a prefix "(gendisk_completion)" instead of "(complete)" for gendisk's map
-- Provide empty lockdep_map structure for !CONFIG_LOCKDEP
-- Remove #ifdef in this series as much as possible
-- Use canocical variable names in all_disk_node() macro
+There are two things I didn't apply as Ingo suggested, since I didn't
+understand his intention exactly:
+
+   1. Adding 'Analyzed-by' tag at the 2nd patch
+   2. Using a inline function instead #define at the 7th patch
+
+Let me know if the above should still be applied.
 
 Changes from v3
 - Exclude a patch removing white space
@@ -53,10 +52,7 @@ Changes from v1
 - Replace the number with the output of *perf*
 - Separate a patch removing white space
 
-Byungchul Park (8):
-  locking/lockdep: Provide empty lockdep_map structure for
-    !CONFIG_LOCKDEP
-  completion: Change the prefix of lock name for completion variable
+Byungchul Park (6):
   locking/lockdep: Add a boot parameter allowing unwind in cross-release
     and disable it by default
   locking/lockdep: Remove the BROKEN flag from
@@ -73,14 +69,13 @@ Christoph Hellwig (1):
  Documentation/admin-guide/kernel-parameters.txt |  3 +++
  block/bio.c                                     | 19 +++++--------------
  block/genhd.c                                   | 10 ++--------
- include/linux/completion.h                      | 18 ++++++++++++++++--
- include/linux/genhd.h                           | 22 ++++++++++++++++++++--
- include/linux/lockdep.h                         |  5 +++++
+ include/linux/completion.h                      | 14 ++++++++++++++
+ include/linux/genhd.h                           | 24 ++++++++++++++++++++++--
  include/linux/workqueue.h                       |  4 ++--
  kernel/locking/lockdep.c                        | 23 +++++++++++++++++++++--
  kernel/workqueue.c                              | 19 +++----------------
  lib/Kconfig.debug                               | 19 +++++++++++++++++--
- 10 files changed, 94 insertions(+), 48 deletions(-)
+ 9 files changed, 89 insertions(+), 46 deletions(-)
 
 -- 
 1.9.1
