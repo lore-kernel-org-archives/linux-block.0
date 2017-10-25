@@ -1,44 +1,16 @@
-Return-Path: <BATV+e774f35f755d74bf45df+5174+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 08/17] nvme: use kref_get_unless_zero in nvme_find_get_ns
-Date: Mon, 23 Oct 2017 16:51:17 +0200
-Message-Id: <20171023145126.2471-9-hch@lst.de>
-In-Reply-To: <20171023145126.2471-1-hch@lst.de>
-References: <20171023145126.2471-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Received: from x1.vtm-guests.local (50-76-103-53-static.hfc.comcastbusiness.net. [50.76.103.53])
+        by smtp.gmail.com with ESMTPSA id 62sm6386083pfw.129.2017.10.25.11.04.50
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Wed, 25 Oct 2017 11:04:50 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org
+Subject: [PATCH 0/3] mq vs non-mq scheduler tweaks
+Date: Wed, 25 Oct 2017 12:04:44 -0600
+Message-Id: <1508954687-3204-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-For kref_get_unless_zero to protect against lookup vs free races we need
-to use it in all places where we aren't guaranteed to already hold a
-reference.  There is no such guarantee in nvme_find_get_ns, so switch to
-kref_get_unless_zero in this function.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/nvme/host/core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 7fae42d595d5..1d931deac83b 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2290,7 +2290,8 @@ static struct nvme_ns *nvme_find_get_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 	mutex_lock(&ctrl->namespaces_mutex);
- 	list_for_each_entry(ns, &ctrl->namespaces, list) {
- 		if (ns->ns_id == nsid) {
--			kref_get(&ns->kref);
-+			if (!kref_get_unless_zero(&ns->kref))
-+				continue;
- 			ret = ns;
- 			break;
- 		}
--- 
-2.14.2
+Small series that streamlines this a little bit, and also introduces
+name aliases since that's now easy to do with the mq vs non-mq
+explicit scheduler lookups.
