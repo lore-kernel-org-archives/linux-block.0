@@ -1,49 +1,80 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.mpynet.fi ([82.197.21.84]:47356 "EHLO mx1.mpynet.fi"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751005AbdJANWT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 1 Oct 2017 09:22:19 -0400
-Date: Sun, 1 Oct 2017 16:22:17 +0300
-From: Rakesh Pandit <rakesh@tuxera.com>
-To: Matias =?iso-8859-1?Q?Bj=F8rling?= <mb@lightnvm.io>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Javier =?iso-8859-1?Q?Gonz=E1lez?= <jg@lightnvm.io>
-Subject: [PATCH 0/6] misc cleanups and error path fixes
-Message-ID: <20171001132216.GA5456@hercules.tuxera.com>
+Return-Path: <zhangweiping@didichuxing.com>
+Date: Thu, 26 Oct 2017 00:00:50 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>
+Subject: [PATCH] loop: check loop_add's return value
+Message-ID: <20171025160031.GA40241@source.didichuxing.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: zhangweiping@didichuxing.com
+List-ID: <linux-block@vger.kernel.org>
 
-For 4.15.
+do cleanup if loop_add fail.
 
-These are last set of cleanups, error path fixes most likely and also
-some memory leak.  Also removes stale symbols from lightnvm.h.  In
-addition remove exported symbols which are no where used (except
-locally in core).
+Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+---
+ drivers/block/loop.c | 30 ++++++++++++++++++++----------
+ 1 file changed, 20 insertions(+), 10 deletions(-)
 
-Everything is based on top of:
-https://github.com/OpenChannelSSD/linux branch for-4.15/pblk
-
-So, they can be queued on top of patches already submitted earlier for
-4.15.  Most of them are trivial found while reading algorithms used
-during ALPSS yesterday or day before.
-
-Rakesh Pandit (6):
-  lightnvm: pblk: remove useless line
-  lightnvm: pblk: reduce arguments in __pblk_rb_update_l2p
-  lightnvm: remove unused argument from nvm_set_tgt_bb_tbl
-  lightnvm: remove stable extern and unused exported symbols
-  lightnvm: pblk: free up mempool allocation for erases correctly
-  lightnvm: pblk: fix releases of kmem cache in error path
-
- drivers/lightnvm/core.c      | 138 +++++++++++++++++++++----------------------
- drivers/lightnvm/pblk-core.c |   1 -
- drivers/lightnvm/pblk-init.c |  24 +++++++-
- drivers/lightnvm/pblk-rb.c   |  12 ++--
- drivers/lightnvm/pblk.h      |   1 +
- include/linux/lightnvm.h     |   7 ---
- 6 files changed, 94 insertions(+), 89 deletions(-)
-
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index bc8e61506968..9bea70a7da16 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1987,6 +1987,14 @@ static struct miscdevice loop_misc = {
+ MODULE_ALIAS_MISCDEV(LOOP_CTRL_MINOR);
+ MODULE_ALIAS("devname:loop-control");
+ 
++static int loop_exit_cb(int id, void *ptr, void *data)
++{
++	struct loop_device *lo = ptr;
++
++	loop_remove(lo);
++	return 0;
++}
++
+ static int __init loop_init(void)
+ {
+ 	int i, nr;
+@@ -2050,27 +2058,29 @@ static int __init loop_init(void)
+ 
+ 	/* pre-create number of devices given by config or max_loop */
+ 	mutex_lock(&loop_index_mutex);
+-	for (i = 0; i < nr; i++)
+-		loop_add(&lo, i);
++	for (i = 0; i < nr; i++) {
++		err = loop_add(&lo, i);
++		if (err < 0) {
++			mutex_unlock(&loop_index_mutex);
++			goto err_blk;
++		}
++	}
+ 	mutex_unlock(&loop_index_mutex);
+ 
+ 	printk(KERN_INFO "loop: module loaded\n");
+ 	return 0;
+ 
++err_blk:
++	idr_for_each(&loop_index_idr, &loop_exit_cb, NULL);
++	idr_destroy(&loop_index_idr);
++	blk_unregister_region(MKDEV(LOOP_MAJOR, 0), range);
++	unregister_blkdev(LOOP_MAJOR, "loop");
+ misc_out:
+ 	misc_deregister(&loop_misc);
+ err_out:
+ 	return err;
+ }
+ 
+-static int loop_exit_cb(int id, void *ptr, void *data)
+-{
+-	struct loop_device *lo = ptr;
+-
+-	loop_remove(lo);
+-	return 0;
+-}
+-
+ static void __exit loop_exit(void)
+ {
+ 	unsigned long range;
 -- 
-2.7.4
+2.14.2
