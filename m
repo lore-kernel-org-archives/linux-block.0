@@ -19,11 +19,11 @@ Cc: johan@kernel.org,
 	hch@infradead.org,
 	idryomov@gmail.com,
 	kernel-team@lge.com
-Subject: [PATCH v5 4/9] locking/lockdep: Add a boot parameter allowing unwind in cross-release and disable it by default
-Date: Wed, 25 Oct 2017 17:56:00 +0900
-Message-Id: <1508921765-15396-5-git-send-email-byungchul.park@lge.com>
-In-Reply-To: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
-References: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
+Subject: [PATCH v4 2/7] locking/lockdep: Add a boot parameter allowing unwind in cross-release and disable it by default
+Date: Wed, 25 Oct 2017 14:11:07 +0900
+Message-Id: <1508908272-15757-3-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <1508908272-15757-1-git-send-email-byungchul.park@lge.com>
+References: <1508908272-15757-1-git-send-email-byungchul.park@lge.com>
 List-ID: <linux-block@vger.kernel.org>
 
 Johan Hovold reported a heavy performance regression caused by lockdep
@@ -82,8 +82,6 @@ I.e. lockdep cross-release performance is now indistinguishable from
 vanilla lockdep.
 
 Reported-by: Johan Hovold <johan@kernel.org>
-Bisected-by: Johan Hovold <johan@kernel.org>
-Analyzed-by: Thomas Gleixner <tglx@linutronix.de>
 Suggested-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Byungchul Park <byungchul.park@lge.com>
 ---
