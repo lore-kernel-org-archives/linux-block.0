@@ -1,99 +1,84 @@
-Return-Path: <elena.reshetova@intel.com>
-From: Elena Reshetova <elena.reshetova@intel.com>
-To: axboe@kernel.dk
-Cc: james.bottomley@hansenpartnership.com,
+Return-Path: <byungchul.park@lge.com>
+From: Byungchul Park <byungchul.park@lge.com>
+To: peterz@infradead.org,
+	mingo@kernel.org,
+	axboe@kernel.dk
+Cc: johan@kernel.org,
+	tglx@linutronix.de,
 	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	tj@kernel.org,
+	johannes.berg@intel.com,
+	oleg@redhat.com,
+	amir73il@gmail.com,
+	david@fromorbit.com,
+	darrick.wong@oracle.com,
+	linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	peterz@infradead.org,
-	gregkh@linuxfoundation.org,
-	fujita.tomonori@lab.ntt.co.jp,
-	mingo@redhat.com,
-	clm@fb.com,
-	jbacik@fb.com,
-	dsterba@suse.com,
-	keescook@chromium.org,
-	Elena Reshetova <elena.reshetova@intel.com>
-Subject: [PATCH 6/6] drivers, block: convert xen_blkif.refcnt from atomic_t to refcount_t
-Date: Fri, 20 Oct 2017 11:16:02 +0300
-Message-Id: <1508487362-26663-7-git-send-email-elena.reshetova@intel.com>
-In-Reply-To: <1508487362-26663-1-git-send-email-elena.reshetova@intel.com>
-References: <1508487362-26663-1-git-send-email-elena.reshetova@intel.com>
+	hch@infradead.org,
+	idryomov@gmail.com,
+	kernel-team@lge.com,
+	Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v5 1/9] block: use DECLARE_COMPLETION_ONSTACK in submit_bio_wait
+Date: Wed, 25 Oct 2017 17:55:57 +0900
+Message-Id: <1508921765-15396-2-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
+References: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
 List-ID: <linux-block@vger.kernel.org>
 
-atomic_t variables are currently used to implement reference
-counters with the following properties:
- - counter is initialized to 1 using atomic_set()
- - a resource is freed upon counter reaching zero
- - once counter reaches zero, its further
-   increments aren't allowed
- - counter schema uses basic atomic operations
-   (set, inc, inc_not_zero, dec_and_test, etc.)
+From: Christoph Hellwig <hch@lst.de>
 
-Such atomic variables should be converted to a newly provided
-refcount_t type and API that prevents accidental counter overflows
-and underflows. This is important since overflows and underflows
-can lead to use-after-free situation and be exploitable.
+Simplify the code by getting rid of the submit_bio_ret structure.
 
-The variable xen_blkif.refcnt is used as pure reference counter.
-Convert it to refcount_t and fix up the operations.
-
-Suggested-by: Kees Cook <keescook@chromium.org>
-Reviewed-by: David Windsor <dwindsor@gmail.com>
-Reviewed-by: Hans Liljestrand <ishkamiel@gmail.com>
-Signed-off-by: Elena Reshetova <elena.reshetova@intel.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/xen-blkback/common.h | 7 ++++---
- drivers/block/xen-blkback/xenbus.c | 2 +-
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ block/bio.c | 19 +++++--------------
+ 1 file changed, 5 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkback/common.h
-index ecb35fe..0c3320d 100644
---- a/drivers/block/xen-blkback/common.h
-+++ b/drivers/block/xen-blkback/common.h
-@@ -35,6 +35,7 @@
- #include <linux/wait.h>
- #include <linux/io.h>
- #include <linux/rbtree.h>
-+#include <linux/refcount.h>
- #include <asm/setup.h>
- #include <asm/pgalloc.h>
- #include <asm/hypervisor.h>
-@@ -319,7 +320,7 @@ struct xen_blkif {
- 	struct xen_vbd		vbd;
- 	/* Back pointer to the backend_info. */
- 	struct backend_info	*be;
--	atomic_t		refcnt;
-+	refcount_t		refcnt;
- 	/* for barrier (drain) requests */
- 	struct completion	drain_complete;
- 	atomic_t		drain;
-@@ -372,10 +373,10 @@ struct pending_req {
- 			 (_v)->bdev->bd_part->nr_sects : \
- 			  get_capacity((_v)->bdev->bd_disk))
+diff --git a/block/bio.c b/block/bio.c
+index 5f5472e..99d0ca5 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -917,17 +917,9 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ }
+ EXPORT_SYMBOL_GPL(bio_iov_iter_get_pages);
  
--#define xen_blkif_get(_b) (atomic_inc(&(_b)->refcnt))
-+#define xen_blkif_get(_b) (refcount_inc(&(_b)->refcnt))
- #define xen_blkif_put(_b)				\
- 	do {						\
--		if (atomic_dec_and_test(&(_b)->refcnt))	\
-+		if (refcount_dec_and_test(&(_b)->refcnt))	\
- 			schedule_work(&(_b)->free_work);\
- 	} while (0)
+-struct submit_bio_ret {
+-	struct completion event;
+-	int error;
+-};
+-
+ static void submit_bio_wait_endio(struct bio *bio)
+ {
+-	struct submit_bio_ret *ret = bio->bi_private;
+-
+-	ret->error = blk_status_to_errno(bio->bi_status);
+-	complete(&ret->event);
++	complete(bio->bi_private);
+ }
  
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index 21c1be1..5955b61 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -176,7 +176,7 @@ static struct xen_blkif *xen_blkif_alloc(domid_t domid)
- 		return ERR_PTR(-ENOMEM);
+ /**
+@@ -943,16 +935,15 @@ static void submit_bio_wait_endio(struct bio *bio)
+  */
+ int submit_bio_wait(struct bio *bio)
+ {
+-	struct submit_bio_ret ret;
++	DECLARE_COMPLETION_ONSTACK(done);
  
- 	blkif->domid = domid;
--	atomic_set(&blkif->refcnt, 1);
-+	refcount_set(&blkif->refcnt, 1);
- 	init_completion(&blkif->drain_complete);
- 	INIT_WORK(&blkif->free_work, xen_blkif_deferred_free);
+-	init_completion(&ret.event);
+-	bio->bi_private = &ret;
++	bio->bi_private = &done;
+ 	bio->bi_end_io = submit_bio_wait_endio;
+ 	bio->bi_opf |= REQ_SYNC;
+ 	submit_bio(bio);
+-	wait_for_completion_io(&ret.event);
++	wait_for_completion_io(&done);
+ 
+-	return ret.error;
++	return blk_status_to_errno(bio->bi_status);
+ }
+ EXPORT_SYMBOL(submit_bio_wait);
  
 -- 
-2.7.4
+1.9.1
