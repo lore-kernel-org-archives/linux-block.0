@@ -1,90 +1,60 @@
-Return-Path: <prvs=4411c008b=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	=Oleksandr Natalenko <oleksandr@natalenko.name>,
-	"Luis R . Rodriguez" <mcgrof@kernel.org>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v5 0/8] block, scsi, md: Improve suspend and resume
-Date: Mon,  2 Oct 2017 15:52:10 -0700
-Message-Id: <20171002225218.18548-1-bart.vanassche@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 1/3] elevator: lookup mq vs non-mq elevators
+To: Omar Sandoval <osandov@osandov.com>
+Cc: linux-block@vger.kernel.org
+References: <1508954687-3204-1-git-send-email-axboe@kernel.dk>
+ <1508954687-3204-2-git-send-email-axboe@kernel.dk>
+ <20171025182708.GA9160@vader>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <48fd922c-d675-cd6f-bcec-c2e83879f130@kernel.dk>
+Date: Wed, 25 Oct 2017 11:31:59 -0700
+MIME-Version: 1.0
+In-Reply-To: <20171025182708.GA9160@vader>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hello Jens,
+On 10/25/2017 11:27 AM, Omar Sandoval wrote:
+> On Wed, Oct 25, 2017 at 12:04:45PM -0600, Jens Axboe wrote:
+>> If an IO scheduler is selected via elevator= and it doesn't match
+>> the driver in question wrt blk-mq support, then we fail to boot.
+>>
+>> The elevator= parameter is deprecated and only supported for
+>> non-mq devices. Augment the elevator lookup API so that we
+>> pass in if we're looking for an mq capable scheduler or not,
+>> so that we only ever return a valid type for the queue in
+>> question.
+>>
+>> Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=196695
+>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>> ---
+>>  block/elevator.c | 44 +++++++++++++++++++++-----------------------
+>>  1 file changed, 21 insertions(+), 23 deletions(-)
+>>
+>> diff --git a/block/elevator.c b/block/elevator.c
+>> index 7ae50eb2732b..b70e69f795db 100644
+>> --- a/block/elevator.c
+>> +++ b/block/elevator.c
+>> @@ -83,12 +83,15 @@ bool elv_bio_merge_ok(struct request *rq, struct bio *bio)
+>>  }
+>>  EXPORT_SYMBOL(elv_bio_merge_ok);
+>>  
+>> -static struct elevator_type *elevator_find(const char *name)
+>> +/*
+>> + * Return scheduler with name 'name' and with matching 'mq capability
+>> + */
+>> +static struct elevator_type *elevator_find(const char *name, bool mq)
+>>  {
+>>  	struct elevator_type *e;
+>>  
+>>  	list_for_each_entry(e, &elv_list, list) {
+>> -		if (!strcmp(e->elevator_name, name))
+>> +		if (!strcmp(e->elevator_name, name) && !(mq ^ e->uses_mq))
+> 
+> 
+> How about just (mq == e->uses_mq)?
 
-It is known that during the resume following a hibernate, especially when
-using an md RAID1 array created on top of SCSI devices, sometimes the
-system hangs instead of coming up properly. This patch series fixes this
-problem. This patch series is an alternative for Ming Lei's "block/scsi:
-safe SCSI quiescing" patch series. The advantages of this patch series are
-that a fix for the md driver is included, that no third argument has been
-added to blk_get_request() and that there is no race between
-blk_get_request() and SCSI quiescing.
-
-These patches have been tested on top of a merge of the block layer
-for-next branch and Linus' master tree. Linus' master tree includes
-patch "KVM: x86: Fix the NULL pointer parameter in check_cr_write()"
-but the block layer for-next branch not yet.
-
-Please consider these changes for kernel v4.15.
-
-Thanks,
-
-Bart.
-
-Changes between v4 and v5:
-- Split blk_set_preempt_only() into two functions as requested by Christoph.
-- Made blk_get_request() trigger WARN_ONCE() if it is attempted to allocate
-  a request while the system is frozen. This is a big help to identify drivers
-  that submit I/O while the system is frozen.
-- Since kernel thread freezing is on its way out, reworked the approach for
-  avoiding that the md driver submits I/O while the system is frozen such that
-  the approach no longer depends on the kernel thread freeze mechanism.
-- Fixed the (theoretical) deadlock in scsi_device_quiesce() that was identified
-  by Ming.
-
-Changes between v3 and v4:
-- Made sure that this patch series not only works for scsi-mq but also for
-  the legacy SCSI stack.
-- Removed an smp_rmb()/smp_wmb() pair from the hot path and added a comment
-  that explains why that is safe.
-- Reordered the patches in this patch series.
-
-Changes between v2 and v3:
-- Made md kernel threads freezable.
-- Changed the approach for quiescing SCSI devices again.
-- Addressed Ming's review comments.
-
-Changes compared to v1 of this patch series:
-- Changed the approach and rewrote the patch series.
-
-Bart Van Assche (7):
-  md: Introduce md_stop_all_writes()
-  md: Neither resync nor reshape while the system is frozen
-  block: Convert RQF_PREEMPT into REQ_PREEMPT
-  block: Add the QUEUE_FLAG_PREEMPT_ONLY request queue flag
-  scsi: Reduce suspend latency
-  scsi: Set QUEUE_FLAG_PREEMPT_ONLY while quiesced
-  block: Make SCSI device suspend and resume work reliably
-
-Ming Lei (1):
-  block: Make q_usage_counter also track legacy requests
-
- block/blk-core.c          | 67 ++++++++++++++++++++++++++++++++++++++++++-----
- block/blk-mq-debugfs.c    |  2 +-
- block/blk-mq.c            | 14 +++-------
- block/blk-timeout.c       |  2 +-
- drivers/ide/ide-atapi.c   |  3 +--
- drivers/ide/ide-io.c      |  2 +-
- drivers/ide/ide-pm.c      |  4 +--
- drivers/md/md.c           | 52 +++++++++++++++++++++++++++++++-----
- drivers/scsi/scsi_lib.c   | 43 ++++++++++++++++++++----------
- fs/block_dev.c            |  4 +--
- include/linux/blk_types.h |  6 +++++
- include/linux/blkdev.h    | 11 +++++---
- 12 files changed, 160 insertions(+), 50 deletions(-)
+That is simpler/cleaner, I'll make that adjustment. Not sure where the XOR
+temptation came from.
 
 -- 
-2.14.1
+Jens Axboe
