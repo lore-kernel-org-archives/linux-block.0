@@ -1,81 +1,54 @@
-Return-Path: <byungchul.park@lge.com>
-From: Byungchul Park <byungchul.park@lge.com>
-To: peterz@infradead.org,
-	mingo@kernel.org,
-	axboe@kernel.dk
-Cc: johan@kernel.org,
-	tglx@linutronix.de,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	tj@kernel.org,
-	johannes.berg@intel.com,
-	oleg@redhat.com,
-	amir73il@gmail.com,
-	david@fromorbit.com,
-	darrick.wong@oracle.com,
-	linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	hch@infradead.org,
-	idryomov@gmail.com,
-	kernel-team@lge.com
-Subject: [PATCH v4 0/7] cross-release: Enhence performance and fix false positives
-Date: Wed, 25 Oct 2017 14:11:05 +0900
-Message-Id: <1508908272-15757-1-git-send-email-byungchul.park@lge.com>
+Return-Path: <mingo.kernel.org@gmail.com>
+Return-Path: <mingo.kernel.org@gmail.com>
+Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
+Date: Wed, 25 Oct 2017 08:35:12 +0200
+From: Ingo Molnar <mingo@kernel.org>
+To: Byungchul Park <byungchul.park@lge.com>
+Cc: peterz@infradead.org, axboe@kernel.dk, johan@kernel.org,
+	tglx@linutronix.de, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, tj@kernel.org, johannes.berg@intel.com,
+	oleg@redhat.com, amir73il@gmail.com, david@fromorbit.com,
+	darrick.wong@oracle.com, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	hch@infradead.org, idryomov@gmail.com, kernel-team@lge.com
+Subject: Re: [PATCH v4 6/7] workqueue: Remove unnecessary acquisitions wrt
+ workqueue flush
+Message-ID: <20171025063512.qvdwo4q7hakeiwqf@gmail.com>
+References: <1508908272-15757-1-git-send-email-byungchul.park@lge.com>
+ <1508908272-15757-7-git-send-email-byungchul.park@lge.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1508908272-15757-7-git-send-email-byungchul.park@lge.com>
 List-ID: <linux-block@vger.kernel.org>
 
-There are two things I didn't apply as Ingo suggested, since I didn't
-understand his intention exactly:
 
-   1. Adding 'Analyzed-by' tag at the 2nd patch
-   2. Using a inline function instead #define at the 7th patch
+* Byungchul Park <byungchul.park@lge.com> wrote:
 
-Let me know if the above should still be applied.
+> The workqueue added manual acquisitions to catch deadlock cases.
+> Now crossrelease was introduced, some of those are redundant, since
+> wait_for_completion() already includes the acquisition for itself.
+> Removed it.
+> 
+> Signed-off-by: Byungchul Park <byungchul.park@lge.com>
+> ---
+>  include/linux/workqueue.h |  4 ++--
+>  kernel/workqueue.c        | 19 +++----------------
+>  2 files changed, 5 insertions(+), 18 deletions(-)
+> 
+> diff --git a/include/linux/workqueue.h b/include/linux/workqueue.h
+> index f3c47a0..1455b5e 100644
+> --- a/include/linux/workqueue.h
+> +++ b/include/linux/workqueue.h
+> @@ -218,7 +218,7 @@ static inline void destroy_delayed_work_on_stack(struct delayed_work *work) { }
+>  									\
+>  		__init_work((_work), _onstack);				\
+>  		(_work)->data = (atomic_long_t) WORK_DATA_INIT();	\
+> -		lockdep_init_map(&(_work)->lockdep_map, #_work, &__key, 0); \
+> +		lockdep_init_map(&(_work)->lockdep_map, "(complete)"#_work, &__key, 0); \
 
-Changes from v3
-- Exclude a patch removing white space
-- Enhance commit messages as Ingo suggested
-- Re-design patches adding a boot param and a Kconfig allowing unwind
-- Simplify a patch assigning lock classes to genhds as Ingo suggested
-- Add proper tags in commit messages e.g. reported-by and analyzed-by
+This has a similar naming problem as the block bits: should be "wq_completion" or 
+such.
 
-Changes from v2
-- Combine 2 serises, fixing false positives and enhance performance
-- Add Christoph Hellwig's patch simplifying submit_bio_wait() code
-- Add 2 more 'init with lockdep map' macros for completionm
-- Rename init_completion_with_map() to init_completion_map()
+Thanks,
 
-Changes from v1
-- Fix kconfig description as Ingo suggested
-- Fix commit message writing out CONFIG_ variable
-- Introduce a new kernel parameter, crossrelease_fullstack
-- Replace the number with the output of *perf*
-- Separate a patch removing white space
-
-Byungchul Park (6):
-  locking/lockdep: Add a boot parameter allowing unwind in cross-release
-    and disable it by default
-  locking/lockdep: Remove the BROKEN flag from
-    CONFIG_LOCKDEP_CROSSRELEASE and CONFIG_LOCKDEP_COMPLETIONS
-  locking/lockdep: Introduce
-    CONFIG_BOOTPARAM_LOCKDEP_CROSSRELEASE_FULLSTACK
-  completion: Add support for initializing completion with lockdep_map
-  workqueue: Remove unnecessary acquisitions wrt workqueue flush
-  block: Assign a lock_class per gendisk used for wait_for_completion()
-
-Christoph Hellwig (1):
-  block: use DECLARE_COMPLETION_ONSTACK in submit_bio_wait
-
- Documentation/admin-guide/kernel-parameters.txt |  3 +++
- block/bio.c                                     | 19 +++++--------------
- block/genhd.c                                   | 10 ++--------
- include/linux/completion.h                      | 14 ++++++++++++++
- include/linux/genhd.h                           | 24 ++++++++++++++++++++++--
- include/linux/workqueue.h                       |  4 ++--
- kernel/locking/lockdep.c                        | 23 +++++++++++++++++++++--
- kernel/workqueue.c                              | 19 +++----------------
- lib/Kconfig.debug                               | 19 +++++++++++++++++--
- 9 files changed, 89 insertions(+), 46 deletions(-)
-
--- 
-1.9.1
+	Ingo
