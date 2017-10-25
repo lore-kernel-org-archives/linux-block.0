@@ -1,41 +1,40 @@
-Return-Path: <prvs=464e5a0c2=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"dann.frazier@canonical.com" <dann.frazier@canonical.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH v2] virtio_blk: Fix an SG_IO regression
-Date: Wed, 25 Oct 2017 19:25:58 +0000
-Message-ID: <1508959556.5073.1.camel@wdc.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ Dann Frazier <dann.frazier@canonical.com>, stable@vger.kernel.org
 References: <20171025095617.7315-1-bart.vanassche@wdc.com>
-	 <11a35a46-dc51-c32f-cb64-793d9dd02c53@kernel.dk>
-In-Reply-To: <11a35a46-dc51-c32f-cb64-793d9dd02c53@kernel.dk>
-Content-Type: text/plain; charset="utf-8"
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <11a35a46-dc51-c32f-cb64-793d9dd02c53@kernel.dk>
+Date: Wed, 25 Oct 2017 11:23:28 -0700
 MIME-Version: 1.0
+In-Reply-To: <20171025095617.7315-1-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-T24gV2VkLCAyMDE3LTEwLTI1IGF0IDExOjIzIC0wNzAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
-biAxMC8yNS8yMDE3IDAyOjU2IEFNLCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6DQo+ID4gQXZvaWQg
-dGhhdCBzdWJtaXR0aW5nIGFuIFNHX0lPIGlvY3RsIHRyaWdnZXJzIGEga2VybmVsIG9vcHMgdGhh
-dA0KPiA+IGlzIHByZWNlZGVkIGJ5Og0KPiA+IA0KPiA+IHVzZXJjb3B5OiBrZXJuZWwgbWVtb3J5
-IG92ZXJ3cml0ZSBhdHRlbXB0IGRldGVjdGVkIHRvIChudWxsKSAoPG51bGw+KSAoNiBieXRlcykN
-Cj4gPiBrZXJuZWwgQlVHIGF0IG1tL3VzZXJjb3B5LmM6NzIhDQo+IA0KPiBTZWVtcyBJIHNhdyBh
-IG5vdGUgb24gYSBydW50aW1lIG9vcHMgdHJpZ2dlcmVkIGJ5IHRoaXMgcGF0Y2ggeWVzdGVyZGF5
-LA0KPiBidXQgbm93IEkgY2FuJ3Qgc2VlbSB0byBmaW5kIGl0Li4uIERpZCB5b3Ugc2VlIGl0Pw0K
-DQpEbyB5b3UgcGVyaGFwcyB3YW50IG1lIHRvIGFkZCB0aGUgc3RhY2sgdHJhY2UgZnJvbSB0aGUg
-Zm9sbG93aW5nIGUtbWFpbCB0bw0KdGhlIHBhdGNoIGRlc2NyaXB0aW9uOiBodHRwczovL21hcmMu
-aW5mby8/bD1saW51eC1hcm0ta2VybmVsJm09MTUwODU0MDEwMzIxODMzID8NCg0KPiA+IGRpZmYg
-LS1naXQgYS9kcml2ZXJzL2Jsb2NrL0tjb25maWcgYi9kcml2ZXJzL2Jsb2NrL0tjb25maWcNCj4g
-PiBpbmRleCA0YTQzOGI4YWJlMjcuLmIwYjIxMDA3NjNiZiAxMDA2NDQNCj4gPiAtLS0gYS9kcml2
-ZXJzL2Jsb2NrL0tjb25maWcNCj4gPiArKysgYi9kcml2ZXJzL2Jsb2NrL0tjb25maWcNCj4gPiBA
-QCAtNDUwLDYgKzQ1MCw3IEBAIGNvbmZpZyBWSVJUSU9fQkxLX1NDU0kNCj4gPiAgCWJvb2wgIlND
-U0kgcGFzc3Rocm91Z2ggcmVxdWVzdCBmb3IgdGhlIFZpcnRpbyBibG9jayBkcml2ZXIiDQo+ID4g
-IAlkZXBlbmRzIG9uIFZJUlRJT19CTEsNCj4gPiAgCXNlbGVjdCBCTEtfU0NTSV9SRVFVRVNUDQo+
-ID4gKwlzZWxlY3QgU0NTSV9NT0QNCj4gDQo+IFNob3VsZCB0aGlzIGJlIFNDU0k/IFRoYXQncyB3
-aGF0IGxpYmF0YSBkb2VzLiBJdCBtYXkgYmUgY29ycmVjdCBhcy1pcywNCj4gZGlkbid0IGxvb2sg
-dG9vIGRlZXBseSwganVzdCBjdXJpb3VzIHdoeSBpdCdzIGRpZmZlcmVudC4NCg0KVGhhdCBpcyB3
-aGF0IEkgY2FtZSB1cCB3aXRoIGFmdGVyIGhhdmluZyBoYWQgYSBsb29rIGF0IGRyaXZlcnMvc2Nz
-aS9NYWtlZmlsZS4NCkJ1dCBhZnRlciBoYXZpbmcgY2hlY2tlZCBkcml2ZXJzL3Njc2kvS2NvbmZp
-ZyBJIHRoaW5rIHdlIGluZGVlZCBuZWVkIHRvIHNlbGVjdA0KU0NTSSBpbnN0ZWFkIG9mIFNDU0lf
-TU9ELg0KDQpCYXJ0Lg==
+On 10/25/2017 02:56 AM, Bart Van Assche wrote:
+> Avoid that submitting an SG_IO ioctl triggers a kernel oops that
+> is preceded by:
+> 
+> usercopy: kernel memory overwrite attempt detected to (null) (<null>) (6 bytes)
+> kernel BUG at mm/usercopy.c:72!
+
+Seems I saw a note on a runtime oops triggered by this patch yesterday,
+but now I can't seem to find it... Did you see it?
+
+> diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+> index 4a438b8abe27..b0b2100763bf 100644
+> --- a/drivers/block/Kconfig
+> +++ b/drivers/block/Kconfig
+> @@ -450,6 +450,7 @@ config VIRTIO_BLK_SCSI
+>  	bool "SCSI passthrough request for the Virtio block driver"
+>  	depends on VIRTIO_BLK
+>  	select BLK_SCSI_REQUEST
+> +	select SCSI_MOD
+
+Should this be SCSI? That's what libata does. It may be correct as-is,
+didn't look too deeply, just curious why it's different.
+
+-- 
+Jens Axboe
