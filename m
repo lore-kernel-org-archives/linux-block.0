@@ -1,332 +1,57 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:48996 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1758234AbdJMMrk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 08:47:40 -0400
-Received: by mail-wm0-f68.google.com with SMTP id i124so21105217wmf.3
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:39 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 34/58] lightnvm: pblk: guarantee line integrity on reads
-Date: Fri, 13 Oct 2017 14:46:23 +0200
-Message-Id: <20171013124647.32668-35-m@bjorling.me>
-In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
-References: <20171013124647.32668-1-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <byungchul.park@lge.com>
+From: Byungchul Park <byungchul.park@lge.com>
+To: peterz@infradead.org,
+	mingo@kernel.org,
+	axboe@kernel.dk
+Cc: johan@kernel.org,
+	tglx@linutronix.de,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	tj@kernel.org,
+	johannes.berg@intel.com,
+	oleg@redhat.com,
+	amir73il@gmail.com,
+	david@fromorbit.com,
+	darrick.wong@oracle.com,
+	linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	hch@infradead.org,
+	idryomov@gmail.com,
+	kernel-team@lge.com
+Subject: [PATCH v5 2/9] locking/lockdep: Provide empty lockdep_map structure for !CONFIG_LOCKDEP
+Date: Wed, 25 Oct 2017 17:55:58 +0900
+Message-Id: <1508921765-15396-3-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
+References: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <javier@cnexlabs.com>
+By this patch, the lockdep_map structure takes no space if lockdep is
+disabled, making a debug facility's impact on unreleated kernel less.
 
-When a line is recycled during garbage collection, reads can still be
-issued to the line. If the line is freed in the middle of this process,
-data corruption might occur.
+Thanks to this, we don't need #ifdef to sparate code due to the
+lockdep_map structure.
 
-This patch guarantees that lines are not freed in the middle of reads
-that target them (lines). Specifically, we use the existing line
-reference to decide when a line is eligible for being freed after the
-recycle process.
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Signed-off-by: Byungchul Park <byungchul.park@lge.com>
 ---
- drivers/lightnvm/pblk-core.c | 56 ++++++++++++++++++++++++++++++----
- drivers/lightnvm/pblk-init.c | 14 +++++++--
- drivers/lightnvm/pblk-read.c | 71 +++++++++++++++++++++++++++++++++-----------
- drivers/lightnvm/pblk.h      |  2 ++
- 4 files changed, 118 insertions(+), 25 deletions(-)
+ include/linux/lockdep.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 08d166a..0a41fb9 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -1460,10 +1460,8 @@ void pblk_line_free(struct pblk *pblk, struct pblk_line *line)
- 	line->emeta = NULL;
- }
+diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
+index bfa8e0b..b6662d0 100644
+--- a/include/linux/lockdep.h
++++ b/include/linux/lockdep.h
+@@ -527,6 +527,11 @@ static inline void lockdep_on(void)
+  */
+ struct lock_class_key { };
  
--void pblk_line_put(struct kref *ref)
-+static void __pblk_line_put(struct pblk *pblk, struct pblk_line *line)
- {
--	struct pblk_line *line = container_of(ref, struct pblk_line, ref);
--	struct pblk *pblk = line->pblk;
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
- 
- 	spin_lock(&line->lock);
-@@ -1481,6 +1479,43 @@ void pblk_line_put(struct kref *ref)
- 	pblk_rl_free_lines_inc(&pblk->rl, line);
- }
- 
-+static void pblk_line_put_ws(struct work_struct *work)
-+{
-+	struct pblk_line_ws *line_put_ws = container_of(work,
-+						struct pblk_line_ws, ws);
-+	struct pblk *pblk = line_put_ws->pblk;
-+	struct pblk_line *line = line_put_ws->line;
++/*
++ * The lockdep_map takes no space if lockdep is disabled:
++ */
++struct lockdep_map { };
 +
-+	__pblk_line_put(pblk, line);
-+	mempool_free(line_put_ws, pblk->gen_ws_pool);
-+}
-+
-+void pblk_line_put(struct kref *ref)
-+{
-+	struct pblk_line *line = container_of(ref, struct pblk_line, ref);
-+	struct pblk *pblk = line->pblk;
-+
-+	__pblk_line_put(pblk, line);
-+}
-+
-+void pblk_line_put_wq(struct kref *ref)
-+{
-+	struct pblk_line *line = container_of(ref, struct pblk_line, ref);
-+	struct pblk *pblk = line->pblk;
-+	struct pblk_line_ws *line_put_ws;
-+
-+	line_put_ws = mempool_alloc(pblk->gen_ws_pool, GFP_ATOMIC);
-+	if (!line_put_ws)
-+		return;
-+
-+	line_put_ws->pblk = pblk;
-+	line_put_ws->line = line;
-+	line_put_ws->priv = NULL;
-+
-+	INIT_WORK(&line_put_ws->ws, pblk_line_put_ws);
-+	queue_work(pblk->r_end_wq, &line_put_ws->ws);
-+}
-+
- int pblk_blk_erase_async(struct pblk *pblk, struct ppa_addr ppa)
- {
- 	struct nvm_rq *rqd;
-@@ -1878,8 +1913,19 @@ void pblk_lookup_l2p_seq(struct pblk *pblk, struct ppa_addr *ppas,
- 	int i;
+ #define lockdep_depth(tsk)	(0)
  
- 	spin_lock(&pblk->trans_lock);
--	for (i = 0; i < nr_secs; i++)
--		ppas[i] = pblk_trans_map_get(pblk, blba + i);
-+	for (i = 0; i < nr_secs; i++) {
-+		struct ppa_addr ppa;
-+
-+		ppa = ppas[i] = pblk_trans_map_get(pblk, blba + i);
-+
-+		/* If the L2P entry maps to a line, the reference is valid */
-+		if (!pblk_ppa_empty(ppa) && !pblk_addr_in_cache(ppa)) {
-+			int line_id = pblk_dev_ppa_to_line(ppa);
-+			struct pblk_line *line = &pblk->lines[line_id];
-+
-+			kref_get(&line->ref);
-+		}
-+	}
- 	spin_unlock(&pblk->trans_lock);
- }
- 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 4d71978..3452764 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -271,15 +271,22 @@ static int pblk_core_init(struct pblk *pblk)
- 	if (!pblk->bb_wq)
- 		goto free_close_wq;
- 
-+	pblk->r_end_wq = alloc_workqueue("pblk-read-end-wq",
-+			WQ_MEM_RECLAIM | WQ_UNBOUND, 0);
-+	if (!pblk->r_end_wq)
-+		goto free_bb_wq;
-+
- 	if (pblk_set_ppaf(pblk))
--		goto free_bb_wq;
-+		goto free_r_end_wq;
- 
- 	if (pblk_rwb_init(pblk))
--		goto free_bb_wq;
-+		goto free_r_end_wq;
- 
- 	INIT_LIST_HEAD(&pblk->compl_list);
- 	return 0;
- 
-+free_r_end_wq:
-+	destroy_workqueue(pblk->r_end_wq);
- free_bb_wq:
- 	destroy_workqueue(pblk->bb_wq);
- free_close_wq:
-@@ -304,6 +311,9 @@ static void pblk_core_free(struct pblk *pblk)
- 	if (pblk->close_wq)
- 		destroy_workqueue(pblk->close_wq);
- 
-+	if (pblk->r_end_wq)
-+		destroy_workqueue(pblk->r_end_wq);
-+
- 	if (pblk->bb_wq)
- 		destroy_workqueue(pblk->bb_wq);
- 
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index a465d99..402f8ef 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -130,9 +130,34 @@ static void pblk_read_check(struct pblk *pblk, struct nvm_rq *rqd,
- 	}
- }
- 
--static void pblk_end_io_read(struct nvm_rq *rqd)
-+static void pblk_read_put_rqd_kref(struct pblk *pblk, struct nvm_rq *rqd)
-+{
-+	struct ppa_addr *ppa_list;
-+	int i;
-+
-+	ppa_list = (rqd->nr_ppas > 1) ? rqd->ppa_list : &rqd->ppa_addr;
-+
-+	for (i = 0; i < rqd->nr_ppas; i++) {
-+		struct ppa_addr ppa = ppa_list[i];
-+		struct pblk_line *line;
-+
-+		line = &pblk->lines[pblk_dev_ppa_to_line(ppa)];
-+		kref_put(&line->ref, pblk_line_put_wq);
-+	}
-+}
-+
-+static void pblk_end_user_read(struct bio *bio)
-+{
-+#ifdef CONFIG_NVM_DEBUG
-+	WARN_ONCE(bio->bi_status, "pblk: corrupted read bio\n");
-+#endif
-+	bio_endio(bio);
-+	bio_put(bio);
-+}
-+
-+static void __pblk_end_io_read(struct pblk *pblk, struct nvm_rq *rqd,
-+			       bool put_line)
- {
--	struct pblk *pblk = rqd->private;
- 	struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
- 	struct bio *bio = rqd->bio;
- 
-@@ -146,15 +171,11 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
- 	pblk_read_check(pblk, rqd, r_ctx->lba);
- 
- 	bio_put(bio);
--	if (r_ctx->private) {
--		struct bio *orig_bio = r_ctx->private;
-+	if (r_ctx->private)
-+		pblk_end_user_read((struct bio *)r_ctx->private);
- 
--#ifdef CONFIG_NVM_DEBUG
--		WARN_ONCE(orig_bio->bi_status, "pblk: corrupted read bio\n");
--#endif
--		bio_endio(orig_bio);
--		bio_put(orig_bio);
--	}
-+	if (put_line)
-+		pblk_read_put_rqd_kref(pblk, rqd);
- 
- #ifdef CONFIG_NVM_DEBUG
- 	atomic_long_add(rqd->nr_ppas, &pblk->sync_reads);
-@@ -165,6 +186,13 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
- 	atomic_dec(&pblk->inflight_io);
- }
- 
-+static void pblk_end_io_read(struct nvm_rq *rqd)
-+{
-+	struct pblk *pblk = rqd->private;
-+
-+	__pblk_end_io_read(pblk, rqd, true);
-+}
-+
- static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 				      unsigned int bio_init_idx,
- 				      unsigned long *read_bitmap)
-@@ -233,8 +261,12 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 	}
- 
- 	if (unlikely(nr_secs > 1 && nr_holes == 1)) {
-+		struct ppa_addr ppa;
-+
-+		ppa = rqd->ppa_addr;
- 		rqd->ppa_list = ppa_ptr;
- 		rqd->dma_ppa_list = dma_ppa_list;
-+		rqd->ppa_list[0] = ppa;
- 	}
- 
- 	for (i = 0; i < nr_secs; i++) {
-@@ -246,6 +278,11 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 	i = 0;
- 	hole = find_first_zero_bit(read_bitmap, nr_secs);
- 	do {
-+		int line_id = pblk_dev_ppa_to_line(rqd->ppa_list[i]);
-+		struct pblk_line *line = &pblk->lines[line_id];
-+
-+		kref_put(&line->ref, pblk_line_put);
-+
- 		meta_list[hole].lba = lba_list_media[i];
- 
- 		src_bv = new_bio->bi_io_vec[i++];
-@@ -269,19 +306,17 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 	bio_put(new_bio);
- 
- 	/* Complete the original bio and associated request */
-+	bio_endio(bio);
- 	rqd->bio = bio;
- 	rqd->nr_ppas = nr_secs;
--	rqd->private = pblk;
- 
--	bio_endio(bio);
--	pblk_end_io_read(rqd);
-+	__pblk_end_io_read(pblk, rqd, false);
- 	return NVM_IO_OK;
- 
- err:
- 	/* Free allocated pages in new bio */
- 	pblk_bio_free_pages(pblk, bio, 0, new_bio->bi_vcnt);
--	rqd->private = pblk;
--	pblk_end_io_read(rqd);
-+	__pblk_end_io_read(pblk, rqd, false);
- 	return NVM_IO_ERR;
- }
- 
-@@ -314,11 +349,11 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
- 			goto retry;
- 		}
- 
-+		WARN_ON(test_and_set_bit(0, read_bitmap));
- 		meta_list[0].lba = cpu_to_le64(lba);
- 
--		WARN_ON(test_and_set_bit(0, read_bitmap));
- #ifdef CONFIG_NVM_DEBUG
--			atomic_long_inc(&pblk->cache_reads);
-+		atomic_long_inc(&pblk->cache_reads);
- #endif
- 	} else {
- 		rqd->ppa_addr = ppa;
-@@ -383,7 +418,7 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
- 	if (bitmap_full(&read_bitmap, nr_secs)) {
- 		bio_endio(bio);
- 		atomic_inc(&pblk->inflight_io);
--		pblk_end_io_read(rqd);
-+		__pblk_end_io_read(pblk, rqd, false);
- 		return NVM_IO_OK;
- 	}
- 
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 4a51e6d..e470437 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -636,6 +636,7 @@ struct pblk {
- 
- 	struct workqueue_struct *close_wq;
- 	struct workqueue_struct *bb_wq;
-+	struct workqueue_struct *r_end_wq;
- 
- 	struct timer_list wtimer;
- 
-@@ -741,6 +742,7 @@ int pblk_line_read_emeta(struct pblk *pblk, struct pblk_line *line,
- 			 void *emeta_buf);
- int pblk_blk_erase_async(struct pblk *pblk, struct ppa_addr erase_ppa);
- void pblk_line_put(struct kref *ref);
-+void pblk_line_put_wq(struct kref *ref);
- struct list_head *pblk_line_gc_list(struct pblk *pblk, struct pblk_line *line);
- u64 pblk_lookup_page(struct pblk *pblk, struct pblk_line *line);
- void pblk_dealloc_page(struct pblk *pblk, struct pblk_line *line, int nr_secs);
+ #define lockdep_is_held_type(l, r)		(1)
 -- 
-2.9.3
+1.9.1
