@@ -19,11 +19,11 @@ Cc: johan@kernel.org,
 	hch@infradead.org,
 	idryomov@gmail.com,
 	kernel-team@lge.com
-Subject: [PATCH v5 6/9] locking/lockdep: Introduce CONFIG_BOOTPARAM_LOCKDEP_CROSSRELEASE_FULLSTACK
-Date: Wed, 25 Oct 2017 17:56:02 +0900
-Message-Id: <1508921765-15396-7-git-send-email-byungchul.park@lge.com>
-In-Reply-To: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
-References: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
+Subject: [PATCH v4 4/7] locking/lockdep: Introduce CONFIG_BOOTPARAM_LOCKDEP_CROSSRELEASE_FULLSTACK
+Date: Wed, 25 Oct 2017 14:11:09 +0900
+Message-Id: <1508908272-15757-5-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <1508908272-15757-1-git-send-email-byungchul.park@lge.com>
+References: <1508908272-15757-1-git-send-email-byungchul.park@lge.com>
 List-ID: <linux-block@vger.kernel.org>
 
 The boot parameter, crossrelease_fullstack, was introduced to control
