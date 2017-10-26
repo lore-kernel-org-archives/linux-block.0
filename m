@@ -1,53 +1,84 @@
-Return-Path: <zhangweiping@didichuxing.com>
-Date: Fri, 27 Oct 2017 01:36:14 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>, <jack@suse.cz>
-CC: <linux-block@vger.kernel.org>, <linux-mm@kvack.org>
-Subject: [PATCH 3/4] bdi: add error handle for bdi_debug_register
-Message-ID: <b28a35a3af256e2c64b905728b0e9df307e12b0b.1509038624.git.zhangweiping@didichuxing.com>
-References: <cover.1509038624.git.zhangweiping@didichuxing.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <cover.1509038624.git.zhangweiping@didichuxing.com>
-Return-Path: zhangweiping@didichuxing.com
+Return-Path: <linus.walleij@linaro.org>
+Return-Path: <linus.walleij@linaro.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+To: linux-mmc@vger.kernel.org,
+	Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+	Paolo Valente <paolo.valente@linaro.org>,
+	Avri Altman <Avri.Altman@sandisk.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH 05/12 v4] mmc: core: do away with is_new_req
+Date: Thu, 26 Oct 2017 14:57:50 +0200
+Message-Id: <20171026125757.10200-6-linus.walleij@linaro.org>
+In-Reply-To: <20171026125757.10200-1-linus.walleij@linaro.org>
+References: <20171026125757.10200-1-linus.walleij@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-In order to make error handle more cleaner we call bdi_debug_register
-before set state to WB_registered, that we can avoid call bdi_unregister
-in release_bdi().
+The host context member "is_new_req" is only assigned values,
+never checked. Delete it.
 
-Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- mm/backing-dev.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ drivers/mmc/core/core.c  | 1 -
+ drivers/mmc/core/queue.c | 5 -----
+ include/linux/mmc/host.h | 2 --
+ 3 files changed, 8 deletions(-)
 
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index e9d6a1ede12b..54396d53f471 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -893,10 +893,13 @@ int bdi_register_va(struct backing_dev_info *bdi, const char *fmt, va_list args)
- 	if (IS_ERR(dev))
- 		return PTR_ERR(dev);
- 
-+	if (bdi_debug_register(bdi, dev_name(dev))) {
-+		device_destroy(bdi_class, dev->devt);
-+		return -ENOMEM;
-+	}
- 	cgwb_bdi_register(bdi);
- 	bdi->dev = dev;
- 
--	bdi_debug_register(bdi, dev_name(dev));
- 	set_bit(WB_registered, &bdi->wb.state);
- 
- 	spin_lock_bh(&bdi_lock);
-@@ -916,6 +919,8 @@ int bdi_register(struct backing_dev_info *bdi, const char *fmt, ...)
- 	va_start(args, fmt);
- 	ret = bdi_register_va(bdi, fmt, args);
- 	va_end(args);
-+	if (ret)
-+		bdi_put(bdi);
- 	return ret;
+diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
+index 68125360a078..ad832317f25b 100644
+--- a/drivers/mmc/core/core.c
++++ b/drivers/mmc/core/core.c
+@@ -2997,7 +2997,6 @@ void mmc_unregister_pm_notifier(struct mmc_host *host)
+  */
+ void mmc_init_context_info(struct mmc_host *host)
+ {
+-	host->context_info.is_new_req = false;
+ 	host->context_info.is_waiting_last_req = false;
  }
- EXPORT_SYMBOL(bdi_register);
+ 
+diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+index c46be4402803..4a0752ef6154 100644
+--- a/drivers/mmc/core/queue.c
++++ b/drivers/mmc/core/queue.c
+@@ -55,7 +55,6 @@ static int mmc_queue_thread(void *d)
+ 		req = blk_fetch_request(q);
+ 		mq->asleep = false;
+ 		cntx->is_waiting_last_req = false;
+-		cntx->is_new_req = false;
+ 		if (!req) {
+ 			/*
+ 			 * Dispatch queue is empty so set flags for
+@@ -109,10 +108,6 @@ static void mmc_request_fn(struct request_queue *q)
+ 
+ 	cntx = &mq->card->host->context_info;
+ 
+-	if (cntx->is_waiting_last_req) {
+-		cntx->is_new_req = true;
+-	}
+-
+ 	if (mq->asleep)
+ 		wake_up_process(mq->thread);
+ }
+diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
+index d536325a9640..ceb58b27f402 100644
+--- a/include/linux/mmc/host.h
++++ b/include/linux/mmc/host.h
+@@ -241,11 +241,9 @@ struct mmc_slot {
+ 
+ /**
+  * mmc_context_info - synchronization details for mmc context
+- * @is_new_req		wake up reason was new request
+  * @is_waiting_last_req	mmc context waiting for single running request
+  */
+ struct mmc_context_info {
+-	bool			is_new_req;
+ 	bool			is_waiting_last_req;
+ };
+ 
 -- 
-2.14.2
+2.13.6
