@@ -1,267 +1,129 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga05.intel.com ([192.55.52.43]:13070 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751665AbdJXIrw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Oct 2017 04:47:52 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V12 5/5] mmc: sdhci-pci: Add CQHCI support for Intel GLK
-Date: Tue, 24 Oct 2017 11:40:28 +0300
-Message-Id: <1508834428-4360-6-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1508834428-4360-1-git-send-email-adrian.hunter@intel.com>
-References: <1508834428-4360-1-git-send-email-adrian.hunter@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linus.walleij@linaro.org>
+Return-Path: <linus.walleij@linaro.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+To: linux-mmc@vger.kernel.org,
+	Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+	Paolo Valente <paolo.valente@linaro.org>,
+	Avri Altman <Avri.Altman@sandisk.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH 04/12 v4] mmc: core: do away with is_done_rcv
+Date: Thu, 26 Oct 2017 14:57:49 +0200
+Message-Id: <20171026125757.10200-5-linus.walleij@linaro.org>
+In-Reply-To: <20171026125757.10200-1-linus.walleij@linaro.org>
+References: <20171026125757.10200-1-linus.walleij@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Add CQHCI initialization and implement CQHCI operations for Intel GLK.
+The "is_done_rcv" in the context info for the host is no longer
+needed: it is clear from context (ha!) that as long as we are
+waiting for the asynchronous request to come to completion,
+we are not done receiving data, and when the finalization work
+has run and completed the completion, we are indeed done.
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- drivers/mmc/host/Kconfig          |   1 +
- drivers/mmc/host/sdhci-pci-core.c | 155 +++++++++++++++++++++++++++++++++++++-
- 2 files changed, 155 insertions(+), 1 deletion(-)
+ drivers/mmc/core/core.c  | 40 ++++++++++++++++------------------------
+ include/linux/mmc/host.h |  2 --
+ 2 files changed, 16 insertions(+), 26 deletions(-)
 
-diff --git a/drivers/mmc/host/Kconfig b/drivers/mmc/host/Kconfig
-index 3092b7085cb5..2b02a9788bb6 100644
---- a/drivers/mmc/host/Kconfig
-+++ b/drivers/mmc/host/Kconfig
-@@ -81,6 +81,7 @@ config MMC_SDHCI_BIG_ENDIAN_32BIT_BYTE_SWAPPER
- config MMC_SDHCI_PCI
- 	tristate "SDHCI support on PCI bus"
- 	depends on MMC_SDHCI && PCI
-+	select MMC_CQHCI
- 	help
- 	  This selects the PCI Secure Digital Host Controller Interface.
- 	  Most controllers found today are PCI devices.
-diff --git a/drivers/mmc/host/sdhci-pci-core.c b/drivers/mmc/host/sdhci-pci-core.c
-index 3e4f04fd5175..110c634cfb43 100644
---- a/drivers/mmc/host/sdhci-pci-core.c
-+++ b/drivers/mmc/host/sdhci-pci-core.c
-@@ -30,6 +30,8 @@
- #include <linux/mmc/sdhci-pci-data.h>
- #include <linux/acpi.h>
- 
-+#include "cqhci.h"
-+
- #include "sdhci.h"
- #include "sdhci-pci.h"
- 
-@@ -116,6 +118,28 @@ int sdhci_pci_resume_host(struct sdhci_pci_chip *chip)
- 
- 	return 0;
- }
-+
-+static int sdhci_cqhci_suspend(struct sdhci_pci_chip *chip)
-+{
-+	int ret;
-+
-+	ret = cqhci_suspend(chip->slots[0]->host->mmc);
-+	if (ret)
-+		return ret;
-+
-+	return sdhci_pci_suspend_host(chip);
-+}
-+
-+static int sdhci_cqhci_resume(struct sdhci_pci_chip *chip)
-+{
-+	int ret;
-+
-+	ret = sdhci_pci_resume_host(chip);
-+	if (ret)
-+		return ret;
-+
-+	return cqhci_resume(chip->slots[0]->host->mmc);
-+}
- #endif
- 
- #ifdef CONFIG_PM
-@@ -166,8 +190,48 @@ static int sdhci_pci_runtime_resume_host(struct sdhci_pci_chip *chip)
- 
- 	return 0;
- }
-+
-+static int sdhci_cqhci_runtime_suspend(struct sdhci_pci_chip *chip)
-+{
-+	int ret;
-+
-+	ret = cqhci_suspend(chip->slots[0]->host->mmc);
-+	if (ret)
-+		return ret;
-+
-+	return sdhci_pci_runtime_suspend_host(chip);
-+}
-+
-+static int sdhci_cqhci_runtime_resume(struct sdhci_pci_chip *chip)
-+{
-+	int ret;
-+
-+	ret = sdhci_pci_runtime_resume_host(chip);
-+	if (ret)
-+		return ret;
-+
-+	return cqhci_resume(chip->slots[0]->host->mmc);
-+}
- #endif
- 
-+static u32 sdhci_cqhci_irq(struct sdhci_host *host, u32 intmask)
-+{
-+	int cmd_error = 0;
-+	int data_error = 0;
-+
-+	if (!sdhci_cqe_irq(host, intmask, &cmd_error, &data_error))
-+		return intmask;
-+
-+	cqhci_irq(host->mmc, intmask, cmd_error, data_error);
-+
-+	return 0;
-+}
-+
-+static void sdhci_pci_dumpregs(struct mmc_host *mmc)
-+{
-+	sdhci_dumpregs(mmc_priv(mmc));
-+}
-+
- /*****************************************************************************\
-  *                                                                           *
-  * Hardware specific quirk handling                                          *
-@@ -583,6 +647,18 @@ static void sdhci_intel_voltage_switch(struct sdhci_host *host)
- 	.voltage_switch		= sdhci_intel_voltage_switch,
- };
- 
-+static const struct sdhci_ops sdhci_intel_glk_ops = {
-+	.set_clock		= sdhci_set_clock,
-+	.set_power		= sdhci_intel_set_power,
-+	.enable_dma		= sdhci_pci_enable_dma,
-+	.set_bus_width		= sdhci_set_bus_width,
-+	.reset			= sdhci_reset,
-+	.set_uhs_signaling	= sdhci_set_uhs_signaling,
-+	.hw_reset		= sdhci_pci_hw_reset,
-+	.voltage_switch		= sdhci_intel_voltage_switch,
-+	.irq			= sdhci_cqhci_irq,
-+};
-+
- static void byt_read_dsm(struct sdhci_pci_slot *slot)
+diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
+index f6a51608ab0b..68125360a078 100644
+--- a/drivers/mmc/core/core.c
++++ b/drivers/mmc/core/core.c
+@@ -370,10 +370,8 @@ EXPORT_SYMBOL(mmc_start_request);
+ static void mmc_wait_data_done(struct mmc_request *mrq)
  {
- 	struct intel_host *intel_host = sdhci_pci_priv(slot);
-@@ -612,12 +688,80 @@ static int glk_emmc_probe_slot(struct sdhci_pci_slot *slot)
- {
- 	int ret = byt_emmc_probe_slot(slot);
+ 	struct mmc_host *host = mrq->host;
+-	struct mmc_context_info *context_info = &host->context_info;
+ 	struct mmc_async_req *areq = mrq->areq;
  
-+	slot->host->mmc->caps2 |= MMC_CAP2_CQE;
-+
- 	if (slot->chip->pdev->device != PCI_DEVICE_ID_INTEL_GLK_EMMC) {
- 		slot->host->mmc->caps2 |= MMC_CAP2_HS400_ES,
- 		slot->host->mmc_host_ops.hs400_enhanced_strobe =
- 						intel_hs400_enhanced_strobe;
-+		slot->host->mmc->caps2 |= MMC_CAP2_CQE_DCMD;
-+	}
-+
-+	return ret;
-+}
-+
-+static void glk_cqe_enable(struct mmc_host *mmc)
-+{
-+	struct sdhci_host *host = mmc_priv(mmc);
-+	u32 reg;
-+
-+	/*
-+	 * CQE gets stuck if it sees Buffer Read Enable bit set, which can be
-+	 * the case after tuning, so ensure the buffer is drained.
-+	 */
-+	reg = sdhci_readl(host, SDHCI_PRESENT_STATE);
-+	while (reg & SDHCI_DATA_AVAILABLE) {
-+		sdhci_readl(host, SDHCI_BUFFER);
-+		reg = sdhci_readl(host, SDHCI_PRESENT_STATE);
-+	}
-+
-+	sdhci_cqe_enable(mmc);
-+}
-+
-+static const struct cqhci_host_ops glk_cqhci_ops = {
-+	.enable		= glk_cqe_enable,
-+	.disable	= sdhci_cqe_disable,
-+	.dumpregs	= sdhci_pci_dumpregs,
-+};
-+
-+static int glk_emmc_add_host(struct sdhci_pci_slot *slot)
-+{
-+	struct device *dev = &slot->chip->pdev->dev;
-+	struct sdhci_host *host = slot->host;
-+	struct cqhci_host *cq_host;
-+	bool dma64;
-+	int ret;
-+
-+	ret = sdhci_setup_host(host);
-+	if (ret)
-+		return ret;
-+
-+	cq_host = devm_kzalloc(dev, sizeof(*cq_host), GFP_KERNEL);
-+	if (!cq_host) {
-+		ret = -ENOMEM;
-+		goto cleanup;
+-	context_info->is_done_rcv = true;
+ 	/* Schedule a work to deal with finalizing this request */
+ 	if (!areq)
+ 		pr_err("areq of the data mmc_request was NULL!\n");
+@@ -656,7 +654,7 @@ EXPORT_SYMBOL(mmc_cqe_recovery);
+ bool mmc_is_req_done(struct mmc_host *host, struct mmc_request *mrq)
+ {
+ 	if (host->areq)
+-		return host->context_info.is_done_rcv;
++		return completion_done(&host->areq->complete);
+ 	else
+ 		return completion_done(&mrq->completion);
+ }
+@@ -705,29 +703,24 @@ void mmc_finalize_areq(struct work_struct *work)
+ 	struct mmc_async_req *areq =
+ 		container_of(work, struct mmc_async_req, finalization_work);
+ 	struct mmc_host *host = areq->host;
+-	struct mmc_context_info *context_info = &host->context_info;
+ 	enum mmc_blk_status status = MMC_BLK_SUCCESS;
++	struct mmc_command *cmd;
+ 
+-	if (context_info->is_done_rcv) {
+-		struct mmc_command *cmd;
+-
+-		context_info->is_done_rcv = false;
+-		cmd = areq->mrq->cmd;
++	cmd = areq->mrq->cmd;
+ 
+-		if (!cmd->error || !cmd->retries ||
+-		    mmc_card_removed(host->card)) {
+-			status = areq->err_check(host->card,
+-						 areq);
+-		} else {
+-			mmc_retune_recheck(host);
+-			pr_info("%s: req failed (CMD%u): %d, retrying...\n",
+-				mmc_hostname(host),
+-				cmd->opcode, cmd->error);
+-			cmd->retries--;
+-			cmd->error = 0;
+-			__mmc_start_request(host, areq->mrq);
+-			return; /* wait for done/new event again */
+-		}
++	if (!cmd->error || !cmd->retries ||
++	    mmc_card_removed(host->card)) {
++		status = areq->err_check(host->card,
++					 areq);
++	} else {
++		mmc_retune_recheck(host);
++		pr_info("%s: req failed (CMD%u): %d, retrying...\n",
++			mmc_hostname(host),
++			cmd->opcode, cmd->error);
++		cmd->retries--;
++		cmd->error = 0;
++		__mmc_start_request(host, areq->mrq);
++		return; /* wait for done/new event again */
  	}
  
-+	cq_host->mmio = host->ioaddr + 0x200;
-+	cq_host->quirks |= CQHCI_QUIRK_SHORT_TXFR_DESC_SZ;
-+	cq_host->ops = &glk_cqhci_ops;
-+
-+	dma64 = host->flags & SDHCI_USE_64_BIT_DMA;
-+	if (dma64)
-+		cq_host->caps |= CQHCI_TASK_DESC_SZ_128;
-+
-+	ret = cqhci_init(cq_host, host->mmc, dma64);
-+	if (ret)
-+		goto cleanup;
-+
-+	ret = __sdhci_add_host(host);
-+	if (ret)
-+		goto cleanup;
-+
-+	return 0;
-+
-+cleanup:
-+	sdhci_cleanup_host(host);
- 	return ret;
+ 	mmc_retune_release(host);
+@@ -3005,7 +2998,6 @@ void mmc_unregister_pm_notifier(struct mmc_host *host)
+ void mmc_init_context_info(struct mmc_host *host)
+ {
+ 	host->context_info.is_new_req = false;
+-	host->context_info.is_done_rcv = false;
+ 	host->context_info.is_waiting_last_req = false;
  }
  
-@@ -699,11 +843,20 @@ static int byt_sd_probe_slot(struct sdhci_pci_slot *slot)
- static const struct sdhci_pci_fixes sdhci_intel_glk_emmc = {
- 	.allow_runtime_pm	= true,
- 	.probe_slot		= glk_emmc_probe_slot,
-+	.add_host		= glk_emmc_add_host,
-+#ifdef CONFIG_PM_SLEEP
-+	.suspend		= sdhci_cqhci_suspend,
-+	.resume			= sdhci_cqhci_resume,
-+#endif
-+#ifdef CONFIG_PM
-+	.runtime_suspend	= sdhci_cqhci_runtime_suspend,
-+	.runtime_resume		= sdhci_cqhci_runtime_resume,
-+#endif
- 	.quirks			= SDHCI_QUIRK_NO_ENDATTR_IN_NOPDESC,
- 	.quirks2		= SDHCI_QUIRK2_PRESET_VALUE_BROKEN |
- 				  SDHCI_QUIRK2_CAPS_BIT63_FOR_HS400 |
- 				  SDHCI_QUIRK2_STOP_WITH_TC,
--	.ops			= &sdhci_intel_byt_ops,
-+	.ops			= &sdhci_intel_glk_ops,
- 	.priv_size		= sizeof(struct intel_host),
- };
+diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
+index 65f23a9ea724..d536325a9640 100644
+--- a/include/linux/mmc/host.h
++++ b/include/linux/mmc/host.h
+@@ -241,12 +241,10 @@ struct mmc_slot {
  
+ /**
+  * mmc_context_info - synchronization details for mmc context
+- * @is_done_rcv		wake up reason was done request
+  * @is_new_req		wake up reason was new request
+  * @is_waiting_last_req	mmc context waiting for single running request
+  */
+ struct mmc_context_info {
+-	bool			is_done_rcv;
+ 	bool			is_new_req;
+ 	bool			is_waiting_last_req;
+ };
 -- 
-1.9.1
+2.13.6
