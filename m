@@ -1,125 +1,58 @@
-Return-Path: <prvs=451f24578=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 2/8] crypto: scompress - use sgl_alloc() and sgl_free()
-Date: Thu, 12 Oct 2017 15:45:44 -0700
-Message-Id: <20171012224550.25440-3-bart.vanassche@wdc.com>
-In-Reply-To: <20171012224550.25440-1-bart.vanassche@wdc.com>
-References: <20171012224550.25440-1-bart.vanassche@wdc.com>
+Return-Path: <byungchul.park@lge.com>
+Date: Thu, 26 Oct 2017 14:58:50 +0900
+From: Byungchul Park <byungchul.park@lge.com>
+To: Ingo Molnar <mingo@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, peterz@infradead.org, johan@kernel.org,
+	tglx@linutronix.de, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, tj@kernel.org, johannes.berg@intel.com,
+	oleg@redhat.com, amir73il@gmail.com, david@fromorbit.com,
+	darrick.wong@oracle.com, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	hch@infradead.org, idryomov@gmail.com, kernel-team@lge.com
+Subject: Re: [PATCH v5 9/9] block: Assign a lock_class per gendisk used for
+ wait_for_completion()
+Message-ID: <20171026055850.GA5594@X58A-UD3R>
+References: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
+ <1508921765-15396-10-git-send-email-byungchul.park@lge.com>
+ <20171025101328.b6fg32m2oazh3zro@gmail.com>
+ <89864125-688d-d3df-a24c-7f335b9a144e@kernel.dk>
+ <20171026055046.wjbbua4kx6lw5l2r@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171026055046.wjbbua4kx6lw5l2r@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Use the sgl_alloc() and sgl_free() functions instead of open coding
-these functions.
+On Thu, Oct 26, 2017 at 07:50:46AM +0200, Ingo Molnar wrote:
+> 
+> * Jens Axboe <axboe@kernel.dk> wrote:
+> 
+> > On 10/25/2017 03:13 AM, Ingo Molnar wrote:
+> > > 
+> > > * Byungchul Park <byungchul.park@lge.com> wrote:
+> > > 
+> > >> Darrick posted the following warning and Dave Chinner analyzed it:
+> > >>
+> > >>> ======================================================
+> > >>> WARNING: possible circular locking dependency detected
+> > >>> 4.14.0-rc1-fixes #1 Tainted: G        W
+> > > 
+> > >> Reported-by: Darrick J. Wong <darrick.wong@oracle.com>
+> > >> Analyzed-by: Dave Chinner <david@fromorbit.com>
+> > >> Signed-off-by: Byungchul Park <byungchul.park@lge.com>
+> > >> ---
+> > >>  block/bio.c           |  2 +-
+> > >>  block/genhd.c         | 10 ++--------
+> > >>  include/linux/genhd.h | 22 ++++++++++++++++++++--
+> > >>  3 files changed, 23 insertions(+), 11 deletions(-)
+> > > 
+> > > Ok, this patch looks good to me now, I'll wait to get an Ack or Nak from Jens for 
+> > > these changes.
+> > > 
+> > > Jens: this patch has some dependencies in prior lockdep changes, so I'd like to 
+> > > carry it in the locking tree for a v4.15 merge.
+> > 
+> > Looks fine to me, you can add my reviewed-by and carry it in your tree.
+> 
+> Thanks Jens!
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
----
- crypto/Kconfig     |  1 +
- crypto/scompress.c | 52 +++-------------------------------------------------
- 2 files changed, 4 insertions(+), 49 deletions(-)
-
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 0a121f9ddf8e..a0667dd284ff 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -105,6 +105,7 @@ config CRYPTO_KPP
- config CRYPTO_ACOMP2
- 	tristate
- 	select CRYPTO_ALGAPI2
-+	select SGL_ALLOC
- 
- config CRYPTO_ACOMP
- 	tristate
-diff --git a/crypto/scompress.c b/crypto/scompress.c
-index 2075e2c4e7df..ea4d5a3e01d1 100644
---- a/crypto/scompress.c
-+++ b/crypto/scompress.c
-@@ -24,6 +24,7 @@
- #include <linux/cryptouser.h>
- #include <net/netlink.h>
- #include <linux/scatterlist.h>
-+#include <linux/sgl_alloc.h>
- #include <crypto/scatterwalk.h>
- #include <crypto/internal/acompress.h>
- #include <crypto/internal/scompress.h>
-@@ -140,53 +141,6 @@ static int crypto_scomp_init_tfm(struct crypto_tfm *tfm)
- 	return ret;
- }
- 
--static void crypto_scomp_sg_free(struct scatterlist *sgl)
--{
--	int i, n;
--	struct page *page;
--
--	if (!sgl)
--		return;
--
--	n = sg_nents(sgl);
--	for_each_sg(sgl, sgl, n, i) {
--		page = sg_page(sgl);
--		if (page)
--			__free_page(page);
--	}
--
--	kfree(sgl);
--}
--
--static struct scatterlist *crypto_scomp_sg_alloc(size_t size, gfp_t gfp)
--{
--	struct scatterlist *sgl;
--	struct page *page;
--	int i, n;
--
--	n = ((size - 1) >> PAGE_SHIFT) + 1;
--
--	sgl = kmalloc_array(n, sizeof(struct scatterlist), gfp);
--	if (!sgl)
--		return NULL;
--
--	sg_init_table(sgl, n);
--
--	for (i = 0; i < n; i++) {
--		page = alloc_page(gfp);
--		if (!page)
--			goto err;
--		sg_set_page(sgl + i, page, PAGE_SIZE, 0);
--	}
--
--	return sgl;
--
--err:
--	sg_mark_end(sgl + i);
--	crypto_scomp_sg_free(sgl);
--	return NULL;
--}
--
- static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- {
- 	struct crypto_acomp *tfm = crypto_acomp_reqtfm(req);
-@@ -220,7 +174,7 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- 					      scratch_dst, &req->dlen, *ctx);
- 	if (!ret) {
- 		if (!req->dst) {
--			req->dst = crypto_scomp_sg_alloc(req->dlen, GFP_ATOMIC);
-+			req->dst = sgl_alloc(req->dlen, NULL, GFP_ATOMIC);
- 			if (!req->dst)
- 				goto out;
- 		}
-@@ -274,7 +228,7 @@ int crypto_init_scomp_ops_async(struct crypto_tfm *tfm)
- 
- 	crt->compress = scomp_acomp_compress;
- 	crt->decompress = scomp_acomp_decompress;
--	crt->dst_free = crypto_scomp_sg_free;
-+	crt->dst_free = sgl_free;
- 	crt->reqsize = sizeof(void *);
- 
- 	return 0;
--- 
-2.14.2
+Thanks all of you.
