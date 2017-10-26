@@ -1,75 +1,60 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:53795 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1758084AbdJMMrU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 08:47:20 -0400
-Received: by mail-wm0-f65.google.com with SMTP id q132so21527538wmd.2
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:19 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 13/58] lightnvm: pblk: use right flag for GC allocation
-Date: Fri, 13 Oct 2017 14:46:02 +0200
-Message-Id: <20171013124647.32668-14-m@bjorling.me>
-In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
-References: <20171013124647.32668-1-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linus.walleij@linaro.org>
+Return-Path: <linus.walleij@linaro.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+To: linux-mmc@vger.kernel.org,
+	Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+	Paolo Valente <paolo.valente@linaro.org>,
+	Avri Altman <Avri.Altman@sandisk.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH 07/12 v4] mmc: queue: simplify queue logic
+Date: Thu, 26 Oct 2017 14:57:52 +0200
+Message-Id: <20171026125757.10200-8-linus.walleij@linaro.org>
+In-Reply-To: <20171026125757.10200-1-linus.walleij@linaro.org>
+References: <20171026125757.10200-1-linus.walleij@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <javier@cnexlabs.com>
+The if() statment checking if there is no current or previous
+request is now just looking ahead at something that will be
+concluded a few lines below. Simplify the logic by moving the
+assignment of .asleep.
 
-The data buffer for the GC path allocates virtual memory through
-vmalloc. When this change was introduced, a flag signaling kmalloc'ed
-memory was wrongly introduced. Use the right flag when creating a bio
-from this buffer.
-
-Fixes: de54e703a422 ("lightnvm: pblk: use vmalloc for GC data buffer")
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- drivers/lightnvm/pblk-read.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ drivers/mmc/core/queue.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index d682e89..ee8efb5 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -499,7 +499,7 @@ int pblk_submit_read_gc(struct pblk *pblk, u64 *lba_list, void *data,
+diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+index 2c232ba4e594..023bbddc1a0b 100644
+--- a/drivers/mmc/core/queue.c
++++ b/drivers/mmc/core/queue.c
+@@ -53,14 +53,6 @@ static int mmc_queue_thread(void *d)
+ 		set_current_state(TASK_INTERRUPTIBLE);
+ 		req = blk_fetch_request(q);
+ 		mq->asleep = false;
+-		if (!req) {
+-			/*
+-			 * Dispatch queue is empty so set flags for
+-			 * mmc_request_fn() to wake us up.
+-			 */
+-			if (!mq->qcnt)
+-				mq->asleep = true;
+-		}
+ 		spin_unlock_irq(q->queue_lock);
  
- 	data_len = (*secs_to_gc) * geo->sec_size;
- 	bio = pblk_bio_map_addr(pblk, data, *secs_to_gc, data_len,
--						PBLK_KMALLOC_META, GFP_KERNEL);
-+						PBLK_VMALLOC_META, GFP_KERNEL);
- 	if (IS_ERR(bio)) {
- 		pr_err("pblk: could not allocate GC bio (%lu)\n", PTR_ERR(bio));
- 		goto err_free_dma;
-@@ -519,7 +519,7 @@ int pblk_submit_read_gc(struct pblk *pblk, u64 *lba_list, void *data,
- 	if (ret) {
- 		bio_endio(bio);
- 		pr_err("pblk: GC read request failed\n");
--		goto err_free_dma;
-+		goto err_free_bio;
- 	}
- 
- 	if (!wait_for_completion_io_timeout(&wait,
-@@ -541,10 +541,13 @@ int pblk_submit_read_gc(struct pblk *pblk, u64 *lba_list, void *data,
- 	atomic_long_sub(*secs_to_gc, &pblk->inflight_reads);
- #endif
- 
-+	bio_put(bio);
- out:
- 	nvm_dev_dma_free(dev->parent, rqd.meta_list, rqd.dma_meta_list);
- 	return NVM_IO_OK;
- 
-+err_free_bio:
-+	bio_put(bio);
- err_free_dma:
- 	nvm_dev_dma_free(dev->parent, rqd.meta_list, rqd.dma_meta_list);
- 	return NVM_IO_ERR;
+ 		if (req || mq->qcnt) {
+@@ -68,6 +60,7 @@ static int mmc_queue_thread(void *d)
+ 			mmc_blk_issue_rq(mq, req);
+ 			cond_resched();
+ 		} else {
++			mq->asleep = true;
+ 			if (kthread_should_stop()) {
+ 				set_current_state(TASK_RUNNING);
+ 				break;
 -- 
-2.9.3
+2.13.6
