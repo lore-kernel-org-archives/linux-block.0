@@ -1,57 +1,35 @@
-Return-Path: <byungchul.park@lge.com>
-From: Byungchul Park <byungchul.park@lge.com>
-To: peterz@infradead.org,
-	mingo@kernel.org,
-	axboe@kernel.dk
-Cc: johan@kernel.org,
-	tglx@linutronix.de,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	tj@kernel.org,
-	johannes.berg@intel.com,
-	oleg@redhat.com,
-	amir73il@gmail.com,
-	david@fromorbit.com,
-	darrick.wong@oracle.com,
-	linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	hch@infradead.org,
-	idryomov@gmail.com,
-	kernel-team@lge.com
-Subject: [PATCH v5 2/9] locking/lockdep: Provide empty lockdep_map structure for !CONFIG_LOCKDEP
-Date: Wed, 25 Oct 2017 17:55:58 +0900
-Message-Id: <1508921765-15396-3-git-send-email-byungchul.park@lge.com>
-In-Reply-To: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
-References: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [GIT PULL] one nvme fix for 4.14
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+ Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
+References: <20171027062319.gvxuxxffwcfh2v4q@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <8d69e358-756b-6ab9-5c18-0671d926cbd4@kernel.dk>
+Date: Fri, 27 Oct 2017 08:18:15 -0600
+MIME-Version: 1.0
+In-Reply-To: <20171027062319.gvxuxxffwcfh2v4q@infradead.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-By this patch, the lockdep_map structure takes no space if lockdep is
-disabled, making a debug facility's impact on unreleated kernel less.
+On 10/27/2017 12:23 AM, Christoph Hellwig wrote:
+> The following changes since commit f04b9cc87b5fc466b1b7231ba7b078e885956c5b:
+> 
+>   nvme-rdma: Fix error status return in tagset allocation failure (2017-10-19 17:13:51 +0200)
+> 
+> are available in the git repository at:
+> 
+>   git://git.infradead.org/nvme.git nvme-4.14
+> 
+> for you to fetch changes up to 7db814465395f3196ee98c8bd40d214d63e4f708:
+> 
+>   nvme-rdma: fix possible hang when issuing commands during ctrl removal (2017-10-23 16:27:44 +0200)
+> 
+> ----------------------------------------------------------------
+> Sagi Grimberg (1):
+>       nvme-rdma: fix possible hang when issuing commands during ctrl removal
 
-Thanks to this, we don't need #ifdef to sparate code due to the
-lockdep_map structure.
+Pulled, thanks.
 
-Signed-off-by: Byungchul Park <byungchul.park@lge.com>
----
- include/linux/lockdep.h | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
-index bfa8e0b..b6662d0 100644
---- a/include/linux/lockdep.h
-+++ b/include/linux/lockdep.h
-@@ -527,6 +527,11 @@ static inline void lockdep_on(void)
-  */
- struct lock_class_key { };
- 
-+/*
-+ * The lockdep_map takes no space if lockdep is disabled:
-+ */
-+struct lockdep_map { };
-+
- #define lockdep_depth(tsk)	(0)
- 
- #define lockdep_is_held_type(l, r)		(1)
 -- 
-1.9.1
+Jens Axboe
