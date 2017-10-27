@@ -1,90 +1,46 @@
-Return-Path: <byungchul.park@lge.com>
-From: Byungchul Park <byungchul.park@lge.com>
-To: peterz@infradead.org,
-	mingo@kernel.org,
-	axboe@kernel.dk
-Cc: johan@kernel.org,
-	tglx@linutronix.de,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	tj@kernel.org,
-	johannes.berg@intel.com,
-	oleg@redhat.com,
-	amir73il@gmail.com,
-	david@fromorbit.com,
-	darrick.wong@oracle.com,
-	linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	hch@infradead.org,
-	idryomov@gmail.com,
-	kernel-team@lge.com
-Subject: [PATCH v5 7/9] completion: Add support for initializing completion with lockdep_map
-Date: Wed, 25 Oct 2017 17:56:03 +0900
-Message-Id: <1508921765-15396-8-git-send-email-byungchul.park@lge.com>
-In-Reply-To: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
-References: <1508921765-15396-1-git-send-email-byungchul.park@lge.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-qk0-f172.google.com ([209.85.220.172]:48997 "EHLO
+        mail-qk0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932279AbdJ0XgP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 27 Oct 2017 19:36:15 -0400
+Received: by mail-qk0-f172.google.com with SMTP id d67so10229677qkg.5
+        for <linux-block@vger.kernel.org>; Fri, 27 Oct 2017 16:36:14 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <alpine.LRH.2.11.1710272310510.24585@mail.ewheeler.net>
+References: <20171016180428.123657-1-colyli@suse.de> <alpine.LRH.2.11.1710271955340.24585@mail.ewheeler.net>
+ <CAJ+L6qeSP6OLkaNBs1N0=D5=4hz3wDa2UcZfRSKHUM_rxZFpTQ@mail.gmail.com>
+ <alpine.LRH.2.11.1710272111120.24585@mail.ewheeler.net> <CAJ+L6qdZekS4hTFwXG6oSHuXEuVODW1PRWh3j62RJDMWj9EXgw@mail.gmail.com>
+ <alpine.LRH.2.11.1710272310510.24585@mail.ewheeler.net>
+From: Michael Lyle <mlyle@lyle.org>
+Date: Fri, 27 Oct 2017 16:36:13 -0700
+Message-ID: <CAJ+L6qdA8zE+Za2xgV7J7hSY8B9Qt4f_=6-vbP+6MHns+H9vpg@mail.gmail.com>
+Subject: Re: [PATCHv4] bcache: only permit to recovery read error when cache
+ device is clean
+To: Eric Wheeler <bcache@lists.ewheeler.net>
+Cc: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Nix <nix@esperi.org.uk>, Kai Krakow <hurikhan77@gmail.com>,
+        Junhui Tang <tang.junhui@zte.com.cn>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Sometimes, we want to initialize completions with sparate lockdep maps
-to assign lock classes as desired. For example, the workqueue code
-needs to directly manage lockdep maps, since only the code is aware of
-how to classify lockdep maps properly.
+On Fri, Oct 27, 2017 at 4:31 PM, Eric Wheeler <bcache@lists.ewheeler.net> wrote:
+>> Seems like something that's a lot of effort for little gain.  It'll
+>> only help when A) everything you need isn't dirty, and
+>
+> Indeed!
+>
+>> B) all the associated btree nodes are in memory.
+>
+> Is the dirty key map not memory resident?
 
-Provide additional macros initializing completions in that way.
+The overall bcache btree says where stuff is resident and whether it's
+dirty.  It is stored on disk and portions of it are cached in memory.
 
-Signed-off-by: Byungchul Park <byungchul.park@lge.com>
----
- include/linux/completion.h | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+If data is hot, the relevant tree nodes are likely to be in memory,
+but the data is also more likely to be dirty.
 
-diff --git a/include/linux/completion.h b/include/linux/completion.h
-index 9121803..4da4991 100644
---- a/include/linux/completion.h
-+++ b/include/linux/completion.h
-@@ -49,6 +49,13 @@ static inline void complete_release_commit(struct completion *x)
- 	lock_commit_crosslock((struct lockdep_map *)&x->map);
- }
- 
-+#define init_completion_map(x, m)					\
-+do {									\
-+	lockdep_init_map_crosslock((struct lockdep_map *)&(x)->map,	\
-+			(m)->name, (m)->key, 0);				\
-+	__init_completion(x);						\
-+} while (0)
-+
- #define init_completion(x)						\
- do {									\
- 	static struct lock_class_key __key;				\
-@@ -58,6 +65,7 @@ static inline void complete_release_commit(struct completion *x)
- 	__init_completion(x);						\
- } while (0)
- #else
-+#define init_completion_map(x, m) __init_completion(x)
- #define init_completion(x) __init_completion(x)
- static inline void complete_acquire(struct completion *x) {}
- static inline void complete_release(struct completion *x) {}
-@@ -73,6 +81,9 @@ static inline void complete_release_commit(struct completion *x) {}
- 	{ 0, __WAIT_QUEUE_HEAD_INITIALIZER((work).wait) }
- #endif
- 
-+#define COMPLETION_INITIALIZER_ONSTACK_MAP(work, map) \
-+	(*({ init_completion_map(&(work), &(map)); &(work); }))
-+
- #define COMPLETION_INITIALIZER_ONSTACK(work) \
- 	(*({ init_completion(&work); &work; }))
- 
-@@ -102,8 +113,11 @@ static inline void complete_release_commit(struct completion *x) {}
- #ifdef CONFIG_LOCKDEP
- # define DECLARE_COMPLETION_ONSTACK(work) \
- 	struct completion work = COMPLETION_INITIALIZER_ONSTACK(work)
-+# define DECLARE_COMPLETION_ONSTACK_MAP(work, map) \
-+	struct completion work = COMPLETION_INITIALIZER_ONSTACK_MAP(work, map)
- #else
- # define DECLARE_COMPLETION_ONSTACK(work) DECLARE_COMPLETION(work)
-+# define DECLARE_COMPLETION_ONSTACK_MAP(work, map) DECLARE_COMPLETION(work)
- #endif
- 
- /**
--- 
-1.9.1
+Mike
