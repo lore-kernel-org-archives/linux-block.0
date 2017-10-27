@@ -1,69 +1,43 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:32956 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750790AbdJ0Fiz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Oct 2017 01:38:55 -0400
-Date: Fri, 27 Oct 2017 13:38:39 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:46190 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750790AbdJ0Exd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 27 Oct 2017 00:53:33 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@infradead.org" <hch@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "axboe@fb.com" <axboe@fb.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: Bart Van Assche <Bart.VanAssche@wdc.com>,
         "roman.penyaev@profitbricks.com" <roman.penyaev@profitbricks.com>,
         "osandov@fb.com" <osandov@fb.com>, "hare@suse.com" <hare@suse.com>
 Subject: Re: [PATCH V2 0/2] block: remove unnecessary RESTART
-Message-ID: <20171027053834.GA12858@ming.t460p>
+Date: Fri, 27 Oct 2017 04:53:18 +0000
+Message-ID: <1509079996.3244.3.camel@wdc.com>
 References: <20171027044330.11921-1-ming.lei@redhat.com>
- <1509079996.3244.3.camel@wdc.com>
+In-Reply-To: <20171027044330.11921-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1509079996.3244.3.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hello Bart,
-
-On Fri, Oct 27, 2017 at 04:53:18AM +0000, Bart Van Assche wrote:
-> On Fri, 2017-10-27 at 12:43 +0800, Ming Lei wrote:
-> > The 1st patch removes the RESTART for TAG-SHARED because SCSI handles it
-> > by itself, and not necessary to waste CPU to do the expensive RESTART.
-> > And Roman Pen reported that this RESTART cuts half of IOPS in his case.
-> > 
-> > The 2nd patch removes the RESTART when .get_budget returns BLK_STS_RESOURCE,
-> > and this RESTART is handled by SCSI's RESTART(scsi_end_request()) too.
-> 
-> Hello Ming,
-> 
-> There are more block drivers than the SCSI core that share tags. If the
-
-Could you share us what the other in-tree driver which share tags is?
-
-If there are really more, and when all can share similar RESTART mechanism, I
-think that is the time for considering the common RESTART.
-
-> restart mechanism is removed from the blk-mq core, does that mean that all
-> block drivers that share tags will have to follow the example of the SCSI
-> core and implement a restart mechanism themselves? As far as I know there
-
-If there are such drivers, there should have been their own restart mechanism
-which works for long time before blk-mq comes, and more importantly each driver
-has much more knowledge than generic block layer to handle the restart,
-such as SCSI's restart, that means driver's implementation may be more efficient.
-
-Also the RESTART for TAG-SHARED may never function as expected wrt. SCSI.
-
-And more importantly the block's RESTART for TAG-SHARED has caused big performance
-issue for people.
-
-IMO, the above two reasons are enough to remove the current RESTART for shared-tag.
-
-> is a strong preference in the Linux community to implement common mechanisms
-> in the (block layer) core instead of in drivers. It seems to me like you are
-> proposing the opposite, namely removing a general mechanism from the (block
-> layer) core and moving it into a driver, namely the SCSI core?
-
-Actually SCSI's RESTART is very thin, and it is just the per-host starved_list.
-
-
-Thanks,
-Ming
+T24gRnJpLCAyMDE3LTEwLTI3IGF0IDEyOjQzICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gVGhl
+IDFzdCBwYXRjaCByZW1vdmVzIHRoZSBSRVNUQVJUIGZvciBUQUctU0hBUkVEIGJlY2F1c2UgU0NT
+SSBoYW5kbGVzIGl0DQo+IGJ5IGl0c2VsZiwgYW5kIG5vdCBuZWNlc3NhcnkgdG8gd2FzdGUgQ1BV
+IHRvIGRvIHRoZSBleHBlbnNpdmUgUkVTVEFSVC4NCj4gQW5kIFJvbWFuIFBlbiByZXBvcnRlZCB0
+aGF0IHRoaXMgUkVTVEFSVCBjdXRzIGhhbGYgb2YgSU9QUyBpbiBoaXMgY2FzZS4NCj4gDQo+IFRo
+ZSAybmQgcGF0Y2ggcmVtb3ZlcyB0aGUgUkVTVEFSVCB3aGVuIC5nZXRfYnVkZ2V0IHJldHVybnMg
+QkxLX1NUU19SRVNPVVJDRSwNCj4gYW5kIHRoaXMgUkVTVEFSVCBpcyBoYW5kbGVkIGJ5IFNDU0kn
+cyBSRVNUQVJUKHNjc2lfZW5kX3JlcXVlc3QoKSkgdG9vLg0KDQpIZWxsbyBNaW5nLA0KDQpUaGVy
+ZSBhcmUgbW9yZSBibG9jayBkcml2ZXJzIHRoYW4gdGhlIFNDU0kgY29yZSB0aGF0IHNoYXJlIHRh
+Z3MuIElmIHRoZQ0KcmVzdGFydCBtZWNoYW5pc20gaXMgcmVtb3ZlZCBmcm9tIHRoZSBibGstbXEg
+Y29yZSwgZG9lcyB0aGF0IG1lYW4gdGhhdCBhbGwNCmJsb2NrIGRyaXZlcnMgdGhhdCBzaGFyZSB0
+YWdzIHdpbGwgaGF2ZSB0byBmb2xsb3cgdGhlIGV4YW1wbGUgb2YgdGhlIFNDU0kNCmNvcmUgYW5k
+IGltcGxlbWVudCBhIHJlc3RhcnQgbWVjaGFuaXNtIHRoZW1zZWx2ZXM/IEFzIGZhciBhcyBJIGtu
+b3cgdGhlcmUNCmlzIGEgc3Ryb25nIHByZWZlcmVuY2UgaW4gdGhlIExpbnV4IGNvbW11bml0eSB0
+byBpbXBsZW1lbnQgY29tbW9uIG1lY2hhbmlzbXMNCmluIHRoZSAoYmxvY2sgbGF5ZXIpIGNvcmUg
+aW5zdGVhZCBvZiBpbiBkcml2ZXJzLiBJdCBzZWVtcyB0byBtZSBsaWtlIHlvdSBhcmUNCnByb3Bv
+c2luZyB0aGUgb3Bwb3NpdGUsIG5hbWVseSByZW1vdmluZyBhIGdlbmVyYWwgbWVjaGFuaXNtIGZy
+b20gdGhlIChibG9jaw0KbGF5ZXIpIGNvcmUgYW5kIG1vdmluZyBpdCBpbnRvIGEgZHJpdmVyLCBu
+YW1lbHkgdGhlIFNDU0kgY29yZT8NCg0KQmFydC4=
