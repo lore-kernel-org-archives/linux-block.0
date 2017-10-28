@@ -1,52 +1,36 @@
-Return-Path: <guanjunxiong@huawei.com>
-Subject: Re: [PATCH 16/17] nvme: implement multipath access to nvme subsystems
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	<linux-nvme@lists.infradead.org>, Keith Busch <keith.busch@intel.com>,
-	"Hannes Reinecke" <hare@suse.de>, Johannes Thumshirn <jthumshirn@suse.de>,
-	niuhaoxin <niuhaoxin@huawei.com>, "Shenhong (C)" <shenhong09@huawei.com>
-References: <20171023145126.2471-1-hch@lst.de>
- <20171023145126.2471-17-hch@lst.de>
-From: Guan Junxiong <guanjunxiong@huawei.com>
-Message-ID: <70b681c5-5fae-ae40-2ff6-60cf75d52616@huawei.com>
-Date: Mon, 30 Oct 2017 11:37:55 +0800
+Return-Path: <hch@lst.de>
+Date: Sat, 28 Oct 2017 08:32:52 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 16/17] nvme: implement multipath access to nvme
+	subsystems
+Message-ID: <20171028063252.GA13998@lst.de>
+References: <20171023145126.2471-1-hch@lst.de> <20171023145126.2471-17-hch@lst.de> <104278cd-0383-71e0-45c2-750108723b8b@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <20171023145126.2471-17-hch@lst.de>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <104278cd-0383-71e0-45c2-750108723b8b@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
+> Sure this works?
 
+It does.
 
-On 2017/10/23 22:51, Christoph Hellwig wrote:
-> @@ -2427,20 +2681,46 @@ static struct nvme_ns_head *nvme_alloc_ns_head(struct nvme_ctrl *ctrl,
->  	if (ret) {
->  		dev_err(ctrl->device,
->  			"duplicate IDs for nsid %d\n", nsid);
-> -		goto out_free_head;
-> +		goto out_release_instance;
->  	}
->  
-> +	ret = -ENOMEM;
-> +	q = blk_alloc_queue_node(GFP_KERNEL, NUMA_NO_NODE);
-> +	if (!q)
-> +		goto out_free_head;
-> +	q->queuedata = head;
-> +	blk_queue_make_request(q, nvme_ns_head_make_request);
-> +	q->poll_fn = nvme_ns_head_poll;
-> +	queue_flag_set_unlocked(QUEUE_FLAG_NONROT, q);
-> +	/* set to a default value for 512 until disk is validated */
-> +	blk_queue_logical_block_size(q, 512);
-> +	nvme_set_queue_limits(ctrl, q);
-> +
-> +	head->disk = alloc_disk(0);
-> +	if (!head->disk)
-> +		goto out_cleanup_queue;
-> +	head->disk->fops = &nvme_ns_head_ops;
-> +	head->disk->private_data = head;
-> +	head->disk->queue = q;
-> +	head->disk->flags = GENHD_FL_EXT_DEVT;
-> +	sprintf(head->disk->disk_name, "nvme%dn%d",
-> +			ctrl->subsys->instance, nsid);
+> nvme_req_needs_retry() checks blk_noretry_request():
 
-Is it okay to use head->instance instead of nsid for disk name nvme#n# ?
-Becuase _nsid_ sets are not continuous sometimes, so disk name is ugly in that case.
+> The original idea here was to _set_ these bits on multipath path devices
+> so that they won't attempt any retry, but rather forward the I/O error
+> to the multipath device itself for failover.
+> So if these bits are set (as they should be for multipathed devices)
+> we'll never attempt any failover...
+
+While that might have been the "original" idea, it isn't what this code
+does.  We never set any of the REQ_FAILFAST_* bits in
+nvme_ns_head_make_request.  In NVMe there aren't really any device
+equivalents of REQ_FAILFAST_ that make sense for multipath.  The only
+one that we map to is the limited retry bit, and that is media centric,
+so a failver would not help.
