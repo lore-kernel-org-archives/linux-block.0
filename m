@@ -1,68 +1,32 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Omar Sandoval <osandov@fb.com>,
-        John Garry <john.garry@huawei.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 1/2] SCSI: run idle hctx after delay in scsi_mq_get_budget()
-Date: Tue, 17 Oct 2017 13:04:17 +0800
-Message-Id: <20171017050418.22555-2-ming.lei@redhat.com>
-In-Reply-To: <20171017050418.22555-1-ming.lei@redhat.com>
-References: <20171017050418.22555-1-ming.lei@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mxhk.zte.com.cn ([63.217.80.70]:12234 "EHLO mxhk.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750851AbdJ1CiN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 27 Oct 2017 22:38:13 -0400
+From: tang.junhui@zte.com.cn
+To: bcache@lists.ewheeler.net, colyli@suse.de, mlyle@lyle.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        tang.junhui@zte.com.cn
+Subject: Re: Re: [PATCH 11/19] bcache: Subtract dirty sectors of thin flash from cache_sectors in calculating writeback rate
+Date: Sat, 28 Oct 2017 10:37:54 +0800
+Message-Id: <1509158274-31937-1-git-send-email-tang.junhui@zte.com.cn>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-If there isn't any outstanding request in this queue, both
-blk-mq's RESTART and SCSI's builtin RESTART can't work,
-so we have to deal with this case by running this queue
-after delay.
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-Fixes: d04b6d97d0a1(scsi: implement .get_budget and .put_budget for blk-mq)
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/scsi_lib.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+Hello Eric
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 6f10afaca25b..08c495364b28 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1959,6 +1959,14 @@ static void scsi_mq_put_budget(struct blk_mq_hw_ctx *hctx)
- 	put_device(&sdev->sdev_gendev);
- }
- 
-+static void scsi_mq_run_idle_hctx(struct scsi_device *sdev,
-+		struct blk_mq_hw_ctx *hctx)
-+{
-+	if (atomic_read(&sdev->device_busy) == 0 &&
-+	    !scsi_device_blocked(sdev))
-+		blk_mq_delay_run_hw_queue(hctx, SCSI_QUEUE_DELAY);
-+}
-+
- static blk_status_t scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
- {
- 	struct request_queue *q = hctx->queue;
-@@ -1989,6 +1997,7 @@ static blk_status_t scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
- out_put_device:
- 	put_device(&sdev->sdev_gendev);
- out:
-+	scsi_mq_run_idle_hctx(sdev, hctx);
- 	return BLK_STS_RESOURCE;
- }
- 
-@@ -2039,9 +2048,7 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	case BLK_STS_OK:
- 		break;
- 	case BLK_STS_RESOURCE:
--		if (atomic_read(&sdev->device_busy) == 0 &&
--		    !scsi_device_blocked(sdev))
--			blk_mq_delay_run_hw_queue(hctx, SCSI_QUEUE_DELAY);
-+		scsi_mq_run_idle_hctx(sdev, hctx);
- 		break;
- 	default:
- 		/*
--- 
-2.9.5
+> > I discussed with Tang offline, this patch is correct. But the patch
+> > commit log should be improved. Now I help to work on it, should be done
+> > quite soon.
+> 
+> Has an updated commit log been made?  I've not seen this in the commit 
+> stream yet.
+
+It has been commited as
+bcache: correct cache_dirty_target in __update_writeback_rate()
+log: a8394090a9129b40f9d90dcb7f4a49d60c727ca6
+
+Regards,
+Tang
