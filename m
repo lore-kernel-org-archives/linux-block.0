@@ -1,15 +1,15 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mxhk.zte.com.cn ([63.217.80.70]:12234 "EHLO mxhk.zte.com.cn"
+Received: from out1.zte.com.cn ([202.103.147.172]:34292 "EHLO mxct.zte.com.cn"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750851AbdJ1CiN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Oct 2017 22:38:13 -0400
+        id S1750915AbdJ1BxH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 27 Oct 2017 21:53:07 -0400
 From: tang.junhui@zte.com.cn
 To: bcache@lists.ewheeler.net, colyli@suse.de, mlyle@lyle.org
 Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
         tang.junhui@zte.com.cn
 Subject: Re: Re: [PATCH 11/19] bcache: Subtract dirty sectors of thin flash from cache_sectors in calculating writeback rate
-Date: Sat, 28 Oct 2017 10:37:54 +0800
-Message-Id: <1509158274-31937-1-git-send-email-tang.junhui@zte.com.cn>
+Date: Sat, 28 Oct 2017 09:52:49 +0800
+Message-Id: <1509155569-31338-1-git-send-email-tang.junhui@zte.com.cn>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
