@@ -1,228 +1,86 @@
-Return-Path: <guanjunxiong@huawei.com>
+Return-Path: <hare@suse.de>
 Subject: Re: [PATCH 06/17] block: introduce GENHD_FL_HIDDEN
-To: Hannes Reinecke <hare@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-	Christoph Hellwig <hch@lst.de>
-CC: Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>, Sagi Grimberg
-	<sagi@grimberg.me>, <linux-nvme@lists.infradead.org>, Keith Busch
-	<keith.busch@intel.com>, Johannes Thumshirn <jthumshirn@suse.de>, niuhaoxin
-	<niuhaoxin@huawei.com>, "Shenhong (C)" <shenhong09@huawei.com>
+To: Mike Snitzer <snitzer@redhat.com>, Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+ Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
+ linux-block@vger.kernel.org, Johannes Thumshirn <jthumshirn@suse.de>
 References: <20171023145126.2471-1-hch@lst.de>
  <20171023145126.2471-7-hch@lst.de> <20171024213959.GB23307@redhat.com>
  <20171028063825.GA14261@lst.de> <20171028141745.GA32039@redhat.com>
- <ae4180e2-4c1b-a5f0-5c26-7cec692e6d50@suse.de>
-From: Guan Junxiong <guanjunxiong@huawei.com>
-Message-ID: <7cabd9cf-61e7-d53e-d0d5-6af90f2a2ce8@huawei.com>
-Date: Mon, 30 Oct 2017 12:09:39 +0800
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <ae4180e2-4c1b-a5f0-5c26-7cec692e6d50@suse.de>
+Date: Sun, 29 Oct 2017 11:01:54 +0100
 MIME-Version: 1.0
-In-Reply-To: <ae4180e2-4c1b-a5f0-5c26-7cec692e6d50@suse.de>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20171028141745.GA32039@redhat.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Christoph, Mike and Hannes
+On 10/28/2017 04:17 PM, Mike Snitzer wrote:
+> On Sat, Oct 28 2017 at  2:38am -0400,
+> Christoph Hellwig <hch@lst.de> wrote:
+> 
+>> On Tue, Oct 24, 2017 at 05:40:00PM -0400, Mike Snitzer wrote:
+[ .. ]
+>>> Ah well.  There is only one correct way to do NVMe multipathing after
+>>> all right?
+>>
+>> I don't think you'll get very useful results, even if you try.  But I
+>> guess we'll just have to tell people to use SuSE if they want NVMe
+>> multipathing to work then :)
+> 
+> Don't do that.  Don't assume you know it all.  Don't fabricate vendor
+> wars in your head and then project it out to the rest of the community.
+> We're all in this together.
+> 
+> Fact is Hannes and I have exchanged private mail (in response to this
+> very thread) and we agree that your approach is currently not suitable
+> for enterprise deployment.  Hannes needs to also deal with the coming
+> duality of Linux multipathing and you aren't making it easy.  Just
+> because you're able to be myopic doesn't mean the rest of us with way
+> more direct customers behind us can be.
+> 
+> You're finding your way with this new multipath model and I'm happy to
+> see that happen.  But what I'm not happy about is the steps you're
+> taking to be actively disruptive.  There were so many ways this all
+> could've gone and sadly you've elected to stand up an architecture that
+> doesn't even allow the prospect of reuse.  And for what?  Because doing
+> so takes 10% more work?  Well we can backfill that work if you'll grant
+> us an open-mind.
+> 
+> I'm really not against you.  I just need very basic controls put into
+> the NVMe multipathing code that allows it to be disabled (yet reused).
+> Not that I have immediate plans to actually _use_ it.  My hope is I can
+> delegate NVMe multipathing to NVMe!  But I need the latitude to find my
+> way with the requirements I am, or will be, needing to consider.
+> 
+> Please don't paint me and others in my position into a corner.
+> 
+To add my some cents from the SUSE perspective:
+We have _quite_ some deployments on dm-multipathing, and most of our
+customers are quite accustomed to setting up deployments with that.
+It will be impossible to ensure that all customers and installation
+scripts will _not_ try starting up multipathing, and for some scenarios
+even preferring to use dm-multipath just because their tooling is geared
+up for that.
+So we absolutely need peaceful coexistence between dm-multipathing and
+nvme multipathing. The precise level can be discussed (whether it being
+a global on/off switch or some more fine-grained thingie), but we simply
+cannot declare nvme multipathing being the one true way for NVMe.
+The support-calls alone will kill us.
 
-On 2017/10/29 18:01, Hannes Reinecke wrote:
-> After all, Linux is about choice, not about forcing users to do things
-> in one way only.
+Note: this has _nothing_ to do with performance. I'm perfectly fine to
+accept that dm-multipath has sub-optimal performance.
+But that should not imply that it cannot be used for NVMe.
 
+After all, Linux is about choice, not about forcing users to do things
+in one way only.
 
-I have added an option CONFIG_NVME_SHOW_CTRL_BLK_DEV to show per-controller
-block devices nodes.
-It is tested simply that dm-multipath and nvme-mpath can coexist.
+Cheers,
 
-This patch, based on the Christoph V5 of nvme-mpath,  is in the following.
-
-Does it look good for you ?
-
-Regards
-Guan
-
---
->From de3f446af6591d68ef84333138e744f12db4d695 Mon Sep 17 00:00:00 2001
-From: Junxiong Guan <guanjunxiong@huawei.com>
-Date: Mon, 30 Oct 2017 04:59:20 -0400
-Subject: [PATCH] nvme: add an option to show per-controller block devices
- nodes
-
-Signed-off-by: Junxiong Guan <guanjunxiong@huawei.com>
----
- drivers/nvme/host/Kconfig |  9 ++++++
- drivers/nvme/host/core.c  | 80 +++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 87 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/nvme/host/Kconfig b/drivers/nvme/host/Kconfig
-index 46d6cb1e03bd..725bff035f38 100644
---- a/drivers/nvme/host/Kconfig
-+++ b/drivers/nvme/host/Kconfig
-@@ -13,6 +13,15 @@ config BLK_DEV_NVME
- 	  To compile this driver as a module, choose M here: the
- 	  module will be called nvme.
-
-+config NVME_SHOW_CTRL_BLK_DEV
-+	bool "Show per-controller block devices of NVMe"
-+	depends on NVME_CORE
-+	---help---
-+	  This adds support to show per-controller block devices nodes in
-+	  the user space.
-+
-+	  If unsure, say N.
-+
- config NVME_FABRICS
- 	tristate
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 334735db90c8..ae37e274108c 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -72,6 +72,9 @@ static DEFINE_IDA(nvme_subsystems_ida);
- static LIST_HEAD(nvme_subsystems);
- static DEFINE_MUTEX(nvme_subsystems_lock);
-
-+#ifdef CONFIG_NVME_SHOW_CTRL_BLK_DEV
-+static DEFINE_SPINLOCK(dev_list_lock);
-+#endif
- static DEFINE_IDA(nvme_instance_ida);
- static dev_t nvme_chr_devt;
- static struct class *nvme_class;
-@@ -357,6 +360,14 @@ static void nvme_free_ns(struct kref *kref)
-
- 	if (ns->ndev)
- 		nvme_nvm_unregister(ns);
-+
-+#ifdef CONFIG_NVME_SHOW_CTRL_BLK_DEV
-+	if (ns->disk) {
-+		spin_lock(&dev_list_lock);
-+		ns->disk->private_data = NULL;
-+		spin_unlock(&dev_list_lock);
-+	}
-+#endif
- 	put_disk(ns->disk);
- 	nvme_put_ns_head(ns->head);
- 	nvme_put_ctrl(ns->ctrl);
-@@ -1127,10 +1138,32 @@ static int nvme_ns_ioctl(struct nvme_ns *ns, unsigned int cmd,
- 	}
- }
-
--/* should never be called due to GENHD_FL_HIDDEN */
- static int nvme_open(struct block_device *bdev, fmode_t mode)
- {
-+#ifdef CONFIG_NVME_SHOW_CTRL_BLK_DEV
-+	struct nvme_ns *ns;
-+
-+	spin_lock(&dev_list_lock);
-+	ns = bdev->bd_disk->private_data;
-+	if (ns) {
-+		if (!kref_get_unless_zero(&ns->kref))
-+			goto fail;
-+		if (!try_module_get(ns->ctrl->ops->module))
-+			goto fail_put_ns;
-+	}
-+	spin_unlock(&dev_list_lock);
-+
-+	return ns ? 0 : -ENXIO;
-+
-+fail_put_ns:
-+	kref_put(&ns->kref, nvme_free_ns);
-+fail:
-+	spin_unlock(&dev_list_lock);
-+	return -ENXIO;
-+#else
-+	/* should never be called due to GENHD_FL_HIDDEN */
- 	return WARN_ON_ONCE(-ENXIO);
-+#endif /* CONFIG_NVME_SHOW_CTRL_BLK_DEV */
- }
-
- static int nvme_getgeo(struct block_device *bdev, struct hd_geometry *geo)
-@@ -1392,10 +1425,15 @@ static char nvme_pr_type(enum pr_type type)
- static int nvme_pr_command(struct block_device *bdev, u32 cdw10,
- 				u64 key, u64 sa_key, u8 op)
- {
-+#ifdef CONFIG_NVME_SHOW_CTRL_BLK_DEV
-+	struct nvme_ns *ns = bdev->bd_disk->private_data;
-+	struct nvme_ns_head *head = ns->head;
-+#else
- 	struct nvme_ns_head *head = bdev->bd_disk->private_data;
- 	struct nvme_ns *ns;
--	struct nvme_command c;
- 	int srcu_idx, ret;
-+#endif
-+	struct nvme_command c;
- 	u8 data[16] = { 0, };
-
- 	put_unaligned_le64(key, &data[0]);
-@@ -1406,6 +1444,9 @@ static int nvme_pr_command(struct block_device *bdev, u32 cdw10,
- 	c.common.nsid = cpu_to_le32(head->ns_id);
- 	c.common.cdw10[0] = cpu_to_le32(cdw10);
-
-+#ifdef CONFIG_NVME_SHOW_CTRL_BLK_DEV
-+	return nvme_submit_sync_cmd(ns->queue, &c, data, 16);
-+#else
- 	srcu_idx = srcu_read_lock(&head->srcu);
- 	ns = nvme_find_path(head);
- 	if (likely(ns))
-@@ -1413,7 +1454,9 @@ static int nvme_pr_command(struct block_device *bdev, u32 cdw10,
- 	else
- 		ret = -EWOULDBLOCK;
- 	srcu_read_unlock(&head->srcu, srcu_idx);
-+
- 	return ret;
-+#endif
- }
-
- static int nvme_pr_register(struct block_device *bdev, u64 old,
-@@ -1492,6 +1535,34 @@ int nvme_sec_submit(void *data, u16 spsp, u8 secp, void *buffer, size_t len,
- EXPORT_SYMBOL_GPL(nvme_sec_submit);
- #endif /* CONFIG_BLK_SED_OPAL */
-
-+#ifdef CONFIG_NVME_SHOW_CTRL_BLK_DEV
-+static void nvme_release(struct gendisk *disk, fmode_t mode)
-+{
-+	struct nvme_ns *ns = disk->private_data;
-+
-+	module_put(ns->ctrl->ops->module);
-+	nvme_put_ns(ns);
-+}
-+
-+static int nvme_ioctl(struct block_device *bdev, fmode_t mode,
-+		unsigned int cmd, unsigned long arg)
-+{
-+	struct nvme_ns *ns = bdev->bd_disk->private_data;
-+
-+	return nvme_ns_ioctl(ns, cmd, arg);
-+}
-+
-+static const struct block_device_operations nvme_fops = {
-+	.owner		= THIS_MODULE,
-+	.ioctl		= nvme_ioctl,
-+	.compat_ioctl	= nvme_ioctl,
-+	.open		= nvme_open,
-+	.release	= nvme_release,
-+	.getgeo		= nvme_getgeo,
-+	.revalidate_disk= nvme_revalidate_disk,
-+	.pr_ops		=&nvme_pr_ops,
-+};
-+#else
- /*
-  * While we don't expose the per-controller devices to userspace we still
-  * need valid file operations for them, for one because the block layer
-@@ -1503,6 +1574,7 @@ static const struct block_device_operations nvme_fops = {
- 	.open		= nvme_open,
- 	.revalidate_disk= nvme_revalidate_disk,
- };
-+#endif /* CONFIG_NVME_SHOW_CTRL_BLK_DEV */
-
- static int nvme_wait_ready(struct nvme_ctrl *ctrl, u64 cap, bool enabled)
- {
-@@ -2875,7 +2947,11 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 	disk->fops = &nvme_fops;
- 	disk->private_data = ns;
- 	disk->queue = ns->queue;
-+#ifdef CONFIG_NVME_SHOW_CTRL_BLK_DEV
-+	disk->flags = GENHD_FL_EXT_DEVT;
-+#else
- 	disk->flags = GENHD_FL_HIDDEN;
-+#endif
- 	memcpy(disk->disk_name, disk_name, DISK_NAME_LEN);
- 	ns->disk = disk;
-
+Hannes
 -- 
-2.11.1
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
