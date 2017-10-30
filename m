@@ -1,77 +1,52 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:56723 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932274AbdJ3VrA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Oct 2017 17:47:00 -0400
-Received: by mail-pg0-f67.google.com with SMTP id m18so12795258pgd.13
-        for <linux-block@vger.kernel.org>; Mon, 30 Oct 2017 14:47:00 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, "tang.junhui" <tang.junhui@zte.com.cn>
-Subject: [PATCH 4/5] bcache: fix wrong cache_misses statistics
-Date: Mon, 30 Oct 2017 14:46:34 -0700
-Message-Id: <20171030214635.29888-5-mlyle@lyle.org>
-In-Reply-To: <20171030214635.29888-1-mlyle@lyle.org>
-References: <20171030214635.29888-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <guanjunxiong@huawei.com>
+Subject: Re: [PATCH 16/17] nvme: implement multipath access to nvme subsystems
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	<linux-nvme@lists.infradead.org>, Keith Busch <keith.busch@intel.com>,
+	"Hannes Reinecke" <hare@suse.de>, Johannes Thumshirn <jthumshirn@suse.de>,
+	niuhaoxin <niuhaoxin@huawei.com>, "Shenhong (C)" <shenhong09@huawei.com>
+References: <20171023145126.2471-1-hch@lst.de>
+ <20171023145126.2471-17-hch@lst.de>
+From: Guan Junxiong <guanjunxiong@huawei.com>
+Message-ID: <70b681c5-5fae-ae40-2ff6-60cf75d52616@huawei.com>
+Date: Mon, 30 Oct 2017 11:37:55 +0800
+MIME-Version: 1.0
+In-Reply-To: <20171023145126.2471-17-hch@lst.de>
+Content-Type: text/plain; charset="utf-8"
+List-ID: <linux-block@vger.kernel.org>
 
-From: "tang.junhui" <tang.junhui@zte.com.cn>
 
-Currently, Cache missed IOs are identified by s->cache_miss, but actually,
-there are many situations that missed IOs are not assigned a value for
-s->cache_miss in cached_dev_cache_miss(), for example, a bypassed IO
-(s->iop.bypass = 1), or the cache_bio allocate failed. In these situations,
-it will go to out_put or out_submit, and s->cache_miss is null, which leads
-bch_mark_cache_accounting() to treat this IO as a hit IO.
 
-[ML: applied by 3-way merge]
+On 2017/10/23 22:51, Christoph Hellwig wrote:
+> @@ -2427,20 +2681,46 @@ static struct nvme_ns_head *nvme_alloc_ns_head(struct nvme_ctrl *ctrl,
+>  	if (ret) {
+>  		dev_err(ctrl->device,
+>  			"duplicate IDs for nsid %d\n", nsid);
+> -		goto out_free_head;
+> +		goto out_release_instance;
+>  	}
+>  
+> +	ret = -ENOMEM;
+> +	q = blk_alloc_queue_node(GFP_KERNEL, NUMA_NO_NODE);
+> +	if (!q)
+> +		goto out_free_head;
+> +	q->queuedata = head;
+> +	blk_queue_make_request(q, nvme_ns_head_make_request);
+> +	q->poll_fn = nvme_ns_head_poll;
+> +	queue_flag_set_unlocked(QUEUE_FLAG_NONROT, q);
+> +	/* set to a default value for 512 until disk is validated */
+> +	blk_queue_logical_block_size(q, 512);
+> +	nvme_set_queue_limits(ctrl, q);
+> +
+> +	head->disk = alloc_disk(0);
+> +	if (!head->disk)
+> +		goto out_cleanup_queue;
+> +	head->disk->fops = &nvme_ns_head_ops;
+> +	head->disk->private_data = head;
+> +	head->disk->queue = q;
+> +	head->disk->flags = GENHD_FL_EXT_DEVT;
+> +	sprintf(head->disk->disk_name, "nvme%dn%d",
+> +			ctrl->subsys->instance, nsid);
 
-Signed-off-by: tang.junhui <tang.junhui@zte.com.cn>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
-Reviewed-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/request.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 886e4b6643f1..597dd1e87bea 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -470,6 +470,7 @@ struct search {
- 	unsigned		recoverable:1;
- 	unsigned		write:1;
- 	unsigned		read_dirty_data:1;
-+	unsigned		cache_missed:1;
- 
- 	unsigned long		start_time;
- 
-@@ -656,6 +657,7 @@ static inline struct search *search_alloc(struct bio *bio,
- 
- 	s->orig_bio		= bio;
- 	s->cache_miss		= NULL;
-+	s->cache_missed		= 0;
- 	s->d			= d;
- 	s->recoverable		= 1;
- 	s->write		= op_is_write(bio_op(bio));
-@@ -775,7 +777,7 @@ static void cached_dev_read_done_bh(struct closure *cl)
- 	struct cached_dev *dc = container_of(s->d, struct cached_dev, disk);
- 
- 	bch_mark_cache_accounting(s->iop.c, s->d,
--				  !s->cache_miss, s->iop.bypass);
-+				  !s->cache_missed, s->iop.bypass);
- 	trace_bcache_read(s->orig_bio, !s->cache_miss, s->iop.bypass);
- 
- 	if (s->iop.status)
-@@ -794,6 +796,8 @@ static int cached_dev_cache_miss(struct btree *b, struct search *s,
- 	struct cached_dev *dc = container_of(s->d, struct cached_dev, disk);
- 	struct bio *miss, *cache_bio;
- 
-+	s->cache_missed = 1;
-+
- 	if (s->cache_miss || s->iop.bypass) {
- 		miss = bio_next_split(bio, sectors, GFP_NOIO, s->d->bio_split);
- 		ret = miss == bio ? MAP_DONE : MAP_CONTINUE;
--- 
-2.11.0
+Is it okay to use head->instance instead of nsid for disk name nvme#n# ?
+Becuase _nsid_ sets are not continuous sometimes, so disk name is ugly in that case.
