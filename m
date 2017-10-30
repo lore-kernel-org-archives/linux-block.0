@@ -1,113 +1,78 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:56357 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932368AbdJMMr4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 08:47:56 -0400
-Received: by mail-wm0-f66.google.com with SMTP id l68so21514260wmd.5
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:55 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 51/58] lightnvm: pblk: add l2p crc debug printouts
-Date: Fri, 13 Oct 2017 14:46:40 +0200
-Message-Id: <20171013124647.32668-52-m@bjorling.me>
-In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
-References: <20171013124647.32668-1-m@bjorling.me>
+Return-Path: <prvs=469d6a95f=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, "Christoph
+ Hellwig" <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
+	Oleksandr Natalenko <oleksandr@natalenko.name>, Ming Lei
+	<ming.lei@redhat.com>, Martin Steigerwald <martin@lichtvoll.de>, "Bart Van
+ Assche" <bart.vanassche@wdc.com>, Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH v11 4/7] ide, scsi: Tell the block layer at request allocation time about preempt requests
+Date: Mon, 30 Oct 2017 15:42:02 -0700
+Message-ID: <20171030224205.25212-5-bart.vanassche@wdc.com>
+In-Reply-To: <20171030224205.25212-1-bart.vanassche@wdc.com>
+References: <20171030224205.25212-1-bart.vanassche@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+Return-Path: bart.vanassche@wdc.com
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Convert blk_get_request(q, op, __GFP_RECLAIM) into
+blk_get_request_flags(q, op, BLK_MQ_PREEMPT). This patch does not
+change any functionality.
 
-Print the CRC of the logical-to-physical mapping during exit and
-after recovering the L2P table to facilitate detection of meta
-data corruption/recovery issues.
-
-The CRC printed after recovery should match the CRC printed during
-the previous exit - if it doesn't this indicates that either the meta
-data written to the disk is corrupt or recovery failed.
-
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Tested-by: Martin Steigerwald <martin@lichtvoll.de>
+Acked-by: David S. Miller <davem@davemloft.net> [ for IDE ]
+Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/lightnvm/pblk-init.c | 39 ++++++++++++++++++++++++++++++++++-----
- 1 file changed, 34 insertions(+), 5 deletions(-)
+ drivers/ide/ide-pm.c    | 4 ++--
+ drivers/scsi/scsi_lib.c | 6 +++---
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index ad9f014..52c85f4 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -76,6 +76,28 @@ static blk_qc_t pblk_make_rq(struct request_queue *q, struct bio *bio)
- 	return BLK_QC_T_NONE;
- }
- 
-+static size_t pblk_trans_map_size(struct pblk *pblk)
-+{
-+	int entry_size = 8;
-+
-+	if (pblk->ppaf_bitsize < 32)
-+		entry_size = 4;
-+
-+	return entry_size * pblk->rl.nr_secs;
-+}
-+
-+#ifdef CONFIG_NVM_DEBUG
-+static u32 pblk_l2p_crc(struct pblk *pblk)
-+{
-+	size_t map_size;
-+	u32 crc = ~(u32)0;
-+
-+	map_size = pblk_trans_map_size(pblk);
-+	crc = crc32_le(crc, pblk->trans_map, map_size);
-+	return crc;
-+}
-+#endif
-+
- static void pblk_l2p_free(struct pblk *pblk)
- {
- 	vfree(pblk->trans_map);
-@@ -85,12 +107,10 @@ static int pblk_l2p_init(struct pblk *pblk)
- {
- 	sector_t i;
- 	struct ppa_addr ppa;
--	int entry_size = 8;
-+	size_t map_size;
- 
--	if (pblk->ppaf_bitsize < 32)
--		entry_size = 4;
--
--	pblk->trans_map = vmalloc(entry_size * pblk->rl.nr_secs);
-+	map_size = pblk_trans_map_size(pblk);
-+	pblk->trans_map = vmalloc(map_size);
- 	if (!pblk->trans_map)
- 		return -ENOMEM;
- 
-@@ -508,6 +528,10 @@ static int pblk_lines_configure(struct pblk *pblk, int flags)
- 		}
+diff --git a/drivers/ide/ide-pm.c b/drivers/ide/ide-pm.c
+index 544f02d673ca..f56d742908df 100644
+--- a/drivers/ide/ide-pm.c
++++ b/drivers/ide/ide-pm.c
+@@ -89,9 +89,9 @@ int generic_ide_resume(struct device *dev)
  	}
  
-+#ifdef CONFIG_NVM_DEBUG
-+	pr_info("pblk init: L2P CRC: %x\n", pblk_l2p_crc(pblk));
-+#endif
-+
- 	/* Free full lines directly as GC has not been started yet */
- 	pblk_gc_free_full_lines(pblk);
+ 	memset(&rqpm, 0, sizeof(rqpm));
+-	rq = blk_get_request(drive->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
++	rq = blk_get_request_flags(drive->queue, REQ_OP_DRV_IN,
++				   BLK_MQ_REQ_PREEMPT);
+ 	ide_req(rq)->type = ATA_PRIV_PM_RESUME;
+-	rq->rq_flags |= RQF_PREEMPT;
+ 	rq->special = &rqpm;
+ 	rqpm.pm_step = IDE_PM_START_RESUME;
+ 	rqpm.pm_state = PM_EVENT_ON;
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 6f10afaca25b..7c119696402c 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -252,9 +252,9 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 	struct scsi_request *rq;
+ 	int ret = DRIVER_ERROR << 24;
  
-@@ -901,6 +925,11 @@ static void pblk_exit(void *private)
- 	down_write(&pblk_lock);
- 	pblk_gc_exit(pblk);
- 	pblk_tear_down(pblk);
-+
-+#ifdef CONFIG_NVM_DEBUG
-+	pr_info("pblk exit: L2P CRC: %x\n", pblk_l2p_crc(pblk));
-+#endif
-+
- 	pblk_free(pblk);
- 	up_write(&pblk_lock);
- }
+-	req = blk_get_request(sdev->request_queue,
++	req = blk_get_request_flags(sdev->request_queue,
+ 			data_direction == DMA_TO_DEVICE ?
+-			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, __GFP_RECLAIM);
++			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, BLK_MQ_REQ_PREEMPT);
+ 	if (IS_ERR(req))
+ 		return ret;
+ 	rq = scsi_req(req);
+@@ -268,7 +268,7 @@ int scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 	rq->retries = retries;
+ 	req->timeout = timeout;
+ 	req->cmd_flags |= flags;
+-	req->rq_flags |= rq_flags | RQF_QUIET | RQF_PREEMPT;
++	req->rq_flags |= rq_flags | RQF_QUIET;
+ 
+ 	/*
+ 	 * head injection *required* here otherwise quiesce won't work
 -- 
-2.9.3
+2.14.2
