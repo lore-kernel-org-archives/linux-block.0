@@ -1,124 +1,37 @@
-Return-Path: <prvs=469d6a95f=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@wdc.com>, Hannes Reinecke <hare@suse.de>, "Johannes
- Thumshirn" <jthumshirn@suse.de>
-Subject: [PATCH] block: Rework drivers/cdrom/Makefile
-Date: Mon, 30 Oct 2017 09:02:19 -0700
-Message-ID: <20171030160219.13019-1-bart.vanassche@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Date: Mon, 30 Oct 2017 15:58:23 -0600
+From: Jens Axboe <axboe@kernel.dk>
+To: Michael Lyle <mlyle@lyle.org>
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: Series of patches for bcache targeting 4.15
+Message-ID: <20171030215821.GA17465@kernel.dk>
+References: <20171030214635.29888-1-mlyle@lyle.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171030214635.29888-1-mlyle@lyle.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Instead of referring from inside drivers/cdrom/Makefile to all the
-drivers that use this driver, let these drivers select the cdrom
-driver. This change makes the cdrom build code follow the approach
-that is used for most other drivers, namely refer from the higher
-layers to the lower layer instead of from the lower layer to the
-higher layers.
+On Mon, Oct 30 2017, Michael Lyle wrote:
+> Hi Jens--
+> 
+> I have a few last patches for bcache targeting 4.15 if it's
+> possible to get them in.  I'm sorry this is a bit late.
+> 
+> All are reviewed and have received a moderate amount of test
+> in my environment (and I'm continuing testing).
+> 
+> [PATCH 1/5] bcache: only permit to recovery read error when cache
+> [PATCH 2/5] bcache: convert cached_dev.count from atomic_t to
+> [PATCH 3/5] bcache: update bucket_in_use in real time
+> [PATCH 4/5] bcache: fix wrong cache_misses statistics
+> [PATCH 5/5] bcache: explicitly destroy mutex while exiting
+> 
+> Patches 1 and 3 are critical.  The first fixes correctness problems
+> if a cache volume fails and is being carried in distro trees.  #3
+> prevents a rare issue that can cause extended hanging of end-user
+> I/O.  The other three patches are relatively safe cleanup.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- drivers/block/Kconfig        | 12 ++++++++++++
- drivers/block/paride/Kconfig |  1 +
- drivers/cdrom/Makefile       | 15 ++-------------
- drivers/ide/Kconfig          |  1 +
- drivers/scsi/Kconfig         |  1 +
- 5 files changed, 17 insertions(+), 13 deletions(-)
+Thanks, applied for 4.15.
 
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index 4a438b8abe27..b998b3c9ea86 100644
---- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -67,9 +67,20 @@ config AMIGA_Z2RAM
- 	  To compile this driver as a module, choose M here: the
- 	  module will be called z2ram.
- 
-+config CDROM
-+	tristate "CD-ROM driver"
-+	help
-+	  A CD-ROM is a pre-pressed optical compact disc which contains
-+	  data. The name is an acronym which stands for "Compact Disc
-+	  Read-Only Memory". This driver implements functionality that is
-+	  shared by all CD-ROM drivers, e.g. the IDE CD-ROM driver and the
-+	  SCSI CD-ROM driver. For a list of the ioctls implemented by this
-+	  driver, see also Documentation/ioctl/cdrom.txt.
-+
- config GDROM
- 	tristate "SEGA Dreamcast GD-ROM drive"
- 	depends on SH_DREAMCAST
-+	select CDROM
- 	select BLK_SCSI_REQUEST # only for the generic cdrom code
- 	help
- 	  A standard SEGA Dreamcast comes with a modified CD ROM drive called a
-@@ -347,6 +358,7 @@ config BLK_DEV_RAM_DAX
- config CDROM_PKTCDVD
- 	tristate "Packet writing on CD/DVD media (DEPRECATED)"
- 	depends on !UML
-+	select CDROM
- 	select BLK_SCSI_REQUEST
- 	help
- 	  Note: This driver is deprecated and will be removed from the
-diff --git a/drivers/block/paride/Kconfig b/drivers/block/paride/Kconfig
-index 3a15247942e4..1d5057f5080b 100644
---- a/drivers/block/paride/Kconfig
-+++ b/drivers/block/paride/Kconfig
-@@ -25,6 +25,7 @@ config PARIDE_PD
- config PARIDE_PCD
- 	tristate "Parallel port ATAPI CD-ROMs"
- 	depends on PARIDE
-+	select CDROM
- 	select BLK_SCSI_REQUEST # only for the generic cdrom code
- 	---help---
- 	  This option enables the high-level driver for ATAPI CD-ROM devices
-diff --git a/drivers/cdrom/Makefile b/drivers/cdrom/Makefile
-index 8ffde4f8ab9a..7f3f43cc2257 100644
---- a/drivers/cdrom/Makefile
-+++ b/drivers/cdrom/Makefile
-@@ -1,13 +1,2 @@
--# Makefile for the kernel cdrom device drivers.
--#
--# 30 Jan 1998, Michael Elizabeth Chastain, <mailto:mec@shout.net>
--# Rewritten to use lists instead of if-statements.
--
--# Each configuration option enables a list of files.
--
--obj-$(CONFIG_BLK_DEV_IDECD)	+=              cdrom.o
--obj-$(CONFIG_BLK_DEV_SR)	+=              cdrom.o
--obj-$(CONFIG_PARIDE_PCD)	+=		cdrom.o
--obj-$(CONFIG_CDROM_PKTCDVD)	+=		cdrom.o
--
--obj-$(CONFIG_GDROM)		+= gdrom.o      cdrom.o
-+obj-$(CONFIG_CDROM)	+= cdrom.o
-+obj-$(CONFIG_GDROM)	+= gdrom.o
-diff --git a/drivers/ide/Kconfig b/drivers/ide/Kconfig
-index c99a25c075bc..7b92c591e4c1 100644
---- a/drivers/ide/Kconfig
-+++ b/drivers/ide/Kconfig
-@@ -118,6 +118,7 @@ config BLK_DEV_DELKIN
- config BLK_DEV_IDECD
- 	tristate "Include IDE/ATAPI CDROM support"
- 	select IDE_ATAPI
-+	select CDROM
- 	---help---
- 	  If you have a CD-ROM drive using the ATAPI protocol, say Y. ATAPI is
- 	  a newer protocol used by IDE CD-ROM and TAPE drives, similar to the
-diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
-index 41366339b950..cca0b03c2ead 100644
---- a/drivers/scsi/Kconfig
-+++ b/drivers/scsi/Kconfig
-@@ -131,6 +131,7 @@ config CHR_DEV_OSST
- config BLK_DEV_SR
- 	tristate "SCSI CDROM support"
- 	depends on SCSI
-+	select CDROM
- 	---help---
- 	  If you want to use a CD or DVD drive attached to your computer
- 	  by SCSI, FireWire, USB or ATAPI, say Y and read the SCSI-HOWTO
 -- 
-2.14.2
+Jens Axboe
