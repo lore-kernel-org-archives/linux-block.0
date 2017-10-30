@@ -1,116 +1,113 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:40492 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751121AbdJCKsv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 Oct 2017 06:48:51 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Cc: Johannes Thumshirn <jthumshirn@suse.de>,
-        Benjamin Block <bblock@linux.vnet.ibm.com>,
-        stable@vger.kernel.org
-Subject: [PATCH 1/9] bsg-lib: fix use-after-free under memory-pressure
-Date: Tue,  3 Oct 2017 12:48:37 +0200
-Message-Id: <20171003104845.10417-2-hch@lst.de>
-In-Reply-To: <20171003104845.10417-1-hch@lst.de>
-References: <20171003104845.10417-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=469d6a95f=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, "Christoph
+ Hellwig" <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
+	Oleksandr Natalenko <oleksandr@natalenko.name>, Ming Lei
+	<ming.lei@redhat.com>, Martin Steigerwald <martin@lichtvoll.de>, "Bart Van
+ Assche" <bart.vanassche@wdc.com>, Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH v11 5/7] block: Add the QUEUE_FLAG_PREEMPT_ONLY request queue flag
+Date: Mon, 30 Oct 2017 15:42:03 -0700
+Message-ID: <20171030224205.25212-6-bart.vanassche@wdc.com>
+In-Reply-To: <20171030224205.25212-1-bart.vanassche@wdc.com>
+References: <20171030224205.25212-1-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: bart.vanassche@wdc.com
+List-ID: <linux-block@vger.kernel.org>
 
-From: Benjamin Block <bblock@linux.vnet.ibm.com>
+This flag will be used in the next patch to let the block layer
+core know whether or not a SCSI request queue has been quiesced.
+A quiesced SCSI queue namely only processes RQF_PREEMPT requests.
 
-When under memory-pressure it is possible that the mempool which backs
-the 'struct request_queue' will make use of up to BLKDEV_MIN_RQ count
-emergency buffers - in case it can't get a regular allocation. These
-buffers are preallocated and once they are also used, they are
-re-supplied with old finished requests from the same request_queue (see
-mempool_free()).
-
-The bug is, when re-supplying the emergency pool, the old requests are
-not again ran through the callback mempool_t->alloc(), and thus also not
-through the callback bsg_init_rq(). Thus we skip initialization, and
-while the sense-buffer still should be good, scsi_request->cmd might
-have become to be an invalid pointer in the meantime. When the request
-is initialized in bsg.c, and the user's CDB is larger than BLK_MAX_CDB,
-bsg will replace it with a custom allocated buffer, which is freed when
-the user's command is finished, thus it dangles afterwards. When next a
-command is sent by the user that has a smaller/similar CDB as
-BLK_MAX_CDB, bsg will assume that scsi_request->cmd is backed by
-scsi_request->__cmd, will not make a custom allocation, and write into
-undefined memory.
-
-Fix this by splitting bsg_init_rq() into two functions:
- - bsg_init_rq() is changed to only do the allocation of the
-   sense-buffer, which is used to back the bsg job's reply buffer. This
-   pointer should never change during the lifetime of a scsi_request, so
-   it doesn't need re-initialization.
- - bsg_initialize_rq() is a new function that makes use of
-   'struct request_queue's initialize_rq_fn callback (which was
-   introduced in v4.12). This is always called before the request is
-   given out via blk_get_request(). This function does the remaining
-   initialization that was previously done in bsg_init_rq(), and will
-   also do it when the request is taken from the emergency-pool of the
-   backing mempool.
-
-Fixes: 50b4d485528d ("bsg-lib: fix kernel panic resulting from missing allocation of reply-buffer")
-Cc: <stable@vger.kernel.org> # 4.11+
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Benjamin Block <bblock@linux.vnet.ibm.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Tested-by: Martin Steigerwald <martin@lichtvoll.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- block/bsg-lib.c | 27 +++++++++++++++++++++------
- 1 file changed, 21 insertions(+), 6 deletions(-)
+ block/blk-core.c       | 30 ++++++++++++++++++++++++++++++
+ block/blk-mq-debugfs.c |  1 +
+ include/linux/blkdev.h |  6 ++++++
+ 3 files changed, 37 insertions(+)
 
-diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-index dbddff8174e5..15d25ccd51a5 100644
---- a/block/bsg-lib.c
-+++ b/block/bsg-lib.c
-@@ -207,20 +207,34 @@ static int bsg_init_rq(struct request_queue *q, struct request *req, gfp_t gfp)
- 	struct bsg_job *job = blk_mq_rq_to_pdu(req);
- 	struct scsi_request *sreq = &job->sreq;
- 
-+	/* called right after the request is allocated for the request_queue */
-+
-+	sreq->sense = kzalloc(SCSI_SENSE_BUFFERSIZE, gfp);
-+	if (!sreq->sense)
-+		return -ENOMEM;
-+
-+	return 0;
-+}
-+
-+static void bsg_initialize_rq(struct request *req)
-+{
-+	struct bsg_job *job = blk_mq_rq_to_pdu(req);
-+	struct scsi_request *sreq = &job->sreq;
-+	void *sense = sreq->sense;
-+
-+	/* called right before the request is given to the request_queue user */
-+
- 	memset(job, 0, sizeof(*job));
- 
- 	scsi_req_init(sreq);
-+
-+	sreq->sense = sense;
- 	sreq->sense_len = SCSI_SENSE_BUFFERSIZE;
--	sreq->sense = kzalloc(sreq->sense_len, gfp);
--	if (!sreq->sense)
--		return -ENOMEM;
- 
- 	job->req = req;
--	job->reply = sreq->sense;
-+	job->reply = sense;
- 	job->reply_len = sreq->sense_len;
- 	job->dd_data = job + 1;
--
--	return 0;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 48f18f5e2e16..16ddd52e6408 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -347,6 +347,36 @@ void blk_sync_queue(struct request_queue *q)
  }
+ EXPORT_SYMBOL(blk_sync_queue);
  
- static void bsg_exit_rq(struct request_queue *q, struct request *req)
-@@ -251,6 +265,7 @@ struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
- 	q->cmd_size = sizeof(struct bsg_job) + dd_job_size;
- 	q->init_rq_fn = bsg_init_rq;
- 	q->exit_rq_fn = bsg_exit_rq;
-+	q->initialize_rq_fn = bsg_initialize_rq;
- 	q->request_fn = bsg_request_fn;
++/**
++ * blk_set_preempt_only - set QUEUE_FLAG_PREEMPT_ONLY
++ * @q: request queue pointer
++ *
++ * Returns the previous value of the PREEMPT_ONLY flag - 0 if the flag was not
++ * set and 1 if the flag was already set.
++ */
++int blk_set_preempt_only(struct request_queue *q)
++{
++	unsigned long flags;
++	int res;
++
++	spin_lock_irqsave(q->queue_lock, flags);
++	res = queue_flag_test_and_set(QUEUE_FLAG_PREEMPT_ONLY, q);
++	spin_unlock_irqrestore(q->queue_lock, flags);
++
++	return res;
++}
++EXPORT_SYMBOL_GPL(blk_set_preempt_only);
++
++void blk_clear_preempt_only(struct request_queue *q)
++{
++	unsigned long flags;
++
++	spin_lock_irqsave(q->queue_lock, flags);
++	queue_flag_clear(QUEUE_FLAG_PREEMPT_ONLY, q);
++	spin_unlock_irqrestore(q->queue_lock, flags);
++}
++EXPORT_SYMBOL_GPL(blk_clear_preempt_only);
++
+ /**
+  * __blk_run_queue_uncond - run a queue whether or not it has been stopped
+  * @q:	The queue to run
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 7f4a1ba532af..75f31535f280 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -74,6 +74,7 @@ static const char *const blk_queue_flag_name[] = {
+ 	QUEUE_FLAG_NAME(REGISTERED),
+ 	QUEUE_FLAG_NAME(SCSI_PASSTHROUGH),
+ 	QUEUE_FLAG_NAME(QUIESCED),
++	QUEUE_FLAG_NAME(PREEMPT_ONLY),
+ };
+ #undef QUEUE_FLAG_NAME
  
- 	ret = blk_init_allocated_queue(q);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 05203175eb9c..864ad2e4a58c 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -630,6 +630,7 @@ struct request_queue {
+ #define QUEUE_FLAG_REGISTERED  26	/* queue has been registered to a disk */
+ #define QUEUE_FLAG_SCSI_PASSTHROUGH 27	/* queue supports SCSI commands */
+ #define QUEUE_FLAG_QUIESCED    28	/* queue has been quiesced */
++#define QUEUE_FLAG_PREEMPT_ONLY	29	/* only process REQ_PREEMPT requests */
+ 
+ #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
+ 				 (1 << QUEUE_FLAG_SAME_COMP)	|	\
+@@ -730,6 +731,11 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
+ 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
+ 			     REQ_FAILFAST_DRIVER))
+ #define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
++#define blk_queue_preempt_only(q)				\
++	test_bit(QUEUE_FLAG_PREEMPT_ONLY, &(q)->queue_flags)
++
++extern int blk_set_preempt_only(struct request_queue *q);
++extern void blk_clear_preempt_only(struct request_queue *q);
+ 
+ static inline bool blk_account_rq(struct request *rq)
+ {
 -- 
-2.14.1
+2.14.2
