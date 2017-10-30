@@ -1,53 +1,59 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:51282 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1758034AbdJMMrM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 Oct 2017 08:47:12 -0400
-Received: by mail-wm0-f68.google.com with SMTP id f4so21572804wme.0
-        for <linux-block@vger.kernel.org>; Fri, 13 Oct 2017 05:47:11 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Rakesh Pandit <rakesh@tuxera.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 05/58] lightnvm: pblk: fix error path in pblk_lines_alloc_metadata
-Date: Fri, 13 Oct 2017 14:45:54 +0200
-Message-Id: <20171013124647.32668-6-m@bjorling.me>
-In-Reply-To: <20171013124647.32668-1-m@bjorling.me>
-References: <20171013124647.32668-1-m@bjorling.me>
+Return-Path: <brking@linux.vnet.ibm.com>
+Subject: Re: [PATCH v2 6/8] scsi/ipr: Use sgl_alloc_order() and
+ sgl_free_order()
+To: Bart Van Assche <Bart.VanAssche@wdc.com>, "hare@suse.de" <hare@suse.de>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+References: <20171016224940.1332-1-bart.vanassche@wdc.com>
+ <20171016224940.1332-7-bart.vanassche@wdc.com>
+ <c804098f-5543-395c-1395-5778ef74a61b@suse.de>
+ <ce6f2f5b-b4bc-380f-8ac1-1e91e4d6bf24@linux.vnet.ibm.com>
+ <1509395828.27259.21.camel@wdc.com>
+From: Brian King <brking@linux.vnet.ibm.com>
+Date: Mon, 30 Oct 2017 16:01:48 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <1509395828.27259.21.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Message-Id: <33515fd2-9639-7981-e344-80cdacd40d32@linux.vnet.ibm.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Rakesh Pandit <rakesh@tuxera.com>
+On 10/30/2017 03:37 PM, Bart Van Assche wrote:
+> On Wed, 2017-10-18 at 15:57 -0500, Brian King wrote:
+>> On 10/17/2017 01:19 AM, Hannes Reinecke wrote:
+>>> On 10/17/2017 12:49 AM, Bart Van Assche wrote:
+>>>> [ ... ]
+>>>
+>>> Not sure if this is a valid conversion.
+>>> Originally the driver would allocate a single buffer; with this buffer
+>>> we have two distinct buffers.
+>>> Given that this is used to download the microcode I'm not sure if this
+>>> isn't a hardware-dependent structure which requires a single buffer
+>>> including the sglist.
+>>> Brian, can you shed some light here?
+>>
+>> The struct ipr_sglist is not a hardware defined data structure, so on initial
+>> glance, this should be OK. I'll load it up and give it a try to make sure
+>> it doesn't break code download.
+> 
+> Hello Brian,
+> 
+> Have you already obtained any test results?
 
-Use appropriate memory free calls based on allocation type used and
-also fix number of times free is called if kmalloc fails.
+Bart,
 
-Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
-Reviewed-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/lightnvm/pblk-init.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Yes. I tried this out on an ipr adapter and it looks fine.
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 6df65d1..05665a7 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -630,7 +630,10 @@ static int pblk_lines_alloc_metadata(struct pblk *pblk)
- 
- fail_free_emeta:
- 	while (--i >= 0) {
--		vfree(l_mg->eline_meta[i]->buf);
-+		if (l_mg->emeta_alloc_type == PBLK_VMALLOC_META)
-+			vfree(l_mg->eline_meta[i]->buf);
-+		else
-+			kfree(l_mg->eline_meta[i]->buf);
- 		kfree(l_mg->eline_meta[i]);
- 	}
- 
+Acked-by: Brian King <brking@linux.vnet.ibm.com>
+
+Thanks,
+
+Brian
+
 -- 
-2.9.3
+Brian King
+Power Linux I/O
+IBM Linux Technology Center
