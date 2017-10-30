@@ -1,81 +1,88 @@
-Return-Path: <prvs=469d6a95f=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "hch@lst.de" <hch@lst.de>, "jthumshirn@suse.de" <jthumshirn@suse.de>,
-	"keith.busch@intel.com" <keith.busch@intel.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "hare@suse.com"
-	<hare@suse.com>, "stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH] block: Fix a race between blk_cleanup_queue() and timeout
  handling
-Date: Mon, 30 Oct 2017 18:37:11 +0000
-Message-ID: <1509388630.27259.6.camel@wdc.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Keith Busch <keith.busch@intel.com>, Hannes Reinecke <hare@suse.com>,
+ Ming Lei <ming.lei@redhat.com>, Johannes Thumshirn <jthumshirn@suse.de>,
+ stable@vger.kernel.org
 References: <20171019170048.16044-1-bart.vanassche@wdc.com>
-	 <c91fcb5c-9699-d2e0-0a92-c6656624566a@kernel.dk>
-In-Reply-To: <c91fcb5c-9699-d2e0-0a92-c6656624566a@kernel.dk>
-Content-Type: text/plain; charset="utf-8"
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <c91fcb5c-9699-d2e0-0a92-c6656624566a@kernel.dk>
+Date: Mon, 30 Oct 2017 12:16:30 -0600
 MIME-Version: 1.0
+In-Reply-To: <20171019170048.16044-1-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE3LTEwLTMwIGF0IDEyOjE2IC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
-biAxMC8xOS8yMDE3IDExOjAwIEFNLCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6DQo+ID4gTWFrZSBz
-dXJlIHRoYXQgaWYgdGhlIHRpbWVvdXQgdGltZXIgZmlyZXMgYWZ0ZXIgYSBxdWV1ZSBoYXMgYmVl
-bg0KPiA+IG1hcmtlZCAiZHlpbmciIHRoYXQgdGhlIGFmZmVjdGVkIHJlcXVlc3RzIGFyZSBmaW5p
-c2hlZC4NCj4gPiANCj4gPiBSZXBvcnRlZC1ieTogY2hlbnhpYW5nIChNKSA8Y2hlbnhpYW5nNjZA
-aGlzaWxpY29uLmNvbT4NCj4gPiBGaXhlczogY29tbWl0IDI4NzkyMmViMGIxOCAoImJsb2NrOiBk
-ZWZlciB0aW1lb3V0cyB0byBhIHdvcmtxdWV1ZSIpDQo+ID4gU2lnbmVkLW9mZi1ieTogQmFydCBW
-YW4gQXNzY2hlIDxiYXJ0LnZhbmFzc2NoZUB3ZGMuY29tPg0KPiA+IFRlc3RlZC1ieTogY2hlbnhp
-YW5nIChNKSA8Y2hlbnhpYW5nNjZAaGlzaWxpY29uLmNvbT4NCj4gPiBDYzogQ2hyaXN0b3BoIEhl
-bGx3aWcgPGhjaEBsc3QuZGU+DQo+ID4gQ2M6IEtlaXRoIEJ1c2NoIDxrZWl0aC5idXNjaEBpbnRl
-bC5jb20+DQo+ID4gQ2M6IEhhbm5lcyBSZWluZWNrZSA8aGFyZUBzdXNlLmNvbT4NCj4gPiBDYzog
-TWluZyBMZWkgPG1pbmcubGVpQHJlZGhhdC5jb20+DQo+ID4gQ2M6IEpvaGFubmVzIFRodW1zaGly
-biA8anRodW1zaGlybkBzdXNlLmRlPg0KPiA+IENjOiA8c3RhYmxlQHZnZXIua2VybmVsLm9yZz4N
-Cj4gPiAtLS0NCj4gPiAgYmxvY2svYmxrLWNvcmUuYyAgICB8IDIgKysNCj4gPiAgYmxvY2svYmxr
-LXRpbWVvdXQuYyB8IDMgLS0tDQo+ID4gIDIgZmlsZXMgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCsp
-LCAzIGRlbGV0aW9ucygtKQ0KPiA+IA0KPiA+IGRpZmYgLS1naXQgYS9ibG9jay9ibGstY29yZS5j
-IGIvYmxvY2svYmxrLWNvcmUuYw0KPiA+IGluZGV4IGU4ZTE0OWNjYzg2Yi4uYmI0ZmNlNjk0YTYw
-IDEwMDY0NA0KPiA+IC0tLSBhL2Jsb2NrL2Jsay1jb3JlLmMNCj4gPiArKysgYi9ibG9jay9ibGst
-Y29yZS5jDQo+ID4gQEAgLTMzMyw2ICszMzMsNyBAQCBFWFBPUlRfU1lNQk9MKGJsa19zdG9wX3F1
-ZXVlKTsNCj4gPiAgdm9pZCBibGtfc3luY19xdWV1ZShzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSkN
-Cj4gPiAgew0KPiA+ICAJZGVsX3RpbWVyX3N5bmMoJnEtPnRpbWVvdXQpOw0KPiA+ICsJY2FuY2Vs
-X3dvcmtfc3luYygmcS0+dGltZW91dF93b3JrKTsNCj4gPiAgDQo+ID4gIAlpZiAocS0+bXFfb3Bz
-KSB7DQo+ID4gIAkJc3RydWN0IGJsa19tcV9od19jdHggKmhjdHg7DQo+ID4gQEAgLTg0NCw2ICs4
-NDUsNyBAQCBzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqYmxrX2FsbG9jX3F1ZXVlX25vZGUoZ2ZwX3Qg
-Z2ZwX21hc2ssIGludCBub2RlX2lkKQ0KPiA+ICAJc2V0dXBfdGltZXIoJnEtPmJhY2tpbmdfZGV2
-X2luZm8tPmxhcHRvcF9tb2RlX3diX3RpbWVyLA0KPiA+ICAJCSAgICBsYXB0b3BfbW9kZV90aW1l
-cl9mbiwgKHVuc2lnbmVkIGxvbmcpIHEpOw0KPiA+ICAJc2V0dXBfdGltZXIoJnEtPnRpbWVvdXQs
-IGJsa19ycV90aW1lZF9vdXRfdGltZXIsICh1bnNpZ25lZCBsb25nKSBxKTsNCj4gPiArCUlOSVRf
-V09SSygmcS0+dGltZW91dF93b3JrLCBOVUxMKTsNCj4gPiAgCUlOSVRfTElTVF9IRUFEKCZxLT5x
-dWV1ZV9oZWFkKTsNCj4gPiAgCUlOSVRfTElTVF9IRUFEKCZxLT50aW1lb3V0X2xpc3QpOw0KPiA+
-ICAJSU5JVF9MSVNUX0hFQUQoJnEtPmljcV9saXN0KTsNCj4gDQo+IFRoaXMgcGFydCBsb29rcyBs
-aWtlIGEgbm8tYnJhaW5lci4NCj4gDQo+ID4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay10aW1lb3V0
-LmMgYi9ibG9jay9ibGstdGltZW91dC5jDQo+ID4gaW5kZXggZTNlOWM5NzcxZDM2Li43NjRlY2Y5
-YWViMzAgMTAwNjQ0DQo+ID4gLS0tIGEvYmxvY2svYmxrLXRpbWVvdXQuYw0KPiA+ICsrKyBiL2Js
-b2NrL2Jsay10aW1lb3V0LmMNCj4gPiBAQCAtMTM0LDggKzEzNCw2IEBAIHZvaWQgYmxrX3RpbWVv
-dXRfd29yayhzdHJ1Y3Qgd29ya19zdHJ1Y3QgKndvcmspDQo+ID4gIAlzdHJ1Y3QgcmVxdWVzdCAq
-cnEsICp0bXA7DQo+ID4gIAlpbnQgbmV4dF9zZXQgPSAwOw0KPiA+ICANCj4gPiAtCWlmIChibGtf
-cXVldWVfZW50ZXIocSwgdHJ1ZSkpDQo+ID4gLQkJcmV0dXJuOw0KPiA+ICAJc3Bpbl9sb2NrX2ly
-cXNhdmUocS0+cXVldWVfbG9jaywgZmxhZ3MpOw0KPiA+ICANCj4gPiAgCWxpc3RfZm9yX2VhY2hf
-ZW50cnlfc2FmZShycSwgdG1wLCAmcS0+dGltZW91dF9saXN0LCB0aW1lb3V0X2xpc3QpDQo+ID4g
-QEAgLTE0NSw3ICsxNDMsNiBAQCB2b2lkIGJsa190aW1lb3V0X3dvcmsoc3RydWN0IHdvcmtfc3Ry
-dWN0ICp3b3JrKQ0KPiA+ICAJCW1vZF90aW1lcigmcS0+dGltZW91dCwgcm91bmRfamlmZmllc191
-cChuZXh0KSk7DQo+ID4gIA0KPiA+ICAJc3Bpbl91bmxvY2tfaXJxcmVzdG9yZShxLT5xdWV1ZV9s
-b2NrLCBmbGFncyk7DQo+ID4gLQlibGtfcXVldWVfZXhpdChxKTsNCj4gPiAgfQ0KPiANCj4gQW5k
-IHRoaXMgc2hvdWxkIGJlIGZpbmUgdG9vLCBpZiB3ZSBoYXZlIHJlcXVlc3RzIHRoYXQgdGltZW91
-dCAoYXMgdGhleQ0KPiBob2xkIGEgcXVldWUgZW50ZXIgcmVmZXJlbmNlKS4gSXMgaXQgc2FmZSBp
-ZiB0aGVyZSBhcmUgbm8gcmVxdWVzdHMgbGVmdD8NCj4gUHJldmlvdXNseSB3ZSB3b3VsZCBmYWls
-IHRoZSBlbnRlciBpZiB0aGUgcXVldWUgd2FzIGR5aW5nLCBub3cgd2Ugd29uJ3QuDQo+IA0KPiBE
-b2Vzbid0IGxvb2sgcmVxdWlyZWQgZm9yIHRoZSBjaGFuZ2UsIHNob3VsZCBwcm9iYWJseSBiZSBh
-IHNlcGFyYXRlDQo+IHBhdGNoLg0KDQpIZWxsbyBKZW5zLA0KDQpUaGlzIHBhdGNoIHdhcyBkZXZl
-bG9wZWQgYXMgZm9sbG93czoNCi0gSW4gb3JkZXIgdG8gYXZvaWQgdGhhdCByZXF1ZXN0IHRpbWVv
-dXRzIGRvIG5vdCBnZXQgcHJvY2Vzc2VkLCBJIHJlbW92ZWQNCiAgdGhlIGJsa19xdWV1ZV9lbnRl
-cigpIGFuZCBibGtfcXVldWVfZXhpdCgpIGNhbGxzIGZyb20gYmxrX3RpbWVvdXRfd29yaygpLg0K
-LSBUbyBhdm9pZCB0aGF0IGNhbGxpbmcgYmxrX3RpbWVvdXRfd29yaygpIHdoaWxlIGEgcXVldWUg
-aXMgZHlpbmcgd291bGQNCiAgY2F1c2UgdHJvdWJsZSwgSSBhZGRlZCB0aGUgY2FuY2VsX3dvcmtf
-c3luYygpIGNhbGwgaW4gYmxrX3N5bmNfcXVldWUoKS4NCi0gQWZ0ZXIgSSBub3RpY2VkIHRoYXQg
-dGhlIGNhbmNlbF93b3JrX3N5bmMoKSBjYWxsIGFkZGVkIGJ5IHRoaXMgcGF0Y2gNCiAgdHJpZ2dl
-cnMgYSBrZXJuZWwgd2FybmluZyB3aGVuIHVubG9hZGluZyB0aGUgYnJkIGRyaXZlciBJIGFkZGVk
-IHRoZQ0KICBJTklUX1dPUksoKSBjYWxsLg0KDQpJIGhvcGUgdGhpcyBtYWtlcyBpdCBjbGVhciB0
-aGF0IHJlbW92aW5nIHRoZSBibGtfcXVldWVfZW50ZXIoKSBhbmQNCmJsa19xdWV1ZV9leGl0KCkg
-Y2FsbHMgaXMgZXNzZW50aWFsIGFuZCBhbHNvIHRoYXQgYWxsIGNoYW5nZXMgaW4gdGhpcyBwYXRj
-aA0KYXJlIG5lY2Vzc2FyeS4NCg0KVGhhbmtzLA0KDQpCYXJ0Lg==
+On 10/19/2017 11:00 AM, Bart Van Assche wrote:
+> Make sure that if the timeout timer fires after a queue has been
+> marked "dying" that the affected requests are finished.
+> 
+> Reported-by: chenxiang (M) <chenxiang66@hisilicon.com>
+> Fixes: commit 287922eb0b18 ("block: defer timeouts to a workqueue")
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Tested-by: chenxiang (M) <chenxiang66@hisilicon.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Keith Busch <keith.busch@intel.com>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> Cc: <stable@vger.kernel.org>
+> ---
+>  block/blk-core.c    | 2 ++
+>  block/blk-timeout.c | 3 ---
+>  2 files changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index e8e149ccc86b..bb4fce694a60 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -333,6 +333,7 @@ EXPORT_SYMBOL(blk_stop_queue);
+>  void blk_sync_queue(struct request_queue *q)
+>  {
+>  	del_timer_sync(&q->timeout);
+> +	cancel_work_sync(&q->timeout_work);
+>  
+>  	if (q->mq_ops) {
+>  		struct blk_mq_hw_ctx *hctx;
+> @@ -844,6 +845,7 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
+>  	setup_timer(&q->backing_dev_info->laptop_mode_wb_timer,
+>  		    laptop_mode_timer_fn, (unsigned long) q);
+>  	setup_timer(&q->timeout, blk_rq_timed_out_timer, (unsigned long) q);
+> +	INIT_WORK(&q->timeout_work, NULL);
+>  	INIT_LIST_HEAD(&q->queue_head);
+>  	INIT_LIST_HEAD(&q->timeout_list);
+>  	INIT_LIST_HEAD(&q->icq_list);
+
+This part looks like a no-brainer.
+
+> diff --git a/block/blk-timeout.c b/block/blk-timeout.c
+> index e3e9c9771d36..764ecf9aeb30 100644
+> --- a/block/blk-timeout.c
+> +++ b/block/blk-timeout.c
+> @@ -134,8 +134,6 @@ void blk_timeout_work(struct work_struct *work)
+>  	struct request *rq, *tmp;
+>  	int next_set = 0;
+>  
+> -	if (blk_queue_enter(q, true))
+> -		return;
+>  	spin_lock_irqsave(q->queue_lock, flags);
+>  
+>  	list_for_each_entry_safe(rq, tmp, &q->timeout_list, timeout_list)
+> @@ -145,7 +143,6 @@ void blk_timeout_work(struct work_struct *work)
+>  		mod_timer(&q->timeout, round_jiffies_up(next));
+>  
+>  	spin_unlock_irqrestore(q->queue_lock, flags);
+> -	blk_queue_exit(q);
+>  }
+
+And this should be fine too, if we have requests that timeout (as they
+hold a queue enter reference). Is it safe if there are no requests left?
+Previously we would fail the enter if the queue was dying, now we won't.
+
+Doesn't look required for the change, should probably be a separate
+patch.
+
+-- 
+Jens Axboe
