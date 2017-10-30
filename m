@@ -1,133 +1,82 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Cathy Avery <cavery@redhat.com>,
-        Martin Steigerwald <martin@lichtvoll.de>,
-        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V8 0/8] block/scsi: safe SCSI quiescing
-Date: Tue,  3 Oct 2017 22:03:58 +0800
-Message-Id: <20171003140406.26060-1-ming.lei@redhat.com>
+Return-Path: <prvs=469d6a95f=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, "Christoph
+ Hellwig" <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
+	Oleksandr Natalenko <oleksandr@natalenko.name>, Ming Lei
+	<ming.lei@redhat.com>, Martin Steigerwald <martin@lichtvoll.de>, "Bart Van
+ Assche" <bart.vanassche@wdc.com>, Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH v11 3/7] block: Introduce BLK_MQ_REQ_PREEMPT
+Date: Mon, 30 Oct 2017 15:42:01 -0700
+Message-ID: <20171030224205.25212-4-bart.vanassche@wdc.com>
+In-Reply-To: <20171030224205.25212-1-bart.vanassche@wdc.com>
+References: <20171030224205.25212-1-bart.vanassche@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-scsi-owner@vger.kernel.org
+Content-Type: text/plain
+Return-Path: bart.vanassche@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+Set RQF_PREEMPT if BLK_MQ_REQ_PREEMPT is passed to
+blk_get_request_flags().
 
-Please consider this patchset for V4.15, and it fixes one
-kind of long-term I/O hang issue in either block legacy path
-or blk-mq.
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Tested-by: Martin Steigerwald <martin@lichtvoll.de>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ block/blk-core.c       | 4 +++-
+ block/blk-mq.c         | 2 ++
+ include/linux/blk-mq.h | 1 +
+ 3 files changed, 6 insertions(+), 1 deletion(-)
 
-The current SCSI quiesce isn't safe and easy to trigger I/O deadlock.
-
-Once SCSI device is put into QUIESCE, no new request except for
-RQF_PREEMPT can be dispatched to SCSI successfully, and
-scsi_device_quiesce() just simply waits for completion of I/Os
-dispatched to SCSI stack. It isn't enough at all.
-
-Because new request still can be comming, but all the allocated
-requests can't be dispatched successfully, so request pool can be
-consumed up easily.
-
-Then request with RQF_PREEMPT can't be allocated and wait forever,
-then system hangs forever, such as during system suspend or
-sending SCSI domain alidation in case of transport_spi.
-
-Both IO hang inside system suspend[1] or SCSI domain validation
-were reported before.
-
-This patch introduces preempt only mode, and solves the issue
-by allowing RQF_PREEMP only during SCSI quiesce.
-
-Both SCSI and SCSI_MQ have this IO deadlock issue, this patch fixes
-them all.
-
-V8:
-	- fix one race as pointed out by Bart
-	- pass 'op' to blk_queue_enter() as suggested by Christoph
-
-V7:
-	- add Reviewed-by & Tested-by
-	- one line change in patch 5 for checking preempt request
-
-V6:
-	- borrow Bart's idea of preempt only, with clean
-	  implementation(patch 5/patch 6)
-	- needn't any external driver's dependency, such as MD's
-	change
-
-V5:
-	- fix one tiny race by introducing blk_queue_enter_preempt_freeze()
-	given this change is small enough compared with V4, I added
-	tested-by directly
-
-V4:
-	- reorganize patch order to make it more reasonable
-	- support nested preempt freeze, as required by SCSI transport spi
-	- check preempt freezing in slow path of of blk_queue_enter()
-	- add "SCSI: transport_spi: resume a quiesced device"
-	- wake up freeze queue in setting dying for both blk-mq and legacy
-	- rename blk_mq_[freeze|unfreeze]_queue() in one patch
-	- rename .mq_freeze_wq and .mq_freeze_depth
-	- improve comment
-
-V3:
-	- introduce q->preempt_unfreezing to fix one bug of preempt freeze
-	- call blk_queue_enter_live() only when queue is preempt frozen
-	- cleanup a bit on the implementation of preempt freeze
-	- only patch 6 and 7 are changed
-
-V2:
-	- drop the 1st patch in V1 because percpu_ref_is_dying() is
-	enough as pointed by Tejun
-	- introduce preempt version of blk_[freeze|unfreeze]_queue
-	- sync between preempt freeze and normal freeze
-	- fix warning from percpu-refcount as reported by Oleksandr
-
-
-[1] https://marc.info/?t=150340250100013&r=3&w=2
-
-
-Thanks,
-Ming
-
-Bart Van Assche (1):
-  block: Convert RQF_PREEMPT into REQ_PREEMPT
-
-Ming Lei (7):
-  blk-mq: only run hw queues for blk-mq
-  block: tracking request allocation with q_usage_counter
-  block: pass 'op' to blk_queue_enter()
-  percpu-refcount: introduce __percpu_ref_tryget_live
-  blk-mq: return if queue is frozen via current blk_freeze_queue_start
-  block: support PREEMPT_ONLY
-  SCSI: set block queue at preempt only when SCSI device is put into
-    quiesce
-
- block/blk-core.c                | 66 +++++++++++++++++++++++++++++++++++++----
- block/blk-mq-debugfs.c          |  2 +-
- block/blk-mq.c                  | 26 ++++++++--------
- block/blk-mq.h                  |  1 -
- block/blk-timeout.c             |  2 +-
- block/blk.h                     |  2 +-
- drivers/ide/ide-atapi.c         |  3 +-
- drivers/ide/ide-io.c            |  2 +-
- drivers/ide/ide-pm.c            |  4 +--
- drivers/scsi/scsi_lib.c         | 31 +++++++++++++++----
- fs/block_dev.c                  |  4 +--
- include/linux/blk-mq.h          |  4 +--
- include/linux/blk_types.h       |  6 ++++
- include/linux/blkdev.h          | 10 ++++---
- include/linux/percpu-refcount.h | 27 ++++++++++-------
- 15 files changed, 137 insertions(+), 53 deletions(-)
-
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 396104c05b38..48f18f5e2e16 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1262,6 +1262,8 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
+ 	blk_rq_set_rl(rq, rl);
+ 	rq->cmd_flags = op;
+ 	rq->rq_flags = rq_flags;
++	if (flags & BLK_MQ_REQ_PREEMPT)
++		rq->rq_flags |= RQF_PREEMPT;
+ 
+ 	/* init elvpriv */
+ 	if (rq_flags & RQF_ELVPRIV) {
+@@ -1443,7 +1445,7 @@ struct request *blk_get_request_flags(struct request_queue *q, unsigned int op,
+ 	struct request *req;
+ 
+ 	WARN_ON_ONCE(op & REQ_NOWAIT);
+-	WARN_ON_ONCE(flags & ~BLK_MQ_REQ_NOWAIT);
++	WARN_ON_ONCE(flags & ~(BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_PREEMPT));
+ 
+ 	if (q->mq_ops) {
+ 		req = blk_mq_alloc_request(q, op, flags);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 59b7de6b616b..6a025b17caac 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -290,6 +290,8 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	rq->q = data->q;
+ 	rq->mq_ctx = data->ctx;
+ 	rq->cmd_flags = op;
++	if (data->flags & BLK_MQ_REQ_PREEMPT)
++		rq->rq_flags |= RQF_PREEMPT;
+ 	if (blk_queue_io_stat(data->q))
+ 		rq->rq_flags |= RQF_IO_STAT;
+ 	/* do not touch atomic flags, it needs atomic ops against the timer */
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index e5e6becd57d3..22c7f36745fc 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -213,6 +213,7 @@ enum {
+ 	BLK_MQ_REQ_NOWAIT	= (1 << 0), /* return when out of requests */
+ 	BLK_MQ_REQ_RESERVED	= (1 << 1), /* allocate from reserved pool */
+ 	BLK_MQ_REQ_INTERNAL	= (1 << 2), /* allocate internal/sched tag */
++	BLK_MQ_REQ_PREEMPT	= (1 << 3), /* set RQF_PREEMPT */
+ };
+ 
+ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
 -- 
-2.9.5
+2.14.2
