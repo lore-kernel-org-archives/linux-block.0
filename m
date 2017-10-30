@@ -1,71 +1,36 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:42844 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753247AbdJaBrs (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Oct 2017 21:47:48 -0400
-Date: Tue, 31 Oct 2017 09:47:34 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
-        "roman.penyaev@profitbricks.com" <roman.penyaev@profitbricks.com>,
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:28383 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751475AbdJ3Udx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Oct 2017 16:33:53 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "roman.penyaev@profitbricks.com" <roman.penyaev@profitbricks.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "hch@infradead.org" <hch@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "osandov@fb.com" <osandov@fb.com>, "axboe@fb.com" <axboe@fb.com>,
         "hare@suse.com" <hare@suse.com>
 Subject: Re: [PATCH V2 0/2] block: remove unnecessary RESTART
-Message-ID: <20171031014728.GA12070@ming.t460p>
+Date: Mon, 30 Oct 2017 20:33:49 +0000
+Message-ID: <1509395628.27259.19.camel@wdc.com>
 References: <20171027044330.11921-1-ming.lei@redhat.com>
- <1509079996.3244.3.camel@wdc.com>
- <20171027053834.GA12858@ming.t460p>
- <1509395096.27259.15.camel@wdc.com>
+         <1509079996.3244.3.camel@wdc.com> <20171027053834.GA12858@ming.t460p>
+         <CAJrWOzD0LoFhKhFf-BrCtWipVEteT3uUqUc30_qr8E8wNeESGg@mail.gmail.com>
+In-Reply-To: <CAJrWOzD0LoFhKhFf-BrCtWipVEteT3uUqUc30_qr8E8wNeESGg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1509395096.27259.15.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, Oct 30, 2017 at 08:24:57PM +0000, Bart Van Assche wrote:
-> On Fri, 2017-10-27 at 13:38 +0800, Ming Lei wrote:
-> > On Fri, Oct 27, 2017 at 04:53:18AM +0000, Bart Van Assche wrote:
-> > > On Fri, 2017-10-27 at 12:43 +0800, Ming Lei wrote:
-> > > > The 1st patch removes the RESTART for TAG-SHARED because SCSI handles it
-> > > > by itself, and not necessary to waste CPU to do the expensive RESTART.
-> > > > And Roman Pen reported that this RESTART cuts half of IOPS in his case.
-> > > > 
-> > > > The 2nd patch removes the RESTART when .get_budget returns BLK_STS_RESOURCE,
-> > > > and this RESTART is handled by SCSI's RESTART(scsi_end_request()) too.
-> > > 
-> > > There are more block drivers than the SCSI core that share tags. If the
-> > 
-> > Could you share us what the other in-tree driver which share tags is?
-> 
-> I think the following in-tree drivers support shared tags (in alphabetical
-> order):
-> * null_blk. See also the shared_tags kernel module parameter.
-> * nvme. See also nvme_alloc_ns().
-
-For both null_blk and nvme, we don't need to deal with cross-queue RESTART,
-because BLK_MQ_S_TAG_WAITING has handled it already.
-
-> * scsi-mq.
-> 
-> Please note that the queue_rq() function of *all* these drivers can return
-> BLK_STS_RESOURCE.
-
-Yes, but this patch doesn't remove the RESTART for the current hctx, and
-only removed the part of handling cross-queue RESTART.
-
-> 
-> > Actually SCSI's RESTART is very thin, and it is just the per-host starved_list.
-> 
-> Do you see any reason that would prevent to move that mechanism from scsi-mq
-> into the blk-mq core?
-
-I don't see it is required from SCSI's view since this way has been run
-for SCSI for long time, and we don't have this requirement for other
-in-tree drivers meantime.
-
-Also as I mentioned before, driver has more knowledge than generic block
-layer for making it more efficiently.
-
-Thanks,
-Ming
+T24gRnJpLCAyMDE3LTEwLTI3IGF0IDE5OjU1ICswMjAwLCBSb21hbiBQZW55YWV2IHdyb3RlOg0K
+PiBUaGF0J3MganVzdCBhIGJ1ZyBpbiBjb2RlLCBub3QgYSBpbiBpc3N1ZSB3aXRoIHJlc3RhcnRz
+LCB3aGljaCBjYW4gYmUgZml4ZWQNCj4gaWYgd2UgcHV0IGhjdHggd2hpY2ggYXJlIG5lZWRlZCB0
+byBiZSByZXN0YXJ0ZWQgaW4gcGVyY3B1IGxpc3RzIGFuZCBhdm9pZA0KPiBsb25nIGxvb3BzIGFu
+ZCBjb250ZW50aW9ucy4NCg0KSGVsbG8gUm9tYW4sDQoNCkhhdmUgeW91IG5vdGljZWQgdGhhdCBy
+ZWNlbnRseSAuZ2V0X2J1ZGdldCgpIGFuZCAucHV0X2J1ZGdldCgpIGNhbGxiYWNrcyBoYXZlDQpi
+ZWVuIGFkZGVkIGludG8gc3RydWN0IGJsa19tcV9vcHM/IElmIGJsb2NrIGRyaXZlcnMgdGhhdCBz
+dXBwb3J0IHNoYXJlZCB0YWdzDQppbXBsZW1lbnQgdGhlc2UgY2FsbGJhY2sgZnVuY3Rpb25zIHBy
+b3Blcmx5IHRoZW4gbWF5YmUgYnVzeSBjb25kaXRpb25zIGJlY29tZQ0KaW5mcmVxdWVudCBlbm91
+Z2ggdG8gdXNlIGEgc2luZ2xlICJoY3R4IGJ1c3kiIGxpc3QgcGVyIHRhZyBzZXQgaW5zdGVhZCBv
+Zg0KcGVyLWNwdSAiaGN0eCBidXN5IiBsaXN0cy4NCg0KQmFydC4=
