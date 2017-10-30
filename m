@@ -1,29 +1,310 @@
-Return-Path: <hch@lst.de>
-Date: Mon, 2 Oct 2017 15:53:09 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	=Oleksandr Natalenko <oleksandr@natalenko.name>,
-	Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: Re: [PATCH v4 6/7] scsi: Set QUEUE_FLAG_PREEMPT_ONLY while quiesced
-Message-ID: <20171002135309.GB7571@lst.de>
-References: <20170925202924.16603-1-bart.vanassche@wdc.com> <20170925202924.16603-7-bart.vanassche@wdc.com>
+Return-Path: <prvs=469d6a95f=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, "Christoph
+ Hellwig" <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
+	Oleksandr Natalenko <oleksandr@natalenko.name>, Ming Lei
+	<ming.lei@redhat.com>, Martin Steigerwald <martin@lichtvoll.de>, "Bart Van
+ Assche" <bart.vanassche@wdc.com>, Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH v11 6/7] block, scsi: Make SCSI quiesce and resume work reliably
+Date: Mon, 30 Oct 2017 15:42:04 -0700
+Message-ID: <20171030224205.25212-7-bart.vanassche@wdc.com>
+In-Reply-To: <20171030224205.25212-1-bart.vanassche@wdc.com>
+References: <20171030224205.25212-1-bart.vanassche@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20170925202924.16603-7-bart.vanassche@wdc.com>
+Content-Type: text/plain
+Return-Path: bart.vanassche@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Sep 25, 2017 at 01:29:23PM -0700, Bart Van Assche wrote:
-> Make the quiesce state visible to the block layer for the next
-> patch in this series.
+The contexts from which a SCSI device can be quiesced or resumed are:
+* Writing into /sys/class/scsi_device/*/device/state.
+* SCSI parallel (SPI) domain validation.
+* The SCSI device power management methods. See also scsi_bus_pm_ops.
 
-This looks like the more correct version as everything is under
-state_mutex.
+It is essential during suspend and resume that neither the filesystem
+state nor the filesystem metadata in RAM changes. This is why while
+the hibernation image is being written or restored that SCSI devices
+are quiesced. The SCSI core quiesces devices through scsi_device_quiesce()
+and scsi_device_resume(). In the SDEV_QUIESCE state execution of
+non-preempt requests is deferred. This is realized by returning
+BLKPREP_DEFER from inside scsi_prep_state_check() for quiesced SCSI
+devices. Avoid that a full queue prevents power management requests
+to be submitted by deferring allocation of non-preempt requests for
+devices in the quiesced state. This patch has been tested by running
+the following commands and by verifying that after each resume the
+fio job was still running:
 
-Except for the fact that I'd like to get rid of the blk_set_preempt_only
-helper this looks good:
+for ((i=0; i<10; i++)); do
+  (
+    cd /sys/block/md0/md &&
+    while true; do
+      [ "$(<sync_action)" = "idle" ] && echo check > sync_action
+      sleep 1
+    done
+  ) &
+  pids=($!)
+  for d in /sys/class/block/sd*[a-z]; do
+    bdev=${d#/sys/class/block/}
+    hcil=$(readlink "$d/device")
+    hcil=${hcil#../../../}
+    echo 4 > "$d/queue/nr_requests"
+    echo 1 > "/sys/class/scsi_device/$hcil/device/queue_depth"
+    fio --name="$bdev" --filename="/dev/$bdev" --buffered=0 --bs=512 \
+      --rw=randread --ioengine=libaio --numjobs=4 --iodepth=16       \
+      --iodepth_batch=1 --thread --loops=$((2**31)) &
+    pids+=($!)
+  done
+  sleep 1
+  echo "$(date) Hibernating ..." >>hibernate-test-log.txt
+  systemctl hibernate
+  sleep 10
+  kill "${pids[@]}"
+  echo idle > /sys/block/md0/md/sync_action
+  wait
+  echo "$(date) Done." >>hibernate-test-log.txt
+done
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reported-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+References: "I/O hangs after resuming from suspend-to-ram" (https://marc.info/?l=linux-block&m=150340235201348).
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Tested-by: Martin Steigerwald <martin@lichtvoll.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ block/blk-core.c           | 43 ++++++++++++++++++++++++++++++++++++-------
+ block/blk-mq.c             |  4 ++--
+ drivers/scsi/scsi_lib.c    | 42 ++++++++++++++++++++++++++++++------------
+ fs/block_dev.c             |  4 ++--
+ include/linux/blkdev.h     |  2 +-
+ include/scsi/scsi_device.h |  1 +
+ 6 files changed, 72 insertions(+), 24 deletions(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 16ddd52e6408..d4dc10bb01e3 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -373,6 +373,7 @@ void blk_clear_preempt_only(struct request_queue *q)
+ 
+ 	spin_lock_irqsave(q->queue_lock, flags);
+ 	queue_flag_clear(QUEUE_FLAG_PREEMPT_ONLY, q);
++	wake_up_all(&q->mq_freeze_wq);
+ 	spin_unlock_irqrestore(q->queue_lock, flags);
+ }
+ EXPORT_SYMBOL_GPL(blk_clear_preempt_only);
+@@ -794,15 +795,41 @@ struct request_queue *blk_alloc_queue(gfp_t gfp_mask)
+ }
+ EXPORT_SYMBOL(blk_alloc_queue);
+ 
+-int blk_queue_enter(struct request_queue *q, bool nowait)
++/**
++ * blk_queue_enter() - try to increase q->q_usage_counter
++ * @q: request queue pointer
++ * @flags: BLK_MQ_REQ_NOWAIT and/or BLK_MQ_REQ_PREEMPT
++ */
++int blk_queue_enter(struct request_queue *q, unsigned int flags)
+ {
++	const bool preempt = flags & BLK_MQ_REQ_PREEMPT;
++
+ 	while (true) {
++		bool success = false;
+ 		int ret;
+ 
+-		if (percpu_ref_tryget_live(&q->q_usage_counter))
++		rcu_read_lock_sched();
++		if (percpu_ref_tryget_live(&q->q_usage_counter)) {
++			/*
++			 * The code that sets the PREEMPT_ONLY flag is
++			 * responsible for ensuring that that flag is globally
++			 * visible before the queue is unfrozen.
++			 */
++			if (preempt || !blk_queue_preempt_only(q)) {
++				success = true;
++			} else {
++				percpu_ref_put(&q->q_usage_counter);
++				WARN_ONCE(true,
++					  "%s: Attempt to allocate non-preempt request in preempt-only mode.\n",
++					  kobject_name(q->kobj.parent));
++			}
++		}
++		rcu_read_unlock_sched();
++
++		if (success)
+ 			return 0;
+ 
+-		if (nowait)
++		if (flags & BLK_MQ_REQ_NOWAIT)
+ 			return -EBUSY;
+ 
+ 		/*
+@@ -815,7 +842,8 @@ int blk_queue_enter(struct request_queue *q, bool nowait)
+ 		smp_rmb();
+ 
+ 		ret = wait_event_interruptible(q->mq_freeze_wq,
+-				!atomic_read(&q->mq_freeze_depth) ||
++				(atomic_read(&q->mq_freeze_depth) == 0 &&
++				 (preempt || !blk_queue_preempt_only(q))) ||
+ 				blk_queue_dying(q));
+ 		if (blk_queue_dying(q))
+ 			return -ENODEV;
+@@ -1444,8 +1472,7 @@ static struct request *blk_old_get_request(struct request_queue *q,
+ 	/* create ioc upfront */
+ 	create_io_context(gfp_mask, q->node);
+ 
+-	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM) ||
+-			      (op & REQ_NOWAIT));
++	ret = blk_queue_enter(q, flags);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 	spin_lock_irq(q->queue_lock);
+@@ -2266,8 +2293,10 @@ blk_qc_t generic_make_request(struct bio *bio)
+ 	current->bio_list = bio_list_on_stack;
+ 	do {
+ 		struct request_queue *q = bio->bi_disk->queue;
++		unsigned int flags = bio->bi_opf & REQ_NOWAIT ?
++			BLK_MQ_REQ_NOWAIT : 0;
+ 
+-		if (likely(blk_queue_enter(q, bio->bi_opf & REQ_NOWAIT) == 0)) {
++		if (likely(blk_queue_enter(q, flags) == 0)) {
+ 			struct bio_list lower, same;
+ 
+ 			/* Create a fresh bio_list for all subordinate requests */
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 6a025b17caac..c6bff60e6b8b 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -386,7 +386,7 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ 	struct request *rq;
+ 	int ret;
+ 
+-	ret = blk_queue_enter(q, flags & BLK_MQ_REQ_NOWAIT);
++	ret = blk_queue_enter(q, flags);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 
+@@ -425,7 +425,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ 	if (hctx_idx >= q->nr_hw_queues)
+ 		return ERR_PTR(-EIO);
+ 
+-	ret = blk_queue_enter(q, true);
++	ret = blk_queue_enter(q, flags);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 7c119696402c..d85b7941b988 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -2955,21 +2955,37 @@ static void scsi_wait_for_queuecommand(struct scsi_device *sdev)
+ int
+ scsi_device_quiesce(struct scsi_device *sdev)
+ {
++	struct request_queue *q = sdev->request_queue;
+ 	int err;
+ 
++	/*
++	 * It is allowed to call scsi_device_quiesce() multiple times from
++	 * the same context but concurrent scsi_device_quiesce() calls are
++	 * not allowed.
++	 */
++	WARN_ON_ONCE(sdev->quiesced_by && sdev->quiesced_by != current);
++
++	blk_set_preempt_only(q);
++
++	blk_mq_freeze_queue(q);
++	/*
++	 * Ensure that the effect of blk_set_preempt_only() will be visible
++	 * for percpu_ref_tryget() callers that occur after the queue
++	 * unfreeze even if the queue was already frozen before this function
++	 * was called. See also https://lwn.net/Articles/573497/.
++	 */
++	synchronize_rcu();
++	blk_mq_unfreeze_queue(q);
++
+ 	mutex_lock(&sdev->state_mutex);
+ 	err = scsi_device_set_state(sdev, SDEV_QUIESCE);
++	if (err == 0)
++		sdev->quiesced_by = current;
++	else
++		blk_clear_preempt_only(q);
+ 	mutex_unlock(&sdev->state_mutex);
+ 
+-	if (err)
+-		return err;
+-
+-	scsi_run_queue(sdev->request_queue);
+-	while (atomic_read(&sdev->device_busy)) {
+-		msleep_interruptible(200);
+-		scsi_run_queue(sdev->request_queue);
+-	}
+-	return 0;
++	return err;
+ }
+ EXPORT_SYMBOL(scsi_device_quiesce);
+ 
+@@ -2989,9 +3005,11 @@ void scsi_device_resume(struct scsi_device *sdev)
+ 	 * device deleted during suspend)
+ 	 */
+ 	mutex_lock(&sdev->state_mutex);
+-	if (sdev->sdev_state == SDEV_QUIESCE &&
+-	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0)
+-		scsi_run_queue(sdev->request_queue);
++	WARN_ON_ONCE(!sdev->quiesced_by);
++	sdev->quiesced_by = NULL;
++	blk_clear_preempt_only(sdev->request_queue);
++	if (sdev->sdev_state == SDEV_QUIESCE)
++		scsi_device_set_state(sdev, SDEV_RUNNING);
+ 	mutex_unlock(&sdev->state_mutex);
+ }
+ EXPORT_SYMBOL(scsi_device_resume);
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 07ddccd17801..c5363186618b 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -662,7 +662,7 @@ int bdev_read_page(struct block_device *bdev, sector_t sector,
+ 	if (!ops->rw_page || bdev_get_integrity(bdev))
+ 		return result;
+ 
+-	result = blk_queue_enter(bdev->bd_queue, false);
++	result = blk_queue_enter(bdev->bd_queue, 0);
+ 	if (result)
+ 		return result;
+ 	result = ops->rw_page(bdev, sector + get_start_sect(bdev), page, false);
+@@ -698,7 +698,7 @@ int bdev_write_page(struct block_device *bdev, sector_t sector,
+ 
+ 	if (!ops->rw_page || bdev_get_integrity(bdev))
+ 		return -EOPNOTSUPP;
+-	result = blk_queue_enter(bdev->bd_queue, false);
++	result = blk_queue_enter(bdev->bd_queue, 0);
+ 	if (result)
+ 		return result;
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 864ad2e4a58c..4f91c6462752 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -956,7 +956,7 @@ extern int scsi_cmd_ioctl(struct request_queue *, struct gendisk *, fmode_t,
+ extern int sg_scsi_ioctl(struct request_queue *, struct gendisk *, fmode_t,
+ 			 struct scsi_ioctl_command __user *);
+ 
+-extern int blk_queue_enter(struct request_queue *q, bool nowait);
++extern int blk_queue_enter(struct request_queue *q, unsigned int flags);
+ extern void blk_queue_exit(struct request_queue *q);
+ extern void blk_start_queue(struct request_queue *q);
+ extern void blk_start_queue_async(struct request_queue *q);
+diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
+index 82e93ee94708..6f0f1e242e23 100644
+--- a/include/scsi/scsi_device.h
++++ b/include/scsi/scsi_device.h
+@@ -219,6 +219,7 @@ struct scsi_device {
+ 	unsigned char		access_state;
+ 	struct mutex		state_mutex;
+ 	enum scsi_device_state sdev_state;
++	struct task_struct	*quiesced_by;
+ 	unsigned long		sdev_data[0];
+ } __attribute__((aligned(sizeof(unsigned long))));
+ 
+-- 
+2.14.2
