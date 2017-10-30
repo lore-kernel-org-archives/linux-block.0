@@ -1,82 +1,171 @@
-Return-Path: <prvs=4560204ad=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Oleksandr Natalenko <oleksandr@natalenko.name>,
-	Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v10 06/10] block: Introduce BLK_MQ_REQ_PREEMPT
-Date: Tue, 17 Oct 2017 16:26:26 -0700
-Message-Id: <20171017232630.4264-7-bart.vanassche@wdc.com>
-In-Reply-To: <20171017232630.4264-1-bart.vanassche@wdc.com>
-References: <20171017232630.4264-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:50224 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932353AbdJ3Vq7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Oct 2017 17:46:59 -0400
+Received: by mail-pf0-f196.google.com with SMTP id b6so12071963pfh.7
+        for <linux-block@vger.kernel.org>; Mon, 30 Oct 2017 14:46:58 -0700 (PDT)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Tang Junhui <tang.junhui@zte.com.cn>,
+        Michael Lyle <mlyle@lyle.org>
+Subject: [PATCH 3/5] bcache: update bucket_in_use in real time
+Date: Mon, 30 Oct 2017 14:46:33 -0700
+Message-Id: <20171030214635.29888-4-mlyle@lyle.org>
+In-Reply-To: <20171030214635.29888-1-mlyle@lyle.org>
+References: <20171030214635.29888-1-mlyle@lyle.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Set RQF_PREEMPT if BLK_MQ_REQ_PREEMPT is passed to
-blk_get_request_flags().
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Tested-by: Martin Steigerwald <martin@lichtvoll.de>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+bucket_in_use is updated in gc thread which triggered by invalidating or
+writing sectors_to_gc dirty data, It's a long interval. Therefore, when we
+use it to compare with the threshold, it is often not timely, which leads
+to inaccurate judgment and often results in bucket depletion.
+
+We have send a patch before, by the means of updating bucket_in_use
+periodically In gc thread, which Coly thought that would lead high
+latency, In this patch, we add avail_nbuckets to record the count of
+available buckets, and we calculate bucket_in_use when alloc or free
+bucket in real time.
+
+[edited by ML: eliminated some whitespace errors]
+
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+Signed-off-by: Michael Lyle <mlyle@lyle.org>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
+Reviewed-by: Coly Li <colyli@suse.de>
 ---
- block/blk-core.c       | 4 +++-
- block/blk-mq.c         | 2 ++
- include/linux/blk-mq.h | 1 +
- 3 files changed, 6 insertions(+), 1 deletion(-)
+ drivers/md/bcache/alloc.c  | 10 ++++++++++
+ drivers/md/bcache/bcache.h |  1 +
+ drivers/md/bcache/btree.c  | 17 ++++++++++-------
+ drivers/md/bcache/btree.h  |  2 +-
+ 4 files changed, 22 insertions(+), 8 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 559818be8e02..ab835d3c2f39 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1260,6 +1260,8 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
- 	blk_rq_set_rl(rq, rl);
- 	rq->cmd_flags = op;
- 	rq->rq_flags = rq_flags;
-+	if (flags & BLK_MQ_REQ_PREEMPT)
-+		rq->rq_flags |= RQF_PREEMPT;
+diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
+index 4c40870e99f5..8c5a626343d4 100644
+--- a/drivers/md/bcache/alloc.c
++++ b/drivers/md/bcache/alloc.c
+@@ -442,6 +442,11 @@ long bch_bucket_alloc(struct cache *ca, unsigned reserve, bool wait)
+ 		b->prio = INITIAL_PRIO;
+ 	}
  
- 	/* init elvpriv */
- 	if (rq_flags & RQF_ELVPRIV) {
-@@ -1441,7 +1443,7 @@ struct request *blk_get_request_flags(struct request_queue *q, unsigned int op,
- 	struct request *req;
++	if (ca->set->avail_nbuckets > 0) {
++		ca->set->avail_nbuckets--;
++		bch_update_bucket_in_use(ca->set, &ca->set->gc_stats);
++	}
++
+ 	return r;
+ }
  
- 	WARN_ON_ONCE(op & REQ_NOWAIT);
--	WARN_ON_ONCE(flags & ~BLK_MQ_REQ_NOWAIT);
-+	WARN_ON_ONCE(flags & ~(BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_PREEMPT));
+@@ -449,6 +454,11 @@ void __bch_bucket_free(struct cache *ca, struct bucket *b)
+ {
+ 	SET_GC_MARK(b, 0);
+ 	SET_GC_SECTORS_USED(b, 0);
++
++	if (ca->set->avail_nbuckets < ca->set->nbuckets) {
++		ca->set->avail_nbuckets++;
++		bch_update_bucket_in_use(ca->set, &ca->set->gc_stats);
++	}
+ }
  
- 	if (q->mq_ops) {
- 		req = blk_mq_alloc_request(q, op, flags);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 59b7de6b616b..6a025b17caac 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -290,6 +290,8 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 	rq->q = data->q;
- 	rq->mq_ctx = data->ctx;
- 	rq->cmd_flags = op;
-+	if (data->flags & BLK_MQ_REQ_PREEMPT)
-+		rq->rq_flags |= RQF_PREEMPT;
- 	if (blk_queue_io_stat(data->q))
- 		rq->rq_flags |= RQF_IO_STAT;
- 	/* do not touch atomic flags, it needs atomic ops against the timer */
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index e5e6becd57d3..22c7f36745fc 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -213,6 +213,7 @@ enum {
- 	BLK_MQ_REQ_NOWAIT	= (1 << 0), /* return when out of requests */
- 	BLK_MQ_REQ_RESERVED	= (1 << 1), /* allocate from reserved pool */
- 	BLK_MQ_REQ_INTERNAL	= (1 << 2), /* allocate internal/sched tag */
-+	BLK_MQ_REQ_PREEMPT	= (1 << 3), /* set RQF_PREEMPT */
- };
+ void bch_bucket_free(struct cache_set *c, struct bkey *k)
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 363ea6256b39..e274082330dc 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -581,6 +581,7 @@ struct cache_set {
+ 	uint8_t			need_gc;
+ 	struct gc_stat		gc_stats;
+ 	size_t			nbuckets;
++	size_t			avail_nbuckets;
  
- struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ 	struct task_struct	*gc_thread;
+ 	/* Where in the btree gc currently is */
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index 866dcf78ff8e..d8865e6ead37 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -1240,6 +1240,11 @@ void bch_initial_mark_key(struct cache_set *c, int level, struct bkey *k)
+ 	__bch_btree_mark_key(c, level, k);
+ }
+ 
++void bch_update_bucket_in_use(struct cache_set *c, struct gc_stat *stats)
++{
++	stats->in_use = (c->nbuckets - c->avail_nbuckets) * 100 / c->nbuckets;
++}
++
+ static bool btree_gc_mark_node(struct btree *b, struct gc_stat *gc)
+ {
+ 	uint8_t stale = 0;
+@@ -1651,9 +1656,8 @@ static void btree_gc_start(struct cache_set *c)
+ 	mutex_unlock(&c->bucket_lock);
+ }
+ 
+-static size_t bch_btree_gc_finish(struct cache_set *c)
++static void bch_btree_gc_finish(struct cache_set *c)
+ {
+-	size_t available = 0;
+ 	struct bucket *b;
+ 	struct cache *ca;
+ 	unsigned i;
+@@ -1690,6 +1694,7 @@ static size_t bch_btree_gc_finish(struct cache_set *c)
+ 	}
+ 	rcu_read_unlock();
+ 
++	c->avail_nbuckets = 0;
+ 	for_each_cache(ca, c, i) {
+ 		uint64_t *i;
+ 
+@@ -1711,18 +1716,16 @@ static size_t bch_btree_gc_finish(struct cache_set *c)
+ 			BUG_ON(!GC_MARK(b) && GC_SECTORS_USED(b));
+ 
+ 			if (!GC_MARK(b) || GC_MARK(b) == GC_MARK_RECLAIMABLE)
+-				available++;
++				c->avail_nbuckets++;
+ 		}
+ 	}
+ 
+ 	mutex_unlock(&c->bucket_lock);
+-	return available;
+ }
+ 
+ static void bch_btree_gc(struct cache_set *c)
+ {
+ 	int ret;
+-	unsigned long available;
+ 	struct gc_stat stats;
+ 	struct closure writes;
+ 	struct btree_op op;
+@@ -1745,14 +1748,14 @@ static void bch_btree_gc(struct cache_set *c)
+ 			pr_warn("gc failed!");
+ 	} while (ret);
+ 
+-	available = bch_btree_gc_finish(c);
++	bch_btree_gc_finish(c);
+ 	wake_up_allocators(c);
+ 
+ 	bch_time_stats_update(&c->btree_gc_time, start_time);
+ 
+ 	stats.key_bytes *= sizeof(uint64_t);
+ 	stats.data	<<= 9;
+-	stats.in_use	= (c->nbuckets - available) * 100 / c->nbuckets;
++	bch_update_bucket_in_use(c, &stats);
+ 	memcpy(&c->gc_stats, &stats, sizeof(struct gc_stat));
+ 
+ 	trace_bcache_gc_end(c);
+diff --git a/drivers/md/bcache/btree.h b/drivers/md/bcache/btree.h
+index 73da1f5626cb..4073aca09a49 100644
+--- a/drivers/md/bcache/btree.h
++++ b/drivers/md/bcache/btree.h
+@@ -305,5 +305,5 @@ void bch_keybuf_del(struct keybuf *, struct keybuf_key *);
+ struct keybuf_key *bch_keybuf_next(struct keybuf *);
+ struct keybuf_key *bch_keybuf_next_rescan(struct cache_set *, struct keybuf *,
+ 					  struct bkey *, keybuf_pred_fn *);
+-
++void bch_update_bucket_in_use(struct cache_set *c, struct gc_stat *stats);
+ #endif
 -- 
-2.14.2
+2.11.0
