@@ -1,38 +1,55 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from 22.17.110.36.static.bjtelecom.net ([36.110.17.22]:31790 "EHLO
-        BJEXCAS003.didichuxing.com" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751595AbdJaKhj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 Oct 2017 06:37:39 -0400
-Date: Tue, 31 Oct 2017 18:37:32 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>, <jack@suse.cz>
-CC: <linux-block@vger.kernel.org>, <linux-mm@kvack.org>
-Subject: [PATCH v2 0/3] add error handle for bdi debugfs register
-Message-ID: <cover.1509415695.git.zhangweiping@didichuxing.com>
+Return-Path: <redfish@galactica.pw>
+Date: Mon, 30 Oct 2017 21:50:53 -0400
+From: redfish <redfish@galactica.pw>
+To: linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	regressions@leemhuis.info
+Subject: [Bug 197303] blk_partition_remap: fail for partition 3]
+Message-ID: <20171031015053.GA15858@thinkpad.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+List-ID: <linux-block@vger.kernel.org>
 
-Hello,
+(This report on Bugzilla): https://bugzilla.kernel.org/show_bug.cgi?id=197303
 
-Change since V1:
- * remove the patch for bdi_debug_init(), because patch1 add a check
-   for bdi_debug_root
- * remove bdi_put in bdi_register, this functions has two callers:
-caller1: mtd_bdi_init->bdi_register, bdi_put if register fail
-caller2: device_add_disk->bdi_register_owner->bdi_register, this call
-stack need more safety cleanup, so patch3 add an WARN_ON.
+On ARM board Odroid U3, with root fs on eMMC with 4.14rc4 got this:
 
-weiping zhang (3):
-  bdi: convert bdi_debug_register to int
-  bdi: add error handle for bdi_debug_register
-  block: add WARN_ON if bdi register fail
+blk_partition_remap: fail for partition 3
+[52311.638650] EXT4-fs error (device mmcblk1p3): ext4_find_entry:1431: inode #20381: comm kworker/u8:0: reading directory lblock 0
+[52311.650728] Core dump to |/usr/lib/systemd/systemd-coredump 2980 0 0 7 1507904006 4294967295 agetty pipe failed
 
- block/genhd.c    |  2 +-
- mm/backing-dev.c | 22 +++++++++++++++++++---
- 2 files changed, 20 insertions(+), 4 deletions(-)
+Board fatally hung. Never observed happening in 4.13.6, 4.13.7 or any earlier kernel.
+
+It looks like at least the error message was introduced in this commit present only in 4.14: 
+74d46992e0d9dee7f1f376de0d56d31614c8a17a
+block: replace bi_bdev with a gendisk pointer and partitions index
+
+Thank you.
+
+
+----- Forwarded message from bugzilla-daemon@bugzilla.kernel.org -----
+
+Date: Sun, 29 Oct 2017 13:55:51 +0000
+From: bugzilla-daemon@bugzilla.kernel.org
+To: redfish@galactica.pw
+Subject: [Bug 197303] blk_partition_remap: fail for partition 3
+
+https://bugzilla.kernel.org/show_bug.cgi?id=197303
+
+Thorsten Leemhuis (regressions@leemhuis.info) changed:
+
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |regressions@leemhuis.info
+
+--- Comment #1 from Thorsten Leemhuis (regressions@leemhuis.info) ---
+I'll add this issue to the regression report. But you really should mail this
+issue to linux-block@vger.kernel.org and CC the two developers mentioned in
+74d46992e0d9dee7f1f376de0d56d31614c8a17a , as it will likely get ignored here
+on bugzilla.
 
 -- 
-2.14.2
+You are receiving this mail because:
+You reported the bug.
+
+----- End forwarded message -----
