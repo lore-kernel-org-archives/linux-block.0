@@ -1,82 +1,38 @@
-Return-Path: <prvs=469d6a95f=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, "Christoph
- Hellwig" <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Oleksandr Natalenko <oleksandr@natalenko.name>, Ming Lei
-	<ming.lei@redhat.com>, Martin Steigerwald <martin@lichtvoll.de>, "Bart Van
- Assche" <bart.vanassche@wdc.com>, Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v11 3/7] block: Introduce BLK_MQ_REQ_PREEMPT
-Date: Mon, 30 Oct 2017 15:42:01 -0700
-Message-ID: <20171030224205.25212-4-bart.vanassche@wdc.com>
-In-Reply-To: <20171030224205.25212-1-bart.vanassche@wdc.com>
-References: <20171030224205.25212-1-bart.vanassche@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from 22.17.110.36.static.bjtelecom.net ([36.110.17.22]:31790 "EHLO
+        BJEXCAS003.didichuxing.com" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1751595AbdJaKhj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 31 Oct 2017 06:37:39 -0400
+Date: Tue, 31 Oct 2017 18:37:32 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: <axboe@kernel.dk>, <jack@suse.cz>
+CC: <linux-block@vger.kernel.org>, <linux-mm@kvack.org>
+Subject: [PATCH v2 0/3] add error handle for bdi debugfs register
+Message-ID: <cover.1509415695.git.zhangweiping@didichuxing.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Set RQF_PREEMPT if BLK_MQ_REQ_PREEMPT is passed to
-blk_get_request_flags().
+Hello,
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Tested-by: Martin Steigerwald <martin@lichtvoll.de>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- block/blk-core.c       | 4 +++-
- block/blk-mq.c         | 2 ++
- include/linux/blk-mq.h | 1 +
- 3 files changed, 6 insertions(+), 1 deletion(-)
+Change since V1:
+ * remove the patch for bdi_debug_init(), because patch1 add a check
+   for bdi_debug_root
+ * remove bdi_put in bdi_register, this functions has two callers:
+caller1: mtd_bdi_init->bdi_register, bdi_put if register fail
+caller2: device_add_disk->bdi_register_owner->bdi_register, this call
+stack need more safety cleanup, so patch3 add an WARN_ON.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 396104c05b38..48f18f5e2e16 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1262,6 +1262,8 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
- 	blk_rq_set_rl(rq, rl);
- 	rq->cmd_flags = op;
- 	rq->rq_flags = rq_flags;
-+	if (flags & BLK_MQ_REQ_PREEMPT)
-+		rq->rq_flags |= RQF_PREEMPT;
- 
- 	/* init elvpriv */
- 	if (rq_flags & RQF_ELVPRIV) {
-@@ -1443,7 +1445,7 @@ struct request *blk_get_request_flags(struct request_queue *q, unsigned int op,
- 	struct request *req;
- 
- 	WARN_ON_ONCE(op & REQ_NOWAIT);
--	WARN_ON_ONCE(flags & ~BLK_MQ_REQ_NOWAIT);
-+	WARN_ON_ONCE(flags & ~(BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_PREEMPT));
- 
- 	if (q->mq_ops) {
- 		req = blk_mq_alloc_request(q, op, flags);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 59b7de6b616b..6a025b17caac 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -290,6 +290,8 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 	rq->q = data->q;
- 	rq->mq_ctx = data->ctx;
- 	rq->cmd_flags = op;
-+	if (data->flags & BLK_MQ_REQ_PREEMPT)
-+		rq->rq_flags |= RQF_PREEMPT;
- 	if (blk_queue_io_stat(data->q))
- 		rq->rq_flags |= RQF_IO_STAT;
- 	/* do not touch atomic flags, it needs atomic ops against the timer */
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index e5e6becd57d3..22c7f36745fc 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -213,6 +213,7 @@ enum {
- 	BLK_MQ_REQ_NOWAIT	= (1 << 0), /* return when out of requests */
- 	BLK_MQ_REQ_RESERVED	= (1 << 1), /* allocate from reserved pool */
- 	BLK_MQ_REQ_INTERNAL	= (1 << 2), /* allocate internal/sched tag */
-+	BLK_MQ_REQ_PREEMPT	= (1 << 3), /* set RQF_PREEMPT */
- };
- 
- struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+weiping zhang (3):
+  bdi: convert bdi_debug_register to int
+  bdi: add error handle for bdi_debug_register
+  block: add WARN_ON if bdi register fail
+
+ block/genhd.c    |  2 +-
+ mm/backing-dev.c | 22 +++++++++++++++++++---
+ 2 files changed, 20 insertions(+), 4 deletions(-)
+
 -- 
 2.14.2
