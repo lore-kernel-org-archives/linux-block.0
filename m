@@ -1,62 +1,54 @@
-Return-Path: <bart@localhost>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Dann Frazier <dann.frazier@canonical.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] virtio_blk: Fix an SG_IO regression
-Date: Tue, 24 Oct 2017 08:04:36 +0200
-Message-Id: <20171024060436.24954-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from out1.zte.com.cn ([202.103.147.172]:58292 "EHLO mxct.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751593AbdJaIOc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 31 Oct 2017 04:14:32 -0400
+From: tang.junhui@zte.com.cn
+To: colyli@suse.de, mlyle@lyle.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        tang.junhui@zte.com.cn
+Subject: [PATCH] bcache: stop writeback thread after detaching
+Date: Tue, 31 Oct 2017 16:14:11 +0800
+Message-Id: <1509437651-24052-1-git-send-email-tang.junhui@zte.com.cn>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Avoid that submitting an SG_IO ioctl triggers a kernel oops that
-is preceded by:
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-usercopy: kernel memory overwrite attempt detected to (null) (<null>) (6 bytes)
-kernel BUG at mm/usercopy.c:72!
+Currently, when a cached device detaching from cache, writeback thread is not stopped,
+and writeback_rate_update work is not canceled. For example, after bellow command:
+echo 1 >/sys/block/sdb/bcache/detach
+you can still see the writeback thread. Then you attach the device to the cache again,
+bcache will create another writeback thread, for example, after bellow command:
+echo  ba0fb5cd-658a-4533-9806-6ce166d883b9 > /sys/block/sdb/bcache/attach
+then you will see 2 writeback threads.
+This patch stops writeback thread and cancels writeback_rate_update work when cached
+device detaching from cache.
 
-Additionally, make it easier to diagnose crashes like the one
-fixed by this patch.
-
-Reported-by: Dann Frazier <dann.frazier@canonical.com>
-Fixes: commit ca18d6f769d2 ("block: Make most scsi_req_init() calls implicit")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Tested-by: Dann Frazier <dann.frazier@canonical.com>
-Cc: Dann Frazier <dann.frazier@canonical.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: <stable@vger.kernel.org> # v4.13
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
 ---
- drivers/block/virtio_blk.c | 1 +
- drivers/scsi/sg.c          | 2 ++
- 2 files changed, 3 insertions(+)
+ drivers/md/bcache/super.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+ mode change 100644 => 100755 drivers/md/bcache/super.c
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 34e17ee799be..15e11a519801 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -597,6 +597,7 @@ static const struct blk_mq_ops virtio_mq_ops = {
- 	.queue_rq	= virtio_queue_rq,
- 	.complete	= virtblk_request_done,
- 	.init_request	= virtblk_init_request,
-+	.initialize_rq_fn = scsi_initialize_rq,
- 	.map_queues	= virtblk_map_queues,
- };
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+old mode 100644
+new mode 100755
+index 8352fad..bf79892
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -891,6 +891,12 @@ static void cached_dev_detach_finish(struct work_struct *w)
+ 	BUG_ON(!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags));
+ 	BUG_ON(atomic_read(&dc->count));
  
-diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
-index 0419c2298eab..14096f67eebb 100644
---- a/drivers/scsi/sg.c
-+++ b/drivers/scsi/sg.c
-@@ -1722,6 +1722,8 @@ sg_start_req(Sg_request *srp, unsigned char *cmd)
- 	}
- 	req = scsi_req(rq);
- 
-+	WARN_ON_ONCE(!req->cmd);
++	cancel_delayed_work_sync(&dc->writeback_rate_update);
++	if (!IS_ERR_OR_NULL(dc->writeback_thread)) {
++		kthread_stop(dc->writeback_thread);
++		dc->writeback_thread = NULL;
++	}
 +
- 	if (hp->cmd_len > BLK_MAX_CDB)
- 		req->cmd = long_cmdp;
- 	memcpy(req->cmd, cmd, hp->cmd_len);
+ 	mutex_lock(&bch_register_lock);
+ 
+ 	memset(&dc->sb.set_uuid, 0, 16);
 -- 
-2.14.2
+1.8.3.1
