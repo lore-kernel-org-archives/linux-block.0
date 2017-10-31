@@ -1,124 +1,70 @@
-Return-Path: <prvs=44404dd03=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	=Oleksandr Natalenko <oleksandr@natalenko.name>,
-	"Luis R . Rodriguez" <mcgrof@kernel.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v6 4/9] block: Make q_usage_counter also track legacy requests
-Date: Wed,  4 Oct 2017 17:01:05 -0700
-Message-Id: <20171005000110.15904-5-bart.vanassche@wdc.com>
-In-Reply-To: <20171005000110.15904-1-bart.vanassche@wdc.com>
-References: <20171005000110.15904-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.didichuxing.com ([111.202.154.82]:5856 "EHLO
+        BJEXCAS005.didichuxing.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1751399AbdJaKiA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 31 Oct 2017 06:38:00 -0400
+Date: Tue, 31 Oct 2017 18:37:54 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: <axboe@kernel.dk>, <jack@suse.cz>
+CC: <linux-block@vger.kernel.org>, <linux-mm@kvack.org>
+Subject: [PATCH v2 1/3] bdi: convert bdi_debug_register to int
+Message-ID: <8f8d9678f5843f7fd01588d2cc4f4dc3f21dd50b.1509415695.git.zhangweiping@didichuxing.com>
+References: <cover.1509415695.git.zhangweiping@didichuxing.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <cover.1509415695.git.zhangweiping@didichuxing.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Ming Lei <ming.lei@redhat.com>
+Convert bdi_debug_register to int and then do error handle for it.
 
-This patch makes it possible to pause request allocation for
-the legacy block layer by calling blk_mq_freeze_queue() and
-blk_mq_unfreeze_queue().
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-[ bvanassche: Combined two patches into one, edited a comment and made sure
-  REQ_NOWAIT is handled properly in blk_old_get_request() ]
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
 ---
- block/blk-core.c | 12 ++++++++++++
- block/blk-mq.c   | 10 ++--------
- 2 files changed, 14 insertions(+), 8 deletions(-)
+ mm/backing-dev.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 14f7674fa0b1..265a69511c47 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -610,6 +610,9 @@ void blk_set_queue_dying(struct request_queue *q)
- 		}
- 		spin_unlock_irq(q->queue_lock);
- 	}
-+
-+	/* Make blk_queue_enter() reexamine the DYING flag. */
-+	wake_up_all(&q->mq_freeze_wq);
- }
- EXPORT_SYMBOL_GPL(blk_set_queue_dying);
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index 74b52dfd5852..b5f940ce0143 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -113,11 +113,23 @@ static const struct file_operations bdi_debug_stats_fops = {
+ 	.release	= single_release,
+ };
  
-@@ -1395,16 +1398,22 @@ static struct request *blk_old_get_request(struct request_queue *q,
- 					   unsigned int op, gfp_t gfp_mask)
+-static void bdi_debug_register(struct backing_dev_info *bdi, const char *name)
++static int bdi_debug_register(struct backing_dev_info *bdi, const char *name)
  {
- 	struct request *rq;
-+	int ret = 0;
- 
- 	WARN_ON_ONCE(q->mq_ops);
- 
- 	/* create ioc upfront */
- 	create_io_context(gfp_mask, q->node);
- 
-+	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM) ||
-+			      (op & REQ_NOWAIT));
-+	if (ret)
-+		return ERR_PTR(ret);
- 	spin_lock_irq(q->queue_lock);
- 	rq = get_request(q, op, NULL, gfp_mask);
- 	if (IS_ERR(rq)) {
- 		spin_unlock_irq(q->queue_lock);
-+		blk_queue_exit(q);
- 		return rq;
- 	}
- 
-@@ -1576,6 +1585,7 @@ void __blk_put_request(struct request_queue *q, struct request *req)
- 		blk_free_request(rl, req);
- 		freed_request(rl, sync, rq_flags);
- 		blk_put_rl(rl);
-+		blk_queue_exit(q);
- 	}
- }
- EXPORT_SYMBOL_GPL(__blk_put_request);
-@@ -1857,8 +1867,10 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
- 	 * Grab a free request. This is might sleep but can not fail.
- 	 * Returns with the queue unlocked.
- 	 */
-+	blk_queue_enter_live(q);
- 	req = get_request(q, bio->bi_opf, bio, GFP_NOIO);
- 	if (IS_ERR(req)) {
-+		blk_queue_exit(q);
- 		__wbt_done(q->rq_wb, wb_acct);
- 		if (PTR_ERR(req) == -ENOMEM)
- 			bio->bi_status = BLK_STS_RESOURCE;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 7f01d69879d6..ebf85e270509 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -125,7 +125,8 @@ void blk_freeze_queue_start(struct request_queue *q)
- 	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
- 	if (freeze_depth == 1) {
- 		percpu_ref_kill(&q->q_usage_counter);
--		blk_mq_run_hw_queues(q, false);
-+		if (q->mq_ops)
-+			blk_mq_run_hw_queues(q, false);
- 	}
- }
- EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
-@@ -255,13 +256,6 @@ void blk_mq_wake_waiters(struct request_queue *q)
- 	queue_for_each_hw_ctx(q, hctx, i)
- 		if (blk_mq_hw_queue_mapped(hctx))
- 			blk_mq_tag_wakeup_all(hctx->tags, true);
--
--	/*
--	 * If we are called because the queue has now been marked as
--	 * dying, we need to ensure that processes currently waiting on
--	 * the queue are notified as well.
--	 */
--	wake_up_all(&q->mq_freeze_wq);
++	if (!bdi_debug_root)
++		return -ENOMEM;
++
+ 	bdi->debug_dir = debugfs_create_dir(name, bdi_debug_root);
++	if (!bdi->debug_dir)
++		return -ENOMEM;
++
+ 	bdi->debug_stats = debugfs_create_file("stats", 0444, bdi->debug_dir,
+ 					       bdi, &bdi_debug_stats_fops);
++	if (!bdi->debug_stats) {
++		debugfs_remove(bdi->debug_dir);
++		return -ENOMEM;
++	}
++
++	return 0;
  }
  
- bool blk_mq_can_queue(struct blk_mq_hw_ctx *hctx)
+ static void bdi_debug_unregister(struct backing_dev_info *bdi)
+@@ -129,9 +141,10 @@ static void bdi_debug_unregister(struct backing_dev_info *bdi)
+ static inline void bdi_debug_init(void)
+ {
+ }
+-static inline void bdi_debug_register(struct backing_dev_info *bdi,
++static inline int bdi_debug_register(struct backing_dev_info *bdi,
+ 				      const char *name)
+ {
++	return 0;
+ }
+ static inline void bdi_debug_unregister(struct backing_dev_info *bdi)
+ {
 -- 
 2.14.2
