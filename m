@@ -1,118 +1,49 @@
-Return-Path: <prvs=45557a1c1=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-crypto@vger.kernel.org,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH v2 2/8] crypto: scompress - use sgl_alloc() and sgl_free()
-Date: Mon, 16 Oct 2017 15:49:34 -0700
-Message-Id: <20171016224940.1332-3-bart.vanassche@wdc.com>
-In-Reply-To: <20171016224940.1332-1-bart.vanassche@wdc.com>
-References: <20171016224940.1332-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.didichuxing.com ([111.202.154.82]:29020 "EHLO
+        BJEXMBX011.didichuxing.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1753040AbdJaKib (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 31 Oct 2017 06:38:31 -0400
+Date: Tue, 31 Oct 2017 18:38:24 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: <axboe@kernel.dk>, <jack@suse.cz>
+CC: <linux-block@vger.kernel.org>, <linux-mm@kvack.org>
+Subject: [PATCH v2 2/3] bdi: add error handle for bdi_debug_register
+Message-ID: <100ecef9a09dc2a95feb5f6fac21c8bfa26be4eb.1509415695.git.zhangweiping@didichuxing.com>
+References: <cover.1509415695.git.zhangweiping@didichuxing.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <cover.1509415695.git.zhangweiping@didichuxing.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Use the sgl_alloc() and sgl_free() functions instead of open coding
-these functions.
+In order to make error handle more cleaner we call bdi_debug_register
+before set state to WB_registered, that we can avoid call bdi_unregister
+in release_bdi().
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
 ---
- crypto/Kconfig     |  1 +
- crypto/scompress.c | 51 ++-------------------------------------------------
- 2 files changed, 3 insertions(+), 49 deletions(-)
+ mm/backing-dev.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 0a121f9ddf8e..a0667dd284ff 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -105,6 +105,7 @@ config CRYPTO_KPP
- config CRYPTO_ACOMP2
- 	tristate
- 	select CRYPTO_ALGAPI2
-+	select SGL_ALLOC
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index b5f940ce0143..84b2dc76f140 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -882,10 +882,13 @@ int bdi_register_va(struct backing_dev_info *bdi, const char *fmt, va_list args)
+ 	if (IS_ERR(dev))
+ 		return PTR_ERR(dev);
  
- config CRYPTO_ACOMP
- 	tristate
-diff --git a/crypto/scompress.c b/crypto/scompress.c
-index 2075e2c4e7df..968bbcf65c94 100644
---- a/crypto/scompress.c
-+++ b/crypto/scompress.c
-@@ -140,53 +140,6 @@ static int crypto_scomp_init_tfm(struct crypto_tfm *tfm)
- 	return ret;
- }
++	if (bdi_debug_register(bdi, dev_name(dev))) {
++		device_destroy(bdi_class, dev->devt);
++		return -ENOMEM;
++	}
+ 	cgwb_bdi_register(bdi);
+ 	bdi->dev = dev;
  
--static void crypto_scomp_sg_free(struct scatterlist *sgl)
--{
--	int i, n;
--	struct page *page;
--
--	if (!sgl)
--		return;
--
--	n = sg_nents(sgl);
--	for_each_sg(sgl, sgl, n, i) {
--		page = sg_page(sgl);
--		if (page)
--			__free_page(page);
--	}
--
--	kfree(sgl);
--}
--
--static struct scatterlist *crypto_scomp_sg_alloc(size_t size, gfp_t gfp)
--{
--	struct scatterlist *sgl;
--	struct page *page;
--	int i, n;
--
--	n = ((size - 1) >> PAGE_SHIFT) + 1;
--
--	sgl = kmalloc_array(n, sizeof(struct scatterlist), gfp);
--	if (!sgl)
--		return NULL;
--
--	sg_init_table(sgl, n);
--
--	for (i = 0; i < n; i++) {
--		page = alloc_page(gfp);
--		if (!page)
--			goto err;
--		sg_set_page(sgl + i, page, PAGE_SIZE, 0);
--	}
--
--	return sgl;
--
--err:
--	sg_mark_end(sgl + i);
--	crypto_scomp_sg_free(sgl);
--	return NULL;
--}
--
- static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- {
- 	struct crypto_acomp *tfm = crypto_acomp_reqtfm(req);
-@@ -220,7 +173,7 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- 					      scratch_dst, &req->dlen, *ctx);
- 	if (!ret) {
- 		if (!req->dst) {
--			req->dst = crypto_scomp_sg_alloc(req->dlen, GFP_ATOMIC);
-+			req->dst = sgl_alloc(req->dlen, GFP_ATOMIC, NULL);
- 			if (!req->dst)
- 				goto out;
- 		}
-@@ -274,7 +227,7 @@ int crypto_init_scomp_ops_async(struct crypto_tfm *tfm)
+-	bdi_debug_register(bdi, dev_name(dev));
+ 	set_bit(WB_registered, &bdi->wb.state);
  
- 	crt->compress = scomp_acomp_compress;
- 	crt->decompress = scomp_acomp_decompress;
--	crt->dst_free = crypto_scomp_sg_free;
-+	crt->dst_free = sgl_free;
- 	crt->reqsize = sizeof(void *);
- 
- 	return 0;
+ 	spin_lock_bh(&bdi_lock);
 -- 
 2.14.2
