@@ -1,67 +1,34 @@
-Return-Path: <prvs=449916f6d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Oleksandr Natalenko <oleksandr@natalenko.name>,
-	Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Shaohua Li <shli@kernel.org>,
-	linux-raid@vger.kernel.org,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH v8 01/10] md: Rename md_notifier into md_reboot_notifier
-Date: Tue, 10 Oct 2017 14:03:37 -0700
-Message-Id: <20171010210346.14574-2-bart.vanassche@wdc.com>
-In-Reply-To: <20171010210346.14574-1-bart.vanassche@wdc.com>
-References: <20171010210346.14574-1-bart.vanassche@wdc.com>
+Return-Path: <zhangweiping@didichuxing.com>
+Date: Tue, 31 Oct 2017 18:30:06 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: Jan Kara <jack@suse.cz>
+CC: <axboe@kernel.dk>, <linux-block@vger.kernel.org>, <linux-mm@kvack.org>
+Subject: Re: [PATCH 1/4] bdi: add check for bdi_debug_root
+Message-ID: <20171031103006.GA1616@source.didichuxing.com>
+References: <cover.1509038624.git.zhangweiping@didichuxing.com>
+ <883f8bb529fbde0d4adc2b78ba3bbda81e1ce6a0.1509038624.git.zhangweiping@didichuxing.com>
+ <20171030130028.GG23278@quack2.suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <20171030130028.GG23278@quack2.suse.cz>
+Return-Path: zhangweiping@didichuxing.com
 List-ID: <linux-block@vger.kernel.org>
 
-This avoids confusion with the pm notifier that will be added
-through a later patch.
+On Mon, Oct 30, 2017 at 02:00:28PM +0100, Jan Kara wrote:
+> On Fri 27-10-17 01:35:36, weiping zhang wrote:
+> > this patch add a check for bdi_debug_root and do error handle for it.
+> > we should make sure it was created success, otherwise when add new
+> > block device's bdi folder(eg, 8:0) will be create a debugfs root directory.
+> > 
+> > Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+> > ---
+> >  mm/backing-dev.c | 17 ++++++++++++++---
+> >  1 file changed, 14 insertions(+), 3 deletions(-)
+> 
+> These functions get called only on system boot - ENOMEM in those cases is
+> generally considered fatal and oopsing is acceptable result. So I don't
+> think this patch is needed.
+> 
+OK, I drop this patch.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Shaohua Li <shli@kernel.org>
-Cc: linux-raid@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
----
- drivers/md/md.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 5d61049e7417..8933cafc212d 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -8966,7 +8966,7 @@ static int md_notify_reboot(struct notifier_block *this,
- 	return NOTIFY_DONE;
- }
- 
--static struct notifier_block md_notifier = {
-+static struct notifier_block md_reboot_notifier = {
- 	.notifier_call	= md_notify_reboot,
- 	.next		= NULL,
- 	.priority	= INT_MAX, /* before any real devices */
-@@ -9003,7 +9003,7 @@ static int __init md_init(void)
- 	blk_register_region(MKDEV(mdp_major, 0), 1UL<<MINORBITS, THIS_MODULE,
- 			    md_probe, NULL, NULL);
- 
--	register_reboot_notifier(&md_notifier);
-+	register_reboot_notifier(&md_reboot_notifier);
- 	raid_table_header = register_sysctl_table(raid_root_table);
- 
- 	md_geninit();
-@@ -9243,7 +9243,7 @@ static __exit void md_exit(void)
- 
- 	unregister_blkdev(MD_MAJOR,"md");
- 	unregister_blkdev(mdp_major, "mdp");
--	unregister_reboot_notifier(&md_notifier);
-+	unregister_reboot_notifier(&md_reboot_notifier);
- 	unregister_sysctl_table(raid_table_header);
- 
- 	/* We cannot unload the modules while some process is
--- 
-2.14.2
+Thanks a ton.
