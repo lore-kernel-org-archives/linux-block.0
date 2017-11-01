@@ -1,218 +1,68 @@
-Return-Path: <prvs=4780b5c65=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V7 3/8] block: mq-deadline: Introduce zone locking support
-Date: Wed,  8 Nov 2017 17:11:13 +0900
-Message-Id: <20171108081118.7632-4-damien.lemoal@wdc.com>
-In-Reply-To: <20171108081118.7632-1-damien.lemoal@wdc.com>
-References: <20171108081118.7632-1-damien.lemoal@wdc.com>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH v2 6/8] scsi/ipr: Use sgl_alloc_order() and
+ sgl_free_order()
+To: Brian King <brking@linux.vnet.ibm.com>,
+ Bart Van Assche <Bart.VanAssche@wdc.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+References: <20171016224940.1332-1-bart.vanassche@wdc.com>
+ <20171016224940.1332-7-bart.vanassche@wdc.com>
+ <c804098f-5543-395c-1395-5778ef74a61b@suse.de>
+ <ce6f2f5b-b4bc-380f-8ac1-1e91e4d6bf24@linux.vnet.ibm.com>
+ <1509395828.27259.21.camel@wdc.com>
+ <33515fd2-9639-7981-e344-80cdacd40d32@linux.vnet.ibm.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <a3274a4a-e0aa-0081-dfa1-e3c884800133@suse.de>
+Date: Wed, 1 Nov 2017 12:13:48 +0100
+MIME-Version: 1.0
+In-Reply-To: <33515fd2-9639-7981-e344-80cdacd40d32@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Introduce zone write locking to avoid write request reordering with
-zoned block devices. This is achieved using a finer selection of the
-next request to dispatch:
-1) Any non-write request is always allowed to proceed.
-2) Any write to a conventional zone is always allowed to proceed.
-3) For a write to a sequential zone, the zone lock is first checked.
-   a) If the zone is not locked, the write is allowed to proceed after
-      its target zone is locked.
-   b) If the zone is locked, the write request is skipped and the next
-      request in the dispatch queue tested (back to step 1).
+On 10/30/2017 10:01 PM, Brian King wrote:
+> On 10/30/2017 03:37 PM, Bart Van Assche wrote:
+>> On Wed, 2017-10-18 at 15:57 -0500, Brian King wrote:
+>>> On 10/17/2017 01:19 AM, Hannes Reinecke wrote:
+>>>> On 10/17/2017 12:49 AM, Bart Van Assche wrote:
+>>>>> [ ... ]
+>>>>
+>>>> Not sure if this is a valid conversion.
+>>>> Originally the driver would allocate a single buffer; with this buffer
+>>>> we have two distinct buffers.
+>>>> Given that this is used to download the microcode I'm not sure if this
+>>>> isn't a hardware-dependent structure which requires a single buffer
+>>>> including the sglist.
+>>>> Brian, can you shed some light here?
+>>>
+>>> The struct ipr_sglist is not a hardware defined data structure, so on initial
+>>> glance, this should be OK. I'll load it up and give it a try to make sure
+>>> it doesn't break code download.
+>>
+>> Hello Brian,
+>>
+>> Have you already obtained any test results?
+> 
+> Bart,
+> 
+> Yes. I tried this out on an ipr adapter and it looks fine.
+> 
+> Acked-by: Brian King <brking@linux.vnet.ibm.com>
+> 
+Thanks for the confirmation.
 
-For a write request that has locked its target zone, the zone is
-unlocked either when the request completes with a call to the method
-deadline_request_completed() or when the request is requeued using
-dd_insert_request().
+Bart, you can add my
 
-Requests targeting a locked zone are always left in the scheduler queue
-to preserve the lba ordering for write requests. If no write request
-can be dispatched, allow reads to be dispatched even if the write batch
-is not done.
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-If the device used is not a zoned block device, or if zoned block device
-support is disabled, this patch does not modify mq-deadline behavior.
+Cheers,
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/mq-deadline.c | 89 +++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 86 insertions(+), 3 deletions(-)
-
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 8bd6db9e69c7..d56972e8ebda 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -59,6 +59,7 @@ struct deadline_data {
- 	int front_merges;
- 
- 	spinlock_t lock;
-+	spinlock_t zone_lock;
- 	struct list_head dispatch;
- };
- 
-@@ -198,13 +199,33 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
- static struct request *
- deadline_fifo_request(struct deadline_data *dd, int data_dir)
- {
-+	struct request *rq;
-+	unsigned long flags;
-+
- 	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
- 		return NULL;
- 
- 	if (list_empty(&dd->fifo_list[data_dir]))
- 		return NULL;
- 
--	return rq_entry_fifo(dd->fifo_list[data_dir].next);
-+	rq = rq_entry_fifo(dd->fifo_list[data_dir].next);
-+	if (data_dir == READ || !blk_queue_is_zoned(rq->q))
-+		return rq;
-+
-+	/*
-+	 * Look for a write request that can be dispatched, that is one with
-+	 * an unlocked target zone.
-+	 */
-+	spin_lock_irqsave(&dd->zone_lock, flags);
-+	list_for_each_entry(rq, &dd->fifo_list[WRITE], queuelist) {
-+		if (blk_req_can_dispatch_to_zone(rq))
-+			goto out;
-+	}
-+	rq = NULL;
-+out:
-+	spin_unlock_irqrestore(&dd->zone_lock, flags);
-+
-+	return rq;
- }
- 
- /*
-@@ -214,10 +235,32 @@ deadline_fifo_request(struct deadline_data *dd, int data_dir)
- static struct request *
- deadline_next_request(struct deadline_data *dd, int data_dir)
- {
-+	struct request *rq;
-+	unsigned long flags;
-+
- 	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
- 		return NULL;
- 
--	return dd->next_rq[data_dir];
-+	rq = dd->next_rq[data_dir];
-+	if (!rq)
-+		return NULL;
-+
-+	if (data_dir == READ || !blk_queue_is_zoned(rq->q))
-+		return rq;
-+
-+	/*
-+	 * Look for a write request that can be dispatched, that is one with
-+	 * an unlocked target zone.
-+	 */
-+	spin_lock_irqsave(&dd->zone_lock, flags);
-+	while (rq) {
-+		if (blk_req_can_dispatch_to_zone(rq))
-+			break;
-+		rq = deadline_latter_request(rq);
-+	}
-+	spin_unlock_irqrestore(&dd->zone_lock, flags);
-+
-+	return rq;
- }
- 
- /*
-@@ -259,7 +302,8 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	if (reads) {
- 		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[READ]));
- 
--		if (writes && (dd->starved++ >= dd->writes_starved))
-+		if (deadline_fifo_request(dd, WRITE) &&
-+		    (dd->starved++ >= dd->writes_starved))
- 			goto dispatch_writes;
- 
- 		data_dir = READ;
-@@ -304,6 +348,13 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 		rq = next_rq;
- 	}
- 
-+	/*
-+	 * For a zoned block device, if we only have writes queued and none of
-+	 * them can be dispatched, rq will be NULL.
-+	 */
-+	if (!rq)
-+		return NULL;
-+
- 	dd->batching = 0;
- 
- dispatch_request:
-@@ -313,6 +364,10 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	dd->batching++;
- 	deadline_move_request(dd, rq);
- done:
-+	/*
-+	 * If the request needs its target zone locked, do it.
-+	 */
-+	blk_req_zone_write_lock(rq);
- 	rq->rq_flags |= RQF_STARTED;
- 	return rq;
- }
-@@ -368,6 +423,7 @@ static int dd_init_queue(struct request_queue *q, struct elevator_type *e)
- 	dd->front_merges = 1;
- 	dd->fifo_batch = fifo_batch;
- 	spin_lock_init(&dd->lock);
-+	spin_lock_init(&dd->zone_lock);
- 	INIT_LIST_HEAD(&dd->dispatch);
- 
- 	q->elevator = eq;
-@@ -424,6 +480,12 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 	struct deadline_data *dd = q->elevator->elevator_data;
- 	const int data_dir = rq_data_dir(rq);
- 
-+	/*
-+	 * This may be a requeue of a write request that has locked its
-+	 * target zone. If it is the case, this releases the zone lock.
-+	 */
-+	blk_req_zone_write_unlock(rq);
-+
- 	if (blk_mq_sched_try_insert_merge(q, rq))
- 		return;
- 
-@@ -468,6 +530,26 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
- 	spin_unlock(&dd->lock);
- }
- 
-+/*
-+ * For zoned block devices, write unlock the target zone of
-+ * completed write requests. Do this while holding the zone lock
-+ * spinlock so that the zone is never unlocked while deadline_fifo_request()
-+ * while deadline_next_request() are executing.
-+ */
-+static void dd_completed_request(struct request *rq)
-+{
-+	struct request_queue *q = rq->q;
-+
-+	if (blk_queue_is_zoned(q)) {
-+		struct deadline_data *dd = q->elevator->elevator_data;
-+		unsigned long flags;
-+
-+		spin_lock_irqsave(&dd->zone_lock, flags);
-+		blk_req_zone_write_unlock(rq);
-+		spin_unlock_irqrestore(&dd->zone_lock, flags);
-+	}
-+}
-+
- static bool dd_has_work(struct blk_mq_hw_ctx *hctx)
- {
- 	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
-@@ -669,6 +751,7 @@ static struct elevator_type mq_deadline = {
- 	.ops.mq = {
- 		.insert_requests	= dd_insert_requests,
- 		.dispatch_request	= dd_dispatch_request,
-+		.completed_request	= dd_completed_request,
- 		.next_request		= elv_rb_latter_request,
- 		.former_request		= elv_rb_former_request,
- 		.bio_merge		= dd_bio_merge,
+Hannes
 -- 
-2.13.6
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
