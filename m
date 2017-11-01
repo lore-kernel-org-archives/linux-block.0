@@ -1,43 +1,83 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
-Subject: Re: [PATCH 5/9] nvme: track subsystems
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>, linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org
-References: <20170925134031.10548-1-hch@lst.de>
- <20170925134031.10548-6-hch@lst.de>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <1535c6f9-8ddf-ab30-2bbd-5d9ce626b913@grimberg.me>
-Date: Wed, 11 Oct 2017 14:57:31 +0300
-MIME-Version: 1.0
-In-Reply-To: <20170925134031.10548-6-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mxhk.zte.com.cn ([63.217.80.70]:62240 "EHLO mxhk.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750716AbdKAG4X (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 1 Nov 2017 02:56:23 -0400
+From: tang.junhui@zte.com.cn
+To: colyli@suse.de, mlyle@lyle.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        tang.junhui@zte.com.cn
+Subject: [PATCH] bcache: correct journal bucket reading
+Date: Wed, 1 Nov 2017 14:56:12 +0800
+Message-Id: <1509519372-9999-1-git-send-email-tang.junhui@zte.com.cn>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-> @@ -2230,7 +2315,7 @@ static ssize_t nvme_sysfs_show_subsysnqn(struct device *dev,
->   {
->   	struct nvme_ctrl *ctrl = dev_get_drvdata(dev);
->   
-> -	return snprintf(buf, PAGE_SIZE, "%s\n", ctrl->subnqn);
-> +	return snprintf(buf, PAGE_SIZE, "%s\n", ctrl->subsys->subnqn);
->   }
->   static DEVICE_ATTR(subsysnqn, S_IRUGO, nvme_sysfs_show_subsysnqn, NULL);
->   
-> @@ -2770,12 +2855,22 @@ EXPORT_SYMBOL_GPL(nvme_uninit_ctrl);
->   static void nvme_free_ctrl(struct kref *kref)
->   {
->   	struct nvme_ctrl *ctrl = container_of(kref, struct nvme_ctrl, kref);
-> +	struct nvme_subsystem *subsys = ctrl->subsys;
->   
->   	put_device(ctrl->device);
->   	nvme_release_instance(ctrl);
->   	ida_destroy(&ctrl->ns_ida);
->   
-> +	if (subsys) {
-> +		mutex_lock(&subsys->lock);
-> +		list_del(&ctrl->subsys_entry);
-> +		mutex_unlock(&subsys->lock);
-> +	}
-> +
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-When can this happen? can a controller not have a subsys?
+There are 3 steps to read out all journal buckets.
+1) Try to get a valid journal bucket by golden ratio hash or
+falling back to linear search. For an example, NNNYYYNN, each
+character represents a bucket, Y represents a valid journal
+bucket, and N is not. After step 1, we may get the 5th bucket
+as a valid journal bucket, and the 7th bucket as an invalid
+bucket.
+2) Try to get the latest valid journal bucket by Binary search.
+After this steps, in NNNYYYNN, we can get the 6th as the latest
+valid bucket.
+3) Read the journal form tail to front in the 6th bucket.
+
+But actually, since the journal bucket is a ring, the bucket
+can be like YYYNNNYY, which means the first valid journal in
+the 7th bucket, and the last valid journal in third bucket, in
+this case, we may get a valid journal in the 7th bucket by step
+1, but in step 2 we call find_next_bit(bitmap,
+ca->sb.njournal_buckets, l + 1) to find the first invalid bucket
+after the 7th bucket, because all these buckets is valid, so no
+bit 1 in bitmap, thus find_next_bit() function would return with
+ca->sb.njournal_buckets (8). So, in step 3), bcache only read
+journal in 7th bucket, the journal in 8th bucket and the first
+to the third buckets are lost.
+
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+---
+ drivers/md/bcache/journal.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+ mode change 100644 => 100755 drivers/md/bcache/journal.c
+
+diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
+old mode 100644
+new mode 100755
+index 0352d05..8a549fb
+--- a/drivers/md/bcache/journal.c
++++ b/drivers/md/bcache/journal.c
+@@ -199,14 +199,17 @@ int bch_journal_read(struct cache_set *c, struct list_head *list)
+ 		/* Binary search */
+ 		m = l;
+ 		r = find_next_bit(bitmap, ca->sb.njournal_buckets, l + 1);
+-		pr_debug("starting binary search, l %u r %u", l, r);
++		if (r == ca->sb.njournal_buckets && 
++		    !test_bit(r, bitmap))
++			r = ca->sb.njournal_buckets + find_next_bit(bitmap, ca->sb.njournal_buckets, 0);
++		pr_debug("starting binary search, l %u r %u", l, r % ca->sb.njournal_buckets);
+ 
+ 		while (l + 1 < r) {
+ 			seq = list_entry(list->prev, struct journal_replay,
+ 					 list)->j.seq;
+ 
+ 			m = (l + r) >> 1;
+-			read_bucket(m);
++			read_bucket(m % ca->sb.njournal_buckets);
+ 
+ 			if (seq != list_entry(list->prev, struct journal_replay,
+ 					      list)->j.seq)
+@@ -219,6 +222,7 @@ int bch_journal_read(struct cache_set *c, struct list_head *list)
+ 		 * Read buckets in reverse order until we stop finding more
+ 		 * journal entries
+ 		 */
++		m = m % ca->sb.njournal_buckets;
+ 		pr_debug("finishing up: m %u njournal_buckets %u",
+ 			 m, ca->sb.njournal_buckets);
+ 		l = m;
+-- 
+1.8.3.1
