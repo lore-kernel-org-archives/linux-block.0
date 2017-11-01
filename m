@@ -1,65 +1,57 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:39609 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751566AbdKAQrK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Nov 2017 12:47:10 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "hch@infradead.org" <hch@infradead.org>,
-        "roman.penyaev@profitbricks.com" <roman.penyaev@profitbricks.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "osandov@fb.com" <osandov@fb.com>, "axboe@fb.com" <axboe@fb.com>,
-        "hare@suse.com" <hare@suse.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH V2 0/2] block: remove unnecessary RESTART
-Date: Wed, 1 Nov 2017 16:47:06 +0000
-Message-ID: <1509554825.2530.32.camel@wdc.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+ Omar Sandoval <osandov@fb.com>, Bart Van Assche
+ <bart.vanassche@sandisk.com>, Roman Pen <roman.penyaev@profitbricks.com>,
+ Hannes Reinecke <hare@suse.com>
 References: <20171027044330.11921-1-ming.lei@redhat.com>
-         <1509079996.3244.3.camel@wdc.com> <20171027053834.GA12858@ming.t460p>
-         <1509395096.27259.15.camel@wdc.com> <20171031014728.GA12070@ming.t460p>
-         <1509508448.2604.4.camel@wdc.com> <20171101040755.GB9527@ming.t460p>
-In-Reply-To: <20171101040755.GB9527@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
+ <7921fc66-16de-200b-cc0f-02cf52ef9002@kernel.dk>
+ <20171101014611.GA8200@ming.t460p>
+ <59F9FE28-F31A-47FD-A3FD-90CE1DB38FB2@kernel.dk>
+ <20171101020312.GA9527@ming.t460p>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <e6c4aa07-6427-bbee-ba14-fcba5e4f29ac@kernel.dk>
+Date: Wed, 1 Nov 2017 08:21:36 -0600
 MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20171101020312.GA9527@ming.t460p>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-T24gV2VkLCAyMDE3LTExLTAxIGF0IDEyOjA4ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
-V2VkLCBOb3YgMDEsIDIwMTcgYXQgMDM6NTQ6MDlBTSArMDAwMCwgQmFydCBWYW4gQXNzY2hlIHdy
-b3RlOg0KPiA+IE9uIFR1ZSwgMjAxNy0xMC0zMSBhdCAwOTo0NyArMDgwMCwgTWluZyBMZWkgd3Jv
-dGU6DQo+ID4gPiBPbiBNb24sIE9jdCAzMCwgMjAxNyBhdCAwODoyNDo1N1BNICswMDAwLCBCYXJ0
-IFZhbiBBc3NjaGUgd3JvdGU6DQo+ID4gPiA+IE9uIEZyaSwgMjAxNy0xMC0yNyBhdCAxMzozOCAr
-MDgwMCwgTWluZyBMZWkgd3JvdGU6DQo+ID4gPiA+ID4gT24gRnJpLCBPY3QgMjcsIDIwMTcgYXQg
-MDQ6NTM6MThBTSArMDAwMCwgQmFydCBWYW4gQXNzY2hlIHdyb3RlOg0KPiA+ID4gPiA+ID4gT24g
-RnJpLCAyMDE3LTEwLTI3IGF0IDEyOjQzICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gPiA+ID4g
-PiA+ID4gVGhlIDFzdCBwYXRjaCByZW1vdmVzIHRoZSBSRVNUQVJUIGZvciBUQUctU0hBUkVEIGJl
-Y2F1c2UgU0NTSSBoYW5kbGVzIGl0DQo+ID4gPiA+ID4gPiA+IGJ5IGl0c2VsZiwgYW5kIG5vdCBu
-ZWNlc3NhcnkgdG8gd2FzdGUgQ1BVIHRvIGRvIHRoZSBleHBlbnNpdmUgUkVTVEFSVC4NCj4gPiA+
-ID4gPiA+ID4gQW5kIFJvbWFuIFBlbiByZXBvcnRlZCB0aGF0IHRoaXMgUkVTVEFSVCBjdXRzIGhh
-bGYgb2YgSU9QUyBpbiBoaXMgY2FzZS4NCj4gPiA+ID4gPiA+ID4gDQo+ID4gPiA+ID4gPiA+IFRo
-ZSAybmQgcGF0Y2ggcmVtb3ZlcyB0aGUgUkVTVEFSVCB3aGVuIC5nZXRfYnVkZ2V0IHJldHVybnMg
-QkxLX1NUU19SRVNPVVJDRSwNCj4gPiA+ID4gPiA+ID4gYW5kIHRoaXMgUkVTVEFSVCBpcyBoYW5k
-bGVkIGJ5IFNDU0kncyBSRVNUQVJUKHNjc2lfZW5kX3JlcXVlc3QoKSkgdG9vLg0KPiA+ID4gPiA+
-ID4gDQo+ID4gPiA+ID4gPiBUaGVyZSBhcmUgbW9yZSBibG9jayBkcml2ZXJzIHRoYW4gdGhlIFND
-U0kgY29yZSB0aGF0IHNoYXJlIHRhZ3MuIElmIHRoZQ0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IENv
-dWxkIHlvdSBzaGFyZSB1cyB3aGF0IHRoZSBvdGhlciBpbi10cmVlIGRyaXZlciB3aGljaCBzaGFy
-ZSB0YWdzIGlzPw0KPiA+ID4gPiANCj4gPiA+ID4gSSB0aGluayB0aGUgZm9sbG93aW5nIGluLXRy
-ZWUgZHJpdmVycyBzdXBwb3J0IHNoYXJlZCB0YWdzIChpbiBhbHBoYWJldGljYWwNCj4gPiA+ID4g
-b3JkZXIpOg0KPiA+ID4gPiAqIG51bGxfYmxrLiBTZWUgYWxzbyB0aGUgc2hhcmVkX3RhZ3Mga2Vy
-bmVsIG1vZHVsZSBwYXJhbWV0ZXIuDQo+ID4gPiA+ICogbnZtZS4gU2VlIGFsc28gbnZtZV9hbGxv
-Y19ucygpLg0KPiA+ID4gPiAqIHNjc2ktbXEuDQo+ID4gPiANCj4gPiA+IEZvciBib3RoIG51bGxf
-YmxrIGFuZCBudm1lLCB3ZSBkb24ndCBuZWVkIHRvIGRlYWwgd2l0aCBjcm9zcy1xdWV1ZSBSRVNU
-QVJULA0KPiA+ID4gYmVjYXVzZSBCTEtfTVFfU19UQUdfV0FJVElORyBoYXMgaGFuZGxlZCBpdCBh
-bHJlYWR5Lg0KPiA+IA0KPiA+IGJsa19tcV9kaXNwYXRjaF93YWl0X2FkZCgpIHJldHVybnMgaW1t
-ZWRpYXRlbHkgaWYgQkxLX01RX1NfVEFHX1dBSVRJTkcgaXMNCj4gPiBhbHJlYWR5IHNldC4gQXJl
-IHlvdSByZWFsbHkgc3VyZSB0aGF0IHJlbW92aW5nIHRoZSByZXN0YXJ0IG1lY2hhbmlzbSBkb2Vz
-bid0DQo+ID4gYnJlYWsgdGhlIE5WTWUgZHJpdmVyIGlmIHRoZXJlIGFyZSBtdWx0aXBsZSBuYW1l
-c3BhY2VzPz4gDQo+IElmIHRoaXMgZmxhZyBpcyBzZXQsIHRoYXQgbWVhbnMgYmxrX21xX2Rpc3Bh
-dGNoX3dha2UoKSB3aWxsIGJlIHJ1biB3aGVuDQo+IGRyaXZlciB0YWcgaXMgYXZhaWxhYmxlLCBz
-byB0aGUgaHcgcXVldWUgd2lsbCBiZSBydW4gYXQgdGhhdCB0aW1lLg0KDQpUaGUgb25seSBodyBx
-dWV1ZSB0aGF0IHdpbGwgYmUgcmVydW4gaWYgQkxLX01RX1NfVEFHX1dBSVRJTkcgaXMgc2V0IGlz
-IHRoZSBodw0KcXVldWUgZm9yIHdoaWNoIHRoYXQgZmxhZyB3YXMgc2V0LiBTb3JyeSBidXQgSSBk
-b24ndCB0aGluayB0aGF0IG1lY2hhbmlzbSBieQ0KaXRzZWxmIGlzIHN1ZmZpY2llbnQgdG8gYXZv
-aWQgcXVldWUgbG9ja3VwcyB3aXRoIHRoZSBOVk1lIGRyaXZlciBpbiBjYXNlIG9mDQpzaGFyZWQg
-bmFtZXNwYWNlcy4gU2VlIGFsc28gdGhlIGRlc2NyaXB0aW9uIG9mIGNvbW1pdCBkYTU1ZjJjYzc4
-NDEgKCJibGstbXE6DQp1c2Ugc2JxIHdhaXQgcXVldWVzIGluc3RlYWQgb2YgcmVzdGFydCBmb3Ig
-ZHJpdmVyIHRhZ3MiKS4NCg0KQmFydC4=
+On 10/31/2017 08:03 PM, Ming Lei wrote:
+> On Tue, Oct 31, 2017 at 07:53:03PM -0600, Jens Axboe wrote:
+>>
+>>> On Oct 31, 2017, at 7:46 PM, Ming Lei <ming.lei@redhat.com> wrote:
+>>>
+>>>> On Tue, Oct 31, 2017 at 02:29:32PM -0600, Jens Axboe wrote:
+>>>>> On 10/26/2017 10:43 PM, Ming Lei wrote:
+>>>>> Hi Jens,
+>>>>>
+>>>>> The 1st patch removes the RESTART for TAG-SHARED because SCSI handles it
+>>>>> by itself, and not necessary to waste CPU to do the expensive RESTART.
+>>>>> And Roman Pen reported that this RESTART cuts half of IOPS in his case.
+>>>>>
+>>>>> The 2nd patch removes the RESTART when .get_budget returns BLK_STS_RESOURCE,
+>>>>> and this RESTART is handled by SCSI's RESTART(scsi_end_request()) too.
+>>>>
+>>>> What base is this against?
+>>>
+>>> The for-next branch of your block tree:
+>>
+>> From when? Doesn’t apply at all today. 
+> 
+> I just tried today's for-next(top commit is 'MAINTAINERS: Remove Rafael from Opal maintainers.'),
+> and the two patches can be applied cleanly.
+> 
+> I guess you may try to apply the two patches against for-4.15/block,
+> which doesn't include the patchset of '[PATCH V10 0/8] blk-mq-sched: improve sequential I/O'[1]:
+> 
+> 	https://marc.info/?t=150797316600002&r=1&w=2
+
+I'm the idiot, for some reason that patchset got applied to for-next
+directly. That's not supposed to happen, for-next is always just
+a merge point. Fixed that up, and applied these two patches as
+well.
+
+-- 
+Jens Axboe
