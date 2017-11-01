@@ -1,86 +1,227 @@
-Return-Path: <ebiggers3@gmail.com>
-Return-Path: <ebiggers3@gmail.com>
-Date: Sun, 5 Nov 2017 12:18:34 -0800
-From: Eric Biggers <ebiggers3@gmail.com>
-To: Dmitry Vyukov <dvyukov@google.com>
-Cc: syzbot <bot+4684a000d5abdade83fac55b1e7d1f935ef1936e@syzkaller.appspotmail.com>,
-	axboe@kernel.dk, linux-block@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: possible deadlock in blkdev_reread_part
-Message-ID: <20171105201834.GA8126@zzz.localdomain>
-References: <001a11446e86e97ceb055cf07f4e@google.com>
- <CACT4Y+bGjnajib6P4a0SxYkNUJpg_x8abEkec8AR+oBmC=-QUQ@mail.gmail.com>
+Return-Path: <dvyukov@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CACT4Y+bGjnajib6P4a0SxYkNUJpg_x8abEkec8AR+oBmC=-QUQ@mail.gmail.com>
+In-Reply-To: <001a11446e86e97ceb055cf07f4e@google.com>
+References: <001a11446e86e97ceb055cf07f4e@google.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Wed, 1 Nov 2017 22:02:44 +0300
+Message-ID: <CACT4Y+bGjnajib6P4a0SxYkNUJpg_x8abEkec8AR+oBmC=-QUQ@mail.gmail.com>
+Subject: Re: possible deadlock in blkdev_reread_part
+To: syzbot <bot+4684a000d5abdade83fac55b1e7d1f935ef1936e@syzkaller.appspotmail.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+	LKML <linux-kernel@vger.kernel.org>, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Nov 01, 2017 at 10:02:44PM +0300, 'Dmitry Vyukov' via syzkaller-bugs wrote:
-> 
-> Still happens on linux-next 36ef71cae353f88fd6e095e2aaa3e5953af1685d (Oct 20).
-> Note repro needs to be compiled with -m32
-> 
-> [  243.819514] ======================================================
-> [  243.820949] WARNING: possible circular locking dependency detected
-> [  243.822417] 4.14.0-rc5-next-20171018 #15 Not tainted
-> [  243.823592] ------------------------------------------------------
-> [  243.825012] a.out/11871 is trying to acquire lock:
-> [  243.826182]  (&bdev->bd_mutex){+.+.}, at: [<ffffffff8245f13e>]
-> blkdev_reread_part+0x1e/0x40
-> [  243.828317]
-> [  243.828317] but task is already holding lock:
-> [  243.829669]  (&lo->lo_ctl_mutex#2){+.+.}, at: [<ffffffff83867189>]
-> lo_compat_ioctl+0x119/0x150
-> [  243.831728]
-> [  243.831728] which lock already depends on the new lock.
-> [  243.831728]
-> [  243.833373]
+On Wed, Nov 1, 2017 at 10:01 PM, syzbot
+<bot+4684a000d5abdade83fac55b1e7d1f935ef1936e@syzkaller.appspotmail.com>
+wrote:
+> Hello,
+>
+> syzkaller hit the following crash on
+> e19b205be43d11bff638cad4487008c48d21c103
+> git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/master
+> compiler: gcc (GCC) 7.1.1 20170620
+> .config is attached
+> Raw console output is attached.
+> C reproducer is attached
+> syzkaller reproducer is attached. See https://goo.gl/kgGztJ
+> for information about syzkaller reproducers
+>
+>
+> ======================================================
+> WARNING: possible circular locking dependency detected
+> 4.14.0-rc2+ #10 Not tainted
+> ------------------------------------------------------
+> syzkaller821047/2981 is trying to acquire lock:
+>  (&bdev->bd_mutex){+.+.}, at: [<ffffffff8232c60e>]
+> blkdev_reread_part+0x1e/0x40 block/ioctl.c:192
+>
+> but task is already holding lock:
+>  (&lo->lo_ctl_mutex#2){+.+.}, at: [<ffffffff83541ef9>]
+> lo_compat_ioctl+0x109/0x140 drivers/block/loop.c:1533
+>
+> which lock already depends on the new lock.
+>
+>
+> the existing dependency chain (in reverse order) is:
+>
+> -> #1 (&lo->lo_ctl_mutex#2){+.+.}:
+>        check_prevs_add kernel/locking/lockdep.c:2020 [inline]
+>        validate_chain kernel/locking/lockdep.c:2469 [inline]
+>        __lock_acquire+0x328f/0x4620 kernel/locking/lockdep.c:3498
+>        lock_acquire+0x1d5/0x580 kernel/locking/lockdep.c:4002
+>        __mutex_lock_common kernel/locking/mutex.c:756 [inline]
+>        __mutex_lock+0x16f/0x19d0 kernel/locking/mutex.c:893
+>        mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
+>        lo_release+0x6b/0x180 drivers/block/loop.c:1587
+>        __blkdev_put+0x602/0x7c0 fs/block_dev.c:1780
+>        blkdev_put+0x85/0x4f0 fs/block_dev.c:1845
+>        blkdev_close+0x91/0xc0 fs/block_dev.c:1852
+>        __fput+0x333/0x7f0 fs/file_table.c:210
+>        ____fput+0x15/0x20 fs/file_table.c:244
+>        task_work_run+0x199/0x270 kernel/task_work.c:112
+>        tracehook_notify_resume include/linux/tracehook.h:191 [inline]
+>        exit_to_usermode_loop+0x296/0x310 arch/x86/entry/common.c:162
+>        prepare_exit_to_usermode arch/x86/entry/common.c:197 [inline]
+>        syscall_return_slowpath+0x42f/0x510 arch/x86/entry/common.c:266
+>        entry_SYSCALL_64_fastpath+0xbc/0xbe
+>
+> -> #0 (&bdev->bd_mutex){+.+.}:
+>        check_prev_add+0x865/0x1520 kernel/locking/lockdep.c:1894
+>        check_prevs_add kernel/locking/lockdep.c:2020 [inline]
+>        validate_chain kernel/locking/lockdep.c:2469 [inline]
+>        __lock_acquire+0x328f/0x4620 kernel/locking/lockdep.c:3498
+>        lock_acquire+0x1d5/0x580 kernel/locking/lockdep.c:4002
+>        __mutex_lock_common kernel/locking/mutex.c:756 [inline]
+>        __mutex_lock+0x16f/0x19d0 kernel/locking/mutex.c:893
+>        mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
+>        blkdev_reread_part+0x1e/0x40 block/ioctl.c:192
+>        loop_reread_partitions+0x12f/0x1a0 drivers/block/loop.c:614
+>        loop_set_status+0x9ba/0xf60 drivers/block/loop.c:1156
+>        loop_set_status_compat+0x92/0xf0 drivers/block/loop.c:1506
+>        lo_compat_ioctl+0x114/0x140 drivers/block/loop.c:1534
+>        compat_blkdev_ioctl+0x3ba/0x1850 block/compat_ioctl.c:405
+>        C_SYSC_ioctl fs/compat_ioctl.c:1593 [inline]
+>        compat_SyS_ioctl+0x1d7/0x3290 fs/compat_ioctl.c:1540
+>        do_syscall_32_irqs_on arch/x86/entry/common.c:329 [inline]
+>        do_fast_syscall_32+0x3f2/0xf05 arch/x86/entry/common.c:391
+>        entry_SYSENTER_compat+0x51/0x60 arch/x86/entry/entry_64_compat.S:124
+>
+> other info that might help us debug this:
+>
+>  Possible unsafe locking scenario:
+>
+>        CPU0                    CPU1
+>        ----                    ----
+>   lock(&lo->lo_ctl_mutex#2);
+>                                lock(&bdev->bd_mutex);
+>                                lock(&lo->lo_ctl_mutex#2);
+>   lock(&bdev->bd_mutex);
+>
+>  *** DEADLOCK ***
+>
+> 1 lock held by syzkaller821047/2981:
+>  #0:  (&lo->lo_ctl_mutex#2){+.+.}, at: [<ffffffff83541ef9>]
+> lo_compat_ioctl+0x109/0x140 drivers/block/loop.c:1533
+>
+> stack backtrace:
+> CPU: 0 PID: 2981 Comm: syzkaller821047 Not tainted 4.14.0-rc2+ #10
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+> Google 01/01/2011
+> Call Trace:
+>  __dump_stack lib/dump_stack.c:16 [inline]
+>  dump_stack+0x194/0x257 lib/dump_stack.c:52
+>  print_circular_bug+0x503/0x710 kernel/locking/lockdep.c:1259
+>  check_prev_add+0x865/0x1520 kernel/locking/lockdep.c:1894
+>  check_prevs_add kernel/locking/lockdep.c:2020 [inline]
+>  validate_chain kernel/locking/lockdep.c:2469 [inline]
+>  __lock_acquire+0x328f/0x4620 kernel/locking/lockdep.c:3498
+>  lock_acquire+0x1d5/0x580 kernel/locking/lockdep.c:4002
+>  __mutex_lock_common kernel/locking/mutex.c:756 [inline]
+>  __mutex_lock+0x16f/0x19d0 kernel/locking/mutex.c:893
+>  mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
+>  blkdev_reread_part+0x1e/0x40 block/ioctl.c:192
+>  loop_reread_partitions+0x12f/0x1a0 drivers/block/loop.c:614
+>  loop_set_status+0x9ba/0xf60 drivers/block/loop.c:1156
+>  loop_set_status_compat+0x92/0xf0 drivers/block/loop.c:1506
+>  lo_compat_ioctl+0x114/0x140 drivers/block/loop.c:1534
+>  compat_blkdev_ioctl+0x3ba/0x1850 block/compat_ioctl.c:405
+>  C_SYSC_ioctl fs/compat_ioctl.c:1593 [inline]
+>  compat_SyS_ioctl+0x1d7/0x3290 fs/compat_ioctl.c:1540
+>  do_syscall_32_irqs_on arch/x86/entry/common.c:329 [inline]
+>  do_fast_syscall_32+0x3f2/0xf05 arch/x86/entry/common.c:391
+>  entry_SYSENTER_compat+0x51/0x60 arch/x86/entry/entry_64_compat.S:124
+> RIP: 0023:0xf7f4bc79
+> RSP: 002b:00000000ff90868c EFLAGS: 00000286 ORIG_RAX: 0000000000000036
+> RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000004c02
+> RDX: 00000
 
-Here's a simplified reproducer:
 
-	#include <fcntl.h>
-	#include <linux/loop.h>
-	#include <sys/ioctl.h>
-	#include <unistd.h>
+Still happens on linux-next 36ef71cae353f88fd6e095e2aaa3e5953af1685d (Oct 20).
+Note repro needs to be compiled with -m32
 
-	int main()
-	{
-		int loopfd, fd;
-		struct loop_info info = { .lo_flags = LO_FLAGS_PARTSCAN };
+[  243.819514] ======================================================
+[  243.820949] WARNING: possible circular locking dependency detected
+[  243.822417] 4.14.0-rc5-next-20171018 #15 Not tainted
+[  243.823592] ------------------------------------------------------
+[  243.825012] a.out/11871 is trying to acquire lock:
+[  243.826182]  (&bdev->bd_mutex){+.+.}, at: [<ffffffff8245f13e>]
+blkdev_reread_part+0x1e/0x40
+[  243.828317]
+[  243.828317] but task is already holding lock:
+[  243.829669]  (&lo->lo_ctl_mutex#2){+.+.}, at: [<ffffffff83867189>]
+lo_compat_ioctl+0x119/0x150
+[  243.831728]
+[  243.831728] which lock already depends on the new lock.
+[  243.831728]
+[  243.833373]
+[  243.833373] the existing dependency chain (in reverse order) is:
+[  243.834991]
+[  243.834991] -> #1 (&lo->lo_ctl_mutex#2){+.+.}:
+[  243.836422]        __mutex_lock+0x16f/0x1990
+[  243.837474]        mutex_lock_nested+0x16/0x20
+[  243.838463]        lo_release+0x7a/0x1d0
+[  243.839370]        __blkdev_put+0x66e/0x810
+[  243.840300]        blkdev_put+0x98/0x540
+[  243.841171]        blkdev_close+0x8b/0xb0
+[  243.842101]        __fput+0x354/0x870
+[  243.842932]        ____fput+0x15/0x20
+[  243.843680]        task_work_run+0x1c6/0x270
+[  243.844540]        exit_to_usermode_loop+0x2b9/0x300
+[  243.845502]        syscall_return_slowpath+0x425/0x4d0
+[  243.846469]        entry_SYSCALL_64_fastpath+0xbc/0xbe
+[  243.847598]
+[  243.847598] -> #0 (&bdev->bd_mutex){+.+.}:
+[  243.848686]        lock_acquire+0x1d3/0x520
+[  243.849495]        __mutex_lock+0x16f/0x1990
+[  243.850332]        mutex_lock_nested+0x16/0x20
+[  243.851204]        blkdev_reread_part+0x1e/0x40
+[  243.852053]        loop_reread_partitions+0x14c/0x170
+[  243.853049]        loop_set_status+0xac6/0xfd0
+[  243.853892]        loop_set_status_compat+0x9c/0xd0
+[  243.854841]        lo_compat_ioctl+0x124/0x150
+[  243.855664]        compat_blkdev_ioctl+0x3c4/0x1ad0
+[  243.856547]        compat_SyS_ioctl+0x1c6/0x3a00
+[  243.857365]        do_fast_syscall_32+0x428/0xf67
+[  243.858284]        entry_SYSENTER_compat+0x51/0x60
+[  243.859189]
+[  243.859189] other info that might help us debug this:
+[  243.859189]
+[  243.860555]  Possible unsafe locking scenario:
+[  243.860555]
+[  243.861597]        CPU0                    CPU1
+[  243.862374]        ----                    ----
+[  243.863175]   lock(&lo->lo_ctl_mutex#2);
+[  243.863886]                                lock(&bdev->bd_mutex);
+[  243.865020]                                lock(&lo->lo_ctl_mutex#2);
+[  243.866152]   lock(&bdev->bd_mutex);
+[  243.866822]
+[  243.866822]  *** DEADLOCK ***
 
-		loopfd = open("/dev/loop0", O_RDWR);
 
-		fd = open("/bin/ls", O_RDONLY);
 
-		ioctl(loopfd, LOOP_SET_FD, fd);
-
-		ioctl(loopfd, LOOP_SET_STATUS, &info);
-	}
-
-It still needs to be compiled with -m32.  The reason is that lo_ioctl() has:
-
-	mutex_lock_nested(&lo->lo_ctl_mutex, 1);
-
-but lo_compat_ioctl() has:
-
-	mutex_lock(&lo->lo_ctl_mutex);
-
-But ->lo_ctl_mutex isn't actually being nested under itself, so I don't think
-the "nested" annotation is actually appropriate.
-
-It seems that ->bd_mutex is held while opening and closing block devices, which
-should rank it above both ->lo_ctl_mutex and loop_index_mutex (see lo_open() and
-lo_release()).
-
-But blkdev_reread_part(), which takes ->bd_mutex, is called from some of the
-ioctls while ->lo_ctl_mutex is held.
-
-Perhaps we should call blkdev_reread_part() at the end of the ioctls, after
-->lo_ctl_mutex has been dropped?  But it looks like that can do I/O to the
-device, which probably could race with loop_clr_fd()...
-
-Or perhaps we should just take both locks for the ioctls, in the order
-->bd_mutex, then ->lo_ctl_mutex -- and then use __blkdev_reread_part()?
-
-Eric
+> ---
+> This bug is generated by a dumb bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for details.
+> Direct all questions to syzkaller@googlegroups.com.
+> Please credit me with: Reported-by: syzbot <syzkaller@googlegroups.com>
+>
+> syzbot will keep track of this bug report.
+> Once a fix for this bug is committed, please reply to this email with:
+> #syz fix: exact-commit-title
+> To mark this as a duplicate of another syzbot report, please reply with:
+> #syz dup: exact-subject-of-another-report
+> If it's a one-off invalid bug report, please reply with:
+> #syz invalid
+> Note: if the crash happens again, it will cause creation of a new bug
+> report.
+> Note: all commands must start from beginning of the line.
+>
+> --
+> You received this message because you are subscribed to the Google Groups
+> "syzkaller-bugs" group.
+> To unsubscribe from this group and stop receiving emails from it, send an
+> email to syzkaller-bugs+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit
+> https://groups.google.com/d/msgid/syzkaller-bugs/001a11446e86e97ceb055cf07f4e%40google.com.
+> For more options, visit https://groups.google.com/d/optout.
