@@ -1,56 +1,106 @@
 Return-Path: <BATV+adf086a54a2d754d8a83+5184+infradead.org+hch@bombadil.srs.infradead.org>
 From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
+To: Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>
+Cc: Jens Axboe <axboe@kernel.dk>,
 	Hannes Reinecke <hare@suse.de>,
 	Johannes Thumshirn <jthumshirn@suse.de>,
 	linux-nvme@lists.infradead.org,
 	linux-block@vger.kernel.org
-Subject: [PATCH 1/7] block: move REQ_NOWAIT
-Date: Thu,  2 Nov 2017 21:29:48 +0300
-Message-Id: <20171102182954.9263-2-hch@lst.de>
-In-Reply-To: <20171102182954.9263-1-hch@lst.de>
-References: <20171102182954.9263-1-hch@lst.de>
+Subject: nvme multipath support V6
+Date: Thu,  2 Nov 2017 21:30:29 +0300
+Message-Id: <20171102183034.9320-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-This flag should be before the operation-specific REQ_NOUNMAP bit.
+Hi all,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- include/linux/blk_types.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+this series adds support for multipathing, that is accessing nvme
+namespaces through multiple controllers to the nvme core driver.
 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index a2d2aa709cef..acc2f3cdc2fc 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -224,11 +224,11 @@ enum req_flag_bits {
- 	__REQ_PREFLUSH,		/* request for cache flush */
- 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
- 	__REQ_BACKGROUND,	/* background IO */
-+	__REQ_NOWAIT,           /* Don't wait if request will block */
- 
- 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
- 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
- 
--	__REQ_NOWAIT,           /* Don't wait if request will block */
- 	__REQ_NR_BITS,		/* stops here */
- };
- 
-@@ -245,9 +245,9 @@ enum req_flag_bits {
- #define REQ_PREFLUSH		(1ULL << __REQ_PREFLUSH)
- #define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
- #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
-+#define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
- 
- #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
--#define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
- 
- #define REQ_FAILFAST_MASK \
- 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
--- 
-2.14.2
+It is a very thin and efficient implementation that relies on
+close cooperation with other bits of the nvme driver, and few small
+and simple block helpers.
+
+Compared to dm-multipath the important differences are how management
+of the paths is done, and how the I/O path works.
+
+Management of the paths is fully integrated into the nvme driver,
+for each newly found nvme controller we check if there are other
+controllers that refer to the same subsystem, and if so we link them
+up in the nvme driver.  Then for each namespace found we check if
+the namespace id and identifiers match to check if we have multiple
+controllers that refer to the same namespaces.  For now path
+availability is based entirely on the controller status, which at
+least for fabrics will be continuously updated based on the mandatory
+keep alive timer.  Once the Asynchronous Namespace Access (ANA)
+proposal passes in NVMe we will also get per-namespace states in
+addition to that, but for now any details of that remain confidential
+to NVMe members.
+
+The I/O path is very different from the existing multipath drivers,
+which is enabled by the fact that NVMe (unlike SCSI) does not support
+partial completions - a controller will either complete a whole
+command or not, but never only complete parts of it.  Because of that
+there is no need to clone bios or requests - the I/O path simply
+redirects the I/O to a suitable path.  For successful commands
+multipath is not in the completion stack at all.  For failed commands
+we decide if the error could be a path failure, and if yes remove
+the bios from the request structure and requeue them before completing
+the request.  All together this means there is no performance
+degradation compared to normal nvme operation when using the multipath
+device node (at least not until I find a dual ported DRAM backed
+device :))
+
+A git tree is available at:
+
+   git://git.infradead.org/users/hch/block.git nvme-mpath
+
+gitweb:
+
+   http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/nvme-mpath
+
+Changes since V5:
+  - dropped various prep patches merged into the nvme tree
+  - removed a leftover debug printk
+  - small cleanups to blk_steal_bio
+  - add a sysfs attribute for hidden gendisks
+  - don't complete cancelled requests if another path is available
+  - use the instance index for device naming
+  - make the multipath code optional at compile time
+  - don't use the multipath node for single-controller subsystems
+  - add a module_option to disable multipathing (temporarily)
+   
+Changes since V4:
+  - add a refcount to release the device in struct nvme_subsystem
+  - use the instance to name the nvme_subsystems in sysfs
+  - remove a NULL check before nvme_put_ns_head
+  - take a ns_head reference in ->open
+  - improve open protection for GENHD_FL_HIDDEN
+  - add poll support for the mpath device
+
+Changes since V3:
+  - new block layer support for hidden gendisks
+  - a couple new patches to refactor device handling before the
+    actual multipath support
+  - don't expose per-controller block device nodes
+  - use /dev/nvmeXnZ as the device nodes for the whole subsystem.
+  - expose subsystems in sysfs (Hannes Reinecke)
+  - fix a subsystem leak when duplicate NQNs are found
+  - fix up some names
+  - don't clear current_path if freeing a different namespace
+
+Changes since V2:
+  - don't create duplicate subsystems on reset (Keith Bush)
+  - free requests properly when failing over in I/O completion (Keith Bush)
+  - new devices names: /dev/nvm-sub%dn%d
+  - expose the namespace identification sysfs files for the mpath nodes
+
+Changes since V1:
+  - introduce new nvme_ns_ids structure to clean up identifier handling
+  - generic_make_request_fast is now named direct_make_request and calls
+    generic_make_request_checks
+  - reset bi_disk on resubmission
+  - create sysfs links between the existing nvme namespace block devices and
+    the new share mpath device
+  - temporarily added the timeout patches from James, this should go into
+    nvme-4.14, though
