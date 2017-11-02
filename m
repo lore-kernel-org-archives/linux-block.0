@@ -1,68 +1,57 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH v2 6/8] scsi/ipr: Use sgl_alloc_order() and
- sgl_free_order()
-To: Brian King <brking@linux.vnet.ibm.com>,
- Bart Van Assche <Bart.VanAssche@wdc.com>, "axboe@kernel.dk" <axboe@kernel.dk>
-Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- "martin.petersen@oracle.com" <martin.petersen@oracle.com>
-References: <20171016224940.1332-1-bart.vanassche@wdc.com>
- <20171016224940.1332-7-bart.vanassche@wdc.com>
- <c804098f-5543-395c-1395-5778ef74a61b@suse.de>
- <ce6f2f5b-b4bc-380f-8ac1-1e91e4d6bf24@linux.vnet.ibm.com>
- <1509395828.27259.21.camel@wdc.com>
- <33515fd2-9639-7981-e344-80cdacd40d32@linux.vnet.ibm.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <a3274a4a-e0aa-0081-dfa1-e3c884800133@suse.de>
-Date: Wed, 1 Nov 2017 12:13:48 +0100
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from szxga03-in.huawei.com ([45.249.212.189]:13352 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751898AbdKBMyP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Nov 2017 08:54:15 -0400
+From: "Zouming (IT)" <zouming.zouming@huawei.com>
+To: "chenxiang (M)" <chenxiang66@hisilicon.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>
+CC: wangzhoumengjian <wangzhoumengjian@huawei.com>
+Subject: =?utf-8?B?562U5aSNOiBbYnVnIHJlcG9ydCBhZnRlciB2NC41LXJjMV1ibG9jazogV2hl?=
+ =?utf-8?B?biB0aGUgc2NzaSBkZXZpY2UgaGFzIGEgdGltZW91dCBJTywgdGhlIHNjc2kg?=
+ =?utf-8?Q?device_is_stuck_when_it_is_deleted?=
+Date: Thu, 2 Nov 2017 12:54:01 +0000
+Message-ID: <32770656ECCC174D9F733890F5D00C0D99557C3B@dggemm511-mbs.china.huawei.com>
+References: <32770656ECCC174D9F733890F5D00C0D99557B3A@dggemm511-mbs.china.huawei.com>
+ <77dc5059-a8db-6f9b-e4ee-1a65b030c9bf@hisilicon.com>
+In-Reply-To: <77dc5059-a8db-6f9b-e4ee-1a65b030c9bf@hisilicon.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <33515fd2-9639-7981-e344-80cdacd40d32@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 10/30/2017 10:01 PM, Brian King wrote:
-> On 10/30/2017 03:37 PM, Bart Van Assche wrote:
->> On Wed, 2017-10-18 at 15:57 -0500, Brian King wrote:
->>> On 10/17/2017 01:19 AM, Hannes Reinecke wrote:
->>>> On 10/17/2017 12:49 AM, Bart Van Assche wrote:
->>>>> [ ... ]
->>>>
->>>> Not sure if this is a valid conversion.
->>>> Originally the driver would allocate a single buffer; with this buffer
->>>> we have two distinct buffers.
->>>> Given that this is used to download the microcode I'm not sure if this
->>>> isn't a hardware-dependent structure which requires a single buffer
->>>> including the sglist.
->>>> Brian, can you shed some light here?
->>>
->>> The struct ipr_sglist is not a hardware defined data structure, so on initial
->>> glance, this should be OK. I'll load it up and give it a try to make sure
->>> it doesn't break code download.
->>
->> Hello Brian,
->>
->> Have you already obtained any test results?
-> 
-> Bart,
-> 
-> Yes. I tried this out on an ipr adapter and it looks fine.
-> 
-> Acked-by: Brian King <brking@linux.vnet.ibm.com>
-> 
-Thanks for the confirmation.
-
-Bart, you can add my
-
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+T0ssM2tzLg0KDQotLS0tLemCruS7tuWOn+S7ti0tLS0tDQrlj5Hku7bkuro6IGNoZW54aWFuZyAo
+TSkgDQrlj5HpgIHml7bpl7Q6IDIwMTflubQxMeaciDLml6UgMjA6MzQNCuaUtuS7tuS6ujogWm91
+bWluZyAoSVQpIDx6b3VtaW5nLnpvdW1pbmdAaHVhd2VpLmNvbT47IGxpbnV4LWJsb2NrQHZnZXIu
+a2VybmVsLm9yZzsgYXhib2VAZmIuY29tDQrmioTpgIE6IHdhbmd6aG91bWVuZ2ppYW4gPHdhbmd6
+aG91bWVuZ2ppYW5AaHVhd2VpLmNvbT4NCuS4u+mimDogUmU6IFtidWcgcmVwb3J0IGFmdGVyIHY0
+LjUtcmMxXWJsb2NrOiBXaGVuIHRoZSBzY3NpIGRldmljZSBoYXMgYSB0aW1lb3V0IElPLCB0aGUg
+c2NzaSBkZXZpY2UgaXMgc3R1Y2sgd2hlbiBpdCBpcyBkZWxldGVkDQoNCuWcqCAyMDE3LzExLzIg
+MjA6MTYsIFpvdW1pbmcgKElUKSDlhpnpgZM6DQo+IDEuUmVwZWF0IHN0ZXBzOg0KPiAoMSkgc2Vu
+ZCBJTyBvbiB0aGUgZGV2aWNlIC9kZXYvc2R4Lg0KPiAoMikgU2ltdWxhdGUgYW4gSU8gbG9zdA0K
+PiAoMykgVXNlIHRoZSBjb21tYW5kIGJlZm9yZSB0byAgZGVsZXRlIHNjc2kgZGV2aWNlICBiZWZv
+cmUgSU8gdGltZW91dA0KPiAgICAgICAgZWhjbyAxID4gL3N5cy9jbGFzcy9zZHgvZGV2aWNlL2Rl
+bGV0ZQ0KPg0KPiAyLlRoZSBzdGFjayBvZiBkZWxldGUgdGhlYWQgaXMgYmVmb3JlOg0KPiBbPGZm
+ZmZmZmZmODEwOTk5ZWY+XSBtc2xlZXArMHgyZi8weDQwDQo+IFs8ZmZmZmZmZmY4MTJmNzhiND5d
+IF9fYmxrX2RyYWluX3F1ZXVlKzB4YTQvMHgxNzAgWzxmZmZmZmZmZjgxMmY3YmZkPl0gDQo+IGJs
+a19jbGVhbnVwX3F1ZXVlKzB4MTNkLzB4MTUwIFs8ZmZmZmZmZmY4MTQ3M2QyYT5dIA0KPiBfX3Nj
+c2lfcmVtb3ZlX2RldmljZSsweDRhLzB4ZDAgWzxmZmZmZmZmZjgxNDczZGQ2Pl0gDQo+IHNjc2lf
+cmVtb3ZlX2RldmljZSsweDI2LzB4NDAgWzxmZmZmZmZmZjgxNDczZTA1Pl0gDQo+IHNkZXZfc3Rv
+cmVfZGVsZXRlX2NhbGxiYWNrKzB4MTUvMHgyMA0KPiBbPGZmZmZmZmZmODEyN2ZkYzQ+XSBzeXNm
+c19zY2hlZHVsZV9jYWxsYmFja193b3JrKzB4MTQvMHg2MA0KPiBbPGZmZmZmZmZmODEwYTg4MWE+
+XSBwcm9jZXNzX29uZV93b3JrKzB4MTdhLzB4NDQwIFs8ZmZmZmZmZmY4MTBhOTRlNj5dIA0KPiB3
+b3JrZXJfdGhyZWFkKzB4MTI2LzB4M2MwIFs8ZmZmZmZmZmY4MTBiMDk4Zj5dIGt0aHJlYWQrMHhj
+Zi8weGUwIA0KPiBbPGZmZmZmZmZmODE2YjRmMTg+XSByZXRfZnJvbV9mb3JrKzB4NTgvMHg5MA0K
+Pg0KPiAzLlRoZSByZWFzb24gaXMgYmVmb3JlOg0KPiAgICAoMSkgV2hlbiB0aGUgc2NzaSBkZXZp
+Y2UgaXMgZGVsZXRlZCwgaW52b2tlIGJsa19jbGVhbnVwX3F1ZXVlIGZ1bnRpb24gdG8NCj4gICAg
+ICAgICAgc2V0IHRoZSBmbGFnIG9mIHJlcXVlc3RfcXVldWUgZHlpbmcsIGFuZCB3YWl0IGFsbCBJ
+TyBiYWNrLg0KPg0KPiAgICAoMikgd2hlbiBJTyB0aW1vdXQsdGhlIHRpbWVvdXQgd29ya3F1ZXVl
+IGludm9rZSBibGtfdGltZW91dF93b3JrIGZ1bmN0aW9uIHRvIGFib3J0IElPLA0KPiAgICAgICAg
+IGJ1dCBpdCB3aWxsIG5vdCBhYm9ydCB0aGUgSU8gYmVjYXVzZSBpdCBjYWxsICBibGtfcXVldWVf
+ZW50ZXIgZnVudGlvbg0KPiAgICAgICAgIGp1ZGdlIHRoZSByZXF1ZXN0X3F1ZXVlIGlzIGR5aW5n
+IGFuZCByZXR1cm4gZGlyZWN0IHdpdGhvdXQgZG9pbmcgYW55dGhpbmcuDQoNCkhpIFpvdW1pbmcs
+DQpZb3UgY2FuIGhhdmUgYSB0ZXN0IG9uIEJhcnQncyBwYXRjaCAiW1BBVENIXSBibG9jazogRml4
+IGEgcmFjZSBiZXR3ZWVuDQpibGtfY2xlYW51cF9xdWV1ZSgpIGFuZCB0aW1lb3V0IGhhbmRsaW5n
+IiBmb3IgdGhpcyBpc3N1ZS4NCkkgdGhpbmsgdGhpcyBwYXRjaCBjYW4gc29sdmUgeW91ciBpc3N1
+ZS4NCg0KDQoNCg==
