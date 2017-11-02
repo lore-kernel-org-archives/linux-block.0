@@ -1,247 +1,102 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:65339 "EHLO mga02.intel.com"
+Received: from mx1.redhat.com ([209.132.183.28]:50368 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751796AbdKUNo7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Nov 2017 08:44:59 -0500
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V14 21/24] mmc: mmc_test: Do not use mmc_start_areq() anymore
-Date: Tue, 21 Nov 2017 15:42:47 +0200
-Message-Id: <1511271770-3444-22-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
-References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
+        id S933983AbdKBPZr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 2 Nov 2017 11:25:47 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Omar Sandoval <osandov@fb.com>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Hannes Reinecke <hare@suse.com>, linux-kernel@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 5/7] blk-mq-sched: decide how to handle flush rq via RQF_FLUSH_SEQ
+Date: Thu,  2 Nov 2017 23:24:36 +0800
+Message-Id: <20171102152438.25324-6-ming.lei@redhat.com>
+In-Reply-To: <20171102152438.25324-1-ming.lei@redhat.com>
+References: <20171102152438.25324-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The block driver's blk-mq paths do not use mmc_start_areq(). In order to
-remove mmc_start_areq() entirely, start by removing it from mmc_test.
+In case of IO scheduler we always pre-allocate one driver tag before
+calling blk_insert_flush(), and flush request will be marked as
+RQF_FLUSH_SEQ once it is in flush machinary.
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+So if RQF_FLUSH_SEQ isn't set, we call blk_insert_flush() to handle
+the request, otherwise the flush request is dispatched to ->dispatch
+list directly.
+
+This is a prepare patch for not preallocating driver tag on flush rq,
+and don't treat flush rq as special case, just what the legacy path
+did.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/mmc/core/mmc_test.c | 122 ++++++++++++++++++++------------------------
- 1 file changed, 54 insertions(+), 68 deletions(-)
+ block/blk-mq-sched.c | 29 ++++++++++++++++-------------
+ 1 file changed, 16 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/mmc/core/mmc_test.c b/drivers/mmc/core/mmc_test.c
-index 478869805b96..9311c8de2061 100644
---- a/drivers/mmc/core/mmc_test.c
-+++ b/drivers/mmc/core/mmc_test.c
-@@ -171,11 +171,6 @@ struct mmc_test_multiple_rw {
- 	enum mmc_test_prep_media prepare;
- };
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 7775f6b12fa9..32e4ea2d0a77 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -355,21 +355,23 @@ void blk_mq_sched_request_inserted(struct request *rq)
+ EXPORT_SYMBOL_GPL(blk_mq_sched_request_inserted);
  
--struct mmc_test_async_req {
--	struct mmc_async_req areq;
--	struct mmc_test_card *test;
--};
--
- /*******************************************************************/
- /*  General helper functions                                       */
- /*******************************************************************/
-@@ -741,30 +736,6 @@ static int mmc_test_check_result(struct mmc_test_card *test,
- 	return ret;
- }
- 
--static enum mmc_blk_status mmc_test_check_result_async(struct mmc_card *card,
--				       struct mmc_async_req *areq)
--{
--	struct mmc_test_async_req *test_async =
--		container_of(areq, struct mmc_test_async_req, areq);
--	int ret;
--
--	mmc_test_wait_busy(test_async->test);
--
--	/*
--	 * FIXME: this would earlier just casts a regular error code,
--	 * either of the kernel type -ERRORCODE or the local test framework
--	 * RESULT_* errorcode, into an enum mmc_blk_status and return as
--	 * result check. Instead, convert it to some reasonable type by just
--	 * returning either MMC_BLK_SUCCESS or MMC_BLK_CMD_ERR.
--	 * If possible, a reasonable error code should be returned.
--	 */
--	ret = mmc_test_check_result(test_async->test, areq->mrq);
--	if (ret)
--		return MMC_BLK_CMD_ERR;
--
--	return MMC_BLK_SUCCESS;
--}
--
- /*
-  * Checks that a "short transfer" behaved as expected
-  */
-@@ -831,6 +802,45 @@ static struct mmc_test_req *mmc_test_req_alloc(void)
- 	return rq;
- }
- 
-+static void mmc_test_wait_done(struct mmc_request *mrq)
-+{
-+	complete(&mrq->completion);
-+}
-+
-+static int mmc_test_start_areq(struct mmc_test_card *test,
-+			       struct mmc_request *mrq,
-+			       struct mmc_request *prev_mrq)
-+{
-+	struct mmc_host *host = test->card->host;
-+	int err = 0;
-+
-+	if (mrq) {
-+		init_completion(&mrq->completion);
-+		mrq->done = mmc_test_wait_done;
-+		mmc_pre_req(host, mrq);
-+	}
-+
-+	if (prev_mrq) {
-+		wait_for_completion(&prev_mrq->completion);
-+		err = mmc_test_wait_busy(test);
-+		if (!err)
-+			err = mmc_test_check_result(test, prev_mrq);
-+	}
-+
-+	if (!err && mrq) {
-+		err = mmc_start_request(host, mrq);
-+		if (err)
-+			mmc_retune_release(host);
-+	}
-+
-+	if (prev_mrq)
-+		mmc_post_req(host, prev_mrq, 0);
-+
-+	if (err && mrq)
-+		mmc_post_req(host, mrq, err);
-+
-+	return err;
-+}
- 
- static int mmc_test_nonblock_transfer(struct mmc_test_card *test,
- 				      struct scatterlist *sg, unsigned sg_len,
-@@ -838,17 +848,10 @@ static int mmc_test_nonblock_transfer(struct mmc_test_card *test,
- 				      unsigned blksz, int write, int count)
+ static bool blk_mq_sched_bypass_insert(struct blk_mq_hw_ctx *hctx,
++				       bool has_sched,
+ 				       struct request *rq)
  {
- 	struct mmc_test_req *rq1, *rq2;
--	struct mmc_test_async_req test_areq[2];
--	struct mmc_async_req *done_areq;
--	struct mmc_async_req *cur_areq = &test_areq[0].areq;
--	struct mmc_async_req *other_areq = &test_areq[1].areq;
--	enum mmc_blk_status status;
-+	struct mmc_request *mrq, *prev_mrq;
- 	int i;
- 	int ret = RESULT_OK;
- 
--	test_areq[0].test = test;
--	test_areq[1].test = test;
--
- 	rq1 = mmc_test_req_alloc();
- 	rq2 = mmc_test_req_alloc();
- 	if (!rq1 || !rq2) {
-@@ -856,33 +859,25 @@ static int mmc_test_nonblock_transfer(struct mmc_test_card *test,
- 		goto err;
+-	if (rq->tag == -1) {
++	/* dispatch flush rq directly */
++	if (rq->rq_flags & RQF_FLUSH_SEQ) {
++		spin_lock(&hctx->lock);
++		list_add(&rq->queuelist, &hctx->dispatch);
++		spin_unlock(&hctx->lock);
++		return true;
++	}
++
++	if (has_sched) {
+ 		rq->rq_flags |= RQF_SORTED;
+-		return false;
++		WARN_ON(rq->tag != -1);
  	}
  
--	cur_areq->mrq = &rq1->mrq;
--	cur_areq->err_check = mmc_test_check_result_async;
--	other_areq->mrq = &rq2->mrq;
--	other_areq->err_check = mmc_test_check_result_async;
-+	mrq = &rq1->mrq;
-+	prev_mrq = NULL;
+-	/*
+-	 * If we already have a real request tag, send directly to
+-	 * the dispatch list.
+-	 */
+-	spin_lock(&hctx->lock);
+-	list_add(&rq->queuelist, &hctx->dispatch);
+-	spin_unlock(&hctx->lock);
+-	return true;
++	return false;
+ }
  
- 	for (i = 0; i < count; i++) {
--		mmc_test_prepare_mrq(test, cur_areq->mrq, sg, sg_len, dev_addr,
--				     blocks, blksz, write);
--		done_areq = mmc_start_areq(test->card->host, cur_areq, &status);
--
--		if (status != MMC_BLK_SUCCESS || (!done_areq && i > 0)) {
--			ret = RESULT_FAIL;
-+		mmc_test_req_reset(container_of(mrq, struct mmc_test_req, mrq));
-+		mmc_test_prepare_mrq(test, mrq, sg, sg_len, dev_addr, blocks,
-+				     blksz, write);
-+		ret = mmc_test_start_areq(test, mrq, prev_mrq);
-+		if (ret)
- 			goto err;
--		}
+ /*
+@@ -395,12 +397,13 @@ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
+ 	struct blk_mq_ctx *ctx = rq->mq_ctx;
+ 	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, ctx->cpu);
  
--		if (done_areq)
--			mmc_test_req_reset(container_of(done_areq->mrq,
--						struct mmc_test_req, mrq));
-+		if (!prev_mrq)
-+			prev_mrq = &rq2->mrq;
- 
--		swap(cur_areq, other_areq);
-+		swap(mrq, prev_mrq);
- 		dev_addr += blocks;
+-	if (rq->tag == -1 && op_is_flush(rq->cmd_flags)) {
++	/* flush rq in flush machinery need to be dispatched directly */
++	if (!(rq->rq_flags & RQF_FLUSH_SEQ) && op_is_flush(rq->cmd_flags)) {
+ 		blk_mq_sched_insert_flush(hctx, rq, can_block);
+ 		return;
  	}
  
--	done_areq = mmc_start_areq(test->card->host, NULL, &status);
--	if (status != MMC_BLK_SUCCESS)
--		ret = RESULT_FAIL;
--
-+	ret = mmc_test_start_areq(test, NULL, prev_mrq);
- err:
- 	kfree(rq1);
- 	kfree(rq2);
-@@ -2356,11 +2351,9 @@ static int mmc_test_ongoing_transfer(struct mmc_test_card *test,
- 	struct mmc_test_req *rq = mmc_test_req_alloc();
- 	struct mmc_host *host = test->card->host;
- 	struct mmc_test_area *t = &test->area;
--	struct mmc_test_async_req test_areq = { .test = test };
- 	struct mmc_request *mrq;
- 	unsigned long timeout;
- 	bool expired = false;
--	enum mmc_blk_status blkstat = MMC_BLK_SUCCESS;
- 	int ret = 0, cmd_ret;
- 	u32 status = 0;
- 	int count = 0;
-@@ -2373,9 +2366,6 @@ static int mmc_test_ongoing_transfer(struct mmc_test_card *test,
- 		mrq->sbc = &rq->sbc;
- 	mrq->cap_cmd_during_tfr = true;
+-	if (e && blk_mq_sched_bypass_insert(hctx, rq))
++	if (blk_mq_sched_bypass_insert(hctx, !!e, rq))
+ 		goto run;
  
--	test_areq.areq.mrq = mrq;
--	test_areq.areq.err_check = mmc_test_check_result_async;
--
- 	mmc_test_prepare_mrq(test, mrq, t->sg, t->sg_len, dev_addr, t->blocks,
- 			     512, write);
- 
-@@ -2388,11 +2378,9 @@ static int mmc_test_ongoing_transfer(struct mmc_test_card *test,
- 
- 	/* Start ongoing data request */
- 	if (use_areq) {
--		mmc_start_areq(host, &test_areq.areq, &blkstat);
--		if (blkstat != MMC_BLK_SUCCESS) {
--			ret = RESULT_FAIL;
-+		ret = mmc_test_start_areq(test, mrq, NULL);
-+		if (ret)
- 			goto out_free;
--		}
- 	} else {
- 		mmc_wait_for_req(host, mrq);
- 	}
-@@ -2426,9 +2414,7 @@ static int mmc_test_ongoing_transfer(struct mmc_test_card *test,
- 
- 	/* Wait for data request to complete */
- 	if (use_areq) {
--		mmc_start_areq(host, NULL, &blkstat);
--		if (blkstat != MMC_BLK_SUCCESS)
--			ret = RESULT_FAIL;
-+		ret = mmc_test_start_areq(test, NULL, mrq);
- 	} else {
- 		mmc_wait_for_req_done(test->card->host, mrq);
+ 	if (e && e->type->ops.mq.insert_requests) {
+@@ -438,7 +441,7 @@ void blk_mq_sched_insert_requests(struct request_queue *q,
+ 		list_for_each_entry_safe(rq, next, list, queuelist) {
+ 			if (WARN_ON_ONCE(rq->tag != -1)) {
+ 				list_del_init(&rq->queuelist);
+-				blk_mq_sched_bypass_insert(hctx, rq);
++				blk_mq_sched_bypass_insert(hctx, true, rq);
+ 			}
+ 		}
  	}
 -- 
-1.9.1
+2.9.5
