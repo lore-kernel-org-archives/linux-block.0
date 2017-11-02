@@ -1,51 +1,46 @@
-Return-Path: <BATV+adf086a54a2d754d8a83+5184+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 2/7] block: add REQ_DRV bit
-Date: Thu,  2 Nov 2017 21:29:49 +0300
-Message-Id: <20171102182954.9263-3-hch@lst.de>
-In-Reply-To: <20171102182954.9263-1-hch@lst.de>
-References: <20171102182954.9263-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:40384 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S933716AbdKBPZS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 2 Nov 2017 11:25:18 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Omar Sandoval <osandov@fb.com>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Hannes Reinecke <hare@suse.com>, linux-kernel@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 2/7] blk-flush: don't run queue for requests of bypassing flush
+Date: Thu,  2 Nov 2017 23:24:33 +0800
+Message-Id: <20171102152438.25324-3-ming.lei@redhat.com>
+In-Reply-To: <20171102152438.25324-1-ming.lei@redhat.com>
+References: <20171102152438.25324-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Set aside a bit in the request/bio flags for driver use.
+blk_insert_flush() should only insert request since run queue always
+follows it.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+In case of bypassing flush, we don't need to run queue because every
+blk_insert_flush() follows one run queue.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- include/linux/blk_types.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ block/blk-flush.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index acc2f3cdc2fc..7ec2ed097a8a 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -229,6 +229,9 @@ enum req_flag_bits {
- 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
- 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
- 
-+	/* for driver use */
-+	__REQ_DRV,
-+
- 	__REQ_NR_BITS,		/* stops here */
- };
- 
-@@ -249,6 +252,8 @@ enum req_flag_bits {
- 
- #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
- 
-+#define REQ_DRV			(1ULL << __REQ_DRV)
-+
- #define REQ_FAILFAST_MASK \
- 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
- 
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index 4938bec8cfef..81bd1a843043 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -463,7 +463,7 @@ void blk_insert_flush(struct request *rq)
+ 	if ((policy & REQ_FSEQ_DATA) &&
+ 	    !(policy & (REQ_FSEQ_PREFLUSH | REQ_FSEQ_POSTFLUSH))) {
+ 		if (q->mq_ops)
+-			blk_mq_sched_insert_request(rq, false, true, false, false);
++			blk_mq_sched_insert_request(rq, false, false, false, false);
+ 		else
+ 			list_add_tail(&rq->queuelist, &q->queue_head);
+ 		return;
 -- 
-2.14.2
+2.9.5
