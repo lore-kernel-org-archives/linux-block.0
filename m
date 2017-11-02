@@ -1,335 +1,90 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:39581 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932792AbdK2Nnd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Nov 2017 08:43:33 -0500
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V15 22/22] mmc: core: Remove code no longer needed after the switch to blk-mq
-Date: Wed, 29 Nov 2017 15:41:19 +0200
-Message-Id: <1511962879-24262-23-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
-References: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+adf086a54a2d754d8a83+5184+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 3/7] block: provide a direct_make_request helper
+Date: Thu,  2 Nov 2017 21:29:50 +0300
+Message-Id: <20171102182954.9263-4-hch@lst.de>
+In-Reply-To: <20171102182954.9263-1-hch@lst.de>
+References: <20171102182954.9263-1-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+List-ID: <linux-block@vger.kernel.org>
 
-Remove code no longer needed after the switch to blk-mq.
+This helper allows reinserting a bio into a new queue without much
+overhead, but requires all queue limits to be the same for the upper
+and lower queues, and it does not provide any recursion preventions.
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Reviewed-by: Javier González <javier@cnexlabs.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- drivers/mmc/core/bus.c   |   2 -
- drivers/mmc/core/core.c  | 185 +----------------------------------------------
- drivers/mmc/core/core.h  |   8 --
- drivers/mmc/core/host.h  |   5 --
- include/linux/mmc/host.h |   3 -
- 5 files changed, 1 insertion(+), 202 deletions(-)
+ block/blk-core.c       | 34 ++++++++++++++++++++++++++++++++++
+ include/linux/blkdev.h |  1 +
+ 2 files changed, 35 insertions(+)
 
-diff --git a/drivers/mmc/core/bus.c b/drivers/mmc/core/bus.c
-index 7586ff2ad1f1..fc92c6c1c9a4 100644
---- a/drivers/mmc/core/bus.c
-+++ b/drivers/mmc/core/bus.c
-@@ -351,8 +351,6 @@ int mmc_add_card(struct mmc_card *card)
- #ifdef CONFIG_DEBUG_FS
- 	mmc_add_card_debugfs(card);
- #endif
--	mmc_init_context_info(card->host);
--
- 	card->dev.of_node = mmc_of_find_child_device(card->host, 0);
- 
- 	device_enable_async_suspend(&card->dev);
-diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
-index 7ca6e4866a8b..e5c8727c16ad 100644
---- a/drivers/mmc/core/core.c
-+++ b/drivers/mmc/core/core.c
-@@ -361,20 +361,6 @@ int mmc_start_request(struct mmc_host *host, struct mmc_request *mrq)
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 14f7674fa0b1..b8c80f39f5fe 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2241,6 +2241,40 @@ blk_qc_t generic_make_request(struct bio *bio)
  }
- EXPORT_SYMBOL(mmc_start_request);
+ EXPORT_SYMBOL(generic_make_request);
  
--/*
-- * mmc_wait_data_done() - done callback for data request
-- * @mrq: done data request
-- *
-- * Wakes up mmc context, passed as a callback to host controller driver
-- */
--static void mmc_wait_data_done(struct mmc_request *mrq)
--{
--	struct mmc_context_info *context_info = &mrq->host->context_info;
--
--	context_info->is_done_rcv = true;
--	wake_up_interruptible(&context_info->wait);
--}
--
- static void mmc_wait_done(struct mmc_request *mrq)
- {
- 	complete(&mrq->completion);
-@@ -392,37 +378,6 @@ static inline void mmc_wait_ongoing_tfr_cmd(struct mmc_host *host)
- 		wait_for_completion(&ongoing_mrq->cmd_completion);
- }
- 
--/*
-- *__mmc_start_data_req() - starts data request
-- * @host: MMC host to start the request
-- * @mrq: data request to start
-- *
-- * Sets the done callback to be called when request is completed by the card.
-- * Starts data mmc request execution
-- * If an ongoing transfer is already in progress, wait for the command line
-- * to become available before sending another command.
-- */
--static int __mmc_start_data_req(struct mmc_host *host, struct mmc_request *mrq)
--{
--	int err;
--
--	mmc_wait_ongoing_tfr_cmd(host);
--
--	mrq->done = mmc_wait_data_done;
--	mrq->host = host;
--
--	init_completion(&mrq->cmd_completion);
--
--	err = mmc_start_request(host, mrq);
--	if (err) {
--		mrq->cmd->error = err;
--		mmc_complete_cmd(mrq);
--		mmc_wait_data_done(mrq);
--	}
--
--	return err;
--}
--
- static int __mmc_start_req(struct mmc_host *host, struct mmc_request *mrq)
- {
- 	int err;
-@@ -650,133 +605,11 @@ int mmc_cqe_recovery(struct mmc_host *host)
-  */
- bool mmc_is_req_done(struct mmc_host *host, struct mmc_request *mrq)
- {
--	if (host->areq)
--		return host->context_info.is_done_rcv;
--	else
--		return completion_done(&mrq->completion);
-+	return completion_done(&mrq->completion);
- }
- EXPORT_SYMBOL(mmc_is_req_done);
- 
++/**
++ * direct_make_request - hand a buffer directly to its device driver for I/O
++ * @bio:  The bio describing the location in memory and on the device.
++ *
++ * This function behaves like generic_make_request(), but does not protect
++ * against recursion.  Must only be used if the called driver is known
++ * to not call generic_make_request (or direct_make_request) again from
++ * its make_request function.  (Calling direct_make_request again from
++ * a workqueue is perfectly fine as that doesn't recurse).
++ */
++blk_qc_t direct_make_request(struct bio *bio)
++{
++	struct request_queue *q = bio->bi_disk->queue;
++	bool nowait = bio->bi_opf & REQ_NOWAIT;
++	blk_qc_t ret;
++
++	if (!generic_make_request_checks(bio))
++		return BLK_QC_T_NONE;
++
++	if (unlikely(blk_queue_enter(q, nowait))) {
++		if (nowait && !blk_queue_dying(q))
++			bio->bi_status = BLK_STS_AGAIN;
++		else
++			bio->bi_status = BLK_STS_IOERR;
++		bio_endio(bio);
++		return BLK_QC_T_NONE;
++	}
++
++	ret = q->make_request_fn(q, bio);
++	blk_queue_exit(q);
++	return ret;
++}
++EXPORT_SYMBOL_GPL(direct_make_request);
++
  /**
-- * mmc_finalize_areq() - finalize an asynchronous request
-- * @host: MMC host to finalize any ongoing request on
-- *
-- * Returns the status of the ongoing asynchronous request, but
-- * MMC_BLK_SUCCESS if no request was going on.
-- */
--static enum mmc_blk_status mmc_finalize_areq(struct mmc_host *host)
--{
--	struct mmc_context_info *context_info = &host->context_info;
--	enum mmc_blk_status status;
--
--	if (!host->areq)
--		return MMC_BLK_SUCCESS;
--
--	while (1) {
--		wait_event_interruptible(context_info->wait,
--				(context_info->is_done_rcv ||
--				 context_info->is_new_req));
--
--		if (context_info->is_done_rcv) {
--			struct mmc_command *cmd;
--
--			context_info->is_done_rcv = false;
--			cmd = host->areq->mrq->cmd;
--
--			if (!cmd->error || !cmd->retries ||
--			    mmc_card_removed(host->card)) {
--				status = host->areq->err_check(host->card,
--							       host->areq);
--				break; /* return status */
--			} else {
--				mmc_retune_recheck(host);
--				pr_info("%s: req failed (CMD%u): %d, retrying...\n",
--					mmc_hostname(host),
--					cmd->opcode, cmd->error);
--				cmd->retries--;
--				cmd->error = 0;
--				__mmc_start_request(host, host->areq->mrq);
--				continue; /* wait for done/new event again */
--			}
--		}
--
--		return MMC_BLK_NEW_REQUEST;
--	}
--
--	mmc_retune_release(host);
--
--	/*
--	 * Check BKOPS urgency for each R1 response
--	 */
--	if (host->card && mmc_card_mmc(host->card) &&
--	    ((mmc_resp_type(host->areq->mrq->cmd) == MMC_RSP_R1) ||
--	     (mmc_resp_type(host->areq->mrq->cmd) == MMC_RSP_R1B)) &&
--	    (host->areq->mrq->cmd->resp[0] & R1_EXCEPTION_EVENT)) {
--		mmc_start_bkops(host->card, true);
--	}
--
--	return status;
--}
--
--/**
-- *	mmc_start_areq - start an asynchronous request
-- *	@host: MMC host to start command
-- *	@areq: asynchronous request to start
-- *	@ret_stat: out parameter for status
-- *
-- *	Start a new MMC custom command request for a host.
-- *	If there is on ongoing async request wait for completion
-- *	of that request and start the new one and return.
-- *	Does not wait for the new request to complete.
-- *
-- *      Returns the completed request, NULL in case of none completed.
-- *	Wait for the an ongoing request (previoulsy started) to complete and
-- *	return the completed request. If there is no ongoing request, NULL
-- *	is returned without waiting. NULL is not an error condition.
-- */
--struct mmc_async_req *mmc_start_areq(struct mmc_host *host,
--				     struct mmc_async_req *areq,
--				     enum mmc_blk_status *ret_stat)
--{
--	enum mmc_blk_status status;
--	int start_err = 0;
--	struct mmc_async_req *previous = host->areq;
--
--	/* Prepare a new request */
--	if (areq)
--		mmc_pre_req(host, areq->mrq);
--
--	/* Finalize previous request */
--	status = mmc_finalize_areq(host);
--	if (ret_stat)
--		*ret_stat = status;
--
--	/* The previous request is still going on... */
--	if (status == MMC_BLK_NEW_REQUEST)
--		return NULL;
--
--	/* Fine so far, start the new request! */
--	if (status == MMC_BLK_SUCCESS && areq)
--		start_err = __mmc_start_data_req(host, areq->mrq);
--
--	/* Postprocess the old request at this point */
--	if (host->areq)
--		mmc_post_req(host, host->areq->mrq, 0);
--
--	/* Cancel a prepared request if it was not started. */
--	if ((status != MMC_BLK_SUCCESS || start_err) && areq)
--		mmc_post_req(host, areq->mrq, -EINVAL);
--
--	if (status != MMC_BLK_SUCCESS)
--		host->areq = NULL;
--	else
--		host->areq = areq;
--
--	return previous;
--}
--EXPORT_SYMBOL(mmc_start_areq);
--
--/**
-  *	mmc_wait_for_req - start a request and wait for completion
-  *	@host: MMC host to start command
-  *	@mrq: MMC request to start
-@@ -2963,22 +2796,6 @@ void mmc_unregister_pm_notifier(struct mmc_host *host)
- }
- #endif
- 
--/**
-- * mmc_init_context_info() - init synchronization context
-- * @host: mmc host
-- *
-- * Init struct context_info needed to implement asynchronous
-- * request mechanism, used by mmc core, host driver and mmc requests
-- * supplier.
-- */
--void mmc_init_context_info(struct mmc_host *host)
--{
--	host->context_info.is_new_req = false;
--	host->context_info.is_done_rcv = false;
--	host->context_info.is_waiting_last_req = false;
--	init_waitqueue_head(&host->context_info.wait);
--}
--
- static int __init mmc_init(void)
- {
- 	int ret;
-diff --git a/drivers/mmc/core/core.h b/drivers/mmc/core/core.h
-index 3e3d21304e5f..d6303d69071b 100644
---- a/drivers/mmc/core/core.h
-+++ b/drivers/mmc/core/core.h
-@@ -89,8 +89,6 @@ static inline void mmc_delay(unsigned int ms)
- void mmc_add_card_debugfs(struct mmc_card *card);
- void mmc_remove_card_debugfs(struct mmc_card *card);
- 
--void mmc_init_context_info(struct mmc_host *host);
--
- int mmc_execute_tuning(struct mmc_card *card);
- int mmc_hs200_to_hs400(struct mmc_card *card);
- int mmc_hs400_to_hs200(struct mmc_card *card);
-@@ -108,12 +106,6 @@ static inline void mmc_unregister_pm_notifier(struct mmc_host *host) { }
- 
- int mmc_start_request(struct mmc_host *host, struct mmc_request *mrq);
- 
--struct mmc_async_req;
--
--struct mmc_async_req *mmc_start_areq(struct mmc_host *host,
--				     struct mmc_async_req *areq,
--				     enum mmc_blk_status *ret_stat);
--
- int mmc_erase(struct mmc_card *card, unsigned int from, unsigned int nr,
- 		unsigned int arg);
- int mmc_can_erase(struct mmc_card *card);
-diff --git a/drivers/mmc/core/host.h b/drivers/mmc/core/host.h
-index 6d896869e5c6..06ec19b5bf9f 100644
---- a/drivers/mmc/core/host.h
-+++ b/drivers/mmc/core/host.h
-@@ -79,10 +79,5 @@ static inline bool mmc_card_hs400es(struct mmc_card *card)
- 	return card->host->ios.enhanced_strobe;
- }
- 
--static inline bool mmc_host_use_blk_mq(struct mmc_host *host)
--{
--	return true;
--}
--
- #endif
- 
-diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
-index f3e13c50f6b0..85146235231e 100644
---- a/include/linux/mmc/host.h
-+++ b/include/linux/mmc/host.h
-@@ -424,9 +424,6 @@ struct mmc_host {
- 
- 	struct dentry		*debugfs_root;
- 
--	struct mmc_async_req	*areq;		/* active async req */
--	struct mmc_context_info	context_info;	/* async synchronization info */
--
- 	/* Ongoing data transfer that allows commands during transfer */
- 	struct mmc_request	*ongoing_mrq;
- 
+  * submit_bio - submit a bio to the block device layer for I/O
+  * @bio: The &struct bio which describes the I/O
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 02fa42d24b52..780f01db5899 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -936,6 +936,7 @@ do {								\
+ extern int blk_register_queue(struct gendisk *disk);
+ extern void blk_unregister_queue(struct gendisk *disk);
+ extern blk_qc_t generic_make_request(struct bio *bio);
++extern blk_qc_t direct_make_request(struct bio *bio);
+ extern void blk_rq_init(struct request_queue *q, struct request *rq);
+ extern void blk_init_request_from_bio(struct request *req, struct bio *bio);
+ extern void blk_put_request(struct request *);
 -- 
-1.9.1
+2.14.2
