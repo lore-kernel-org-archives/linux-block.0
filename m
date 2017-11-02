@@ -1,47 +1,51 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	nbd@other.debian.org,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Cc: Josef Bacik <jbacik@fb.com>,
-	stable@vger.kernel.org
-Subject: [PATCH 1/2][RESEND] nbd: wait uninterruptible for the dead timeout
-Date: Mon,  6 Nov 2017 16:11:57 -0500
-Message-Id: <1510002718-9574-1-git-send-email-josef@toxicpanda.com>
+Return-Path: <BATV+adf086a54a2d754d8a83+5184+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 2/7] block: add REQ_DRV bit
+Date: Thu,  2 Nov 2017 21:29:49 +0300
+Message-Id: <20171102182954.9263-3-hch@lst.de>
+In-Reply-To: <20171102182954.9263-1-hch@lst.de>
+References: <20171102182954.9263-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Josef Bacik <jbacik@fb.com>
+Set aside a bit in the request/bio flags for driver use.
 
-If we have a pending signal or the user kills their application then
-it'll bring down the whole device, which is less than awesome.  Instead
-wait uninterruptible for the dead timeout so we're sure we gave it our
-best shot.
-
-Fixes: 560bc4b39952 ("nbd: handle dead connections")
-Cc: stable@vger.kernel.org
-Signed-off-by: Josef Bacik <jbacik@fb.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/block/nbd.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ include/linux/blk_types.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 9adfb5445f8d..fdef8efcdabc 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -723,9 +723,9 @@ static int wait_for_reconnect(struct nbd_device *nbd)
- 		return 0;
- 	if (test_bit(NBD_DISCONNECTED, &config->runtime_flags))
- 		return 0;
--	wait_event_interruptible_timeout(config->conn_wait,
--					 atomic_read(&config->live_connections),
--					 config->dead_conn_timeout);
-+	wait_event_timeout(config->conn_wait,
-+			   atomic_read(&config->live_connections),
-+			   config->dead_conn_timeout);
- 	return atomic_read(&config->live_connections);
- }
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index acc2f3cdc2fc..7ec2ed097a8a 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -229,6 +229,9 @@ enum req_flag_bits {
+ 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
+ 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
+ 
++	/* for driver use */
++	__REQ_DRV,
++
+ 	__REQ_NR_BITS,		/* stops here */
+ };
+ 
+@@ -249,6 +252,8 @@ enum req_flag_bits {
+ 
+ #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
+ 
++#define REQ_DRV			(1ULL << __REQ_DRV)
++
+ #define REQ_FAILFAST_MASK \
+ 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
  
 -- 
-2.7.5
+2.14.2
