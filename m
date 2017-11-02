@@ -1,132 +1,60 @@
-Return-Path: <prvs=473169c3e=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
+Return-Path: <BATV+adf086a54a2d754d8a83+5184+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Ard
- Biesheuvel" <ard.biesheuvel@linaro.org>, Herbert Xu
-	<herbert@gondor.apana.org.au>, Bart Van Assche <bart.vanassche@wdc.com>,
-	<linux-scsi@vger.kernel.org>, "Martin K . Petersen"
-	<martin.petersen@oracle.com>, Anil Ravindranath
-	<anil_ravindranath@pmc-sierra.com>
-Subject: [PATCH v3 8/8] scsi/pmcraid: Use sgl_alloc_order() and sgl_free_order()
-Date: Fri, 3 Nov 2017 15:23:39 -0700
-Message-ID: <20171103222339.26540-9-bart.vanassche@wdc.com>
-In-Reply-To: <20171103222339.26540-1-bart.vanassche@wdc.com>
-References: <20171103222339.26540-1-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
+Cc: Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 5/7] block: don't look at the struct device dev_t in disk_devt
+Date: Thu,  2 Nov 2017 21:29:52 +0300
+Message-Id: <20171102182954.9263-6-hch@lst.de>
+In-Reply-To: <20171102182954.9263-1-hch@lst.de>
+References: <20171102182954.9263-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Use the sgl_alloc_order() and sgl_free_order() functions instead
-of open coding these functions.
+The hidden gendisks introduced in the next patch need to keep the dev
+field in their struct device empty so that udev won't try to create
+block device nodes for them.  To support that rewrite disk_devt to
+look at the major and first_minor fields in the gendisk itself instead
+of looking into the struct device.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: linux-scsi@vger.kernel.org
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Anil Ravindranath <anil_ravindranath@pmc-sierra.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- drivers/scsi/Kconfig   |  1 +
- drivers/scsi/pmcraid.c | 43 ++++---------------------------------------
- drivers/scsi/pmcraid.h |  2 +-
- 3 files changed, 6 insertions(+), 40 deletions(-)
+ block/genhd.c         | 4 ----
+ include/linux/genhd.h | 2 +-
+ 2 files changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
-index d918115afdca..04400bed39a1 100644
---- a/drivers/scsi/Kconfig
-+++ b/drivers/scsi/Kconfig
-@@ -1577,6 +1577,7 @@ config ZFCP
- config SCSI_PMCRAID
- 	tristate "PMC SIERRA Linux MaxRAID adapter support"
- 	depends on PCI && SCSI && NET
-+	select SGL_ALLOC
- 	---help---
- 	  This driver supports the PMC SIERRA MaxRAID adapters.
+diff --git a/block/genhd.c b/block/genhd.c
+index dd305c65ffb0..1174d24e405e 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -649,10 +649,6 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
+ 		return;
+ 	}
+ 	disk_to_dev(disk)->devt = devt;
+-
+-	/* ->major and ->first_minor aren't supposed to be
+-	 * dereferenced from here on, but set them just in case.
+-	 */
+ 	disk->major = MAJOR(devt);
+ 	disk->first_minor = MINOR(devt);
  
-diff --git a/drivers/scsi/pmcraid.c b/drivers/scsi/pmcraid.c
-index b4d6cd8cd1ad..95fc0352f9bb 100644
---- a/drivers/scsi/pmcraid.c
-+++ b/drivers/scsi/pmcraid.c
-@@ -3232,12 +3232,7 @@ static int pmcraid_build_ioadl(
-  */
- static void pmcraid_free_sglist(struct pmcraid_sglist *sglist)
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index ea652bfcd675..5c0ed5db33c2 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -234,7 +234,7 @@ static inline bool disk_part_scan_enabled(struct gendisk *disk)
+ 
+ static inline dev_t disk_devt(struct gendisk *disk)
  {
--	int i;
--
--	for (i = 0; i < sglist->num_sg; i++)
--		__free_pages(sg_page(&(sglist->scatterlist[i])),
--			     sglist->order);
--
-+	sgl_free_order(sglist->scatterlist, sglist->order);
- 	kfree(sglist);
+-	return disk_to_dev(disk)->devt;
++	return MKDEV(disk->major, disk->first_minor);
  }
  
-@@ -3254,50 +3249,20 @@ static void pmcraid_free_sglist(struct pmcraid_sglist *sglist)
- static struct pmcraid_sglist *pmcraid_alloc_sglist(int buflen)
- {
- 	struct pmcraid_sglist *sglist;
--	struct scatterlist *scatterlist;
--	struct page *page;
--	int num_elem, i, j;
- 	int sg_size;
- 	int order;
--	int bsize_elem;
- 
- 	sg_size = buflen / (PMCRAID_MAX_IOADLS - 1);
- 	order = (sg_size > 0) ? get_order(sg_size) : 0;
--	bsize_elem = PAGE_SIZE * (1 << order);
--
--	/* Determine the actual number of sg entries needed */
--	if (buflen % bsize_elem)
--		num_elem = (buflen / bsize_elem) + 1;
--	else
--		num_elem = buflen / bsize_elem;
- 
- 	/* Allocate a scatter/gather list for the DMA */
--	sglist = kzalloc(sizeof(struct pmcraid_sglist) +
--			 (sizeof(struct scatterlist) * (num_elem - 1)),
--			 GFP_KERNEL);
--
-+	sglist = kzalloc(sizeof(struct pmcraid_sglist), GFP_KERNEL);
- 	if (sglist == NULL)
- 		return NULL;
- 
--	scatterlist = sglist->scatterlist;
--	sg_init_table(scatterlist, num_elem);
- 	sglist->order = order;
--	sglist->num_sg = num_elem;
--	sg_size = buflen;
--
--	for (i = 0; i < num_elem; i++) {
--		page = alloc_pages(GFP_KERNEL|GFP_DMA|__GFP_ZERO, order);
--		if (!page) {
--			for (j = i - 1; j >= 0; j--)
--				__free_pages(sg_page(&scatterlist[j]), order);
--			kfree(sglist);
--			return NULL;
--		}
--
--		sg_set_page(&scatterlist[i], page,
--			sg_size < bsize_elem ? sg_size : bsize_elem, 0);
--		sg_size -= bsize_elem;
--	}
-+	sgl_alloc_order(buflen, order, false,
-+			GFP_KERNEL | GFP_DMA | __GFP_ZERO, &sglist->num_sg);
- 
- 	return sglist;
- }
-diff --git a/drivers/scsi/pmcraid.h b/drivers/scsi/pmcraid.h
-index 44da91712115..754ef30927e2 100644
---- a/drivers/scsi/pmcraid.h
-+++ b/drivers/scsi/pmcraid.h
-@@ -542,7 +542,7 @@ struct pmcraid_sglist {
- 	u32 order;
- 	u32 num_sg;
- 	u32 num_dma_sg;
--	struct scatterlist scatterlist[1];
-+	struct scatterlist *scatterlist;
- };
- 
- /* page D0 inquiry data of focal point resource */
+ static inline dev_t part_devt(struct hd_struct *part)
 -- 
-2.14.3
+2.14.2
