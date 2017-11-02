@@ -1,30 +1,45 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] skd: use ktime_get_real_seconds()
-To: Arnd Bergmann <arnd@arndb.de>, Bart Van Assche <bart.vanassche@wdc.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20171102114209.1686507-1-arnd@arndb.de>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <2008f991-f586-3552-5284-269ebc235e89@kernel.dk>
-Date: Thu, 2 Nov 2017 08:27:31 -0600
-MIME-Version: 1.0
-In-Reply-To: <20171102114209.1686507-1-arnd@arndb.de>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <arnd@arndb.de>
+From: Arnd Bergmann <arnd@arndb.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] skd: use ktime_get_real_seconds()
+Date: Thu,  2 Nov 2017 12:42:00 +0100
+Message-Id: <20171102114209.1686507-1-arnd@arndb.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On 11/02/2017 05:42 AM, Arnd Bergmann wrote:
-> Like many storage drivers, skd uses an unsigned 32-bit number for
-> interchanging the current time with the firmware. This will overflow in
-> y2106 and is otherwise safe.
-> 
-> However, the get_seconds() function is generally considered deprecated
-> since the behavior is different between 32-bit and 64-bit architectures,
-> and using it may indicate a bigger problem.
-> 
-> To annotate that we've thought about this, let's add a comment here
-> and migrate to the ktime_get_real_seconds() function that consistently
-> returns a 64-bit number.
+Like many storage drivers, skd uses an unsigned 32-bit number for
+interchanging the current time with the firmware. This will overflow in
+y2106 and is otherwise safe.
 
-Thanks Arnd, applied.
+However, the get_seconds() function is generally considered deprecated
+since the behavior is different between 32-bit and 64-bit architectures,
+and using it may indicate a bigger problem.
 
+To annotate that we've thought about this, let's add a comment here
+and migrate to the ktime_get_real_seconds() function that consistently
+returns a 64-bit number.
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/block/skd_main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index 64d0fc17c174..2819f23e8bf2 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -1967,7 +1967,8 @@ static void skd_isr_msg_from_dev(struct skd_device *skdev)
+ 		break;
+ 
+ 	case FIT_MTD_CMD_LOG_HOST_ID:
+-		skdev->connect_time_stamp = get_seconds();
++		/* hardware interface overflows in y2106 */
++		skdev->connect_time_stamp = (u32)ktime_get_real_seconds();
+ 		data = skdev->connect_time_stamp & 0xFFFF;
+ 		mtd = FIT_MXD_CONS(FIT_MTD_CMD_LOG_TIME_STAMP_LO, 0, data);
+ 		SKD_WRITEL(skdev, mtd, FIT_MSG_TO_DEVICE);
 -- 
-Jens Axboe
+2.9.0
