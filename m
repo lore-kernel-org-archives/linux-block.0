@@ -1,57 +1,33 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.14-rc
-Message-ID: <18177e72-0fe2-6f26-835b-3509b4fadffc@kernel.dk>
-Date: Wed, 1 Nov 2017 15:45:45 -0600
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-vk0-f47.google.com ([209.85.213.47]:50650 "EHLO
+        mail-vk0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751428AbdKBDKE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Nov 2017 23:10:04 -0400
+Received: by mail-vk0-f47.google.com with SMTP id h142so2699697vkf.7
+        for <linux-block@vger.kernel.org>; Wed, 01 Nov 2017 20:10:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <1509588931-25262-1-git-send-email-tang.junhui@zte.com.cn>
+References: <1509588931-25262-1-git-send-email-tang.junhui@zte.com.cn>
+From: Michael Lyle <mlyle@lyle.org>
+Date: Wed, 1 Nov 2017 20:10:03 -0700
+Message-ID: <CAJ+L6qcWFHDv0ur5QhY++BE=4_LtqcmbDiPo2H0SjzRxTt5mXw@mail.gmail.com>
+Subject: Re: Re: [PATCH] bcache: correct journal bucket reading
+To: Junhui Tang <tang.junhui@zte.com.cn>
+Cc: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Linus,
+Tang--
 
-A few fixes that should go into this series. This pull request contains:
+On Wed, Nov 1, 2017 at 7:15 PM,  <tang.junhui@zte.com.cn> wrote:
+> I read the the code again, and found that find_next_bit() would return 7 in this
+> scenario, but the bucket number begin with 0, so the 7th bucket's number is 6,
+> so it will take the last bucket as the first bucket to read journal,
+> so the 7the bucket would not be lost. I will change this patch to a annotation patch,
+> other readers would be easy to understand these codes.
 
-- Regression fix for ide-cd, ensuring that a request is fully
-  initialized. From Hongxu.
+Thank you.  It is way too complicated/tricky :)
 
-- Ditto fix for virtio_blk, from Bart.
-
-- NVMe fix from Keith, ensuring that we set the right block size on
-  revalidation. If the block size changed, we'd be in trouble without
-  it.
-
-- NVMe rdma fix from Sagi, fixing a potential hang while the controller
-  is being removed.
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-Bart Van Assche (1):
-      virtio_blk: Fix an SG_IO regression
-
-Hongxu Jia (1):
-      ide:ide-cd: fix kernel panic resulting from missing scsi_req_init
-
-Jens Axboe (1):
-      Merge branch 'nvme-4.14' of git://git.infradead.org/nvme into for-linus
-
-Keith Busch (1):
-      nvme: Fix setting logical block format when revalidating
-
-Sagi Grimberg (1):
-      nvme-rdma: fix possible hang when issuing commands during ctrl removal
-
- drivers/block/virtio_blk.c | 12 ++++++++++++
- drivers/ide/ide-cd.c       |  1 +
- drivers/nvme/host/core.c   |  1 +
- drivers/nvme/host/rdma.c   | 11 +++++++----
- 4 files changed, 21 insertions(+), 4 deletions(-)
-
--- 
-Jens Axboe
+Mike
