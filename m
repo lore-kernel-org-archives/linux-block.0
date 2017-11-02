@@ -1,226 +1,172 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Fri, 3 Nov 2017 07:38:40 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "axboe@kernel.dk" <axboe@kernel.dk>,
-	"hch@infradead.org" <hch@infradead.org>,
-	"roman.penyaev@profitbricks.com" <roman.penyaev@profitbricks.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"osandov@fb.com" <osandov@fb.com>, "hare@suse.com" <hare@suse.com>
+Return-Path: <prvs=4723aae07=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "axboe@kernel.dk" <axboe@kernel.dk>, "ming.lei@redhat.com"
+	<ming.lei@redhat.com>
+CC: Bart Van Assche <Bart.VanAssche@wdc.com>, "hch@infradead.org"
+	<hch@infradead.org>, "roman.penyaev@profitbricks.com"
+	<roman.penyaev@profitbricks.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "osandov@fb.com" <osandov@fb.com>,
+	"hare@suse.com" <hare@suse.com>
 Subject: Re: [PATCH V2 0/2] block: remove unnecessary RESTART
-Message-ID: <20171102233835.GA27370@ming.t460p>
+Date: Thu, 2 Nov 2017 15:57:05 +0000
+Message-ID: <1509638224.2484.14.camel@wdc.com>
 References: <20171027044330.11921-1-ming.lei@redhat.com>
- <7921fc66-16de-200b-cc0f-02cf52ef9002@kernel.dk>
- <20171101014611.GA8200@ming.t460p>
- <59F9FE28-F31A-47FD-A3FD-90CE1DB38FB2@kernel.dk>
- <20171101020312.GA9527@ming.t460p>
- <e6c4aa07-6427-bbee-ba14-fcba5e4f29ac@kernel.dk>
- <1509638224.2484.14.camel@wdc.com>
+	 <7921fc66-16de-200b-cc0f-02cf52ef9002@kernel.dk>
+	 <20171101014611.GA8200@ming.t460p>
+	 <59F9FE28-F31A-47FD-A3FD-90CE1DB38FB2@kernel.dk>
+	 <20171101020312.GA9527@ming.t460p>
+	 <e6c4aa07-6427-bbee-ba14-fcba5e4f29ac@kernel.dk>
+In-Reply-To: <e6c4aa07-6427-bbee-ba14-fcba5e4f29ac@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1509638224.2484.14.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Nov 02, 2017 at 03:57:05PM +0000, Bart Van Assche wrote:
-> On Wed, 2017-11-01 at 08:21 -0600, Jens Axboe wrote:
-> > Fixed that up, and applied these two patches as well.
-> 
-> Hello Jens,
-> 
-> Recently I noticed that a test system sporadically hangs during boot (Dell
-> PowerEdge R720 that boots from a hard disk connected to a MegaRAID SAS adapter)
-> and also that srp-tests systematically hangs. Reverting the two patches from
-> this series fixes both issues. I'm not sure there is another solution than
-> reverting the two patches from this series.
-
-Then we need to find the root cause, instead of using sort of workaround
-as before.
-
-For SCSI, the restart is always run from scsi_end_request(), and this
-kind of restart from all hctx isn't necessary at all.
-
-> 
-> Bart.
-> 
-> 
-> BTW, the following appeared in the kernel log when I tried to run srp-tests
-> against a kernel with the two patches from this series applied:
-> 
-> INFO: task kworker/19:1:209 blocked for more than 480 seconds.
-> INFO: task kworker/19:1:209 blocked for more than 480 seconds.
->       Tainted: G        W       4.14.0-rc7-dbg+ #1
->       Tainted: G        W       4.14.0-rc7-dbg+ #1
-> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> kworker/19:1    D    0   209      2 0x80000000
-> kworker/19:1    D    0   209      2 0x80000000
-> Workqueue: srp_remove srp_remove_work [ib_srp]
-> Workqueue: srp_remove srp_remove_work [ib_srp]
-> Call Trace:
-> Call Trace:
->  __schedule+0x2fa/0xbb0
->  __schedule+0x2fa/0xbb0
->  schedule+0x36/0x90
->  schedule+0x36/0x90
->  async_synchronize_cookie_domain+0x88/0x130
->  async_synchronize_cookie_domain+0x88/0x130
->  ? finish_wait+0x90/0x90
->  ? finish_wait+0x90/0x90
->  async_synchronize_full_domain+0x18/0x20
->  async_synchronize_full_domain+0x18/0x20
->  sd_remove+0x4d/0xc0 [sd_mod]
->  sd_remove+0x4d/0xc0 [sd_mod]
->  device_release_driver_internal+0x160/0x210
->  device_release_driver_internal+0x160/0x210
->  device_release_driver+0x12/0x20
->  device_release_driver+0x12/0x20
->  bus_remove_device+0x100/0x180
->  bus_remove_device+0x100/0x180
->  device_del+0x1d8/0x340
->  device_del+0x1d8/0x340
->  __scsi_remove_device+0xfc/0x130
->  __scsi_remove_device+0xfc/0x130
->  scsi_forget_host+0x25/0x70
->  scsi_forget_host+0x25/0x70
->  scsi_remove_host+0x79/0x120
->  scsi_remove_host+0x79/0x120
->  srp_remove_work+0x90/0x1d0 [ib_srp]
->  srp_remove_work+0x90/0x1d0 [ib_srp]
->  process_one_work+0x20a/0x660
->  process_one_work+0x20a/0x660
->  worker_thread+0x3d/0x3b0
->  worker_thread+0x3d/0x3b0
->  kthread+0x13a/0x150
->  kthread+0x13a/0x150
->  ? process_one_work+0x660/0x660
->  ? process_one_work+0x660/0x660
->  ? kthread_create_on_node+0x40/0x40
->  ? kthread_create_on_node+0x40/0x40
->  ret_from_fork+0x27/0x40
->  ret_from_fork+0x27/0x40
-> 
-> Showing all locks held in the system:
-> 
-> Showing all locks held in the system:
-> 1 lock held by khungtaskd/170:
-> 1 lock held by khungtaskd/170:
->  #0:  (tasklist_lock){.+.+}, at: [<ffffffff810c125d>] debug_show_all_locks+0x3d/0x1a0
->  #0:  (tasklist_lock){.+.+}, at: [<ffffffff810c125d>] debug_show_all_locks+0x3d/0x1a0
-> 4 locks held by kworker/19:1/209:
-> 4 locks held by kworker/19:1/209:
->  #0:  ("%s"("srp_remove")){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
->  #0:  ("%s"("srp_remove")){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
->  #1:  ((&target->remove_work)){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
->  #1:  ((&target->remove_work)){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
->  #2:  (&shost->scan_mutex){+.+.}, at: [<ffffffff814807bf>] scsi_remove_host+0x1f/0x120
->  #2:  (&shost->scan_mutex){+.+.}, at: [<ffffffff814807bf>] scsi_remove_host+0x1f/0x120
->  #3:  (&dev->mutex){....}, at: [<ffffffff814501a9>] device_release_driver_internal+0x39/0x210
->  #3:  (&dev->mutex){....}, at: [<ffffffff814501a9>] device_release_driver_internal+0x39/0x210
-> 2 locks held by kworker/u66:0/1927:
-> 2 locks held by kworker/u66:0/1927:
->  #0:  ("events_unbound"){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
->  #0:  ("events_unbound"){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
->  #1:  ((&entry->work)){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
->  #1:  ((&entry->work)){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
-> 2 locks held by kworker/5:0/2047:
-> 2 locks held by kworker/5:0/2047:
->  #0:  ("kaluad"){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
->  #0:  ("kaluad"){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
->  #1:  ((&(&pg->rtpg_work)->work)){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
->  #1:  ((&(&pg->rtpg_work)->work)){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
-> 
-> 
-> =============================================
-> 
-> =============================================
-> 
-> INFO: task kworker/19:1:209 blocked for more than 480 seconds.
-> INFO: task kworker/19:1:209 blocked for more than 480 seconds.
->       Tainted: G        W       4.14.0-rc7-dbg+ #1
->       Tainted: G        W       4.14.0-rc7-dbg+ #1
-> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> kworker/19:1    D    0   209      2 0x80000000
-> kworker/19:1    D    0   209      2 0x80000000
-> Workqueue: srp_remove srp_remove_work [ib_srp]
-> Workqueue: srp_remove srp_remove_work [ib_srp]
-> Call Trace:
-> Call Trace:
->  __schedule+0x2fa/0xbb0
->  __schedule+0x2fa/0xbb0
->  schedule+0x36/0x90
->  schedule+0x36/0x90
->  async_synchronize_cookie_domain+0x88/0x130
->  async_synchronize_cookie_domain+0x88/0x130
->  ? finish_wait+0x90/0x90
->  ? finish_wait+0x90/0x90
->  async_synchronize_full_domain+0x18/0x20
->  async_synchronize_full_domain+0x18/0x20
->  sd_remove+0x4d/0xc0 [sd_mod]
->  sd_remove+0x4d/0xc0 [sd_mod]
->  device_release_driver_internal+0x160/0x210
->  device_release_driver_internal+0x160/0x210
->  device_release_driver+0x12/0x20
->  device_release_driver+0x12/0x20
->  bus_remove_device+0x100/0x180
->  bus_remove_device+0x100/0x180
->  device_del+0x1d8/0x340
->  device_del+0x1d8/0x340
->  __scsi_remove_device+0xfc/0x130
->  __scsi_remove_device+0xfc/0x130
->  scsi_forget_host+0x25/0x70
->  scsi_forget_host+0x25/0x70
->  scsi_remove_host+0x79/0x120
->  scsi_remove_host+0x79/0x120
->  srp_remove_work+0x90/0x1d0 [ib_srp]
->  srp_remove_work+0x90/0x1d0 [ib_srp]
->  process_one_work+0x20a/0x660
->  process_one_work+0x20a/0x660
->  worker_thread+0x3d/0x3b0
->  worker_thread+0x3d/0x3b0
->  kthread+0x13a/0x150
->  kthread+0x13a/0x150
->  ? process_one_work+0x660/0x660
->  ? process_one_work+0x660/0x660
->  ? kthread_create_on_node+0x40/0x40
->  ? kthread_create_on_node+0x40/0x40
->  ret_from_fork+0x27/0x40
->  ret_from_fork+0x27/0x40
-> 
-> Showing all locks held in the system:
-> 
-> Showing all locks held in the system:
-> 1 lock held by khungtaskd/170:
-> 1 lock held by khungtaskd/170:
->  #0:  (tasklist_lock){.+.+}, at: [<ffffffff810c125d>] debug_show_all_locks+0x3d/0x1a0
->  #0:  (tasklist_lock){.+.+}, at: [<ffffffff810c125d>] debug_show_all_locks+0x3d/0x1a0
-> 4 locks held by kworker/19:1/209:
-> 4 locks held by kworker/19:1/209:
->  #0:  ("%s"("srp_remove")){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
->  #0:  ("%s"("srp_remove")){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
->  #1:  ((&target->remove_work)){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
->  #1:  ((&target->remove_work)){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
->  #2:  (&shost->scan_mutex){+.+.}, at: [<ffffffff814807bf>] scsi_remove_host+0x1f/0x120
->  #2:  (&shost->scan_mutex){+.+.}, at: [<ffffffff814807bf>] scsi_remove_host+0x1f/0x120
->  #3:  (&dev->mutex){....}, at: [<ffffffff814501a9>] device_release_driver_internal+0x39/0x210
->  #3:  (&dev->mutex){....}, at: [<ffffffff814501a9>] device_release_driver_internal+0x39/0x210
-> 2 locks held by kworker/u66:0/1927:
-> 2 locks held by kworker/u66:0/1927:
->  #0:  ("events_unbound"){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
->  #0:  ("events_unbound"){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
->  #1:  ((&entry->work)){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
->  #1:  ((&entry->work)){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
-> 2 locks held by kworker/5:0/2047:
-> 2 locks held by kworker/5:0/2047:
->  #0:  ("kaluad"){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
->  #0:  ("kaluad"){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
->  #1:  ((&(&pg->rtpg_work)->work)){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
->  #1:  ((&(&pg->rtpg_work)->work)){+.+.}, at: [<ffffffff81083b85>] process_one_work+0x195/0x660
-> 
-> 
-> =============================================
-> 
-> =============================================
-
--- 
-Ming
+T24gV2VkLCAyMDE3LTExLTAxIGF0IDA4OjIxIC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBG
+aXhlZCB0aGF0IHVwLCBhbmQgYXBwbGllZCB0aGVzZSB0d28gcGF0Y2hlcyBhcyB3ZWxsLg0KDQpI
+ZWxsbyBKZW5zLA0KDQpSZWNlbnRseSBJIG5vdGljZWQgdGhhdCBhIHRlc3Qgc3lzdGVtIHNwb3Jh
+ZGljYWxseSBoYW5ncyBkdXJpbmcgYm9vdCAoRGVsbA0KUG93ZXJFZGdlIFI3MjAgdGhhdCBib290
+cyBmcm9tIGEgaGFyZCBkaXNrIGNvbm5lY3RlZCB0byBhIE1lZ2FSQUlEIFNBUyBhZGFwdGVyKQ0K
+YW5kIGFsc28gdGhhdCBzcnAtdGVzdHMgc3lzdGVtYXRpY2FsbHkgaGFuZ3MuIFJldmVydGluZyB0
+aGUgdHdvIHBhdGNoZXMgZnJvbQ0KdGhpcyBzZXJpZXMgZml4ZXMgYm90aCBpc3N1ZXMuIEknbSBu
+b3Qgc3VyZSB0aGVyZSBpcyBhbm90aGVyIHNvbHV0aW9uIHRoYW4NCnJldmVydGluZyB0aGUgdHdv
+IHBhdGNoZXMgZnJvbSB0aGlzIHNlcmllcy4NCg0KQmFydC4NCg0KDQpCVFcsIHRoZSBmb2xsb3dp
+bmcgYXBwZWFyZWQgaW4gdGhlIGtlcm5lbCBsb2cgd2hlbiBJIHRyaWVkIHRvIHJ1biBzcnAtdGVz
+dHMNCmFnYWluc3QgYSBrZXJuZWwgd2l0aCB0aGUgdHdvIHBhdGNoZXMgZnJvbSB0aGlzIHNlcmll
+cyBhcHBsaWVkOg0KDQpJTkZPOiB0YXNrIGt3b3JrZXIvMTk6MToyMDkgYmxvY2tlZCBmb3IgbW9y
+ZSB0aGFuIDQ4MCBzZWNvbmRzLg0KSU5GTzogdGFzayBrd29ya2VyLzE5OjE6MjA5IGJsb2NrZWQg
+Zm9yIG1vcmUgdGhhbiA0ODAgc2Vjb25kcy4NCiAgICAgIFRhaW50ZWQ6IEcgICAgICAgIFcgICAg
+ICAgNC4xNC4wLXJjNy1kYmcrICMxDQogICAgICBUYWludGVkOiBHICAgICAgICBXICAgICAgIDQu
+MTQuMC1yYzctZGJnKyAjMQ0KImVjaG8gMCA+IC9wcm9jL3N5cy9rZXJuZWwvaHVuZ190YXNrX3Rp
+bWVvdXRfc2VjcyIgZGlzYWJsZXMgdGhpcyBtZXNzYWdlLg0KImVjaG8gMCA+IC9wcm9jL3N5cy9r
+ZXJuZWwvaHVuZ190YXNrX3RpbWVvdXRfc2VjcyIgZGlzYWJsZXMgdGhpcyBtZXNzYWdlLg0Ka3dv
+cmtlci8xOToxICAgIEQgICAgMCAgIDIwOSAgICAgIDIgMHg4MDAwMDAwMA0Ka3dvcmtlci8xOTox
+ICAgIEQgICAgMCAgIDIwOSAgICAgIDIgMHg4MDAwMDAwMA0KV29ya3F1ZXVlOiBzcnBfcmVtb3Zl
+IHNycF9yZW1vdmVfd29yayBbaWJfc3JwXQ0KV29ya3F1ZXVlOiBzcnBfcmVtb3ZlIHNycF9yZW1v
+dmVfd29yayBbaWJfc3JwXQ0KQ2FsbCBUcmFjZToNCkNhbGwgVHJhY2U6DQogX19zY2hlZHVsZSsw
+eDJmYS8weGJiMA0KIF9fc2NoZWR1bGUrMHgyZmEvMHhiYjANCiBzY2hlZHVsZSsweDM2LzB4OTAN
+CiBzY2hlZHVsZSsweDM2LzB4OTANCiBhc3luY19zeW5jaHJvbml6ZV9jb29raWVfZG9tYWluKzB4
+ODgvMHgxMzANCiBhc3luY19zeW5jaHJvbml6ZV9jb29raWVfZG9tYWluKzB4ODgvMHgxMzANCiA/
+IGZpbmlzaF93YWl0KzB4OTAvMHg5MA0KID8gZmluaXNoX3dhaXQrMHg5MC8weDkwDQogYXN5bmNf
+c3luY2hyb25pemVfZnVsbF9kb21haW4rMHgxOC8weDIwDQogYXN5bmNfc3luY2hyb25pemVfZnVs
+bF9kb21haW4rMHgxOC8weDIwDQogc2RfcmVtb3ZlKzB4NGQvMHhjMCBbc2RfbW9kXQ0KIHNkX3Jl
+bW92ZSsweDRkLzB4YzAgW3NkX21vZF0NCiBkZXZpY2VfcmVsZWFzZV9kcml2ZXJfaW50ZXJuYWwr
+MHgxNjAvMHgyMTANCiBkZXZpY2VfcmVsZWFzZV9kcml2ZXJfaW50ZXJuYWwrMHgxNjAvMHgyMTAN
+CiBkZXZpY2VfcmVsZWFzZV9kcml2ZXIrMHgxMi8weDIwDQogZGV2aWNlX3JlbGVhc2VfZHJpdmVy
+KzB4MTIvMHgyMA0KIGJ1c19yZW1vdmVfZGV2aWNlKzB4MTAwLzB4MTgwDQogYnVzX3JlbW92ZV9k
+ZXZpY2UrMHgxMDAvMHgxODANCiBkZXZpY2VfZGVsKzB4MWQ4LzB4MzQwDQogZGV2aWNlX2RlbCsw
+eDFkOC8weDM0MA0KIF9fc2NzaV9yZW1vdmVfZGV2aWNlKzB4ZmMvMHgxMzANCiBfX3Njc2lfcmVt
+b3ZlX2RldmljZSsweGZjLzB4MTMwDQogc2NzaV9mb3JnZXRfaG9zdCsweDI1LzB4NzANCiBzY3Np
+X2ZvcmdldF9ob3N0KzB4MjUvMHg3MA0KIHNjc2lfcmVtb3ZlX2hvc3QrMHg3OS8weDEyMA0KIHNj
+c2lfcmVtb3ZlX2hvc3QrMHg3OS8weDEyMA0KIHNycF9yZW1vdmVfd29yaysweDkwLzB4MWQwIFtp
+Yl9zcnBdDQogc3JwX3JlbW92ZV93b3JrKzB4OTAvMHgxZDAgW2liX3NycF0NCiBwcm9jZXNzX29u
+ZV93b3JrKzB4MjBhLzB4NjYwDQogcHJvY2Vzc19vbmVfd29yaysweDIwYS8weDY2MA0KIHdvcmtl
+cl90aHJlYWQrMHgzZC8weDNiMA0KIHdvcmtlcl90aHJlYWQrMHgzZC8weDNiMA0KIGt0aHJlYWQr
+MHgxM2EvMHgxNTANCiBrdGhyZWFkKzB4MTNhLzB4MTUwDQogPyBwcm9jZXNzX29uZV93b3JrKzB4
+NjYwLzB4NjYwDQogPyBwcm9jZXNzX29uZV93b3JrKzB4NjYwLzB4NjYwDQogPyBrdGhyZWFkX2Ny
+ZWF0ZV9vbl9ub2RlKzB4NDAvMHg0MA0KID8ga3RocmVhZF9jcmVhdGVfb25fbm9kZSsweDQwLzB4
+NDANCiByZXRfZnJvbV9mb3JrKzB4MjcvMHg0MA0KIHJldF9mcm9tX2ZvcmsrMHgyNy8weDQwDQoN
+ClNob3dpbmcgYWxsIGxvY2tzIGhlbGQgaW4gdGhlIHN5c3RlbToNCg0KU2hvd2luZyBhbGwgbG9j
+a3MgaGVsZCBpbiB0aGUgc3lzdGVtOg0KMSBsb2NrIGhlbGQgYnkga2h1bmd0YXNrZC8xNzA6DQox
+IGxvY2sgaGVsZCBieSBraHVuZ3Rhc2tkLzE3MDoNCiAjMDogICh0YXNrbGlzdF9sb2NrKXsuKy4r
+fSwgYXQ6IFs8ZmZmZmZmZmY4MTBjMTI1ZD5dIGRlYnVnX3Nob3dfYWxsX2xvY2tzKzB4M2QvMHgx
+YTANCiAjMDogICh0YXNrbGlzdF9sb2NrKXsuKy4rfSwgYXQ6IFs8ZmZmZmZmZmY4MTBjMTI1ZD5d
+IGRlYnVnX3Nob3dfYWxsX2xvY2tzKzB4M2QvMHgxYTANCjQgbG9ja3MgaGVsZCBieSBrd29ya2Vy
+LzE5OjEvMjA5Og0KNCBsb2NrcyBoZWxkIGJ5IGt3b3JrZXIvMTk6MS8yMDk6DQogIzA6ICAoIiVz
+Iigic3JwX3JlbW92ZSIpKXsrLisufSwgYXQ6IFs8ZmZmZmZmZmY4MTA4M2I4NT5dIHByb2Nlc3Nf
+b25lX3dvcmsrMHgxOTUvMHg2NjANCiAjMDogICgiJXMiKCJzcnBfcmVtb3ZlIikpeysuKy59LCBh
+dDogWzxmZmZmZmZmZjgxMDgzYjg1Pl0gcHJvY2Vzc19vbmVfd29yaysweDE5NS8weDY2MA0KICMx
+OiAgKCgmdGFyZ2V0LT5yZW1vdmVfd29yaykpeysuKy59LCBhdDogWzxmZmZmZmZmZjgxMDgzYjg1
+Pl0gcHJvY2Vzc19vbmVfd29yaysweDE5NS8weDY2MA0KICMxOiAgKCgmdGFyZ2V0LT5yZW1vdmVf
+d29yaykpeysuKy59LCBhdDogWzxmZmZmZmZmZjgxMDgzYjg1Pl0gcHJvY2Vzc19vbmVfd29yaysw
+eDE5NS8weDY2MA0KICMyOiAgKCZzaG9zdC0+c2Nhbl9tdXRleCl7Ky4rLn0sIGF0OiBbPGZmZmZm
+ZmZmODE0ODA3YmY+XSBzY3NpX3JlbW92ZV9ob3N0KzB4MWYvMHgxMjANCiAjMjogICgmc2hvc3Qt
+PnNjYW5fbXV0ZXgpeysuKy59LCBhdDogWzxmZmZmZmZmZjgxNDgwN2JmPl0gc2NzaV9yZW1vdmVf
+aG9zdCsweDFmLzB4MTIwDQogIzM6ICAoJmRldi0+bXV0ZXgpey4uLi59LCBhdDogWzxmZmZmZmZm
+ZjgxNDUwMWE5Pl0gZGV2aWNlX3JlbGVhc2VfZHJpdmVyX2ludGVybmFsKzB4MzkvMHgyMTANCiAj
+MzogICgmZGV2LT5tdXRleCl7Li4uLn0sIGF0OiBbPGZmZmZmZmZmODE0NTAxYTk+XSBkZXZpY2Vf
+cmVsZWFzZV9kcml2ZXJfaW50ZXJuYWwrMHgzOS8weDIxMA0KMiBsb2NrcyBoZWxkIGJ5IGt3b3Jr
+ZXIvdTY2OjAvMTkyNzoNCjIgbG9ja3MgaGVsZCBieSBrd29ya2VyL3U2NjowLzE5Mjc6DQogIzA6
+ICAoImV2ZW50c191bmJvdW5kIil7Ky4rLn0sIGF0OiBbPGZmZmZmZmZmODEwODNiODU+XSBwcm9j
+ZXNzX29uZV93b3JrKzB4MTk1LzB4NjYwDQogIzA6ICAoImV2ZW50c191bmJvdW5kIil7Ky4rLn0s
+IGF0OiBbPGZmZmZmZmZmODEwODNiODU+XSBwcm9jZXNzX29uZV93b3JrKzB4MTk1LzB4NjYwDQog
+IzE6ICAoKCZlbnRyeS0+d29yaykpeysuKy59LCBhdDogWzxmZmZmZmZmZjgxMDgzYjg1Pl0gcHJv
+Y2Vzc19vbmVfd29yaysweDE5NS8weDY2MA0KICMxOiAgKCgmZW50cnktPndvcmspKXsrLisufSwg
+YXQ6IFs8ZmZmZmZmZmY4MTA4M2I4NT5dIHByb2Nlc3Nfb25lX3dvcmsrMHgxOTUvMHg2NjANCjIg
+bG9ja3MgaGVsZCBieSBrd29ya2VyLzU6MC8yMDQ3Og0KMiBsb2NrcyBoZWxkIGJ5IGt3b3JrZXIv
+NTowLzIwNDc6DQogIzA6ICAoImthbHVhZCIpeysuKy59LCBhdDogWzxmZmZmZmZmZjgxMDgzYjg1
+Pl0gcHJvY2Vzc19vbmVfd29yaysweDE5NS8weDY2MA0KICMwOiAgKCJrYWx1YWQiKXsrLisufSwg
+YXQ6IFs8ZmZmZmZmZmY4MTA4M2I4NT5dIHByb2Nlc3Nfb25lX3dvcmsrMHgxOTUvMHg2NjANCiAj
+MTogICgoJigmcGctPnJ0cGdfd29yayktPndvcmspKXsrLisufSwgYXQ6IFs8ZmZmZmZmZmY4MTA4
+M2I4NT5dIHByb2Nlc3Nfb25lX3dvcmsrMHgxOTUvMHg2NjANCiAjMTogICgoJigmcGctPnJ0cGdf
+d29yayktPndvcmspKXsrLisufSwgYXQ6IFs8ZmZmZmZmZmY4MTA4M2I4NT5dIHByb2Nlc3Nfb25l
+X3dvcmsrMHgxOTUvMHg2NjANCg0KDQo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT0NCg0KPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09DQoNCklORk86IHRhc2sga3dvcmtlci8xOToxOjIwOSBibG9ja2VkIGZvciBtb3JlIHRoYW4g
+NDgwIHNlY29uZHMuDQpJTkZPOiB0YXNrIGt3b3JrZXIvMTk6MToyMDkgYmxvY2tlZCBmb3IgbW9y
+ZSB0aGFuIDQ4MCBzZWNvbmRzLg0KICAgICAgVGFpbnRlZDogRyAgICAgICAgVyAgICAgICA0LjE0
+LjAtcmM3LWRiZysgIzENCiAgICAgIFRhaW50ZWQ6IEcgICAgICAgIFcgICAgICAgNC4xNC4wLXJj
+Ny1kYmcrICMxDQoiZWNobyAwID4gL3Byb2Mvc3lzL2tlcm5lbC9odW5nX3Rhc2tfdGltZW91dF9z
+ZWNzIiBkaXNhYmxlcyB0aGlzIG1lc3NhZ2UuDQoiZWNobyAwID4gL3Byb2Mvc3lzL2tlcm5lbC9o
+dW5nX3Rhc2tfdGltZW91dF9zZWNzIiBkaXNhYmxlcyB0aGlzIG1lc3NhZ2UuDQprd29ya2VyLzE5
+OjEgICAgRCAgICAwICAgMjA5ICAgICAgMiAweDgwMDAwMDAwDQprd29ya2VyLzE5OjEgICAgRCAg
+ICAwICAgMjA5ICAgICAgMiAweDgwMDAwMDAwDQpXb3JrcXVldWU6IHNycF9yZW1vdmUgc3JwX3Jl
+bW92ZV93b3JrIFtpYl9zcnBdDQpXb3JrcXVldWU6IHNycF9yZW1vdmUgc3JwX3JlbW92ZV93b3Jr
+IFtpYl9zcnBdDQpDYWxsIFRyYWNlOg0KQ2FsbCBUcmFjZToNCiBfX3NjaGVkdWxlKzB4MmZhLzB4
+YmIwDQogX19zY2hlZHVsZSsweDJmYS8weGJiMA0KIHNjaGVkdWxlKzB4MzYvMHg5MA0KIHNjaGVk
+dWxlKzB4MzYvMHg5MA0KIGFzeW5jX3N5bmNocm9uaXplX2Nvb2tpZV9kb21haW4rMHg4OC8weDEz
+MA0KIGFzeW5jX3N5bmNocm9uaXplX2Nvb2tpZV9kb21haW4rMHg4OC8weDEzMA0KID8gZmluaXNo
+X3dhaXQrMHg5MC8weDkwDQogPyBmaW5pc2hfd2FpdCsweDkwLzB4OTANCiBhc3luY19zeW5jaHJv
+bml6ZV9mdWxsX2RvbWFpbisweDE4LzB4MjANCiBhc3luY19zeW5jaHJvbml6ZV9mdWxsX2RvbWFp
+bisweDE4LzB4MjANCiBzZF9yZW1vdmUrMHg0ZC8weGMwIFtzZF9tb2RdDQogc2RfcmVtb3ZlKzB4
+NGQvMHhjMCBbc2RfbW9kXQ0KIGRldmljZV9yZWxlYXNlX2RyaXZlcl9pbnRlcm5hbCsweDE2MC8w
+eDIxMA0KIGRldmljZV9yZWxlYXNlX2RyaXZlcl9pbnRlcm5hbCsweDE2MC8weDIxMA0KIGRldmlj
+ZV9yZWxlYXNlX2RyaXZlcisweDEyLzB4MjANCiBkZXZpY2VfcmVsZWFzZV9kcml2ZXIrMHgxMi8w
+eDIwDQogYnVzX3JlbW92ZV9kZXZpY2UrMHgxMDAvMHgxODANCiBidXNfcmVtb3ZlX2RldmljZSsw
+eDEwMC8weDE4MA0KIGRldmljZV9kZWwrMHgxZDgvMHgzNDANCiBkZXZpY2VfZGVsKzB4MWQ4LzB4
+MzQwDQogX19zY3NpX3JlbW92ZV9kZXZpY2UrMHhmYy8weDEzMA0KIF9fc2NzaV9yZW1vdmVfZGV2
+aWNlKzB4ZmMvMHgxMzANCiBzY3NpX2ZvcmdldF9ob3N0KzB4MjUvMHg3MA0KIHNjc2lfZm9yZ2V0
+X2hvc3QrMHgyNS8weDcwDQogc2NzaV9yZW1vdmVfaG9zdCsweDc5LzB4MTIwDQogc2NzaV9yZW1v
+dmVfaG9zdCsweDc5LzB4MTIwDQogc3JwX3JlbW92ZV93b3JrKzB4OTAvMHgxZDAgW2liX3NycF0N
+CiBzcnBfcmVtb3ZlX3dvcmsrMHg5MC8weDFkMCBbaWJfc3JwXQ0KIHByb2Nlc3Nfb25lX3dvcmsr
+MHgyMGEvMHg2NjANCiBwcm9jZXNzX29uZV93b3JrKzB4MjBhLzB4NjYwDQogd29ya2VyX3RocmVh
+ZCsweDNkLzB4M2IwDQogd29ya2VyX3RocmVhZCsweDNkLzB4M2IwDQoga3RocmVhZCsweDEzYS8w
+eDE1MA0KIGt0aHJlYWQrMHgxM2EvMHgxNTANCiA/IHByb2Nlc3Nfb25lX3dvcmsrMHg2NjAvMHg2
+NjANCiA/IHByb2Nlc3Nfb25lX3dvcmsrMHg2NjAvMHg2NjANCiA/IGt0aHJlYWRfY3JlYXRlX29u
+X25vZGUrMHg0MC8weDQwDQogPyBrdGhyZWFkX2NyZWF0ZV9vbl9ub2RlKzB4NDAvMHg0MA0KIHJl
+dF9mcm9tX2ZvcmsrMHgyNy8weDQwDQogcmV0X2Zyb21fZm9yaysweDI3LzB4NDANCg0KU2hvd2lu
+ZyBhbGwgbG9ja3MgaGVsZCBpbiB0aGUgc3lzdGVtOg0KDQpTaG93aW5nIGFsbCBsb2NrcyBoZWxk
+IGluIHRoZSBzeXN0ZW06DQoxIGxvY2sgaGVsZCBieSBraHVuZ3Rhc2tkLzE3MDoNCjEgbG9jayBo
+ZWxkIGJ5IGtodW5ndGFza2QvMTcwOg0KICMwOiAgKHRhc2tsaXN0X2xvY2spey4rLit9LCBhdDog
+WzxmZmZmZmZmZjgxMGMxMjVkPl0gZGVidWdfc2hvd19hbGxfbG9ja3MrMHgzZC8weDFhMA0KICMw
+OiAgKHRhc2tsaXN0X2xvY2spey4rLit9LCBhdDogWzxmZmZmZmZmZjgxMGMxMjVkPl0gZGVidWdf
+c2hvd19hbGxfbG9ja3MrMHgzZC8weDFhMA0KNCBsb2NrcyBoZWxkIGJ5IGt3b3JrZXIvMTk6MS8y
+MDk6DQo0IGxvY2tzIGhlbGQgYnkga3dvcmtlci8xOToxLzIwOToNCiAjMDogICgiJXMiKCJzcnBf
+cmVtb3ZlIikpeysuKy59LCBhdDogWzxmZmZmZmZmZjgxMDgzYjg1Pl0gcHJvY2Vzc19vbmVfd29y
+aysweDE5NS8weDY2MA0KICMwOiAgKCIlcyIoInNycF9yZW1vdmUiKSl7Ky4rLn0sIGF0OiBbPGZm
+ZmZmZmZmODEwODNiODU+XSBwcm9jZXNzX29uZV93b3JrKzB4MTk1LzB4NjYwDQogIzE6ICAoKCZ0
+YXJnZXQtPnJlbW92ZV93b3JrKSl7Ky4rLn0sIGF0OiBbPGZmZmZmZmZmODEwODNiODU+XSBwcm9j
+ZXNzX29uZV93b3JrKzB4MTk1LzB4NjYwDQogIzE6ICAoKCZ0YXJnZXQtPnJlbW92ZV93b3JrKSl7
+Ky4rLn0sIGF0OiBbPGZmZmZmZmZmODEwODNiODU+XSBwcm9jZXNzX29uZV93b3JrKzB4MTk1LzB4
+NjYwDQogIzI6ICAoJnNob3N0LT5zY2FuX211dGV4KXsrLisufSwgYXQ6IFs8ZmZmZmZmZmY4MTQ4
+MDdiZj5dIHNjc2lfcmVtb3ZlX2hvc3QrMHgxZi8weDEyMA0KICMyOiAgKCZzaG9zdC0+c2Nhbl9t
+dXRleCl7Ky4rLn0sIGF0OiBbPGZmZmZmZmZmODE0ODA3YmY+XSBzY3NpX3JlbW92ZV9ob3N0KzB4
+MWYvMHgxMjANCiAjMzogICgmZGV2LT5tdXRleCl7Li4uLn0sIGF0OiBbPGZmZmZmZmZmODE0NTAx
+YTk+XSBkZXZpY2VfcmVsZWFzZV9kcml2ZXJfaW50ZXJuYWwrMHgzOS8weDIxMA0KICMzOiAgKCZk
+ZXYtPm11dGV4KXsuLi4ufSwgYXQ6IFs8ZmZmZmZmZmY4MTQ1MDFhOT5dIGRldmljZV9yZWxlYXNl
+X2RyaXZlcl9pbnRlcm5hbCsweDM5LzB4MjEwDQoyIGxvY2tzIGhlbGQgYnkga3dvcmtlci91NjY6
+MC8xOTI3Og0KMiBsb2NrcyBoZWxkIGJ5IGt3b3JrZXIvdTY2OjAvMTkyNzoNCiAjMDogICgiZXZl
+bnRzX3VuYm91bmQiKXsrLisufSwgYXQ6IFs8ZmZmZmZmZmY4MTA4M2I4NT5dIHByb2Nlc3Nfb25l
+X3dvcmsrMHgxOTUvMHg2NjANCiAjMDogICgiZXZlbnRzX3VuYm91bmQiKXsrLisufSwgYXQ6IFs8
+ZmZmZmZmZmY4MTA4M2I4NT5dIHByb2Nlc3Nfb25lX3dvcmsrMHgxOTUvMHg2NjANCiAjMTogICgo
+JmVudHJ5LT53b3JrKSl7Ky4rLn0sIGF0OiBbPGZmZmZmZmZmODEwODNiODU+XSBwcm9jZXNzX29u
+ZV93b3JrKzB4MTk1LzB4NjYwDQogIzE6ICAoKCZlbnRyeS0+d29yaykpeysuKy59LCBhdDogWzxm
+ZmZmZmZmZjgxMDgzYjg1Pl0gcHJvY2Vzc19vbmVfd29yaysweDE5NS8weDY2MA0KMiBsb2NrcyBo
+ZWxkIGJ5IGt3b3JrZXIvNTowLzIwNDc6DQoyIGxvY2tzIGhlbGQgYnkga3dvcmtlci81OjAvMjA0
+NzoNCiAjMDogICgia2FsdWFkIil7Ky4rLn0sIGF0OiBbPGZmZmZmZmZmODEwODNiODU+XSBwcm9j
+ZXNzX29uZV93b3JrKzB4MTk1LzB4NjYwDQogIzA6ICAoImthbHVhZCIpeysuKy59LCBhdDogWzxm
+ZmZmZmZmZjgxMDgzYjg1Pl0gcHJvY2Vzc19vbmVfd29yaysweDE5NS8weDY2MA0KICMxOiAgKCgm
+KCZwZy0+cnRwZ193b3JrKS0+d29yaykpeysuKy59LCBhdDogWzxmZmZmZmZmZjgxMDgzYjg1Pl0g
+cHJvY2Vzc19vbmVfd29yaysweDE5NS8weDY2MA0KICMxOiAgKCgmKCZwZy0+cnRwZ193b3JrKS0+
+d29yaykpeysuKy59LCBhdDogWzxmZmZmZmZmZjgxMDgzYjg1Pl0gcHJvY2Vzc19vbmVfd29yaysw
+eDE5NS8weDY2MA0KDQoNCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PQ0KDQo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0=
