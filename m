@@ -1,47 +1,56 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH] block: Rework drivers/cdrom/Makefile
-To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Johannes Thumshirn <jthumshirn@suse.de>
-References: <20171030160219.13019-1-bart.vanassche@wdc.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <fa1e4397-46d4-3c29-1839-e27d68d6dacb@suse.de>
-Date: Wed, 1 Nov 2017 12:07:33 +0100
-MIME-Version: 1.0
-In-Reply-To: <20171030160219.13019-1-bart.vanassche@wdc.com>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <BATV+adf086a54a2d754d8a83+5184+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 1/7] block: move REQ_NOWAIT
+Date: Thu,  2 Nov 2017 21:29:48 +0300
+Message-Id: <20171102182954.9263-2-hch@lst.de>
+In-Reply-To: <20171102182954.9263-1-hch@lst.de>
+References: <20171102182954.9263-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/30/2017 05:02 PM, Bart Van Assche wrote:
-> Instead of referring from inside drivers/cdrom/Makefile to all the
-> drivers that use this driver, let these drivers select the cdrom
-> driver. This change makes the cdrom build code follow the approach
-> that is used for most other drivers, namely refer from the higher
-> layers to the lower layer instead of from the lower layer to the
-> higher layers.
-> 
-> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Hannes Reinecke <hare@suse.de>
-> Cc: Johannes Thumshirn <jthumshirn@suse.de>
-> ---
->  drivers/block/Kconfig        | 12 ++++++++++++
->  drivers/block/paride/Kconfig |  1 +
->  drivers/cdrom/Makefile       | 15 ++-------------
->  drivers/ide/Kconfig          |  1 +
->  drivers/scsi/Kconfig         |  1 +
->  5 files changed, 17 insertions(+), 13 deletions(-)
-> 
-You seem to have too much spare time ...
+This flag should be before the operation-specific REQ_NOUNMAP bit.
 
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ include/linux/blk_types.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Cheers,
-
-Hannes
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index a2d2aa709cef..acc2f3cdc2fc 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -224,11 +224,11 @@ enum req_flag_bits {
+ 	__REQ_PREFLUSH,		/* request for cache flush */
+ 	__REQ_RAHEAD,		/* read ahead, can fail anytime */
+ 	__REQ_BACKGROUND,	/* background IO */
++	__REQ_NOWAIT,           /* Don't wait if request will block */
+ 
+ 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
+ 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
+ 
+-	__REQ_NOWAIT,           /* Don't wait if request will block */
+ 	__REQ_NR_BITS,		/* stops here */
+ };
+ 
+@@ -245,9 +245,9 @@ enum req_flag_bits {
+ #define REQ_PREFLUSH		(1ULL << __REQ_PREFLUSH)
+ #define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
+ #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
++#define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
+ 
+ #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
+-#define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
+ 
+ #define REQ_FAILFAST_MASK \
+ 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.14.2
