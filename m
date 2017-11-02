@@ -1,164 +1,74 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:13823 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751580AbdKUNnb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Nov 2017 08:43:31 -0500
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V14 04/24] mmc: block: Ensure that debugfs files are removed
-Date: Tue, 21 Nov 2017 15:42:30 +0200
-Message-Id: <1511271770-3444-5-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
-References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+adf086a54a2d754d8a83+5184+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 4/7] block: add a blk_steal_bios helper
+Date: Thu,  2 Nov 2017 21:29:51 +0300
+Message-Id: <20171102182954.9263-5-hch@lst.de>
+In-Reply-To: <20171102182954.9263-1-hch@lst.de>
+References: <20171102182954.9263-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-The card is not necessarily being removed, but the debugfs files must be
-removed when the driver is removed, otherwise they will continue to exist
-after unbinding the card from the driver. e.g.
+This helpers allows to bounce steal the uncompleted bios from a request so
+that they can be reissued on another path.
 
-  # echo "mmc1:0001" > /sys/bus/mmc/drivers/mmcblk/unbind
-  # cat /sys/kernel/debug/mmc1/mmc1\:0001/ext_csd
-  [  173.634584] BUG: unable to handle kernel NULL pointer dereference at 0000000000000050
-  [  173.643356] IP: mmc_ext_csd_open+0x5e/0x170
-
-A complication is that the debugfs_root may have already been removed, so
-check for that too.
-
-Fixes: 627c3ccfb46a ("mmc: debugfs: Move block debugfs into block module")
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- drivers/mmc/core/block.c   | 44 +++++++++++++++++++++++++++++++++++++-------
- drivers/mmc/core/debugfs.c |  1 +
- 2 files changed, 38 insertions(+), 7 deletions(-)
+ block/blk-core.c       | 21 +++++++++++++++++++++
+ include/linux/blkdev.h |  2 ++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index 4a319ddbd956..ccfa98af1dd3 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -122,6 +122,10 @@ struct mmc_blk_data {
- 	struct device_attribute force_ro;
- 	struct device_attribute power_ro_lock;
- 	int	area_type;
-+
-+	/* debugfs files (only in main mmc_blk_data) */
-+	struct dentry *status_dentry;
-+	struct dentry *ext_csd_dentry;
- };
- 
- /* Device type for RPMB character devices */
-@@ -2653,7 +2657,7 @@ static int mmc_ext_csd_release(struct inode *inode, struct file *file)
- 	.llseek		= default_llseek,
- };
- 
--static int mmc_blk_add_debugfs(struct mmc_card *card)
-+static int mmc_blk_add_debugfs(struct mmc_card *card, struct mmc_blk_data *md)
- {
- 	struct dentry *root;
- 
-@@ -2663,28 +2667,53 @@ static int mmc_blk_add_debugfs(struct mmc_card *card)
- 	root = card->debugfs_root;
- 
- 	if (mmc_card_mmc(card) || mmc_card_sd(card)) {
--		if (!debugfs_create_file("status", S_IRUSR, root, card,
--					 &mmc_dbg_card_status_fops))
-+		md->status_dentry =
-+			debugfs_create_file("status", S_IRUSR, root, card,
-+					    &mmc_dbg_card_status_fops);
-+		if (!md->status_dentry)
- 			return -EIO;
- 	}
- 
- 	if (mmc_card_mmc(card)) {
--		if (!debugfs_create_file("ext_csd", S_IRUSR, root, card,
--					 &mmc_dbg_ext_csd_fops))
-+		md->ext_csd_dentry =
-+			debugfs_create_file("ext_csd", S_IRUSR, root, card,
-+					    &mmc_dbg_ext_csd_fops);
-+		if (!md->ext_csd_dentry)
- 			return -EIO;
- 	}
- 
- 	return 0;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index b8c80f39f5fe..54fe673fb3ba 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2767,6 +2767,27 @@ struct request *blk_fetch_request(struct request_queue *q)
  }
+ EXPORT_SYMBOL(blk_fetch_request);
  
-+static void mmc_blk_remove_debugfs(struct mmc_card *card,
-+				   struct mmc_blk_data *md)
++/*
++ * Steal bios from a request and add them to a bio list.
++ * The request must not have been partially completed before.
++ */
++void blk_steal_bios(struct bio_list *list, struct request *rq)
 +{
-+	if (!card->debugfs_root)
-+		return;
++	if (rq->bio) {
++		if (list->tail)
++			list->tail->bi_next = rq->bio;
++		else
++			list->head = rq->bio;
++		list->tail = rq->biotail;
 +
-+	if (!IS_ERR_OR_NULL(md->status_dentry)) {
-+		debugfs_remove(md->status_dentry);
-+		md->status_dentry = NULL;
++		rq->bio = NULL;
++		rq->biotail = NULL;
 +	}
 +
-+	if (!IS_ERR_OR_NULL(md->ext_csd_dentry)) {
-+		debugfs_remove(md->ext_csd_dentry);
-+		md->ext_csd_dentry = NULL;
-+	}
++	rq->__data_len = 0;
 +}
- 
- #else
- 
--static int mmc_blk_add_debugfs(struct mmc_card *card)
-+static int mmc_blk_add_debugfs(struct mmc_card *card, struct mmc_blk_data *md)
- {
- 	return 0;
- }
- 
-+static void mmc_blk_remove_debugfs(struct mmc_card *card,
-+				   struct mmc_blk_data *md)
-+{
-+}
++EXPORT_SYMBOL_GPL(blk_steal_bios);
 +
- #endif /* CONFIG_DEBUG_FS */
+ /**
+  * blk_update_request - Special helper function for request stacking drivers
+  * @req:      the request being processed
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 780f01db5899..45c63764a14e 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1110,6 +1110,8 @@ extern struct request *blk_peek_request(struct request_queue *q);
+ extern void blk_start_request(struct request *rq);
+ extern struct request *blk_fetch_request(struct request_queue *q);
  
- static int mmc_blk_probe(struct mmc_card *card)
-@@ -2724,7 +2753,7 @@ static int mmc_blk_probe(struct mmc_card *card)
- 	}
- 
- 	/* Add two debugfs entries */
--	mmc_blk_add_debugfs(card);
-+	mmc_blk_add_debugfs(card, md);
- 
- 	pm_runtime_set_autosuspend_delay(&card->dev, 3000);
- 	pm_runtime_use_autosuspend(&card->dev);
-@@ -2750,6 +2779,7 @@ static void mmc_blk_remove(struct mmc_card *card)
- {
- 	struct mmc_blk_data *md = dev_get_drvdata(&card->dev);
- 
-+	mmc_blk_remove_debugfs(card, md);
- 	mmc_blk_remove_parts(card, md);
- 	pm_runtime_get_sync(&card->dev);
- 	mmc_claim_host(card->host);
-diff --git a/drivers/mmc/core/debugfs.c b/drivers/mmc/core/debugfs.c
-index 01e459a34f33..0f4a7d7b2626 100644
---- a/drivers/mmc/core/debugfs.c
-+++ b/drivers/mmc/core/debugfs.c
-@@ -314,4 +314,5 @@ void mmc_add_card_debugfs(struct mmc_card *card)
- void mmc_remove_card_debugfs(struct mmc_card *card)
- {
- 	debugfs_remove_recursive(card->debugfs_root);
-+	card->debugfs_root = NULL;
- }
++void blk_steal_bios(struct bio_list *list, struct request *rq);
++
+ /*
+  * Request completion related functions.
+  *
 -- 
-1.9.1
+2.14.2
