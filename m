@@ -1,72 +1,124 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from server.coly.li ([162.144.45.48]:58330 "EHLO server.coly.li"
+Received: from mx1.redhat.com ([209.132.183.28]:50938 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754608AbdKALz3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 1 Nov 2017 07:55:29 -0400
-Subject: Re: [PATCH] bcache: stop writeback thread after detaching
-To: tang.junhui@zte.com.cn
-Cc: colyli@suse.de, mlyle@lyle.org, linux-bcache@vger.kernel.org,
-        linux-block@vger.kernel.org
-References: <1509437651-24052-1-git-send-email-tang.junhui@zte.com.cn>
-From: Coly Li <i@coly.li>
-Message-ID: <32ba916e-a7d4-b4c0-ea75-844bb34a3d86@coly.li>
-Date: Wed, 1 Nov 2017 19:55:18 +0800
-MIME-Version: 1.0
-In-Reply-To: <1509437651-24052-1-git-send-email-tang.junhui@zte.com.cn>
-Content-Type: text/plain; charset=utf-8
+        id S933983AbdKBPZ5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 2 Nov 2017 11:25:57 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Omar Sandoval <osandov@fb.com>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Hannes Reinecke <hare@suse.com>, linux-kernel@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 6/7] blk-mq: move blk_mq_put_driver_tag*() into blk-mq.h
+Date: Thu,  2 Nov 2017 23:24:37 +0800
+Message-Id: <20171102152438.25324-7-ming.lei@redhat.com>
+In-Reply-To: <20171102152438.25324-1-ming.lei@redhat.com>
+References: <20171102152438.25324-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 2017/10/31 下午4:14, tang.junhui@zte.com.cn wrote:
-> From: Tang Junhui <tang.junhui@zte.com.cn>
-> 
-> Currently, when a cached device detaching from cache, writeback thread is not stopped,
-> and writeback_rate_update work is not canceled. For example, after bellow command:
-> echo 1 >/sys/block/sdb/bcache/detach
-> you can still see the writeback thread. Then you attach the device to the cache again,
-> bcache will create another writeback thread, for example, after bellow command:
-> echo  ba0fb5cd-658a-4533-9806-6ce166d883b9 > /sys/block/sdb/bcache/attach
-> then you will see 2 writeback threads.
-> This patch stops writeback thread and cancels writeback_rate_update work when cached
-> device detaching from cache.
-> 
-> Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+We need this helper to put the driver tag for flush rq, since we will
+not share tag in the flush request sequence in the following patch
+in case that I/O scheduler is applied.
 
-If the change can be inside bch_register_lock, it would (just) be more
-comfortable. The code is correct, because attach/detach sysfs is created
-after writeback_thread created and writeback_rate_update worker
-initialized, even these resources are initialized within
-bch_register_lock and released out of bch)register_lock in your patch,
-there won't be any race. It's OK to me.
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 32 --------------------------------
+ block/blk-mq.h | 33 +++++++++++++++++++++++++++++++++
+ 2 files changed, 33 insertions(+), 32 deletions(-)
 
-Reviewed-by: Coly Li <colyli@suse.de>
-
-Thanks.
-
-Coly Li
-
-> ---
->  drivers/md/bcache/super.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->  mode change 100644 => 100755 drivers/md/bcache/super.c
-> 
-> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-> old mode 100644
-> new mode 100755
-> index 8352fad..bf79892
-> --- a/drivers/md/bcache/super.c
-> +++ b/drivers/md/bcache/super.c
-> @@ -891,6 +891,12 @@ static void cached_dev_detach_finish(struct work_struct *w)
->  	BUG_ON(!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags));
->  	BUG_ON(atomic_read(&dc->count));
->  
-> +	cancel_delayed_work_sync(&dc->writeback_rate_update);
-> +	if (!IS_ERR_OR_NULL(dc->writeback_thread)) {
-> +		kthread_stop(dc->writeback_thread);
-> +		dc->writeback_thread = NULL;
-> +	}
-> +
->  	mutex_lock(&bch_register_lock);
->  
->  	memset(&dc->sb.set_uuid, 0, 16);
-> 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 5e2866b83305..bf62065a15ec 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -993,38 +993,6 @@ bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
+ 	return rq->tag != -1;
+ }
+ 
+-static void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
+-				    struct request *rq)
+-{
+-	blk_mq_put_tag(hctx, hctx->tags, rq->mq_ctx, rq->tag);
+-	rq->tag = -1;
+-
+-	if (rq->rq_flags & RQF_MQ_INFLIGHT) {
+-		rq->rq_flags &= ~RQF_MQ_INFLIGHT;
+-		atomic_dec(&hctx->nr_active);
+-	}
+-}
+-
+-static void blk_mq_put_driver_tag_hctx(struct blk_mq_hw_ctx *hctx,
+-				       struct request *rq)
+-{
+-	if (rq->tag == -1 || rq->internal_tag == -1)
+-		return;
+-
+-	__blk_mq_put_driver_tag(hctx, rq);
+-}
+-
+-static void blk_mq_put_driver_tag(struct request *rq)
+-{
+-	struct blk_mq_hw_ctx *hctx;
+-
+-	if (rq->tag == -1 || rq->internal_tag == -1)
+-		return;
+-
+-	hctx = blk_mq_map_queue(rq->q, rq->mq_ctx->cpu);
+-	__blk_mq_put_driver_tag(hctx, rq);
+-}
+-
+ /*
+  * If we fail getting a driver tag because all the driver tags are already
+  * assigned and on the dispatch list, BUT the first entry does not have a
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 713be5ae83ba..f55d39b0c6ed 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -2,6 +2,7 @@
+ #define INT_BLK_MQ_H
+ 
+ #include "blk-stat.h"
++#include "blk-mq-tag.h"
+ 
+ struct blk_mq_tag_set;
+ 
+@@ -157,4 +158,36 @@ static inline blk_status_t blk_mq_get_dispatch_budget(
+ 	return BLK_STS_OK;
+ }
+ 
++static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
++					   struct request *rq)
++{
++	blk_mq_put_tag(hctx, hctx->tags, rq->mq_ctx, rq->tag);
++	rq->tag = -1;
++
++	if (rq->rq_flags & RQF_MQ_INFLIGHT) {
++		rq->rq_flags &= ~RQF_MQ_INFLIGHT;
++		atomic_dec(&hctx->nr_active);
++	}
++}
++
++static inline void blk_mq_put_driver_tag_hctx(struct blk_mq_hw_ctx *hctx,
++				       struct request *rq)
++{
++	if (rq->tag == -1 || rq->internal_tag == -1)
++		return;
++
++	__blk_mq_put_driver_tag(hctx, rq);
++}
++
++static inline void blk_mq_put_driver_tag(struct request *rq)
++{
++	struct blk_mq_hw_ctx *hctx;
++
++	if (rq->tag == -1 || rq->internal_tag == -1)
++		return;
++
++	hctx = blk_mq_map_queue(rq->q, rq->mq_ctx->cpu);
++	__blk_mq_put_driver_tag(hctx, rq);
++}
++
+ #endif
+-- 
+2.9.5
