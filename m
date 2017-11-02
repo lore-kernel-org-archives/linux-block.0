@@ -1,141 +1,81 @@
-Return-Path: <prvs=473169c3e=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Ard
- Biesheuvel" <ard.biesheuvel@linaro.org>, Herbert Xu
-	<herbert@gondor.apana.org.au>, Bart Van Assche <bart.vanassche@wdc.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	<linux-scsi@vger.kernel.org>
-Subject: [PATCH v3 6/8] scsi/ipr: Use sgl_alloc_order() and sgl_free_order()
-Date: Fri, 3 Nov 2017 15:23:37 -0700
-Message-ID: <20171103222339.26540-7-bart.vanassche@wdc.com>
-In-Reply-To: <20171103222339.26540-1-bart.vanassche@wdc.com>
-References: <20171103222339.26540-1-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:36450 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S933418AbdKBPZ3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 2 Nov 2017 11:25:29 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Omar Sandoval <osandov@fb.com>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Hannes Reinecke <hare@suse.com>, linux-kernel@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 3/7] block: pass 'run_queue' to blk_mq_request_bypass_insert
+Date: Thu,  2 Nov 2017 23:24:34 +0800
+Message-Id: <20171102152438.25324-4-ming.lei@redhat.com>
+In-Reply-To: <20171102152438.25324-1-ming.lei@redhat.com>
+References: <20171102152438.25324-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Use the sgl_alloc_order() and sgl_free_order() functions instead
-of open coding these functions.
+Block flush need this function without running queue, so introduce the
+parameter.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Acked-by: Brian King <brking@linux.vnet.ibm.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/scsi/Kconfig |  1 +
- drivers/scsi/ipr.c   | 49 ++++++++-----------------------------------------
- drivers/scsi/ipr.h   |  2 +-
- 3 files changed, 10 insertions(+), 42 deletions(-)
+ block/blk-core.c | 2 +-
+ block/blk-mq.c   | 5 +++--
+ block/blk-mq.h   | 2 +-
+ 3 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
-index 766955318005..d918115afdca 100644
---- a/drivers/scsi/Kconfig
-+++ b/drivers/scsi/Kconfig
-@@ -1059,6 +1059,7 @@ config SCSI_IPR
- 	depends on PCI && SCSI && ATA
- 	select FW_LOADER
- 	select IRQ_POLL
-+	select SGL_ALLOC
- 	---help---
- 	  This driver supports the IBM Power Linux family RAID adapters.
- 	  This includes IBM pSeries 5712, 5703, 5709, and 570A, as well
-diff --git a/drivers/scsi/ipr.c b/drivers/scsi/ipr.c
-index f838bd73befa..6fed5db6255e 100644
---- a/drivers/scsi/ipr.c
-+++ b/drivers/scsi/ipr.c
-@@ -3815,10 +3815,8 @@ static struct device_attribute ipr_iopoll_weight_attr = {
-  **/
- static struct ipr_sglist *ipr_alloc_ucode_buffer(int buf_len)
- {
--	int sg_size, order, bsize_elem, num_elem, i, j;
-+	int sg_size, order;
- 	struct ipr_sglist *sglist;
--	struct scatterlist *scatterlist;
--	struct page *page;
- 
- 	/* Get the minimum size per scatter/gather element */
- 	sg_size = buf_len / (IPR_MAX_SGLIST - 1);
-@@ -3826,45 +3824,18 @@ static struct ipr_sglist *ipr_alloc_ucode_buffer(int buf_len)
- 	/* Get the actual size per element */
- 	order = get_order(sg_size);
- 
--	/* Determine the actual number of bytes per element */
--	bsize_elem = PAGE_SIZE * (1 << order);
--
--	/* Determine the actual number of sg entries needed */
--	if (buf_len % bsize_elem)
--		num_elem = (buf_len / bsize_elem) + 1;
--	else
--		num_elem = buf_len / bsize_elem;
--
- 	/* Allocate a scatter/gather list for the DMA */
--	sglist = kzalloc(sizeof(struct ipr_sglist) +
--			 (sizeof(struct scatterlist) * (num_elem - 1)),
--			 GFP_KERNEL);
--
-+	sglist = kzalloc(sizeof(struct ipr_sglist), GFP_KERNEL);
- 	if (sglist == NULL) {
- 		ipr_trace;
- 		return NULL;
- 	}
--
--	scatterlist = sglist->scatterlist;
--	sg_init_table(scatterlist, num_elem);
--
- 	sglist->order = order;
--	sglist->num_sg = num_elem;
--
--	/* Allocate a bunch of sg elements */
--	for (i = 0; i < num_elem; i++) {
--		page = alloc_pages(GFP_KERNEL, order);
--		if (!page) {
--			ipr_trace;
--
--			/* Free up what we already allocated */
--			for (j = i - 1; j >= 0; j--)
--				__free_pages(sg_page(&scatterlist[j]), order);
--			kfree(sglist);
--			return NULL;
--		}
--
--		sg_set_page(&scatterlist[i], page, 0, 0);
-+	sglist->scatterlist = sgl_alloc_order(buf_len, order, false, GFP_KERNEL,
-+					      &sglist->num_sg);
-+	if (!sglist->scatterlist) {
-+		kfree(sglist);
-+		return NULL;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index bb4fce694a60..279d9f41a492 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2352,7 +2352,7 @@ blk_status_t blk_insert_cloned_request(struct request_queue *q, struct request *
+ 		 * bypass a potential scheduler on the bottom device for
+ 		 * insert.
+ 		 */
+-		blk_mq_request_bypass_insert(rq);
++		blk_mq_request_bypass_insert(rq, true);
+ 		return BLK_STS_OK;
  	}
  
- 	return sglist;
-@@ -3882,11 +3853,7 @@ static struct ipr_sglist *ipr_alloc_ucode_buffer(int buf_len)
-  **/
- static void ipr_free_ucode_buffer(struct ipr_sglist *sglist)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index fe14b28760eb..5e2866b83305 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1495,7 +1495,7 @@ void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+  * Should only be used carefully, when the caller knows we want to
+  * bypass a potential IO scheduler on the target device.
+  */
+-void blk_mq_request_bypass_insert(struct request *rq)
++void blk_mq_request_bypass_insert(struct request *rq, bool run_queue)
  {
--	int i;
--
--	for (i = 0; i < sglist->num_sg; i++)
--		__free_pages(sg_page(&sglist->scatterlist[i]), sglist->order);
--
-+	sgl_free_order(sglist->scatterlist, sglist->order);
- 	kfree(sglist);
+ 	struct blk_mq_ctx *ctx = rq->mq_ctx;
+ 	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(rq->q, ctx->cpu);
+@@ -1504,7 +1504,8 @@ void blk_mq_request_bypass_insert(struct request *rq)
+ 	list_add_tail(&rq->queuelist, &hctx->dispatch);
+ 	spin_unlock(&hctx->lock);
+ 
+-	blk_mq_run_hw_queue(hctx, false);
++	if (run_queue)
++		blk_mq_run_hw_queue(hctx, false);
  }
  
-diff --git a/drivers/scsi/ipr.h b/drivers/scsi/ipr.h
-index c7f0e9e3cd7d..93570734cbfb 100644
---- a/drivers/scsi/ipr.h
-+++ b/drivers/scsi/ipr.h
-@@ -1454,7 +1454,7 @@ struct ipr_sglist {
- 	u32 num_sg;
- 	u32 num_dma_sg;
- 	u32 buffer_len;
--	struct scatterlist scatterlist[1];
-+	struct scatterlist *scatterlist;
- };
+ void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 522b420dedc0..713be5ae83ba 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -56,7 +56,7 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+  */
+ void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ 				bool at_head);
+-void blk_mq_request_bypass_insert(struct request *rq);
++void blk_mq_request_bypass_insert(struct request *rq, bool run_queue);
+ void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
+ 				struct list_head *list);
  
- enum ipr_sdt_state {
 -- 
-2.14.3
+2.9.5
