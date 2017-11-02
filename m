@@ -1,44 +1,205 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:55173 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755920AbdKCKDA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Nov 2017 06:03:00 -0400
-Received: by mail-wm0-f65.google.com with SMTP id r68so343816wmr.3
-        for <linux-block@vger.kernel.org>; Fri, 03 Nov 2017 03:02:59 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: hch@lst.de, sagi@grimberg.me, keith.busch@intel.com
-Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 2/3] nvme: compare NQN string with right size
-Date: Fri,  3 Nov 2017 11:02:49 +0100
-Message-Id: <1509703370-20379-3-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1509703370-20379-1-git-send-email-javier@cnexlabs.com>
-References: <1509703370-20379-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+adf086a54a2d754d8a83+5184+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH 6/7] block: introduce GENHD_FL_HIDDEN
+Date: Thu,  2 Nov 2017 21:29:53 +0300
+Message-Id: <20171102182954.9263-7-hch@lst.de>
+In-Reply-To: <20171102182954.9263-1-hch@lst.de>
+References: <20171102182954.9263-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Compare subnqns using NVMF_NQN_SIZE as it is < 256
+With this flag a driver can create a gendisk that can be used for I/O
+submission inside the kernel, but which is not registered as user
+facing block device.  This will be useful for the NVMe multipath
+implementation.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/genhd.c         | 68 +++++++++++++++++++++++++++++++++++++--------------
+ include/linux/genhd.h |  1 +
+ 2 files changed, 51 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index bd1d5ff911c9..ae8ab0a1ef0d 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1743,7 +1743,7 @@ static void nvme_init_subnqn(struct nvme_ctrl *ctrl, struct nvme_id_ctrl *id)
+diff --git a/block/genhd.c b/block/genhd.c
+index 1174d24e405e..835e907e6e01 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -585,6 +585,11 @@ static void register_disk(struct device *parent, struct gendisk *disk)
+ 	 */
+ 	pm_runtime_set_memalloc_noio(ddev, true);
  
- 	nqnlen = strnlen(id->subnqn, NVMF_NQN_SIZE);
- 	if (nqnlen > 0 && nqnlen < NVMF_NQN_SIZE) {
--		strcpy(ctrl->subnqn, id->subnqn);
-+		strncpy(ctrl->subnqn, id->subnqn, NVMF_NQN_SIZE);
++	if (disk->flags & GENHD_FL_HIDDEN) {
++		dev_set_uevent_suppress(ddev, 0);
++		return;
++	}
++
+ 	disk->part0.holder_dir = kobject_create_and_add("holders", &ddev->kobj);
+ 	disk->slave_dir = kobject_create_and_add("slaves", &ddev->kobj);
+ 
+@@ -616,6 +621,11 @@ static void register_disk(struct device *parent, struct gendisk *disk)
+ 	while ((part = disk_part_iter_next(&piter)))
+ 		kobject_uevent(&part_to_dev(part)->kobj, KOBJ_ADD);
+ 	disk_part_iter_exit(&piter);
++
++	err = sysfs_create_link(&ddev->kobj,
++				&disk->queue->backing_dev_info->dev->kobj,
++				"bdi");
++	WARN_ON(err);
+ }
+ 
+ /**
+@@ -630,7 +640,6 @@ static void register_disk(struct device *parent, struct gendisk *disk)
+  */
+ void device_add_disk(struct device *parent, struct gendisk *disk)
+ {
+-	struct backing_dev_info *bdi;
+ 	dev_t devt;
+ 	int retval;
+ 
+@@ -639,7 +648,8 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
+ 	 * parameters make sense.
+ 	 */
+ 	WARN_ON(disk->minors && !(disk->major || disk->first_minor));
+-	WARN_ON(!disk->minors && !(disk->flags & GENHD_FL_EXT_DEVT));
++	WARN_ON(!disk->minors &&
++		!(disk->flags & (GENHD_FL_EXT_DEVT | GENHD_FL_HIDDEN)));
+ 
+ 	disk->flags |= GENHD_FL_UP;
+ 
+@@ -648,18 +658,26 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
+ 		WARN_ON(1);
  		return;
  	}
+-	disk_to_dev(disk)->devt = devt;
+ 	disk->major = MAJOR(devt);
+ 	disk->first_minor = MINOR(devt);
  
+ 	disk_alloc_events(disk);
+ 
+-	/* Register BDI before referencing it from bdev */
+-	bdi = disk->queue->backing_dev_info;
+-	bdi_register_owner(bdi, disk_to_dev(disk));
+-
+-	blk_register_region(disk_devt(disk), disk->minors, NULL,
+-			    exact_match, exact_lock, disk);
++	if (disk->flags & GENHD_FL_HIDDEN) {
++		/*
++		 * Don't let hidden disks show up in /proc/partitions,
++		 * and don't bother scanning for partitions either.
++		 */
++		disk->flags |= GENHD_FL_SUPPRESS_PARTITION_INFO;
++		disk->flags |= GENHD_FL_NO_PART_SCAN;
++	} else {
++		/* Register BDI before referencing it from bdev */
++		disk_to_dev(disk)->devt = devt;
++		bdi_register_owner(disk->queue->backing_dev_info,
++				disk_to_dev(disk));
++		blk_register_region(disk_devt(disk), disk->minors, NULL,
++				    exact_match, exact_lock, disk);
++	}
+ 	register_disk(parent, disk);
+ 	blk_register_queue(disk);
+ 
+@@ -669,10 +687,6 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
+ 	 */
+ 	WARN_ON_ONCE(!blk_get_queue(disk->queue));
+ 
+-	retval = sysfs_create_link(&disk_to_dev(disk)->kobj, &bdi->dev->kobj,
+-				   "bdi");
+-	WARN_ON(retval);
+-
+ 	disk_add_events(disk);
+ 	blk_integrity_add(disk);
+ }
+@@ -701,7 +715,8 @@ void del_gendisk(struct gendisk *disk)
+ 	set_capacity(disk, 0);
+ 	disk->flags &= ~GENHD_FL_UP;
+ 
+-	sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
++	if (!(disk->flags & GENHD_FL_HIDDEN))
++		sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
+ 	if (disk->queue) {
+ 		/*
+ 		 * Unregister bdi before releasing device numbers (as they can
+@@ -712,13 +727,15 @@ void del_gendisk(struct gendisk *disk)
+ 	} else {
+ 		WARN_ON(1);
+ 	}
+-	blk_unregister_region(disk_devt(disk), disk->minors);
++
++	if (!(disk->flags & GENHD_FL_HIDDEN)) {
++		blk_unregister_region(disk_devt(disk), disk->minors);
++		kobject_put(disk->part0.holder_dir);
++		kobject_put(disk->slave_dir);
++	}
+ 
+ 	part_stat_set_all(&disk->part0, 0);
+ 	disk->part0.stamp = 0;
+-
+-	kobject_put(disk->part0.holder_dir);
+-	kobject_put(disk->slave_dir);
+ 	if (!sysfs_deprecated)
+ 		sysfs_remove_link(block_depr, dev_name(disk_to_dev(disk)));
+ 	pm_runtime_set_memalloc_noio(disk_to_dev(disk), false);
+@@ -781,6 +798,10 @@ struct gendisk *get_gendisk(dev_t devt, int *partno)
+ 		spin_unlock_bh(&ext_devt_lock);
+ 	}
+ 
++	if (unlikely(disk->flags & GENHD_FL_HIDDEN)) {
++		put_disk(disk);
++		disk = NULL;
++	}
+ 	return disk;
+ }
+ EXPORT_SYMBOL(get_gendisk);
+@@ -1024,6 +1045,15 @@ static ssize_t disk_removable_show(struct device *dev,
+ 		       (disk->flags & GENHD_FL_REMOVABLE ? 1 : 0));
+ }
+ 
++static ssize_t disk_hidden_show(struct device *dev,
++				   struct device_attribute *attr, char *buf)
++{
++	struct gendisk *disk = dev_to_disk(dev);
++
++	return sprintf(buf, "%d\n",
++		       (disk->flags & GENHD_FL_HIDDEN ? 1 : 0));
++}
++
+ static ssize_t disk_ro_show(struct device *dev,
+ 				   struct device_attribute *attr, char *buf)
+ {
+@@ -1061,6 +1091,7 @@ static ssize_t disk_discard_alignment_show(struct device *dev,
+ static DEVICE_ATTR(range, S_IRUGO, disk_range_show, NULL);
+ static DEVICE_ATTR(ext_range, S_IRUGO, disk_ext_range_show, NULL);
+ static DEVICE_ATTR(removable, S_IRUGO, disk_removable_show, NULL);
++static DEVICE_ATTR(hidden, S_IRUGO, disk_hidden_show, NULL);
+ static DEVICE_ATTR(ro, S_IRUGO, disk_ro_show, NULL);
+ static DEVICE_ATTR(size, S_IRUGO, part_size_show, NULL);
+ static DEVICE_ATTR(alignment_offset, S_IRUGO, disk_alignment_offset_show, NULL);
+@@ -1085,6 +1116,7 @@ static struct attribute *disk_attrs[] = {
+ 	&dev_attr_range.attr,
+ 	&dev_attr_ext_range.attr,
+ 	&dev_attr_removable.attr,
++	&dev_attr_hidden.attr,
+ 	&dev_attr_ro.attr,
+ 	&dev_attr_size.attr,
+ 	&dev_attr_alignment_offset.attr,
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 5c0ed5db33c2..93aae3476f58 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -140,6 +140,7 @@ struct hd_struct {
+ #define GENHD_FL_NATIVE_CAPACITY		128
+ #define GENHD_FL_BLOCK_EVENTS_ON_EXCL_WRITE	256
+ #define GENHD_FL_NO_PART_SCAN			512
++#define GENHD_FL_HIDDEN				1024
+ 
+ enum {
+ 	DISK_EVENT_MEDIA_CHANGE			= 1 << 0, /* media changed */
 -- 
-2.7.4
+2.14.2
