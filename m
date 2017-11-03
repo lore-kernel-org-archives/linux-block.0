@@ -1,188 +1,138 @@
-Return-Path: <prvs=47960c428=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V8 5/7] deadline-iosched: Introduce zone locking support
-Date: Thu,  9 Nov 2017 15:57:05 +0900
-Message-Id: <20171109065707.17210-6-damien.lemoal@wdc.com>
-In-Reply-To: <20171109065707.17210-1-damien.lemoal@wdc.com>
-References: <20171109065707.17210-1-damien.lemoal@wdc.com>
+Return-Path: <prvs=473169c3e=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Ard
+ Biesheuvel" <ard.biesheuvel@linaro.org>, Herbert Xu
+	<herbert@gondor.apana.org.au>, Bart Van Assche <bart.vanassche@wdc.com>,
+	Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>
+Subject: [PATCH v3 4/8] nvmet/rdma: Use sgl_alloc() and sgl_free()
+Date: Fri, 3 Nov 2017 15:23:35 -0700
+Message-ID: <20171103222339.26540-5-bart.vanassche@wdc.com>
+In-Reply-To: <20171103222339.26540-1-bart.vanassche@wdc.com>
+References: <20171103222339.26540-1-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: bart.vanassche@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-Introduce zone write locking to avoid write request reordering with
-zoned block devices. This is achieved using a finer selection of the
-next request to dispatch:
-1) Any non-write request is always allowed to proceed.
-2) Any write to a conventional zone is always allowed to proceed.
-3) For a write to a sequential zone, the zone lock is first checked.
-   a) If the zone is not locked, the write is allowed to proceed after
-      its target zone is locked.
-   b) If the zone is locked, the write request is skipped and the next
-      request in the dispatch queue tested (back to step 1).
+Use the sgl_alloc() and sgl_free() functions instead of open coding
+these functions.
 
-For a write request that has locked its target zone, the zone is
-unlocked either when the request completes and the method
-deadline_request_completed() is called, or when the request is requeued
-using the method deadline_add_request().
-
-Requests targeting a locked zone are always left in the scheduler queue
-to preserve the initial write order. If no write request can be
-dispatched, allow reads to be dispatched even if the write batch is not
-done.
-
-If the device used is not a zoned block device, or if zoned block device
-support is disabled, this patch does not modify deadline behavior.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Cc: Keith Busch <keith.busch@intel.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Sagi Grimberg <sagi@grimberg.me>
 ---
- block/deadline-iosched.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 68 insertions(+), 3 deletions(-)
+ drivers/nvme/target/Kconfig |  1 +
+ drivers/nvme/target/rdma.c  | 63 +++------------------------------------------
+ 2 files changed, 5 insertions(+), 59 deletions(-)
 
-diff --git a/block/deadline-iosched.c b/block/deadline-iosched.c
-index 81e3f0897457..9de9f156e203 100644
---- a/block/deadline-iosched.c
-+++ b/block/deadline-iosched.c
-@@ -98,6 +98,12 @@ deadline_add_request(struct request_queue *q, struct request *rq)
- 	struct deadline_data *dd = q->elevator->elevator_data;
- 	const int data_dir = rq_data_dir(rq);
- 
-+	/*
-+	 * This may be a requeue of a write request that has locked its
-+	 * target zone. If it is the case, this releases the zone lock.
-+	 */
-+	blk_req_zone_write_unlock(rq);
-+
- 	deadline_add_rq_rb(dd, rq);
- 
- 	/*
-@@ -188,6 +194,12 @@ deadline_move_to_dispatch(struct deadline_data *dd, struct request *rq)
- {
- 	struct request_queue *q = rq->q;
- 
-+	/*
-+	 * For a zoned block device, write requests must write lock their
-+	 * target zone.
-+	 */
-+	blk_req_zone_write_lock(rq);
-+
- 	deadline_remove_request(q, rq);
- 	elv_dispatch_add_tail(q, rq);
- }
-@@ -235,13 +247,28 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
- static struct request *
- deadline_fifo_request(struct deadline_data *dd, int data_dir)
- {
-+	struct request *rq;
-+
- 	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
- 		return NULL;
- 
- 	if (list_empty(&dd->fifo_list[data_dir]))
- 		return NULL;
- 
--	return rq_entry_fifo(dd->fifo_list[data_dir].next);
-+	rq = rq_entry_fifo(dd->fifo_list[data_dir].next);
-+	if (data_dir == READ || !blk_queue_is_zoned(rq->q))
-+		return rq;
-+
-+	/*
-+	 * Look for a write request that can be dispatched, that is one with
-+	 * an unlocked target zone.
-+	 */
-+	list_for_each_entry(rq, &dd->fifo_list[WRITE], queuelist) {
-+		if (blk_req_can_dispatch_to_zone(rq))
-+			return rq;
-+	}
-+
-+	return NULL;
+diff --git a/drivers/nvme/target/Kconfig b/drivers/nvme/target/Kconfig
+index 4d9715630e21..5f4f8b16685f 100644
+--- a/drivers/nvme/target/Kconfig
++++ b/drivers/nvme/target/Kconfig
+@@ -29,6 +29,7 @@ config NVME_TARGET_RDMA
+ 	tristate "NVMe over Fabrics RDMA target support"
+ 	depends on INFINIBAND
+ 	depends on NVME_TARGET
++	select SGL_ALLOC
+ 	help
+ 	  This enables the NVMe RDMA target support, which allows exporting NVMe
+ 	  devices over RDMA.
+diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
+index 76d2bb793afe..363d44c10b68 100644
+--- a/drivers/nvme/target/rdma.c
++++ b/drivers/nvme/target/rdma.c
+@@ -185,59 +185,6 @@ nvmet_rdma_put_rsp(struct nvmet_rdma_rsp *rsp)
+ 	spin_unlock_irqrestore(&rsp->queue->rsps_lock, flags);
  }
  
- /*
-@@ -251,10 +278,29 @@ deadline_fifo_request(struct deadline_data *dd, int data_dir)
- static struct request *
- deadline_next_request(struct deadline_data *dd, int data_dir)
+-static void nvmet_rdma_free_sgl(struct scatterlist *sgl, unsigned int nents)
+-{
+-	struct scatterlist *sg;
+-	int count;
+-
+-	if (!sgl || !nents)
+-		return;
+-
+-	for_each_sg(sgl, sg, nents, count)
+-		__free_page(sg_page(sg));
+-	kfree(sgl);
+-}
+-
+-static int nvmet_rdma_alloc_sgl(struct scatterlist **sgl, unsigned int *nents,
+-		u32 length)
+-{
+-	struct scatterlist *sg;
+-	struct page *page;
+-	unsigned int nent;
+-	int i = 0;
+-
+-	nent = DIV_ROUND_UP(length, PAGE_SIZE);
+-	sg = kmalloc_array(nent, sizeof(struct scatterlist), GFP_KERNEL);
+-	if (!sg)
+-		goto out;
+-
+-	sg_init_table(sg, nent);
+-
+-	while (length) {
+-		u32 page_len = min_t(u32, length, PAGE_SIZE);
+-
+-		page = alloc_page(GFP_KERNEL);
+-		if (!page)
+-			goto out_free_pages;
+-
+-		sg_set_page(&sg[i], page, page_len, 0);
+-		length -= page_len;
+-		i++;
+-	}
+-	*sgl = sg;
+-	*nents = nent;
+-	return 0;
+-
+-out_free_pages:
+-	while (i > 0) {
+-		i--;
+-		__free_page(sg_page(&sg[i]));
+-	}
+-	kfree(sg);
+-out:
+-	return NVME_SC_INTERNAL;
+-}
+-
+ static int nvmet_rdma_alloc_cmd(struct nvmet_rdma_device *ndev,
+ 			struct nvmet_rdma_cmd *c, bool admin)
  {
-+	struct request *rq;
-+
- 	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
- 		return NULL;
- 
--	return dd->next_rq[data_dir];
-+	rq = dd->next_rq[data_dir];
-+	if (!rq)
-+		return NULL;
-+
-+	if (data_dir == READ || !blk_queue_is_zoned(rq->q))
-+		return rq;
-+
-+	/*
-+	 * Look for a write request that can be dispatched, that is one with
-+	 * an unlocked target zone.
-+	 */
-+	while (rq) {
-+		if (blk_req_can_dispatch_to_zone(rq))
-+			return rq;
-+		rq = deadline_latter_request(rq);
-+	}
-+
-+	return NULL;
- }
- 
- /*
-@@ -288,7 +334,8 @@ static int deadline_dispatch_requests(struct request_queue *q, int force)
- 	if (reads) {
- 		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[READ]));
- 
--		if (writes && (dd->starved++ >= dd->writes_starved))
-+		if (deadline_fifo_request(dd, WRITE) &&
-+		    (dd->starved++ >= dd->writes_starved))
- 			goto dispatch_writes;
- 
- 		data_dir = READ;
-@@ -333,6 +380,13 @@ static int deadline_dispatch_requests(struct request_queue *q, int force)
- 		rq = next_rq;
+@@ -484,7 +431,7 @@ static void nvmet_rdma_release_rsp(struct nvmet_rdma_rsp *rsp)
  	}
  
-+	/*
-+	 * For a zoned block device, if we only have writes queued and none of
-+	 * them can be dispatched, rq will be NULL.
-+	 */
-+	if (!rq)
-+		return 0;
-+
- 	dd->batching = 0;
+ 	if (rsp->req.sg != &rsp->cmd->inline_sg)
+-		nvmet_rdma_free_sgl(rsp->req.sg, rsp->req.sg_cnt);
++		sgl_free(rsp->req.sg);
  
- dispatch_request:
-@@ -345,6 +399,16 @@ static int deadline_dispatch_requests(struct request_queue *q, int force)
- 	return 1;
- }
+ 	if (unlikely(!list_empty_careful(&queue->rsp_wr_wait_list)))
+ 		nvmet_rdma_process_wr_wait_list(queue);
+@@ -620,16 +567,14 @@ static u16 nvmet_rdma_map_sgl_keyed(struct nvmet_rdma_rsp *rsp,
+ 	u32 len = get_unaligned_le24(sgl->length);
+ 	u32 key = get_unaligned_le32(sgl->key);
+ 	int ret;
+-	u16 status;
  
-+/*
-+ * For zoned block devices, write unlock the target zone of completed
-+ * write requests.
-+ */
-+static void
-+deadline_completed_request(struct request_queue *q, struct request *rq)
-+{
-+	blk_req_zone_write_unlock(rq);
-+}
-+
- static void deadline_exit_queue(struct elevator_queue *e)
- {
- 	struct deadline_data *dd = e->elevator_data;
-@@ -466,6 +530,7 @@ static struct elevator_type iosched_deadline = {
- 		.elevator_merged_fn =		deadline_merged_request,
- 		.elevator_merge_req_fn =	deadline_merged_requests,
- 		.elevator_dispatch_fn =		deadline_dispatch_requests,
-+		.elevator_completed_req_fn =	deadline_completed_request,
- 		.elevator_add_req_fn =		deadline_add_request,
- 		.elevator_former_req_fn =	elv_rb_former_request,
- 		.elevator_latter_req_fn =	elv_rb_latter_request,
+ 	/* no data command? */
+ 	if (!len)
+ 		return 0;
+ 
+-	status = nvmet_rdma_alloc_sgl(&rsp->req.sg, &rsp->req.sg_cnt,
+-			len);
+-	if (status)
+-		return status;
++	rsp->req.sg = sgl_alloc(len, GFP_KERNEL, &rsp->req.sg_cnt);
++	if (!rsp->req.sg)
++		return NVME_SC_INTERNAL;
+ 
+ 	ret = rdma_rw_ctx_init(&rsp->rw, cm_id->qp, cm_id->port_num,
+ 			rsp->req.sg, rsp->req.sg_cnt, 0, addr, key,
 -- 
-2.13.6
+2.14.3
