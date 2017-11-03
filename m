@@ -1,185 +1,161 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Fri, 3 Nov 2017 23:47:06 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
-	"roman.penyaev@profitbricks.com" <roman.penyaev@profitbricks.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"osandov@fb.com" <osandov@fb.com>, "hare@suse.com" <hare@suse.com>,
-	"loberman@redhat.com" <loberman@redhat.com>,
+Return-Path: <prvs=473169c3e=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "hch@infradead.org" <hch@infradead.org>, "roman.penyaev@profitbricks.com"
+	<roman.penyaev@profitbricks.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "osandov@fb.com" <osandov@fb.com>,
+	"hare@suse.com" <hare@suse.com>, "loberman@redhat.com" <loberman@redhat.com>,
 	"axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH V2 0/2] block: remove unnecessary RESTART
-Message-ID: <20171103154700.GA7021@ming.t460p>
-References: <1509666235.2484.23.camel@wdc.com>
- <20171102234801.GB27370@ming.t460p>
- <1509666897.2484.25.camel@wdc.com>
- <20171103001541.GF27370@ming.t460p>
- <1509670091.2636.0.camel@wdc.com>
- <CAFfF4qsbPCj3XLw0HkyJYELcqeqiPx_nR-G-1tSRew9z7ujw2Q@mail.gmail.com>
- <20171103021234.GH27370@ming.t460p>
- <1509676969.10883.0.camel@wdc.com>
- <20171103035050.GI27370@ming.t460p>
- <1509722593.2473.12.camel@wdc.com>
+Date: Fri, 3 Nov 2017 15:43:01 +0000
+Message-ID: <1509723780.2473.14.camel@wdc.com>
+References: <1509638224.2484.14.camel@wdc.com>
+	 <20171102233835.GA27370@ming.t460p> <1509666235.2484.23.camel@wdc.com>
+	 <20171102234801.GB27370@ming.t460p> <1509666897.2484.25.camel@wdc.com>
+	 <20171103001541.GF27370@ming.t460p> <1509670091.2636.0.camel@wdc.com>
+	 <CAFfF4qsbPCj3XLw0HkyJYELcqeqiPx_nR-G-1tSRew9z7ujw2Q@mail.gmail.com>
+	 <20171103021234.GH27370@ming.t460p> <1509676969.10883.0.camel@wdc.com>
+	 <20171103151844.GB5059@ming.t460p>
+In-Reply-To: <20171103151844.GB5059@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1509722593.2473.12.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Nov 03, 2017 at 03:23:14PM +0000, Bart Van Assche wrote:
-> On Fri, 2017-11-03 at 11:50 +0800, Ming Lei wrote:
-> > On Fri, Nov 03, 2017 at 02:42:50AM +0000, Bart Van Assche wrote:
-> > > On Fri, 2017-11-03 at 10:12 +0800, Ming Lei wrote:
-> > > > [root@ibclient srp-test]# ./run_tests
-> > > > modprobe: FATAL: Module target_core_mod is in use.
-> > > 
-> > > LIO must be unloaded before srp-test software is started.
-> > 
-> > Yeah, I can make this test kick off after running
-> > 'modprobe -fr ib_isert' first, but looks all tests failed without
-> > any hang, could you check if that is the expected result?
-> > 
-> > 	https://pastebin.com/VXe66Jpg
-> 
-> I see plenty of "... >/sys/.../add_target failed: Connection timed out"
-> messages. The srp-test scripts use the loopback functionality of IB ports
-> so one or more IB ports must be active. Have you already checked the IB
-> ports state, e.g. by running ibv_devinfo?
-
-[root@ibclient ~]# ibv_devinfo
-hca_id:	mlx5_1
-	transport:			InfiniBand (0)
-	fw_ver:				12.20.1010
-	node_guid:			7cfe:9003:0072:6ed3
-	sys_image_guid:			7cfe:9003:0072:6ed2
-	vendor_id:			0x02c9
-	vendor_part_id:			4115
-	hw_ver:				0x0
-	board_id:			MT_2190110032
-	phys_port_cnt:			1
-		port:	1
-			state:			PORT_ACTIVE (4)
-			max_mtu:		4096 (5)
-			active_mtu:		4096 (5)
-			sm_lid:			1
-			port_lid:		1
-			port_lmc:		0x00
-			link_layer:		InfiniBand
-
-hca_id:	mlx5_0
-	transport:			InfiniBand (0)
-	fw_ver:				12.20.1010
-	node_guid:			7cfe:9003:0072:6ed2
-	sys_image_guid:			7cfe:9003:0072:6ed2
-	vendor_id:			0x02c9
-	vendor_part_id:			4115
-	hw_ver:				0x0
-	board_id:			MT_2190110032
-	phys_port_cnt:			1
-		port:	1
-			state:			PORT_ACTIVE (4)
-			max_mtu:		4096 (5)
-			active_mtu:		4096 (5)
-			sm_lid:			4
-			port_lid:		4
-			port_lmc:		0x00
-			link_layer:		InfiniBand
-
-Forget to mention, there is failure when running 'make' under srp-test
-because shellcheck package is missed in RHEL7. Can that be the issue
-of test failure? If yes, could you provide a special version of srp-test
-which doesn't depend on shellcheck?
-
-> 
-> > Also could you provide some output from debugfs when this hang happens?
-> > such as:
-> > 
-> > 	dispatch/busy/.. under hctxN
-> 
-> This is the output that appears on my test setup if the two patches from
-> the patch series "block: remove unnecessary RESTART" are applied:
-> 
-> # ~bart/software/infiniband/srp-test/run_tests -f xfs -d -e deadline -r 60                             
-> Unloaded the ib_srpt kernel module
-> Zero-initializing /dev/ram0 ... done
-> Zero-initializing /dev/ram1 ... done
-> Zero-initializing /dev/disk/by-id/scsi-33333333000004650 ... done
-> brw-rw---- 1 root disk 1, 0 Nov  3 08:10 /dev/ram0
-> /dev/ram0
-> brw-rw---- 1 root disk 1, 1 Nov  3 08:10 /dev/ram1
-> /dev/ram1
-> lrwxrwxrwx 1 root root 9 Nov  3 08:11 /dev/disk/by-id/scsi-33333333000004650 -> ../../sdi
-> /dev/sdi
-> Configured SRP target driver
-> Running test /home/bart/software/infiniband/srp-test/tests/01 ...
-> id_ext=0x0002c90300a02d50,ioc_guid=0x0002c90300a02d50,dgid=fe800000000000000002c90300a02d51,pkey=7fff,service_id=0x0002c90300a02d50, >/sys/class/infiniband_srp/
-> srp-mlx4_0-2/add_target failed: Invalid argument
-> id_ext=0x0002c90300a02d50,ioc_guid=0x0002c90300a02d50,dgid=fe800000000000000002c90300a02d52,pkey=7fff,service_id=0x0002c90300a02d50, >/sys/class/infiniband_srp/
-> srp-mlx4_0-2/add_target failed: Invalid argument
-> count_luns(): 3 <> 3
-> Error: unloading kernel module ib_srp failed
-> Test /home/bart/software/infiniband/srp-test/tests/01 failed
-> # cat /sys/module/scsi_mod/parameters/use_blk_mq  
-> Y
-> # find /sys/kernel/debug/block -name busy | xargs cat
-
-Can you check 'dispatch' file, hctx state, tags and sched_tags?
-And see where is the IO not dispatched?
-
-> # dmesg -c >/dev/null; echo w > /proc/sysrq-trigger; dmesg
-> [  709.321750] sysrq: SysRq : Show Blocked State
-> [  709.327906]   task                        PC stack   pid father
-...
-> [  709.456602] kworker/u66:6   D    0   341      2 0x80000000
-> [  709.463371] Workqueue: events_unbound async_run_entry_fn
-> [  709.469919] Call Trace:
-> [  709.473325]  __schedule+0x2fa/0xbb0
-> [  709.477850]  ? trace_hardirqs_on_caller+0xfb/0x190
-> [  709.483847]  schedule+0x36/0x90
-> [  709.487982]  schedule_timeout+0x22c/0x570
-> [  709.493115]  ? call_timer_fn+0x330/0x330
-> [  709.498133]  ? wait_for_completion_io_timeout+0xf7/0x180
-> [  709.504732]  io_schedule_timeout+0x1e/0x50
-> [  709.509938]  ? io_schedule_timeout+0x1e/0x50
-> [  709.515413]  wait_for_completion_io_timeout+0x11f/0x180
-> [  709.521920]  ? wake_up_q+0x80/0x80
-> [  709.526376]  blk_execute_rq+0x86/0xc0
-> [  709.531135]  scsi_execute+0xdb/0x1f0
-> [  709.536336]  sd_revalidate_disk+0xed/0x1c70 [sd_mod]
-> [  709.543281]  sd_probe_async+0xc3/0x1d0 [sd_mod]
-> [  709.549524]  async_run_entry_fn+0x38/0x160
-> [  709.555503]  process_one_work+0x20a/0x660
-> [  709.561299]  worker_thread+0x3d/0x3b0
-> [  709.566688]  kthread+0x13a/0x150
-> [  709.571613]  ? process_one_work+0x660/0x660
-> [  709.577561]  ? kthread_create_on_node+0x40/0x40
-> [  709.583910]  ret_from_fork+0x27/0x40
-
-Looks hang in scsi_execute().
-
-> [  709.589174] kworker/5:2     D    0   386      2 0x80000000
-> [  709.596616] Workqueue: kaluad alua_rtpg_work [scsi_dh_alua]
-> [  709.604130] Call Trace:
-> [  709.608096]  __schedule+0x2fa/0xbb0
-> [  709.613265]  ? trace_hardirqs_on_caller+0xfb/0x190
-> [  709.619879]  schedule+0x36/0x90
-> [  709.624684]  schedule_timeout+0x22c/0x570
-> [  709.630437]  ? call_timer_fn+0x330/0x330
-> [  709.636059]  ? wait_for_completion_io_timeout+0xf7/0x180
-> [  709.643270]  io_schedule_timeout+0x1e/0x50
-> [  709.649083]  ? io_schedule_timeout+0x1e/0x50
-> [  709.655159]  wait_for_completion_io_timeout+0x11f/0x180
-> [  709.662284]  ? wake_up_q+0x80/0x80
-> [  709.667334]  blk_execute_rq+0x86/0xc0
-> [  709.672705]  scsi_execute+0xdb/0x1f0
-> [  709.677938]  alua_rtpg_work+0x2b3/0xe8a [scsi_dh_alua]
-> [  709.684983]  process_one_work+0x20a/0x660
-> [  709.690759]  worker_thread+0x3d/0x3b0
-> [  709.696107]  kthread+0x13a/0x150
-> [  709.700986]  ? process_one_work+0x660/0x660
-> [  709.706920]  ? kthread_create_on_node+0x40/0x40
-> [  709.713316]  ret_from_fork+0x27/0x40
-
-Same with above.
-
--- 
-Ming
+T24gRnJpLCAyMDE3LTExLTAzIGF0IDIzOjE4ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gU3Vi
+amVjdDogW1BBVENIXSBTQ1NJX01ROiBmaXggSU8gaGFuZyBpbiBjYXNlIG9mIHF1ZXVlIGJ1c3kN
+Cj4gDQo+IFdlIGhhdmUgdG8gaW5zZXJ0IHRoZSBycSBiYWNrIGJlZm9yZSBjaGVja2luZyAuZGV2
+aWNlX2J1c3ksDQo+IG90aGVyd2lzZSBXaGVuIElPIGNvbXBsZXRlcyBqdXN0IGFmdGVyIHRoZSBj
+aGVjayBhbmQgYmVmb3JlDQo+IHRoaXMgcmVxIGlzIGFkZGVkIHRvIGhjdHgtPmRpc3BhdGNoLCB0
+aGlzIHF1ZXVlIG1heSBuZXZlciBnZXQNCj4gY2hhbmNlIHRvIGJlIHJ1biwgdGhlbiB0aGlzIElP
+IG1heSBoYW5nIGZvcmV2ZXIuDQo+IA0KPiBUaGlzIHBhdGNoIGludHJvZHVjZXMgQkxLX1NUU19S
+RVNPVVJDRV9PSyBmb3IgaGFuZGxpbmcgdGhpcw0KPiBpc3N1ZS4NCj4gDQo+IFNpZ25lZC1vZmYt
+Ynk6IE1pbmcgTGVpIDxtaW5nLmxlaUByZWRoYXQuY29tPg0KPiAtLS0NCj4gIGJsb2NrL2Jsay1t
+cS5jICAgICAgICAgICAgfCAxNyArKysrKysrKysrKysrKysrKw0KPiAgZHJpdmVycy9zY3NpL3Nj
+c2lfbGliLmMgICB8ICA4ICsrKysrKysrDQo+ICBpbmNsdWRlL2xpbnV4L2Jsay1tcS5oICAgIHwg
+IDEgKw0KPiAgaW5jbHVkZS9saW51eC9ibGtfdHlwZXMuaCB8ICAxICsNCj4gIDQgZmlsZXMgY2hh
+bmdlZCwgMjcgaW5zZXJ0aW9ucygrKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1tcS5j
+IGIvYmxvY2svYmxrLW1xLmMNCj4gaW5kZXggZTRkMjQ5MGY0ZTdlLi5lMWUwMzU3NmVkY2EgMTAw
+NjQ0DQo+IC0tLSBhL2Jsb2NrL2Jsay1tcS5jDQo+ICsrKyBiL2Jsb2NrL2Jsay1tcS5jDQo+IEBA
+IC02NjAsNiArNjYwLDE2IEBAIHN0YXRpYyB2b2lkIF9fYmxrX21xX3JlcXVldWVfcmVxdWVzdChz
+dHJ1Y3QgcmVxdWVzdCAqcnEpDQo+ICAJfQ0KPiAgfQ0KPiAgDQo+ICt2b2lkIGJsa19tcV9yZWlu
+c2VydF9yZXF1ZXN0X2hjdHgoc3RydWN0IGJsa19tcV9od19jdHggKmhjdHgsIHN0cnVjdCByZXF1
+ZXN0ICpycSkNCj4gK3sNCj4gKwlfX2Jsa19tcV9yZXF1ZXVlX3JlcXVlc3QocnEpOw0KPiArDQo+
+ICsJc3Bpbl9sb2NrKCZoY3R4LT5sb2NrKTsNCj4gKwlsaXN0X2FkZF90YWlsKCZycS0+cXVldWVs
+aXN0LCAmaGN0eC0+ZGlzcGF0Y2gpOw0KPiArCXNwaW5fdW5sb2NrKCZoY3R4LT5sb2NrKTsNCj4g
+K30NCj4gK0VYUE9SVF9TWU1CT0woYmxrX21xX3JlaW5zZXJ0X3JlcXVlc3RfaGN0eCk7DQo+ICsN
+Cj4gIHZvaWQgYmxrX21xX3JlcXVldWVfcmVxdWVzdChzdHJ1Y3QgcmVxdWVzdCAqcnEsIGJvb2wg
+a2lja19yZXF1ZXVlX2xpc3QpDQo+ICB7DQo+ICAJX19ibGtfbXFfcmVxdWV1ZV9yZXF1ZXN0KHJx
+KTsNCj4gQEAgLTExNjUsNiArMTE3NSwxMiBAQCBib29sIGJsa19tcV9kaXNwYXRjaF9ycV9saXN0
+KHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxLCBzdHJ1Y3QgbGlzdF9oZWFkICpsaXN0LA0KPiAgCQkJ
+bGlzdF9hZGQoJnJxLT5xdWV1ZWxpc3QsIGxpc3QpOw0KPiAgCQkJX19ibGtfbXFfcmVxdWV1ZV9y
+ZXF1ZXN0KHJxKTsNCj4gIAkJCWJyZWFrOw0KPiArCQl9IGVsc2UgaWYgKHJldCA9PSBCTEtfU1RT
+X1JFU09VUkNFX09LKSB7DQo+ICsJCQkvKg0KPiArCQkJICogQkxLX1NUU19SRVNPVVJDRV9PSyBt
+ZWFucyBkcml2ZXIgaGFuZGxlZCB0aGlzDQo+ICsJCQkgKiBTVFNfUkVTT1VSQ0UgYWxyZWFkeSwg
+d2UganVzdCBuZWVkIHRvIHN0b3AgZGlzcGF0Y2guDQo+ICsJCQkgKi8NCj4gKwkJCWJyZWFrOw0K
+PiAgCQl9DQo+ICANCj4gICBmYWlsX3JxOg0KPiBAQCAtMTY1Niw2ICsxNjcyLDcgQEAgc3RhdGlj
+IHZvaWQgX19ibGtfbXFfdHJ5X2lzc3VlX2RpcmVjdGx5KHN0cnVjdCBibGtfbXFfaHdfY3R4ICpo
+Y3R4LA0KPiAgCXJldCA9IHEtPm1xX29wcy0+cXVldWVfcnEoaGN0eCwgJmJkKTsNCj4gIAlzd2l0
+Y2ggKHJldCkgew0KPiAgCWNhc2UgQkxLX1NUU19PSzoNCj4gKwljYXNlIEJMS19TVFNfUkVTT1VS
+Q0VfT0s6DQo+ICAJCSpjb29raWUgPSBuZXdfY29va2llOw0KPiAgCQlyZXR1cm47DQo+ICAJY2Fz
+ZSBCTEtfU1RTX1JFU09VUkNFOg0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9zY3NpL3Njc2lfbGli
+LmMgYi9kcml2ZXJzL3Njc2kvc2NzaV9saWIuYw0KPiBpbmRleCA3ZjIxOGVmNjE5MDAuLjAxNjVj
+MWNhZWQ4MiAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy9zY3NpL3Njc2lfbGliLmMNCj4gKysrIGIv
+ZHJpdmVycy9zY3NpL3Njc2lfbGliLmMNCj4gQEAgLTIwMzAsOSArMjAzMCwxNyBAQCBzdGF0aWMg
+YmxrX3N0YXR1c190IHNjc2lfcXVldWVfcnEoc3RydWN0IGJsa19tcV9od19jdHggKmhjdHgsDQo+
+ICAJY2FzZSBCTEtfU1RTX09LOg0KPiAgCQlicmVhazsNCj4gIAljYXNlIEJMS19TVFNfUkVTT1VS
+Q0U6DQo+ICsJCS8qDQo+ICsJCSAqIFdlIGhhdmUgdG8gaW5zZXJ0IHRoZSBycSBiYWNrIGJlZm9y
+ZSBjaGVja2luZyAuZGV2aWNlX2J1c3ksDQo+ICsJCSAqIG90aGVyd2lzZSB3aGVuIElPIGNvbXBs
+ZXRlcyBqdXN0IGFmdGVyIHRoZSBjaGVjayBhbmQgYmVmb3JlDQo+ICsJCSAqIHRoaXMgcmVxIGlz
+IGFkZGVkIHRvIGhjdHgtPmRpc3BhdGNoLCB0aGlzIHF1ZXVlIG1heSBuZXZlciBnZXQNCj4gKwkJ
+ICogY2hhbmNlIHRvIGJlIHJ1biwgdGhlbiB0aGlzIElPIG1heSBoYW5nIGZvcmV2ZXIuDQo+ICsJ
+CSAqLw0KPiArCQlibGtfbXFfcmVpbnNlcnRfcmVxdWVzdF9oY3R4KGhjdHgsIHJlcSk7DQo+ICAJ
+CWlmIChhdG9taWNfcmVhZCgmc2Rldi0+ZGV2aWNlX2J1c3kpID09IDAgJiYNCj4gIAkJICAgICFz
+Y3NpX2RldmljZV9ibG9ja2VkKHNkZXYpKQ0KPiAgCQkJYmxrX21xX2RlbGF5X3J1bl9od19xdWV1
+ZShoY3R4LCBTQ1NJX1FVRVVFX0RFTEFZKTsNCj4gKwkJcmV0ID0gQkxLX1NUU19SRVNPVVJDRV9P
+SzsNCj4gIAkJYnJlYWs7DQo+ICAJZGVmYXVsdDoNCj4gIAkJLyoNCj4gZGlmZiAtLWdpdCBhL2lu
+Y2x1ZGUvbGludXgvYmxrLW1xLmggYi9pbmNsdWRlL2xpbnV4L2Jsay1tcS5oDQo+IGluZGV4IGU1
+ZTZiZWNkNTdkMy4uNDc0MGY2NDNkOGM1IDEwMDY0NA0KPiAtLS0gYS9pbmNsdWRlL2xpbnV4L2Js
+ay1tcS5oDQo+ICsrKyBiL2luY2x1ZGUvbGludXgvYmxrLW1xLmgNCj4gQEAgLTI0NCw2ICsyNDQs
+NyBAQCB2b2lkIGJsa19tcV9zdGFydF9yZXF1ZXN0KHN0cnVjdCByZXF1ZXN0ICpycSk7DQo+ICB2
+b2lkIGJsa19tcV9lbmRfcmVxdWVzdChzdHJ1Y3QgcmVxdWVzdCAqcnEsIGJsa19zdGF0dXNfdCBl
+cnJvcik7DQo+ICB2b2lkIF9fYmxrX21xX2VuZF9yZXF1ZXN0KHN0cnVjdCByZXF1ZXN0ICpycSwg
+YmxrX3N0YXR1c190IGVycm9yKTsNCj4gIA0KPiArdm9pZCBibGtfbXFfcmVpbnNlcnRfcmVxdWVz
+dF9oY3R4KHN0cnVjdCBibGtfbXFfaHdfY3R4ICpoY3R4LCBzdHJ1Y3QgcmVxdWVzdCAqcnEpOw0K
+PiAgdm9pZCBibGtfbXFfcmVxdWV1ZV9yZXF1ZXN0KHN0cnVjdCByZXF1ZXN0ICpycSwgYm9vbCBr
+aWNrX3JlcXVldWVfbGlzdCk7DQo+ICB2b2lkIGJsa19tcV9hZGRfdG9fcmVxdWV1ZV9saXN0KHN0
+cnVjdCByZXF1ZXN0ICpycSwgYm9vbCBhdF9oZWFkLA0KPiAgCQkJCWJvb2wga2lja19yZXF1ZXVl
+X2xpc3QpOw0KPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9ibGtfdHlwZXMuaCBiL2luY2x1
+ZGUvbGludXgvYmxrX3R5cGVzLmgNCj4gaW5kZXggMzM4NWM4OWY0MDJlLi5iNjMwY2MwMjZhOTMg
+MTAwNjQ0DQo+IC0tLSBhL2luY2x1ZGUvbGludXgvYmxrX3R5cGVzLmgNCj4gKysrIGIvaW5jbHVk
+ZS9saW51eC9ibGtfdHlwZXMuaA0KPiBAQCAtMzIsNiArMzIsNyBAQCB0eXBlZGVmIHU4IF9fYml0
+d2lzZSBibGtfc3RhdHVzX3Q7DQo+ICAjZGVmaW5lIEJMS19TVFNfUFJPVEVDVElPTgkoKF9fZm9y
+Y2UgYmxrX3N0YXR1c190KTgpDQo+ICAjZGVmaW5lIEJMS19TVFNfUkVTT1VSQ0UJKChfX2ZvcmNl
+IGJsa19zdGF0dXNfdCk5KQ0KPiAgI2RlZmluZSBCTEtfU1RTX0lPRVJSCQkoKF9fZm9yY2UgYmxr
+X3N0YXR1c190KTEwKQ0KPiArI2RlZmluZSBCTEtfU1RTX1JFU09VUkNFX09LCSgoX19mb3JjZSBi
+bGtfc3RhdHVzX3QpMTEpDQo+ICANCj4gIC8qIGhhY2sgZm9yIGRldmljZSBtYXBwZXIsIGRvbid0
+IHVzZSBlbHNld2hlcmU6ICovDQo+ICAjZGVmaW5lIEJMS19TVFNfRE1fUkVRVUVVRSAgICAoKF9f
+Zm9yY2UgYmxrX3N0YXR1c190KTExKQ0KDQpSdW5uaW5nIHRlc3Qgb25lIHdpdGggdGhpcyBwYXRj
+aCBhcHBsaWVkIG9uIHRvcCBvZiBKZW5zJyBmb3ItbmV4dCBicmFuY2ggeWllbGRzDQp0aGUgc2Ft
+ZSByZXN1bHQgYXMgd2l0aG91dCB0aGlzIHBhdGNoOg0KWyAuLi4gXQ0KRXJyb3I6IHVubG9hZGlu
+ZyBrZXJuZWwgbW9kdWxlIGliX3NycCBmYWlsZWQNClRlc3QgL2hvbWUvYmFydC9zb2Z0d2FyZS9p
+bmZpbmliYW5kL3NycC10ZXN0L3Rlc3RzLzAxIGZhaWxlZA0KIyBkbWVzZyAtYyA+L2Rldi9udWxs
+OyBlY2hvIHcgPiAvcHJvYy9zeXNycS10cmlnZ2VyOyBkbWVzZw0KWyAgMzI1LjE2NzI5NV0gc3lz
+cnE6IFN5c1JxIDogU2hvdyBCbG9ja2VkIFN0YXRlDQpbICAzMjUuMTczNjEyXSAgIHRhc2sgICAg
+ICAgICAgICAgICAgICAgICAgICBQQyBzdGFjayAgIHBpZCBmYXRoZXINClsgIDMyNS4xODE5MDNd
+IGt3b3JrZXIvMTA6MSAgICBEICAgIDAgICAxNjUgICAgICAyIDB4ODAwMDAwMDANClsgIDMyNS4x
+ODkzOTZdIFdvcmtxdWV1ZTogc3JwX3JlbW92ZSBzcnBfcmVtb3ZlX3dvcmsgW2liX3NycF0NClsg
+IDMyNS4xOTYyMjJdIENhbGwgVHJhY2U6DQpbICAzMjUuMTk5NjIyXSAgX19zY2hlZHVsZSsweDJm
+YS8weGJiMA0KWyAgMzI1LjIwNDIyN10gIHNjaGVkdWxlKzB4MzYvMHg5MA0KWyAgMzI1LjIwODM5
+MF0gIGFzeW5jX3N5bmNocm9uaXplX2Nvb2tpZV9kb21haW4rMHg4OC8weDEzMA0KWyAgMzI1LjIx
+NDkxNV0gID8gZmluaXNoX3dhaXQrMHg5MC8weDkwDQpbICAzMjUuMjE5NTc0XSAgYXN5bmNfc3lu
+Y2hyb25pemVfZnVsbF9kb21haW4rMHgxOC8weDIwDQpbICAzMjUuMjI1ODE2XSAgc2RfcmVtb3Zl
+KzB4NGQvMHhjMCBbc2RfbW9kXQ0KWyAgMzI1LjIzMDk0OV0gIGRldmljZV9yZWxlYXNlX2RyaXZl
+cl9pbnRlcm5hbCsweDE2MC8weDIxMA0KWyAgMzI1LjIzNzQ3OV0gIGRldmljZV9yZWxlYXNlX2Ry
+aXZlcisweDEyLzB4MjANClsgIDMyNS4yNDI5MDRdICBidXNfcmVtb3ZlX2RldmljZSsweDEwMC8w
+eDE4MA0KWyAgMzI1LjI0ODE2M10gIGRldmljZV9kZWwrMHgxZDgvMHgzNDANClsgIDMyNS4yNTI3
+MzVdICBfX3Njc2lfcmVtb3ZlX2RldmljZSsweGZjLzB4MTMwDQpbICAzMjUuMjU4MTkyXSAgc2Nz
+aV9mb3JnZXRfaG9zdCsweDI1LzB4NzANClsgIDMyNS4yNjMxNzNdICBzY3NpX3JlbW92ZV9ob3N0
+KzB4NzkvMHgxMjANClsgIDMyNS4yNjgyMjddICBzcnBfcmVtb3ZlX3dvcmsrMHg5MC8weDFkMCBb
+aWJfc3JwXQ0KWyAgMzI1LjI3NDA1OV0gIHByb2Nlc3Nfb25lX3dvcmsrMHgyMGEvMHg2NjANClsg
+IDMyNS4yNzkyNDNdICB3b3JrZXJfdGhyZWFkKzB4M2QvMHgzYjANClsgIDMyNS4yODQwMDRdICBr
+dGhyZWFkKzB4MTNhLzB4MTUwDQpbICAzMjUuMjg4MjMyXSAgPyBwcm9jZXNzX29uZV93b3JrKzB4
+NjYwLzB4NjYwDQpbICAzMjUuMjkzNTc1XSAgPyBrdGhyZWFkX2NyZWF0ZV9vbl9ub2RlKzB4NDAv
+MHg0MA0KWyAgMzI1LjI5OTMzNF0gIHJldF9mcm9tX2ZvcmsrMHgyNy8weDQwDQpbICAzMjUuMzA0
+MDAyXSBrd29ya2VyLzU6MSAgICAgRCAgICAwICAgMTgwICAgICAgMiAweDgwMDAwMDAwDQpbICAz
+MjUuMzEwNzY4XSBXb3JrcXVldWU6IGthbHVhZCBhbHVhX3J0cGdfd29yayBbc2NzaV9kaF9hbHVh
+XQ0KWyAgMzI1LjMxNzY3NF0gQ2FsbCBUcmFjZToNClsgIDMyNS4zMjEwNDddICBfX3NjaGVkdWxl
+KzB4MmZhLzB4YmIwDQpbICAzMjUuMzI1NjE1XSAgPyB0cmFjZV9oYXJkaXJxc19vbl9jYWxsZXIr
+MHhmYi8weDE5MA0KWyAgMzI1LjMzMTYxMl0gIHNjaGVkdWxlKzB4MzYvMHg5MA0KWyAgMzI1LjMz
+NTc5N10gIHNjaGVkdWxlX3RpbWVvdXQrMHgyMmMvMHg1NzANClsgIDMyNS4zNDA5MTddICA/IGNh
+bGxfdGltZXJfZm4rMHgzMzAvMHgzMzANClsgIDMyNS4zNDU5NzJdICA/IHdhaXRfZm9yX2NvbXBs
+ZXRpb25faW9fdGltZW91dCsweGY3LzB4MTgwDQpbICAzMjUuMzUyNTU4XSAgaW9fc2NoZWR1bGVf
+dGltZW91dCsweDFlLzB4NTANClsgIDMyNS4zNTc4MDhdICA/IGlvX3NjaGVkdWxlX3RpbWVvdXQr
+MHgxZS8weDUwDQpbICAzMjUuMzYzMjYyXSAgd2FpdF9mb3JfY29tcGxldGlvbl9pb190aW1lb3V0
+KzB4MTFmLzB4MTgwDQpbICAzMjUuMzY5NzkzXSAgPyB3YWtlX3VwX3ErMHg4MC8weDgwDQpbICAz
+MjUuMzc0MjY3XSAgYmxrX2V4ZWN1dGVfcnErMHg4Ni8weGMwDQpbICAzMjUuMzc5MDEyXSAgc2Nz
+aV9leGVjdXRlKzB4ZGIvMHgxZjANClsgIDMyNS4zODM2NzhdICBhbHVhX3J0cGdfd29yaysweDJi
+My8weGU4YSBbc2NzaV9kaF9hbHVhXQ0KWyAgMzI1LjM5MDEzMF0gIHByb2Nlc3Nfb25lX3dvcmsr
+MHgyMGEvMHg2NjANClsgIDMyNS4zOTU4MThdICB3b3JrZXJfdGhyZWFkKzB4M2QvMHgzYjANClsg
+IDMyNS40MDEyNDhdICBrdGhyZWFkKzB4MTNhLzB4MTUwDQpbICAzMjUuNDA2MDU2XSAgPyBwcm9j
+ZXNzX29uZV93b3JrKzB4NjYwLzB4NjYwDQpbICAzMjUuNDEyMDcwXSAgPyBrdGhyZWFkX2NyZWF0
+ZV9vbl9ub2RlKzB4NDAvMHg0MA0KWyAgMzI1LjQxODQ3NF0gIHJldF9mcm9tX2ZvcmsrMHgyNy8w
+eDQwDQpbICAzMjUuNDIzODc0XSBrd29ya2VyL3U2NjoxICAgRCAgICAwICAgMzMxICAgICAgMiAw
+eDgwMDAwMDAwDQpbICAzMjUuNDMxMzc0XSBXb3JrcXVldWU6IGV2ZW50c191bmJvdW5kIGFzeW5j
+X3J1bl9lbnRyeV9mbg0KWyAgMzI1LjQzODY1MV0gQ2FsbCBUcmFjZToNClsgIDMyNS40NDI2NjJd
+ICBfX3NjaGVkdWxlKzB4MmZhLzB4YmIwDQpbICAzMjUuNDQ3ODM1XSAgPyB0cmFjZV9oYXJkaXJx
+c19vbl9jYWxsZXIrMHhmYi8weDE5MA0KWyAgMzI1LjQ1NDUyMl0gIHNjaGVkdWxlKzB4MzYvMHg5
+MA0KWyAgMzI1LjQ1OTMzOV0gIHNjaGVkdWxlX3RpbWVvdXQrMHgyMmMvMHg1NzANClsgIDMyNS40
+NjUwOTddICA/IGNhbGxfdGltZXJfZm4rMHgzMzAvMHgzMzANClsgIDMyNS40NzA4MDBdICA/IHdh
+aXRfZm9yX2NvbXBsZXRpb25faW9fdGltZW91dCsweGY3LzB4MTgwDQpbICAzMjUuNDc4MDE3XSAg
+aW9fc2NoZWR1bGVfdGltZW91dCsweDFlLzB4NTANClsgIDMyNS40ODM5MzVdICA/IGlvX3NjaGVk
+dWxlX3RpbWVvdXQrMHgxZS8weDUwDQpbICAzMjUuNDkwMDE1XSAgd2FpdF9mb3JfY29tcGxldGlv
+bl9pb190aW1lb3V0KzB4MTFmLzB4MTgwDQpbICAzMjUuNDk3MTM0XSAgPyB3YWtlX3VwX3ErMHg4
+MC8weDgwDQpbICAzMjUuNTAyMjcyXSAgYmxrX2V4ZWN1dGVfcnErMHg4Ni8weGMwDQpbICAzMjUu
+NTA3NjUyXSAgc2NzaV9leGVjdXRlKzB4ZGIvMHgxZjANClsgIDMyNS41MTI5NjBdICBzZF9yZXZh
+bGlkYXRlX2Rpc2srMHhlZC8weDFjNzAgW3NkX21vZF0NClsgIDMyNS41MTk4NDZdICBzZF9wcm9i
+ZV9hc3luYysweGMzLzB4MWQwIFtzZF9tb2RdDQpbICAzMjUuNTI2MTk5XSAgYXN5bmNfcnVuX2Vu
+dHJ5X2ZuKzB4MzgvMHgxNjANClsgIDMyNS41MzIxMjFdICBwcm9jZXNzX29uZV93b3JrKzB4MjBh
+LzB4NjYwDQpbICAzMjUuNTM3ODk3XSAgd29ya2VyX3RocmVhZCsweDNkLzB4M2IwDQpbICAzMjUu
+NTQzMzE5XSAga3RocmVhZCsweDEzYS8weDE1MA0KWyAgMzI1LjU0ODIwMF0gID8gcHJvY2Vzc19v
+bmVfd29yaysweDY2MC8weDY2MA0KWyAgMzI1LjU1NDIwNF0gID8ga3RocmVhZF9jcmVhdGVfb25f
+bm9kZSsweDQwLzB4NDANClsgIDMyNS41NjA2MDVdICByZXRfZnJvbV9mb3JrKzB4MjcvMHg0MA==
