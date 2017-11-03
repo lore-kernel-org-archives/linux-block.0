@@ -1,162 +1,182 @@
-Return-Path: <prvs=473169c3e=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "hch@infradead.org" <hch@infradead.org>, "roman.penyaev@profitbricks.com"
-	<roman.penyaev@profitbricks.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "osandov@fb.com" <osandov@fb.com>,
-	"hare@suse.com" <hare@suse.com>, "loberman@redhat.com" <loberman@redhat.com>,
+Return-Path: <ming.lei@redhat.com>
+Date: Fri, 3 Nov 2017 23:18:45 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "loberman@redhat.com" <loberman@redhat.com>,
+	"hch@infradead.org" <hch@infradead.org>,
+	"roman.penyaev@profitbricks.com" <roman.penyaev@profitbricks.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"osandov@fb.com" <osandov@fb.com>, "hare@suse.com" <hare@suse.com>,
 	"axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH V2 0/2] block: remove unnecessary RESTART
-Date: Fri, 3 Nov 2017 15:23:14 +0000
-Message-ID: <1509722593.2473.12.camel@wdc.com>
+Message-ID: <20171103151844.GB5059@ming.t460p>
 References: <1509638224.2484.14.camel@wdc.com>
-	 <20171102233835.GA27370@ming.t460p> <1509666235.2484.23.camel@wdc.com>
-	 <20171102234801.GB27370@ming.t460p> <1509666897.2484.25.camel@wdc.com>
-	 <20171103001541.GF27370@ming.t460p> <1509670091.2636.0.camel@wdc.com>
-	 <CAFfF4qsbPCj3XLw0HkyJYELcqeqiPx_nR-G-1tSRew9z7ujw2Q@mail.gmail.com>
-	 <20171103021234.GH27370@ming.t460p> <1509676969.10883.0.camel@wdc.com>
-	 <20171103035050.GI27370@ming.t460p>
-In-Reply-To: <20171103035050.GI27370@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
+ <20171102233835.GA27370@ming.t460p>
+ <1509666235.2484.23.camel@wdc.com>
+ <20171102234801.GB27370@ming.t460p>
+ <1509666897.2484.25.camel@wdc.com>
+ <20171103001541.GF27370@ming.t460p>
+ <1509670091.2636.0.camel@wdc.com>
+ <CAFfF4qsbPCj3XLw0HkyJYELcqeqiPx_nR-G-1tSRew9z7ujw2Q@mail.gmail.com>
+ <20171103021234.GH27370@ming.t460p>
+ <1509676969.10883.0.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1509676969.10883.0.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gRnJpLCAyMDE3LTExLTAzIGF0IDExOjUwICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
-RnJpLCBOb3YgMDMsIDIwMTcgYXQgMDI6NDI6NTBBTSArMDAwMCwgQmFydCBWYW4gQXNzY2hlIHdy
-b3RlOg0KPiA+IE9uIEZyaSwgMjAxNy0xMS0wMyBhdCAxMDoxMiArMDgwMCwgTWluZyBMZWkgd3Jv
-dGU6DQo+ID4gPiBbcm9vdEBpYmNsaWVudCBzcnAtdGVzdF0jIC4vcnVuX3Rlc3RzDQo+ID4gPiBt
-b2Rwcm9iZTogRkFUQUw6IE1vZHVsZSB0YXJnZXRfY29yZV9tb2QgaXMgaW4gdXNlLg0KPiA+IA0K
-PiA+IExJTyBtdXN0IGJlIHVubG9hZGVkIGJlZm9yZSBzcnAtdGVzdCBzb2Z0d2FyZSBpcyBzdGFy
-dGVkLg0KPiANCj4gWWVhaCwgSSBjYW4gbWFrZSB0aGlzIHRlc3Qga2ljayBvZmYgYWZ0ZXIgcnVu
-bmluZw0KPiAnbW9kcHJvYmUgLWZyIGliX2lzZXJ0JyBmaXJzdCwgYnV0IGxvb2tzIGFsbCB0ZXN0
-cyBmYWlsZWQgd2l0aG91dA0KPiBhbnkgaGFuZywgY291bGQgeW91IGNoZWNrIGlmIHRoYXQgaXMg
-dGhlIGV4cGVjdGVkIHJlc3VsdD8NCj4gDQo+IAlodHRwczovL3Bhc3RlYmluLmNvbS9WWGU2Nkpw
-Zw0KDQpJIHNlZSBwbGVudHkgb2YgIi4uLiA+L3N5cy8uLi4vYWRkX3RhcmdldCBmYWlsZWQ6IENv
-bm5lY3Rpb24gdGltZWQgb3V0Ig0KbWVzc2FnZXMuIFRoZSBzcnAtdGVzdCBzY3JpcHRzIHVzZSB0
-aGUgbG9vcGJhY2sgZnVuY3Rpb25hbGl0eSBvZiBJQiBwb3J0cw0Kc28gb25lIG9yIG1vcmUgSUIg
-cG9ydHMgbXVzdCBiZSBhY3RpdmUuIEhhdmUgeW91IGFscmVhZHkgY2hlY2tlZCB0aGUgSUINCnBv
-cnRzIHN0YXRlLCBlLmcuIGJ5IHJ1bm5pbmcgaWJ2X2RldmluZm8/DQoNCj4gQWxzbyBjb3VsZCB5
-b3UgcHJvdmlkZSBzb21lIG91dHB1dCBmcm9tIGRlYnVnZnMgd2hlbiB0aGlzIGhhbmcgaGFwcGVu
-cz8NCj4gc3VjaCBhczoNCj4gDQo+IAlkaXNwYXRjaC9idXN5Ly4uIHVuZGVyIGhjdHhODQoNClRo
-aXMgaXMgdGhlIG91dHB1dCB0aGF0IGFwcGVhcnMgb24gbXkgdGVzdCBzZXR1cCBpZiB0aGUgdHdv
-IHBhdGNoZXMgZnJvbQ0KdGhlIHBhdGNoIHNlcmllcyAiYmxvY2s6IHJlbW92ZSB1bm5lY2Vzc2Fy
-eSBSRVNUQVJUIiBhcmUgYXBwbGllZDoNCg0KIyB+YmFydC9zb2Z0d2FyZS9pbmZpbmliYW5kL3Ny
-cC10ZXN0L3J1bl90ZXN0cyAtZiB4ZnMgLWQgLWUgZGVhZGxpbmUgLXIgNjAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIA0KVW5sb2FkZWQgdGhlIGliX3NycHQga2VybmVsIG1vZHVsZQ0KWmVy
-by1pbml0aWFsaXppbmcgL2Rldi9yYW0wIC4uLiBkb25lDQpaZXJvLWluaXRpYWxpemluZyAvZGV2
-L3JhbTEgLi4uIGRvbmUNClplcm8taW5pdGlhbGl6aW5nIC9kZXYvZGlzay9ieS1pZC9zY3NpLTMz
-MzMzMzMzMDAwMDA0NjUwIC4uLiBkb25lDQpicnctcnctLS0tIDEgcm9vdCBkaXNrIDEsIDAgTm92
-ICAzIDA4OjEwIC9kZXYvcmFtMA0KL2Rldi9yYW0wDQpicnctcnctLS0tIDEgcm9vdCBkaXNrIDEs
-IDEgTm92ICAzIDA4OjEwIC9kZXYvcmFtMQ0KL2Rldi9yYW0xDQpscnd4cnd4cnd4IDEgcm9vdCBy
-b290IDkgTm92ICAzIDA4OjExIC9kZXYvZGlzay9ieS1pZC9zY3NpLTMzMzMzMzMzMDAwMDA0NjUw
-IC0+IC4uLy4uL3NkaQ0KL2Rldi9zZGkNCkNvbmZpZ3VyZWQgU1JQIHRhcmdldCBkcml2ZXINClJ1
-bm5pbmcgdGVzdCAvaG9tZS9iYXJ0L3NvZnR3YXJlL2luZmluaWJhbmQvc3JwLXRlc3QvdGVzdHMv
-MDEgLi4uDQppZF9leHQ9MHgwMDAyYzkwMzAwYTAyZDUwLGlvY19ndWlkPTB4MDAwMmM5MDMwMGEw
-MmQ1MCxkZ2lkPWZlODAwMDAwMDAwMDAwMDAwMDAyYzkwMzAwYTAyZDUxLHBrZXk9N2ZmZixzZXJ2
-aWNlX2lkPTB4MDAwMmM5MDMwMGEwMmQ1MCwgPi9zeXMvY2xhc3MvaW5maW5pYmFuZF9zcnAvDQpz
-cnAtbWx4NF8wLTIvYWRkX3RhcmdldCBmYWlsZWQ6IEludmFsaWQgYXJndW1lbnQNCmlkX2V4dD0w
-eDAwMDJjOTAzMDBhMDJkNTAsaW9jX2d1aWQ9MHgwMDAyYzkwMzAwYTAyZDUwLGRnaWQ9ZmU4MDAw
-MDAwMDAwMDAwMDAwMDJjOTAzMDBhMDJkNTIscGtleT03ZmZmLHNlcnZpY2VfaWQ9MHgwMDAyYzkw
-MzAwYTAyZDUwLCA+L3N5cy9jbGFzcy9pbmZpbmliYW5kX3NycC8NCnNycC1tbHg0XzAtMi9hZGRf
-dGFyZ2V0IGZhaWxlZDogSW52YWxpZCBhcmd1bWVudA0KY291bnRfbHVucygpOiAzIDw+IDMNCkVy
-cm9yOiB1bmxvYWRpbmcga2VybmVsIG1vZHVsZSBpYl9zcnAgZmFpbGVkDQpUZXN0IC9ob21lL2Jh
-cnQvc29mdHdhcmUvaW5maW5pYmFuZC9zcnAtdGVzdC90ZXN0cy8wMSBmYWlsZWQNCiMgY2F0IC9z
-eXMvbW9kdWxlL3Njc2lfbW9kL3BhcmFtZXRlcnMvdXNlX2Jsa19tcSAgDQpZDQojIGZpbmQgL3N5
-cy9rZXJuZWwvZGVidWcvYmxvY2sgLW5hbWUgYnVzeSB8IHhhcmdzIGNhdA0KIyBkbWVzZyAtYyA+
-L2Rldi9udWxsOyBlY2hvIHcgPiAvcHJvYy9zeXNycS10cmlnZ2VyOyBkbWVzZw0KWyAgNzA5LjMy
-MTc1MF0gc3lzcnE6IFN5c1JxIDogU2hvdyBCbG9ja2VkIFN0YXRlDQpbICA3MDkuMzI3OTA2XSAg
-IHRhc2sgICAgICAgICAgICAgICAgICAgICAgICBQQyBzdGFjayAgIHBpZCBmYXRoZXINClsgIDcw
-OS4zMzU5MTBdIGt3b3JrZXIvNDoxICAgICBEICAgIDAgICAgNTQgICAgICAyIDB4ODAwMDAwMDAN
-ClsgIDcwOS4zNDI4ODddIFdvcmtxdWV1ZTogc3JwX3JlbW92ZSBzcnBfcmVtb3ZlX3dvcmsgW2li
-X3NycF0NClsgIDcwOS4zNDk4MDZdIENhbGwgVHJhY2U6DQpbICA3MDkuMzUzMzY1XSAgX19zY2hl
-ZHVsZSsweDJmYS8weGJiMA0KWyAgNzA5LjM1Nzg2NV0gIHNjaGVkdWxlKzB4MzYvMHg5MA0KWyAg
-NzA5LjM2MTk4NV0gIGFzeW5jX3N5bmNocm9uaXplX2Nvb2tpZV9kb21haW4rMHg4OC8weDEzMA0K
-WyAgNzA5LjM2ODQyMl0gID8gZmluaXNoX3dhaXQrMHg5MC8weDkwDQpbICA3MDkuMzczMDMzXSAg
-YXN5bmNfc3luY2hyb25pemVfZnVsbF9kb21haW4rMHgxOC8weDIwDQpbICA3MDkuMzc5MTg0XSAg
-c2RfcmVtb3ZlKzB4NGQvMHhjMCBbc2RfbW9kXQ0KWyAgNzA5LjM4NDI4Ml0gIGRldmljZV9yZWxl
-YXNlX2RyaXZlcl9pbnRlcm5hbCsweDE2MC8weDIxMA0KWyAgNzA5LjM5MDc1Ml0gIGRldmljZV9y
-ZWxlYXNlX2RyaXZlcisweDEyLzB4MjANClsgIDcwOS4zOTYxMzBdICBidXNfcmVtb3ZlX2Rldmlj
-ZSsweDEwMC8weDE4MA0KWyAgNzA5LjQwMTMzMl0gIGRldmljZV9kZWwrMHgxZDgvMHgzNDANClsg
-IDcwOS40MDU4MjNdICBfX3Njc2lfcmVtb3ZlX2RldmljZSsweGZjLzB4MTMwDQpbICA3MDkuNDEx
-MjIxXSAgc2NzaV9mb3JnZXRfaG9zdCsweDI1LzB4NzANClsgIDcwOS40MTYxMDhdICBzY3NpX3Jl
-bW92ZV9ob3N0KzB4NzkvMHgxMjANClsgIDcwOS40MjExMTRdICBzcnBfcmVtb3ZlX3dvcmsrMHg5
-MC8weDFkMCBbaWJfc3JwXQ0KWyAgNzA5LjQyNjg2N10gIHByb2Nlc3Nfb25lX3dvcmsrMHgyMGEv
-MHg2NjANClsgIDcwOS40MzE5NzFdICB3b3JrZXJfdGhyZWFkKzB4M2QvMHgzYjANClsgIDcwOS40
-MzY2NTVdICBrdGhyZWFkKzB4MTNhLzB4MTUwDQpbICA3MDkuNDQwODcyXSAgPyBwcm9jZXNzX29u
-ZV93b3JrKzB4NjYwLzB4NjYwDQpbICA3MDkuNDQ2MTMzXSAgPyBrdGhyZWFkX2NyZWF0ZV9vbl9u
-b2RlKzB4NDAvMHg0MA0KWyAgNzA5LjQ1MTgyNV0gIHJldF9mcm9tX2ZvcmsrMHgyNy8weDQwDQpb
-ICA3MDkuNDU2NjAyXSBrd29ya2VyL3U2Njo2ICAgRCAgICAwICAgMzQxICAgICAgMiAweDgwMDAw
-MDAwDQpbICA3MDkuNDYzMzcxXSBXb3JrcXVldWU6IGV2ZW50c191bmJvdW5kIGFzeW5jX3J1bl9l
-bnRyeV9mbg0KWyAgNzA5LjQ2OTkxOV0gQ2FsbCBUcmFjZToNClsgIDcwOS40NzMzMjVdICBfX3Nj
-aGVkdWxlKzB4MmZhLzB4YmIwDQpbICA3MDkuNDc3ODUwXSAgPyB0cmFjZV9oYXJkaXJxc19vbl9j
-YWxsZXIrMHhmYi8weDE5MA0KWyAgNzA5LjQ4Mzg0N10gIHNjaGVkdWxlKzB4MzYvMHg5MA0KWyAg
-NzA5LjQ4Nzk4Ml0gIHNjaGVkdWxlX3RpbWVvdXQrMHgyMmMvMHg1NzANClsgIDcwOS40OTMxMTVd
-ICA/IGNhbGxfdGltZXJfZm4rMHgzMzAvMHgzMzANClsgIDcwOS40OTgxMzNdICA/IHdhaXRfZm9y
-X2NvbXBsZXRpb25faW9fdGltZW91dCsweGY3LzB4MTgwDQpbICA3MDkuNTA0NzMyXSAgaW9fc2No
-ZWR1bGVfdGltZW91dCsweDFlLzB4NTANClsgIDcwOS41MDk5MzhdICA/IGlvX3NjaGVkdWxlX3Rp
-bWVvdXQrMHgxZS8weDUwDQpbICA3MDkuNTE1NDEzXSAgd2FpdF9mb3JfY29tcGxldGlvbl9pb190
-aW1lb3V0KzB4MTFmLzB4MTgwDQpbICA3MDkuNTIxOTIwXSAgPyB3YWtlX3VwX3ErMHg4MC8weDgw
-DQpbICA3MDkuNTI2Mzc2XSAgYmxrX2V4ZWN1dGVfcnErMHg4Ni8weGMwDQpbICA3MDkuNTMxMTM1
-XSAgc2NzaV9leGVjdXRlKzB4ZGIvMHgxZjANClsgIDcwOS41MzYzMzZdICBzZF9yZXZhbGlkYXRl
-X2Rpc2srMHhlZC8weDFjNzAgW3NkX21vZF0NClsgIDcwOS41NDMyODFdICBzZF9wcm9iZV9hc3lu
-YysweGMzLzB4MWQwIFtzZF9tb2RdDQpbICA3MDkuNTQ5NTI0XSAgYXN5bmNfcnVuX2VudHJ5X2Zu
-KzB4MzgvMHgxNjANClsgIDcwOS41NTU1MDNdICBwcm9jZXNzX29uZV93b3JrKzB4MjBhLzB4NjYw
-DQpbICA3MDkuNTYxMjk5XSAgd29ya2VyX3RocmVhZCsweDNkLzB4M2IwDQpbICA3MDkuNTY2Njg4
-XSAga3RocmVhZCsweDEzYS8weDE1MA0KWyAgNzA5LjU3MTYxM10gID8gcHJvY2Vzc19vbmVfd29y
-aysweDY2MC8weDY2MA0KWyAgNzA5LjU3NzU2MV0gID8ga3RocmVhZF9jcmVhdGVfb25fbm9kZSsw
-eDQwLzB4NDANClsgIDcwOS41ODM5MTBdICByZXRfZnJvbV9mb3JrKzB4MjcvMHg0MA0KWyAgNzA5
-LjU4OTE3NF0ga3dvcmtlci81OjIgICAgIEQgICAgMCAgIDM4NiAgICAgIDIgMHg4MDAwMDAwMA0K
-WyAgNzA5LjU5NjYxNl0gV29ya3F1ZXVlOiBrYWx1YWQgYWx1YV9ydHBnX3dvcmsgW3Njc2lfZGhf
-YWx1YV0NClsgIDcwOS42MDQxMzBdIENhbGwgVHJhY2U6DQpbICA3MDkuNjA4MDk2XSAgX19zY2hl
-ZHVsZSsweDJmYS8weGJiMA0KWyAgNzA5LjYxMzI2NV0gID8gdHJhY2VfaGFyZGlycXNfb25fY2Fs
-bGVyKzB4ZmIvMHgxOTANClsgIDcwOS42MTk4NzldICBzY2hlZHVsZSsweDM2LzB4OTANClsgIDcw
-OS42MjQ2ODRdICBzY2hlZHVsZV90aW1lb3V0KzB4MjJjLzB4NTcwDQpbICA3MDkuNjMwNDM3XSAg
-PyBjYWxsX3RpbWVyX2ZuKzB4MzMwLzB4MzMwDQpbICA3MDkuNjM2MDU5XSAgPyB3YWl0X2Zvcl9j
-b21wbGV0aW9uX2lvX3RpbWVvdXQrMHhmNy8weDE4MA0KWyAgNzA5LjY0MzI3MF0gIGlvX3NjaGVk
-dWxlX3RpbWVvdXQrMHgxZS8weDUwDQpbICA3MDkuNjQ5MDgzXSAgPyBpb19zY2hlZHVsZV90aW1l
-b3V0KzB4MWUvMHg1MA0KWyAgNzA5LjY1NTE1OV0gIHdhaXRfZm9yX2NvbXBsZXRpb25faW9fdGlt
-ZW91dCsweDExZi8weDE4MA0KWyAgNzA5LjY2MjI4NF0gID8gd2FrZV91cF9xKzB4ODAvMHg4MA0K
-WyAgNzA5LjY2NzMzNF0gIGJsa19leGVjdXRlX3JxKzB4ODYvMHhjMA0KWyAgNzA5LjY3MjcwNV0g
-IHNjc2lfZXhlY3V0ZSsweGRiLzB4MWYwDQpbICA3MDkuNjc3OTM4XSAgYWx1YV9ydHBnX3dvcmsr
-MHgyYjMvMHhlOGEgW3Njc2lfZGhfYWx1YV0NClsgIDcwOS42ODQ5ODNdICBwcm9jZXNzX29uZV93
-b3JrKzB4MjBhLzB4NjYwDQpbICA3MDkuNjkwNzU5XSAgd29ya2VyX3RocmVhZCsweDNkLzB4M2Iw
-DQpbICA3MDkuNjk2MTA3XSAga3RocmVhZCsweDEzYS8weDE1MA0KWyAgNzA5LjcwMDk4Nl0gID8g
-cHJvY2Vzc19vbmVfd29yaysweDY2MC8weDY2MA0KWyAgNzA5LjcwNjkyMF0gID8ga3RocmVhZF9j
-cmVhdGVfb25fbm9kZSsweDQwLzB4NDANClsgIDcwOS43MTMzMTZdICByZXRfZnJvbV9mb3JrKzB4
-MjcvMHg0MA0KWyAgNzA5LjcxODgwOV0gc3lzdGVtZC11ZGV2ZCAgIEQgICAgMCAgMTkwNSAgICA0
-NjMgMHg4MDAwMDEwNg0KWyAgNzA5LjcyNjI4NV0gQ2FsbCBUcmFjZToNClsgIDcwOS43MzAzMDld
-ICBfX3NjaGVkdWxlKzB4MmZhLzB4YmIwDQpbICA3MDkuNzM1NDYyXSAgc2NoZWR1bGUrMHgzNi8w
-eDkwDQpbICA3MDkuNzQwMjcwXSAgaW9fc2NoZWR1bGUrMHgxNi8weDQwDQpbICA3MDkuNzQ1MzY5
-XSAgX19sb2NrX3BhZ2UrMHgxMGEvMHgxNDANClsgIDcwOS43NTA2OTFdICA/IHBhZ2VfY2FjaGVf
-dHJlZV9pbnNlcnQrMHgxMDAvMHgxMDANClsgIDcwOS43NTcyODBdICB0cnVuY2F0ZV9pbm9kZV9w
-YWdlc19yYW5nZSsweDRmZi8weDgwMA0KWyAgNzA5Ljc2NDA0NF0gID8gYnVmZmVyX2V4aXRfY3B1
-X2RlYWQrMHg3MC8weDcwDQpbICA3MDkuNzcwMjg1XSAgPyBmaW5kX25leHRfYml0KzB4Yi8weDEw
-DQpbICA3MDkuNzc1NjkxXSAgPyBjcHVtYXNrX25leHQrMHgxYS8weDIwDQpbICA3MDkuNzgxMDg5
-XSAgPyBzbXBfY2FsbF9mdW5jdGlvbl9tYW55KzB4MWUzLzB4MjMwDQpbICA3MDkuNzg3NTk4XSAg
-PyBvbl9lYWNoX2NwdV9tYXNrKzB4NTIvMHhhMA0KWyAgNzA5Ljc5MzM1M10gID8gbWFya19idWZm
-ZXJfYXN5bmNfd3JpdGUrMHgyMC8weDIwDQpbICA3MDkuNzk5NzQxXSAgPyBidWZmZXJfZXhpdF9j
-cHVfZGVhZCsweDcwLzB4NzANClsgIDcwOS44MDU4ODhdICA/IG9uX2VhY2hfY3B1X2NvbmQrMHg5
-OS8weGUwDQpbICA3MDkuODExNjM2XSAgdHJ1bmNhdGVfaW5vZGVfcGFnZXMrMHgxNS8weDIwDQpb
-ICA3MDkuODE3NTM2XSAga2lsbF9iZGV2KzB4MzUvMHg0MA0KWyAgNzA5LjgyMjQwMF0gIF9fYmxr
-ZGV2X3B1dCsweDZkLzB4MWYwDQpbICA3MDkuODI3NjI1XSAgYmxrZGV2X3B1dCsweDRlLzB4MTMw
-DQpbICA3MDkuODMyNjczXSAgYmxrZGV2X2Nsb3NlKzB4MjUvMHgzMA0KWyAgNzA5LjgzNzc3OV0g
-IF9fZnB1dCsweGVkLzB4MWYwDQpbICA3MDkuODQyNDMwXSAgX19fX2ZwdXQrMHhlLzB4MTANClsg
-IDcwOS44NDcwMzBdICB0YXNrX3dvcmtfcnVuKzB4OGIvMHhjMA0KWyAgNzA5Ljg1MjI1MV0gIGRv
-X2V4aXQrMHgzOGQvMHhjNzANClsgIDcwOS44NTcwNDZdICA/IGdldF9zaWduYWwrMHgyZjYvMHg4
-YzANClsgIDcwOS44NjIzNDddICBkb19ncm91cF9leGl0KzB4NTAvMHhkMA0KWyAgNzA5Ljg2NzUx
-NV0gIGdldF9zaWduYWwrMHgyYWQvMHg4YzANClsgIDcwOS44NzI2MDFdICBkb19zaWduYWwrMHgy
-OC8weDY4MA0KWyAgNzA5Ljg3NzQ1Ml0gID8gYmxrZGV2X3JlYWRfaXRlcisweDM1LzB4NDANClsg
-IDcwOS44ODMxMDhdICA/IF9fdmZzX3JlYWQrMHhjYy8weDEzMA0KWyAgNzA5Ljg4ODIzN10gID8g
-dmZzX3JlYWQrMHhhMC8weDE1MA0KWyAgNzA5Ljg5MzIwMF0gIGV4aXRfdG9fdXNlcm1vZGVfbG9v
-cCsweDVhLzB4YTANClsgIDcwOS44OTkxMDldICBkb19zeXNjYWxsXzY0KzB4MTJlLzB4MTcwDQpb
-ICA3MDkuOTA0NDc1XSAgZW50cnlfU1lTQ0FMTDY0X3Nsb3dfcGF0aCsweDI1LzB4MjUNClsgIDcw
-OS45MTA3OTddIFJJUDogMDAzMzoweDdmNWRjNGUzMmQxMQ0KWyAgNzA5LjkxNTkxN10gUlNQOiAw
-MDJiOjAwMDA3ZmZlYjBiMTA1ODggRUZMQUdTOiAwMDAwMDI0NiBPUklHX1JBWDogMDAwMDAwMDAw
-MDAwMDAwMA0KWyAgNzA5LjkyNTU4OV0gUkFYOiBmZmZmZmZmZmZmZmZmZmZjIFJCWDogMDAwMDU2
-MjMwZGE4NDQ5MCBSQ1g6IDAwMDA3ZjVkYzRlMzJkMTENClsgIDcwOS45MzQ3ODVdIFJEWDogMDAw
-MDAwMDAwMDAwMDA0MCBSU0k6IDAwMDA1NjIzMGRhODQ0YjggUkRJOiAwMDAwMDAwMDAwMDAwMDA3
-DQpbICA3MDkuOTQzOTg3XSBSQlA6IDAwMDA1NjIzMGRhYmMzYzAgUjA4OiAwMDAwMDAwMDAwMDAw
-MDAwIFIwOTogMDAwMDU2MjMwZGE4NDQ5MA0KWyAgNzA5Ljk1MzIwMl0gUjEwOiAwMDAwMDAwMDAw
-MDAwMDZmIFIxMTogMDAwMDAwMDAwMDAwMDI0NiBSMTI6IDAwMDAwMDAwOGQ1MzAwMDANClsgIDcw
-OS45NjI0MTldIFIxMzogMDAwMDAwMDA4ZDUzMDA0MCBSMTQ6IDAwMDA1NjIzMGRhYmM0MTAgUjE1
-OiAwMDAwMDAwMDAwMDAwMDQwDQo=
+On Fri, Nov 03, 2017 at 02:42:50AM +0000, Bart Van Assche wrote:
+> On Fri, 2017-11-03 at 10:12 +0800, Ming Lei wrote:
+> > [root@ibclient srp-test]# ./run_tests
+> > modprobe: FATAL: Module target_core_mod is in use.
+> 
+> LIO must be unloaded before srp-test software is started.
+
+Hi Bart,
+
+Even with help of Laurence, we still can't setup your srp-test
+in our test environment today.
+
+But we have run Laurence's usual 3 tests on IB/SRP with/without all
+my following patches against V4.14-rc4, looks everything is fine, and
+no I/O hang is observed.
+
+        0001-blk-mq-sched-dispatch-from-scheduler-IFF-progress-is.patch
+        0002-blk-mq-sched-move-actual-dispatching-into-one-helper.patch
+        0003-sbitmap-introduce-__sbitmap_for_each_set.patch
+        0004-block-kyber-check-if-there-are-requests-in-ctx-in-ky.patch
+        0005-blk-mq-introduce-.get_budget-and-.put_budget-in-blk_.patch
+        0006-blk-mq-sched-improve-dispatching-from-sw-queue.patch
+        0007-scsi-allow-passing-in-null-rq-to-scsi_prep_state_che.patch
+        0008-scsi-implement-.get_budget-and-.put_budget-for-blk-m.patch
+        0009-blk-mq-don-t-handle-TAG_SHARED-in-restart.patch
+        0010-blk-mq-don-t-restart-queue-when-.get_budget-returns-.patch
+
+BTW, Laurence found there is kernel crash in his IB/SRP test when running
+for-next branch of block tree, so we just test v4.14-rc4 w/wo my blk-mq patches.
+
+And I looked at the SCSI's queue_rq code for a while, and only found
+one issue which may cause IO hang, and the following patch may address
+this issue, but not sure if it is same with your issue. Could you apply
+this patch and see if your issue can be fixed?
+
+BTW, it should be helpful to check the blk-mq debugfs related files
+when your I/O hang happens, could you provide that info?
+
+--
+
+>From edcb243d9a6f3446bd9a9f95c00bed7616dd7368 Mon Sep 17 00:00:00 2001
+From: Ming Lei <ming.lei@redhat.com>
+Date: Fri, 3 Nov 2017 12:11:59 +0800
+Subject: [PATCH] SCSI_MQ: fix IO hang in case of queue busy
+
+We have to insert the rq back before checking .device_busy,
+otherwise When IO completes just after the check and before
+this req is added to hctx->dispatch, this queue may never get
+chance to be run, then this IO may hang forever.
+
+This patch introduces BLK_STS_RESOURCE_OK for handling this
+issue.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c            | 17 +++++++++++++++++
+ drivers/scsi/scsi_lib.c   |  8 ++++++++
+ include/linux/blk-mq.h    |  1 +
+ include/linux/blk_types.h |  1 +
+ 4 files changed, 27 insertions(+)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e4d2490f4e7e..e1e03576edca 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -660,6 +660,16 @@ static void __blk_mq_requeue_request(struct request *rq)
+ 	}
+ }
+ 
++void blk_mq_reinsert_request_hctx(struct blk_mq_hw_ctx *hctx, struct request *rq)
++{
++	__blk_mq_requeue_request(rq);
++
++	spin_lock(&hctx->lock);
++	list_add_tail(&rq->queuelist, &hctx->dispatch);
++	spin_unlock(&hctx->lock);
++}
++EXPORT_SYMBOL(blk_mq_reinsert_request_hctx);
++
+ void blk_mq_requeue_request(struct request *rq, bool kick_requeue_list)
+ {
+ 	__blk_mq_requeue_request(rq);
+@@ -1165,6 +1175,12 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+ 			list_add(&rq->queuelist, list);
+ 			__blk_mq_requeue_request(rq);
+ 			break;
++		} else if (ret == BLK_STS_RESOURCE_OK) {
++			/*
++			 * BLK_STS_RESOURCE_OK means driver handled this
++			 * STS_RESOURCE already, we just need to stop dispatch.
++			 */
++			break;
+ 		}
+ 
+  fail_rq:
+@@ -1656,6 +1672,7 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	ret = q->mq_ops->queue_rq(hctx, &bd);
+ 	switch (ret) {
+ 	case BLK_STS_OK:
++	case BLK_STS_RESOURCE_OK:
+ 		*cookie = new_cookie;
+ 		return;
+ 	case BLK_STS_RESOURCE:
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 7f218ef61900..0165c1caed82 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -2030,9 +2030,17 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	case BLK_STS_OK:
+ 		break;
+ 	case BLK_STS_RESOURCE:
++		/*
++		 * We have to insert the rq back before checking .device_busy,
++		 * otherwise when IO completes just after the check and before
++		 * this req is added to hctx->dispatch, this queue may never get
++		 * chance to be run, then this IO may hang forever.
++		 */
++		blk_mq_reinsert_request_hctx(hctx, req);
+ 		if (atomic_read(&sdev->device_busy) == 0 &&
+ 		    !scsi_device_blocked(sdev))
+ 			blk_mq_delay_run_hw_queue(hctx, SCSI_QUEUE_DELAY);
++		ret = BLK_STS_RESOURCE_OK;
+ 		break;
+ 	default:
+ 		/*
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index e5e6becd57d3..4740f643d8c5 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -244,6 +244,7 @@ void blk_mq_start_request(struct request *rq);
+ void blk_mq_end_request(struct request *rq, blk_status_t error);
+ void __blk_mq_end_request(struct request *rq, blk_status_t error);
+ 
++void blk_mq_reinsert_request_hctx(struct blk_mq_hw_ctx *hctx, struct request *rq);
+ void blk_mq_requeue_request(struct request *rq, bool kick_requeue_list);
+ void blk_mq_add_to_requeue_list(struct request *rq, bool at_head,
+ 				bool kick_requeue_list);
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 3385c89f402e..b630cc026a93 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -32,6 +32,7 @@ typedef u8 __bitwise blk_status_t;
+ #define BLK_STS_PROTECTION	((__force blk_status_t)8)
+ #define BLK_STS_RESOURCE	((__force blk_status_t)9)
+ #define BLK_STS_IOERR		((__force blk_status_t)10)
++#define BLK_STS_RESOURCE_OK	((__force blk_status_t)11)
+ 
+ /* hack for device mapper, don't use elsewhere: */
+ #define BLK_STS_DM_REQUEUE    ((__force blk_status_t)11)
+-- 
+2.9.5
+
+
+-- 
+Ming
