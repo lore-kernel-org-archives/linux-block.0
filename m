@@ -1,163 +1,187 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from LGEAMRELO13.lge.com ([156.147.23.53]:38040 "EHLO
-        lgeamrelo13.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750792AbdKKN0g (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 11 Nov 2017 08:26:36 -0500
-From: Byungchul Park <byungchul.park@lge.com>
-To: peterz@infradead.org, mingo@kernel.org
-Cc: tglx@linutronix.de, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org,
-        kernel-team@lge.com
-Subject: [PATCH v3 5/5] locking/Documentation: Align crossrelease.txt with the width
-Date: Sat, 11 Nov 2017 22:26:32 +0900
-Message-Id: <1510406792-28676-6-git-send-email-byungchul.park@lge.com>
-In-Reply-To: <1510406792-28676-1-git-send-email-byungchul.park@lge.com>
-References: <1510406792-28676-1-git-send-email-byungchul.park@lge.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=473169c3e=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Ard
+ Biesheuvel" <ard.biesheuvel@linaro.org>, Herbert Xu
+	<herbert@gondor.apana.org.au>, Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH v3 1/8] lib/scatterlist: Introduce sgl_alloc() and sgl_free()
+Date: Fri, 3 Nov 2017 15:23:32 -0700
+Message-ID: <20171103222339.26540-2-bart.vanassche@wdc.com>
+In-Reply-To: <20171103222339.26540-1-bart.vanassche@wdc.com>
+References: <20171103222339.26540-1-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: bart.vanassche@wdc.com
+List-ID: <linux-block@vger.kernel.org>
 
-No change of contents at all. Only adjust the width.
+Many kernel drivers contain code that allocates and frees both a
+scatterlist and the pages that populate that scatterlist.
+Introduce functions in lib/scatterlist.c that perform these tasks
+instead of duplicating this functionality in multiple drivers.
+Only include these functions in the build if CONFIG_SGL_ALLOC=y
+to avoid that the kernel size increases if this functionality is
+not used.
 
-(Please merge this to another after the review.)
-
-Signed-off-by: Byungchul Park <byungchul.park@lge.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- Documentation/locking/crossrelease.txt | 59 +++++++++++++++++-----------------
- 1 file changed, 30 insertions(+), 29 deletions(-)
+ include/linux/scatterlist.h |  10 +++++
+ lib/Kconfig                 |   4 ++
+ lib/scatterlist.c           | 105 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 119 insertions(+)
 
-diff --git a/Documentation/locking/crossrelease.txt b/Documentation/locking/crossrelease.txt
-index dac56f4..c6d628b 100644
---- a/Documentation/locking/crossrelease.txt
-+++ b/Documentation/locking/crossrelease.txt
-@@ -61,9 +61,9 @@ turn cannot be triggered if event B does not happen, which in turn
- cannot be triggered if event C does not happen. After all, no event can
- be triggered since any of them never meets its condition to wake up.
+diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
+index 4b3286ac60c8..3642511918d5 100644
+--- a/include/linux/scatterlist.h
++++ b/include/linux/scatterlist.h
+@@ -266,6 +266,16 @@ int sg_alloc_table_from_pages(struct sg_table *sgt,
+ 	unsigned long offset, unsigned long size,
+ 	gfp_t gfp_mask);
  
--A dependency might exist between two waiters and a deadlock happens
--due to an incorrect relationship between dependencies. Thus, we must
--define what a dependency is first. A dependency exists if:
-+A dependency might exist between two waiters and a deadlock happens due
-+to an incorrect relationship between dependencies. Thus, we must define
-+what a dependency is first. A dependency exists if:
++#ifdef CONFIG_SGL_ALLOC
++struct scatterlist *sgl_alloc_order(unsigned long long length,
++				    unsigned int order, bool chainable,
++				    gfp_t gfp, unsigned int *nent_p);
++struct scatterlist *sgl_alloc(unsigned long long length, gfp_t gfp,
++			      unsigned int *nent_p);
++void sgl_free_order(struct scatterlist *sgl, int order);
++void sgl_free(struct scatterlist *sgl);
++#endif /* CONFIG_SGL_ALLOC */
++
+ size_t sg_copy_buffer(struct scatterlist *sgl, unsigned int nents, void *buf,
+ 		      size_t buflen, off_t skip, bool to_buffer);
  
-    1. There are two waiters waiting for each event at a given time.
-    2. The only way to wake up each waiter is to trigger its event.
-@@ -304,10 +304,10 @@ Considering only typical locks, lockdep builds nothing. However,
- relaxing the limitation, a dependency 'A -> B' can be added, giving us
- more chances to check circular dependencies.
+diff --git a/lib/Kconfig b/lib/Kconfig
+index b1445b22a6de..8396c4cfa1ab 100644
+--- a/lib/Kconfig
++++ b/lib/Kconfig
+@@ -413,6 +413,10 @@ config HAS_DMA
+ 	depends on !NO_DMA
+ 	default y
  
--However, it might suffer performance degradation since
--relaxing the limitation, with which design and implementation of lockdep
--can be efficient, might introduce inefficiency inevitably. So lockdep
--should provide two options, strong detection and efficient detection.
-+However, it might suffer performance degradation since relaxing the
-+limitation, with which design and implementation of lockdep can be
-+efficient, might introduce inefficiency inevitably. So lockdep should
-+provide two options, strong detection and efficient detection.
++config SGL_ALLOC
++	bool
++	default n
++
+ config DMA_NOOP_OPS
+ 	bool
+ 	depends on HAS_DMA && (!64BIT || ARCH_DMA_ADDR_T_64BIT)
+diff --git a/lib/scatterlist.c b/lib/scatterlist.c
+index be7b4dd6b68d..e2b5a78ceb44 100644
+--- a/lib/scatterlist.c
++++ b/lib/scatterlist.c
+@@ -433,6 +433,111 @@ int sg_alloc_table_from_pages(struct sg_table *sgt,
+ }
+ EXPORT_SYMBOL(sg_alloc_table_from_pages);
  
- Choosing efficient detection:
- 
-@@ -404,8 +404,8 @@ There are four types of dependencies:
- 
-    When acquiring BX, lockdep cannot identify the dependency because
-    there's no way to know if it's in the AX's release context. It has
--   to wait until the decision can be made. Commit is necessary.
--   But, handling CC type is not implemented yet. It's a future work.
-+   to wait until the decision can be made. Commit is necessary. But,
-+   handling CC type is not implemented yet. It's a future work.
- 
- Lockdep can work without commit for typical locks, but the step is
- necessary once crosslocks are involved. Introducing commit, lockdep
-@@ -442,9 +442,9 @@ Crossrelease introduces two main data structures.
- 
-    This is an array embedded in task_struct, for keeping lock history so
-    that dependencies can be added using them at the commit step. Since
--   they are local data, they can be accessed locklessly in the owner context.
--   The array is filled at the acquisition step and consumed at the
--   commit step. And it's managed in a circular manner.
-+   they are local data, they can be accessed locklessly in the owner
-+   context. The array is filled at the acquisition step and consumed at
-+   the commit step. And it's managed in a circular manner.
- 
- 2. cross_lock
- 
-@@ -470,8 +470,8 @@ works for typical locks, without crossrelease.
- 
-    where A, B, and C are different lock classes.
- 
--Lockdep adds 'the top of held_locks -> the lock to acquire'
--dependency every time acquiring a lock.
-+Lockdep adds 'the top of held_locks -> the lock to acquire' dependency
-+every time acquiring a lock.
- 
- After adding 'A -> B', the dependency graph will be:
- 
-@@ -561,10 +561,10 @@ for A, B, and C, the graph will be:
-    NOTE: A dependency 'A -> C' is optimized out.
- 
- We can see the former graph built without the commit step is same as the
--latter graph. Of course, the former way leads to
--earlier finish for building the graph, which means we can detect a
--deadlock or its possibility sooner. So the former way would be preferred
--when possible. But we cannot avoid using the latter way for crosslocks.
-+latter graph. Of course, the former way leads to earlier finish for
-+building the graph, which means we can detect a deadlock or its
-+possibility sooner. So the former way would be preferred when possible.
-+But we cannot avoid using the latter way for crosslocks.
- 
- Lastly, let's look at how commit works for crosslocks in practice.
- 
-@@ -685,10 +685,10 @@ Lastly, let's look at how commit works for crosslocks in practice.
- 
- Crossrelease considers all acquisitions following acquiring BX because
- they can create dependencies with BX. The dependencies will be
--determined in the release context of BX. Meanwhile,
--all typical locks are queued so that they can be used at the commit step.
--Finally, two dependencies 'BX -> C' and 'BX -> E' will be added at the
--commit step, when identifying the release context.
-+determined in the release context of BX. Meanwhile, all typical locks
-+are queued so that they can be used at the commit step. Finally, two
-+dependencies 'BX -> C' and 'BX -> E' will be added at the commit step,
-+when identifying the release context.
- 
- The final graph will be, with crossrelease:
- 
-@@ -737,8 +737,8 @@ Make hot paths lockless
- To keep all locks for later use at the commit step, crossrelease adopts
- a local array embedded in task_struct, which makes the data locklessly
- accessible by forcing it to happen only within the owner context. It's
--like how lockdep handles held_locks. Lockless implementation is important
--since typical locks are very frequently acquired and released.
-+like how lockdep handles held_locks. Lockless implementation is
-+important since typical locks are very frequently acquired and released.
- 
- 
- =================================================
-@@ -751,9 +751,10 @@ deadlock exists if the problematic dependencies exist. Thus, it's
- meaningful to detect not only an actual deadlock but also its potential
- possibility. The latter is rather valuable. When a deadlock actually
- occurs, we can identify what happens in the system by some means or
--other even without lockdep. However, there's no way to detect a possibility
--without lockdep, unless the whole code is parsed in the head. It's terrible.
--Lockdep does the both, and crossrelease only focuses on the latter.
-+other even without lockdep. However, there's no way to detect a
-+possibility without lockdep, unless the whole code is parsed in the head.
-+It's terrible. Lockdep does the both, and crossrelease only focuses on
-+the latter.
- 
- Whether or not a deadlock actually occurs depends on several factors.
- For example, what order contexts are switched in is a factor. Assuming
-@@ -845,8 +846,8 @@ we can ensure nothing but what actually happened. Relying on what
- actually happens at runtime, we can anyway add only true ones, though
- they might be a subset of true ones. It's similar to how lockdep works
- for typical locks. There might be more true dependencies than lockdep
--has detected. Lockdep has no choice but to rely on
--what actually happens. Crossrelease also relies on it.
-+has detected. Lockdep has no choice but to rely on what actually happens.
-+Crossrelease also relies on it.
- 
- CONCLUSION
- 
++#ifdef CONFIG_SGL_ALLOC
++
++/**
++ * sgl_alloc_order - allocate a scatterlist and its pages
++ * @length: Length in bytes of the scatterlist. Must be at least one
++ * @order: Second argument for alloc_pages()
++ * @chainable: Whether or not to allocate an extra element in the scatterlist
++ *	for scatterlist chaining purposes
++ * @gfp: Memory allocation flags
++ * @nent_p: [out] Number of entries in the scatterlist that have pages
++ *
++ * Returns: A pointer to an initialized scatterlist or %NULL upon failure.
++ */
++struct scatterlist *sgl_alloc_order(unsigned long long length,
++				    unsigned int order, bool chainable,
++				    gfp_t gfp, unsigned int *nent_p)
++{
++	struct scatterlist *sgl, *sg;
++	struct page *page;
++	unsigned int nent, nalloc;
++	u32 elem_len;
++
++	nent = round_up(length, PAGE_SIZE << order) >> (PAGE_SHIFT + order);
++	/* Check for integer overflow */
++	if (length > (nent << (PAGE_SHIFT + order)))
++		return NULL;
++	nalloc = nent;
++	if (chainable) {
++		/* Check for integer overflow */
++		if (nalloc + 1 < nalloc)
++			return NULL;
++		nalloc++;
++	}
++	sgl = kmalloc_array(nalloc, sizeof(struct scatterlist),
++			    (gfp & ~GFP_DMA) | __GFP_ZERO);
++	if (!sgl)
++		return NULL;
++
++	sg_init_table(sgl, nent);
++	sg = sgl;
++	while (length) {
++		elem_len = min_t(u64, length, PAGE_SIZE << order);
++		page = alloc_pages(gfp, order);
++		if (!page) {
++			sgl_free(sgl);
++			return NULL;
++		}
++
++		sg_set_page(sg, page, elem_len, 0);
++		length -= elem_len;
++		sg = sg_next(sg);
++	}
++	WARN_ON_ONCE(sg);
++	if (nent_p)
++		*nent_p = nent;
++	return sgl;
++}
++EXPORT_SYMBOL(sgl_alloc_order);
++
++/**
++ * sgl_alloc - allocate a scatterlist and its pages
++ * @length: Length in bytes of the scatterlist
++ * @gfp: Memory allocation flags
++ * @nent_p: [out] Number of entries in the scatterlist
++ *
++ * Returns: A pointer to an initialized scatterlist or %NULL upon failure.
++ */
++struct scatterlist *sgl_alloc(unsigned long long length, gfp_t gfp,
++			      unsigned int *nent_p)
++{
++	return sgl_alloc_order(length, 0, false, gfp, nent_p);
++}
++EXPORT_SYMBOL(sgl_alloc);
++
++/**
++ * sgl_free_order - free a scatterlist and its pages
++ * @sgl: Scatterlist with one or more elements
++ * @order: Second argument for __free_pages()
++ */
++void sgl_free_order(struct scatterlist *sgl, int order)
++{
++	struct scatterlist *sg;
++	struct page *page;
++
++	for (sg = sgl; sg; sg = sg_next(sg)) {
++		page = sg_page(sg);
++		if (page)
++			__free_pages(page, order);
++	}
++	kfree(sgl);
++}
++EXPORT_SYMBOL(sgl_free_order);
++
++/**
++ * sgl_free - free a scatterlist and its pages
++ * @sgl: Scatterlist with one or more elements
++ */
++void sgl_free(struct scatterlist *sgl)
++{
++	sgl_free_order(sgl, 0);
++}
++EXPORT_SYMBOL(sgl_free);
++
++#endif /* CONFIG_SGL_ALLOC */
++
+ void __sg_page_iter_start(struct sg_page_iter *piter,
+ 			  struct scatterlist *sglist, unsigned int nents,
+ 			  unsigned long pgoffset)
 -- 
-1.9.1
+2.14.3
