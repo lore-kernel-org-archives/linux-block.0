@@ -1,102 +1,119 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from LGEAMRELO11.lge.com ([156.147.23.51]:51987 "EHLO
-        lgeamrelo11.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750899AbdKKN0g (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 11 Nov 2017 08:26:36 -0500
-From: Byungchul Park <byungchul.park@lge.com>
-To: peterz@infradead.org, mingo@kernel.org
-Cc: tglx@linutronix.de, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org,
-        kernel-team@lge.com
-Subject: [PATCH v3 1/5] locking/Documentation: Remove meaningless examples and a note
-Date: Sat, 11 Nov 2017 22:26:28 +0900
-Message-Id: <1510406792-28676-2-git-send-email-byungchul.park@lge.com>
-In-Reply-To: <1510406792-28676-1-git-send-email-byungchul.park@lge.com>
-References: <1510406792-28676-1-git-send-email-byungchul.park@lge.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=473169c3e=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Ard
+ Biesheuvel" <ard.biesheuvel@linaro.org>, Herbert Xu
+	<herbert@gondor.apana.org.au>, Bart Van Assche <bart.vanassche@wdc.com>,
+	Keith Busch <keith.busch@intel.com>, James Smart <james.smart@broadcom.com>,
+	Sagi Grimberg <sagi@grimberg.me>
+Subject: [PATCH v3 3/8] nvmet/fc: Use sgl_alloc() and sgl_free()
+Date: Fri, 3 Nov 2017 15:23:34 -0700
+Message-ID: <20171103222339.26540-4-bart.vanassche@wdc.com>
+In-Reply-To: <20171103222339.26540-1-bart.vanassche@wdc.com>
+References: <20171103222339.26540-1-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: bart.vanassche@wdc.com
+List-ID: <linux-block@vger.kernel.org>
 
-crossrelease.txt is too verbose and includes two meaningless examples
-and an unnecessary note. Remove them.
+Use the sgl_alloc() and sgl_free() functions instead of open coding
+these functions.
 
-Signed-off-by: Byungchul Park <byungchul.park@lge.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Cc: Keith Busch <keith.busch@intel.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: James Smart <james.smart@broadcom.com>
+Cc: Sagi Grimberg <sagi@grimberg.me>
 ---
- Documentation/locking/crossrelease.txt | 48 +---------------------------------
- 1 file changed, 1 insertion(+), 47 deletions(-)
+ drivers/nvme/target/Kconfig |  1 +
+ drivers/nvme/target/fc.c    | 36 ++----------------------------------
+ 2 files changed, 3 insertions(+), 34 deletions(-)
 
-diff --git a/Documentation/locking/crossrelease.txt b/Documentation/locking/crossrelease.txt
-index bdf1423..0f8eb8a 100644
---- a/Documentation/locking/crossrelease.txt
-+++ b/Documentation/locking/crossrelease.txt
-@@ -281,31 +281,7 @@ causes a deadlock. The more lockdep adds dependencies, the more it
- thoroughly works. Thus Lockdep has to do its best to detect and add as
- many true dependencies into a graph as possible.
+diff --git a/drivers/nvme/target/Kconfig b/drivers/nvme/target/Kconfig
+index 03e4ab65fe77..4d9715630e21 100644
+--- a/drivers/nvme/target/Kconfig
++++ b/drivers/nvme/target/Kconfig
+@@ -39,6 +39,7 @@ config NVME_TARGET_FC
+ 	tristate "NVMe over Fabrics FC target driver"
+ 	depends on NVME_TARGET
+ 	depends on HAS_DMA
++	select SGL_ALLOC
+ 	help
+ 	  This enables the NVMe FC target support, which allows exporting NVMe
+ 	  devices over FC.
+diff --git a/drivers/nvme/target/fc.c b/drivers/nvme/target/fc.c
+index 5f2570f5dfa9..1b4030d74ceb 100644
+--- a/drivers/nvme/target/fc.c
++++ b/drivers/nvme/target/fc.c
+@@ -1695,31 +1695,12 @@ static int
+ nvmet_fc_alloc_tgt_pgs(struct nvmet_fc_fcp_iod *fod)
+ {
+ 	struct scatterlist *sg;
+-	struct page *page;
+ 	unsigned int nent;
+-	u32 page_len, length;
+-	int i = 0;
  
--For example, considering only typical locks, lockdep builds a graph like:
--
--   A -> B -
--           \
--            -> E
--           /
--   C -> D -
--
--   where A, B,..., E are different lock classes.
--
--On the other hand, under the relaxation, additional dependencies might
--be created and added. Assuming additional 'FX -> C' and 'E -> GX' are
--added thanks to the relaxation, the graph will be:
--
--         A -> B -
--                 \
--                  -> E -> GX
--                 /
--   FX -> C -> D -
--
--   where A, B,..., E, FX and GX are different lock classes, and a suffix
--   'X' is added on non-typical locks.
--
--The latter graph gives us more chances to check circular dependencies
--than the former. However, it might suffer performance degradation since
-+However, it might suffer performance degradation since
- relaxing the limitation, with which design and implementation of lockdep
- can be efficient, might introduce inefficiency inevitably. So lockdep
- should provide two options, strong detection and efficient detection.
-@@ -469,12 +445,6 @@ works without crossrelease for typical locks.
+-	length = fod->total_length;
+-	nent = DIV_ROUND_UP(length, PAGE_SIZE);
+-	sg = kmalloc_array(nent, sizeof(struct scatterlist), GFP_KERNEL);
++	sg = sgl_alloc(fod->total_length, GFP_KERNEL, &nent);
+ 	if (!sg)
+ 		goto out;
  
-    where A, B and C are different lock classes.
+-	sg_init_table(sg, nent);
+-
+-	while (length) {
+-		page_len = min_t(u32, length, PAGE_SIZE);
+-
+-		page = alloc_page(GFP_KERNEL);
+-		if (!page)
+-			goto out_free_pages;
+-
+-		sg_set_page(&sg[i], page, page_len, 0);
+-		length -= page_len;
+-		i++;
+-	}
+-
+ 	fod->data_sg = sg;
+ 	fod->data_sg_cnt = nent;
+ 	fod->data_sg_cnt = fc_dma_map_sg(fod->tgtport->dev, sg, nent,
+@@ -1729,14 +1710,6 @@ nvmet_fc_alloc_tgt_pgs(struct nvmet_fc_fcp_iod *fod)
  
--   NOTE: This document assumes that readers already understand how
--   lockdep works without crossrelease thus omits details. But there's
--   one thing to note. Lockdep pretends to pop a lock from held_locks
--   when releasing it. But it's subtly different from the original pop
--   operation because lockdep allows other than the top to be poped.
--
- In this case, lockdep adds 'the top of held_locks -> the lock to acquire'
- dependency every time acquiring a lock.
+ 	return 0;
  
-@@ -805,22 +775,6 @@ Remind what a dependency is. A dependency exists if:
+-out_free_pages:
+-	while (i > 0) {
+-		i--;
+-		__free_page(sg_page(&sg[i]));
+-	}
+-	kfree(sg);
+-	fod->data_sg = NULL;
+-	fod->data_sg_cnt = 0;
+ out:
+ 	return NVME_SC_INTERNAL;
+ }
+@@ -1744,18 +1717,13 @@ nvmet_fc_alloc_tgt_pgs(struct nvmet_fc_fcp_iod *fod)
+ static void
+ nvmet_fc_free_tgt_pgs(struct nvmet_fc_fcp_iod *fod)
+ {
+-	struct scatterlist *sg;
+-	int count;
+-
+ 	if (!fod->data_sg || !fod->data_sg_cnt)
+ 		return;
  
- For example:
- 
--   acquire A
--   acquire B /* A dependency 'A -> B' exists */
--   release B
--   release A
--
--   where A and B are different lock classes.
--
--A depedency 'A -> B' exists since:
--
--   1. A waiter for A and a waiter for B might exist when acquiring B.
--   2. Only way to wake up each is to release what it waits for.
--   3. Whether the waiter for A can be woken up depends on whether the
--      other can. IOW, TASK X cannot release A if it fails to acquire B.
--
--For another example:
--
-    TASK X			   TASK Y
-    ------			   ------
- 				   acquire AX
+ 	fc_dma_unmap_sg(fod->tgtport->dev, fod->data_sg, fod->data_sg_cnt,
+ 				((fod->io_dir == NVMET_FCP_WRITE) ?
+ 					DMA_FROM_DEVICE : DMA_TO_DEVICE));
+-	for_each_sg(fod->data_sg, sg, fod->data_sg_cnt, count)
+-		__free_page(sg_page(sg));
+-	kfree(fod->data_sg);
++	sgl_free(fod->data_sg);
+ 	fod->data_sg = NULL;
+ 	fod->data_sg_cnt = 0;
+ }
 -- 
-1.9.1
+2.14.3
