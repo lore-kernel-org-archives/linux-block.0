@@ -1,133 +1,212 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:11465 "EHLO mga09.intel.com"
+Received: from mx1.redhat.com ([209.132.183.28]:39862 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756217AbdKCNUo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 3 Nov 2017 09:20:44 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V13 02/10] mmc: block: Add error-handling comments
-Date: Fri,  3 Nov 2017 15:20:12 +0200
-Message-Id: <1509715220-31885-3-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1509715220-31885-1-git-send-email-adrian.hunter@intel.com>
-References: <1509715220-31885-1-git-send-email-adrian.hunter@intel.com>
+        id S932148AbdKDSV2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 4 Nov 2017 14:21:28 -0400
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        John Garry <john.garry@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] blk-mq: don't handle failure in .get_budget
+Date: Sun,  5 Nov 2017 02:21:12 +0800
+Message-Id: <20171104182112.32666-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Add error-handling comments to explain what would also be done for blk-mq
-if it used the legacy error-handling.
+It is enough to just check if we can get the budget via .get_budget().
+And we don't need to deal with device state change in .get_budget().
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+For SCSI, one issue to be fixed is that we have to call scsi_mq_uninit_cmd()
+to free allocated ressources if SCSI device fails to handle the request. And
+it isn't enough to simply call blk_mq_end_request() to do that if this request
+is marked as RQF_DONTPREP.
+
+Fixes: 0df21c86bdbf(scsi: implement .get_budget and .put_budget for blk-mq)
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/mmc/core/block.c | 36 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 35 insertions(+), 1 deletion(-)
+ block/blk-mq-sched.c    | 14 ++------------
+ block/blk-mq.c          | 17 ++++-------------
+ block/blk-mq.h          |  5 ++---
+ drivers/scsi/scsi_lib.c | 11 +++--------
+ include/linux/blk-mq.h  |  2 +-
+ 5 files changed, 12 insertions(+), 37 deletions(-)
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index ea80ff4cd7f9..ad72fa19f082 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -1894,7 +1894,11 @@ static void mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *new_req)
- 		case MMC_BLK_SUCCESS:
- 		case MMC_BLK_PARTIAL:
- 			/*
--			 * A block was successfully transferred.
-+			 * Reset success, and accept bytes_xfered. For
-+			 * MMC_BLK_PARTIAL re-submit the remaining request. For
-+			 * MMC_BLK_SUCCESS error out the remaining request (it
-+			 * could not be re-submitted anyway if a next request
-+			 * had already begun).
- 			 */
- 			mmc_blk_reset_success(md, type);
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 7775f6b12fa9..13a27d4d1671 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -94,23 +94,18 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
  
-@@ -1914,6 +1918,14 @@ static void mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *new_req)
- 			}
- 			break;
- 		case MMC_BLK_CMD_ERR:
-+			/*
-+			 * For SD cards, get bytes written, but do not accept
-+			 * bytes_xfered if that fails. For MMC cards accept
-+			 * bytes_xfered. Then try to reset. If reset fails then
-+			 * error out the remaining request, otherwise retry
-+			 * once (N.B mmc_blk_reset() will not succeed twice in a
-+			 * row).
-+			 */
- 			req_pending = mmc_blk_rw_cmd_err(md, card, brq, old_req, req_pending);
- 			if (mmc_blk_reset(md, card->host, type)) {
- 				if (req_pending)
-@@ -1930,11 +1942,20 @@ static void mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *new_req)
- 			}
- 			break;
- 		case MMC_BLK_RETRY:
-+			/*
-+			 * Do not accept bytes_xfered, but retry up to 5 times,
-+			 * otherwise same as abort.
-+			 */
- 			retune_retry_done = brq->retune_retry_done;
- 			if (retry++ < 5)
- 				break;
- 			/* Fall through */
- 		case MMC_BLK_ABORT:
-+			/*
-+			 * Do not accept bytes_xfered, but try to reset. If
-+			 * reset succeeds, try once more, otherwise error out
-+			 * the request.
-+			 */
- 			if (!mmc_blk_reset(md, card->host, type))
- 				break;
- 			mmc_blk_rw_cmd_abort(mq, card, old_req, mq_rq);
-@@ -1943,6 +1964,13 @@ static void mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *new_req)
- 		case MMC_BLK_DATA_ERR: {
- 			int err;
+ 	do {
+ 		struct request *rq;
+-		blk_status_t ret;
  
-+			/*
-+			 * Do not accept bytes_xfered, but try to reset. If
-+			 * reset succeeds, try once more. If reset fails with
-+			 * ENODEV which means the partition is wrong, then error
-+			 * out the request. Otherwise attempt to read one sector
-+			 * at a time.
-+			 */
- 			err = mmc_blk_reset(md, card->host, type);
- 			if (!err)
- 				break;
-@@ -1954,6 +1982,10 @@ static void mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *new_req)
- 			/* Fall through */
+ 		if (e->type->ops.mq.has_work &&
+ 				!e->type->ops.mq.has_work(hctx))
+ 			break;
+ 
+-		ret = blk_mq_get_dispatch_budget(hctx);
+-		if (ret == BLK_STS_RESOURCE)
++		if (!blk_mq_get_dispatch_budget(hctx))
+ 			break;
+ 
+ 		rq = e->type->ops.mq.dispatch_request(hctx);
+ 		if (!rq) {
+ 			blk_mq_put_dispatch_budget(hctx);
+ 			break;
+-		} else if (ret != BLK_STS_OK) {
+-			blk_mq_end_request(rq, ret);
+-			continue;
  		}
- 		case MMC_BLK_ECC_ERR:
-+			/*
-+			 * Do not accept bytes_xfered. If reading more than one
-+			 * sector, try reading one sector at a time.
-+			 */
- 			if (brq->data.blocks > 1) {
- 				/* Redo read one sector at a time */
- 				pr_warn("%s: retrying using single block read\n",
-@@ -1975,10 +2007,12 @@ static void mmc_blk_issue_rw_rq(struct mmc_queue *mq, struct request *new_req)
- 			}
+ 
+ 		/*
+@@ -146,22 +141,17 @@ static void blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
+ 
+ 	do {
+ 		struct request *rq;
+-		blk_status_t ret;
+ 
+ 		if (!sbitmap_any_bit_set(&hctx->ctx_map))
  			break;
- 		case MMC_BLK_NOMEDIUM:
-+			/* Do not accept bytes_xfered. Error out the request */
- 			mmc_blk_rw_cmd_abort(mq, card, old_req, mq_rq);
- 			mmc_blk_rw_try_restart(mq, new_req, mqrq_cur);
- 			return;
- 		default:
-+			/* Do not accept bytes_xfered. Error out the request */
- 			pr_err("%s: Unhandled return value (%d)",
- 					old_req->rq_disk->disk_name, status);
- 			mmc_blk_rw_cmd_abort(mq, card, old_req, mq_rq);
+ 
+-		ret = blk_mq_get_dispatch_budget(hctx);
+-		if (ret == BLK_STS_RESOURCE)
++		if (!blk_mq_get_dispatch_budget(hctx))
+ 			break;
+ 
+ 		rq = blk_mq_dequeue_from_ctx(hctx, ctx);
+ 		if (!rq) {
+ 			blk_mq_put_dispatch_budget(hctx);
+ 			break;
+-		} else if (ret != BLK_STS_OK) {
+-			blk_mq_end_request(rq, ret);
+-			continue;
+ 		}
+ 
+ 		/*
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e4d2490f4e7e..f4e1d8447b5d 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1134,13 +1134,8 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+ 			}
+ 		}
+ 
+-		if (!got_budget) {
+-			ret = blk_mq_get_dispatch_budget(hctx);
+-			if (ret == BLK_STS_RESOURCE)
+-				break;
+-			if (ret != BLK_STS_OK)
+-				goto fail_rq;
+-		}
++		if (!got_budget && !blk_mq_get_dispatch_budget(hctx))
++			break;
+ 
+ 		list_del_init(&rq->queuelist);
+ 
+@@ -1167,7 +1162,6 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+ 			break;
+ 		}
+ 
+- fail_rq:
+ 		if (unlikely(ret != BLK_STS_OK)) {
+ 			errors++;
+ 			blk_mq_end_request(rq, BLK_STS_IOERR);
+@@ -1639,12 +1633,10 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	if (!blk_mq_get_driver_tag(rq, NULL, false))
+ 		goto insert;
+ 
+-	ret = blk_mq_get_dispatch_budget(hctx);
+-	if (ret == BLK_STS_RESOURCE) {
++	if (!blk_mq_get_dispatch_budget(hctx)) {
+ 		blk_mq_put_driver_tag(rq);
+ 		goto insert;
+-	} else if (ret != BLK_STS_OK)
+-		goto fail_rq;
++	}
+ 
+ 	new_cookie = request_to_qc_t(hctx, rq);
+ 
+@@ -1662,7 +1654,6 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 		__blk_mq_requeue_request(rq);
+ 		goto insert;
+ 	default:
+- fail_rq:
+ 		*cookie = BLK_QC_T_NONE;
+ 		blk_mq_end_request(rq, ret);
+ 		return;
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 522b420dedc0..f97aceff76e9 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -147,14 +147,13 @@ static inline void blk_mq_put_dispatch_budget(struct blk_mq_hw_ctx *hctx)
+ 		q->mq_ops->put_budget(hctx);
+ }
+ 
+-static inline blk_status_t blk_mq_get_dispatch_budget(
+-		struct blk_mq_hw_ctx *hctx)
++static inline bool blk_mq_get_dispatch_budget(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct request_queue *q = hctx->queue;
+ 
+ 	if (q->mq_ops->get_budget)
+ 		return q->mq_ops->get_budget(hctx);
+-	return BLK_STS_OK;
++	return true;
+ }
+ 
+ #endif
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 7f218ef61900..c537c4d768c1 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1949,27 +1949,22 @@ static void scsi_mq_put_budget(struct blk_mq_hw_ctx *hctx)
+ 	put_device(&sdev->sdev_gendev);
+ }
+ 
+-static blk_status_t scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
++static bool scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct request_queue *q = hctx->queue;
+ 	struct scsi_device *sdev = q->queuedata;
+-	blk_status_t ret;
+-
+-	ret = prep_to_mq(scsi_prep_state_check(sdev, NULL));
+-	if (ret == BLK_STS_RESOURCE || ret != BLK_STS_OK)
+-		return ret;
+ 
+ 	if (!get_device(&sdev->sdev_gendev))
+ 		goto out;
+ 	if (!scsi_dev_queue_ready(q, sdev))
+ 		goto out_put_device;
+ 
+-	return BLK_STS_OK;
++	return true;
+ 
+ out_put_device:
+ 	put_device(&sdev->sdev_gendev);
+ out:
+-	return BLK_STS_RESOURCE;
++	return false;
+ }
+ 
+ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index e5e6becd57d3..439a7970ed5d 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -92,7 +92,7 @@ struct blk_mq_queue_data {
+ 
+ typedef blk_status_t (queue_rq_fn)(struct blk_mq_hw_ctx *,
+ 		const struct blk_mq_queue_data *);
+-typedef blk_status_t (get_budget_fn)(struct blk_mq_hw_ctx *);
++typedef bool (get_budget_fn)(struct blk_mq_hw_ctx *);
+ typedef void (put_budget_fn)(struct blk_mq_hw_ctx *);
+ typedef enum blk_eh_timer_return (timeout_fn)(struct request *, bool);
+ typedef int (init_hctx_fn)(struct blk_mq_hw_ctx *, void *, unsigned int);
 -- 
-1.9.1
+2.9.5
