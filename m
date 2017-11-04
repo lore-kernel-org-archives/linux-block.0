@@ -1,124 +1,203 @@
-Return-Path: <prvs=4780b5c65=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V7 4/8] block: deadline-iosched: Introduce dispatch helpers
-Date: Wed,  8 Nov 2017 17:11:14 +0900
-Message-Id: <20171108081118.7632-5-damien.lemoal@wdc.com>
-In-Reply-To: <20171108081118.7632-1-damien.lemoal@wdc.com>
-References: <20171108081118.7632-1-damien.lemoal@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Received: from [192.168.1.154] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id k86sm4226315ioi.23.2017.11.04.10.32.26
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 04 Nov 2017 10:32:26 -0700 (PDT)
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] blktrace: fix unlocked access to init/start-stop/teardown
+Message-ID: <b786bbb3-12f8-6609-8e0d-2fe740de204f@kernel.dk>
+Date: Sat, 4 Nov 2017 11:32:26 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Avoid directly referencing the next_rq and fifo_list arrays using the
-helper functions deadline_next_request() and deadline_fifo_request() to
-facilitate changes in the dispatch request selection in
-deadline_dispatch_requests() for zoned block devices.
+sg.c calls into the blktrace functions without holding the proper queue
+mutex for doing setup, start/stop, or teardown. This can cause problems
+like the below:
 
-While at it, also remove the unnecessary forward declaration of the
-function deadline_move_request().
+CPU: 0 PID: 2995 Comm: syzkaller857118 Not tainted  
+4.14.0-rc5-next-20171018+ #36
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Call Trace:
+  __dump_stack lib/dump_stack.c:16 [inline]
+  dump_stack+0x194/0x257 lib/dump_stack.c:52
+  panic+0x1e4/0x41c kernel/panic.c:183
+  __warn+0x1c4/0x1e0 kernel/panic.c:546
+  report_bug+0x211/0x2d0 lib/bug.c:183
+  fixup_bug+0x40/0x90 arch/x86/kernel/traps.c:177
+  do_trap_no_signal arch/x86/kernel/traps.c:211 [inline]
+  do_trap+0x260/0x390 arch/x86/kernel/traps.c:260
+  do_error_trap+0x120/0x390 arch/x86/kernel/traps.c:297
+  do_invalid_op+0x1b/0x20 arch/x86/kernel/traps.c:310
+  invalid_op+0x18/0x20 arch/x86/entry/entry_64.S:905
+RIP: 0010:tracepoint_add_func kernel/tracepoint.c:210 [inline]
+RIP: 0010:tracepoint_probe_register_prio+0x397/0x9a0 kernel/tracepoint.c:283
+RSP: 0018:ffff8801d1d1f6c0 EFLAGS: 00010293
+RAX: ffff8801d22e8540 RBX: 00000000ffffffef RCX: ffffffff81710f07
+RDX: 0000000000000000 RSI: ffffffff85b679c0 RDI: ffff8801d5f19818
+RBP: ffff8801d1d1f7c8 R08: ffffffff81710c10 R09: 0000000000000004
+R10: ffff8801d1d1f6b0 R11: 0000000000000003 R12: ffffffff817597f0
+R13: 0000000000000000 R14: 00000000ffffffff R15: ffff8801d1d1f7a0
+  tracepoint_probe_register+0x2a/0x40 kernel/tracepoint.c:304
+  register_trace_block_rq_insert include/trace/events/block.h:191 [inline]
+  blk_register_tracepoints+0x1e/0x2f0 kernel/trace/blktrace.c:1043
+  do_blk_trace_setup+0xa10/0xcf0 kernel/trace/blktrace.c:542
+  blk_trace_setup+0xbd/0x180 kernel/trace/blktrace.c:564
+  sg_ioctl+0xc71/0x2d90 drivers/scsi/sg.c:1089
+  vfs_ioctl fs/ioctl.c:45 [inline]
+  do_vfs_ioctl+0x1b1/0x1520 fs/ioctl.c:685
+  SYSC_ioctl fs/ioctl.c:700 [inline]
+  SyS_ioctl+0x8f/0xc0 fs/ioctl.c:691
+  entry_SYSCALL_64_fastpath+0x1f/0xbe
+RIP: 0033:0x444339
+RSP: 002b:00007ffe05bb5b18 EFLAGS: 00000206 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00000000006d66c0 RCX: 0000000000444339
+RDX: 000000002084cf90 RSI: 00000000c0481273 RDI: 0000000000000009
+RBP: 0000000000000082 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000206 R12: ffffffffffffffff
+R13: 00000000c0481273 R14: 0000000000000000 R15: 0000000000000000
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+since we can now run these in parallel. Ensure that the exported helpers
+for doing this are grabbing the queue trace mutex.
+
+Reported-by: Steven Rostedt <rostedt@goodmis.org>
+Fixes: 6da127ad0918 ("blktrace: Add blktrace ioctls to SCSI generic devices")
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
 ---
- block/deadline-iosched.c | 47 +++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 37 insertions(+), 10 deletions(-)
 
-diff --git a/block/deadline-iosched.c b/block/deadline-iosched.c
-index b83f77460d28..81e3f0897457 100644
---- a/block/deadline-iosched.c
-+++ b/block/deadline-iosched.c
-@@ -50,8 +50,6 @@ struct deadline_data {
- 	int front_merges;
- };
- 
--static void deadline_move_request(struct deadline_data *, struct request *);
--
- static inline struct rb_root *
- deadline_rb_root(struct deadline_data *dd, struct request *rq)
- {
-@@ -231,6 +229,35 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 45a3928544ce..ea57dd94b2b2 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -336,7 +336,7 @@ static void blk_trace_cleanup(struct blk_trace *bt)
+ 		blk_unregister_tracepoints();
  }
  
- /*
-+ * For the specified data direction, return the next request to dispatch using
-+ * arrival ordered lists.
-+ */
-+static struct request *
-+deadline_fifo_request(struct deadline_data *dd, int data_dir)
-+{
-+	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
-+		return NULL;
-+
-+	if (list_empty(&dd->fifo_list[data_dir]))
-+		return NULL;
-+
-+	return rq_entry_fifo(dd->fifo_list[data_dir].next);
-+}
-+
-+/*
-+ * For the specified data direction, return the next request to dispatch using
-+ * sector position sorted lists.
-+ */
-+static struct request *
-+deadline_next_request(struct deadline_data *dd, int data_dir)
-+{
-+	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
-+		return NULL;
-+
-+	return dd->next_rq[data_dir];
-+}
-+
-+/*
-  * deadline_dispatch_requests selects the best request according to
-  * read/write expire, fifo_batch, etc
-  */
-@@ -239,16 +266,15 @@ static int deadline_dispatch_requests(struct request_queue *q, int force)
- 	struct deadline_data *dd = q->elevator->elevator_data;
- 	const int reads = !list_empty(&dd->fifo_list[READ]);
- 	const int writes = !list_empty(&dd->fifo_list[WRITE]);
--	struct request *rq;
-+	struct request *rq, *next_rq;
- 	int data_dir;
+-int blk_trace_remove(struct request_queue *q)
++static int __blk_trace_remove(struct request_queue *q)
+ {
+ 	struct blk_trace *bt;
  
- 	/*
- 	 * batches are currently reads XOR writes
- 	 */
--	if (dd->next_rq[WRITE])
--		rq = dd->next_rq[WRITE];
--	else
--		rq = dd->next_rq[READ];
-+	rq = deadline_next_request(dd, WRITE);
-+	if (!rq)
-+		rq = deadline_next_request(dd, READ);
+@@ -349,6 +349,17 @@ int blk_trace_remove(struct request_queue *q)
  
- 	if (rq && dd->batching < dd->fifo_batch)
- 		/* we have a next request are still entitled to batch */
-@@ -291,19 +317,20 @@ static int deadline_dispatch_requests(struct request_queue *q, int force)
- 	/*
- 	 * we are not running a batch, find best request for selected data_dir
- 	 */
--	if (deadline_check_fifo(dd, data_dir) || !dd->next_rq[data_dir]) {
-+	next_rq = deadline_next_request(dd, data_dir);
-+	if (deadline_check_fifo(dd, data_dir) || !next_rq) {
- 		/*
- 		 * A deadline has expired, the last request was in the other
- 		 * direction, or we have run out of higher-sectored requests.
- 		 * Start again from the request with the earliest expiry time.
- 		 */
--		rq = rq_entry_fifo(dd->fifo_list[data_dir].next);
-+		rq = deadline_fifo_request(dd, data_dir);
- 	} else {
- 		/*
- 		 * The last req was the same dir and we have a next request in
- 		 * sort order. No expired requests so continue on from here.
- 		 */
--		rq = dd->next_rq[data_dir];
-+		rq = next_rq;
+ 	return 0;
+ }
++
++int blk_trace_remove(struct request_queue *q)
++{
++	int ret;
++
++	mutex_lock(&q->blk_trace_mutex);
++	ret = __blk_trace_remove(q);
++	mutex_unlock(&q->blk_trace_mutex);
++
++	return ret;
++}
+ EXPORT_SYMBOL_GPL(blk_trace_remove);
+ 
+ static ssize_t blk_dropped_read(struct file *filp, char __user *buffer,
+@@ -550,9 +561,8 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+ 	return ret;
+ }
+ 
+-int blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+-		    struct block_device *bdev,
+-		    char __user *arg)
++static int __blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
++			     struct block_device *bdev, char __user *arg)
+ {
+ 	struct blk_user_trace_setup buts;
+ 	int ret;
+@@ -571,6 +581,19 @@ int blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
  	}
+ 	return 0;
+ }
++
++int blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
++		    struct block_device *bdev,
++		    char __user *arg)
++{
++	int ret;
++
++	mutex_lock(&q->blk_trace_mutex);
++	ret = __blk_trace_setup(q, name, dev, bdev, arg);
++	mutex_unlock(&q->blk_trace_mutex);
++
++	return ret;
++}
+ EXPORT_SYMBOL_GPL(blk_trace_setup);
  
- 	dd->batching = 0;
+ #if defined(CONFIG_COMPAT) && defined(CONFIG_X86_64)
+@@ -607,7 +630,7 @@ static int compat_blk_trace_setup(struct request_queue *q, char *name,
+ }
+ #endif
+ 
+-int blk_trace_startstop(struct request_queue *q, int start)
++static int __blk_trace_startstop(struct request_queue *q, int start)
+ {
+ 	int ret;
+ 	struct blk_trace *bt = q->blk_trace;
+@@ -646,6 +669,17 @@ int blk_trace_startstop(struct request_queue *q, int start)
+ 
+ 	return ret;
+ }
++
++int blk_trace_startstop(struct request_queue *q, int start)
++{
++	int ret;
++
++	mutex_lock(&q->blk_trace_mutex);
++	ret = __blk_trace_startstop(q, start);
++	mutex_unlock(&q->blk_trace_mutex);
++
++	return ret;
++}
+ EXPORT_SYMBOL_GPL(blk_trace_startstop);
+ 
+ /*
+@@ -676,7 +710,7 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
+ 	switch (cmd) {
+ 	case BLKTRACESETUP:
+ 		bdevname(bdev, b);
+-		ret = blk_trace_setup(q, b, bdev->bd_dev, bdev, arg);
++		ret = __blk_trace_setup(q, b, bdev->bd_dev, bdev, arg);
+ 		break;
+ #if defined(CONFIG_COMPAT) && defined(CONFIG_X86_64)
+ 	case BLKTRACESETUP32:
+@@ -687,10 +721,10 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
+ 	case BLKTRACESTART:
+ 		start = 1;
+ 	case BLKTRACESTOP:
+-		ret = blk_trace_startstop(q, start);
++		ret = __blk_trace_startstop(q, start);
+ 		break;
+ 	case BLKTRACETEARDOWN:
+-		ret = blk_trace_remove(q);
++		ret = __blk_trace_remove(q);
+ 		break;
+ 	default:
+ 		ret = -ENOTTY;
+@@ -708,10 +742,14 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
+  **/
+ void blk_trace_shutdown(struct request_queue *q)
+ {
++	mutex_lock(&q->blk_trace_mutex);
++
+ 	if (q->blk_trace) {
+-		blk_trace_startstop(q, 0);
+-		blk_trace_remove(q);
++		__blk_trace_startstop(q, 0);
++		__blk_trace_remove(q);
+ 	}
++
++	mutex_unlock(&q->blk_trace_mutex);
+ }
+ 
+ #ifdef CONFIG_BLK_CGROUP
+
 -- 
-2.13.6
+Jens Axboe
