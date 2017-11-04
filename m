@@ -1,73 +1,33 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:60479 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753962AbdKFSEq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Nov 2017 13:04:46 -0500
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "osandov@fb.com" <osandov@fb.com>,
-        "john.garry@huawei.com" <john.garry@huawei.com>,
-        "loberman@redhat.com" <loberman@redhat.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH] SCSI: don't get target/host busy_count in
  scsi_mq_get_budget()
-Date: Mon, 6 Nov 2017 18:04:42 +0000
-Message-ID: <1509991480.2409.54.camel@wdc.com>
+To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+ Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+ Laurence Oberman <loberman@redhat.com>, linux-scsi@vger.kernel.org,
+ Omar Sandoval <osandov@fb.com>, John Garry <john.garry@huawei.com>
 References: <20171104015534.32684-1-ming.lei@redhat.com>
-In-Reply-To: <20171104015534.32684-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <adb7f6bd-bf0d-8176-808b-32a84ac4273a@kernel.dk>
+Date: Sat, 4 Nov 2017 08:19:58 -0600
 MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20171104015534.32684-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-T24gU2F0LCAyMDE3LTExLTA0IGF0IDA5OjU1ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gSXQg
-aXMgdmVyeSBleHBlbnNpdmUgdG8gYXRvbWljX2luYy9hdG9taWNfZGVjIHRoZSBob3N0IHdpZGUg
-Y291bnRlciBvZg0KPiBob3N0LT5idXN5X2NvdW50LCBhbmQgaXQgc2hvdWxkIGhhdmUgYmVlbiBh
-dm9pZGVkIHZpYSBibGstbXEncyBtZWNoYW5pc20NCj4gb2YgZ2V0dGluZyBkcml2ZXIgdGFnLCB3
-aGljaCB1c2VzIHRoZSBtb3JlIGVmZmljaWVudCB3YXkgb2Ygc2JpdG1hcCBxdWV1ZS4NCg0KRGlk
-IHlvdSBwZXJoYXBzIG1lYW4gdGhlIGhvc3QtPmhvc3RfYnVzeSBjb3VudGVyPyBVbnJlbGF0ZWQg
-dG8gdGhpcyBwYXRjaDoNCkkgdGhpbmsgdGhhdCBjb21taXQgNjRkNTEzYWMzMWJkICgic2NzaTog
-dXNlIGhvc3Qgd2lkZSB0YWdzIGJ5IGRlZmF1bHQiKSBtYWRlDQp0aGF0IGNvdW50ZXIgc3VwZXJm
-bHVvdXMuDQoNCj4gQWxzbyB3ZSBkb24ndCBjaGVjayBhdG9taWNfcmVhZCgmc2Rldi0+ZGV2aWNl
-X2J1c3kpIGluIHNjc2lfbXFfZ2V0X2J1ZGdldCgpDQo+IGFuZCBkb24ndCBydW4gcXVldWUgaWYg
-dGhlIGNvdW50ZXIgYmVjb21lcyB6ZXJvLCBzbyBJTyBoYW5nIG1heSBiZSBjYXVzZWQNCj4gaWYg
-YWxsIHJlcXVlc3RzIGFyZSBjb21wbGV0ZWQganVzdCBiZWZvcmUgdGhlIGN1cnJlbnQgU0NTSSBk
-ZXZpY2UNCj4gaXMgYWRkZWQgdG8gc2hvc3QtPnN0YXJ2ZWRfbGlzdC4NCg0KV2hhdCBpcyB0aGUg
-cmVsYXRpb25zaGlwIGJldHdlZW4gdGhlIGFib3ZlIGRlc2NyaXB0aW9uIGFuZCB0aGUgY29kZSBj
-aGFuZ2VzDQpiZWxvdz8gVGhlIGFib3ZlIGRlc2NyaXB0aW9uIGRvZXMgbm90IGV4cGxhaW4gd2hl
-dGhlciB0aGUgc2NzaV9tcV9nZXQvcHV0X2J1ZGdldCgpDQpjaGFuZ2VzIGJlbG93IHByZXZlbnQg
-dGhhdCBhbGwgb3V0c3RhbmRpbmcgU0NTSSByZXF1ZXN0cyBjb21wbGV0ZSBiZWZvcmUNCmFub3Ro
-ZXIgcXVldWUgaXMgYWRkZWQgdG8gdGhlIHN0YXJ2ZWQgbGlzdC4NCg0KSXMgdGhpcyBwZXJoYXBz
-IGFuIGF0dGVtcHQgdG8gbW92ZSB0aGUgY29kZSB0aGF0IGNhbiBhZGQgYSByZXF1ZXN0IHF1ZXVl
-IHRvDQoic3RhcnZlZF9saXN0IiBmcm9tIGluc2lkZSBzY3NpX21xX2dldF9idWRnZXQoKSBpbnRv
-IHNjc2lfcXVldWVfcnEoKT8gRG9lcw0KdGhpcyBwYXRjaCBtb3JlIHRoYW4gcmVkdWNpbmcgdGhl
-IHByb2JhYmlsaXR5IHRoYXQgdGhlIHJhY2UgaXMgZW5jb3VudGVyZWQNCnRoYXQgYSBxdWV1ZSBp
-cyBhZGRlZCB0byAic3RhcnZlZF9saXN0IiBhZnRlciBhbGwgcmVxdWVzdHMgaGF2ZSBmaW5pc2hl
-ZD8NCg0KPiBGaXhlczogMGRmMjFjODZiZGJmKHNjc2k6IGltcGxlbWVudCAuZ2V0X2J1ZGdldCBh
-bmQgLnB1dF9idWRnZXQgZm9yIGJsay1tcSkNCj4gUmVwb3J0ZWQtYnk6IEJhcnQgVmFuIEFzc2No
-ZSA8YmFydC52YW5hc3NjaGVAd2RjLmNvbT4NCj4gU2lnbmVkLW9mZi1ieTogTWluZyBMZWkgPG1p
-bmcubGVpQHJlZGhhdC5jb20+DQoNClNpbmNlIHRoaXMgaXMgYSBTQ1NJIHBhdGNoIHRoZSBTQ1NJ
-IG1haW50YWluZXIsIE1hcnRpbiBQZXRlcnNlbiwgc2hvdWxkIGhhdmUNCmJlZW4gQ2MtZWQgZm9y
-IHRoaXMgcGF0Y2guIEFkZGl0aW9uYWxseSwgSSB0aGluayB0aGF0IHRoaXMgcGF0Y2ggc2hvdWxk
-IG5vdA0KaGF2ZSBiZWVuIHF1ZXVlZCBieSBKZW5zIGJlZm9yZSBNYXJ0aW4gaGFkIGFwcHJvdmVk
-IHRoaXMgcGF0Y2guDQoNCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvc2NzaS9zY3NpX2xpYi5jIGIv
-ZHJpdmVycy9zY3NpL3Njc2lfbGliLmMNCj4gaW5kZXggYTA5OGFmMzA3MGExLi43ZjIxOGVmNjE5
-MDAgMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvc2NzaS9zY3NpX2xpYi5jDQo+ICsrKyBiL2RyaXZl
-cnMvc2NzaS9zY3NpX2xpYi5jDQo+IEBAIC0xOTQ0LDExICsxOTQ0LDcgQEAgc3RhdGljIHZvaWQg
-c2NzaV9tcV9wdXRfYnVkZ2V0KHN0cnVjdCBibGtfbXFfaHdfY3R4ICpoY3R4KQ0KPiAgew0KPiAg
-CXN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxID0gaGN0eC0+cXVldWU7DQo+ICAJc3RydWN0IHNjc2lf
-ZGV2aWNlICpzZGV2ID0gcS0+cXVldWVkYXRhOw0KPiAtCXN0cnVjdCBTY3NpX0hvc3QgKnNob3N0
-ID0gc2Rldi0+aG9zdDsNCj4gIA0KPiAtCWF0b21pY19kZWMoJnNob3N0LT5ob3N0X2J1c3kpOw0K
-PiAtCWlmIChzY3NpX3RhcmdldChzZGV2KS0+Y2FuX3F1ZXVlID4gMCkNCj4gLQkJYXRvbWljX2Rl
-Yygmc2NzaV90YXJnZXQoc2RldiktPnRhcmdldF9idXN5KTsNCj4gIAlhdG9taWNfZGVjKCZzZGV2
-LT5kZXZpY2VfYnVzeSk7DQo+ICAJcHV0X2RldmljZSgmc2Rldi0+c2Rldl9nZW5kZXYpOw0KPiAg
-fQ0KDQpzY3NpX21xX2dldC9wdXRfYnVkZ2V0KCkgd2VyZSBpbnRyb2R1Y2VkIHRvIGltcHJvdmUg
-c2VxdWVudGlhbCBJL08NCnBlcmZvcm1hbmNlLiBEb2VzIHJlbW92aW5nIHRoZSBTQ1NJIHRhcmdl
-dCBidXN5IGNoZWNrIGhhdmUgYSBuZWdhdGl2ZQ0KcGVyZm9ybWFuY2Ugb24gc2VxdWVudGlhbCBJ
-L08gZm9yIGUuZy4gdGhlIGlTRVIgaW5pdGlhdG9yIGRyaXZlcj8gVGhlIGlTQ1NJDQpvdmVyIFRD
-UCBpbml0aWF0b3IgZHJpdmVyIGlzIG5vdCBhcHByb3ByaWF0ZSBmb3IgdGVzdGluZyBwZXJmb3Jt
-YW5jZQ0KcmVncmVzc2lvbnMgYmVjYXVzZSBpdCBsaW1pdHMgdGhlIGlTQ1NJIHBhcmFtZXRlciBN
-YXhPdXRzdGFuZGluZ1IyVCB0byBvbmUuDQoNCkJhcnQu
+On 11/03/2017 07:55 PM, Ming Lei wrote:
+> It is very expensive to atomic_inc/atomic_dec the host wide counter of
+> host->busy_count, and it should have been avoided via blk-mq's mechanism
+> of getting driver tag, which uses the more efficient way of sbitmap queue.
+> 
+> Also we don't check atomic_read(&sdev->device_busy) in scsi_mq_get_budget()
+> and don't run queue if the counter becomes zero, so IO hang may be caused
+> if all requests are completed just before the current SCSI device
+> is added to shost->starved_list.
+
+This looks like an improvement. I have added it for 4.15.
+
+Bart, does this fix your hang?
+
+-- 
+Jens Axboe
