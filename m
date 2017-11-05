@@ -1,24 +1,16 @@
-Return-Path: <tom.leiming@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <1509898908-7175-1-git-send-email-axboe@kernel.dk>
-References: <1509898908-7175-1-git-send-email-axboe@kernel.dk>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Mon, 6 Nov 2017 20:21:56 +0800
-Message-ID: <CACVXFVPRmauUODH1KjUkyBOiWtORGeAXGWiMS0zhmP6Unt=Jpw@mail.gmail.com>
-Subject: Re: [PATCH v2] blktrace: cleanup/fix registration locking
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <axboe@kernel.dk>
+Received: from x1.router (mobile-166-176-57-8.mycingular.net. [166.176.57.8])
+        by smtp.gmail.com with ESMTPSA id i187sm18420894pfc.96.2017.11.05.08.21.52
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Sun, 05 Nov 2017 08:21:52 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org
+Subject: [PATCH v2] blktrace: cleanup/fix registration locking
+Date: Sun,  5 Nov 2017 09:21:46 -0700
+Message-Id: <1509898908-7175-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Nov 6, 2017 at 12:21 AM, Jens Axboe <axboe@kernel.dk> wrote:
-> One patch that fixes up a discrepancy in how we lock the queue for
-> blktrace registration, and one that fixes up how we globally
-> serialize registering the tracepoints.
->
-
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
-
--- 
-Ming Lei
+One patch that fixes up a discrepancy in how we lock the queue for
+blktrace registration, and one that fixes up how we globally
+serialize registering the tracepoints.
