@@ -1,114 +1,86 @@
-Return-Path: <BATV+880bc34f87153fcb2b61+5191+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: nvme multipath support V7
-Date: Thu,  9 Nov 2017 18:44:43 +0100
-Message-Id: <20171109174450.17142-1-hch@lst.de>
+Return-Path: <ebiggers3@gmail.com>
+Return-Path: <ebiggers3@gmail.com>
+Date: Sun, 5 Nov 2017 12:18:34 -0800
+From: Eric Biggers <ebiggers3@gmail.com>
+To: Dmitry Vyukov <dvyukov@google.com>
+Cc: syzbot <bot+4684a000d5abdade83fac55b1e7d1f935ef1936e@syzkaller.appspotmail.com>,
+	axboe@kernel.dk, linux-block@vger.kernel.org,
+	LKML <linux-kernel@vger.kernel.org>,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: possible deadlock in blkdev_reread_part
+Message-ID: <20171105201834.GA8126@zzz.localdomain>
+References: <001a11446e86e97ceb055cf07f4e@google.com>
+ <CACT4Y+bGjnajib6P4a0SxYkNUJpg_x8abEkec8AR+oBmC=-QUQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CACT4Y+bGjnajib6P4a0SxYkNUJpg_x8abEkec8AR+oBmC=-QUQ@mail.gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi all,
+On Wed, Nov 01, 2017 at 10:02:44PM +0300, 'Dmitry Vyukov' via syzkaller-bugs wrote:
+> 
+> Still happens on linux-next 36ef71cae353f88fd6e095e2aaa3e5953af1685d (Oct 20).
+> Note repro needs to be compiled with -m32
+> 
+> [  243.819514] ======================================================
+> [  243.820949] WARNING: possible circular locking dependency detected
+> [  243.822417] 4.14.0-rc5-next-20171018 #15 Not tainted
+> [  243.823592] ------------------------------------------------------
+> [  243.825012] a.out/11871 is trying to acquire lock:
+> [  243.826182]  (&bdev->bd_mutex){+.+.}, at: [<ffffffff8245f13e>]
+> blkdev_reread_part+0x1e/0x40
+> [  243.828317]
+> [  243.828317] but task is already holding lock:
+> [  243.829669]  (&lo->lo_ctl_mutex#2){+.+.}, at: [<ffffffff83867189>]
+> lo_compat_ioctl+0x119/0x150
+> [  243.831728]
+> [  243.831728] which lock already depends on the new lock.
+> [  243.831728]
+> [  243.833373]
 
-this series adds support for multipathing, that is accessing nvme
-namespaces through multiple controllers to the nvme core driver.
+Here's a simplified reproducer:
 
-I think we are pretty much done with with very little changes in
-the last reposts.  Unless I hear objections I plan to send this
-to Jens tomorrow with the remaining NVMe updates.
+	#include <fcntl.h>
+	#include <linux/loop.h>
+	#include <sys/ioctl.h>
+	#include <unistd.h>
 
-It is a very thin and efficient implementation that relies on
-close cooperation with other bits of the nvme driver, and few small
-and simple block helpers.
+	int main()
+	{
+		int loopfd, fd;
+		struct loop_info info = { .lo_flags = LO_FLAGS_PARTSCAN };
 
-Compared to dm-multipath the important differences are how management
-of the paths is done, and how the I/O path works.
+		loopfd = open("/dev/loop0", O_RDWR);
 
-Management of the paths is fully integrated into the nvme driver,
-for each newly found nvme controller we check if there are other
-controllers that refer to the same subsystem, and if so we link them
-up in the nvme driver.  Then for each namespace found we check if
-the namespace id and identifiers match to check if we have multiple
-controllers that refer to the same namespaces.  For now path
-availability is based entirely on the controller status, which at
-least for fabrics will be continuously updated based on the mandatory
-keep alive timer.  Once the Asynchronous Namespace Access (ANA)
-proposal passes in NVMe we will also get per-namespace states in
-addition to that, but for now any details of that remain confidential
-to NVMe members.
+		fd = open("/bin/ls", O_RDONLY);
 
-The I/O path is very different from the existing multipath drivers,
-which is enabled by the fact that NVMe (unlike SCSI) does not support
-partial completions - a controller will either complete a whole
-command or not, but never only complete parts of it.  Because of that
-there is no need to clone bios or requests - the I/O path simply
-redirects the I/O to a suitable path.  For successful commands
-multipath is not in the completion stack at all.  For failed commands
-we decide if the error could be a path failure, and if yes remove
-the bios from the request structure and requeue them before completing
-the request.  All together this means there is no performance
-degradation compared to normal nvme operation when using the multipath
-device node (at least not until I find a dual ported DRAM backed
-device :))
+		ioctl(loopfd, LOOP_SET_FD, fd);
 
-A git tree is available at:
+		ioctl(loopfd, LOOP_SET_STATUS, &info);
+	}
 
-   git://git.infradead.org/users/hch/block.git nvme-mpath
+It still needs to be compiled with -m32.  The reason is that lo_ioctl() has:
 
-gitweb:
+	mutex_lock_nested(&lo->lo_ctl_mutex, 1);
 
-   http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/nvme-mpath
+but lo_compat_ioctl() has:
 
-Changes since V6:
-  - added slaves/holder directories (Hannes)
-  - trivial rebase on top of the latest nvme-4.15 changes
+	mutex_lock(&lo->lo_ctl_mutex);
 
-Changes since V5:
-  - dropped various prep patches merged into the nvme tree
-  - removed a leftover debug printk
-  - small cleanups to blk_steal_bio
-  - add a sysfs attribute for hidden gendisks
-  - don't complete cancelled requests if another path is available
-  - use the instance index for device naming
-  - make the multipath code optional at compile time
-  - don't use the multipath node for single-controller subsystems
-  - add a module_option to disable multipathing (temporarily)
-   
-Changes since V4:
-  - add a refcount to release the device in struct nvme_subsystem
-  - use the instance to name the nvme_subsystems in sysfs
-  - remove a NULL check before nvme_put_ns_head
-  - take a ns_head reference in ->open
-  - improve open protection for GENHD_FL_HIDDEN
-  - add poll support for the mpath device
+But ->lo_ctl_mutex isn't actually being nested under itself, so I don't think
+the "nested" annotation is actually appropriate.
 
-Changes since V3:
-  - new block layer support for hidden gendisks
-  - a couple new patches to refactor device handling before the
-    actual multipath support
-  - don't expose per-controller block device nodes
-  - use /dev/nvmeXnZ as the device nodes for the whole subsystem.
-  - expose subsystems in sysfs (Hannes Reinecke)
-  - fix a subsystem leak when duplicate NQNs are found
-  - fix up some names
-  - don't clear current_path if freeing a different namespace
+It seems that ->bd_mutex is held while opening and closing block devices, which
+should rank it above both ->lo_ctl_mutex and loop_index_mutex (see lo_open() and
+lo_release()).
 
-Changes since V2:
-  - don't create duplicate subsystems on reset (Keith Bush)
-  - free requests properly when failing over in I/O completion (Keith Bush)
-  - new devices names: /dev/nvm-sub%dn%d
-  - expose the namespace identification sysfs files for the mpath nodes
+But blkdev_reread_part(), which takes ->bd_mutex, is called from some of the
+ioctls while ->lo_ctl_mutex is held.
 
-Changes since V1:
-  - introduce new nvme_ns_ids structure to clean up identifier handling
-  - generic_make_request_fast is now named direct_make_request and calls
-    generic_make_request_checks
-  - reset bi_disk on resubmission
-  - create sysfs links between the existing nvme namespace block devices and
-    the new share mpath device
-  - temporarily added the timeout patches from James, this should go into
-    nvme-4.14, though
+Perhaps we should call blkdev_reread_part() at the end of the ioctls, after
+->lo_ctl_mutex has been dropped?  But it looks like that can do I/O to the
+device, which probably could race with loop_clr_fd()...
+
+Or perhaps we should just take both locks for the ioctls, in the order
+->bd_mutex, then ->lo_ctl_mutex -- and then use __blkdev_reread_part()?
+
+Eric
