@@ -1,21 +1,19 @@
-Return-Path: <keith.busch@intel.com>
-Date: Mon, 6 Nov 2017 07:46:13 -0700
-From: Keith Busch <keith.busch@intel.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
 Subject: Re: [PATCH 1/6] nvme: move the dying queue check from cancel to
  completion
-Message-ID: <20171106144612.GB11677@localhost.localdomain>
+To: Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.de>,
+ Johannes Thumshirn <jthumshirn@suse.de>, linux-nvme@lists.infradead.org,
+ linux-block@vger.kernel.org
 References: <20171102182856.9162-1-hch@lst.de>
  <20171102182856.9162-2-hch@lst.de>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <0c6187ca-b714-2f24-9f41-791103b9d8e5@grimberg.me>
+Date: Sun, 5 Nov 2017 16:01:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20171102182856.9162-2-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good.
-
-Reviewed-by: Keith Busch <keith.busch@intel.com>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
