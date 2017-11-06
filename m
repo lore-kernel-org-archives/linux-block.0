@@ -1,94 +1,64 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Tue, 7 Nov 2017 10:11:26 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"osandov@fb.com" <osandov@fb.com>,
-	"john.garry@huawei.com" <john.garry@huawei.com>,
-	"loberman@redhat.com" <loberman@redhat.com>
+Return-Path: <prvs=476e29079=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@infradead.org" <hch@infradead.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"osandov@fb.com" <osandov@fb.com>, "john.garry@huawei.com"
+	<john.garry@huawei.com>, "loberman@redhat.com" <loberman@redhat.com>
 Subject: Re: [PATCH] SCSI: don't get target/host busy_count in
  scsi_mq_get_budget()
-Message-ID: <20171107021125.GB15090@ming.t460p>
+Date: Mon, 6 Nov 2017 19:45:23 +0000
+Message-ID: <1509997522.2409.58.camel@wdc.com>
 References: <20171104015534.32684-1-ming.lei@redhat.com>
- <adb7f6bd-bf0d-8176-808b-32a84ac4273a@kernel.dk>
- <1509997522.2409.58.camel@wdc.com>
+	 <adb7f6bd-bf0d-8176-808b-32a84ac4273a@kernel.dk>
+In-Reply-To: <adb7f6bd-bf0d-8176-808b-32a84ac4273a@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1509997522.2409.58.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Nov 06, 2017 at 07:45:23PM +0000, Bart Van Assche wrote:
-> On Sat, 2017-11-04 at 08:19 -0600, Jens Axboe wrote:
-> > On 11/03/2017 07:55 PM, Ming Lei wrote:
-> > > It is very expensive to atomic_inc/atomic_dec the host wide counter of
-> > > host->busy_count, and it should have been avoided via blk-mq's mechanism
-> > > of getting driver tag, which uses the more efficient way of sbitmap queue.
-> > > 
-> > > Also we don't check atomic_read(&sdev->device_busy) in scsi_mq_get_budget()
-> > > and don't run queue if the counter becomes zero, so IO hang may be caused
-> > > if all requests are completed just before the current SCSI device
-> > > is added to shost->starved_list.
-> > 
-> > This looks like an improvement. I have added it for 4.15.
-> > 
-> > Bart, does this fix your hang?
-> 
-> No, it doesn't. After I had reduced starget->can_queue in the SRP initiator I
-> ran into the following hang while running the srp-test software:
-> 
-> sysrq: SysRq : Show Blocked State
->   task                        PC stack   pid father
-> systemd-udevd   D    0 19882    467 0x80000106
-> Call Trace:
->  __schedule+0x2fa/0xbb0
->  schedule+0x36/0x90
->  io_schedule+0x16/0x40
->  __lock_page+0x10a/0x140
->  truncate_inode_pages_range+0x4ff/0x800
->  truncate_inode_pages+0x15/0x20
->  kill_bdev+0x35/0x40
->  __blkdev_put+0x6d/0x1f0
->  blkdev_put+0x4e/0x130
->  blkdev_close+0x25/0x30
->  __fput+0xed/0x1f0
->  ____fput+0xe/0x10
->  task_work_run+0x8b/0xc0
->  do_exit+0x38d/0xc70
->  do_group_exit+0x50/0xd0
->  get_signal+0x2ad/0x8c0
->  do_signal+0x28/0x680
->  exit_to_usermode_loop+0x5a/0xa0
->  do_syscall_64+0x12e/0x170
->  entry_SYSCALL64_slow_path+0x25/0x25
-
-I can't reproduce your issue on IB/SRP any more against V4.14-RC4 with
-the following patches, and without any hang after running your 6
-srp-test:
-
-88022d7201e9 blk-mq: don't handle failure in .get_budget
-826a70a08b12 SCSI: don't get target/host busy_count in scsi_mq_get_budget()
-1f460b63d4b3 blk-mq: don't restart queue when .get_budget returns BLK_STS_RESOURCE
-358a3a6bccb7 blk-mq: don't handle TAG_SHARED in restart
-0df21c86bdbf scsi: implement .get_budget and .put_budget for blk-mq
-aeec77629a4a scsi: allow passing in null rq to scsi_prep_state_check()
-b347689ffbca blk-mq-sched: improve dispatching from sw queue
-de1482974080 blk-mq: introduce .get_budget and .put_budget in blk_mq_ops
-63ba8e31c3ac block: kyber: check if there are requests in ctx in kyber_has_work()
-7930d0a00ff5 sbitmap: introduce __sbitmap_for_each_set()
-caf8eb0d604a blk-mq-sched: move actual dispatching into one helper
-5e3d02bbafad blk-mq-sched: dispatch from scheduler IFF progress is made in ->dispatch
-
-
-If you can reproduce, please provide me at least the following log
-first:
-
-	find /sys/kernel/debug/block -name tags | xargs cat | grep busy
-
-If any pending requests arn't completed, please provide the related
-info in dbgfs about where is the request.
-
--- 
-Ming
+T24gU2F0LCAyMDE3LTExLTA0IGF0IDA4OjE5IC0wNjAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
+biAxMS8wMy8yMDE3IDA3OjU1IFBNLCBNaW5nIExlaSB3cm90ZToNCj4gPiBJdCBpcyB2ZXJ5IGV4
+cGVuc2l2ZSB0byBhdG9taWNfaW5jL2F0b21pY19kZWMgdGhlIGhvc3Qgd2lkZSBjb3VudGVyIG9m
+DQo+ID4gaG9zdC0+YnVzeV9jb3VudCwgYW5kIGl0IHNob3VsZCBoYXZlIGJlZW4gYXZvaWRlZCB2
+aWEgYmxrLW1xJ3MgbWVjaGFuaXNtDQo+ID4gb2YgZ2V0dGluZyBkcml2ZXIgdGFnLCB3aGljaCB1
+c2VzIHRoZSBtb3JlIGVmZmljaWVudCB3YXkgb2Ygc2JpdG1hcCBxdWV1ZS4NCj4gPiANCj4gPiBB
+bHNvIHdlIGRvbid0IGNoZWNrIGF0b21pY19yZWFkKCZzZGV2LT5kZXZpY2VfYnVzeSkgaW4gc2Nz
+aV9tcV9nZXRfYnVkZ2V0KCkNCj4gPiBhbmQgZG9uJ3QgcnVuIHF1ZXVlIGlmIHRoZSBjb3VudGVy
+IGJlY29tZXMgemVybywgc28gSU8gaGFuZyBtYXkgYmUgY2F1c2VkDQo+ID4gaWYgYWxsIHJlcXVl
+c3RzIGFyZSBjb21wbGV0ZWQganVzdCBiZWZvcmUgdGhlIGN1cnJlbnQgU0NTSSBkZXZpY2UNCj4g
+PiBpcyBhZGRlZCB0byBzaG9zdC0+c3RhcnZlZF9saXN0Lg0KPiANCj4gVGhpcyBsb29rcyBsaWtl
+IGFuIGltcHJvdmVtZW50LiBJIGhhdmUgYWRkZWQgaXQgZm9yIDQuMTUuDQo+IA0KPiBCYXJ0LCBk
+b2VzIHRoaXMgZml4IHlvdXIgaGFuZz8NCg0KTm8sIGl0IGRvZXNuJ3QuIEFmdGVyIEkgaGFkIHJl
+ZHVjZWQgc3RhcmdldC0+Y2FuX3F1ZXVlIGluIHRoZSBTUlAgaW5pdGlhdG9yIEkNCnJhbiBpbnRv
+IHRoZSBmb2xsb3dpbmcgaGFuZyB3aGlsZSBydW5uaW5nIHRoZSBzcnAtdGVzdCBzb2Z0d2FyZToN
+Cg0Kc3lzcnE6IFN5c1JxIDogU2hvdyBCbG9ja2VkIFN0YXRlDQogIHRhc2sgICAgICAgICAgICAg
+ICAgICAgICAgICBQQyBzdGFjayAgIHBpZCBmYXRoZXINCnN5c3RlbWQtdWRldmQgICBEICAgIDAg
+MTk4ODIgICAgNDY3IDB4ODAwMDAxMDYNCkNhbGwgVHJhY2U6DQogX19zY2hlZHVsZSsweDJmYS8w
+eGJiMA0KIHNjaGVkdWxlKzB4MzYvMHg5MA0KIGlvX3NjaGVkdWxlKzB4MTYvMHg0MA0KIF9fbG9j
+a19wYWdlKzB4MTBhLzB4MTQwDQogdHJ1bmNhdGVfaW5vZGVfcGFnZXNfcmFuZ2UrMHg0ZmYvMHg4
+MDANCiB0cnVuY2F0ZV9pbm9kZV9wYWdlcysweDE1LzB4MjANCiBraWxsX2JkZXYrMHgzNS8weDQw
+DQogX19ibGtkZXZfcHV0KzB4NmQvMHgxZjANCiBibGtkZXZfcHV0KzB4NGUvMHgxMzANCiBibGtk
+ZXZfY2xvc2UrMHgyNS8weDMwDQogX19mcHV0KzB4ZWQvMHgxZjANCiBfX19fZnB1dCsweGUvMHgx
+MA0KIHRhc2tfd29ya19ydW4rMHg4Yi8weGMwDQogZG9fZXhpdCsweDM4ZC8weGM3MA0KIGRvX2dy
+b3VwX2V4aXQrMHg1MC8weGQwDQogZ2V0X3NpZ25hbCsweDJhZC8weDhjMA0KIGRvX3NpZ25hbCsw
+eDI4LzB4NjgwDQogZXhpdF90b191c2VybW9kZV9sb29wKzB4NWEvMHhhMA0KIGRvX3N5c2NhbGxf
+NjQrMHgxMmUvMHgxNzANCiBlbnRyeV9TWVNDQUxMNjRfc2xvd19wYXRoKzB4MjUvMHgyNQ0KDQpU
+aGUgU1JQIGluaXRpYXRvciBkcml2ZXIgd2FzIG1vZGlmaWVkIGFzIGZvbGxvd3MgZm9yIHRoaXMg
+dGVzdDoNCg0KZGlmZiAtLWdpdCBhL2RyaXZlcnMvaW5maW5pYmFuZC91bHAvc3JwL2liX3NycC5j
+IGIvZHJpdmVycy9pbmZpbmliYW5kL3VscC9zcnAvaWJfc3JwLmMNCmluZGV4IGE2NjY0NDY3NjUx
+ZS4uOWQyNGE4NzFjYzJlIDEwMDY0NA0KLS0tIGEvZHJpdmVycy9pbmZpbmliYW5kL3VscC9zcnAv
+aWJfc3JwLmMNCisrKyBiL2RyaXZlcnMvaW5maW5pYmFuZC91bHAvc3JwL2liX3NycC5jDQoNCkBA
+IC0yODM1LDYgKzI4MzksMTMgQEAgc3RhdGljIGludCBzcnBfcmVzZXRfaG9zdChzdHJ1Y3Qgc2Nz
+aV9jbW5kICpzY21uZCkNCiAJcmV0dXJuIHNycF9yZWNvbm5lY3RfcnBvcnQodGFyZ2V0LT5ycG9y
+dCkgPT0gMCA/IFNVQ0NFU1MgOiBGQUlMRUQ7DQogfQ0KIA0KK3N0YXRpYyBpbnQgc3JwX3Rhcmdl
+dF9hbGxvYyhzdHJ1Y3Qgc2NzaV90YXJnZXQgKnN0YXJnZXQpDQorew0KKwlzdGFyZ2V0LT5jYW5f
+cXVldWUgPSAxOw0KKwlyZXR1cm4gMDsNCit9DQorDQogc3RhdGljIGludCBzcnBfc2xhdmVfYWxs
+b2Moc3RydWN0IHNjc2lfZGV2aWNlICpzZGV2KQ0KIHsNCiAJc3RydWN0IFNjc2lfSG9zdCAqc2hv
+c3QgPSBzZGV2LT5ob3N0Ow0KQEAgLTMwMzksNiArMzA1MCw3IEBAIHN0YXRpYyBzdHJ1Y3Qgc2Nz
+aV9ob3N0X3RlbXBsYXRlIHNycF90ZW1wbGF0ZSA9IHsNCiAJLm1vZHVsZQkJCQk9IFRISVNfTU9E
+VUxFLA0KIAkubmFtZQkJCQk9ICJJbmZpbmlCYW5kIFNSUCBpbml0aWF0b3IiLA0KIAkucHJvY19u
+YW1lCQkJPSBEUlZfTkFNRSwNCisJLnRhcmdldF9hbGxvYwkJCT0gc3JwX3RhcmdldF9hbGxvYywN
+CiAJLnNsYXZlX2FsbG9jCQkJPSBzcnBfc2xhdmVfYWxsb2MsDQogCS5zbGF2ZV9jb25maWd1cmUJ
+CT0gc3JwX3NsYXZlX2NvbmZpZ3VyZSwNCiAJLmluZm8JCQkJPSBzcnBfdGFyZ2V0X2luZm8sDQoN
+CkJhcnQuDQo=
