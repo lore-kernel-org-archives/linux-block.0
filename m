@@ -1,47 +1,118 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Mon, 6 Nov 2017 08:30:40 -0800
-From: Tejun Heo <tj@kernel.org>
-To: Paolo Valente <paolo.valente@linaro.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block <linux-block@vger.kernel.org>,
-	Luca Miccio <lucmiccio@gmail.com>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Mark Brown <broonie@kernel.org>, dhowells@redhat.com, hpa@zytor.com,
-	akinobu.mita@gmail.com
-Subject: Re: high overhead of functions blkg_*stats_* in bfq
-Message-ID: <20171106163040.GC3252168@devbig577.frc2.facebook.com>
-References: <20171018131918.GB1302522@devbig577.frc2.facebook.com>
- <76CAD24C-BE7A-4AE0-A207-0FDD0E6506DD@linaro.org>
- <83aaaeb1-2e04-33ed-193a-7d36024fc9dd@kernel.dk>
- <20171106150002.GY3252168@devbig577.frc2.facebook.com>
- <A9703041-F28C-4068-81AB-4CE36D806716@linaro.org>
- <CDDD839D-93E8-4D63-9456-1AEAF101651B@linaro.org>
- <01f923d7-f263-0664-e214-3d37c63dbfaa@kernel.dk>
- <C223E9AE-BE2D-4603-86BC-E72097DCD6D5@linaro.org>
- <f9483b0c-e1b2-9ed4-f217-01568d1aaa7e@kernel.dk>
- <A4406E55-0956-4A8C-B14D-B95E8743D399@linaro.org>
-MIME-Version: 1.0
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <A4406E55-0956-4A8C-B14D-B95E8743D399@linaro.org>
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: high overhead of functions blkg_*stats_* in bfq
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <f9483b0c-e1b2-9ed4-f217-01568d1aaa7e@kernel.dk>
+Date: Mon, 6 Nov 2017 17:26:38 +0100
+Cc: Tejun Heo <tj@kernel.org>,
+ linux-block <linux-block@vger.kernel.org>,
+ Luca Miccio <lucmiccio@gmail.com>,
+ Ulf Hansson <ulf.hansson@linaro.org>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Mark Brown <broonie@kernel.org>,
+ dhowells@redhat.com,
+ hpa@zytor.com,
+ akinobu.mita@gmail.com
+Message-Id: <A4406E55-0956-4A8C-B14D-B95E8743D399@linaro.org>
+References: <07DF24AB-9B62-4EE5-8B45-3E04C1CEA84C@linaro.org> <20171018131918.GB1302522@devbig577.frc2.facebook.com> <76CAD24C-BE7A-4AE0-A207-0FDD0E6506DD@linaro.org> <83aaaeb1-2e04-33ed-193a-7d36024fc9dd@kernel.dk> <20171106150002.GY3252168@devbig577.frc2.facebook.com> <A9703041-F28C-4068-81AB-4CE36D806716@linaro.org> <CDDD839D-93E8-4D63-9456-1AEAF101651B@linaro.org> <01f923d7-f263-0664-e214-3d37c63dbfaa@kernel.dk> <C223E9AE-BE2D-4603-86BC-E72097DCD6D5@linaro.org> <f9483b0c-e1b2-9ed4-f217-01568d1aaa7e@kernel.dk>
+To: Jens Axboe <axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello,
 
-On Mon, Nov 06, 2017 at 05:26:38PM +0100, Paolo Valente wrote:
-> Yes.  DEBUG_BLK_CGROUP will just serve to keep the for-debugging
-> subset switched off even when the dynamic parameter is on.
-> 
-> We'll wait for possible counter-arguments from Tejun, and then start
-> to work on what you propose.
+> Il giorno 06 nov 2017, alle ore 17:22, Jens Axboe <axboe@kernel.dk> ha =
+scritto:
+>=20
+> On 11/06/2017 09:21 AM, Paolo Valente wrote:
+>>=20
+>>> Il giorno 06 nov 2017, alle ore 17:13, Jens Axboe <axboe@kernel.dk> =
+ha scritto:
+>>>=20
+>>> On 11/06/2017 09:11 AM, Paolo Valente wrote:
+>>>>=20
+>>>>> Il giorno 06 nov 2017, alle ore 16:47, Paolo Valente =
+<paolo.valente@linaro.org> ha scritto:
+>>>>>=20
+>>>>>>=20
+>>>>>> Il giorno 06 nov 2017, alle ore 16:00, Tejun Heo <tj@kernel.org> =
+ha scritto:
+>>>>>>=20
+>>>>>> Hello,
+>>>>>>=20
+>>>>>> On Sun, Nov 05, 2017 at 07:21:01PM -0700, Jens Axboe wrote:
+>>>>>>> It's pointless to give up on this so soon, when no effort has =
+apparently
+>>>>>>> been dedicated to figuring out what the actual issue is yet. So =
+no, no
+>>>>>>> patch that will just disable the stats is going to be accepted.
+>>>>>>>=20
+>>>>>>> That said, I have no idea who uses these stats. Surely someone =
+can
+>>>>>>> answer that question. Tejun?
+>>>>>>=20
+>>>>>> Except for the basic bytes / ios counts, it's all debug fluff, =
+which
+>>>>>> should have been hidden behind a debug boot param or go under =
+debugfs.
+>>>>>> I'm not sure we can get rid of them at this point for cfq but I =
+don't
+>>>>>> see why we'd have them for bfq.
+>>>>>>=20
+>>>>>=20
+>>>>> Ok, then I think this is the right time to ask you what I can =
+throw
+>>>>> way for bfq.  According to your documentation, basic non-debug =
+stats
+>>>>> should be:
+>>>>>=20
+>>>>> blkio.time
+>>>>> blkio.time_recursive
+>>>>> blkio.sectors
+>>>>> blkio.io_service_bytes
+>>>>> blkio.io_service_bytes_recursive
+>>>>> blkio.io_serviced
+>>>>> blkio.io_serviced_recursive
+>>>>> blkio.io_service_time
+>>>>> blkio.io_service_time_recursive
+>>>>> blkio.io_wait_time
+>>>>> blkio.io_wait_time_recursive
+>>>>> blkio.io_merged
+>>>>> blkio.io_merged_recursive
+>>>>> blkio.io_queued
+>>>>> blkio.io_queued_recursive
+>>>>>=20
+>>>>> So, I have to keep them in bfq, right?  Or is there something I =
+can
+>>>>> remove for bfq, in your opinion?  Of course, I would be very happy =
+to remove stuff!
+>>>>>=20
+>>>>=20
+>>>> Or, more mildly, could some of these stats be moved behind
+>>>> CONFIG_DEBUG_BLK_CGROUP?
+>>>=20
+>>> It'd be nice to have them be runtime enabled, but I don't think
+>>> that's a hard requirement at all.
+>>=20
+>> So, you mean *all* stats dynamically enabled/disabled, and disabled =
+by
+>> default.  Plus, some of them also statically filtered, that is
+>> enabled/disabled, through CONFIG_DEBUG_BLK_CGROUP.  Is my
+>> understanding correct?  If it is, we will be happy to do it.
+>=20
+> If you go the enable/disable route, don't make them depend on
+> DEBUG_BLK_CGROUP at all. Just have them be default off, with
+> some way to switch them on.
+>=20
 
-So, I think the only *really* required ones are io_serviced and the
-corresponding byte counts, which are tracked by blk-cgroup core
-anyway.  Everything else can be hidden behind an obviously debug boot
-param, say, bfq.__DEBUG__extra_stats or whatever.
+Yes.  DEBUG_BLK_CGROUP will just serve to keep the for-debugging
+subset switched off even when the dynamic parameter is on.
 
-Thanks.
+We'll wait for possible counter-arguments from Tejun, and then start
+to work on what you propose.
 
--- 
-tejun
+Thanks,
+Paolo
+
+> --=20
+> Jens Axboe
