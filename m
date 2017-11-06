@@ -1,78 +1,49 @@
-Return-Path: <prvs=4780b5c65=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V7 8/8] scsi: sd_zbc: Fix zone information initialization
-Date: Wed,  8 Nov 2017 17:11:18 +0900
-Message-Id: <20171108081118.7632-9-damien.lemoal@wdc.com>
-In-Reply-To: <20171108081118.7632-1-damien.lemoal@wdc.com>
-References: <20171108081118.7632-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-it0-f41.google.com ([209.85.214.41]:55710 "EHLO
+        mail-it0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750888AbdKFIkA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Nov 2017 03:40:00 -0500
+Received: by mail-it0-f41.google.com with SMTP id l196so4187101itl.4
+        for <linux-block@vger.kernel.org>; Mon, 06 Nov 2017 00:40:00 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <1509715220-31885-3-git-send-email-adrian.hunter@intel.com>
+References: <1509715220-31885-1-git-send-email-adrian.hunter@intel.com> <1509715220-31885-3-git-send-email-adrian.hunter@intel.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Mon, 6 Nov 2017 09:39:58 +0100
+Message-ID: <CACRpkdZvLV7cmyKz=DgQj7jM_o=Ns1GFt1vGWaUZezSwYxVQ4w@mail.gmail.com>
+Subject: Re: [PATCH V13 02/10] mmc: block: Add error-handling comments
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Make sure that the device request queue zone information (number of
-zones and zone bitmaps) are reinitialized if the number of zones
-changes (e.g. on a drive capacity change on revalidate).
+On Fri, Nov 3, 2017 at 2:20 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- drivers/scsi/sd_zbc.c | 36 ++++++++++++++++++------------------
- 1 file changed, 18 insertions(+), 18 deletions(-)
+> Add error-handling comments to explain what would also be done for blk-mq
+> if it used the legacy error-handling.
+>
+> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index d2121e7738d7..6c348a211ebb 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -632,29 +632,29 @@ static int sd_zbc_setup(struct scsi_disk *sdkp)
- 		round_up(sdkp->capacity, sdkp->zone_blocks) >> sdkp->zone_shift;
- 
- 	/*
--	 * Wait for the disk capacity to stabilize before
--	 * initializing zone related information.
-+	 * Initialize the device request queue information if the number
-+	 * of zones changed.
- 	 */
--	if (sdkp->first_scan)
--		return 0;
-+	if (sdkp->nr_zones != q->nr_zones) {
- 
--	if (!q->seq_zones_wlock) {
--		q->seq_zones_wlock = sd_zbc_alloc_zone_bitmap(sdkp);
--		if (!q->seq_zones_wlock) {
--			ret = -ENOMEM;
--			goto err;
--		}
--	}
-+		sd_zbc_cleanup(sdkp);
- 
--	if (!q->seq_zones_bitmap) {
--		ret = sd_zbc_setup_seq_zones_bitmap(sdkp);
--		if (ret) {
--			sd_zbc_cleanup(sdkp);
--			goto err;
-+		q->nr_zones = sdkp->nr_zones;
-+		if (sdkp->nr_zones) {
-+			q->seq_zones_wlock = sd_zbc_alloc_zone_bitmap(sdkp);
-+			if (!q->seq_zones_wlock) {
-+				ret = -ENOMEM;
-+				goto err;
-+			}
-+
-+			ret = sd_zbc_setup_seq_zones_bitmap(sdkp);
-+			if (ret) {
-+				sd_zbc_cleanup(sdkp);
-+				goto err;
-+			}
- 		}
--	}
- 
--	q->nr_zones = sdkp->nr_zones;
-+	}
- 
- 	return 0;
- 
--- 
-2.13.6
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+
+Safe to apply right now, during -rc8 as well.
+
+Yours,
+Linus Walleij
