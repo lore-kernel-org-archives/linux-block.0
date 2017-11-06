@@ -1,33 +1,72 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:8929 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753704AbdKFQtp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Nov 2017 11:49:45 -0500
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "osandov@fb.com" <osandov@fb.com>, "hare@suse.com" <hare@suse.com>
-Subject: Re: [PATCH] blk-mq: quiesce queue during switching io sched and
- updating nr_requests
-Date: Mon, 6 Nov 2017 16:49:42 +0000
-Message-ID: <1509986980.2409.27.camel@wdc.com>
-References: <20171106104322.3861-1-ming.lei@redhat.com>
-In-Reply-To: <20171106104322.3861-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Received: from mx1.redhat.com ([209.132.183.28]:60748 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751875AbdKFKnf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 6 Nov 2017 05:43:35 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Omar Sandoval <osandov@fb.com>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Hannes Reinecke <hare@suse.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] blk-mq: quiesce queue during switching io sched and updating nr_requests
+Date: Mon,  6 Nov 2017 18:43:22 +0800
+Message-Id: <20171106104322.3861-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gTW9uLCAyMDE3LTExLTA2IGF0IDE4OjQzICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gQEAg
-LTI2NjUsNiArMjY2NSw3IEBAIGludCBibGtfbXFfdXBkYXRlX25yX3JlcXVlc3RzKHN0cnVjdCBy
-ZXF1ZXN0X3F1ZXVlICpxLCB1bnNpZ25lZCBpbnQgbnIpDQo+ICAJCXJldHVybiAtRUlOVkFMOw0K
-PiAgDQo+ICAJYmxrX21xX2ZyZWV6ZV9xdWV1ZShxKTsNCj4gKwlibGtfbXFfcXVpZXNjZV9xdWV1
-ZShxKTsNCj4gIA0KPiAgCXJldCA9IDA7DQo+ICAJcXVldWVfZm9yX2VhY2hfaHdfY3R4KHEsIGhj
-dHgsIGkpIHsNCg0KQmVmb3JlIG1vcmUgYmxrX21xX3F1aWVzY2VfcXVldWUoKSBjYWxsZXJzIGFy
-ZSBhZGRlZCBhIGNvdW50ZXIgbWVjaGFuaXNtDQpoYXMgdG8gYmUgYWRkZWQgaW50byBibGtfbXFf
-cXVpZXNjZV9xdWV1ZV9ub3dhaXQoKSBhbmQgYmxrX21xX3VucXVpZXNjZV9xdWV1ZSgpDQp0byBh
-dm9pZCB0cm91YmxlIGR1ZSB0byBjb25jdXJyZW50IGJsa19tcV9xdWllc2NlX3F1ZXVlX25vd2Fp
-dCgpIGFuZC9vcg0KYmxrX21xX3VucXVpZXNjZV9xdWV1ZSgpIGNhbGxzLg0KDQpCYXJ0Lg==
+Dispatch may still be in-progress after queue is frozen, so we have to
+quiesce queue before switching IO scheduler and updating nr_requests.
+
+This reverts commit 7a148c2fcff8330(block: don't call blk_mq_quiesce_queue()
+after queue is frozen) basically.
+
+Fixes: 7a148c2fcff83309(block: don't call blk_mq_quiesce_queue() after queue is frozen)
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c   | 2 ++
+ block/elevator.c | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c501cbd0de93..88c3e4c89052 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2665,6 +2665,7 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+ 		return -EINVAL;
+ 
+ 	blk_mq_freeze_queue(q);
++	blk_mq_quiesce_queue(q);
+ 
+ 	ret = 0;
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+@@ -2688,6 +2689,7 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+ 	if (!ret)
+ 		q->nr_requests = nr;
+ 
++	blk_mq_unquiesce_queue(q);
+ 	blk_mq_unfreeze_queue(q);
+ 
+ 	return ret;
+diff --git a/block/elevator.c b/block/elevator.c
+index 7bda083d5968..138faeb08a7c 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -968,6 +968,7 @@ static int elevator_switch_mq(struct request_queue *q,
+ 	int ret;
+ 
+ 	blk_mq_freeze_queue(q);
++	blk_mq_quiesce_queue(q);
+ 
+ 	if (q->elevator) {
+ 		if (q->elevator->registered)
+@@ -994,6 +995,7 @@ static int elevator_switch_mq(struct request_queue *q,
+ 		blk_add_trace_msg(q, "elv switch: none");
+ 
+ out:
++	blk_mq_unquiesce_queue(q);
+ 	blk_mq_unfreeze_queue(q);
+ 	return ret;
+ }
+-- 
+2.9.5
