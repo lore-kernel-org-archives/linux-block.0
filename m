@@ -1,101 +1,72 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:38648 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753018AbdKGC1W (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 6 Nov 2017 21:27:22 -0500
-Date: Tue, 7 Nov 2017 10:27:11 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:48064 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752655AbdKFQeY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Nov 2017 11:34:24 -0500
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "hch@infradead.org" <hch@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "osandov@fb.com" <osandov@fb.com>, "axboe@fb.com" <axboe@fb.com>,
         "hare@suse.com" <hare@suse.com>
 Subject: Re: [PATCH] blk-mq: respect queue dead via blk_mq_quiesce_queue
-Message-ID: <20171107022710.GD15090@ming.t460p>
+Date: Mon, 6 Nov 2017 16:34:21 +0000
+Message-ID: <1509986060.2409.17.camel@wdc.com>
 References: <20171105121008.28180-1-ming.lei@redhat.com>
- <1509896328.2697.4.camel@wdc.com>
- <20171106034423.GC26416@ming.t460p>
- <1509986060.2409.17.camel@wdc.com>
+         <1509896328.2697.4.camel@wdc.com> <20171106034423.GC26416@ming.t460p>
+In-Reply-To: <20171106034423.GC26416@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1509986060.2409.17.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, Nov 06, 2017 at 04:34:21PM +0000, Bart Van Assche wrote:
-> On Mon, 2017-11-06 at 11:44 +0800, Ming Lei wrote:
-> > On Sun, Nov 05, 2017 at 03:38:49PM +0000, Bart Van Assche wrote:
-> > > On Sun, 2017-11-05 at 20:10 +0800, Ming Lei wrote:
-> > > > diff --git a/block/blk-core.c b/block/blk-core.c
-> > > > index 048be4aa6024..0b121f29e3b1 100644
-> > > > --- a/block/blk-core.c
-> > > > +++ b/block/blk-core.c
-> > > > @@ -658,6 +658,10 @@ void blk_cleanup_queue(struct request_queue *q)
-> > > >  	queue_flag_set(QUEUE_FLAG_DEAD, q);
-> > > >  	spin_unlock_irq(lock);
-> > > >  
-> > > > +	/* respect queue DEAD via quiesce for blk-mq */
-> > > > +	if (q->mq_ops)
-> > > > +		blk_mq_quiesce_queue(q);
-> > > > +
-> > > >  	/* for synchronous bio-based driver finish in-flight integrity i/o */
-> > > >  	blk_flush_integrity();
-> > > 
-> > > Have you considered to change the blk_freeze_queue_start() call in
-> > > blk_set_queue_dying() into a blk_freeze_queue() call? That approach has the
-> > > advantage that no new if (q->mq_ops) test has to be introduced.
-> > 
-> > That approach isn't nothing to do with this issue, and can't fix this issue
-> > too.
-> 
-> Sorry but I disagree. My opinion is that the change I proposed is a more
-> elegant way to avoid that blk_mq_run_hw_queue() tries to execute a request
-> after blk_cleanup_queue() has started.
-> 
-> > Not mention we hold q->sysfs_lock before calling blk_set_queue_dying(),
-> > there may be risk to cause deadlock.
-> 
-> Sorry but I disagree again. q->sysfs_lock is not obtained from inside any
-> code that runs the queue so there is no deadlock risk. Additionally, I doubt
-> that it is useful to obtain q->sysfs_lock from inside blk_cleanup_queue().
-> The queue attributes that are exported through sysfs can be modified safely
-> until these sysfs attributes are removed.
-> 
-> > The issue is that there isn't any request in queue(queue is frozen), but
-> > dispatch still may happen, let me explain it a bit:
-> > 
-> > 1) there are several IO submit paths in-progress
-> > 2) requests from all these paths are inserted to queue, but may dispatch to
-> > LLD in only one of these paths, but other paths may still move on to dispatch
-> > even all these requests are completed(that means blk_mq_freeze_queue_wait()
-> > returns at that time)
-> > 3) the dispatch after queue dead happens and causes the use-after-free,
-> > because we never respect queue dead for blk-mq.
-> 
-> After a queue has been marked "dying" and after blk_freeze_queue() has
-> returned it is guaranteed that all requests have finished and that all future
-> blk_get_request() calls will fail. Hence .queue_rq() won't be called anymore.
-> Any code that runs a queue (the __blk_mq_run_hw_queue() / blk_mq_make_request()
-> callers) must hold a reference on that queue. Running a queue even after
-
-The reference is released via blk_queue_exit() when the request is freed in
-blk_mq_free_request(), but the dispatch may still be in-progress after the request
-is freed. I suggest you to take a look at the following words carefully,
-and if you think something is wrong, please comment on it directly:
-
-	1) there are several IO submit paths in-progress
-
-	2) requests from all these paths are inserted to queue, but may dispatch to
-	LLD in only one of these paths, but other paths may still move on to dispatch
-	even all these requests are completed(that means blk_mq_freeze_queue_wait()
-	returns at that time)
-
-	3) the dispatch after queue dead happens and causes the use-after-free,
-	because we never respect queue dead for blk-mq.
-
-blk_freeze_queue() can make sure that no .queue_rq() can be run, but
-can't make sure the other dispatch part(like dequeue, check if there is
-work in queue, ...) is finished.
-
--- 
-Ming
+T24gTW9uLCAyMDE3LTExLTA2IGF0IDExOjQ0ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
+U3VuLCBOb3YgMDUsIDIwMTcgYXQgMDM6Mzg6NDlQTSArMDAwMCwgQmFydCBWYW4gQXNzY2hlIHdy
+b3RlOg0KPiA+IE9uIFN1biwgMjAxNy0xMS0wNSBhdCAyMDoxMCArMDgwMCwgTWluZyBMZWkgd3Jv
+dGU6DQo+ID4gPiBkaWZmIC0tZ2l0IGEvYmxvY2svYmxrLWNvcmUuYyBiL2Jsb2NrL2Jsay1jb3Jl
+LmMNCj4gPiA+IGluZGV4IDA0OGJlNGFhNjAyNC4uMGIxMjFmMjllM2IxIDEwMDY0NA0KPiA+ID4g
+LS0tIGEvYmxvY2svYmxrLWNvcmUuYw0KPiA+ID4gKysrIGIvYmxvY2svYmxrLWNvcmUuYw0KPiA+
+ID4gQEAgLTY1OCw2ICs2NTgsMTAgQEAgdm9pZCBibGtfY2xlYW51cF9xdWV1ZShzdHJ1Y3QgcmVx
+dWVzdF9xdWV1ZSAqcSkNCj4gPiA+ICAJcXVldWVfZmxhZ19zZXQoUVVFVUVfRkxBR19ERUFELCBx
+KTsNCj4gPiA+ICAJc3Bpbl91bmxvY2tfaXJxKGxvY2spOw0KPiA+ID4gIA0KPiA+ID4gKwkvKiBy
+ZXNwZWN0IHF1ZXVlIERFQUQgdmlhIHF1aWVzY2UgZm9yIGJsay1tcSAqLw0KPiA+ID4gKwlpZiAo
+cS0+bXFfb3BzKQ0KPiA+ID4gKwkJYmxrX21xX3F1aWVzY2VfcXVldWUocSk7DQo+ID4gPiArDQo+
+ID4gPiAgCS8qIGZvciBzeW5jaHJvbm91cyBiaW8tYmFzZWQgZHJpdmVyIGZpbmlzaCBpbi1mbGln
+aHQgaW50ZWdyaXR5IGkvbyAqLw0KPiA+ID4gIAlibGtfZmx1c2hfaW50ZWdyaXR5KCk7DQo+ID4g
+DQo+ID4gSGF2ZSB5b3UgY29uc2lkZXJlZCB0byBjaGFuZ2UgdGhlIGJsa19mcmVlemVfcXVldWVf
+c3RhcnQoKSBjYWxsIGluDQo+ID4gYmxrX3NldF9xdWV1ZV9keWluZygpIGludG8gYSBibGtfZnJl
+ZXplX3F1ZXVlKCkgY2FsbD8gVGhhdCBhcHByb2FjaCBoYXMgdGhlDQo+ID4gYWR2YW50YWdlIHRo
+YXQgbm8gbmV3IGlmIChxLT5tcV9vcHMpIHRlc3QgaGFzIHRvIGJlIGludHJvZHVjZWQuDQo+IA0K
+PiBUaGF0IGFwcHJvYWNoIGlzbid0IG5vdGhpbmcgdG8gZG8gd2l0aCB0aGlzIGlzc3VlLCBhbmQg
+Y2FuJ3QgZml4IHRoaXMgaXNzdWUNCj4gdG9vLg0KDQpTb3JyeSBidXQgSSBkaXNhZ3JlZS4gTXkg
+b3BpbmlvbiBpcyB0aGF0IHRoZSBjaGFuZ2UgSSBwcm9wb3NlZCBpcyBhIG1vcmUNCmVsZWdhbnQg
+d2F5IHRvIGF2b2lkIHRoYXQgYmxrX21xX3J1bl9od19xdWV1ZSgpIHRyaWVzIHRvIGV4ZWN1dGUg
+YSByZXF1ZXN0DQphZnRlciBibGtfY2xlYW51cF9xdWV1ZSgpIGhhcyBzdGFydGVkLg0KDQo+IE5v
+dCBtZW50aW9uIHdlIGhvbGQgcS0+c3lzZnNfbG9jayBiZWZvcmUgY2FsbGluZyBibGtfc2V0X3F1
+ZXVlX2R5aW5nKCksDQo+IHRoZXJlIG1heSBiZSByaXNrIHRvIGNhdXNlIGRlYWRsb2NrLg0KDQpT
+b3JyeSBidXQgSSBkaXNhZ3JlZSBhZ2Fpbi4gcS0+c3lzZnNfbG9jayBpcyBub3Qgb2J0YWluZWQg
+ZnJvbSBpbnNpZGUgYW55DQpjb2RlIHRoYXQgcnVucyB0aGUgcXVldWUgc28gdGhlcmUgaXMgbm8g
+ZGVhZGxvY2sgcmlzay4gQWRkaXRpb25hbGx5LCBJIGRvdWJ0DQp0aGF0IGl0IGlzIHVzZWZ1bCB0
+byBvYnRhaW4gcS0+c3lzZnNfbG9jayBmcm9tIGluc2lkZSBibGtfY2xlYW51cF9xdWV1ZSgpLg0K
+VGhlIHF1ZXVlIGF0dHJpYnV0ZXMgdGhhdCBhcmUgZXhwb3J0ZWQgdGhyb3VnaCBzeXNmcyBjYW4g
+YmUgbW9kaWZpZWQgc2FmZWx5DQp1bnRpbCB0aGVzZSBzeXNmcyBhdHRyaWJ1dGVzIGFyZSByZW1v
+dmVkLg0KDQo+IFRoZSBpc3N1ZSBpcyB0aGF0IHRoZXJlIGlzbid0IGFueSByZXF1ZXN0IGluIHF1
+ZXVlKHF1ZXVlIGlzIGZyb3plbiksIGJ1dA0KPiBkaXNwYXRjaCBzdGlsbCBtYXkgaGFwcGVuLCBs
+ZXQgbWUgZXhwbGFpbiBpdCBhIGJpdDoNCj4gDQo+IDEpIHRoZXJlIGFyZSBzZXZlcmFsIElPIHN1
+Ym1pdCBwYXRocyBpbi1wcm9ncmVzcw0KPiAyKSByZXF1ZXN0cyBmcm9tIGFsbCB0aGVzZSBwYXRo
+cyBhcmUgaW5zZXJ0ZWQgdG8gcXVldWUsIGJ1dCBtYXkgZGlzcGF0Y2ggdG8NCj4gTExEIGluIG9u
+bHkgb25lIG9mIHRoZXNlIHBhdGhzLCBidXQgb3RoZXIgcGF0aHMgbWF5IHN0aWxsIG1vdmUgb24g
+dG8gZGlzcGF0Y2gNCj4gZXZlbiBhbGwgdGhlc2UgcmVxdWVzdHMgYXJlIGNvbXBsZXRlZCh0aGF0
+IG1lYW5zIGJsa19tcV9mcmVlemVfcXVldWVfd2FpdCgpDQo+IHJldHVybnMgYXQgdGhhdCB0aW1l
+KQ0KPiAzKSB0aGUgZGlzcGF0Y2ggYWZ0ZXIgcXVldWUgZGVhZCBoYXBwZW5zIGFuZCBjYXVzZXMg
+dGhlIHVzZS1hZnRlci1mcmVlLA0KPiBiZWNhdXNlIHdlIG5ldmVyIHJlc3BlY3QgcXVldWUgZGVh
+ZCBmb3IgYmxrLW1xLg0KDQpBZnRlciBhIHF1ZXVlIGhhcyBiZWVuIG1hcmtlZCAiZHlpbmciIGFu
+ZCBhZnRlciBibGtfZnJlZXplX3F1ZXVlKCkgaGFzDQpyZXR1cm5lZCBpdCBpcyBndWFyYW50ZWVk
+IHRoYXQgYWxsIHJlcXVlc3RzIGhhdmUgZmluaXNoZWQgYW5kIHRoYXQgYWxsIGZ1dHVyZQ0KYmxr
+X2dldF9yZXF1ZXN0KCkgY2FsbHMgd2lsbCBmYWlsLiBIZW5jZSAucXVldWVfcnEoKSB3b24ndCBi
+ZSBjYWxsZWQgYW55bW9yZS4NCkFueSBjb2RlIHRoYXQgcnVucyBhIHF1ZXVlICh0aGUgX19ibGtf
+bXFfcnVuX2h3X3F1ZXVlKCkgLyBibGtfbXFfbWFrZV9yZXF1ZXN0KCkNCmNhbGxlcnMpIG11c3Qg
+aG9sZCBhIHJlZmVyZW5jZSBvbiB0aGF0IHF1ZXVlLiBSdW5uaW5nIGEgcXVldWUgZXZlbiBhZnRl
+cg0KYmxrX2NsZWFudXBfcXVldWUoKSBmaW5pc2hlZCBpcyBzYWZlIGFzIGxvbmcgYXMgdGhlIGNh
+bGxlciBob2xkcyBhIHJlZmVyZW5jZQ0Kb24gdGhhdCBxdWV1ZS4gU28gdGhlIHNjZW5hcmlvIGRl
+c2NyaWJlZCBhYm92ZSB3b24ndCBsZWFkIHRvIGEgY3Jhc2guDQoNCkJhcnQu
