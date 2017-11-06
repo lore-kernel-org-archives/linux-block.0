@@ -2,123 +2,92 @@ Return-Path: <paolo.valente@linaro.org>
 Return-Path: <paolo.valente@linaro.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: high overhead of functions blkg_*stats_* in bfq 
+Subject: Re: high overhead of functions blkg_*stats_* in bfq
 From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <83aaaeb1-2e04-33ed-193a-7d36024fc9dd@kernel.dk>
-Date: Mon, 6 Nov 2017 19:46:29 +0100
+In-Reply-To: <2614a5f5-5520-5d5f-2013-d7c19fa8f856@kernel.dk>
+Date: Mon, 6 Nov 2017 18:05:58 +0100
 Cc: Tejun Heo <tj@kernel.org>,
  linux-block <linux-block@vger.kernel.org>,
  Luca Miccio <lucmiccio@gmail.com>,
  Ulf Hansson <ulf.hansson@linaro.org>,
  Linus Walleij <linus.walleij@linaro.org>,
  Mark Brown <broonie@kernel.org>,
- David Howells <dhowells@redhat.com>,
- akinobu.mita@gmail.com,
- hpa@zytor.com
-Message-Id: <E40D89CB-5443-4501-8ABF-0BDB51693188@linaro.org>
-References: <07DF24AB-9B62-4EE5-8B45-3E04C1CEA84C@linaro.org> <20171018131918.GB1302522@devbig577.frc2.facebook.com> <76CAD24C-BE7A-4AE0-A207-0FDD0E6506DD@linaro.org> <83aaaeb1-2e04-33ed-193a-7d36024fc9dd@kernel.dk>
+ dhowells@redhat.com,
+ hpa@zytor.com,
+ akinobu.mita@gmail.com
+Message-Id: <21866329-AEE2-4804-933D-70D538140121@linaro.org>
+References: <83aaaeb1-2e04-33ed-193a-7d36024fc9dd@kernel.dk> <20171106150002.GY3252168@devbig577.frc2.facebook.com> <A9703041-F28C-4068-81AB-4CE36D806716@linaro.org> <CDDD839D-93E8-4D63-9456-1AEAF101651B@linaro.org> <01f923d7-f263-0664-e214-3d37c63dbfaa@kernel.dk> <C223E9AE-BE2D-4603-86BC-E72097DCD6D5@linaro.org> <f9483b0c-e1b2-9ed4-f217-01568d1aaa7e@kernel.dk> <A4406E55-0956-4A8C-B14D-B95E8743D399@linaro.org> <20171106163040.GC3252168@devbig577.frc2.facebook.com> <6BC5F831-9777-47A9-A141-B03453F7AF46@linaro.org> <20171106163730.GD3252168@devbig577.frc2.facebook.com> <2614a5f5-5520-5d5f-2013-d7c19fa8f856@kernel.dk>
 To: Jens Axboe <axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
 
-> Il giorno 06 nov 2017, alle ore 03:21, Jens Axboe <axboe@kernel.dk> ha =
+> Il giorno 06 nov 2017, alle ore 17:39, Jens Axboe <axboe@kernel.dk> ha =
 scritto:
 >=20
-> On 11/05/2017 01:39 AM, Paolo Valente wrote:
->>=20
->>> Il giorno 18 ott 2017, alle ore 15:19, Tejun Heo <tj@kernel.org> ha =
+> On 11/06/2017 09:37 AM, Tejun Heo wrote:
+>> On Mon, Nov 06, 2017 at 05:33:45PM +0100, Paolo Valente wrote:
+>>>=20
+>>>> Il giorno 06 nov 2017, alle ore 17:30, Tejun Heo <tj@kernel.org> ha =
 scritto:
+>>>>=20
+>>>> Hello,
+>>>>=20
+>>>> On Mon, Nov 06, 2017 at 05:26:38PM +0100, Paolo Valente wrote:
+>>>>> Yes.  DEBUG_BLK_CGROUP will just serve to keep the for-debugging
+>>>>> subset switched off even when the dynamic parameter is on.
+>>>>>=20
+>>>>> We'll wait for possible counter-arguments from Tejun, and then =
+start
+>>>>> to work on what you propose.
+>>>>=20
+>>>> So, I think the only *really* required ones are io_serviced and the
+>>>> corresponding byte counts, which are tracked by blk-cgroup core
+>>>> anyway.  Everything else can be hidden behind an obviously debug =
+boot
+>>>> param, say, bfq.__DEBUG__extra_stats or whatever.
+>>>>=20
 >>>=20
->>> Hello, Paolo.
->>>=20
->>> On Tue, Oct 17, 2017 at 12:11:01PM +0200, Paolo Valente wrote:
->>> ...
->>>> protected by a per-device scheduler lock.  To give you an idea, on =
-an
->>>> Intel i7-4850HQ, and with 8 threads doing random I/O in parallel on
->>>> null_blk (configured with 0 latency), if the update of groups stats =
-is
->>>> removed, then the throughput grows from 260 to 404 KIOPS.  This and
->>>> all the other results we might share in this thread can be =
-reproduced
->>>> very easily with a (useful) script made by Luca Miccio [1].
->>>=20
->>> I don't think the old request_queue is ever built for multiple CPUs
->>> hitting on a mem-backed device.
->>>=20
+>>> ok, can we change it, or do you want us to change it, for cfq too?
 >>=20
->> Hi,
->> from our measurements, the code and the comments received so far in
->> this thread, I guess that reducing the execution time of =
-blkg_*stats_*
->> functions is not an easy task, and is unlikely to be accomplished in
->> the short term.  In this respect, we have unfortunately found out =
-that
->> executing these functions causes a very high reduction of the
->> sustainable throughput on some CPUs.  For example, -70% on an ARM
->> CortexTM-A53 Octa-core.
+>> I don't have a strong opinion there but it coudl be more hassle than
+>> its worth given how long the stats have been out there.  idk.
 >>=20
->> Thus, to deal with such a considerable slowdown, until the overhead =
-of
->> these functions gets reduced, it may make more sense to switch the
->> update of these statistics off, in all cases where these statistics
->> are not used, while higher performance (or lower power consumption) =
-is
->> welcome/needed.
->>=20
->> We wondered, however, how hazardous it might be to switch the update
->> of these statistics off.  To answer this question, we investigated =
-the
->> extent at which these statistics are used by applications and
->> services.  Mainly, we tried to survey relevant people or
->> forums/mailing lists for involved communities: Linux distributions,
->> systemd, containers and other minor communities.  Nobody reported any
->> application or service using these statistics (either the variant
->> updated by bfq, or that updated by cfq).
->>=20
->> So, one of the patches we are working on gives the user the
->> possibility to disable the update of these statistics online.
+>> Please also note that you can still allow the extra stats to be
+>> enabled run-time through /sys/kernel/module moduleparams and gate =
+them
+>> with the static_branch.  No idea whether making it that way is
+>> worthwhile tho.  Creating / removing the files dynamically is
+>> supported but given that some stats need to be tracking all the time
+>> to be correct (like # in flights), it seems kinda silly.
 >=20
-> If you want help with this, provide an easy way to reproduce this,
-> and/or some decent profiling output. There was one flamegraph posted,
-> but that was basically useless. Just do:
->=20
-> perf record -g -- whatever test
-> perf report -g --no-children
->=20
-> and post the top 10 entries from the perf report.
+> Yeah, I'd keep them enable-only through some boot/module parameter.
+> Folks using this can just reboot to turn them back off.
 >=20
 
-Probably not much meaningful any longer, but just for completeness ...
+Ok to change our solution that way.  One question though: if this
+switch must be system-wide (as I seem to understand), and not only
+bfq-specific, is a per-scheduler-module parameter ok?
 
-We have already passed through what you propose, and unfortunately it
-was useless for us.  In fact, on laptop or desktop processors,
-- bfq total per-request overhead is about 2/3 of CPU cycles, and
-distributed across about four functions;
-- the portion of the above 2/3 of CPU cycles consumed by stat-update
-functions is about 40%, and distributed across five further functions,
-which are in their turn scattered among bfq functions;
-then a list of the absolute top-consuming 10 functions will tell you
-very little.
+> Bonus points for doing the same for CFQ.
+>=20
 
-That's why we ended up using a flamegraph.  In this respect, in
-addition to one of our flamegraphs, in this thread we provided the
-indication of which functions to look for, plus the steps to reproduce
-the data, after your request.
+Prepare the points ... :)
 
-Anyway, if you still want the top 10 entries, we'll provide them for =
-you.
+I'm unsure we can finish all this by the next merge window, so, to not
+miss the chance of the merge window for the other patches we have
+already almost finished, in the next days we'll submit only patches
+to:
+1) Hide behind DEBUG_BLK_CGROUP all the parameters that Tejun said can
+be hidden behind it (only for bfq, as agreed)
+2) Move the execution of stat update functions outside the scheduler
+lock, which does increase parallelism, and provides a boost of about
+30% of sustainable throughput when stats need to be update.  Because
+of the patch in item 1), this boost will provide most benefits when
+DEBUG_BLK_CGROUP is set, and when also the boot/module parameter is
+set, after we will have implemented that too.
 
 Thanks,
 Paolo
 
-> It's pointless to give up on this so soon, when no effort has =
-apparently
-> been dedicated to figuring out what the actual issue is yet. So no, no
-> patch that will just disable the stats is going to be accepted.
->=20
-> That said, I have no idea who uses these stats. Surely someone can
-> answer that question. Tejun?
->=20
 > --=20
 > Jens Axboe
