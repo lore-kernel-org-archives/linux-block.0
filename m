@@ -1,63 +1,42 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from LGEAMRELO13.lge.com ([156.147.23.53]:38039 "EHLO
-        lgeamrelo13.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750818AbdKKN0g (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 11 Nov 2017 08:26:36 -0500
-From: Byungchul Park <byungchul.park@lge.com>
-To: peterz@infradead.org, mingo@kernel.org
-Cc: tglx@linutronix.de, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org,
-        kernel-team@lge.com
-Subject: [PATCH v3 4/5] locking/Documentation: Add an example to help crossrelease.txt more readable
-Date: Sat, 11 Nov 2017 22:26:31 +0900
-Message-Id: <1510406792-28676-5-git-send-email-byungchul.park@lge.com>
-In-Reply-To: <1510406792-28676-1-git-send-email-byungchul.park@lge.com>
-References: <1510406792-28676-1-git-send-email-byungchul.park@lge.com>
+Received: from mail-lf0-f47.google.com ([209.85.215.47]:47443 "EHLO
+        mail-lf0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1758143AbdKGQgX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Nov 2017 11:36:23 -0500
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH 3/3] nvme: fix eui_show() print format
+From: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javigon.napster@gmail.com>
+In-Reply-To: <20171107162828.GA26824@lst.de>
+Date: Tue, 7 Nov 2017 17:36:18 +0100
+Cc: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>,
+        linux-block@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Keith Busch <keith.busch@intel.com>,
+        Joe Perches <joe@perches.com>
+Message-Id: <7A69CDDA-7901-4A4C-BCE4-B5A83300202C@gmail.com>
+References: <1509703370-20379-1-git-send-email-javier@cnexlabs.com> <1509703370-20379-4-git-send-email-javier@cnexlabs.com> <20171103125516.GC25186@lst.de> <1509722197.15520.17.camel@perches.com> <2AC384A2-C792-45AF-AF11-89CBC128C527@lightnvm.io> <20171107162828.GA26824@lst.de>
+To: Christoph Hellwig <hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Add an example explaining the rationale that the limitation that old
-lockdep implies, can be relaxed.
 
-Signed-off-by: Byungchul Park <byungchul.park@lge.com>
----
- Documentation/locking/crossrelease.txt | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+> On 7 Nov 2017, at 17.28, Christoph Hellwig <hch@lst.de> wrote:
+>=20
+> On Sat, Nov 04, 2017 at 12:22:20PM +0100, Javier Gonz=C3=A1lez wrote:
+>>> Perhaps this should just become
+>>>=20
+>>>    %8ph
+>>>=20
+>>> without D
+>>=20
+>> That would be ok with me.
+>=20
+> Can you resend a patch for that?
+>=20
 
-diff --git a/Documentation/locking/crossrelease.txt b/Documentation/locking/crossrelease.txt
-index bb449e8..dac56f4 100644
---- a/Documentation/locking/crossrelease.txt
-+++ b/Documentation/locking/crossrelease.txt
-@@ -281,6 +281,29 @@ causes a deadlock. The more lockdep adds dependencies, the more it
- thoroughly works. Thus, lockdep has to do its best to detect and add as
- many true dependencies to the graph as possible.
- 
-+For example:
-+
-+   CONTEXT X			   CONTEXT Y
-+   ---------			   ---------
-+				   acquire A
-+   acquire B /* A dependency 'A -> B' exists */
-+   release B
-+   release A held by Y
-+
-+   where A and B are different lock classes.
-+
-+In this case, a dependency 'A -> B' exists since:
-+
-+   1. A waiter for A and a waiter for B might exist when acquiring B.
-+   2. The only way to wake up each is to release what it waits for.
-+   3. Whether the waiter for A can be woken up depends on whether the
-+      other can. In other words, CONTEXT X cannot release A if it fails
-+      to acquire B.
-+
-+Considering only typical locks, lockdep builds nothing. However,
-+relaxing the limitation, a dependency 'A -> B' can be added, giving us
-+more chances to check circular dependencies.
-+
- However, it might suffer performance degradation since
- relaxing the limitation, with which design and implementation of lockdep
- can be efficient, might introduce inefficiency inevitably. So lockdep
--- 
-1.9.1
+Sure. I=E2=80=99ll send it tomorrow together with the copy fix with the righ=
+t commit message.=20
+
+Javier=
