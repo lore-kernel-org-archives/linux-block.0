@@ -1,116 +1,32 @@
-Return-Path: <prvs=47960c428=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V8 2/7] mq-deadline: Introduce dispatch helpers
-Date: Thu,  9 Nov 2017 15:57:02 +0900
-Message-Id: <20171109065707.17210-3-damien.lemoal@wdc.com>
-In-Reply-To: <20171109065707.17210-1-damien.lemoal@wdc.com>
-References: <20171109065707.17210-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:56877 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752194AbdKGPyi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Nov 2017 10:54:38 -0500
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "roman.penyaev@profitbricks.com" <roman.penyaev@profitbricks.com>
+CC: Bart Van Assche <Bart.VanAssche@wdc.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "hare@suse.com" <hare@suse.com>, "axboe@fb.com" <axboe@fb.com>,
+        "hch@lst.de" <hch@lst.de>
+Subject: Re: [PATCH 1/1] [RFC] blk-mq: fix queue stalling on shared hctx
+ restart
+Date: Tue, 7 Nov 2017 15:54:35 +0000
+Message-ID: <1510070074.2656.2.camel@wdc.com>
+References: <20171018102206.26020-1-roman.penyaev@profitbricks.com>
+In-Reply-To: <20171018102206.26020-1-roman.penyaev@profitbricks.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Avoid directly referencing the next_rq and fifo_list arrays using the
-helper functions deadline_next_request() and deadline_fifo_request() to
-facilitate changes in the dispatch request selection in
-__dd_dispatch_request() for zoned block devices.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Bart Van Assche <Bart.VanAssche@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
----
- block/mq-deadline.c | 45 +++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 37 insertions(+), 8 deletions(-)
-
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 0179e484ec98..8bd6db9e69c7 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -192,13 +192,42 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
- }
- 
- /*
-+ * For the specified data direction, return the next request to
-+ * dispatch using arrival ordered lists.
-+ */
-+static struct request *
-+deadline_fifo_request(struct deadline_data *dd, int data_dir)
-+{
-+	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
-+		return NULL;
-+
-+	if (list_empty(&dd->fifo_list[data_dir]))
-+		return NULL;
-+
-+	return rq_entry_fifo(dd->fifo_list[data_dir].next);
-+}
-+
-+/*
-+ * For the specified data direction, return the next request to
-+ * dispatch using sector position sorted lists.
-+ */
-+static struct request *
-+deadline_next_request(struct deadline_data *dd, int data_dir)
-+{
-+	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
-+		return NULL;
-+
-+	return dd->next_rq[data_dir];
-+}
-+
-+/*
-  * deadline_dispatch_requests selects the best request according to
-  * read/write expire, fifo_batch, etc
-  */
- static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- {
- 	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
--	struct request *rq;
-+	struct request *rq, *next_rq;
- 	bool reads, writes;
- 	int data_dir;
- 
-@@ -214,10 +243,9 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	/*
- 	 * batches are currently reads XOR writes
- 	 */
--	if (dd->next_rq[WRITE])
--		rq = dd->next_rq[WRITE];
--	else
--		rq = dd->next_rq[READ];
-+	rq = deadline_next_request(dd, WRITE);
-+	if (!rq)
-+		rq = deadline_next_request(dd, READ);
- 
- 	if (rq && dd->batching < dd->fifo_batch)
- 		/* we have a next request are still entitled to batch */
-@@ -260,19 +288,20 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	/*
- 	 * we are not running a batch, find best request for selected data_dir
- 	 */
--	if (deadline_check_fifo(dd, data_dir) || !dd->next_rq[data_dir]) {
-+	next_rq = deadline_next_request(dd, data_dir);
-+	if (deadline_check_fifo(dd, data_dir) || !next_rq) {
- 		/*
- 		 * A deadline has expired, the last request was in the other
- 		 * direction, or we have run out of higher-sectored requests.
- 		 * Start again from the request with the earliest expiry time.
- 		 */
--		rq = rq_entry_fifo(dd->fifo_list[data_dir].next);
-+		rq = deadline_fifo_request(dd, data_dir);
- 	} else {
- 		/*
- 		 * The last req was the same dir and we have a next request in
- 		 * sort order. No expired requests so continue on from here.
- 		 */
--		rq = dd->next_rq[data_dir];
-+		rq = next_rq;
- 	}
- 
- 	dd->batching = 0;
--- 
-2.13.6
+T24gV2VkLCAyMDE3LTEwLTE4IGF0IDEyOjIyICswMjAwLCBSb21hbiBQZW4gd3JvdGU6DQo+IHRo
+ZSBwYXRjaCBiZWxvdyBmaXhlcyBxdWV1ZSBzdGFsbGluZyB3aGVuIHNoYXJlZCBoY3R4IG1hcmtl
+ZCBmb3IgcmVzdGFydA0KPiAoQkxLX01RX1NfU0NIRURfUkVTVEFSVCBiaXQpIGJ1dCBxLT5zaGFy
+ZWRfaGN0eF9yZXN0YXJ0IHN0YXlzIHplcm8uDQoNClNpbmNlIEkgaGF2ZSBiZWVuIGFibGUgdG8g
+cmVwcm9kdWNlIHRoaXMgcXVldWUgc3RhbGwgd2l0aCBhbiB1cHN0cmVhbSBkcml2ZXINCihpYl9z
+cnApIGFuZCBzaW5jZSBJIGFsc28gaGF2ZSBiZWVuIGFibGUgdG8gdmVyaWZ5IHRoYXQgdGhpcyBw
+YXRjaCBmaXhlcyB0aGF0DQpzdGFsbDoNCg0KUmV2aWV3ZWQtYnk6IEJhcnQgVmFuIEFzc2NoZSA8
+YmFydC52YW5hc3NjaGVAd2RjLmNvbT4NClRlc3RlZC1ieTogQmFydCBWYW4gQXNzY2hlIDxiYXJ0
+LnZhbmFzc2NoZUB3ZGMuY29tPg==
