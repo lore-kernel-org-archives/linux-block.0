@@ -1,128 +1,41 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:8196 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932321AbdK2Nmm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Nov 2017 08:42:42 -0500
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V15 12/22] mmc: block: Make card_busy_detect() accumulate all response error bits
-Date: Wed, 29 Nov 2017 15:41:09 +0200
-Message-Id: <1511962879-24262-13-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
-References: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] null_blk: add an usage for shared tags in documentation
+To: Minwoo Im <minwoo.im.dev@gmail.com>
+Cc: linux-block@vger.kernel.org, Minwoo Im <dn3108@gmail.com>
+References: <1510064307-20916-1-git-send-email-minwoo.im.dev@gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <761c2f1f-d759-ef17-e630-00de7240715a@kernel.dk>
+Date: Tue, 7 Nov 2017 09:24:31 -0700
+MIME-Version: 1.0
+In-Reply-To: <1510064307-20916-1-git-send-email-minwoo.im.dev@gmail.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Make card_busy_detect() accumulate all response error bits. Later patches
-will make use of this.
+On 11/07/2017 07:18 AM, Minwoo Im wrote:
+> add usage explanation for a shared_tags of
+> commit 82f402fefa50f1675bf918bcd009981bd6b30ac8
+> ("null_blk: add support for shared tags") to this documentation.
+> 
+> Signed-off-by: Minwoo Im <minwoo.im.dev@gmail.com>
+> ---
+>  Documentation/block/null_blk.txt | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/Documentation/block/null_blk.txt b/Documentation/block/null_blk.txt
+> index b7161c8..e1d1aa9 100644
+> --- a/Documentation/block/null_blk.txt
+> +++ b/Documentation/block/null_blk.txt
+> @@ -77,3 +77,8 @@ use_lightnvm=[0/1]: Default: 0
+>  no_sched=[0/1]: Default: 0
+>    0: nullb* use default blk-mq io scheduler.
+>    1: nullb* doesn't use io scheduler.
+> +
+> +shared_tags=[0/1]: Default: 0
+> +  0: Tag set is not shared.
+> +  1: Tag set shared between devices for blk-mq.
+> +     Requires nr_devices to be bigger than 1.
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/core/block.c | 39 +++++++++++++++++++++++++++++----------
- 1 file changed, 29 insertions(+), 10 deletions(-)
+I have added this, but reworded slightly.
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index 6d2c42c1c33a..30fc012353ae 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -923,7 +923,8 @@ static int mmc_sd_num_wr_blocks(struct mmc_card *card, u32 *written_blocks)
- }
- 
- static int card_busy_detect(struct mmc_card *card, unsigned int timeout_ms,
--		bool hw_busy_detect, struct request *req, bool *gen_err)
-+			    bool hw_busy_detect, struct request *req,
-+			    u32 *resp_errs)
- {
- 	unsigned long timeout = jiffies + msecs_to_jiffies(timeout_ms);
- 	int err = 0;
-@@ -937,11 +938,9 @@ static int card_busy_detect(struct mmc_card *card, unsigned int timeout_ms,
- 			return err;
- 		}
- 
--		if (status & R1_ERROR) {
--			pr_err("%s: %s: error sending status cmd, status %#x\n",
--				req->rq_disk->disk_name, __func__, status);
--			*gen_err = true;
--		}
-+		/* Accumulate any response error bits seen */
-+		if (resp_errs)
-+			*resp_errs |= status;
- 
- 		/* We may rely on the host hw to handle busy detection.*/
- 		if ((card->host->caps & MMC_CAP_WAIT_WHILE_BUSY) &&
-@@ -970,6 +969,24 @@ static int card_busy_detect(struct mmc_card *card, unsigned int timeout_ms,
- 	return err;
- }
- 
-+static int card_busy_detect_err(struct mmc_card *card, unsigned int timeout_ms,
-+				bool hw_busy_detect, struct request *req,
-+				bool *gen_err)
-+{
-+	u32 resp_errs = 0;
-+	int err;
-+
-+	err = card_busy_detect(card, timeout_ms, hw_busy_detect, req,
-+			       &resp_errs);
-+	if (resp_errs & R1_ERROR) {
-+		pr_err("%s: %s: error sending status cmd, status %#x\n",
-+		       req->rq_disk->disk_name, __func__, resp_errs);
-+		*gen_err = true;
-+	}
-+
-+	return err;
-+}
-+
- static int send_stop(struct mmc_card *card, unsigned int timeout_ms,
- 		struct request *req, bool *gen_err, u32 *stop_status)
- {
-@@ -1012,7 +1029,8 @@ static int send_stop(struct mmc_card *card, unsigned int timeout_ms,
- 		*gen_err = true;
- 	}
- 
--	return card_busy_detect(card, timeout_ms, use_r1b_resp, req, gen_err);
-+	return card_busy_detect_err(card, timeout_ms, use_r1b_resp, req,
-+				    gen_err);
- }
- 
- #define ERR_NOMEDIUM	3
-@@ -1553,8 +1571,8 @@ static enum mmc_blk_status __mmc_blk_err_check(struct mmc_card *card,
- 			gen_err = true;
- 		}
- 
--		err = card_busy_detect(card, MMC_BLK_TIMEOUT_MS, false, req,
--					&gen_err);
-+		err = card_busy_detect_err(card, MMC_BLK_TIMEOUT_MS, false, req,
-+					   &gen_err);
- 		if (err)
- 			return MMC_BLK_CMD_ERR;
- 	}
-@@ -2148,7 +2166,8 @@ static int mmc_blk_card_busy(struct mmc_card *card, struct request *req)
- 	if (mmc_host_is_spi(card->host) || rq_data_dir(req) == READ)
- 		return 0;
- 
--	err = card_busy_detect(card, MMC_BLK_TIMEOUT_MS, false, req, &gen_err);
-+	err = card_busy_detect_err(card, MMC_BLK_TIMEOUT_MS, false, req,
-+				   &gen_err);
- 
- 	/* Copy the general error bit so it will be seen later on */
- 	if (gen_err) {
 -- 
-1.9.1
+Jens Axboe
