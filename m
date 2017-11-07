@@ -1,54 +1,28 @@
-Return-Path: <jiangqi903@gmail.com>
-Return-Path: <jiangqi903@gmail.com>
-From: Joseph Qi <jiangqi903@gmail.com>
-Subject: [PATCH] blk-throttle: fix wrong initialization in case of dm device
-To: linux-block <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
- Shaohua Li <shli@fb.com>
-Cc: wenqing.lz@taobao.com, boyu.mt@taobao.com, qijiang.qj@alibaba-inc.com
-Message-ID: <da3a4940-9c03-53e0-8e73-3ea941a374c5@gmail.com>
-Date: Mon, 6 Nov 2017 08:38:59 +0800
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 7 Nov 2017 10:56:21 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH] blk-mq: Revert multiple recent patches
+Message-ID: <20171107025620.GG15090@ming.t460p>
+References: <20171107010731.5099-1-bart.vanassche@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171107010731.5099-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Joseph Qi <qijiang.qj@alibaba-inc.com>
+On Mon, Nov 06, 2017 at 05:07:31PM -0800, Bart Van Assche wrote:
+> Since we are close to the merge window and since it is too late for
+> reworking patches and algorithms that have turned out to be flawed,
+> revert multiple recent patches. Revert patch "blk-mq: don't handle
+> TAG_SHARED in restart" and all patches that conflict with the revert
+> of that patch because that patch is based on an incorrect assumption,
+> namely that the SCSI starved list can be used as a replacement for
+> the blk-mq queue restarting mechanism. Revert patch "scsi: implement
 
-dm device set QUEUE_FLAG_NONROT in resume, which is after register
-queue. That is to mean, the previous initialization in
-blk_throtl_register_queue is wrong in this case.
-Fix it by checking and then updating the info during root tg
-initialization as we don't have a better choice.
+Why is the replacement correct? Please explain it in details.
 
-Signed-off-by: Joseph Qi <qijiang.qj@alibaba-inc.com>
----
- block/blk-throttle.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 17816a0..6aeb79e 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -539,6 +539,21 @@ static void throtl_pd_init(struct blkg_policy_data *pd)
- 	sq->parent_sq = &td->service_queue;
- 	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && blkg->parent)
- 		sq->parent_sq = &blkg_to_tg(blkg->parent)->service_queue;
-+
-+	/*
-+	 * dm device set QUEUE_FLAG_NONROT in resume, which is after resister
-+	 * queue, so the previous initialization is wrong in this case. Check
-+	 * and update it here.
-+	 */
-+	if (blk_queue_nonrot(blkg->q) &&
-+	    td->filtered_latency != LATENCY_FILTERED_SSD) {
-+		int i;
-+
-+		td->throtl_slice = DFL_THROTL_SLICE_SSD;
-+		td->filtered_latency = LATENCY_FILTERED_SSD;
-+		for (i = 0; i < LATENCY_BUCKET_SIZE; i++)
-+			td->avg_buckets[i].latency = 0;
-+	}
- 	tg->td = td;
- }
- 
 -- 
-1.9.4
+Ming
