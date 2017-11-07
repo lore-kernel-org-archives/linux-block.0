@@ -1,31 +1,107 @@
-Return-Path: <prvs=477c6a222=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"hch@infradead.org" <hch@infradead.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "osandov@fb.com" <osandov@fb.com>,
-	"john.garry@huawei.com" <john.garry@huawei.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "loberman@redhat.com" <loberman@redhat.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 7 Nov 2017 18:15:53 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@infradead.org" <hch@infradead.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"osandov@fb.com" <osandov@fb.com>,
+	"john.garry@huawei.com" <john.garry@huawei.com>,
+	"loberman@redhat.com" <loberman@redhat.com>
 Subject: Re: [PATCH] SCSI: don't get target/host busy_count in
  scsi_mq_get_budget()
-Date: Tue, 7 Nov 2017 16:17:54 +0000
-Message-ID: <1510071472.2656.15.camel@wdc.com>
+Message-ID: <20171107101546.GA2848@ming.t460p>
 References: <20171104015534.32684-1-ming.lei@redhat.com>
-	 <adb7f6bd-bf0d-8176-808b-32a84ac4273a@kernel.dk>
-	 <1509997522.2409.58.camel@wdc.com> <20171107101546.GA2848@ming.t460p>
-In-Reply-To: <20171107101546.GA2848@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
+ <adb7f6bd-bf0d-8176-808b-32a84ac4273a@kernel.dk>
+ <1509997522.2409.58.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1509997522.2409.58.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE3LTExLTA3IGF0IDE4OjE1ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gTGFz
-dCB0aW1lLCB5b3UgZGlkbid0IG1lbnRpb24gdGhlIHRhcmdldCBwYXRjaCBmb3Igc2V0dGluZyBp
-dHMNCj4gY2FuX3F1ZXVlIGFzIDEsIHNvIEkgdGhpbmsgeW91IGNhbid0IHJlcHJvZHVjZSB0aGUg
-aXNzdWUgb24gdXBzdHJlYW0NCj4ga2VybmVsIHdpdGhvdXQgb3V0LW9mLXRyZWUgcGF0Y2guIFRo
-ZW4gbG9va3MgaXQgaXMgYW5vdGhlciBpc3N1ZSwNCj4gYW5kIHdlIGFyZSBtYWtpbmcgcHJvZ3Jl
-c3MgYWN0dWFsbHkuDQoNCklmIEkgZG9uJ3QgdHJ1c3QgYSBwYXRjaCBJIGludHJvZHVjZSBhZGRp
-dGlvbmFsIHRlc3RzLiBUaGUgZmFjdCB0aGF0IEkNCm1vZGlmaWVkIHRoZSBTUlAgaW5pdGlhdG9y
-IGJlZm9yZSB0aGlzIGhhbmcgb2NjdXJyZWQgZG9lcyBub3QgbWVhbiB0aGF0IHRoZQ0KYXBwcm9h
-Y2ggb2YgeW91ciBwYXRjaCBpcyBmaW5lLiBXaGF0IHRoaXMgbWVhbnMgaXMgdGhhdCBhbGwgeW91
-ciBwYXRjaCBkb2VzDQppcyB0byByZWR1Y2UgdGhlIHJhY2Ugd2luZG93IGFuZCB0aGF0IHRoZXJl
-IGlzIHN0aWxsIGEgcmFjZSB3aW5kb3cuDQoNCkJhcnQu
+On Mon, Nov 06, 2017 at 07:45:23PM +0000, Bart Van Assche wrote:
+> On Sat, 2017-11-04 at 08:19 -0600, Jens Axboe wrote:
+> > On 11/03/2017 07:55 PM, Ming Lei wrote:
+> > > It is very expensive to atomic_inc/atomic_dec the host wide counter of
+> > > host->busy_count, and it should have been avoided via blk-mq's mechanism
+> > > of getting driver tag, which uses the more efficient way of sbitmap queue.
+> > > 
+> > > Also we don't check atomic_read(&sdev->device_busy) in scsi_mq_get_budget()
+> > > and don't run queue if the counter becomes zero, so IO hang may be caused
+> > > if all requests are completed just before the current SCSI device
+> > > is added to shost->starved_list.
+> > 
+> > This looks like an improvement. I have added it for 4.15.
+> > 
+> > Bart, does this fix your hang?
+> 
+> No, it doesn't. After I had reduced starget->can_queue in the SRP initiator I
+> ran into the following hang while running the srp-test software:
+> 
+> sysrq: SysRq : Show Blocked State
+>   task                        PC stack   pid father
+> systemd-udevd   D    0 19882    467 0x80000106
+> Call Trace:
+>  __schedule+0x2fa/0xbb0
+>  schedule+0x36/0x90
+>  io_schedule+0x16/0x40
+>  __lock_page+0x10a/0x140
+>  truncate_inode_pages_range+0x4ff/0x800
+>  truncate_inode_pages+0x15/0x20
+>  kill_bdev+0x35/0x40
+>  __blkdev_put+0x6d/0x1f0
+>  blkdev_put+0x4e/0x130
+>  blkdev_close+0x25/0x30
+>  __fput+0xed/0x1f0
+>  ____fput+0xe/0x10
+>  task_work_run+0x8b/0xc0
+>  do_exit+0x38d/0xc70
+>  do_group_exit+0x50/0xd0
+>  get_signal+0x2ad/0x8c0
+>  do_signal+0x28/0x680
+>  exit_to_usermode_loop+0x5a/0xa0
+>  do_syscall_64+0x12e/0x170
+>  entry_SYSCALL64_slow_path+0x25/0x25
+> 
+> The SRP initiator driver was modified as follows for this test:
+> 
+> diff --git a/drivers/infiniband/ulp/srp/ib_srp.c b/drivers/infiniband/ulp/srp/ib_srp.c
+> index a6664467651e..9d24a871cc2e 100644
+> --- a/drivers/infiniband/ulp/srp/ib_srp.c
+> +++ b/drivers/infiniband/ulp/srp/ib_srp.c
+> 
+> @@ -2835,6 +2839,13 @@ static int srp_reset_host(struct scsi_cmnd *scmnd)
+>  	return srp_reconnect_rport(target->rport) == 0 ? SUCCESS : FAILED;
+>  }
+>  
+> +static int srp_target_alloc(struct scsi_target *starget)
+> +{
+> +	starget->can_queue = 1;
+> +	return 0;
+> +}
+> +
+>  static int srp_slave_alloc(struct scsi_device *sdev)
+>  {
+>  	struct Scsi_Host *shost = sdev->host;
+> @@ -3039,6 +3050,7 @@ static struct scsi_host_template srp_template = {
+>  	.module				= THIS_MODULE,
+>  	.name				= "InfiniBand SRP initiator",
+>  	.proc_name			= DRV_NAME,
+> +	.target_alloc			= srp_target_alloc,
+>  	.slave_alloc			= srp_slave_alloc,
+>  	.slave_configure		= srp_slave_configure,
+>  	.info				= srp_target_info,
+
+Last time, you didn't mention the target patch for setting its
+can_queue as 1, so I think you can't reproduce the issue on upstream
+kernel without out-of-tree patch. Then looks it is another issue,
+and we are making progress actually.
+
+I just posted a one-line patch, which should address the small queue
+depth issue, please let us know if it fixes your issue:
+
+	https://marc.info/?l=linux-block&m=151004881411480&w=2
+
+-- 
+Ming
