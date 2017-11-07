@@ -1,39 +1,31 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:38724 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933868AbdKGPID (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 7 Nov 2017 10:08:03 -0500
-Date: Tue, 7 Nov 2017 23:07:48 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: John Garry <john.garry@huawei.com>
-Cc: James Bottomley <JBottomley@parallels.com>,
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Subject: Re: [PATCH] scsi_debugfs: fix crash in scsi_show_rq()
+To: Ming Lei <ming.lei@redhat.com>,
+        James Bottomley <JBottomley@parallels.com>,
         Jens Axboe <axboe@fb.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+References: <20171107145526.19315-1-ming.lei@redhat.com>
+CC: Christoph Hellwig <hch@lst.de>, <linux-scsi@vger.kernel.org>,
+        <linux-block@vger.kernel.org>,
         Bart Van Assche <bart.vanassche@sandisk.com>,
         Omar Sandoval <osandov@fb.com>,
         James Bottomley <James.Bottomley@HansenPartnership.com>,
         Hannes Reinecke <hare@suse.com>
-Subject: Re: [PATCH] scsi_debugfs: fix crash in scsi_show_rq()
-Message-ID: <20171107150747.GA5899@ming.t460p>
-References: <20171107145526.19315-1-ming.lei@redhat.com>
- <88aa2b0b-ef36-411e-a429-06da2dda50d3@huawei.com>
+From: John Garry <john.garry@huawei.com>
+Message-ID: <88aa2b0b-ef36-411e-a429-06da2dda50d3@huawei.com>
+Date: Tue, 7 Nov 2017 15:04:09 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <88aa2b0b-ef36-411e-a429-06da2dda50d3@huawei.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20171107145526.19315-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Nov 07, 2017 at 03:04:09PM +0000, John Garry wrote:
-> Hi Ming,
-> 
-> On 07/11/2017 14:55, Ming Lei wrote:
-> > +		strcpy(buf, "unknow");
-> 
-> typo?
+Hi Ming,
 
-Yeah, will fix it in V2, thanks!
+On 07/11/2017 14:55, Ming Lei wrote:
+ > +		strcpy(buf, "unknow");
 
--- 
-Ming
+typo?
+
+Thanks,
+John
