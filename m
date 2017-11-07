@@ -1,268 +1,121 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:51816 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933718AbdKBP0I (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 Nov 2017 11:26:08 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Omar Sandoval <osandov@fb.com>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Hannes Reinecke <hare@suse.com>, linux-kernel@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 7/7] blk-mq: don't allocate driver tag beforehand for flush rq
-Date: Thu,  2 Nov 2017 23:24:38 +0800
-Message-Id: <20171102152438.25324-8-ming.lei@redhat.com>
-In-Reply-To: <20171102152438.25324-1-ming.lei@redhat.com>
-References: <20171102152438.25324-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <josef@toxicpanda.com>
+Return-Path: <josef@toxicpanda.com>
+From: Josef Bacik <josef@toxicpanda.com>
+To: axboe@kernel.dk,
+	nbd@other.debian.org,
+	linux-block@vger.kernel.org,
+	kernel-team@fb.com
+Cc: Josef Bacik <jbacik@fb.com>
+Subject: [PATCH] nbd: fix bdev invalidation
+Date: Tue,  7 Nov 2017 13:26:56 -0500
+Message-Id: <1510079216-4580-1-git-send-email-josef@toxicpanda.com>
+List-ID: <linux-block@vger.kernel.org>
 
-The behind idea is simple:
+From: Josef Bacik <jbacik@fb.com>
 
-1) for none scheduler, driver tag has to be borrowed for flush rq, otherwise
-we may run out of tag, and IO hang is caused. And get/put driver tag is
-actually noop, so reorder tags isn't necessary at all.
+We do the bdev invalidation sort of haphazardly throughout nbd which has
+resulted in weirdness like partitions not showing up when doing netlink
+connects, or they not disappearing properly in the ioctl case.  Fix this
+by making the invalidation of the device more forceful when we drop our
+config, and make sure we invalidate the bdev every time we make a new
+connection so the partition table is picked up.
 
-2) for real I/O scheduler, we needn't to allocate driver tag beforehand for
-flush rq, and it works just fine to follow the way for normal requests: allocate
-driver tag for each rq just before calling .queue_rq().
-
-One visible change to driver is that the driver tag isn't shared in the flush
-request sequence, that won't be a problem, since we always do that in legacy path.
-
-Then flush rq needn't to be treated specially wrt. get/put driver tag, code gets
-cleanup much, such as, reorder_tags_to_front() is removed, and we needn't to worry
-about request order in dispatch list for avoiding I/O deadlock.
-
-Also we have to put the driver tag before requeueing.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Josef Bacik <jbacik@fb.com>
 ---
- block/blk-flush.c    | 35 ++++++++++++++++++++++++++---------
- block/blk-mq-sched.c | 42 +++++-------------------------------------
- block/blk-mq.c       | 41 ++++++-----------------------------------
- 3 files changed, 37 insertions(+), 81 deletions(-)
+ drivers/block/nbd.c | 37 ++++++++++++++++++-------------------
+ 1 file changed, 18 insertions(+), 19 deletions(-)
 
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index a9773d2075ac..f17170675917 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -231,8 +231,13 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
- 		/* release the tag's ownership to the req cloned from */
- 		spin_lock_irqsave(&fq->mq_flush_lock, flags);
- 		hctx = blk_mq_map_queue(q, flush_rq->mq_ctx->cpu);
--		blk_mq_tag_set_rq(hctx, flush_rq->tag, fq->orig_rq);
--		flush_rq->tag = -1;
-+		if (!q->elevator) {
-+			blk_mq_tag_set_rq(hctx, flush_rq->tag, fq->orig_rq);
-+			flush_rq->tag = -1;
-+		} else {
-+			blk_mq_put_driver_tag_hctx(hctx, flush_rq);
-+			flush_rq->internal_tag = -1;
-+		}
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 5f2a4240a204..ef7398ccb387 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -220,14 +220,6 @@ static void nbd_mark_nsock_dead(struct nbd_device *nbd, struct nbd_sock *nsock,
+ 	nsock->sent = 0;
+ }
+ 
+-static void nbd_size_clear(struct nbd_device *nbd)
+-{
+-	if (nbd->config->bytesize) {
+-		set_capacity(nbd->disk, 0);
+-		kobject_uevent(&nbd_to_dev(nbd)->kobj, KOBJ_CHANGE);
+-	}
+-}
+-
+ static void nbd_size_update(struct nbd_device *nbd)
+ {
+ 	struct nbd_config *config = nbd->config;
+@@ -945,14 +937,20 @@ static int nbd_reconnect_socket(struct nbd_device *nbd, unsigned long arg)
+ 	return -ENOSPC;
+ }
+ 
+-static void nbd_bdev_reset(struct block_device *bdev)
++static void nbd_invalidate_disk(struct nbd_device *nbd)
+ {
+-	if (bdev->bd_openers > 1)
++	struct block_device *bdev;
++
++	if (!nbd->config->bytesize)
+ 		return;
+-	bd_set_size(bdev, 0);
+-	if (max_part > 0) {
+-		blkdev_reread_part(bdev);
++
++	bdev = bdget_disk(nbd->disk, 0);
++	if (bdev) {
++		set_capacity(nbd->disk, 0);
++		__invalidate_device(bdev, true);
+ 		bdev->bd_invalidated = 1;
++		bdput(bdev);
++		kobject_uevent(&nbd_to_dev(nbd)->kobj, KOBJ_CHANGE);
  	}
+ }
  
- 	running = &fq->flush_queue[fq->flush_running_idx];
-@@ -318,19 +323,26 @@ static bool blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq)
- 	blk_rq_init(q, flush_rq);
+@@ -1022,7 +1020,7 @@ static void nbd_config_put(struct nbd_device *nbd)
+ 					&nbd->config_lock)) {
+ 		struct nbd_config *config = nbd->config;
+ 		nbd_dev_dbg_close(nbd);
+-		nbd_size_clear(nbd);
++		nbd_invalidate_disk(nbd);
+ 		if (test_and_clear_bit(NBD_HAS_PID_FILE,
+ 				       &config->runtime_flags))
+ 			device_remove_file(disk_to_dev(nbd->disk), &pid_attr);
+@@ -1110,15 +1108,13 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *b
+ 		return ret;
  
- 	/*
--	 * Borrow tag from the first request since they can't
--	 * be in flight at the same time. And acquire the tag's
--	 * ownership for flush req.
-+	 * In case of none scheduler, borrow tag from the first request
-+	 * since they can't be in flight at the same time. And acquire
-+	 * the tag's ownership for flush req.
-+	 *
-+	 * In case of IO scheduler, flush rq need to borrow scheduler tag
-+	 * just for cheating put/get driver tag.
- 	 */
- 	if (q->mq_ops) {
- 		struct blk_mq_hw_ctx *hctx;
- 
- 		flush_rq->mq_ctx = first_rq->mq_ctx;
--		flush_rq->tag = first_rq->tag;
--		fq->orig_rq = first_rq;
- 
--		hctx = blk_mq_map_queue(q, first_rq->mq_ctx->cpu);
--		blk_mq_tag_set_rq(hctx, first_rq->tag, flush_rq);
-+		if (!q->elevator) {
-+			fq->orig_rq = first_rq;
-+			flush_rq->tag = first_rq->tag;
-+			hctx = blk_mq_map_queue(q, first_rq->mq_ctx->cpu);
-+			blk_mq_tag_set_rq(hctx, first_rq->tag, flush_rq);
-+		} else {
-+			flush_rq->internal_tag = first_rq->internal_tag;
-+		}
+ 	bd_set_size(bdev, config->bytesize);
+-	if (max_part)
+-		bdev->bd_invalidated = 1;
++	bdev->bd_invalidated = 1;
+ 	mutex_unlock(&nbd->config_lock);
+ 	ret = wait_event_interruptible(config->recv_wq,
+ 					 atomic_read(&config->recv_threads) == 0);
+ 	if (ret)
+ 		sock_shutdown(nbd);
+ 	mutex_lock(&nbd->config_lock);
+-	bd_set_size(bdev, 0);
+ 	/* user requested, ignore socket errors */
+ 	if (test_bit(NBD_DISCONNECT_REQUESTED, &config->runtime_flags))
+ 		ret = 0;
+@@ -1131,8 +1127,6 @@ static void nbd_clear_sock_ioctl(struct nbd_device *nbd,
+ 				 struct block_device *bdev)
+ {
+ 	sock_shutdown(nbd);
+-	kill_bdev(bdev);
+-	nbd_bdev_reset(bdev);
+ 	if (test_and_clear_bit(NBD_HAS_CONFIG_REF,
+ 			       &nbd->config->runtime_flags))
+ 		nbd_config_put(nbd);
+@@ -1708,6 +1702,11 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
+ 		}
  	}
- 
- 	flush_rq->cmd_flags = REQ_OP_FLUSH | REQ_PREFLUSH;
-@@ -394,6 +406,11 @@ static void mq_flush_data_end_io(struct request *rq, blk_status_t error)
- 
- 	hctx = blk_mq_map_queue(q, ctx->cpu);
- 
-+	if (q->elevator) {
-+		WARN_ON(rq->tag < 0);
-+		blk_mq_put_driver_tag_hctx(hctx, rq);
+ 	ret = nbd_start_device(nbd);
++	if (!ret) {
++		struct block_device *bdev = bdget_disk(nbd->disk, 0);
++		bdev->bd_invalidated = 1;
++		bdput(bdev);
 +	}
-+
- 	/*
- 	 * After populating an empty queue, kick it to avoid stall.  Read
- 	 * the comment in flush_end_io().
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 32e4ea2d0a77..eb082f82b470 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -366,29 +366,12 @@ static bool blk_mq_sched_bypass_insert(struct blk_mq_hw_ctx *hctx,
- 		return true;
- 	}
- 
--	if (has_sched) {
-+	if (has_sched)
- 		rq->rq_flags |= RQF_SORTED;
--		WARN_ON(rq->tag != -1);
--	}
- 
- 	return false;
- }
- 
--/*
-- * Add flush/fua to the queue. If we fail getting a driver tag, then
-- * punt to the requeue list. Requeue will re-invoke us from a context
-- * that's safe to block from.
-- */
--static void blk_mq_sched_insert_flush(struct blk_mq_hw_ctx *hctx,
--				      struct request *rq, bool can_block)
--{
--	if (blk_mq_get_driver_tag(rq, &hctx, can_block)) {
--		blk_insert_flush(rq);
--		blk_mq_run_hw_queue(hctx, true);
--	} else
--		blk_mq_add_to_requeue_list(rq, false, true);
--}
--
- void blk_mq_sched_insert_request(struct request *rq, bool at_head,
- 				 bool run_queue, bool async, bool can_block)
- {
-@@ -399,10 +382,12 @@ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
- 
- 	/* flush rq in flush machinery need to be dispatched directly */
- 	if (!(rq->rq_flags & RQF_FLUSH_SEQ) && op_is_flush(rq->cmd_flags)) {
--		blk_mq_sched_insert_flush(hctx, rq, can_block);
--		return;
-+		blk_insert_flush(rq);
-+		goto run;
- 	}
- 
-+	WARN_ON(e && (rq->tag != -1));
-+
- 	if (blk_mq_sched_bypass_insert(hctx, !!e, rq))
- 		goto run;
- 
-@@ -429,23 +414,6 @@ void blk_mq_sched_insert_requests(struct request_queue *q,
- 	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, ctx->cpu);
- 	struct elevator_queue *e = hctx->queue->elevator;
- 
--	if (e) {
--		struct request *rq, *next;
--
--		/*
--		 * We bypass requests that already have a driver tag assigned,
--		 * which should only be flushes. Flushes are only ever inserted
--		 * as single requests, so we shouldn't ever hit the
--		 * WARN_ON_ONCE() below (but let's handle it just in case).
--		 */
--		list_for_each_entry_safe(rq, next, list, queuelist) {
--			if (WARN_ON_ONCE(rq->tag != -1)) {
--				list_del_init(&rq->queuelist);
--				blk_mq_sched_bypass_insert(hctx, true, rq);
--			}
--		}
--	}
--
- 	if (e && e->type->ops.mq.insert_requests)
- 		e->type->ops.mq.insert_requests(hctx, list, false);
- 	else
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index bf62065a15ec..445c74e0f5e5 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -650,6 +650,8 @@ static void __blk_mq_requeue_request(struct request *rq)
- {
- 	struct request_queue *q = rq->q;
- 
-+	blk_mq_put_driver_tag(rq);
-+
- 	trace_block_rq_requeue(q, rq);
- 	wbt_requeue(q->rq_wb, &rq->issue_stat);
- 	blk_mq_sched_requeue_request(rq);
-@@ -993,30 +995,6 @@ bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
- 	return rq->tag != -1;
- }
- 
--/*
-- * If we fail getting a driver tag because all the driver tags are already
-- * assigned and on the dispatch list, BUT the first entry does not have a
-- * tag, then we could deadlock. For that case, move entries with assigned
-- * driver tags to the front, leaving the set of tagged requests in the
-- * same order, and the untagged set in the same order.
-- */
--static bool reorder_tags_to_front(struct list_head *list)
--{
--	struct request *rq, *tmp, *first = NULL;
--
--	list_for_each_entry_safe_reverse(rq, tmp, list, queuelist) {
--		if (rq == first)
--			break;
--		if (rq->tag != -1) {
--			list_move(&rq->queuelist, list);
--			if (!first)
--				first = rq;
--		}
--	}
--
--	return first != NULL;
--}
--
- static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode, int flags,
- 				void *key)
- {
-@@ -1077,9 +1055,6 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 
- 		rq = list_first_entry(list, struct request, queuelist);
- 		if (!blk_mq_get_driver_tag(rq, &hctx, false)) {
--			if (!queued && reorder_tags_to_front(list))
--				continue;
--
- 			/*
- 			 * The initial allocation attempt failed, so we need to
- 			 * rerun the hardware queue when a tag is freed.
-@@ -1135,7 +1110,6 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 				nxt = list_first_entry(list, struct request, queuelist);
- 				blk_mq_put_driver_tag(nxt);
- 			}
--			blk_mq_put_driver_tag_hctx(hctx, rq);
- 			list_add(&rq->queuelist, list);
- 			__blk_mq_requeue_request(rq);
- 			break;
-@@ -1704,13 +1678,10 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 	if (unlikely(is_flush_fua)) {
- 		blk_mq_put_ctx(data.ctx);
- 		blk_mq_bio_to_request(rq, bio);
--		if (q->elevator) {
--			blk_mq_sched_insert_request(rq, false, true, true,
--					true);
--		} else {
--			blk_insert_flush(rq);
--			blk_mq_run_hw_queue(data.hctx, true);
--		}
-+
-+		/* bypass scheduler for flush rq */
-+		blk_insert_flush(rq);
-+		blk_mq_run_hw_queue(data.hctx, true);
- 	} else if (plug && q->nr_hw_queues == 1) {
- 		struct request *last = NULL;
- 
+ out:
+ 	mutex_unlock(&nbd->config_lock);
+ 	if (!ret) {
 -- 
-2.9.5
+2.7.5
