@@ -1,45 +1,68 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Wed, 8 Nov 2017 08:39:35 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"hch@infradead.org" <hch@infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"osandov@fb.com" <osandov@fb.com>,
-	"john.garry@huawei.com" <john.garry@huawei.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"loberman@redhat.com" <loberman@redhat.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH] SCSI: don't get target/host busy_count in
  scsi_mq_get_budget()
-Message-ID: <20171108003934.GB20599@ming.t460p>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>,
+ "ming.lei@redhat.com" <ming.lei@redhat.com>
+Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "hch@infradead.org" <hch@infradead.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "osandov@fb.com" <osandov@fb.com>,
+ "john.garry@huawei.com" <john.garry@huawei.com>,
+ "loberman@redhat.com" <loberman@redhat.com>
 References: <20171104015534.32684-1-ming.lei@redhat.com>
  <adb7f6bd-bf0d-8176-808b-32a84ac4273a@kernel.dk>
- <1509997522.2409.58.camel@wdc.com>
- <20171107021125.GB15090@ming.t460p>
+ <1509997522.2409.58.camel@wdc.com> <20171107021125.GB15090@ming.t460p>
  <1510071607.2656.17.camel@wdc.com>
+ <74925156-b425-de0e-de39-0a166ef5c5f3@kernel.dk>
+ <49b5c202-0303-85f7-102a-fcc013e7256e@kernel.dk>
+ <292e3f7d-cfe3-840a-5a5e-d00e01239152@kernel.dk>
+ <a6a505f5-d374-2878-6c55-116255795346@kernel.dk>
+ <1510094074.2656.39.camel@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <a147bd8a-a55b-8643-9aa2-facb805fb1d3@kernel.dk>
+Date: Tue, 7 Nov 2017 15:39:16 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1510071607.2656.17.camel@wdc.com>
+In-Reply-To: <1510094074.2656.39.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Nov 07, 2017 at 04:20:08PM +0000, Bart Van Assche wrote:
-> On Tue, 2017-11-07 at 10:11 +0800, Ming Lei wrote:
-> > If you can reproduce, please provide me at least the following log
-> > first:
-> > 
-> > 	find /sys/kernel/debug/block -name tags | xargs cat | grep busy
-> > 
-> > If any pending requests arn't completed, please provide the related
-> > info in dbgfs about where is the request.
+On 11/07/2017 03:34 PM, Bart Van Assche wrote:
+> On Tue, 2017-11-07 at 15:06 -0700, Jens Axboe wrote:
+>> Just to keep everyone in the loop, this bug is not new to
+>> for-4.15/block, nor is it new to the current 4.14-rc or 4.13. So it's
+>> probably different to what Bart is hitting, but it's a bug none the
+>> less...
 > 
-> Every time I ran the above or a similar command its output was empty. I
-> assume that's because the hang usually occurs in a phase where these debugfs
-> attributes either have not yet been created or have already disappeared.
+> Hello Jens,
+> 
+> There are several reasons why I think that patch "blk-mq: don't handle
+> TAG_SHARED in restart" really should be reverted:
+> * That patch is based on the assumption that only the SCSI driver uses shared
+>   tags. That assumption is not correct. null_blk and nvme also use shared tags.
+> * As my tests have shown, the algorithm for restarting queues based on the
+>   SCSI starved list is flawed. So using that mechanism instead of the blk-mq
+>   shared queue restarting algorithm is wrong.
+> * We are close to the merge window. It is too late for trying to fix the
+>   "blk-mq: don't handle TAG_SHARED in restart" patch.
+> 
+> My proposal is to make sure that what will be sent to Linus during the v4.15
+> merge window works reliably. That means using the v4.13/v4.14 algorithm for
+> queue restarting which is an algorithm that is trusted by the community. If
+> Roman Penyaev's patch could get applied that would be even better.
 
-Could you dump all tags? Then you can see if this attribute is disappeared.
+I'm fine with reverting a single patch, that's still a far cry from the
+giant list. I'd rather get a fix in though, if at all possible. The code
+it removed wasn't exactly the fastest or prettiest solution. But the
+most important part is that we have something that works. If you have a
+test case that is runnable AND reproduces the problem, I'd love to have
+it. I've seen comments to that effect spread over several messages,
+would be nice to have it summarized and readily available for all that
+want to work on it.
 
-If that output is empty, it often means there isn't pending request not
-completed. So if that is true, your hang is _not_ related with RESTART.
+The issue above is NOT a new bug, I ran into it by accident trying to
+reproduce your case. Debugging that one right now, hopefully we'll have
+some closure on that tomorrow and we can move forward on the shared tag
+restart/loop. It smells like a TAG_WAITING race, or a restart race.
 
-Thakns,
-Ming
+-- 
+Jens Axboe
