@@ -1,27 +1,114 @@
-Return-Path: <hch@lst.de>
-Date: Wed, 8 Nov 2017 19:23:45 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <damien.lemoal@wdc.com>
-Cc: linux-scsi@vger.kernel.org,
+Return-Path: <prvs=4780b5c65=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
 	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
 	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: Re: [PATCH V7 2/8] blokc: mq-deadline: Introduce dispatch helpers
-Message-ID: <20171108182345.GA579@lst.de>
-References: <20171108081118.7632-1-damien.lemoal@wdc.com> <20171108081118.7632-3-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171108081118.7632-3-damien.lemoal@wdc.com>
+Subject: [PATCH V7 2/8] blokc: mq-deadline: Introduce dispatch helpers
+Date: Wed,  8 Nov 2017 17:11:12 +0900
+Message-Id: <20171108081118.7632-3-damien.lemoal@wdc.com>
+In-Reply-To: <20171108081118.7632-1-damien.lemoal@wdc.com>
+References: <20171108081118.7632-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Except for a bit of mis-spelling in the Subject this looks fine
-to me:
+Avoid directly referencing the next_rq and fifo_list arrays using the
+helper functions deadline_next_request() and deadline_fifo_request() to
+facilitate changes in the dispatch request selection in
+__dd_dispatch_request() for zoned block devices.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Bart Van Assche <Bart.VanAssche@wdc.com>
+---
+ block/mq-deadline.c | 45 +++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 37 insertions(+), 8 deletions(-)
 
-FYI, I would just simplify the subject to
-
-mq-deadline: Introduce dispatch helpers
-
-and similar in the other patches.
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index 0179e484ec98..8bd6db9e69c7 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -192,13 +192,42 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
+ }
+ 
+ /*
++ * For the specified data direction, return the next request to
++ * dispatch using arrival ordered lists.
++ */
++static struct request *
++deadline_fifo_request(struct deadline_data *dd, int data_dir)
++{
++	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
++		return NULL;
++
++	if (list_empty(&dd->fifo_list[data_dir]))
++		return NULL;
++
++	return rq_entry_fifo(dd->fifo_list[data_dir].next);
++}
++
++/*
++ * For the specified data direction, return the next request to
++ * dispatch using sector position sorted lists.
++ */
++static struct request *
++deadline_next_request(struct deadline_data *dd, int data_dir)
++{
++	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
++		return NULL;
++
++	return dd->next_rq[data_dir];
++}
++
++/*
+  * deadline_dispatch_requests selects the best request according to
+  * read/write expire, fifo_batch, etc
+  */
+ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
+-	struct request *rq;
++	struct request *rq, *next_rq;
+ 	bool reads, writes;
+ 	int data_dir;
+ 
+@@ -214,10 +243,9 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	/*
+ 	 * batches are currently reads XOR writes
+ 	 */
+-	if (dd->next_rq[WRITE])
+-		rq = dd->next_rq[WRITE];
+-	else
+-		rq = dd->next_rq[READ];
++	rq = deadline_next_request(dd, WRITE);
++	if (!rq)
++		rq = deadline_next_request(dd, READ);
+ 
+ 	if (rq && dd->batching < dd->fifo_batch)
+ 		/* we have a next request are still entitled to batch */
+@@ -260,19 +288,20 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	/*
+ 	 * we are not running a batch, find best request for selected data_dir
+ 	 */
+-	if (deadline_check_fifo(dd, data_dir) || !dd->next_rq[data_dir]) {
++	next_rq = deadline_next_request(dd, data_dir);
++	if (deadline_check_fifo(dd, data_dir) || !next_rq) {
+ 		/*
+ 		 * A deadline has expired, the last request was in the other
+ 		 * direction, or we have run out of higher-sectored requests.
+ 		 * Start again from the request with the earliest expiry time.
+ 		 */
+-		rq = rq_entry_fifo(dd->fifo_list[data_dir].next);
++		rq = deadline_fifo_request(dd, data_dir);
+ 	} else {
+ 		/*
+ 		 * The last req was the same dir and we have a next request in
+ 		 * sort order. No expired requests so continue on from here.
+ 		 */
+-		rq = dd->next_rq[data_dir];
++		rq = next_rq;
+ 	}
+ 
+ 	dd->batching = 0;
+-- 
+2.13.6
