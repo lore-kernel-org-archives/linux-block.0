@@ -1,34 +1,32 @@
-Return-Path: <mlyle@lyle.org>
-Return-Path: <mlyle@lyle.org>
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: axboe@kernel.dk
-Subject: Commits for 4.15-- bcache
-Date: Fri, 24 Nov 2017 15:14:23 -0800
-Message-Id: <20171124231427.9563-1-mlyle@lyle.org>
+Return-Path: <martin.petersen@oracle.com>
+To: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: Re: [PATCH V7 8/8] scsi: sd_zbc: Fix zone information initialization
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20171108081118.7632-1-damien.lemoal@wdc.com>
+	<20171108081118.7632-9-damien.lemoal@wdc.com>
+Date: Wed, 08 Nov 2017 18:46:04 -0500
+In-Reply-To: <20171108081118.7632-9-damien.lemoal@wdc.com> (Damien Le Moal's
+	message of "Wed, 8 Nov 2017 17:11:18 +0900")
+Message-ID: <yq1wp30wczn.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
 
-We have a few more small things:
+Damien,
 
-Huacai Chen (1):
-      bcache: Fix building error on MIPS
+> Make sure that the device request queue zone information (number of
+> zones and zone bitmaps) are reinitialized if the number of zones
+> changes (e.g. on a drive capacity change on revalidate).
 
-Michael Lyle (1):
-      bcache: check return value of register_shrinker
+This should probably be part of patch 6.
 
-Rui Hua (1):
-      bcache: recover data from backing when data is clean
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-Tang Junhui (1):
-      bcache: add a comment in journal bucket reading
-
-Most important is Rui Hua's change, which prevents EINTR from being
-returned to users unexpectedly (and is cc'd stable).  All changes are
-reviewed and have had a moderate degree of test.
-
-Thanks,
-
-Mike
+-- 
+Martin K. Petersen	Oracle Linux Engineering
