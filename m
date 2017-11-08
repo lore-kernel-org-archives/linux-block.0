@@ -1,197 +1,50 @@
-Return-Path: <prvs=479c705ad=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, "Christoph
- Hellwig" <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Oleksandr Natalenko <oleksandr@natalenko.name>, Ming Lei
-	<ming.lei@redhat.com>, Martin Steigerwald <martin@lichtvoll.de>, "Bart Van
- Assche" <bart.vanassche@wdc.com>, Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v12 2/7] block: Introduce blk_get_request_flags()
-Date: Thu, 9 Nov 2017 10:49:54 -0800
-Message-ID: <20171109184959.4617-3-bart.vanassche@wdc.com>
-In-Reply-To: <20171109184959.4617-1-bart.vanassche@wdc.com>
-References: <20171109184959.4617-1-bart.vanassche@wdc.com>
+Return-Path: <martin.petersen@oracle.com>
+To: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: Re: [PATCH V7 5/8] block: deadline-iosched: Introduce zone locking support
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20171108081118.7632-1-damien.lemoal@wdc.com>
+	<20171108081118.7632-6-damien.lemoal@wdc.com>
+Date: Wed, 08 Nov 2017 18:38:30 -0500
+In-Reply-To: <20171108081118.7632-6-damien.lemoal@wdc.com> (Damien Le Moal's
+	message of "Wed, 8 Nov 2017 17:11:15 +0900")
+Message-ID: <yq1a7zwxrwp.fsf@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-A side effect of this patch is that the GFP mask that is passed to
-several allocation functions in the legacy block layer is changed
-from GFP_KERNEL into __GFP_DIRECT_RECLAIM.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Tested-by: Martin Steigerwald <martin@lichtvoll.de>
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- block/blk-core.c       | 50 +++++++++++++++++++++++++++++++++++---------------
- include/linux/blkdev.h |  3 +++
- 2 files changed, 38 insertions(+), 15 deletions(-)
+Damien,
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index a4362849059a..0f7093dfc010 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1160,7 +1160,7 @@ int blk_update_nr_requests(struct request_queue *q, unsigned int nr)
-  * @rl: request list to allocate from
-  * @op: operation and flags
-  * @bio: bio to allocate request for (can be %NULL)
-- * @gfp_mask: allocation mask
-+ * @flags: BLQ_MQ_REQ_* flags
-  *
-  * Get a free request from @q.  This function may fail under memory
-  * pressure or if @q is dead.
-@@ -1170,7 +1170,7 @@ int blk_update_nr_requests(struct request_queue *q, unsigned int nr)
-  * Returns request pointer on success, with @q->queue_lock *not held*.
-  */
- static struct request *__get_request(struct request_list *rl, unsigned int op,
--		struct bio *bio, gfp_t gfp_mask)
-+				     struct bio *bio, unsigned int flags)
- {
- 	struct request_queue *q = rl->q;
- 	struct request *rq;
-@@ -1179,6 +1179,8 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
- 	struct io_cq *icq = NULL;
- 	const bool is_sync = op_is_sync(op);
- 	int may_queue;
-+	gfp_t gfp_mask = flags & BLK_MQ_REQ_NOWAIT ? GFP_ATOMIC :
-+			 __GFP_DIRECT_RECLAIM;
- 	req_flags_t rq_flags = RQF_ALLOCED;
- 
- 	lockdep_assert_held(q->queue_lock);
-@@ -1339,7 +1341,7 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
-  * @q: request_queue to allocate request from
-  * @op: operation and flags
-  * @bio: bio to allocate request for (can be %NULL)
-- * @gfp_mask: allocation mask
-+ * @flags: BLK_MQ_REQ_* flags.
-  *
-  * Get a free request from @q.  If %__GFP_DIRECT_RECLAIM is set in @gfp_mask,
-  * this function keeps retrying under memory pressure and fails iff @q is dead.
-@@ -1349,7 +1351,7 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
-  * Returns request pointer on success, with @q->queue_lock *not held*.
-  */
- static struct request *get_request(struct request_queue *q, unsigned int op,
--		struct bio *bio, gfp_t gfp_mask)
-+				   struct bio *bio, unsigned int flags)
- {
- 	const bool is_sync = op_is_sync(op);
- 	DEFINE_WAIT(wait);
-@@ -1361,7 +1363,7 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
- 
- 	rl = blk_get_rl(q, bio);	/* transferred to @rq on success */
- retry:
--	rq = __get_request(rl, op, bio, gfp_mask);
-+	rq = __get_request(rl, op, bio, flags);
- 	if (!IS_ERR(rq))
- 		return rq;
- 
-@@ -1370,7 +1372,7 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
- 		return ERR_PTR(-EAGAIN);
- 	}
- 
--	if (!gfpflags_allow_blocking(gfp_mask) || unlikely(blk_queue_dying(q))) {
-+	if ((flags & BLK_MQ_REQ_NOWAIT) || unlikely(blk_queue_dying(q))) {
- 		blk_put_rl(rl);
- 		return rq;
- 	}
-@@ -1397,10 +1399,13 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
- 	goto retry;
- }
- 
-+/* flags: BLK_MQ_REQ_PREEMPT and/or BLK_MQ_REQ_NOWAIT. */
- static struct request *blk_old_get_request(struct request_queue *q,
--					   unsigned int op, gfp_t gfp_mask)
-+					   unsigned int op, unsigned int flags)
- {
- 	struct request *rq;
-+	gfp_t gfp_mask = flags & BLK_MQ_REQ_NOWAIT ? GFP_ATOMIC :
-+			 __GFP_DIRECT_RECLAIM;
- 	int ret = 0;
- 
- 	WARN_ON_ONCE(q->mq_ops);
-@@ -1413,7 +1418,7 @@ static struct request *blk_old_get_request(struct request_queue *q,
- 	if (ret)
- 		return ERR_PTR(ret);
- 	spin_lock_irq(q->queue_lock);
--	rq = get_request(q, op, NULL, gfp_mask);
-+	rq = get_request(q, op, NULL, flags);
- 	if (IS_ERR(rq)) {
- 		spin_unlock_irq(q->queue_lock);
- 		blk_queue_exit(q);
-@@ -1427,25 +1432,40 @@ static struct request *blk_old_get_request(struct request_queue *q,
- 	return rq;
- }
- 
--struct request *blk_get_request(struct request_queue *q, unsigned int op,
--				gfp_t gfp_mask)
-+/**
-+ * blk_get_request_flags - allocate a request
-+ * @q: request queue to allocate a request for
-+ * @op: operation (REQ_OP_*) and REQ_* flags, e.g. REQ_SYNC.
-+ * @flags: BLK_MQ_REQ_* flags, e.g. BLK_MQ_REQ_NOWAIT.
-+ */
-+struct request *blk_get_request_flags(struct request_queue *q, unsigned int op,
-+				      unsigned int flags)
- {
- 	struct request *req;
- 
-+	WARN_ON_ONCE(op & REQ_NOWAIT);
-+	WARN_ON_ONCE(flags & ~BLK_MQ_REQ_NOWAIT);
-+
- 	if (q->mq_ops) {
--		req = blk_mq_alloc_request(q, op,
--			(gfp_mask & __GFP_DIRECT_RECLAIM) ?
--				0 : BLK_MQ_REQ_NOWAIT);
-+		req = blk_mq_alloc_request(q, op, flags);
- 		if (!IS_ERR(req) && q->mq_ops->initialize_rq_fn)
- 			q->mq_ops->initialize_rq_fn(req);
- 	} else {
--		req = blk_old_get_request(q, op, gfp_mask);
-+		req = blk_old_get_request(q, op, flags);
- 		if (!IS_ERR(req) && q->initialize_rq_fn)
- 			q->initialize_rq_fn(req);
- 	}
- 
- 	return req;
- }
-+EXPORT_SYMBOL(blk_get_request_flags);
-+
-+struct request *blk_get_request(struct request_queue *q, unsigned int op,
-+				gfp_t gfp_mask)
-+{
-+	return blk_get_request_flags(q, op, gfp_mask & __GFP_DIRECT_RECLAIM ?
-+				     0 : BLK_MQ_REQ_NOWAIT);
-+}
- EXPORT_SYMBOL(blk_get_request);
- 
- /**
-@@ -1871,7 +1891,7 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
- 	 * Returns with the queue unlocked.
- 	 */
- 	blk_queue_enter_live(q);
--	req = get_request(q, bio->bi_opf, bio, GFP_NOIO);
-+	req = get_request(q, bio->bi_opf, bio, 0);
- 	if (IS_ERR(req)) {
- 		blk_queue_exit(q);
- 		__wbt_done(q->rq_wb, wb_acct);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 1437ef4d8037..1af5ddd0f631 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -927,6 +927,9 @@ extern void blk_rq_init(struct request_queue *q, struct request *rq);
- extern void blk_init_request_from_bio(struct request *req, struct bio *bio);
- extern void blk_put_request(struct request *);
- extern void __blk_put_request(struct request_queue *, struct request *);
-+extern struct request *blk_get_request_flags(struct request_queue *,
-+					     unsigned int op,
-+					     unsigned int flags);
- extern struct request *blk_get_request(struct request_queue *, unsigned int op,
- 				       gfp_t gfp_mask);
- extern void blk_requeue_request(struct request_queue *, struct request *);
+> Introduce zone write locking to avoid write request reordering with
+> zoned block devices. This is achieved using a finer selection of the
+> next request to dispatch:
+> 1) Any non-write request is always allowed to proceed.
+> 2) Any write to a conventional zone is always allowed to proceed.
+> 3) For a write to a sequential zone, the zone lock is first checked.
+>    a) If the zone is not locked, the write is allowed to proceed after
+>       its target zone is locked.
+>    b) If the zone is locked, the write request is skipped and the next
+>       request in the dispatch queue tested (back to step 1).
+>
+> For a write request that has locked its target zone, the zone is
+> unlocked either when the request completes and the method
+> deadline_request_completed() is called, or when the request is requeued
+> using the method deadline_add_request().
+>
+> Requests targeting a locked zone are always left in the scheduler queue
+> to preserve the initial write order. If no write request can be
+> dispatched, allow reads to be dispatched even if the write batch is not
+> done.
+>
+> If the device used is not a zoned block device, or if zoned block device
+> support is disabled, this patch does not modify deadline behavior.
+
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+
 -- 
-2.14.3
+Martin K. Petersen	Oracle Linux Engineering
