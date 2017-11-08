@@ -1,21 +1,124 @@
-Return-Path: <hch@lst.de>
-Date: Wed, 8 Nov 2017 19:24:27 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <damien.lemoal@wdc.com>
-Cc: linux-scsi@vger.kernel.org,
+Return-Path: <prvs=4780b5c65=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
 	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
 	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: Re: [PATCH V7 4/8] block: deadline-iosched: Introduce dispatch
-	helpers
-Message-ID: <20171108182427.GC579@lst.de>
-References: <20171108081118.7632-1-damien.lemoal@wdc.com> <20171108081118.7632-5-damien.lemoal@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171108081118.7632-5-damien.lemoal@wdc.com>
+Subject: [PATCH V7 4/8] block: deadline-iosched: Introduce dispatch helpers
+Date: Wed,  8 Nov 2017 17:11:14 +0900
+Message-Id: <20171108081118.7632-5-damien.lemoal@wdc.com>
+In-Reply-To: <20171108081118.7632-1-damien.lemoal@wdc.com>
+References: <20171108081118.7632-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
+Avoid directly referencing the next_rq and fifo_list arrays using the
+helper functions deadline_next_request() and deadline_fifo_request() to
+facilitate changes in the dispatch request selection in
+deadline_dispatch_requests() for zoned block devices.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+While at it, also remove the unnecessary forward declaration of the
+function deadline_move_request().
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+---
+ block/deadline-iosched.c | 47 +++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 37 insertions(+), 10 deletions(-)
+
+diff --git a/block/deadline-iosched.c b/block/deadline-iosched.c
+index b83f77460d28..81e3f0897457 100644
+--- a/block/deadline-iosched.c
++++ b/block/deadline-iosched.c
+@@ -50,8 +50,6 @@ struct deadline_data {
+ 	int front_merges;
+ };
+ 
+-static void deadline_move_request(struct deadline_data *, struct request *);
+-
+ static inline struct rb_root *
+ deadline_rb_root(struct deadline_data *dd, struct request *rq)
+ {
+@@ -231,6 +229,35 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
+ }
+ 
+ /*
++ * For the specified data direction, return the next request to dispatch using
++ * arrival ordered lists.
++ */
++static struct request *
++deadline_fifo_request(struct deadline_data *dd, int data_dir)
++{
++	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
++		return NULL;
++
++	if (list_empty(&dd->fifo_list[data_dir]))
++		return NULL;
++
++	return rq_entry_fifo(dd->fifo_list[data_dir].next);
++}
++
++/*
++ * For the specified data direction, return the next request to dispatch using
++ * sector position sorted lists.
++ */
++static struct request *
++deadline_next_request(struct deadline_data *dd, int data_dir)
++{
++	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
++		return NULL;
++
++	return dd->next_rq[data_dir];
++}
++
++/*
+  * deadline_dispatch_requests selects the best request according to
+  * read/write expire, fifo_batch, etc
+  */
+@@ -239,16 +266,15 @@ static int deadline_dispatch_requests(struct request_queue *q, int force)
+ 	struct deadline_data *dd = q->elevator->elevator_data;
+ 	const int reads = !list_empty(&dd->fifo_list[READ]);
+ 	const int writes = !list_empty(&dd->fifo_list[WRITE]);
+-	struct request *rq;
++	struct request *rq, *next_rq;
+ 	int data_dir;
+ 
+ 	/*
+ 	 * batches are currently reads XOR writes
+ 	 */
+-	if (dd->next_rq[WRITE])
+-		rq = dd->next_rq[WRITE];
+-	else
+-		rq = dd->next_rq[READ];
++	rq = deadline_next_request(dd, WRITE);
++	if (!rq)
++		rq = deadline_next_request(dd, READ);
+ 
+ 	if (rq && dd->batching < dd->fifo_batch)
+ 		/* we have a next request are still entitled to batch */
+@@ -291,19 +317,20 @@ static int deadline_dispatch_requests(struct request_queue *q, int force)
+ 	/*
+ 	 * we are not running a batch, find best request for selected data_dir
+ 	 */
+-	if (deadline_check_fifo(dd, data_dir) || !dd->next_rq[data_dir]) {
++	next_rq = deadline_next_request(dd, data_dir);
++	if (deadline_check_fifo(dd, data_dir) || !next_rq) {
+ 		/*
+ 		 * A deadline has expired, the last request was in the other
+ 		 * direction, or we have run out of higher-sectored requests.
+ 		 * Start again from the request with the earliest expiry time.
+ 		 */
+-		rq = rq_entry_fifo(dd->fifo_list[data_dir].next);
++		rq = deadline_fifo_request(dd, data_dir);
+ 	} else {
+ 		/*
+ 		 * The last req was the same dir and we have a next request in
+ 		 * sort order. No expired requests so continue on from here.
+ 		 */
+-		rq = dd->next_rq[data_dir];
++		rq = next_rq;
+ 	}
+ 
+ 	dd->batching = 0;
+-- 
+2.13.6
