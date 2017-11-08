@@ -1,227 +1,130 @@
-Return-Path: <dvyukov@google.com>
-MIME-Version: 1.0
-In-Reply-To: <001a11446e86e97ceb055cf07f4e@google.com>
-References: <001a11446e86e97ceb055cf07f4e@google.com>
-From: Dmitry Vyukov <dvyukov@google.com>
-Date: Wed, 1 Nov 2017 22:02:44 +0300
-Message-ID: <CACT4Y+bGjnajib6P4a0SxYkNUJpg_x8abEkec8AR+oBmC=-QUQ@mail.gmail.com>
-Subject: Re: possible deadlock in blkdev_reread_part
-To: syzbot <bot+4684a000d5abdade83fac55b1e7d1f935ef1936e@syzkaller.appspotmail.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <prvs=4780b5c65=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V7 0/8] blk-mq support for ZBC disks
+Date: Wed,  8 Nov 2017 17:11:10 +0900
+Message-Id: <20171108081118.7632-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Nov 1, 2017 at 10:01 PM, syzbot
-<bot+4684a000d5abdade83fac55b1e7d1f935ef1936e@syzkaller.appspotmail.com>
-wrote:
-> Hello,
->
-> syzkaller hit the following crash on
-> e19b205be43d11bff638cad4487008c48d21c103
-> git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/master
-> compiler: gcc (GCC) 7.1.1 20170620
-> .config is attached
-> Raw console output is attached.
-> C reproducer is attached
-> syzkaller reproducer is attached. See https://goo.gl/kgGztJ
-> for information about syzkaller reproducers
->
->
-> ======================================================
-> WARNING: possible circular locking dependency detected
-> 4.14.0-rc2+ #10 Not tainted
-> ------------------------------------------------------
-> syzkaller821047/2981 is trying to acquire lock:
->  (&bdev->bd_mutex){+.+.}, at: [<ffffffff8232c60e>]
-> blkdev_reread_part+0x1e/0x40 block/ioctl.c:192
->
-> but task is already holding lock:
->  (&lo->lo_ctl_mutex#2){+.+.}, at: [<ffffffff83541ef9>]
-> lo_compat_ioctl+0x109/0x140 drivers/block/loop.c:1533
->
-> which lock already depends on the new lock.
->
->
-> the existing dependency chain (in reverse order) is:
->
-> -> #1 (&lo->lo_ctl_mutex#2){+.+.}:
->        check_prevs_add kernel/locking/lockdep.c:2020 [inline]
->        validate_chain kernel/locking/lockdep.c:2469 [inline]
->        __lock_acquire+0x328f/0x4620 kernel/locking/lockdep.c:3498
->        lock_acquire+0x1d5/0x580 kernel/locking/lockdep.c:4002
->        __mutex_lock_common kernel/locking/mutex.c:756 [inline]
->        __mutex_lock+0x16f/0x19d0 kernel/locking/mutex.c:893
->        mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
->        lo_release+0x6b/0x180 drivers/block/loop.c:1587
->        __blkdev_put+0x602/0x7c0 fs/block_dev.c:1780
->        blkdev_put+0x85/0x4f0 fs/block_dev.c:1845
->        blkdev_close+0x91/0xc0 fs/block_dev.c:1852
->        __fput+0x333/0x7f0 fs/file_table.c:210
->        ____fput+0x15/0x20 fs/file_table.c:244
->        task_work_run+0x199/0x270 kernel/task_work.c:112
->        tracehook_notify_resume include/linux/tracehook.h:191 [inline]
->        exit_to_usermode_loop+0x296/0x310 arch/x86/entry/common.c:162
->        prepare_exit_to_usermode arch/x86/entry/common.c:197 [inline]
->        syscall_return_slowpath+0x42f/0x510 arch/x86/entry/common.c:266
->        entry_SYSCALL_64_fastpath+0xbc/0xbe
->
-> -> #0 (&bdev->bd_mutex){+.+.}:
->        check_prev_add+0x865/0x1520 kernel/locking/lockdep.c:1894
->        check_prevs_add kernel/locking/lockdep.c:2020 [inline]
->        validate_chain kernel/locking/lockdep.c:2469 [inline]
->        __lock_acquire+0x328f/0x4620 kernel/locking/lockdep.c:3498
->        lock_acquire+0x1d5/0x580 kernel/locking/lockdep.c:4002
->        __mutex_lock_common kernel/locking/mutex.c:756 [inline]
->        __mutex_lock+0x16f/0x19d0 kernel/locking/mutex.c:893
->        mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
->        blkdev_reread_part+0x1e/0x40 block/ioctl.c:192
->        loop_reread_partitions+0x12f/0x1a0 drivers/block/loop.c:614
->        loop_set_status+0x9ba/0xf60 drivers/block/loop.c:1156
->        loop_set_status_compat+0x92/0xf0 drivers/block/loop.c:1506
->        lo_compat_ioctl+0x114/0x140 drivers/block/loop.c:1534
->        compat_blkdev_ioctl+0x3ba/0x1850 block/compat_ioctl.c:405
->        C_SYSC_ioctl fs/compat_ioctl.c:1593 [inline]
->        compat_SyS_ioctl+0x1d7/0x3290 fs/compat_ioctl.c:1540
->        do_syscall_32_irqs_on arch/x86/entry/common.c:329 [inline]
->        do_fast_syscall_32+0x3f2/0xf05 arch/x86/entry/common.c:391
->        entry_SYSENTER_compat+0x51/0x60 arch/x86/entry/entry_64_compat.S:124
->
-> other info that might help us debug this:
->
->  Possible unsafe locking scenario:
->
->        CPU0                    CPU1
->        ----                    ----
->   lock(&lo->lo_ctl_mutex#2);
->                                lock(&bdev->bd_mutex);
->                                lock(&lo->lo_ctl_mutex#2);
->   lock(&bdev->bd_mutex);
->
->  *** DEADLOCK ***
->
-> 1 lock held by syzkaller821047/2981:
->  #0:  (&lo->lo_ctl_mutex#2){+.+.}, at: [<ffffffff83541ef9>]
-> lo_compat_ioctl+0x109/0x140 drivers/block/loop.c:1533
->
-> stack backtrace:
-> CPU: 0 PID: 2981 Comm: syzkaller821047 Not tainted 4.14.0-rc2+ #10
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
-> Google 01/01/2011
-> Call Trace:
->  __dump_stack lib/dump_stack.c:16 [inline]
->  dump_stack+0x194/0x257 lib/dump_stack.c:52
->  print_circular_bug+0x503/0x710 kernel/locking/lockdep.c:1259
->  check_prev_add+0x865/0x1520 kernel/locking/lockdep.c:1894
->  check_prevs_add kernel/locking/lockdep.c:2020 [inline]
->  validate_chain kernel/locking/lockdep.c:2469 [inline]
->  __lock_acquire+0x328f/0x4620 kernel/locking/lockdep.c:3498
->  lock_acquire+0x1d5/0x580 kernel/locking/lockdep.c:4002
->  __mutex_lock_common kernel/locking/mutex.c:756 [inline]
->  __mutex_lock+0x16f/0x19d0 kernel/locking/mutex.c:893
->  mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:908
->  blkdev_reread_part+0x1e/0x40 block/ioctl.c:192
->  loop_reread_partitions+0x12f/0x1a0 drivers/block/loop.c:614
->  loop_set_status+0x9ba/0xf60 drivers/block/loop.c:1156
->  loop_set_status_compat+0x92/0xf0 drivers/block/loop.c:1506
->  lo_compat_ioctl+0x114/0x140 drivers/block/loop.c:1534
->  compat_blkdev_ioctl+0x3ba/0x1850 block/compat_ioctl.c:405
->  C_SYSC_ioctl fs/compat_ioctl.c:1593 [inline]
->  compat_SyS_ioctl+0x1d7/0x3290 fs/compat_ioctl.c:1540
->  do_syscall_32_irqs_on arch/x86/entry/common.c:329 [inline]
->  do_fast_syscall_32+0x3f2/0xf05 arch/x86/entry/common.c:391
->  entry_SYSENTER_compat+0x51/0x60 arch/x86/entry/entry_64_compat.S:124
-> RIP: 0023:0xf7f4bc79
-> RSP: 002b:00000000ff90868c EFLAGS: 00000286 ORIG_RAX: 0000000000000036
-> RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000004c02
-> RDX: 00000
+This series, formerly titled "scsi-mq support for ZBC disks", implements
+support for ZBC disks for system using the scsi-mq I/O path.
 
+The current scsi level support of ZBC disks guarantees write request ordering
+using a per-zone write lock which prevents issuing simultaneously multiple
+write commands to a zone, doing so avoid reordering of sequential writes to
+sequential zones. This method is however ineffective when scsi-mq is used with
+zoned block devices. This is due to the different execution model of blk-mq
+which passes a request to the scsi layer for dispatching after the request has
+been removed from the I/O scheduler queue. That is, when the scsi layer tries
+to lock the target zone of the request, the request may already be out of
+order and zone write locking fails to prevent that.
 
-Still happens on linux-next 36ef71cae353f88fd6e095e2aaa3e5953af1685d (Oct 20).
-Note repro needs to be compiled with -m32
+Various approaches have been tried to solve this problem directly from the core
+code of blk-mq. All of them had the serious disadvantage of cluttering blk-mq
+code with zoned block device specific conditions and processing, making
+maintenance and testing difficult.
 
-[  243.819514] ======================================================
-[  243.820949] WARNING: possible circular locking dependency detected
-[  243.822417] 4.14.0-rc5-next-20171018 #15 Not tainted
-[  243.823592] ------------------------------------------------------
-[  243.825012] a.out/11871 is trying to acquire lock:
-[  243.826182]  (&bdev->bd_mutex){+.+.}, at: [<ffffffff8245f13e>]
-blkdev_reread_part+0x1e/0x40
-[  243.828317]
-[  243.828317] but task is already holding lock:
-[  243.829669]  (&lo->lo_ctl_mutex#2){+.+.}, at: [<ffffffff83867189>]
-lo_compat_ioctl+0x119/0x150
-[  243.831728]
-[  243.831728] which lock already depends on the new lock.
-[  243.831728]
-[  243.833373]
-[  243.833373] the existing dependency chain (in reverse order) is:
-[  243.834991]
-[  243.834991] -> #1 (&lo->lo_ctl_mutex#2){+.+.}:
-[  243.836422]        __mutex_lock+0x16f/0x1990
-[  243.837474]        mutex_lock_nested+0x16/0x20
-[  243.838463]        lo_release+0x7a/0x1d0
-[  243.839370]        __blkdev_put+0x66e/0x810
-[  243.840300]        blkdev_put+0x98/0x540
-[  243.841171]        blkdev_close+0x8b/0xb0
-[  243.842101]        __fput+0x354/0x870
-[  243.842932]        ____fput+0x15/0x20
-[  243.843680]        task_work_run+0x1c6/0x270
-[  243.844540]        exit_to_usermode_loop+0x2b9/0x300
-[  243.845502]        syscall_return_slowpath+0x425/0x4d0
-[  243.846469]        entry_SYSCALL_64_fastpath+0xbc/0xbe
-[  243.847598]
-[  243.847598] -> #0 (&bdev->bd_mutex){+.+.}:
-[  243.848686]        lock_acquire+0x1d3/0x520
-[  243.849495]        __mutex_lock+0x16f/0x1990
-[  243.850332]        mutex_lock_nested+0x16/0x20
-[  243.851204]        blkdev_reread_part+0x1e/0x40
-[  243.852053]        loop_reread_partitions+0x14c/0x170
-[  243.853049]        loop_set_status+0xac6/0xfd0
-[  243.853892]        loop_set_status_compat+0x9c/0xd0
-[  243.854841]        lo_compat_ioctl+0x124/0x150
-[  243.855664]        compat_blkdev_ioctl+0x3c4/0x1ad0
-[  243.856547]        compat_SyS_ioctl+0x1c6/0x3a00
-[  243.857365]        do_fast_syscall_32+0x428/0xf67
-[  243.858284]        entry_SYSENTER_compat+0x51/0x60
-[  243.859189]
-[  243.859189] other info that might help us debug this:
-[  243.859189]
-[  243.860555]  Possible unsafe locking scenario:
-[  243.860555]
-[  243.861597]        CPU0                    CPU1
-[  243.862374]        ----                    ----
-[  243.863175]   lock(&lo->lo_ctl_mutex#2);
-[  243.863886]                                lock(&bdev->bd_mutex);
-[  243.865020]                                lock(&lo->lo_ctl_mutex#2);
-[  243.866152]   lock(&bdev->bd_mutex);
-[  243.866822]
-[  243.866822]  *** DEADLOCK ***
+This series adds blk-mq support for zoned block devices at the I/O scheduler
+level with simple modifications of the mq-deadline scheduler. Implementation
+is done with reusable helpers defined in the zoned block device support file
+(blk-zoned.c). These helpers provide per zone write locking control functions
+similar to what was implemented directly in the SCSI layer in sd_zbc.c.
+The zone write locking mechanism is used by mq-deadline for the exact same
+purpose, that is, to limit writes per zone to at most one request to avoid
+reordering.
 
+The changes to mq-deadline do not affect its operation with regular disks. The
+same scheduling behavior is maintained for these devices. Compared to the SCSI
+layer zone locking implementation, this series optimizes avoids locking
+conventional zones which result in a use of these zone that is comparable to a
+regular disk.
 
+This series also implements changes to the legacy deadline-iosched. Doing so,
+the zone locking code at the SCSI layer in sd.c and sd_zbc.c can be removed.
+This results in a significant simplification of the sd driver command handling.
 
-> ---
-> This bug is generated by a dumb bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for details.
-> Direct all questions to syzkaller@googlegroups.com.
-> Please credit me with: Reported-by: syzbot <syzkaller@googlegroups.com>
->
-> syzbot will keep track of this bug report.
-> Once a fix for this bug is committed, please reply to this email with:
-> #syz fix: exact-commit-title
-> To mark this as a duplicate of another syzbot report, please reply with:
-> #syz dup: exact-subject-of-another-report
-> If it's a one-off invalid bug report, please reply with:
-> #syz invalid
-> Note: if the crash happens again, it will cause creation of a new bug
-> report.
-> Note: all commands must start from beginning of the line.
->
-> --
-> You received this message because you are subscribed to the Google Groups
-> "syzkaller-bugs" group.
-> To unsubscribe from this group and stop receiving emails from it, send an
-> email to syzkaller-bugs+unsubscribe@googlegroups.com.
-> To view this discussion on the web visit
-> https://groups.google.com/d/msgid/syzkaller-bugs/001a11446e86e97ceb055cf07f4e%40google.com.
-> For more options, visit https://groups.google.com/d/optout.
+Patch 1 to 5 introduce the zone locking helpers in the block layer and modify
+the deadline and mq-deadline schedulers. They equally apply on top of the block
+tree branch for-4.15/block and on top of the scsi tree branch 4.15/scsi-queue.
+Patch 6 to 8 remove the SCSI layer zone locking and initialize the device
+request queue zone information. They apply to the scsi tree branch
+4.15/scsi-queue. To cleanly apply these last 3 patches to the block tree branch
+for-4.15/block, the following patches from the scsi tree must first be applied:
+
+aa8a845662 "scsi: sd_zbc: Move ZBC declarations to scsi_proto.h"
+e98f42bcad "scsi: sd_zbc: Fix comments and indentation"
+5eed92d173 "scsi: sd_zbc: Rearrange code"
+e8c77ec483 "scsi: sd_zbc: Use well defined macros"
+4a109032e3 "scsi: sd_zbc: Fix sd_zbc_read_zoned_characteristics()"
+
+Of note is that this series imposes the use of the deadline and mq-deadline
+schedulers with zoned block devices. A system can trivialy enforce this using
+a udev rule such as:
+
+ACTION=="add|change", KERNEL=="sd[a-z]", ATTRS{queue/zoned}=="host-managed", \
+ATTR{queue/scheduler}="deadline"
+
+This rules applies equally for the legacy SCSI path as well as the scsi-mq path
+thanks to "mq-deadline" being aliased to "deadline".
+
+Comments are as always very much appreciated.
+
+Changes from v6:
+* Implement zone write locking helpers in the block layer
+* Also modify legacy path deadline scheduler to remove all zone write locking
+  code from the scsi layer
+
+Changes from v5:
+* Refactor patches to introduce the zone_lock spinlock only when needed
+* Addressed Bart's comments (in particular explanations of the zone_lock
+  spinlock use)
+
+Changes from v4:
+* Various fixes and improvements (From Christoph's comments)
+* Dropped zones_wlock scheduler tunable attribute
+
+Changes from v3:
+* Integrated support directly into mq-deadline instead of creating a new I/O
+  scheduler.
+* Disable setting of default mq scheduler for single queue devices
+
+Changes from v2:
+* Introduced blk_zoned structure
+* Moved I/O scheduler from drivers/scsi to block
+
+Changes from v1:
+* Addressed Bart's comments for the blk-mq patches (declarations files)
+* Split (former) patch 4 into multiple patches to facilitate review
+* Fixed scsi disk lookup from io scheduler by introducing
+  scsi_disk_from_queue()
+
+Christoph Hellwig (1):
+  block: introduce zoned block devices zone write locking
+
+Damien Le Moal (7):
+  blokc: mq-deadline: Introduce dispatch helpers
+  block: mq-deadline: Introduce zone locking support
+  block: deadline-iosched: Introduce dispatch helpers
+  block: deadline-iosched: Introduce zone locking support
+  scsi: sd_zbc: Initialize device request queue zoned data
+  scsi: sd: Remove zone write locking
+  scsi: sd_zbc: Fix zone information initialization
+
+ block/blk-core.c         |   1 +
+ block/blk-zoned.c        |  41 +++++++++
+ block/deadline-iosched.c | 114 ++++++++++++++++++++---
+ block/mq-deadline.c      | 130 ++++++++++++++++++++++++--
+ drivers/scsi/sd.c        |  41 +--------
+ drivers/scsi/sd.h        |  11 ---
+ drivers/scsi/sd_zbc.c    | 235 +++++++++++++++++++++++++++++------------------
+ include/linux/blkdev.h   | 110 ++++++++++++++++++++++
+ include/scsi/scsi_cmnd.h |   3 +-
+ 9 files changed, 526 insertions(+), 160 deletions(-)
+
+-- 
+2.13.6
