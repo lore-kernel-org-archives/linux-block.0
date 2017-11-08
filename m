@@ -1,32 +1,21 @@
-Return-Path: <martin.petersen@oracle.com>
+Return-Path: <hch@lst.de>
+Date: Wed, 8 Nov 2017 19:26:24 +0100
+From: Christoph Hellwig <hch@lst.de>
 To: Damien Le Moal <damien.lemoal@wdc.com>
 Cc: linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: Re: [PATCH V7 8/8] scsi: sd_zbc: Fix zone information initialization
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <20171108081118.7632-1-damien.lemoal@wdc.com>
-	<20171108081118.7632-9-damien.lemoal@wdc.com>
-Date: Wed, 08 Nov 2017 18:46:04 -0500
-In-Reply-To: <20171108081118.7632-9-damien.lemoal@wdc.com> (Damien Le Moal's
-	message of "Wed, 8 Nov 2017 17:11:18 +0900")
-Message-ID: <yq1wp30wczn.fsf@oracle.com>
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: Re: [PATCH V7 8/8] scsi: sd_zbc: Fix zone information
+	initialization
+Message-ID: <20171108182624.GG579@lst.de>
+References: <20171108081118.7632-1-damien.lemoal@wdc.com> <20171108081118.7632-9-damien.lemoal@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171108081118.7632-9-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
+Looks good:
 
-Damien,
-
-> Make sure that the device request queue zone information (number of
-> zones and zone bitmaps) are reinitialized if the number of zones
-> changes (e.g. on a drive capacity change on revalidate).
-
-This should probably be part of patch 6.
-
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+Reviewed-by: Christoph Hellwig <hch@lst.de>
