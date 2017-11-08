@@ -1,31 +1,27 @@
-Return-Path: <martin.petersen@oracle.com>
+Return-Path: <hch@lst.de>
+Date: Wed, 8 Nov 2017 19:23:45 +0100
+From: Christoph Hellwig <hch@lst.de>
 To: Damien Le Moal <damien.lemoal@wdc.com>
 Cc: linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <Bart.VanAssche@wdc.com>
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
 Subject: Re: [PATCH V7 2/8] blokc: mq-deadline: Introduce dispatch helpers
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <20171108081118.7632-1-damien.lemoal@wdc.com>
-	<20171108081118.7632-3-damien.lemoal@wdc.com>
-Date: Wed, 08 Nov 2017 18:34:35 -0500
-In-Reply-To: <20171108081118.7632-3-damien.lemoal@wdc.com> (Damien Le Moal's
-	message of "Wed, 8 Nov 2017 17:11:12 +0900")
-Message-ID: <yq1mv3wxs38.fsf@oracle.com>
+Message-ID: <20171108182345.GA579@lst.de>
+References: <20171108081118.7632-1-damien.lemoal@wdc.com> <20171108081118.7632-3-damien.lemoal@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171108081118.7632-3-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
+Except for a bit of mis-spelling in the Subject this looks fine
+to me:
 
-Damien,
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-> Avoid directly referencing the next_rq and fifo_list arrays using the
-> helper functions deadline_next_request() and deadline_fifo_request()
-> to facilitate changes in the dispatch request selection in
-> __dd_dispatch_request() for zoned block devices.
+FYI, I would just simplify the subject to
 
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+mq-deadline: Introduce dispatch helpers
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+and similar in the other patches.
