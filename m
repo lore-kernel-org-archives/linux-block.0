@@ -1,34 +1,21 @@
-Return-Path: <martin.petersen@oracle.com>
+Return-Path: <hch@lst.de>
+Date: Wed, 8 Nov 2017 19:24:27 +0100
+From: Christoph Hellwig <hch@lst.de>
 To: Damien Le Moal <damien.lemoal@wdc.com>
 Cc: linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: Re: [PATCH V7 4/8] block: deadline-iosched: Introduce dispatch helpers
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <20171108081118.7632-1-damien.lemoal@wdc.com>
-	<20171108081118.7632-5-damien.lemoal@wdc.com>
-Date: Wed, 08 Nov 2017 18:37:45 -0500
-In-Reply-To: <20171108081118.7632-5-damien.lemoal@wdc.com> (Damien Le Moal's
-	message of "Wed, 8 Nov 2017 17:11:14 +0900")
-Message-ID: <yq1efp8xrxy.fsf@oracle.com>
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: Re: [PATCH V7 4/8] block: deadline-iosched: Introduce dispatch
+	helpers
+Message-ID: <20171108182427.GC579@lst.de>
+References: <20171108081118.7632-1-damien.lemoal@wdc.com> <20171108081118.7632-5-damien.lemoal@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171108081118.7632-5-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
+Looks good,
 
-Damien,
-
-> Avoid directly referencing the next_rq and fifo_list arrays using the
-> helper functions deadline_next_request() and deadline_fifo_request() to
-> facilitate changes in the dispatch request selection in
-> deadline_dispatch_requests() for zoned block devices.
->
-> While at it, also remove the unnecessary forward declaration of the
-> function deadline_move_request().
-
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+Reviewed-by: Christoph Hellwig <hch@lst.de>
