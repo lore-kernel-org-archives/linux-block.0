@@ -1,25 +1,114 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] block: remove __bio_kmap_atomic
-To: Christoph Hellwig <hch@lst.de>
+Return-Path: <BATV+a67e4e696b4474702002+5190+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
 Cc: linux-block@vger.kernel.org
-References: <20171108181348.13945-1-hch@lst.de>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <ee439005-185e-4f3c-3372-21167f5e2fb1@kernel.dk>
-Date: Wed, 8 Nov 2017 11:16:38 -0700
-MIME-Version: 1.0
-In-Reply-To: <20171108181348.13945-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
+Subject: [PATCH] block: remove __bio_kmap_atomic
+Date: Wed,  8 Nov 2017 19:13:48 +0100
+Message-Id: <20171108181348.13945-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On 11/08/2017 11:13 AM, Christoph Hellwig wrote:
-> This helper doesn't buy us much over calling kmap_atomic directly.
-> In fact in the only caller it does a bit of useless work as the
-> caller already has the bvec at hand, and said caller would even
-> buggy for a multi-segment bio due to the use of this helper.
-> 
-> So just remove it.
+This helper doesn't buy us much over calling kmap_atomic directly.
+In fact in the only caller it does a bit of useless work as the
+caller already has the bvec at hand, and said caller would even
+buggy for a multi-segment bio due to the use of this helper.
 
-Thanks, done and done.
+So just remove it.
 
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+
+Jens, this is on top of your bio_kmap_irq removal patch on the list.
+
+ Documentation/block/biodoc.txt      | 11 +++++------
+ arch/xtensa/platforms/iss/simdisk.c |  4 ++--
+ block/blk-settings.c                |  2 +-
+ include/linux/bio.h                 | 12 ------------
+ 4 files changed, 8 insertions(+), 21 deletions(-)
+
+diff --git a/Documentation/block/biodoc.txt b/Documentation/block/biodoc.txt
+index 01c0a03407cc..86927029a52d 100644
+--- a/Documentation/block/biodoc.txt
++++ b/Documentation/block/biodoc.txt
+@@ -216,10 +216,9 @@ may need to abort DMA operations and revert to PIO for the transfer, in
+ which case a virtual mapping of the page is required. For SCSI it is also
+ done in some scenarios where the low level driver cannot be trusted to
+ handle a single sg entry correctly. The driver is expected to perform the
+-kmaps as needed on such occasions using the bio_kmap_irq and friends
+-routines as appropriate. A driver could also use the blk_queue_bounce()
+-routine on its own to bounce highmem i/o to low memory for specific requests
+-if so desired.
++kmaps as needed on such occasions as appropriate. A driver could also use
++the blk_queue_bounce() routine on its own to bounce highmem i/o to low
++memory for specific requests if so desired.
+ 
+ iii. The i/o scheduler algorithm itself can be replaced/set as appropriate
+ 
+@@ -1137,8 +1136,8 @@ use dma_map_sg for scatter gather) to be able to ship it to the driver. For
+ PIO drivers (or drivers that need to revert to PIO transfer once in a
+ while (IDE for example)), where the CPU is doing the actual data
+ transfer a virtual mapping is needed. If the driver supports highmem I/O,
+-(Sec 1.1, (ii) ) it needs to use __bio_kmap_atomic or similar to
+-temporarily map a bio into the virtual address space.
++(Sec 1.1, (ii) ) it needs to use kmap_atomic or similar to temporarily map
++a bio into the virtual address space.
+ 
+ 
+ 8. Prior/Related/Impacted patches
+diff --git a/arch/xtensa/platforms/iss/simdisk.c b/arch/xtensa/platforms/iss/simdisk.c
+index c45b90bb9339..eacf1e433518 100644
+--- a/arch/xtensa/platforms/iss/simdisk.c
++++ b/arch/xtensa/platforms/iss/simdisk.c
+@@ -110,13 +110,13 @@ static blk_qc_t simdisk_make_request(struct request_queue *q, struct bio *bio)
+ 	sector_t sector = bio->bi_iter.bi_sector;
+ 
+ 	bio_for_each_segment(bvec, bio, iter) {
+-		char *buffer = __bio_kmap_atomic(bio, iter);
++		char *buffer = kmap_atomic(bvec.bv_page) + bvec.bv_offset;
+ 		unsigned len = bvec.bv_len >> SECTOR_SHIFT;
+ 
+ 		simdisk_transfer(dev, sector, len, buffer,
+ 				bio_data_dir(bio) == WRITE);
+ 		sector += len;
+-		__bio_kunmap_atomic(buffer);
++		kunmap_atomic(buffer)
+ 	}
+ 
+ 	bio_endio(bio);
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 8559e9563c52..48ebe6be07b7 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -157,7 +157,7 @@ EXPORT_SYMBOL(blk_set_stacking_limits);
+  * Caveat:
+  *    The driver that does this *must* be able to deal appropriately
+  *    with buffers in "highmemory". This can be accomplished by either calling
+- *    __bio_kmap_atomic() to get a temporary kernel mapping, or by calling
++ *    kmap_atomic() to get a temporary kernel mapping, or by calling
+  *    blk_queue_bounce() to create a buffer in normal memory.
+  **/
+ void blk_queue_make_request(struct request_queue *q, make_request_fn *mfn)
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index fd3e11284a38..65f613612fb0 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -128,18 +128,6 @@ static inline void *bio_data(struct bio *bio)
+  */
+ #define bvec_to_phys(bv)	(page_to_phys((bv)->bv_page) + (unsigned long) (bv)->bv_offset)
+ 
+-/*
+- * queues that have highmem support enabled may still need to revert to
+- * PIO transfers occasionally and thus map high pages temporarily. For
+- * permanent PIO fall back, user is probably better off disabling highmem
+- * I/O completely on that queue (see ide-dma for example)
+- */
+-#define __bio_kmap_atomic(bio, iter)				\
+-	(kmap_atomic(bio_iter_iovec((bio), (iter)).bv_page) +	\
+-		bio_iter_iovec((bio), (iter)).bv_offset)
+-
+-#define __bio_kunmap_atomic(addr)	kunmap_atomic(addr)
+-
+ /*
+  * merge helpers etc
+  */
 -- 
-Jens Axboe
+2.14.2
