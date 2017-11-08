@@ -1,61 +1,30 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mxhk.zte.com.cn ([63.217.80.70]:61932 "EHLO mxhk.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751588AbdKVIuC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Nov 2017 03:50:02 -0500
-From: tang.junhui@zte.com.cn
-To: colyli@suse.de, mlyle@lyle.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        tang.junhui@zte.com.cn
-Subject: [bug report] bcache stucked when writting jounrnal 
-Date: Wed, 22 Nov 2017 16:49:45 +0800
-Message-Id: <1511340585-24848-1-git-send-email-tang.junhui@zte.com.cn>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <martin.petersen@oracle.com>
+To: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: Re: [PATCH V7 7/8] scsi: sd: Remove zone write locking
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20171108081118.7632-1-damien.lemoal@wdc.com>
+	<20171108081118.7632-8-damien.lemoal@wdc.com>
+Date: Wed, 08 Nov 2017 18:44:42 -0500
+In-Reply-To: <20171108081118.7632-8-damien.lemoal@wdc.com> (Damien Le Moal's
+	message of "Wed, 8 Nov 2017 17:11:17 +0900")
+Message-ID: <yq11sl8xrmd.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
 
-Hi, everyone:
+Damien,
 
-bcache stucked when reboot system after high load.
+> The block layer now handles zone write locking.
 
-root      1704  3.7  0.0   4164   360 ?        D    14:07   0:09 /usr/lib/udev/bcache-register /dev/sdc
-[<ffffffffa062d2f5>] closure_sync+0x25/0x90 [bcache]
-[<ffffffffa062b481>] bch_btree_set_root+0x1f1/0x250 [bcache]
-[<ffffffffa062bcf2>] btree_split+0x632/0x760 [bcache]
-[<ffffffffa062c1fb>] bch_btree_insert_recurse+0x3db/0x500 [bcache]
-[<ffffffffa062c487>] bch_btree_insert+0x167/0x360 [bcache]
-[<ffffffffa062feba>] bch_journal_replay+0x1aa/0x2e0 [bcache]
-[<ffffffffa0642b36>] run_cache_set+0x813/0x83e [bcache]
-[<ffffffffa063aee3>] register_bcache+0xea3/0x1410 [bcache]
-[<ffffffff812e453f>] kobj_attr_store+0xf/0x20
-[<ffffffff81246be6>] sysfs_write_file+0xc6/0x140
-[<ffffffff811cdbfd>] vfs_write+0xbd/0x1e0
-[<ffffffff811ce648>] SyS_write+0x58/0xb0
-[<ffffffff816306c9>] system_call_fastpath+0x16/0x1b
+Looks OK.
 
-root      2097  0.0  0.0      0     0 ?        D    14:08   0:00 [bcache_allocato]
-[<ffffffffa062d2f5>] closure_sync+0x25/0x90 [bcache]
-[<ffffffffa06387fe>] bch_prio_write+0x23e/0x340 [bcache]
-[<ffffffffa0620e50>] bch_allocator_thread+0x340/0x350 [bcache]
-[<ffffffff810990bf>] kthread+0xcf/0xe0
-[<ffffffff81630618>] ret_from_fork+0x58/0x90
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-I try to add some debug info to the code, it seems that it always run in
-journal_write_unlocked()
-	else if (journal_full(&c->journal)) {
-		journal_reclaim(c);
-		spin_unlock(&c->journal.lock);
-
-		btree_flush_write(c);
-		continue_at(cl, journal_write, system_wq);
-		return;
-	}
-the condition of journal_full() always returns true, so the journal 
-can not finish all the time.
-
-My code has a little difference with the upstream branch.
-Could anyone give me some suggestions?
-
-Thanks,
-Tang
+-- 
+Martin K. Petersen	Oracle Linux Engineering
