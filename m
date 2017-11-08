@@ -1,79 +1,60 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <prvs=47882fd2f=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "axboe@kernel.dk" <axboe@kernel.dk>, "ming.lei@redhat.com"
+	<ming.lei@redhat.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"hch@infradead.org" <hch@infradead.org>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>, "john.garry@huawei.com"
+	<john.garry@huawei.com>, "osandov@fb.com" <osandov@fb.com>,
+	"jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>, "loberman@redhat.com"
+	<loberman@redhat.com>
 Subject: Re: [PATCH] SCSI: don't get target/host busy_count in
  scsi_mq_get_budget()
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
- "ming.lei@redhat.com" <ming.lei@redhat.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "hch@infradead.org" <hch@infradead.org>,
- "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "john.garry@huawei.com" <john.garry@huawei.com>,
- "osandov@fb.com" <osandov@fb.com>,
- "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
- "loberman@redhat.com" <loberman@redhat.com>
+Date: Wed, 8 Nov 2017 16:41:35 +0000
+Message-ID: <1510159293.24237.19.camel@wdc.com>
 References: <20171104015534.32684-1-ming.lei@redhat.com>
- <adb7f6bd-bf0d-8176-808b-32a84ac4273a@kernel.dk>
- <1509997522.2409.58.camel@wdc.com> <20171107021125.GB15090@ming.t460p>
- <1510071607.2656.17.camel@wdc.com> <20171108003934.GB20599@ming.t460p>
- <26ee805b-883f-d588-5649-13700244b6e8@kernel.dk>
- <20171108025830.GA30129@ming.t460p>
- <1a153ff3-9d53-d347-cb16-b8480e690221@kernel.dk>
- <1510159293.24237.19.camel@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <e699ee0f-1ff9-42be-8283-7cdaea65b0b3@kernel.dk>
-Date: Wed, 8 Nov 2017 10:57:23 -0700
+	 <adb7f6bd-bf0d-8176-808b-32a84ac4273a@kernel.dk>
+	 <1509997522.2409.58.camel@wdc.com> <20171107021125.GB15090@ming.t460p>
+	 <1510071607.2656.17.camel@wdc.com> <20171108003934.GB20599@ming.t460p>
+	 <26ee805b-883f-d588-5649-13700244b6e8@kernel.dk>
+	 <20171108025830.GA30129@ming.t460p>
+	 <1a153ff3-9d53-d347-cb16-b8480e690221@kernel.dk>
+In-Reply-To: <1a153ff3-9d53-d347-cb16-b8480e690221@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1510159293.24237.19.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 11/08/2017 09:41 AM, Bart Van Assche wrote:
-> On Tue, 2017-11-07 at 20:06 -0700, Jens Axboe wrote:
->> At this point, I have no idea what Bart's setup looks like. Bart, it
->> would be REALLY helpful if you could tell us how you are reproducing
->> your hang. I don't know why this has to be dragged out.
-> 
-> Hello Jens,
-> 
-> It is a disappointment to me that you have allowed Ming to evaluate other
-> approaches than reverting "blk-mq: don't handle TAG_SHARED in restart". That
-> patch namely replaces an algorithm that is trusted by the community with an
-> algorithm of which even Ming acknowledged that it is racy. A quote from [1]:
-> "IO hang may be caused if all requests are completed just before the current
-> SCSI device is added to shost->starved_list". I don't know of any way to fix
-> that race other than serializing request submission and completion by adding
-> locking around these actions, which is something we don't want. Hence my
-> request to revert that patch.
-
-I was reluctant to revert it, in case we could work out a better way of
-doing it. As I mentioned in the other replies, it's not exactly the
-prettiest or most efficient. However, since we currently don't have
-a good solution for the issue, I'm fine with reverting that patch.
-
-> Regarding the test I run, here is a summary of what I mentioned in previous
-> e-mails:
-> * I modified the SRP initiator such that the SCSI target queue depth is
->   reduced to one by setting starget->can_queue to 1 from inside
->   scsi_host_template.target_alloc.
-> * With that modified SRP initiator I run the srp-test software as follows
->   until something breaks:
->   while ./run_tests -f xfs -d -e deadline -r 60; do :; done
-
-What kernel options are needed? Where do I download everything I need?
-
-In other words, would it be possible to do a fuller guide for getting
-this setup and running?
-
-I'll run my simple test case as well, since it's currently breaking
-basically everywhere.
-
-> Today a system with at least one InfiniBand HCA is required to run that test.
-> When I have the time I will post the SRP initiator and target patches on the
-> linux-rdma mailing list that make it possible to run that test against the
-> SoftRoCE driver (drivers/infiniband/sw/rxe). The only hardware required to
-> use that driver is an Ethernet adapter.
-
-OK, I guess I can't run it then... I'll have to rely on your testing.
-
--- 
-Jens Axboe
+T24gVHVlLCAyMDE3LTExLTA3IGF0IDIwOjA2IC0wNzAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBB
+dCB0aGlzIHBvaW50LCBJIGhhdmUgbm8gaWRlYSB3aGF0IEJhcnQncyBzZXR1cCBsb29rcyBsaWtl
+LiBCYXJ0LCBpdA0KPiB3b3VsZCBiZSBSRUFMTFkgaGVscGZ1bCBpZiB5b3UgY291bGQgdGVsbCB1
+cyBob3cgeW91IGFyZSByZXByb2R1Y2luZw0KPiB5b3VyIGhhbmcuIEkgZG9uJ3Qga25vdyB3aHkg
+dGhpcyBoYXMgdG8gYmUgZHJhZ2dlZCBvdXQuDQoNCkhlbGxvIEplbnMsDQoNCkl0IGlzIGEgZGlz
+YXBwb2ludG1lbnQgdG8gbWUgdGhhdCB5b3UgaGF2ZSBhbGxvd2VkIE1pbmcgdG8gZXZhbHVhdGUg
+b3RoZXINCmFwcHJvYWNoZXMgdGhhbiByZXZlcnRpbmcgImJsay1tcTogZG9uJ3QgaGFuZGxlIFRB
+R19TSEFSRUQgaW4gcmVzdGFydCIuIFRoYXQNCnBhdGNoIG5hbWVseSByZXBsYWNlcyBhbiBhbGdv
+cml0aG0gdGhhdCBpcyB0cnVzdGVkIGJ5IHRoZSBjb21tdW5pdHkgd2l0aCBhbg0KYWxnb3JpdGht
+IG9mIHdoaWNoIGV2ZW4gTWluZyBhY2tub3dsZWRnZWQgdGhhdCBpdCBpcyByYWN5LiBBIHF1b3Rl
+IGZyb20gWzFdOg0KIklPIGhhbmcgbWF5IGJlIGNhdXNlZCBpZiBhbGwgcmVxdWVzdHMgYXJlIGNv
+bXBsZXRlZCBqdXN0IGJlZm9yZSB0aGUgY3VycmVudA0KU0NTSSBkZXZpY2UgaXMgYWRkZWQgdG8g
+c2hvc3QtPnN0YXJ2ZWRfbGlzdCIuIEkgZG9uJ3Qga25vdyBvZiBhbnkgd2F5IHRvIGZpeA0KdGhh
+dCByYWNlIG90aGVyIHRoYW4gc2VyaWFsaXppbmcgcmVxdWVzdCBzdWJtaXNzaW9uIGFuZCBjb21w
+bGV0aW9uIGJ5IGFkZGluZw0KbG9ja2luZyBhcm91bmQgdGhlc2UgYWN0aW9ucywgd2hpY2ggaXMg
+c29tZXRoaW5nIHdlIGRvbid0IHdhbnQuIEhlbmNlIG15DQpyZXF1ZXN0IHRvIHJldmVydCB0aGF0
+IHBhdGNoLg0KDQpSZWdhcmRpbmcgdGhlIHRlc3QgSSBydW4sIGhlcmUgaXMgYSBzdW1tYXJ5IG9m
+IHdoYXQgSSBtZW50aW9uZWQgaW4gcHJldmlvdXMNCmUtbWFpbHM6DQoqIEkgbW9kaWZpZWQgdGhl
+IFNSUCBpbml0aWF0b3Igc3VjaCB0aGF0IHRoZSBTQ1NJIHRhcmdldCBxdWV1ZSBkZXB0aCBpcw0K
+ICByZWR1Y2VkIHRvIG9uZSBieSBzZXR0aW5nIHN0YXJnZXQtPmNhbl9xdWV1ZSB0byAxIGZyb20g
+aW5zaWRlDQogIHNjc2lfaG9zdF90ZW1wbGF0ZS50YXJnZXRfYWxsb2MuDQoqIFdpdGggdGhhdCBt
+b2RpZmllZCBTUlAgaW5pdGlhdG9yIEkgcnVuIHRoZSBzcnAtdGVzdCBzb2Z0d2FyZSBhcyBmb2xs
+b3dzDQogIHVudGlsIHNvbWV0aGluZyBicmVha3M6DQogIHdoaWxlIC4vcnVuX3Rlc3RzIC1mIHhm
+cyAtZCAtZSBkZWFkbGluZSAtciA2MDsgZG8gOjsgZG9uZQ0KDQpUb2RheSBhIHN5c3RlbSB3aXRo
+IGF0IGxlYXN0IG9uZSBJbmZpbmlCYW5kIEhDQSBpcyByZXF1aXJlZCB0byBydW4gdGhhdCB0ZXN0
+Lg0KV2hlbiBJIGhhdmUgdGhlIHRpbWUgSSB3aWxsIHBvc3QgdGhlIFNSUCBpbml0aWF0b3IgYW5k
+IHRhcmdldCBwYXRjaGVzIG9uIHRoZQ0KbGludXgtcmRtYSBtYWlsaW5nIGxpc3QgdGhhdCBtYWtl
+IGl0IHBvc3NpYmxlIHRvIHJ1biB0aGF0IHRlc3QgYWdhaW5zdCB0aGUNClNvZnRSb0NFIGRyaXZl
+ciAoZHJpdmVycy9pbmZpbmliYW5kL3N3L3J4ZSkuIFRoZSBvbmx5IGhhcmR3YXJlIHJlcXVpcmVk
+IHRvDQp1c2UgdGhhdCBkcml2ZXIgaXMgYW4gRXRoZXJuZXQgYWRhcHRlci4NCg0KQmFydC4NCg0K
+WzFdIFtQQVRDSF0gU0NTSTogZG9uJ3QgZ2V0IHRhcmdldC9ob3N0IGJ1c3lfY291bnQgaW4gc2Nz
+aV9tcV9nZXRfYnVkZ2V0KCkNCihodHRwczovL3d3dy5tYWlsLWFyY2hpdmUuY29tL2xpbnV4LWJs
+b2NrQHZnZXIua2VybmVsLm9yZy9tc2cxNTI2My5odG1sKS4=
