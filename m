@@ -1,77 +1,70 @@
-Return-Path: <shli@kernel.org>
-Date: Wed, 8 Nov 2017 16:01:56 -0800
-From: Shaohua Li <shli@kernel.org>
-To: David Disseldorp <ddiss@suse.de>
-Cc: linux-block@vger.kernel.org, Shaohua Li <shli@fb.com>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH] null_blk: fix dev->badblocks leak
-Message-ID: <20171109000156.75cn5kltu4x4c2hc@kernel.org>
-References: <20171108162944.7415-1-ddiss@suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171108162944.7415-1-ddiss@suse.de>
+Return-Path: <ddiss@suse.de>
+From: David Disseldorp <ddiss@suse.de>
+To: linux-block@vger.kernel.org
+Cc: Shaohua Li <shli@fb.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	David Disseldorp <ddiss@suse.de>
+Subject: [PATCH] null_blk: fix dev->badblocks leak
+Date: Wed,  8 Nov 2017 17:29:44 +0100
+Message-Id: <20171108162944.7415-1-ddiss@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Nov 08, 2017 at 05:29:44PM +0100, David Disseldorp wrote:
-> null_alloc_dev() allocates memory for dev->badblocks, but cleanup
-> currently only occurs in the configfs release codepath, missing a number
-> of other places.
-> 
-> This bug was found running the blktests block/010 test, alongside
-> kmemleak:
-> rapido1:/blktests# ./check block/010
-> ...
-> rapido1:/blktests# echo scan > /sys/kernel/debug/kmemleak
-> [  306.966708] kmemleak: 32 new suspected memory leaks (see /sys/kernel/debug/kmemleak)
-> rapido1:/blktests# cat /sys/kernel/debug/kmemleak
-> unreferenced object 0xffff88001f86d000 (size 4096):
->   comm "modprobe", pid 231, jiffies 4294892415 (age 318.252s)
->   hex dump (first 32 bytes):
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->   backtrace:
->     [<ffffffff814b0379>] kmemleak_alloc+0x49/0xa0
->     [<ffffffff810f180f>] kmem_cache_alloc+0x9f/0xe0
->     [<ffffffff8124e45f>] badblocks_init+0x2f/0x60
->     [<ffffffffa0019fae>] 0xffffffffa0019fae
->     [<ffffffffa0021273>] nullb_device_badblocks_store+0x63/0x130 [null_blk]
->     [<ffffffff810004cd>] do_one_initcall+0x3d/0x170
->     [<ffffffff8109fe0d>] do_init_module+0x56/0x1e9
->     [<ffffffff8109ebd7>] load_module+0x1c47/0x26a0
->     [<ffffffff8109f819>] SyS_finit_module+0xa9/0xd0
->     [<ffffffff814b4f60>] entry_SYSCALL_64_fastpath+0x13/0x94
-> 
-> Fixes: 2f54a613c942 ("nullb: badbblocks support")
-> Signed-off-by: David Disseldorp <ddiss@suse.de>
+null_alloc_dev() allocates memory for dev->badblocks, but cleanup
+currently only occurs in the configfs release codepath, missing a number
+of other places.
 
-Reviewed-by: Shaohua Li <shli@fb.com>
-> ---
->  drivers/block/null_blk.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-> index 8042c26ea9e6..fc80354477c6 100644
-> --- a/drivers/block/null_blk.c
-> +++ b/drivers/block/null_blk.c
-> @@ -467,7 +467,6 @@ static void nullb_device_release(struct config_item *item)
->  {
->  	struct nullb_device *dev = to_nullb_device(item);
->  
-> -	badblocks_exit(&dev->badblocks);
->  	null_free_device_storage(dev, false);
->  	null_free_dev(dev);
->  }
-> @@ -578,6 +577,10 @@ static struct nullb_device *null_alloc_dev(void)
->  
->  static void null_free_dev(struct nullb_device *dev)
->  {
-> +	if (!dev)
-> +		return;
-> +
-> +	badblocks_exit(&dev->badblocks);
->  	kfree(dev);
->  }
->  
-> -- 
-> 2.13.6
-> 
+This bug was found running the blktests block/010 test, alongside
+kmemleak:
+rapido1:/blktests# ./check block/010
+...
+rapido1:/blktests# echo scan > /sys/kernel/debug/kmemleak
+[  306.966708] kmemleak: 32 new suspected memory leaks (see /sys/kernel/debug/kmemleak)
+rapido1:/blktests# cat /sys/kernel/debug/kmemleak
+unreferenced object 0xffff88001f86d000 (size 4096):
+  comm "modprobe", pid 231, jiffies 4294892415 (age 318.252s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff814b0379>] kmemleak_alloc+0x49/0xa0
+    [<ffffffff810f180f>] kmem_cache_alloc+0x9f/0xe0
+    [<ffffffff8124e45f>] badblocks_init+0x2f/0x60
+    [<ffffffffa0019fae>] 0xffffffffa0019fae
+    [<ffffffffa0021273>] nullb_device_badblocks_store+0x63/0x130 [null_blk]
+    [<ffffffff810004cd>] do_one_initcall+0x3d/0x170
+    [<ffffffff8109fe0d>] do_init_module+0x56/0x1e9
+    [<ffffffff8109ebd7>] load_module+0x1c47/0x26a0
+    [<ffffffff8109f819>] SyS_finit_module+0xa9/0xd0
+    [<ffffffff814b4f60>] entry_SYSCALL_64_fastpath+0x13/0x94
+
+Fixes: 2f54a613c942 ("nullb: badbblocks support")
+Signed-off-by: David Disseldorp <ddiss@suse.de>
+---
+ drivers/block/null_blk.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index 8042c26ea9e6..fc80354477c6 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -467,7 +467,6 @@ static void nullb_device_release(struct config_item *item)
+ {
+ 	struct nullb_device *dev = to_nullb_device(item);
+ 
+-	badblocks_exit(&dev->badblocks);
+ 	null_free_device_storage(dev, false);
+ 	null_free_dev(dev);
+ }
+@@ -578,6 +577,10 @@ static struct nullb_device *null_alloc_dev(void)
+ 
+ static void null_free_dev(struct nullb_device *dev)
+ {
++	if (!dev)
++		return;
++
++	badblocks_exit(&dev->badblocks);
+ 	kfree(dev);
+ }
+ 
+-- 
+2.13.6
