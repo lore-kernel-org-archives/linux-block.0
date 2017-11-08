@@ -1,106 +1,31 @@
-Return-Path: <BATV+adf086a54a2d754d8a83+5184+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: nvme multipath support V6
-Date: Thu,  2 Nov 2017 21:30:29 +0300
-Message-Id: <20171102183034.9320-1-hch@lst.de>
+Return-Path: <martin.petersen@oracle.com>
+To: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: Re: [PATCH V7 2/8] blokc: mq-deadline: Introduce dispatch helpers
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20171108081118.7632-1-damien.lemoal@wdc.com>
+	<20171108081118.7632-3-damien.lemoal@wdc.com>
+Date: Wed, 08 Nov 2017 18:34:35 -0500
+In-Reply-To: <20171108081118.7632-3-damien.lemoal@wdc.com> (Damien Le Moal's
+	message of "Wed, 8 Nov 2017 17:11:12 +0900")
+Message-ID: <yq1mv3wxs38.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-Hi all,
 
-this series adds support for multipathing, that is accessing nvme
-namespaces through multiple controllers to the nvme core driver.
+Damien,
 
-It is a very thin and efficient implementation that relies on
-close cooperation with other bits of the nvme driver, and few small
-and simple block helpers.
+> Avoid directly referencing the next_rq and fifo_list arrays using the
+> helper functions deadline_next_request() and deadline_fifo_request()
+> to facilitate changes in the dispatch request selection in
+> __dd_dispatch_request() for zoned block devices.
 
-Compared to dm-multipath the important differences are how management
-of the paths is done, and how the I/O path works.
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-Management of the paths is fully integrated into the nvme driver,
-for each newly found nvme controller we check if there are other
-controllers that refer to the same subsystem, and if so we link them
-up in the nvme driver.  Then for each namespace found we check if
-the namespace id and identifiers match to check if we have multiple
-controllers that refer to the same namespaces.  For now path
-availability is based entirely on the controller status, which at
-least for fabrics will be continuously updated based on the mandatory
-keep alive timer.  Once the Asynchronous Namespace Access (ANA)
-proposal passes in NVMe we will also get per-namespace states in
-addition to that, but for now any details of that remain confidential
-to NVMe members.
-
-The I/O path is very different from the existing multipath drivers,
-which is enabled by the fact that NVMe (unlike SCSI) does not support
-partial completions - a controller will either complete a whole
-command or not, but never only complete parts of it.  Because of that
-there is no need to clone bios or requests - the I/O path simply
-redirects the I/O to a suitable path.  For successful commands
-multipath is not in the completion stack at all.  For failed commands
-we decide if the error could be a path failure, and if yes remove
-the bios from the request structure and requeue them before completing
-the request.  All together this means there is no performance
-degradation compared to normal nvme operation when using the multipath
-device node (at least not until I find a dual ported DRAM backed
-device :))
-
-A git tree is available at:
-
-   git://git.infradead.org/users/hch/block.git nvme-mpath
-
-gitweb:
-
-   http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/nvme-mpath
-
-Changes since V5:
-  - dropped various prep patches merged into the nvme tree
-  - removed a leftover debug printk
-  - small cleanups to blk_steal_bio
-  - add a sysfs attribute for hidden gendisks
-  - don't complete cancelled requests if another path is available
-  - use the instance index for device naming
-  - make the multipath code optional at compile time
-  - don't use the multipath node for single-controller subsystems
-  - add a module_option to disable multipathing (temporarily)
-   
-Changes since V4:
-  - add a refcount to release the device in struct nvme_subsystem
-  - use the instance to name the nvme_subsystems in sysfs
-  - remove a NULL check before nvme_put_ns_head
-  - take a ns_head reference in ->open
-  - improve open protection for GENHD_FL_HIDDEN
-  - add poll support for the mpath device
-
-Changes since V3:
-  - new block layer support for hidden gendisks
-  - a couple new patches to refactor device handling before the
-    actual multipath support
-  - don't expose per-controller block device nodes
-  - use /dev/nvmeXnZ as the device nodes for the whole subsystem.
-  - expose subsystems in sysfs (Hannes Reinecke)
-  - fix a subsystem leak when duplicate NQNs are found
-  - fix up some names
-  - don't clear current_path if freeing a different namespace
-
-Changes since V2:
-  - don't create duplicate subsystems on reset (Keith Bush)
-  - free requests properly when failing over in I/O completion (Keith Bush)
-  - new devices names: /dev/nvm-sub%dn%d
-  - expose the namespace identification sysfs files for the mpath nodes
-
-Changes since V1:
-  - introduce new nvme_ns_ids structure to clean up identifier handling
-  - generic_make_request_fast is now named direct_make_request and calls
-    generic_make_request_checks
-  - reset bi_disk on resubmission
-  - create sysfs links between the existing nvme namespace block devices and
-    the new share mpath device
-  - temporarily added the timeout patches from James, this should go into
-    nvme-4.14, though
+-- 
+Martin K. Petersen	Oracle Linux Engineering
