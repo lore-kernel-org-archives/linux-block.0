@@ -1,109 +1,109 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:44468 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:34588 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750793AbdKJGR7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Nov 2017 01:17:59 -0500
-Date: Fri, 10 Nov 2017 14:17:37 +0800
+        id S1752475AbdKHCKX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 7 Nov 2017 21:10:23 -0500
+Date: Wed, 8 Nov 2017 10:10:07 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Omar Sandoval <osandov@fb.com>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Hannes Reinecke <hare@suse.com>, stable@vger.kernel.org
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "osandov@fb.com" <osandov@fb.com>, "axboe@fb.com" <axboe@fb.com>,
+        "hare@suse.com" <hare@suse.com>
 Subject: Re: [PATCH] blk-mq: respect queue dead via blk_mq_quiesce_queue
-Message-ID: <20171110061736.GB9755@ming.t460p>
+Message-ID: <20171108021006.GB22219@ming.t460p>
 References: <20171105121008.28180-1-ming.lei@redhat.com>
+ <1509896328.2697.4.camel@wdc.com>
+ <20171106034423.GC26416@ming.t460p>
+ <1509986060.2409.17.camel@wdc.com>
+ <20171107022710.GD15090@ming.t460p>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171105121008.28180-1-ming.lei@redhat.com>
+In-Reply-To: <20171107022710.GD15090@ming.t460p>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Sun, Nov 05, 2017 at 08:10:08PM +0800, Ming Lei wrote:
-> blk-mq never respects queue dead, and this may cause use-after-free on
-> any kind of queue resources. This patch respects the rule by calling
-> blk_mq_quiesce_queue() when queue is marked as DEAD.
+On Tue, Nov 07, 2017 at 10:27:11AM +0800, Ming Lei wrote:
+> On Mon, Nov 06, 2017 at 04:34:21PM +0000, Bart Van Assche wrote:
+> > On Mon, 2017-11-06 at 11:44 +0800, Ming Lei wrote:
+> > > On Sun, Nov 05, 2017 at 03:38:49PM +0000, Bart Van Assche wrote:
+> > > > On Sun, 2017-11-05 at 20:10 +0800, Ming Lei wrote:
+> > > > > diff --git a/block/blk-core.c b/block/blk-core.c
+> > > > > index 048be4aa6024..0b121f29e3b1 100644
+> > > > > --- a/block/blk-core.c
+> > > > > +++ b/block/blk-core.c
+> > > > > @@ -658,6 +658,10 @@ void blk_cleanup_queue(struct request_queue *q)
+> > > > >  	queue_flag_set(QUEUE_FLAG_DEAD, q);
+> > > > >  	spin_unlock_irq(lock);
+> > > > >  
+> > > > > +	/* respect queue DEAD via quiesce for blk-mq */
+> > > > > +	if (q->mq_ops)
+> > > > > +		blk_mq_quiesce_queue(q);
+> > > > > +
+> > > > >  	/* for synchronous bio-based driver finish in-flight integrity i/o */
+> > > > >  	blk_flush_integrity();
+> > > > 
+> > > > Have you considered to change the blk_freeze_queue_start() call in
+> > > > blk_set_queue_dying() into a blk_freeze_queue() call? That approach has the
+> > > > advantage that no new if (q->mq_ops) test has to be introduced.
+> > > 
+> > > That approach isn't nothing to do with this issue, and can't fix this issue
+> > > too.
+> > 
+> > Sorry but I disagree. My opinion is that the change I proposed is a more
+> > elegant way to avoid that blk_mq_run_hw_queue() tries to execute a request
+> > after blk_cleanup_queue() has started.
+> > 
+> > > Not mention we hold q->sysfs_lock before calling blk_set_queue_dying(),
+> > > there may be risk to cause deadlock.
+> > 
+> > Sorry but I disagree again. q->sysfs_lock is not obtained from inside any
+> > code that runs the queue so there is no deadlock risk. Additionally, I doubt
+> > that it is useful to obtain q->sysfs_lock from inside blk_cleanup_queue().
+> > The queue attributes that are exported through sysfs can be modified safely
+> > until these sysfs attributes are removed.
+> > 
+> > > The issue is that there isn't any request in queue(queue is frozen), but
+> > > dispatch still may happen, let me explain it a bit:
+> > > 
+> > > 1) there are several IO submit paths in-progress
+> > > 2) requests from all these paths are inserted to queue, but may dispatch to
+> > > LLD in only one of these paths, but other paths may still move on to dispatch
+> > > even all these requests are completed(that means blk_mq_freeze_queue_wait()
+> > > returns at that time)
+> > > 3) the dispatch after queue dead happens and causes the use-after-free,
+> > > because we never respect queue dead for blk-mq.
+> > 
+> > After a queue has been marked "dying" and after blk_freeze_queue() has
+> > returned it is guaranteed that all requests have finished and that all future
+> > blk_get_request() calls will fail. Hence .queue_rq() won't be called anymore.
+> > Any code that runs a queue (the __blk_mq_run_hw_queue() / blk_mq_make_request()
+> > callers) must hold a reference on that queue. Running a queue even after
 > 
-> This patch fixes the following kernel crash:
+> The reference is released via blk_queue_exit() when the request is freed in
+> blk_mq_free_request(), but the dispatch may still be in-progress after the request
+> is freed. I suggest you to take a look at the following words carefully,
+> and if you think something is wrong, please comment on it directly:
 > 
-> [   42.170824] BUG: unable to handle kernel NULL pointer dereference at           (null)
-> [   42.172011] IP: blk_mq_flush_busy_ctxs+0x5a/0xe0
-> [   42.172011] PGD 25d8d1067 P4D 25d8d1067 PUD 25d458067 PMD 0
-> [   42.172011] Oops: 0000 [#1] PREEMPT SMP
-> [   42.172011] Dumping ftrace buffer:
-> [   42.172011]    (ftrace buffer empty)
-> [   42.172011] Modules linked in: scsi_debug ebtable_filter ebtables ip6table_filter ip6_tables xt_CHECKSUM iptable_mangle ipt_MASQUERADE nf_nat_masquerade_ipv4 iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 nf_nat nf_conntrack libcrc32c bridge stp llc fuse iptable_filter ip_tables sd_mod sg mptsas mptscsih mptbase crc32c_intel scsi_transport_sas nvme lpc_ich serio_raw ahci virtio_scsi libahci libata nvme_core binfmt_misc dm_mod iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi null_blk configs
-> [   42.172011] CPU: 0 PID: 2750 Comm: fio Not tainted 4.14.0-rc7.blk_mq_io_hang+ #507
-> [   42.172011] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.9.3-1.fc25 04/01/2014
-> [   42.172011] task: ffff88025dc18000 task.stack: ffffc900028c4000
-> [   42.172011] RIP: 0010:blk_mq_flush_busy_ctxs+0x5a/0xe0
-> [   42.172011] RSP: 0018:ffffc900028c7be0 EFLAGS: 00010246
-> [   42.172011] RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff8802775907c8
-> [   42.172011] RDX: 0000000000000000 RSI: ffffc900028c7c50 RDI: ffff88025de25c00
-> [   42.172011] RBP: ffffc900028c7c28 R08: 0000000000000000 R09: ffff8802595692c0
-> [   42.172011] R10: ffffc900028c7e50 R11: 0000000000000008 R12: ffffc900028c7c50
-> [   42.172011] R13: ffff88025de25cd8 R14: ffffc900028c7d78 R15: ffff88025de25c00
-> [   42.172011] FS:  00007faa8653f7c0(0000) GS:ffff88027fc00000(0000) knlGS:0000000000000000
-> [   42.172011] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [   42.172011] CR2: 0000000000000000 CR3: 00000002593df006 CR4: 00000000003606f0
-> [   42.172011] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> [   42.172011] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> [   42.172011] Call Trace:
-> [   42.172011]  blk_mq_sched_dispatch_requests+0x1b4/0x1f0
-> [   42.172011]  ? preempt_schedule+0x27/0x30
-> [   42.172011]  __blk_mq_run_hw_queue+0x8b/0xa0
-> [   42.172011]  __blk_mq_delay_run_hw_queue+0xb7/0x100
-> [   42.172011]  blk_mq_run_hw_queue+0x14/0x20
-> [   42.172011]  blk_mq_sched_insert_requests+0xda/0x120
-> [   42.172011]  blk_mq_flush_plug_list+0x179/0x280
-> [   42.172011]  blk_flush_plug_list+0x102/0x290
-> [   42.172011]  blk_finish_plug+0x2c/0x40
-> [   42.172011]  do_io_submit+0x3fa/0x780
-> [   42.172011]  SyS_io_submit+0x10/0x20
-> [   42.172011]  ? SyS_io_submit+0x10/0x20
-> [   42.172011]  entry_SYSCALL_64_fastpath+0x1a/0xa5
-> [   42.172011] RIP: 0033:0x7faa80ff8697
-> [   42.172011] RSP: 002b:00007ffe08236de8 EFLAGS: 00000206 ORIG_RAX: 00000000000000d1
-> [   42.172011] RAX: ffffffffffffffda RBX: 0000000001f1e600 RCX: 00007faa80ff8697
-> [   42.172011] RDX: 000000000208e638 RSI: 0000000000000001 RDI: 00007faa6ecae000
-> [   42.172011] RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000001f1e0e0
-> [   42.172011] R10: 0000000000000001 R11: 0000000000000206 R12: 00007faa614f19e0
-> [   42.172011] R13: 00007faa614ff0b0 R14: 00007faa614fef50 R15: 0000000100000000
-> [   42.172011] Code: e0 00 00 00 c7 45 bc 00 00 00 00 85 c0 74 76 4c 8d af d8 00 00 00 49 89 ff 44 8b 45 bc 4c 89 c0 49 c1 e0 06 4d 03 87 e8 00 00 00 <49> 83 38 00 4d 89 c6 74 41 41 8b 8f dc 00 00 00 41 89 c4 31 db
-> [   42.172011] RIP: blk_mq_flush_busy_ctxs+0x5a/0xe0 RSP: ffffc900028c7be0
-> [   42.172011] CR2: 0000000000000000
-> [   42.172011] ---[ end trace 2432dfddf9b84061 ]---
-> [   42.172011] Kernel panic - not syncing: Fatal exception
-> [   42.172011] Dumping ftrace buffer:
-> [   42.172011]    (ftrace buffer empty)
-> [   42.172011] Kernel Offset: disabled
-> [   42.172011] ---[ end Kernel panic - not syncing: Fatal exception
+> 	1) there are several IO submit paths in-progress
 > 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-core.c | 4 ++++
->  1 file changed, 4 insertions(+)
+> 	2) requests from all these paths are inserted to queue, but may dispatch to
+> 	LLD in only one of these paths, but other paths may still move on to dispatch
+> 	even all these requests are completed(that means blk_mq_freeze_queue_wait()
+> 	returns at that time)
 > 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 048be4aa6024..0b121f29e3b1 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -658,6 +658,10 @@ void blk_cleanup_queue(struct request_queue *q)
->  	queue_flag_set(QUEUE_FLAG_DEAD, q);
->  	spin_unlock_irq(lock);
->  
-> +	/* respect queue DEAD via quiesce for blk-mq */
-> +	if (q->mq_ops)
-> +		blk_mq_quiesce_queue(q);
-> +
->  	/* for synchronous bio-based driver finish in-flight integrity i/o */
->  	blk_flush_integrity();
+> 	3) the dispatch after queue dead happens and causes the use-after-free,
+> 	because we never respect queue dead for blk-mq.
+> 
+> blk_freeze_queue() can make sure that no .queue_rq() can be run, but
+> can't make sure the other dispatch part(like dequeue, check if there is
+> work in queue, ...) is finished.
 
 Hi Jens,
 
-Could you consider this patch? This issue can be reproduced easily
-in heavy IO and device remove test on SCSI.
+Please consider this patch for V4.14, since the in-progress dispatch
+after queue DEAD may cause memory corruption(some operations on ctx & lock
+may write to the freed memory).
 
--- 
+Thanks,
 Ming
