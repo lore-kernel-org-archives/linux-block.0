@@ -1,32 +1,47 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] blk-mq: Avoid that request queue removal can trigger list
- corruption
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- linux-scsi@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
- Johannes Thumshirn <jthumshirn@suse.de>
-References: <20171108182345.8616-1-bart.vanassche@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <09b1199a-6ddf-ff5a-8f3b-99fc7a07937b@kernel.dk>
-Date: Wed, 8 Nov 2017 11:32:42 -0700
+Return-Path: <prvs=47882fd2f=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>,
+	<linux-scsi@vger.kernel.org>, Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.com>, Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH] blk-mq: Avoid that request queue removal can trigger list corruption
+Date: Wed, 8 Nov 2017 10:23:45 -0800
+Message-ID: <20171108182345.8616-1-bart.vanassche@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <20171108182345.8616-1-bart.vanassche@wdc.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
+Return-Path: bart.vanassche@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 11/08/2017 11:23 AM, Bart Van Assche wrote:
-> Avoid that removal of a request queue sporadically triggers the
-> following warning:
-> 
-> list_del corruption. next->prev should be ffff8807d649b970, but was 6b6b6b6b6b6b6b6b
-> WARNING: CPU: 3 PID: 342 at lib/list_debug.c:56 __list_del_entry_valid+0x92/0xa0
-> Call Trace:
->  process_one_work+0x11b/0x660
->  worker_thread+0x3d/0x3b0
->  kthread+0x129/0x140
->  ret_from_fork+0x27/0x40
+Avoid that removal of a request queue sporadically triggers the
+following warning:
 
-Looks good to me, applied.
+list_del corruption. next->prev should be ffff8807d649b970, but was 6b6b6b6b6b6b6b6b
+WARNING: CPU: 3 PID: 342 at lib/list_debug.c:56 __list_del_entry_valid+0x92/0xa0
+Call Trace:
+ process_one_work+0x11b/0x660
+ worker_thread+0x3d/0x3b0
+ kthread+0x129/0x140
+ ret_from_fork+0x27/0x40
 
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ block/blk-core.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 25ccddd0b82a..1b80d43fcbc6 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -339,6 +339,7 @@ void blk_sync_queue(struct request_queue *q)
+ 		struct blk_mq_hw_ctx *hctx;
+ 		int i;
+ 
++		cancel_delayed_work_sync(&q->requeue_work);
+ 		queue_for_each_hw_ctx(q, hctx, i)
+ 			cancel_delayed_work_sync(&hctx->run_work);
+ 	} else {
 -- 
-Jens Axboe
+2.14.3
