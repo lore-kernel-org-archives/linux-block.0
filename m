@@ -1,237 +1,317 @@
-Return-Path: <axboe@kernel.dk>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] blk-mq: fix issue with shared tag queue re-running
-Cc: Omar Sandoval <osandov@fb.com>
-Message-ID: <98418e6d-2981-0fb7-dcdd-79b635955fcf@kernel.dk>
-Date: Wed, 8 Nov 2017 15:48:51 -0700
+Return-Path: <prvs=479c705ad=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, "Christoph
+ Hellwig" <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
+	Oleksandr Natalenko <oleksandr@natalenko.name>, Ming Lei
+	<ming.lei@redhat.com>, Martin Steigerwald <martin@lichtvoll.de>, "Bart Van
+ Assche" <bart.vanassche@wdc.com>, Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH v12 6/7] block, scsi: Make SCSI quiesce and resume work reliably
+Date: Thu, 9 Nov 2017 10:49:58 -0800
+Message-ID: <20171109184959.4617-7-bart.vanassche@wdc.com>
+In-Reply-To: <20171109184959.4617-1-bart.vanassche@wdc.com>
+References: <20171109184959.4617-1-bart.vanassche@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
+Return-Path: bart.vanassche@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-This patch attempts to make the case of hctx re-running on driver tag
-failure more robust. Without this patch, it's pretty easy to trigger a
-stall condition with shared tags. An example is using null_blk like
-this:
+The contexts from which a SCSI device can be quiesced or resumed are:
+* Writing into /sys/class/scsi_device/*/device/state.
+* SCSI parallel (SPI) domain validation.
+* The SCSI device power management methods. See also scsi_bus_pm_ops.
 
-modprobe null_blk queue_mode=2 nr_devices=4 shared_tags=1 submit_queues=1 hw_queue_depth=1
+It is essential during suspend and resume that neither the filesystem
+state nor the filesystem metadata in RAM changes. This is why while
+the hibernation image is being written or restored that SCSI devices
+are quiesced. The SCSI core quiesces devices through scsi_device_quiesce()
+and scsi_device_resume(). In the SDEV_QUIESCE state execution of
+non-preempt requests is deferred. This is realized by returning
+BLKPREP_DEFER from inside scsi_prep_state_check() for quiesced SCSI
+devices. Avoid that a full queue prevents power management requests
+to be submitted by deferring allocation of non-preempt requests for
+devices in the quiesced state. This patch has been tested by running
+the following commands and by verifying that after each resume the
+fio job was still running:
 
-which sets up 4 devices, sharing the same tag set with a depth of 1.
-Running a fio job ala:
+for ((i=0; i<10; i++)); do
+  (
+    cd /sys/block/md0/md &&
+    while true; do
+      [ "$(<sync_action)" = "idle" ] && echo check > sync_action
+      sleep 1
+    done
+  ) &
+  pids=($!)
+  for d in /sys/class/block/sd*[a-z]; do
+    bdev=${d#/sys/class/block/}
+    hcil=$(readlink "$d/device")
+    hcil=${hcil#../../../}
+    echo 4 > "$d/queue/nr_requests"
+    echo 1 > "/sys/class/scsi_device/$hcil/device/queue_depth"
+    fio --name="$bdev" --filename="/dev/$bdev" --buffered=0 --bs=512 \
+      --rw=randread --ioengine=libaio --numjobs=4 --iodepth=16       \
+      --iodepth_batch=1 --thread --loops=$((2**31)) &
+    pids+=($!)
+  done
+  sleep 1
+  echo "$(date) Hibernating ..." >>hibernate-test-log.txt
+  systemctl hibernate
+  sleep 10
+  kill "${pids[@]}"
+  echo idle > /sys/block/md0/md/sync_action
+  wait
+  echo "$(date) Done." >>hibernate-test-log.txt
+done
 
-[global]
-bs=4k
-rw=randread
-norandommap
-direct=1
-ioengine=libaio
-iodepth=4
-
-[nullb0]
-filename=/dev/nullb0
-[nullb1]
-filename=/dev/nullb1
-[nullb2]
-filename=/dev/nullb2
-[nullb3]
-filename=/dev/nullb3
-
-will inevitably end with one or more threads being stuck waiting for a
-scheduler tag. That IO is then stuck forever, until someone else
-triggers a run of the queue.
-
-Ensure that we always re-run the hardware queue, if the driver tag we
-were waiting for got freed before we added our leftover request entries
-back on the dispatch list.
-
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
+Reported-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+References: "I/O hangs after resuming from suspend-to-ram" (https://marc.info/?l=linux-block&m=150340235201348).
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Tested-by: Martin Steigerwald <martin@lichtvoll.de>
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
+ block/blk-core.c           | 42 ++++++++++++++++++++++++++++++++++--------
+ block/blk-mq.c             |  4 ++--
+ drivers/scsi/scsi_lib.c    | 42 ++++++++++++++++++++++++++++++------------
+ fs/block_dev.c             |  4 ++--
+ include/linux/blkdev.h     |  2 +-
+ include/scsi/scsi_device.h |  1 +
+ 6 files changed, 70 insertions(+), 25 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 7f4a1ba532af..bb7f08415203 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -179,7 +179,6 @@ static const char *const hctx_state_name[] = {
- 	HCTX_STATE_NAME(STOPPED),
- 	HCTX_STATE_NAME(TAG_ACTIVE),
- 	HCTX_STATE_NAME(SCHED_RESTART),
--	HCTX_STATE_NAME(TAG_WAITING),
- 	HCTX_STATE_NAME(START_ON_RUN),
- };
- #undef HCTX_STATE_NAME
+diff --git a/block/blk-core.c b/block/blk-core.c
+index edc276899116..29b08428ae45 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -374,6 +374,7 @@ void blk_clear_preempt_only(struct request_queue *q)
+ 
+ 	spin_lock_irqsave(q->queue_lock, flags);
+ 	queue_flag_clear(QUEUE_FLAG_PREEMPT_ONLY, q);
++	wake_up_all(&q->mq_freeze_wq);
+ 	spin_unlock_irqrestore(q->queue_lock, flags);
+ }
+ EXPORT_SYMBOL_GPL(blk_clear_preempt_only);
+@@ -795,15 +796,38 @@ struct request_queue *blk_alloc_queue(gfp_t gfp_mask)
+ }
+ EXPORT_SYMBOL(blk_alloc_queue);
+ 
+-int blk_queue_enter(struct request_queue *q, bool nowait)
++/**
++ * blk_queue_enter() - try to increase q->q_usage_counter
++ * @q: request queue pointer
++ * @flags: BLK_MQ_REQ_NOWAIT and/or BLK_MQ_REQ_PREEMPT
++ */
++int blk_queue_enter(struct request_queue *q, unsigned int flags)
+ {
++	const bool preempt = flags & BLK_MQ_REQ_PREEMPT;
++
+ 	while (true) {
++		bool success = false;
+ 		int ret;
+ 
+-		if (percpu_ref_tryget_live(&q->q_usage_counter))
++		rcu_read_lock_sched();
++		if (percpu_ref_tryget_live(&q->q_usage_counter)) {
++			/*
++			 * The code that sets the PREEMPT_ONLY flag is
++			 * responsible for ensuring that that flag is globally
++			 * visible before the queue is unfrozen.
++			 */
++			if (preempt || !blk_queue_preempt_only(q)) {
++				success = true;
++			} else {
++				percpu_ref_put(&q->q_usage_counter);
++			}
++		}
++		rcu_read_unlock_sched();
++
++		if (success)
+ 			return 0;
+ 
+-		if (nowait)
++		if (flags & BLK_MQ_REQ_NOWAIT)
+ 			return -EBUSY;
+ 
+ 		/*
+@@ -816,7 +840,8 @@ int blk_queue_enter(struct request_queue *q, bool nowait)
+ 		smp_rmb();
+ 
+ 		ret = wait_event_interruptible(q->mq_freeze_wq,
+-				!atomic_read(&q->mq_freeze_depth) ||
++				(atomic_read(&q->mq_freeze_depth) == 0 &&
++				 (preempt || !blk_queue_preempt_only(q))) ||
+ 				blk_queue_dying(q));
+ 		if (blk_queue_dying(q))
+ 			return -ENODEV;
+@@ -1445,8 +1470,7 @@ static struct request *blk_old_get_request(struct request_queue *q,
+ 	/* create ioc upfront */
+ 	create_io_context(gfp_mask, q->node);
+ 
+-	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM) ||
+-			      (op & REQ_NOWAIT));
++	ret = blk_queue_enter(q, flags);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 	spin_lock_irq(q->queue_lock);
+@@ -2267,8 +2291,10 @@ blk_qc_t generic_make_request(struct bio *bio)
+ 	current->bio_list = bio_list_on_stack;
+ 	do {
+ 		struct request_queue *q = bio->bi_disk->queue;
++		unsigned int flags = bio->bi_opf & REQ_NOWAIT ?
++			BLK_MQ_REQ_NOWAIT : 0;
+ 
+-		if (likely(blk_queue_enter(q, bio->bi_opf & REQ_NOWAIT) == 0)) {
++		if (likely(blk_queue_enter(q, flags) == 0)) {
+ 			struct bio_list lower, same;
+ 
+ 			/* Create a fresh bio_list for all subordinate requests */
+@@ -2327,7 +2353,7 @@ blk_qc_t direct_make_request(struct bio *bio)
+ 	if (!generic_make_request_checks(bio))
+ 		return BLK_QC_T_NONE;
+ 
+-	if (unlikely(blk_queue_enter(q, nowait))) {
++	if (unlikely(blk_queue_enter(q, nowait ? BLK_MQ_REQ_NOWAIT : 0))) {
+ 		if (nowait && !blk_queue_dying(q))
+ 			bio->bi_status = BLK_STS_AGAIN;
+ 		else
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3d759bb8a5bb..8dc5db40df9d 100644
+index 2c7ceb34a016..4fb187570e96 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -998,49 +998,64 @@ bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
- 	return rq->tag != -1;
- }
+@@ -389,7 +389,7 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ 	struct request *rq;
+ 	int ret;
  
--static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode, int flags,
--				void *key)
-+static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
-+				int flags, void *key)
+-	ret = blk_queue_enter(q, flags & BLK_MQ_REQ_NOWAIT);
++	ret = blk_queue_enter(q, flags);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 
+@@ -428,7 +428,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ 	if (hctx_idx >= q->nr_hw_queues)
+ 		return ERR_PTR(-EIO);
+ 
+-	ret = blk_queue_enter(q, true);
++	ret = blk_queue_enter(q, flags);
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 1e94081cc791..91016208d107 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -2941,21 +2941,37 @@ static void scsi_wait_for_queuecommand(struct scsi_device *sdev)
+ int
+ scsi_device_quiesce(struct scsi_device *sdev)
  {
- 	struct blk_mq_hw_ctx *hctx;
++	struct request_queue *q = sdev->request_queue;
+ 	int err;
  
- 	hctx = container_of(wait, struct blk_mq_hw_ctx, dispatch_wait);
- 
--	list_del(&wait->entry);
--	clear_bit_unlock(BLK_MQ_S_TAG_WAITING, &hctx->state);
-+	list_del_init(&wait->entry);
- 	blk_mq_run_hw_queue(hctx, true);
- 	return 1;
- }
- 
--static bool blk_mq_dispatch_wait_add(struct blk_mq_hw_ctx *hctx)
-+static bool blk_mq_dispatch_wait_add(struct blk_mq_hw_ctx **hctx,
-+				     struct request *rq)
- {
-+	struct blk_mq_hw_ctx *this_hctx = *hctx;
-+	wait_queue_entry_t *wait = &this_hctx->dispatch_wait;
- 	struct sbq_wait_state *ws;
- 
-+	if (!list_empty_careful(&wait->entry))
-+		return false;
++	/*
++	 * It is allowed to call scsi_device_quiesce() multiple times from
++	 * the same context but concurrent scsi_device_quiesce() calls are
++	 * not allowed.
++	 */
++	WARN_ON_ONCE(sdev->quiesced_by && sdev->quiesced_by != current);
 +
-+	spin_lock(&this_hctx->lock);
-+	if (!list_empty(&wait->entry)) {
-+		spin_unlock(&this_hctx->lock);
-+		return false;
-+	}
++	blk_set_preempt_only(q);
 +
-+	ws = bt_wait_ptr(&this_hctx->tags->bitmap_tags, this_hctx);
-+	add_wait_queue(&ws->wait, wait);
++	blk_mq_freeze_queue(q);
++	/*
++	 * Ensure that the effect of blk_set_preempt_only() will be visible
++	 * for percpu_ref_tryget() callers that occur after the queue
++	 * unfreeze even if the queue was already frozen before this function
++	 * was called. See also https://lwn.net/Articles/573497/.
++	 */
++	synchronize_rcu();
++	blk_mq_unfreeze_queue(q);
 +
- 	/*
--	 * The TAG_WAITING bit serves as a lock protecting hctx->dispatch_wait.
--	 * The thread which wins the race to grab this bit adds the hardware
--	 * queue to the wait queue.
-+	 * It's possible that a tag was freed in the window between the
-+	 * allocation failure and adding the hardware queue to the wait
-+	 * queue.
- 	 */
--	if (test_bit(BLK_MQ_S_TAG_WAITING, &hctx->state) ||
--	    test_and_set_bit_lock(BLK_MQ_S_TAG_WAITING, &hctx->state))
-+	if (!blk_mq_get_driver_tag(rq, hctx, false)) {
-+		spin_unlock(&this_hctx->lock);
- 		return false;
+ 	mutex_lock(&sdev->state_mutex);
+ 	err = scsi_device_set_state(sdev, SDEV_QUIESCE);
++	if (err == 0)
++		sdev->quiesced_by = current;
++	else
++		blk_clear_preempt_only(q);
+ 	mutex_unlock(&sdev->state_mutex);
+ 
+-	if (err)
+-		return err;
 -
--	init_waitqueue_func_entry(&hctx->dispatch_wait, blk_mq_dispatch_wake);
--	ws = bt_wait_ptr(&hctx->tags->bitmap_tags, hctx);
-+	}
- 
- 	/*
--	 * As soon as this returns, it's no longer safe to fiddle with
--	 * hctx->dispatch_wait, since a completion can wake up the wait queue
--	 * and unlock the bit.
-+	 * We got a tag, remove outselves from the wait queue to ensure
-+	 * someone else gets the wakeup.
- 	 */
--	add_wait_queue(&ws->wait, &hctx->dispatch_wait);
-+	spin_lock_irq(&ws->wait.lock);
-+	list_del_init(&wait->entry);
-+	spin_unlock_irq(&ws->wait.lock);
-+	spin_unlock(&this_hctx->lock);
- 	return true;
+-	scsi_run_queue(sdev->request_queue);
+-	while (atomic_read(&sdev->device_busy)) {
+-		msleep_interruptible(200);
+-		scsi_run_queue(sdev->request_queue);
+-	}
+-	return 0;
++	return err;
  }
+ EXPORT_SYMBOL(scsi_device_quiesce);
  
- bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
--		bool got_budget)
-+			     bool got_budget)
- {
- 	struct blk_mq_hw_ctx *hctx;
- 	struct request *rq, *nxt;
-+	bool no_tag = false;
- 	int errors, queued;
+@@ -2975,9 +2991,11 @@ void scsi_device_resume(struct scsi_device *sdev)
+ 	 * device deleted during suspend)
+ 	 */
+ 	mutex_lock(&sdev->state_mutex);
+-	if (sdev->sdev_state == SDEV_QUIESCE &&
+-	    scsi_device_set_state(sdev, SDEV_RUNNING) == 0)
+-		scsi_run_queue(sdev->request_queue);
++	WARN_ON_ONCE(!sdev->quiesced_by);
++	sdev->quiesced_by = NULL;
++	blk_clear_preempt_only(sdev->request_queue);
++	if (sdev->sdev_state == SDEV_QUIESCE)
++		scsi_device_set_state(sdev, SDEV_RUNNING);
+ 	mutex_unlock(&sdev->state_mutex);
+ }
+ EXPORT_SYMBOL(scsi_device_resume);
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 222824ecd480..4a181fcb5175 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -662,7 +662,7 @@ int bdev_read_page(struct block_device *bdev, sector_t sector,
+ 	if (!ops->rw_page || bdev_get_integrity(bdev))
+ 		return result;
  
- 	if (list_empty(list))
-@@ -1060,22 +1075,15 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 		if (!blk_mq_get_driver_tag(rq, &hctx, false)) {
- 			/*
- 			 * The initial allocation attempt failed, so we need to
--			 * rerun the hardware queue when a tag is freed.
-+			 * rerun the hardware queue when a tag is freed. The
-+			 * waitqueue takes care of that. If the queue is run
-+			 * before we add this entry back on the dispatch list,
-+			 * we'll re-run it below.
- 			 */
--			if (!blk_mq_dispatch_wait_add(hctx)) {
--				if (got_budget)
--					blk_mq_put_dispatch_budget(hctx);
--				break;
--			}
--
--			/*
--			 * It's possible that a tag was freed in the window
--			 * between the allocation failure and adding the
--			 * hardware queue to the wait queue.
--			 */
--			if (!blk_mq_get_driver_tag(rq, &hctx, false)) {
-+			if (!blk_mq_dispatch_wait_add(&hctx, rq)) {
- 				if (got_budget)
- 					blk_mq_put_dispatch_budget(hctx);
-+				no_tag = true;
- 				break;
- 			}
- 		}
-@@ -1140,10 +1148,10 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 		 * it is no longer set that means that it was cleared by another
- 		 * thread and hence that a queue rerun is needed.
- 		 *
--		 * If TAG_WAITING is set that means that an I/O scheduler has
--		 * been configured and another thread is waiting for a driver
--		 * tag. To guarantee fairness, do not rerun this hardware queue
--		 * but let the other thread grab the driver tag.
-+		 * If 'no_tag' is set, that means that we failed getting
-+		 * a driver tag with an I/O scheduler attached. If our dispatch
-+		 * waitqueue is no longer active, ensure that we run the queue
-+		 * AFTER adding our entries back to the list.
- 		 *
- 		 * If no I/O scheduler has been configured it is possible that
- 		 * the hardware queue got stopped and restarted before requests
-@@ -1156,7 +1164,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 		 *   and dm-rq.
- 		 */
- 		if (!blk_mq_sched_needs_restart(hctx) &&
--		    !test_bit(BLK_MQ_S_TAG_WAITING, &hctx->state))
-+		    (no_tag && list_empty_careful(&hctx->dispatch_wait.entry)))
- 			blk_mq_run_hw_queue(hctx, true);
- 	}
+-	result = blk_queue_enter(bdev->bd_queue, false);
++	result = blk_queue_enter(bdev->bd_queue, 0);
+ 	if (result)
+ 		return result;
+ 	result = ops->rw_page(bdev, sector + get_start_sect(bdev), page, false);
+@@ -698,7 +698,7 @@ int bdev_write_page(struct block_device *bdev, sector_t sector,
  
-@@ -2020,6 +2028,9 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ 	if (!ops->rw_page || bdev_get_integrity(bdev))
+ 		return -EOPNOTSUPP;
+-	result = blk_queue_enter(bdev->bd_queue, false);
++	result = blk_queue_enter(bdev->bd_queue, 0);
+ 	if (result)
+ 		return result;
  
- 	hctx->nr_ctx = 0;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 2147e2381a22..402c9d536ae1 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -959,7 +959,7 @@ extern int scsi_cmd_ioctl(struct request_queue *, struct gendisk *, fmode_t,
+ extern int sg_scsi_ioctl(struct request_queue *, struct gendisk *, fmode_t,
+ 			 struct scsi_ioctl_command __user *);
  
-+	init_waitqueue_func_entry(&hctx->dispatch_wait, blk_mq_dispatch_wake);
-+	INIT_LIST_HEAD(&hctx->dispatch_wait.entry);
-+
- 	if (set->ops->init_hctx &&
- 	    set->ops->init_hctx(hctx, set->driver_data, hctx_idx))
- 		goto free_bitmap;
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 674641527da7..4ae987c2352c 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -35,7 +35,7 @@ struct blk_mq_hw_ctx {
- 	struct blk_mq_ctx	**ctxs;
- 	unsigned int		nr_ctx;
- 
--	wait_queue_entry_t		dispatch_wait;
-+	wait_queue_entry_t	dispatch_wait;
- 	atomic_t		wait_index;
- 
- 	struct blk_mq_tags	*tags;
-@@ -181,8 +181,7 @@ enum {
- 	BLK_MQ_S_STOPPED	= 0,
- 	BLK_MQ_S_TAG_ACTIVE	= 1,
- 	BLK_MQ_S_SCHED_RESTART	= 2,
--	BLK_MQ_S_TAG_WAITING	= 3,
--	BLK_MQ_S_START_ON_RUN	= 4,
-+	BLK_MQ_S_START_ON_RUN	= 3,
- 
- 	BLK_MQ_MAX_DEPTH	= 10240,
+-extern int blk_queue_enter(struct request_queue *q, bool nowait);
++extern int blk_queue_enter(struct request_queue *q, unsigned int flags);
+ extern void blk_queue_exit(struct request_queue *q);
+ extern void blk_start_queue(struct request_queue *q);
+ extern void blk_start_queue_async(struct request_queue *q);
+diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
+index 67c5a9f223f7..59ea1e4a4a50 100644
+--- a/include/scsi/scsi_device.h
++++ b/include/scsi/scsi_device.h
+@@ -220,6 +220,7 @@ struct scsi_device {
+ 	unsigned char		access_state;
+ 	struct mutex		state_mutex;
+ 	enum scsi_device_state sdev_state;
++	struct task_struct	*quiesced_by;
+ 	unsigned long		sdev_data[0];
+ } __attribute__((aligned(sizeof(unsigned long))));
  
 -- 
-Jens Axboe
+2.14.3
