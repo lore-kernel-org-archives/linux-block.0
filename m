@@ -1,87 +1,104 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ua0-f193.google.com ([209.85.217.193]:42249 "EHLO
-        mail-ua0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751303AbdKUN6v (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Nov 2017 08:58:51 -0500
+Received: from mga01.intel.com ([192.55.52.88]:31299 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751132AbdKIPdf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 9 Nov 2017 10:33:35 -0500
+Subject: Re: [PATCH V13 07/10] mmc: block: blk-mq: Add support for direct
+ completion
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <1509715220-31885-1-git-send-email-adrian.hunter@intel.com>
+ <1509715220-31885-8-git-send-email-adrian.hunter@intel.com>
+ <CACRpkdb_ggnC6tguEajiiyMaC=NiNQ-pdOydNJ5w69HgQ05SmQ@mail.gmail.com>
+ <fcba7824-db15-d331-e580-7e26f07e6939@intel.com>
+ <CACRpkdb2AZbqU=J8X8EtS5WG1vORgOhTuq8TgENUAnv9A7O5VQ@mail.gmail.com>
+From: Adrian Hunter <adrian.hunter@intel.com>
+Message-ID: <44da3008-8dfd-01e4-39c1-15df20cef0e2@intel.com>
+Date: Thu, 9 Nov 2017 17:33:03 +0200
 MIME-Version: 1.0
-From: Rui Hua <huarui.dev@gmail.com>
-Date: Tue, 21 Nov 2017 21:58:30 +0800
-Message-ID: <CAPGwLLOXh7-T7HtXGWRTAuLh3La-njWtv44dgPZXUfbrUod1zA@mail.gmail.com>
-Subject: [PATCH] bcache: return IOERR to upper layer when read request meet
- metadata error
-To: Coly Li <i@coly.li>, Michael Lyle <mlyle@lyle.org>
-Cc: linux-bcache <linux-bcache@vger.kernel.org>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CACRpkdb2AZbqU=J8X8EtS5WG1vORgOhTuq8TgENUAnv9A7O5VQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The read request might meet error when searching the btree, but the error was
-not handled in cache_lookup(), and this kind of metadata failure will not go
-into cached_dev_read_error(), finally, the upper layer will receive bi_status=0.
-In this patch we judge the metadata error by the return value of
-bch_btree_map_keys(), there are two potential paths give rise to the error:
-1.Because the btree is not totally cached in memery, we maybe get error when
-  read btree node from cache device (see bch_btree_node_get()), the likely
-  errno is -EIO, -ENOMEM
-2.When read miss happend, bch_btree_insert_check_key() will be called to
-  insert a "replace_key" to btree(see cached_dev_cache_miss(), just for doing
-  preparatory work before insert the missed data to cache device), a failure
-  can also happen in this situation, the likely errno is -ENOMEM
-bch_btree_map_keys() will return MAP_DONE in normal scenario, but we will
-get either -EIO or -ENOMEM in above two cases. if these happend, we should
-NOT recover data from backing device (when cache device is dirty) because
-we don't know whether bkeys the read request covered are all clean.
-And after that happend, s->iop.status is still its initially value(0)
-before we submit s->bio.bio, we set it to BLK_STS_IOERR, so it can go into
-cached_dev_read_error(), and finally it can be passed to upper layer,
-or recovered by reread from backing device.
+On 09/11/17 14:34, Linus Walleij wrote:
+> On Thu, Nov 9, 2017 at 8:27 AM, Adrian Hunter <adrian.hunter@intel.com> wrote:
+>> On 08/11/17 11:28, Linus Walleij wrote:
+>>> On Fri, Nov 3, 2017 at 2:20 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
+>>>
+>>>> For blk-mq, add support for completing requests directly in the ->done
+>>>> callback. That means that error handling and urgent background operations
+>>>> must be handled by recovery_work in that case.
+>>>>
+>>>> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+>>>
+>>> I tried enabling this on my MMC host (mmci) but I got weird
+>>> DMA error messages when I did.
+>>>
+>>> I guess this has not been tested on a non-DMA-coherent
+>>> system?
+>>
+>> I don't see what DMA-coherence has to do with anything.
+>>
+>> Possibilities:
+>>         - DMA unmapping doesn't work in an atomic context
+>>         - requests' DMA operations have to be synchronized with each other
+> 
+> So since MMCI need the post_req() hook called with
+> an error code to properly tear down any DMA operations,
+> I was worried that maybe your error path is not doing this
+> (passing an error code or calling in the right order).
+> 
+> I had a bunch of fallouts in my own patch set relating
+> to that.
+> 
+>>> I think I might be seeing this because the .pre and .post
+>>> callbacks need to be strictly sequenced, and this is
+>>> maybe not taken into account here?
+>>
+>> I looked at mmci but that did not seem to be the case.
+>>
+>>> Isn't there as risk
+>>> that the .post callback of the next request is called before
+>>> the .post callback of the previous request has returned
+>>> for example?
+>>
+>> Of course, the requests are treated as independent.  If the separate DMA
+>> operations require synchronization, that is for the host driver to fix.
+> 
+> They are treated as independent by the block layer but
+> it is the subsystems duty to serialize them for the hardware,
+> 
+> MMCI strictly requires that pre/post hooks per request
+> happen in the right order, so if you have prepared a second
+> request after submitting the first, and the first fails, you have
+> to back out by unpreparing the second one before unpreparing
+> the first. It is also the only host driver requireing to be passed
+> an error code in the last parameter to the post hook in
+> order to work properly.
+> 
+> I think your patch set handles that nicely though, because I
+> haven't seen any errors, it's just when we do this direct
+> completion I see problems.
 
-Signed-off-by: Hua Rui <huarui.dev@gmail.com>
----
- drivers/md/bcache/request.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
-
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index f02fefb..b749431 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -576,6 +576,7 @@ static void cache_lookup(struct closure *cl)
- {
-        struct search *s = container_of(cl, struct search, iop.cl);
-        struct bio *bio = &s->bio.bio;
-+       struct cached_dev *dc;
-        int ret;
-
-        bch_btree_op_init(&s->op, -1);
-@@ -588,6 +589,27 @@ static void cache_lookup(struct closure *cl)
-                return;
-        }
-
-+       /*
-+        * We might meet err when searching the btree, If that happend, we will
-+        * get negative ret, in this scenario we should not recover data from
-+        * backing device (when cache device is dirty) because we don't know
-+        * whether bkeys the read request covered are all clean.
-+        *
-+        * And after that happend, s->iop.status is still its initially value
-+        * before we submit s->bio.bio
-+        */
-+        if (ret < 0) {
-+                BUG_ON(ret == -EINTR);
-+                if (s->d && s->d->c &&
-+                        !UUID_FLASH_ONLY(&s->d->c->uuids[s->d->id])) {
-+                        dc = container_of(s->d, struct cached_dev, disk);
-+                        if (dc && atomic_read(&dc->has_dirty))
-+                                s->recoverable = false;
-+                }
-+                if (!s->iop.status)
-+                        s->iop.status = BLK_STS_IOERR;
-+        }
-+
-        closure_return(cl);
- }
-
--- 
-1.8.3.1
+If a request gets an error, then we always do the post_req before starting
+another request, so the driver can assume that the first request finished
+successfully if it is asked to do post_req on the second request.  So the
+driver does have enough information to keep the DMA unmapping in order if
+necessary.
