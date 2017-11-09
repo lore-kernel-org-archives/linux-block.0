@@ -1,263 +1,126 @@
-Return-Path: <jiangqi903@gmail.com>
-Return-Path: <jiangqi903@gmail.com>
-From: Joseph Qi <jiangqi903@gmail.com>
-Subject: [PATCH v2 RESEND 1/2] blk-throttle: track read and write request
- individually
-To: Jens Axboe <axboe@kernel.dk>, Shaohua Li <shli@fb.com>,
- linux-block <linux-block@vger.kernel.org>
-Cc: qijiang.qj@alibaba-inc.com
-Message-ID: <9ce1aef1-be81-460c-41fe-27be40633946@gmail.com>
-Date: Mon, 20 Nov 2017 09:59:55 +0800
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <prvs=47960c428=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V8 4/7] deadline-iosched: Introduce dispatch helpers
+Date: Thu,  9 Nov 2017 15:57:04 +0900
+Message-Id: <20171109065707.17210-5-damien.lemoal@wdc.com>
+In-Reply-To: <20171109065707.17210-1-damien.lemoal@wdc.com>
+References: <20171109065707.17210-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Joseph Qi <qijiang.qj@alibaba-inc.com>
+Avoid directly referencing the next_rq and fifo_list arrays using the
+helper functions deadline_next_request() and deadline_fifo_request() to
+facilitate changes in the dispatch request selection in
+deadline_dispatch_requests() for zoned block devices.
 
-In mixed read/write workload on SSD, write latency is much lower than
-read. But now we only track and record read latency and then use it as
-threshold base for both read and write io latency accounting. As a
-result, write io latency will always be considered as good and
-bad_bio_cnt is much smaller than 20% of bio_cnt. That is to mean, the
-tg to be checked will be treated as idle most of the time and still let
-others dispatch more ios, even it is truly running under low limit and
-wants its low limit to be guaranteed, which is not we expected in fact.
-So track read and write request individually, which can bring more
-precise latency control for low limit idle detection.
+While at it, also remove the unnecessary forward declaration of the
+function deadline_move_request().
 
-Signed-off-by: Joseph Qi <qijiang.qj@alibaba-inc.com>
-Reviewed-by: Shaohua Li <shli@fb.com>
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 ---
- block/blk-throttle.c | 134 ++++++++++++++++++++++++++++++---------------------
- 1 file changed, 79 insertions(+), 55 deletions(-)
+ block/deadline-iosched.c | 47 +++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 37 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 96ad326..bf52035 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -216,9 +216,9 @@ struct throtl_data
+diff --git a/block/deadline-iosched.c b/block/deadline-iosched.c
+index b83f77460d28..81e3f0897457 100644
+--- a/block/deadline-iosched.c
++++ b/block/deadline-iosched.c
+@@ -50,8 +50,6 @@ struct deadline_data {
+ 	int front_merges;
+ };
  
- 	unsigned int scale;
- 
--	struct latency_bucket tmp_buckets[LATENCY_BUCKET_SIZE];
--	struct avg_latency_bucket avg_buckets[LATENCY_BUCKET_SIZE];
--	struct latency_bucket __percpu *latency_buckets;
-+	struct latency_bucket tmp_buckets[2][LATENCY_BUCKET_SIZE];
-+	struct avg_latency_bucket avg_buckets[2][LATENCY_BUCKET_SIZE];
-+	struct latency_bucket __percpu *latency_buckets[2];
- 	unsigned long last_calculate_time;
- 	unsigned long filtered_latency;
- 
-@@ -2041,10 +2041,10 @@ static void blk_throtl_update_idletime(struct throtl_grp *tg)
- #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
- static void throtl_update_latency_buckets(struct throtl_data *td)
+-static void deadline_move_request(struct deadline_data *, struct request *);
+-
+ static inline struct rb_root *
+ deadline_rb_root(struct deadline_data *dd, struct request *rq)
  {
--	struct avg_latency_bucket avg_latency[LATENCY_BUCKET_SIZE];
--	int i, cpu;
--	unsigned long last_latency = 0;
--	unsigned long latency;
-+	struct avg_latency_bucket avg_latency[2][LATENCY_BUCKET_SIZE];
-+	int i, cpu, rw;
-+	unsigned long last_latency[2] = { 0 };
-+	unsigned long latency[2];
+@@ -231,6 +229,35 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
+ }
  
- 	if (!blk_queue_nonrot(td->queue))
- 		return;
-@@ -2053,56 +2053,67 @@ static void throtl_update_latency_buckets(struct throtl_data *td)
- 	td->last_calculate_time = jiffies;
- 
- 	memset(avg_latency, 0, sizeof(avg_latency));
--	for (i = 0; i < LATENCY_BUCKET_SIZE; i++) {
--		struct latency_bucket *tmp = &td->tmp_buckets[i];
--
--		for_each_possible_cpu(cpu) {
--			struct latency_bucket *bucket;
--
--			/* this isn't race free, but ok in practice */
--			bucket = per_cpu_ptr(td->latency_buckets, cpu);
--			tmp->total_latency += bucket[i].total_latency;
--			tmp->samples += bucket[i].samples;
--			bucket[i].total_latency = 0;
--			bucket[i].samples = 0;
--		}
-+	for (rw = READ; rw <= WRITE; rw++) {
-+		for (i = 0; i < LATENCY_BUCKET_SIZE; i++) {
-+			struct latency_bucket *tmp = &td->tmp_buckets[rw][i];
+ /*
++ * For the specified data direction, return the next request to dispatch using
++ * arrival ordered lists.
++ */
++static struct request *
++deadline_fifo_request(struct deadline_data *dd, int data_dir)
++{
++	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
++		return NULL;
 +
-+			for_each_possible_cpu(cpu) {
-+				struct latency_bucket *bucket;
++	if (list_empty(&dd->fifo_list[data_dir]))
++		return NULL;
 +
-+				/* this isn't race free, but ok in practice */
-+				bucket = per_cpu_ptr(td->latency_buckets[rw],
-+					cpu);
-+				tmp->total_latency += bucket[i].total_latency;
-+				tmp->samples += bucket[i].samples;
-+				bucket[i].total_latency = 0;
-+				bucket[i].samples = 0;
-+			}
++	return rq_entry_fifo(dd->fifo_list[data_dir].next);
++}
++
++/*
++ * For the specified data direction, return the next request to dispatch using
++ * sector position sorted lists.
++ */
++static struct request *
++deadline_next_request(struct deadline_data *dd, int data_dir)
++{
++	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
++		return NULL;
++
++	return dd->next_rq[data_dir];
++}
++
++/*
+  * deadline_dispatch_requests selects the best request according to
+  * read/write expire, fifo_batch, etc
+  */
+@@ -239,16 +266,15 @@ static int deadline_dispatch_requests(struct request_queue *q, int force)
+ 	struct deadline_data *dd = q->elevator->elevator_data;
+ 	const int reads = !list_empty(&dd->fifo_list[READ]);
+ 	const int writes = !list_empty(&dd->fifo_list[WRITE]);
+-	struct request *rq;
++	struct request *rq, *next_rq;
+ 	int data_dir;
  
--		if (tmp->samples >= 32) {
--			int samples = tmp->samples;
-+			if (tmp->samples >= 32) {
-+				int samples = tmp->samples;
+ 	/*
+ 	 * batches are currently reads XOR writes
+ 	 */
+-	if (dd->next_rq[WRITE])
+-		rq = dd->next_rq[WRITE];
+-	else
+-		rq = dd->next_rq[READ];
++	rq = deadline_next_request(dd, WRITE);
++	if (!rq)
++		rq = deadline_next_request(dd, READ);
  
--			latency = tmp->total_latency;
-+				latency[rw] = tmp->total_latency;
- 
--			tmp->total_latency = 0;
--			tmp->samples = 0;
--			latency /= samples;
--			if (latency == 0)
--				continue;
--			avg_latency[i].latency = latency;
-+				tmp->total_latency = 0;
-+				tmp->samples = 0;
-+				latency[rw] /= samples;
-+				if (latency[rw] == 0)
-+					continue;
-+				avg_latency[rw][i].latency = latency[rw];
-+			}
- 		}
- 	}
- 
--	for (i = 0; i < LATENCY_BUCKET_SIZE; i++) {
--		if (!avg_latency[i].latency) {
--			if (td->avg_buckets[i].latency < last_latency)
--				td->avg_buckets[i].latency = last_latency;
--			continue;
--		}
-+	for (rw = READ; rw <= WRITE; rw++) {
-+		for (i = 0; i < LATENCY_BUCKET_SIZE; i++) {
-+			if (!avg_latency[rw][i].latency) {
-+				if (td->avg_buckets[rw][i].latency < last_latency[rw])
-+					td->avg_buckets[rw][i].latency =
-+						last_latency[rw];
-+				continue;
-+			}
- 
--		if (!td->avg_buckets[i].valid)
--			latency = avg_latency[i].latency;
--		else
--			latency = (td->avg_buckets[i].latency * 7 +
--				avg_latency[i].latency) >> 3;
-+			if (!td->avg_buckets[rw][i].valid)
-+				latency[rw] = avg_latency[rw][i].latency;
-+			else
-+				latency[rw] = (td->avg_buckets[rw][i].latency * 7 +
-+					avg_latency[rw][i].latency) >> 3;
- 
--		td->avg_buckets[i].latency = max(latency, last_latency);
--		td->avg_buckets[i].valid = true;
--		last_latency = td->avg_buckets[i].latency;
-+			td->avg_buckets[rw][i].latency = max(latency[rw],
-+				last_latency[rw]);
-+			td->avg_buckets[rw][i].valid = true;
-+			last_latency[rw] = td->avg_buckets[rw][i].latency;
-+		}
- 	}
- 
- 	for (i = 0; i < LATENCY_BUCKET_SIZE; i++)
- 		throtl_log(&td->service_queue,
--			"Latency bucket %d: latency=%ld, valid=%d", i,
--			td->avg_buckets[i].latency, td->avg_buckets[i].valid);
-+			"Latency bucket %d: read latency=%ld, read valid=%d, "
-+			"write latency=%ld, write valid=%d", i,
-+			td->avg_buckets[READ][i].latency,
-+			td->avg_buckets[READ][i].valid,
-+			td->avg_buckets[WRITE][i].latency,
-+			td->avg_buckets[WRITE][i].valid);
- }
- #else
- static inline void throtl_update_latency_buckets(struct throtl_data *td)
-@@ -2249,16 +2260,17 @@ static void throtl_track_latency(struct throtl_data *td, sector_t size,
- 	struct latency_bucket *latency;
- 	int index;
- 
--	if (!td || td->limit_index != LIMIT_LOW || op != REQ_OP_READ ||
-+	if (!td || td->limit_index != LIMIT_LOW ||
-+	    !(op == REQ_OP_READ || op == REQ_OP_WRITE) ||
- 	    !blk_queue_nonrot(td->queue))
- 		return;
- 
- 	index = request_bucket_index(size);
- 
--	latency = get_cpu_ptr(td->latency_buckets);
-+	latency = get_cpu_ptr(td->latency_buckets[op]);
- 	latency[index].total_latency += time;
- 	latency[index].samples++;
--	put_cpu_ptr(td->latency_buckets);
-+	put_cpu_ptr(td->latency_buckets[op]);
- }
- 
- void blk_throtl_stat_add(struct request *rq, u64 time_ns)
-@@ -2277,6 +2289,7 @@ void blk_throtl_bio_endio(struct bio *bio)
- 	unsigned long finish_time;
- 	unsigned long start_time;
- 	unsigned long lat;
-+	int rw = bio_data_dir(bio);
- 
- 	tg = bio->bi_cg_private;
- 	if (!tg)
-@@ -2305,7 +2318,7 @@ void blk_throtl_bio_endio(struct bio *bio)
- 
- 		bucket = request_bucket_index(
- 			blk_stat_size(&bio->bi_issue_stat));
--		threshold = tg->td->avg_buckets[bucket].latency +
-+		threshold = tg->td->avg_buckets[rw][bucket].latency +
- 			tg->latency_target;
- 		if (lat > threshold)
- 			tg->bad_bio_cnt++;
-@@ -2398,9 +2411,16 @@ int blk_throtl_init(struct request_queue *q)
- 	td = kzalloc_node(sizeof(*td), GFP_KERNEL, q->node);
- 	if (!td)
- 		return -ENOMEM;
--	td->latency_buckets = __alloc_percpu(sizeof(struct latency_bucket) *
-+	td->latency_buckets[READ] = __alloc_percpu(sizeof(struct latency_bucket) *
-+		LATENCY_BUCKET_SIZE, __alignof__(u64));
-+	if (!td->latency_buckets[READ]) {
-+		kfree(td);
-+		return -ENOMEM;
-+	}
-+	td->latency_buckets[WRITE] = __alloc_percpu(sizeof(struct latency_bucket) *
- 		LATENCY_BUCKET_SIZE, __alignof__(u64));
--	if (!td->latency_buckets) {
-+	if (!td->latency_buckets[WRITE]) {
-+		free_percpu(td->latency_buckets[READ]);
- 		kfree(td);
- 		return -ENOMEM;
- 	}
-@@ -2419,7 +2439,8 @@ int blk_throtl_init(struct request_queue *q)
- 	/* activate policy */
- 	ret = blkcg_activate_policy(q, &blkcg_policy_throtl);
- 	if (ret) {
--		free_percpu(td->latency_buckets);
-+		free_percpu(td->latency_buckets[READ]);
-+		free_percpu(td->latency_buckets[WRITE]);
- 		kfree(td);
- 	}
- 	return ret;
-@@ -2430,7 +2451,8 @@ void blk_throtl_exit(struct request_queue *q)
- 	BUG_ON(!q->td);
- 	throtl_shutdown_wq(q);
- 	blkcg_deactivate_policy(q, &blkcg_policy_throtl);
--	free_percpu(q->td->latency_buckets);
-+	free_percpu(q->td->latency_buckets[READ]);
-+	free_percpu(q->td->latency_buckets[WRITE]);
- 	kfree(q->td);
- }
- 
-@@ -2448,8 +2470,10 @@ void blk_throtl_register_queue(struct request_queue *q)
+ 	if (rq && dd->batching < dd->fifo_batch)
+ 		/* we have a next request are still entitled to batch */
+@@ -291,19 +317,20 @@ static int deadline_dispatch_requests(struct request_queue *q, int force)
+ 	/*
+ 	 * we are not running a batch, find best request for selected data_dir
+ 	 */
+-	if (deadline_check_fifo(dd, data_dir) || !dd->next_rq[data_dir]) {
++	next_rq = deadline_next_request(dd, data_dir);
++	if (deadline_check_fifo(dd, data_dir) || !next_rq) {
+ 		/*
+ 		 * A deadline has expired, the last request was in the other
+ 		 * direction, or we have run out of higher-sectored requests.
+ 		 * Start again from the request with the earliest expiry time.
+ 		 */
+-		rq = rq_entry_fifo(dd->fifo_list[data_dir].next);
++		rq = deadline_fifo_request(dd, data_dir);
  	} else {
- 		td->throtl_slice = DFL_THROTL_SLICE_HD;
- 		td->filtered_latency = LATENCY_FILTERED_HD;
--		for (i = 0; i < LATENCY_BUCKET_SIZE; i++)
--			td->avg_buckets[i].latency = DFL_HD_BASELINE_LATENCY;
-+		for (i = 0; i < LATENCY_BUCKET_SIZE; i++) {
-+			td->avg_buckets[READ][i].latency = DFL_HD_BASELINE_LATENCY;
-+			td->avg_buckets[WRITE][i].latency = DFL_HD_BASELINE_LATENCY;
-+		}
+ 		/*
+ 		 * The last req was the same dir and we have a next request in
+ 		 * sort order. No expired requests so continue on from here.
+ 		 */
+-		rq = dd->next_rq[data_dir];
++		rq = next_rq;
  	}
- #ifndef CONFIG_BLK_DEV_THROTTLING_LOW
- 	/* if no low limit, use previous default */
+ 
+ 	dd->batching = 0;
 -- 
-1.9.4
+2.13.6
