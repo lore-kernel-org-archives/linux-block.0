@@ -1,70 +1,250 @@
-Return-Path: <ddiss@suse.de>
-From: David Disseldorp <ddiss@suse.de>
-To: linux-block@vger.kernel.org
-Cc: Shaohua Li <shli@fb.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	David Disseldorp <ddiss@suse.de>
-Subject: [PATCH] null_blk: fix dev->badblocks leak
-Date: Wed,  8 Nov 2017 17:29:44 +0100
-Message-Id: <20171108162944.7415-1-ddiss@suse.de>
+Return-Path: <prvs=479c705ad=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, "Christoph
+ Hellwig" <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
+	Oleksandr Natalenko <oleksandr@natalenko.name>, Ming Lei
+	<ming.lei@redhat.com>, Martin Steigerwald <martin@lichtvoll.de>, "Bart Van
+ Assche" <bart.vanassche@wdc.com>, <linux-nvme@lists.infradead.org>,
+	"Johannes Thumshirn" <jthumshirn@suse.de>
+Subject: [PATCH v12 7/7] block, nvme: Introduce blk_mq_req_flags_t
+Date: Thu, 9 Nov 2017 10:49:59 -0800
+Message-ID: <20171109184959.4617-8-bart.vanassche@wdc.com>
+In-Reply-To: <20171109184959.4617-1-bart.vanassche@wdc.com>
+References: <20171109184959.4617-1-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: bart.vanassche@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-null_alloc_dev() allocates memory for dev->badblocks, but cleanup
-currently only occurs in the configfs release codepath, missing a number
-of other places.
+Several block layer and NVMe core functions accept a combination
+of BLK_MQ_REQ_* flags through the 'flags' argument but there is
+no verification at compile time whether the right type of block
+layer flags is passed. Make it possible for sparse to verify this.
+This patch does not change any functionality.
 
-This bug was found running the blktests block/010 test, alongside
-kmemleak:
-rapido1:/blktests# ./check block/010
-...
-rapido1:/blktests# echo scan > /sys/kernel/debug/kmemleak
-[  306.966708] kmemleak: 32 new suspected memory leaks (see /sys/kernel/debug/kmemleak)
-rapido1:/blktests# cat /sys/kernel/debug/kmemleak
-unreferenced object 0xffff88001f86d000 (size 4096):
-  comm "modprobe", pid 231, jiffies 4294892415 (age 318.252s)
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<ffffffff814b0379>] kmemleak_alloc+0x49/0xa0
-    [<ffffffff810f180f>] kmem_cache_alloc+0x9f/0xe0
-    [<ffffffff8124e45f>] badblocks_init+0x2f/0x60
-    [<ffffffffa0019fae>] 0xffffffffa0019fae
-    [<ffffffffa0021273>] nullb_device_badblocks_store+0x63/0x130 [null_blk]
-    [<ffffffff810004cd>] do_one_initcall+0x3d/0x170
-    [<ffffffff8109fe0d>] do_init_module+0x56/0x1e9
-    [<ffffffff8109ebd7>] load_module+0x1c47/0x26a0
-    [<ffffffff8109f819>] SyS_finit_module+0xa9/0xd0
-    [<ffffffff814b4f60>] entry_SYSCALL_64_fastpath+0x13/0x94
-
-Fixes: 2f54a613c942 ("nullb: badbblocks support")
-Signed-off-by: David Disseldorp <ddiss@suse.de>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Cc: linux-nvme@lists.infradead.org
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/null_blk.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ block/blk-core.c          | 12 ++++++------
+ block/blk-mq.c            |  4 ++--
+ block/blk-mq.h            |  2 +-
+ drivers/nvme/host/core.c  |  5 +++--
+ drivers/nvme/host/nvme.h  |  5 +++--
+ include/linux/blk-mq.h    | 17 +++++++++++------
+ include/linux/blk_types.h |  2 ++
+ include/linux/blkdev.h    |  4 ++--
+ 8 files changed, 30 insertions(+), 21 deletions(-)
 
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index 8042c26ea9e6..fc80354477c6 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -467,7 +467,6 @@ static void nullb_device_release(struct config_item *item)
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 29b08428ae45..7c54c195e79e 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -801,7 +801,7 @@ EXPORT_SYMBOL(blk_alloc_queue);
+  * @q: request queue pointer
+  * @flags: BLK_MQ_REQ_NOWAIT and/or BLK_MQ_REQ_PREEMPT
+  */
+-int blk_queue_enter(struct request_queue *q, unsigned int flags)
++int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
  {
- 	struct nullb_device *dev = to_nullb_device(item);
+ 	const bool preempt = flags & BLK_MQ_REQ_PREEMPT;
  
--	badblocks_exit(&dev->badblocks);
- 	null_free_device_storage(dev, false);
- 	null_free_dev(dev);
+@@ -1225,7 +1225,7 @@ int blk_update_nr_requests(struct request_queue *q, unsigned int nr)
+  * Returns request pointer on success, with @q->queue_lock *not held*.
+  */
+ static struct request *__get_request(struct request_list *rl, unsigned int op,
+-				     struct bio *bio, unsigned int flags)
++				     struct bio *bio, blk_mq_req_flags_t flags)
+ {
+ 	struct request_queue *q = rl->q;
+ 	struct request *rq;
+@@ -1408,7 +1408,7 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
+  * Returns request pointer on success, with @q->queue_lock *not held*.
+  */
+ static struct request *get_request(struct request_queue *q, unsigned int op,
+-				   struct bio *bio, unsigned int flags)
++				   struct bio *bio, blk_mq_req_flags_t flags)
+ {
+ 	const bool is_sync = op_is_sync(op);
+ 	DEFINE_WAIT(wait);
+@@ -1458,7 +1458,7 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
+ 
+ /* flags: BLK_MQ_REQ_PREEMPT and/or BLK_MQ_REQ_NOWAIT. */
+ static struct request *blk_old_get_request(struct request_queue *q,
+-					   unsigned int op, unsigned int flags)
++				unsigned int op, blk_mq_req_flags_t flags)
+ {
+ 	struct request *rq;
+ 	gfp_t gfp_mask = flags & BLK_MQ_REQ_NOWAIT ? GFP_ATOMIC :
+@@ -1495,7 +1495,7 @@ static struct request *blk_old_get_request(struct request_queue *q,
+  * @flags: BLK_MQ_REQ_* flags, e.g. BLK_MQ_REQ_NOWAIT.
+  */
+ struct request *blk_get_request_flags(struct request_queue *q, unsigned int op,
+-				      unsigned int flags)
++				      blk_mq_req_flags_t flags)
+ {
+ 	struct request *req;
+ 
+@@ -2291,7 +2291,7 @@ blk_qc_t generic_make_request(struct bio *bio)
+ 	current->bio_list = bio_list_on_stack;
+ 	do {
+ 		struct request_queue *q = bio->bi_disk->queue;
+-		unsigned int flags = bio->bi_opf & REQ_NOWAIT ?
++		blk_mq_req_flags_t flags = bio->bi_opf & REQ_NOWAIT ?
+ 			BLK_MQ_REQ_NOWAIT : 0;
+ 
+ 		if (likely(blk_queue_enter(q, flags) == 0)) {
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4fb187570e96..462c188d9679 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -383,7 +383,7 @@ static struct request *blk_mq_get_request(struct request_queue *q,
  }
-@@ -578,6 +577,10 @@ static struct nullb_device *null_alloc_dev(void)
  
- static void null_free_dev(struct nullb_device *dev)
+ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+-		unsigned int flags)
++		blk_mq_req_flags_t flags)
  {
-+	if (!dev)
-+		return;
+ 	struct blk_mq_alloc_data alloc_data = { .flags = flags };
+ 	struct request *rq;
+@@ -409,7 +409,7 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ EXPORT_SYMBOL(blk_mq_alloc_request);
+ 
+ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+-		unsigned int op, unsigned int flags, unsigned int hctx_idx)
++	unsigned int op, blk_mq_req_flags_t flags, unsigned int hctx_idx)
+ {
+ 	struct blk_mq_alloc_data alloc_data = { .flags = flags };
+ 	struct request *rq;
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 2502f40ccdc0..99a19c5523e2 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -111,7 +111,7 @@ static inline void blk_mq_put_ctx(struct blk_mq_ctx *ctx)
+ struct blk_mq_alloc_data {
+ 	/* input parameter */
+ 	struct request_queue *q;
+-	unsigned int flags;
++	blk_mq_req_flags_t flags;
+ 	unsigned int shallow_depth;
+ 
+ 	/* input & output parameter */
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 2c3facb0eba2..c14e35f70b99 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -300,7 +300,7 @@ static void nvme_put_ns(struct nvme_ns *ns)
+ }
+ 
+ struct request *nvme_alloc_request(struct request_queue *q,
+-		struct nvme_command *cmd, unsigned int flags, int qid)
++		struct nvme_command *cmd, blk_mq_req_flags_t flags, int qid)
+ {
+ 	unsigned op = nvme_is_write(cmd) ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN;
+ 	struct request *req;
+@@ -568,7 +568,8 @@ EXPORT_SYMBOL_GPL(nvme_setup_cmd);
+  */
+ int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
+ 		union nvme_result *result, void *buffer, unsigned bufflen,
+-		unsigned timeout, int qid, int at_head, int flags)
++		unsigned timeout, int qid, int at_head,
++		blk_mq_req_flags_t flags)
+ {
+ 	struct request *req;
+ 	int ret;
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 35d9cee515f1..d582d3936ec7 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -328,14 +328,15 @@ int nvme_reinit_tagset(struct nvme_ctrl *ctrl, struct blk_mq_tag_set *set);
+ 
+ #define NVME_QID_ANY -1
+ struct request *nvme_alloc_request(struct request_queue *q,
+-		struct nvme_command *cmd, unsigned int flags, int qid);
++		struct nvme_command *cmd, blk_mq_req_flags_t flags, int qid);
+ blk_status_t nvme_setup_cmd(struct nvme_ns *ns, struct request *req,
+ 		struct nvme_command *cmd);
+ int nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
+ 		void *buf, unsigned bufflen);
+ int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
+ 		union nvme_result *result, void *buffer, unsigned bufflen,
+-		unsigned timeout, int qid, int at_head, int flags);
++		unsigned timeout, int qid, int at_head,
++		blk_mq_req_flags_t flags);
+ int nvme_set_queue_count(struct nvme_ctrl *ctrl, int *count);
+ void nvme_start_keep_alive(struct nvme_ctrl *ctrl);
+ void nvme_stop_keep_alive(struct nvme_ctrl *ctrl);
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 82b56609736a..b326208277ee 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -209,16 +209,21 @@ void blk_mq_free_request(struct request *rq);
+ bool blk_mq_can_queue(struct blk_mq_hw_ctx *);
+ 
+ enum {
+-	BLK_MQ_REQ_NOWAIT	= (1 << 0), /* return when out of requests */
+-	BLK_MQ_REQ_RESERVED	= (1 << 1), /* allocate from reserved pool */
+-	BLK_MQ_REQ_INTERNAL	= (1 << 2), /* allocate internal/sched tag */
+-	BLK_MQ_REQ_PREEMPT	= (1 << 3), /* set RQF_PREEMPT */
++	/* return when out of requests */
++	BLK_MQ_REQ_NOWAIT	= (__force blk_mq_req_flags_t)(1 << 0),
++	/* allocate from reserved pool */
++	BLK_MQ_REQ_RESERVED	= (__force blk_mq_req_flags_t)(1 << 1),
++	/* allocate internal/sched tag */
++	BLK_MQ_REQ_INTERNAL	= (__force blk_mq_req_flags_t)(1 << 2),
++	/* set RQF_PREEMPT */
++	BLK_MQ_REQ_PREEMPT	= (__force blk_mq_req_flags_t)(1 << 3),
+ };
+ 
+ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+-		unsigned int flags);
++		blk_mq_req_flags_t flags);
+ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+-		unsigned int op, unsigned int flags, unsigned int hctx_idx);
++		unsigned int op, blk_mq_req_flags_t flags,
++		unsigned int hctx_idx);
+ struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags, unsigned int tag);
+ 
+ enum {
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 1b04085255fb..13ccfc9b210a 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -162,6 +162,8 @@ struct bio {
+  */
+ #define BIO_RESET_BITS	BVEC_POOL_OFFSET
+ 
++typedef __u32 __bitwise blk_mq_req_flags_t;
 +
-+	badblocks_exit(&dev->badblocks);
- 	kfree(dev);
- }
+ /*
+  * Operations and flags common to the bio and request structures.
+  * We use 8 bits for encoding the operation, and the remaining 24 for flags.
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 402c9d536ae1..e80ea1d31343 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -935,7 +935,7 @@ extern void blk_put_request(struct request *);
+ extern void __blk_put_request(struct request_queue *, struct request *);
+ extern struct request *blk_get_request_flags(struct request_queue *,
+ 					     unsigned int op,
+-					     unsigned int flags);
++					     blk_mq_req_flags_t flags);
+ extern struct request *blk_get_request(struct request_queue *, unsigned int op,
+ 				       gfp_t gfp_mask);
+ extern void blk_requeue_request(struct request_queue *, struct request *);
+@@ -959,7 +959,7 @@ extern int scsi_cmd_ioctl(struct request_queue *, struct gendisk *, fmode_t,
+ extern int sg_scsi_ioctl(struct request_queue *, struct gendisk *, fmode_t,
+ 			 struct scsi_ioctl_command __user *);
  
+-extern int blk_queue_enter(struct request_queue *q, unsigned int flags);
++extern int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags);
+ extern void blk_queue_exit(struct request_queue *q);
+ extern void blk_start_queue(struct request_queue *q);
+ extern void blk_start_queue_async(struct request_queue *q);
 -- 
-2.13.6
+2.14.3
