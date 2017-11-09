@@ -1,16 +1,31 @@
-Return-Path: <axboe@kernel.dk>
-Received: from x1.router (mobile-166-176-57-8.mycingular.net. [166.176.57.8])
-        by smtp.gmail.com with ESMTPSA id i187sm18420894pfc.96.2017.11.05.08.21.52
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Sun, 05 Nov 2017 08:21:52 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Subject: [PATCH v2] blktrace: cleanup/fix registration locking
-Date: Sun,  5 Nov 2017 09:21:46 -0700
-Message-Id: <1509898908-7175-1-git-send-email-axboe@kernel.dk>
+Return-Path: <martin.petersen@oracle.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+        Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.de>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH 7/7] nvme: create 'slaves' and 'holders' entries for hidden controllers
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20171109174450.17142-1-hch@lst.de>
+	<20171109174450.17142-8-hch@lst.de>
+Date: Thu, 09 Nov 2017 15:34:39 -0500
+In-Reply-To: <20171109174450.17142-8-hch@lst.de> (Christoph Hellwig's message
+	of "Thu, 9 Nov 2017 18:44:50 +0100")
+Message-ID: <yq1r2t7ur6o.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-One patch that fixes up a discrepancy in how we lock the queue for
-blktrace registration, and one that fixes up how we globally
-serialize registering the tracepoints.
+
+Christoph,
+
+> From: Hannes Reinecke <hare@suse.de>
+>
+> When creating nvme multipath devices we should populate the 'slaves'
+> and 'holders' directorys properly to aid userspace topology detection.
+
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
