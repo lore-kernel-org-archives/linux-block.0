@@ -1,37 +1,149 @@
-Return-Path: <osandov@osandov.com>
-Return-Path: <osandov@osandov.com>
-Date: Fri, 10 Nov 2017 14:04:37 -0800
-From: Omar Sandoval <osandov@osandov.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	Omar Sandoval <osandov@fb.com>
-Subject: Re: [PATCH] blk-mq: improve tag waiting setup for non-shared tags
-Message-ID: <20171110220437.GA5449@vader.DHCP.thefacebook.com>
-References: <3649d84b-978d-ce1b-a8bc-5735b07296a7@kernel.dk>
+Return-Path: <axboe@kernel.dk>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc: Omar Sandoval <osandov@fb.com>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] blk-mq: improve tag waiting setup for non-shared tags
+Message-ID: <3649d84b-978d-ce1b-a8bc-5735b07296a7@kernel.dk>
+Date: Thu, 9 Nov 2017 16:00:09 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <3649d84b-978d-ce1b-a8bc-5735b07296a7@kernel.dk>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Nov 09, 2017 at 04:00:09PM -0700, Jens Axboe wrote:
-> If we run out of driver tags, we currently treat shared and non-shared
-> tags the same - both cases hook into the tag waitqueue. This is a bit
-> more costly than it needs to be on unshared tags, since we have to both
-> grab the hctx lock, and the waitqueue lock (and disable interrupts).
-> For the non-shared case, we can simply mark the queue as needing a
-> restart.
-> 
-> Split blk_mq_dispatch_wait_add() to account for both cases, and
-> rename it to blk_mq_mark_tag_wait() to better reflect what it
-> does now.
-> 
-> Without this patch, shared and non-shared performance is about the same
-> with 4 fio thread hammering on a single null_blk device (~410K, at 75%
-> sys). With the patch, the shared case is the same, but the non-shared
-> tags case runs at 431K at 71% sys.
-> 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+If we run out of driver tags, we currently treat shared and non-shared
+tags the same - both cases hook into the tag waitqueue. This is a bit
+more costly than it needs to be on unshared tags, since we have to both
+grab the hctx lock, and the waitqueue lock (and disable interrupts).
+For the non-shared case, we can simply mark the queue as needing a
+restart.
 
-The best of both worlds.
+Split blk_mq_dispatch_wait_add() to account for both cases, and
+rename it to blk_mq_mark_tag_wait() to better reflect what it
+does now.
 
-Reviewed-by: Omar Sandoval <osandov@fb.com>
+Without this patch, shared and non-shared performance is about the same
+with 4 fio thread hammering on a single null_blk device (~410K, at 75%
+sys). With the patch, the shared case is the same, but the non-shared
+tags case runs at 431K at 71% sys.
+
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+---
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index bfe24a5b62a3..965317ea45f9 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1006,44 +1006,68 @@ static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
+ 	return 1;
+ }
+ 
+-static bool blk_mq_dispatch_wait_add(struct blk_mq_hw_ctx **hctx,
+-				     struct request *rq)
++/*
++ * Mark us waiting for a tag. For shared tags, this involves hooking us into
++ * the tag wakeups. For non-shared tags, we can simply mark us nedeing a
++ * restart. For both caes, take care to check the condition again after
++ * marking us as waiting.
++ */
++static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx **hctx,
++				 struct request *rq)
+ {
+ 	struct blk_mq_hw_ctx *this_hctx = *hctx;
+-	wait_queue_entry_t *wait = &this_hctx->dispatch_wait;
++	bool shared_tags = (this_hctx->flags & BLK_MQ_F_TAG_SHARED) != 0;
+ 	struct sbq_wait_state *ws;
++	wait_queue_entry_t *wait;
++	bool ret;
+ 
+-	if (!list_empty_careful(&wait->entry))
+-		return false;
++	if (!shared_tags) {
++		if (!test_bit(BLK_MQ_S_SCHED_RESTART, &this_hctx->state))
++			set_bit(BLK_MQ_S_SCHED_RESTART, &this_hctx->state);
++	} else {
++		wait = &this_hctx->dispatch_wait;
++		if (!list_empty_careful(&wait->entry))
++			return false;
+ 
+-	spin_lock(&this_hctx->lock);
+-	if (!list_empty(&wait->entry)) {
+-		spin_unlock(&this_hctx->lock);
+-		return false;
+-	}
++		spin_lock(&this_hctx->lock);
++		if (!list_empty(&wait->entry)) {
++			spin_unlock(&this_hctx->lock);
++			return false;
++		}
+ 
+-	ws = bt_wait_ptr(&this_hctx->tags->bitmap_tags, this_hctx);
+-	add_wait_queue(&ws->wait, wait);
++		ws = bt_wait_ptr(&this_hctx->tags->bitmap_tags, this_hctx);
++		add_wait_queue(&ws->wait, wait);
++	}
+ 
+ 	/*
+ 	 * It's possible that a tag was freed in the window between the
+ 	 * allocation failure and adding the hardware queue to the wait
+ 	 * queue.
+ 	 */
+-	if (!blk_mq_get_driver_tag(rq, hctx, false)) {
++	ret = blk_mq_get_driver_tag(rq, hctx, false);
++
++	if (!shared_tags) {
++		/*
++		 * Don't clear RESTART here, someone else could have set it.
++		 * At most this will cost an extra queue run.
++		 */
++		return ret;
++	} else {
++		if (!ret) {
++			spin_unlock(&this_hctx->lock);
++			return false;
++		}
++
++		/*
++		 * We got a tag, remove ourselves from the wait queue to ensure
++		 * someone else gets the wakeup.
++		 */
++		spin_lock_irq(&ws->wait.lock);
++		list_del_init(&wait->entry);
++		spin_unlock_irq(&ws->wait.lock);
+ 		spin_unlock(&this_hctx->lock);
+-		return false;
++		return true;
+ 	}
+-
+-	/*
+-	 * We got a tag, remove ourselves from the wait queue to ensure
+-	 * someone else gets the wakeup.
+-	 */
+-	spin_lock_irq(&ws->wait.lock);
+-	list_del_init(&wait->entry);
+-	spin_unlock_irq(&ws->wait.lock);
+-	spin_unlock(&this_hctx->lock);
+-	return true;
+ }
+ 
+ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+@@ -1076,10 +1100,15 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+ 			 * before we add this entry back on the dispatch list,
+ 			 * we'll re-run it below.
+ 			 */
+-			if (!blk_mq_dispatch_wait_add(&hctx, rq)) {
++			if (!blk_mq_mark_tag_wait(&hctx, rq)) {
+ 				if (got_budget)
+ 					blk_mq_put_dispatch_budget(hctx);
+-				no_tag = true;
++				/*
++				 * For non-shared tags, the RESTART check
++				 * will suffice.
++				 */
++				if (hctx->flags & BLK_MQ_F_TAG_SHARED)
++					no_tag = true;
+ 				break;
+ 			}
+ 		}
+
+-- 
+Jens Axboe
