@@ -1,26 +1,54 @@
-Return-Path: <prvs=4801c944a=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "axboe@kernel.dk" <axboe@kernel.dk>, "ming.lei@redhat.com"
-	<ming.lei@redhat.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"osandov@fb.com" <osandov@fb.com>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Thu, 9 Nov 2017 10:47:26 -0800
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	Omar Sandoval <osandov@fb.com>
 Subject: Re: [PATCH] blk-mq: fix issue with shared tag queue re-running
-Date: Fri, 10 Nov 2017 01:08:49 +0000
-Message-ID: <1510276129.2608.31.camel@wdc.com>
+Message-ID: <20171109184726.GA14209@vader.dhcp.thefacebook.com>
 References: <98418e6d-2981-0fb7-dcdd-79b635955fcf@kernel.dk>
-	 <20171109034133.GA19098@ming.t460p> <20171109100036.GA17976@ming.t460p>
-	 <2d03b95b-580b-4cb7-0a84-c4fc069e5efd@kernel.dk>
-	 <2add8e70-f107-b8be-eefb-e6092d0effa6@kernel.dk>
-In-Reply-To: <2add8e70-f107-b8be-eefb-e6092d0effa6@kernel.dk>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <98418e6d-2981-0fb7-dcdd-79b635955fcf@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVGh1LCAyMDE3LTExLTA5IGF0IDA5OjMyIC0wNzAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBJ
-dCdzIGJlZW4gcnVubmluZyBoYXBwaWx5IGZvciA+IDEgaG91ciBub3csIG5vIGlzc3VlcyBvYnNl
-cnZlZC4NCg0KVGhlIHNhbWUgbnVsbF9ibGsgdGVzdCBydW5zIGZpbmUgb24gbXkgc2V0dXAuIEJ1
-dCB3aGF0J3Mgd2VpcmQgaXMgdGhhdCBpZg0KSSBydW4gdGhlIHNycC10ZXN0IHNvZnR3YXJlIHRo
-YXQgSSBhZ2FpbiBzZWUgYSBsb2NrdXAgaW4gc2RfcHJvYmVfYXN5bmMoKS4NClRoYXQgaGFwcGVu
-cyBub3Qgb25seSB3aXRoIHRvZGF5J3MgZm9yLW5leHQgYnJhbmNoIGJ1dCBhbHNvIHdpdGggdGhl
-IHNhbWUNCmtlcm5lbCB0cmVlIHdpdGggd2hpY2ggbXkgdGVzdHMgcGFzc2VkIHllc3RlcmRheSwg
-d2hpY2ggaXMgd2VpcmQuIEkgd2lsbA0KYW5hbHl6ZSB0aGlzIGZ1cnRoZXIuDQoNCkJhcnQu
+On Wed, Nov 08, 2017 at 03:48:51PM -0700, Jens Axboe wrote:
+> This patch attempts to make the case of hctx re-running on driver tag
+> failure more robust. Without this patch, it's pretty easy to trigger a
+> stall condition with shared tags. An example is using null_blk like
+> this:
+> 
+> modprobe null_blk queue_mode=2 nr_devices=4 shared_tags=1 submit_queues=1 hw_queue_depth=1
+> 
+> which sets up 4 devices, sharing the same tag set with a depth of 1.
+> Running a fio job ala:
+> 
+> [global]
+> bs=4k
+> rw=randread
+> norandommap
+> direct=1
+> ioengine=libaio
+> iodepth=4
+> 
+> [nullb0]
+> filename=/dev/nullb0
+> [nullb1]
+> filename=/dev/nullb1
+> [nullb2]
+> filename=/dev/nullb2
+> [nullb3]
+> filename=/dev/nullb3
+> 
+> will inevitably end with one or more threads being stuck waiting for a
+> scheduler tag. That IO is then stuck forever, until someone else
+> triggers a run of the queue.
+> 
+> Ensure that we always re-run the hardware queue, if the driver tag we
+> were waiting for got freed before we added our leftover request entries
+> back on the dispatch list.
+> 
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+Reviewed-by: Omar Sandoval <osandov@fb.com>
