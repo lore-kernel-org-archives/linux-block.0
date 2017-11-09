@@ -1,154 +1,48 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 1/2] blktrace: fix unlocked access to init/start-stop/teardown
-Date: Sun,  5 Nov 2017 09:21:47 -0700
-Message-Id: <1509898908-7175-2-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1509898908-7175-1-git-send-email-axboe@kernel.dk>
-References: <1509898908-7175-1-git-send-email-axboe@kernel.dk>
+Return-Path: <oleksandr@natalenko.name>
+From: Oleksandr Natalenko <oleksandr@natalenko.name>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "martin@lichtvoll.de" <martin@lichtvoll.de>, "martin.petersen@oracle.com" <martin.petersen@oracle.com>, "ming.lei@redhat.com" <ming.lei@redhat.com>
+Subject: Re: [PATCH v11 0/7] block, scsi, md: Improve suspend and resume
+Date: Thu, 09 Nov 2017 18:10:29 +0100
+Message-ID: <2843000.pAMepr1eOs@natalenko.name>
+In-Reply-To: <5e91482c-16f5-13c8-e42d-cbe8dda355ad@kernel.dk>
+References: <20171030224205.25212-1-bart.vanassche@wdc.com> <1510246471.2608.11.camel@wdc.com> <5e91482c-16f5-13c8-e42d-cbe8dda355ad@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-sg.c calls into the blktrace functions without holding the proper queue
-mutex for doing setup, start/stop, or teardown.
+Then,
 
-Add internal unlocked variants, and export the ones that do the proper
-locking.
+Reported-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
 
-Fixes: 6da127ad0918 ("blktrace: Add blktrace ioctls to SCSI generic devices")
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- kernel/trace/blktrace.c | 58 ++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 48 insertions(+), 10 deletions(-)
-
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 45a3928544ce..ea57dd94b2b2 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -336,7 +336,7 @@ static void blk_trace_cleanup(struct blk_trace *bt)
- 		blk_unregister_tracepoints();
- }
- 
--int blk_trace_remove(struct request_queue *q)
-+static int __blk_trace_remove(struct request_queue *q)
- {
- 	struct blk_trace *bt;
- 
-@@ -349,6 +349,17 @@ int blk_trace_remove(struct request_queue *q)
- 
- 	return 0;
- }
-+
-+int blk_trace_remove(struct request_queue *q)
-+{
-+	int ret;
-+
-+	mutex_lock(&q->blk_trace_mutex);
-+	ret = __blk_trace_remove(q);
-+	mutex_unlock(&q->blk_trace_mutex);
-+
-+	return ret;
-+}
- EXPORT_SYMBOL_GPL(blk_trace_remove);
- 
- static ssize_t blk_dropped_read(struct file *filp, char __user *buffer,
-@@ -550,9 +561,8 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
- 	return ret;
- }
- 
--int blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
--		    struct block_device *bdev,
--		    char __user *arg)
-+static int __blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
-+			     struct block_device *bdev, char __user *arg)
- {
- 	struct blk_user_trace_setup buts;
- 	int ret;
-@@ -571,6 +581,19 @@ int blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
- 	}
- 	return 0;
- }
-+
-+int blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
-+		    struct block_device *bdev,
-+		    char __user *arg)
-+{
-+	int ret;
-+
-+	mutex_lock(&q->blk_trace_mutex);
-+	ret = __blk_trace_setup(q, name, dev, bdev, arg);
-+	mutex_unlock(&q->blk_trace_mutex);
-+
-+	return ret;
-+}
- EXPORT_SYMBOL_GPL(blk_trace_setup);
- 
- #if defined(CONFIG_COMPAT) && defined(CONFIG_X86_64)
-@@ -607,7 +630,7 @@ static int compat_blk_trace_setup(struct request_queue *q, char *name,
- }
- #endif
- 
--int blk_trace_startstop(struct request_queue *q, int start)
-+static int __blk_trace_startstop(struct request_queue *q, int start)
- {
- 	int ret;
- 	struct blk_trace *bt = q->blk_trace;
-@@ -646,6 +669,17 @@ int blk_trace_startstop(struct request_queue *q, int start)
- 
- 	return ret;
- }
-+
-+int blk_trace_startstop(struct request_queue *q, int start)
-+{
-+	int ret;
-+
-+	mutex_lock(&q->blk_trace_mutex);
-+	ret = __blk_trace_startstop(q, start);
-+	mutex_unlock(&q->blk_trace_mutex);
-+
-+	return ret;
-+}
- EXPORT_SYMBOL_GPL(blk_trace_startstop);
- 
- /*
-@@ -676,7 +710,7 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
- 	switch (cmd) {
- 	case BLKTRACESETUP:
- 		bdevname(bdev, b);
--		ret = blk_trace_setup(q, b, bdev->bd_dev, bdev, arg);
-+		ret = __blk_trace_setup(q, b, bdev->bd_dev, bdev, arg);
- 		break;
- #if defined(CONFIG_COMPAT) && defined(CONFIG_X86_64)
- 	case BLKTRACESETUP32:
-@@ -687,10 +721,10 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
- 	case BLKTRACESTART:
- 		start = 1;
- 	case BLKTRACESTOP:
--		ret = blk_trace_startstop(q, start);
-+		ret = __blk_trace_startstop(q, start);
- 		break;
- 	case BLKTRACETEARDOWN:
--		ret = blk_trace_remove(q);
-+		ret = __blk_trace_remove(q);
- 		break;
- 	default:
- 		ret = -ENOTTY;
-@@ -708,10 +742,14 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
-  **/
- void blk_trace_shutdown(struct request_queue *q)
- {
-+	mutex_lock(&q->blk_trace_mutex);
-+
- 	if (q->blk_trace) {
--		blk_trace_startstop(q, 0);
--		blk_trace_remove(q);
-+		__blk_trace_startstop(q, 0);
-+		__blk_trace_remove(q);
- 	}
-+
-+	mutex_unlock(&q->blk_trace_mutex);
- }
- 
- #ifdef CONFIG_BLK_CGROUP
--- 
-2.7.4
+On =C4=8Dtvrtek 9. listopadu 2017 17:55:58 CET Jens Axboe wrote:
+> On 11/09/2017 09:54 AM, Bart Van Assche wrote:
+> > On Thu, 2017-11-09 at 07:16 +0100, Oleksandr Natalenko wrote:
+> >> is this something known to you, or it is just my fault applying this
+> >> series to v4.13? Except having this warning, suspend/resume works for
+> >> me:
+> >>=20
+> >> [   27.383846] sd 0:0:0:0: [sda] Starting disk
+> >> [   27.383976] sd 1:0:0:0: [sdb] Starting disk
+> >> [   27.451218] sdb: Attempt to allocate non-preempt request in
+> >> preempt-only
+> >> mode.
+> >> [   27.459640] ------------[ cut here ]------------
+> >> [   27.464521] WARNING: CPU: 0 PID: 172 at block/blk-core.c:823
+> >> blk_queue_enter+0x222/0x280>=20
+> > Hello Oleksandr,
+> >=20
+> > Thanks for the testing. The warning that you reported is expected. Maybe
+> > it
+> > should be left out to avoid that users get confused.
+>=20
+> If the warning is expected, then it should be removed. It'll just confuse
+> users and cause useless bug reports.
+>=20
+> > Jens, this patch series still applies cleanly on top of your
+> > for-4.15/block
+> > branch. Are you fine with this patch series or do you perhaps want me to
+> > repost it with Oleksandr's Tested-by tag added to each patch?
+>=20
+> Since you need to kill the warning anyway, let's get it respun.
