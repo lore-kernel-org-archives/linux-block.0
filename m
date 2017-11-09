@@ -1,81 +1,285 @@
-Return-Path: <prvs=5014e5409=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 2/7] block: Document more locking requirements
-Date: Thu, 30 Nov 2017 16:08:43 -0800
-Message-Id: <20171201000848.2656-3-bart.vanassche@wdc.com>
-In-Reply-To: <20171201000848.2656-1-bart.vanassche@wdc.com>
-References: <20171201000848.2656-1-bart.vanassche@wdc.com>
+Return-Path: <prvs=47960c428=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V8 7/7] sd: Remove zone write locking
+Date: Thu,  9 Nov 2017 15:57:07 +0900
+Message-Id: <20171109065707.17210-8-damien.lemoal@wdc.com>
+In-Reply-To: <20171109065707.17210-1-damien.lemoal@wdc.com>
+References: <20171109065707.17210-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch does not change any functionality.
+The block layer now handles zone write locking.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 ---
- block/blk-mq.c      | 13 +++++++++++--
- block/blk-timeout.c |  3 +++
- 2 files changed, 14 insertions(+), 2 deletions(-)
+ drivers/scsi/sd.c        | 41 +++---------------------
+ drivers/scsi/sd.h        | 11 -------
+ drivers/scsi/sd_zbc.c    | 83 ------------------------------------------------
+ include/scsi/scsi_cmnd.h |  3 +-
+ 4 files changed, 6 insertions(+), 132 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e1ca7661daa5..7f290a91a612 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -74,6 +74,8 @@ static bool blk_mq_hctx_has_pending(struct blk_mq_hw_ctx *hctx)
- static void blk_mq_hctx_mark_pending(struct blk_mq_hw_ctx *hctx,
- 				     struct blk_mq_ctx *ctx)
- {
-+	lockdep_assert_held(&ctx->lock);
-+
- 	if (!sbitmap_test_bit(&hctx->ctx_map, ctx->index_hw))
- 		sbitmap_set_bit(&hctx->ctx_map, ctx->index_hw);
- }
-@@ -81,6 +83,8 @@ static void blk_mq_hctx_mark_pending(struct blk_mq_hw_ctx *hctx,
- static void blk_mq_hctx_clear_pending(struct blk_mq_hw_ctx *hctx,
- 				      struct blk_mq_ctx *ctx)
- {
-+	lockdep_assert_held(&ctx->lock);
-+
- 	sbitmap_clear_bit(&hctx->ctx_map, ctx->index_hw);
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index fb9f8b5f4673..2d5b0f84ff14 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -835,16 +835,13 @@ static int sd_setup_write_zeroes_cmnd(struct scsi_cmnd *cmd)
+ 	struct scsi_disk *sdkp = scsi_disk(rq->rq_disk);
+ 	u64 sector = blk_rq_pos(rq) >> (ilog2(sdp->sector_size) - 9);
+ 	u32 nr_sectors = blk_rq_sectors(rq) >> (ilog2(sdp->sector_size) - 9);
+-	int ret;
+ 
+ 	if (!(rq->cmd_flags & REQ_NOUNMAP)) {
+ 		switch (sdkp->zeroing_mode) {
+ 		case SD_ZERO_WS16_UNMAP:
+-			ret = sd_setup_write_same16_cmnd(cmd, true);
+-			goto out;
++			return sd_setup_write_same16_cmnd(cmd, true);
+ 		case SD_ZERO_WS10_UNMAP:
+-			ret = sd_setup_write_same10_cmnd(cmd, true);
+-			goto out;
++			return sd_setup_write_same10_cmnd(cmd, true);
+ 		}
+ 	}
+ 
+@@ -852,15 +849,9 @@ static int sd_setup_write_zeroes_cmnd(struct scsi_cmnd *cmd)
+ 		return BLKPREP_INVALID;
+ 
+ 	if (sdkp->ws16 || sector > 0xffffffff || nr_sectors > 0xffff)
+-		ret = sd_setup_write_same16_cmnd(cmd, false);
+-	else
+-		ret = sd_setup_write_same10_cmnd(cmd, false);
+-
+-out:
+-	if (sd_is_zoned(sdkp) && ret == BLKPREP_OK)
+-		return sd_zbc_write_lock_zone(cmd);
++		return sd_setup_write_same16_cmnd(cmd, false);
+ 
+-	return ret;
++	return sd_setup_write_same10_cmnd(cmd, false);
  }
  
-@@ -1003,9 +1007,14 @@ bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
- static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
- 				int flags, void *key)
- {
--	struct blk_mq_hw_ctx *hctx;
-+	struct blk_mq_hw_ctx *hctx =
-+		container_of(wait, struct blk_mq_hw_ctx, dispatch_wait);
-+
-+#ifdef CONFIG_LOCKDEP
-+	struct sbq_wait_state *ws = bt_wait_ptr(&hctx->tags->bitmap_tags, hctx);
+ static void sd_config_write_same(struct scsi_disk *sdkp)
+@@ -928,12 +919,6 @@ static int sd_setup_write_same_cmnd(struct scsi_cmnd *cmd)
  
--	hctx = container_of(wait, struct blk_mq_hw_ctx, dispatch_wait);
-+	lockdep_assert_held(&ws->wait.lock);
-+#endif
+ 	BUG_ON(bio_offset(bio) || bio_iovec(bio).bv_len != sdp->sector_size);
  
- 	list_del_init(&wait->entry);
- 	blk_mq_run_hw_queue(hctx, true);
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index 764ecf9aeb30..77bf0c6e7c7e 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -77,6 +77,9 @@ ssize_t part_timeout_store(struct device *dev, struct device_attribute *attr,
-  */
- void blk_delete_timer(struct request *req)
- {
-+	lockdep_assert_held(req->q->queue_lock);
-+	WARN_ON_ONCE(req->q->mq_ops);
-+
- 	list_del_init(&req->timeout_list);
+-	if (sd_is_zoned(sdkp)) {
+-		ret = sd_zbc_write_lock_zone(cmd);
+-		if (ret != BLKPREP_OK)
+-			return ret;
+-	}
+-
+ 	sector >>= ilog2(sdp->sector_size) - 9;
+ 	nr_sectors >>= ilog2(sdp->sector_size) - 9;
+ 
+@@ -968,9 +953,6 @@ static int sd_setup_write_same_cmnd(struct scsi_cmnd *cmd)
+ 	ret = scsi_init_io(cmd);
+ 	rq->__data_len = nr_bytes;
+ 
+-	if (sd_is_zoned(sdkp) && ret != BLKPREP_OK)
+-		sd_zbc_write_unlock_zone(cmd);
+-
+ 	return ret;
  }
+ 
+@@ -1000,19 +982,12 @@ static int sd_setup_read_write_cmnd(struct scsi_cmnd *SCpnt)
+ 	sector_t threshold;
+ 	unsigned int this_count = blk_rq_sectors(rq);
+ 	unsigned int dif, dix;
+-	bool zoned_write = sd_is_zoned(sdkp) && rq_data_dir(rq) == WRITE;
+ 	int ret;
+ 	unsigned char protect;
+ 
+-	if (zoned_write) {
+-		ret = sd_zbc_write_lock_zone(SCpnt);
+-		if (ret != BLKPREP_OK)
+-			return ret;
+-	}
+-
+ 	ret = scsi_init_io(SCpnt);
+ 	if (ret != BLKPREP_OK)
+-		goto out;
++		return ret;
+ 	WARN_ON_ONCE(SCpnt != rq->special);
+ 
+ 	/* from here on until we're complete, any goto out
+@@ -1231,9 +1206,6 @@ static int sd_setup_read_write_cmnd(struct scsi_cmnd *SCpnt)
+ 	 */
+ 	ret = BLKPREP_OK;
+  out:
+-	if (zoned_write && ret != BLKPREP_OK)
+-		sd_zbc_write_unlock_zone(SCpnt);
+-
+ 	return ret;
+ }
+ 
+@@ -1277,9 +1249,6 @@ static void sd_uninit_command(struct scsi_cmnd *SCpnt)
+ {
+ 	struct request *rq = SCpnt->request;
+ 
+-	if (SCpnt->flags & SCMD_ZONE_WRITE_LOCK)
+-		sd_zbc_write_unlock_zone(SCpnt);
+-
+ 	if (rq->rq_flags & RQF_SPECIAL_PAYLOAD)
+ 		__free_page(rq->special_vec.bv_page);
+ 
+diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
+index 99c4dde9b6bf..112627c1cc85 100644
+--- a/drivers/scsi/sd.h
++++ b/drivers/scsi/sd.h
+@@ -76,7 +76,6 @@ struct scsi_disk {
+ 	unsigned int	nr_zones;
+ 	unsigned int	zone_blocks;
+ 	unsigned int	zone_shift;
+-	unsigned long	*zones_wlock;
+ 	unsigned int	zones_optimal_open;
+ 	unsigned int	zones_optimal_nonseq;
+ 	unsigned int	zones_max_open;
+@@ -282,8 +281,6 @@ static inline int sd_is_zoned(struct scsi_disk *sdkp)
+ extern int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buffer);
+ extern void sd_zbc_remove(struct scsi_disk *sdkp);
+ extern void sd_zbc_print_zones(struct scsi_disk *sdkp);
+-extern int sd_zbc_write_lock_zone(struct scsi_cmnd *cmd);
+-extern void sd_zbc_write_unlock_zone(struct scsi_cmnd *cmd);
+ extern int sd_zbc_setup_report_cmnd(struct scsi_cmnd *cmd);
+ extern int sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd);
+ extern void sd_zbc_complete(struct scsi_cmnd *cmd, unsigned int good_bytes,
+@@ -301,14 +298,6 @@ static inline void sd_zbc_remove(struct scsi_disk *sdkp) {}
+ 
+ static inline void sd_zbc_print_zones(struct scsi_disk *sdkp) {}
+ 
+-static inline int sd_zbc_write_lock_zone(struct scsi_cmnd *cmd)
+-{
+-	/* Let the drive fail requests */
+-	return BLKPREP_OK;
+-}
+-
+-static inline void sd_zbc_write_unlock_zone(struct scsi_cmnd *cmd) {}
+-
+ static inline int sd_zbc_setup_report_cmnd(struct scsi_cmnd *cmd)
+ {
+ 	return BLKPREP_INVALID;
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index c715b8363ce0..6c348a211ebb 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -230,17 +230,6 @@ static inline sector_t sd_zbc_zone_sectors(struct scsi_disk *sdkp)
+ }
+ 
+ /**
+- * sd_zbc_zone_no - Get the number of the zone conataining a sector.
+- * @sdkp: The target disk
+- * @sector: 512B sector address contained in the zone
+- */
+-static inline unsigned int sd_zbc_zone_no(struct scsi_disk *sdkp,
+-					  sector_t sector)
+-{
+-	return sectors_to_logical(sdkp->device, sector) >> sdkp->zone_shift;
+-}
+-
+-/**
+  * sd_zbc_setup_reset_cmnd - Prepare a RESET WRITE POINTER scsi command.
+  * @cmd: the command to setup
+  *
+@@ -279,78 +268,6 @@ int sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd)
+ }
+ 
+ /**
+- * sd_zbc_write_lock_zone - Write lock a sequential zone.
+- * @cmd: write command
+- *
+- * Called from sd_init_cmd() for write requests (standard write, write same or
+- * write zeroes operations). If the request target zone is not already locked,
+- * the zone is locked and BLKPREP_OK returned, allowing the request to proceed
+- * through dispatch in scsi_request_fn(). Otherwise, BLKPREP_DEFER is returned,
+- * forcing the request to wait for the zone to be unlocked, that is, for the
+- * previously issued write request targeting the same zone to complete.
+- *
+- * This is called from blk_peek_request() context with the queue lock held and
+- * before the request is removed from the scheduler. As a result, multiple
+- * contexts executing concurrently scsi_request_fn() cannot result in write
+- * sequence reordering as only a single write request per zone is allowed to
+- * proceed.
+- */
+-int sd_zbc_write_lock_zone(struct scsi_cmnd *cmd)
+-{
+-	struct request *rq = cmd->request;
+-	struct scsi_disk *sdkp = scsi_disk(rq->rq_disk);
+-	sector_t sector = blk_rq_pos(rq);
+-	sector_t zone_sectors = sd_zbc_zone_sectors(sdkp);
+-	unsigned int zno = sd_zbc_zone_no(sdkp, sector);
+-
+-	/*
+-	 * Note: Checks of the alignment of the write command on
+-	 * logical blocks is done in sd.c
+-	 */
+-
+-	/* Do not allow zone boundaries crossing on host-managed drives */
+-	if (blk_queue_zoned_model(sdkp->disk->queue) == BLK_ZONED_HM &&
+-	    (sector & (zone_sectors - 1)) + blk_rq_sectors(rq) > zone_sectors)
+-		return BLKPREP_KILL;
+-
+-	/*
+-	 * Do not issue more than one write at a time per
+-	 * zone. This solves write ordering problems due to
+-	 * the unlocking of the request queue in the dispatch
+-	 * path in the non scsi-mq case.
+-	 */
+-	if (sdkp->zones_wlock &&
+-	    test_and_set_bit(zno, sdkp->zones_wlock))
+-		return BLKPREP_DEFER;
+-
+-	WARN_ON_ONCE(cmd->flags & SCMD_ZONE_WRITE_LOCK);
+-	cmd->flags |= SCMD_ZONE_WRITE_LOCK;
+-
+-	return BLKPREP_OK;
+-}
+-
+-/**
+- * sd_zbc_write_unlock_zone - Write unlock a sequential zone.
+- * @cmd: write command
+- *
+- * Called from sd_uninit_cmd(). Unlocking the request target zone will allow
+- * dispatching the next write request for the zone.
+- */
+-void sd_zbc_write_unlock_zone(struct scsi_cmnd *cmd)
+-{
+-	struct request *rq = cmd->request;
+-	struct scsi_disk *sdkp = scsi_disk(rq->rq_disk);
+-
+-	if (sdkp->zones_wlock && cmd->flags & SCMD_ZONE_WRITE_LOCK) {
+-		unsigned int zno = sd_zbc_zone_no(sdkp, blk_rq_pos(rq));
+-		WARN_ON_ONCE(!test_bit(zno, sdkp->zones_wlock));
+-		cmd->flags &= ~SCMD_ZONE_WRITE_LOCK;
+-		clear_bit_unlock(zno, sdkp->zones_wlock);
+-		smp_mb__after_atomic();
+-	}
+-}
+-
+-/**
+  * sd_zbc_complete - ZBC command post processing.
+  * @cmd: Completed command
+  * @good_bytes: Command reply bytes
+diff --git a/include/scsi/scsi_cmnd.h b/include/scsi/scsi_cmnd.h
+index 3d3f8b342e05..04477648aa1a 100644
+--- a/include/scsi/scsi_cmnd.h
++++ b/include/scsi/scsi_cmnd.h
+@@ -57,8 +57,7 @@ struct scsi_pointer {
+ /* for scmd->flags */
+ #define SCMD_TAGGED		(1 << 0)
+ #define SCMD_UNCHECKED_ISA_DMA	(1 << 1)
+-#define SCMD_ZONE_WRITE_LOCK	(1 << 2)
+-#define SCMD_INITIALIZED	(1 << 3)
++#define SCMD_INITIALIZED	(1 << 2)
+ /* flags preserved across unprep / reprep */
+ #define SCMD_PRESERVED_FLAGS	(SCMD_UNCHECKED_ISA_DMA | SCMD_INITIALIZED)
  
 -- 
-2.15.0
+2.13.6
