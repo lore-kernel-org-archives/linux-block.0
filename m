@@ -1,212 +1,220 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:39862 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932148AbdKDSV2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 4 Nov 2017 14:21:28 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        John Garry <john.garry@huawei.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] blk-mq: don't handle failure in .get_budget
-Date: Sun,  5 Nov 2017 02:21:12 +0800
-Message-Id: <20171104182112.32666-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=47960c428=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V8 3/7] mq-deadline: Introduce zone locking support
+Date: Thu,  9 Nov 2017 15:57:03 +0900
+Message-Id: <20171109065707.17210-4-damien.lemoal@wdc.com>
+In-Reply-To: <20171109065707.17210-1-damien.lemoal@wdc.com>
+References: <20171109065707.17210-1-damien.lemoal@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-It is enough to just check if we can get the budget via .get_budget().
-And we don't need to deal with device state change in .get_budget().
+Introduce zone write locking to avoid write request reordering with
+zoned block devices. This is achieved using a finer selection of the
+next request to dispatch:
+1) Any non-write request is always allowed to proceed.
+2) Any write to a conventional zone is always allowed to proceed.
+3) For a write to a sequential zone, the zone lock is first checked.
+   a) If the zone is not locked, the write is allowed to proceed after
+      its target zone is locked.
+   b) If the zone is locked, the write request is skipped and the next
+      request in the dispatch queue tested (back to step 1).
 
-For SCSI, one issue to be fixed is that we have to call scsi_mq_uninit_cmd()
-to free allocated ressources if SCSI device fails to handle the request. And
-it isn't enough to simply call blk_mq_end_request() to do that if this request
-is marked as RQF_DONTPREP.
+For a write request that has locked its target zone, the zone is
+unlocked either when the request completes with a call to the method
+deadline_request_completed() or when the request is requeued using
+dd_insert_request().
 
-Fixes: 0df21c86bdbf(scsi: implement .get_budget and .put_budget for blk-mq)
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Requests targeting a locked zone are always left in the scheduler queue
+to preserve the lba ordering for write requests. If no write request
+can be dispatched, allow reads to be dispatched even if the write batch
+is not done.
+
+If the device used is not a zoned block device, or if zoned block device
+support is disabled, this patch does not modify mq-deadline behavior.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 ---
- block/blk-mq-sched.c    | 14 ++------------
- block/blk-mq.c          | 17 ++++-------------
- block/blk-mq.h          |  5 ++---
- drivers/scsi/scsi_lib.c | 11 +++--------
- include/linux/blk-mq.h  |  2 +-
- 5 files changed, 12 insertions(+), 37 deletions(-)
+ block/mq-deadline.c | 89 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 86 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 7775f6b12fa9..13a27d4d1671 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -94,23 +94,18 @@ static void blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index 8bd6db9e69c7..d56972e8ebda 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -59,6 +59,7 @@ struct deadline_data {
+ 	int front_merges;
  
- 	do {
- 		struct request *rq;
--		blk_status_t ret;
+ 	spinlock_t lock;
++	spinlock_t zone_lock;
+ 	struct list_head dispatch;
+ };
  
- 		if (e->type->ops.mq.has_work &&
- 				!e->type->ops.mq.has_work(hctx))
- 			break;
+@@ -198,13 +199,33 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
+ static struct request *
+ deadline_fifo_request(struct deadline_data *dd, int data_dir)
+ {
++	struct request *rq;
++	unsigned long flags;
++
+ 	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
+ 		return NULL;
  
--		ret = blk_mq_get_dispatch_budget(hctx);
--		if (ret == BLK_STS_RESOURCE)
-+		if (!blk_mq_get_dispatch_budget(hctx))
- 			break;
+ 	if (list_empty(&dd->fifo_list[data_dir]))
+ 		return NULL;
  
- 		rq = e->type->ops.mq.dispatch_request(hctx);
- 		if (!rq) {
- 			blk_mq_put_dispatch_budget(hctx);
- 			break;
--		} else if (ret != BLK_STS_OK) {
--			blk_mq_end_request(rq, ret);
--			continue;
- 		}
- 
- 		/*
-@@ -146,22 +141,17 @@ static void blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
- 
- 	do {
- 		struct request *rq;
--		blk_status_t ret;
- 
- 		if (!sbitmap_any_bit_set(&hctx->ctx_map))
- 			break;
- 
--		ret = blk_mq_get_dispatch_budget(hctx);
--		if (ret == BLK_STS_RESOURCE)
-+		if (!blk_mq_get_dispatch_budget(hctx))
- 			break;
- 
- 		rq = blk_mq_dequeue_from_ctx(hctx, ctx);
- 		if (!rq) {
- 			blk_mq_put_dispatch_budget(hctx);
- 			break;
--		} else if (ret != BLK_STS_OK) {
--			blk_mq_end_request(rq, ret);
--			continue;
- 		}
- 
- 		/*
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e4d2490f4e7e..f4e1d8447b5d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1134,13 +1134,8 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 			}
- 		}
- 
--		if (!got_budget) {
--			ret = blk_mq_get_dispatch_budget(hctx);
--			if (ret == BLK_STS_RESOURCE)
--				break;
--			if (ret != BLK_STS_OK)
--				goto fail_rq;
--		}
-+		if (!got_budget && !blk_mq_get_dispatch_budget(hctx))
-+			break;
- 
- 		list_del_init(&rq->queuelist);
- 
-@@ -1167,7 +1162,6 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 			break;
- 		}
- 
-- fail_rq:
- 		if (unlikely(ret != BLK_STS_OK)) {
- 			errors++;
- 			blk_mq_end_request(rq, BLK_STS_IOERR);
-@@ -1639,12 +1633,10 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	if (!blk_mq_get_driver_tag(rq, NULL, false))
- 		goto insert;
- 
--	ret = blk_mq_get_dispatch_budget(hctx);
--	if (ret == BLK_STS_RESOURCE) {
-+	if (!blk_mq_get_dispatch_budget(hctx)) {
- 		blk_mq_put_driver_tag(rq);
- 		goto insert;
--	} else if (ret != BLK_STS_OK)
--		goto fail_rq;
+-	return rq_entry_fifo(dd->fifo_list[data_dir].next);
++	rq = rq_entry_fifo(dd->fifo_list[data_dir].next);
++	if (data_dir == READ || !blk_queue_is_zoned(rq->q))
++		return rq;
++
++	/*
++	 * Look for a write request that can be dispatched, that is one with
++	 * an unlocked target zone.
++	 */
++	spin_lock_irqsave(&dd->zone_lock, flags);
++	list_for_each_entry(rq, &dd->fifo_list[WRITE], queuelist) {
++		if (blk_req_can_dispatch_to_zone(rq))
++			goto out;
 +	}
++	rq = NULL;
++out:
++	spin_unlock_irqrestore(&dd->zone_lock, flags);
++
++	return rq;
+ }
  
- 	new_cookie = request_to_qc_t(hctx, rq);
+ /*
+@@ -214,10 +235,32 @@ deadline_fifo_request(struct deadline_data *dd, int data_dir)
+ static struct request *
+ deadline_next_request(struct deadline_data *dd, int data_dir)
+ {
++	struct request *rq;
++	unsigned long flags;
++
+ 	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
+ 		return NULL;
  
-@@ -1662,7 +1654,6 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 		__blk_mq_requeue_request(rq);
- 		goto insert;
- 	default:
-- fail_rq:
- 		*cookie = BLK_QC_T_NONE;
- 		blk_mq_end_request(rq, ret);
+-	return dd->next_rq[data_dir];
++	rq = dd->next_rq[data_dir];
++	if (!rq)
++		return NULL;
++
++	if (data_dir == READ || !blk_queue_is_zoned(rq->q))
++		return rq;
++
++	/*
++	 * Look for a write request that can be dispatched, that is one with
++	 * an unlocked target zone.
++	 */
++	spin_lock_irqsave(&dd->zone_lock, flags);
++	while (rq) {
++		if (blk_req_can_dispatch_to_zone(rq))
++			break;
++		rq = deadline_latter_request(rq);
++	}
++	spin_unlock_irqrestore(&dd->zone_lock, flags);
++
++	return rq;
+ }
+ 
+ /*
+@@ -259,7 +302,8 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	if (reads) {
+ 		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[READ]));
+ 
+-		if (writes && (dd->starved++ >= dd->writes_starved))
++		if (deadline_fifo_request(dd, WRITE) &&
++		    (dd->starved++ >= dd->writes_starved))
+ 			goto dispatch_writes;
+ 
+ 		data_dir = READ;
+@@ -304,6 +348,13 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 		rq = next_rq;
+ 	}
+ 
++	/*
++	 * For a zoned block device, if we only have writes queued and none of
++	 * them can be dispatched, rq will be NULL.
++	 */
++	if (!rq)
++		return NULL;
++
+ 	dd->batching = 0;
+ 
+ dispatch_request:
+@@ -313,6 +364,10 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	dd->batching++;
+ 	deadline_move_request(dd, rq);
+ done:
++	/*
++	 * If the request needs its target zone locked, do it.
++	 */
++	blk_req_zone_write_lock(rq);
+ 	rq->rq_flags |= RQF_STARTED;
+ 	return rq;
+ }
+@@ -368,6 +423,7 @@ static int dd_init_queue(struct request_queue *q, struct elevator_type *e)
+ 	dd->front_merges = 1;
+ 	dd->fifo_batch = fifo_batch;
+ 	spin_lock_init(&dd->lock);
++	spin_lock_init(&dd->zone_lock);
+ 	INIT_LIST_HEAD(&dd->dispatch);
+ 
+ 	q->elevator = eq;
+@@ -424,6 +480,12 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ 	struct deadline_data *dd = q->elevator->elevator_data;
+ 	const int data_dir = rq_data_dir(rq);
+ 
++	/*
++	 * This may be a requeue of a write request that has locked its
++	 * target zone. If it is the case, this releases the zone lock.
++	 */
++	blk_req_zone_write_unlock(rq);
++
+ 	if (blk_mq_sched_try_insert_merge(q, rq))
  		return;
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 522b420dedc0..f97aceff76e9 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -147,14 +147,13 @@ static inline void blk_mq_put_dispatch_budget(struct blk_mq_hw_ctx *hctx)
- 		q->mq_ops->put_budget(hctx);
+ 
+@@ -468,6 +530,26 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
+ 	spin_unlock(&dd->lock);
  }
  
--static inline blk_status_t blk_mq_get_dispatch_budget(
--		struct blk_mq_hw_ctx *hctx)
-+static inline bool blk_mq_get_dispatch_budget(struct blk_mq_hw_ctx *hctx)
++/*
++ * For zoned block devices, write unlock the target zone of
++ * completed write requests. Do this while holding the zone lock
++ * spinlock so that the zone is never unlocked while deadline_fifo_request()
++ * while deadline_next_request() are executing.
++ */
++static void dd_completed_request(struct request *rq)
++{
++	struct request_queue *q = rq->q;
++
++	if (blk_queue_is_zoned(q)) {
++		struct deadline_data *dd = q->elevator->elevator_data;
++		unsigned long flags;
++
++		spin_lock_irqsave(&dd->zone_lock, flags);
++		blk_req_zone_write_unlock(rq);
++		spin_unlock_irqrestore(&dd->zone_lock, flags);
++	}
++}
++
+ static bool dd_has_work(struct blk_mq_hw_ctx *hctx)
  {
- 	struct request_queue *q = hctx->queue;
- 
- 	if (q->mq_ops->get_budget)
- 		return q->mq_ops->get_budget(hctx);
--	return BLK_STS_OK;
-+	return true;
- }
- 
- #endif
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 7f218ef61900..c537c4d768c1 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1949,27 +1949,22 @@ static void scsi_mq_put_budget(struct blk_mq_hw_ctx *hctx)
- 	put_device(&sdev->sdev_gendev);
- }
- 
--static blk_status_t scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
-+static bool scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
- {
- 	struct request_queue *q = hctx->queue;
- 	struct scsi_device *sdev = q->queuedata;
--	blk_status_t ret;
--
--	ret = prep_to_mq(scsi_prep_state_check(sdev, NULL));
--	if (ret == BLK_STS_RESOURCE || ret != BLK_STS_OK)
--		return ret;
- 
- 	if (!get_device(&sdev->sdev_gendev))
- 		goto out;
- 	if (!scsi_dev_queue_ready(q, sdev))
- 		goto out_put_device;
- 
--	return BLK_STS_OK;
-+	return true;
- 
- out_put_device:
- 	put_device(&sdev->sdev_gendev);
- out:
--	return BLK_STS_RESOURCE;
-+	return false;
- }
- 
- static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index e5e6becd57d3..439a7970ed5d 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -92,7 +92,7 @@ struct blk_mq_queue_data {
- 
- typedef blk_status_t (queue_rq_fn)(struct blk_mq_hw_ctx *,
- 		const struct blk_mq_queue_data *);
--typedef blk_status_t (get_budget_fn)(struct blk_mq_hw_ctx *);
-+typedef bool (get_budget_fn)(struct blk_mq_hw_ctx *);
- typedef void (put_budget_fn)(struct blk_mq_hw_ctx *);
- typedef enum blk_eh_timer_return (timeout_fn)(struct request *, bool);
- typedef int (init_hctx_fn)(struct blk_mq_hw_ctx *, void *, unsigned int);
+ 	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
+@@ -669,6 +751,7 @@ static struct elevator_type mq_deadline = {
+ 	.ops.mq = {
+ 		.insert_requests	= dd_insert_requests,
+ 		.dispatch_request	= dd_dispatch_request,
++		.completed_request	= dd_completed_request,
+ 		.next_request		= elv_rb_latter_request,
+ 		.former_request		= elv_rb_former_request,
+ 		.bio_merge		= dd_bio_merge,
 -- 
-2.9.5
+2.13.6
