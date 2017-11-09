@@ -1,208 +1,197 @@
-Return-Path: <ivan@ludios.org>
-Return-Path: <ivan@ludios.org>
-From: ivan@ludios.org
-To: axboe@kernel.dk, paolo.valente@linaro.org
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, oleksandr@natalenko.name
-Subject: blk-mq + bfq IO hangs after writing partition table
-Date: Fri, 01 Dec 2017 06:52:37 +0000
-Message-ID: <87fu8v7xe2.fsf@ksca2.i-did-not-set--mail-host-address--so-tickle-me>
+Return-Path: <prvs=479c705ad=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, "Christoph
+ Hellwig" <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
+	Oleksandr Natalenko <oleksandr@natalenko.name>, Ming Lei
+	<ming.lei@redhat.com>, Martin Steigerwald <martin@lichtvoll.de>, "Bart Van
+ Assche" <bart.vanassche@wdc.com>, Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH v12 2/7] block: Introduce blk_get_request_flags()
+Date: Thu, 9 Nov 2017 10:49:54 -0800
+Message-ID: <20171109184959.4617-3-bart.vanassche@wdc.com>
+In-Reply-To: <20171109184959.4617-1-bart.vanassche@wdc.com>
+References: <20171109184959.4617-1-bart.vanassche@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain
+Return-Path: bart.vanassche@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
+A side effect of this patch is that the GFP mask that is passed to
+several allocation functions in the legacy block layer is changed
+from GFP_KERNEL into __GFP_DIRECT_RECLAIM.
 
-Hi,
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Tested-by: Martin Steigerwald <martin@lichtvoll.de>
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ block/blk-core.c       | 50 +++++++++++++++++++++++++++++++++++---------------
+ include/linux/blkdev.h |  3 +++
+ 2 files changed, 38 insertions(+), 15 deletions(-)
 
-I think I am triggering a blk-mq + bfq bug that I can reproduce 100%
-of the time by using gdisk (1.0.1-1 in Debian stretch) to write a
-partition table to a USB flash drive.  After it is triggered, IO hangs
-forever to that device and the machine cannot be shut down cleanly.
-I have reproduced this on two very different amd64 machines and two
-different USB drives.  I don't know if this affects other storage
-devices.  This happens *only* with blk-mq + bfq, never with mq-deadline
-or kyber.
-
-I built df8ba95c572a187ed2aa7403e97a7a7f58c01f00 (2017-11-30) from
-Linus's tree with make-kpkg, without patches of any sort.
-
-My cmdline was:
-scsi_mod.use_blk_mq=y dm_mod.use_blk_mq=y apparmor=1 security=apparmor
-
-.config file:
-https://gist.githubusercontent.com/ivan/35935783e3153878ce650ab105c1695f/raw/b3de6c85eabd342118b5fecf2b4fab362bde7aa6/config
-
-To reproduce:
-boot with blk-mq
-plug in a USB stick without any data you want to keep
-echo bfq > /sys/block/sdX/queue/scheduler
-gdisk /dev/sdX
-delete some partitions or add some partitions
-"w" to write the partition table
-observe IO hang and call trace (below) in the journal after 2 minutes
-
-Note the log below does not show "bfq" because it was loaded earlier.
-
-If it does not reproduce, try another USB flash drive; if that does not
-reproduce, cat /dev/zero over it first.
-
-Best regards,
-
-Ivan
-
-Dec 01 05:12:17 kernel: usb 3-1: new high-speed USB device number 2 using xhci_hcd
-Dec 01 05:12:18 kernel: usb 3-1: New USB device found, idVendor=26bf, idProduct=201a
-Dec 01 05:12:18 kernel: usb 3-1: New USB device strings: Mfr=0, Product=3, SerialNumber=4
-Dec 01 05:12:18 kernel: usb 3-1: Product: STORAGE DEVICE
-Dec 01 05:12:18 kernel: usb 3-1: SerialNumber: 44705421454402634814
-Dec 01 05:12:18 mtp-probe[3289]: checking bus 3, device 2: "/sys/devices/pci0000:00/0000:00:1c.7/0000:26:00.0/usb3/3-1"
-Dec 01 05:12:18 mtp-probe[3289]: bus: 3, device: 2 was not an MTP device
-Dec 01 05:12:18 kernel: usb-storage 3-1:1.0: USB Mass Storage device detected
-Dec 01 05:12:18 kernel: scsi host6: usb-storage 3-1:1.0
-Dec 01 05:12:18 kernel: usbcore: registered new interface driver usb-storage
-Dec 01 05:12:18 kernel: usbcore: registered new interface driver uas
-Dec 01 05:12:19 kernel: scsi 6:0:0:0: Direct-Access     Specific STORAGE DEVICE   0009 PQ: 0 ANSI: 5
-Dec 01 05:12:19 kernel: sd 6:0:0:0: Attached scsi generic sg2 type 0
-Dec 01 05:12:19 kernel: sd 6:0:0:0: [sdc] 7864320 512-byte logical blocks: (4.03 GB/3.75 GiB)
-Dec 01 05:12:19 kernel: sd 6:0:0:0: [sdc] Attached SCSI removable disk
-Dec 01 05:12:19 kernel:  sdc:
-Dec 01 05:12:24 kernel:  sdc:
-Dec 01 05:12:35 kernel:  sdc: sdc1 sdc2
-Dec 01 05:12:36 kernel:  sdc: sdc1 sdc2
-Dec 01 05:12:40 kernel: io scheduler kyber registered
-Dec 01 05:12:41 kernel:  sdc: sdc1 sdc2
-Dec 01 05:12:52 kernel:  sdc: sdc1
-Dec 01 05:12:53 kernel:  sdc: sdc1
-Dec 01 05:12:59 kernel:  sdc: sdc1
-Dec 01 05:14:00 systemd-udevd[331]: seq 2520 '/devices/pci0000:00/0000:00:1c.7/0000:26:00.0/usb3/3-1/3-1:1.0/host6/target6:0:0/6:0:0:0/block/sdc' is taking a long time
-Dec 01 05:14:05 systemd[1]: Started Getty on tty3.
-Dec 01 05:14:09 login[3339]: pam_unix(login:session): session opened for user root by LOGIN(uid=0)
-Dec 01 05:14:09 systemd[1]: Created slice User Slice of root.
-Dec 01 05:14:09 systemd[1]: Starting User Manager for UID 0...
-Dec 01 05:14:09 systemd[3344]: pam_unix(systemd-user:session): session opened for user root by (uid=0)
-Dec 01 05:14:09 systemd-logind[545]: New session 3 of user root.
-Dec 01 05:14:09 systemd[1]: Started Session 3 of user root.
-Dec 01 05:14:09 systemd[3344]: Reached target Paths.
-Dec 01 05:14:09 systemd[3344]: Starting D-Bus User Message Bus Socket.
-Dec 01 05:14:09 systemd[3344]: Listening on GnuPG cryptographic agent and passphrase cache (restricted).
-Dec 01 05:14:09 systemd[3344]: Listening on GnuPG cryptographic agent and passphrase cache.
-Dec 01 05:14:09 systemd[3344]: Listening on GnuPG cryptographic agent (access for web browsers).
-Dec 01 05:14:09 systemd[3344]: Listening on GnuPG cryptographic agent (ssh-agent emulation).
-Dec 01 05:14:09 systemd[3344]: Reached target Timers.
-Dec 01 05:14:09 systemd[3344]: Listening on D-Bus User Message Bus Socket.
-Dec 01 05:14:09 systemd[3344]: Reached target Sockets.
-Dec 01 05:14:09 systemd[3344]: Reached target Basic System.
-Dec 01 05:14:09 systemd[3344]: Reached target Default.
-Dec 01 05:14:09 systemd[3344]: Startup finished in 13ms.
-Dec 01 05:14:09 systemd[1]: Started User Manager for UID 0.
-Dec 01 05:14:09 login[3350]: ROOT LOGIN  on '/dev/tty3'
-Dec 01 05:15:23 kernel: INFO: task kworker/2:1:34 blocked for more than 120 seconds.
-Dec 01 05:15:23 kernel:       Not tainted 4.15.0-rc1+ #2
-Dec 01 05:15:23 kernel: "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-Dec 01 05:15:23 kernel: kworker/2:1     D    0    34      2 0x80000000
-Dec 01 05:15:23 kernel: Workqueue: events_freezable_power_ disk_events_workfn
-Dec 01 05:15:23 kernel: Call Trace:
-Dec 01 05:15:23 kernel:  ? __schedule+0x3cb/0x850
-Dec 01 05:15:23 kernel:  schedule+0x32/0x80
-Dec 01 05:15:23 kernel:  io_schedule+0x12/0x40
-Dec 01 05:15:23 kernel:  blk_mq_get_tag+0x15e/0x250
-Dec 01 05:15:23 kernel:  ? remove_wait_queue+0x60/0x60
-Dec 01 05:15:23 kernel:  blk_mq_get_request+0xcb/0x390
-Dec 01 05:15:23 kernel:  blk_mq_alloc_request+0x7d/0xd0
-Dec 01 05:15:23 kernel:  blk_get_request_flags+0x40/0x190
-Dec 01 05:15:23 kernel:  scsi_execute+0x38/0x250 [scsi_mod]
-Dec 01 05:15:23 kernel:  scsi_test_unit_ready+0x75/0xf0 [scsi_mod]
-Dec 01 05:15:23 kernel:  sd_check_events+0x125/0x1a0 [sd_mod]
-Dec 01 05:15:23 kernel:  disk_check_events+0x63/0x150
-Dec 01 05:15:23 kernel:  process_one_work+0x184/0x380
-Dec 01 05:15:23 kernel:  worker_thread+0x4d/0x3c0
-Dec 01 05:15:23 kernel:  kthread+0xf5/0x130
-Dec 01 05:15:23 kernel:  ? process_one_work+0x380/0x380
-Dec 01 05:15:23 kernel:  ? kthread_create_worker_on_cpu+0x70/0x70
-Dec 01 05:15:23 kernel:  ret_from_fork+0x1f/0x30
-Dec 01 05:15:23 kernel: INFO: task kworker/u16:3:131 blocked for more than 120 seconds.
-Dec 01 05:15:23 kernel:       Not tainted 4.15.0-rc1+ #2
-Dec 01 05:15:23 kernel: "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-Dec 01 05:15:23 kernel: kworker/u16:3   D    0   131      2 0x80000000
-Dec 01 05:15:23 kernel: Workqueue: writeback wb_workfn (flush-8:32)
-Dec 01 05:15:23 kernel: Call Trace:
-Dec 01 05:15:23 kernel:  ? __schedule+0x3cb/0x850
-Dec 01 05:15:23 kernel:  schedule+0x32/0x80
-Dec 01 05:15:23 kernel:  io_schedule+0x12/0x40
-Dec 01 05:15:23 kernel:  blk_mq_get_tag+0x15e/0x250
-Dec 01 05:15:23 kernel:  ? elv_merge+0x69/0xe0
-Dec 01 05:15:23 kernel:  ? remove_wait_queue+0x60/0x60
-Dec 01 05:15:23 kernel:  blk_mq_get_request+0xcb/0x390
-Dec 01 05:15:23 kernel:  blk_mq_make_request+0x12b/0x5e0
-Dec 01 05:15:23 kernel:  generic_make_request+0x11e/0x2f0
-Dec 01 05:15:23 kernel:  ? submit_bio+0x6c/0x140
-Dec 01 05:15:23 kernel:  submit_bio+0x6c/0x140
-Dec 01 05:15:23 kernel:  ? guard_bio_eod+0x26/0xe0
-Dec 01 05:15:23 kernel:  submit_bh_wbc+0x14b/0x170
-Dec 01 05:15:23 kernel:  __block_write_full_page+0x17c/0x400
-Dec 01 05:15:23 kernel:  ? I_BDEV+0x10/0x10
-Dec 01 05:15:23 kernel:  ? page_referenced_one+0x160/0x160
-Dec 01 05:15:23 kernel:  __writepage+0x13/0x50
-Dec 01 05:15:23 kernel:  write_cache_pages+0x1ed/0x430
-Dec 01 05:15:23 kernel:  ? __wb_calc_thresh+0x130/0x130
-Dec 01 05:15:23 kernel:  ? bit_clear+0x110/0x110
-Dec 01 05:15:23 kernel:  ? drm_fb_helper_cfb_fillrect+0x12/0x30 [drm_kms_helper]
-Dec 01 05:15:23 kernel:  generic_writepages+0x61/0xa0
-Dec 01 05:15:23 kernel:  ? do_writepages+0x17/0x60
-Dec 01 05:15:23 kernel:  do_writepages+0x17/0x60
-Dec 01 05:15:23 kernel:  __writeback_single_inode+0x3d/0x310
-Dec 01 05:15:23 kernel:  writeback_sb_inodes+0x221/0x4b0
-Dec 01 05:15:23 kernel:  __writeback_inodes_wb+0x87/0xb0
-Dec 01 05:15:23 kernel:  wb_writeback+0x282/0x310
-Dec 01 05:15:23 kernel:  ? cpumask_next+0x16/0x20
-Dec 01 05:15:23 kernel:  ? wb_workfn+0x345/0x450
-Dec 01 05:15:23 kernel:  wb_workfn+0x345/0x450
-Dec 01 05:15:23 kernel:  process_one_work+0x184/0x380
-Dec 01 05:15:23 kernel:  worker_thread+0x4d/0x3c0
-Dec 01 05:15:23 kernel:  kthread+0xf5/0x130
-Dec 01 05:15:23 kernel:  ? process_one_work+0x380/0x380
-Dec 01 05:15:23 kernel:  ? kthread_create_worker_on_cpu+0x70/0x70
-Dec 01 05:15:23 kernel:  ret_from_fork+0x1f/0x30
-Dec 01 05:15:23 kernel: INFO: task gdisk:3337 blocked for more than 120 seconds.
-Dec 01 05:15:23 kernel:       Not tainted 4.15.0-rc1+ #2
-Dec 01 05:15:23 kernel: "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-Dec 01 05:15:23 kernel: gdisk           D    0  3337   3253 0x00000000
-Dec 01 05:15:23 kernel: Call Trace:
-Dec 01 05:15:23 kernel:  ? __schedule+0x3cb/0x850
-Dec 01 05:15:23 kernel:  schedule+0x32/0x80
-Dec 01 05:15:23 kernel:  io_schedule+0x12/0x40
-Dec 01 05:15:23 kernel:  blk_mq_get_tag+0x15e/0x250
-Dec 01 05:15:23 kernel:  ? elv_merge+0x69/0xe0
-Dec 01 05:15:23 kernel:  ? remove_wait_queue+0x60/0x60
-Dec 01 05:15:23 kernel:  blk_mq_get_request+0xcb/0x390
-Dec 01 05:15:23 kernel:  blk_mq_make_request+0x12b/0x5e0
-Dec 01 05:15:23 kernel:  generic_make_request+0x11e/0x2f0
-Dec 01 05:15:23 kernel:  ? submit_bio+0x6c/0x140
-Dec 01 05:15:23 kernel:  submit_bio+0x6c/0x140
-Dec 01 05:15:23 kernel:  ? guard_bio_eod+0x26/0xe0
-Dec 01 05:15:23 kernel:  submit_bh_wbc+0x14b/0x170
-Dec 01 05:15:23 kernel:  __block_write_full_page+0x17c/0x400
-Dec 01 05:15:23 kernel:  ? I_BDEV+0x10/0x10
-Dec 01 05:15:23 kernel:  ? page_referenced_one+0x160/0x160
-Dec 01 05:15:23 kernel:  __writepage+0x13/0x50
-Dec 01 05:15:23 kernel:  write_cache_pages+0x1ed/0x430
-Dec 01 05:15:23 kernel:  ? __wb_calc_thresh+0x130/0x130
-Dec 01 05:15:23 kernel:  ? _cond_resched+0x16/0x40
-Dec 01 05:15:23 kernel:  ? flush_work+0x43/0x1d0
-Dec 01 05:15:23 kernel:  ? pick_next_task_fair+0x308/0x5d0
-Dec 01 05:15:23 kernel:  generic_writepages+0x61/0xa0
-Dec 01 05:15:23 kernel:  ? fdatawait_one_bdev+0x20/0x20
-Dec 01 05:15:23 kernel:  ? do_writepages+0x17/0x60
-Dec 01 05:15:23 kernel:  do_writepages+0x17/0x60
-Dec 01 05:15:23 kernel:  __filemap_fdatawrite_range+0xc8/0x100
-Dec 01 05:15:23 kernel:  ? _xfs_log_force+0x8a/0x2a0 [xfs]
-Dec 01 05:15:23 kernel:  iterate_bdevs+0x140/0x150
-Dec 01 05:15:23 kernel:  sys_sync+0x6e/0xb0
-Dec 01 05:15:23 kernel:  entry_SYSCALL_64_fastpath+0x1e/0x81
-Dec 01 05:15:23 kernel: RIP: 0033:0x7f0b4eaeb5e7
-Dec 01 05:15:23 kernel: RSP: 002b:00007ffdaa3c1db8 EFLAGS: 00000202 ORIG_RAX: 00000000000000a2
-Dec 01 05:15:23 kernel: RAX: ffffffffffffffda RBX: 00007ffdaa3c3878 RCX: 00007f0b4eaeb5e7
-Dec 01 05:15:23 kernel: RDX: 00007ffdaa3c1cf0 RSI: 00007ffdaa3c1cf0 RDI: 0000000000000003
-Dec 01 05:15:23 kernel: RBP: 00007ffdaa3c1b80 R08: 00005640d1adf940 R09: 0000000000000210
-Dec 01 05:15:23 kernel: R10: 0000000000016830 R11: 0000000000000202 R12: 0000000000000001
-Dec 01 05:15:23 kernel: R13: 00007ffdaa3c3878 R14: 0000000000000000 R15: 00007ffdaa3c26a2
-Dec 01 05:16:00 systemd-udevd[331]: seq 2520 '/devices/pci0000:00/0000:00:1c.7/0000:26:00.0/usb3/3-1/3-1:1.0/host6/target6:0:0/6:0:0:0/block/sdc' killed
+diff --git a/block/blk-core.c b/block/blk-core.c
+index a4362849059a..0f7093dfc010 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1160,7 +1160,7 @@ int blk_update_nr_requests(struct request_queue *q, unsigned int nr)
+  * @rl: request list to allocate from
+  * @op: operation and flags
+  * @bio: bio to allocate request for (can be %NULL)
+- * @gfp_mask: allocation mask
++ * @flags: BLQ_MQ_REQ_* flags
+  *
+  * Get a free request from @q.  This function may fail under memory
+  * pressure or if @q is dead.
+@@ -1170,7 +1170,7 @@ int blk_update_nr_requests(struct request_queue *q, unsigned int nr)
+  * Returns request pointer on success, with @q->queue_lock *not held*.
+  */
+ static struct request *__get_request(struct request_list *rl, unsigned int op,
+-		struct bio *bio, gfp_t gfp_mask)
++				     struct bio *bio, unsigned int flags)
+ {
+ 	struct request_queue *q = rl->q;
+ 	struct request *rq;
+@@ -1179,6 +1179,8 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
+ 	struct io_cq *icq = NULL;
+ 	const bool is_sync = op_is_sync(op);
+ 	int may_queue;
++	gfp_t gfp_mask = flags & BLK_MQ_REQ_NOWAIT ? GFP_ATOMIC :
++			 __GFP_DIRECT_RECLAIM;
+ 	req_flags_t rq_flags = RQF_ALLOCED;
+ 
+ 	lockdep_assert_held(q->queue_lock);
+@@ -1339,7 +1341,7 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
+  * @q: request_queue to allocate request from
+  * @op: operation and flags
+  * @bio: bio to allocate request for (can be %NULL)
+- * @gfp_mask: allocation mask
++ * @flags: BLK_MQ_REQ_* flags.
+  *
+  * Get a free request from @q.  If %__GFP_DIRECT_RECLAIM is set in @gfp_mask,
+  * this function keeps retrying under memory pressure and fails iff @q is dead.
+@@ -1349,7 +1351,7 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
+  * Returns request pointer on success, with @q->queue_lock *not held*.
+  */
+ static struct request *get_request(struct request_queue *q, unsigned int op,
+-		struct bio *bio, gfp_t gfp_mask)
++				   struct bio *bio, unsigned int flags)
+ {
+ 	const bool is_sync = op_is_sync(op);
+ 	DEFINE_WAIT(wait);
+@@ -1361,7 +1363,7 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
+ 
+ 	rl = blk_get_rl(q, bio);	/* transferred to @rq on success */
+ retry:
+-	rq = __get_request(rl, op, bio, gfp_mask);
++	rq = __get_request(rl, op, bio, flags);
+ 	if (!IS_ERR(rq))
+ 		return rq;
+ 
+@@ -1370,7 +1372,7 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
+ 		return ERR_PTR(-EAGAIN);
+ 	}
+ 
+-	if (!gfpflags_allow_blocking(gfp_mask) || unlikely(blk_queue_dying(q))) {
++	if ((flags & BLK_MQ_REQ_NOWAIT) || unlikely(blk_queue_dying(q))) {
+ 		blk_put_rl(rl);
+ 		return rq;
+ 	}
+@@ -1397,10 +1399,13 @@ static struct request *get_request(struct request_queue *q, unsigned int op,
+ 	goto retry;
+ }
+ 
++/* flags: BLK_MQ_REQ_PREEMPT and/or BLK_MQ_REQ_NOWAIT. */
+ static struct request *blk_old_get_request(struct request_queue *q,
+-					   unsigned int op, gfp_t gfp_mask)
++					   unsigned int op, unsigned int flags)
+ {
+ 	struct request *rq;
++	gfp_t gfp_mask = flags & BLK_MQ_REQ_NOWAIT ? GFP_ATOMIC :
++			 __GFP_DIRECT_RECLAIM;
+ 	int ret = 0;
+ 
+ 	WARN_ON_ONCE(q->mq_ops);
+@@ -1413,7 +1418,7 @@ static struct request *blk_old_get_request(struct request_queue *q,
+ 	if (ret)
+ 		return ERR_PTR(ret);
+ 	spin_lock_irq(q->queue_lock);
+-	rq = get_request(q, op, NULL, gfp_mask);
++	rq = get_request(q, op, NULL, flags);
+ 	if (IS_ERR(rq)) {
+ 		spin_unlock_irq(q->queue_lock);
+ 		blk_queue_exit(q);
+@@ -1427,25 +1432,40 @@ static struct request *blk_old_get_request(struct request_queue *q,
+ 	return rq;
+ }
+ 
+-struct request *blk_get_request(struct request_queue *q, unsigned int op,
+-				gfp_t gfp_mask)
++/**
++ * blk_get_request_flags - allocate a request
++ * @q: request queue to allocate a request for
++ * @op: operation (REQ_OP_*) and REQ_* flags, e.g. REQ_SYNC.
++ * @flags: BLK_MQ_REQ_* flags, e.g. BLK_MQ_REQ_NOWAIT.
++ */
++struct request *blk_get_request_flags(struct request_queue *q, unsigned int op,
++				      unsigned int flags)
+ {
+ 	struct request *req;
+ 
++	WARN_ON_ONCE(op & REQ_NOWAIT);
++	WARN_ON_ONCE(flags & ~BLK_MQ_REQ_NOWAIT);
++
+ 	if (q->mq_ops) {
+-		req = blk_mq_alloc_request(q, op,
+-			(gfp_mask & __GFP_DIRECT_RECLAIM) ?
+-				0 : BLK_MQ_REQ_NOWAIT);
++		req = blk_mq_alloc_request(q, op, flags);
+ 		if (!IS_ERR(req) && q->mq_ops->initialize_rq_fn)
+ 			q->mq_ops->initialize_rq_fn(req);
+ 	} else {
+-		req = blk_old_get_request(q, op, gfp_mask);
++		req = blk_old_get_request(q, op, flags);
+ 		if (!IS_ERR(req) && q->initialize_rq_fn)
+ 			q->initialize_rq_fn(req);
+ 	}
+ 
+ 	return req;
+ }
++EXPORT_SYMBOL(blk_get_request_flags);
++
++struct request *blk_get_request(struct request_queue *q, unsigned int op,
++				gfp_t gfp_mask)
++{
++	return blk_get_request_flags(q, op, gfp_mask & __GFP_DIRECT_RECLAIM ?
++				     0 : BLK_MQ_REQ_NOWAIT);
++}
+ EXPORT_SYMBOL(blk_get_request);
+ 
+ /**
+@@ -1871,7 +1891,7 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
+ 	 * Returns with the queue unlocked.
+ 	 */
+ 	blk_queue_enter_live(q);
+-	req = get_request(q, bio->bi_opf, bio, GFP_NOIO);
++	req = get_request(q, bio->bi_opf, bio, 0);
+ 	if (IS_ERR(req)) {
+ 		blk_queue_exit(q);
+ 		__wbt_done(q->rq_wb, wb_acct);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 1437ef4d8037..1af5ddd0f631 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -927,6 +927,9 @@ extern void blk_rq_init(struct request_queue *q, struct request *rq);
+ extern void blk_init_request_from_bio(struct request *req, struct bio *bio);
+ extern void blk_put_request(struct request *);
+ extern void __blk_put_request(struct request_queue *, struct request *);
++extern struct request *blk_get_request_flags(struct request_queue *,
++					     unsigned int op,
++					     unsigned int flags);
+ extern struct request *blk_get_request(struct request_queue *, unsigned int op,
+ 				       gfp_t gfp_mask);
+ extern void blk_requeue_request(struct request_queue *, struct request *);
+-- 
+2.14.3
