@@ -1,69 +1,125 @@
-Return-Path: <BATV+880bc34f87153fcb2b61+5191+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 6/7] block: create 'slaves' and 'holders' entries for hidden gendisks
-Date: Thu,  9 Nov 2017 18:44:49 +0100
-Message-Id: <20171109174450.17142-7-hch@lst.de>
-In-Reply-To: <20171109174450.17142-1-hch@lst.de>
-References: <20171109174450.17142-1-hch@lst.de>
+Return-Path: <prvs=479c705ad=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, "Christoph
+ Hellwig" <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
+	Oleksandr Natalenko <oleksandr@natalenko.name>, Ming Lei
+	<ming.lei@redhat.com>, Martin Steigerwald <martin@lichtvoll.de>, "Bart Van
+ Assche" <bart.vanassche@wdc.com>
+Subject: [PATCH v12 1/7] block: Make q_usage_counter also track legacy requests
+Date: Thu, 9 Nov 2017 10:49:53 -0800
+Message-ID: <20171109184959.4617-2-bart.vanassche@wdc.com>
+In-Reply-To: <20171109184959.4617-1-bart.vanassche@wdc.com>
+References: <20171109184959.4617-1-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Return-Path: bart.vanassche@wdc.com
 List-ID: <linux-block@vger.kernel.org>
 
-From: Hannes Reinecke <hare@suse.de>
+From: Ming Lei <ming.lei@redhat.com>
 
-When creating nvme multipath devices we should populate the 'slaves' and
-'holders' directorys properly to aid userspace topology detection.
+This patch makes it possible to pause request allocation for
+the legacy block layer by calling blk_mq_freeze_queue() and
+blk_mq_unfreeze_queue().
 
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-[hch: split from a larger patch]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+[ bvanassche: Combined two patches into one, edited a comment and made sure
+  REQ_NOWAIT is handled properly in blk_old_get_request() ]
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Tested-by: Martin Steigerwald <martin@lichtvoll.de>
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Cc: Ming Lei <ming.lei@redhat.com>
 ---
- block/genhd.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ block/blk-core.c | 12 ++++++++++++
+ block/blk-mq.c   | 10 ++--------
+ 2 files changed, 14 insertions(+), 8 deletions(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 835e907e6e01..3de1671631bf 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -585,14 +585,14 @@ static void register_disk(struct device *parent, struct gendisk *disk)
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 5e81dcf4690a..a4362849059a 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -612,6 +612,9 @@ void blk_set_queue_dying(struct request_queue *q)
+ 		}
+ 		spin_unlock_irq(q->queue_lock);
+ 	}
++
++	/* Make blk_queue_enter() reexamine the DYING flag. */
++	wake_up_all(&q->mq_freeze_wq);
+ }
+ EXPORT_SYMBOL_GPL(blk_set_queue_dying);
+ 
+@@ -1398,16 +1401,22 @@ static struct request *blk_old_get_request(struct request_queue *q,
+ 					   unsigned int op, gfp_t gfp_mask)
+ {
+ 	struct request *rq;
++	int ret = 0;
+ 
+ 	WARN_ON_ONCE(q->mq_ops);
+ 
+ 	/* create ioc upfront */
+ 	create_io_context(gfp_mask, q->node);
+ 
++	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM) ||
++			      (op & REQ_NOWAIT));
++	if (ret)
++		return ERR_PTR(ret);
+ 	spin_lock_irq(q->queue_lock);
+ 	rq = get_request(q, op, NULL, gfp_mask);
+ 	if (IS_ERR(rq)) {
+ 		spin_unlock_irq(q->queue_lock);
++		blk_queue_exit(q);
+ 		return rq;
+ 	}
+ 
+@@ -1579,6 +1588,7 @@ void __blk_put_request(struct request_queue *q, struct request *req)
+ 		blk_free_request(rl, req);
+ 		freed_request(rl, sync, rq_flags);
+ 		blk_put_rl(rl);
++		blk_queue_exit(q);
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(__blk_put_request);
+@@ -1860,8 +1870,10 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
+ 	 * Grab a free request. This is might sleep but can not fail.
+ 	 * Returns with the queue unlocked.
  	 */
- 	pm_runtime_set_memalloc_noio(ddev, true);
- 
-+	disk->part0.holder_dir = kobject_create_and_add("holders", &ddev->kobj);
-+	disk->slave_dir = kobject_create_and_add("slaves", &ddev->kobj);
-+
- 	if (disk->flags & GENHD_FL_HIDDEN) {
- 		dev_set_uevent_suppress(ddev, 0);
- 		return;
++	blk_queue_enter_live(q);
+ 	req = get_request(q, bio->bi_opf, bio, GFP_NOIO);
+ 	if (IS_ERR(req)) {
++		blk_queue_exit(q);
+ 		__wbt_done(q->rq_wb, wb_acct);
+ 		if (PTR_ERR(req) == -ENOMEM)
+ 			bio->bi_status = BLK_STS_RESOURCE;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 2396f036c388..2b7d95b2cdfb 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -126,7 +126,8 @@ void blk_freeze_queue_start(struct request_queue *q)
+ 	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
+ 	if (freeze_depth == 1) {
+ 		percpu_ref_kill(&q->q_usage_counter);
+-		blk_mq_run_hw_queues(q, false);
++		if (q->mq_ops)
++			blk_mq_run_hw_queues(q, false);
  	}
- 
--	disk->part0.holder_dir = kobject_create_and_add("holders", &ddev->kobj);
--	disk->slave_dir = kobject_create_and_add("slaves", &ddev->kobj);
+ }
+ EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
+@@ -256,13 +257,6 @@ void blk_mq_wake_waiters(struct request_queue *q)
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		if (blk_mq_hw_queue_mapped(hctx))
+ 			blk_mq_tag_wakeup_all(hctx->tags, true);
 -
- 	/* No minors to use for partitions */
- 	if (!disk_part_scan_enabled(disk))
- 		goto exit;
-@@ -728,11 +728,11 @@ void del_gendisk(struct gendisk *disk)
- 		WARN_ON(1);
- 	}
+-	/*
+-	 * If we are called because the queue has now been marked as
+-	 * dying, we need to ensure that processes currently waiting on
+-	 * the queue are notified as well.
+-	 */
+-	wake_up_all(&q->mq_freeze_wq);
+ }
  
--	if (!(disk->flags & GENHD_FL_HIDDEN)) {
-+	if (!(disk->flags & GENHD_FL_HIDDEN))
- 		blk_unregister_region(disk_devt(disk), disk->minors);
--		kobject_put(disk->part0.holder_dir);
--		kobject_put(disk->slave_dir);
--	}
-+
-+	kobject_put(disk->part0.holder_dir);
-+	kobject_put(disk->slave_dir);
- 
- 	part_stat_set_all(&disk->part0, 0);
- 	disk->part0.stamp = 0;
+ bool blk_mq_can_queue(struct blk_mq_hw_ctx *hctx)
 -- 
-2.14.2
+2.14.3
