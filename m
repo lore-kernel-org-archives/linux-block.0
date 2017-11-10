@@ -1,46 +1,37 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:39806 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752233AbdKWEsS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Nov 2017 23:48:18 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Omar Sandoval <osandov@fb.com>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Wen Xiong <wenxiong@us.ibm.com>,
-        Mauricio Faria de Oliveira <mauricfo@linux.vnet.ibm.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 0/2] block: fix queue freeze and cleanup
-Date: Thu, 23 Nov 2017 12:47:58 +0800
-Message-Id: <20171123044800.25251-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Fri, 10 Nov 2017 14:04:37 -0800
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	Omar Sandoval <osandov@fb.com>
+Subject: Re: [PATCH] blk-mq: improve tag waiting setup for non-shared tags
+Message-ID: <20171110220437.GA5449@vader.DHCP.thefacebook.com>
+References: <3649d84b-978d-ce1b-a8bc-5735b07296a7@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <3649d84b-978d-ce1b-a8bc-5735b07296a7@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+On Thu, Nov 09, 2017 at 04:00:09PM -0700, Jens Axboe wrote:
+> If we run out of driver tags, we currently treat shared and non-shared
+> tags the same - both cases hook into the tag waitqueue. This is a bit
+> more costly than it needs to be on unshared tags, since we have to both
+> grab the hctx lock, and the waitqueue lock (and disable interrupts).
+> For the non-shared case, we can simply mark the queue as needing a
+> restart.
+> 
+> Split blk_mq_dispatch_wait_add() to account for both cases, and
+> rename it to blk_mq_mark_tag_wait() to better reflect what it
+> does now.
+> 
+> Without this patch, shared and non-shared performance is about the same
+> with 4 fio thread hammering on a single null_blk device (~410K, at 75%
+> sys). With the patch, the shared case is the same, but the non-shared
+> tags case runs at 431K at 71% sys.
+> 
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-The 1st patch runs queue in blk_freeze_queue_start() for fixing one
-regression by 055f6e18e08f("block: Make q_usage_counter also track legacy
-requests").
+The best of both worlds.
 
-The 2nd patch drians blkcg part of request_queue for both blk-mq and
-legacy, which can be a fix on blk-mq's queue cleanup.
-
-V2:
-	- follow Bart's suggestion to use run queue instead of drain queue
-	- drians blkcg part of request_queue for blk-mq
-
-thanks,
-Ming
-
-Ming Lei (2):
-  block: run queue before waiting for q_usage_counter becoming zero
-  block: drain blkcg part of request_queue after queue is frozen
-
- block/blk-core.c | 3 +--
- block/blk-mq.c   | 2 ++
- 2 files changed, 3 insertions(+), 2 deletions(-)
-
--- 
-2.9.5
+Reviewed-by: Omar Sandoval <osandov@fb.com>
