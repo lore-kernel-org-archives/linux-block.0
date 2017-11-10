@@ -1,186 +1,63 @@
-Return-Path: <prvs=4780b5c65=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V7 5/8] block: deadline-iosched: Introduce zone locking support
-Date: Wed,  8 Nov 2017 17:11:15 +0900
-Message-Id: <20171108081118.7632-6-damien.lemoal@wdc.com>
-In-Reply-To: <20171108081118.7632-1-damien.lemoal@wdc.com>
-References: <20171108081118.7632-1-damien.lemoal@wdc.com>
+Return-Path: <linus.walleij@linaro.org>
+Return-Path: <linus.walleij@linaro.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+To: linux-mmc@vger.kernel.org,
+	Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+	Paolo Valente <paolo.valente@linaro.org>,
+	Avri Altman <Avri.Altman@sandisk.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH 07/12 v5] mmc: queue: simplify queue logic
+Date: Fri, 10 Nov 2017 11:01:38 +0100
+Message-Id: <20171110100143.12256-8-linus.walleij@linaro.org>
+In-Reply-To: <20171110100143.12256-1-linus.walleij@linaro.org>
+References: <20171110100143.12256-1-linus.walleij@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Introduce zone write locking to avoid write request reordering with
-zoned block devices. This is achieved using a finer selection of the
-next request to dispatch:
-1) Any non-write request is always allowed to proceed.
-2) Any write to a conventional zone is always allowed to proceed.
-3) For a write to a sequential zone, the zone lock is first checked.
-   a) If the zone is not locked, the write is allowed to proceed after
-      its target zone is locked.
-   b) If the zone is locked, the write request is skipped and the next
-      request in the dispatch queue tested (back to step 1).
+The if() statment checking if there is no current or previous
+request is now just looking ahead at something that will be
+concluded a few lines below. Simplify the logic by moving the
+assignment of .asleep.
 
-For a write request that has locked its target zone, the zone is
-unlocked either when the request completes and the method
-deadline_request_completed() is called, or when the request is requeued
-using the method deadline_add_request().
-
-Requests targeting a locked zone are always left in the scheduler queue
-to preserve the initial write order. If no write request can be
-dispatched, allow reads to be dispatched even if the write batch is not
-done.
-
-If the device used is not a zoned block device, or if zoned block device
-support is disabled, this patch does not modify deadline behavior.
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- block/deadline-iosched.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 68 insertions(+), 3 deletions(-)
+ChangeLog v1->v5:
+- Rebasing on the "next" branch in the MMC tree.
+---
+ drivers/mmc/core/queue.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
-diff --git a/block/deadline-iosched.c b/block/deadline-iosched.c
-index 81e3f0897457..9de9f156e203 100644
---- a/block/deadline-iosched.c
-+++ b/block/deadline-iosched.c
-@@ -98,6 +98,12 @@ deadline_add_request(struct request_queue *q, struct request *rq)
- 	struct deadline_data *dd = q->elevator->elevator_data;
- 	const int data_dir = rq_data_dir(rq);
+diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+index 2c232ba4e594..023bbddc1a0b 100644
+--- a/drivers/mmc/core/queue.c
++++ b/drivers/mmc/core/queue.c
+@@ -53,14 +53,6 @@ static int mmc_queue_thread(void *d)
+ 		set_current_state(TASK_INTERRUPTIBLE);
+ 		req = blk_fetch_request(q);
+ 		mq->asleep = false;
+-		if (!req) {
+-			/*
+-			 * Dispatch queue is empty so set flags for
+-			 * mmc_request_fn() to wake us up.
+-			 */
+-			if (!mq->qcnt)
+-				mq->asleep = true;
+-		}
+ 		spin_unlock_irq(q->queue_lock);
  
-+	/*
-+	 * This may be a requeue of a write request that has locked its
-+	 * target zone. If it is the case, this releases the zone lock.
-+	 */
-+	blk_req_zone_write_unlock(rq);
-+
- 	deadline_add_rq_rb(dd, rq);
- 
- 	/*
-@@ -188,6 +194,12 @@ deadline_move_to_dispatch(struct deadline_data *dd, struct request *rq)
- {
- 	struct request_queue *q = rq->q;
- 
-+	/*
-+	 * For a zoned block device, write requests must write lock their
-+	 * target zone.
-+	 */
-+	blk_req_zone_write_lock(rq);
-+
- 	deadline_remove_request(q, rq);
- 	elv_dispatch_add_tail(q, rq);
- }
-@@ -235,13 +247,28 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
- static struct request *
- deadline_fifo_request(struct deadline_data *dd, int data_dir)
- {
-+	struct request *rq;
-+
- 	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
- 		return NULL;
- 
- 	if (list_empty(&dd->fifo_list[data_dir]))
- 		return NULL;
- 
--	return rq_entry_fifo(dd->fifo_list[data_dir].next);
-+	rq = rq_entry_fifo(dd->fifo_list[data_dir].next);
-+	if (data_dir == READ || !blk_queue_is_zoned(rq->q))
-+		return rq;
-+
-+	/*
-+	 * Look for a write request that can be dispatched, that is one with
-+	 * an unlocked target zone.
-+	 */
-+	list_for_each_entry(rq, &dd->fifo_list[WRITE], queuelist) {
-+		if (blk_req_can_dispatch_to_zone(rq))
-+			return rq;
-+	}
-+
-+	return NULL;
- }
- 
- /*
-@@ -251,10 +278,29 @@ deadline_fifo_request(struct deadline_data *dd, int data_dir)
- static struct request *
- deadline_next_request(struct deadline_data *dd, int data_dir)
- {
-+	struct request *rq;
-+
- 	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
- 		return NULL;
- 
--	return dd->next_rq[data_dir];
-+	rq = dd->next_rq[data_dir];
-+	if (!rq)
-+		return NULL;
-+
-+	if (data_dir == READ || !blk_queue_is_zoned(rq->q))
-+		return rq;
-+
-+	/*
-+	 * Look for a write request that can be dispatched, that is one with
-+	 * an unlocked target zone.
-+	 */
-+	while (rq) {
-+		if (blk_req_can_dispatch_to_zone(rq))
-+			return rq;
-+		rq = deadline_latter_request(rq);
-+	}
-+
-+	return NULL;
- }
- 
- /*
-@@ -288,7 +334,8 @@ static int deadline_dispatch_requests(struct request_queue *q, int force)
- 	if (reads) {
- 		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[READ]));
- 
--		if (writes && (dd->starved++ >= dd->writes_starved))
-+		if (deadline_fifo_request(dd, WRITE) &&
-+		    (dd->starved++ >= dd->writes_starved))
- 			goto dispatch_writes;
- 
- 		data_dir = READ;
-@@ -333,6 +380,13 @@ static int deadline_dispatch_requests(struct request_queue *q, int force)
- 		rq = next_rq;
- 	}
- 
-+	/*
-+	 * For a zoned block device, if we only have writes queued and none of
-+	 * them can be dispatched, rq will be NULL.
-+	 */
-+	if (!rq)
-+		return 0;
-+
- 	dd->batching = 0;
- 
- dispatch_request:
-@@ -345,6 +399,16 @@ static int deadline_dispatch_requests(struct request_queue *q, int force)
- 	return 1;
- }
- 
-+/*
-+ * For zoned block devices, write unlock the target zone of completed
-+ * write requests.
-+ */
-+static void
-+deadline_completed_request(struct request_queue *q, struct request *rq)
-+{
-+	blk_req_zone_write_unlock(rq);
-+}
-+
- static void deadline_exit_queue(struct elevator_queue *e)
- {
- 	struct deadline_data *dd = e->elevator_data;
-@@ -466,6 +530,7 @@ static struct elevator_type iosched_deadline = {
- 		.elevator_merged_fn =		deadline_merged_request,
- 		.elevator_merge_req_fn =	deadline_merged_requests,
- 		.elevator_dispatch_fn =		deadline_dispatch_requests,
-+		.elevator_completed_req_fn =	deadline_completed_request,
- 		.elevator_add_req_fn =		deadline_add_request,
- 		.elevator_former_req_fn =	elv_rb_former_request,
- 		.elevator_latter_req_fn =	elv_rb_latter_request,
+ 		if (req || mq->qcnt) {
+@@ -68,6 +60,7 @@ static int mmc_queue_thread(void *d)
+ 			mmc_blk_issue_rq(mq, req);
+ 			cond_resched();
+ 		} else {
++			mq->asleep = true;
+ 			if (kthread_should_stop()) {
+ 				set_current_state(TASK_RUNNING);
+ 				break;
 -- 
 2.13.6
