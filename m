@@ -1,71 +1,47 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.didichuxing.com ([111.202.154.82]:12941 "EHLO
-        BJEXCAS008.didichuxing.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1756087AbdKCSGv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 3 Nov 2017 14:06:51 -0400
-Date: Sat, 4 Nov 2017 02:06:42 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
-Subject: Re: [PATCH v4] blk-mq: fix nr_requests wrong value when modify it
- from sysfs
-Message-ID: <20171103180642.GA13051@localhost.didichuxing.com>
-References: <20170922153624.GA15873@localhost.didichuxing.com>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 5/7] nvme: also expose the namespace identification sysfs
+ files for mpath nodes
+To: Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@intel.com>,
+ Sagi Grimberg <sagi@grimberg.me>
+Cc: Jens Axboe <axboe@kernel.dk>, Johannes Thumshirn <jthumshirn@suse.de>,
+ linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+References: <20171109174450.17142-1-hch@lst.de>
+ <20171109174450.17142-6-hch@lst.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <3d24b1ad-5fee-ee4b-8518-a040c1b39006@suse.de>
+Date: Fri, 10 Nov 2017 09:21:20 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <20170922153624.GA15873@localhost.didichuxing.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20171109174450.17142-6-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Sep 22, 2017 at 11:36:28PM +0800, weiping zhang wrote:
-> if blk-mq use "none" io scheduler, nr_request get a wrong value when
-> input a number > tag_set->queue_depth. blk_mq_tag_update_depth will get
-> the smaller one min(nr, set->queue_depth), and then q->nr_request get a
-> wrong value.
+On 11/09/2017 06:44 PM, Christoph Hellwig wrote:
+> We do this by adding a helper that returns the ns_head for a device that
+> can belong to either the per-controller or per-subsystem block device
+> nodes, and otherwise reuse all the existing code.
 > 
-> Reproduce:
-> 
-> echo none > /sys/block/nvme0n1/queue/scheduler
-> echo 1000000 > /sys/block/nvme0n1/queue/nr_requests
-> cat /sys/block/nvme0n1/queue/nr_requests
-> 1000000
-> 
-> Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Keith Busch <keith.busch@intel.com>
+> Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 > ---
+>  drivers/nvme/host/core.c      | 57 +++++++++++++++++++++++--------------------
+>  drivers/nvme/host/multipath.c |  6 +++++
+>  drivers/nvme/host/nvme.h      |  1 +
+>  3 files changed, 38 insertions(+), 26 deletions(-)
 > 
-> Changes since v4:
->  * fix typo in commit message(queue/ioscheduler => queue/scheduler)
-> 
-> Changes since v3:
->  * remove compare nr with tags->qdepth, pass nr to blk_mq_tag_update_depth
-> directly
-> 
->  * remove return EINVAL when user modify nr_request less than BLKDEV_MIN_RQ
-> 
-> Changes since v2:
->  * add return EINVAL when user modify nr_request less than BLKDEV_MIN_RQ
->  * remove pr_warn, and return EINVAL, if input number is too large
-> 
->  block/blk-mq.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 98a1860..491e336 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2642,8 +2642,7 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
->  		 * queue depth. This is similar to what the old code would do.
->  		 */
->  		if (!hctx->sched_tags) {
-> -			ret = blk_mq_tag_update_depth(hctx, &hctx->tags,
-> -							min(nr, set->queue_depth),
-> +			ret = blk_mq_tag_update_depth(hctx, &hctx->tags, nr,
->  							false);
->  		} else {
->  			ret = blk_mq_tag_update_depth(hctx, &hctx->sched_tags,
-> -- 
-> 2.9.4
-> 
-Hello Jens,
+In principle, yes, but I would like to have some more info (like
+subsysnqn, and maybe 'model' etc) in the subsys sysfs entry, too.
+But this can be handled in a later patch, so:
 
-ping
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
