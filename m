@@ -1,33 +1,129 @@
-Return-Path: <BATV+b9f22be6cf688ae68bc2+5192+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Fri, 10 Nov 2017 09:29:57 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] blk-mq: only run the hardware queue if IO is pending
-Message-ID: <20171110172957.GA29446@infradead.org>
-References: <b1c29434-929d-a8aa-7181-b0b90607ede1@kernel.dk>
+Return-Path: <axboe@kernel.dk>
+Received: from [192.168.1.154] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id r65sm1121730ith.1.2017.11.10.08.12.19
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 10 Nov 2017 08:12:19 -0800 (PST)
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] blk-mq: only run the hardware queue if IO is pending
+Message-ID: <b1c29434-929d-a8aa-7181-b0b90607ede1@kernel.dk>
+Date: Fri, 10 Nov 2017 09:12:18 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <b1c29434-929d-a8aa-7181-b0b90607ede1@kernel.dk>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Nov 10, 2017 at 09:12:18AM -0700, Jens Axboe wrote:
-> Currently we are inconsistent in when we decide to run the queue. Using
-> blk_mq_run_hw_queues() we check if the hctx has pending IO before
-> running it, but we don't do that from the individual queue run function,
-> blk_mq_run_hw_queue(). This results in a lot of extra and pointless
-> queue runs, potentially, on flush requests and (much worse) on tag
-> starvation situations. This is observable just looking at the top
-> output, with lots of kworkers active. For the !async runs, it just adds
-> to the CPU overhead of blk-mq.
-> 
-> Move the has-pending check into the run function instead of having
-> callers do it.
-> 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Currently we are inconsistent in when we decide to run the queue. Using
+blk_mq_run_hw_queues() we check if the hctx has pending IO before
+running it, but we don't do that from the individual queue run function,
+blk_mq_run_hw_queue(). This results in a lot of extra and pointless
+queue runs, potentially, on flush requests and (much worse) on tag
+starvation situations. This is observable just looking at the top
+output, with lots of kworkers active. For the !async runs, it just adds
+to the CPU overhead of blk-mq.
 
-Do we even still need the blk_mq_hctx_has_pending helper at all?
+Move the has-pending check into the run function instead of having
+callers do it.
 
-Except for that this looks fine to me:
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 6f4bdb8209f7..c117bd8fd1f6 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -81,12 +81,7 @@ static bool blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
+ 	} else
+ 		clear_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
+ 
+-	if (blk_mq_hctx_has_pending(hctx)) {
+-		blk_mq_run_hw_queue(hctx, true);
+-		return true;
+-	}
+-
+-	return false;
++	return blk_mq_run_hw_queue(hctx, true);
+ }
+ 
+ /*
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index bfe24a5b62a3..a2a4271f5ab8 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -61,10 +61,10 @@ static int blk_mq_poll_stats_bkt(const struct request *rq)
+ /*
+  * Check if any of the ctx's have pending work in this hardware queue
+  */
+-bool blk_mq_hctx_has_pending(struct blk_mq_hw_ctx *hctx)
++static bool blk_mq_hctx_has_pending(struct blk_mq_hw_ctx *hctx)
+ {
+-	return sbitmap_any_bit_set(&hctx->ctx_map) ||
+-			!list_empty_careful(&hctx->dispatch) ||
++	return !list_empty_careful(&hctx->dispatch) ||
++		sbitmap_any_bit_set(&hctx->ctx_map) ||
+ 			blk_mq_sched_has_work(hctx);
+ }
+ 
+@@ -1253,9 +1253,14 @@ void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs)
+ }
+ EXPORT_SYMBOL(blk_mq_delay_run_hw_queue);
+ 
+-void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
++bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ {
+-	__blk_mq_delay_run_hw_queue(hctx, async, 0);
++	if (blk_mq_hctx_has_pending(hctx)) {
++		__blk_mq_delay_run_hw_queue(hctx, async, 0);
++		return true;
++	}
++
++	return false;
+ }
+ EXPORT_SYMBOL(blk_mq_run_hw_queue);
+ 
+@@ -1265,8 +1270,7 @@ void blk_mq_run_hw_queues(struct request_queue *q, bool async)
+ 	int i;
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+-		if (!blk_mq_hctx_has_pending(hctx) ||
+-		    blk_mq_hctx_stopped(hctx))
++		if (blk_mq_hctx_stopped(hctx))
+ 			continue;
+ 
+ 		blk_mq_run_hw_queue(hctx, async);
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 99a19c5523e2..dcf379a892dd 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -26,14 +26,12 @@ struct blk_mq_ctx {
+ 	struct kobject		kobj;
+ } ____cacheline_aligned_in_smp;
+ 
+-void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
+ void blk_mq_freeze_queue(struct request_queue *q);
+ void blk_mq_free_queue(struct request_queue *q);
+ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr);
+ void blk_mq_wake_waiters(struct request_queue *q);
+ bool blk_mq_dispatch_rq_list(struct request_queue *, struct list_head *, bool);
+ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list);
+-bool blk_mq_hctx_has_pending(struct blk_mq_hw_ctx *hctx);
+ bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
+ 				bool wait);
+ struct request *blk_mq_dequeue_from_ctx(struct blk_mq_hw_ctx *hctx,
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index b326208277ee..eb1e2cdffb31 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -266,7 +266,7 @@ void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
+ void blk_mq_quiesce_queue(struct request_queue *q);
+ void blk_mq_unquiesce_queue(struct request_queue *q);
+ void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
+-void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
++bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
+ void blk_mq_run_hw_queues(struct request_queue *q, bool async);
+ void blk_mq_delay_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
+ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+
+-- 
+Jens Axboe
