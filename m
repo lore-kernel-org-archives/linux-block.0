@@ -1,103 +1,58 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:37134 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751196AbdK0FIr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Nov 2017 00:08:47 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-Cc: Christoph Hellwig <hch@infradead.org>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
-        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 4/5] blk-mq: return dispatch result to caller in blk_mq_try_issue_directly
-Date: Mon, 27 Nov 2017 13:07:20 +0800
-Message-Id: <20171127050721.5884-5-ming.lei@redhat.com>
-In-Reply-To: <20171127050721.5884-1-ming.lei@redhat.com>
-References: <20171127050721.5884-1-ming.lei@redhat.com>
+Received: from LGEAMRELO11.lge.com ([156.147.23.51]:50440 "EHLO
+        lgeamrelo11.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750847AbdKJHlX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Nov 2017 02:41:23 -0500
+Subject: Re: [PATCH v2] locking/lockdep: Revise
+ Documentation/locking/crossrelease.txt
+To: Ingo Molnar <mingo@kernel.org>
+Cc: peterz@infradead.org, tglx@linutronix.de,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, kernel-team@lge.com
+References: <1510212036-22008-1-git-send-email-byungchul.park@lge.com>
+ <20171110073053.qh4nhpl26i47gbiv@gmail.com>
+From: Byungchul Park <byungchul.park@lge.com>
+Message-ID: <2f2de6c8-ef4b-070d-a81d-eed677bcce35@lge.com>
+Date: Fri, 10 Nov 2017 16:41:18 +0900
+MIME-Version: 1.0
+In-Reply-To: <20171110073053.qh4nhpl26i47gbiv@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-In the following patch, we will use blk_mq_try_issue_directly() for DM
-to return the dispatch result, and DM need this informatin to improve
-IO merge.
+On 11/10/2017 4:30 PM, Ingo Molnar wrote:
+> 
+> * Byungchul Park <byungchul.park@lge.com> wrote:
+> 
+>>      Event C depends on event A.
+>>      Event A depends on event B.
+>>      Event B depends on event C.
+>>   
+>> -   NOTE: Precisely speaking, a dependency is one between whether a
+>> -   waiter for an event can be woken up and whether another waiter for
+>> -   another event can be woken up. However from now on, we will describe
+>> -   a dependency as if it's one between an event and another event for
+>> -   simplicity.
+> 
+> Why was this explanation removed?
+> 
+>> -Lockdep tries to detect a deadlock by checking dependencies created by
+>> -lock operations, acquire and release. Waiting for a lock corresponds to
+>> -waiting for an event, and releasing a lock corresponds to triggering an
+>> -event in the previous section.
+>> +Lockdep tries to detect a deadlock by checking circular dependencies
+>> +created by lock operations, acquire and release, which are wait and
+>> +event respectively.
+> 
+> What? You changed a readable paragraph into an unreadable one.
+> 
+> Sorry, this text needs to be acked by someone with good English skills, and I
+> don't have the time right now to fix it all up. Please send minimal, obvious
+> typo/grammar fixes only.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 27 +++++++++++++++++----------
- 1 file changed, 17 insertions(+), 10 deletions(-)
+I will send one including minimal fixes at the next spin.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index fe82d7a47b35..fd4fb6316ea1 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1620,13 +1620,14 @@ static bool __blk_mq_issue_req(struct blk_mq_hw_ctx *hctx,
- 	return false;
- }
- 
--static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
--					struct request *rq,
--					blk_qc_t *cookie, bool may_sleep)
-+static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-+						struct request *rq,
-+						blk_qc_t *cookie,
-+						bool may_sleep)
- {
- 	struct request_queue *q = rq->q;
- 	blk_qc_t new_cookie;
--	blk_status_t ret;
-+	blk_status_t ret = BLK_STS_OK;
- 	bool run_queue = true;
- 
- 	/* RCU or SRCU read lock is needed before checking quiesced flag */
-@@ -1649,26 +1650,30 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	switch (ret) {
- 	case BLK_STS_OK:
- 		*cookie = new_cookie;
--		return;
-+		return ret;
- 	case BLK_STS_RESOURCE:
- 		__blk_mq_requeue_request(rq);
- 		goto insert;
- 	default:
- 		*cookie = BLK_QC_T_NONE;
- 		blk_mq_end_request(rq, ret);
--		return;
-+		return ret;
- 	}
- 
- insert:
- 	blk_mq_sched_insert_request(rq, false, run_queue, false, may_sleep);
-+	return ret;
- }
- 
--static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
--		struct request *rq, blk_qc_t *cookie)
-+static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-+					      struct request *rq,
-+					      blk_qc_t *cookie)
- {
-+	blk_status_t ret;
-+
- 	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
- 		rcu_read_lock();
--		__blk_mq_try_issue_directly(hctx, rq, cookie, false);
-+		ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false);
- 		rcu_read_unlock();
- 	} else {
- 		unsigned int srcu_idx;
-@@ -1676,9 +1681,11 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 		might_sleep();
- 
- 		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
--		__blk_mq_try_issue_directly(hctx, rq, cookie, true);
-+		ret = __blk_mq_try_issue_directly(hctx, rq, cookie, true);
- 		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
- 	}
-+
-+	return ret;
- }
- 
- static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
 -- 
-2.9.5
+Thanks,
+Byungchul
