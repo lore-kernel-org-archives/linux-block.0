@@ -1,37 +1,81 @@
 Return-Path: <linus.walleij@linaro.org>
-MIME-Version: 1.0
-In-Reply-To: <20171110100143.12256-1-linus.walleij@linaro.org>
-References: <20171110100143.12256-1-linus.walleij@linaro.org>
+Return-Path: <linus.walleij@linaro.org>
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Fri, 10 Nov 2017 14:39:09 +0100
-Message-ID: <CACRpkdb72u4Pso9YwCpsWey4pLazKbLmL6z5RxhswMf0zbAnsw@mail.gmail.com>
-Subject: Re: [PATCH 00/12 v5] Multiqueue for MMC/SD
-To: linux-mmc <linux-mmc@vger.kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-block <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>, Arnd Bergmann <arnd@arndb.de>,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Paolo Valente <paolo.valente@linaro.org>,
-	Avri Altman <Avri.Altman@sandisk.com>, Adrian Hunter <adrian.hunter@intel.com>,
+To: linux-mmc@vger.kernel.org,
+	Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+	Paolo Valente <paolo.valente@linaro.org>,
+	Avri Altman <Avri.Altman@sandisk.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
 	Linus Walleij <linus.walleij@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH 00/12 v5] Multiqueue for MMC/SD
+Date: Fri, 10 Nov 2017 11:01:31 +0100
+Message-Id: <20171110100143.12256-1-linus.walleij@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Nov 10, 2017 at 11:01 AM, Linus Walleij
-<linus.walleij@linaro.org> wrote:
+This is the fifth iteration of this patch set.
 
-> Removing a card during I/O does not work well however :/
-> So I guess I would need to work on that if this series should
-> continue. (Hopefully unlikely.)
+I *HOPE* that we can scrap this patch set and merge Adrian's
+patches instead, because they also bring CQE support which is
+nice. I had some review comments on his series, mainly that
+it needs to kill off the legacy block layer code path that
+noone likes anyway.
 
-I tested a bit more and it turns out this doesn't work on any of
-the MQ patch sets.
+So this is mainly an academic and inspirational exercise.
+Whatever remains of this refactoring, if anything, I can
+certainly do on top of Adrian's patches as well.
 
-Which matches Christoph's statement that this is not really
-working. I haven't really analyzed why though, I can see that
-the kernel crashes firmly into a brick wall, but on mainline
-it does not.
+What changed since v4 is the error path, since Adrian pointed
+out that the error handling seems to be fragile. It was indeed
+fragile... To make sure things work properly I have run long
+test rounds with fault injection, essentially:
 
-I think it's just something we have to smoke out in the next
-release cycle as we switch to MQ.
+Enable FAULT_INJECTION, FAULT_INJECTION_DEBUG_FS,
+       FAIL_MMC_REQUEST
+cd /debug/mmc3/fail_mmc_request/
+echo 1 > probability
+echo -1 > times
 
-Yours,
-Linus Walleij
+Then running a dd to the card, also increased the error rate
+to 10% and completed tests successfully, but at this error
+rate the MMC stack sometimes exceeds the retry limit and the
+dd command fails (as is appropriate).
+
+Removing a card during I/O does not work well however :/
+So I guess I would need to work on that if this series should
+continue. (Hopefully unlikely.)
+
+
+Linus Walleij (12):
+  mmc: core: move the asynchronous post-processing
+  mmc: core: add a workqueue for completing requests
+  mmc: core: replace waitqueue with worker
+  mmc: core: do away with is_done_rcv
+  mmc: core: do away with is_new_req
+  mmc: core: kill off the context info
+  mmc: queue: simplify queue logic
+  mmc: block: shuffle retry and error handling
+  mmc: queue: stop flushing the pipeline with NULL
+  mmc: queue/block: pass around struct mmc_queue_req*s
+  mmc: block: issue requests in massive parallel
+  mmc: switch MMC/SD to use blk-mq multiqueueing v5
+
+ drivers/mmc/core/block.c    | 557 +++++++++++++++++++++++---------------------
+ drivers/mmc/core/block.h    |   5 +-
+ drivers/mmc/core/bus.c      |   1 -
+ drivers/mmc/core/core.c     | 217 ++++++++++-------
+ drivers/mmc/core/core.h     |  11 +-
+ drivers/mmc/core/host.c     |   1 -
+ drivers/mmc/core/mmc_test.c |  31 +--
+ drivers/mmc/core/queue.c    | 252 ++++++++------------
+ drivers/mmc/core/queue.h    |  16 +-
+ include/linux/mmc/core.h    |   3 +-
+ include/linux/mmc/host.h    |  31 +--
+ 11 files changed, 557 insertions(+), 568 deletions(-)
+
+-- 
+2.13.6
