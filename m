@@ -1,34 +1,28 @@
 Return-Path: <hch@lst.de>
-Date: Fri, 10 Nov 2017 05:54:18 +0100
+Date: Fri, 10 Nov 2017 05:52:36 +0100
 From: Christoph Hellwig <hch@lst.de>
-To: Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
-	linux-nvme@lists.infradead.org,
-	Johannes Thumshirn <jthumshirn@suse.de>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
 Subject: Re: [PATCH 4/7] nvme: implement multipath access to nvme subsystems
-Message-ID: <20171110045418.GB32408@lst.de>
-References: <20171109174450.17142-1-hch@lst.de> <20171109174450.17142-5-hch@lst.de> <20171109212217.GA16454@redhat.com>
+Message-ID: <20171110045236.GA32408@lst.de>
+References: <20171109174450.17142-1-hch@lst.de> <20171109174450.17142-5-hch@lst.de> <20171109212111.GA1718@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171109212217.GA16454@redhat.com>
+In-Reply-To: <20171109212111.GA1718@localhost.localdomain>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Nov 09, 2017 at 04:22:17PM -0500, Mike Snitzer wrote:
-> Your 0th header speaks to the NVMe multipath IO path leveraging NVMe's
-> lack of partial completion but I think it'd be useful to have this
-> header (that actually gets committed) speak to it.
-
-There is a comment above blk_steal_bios to this respect, which is in
-the tree.
-
-> Also, the block core patch to introduce blk_steal_bios() already went in
-> but should there be a QUEUE_FLAG that gets set by drivers like NVMe that
-> don't support partial completion?
+> If we've CMIC capabilities, we'll use the subsys->instance; if we don't
+> have CMIC, we use the ctrl->instance. 
 > 
-> This would make it easier for other future drivers to know whether they
-> can use a more optimized IO path.
+> Since the two instances are independent of each other, they can create
+> duplicate names.
+> 
+> To fix, I think we'll need to always use the subsys instance for
+> consistency if CONFIG_NVME_MULTIPATH=y.
 
-As-is there is not real need for this.  But if you want to use a similar
-path in dm-multipath feel free to add the flag when needed.
+Yes, we should.  But once we do that we should just always use
+subsys->instance, as it will always be the same as ctrl->instance
+for CONFIG_NVME_MULTIPATH=n.
