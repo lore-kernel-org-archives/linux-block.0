@@ -1,29 +1,62 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] ide: ide-atapi: fix compile error with defining macro
- DEBUG
-To: Hongxu Jia <hongxu.jia@windriver.com>, hch@lst.de,
- Bart.VanAssche@wdc.com, linux-block@vger.kernel.org
-References: <1510300757-21098-1-git-send-email-hongxu.jia@windriver.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <36db4737-bad5-384b-0db3-486abb7483ce@kernel.dk>
-Date: Fri, 10 Nov 2017 08:30:07 -0700
+Return-Path: <Hongxu.Jia@windriver.com>
+From: Hongxu Jia <hongxu.jia@windriver.com>
+To: <hch@lst.de>, <axboe@kernel.dk>, <Bart.VanAssche@wdc.com>,
+        <linux-block@vger.kernel.org>
+CC: <hongxu.jia@windriver.com>
+Subject: [PATCH] ide: ide-atapi: fix compile error with defining macro DEBUG
+Date: Fri, 10 Nov 2017 15:59:17 +0800
+Message-ID: <1510300757-21098-1-git-send-email-hongxu.jia@windriver.com>
 MIME-Version: 1.0
-In-Reply-To: <1510300757-21098-1-git-send-email-hongxu.jia@windriver.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-On 11/10/2017 12:59 AM, Hongxu Jia wrote:
-> Compile ide-atapi failed with defining macro "DEBUG"
-> ...
-> |drivers/ide/ide-atapi.c:285:52: error: 'struct request' has
-> no member named 'cmd'; did you mean 'csd'?
-> |  debug_log("%s: rq->cmd[0]: 0x%x\n", __func__, rq->cmd[0]);
-> ...
-> 
-> Since we split the scsi_request out of struct request, it missed
-> do the same thing on debug_log
+Compile ide-atapi failed with defining macro "DEBUG"
+...
+|drivers/ide/ide-atapi.c:285:52: error: 'struct request' has
+no member named 'cmd'; did you mean 'csd'?
+|  debug_log("%s: rq->cmd[0]: 0x%x\n", __func__, rq->cmd[0]);
+...
 
-Thanks, applied.
+Since we split the scsi_request out of struct request, it missed
+do the same thing on debug_log
 
+Fixes: 82ed4db499b8 ("block: split scsi_request out of struct request")
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ drivers/ide/ide-atapi.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/ide/ide-atapi.c b/drivers/ide/ide-atapi.c
+index 14d1e7d..0e6bc63 100644
+--- a/drivers/ide/ide-atapi.c
++++ b/drivers/ide/ide-atapi.c
+@@ -282,7 +282,7 @@ int ide_cd_expiry(ide_drive_t *drive)
+ 	struct request *rq = drive->hwif->rq;
+ 	unsigned long wait = 0;
+ 
+-	debug_log("%s: rq->cmd[0]: 0x%x\n", __func__, rq->cmd[0]);
++	debug_log("%s: scsi_req(rq)->cmd[0]: 0x%x\n", __func__, scsi_req(rq)->cmd[0]);
+ 
+ 	/*
+ 	 * Some commands are *slow* and normally take a long time to complete.
+@@ -463,7 +463,7 @@ static ide_startstop_t ide_pc_intr(ide_drive_t *drive)
+ 				return ide_do_reset(drive);
+ 			}
+ 
+-			debug_log("[cmd %x]: check condition\n", rq->cmd[0]);
++			debug_log("[cmd %x]: check condition\n", scsi_req(rq)->cmd[0]);
+ 
+ 			/* Retry operation */
+ 			ide_retry_pc(drive);
+@@ -531,7 +531,7 @@ static ide_startstop_t ide_pc_intr(ide_drive_t *drive)
+ 		ide_pad_transfer(drive, write, bcount);
+ 
+ 	debug_log("[cmd %x] transferred %d bytes, padded %d bytes, resid: %u\n",
+-		  rq->cmd[0], done, bcount, scsi_req(rq)->resid_len);
++		  scsi_req(rq)->cmd[0], done, bcount, scsi_req(rq)->resid_len);
+ 
+ 	/* And set the interrupt handler again */
+ 	ide_set_handler(drive, ide_pc_intr, timeout);
 -- 
-Jens Axboe
+2.7.4
