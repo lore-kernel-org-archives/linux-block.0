@@ -1,100 +1,29 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mout.gmx.net ([212.227.17.21]:50574 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751872AbdKOAgU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Nov 2017 19:36:20 -0500
-Received: from [192.168.43.38] ([2.247.241.167]) by mail.gmx.com (mrgmx101
- [212.227.17.168]) with ESMTPSA (Nemesis) id 0M4CB5-1f4fuy0T9X-00rs9J for
- <linux-block@vger.kernel.org>; Wed, 15 Nov 2017 01:36:19 +0100
-To: linux-block@vger.kernel.org
-From: "peter.boettcher@gmx.net" <peter.boettcher@gmx.net>
-Subject: GPT (more than 256 partitions)
-Message-ID: <4fc498fe-fa3a-d0e1-1bb5-ce29704bc699@gmx.net>
-Date: Wed, 15 Nov 2017 01:36:36 +0100
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] ide: ide-atapi: fix compile error with defining macro
+ DEBUG
+To: Hongxu Jia <hongxu.jia@windriver.com>, hch@lst.de,
+ Bart.VanAssche@wdc.com, linux-block@vger.kernel.org
+References: <1510300757-21098-1-git-send-email-hongxu.jia@windriver.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <36db4737-bad5-384b-0db3-486abb7483ce@kernel.dk>
+Date: Fri, 10 Nov 2017 08:30:07 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <1510300757-21098-1-git-send-email-hongxu.jia@windriver.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
+On 11/10/2017 12:59 AM, Hongxu Jia wrote:
+> Compile ide-atapi failed with defining macro "DEBUG"
+> ...
+> |drivers/ide/ide-atapi.c:285:52: error: 'struct request' has
+> no member named 'cmd'; did you mean 'csd'?
+> |  debug_log("%s: rq->cmd[0]: 0x%x\n", __func__, rq->cmd[0]);
+> ...
+> 
+> Since we split the scsi_request out of struct request, it missed
+> do the same thing on debug_log
 
-Peter Böttcher
-Hingbergstrasse 363
-45472 Muelheim Ruhr
-NRW
-Germany
+Thanks, applied.
 
-mail: peter.boettcher@gmx.net
-
-
-First! Sorry for this english.
-
-I wrote a partition program just for the GUID Partition Table (GPT). 5 
-years ago.
-
-The program can generate volumes from 4 to 4096  partitions (my own limit).
-GPT header pos. 80 is an unsigned 32 Bit field.
-
-The program can e.g. create partitions with the numbers 1, 10, 100, 200, 
-300, 1000, 2000 etc. on the volume.
-
-Windows, FREE/BSD Unix, Mac OS X manage a volume without problems.
-They mount all partitions without problems.
-
-So that Linux can do such a volume management, I had to patch the file 
-include/linux/genhd.h up to the Linux kernel 4.13.12.
-It worked fine for many years.
-
----------------------------------------------------------------------
-patch: include/linux/genhd.h
-
-old: #define DISK_MAX_PARTS  256
-new: #define DISK_MAX_PARTS  4096
-
-
----------------------------------------------------------------------
-
-In Linux Kernel 4.14.0 I have to patch the following files.
-
----------------------------------------------------------------------
-patch: include/linux/genhd.h
-
-old: #define DISK_MAX_PARTS  256
-new: #define DISK_MAX_PARTS  4096
-
----------------------------------------------------------------------
-patch: include/linux/fs.h
-
-struct block_device  {
-
-                                 old: u8 bd_partno;
-                                 new: u16 bd_partno;
-
-
----------------------------------------------------------------------
-patch: include/linux/blk_types.h
-
-struct bio {
-                 old: u8 bio_partno;
-                 new: u16 bio_partno;
-
----------------------------------------------------------------------
-patch: driver/md/dm-bio-record.h
-
-struct dm_bio_details {
-                   old: u8 bio_partno;
-                   new: u16 bio_partno;
-
----------------------------------------------------------------------
-patch: driver/md/dm-bio-integrity.c
-
-struct dm_integrity_io {
-                 old: u8 bio_partno;
-                 new: u16 bio_partno;
-
----------------------------------------------------------------------
-
-
-This works well (admittedly short time).
-
-
-Peter Böttcher
+-- 
+Jens Axboe
