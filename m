@@ -1,63 +1,19 @@
-Return-Path: <linus.walleij@linaro.org>
-Return-Path: <linus.walleij@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-To: linux-mmc@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Avri Altman <Avri.Altman@sandisk.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 07/12 v5] mmc: queue: simplify queue logic
-Date: Fri, 10 Nov 2017 11:01:38 +0100
-Message-Id: <20171110100143.12256-8-linus.walleij@linaro.org>
-In-Reply-To: <20171110100143.12256-1-linus.walleij@linaro.org>
-References: <20171110100143.12256-1-linus.walleij@linaro.org>
+Return-Path: <hch@lst.de>
+Date: Fri, 10 Nov 2017 09:44:20 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Hannes Reinecke <hare@suse.de>, linux-nvme@lists.infradead.org,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: Re: nvme multipath support V7
+Message-ID: <20171110084420.GA4603@lst.de>
+References: <20171109174450.17142-1-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171109174450.17142-1-hch@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-The if() statment checking if there is no current or previous
-request is now just looking ahead at something that will be
-concluded a few lines below. Simplify the logic by moving the
-assignment of .asleep.
-
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
-ChangeLog v1->v5:
-- Rebasing on the "next" branch in the MMC tree.
----
- drivers/mmc/core/queue.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
-
-diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-index 2c232ba4e594..023bbddc1a0b 100644
---- a/drivers/mmc/core/queue.c
-+++ b/drivers/mmc/core/queue.c
-@@ -53,14 +53,6 @@ static int mmc_queue_thread(void *d)
- 		set_current_state(TASK_INTERRUPTIBLE);
- 		req = blk_fetch_request(q);
- 		mq->asleep = false;
--		if (!req) {
--			/*
--			 * Dispatch queue is empty so set flags for
--			 * mmc_request_fn() to wake us up.
--			 */
--			if (!mq->qcnt)
--				mq->asleep = true;
--		}
- 		spin_unlock_irq(q->queue_lock);
- 
- 		if (req || mq->qcnt) {
-@@ -68,6 +60,7 @@ static int mmc_queue_thread(void *d)
- 			mmc_blk_issue_rq(mq, req);
- 			cond_resched();
- 		} else {
-+			mq->asleep = true;
- 			if (kthread_should_stop()) {
- 				set_current_state(TASK_RUNNING);
- 				break;
--- 
-2.13.6
+I've updated the git tree with the Kconfig type fix, the instance
+fixup from Keith (plus extensive comments explaning the issue) and
+the various reviews.  I'll wait for the buildbot a and do a little
+more manual testing and will send it to Jens in the afternoon.
