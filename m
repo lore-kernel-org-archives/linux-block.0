@@ -1,45 +1,109 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:48669 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753231AbdKJQai (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Nov 2017 11:30:38 -0500
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@infradead.org" <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "osandov@fb.com" <osandov@fb.com>, "hare@suse.com" <hare@suse.com>
+Received: from mx1.redhat.com ([209.132.183.28]:44468 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750793AbdKJGR7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Nov 2017 01:17:59 -0500
+Date: Fri, 10 Nov 2017 14:17:37 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Omar Sandoval <osandov@fb.com>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Hannes Reinecke <hare@suse.com>, stable@vger.kernel.org
 Subject: Re: [PATCH] blk-mq: respect queue dead via blk_mq_quiesce_queue
-Date: Fri, 10 Nov 2017 16:30:35 +0000
-Message-ID: <1510331434.2905.2.camel@wdc.com>
+Message-ID: <20171110061736.GB9755@ming.t460p>
 References: <20171105121008.28180-1-ming.lei@redhat.com>
-         <1509896328.2697.4.camel@wdc.com>
-In-Reply-To: <1509896328.2697.4.camel@wdc.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171105121008.28180-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gU3VuLCAyMDE3LTExLTA1IGF0IDE1OjM4ICswMDAwLCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6
-DQo+IE9uIFN1biwgMjAxNy0xMS0wNSBhdCAyMDoxMCArMDgwMCwgTWluZyBMZWkgd3JvdGU6DQo+
-ID4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1jb3JlLmMgYi9ibG9jay9ibGstY29yZS5jDQo+ID4g
-aW5kZXggMDQ4YmU0YWE2MDI0Li4wYjEyMWYyOWUzYjEgMTAwNjQ0DQo+ID4gLS0tIGEvYmxvY2sv
-YmxrLWNvcmUuYw0KPiA+ICsrKyBiL2Jsb2NrL2Jsay1jb3JlLmMNCj4gPiBAQCAtNjU4LDYgKzY1
-OCwxMCBAQCB2b2lkIGJsa19jbGVhbnVwX3F1ZXVlKHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxKQ0K
-PiA+ICAJcXVldWVfZmxhZ19zZXQoUVVFVUVfRkxBR19ERUFELCBxKTsNCj4gPiAgCXNwaW5fdW5s
-b2NrX2lycShsb2NrKTsNCj4gPiAgDQo+ID4gKwkvKiByZXNwZWN0IHF1ZXVlIERFQUQgdmlhIHF1
-aWVzY2UgZm9yIGJsay1tcSAqLw0KPiA+ICsJaWYgKHEtPm1xX29wcykNCj4gPiArCQlibGtfbXFf
-cXVpZXNjZV9xdWV1ZShxKTsNCj4gPiArDQo+ID4gIAkvKiBmb3Igc3luY2hyb25vdXMgYmlvLWJh
-c2VkIGRyaXZlciBmaW5pc2ggaW4tZmxpZ2h0IGludGVncml0eSBpL28gKi8NCj4gPiAgCWJsa19m
-bHVzaF9pbnRlZ3JpdHkoKTsNCj4gDQo+IEhhdmUgeW91IGNvbnNpZGVyZWQgdG8gY2hhbmdlIHRo
-ZSBibGtfZnJlZXplX3F1ZXVlX3N0YXJ0KCkgY2FsbCBpbg0KPiBibGtfc2V0X3F1ZXVlX2R5aW5n
-KCkgaW50byBhIGJsa19mcmVlemVfcXVldWUoKSBjYWxsPyBUaGF0IGFwcHJvYWNoIGhhcyB0aGUN
-Cj4gYWR2YW50YWdlIHRoYXQgbm8gbmV3IGlmIChxLT5tcV9vcHMpIHRlc3QgaGFzIHRvIGJlIGlu
-dHJvZHVjZWQuDQoNClRoZXJlIGlzIGFuIGFkZGl0aW9uYWwgcmVhc29uIHdoeSBJIHRoaW5rIGl0
-IHdvdWxkIGJlIGJldHRlciB0byBtYWtlDQpibGtfc2V0X3F1ZXVlX2R5aW5nKCkgd2FpdCB1bnRp
-bCByZXF1ZXN0cyB0aGF0IGFyZSBpbiBwcm9ncmVzcyBoYXZlIGZpbmlzaGVkLg0KU29tZSBibG9j
-ayBkcml2ZXJzLCBlLmcuIHRoZSBtdGlwIGRyaXZlciwgc3RhcnQgY2xlYW5pbmcgdXAgcmVzb3Vy
-Y2VzDQppbW1lZGlhdGVseSBhZnRlciBibGtfc2V0X3F1ZXVlX2R5aW5nKCkgaGFzIHJldHVybmVk
-LiBTbyBtYWtpbmcNCmJsa19zZXRfcXVldWVfZHlpbmcoKSB3YWl0IHdvdWxkIGZpeCBhIHJhY2Ug
-Y29uZGl0aW9uIGluIGF0IGxlYXN0IHRoZSBtdGlwDQpkcml2ZXIuDQoNCkJhcnQu
+On Sun, Nov 05, 2017 at 08:10:08PM +0800, Ming Lei wrote:
+> blk-mq never respects queue dead, and this may cause use-after-free on
+> any kind of queue resources. This patch respects the rule by calling
+> blk_mq_quiesce_queue() when queue is marked as DEAD.
+> 
+> This patch fixes the following kernel crash:
+> 
+> [   42.170824] BUG: unable to handle kernel NULL pointer dereference at           (null)
+> [   42.172011] IP: blk_mq_flush_busy_ctxs+0x5a/0xe0
+> [   42.172011] PGD 25d8d1067 P4D 25d8d1067 PUD 25d458067 PMD 0
+> [   42.172011] Oops: 0000 [#1] PREEMPT SMP
+> [   42.172011] Dumping ftrace buffer:
+> [   42.172011]    (ftrace buffer empty)
+> [   42.172011] Modules linked in: scsi_debug ebtable_filter ebtables ip6table_filter ip6_tables xt_CHECKSUM iptable_mangle ipt_MASQUERADE nf_nat_masquerade_ipv4 iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 nf_nat nf_conntrack libcrc32c bridge stp llc fuse iptable_filter ip_tables sd_mod sg mptsas mptscsih mptbase crc32c_intel scsi_transport_sas nvme lpc_ich serio_raw ahci virtio_scsi libahci libata nvme_core binfmt_misc dm_mod iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi null_blk configs
+> [   42.172011] CPU: 0 PID: 2750 Comm: fio Not tainted 4.14.0-rc7.blk_mq_io_hang+ #507
+> [   42.172011] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.9.3-1.fc25 04/01/2014
+> [   42.172011] task: ffff88025dc18000 task.stack: ffffc900028c4000
+> [   42.172011] RIP: 0010:blk_mq_flush_busy_ctxs+0x5a/0xe0
+> [   42.172011] RSP: 0018:ffffc900028c7be0 EFLAGS: 00010246
+> [   42.172011] RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff8802775907c8
+> [   42.172011] RDX: 0000000000000000 RSI: ffffc900028c7c50 RDI: ffff88025de25c00
+> [   42.172011] RBP: ffffc900028c7c28 R08: 0000000000000000 R09: ffff8802595692c0
+> [   42.172011] R10: ffffc900028c7e50 R11: 0000000000000008 R12: ffffc900028c7c50
+> [   42.172011] R13: ffff88025de25cd8 R14: ffffc900028c7d78 R15: ffff88025de25c00
+> [   42.172011] FS:  00007faa8653f7c0(0000) GS:ffff88027fc00000(0000) knlGS:0000000000000000
+> [   42.172011] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [   42.172011] CR2: 0000000000000000 CR3: 00000002593df006 CR4: 00000000003606f0
+> [   42.172011] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> [   42.172011] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> [   42.172011] Call Trace:
+> [   42.172011]  blk_mq_sched_dispatch_requests+0x1b4/0x1f0
+> [   42.172011]  ? preempt_schedule+0x27/0x30
+> [   42.172011]  __blk_mq_run_hw_queue+0x8b/0xa0
+> [   42.172011]  __blk_mq_delay_run_hw_queue+0xb7/0x100
+> [   42.172011]  blk_mq_run_hw_queue+0x14/0x20
+> [   42.172011]  blk_mq_sched_insert_requests+0xda/0x120
+> [   42.172011]  blk_mq_flush_plug_list+0x179/0x280
+> [   42.172011]  blk_flush_plug_list+0x102/0x290
+> [   42.172011]  blk_finish_plug+0x2c/0x40
+> [   42.172011]  do_io_submit+0x3fa/0x780
+> [   42.172011]  SyS_io_submit+0x10/0x20
+> [   42.172011]  ? SyS_io_submit+0x10/0x20
+> [   42.172011]  entry_SYSCALL_64_fastpath+0x1a/0xa5
+> [   42.172011] RIP: 0033:0x7faa80ff8697
+> [   42.172011] RSP: 002b:00007ffe08236de8 EFLAGS: 00000206 ORIG_RAX: 00000000000000d1
+> [   42.172011] RAX: ffffffffffffffda RBX: 0000000001f1e600 RCX: 00007faa80ff8697
+> [   42.172011] RDX: 000000000208e638 RSI: 0000000000000001 RDI: 00007faa6ecae000
+> [   42.172011] RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000001f1e0e0
+> [   42.172011] R10: 0000000000000001 R11: 0000000000000206 R12: 00007faa614f19e0
+> [   42.172011] R13: 00007faa614ff0b0 R14: 00007faa614fef50 R15: 0000000100000000
+> [   42.172011] Code: e0 00 00 00 c7 45 bc 00 00 00 00 85 c0 74 76 4c 8d af d8 00 00 00 49 89 ff 44 8b 45 bc 4c 89 c0 49 c1 e0 06 4d 03 87 e8 00 00 00 <49> 83 38 00 4d 89 c6 74 41 41 8b 8f dc 00 00 00 41 89 c4 31 db
+> [   42.172011] RIP: blk_mq_flush_busy_ctxs+0x5a/0xe0 RSP: ffffc900028c7be0
+> [   42.172011] CR2: 0000000000000000
+> [   42.172011] ---[ end trace 2432dfddf9b84061 ]---
+> [   42.172011] Kernel panic - not syncing: Fatal exception
+> [   42.172011] Dumping ftrace buffer:
+> [   42.172011]    (ftrace buffer empty)
+> [   42.172011] Kernel Offset: disabled
+> [   42.172011] ---[ end Kernel panic - not syncing: Fatal exception
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-core.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 048be4aa6024..0b121f29e3b1 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -658,6 +658,10 @@ void blk_cleanup_queue(struct request_queue *q)
+>  	queue_flag_set(QUEUE_FLAG_DEAD, q);
+>  	spin_unlock_irq(lock);
+>  
+> +	/* respect queue DEAD via quiesce for blk-mq */
+> +	if (q->mq_ops)
+> +		blk_mq_quiesce_queue(q);
+> +
+>  	/* for synchronous bio-based driver finish in-flight integrity i/o */
+>  	blk_flush_integrity();
+
+Hi Jens,
+
+Could you consider this patch? This issue can be reproduced easily
+in heavy IO and device remove test on SCSI.
+
+-- 
+Ming
