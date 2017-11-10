@@ -1,81 +1,45 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:49132 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751058AbdKKCUC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Nov 2017 21:20:02 -0500
-Date: Sat, 11 Nov 2017 10:19:48 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:48669 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753231AbdKJQai (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Nov 2017 11:30:38 -0500
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@infradead.org" <hch@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>, "osandov@fb.com" <osandov@fb.com>,
-        "hare@suse.com" <hare@suse.com>
+        "axboe@fb.com" <axboe@fb.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "osandov@fb.com" <osandov@fb.com>, "hare@suse.com" <hare@suse.com>
 Subject: Re: [PATCH] blk-mq: respect queue dead via blk_mq_quiesce_queue
-Message-ID: <20171111021942.GA20382@ming.t460p>
+Date: Fri, 10 Nov 2017 16:30:35 +0000
+Message-ID: <1510331434.2905.2.camel@wdc.com>
 References: <20171105121008.28180-1-ming.lei@redhat.com>
- <1509896328.2697.4.camel@wdc.com>
- <1510331434.2905.2.camel@wdc.com>
+         <1509896328.2697.4.camel@wdc.com>
+In-Reply-To: <1509896328.2697.4.camel@wdc.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1510331434.2905.2.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Nov 10, 2017 at 04:30:35PM +0000, Bart Van Assche wrote:
-> On Sun, 2017-11-05 at 15:38 +0000, Bart Van Assche wrote:
-> > On Sun, 2017-11-05 at 20:10 +0800, Ming Lei wrote:
-> > > diff --git a/block/blk-core.c b/block/blk-core.c
-> > > index 048be4aa6024..0b121f29e3b1 100644
-> > > --- a/block/blk-core.c
-> > > +++ b/block/blk-core.c
-> > > @@ -658,6 +658,10 @@ void blk_cleanup_queue(struct request_queue *q)
-> > >  	queue_flag_set(QUEUE_FLAG_DEAD, q);
-> > >  	spin_unlock_irq(lock);
-> > >  
-> > > +	/* respect queue DEAD via quiesce for blk-mq */
-> > > +	if (q->mq_ops)
-> > > +		blk_mq_quiesce_queue(q);
-> > > +
-> > >  	/* for synchronous bio-based driver finish in-flight integrity i/o */
-> > >  	blk_flush_integrity();
-> > 
-> > Have you considered to change the blk_freeze_queue_start() call in
-> > blk_set_queue_dying() into a blk_freeze_queue() call? That approach has the
-> > advantage that no new if (q->mq_ops) test has to be introduced.
-> 
-> There is an additional reason why I think it would be better to make
-> blk_set_queue_dying() wait until requests that are in progress have finished.
-> Some block drivers, e.g. the mtip driver, start cleaning up resources
-> immediately after blk_set_queue_dying() has returned. So making
-> blk_set_queue_dying() wait would fix a race condition in at least the mtip
-> driver.
-
-Looks you don't explain how your approach fixes this issue.
-
-IMO, your may can't fix this issue.
-
-1) the core idea:
-when blk_freeze_queue() returns, there is still in-progress dispatch or
-we can call it in-progress io submission; So once blk_freeze_queue() returns,
-blk_cleanup_queue() will go ahead, and the in-progress dispatch may trigger
-use-after-free, even corrupt memory.
-
-For detailed reason, please see:
-
-	https://marc.info/?l=linux-block&m=150993988115872&w=2
-
-2) suppose you replace blk_freeze_queue_start() with blk_freeze_queue()
-in blk_set_queue_dying(), that changes nothing about this issue.
-
-You may think the blk_freeze_queue() called in blk_cleanup_queue() implies
-synchronize_rcu(), which may drain up the in-progress dispatch. But the
-in-progress dispatch(io submission) may not enter rcu read critical area yet
-at that time, for example, in one IO submission path, the request is just
-added to scheduler queue, and this request is exactly dispatched to LLD via
-other run queue and completed before the actual run queue from the current
-io submission. So the implied synchronize_rcu() won't help this case at all.
-
-Or do I miss your idea?
-
--- 
-Ming
+T24gU3VuLCAyMDE3LTExLTA1IGF0IDE1OjM4ICswMDAwLCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6
+DQo+IE9uIFN1biwgMjAxNy0xMS0wNSBhdCAyMDoxMCArMDgwMCwgTWluZyBMZWkgd3JvdGU6DQo+
+ID4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1jb3JlLmMgYi9ibG9jay9ibGstY29yZS5jDQo+ID4g
+aW5kZXggMDQ4YmU0YWE2MDI0Li4wYjEyMWYyOWUzYjEgMTAwNjQ0DQo+ID4gLS0tIGEvYmxvY2sv
+YmxrLWNvcmUuYw0KPiA+ICsrKyBiL2Jsb2NrL2Jsay1jb3JlLmMNCj4gPiBAQCAtNjU4LDYgKzY1
+OCwxMCBAQCB2b2lkIGJsa19jbGVhbnVwX3F1ZXVlKHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxKQ0K
+PiA+ICAJcXVldWVfZmxhZ19zZXQoUVVFVUVfRkxBR19ERUFELCBxKTsNCj4gPiAgCXNwaW5fdW5s
+b2NrX2lycShsb2NrKTsNCj4gPiAgDQo+ID4gKwkvKiByZXNwZWN0IHF1ZXVlIERFQUQgdmlhIHF1
+aWVzY2UgZm9yIGJsay1tcSAqLw0KPiA+ICsJaWYgKHEtPm1xX29wcykNCj4gPiArCQlibGtfbXFf
+cXVpZXNjZV9xdWV1ZShxKTsNCj4gPiArDQo+ID4gIAkvKiBmb3Igc3luY2hyb25vdXMgYmlvLWJh
+c2VkIGRyaXZlciBmaW5pc2ggaW4tZmxpZ2h0IGludGVncml0eSBpL28gKi8NCj4gPiAgCWJsa19m
+bHVzaF9pbnRlZ3JpdHkoKTsNCj4gDQo+IEhhdmUgeW91IGNvbnNpZGVyZWQgdG8gY2hhbmdlIHRo
+ZSBibGtfZnJlZXplX3F1ZXVlX3N0YXJ0KCkgY2FsbCBpbg0KPiBibGtfc2V0X3F1ZXVlX2R5aW5n
+KCkgaW50byBhIGJsa19mcmVlemVfcXVldWUoKSBjYWxsPyBUaGF0IGFwcHJvYWNoIGhhcyB0aGUN
+Cj4gYWR2YW50YWdlIHRoYXQgbm8gbmV3IGlmIChxLT5tcV9vcHMpIHRlc3QgaGFzIHRvIGJlIGlu
+dHJvZHVjZWQuDQoNClRoZXJlIGlzIGFuIGFkZGl0aW9uYWwgcmVhc29uIHdoeSBJIHRoaW5rIGl0
+IHdvdWxkIGJlIGJldHRlciB0byBtYWtlDQpibGtfc2V0X3F1ZXVlX2R5aW5nKCkgd2FpdCB1bnRp
+bCByZXF1ZXN0cyB0aGF0IGFyZSBpbiBwcm9ncmVzcyBoYXZlIGZpbmlzaGVkLg0KU29tZSBibG9j
+ayBkcml2ZXJzLCBlLmcuIHRoZSBtdGlwIGRyaXZlciwgc3RhcnQgY2xlYW5pbmcgdXAgcmVzb3Vy
+Y2VzDQppbW1lZGlhdGVseSBhZnRlciBibGtfc2V0X3F1ZXVlX2R5aW5nKCkgaGFzIHJldHVybmVk
+LiBTbyBtYWtpbmcNCmJsa19zZXRfcXVldWVfZHlpbmcoKSB3YWl0IHdvdWxkIGZpeCBhIHJhY2Ug
+Y29uZGl0aW9uIGluIGF0IGxlYXN0IHRoZSBtdGlwDQpkcml2ZXIuDQoNCkJhcnQu
