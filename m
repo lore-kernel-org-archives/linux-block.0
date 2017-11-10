@@ -1,83 +1,76 @@
-Return-Path: <prvs=479c705ad=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, "Christoph
- Hellwig" <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Oleksandr Natalenko <oleksandr@natalenko.name>, Ming Lei
-	<ming.lei@redhat.com>, Martin Steigerwald <martin@lichtvoll.de>, "Bart Van
- Assche" <bart.vanassche@wdc.com>, Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v12 3/7] block: Introduce BLK_MQ_REQ_PREEMPT
-Date: Thu, 9 Nov 2017 10:49:55 -0800
-Message-ID: <20171109184959.4617-4-bart.vanassche@wdc.com>
-In-Reply-To: <20171109184959.4617-1-bart.vanassche@wdc.com>
-References: <20171109184959.4617-1-bart.vanassche@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-it0-f42.google.com ([209.85.214.42]:53744 "EHLO
+        mail-it0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751099AbdKJIZU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 10 Nov 2017 03:25:20 -0500
+Received: by mail-it0-f42.google.com with SMTP id m191so753318itg.2
+        for <linux-block@vger.kernel.org>; Fri, 10 Nov 2017 00:25:19 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <22024e13-0c04-c25c-9377-65c2cf606b4f@intel.com>
+References: <1509715220-31885-1-git-send-email-adrian.hunter@intel.com>
+ <1509715220-31885-9-git-send-email-adrian.hunter@intel.com>
+ <CACRpkdb2_D3WZZp2f2o+f+zc7R-jU=wfs7Ec1rppim0mTd-sDw@mail.gmail.com>
+ <afcf5ce3-2795-3f88-3544-d939d3513f4f@intel.com> <CACRpkdaHhp2dQAsFX8ps9hsG5BjcS5eywfz4ty1qkCyZmOqX+A@mail.gmail.com>
+ <22024e13-0c04-c25c-9377-65c2cf606b4f@intel.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Fri, 10 Nov 2017 09:25:18 +0100
+Message-ID: <CACRpkdY4P=1FR3upQF_Y3HUtrWh4yyz2p4_XYrkXjk8EhDjsOA@mail.gmail.com>
+Subject: Re: [PATCH V13 08/10] mmc: block: blk-mq: Separate card polling from recovery
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Set RQF_PREEMPT if BLK_MQ_REQ_PREEMPT is passed to
-blk_get_request_flags().
+On Thu, Nov 9, 2017 at 2:02 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
+> On 09/11/17 14:52, Linus Walleij wrote:
+>> On Thu, Nov 9, 2017 at 8:56 AM, Adrian Hunter <adrian.hunter@intel.com> wrote:
+>>> On 08/11/17 11:30, Linus Walleij wrote:
+>>>> On Fri, Nov 3, 2017 at 2:20 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
+>>>>
+>>>>> Recovery is simpler to understand if it is only used for errors. Create a
+>>>>> separate function for card polling.
+>>>>>
+>>>>> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+>>>>
+>>>> This looks good but I can't see why it's not folded into
+>>>> patch 3 already. This error handling is introduced there.
+>>>
+>>> What are you on about?
+>>
+>> You are attacking your most valuable resource, a reviewer.
+>>
+>> And I even said the patch looks good.
+>>
+>> The only thing you attain with this kind of langauge is alienante
+>> me and discourage others to review your patch set. You also
+>> give your employer a bad name, since you are representing
+>> them.
+>
+> 6 months of being messed around will do that.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Tested-by: Martin Steigerwald <martin@lichtvoll.de>
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- block/blk-core.c       | 4 +++-
- block/blk-mq.c         | 2 ++
- include/linux/blk-mq.h | 1 +
- 3 files changed, 6 insertions(+), 1 deletion(-)
+Blessed are the meek, for they will inherit the earth.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 0f7093dfc010..17eed16a6e04 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1263,6 +1263,8 @@ static struct request *__get_request(struct request_list *rl, unsigned int op,
- 	blk_rq_set_rl(rq, rl);
- 	rq->cmd_flags = op;
- 	rq->rq_flags = rq_flags;
-+	if (flags & BLK_MQ_REQ_PREEMPT)
-+		rq->rq_flags |= RQF_PREEMPT;
- 
- 	/* init elvpriv */
- 	if (rq_flags & RQF_ELVPRIV) {
-@@ -1444,7 +1446,7 @@ struct request *blk_get_request_flags(struct request_queue *q, unsigned int op,
- 	struct request *req;
- 
- 	WARN_ON_ONCE(op & REQ_NOWAIT);
--	WARN_ON_ONCE(flags & ~BLK_MQ_REQ_NOWAIT);
-+	WARN_ON_ONCE(flags & ~(BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_PREEMPT));
- 
- 	if (q->mq_ops) {
- 		req = blk_mq_alloc_request(q, op, flags);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 2b7d95b2cdfb..2c7ceb34a016 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -291,6 +291,8 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 	rq->q = data->q;
- 	rq->mq_ctx = data->ctx;
- 	rq->cmd_flags = op;
-+	if (data->flags & BLK_MQ_REQ_PREEMPT)
-+		rq->rq_flags |= RQF_PREEMPT;
- 	if (blk_queue_io_stat(data->q))
- 		rq->rq_flags |= RQF_IO_STAT;
- 	/* do not touch atomic flags, it needs atomic ops against the timer */
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 4ae987c2352c..82b56609736a 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -212,6 +212,7 @@ enum {
- 	BLK_MQ_REQ_NOWAIT	= (1 << 0), /* return when out of requests */
- 	BLK_MQ_REQ_RESERVED	= (1 << 1), /* allocate from reserved pool */
- 	BLK_MQ_REQ_INTERNAL	= (1 << 2), /* allocate internal/sched tag */
-+	BLK_MQ_REQ_PREEMPT	= (1 << 3), /* set RQF_PREEMPT */
- };
- 
- struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
--- 
-2.14.3
+Nobody is after you, this is just hard stuff and too few people care to
+help out with review etc. With this and with the block layer as well.
+That makes things slow. It's noone's agenda to slow things down.
+
+Yours,
+Linus Walleij
