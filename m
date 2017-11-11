@@ -1,49 +1,32 @@
-Return-Path: <prvs=5014e5409=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Omar Sandoval <osandov@fb.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 4/7] blk-mq: Avoid that request processing stalls when sharing tags
-Date: Thu, 30 Nov 2017 16:08:45 -0800
-Message-Id: <20171201000848.2656-5-bart.vanassche@wdc.com>
-In-Reply-To: <20171201000848.2656-1-bart.vanassche@wdc.com>
-References: <20171201000848.2656-1-bart.vanassche@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [GIT PULL] nvme updates for Linux 4.15
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+ Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
+References: <20171110143407.zapukx3fhfcr4fm5@infradead.org>
+ <e4ae08a2-4724-6ae5-6e64-7f42fb825bad@kernel.dk>
+ <fe9a0a40-11d0-97b4-86e1-ba66d3932eb1@kernel.dk>
+ <20171110172248.GA8381@infradead.org>
+ <a2178e34-ecae-f90d-bef4-eb02af6eb43e@kernel.dk>
+ <20171110173342.GA15114@infradead.org>
+ <9bcc3b27-0008-b11e-5bbe-4e908326e031@kernel.dk>
+ <5c78255c-2678-db0c-55a2-128a11aff660@kernel.dk>
+ <20171111084346.GA24802@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <7276984e-3eaf-4746-2967-990588d28f98@kernel.dk>
+Date: Sat, 11 Nov 2017 15:37:59 -0700
+MIME-Version: 1.0
+In-Reply-To: <20171111084346.GA24802@infradead.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-blk_mq_sched_mark_restart_hctx() must be called before
-blk_mq_dispatch_rq_list() is called. Make sure that
-BLK_MQ_S_SCHED_RESTART is set before any blk_mq_dispatch_rq_list()
-call occurs.
+On 11/11/2017 01:43 AM, Christoph Hellwig wrote:
+> Do you want to apply this forward ported version of the patch
+> to your for-4.15/block tree?  That should at least make the conflict
+> go away for Linus when he pulls it.
 
-Fixes: commit b347689ffbca ("blk-mq-sched: improve dispatching from sw queue")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- block/blk-mq-sched.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Yeah I will probably add that. I won't kill the conflict, but it'll
+make it more logically solvable.
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index d8e3533d3218..c4e0cb5f6f1f 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -208,8 +208,8 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
- 	 * on the dispatch list or we were able to dispatch from the
- 	 * dispatch list.
- 	 */
-+	blk_mq_sched_mark_restart_hctx(hctx);
- 	if (!list_empty(&rq_list)) {
--		blk_mq_sched_mark_restart_hctx(hctx);
- 		if (blk_mq_dispatch_rq_list(q, &rq_list, false)) {
- 			if (has_sched_dispatch)
- 				blk_mq_do_dispatch_sched(hctx);
 -- 
-2.15.0
+Jens Axboe
