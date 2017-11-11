@@ -1,136 +1,267 @@
-Return-Path: <BATV+4f5d8ac065f641832dc0+5185+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Fri, 3 Nov 2017 15:17:03 +0300
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme updates for Linux 4.15
-Message-ID: <20171103121703.kupyb5rvuyvaevsr@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from LGEAMRELO13.lge.com ([156.147.23.53]:38032 "EHLO
+        lgeamrelo13.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750890AbdKKN0g (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 11 Nov 2017 08:26:36 -0500
+From: Byungchul Park <byungchul.park@lge.com>
+To: peterz@infradead.org, mingo@kernel.org
+Cc: tglx@linutronix.de, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org,
+        kernel-team@lge.com
+Subject: [PATCH v3 3/5] locking/Documentation: Fix weird expressions.
+Date: Sat, 11 Nov 2017 22:26:30 +0900
+Message-Id: <1510406792-28676-4-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <1510406792-28676-1-git-send-email-byungchul.park@lge.com>
+References: <1510406792-28676-1-git-send-email-byungchul.park@lge.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Jens,
+Fix Weird expressions not reported by checker tools by myself.
 
-below are the currently queue nvme updates for Linux 4.15.  There are
-a few more things that could make it for this merge window, but I'd
-like to get things into linux-next, especially for the unlikely case
-that Linus decided to cut -rc8.
+Signed-off-by: Byungchul Park <byungchul.park@lge.com>
+---
+ Documentation/locking/crossrelease.txt | 87 ++++++++++++++++++----------------
+ 1 file changed, 45 insertions(+), 42 deletions(-)
 
-Highlights:
- - support for SGLs in the PCIe driver (Chaitanya Kulkarni)
- - disable I/O schedulers for the admin queue (Israel Rukshin)
- - various Fibre Channel fixes and enhancements (James Smart)
- - various refactoring for better code sharing between transports
-   (Sagi Grimberg and me)
-
-as well as lots of little bits from various contributors.
-
-The following changes since commit 9c9883744dda1cc38339a448dd8435140537027e:
-
-  block: move __elv_next_request to blk-core.c (2017-10-03 08:43:04 -0600)
-
-are available in the git repository at:
-
-  git://git.infradead.org/nvme.git nvme-4.15
-
-for you to fetch changes up to a806c6c81e6c0d07c8a8b2643bad4a37a196d681:
-
-  nvme: comment typo fixed in clearing AER (2017-11-03 10:02:20 +0300)
-
-----------------------------------------------------------------
-Chaitanya Kulkarni (1):
-      nvme-pci: add SGL support
-
-Christoph Hellwig (11):
-      nvme: simplify compat_ioctl handling
-      nvme: use ida_simple_{get,remove} for the controller instance
-      nvme: use kref_get_unless_zero in nvme_find_get_ns
-      nvme: simplify nvme_open
-      nvme: switch controller refcounting to use struct device
-      nvme: get rid of nvme_ctrl_list
-      nvme: check for a live controller in nvme_dev_open
-      nvme-fc: merge __nvme_fc_schedule_delete_work into __nvme_fc_del_ctrl
-      nvme: move controller deletion to common code
-      nvme-rdma: remove nvme_rdma_remove_ctrl
-      nvme: consolidate common code from ->reset_work
-
-Israel Rukshin (3):
-      nvme-rdma: Add BLK_MQ_F_NO_SCHED flag to admin tag set
-      nvme-fc: Add BLK_MQ_F_NO_SCHED flag to admin tag set
-      nvme-loop: Add BLK_MQ_F_NO_SCHED flag to admin tag set
-
-James Smart (18):
-      nvmet: bump NVMET_NR_QUEUES to 128
-      nvme-fc: add uevent for auto-connect
-      nvme-fc: create fc class and transport device
-      nvme-fc: move remote port get/put/free location
-      nvme-fc: correct io termination handling
-      nvme-fc: correct io timeout behavior
-      nvme: add duplicate_connect option
-      nvme: add helper to compare options to controller
-      nvme-rdma: add support for duplicate_connect option
-      nvme-fc: add support for duplicate_connect option
-      nvme-fc: remove NVME_FC_MAX_SEGMENTS
-      nvme-fc: avoid workqueue flush stalls
-      nvme-fc: change ctlr state assignments during reset/reconnect
-      nvme-fc: add a dev_loss_tmo field to the remoteport
-      nvme-fc: check connectivity before initiating reconnects
-      nvme: allow controller RESETTING to RECONNECTING transition
-      nvme-fc: add dev_loss_tmo timeout and remoteport resume support
-      nvmet: fix fatal_err_work deadlock
-
-Keith Busch (1):
-      nvme: Remove unused headers
-
-Marc Olson (1):
-      nvme: update timeout module parameter type
-
-Max Gurtovoy (1):
-      nvme-rdma: align nvme_rdma_device structure
-
-Minwoo Im (2):
-      nvme-pci: fix typos in comments
-      nvme: comment typo fixed in clearing AER
-
-Nitzan Carmi (1):
-      nvme-rdma: Add debug message when reaches timeout
-
-Randy Dunlap (1):
-      nvme: use menu Kconfig interface
-
-Roy Shterman (1):
-      nvmet: Change max_nsid in subsystem due to ns_disable if needed
-
-Sagi Grimberg (14):
-      nvme-fabrics: request transport module
-      block: introduce blk_mq_tagset_iter
-      nvme: introduce nvme_reinit_tagset
-      block: remove blk_mq_reinit_tagset
-      nvme-rdma: pass tagset to directly nvme_rdma_free_tagset
-      nvme-rdma: fix wrong logging message
-      nvme-rdma: move assignment to declaration
-      nvme-rdma: Check that reinit_request got a proper mr
-      nvme-rdma: teardown admin/io queues once on error recovery
-      nvme-rdma: Don't local invalidate if the queue is not live
-      nvme-rdma: change queue flag semantics DELETING -> ALLOCATED
-      nvme-rdma: stop controller reset if the controller is deleting
-      nvme-rdma: reuse nvme_delete_ctrl when reconnect attempts expire
-      nvme: flush reset_work before safely continuing with delete operation
-
- block/blk-mq-tag.c             |  11 +-
- drivers/nvme/Kconfig           |   4 +
- drivers/nvme/host/core.c       | 260 +++++++---------
- drivers/nvme/host/fabrics.c    |  12 +-
- drivers/nvme/host/fabrics.h    |  14 +
- drivers/nvme/host/fc.c         | 656 ++++++++++++++++++++++++++++++-----------
- drivers/nvme/host/nvme.h       |  26 +-
- drivers/nvme/host/pci.c        | 224 +++++++++++---
- drivers/nvme/host/rdma.c       | 225 ++++++++------
- drivers/nvme/target/core.c     |  13 +
- drivers/nvme/target/fc.c       |  16 +-
- drivers/nvme/target/loop.c     |  47 +--
- drivers/nvme/target/nvmet.h    |   2 +-
- include/linux/blk-mq.h         |   4 +-
- include/linux/nvme-fc-driver.h |  15 +-
- 15 files changed, 1026 insertions(+), 503 deletions(-)
+diff --git a/Documentation/locking/crossrelease.txt b/Documentation/locking/crossrelease.txt
+index 48ef689..bb449e8 100644
+--- a/Documentation/locking/crossrelease.txt
++++ b/Documentation/locking/crossrelease.txt
+@@ -30,7 +30,7 @@ Contents:
+  (*) Optimizations
+ 
+      - Avoid duplication
+-     - Lockless for hot paths
++     - Make hot paths lockless
+ 
+  (*) APPENDIX A: What lockdep does to work aggressively
+ 
+@@ -195,12 +195,11 @@ For example:
+ When acquiring lock A, the held_locks of CONTEXT X is empty thus no
+ dependency is added. But when acquiring lock B, lockdep detects and adds
+ a new dependency 'A -> B' between lock A in the held_locks and lock B.
+-They can be simply added whenever acquiring each lock.
++Dependencies can be simply added this way, whenever acquiring each lock.
+ 
+-And data required by lockdep exists in a local structure, held_locks
+-embedded in task_struct. Forcing to access the data within the context,
+-lockdep can avoid racy problems without explicit locks while handling
+-the local data.
++Furthermore, since data required to create a dependency can be kept in
++local task_struct, lockdep can avoid racy problems without explicit
++protection by forcing to access the data within the context.
+ 
+ Lastly, lockdep only needs to keep locks currently being held, to build
+ the dependency graph. However, relaxing the limitation, it needs to keep
+@@ -210,7 +209,8 @@ dependencies might be long-deferred.
+ To sum up, we can expect several advantages from the limitation:
+ 
+    1. Lockdep can easily identify a dependency when acquiring a lock.
+-   2. Races are avoidable while accessing local locks in a held_locks.
++   2. Races are avoidable without explicit protection while accessing
++      local locks in a held_locks.
+    3. Lockdep only needs to keep locks currently being held.
+ 
+ CONCLUSION
+@@ -353,8 +353,9 @@ Introduce commit
+ Since crossrelease defers the work adding true dependencies of
+ crosslocks until they are eventually released, crossrelease has to queue
+ all acquisitions which might create dependencies with the crosslocks.
+-Then it identifies dependencies using the queued data in batches at a
+-proper time. We call it 'commit'.
++Then lockdep can identify dependencies using the queued data in batches
++at a proper time. We call the step adding true dependencies to the graph
++in batches, 'commit'.
+ 
+ There are four types of dependencies:
+ 
+@@ -433,6 +434,7 @@ How crossrelease works
+ 
+ It's the key of how crossrelease works, to defer necessary works to an
+ appropriate point in time and perform the works at the commit step.
++
+ Let's take a look at examples step by step, starting from how lockdep
+ works for typical locks, without crossrelease.
+ 
+@@ -460,9 +462,9 @@ And after adding 'B -> C', the graph will be:
+ 
+    where A, B, and C are different lock classes.
+ 
+-Let's performs commit step even for typical locks to add dependencies.
+-Of course, commit step is not necessary for them, however, it would work
+-well because this is a more general way.
++Let's build the graph using the commit step with the same example. Of
++course, the step is not necessary for typical locks, however, it would
++also work because this is a more general way.
+ 
+    acquire A
+    /*
+@@ -526,9 +528,8 @@ well because this is a more general way.
+ 
+    where A, B, and C are different lock classes.
+ 
+-In this case, dependencies are added at the commit step as described.
+-
+-After commits for A, B and C, the graph will be:
++Dependencies are added at the commit step as described. After commits
++for A, B, and C, the graph will be:
+ 
+    A -> B -> C
+ 
+@@ -537,19 +538,18 @@ After commits for A, B and C, the graph will be:
+    NOTE: A dependency 'A -> C' is optimized out.
+ 
+ We can see the former graph built without the commit step is same as the
+-latter graph built using commit steps. Of course, the former way leads to
++latter graph. Of course, the former way leads to
+ earlier finish for building the graph, which means we can detect a
+ deadlock or its possibility sooner. So the former way would be preferred
+ when possible. But we cannot avoid using the latter way for crosslocks.
+ 
+-Let's look at how commit steps work for crosslocks. In this case, the
+-commit step is performed only on crosslock AX as real. And it assumes
+-that the AX release context is different from the AX acquire context.
++Lastly, let's look at how commit works for crosslocks in practice.
+ 
+    BX RELEASE CONTEXT		   BX ACQUIRE CONTEXT
+    ------------------		   ------------------
+ 				   acquire A
+ 				   /*
++				    * Add 'the top of held_locks -> A'
+ 				    * Push A to held_locks
+ 				    * Queue A in hist_locks
+ 				    *
+@@ -574,6 +574,7 @@ that the AX release context is different from the AX acquire context.
+ 
+    acquire C
+    /*
++    * Add 'the top of held_locks -> C'
+     * Push C to held_locks
+     * Queue C in hist_locks
+     *
+@@ -592,9 +593,9 @@ that the AX release context is different from the AX acquire context.
+     */
+ 				   acquire D
+ 				   /*
++				    * Add 'the top of held_locks -> D'
+ 				    * Push D to held_locks
+ 				    * Queue D in hist_locks
+-				    * Add 'the top of held_locks -> D'
+ 				    *
+ 				    * In held_locks: A, D
+ 				    * In hist_locks: A, D
+@@ -602,6 +603,7 @@ that the AX release context is different from the AX acquire context.
+ 				    */
+    acquire E
+    /*
++    * Add 'the top of held_locks -> E'
+     * Push E to held_locks
+     * Queue E in hist_locks
+     *
+@@ -629,6 +631,7 @@ that the AX release context is different from the AX acquire context.
+    commit BX
+    /*
+     * Add 'BX -> ?'
++    * Answer the following to decide '?'
+     * What has been queued since acquire BX: C, E
+     *
+     * In held_locks: Empty
+@@ -657,12 +660,12 @@ that the AX release context is different from the AX acquire context.
+    where A, BX, C,..., E are different lock classes and a suffix 'X' is
+    added at crosslocks.
+ 
+-Crossrelease considers all acquisitions after acquiring BX are
+-candidates which might create dependencies with BX. True dependencies
+-will be determined when identifying the release context of BX. Meanwhile,
++Crossrelease considers all acquisitions following acquiring BX because
++they can create dependencies with BX. The dependencies will be
++determined in the release context of BX. Meanwhile,
+ all typical locks are queued so that they can be used at the commit step.
+-And then two dependencies 'BX -> C' and 'BX -> E' are added at the
+-commit step when identifying the release context.
++Finally, two dependencies 'BX -> C' and 'BX -> E' will be added at the
++commit step, when identifying the release context.
+ 
+ The final graph will be, with crossrelease:
+ 
+@@ -705,12 +708,12 @@ dependency chains, but this time it's for caching CT type dependencies.
+ Once a dependency is cached, the same will never be added again.
+ 
+ 
+-Lockless for hot paths
+-----------------------
++Make hot paths lockless
++-----------------------
+ 
+ To keep all locks for later use at the commit step, crossrelease adopts
+-a local array embedded in task_struct, which makes access to the data
+-lockless by forcing it to happen only within the owner context. It's
++a local array embedded in task_struct, which makes the data locklessly
++accessible by forcing it to happen only within the owner context. It's
+ like how lockdep handles held_locks. Lockless implementation is important
+ since typical locks are very frequently acquired and released.
+ 
+@@ -723,10 +726,10 @@ A deadlock actually occurs when all waiters creating circular
+ dependencies run at the same time. Even though they don't, a potential
+ deadlock exists if the problematic dependencies exist. Thus, it's
+ meaningful to detect not only an actual deadlock but also its potential
+-possibility. The latter is rather valuable. When a deadlock occurs
+-actually, we can identify what happens in the system by some means or
+-other even without lockdep. However, there's no way to detect possibility
+-without lockdep unless the whole code is parsed in the head. It's terrible.
++possibility. The latter is rather valuable. When a deadlock actually
++occurs, we can identify what happens in the system by some means or
++other even without lockdep. However, there's no way to detect a possibility
++without lockdep, unless the whole code is parsed in the head. It's terrible.
+ Lockdep does the both, and crossrelease only focuses on the latter.
+ 
+ Whether or not a deadlock actually occurs depends on several factors.
+@@ -775,8 +778,8 @@ Remind what a dependency is. A dependency exists if:
+ 
+ For example:
+ 
+-   TASK X			   TASK Y
+-   ------			   ------
++   CONTEXT X			   CONTEXT Y
++   ---------			   ---------
+ 				   acquire AX
+    acquire B /* A dependency 'AX -> B' exists */
+    release B
+@@ -785,18 +788,18 @@ For example:
+    where AX and B are different lock classes and a suffix 'X' is added
+    at crosslocks.
+ 
+-Even in this case involving crosslocks, the same rule can be applied. A
+-dependency 'AX -> B' exists since:
++Here, a dependency 'AX -> B' exists since:
+ 
+    1. A waiter for AX and a waiter for B might exist when acquiring B.
+    2. The only way to wake up each is to release what it waits for.
+    3. Whether the waiter for AX can be woken up depends on whether the
+-      other can. IOW, TASK X cannot release AX if it fails to acquire B.
++      other can. In other words, CONTEXT X cannot release AX if it fails
++      to acquire B.
+ 
+ Let's take a look at a more complicated example:
+ 
+-   TASK X			   TASK Y
+-   ------			   ------
++   CONTEXT X			   CONTEXT Y
++   ---------			   ---------
+    acquire B
+    release B
+    fork Y
+@@ -818,8 +821,8 @@ It would be ideal if the full set of true ones can be considered. But
+ we can ensure nothing but what actually happened. Relying on what
+ actually happens at runtime, we can anyway add only true ones, though
+ they might be a subset of true ones. It's similar to how lockdep works
+-for typical locks. There might be more true dependencies than what
+-lockdep has detected at runtime. Lockdep has no choice but to rely on
++for typical locks. There might be more true dependencies than lockdep
++has detected. Lockdep has no choice but to rely on
+ what actually happens. Crossrelease also relies on it.
+ 
+ CONCLUSION
+-- 
+1.9.1
