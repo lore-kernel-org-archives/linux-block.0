@@ -1,124 +1,102 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:54620 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751419AbdKDBz5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 3 Nov 2017 21:55:57 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        linux-scsi@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        John Garry <john.garry@huawei.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] SCSI: don't get target/host busy_count in scsi_mq_get_budget()
-Date: Sat,  4 Nov 2017 09:55:34 +0800
-Message-Id: <20171104015534.32684-1-ming.lei@redhat.com>
+Received: from LGEAMRELO11.lge.com ([156.147.23.51]:51987 "EHLO
+        lgeamrelo11.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750899AbdKKN0g (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 11 Nov 2017 08:26:36 -0500
+From: Byungchul Park <byungchul.park@lge.com>
+To: peterz@infradead.org, mingo@kernel.org
+Cc: tglx@linutronix.de, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org,
+        kernel-team@lge.com
+Subject: [PATCH v3 1/5] locking/Documentation: Remove meaningless examples and a note
+Date: Sat, 11 Nov 2017 22:26:28 +0900
+Message-Id: <1510406792-28676-2-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <1510406792-28676-1-git-send-email-byungchul.park@lge.com>
+References: <1510406792-28676-1-git-send-email-byungchul.park@lge.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-It is very expensive to atomic_inc/atomic_dec the host wide counter of
-host->busy_count, and it should have been avoided via blk-mq's mechanism
-of getting driver tag, which uses the more efficient way of sbitmap queue.
+crossrelease.txt is too verbose and includes two meaningless examples
+and an unnecessary note. Remove them.
 
-Also we don't check atomic_read(&sdev->device_busy) in scsi_mq_get_budget()
-and don't run queue if the counter becomes zero, so IO hang may be caused
-if all requests are completed just before the current SCSI device
-is added to shost->starved_list.
-
-Fixes: 0df21c86bdbf(scsi: implement .get_budget and .put_budget for blk-mq)
-Reported-by: Bart Van Assche <bart.vanassche@wdc.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Byungchul Park <byungchul.park@lge.com>
 ---
+ Documentation/locking/crossrelease.txt | 48 +---------------------------------
+ 1 file changed, 1 insertion(+), 47 deletions(-)
 
- drivers/scsi/scsi_lib.c | 29 +++++++++++++----------------
- 1 file changed, 13 insertions(+), 16 deletions(-)
-
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index a098af3070a1..7f218ef61900 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1944,11 +1944,7 @@ static void scsi_mq_put_budget(struct blk_mq_hw_ctx *hctx)
- {
- 	struct request_queue *q = hctx->queue;
- 	struct scsi_device *sdev = q->queuedata;
--	struct Scsi_Host *shost = sdev->host;
+diff --git a/Documentation/locking/crossrelease.txt b/Documentation/locking/crossrelease.txt
+index bdf1423..0f8eb8a 100644
+--- a/Documentation/locking/crossrelease.txt
++++ b/Documentation/locking/crossrelease.txt
+@@ -281,31 +281,7 @@ causes a deadlock. The more lockdep adds dependencies, the more it
+ thoroughly works. Thus Lockdep has to do its best to detect and add as
+ many true dependencies into a graph as possible.
  
--	atomic_dec(&shost->host_busy);
--	if (scsi_target(sdev)->can_queue > 0)
--		atomic_dec(&scsi_target(sdev)->target_busy);
- 	atomic_dec(&sdev->device_busy);
- 	put_device(&sdev->sdev_gendev);
- }
-@@ -1957,7 +1953,6 @@ static blk_status_t scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
- {
- 	struct request_queue *q = hctx->queue;
- 	struct scsi_device *sdev = q->queuedata;
--	struct Scsi_Host *shost = sdev->host;
- 	blk_status_t ret;
+-For example, considering only typical locks, lockdep builds a graph like:
+-
+-   A -> B -
+-           \
+-            -> E
+-           /
+-   C -> D -
+-
+-   where A, B,..., E are different lock classes.
+-
+-On the other hand, under the relaxation, additional dependencies might
+-be created and added. Assuming additional 'FX -> C' and 'E -> GX' are
+-added thanks to the relaxation, the graph will be:
+-
+-         A -> B -
+-                 \
+-                  -> E -> GX
+-                 /
+-   FX -> C -> D -
+-
+-   where A, B,..., E, FX and GX are different lock classes, and a suffix
+-   'X' is added on non-typical locks.
+-
+-The latter graph gives us more chances to check circular dependencies
+-than the former. However, it might suffer performance degradation since
++However, it might suffer performance degradation since
+ relaxing the limitation, with which design and implementation of lockdep
+ can be efficient, might introduce inefficiency inevitably. So lockdep
+ should provide two options, strong detection and efficient detection.
+@@ -469,12 +445,6 @@ works without crossrelease for typical locks.
  
- 	ret = prep_to_mq(scsi_prep_state_check(sdev, NULL));
-@@ -1968,18 +1963,9 @@ static blk_status_t scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
- 		goto out;
- 	if (!scsi_dev_queue_ready(q, sdev))
- 		goto out_put_device;
--	if (!scsi_target_queue_ready(shost, sdev))
--		goto out_dec_device_busy;
--	if (!scsi_host_queue_ready(q, shost, sdev))
--		goto out_dec_target_busy;
+    where A, B and C are different lock classes.
  
- 	return BLK_STS_OK;
+-   NOTE: This document assumes that readers already understand how
+-   lockdep works without crossrelease thus omits details. But there's
+-   one thing to note. Lockdep pretends to pop a lock from held_locks
+-   when releasing it. But it's subtly different from the original pop
+-   operation because lockdep allows other than the top to be poped.
+-
+ In this case, lockdep adds 'the top of held_locks -> the lock to acquire'
+ dependency every time acquiring a lock.
  
--out_dec_target_busy:
--	if (scsi_target(sdev)->can_queue > 0)
--		atomic_dec(&scsi_target(sdev)->target_busy);
--out_dec_device_busy:
--	atomic_dec(&sdev->device_busy);
- out_put_device:
- 	put_device(&sdev->sdev_gendev);
- out:
-@@ -1992,6 +1978,7 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	struct request *req = bd->rq;
- 	struct request_queue *q = req->q;
- 	struct scsi_device *sdev = q->queuedata;
-+	struct Scsi_Host *shost = sdev->host;
- 	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
- 	blk_status_t ret;
- 	int reason;
-@@ -2001,10 +1988,15 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		goto out_put_budget;
+@@ -805,22 +775,6 @@ Remind what a dependency is. A dependency exists if:
  
- 	ret = BLK_STS_RESOURCE;
-+	if (!scsi_target_queue_ready(shost, sdev))
-+		goto out_put_budget;
-+	if (!scsi_host_queue_ready(q, shost, sdev))
-+		goto out_dec_target_busy;
-+
- 	if (!(req->rq_flags & RQF_DONTPREP)) {
- 		ret = prep_to_mq(scsi_mq_prep_fn(req));
- 		if (ret != BLK_STS_OK)
--			goto out_put_budget;
-+			goto out_dec_host_busy;
- 		req->rq_flags |= RQF_DONTPREP;
- 	} else {
- 		blk_mq_start_request(req);
-@@ -2022,11 +2014,16 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	if (reason) {
- 		scsi_set_blocked(cmd, reason);
- 		ret = BLK_STS_RESOURCE;
--		goto out_put_budget;
-+		goto out_dec_host_busy;
- 	}
+ For example:
  
- 	return BLK_STS_OK;
- 
-+out_dec_host_busy:
-+       atomic_dec(&shost->host_busy);
-+out_dec_target_busy:
-+	if (scsi_target(sdev)->can_queue > 0)
-+		atomic_dec(&scsi_target(sdev)->target_busy);
- out_put_budget:
- 	scsi_mq_put_budget(hctx);
- 	switch (ret) {
+-   acquire A
+-   acquire B /* A dependency 'A -> B' exists */
+-   release B
+-   release A
+-
+-   where A and B are different lock classes.
+-
+-A depedency 'A -> B' exists since:
+-
+-   1. A waiter for A and a waiter for B might exist when acquiring B.
+-   2. Only way to wake up each is to release what it waits for.
+-   3. Whether the waiter for A can be woken up depends on whether the
+-      other can. IOW, TASK X cannot release A if it fails to acquire B.
+-
+-For another example:
+-
+    TASK X			   TASK Y
+    ------			   ------
+ 				   acquire AX
 -- 
-2.9.5
+1.9.1
