@@ -12,64 +12,111 @@ Cc: linux-block@vger.kernel.org,
 	lucmiccio@gmail.com,
 	bfq-iosched@googlegroups.com,
 	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX/IMPROVEMENT 1/4] doc, block, bfq: update max IOPS sustainable with BFQ
-Date: Mon, 13 Nov 2017 07:34:07 +0100
-Message-Id: <20171113063410.3029-2-paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENT 2/4] block, bfq: add missing invocations of bfqg_stats_update_io_add/remove
+Date: Mon, 13 Nov 2017 07:34:08 +0100
+Message-Id: <20171113063410.3029-3-paolo.valente@linaro.org>
 In-Reply-To: <20171113063410.3029-1-paolo.valente@linaro.org>
 References: <20171113063410.3029-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-We have investigated more deeply the performance of BFQ, in terms of
-number of IOPS that can be processed by the CPU when BFQ is used as
-I/O scheduler. In more detail, using the script [1], we have measured
-the number of IOPS reached on top of a null block device configured
-with zero latency, as a function of the workload (sequential read,
-sequential write, random read, random write) and of the system (we
-considered desktops, laptops and embedded systems).
+From: Luca Miccio <lucmiccio@gmail.com>
 
-Basing on the resulting figures, with this commit we update the
-current, conservative IOPS range reported in BFQ documentation. In
-particular, the documentation now reports, for each of three different
-systems, the lowest number of IOPS obtained for that system with the
-above test (namely, the value obtained with the workload leading to
-the lowest IOPS).
+bfqg_stats_update_io_add and bfqg_stats_update_io_remove are to be
+invoked, respectively, when an I/O request enters and when an I/O
+request exits the scheduler. Unfortunately, bfq does not fully comply
+with this scheme, because it does not invoke these functions for
+requests that are inserted into or extracted from its priority
+dispatch list. This commit fixes this mistake.
 
-[1] https://github.com/Algodev-github/IOSpeed
-
-Reviewed-by: Lee Tibbert <lee.tibbert@gmail.com>
+Tested-by: Lee Tibbert <lee.tibbert@gmail.com>
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
 Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 Signed-off-by: Luca Miccio <lucmiccio@gmail.com>
 ---
- Documentation/block/bfq-iosched.txt | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
+ block/bfq-iosched.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/block/bfq-iosched.txt b/Documentation/block/bfq-iosched.txt
-index 3d6951d..7a93615 100644
---- a/Documentation/block/bfq-iosched.txt
-+++ b/Documentation/block/bfq-iosched.txt
-@@ -20,12 +20,17 @@ for that device, by setting low_latency to 0. See Section 3 for
- details on how to configure BFQ for the desired tradeoff between
- latency and throughput, or on how to maximize throughput.
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 889a854..91703eb 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -1359,7 +1359,6 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
+ 			bfqq->ttime.last_end_request +
+ 			bfqd->bfq_slice_idle * 3;
  
--On average CPUs, the current version of BFQ can handle devices
--performing at most ~30K IOPS; at most ~50 KIOPS on faster CPUs. As a
--reference, 30-50 KIOPS correspond to very high bandwidths with
--sequential I/O (e.g., 8-12 GB/s if I/O requests are 256 KB large), and
--to 120-200 MB/s with 4KB random I/O. BFQ is currently being tested on
--multi-queue devices too.
-+BFQ has a non-null overhead, which limits the maximum IOPS that the
-+CPU can process for a device scheduled with BFQ. To give an idea of
-+the limits on slow or average CPUs, here are BFQ limits for three
-+different CPUs, on, respectively, an average laptop, an old desktop,
-+and a cheap embedded system, in case full hierarchical support is
-+enabled (i.e., CONFIG_BFQ_GROUP_IOSCHED is set):
-+- Intel i7-4850HQ: 250 KIOPS
-+- AMD A8-3850: 170 KIOPS
-+- ARM CortexTM-A53 Octa-core: 45 KIOPS
+-	bfqg_stats_update_io_add(bfqq_group(RQ_BFQQ(rq)), bfqq, rq->cmd_flags);
+ 
+ 	/*
+ 	 * bfqq deserves to be weight-raised if:
+@@ -1633,7 +1632,6 @@ static void bfq_remove_request(struct request_queue *q,
+ 	if (rq->cmd_flags & REQ_META)
+ 		bfqq->meta_pending--;
+ 
+-	bfqg_stats_update_io_remove(bfqq_group(bfqq), rq->cmd_flags);
+ }
+ 
+ static bool bfq_bio_merge(struct blk_mq_hw_ctx *hctx, struct bio *bio)
+@@ -1746,6 +1744,7 @@ static void bfq_requests_merged(struct request_queue *q, struct request *rq,
+ 		bfqq->next_rq = rq;
+ 
+ 	bfq_remove_request(q, next);
++	bfqg_stats_update_io_remove(bfqq_group(bfqq), next->cmd_flags);
+ 
+ 	spin_unlock_irq(&bfqq->bfqd->lock);
+ end:
+@@ -3700,6 +3699,9 @@ static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	spin_lock_irq(&bfqd->lock);
+ 
+ 	rq = __bfq_dispatch_request(hctx);
++	if (rq && RQ_BFQQ(rq))
++		bfqg_stats_update_io_remove(bfqq_group(RQ_BFQQ(rq)),
++					    rq->cmd_flags);
+ 	spin_unlock_irq(&bfqd->lock);
+ 
+ 	return rq;
+@@ -4224,6 +4226,7 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ {
+ 	struct request_queue *q = hctx->queue;
+ 	struct bfq_data *bfqd = q->elevator->elevator_data;
++	struct bfq_queue *bfqq = RQ_BFQQ(rq);
+ 
+ 	spin_lock_irq(&bfqd->lock);
+ 	if (blk_mq_sched_try_insert_merge(q, rq)) {
+@@ -4243,6 +4246,12 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ 			list_add_tail(&rq->queuelist, &bfqd->dispatch);
+ 	} else {
+ 		__bfq_insert_request(bfqd, rq);
++		/*
++		 * Update bfqq, because, if a queue merge has occurred
++		 * in __bfq_insert_request, then rq has been
++		 * redirected into a new queue.
++		 */
++		bfqq = RQ_BFQQ(rq);
+ 
+ 		if (rq_mergeable(rq)) {
+ 			elv_rqhash_add(q, rq);
+@@ -4251,6 +4260,9 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ 		}
+ 	}
+ 
++	if (bfqq)
++		bfqg_stats_update_io_add(bfqq_group(bfqq), bfqq, rq->cmd_flags);
 +
-+BFQ works for multi-queue devices too.
+ 	spin_unlock_irq(&bfqd->lock);
+ }
  
- The table of contents follow. Impatients can just jump to Section 3.
+@@ -4428,8 +4440,11 @@ static void bfq_finish_request(struct request *rq)
+ 		 * lock is held.
+ 		 */
+ 
+-		if (!RB_EMPTY_NODE(&rq->rb_node))
++		if (!RB_EMPTY_NODE(&rq->rb_node)) {
+ 			bfq_remove_request(rq->q, rq);
++			bfqg_stats_update_io_remove(bfqq_group(bfqq),
++						    rq->cmd_flags);
++		}
+ 		bfq_put_rq_priv_body(bfqq);
+ 	}
  
 -- 
 2.10.0
