@@ -1,90 +1,104 @@
-Return-Path: <BATV+adf086a54a2d754d8a83+5184+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 3/7] block: provide a direct_make_request helper
-Date: Thu,  2 Nov 2017 21:29:50 +0300
-Message-Id: <20171102182954.9263-4-hch@lst.de>
-In-Reply-To: <20171102182954.9263-1-hch@lst.de>
-References: <20171102182954.9263-1-hch@lst.de>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Mon, 13 Nov 2017 12:37:03 -0800
+From: Tejun Heo <tj@kernel.org>
+To: Shaohua Li <shli@fb.com>
+Cc: linux-block@vger.kernel.org, axboe@kernel.dk, Kernel-team@fb.com,
+	Vivek Goyal <vgoyal@redhat.com>
+Subject: Re: [PATCH] block-throttle: avoid double charge
+Message-ID: <20171113203703.GP983427@devbig577.frc2.facebook.com>
+References: <aac85300238aec9e310b5092260a6ec6e6f02e04.1507918159.git.shli@fb.com>
+ <20171113200338.GK983427@devbig577.frc2.facebook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171113200338.GK983427@devbig577.frc2.facebook.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This helper allows reinserting a bio into a new queue without much
-overhead, but requires all queue limits to be the same for the upper
-and lower queues, and it does not provide any recursion preventions.
+On Mon, Nov 13, 2017 at 12:03:38PM -0800, Tejun Heo wrote:
+> So, one question I have is whether we need both BIO_THROTTLED and
+> bi_throttled_disk.  Can't we replace BIO_THROTTLED w/
+> bi_throttled_disk?
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-Reviewed-by: Javier González <javier@cnexlabs.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+IOW, won't something like the following work?  (not tested yet)
+
+Thanks.
+
 ---
- block/blk-core.c       | 34 ++++++++++++++++++++++++++++++++++
- include/linux/blkdev.h |  1 +
- 2 files changed, 35 insertions(+)
+ block/bio.c               |    3 +++
+ block/blk-throttle.c      |   20 +++++++-------------
+ include/linux/blk_types.h |    4 ++++
+ 3 files changed, 14 insertions(+), 13 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 14f7674fa0b1..b8c80f39f5fe 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2241,6 +2241,40 @@ blk_qc_t generic_make_request(struct bio *bio)
- }
- EXPORT_SYMBOL(generic_make_request);
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -597,6 +597,9 @@ void __bio_clone_fast(struct bio *bio, s
+ 	 * so we don't set nor calculate new physical/hw segment counts here
+ 	 */
+ 	bio->bi_disk = bio_src->bi_disk;
++#ifdef CONFIG_BLK_DEV_THROTTLING
++	bio->bi_throttled_disk = bio_src->bi_throttled_disk;
++#endif
+ 	bio_set_flag(bio, BIO_CLONED);
+ 	bio->bi_opf = bio_src->bi_opf;
+ 	bio->bi_write_hint = bio_src->bi_write_hint;
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1051,13 +1051,12 @@ static void throtl_charge_bio(struct thr
+ 	tg->last_io_disp[rw]++;
  
-+/**
-+ * direct_make_request - hand a buffer directly to its device driver for I/O
-+ * @bio:  The bio describing the location in memory and on the device.
-+ *
-+ * This function behaves like generic_make_request(), but does not protect
-+ * against recursion.  Must only be used if the called driver is known
-+ * to not call generic_make_request (or direct_make_request) again from
-+ * its make_request function.  (Calling direct_make_request again from
-+ * a workqueue is perfectly fine as that doesn't recurse).
-+ */
-+blk_qc_t direct_make_request(struct bio *bio)
-+{
-+	struct request_queue *q = bio->bi_disk->queue;
-+	bool nowait = bio->bi_opf & REQ_NOWAIT;
-+	blk_qc_t ret;
-+
-+	if (!generic_make_request_checks(bio))
-+		return BLK_QC_T_NONE;
-+
-+	if (unlikely(blk_queue_enter(q, nowait))) {
-+		if (nowait && !blk_queue_dying(q))
-+			bio->bi_status = BLK_STS_AGAIN;
-+		else
-+			bio->bi_status = BLK_STS_IOERR;
-+		bio_endio(bio);
-+		return BLK_QC_T_NONE;
-+	}
-+
-+	ret = q->make_request_fn(q, bio);
-+	blk_queue_exit(q);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(direct_make_request);
-+
+ 	/*
+-	 * BIO_THROTTLED is used to prevent the same bio to be throttled
++	 * bi_throttled_disk is used to prevent the same bio to be throttled
+ 	 * more than once as a throttled bio will go through blk-throtl the
+ 	 * second time when it eventually gets issued.  Set it when a bio
+ 	 * is being charged to a tg.
+ 	 */
+-	if (!bio_flagged(bio, BIO_THROTTLED))
+-		bio_set_flag(bio, BIO_THROTTLED);
++	bio->bi_throttled_disk = bio->bi_disk;
+ }
+ 
  /**
-  * submit_bio - submit a bio to the block device layer for I/O
-  * @bio: The &struct bio which describes the I/O
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 02fa42d24b52..780f01db5899 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -936,6 +936,7 @@ do {								\
- extern int blk_register_queue(struct gendisk *disk);
- extern void blk_unregister_queue(struct gendisk *disk);
- extern blk_qc_t generic_make_request(struct bio *bio);
-+extern blk_qc_t direct_make_request(struct bio *bio);
- extern void blk_rq_init(struct request_queue *q, struct request *rq);
- extern void blk_init_request_from_bio(struct request *req, struct bio *bio);
- extern void blk_put_request(struct request *);
--- 
-2.14.2
+@@ -2131,8 +2130,11 @@ bool blk_throtl_bio(struct request_queue
+ 
+ 	WARN_ON_ONCE(!rcu_read_lock_held());
+ 
+-	/* see throtl_charge_bio() */
+-	if (bio_flagged(bio, BIO_THROTTLED) || !tg->has_rules[rw])
++	/*
++	 * See throtl_charge_bio().  If a bio is throttled against a disk
++	 * but remapped to other disk, we should throttle it again
++	 */
++	if (bio->bi_throttled_disk == bio->bi_disk || !tg->has_rules[rw])
+ 		goto out;
+ 
+ 	spin_lock_irq(q->queue_lock);
+@@ -2223,14 +2225,6 @@ again:
+ out_unlock:
+ 	spin_unlock_irq(q->queue_lock);
+ out:
+-	/*
+-	 * As multiple blk-throtls may stack in the same issue path, we
+-	 * don't want bios to leave with the flag set.  Clear the flag if
+-	 * being issued.
+-	 */
+-	if (!throttled)
+-		bio_clear_flag(bio, BIO_THROTTLED);
+-
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+ 	if (throttled || !td->track_bio_latency)
+ 		bio->bi_issue_stat.stat |= SKIP_LATENCY;
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -90,6 +90,10 @@ struct bio {
+ 	void			*bi_cg_private;
+ 	struct blk_issue_stat	bi_issue_stat;
+ #endif
++#ifdef CONFIG_BLK_DEV_THROTTLING
++	/* record which disk the bio is throttled against */
++	struct gendisk		*bi_throttled_disk;
++#endif
+ #endif
+ 	union {
+ #if defined(CONFIG_BLK_DEV_INTEGRITY)
