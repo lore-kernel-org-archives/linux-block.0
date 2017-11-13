@@ -1,99 +1,49 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:39776 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752675AbdK2X4u (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Nov 2017 18:56:50 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Omar Sandoval <osandov@fb.com>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Hannes Reinecke <hare@suse.com>,
-        chenxiang <chenxiang66@hisilicon.com>,
-        Mauricio Faria de Oliveira <mauricfo@linux.vnet.ibm.com>,
-        Ming Lei <ming.lei@redhat.com>, Wen Xiong <wenxiong@us.ibm.com>
-Subject: [PATCH V3] block: drain queue before waiting for q_usage_counter becoming zero
-Date: Thu, 30 Nov 2017 07:56:35 +0800
-Message-Id: <20171129235635.20292-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Mon, 13 Nov 2017 12:38:49 -0800
+From: Tejun Heo <tj@kernel.org>
+To: Shaohua Li <shli@fb.com>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Kernel-team@fb.com, Vivek Goyal <vgoyal@redhat.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH V2] block-throttle: avoid double charge
+Message-ID: <20171113203849.GQ983427@devbig577.frc2.facebook.com>
+References: <23857cbf1d586e904bd01196fa05705fb0161785.1510605343.git.shli@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <23857cbf1d586e904bd01196fa05705fb0161785.1510605343.git.shli@fb.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Now we track legacy requests with .q_usage_counter in commit 055f6e18e08f
-("block: Make q_usage_counter also track legacy requests"), but that
-commit never runs and drains legacy queue before waiting for this counter
-becoming zero, then IO hang is caused in the test of pulling disk during IO.
+On Mon, Nov 13, 2017 at 12:37:10PM -0800, Shaohua Li wrote:
+> If a bio is throttled and splitted after throttling, the bio could be
+> resubmited and enters the throttling again. This will cause part of the
+> bio is charged multiple times. If the cgroup has an IO limit, the double
+> charge will significantly harm the performance. The bio split becomes
+> quite common after arbitrary bio size change.
+> 
+> To fix this, we always set the BIO_THROTTLED flag if a bio is throttled.
+> If the bio is cloned/slitted, we copy the flag to new bio too to avoid
+> double charge. However cloned bio could be directed to a new disk,
+> keeping the flag will have problem. The observation is we always set new
+> disk for the bio in this case, so we can clear the flag in
+> bio_set_dev().
+> 
+> This issue exists a long time, arbitrary bio size change makes it worse,
+> so this should go into stable at least since v4.2.
+> 
+> V1-> V2: Not add extra field in bio based on discussion with Tejun
+> 
+> Cc: Tejun Heo <tj@kernel.org>
+> Cc: Vivek Goyal <vgoyal@redhat.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Shaohua Li <shli@fb.com>
 
-This patch fixes the issue by draining requests before waiting for
-q_usage_counter becoming zero, both Mauricio and chenxiang reported this
-issue, and observed that it can be fixed by this patch.
+Yeah, this works too.
 
-Link: https://marc.info/?l=linux-block&m=151192424731797&w=2
-Fixes: 055f6e18e08f("block: Make q_usage_counter also track legacy requests")
-Cc: Wen Xiong <wenxiong@us.ibm.com>
-Tested-by: "chenxiang (M)" <chenxiang66@hisilicon.com>
-Tested-by: Mauricio Faria de Oliveira <mauricfo@linux.vnet.ibm.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V3:
-	- V2 can't cover chenxiang's issue, so we have to drain queue via
-	blk_drain_queue(), and fallback to original post(V1)
+Acked-by: Tejun Heo <tj@kernel.org>
 
+Thanks.
 
- block/blk-core.c | 9 +++++++--
- block/blk-mq.c   | 2 ++
- block/blk.h      | 2 ++
- 3 files changed, 11 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index e5a623b45a1d..01329367e51c 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -562,6 +562,13 @@ static void __blk_drain_queue(struct request_queue *q, bool drain_all)
- 	}
- }
- 
-+void blk_drain_queue(struct request_queue *q)
-+{
-+	spin_lock_irq(q->queue_lock);
-+	__blk_drain_queue(q, true);
-+	spin_unlock_irq(q->queue_lock);
-+}
-+
- /**
-  * blk_queue_bypass_start - enter queue bypass mode
-  * @q: queue of interest
-@@ -689,8 +696,6 @@ void blk_cleanup_queue(struct request_queue *q)
- 	 */
- 	blk_freeze_queue(q);
- 	spin_lock_irq(lock);
--	if (!q->mq_ops)
--		__blk_drain_queue(q, true);
- 	queue_flag_set(QUEUE_FLAG_DEAD, q);
- 	spin_unlock_irq(lock);
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c94a8d225b63..e4c2e5c17343 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -161,6 +161,8 @@ void blk_freeze_queue(struct request_queue *q)
- 	 * exported to drivers as the only user for unfreeze is blk_mq.
- 	 */
- 	blk_freeze_queue_start(q);
-+	if (!q->mq_ops)
-+		blk_drain_queue(q);
- 	blk_mq_freeze_queue_wait(q);
- }
- 
-diff --git a/block/blk.h b/block/blk.h
-index 3f1446937aec..442098aa9463 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -330,4 +330,6 @@ static inline void blk_queue_bounce(struct request_queue *q, struct bio **bio)
- }
- #endif /* CONFIG_BOUNCE */
- 
-+extern void blk_drain_queue(struct request_queue *q);
-+
- #endif /* BLK_INTERNAL_H */
 -- 
-2.9.5
+tejun
