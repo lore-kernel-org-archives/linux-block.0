@@ -1,62 +1,75 @@
-Return-Path: <Hongxu.Jia@windriver.com>
-From: Hongxu Jia <hongxu.jia@windriver.com>
-To: <hch@lst.de>, <axboe@kernel.dk>, <Bart.VanAssche@wdc.com>,
-        <linux-block@vger.kernel.org>
-CC: <hongxu.jia@windriver.com>
-Subject: [PATCH] ide: ide-atapi: fix compile error with defining macro DEBUG
-Date: Fri, 10 Nov 2017 15:59:17 +0800
-Message-ID: <1510300757-21098-1-git-send-email-hongxu.jia@windriver.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	linus.walleij@linaro.org,
+	lee.tibbert@gmail.com,
+	oleksandr@natalenko.name,
+	lucmiccio@gmail.com,
+	bfq-iosched@googlegroups.com,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENT 1/4] doc, block, bfq: update max IOPS sustainable with BFQ
+Date: Mon, 13 Nov 2017 07:34:07 +0100
+Message-Id: <20171113063410.3029-2-paolo.valente@linaro.org>
+In-Reply-To: <20171113063410.3029-1-paolo.valente@linaro.org>
+References: <20171113063410.3029-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Compile ide-atapi failed with defining macro "DEBUG"
-...
-|drivers/ide/ide-atapi.c:285:52: error: 'struct request' has
-no member named 'cmd'; did you mean 'csd'?
-|  debug_log("%s: rq->cmd[0]: 0x%x\n", __func__, rq->cmd[0]);
-...
+We have investigated more deeply the performance of BFQ, in terms of
+number of IOPS that can be processed by the CPU when BFQ is used as
+I/O scheduler. In more detail, using the script [1], we have measured
+the number of IOPS reached on top of a null block device configured
+with zero latency, as a function of the workload (sequential read,
+sequential write, random read, random write) and of the system (we
+considered desktops, laptops and embedded systems).
 
-Since we split the scsi_request out of struct request, it missed
-do the same thing on debug_log
+Basing on the resulting figures, with this commit we update the
+current, conservative IOPS range reported in BFQ documentation. In
+particular, the documentation now reports, for each of three different
+systems, the lowest number of IOPS obtained for that system with the
+above test (namely, the value obtained with the workload leading to
+the lowest IOPS).
 
-Fixes: 82ed4db499b8 ("block: split scsi_request out of struct request")
+[1] https://github.com/Algodev-github/IOSpeed
 
-Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+Reviewed-by: Lee Tibbert <lee.tibbert@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Luca Miccio <lucmiccio@gmail.com>
 ---
- drivers/ide/ide-atapi.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ Documentation/block/bfq-iosched.txt | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/ide/ide-atapi.c b/drivers/ide/ide-atapi.c
-index 14d1e7d..0e6bc63 100644
---- a/drivers/ide/ide-atapi.c
-+++ b/drivers/ide/ide-atapi.c
-@@ -282,7 +282,7 @@ int ide_cd_expiry(ide_drive_t *drive)
- 	struct request *rq = drive->hwif->rq;
- 	unsigned long wait = 0;
+diff --git a/Documentation/block/bfq-iosched.txt b/Documentation/block/bfq-iosched.txt
+index 3d6951d..7a93615 100644
+--- a/Documentation/block/bfq-iosched.txt
++++ b/Documentation/block/bfq-iosched.txt
+@@ -20,12 +20,17 @@ for that device, by setting low_latency to 0. See Section 3 for
+ details on how to configure BFQ for the desired tradeoff between
+ latency and throughput, or on how to maximize throughput.
  
--	debug_log("%s: rq->cmd[0]: 0x%x\n", __func__, rq->cmd[0]);
-+	debug_log("%s: scsi_req(rq)->cmd[0]: 0x%x\n", __func__, scsi_req(rq)->cmd[0]);
+-On average CPUs, the current version of BFQ can handle devices
+-performing at most ~30K IOPS; at most ~50 KIOPS on faster CPUs. As a
+-reference, 30-50 KIOPS correspond to very high bandwidths with
+-sequential I/O (e.g., 8-12 GB/s if I/O requests are 256 KB large), and
+-to 120-200 MB/s with 4KB random I/O. BFQ is currently being tested on
+-multi-queue devices too.
++BFQ has a non-null overhead, which limits the maximum IOPS that the
++CPU can process for a device scheduled with BFQ. To give an idea of
++the limits on slow or average CPUs, here are BFQ limits for three
++different CPUs, on, respectively, an average laptop, an old desktop,
++and a cheap embedded system, in case full hierarchical support is
++enabled (i.e., CONFIG_BFQ_GROUP_IOSCHED is set):
++- Intel i7-4850HQ: 250 KIOPS
++- AMD A8-3850: 170 KIOPS
++- ARM CortexTM-A53 Octa-core: 45 KIOPS
++
++BFQ works for multi-queue devices too.
  
- 	/*
- 	 * Some commands are *slow* and normally take a long time to complete.
-@@ -463,7 +463,7 @@ static ide_startstop_t ide_pc_intr(ide_drive_t *drive)
- 				return ide_do_reset(drive);
- 			}
+ The table of contents follow. Impatients can just jump to Section 3.
  
--			debug_log("[cmd %x]: check condition\n", rq->cmd[0]);
-+			debug_log("[cmd %x]: check condition\n", scsi_req(rq)->cmd[0]);
- 
- 			/* Retry operation */
- 			ide_retry_pc(drive);
-@@ -531,7 +531,7 @@ static ide_startstop_t ide_pc_intr(ide_drive_t *drive)
- 		ide_pad_transfer(drive, write, bcount);
- 
- 	debug_log("[cmd %x] transferred %d bytes, padded %d bytes, resid: %u\n",
--		  rq->cmd[0], done, bcount, scsi_req(rq)->resid_len);
-+		  scsi_req(rq)->cmd[0], done, bcount, scsi_req(rq)->resid_len);
- 
- 	/* And set the interrupt handler again */
- 	ide_set_handler(drive, ide_pc_intr, timeout);
 -- 
-2.7.4
+2.10.0
