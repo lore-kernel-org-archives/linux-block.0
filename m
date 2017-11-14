@@ -1,87 +1,83 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:39954 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933418AbdKBPZI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 2 Nov 2017 11:25:08 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Omar Sandoval <osandov@fb.com>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Hannes Reinecke <hare@suse.com>, linux-kernel@vger.kernel.org,
-        Jianchao Wang <jianchao.w.wang@oracle.com>
-Subject: [PATCH V3 1/7] blk-mq: put the driver tag of nxt rq before first one is requeued
-Date: Thu,  2 Nov 2017 23:24:32 +0800
-Message-Id: <20171102152438.25324-2-ming.lei@redhat.com>
-In-Reply-To: <20171102152438.25324-1-ming.lei@redhat.com>
-References: <20171102152438.25324-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Received: from [192.168.1.154] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id w195sm5647261ita.44.2017.11.14.09.24.59
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 14 Nov 2017 09:24:59 -0800 (PST)
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH/RFC] blk-mq: improve heavily contended tag case
+Message-ID: <3de98bc5-d2f5-64cb-d2da-1670a25f4e52@kernel.dk>
+Date: Tue, 14 Nov 2017 10:24:58 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
+Even with a number of waitqueues, we can get into a situation where we
+are heavily contended on the waitqueue lock. I got a report on spc1
+where we're spending seconds doing this. Arguably the use case is nasty,
+I reproduce it with one device and 1000 threads banging on the device.
+But that doesn't mean we shouldn't be handling it better.
 
-When free the driver tag of the next rq with I/O scheduler
-configured, it get the first entry of the list, however, at the
-moment, the failed rq has been requeued at the head of the list.
-The rq it gets is the failed rq not the next rq.
-Free the driver tag of next rq before the failed one is requeued
-in the failure branch of queue_rq callback and it is just needed
-there.
+What ends up happening is that a thread will fail to get a tag, add
+itself to the waitqueue, and subsequently get woken up when a tag is
+freed - only to find itself going back to sleep on the waitqueue.
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+Instead of waking all threads, use an exclusive wait and wake up our
+sbitmap batch count instead. This seems to work well for me (massive
+improvement for this use case), and it survives basic testing. But I
+haven't fully verified it yet.
+
+An additional improvement is running the queue and checking for a new
+tag BEFORE needing to add ourselves to the waitqueue.
+
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
 ---
- block/blk-mq.c | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e4d2490f4e7e..fe14b28760eb 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1091,7 +1091,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 		bool got_budget)
- {
- 	struct blk_mq_hw_ctx *hctx;
--	struct request *rq;
-+	struct request *rq, *nxt;
- 	int errors, queued;
- 
- 	if (list_empty(list))
-@@ -1153,14 +1153,20 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 		if (list_empty(list))
- 			bd.last = true;
- 		else {
--			struct request *nxt;
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index c81b40ecd3f1..336dde07b230 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -134,12 +134,6 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 	ws = bt_wait_ptr(bt, data->hctx);
+ 	drop_ctx = data->ctx == NULL;
+ 	do {
+-		prepare_to_wait(&ws->wait, &wait, TASK_UNINTERRUPTIBLE);
 -
- 			nxt = list_first_entry(list, struct request, queuelist);
- 			bd.last = !blk_mq_get_driver_tag(nxt, NULL, false);
- 		}
- 
- 		ret = q->mq_ops->queue_rq(hctx, &bd);
- 		if (ret == BLK_STS_RESOURCE) {
-+			/*
-+			 * If an I/O scheduler has been configured and we got a
-+			 * driver tag for the next request already, free it again.
-+			 */
-+			if (!list_empty(list)) {
-+				nxt = list_first_entry(list, struct request, queuelist);
-+				blk_mq_put_driver_tag(nxt);
-+			}
- 			blk_mq_put_driver_tag_hctx(hctx, rq);
- 			list_add(&rq->queuelist, list);
- 			__blk_mq_requeue_request(rq);
-@@ -1184,13 +1190,6 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 	 * that is where we will continue on next queue run.
- 	 */
- 	if (!list_empty(list)) {
--		/*
--		 * If an I/O scheduler has been configured and we got a driver
--		 * tag for the next request already, free it again.
--		 */
--		rq = list_first_entry(list, struct request, queuelist);
--		blk_mq_put_driver_tag(rq);
+-		tag = __blk_mq_get_tag(data, bt);
+-		if (tag != -1)
+-			break;
 -
- 		spin_lock(&hctx->lock);
- 		list_splice_init(list, &hctx->dispatch);
- 		spin_unlock(&hctx->lock);
+ 		/*
+ 		 * We're out of tags on this hardware queue, kick any
+ 		 * pending IO submits before going to sleep waiting for
+@@ -155,6 +149,13 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 		if (tag != -1)
+ 			break;
+ 
++		prepare_to_wait_exclusive(&ws->wait, &wait,
++						TASK_UNINTERRUPTIBLE);
++
++		tag = __blk_mq_get_tag(data, bt);
++		if (tag != -1)
++			break;
++
+ 		if (data->ctx)
+ 			blk_mq_put_ctx(data->ctx);
+ 
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index 80aa8d5463fa..42b5ca0acf93 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -462,7 +462,7 @@ static void sbq_wake_up(struct sbitmap_queue *sbq)
+ 		 */
+ 		atomic_cmpxchg(&ws->wait_cnt, wait_cnt, wait_cnt + wake_batch);
+ 		sbq_index_atomic_inc(&sbq->wake_index);
+-		wake_up(&ws->wait);
++		wake_up_nr(&ws->wait, wake_batch);
+ 	}
+ }
+ 
 -- 
-2.9.5
+Jens Axboe
