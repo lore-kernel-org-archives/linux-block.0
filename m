@@ -1,30 +1,37 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Wed, 15 Nov 2017 15:30:18 -0800
-From: Tejun Heo <tj@kernel.org>
-To: Shaohua Li <shli@fb.com>
-Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Kernel-team@fb.com
-Subject: Re: [PATCH] blk-throttle: allow configure 0 for some settings
- --resend
-Message-ID: <20171115233018.GC983427@devbig577.frc2.facebook.com>
-References: <74e04440fa46aca5488912050395f2bc406f7afa.1510787708.git.shli@fb.com>
+Return-Path: <prvs=2492acfd3a=shli@fb.com>
+From: Shaohua Li <shli@fb.com>
+To: <linux-block@vger.kernel.org>
+CC: Jens Axboe <axboe@kernel.dk>, <Kernel-team@fb.com>,
+        Tejun Heo
+	<tj@kernel.org>
+Subject: [PATCH] blk-throttle: allow configure 0 for some settings --resend
+Date: Wed, 15 Nov 2017 15:27:29 -0800
+Message-ID: <74e04440fa46aca5488912050395f2bc406f7afa.1510787708.git.shli@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <74e04440fa46aca5488912050395f2bc406f7afa.1510787708.git.shli@fb.com>
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Nov 15, 2017 at 03:27:29PM -0800, Shaohua Li wrote:
-> For io.low, latency target 0 is legit. 0 for rbps/wbps/rios/wios is ok
-> too. And we use 0 to clear io.low settings.
-> 
-> Cc: Tejun Heo <tj@kernel.org>
-> Signed-off-by: Shaohua Li <shli@fb.com>
+For io.low, latency target 0 is legit. 0 for rbps/wbps/rios/wios is ok
+too. And we use 0 to clear io.low settings.
 
-Acked-by: Tejun Heo <tj@kernel.org>
+Cc: Tejun Heo <tj@kernel.org>
+Signed-off-by: Shaohua Li <shli@fb.com>
+---
+ block/blk-throttle.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks.
-
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 96ad326..7040285 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1633,7 +1633,7 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
+ 			goto out_finish;
+ 
+ 		ret = -ERANGE;
+-		if (!val)
++		if (!val && off != LIMIT_LOW)
+ 			goto out_finish;
+ 
+ 		ret = -EINVAL;
 -- 
-tejun
+2.9.5
