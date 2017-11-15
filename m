@@ -1,149 +1,91 @@
-Return-Path: <axboe@kernel.dk>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: Omar Sandoval <osandov@fb.com>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] blk-mq: improve tag waiting setup for non-shared tags
-Message-ID: <3649d84b-978d-ce1b-a8bc-5735b07296a7@kernel.dk>
-Date: Thu, 9 Nov 2017 16:00:09 -0700
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:40804 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932180AbdKOMFG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 15 Nov 2017 07:05:06 -0500
+Date: Wed, 15 Nov 2017 20:04:50 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: Jens Axboe <axboe@fb.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Omar Sandoval <osandov@fb.com>, Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH V4] scsi_debugfs: fix crash in scsi_show_rq()
+Message-ID: <20171115120449.GD908@ming.t460p>
+References: <20171110090144.11791-1-ming.lei@redhat.com>
+ <1510332718.3095.2.camel@HansenPartnership.com>
+ <20171111024337.GB20382@ming.t460p>
+ <1510599352.3336.20.camel@HansenPartnership.com>
+ <20171114005544.GA20889@ming.t460p>
+ <1510683292.3077.3.camel@HansenPartnership.com>
+ <20171115100949.GC908@ming.t460p>
+ <1510741680.3088.1.camel@HansenPartnership.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1510741680.3088.1.camel@HansenPartnership.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-If we run out of driver tags, we currently treat shared and non-shared
-tags the same - both cases hook into the tag waitqueue. This is a bit
-more costly than it needs to be on unshared tags, since we have to both
-grab the hctx lock, and the waitqueue lock (and disable interrupts).
-For the non-shared case, we can simply mark the queue as needing a
-restart.
+On Wed, Nov 15, 2017 at 07:28:00PM +0900, James Bottomley wrote:
+> On Wed, 2017-11-15 at 18:09 +0800, Ming Lei wrote:
+> > On Tue, Nov 14, 2017 at 10:14:52AM -0800, James Bottomley wrote:
+> > > 
+> > > On Tue, 2017-11-14 at 08:55 +0800, Ming Lei wrote:
+> > > > 
+> > > > Hi James,
+> > > > 
+> > > > On Mon, Nov 13, 2017 at 10:55:52AM -0800, James Bottomley wrote:
+> > > > > 
+> > > > > 
+> > > > > On Sat, 2017-11-11 at 10:43 +0800, Ming Lei wrote:
+> > > > > > 
+> > > > > > 
+> > > > > > So from CPU1's review, cmd->cmnd is in a remote NUMA node,
+> > > > > > __scsi_format_command() is executed much slower than
+> > > > > > mempool_free().
+> > > > > > So when mempool_free() returns, __scsi_format_command() may
+> > > > > > not fetched the buffer in L1 cache yet, then use-after-free
+> > > > > > is still triggered.
+> > > > > > 
+> > > > > > That is why I say this use-after-free is inevitable no matter
+> > > > > > 'setting SCpnt->cmnd to NULL before calling mempool_free()'
+> > > > > > or not.
+> > > > > 
+> > > > > The bottom line is that there are several creative ways around
+> > > > > this but the proposed code is currently broken and simply
+> > > > > putting a comment in saying so doesn't make it acceptable.
+> > > > 
+> > > > As I explained above, I didn't see one really workable way. Or
+> > > > please correct it if I am wrong.
+> > > 
+> > > I simply can't believe it's beyond the wit of man to solve a use
+> > > after free race. �About 40% of kernel techniques are devoted to
+> > > this. �All I really care about is not losing the PI information we
+> > > previously had. �I agree with Bart that NULL cmnd is a good
+> > > indicator, so it seems reasonable to use it. �If you have another
+> > > mechanism, feel free to propose it.
+> > 
+> > Hi James,
+> > 
+> > This patch is my proposal, no others thought of yet.
+> > 
+> > We can fix the use-after-free easily via lock, rcu and ..., but some
+> > cost has to pay. In this case, we can't wait too long in show_rq(),
+> > otherwise we may lose important debug info, so I do not have better
+> > way.
+> > 
+> > IMO this use-after-free is actually no harm, I don't think we have to
+> > fix it, but it should be better to not let utility warn on this case.
+> 
+> Fine, so lose the snide comment and set the cmnd to NULL *before*
+> calling free so we narrow the race window.
 
-Split blk_mq_dispatch_wait_add() to account for both cases, and
-rename it to blk_mq_mark_tag_wait() to better reflect what it
-does now.
+Hi James,
 
-Without this patch, shared and non-shared performance is about the same
-with 4 fio thread hammering on a single null_blk device (~410K, at 75%
-sys). With the patch, the shared case is the same, but the non-shared
-tags case runs at 431K at 71% sys.
+Given we can't avoid the use-after-free, how about not do that way so
+we won't lose the precious debug info too early?
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
----
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index bfe24a5b62a3..965317ea45f9 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1006,44 +1006,68 @@ static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
- 	return 1;
- }
- 
--static bool blk_mq_dispatch_wait_add(struct blk_mq_hw_ctx **hctx,
--				     struct request *rq)
-+/*
-+ * Mark us waiting for a tag. For shared tags, this involves hooking us into
-+ * the tag wakeups. For non-shared tags, we can simply mark us nedeing a
-+ * restart. For both caes, take care to check the condition again after
-+ * marking us as waiting.
-+ */
-+static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx **hctx,
-+				 struct request *rq)
- {
- 	struct blk_mq_hw_ctx *this_hctx = *hctx;
--	wait_queue_entry_t *wait = &this_hctx->dispatch_wait;
-+	bool shared_tags = (this_hctx->flags & BLK_MQ_F_TAG_SHARED) != 0;
- 	struct sbq_wait_state *ws;
-+	wait_queue_entry_t *wait;
-+	bool ret;
- 
--	if (!list_empty_careful(&wait->entry))
--		return false;
-+	if (!shared_tags) {
-+		if (!test_bit(BLK_MQ_S_SCHED_RESTART, &this_hctx->state))
-+			set_bit(BLK_MQ_S_SCHED_RESTART, &this_hctx->state);
-+	} else {
-+		wait = &this_hctx->dispatch_wait;
-+		if (!list_empty_careful(&wait->entry))
-+			return false;
- 
--	spin_lock(&this_hctx->lock);
--	if (!list_empty(&wait->entry)) {
--		spin_unlock(&this_hctx->lock);
--		return false;
--	}
-+		spin_lock(&this_hctx->lock);
-+		if (!list_empty(&wait->entry)) {
-+			spin_unlock(&this_hctx->lock);
-+			return false;
-+		}
- 
--	ws = bt_wait_ptr(&this_hctx->tags->bitmap_tags, this_hctx);
--	add_wait_queue(&ws->wait, wait);
-+		ws = bt_wait_ptr(&this_hctx->tags->bitmap_tags, this_hctx);
-+		add_wait_queue(&ws->wait, wait);
-+	}
- 
- 	/*
- 	 * It's possible that a tag was freed in the window between the
- 	 * allocation failure and adding the hardware queue to the wait
- 	 * queue.
- 	 */
--	if (!blk_mq_get_driver_tag(rq, hctx, false)) {
-+	ret = blk_mq_get_driver_tag(rq, hctx, false);
-+
-+	if (!shared_tags) {
-+		/*
-+		 * Don't clear RESTART here, someone else could have set it.
-+		 * At most this will cost an extra queue run.
-+		 */
-+		return ret;
-+	} else {
-+		if (!ret) {
-+			spin_unlock(&this_hctx->lock);
-+			return false;
-+		}
-+
-+		/*
-+		 * We got a tag, remove ourselves from the wait queue to ensure
-+		 * someone else gets the wakeup.
-+		 */
-+		spin_lock_irq(&ws->wait.lock);
-+		list_del_init(&wait->entry);
-+		spin_unlock_irq(&ws->wait.lock);
- 		spin_unlock(&this_hctx->lock);
--		return false;
-+		return true;
- 	}
--
--	/*
--	 * We got a tag, remove ourselves from the wait queue to ensure
--	 * someone else gets the wakeup.
--	 */
--	spin_lock_irq(&ws->wait.lock);
--	list_del_init(&wait->entry);
--	spin_unlock_irq(&ws->wait.lock);
--	spin_unlock(&this_hctx->lock);
--	return true;
- }
- 
- bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
-@@ -1076,10 +1100,15 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 			 * before we add this entry back on the dispatch list,
- 			 * we'll re-run it below.
- 			 */
--			if (!blk_mq_dispatch_wait_add(&hctx, rq)) {
-+			if (!blk_mq_mark_tag_wait(&hctx, rq)) {
- 				if (got_budget)
- 					blk_mq_put_dispatch_budget(hctx);
--				no_tag = true;
-+				/*
-+				 * For non-shared tags, the RESTART check
-+				 * will suffice.
-+				 */
-+				if (hctx->flags & BLK_MQ_F_TAG_SHARED)
-+					no_tag = true;
- 				break;
- 			}
- 		}
-
--- 
-Jens Axboe
+Thanks,
+Ming
