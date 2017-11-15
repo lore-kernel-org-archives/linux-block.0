@@ -1,558 +1,88 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:26989 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932343AbdK2NmR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Nov 2017 08:42:17 -0500
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V15 07/22] mmc: block: Add CQE support
-Date: Wed, 29 Nov 2017 15:41:04 +0200
-Message-Id: <1511962879-24262-8-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
-References: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <pavel@ucw.cz>
+Date: Wed, 15 Nov 2017 22:12:42 +0100
+From: Pavel Machek <pavel@ucw.cz>
+To: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: Philipp Guendisch <philipp.guendisch@fau.de>,
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org, axboe@kernel.dk,
+	viro@zeniv.linux.org.uk, bart.vanassche@sandisk.com,
+	martin.petersen@oracle.com, hare@suse.de, osandov@fb.com,
+	dan.j.williams@intel.com, ming.lei@redhat.com,
+	linux-kernel@i4.cs.fau.de, Mate Horvath <horvatmate@gmail.com>
+Subject: Re: [PATCH] Support for secure erase functionality
+Message-ID: <20171115211242.GE6183@amd>
+References: <1505317073-22567-1-git-send-email-philipp.guendisch@fau.de>
+ <2b2d3855-00e9-77d0-7ee4-050c210b718e@wdc.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Bqc0IY4JZZt50bUr"
+In-Reply-To: <2b2d3855-00e9-77d0-7ee4-050c210b718e@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Add CQE support to the block driver, including:
-    - optionally using DCMD for flush requests
-    - "manually" issuing discard requests
-    - issuing read / write requests to the CQE
-    - supporting block-layer timeouts
-    - handling recovery
-    - supporting re-tuning
 
-CQE offers 25% - 50% better random multi-threaded I/O.  There is a slight
-(e.g. 2%) drop in sequential read speed but no observable change to sequential
-write.
+--Bqc0IY4JZZt50bUr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-CQE automatically sends the commands to complete requests.  However it only
-supports reads / writes and so-called "direct commands" (DCMD).  Furthermore
-DCMD is limited to one command at a time, but discards require 3 commands.
-That makes issuing discards through CQE very awkward, but some CQE's don't
-support DCMD anyway.  So for discards, the existing non-CQE approach is
-taken, where the mmc core code issues the 3 commands one at a time i.e.
-mmc_erase(). Where DCMD is used, is for issuing flushes.
+Hi!
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/core/block.c | 150 ++++++++++++++++++++++++++++++++++++++++++-
- drivers/mmc/core/block.h |   2 +
- drivers/mmc/core/queue.c | 162 +++++++++++++++++++++++++++++++++++++++++++++--
- drivers/mmc/core/queue.h |  18 ++++++
- 4 files changed, 326 insertions(+), 6 deletions(-)
+> On 9/14/17 00:37, Philipp Guendisch wrote:
+> > This patch adds a software based secure erase option to improve data
+> > confidentiality. The CONFIG_BLK_DEV_SECURE_ERASE option enables a mount
+> > flag called 'sw_secure_erase'. When you mount a volume with this flag,
+> > every discard call is prepended by an explicit write command to overwri=
+te
+> > the data before it is discarded. A volume without a discard compatibili=
+ty
+> > can be used as well but the discard calls will be enabled for this devi=
+ce
+> > and suppressed after the write call is made.
+>=20
+> Writing once to a sector stored on spinning rust will *not* fully erase
+> the previous data. Part of the signal used for storing that data will
+> remain on the track (because the disk head is never perfectly aligned on
+> the track). With some signal processing work, the old data can be retriev=
+ed.
+>=20
+> You will need a *lot* of normal writes to make sure nothing remains of
+> the old data signal. Granted, even a single write will make it hard to
+> get to the old data, but it is possible nevertheless. Hence the standard
+> defined SANITIZE with cryptographic erase option to ensure that the old
+> data is really dead.
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index 7874c3bbf6b5..7275ac5d6799 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -112,6 +112,7 @@ struct mmc_blk_data {
- #define MMC_BLK_WRITE		BIT(1)
- #define MMC_BLK_DISCARD		BIT(2)
- #define MMC_BLK_SECDISCARD	BIT(3)
-+#define MMC_BLK_CQE_RECOVERY	BIT(4)
- 
- 	/*
- 	 * Only set in main mmc_blk_data associated
-@@ -1730,6 +1731,138 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
- 		*do_data_tag_p = do_data_tag;
- }
- 
-+#define MMC_CQE_RETRIES 2
-+
-+static void mmc_blk_cqe_complete_rq(struct mmc_queue *mq, struct request *req)
-+{
-+	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
-+	struct mmc_request *mrq = &mqrq->brq.mrq;
-+	struct request_queue *q = req->q;
-+	struct mmc_host *host = mq->card->host;
-+	unsigned long flags;
-+	bool put_card;
-+	int err;
-+
-+	mmc_cqe_post_req(host, mrq);
-+
-+	if (mrq->cmd && mrq->cmd->error)
-+		err = mrq->cmd->error;
-+	else if (mrq->data && mrq->data->error)
-+		err = mrq->data->error;
-+	else
-+		err = 0;
-+
-+	if (err) {
-+		if (mqrq->retries++ < MMC_CQE_RETRIES)
-+			blk_mq_requeue_request(req, true);
-+		else
-+			blk_mq_end_request(req, BLK_STS_IOERR);
-+	} else if (mrq->data) {
-+		if (blk_update_request(req, BLK_STS_OK, mrq->data->bytes_xfered))
-+			blk_mq_requeue_request(req, true);
-+		else
-+			__blk_mq_end_request(req, BLK_STS_OK);
-+	} else {
-+		blk_mq_end_request(req, BLK_STS_OK);
-+	}
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+
-+	mq->in_flight[mmc_issue_type(mq, req)] -= 1;
-+
-+	put_card = (mmc_tot_in_flight(mq) == 0);
-+
-+	mmc_cqe_check_busy(mq);
-+
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+
-+	if (!mq->cqe_busy)
-+		blk_mq_run_hw_queues(q, true);
-+
-+	if (put_card)
-+		mmc_put_card(mq->card, &mq->ctx);
-+}
-+
-+void mmc_blk_cqe_recovery(struct mmc_queue *mq)
-+{
-+	struct mmc_card *card = mq->card;
-+	struct mmc_host *host = card->host;
-+	int err;
-+
-+	pr_debug("%s: CQE recovery start\n", mmc_hostname(host));
-+
-+	err = mmc_cqe_recovery(host);
-+	if (err)
-+		mmc_blk_reset(mq->blkdata, host, MMC_BLK_CQE_RECOVERY);
-+	else
-+		mmc_blk_reset_success(mq->blkdata, MMC_BLK_CQE_RECOVERY);
-+
-+	pr_debug("%s: CQE recovery done\n", mmc_hostname(host));
-+}
-+
-+static void mmc_blk_cqe_req_done(struct mmc_request *mrq)
-+{
-+	struct mmc_queue_req *mqrq = container_of(mrq, struct mmc_queue_req,
-+						  brq.mrq);
-+	struct request *req = mmc_queue_req_to_req(mqrq);
-+	struct request_queue *q = req->q;
-+	struct mmc_queue *mq = q->queuedata;
-+
-+	/*
-+	 * Block layer timeouts race with completions which means the normal
-+	 * completion path cannot be used during recovery.
-+	 */
-+	if (mq->in_recovery)
-+		mmc_blk_cqe_complete_rq(mq, req);
-+	else
-+		blk_mq_complete_request(req);
-+}
-+
-+static int mmc_blk_cqe_start_req(struct mmc_host *host, struct mmc_request *mrq)
-+{
-+	mrq->done		= mmc_blk_cqe_req_done;
-+	mrq->recovery_notifier	= mmc_cqe_recovery_notifier;
-+
-+	return mmc_cqe_start_req(host, mrq);
-+}
-+
-+static struct mmc_request *mmc_blk_cqe_prep_dcmd(struct mmc_queue_req *mqrq,
-+						 struct request *req)
-+{
-+	struct mmc_blk_request *brq = &mqrq->brq;
-+
-+	memset(brq, 0, sizeof(*brq));
-+
-+	brq->mrq.cmd = &brq->cmd;
-+	brq->mrq.tag = req->tag;
-+
-+	return &brq->mrq;
-+}
-+
-+static int mmc_blk_cqe_issue_flush(struct mmc_queue *mq, struct request *req)
-+{
-+	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
-+	struct mmc_request *mrq = mmc_blk_cqe_prep_dcmd(mqrq, req);
-+
-+	mrq->cmd->opcode = MMC_SWITCH;
-+	mrq->cmd->arg = (MMC_SWITCH_MODE_WRITE_BYTE << 24) |
-+			(EXT_CSD_FLUSH_CACHE << 16) |
-+			(1 << 8) |
-+			EXT_CSD_CMD_SET_NORMAL;
-+	mrq->cmd->flags = MMC_CMD_AC | MMC_RSP_R1B;
-+
-+	return mmc_blk_cqe_start_req(mq->card->host, mrq);
-+}
-+
-+static int mmc_blk_cqe_issue_rw_rq(struct mmc_queue *mq, struct request *req)
-+{
-+	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
-+
-+	mmc_blk_data_prep(mq, mqrq, 0, NULL, NULL);
-+
-+	return mmc_blk_cqe_start_req(mq->card->host, &mqrq->brq.mrq);
-+}
-+
- static void mmc_blk_rw_rq_prep(struct mmc_queue_req *mqrq,
- 			       struct mmc_card *card,
- 			       int disable_multi,
-@@ -2038,7 +2171,10 @@ void mmc_blk_mq_complete(struct request *req)
- {
- 	struct mmc_queue *mq = req->q->queuedata;
- 
--	mmc_blk_mq_complete_rq(mq, req);
-+	if (mq->use_cqe)
-+		mmc_blk_cqe_complete_rq(mq, req);
-+	else
-+		mmc_blk_mq_complete_rq(mq, req);
- }
- 
- static void mmc_blk_mq_poll_completion(struct mmc_queue *mq,
-@@ -2212,6 +2348,9 @@ static int mmc_blk_mq_issue_rw_rq(struct mmc_queue *mq,
- 
- static int mmc_blk_wait_for_idle(struct mmc_queue *mq, struct mmc_host *host)
- {
-+	if (mq->use_cqe)
-+		return host->cqe_ops->cqe_wait_for_idle(host);
-+
- 	return mmc_blk_rw_wait(mq, NULL);
- }
- 
-@@ -2250,11 +2389,18 @@ enum mmc_issued mmc_blk_mq_issue_rq(struct mmc_queue *mq, struct request *req)
- 			return MMC_REQ_FAILED_TO_START;
- 		}
- 		return MMC_REQ_FINISHED;
-+	case MMC_ISSUE_DCMD:
- 	case MMC_ISSUE_ASYNC:
- 		switch (req_op(req)) {
-+		case REQ_OP_FLUSH:
-+			ret = mmc_blk_cqe_issue_flush(mq, req);
-+			break;
- 		case REQ_OP_READ:
- 		case REQ_OP_WRITE:
--			ret = mmc_blk_mq_issue_rw_rq(mq, req);
-+			if (mq->use_cqe)
-+				ret = mmc_blk_cqe_issue_rw_rq(mq, req);
-+			else
-+				ret = mmc_blk_mq_issue_rw_rq(mq, req);
- 			break;
- 		default:
- 			WARN_ON_ONCE(1);
-diff --git a/drivers/mmc/core/block.h b/drivers/mmc/core/block.h
-index 6d34e87b18f6..f472ce5d5647 100644
---- a/drivers/mmc/core/block.h
-+++ b/drivers/mmc/core/block.h
-@@ -7,6 +7,8 @@
- 
- void mmc_blk_issue_rq(struct mmc_queue *mq, struct request *req);
- 
-+void mmc_blk_cqe_recovery(struct mmc_queue *mq);
-+
- enum mmc_issued;
- 
- enum mmc_issued mmc_blk_mq_issue_rq(struct mmc_queue *mq, struct request *req);
-diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-index 54bec4c6c9bd..8d632d2f5199 100644
---- a/drivers/mmc/core/queue.c
-+++ b/drivers/mmc/core/queue.c
-@@ -40,18 +40,142 @@ static int mmc_prep_request(struct request_queue *q, struct request *req)
- 	return BLKPREP_OK;
- }
- 
-+static inline bool mmc_cqe_dcmd_busy(struct mmc_queue *mq)
-+{
-+	/* Allow only 1 DCMD at a time */
-+	return mq->in_flight[MMC_ISSUE_DCMD];
-+}
-+
-+void mmc_cqe_check_busy(struct mmc_queue *mq)
-+{
-+	if ((mq->cqe_busy & MMC_CQE_DCMD_BUSY) && !mmc_cqe_dcmd_busy(mq))
-+		mq->cqe_busy &= ~MMC_CQE_DCMD_BUSY;
-+
-+	mq->cqe_busy &= ~MMC_CQE_QUEUE_FULL;
-+}
-+
-+static inline bool mmc_cqe_can_dcmd(struct mmc_host *host)
-+{
-+	return host->caps2 & MMC_CAP2_CQE_DCMD;
-+}
-+
-+enum mmc_issue_type mmc_cqe_issue_type(struct mmc_host *host,
-+				       struct request *req)
-+{
-+	switch (req_op(req)) {
-+	case REQ_OP_DRV_IN:
-+	case REQ_OP_DRV_OUT:
-+	case REQ_OP_DISCARD:
-+	case REQ_OP_SECURE_ERASE:
-+		return MMC_ISSUE_SYNC;
-+	case REQ_OP_FLUSH:
-+		return mmc_cqe_can_dcmd(host) ? MMC_ISSUE_DCMD : MMC_ISSUE_SYNC;
-+	default:
-+		return MMC_ISSUE_ASYNC;
-+	}
-+}
-+
- enum mmc_issue_type mmc_issue_type(struct mmc_queue *mq, struct request *req)
- {
-+	struct mmc_host *host = mq->card->host;
-+
-+	if (mq->use_cqe)
-+		return mmc_cqe_issue_type(host, req);
-+
- 	if (req_op(req) == REQ_OP_READ || req_op(req) == REQ_OP_WRITE)
- 		return MMC_ISSUE_ASYNC;
- 
- 	return MMC_ISSUE_SYNC;
- }
- 
-+static void __mmc_cqe_recovery_notifier(struct mmc_queue *mq)
-+{
-+	if (!mq->recovery_needed) {
-+		mq->recovery_needed = true;
-+		schedule_work(&mq->recovery_work);
-+	}
-+}
-+
-+void mmc_cqe_recovery_notifier(struct mmc_request *mrq)
-+{
-+	struct mmc_queue_req *mqrq = container_of(mrq, struct mmc_queue_req,
-+						  brq.mrq);
-+	struct request *req = mmc_queue_req_to_req(mqrq);
-+	struct request_queue *q = req->q;
-+	struct mmc_queue *mq = q->queuedata;
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	__mmc_cqe_recovery_notifier(mq);
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+}
-+
-+static enum blk_eh_timer_return mmc_cqe_timed_out(struct request *req)
-+{
-+	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
-+	struct mmc_request *mrq = &mqrq->brq.mrq;
-+	struct mmc_queue *mq = req->q->queuedata;
-+	struct mmc_host *host = mq->card->host;
-+	enum mmc_issue_type issue_type = mmc_issue_type(mq, req);
-+	bool recovery_needed = false;
-+
-+	switch (issue_type) {
-+	case MMC_ISSUE_ASYNC:
-+	case MMC_ISSUE_DCMD:
-+		if (host->cqe_ops->cqe_timeout(host, mrq, &recovery_needed)) {
-+			if (recovery_needed)
-+				__mmc_cqe_recovery_notifier(mq);
-+			return BLK_EH_RESET_TIMER;
-+		}
-+		/* No timeout */
-+		return BLK_EH_HANDLED;
-+	default:
-+		/* Timeout is handled by mmc core */
-+		return BLK_EH_RESET_TIMER;
-+	}
-+}
-+
- static enum blk_eh_timer_return mmc_mq_timed_out(struct request *req,
- 						 bool reserved)
- {
--	return BLK_EH_RESET_TIMER;
-+	struct request_queue *q = req->q;
-+	struct mmc_queue *mq = q->queuedata;
-+	unsigned long flags;
-+	int ret;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+
-+	if (mq->recovery_needed || !mq->use_cqe)
-+		ret = BLK_EH_RESET_TIMER;
-+	else
-+		ret = mmc_cqe_timed_out(req);
-+
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+
-+	return ret;
-+}
-+
-+static void mmc_mq_recovery_handler(struct work_struct *work)
-+{
-+	struct mmc_queue *mq = container_of(work, struct mmc_queue,
-+					    recovery_work);
-+	struct request_queue *q = mq->queue;
-+
-+	mmc_get_card(mq->card, &mq->ctx);
-+
-+	mq->in_recovery = true;
-+
-+	mmc_blk_cqe_recovery(mq);
-+
-+	mq->in_recovery = false;
-+
-+	spin_lock_irq(q->queue_lock);
-+	mq->recovery_needed = false;
-+	spin_unlock_irq(q->queue_lock);
-+
-+	mmc_put_card(mq->card, &mq->ctx);
-+
-+	blk_mq_run_hw_queues(q, true);
- }
- 
- static int mmc_queue_thread(void *d)
-@@ -223,9 +347,10 @@ static blk_status_t mmc_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	struct request_queue *q = req->q;
- 	struct mmc_queue *mq = q->queuedata;
- 	struct mmc_card *card = mq->card;
-+	struct mmc_host *host = card->host;
- 	enum mmc_issue_type issue_type;
- 	enum mmc_issued issued;
--	bool get_card;
-+	bool get_card, cqe_retune_ok;
- 	int ret;
- 
- 	if (mmc_card_removed(mq->card)) {
-@@ -237,7 +362,19 @@ static blk_status_t mmc_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
- 
- 	spin_lock_irq(q->queue_lock);
- 
-+	if (mq->recovery_needed) {
-+		spin_unlock_irq(q->queue_lock);
-+		return BLK_STS_RESOURCE;
-+	}
-+
- 	switch (issue_type) {
-+	case MMC_ISSUE_DCMD:
-+		if (mmc_cqe_dcmd_busy(mq)) {
-+			mq->cqe_busy |= MMC_CQE_DCMD_BUSY;
-+			spin_unlock_irq(q->queue_lock);
-+			return BLK_STS_RESOURCE;
-+		}
-+		break;
- 	case MMC_ISSUE_ASYNC:
- 		break;
- 	default:
-@@ -254,6 +391,7 @@ static blk_status_t mmc_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
- 
- 	mq->in_flight[issue_type] += 1;
- 	get_card = (mmc_tot_in_flight(mq) == 1);
-+	cqe_retune_ok = (mmc_cqe_qcnt(mq) == 1);
- 
- 	spin_unlock_irq(q->queue_lock);
- 
-@@ -265,6 +403,11 @@ static blk_status_t mmc_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	if (get_card)
- 		mmc_get_card(card, &mq->ctx);
- 
-+	if (mq->use_cqe) {
-+		host->retune_now = host->need_retune && cqe_retune_ok &&
-+				   !host->hold_retune;
-+	}
-+
- 	blk_mq_start_request(req);
- 
- 	issued = mmc_blk_mq_issue_rq(mq, req);
-@@ -326,6 +469,7 @@ static void mmc_setup_queue(struct mmc_queue *mq, struct mmc_card *card)
- 	/* Initialize thread_sem even if it is not used */
- 	sema_init(&mq->thread_sem, 1);
- 
-+	INIT_WORK(&mq->recovery_work, mmc_mq_recovery_handler);
- 	INIT_WORK(&mq->complete_work, mmc_blk_mq_complete_work);
- 
- 	mutex_init(&mq->complete_lock);
-@@ -375,10 +519,18 @@ static int mmc_mq_init_queue(struct mmc_queue *mq, int q_depth,
- static int mmc_mq_init(struct mmc_queue *mq, struct mmc_card *card,
- 			 spinlock_t *lock)
- {
-+	struct mmc_host *host = card->host;
- 	int q_depth;
- 	int ret;
- 
--	q_depth = MMC_QUEUE_DEPTH;
-+	/*
-+	 * The queue depth for CQE must match the hardware because the request
-+	 * tag is used to index the hardware queue.
-+	 */
-+	if (mq->use_cqe)
-+		q_depth = min_t(int, card->ext_csd.cmdq_depth, host->cqe_qdepth);
-+	else
-+		q_depth = MMC_QUEUE_DEPTH;
- 
- 	ret = mmc_mq_init_queue(mq, q_depth, &mmc_mq_ops, lock);
- 	if (ret)
-@@ -408,7 +560,9 @@ int mmc_init_queue(struct mmc_queue *mq, struct mmc_card *card,
- 
- 	mq->card = card;
- 
--	if (mmc_host_use_blk_mq(host))
-+	mq->use_cqe = host->cqe_enabled;
-+
-+	if (mq->use_cqe || mmc_host_use_blk_mq(host))
- 		return mmc_mq_init(mq, card, lock);
- 
- 	mq->queue = blk_alloc_queue(GFP_KERNEL);
-diff --git a/drivers/mmc/core/queue.h b/drivers/mmc/core/queue.h
-index ce9249852f26..1d7d3b0afff8 100644
---- a/drivers/mmc/core/queue.h
-+++ b/drivers/mmc/core/queue.h
-@@ -17,6 +17,7 @@ enum mmc_issued {
- 
- enum mmc_issue_type {
- 	MMC_ISSUE_SYNC,
-+	MMC_ISSUE_DCMD,
- 	MMC_ISSUE_ASYNC,
- 	MMC_ISSUE_MAX,
- };
-@@ -92,8 +93,15 @@ struct mmc_queue {
- 	int			qcnt;
- 
- 	int			in_flight[MMC_ISSUE_MAX];
-+	unsigned int		cqe_busy;
-+#define MMC_CQE_DCMD_BUSY	BIT(0)
-+#define MMC_CQE_QUEUE_FULL	BIT(1)
-+	bool			use_cqe;
-+	bool			recovery_needed;
-+	bool			in_recovery;
- 	bool			rw_wait;
- 	bool			waiting;
-+	struct work_struct	recovery_work;
- 	wait_queue_head_t	wait;
- 	struct request		*complete_req;
- 	struct mutex		complete_lock;
-@@ -108,11 +116,21 @@ extern int mmc_init_queue(struct mmc_queue *, struct mmc_card *, spinlock_t *,
- extern unsigned int mmc_queue_map_sg(struct mmc_queue *,
- 				     struct mmc_queue_req *);
- 
-+void mmc_cqe_check_busy(struct mmc_queue *mq);
-+void mmc_cqe_recovery_notifier(struct mmc_request *mrq);
-+
- enum mmc_issue_type mmc_issue_type(struct mmc_queue *mq, struct request *req);
- 
- static inline int mmc_tot_in_flight(struct mmc_queue *mq)
- {
- 	return mq->in_flight[MMC_ISSUE_SYNC] +
-+	       mq->in_flight[MMC_ISSUE_DCMD] +
-+	       mq->in_flight[MMC_ISSUE_ASYNC];
-+}
-+
-+static inline int mmc_cqe_qcnt(struct mmc_queue *mq)
-+{
-+	return mq->in_flight[MMC_ISSUE_DCMD] +
- 	       mq->in_flight[MMC_ISSUE_ASYNC];
- }
- 
--- 
-1.9.1
+Single overwrite is enough if you are not defending against with NSA
+(or someone with way too much time and osciloscope). Two overwrites
+should be enough against them, too.
+
+OTOH... discard is performance optimalizaton. Are they sure it is
+always used when they need it?
+
+> I think that a similar problem also exist for SSDs, and it is even worse
+> there since writing twice to the same logical sector does not even go to
+> the same physical sector. The old data is not even overwritten.
+
+Exactly -- overwrite will not help on SSD. But discard _should_
+normally work on SSD, so this actually makes stuff worse on SSDs:
+you'll write random data to a new place, and then discard will erase
+that... making sure original data is intact.
+
+									Pavel
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html
+
+--Bqc0IY4JZZt50bUr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAloMrckACgkQMOfwapXb+vICVQCfRg9JwB5E9YEJKL36ZJTZbpat
+hP8AniLrb5tREQyffzh8k6gnxp3mY8hA
+=yQW5
+-----END PGP SIGNATURE-----
+
+--Bqc0IY4JZZt50bUr--
