@@ -1,42 +1,52 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:49296 "EHLO
-        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751966AbdKFLsx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Nov 2017 06:48:53 -0500
-Date: Mon, 6 Nov 2017 14:48:43 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] lightnvm: pblk: remove some unnecessary NULL checks
-Message-ID: <20171106114843.7rs6myhgxgij3jh7@mwanda>
+Received: from LGEAMRELO11.lge.com ([156.147.23.51]:60937 "EHLO
+        lgeamrelo11.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1759046AbdKPHgH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Nov 2017 02:36:07 -0500
+Subject: Re: [PATCH] locking/Documentation: Revise
+ Documentation/locking/crossrelease.txt
+To: Ingo Molnar <mingo@kernel.org>
+Cc: peterz@infradead.org, tglx@linutronix.de,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, kernel-team@lge.com
+References: <1510406792-28676-1-git-send-email-byungchul.park@lge.com>
+ <1510407214-31452-1-git-send-email-byungchul.park@lge.com>
+ <20171111134524.GA16714@X58A-UD3R> <20171116000456.GB4394@X58A-UD3R>
+ <20171116072237.jcztqvlnzerzyozh@gmail.com>
+From: Byungchul Park <byungchul.park@lge.com>
+Message-ID: <57849b74-b825-b4b2-7863-c22998b86291@lge.com>
+Date: Thu, 16 Nov 2017 16:36:02 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171116072237.jcztqvlnzerzyozh@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Smatch complains that flush_workqueue() dereferences the work queue
-pointer but then we check if it's NULL on the next line when it's too
-late.  These NULL checks can be removed because the module won't load if
-we can't allocate the work queues.
+On 11/16/2017 4:22 PM, Ingo Molnar wrote:
+> 
+> * Byungchul Park <byungchul.park@lge.com> wrote:
+> 
+>> On Sat, Nov 11, 2017 at 10:45:24PM +0900, Byungchul Park wrote:
+>>> This is the big one including all of version 3.
+>>>
+>>> You can take only this.
+>>
+>> Hello Ingo,
+>>
+>> Could you consider this?
+> 
+> Yeah, I'll have a look in a few days, but right now we are in the middle of the
+> merge window.
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+Thank you very much.
 
-diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-index 00d5698d64a9..aaba2049a135 100644
---- a/drivers/lightnvm/pblk-gc.c
-+++ b/drivers/lightnvm/pblk-gc.c
-@@ -669,12 +669,10 @@ void pblk_gc_exit(struct pblk *pblk)
- 		kthread_stop(gc->gc_reader_ts);
- 
- 	flush_workqueue(gc->gc_reader_wq);
--	if (gc->gc_reader_wq)
--		destroy_workqueue(gc->gc_reader_wq);
-+	destroy_workqueue(gc->gc_reader_wq);
- 
- 	flush_workqueue(gc->gc_line_reader_wq);
--	if (gc->gc_line_reader_wq)
--		destroy_workqueue(gc->gc_line_reader_wq);
-+	destroy_workqueue(gc->gc_line_reader_wq);
- 
- 	if (gc->gc_writer_ts)
- 		kthread_stop(gc->gc_writer_ts);
+> 
+> Thanks,
+> 
+> 	Ingo
+> 
+
+-- 
+Thanks,
+Byungchul
