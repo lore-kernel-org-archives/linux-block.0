@@ -1,74 +1,87 @@
-Return-Path: <BATV+adf086a54a2d754d8a83+5184+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 4/7] block: add a blk_steal_bios helper
-Date: Thu,  2 Nov 2017 21:29:51 +0300
-Message-Id: <20171102182954.9263-5-hch@lst.de>
-In-Reply-To: <20171102182954.9263-1-hch@lst.de>
-References: <20171102182954.9263-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from LGEAMRELO11.lge.com ([156.147.23.51]:40249 "EHLO
+        lgeamrelo11.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1759020AbdKPDOg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 15 Nov 2017 22:14:36 -0500
+From: Byungchul Park <byungchul.park@lge.com>
+To: peterz@infradead.org, mingo@kernel.org, akpm@linux-foundation.org
+Cc: tglx@linutronix.de, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org,
+        kernel-team@lge.com, jack@suse.cz, jlayton@redhat.com,
+        viro@zeniv.linux.org.uk, hannes@cmpxchg.org, npiggin@gmail.com,
+        rgoldwyn@suse.com, vbabka@suse.cz, mhocko@suse.com,
+        pombredanne@nexb.com, vinmenon@codeaurora.org,
+        gregkh@linuxfoundation.org
+Subject: [PATCH 2/3] lockdep: Apply lock_acquire(release) on __Set(__Clear)PageLocked
+Date: Thu, 16 Nov 2017 12:14:26 +0900
+Message-Id: <1510802067-18609-3-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <1510802067-18609-1-git-send-email-byungchul.park@lge.com>
+References: <1510802067-18609-1-git-send-email-byungchul.park@lge.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This helpers allows to bounce steal the uncompleted bios from a request so
-that they can be reissued on another path.
+Usually PG_locked bit is updated by lock_page() or unlock_page().
+However, it can be also updated through __SetPageLocked() or
+__ClearPageLockded(). They have to be considered, to get paired between
+acquire and release.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Furthermore, e.g. __SetPageLocked() in add_to_page_cache_lru() is called
+frequently. We might miss many chances to check deadlock if we ignore it.
+Make __Set(__Clear)PageLockded considered as well.
+
+Signed-off-by: Byungchul Park <byungchul.park@lge.com>
 ---
- block/blk-core.c       | 21 +++++++++++++++++++++
- include/linux/blkdev.h |  2 ++
- 2 files changed, 23 insertions(+)
+ include/linux/page-flags.h | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index b8c80f39f5fe..54fe673fb3ba 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2767,6 +2767,27 @@ struct request *blk_fetch_request(struct request_queue *q)
- }
- EXPORT_SYMBOL(blk_fetch_request);
+diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+index 584b14c..108d2dd 100644
+--- a/include/linux/page-flags.h
++++ b/include/linux/page-flags.h
+@@ -262,7 +262,6 @@ static __always_inline int PageCompound(struct page *page)
+ #define TESTSCFLAG_FALSE(uname)						\
+ 	TESTSETFLAG_FALSE(uname) TESTCLEARFLAG_FALSE(uname)
  
-+/*
-+ * Steal bios from a request and add them to a bio list.
-+ * The request must not have been partially completed before.
-+ */
-+void blk_steal_bios(struct bio_list *list, struct request *rq)
+-__PAGEFLAG(Locked, locked, PF_NO_TAIL)
+ PAGEFLAG(Waiters, waiters, PF_ONLY_HEAD) __CLEARPAGEFLAG(Waiters, waiters, PF_ONLY_HEAD)
+ PAGEFLAG(Error, error, PF_NO_COMPOUND) TESTCLEARFLAG(Error, error, PF_NO_COMPOUND)
+ PAGEFLAG(Referenced, referenced, PF_HEAD)
+@@ -374,6 +373,35 @@ static __always_inline int PageSwapCache(struct page *page)
+ PAGEFLAG(Idle, idle, PF_ANY)
+ #endif
+ 
++#ifdef CONFIG_LOCKDEP_PAGELOCK
++#include <linux/lockdep.h>
++
++TESTPAGEFLAG(Locked, locked, PF_NO_TAIL)
++
++static __always_inline void __SetPageLocked(struct page *page)
 +{
-+	if (rq->bio) {
-+		if (list->tail)
-+			list->tail->bi_next = rq->bio;
-+		else
-+			list->head = rq->bio;
-+		list->tail = rq->biotail;
++	__set_bit(PG_locked, &PF_NO_TAIL(page, 1)->flags);
 +
-+		rq->bio = NULL;
-+		rq->biotail = NULL;
-+	}
-+
-+	rq->__data_len = 0;
++	page = compound_head(page);
++	lock_acquire_exclusive((struct lockdep_map *)&page->map, 0, 1, NULL, _RET_IP_);
 +}
-+EXPORT_SYMBOL_GPL(blk_steal_bios);
 +
- /**
-  * blk_update_request - Special helper function for request stacking drivers
-  * @req:      the request being processed
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 780f01db5899..45c63764a14e 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1110,6 +1110,8 @@ extern struct request *blk_peek_request(struct request_queue *q);
- extern void blk_start_request(struct request *rq);
- extern struct request *blk_fetch_request(struct request_queue *q);
- 
-+void blk_steal_bios(struct bio_list *list, struct request *rq);
++static __always_inline void __ClearPageLocked(struct page *page)
++{
++	__clear_bit(PG_locked, &PF_NO_TAIL(page, 1)->flags);
++
++	page = compound_head(page);
++	/*
++	 * lock_commit_crosslock() is necessary for crosslock
++	 * when the lock is released, before lock_release().
++	 */
++	lock_commit_crosslock((struct lockdep_map *)&page->map);
++	lock_release((struct lockdep_map *)&page->map, 0, _RET_IP_);
++}
++#else
++__PAGEFLAG(Locked, locked, PF_NO_TAIL)
++#endif
 +
  /*
-  * Request completion related functions.
-  *
+  * On an anonymous page mapped into a user virtual memory area,
+  * page->mapping points to its anon_vma, not to a struct address_space;
 -- 
-2.14.2
+1.9.1
