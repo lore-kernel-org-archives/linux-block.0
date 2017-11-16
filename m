@@ -1,12 +1,11 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from LGEAMRELO12.lge.com ([156.147.23.52]:57790 "EHLO
-        lgeamrelo12.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751689AbdKXDCq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Nov 2017 22:02:46 -0500
-Date: Fri, 24 Nov 2017 12:02:36 +0900
-From: Byungchul Park <byungchul.park@lge.com>
-To: Michal Hocko <mhocko@kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:56134 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S934879AbdKPNHu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 16 Nov 2017 08:07:50 -0500
+Date: Thu, 16 Nov 2017 14:07:46 +0100
+From: Michal Hocko <mhocko@kernel.org>
+To: Byungchul Park <byungchul.park@lge.com>
 Cc: peterz@infradead.org, mingo@kernel.org, akpm@linux-foundation.org,
         tglx@linutronix.de, linux-kernel@vger.kernel.org,
         linux-mm@kvack.org, linux-block@vger.kernel.org,
@@ -15,101 +14,44 @@ Cc: peterz@infradead.org, mingo@kernel.org, akpm@linux-foundation.org,
         rgoldwyn@suse.com, vbabka@suse.cz, pombredanne@nexb.com,
         vinmenon@codeaurora.org, gregkh@linuxfoundation.org
 Subject: Re: [PATCH 1/3] lockdep: Apply crossrelease to PG_locked locks
-Message-ID: <20171124030236.GA28999@X58A-UD3R>
+Message-ID: <20171116130746.i642wszwvyb7q6hm@dhcp22.suse.cz>
 References: <1510802067-18609-1-git-send-email-byungchul.park@lge.com>
  <1510802067-18609-2-git-send-email-byungchul.park@lge.com>
  <20171116120216.nxbwkj5y3kvim6cj@dhcp22.suse.cz>
  <cf8aa555-7435-ea00-a4ee-3dcfd33ab5a0@lge.com>
- <20171116130746.i642wszwvyb7q6hm@dhcp22.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171116130746.i642wszwvyb7q6hm@dhcp22.suse.cz>
+In-Reply-To: <cf8aa555-7435-ea00-a4ee-3dcfd33ab5a0@lge.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Nov 16, 2017 at 02:07:46PM +0100, Michal Hocko wrote:
-> On Thu 16-11-17 21:48:05, Byungchul Park wrote:
-> > On 11/16/2017 9:02 PM, Michal Hocko wrote:
-> > > for each struct page. So you are doubling the size. Who is going to
-> > > enable this config option? You are moving this to page_ext in a later
-> > > patch which is a good step but it doesn't go far enough because this
-> > > still consumes those resources. Is there any problem to make this
-> > > kernel command line controllable? Something we do for page_owner for
-> > > example?
-> > 
-> > Sure. I will add it.
-> > 
-> > > Also it would be really great if you could give us some measures about
-> > > the runtime overhead. I do not expect it to be very large but this is
-> > 
-> > The major overhead would come from the amount of additional memory
-> > consumption for 'lockdep_map's.
+On Thu 16-11-17 21:48:05, Byungchul Park wrote:
+> On 11/16/2017 9:02 PM, Michal Hocko wrote:
+> > for each struct page. So you are doubling the size. Who is going to
+> > enable this config option? You are moving this to page_ext in a later
+> > patch which is a good step but it doesn't go far enough because this
+> > still consumes those resources. Is there any problem to make this
+> > kernel command line controllable? Something we do for page_owner for
+> > example?
 > 
-> yes
+> Sure. I will add it.
 > 
-> > Do you want me to measure the overhead by the additional memory
-> > consumption?
-> > 
-> > Or do you expect another overhead?
+> > Also it would be really great if you could give us some measures about
+> > the runtime overhead. I do not expect it to be very large but this is
 > 
-> I would be also interested how much impact this has on performance. I do
-> not expect it would be too large but having some numbers for cache cold
-> parallel kbuild or other heavy page lock workloads.
+> The major overhead would come from the amount of additional memory
+> consumption for 'lockdep_map's.
 
-Hello Michal,
+yes
 
-I measured 'cache cold parallel kbuild' on my qemu machine. The result
-varies much so I cannot confirm, but I think there's no meaningful
-difference between before and after applying crossrelease to page locks.
+> Do you want me to measure the overhead by the additional memory
+> consumption?
+> 
+> Or do you expect another overhead?
 
-Actually, I expect little overhead in lock_page() and unlock_page() even
-after applying crossreleas to page locks, but only expect a bit overhead
-by additional memory consumption for 'lockdep_map's per page.
-
-I run the following instructions within "QEMU x86_64 4GB memory 4 cpus":
-
-   make clean
-   echo 3 > drop_caches
-   time make -j4
-
-The results are:
-
-   # w/o page lock tracking
-
-   At the 1st try,
-   real     5m28.105s
-   user     17m52.716s
-   sys      3m8.871s
-
-   At the 2nd try,
-   real     5m27.023s
-   user     17m50.134s
-   sys      3m9.289s
-
-   At the 3rd try,
-   real     5m22.837s
-   user     17m34.514s
-   sys      3m8.097s
-
-   # w/ page lock tracking
-
-   At the 1st try,
-   real     5m18.158s
-   user     17m18.200s
-   sys      3m8.639s
-
-   At the 2nd try,
-   real     5m19.329s
-   user     17m19.982s
-   sys      3m8.345s
-
-   At the 3rd try,
-   real     5m19.626s
-   user     17m21.363s
-   sys      3m9.869s
-
-I think thers's no meaningful difference on my small machine.
-
---
-Thanks,
-Byungchul
+I would be also interested how much impact this has on performance. I do
+not expect it would be too large but having some numbers for cache cold
+parallel kbuild or other heavy page lock workloads.
+-- 
+Michal Hocko
+SUSE Labs
