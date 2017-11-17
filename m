@@ -1,72 +1,34 @@
-Return-Path: <msnitzer@redhat.com>
-Date: Tue, 21 Nov 2017 14:47:09 -0500
-From: Mike Snitzer <snitzer@redhat.com>
-To: NeilBrown <neilb@suse.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	device-mapper development <dm-devel@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Zdenek Kabelac <zkabelac@redhat.com>,
-	Mikulas Patocka <mpatocka@redhat.com>
-Subject: new patchset to eliminate DM's use of BIOSET_NEED_RESCUER [was: Re:
- [PATCH 00/13] block: assorted cleanup for bio splitting and cloning.]
-Message-ID: <20171121194709.GA18903@redhat.com>
-References: <149776047907.23258.8058071140236879834.stgit@noble>
- <20170618184143.GA10920@kernel.dk>
- <87poe13rmm.fsf@notabene.neil.brown.name>
- <CAMM=eLf9Vu-z1ZEsGtRoSkhpaaQXAdr8TsUYUCSmAjqrqo=W-w@mail.gmail.com>
- <87a7zg31vx.fsf@notabene.neil.brown.name>
- <20171121013533.GA14520@redhat.com>
- <20171121121049.GA17014@redhat.com>
- <20171121124311.GA17243@redhat.com>
+Return-Path: <mlyle@lyle.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171121124311.GA17243@redhat.com>
+In-Reply-To: <20171117150828.GA24694@lst.de>
+References: <1321800569.20171116152838@pvgoran.name> <CAPerZE-KiYVWXtBsu+SR0wCgbSJgzZAufm+3NYdoybjq+6ySbQ@mail.gmail.com>
+ <aa11e8f1-5120-9089-c1ad-43ac5057c029@lyle.org> <8a3d34b9-c49f-3870-fc7f-d337f7077c32@kernel.dk>
+ <3474003b-b49f-d811-4116-e2d5fac730ce@lyle.org> <CAJ+L6qf=6-dBxNf+LdeXNNu0qkXNE_xEUqU_rb6ZASonV6=1sw@mail.gmail.com>
+ <20171117150828.GA24694@lst.de>
+From: Michael Lyle <mlyle@lyle.org>
+Date: Fri, 17 Nov 2017 09:04:47 -0800
+Message-ID: <CAJ+L6qeLBZ7447PeLF8AW1FJyDeQFL38ufXGtwQV_NwfbE_Pxg@mail.gmail.com>
+Subject: Re: Regression in 4.14: wrong data being read from bcache device
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Campbell Steven <casteven@gmail.com>,
+	Pavel Goran <via-bcache@pvgoran.name>, linux-bcache <linux-bcache@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Kent Overstreet <kent.overstreet@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Nov 21 2017 at  7:43am -0500,
-Mike Snitzer <snitzer@redhat.com> wrote:
- 
-> Decided it a better use of my time to review and then hopefully use the
-> block-core's bio splitting infrastructure in DM.  Been meaning to do
-> that for quite a while anyway.  This mail from you just made it all the
-> more clear that needs doing:
-> https://www.redhat.com/archives/dm-devel/2017-September/msg00098.html
-> 
-> So I will start here on this patch you proposed:
-> https://www.redhat.com/archives/dm-devel/2017-September/msg00091.html
-> (of note, this patch slipped through the cracks because I was recovering
-> from injury when it originally came through).
-> 
-> Once DM is using q->bio_split I'll come back to this patch (aka
-> "[1]") as a starting point for the follow-on work to remove DM's use of
-> BIOSET_NEED_RESCUER:
-> https://www.redhat.com/archives/dm-devel/2017-August/msg00315.html
+On Fri, Nov 17, 2017 at 7:08 AM, Christoph Hellwig <hch@lst.de> wrote:
+> On Thu, Nov 16, 2017 at 07:07:40PM -0800, Michael Lyle wrote:
+>> I think the probable cause is this: we construct bios based on
+>> previously completed bios in a few places,
+>
+> That is an extremely bad idea in many ways, so I think we'll need
+> to fix this as the priority.
 
-Hey Neil,
+Yah, sorry, this wasn't actually the case.  I was sleep deprived and
+hadn't been able to follow it all yet.
 
-Good news!  All your code works ;)
+Bart points out that there's many remaining cases of assignment of
+disk where partno isn't assigned as well-- so I wonder if there are
+other potential problems from this.
 
-(well after 1 fixup due to a cut-n-paste bug.. the code you added to
-dm_wq_work() to process the md->rescued bio_list was operating on
-the md->deferred bio_list due to cut-n-paste from code you copied from
-just below it)
-
-I split your code out some to make it more reviewable.  I also tweaked
-headers accordingly.
-
-Please see this branch (which _will_ get rebased between now and the
-4.16 merge window):
-https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/log/?h=dm-4.16
-
-I successfully tested these changes using Mikulas' test program that
-reproduces the snapshot deadlock:
-https://www.redhat.com/archives/dm-devel/2017-January/msg00064.html
-
-I'll throw various other DM testsuites at it to verify they all look
-good (e.g. thinp, cache, multipath).
-
-I'm open to all suggestions about changes you'd like to see (either to
-these patches or anything you'd like to layer ontop of them).
-
-Thanks for all your work, much appreciated!
 Mike
