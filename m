@@ -1,64 +1,99 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qk0-f182.google.com ([209.85.220.182]:45420 "EHLO
-        mail-qk0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752999AbdKRA5l (ORCPT
+Received: from schatzi.steelbluetech.co.uk ([92.63.139.240]:62641 "EHLO
+        schatzi.steelbluetech.co.uk" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S933177AbdKQNnf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Nov 2017 19:57:41 -0500
-Received: by mail-qk0-f182.google.com with SMTP id d125so1512163qkc.12
-        for <linux-block@vger.kernel.org>; Fri, 17 Nov 2017 16:57:41 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <CAPGwLLNyjjxKOXA3RCFGSi4p-ZWZ5T9ADWP6EAqrfL3oUvMbFQ@mail.gmail.com>
-References: <CAPGwLLNwG+kLT9_QaCL5PBLS0a6K-x-iog+ON2pArUQWr1rWTg@mail.gmail.com>
- <1c715cc2-b656-36a8-4017-55052937df82@lyle.org> <CAPGwLLNyjjxKOXA3RCFGSi4p-ZWZ5T9ADWP6EAqrfL3oUvMbFQ@mail.gmail.com>
-From: Michael Lyle <mlyle@lyle.org>
-Date: Fri, 17 Nov 2017 16:57:40 -0800
-Message-ID: <CAJ+L6qen=5AVFr_q_r_F6jU8BTQ=t+7p94ucFW9HXEDD6AGEKg@mail.gmail.com>
+        Fri, 17 Nov 2017 08:43:35 -0500
 Subject: Re: [PATCH] bcache: recover data from backing device when read
  request hit clean
-To: Rui Hua <huarui.dev@gmail.com>
-Cc: Coly Li <i@coly.li>, Kent Overstreet <kent.overstreet@gmail.com>,
-        linux-bcache <linux-bcache@vger.kernel.org>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+To: Coly Li <colyli@suse.de>
+Cc: Rui Hua <huarui.dev@gmail.com>,
+        Stefan Priebe - Profihost AG <s.priebe@profihost.ag>,
+        Coly Li <i@coly.li>, Michael Lyle <mlyle@lyle.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <CAPGwLLNwG+kLT9_QaCL5PBLS0a6K-x-iog+ON2pArUQWr1rWTg@mail.gmail.com>
+ <dc6f513b-cca3-a37d-3379-2e12df21e825@suse.de>
+ <CAPGwLLPmUiz-6xjur5jPAn1QLvkJY23QcsPCNvK+4+BVubWYnw@mail.gmail.com>
+ <D393CD04-8C7A-4A8C-B23A-6C68D5544E34@profihost.ag>
+ <CAPGwLLNTwZ1WrRVqwaLK5h8Ovj5SN5-Y-2qja843hwx2kJCAUQ@mail.gmail.com>
+ <54dbc609-b448-68f6-bd9a-676fd5d21151@ehuk.net>
+ <dc4a100c-e1c0-ff9b-4a13-a90faf8a9d06@suse.de>
+From: Eddie Chapman <eddie@ehuk.net>
+Reply-To: Eddie Chapman <eddie@ehuk.net>
+Message-ID: <6b1f4824-cefb-480e-dc85-9058bce25db9@ehuk.net>
+Date: Fri, 17 Nov 2017 13:43:33 +0000
+MIME-Version: 1.0
+In-Reply-To: <dc4a100c-e1c0-ff9b-4a13-a90faf8a9d06@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Rui Hua--
-
-Thanks for the clarification.  You're correct, it doesn't get called,
-and it goes to read_complete.  However, read_error should probably get
-called.  How would you suggest handling this-- should we initially set
-read_dirty_data true and clear it if it is all clean?  (and change the
-condition to properly go into the error path).  As it is, the patch
-makes things no worse but the error path is very unsafe.
-
-Mike
-
-On Thu, Nov 16, 2017 at 8:25 PM, Rui Hua <huarui.dev@gmail.com> wrote:
-> Hi, Michael--
->
-> Thanks for the quickly reply.
->
-> If the metadata on the cache device was NOT correctly read,
-> cached_dev_read_error() will not be called, so the recovery check will
-> not be executed. so this patch is safe.
-> s->iop.error was not set when faild to read metadata on the cache
-> device, so the  cached_dev_bio_complete() will be called instead of
-> cached_dev_read_error()
->
-> 2017-11-17 12:02 GMT+08:00 Michael Lyle <mlyle@lyle.org>:
->> Hi, Rui Hua--
+On 17/11/17 13:22, Coly Li wrote:
+> On 17/11/2017 8:57 PM, Eddie Chapman wrote:
+>> On 17/11/17 10:20, Rui Hua wrote:
+>>> Hi, Stefan
+>>>
+>>> 2017-11-17 16:28 GMT+08:00 Stefan Priebe - Profihost AG
+>>> <s.priebe@profihost.ag>:
+>>>> I‘m getting the same xfs error message under high load. Does this
+>>>> patch fix
+>>>> it?
+>>>>
+>>> Did you applied the patch "bcache: only permit to recovery read error
+>>> when cache device is clean" ?
+>>> If you did, maybe this patch can fix it. And you'd better check
+>>> /sys/fs/bcache/XXX/internal/cache_read_races in your environment,
+>>> meanwhile, it should not be zero when you get that err message.
 >>
->> On 11/16/2017 07:51 PM, Rui Hua wrote:
->>> In this patch, we use s->read_dirty_data to judge whether the read
->>> request hit dirty data in cache device, it is safe to reread data from
->>> the backing device when the read request hit clean data. This can not
->>> only handle cache read race, but also recover data when failed read
->>> request from cache device.
+>> Hi all,
 >>
->> I haven't read over all of this yet, to understand the read race.  But
->> this change can't be safe-- read_dirty_data only is set to true if the
->> metadata on the cache device is correctly read.  If that fails, the flag
->> may not be set and we could read stale data on the backing device.
+>> I have 3 servers running a very recent 4.9 stable release, with several
+>> recent bcache patches cherry picked, including V4 of "bcache: only
+>> permit to recovery read error when cache device is clean".
 >>
->> Mike
+>> In the 3 weeks since using these cherry picks I've experienced a very
+>> small number of isolated read errors in the layer above bcache, on all 3
+>> servers.
+>>
+>> On one of the servers, 2 out of the 6 bcache resources have a value of 1
+>> in /sys/fs/bcache/XXX/internal/cache_read_races, and it is on these same
+>> 2 bcache resources where one read error has occurred on the upper layer.
+>> The other 4 bcache resources have 0 in cache_read_races and I haven't
+>> had any read errors on the layers above them.
+>>
+>> On another server, I have 1 bcache resource out of 10 with a value of 5
+>> in /sys/fs/bcache/XXX/internal/cache_read_races, and it is on that
+>> bcache resource where a read error occurred on one occasion. The other 9
+>> bcache resources have 0 in cache_read_races, and no read errors have
+>> occurred on the layers above any of them.
+>>
+>> On the 3rd server where some read errors occurred, I cannot verify if
+>> there were positive values in cache_read_races as I moved the data from
+>> there onto other storage, and shut down the bcache resources where the
+>> errors occurred.
+>>
+>> If I can provide any other info which might help with this issue, please
+>> let me know.
+> 
+> Hi Eddie,
+> 
+> This is very informative, thank you so much :-)
+> 
+> Coly Li
+
+Hi Coly,
+
+You are most welcome. Another interesting info, but maybe it is 
+unrelated/coincidence: the bcache resources where the errors occurred, 
+the underlying backing device was a raid adapter that is quite a lot 
+slower than the (different) underlying physical storage on the other 
+bcache resources that do not have read races. Up to now I had suspected 
+a driver issue with this raid adapter as causing the read errors, so I 
+started the process of gradually retiring the adapter on these servers 
+in the last 3 weeks. Anyway, in light of this issue coming up here I'm 
+wondering if this is significant in suggesting possibly that the read 
+races are more likely to occur if the backing storage is quite slow. Or 
+maybe not.
+
+Eddie
