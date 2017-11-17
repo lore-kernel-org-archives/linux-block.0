@@ -1,49 +1,64 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [GIT PULL] Followup merge window block fixes/changes
-To: Linus Torvalds <torvalds@linux-foundation.org>,
- Luca Miccio <lucmiccio@gmail.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <82ee3a59-1767-3073-7893-bf78b5933c5e@kernel.dk>
- <CA+55aFy34p7YAtts5e0Uxt5drKws8QHw5nPDoBi64YX2xXnLrw@mail.gmail.com>
- <CA+55aFxeRBHhTyKTHPYGAz3+bUv-ObLNwMLtqRV-cftuDhLxZA@mail.gmail.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <0f58f74a-705c-ce6b-2ef1-e3a267a03b7c@kernel.dk>
-Date: Fri, 17 Nov 2017 14:26:10 -0700
+Return-Path: <linus971@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CA+55aFxeRBHhTyKTHPYGAz3+bUv-ObLNwMLtqRV-cftuDhLxZA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+Sender: linus971@gmail.com
+In-Reply-To: <64E6F87F-FEF8-46D2-B7FA-4626EE3EA14E@linaro.org>
+References: <82ee3a59-1767-3073-7893-bf78b5933c5e@kernel.dk>
+ <CA+55aFy34p7YAtts5e0Uxt5drKws8QHw5nPDoBi64YX2xXnLrw@mail.gmail.com> <64E6F87F-FEF8-46D2-B7FA-4626EE3EA14E@linaro.org>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 17 Nov 2017 12:34:11 -0800
+Message-ID: <CA+55aFyo0Md9G5xF40jLL8DwjBHCaxPn628xUEVG=yr3d6YBUg@mail.gmail.com>
+Subject: Re: [GIT PULL] Followup merge window block fixes/changes
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Luca Miccio <lucmiccio@gmail.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On 11/17/2017 12:35 PM, Linus Torvalds wrote:
-> On Fri, Nov 17, 2017 at 11:29 AM, Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
->>
->> "F*ck no, that code is too ugly, you need to write it so that it can
->> be maintained".
-> 
-> Dammit, the rest of the pull looks ok, so I'll take it anyway.
-> 
-> But I really do expect you to
-> 
->  (a) clean up that mess - maybe with my patch as an example, but maybe
-> some entirely different way. The patch I sent is already deleted from
-> my tree, it was purely meant as an example.
-> 
->  (b) really push back on people when they send you ugly code
-> 
-> It shouldn't have to always be me being upset and pushing back on the
-> block pulls.
+On Fri, Nov 17, 2017 at 12:18 PM, Paolo Valente
+<paolo.valente@linaro.org> wrote:
+>
+> Sorry for causing this problem.  Yours was our first version, but then
+> we feared that leaving useless instructions was worse than adding a
+> burst of ifdefs. I'll try not to repeat this mistake.
 
-My bad, I have probably given Paolo and Luca a bit more leeway than
-usual, since they are new to upstream development and the BFQ code does
-need some cleanups here and there. A huge part of that was completed as
-part of getting it merged, but it still needs a bit of love.
+So I generally do not want people to depend on the compiler to do
+non-obvious conversions (so please do not write bad code that you just
+hope the compiler can sort out and make reasonable), but we do heavily
+rely on the compiler doing the obvious dead code removal particularly
+for when things end up not being used.
 
-Now that they have received the Linus hazing, I guess the honey moon is
-over.
+A lot of the time that's very much something you can and should depend
+on, because we have abstraction layers that involves a lot of code
+just becoming no-ops on many architectures, but other architectures
+need some particular sequence.
 
-In all seriousness, I do push back on crap quite often. Sometimes I miss
-some too...
+Another example is a lot of helper functions to do verification of
+various kernel rules that then are enabled by some debug option (eg
+CONFIG_DEBUG_ATOMIC_SLEEP etc), where we know that (and depend on)
+the compiler will do a reasonable job.
 
--- 
-Jens Axboe
+That's not so different from having "statistics gathering function
+that compiles to nothing".
+
+And yes, sometimes the code might need to be written so that the
+compiler has an easier time _seeing_ that the core really goes away,
+so it's not necessarily a blind trust in the compiler.
+
+So for example,  the functions that can go away should obviously be
+inline functions so that you don't end up having the compiler generate
+the arguments and the call to an empty function body, and so that the
+compiler can see that "oh, those arguments aren't even used at all, so
+now I can remove all the code that generates them".
+
+If you are comfy with assembler, it can actually be a great thing to
+occasionally just verify the actual generated code if it's some piece
+of code you care deeply about. Obviously for performance work,
+profiling happens, and then you see it that way.
+
+Because sometimes you find some silly "Duh!" moments, where you didn't
+realize that the compiler wasn't able to really get rid of something
+for some reason that is usually very obvious in hindsight, but wasn't
+actually obvious at all until you looked at what the compiler
+generated.
+
+                   Linus
