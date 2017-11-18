@@ -1,20 +1,21 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-vk0-f54.google.com ([209.85.213.54]:39922 "EHLO
-        mail-vk0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1424334AbdKRRBD (ORCPT
+Received: from mail-qk0-f182.google.com ([209.85.220.182]:45420 "EHLO
+        mail-qk0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752999AbdKRA5l (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Nov 2017 12:01:03 -0500
+        Fri, 17 Nov 2017 19:57:41 -0500
+Received: by mail-qk0-f182.google.com with SMTP id d125so1512163qkc.12
+        for <linux-block@vger.kernel.org>; Fri, 17 Nov 2017 16:57:41 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAJ+L6qen=5AVFr_q_r_F6jU8BTQ=t+7p94ucFW9HXEDD6AGEKg@mail.gmail.com>
+In-Reply-To: <CAPGwLLNyjjxKOXA3RCFGSi4p-ZWZ5T9ADWP6EAqrfL3oUvMbFQ@mail.gmail.com>
 References: <CAPGwLLNwG+kLT9_QaCL5PBLS0a6K-x-iog+ON2pArUQWr1rWTg@mail.gmail.com>
  <1c715cc2-b656-36a8-4017-55052937df82@lyle.org> <CAPGwLLNyjjxKOXA3RCFGSi4p-ZWZ5T9ADWP6EAqrfL3oUvMbFQ@mail.gmail.com>
- <CAJ+L6qen=5AVFr_q_r_F6jU8BTQ=t+7p94ucFW9HXEDD6AGEKg@mail.gmail.com>
-From: Rui Hua <huarui.dev@gmail.com>
-Date: Sun, 19 Nov 2017 01:00:41 +0800
-Message-ID: <CAPGwLLPggTUZ6OtnvTQ+tHnGCRcP-4mN11MG1fpAX0JFQXakuA@mail.gmail.com>
+From: Michael Lyle <mlyle@lyle.org>
+Date: Fri, 17 Nov 2017 16:57:40 -0800
+Message-ID: <CAJ+L6qen=5AVFr_q_r_F6jU8BTQ=t+7p94ucFW9HXEDD6AGEKg@mail.gmail.com>
 Subject: Re: [PATCH] bcache: recover data from backing device when read
  request hit clean
-To: Michael Lyle <mlyle@lyle.org>
+To: Rui Hua <huarui.dev@gmail.com>
 Cc: Coly Li <i@coly.li>, Kent Overstreet <kent.overstreet@gmail.com>,
         linux-bcache <linux-bcache@vger.kernel.org>,
         linux-block@vger.kernel.org
@@ -22,26 +23,42 @@ Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi, Michael
+Rui Hua--
 
-> Thanks for the clarification.  You're correct, it doesn't get called,
-> and it goes to read_complete.  However, read_error should probably get
-> called.  How would you suggest handling this-- should we initially set
-> read_dirty_data true and clear it if it is all clean?  (and change the
-> condition to properly go into the error path).  As it is, the patch
-> makes things no worse but the error path is very unsafe.
+Thanks for the clarification.  You're correct, it doesn't get called,
+and it goes to read_complete.  However, read_error should probably get
+called.  How would you suggest handling this-- should we initially set
+read_dirty_data true and clear it if it is all clean?  (and change the
+condition to properly go into the error path).  As it is, the patch
+makes things no worse but the error path is very unsafe.
 
-Yes, init read_dirty_data to true is an option, but I think it is not
-so easy to judge whether it is all clean, because a read request may
-cover several keys(just as Coly mentioned in previous reply), probably
-some of them are dirty, others are clean, and cache_lookup_fn() was
-called on each of these keys when read request search them on btree,
-which means we should count and mark them in some place?
+Mike
 
-Maybe we can set s->iop.status when metadata I/O error, and clear
-s->recoverable at the same time (add the code in cache_lookup(), after
-bch_btree_map_keys() returns), then it can goto the read_error path,
-and will not goto the recovery code.  This option is just a idea,
-certainly, we should consider other exception cases.
-
-Thanks,
+On Thu, Nov 16, 2017 at 8:25 PM, Rui Hua <huarui.dev@gmail.com> wrote:
+> Hi, Michael--
+>
+> Thanks for the quickly reply.
+>
+> If the metadata on the cache device was NOT correctly read,
+> cached_dev_read_error() will not be called, so the recovery check will
+> not be executed. so this patch is safe.
+> s->iop.error was not set when faild to read metadata on the cache
+> device, so the  cached_dev_bio_complete() will be called instead of
+> cached_dev_read_error()
+>
+> 2017-11-17 12:02 GMT+08:00 Michael Lyle <mlyle@lyle.org>:
+>> Hi, Rui Hua--
+>>
+>> On 11/16/2017 07:51 PM, Rui Hua wrote:
+>>> In this patch, we use s->read_dirty_data to judge whether the read
+>>> request hit dirty data in cache device, it is safe to reread data from
+>>> the backing device when the read request hit clean data. This can not
+>>> only handle cache read race, but also recover data when failed read
+>>> request from cache device.
+>>
+>> I haven't read over all of this yet, to understand the read race.  But
+>> this change can't be safe-- read_dirty_data only is set to true if the
+>> metadata on the cache device is correctly read.  If that fails, the flag
+>> may not be set and we could read stale data on the backing device.
+>>
+>> Mike
