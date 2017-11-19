@@ -1,125 +1,65 @@
-Return-Path: <prvs=479c705ad=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, "Christoph
- Hellwig" <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Oleksandr Natalenko <oleksandr@natalenko.name>, Ming Lei
-	<ming.lei@redhat.com>, Martin Steigerwald <martin@lichtvoll.de>, "Bart Van
- Assche" <bart.vanassche@wdc.com>
-Subject: [PATCH v12 1/7] block: Make q_usage_counter also track legacy requests
-Date: Thu, 9 Nov 2017 10:49:53 -0800
-Message-ID: <20171109184959.4617-2-bart.vanassche@wdc.com>
-In-Reply-To: <20171109184959.4617-1-bart.vanassche@wdc.com>
-References: <20171109184959.4617-1-bart.vanassche@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:35945 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750915AbdKST7c (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 19 Nov 2017 14:59:32 -0500
+Received: by mail-pg0-f67.google.com with SMTP id k190so1026825pga.3
+        for <linux-block@vger.kernel.org>; Sun, 19 Nov 2017 11:59:32 -0800 (PST)
+Subject: Re: [RFC] bcache: fix a circular dead locking with dc->writeback_lock
+ and bch_register_lock
+To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+References: <20171118081415.49669-1-colyli@suse.de>
+ <a64160cc-f008-3732-4c95-818368614cbb@lyle.org>
+ <136f0ccd-0bdb-c4a2-9b42-d76c6361ac26@suse.de>
+From: Michael Lyle <mlyle@lyle.org>
+Message-ID: <1c0eeb2d-7c7a-466f-370c-89f8ae5c3c92@lyle.org>
+Date: Sun, 19 Nov 2017 11:59:29 -0800
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <136f0ccd-0bdb-c4a2-9b42-d76c6361ac26@suse.de>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Ming Lei <ming.lei@redhat.com>
+On 11/18/2017 09:32 AM, Coly Li wrote:
+> On 19/11/2017 1:01 AM, Michael Lyle wrote:
+>> Coly--
+>>
+>> It's a real circular lock dep between registration (a very rare
+>> operation) and writeback rate calculation (a fairly rare operation).
+>> While it's definitely a real issue, it's a very unlikely one to be
+>> actually encountered.
+>>
+>> (Encountering it requires the every-5-second periodic task of
+>> calculating writeback to be running, between writeback lock and register
+>> lock [a pretty short window], and then for the user to register a new
+>> cached volume)
+>>
+> 
+> Hi Mike,
+> 
+> Thanks for response. It seems I can almost 100% reproduce this lockdep
+> warning on my simple test environment. Just compiling mainline kernel
+> with locking debug enabled, then attach a backing device to a cache
+> device, and use fio to write around 30G 4KB blocksize data on bcache
+> device. This is why this warning grabs my eyes.
+> 
+> From the lockdep warning it seems this should be very rare to happen,
+> but I don't know why it happens almost every time in my testing...
 
-This patch makes it possible to pause request allocation for
-the legacy block layer by calling blk_mq_freeze_queue() and
-blk_mq_unfreeze_queue().
+Coly--
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-[ bvanassche: Combined two patches into one, edited a comment and made sure
-  REQ_NOWAIT is handled properly in blk_old_get_request() ]
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Tested-by: Martin Steigerwald <martin@lichtvoll.de>
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Cc: Ming Lei <ming.lei@redhat.com>
----
- block/blk-core.c | 12 ++++++++++++
- block/blk-mq.c   | 10 ++--------
- 2 files changed, 14 insertions(+), 8 deletions(-)
+Do you get an actual deadlock here, or just a lockdep warning?  The
+lockdep warning just lets you know that locks were acquired in different
+orders and that an issue is possible.  I'd expect a lockdep warning
+every time, but almost never an actual deadlock.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 5e81dcf4690a..a4362849059a 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -612,6 +612,9 @@ void blk_set_queue_dying(struct request_queue *q)
- 		}
- 		spin_unlock_irq(q->queue_lock);
- 	}
-+
-+	/* Make blk_queue_enter() reexamine the DYING flag. */
-+	wake_up_all(&q->mq_freeze_wq);
- }
- EXPORT_SYMBOL_GPL(blk_set_queue_dying);
- 
-@@ -1398,16 +1401,22 @@ static struct request *blk_old_get_request(struct request_queue *q,
- 					   unsigned int op, gfp_t gfp_mask)
- {
- 	struct request *rq;
-+	int ret = 0;
- 
- 	WARN_ON_ONCE(q->mq_ops);
- 
- 	/* create ioc upfront */
- 	create_io_context(gfp_mask, q->node);
- 
-+	ret = blk_queue_enter(q, !(gfp_mask & __GFP_DIRECT_RECLAIM) ||
-+			      (op & REQ_NOWAIT));
-+	if (ret)
-+		return ERR_PTR(ret);
- 	spin_lock_irq(q->queue_lock);
- 	rq = get_request(q, op, NULL, gfp_mask);
- 	if (IS_ERR(rq)) {
- 		spin_unlock_irq(q->queue_lock);
-+		blk_queue_exit(q);
- 		return rq;
- 	}
- 
-@@ -1579,6 +1588,7 @@ void __blk_put_request(struct request_queue *q, struct request *req)
- 		blk_free_request(rl, req);
- 		freed_request(rl, sync, rq_flags);
- 		blk_put_rl(rl);
-+		blk_queue_exit(q);
- 	}
- }
- EXPORT_SYMBOL_GPL(__blk_put_request);
-@@ -1860,8 +1870,10 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
- 	 * Grab a free request. This is might sleep but can not fail.
- 	 * Returns with the queue unlocked.
- 	 */
-+	blk_queue_enter_live(q);
- 	req = get_request(q, bio->bi_opf, bio, GFP_NOIO);
- 	if (IS_ERR(req)) {
-+		blk_queue_exit(q);
- 		__wbt_done(q->rq_wb, wb_acct);
- 		if (PTR_ERR(req) == -ENOMEM)
- 			bio->bi_status = BLK_STS_RESOURCE;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 2396f036c388..2b7d95b2cdfb 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -126,7 +126,8 @@ void blk_freeze_queue_start(struct request_queue *q)
- 	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
- 	if (freeze_depth == 1) {
- 		percpu_ref_kill(&q->q_usage_counter);
--		blk_mq_run_hw_queues(q, false);
-+		if (q->mq_ops)
-+			blk_mq_run_hw_queues(q, false);
- 	}
- }
- EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
-@@ -256,13 +257,6 @@ void blk_mq_wake_waiters(struct request_queue *q)
- 	queue_for_each_hw_ctx(q, hctx, i)
- 		if (blk_mq_hw_queue_mapped(hctx))
- 			blk_mq_tag_wakeup_all(hctx->tags, true);
--
--	/*
--	 * If we are called because the queue has now been marked as
--	 * dying, we need to ensure that processes currently waiting on
--	 * the queue are notified as well.
--	 */
--	wake_up_all(&q->mq_freeze_wq);
- }
- 
- bool blk_mq_can_queue(struct blk_mq_hw_ctx *hctx)
--- 
-2.14.3
+> [snip] 
+> Another warning is the nested locking in btree levels, so far I don't
+> have no idea what happens here yet ....
+
+I am guessing there is a missing free of a lock-- which only creates
+problems with lockdep on but we should fix it.
+
+Mike
