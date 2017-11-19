@@ -1,50 +1,119 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:45167 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753764AbdKISpe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Nov 2017 13:45:34 -0500
-Received: by mail-wm0-f66.google.com with SMTP id y80so19120968wmd.0
-        for <linux-block@vger.kernel.org>; Thu, 09 Nov 2017 10:45:33 -0800 (PST)
-From: Ilya Dryomov <idryomov@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@fb.com>,
-        Tejun Heo <tj@kernel.org>, David Disseldorp <ddiss@suse.de>
-Subject: [PATCH 0/2] block: enforce ioctl(BLKROSET) and set_disk_ro()
-Date: Thu,  9 Nov 2017 19:44:59 +0100
-Message-Id: <1510253101-10291-1-git-send-email-idryomov@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <marcos.souza.org@gmail.com>
+Return-Path: <marcos.souza.org@gmail.com>
+From: Marcos Paulo de Souza <marcos.souza.org@gmail.com>
+To: 
+Cc: Marcos Paulo de Souza <marcos.souza.org@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCHv2 -next] blktrace.c: Use blk_trace_bio_get_cgid inside blk_add_trace_bio
+Date: Sun, 19 Nov 2017 17:59:26 -0200
+Message-Id: <20171119195931.27774-1-marcos.souza.org@gmail.com>
+In-Reply-To: <20171119184817.15754-1-marcos.souza.org@gmail.com>
+References: <20171119184817.15754-1-marcos.souza.org@gmail.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Hello,
+Instead of calling blk_trace_bio_get_cgid(q, bio)) seven times, call it directly
+inside blk_add_trace_bio.
 
-I was doing some cleanup work on rbd BLKROSET handler and discovered
-that we ignore partition rw/ro setting (hd_struct->policy) for pretty
-much everything but straight writes.
+Signed-off-by: Marcos Paulo de Souza <marcos.souza.org@gmail.com>
+---
 
-David (CCed) has blktests patches standing by.
+Discovered when checking the missing documentation of cgid in blk_add_trace_bio
+function when running make pdfdocs.
 
-(Another aspect of this is that we don't enforce open(2) mode.  Tejun
-took a stab at this a few years ago, but his patch had to be reverted:
+ kernel/trace/blktrace.c | 26 ++++++++++----------------
+ 1 file changed, 10 insertions(+), 16 deletions(-)
 
-  75f1dc0d076d ("block: check bdev_read_only() from blkdev_get()")
-  e51900f7d38c ("block: revert block_dev read-only check")
-
-It is a separate issue and refusing writes to read-only devices is
-obviously more important, but perhaps it's time to revisit that as
-well?)
-
-Thanks,
-
-                Ilya
-
-
-Ilya Dryomov (2):
-  block: fail op_is_write() requests to read-only partitions
-  block: add bdev_read_only() checks to common helpers
-
- block/blk-core.c | 23 ++++++++++++++++++++++-
- block/blk-lib.c  | 12 ++++++++++++
- 2 files changed, 34 insertions(+), 1 deletion(-)
-
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 206e0e2ace53..c5987d4c5f23 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -872,7 +872,7 @@ static void blk_add_trace_rq_complete(void *ignore, struct request *rq,
+  *
+  **/
+ static void blk_add_trace_bio(struct request_queue *q, struct bio *bio,
+-			      u32 what, int error, union kernfs_node_id *cgid)
++			      u32 what, int error)
+ {
+ 	struct blk_trace *bt = q->blk_trace;
+ 
+@@ -880,22 +880,21 @@ static void blk_add_trace_bio(struct request_queue *q, struct bio *bio,
+ 		return;
+ 
+ 	__blk_add_trace(bt, bio->bi_iter.bi_sector, bio->bi_iter.bi_size,
+-			bio_op(bio), bio->bi_opf, what, error, 0, NULL, cgid);
++			bio_op(bio), bio->bi_opf, what, error, 0, NULL,
++			blk_trace_bio_get_cgid(q, bio));
+ }
+ 
+ static void blk_add_trace_bio_bounce(void *ignore,
+ 				     struct request_queue *q, struct bio *bio)
+ {
+-	blk_add_trace_bio(q, bio, BLK_TA_BOUNCE, 0,
+-			  blk_trace_bio_get_cgid(q, bio));
++	blk_add_trace_bio(q, bio, BLK_TA_BOUNCE, 0);
+ }
+ 
+ static void blk_add_trace_bio_complete(void *ignore,
+ 				       struct request_queue *q, struct bio *bio,
+ 				       int error)
+ {
+-	blk_add_trace_bio(q, bio, BLK_TA_COMPLETE, error,
+-			  blk_trace_bio_get_cgid(q, bio));
++	blk_add_trace_bio(q, bio, BLK_TA_COMPLETE, error);
+ }
+ 
+ static void blk_add_trace_bio_backmerge(void *ignore,
+@@ -903,8 +902,7 @@ static void blk_add_trace_bio_backmerge(void *ignore,
+ 					struct request *rq,
+ 					struct bio *bio)
+ {
+-	blk_add_trace_bio(q, bio, BLK_TA_BACKMERGE, 0,
+-			 blk_trace_bio_get_cgid(q, bio));
++	blk_add_trace_bio(q, bio, BLK_TA_BACKMERGE, 0);
+ }
+ 
+ static void blk_add_trace_bio_frontmerge(void *ignore,
+@@ -912,15 +910,13 @@ static void blk_add_trace_bio_frontmerge(void *ignore,
+ 					 struct request *rq,
+ 					 struct bio *bio)
+ {
+-	blk_add_trace_bio(q, bio, BLK_TA_FRONTMERGE, 0,
+-			  blk_trace_bio_get_cgid(q, bio));
++	blk_add_trace_bio(q, bio, BLK_TA_FRONTMERGE, 0);
+ }
+ 
+ static void blk_add_trace_bio_queue(void *ignore,
+ 				    struct request_queue *q, struct bio *bio)
+ {
+-	blk_add_trace_bio(q, bio, BLK_TA_QUEUE, 0,
+-			  blk_trace_bio_get_cgid(q, bio));
++	blk_add_trace_bio(q, bio, BLK_TA_QUEUE, 0);
+ }
+ 
+ static void blk_add_trace_getrq(void *ignore,
+@@ -928,8 +924,7 @@ static void blk_add_trace_getrq(void *ignore,
+ 				struct bio *bio, int rw)
+ {
+ 	if (bio)
+-		blk_add_trace_bio(q, bio, BLK_TA_GETRQ, 0,
+-				  blk_trace_bio_get_cgid(q, bio));
++		blk_add_trace_bio(q, bio, BLK_TA_GETRQ, 0);
+ 	else {
+ 		struct blk_trace *bt = q->blk_trace;
+ 
+@@ -945,8 +940,7 @@ static void blk_add_trace_sleeprq(void *ignore,
+ 				  struct bio *bio, int rw)
+ {
+ 	if (bio)
+-		blk_add_trace_bio(q, bio, BLK_TA_SLEEPRQ, 0,
+-				  blk_trace_bio_get_cgid(q, bio));
++		blk_add_trace_bio(q, bio, BLK_TA_SLEEPRQ, 0);
+ 	else {
+ 		struct blk_trace *bt = q->blk_trace;
+ 
 -- 
-2.4.3
+2.13.6
