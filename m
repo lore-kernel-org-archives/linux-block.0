@@ -1,74 +1,42 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38666 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751867AbdKTTaE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Nov 2017 14:30:04 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id vAKJT4lj088463
-        for <linux-block@vger.kernel.org>; Mon, 20 Nov 2017 14:30:03 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2ec0dchkby-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 20 Nov 2017 14:30:02 -0500
-Received: from localhost
-        by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 20 Nov 2017 19:30:01 -0000
+Return-Path: <prvs=4901f3e44=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "virtualization@lists.linux-foundation.org"
+	<virtualization@lists.linux-foundation.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
+	"borntraeger@de.ibm.com" <borntraeger@de.ibm.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "jasowang@redhat.com" <jasowang@redhat.com>
 Subject: Re: 4.14: WARNING: CPU: 4 PID: 2895 at block/blk-mq.c:1144 with
  virtio-blk
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "virtualization@lists.linux-foundation.org"
-        <virtualization@lists.linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "jasowang@redhat.com" <jasowang@redhat.com>
+Date: Mon, 20 Nov 2017 19:20:46 +0000
+Message-ID: <1511205644.2396.32.camel@wdc.com>
 References: <9c5eec5d-f542-4d76-6933-6fe31203ce09@de.ibm.com>
- <1511205644.2396.32.camel@wdc.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 20 Nov 2017 20:29:56 +0100
+In-Reply-To: <9c5eec5d-f542-4d76-6933-6fe31203ce09@de.ibm.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1511205644.2396.32.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Message-Id: <04526c98-ffc5-1eca-3aa8-50f9212c4323@de.ibm.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-
-
-On 11/20/2017 08:20 PM, Bart Van Assche wrote:
-> On Fri, 2017-11-17 at 15:42 +0100, Christian Borntraeger wrote:
->> This is 
->>
->> b7a71e66d (Jens Axboe                2017-08-01 09:28:24 -0600 1141)     * are mapped to it.
->> b7a71e66d (Jens Axboe                2017-08-01 09:28:24 -0600 1142)     */
->> 6a83e74d2 (Bart Van Assche           2016-11-02 10:09:51 -0600 1143)    WARN_ON(!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) &&
->> 6a83e74d2 (Bart Van Assche           2016-11-02 10:09:51 -0600 1144)            cpu_online(hctx->next_cpu));
->> 6a83e74d2 (Bart Van Assche           2016-11-02 10:09:51 -0600 1145) 
->> b7a71e66d (Jens Axboe                2017-08-01 09:28:24 -0600 1146)    /*
-> 
-> Did you really try to figure out when the code that reported the warning
-> was introduced? I think that warning was introduced through the following
-> commit:
-
-This was more a cut'n'paste to show which warning triggered since line numbers are somewhat volatile.
-
-> 
-> commit fd1270d5df6a005e1248e87042159a799cc4b2c9
-> Date:   Wed Apr 16 09:23:48 2014 -0600
-> 
->     blk-mq: don't use preempt_count() to check for right CPU
->      
->     UP or CONFIG_PREEMPT_NONE will return 0, and what we really
->     want to check is whether or not we are on the right CPU.
->     So don't make PREEMPT part of this, just test the CPU in
->     the mask directly.
-> 
-> Anyway, I think that warning is appropriate and useful. So the next step
-> is to figure out what work item was involved and why that work item got
-> executed on the wrong CPU.
-
-It seems to be related to virtio-blk (is triggered by fio on such disks). Your comment basically
-says: "no this is not a known issue" then :-)
-I will try to take a dump to find out the work item
+T24gRnJpLCAyMDE3LTExLTE3IGF0IDE1OjQyICswMTAwLCBDaHJpc3RpYW4gQm9ybnRyYWVnZXIg
+d3JvdGU6DQo+IFRoaXMgaXMgDQo+IA0KPiBiN2E3MWU2NmQgKEplbnMgQXhib2UgICAgICAgICAg
+ICAgICAgMjAxNy0wOC0wMSAwOToyODoyNCAtMDYwMCAxMTQxKSAgICAgKiBhcmUgbWFwcGVkIHRv
+IGl0Lg0KPiBiN2E3MWU2NmQgKEplbnMgQXhib2UgICAgICAgICAgICAgICAgMjAxNy0wOC0wMSAw
+OToyODoyNCAtMDYwMCAxMTQyKSAgICAgKi8NCj4gNmE4M2U3NGQyIChCYXJ0IFZhbiBBc3NjaGUg
+ICAgICAgICAgIDIwMTYtMTEtMDIgMTA6MDk6NTEgLTA2MDAgMTE0MykgICAgV0FSTl9PTighY3B1
+bWFza190ZXN0X2NwdShyYXdfc21wX3Byb2Nlc3Nvcl9pZCgpLCBoY3R4LT5jcHVtYXNrKSAmJg0K
+PiA2YTgzZTc0ZDIgKEJhcnQgVmFuIEFzc2NoZSAgICAgICAgICAgMjAxNi0xMS0wMiAxMDowOTo1
+MSAtMDYwMCAxMTQ0KSAgICAgICAgICAgIGNwdV9vbmxpbmUoaGN0eC0+bmV4dF9jcHUpKTsNCj4g
+NmE4M2U3NGQyIChCYXJ0IFZhbiBBc3NjaGUgICAgICAgICAgIDIwMTYtMTEtMDIgMTA6MDk6NTEg
+LTA2MDAgMTE0NSkgDQo+IGI3YTcxZTY2ZCAoSmVucyBBeGJvZSAgICAgICAgICAgICAgICAyMDE3
+LTA4LTAxIDA5OjI4OjI0IC0wNjAwIDExNDYpICAgIC8qDQoNCkRpZCB5b3UgcmVhbGx5IHRyeSB0
+byBmaWd1cmUgb3V0IHdoZW4gdGhlIGNvZGUgdGhhdCByZXBvcnRlZCB0aGUgd2FybmluZw0Kd2Fz
+IGludHJvZHVjZWQ/IEkgdGhpbmsgdGhhdCB3YXJuaW5nIHdhcyBpbnRyb2R1Y2VkIHRocm91Z2gg
+dGhlIGZvbGxvd2luZw0KY29tbWl0Og0KDQpjb21taXQgZmQxMjcwZDVkZjZhMDA1ZTEyNDhlODcw
+NDIxNTlhNzk5Y2M0YjJjOQ0KRGF0ZTogICBXZWQgQXByIDE2IDA5OjIzOjQ4IDIwMTQgLTA2MDAN
+Cg0KICAgIGJsay1tcTogZG9uJ3QgdXNlIHByZWVtcHRfY291bnQoKSB0byBjaGVjayBmb3Igcmln
+aHQgQ1BVDQogICAgIA0KICAgIFVQIG9yIENPTkZJR19QUkVFTVBUX05PTkUgd2lsbCByZXR1cm4g
+MCwgYW5kIHdoYXQgd2UgcmVhbGx5DQogICAgd2FudCB0byBjaGVjayBpcyB3aGV0aGVyIG9yIG5v
+dCB3ZSBhcmUgb24gdGhlIHJpZ2h0IENQVS4NCiAgICBTbyBkb24ndCBtYWtlIFBSRUVNUFQgcGFy
+dCBvZiB0aGlzLCBqdXN0IHRlc3QgdGhlIENQVSBpbg0KICAgIHRoZSBtYXNrIGRpcmVjdGx5Lg0K
+DQpBbnl3YXksIEkgdGhpbmsgdGhhdCB3YXJuaW5nIGlzIGFwcHJvcHJpYXRlIGFuZCB1c2VmdWwu
+IFNvIHRoZSBuZXh0IHN0ZXANCmlzIHRvIGZpZ3VyZSBvdXQgd2hhdCB3b3JrIGl0ZW0gd2FzIGlu
+dm9sdmVkIGFuZCB3aHkgdGhhdCB3b3JrIGl0ZW0gZ290DQpleGVjdXRlZCBvbiB0aGUgd3Jvbmcg
+Q1BVLg0KDQpCYXJ0Lg==
