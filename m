@@ -1,114 +1,188 @@
-Return-Path: <prvs=4780b5c65=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V7 2/8] blokc: mq-deadline: Introduce dispatch helpers
-Date: Wed,  8 Nov 2017 17:11:12 +0900
-Message-Id: <20171108081118.7632-3-damien.lemoal@wdc.com>
-In-Reply-To: <20171108081118.7632-1-damien.lemoal@wdc.com>
-References: <20171108081118.7632-1-damien.lemoal@wdc.com>
+Return-Path: <hyc.lee@gmail.com>
+Message-ID: <5A123A10.1050801@gmail.com>
+Date: Mon, 20 Nov 2017 11:12:32 +0900
+From: Hyunchul Lee <hyc.lee@gmail.com>
+MIME-Version: 1.0
+To: Jaegeuk Kim <jaegeuk@kernel.org>
+CC: Chao Yu <yuchao0@huawei.com>, linux-f2fs-devel@lists.sourceforge.net,
+ linux-kernel@vger.kernel.org, kernel-team@lge.com,
+ Hyunchul Lee <cheol.lee@lge.com>,
+ Chao Yu <chao@kernel.org>, linux-block@vger.kernel.org, axboe@kernel.dk,
+ hch@infradead.org
+Subject: Re: [RFC PATCH 0/2] apply write hints to select the type of segments
+References: <5A08F6CA.6040507@gmail.com> <5bd3945c-16f8-a718-a140-44589ceb490a@huawei.com> <5A090283.60206@gmail.com> <20171114042024.GA13008@jaegeuk-macbookpro.roam.corp.google.com> <3dd3f540-f5e5-2d58-99ef-6abf18bad923@huawei.com> <20171115162730.GC33528@jaegeuk-macbookpro.roam.corp.google.com> <5A0CE25A.9090506@gmail.com> <533fb91e-21af-513e-f587-619498b1f848@huawei.com> <20171116035858.GA73172@jaegeuk-macbookpro.roam.corp.google.com> <5A0D15A9.3090706@gmail.com> <20171117185338.GB77642@jaegeuk-macbookpro.roam.corp.google.com>
+In-Reply-To: <20171117185338.GB77642@jaegeuk-macbookpro.roam.corp.google.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-Avoid directly referencing the next_rq and fifo_list arrays using the
-helper functions deadline_next_request() and deadline_fifo_request() to
-facilitate changes in the dispatch request selection in
-__dd_dispatch_request() for zoned block devices.
+On 11/18/2017 03:53 AM, Jaegeuk Kim wrote:
+> ...
+>>>>>>>>>>>>>>>>> From: Hyunchul Lee <cheol.lee@lge.com>
+>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>> Using write hints[1], applications can inform the life time of the data
+>>>>>>>>>>>>>>>>> written to devices. and this[2] reported that the write hints patch
+>>>>>>>>>>>>>>>>> decreased writes in NAND by 25%.
+>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>> This hints help F2FS to determine the followings.
+>>>>>>>>>>>>>>>>>   1) the segment types where the data will be written.
+>>>>>>>>>>>>>>>>>   2) the hints that will be passed down to devices with the data of segments.
+>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>> This patch set implements the first mapping from write hints to segment types
+>>>>>>>>>>>>>>>>> as shown below.
+>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>>   hints                     segment type
+>>>>>>>>>>>>>>>>>   -----                     ------------
+>>>>>>>>>>>>>>>>>   WRITE_LIFE_SHORT          CURSEG_COLD_DATA
+>>>>>>>>>>>>>>>>>   WRITE_LIFE_EXTREME        CURSEG_HOT_DATA
+>>>>>>>>>>>>>>>>>   others                    CURSEG_WARM_DATA
+>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>> The F2FS poliy for hot/cold seperation has precedence over this hints, And
+>>>>>>>>>>>>>>>>> hints are not applied in in-place update.
+>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>> Could we change to disable IPU if file/inode write hint is existing?
+>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>> I am afraid that this makes side effects. for example, this could cause
+>>>>>>>>>>>>>>> out-of-place updates even when there are not enough free segments. 
+>>>>>>>>>>>>>>> I can write the patch that handles these situations. But I wonder 
+>>>>>>>>>>>>>>> that this is required, and I am not sure which IPU polices can be disabled.
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> Oh, As I replied in another thread, I think IPU just affects filesystem
+>>>>>>>>>>>>>> hot/cold separating, rather than this feature. So I think it will be okay
+>>>>>>>>>>>>>> to not consider it.
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>> Before the second mapping is implemented, write hints are not passed down
+>>>>>>>>>>>>>>>>> to devices. Because it is better that the data of a segment have the same 
+>>>>>>>>>>>>>>>>> hint.
+>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>> [1]: c75b1d9421f80f4143e389d2d50ddfc8a28c8c35
+>>>>>>>>>>>>>>>>> [2]: https://lwn.net/Articles/726477/
+>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>> Could you write a patch to support passing write hint to block layer for
+>>>>>>>>>>>>>>>> buffered writes as below commit:
+>>>>>>>>>>>>>>>> 0127251c45ae ("ext4: add support for passing in write hints for buffered writes")
+>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>> Sure I will. I wrote it already ;)
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> Cool, ;)
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>> I think that datas from the same segment should be passed down with the same
+>>>>>>>>>>>>>>> hint, and the following mapping is reasonable. I wonder what is your opinion
+>>>>>>>>>>>>>>> about it.
+>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>   segment type               hints
+>>>>>>>>>>>>>>>   ------------               -----
+>>>>>>>>>>>>>>>   CURSEG_COLD_DATA           WRITE_LIFE_EXTREME
+>>>>>>>>>>>>>>>   CURSEG_HOT_DATA            WRITE_LIFE_SHORT
+>>>>>>>>>>>>>>>   CURSEG_COLD_NODE           WRITE_LIFE_NORMAL
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> We have WRITE_LIFE_LONG defined rather than WRITE_LIFE_NORMAL in fs.h?
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>   CURSEG_HOT_NODE            WRITE_LIFE_MEDIUM
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> As I know, in scenario of cell phone, data of meta_inode is hottest, then hot
+>>>>>>>>>>>>>> data, warm node, and cold node should be coldest. So I suggested we can define
+>>>>>>>>>>>>>> as below:
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> META_DATA			WRITE_LIFE_SHORT
+>>>>>>>>>>>>>> HOT_DATA & WARM_NODE		WRITE_LIFE_MEDIUM
+>>>>>>>>>>>>>> HOT_NODE & WARM_DATA		WRITE_LIFE_LONG
+>>>>>>>>>>>>>> COLD_NODE & COLD_DATA		WRITE_LIFE_EXTREME
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> I agree, But I am not sure that assigning the same hint to a node and data
+>>>>>>>>>>>>> segment is good. Because NVMe is likely to write them in the same erase 
+>>>>>>>>>>>>> block if they have the same hint.
+>>>>>>>>>>>>
+>>>>>>>>>>>> If we do not give the hint, they can still be written to the same erase block,
+>>>>>>>>>>
+>>>>>>>>>> I mean it's possible to write them to the same erase block. :)
+>>>>>>>>>>
+>>>>>>>>>>>> right? it will not be worse?
+>>>>>>>>>>>>
+>>>>>>>>>>>
+>>>>>>>>>>> If the hint is not given, I think that they could be written to 
+>>>>>>>>>>> the same erase block, or not. But if we give the same hint, they are written
+>>>>>>>>>>> to the same block.
+>>>>>>>>>>
+>>>>>>>>>> IMO, Only if underlying device can support more hint type or opened channels,
+>>>>>>>>>> and actual temperature of data segment and node segment is quite different, we
+>>>>>>>>>> can separate them.
+>>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> Okay, If Jaegeuk Kim agrees with this, I will submit the patch that 
+>>>>>>>>> implements your proposed mapping.
+>>>>>>>>
+>>>>>>>> How about this? We'd better to split data and node blocks as much as possible.
+>>>>>>>>
+>>>>>>>> segment type                    hints
+>>>>>>>> ------------                    -----
+>>>>>>>> COLD_NODE & COLD_DATA		WRITE_LIFE_NONE
+>>>>>>>
+>>>>>>> WRITE_LIFE_NONE means there is no hints about write life time.
+>>>>>>>
+>>>>>>> Shouldn't we define COLD_NODE & COLD_DATA as WRITE_LIFE_EXTERME?
+>>>>>>
+>>>>>> The assumption would be to split different types of blocks by flash firmware,
+>>>>>> so I think we can use WRITE_LIFE_NONE as a type as well.
+>>>>>>
+>>>>>
+>>>>> WRITE_LIFE_NONE means that no stream id is specified. It equals WRITE_LIFE_NOT_SET.
+>>>>
+>>>> Rgith, I just saw nvme implementation:
+>>>>
+>>>> nvme_assign_write_stream
+>>>>
+>>>> 	enum rw_hint streamid = req->write_hint;
+>>>>
+>>>> 	if (streamid == WRITE_LIFE_NOT_SET || streamid == WRITE_LIFE_NONE)
+>>>> 		streamid = 0;
+>>>> 	else {
+>>>> 		streamid--;
+>>>> ...
+>>>>
+>>>>> So I think that we can define WARM_DATA as WRITE_LIFE_NONE, and
+>>>>> COLD_NODE & COLD_DATA as WRITE_LIFE_EXTREME.
+>>>
+>>> What's the point?
+>>>
+>>> segment type                 hints                streamid
+>>> -------------                -----                -------
+>>> COLD_NODE & COLD_DATA        WRITE_LIFE_NONE      0
+>>> WARM_DATA                    WRITE_LIFE_EXTERME   4
+>>> HOT_NODE & WARM_NODE         WRITE_LIFE_LONG      3
+>>> HOT_DATA                     WRITE_LIFE_MEDIUM    2
+>>> META_DATA                    WRITE_LIFE_SHORT     1
+>>>
+>>> So, I don't think something is wrong. Again, I don't care about its hotness
+>>> given to the naming, but do care how to split different types of blocks with
+>>> different stream ids. Exceptions would be giving _SHORT or _MEDIUM which are
+>>> likely to be latency-critical, since I guess firmware may be able to store them
+>>> into SLC buffer.
+>>>
+>>> Am I missing that _NONE has another meaning?
+>>>
+>>
+>> What I am worried about is that datas with no hint have WRITE_LIFE_NOT_SET(id 0).
+>> If block devices have swap partitions and anothor file systems, cold datas could
+>> be mixed with datas from that. Does this seems way too much?
+> 
+> That seems like how to distinguish write_hints across multiple partitions?
+> 
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Bart Van Assche <Bart.VanAssche@wdc.com>
----
- block/mq-deadline.c | 45 +++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 37 insertions(+), 8 deletions(-)
+What I intend is that because there could be another partitions and 
+the default stream ID is 0, WRITE_LIFE_EXTREAM could be better than 
+WRITE_LIFE_NONE for cold datas.
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 0179e484ec98..8bd6db9e69c7 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -192,13 +192,42 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
- }
- 
- /*
-+ * For the specified data direction, return the next request to
-+ * dispatch using arrival ordered lists.
-+ */
-+static struct request *
-+deadline_fifo_request(struct deadline_data *dd, int data_dir)
-+{
-+	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
-+		return NULL;
-+
-+	if (list_empty(&dd->fifo_list[data_dir]))
-+		return NULL;
-+
-+	return rq_entry_fifo(dd->fifo_list[data_dir].next);
-+}
-+
-+/*
-+ * For the specified data direction, return the next request to
-+ * dispatch using sector position sorted lists.
-+ */
-+static struct request *
-+deadline_next_request(struct deadline_data *dd, int data_dir)
-+{
-+	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
-+		return NULL;
-+
-+	return dd->next_rq[data_dir];
-+}
-+
-+/*
-  * deadline_dispatch_requests selects the best request according to
-  * read/write expire, fifo_batch, etc
-  */
- static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- {
- 	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
--	struct request *rq;
-+	struct request *rq, *next_rq;
- 	bool reads, writes;
- 	int data_dir;
- 
-@@ -214,10 +243,9 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	/*
- 	 * batches are currently reads XOR writes
- 	 */
--	if (dd->next_rq[WRITE])
--		rq = dd->next_rq[WRITE];
--	else
--		rq = dd->next_rq[READ];
-+	rq = deadline_next_request(dd, WRITE);
-+	if (!rq)
-+		rq = deadline_next_request(dd, READ);
- 
- 	if (rq && dd->batching < dd->fifo_batch)
- 		/* we have a next request are still entitled to batch */
-@@ -260,19 +288,20 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	/*
- 	 * we are not running a batch, find best request for selected data_dir
- 	 */
--	if (deadline_check_fifo(dd, data_dir) || !dd->next_rq[data_dir]) {
-+	next_rq = deadline_next_request(dd, data_dir);
-+	if (deadline_check_fifo(dd, data_dir) || !next_rq) {
- 		/*
- 		 * A deadline has expired, the last request was in the other
- 		 * direction, or we have run out of higher-sectored requests.
- 		 * Start again from the request with the earliest expiry time.
- 		 */
--		rq = rq_entry_fifo(dd->fifo_list[data_dir].next);
-+		rq = deadline_fifo_request(dd, data_dir);
- 	} else {
- 		/*
- 		 * The last req was the same dir and we have a next request in
- 		 * sort order. No expired requests so continue on from here.
- 		 */
--		rq = dd->next_rq[data_dir];
-+		rq = next_rq;
- 	}
- 
- 	dd->batching = 0;
--- 
-2.13.6
+Thanks.
+
+>> And I think that stream id 0 means disabling stream directives. 
+>> Becasue NVME_RW_DTYPE_STREAMS is clear.
+> 
+> Then, I guess SSD FW will just handle 5 stream IDs including disabled 0.
+> 
+> Thanks,
+> 
