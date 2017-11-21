@@ -1,205 +1,45 @@
-Return-Path: <BATV+adf086a54a2d754d8a83+5184+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 6/7] block: introduce GENHD_FL_HIDDEN
-Date: Thu,  2 Nov 2017 21:29:53 +0300
-Message-Id: <20171102182954.9263-7-hch@lst.de>
-In-Reply-To: <20171102182954.9263-1-hch@lst.de>
-References: <20171102182954.9263-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from imap.thunk.org ([74.207.234.97]:37802 "EHLO imap.thunk.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751877AbdKUCxg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 20 Nov 2017 21:53:36 -0500
+Date: Mon, 20 Nov 2017 21:53:29 -0500
+From: Theodore Ts'o <tytso@mit.edu>
+To: Chris Murphy <lists@colorremedies.com>
+Cc: Qu Wenruo <quwenruo.btrfs@gmx.com>,
+        Nikolay Borisov <nborisov@suse.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Zdenek Kabelac <zkabelac@redhat.com>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>
+Subject: Re: [dm-devel] Ideas to reuse filesystem's checksum to enhance
+ dm-raid1/10/5/6?
+Message-ID: <20171121025329.ll72kg6yqkjeaz5o@thunk.org>
+References: <477d2d2b-3893-50c1-5946-076670a03f2d@gmx.com>
+ <7ed134fc-1616-a1ab-6701-a917af0522da@suse.com>
+ <5357fd4a-51b1-ebfb-27de-4d022d9749c0@gmx.com>
+ <4df8d248-5def-9d29-89eb-7d9b977f089e@suse.com>
+ <354402cd-587d-72d8-aaa1-87a1b5c9f03c@gmx.com>
+ <6e0f8a37-c3f8-61f0-d51d-01b72c3c65b7@redhat.com>
+ <189cda7b-e3ee-4379-c7f2-57efd759b78a@gmx.com>
+ <CAJCQCtRUGEdu13RCKFb6uZQ3UCzoAByhu97FdwQoFPxvsOua0Q@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAJCQCtRUGEdu13RCKFb6uZQ3UCzoAByhu97FdwQoFPxvsOua0Q@mail.gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-With this flag a driver can create a gendisk that can be used for I/O
-submission inside the kernel, but which is not registered as user
-facing block device.  This will be useful for the NVMe multipath
-implementation.
+On Thu, Nov 16, 2017 at 03:32:05PM -0700, Chris Murphy wrote:
+> 
+> XFS by default does metadata csums. But ext4 doesn't use it for either
+> metadata or the journal by default still, it is still optional. So for
+> now it mainly benefits XFS.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/genhd.c         | 68 +++++++++++++++++++++++++++++++++++++--------------
- include/linux/genhd.h |  1 +
- 2 files changed, 51 insertions(+), 18 deletions(-)
+Metadata checksums are enabled by default in the version of e2fsprogs
+shipped by Debian.  Since there were no real problems reported by
+Debian users, in the next release of e2fsprogs, coming soon, it will
+be enabled by default for all new ext4 file systems.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 1174d24e405e..835e907e6e01 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -585,6 +585,11 @@ static void register_disk(struct device *parent, struct gendisk *disk)
- 	 */
- 	pm_runtime_set_memalloc_noio(ddev, true);
- 
-+	if (disk->flags & GENHD_FL_HIDDEN) {
-+		dev_set_uevent_suppress(ddev, 0);
-+		return;
-+	}
-+
- 	disk->part0.holder_dir = kobject_create_and_add("holders", &ddev->kobj);
- 	disk->slave_dir = kobject_create_and_add("slaves", &ddev->kobj);
- 
-@@ -616,6 +621,11 @@ static void register_disk(struct device *parent, struct gendisk *disk)
- 	while ((part = disk_part_iter_next(&piter)))
- 		kobject_uevent(&part_to_dev(part)->kobj, KOBJ_ADD);
- 	disk_part_iter_exit(&piter);
-+
-+	err = sysfs_create_link(&ddev->kobj,
-+				&disk->queue->backing_dev_info->dev->kobj,
-+				"bdi");
-+	WARN_ON(err);
- }
- 
- /**
-@@ -630,7 +640,6 @@ static void register_disk(struct device *parent, struct gendisk *disk)
-  */
- void device_add_disk(struct device *parent, struct gendisk *disk)
- {
--	struct backing_dev_info *bdi;
- 	dev_t devt;
- 	int retval;
- 
-@@ -639,7 +648,8 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
- 	 * parameters make sense.
- 	 */
- 	WARN_ON(disk->minors && !(disk->major || disk->first_minor));
--	WARN_ON(!disk->minors && !(disk->flags & GENHD_FL_EXT_DEVT));
-+	WARN_ON(!disk->minors &&
-+		!(disk->flags & (GENHD_FL_EXT_DEVT | GENHD_FL_HIDDEN)));
- 
- 	disk->flags |= GENHD_FL_UP;
- 
-@@ -648,18 +658,26 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
- 		WARN_ON(1);
- 		return;
- 	}
--	disk_to_dev(disk)->devt = devt;
- 	disk->major = MAJOR(devt);
- 	disk->first_minor = MINOR(devt);
- 
- 	disk_alloc_events(disk);
- 
--	/* Register BDI before referencing it from bdev */
--	bdi = disk->queue->backing_dev_info;
--	bdi_register_owner(bdi, disk_to_dev(disk));
--
--	blk_register_region(disk_devt(disk), disk->minors, NULL,
--			    exact_match, exact_lock, disk);
-+	if (disk->flags & GENHD_FL_HIDDEN) {
-+		/*
-+		 * Don't let hidden disks show up in /proc/partitions,
-+		 * and don't bother scanning for partitions either.
-+		 */
-+		disk->flags |= GENHD_FL_SUPPRESS_PARTITION_INFO;
-+		disk->flags |= GENHD_FL_NO_PART_SCAN;
-+	} else {
-+		/* Register BDI before referencing it from bdev */
-+		disk_to_dev(disk)->devt = devt;
-+		bdi_register_owner(disk->queue->backing_dev_info,
-+				disk_to_dev(disk));
-+		blk_register_region(disk_devt(disk), disk->minors, NULL,
-+				    exact_match, exact_lock, disk);
-+	}
- 	register_disk(parent, disk);
- 	blk_register_queue(disk);
- 
-@@ -669,10 +687,6 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
- 	 */
- 	WARN_ON_ONCE(!blk_get_queue(disk->queue));
- 
--	retval = sysfs_create_link(&disk_to_dev(disk)->kobj, &bdi->dev->kobj,
--				   "bdi");
--	WARN_ON(retval);
--
- 	disk_add_events(disk);
- 	blk_integrity_add(disk);
- }
-@@ -701,7 +715,8 @@ void del_gendisk(struct gendisk *disk)
- 	set_capacity(disk, 0);
- 	disk->flags &= ~GENHD_FL_UP;
- 
--	sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
-+	if (!(disk->flags & GENHD_FL_HIDDEN))
-+		sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
- 	if (disk->queue) {
- 		/*
- 		 * Unregister bdi before releasing device numbers (as they can
-@@ -712,13 +727,15 @@ void del_gendisk(struct gendisk *disk)
- 	} else {
- 		WARN_ON(1);
- 	}
--	blk_unregister_region(disk_devt(disk), disk->minors);
-+
-+	if (!(disk->flags & GENHD_FL_HIDDEN)) {
-+		blk_unregister_region(disk_devt(disk), disk->minors);
-+		kobject_put(disk->part0.holder_dir);
-+		kobject_put(disk->slave_dir);
-+	}
- 
- 	part_stat_set_all(&disk->part0, 0);
- 	disk->part0.stamp = 0;
--
--	kobject_put(disk->part0.holder_dir);
--	kobject_put(disk->slave_dir);
- 	if (!sysfs_deprecated)
- 		sysfs_remove_link(block_depr, dev_name(disk_to_dev(disk)));
- 	pm_runtime_set_memalloc_noio(disk_to_dev(disk), false);
-@@ -781,6 +798,10 @@ struct gendisk *get_gendisk(dev_t devt, int *partno)
- 		spin_unlock_bh(&ext_devt_lock);
- 	}
- 
-+	if (unlikely(disk->flags & GENHD_FL_HIDDEN)) {
-+		put_disk(disk);
-+		disk = NULL;
-+	}
- 	return disk;
- }
- EXPORT_SYMBOL(get_gendisk);
-@@ -1024,6 +1045,15 @@ static ssize_t disk_removable_show(struct device *dev,
- 		       (disk->flags & GENHD_FL_REMOVABLE ? 1 : 0));
- }
- 
-+static ssize_t disk_hidden_show(struct device *dev,
-+				   struct device_attribute *attr, char *buf)
-+{
-+	struct gendisk *disk = dev_to_disk(dev);
-+
-+	return sprintf(buf, "%d\n",
-+		       (disk->flags & GENHD_FL_HIDDEN ? 1 : 0));
-+}
-+
- static ssize_t disk_ro_show(struct device *dev,
- 				   struct device_attribute *attr, char *buf)
- {
-@@ -1061,6 +1091,7 @@ static ssize_t disk_discard_alignment_show(struct device *dev,
- static DEVICE_ATTR(range, S_IRUGO, disk_range_show, NULL);
- static DEVICE_ATTR(ext_range, S_IRUGO, disk_ext_range_show, NULL);
- static DEVICE_ATTR(removable, S_IRUGO, disk_removable_show, NULL);
-+static DEVICE_ATTR(hidden, S_IRUGO, disk_hidden_show, NULL);
- static DEVICE_ATTR(ro, S_IRUGO, disk_ro_show, NULL);
- static DEVICE_ATTR(size, S_IRUGO, part_size_show, NULL);
- static DEVICE_ATTR(alignment_offset, S_IRUGO, disk_alignment_offset_show, NULL);
-@@ -1085,6 +1116,7 @@ static struct attribute *disk_attrs[] = {
- 	&dev_attr_range.attr,
- 	&dev_attr_ext_range.attr,
- 	&dev_attr_removable.attr,
-+	&dev_attr_hidden.attr,
- 	&dev_attr_ro.attr,
- 	&dev_attr_size.attr,
- 	&dev_attr_alignment_offset.attr,
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 5c0ed5db33c2..93aae3476f58 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -140,6 +140,7 @@ struct hd_struct {
- #define GENHD_FL_NATIVE_CAPACITY		128
- #define GENHD_FL_BLOCK_EVENTS_ON_EXCL_WRITE	256
- #define GENHD_FL_NO_PART_SCAN			512
-+#define GENHD_FL_HIDDEN				1024
- 
- enum {
- 	DISK_EVENT_MEDIA_CHANGE			= 1 << 0, /* media changed */
--- 
-2.14.2
+Regards,
+
+					- Ted
