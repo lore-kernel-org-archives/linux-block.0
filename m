@@ -1,32 +1,126 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f52.google.com ([74.125.82.52]:52073 "EHLO
-        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752542AbdKCKC6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Nov 2017 06:02:58 -0400
-Received: by mail-wm0-f52.google.com with SMTP id b9so380007wmh.0
-        for <linux-block@vger.kernel.org>; Fri, 03 Nov 2017 03:02:57 -0700 (PDT)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: hch@lst.de, sagi@grimberg.me, keith.busch@intel.com
-Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 0/3] nvme: small fixes reported by smatch
-Date: Fri,  3 Nov 2017 11:02:47 +0100
-Message-Id: <1509703370-20379-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mga06.intel.com ([134.134.136.31]:47760 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751343AbdKUNoD (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Nov 2017 08:44:03 -0500
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V14 10/24] mmc: core: Make mmc_pre_req() and mmc_post_req() available
+Date: Tue, 21 Nov 2017 15:42:36 +0200
+Message-Id: <1511271770-3444-11-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
+References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Fix a number of small things reported by smatch on the nvme driver
+Make mmc_pre_req() and mmc_post_req() available to the card drivers. Later
+patches will make use of this.
 
-Javier González (3):
-  nvme: do not check for ns on rw path
-  nvme: compare NQN string with right size
-  nvme: fix eui_show() print format
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+---
+ drivers/mmc/core/core.c | 31 -------------------------------
+ drivers/mmc/core/core.h | 31 +++++++++++++++++++++++++++++++
+ 2 files changed, 31 insertions(+), 31 deletions(-)
 
- drivers/nvme/host/core.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
+diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
+index 1f0f44f4dd5f..7ca6e4866a8b 100644
+--- a/drivers/mmc/core/core.c
++++ b/drivers/mmc/core/core.c
+@@ -658,37 +658,6 @@ bool mmc_is_req_done(struct mmc_host *host, struct mmc_request *mrq)
+ EXPORT_SYMBOL(mmc_is_req_done);
+ 
+ /**
+- *	mmc_pre_req - Prepare for a new request
+- *	@host: MMC host to prepare command
+- *	@mrq: MMC request to prepare for
+- *
+- *	mmc_pre_req() is called in prior to mmc_start_req() to let
+- *	host prepare for the new request. Preparation of a request may be
+- *	performed while another request is running on the host.
+- */
+-static void mmc_pre_req(struct mmc_host *host, struct mmc_request *mrq)
+-{
+-	if (host->ops->pre_req)
+-		host->ops->pre_req(host, mrq);
+-}
+-
+-/**
+- *	mmc_post_req - Post process a completed request
+- *	@host: MMC host to post process command
+- *	@mrq: MMC request to post process for
+- *	@err: Error, if non zero, clean up any resources made in pre_req
+- *
+- *	Let the host post process a completed request. Post processing of
+- *	a request may be performed while another reuqest is running.
+- */
+-static void mmc_post_req(struct mmc_host *host, struct mmc_request *mrq,
+-			 int err)
+-{
+-	if (host->ops->post_req)
+-		host->ops->post_req(host, mrq, err);
+-}
+-
+-/**
+  * mmc_finalize_areq() - finalize an asynchronous request
+  * @host: MMC host to finalize any ongoing request on
+  *
+diff --git a/drivers/mmc/core/core.h b/drivers/mmc/core/core.h
+index 71e6c6d7ceb7..f564ddfbe070 100644
+--- a/drivers/mmc/core/core.h
++++ b/drivers/mmc/core/core.h
+@@ -152,4 +152,35 @@ static inline void mmc_claim_host(struct mmc_host *host)
+ void mmc_cqe_post_req(struct mmc_host *host, struct mmc_request *mrq);
+ int mmc_cqe_recovery(struct mmc_host *host);
+ 
++/**
++ *	mmc_pre_req - Prepare for a new request
++ *	@host: MMC host to prepare command
++ *	@mrq: MMC request to prepare for
++ *
++ *	mmc_pre_req() is called in prior to mmc_start_req() to let
++ *	host prepare for the new request. Preparation of a request may be
++ *	performed while another request is running on the host.
++ */
++static inline void mmc_pre_req(struct mmc_host *host, struct mmc_request *mrq)
++{
++	if (host->ops->pre_req)
++		host->ops->pre_req(host, mrq);
++}
++
++/**
++ *	mmc_post_req - Post process a completed request
++ *	@host: MMC host to post process command
++ *	@mrq: MMC request to post process for
++ *	@err: Error, if non zero, clean up any resources made in pre_req
++ *
++ *	Let the host post process a completed request. Post processing of
++ *	a request may be performed while another reuqest is running.
++ */
++static inline void mmc_post_req(struct mmc_host *host, struct mmc_request *mrq,
++				int err)
++{
++	if (host->ops->post_req)
++		host->ops->post_req(host, mrq, err);
++}
++
+ #endif
 -- 
-2.7.4
+1.9.1
