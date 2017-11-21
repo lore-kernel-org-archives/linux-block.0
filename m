@@ -1,21 +1,11 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-it0-f43.google.com ([209.85.214.43]:34165 "EHLO
-        mail-it0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752684AbdKWNXK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Nov 2017 08:23:10 -0500
-Received: by mail-it0-f43.google.com with SMTP id m11so12387434iti.1
-        for <linux-block@vger.kernel.org>; Thu, 23 Nov 2017 05:23:10 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1511271770-3444-6-git-send-email-adrian.hunter@intel.com>
-References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com> <1511271770-3444-6-git-send-email-adrian.hunter@intel.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 23 Nov 2017 14:23:09 +0100
-Message-ID: <CACRpkdaJps0QfYUUU-kYqjraiiE6kAgRTbwj7Kn4uM5iRL9E_A@mail.gmail.com>
-Subject: Re: [PATCH V14 05/24] mmc: block: No need to export mmc_cleanup_queue()
-To: Adrian Hunter <adrian.hunter@intel.com>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
+Received: from mga02.intel.com ([134.134.136.20]:13823 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751594AbdKUNng (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Nov 2017 08:43:36 -0500
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
         linux-kernel <linux-kernel@vger.kernel.org>,
         Bough Chen <haibo.chen@nxp.com>,
@@ -29,20 +19,36 @@ Cc: Ulf Hansson <ulf.hansson@linaro.org>,
         Sahitya Tummala <stummala@codeaurora.org>,
         Harjani Ritesh <riteshh@codeaurora.org>,
         Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
         Shawn Lin <shawn.lin@rock-chips.com>,
         Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
         Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH V14 05/24] mmc: block: No need to export mmc_cleanup_queue()
+Date: Tue, 21 Nov 2017 15:42:31 +0200
+Message-Id: <1511271770-3444-6-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
+References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, Nov 21, 2017 at 2:42 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
+mmc_cleanup_queue() is not used by a different module. Do not export it.
 
-> mmc_cleanup_queue() is not used by a different module. Do not export it.
->
-> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+---
+ drivers/mmc/core/queue.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-
-Yours,
-Linus Walleij
+diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+index 4f33d277b125..26f8da30ebe5 100644
+--- a/drivers/mmc/core/queue.c
++++ b/drivers/mmc/core/queue.c
+@@ -270,7 +270,6 @@ void mmc_cleanup_queue(struct mmc_queue *mq)
+ 
+ 	mq->card = NULL;
+ }
+-EXPORT_SYMBOL(mmc_cleanup_queue);
+ 
+ /**
+  * mmc_queue_suspend - suspend a MMC request queue
+-- 
+1.9.1
