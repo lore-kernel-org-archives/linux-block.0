@@ -1,70 +1,247 @@
-Return-Path: <prvs=473169c3e=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Ard
- Biesheuvel" <ard.biesheuvel@linaro.org>, Herbert Xu
-	<herbert@gondor.apana.org.au>, Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v3 0/8] Introduce sgl_alloc() and sgl_free()
-Date: Fri, 3 Nov 2017 15:23:31 -0700
-Message-ID: <20171103222339.26540-1-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:65339 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751796AbdKUNo7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Nov 2017 08:44:59 -0500
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V14 21/24] mmc: mmc_test: Do not use mmc_start_areq() anymore
+Date: Tue, 21 Nov 2017 15:42:47 +0200
+Message-Id: <1511271770-3444-22-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
+References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hello Jens,
+The block driver's blk-mq paths do not use mmc_start_areq(). In order to
+remove mmc_start_areq() entirely, start by removing it from mmc_test.
 
-As you know there are multiple drivers that both allocate a scatter/gather
-list and populate that list with pages. This patch series moves the code for
-allocating and freeing such scatterlists from these drivers into
-lib/scatterlist.c. Please consider this patch series for kernel v4.15.
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+---
+ drivers/mmc/core/mmc_test.c | 122 ++++++++++++++++++++------------------------
+ 1 file changed, 54 insertions(+), 68 deletions(-)
 
-Notes:
-- Only the ib_srpt and ipr changes have been tested.
-- The next step is to introduce a caching mechanism for these scatterlists
-  and make the nvmet/rdma and SCSI target drivers use that caching mechanism
-  since for these drivers sgl allocation occurs in the hot path.
-
-Changes between v2 and v3:
-- Added Reviewed-by tags that had been posted as replies on v2.
-- Cc'ed the crypto maintainers for the entire patch series.
-
-Changes between v1 and v2:
-- Moved the sgl_alloc*() and sgl_free() functions from a new source file into
-  lib/scatterlist.c.
-- Changed the argument order for the sgl_alloc*() functions such that the
-  (pointer to) the output argument comes last.
-
-Thanks,
-
-Bart.
-
-Bart Van Assche (8):
-  lib/scatterlist: Introduce sgl_alloc() and sgl_free()
-  crypto: scompress - use sgl_alloc() and sgl_free()
-  nvmet/fc: Use sgl_alloc() and sgl_free()
-  nvmet/rdma: Use sgl_alloc() and sgl_free()
-  target: Use sgl_alloc_order() and sgl_free()
-  scsi/ipr: Use sgl_alloc_order() and sgl_free_order()
-  scsi/pmcraid: Remove an unused structure member
-  scsi/pmcraid: Use sgl_alloc_order() and sgl_free_order()
-
- crypto/Kconfig                         |   1 +
- crypto/scompress.c                     |  51 +---------------
- drivers/nvme/target/Kconfig            |   2 +
- drivers/nvme/target/fc.c               |  36 +----------
- drivers/nvme/target/rdma.c             |  63 ++------------------
- drivers/scsi/Kconfig                   |   2 +
- drivers/scsi/ipr.c                     |  49 +++------------
- drivers/scsi/ipr.h                     |   2 +-
- drivers/scsi/pmcraid.c                 |  43 ++------------
- drivers/scsi/pmcraid.h                 |   3 +-
- drivers/target/Kconfig                 |   1 +
- drivers/target/target_core_transport.c |  46 ++-------------
- include/linux/scatterlist.h            |  10 ++++
- lib/Kconfig                            |   4 ++
- lib/scatterlist.c                      | 105 +++++++++++++++++++++++++++++++++
- 15 files changed, 151 insertions(+), 267 deletions(-)
-
+diff --git a/drivers/mmc/core/mmc_test.c b/drivers/mmc/core/mmc_test.c
+index 478869805b96..9311c8de2061 100644
+--- a/drivers/mmc/core/mmc_test.c
++++ b/drivers/mmc/core/mmc_test.c
+@@ -171,11 +171,6 @@ struct mmc_test_multiple_rw {
+ 	enum mmc_test_prep_media prepare;
+ };
+ 
+-struct mmc_test_async_req {
+-	struct mmc_async_req areq;
+-	struct mmc_test_card *test;
+-};
+-
+ /*******************************************************************/
+ /*  General helper functions                                       */
+ /*******************************************************************/
+@@ -741,30 +736,6 @@ static int mmc_test_check_result(struct mmc_test_card *test,
+ 	return ret;
+ }
+ 
+-static enum mmc_blk_status mmc_test_check_result_async(struct mmc_card *card,
+-				       struct mmc_async_req *areq)
+-{
+-	struct mmc_test_async_req *test_async =
+-		container_of(areq, struct mmc_test_async_req, areq);
+-	int ret;
+-
+-	mmc_test_wait_busy(test_async->test);
+-
+-	/*
+-	 * FIXME: this would earlier just casts a regular error code,
+-	 * either of the kernel type -ERRORCODE or the local test framework
+-	 * RESULT_* errorcode, into an enum mmc_blk_status and return as
+-	 * result check. Instead, convert it to some reasonable type by just
+-	 * returning either MMC_BLK_SUCCESS or MMC_BLK_CMD_ERR.
+-	 * If possible, a reasonable error code should be returned.
+-	 */
+-	ret = mmc_test_check_result(test_async->test, areq->mrq);
+-	if (ret)
+-		return MMC_BLK_CMD_ERR;
+-
+-	return MMC_BLK_SUCCESS;
+-}
+-
+ /*
+  * Checks that a "short transfer" behaved as expected
+  */
+@@ -831,6 +802,45 @@ static struct mmc_test_req *mmc_test_req_alloc(void)
+ 	return rq;
+ }
+ 
++static void mmc_test_wait_done(struct mmc_request *mrq)
++{
++	complete(&mrq->completion);
++}
++
++static int mmc_test_start_areq(struct mmc_test_card *test,
++			       struct mmc_request *mrq,
++			       struct mmc_request *prev_mrq)
++{
++	struct mmc_host *host = test->card->host;
++	int err = 0;
++
++	if (mrq) {
++		init_completion(&mrq->completion);
++		mrq->done = mmc_test_wait_done;
++		mmc_pre_req(host, mrq);
++	}
++
++	if (prev_mrq) {
++		wait_for_completion(&prev_mrq->completion);
++		err = mmc_test_wait_busy(test);
++		if (!err)
++			err = mmc_test_check_result(test, prev_mrq);
++	}
++
++	if (!err && mrq) {
++		err = mmc_start_request(host, mrq);
++		if (err)
++			mmc_retune_release(host);
++	}
++
++	if (prev_mrq)
++		mmc_post_req(host, prev_mrq, 0);
++
++	if (err && mrq)
++		mmc_post_req(host, mrq, err);
++
++	return err;
++}
+ 
+ static int mmc_test_nonblock_transfer(struct mmc_test_card *test,
+ 				      struct scatterlist *sg, unsigned sg_len,
+@@ -838,17 +848,10 @@ static int mmc_test_nonblock_transfer(struct mmc_test_card *test,
+ 				      unsigned blksz, int write, int count)
+ {
+ 	struct mmc_test_req *rq1, *rq2;
+-	struct mmc_test_async_req test_areq[2];
+-	struct mmc_async_req *done_areq;
+-	struct mmc_async_req *cur_areq = &test_areq[0].areq;
+-	struct mmc_async_req *other_areq = &test_areq[1].areq;
+-	enum mmc_blk_status status;
++	struct mmc_request *mrq, *prev_mrq;
+ 	int i;
+ 	int ret = RESULT_OK;
+ 
+-	test_areq[0].test = test;
+-	test_areq[1].test = test;
+-
+ 	rq1 = mmc_test_req_alloc();
+ 	rq2 = mmc_test_req_alloc();
+ 	if (!rq1 || !rq2) {
+@@ -856,33 +859,25 @@ static int mmc_test_nonblock_transfer(struct mmc_test_card *test,
+ 		goto err;
+ 	}
+ 
+-	cur_areq->mrq = &rq1->mrq;
+-	cur_areq->err_check = mmc_test_check_result_async;
+-	other_areq->mrq = &rq2->mrq;
+-	other_areq->err_check = mmc_test_check_result_async;
++	mrq = &rq1->mrq;
++	prev_mrq = NULL;
+ 
+ 	for (i = 0; i < count; i++) {
+-		mmc_test_prepare_mrq(test, cur_areq->mrq, sg, sg_len, dev_addr,
+-				     blocks, blksz, write);
+-		done_areq = mmc_start_areq(test->card->host, cur_areq, &status);
+-
+-		if (status != MMC_BLK_SUCCESS || (!done_areq && i > 0)) {
+-			ret = RESULT_FAIL;
++		mmc_test_req_reset(container_of(mrq, struct mmc_test_req, mrq));
++		mmc_test_prepare_mrq(test, mrq, sg, sg_len, dev_addr, blocks,
++				     blksz, write);
++		ret = mmc_test_start_areq(test, mrq, prev_mrq);
++		if (ret)
+ 			goto err;
+-		}
+ 
+-		if (done_areq)
+-			mmc_test_req_reset(container_of(done_areq->mrq,
+-						struct mmc_test_req, mrq));
++		if (!prev_mrq)
++			prev_mrq = &rq2->mrq;
+ 
+-		swap(cur_areq, other_areq);
++		swap(mrq, prev_mrq);
+ 		dev_addr += blocks;
+ 	}
+ 
+-	done_areq = mmc_start_areq(test->card->host, NULL, &status);
+-	if (status != MMC_BLK_SUCCESS)
+-		ret = RESULT_FAIL;
+-
++	ret = mmc_test_start_areq(test, NULL, prev_mrq);
+ err:
+ 	kfree(rq1);
+ 	kfree(rq2);
+@@ -2356,11 +2351,9 @@ static int mmc_test_ongoing_transfer(struct mmc_test_card *test,
+ 	struct mmc_test_req *rq = mmc_test_req_alloc();
+ 	struct mmc_host *host = test->card->host;
+ 	struct mmc_test_area *t = &test->area;
+-	struct mmc_test_async_req test_areq = { .test = test };
+ 	struct mmc_request *mrq;
+ 	unsigned long timeout;
+ 	bool expired = false;
+-	enum mmc_blk_status blkstat = MMC_BLK_SUCCESS;
+ 	int ret = 0, cmd_ret;
+ 	u32 status = 0;
+ 	int count = 0;
+@@ -2373,9 +2366,6 @@ static int mmc_test_ongoing_transfer(struct mmc_test_card *test,
+ 		mrq->sbc = &rq->sbc;
+ 	mrq->cap_cmd_during_tfr = true;
+ 
+-	test_areq.areq.mrq = mrq;
+-	test_areq.areq.err_check = mmc_test_check_result_async;
+-
+ 	mmc_test_prepare_mrq(test, mrq, t->sg, t->sg_len, dev_addr, t->blocks,
+ 			     512, write);
+ 
+@@ -2388,11 +2378,9 @@ static int mmc_test_ongoing_transfer(struct mmc_test_card *test,
+ 
+ 	/* Start ongoing data request */
+ 	if (use_areq) {
+-		mmc_start_areq(host, &test_areq.areq, &blkstat);
+-		if (blkstat != MMC_BLK_SUCCESS) {
+-			ret = RESULT_FAIL;
++		ret = mmc_test_start_areq(test, mrq, NULL);
++		if (ret)
+ 			goto out_free;
+-		}
+ 	} else {
+ 		mmc_wait_for_req(host, mrq);
+ 	}
+@@ -2426,9 +2414,7 @@ static int mmc_test_ongoing_transfer(struct mmc_test_card *test,
+ 
+ 	/* Wait for data request to complete */
+ 	if (use_areq) {
+-		mmc_start_areq(host, NULL, &blkstat);
+-		if (blkstat != MMC_BLK_SUCCESS)
+-			ret = RESULT_FAIL;
++		ret = mmc_test_start_areq(test, NULL, mrq);
+ 	} else {
+ 		mmc_wait_for_req_done(test->card->host, mrq);
+ 	}
 -- 
-2.14.3
+1.9.1
