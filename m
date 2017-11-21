@@ -1,57 +1,87 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f43.google.com ([209.85.160.43]:39151 "EHLO
-        mail-pl0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751050AbdKVE5n (ORCPT
+Received: from mail-ua0-f193.google.com ([209.85.217.193]:42249 "EHLO
+        mail-ua0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751303AbdKUN6v (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Nov 2017 23:57:43 -0500
-Received: by mail-pl0-f43.google.com with SMTP id l16so143254pli.6
-        for <linux-block@vger.kernel.org>; Tue, 21 Nov 2017 20:57:42 -0800 (PST)
-Subject: Re: [PATCH] bcache: return IOERR to upper layer when read request
- meet metadata error
-To: Rui Hua <huarui.dev@gmail.com>, Coly Li <i@coly.li>
+        Tue, 21 Nov 2017 08:58:51 -0500
+MIME-Version: 1.0
+From: Rui Hua <huarui.dev@gmail.com>
+Date: Tue, 21 Nov 2017 21:58:30 +0800
+Message-ID: <CAPGwLLOXh7-T7HtXGWRTAuLh3La-njWtv44dgPZXUfbrUod1zA@mail.gmail.com>
+Subject: [PATCH] bcache: return IOERR to upper layer when read request meet
+ metadata error
+To: Coly Li <i@coly.li>, Michael Lyle <mlyle@lyle.org>
 Cc: linux-bcache <linux-bcache@vger.kernel.org>,
         linux-block@vger.kernel.org
-References: <CAPGwLLOXh7-T7HtXGWRTAuLh3La-njWtv44dgPZXUfbrUod1zA@mail.gmail.com>
-From: Michael Lyle <mlyle@lyle.org>
-Message-ID: <f42404a8-9b57-7805-964e-250e5f9f842e@lyle.org>
-Date: Tue, 21 Nov 2017 20:57:40 -0800
-MIME-Version: 1.0
-In-Reply-To: <CAPGwLLOXh7-T7HtXGWRTAuLh3La-njWtv44dgPZXUfbrUod1zA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Rui Hua--
+The read request might meet error when searching the btree, but the error was
+not handled in cache_lookup(), and this kind of metadata failure will not go
+into cached_dev_read_error(), finally, the upper layer will receive bi_status=0.
+In this patch we judge the metadata error by the return value of
+bch_btree_map_keys(), there are two potential paths give rise to the error:
+1.Because the btree is not totally cached in memery, we maybe get error when
+  read btree node from cache device (see bch_btree_node_get()), the likely
+  errno is -EIO, -ENOMEM
+2.When read miss happend, bch_btree_insert_check_key() will be called to
+  insert a "replace_key" to btree(see cached_dev_cache_miss(), just for doing
+  preparatory work before insert the missed data to cache device), a failure
+  can also happen in this situation, the likely errno is -ENOMEM
+bch_btree_map_keys() will return MAP_DONE in normal scenario, but we will
+get either -EIO or -ENOMEM in above two cases. if these happend, we should
+NOT recover data from backing device (when cache device is dirty) because
+we don't know whether bkeys the read request covered are all clean.
+And after that happend, s->iop.status is still its initially value(0)
+before we submit s->bio.bio, we set it to BLK_STS_IOERR, so it can go into
+cached_dev_read_error(), and finally it can be passed to upper layer,
+or recovered by reread from backing device.
 
-Thank you for fixing this.
+Signed-off-by: Hua Rui <huarui.dev@gmail.com>
+---
+ drivers/md/bcache/request.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-On 11/21/2017 05:58 AM, Rui Hua wrote:
-> The read request might meet error when searching the btree, but the error was
-> not handled in cache_lookup(), and this kind of metadata failure will not go
-> into cached_dev_read_error(), finally, the upper layer will receive bi_status=0.
-> In this patch we judge the metadata error by the return value of
-> bch_btree_map_keys(), there are two potential paths give rise to the error:
-> 1.Because the btree is not totally cached in memery, we maybe get error when
->   read btree node from cache device (see bch_btree_node_get()), the likely
->   errno is -EIO, -ENOMEM
-> 2.When read miss happend, bch_btree_insert_check_key() will be called to
->   insert a "replace_key" to btree(see cached_dev_cache_miss(), just for doing
->   preparatory work before insert the missed data to cache device), a failure
->   can also happen in this situation, the likely errno is -ENOMEM
-> bch_btree_map_keys() will return MAP_DONE in normal scenario, but we will
-> get either -EIO or -ENOMEM in above two cases. if these happend, we should
-> NOT recover data from backing device (when cache device is dirty) because
-> we don't know whether bkeys the read request covered are all clean.
-> And after that happend, s->iop.status is still its initially value(0)
-> before we submit s->bio.bio, we set it to BLK_STS_IOERR, so it can go into
-> cached_dev_read_error(), and finally it can be passed to upper layer,
-> or recovered by reread from backing device.
-> 
-> Signed-off-by: Hua Rui <huarui.dev@gmail.com>
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index f02fefb..b749431 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -576,6 +576,7 @@ static void cache_lookup(struct closure *cl)
+ {
+        struct search *s = container_of(cl, struct search, iop.cl);
+        struct bio *bio = &s->bio.bio;
++       struct cached_dev *dc;
+        int ret;
 
-This preliminarily LGTM-- I have added it to my tree, though I plan to
-make another review pass through all of the error path here.
+        bch_btree_op_init(&s->op, -1);
+@@ -588,6 +589,27 @@ static void cache_lookup(struct closure *cl)
+                return;
+        }
 
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
++       /*
++        * We might meet err when searching the btree, If that happend, we will
++        * get negative ret, in this scenario we should not recover data from
++        * backing device (when cache device is dirty) because we don't know
++        * whether bkeys the read request covered are all clean.
++        *
++        * And after that happend, s->iop.status is still its initially value
++        * before we submit s->bio.bio
++        */
++        if (ret < 0) {
++                BUG_ON(ret == -EINTR);
++                if (s->d && s->d->c &&
++                        !UUID_FLASH_ONLY(&s->d->c->uuids[s->d->id])) {
++                        dc = container_of(s->d, struct cached_dev, disk);
++                        if (dc && atomic_read(&dc->has_dirty))
++                                s->recoverable = false;
++                }
++                if (!s->iop.status)
++                        s->iop.status = BLK_STS_IOERR;
++        }
++
+        closure_return(cl);
+ }
 
-Mike
+-- 
+1.8.3.1
