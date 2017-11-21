@@ -1,112 +1,89 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:13823 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751115AbdKUNnW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Nov 2017 08:43:22 -0500
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V14 02/24] mmc: block: Check return value of blk_get_request()
-Date: Tue, 21 Nov 2017 15:42:28 +0200
-Message-Id: <1511271770-3444-3-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
-References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <msnitzer@redhat.com>
+Date: Mon, 20 Nov 2017 20:08:12 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: Shaohua Li <shli@kernel.org>
+Cc: Joseph Qi <jiangqi903@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+	Shaohua Li <shli@fb.com>, linux-block <linux-block@vger.kernel.org>,
+	qijiang.qj@alibaba-inc.com,
+	device-mapper development <dm-devel@redhat.com>
+Subject: Re: [PATCH v2 2/2] blk-throttle: fix wrong initialization in case of
+ dm device
+Message-ID: <20171121010812.GA14445@redhat.com>
+References: <241a6fbe-f2d2-3d11-ba45-afc5b02de9c2@gmail.com>
+ <CAMM=eLes8Z05HseDYjt+S3HC7jvfyREZrRqGBbTzxEfy8KHEEA@mail.gmail.com>
+ <20171120212319.3rxkbcdpxglfa565@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171120212319.3rxkbcdpxglfa565@kernel.org>
+List-ID: <linux-block@vger.kernel.org>
 
-blk_get_request() can fail, always check the return value.
+On Mon, Nov 20 2017 at  4:23pm -0500,
+Shaohua Li <shli@kernel.org> wrote:
 
-Fixes: 0493f6fe5bde ("mmc: block: Move boot partition locking into a driver op")
-Fixes: 3ecd8cf23f88 ("mmc: block: move multi-ioctl() to use block layer")
-Fixes: 614f0388f580 ("mmc: block: move single ioctl() commands to block requests")
-Fixes: 627c3ccfb46a ("mmc: debugfs: Move block debugfs into block module")
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/core/block.c | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+> On Mon, Nov 20, 2017 at 04:02:03PM -0500, Mike Snitzer wrote:
+> > On Sun, Nov 19, 2017 at 9:00 PM, Joseph Qi <jiangqi903@gmail.com> wrote:
+> > > From: Joseph Qi <qijiang.qj@alibaba-inc.com>
+> > >
+> > > dm device set QUEUE_FLAG_NONROT in resume, which is after register
+> > > queue. That is to mean, the previous initialization in
+> > > blk_throtl_register_queue is wrong in this case.
+> > > Fix it by checking and then updating the info during root tg
+> > > initialization as we don't have a better choice.
+> > 
+> > Given DM motivated this change, curious why you didn't send this to dm-devel?
+> > 
+> > In any case, not sure why you need to reference "resume".  Very few
+> > people will appreciate that detail.
+> > 
+> > Better to just say: DM device sets QUEUE_FLAG_NONROT after the queue
+> > is registered.
+> > 
+> > > Signed-off-by: Joseph Qi <qijiang.qj@alibaba-inc.com>
+> > > ---
+> > >  block/blk-throttle.c | 17 +++++++++++++++++
+> > >  1 file changed, 17 insertions(+)
+> > >
+> > > diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+> > > index bf52035..6d6b220 100644
+> > > --- a/block/blk-throttle.c
+> > > +++ b/block/blk-throttle.c
+> > > @@ -541,6 +541,23 @@ static void throtl_pd_init(struct blkg_policy_data *pd)
+> > >         if (cgroup_subsys_on_dfl(io_cgrp_subsys) && blkg->parent)
+> > >                 sq->parent_sq = &blkg_to_tg(blkg->parent)->service_queue;
+> > >         tg->td = td;
+> > > +
+> > > +       /*
+> > > +        * dm device set QUEUE_FLAG_NONROT in resume, which is after resister
+> > > +        * queue, so the previous initialization is wrong in this case. Check
+> > > +        * and update it here.
+> > > +        */
+> > 
+> > typo: s/resister/register/
+> > But again, best to say:
+> > DM device sets QUEUE_FLAG_NONROT after the queue is registered, ...
+> > 
+> > Also, an alternative to your patch would be to have DM's
+> > dm_table_set_restrictions() call a blk-throttle function to setup
+> > blk-throttle after it is done setting queue flags?
+> > Saves all other drivers from having to run this 2 stage initialization
+> > code.. just a thought.
+> 
+> Though the patch is a workaround, I'd prefer limiting the code into
+> blk-throttle itself. Populating it to drivers is a layer violation to me. The
+> initialization only runs once, so I think it's ok.
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index f60939858586..4a319ddbd956 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -233,6 +233,10 @@ static ssize_t power_ro_lock_store(struct device *dev,
- 
- 	/* Dispatch locking to the block layer */
- 	req = blk_get_request(mq->queue, REQ_OP_DRV_OUT, __GFP_RECLAIM);
-+	if (IS_ERR(req)) {
-+		count = PTR_ERR(req);
-+		goto out_put;
-+	}
- 	req_to_mmc_queue_req(req)->drv_op = MMC_DRV_OP_BOOT_WP;
- 	blk_execute_rq(mq->queue, NULL, req, 0);
- 	ret = req_to_mmc_queue_req(req)->drv_op_result;
-@@ -249,7 +253,7 @@ static ssize_t power_ro_lock_store(struct device *dev,
- 				set_disk_ro(part_md->disk, 1);
- 			}
- 	}
--
-+out_put:
- 	mmc_blk_put(md);
- 	return count;
- }
-@@ -625,6 +629,10 @@ static int mmc_blk_ioctl_cmd(struct mmc_blk_data *md,
- 	req = blk_get_request(mq->queue,
- 		idata->ic.write_flag ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN,
- 		__GFP_RECLAIM);
-+	if (IS_ERR(req)) {
-+		err = PTR_ERR(req);
-+		goto cmd_done;
-+	}
- 	idatas[0] = idata;
- 	req_to_mmc_queue_req(req)->drv_op =
- 		rpmb ? MMC_DRV_OP_IOCTL_RPMB : MMC_DRV_OP_IOCTL;
-@@ -692,6 +700,10 @@ static int mmc_blk_ioctl_multi_cmd(struct mmc_blk_data *md,
- 	req = blk_get_request(mq->queue,
- 		idata[0]->ic.write_flag ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN,
- 		__GFP_RECLAIM);
-+	if (IS_ERR(req)) {
-+		err = PTR_ERR(req);
-+		goto cmd_err;
-+	}
- 	req_to_mmc_queue_req(req)->drv_op =
- 		rpmb ? MMC_DRV_OP_IOCTL_RPMB : MMC_DRV_OP_IOCTL;
- 	req_to_mmc_queue_req(req)->drv_op_data = idata;
-@@ -2551,6 +2563,8 @@ static int mmc_dbg_card_status_get(void *data, u64 *val)
- 
- 	/* Ask the block layer about the card status */
- 	req = blk_get_request(mq->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
-+	if (IS_ERR(req))
-+		return PTR_ERR(req);
- 	req_to_mmc_queue_req(req)->drv_op = MMC_DRV_OP_GET_CARD_STATUS;
- 	blk_execute_rq(mq->queue, NULL, req, 0);
- 	ret = req_to_mmc_queue_req(req)->drv_op_result;
-@@ -2585,6 +2599,10 @@ static int mmc_ext_csd_open(struct inode *inode, struct file *filp)
- 
- 	/* Ask the block layer for the EXT CSD */
- 	req = blk_get_request(mq->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
-+	if (IS_ERR(req)) {
-+		err = PTR_ERR(req);
-+		goto out_free;
-+	}
- 	req_to_mmc_queue_req(req)->drv_op = MMC_DRV_OP_GET_EXT_CSD;
- 	req_to_mmc_queue_req(req)->drv_op_data = &ext_csd;
- 	blk_execute_rq(mq->queue, NULL, req, 0);
--- 
-1.9.1
+I fail to see how this is a "workaround".  Whatever you call it, the
+blk-throttle code needs to cope with the fact that DM's request_queue
+setup is different than other block devices.
+
+If having DM call a function that blk-throttle provides (code that is in
+block/blk-throttle.c) I fail to see the layer violation.  No more a
+layer violation than any of the other block core code that block drivers
+call to setup the request_queue's capabilities.
+
+But I'm not well-versed on blk-throttle code (hence DM coming up lacking
+relative to it).  SO I'll defer to you guys to sort it out how you think
+best.
+
+Thanks,
+Mike
