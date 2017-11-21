@@ -1,116 +1,32 @@
-Return-Path: <marcos.souza.org@gmail.com>
-Return-Path: <marcos.souza.org@gmail.com>
-From: Marcos Paulo de Souza <marcos.souza.org@gmail.com>
-To: 
-Cc: Marcos Paulo de Souza <marcos.souza.org@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH -next] blktrace.c: Use blk_trace_bio_get_cgid inside blk_add_trace_bio
-Date: Sun, 19 Nov 2017 16:48:13 -0200
-Message-Id: <20171119184817.15754-1-marcos.souza.org@gmail.com>
+Return-Path: <martin.petersen@oracle.com>
+To: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: Re: [PATCH V8 6/7] sd_zbc: Initialize device request queue zoned data
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20171109065707.17210-1-damien.lemoal@wdc.com>
+	<20171109065707.17210-7-damien.lemoal@wdc.com>
+Date: Mon, 20 Nov 2017 21:36:55 -0500
+In-Reply-To: <20171109065707.17210-7-damien.lemoal@wdc.com> (Damien Le Moal's
+	message of "Thu, 9 Nov 2017 15:57:06 +0900")
+Message-ID: <yq1a7zgnyrc.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-instead of passing cgid as a parameter.
 
-Signed-off-by: Marcos Paulo de Souza <marcos.souza.org@gmail.com>
----
+Damien,
 
-Discovered when checking the missing documentation of cgid in blk_add_trace_bio
-function when running make pdfdocs.
+> Initialize the seq_zones_bitmap, seq_zones_wlock and nr_zones fields
+> of the disk request queue on disk revalidate. As the seq_zones_bitmap
+> and seq_zones_wlock allocations are identical, introduce the helper
+> sd_zbc_alloc_zone_bitmap(). Using this helper, reallocate the bitmaps
+> whenever the disk capacity (number of zones) changes.
 
- kernel/trace/blktrace.c | 26 ++++++++++----------------
- 1 file changed, 10 insertions(+), 16 deletions(-)
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 206e0e2ace53..c5987d4c5f23 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -872,7 +872,7 @@ static void blk_add_trace_rq_complete(void *ignore, struct request *rq,
-  *
-  **/
- static void blk_add_trace_bio(struct request_queue *q, struct bio *bio,
--			      u32 what, int error, union kernfs_node_id *cgid)
-+			      u32 what, int error)
- {
- 	struct blk_trace *bt = q->blk_trace;
- 
-@@ -880,22 +880,21 @@ static void blk_add_trace_bio(struct request_queue *q, struct bio *bio,
- 		return;
- 
- 	__blk_add_trace(bt, bio->bi_iter.bi_sector, bio->bi_iter.bi_size,
--			bio_op(bio), bio->bi_opf, what, error, 0, NULL, cgid);
-+			bio_op(bio), bio->bi_opf, what, error, 0, NULL,
-+			blk_trace_bio_get_cgid(q, bio));
- }
- 
- static void blk_add_trace_bio_bounce(void *ignore,
- 				     struct request_queue *q, struct bio *bio)
- {
--	blk_add_trace_bio(q, bio, BLK_TA_BOUNCE, 0,
--			  blk_trace_bio_get_cgid(q, bio));
-+	blk_add_trace_bio(q, bio, BLK_TA_BOUNCE, 0);
- }
- 
- static void blk_add_trace_bio_complete(void *ignore,
- 				       struct request_queue *q, struct bio *bio,
- 				       int error)
- {
--	blk_add_trace_bio(q, bio, BLK_TA_COMPLETE, error,
--			  blk_trace_bio_get_cgid(q, bio));
-+	blk_add_trace_bio(q, bio, BLK_TA_COMPLETE, error);
- }
- 
- static void blk_add_trace_bio_backmerge(void *ignore,
-@@ -903,8 +902,7 @@ static void blk_add_trace_bio_backmerge(void *ignore,
- 					struct request *rq,
- 					struct bio *bio)
- {
--	blk_add_trace_bio(q, bio, BLK_TA_BACKMERGE, 0,
--			 blk_trace_bio_get_cgid(q, bio));
-+	blk_add_trace_bio(q, bio, BLK_TA_BACKMERGE, 0);
- }
- 
- static void blk_add_trace_bio_frontmerge(void *ignore,
-@@ -912,15 +910,13 @@ static void blk_add_trace_bio_frontmerge(void *ignore,
- 					 struct request *rq,
- 					 struct bio *bio)
- {
--	blk_add_trace_bio(q, bio, BLK_TA_FRONTMERGE, 0,
--			  blk_trace_bio_get_cgid(q, bio));
-+	blk_add_trace_bio(q, bio, BLK_TA_FRONTMERGE, 0);
- }
- 
- static void blk_add_trace_bio_queue(void *ignore,
- 				    struct request_queue *q, struct bio *bio)
- {
--	blk_add_trace_bio(q, bio, BLK_TA_QUEUE, 0,
--			  blk_trace_bio_get_cgid(q, bio));
-+	blk_add_trace_bio(q, bio, BLK_TA_QUEUE, 0);
- }
- 
- static void blk_add_trace_getrq(void *ignore,
-@@ -928,8 +924,7 @@ static void blk_add_trace_getrq(void *ignore,
- 				struct bio *bio, int rw)
- {
- 	if (bio)
--		blk_add_trace_bio(q, bio, BLK_TA_GETRQ, 0,
--				  blk_trace_bio_get_cgid(q, bio));
-+		blk_add_trace_bio(q, bio, BLK_TA_GETRQ, 0);
- 	else {
- 		struct blk_trace *bt = q->blk_trace;
- 
-@@ -945,8 +940,7 @@ static void blk_add_trace_sleeprq(void *ignore,
- 				  struct bio *bio, int rw)
- {
- 	if (bio)
--		blk_add_trace_bio(q, bio, BLK_TA_SLEEPRQ, 0,
--				  blk_trace_bio_get_cgid(q, bio));
-+		blk_add_trace_bio(q, bio, BLK_TA_SLEEPRQ, 0);
- 	else {
- 		struct blk_trace *bt = q->blk_trace;
- 
 -- 
-2.13.6
+Martin K. Petersen	Oracle Linux Engineering
