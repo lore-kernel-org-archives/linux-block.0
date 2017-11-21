@@ -1,78 +1,88 @@
-Return-Path: <prvs=5014e5409=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Omar Sandoval <osandov@fb.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 5/7] blk-mq: Avoid that blk_mq_mark_tag_wait() triggers a queue stall
-Date: Thu, 30 Nov 2017 16:08:46 -0800
-Message-Id: <20171201000848.2656-6-bart.vanassche@wdc.com>
-In-Reply-To: <20171201000848.2656-1-bart.vanassche@wdc.com>
-References: <20171201000848.2656-1-bart.vanassche@wdc.com>
+Return-Path: <borntraeger@de.ibm.com>
+Subject: Re: 4.14: WARNING: CPU: 4 PID: 2895 at block/blk-mq.c:1144 with
+ virtio-blk
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+To: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <Bart.VanAssche@wdc.com>,
+        "virtualization@lists.linux-foundation.org"
+ <virtualization@lists.linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "jasowang@redhat.com"
+ <jasowang@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <9c5eec5d-f542-4d76-6933-6fe31203ce09@de.ibm.com>
+ <1511205644.2396.32.camel@wdc.com>
+ <04526c98-ffc5-1eca-3aa8-50f9212c4323@de.ibm.com>
+ <5c9f2228-0a8b-8225-7038-e6cb3f31ca0b@kernel.dk>
+ <2e44dbd3-2f90-c267-560c-91d1d4b0e892@de.ibm.com>
+ <823b9dd5-7781-5a72-03ff-bc931433fc19@kernel.dk>
+ <bd928410-4d38-603e-00c9-4c4db20d8e86@de.ibm.com>
+Date: Tue, 21 Nov 2017 10:50:18 +0100
+MIME-Version: 1.0
+In-Reply-To: <bd928410-4d38-603e-00c9-4c4db20d8e86@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Message-Id: <15f232d2-2aaa-df7c-57e8-2f710e051e84@de.ibm.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The blk_mq_sched_restart() call from inside blk_mq_free_request()
-only runs those queues for which BLK_MQ_S_SCHED_RESTART has been
-set. Hence set that flag from inside blk_mq_mark_tag_wait() whether
-or not a queue is shared.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- block/blk-mq-sched.c | 2 +-
- block/blk-mq.c       | 4 ++--
- block/blk-mq.h       | 2 ++
- 3 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index c4e0cb5f6f1f..398545d94521 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -54,7 +54,7 @@ void blk_mq_sched_assign_ioc(struct request *rq, struct bio *bio)
-  * Mark a hardware queue as needing a restart. For shared queues, maintain
-  * a count of how many hardware queues are marked for restart.
-  */
--static void blk_mq_sched_mark_restart_hctx(struct blk_mq_hw_ctx *hctx)
-+void blk_mq_sched_mark_restart_hctx(struct blk_mq_hw_ctx *hctx)
- {
- 	if (test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
- 		return;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 26fec4dfa40f..3e0ce940377f 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1036,9 +1036,9 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx **hctx,
- 	wait_queue_entry_t *wait;
- 	bool ret;
- 
-+	blk_mq_sched_mark_restart_hctx(this_hctx);
-+
- 	if (!shared_tags) {
--		if (!test_bit(BLK_MQ_S_SCHED_RESTART, &this_hctx->state))
--			set_bit(BLK_MQ_S_SCHED_RESTART, &this_hctx->state);
- 		ret = blk_mq_get_driver_tag(rq, hctx, false);
- 		/*
- 		 * Don't clear RESTART here, someone else could have set it.
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 6c7c3ff5bf62..eb3c93aeb8b3 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -139,6 +139,8 @@ static inline bool blk_mq_hw_queue_mapped(struct blk_mq_hw_ctx *hctx)
- void blk_mq_in_flight(struct request_queue *q, struct hd_struct *part,
- 			unsigned int inflight[2]);
- 
-+void blk_mq_sched_mark_restart_hctx(struct blk_mq_hw_ctx *hctx);
-+
- static inline void blk_mq_put_dispatch_budget(struct blk_mq_hw_ctx *hctx)
- {
- 	struct request_queue *q = hctx->queue;
--- 
-2.15.0
+On 11/21/2017 09:35 AM, Christian Borntraeger wrote:
+> 
+> 
+> On 11/20/2017 09:52 PM, Jens Axboe wrote:
+>> On 11/20/2017 01:49 PM, Christian Borntraeger wrote:
+>>>
+>>>
+>>> On 11/20/2017 08:42 PM, Jens Axboe wrote:
+>>>> On 11/20/2017 12:29 PM, Christian Borntraeger wrote:
+>>>>>
+>>>>>
+>>>>> On 11/20/2017 08:20 PM, Bart Van Assche wrote:
+>>>>>> On Fri, 2017-11-17 at 15:42 +0100, Christian Borntraeger wrote:
+>>>>>>> This is 
+>>>>>>>
+>>>>>>> b7a71e66d (Jens Axboe                2017-08-01 09:28:24 -0600 1141)     * are mapped to it.
+>>>>>>> b7a71e66d (Jens Axboe                2017-08-01 09:28:24 -0600 1142)     */
+>>>>>>> 6a83e74d2 (Bart Van Assche           2016-11-02 10:09:51 -0600 1143)    WARN_ON(!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) &&
+>>>>>>> 6a83e74d2 (Bart Van Assche           2016-11-02 10:09:51 -0600 1144)            cpu_online(hctx->next_cpu));
+>>>>>>> 6a83e74d2 (Bart Van Assche           2016-11-02 10:09:51 -0600 1145) 
+>>>>>>> b7a71e66d (Jens Axboe                2017-08-01 09:28:24 -0600 1146)    /*
+>>>>>>
+>>>>>> Did you really try to figure out when the code that reported the warning
+>>>>>> was introduced? I think that warning was introduced through the following
+>>>>>> commit:
+>>>>>
+>>>>> This was more a cut'n'paste to show which warning triggered since line numbers are somewhat volatile.
+>>>>>
+>>>>>>
+>>>>>> commit fd1270d5df6a005e1248e87042159a799cc4b2c9
+>>>>>> Date:   Wed Apr 16 09:23:48 2014 -0600
+>>>>>>
+>>>>>>     blk-mq: don't use preempt_count() to check for right CPU
+>>>>>>      
+>>>>>>     UP or CONFIG_PREEMPT_NONE will return 0, and what we really
+>>>>>>     want to check is whether or not we are on the right CPU.
+>>>>>>     So don't make PREEMPT part of this, just test the CPU in
+>>>>>>     the mask directly.
+>>>>>>
+>>>>>> Anyway, I think that warning is appropriate and useful. So the next step
+>>>>>> is to figure out what work item was involved and why that work item got
+>>>>>> executed on the wrong CPU.
+>>>>>
+>>>>> It seems to be related to virtio-blk (is triggered by fio on such disks). Your comment basically
+>>>>> says: "no this is not a known issue" then :-)
+>>>>> I will try to take a dump to find out the work item
+>>>>
+>>>> blk-mq does not attempt to freeze/sync existing work if a CPU goes away,
+>>>> and we reconfigure the mappings. So I don't think the above is unexpected,
+>>>> if you are doing CPU hot unplug while running a fio job.
+>>>
+>>> I did a cpu hot plug (adding a CPU) and I started fio AFTER that.
+>>
+>> OK, that's different, we should not be triggering a warning for that.
+>> What does your machine/virtblk topology look like in terms of CPUS,
+>> nr of queues for virtblk, etc?
+> 
+> FWIW, 4.11 does work, 4.12 and later is broken.
+
+In fact: 4.12 is fine, 4.12.14 is broken.
