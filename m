@@ -1,122 +1,89 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	lee.tibbert@gmail.com,
-	oleksandr@natalenko.name,
-	lucmiccio@gmail.com,
-	bfq-iosched@googlegroups.com,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX/IMPROVEMENT 2/4] block, bfq: add missing invocations of bfqg_stats_update_io_add/remove
-Date: Mon, 13 Nov 2017 07:34:08 +0100
-Message-Id: <20171113063410.3029-3-paolo.valente@linaro.org>
-In-Reply-To: <20171113063410.3029-1-paolo.valente@linaro.org>
-References: <20171113063410.3029-1-paolo.valente@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:65339 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751443AbdKUNoo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Nov 2017 08:44:44 -0500
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V14 18/24] mmc: block: blk-mq: Separate card polling from recovery
+Date: Tue, 21 Nov 2017 15:42:44 +0200
+Message-Id: <1511271770-3444-19-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
+References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Luca Miccio <lucmiccio@gmail.com>
+Recovery is simpler to understand if it is only used for errors. Create a
+separate function for card polling.
 
-bfqg_stats_update_io_add and bfqg_stats_update_io_remove are to be
-invoked, respectively, when an I/O request enters and when an I/O
-request exits the scheduler. Unfortunately, bfq does not fully comply
-with this scheme, because it does not invoke these functions for
-requests that are inserted into or extracted from its priority
-dispatch list. This commit fixes this mistake.
-
-Tested-by: Lee Tibbert <lee.tibbert@gmail.com>
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Luca Miccio <lucmiccio@gmail.com>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- block/bfq-iosched.c | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
+ drivers/mmc/core/block.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 889a854..91703eb 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -1359,7 +1359,6 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
- 			bfqq->ttime.last_end_request +
- 			bfqd->bfq_slice_idle * 3;
- 
--	bfqg_stats_update_io_add(bfqq_group(RQ_BFQQ(rq)), bfqq, rq->cmd_flags);
- 
- 	/*
- 	 * bfqq deserves to be weight-raised if:
-@@ -1633,7 +1632,6 @@ static void bfq_remove_request(struct request_queue *q,
- 	if (rq->cmd_flags & REQ_META)
- 		bfqq->meta_pending--;
- 
--	bfqg_stats_update_io_remove(bfqq_group(bfqq), rq->cmd_flags);
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index b1857eee46fd..7eb55f2dffa9 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -2162,6 +2162,24 @@ static inline bool mmc_blk_rq_error(struct mmc_blk_request *brq)
+ 	       brq->data.error || brq->cmd.resp[0] & CMD_ERRORS;
  }
  
- static bool bfq_bio_merge(struct blk_mq_hw_ctx *hctx, struct bio *bio)
-@@ -1746,6 +1744,7 @@ static void bfq_requests_merged(struct request_queue *q, struct request *rq,
- 		bfqq->next_rq = rq;
- 
- 	bfq_remove_request(q, next);
-+	bfqg_stats_update_io_remove(bfqq_group(bfqq), next->cmd_flags);
- 
- 	spin_unlock_irq(&bfqq->bfqd->lock);
- end:
-@@ -3700,6 +3699,9 @@ static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	spin_lock_irq(&bfqd->lock);
- 
- 	rq = __bfq_dispatch_request(hctx);
-+	if (rq && RQ_BFQQ(rq))
-+		bfqg_stats_update_io_remove(bfqq_group(RQ_BFQQ(rq)),
-+					    rq->cmd_flags);
- 	spin_unlock_irq(&bfqd->lock);
- 
- 	return rq;
-@@ -4224,6 +4226,7 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- {
- 	struct request_queue *q = hctx->queue;
- 	struct bfq_data *bfqd = q->elevator->elevator_data;
-+	struct bfq_queue *bfqq = RQ_BFQQ(rq);
- 
- 	spin_lock_irq(&bfqd->lock);
- 	if (blk_mq_sched_try_insert_merge(q, rq)) {
-@@ -4243,6 +4246,12 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 			list_add_tail(&rq->queuelist, &bfqd->dispatch);
- 	} else {
- 		__bfq_insert_request(bfqd, rq);
-+		/*
-+		 * Update bfqq, because, if a queue merge has occurred
-+		 * in __bfq_insert_request, then rq has been
-+		 * redirected into a new queue.
-+		 */
-+		bfqq = RQ_BFQQ(rq);
- 
- 		if (rq_mergeable(rq)) {
- 			elv_rqhash_add(q, rq);
-@@ -4251,6 +4260,9 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 		}
- 	}
- 
-+	if (bfqq)
-+		bfqg_stats_update_io_add(bfqq_group(bfqq), bfqq, rq->cmd_flags);
++static int mmc_blk_card_busy(struct mmc_card *card, struct request *req)
++{
++	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
++	bool gen_err = false;
++	int err;
 +
- 	spin_unlock_irq(&bfqd->lock);
++	if (mmc_host_is_spi(card->host) || rq_data_dir(req) == READ)
++		return 0;
++
++	err = card_busy_detect_err(card, true, req, &gen_err);
++
++	/* Copy the general error bit so it will be seen later on */
++	if (gen_err)
++		mqrq->brq.stop.resp[0] |= R1_ERROR;
++
++	return err;
++}
++
+ static inline void mmc_blk_rw_reset_success(struct mmc_queue *mq,
+ 					    struct request *req)
+ {
+@@ -2218,8 +2236,15 @@ static void mmc_blk_mq_poll_completion(struct mmc_queue *mq,
+ 				       struct request *req)
+ {
+ 	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
++	struct mmc_host *host = mq->card->host;
+ 
+-	mmc_blk_mq_rw_recovery(mq, req);
++	if (mmc_blk_rq_error(&mqrq->brq) ||
++	    mmc_blk_card_busy(mq->card, req)) {
++		mmc_blk_mq_rw_recovery(mq, req);
++	} else {
++		mmc_blk_rw_reset_success(mq, req);
++		mmc_retune_release(host);
++	}
+ 
+ 	mmc_blk_urgent_bkops(mq, mqrq);
  }
- 
-@@ -4428,8 +4440,11 @@ static void bfq_finish_request(struct request *rq)
- 		 * lock is held.
- 		 */
- 
--		if (!RB_EMPTY_NODE(&rq->rb_node))
-+		if (!RB_EMPTY_NODE(&rq->rb_node)) {
- 			bfq_remove_request(rq->q, rq);
-+			bfqg_stats_update_io_remove(bfqq_group(bfqq),
-+						    rq->cmd_flags);
-+		}
- 		bfq_put_rq_priv_body(bfqq);
- 	}
- 
 -- 
-2.10.0
+1.9.1
