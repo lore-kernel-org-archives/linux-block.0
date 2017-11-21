@@ -1,7 +1,6 @@
 Return-Path: <axboe@kernel.dk>
 Subject: Re: 4.14: WARNING: CPU: 4 PID: 2895 at block/blk-mq.c:1144 with
  virtio-blk (also 4.12 stable)
-From: Jens Axboe <axboe@kernel.dk>
 To: Christian Borntraeger <borntraeger@de.ibm.com>,
  Bart Van Assche <Bart.VanAssche@wdc.com>,
  "virtualization@lists.linux-foundation.org"
@@ -20,55 +19,44 @@ References: <9c5eec5d-f542-4d76-6933-6fe31203ce09@de.ibm.com>
  <bd928410-4d38-603e-00c9-4c4db20d8e86@de.ibm.com>
  <15f232d2-2aaa-df7c-57e8-2f710e051e84@de.ibm.com>
  <c8bd769e-9742-205d-11b0-469428a8579c@de.ibm.com>
- <b7b3cf4b-837e-f9ba-61c0-4f9ddd8b9a95@kernel.dk>
-Message-ID: <055f040d-3f9a-a8fd-e8e2-326c6b9094a1@kernel.dk>
-Date: Tue, 21 Nov 2017 11:09:33 -0700
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <b7b3cf4b-837e-f9ba-61c0-4f9ddd8b9a95@kernel.dk>
+Date: Tue, 21 Nov 2017 10:27:04 -0700
 MIME-Version: 1.0
-In-Reply-To: <b7b3cf4b-837e-f9ba-61c0-4f9ddd8b9a95@kernel.dk>
+In-Reply-To: <c8bd769e-9742-205d-11b0-469428a8579c@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 11/21/2017 10:27 AM, Jens Axboe wrote:
-> On 11/21/2017 03:14 AM, Christian Borntraeger wrote:
->> Bisect points to
->>
->> 1b5a7455d345b223d3a4658a9e5fce985b7998c1 is the first bad commit
->> commit 1b5a7455d345b223d3a4658a9e5fce985b7998c1
->> Author: Christoph Hellwig <hch@lst.de>
->> Date:   Mon Jun 26 12:20:57 2017 +0200
->>
->>     blk-mq: Create hctx for each present CPU
->>     
->>     commit 4b855ad37194f7bdbb200ce7a1c7051fecb56a08 upstream.
->>     
->>     Currently we only create hctx for online CPUs, which can lead to a lot
->>     of churn due to frequent soft offline / online operations.  Instead
->>     allocate one for each present CPU to avoid this and dramatically simplify
->>     the code.
->>     
->>     Signed-off-by: Christoph Hellwig <hch@lst.de>
->>     Reviewed-by: Jens Axboe <axboe@kernel.dk>
->>     Cc: Keith Busch <keith.busch@intel.com>
->>     Cc: linux-block@vger.kernel.org
->>     Cc: linux-nvme@lists.infradead.org
->>     Link: http://lkml.kernel.org/r/20170626102058.10200-3-hch@lst.de
->>     Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
->>     Cc: Oleksandr Natalenko <oleksandr@natalenko.name>
->>     Cc: Mike Galbraith <efault@gmx.de>
->>     Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+On 11/21/2017 03:14 AM, Christian Borntraeger wrote:
+> Bisect points to
 > 
-> I wonder if we're simply not getting the masks updated correctly. I'll
-> take a look.
+> 1b5a7455d345b223d3a4658a9e5fce985b7998c1 is the first bad commit
+> commit 1b5a7455d345b223d3a4658a9e5fce985b7998c1
+> Author: Christoph Hellwig <hch@lst.de>
+> Date:   Mon Jun 26 12:20:57 2017 +0200
+> 
+>     blk-mq: Create hctx for each present CPU
+>     
+>     commit 4b855ad37194f7bdbb200ce7a1c7051fecb56a08 upstream.
+>     
+>     Currently we only create hctx for online CPUs, which can lead to a lot
+>     of churn due to frequent soft offline / online operations.  Instead
+>     allocate one for each present CPU to avoid this and dramatically simplify
+>     the code.
+>     
+>     Signed-off-by: Christoph Hellwig <hch@lst.de>
+>     Reviewed-by: Jens Axboe <axboe@kernel.dk>
+>     Cc: Keith Busch <keith.busch@intel.com>
+>     Cc: linux-block@vger.kernel.org
+>     Cc: linux-nvme@lists.infradead.org
+>     Link: http://lkml.kernel.org/r/20170626102058.10200-3-hch@lst.de
+>     Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+>     Cc: Oleksandr Natalenko <oleksandr@natalenko.name>
+>     Cc: Mike Galbraith <efault@gmx.de>
+>     Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-Can't make it trigger here. We do init for each present CPU, which means
-that if I offline a few CPUs here and register a queue, those still show
-up as present (just offline) and get mapped accordingly.
-
->From the looks of it, your setup is different. If the CPU doesn't show
-up as present and it gets hotplugged, then I can see how this condition
-would trigger. What environment are you running this in? We might have
-to re-introduce the cpu hotplug notifier, right now we just monitor
-for a dead cpu and handle that.
+I wonder if we're simply not getting the masks updated correctly. I'll
+take a look.
 
 -- 
 Jens Axboe
