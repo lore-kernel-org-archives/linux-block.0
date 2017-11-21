@@ -1,98 +1,112 @@
-Return-Path: <BATV+adf086a54a2d754d8a83+5184+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 2/6] nvme: always unregister the integrity profile in __nvme_revalidate_disk
-Date: Thu,  2 Nov 2017 21:28:52 +0300
-Message-Id: <20171102182856.9162-3-hch@lst.de>
-In-Reply-To: <20171102182856.9162-1-hch@lst.de>
-References: <20171102182856.9162-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:13823 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751944AbdKUNn5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Nov 2017 08:43:57 -0500
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V14 09/24] mmc: block: Make card_busy_detect() accumulate all response error bits
+Date: Tue, 21 Nov 2017 15:42:35 +0200
+Message-Id: <1511271770-3444-10-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
+References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This is safe because the queue is always frozen when we revalidate, and
-it simplifies both the existing code as well as the multipath
-implementation.
+Make card_busy_detect() accumulate all response error bits. Later patches
+will make use of this.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- drivers/nvme/host/core.c | 40 ++++++++++------------------------------
- 1 file changed, 10 insertions(+), 30 deletions(-)
+ drivers/mmc/core/block.c | 30 ++++++++++++++++++++++--------
+ 1 file changed, 22 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 1c2686d4eaf3..bc27f6603861 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1081,29 +1081,6 @@ static int nvme_getgeo(struct block_device *bdev, struct hd_geometry *geo)
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index 130ce94fdaf2..607774fcb9f5 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -959,7 +959,7 @@ static inline bool mmc_blk_in_tran_state(u32 status)
  }
  
- #ifdef CONFIG_BLK_DEV_INTEGRITY
--static void nvme_prep_integrity(struct gendisk *disk, struct nvme_id_ns *id,
--		u16 bs)
--{
--	struct nvme_ns *ns = disk->private_data;
--	u16 old_ms = ns->ms;
--	u8 pi_type = 0;
--
--	ns->ms = le16_to_cpu(id->lbaf[id->flbas & NVME_NS_FLBAS_LBA_MASK].ms);
--	ns->ext = ns->ms && (id->flbas & NVME_NS_FLBAS_META_EXT);
--
--	/* PI implementation requires metadata equal t10 pi tuple size */
--	if (ns->ms == sizeof(struct t10_pi_tuple))
--		pi_type = id->dps & NVME_NS_DPS_PI_MASK;
--
--	if (blk_get_integrity(disk) &&
--	    (ns->pi_type != pi_type || ns->ms != old_ms ||
--	     bs != queue_logical_block_size(disk->queue) ||
--	     (ns->ms && ns->ext)))
--		blk_integrity_unregister(disk);
--
--	ns->pi_type = pi_type;
--}
--
- static void nvme_init_integrity(struct nvme_ns *ns)
+ static int card_busy_detect(struct mmc_card *card, bool hw_busy_detect,
+-			    struct request *req, bool *gen_err)
++			    struct request *req, u32 *resp_errs)
  {
- 	struct blk_integrity integrity;
-@@ -1130,10 +1107,6 @@ static void nvme_init_integrity(struct nvme_ns *ns)
- 	blk_queue_max_integrity_segments(ns->queue, 1);
+ 	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
+ 	struct mmc_data *data = &mqrq->brq.data;
+@@ -979,11 +979,9 @@ static int card_busy_detect(struct mmc_card *card, bool hw_busy_detect,
+ 			return err;
+ 		}
+ 
+-		if (status & R1_ERROR) {
+-			pr_err("%s: %s: error sending status cmd, status %#x\n",
+-				req->rq_disk->disk_name, __func__, status);
+-			*gen_err = true;
+-		}
++		/* Accumulate any response error bits seen */
++		if (resp_errs)
++			*resp_errs |= status;
+ 
+ 		/* We may rely on the host hw to handle busy detection.*/
+ 		if ((card->host->caps & MMC_CAP_WAIT_WHILE_BUSY) &&
+@@ -1011,6 +1009,22 @@ static int card_busy_detect(struct mmc_card *card, bool hw_busy_detect,
+ 	return err;
  }
- #else
--static void nvme_prep_integrity(struct gendisk *disk, struct nvme_id_ns *id,
--		u16 bs)
--{
--}
- static void nvme_init_integrity(struct nvme_ns *ns)
+ 
++static int card_busy_detect_err(struct mmc_card *card, bool hw_busy_detect,
++				struct request *req, bool *gen_err)
++{
++	u32 resp_errs = 0;
++	int err;
++
++	err = card_busy_detect(card, hw_busy_detect, req, &resp_errs);
++	if (resp_errs & R1_ERROR) {
++		pr_err("%s: %s: error sending status cmd, status %#x\n",
++		       req->rq_disk->disk_name, __func__, resp_errs);
++		*gen_err = true;
++	}
++
++	return err;
++}
++
+ static int send_stop(struct mmc_card *card, unsigned int timeout_ms,
+ 		struct request *req, bool *gen_err, u32 *stop_status)
  {
+@@ -1053,7 +1067,7 @@ static int send_stop(struct mmc_card *card, unsigned int timeout_ms,
+ 		*gen_err = true;
+ 	}
+ 
+-	return card_busy_detect(card, use_r1b_resp, req, gen_err);
++	return card_busy_detect_err(card, use_r1b_resp, req, gen_err);
  }
-@@ -1202,15 +1175,22 @@ static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
- 		ns->lba_shift = 9;
- 	bs = 1 << ns->lba_shift;
- 	ns->noiob = le16_to_cpu(id->noiob);
-+	ns->ext = ns->ms && (id->flbas & NVME_NS_FLBAS_META_EXT);
-+	ns->ms = le16_to_cpu(id->lbaf[id->flbas & NVME_NS_FLBAS_LBA_MASK].ms);
-+	/* the PI implementation requires metadata equal t10 pi tuple size */
-+	if (ns->ms == sizeof(struct t10_pi_tuple))
-+		ns->pi_type = id->dps & NVME_NS_DPS_PI_MASK;
-+	else
-+		ns->pi_type = 0;
  
- 	blk_mq_freeze_queue(disk->queue);
-+	blk_integrity_unregister(disk);
+ #define ERR_NOMEDIUM	3
+@@ -1588,7 +1602,7 @@ static enum mmc_blk_status mmc_blk_err_check(struct mmc_card *card,
+ 			gen_err = true;
+ 		}
  
--	if (ctrl->ops->flags & NVME_F_METADATA_SUPPORTED)
--		nvme_prep_integrity(disk, id, bs);
- 	blk_queue_logical_block_size(ns->queue, bs);
- 	if (ns->noiob)
- 		nvme_set_chunk_size(ns);
--	if (ns->ms && !blk_get_integrity(disk) && !ns->ext)
-+	if (ns->ms && !ns->ext &&
-+	    (ctrl->ops->flags & NVME_F_METADATA_SUPPORTED))
- 		nvme_init_integrity(ns);
- 	if (ns->ms && !(ns->ms == 8 && ns->pi_type) && !blk_get_integrity(disk))
- 		set_capacity(disk, 0);
+-		err = card_busy_detect(card, false, req, &gen_err);
++		err = card_busy_detect_err(card, false, req, &gen_err);
+ 		if (err)
+ 			return MMC_BLK_CMD_ERR;
+ 	}
 -- 
-2.14.2
+1.9.1
