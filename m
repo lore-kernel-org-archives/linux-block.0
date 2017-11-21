@@ -1,45 +1,87 @@
-Return-Path: <mlyle@lyle.org>
-Return-Path: <mlyle@lyle.org>
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-block@vger.kernel.org,
-	linux-bcache@vger.kernel.org
-Cc: Michael Lyle <mlyle@lyle.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	stable@vger.kernel.org
-Subject: [PATCH] bio: ensure __bio_clone_fast copies bi_partno
-Date: Thu, 16 Nov 2017 23:47:25 -0800
-Message-Id: <20171117074725.22536-1-mlyle@lyle.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:13823 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751751AbdKUNnw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Nov 2017 08:43:52 -0500
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V14 08/24] mmc: block: Check for transfer state in card_busy_detect()
+Date: Tue, 21 Nov 2017 15:42:34 +0200
+Message-Id: <1511271770-3444-9-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
+References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-A new field was introduced in 74d46992e0d9dee7f1f376de0d56d31614c8a17a,
-bi_partno, instead of using bdev->bd_contains and encoding the partition
-information in the bi_bdev field.  __bio_clone_fast was changed to copy
-the disk information, but not the partition information.  At minimum,
-this regressed bcache and caused data corruption.
+The card is required to return to transfer state. Since that is the state
+required to start another transfer, check for that state instead of
+programming state.
 
-Signed-off-by: Michael Lyle <mlyle@lyle.org>
-Fixes: 74d46992e0d9dee7f1f376de0d56d31614c8a17a
-Reported-by: Pavel Goran <via-bcache@pvgoran.name>
-Reported-by: Campbell Steven <casteven@gmail.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: <stable@vger.kernel.org>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- block/bio.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/mmc/core/block.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 101c2a9b5481..33fa6b4af312 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -597,6 +597,7 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
- 	 * so we don't set nor calculate new physical/hw segment counts here
- 	 */
- 	bio->bi_disk = bio_src->bi_disk;
-+	bio->bi_partno = bio_src->bi_partno;
- 	bio_set_flag(bio, BIO_CLONED);
- 	bio->bi_opf = bio_src->bi_opf;
- 	bio->bi_write_hint = bio_src->bi_write_hint;
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index 0874ab3e5c92..130ce94fdaf2 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -948,6 +948,16 @@ static unsigned long mmc_blk_data_timeout_jiffies(struct mmc_host *host,
+ 	return msecs_to_jiffies(ms);
+ }
+ 
++static inline bool mmc_blk_in_tran_state(u32 status)
++{
++	/*
++	 * Some cards mishandle the status bits, so make sure to check both the
++	 * busy indication and the card state.
++	 */
++	return status & R1_READY_FOR_DATA &&
++	       (R1_CURRENT_STATE(status) == R1_STATE_TRAN);
++}
++
+ static int card_busy_detect(struct mmc_card *card, bool hw_busy_detect,
+ 			    struct request *req, bool *gen_err)
+ {
+@@ -985,9 +995,9 @@ static int card_busy_detect(struct mmc_card *card, bool hw_busy_detect,
+ 		 * leaves the program state.
+ 		 */
+ 		if (done) {
+-			pr_err("%s: Card stuck in programming state! %s %s\n",
++			pr_err("%s: Card stuck in wrong state! %s %s status: %#x\n",
+ 				mmc_hostname(card->host),
+-				req->rq_disk->disk_name, __func__);
++				req->rq_disk->disk_name, __func__, status);
+ 			return -ETIMEDOUT;
+ 		}
+ 
+@@ -996,8 +1006,7 @@ static int card_busy_detect(struct mmc_card *card, bool hw_busy_detect,
+ 		 * so make sure to check both the busy
+ 		 * indication and the card state.
+ 		 */
+-	} while (!(status & R1_READY_FOR_DATA) ||
+-		 (R1_CURRENT_STATE(status) == R1_STATE_PRG));
++	} while (!mmc_blk_in_tran_state(status));
+ 
+ 	return err;
+ }
 -- 
-2.14.1
+1.9.1
