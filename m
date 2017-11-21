@@ -1,8 +1,8 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:13823 "EHLO mga02.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:65339 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751115AbdKUNnR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Nov 2017 08:43:17 -0500
+        id S1751796AbdKUNpE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Nov 2017 08:45:04 -0500
 From: Adrian Hunter <adrian.hunter@intel.com>
 To: Ulf Hansson <ulf.hansson@linaro.org>
 Cc: linux-mmc <linux-mmc@vger.kernel.org>,
@@ -23,50 +23,103 @@ Cc: linux-mmc <linux-mmc@vger.kernel.org>,
         Shawn Lin <shawn.lin@rock-chips.com>,
         Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
         Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V14 01/24] mmc: block: Fix missing blk_put_request()
-Date: Tue, 21 Nov 2017 15:42:27 +0200
-Message-Id: <1511271770-3444-2-git-send-email-adrian.hunter@intel.com>
+Subject: [PATCH V14 22/24] mmc: core: Remove option not to use blk-mq
+Date: Tue, 21 Nov 2017 15:42:48 +0200
+Message-Id: <1511271770-3444-23-git-send-email-adrian.hunter@intel.com>
 In-Reply-To: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
 References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Ensure blk_get_request() is paired with blk_put_request().
+Remove config option MMC_MQ_DEFAULT and parameter mmc_use_blk_mq, so that
+blk-mq must be used always.
 
-Fixes: 0493f6fe5bde ("mmc: block: Move boot partition locking into a driver op")
-Fixes: 627c3ccfb46a ("mmc: debugfs: Move block debugfs into block module")
 Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- drivers/mmc/core/block.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/mmc/Kconfig     | 10 ----------
+ drivers/mmc/core/core.c |  7 -------
+ drivers/mmc/core/core.h |  2 --
+ drivers/mmc/core/host.c |  2 --
+ drivers/mmc/core/host.h |  2 +-
+ 5 files changed, 1 insertion(+), 22 deletions(-)
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index ea80ff4cd7f9..f60939858586 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -236,6 +236,7 @@ static ssize_t power_ro_lock_store(struct device *dev,
- 	req_to_mmc_queue_req(req)->drv_op = MMC_DRV_OP_BOOT_WP;
- 	blk_execute_rq(mq->queue, NULL, req, 0);
- 	ret = req_to_mmc_queue_req(req)->drv_op_result;
-+	blk_put_request(req);
+diff --git a/drivers/mmc/Kconfig b/drivers/mmc/Kconfig
+index 42565562577c..ec21388311db 100644
+--- a/drivers/mmc/Kconfig
++++ b/drivers/mmc/Kconfig
+@@ -12,16 +12,6 @@ menuconfig MMC
+ 	  If you want MMC/SD/SDIO support, you should say Y here and
+ 	  also to your specific host controller driver.
  
- 	if (!ret) {
- 		pr_info("%s: Locking boot partition ro until next power on\n",
-@@ -2557,6 +2558,7 @@ static int mmc_dbg_card_status_get(void *data, u64 *val)
- 		*val = ret;
- 		ret = 0;
- 	}
-+	blk_put_request(req);
+-config MMC_MQ_DEFAULT
+-	bool "MMC: use blk-mq I/O path by default"
+-	depends on MMC && BLOCK
+-	default y
+-	---help---
+-	  This option enables the new blk-mq based I/O path for MMC block
+-	  devices by default.  With the option the mmc_core.use_blk_mq
+-	  module/boot option defaults to Y, without it to N, but it can
+-	  still be overridden either way.
+-
+ if MMC
  
- 	return ret;
+ source "drivers/mmc/core/Kconfig"
+diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
+index 617802f45386..7ca6e4866a8b 100644
+--- a/drivers/mmc/core/core.c
++++ b/drivers/mmc/core/core.c
+@@ -66,13 +66,6 @@
+ bool use_spi_crc = 1;
+ module_param(use_spi_crc, bool, 0);
+ 
+-#ifdef CONFIG_MMC_MQ_DEFAULT
+-bool mmc_use_blk_mq = true;
+-#else
+-bool mmc_use_blk_mq = false;
+-#endif
+-module_param_named(use_blk_mq, mmc_use_blk_mq, bool, S_IWUSR | S_IRUGO);
+-
+ static int mmc_schedule_delayed_work(struct delayed_work *work,
+ 				     unsigned long delay)
+ {
+diff --git a/drivers/mmc/core/core.h b/drivers/mmc/core/core.h
+index aa87cd8d14c6..f564ddfbe070 100644
+--- a/drivers/mmc/core/core.h
++++ b/drivers/mmc/core/core.h
+@@ -35,8 +35,6 @@ struct mmc_bus_ops {
+ 	int (*reset)(struct mmc_host *);
+ };
+ 
+-extern bool mmc_use_blk_mq;
+-
+ void mmc_attach_bus(struct mmc_host *host, const struct mmc_bus_ops *ops);
+ void mmc_detach_bus(struct mmc_host *host);
+ 
+diff --git a/drivers/mmc/core/host.c b/drivers/mmc/core/host.c
+index 62ef6cb0ece4..35a9e4fd1a9f 100644
+--- a/drivers/mmc/core/host.c
++++ b/drivers/mmc/core/host.c
+@@ -404,8 +404,6 @@ struct mmc_host *mmc_alloc_host(int extra, struct device *dev)
+ 
+ 	host->fixed_drv_type = -EINVAL;
+ 
+-	host->use_blk_mq = mmc_use_blk_mq;
+-
+ 	return host;
  }
-@@ -2587,6 +2589,7 @@ static int mmc_ext_csd_open(struct inode *inode, struct file *filp)
- 	req_to_mmc_queue_req(req)->drv_op_data = &ext_csd;
- 	blk_execute_rq(mq->queue, NULL, req, 0);
- 	err = req_to_mmc_queue_req(req)->drv_op_result;
-+	blk_put_request(req);
- 	if (err) {
- 		pr_err("FAILED %d\n", err);
- 		goto out_free;
+ 
+diff --git a/drivers/mmc/core/host.h b/drivers/mmc/core/host.h
+index 6eaf558e62d6..a33903a2ea96 100644
+--- a/drivers/mmc/core/host.h
++++ b/drivers/mmc/core/host.h
+@@ -76,7 +76,7 @@ static inline bool mmc_card_hs400es(struct mmc_card *card)
+ 
+ static inline bool mmc_host_use_blk_mq(struct mmc_host *host)
+ {
+-	return host->use_blk_mq;
++	return true;
+ }
+ 
+ #endif
 -- 
 1.9.1
