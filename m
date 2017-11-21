@@ -1,21 +1,11 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-io0-f180.google.com ([209.85.223.180]:44655 "EHLO
-        mail-io0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752436AbdKWN1I (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Nov 2017 08:27:08 -0500
-Received: by mail-io0-f180.google.com with SMTP id w127so26620545iow.11
-        for <linux-block@vger.kernel.org>; Thu, 23 Nov 2017 05:27:08 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1511271770-3444-7-git-send-email-adrian.hunter@intel.com>
-References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com> <1511271770-3444-7-git-send-email-adrian.hunter@intel.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 23 Nov 2017 14:27:07 +0100
-Message-ID: <CACRpkdZ2UHjsLJMLVqr-UzLLhgesJrBEHymh_AgiKzj6WAU3Tg@mail.gmail.com>
-Subject: Re: [PATCH V14 06/24] mmc: block: Simplify cleaning up the queue
-To: Adrian Hunter <adrian.hunter@intel.com>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
+Received: from mga02.intel.com ([134.134.136.20]:13823 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751731AbdKUNnm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 21 Nov 2017 08:43:42 -0500
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
         linux-kernel <linux-kernel@vger.kernel.org>,
         Bough Chen <haibo.chen@nxp.com>,
@@ -29,23 +19,82 @@ Cc: Ulf Hansson <ulf.hansson@linaro.org>,
         Sahitya Tummala <stummala@codeaurora.org>,
         Harjani Ritesh <riteshh@codeaurora.org>,
         Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
         Shawn Lin <shawn.lin@rock-chips.com>,
         Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
         Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH V14 06/24] mmc: block: Simplify cleaning up the queue
+Date: Tue, 21 Nov 2017 15:42:32 +0200
+Message-Id: <1511271770-3444-7-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
+References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, Nov 21, 2017 at 2:42 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
+Use blk_cleanup_queue() to shutdown the queue when the driver is removed,
+and instead get an extra reference to the queue to prevent the queue being
+freed before the final mmc_blk_put().
 
-> Use blk_cleanup_queue() to shutdown the queue when the driver is removed,
-> and instead get an extra reference to the queue to prevent the queue being
-> freed before the final mmc_blk_put().
->
-> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+---
+ drivers/mmc/core/block.c | 17 ++++++++++++-----
+ drivers/mmc/core/queue.c |  2 ++
+ 2 files changed, 14 insertions(+), 5 deletions(-)
 
-This is way more elegant.
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-
-Yours,
-Linus Walleij
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index ccfa98af1dd3..e44f6d90aeb4 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -189,7 +189,7 @@ static void mmc_blk_put(struct mmc_blk_data *md)
+ 	md->usage--;
+ 	if (md->usage == 0) {
+ 		int devidx = mmc_get_devidx(md->disk);
+-		blk_cleanup_queue(md->queue.queue);
++		blk_put_queue(md->queue.queue);
+ 		ida_simple_remove(&mmc_blk_ida, devidx);
+ 		put_disk(md->disk);
+ 		kfree(md);
+@@ -2156,6 +2156,17 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
+ 
+ 	md->queue.blkdata = md;
+ 
++	/*
++	 * Keep an extra reference to the queue so that we can shutdown the
++	 * queue (i.e. call blk_cleanup_queue()) while there are still
++	 * references to the 'md'. The corresponding blk_put_queue() is in
++	 * mmc_blk_put().
++	 */
++	if (!blk_get_queue(md->queue.queue)) {
++		mmc_cleanup_queue(&md->queue);
++		goto err_putdisk;
++	}
++
+ 	md->disk->major	= MMC_BLOCK_MAJOR;
+ 	md->disk->first_minor = devidx * perdev_minors;
+ 	md->disk->fops = &mmc_bdops;
+@@ -2471,10 +2482,6 @@ static void mmc_blk_remove_req(struct mmc_blk_data *md)
+ 		 * from being accepted.
+ 		 */
+ 		card = md->queue.card;
+-		spin_lock_irq(md->queue.queue->queue_lock);
+-		queue_flag_set(QUEUE_FLAG_BYPASS, md->queue.queue);
+-		spin_unlock_irq(md->queue.queue->queue_lock);
+-		blk_set_queue_dying(md->queue.queue);
+ 		mmc_cleanup_queue(&md->queue);
+ 		if (md->disk->flags & GENHD_FL_UP) {
+ 			device_remove_file(disk_to_dev(md->disk), &md->force_ro);
+diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+index 26f8da30ebe5..ae6d9da68735 100644
+--- a/drivers/mmc/core/queue.c
++++ b/drivers/mmc/core/queue.c
+@@ -268,6 +268,8 @@ void mmc_cleanup_queue(struct mmc_queue *mq)
+ 	blk_start_queue(q);
+ 	spin_unlock_irqrestore(q->queue_lock, flags);
+ 
++	blk_cleanup_queue(q);
++
+ 	mq->card = NULL;
+ }
+ 
+-- 
+1.9.1
