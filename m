@@ -1,59 +1,35 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out1.zte.com.cn ([202.103.147.172]:40250 "EHLO mxct.zte.com.cn"
+Received: from mxhk.zte.com.cn ([63.217.80.70]:51592 "EHLO mxhk.zte.com.cn"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751368AbdKVGUj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Nov 2017 01:20:39 -0500
+        id S1751167AbdKVFsn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 Nov 2017 00:48:43 -0500
 From: tang.junhui@zte.com.cn
 To: colyli@suse.de, mlyle@lyle.org
 Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
         tang.junhui@zte.com.cn
-Subject: [PATCH v2] bcache: stop writeback thread after detaching
-Date: Wed, 22 Nov 2017 14:20:13 +0800
-Message-Id: <1511331613-23140-1-git-send-email-tang.junhui@zte.com.cn>
+Subject: Re: Re: Re: [PATCH] bcache: stop writeback thread after detaching
+Date: Wed, 22 Nov 2017 13:48:27 +0800
+Message-Id: <1511329707-22492-1-git-send-email-tang.junhui@zte.com.cn>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
 From: Tang Junhui <tang.junhui@zte.com.cn>
 
-Currently, when a cached device detaching from cache, writeback thread is
-not stopped, and writeback_rate_update work is not canceled. For example,
-after bellow command:
-echo 1 >/sys/block/sdb/bcache/detach
-you can still see the writeback thread. Then you attach the device to the
-cache again, bcache will create another writeback thread, for example,
-after bellow command:
-echo  ba0fb5cd-658a-4533-9806-6ce166d883b9 > /sys/block/sdb/bcache/attach
-then you will see 2 writeback threads.
-This patch stops writeback thread and cancels writeback_rate_update work
-when cached device detaching from cache.
+Hello Coly, Mike
 
-Compare with patch v1, this v2 patch moves code down into the register
-lock for safety in case of any future changes as Coly and mike suggested.
+> > If the change can be inside bch_register_lock, it would (just) be more
+> > comfortable. The code is correct, because attach/detach sysfs is created
+> > after writeback_thread created and writeback_rate_update worker
+> > initialized, even these resources are initialized within
+> > bch_register_lock and released out of bch)register_lock in your patch,
+> > there won't be any race. It's OK to me.
+>
+> I think I agree with Coly that I'd prefer it to be moved down into the
+> register lock, as I think that will be safer with any future changes.
+> Are you willing to adjust it this way?
 
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
----
- drivers/md/bcache/super.c | 6 ++++++
- 1 file changed, 6 insertions(+)
- mode change 100644 => 100755 drivers/md/bcache/super.c
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-old mode 100644
-new mode 100755
-index 8352fad..1c5136e
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -893,6 +893,12 @@ static void cached_dev_detach_finish(struct work_struct *w)
- 
- 	mutex_lock(&bch_register_lock);
- 
-+	cancel_delayed_work_sync(&dc->writeback_rate_update);
-+	if (!IS_ERR_OR_NULL(dc->writeback_thread)) {
-+		kthread_stop(dc->writeback_thread);
-+		dc->writeback_thread = NULL;
-+	}
-+
- 	memset(&dc->sb.set_uuid, 0, 16);
- 	SET_BDEV_STATE(&dc->sb, BDEV_STATE_NONE);
- 
--- 
-1.8.3.1
+OK, I'll fix it and resend a v2 patch later.    
+
+Thanks,
+Tang
