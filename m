@@ -1,22 +1,33 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] block: remove useless assignment in bio_split
-To: Mikulas Patocka <mpatocka@redhat.com>,
- Kent Overstreet <kent.overstreet@gmail.com>
-Cc: linux-block@vger.kernel.org
-References: <alpine.LRH.2.02.1711221312020.21196@file01.intranet.prod.int.rdu2.redhat.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <c647eafa-dce6-883e-a4c7-ec93f6a1b44f@kernel.dk>
-Date: Wed, 22 Nov 2017 11:26:14 -0700
+Return-Path: <mpatocka@redhat.com>
+Date: Wed, 22 Nov 2017 13:18:05 -0500 (EST)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>, Kent Overstreet <kent.overstreet@gmail.com>
+cc: linux-block@vger.kernel.org
+Subject: [PATCH] block: remove useless assignment in bio_split
+Message-ID: <alpine.LRH.2.02.1711221312020.21196@file01.intranet.prod.int.rdu2.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.LRH.2.02.1711221312020.21196@file01.intranet.prod.int.rdu2.redhat.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
-On 11/22/2017 11:18 AM, Mikulas Patocka wrote:
-> Remove useless assignment to the variable "split" because the variable is
-> unconditionally assigned later.
+Remove useless assignment to the variable "split" because the variable is
+unconditionally assigned later.
 
-Thanks, applied.
+Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
 
--- 
-Jens Axboe
+---
+ block/bio.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: linux-2.6/block/bio.c
+===================================================================
+--- linux-2.6.orig/block/bio.c
++++ linux-2.6/block/bio.c
+@@ -1873,7 +1873,7 @@ EXPORT_SYMBOL(bio_endio);
+ struct bio *bio_split(struct bio *bio, int sectors,
+ 		      gfp_t gfp, struct bio_set *bs)
+ {
+-	struct bio *split = NULL;
++	struct bio *split;
+ 
+ 	BUG_ON(sectors <= 0);
+ 	BUG_ON(sectors >= bio_sectors(bio));
