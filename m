@@ -1,49 +1,40 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:44130 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751730AbdKVW25 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Nov 2017 17:28:57 -0500
-Date: Thu, 23 Nov 2017 06:28:41 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:2142 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751798AbdKVQrv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 Nov 2017 11:47:51 -0500
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@infradead.org" <hch@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>, "osandov@fb.com" <osandov@fb.com>,
-        "hare@suse.com" <hare@suse.com>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "osandov@fb.com" <osandov@fb.com>, "hare@suse.com" <hare@suse.com>,
         "wenxiong@us.ibm.com" <wenxiong@us.ibm.com>
 Subject: Re: [PATCH] block: drain queue before waiting for q_usage_counter
  becoming zero
-Message-ID: <20171122222839.GA7362@ming.t460p>
+Date: Wed, 22 Nov 2017 16:47:48 +0000
+Message-ID: <1511369267.3061.5.camel@sandisk.com>
 References: <20171122051143.31943-1-ming.lei@redhat.com>
- <1511369267.3061.5.camel@sandisk.com>
+In-Reply-To: <20171122051143.31943-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1511369267.3061.5.camel@sandisk.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, Nov 22, 2017 at 04:47:48PM +0000, Bart Van Assche wrote:
-> On Wed, 2017-11-22 at 13:11 +0800, Ming Lei wrote:
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index 11097477eeab..3d3797327491 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -161,6 +161,8 @@ void blk_freeze_queue(struct request_queue *q)
-> >  	 * exported to drivers as the only user for unfreeze is blk_mq.
-> >  	 */
-> >  	blk_freeze_queue_start(q);
-> > +	if (!q->mq_ops)
-> > +		blk_drain_queue(q);
-> >  	blk_mq_freeze_queue_wait(q);
-> >  }
-> 
-> Since q_usage_counter now tracks legacy requests, is there any reason why we
-> still need __blk_drain_queue()? Have you considered to eliminate
-> __blk_drain_queue() and to call blk_run_queue() from inside blk_freeze_queue()
-> instead of calling blk_drain_queue()? I'm asking this because
-
-Yeah, that looks better, I am thinking of that too, will do this way
-in V2.
-
--- 
-Ming
+T24gV2VkLCAyMDE3LTExLTIyIGF0IDEzOjExICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gZGlm
+ZiAtLWdpdCBhL2Jsb2NrL2Jsay1tcS5jIGIvYmxvY2svYmxrLW1xLmMNCj4gaW5kZXggMTEwOTc0
+NzdlZWFiLi4zZDM3OTczMjc0OTEgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2Jsay1tcS5jDQo+ICsr
+KyBiL2Jsb2NrL2Jsay1tcS5jDQo+IEBAIC0xNjEsNiArMTYxLDggQEAgdm9pZCBibGtfZnJlZXpl
+X3F1ZXVlKHN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxKQ0KPiAgCSAqIGV4cG9ydGVkIHRvIGRyaXZl
+cnMgYXMgdGhlIG9ubHkgdXNlciBmb3IgdW5mcmVlemUgaXMgYmxrX21xLg0KPiAgCSAqLw0KPiAg
+CWJsa19mcmVlemVfcXVldWVfc3RhcnQocSk7DQo+ICsJaWYgKCFxLT5tcV9vcHMpDQo+ICsJCWJs
+a19kcmFpbl9xdWV1ZShxKTsNCj4gIAlibGtfbXFfZnJlZXplX3F1ZXVlX3dhaXQocSk7DQo+ICB9
+DQoNClNpbmNlIHFfdXNhZ2VfY291bnRlciBub3cgdHJhY2tzIGxlZ2FjeSByZXF1ZXN0cywgaXMg
+dGhlcmUgYW55IHJlYXNvbiB3aHkgd2UNCnN0aWxsIG5lZWQgX19ibGtfZHJhaW5fcXVldWUoKT8g
+SGF2ZSB5b3UgY29uc2lkZXJlZCB0byBlbGltaW5hdGUNCl9fYmxrX2RyYWluX3F1ZXVlKCkgYW5k
+IHRvIGNhbGwgYmxrX3J1bl9xdWV1ZSgpIGZyb20gaW5zaWRlIGJsa19mcmVlemVfcXVldWUoKQ0K
+aW5zdGVhZCBvZiBjYWxsaW5nIGJsa19kcmFpbl9xdWV1ZSgpPyBJJ20gYXNraW5nIHRoaXMgYmVj
+YXVzZQ0KYmxrX21xX2ZyZWV6ZV9xdWV1ZV93YWl0KCkgdXNlcyBhIG1vcmUgZWZmaWNpZW50IG1l
+Y2hhbmlzbSAod2FpdF9ldmVudCgpKQ0KdGhhbiBfX2Jsa19kcmFpbl9xdWV1ZSgpICh3aGlsZSAo
+Li4uKSBtc2xlZXAoMTApKS4NCg0KQmFydC4=
