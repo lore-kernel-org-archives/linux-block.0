@@ -1,108 +1,90 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mout.gmx.net ([212.227.17.21]:62306 "EHLO mout.gmx.net"
+Received: from mxhk.zte.com.cn ([63.217.80.70]:61820 "EHLO mxhk.zte.com.cn"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753633AbdKNRO3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Nov 2017 12:14:29 -0500
-Received: from [192.168.43.38] ([89.204.154.177]) by mail.gmx.com (mrgmx103
- [212.227.17.168]) with ESMTPSA (Nemesis) id 0MWTSA-1eglc924Z0-00Xc1K for
- <linux-block@vger.kernel.org>; Tue, 14 Nov 2017 18:14:27 +0100
-To: linux-block@vger.kernel.org
-From: "peter.boettcher@gmx.net" <peter.boettcher@gmx.net>
-Subject: GPT
-Message-ID: <e20c13a1-6f71-1484-cf44-7d0d95c62149@gmx.net>
-Date: Tue, 14 Nov 2017 18:14:44 +0100
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+        id S1751209AbdKVFw3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 22 Nov 2017 00:52:29 -0500
+From: tang.junhui@zte.com.cn
+To: kent.overstreet@gmail.com, colyli@suse.de, mlyle@lyle.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        tang.junhui@zte.com.cn
+Subject: [PATCH] [PATCH v2] bcache: segregate flash only volume write streams from cached devices
+Date: Wed, 22 Nov 2017 13:52:12 +0800
+Message-Id: <1511329932-22581-1-git-send-email-tang.junhui@zte.com.cn>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-Peter Böttcher
-Hingbergstrasse 363
-45472 Muelheim Ruhr
-NRW
-Germany
+In such scenario that there are some flash only volumes
+, and some cached devices, when many tasks request these devices in
+writeback mode, the write IOs may fall to the same bucket as bellow:
+| cached data | flash data | cached data | cached data| flash data|
+then after writeback of these cached devices, the bucket would
+be like bellow bucket:
+| free | flash data | free | free | flash data |
 
-mail: peter.boettcher@gmx.net
+So, there are many free space in this bucket, but since data of flash
+only volumes still exists, so this bucket cannot be reclaimable,
+which would cause waste of bucket space.
 
+In this patch, we segregate flash only volume write streams from
+cached devices, so data from flash only volumes and cached devices
+can store in different buckets.
 
-Sorry for this english.
+Compare to v1 patch, this patch do not add a additionally open bucket
+list, and it is try best to segregate flash only volume write streams
+from cached devices, sectors of flash only volumes may still be mixed
+with dirty sectors of cached device, but the number is very small.
 
-I wrote a partition program just for the GUID Partition Table (GPT). 5 
-years ago.
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+---
+ drivers/md/bcache/alloc.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
+ mode change 100644 => 100755 drivers/md/bcache/alloc.c
 
-The program can generate volumes from 4 to 4096  partitions (my own limit).
-
-GPT header pos. 80 is an unsigned 32 Bit field.
-
-The program can create partitions with the numbers 1, 10, 100, 200, 300, 
-1000, 2000 etc. on the volume.
-
-Windows, FREE/BSD Unix, Mac OS X manage a volume without problems.
-They mount all partitions without problems.
-
-
-
-So that Linux can do such a volume management, I had to patch the file 
-include/linux/genhd.h up to the Linux kernel 4.13.12.
-It worked fine for many years.
-
-
----------------------------------------------------------------------
-
-patch: include/linux/genhd.h
-
-old: #define DISK_MAX_PARTS  256
-new: #define DISK_MAX_PARTS  4096
-
----------------------------------------------------------------------
-
-In Linux Kernel 4.14.0 I have to patch the following files.
-
----------------------------------------------------------------------
-
-patch: include/linux/genhd.h
-
-old: #define DISK_MAX_PARTS  256
-new: #define DISK_MAX_PARTS  4096
-
----------------------------------------------------------------------
-patch: include/linux/fs.h
-
-struct block_device {
-
-                                 old: u8 bd_partno;
-                                 new: u16 bd_partno;
-
----------------------------------------------------------------------
-patch: include/linux/blk_types.h
-
-struct bio {
-
-                 old: u8 bio_partno;
-                 new: u16 bio_partno;
-
----------------------------------------------------------------------
-
-patch: driver/md/dm-bio-record.h
-
-struct dm_bio_details {
-
-                   old: u8 bio_partno;
-                   new: u16 bio_partno;
-
----------------------------------------------------------------------
-patch: driver/md/dm-bio-integrity.c
-
-struct dm_integrity_io {
-
-                 old: u8 bio_partno;
-                 new: u16 bio_partno;
-
----------------------------------------------------------------------
-
-This works well (admittedly short time).
-
-
-Yours truly
-Peter Böttcher
+diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
+old mode 100644
+new mode 100755
+index 0803563..d0ed574
+--- a/drivers/md/bcache/alloc.c
++++ b/drivers/md/bcache/alloc.c
+@@ -514,15 +514,21 @@ struct open_bucket {
+ 
+ /*
+  * We keep multiple buckets open for writes, and try to segregate different
+- * write streams for better cache utilization: first we look for a bucket where
+- * the last write to it was sequential with the current write, and failing that
+- * we look for a bucket that was last used by the same task.
++ * write streams for better cache utilization: first we try to segregate flash
++ * only volume write streams from cached devices, secondly we look for a bucket
++ * where the last write to it was sequential with the current write, and
++ * failing that we look for a bucket that was last used by the same task.
+  *
+  * The ideas is if you've got multiple tasks pulling data into the cache at the
+  * same time, you'll get better cache utilization if you try to segregate their
+  * data and preserve locality.
+  *
+- * For example, say you've starting Firefox at the same time you're copying a
++ * For example, dirty sectors of flash only volume is not reclaimable, if their
++ * dirty sectors mixed with dirty sectors of cached device, such buckets will
++ * be marked as dirty and won't be reclaimed, though the dirty data of cached
++ * device have been written back to backend device.
++ *
++ * And say you've starting Firefox at the same time you're copying a
+  * bunch of files. Firefox will likely end up being fairly hot and stay in the
+  * cache awhile, but the data you copied might not be; if you wrote all that
+  * data to the same buckets it'd get invalidated at the same time.
+@@ -539,7 +545,10 @@ static struct open_bucket *pick_data_bucket(struct cache_set *c,
+ 	struct open_bucket *ret, *ret_task = NULL;
+ 
+ 	list_for_each_entry_reverse(ret, &c->data_buckets, list)
+-		if (!bkey_cmp(&ret->key, search))
++		if (UUID_FLASH_ONLY(&c->uuids[KEY_INODE(&ret->key)]) !=
++		    UUID_FLASH_ONLY(&c->uuids[KEY_INODE(search)]))
++			continue;
++		else if (!bkey_cmp(&ret->key, search))
+ 			goto found;
+ 		else if (ret->last_write_point == write_point)
+ 			ret_task = ret;
+-- 
+1.8.3.1
