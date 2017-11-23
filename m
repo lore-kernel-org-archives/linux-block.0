@@ -1,59 +1,43 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out1.zte.com.cn ([202.103.147.172]:40542 "EHLO mxct.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933932AbdKBDIY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 1 Nov 2017 23:08:24 -0400
-From: tang.junhui@zte.com.cn
-To: colyli@suse.de, mlyle@lyle.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        tang.junhui@zte.com.cn
-Subject: [PATCH] bcache: add a comment in journal bucket reading
-Date: Thu, 2 Nov 2017 11:08:14 +0800
-Message-Id: <1509592094-26115-1-git-send-email-tang.junhui@zte.com.cn>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <zhangweiping@didichuxing.com>
+Date: Thu, 23 Nov 2017 21:39:40 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>
+Subject: [PATCH 3/5] blk-sysfs: remove NULL pointer checking in
+ queue_wb_lat_store
+Message-ID: <fc9f69cd121692fc490e7ed53467791486195bbf.1511444141.git.zhangweiping@didichuxing.com>
+References: <cover.1511444141.git.zhangweiping@didichuxing.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <cover.1511444141.git.zhangweiping@didichuxing.com>
+Return-Path: zhangweiping@didichuxing.com
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+wbt_init doesn't set q->rq_wb to NULL, if wbt_init return 0,
+so check return value is enough, remove NULL checking.
 
-Journal bucket is a circular buffer, the bucket
-can be like YYYNNNYY, which means the first valid journal in
-the 7th bucket, and the latest valid journal in third bucket, in
-this case, if we do not try we the zero index first, We
-may get a valid journal in the 7th bucket, then we call
-find_next_bit(bitmap,ca->sb.njournal_buckets, l + 1) to get the
-first invalid bucket after the 7th bucket, because all these
-buckets is valid, so no bit 1 in bitmap, thus find_next_bit()
-function would return with ca->sb.njournal_buckets (8). So, after
-that, bcache only read journal in 7th and 8the bucket,
-the first to the third buckets are lost.
-
-So, it is important to let developer know that, we need to try
-the zero index at first in the hash-search, and avoid any breaks
-in future's code modification.
-
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
 ---
- drivers/md/bcache/journal.c | 5 +++++
- 1 file changed, 5 insertions(+)
- mode change 100644 => 100755 drivers/md/bcache/journal.c
+ block/blk-sysfs.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
-old mode 100644
-new mode 100755
-index 0352d05..4b6e651
---- a/drivers/md/bcache/journal.c
-+++ b/drivers/md/bcache/journal.c
-@@ -169,6 +169,11 @@ int bch_journal_read(struct cache_set *c, struct list_head *list)
- 		 * find a sequence of buckets with valid journal entries
- 		 */
- 		for (i = 0; i < ca->sb.njournal_buckets; i++) {
-+			/*
-+			 * We must try the index l with ZERO first for correctness due to  
-+			 * exist scenario that the journal bucket is circular buffer which
-+			 * maybe have wrapped
-+			 */
- 			l = (i * 2654435769U) % ca->sb.njournal_buckets;
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index b8362c0..9b1093a 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -449,12 +449,9 @@ static ssize_t queue_wb_lat_store(struct request_queue *q, const char *page,
+ 		ret = wbt_init(q);
+ 		if (ret)
+ 			return ret;
+-
+-		rwb = q->rq_wb;
+-		if (!rwb)
+-			return -EINVAL;
+ 	}
  
- 			if (test_bit(l, bitmap))
++	rwb = q->rq_wb;
+ 	if (val == -1)
+ 		rwb->min_lat_nsec = wbt_default_latency_nsec(q);
+ 	else if (val >= 0)
 -- 
-1.8.3.1
+2.9.4
