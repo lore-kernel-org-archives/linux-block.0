@@ -1,10 +1,19 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:65339 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751796AbdKUNpE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Nov 2017 08:45:04 -0500
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
+Received: from mail-io0-f196.google.com ([209.85.223.196]:33951 "EHLO
+        mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753274AbdKWSMw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 23 Nov 2017 13:12:52 -0500
+Received: by mail-io0-f196.google.com with SMTP id q101so27316017ioi.1
+        for <linux-block@vger.kernel.org>; Thu, 23 Nov 2017 10:12:52 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <1511271770-3444-3-git-send-email-adrian.hunter@intel.com>
+References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com> <1511271770-3444-3-git-send-email-adrian.hunter@intel.com>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Thu, 23 Nov 2017 19:12:51 +0100
+Message-ID: <CAPDyKFqwU5a6thoLYnOPNG3J3iLbP40+XspPHyORQy26SRi5ow@mail.gmail.com>
+Subject: Re: [PATCH V14 02/24] mmc: block: Check return value of blk_get_request()
+To: Adrian Hunter <adrian.hunter@intel.com>
 Cc: linux-mmc <linux-mmc@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
         linux-kernel <linux-kernel@vger.kernel.org>,
@@ -23,103 +32,94 @@ Cc: linux-mmc <linux-mmc@vger.kernel.org>,
         Shawn Lin <shawn.lin@rock-chips.com>,
         Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
         Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V14 22/24] mmc: core: Remove option not to use blk-mq
-Date: Tue, 21 Nov 2017 15:42:48 +0200
-Message-Id: <1511271770-3444-23-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
-References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Remove config option MMC_MQ_DEFAULT and parameter mmc_use_blk_mq, so that
-blk-mq must be used always.
+On 21 November 2017 at 14:42, Adrian Hunter <adrian.hunter@intel.com> wrote:
+> blk_get_request() can fail, always check the return value.
+>
+> Fixes: 0493f6fe5bde ("mmc: block: Move boot partition locking into a driver op")
+> Fixes: 3ecd8cf23f88 ("mmc: block: move multi-ioctl() to use block layer")
+> Fixes: 614f0388f580 ("mmc: block: move single ioctl() commands to block requests")
+> Fixes: 627c3ccfb46a ("mmc: debugfs: Move block debugfs into block module")
+> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/Kconfig     | 10 ----------
- drivers/mmc/core/core.c |  7 -------
- drivers/mmc/core/core.h |  2 --
- drivers/mmc/core/host.c |  2 --
- drivers/mmc/core/host.h |  2 +-
- 5 files changed, 1 insertion(+), 22 deletions(-)
+Thanks, applied for fixes and added a stable tag!
 
-diff --git a/drivers/mmc/Kconfig b/drivers/mmc/Kconfig
-index 42565562577c..ec21388311db 100644
---- a/drivers/mmc/Kconfig
-+++ b/drivers/mmc/Kconfig
-@@ -12,16 +12,6 @@ menuconfig MMC
- 	  If you want MMC/SD/SDIO support, you should say Y here and
- 	  also to your specific host controller driver.
- 
--config MMC_MQ_DEFAULT
--	bool "MMC: use blk-mq I/O path by default"
--	depends on MMC && BLOCK
--	default y
--	---help---
--	  This option enables the new blk-mq based I/O path for MMC block
--	  devices by default.  With the option the mmc_core.use_blk_mq
--	  module/boot option defaults to Y, without it to N, but it can
--	  still be overridden either way.
--
- if MMC
- 
- source "drivers/mmc/core/Kconfig"
-diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
-index 617802f45386..7ca6e4866a8b 100644
---- a/drivers/mmc/core/core.c
-+++ b/drivers/mmc/core/core.c
-@@ -66,13 +66,6 @@
- bool use_spi_crc = 1;
- module_param(use_spi_crc, bool, 0);
- 
--#ifdef CONFIG_MMC_MQ_DEFAULT
--bool mmc_use_blk_mq = true;
--#else
--bool mmc_use_blk_mq = false;
--#endif
--module_param_named(use_blk_mq, mmc_use_blk_mq, bool, S_IWUSR | S_IRUGO);
--
- static int mmc_schedule_delayed_work(struct delayed_work *work,
- 				     unsigned long delay)
- {
-diff --git a/drivers/mmc/core/core.h b/drivers/mmc/core/core.h
-index aa87cd8d14c6..f564ddfbe070 100644
---- a/drivers/mmc/core/core.h
-+++ b/drivers/mmc/core/core.h
-@@ -35,8 +35,6 @@ struct mmc_bus_ops {
- 	int (*reset)(struct mmc_host *);
- };
- 
--extern bool mmc_use_blk_mq;
--
- void mmc_attach_bus(struct mmc_host *host, const struct mmc_bus_ops *ops);
- void mmc_detach_bus(struct mmc_host *host);
- 
-diff --git a/drivers/mmc/core/host.c b/drivers/mmc/core/host.c
-index 62ef6cb0ece4..35a9e4fd1a9f 100644
---- a/drivers/mmc/core/host.c
-+++ b/drivers/mmc/core/host.c
-@@ -404,8 +404,6 @@ struct mmc_host *mmc_alloc_host(int extra, struct device *dev)
- 
- 	host->fixed_drv_type = -EINVAL;
- 
--	host->use_blk_mq = mmc_use_blk_mq;
--
- 	return host;
- }
- 
-diff --git a/drivers/mmc/core/host.h b/drivers/mmc/core/host.h
-index 6eaf558e62d6..a33903a2ea96 100644
---- a/drivers/mmc/core/host.h
-+++ b/drivers/mmc/core/host.h
-@@ -76,7 +76,7 @@ static inline bool mmc_card_hs400es(struct mmc_card *card)
- 
- static inline bool mmc_host_use_blk_mq(struct mmc_host *host)
- {
--	return host->use_blk_mq;
-+	return true;
- }
- 
- #endif
--- 
-1.9.1
+Kind regards
+Uffe
+
+> ---
+>  drivers/mmc/core/block.c | 20 +++++++++++++++++++-
+>  1 file changed, 19 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+> index f60939858586..4a319ddbd956 100644
+> --- a/drivers/mmc/core/block.c
+> +++ b/drivers/mmc/core/block.c
+> @@ -233,6 +233,10 @@ static ssize_t power_ro_lock_store(struct device *dev,
+>
+>         /* Dispatch locking to the block layer */
+>         req = blk_get_request(mq->queue, REQ_OP_DRV_OUT, __GFP_RECLAIM);
+> +       if (IS_ERR(req)) {
+> +               count = PTR_ERR(req);
+> +               goto out_put;
+> +       }
+>         req_to_mmc_queue_req(req)->drv_op = MMC_DRV_OP_BOOT_WP;
+>         blk_execute_rq(mq->queue, NULL, req, 0);
+>         ret = req_to_mmc_queue_req(req)->drv_op_result;
+> @@ -249,7 +253,7 @@ static ssize_t power_ro_lock_store(struct device *dev,
+>                                 set_disk_ro(part_md->disk, 1);
+>                         }
+>         }
+> -
+> +out_put:
+>         mmc_blk_put(md);
+>         return count;
+>  }
+> @@ -625,6 +629,10 @@ static int mmc_blk_ioctl_cmd(struct mmc_blk_data *md,
+>         req = blk_get_request(mq->queue,
+>                 idata->ic.write_flag ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN,
+>                 __GFP_RECLAIM);
+> +       if (IS_ERR(req)) {
+> +               err = PTR_ERR(req);
+> +               goto cmd_done;
+> +       }
+>         idatas[0] = idata;
+>         req_to_mmc_queue_req(req)->drv_op =
+>                 rpmb ? MMC_DRV_OP_IOCTL_RPMB : MMC_DRV_OP_IOCTL;
+> @@ -692,6 +700,10 @@ static int mmc_blk_ioctl_multi_cmd(struct mmc_blk_data *md,
+>         req = blk_get_request(mq->queue,
+>                 idata[0]->ic.write_flag ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN,
+>                 __GFP_RECLAIM);
+> +       if (IS_ERR(req)) {
+> +               err = PTR_ERR(req);
+> +               goto cmd_err;
+> +       }
+>         req_to_mmc_queue_req(req)->drv_op =
+>                 rpmb ? MMC_DRV_OP_IOCTL_RPMB : MMC_DRV_OP_IOCTL;
+>         req_to_mmc_queue_req(req)->drv_op_data = idata;
+> @@ -2551,6 +2563,8 @@ static int mmc_dbg_card_status_get(void *data, u64 *val)
+>
+>         /* Ask the block layer about the card status */
+>         req = blk_get_request(mq->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
+> +       if (IS_ERR(req))
+> +               return PTR_ERR(req);
+>         req_to_mmc_queue_req(req)->drv_op = MMC_DRV_OP_GET_CARD_STATUS;
+>         blk_execute_rq(mq->queue, NULL, req, 0);
+>         ret = req_to_mmc_queue_req(req)->drv_op_result;
+> @@ -2585,6 +2599,10 @@ static int mmc_ext_csd_open(struct inode *inode, struct file *filp)
+>
+>         /* Ask the block layer for the EXT CSD */
+>         req = blk_get_request(mq->queue, REQ_OP_DRV_IN, __GFP_RECLAIM);
+> +       if (IS_ERR(req)) {
+> +               err = PTR_ERR(req);
+> +               goto out_free;
+> +       }
+>         req_to_mmc_queue_req(req)->drv_op = MMC_DRV_OP_GET_EXT_CSD;
+>         req_to_mmc_queue_req(req)->drv_op_data = &ext_csd;
+>         blk_execute_rq(mq->queue, NULL, req, 0);
+> --
+> 1.9.1
+>
