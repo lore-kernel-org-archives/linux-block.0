@@ -1,89 +1,42 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Luis R. Rodriguez" <mcgrof@kernel.org>
-To: viro@zeniv.linux.org.uk, bart.vanassche@wdc.com,
-        ming.lei@redhat.com, tytso@mit.edu, darrick.wong@oracle.com,
-        jikos@kernel.org, rjw@rjwysocki.net, pavel@ucw.cz,
-        len.brown@intel.com, linux-fsdevel@vger.kernel.org
-Cc: boris.ostrovsky@oracle.com, jgross@suse.com,
-        todd.e.brandt@linux.intel.com, nborisov@suse.com, jack@suse.cz,
-        martin.petersen@oracle.com, ONeukum@suse.com,
-        oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
-        yu.chen.surf@gmail.com, dan.j.williams@intel.com,
-        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Luis R. Rodriguez" <mcgrof@kernel.org>
-Subject: [PATCH 08/11] ext4: remove not needed freezing calls
-Date: Wed, 29 Nov 2017 15:23:53 -0800
-Message-Id: <20171129232356.28296-9-mcgrof@kernel.org>
-In-Reply-To: <20171129232356.28296-1-mcgrof@kernel.org>
-References: <20171129232356.28296-1-mcgrof@kernel.org>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from 22.17.110.36.static.bjtelecom.net ([36.110.17.22]:15308 "EHLO
+        BJEXCAS002.didichuxing.com" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1752814AbdKWNjJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 23 Nov 2017 08:39:09 -0500
+Date: Thu, 23 Nov 2017 21:39:03 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>
+Subject: [PATCH 1/5] blk-wbt: remove duplicated setting in wbt_init
+Message-ID: <30a5272ce52ad928da45a3f7981a42e008f70838.1511444141.git.zhangweiping@didichuxing.com>
+References: <cover.1511444141.git.zhangweiping@didichuxing.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <cover.1511444141.git.zhangweiping@didichuxing.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This removes superflous freezer calls as they are no longer needed
-as the VFS now performs filesystem freezing/thaw if the filesystem has
-support for it.
+rwb->wc and rwb->queue_depth were overwritten by wbt_set_write_cache and
+wbt_set_queue_depth, remove the default setting.
 
-The following Coccinelle rule was used as follows:
-
-spatch --sp-file fs-freeze-cleanup.cocci --in-place fs/$FS/
-
-@ has_freeze_fs @
-identifier super_ops;
-expression freeze_op;
-@@
-
-struct super_operations super_ops = {
-	.freeze_fs = freeze_op,
-};
-
-@ remove_set_freezable depends on has_freeze_fs @
-expression time;
-statement S, S2, S3;
-expression task;
-@@
-
-(
--	set_freezable();
-|
--	if (try_to_freeze())
--		continue;
-|
--	try_to_freeze();
-|
--	freezable_schedule();
-+	schedule();
-|
--	freezable_schedule_timeout(time);
-+	schedule_timeout(time);
-|
--	if (freezing(task)) { S }
-|
--	if (freezing(task)) { S }
--	else
-	{ S2 }
-|
--	freezing(current)
-)
-
-Generated-by: Coccinelle SmPL
-Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
+Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
 ---
- fs/ext4/super.c | 2 --
+ block/blk-wbt.c | 2 --
  1 file changed, 2 deletions(-)
 
-diff --git a/fs/ext4/super.c b/fs/ext4/super.c
-index 57a8fa451d3e..8a510b1c2d92 100644
---- a/fs/ext4/super.c
-+++ b/fs/ext4/super.c
-@@ -2980,8 +2980,6 @@ static int ext4_lazyinit_thread(void *arg)
- 		}
- 		mutex_unlock(&eli->li_list_mtx);
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index e59d59c..edb09e93 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -723,8 +723,6 @@ int wbt_init(struct request_queue *q)
+ 		init_waitqueue_head(&rwb->rq_wait[i].wait);
+ 	}
  
--		try_to_freeze();
--
- 		cur = jiffies;
- 		if ((time_after_eq(cur, next_wakeup)) ||
- 		    (MAX_JIFFY_OFFSET == next_wakeup)) {
+-	rwb->wc = 1;
+-	rwb->queue_depth = RWB_DEF_DEPTH;
+ 	rwb->last_comp = rwb->last_issue = jiffies;
+ 	rwb->queue = q;
+ 	rwb->win_nsec = RWB_WINDOW_NSEC;
 -- 
-2.15.0
+2.9.4
