@@ -1,54 +1,47 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:37430 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752234AbdKWEsg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Nov 2017 23:48:36 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Omar Sandoval <osandov@fb.com>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Wen Xiong <wenxiong@us.ibm.com>,
-        Mauricio Faria de Oliveira <mauricfo@linux.vnet.ibm.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 2/2] block: drain blkcg part of request_queue in blk_cleanup_queue()
-Date: Thu, 23 Nov 2017 12:48:00 +0800
-Message-Id: <20171123044800.25251-3-ming.lei@redhat.com>
-In-Reply-To: <20171123044800.25251-1-ming.lei@redhat.com>
-References: <20171123044800.25251-1-ming.lei@redhat.com>
+Received: from mx1.didichuxing.com ([111.202.154.82]:30908 "EHLO
+        BJEXMBX012.didichuxing.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1752680AbdKWNkB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 23 Nov 2017 08:40:01 -0500
+Date: Thu, 23 Nov 2017 21:39:55 +0800
+From: weiping zhang <zhangweiping@didichuxing.com>
+To: <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>
+Subject: [PATCH 4/5] blk-wbt: move wbt_clear_stat to common place in wbt_done
+Message-ID: <7614401233068669e19b4d0d9e257cc5b84cd906.1511444141.git.zhangweiping@didichuxing.com>
+References: <cover.1511444141.git.zhangweiping@didichuxing.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <cover.1511444141.git.zhangweiping@didichuxing.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Now once blk_freeze_queue() returns, all requests(in-queue and pending)
-can be drained, but we still need to drain blkcg part of request_queue
-for both blk-mq and legacy, so this patch calls blkcg_drain_queue()
-explicitely in blk_cleanup_queue() to do that.
+wbt_done call wbt_clear_stat no matter current stat was tracked
+or not, move it to common place.
 
-Then the __blk_drain_queue() in blk_cleanup_queue() can be covered by both
-blk_freeze_queue() and blkcg_drain_queue(), and tasks blocked in get_request()
-are waken up in blk_set_queue_dying() too, so remove it from blk_cleanup_queue().
-
-Cc: Wen Xiong <wenxiong@us.ibm.com>
-Cc: Mauricio Faria de Oliveira <mauricfo@linux.vnet.ibm.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
 ---
- block/blk-core.c | 3 +--
+ block/blk-wbt.c | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 1038706edd87..f3f6f11a5b31 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -689,8 +689,7 @@ void blk_cleanup_queue(struct request_queue *q)
- 	 */
- 	blk_freeze_queue(q);
- 	spin_lock_irq(lock);
--	if (!q->mq_ops)
--		__blk_drain_queue(q, true);
-+	blkcg_drain_queue(q);
- 	queue_flag_set(QUEUE_FLAG_DEAD, q);
- 	spin_unlock_irq(lock);
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 0fb65f0..cd9a20a 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -178,12 +178,11 @@ void wbt_done(struct rq_wb *rwb, struct blk_issue_stat *stat)
  
+ 		if (wbt_is_read(stat))
+ 			wb_timestamp(rwb, &rwb->last_comp);
+-		wbt_clear_state(stat);
+ 	} else {
+ 		WARN_ON_ONCE(stat == rwb->sync_cookie);
+ 		__wbt_done(rwb, wbt_stat_to_mask(stat));
+-		wbt_clear_state(stat);
+ 	}
++	wbt_clear_state(stat);
+ }
+ 
+ /*
 -- 
-2.9.5
+2.9.4
