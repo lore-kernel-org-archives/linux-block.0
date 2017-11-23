@@ -1,11 +1,21 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:13823 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751751AbdKUNnw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Nov 2017 08:43:52 -0500
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+Received: from mail-io0-f180.google.com ([209.85.223.180]:44655 "EHLO
+        mail-io0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752436AbdKWN1I (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 23 Nov 2017 08:27:08 -0500
+Received: by mail-io0-f180.google.com with SMTP id w127so26620545iow.11
+        for <linux-block@vger.kernel.org>; Thu, 23 Nov 2017 05:27:08 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <1511271770-3444-7-git-send-email-adrian.hunter@intel.com>
+References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com> <1511271770-3444-7-git-send-email-adrian.hunter@intel.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Thu, 23 Nov 2017 14:27:07 +0100
+Message-ID: <CACRpkdZ2UHjsLJMLVqr-UzLLhgesJrBEHymh_AgiKzj6WAU3Tg@mail.gmail.com>
+Subject: Re: [PATCH V14 06/24] mmc: block: Simplify cleaning up the queue
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
         linux-kernel <linux-kernel@vger.kernel.org>,
         Bough Chen <haibo.chen@nxp.com>,
@@ -19,69 +29,23 @@ Cc: linux-mmc <linux-mmc@vger.kernel.org>,
         Sahitya Tummala <stummala@codeaurora.org>,
         Harjani Ritesh <riteshh@codeaurora.org>,
         Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
         Shawn Lin <shawn.lin@rock-chips.com>,
         Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
         Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V14 08/24] mmc: block: Check for transfer state in card_busy_detect()
-Date: Tue, 21 Nov 2017 15:42:34 +0200
-Message-Id: <1511271770-3444-9-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
-References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The card is required to return to transfer state. Since that is the state
-required to start another transfer, check for that state instead of
-programming state.
+On Tue, Nov 21, 2017 at 2:42 PM, Adrian Hunter <adrian.hunter@intel.com> wrote:
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/core/block.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
+> Use blk_cleanup_queue() to shutdown the queue when the driver is removed,
+> and instead get an extra reference to the queue to prevent the queue being
+> freed before the final mmc_blk_put().
+>
+> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index 0874ab3e5c92..130ce94fdaf2 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -948,6 +948,16 @@ static unsigned long mmc_blk_data_timeout_jiffies(struct mmc_host *host,
- 	return msecs_to_jiffies(ms);
- }
- 
-+static inline bool mmc_blk_in_tran_state(u32 status)
-+{
-+	/*
-+	 * Some cards mishandle the status bits, so make sure to check both the
-+	 * busy indication and the card state.
-+	 */
-+	return status & R1_READY_FOR_DATA &&
-+	       (R1_CURRENT_STATE(status) == R1_STATE_TRAN);
-+}
-+
- static int card_busy_detect(struct mmc_card *card, bool hw_busy_detect,
- 			    struct request *req, bool *gen_err)
- {
-@@ -985,9 +995,9 @@ static int card_busy_detect(struct mmc_card *card, bool hw_busy_detect,
- 		 * leaves the program state.
- 		 */
- 		if (done) {
--			pr_err("%s: Card stuck in programming state! %s %s\n",
-+			pr_err("%s: Card stuck in wrong state! %s %s status: %#x\n",
- 				mmc_hostname(card->host),
--				req->rq_disk->disk_name, __func__);
-+				req->rq_disk->disk_name, __func__, status);
- 			return -ETIMEDOUT;
- 		}
- 
-@@ -996,8 +1006,7 @@ static int card_busy_detect(struct mmc_card *card, bool hw_busy_detect,
- 		 * so make sure to check both the busy
- 		 * indication and the card state.
- 		 */
--	} while (!(status & R1_READY_FOR_DATA) ||
--		 (R1_CURRENT_STATE(status) == R1_STATE_PRG));
-+	} while (!mmc_blk_in_tran_state(status));
- 
- 	return err;
- }
--- 
-1.9.1
+This is way more elegant.
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+
+Yours,
+Linus Walleij
