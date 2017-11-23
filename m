@@ -1,7 +1,6 @@
 Return-Path: <borntraeger@de.ibm.com>
 Subject: Re: 4.14: WARNING: CPU: 4 PID: 2895 at block/blk-mq.c:1144 with
  virtio-blk (also 4.12 stable)
-From: Christian Borntraeger <borntraeger@de.ibm.com>
 To: Christoph Hellwig <hch@lst.de>
 Cc: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <Bart.VanAssche@wdc.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
@@ -18,29 +17,25 @@ References: <276625a9-44fb-719d-9281-caacefdbb99f@de.ibm.com>
  <20171123182542.GA2680@lst.de>
  <899f1638-cca4-28e6-3225-51505a053d45@de.ibm.com>
  <20171123183232.GA2845@lst.de>
- <92ef1aae-90b5-f14f-390e-bfab97899431@de.ibm.com>
-Date: Fri, 24 Nov 2017 14:09:50 +0100
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 23 Nov 2017 19:59:55 +0100
 MIME-Version: 1.0
-In-Reply-To: <92ef1aae-90b5-f14f-390e-bfab97899431@de.ibm.com>
+In-Reply-To: <20171123183232.GA2845@lst.de>
 Content-Type: text/plain; charset=utf-8
-Message-Id: <419d8565-9cbe-16ac-3d5d-5945098694bc@de.ibm.com>
+Message-Id: <92ef1aae-90b5-f14f-390e-bfab97899431@de.ibm.com>
 List-ID: <linux-block@vger.kernel.org>
 
 
 
-On 11/23/2017 07:59 PM, Christian Borntraeger wrote:
+On 11/23/2017 07:32 PM, Christoph Hellwig wrote:
+> On Thu, Nov 23, 2017 at 07:28:31PM +0100, Christian Borntraeger wrote:
+>> zfcp on s390.
 > 
-> 
-> On 11/23/2017 07:32 PM, Christoph Hellwig wrote:
->> On Thu, Nov 23, 2017 at 07:28:31PM +0100, Christian Borntraeger wrote:
->>> zfcp on s390.
->>
->> Ok, so it can't be the interrupt code, but probably is the blk-mq-cpumap.c
->> changes.  Can you try to revert just those for a quick test?
-> 
-> 
-> Hmm, I get further in boot, but the system seems very sluggish and it does not
-> seem to be able to access the scsi disks (get data from them)
-> 
+> Ok, so it can't be the interrupt code, but probably is the blk-mq-cpumap.c
+> changes.  Can you try to revert just those for a quick test?
 
-FWIW, just having the changes in irq_affinity.c is indeed fine.
+
+Hmm, I get further in boot, but the system seems very sluggish and it does not
+seem to be able to access the scsi disks (get data from them)
+
+ 
