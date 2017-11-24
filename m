@@ -1,19 +1,35 @@
-Return-Path: <prvs=497ad1de7=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "minwoo.im.dev@gmail.com" <minwoo.im.dev@gmail.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
-CC: "hch@infradead.org" <hch@infradead.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "dn3108@gmail.com" <dn3108@gmail.com>
-Subject: Re: [PATCH] block: fix a comment typo in req_opf
-Date: Mon, 27 Nov 2017 18:06:30 +0000
-Message-ID: <1511805989.2993.6.camel@wdc.com>
-References: <1511533597-9654-1-git-send-email-minwoo.im.dev@gmail.com>
-In-Reply-To: <1511533597-9654-1-git-send-email-minwoo.im.dev@gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Return-Path: <minwoo.im.dev@gmail.com>
+Return-Path: <minwoo.im.dev@gmail.com>
+From: Minwoo Im <minwoo.im.dev@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Minwoo Im <dn3108@gmail.com>,
+	linux-block@vger.kernel.org,
+	Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: [PATCH] block: fix a comment typo in req_opf
+Date: Fri, 24 Nov 2017 23:26:37 +0900
+Message-Id: <1511533597-9654-1-git-send-email-minwoo.im.dev@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gRnJpLCAyMDE3LTExLTI0IGF0IDIzOjI2ICswOTAwLCBNaW53b28gSW0gd3JvdGU6DQo+IGEg
-dGlueSBjb21tZW50IHR5cG8gZml4ZWQuDQoNClBhdGNoIGRlc2NyaXB0aW9ucyBzaG91bGQgdXNl
-IHRoZSBpbXBlcmF0aXZlIG1vb2QuIEFueXdheToNCg0KUmV2aWV3ZWQtYnk6IEJhcnQgVmFuIEFz
-c2NoZSA8YmFydC52YW5hc3NjaGVAd2RjLmNvbT4=
+a tiny comment typo fixed.
+
+Signed-off-by: Minwoo Im <minwoo.im.dev@gmail.com>
+---
+ include/linux/blk_types.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index a1e628e..eca5bf6 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -195,7 +195,7 @@ enum req_opf {
+ 	REQ_OP_ZONE_REPORT	= 4,
+ 	/* securely erase sectors */
+ 	REQ_OP_SECURE_ERASE	= 5,
+-	/* seset a zone write pointer */
++	/* reset a zone write pointer */
+ 	REQ_OP_ZONE_RESET	= 6,
+ 	/* write the same sector many times */
+ 	REQ_OP_WRITE_SAME	= 7,
+-- 
+2.7.4
