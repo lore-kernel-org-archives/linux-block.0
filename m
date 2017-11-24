@@ -1,32 +1,89 @@
-Return-Path: <BATV+ae034aba56c5b09c70ce+5210+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Tue, 28 Nov 2017 05:42:21 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Michael Lyle <mlyle@lyle.org>
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-	axboe@kernel.dk, Huacai Chen <chenhc@lemote.com>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 2/4] bcache: Fix building error on MIPS
-Message-ID: <20171128134221.GA16064@infradead.org>
+Return-Path: <mlyle@lyle.org>
+Return-Path: <mlyle@lyle.org>
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: axboe@kernel.dk,
+	Huacai Chen <chenhc@lemote.com>,
+	stable@vger.kernel.org,
+	Michael Lyle <mlyle@lyle.org>
+Subject: [PATCH 2/4] bcache: Fix building error on MIPS
+Date: Fri, 24 Nov 2017 15:14:25 -0800
+Message-Id: <20171124231427.9563-3-mlyle@lyle.org>
+In-Reply-To: <20171124231427.9563-1-mlyle@lyle.org>
 References: <20171124231427.9563-1-mlyle@lyle.org>
- <20171124231427.9563-3-mlyle@lyle.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171124231427.9563-3-mlyle@lyle.org>
 List-ID: <linux-block@vger.kernel.org>
 
-> diff --git a/include/uapi/linux/bcache.h b/include/uapi/linux/bcache.h
-> index 90fc490f973f..821f71a2e48f 100644
-> --- a/include/uapi/linux/bcache.h
-> +++ b/include/uapi/linux/bcache.h
-> @@ -91,7 +91,7 @@ PTR_FIELD(PTR_GEN,			0,  8)
->  
->  #define PTR_CHECK_DEV			((1 << PTR_DEV_BITS) - 1)
->  
-> -#define PTR(gen, offset, dev)						\
-> +#define MAKE_PTR(gen, offset, dev)					\
->  	((((__u64) dev) << 51) | ((__u64) offset) << 8 | gen)
+From: Huacai Chen <chenhc@lemote.com>
 
-This really should have a BCACHE_ prefix, and probably a lower case
-name.  And last but not least it really shouldn't be in a uapi header.
+This patch try to fix the building error on MIPS. The reason is MIPS
+has already defined the PTR macro, which conflicts with the PTR macro
+in include/uapi/linux/bcache.h.
 
-Similar things apply to various other things around it.
+[fixed by mlyle: corrected a line-length issue]
+
+Cc: stable@vger.kernel.org
+Signed-off-by: Huacai Chen <chenhc@lemote.com>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
+Signed-off-by: Michael Lyle <mlyle@lyle.org>
+---
+ drivers/md/bcache/alloc.c   | 2 +-
+ drivers/md/bcache/extents.c | 2 +-
+ drivers/md/bcache/journal.c | 2 +-
+ include/uapi/linux/bcache.h | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
+index a27d85232ce1..a0cc1bc6d884 100644
+--- a/drivers/md/bcache/alloc.c
++++ b/drivers/md/bcache/alloc.c
+@@ -490,7 +490,7 @@ int __bch_bucket_alloc_set(struct cache_set *c, unsigned reserve,
+ 		if (b == -1)
+ 			goto err;
+ 
+-		k->ptr[i] = PTR(ca->buckets[b].gen,
++		k->ptr[i] = MAKE_PTR(ca->buckets[b].gen,
+ 				bucket_to_sector(c, b),
+ 				ca->sb.nr_this_dev);
+ 
+diff --git a/drivers/md/bcache/extents.c b/drivers/md/bcache/extents.c
+index 41c238fc3733..f9d391711595 100644
+--- a/drivers/md/bcache/extents.c
++++ b/drivers/md/bcache/extents.c
+@@ -585,7 +585,7 @@ static bool bch_extent_merge(struct btree_keys *bk, struct bkey *l, struct bkey
+ 		return false;
+ 
+ 	for (i = 0; i < KEY_PTRS(l); i++)
+-		if (l->ptr[i] + PTR(0, KEY_SIZE(l), 0) != r->ptr[i] ||
++		if (l->ptr[i] + MAKE_PTR(0, KEY_SIZE(l), 0) != r->ptr[i] ||
+ 		    PTR_BUCKET_NR(b->c, l, i) != PTR_BUCKET_NR(b->c, r, i))
+ 			return false;
+ 
+diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
+index 5018c56ebb67..a87165c1d8e5 100644
+--- a/drivers/md/bcache/journal.c
++++ b/drivers/md/bcache/journal.c
+@@ -512,7 +512,7 @@ static void journal_reclaim(struct cache_set *c)
+ 			continue;
+ 
+ 		ja->cur_idx = next;
+-		k->ptr[n++] = PTR(0,
++		k->ptr[n++] = MAKE_PTR(0,
+ 				  bucket_to_sector(c, ca->sb.d[ja->cur_idx]),
+ 				  ca->sb.nr_this_dev);
+ 	}
+diff --git a/include/uapi/linux/bcache.h b/include/uapi/linux/bcache.h
+index 90fc490f973f..821f71a2e48f 100644
+--- a/include/uapi/linux/bcache.h
++++ b/include/uapi/linux/bcache.h
+@@ -91,7 +91,7 @@ PTR_FIELD(PTR_GEN,			0,  8)
+ 
+ #define PTR_CHECK_DEV			((1 << PTR_DEV_BITS) - 1)
+ 
+-#define PTR(gen, offset, dev)						\
++#define MAKE_PTR(gen, offset, dev)					\
+ 	((((__u64) dev) << 51) | ((__u64) offset) << 8 | gen)
+ 
+ /* Bkey utility code */
+-- 
+2.14.1
