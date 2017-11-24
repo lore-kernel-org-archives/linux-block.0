@@ -1,97 +1,87 @@
-Return-Path: <mpatocka@redhat.com>
-Date: Mon, 27 Nov 2017 22:36:59 -0500 (EST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Ingo Molnar <mingo@kernel.org>
-cc: Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
-        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] schedule: use unlikely()
-In-Reply-To: <20171125081613.damtbce2pelywx2k@gmail.com>
-Message-ID: <alpine.LRH.2.02.1711271906400.9280@file01.intranet.prod.int.rdu2.redhat.com>
-References: <alpine.LRH.2.02.1711131359030.2791@file01.intranet.prod.int.rdu2.redhat.com> <20171124073819.ejig4akxinmugbnr@gmail.com> <alpine.LRH.2.02.1711241336410.20259@file01.intranet.prod.int.rdu2.redhat.com> <20171125081613.damtbce2pelywx2k@gmail.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Return-Path: <mlyle@lyle.org>
+Return-Path: <mlyle@lyle.org>
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: axboe@kernel.dk,
+	Rui Hua <huarui.dev@gmail.com>,
+	stable@vger.kernel.org,
+	Michael Lyle <mlyle@lyle.org>
+Subject: [PATCH 3/4] bcache: recover data from backing when data is clean
+Date: Fri, 24 Nov 2017 15:14:26 -0800
+Message-Id: <20171124231427.9563-4-mlyle@lyle.org>
+In-Reply-To: <20171124231427.9563-1-mlyle@lyle.org>
+References: <20171124231427.9563-1-mlyle@lyle.org>
 List-ID: <linux-block@vger.kernel.org>
 
+From: Rui Hua <huarui.dev@gmail.com>
 
+When we send a read request and hit the clean data in cache device, there
+is a situation called cache read race in bcache(see the commit in the tail
+of cache_look_up(), the following explaination just copy from there):
+The bucket we're reading from might be reused while our bio is in flight,
+and we could then end up reading the wrong data. We guard against this
+by checking (in bch_cache_read_endio()) if the pointer is stale again;
+if so, we treat it as an error (s->iop.error = -EINTR) and reread from
+the backing device (but we don't pass that error up anywhere)
 
-On Sat, 25 Nov 2017, Ingo Molnar wrote:
+It should be noted that cache read race happened under normal
+circumstances, not the circumstance when SSD failed, it was counted
+and shown in  /sys/fs/bcache/XXX/internal/cache_read_races.
 
-> 
-> * Mikulas Patocka <mpatocka@redhat.com> wrote:
-> 
-> > On Fri, 24 Nov 2017, Ingo Molnar wrote:
-> > 
-> > > > +	return unlikely(plug != NULL) &&
-> > > >  		(!list_empty(&plug->list) ||
-> > > >  		 !list_empty(&plug->mq_list) ||
-> > > >  		 !list_empty(&plug->cb_list));
-> > > 
-> > > That's an unrelated change.
-> > 
-> > It is related, because this function gets inlined into schedule().
-> 
-> That needs to be in the changelog and the patch needs to be Cc:-ed to the 
-> affected maintainer as well.
-> 
-> > The static branch prediction in gcc assumes that pointers are usually not 
-> > NULL, but in this case tsk->pi_blocked_on and tsk->plug are usually NULL.
-> 
-> That too should be in the changelog.
-> 
-> Thanks,
-> 
-> 	Ingo
-> 
+Without this patch, when we use writeback mode, we will never reread from
+the backing device when cache read race happened, until the whole cache
+device is clean, because the condition
+(s->recoverable && (dc && !atomic_read(&dc->has_dirty))) is false in
+cached_dev_read_error(). In this situation, the s->iop.error(= -EINTR)
+will be passed up, at last, user will receive -EINTR when it's bio end,
+this is not suitable, and wield to up-application.
 
-OK - here I resend it with more verbose message:
+In this patch, we use s->read_dirty_data to judge whether the read
+request hit dirty data in cache device, it is safe to reread data from
+the backing device when the read request hit clean data. This can not
+only handle cache read race, but also recover data when failed read
+request from cache device.
 
-Mikulas
+[edited by mlyle to fix up whitespace, commit log title, comment
+spelling]
 
-
-
-From: Mikulas Patocka <mpatocka@redhat.com>
-Subject: [PATCH] schedule: add unlikely()
-
-A small patch for schedule(), so that the code goes straght in the common 
-case. This patch saves two jumps in the assembler listing. The static 
-branch prediction in GCC assumes that pointers are usually non-NULL when 
-they are compared against NULL, but in theis case, tsk->plug is usually 
-NULL (the function blk_needs_flush_plug gets inlined into schedule()) and 
-tsk->pi_blocked_on is also usually NULL (that is checked by 
-tsk_is_pi_blocked). This patch adds the macro unlikely() to override the 
-static prediction.
-
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-
+Fixes: d59b23795933 ("bcache: only permit to recovery read error when cache device is clean")
+Cc: <stable@vger.kernel.org> # 4.14
+Signed-off-by: Hua Rui <huarui.dev@gmail.com>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
+Reviewed-by: Coly Li <colyli@suse.de>
+Signed-off-by: Michael Lyle <mlyle@lyle.org>
 ---
- include/linux/blkdev.h |    2 +-
- kernel/sched/core.c    |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ drivers/md/bcache/request.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-Index: linux-2.6/include/linux/blkdev.h
-===================================================================
---- linux-2.6.orig/include/linux/blkdev.h
-+++ linux-2.6/include/linux/blkdev.h
-@@ -1308,7 +1308,7 @@ static inline bool blk_needs_flush_plug(
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 3a7aed7282b2..643c3021624f 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -708,16 +708,15 @@ static void cached_dev_read_error(struct closure *cl)
  {
- 	struct blk_plug *plug = tsk->plug;
+ 	struct search *s = container_of(cl, struct search, cl);
+ 	struct bio *bio = &s->bio.bio;
+-	struct cached_dev *dc = container_of(s->d, struct cached_dev, disk);
  
--	return plug &&
-+	return unlikely(plug != NULL) &&
- 		(!list_empty(&plug->list) ||
- 		 !list_empty(&plug->mq_list) ||
- 		 !list_empty(&plug->cb_list));
-Index: linux-2.6/kernel/sched/core.c
-===================================================================
---- linux-2.6.orig/kernel/sched/core.c
-+++ linux-2.6/kernel/sched/core.c
-@@ -3405,7 +3405,7 @@ void __noreturn do_task_dead(void)
- 
- static inline void sched_submit_work(struct task_struct *tsk)
- {
--	if (!tsk->state || tsk_is_pi_blocked(tsk))
-+	if (!tsk->state || unlikely(tsk_is_pi_blocked(tsk)))
- 		return;
  	/*
- 	 * If we are going to sleep and we have plugged IO queued,
+-	 * If cache device is dirty (dc->has_dirty is non-zero), then
+-	 * recovery a failed read request from cached device may get a
+-	 * stale data back. So read failure recovery is only permitted
+-	 * when cache device is clean.
++	 * If read request hit dirty data (s->read_dirty_data is true),
++	 * then recovery a failed read request from cached device may
++	 * get a stale data back. So read failure recovery is only
++	 * permitted when read request hit clean data in cache device,
++	 * or when cache read race happened.
+ 	 */
+-	if (s->recoverable &&
+-	    (dc && !atomic_read(&dc->has_dirty))) {
++	if (s->recoverable && !s->read_dirty_data) {
+ 		/* Retry from the backing device: */
+ 		trace_bcache_read_retry(s->orig_bio);
+ 
+-- 
+2.14.1
