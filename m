@@ -1,54 +1,92 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f47.google.com ([74.125.82.47]:47284 "EHLO
-        mail-wm0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751141AbdKHJem (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Nov 2017 04:34:42 -0500
-Date: Wed, 8 Nov 2017 10:34:38 +0100
-From: Ingo Molnar <mingo@kernel.org>
-To: Byungchul Park <byungchul.park@lge.com>
-Cc: peterz@infradead.org, tglx@linutronix.de,
+Received: from mx2.suse.de ([195.135.220.15]:40038 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752387AbdKXJiX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 24 Nov 2017 04:38:23 -0500
+Date: Fri, 24 Nov 2017 10:38:19 +0100
+From: Jan Kara <jack@suse.cz>
+To: Michal Hocko <mhocko@kernel.org>
+Cc: Byungchul Park <byungchul.park@lge.com>, peterz@infradead.org,
+        mingo@kernel.org, akpm@linux-foundation.org, tglx@linutronix.de,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, kernel-team@lge.com
-Subject: Re: [PATCH] locking/lockdep: Revise
- Documentation/locking/crossrelease.txt
-Message-ID: <20171108093438.t5zjpsgealkiamlh@gmail.com>
-References: <1509344324-22399-1-git-send-email-byungchul.park@lge.com>
+        linux-block@vger.kernel.org, kernel-team@lge.com, jack@suse.cz,
+        jlayton@redhat.com, viro@zeniv.linux.org.uk, hannes@cmpxchg.org,
+        npiggin@gmail.com, rgoldwyn@suse.com, vbabka@suse.cz,
+        pombredanne@nexb.com, vinmenon@codeaurora.org,
+        gregkh@linuxfoundation.org
+Subject: Re: [PATCH 1/3] lockdep: Apply crossrelease to PG_locked locks
+Message-ID: <20171124093819.GA6072@quack2.suse.cz>
+References: <1510802067-18609-1-git-send-email-byungchul.park@lge.com>
+ <1510802067-18609-2-git-send-email-byungchul.park@lge.com>
+ <20171116120216.nxbwkj5y3kvim6cj@dhcp22.suse.cz>
+ <cf8aa555-7435-ea00-a4ee-3dcfd33ab5a0@lge.com>
+ <20171116130746.i642wszwvyb7q6hm@dhcp22.suse.cz>
+ <20171124030236.GA28999@X58A-UD3R>
+ <20171124081149.filhcoy6zh6ysrjj@dhcp22.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1509344324-22399-1-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <20171124081149.filhcoy6zh6ysrjj@dhcp22.suse.cz>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+On Fri 24-11-17 09:11:49, Michal Hocko wrote:
+> On Fri 24-11-17 12:02:36, Byungchul Park wrote:
+> > On Thu, Nov 16, 2017 at 02:07:46PM +0100, Michal Hocko wrote:
+> > > On Thu 16-11-17 21:48:05, Byungchul Park wrote:
+> > > > On 11/16/2017 9:02 PM, Michal Hocko wrote:
+> > > > > for each struct page. So you are doubling the size. Who is going to
+> > > > > enable this config option? You are moving this to page_ext in a later
+> > > > > patch which is a good step but it doesn't go far enough because this
+> > > > > still consumes those resources. Is there any problem to make this
+> > > > > kernel command line controllable? Something we do for page_owner for
+> > > > > example?
+> > > > 
+> > > > Sure. I will add it.
+> > > > 
+> > > > > Also it would be really great if you could give us some measures about
+> > > > > the runtime overhead. I do not expect it to be very large but this is
+> > > > 
+> > > > The major overhead would come from the amount of additional memory
+> > > > consumption for 'lockdep_map's.
+> > > 
+> > > yes
+> > > 
+> > > > Do you want me to measure the overhead by the additional memory
+> > > > consumption?
+> > > > 
+> > > > Or do you expect another overhead?
+> > > 
+> > > I would be also interested how much impact this has on performance. I do
+> > > not expect it would be too large but having some numbers for cache cold
+> > > parallel kbuild or other heavy page lock workloads.
+> > 
+> > Hello Michal,
+> > 
+> > I measured 'cache cold parallel kbuild' on my qemu machine. The result
+> > varies much so I cannot confirm, but I think there's no meaningful
+> > difference between before and after applying crossrelease to page locks.
+> > 
+> > Actually, I expect little overhead in lock_page() and unlock_page() even
+> > after applying crossreleas to page locks, but only expect a bit overhead
+> > by additional memory consumption for 'lockdep_map's per page.
+> > 
+> > I run the following instructions within "QEMU x86_64 4GB memory 4 cpus":
+> > 
+> >    make clean
+> >    echo 3 > drop_caches
+> >    time make -j4
+> 
+> Maybe FS people will help you find a more representative workload. E.g.
+> linear cache cold file read should be good as well. Maybe there are some
+> tests in fstests (or how they call xfstests these days).
 
-* Byungchul Park <byungchul.park@lge.com> wrote:
+So a relatively good test of page handling costs is to mmap cache hot file
+and measure time to fault in all the pages in the mapping. That way IO and
+filesystem stays out of the way and you measure only page table lookup,
+page handling (taking page ref and locking the page), and instantiation of
+the new PTE. Out of this page handling is actually the significant part.
 
-> I'm afraid the revision is not perfect yet. Of course, the document can
-> have got much better english by others than me.
-> 
-> But,
-> 
-> I think I should enhance it as much as I can, before they can help it
-> starting with a better one.
-> 
-> In addition, I removed verboseness as much as possible.
-> 
-> ----->8-----
-> From c7795104ca6ac6dd9f7fd944aee23a2011a6d3a2 Mon Sep 17 00:00:00 2001
-> From: Byungchul Park <byungchul.park@lge.com>
-> Date: Mon, 30 Oct 2017 14:51:26 +0900
-> Subject: [PATCH] locking/lockdep: Revise
->  Documentation/locking/crossrelease.txt
-> 
-> The document should've been written with a better readability. Revise it
-> to enhance its readability.
-> 
-> Signed-off-by: Byungchul Park <byungchul.park@lge.com>
-> ---
->  Documentation/locking/crossrelease.txt | 388 +++++++++++++++------------------
-
-Could you please run a spellchecker over this text? It's still full of typos and 
-various grammar mistakes...
-
-Thanks,
-
-	Ingo
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
