@@ -1,113 +1,103 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:65339 "EHLO mga02.intel.com"
+Received: from mx1.redhat.com ([209.132.183.28]:37134 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752454AbdKUNot (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Nov 2017 08:44:49 -0500
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V14 19/24] mmc: block: blk-mq: Check error bits and save the exception bit when polling card busy
-Date: Tue, 21 Nov 2017 15:42:45 +0200
-Message-Id: <1511271770-3444-20-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
-References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
+        id S1751196AbdK0FIr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Nov 2017 00:08:47 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Cc: Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
+        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 4/5] blk-mq: return dispatch result to caller in blk_mq_try_issue_directly
+Date: Mon, 27 Nov 2017 13:07:20 +0800
+Message-Id: <20171127050721.5884-5-ming.lei@redhat.com>
+In-Reply-To: <20171127050721.5884-1-ming.lei@redhat.com>
+References: <20171127050721.5884-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Check error bits and save the exception bit when polling card busy.
+In the following patch, we will use blk_mq_try_issue_directly() for DM
+to return the dispatch result, and DM need this informatin to improve
+IO merge.
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/mmc/core/block.c | 38 ++++++++++++++++++++++++++++++--------
- 1 file changed, 30 insertions(+), 8 deletions(-)
+ block/blk-mq.c | 27 +++++++++++++++++----------
+ 1 file changed, 17 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index 7eb55f2dffa9..ac976c84571f 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -1495,15 +1495,18 @@ static inline void mmc_apply_rel_rw(struct mmc_blk_request *brq,
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index fe82d7a47b35..fd4fb6316ea1 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1620,13 +1620,14 @@ static bool __blk_mq_issue_req(struct blk_mq_hw_ctx *hctx,
+ 	return false;
+ }
+ 
+-static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+-					struct request *rq,
+-					blk_qc_t *cookie, bool may_sleep)
++static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
++						struct request *rq,
++						blk_qc_t *cookie,
++						bool may_sleep)
+ {
+ 	struct request_queue *q = rq->q;
+ 	blk_qc_t new_cookie;
+-	blk_status_t ret;
++	blk_status_t ret = BLK_STS_OK;
+ 	bool run_queue = true;
+ 
+ 	/* RCU or SRCU read lock is needed before checking quiesced flag */
+@@ -1649,26 +1650,30 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	switch (ret) {
+ 	case BLK_STS_OK:
+ 		*cookie = new_cookie;
+-		return;
++		return ret;
+ 	case BLK_STS_RESOURCE:
+ 		__blk_mq_requeue_request(rq);
+ 		goto insert;
+ 	default:
+ 		*cookie = BLK_QC_T_NONE;
+ 		blk_mq_end_request(rq, ret);
+-		return;
++		return ret;
  	}
+ 
+ insert:
+ 	blk_mq_sched_insert_request(rq, false, run_queue, false, may_sleep);
++	return ret;
  }
  
--#define CMD_ERRORS							\
--	(R1_OUT_OF_RANGE |	/* Command argument out of range */	\
--	 R1_ADDRESS_ERROR |	/* Misaligned address */		\
-+#define CMD_ERRORS_EXCL_OOR						\
-+	(R1_ADDRESS_ERROR |	/* Misaligned address */		\
- 	 R1_BLOCK_LEN_ERROR |	/* Transferred block length incorrect */\
- 	 R1_WP_VIOLATION |	/* Tried to write to protected block */	\
- 	 R1_CARD_ECC_FAILED |	/* Card ECC failed */			\
- 	 R1_CC_ERROR |		/* Card controller error */		\
- 	 R1_ERROR)		/* General/unknown error */
- 
-+#define CMD_ERRORS							\
-+	(CMD_ERRORS_EXCL_OOR |						\
-+	 R1_OUT_OF_RANGE)	/* Command argument out of range */	\
-+
- static void mmc_blk_eval_resp_error(struct mmc_blk_request *brq)
+-static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+-		struct request *rq, blk_qc_t *cookie)
++static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
++					      struct request *rq,
++					      blk_qc_t *cookie)
  {
- 	u32 val;
-@@ -2162,20 +2165,39 @@ static inline bool mmc_blk_rq_error(struct mmc_blk_request *brq)
- 	       brq->data.error || brq->cmd.resp[0] & CMD_ERRORS;
++	blk_status_t ret;
++
+ 	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
+ 		rcu_read_lock();
+-		__blk_mq_try_issue_directly(hctx, rq, cookie, false);
++		ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false);
+ 		rcu_read_unlock();
+ 	} else {
+ 		unsigned int srcu_idx;
+@@ -1676,9 +1681,11 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 		might_sleep();
+ 
+ 		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
+-		__blk_mq_try_issue_directly(hctx, rq, cookie, true);
++		ret = __blk_mq_try_issue_directly(hctx, rq, cookie, true);
+ 		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
+ 	}
++
++	return ret;
  }
  
-+static inline bool mmc_blk_oor_valid(struct mmc_blk_request *brq)
-+{
-+	return !!brq->mrq.sbc;
-+}
-+
-+static inline u32 mmc_blk_stop_err_bits(struct mmc_blk_request *brq)
-+{
-+	return mmc_blk_oor_valid(brq) ? CMD_ERRORS : CMD_ERRORS_EXCL_OOR;
-+}
-+
- static int mmc_blk_card_busy(struct mmc_card *card, struct request *req)
- {
- 	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
--	bool gen_err = false;
-+	u32 status = 0;
- 	int err;
- 
- 	if (mmc_host_is_spi(card->host) || rq_data_dir(req) == READ)
- 		return 0;
- 
--	err = card_busy_detect_err(card, true, req, &gen_err);
-+	err = card_busy_detect(card, true, req, &status);
-+
-+	/*
-+	 * Do not assume data transferred correctly if there are any error bits
-+	 * set.
-+	 */
-+	if (!err && status & mmc_blk_stop_err_bits(&mqrq->brq)) {
-+		mqrq->brq.data.bytes_xfered = 0;
-+		err = -EIO;
-+	}
- 
--	/* Copy the general error bit so it will be seen later on */
--	if (gen_err)
--		mqrq->brq.stop.resp[0] |= R1_ERROR;
-+	/* Copy the exception bit so it will be seen later on */
-+	if (mmc_card_mmc(card) && status & R1_EXCEPTION_EVENT)
-+		mqrq->brq.cmd.resp[0] |= R1_EXCEPTION_EVENT;
- 
- 	return err;
- }
+ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
 -- 
-1.9.1
+2.9.5
