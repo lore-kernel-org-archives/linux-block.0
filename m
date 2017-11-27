@@ -1,93 +1,65 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:50422 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751498AbdLACB0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Nov 2017 21:01:26 -0500
-Date: Fri, 1 Dec 2017 10:01:03 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "dm-devel@redhat.com" <dm-devel@redhat.com>,
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:62481 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751313AbdK0ROu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Nov 2017 12:14:50 -0500
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "dm-devel@redhat.com" <dm-devel@redhat.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "axboe@fb.com" <axboe@fb.com>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "hch@infradead.org" <hch@infradead.org>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>
+CC: "hch@infradead.org" <hch@infradead.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "hare@suse.com" <hare@suse.com>, "osandov@fb.com" <osandov@fb.com>
 Subject: Re: [PATCH V2 1/5] dm-mpath: don't call blk_mq_delay_run_hw_queue()
  in case of BLK_STS_RESOURCE
-Message-ID: <20171201020058.GA30132@ming.t460p>
+Date: Mon, 27 Nov 2017 17:14:46 +0000
+Message-ID: <1511802882.2993.4.camel@wdc.com>
 References: <20171127050721.5884-1-ming.lei@redhat.com>
- <20171127050721.5884-2-ming.lei@redhat.com>
- <1511802882.2993.4.camel@wdc.com>
+         <20171127050721.5884-2-ming.lei@redhat.com>
+In-Reply-To: <20171127050721.5884-2-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1511802882.2993.4.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, Nov 27, 2017 at 05:14:46PM +0000, Bart Van Assche wrote:
-> On Mon, 2017-11-27 at 13:07 +0800, Ming Lei wrote:
-> > If .queue_rq() returns BLK_STS_RESOURCE, blk-mq will rerun the queue in
-> > the three situations:
-> > 
-> > 1) if BLK_MQ_S_SCHED_RESTART is set
-> > - queue is rerun after one rq is completed, see blk_mq_sched_restart()
-> > which is run from blk_mq_free_request()
-> > 
-> > 2) run out of driver tag
-> > - queue is rerun after one tag is freed
-> > 
-> > 3) otherwise
-> > - queue is run immediately in blk_mq_dispatch_rq_list()
-> > 
-> > This random dealy of running hw queue is introduced by commit 6077c2d706097c0
-> > (dm rq: Avoid that request processing stalls sporadically), which claimed
-> > one request processing stalling is fixed, but never explained the behind
-> > idea, and it is a workaound at most. Even the question isn't explained by
-> > anyone in recent discussion.
-> > 
-> > Also calling blk_mq_delay_run_hw_queue() inside .queue_rq() is a horrible
-> > hack because it makes BLK_MQ_S_SCHED_RESTART not working, and degrades I/O
-> > peformance a lot.
-> > 
-> > Finally this patch makes sure that dm-rq returns BLK_STS_RESOURCE to blk-mq
-> > only when underlying queue is out of resource, so we switch to return
-> > DM_MAPIO_DELAY_REQUEU if either MPATHF_QUEUE_IO or MPATHF_PG_INIT_REQUIRED
-> > is set in multipath_clone_and_map().
-> 
-> Sorry but in my opinion the above description shows that you don't understand
-> the dm-mpath driver completely.
-
-I have to treat your above comment as a noop since you never provide a explanation.
-
-Also I don't think it is wrong to deal with MPATHF_QUEUE_IO/MPATHF_PG_INIT_REQUIRED
-via DM_MAPIO_DELAY_REQUEUE, since both can seldom happen, and the delay
-won't cause performance issue.
-
-The idea behind this change is that this patchset switches to return BLK_STS_RESOURCE
-to blk-mq only when we run out of resource, but the above two(MPATHF_QUEUE_IO and
-MPATHF_PG_INIT_REQUIRED) don't belong to 'run out of resource'.
-
-> 
-> > diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-> > index c8faa2b85842..8fe3f45407ce 100644
-> > --- a/drivers/md/dm-mpath.c
-> > +++ b/drivers/md/dm-mpath.c
-> > @@ -484,9 +484,7 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
-> >  		return DM_MAPIO_KILL;
-> >  	} else if (test_bit(MPATHF_QUEUE_IO, &m->flags) ||
-> >  		   test_bit(MPATHF_PG_INIT_REQUIRED, &m->flags)) {
-> > -		if (pg_init_all_paths(m))
-> > -			return DM_MAPIO_DELAY_REQUEUE;
-> > -		return DM_MAPIO_REQUEUE;
-> > +		return DM_MAPIO_DELAY_REQUEUE;
-> >  	}
-> 
-> This patch removes a pg_init_all_paths() call but you don't explain why you
-> think it is allowed to remove that call. Did you perhaps remove that call by
-> mistake?
-
-OK, that is a problem, will fix it in V2.
-
--- 
-Ming
+T24gTW9uLCAyMDE3LTExLTI3IGF0IDEzOjA3ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gSWYg
+LnF1ZXVlX3JxKCkgcmV0dXJucyBCTEtfU1RTX1JFU09VUkNFLCBibGstbXEgd2lsbCByZXJ1biB0
+aGUgcXVldWUgaW4NCj4gdGhlIHRocmVlIHNpdHVhdGlvbnM6DQo+IA0KPiAxKSBpZiBCTEtfTVFf
+U19TQ0hFRF9SRVNUQVJUIGlzIHNldA0KPiAtIHF1ZXVlIGlzIHJlcnVuIGFmdGVyIG9uZSBycSBp
+cyBjb21wbGV0ZWQsIHNlZSBibGtfbXFfc2NoZWRfcmVzdGFydCgpDQo+IHdoaWNoIGlzIHJ1biBm
+cm9tIGJsa19tcV9mcmVlX3JlcXVlc3QoKQ0KPiANCj4gMikgcnVuIG91dCBvZiBkcml2ZXIgdGFn
+DQo+IC0gcXVldWUgaXMgcmVydW4gYWZ0ZXIgb25lIHRhZyBpcyBmcmVlZA0KPiANCj4gMykgb3Ro
+ZXJ3aXNlDQo+IC0gcXVldWUgaXMgcnVuIGltbWVkaWF0ZWx5IGluIGJsa19tcV9kaXNwYXRjaF9y
+cV9saXN0KCkNCj4gDQo+IFRoaXMgcmFuZG9tIGRlYWx5IG9mIHJ1bm5pbmcgaHcgcXVldWUgaXMg
+aW50cm9kdWNlZCBieSBjb21taXQgNjA3N2MyZDcwNjA5N2MwDQo+IChkbSBycTogQXZvaWQgdGhh
+dCByZXF1ZXN0IHByb2Nlc3Npbmcgc3RhbGxzIHNwb3JhZGljYWxseSksIHdoaWNoIGNsYWltZWQN
+Cj4gb25lIHJlcXVlc3QgcHJvY2Vzc2luZyBzdGFsbGluZyBpcyBmaXhlZCwgYnV0IG5ldmVyIGV4
+cGxhaW5lZCB0aGUgYmVoaW5kDQo+IGlkZWEsIGFuZCBpdCBpcyBhIHdvcmthb3VuZCBhdCBtb3N0
+LiBFdmVuIHRoZSBxdWVzdGlvbiBpc24ndCBleHBsYWluZWQgYnkNCj4gYW55b25lIGluIHJlY2Vu
+dCBkaXNjdXNzaW9uLg0KPiANCj4gQWxzbyBjYWxsaW5nIGJsa19tcV9kZWxheV9ydW5faHdfcXVl
+dWUoKSBpbnNpZGUgLnF1ZXVlX3JxKCkgaXMgYSBob3JyaWJsZQ0KPiBoYWNrIGJlY2F1c2UgaXQg
+bWFrZXMgQkxLX01RX1NfU0NIRURfUkVTVEFSVCBub3Qgd29ya2luZywgYW5kIGRlZ3JhZGVzIEkv
+Tw0KPiBwZWZvcm1hbmNlIGEgbG90Lg0KPiANCj4gRmluYWxseSB0aGlzIHBhdGNoIG1ha2VzIHN1
+cmUgdGhhdCBkbS1ycSByZXR1cm5zIEJMS19TVFNfUkVTT1VSQ0UgdG8gYmxrLW1xDQo+IG9ubHkg
+d2hlbiB1bmRlcmx5aW5nIHF1ZXVlIGlzIG91dCBvZiByZXNvdXJjZSwgc28gd2Ugc3dpdGNoIHRv
+IHJldHVybg0KPiBETV9NQVBJT19ERUxBWV9SRVFVRVUgaWYgZWl0aGVyIE1QQVRIRl9RVUVVRV9J
+TyBvciBNUEFUSEZfUEdfSU5JVF9SRVFVSVJFRA0KPiBpcyBzZXQgaW4gbXVsdGlwYXRoX2Nsb25l
+X2FuZF9tYXAoKS4NCg0KU29ycnkgYnV0IGluIG15IG9waW5pb24gdGhlIGFib3ZlIGRlc2NyaXB0
+aW9uIHNob3dzIHRoYXQgeW91IGRvbid0IHVuZGVyc3RhbmQNCnRoZSBkbS1tcGF0aCBkcml2ZXIg
+Y29tcGxldGVseS4NCg0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9tZC9kbS1tcGF0aC5jIGIvZHJp
+dmVycy9tZC9kbS1tcGF0aC5jDQo+IGluZGV4IGM4ZmFhMmI4NTg0Mi4uOGZlM2Y0NTQwN2NlIDEw
+MDY0NA0KPiAtLS0gYS9kcml2ZXJzL21kL2RtLW1wYXRoLmMNCj4gKysrIGIvZHJpdmVycy9tZC9k
+bS1tcGF0aC5jDQo+IEBAIC00ODQsOSArNDg0LDcgQEAgc3RhdGljIGludCBtdWx0aXBhdGhfY2xv
+bmVfYW5kX21hcChzdHJ1Y3QgZG1fdGFyZ2V0ICp0aSwgc3RydWN0IHJlcXVlc3QgKnJxLA0KPiAg
+CQlyZXR1cm4gRE1fTUFQSU9fS0lMTDsNCj4gIAl9IGVsc2UgaWYgKHRlc3RfYml0KE1QQVRIRl9R
+VUVVRV9JTywgJm0tPmZsYWdzKSB8fA0KPiAgCQkgICB0ZXN0X2JpdChNUEFUSEZfUEdfSU5JVF9S
+RVFVSVJFRCwgJm0tPmZsYWdzKSkgew0KPiAtCQlpZiAocGdfaW5pdF9hbGxfcGF0aHMobSkpDQo+
+IC0JCQlyZXR1cm4gRE1fTUFQSU9fREVMQVlfUkVRVUVVRTsNCj4gLQkJcmV0dXJuIERNX01BUElP
+X1JFUVVFVUU7DQo+ICsJCXJldHVybiBETV9NQVBJT19ERUxBWV9SRVFVRVVFOw0KPiAgCX0NCg0K
+VGhpcyBwYXRjaCByZW1vdmVzIGEgcGdfaW5pdF9hbGxfcGF0aHMoKSBjYWxsIGJ1dCB5b3UgZG9u
+J3QgZXhwbGFpbiB3aHkgeW91DQp0aGluayBpdCBpcyBhbGxvd2VkIHRvIHJlbW92ZSB0aGF0IGNh
+bGwuIERpZCB5b3UgcGVyaGFwcyByZW1vdmUgdGhhdCBjYWxsIGJ5DQptaXN0YWtlPw0KDQpCYXJ0
+Lg==
