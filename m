@@ -1,62 +1,198 @@
-Return-Path: <josef@toxicpanda.com>
-Return-Path: <josef@toxicpanda.com>
-From: Josef Bacik <josef@toxicpanda.com>
-To: axboe@kernel.dk,
-	nbd@other.debian.org,
-	linux-block@vger.kernel.org,
-	kernel-team@fb.com
-Cc: Josef Bacik <jbacik@fb.com>
-Subject: [PATCH] nbd: set discard granularity properly
-Date: Wed, 29 Nov 2017 16:13:44 -0500
-Message-Id: <1511990024-2742-1-git-send-email-josef@toxicpanda.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:52810 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751196AbdK0FJE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Nov 2017 00:09:04 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Cc: Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
+        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 5/5] blk-mq: issue request directly for blk_insert_cloned_request
+Date: Mon, 27 Nov 2017 13:07:21 +0800
+Message-Id: <20171127050721.5884-6-ming.lei@redhat.com>
+In-Reply-To: <20171127050721.5884-1-ming.lei@redhat.com>
+References: <20171127050721.5884-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Josef Bacik <jbacik@fb.com>
+blk_insert_cloned_request() is called in fast path of dm-rq driver, and
+in this function we append request to hctx->dispatch_list of the underlying
+queue directly.
 
-For some reason we had discard granularity set to 512 always even when
-discards were disabled.  Fix this by having the default be 0, and then
-if we turn it on set the discard granularity to the blocksize.
+1) This way isn't efficient enough because hctx lock is always required
 
-Signed-off-by: Josef Bacik <jbacik@fb.com>
+2) With blk_insert_cloned_request(), we bypass underlying queue's IO scheduler
+totally, and depend on DM rq driver to do IO schedule completely. But DM
+rq driver can't get underlying queue's dispatch feedback at all, and this
+information is extreamly useful for IO merge. Without that IO merge can't
+be done basically by blk-mq, and causes very bad sequential IO performance.
+
+This patch makes use of blk_mq_try_issue_directly() to dispatch rq to
+underlying queue and provides disptch result to dm-rq and blk-mq, and
+improves the above situations very much.
+
+With this patch, seqential IO is improved by 3X ~ 5X in my test over
+mpath/virtio-scsi.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/nbd.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ block/blk-core.c   |  3 +--
+ block/blk-mq.c     | 32 +++++++++++++++++++++++++++++---
+ block/blk-mq.h     |  3 +++
+ drivers/md/dm-rq.c | 19 ++++++++++++++++---
+ 4 files changed, 49 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 5f2a4240a204..32b6f66ea5bf 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -231,6 +231,11 @@ static void nbd_size_clear(struct nbd_device *nbd)
- static void nbd_size_update(struct nbd_device *nbd)
- {
- 	struct nbd_config *config = nbd->config;
-+
-+	if (config->flags & NBD_FLAG_SEND_TRIM) {
-+		nbd->disk->queue->limits.discard_granularity = config->blksize;
-+		blk_queue_max_discard_sectors(nbd->disk->queue, UINT_MAX);
+diff --git a/block/blk-core.c b/block/blk-core.c
+index b8881750a3ac..e5a623b45a1d 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2488,8 +2488,7 @@ blk_status_t blk_insert_cloned_request(struct request_queue *q, struct request *
+ 		 * bypass a potential scheduler on the bottom device for
+ 		 * insert.
+ 		 */
+-		blk_mq_request_bypass_insert(rq, true);
+-		return BLK_STS_OK;
++		return blk_mq_request_direct_issue(rq);
+ 	}
+ 
+ 	spin_lock_irqsave(q->queue_lock, flags);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index fd4fb6316ea1..c94a8d225b63 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1629,6 +1629,12 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	blk_qc_t new_cookie;
+ 	blk_status_t ret = BLK_STS_OK;
+ 	bool run_queue = true;
++	/*
++	 * This function is called from blk_insert_cloned_request() if
++	 * 'cookie' is NULL, and for dispatching this request only.
++	 */
++	bool dispatch_only = !cookie;
++	bool need_insert;
+ 
+ 	/* RCU or SRCU read lock is needed before checking quiesced flag */
+ 	if (blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)) {
+@@ -1636,10 +1642,19 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 		goto insert;
+ 	}
+ 
+-	if (q->elevator)
++	if (q->elevator && !dispatch_only)
+ 		goto insert;
+ 
+-	if (__blk_mq_issue_req(hctx, rq, &new_cookie, &ret))
++	need_insert = __blk_mq_issue_req(hctx, rq, &new_cookie, &ret);
++	if (dispatch_only) {
++		if (need_insert)
++			return BLK_STS_RESOURCE;
++		if (ret == BLK_STS_RESOURCE)
++			__blk_mq_requeue_request(rq);
++		return ret;
 +	}
- 	blk_queue_logical_block_size(nbd->disk->queue, config->blksize);
- 	blk_queue_physical_block_size(nbd->disk->queue, config->blksize);
- 	set_capacity(nbd->disk, config->bytesize >> 9);
-@@ -1040,6 +1045,8 @@ static void nbd_config_put(struct nbd_device *nbd)
- 		nbd->config = NULL;
++
++	if (need_insert)
+ 		goto insert;
  
- 		nbd->tag_set.timeout = 0;
-+		nbd->disk->queue->limits.discard_granularity = 0;
-+		blk_queue_max_discard_sectors(nbd->disk->queue, 0);
- 		queue_flag_clear_unlocked(QUEUE_FLAG_DISCARD, nbd->disk->queue);
+ 	/*
+@@ -1661,7 +1676,10 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	}
  
- 		mutex_unlock(&nbd->config_lock);
-@@ -1490,8 +1497,8 @@ static int nbd_dev_add(int index)
- 	 */
- 	queue_flag_set_unlocked(QUEUE_FLAG_NONROT, disk->queue);
- 	queue_flag_clear_unlocked(QUEUE_FLAG_ADD_RANDOM, disk->queue);
--	disk->queue->limits.discard_granularity = 512;
--	blk_queue_max_discard_sectors(disk->queue, UINT_MAX);
-+	disk->queue->limits.discard_granularity = 0;
-+	blk_queue_max_discard_sectors(disk->queue, 0);
- 	blk_queue_max_segment_size(disk->queue, UINT_MAX);
- 	blk_queue_max_segments(disk->queue, USHRT_MAX);
- 	blk_queue_max_hw_sectors(disk->queue, 65536);
+ insert:
+-	blk_mq_sched_insert_request(rq, false, run_queue, false, may_sleep);
++	if (!dispatch_only)
++		blk_mq_sched_insert_request(rq, false, run_queue, false, may_sleep);
++	else
++		blk_mq_request_bypass_insert(rq, run_queue);
+ 	return ret;
+ }
+ 
+@@ -1688,6 +1706,14 @@ static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	return ret;
+ }
+ 
++blk_status_t blk_mq_request_direct_issue(struct request *rq)
++{
++	struct blk_mq_ctx *ctx = rq->mq_ctx;
++	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(rq->q, ctx->cpu);
++
++	return blk_mq_try_issue_directly(hctx, rq, NULL);
++}
++
+ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ {
+ 	const int is_sync = op_is_sync(bio->bi_opf);
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 6c7c3ff5bf62..81df35fbce77 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -60,6 +60,9 @@ void blk_mq_request_bypass_insert(struct request *rq, bool run_queue);
+ void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
+ 				struct list_head *list);
+ 
++/* Used by DM for issuing req directly */
++blk_status_t blk_mq_request_direct_issue(struct request *rq);
++
+ /*
+  * CPU -> queue mappings
+  */
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index cbe8a06ef8b0..b96aa208e5cc 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -395,7 +395,7 @@ static void end_clone_request(struct request *clone, blk_status_t error)
+ 	dm_complete_request(tio->orig, error);
+ }
+ 
+-static void dm_dispatch_clone_request(struct request *clone, struct request *rq)
++static blk_status_t dm_dispatch_clone_request(struct request *clone, struct request *rq)
+ {
+ 	blk_status_t r;
+ 
+@@ -404,9 +404,10 @@ static void dm_dispatch_clone_request(struct request *clone, struct request *rq)
+ 
+ 	clone->start_time = jiffies;
+ 	r = blk_insert_cloned_request(clone->q, clone);
+-	if (r)
++	if (r != BLK_STS_OK && r != BLK_STS_RESOURCE)
+ 		/* must complete clone in terms of original request */
+ 		dm_complete_request(rq, r);
++	return r;
+ }
+ 
+ static int dm_rq_bio_constructor(struct bio *bio, struct bio *bio_orig,
+@@ -476,8 +477,10 @@ static int map_request(struct dm_rq_target_io *tio)
+ 	struct mapped_device *md = tio->md;
+ 	struct request *rq = tio->orig;
+ 	struct request *clone = NULL;
++	blk_status_t ret;
+ 
+ 	r = ti->type->clone_and_map_rq(ti, rq, &tio->info, &clone);
++ check_again:
+ 	switch (r) {
+ 	case DM_MAPIO_SUBMITTED:
+ 		/* The target has taken the I/O to submit by itself later */
+@@ -492,7 +495,17 @@ static int map_request(struct dm_rq_target_io *tio)
+ 		/* The target has remapped the I/O so dispatch it */
+ 		trace_block_rq_remap(clone->q, clone, disk_devt(dm_disk(md)),
+ 				     blk_rq_pos(rq));
+-		dm_dispatch_clone_request(clone, rq);
++		ret = dm_dispatch_clone_request(clone, rq);
++		if (ret == BLK_STS_RESOURCE) {
++			blk_rq_unprep_clone(clone);
++			tio->ti->type->release_clone_rq(clone);
++			tio->clone = NULL;
++			if (!rq->q->mq_ops)
++				r = DM_MAPIO_DELAY_REQUEUE;
++			else
++				r = DM_MAPIO_REQUEUE;
++			goto check_again;
++		}
+ 		break;
+ 	case DM_MAPIO_REQUEUE:
+ 		/* The target wants to requeue the I/O */
 -- 
-2.7.5
+2.9.5
