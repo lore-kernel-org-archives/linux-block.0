@@ -1,110 +1,62 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: "Luis R. Rodriguez" <mcgrof@kernel.org>
-To: viro@zeniv.linux.org.uk, bart.vanassche@wdc.com,
-        ming.lei@redhat.com, tytso@mit.edu, darrick.wong@oracle.com,
-        jikos@kernel.org, rjw@rjwysocki.net, pavel@ucw.cz,
-        len.brown@intel.com, linux-fsdevel@vger.kernel.org
-Cc: boris.ostrovsky@oracle.com, jgross@suse.com,
-        todd.e.brandt@linux.intel.com, nborisov@suse.com, jack@suse.cz,
-        martin.petersen@oracle.com, ONeukum@suse.com,
-        oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
-        yu.chen.surf@gmail.com, dan.j.williams@intel.com,
-        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Luis R. Rodriguez" <mcgrof@kernel.org>
-Subject: [PATCH 00/11] fs: use freeze_fs on suspend/hibernate
-Date: Wed, 29 Nov 2017 15:23:45 -0800
-Message-Id: <20171129232356.28296-1-mcgrof@kernel.org>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-it0-f68.google.com ([209.85.214.68]:36205 "EHLO
+        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751252AbdK0JTh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Nov 2017 04:19:37 -0500
+Received: by mail-it0-f68.google.com with SMTP id y71so8585103ita.1
+        for <linux-block@vger.kernel.org>; Mon, 27 Nov 2017 01:19:37 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <CAOi1vP-W1+UKDf4C9zX8QGD8YBnEPSrjbVcnLf7tyryBiW7Afg@mail.gmail.com>
+References: <1510253101-10291-1-git-send-email-idryomov@gmail.com> <CAOi1vP-W1+UKDf4C9zX8QGD8YBnEPSrjbVcnLf7tyryBiW7Afg@mail.gmail.com>
+From: Ilya Dryomov <idryomov@gmail.com>
+Date: Mon, 27 Nov 2017 10:19:36 +0100
+Message-ID: <CAOi1vP8LRdpLTSCKnazM6LpdSA3zUYU6OCDHd4SN4WYcOH9WcA@mail.gmail.com>
+Subject: Re: [PATCH 0/2] block: enforce ioctl(BLKROSET) and set_disk_ro()
+To: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@fb.com>
+Cc: linux-block <linux-block@vger.kernel.org>,
+        Tejun Heo <tj@kernel.org>, David Disseldorp <ddiss@suse.de>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This is a followup from the original RFC which proposed to start
-to kill kthread freezing all together [0]. Instead of going straight
-out to the jugular for kthread freezing this series only addresses
-killing freezer calls on filesystems which implement freeze_fs, after
-we let the kernel freeze these filesystems for us on suspend.
+On Thu, Nov 16, 2017 at 10:02 AM, Ilya Dryomov <idryomov@gmail.com> wrote:
+> On Thu, Nov 9, 2017 at 7:44 PM, Ilya Dryomov <idryomov@gmail.com> wrote:
+>> Hello,
+>>
+>> I was doing some cleanup work on rbd BLKROSET handler and discovered
+>> that we ignore partition rw/ro setting (hd_struct->policy) for pretty
+>> much everything but straight writes.
+>>
+>> David (CCed) has blktests patches standing by.
+>>
+>> (Another aspect of this is that we don't enforce open(2) mode.  Tejun
+>> took a stab at this a few years ago, but his patch had to be reverted:
+>>
+>>   75f1dc0d076d ("block: check bdev_read_only() from blkdev_get()")
+>>   e51900f7d38c ("block: revert block_dev read-only check")
+>>
+>> It is a separate issue and refusing writes to read-only devices is
+>> obviously more important, but perhaps it's time to revisit that as
+>> well?)
+>>
+>> Thanks,
+>>
+>>                 Ilya
+>>
+>>
+>> Ilya Dryomov (2):
+>>   block: fail op_is_write() requests to read-only partitions
+>>   block: add bdev_read_only() checks to common helpers
+>>
+>>  block/blk-core.c | 23 ++++++++++++++++++++++-
+>>  block/blk-lib.c  | 12 ++++++++++++
+>>  2 files changed, 34 insertions(+), 1 deletion(-)
+>
+> Ping...  Christoph, Jens, could one of you please take a look?
 
-This approach puts on a slow but steady path towards the original goal
-though. Each subsystem could look for similar solutions. Even with
-filesystems we're not all done yet, after this we'll still have to
-decide what to do about filesystems which do not implement freeze_fs().
+Ping?
 
-Motivation and problem:
+Thanks,
 
-kthreads have some semantics for freezing, which helps the kernel
-freeze them when a system is going to suspend or hibernation. These
-semantics are not well defined though, and it actually turns out
-pretty hard to get it right.
-
-Without a proper solution suspend and hibernation are fragile on filesystems,
-it can easily break suspend and fixing such issues are in no way trivial [1]
-[2].
-
-Proposed solution:
-
-Instead of fixing such semantics and trying to get all filesystems to do it
-right, we can easily do away with all freezing calls if the filesystem
-implements a proper freeze_fs() callback. The following 9 filesystems have
-freeze_fs() implemented as such we can let the kernel issue the callback upon
-suspend and thaw on resume automatically on our behalf.
-
-  o xfs
-  o reiserfs
-  o nilfs2
-  o jfs
-  o f2fs
-  o ext4
-  o ext2
-  o btrfs
-
-Of these, the following have freezer helpers, which can then be removed
-after the kernel automaticaly calls freeze_fs for us on suspend:
-
-  o xfs
-  o nilfs2
-  o jfs
-  o f2fs
-  o ext4
-
-I've tested this on a system with ext4 and XFS, and have let 0-day go at
-without issues. I have branches availabe for linux-next [3] and Linus'
-latest tree [4].
-
-Further testing, thoughts, reviews, flames are all equally appreciated.
-
-[0] https://lkml.kernel.org/r/20171003185313.1017-1-mcgrof@kernel.org
-[1] https://bugzilla.suse.com/show_bug.cgi?id=1043449
-[2] https://lkml.kernel.org/r/20171113103139.GA18936@yu-chen.sh.intel.com
-[3] https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20171129-fs-freeze-cleanup
-[4] https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux.git/log/?h=20171129-fs-freeze-cleanup
-
-Luis R. Rodriguez (11):
-  fs: provide unlocked helper for freeze_super()
-  fs: provide unlocked helper thaw_super()
-  fs: add frozen sb state helpers
-  fs: distinguish between user initiated freeze and kernel initiated
-    freeze
-  fs: add iterate_supers_excl() and iterate_supers_reverse_excl()
-  fs: freeze on suspend and thaw on resume
-  xfs: remove not needed freezing calls
-  ext4: remove not needed freezing calls
-  f2fs: remove not needed freezing calls
-  nilfs2: remove not needed freezing calls
-  jfs: remove not needed freezing calls
-
- fs/ext4/ext4_jbd2.c    |   2 +-
- fs/ext4/super.c        |   2 -
- fs/f2fs/gc.c           |   5 +-
- fs/f2fs/segment.c      |   6 +-
- fs/jfs/jfs_logmgr.c    |  11 +-
- fs/jfs/jfs_txnmgr.c    |  31 ++---
- fs/nilfs2/segment.c    |  48 ++++----
- fs/super.c             | 320 ++++++++++++++++++++++++++++++++++++++++---------
- fs/xfs/xfs_trans.c     |   2 +-
- fs/xfs/xfs_trans_ail.c |   7 +-
- include/linux/fs.h     |  63 +++++++++-
- kernel/power/process.c |  15 ++-
- 12 files changed, 378 insertions(+), 134 deletions(-)
-
--- 
-2.15.0
+                Ilya
