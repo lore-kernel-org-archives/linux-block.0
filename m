@@ -1,79 +1,57 @@
-Return-Path: <prvs=5014e5409=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Omar Sandoval <osandov@fb.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 7/7] blk-mq: Fix another queue stall
-Date: Thu, 30 Nov 2017 16:08:48 -0800
-Message-Id: <20171201000848.2656-8-bart.vanassche@wdc.com>
-In-Reply-To: <20171201000848.2656-1-bart.vanassche@wdc.com>
-References: <20171201000848.2656-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:40204 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750726AbdK0FHo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Nov 2017 00:07:44 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Cc: Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
+        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 0/5] dm-rq: improve sequential I/O performance
+Date: Mon, 27 Nov 2017 13:07:16 +0800
+Message-Id: <20171127050721.5884-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The following code at the end of blk_mq_dispatch_rq_list() detects
-whether or not wake_up(&hctx->dispatch_wait) has been called
-concurrently with pushing back requests onto the dispatch list:
+Hi Guys,
 
-    list_empty_careful(&hctx->dispatch_wait.entry)
+The 1st patch removes the workaround of blk_mq_delay_run_hw_queue() in
+case of requeue, this way isn't necessary, and more worse, it makes
+BLK_MQ_S_SCHED_RESTART not working, and degarde I/O performance.
 
-Since blk_mq_dispatch_wake() is protected by another lock than the
-dispatch list and since blk_mq_run_hw_queue() does not acquire any
-lock if it notices that no requests are pending,
-blk_mq_dispatch_wake() is not ordered against the code that pushes
-back requests onto the dispatch list. Avoid that the dispatch_wait
-empty check fails due to load/store reordering by serializing it
-against the dispatch_wait queue wakeup. This patch fixes a queue
-stall I ran into while testing a SCSI initiator driver with the
-maximum target depth set to one.
+The 2nd patch return DM_MAPIO_REQUEUE to dm-rq if underlying request
+allocation fails, then we can return BLK_STS_RESOURCE from dm-rq to
+blk-mq, so that blk-mq can hold the requests to be dequeued.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- block/blk-mq.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+The other 3 paches changes the blk-mq part of blk_insert_cloned_request(),
+in which we switch to blk_mq_try_issue_directly(), so that both dm-rq
+and blk-mq can get the dispatch result of underlying queue, and with
+this information, blk-mq can handle IO merge much better, then
+sequential I/O performance is improved much. In my dm-mpath over
+virtio-scsi test, this improvement can be 3X ~ 5X.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b4225f606737..a11767a4d95c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1074,6 +1074,20 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx **hctx,
- 	return ret;
- }
- 
-+static bool blk_mq_dispatch_list_empty(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct sbq_wait_state *ws = bt_wait_ptr(&hctx->tags->bitmap_tags, hctx);
-+	struct wait_queue_head *wq_head = &ws->wait;
-+	unsigned long flags;
-+	bool result;
-+
-+	spin_lock_irqsave(&wq_head->lock, flags);
-+	result = list_empty(&hctx->dispatch_wait.entry);
-+	spin_unlock_irqrestore(&wq_head->lock, flags);
-+
-+	return result;
-+}
-+
- bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 			     bool got_budget)
- {
-@@ -1197,7 +1211,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 		 */
- 		if (restart ||
- 		    !blk_mq_sched_needs_restart(hctx) ||
--		    (no_tag && list_empty_careful(&hctx->dispatch_wait.entry)))
-+		    (no_tag && blk_mq_dispatch_list_empty(hctx)))
- 			blk_mq_run_hw_queue(hctx, true);
- 	}
- 
+V2:
+	- drop 'dm-mpath: cache ti->clone during requeue', which is a bit
+	too complicated, and not see obvious performance improvement.
+	- make change on blk-mq part cleaner
+
+Ming Lei (5):
+  dm-mpath: don't call blk_mq_delay_run_hw_queue() in case of
+    BLK_STS_RESOURCE
+  dm-mpath: return DM_MAPIO_REQUEUE in case of rq allocation failure
+  blk-mq: move actual issue into one helper
+  blk-mq: return dispatch result to caller in blk_mq_try_issue_directly
+  blk-mq: issue request directly for blk_insert_cloned_request
+
+ block/blk-core.c      |  3 +-
+ block/blk-mq.c        | 88 +++++++++++++++++++++++++++++++++++++++------------
+ block/blk-mq.h        |  3 ++
+ drivers/md/dm-mpath.c | 18 ++++++++---
+ drivers/md/dm-rq.c    | 20 +++++++++---
+ 5 files changed, 102 insertions(+), 30 deletions(-)
+
 -- 
-2.15.0
+2.9.5
