@@ -1,65 +1,83 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:62481 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751313AbdK0ROu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Nov 2017 12:14:50 -0500
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "snitzer@redhat.com" <snitzer@redhat.com>
-CC: "hch@infradead.org" <hch@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "hare@suse.com" <hare@suse.com>, "osandov@fb.com" <osandov@fb.com>
-Subject: Re: [PATCH V2 1/5] dm-mpath: don't call blk_mq_delay_run_hw_queue()
- in case of BLK_STS_RESOURCE
-Date: Mon, 27 Nov 2017 17:14:46 +0000
-Message-ID: <1511802882.2993.4.camel@wdc.com>
+Received: from mx1.redhat.com ([209.132.183.28]:54648 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751180AbdK0FH7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Nov 2017 00:07:59 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Cc: Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
+        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 1/5] dm-mpath: don't call blk_mq_delay_run_hw_queue() in case of BLK_STS_RESOURCE
+Date: Mon, 27 Nov 2017 13:07:17 +0800
+Message-Id: <20171127050721.5884-2-ming.lei@redhat.com>
+In-Reply-To: <20171127050721.5884-1-ming.lei@redhat.com>
 References: <20171127050721.5884-1-ming.lei@redhat.com>
-         <20171127050721.5884-2-ming.lei@redhat.com>
-In-Reply-To: <20171127050721.5884-2-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gTW9uLCAyMDE3LTExLTI3IGF0IDEzOjA3ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gSWYg
-LnF1ZXVlX3JxKCkgcmV0dXJucyBCTEtfU1RTX1JFU09VUkNFLCBibGstbXEgd2lsbCByZXJ1biB0
-aGUgcXVldWUgaW4NCj4gdGhlIHRocmVlIHNpdHVhdGlvbnM6DQo+IA0KPiAxKSBpZiBCTEtfTVFf
-U19TQ0hFRF9SRVNUQVJUIGlzIHNldA0KPiAtIHF1ZXVlIGlzIHJlcnVuIGFmdGVyIG9uZSBycSBp
-cyBjb21wbGV0ZWQsIHNlZSBibGtfbXFfc2NoZWRfcmVzdGFydCgpDQo+IHdoaWNoIGlzIHJ1biBm
-cm9tIGJsa19tcV9mcmVlX3JlcXVlc3QoKQ0KPiANCj4gMikgcnVuIG91dCBvZiBkcml2ZXIgdGFn
-DQo+IC0gcXVldWUgaXMgcmVydW4gYWZ0ZXIgb25lIHRhZyBpcyBmcmVlZA0KPiANCj4gMykgb3Ro
-ZXJ3aXNlDQo+IC0gcXVldWUgaXMgcnVuIGltbWVkaWF0ZWx5IGluIGJsa19tcV9kaXNwYXRjaF9y
-cV9saXN0KCkNCj4gDQo+IFRoaXMgcmFuZG9tIGRlYWx5IG9mIHJ1bm5pbmcgaHcgcXVldWUgaXMg
-aW50cm9kdWNlZCBieSBjb21taXQgNjA3N2MyZDcwNjA5N2MwDQo+IChkbSBycTogQXZvaWQgdGhh
-dCByZXF1ZXN0IHByb2Nlc3Npbmcgc3RhbGxzIHNwb3JhZGljYWxseSksIHdoaWNoIGNsYWltZWQN
-Cj4gb25lIHJlcXVlc3QgcHJvY2Vzc2luZyBzdGFsbGluZyBpcyBmaXhlZCwgYnV0IG5ldmVyIGV4
-cGxhaW5lZCB0aGUgYmVoaW5kDQo+IGlkZWEsIGFuZCBpdCBpcyBhIHdvcmthb3VuZCBhdCBtb3N0
-LiBFdmVuIHRoZSBxdWVzdGlvbiBpc24ndCBleHBsYWluZWQgYnkNCj4gYW55b25lIGluIHJlY2Vu
-dCBkaXNjdXNzaW9uLg0KPiANCj4gQWxzbyBjYWxsaW5nIGJsa19tcV9kZWxheV9ydW5faHdfcXVl
-dWUoKSBpbnNpZGUgLnF1ZXVlX3JxKCkgaXMgYSBob3JyaWJsZQ0KPiBoYWNrIGJlY2F1c2UgaXQg
-bWFrZXMgQkxLX01RX1NfU0NIRURfUkVTVEFSVCBub3Qgd29ya2luZywgYW5kIGRlZ3JhZGVzIEkv
-Tw0KPiBwZWZvcm1hbmNlIGEgbG90Lg0KPiANCj4gRmluYWxseSB0aGlzIHBhdGNoIG1ha2VzIHN1
-cmUgdGhhdCBkbS1ycSByZXR1cm5zIEJMS19TVFNfUkVTT1VSQ0UgdG8gYmxrLW1xDQo+IG9ubHkg
-d2hlbiB1bmRlcmx5aW5nIHF1ZXVlIGlzIG91dCBvZiByZXNvdXJjZSwgc28gd2Ugc3dpdGNoIHRv
-IHJldHVybg0KPiBETV9NQVBJT19ERUxBWV9SRVFVRVUgaWYgZWl0aGVyIE1QQVRIRl9RVUVVRV9J
-TyBvciBNUEFUSEZfUEdfSU5JVF9SRVFVSVJFRA0KPiBpcyBzZXQgaW4gbXVsdGlwYXRoX2Nsb25l
-X2FuZF9tYXAoKS4NCg0KU29ycnkgYnV0IGluIG15IG9waW5pb24gdGhlIGFib3ZlIGRlc2NyaXB0
-aW9uIHNob3dzIHRoYXQgeW91IGRvbid0IHVuZGVyc3RhbmQNCnRoZSBkbS1tcGF0aCBkcml2ZXIg
-Y29tcGxldGVseS4NCg0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9tZC9kbS1tcGF0aC5jIGIvZHJp
-dmVycy9tZC9kbS1tcGF0aC5jDQo+IGluZGV4IGM4ZmFhMmI4NTg0Mi4uOGZlM2Y0NTQwN2NlIDEw
-MDY0NA0KPiAtLS0gYS9kcml2ZXJzL21kL2RtLW1wYXRoLmMNCj4gKysrIGIvZHJpdmVycy9tZC9k
-bS1tcGF0aC5jDQo+IEBAIC00ODQsOSArNDg0LDcgQEAgc3RhdGljIGludCBtdWx0aXBhdGhfY2xv
-bmVfYW5kX21hcChzdHJ1Y3QgZG1fdGFyZ2V0ICp0aSwgc3RydWN0IHJlcXVlc3QgKnJxLA0KPiAg
-CQlyZXR1cm4gRE1fTUFQSU9fS0lMTDsNCj4gIAl9IGVsc2UgaWYgKHRlc3RfYml0KE1QQVRIRl9R
-VUVVRV9JTywgJm0tPmZsYWdzKSB8fA0KPiAgCQkgICB0ZXN0X2JpdChNUEFUSEZfUEdfSU5JVF9S
-RVFVSVJFRCwgJm0tPmZsYWdzKSkgew0KPiAtCQlpZiAocGdfaW5pdF9hbGxfcGF0aHMobSkpDQo+
-IC0JCQlyZXR1cm4gRE1fTUFQSU9fREVMQVlfUkVRVUVVRTsNCj4gLQkJcmV0dXJuIERNX01BUElP
-X1JFUVVFVUU7DQo+ICsJCXJldHVybiBETV9NQVBJT19ERUxBWV9SRVFVRVVFOw0KPiAgCX0NCg0K
-VGhpcyBwYXRjaCByZW1vdmVzIGEgcGdfaW5pdF9hbGxfcGF0aHMoKSBjYWxsIGJ1dCB5b3UgZG9u
-J3QgZXhwbGFpbiB3aHkgeW91DQp0aGluayBpdCBpcyBhbGxvd2VkIHRvIHJlbW92ZSB0aGF0IGNh
-bGwuIERpZCB5b3UgcGVyaGFwcyByZW1vdmUgdGhhdCBjYWxsIGJ5DQptaXN0YWtlPw0KDQpCYXJ0
-Lg==
+If .queue_rq() returns BLK_STS_RESOURCE, blk-mq will rerun the queue in
+the three situations:
+
+1) if BLK_MQ_S_SCHED_RESTART is set
+- queue is rerun after one rq is completed, see blk_mq_sched_restart()
+which is run from blk_mq_free_request()
+
+2) run out of driver tag
+- queue is rerun after one tag is freed
+
+3) otherwise
+- queue is run immediately in blk_mq_dispatch_rq_list()
+
+This random dealy of running hw queue is introduced by commit 6077c2d706097c0
+(dm rq: Avoid that request processing stalls sporadically), which claimed
+one request processing stalling is fixed, but never explained the behind
+idea, and it is a workaound at most. Even the question isn't explained by
+anyone in recent discussion.
+
+Also calling blk_mq_delay_run_hw_queue() inside .queue_rq() is a horrible
+hack because it makes BLK_MQ_S_SCHED_RESTART not working, and degrades I/O
+peformance a lot.
+
+Finally this patch makes sure that dm-rq returns BLK_STS_RESOURCE to blk-mq
+only when underlying queue is out of resource, so we switch to return
+DM_MAPIO_DELAY_REQUEU if either MPATHF_QUEUE_IO or MPATHF_PG_INIT_REQUIRED
+is set in multipath_clone_and_map().
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/md/dm-mpath.c | 4 +---
+ drivers/md/dm-rq.c    | 1 -
+ 2 files changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
+index c8faa2b85842..8fe3f45407ce 100644
+--- a/drivers/md/dm-mpath.c
++++ b/drivers/md/dm-mpath.c
+@@ -484,9 +484,7 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
+ 		return DM_MAPIO_KILL;
+ 	} else if (test_bit(MPATHF_QUEUE_IO, &m->flags) ||
+ 		   test_bit(MPATHF_PG_INIT_REQUIRED, &m->flags)) {
+-		if (pg_init_all_paths(m))
+-			return DM_MAPIO_DELAY_REQUEUE;
+-		return DM_MAPIO_REQUEUE;
++		return DM_MAPIO_DELAY_REQUEUE;
+ 	}
+ 
+ 	memset(mpio, 0, sizeof(*mpio));
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index 9d32f25489c2..cbe8a06ef8b0 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -758,7 +758,6 @@ static blk_status_t dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 		/* Undo dm_start_request() before requeuing */
+ 		rq_end_stats(md, rq);
+ 		rq_completed(md, rq_data_dir(rq), false);
+-		blk_mq_delay_run_hw_queue(hctx, 100/*ms*/);
+ 		return BLK_STS_RESOURCE;
+ 	}
+ 
+-- 
+2.9.5
