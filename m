@@ -1,62 +1,101 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:43872 "EHLO mx2.suse.de"
+Received: from mx1.redhat.com ([209.132.183.28]:38422 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752273AbdK2XFi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Nov 2017 18:05:38 -0500
-Date: Thu, 30 Nov 2017 00:05:32 +0100
-From: "Luis R. Rodriguez" <mcgrof@kernel.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "rjw@rjwysocki.net" <rjw@rjwysocki.net>,
-        "mcgrof@kernel.org" <mcgrof@kernel.org>,
-        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
-        "ONeukum@suse.com" <ONeukum@suse.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "nborisov@suse.com" <nborisov@suse.com>,
-        "oleg.b.antonyan@gmail.com" <oleg.b.antonyan@gmail.com>,
-        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        "pavel@ucw.cz" <pavel@ucw.cz>,
-        "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "jgross@suse.com" <jgross@suse.com>,
-        "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
-        "todd.e.brandt@linux.intel.com" <todd.e.brandt@linux.intel.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "jikos@kernel.org" <jikos@kernel.org>,
-        "len.brown@intel.com" <len.brown@intel.com>,
-        "tytso@mit.edu" <tytso@mit.edu>, "jack@suse.cz" <jack@suse.cz>
-Subject: Re: [RFC 5/5] pm: remove kernel thread freezing
-Message-ID: <20171129230531.GH16026@wotan.suse.de>
-References: <20171003185313.1017-1-mcgrof@kernel.org>
- <20171003185313.1017-6-mcgrof@kernel.org>
- <1862632.MOTT9GD8nq@aspire.rjw.lan>
- <29004244.0jnB6Wc1z6@aspire.rjw.lan>
- <20171004004756.GN2294@wotan.suse.de>
- <1507079033.3075.3.camel@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1507079033.3075.3.camel@wdc.com>
+        id S1751277AbdK0FIc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 27 Nov 2017 00:08:32 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Cc: Christoph Hellwig <hch@infradead.org>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
+        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 3/5] blk-mq: move actual issue into one helper
+Date: Mon, 27 Nov 2017 13:07:19 +0800
+Message-Id: <20171127050721.5884-4-ming.lei@redhat.com>
+In-Reply-To: <20171127050721.5884-1-ming.lei@redhat.com>
+References: <20171127050721.5884-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, Oct 04, 2017 at 01:03:54AM +0000, Bart Van Assche wrote:
-> On Wed, 2017-10-04 at 02:47 +0200, Luis R. Rodriguez wrote:
-> >   3) Lookup for kthreads which seem to generate IO -- address / review if
-> >      removal of the freezer API can be done somehow with a quescing. This
-> >      is currently for example being done on SCSI / md.
-> >  4) Only after all the above is done should we consider this patch or some
-> >     form of it.
-> 
-> After having given this more thought, I think we should omit these last two
-> steps. Modifying the md driver such that it does not submit I/O requests while
-> processes are frozen requires either to use the freezer API or to open-code it.
-> I think there is general agreement in the kernel community that open-coding a
-> single mechanism in multiple drivers is wrong. Does this mean that instead of
-> removing the freezer API we should keep it and review all its users instead?
+No functional change, just to clean up code a bit, so that the following
+change of using direct issue for blk_mq_request_bypass_insert() which is
+needed by DM can be easier to do.
 
-Agreed.
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 39 +++++++++++++++++++++++++++------------
+ 1 file changed, 27 insertions(+), 12 deletions(-)
 
-  Luis
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 11097477eeab..fe82d7a47b35 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1593,15 +1593,38 @@ static blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx, struct request *rq)
+ 	return blk_tag_to_qc_t(rq->internal_tag, hctx->queue_num, true);
+ }
+ 
+-static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+-					struct request *rq,
+-					blk_qc_t *cookie, bool may_sleep)
++/* return true if insert is needed */
++static bool __blk_mq_issue_req(struct blk_mq_hw_ctx *hctx,
++			       struct request *rq,
++			       blk_qc_t *new_cookie,
++			       blk_status_t *ret)
+ {
+ 	struct request_queue *q = rq->q;
+ 	struct blk_mq_queue_data bd = {
+ 		.rq = rq,
+ 		.last = true,
+ 	};
++
++	if (!blk_mq_get_driver_tag(rq, NULL, false))
++		return true;
++
++	if (!blk_mq_get_dispatch_budget(hctx)) {
++		blk_mq_put_driver_tag(rq);
++		return true;
++	}
++
++	*new_cookie = request_to_qc_t(hctx, rq);
++
++	*ret = q->mq_ops->queue_rq(hctx, &bd);
++
++	return false;
++}
++
++static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
++					struct request *rq,
++					blk_qc_t *cookie, bool may_sleep)
++{
++	struct request_queue *q = rq->q;
+ 	blk_qc_t new_cookie;
+ 	blk_status_t ret;
+ 	bool run_queue = true;
+@@ -1615,22 +1638,14 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	if (q->elevator)
+ 		goto insert;
+ 
+-	if (!blk_mq_get_driver_tag(rq, NULL, false))
++	if (__blk_mq_issue_req(hctx, rq, &new_cookie, &ret))
+ 		goto insert;
+ 
+-	if (!blk_mq_get_dispatch_budget(hctx)) {
+-		blk_mq_put_driver_tag(rq);
+-		goto insert;
+-	}
+-
+-	new_cookie = request_to_qc_t(hctx, rq);
+-
+ 	/*
+ 	 * For OK queue, we are done. For error, kill it. Any other
+ 	 * error (busy), just add it to our list as we previously
+ 	 * would have done
+ 	 */
+-	ret = q->mq_ops->queue_rq(hctx, &bd);
+ 	switch (ret) {
+ 	case BLK_STS_OK:
+ 		*cookie = new_cookie;
+-- 
+2.9.5
