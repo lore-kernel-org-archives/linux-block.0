@@ -1,170 +1,60 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:39941 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750975AbdKEHgf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Nov 2017 02:36:35 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH] block: pass full fmode_t to blk_verify_command
-Date: Sun,  5 Nov 2017 10:36:31 +0300
-Message-Id: <20171105073631.9132-1-hch@lst.de>
+Received: from mail-io0-f195.google.com ([209.85.223.195]:34757 "EHLO
+        mail-io0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752395AbdK1TX6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Nov 2017 14:23:58 -0500
+Received: by mail-io0-f195.google.com with SMTP id s19so1091224ioa.1
+        for <linux-block@vger.kernel.org>; Tue, 28 Nov 2017 11:23:58 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <CAPDyKFpicjrRPi0YeJTq29BeG_H_nK2w1_=pPjESdS_SeyjU_A@mail.gmail.com>
+References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
+ <CACRpkdYVUj4=z9jANGjHtYGUhWqM6Hxo_Mr2rRvBSbQZMMP_RQ@mail.gmail.com> <CAPDyKFpicjrRPi0YeJTq29BeG_H_nK2w1_=pPjESdS_SeyjU_A@mail.gmail.com>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Tue, 28 Nov 2017 20:23:57 +0100
+Message-ID: <CAPDyKFrwv9uCd4q3XdzBzCebwcy+kS+SwNWdReN0+wDXUcJKiw@mail.gmail.com>
+Subject: Re: [PATCH V14 00/24] mmc: Add Command Queue support
+To: Linus Walleij <linus.walleij@linaro.org>,
+        Adrian Hunter <adrian.hunter@intel.com>
+Cc: Paolo Valente <paolo.valente@linaro.org>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Use the obvious calling convention.
+[...]
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/bsg.c            | 18 ++++++++----------
- block/scsi_ioctl.c     |  8 ++++----
- drivers/scsi/sg.c      |  2 +-
- include/linux/blkdev.h |  2 +-
- 4 files changed, 14 insertions(+), 16 deletions(-)
+>>> While we should look at changing blk-mq to give better workqueue performance,
+>>> a bigger gain is likely to be made by adding a new host API to enable the
+>>> next already-prepared request to be issued directly from within ->done()
+>>> callback of the current request.
+>
+> I assume that is taken care of by adding the new host cap
+> (MMC_CAP_DIRECT_COMPLETE).
+>
+> So, then it's just a matter of adopting all host drivers, and when we
+> are done with that, we can remove that cap. :-)
 
-diff --git a/block/bsg.c b/block/bsg.c
-index ee1335c68de7..452f94f1c5d4 100644
---- a/block/bsg.c
-+++ b/block/bsg.c
-@@ -137,7 +137,7 @@ static inline struct hlist_head *bsg_dev_idx_hash(int index)
- 
- static int blk_fill_sgv4_hdr_rq(struct request_queue *q, struct request *rq,
- 				struct sg_io_v4 *hdr, struct bsg_device *bd,
--				fmode_t has_write_perm)
-+				fmode_t mode)
- {
- 	struct scsi_request *req = scsi_req(rq);
- 
-@@ -152,7 +152,7 @@ static int blk_fill_sgv4_hdr_rq(struct request_queue *q, struct request *rq,
- 		return -EFAULT;
- 
- 	if (hdr->subprotocol == BSG_SUB_PROTOCOL_SCSI_CMD) {
--		if (blk_verify_command(req->cmd, has_write_perm))
-+		if (blk_verify_command(req->cmd, mode))
- 			return -EPERM;
- 	} else if (!capable(CAP_SYS_RAWIO))
- 		return -EPERM;
-@@ -206,7 +206,7 @@ bsg_validate_sgv4_hdr(struct sg_io_v4 *hdr, int *op)
-  * map sg_io_v4 to a request.
-  */
- static struct request *
--bsg_map_hdr(struct bsg_device *bd, struct sg_io_v4 *hdr, fmode_t has_write_perm)
-+bsg_map_hdr(struct bsg_device *bd, struct sg_io_v4 *hdr, fmode_t mode)
- {
- 	struct request_queue *q = bd->queue;
- 	struct request *rq, *next_rq = NULL;
-@@ -237,7 +237,7 @@ bsg_map_hdr(struct bsg_device *bd, struct sg_io_v4 *hdr, fmode_t has_write_perm)
- 	if (IS_ERR(rq))
- 		return rq;
- 
--	ret = blk_fill_sgv4_hdr_rq(q, rq, hdr, bd, has_write_perm);
-+	ret = blk_fill_sgv4_hdr_rq(q, rq, hdr, bd, mode);
- 	if (ret)
- 		goto out;
- 
-@@ -587,8 +587,7 @@ bsg_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
- }
- 
- static int __bsg_write(struct bsg_device *bd, const char __user *buf,
--		       size_t count, ssize_t *bytes_written,
--		       fmode_t has_write_perm)
-+		       size_t count, ssize_t *bytes_written, fmode_t mode)
- {
- 	struct bsg_command *bc;
- 	struct request *rq;
-@@ -619,7 +618,7 @@ static int __bsg_write(struct bsg_device *bd, const char __user *buf,
- 		/*
- 		 * get a request, fill in the blanks, and add to request queue
- 		 */
--		rq = bsg_map_hdr(bd, &bc->hdr, has_write_perm);
-+		rq = bsg_map_hdr(bd, &bc->hdr, mode);
- 		if (IS_ERR(rq)) {
- 			ret = PTR_ERR(rq);
- 			rq = NULL;
-@@ -655,8 +654,7 @@ bsg_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos)
- 	bsg_set_block(bd, file);
- 
- 	bytes_written = 0;
--	ret = __bsg_write(bd, buf, count, &bytes_written,
--			  file->f_mode & FMODE_WRITE);
-+	ret = __bsg_write(bd, buf, count, &bytes_written, file->f_mode);
- 
- 	*ppos = bytes_written;
- 
-@@ -915,7 +913,7 @@ static long bsg_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
- 		if (copy_from_user(&hdr, uarg, sizeof(hdr)))
- 			return -EFAULT;
- 
--		rq = bsg_map_hdr(bd, &hdr, file->f_mode & FMODE_WRITE);
-+		rq = bsg_map_hdr(bd, &hdr, file->f_mode);
- 		if (IS_ERR(rq))
- 			return PTR_ERR(rq);
- 
-diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
-index 7440de44dd85..edcfff974527 100644
---- a/block/scsi_ioctl.c
-+++ b/block/scsi_ioctl.c
-@@ -207,7 +207,7 @@ static void blk_set_cmd_filter_defaults(struct blk_cmd_filter *filter)
- 	__set_bit(GPCMD_SET_READ_AHEAD, filter->write_ok);
- }
- 
--int blk_verify_command(unsigned char *cmd, fmode_t has_write_perm)
-+int blk_verify_command(unsigned char *cmd, fmode_t mode)
- {
- 	struct blk_cmd_filter *filter = &blk_default_cmd_filter;
- 
-@@ -220,7 +220,7 @@ int blk_verify_command(unsigned char *cmd, fmode_t has_write_perm)
- 		return 0;
- 
- 	/* Write-safe commands require a writable open */
--	if (test_bit(cmd[0], filter->write_ok) && has_write_perm)
-+	if (test_bit(cmd[0], filter->write_ok) && (mode & FMODE_WRITE))
- 		return 0;
- 
- 	return -EPERM;
-@@ -234,7 +234,7 @@ static int blk_fill_sghdr_rq(struct request_queue *q, struct request *rq,
- 
- 	if (copy_from_user(req->cmd, hdr->cmdp, hdr->cmd_len))
- 		return -EFAULT;
--	if (blk_verify_command(req->cmd, mode & FMODE_WRITE))
-+	if (blk_verify_command(req->cmd, mode))
- 		return -EPERM;
- 
- 	/*
-@@ -469,7 +469,7 @@ int sg_scsi_ioctl(struct request_queue *q, struct gendisk *disk, fmode_t mode,
- 	if (in_len && copy_from_user(buffer, sic->data + cmdlen, in_len))
- 		goto error;
- 
--	err = blk_verify_command(req->cmd, mode & FMODE_WRITE);
-+	err = blk_verify_command(req->cmd, mode);
- 	if (err)
- 		goto error;
- 
-diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
-index cf0e71db9e51..5839db91103a 100644
---- a/drivers/scsi/sg.c
-+++ b/drivers/scsi/sg.c
-@@ -217,7 +217,7 @@ static int sg_allow_access(struct file *filp, unsigned char *cmd)
- 	if (sfp->parentdp->device->type == TYPE_SCANNER)
- 		return 0;
- 
--	return blk_verify_command(cmd, filp->f_mode & FMODE_WRITE);
-+	return blk_verify_command(cmd, filp->f_mode);
- }
- 
- static int
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 460294bb0fa5..d1021dd33786 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1370,7 +1370,7 @@ static inline int sb_issue_zeroout(struct super_block *sb, sector_t block,
- 				    gfp_mask, 0);
- }
- 
--extern int blk_verify_command(unsigned char *cmd, fmode_t has_write_perm);
-+extern int blk_verify_command(unsigned char *cmd, fmode_t mode);
- 
- enum blk_default_limits {
- 	BLK_MAX_SEGMENTS	= 128,
--- 
-2.14.2
+Ehh, I realize that this not what you really propose, but rather this
+is a next step of improvement. Anyway.
+
+[...]
+
+Kind regards
+Uffe
