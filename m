@@ -1,10 +1,19 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:13823 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751751AbdKUNnr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Nov 2017 08:43:47 -0500
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
+Received: from mail-it0-f65.google.com ([209.85.214.65]:37472 "EHLO
+        mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754966AbdK1LVA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 28 Nov 2017 06:21:00 -0500
+Received: by mail-it0-f65.google.com with SMTP id m191so545427itg.2
+        for <linux-block@vger.kernel.org>; Tue, 28 Nov 2017 03:21:00 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <1511271770-3444-15-git-send-email-adrian.hunter@intel.com>
+References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com> <1511271770-3444-15-git-send-email-adrian.hunter@intel.com>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Tue, 28 Nov 2017 12:20:58 +0100
+Message-ID: <CAPDyKFpHawL2UNUNC_pWE-7Su_nhJkTNUpJf9yyNJygGhi-uPw@mail.gmail.com>
+Subject: Re: [PATCH V14 14/24] mmc: block: Add CQE support
+To: Adrian Hunter <adrian.hunter@intel.com>
 Cc: linux-mmc <linux-mmc@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
         linux-kernel <linux-kernel@vger.kernel.org>,
@@ -23,113 +32,69 @@ Cc: linux-mmc <linux-mmc@vger.kernel.org>,
         Shawn Lin <shawn.lin@rock-chips.com>,
         Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
         Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V14 07/24] mmc: block: Use data timeout in card_busy_detect()
-Date: Tue, 21 Nov 2017 15:42:33 +0200
-Message-Id: <1511271770-3444-8-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
-References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-card_busy_detect() has a 10 minute timeout. However the correct timeout is
-the data timeout. Change card_busy_detect() to use the data timeout.
+On 21 November 2017 at 14:42, Adrian Hunter <adrian.hunter@intel.com> wrote:
+> Add CQE support to the block driver, including:
+>     - optionally using DCMD for flush requests
+>     - "manually" issuing discard requests
+>     - issuing read / write requests to the CQE
+>     - supporting block-layer timeouts
+>     - handling recovery
+>     - supporting re-tuning
+>
+> CQE offers 25% - 50% better random multi-threaded I/O.  There is a slight
+> (e.g. 2%) drop in sequential read speed but no observable change to sequential
+> write.
+>
+> CQE automatically sends the commands to complete requests.  However it only
+> supports reads / writes and so-called "direct commands" (DCMD).  Furthermore
+> DCMD is limited to one command at a time, but discards require 3 commands.
+> That makes issuing discards through CQE very awkward, but some CQE's don't
+> support DCMD anyway.  So for discards, the existing non-CQE approach is
+> taken, where the mmc core code issues the 3 commands one at a time i.e.
+> mmc_erase(). Where DCMD is used, is for issuing flushes.
+>
+> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/core/block.c | 48 ++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 40 insertions(+), 8 deletions(-)
+This looks good to me!
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index e44f6d90aeb4..0874ab3e5c92 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -63,7 +63,6 @@
- #endif
- #define MODULE_PARAM_PREFIX "mmcblk."
- 
--#define MMC_BLK_TIMEOUT_MS  (10 * 60 * 1000)        /* 10 minute timeout */
- #define MMC_SANITIZE_REQ_TIMEOUT 240000
- #define MMC_EXTRACT_INDEX_FROM_ARG(x) ((x & 0x00FF0000) >> 16)
- 
-@@ -921,14 +920,48 @@ static int mmc_sd_num_wr_blocks(struct mmc_card *card, u32 *written_blocks)
- 	return 0;
- }
- 
--static int card_busy_detect(struct mmc_card *card, unsigned int timeout_ms,
--		bool hw_busy_detect, struct request *req, bool *gen_err)
-+static unsigned int mmc_blk_clock_khz(struct mmc_host *host)
- {
--	unsigned long timeout = jiffies + msecs_to_jiffies(timeout_ms);
-+	if (host->actual_clock)
-+		return host->actual_clock / 1000;
-+
-+	/* Clock may be subject to a divisor, fudge it by a factor of 2. */
-+	if (host->ios.clock)
-+		return host->ios.clock / 2000;
-+
-+	/* How can there be no clock */
-+	WARN_ON_ONCE(1);
-+	return 100; /* 100 kHz is minimum possible value */
-+}
-+
-+static unsigned long mmc_blk_data_timeout_jiffies(struct mmc_host *host,
-+						  struct mmc_data *data)
-+{
-+	unsigned int ms = DIV_ROUND_UP(data->timeout_ns, 1000000);
-+	unsigned int khz;
-+
-+	if (data->timeout_clks) {
-+		khz = mmc_blk_clock_khz(host);
-+		ms += DIV_ROUND_UP(data->timeout_clks, khz);
-+	}
-+
-+	return msecs_to_jiffies(ms);
-+}
-+
-+static int card_busy_detect(struct mmc_card *card, bool hw_busy_detect,
-+			    struct request *req, bool *gen_err)
-+{
-+	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
-+	struct mmc_data *data = &mqrq->brq.data;
-+	unsigned long timeout;
- 	int err = 0;
- 	u32 status;
- 
-+	timeout = jiffies + mmc_blk_data_timeout_jiffies(card->host, data);
-+
- 	do {
-+		bool done = time_after(jiffies, timeout);
-+
- 		err = __mmc_send_status(card, &status, 5);
- 		if (err) {
- 			pr_err("%s: error %d requesting status\n",
-@@ -951,7 +984,7 @@ static int card_busy_detect(struct mmc_card *card, unsigned int timeout_ms,
- 		 * Timeout if the device never becomes ready for data and never
- 		 * leaves the program state.
- 		 */
--		if (time_after(jiffies, timeout)) {
-+		if (done) {
- 			pr_err("%s: Card stuck in programming state! %s %s\n",
- 				mmc_hostname(card->host),
- 				req->rq_disk->disk_name, __func__);
-@@ -1011,7 +1044,7 @@ static int send_stop(struct mmc_card *card, unsigned int timeout_ms,
- 		*gen_err = true;
- 	}
- 
--	return card_busy_detect(card, timeout_ms, use_r1b_resp, req, gen_err);
-+	return card_busy_detect(card, use_r1b_resp, req, gen_err);
- }
- 
- #define ERR_NOMEDIUM	3
-@@ -1546,8 +1579,7 @@ static enum mmc_blk_status mmc_blk_err_check(struct mmc_card *card,
- 			gen_err = true;
- 		}
- 
--		err = card_busy_detect(card, MMC_BLK_TIMEOUT_MS, false, req,
--					&gen_err);
-+		err = card_busy_detect(card, false, req, &gen_err);
- 		if (err)
- 			return MMC_BLK_CMD_ERR;
- 	}
--- 
-1.9.1
+I only have one, very minor comment.
+
+[...]
+
+> @@ -370,10 +514,14 @@ static int mmc_mq_init_queue(struct mmc_queue *mq, int q_depth,
+>  static int mmc_mq_init(struct mmc_queue *mq, struct mmc_card *card,
+>                          spinlock_t *lock)
+>  {
+> +       struct mmc_host *host = card->host;
+>         int q_depth;
+>         int ret;
+>
+> -       q_depth = MMC_QUEUE_DEPTH;
+> +       if (mq->use_cqe)
+> +               q_depth = min_t(int, card->ext_csd.cmdq_depth, host->cqe_qdepth);
+
+To make it clear why this is needed, could you please add some comment
+in the code?
+
+As I was trying to point out in the other reply about queue depth, for
+patch 13, this is weird to me.
+This may mean that we end up using queue_depth being less than
+MMC_QUEUE_DEPTH (64) for the CQE case. While in fact, in the CQE case
+the HW actually supports a bigger queue depth, comparing when not
+using CQE.
+
+Anyway, it seems like that will have to be a separate topic to discuss
+with the blkmq experts.
+
+> +       else
+> +               q_depth = MMC_QUEUE_DEPTH;
+>
+
+[...]
+
+Kind regards
+Uffe
