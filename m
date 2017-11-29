@@ -1,89 +1,89 @@
-Return-Path: <mlyle@lyle.org>
-Return-Path: <mlyle@lyle.org>
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: axboe@kernel.dk,
-	Huacai Chen <chenhc@lemote.com>,
-	stable@vger.kernel.org,
-	Michael Lyle <mlyle@lyle.org>
-Subject: [PATCH 2/4] bcache: Fix building error on MIPS
-Date: Fri, 24 Nov 2017 15:14:25 -0800
-Message-Id: <20171124231427.9563-3-mlyle@lyle.org>
-In-Reply-To: <20171124231427.9563-1-mlyle@lyle.org>
-References: <20171124231427.9563-1-mlyle@lyle.org>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+To: viro@zeniv.linux.org.uk, bart.vanassche@wdc.com,
+        ming.lei@redhat.com, tytso@mit.edu, darrick.wong@oracle.com,
+        jikos@kernel.org, rjw@rjwysocki.net, pavel@ucw.cz,
+        len.brown@intel.com, linux-fsdevel@vger.kernel.org
+Cc: boris.ostrovsky@oracle.com, jgross@suse.com,
+        todd.e.brandt@linux.intel.com, nborisov@suse.com, jack@suse.cz,
+        martin.petersen@oracle.com, ONeukum@suse.com,
+        oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
+        yu.chen.surf@gmail.com, dan.j.williams@intel.com,
+        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Luis R. Rodriguez" <mcgrof@kernel.org>
+Subject: [PATCH 08/11] ext4: remove not needed freezing calls
+Date: Wed, 29 Nov 2017 15:23:53 -0800
+Message-Id: <20171129232356.28296-9-mcgrof@kernel.org>
+In-Reply-To: <20171129232356.28296-1-mcgrof@kernel.org>
+References: <20171129232356.28296-1-mcgrof@kernel.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Huacai Chen <chenhc@lemote.com>
+This removes superflous freezer calls as they are no longer needed
+as the VFS now performs filesystem freezing/thaw if the filesystem has
+support for it.
 
-This patch try to fix the building error on MIPS. The reason is MIPS
-has already defined the PTR macro, which conflicts with the PTR macro
-in include/uapi/linux/bcache.h.
+The following Coccinelle rule was used as follows:
 
-[fixed by mlyle: corrected a line-length issue]
+spatch --sp-file fs-freeze-cleanup.cocci --in-place fs/$FS/
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Huacai Chen <chenhc@lemote.com>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
-Signed-off-by: Michael Lyle <mlyle@lyle.org>
+@ has_freeze_fs @
+identifier super_ops;
+expression freeze_op;
+@@
+
+struct super_operations super_ops = {
+	.freeze_fs = freeze_op,
+};
+
+@ remove_set_freezable depends on has_freeze_fs @
+expression time;
+statement S, S2, S3;
+expression task;
+@@
+
+(
+-	set_freezable();
+|
+-	if (try_to_freeze())
+-		continue;
+|
+-	try_to_freeze();
+|
+-	freezable_schedule();
++	schedule();
+|
+-	freezable_schedule_timeout(time);
++	schedule_timeout(time);
+|
+-	if (freezing(task)) { S }
+|
+-	if (freezing(task)) { S }
+-	else
+	{ S2 }
+|
+-	freezing(current)
+)
+
+Generated-by: Coccinelle SmPL
+Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
 ---
- drivers/md/bcache/alloc.c   | 2 +-
- drivers/md/bcache/extents.c | 2 +-
- drivers/md/bcache/journal.c | 2 +-
- include/uapi/linux/bcache.h | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ fs/ext4/super.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
-index a27d85232ce1..a0cc1bc6d884 100644
---- a/drivers/md/bcache/alloc.c
-+++ b/drivers/md/bcache/alloc.c
-@@ -490,7 +490,7 @@ int __bch_bucket_alloc_set(struct cache_set *c, unsigned reserve,
- 		if (b == -1)
- 			goto err;
+diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+index 57a8fa451d3e..8a510b1c2d92 100644
+--- a/fs/ext4/super.c
++++ b/fs/ext4/super.c
+@@ -2980,8 +2980,6 @@ static int ext4_lazyinit_thread(void *arg)
+ 		}
+ 		mutex_unlock(&eli->li_list_mtx);
  
--		k->ptr[i] = PTR(ca->buckets[b].gen,
-+		k->ptr[i] = MAKE_PTR(ca->buckets[b].gen,
- 				bucket_to_sector(c, b),
- 				ca->sb.nr_this_dev);
- 
-diff --git a/drivers/md/bcache/extents.c b/drivers/md/bcache/extents.c
-index 41c238fc3733..f9d391711595 100644
---- a/drivers/md/bcache/extents.c
-+++ b/drivers/md/bcache/extents.c
-@@ -585,7 +585,7 @@ static bool bch_extent_merge(struct btree_keys *bk, struct bkey *l, struct bkey
- 		return false;
- 
- 	for (i = 0; i < KEY_PTRS(l); i++)
--		if (l->ptr[i] + PTR(0, KEY_SIZE(l), 0) != r->ptr[i] ||
-+		if (l->ptr[i] + MAKE_PTR(0, KEY_SIZE(l), 0) != r->ptr[i] ||
- 		    PTR_BUCKET_NR(b->c, l, i) != PTR_BUCKET_NR(b->c, r, i))
- 			return false;
- 
-diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
-index 5018c56ebb67..a87165c1d8e5 100644
---- a/drivers/md/bcache/journal.c
-+++ b/drivers/md/bcache/journal.c
-@@ -512,7 +512,7 @@ static void journal_reclaim(struct cache_set *c)
- 			continue;
- 
- 		ja->cur_idx = next;
--		k->ptr[n++] = PTR(0,
-+		k->ptr[n++] = MAKE_PTR(0,
- 				  bucket_to_sector(c, ca->sb.d[ja->cur_idx]),
- 				  ca->sb.nr_this_dev);
- 	}
-diff --git a/include/uapi/linux/bcache.h b/include/uapi/linux/bcache.h
-index 90fc490f973f..821f71a2e48f 100644
---- a/include/uapi/linux/bcache.h
-+++ b/include/uapi/linux/bcache.h
-@@ -91,7 +91,7 @@ PTR_FIELD(PTR_GEN,			0,  8)
- 
- #define PTR_CHECK_DEV			((1 << PTR_DEV_BITS) - 1)
- 
--#define PTR(gen, offset, dev)						\
-+#define MAKE_PTR(gen, offset, dev)					\
- 	((((__u64) dev) << 51) | ((__u64) offset) << 8 | gen)
- 
- /* Bkey utility code */
+-		try_to_freeze();
+-
+ 		cur = jiffies;
+ 		if ((time_after_eq(cur, next_wakeup)) ||
+ 		    (MAX_JIFFY_OFFSET == next_wakeup)) {
 -- 
-2.14.1
+2.15.0
