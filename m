@@ -1,117 +1,146 @@
-Return-Path: <prvs=473169c3e=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Ard
- Biesheuvel" <ard.biesheuvel@linaro.org>, Herbert Xu
-	<herbert@gondor.apana.org.au>, Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v3 2/8] crypto: scompress - use sgl_alloc() and sgl_free()
-Date: Fri, 3 Nov 2017 15:23:33 -0700
-Message-ID: <20171103222339.26540-3-bart.vanassche@wdc.com>
-In-Reply-To: <20171103222339.26540-1-bart.vanassche@wdc.com>
-References: <20171103222339.26540-1-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+To: viro@zeniv.linux.org.uk, bart.vanassche@wdc.com,
+        ming.lei@redhat.com, tytso@mit.edu, darrick.wong@oracle.com,
+        jikos@kernel.org, rjw@rjwysocki.net, pavel@ucw.cz,
+        len.brown@intel.com, linux-fsdevel@vger.kernel.org
+Cc: boris.ostrovsky@oracle.com, jgross@suse.com,
+        todd.e.brandt@linux.intel.com, nborisov@suse.com, jack@suse.cz,
+        martin.petersen@oracle.com, ONeukum@suse.com,
+        oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
+        yu.chen.surf@gmail.com, dan.j.williams@intel.com,
+        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Luis R. Rodriguez" <mcgrof@kernel.org>
+Subject: [PATCH 10/11] nilfs2: remove not needed freezing calls
+Date: Wed, 29 Nov 2017 15:23:55 -0800
+Message-Id: <20171129232356.28296-11-mcgrof@kernel.org>
+In-Reply-To: <20171129232356.28296-1-mcgrof@kernel.org>
+References: <20171129232356.28296-1-mcgrof@kernel.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Use the sgl_alloc() and sgl_free() functions instead of open coding
-these functions.
+This removes superflous freezer calls as they are no longer needed
+as the VFS now performs filesystem freezing/thaw if the filesystem has
+support for it.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
+The following Coccinelle rule was used as follows:
+
+spatch --sp-file fs-freeze-cleanup.cocci --in-place fs/$FS/
+
+@ has_freeze_fs @
+identifier super_ops;
+expression freeze_op;
+@@
+
+struct super_operations super_ops = {
+	.freeze_fs = freeze_op,
+};
+
+@ remove_set_freezable depends on has_freeze_fs @
+expression time;
+statement S, S2, S3;
+expression task;
+@@
+
+(
+-	set_freezable();
+|
+-	if (try_to_freeze())
+-		continue;
+|
+-	try_to_freeze();
+|
+-	freezable_schedule();
++	schedule();
+|
+-	freezable_schedule_timeout(time);
++	schedule_timeout(time);
+|
+-	if (freezing(task)) { S }
+|
+-	if (freezing(task)) { S }
+-	else
+	{ S2 }
+|
+-	freezing(current)
+)
+
+Generated-by: Coccinelle SmPL
+Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
 ---
- crypto/Kconfig     |  1 +
- crypto/scompress.c | 51 ++-------------------------------------------------
- 2 files changed, 3 insertions(+), 49 deletions(-)
+ fs/nilfs2/segment.c | 48 ++++++++++++++++++++----------------------------
+ 1 file changed, 20 insertions(+), 28 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 0a121f9ddf8e..a0667dd284ff 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -105,6 +105,7 @@ config CRYPTO_KPP
- config CRYPTO_ACOMP2
- 	tristate
- 	select CRYPTO_ALGAPI2
-+	select SGL_ALLOC
+diff --git a/fs/nilfs2/segment.c b/fs/nilfs2/segment.c
+index 9f3ffba41533..407e12a60145 100644
+--- a/fs/nilfs2/segment.c
++++ b/fs/nilfs2/segment.c
+@@ -2543,6 +2543,8 @@ static int nilfs_segctor_thread(void *arg)
+ 	struct nilfs_sc_info *sci = (struct nilfs_sc_info *)arg;
+ 	struct the_nilfs *nilfs = sci->sc_super->s_fs_info;
+ 	int timeout = 0;
++	DEFINE_WAIT(wait);
++	int should_sleep = 1;
  
- config CRYPTO_ACOMP
- 	tristate
-diff --git a/crypto/scompress.c b/crypto/scompress.c
-index 2075e2c4e7df..968bbcf65c94 100644
---- a/crypto/scompress.c
-+++ b/crypto/scompress.c
-@@ -140,53 +140,6 @@ static int crypto_scomp_init_tfm(struct crypto_tfm *tfm)
- 	return ret;
- }
+ 	sci->sc_timer_task = current;
  
--static void crypto_scomp_sg_free(struct scatterlist *sgl)
--{
--	int i, n;
--	struct page *page;
--
--	if (!sgl)
--		return;
--
--	n = sg_nents(sgl);
--	for_each_sg(sgl, sgl, n, i) {
--		page = sg_page(sgl);
--		if (page)
--			__free_page(page);
--	}
--
--	kfree(sgl);
--}
--
--static struct scatterlist *crypto_scomp_sg_alloc(size_t size, gfp_t gfp)
--{
--	struct scatterlist *sgl;
--	struct page *page;
--	int i, n;
--
--	n = ((size - 1) >> PAGE_SHIFT) + 1;
--
--	sgl = kmalloc_array(n, sizeof(struct scatterlist), gfp);
--	if (!sgl)
--		return NULL;
--
--	sg_init_table(sgl, n);
--
--	for (i = 0; i < n; i++) {
--		page = alloc_page(gfp);
--		if (!page)
--			goto err;
--		sg_set_page(sgl + i, page, PAGE_SIZE, 0);
--	}
--
--	return sgl;
--
--err:
--	sg_mark_end(sgl + i);
--	crypto_scomp_sg_free(sgl);
--	return NULL;
--}
--
- static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- {
- 	struct crypto_acomp *tfm = crypto_acomp_reqtfm(req);
-@@ -220,7 +173,7 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- 					      scratch_dst, &req->dlen, *ctx);
- 	if (!ret) {
- 		if (!req->dst) {
--			req->dst = crypto_scomp_sg_alloc(req->dlen, GFP_ATOMIC);
-+			req->dst = sgl_alloc(req->dlen, GFP_ATOMIC, NULL);
- 			if (!req->dst)
- 				goto out;
- 		}
-@@ -274,7 +227,7 @@ int crypto_init_scomp_ops_async(struct crypto_tfm *tfm)
+@@ -2574,38 +2576,28 @@ static int nilfs_segctor_thread(void *arg)
+ 		timeout = 0;
+ 	}
  
- 	crt->compress = scomp_acomp_compress;
- 	crt->decompress = scomp_acomp_decompress;
--	crt->dst_free = crypto_scomp_sg_free;
-+	crt->dst_free = sgl_free;
- 	crt->reqsize = sizeof(void *);
++	prepare_to_wait(&sci->sc_wait_daemon, &wait,
++			TASK_INTERRUPTIBLE);
  
- 	return 0;
+-	if (freezing(current)) {
++	if (sci->sc_seq_request != sci->sc_seq_done)
++		should_sleep = 0;
++	else if (sci->sc_flush_request)
++		should_sleep = 0;
++	else if (sci->sc_state & NILFS_SEGCTOR_COMMIT)
++		should_sleep = time_before(jiffies,
++				sci->sc_timer.expires);
++
++	if (should_sleep) {
+ 		spin_unlock(&sci->sc_state_lock);
+-		try_to_freeze();
++		schedule();
+ 		spin_lock(&sci->sc_state_lock);
+-	} else {
+-		DEFINE_WAIT(wait);
+-		int should_sleep = 1;
+-
+-		prepare_to_wait(&sci->sc_wait_daemon, &wait,
+-				TASK_INTERRUPTIBLE);
+-
+-		if (sci->sc_seq_request != sci->sc_seq_done)
+-			should_sleep = 0;
+-		else if (sci->sc_flush_request)
+-			should_sleep = 0;
+-		else if (sci->sc_state & NILFS_SEGCTOR_COMMIT)
+-			should_sleep = time_before(jiffies,
+-					sci->sc_timer.expires);
+-
+-		if (should_sleep) {
+-			spin_unlock(&sci->sc_state_lock);
+-			schedule();
+-			spin_lock(&sci->sc_state_lock);
+-		}
+-		finish_wait(&sci->sc_wait_daemon, &wait);
+-		timeout = ((sci->sc_state & NILFS_SEGCTOR_COMMIT) &&
+-			   time_after_eq(jiffies, sci->sc_timer.expires));
+-
+-		if (nilfs_sb_dirty(nilfs) && nilfs_sb_need_update(nilfs))
+-			set_nilfs_discontinued(nilfs);
+ 	}
++	finish_wait(&sci->sc_wait_daemon, &wait);
++	timeout = ((sci->sc_state & NILFS_SEGCTOR_COMMIT) &&
++		   time_after_eq(jiffies, sci->sc_timer.expires));
++
++	if (nilfs_sb_dirty(nilfs) && nilfs_sb_need_update(nilfs))
++		set_nilfs_discontinued(nilfs);
+ 	goto loop;
+ 
+  end_thread:
 -- 
-2.14.3
+2.15.0
