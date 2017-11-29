@@ -1,72 +1,91 @@
-Return-Path: <BATV+f1a9c63dd9d55f86c0ec+5205+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Thu, 23 Nov 2017 15:44:38 +0100
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme fixes for Linux 4.15
-Message-ID: <20171123144438.wfs2fo64l6vwgfxj@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga14.intel.com ([192.55.52.115]:40477 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754082AbdK2Nmg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Nov 2017 08:42:36 -0500
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V15 11/22] mmc: block: blk-mq: Separate card polling from recovery
+Date: Wed, 29 Nov 2017 15:41:08 +0200
+Message-Id: <1511962879-24262-12-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
+References: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Jens,
+Recovery is simpler to understand if it is only used for errors. Create a
+separate function for card polling.
 
-a couple nvme fixes for 4.15:
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+---
+ drivers/mmc/core/block.c | 29 ++++++++++++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
 
- - expand the queue ready fix that we only had for RDMA to also cover FC and
-   loop by moving it to common code (Sagi)
- - fix an array out of bounds in the PCIe HMB code (Minwoo Im)
- - two new device quirks (Jeff Lien and Kai-Heng Feng)
- - static checkers fixes (Keith Busch)
- - FC target refcount fix (James Smart)
- - A trivial spelling fix in new code (Colin Ian King)
-
-
-The following changes since commit 1690102de5651bb85b23d5eeaff682a6b96d705b:
-
-  blktrace: Use blk_trace_bio_get_cgid inside blk_add_trace_bio (2017-11-19 12:37:26 -0700)
-
-are available in the git repository at:
-
-  git://git.infradead.org/nvme.git nvme-4.15
-
-for you to fetch changes up to 8c97eeccf0ad8783c057830119467b877bdfced7:
-
-  nvme-pci: add quirk for delay before CHK RDY for WDC SN200 (2017-11-23 09:12:08 +0100)
-
-----------------------------------------------------------------
-Colin Ian King (1):
-      nvme: fix spelling mistake: "requeing" -> "requeuing"
-
-James Smart (1):
-      nvmet-fc: correct ref counting error when deferred rcv used
-
-Jeff Lien (1):
-      nvme-pci: add quirk for delay before CHK RDY for WDC SN200
-
-Kai-Heng Feng (1):
-      nvme-pci: disable APST on Samsung SSD 960 EVO + ASUS PRIME B350M-A
-
-Keith Busch (2):
-      nvme: Fix NULL dereference on reservation request
-      nvme: Suppress static analyis warning
-
-Minwoo Im (1):
-      nvme-pci: avoid hmb desc array idx out-of-bound when hmmaxd set.
-
-Sagi Grimberg (3):
-      nvme-fabrics: introduce init command check for a queue that is not alive
-      nvme-fc: check if queue is ready in queue_rq
-      nvme-loop: check if queue is ready in queue_rq
-
- drivers/nvme/host/core.c      | 19 ++++++++-----------
- drivers/nvme/host/fabrics.h   | 30 ++++++++++++++++++++++++++++++
- drivers/nvme/host/fc.c        | 19 ++++++++++++++++++-
- drivers/nvme/host/multipath.c |  2 +-
- drivers/nvme/host/nvme.h      |  2 +-
- drivers/nvme/host/pci.c       | 16 +++++++++++++---
- drivers/nvme/host/rdma.c      | 32 ++++++--------------------------
- drivers/nvme/target/fc.c      |  9 ++++++---
- drivers/nvme/target/loop.c    | 25 ++++++++++++++++++++++++-
- 9 files changed, 107 insertions(+), 47 deletions(-)
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index a710a6e95307..6d2c42c1c33a 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -2139,6 +2139,26 @@ static inline bool mmc_blk_rq_error(struct mmc_blk_request *brq)
+ 	       brq->data.error || brq->cmd.resp[0] & CMD_ERRORS;
+ }
+ 
++static int mmc_blk_card_busy(struct mmc_card *card, struct request *req)
++{
++	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
++	bool gen_err = false;
++	int err;
++
++	if (mmc_host_is_spi(card->host) || rq_data_dir(req) == READ)
++		return 0;
++
++	err = card_busy_detect(card, MMC_BLK_TIMEOUT_MS, false, req, &gen_err);
++
++	/* Copy the general error bit so it will be seen later on */
++	if (gen_err) {
++		mqrq->brq.stop.resp[0] |= R1_ERROR;
++		err = err ? err : -EIO;
++	}
++
++	return err;
++}
++
+ static inline void mmc_blk_rw_reset_success(struct mmc_queue *mq,
+ 					    struct request *req)
+ {
+@@ -2197,8 +2217,15 @@ static void mmc_blk_mq_poll_completion(struct mmc_queue *mq,
+ 				       struct request *req)
+ {
+ 	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
++	struct mmc_host *host = mq->card->host;
+ 
+-	mmc_blk_mq_rw_recovery(mq, req);
++	if (mmc_blk_rq_error(&mqrq->brq) ||
++	    mmc_blk_card_busy(mq->card, req)) {
++		mmc_blk_mq_rw_recovery(mq, req);
++	} else {
++		mmc_blk_rw_reset_success(mq, req);
++		mmc_retune_release(host);
++	}
+ 
+ 	mmc_blk_urgent_bkops(mq, mqrq);
+ }
+-- 
+1.9.1
