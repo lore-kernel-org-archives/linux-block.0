@@ -1,44 +1,54 @@
-Return-Path: <prvs=4710b8301=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Bart Van
- Assche" <bart.vanassche@wdc.com>, Hongxu Jia <hongxu.jia@windriver.com>
-Subject: [PATCH] ide: Make ide_cdrom_prep_fs() initialize the sense buffer pointer
-Date: Wed, 1 Nov 2017 15:31:49 -0700
-Message-ID: <20171101223149.27593-1-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga06.intel.com ([134.134.136.31]:42160 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932091AbdK2Nlr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Nov 2017 08:41:47 -0500
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V15 01/22] mmc: block: No need to export mmc_cleanup_queue()
+Date: Wed, 29 Nov 2017 15:40:58 +0200
+Message-Id: <1511962879-24262-2-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
+References: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The changes introduced through commit 82ed4db499b8 assume that the
-sense buffer pointer in struct scsi_request is initialized for all
-requests - passthrough and filesystem requests. Hence make sure
-that that pointer is initialized for filesystem requests. Remove
-the memset() call that clears .cmd because the scsi_req_init()
-call in ide_initialize_rq() already initializes the .cmd.
+mmc_cleanup_queue() is not used by a different module. Do not export it.
 
-Fixes: commit 82ed4db499b8 ("block: split scsi_request out of struct request")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hongxu Jia <hongxu.jia@windriver.com>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- drivers/ide/ide-cd.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/mmc/core/queue.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/ide/ide-cd.c b/drivers/ide/ide-cd.c
-index a7355ab3bb22..09b5bdb1af64 100644
---- a/drivers/ide/ide-cd.c
-+++ b/drivers/ide/ide-cd.c
-@@ -1328,8 +1328,7 @@ static int ide_cdrom_prep_fs(struct request_queue *q, struct request *rq)
- 	unsigned long blocks = blk_rq_sectors(rq) / (hard_sect >> 9);
- 	struct scsi_request *req = scsi_req(rq);
+diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+index 4f33d277b125..26f8da30ebe5 100644
+--- a/drivers/mmc/core/queue.c
++++ b/drivers/mmc/core/queue.c
+@@ -270,7 +270,6 @@ void mmc_cleanup_queue(struct mmc_queue *mq)
  
--	scsi_req_init(req);
--	memset(req->cmd, 0, BLK_MAX_CDB);
-+	q->initialize_rq_fn(rq);
+ 	mq->card = NULL;
+ }
+-EXPORT_SYMBOL(mmc_cleanup_queue);
  
- 	if (rq_data_dir(rq) == READ)
- 		req->cmd[0] = GPCMD_READ_10;
+ /**
+  * mmc_queue_suspend - suspend a MMC request queue
 -- 
-2.14.3
+1.9.1
