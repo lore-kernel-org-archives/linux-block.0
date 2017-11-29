@@ -1,147 +1,128 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/2] blktrace: fix unlocked registration of tracepoints
-Date: Sun,  5 Nov 2017 09:21:48 -0700
-Message-Id: <1509898908-7175-3-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1509898908-7175-1-git-send-email-axboe@kernel.dk>
-References: <1509898908-7175-1-git-send-email-axboe@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:8196 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932321AbdK2Nmm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Nov 2017 08:42:42 -0500
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V15 12/22] mmc: block: Make card_busy_detect() accumulate all response error bits
+Date: Wed, 29 Nov 2017 15:41:09 +0200
+Message-Id: <1511962879-24262-13-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
+References: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We need to ensure that tracepoints are registered and unregistered
-with the users of them. The existing atomic count isn't enough for
-that. Add a lock around the tracepoints, so we serialize access
-to them.
+Make card_busy_detect() accumulate all response error bits. Later patches
+will make use of this.
 
-This fixes cases where we have multiple users setting up and
-tearing down tracepoints, like this:
-
-CPU: 0 PID: 2995 Comm: syzkaller857118 Not tainted
-4.14.0-rc5-next-20171018+ #36
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
-Google 01/01/2011
-Call Trace:
-  __dump_stack lib/dump_stack.c:16 [inline]
-  dump_stack+0x194/0x257 lib/dump_stack.c:52
-  panic+0x1e4/0x41c kernel/panic.c:183
-  __warn+0x1c4/0x1e0 kernel/panic.c:546
-  report_bug+0x211/0x2d0 lib/bug.c:183
-  fixup_bug+0x40/0x90 arch/x86/kernel/traps.c:177
-  do_trap_no_signal arch/x86/kernel/traps.c:211 [inline]
-  do_trap+0x260/0x390 arch/x86/kernel/traps.c:260
-  do_error_trap+0x120/0x390 arch/x86/kernel/traps.c:297
-  do_invalid_op+0x1b/0x20 arch/x86/kernel/traps.c:310
-  invalid_op+0x18/0x20 arch/x86/entry/entry_64.S:905
-RIP: 0010:tracepoint_add_func kernel/tracepoint.c:210 [inline]
-RIP: 0010:tracepoint_probe_register_prio+0x397/0x9a0 kernel/tracepoint.c:283
-RSP: 0018:ffff8801d1d1f6c0 EFLAGS: 00010293
-RAX: ffff8801d22e8540 RBX: 00000000ffffffef RCX: ffffffff81710f07
-RDX: 0000000000000000 RSI: ffffffff85b679c0 RDI: ffff8801d5f19818
-RBP: ffff8801d1d1f7c8 R08: ffffffff81710c10 R09: 0000000000000004
-R10: ffff8801d1d1f6b0 R11: 0000000000000003 R12: ffffffff817597f0
-R13: 0000000000000000 R14: 00000000ffffffff R15: ffff8801d1d1f7a0
-  tracepoint_probe_register+0x2a/0x40 kernel/tracepoint.c:304
-  register_trace_block_rq_insert include/trace/events/block.h:191 [inline]
-  blk_register_tracepoints+0x1e/0x2f0 kernel/trace/blktrace.c:1043
-  do_blk_trace_setup+0xa10/0xcf0 kernel/trace/blktrace.c:542
-  blk_trace_setup+0xbd/0x180 kernel/trace/blktrace.c:564
-  sg_ioctl+0xc71/0x2d90 drivers/scsi/sg.c:1089
-  vfs_ioctl fs/ioctl.c:45 [inline]
-  do_vfs_ioctl+0x1b1/0x1520 fs/ioctl.c:685
-  SYSC_ioctl fs/ioctl.c:700 [inline]
-  SyS_ioctl+0x8f/0xc0 fs/ioctl.c:691
-  entry_SYSCALL_64_fastpath+0x1f/0xbe
-RIP: 0033:0x444339
-RSP: 002b:00007ffe05bb5b18 EFLAGS: 00000206 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00000000006d66c0 RCX: 0000000000444339
-RDX: 000000002084cf90 RSI: 00000000c0481273 RDI: 0000000000000009
-RBP: 0000000000000082 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000206 R12: ffffffffffffffff
-R13: 00000000c0481273 R14: 0000000000000000 R15: 0000000000000000
-
-since we can now run these in parallel. Ensure that the exported helpers
-for doing this are grabbing the queue trace mutex.
-
-Reported-by: Steven Rostedt <rostedt@goodmis.org>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- kernel/trace/blktrace.c | 32 ++++++++++++++++++++++----------
- 1 file changed, 22 insertions(+), 10 deletions(-)
+ drivers/mmc/core/block.c | 39 +++++++++++++++++++++++++++++----------
+ 1 file changed, 29 insertions(+), 10 deletions(-)
 
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index ea57dd94b2b2..206e0e2ace53 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -66,7 +66,8 @@ static struct tracer_flags blk_tracer_flags = {
- };
- 
- /* Global reference count of probes */
--static atomic_t blk_probes_ref = ATOMIC_INIT(0);
-+static DEFINE_MUTEX(blk_probe_mutex);
-+static int blk_probes_ref;
- 
- static void blk_register_tracepoints(void);
- static void blk_unregister_tracepoints(void);
-@@ -329,11 +330,26 @@ static void blk_trace_free(struct blk_trace *bt)
- 	kfree(bt);
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index 6d2c42c1c33a..30fc012353ae 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -923,7 +923,8 @@ static int mmc_sd_num_wr_blocks(struct mmc_card *card, u32 *written_blocks)
  }
  
-+static void get_probe_ref(void)
-+{
-+	mutex_lock(&blk_probe_mutex);
-+	if (++blk_probes_ref == 1)
-+		blk_register_tracepoints();
-+	mutex_unlock(&blk_probe_mutex);
-+}
-+
-+static void put_probe_ref(void)
-+{
-+	mutex_lock(&blk_probe_mutex);
-+	if (!--blk_probes_ref)
-+		blk_unregister_tracepoints();
-+	mutex_unlock(&blk_probe_mutex);
-+}
-+
- static void blk_trace_cleanup(struct blk_trace *bt)
+ static int card_busy_detect(struct mmc_card *card, unsigned int timeout_ms,
+-		bool hw_busy_detect, struct request *req, bool *gen_err)
++			    bool hw_busy_detect, struct request *req,
++			    u32 *resp_errs)
  {
- 	blk_trace_free(bt);
--	if (atomic_dec_and_test(&blk_probes_ref))
--		blk_unregister_tracepoints();
-+	put_probe_ref();
+ 	unsigned long timeout = jiffies + msecs_to_jiffies(timeout_ms);
+ 	int err = 0;
+@@ -937,11 +938,9 @@ static int card_busy_detect(struct mmc_card *card, unsigned int timeout_ms,
+ 			return err;
+ 		}
+ 
+-		if (status & R1_ERROR) {
+-			pr_err("%s: %s: error sending status cmd, status %#x\n",
+-				req->rq_disk->disk_name, __func__, status);
+-			*gen_err = true;
+-		}
++		/* Accumulate any response error bits seen */
++		if (resp_errs)
++			*resp_errs |= status;
+ 
+ 		/* We may rely on the host hw to handle busy detection.*/
+ 		if ((card->host->caps & MMC_CAP_WAIT_WHILE_BUSY) &&
+@@ -970,6 +969,24 @@ static int card_busy_detect(struct mmc_card *card, unsigned int timeout_ms,
+ 	return err;
  }
  
- static int __blk_trace_remove(struct request_queue *q)
-@@ -549,8 +565,7 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
- 	if (cmpxchg(&q->blk_trace, NULL, bt))
- 		goto err;
++static int card_busy_detect_err(struct mmc_card *card, unsigned int timeout_ms,
++				bool hw_busy_detect, struct request *req,
++				bool *gen_err)
++{
++	u32 resp_errs = 0;
++	int err;
++
++	err = card_busy_detect(card, timeout_ms, hw_busy_detect, req,
++			       &resp_errs);
++	if (resp_errs & R1_ERROR) {
++		pr_err("%s: %s: error sending status cmd, status %#x\n",
++		       req->rq_disk->disk_name, __func__, resp_errs);
++		*gen_err = true;
++	}
++
++	return err;
++}
++
+ static int send_stop(struct mmc_card *card, unsigned int timeout_ms,
+ 		struct request *req, bool *gen_err, u32 *stop_status)
+ {
+@@ -1012,7 +1029,8 @@ static int send_stop(struct mmc_card *card, unsigned int timeout_ms,
+ 		*gen_err = true;
+ 	}
  
--	if (atomic_inc_return(&blk_probes_ref) == 1)
--		blk_register_tracepoints();
-+	get_probe_ref();
- 
- 	ret = 0;
- err:
-@@ -1596,9 +1611,7 @@ static int blk_trace_remove_queue(struct request_queue *q)
- 	if (bt == NULL)
- 		return -EINVAL;
- 
--	if (atomic_dec_and_test(&blk_probes_ref))
--		blk_unregister_tracepoints();
--
-+	put_probe_ref();
- 	blk_trace_free(bt);
- 	return 0;
+-	return card_busy_detect(card, timeout_ms, use_r1b_resp, req, gen_err);
++	return card_busy_detect_err(card, timeout_ms, use_r1b_resp, req,
++				    gen_err);
  }
-@@ -1629,8 +1642,7 @@ static int blk_trace_setup_queue(struct request_queue *q,
- 	if (cmpxchg(&q->blk_trace, NULL, bt))
- 		goto free_bt;
  
--	if (atomic_inc_return(&blk_probes_ref) == 1)
--		blk_register_tracepoints();
-+	get_probe_ref();
- 	return 0;
+ #define ERR_NOMEDIUM	3
+@@ -1553,8 +1571,8 @@ static enum mmc_blk_status __mmc_blk_err_check(struct mmc_card *card,
+ 			gen_err = true;
+ 		}
  
- free_bt:
+-		err = card_busy_detect(card, MMC_BLK_TIMEOUT_MS, false, req,
+-					&gen_err);
++		err = card_busy_detect_err(card, MMC_BLK_TIMEOUT_MS, false, req,
++					   &gen_err);
+ 		if (err)
+ 			return MMC_BLK_CMD_ERR;
+ 	}
+@@ -2148,7 +2166,8 @@ static int mmc_blk_card_busy(struct mmc_card *card, struct request *req)
+ 	if (mmc_host_is_spi(card->host) || rq_data_dir(req) == READ)
+ 		return 0;
+ 
+-	err = card_busy_detect(card, MMC_BLK_TIMEOUT_MS, false, req, &gen_err);
++	err = card_busy_detect_err(card, MMC_BLK_TIMEOUT_MS, false, req,
++				   &gen_err);
+ 
+ 	/* Copy the general error bit so it will be seen later on */
+ 	if (gen_err) {
 -- 
-2.7.4
+1.9.1
