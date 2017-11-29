@@ -1,83 +1,87 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:54648 "EHLO mx1.redhat.com"
+Received: from mga02.intel.com ([134.134.136.20]:39581 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751180AbdK0FH7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Nov 2017 00:07:59 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-Cc: Christoph Hellwig <hch@infradead.org>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
-        Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 1/5] dm-mpath: don't call blk_mq_delay_run_hw_queue() in case of BLK_STS_RESOURCE
-Date: Mon, 27 Nov 2017 13:07:17 +0800
-Message-Id: <20171127050721.5884-2-ming.lei@redhat.com>
-In-Reply-To: <20171127050721.5884-1-ming.lei@redhat.com>
-References: <20171127050721.5884-1-ming.lei@redhat.com>
+        id S1754203AbdK2Nm6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Nov 2017 08:42:58 -0500
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V15 15/22] mmc: block: Check for transfer state in card_busy_detect()
+Date: Wed, 29 Nov 2017 15:41:12 +0200
+Message-Id: <1511962879-24262-16-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
+References: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-If .queue_rq() returns BLK_STS_RESOURCE, blk-mq will rerun the queue in
-the three situations:
+The card is required to return to transfer state. Since that is the state
+required to start another transfer, check for that state instead of
+programming state.
 
-1) if BLK_MQ_S_SCHED_RESTART is set
-- queue is rerun after one rq is completed, see blk_mq_sched_restart()
-which is run from blk_mq_free_request()
-
-2) run out of driver tag
-- queue is rerun after one tag is freed
-
-3) otherwise
-- queue is run immediately in blk_mq_dispatch_rq_list()
-
-This random dealy of running hw queue is introduced by commit 6077c2d706097c0
-(dm rq: Avoid that request processing stalls sporadically), which claimed
-one request processing stalling is fixed, but never explained the behind
-idea, and it is a workaound at most. Even the question isn't explained by
-anyone in recent discussion.
-
-Also calling blk_mq_delay_run_hw_queue() inside .queue_rq() is a horrible
-hack because it makes BLK_MQ_S_SCHED_RESTART not working, and degrades I/O
-peformance a lot.
-
-Finally this patch makes sure that dm-rq returns BLK_STS_RESOURCE to blk-mq
-only when underlying queue is out of resource, so we switch to return
-DM_MAPIO_DELAY_REQUEU if either MPATHF_QUEUE_IO or MPATHF_PG_INIT_REQUIRED
-is set in multipath_clone_and_map().
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- drivers/md/dm-mpath.c | 4 +---
- drivers/md/dm-rq.c    | 1 -
- 2 files changed, 1 insertion(+), 4 deletions(-)
+ drivers/mmc/core/block.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-index c8faa2b85842..8fe3f45407ce 100644
---- a/drivers/md/dm-mpath.c
-+++ b/drivers/md/dm-mpath.c
-@@ -484,9 +484,7 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
- 		return DM_MAPIO_KILL;
- 	} else if (test_bit(MPATHF_QUEUE_IO, &m->flags) ||
- 		   test_bit(MPATHF_PG_INIT_REQUIRED, &m->flags)) {
--		if (pg_init_all_paths(m))
--			return DM_MAPIO_DELAY_REQUEUE;
--		return DM_MAPIO_REQUEUE;
-+		return DM_MAPIO_DELAY_REQUEUE;
- 	}
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index f7c387c27ac0..0b40fc2ebf77 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -922,6 +922,16 @@ static int mmc_sd_num_wr_blocks(struct mmc_card *card, u32 *written_blocks)
+ 	return 0;
+ }
  
- 	memset(mpio, 0, sizeof(*mpio));
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index 9d32f25489c2..cbe8a06ef8b0 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -758,7 +758,6 @@ static blk_status_t dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		/* Undo dm_start_request() before requeuing */
- 		rq_end_stats(md, rq);
- 		rq_completed(md, rq_data_dir(rq), false);
--		blk_mq_delay_run_hw_queue(hctx, 100/*ms*/);
- 		return BLK_STS_RESOURCE;
- 	}
++static inline bool mmc_blk_in_tran_state(u32 status)
++{
++	/*
++	 * Some cards mishandle the status bits, so make sure to check both the
++	 * busy indication and the card state.
++	 */
++	return status & R1_READY_FOR_DATA &&
++	       (R1_CURRENT_STATE(status) == R1_STATE_TRAN);
++}
++
+ static int card_busy_detect(struct mmc_card *card, unsigned int timeout_ms,
+ 			    bool hw_busy_detect, struct request *req,
+ 			    u32 *resp_errs)
+@@ -954,9 +964,9 @@ static int card_busy_detect(struct mmc_card *card, unsigned int timeout_ms,
+ 		 * leaves the program state.
+ 		 */
+ 		if (done) {
+-			pr_err("%s: Card stuck in programming state! %s %s\n",
++			pr_err("%s: Card stuck in wrong state! %s %s status: %#x\n",
+ 				mmc_hostname(card->host),
+-				req->rq_disk->disk_name, __func__);
++				req->rq_disk->disk_name, __func__, status);
+ 			return -ETIMEDOUT;
+ 		}
  
+@@ -965,8 +975,7 @@ static int card_busy_detect(struct mmc_card *card, unsigned int timeout_ms,
+ 		 * so make sure to check both the busy
+ 		 * indication and the card state.
+ 		 */
+-	} while (!(status & R1_READY_FOR_DATA) ||
+-		 (R1_CURRENT_STATE(status) == R1_STATE_PRG));
++	} while (!mmc_blk_in_tran_state(status));
+ 
+ 	return err;
+ }
 -- 
-2.9.5
+1.9.1
