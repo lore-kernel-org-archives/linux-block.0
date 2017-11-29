@@ -1,47 +1,65 @@
-Return-Path: <geert@linux-m68k.org>
-From: Geert Uytterhoeven <geert+renesas@glider.be>
-To: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH] block: Add default switch case to blk_pm_allow_request() to kill warning
-Date: Mon, 27 Nov 2017 21:40:54 +0100
-Message-Id: <1511815254-18166-1-git-send-email-geert+renesas@glider.be>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:39581 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932321AbdK2Nmy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Nov 2017 08:42:54 -0500
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V15 14/22] mmc: block: Check the timeout correctly in card_busy_detect()
+Date: Wed, 29 Nov 2017 15:41:11 +0200
+Message-Id: <1511962879-24262-15-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
+References: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-With gcc 4.9.0:
+Pedantically, ensure the status is checked for the last time after the full
+timeout has passed.
 
-    block/blk-core.c: In function 'blk_pm_allow_request':
-    block/blk-core.c:2607:2: warning: enumeration value 'RPM_ACTIVE' not handled in switch [-Wswitch]
-      switch (rq->q->rpm_status) {
-      ^
-
-Convert the return statement below the switch() block into a default
-case to fix this.
-
-Fixes: e4f36b249b4d4e75 ("block: fix peeking requests during PM")
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- block/blk-core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/mmc/core/block.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index b8881750a3acd705..579e683c95e26049 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2610,9 +2610,9 @@ static bool blk_pm_allow_request(struct request *rq)
- 		return rq->rq_flags & RQF_PM;
- 	case RPM_SUSPENDED:
- 		return false;
-+	default:
-+		return true;
- 	}
--
--	return true;
- }
- #else
- static bool blk_pm_allow_request(struct request *rq)
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index c446d17b48c4..f7c387c27ac0 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -931,6 +931,8 @@ static int card_busy_detect(struct mmc_card *card, unsigned int timeout_ms,
+ 	u32 status;
+ 
+ 	do {
++		bool done = time_after(jiffies, timeout);
++
+ 		err = __mmc_send_status(card, &status, 5);
+ 		if (err) {
+ 			pr_err("%s: error %d requesting status\n",
+@@ -951,7 +953,7 @@ static int card_busy_detect(struct mmc_card *card, unsigned int timeout_ms,
+ 		 * Timeout if the device never becomes ready for data and never
+ 		 * leaves the program state.
+ 		 */
+-		if (time_after(jiffies, timeout)) {
++		if (done) {
+ 			pr_err("%s: Card stuck in programming state! %s %s\n",
+ 				mmc_hostname(card->host),
+ 				req->rq_disk->disk_name, __func__);
 -- 
-2.7.4
+1.9.1
