@@ -1,279 +1,217 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from LGEAMRELO13.lge.com ([156.147.23.53]:36318 "EHLO
-        lgeamrelo13.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1759017AbdKPDOf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Nov 2017 22:14:35 -0500
-From: Byungchul Park <byungchul.park@lge.com>
-To: peterz@infradead.org, mingo@kernel.org, akpm@linux-foundation.org
-Cc: tglx@linutronix.de, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org,
-        kernel-team@lge.com, jack@suse.cz, jlayton@redhat.com,
-        viro@zeniv.linux.org.uk, hannes@cmpxchg.org, npiggin@gmail.com,
-        rgoldwyn@suse.com, vbabka@suse.cz, mhocko@suse.com,
-        pombredanne@nexb.com, vinmenon@codeaurora.org,
-        gregkh@linuxfoundation.org
-Subject: [PATCH 1/3] lockdep: Apply crossrelease to PG_locked locks
-Date: Thu, 16 Nov 2017 12:14:25 +0900
-Message-Id: <1510802067-18609-2-git-send-email-byungchul.park@lge.com>
-In-Reply-To: <1510802067-18609-1-git-send-email-byungchul.park@lge.com>
-References: <1510802067-18609-1-git-send-email-byungchul.park@lge.com>
+Received: from mail.kernel.org ([198.145.29.99]:54038 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752815AbdK2XYI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Nov 2017 18:24:08 -0500
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+To: viro@zeniv.linux.org.uk, bart.vanassche@wdc.com,
+        ming.lei@redhat.com, tytso@mit.edu, darrick.wong@oracle.com,
+        jikos@kernel.org, rjw@rjwysocki.net, pavel@ucw.cz,
+        len.brown@intel.com, linux-fsdevel@vger.kernel.org
+Cc: boris.ostrovsky@oracle.com, jgross@suse.com,
+        todd.e.brandt@linux.intel.com, nborisov@suse.com, jack@suse.cz,
+        martin.petersen@oracle.com, ONeukum@suse.com,
+        oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
+        yu.chen.surf@gmail.com, dan.j.williams@intel.com,
+        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Luis R. Rodriguez" <mcgrof@kernel.org>
+Subject: [PATCH 06/11] fs: freeze on suspend and thaw on resume
+Date: Wed, 29 Nov 2017 15:23:51 -0800
+Message-Id: <20171129232356.28296-7-mcgrof@kernel.org>
+In-Reply-To: <20171129232356.28296-1-mcgrof@kernel.org>
+References: <20171129232356.28296-1-mcgrof@kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Although lock_page() and its family can cause deadlock, lockdep have not
-worked with them, because unlock_page() might be called in a different
-context from the acquire context, which violated lockdep's assumption.
+This uses the existing filesystem freeze and thaw callbacks to
+freeze each filesystem on suspend/hibernation and thaw upon resume.
 
-Now CONFIG_LOCKDEP_CROSSRELEASE has been introduced, lockdep can work
-with page locks.
+This is needed so that we properly really stop IO in flight without
+races after userspace has been frozen. Without this we rely on
+kthread freezing and its semantics are loose and error prone.
+For instance, even though a kthread may use try_to_freeze() and end
+up being frozen we have no way of being sure that everything that
+has been spawned asynchronously from it (such as timers) have also
+been stopped as well.
 
-Signed-off-by: Byungchul Park <byungchul.park@lge.com>
+A long term advantage of also adding filesystem freeze / thawing
+supporting durign suspend / hibernation is that long term we may
+be able to eventually drop the kernel's thread freezing completely
+as it was originally added to stop disk IO in flight as we hibernate
+or suspend.
+
+This also implies that many kthread users exist which have been
+adding freezer semantics onto its kthreads without need. These also
+will need to be reviewed later.
+
+This is based on prior work originally by Rafael Wysocki and later by
+Jiri Kosina.
+
+Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
 ---
- include/linux/mm_types.h |   8 ++++
- include/linux/pagemap.h  | 101 ++++++++++++++++++++++++++++++++++++++++++++---
- lib/Kconfig.debug        |   7 ++++
- mm/filemap.c             |   4 +-
- mm/page_alloc.c          |   3 ++
- 5 files changed, 115 insertions(+), 8 deletions(-)
+ fs/super.c             | 85 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/fs.h     | 13 ++++++++
+ kernel/power/process.c | 15 ++++++++-
+ 3 files changed, 112 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
-index c85f11d..263b861 100644
---- a/include/linux/mm_types.h
-+++ b/include/linux/mm_types.h
-@@ -17,6 +17,10 @@
- 
- #include <asm/mmu.h>
- 
-+#ifdef CONFIG_LOCKDEP_PAGELOCK
-+#include <linux/lockdep.h>
-+#endif
-+
- #ifndef AT_VECTOR_SIZE_ARCH
- #define AT_VECTOR_SIZE_ARCH 0
- #endif
-@@ -218,6 +222,10 @@ struct page {
- #ifdef LAST_CPUPID_NOT_IN_PAGE_FLAGS
- 	int _last_cpupid;
- #endif
-+
-+#ifdef CONFIG_LOCKDEP_PAGELOCK
-+	struct lockdep_map_cross map;
-+#endif
+diff --git a/fs/super.c b/fs/super.c
+index 885711c1d35b..c3a2842e5690 100644
+--- a/fs/super.c
++++ b/fs/super.c
+@@ -1648,3 +1648,88 @@ int thaw_super(struct super_block *sb)
+ 	return error;
  }
- /*
-  * The struct page can be forced to be double word aligned so that atomic ops
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index e08b533..35b4f67 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -15,6 +15,9 @@
- #include <linux/bitops.h>
- #include <linux/hardirq.h> /* for in_interrupt() */
- #include <linux/hugetlb_inline.h>
-+#ifdef CONFIG_LOCKDEP_PAGELOCK
-+#include <linux/lockdep.h>
-+#endif
- 
- /*
-  * Bits in mapping->flags.
-@@ -457,26 +460,91 @@ static inline pgoff_t linear_page_index(struct vm_area_struct *vma,
- 	return pgoff;
- }
- 
-+#ifdef CONFIG_LOCKDEP_PAGELOCK
-+#define lock_page_init(p)						\
-+do {									\
-+	static struct lock_class_key __key;				\
-+	lockdep_init_map_crosslock((struct lockdep_map *)&(p)->map,	\
-+			"(PG_locked)" #p, &__key, 0);			\
-+} while (0)
+ EXPORT_SYMBOL(thaw_super);
 +
-+static inline void lock_page_acquire(struct page *page, int try)
++#ifdef CONFIG_PM_SLEEP
++static bool super_should_freeze(struct super_block *sb)
 +{
-+	page = compound_head(page);
-+	lock_acquire_exclusive((struct lockdep_map *)&page->map, 0,
-+			       try, NULL, _RET_IP_);
-+}
-+
-+static inline void lock_page_release(struct page *page)
-+{
-+	page = compound_head(page);
++	if (!sb->s_root)
++		return false;
++	if (!(sb->s_flags & MS_BORN))
++		return false;
 +	/*
-+	 * lock_commit_crosslock() is necessary for crosslocks.
++	 * We don't freeze virtual filesystems, we skip those filesystems with
++	 * no backing device.
 +	 */
-+	lock_commit_crosslock((struct lockdep_map *)&page->map);
-+	lock_release((struct lockdep_map *)&page->map, 0, _RET_IP_);
++	if (sb->s_bdi == &noop_backing_dev_info)
++		return false;
++	/* No need to freeze read-only filesystems */
++	if (sb->s_flags & MS_RDONLY)
++		return false;
++
++	return true;
 +}
++
++static int fs_suspend_freeze_sb(struct super_block *sb, void *priv)
++{
++	int error = 0;
++
++	spin_lock(&sb_lock);
++	if (!super_should_freeze(sb))
++		goto out;
++
++	pr_info("%s (%s): freezing\n", sb->s_type->name, sb->s_id);
++
++	spin_unlock(&sb_lock);
++
++	atomic_inc(&sb->s_active);
++	error = freeze_locked_super(sb, false);
++	if (error)
++		atomic_dec(&sb->s_active);
++
++	spin_lock(&sb_lock);
++	if (error && error != -EBUSY)
++		pr_notice("%s (%s): Unable to freeze, error=%d",
++			  sb->s_type->name, sb->s_id, error);
++
++out:
++	spin_unlock(&sb_lock);
++	return error;
++}
++
++int fs_suspend_freeze(void)
++{
++	return iterate_supers_reverse_excl(fs_suspend_freeze_sb, NULL);
++}
++
++static int fs_suspend_thaw_sb(struct super_block *sb, void *priv)
++{
++	int error = 0;
++
++	spin_lock(&sb_lock);
++	if (!super_should_freeze(sb))
++		goto out;
++
++	pr_info("%s (%s): thawing\n", sb->s_type->name, sb->s_id);
++
++	spin_unlock(&sb_lock);
++
++	error = thaw_locked_super(sb, false);
++	if (!error)
++		atomic_dec(&sb->s_active);
++
++	spin_lock(&sb_lock);
++	if (error && error != -EBUSY)
++		pr_notice("%s (%s): Unable to unfreeze, error=%d",
++			  sb->s_type->name, sb->s_id, error);
++
++out:
++	spin_unlock(&sb_lock);
++	return error;
++}
++
++int fs_resume_unfreeze(void)
++{
++	return iterate_supers_excl(fs_suspend_thaw_sb, NULL);
++}
++
++#endif
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index fe90b6542697..dbaa69c3a4cf 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2237,6 +2237,19 @@ extern int user_statfs(const char __user *, struct kstatfs *);
+ extern int fd_statfs(int, struct kstatfs *);
+ extern int freeze_super(struct super_block *super);
+ extern int thaw_super(struct super_block *super);
++#ifdef CONFIG_PM_SLEEP
++int fs_suspend_freeze(void);
++int fs_resume_unfreeze(void);
 +#else
-+static inline void lock_page_init(struct page *page) {}
-+static inline void lock_page_free(struct page *page) {}
-+static inline void lock_page_acquire(struct page *page, int try) {}
-+static inline void lock_page_release(struct page *page) {}
-+#endif
-+
- extern void __lock_page(struct page *page);
- extern int __lock_page_killable(struct page *page);
- extern int __lock_page_or_retry(struct page *page, struct mm_struct *mm,
- 				unsigned int flags);
--extern void unlock_page(struct page *page);
-+extern void do_raw_unlock_page(struct page *page);
- 
--static inline int trylock_page(struct page *page)
-+static inline void unlock_page(struct page *page)
++static inline int fs_suspend_freeze(void)
 +{
-+	lock_page_release(page);
-+	do_raw_unlock_page(page);
-+}
-+
-+static inline int do_raw_trylock_page(struct page *page)
- {
- 	page = compound_head(page);
- 	return (likely(!test_and_set_bit_lock(PG_locked, &page->flags)));
- }
- 
-+static inline int trylock_page(struct page *page)
-+{
-+	if (do_raw_trylock_page(page)) {
-+		lock_page_acquire(page, 1);
-+		return 1;
-+	}
 +	return 0;
 +}
-+
- /*
-  * lock_page may only be called if we have the page's inode pinned.
-  */
- static inline void lock_page(struct page *page)
- {
- 	might_sleep();
--	if (!trylock_page(page))
-+
-+	if (!do_raw_trylock_page(page))
- 		__lock_page(page);
-+	/*
-+	 * acquire() must be after actual lock operation for crosslocks.
-+	 * This way a crosslock and current lock can be ordered like:
-+	 *
-+	 *	CONTEXT 1		CONTEXT 2
-+	 *	---------		---------
-+	 *	lock A (cross)
-+	 *	acquire A
-+	 *	  X = atomic_inc_return(&cross_gen_id)
-+	 *	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+	 *				acquire B
-+	 *				  Y = atomic_read_acquire(&cross_gen_id)
-+	 *				lock B
-+	 *
-+	 * so that 'lock A and then lock B' can be seen globally,
-+	 * if X <= Y.
-+	 */
-+	lock_page_acquire(page, 0);
- }
- 
- /*
-@@ -486,9 +554,20 @@ static inline void lock_page(struct page *page)
-  */
- static inline int lock_page_killable(struct page *page)
- {
-+	int ret;
-+
- 	might_sleep();
--	if (!trylock_page(page))
--		return __lock_page_killable(page);
-+
-+	if (!do_raw_trylock_page(page)) {
-+		ret = __lock_page_killable(page);
-+		if (ret)
-+			return ret;
-+	}
-+	/*
-+	 * acquire() must be after actual lock operation for crosslocks.
-+	 * This way a crosslock and other locks can be ordered.
-+	 */
-+	lock_page_acquire(page, 0);
- 	return 0;
- }
- 
-@@ -503,7 +582,17 @@ static inline int lock_page_or_retry(struct page *page, struct mm_struct *mm,
- 				     unsigned int flags)
- {
- 	might_sleep();
--	return trylock_page(page) || __lock_page_or_retry(page, mm, flags);
-+
-+	if (do_raw_trylock_page(page) || __lock_page_or_retry(page, mm, flags)) {
-+		/*
-+		 * acquire() must be after actual lock operation for crosslocks.
-+		 * This way a crosslock and other locks can be ordered.
-+		 */
-+		lock_page_acquire(page, 0);
-+		return 1;
-+	}
-+
++static inline int fs_resume_unfreeze(void)
++{
 +	return 0;
- }
- 
- /*
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 2b439a5..2e8c679 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -1094,6 +1094,7 @@ config PROVE_LOCKING
- 	select DEBUG_LOCK_ALLOC
- 	select LOCKDEP_CROSSRELEASE
- 	select LOCKDEP_COMPLETIONS
-+	select LOCKDEP_PAGELOCK
- 	select TRACE_IRQFLAGS
- 	default n
- 	help
-@@ -1179,6 +1180,12 @@ config LOCKDEP_COMPLETIONS
- 	 A deadlock caused by wait_for_completion() and complete() can be
- 	 detected by lockdep using crossrelease feature.
- 
-+config LOCKDEP_PAGELOCK
-+	bool
-+	help
-+	 PG_locked lock is a kind of crosslock. Using crossrelease feature,
-+	 PG_locked lock can work with lockdep.
-+
- config BOOTPARAM_LOCKDEP_CROSSRELEASE_FULLSTACK
- 	bool "Enable the boot parameter, crossrelease_fullstack"
- 	depends on LOCKDEP_CROSSRELEASE
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 594d73f..870d442 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -1099,7 +1099,7 @@ static inline bool clear_bit_unlock_is_negative_byte(long nr, volatile void *mem
-  * portably (architectures that do LL/SC can test any bit, while x86 can
-  * test the sign bit).
-  */
--void unlock_page(struct page *page)
-+void do_raw_unlock_page(struct page *page)
- {
- 	BUILD_BUG_ON(PG_waiters != 7);
- 	page = compound_head(page);
-@@ -1107,7 +1107,7 @@ void unlock_page(struct page *page)
- 	if (clear_bit_unlock_is_negative_byte(PG_locked, &page->flags))
- 		wake_up_page_bit(page, PG_locked);
- }
--EXPORT_SYMBOL(unlock_page);
-+EXPORT_SYMBOL(do_raw_unlock_page);
- 
- /**
-  * end_page_writeback - end writeback against a page
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index 77e4d3c..8436b28 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -5371,6 +5371,9 @@ void __meminit memmap_init_zone(unsigned long size, int nid, unsigned long zone,
- 		} else {
- 			__init_single_pfn(pfn, zone, nid);
- 		}
-+#ifdef CONFIG_LOCKDEP_PAGELOCK
-+		lock_page_init(pfn_to_page(pfn));
++}
 +#endif
- 	}
+ extern bool our_mnt(struct vfsmount *mnt);
+ extern __printf(2, 3)
+ int super_setup_bdi_name(struct super_block *sb, char *fmt, ...);
+diff --git a/kernel/power/process.c b/kernel/power/process.c
+index c326d7235c5f..7a44f8310968 100644
+--- a/kernel/power/process.c
++++ b/kernel/power/process.c
+@@ -145,6 +145,16 @@ int freeze_processes(void)
+ 	pr_cont("\n");
+ 	BUG_ON(in_atomic());
+ 
++	pr_info("Freezing filesystems ... ");
++	error = fs_suspend_freeze();
++	if (error) {
++		pr_cont("failed\n");
++		fs_resume_unfreeze();
++		thaw_processes();
++		return error;
++	}
++	pr_cont("done.\n");
++
+ 	/*
+ 	 * Now that the whole userspace is frozen we need to disbale
+ 	 * the OOM killer to disallow any further interference with
+@@ -154,8 +164,10 @@ int freeze_processes(void)
+ 	if (!error && !oom_killer_disable(msecs_to_jiffies(freeze_timeout_msecs)))
+ 		error = -EBUSY;
+ 
+-	if (error)
++	if (error) {
++		fs_resume_unfreeze();
+ 		thaw_processes();
++	}
+ 	return error;
  }
+ 
+@@ -198,6 +210,7 @@ void thaw_processes(void)
+ 	pm_nosig_freezing = false;
+ 
+ 	oom_killer_enable();
++	fs_resume_unfreeze();
+ 
+ 	pr_info("Restarting tasks ... ");
  
 -- 
-1.9.1
+2.15.0
