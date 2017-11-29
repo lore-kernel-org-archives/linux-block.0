@@ -1,47 +1,115 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.didichuxing.com ([111.202.154.82]:30908 "EHLO
-        BJEXMBX012.didichuxing.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1752680AbdKWNkB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Nov 2017 08:40:01 -0500
-Date: Thu, 23 Nov 2017 21:39:55 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>
-Subject: [PATCH 4/5] blk-wbt: move wbt_clear_stat to common place in wbt_done
-Message-ID: <7614401233068669e19b4d0d9e257cc5b84cd906.1511444141.git.zhangweiping@didichuxing.com>
-References: <cover.1511444141.git.zhangweiping@didichuxing.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <cover.1511444141.git.zhangweiping@didichuxing.com>
+Received: from mga02.intel.com ([134.134.136.20]:8196 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751675AbdK2Nmr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Nov 2017 08:42:47 -0500
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V15 13/22] mmc: block: blk-mq: Check error bits and save the exception bit when polling card busy
+Date: Wed, 29 Nov 2017 15:41:10 +0200
+Message-Id: <1511962879-24262-14-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
+References: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-wbt_done call wbt_clear_stat no matter current stat was tracked
-or not, move it to common place.
+Check error bits and save the exception bit when polling card busy.
 
-Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- block/blk-wbt.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/mmc/core/block.c | 37 ++++++++++++++++++++++++++++---------
+ 1 file changed, 28 insertions(+), 9 deletions(-)
 
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 0fb65f0..cd9a20a 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -178,12 +178,11 @@ void wbt_done(struct rq_wb *rwb, struct blk_issue_stat *stat)
- 
- 		if (wbt_is_read(stat))
- 			wb_timestamp(rwb, &rwb->last_comp);
--		wbt_clear_state(stat);
- 	} else {
- 		WARN_ON_ONCE(stat == rwb->sync_cookie);
- 		__wbt_done(rwb, wbt_stat_to_mask(stat));
--		wbt_clear_state(stat);
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index 30fc012353ae..c446d17b48c4 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -1457,15 +1457,18 @@ static inline void mmc_apply_rel_rw(struct mmc_blk_request *brq,
  	}
-+	wbt_clear_state(stat);
  }
  
- /*
+-#define CMD_ERRORS							\
+-	(R1_OUT_OF_RANGE |	/* Command argument out of range */	\
+-	 R1_ADDRESS_ERROR |	/* Misaligned address */		\
++#define CMD_ERRORS_EXCL_OOR						\
++	(R1_ADDRESS_ERROR |	/* Misaligned address */		\
+ 	 R1_BLOCK_LEN_ERROR |	/* Transferred block length incorrect */\
+ 	 R1_WP_VIOLATION |	/* Tried to write to protected block */	\
+ 	 R1_CARD_ECC_FAILED |	/* Card ECC failed */			\
+ 	 R1_CC_ERROR |		/* Card controller error */		\
+ 	 R1_ERROR)		/* General/unknown error */
+ 
++#define CMD_ERRORS							\
++	(CMD_ERRORS_EXCL_OOR |						\
++	 R1_OUT_OF_RANGE)	/* Command argument out of range */	\
++
+ static void mmc_blk_eval_resp_error(struct mmc_blk_request *brq)
+ {
+ 	u32 val;
+@@ -2157,24 +2160,40 @@ static inline bool mmc_blk_rq_error(struct mmc_blk_request *brq)
+ 	       brq->data.error || brq->cmd.resp[0] & CMD_ERRORS;
+ }
+ 
++static inline bool mmc_blk_oor_valid(struct mmc_blk_request *brq)
++{
++	return !!brq->mrq.sbc;
++}
++
++static inline u32 mmc_blk_stop_err_bits(struct mmc_blk_request *brq)
++{
++	return mmc_blk_oor_valid(brq) ? CMD_ERRORS : CMD_ERRORS_EXCL_OOR;
++}
++
+ static int mmc_blk_card_busy(struct mmc_card *card, struct request *req)
+ {
+ 	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
+-	bool gen_err = false;
++	u32 status = 0;
+ 	int err;
+ 
+ 	if (mmc_host_is_spi(card->host) || rq_data_dir(req) == READ)
+ 		return 0;
+ 
+-	err = card_busy_detect_err(card, MMC_BLK_TIMEOUT_MS, false, req,
+-				   &gen_err);
++	err = card_busy_detect(card, MMC_BLK_TIMEOUT_MS, false, req, &status);
+ 
+-	/* Copy the general error bit so it will be seen later on */
+-	if (gen_err) {
+-		mqrq->brq.stop.resp[0] |= R1_ERROR;
++	/*
++	 * Do not assume data transferred correctly if there are any error bits
++	 * set.
++	 */
++	if (status & mmc_blk_stop_err_bits(&mqrq->brq)) {
++		mqrq->brq.data.bytes_xfered = 0;
+ 		err = err ? err : -EIO;
+ 	}
+ 
++	/* Copy the exception bit so it will be seen later on */
++	if (mmc_card_mmc(card) && status & R1_EXCEPTION_EVENT)
++		mqrq->brq.cmd.resp[0] |= R1_EXCEPTION_EVENT;
++
+ 	return err;
+ }
+ 
 -- 
-2.9.4
+1.9.1
