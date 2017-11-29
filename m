@@ -1,114 +1,125 @@
-Return-Path: <prvs=479c705ad=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>, "Christoph
- Hellwig" <hch@lst.de>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Oleksandr Natalenko <oleksandr@natalenko.name>, Ming Lei
-	<ming.lei@redhat.com>, Martin Steigerwald <martin@lichtvoll.de>, "Bart Van
- Assche" <bart.vanassche@wdc.com>, Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v12 5/7] block: Add the QUEUE_FLAG_PREEMPT_ONLY request queue flag
-Date: Thu, 9 Nov 2017 10:49:57 -0800
-Message-ID: <20171109184959.4617-6-bart.vanassche@wdc.com>
-In-Reply-To: <20171109184959.4617-1-bart.vanassche@wdc.com>
-References: <20171109184959.4617-1-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:39581 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754931AbdK2NnX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 29 Nov 2017 08:43:23 -0500
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V15 20/22] mmc: core: Remove option not to use blk-mq
+Date: Wed, 29 Nov 2017 15:41:17 +0200
+Message-Id: <1511962879-24262-21-git-send-email-adrian.hunter@intel.com>
+In-Reply-To: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
+References: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This flag will be used in the next patch to let the block layer
-core know whether or not a SCSI request queue has been quiesced.
-A quiesced SCSI queue namely only processes RQF_PREEMPT requests.
+Remove config option MMC_MQ_DEFAULT and parameter mmc_use_blk_mq, so that
+blk-mq must be used always.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Tested-by: Martin Steigerwald <martin@lichtvoll.de>
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- block/blk-core.c       | 30 ++++++++++++++++++++++++++++++
- block/blk-mq-debugfs.c |  1 +
- include/linux/blkdev.h |  6 ++++++
- 3 files changed, 37 insertions(+)
+ drivers/mmc/Kconfig     | 10 ----------
+ drivers/mmc/core/core.c |  7 -------
+ drivers/mmc/core/core.h |  2 --
+ drivers/mmc/core/host.c |  2 --
+ drivers/mmc/core/host.h |  2 +-
+ 5 files changed, 1 insertion(+), 22 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 17eed16a6e04..edc276899116 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -348,6 +348,36 @@ void blk_sync_queue(struct request_queue *q)
- }
- EXPORT_SYMBOL(blk_sync_queue);
+diff --git a/drivers/mmc/Kconfig b/drivers/mmc/Kconfig
+index 42565562577c..ec21388311db 100644
+--- a/drivers/mmc/Kconfig
++++ b/drivers/mmc/Kconfig
+@@ -12,16 +12,6 @@ menuconfig MMC
+ 	  If you want MMC/SD/SDIO support, you should say Y here and
+ 	  also to your specific host controller driver.
  
-+/**
-+ * blk_set_preempt_only - set QUEUE_FLAG_PREEMPT_ONLY
-+ * @q: request queue pointer
-+ *
-+ * Returns the previous value of the PREEMPT_ONLY flag - 0 if the flag was not
-+ * set and 1 if the flag was already set.
-+ */
-+int blk_set_preempt_only(struct request_queue *q)
-+{
-+	unsigned long flags;
-+	int res;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	res = queue_flag_test_and_set(QUEUE_FLAG_PREEMPT_ONLY, q);
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+
-+	return res;
-+}
-+EXPORT_SYMBOL_GPL(blk_set_preempt_only);
-+
-+void blk_clear_preempt_only(struct request_queue *q)
-+{
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	queue_flag_clear(QUEUE_FLAG_PREEMPT_ONLY, q);
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+}
-+EXPORT_SYMBOL_GPL(blk_clear_preempt_only);
-+
- /**
-  * __blk_run_queue_uncond - run a queue whether or not it has been stopped
-  * @q:	The queue to run
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 7e3ae8105d5f..b56a4f35720d 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -74,6 +74,7 @@ static const char *const blk_queue_flag_name[] = {
- 	QUEUE_FLAG_NAME(REGISTERED),
- 	QUEUE_FLAG_NAME(SCSI_PASSTHROUGH),
- 	QUEUE_FLAG_NAME(QUIESCED),
-+	QUEUE_FLAG_NAME(PREEMPT_ONLY),
- };
- #undef QUEUE_FLAG_NAME
+-config MMC_MQ_DEFAULT
+-	bool "MMC: use blk-mq I/O path by default"
+-	depends on MMC && BLOCK
+-	default y
+-	---help---
+-	  This option enables the new blk-mq based I/O path for MMC block
+-	  devices by default.  With the option the mmc_core.use_blk_mq
+-	  module/boot option defaults to Y, without it to N, but it can
+-	  still be overridden either way.
+-
+ if MMC
  
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 1af5ddd0f631..2147e2381a22 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -632,6 +632,7 @@ struct request_queue {
- #define QUEUE_FLAG_REGISTERED  26	/* queue has been registered to a disk */
- #define QUEUE_FLAG_SCSI_PASSTHROUGH 27	/* queue supports SCSI commands */
- #define QUEUE_FLAG_QUIESCED    28	/* queue has been quiesced */
-+#define QUEUE_FLAG_PREEMPT_ONLY	29	/* only process REQ_PREEMPT requests */
+ source "drivers/mmc/core/Kconfig"
+diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
+index 617802f45386..7ca6e4866a8b 100644
+--- a/drivers/mmc/core/core.c
++++ b/drivers/mmc/core/core.c
+@@ -66,13 +66,6 @@
+ bool use_spi_crc = 1;
+ module_param(use_spi_crc, bool, 0);
  
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_SAME_COMP)	|	\
-@@ -732,6 +733,11 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
- 			     REQ_FAILFAST_DRIVER))
- #define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
-+#define blk_queue_preempt_only(q)				\
-+	test_bit(QUEUE_FLAG_PREEMPT_ONLY, &(q)->queue_flags)
-+
-+extern int blk_set_preempt_only(struct request_queue *q);
-+extern void blk_clear_preempt_only(struct request_queue *q);
- 
- static inline bool blk_account_rq(struct request *rq)
+-#ifdef CONFIG_MMC_MQ_DEFAULT
+-bool mmc_use_blk_mq = true;
+-#else
+-bool mmc_use_blk_mq = false;
+-#endif
+-module_param_named(use_blk_mq, mmc_use_blk_mq, bool, S_IWUSR | S_IRUGO);
+-
+ static int mmc_schedule_delayed_work(struct delayed_work *work,
+ 				     unsigned long delay)
  {
+diff --git a/drivers/mmc/core/core.h b/drivers/mmc/core/core.h
+index 136617d2f971..3e3d21304e5f 100644
+--- a/drivers/mmc/core/core.h
++++ b/drivers/mmc/core/core.h
+@@ -35,8 +35,6 @@ struct mmc_bus_ops {
+ 	int (*reset)(struct mmc_host *);
+ };
+ 
+-extern bool mmc_use_blk_mq;
+-
+ void mmc_attach_bus(struct mmc_host *host, const struct mmc_bus_ops *ops);
+ void mmc_detach_bus(struct mmc_host *host);
+ 
+diff --git a/drivers/mmc/core/host.c b/drivers/mmc/core/host.c
+index 409a68a96a0a..64b03d6eaf18 100644
+--- a/drivers/mmc/core/host.c
++++ b/drivers/mmc/core/host.c
+@@ -404,8 +404,6 @@ struct mmc_host *mmc_alloc_host(int extra, struct device *dev)
+ 
+ 	host->fixed_drv_type = -EINVAL;
+ 
+-	host->use_blk_mq = mmc_use_blk_mq;
+-
+ 	return host;
+ }
+ 
+diff --git a/drivers/mmc/core/host.h b/drivers/mmc/core/host.h
+index 8ca284e079e3..6d896869e5c6 100644
+--- a/drivers/mmc/core/host.h
++++ b/drivers/mmc/core/host.h
+@@ -81,7 +81,7 @@ static inline bool mmc_card_hs400es(struct mmc_card *card)
+ 
+ static inline bool mmc_host_use_blk_mq(struct mmc_host *host)
+ {
+-	return host->use_blk_mq;
++	return true;
+ }
+ 
+ #endif
 -- 
-2.14.3
+1.9.1
