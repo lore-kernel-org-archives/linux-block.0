@@ -1,9 +1,11 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Thu, 30 Nov 2017 20:42:49 +0100
-From: "Luis R. Rodriguez" <mcgrof@kernel.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
-        Benjamin Marzinski <bmarzins@redhat.com>
-Cc: "pavel@ucw.cz" <pavel@ucw.cz>,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:13708 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752795AbdK3RBU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 Nov 2017 12:01:20 -0500
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "pavel@ucw.cz" <pavel@ucw.cz>,
         "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
         "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
         "ming.lei@redhat.com" <ming.lei@redhat.com>,
@@ -12,8 +14,8 @@ Cc: "pavel@ucw.cz" <pavel@ucw.cz>,
         "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
         "jikos@kernel.org" <jikos@kernel.org>,
         "len.brown@intel.com" <len.brown@intel.com>,
-        "tytso@mit.edu" <tytso@mit.edu>,
-        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
+        "tytso@mit.edu" <tytso@mit.edu>
+CC: "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
         "ONeukum@suse.com" <ONeukum@suse.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
@@ -29,72 +31,64 @@ Cc: "pavel@ucw.cz" <pavel@ucw.cz>,
         "todd.e.brandt@linux.intel.com" <todd.e.brandt@linux.intel.com>,
         "jack@suse.cz" <jack@suse.cz>
 Subject: Re: [PATCH 00/11] fs: use freeze_fs on suspend/hibernate
-Message-ID: <20171130194249.GK729@wotan.suse.de>
+Date: Thu, 30 Nov 2017 17:01:13 +0000
+Message-ID: <1512061271.2774.10.camel@wdc.com>
 References: <20171129232356.28296-1-mcgrof@kernel.org>
- <1512061271.2774.10.camel@wdc.com>
+In-Reply-To: <20171129232356.28296-1-mcgrof@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1512061271.2774.10.camel@wdc.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Thu, Nov 30, 2017 at 05:01:13PM +0000, Bart Van Assche wrote:
-> It's great to see that you are making progress with this work :-) However,
-> what's not clear to me is what your (long-term) plan is for freezing
-> filesystems that e.g. exist on top of a md RAID1 block device?
-
-The original approach of doing a full swing kill on kthread freezing helpers
-in one shot was too much. We must therefore approach this turtle style and
-carefully. This patch series currently only addresses filesystems which
-have a freeze_fs() callback implemented, that's it. The rest of the kernel
-needs more work.
-
-So this work is far as I've gotten so far.
-
-Note, it does *not* remove the kthread freezing API calls on any other drivers,
-as such that should still work.
-
-> The md resync
-> thread must be stopped before a system is frozen. Today the md driver uses
-> the kthread freezing mechanism for that purpose. Do you have a plan for
-> handling the more complicated scenarios, e.g. a filesystem that exists on top
-> of an md device where the md device uses one or more files as backing store
-> and with the loop driver between the md device and the files?
-
-Nope not yet. It seems you have given this some thought though so you're 
-help here is greatly appreciated. In fact the way we should see the long
-term 'kill kthread freezing' effort should be a collaborative one. I've
-never touched md, so folks more familiar with md should give this some
-thought.
-
-Can for instance md register_pm_notifier() and register_syscore_ops()
-and do handy work to pause some work to replace kthread freezing?
-Note that I believe a pm notifier is needed in case syscore_suspend()
-is not called, say on a suspend fail.
-
-> How about filesystems implemented in user space using the FUSE driver?
-
-Not sure, someone more familiar with FUSE drivers should chime in. Right
-now all this does is leverage filesystems which *do* implement freeze_fs()
-only, and removes the kthread freezing calls after that. That's all. It
-should not affect any other filesystems
-
-Likewise consider filesystems that implement freeze_super() instead (like gfs2)
-which don't hold sb->s_umount -- see commit 48b6bca6b7b8309 ("fs: add
-freeze_super/thaw_super fs hooks"). If its desirable to address those as well,
-it would seem a pair of non-locking iters somehow are needed. More work to
-be done.
-
-This all needs to be considered for the future as well.
-
-> Patch 6/11 of this series freezes user space processes before freezing
-> filesystems. Will that work for FUSE filesystems?
-
-It doesn't add new code which should negatively affect FUSE drivers.
-Long term if we wanted to address FUSE, it may require other work.
-
-In the future then fs_suspend_freeze() may need to work for different
-types of filesystems. Right now only filesystems which implement freeze_fs()
-are addressed.
-
-  Luis
+T24gV2VkLCAyMDE3LTExLTI5IGF0IDE1OjIzIC0wODAwLCBMdWlzIFIuIFJvZHJpZ3VleiB3cm90
+ZToNCj4gVGhpcyBpcyBhIGZvbGxvd3VwIGZyb20gdGhlIG9yaWdpbmFsIFJGQyB3aGljaCBwcm9w
+b3NlZCB0byBzdGFydA0KPiB0byBraWxsIGt0aHJlYWQgZnJlZXppbmcgYWxsIHRvZ2V0aGVyIFsw
+XS4gSW5zdGVhZCBvZiBnb2luZyBzdHJhaWdodA0KPiBvdXQgdG8gdGhlIGp1Z3VsYXIgZm9yIGt0
+aHJlYWQgZnJlZXppbmcgdGhpcyBzZXJpZXMgb25seSBhZGRyZXNzZXMNCj4ga2lsbGluZyBmcmVl
+emVyIGNhbGxzIG9uIGZpbGVzeXN0ZW1zIHdoaWNoIGltcGxlbWVudCBmcmVlemVfZnMsIGFmdGVy
+DQo+IHdlIGxldCB0aGUga2VybmVsIGZyZWV6ZSB0aGVzZSBmaWxlc3lzdGVtcyBmb3IgdXMgb24g
+c3VzcGVuZC4NCj4gDQo+IFRoaXMgYXBwcm9hY2ggcHV0cyBvbiBhIHNsb3cgYnV0IHN0ZWFkeSBw
+YXRoIHRvd2FyZHMgdGhlIG9yaWdpbmFsIGdvYWwNCj4gdGhvdWdoLiBFYWNoIHN1YnN5c3RlbSBj
+b3VsZCBsb29rIGZvciBzaW1pbGFyIHNvbHV0aW9ucy4gRXZlbiB3aXRoDQo+IGZpbGVzeXN0ZW1z
+IHdlJ3JlIG5vdCBhbGwgZG9uZSB5ZXQsIGFmdGVyIHRoaXMgd2UnbGwgc3RpbGwgaGF2ZSB0bw0K
+PiBkZWNpZGUgd2hhdCB0byBkbyBhYm91dCBmaWxlc3lzdGVtcyB3aGljaCBkbyBub3QgaW1wbGVt
+ZW50IGZyZWV6ZV9mcygpLg0KPiANCj4gTW90aXZhdGlvbiBhbmQgcHJvYmxlbToNCj4gDQo+IGt0
+aHJlYWRzIGhhdmUgc29tZSBzZW1hbnRpY3MgZm9yIGZyZWV6aW5nLCB3aGljaCBoZWxwcyB0aGUg
+a2VybmVsDQo+IGZyZWV6ZSB0aGVtIHdoZW4gYSBzeXN0ZW0gaXMgZ29pbmcgdG8gc3VzcGVuZCBv
+ciBoaWJlcm5hdGlvbi4gVGhlc2UNCj4gc2VtYW50aWNzIGFyZSBub3Qgd2VsbCBkZWZpbmVkIHRo
+b3VnaCwgYW5kIGl0IGFjdHVhbGx5IHR1cm5zIG91dA0KPiBwcmV0dHkgaGFyZCB0byBnZXQgaXQg
+cmlnaHQuDQo+IA0KPiBXaXRob3V0IGEgcHJvcGVyIHNvbHV0aW9uIHN1c3BlbmQgYW5kIGhpYmVy
+bmF0aW9uIGFyZSBmcmFnaWxlIG9uIGZpbGVzeXN0ZW1zLA0KPiBpdCBjYW4gZWFzaWx5IGJyZWFr
+IHN1c3BlbmQgYW5kIGZpeGluZyBzdWNoIGlzc3VlcyBhcmUgaW4gbm8gd2F5IHRyaXZpYWwgWzFd
+DQo+IFsyXS4NCj4gDQo+IFByb3Bvc2VkIHNvbHV0aW9uOg0KPiANCj4gSW5zdGVhZCBvZiBmaXhp
+bmcgc3VjaCBzZW1hbnRpY3MgYW5kIHRyeWluZyB0byBnZXQgYWxsIGZpbGVzeXN0ZW1zIHRvIGRv
+IGl0DQo+IHJpZ2h0LCB3ZSBjYW4gZWFzaWx5IGRvIGF3YXkgd2l0aCBhbGwgZnJlZXppbmcgY2Fs
+bHMgaWYgdGhlIGZpbGVzeXN0ZW0NCj4gaW1wbGVtZW50cyBhIHByb3BlciBmcmVlemVfZnMoKSBj
+YWxsYmFjay4gVGhlIGZvbGxvd2luZyA5IGZpbGVzeXN0ZW1zIGhhdmUNCj4gZnJlZXplX2ZzKCkg
+aW1wbGVtZW50ZWQgYXMgc3VjaCB3ZSBjYW4gbGV0IHRoZSBrZXJuZWwgaXNzdWUgdGhlIGNhbGxi
+YWNrIHVwb24NCj4gc3VzcGVuZCBhbmQgdGhhdyBvbiByZXN1bWUgYXV0b21hdGljYWxseSBvbiBv
+dXIgYmVoYWxmLg0KPiANCj4gICBvIHhmcw0KPiAgIG8gcmVpc2VyZnMNCj4gICBvIG5pbGZzMg0K
+PiAgIG8gamZzDQo+ICAgbyBmMmZzDQo+ICAgbyBleHQ0DQo+ICAgbyBleHQyDQo+ICAgbyBidHJm
+cw0KPiANCj4gT2YgdGhlc2UsIHRoZSBmb2xsb3dpbmcgaGF2ZSBmcmVlemVyIGhlbHBlcnMsIHdo
+aWNoIGNhbiB0aGVuIGJlIHJlbW92ZWQNCj4gYWZ0ZXIgdGhlIGtlcm5lbCBhdXRvbWF0aWNhbHkg
+Y2FsbHMgZnJlZXplX2ZzIGZvciB1cyBvbiBzdXNwZW5kOg0KPiANCj4gICBvIHhmcw0KPiAgIG8g
+bmlsZnMyDQo+ICAgbyBqZnMNCj4gICBvIGYyZnMNCj4gICBvIGV4dDQNCj4gDQo+IEkndmUgdGVz
+dGVkIHRoaXMgb24gYSBzeXN0ZW0gd2l0aCBleHQ0IGFuZCBYRlMsIGFuZCBoYXZlIGxldCAwLWRh
+eSBnbyBhdA0KPiB3aXRob3V0IGlzc3Vlcy4gSSBoYXZlIGJyYW5jaGVzIGF2YWlsYWJlIGZvciBs
+aW51eC1uZXh0IFszXSBhbmQgTGludXMnDQo+IGxhdGVzdCB0cmVlIFs0XS4NCj4gDQo+IEZ1cnRo
+ZXIgdGVzdGluZywgdGhvdWdodHMsIHJldmlld3MsIGZsYW1lcyBhcmUgYWxsIGVxdWFsbHkgYXBw
+cmVjaWF0ZWQuDQoNCkhlbGxvIEx1aXMsDQoNCkl0J3MgZ3JlYXQgdG8gc2VlIHRoYXQgeW91IGFy
+ZSBtYWtpbmcgcHJvZ3Jlc3Mgd2l0aCB0aGlzIHdvcmsgOi0pIEhvd2V2ZXIsDQp3aGF0J3Mgbm90
+IGNsZWFyIHRvIG1lIGlzIHdoYXQgeW91ciAobG9uZy10ZXJtKSBwbGFuIGlzIGZvciBmcmVlemlu
+Zw0KZmlsZXN5c3RlbXMgdGhhdCBlLmcuIGV4aXN0IG9uIHRvcCBvZiBhIG1kIFJBSUQxIGJsb2Nr
+IGRldmljZT8gVGhlIG1kIHJlc3luYw0KdGhyZWFkIG11c3QgYmUgc3RvcHBlZCBiZWZvcmUgYSBz
+eXN0ZW0gaXMgZnJvemVuLiBUb2RheSB0aGUgbWQgZHJpdmVyIHVzZXMNCnRoZSBrdGhyZWFkIGZy
+ZWV6aW5nIG1lY2hhbmlzbSBmb3IgdGhhdCBwdXJwb3NlLiBEbyB5b3UgaGF2ZSBhIHBsYW4gZm9y
+DQpoYW5kbGluZyB0aGUgbW9yZSBjb21wbGljYXRlZCBzY2VuYXJpb3MsIGUuZy4gYSBmaWxlc3lz
+dGVtIHRoYXQgZXhpc3RzIG9uIHRvcA0Kb2YgYW4gbWQgZGV2aWNlIHdoZXJlIHRoZSBtZCBkZXZp
+Y2UgdXNlcyBvbmUgb3IgbW9yZSBmaWxlcyBhcyBiYWNraW5nIHN0b3JlDQphbmQgd2l0aCB0aGUg
+bG9vcCBkcml2ZXIgYmV0d2VlbiB0aGUgbWQgZGV2aWNlIGFuZCB0aGUgZmlsZXM/DQoNCkhvdyBh
+Ym91dCBmaWxlc3lzdGVtcyBpbXBsZW1lbnRlZCBpbiB1c2VyIHNwYWNlIHVzaW5nIHRoZSBGVVNF
+IGRyaXZlcj8NClBhdGNoIDYvMTEgb2YgdGhpcyBzZXJpZXMgZnJlZXplcyB1c2VyIHNwYWNlIHBy
+b2Nlc3NlcyBiZWZvcmUgZnJlZXppbmcNCmZpbGVzeXN0ZW1zLiBXaWxsIHRoYXQgd29yayBmb3Ig
+RlVTRSBmaWxlc3lzdGVtcz8NCg0KVGhhbmtzLA0KDQpCYXJ0Lg==
