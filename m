@@ -1,554 +1,124 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:20251 "EHLO mga09.intel.com"
+Received: from mx2.suse.de ([195.135.220.15]:33874 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752268AbdKUNoY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Nov 2017 08:44:24 -0500
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V14 14/24] mmc: block: Add CQE support
-Date: Tue, 21 Nov 2017 15:42:40 +0200
-Message-Id: <1511271770-3444-15-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
-References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
+        id S1752473AbdK3Q7v (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 Nov 2017 11:59:51 -0500
+Date: Thu, 30 Nov 2017 17:59:48 +0100
+From: Jan Kara <jack@suse.cz>
+To: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Cc: viro@zeniv.linux.org.uk, bart.vanassche@wdc.com,
+        ming.lei@redhat.com, tytso@mit.edu, darrick.wong@oracle.com,
+        jikos@kernel.org, rjw@rjwysocki.net, pavel@ucw.cz,
+        len.brown@intel.com, linux-fsdevel@vger.kernel.org,
+        boris.ostrovsky@oracle.com, jgross@suse.com,
+        todd.e.brandt@linux.intel.com, nborisov@suse.com, jack@suse.cz,
+        martin.petersen@oracle.com, ONeukum@suse.com,
+        oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
+        yu.chen.surf@gmail.com, dan.j.williams@intel.com,
+        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 02/11] fs: provide unlocked helper thaw_super()
+Message-ID: <20171130165948.GF28180@quack2.suse.cz>
+References: <20171129232356.28296-1-mcgrof@kernel.org>
+ <20171129232356.28296-3-mcgrof@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171129232356.28296-3-mcgrof@kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Add CQE support to the block driver, including:
-    - optionally using DCMD for flush requests
-    - "manually" issuing discard requests
-    - issuing read / write requests to the CQE
-    - supporting block-layer timeouts
-    - handling recovery
-    - supporting re-tuning
+On Wed 29-11-17 15:23:47, Luis R. Rodriguez wrote:
+> thaw_super() hold a write lock, however we wish to also enable
+> callers which already hold the write lock. To do this provide a helper
+> and make thaw_super() use it. This way, all that thaw_super() does
+> now is lock handling and active count management.
+> 
+> This change has no functional changes.
+> 
+> Suggested-by: Dave Chinner <david@fromorbit.com>
+> Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
 
-CQE offers 25% - 50% better random multi-threaded I/O.  There is a slight
-(e.g. 2%) drop in sequential read speed but no observable change to sequential
-write.
+Looks good to me. You can add:
 
-CQE automatically sends the commands to complete requests.  However it only
-supports reads / writes and so-called "direct commands" (DCMD).  Furthermore
-DCMD is limited to one command at a time, but discards require 3 commands.
-That makes issuing discards through CQE very awkward, but some CQE's don't
-support DCMD anyway.  So for discards, the existing non-CQE approach is
-taken, where the mmc core code issues the 3 commands one at a time i.e.
-mmc_erase(). Where DCMD is used, is for issuing flushes.
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/core/block.c | 150 +++++++++++++++++++++++++++++++++++++++++++-
- drivers/mmc/core/block.h |   2 +
- drivers/mmc/core/queue.c | 158 +++++++++++++++++++++++++++++++++++++++++++++--
- drivers/mmc/core/queue.h |  18 ++++++
- 4 files changed, 322 insertions(+), 6 deletions(-)
+								Honza
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index a08d727d100b..2aacd3fa0d1a 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -111,6 +111,7 @@ struct mmc_blk_data {
- #define MMC_BLK_WRITE		BIT(1)
- #define MMC_BLK_DISCARD		BIT(2)
- #define MMC_BLK_SECDISCARD	BIT(3)
-+#define MMC_BLK_CQE_RECOVERY	BIT(4)
- 
- 	/*
- 	 * Only set in main mmc_blk_data associated
-@@ -1785,6 +1786,138 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
- 		*do_data_tag_p = do_data_tag;
- }
- 
-+#define MMC_CQE_RETRIES 2
-+
-+static void mmc_blk_cqe_complete_rq(struct mmc_queue *mq, struct request *req)
-+{
-+	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
-+	struct mmc_request *mrq = &mqrq->brq.mrq;
-+	struct request_queue *q = req->q;
-+	struct mmc_host *host = mq->card->host;
-+	unsigned long flags;
-+	bool put_card;
-+	int err;
-+
-+	mmc_cqe_post_req(host, mrq);
-+
-+	if (mrq->cmd && mrq->cmd->error)
-+		err = mrq->cmd->error;
-+	else if (mrq->data && mrq->data->error)
-+		err = mrq->data->error;
-+	else
-+		err = 0;
-+
-+	if (err) {
-+		if (mqrq->retries++ < MMC_CQE_RETRIES)
-+			blk_mq_requeue_request(req, true);
-+		else
-+			blk_mq_end_request(req, BLK_STS_IOERR);
-+	} else if (mrq->data) {
-+		if (blk_update_request(req, BLK_STS_OK, mrq->data->bytes_xfered))
-+			blk_mq_requeue_request(req, true);
-+		else
-+			__blk_mq_end_request(req, BLK_STS_OK);
-+	} else {
-+		blk_mq_end_request(req, BLK_STS_OK);
-+	}
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+
-+	mq->in_flight[mmc_issue_type(mq, req)] -= 1;
-+
-+	put_card = (mmc_tot_in_flight(mq) == 0);
-+
-+	mmc_cqe_check_busy(mq);
-+
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+
-+	if (!mq->cqe_busy)
-+		blk_mq_run_hw_queues(q, true);
-+
-+	if (put_card)
-+		mmc_put_card(mq->card, &mq->ctx);
-+}
-+
-+void mmc_blk_cqe_recovery(struct mmc_queue *mq)
-+{
-+	struct mmc_card *card = mq->card;
-+	struct mmc_host *host = card->host;
-+	int err;
-+
-+	pr_debug("%s: CQE recovery start\n", mmc_hostname(host));
-+
-+	err = mmc_cqe_recovery(host);
-+	if (err)
-+		mmc_blk_reset(mq->blkdata, host, MMC_BLK_CQE_RECOVERY);
-+	else
-+		mmc_blk_reset_success(mq->blkdata, MMC_BLK_CQE_RECOVERY);
-+
-+	pr_debug("%s: CQE recovery done\n", mmc_hostname(host));
-+}
-+
-+static void mmc_blk_cqe_req_done(struct mmc_request *mrq)
-+{
-+	struct mmc_queue_req *mqrq = container_of(mrq, struct mmc_queue_req,
-+						  brq.mrq);
-+	struct request *req = mmc_queue_req_to_req(mqrq);
-+	struct request_queue *q = req->q;
-+	struct mmc_queue *mq = q->queuedata;
-+
-+	/*
-+	 * Block layer timeouts race with completions which means the normal
-+	 * completion path cannot be used during recovery.
-+	 */
-+	if (mq->in_recovery)
-+		mmc_blk_cqe_complete_rq(mq, req);
-+	else
-+		blk_mq_complete_request(req);
-+}
-+
-+static int mmc_blk_cqe_start_req(struct mmc_host *host, struct mmc_request *mrq)
-+{
-+	mrq->done		= mmc_blk_cqe_req_done;
-+	mrq->recovery_notifier	= mmc_cqe_recovery_notifier;
-+
-+	return mmc_cqe_start_req(host, mrq);
-+}
-+
-+static struct mmc_request *mmc_blk_cqe_prep_dcmd(struct mmc_queue_req *mqrq,
-+						 struct request *req)
-+{
-+	struct mmc_blk_request *brq = &mqrq->brq;
-+
-+	memset(brq, 0, sizeof(*brq));
-+
-+	brq->mrq.cmd = &brq->cmd;
-+	brq->mrq.tag = req->tag;
-+
-+	return &brq->mrq;
-+}
-+
-+static int mmc_blk_cqe_issue_flush(struct mmc_queue *mq, struct request *req)
-+{
-+	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
-+	struct mmc_request *mrq = mmc_blk_cqe_prep_dcmd(mqrq, req);
-+
-+	mrq->cmd->opcode = MMC_SWITCH;
-+	mrq->cmd->arg = (MMC_SWITCH_MODE_WRITE_BYTE << 24) |
-+			(EXT_CSD_FLUSH_CACHE << 16) |
-+			(1 << 8) |
-+			EXT_CSD_CMD_SET_NORMAL;
-+	mrq->cmd->flags = MMC_CMD_AC | MMC_RSP_R1B;
-+
-+	return mmc_blk_cqe_start_req(mq->card->host, mrq);
-+}
-+
-+static int mmc_blk_cqe_issue_rw_rq(struct mmc_queue *mq, struct request *req)
-+{
-+	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
-+
-+	mmc_blk_data_prep(mq, mqrq, 0, NULL, NULL);
-+
-+	return mmc_blk_cqe_start_req(mq->card->host, &mqrq->brq.mrq);
-+}
-+
- static void mmc_blk_rw_rq_prep(struct mmc_queue_req *mqrq,
- 			       struct mmc_card *card,
- 			       int disable_multi,
-@@ -2059,7 +2192,10 @@ void mmc_blk_mq_complete(struct request *req)
- {
- 	struct mmc_queue *mq = req->q->queuedata;
- 
--	mmc_blk_mq_complete_rq(mq, req);
-+	if (mq->use_cqe)
-+		mmc_blk_cqe_complete_rq(mq, req);
-+	else
-+		mmc_blk_mq_complete_rq(mq, req);
- }
- 
- static void mmc_blk_mq_poll_completion(struct mmc_queue *mq,
-@@ -2218,6 +2354,9 @@ static int mmc_blk_mq_issue_rw_rq(struct mmc_queue *mq,
- 
- static int mmc_blk_wait_for_idle(struct mmc_queue *mq, struct mmc_host *host)
- {
-+	if (mq->use_cqe)
-+		return host->cqe_ops->cqe_wait_for_idle(host);
-+
- 	return mmc_blk_rw_wait(mq, NULL);
- }
- 
-@@ -2256,11 +2395,18 @@ enum mmc_issued mmc_blk_mq_issue_rq(struct mmc_queue *mq, struct request *req)
- 			return MMC_REQ_FAILED_TO_START;
- 		}
- 		return MMC_REQ_FINISHED;
-+	case MMC_ISSUE_DCMD:
- 	case MMC_ISSUE_ASYNC:
- 		switch (req_op(req)) {
-+		case REQ_OP_FLUSH:
-+			ret = mmc_blk_cqe_issue_flush(mq, req);
-+			break;
- 		case REQ_OP_READ:
- 		case REQ_OP_WRITE:
--			ret = mmc_blk_mq_issue_rw_rq(mq, req);
-+			if (mq->use_cqe)
-+				ret = mmc_blk_cqe_issue_rw_rq(mq, req);
-+			else
-+				ret = mmc_blk_mq_issue_rw_rq(mq, req);
- 			break;
- 		default:
- 			WARN_ON_ONCE(1);
-diff --git a/drivers/mmc/core/block.h b/drivers/mmc/core/block.h
-index 6d34e87b18f6..f472ce5d5647 100644
---- a/drivers/mmc/core/block.h
-+++ b/drivers/mmc/core/block.h
-@@ -7,6 +7,8 @@
- 
- void mmc_blk_issue_rq(struct mmc_queue *mq, struct request *req);
- 
-+void mmc_blk_cqe_recovery(struct mmc_queue *mq);
-+
- enum mmc_issued;
- 
- enum mmc_issued mmc_blk_mq_issue_rq(struct mmc_queue *mq, struct request *req);
-diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-index b9c2430e9292..d0eae15261d7 100644
---- a/drivers/mmc/core/queue.c
-+++ b/drivers/mmc/core/queue.c
-@@ -40,18 +40,142 @@ static int mmc_prep_request(struct request_queue *q, struct request *req)
- 	return BLKPREP_OK;
- }
- 
-+static inline bool mmc_cqe_dcmd_busy(struct mmc_queue *mq)
-+{
-+	/* Allow only 1 DCMD at a time */
-+	return mq->in_flight[MMC_ISSUE_DCMD];
-+}
-+
-+void mmc_cqe_check_busy(struct mmc_queue *mq)
-+{
-+	if ((mq->cqe_busy & MMC_CQE_DCMD_BUSY) && !mmc_cqe_dcmd_busy(mq))
-+		mq->cqe_busy &= ~MMC_CQE_DCMD_BUSY;
-+
-+	mq->cqe_busy &= ~MMC_CQE_QUEUE_FULL;
-+}
-+
-+static inline bool mmc_cqe_can_dcmd(struct mmc_host *host)
-+{
-+	return host->caps2 & MMC_CAP2_CQE_DCMD;
-+}
-+
-+enum mmc_issue_type mmc_cqe_issue_type(struct mmc_host *host,
-+				       struct request *req)
-+{
-+	switch (req_op(req)) {
-+	case REQ_OP_DRV_IN:
-+	case REQ_OP_DRV_OUT:
-+	case REQ_OP_DISCARD:
-+	case REQ_OP_SECURE_ERASE:
-+		return MMC_ISSUE_SYNC;
-+	case REQ_OP_FLUSH:
-+		return mmc_cqe_can_dcmd(host) ? MMC_ISSUE_DCMD : MMC_ISSUE_SYNC;
-+	default:
-+		return MMC_ISSUE_ASYNC;
-+	}
-+}
-+
- enum mmc_issue_type mmc_issue_type(struct mmc_queue *mq, struct request *req)
- {
-+	struct mmc_host *host = mq->card->host;
-+
-+	if (mq->use_cqe)
-+		return mmc_cqe_issue_type(host, req);
-+
- 	if (req_op(req) == REQ_OP_READ || req_op(req) == REQ_OP_WRITE)
- 		return MMC_ISSUE_ASYNC;
- 
- 	return MMC_ISSUE_SYNC;
- }
- 
-+static void __mmc_cqe_recovery_notifier(struct mmc_queue *mq)
-+{
-+	if (!mq->recovery_needed) {
-+		mq->recovery_needed = true;
-+		schedule_work(&mq->recovery_work);
-+	}
-+}
-+
-+void mmc_cqe_recovery_notifier(struct mmc_request *mrq)
-+{
-+	struct mmc_queue_req *mqrq = container_of(mrq, struct mmc_queue_req,
-+						  brq.mrq);
-+	struct request *req = mmc_queue_req_to_req(mqrq);
-+	struct request_queue *q = req->q;
-+	struct mmc_queue *mq = q->queuedata;
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	__mmc_cqe_recovery_notifier(mq);
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+}
-+
-+static enum blk_eh_timer_return mmc_cqe_timed_out(struct request *req)
-+{
-+	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
-+	struct mmc_request *mrq = &mqrq->brq.mrq;
-+	struct mmc_queue *mq = req->q->queuedata;
-+	struct mmc_host *host = mq->card->host;
-+	enum mmc_issue_type issue_type = mmc_issue_type(mq, req);
-+	bool recovery_needed = false;
-+
-+	switch (issue_type) {
-+	case MMC_ISSUE_ASYNC:
-+	case MMC_ISSUE_DCMD:
-+		if (host->cqe_ops->cqe_timeout(host, mrq, &recovery_needed)) {
-+			if (recovery_needed)
-+				__mmc_cqe_recovery_notifier(mq);
-+			return BLK_EH_RESET_TIMER;
-+		}
-+		/* No timeout */
-+		return BLK_EH_HANDLED;
-+	default:
-+		/* Timeout is handled by mmc core */
-+		return BLK_EH_RESET_TIMER;
-+	}
-+}
-+
- static enum blk_eh_timer_return mmc_mq_timed_out(struct request *req,
- 						 bool reserved)
- {
--	return BLK_EH_RESET_TIMER;
-+	struct request_queue *q = req->q;
-+	struct mmc_queue *mq = q->queuedata;
-+	unsigned long flags;
-+	int ret;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+
-+	if (mq->recovery_needed || !mq->use_cqe)
-+		ret = BLK_EH_RESET_TIMER;
-+	else
-+		ret = mmc_cqe_timed_out(req);
-+
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+
-+	return ret;
-+}
-+
-+static void mmc_mq_recovery_handler(struct work_struct *work)
-+{
-+	struct mmc_queue *mq = container_of(work, struct mmc_queue,
-+					    recovery_work);
-+	struct request_queue *q = mq->queue;
-+
-+	mmc_get_card(mq->card, &mq->ctx);
-+
-+	mq->in_recovery = true;
-+
-+	mmc_blk_cqe_recovery(mq);
-+
-+	mq->in_recovery = false;
-+
-+	spin_lock_irq(q->queue_lock);
-+	mq->recovery_needed = false;
-+	spin_unlock_irq(q->queue_lock);
-+
-+	mmc_put_card(mq->card, &mq->ctx);
-+
-+	blk_mq_run_hw_queues(q, true);
- }
- 
- static int mmc_queue_thread(void *d)
-@@ -219,9 +343,10 @@ static blk_status_t mmc_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	struct request_queue *q = req->q;
- 	struct mmc_queue *mq = q->queuedata;
- 	struct mmc_card *card = mq->card;
-+	struct mmc_host *host = card->host;
- 	enum mmc_issue_type issue_type;
- 	enum mmc_issued issued;
--	bool get_card;
-+	bool get_card, cqe_retune_ok;
- 	int ret;
- 
- 	if (mmc_card_removed(mq->card)) {
-@@ -233,7 +358,19 @@ static blk_status_t mmc_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
- 
- 	spin_lock_irq(q->queue_lock);
- 
-+	if (mq->recovery_needed) {
-+		spin_unlock_irq(q->queue_lock);
-+		return BLK_STS_RESOURCE;
-+	}
-+
- 	switch (issue_type) {
-+	case MMC_ISSUE_DCMD:
-+		if (mmc_cqe_dcmd_busy(mq)) {
-+			mq->cqe_busy |= MMC_CQE_DCMD_BUSY;
-+			spin_unlock_irq(q->queue_lock);
-+			return BLK_STS_RESOURCE;
-+		}
-+		break;
- 	case MMC_ISSUE_ASYNC:
- 		break;
- 	default:
-@@ -250,6 +387,7 @@ static blk_status_t mmc_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
- 
- 	mq->in_flight[issue_type] += 1;
- 	get_card = (mmc_tot_in_flight(mq) == 1);
-+	cqe_retune_ok = (mmc_cqe_qcnt(mq) == 1);
- 
- 	spin_unlock_irq(q->queue_lock);
- 
-@@ -261,6 +399,11 @@ static blk_status_t mmc_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	if (get_card)
- 		mmc_get_card(card, &mq->ctx);
- 
-+	if (mq->use_cqe) {
-+		host->retune_now = host->need_retune && cqe_retune_ok &&
-+				   !host->hold_retune;
-+	}
-+
- 	blk_mq_start_request(req);
- 
- 	issued = mmc_blk_mq_issue_rq(mq, req);
-@@ -322,6 +465,7 @@ static void mmc_setup_queue(struct mmc_queue *mq, struct mmc_card *card)
- 	/* Initialize thread_sem even if it is not used */
- 	sema_init(&mq->thread_sem, 1);
- 
-+	INIT_WORK(&mq->recovery_work, mmc_mq_recovery_handler);
- 	INIT_WORK(&mq->complete_work, mmc_blk_mq_complete_work);
- 
- 	mutex_init(&mq->complete_lock);
-@@ -370,10 +514,14 @@ static int mmc_mq_init_queue(struct mmc_queue *mq, int q_depth,
- static int mmc_mq_init(struct mmc_queue *mq, struct mmc_card *card,
- 			 spinlock_t *lock)
- {
-+	struct mmc_host *host = card->host;
- 	int q_depth;
- 	int ret;
- 
--	q_depth = MMC_QUEUE_DEPTH;
-+	if (mq->use_cqe)
-+		q_depth = min_t(int, card->ext_csd.cmdq_depth, host->cqe_qdepth);
-+	else
-+		q_depth = MMC_QUEUE_DEPTH;
- 
- 	ret = mmc_mq_init_queue(mq, q_depth, &mmc_mq_ops, lock);
- 	if (ret)
-@@ -403,7 +551,9 @@ int mmc_init_queue(struct mmc_queue *mq, struct mmc_card *card,
- 
- 	mq->card = card;
- 
--	if (mmc_host_use_blk_mq(host))
-+	mq->use_cqe = host->cqe_enabled;
-+
-+	if (mq->use_cqe || mmc_host_use_blk_mq(host))
- 		return mmc_mq_init(mq, card, lock);
- 
- 	mq->queue = blk_alloc_queue(GFP_KERNEL);
-diff --git a/drivers/mmc/core/queue.h b/drivers/mmc/core/queue.h
-index ce9249852f26..1d7d3b0afff8 100644
---- a/drivers/mmc/core/queue.h
-+++ b/drivers/mmc/core/queue.h
-@@ -17,6 +17,7 @@ enum mmc_issued {
- 
- enum mmc_issue_type {
- 	MMC_ISSUE_SYNC,
-+	MMC_ISSUE_DCMD,
- 	MMC_ISSUE_ASYNC,
- 	MMC_ISSUE_MAX,
- };
-@@ -92,8 +93,15 @@ struct mmc_queue {
- 	int			qcnt;
- 
- 	int			in_flight[MMC_ISSUE_MAX];
-+	unsigned int		cqe_busy;
-+#define MMC_CQE_DCMD_BUSY	BIT(0)
-+#define MMC_CQE_QUEUE_FULL	BIT(1)
-+	bool			use_cqe;
-+	bool			recovery_needed;
-+	bool			in_recovery;
- 	bool			rw_wait;
- 	bool			waiting;
-+	struct work_struct	recovery_work;
- 	wait_queue_head_t	wait;
- 	struct request		*complete_req;
- 	struct mutex		complete_lock;
-@@ -108,11 +116,21 @@ extern int mmc_init_queue(struct mmc_queue *, struct mmc_card *, spinlock_t *,
- extern unsigned int mmc_queue_map_sg(struct mmc_queue *,
- 				     struct mmc_queue_req *);
- 
-+void mmc_cqe_check_busy(struct mmc_queue *mq);
-+void mmc_cqe_recovery_notifier(struct mmc_request *mrq);
-+
- enum mmc_issue_type mmc_issue_type(struct mmc_queue *mq, struct request *req);
- 
- static inline int mmc_tot_in_flight(struct mmc_queue *mq)
- {
- 	return mq->in_flight[MMC_ISSUE_SYNC] +
-+	       mq->in_flight[MMC_ISSUE_DCMD] +
-+	       mq->in_flight[MMC_ISSUE_ASYNC];
-+}
-+
-+static inline int mmc_cqe_qcnt(struct mmc_queue *mq)
-+{
-+	return mq->in_flight[MMC_ISSUE_DCMD] +
- 	       mq->in_flight[MMC_ISSUE_ASYNC];
- }
- 
+> ---
+>  fs/super.c | 39 ++++++++++++++++++++++++++-------------
+>  1 file changed, 26 insertions(+), 13 deletions(-)
+> 
+> diff --git a/fs/super.c b/fs/super.c
+> index a7650ff22f0e..cecc279beecd 100644
+> --- a/fs/super.c
+> +++ b/fs/super.c
+> @@ -1493,21 +1493,13 @@ int freeze_super(struct super_block *sb)
+>  }
+>  EXPORT_SYMBOL(freeze_super);
+>  
+> -/**
+> - * thaw_super -- unlock filesystem
+> - * @sb: the super to thaw
+> - *
+> - * Unlocks the filesystem and marks it writeable again after freeze_super().
+> - */
+> -int thaw_super(struct super_block *sb)
+> +/* Caller takes lock and handles active count */
+> +static int thaw_locked_super(struct super_block *sb)
+>  {
+>  	int error;
+>  
+> -	down_write(&sb->s_umount);
+> -	if (sb->s_writers.frozen != SB_FREEZE_COMPLETE) {
+> -		up_write(&sb->s_umount);
+> +	if (sb->s_writers.frozen != SB_FREEZE_COMPLETE)
+>  		return -EINVAL;
+> -	}
+>  
+>  	if (sb_rdonly(sb)) {
+>  		sb->s_writers.frozen = SB_UNFROZEN;
+> @@ -1522,7 +1514,6 @@ int thaw_super(struct super_block *sb)
+>  			printk(KERN_ERR
+>  				"VFS:Filesystem thaw failed\n");
+>  			lockdep_sb_freeze_release(sb);
+> -			up_write(&sb->s_umount);
+>  			return error;
+>  		}
+>  	}
+> @@ -1531,7 +1522,29 @@ int thaw_super(struct super_block *sb)
+>  	sb_freeze_unlock(sb);
+>  out:
+>  	wake_up(&sb->s_writers.wait_unfrozen);
+> -	deactivate_locked_super(sb);
+>  	return 0;
+>  }
+> +
+> +/**
+> + * thaw_super -- unlock filesystem
+> + * @sb: the super to thaw
+> + *
+> + * Unlocks the filesystem and marks it writeable again after freeze_super().
+> + */
+> +int thaw_super(struct super_block *sb)
+> +{
+> +	int error;
+> +
+> +	down_write(&sb->s_umount);
+> +	error = thaw_locked_super(sb);
+> +	if (error) {
+> +		up_write(&sb->s_umount);
+> +		goto out;
+> +	}
+> +
+> +	deactivate_locked_super(sb);
+> +
+> +out:
+> +	return error;
+> +}
+>  EXPORT_SYMBOL(thaw_super);
+> -- 
+> 2.15.0
+> 
 -- 
-1.9.1
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
