@@ -1,41 +1,37 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.didichuxing.com ([111.202.154.82]:17294 "EHLO
-        BJEXCAS004.didichuxing.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1752680AbdKWNj1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Nov 2017 08:39:27 -0500
-Date: Thu, 23 Nov 2017 21:39:24 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>
-Subject: [PATCH 2/5] blk-wbt: cleanup comments to one line
-Message-ID: <c6f5c88ce4abbab07e5939f4e357b61f00b796ab.1511444141.git.zhangweiping@didichuxing.com>
-References: <cover.1511444141.git.zhangweiping@didichuxing.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <cover.1511444141.git.zhangweiping@didichuxing.com>
+Received: from mx2.suse.de ([195.135.220.15]:44941 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752599AbdK3OJQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 Nov 2017 09:09:16 -0500
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-block@vger.kernel.org
+Cc: neilb@suse.com, axboe@fb.com, Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: [PATCH] block: Set BIO_TRACE_COMPLETION on new bio during split
+Date: Thu, 30 Nov 2017 08:08:14 -0600
+Message-Id: <20171130140814.25871-1-rgoldwyn@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
----
- block/blk-wbt.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+From: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index edb09e93..0fb65f0 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -729,9 +729,7 @@ int wbt_init(struct request_queue *q)
- 	rwb->enable_state = WBT_STATE_ON_DEFAULT;
- 	wbt_update_limits(rwb);
+Fixes: fbbaf700e7b1 ("block: trace completion of all bios.")
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+---
+ block/bio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/bio.c b/block/bio.c
+index 228229f3bb76..3f4940dd00da 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1836,7 +1836,7 @@ struct bio *bio_split(struct bio *bio, int sectors,
+ 	bio_advance(bio, split->bi_iter.bi_size);
  
--	/*
--	 * Assign rwb and add the stats callback.
--	 */
-+	/* Assign rwb and add the stats callback. */
- 	q->rq_wb = rwb;
- 	blk_stat_add_callback(q, rwb->cb);
+ 	if (bio_flagged(bio, BIO_TRACE_COMPLETION))
+-		bio_set_flag(bio, BIO_TRACE_COMPLETION);
++		bio_set_flag(split, BIO_TRACE_COMPLETION);
  
+ 	return split;
+ }
 -- 
-2.9.4
+2.14.2
