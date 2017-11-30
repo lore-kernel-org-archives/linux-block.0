@@ -1,187 +1,145 @@
-Return-Path: <prvs=473169c3e=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, "Ard
- Biesheuvel" <ard.biesheuvel@linaro.org>, Herbert Xu
-	<herbert@gondor.apana.org.au>, Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v3 1/8] lib/scatterlist: Introduce sgl_alloc() and sgl_free()
-Date: Fri, 3 Nov 2017 15:23:32 -0700
-Message-ID: <20171103222339.26540-2-bart.vanassche@wdc.com>
-In-Reply-To: <20171103222339.26540-1-bart.vanassche@wdc.com>
-References: <20171103222339.26540-1-bart.vanassche@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block, bfq: remove batches of confusing ifdefs
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ulf.hansson@linaro.org, broonie@kernel.org, linus.walleij@linaro.org,
+ lucmiccio@gmail.com, bfq-iosched@googlegroups.com
+References: <20171128093734.1918-1-paolo.valente@linaro.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <5892a41d-4677-937a-a56e-5d4554724dd6@kernel.dk>
+Date: Thu, 30 Nov 2017 14:21:45 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
-Return-Path: bart.vanassche@wdc.com
+In-Reply-To: <20171128093734.1918-1-paolo.valente@linaro.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Many kernel drivers contain code that allocates and frees both a
-scatterlist and the pages that populate that scatterlist.
-Introduce functions in lib/scatterlist.c that perform these tasks
-instead of duplicating this functionality in multiple drivers.
-Only include these functions in the build if CONFIG_SGL_ALLOC=y
-to avoid that the kernel size increases if this functionality is
-not used.
+On 11/28/2017 02:37 AM, Paolo Valente wrote:
+> Commit a33801e8b473 ("block, bfq: move debug blkio stats behind
+> CONFIG_DEBUG_BLK_CGROUP") introduced two batches of confusing ifdefs:
+> one reported in [1], plus a similar one in another function. This
+> commit removes both batches, in the way suggested in [1].
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
----
- include/linux/scatterlist.h |  10 +++++
- lib/Kconfig                 |   4 ++
- lib/scatterlist.c           | 105 ++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 119 insertions(+)
+Some comments below.
 
-diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
-index 4b3286ac60c8..3642511918d5 100644
---- a/include/linux/scatterlist.h
-+++ b/include/linux/scatterlist.h
-@@ -266,6 +266,16 @@ int sg_alloc_table_from_pages(struct sg_table *sgt,
- 	unsigned long offset, unsigned long size,
- 	gfp_t gfp_mask);
+> +static inline void bfq_update_dispatch_stats(struct request *rq,
+> +					     spinlock_t *queue_lock,
+> +					     struct bfq_queue *in_serv_queue,
+> +					     bool idle_timer_disabled)
+> +{
+
+Don't pass in the queue lock. The normal convention is to pass in the
+queue, thus making this:
+
+static void bfq_update_dispatch_stats(struct request_queue *q,
+				      struct request *rq,
+				      struct bfq_queue *in_serv_queue,
+				      bool idle_timer_disabled)
+
+which also gets rid of the inline. In general, never inline anything.
+The compiler should figure it out for you. This function is way too big
+to inline, plus the cost of what it's doing completely dwarfes function
+call overhead.
+
+
+>
+> +	struct bfq_queue *bfqq = rq ? RQ_BFQQ(rq) : NULL;
+>  
+> -#if defined(CONFIG_BFQ_GROUP_IOSCHED) && defined(CONFIG_DEBUG_BLK_CGROUP)
+> -	bfqq = rq ? RQ_BFQQ(rq) : NULL;
+>  	if (!idle_timer_disabled && !bfqq)
+> -		return rq;
+> +		return;
+>  
+>  	/*
+>  	 * rq and bfqq are guaranteed to exist until this function
+> @@ -3732,7 +3713,7 @@ static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
+>  	 * In addition, the following queue lock guarantees that
+>  	 * bfqq_group(bfqq) exists as well.
+>  	 */
+> -	spin_lock_irq(hctx->queue->queue_lock);
+> +	spin_lock_irq(queue_lock);
+>  	if (idle_timer_disabled)
+>  		/*
+>  		 * Since the idle timer has been disabled,
+> @@ -3751,9 +3732,37 @@ static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
+>  		bfqg_stats_set_start_empty_time(bfqg);
+>  		bfqg_stats_update_io_remove(bfqg, rq->cmd_flags);
+>  	}
+> -	spin_unlock_irq(hctx->queue->queue_lock);
+> +	spin_unlock_irq(queue_lock);
+> +}
+> +#else
+> +static inline void bfq_update_dispatch_stats(struct request *rq,
+> +					     spinlock_t *queue_lock,
+> +					     struct bfq_queue *in_serv_queue,
+> +					     bool idle_timer_disabled) {}
+>  #endif
+>  
+> +static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
+> +{
+> +	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
+> +	struct request *rq;
+> +	struct bfq_queue *in_serv_queue;
+> +	bool waiting_rq, idle_timer_disabled;
+> +
+> +	spin_lock_irq(&bfqd->lock);
+> +
+> +	in_serv_queue = bfqd->in_service_queue;
+> +	waiting_rq = in_serv_queue && bfq_bfqq_wait_request(in_serv_queue);
+> +
+> +	rq = __bfq_dispatch_request(hctx);
+> +
+> +	idle_timer_disabled =
+> +		waiting_rq && !bfq_bfqq_wait_request(in_serv_queue);
+> +
+> +	spin_unlock_irq(&bfqd->lock);
+> +
+> +	bfq_update_dispatch_stats(rq, hctx->queue->queue_lock, in_serv_queue,
+> +				  idle_timer_disabled);
+> +
+>  	return rq;
+>  }
+>  
+> @@ -4276,16 +4285,46 @@ static bool __bfq_insert_request(struct bfq_data *bfqd, struct request *rq)
+>  	return idle_timer_disabled;
+>  }
+>  
+> +#if defined(CONFIG_BFQ_GROUP_IOSCHED) && defined(CONFIG_DEBUG_BLK_CGROUP)
+> +static inline void bfq_update_insert_stats(struct bfq_queue *bfqq,
+> +					   spinlock_t *queue_lock,
+> +					   bool idle_timer_disabled,
+> +					   unsigned int cmd_flags)
+> +{
+> +	if (!bfqq)
+> +		return;
+> +
+> +	/*
+> +	 * bfqq still exists, because it can disappear only after
+> +	 * either it is merged with another queue, or the process it
+> +	 * is associated with exits. But both actions must be taken by
+> +	 * the same process currently executing this flow of
+> +	 * instructions.
+> +	 *
+> +	 * In addition, the following queue lock guarantees that
+> +	 * bfqq_group(bfqq) exists as well.
+> +	 */
+> +	spin_lock_irq(queue_lock);
+> +	bfqg_stats_update_io_add(bfqq_group(bfqq), bfqq, cmd_flags);
+> +	if (idle_timer_disabled)
+> +		bfqg_stats_update_idle_time(bfqq_group(bfqq));
+> +	spin_unlock_irq(queue_lock);
+> +}
+> +#else
+> +static inline void bfq_update_insert_stats(struct bfq_queue *bfqq,
+> +					   spinlock_t *queue_lock,
+> +					   bool idle_timer_disabled,
+> +					   unsigned int cmd_flags) {}
+> +#endif
+
+Ditto here, kill the inlines.
+
+In general though, good improvement.
  
-+#ifdef CONFIG_SGL_ALLOC
-+struct scatterlist *sgl_alloc_order(unsigned long long length,
-+				    unsigned int order, bool chainable,
-+				    gfp_t gfp, unsigned int *nent_p);
-+struct scatterlist *sgl_alloc(unsigned long long length, gfp_t gfp,
-+			      unsigned int *nent_p);
-+void sgl_free_order(struct scatterlist *sgl, int order);
-+void sgl_free(struct scatterlist *sgl);
-+#endif /* CONFIG_SGL_ALLOC */
-+
- size_t sg_copy_buffer(struct scatterlist *sgl, unsigned int nents, void *buf,
- 		      size_t buflen, off_t skip, bool to_buffer);
- 
-diff --git a/lib/Kconfig b/lib/Kconfig
-index b1445b22a6de..8396c4cfa1ab 100644
---- a/lib/Kconfig
-+++ b/lib/Kconfig
-@@ -413,6 +413,10 @@ config HAS_DMA
- 	depends on !NO_DMA
- 	default y
- 
-+config SGL_ALLOC
-+	bool
-+	default n
-+
- config DMA_NOOP_OPS
- 	bool
- 	depends on HAS_DMA && (!64BIT || ARCH_DMA_ADDR_T_64BIT)
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index be7b4dd6b68d..e2b5a78ceb44 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -433,6 +433,111 @@ int sg_alloc_table_from_pages(struct sg_table *sgt,
- }
- EXPORT_SYMBOL(sg_alloc_table_from_pages);
- 
-+#ifdef CONFIG_SGL_ALLOC
-+
-+/**
-+ * sgl_alloc_order - allocate a scatterlist and its pages
-+ * @length: Length in bytes of the scatterlist. Must be at least one
-+ * @order: Second argument for alloc_pages()
-+ * @chainable: Whether or not to allocate an extra element in the scatterlist
-+ *	for scatterlist chaining purposes
-+ * @gfp: Memory allocation flags
-+ * @nent_p: [out] Number of entries in the scatterlist that have pages
-+ *
-+ * Returns: A pointer to an initialized scatterlist or %NULL upon failure.
-+ */
-+struct scatterlist *sgl_alloc_order(unsigned long long length,
-+				    unsigned int order, bool chainable,
-+				    gfp_t gfp, unsigned int *nent_p)
-+{
-+	struct scatterlist *sgl, *sg;
-+	struct page *page;
-+	unsigned int nent, nalloc;
-+	u32 elem_len;
-+
-+	nent = round_up(length, PAGE_SIZE << order) >> (PAGE_SHIFT + order);
-+	/* Check for integer overflow */
-+	if (length > (nent << (PAGE_SHIFT + order)))
-+		return NULL;
-+	nalloc = nent;
-+	if (chainable) {
-+		/* Check for integer overflow */
-+		if (nalloc + 1 < nalloc)
-+			return NULL;
-+		nalloc++;
-+	}
-+	sgl = kmalloc_array(nalloc, sizeof(struct scatterlist),
-+			    (gfp & ~GFP_DMA) | __GFP_ZERO);
-+	if (!sgl)
-+		return NULL;
-+
-+	sg_init_table(sgl, nent);
-+	sg = sgl;
-+	while (length) {
-+		elem_len = min_t(u64, length, PAGE_SIZE << order);
-+		page = alloc_pages(gfp, order);
-+		if (!page) {
-+			sgl_free(sgl);
-+			return NULL;
-+		}
-+
-+		sg_set_page(sg, page, elem_len, 0);
-+		length -= elem_len;
-+		sg = sg_next(sg);
-+	}
-+	WARN_ON_ONCE(sg);
-+	if (nent_p)
-+		*nent_p = nent;
-+	return sgl;
-+}
-+EXPORT_SYMBOL(sgl_alloc_order);
-+
-+/**
-+ * sgl_alloc - allocate a scatterlist and its pages
-+ * @length: Length in bytes of the scatterlist
-+ * @gfp: Memory allocation flags
-+ * @nent_p: [out] Number of entries in the scatterlist
-+ *
-+ * Returns: A pointer to an initialized scatterlist or %NULL upon failure.
-+ */
-+struct scatterlist *sgl_alloc(unsigned long long length, gfp_t gfp,
-+			      unsigned int *nent_p)
-+{
-+	return sgl_alloc_order(length, 0, false, gfp, nent_p);
-+}
-+EXPORT_SYMBOL(sgl_alloc);
-+
-+/**
-+ * sgl_free_order - free a scatterlist and its pages
-+ * @sgl: Scatterlist with one or more elements
-+ * @order: Second argument for __free_pages()
-+ */
-+void sgl_free_order(struct scatterlist *sgl, int order)
-+{
-+	struct scatterlist *sg;
-+	struct page *page;
-+
-+	for (sg = sgl; sg; sg = sg_next(sg)) {
-+		page = sg_page(sg);
-+		if (page)
-+			__free_pages(page, order);
-+	}
-+	kfree(sgl);
-+}
-+EXPORT_SYMBOL(sgl_free_order);
-+
-+/**
-+ * sgl_free - free a scatterlist and its pages
-+ * @sgl: Scatterlist with one or more elements
-+ */
-+void sgl_free(struct scatterlist *sgl)
-+{
-+	sgl_free_order(sgl, 0);
-+}
-+EXPORT_SYMBOL(sgl_free);
-+
-+#endif /* CONFIG_SGL_ALLOC */
-+
- void __sg_page_iter_start(struct sg_page_iter *piter,
- 			  struct scatterlist *sglist, unsigned int nents,
- 			  unsigned long pgoffset)
+
 -- 
-2.14.3
+Jens Axboe
