@@ -1,87 +1,56 @@
-Return-Path: <mlyle@lyle.org>
-Return-Path: <mlyle@lyle.org>
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: axboe@kernel.dk,
-	Rui Hua <huarui.dev@gmail.com>,
-	stable@vger.kernel.org,
-	Michael Lyle <mlyle@lyle.org>
-Subject: [PATCH 3/4] bcache: recover data from backing when data is clean
-Date: Fri, 24 Nov 2017 15:14:26 -0800
-Message-Id: <20171124231427.9563-4-mlyle@lyle.org>
-In-Reply-To: <20171124231427.9563-1-mlyle@lyle.org>
-References: <20171124231427.9563-1-mlyle@lyle.org>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+To: Dave Chinner <david@fromorbit.com>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Jan Kara <jack@suse.cz>,
+        "Luis R. Rodriguez" <mcgrof@kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>, bart.vanassche@wdc.com,
+        ming.lei@redhat.com, Ted Ts'o <tytso@mit.edu>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Jiri Kosina <jikos@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+        Len Brown <len.brown@intel.com>, linux-fsdevel@vger.kernel.org,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>,
+        Todd Brandt <todd.e.brandt@linux.intel.com>, nborisov@suse.com,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Oliver Neukum <ONeukum@suse.com>, oleksandr@natalenko.name,
+        Oleg Antonyan <oleg.b.antonyan@gmail.com>,
+        Yu Chen <yu.chen.surf@gmail.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 07/11] xfs: remove not needed freezing calls
+Date: Fri, 01 Dec 2017 00:40:31 +0100
+Message-ID: <28033585.qtnqnMzzMp@aspire.rjw.lan>
+In-Reply-To: <20171130233033.GO5858@dastard>
+References: <20171129232356.28296-1-mcgrof@kernel.org> <CAJZ5v0hrEWOMi+C0Cw+ij_P7fwh=d7KVHAKWWTc=C2SSw=2nkA@mail.gmail.com> <20171130233033.GO5858@dastard>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-From: Rui Hua <huarui.dev@gmail.com>
+On Friday, December 1, 2017 12:30:33 AM CET Dave Chinner wrote:
+> On Thu, Nov 30, 2017 at 09:32:53PM +0100, Rafael J. Wysocki wrote:
+> > On Thu, Nov 30, 2017 at 5:21 PM, Jan Kara <jack@suse.cz> wrote:
+> > > On Wed 29-11-17 15:23:52, Luis R. Rodriguez wrote:
+> > >> This removes superflous freezer calls as they are no longer needed
+> > >> as the VFS now performs filesystem freezing/thaw if the filesystem has
+> > >> support for it.
+> > >>
+> > >> The following Coccinelle rule was used as follows:
+> > >>
+> > >> spatch --sp-file fs-freeze-cleanup.cocci --in-place fs/$FS/
+> > >
+> > > I think your rule misses WQ_FREEZABLE flag for workqueues? That would be
+> > > also good to get rid of...
+> > 
+> > We need that one (or equivalent) for the runtime PM workqueue at least.
+> 
+> I think Jan was talking about all the WQ_FREEZABLE flags in
+> filesystem workqueues (such as all the XFS wqs) that are no longer
+> necessary once filesystems are frozen appropriately.
 
-When we send a read request and hit the clean data in cache device, there
-is a situation called cache read race in bcache(see the commit in the tail
-of cache_look_up(), the following explaination just copy from there):
-The bucket we're reading from might be reused while our bio is in flight,
-and we could then end up reading the wrong data. We guard against this
-by checking (in bch_cache_read_endio()) if the pointer is stale again;
-if so, we treat it as an error (s->iop.error = -EINTR) and reread from
-the backing device (but we don't pass that error up anywhere)
+I see, thanks.  That was unclear to me, sorry for the confusion.
 
-It should be noted that cache read race happened under normal
-circumstances, not the circumstance when SSD failed, it was counted
-and shown in  /sys/fs/bcache/XXX/internal/cache_read_races.
-
-Without this patch, when we use writeback mode, we will never reread from
-the backing device when cache read race happened, until the whole cache
-device is clean, because the condition
-(s->recoverable && (dc && !atomic_read(&dc->has_dirty))) is false in
-cached_dev_read_error(). In this situation, the s->iop.error(= -EINTR)
-will be passed up, at last, user will receive -EINTR when it's bio end,
-this is not suitable, and wield to up-application.
-
-In this patch, we use s->read_dirty_data to judge whether the read
-request hit dirty data in cache device, it is safe to reread data from
-the backing device when the read request hit clean data. This can not
-only handle cache read race, but also recover data when failed read
-request from cache device.
-
-[edited by mlyle to fix up whitespace, commit log title, comment
-spelling]
-
-Fixes: d59b23795933 ("bcache: only permit to recovery read error when cache device is clean")
-Cc: <stable@vger.kernel.org> # 4.14
-Signed-off-by: Hua Rui <huarui.dev@gmail.com>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
-Reviewed-by: Coly Li <colyli@suse.de>
-Signed-off-by: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/request.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 3a7aed7282b2..643c3021624f 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -708,16 +708,15 @@ static void cached_dev_read_error(struct closure *cl)
- {
- 	struct search *s = container_of(cl, struct search, cl);
- 	struct bio *bio = &s->bio.bio;
--	struct cached_dev *dc = container_of(s->d, struct cached_dev, disk);
- 
- 	/*
--	 * If cache device is dirty (dc->has_dirty is non-zero), then
--	 * recovery a failed read request from cached device may get a
--	 * stale data back. So read failure recovery is only permitted
--	 * when cache device is clean.
-+	 * If read request hit dirty data (s->read_dirty_data is true),
-+	 * then recovery a failed read request from cached device may
-+	 * get a stale data back. So read failure recovery is only
-+	 * permitted when read request hit clean data in cache device,
-+	 * or when cache read race happened.
- 	 */
--	if (s->recoverable &&
--	    (dc && !atomic_read(&dc->has_dirty))) {
-+	if (s->recoverable && !s->read_dirty_data) {
- 		/* Retry from the backing device: */
- 		trace_bcache_read_retry(s->orig_bio);
- 
--- 
-2.14.1
+Thanks,
+Rafael
