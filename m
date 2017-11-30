@@ -1,8 +1,19 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "bmarzins@redhat.com" <bmarzins@redhat.com>,
-        "mcgrof@kernel.org" <mcgrof@kernel.org>
-CC: "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
+Date: Thu, 30 Nov 2017 20:42:49 +0100
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>,
+        Benjamin Marzinski <bmarzins@redhat.com>
+Cc: "pavel@ucw.cz" <pavel@ucw.cz>,
+        "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "rjw@rjwysocki.net" <rjw@rjwysocki.net>,
+        "mcgrof@kernel.org" <mcgrof@kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "jikos@kernel.org" <jikos@kernel.org>,
+        "len.brown@intel.com" <len.brown@intel.com>,
+        "tytso@mit.edu" <tytso@mit.edu>,
+        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
         "ONeukum@suse.com" <ONeukum@suse.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
@@ -10,62 +21,80 @@ CC: "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
         "oleg.b.antonyan@gmail.com" <oleg.b.antonyan@gmail.com>,
         "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
         "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        "pavel@ucw.cz" <pavel@ucw.cz>,
-        "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "dan.j.williams@intel.com" <dan.j.williams@intel.com>,
-        "rjw@rjwysocki.net" <rjw@rjwysocki.net>,
         "jgross@suse.com" <jgross@suse.com>,
-        "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
-        "yu.chen.surf@gmail.com" <yu.chen.surf@gmail.com>,
-        "todd.e.brandt@linux.intel.com" <todd.e.brandt@linux.intel.com>,
         "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "jikos@kernel.org" <jikos@kernel.org>,
-        "len.brown@intel.com" <len.brown@intel.com>,
-        "tytso@mit.edu" <tytso@mit.edu>, "jack@suse.cz" <jack@suse.cz>
+        "dan.j.williams@intel.com" <dan.j.williams@intel.com>,
+        "yu.chen.surf@gmail.com" <yu.chen.surf@gmail.com>,
+        "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+        "todd.e.brandt@linux.intel.com" <todd.e.brandt@linux.intel.com>,
+        "jack@suse.cz" <jack@suse.cz>
 Subject: Re: [PATCH 00/11] fs: use freeze_fs on suspend/hibernate
-Date: Thu, 30 Nov 2017 20:53:52 +0000
-Message-ID: <1512075231.2774.17.camel@wdc.com>
+Message-ID: <20171130194249.GK729@wotan.suse.de>
 References: <20171129232356.28296-1-mcgrof@kernel.org>
-         <1512061271.2774.10.camel@wdc.com> <20171130194249.GK729@wotan.suse.de>
-In-Reply-To: <20171130194249.GK729@wotan.suse.de>
-Content-Type: text/plain; charset="utf-8"
+ <1512061271.2774.10.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1512061271.2774.10.camel@wdc.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVGh1LCAyMDE3LTExLTMwIGF0IDIwOjQyICswMTAwLCBMdWlzIFIuIFJvZHJpZ3VleiB3cm90
-ZToNCj4gT24gVGh1LCBOb3YgMzAsIDIwMTcgYXQgMDU6MDE6MTNQTSArMDAwMCwgQmFydCBWYW4g
-QXNzY2hlIHdyb3RlOg0KPiA+IFRoZSBtZCByZXN5bmMNCj4gPiB0aHJlYWQgbXVzdCBiZSBzdG9w
-cGVkIGJlZm9yZSBhIHN5c3RlbSBpcyBmcm96ZW4uIFRvZGF5IHRoZSBtZCBkcml2ZXIgdXNlcw0K
-PiA+IHRoZSBrdGhyZWFkIGZyZWV6aW5nIG1lY2hhbmlzbSBmb3IgdGhhdCBwdXJwb3NlLiBEbyB5
-b3UgaGF2ZSBhIHBsYW4gZm9yDQo+ID4gaGFuZGxpbmcgdGhlIG1vcmUgY29tcGxpY2F0ZWQgc2Nl
-bmFyaW9zLCBlLmcuIGEgZmlsZXN5c3RlbSB0aGF0IGV4aXN0cyBvbiB0b3ANCj4gPiBvZiBhbiBt
-ZCBkZXZpY2Ugd2hlcmUgdGhlIG1kIGRldmljZSB1c2VzIG9uZSBvciBtb3JlIGZpbGVzIGFzIGJh
-Y2tpbmcgc3RvcmUNCj4gPiBhbmQgd2l0aCB0aGUgbG9vcCBkcml2ZXIgYmV0d2VlbiB0aGUgbWQg
-ZGV2aWNlIGFuZCB0aGUgZmlsZXM/DQo+IA0KPiBOb3BlIG5vdCB5ZXQuIEl0IHNlZW1zIHlvdSBo
-YXZlIGdpdmVuIHRoaXMgc29tZSB0aG91Z2h0IHRob3VnaCBzbyB5b3UncmUgDQo+IGhlbHAgaGVy
-ZSBpcyBncmVhdGx5IGFwcHJlY2lhdGVkLiBJbiBmYWN0IHRoZSB3YXkgd2Ugc2hvdWxkIHNlZSB0
-aGUgbG9uZw0KPiB0ZXJtICdraWxsIGt0aHJlYWQgZnJlZXppbmcnIGVmZm9ydCBzaG91bGQgYmUg
-YSBjb2xsYWJvcmF0aXZlIG9uZS4gSSd2ZQ0KPiBuZXZlciB0b3VjaGVkIG1kLCBzbyBmb2xrcyBt
-b3JlIGZhbWlsaWFyIHdpdGggbWQgc2hvdWxkIGdpdmUgdGhpcyBzb21lDQo+IHRob3VnaHQuDQo+
-IA0KPiBDYW4gZm9yIGluc3RhbmNlIG1kIHJlZ2lzdGVyX3BtX25vdGlmaWVyKCkgYW5kIHJlZ2lz
-dGVyX3N5c2NvcmVfb3BzKCkNCj4gYW5kIGRvIGhhbmR5IHdvcmsgdG8gcGF1c2Ugc29tZSB3b3Jr
-IHRvIHJlcGxhY2Uga3RocmVhZCBmcmVlemluZz8NCj4gTm90ZSB0aGF0IEkgYmVsaWV2ZSBhIHBt
-IG5vdGlmaWVyIGlzIG5lZWRlZCBpbiBjYXNlIHN5c2NvcmVfc3VzcGVuZCgpDQo+IGlzIG5vdCBj
-YWxsZWQsIHNheSBvbiBhIHN1c3BlbmQgZmFpbC4NCg0KU29ycnkgYnV0IEkgZG9uJ3QgdGhpbmsg
-dGhhdCBhIHNvbHV0aW9uIGNhbiBiZSBiYXNlZCBvbiBhIG5vdGlmaWVyIG1lY2hhbmlzbS4NCkZy
-ZWV6aW5nIGhhcyB0byBoYXBwZW4gaW4gdGhlIG9yZGVyIGluIHdoaWNoIGRyaXZlcnMgYW5kIGZp
-bGVzeXN0ZW1zIGhhdmUNCmJlZW4gc3RhY2tlZCAoZmlsZXN5c3RlbSA+IG1kIGRldmljZSA+IGZp
-bGVzeXN0ZW0gZm9yIHRoZSBhYm92ZSBleGFtcGxlKS4NClNpbmNlIHRoZSBvcmRlciBpbiB3aGlj
-aCBub3RpZmllcnMgYXJlIGNhbGxlZCBpcyByZWxhdGVkIHRvIHRoZSBvcmRlciBpbg0Kd2hpY2gg
-bm90aWZpZXJzIGhhdmUgYmVlbiByZWdpc3RlcmVkIEkgZG9uJ3QgdGhpbmsgdGhhdCBhIHNvbHV0
-aW9uIGZvciB0aGUNCmV4YW1wbGUgSSBkZXNjcmliZWQgY2FuIGJlIGJhc2VkIG9uIG5vdGlmaWVy
-cy4gV2hhdCBJIHRoaW5rIHdlIG5lZWQgaXMgYQ0KbWVjaGFuaXNtIGZvciB0cmF2ZXJzaW5nIHRo
-ZSBzdG9yYWdlIHN0YWNrIHRoYXQgaW5jbHVkZXMgYmxvY2sgZHJpdmVycyBhbmQNCmFuIGVxdWl2
-YWxlbnQgb2YgZnJlZXplX2ZzKCkgZm9yIGJsb2NrIGRyaXZlcnMuIEZyZWV6aW5nIHNob3VsZCBv
-Y2N1ciBieQ0KY2FsbGluZyB0aGUgZnJlZXplX2ZzKCkgbWV0aG9kcyBmb3IgZWFjaCBzdG9yYWdl
-IGxheWVyIHN0YXJ0aW5nIGF0IHRoZSB0b3Agb2YNCnRoZSBzdG9yYWdlIHN0YWNrIGFuZCBwcm9j
-ZWVkaW5nIHRvd2FyZHMgdGhlIGJvdHRvbS4NCg0KQmFydC4=
+On Thu, Nov 30, 2017 at 05:01:13PM +0000, Bart Van Assche wrote:
+> It's great to see that you are making progress with this work :-) However,
+> what's not clear to me is what your (long-term) plan is for freezing
+> filesystems that e.g. exist on top of a md RAID1 block device?
+
+The original approach of doing a full swing kill on kthread freezing helpers
+in one shot was too much. We must therefore approach this turtle style and
+carefully. This patch series currently only addresses filesystems which
+have a freeze_fs() callback implemented, that's it. The rest of the kernel
+needs more work.
+
+So this work is far as I've gotten so far.
+
+Note, it does *not* remove the kthread freezing API calls on any other drivers,
+as such that should still work.
+
+> The md resync
+> thread must be stopped before a system is frozen. Today the md driver uses
+> the kthread freezing mechanism for that purpose. Do you have a plan for
+> handling the more complicated scenarios, e.g. a filesystem that exists on top
+> of an md device where the md device uses one or more files as backing store
+> and with the loop driver between the md device and the files?
+
+Nope not yet. It seems you have given this some thought though so you're 
+help here is greatly appreciated. In fact the way we should see the long
+term 'kill kthread freezing' effort should be a collaborative one. I've
+never touched md, so folks more familiar with md should give this some
+thought.
+
+Can for instance md register_pm_notifier() and register_syscore_ops()
+and do handy work to pause some work to replace kthread freezing?
+Note that I believe a pm notifier is needed in case syscore_suspend()
+is not called, say on a suspend fail.
+
+> How about filesystems implemented in user space using the FUSE driver?
+
+Not sure, someone more familiar with FUSE drivers should chime in. Right
+now all this does is leverage filesystems which *do* implement freeze_fs()
+only, and removes the kthread freezing calls after that. That's all. It
+should not affect any other filesystems
+
+Likewise consider filesystems that implement freeze_super() instead (like gfs2)
+which don't hold sb->s_umount -- see commit 48b6bca6b7b8309 ("fs: add
+freeze_super/thaw_super fs hooks"). If its desirable to address those as well,
+it would seem a pair of non-locking iters somehow are needed. More work to
+be done.
+
+This all needs to be considered for the future as well.
+
+> Patch 6/11 of this series freezes user space processes before freezing
+> filesystems. Will that work for FUSE filesystems?
+
+It doesn't add new code which should negatively affect FUSE drivers.
+Long term if we wanted to address FUSE, it may require other work.
+
+In the future then fs_suspend_freeze() may need to work for different
+types of filesystems. Right now only filesystems which implement freeze_fs()
+are addressed.
+
+  Luis
