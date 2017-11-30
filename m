@@ -1,91 +1,54 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:40477 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754082AbdK2Nmg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Nov 2017 08:42:36 -0500
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V15 11/22] mmc: block: blk-mq: Separate card polling from recovery
-Date: Wed, 29 Nov 2017 15:41:08 +0200
-Message-Id: <1511962879-24262-12-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
-References: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <martin.petersen@oracle.com>
+To: Mariusz Dabrowski <mariusz.dabrowski@intel.com>
+Cc: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-raid@vger.kernel.org, martin.petersen@oracle.com,
+        linux-block@vger.kernel.org
+Subject: Re: [RFC] md: make queue limits depending on limits of RAID members
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20171115102512.18269-1-mariusz.dabrowski@intel.com>
+	<20171117184054.jmk6lks7dzxyyxgu@kernel.org>
+	<0a8abe98-e24a-420d-e673-9bbbb47972b4@intel.com>
+Date: Thu, 30 Nov 2017 11:08:16 -0500
+In-Reply-To: <0a8abe98-e24a-420d-e673-9bbbb47972b4@intel.com> (Mariusz
+	Dabrowski's message of "Wed, 22 Nov 2017 09:12:39 +0100")
+Message-ID: <yq1d13zg367.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-Recovery is simpler to understand if it is only used for errors. Create a
-separate function for card polling.
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/core/block.c | 29 ++++++++++++++++++++++++++++-
- 1 file changed, 28 insertions(+), 1 deletion(-)
+Mariusz,
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index a710a6e95307..6d2c42c1c33a 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -2139,6 +2139,26 @@ static inline bool mmc_blk_rq_error(struct mmc_blk_request *brq)
- 	       brq->data.error || brq->cmd.resp[0] & CMD_ERRORS;
- }
- 
-+static int mmc_blk_card_busy(struct mmc_card *card, struct request *req)
-+{
-+	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
-+	bool gen_err = false;
-+	int err;
-+
-+	if (mmc_host_is_spi(card->host) || rq_data_dir(req) == READ)
-+		return 0;
-+
-+	err = card_busy_detect(card, MMC_BLK_TIMEOUT_MS, false, req, &gen_err);
-+
-+	/* Copy the general error bit so it will be seen later on */
-+	if (gen_err) {
-+		mqrq->brq.stop.resp[0] |= R1_ERROR;
-+		err = err ? err : -EIO;
-+	}
-+
-+	return err;
-+}
-+
- static inline void mmc_blk_rw_reset_success(struct mmc_queue *mq,
- 					    struct request *req)
- {
-@@ -2197,8 +2217,15 @@ static void mmc_blk_mq_poll_completion(struct mmc_queue *mq,
- 				       struct request *req)
- {
- 	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
-+	struct mmc_host *host = mq->card->host;
- 
--	mmc_blk_mq_rw_recovery(mq, req);
-+	if (mmc_blk_rq_error(&mqrq->brq) ||
-+	    mmc_blk_card_busy(mq->card, req)) {
-+		mmc_blk_mq_rw_recovery(mq, req);
-+	} else {
-+		mmc_blk_rw_reset_success(mq, req);
-+		mmc_retune_release(host);
-+	}
- 
- 	mmc_blk_urgent_bkops(mq, mqrq);
- }
+>>> One potential solution for that is to change type of some queue limits
+>>> (at least discard_granularity and discard_alignment, maybe more, like
+>>> max_discard_sectors?) from 32 bits to 64 bits.
+
+You're still restricted by the max bio size which is 32 bits on 32-bit
+platforms.
+
+> Let me give you an example with io_min (it works also for other params):
+> We've got RAID 0 with 2 disks and 32KiB chunk size. Each member disk
+> reports io_min=64KiB. blk_stack_limits takes max value from set of chunk
+> size and members io_min
+> 	t->io_min = max(t->io_min, b->io_min);
+> so new array's io_min will be equal to 64KiB. Such request will be split
+> for both array members, each device will get 32KiB request and it is not
+> enough for them to meet minimum io size requirement.
+
+When this was written, there was a clear benefit giving priority to the
+MD/DM topology over any values reported by the hardware.
+
+I.e. the performance was much better when honoring the MD stripe chunk
+and stripe size over any values reported by the underlying devices. This
+was true for both disk drives and RAID devices that reported the
+relevant issues.
+
+That's why the stacking works the way it does.
+
+For your particular example, I'd say that if your device reports an
+io_min of 64KB, then it's a user error to create an MD device with a
+stripe chunk of 32KB. mdadm should discourage creating such a
+configuration.
+
 -- 
-1.9.1
+Martin K. Petersen	Oracle Linux Engineering
