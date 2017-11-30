@@ -1,196 +1,189 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:43703 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756289AbdKCNVQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 3 Nov 2017 09:21:16 -0400
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V13 09/10] mmc: block: blk-mq: Stop using card_busy_detect()
-Date: Fri,  3 Nov 2017 15:20:19 +0200
-Message-Id: <1509715220-31885-10-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1509715220-31885-1-git-send-email-adrian.hunter@intel.com>
-References: <1509715220-31885-1-git-send-email-adrian.hunter@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Thu, 30 Nov 2017 17:58:37 +0100
+From: Jan Kara <jack@suse.cz>
+To: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Cc: viro@zeniv.linux.org.uk, bart.vanassche@wdc.com,
+        ming.lei@redhat.com, tytso@mit.edu, darrick.wong@oracle.com,
+        jikos@kernel.org, rjw@rjwysocki.net, pavel@ucw.cz,
+        len.brown@intel.com, linux-fsdevel@vger.kernel.org,
+        boris.ostrovsky@oracle.com, jgross@suse.com,
+        todd.e.brandt@linux.intel.com, nborisov@suse.com, jack@suse.cz,
+        martin.petersen@oracle.com, ONeukum@suse.com,
+        oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
+        yu.chen.surf@gmail.com, dan.j.williams@intel.com,
+        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 01/11] fs: provide unlocked helper for freeze_super()
+Message-ID: <20171130165837.GE28180@quack2.suse.cz>
+References: <20171129232356.28296-1-mcgrof@kernel.org>
+ <20171129232356.28296-2-mcgrof@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171129232356.28296-2-mcgrof@kernel.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-card_busy_detect() doesn't set a correct timeout, and it doesn't take care
-of error status bits. Stop using it for blk-mq.
+On Wed 29-11-17 15:23:46, Luis R. Rodriguez wrote:
+> freeze_super() holds a write lock, however we wish to also enable
+> callers which already hold the write lock. To do this provide a helper
+> and make freeze_super() use it. This way, all that freeze_super() does
+> now is lock handling and active count management.
+> 
+> This change has no functional changes.
+> 
+> Suggested-by: Dave Chinner <david@fromorbit.com>
+> Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/core/block.c | 117 +++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 109 insertions(+), 8 deletions(-)
+Looks good to me. You can add:
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index 0c29b1d8d545..5c5ff3c34313 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -1426,15 +1426,18 @@ static inline void mmc_apply_rel_rw(struct mmc_blk_request *brq,
- 	}
- }
- 
--#define CMD_ERRORS							\
--	(R1_OUT_OF_RANGE |	/* Command argument out of range */	\
--	 R1_ADDRESS_ERROR |	/* Misaligned address */		\
-+#define CMD_ERRORS_EXCL_OOR						\
-+	(R1_ADDRESS_ERROR |	/* Misaligned address */		\
- 	 R1_BLOCK_LEN_ERROR |	/* Transferred block length incorrect */\
- 	 R1_WP_VIOLATION |	/* Tried to write to protected block */	\
- 	 R1_CARD_ECC_FAILED |	/* Card ECC failed */			\
- 	 R1_CC_ERROR |		/* Card controller error */		\
- 	 R1_ERROR)		/* General/unknown error */
- 
-+#define CMD_ERRORS							\
-+	(CMD_ERRORS_EXCL_OOR |						\
-+	 R1_OUT_OF_RANGE)	/* Command argument out of range */	\
-+
- static void mmc_blk_eval_resp_error(struct mmc_blk_request *brq)
- {
- 	u32 val;
-@@ -1951,6 +1954,95 @@ static void mmc_blk_ss_read(struct mmc_queue *mq, struct request *req)
- 	mqrq->retries = MMC_NO_RETRIES;
- }
- 
-+static inline bool mmc_blk_oor_valid(struct mmc_blk_request *brq)
-+{
-+	return !!brq->mrq.sbc;
-+}
-+
-+static inline u32 mmc_blk_stop_err_bits(struct mmc_blk_request *brq)
-+{
-+	return mmc_blk_oor_valid(brq) ? CMD_ERRORS : CMD_ERRORS_EXCL_OOR;
-+}
-+
-+static inline bool mmc_blk_in_tran_state(u32 status)
-+{
-+	/*
-+	 * Some cards mishandle the status bits, so make sure to check both the
-+	 * busy indication and the card state.
-+	 */
-+	return status & R1_READY_FOR_DATA &&
-+	       (R1_CURRENT_STATE(status) == R1_STATE_TRAN);
-+}
-+
-+static unsigned int mmc_blk_clock_khz(struct mmc_host *host)
-+{
-+	if (host->actual_clock)
-+		return host->actual_clock / 1000;
-+
-+	/* Clock may be subject to a divisor, fudge it by a factor of 2. */
-+	if (host->ios.clock)
-+		return host->ios.clock / 2000;
-+
-+	/* How can there be no clock */
-+	WARN_ON_ONCE(1);
-+	return 100; /* 100 kHz is minimum possible value */
-+}
-+
-+static unsigned long mmc_blk_data_timeout_jiffies(struct mmc_host *host,
-+						  struct mmc_data *data)
-+{
-+	unsigned int ms = DIV_ROUND_UP(data->timeout_ns, 1000000);
-+	unsigned int khz;
-+
-+	if (data->timeout_clks) {
-+		khz = mmc_blk_clock_khz(host);
-+		ms += DIV_ROUND_UP(data->timeout_clks, khz);
-+	}
-+
-+	return msecs_to_jiffies(ms);
-+}
-+
-+static int mmc_blk_card_stuck(struct mmc_card *card, struct request *req,
-+			      u32 *resp_errs)
-+{
-+	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
-+	struct mmc_data *data = &mqrq->brq.data;
-+	unsigned long timeout;
-+	u32 status;
-+	int err;
-+
-+	timeout = jiffies + mmc_blk_data_timeout_jiffies(card->host, data);
-+
-+	while (1) {
-+		bool done = time_after(jiffies, timeout);
-+
-+		err = __mmc_send_status(card, &status, 5);
-+		if (err) {
-+			pr_err("%s: error %d requesting status\n",
-+			       req->rq_disk->disk_name, err);
-+			break;
-+		}
-+
-+		/* Accumulate any response error bits seen */
-+		if (resp_errs)
-+			*resp_errs |= status;
-+
-+		if (mmc_blk_in_tran_state(status))
-+			break;
-+
-+		/* Timeout if the device never becomes ready */
-+		if (done) {
-+			pr_err("%s: Card stuck in wrong state! %s %s\n",
-+				mmc_hostname(card->host),
-+				req->rq_disk->disk_name, __func__);
-+			err = -ETIMEDOUT;
-+			break;
-+		}
-+	}
-+
-+	return err;
-+}
-+
- static void mmc_blk_rw_recovery(struct mmc_queue *mq, struct request *req)
- {
- 	int type = rq_data_dir(req) == READ ? MMC_BLK_READ : MMC_BLK_WRITE;
-@@ -2097,17 +2189,26 @@ static inline bool mmc_blk_rq_error(struct mmc_blk_request *brq)
- static int mmc_blk_card_busy(struct mmc_card *card, struct request *req)
- {
- 	struct mmc_queue_req *mqrq = req_to_mmc_queue_req(req);
--	bool gen_err = false;
-+	u32 status = 0;
- 	int err;
- 
- 	if (mmc_host_is_spi(card->host) || rq_data_dir(req) == READ)
- 		return 0;
- 
--	err = card_busy_detect(card, MMC_BLK_TIMEOUT_MS, false, req, &gen_err);
-+	err = mmc_blk_card_stuck(card, req, &status);
-+
-+	/*
-+	 * Do not assume data transferred correctly if there are any error bits
-+	 * set.
-+	 */
-+	if (!err && status & mmc_blk_stop_err_bits(&mqrq->brq)) {
-+		mqrq->brq.data.bytes_xfered = 0;
-+		err = -EIO;
-+	}
- 
--	/* Copy the general error bit so it will be seen later on */
--	if (gen_err)
--		mqrq->brq.stop.resp[0] |= R1_ERROR;
-+	/* Copy the exception bit so it will be seen later on */
-+	if (mmc_card_mmc(card) && status & R1_EXCEPTION_EVENT)
-+		mqrq->brq.cmd.resp[0] |= R1_EXCEPTION_EVENT;
- 
- 	return err;
- }
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
+> ---
+>  fs/super.c | 100 +++++++++++++++++++++++++++++++++----------------------------
+>  1 file changed, 55 insertions(+), 45 deletions(-)
+> 
+> diff --git a/fs/super.c b/fs/super.c
+> index d4e33e8f1e6f..a7650ff22f0e 100644
+> --- a/fs/super.c
+> +++ b/fs/super.c
+> @@ -1387,59 +1387,20 @@ static void sb_freeze_unlock(struct super_block *sb)
+>  		percpu_up_write(sb->s_writers.rw_sem + level);
+>  }
+>  
+> -/**
+> - * freeze_super - lock the filesystem and force it into a consistent state
+> - * @sb: the super to lock
+> - *
+> - * Syncs the super to make sure the filesystem is consistent and calls the fs's
+> - * freeze_fs.  Subsequent calls to this without first thawing the fs will return
+> - * -EBUSY.
+> - *
+> - * During this function, sb->s_writers.frozen goes through these values:
+> - *
+> - * SB_UNFROZEN: File system is normal, all writes progress as usual.
+> - *
+> - * SB_FREEZE_WRITE: The file system is in the process of being frozen.  New
+> - * writes should be blocked, though page faults are still allowed. We wait for
+> - * all writes to complete and then proceed to the next stage.
+> - *
+> - * SB_FREEZE_PAGEFAULT: Freezing continues. Now also page faults are blocked
+> - * but internal fs threads can still modify the filesystem (although they
+> - * should not dirty new pages or inodes), writeback can run etc. After waiting
+> - * for all running page faults we sync the filesystem which will clean all
+> - * dirty pages and inodes (no new dirty pages or inodes can be created when
+> - * sync is running).
+> - *
+> - * SB_FREEZE_FS: The file system is frozen. Now all internal sources of fs
+> - * modification are blocked (e.g. XFS preallocation truncation on inode
+> - * reclaim). This is usually implemented by blocking new transactions for
+> - * filesystems that have them and need this additional guard. After all
+> - * internal writers are finished we call ->freeze_fs() to finish filesystem
+> - * freezing. Then we transition to SB_FREEZE_COMPLETE state. This state is
+> - * mostly auxiliary for filesystems to verify they do not modify frozen fs.
+> - *
+> - * sb->s_writers.frozen is protected by sb->s_umount.
+> - */
+> -int freeze_super(struct super_block *sb)
+> +/* Caller takes lock and handles active count */
+> +static int freeze_locked_super(struct super_block *sb)
+>  {
+>  	int ret;
+>  
+> -	atomic_inc(&sb->s_active);
+> -	down_write(&sb->s_umount);
+> -	if (sb->s_writers.frozen != SB_UNFROZEN) {
+> -		deactivate_locked_super(sb);
+> +	if (sb->s_writers.frozen != SB_UNFROZEN)
+>  		return -EBUSY;
+> -	}
+>  
+> -	if (!(sb->s_flags & SB_BORN)) {
+> -		up_write(&sb->s_umount);
+> +	if (!(sb->s_flags & SB_BORN))
+>  		return 0;	/* sic - it's "nothing to do" */
+> -	}
+>  
+>  	if (sb_rdonly(sb)) {
+>  		/* Nothing to do really... */
+>  		sb->s_writers.frozen = SB_FREEZE_COMPLETE;
+> -		up_write(&sb->s_umount);
+>  		return 0;
+>  	}
+>  
+> @@ -1468,7 +1429,6 @@ int freeze_super(struct super_block *sb)
+>  			sb->s_writers.frozen = SB_UNFROZEN;
+>  			sb_freeze_unlock(sb);
+>  			wake_up(&sb->s_writers.wait_unfrozen);
+> -			deactivate_locked_super(sb);
+>  			return ret;
+>  		}
+>  	}
+> @@ -1478,9 +1438,59 @@ int freeze_super(struct super_block *sb)
+>  	 */
+>  	sb->s_writers.frozen = SB_FREEZE_COMPLETE;
+>  	lockdep_sb_freeze_release(sb);
+> -	up_write(&sb->s_umount);
+>  	return 0;
+>  }
+> +
+> +/**
+> + * freeze_super - lock the filesystem and force it into a consistent state
+> + * @sb: the super to lock
+> + *
+> + * Syncs the super to make sure the filesystem is consistent and calls the fs's
+> + * freeze_fs.  Subsequent calls to this without first thawing the fs will return
+> + * -EBUSY.
+> + *
+> + * During this function, sb->s_writers.frozen goes through these values:
+> + *
+> + * SB_UNFROZEN: File system is normal, all writes progress as usual.
+> + *
+> + * SB_FREEZE_WRITE: The file system is in the process of being frozen.  New
+> + * writes should be blocked, though page faults are still allowed. We wait for
+> + * all writes to complete and then proceed to the next stage.
+> + *
+> + * SB_FREEZE_PAGEFAULT: Freezing continues. Now also page faults are blocked
+> + * but internal fs threads can still modify the filesystem (although they
+> + * should not dirty new pages or inodes), writeback can run etc. After waiting
+> + * for all running page faults we sync the filesystem which will clean all
+> + * dirty pages and inodes (no new dirty pages or inodes can be created when
+> + * sync is running).
+> + *
+> + * SB_FREEZE_FS: The file system is frozen. Now all internal sources of fs
+> + * modification are blocked (e.g. XFS preallocation truncation on inode
+> + * reclaim). This is usually implemented by blocking new transactions for
+> + * filesystems that have them and need this additional guard. After all
+> + * internal writers are finished we call ->freeze_fs() to finish filesystem
+> + * freezing. Then we transition to SB_FREEZE_COMPLETE state. This state is
+> + * mostly auxiliary for filesystems to verify they do not modify frozen fs.
+> + *
+> + * sb->s_writers.frozen is protected by sb->s_umount.
+> + */
+> +int freeze_super(struct super_block *sb)
+> +{
+> +	int error;
+> +
+> +	atomic_inc(&sb->s_active);
+> +
+> +	down_write(&sb->s_umount);
+> +	error = freeze_locked_super(sb);
+> +	if (error) {
+> +		deactivate_locked_super(sb);
+> +		goto out;
+> +	}
+> +	up_write(&sb->s_umount);
+> +
+> +out:
+> +	return error;
+> +}
+>  EXPORT_SYMBOL(freeze_super);
+>  
+>  /**
+> -- 
+> 2.15.0
+> 
 -- 
-1.9.1
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
