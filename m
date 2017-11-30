@@ -1,57 +1,86 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.didichuxing.com ([111.202.154.82]:7825 "EHLO
-        BJEXCAS005.didichuxing.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S965224AbdJQP4c (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Oct 2017 11:56:32 -0400
-Date: Tue, 17 Oct 2017 23:56:21 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>
-CC: <jthumshirn@suse.de>, <linux-block@vger.kernel.org>
-Subject: [PATCH v4] blkcg: add sanity check for blkcg policy operations
-Message-ID: <20171017155621.GA38911@bogon.didichuxing.com>
+Received: from mx2.suse.de ([195.135.220.15]:43128 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750932AbdK3TFw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 Nov 2017 14:05:52 -0500
+Date: Thu, 30 Nov 2017 20:05:48 +0100
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+To: Jan Kara <jack@suse.cz>
+Cc: "Luis R. Rodriguez" <mcgrof@kernel.org>, viro@zeniv.linux.org.uk,
+        bart.vanassche@wdc.com, ming.lei@redhat.com, tytso@mit.edu,
+        darrick.wong@oracle.com, jikos@kernel.org, rjw@rjwysocki.net,
+        pavel@ucw.cz, len.brown@intel.com, linux-fsdevel@vger.kernel.org,
+        boris.ostrovsky@oracle.com, jgross@suse.com,
+        todd.e.brandt@linux.intel.com, nborisov@suse.com,
+        martin.petersen@oracle.com, ONeukum@suse.com,
+        oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
+        yu.chen.surf@gmail.com, dan.j.williams@intel.com,
+        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 03/11] fs: add frozen sb state helpers
+Message-ID: <20171130190548.GJ729@wotan.suse.de>
+References: <20171129232356.28296-1-mcgrof@kernel.org>
+ <20171129232356.28296-4-mcgrof@kernel.org>
+ <20171130171310.GG28180@quack2.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171130171310.GG28180@quack2.suse.cz>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-blkcg policy should keep cpd/pd's alloc_fn and free_fn in pairs,
-otherwise policy would register fail.
+On Thu, Nov 30, 2017 at 06:13:10PM +0100, Jan Kara wrote:
+> ... I dislike the _by_user() suffix as there may be different places that
+> call freeze_super() (e.g. device mapper does this during some operations).
+> Clearly we need to distinguish "by system suspend" and "the other" cases.
+> So please make this clear in the naming.
 
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
----
-Changes since V4:
- * merge "if(cpd->xxx)" and "if(pd->xxx)" together
+Ah. How about sb_frozen_by_cb() ?
 
-Changes since V3:
- * make if more cleaner by using !pold->cpd_alloc_fn ^ !pol->cpd_free_fn
+> In fact, what might be a cleaner solution is to introduce a 'freeze_count'
+> for superblock freezing (we already do have this for block devices). Then
+> you don't need to differentiate these two cases - but you'd still need to
+> properly handle cleanup if freezing of all superblocks fails in the middle.
+> So I'm not 100% this works out nicely in the end. But it's certainly worth
+> a consideration.
 
-Chagnes since V2:
- * merge blkcg_policy_check_ops into the caller blkcg_policy_register
+Ah, there are three important reasons for doing it the way I did it which are
+easy to miss, unless you read the commit log message very carefully.
 
-V1:
- * add blkcg_policy_check_ops to check cpd/pd's alloc_fn and free_fn in
- * pairs.
+0) The ioctl interface causes a failure to be sent back to userspace if
+you issue two consecutive freezes, or two thaws. Ie, once a filesystem is
+frozen, a secondary call will result in an error. Likewise for thaw.
 
- block/blk-cgroup.c | 5 +++++
- 1 file changed, 5 insertions(+)
+1) The new iterate supers stuff I added bail on the first error and return that
+error. If we kept the ioctl() interface error scheme we'd be erroring out
+if on suspend if userspace had already frozen a filesystem. Clearly that'd
+be silly so we need to distinguish between the automatic kernel freezing
+and the old userspace ioctl initiated interface, so that we can keep the
+old behaviour but allow in-kernel auto freeze on suspend to work properly.
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index e7ec676..4117524 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1419,6 +1419,11 @@ int blkcg_policy_register(struct blkcg_policy *pol)
- 	if (i >= BLKCG_MAX_POLS)
- 		goto err_unlock;
- 
-+	/* Make sure cpd/pd_alloc_fn and cpd/pd_free_fn in pairs */
-+	if ((!pol->cpd_alloc_fn ^ !pol->cpd_free_fn) ||
-+		(!pol->pd_alloc_fn ^ !pol->pd_free_fn))
-+		goto err_unlock;
-+
- 	/* register @pol */
- 	pol->plid = i;
- 	blkcg_policy[pol->plid] = pol;
--- 
-2.9.4
+2) If we fail to suspend we need to then thaw up all filesystems. The order
+in which we try to freeze is in reverse order on the super_block list. If we
+fail though we iterate in proper order on the super_block list and thaw. If
+you had two filesystems this means that if a failure happened on freezing
+the first filesystem, we'd first thaw the other filesystem -- and because of
+0) if we don't distinguish between the ioctl interface or auto freezing, we'd
+also fail on thaw'ing given the other superblock wouldn't have been frozen.
+
+So we need to keep two separate approaches. The count stuff would not suffice
+to distinguish origin of source for freeze call.
+
+Come to think of it, I think I forgot to avoid thaw if the freeze was ioctl
+initiated..
+
+thaw_unlocked(bool cb_call)
+{
+  if (sb_frozen_by_cb(sb) && !cb_call)
+    return 0; /* skip as the user wanted to keep this fs frozen */
+  ...
+}
+
+Even though the kernel auto call is new I think we need to keep ioctl initiated
+frozen filesystems frozen to not break old userspace assumptions.
+
+So, keeping all this in mind, does a count method still suffice?
+
+  Luis
