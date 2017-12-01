@@ -1,109 +1,70 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:53896 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752838AbdK2XYD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Nov 2017 18:24:03 -0500
-From: "Luis R. Rodriguez" <mcgrof@kernel.org>
-To: viro@zeniv.linux.org.uk, bart.vanassche@wdc.com,
-        ming.lei@redhat.com, tytso@mit.edu, darrick.wong@oracle.com,
-        jikos@kernel.org, rjw@rjwysocki.net, pavel@ucw.cz,
-        len.brown@intel.com, linux-fsdevel@vger.kernel.org
-Cc: boris.ostrovsky@oracle.com, jgross@suse.com,
-        todd.e.brandt@linux.intel.com, nborisov@suse.com, jack@suse.cz,
-        martin.petersen@oracle.com, ONeukum@suse.com,
-        oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
-        yu.chen.surf@gmail.com, dan.j.williams@intel.com,
-        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Luis R. Rodriguez" <mcgrof@kernel.org>
-Subject: [PATCH 02/11] fs: provide unlocked helper thaw_super()
-Date: Wed, 29 Nov 2017 15:23:47 -0800
-Message-Id: <20171129232356.28296-3-mcgrof@kernel.org>
-In-Reply-To: <20171129232356.28296-1-mcgrof@kernel.org>
-References: <20171129232356.28296-1-mcgrof@kernel.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 7/7] blk-mq: Fix another queue stall
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
+ Hannes Reinecke <hare@suse.de>, Johannes Thumshirn <jthumshirn@suse.de>
+References: <20171201000848.2656-1-bart.vanassche@wdc.com>
+ <20171201000848.2656-8-bart.vanassche@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <90810d8b-8f92-70c2-714b-164cb32e34d1@kernel.dk>
+Date: Thu, 30 Nov 2017 20:00:40 -0700
+MIME-Version: 1.0
+In-Reply-To: <20171201000848.2656-8-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-thaw_super() hold a write lock, however we wish to also enable
-callers which already hold the write lock. To do this provide a helper
-and make thaw_super() use it. This way, all that thaw_super() does
-now is lock handling and active count management.
+On 11/30/2017 05:08 PM, Bart Van Assche wrote:
+> The following code at the end of blk_mq_dispatch_rq_list() detects
+> whether or not wake_up(&hctx->dispatch_wait) has been called
+> concurrently with pushing back requests onto the dispatch list:
+> 
+>     list_empty_careful(&hctx->dispatch_wait.entry)
+> 
+> Since blk_mq_dispatch_wake() is protected by another lock than the
+> dispatch list and since blk_mq_run_hw_queue() does not acquire any
+> lock if it notices that no requests are pending,
+> blk_mq_dispatch_wake() is not ordered against the code that pushes
+> back requests onto the dispatch list. Avoid that the dispatch_wait
+> empty check fails due to load/store reordering by serializing it
+> against the dispatch_wait queue wakeup. This patch fixes a queue
+> stall I ran into while testing a SCSI initiator driver with the
+> maximum target depth set to one.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.de>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
+>  block/blk-mq.c | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index b4225f606737..a11767a4d95c 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1074,6 +1074,20 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx **hctx,
+>  	return ret;
+>  }
+>  
+> +static bool blk_mq_dispatch_list_empty(struct blk_mq_hw_ctx *hctx)
+> +{
+> +	struct sbq_wait_state *ws = bt_wait_ptr(&hctx->tags->bitmap_tags, hctx);
+> +	struct wait_queue_head *wq_head = &ws->wait;
+> +	unsigned long flags;
+> +	bool result;
+> +
+> +	spin_lock_irqsave(&wq_head->lock, flags);
+> +	result = list_empty(&hctx->dispatch_wait.entry);
+> +	spin_unlock_irqrestore(&wq_head->lock, flags);
+> +
+> +	return result;
+> +}
 
-This change has no functional changes.
+This can't fix anything, since you're still depending on the state
+outside the lock. You probably just changed the window slightly.
 
-Suggested-by: Dave Chinner <david@fromorbit.com>
-Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
----
- fs/super.c | 39 ++++++++++++++++++++++++++-------------
- 1 file changed, 26 insertions(+), 13 deletions(-)
-
-diff --git a/fs/super.c b/fs/super.c
-index a7650ff22f0e..cecc279beecd 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -1493,21 +1493,13 @@ int freeze_super(struct super_block *sb)
- }
- EXPORT_SYMBOL(freeze_super);
- 
--/**
-- * thaw_super -- unlock filesystem
-- * @sb: the super to thaw
-- *
-- * Unlocks the filesystem and marks it writeable again after freeze_super().
-- */
--int thaw_super(struct super_block *sb)
-+/* Caller takes lock and handles active count */
-+static int thaw_locked_super(struct super_block *sb)
- {
- 	int error;
- 
--	down_write(&sb->s_umount);
--	if (sb->s_writers.frozen != SB_FREEZE_COMPLETE) {
--		up_write(&sb->s_umount);
-+	if (sb->s_writers.frozen != SB_FREEZE_COMPLETE)
- 		return -EINVAL;
--	}
- 
- 	if (sb_rdonly(sb)) {
- 		sb->s_writers.frozen = SB_UNFROZEN;
-@@ -1522,7 +1514,6 @@ int thaw_super(struct super_block *sb)
- 			printk(KERN_ERR
- 				"VFS:Filesystem thaw failed\n");
- 			lockdep_sb_freeze_release(sb);
--			up_write(&sb->s_umount);
- 			return error;
- 		}
- 	}
-@@ -1531,7 +1522,29 @@ int thaw_super(struct super_block *sb)
- 	sb_freeze_unlock(sb);
- out:
- 	wake_up(&sb->s_writers.wait_unfrozen);
--	deactivate_locked_super(sb);
- 	return 0;
- }
-+
-+/**
-+ * thaw_super -- unlock filesystem
-+ * @sb: the super to thaw
-+ *
-+ * Unlocks the filesystem and marks it writeable again after freeze_super().
-+ */
-+int thaw_super(struct super_block *sb)
-+{
-+	int error;
-+
-+	down_write(&sb->s_umount);
-+	error = thaw_locked_super(sb);
-+	if (error) {
-+		up_write(&sb->s_umount);
-+		goto out;
-+	}
-+
-+	deactivate_locked_super(sb);
-+
-+out:
-+	return error;
-+}
- EXPORT_SYMBOL(thaw_super);
 -- 
-2.15.0
+Jens Axboe
