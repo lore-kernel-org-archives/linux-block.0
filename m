@@ -1,43 +1,45 @@
-Return-Path: <zhangweiping@didichuxing.com>
-Date: Thu, 23 Nov 2017 21:39:40 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>
-Subject: [PATCH 3/5] blk-sysfs: remove NULL pointer checking in
- queue_wb_lat_store
-Message-ID: <fc9f69cd121692fc490e7ed53467791486195bbf.1511444141.git.zhangweiping@didichuxing.com>
-References: <cover.1511444141.git.zhangweiping@didichuxing.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <cover.1511444141.git.zhangweiping@didichuxing.com>
-Return-Path: zhangweiping@didichuxing.com
+Return-Path: <prvs=5014e5409=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Omar Sandoval <osandov@fb.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 1/7] blk-mq: Fix spelling in a source code comment
+Date: Thu, 30 Nov 2017 16:08:42 -0800
+Message-Id: <20171201000848.2656-2-bart.vanassche@wdc.com>
+In-Reply-To: <20171201000848.2656-1-bart.vanassche@wdc.com>
+References: <20171201000848.2656-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-wbt_init doesn't set q->rq_wb to NULL, if wbt_init return 0,
-so check return value is enough, remove NULL checking.
+Change "nedeing" into "needing" and "caes" into "cases".
 
-Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+Fixes: commit f906a6a0f426 ("blk-mq: improve tag waiting setup for non-shared tags")
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- block/blk-sysfs.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ block/blk-mq.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index b8362c0..9b1093a 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -449,12 +449,9 @@ static ssize_t queue_wb_lat_store(struct request_queue *q, const char *page,
- 		ret = wbt_init(q);
- 		if (ret)
- 			return ret;
--
--		rwb = q->rq_wb;
--		if (!rwb)
--			return -EINVAL;
- 	}
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index aa165abf08f0..e1ca7661daa5 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1014,8 +1014,8 @@ static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
  
-+	rwb = q->rq_wb;
- 	if (val == -1)
- 		rwb->min_lat_nsec = wbt_default_latency_nsec(q);
- 	else if (val >= 0)
+ /*
+  * Mark us waiting for a tag. For shared tags, this involves hooking us into
+- * the tag wakeups. For non-shared tags, we can simply mark us nedeing a
+- * restart. For both caes, take care to check the condition again after
++ * the tag wakeups. For non-shared tags, we can simply mark us needing a
++ * restart. For both cases, take care to check the condition again after
+  * marking us as waiting.
+  */
+ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx **hctx,
 -- 
-2.9.4
+2.15.0
