@@ -1,126 +1,48 @@
-Return-Path: <prvs=5218034d2=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V9 4/7] deadline-iosched: Introduce dispatch helpers
-Date: Thu, 21 Dec 2017 15:43:41 +0900
-Message-Id: <20171221064344.6228-5-damien.lemoal@wdc.com>
-In-Reply-To: <20171221064344.6228-1-damien.lemoal@wdc.com>
-References: <20171221064344.6228-1-damien.lemoal@wdc.com>
+Return-Path: <prvs=5014e5409=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "hare@suse.de" <hare@suse.de>,
+	"jthumshirn@suse.de" <jthumshirn@suse.de>
+Subject: Re: [PATCH 2/7] block: Document more locking requirements
+Date: Fri, 1 Dec 2017 17:05:28 +0000
+Message-ID: <1512147926.2520.11.camel@wdc.com>
+References: <20171201000848.2656-1-bart.vanassche@wdc.com>
+	 <20171201000848.2656-3-bart.vanassche@wdc.com>
+	 <a057d4ab-ddfd-9461-4086-e6f9ec83bb07@kernel.dk>
+In-Reply-To: <a057d4ab-ddfd-9461-4086-e6f9ec83bb07@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Avoid directly referencing the next_rq and fifo_list arrays using the
-helper functions deadline_next_request() and deadline_fifo_request() to
-facilitate changes in the dispatch request selection in
-deadline_dispatch_requests() for zoned block devices.
-
-While at it, also remove the unnecessary forward declaration of the
-function deadline_move_request().
-
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
----
- block/deadline-iosched.c | 47 +++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 37 insertions(+), 10 deletions(-)
-
-diff --git a/block/deadline-iosched.c b/block/deadline-iosched.c
-index b83f77460d28..81e3f0897457 100644
---- a/block/deadline-iosched.c
-+++ b/block/deadline-iosched.c
-@@ -50,8 +50,6 @@ struct deadline_data {
- 	int front_merges;
- };
- 
--static void deadline_move_request(struct deadline_data *, struct request *);
--
- static inline struct rb_root *
- deadline_rb_root(struct deadline_data *dd, struct request *rq)
- {
-@@ -230,6 +228,35 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
- 	return 0;
- }
- 
-+/*
-+ * For the specified data direction, return the next request to dispatch using
-+ * arrival ordered lists.
-+ */
-+static struct request *
-+deadline_fifo_request(struct deadline_data *dd, int data_dir)
-+{
-+	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
-+		return NULL;
-+
-+	if (list_empty(&dd->fifo_list[data_dir]))
-+		return NULL;
-+
-+	return rq_entry_fifo(dd->fifo_list[data_dir].next);
-+}
-+
-+/*
-+ * For the specified data direction, return the next request to dispatch using
-+ * sector position sorted lists.
-+ */
-+static struct request *
-+deadline_next_request(struct deadline_data *dd, int data_dir)
-+{
-+	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
-+		return NULL;
-+
-+	return dd->next_rq[data_dir];
-+}
-+
- /*
-  * deadline_dispatch_requests selects the best request according to
-  * read/write expire, fifo_batch, etc
-@@ -239,16 +266,15 @@ static int deadline_dispatch_requests(struct request_queue *q, int force)
- 	struct deadline_data *dd = q->elevator->elevator_data;
- 	const int reads = !list_empty(&dd->fifo_list[READ]);
- 	const int writes = !list_empty(&dd->fifo_list[WRITE]);
--	struct request *rq;
-+	struct request *rq, *next_rq;
- 	int data_dir;
- 
- 	/*
- 	 * batches are currently reads XOR writes
- 	 */
--	if (dd->next_rq[WRITE])
--		rq = dd->next_rq[WRITE];
--	else
--		rq = dd->next_rq[READ];
-+	rq = deadline_next_request(dd, WRITE);
-+	if (!rq)
-+		rq = deadline_next_request(dd, READ);
- 
- 	if (rq && dd->batching < dd->fifo_batch)
- 		/* we have a next request are still entitled to batch */
-@@ -291,19 +317,20 @@ static int deadline_dispatch_requests(struct request_queue *q, int force)
- 	/*
- 	 * we are not running a batch, find best request for selected data_dir
- 	 */
--	if (deadline_check_fifo(dd, data_dir) || !dd->next_rq[data_dir]) {
-+	next_rq = deadline_next_request(dd, data_dir);
-+	if (deadline_check_fifo(dd, data_dir) || !next_rq) {
- 		/*
- 		 * A deadline has expired, the last request was in the other
- 		 * direction, or we have run out of higher-sectored requests.
- 		 * Start again from the request with the earliest expiry time.
- 		 */
--		rq = rq_entry_fifo(dd->fifo_list[data_dir].next);
-+		rq = deadline_fifo_request(dd, data_dir);
- 	} else {
- 		/*
- 		 * The last req was the same dir and we have a next request in
- 		 * sort order. No expired requests so continue on from here.
- 		 */
--		rq = dd->next_rq[data_dir];
-+		rq = next_rq;
- 	}
- 
- 	dd->batching = 0;
--- 
-2.14.3
+T24gVGh1LCAyMDE3LTExLTMwIGF0IDIwOjAzIC0wNzAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
+biAxMS8zMC8yMDE3IDA1OjA4IFBNLCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6DQo+ID4gVGhpcyBw
+YXRjaCBkb2VzIG5vdCBjaGFuZ2UgYW55IGZ1bmN0aW9uYWxpdHkuDQo+IA0KPiBVbmxlc3MgdGhl
+c2UgYWN0dWFsbHkgZm91bmQgcmVhbCBidWdzLCBJIHRoaW5rIGl0J3MgcG9pbnRsZXNzLg0KPiBB
+ZGQgYSBjb21tZW50Lg0KIA0KSGVsbG8gSmVucywNCg0KQXMgeW91IGtub3cgbG9ja2RlcF9hc3Nl
+cnRfaGVsZCgpIHN0YXRlbWVudHMgYXJlIHZlcmlmaWVkIGF0IHJ1bnRpbWUgd2l0aA0KTE9DS0RF
+UCBlbmFibGVkIGJ1dCBjb21tZW50cyBub3QuIEhlbmNlIG15IHByZWZlcmVuY2UgZm9yIGxvY2tk
+ZXBfYXNzZXJ0X2hlbGQoKQ0Kb3ZlciBzb3VyY2UgY29kZSBjb21tZW50cy4NCg0KPiBBbmQgdGhp
+czoNCj4NCj4gPiBAQCAtMTAwMyw5ICsxMDA3LDE0IEBAIGJvb2wgYmxrX21xX2dldF9kcml2ZXJf
+dGFnKHN0cnVjdCByZXF1ZXN0ICpycSwgc3RydWN0IGJsa19tcV9od19jdHggKipoY3R4LA0KPiA+
+ICBzdGF0aWMgaW50IGJsa19tcV9kaXNwYXRjaF93YWtlKHdhaXRfcXVldWVfZW50cnlfdCAqd2Fp
+dCwgdW5zaWduZWQgbW9kZSwNCj4gPiAgCQkJCWludCBmbGFncywgdm9pZCAqa2V5KQ0KPiA+ICB7
+DQo+ID4gLQlzdHJ1Y3QgYmxrX21xX2h3X2N0eCAqaGN0eDsNCj4gPiArCXN0cnVjdCBibGtfbXFf
+aHdfY3R4ICpoY3R4ID0NCj4gPiArCQljb250YWluZXJfb2Yod2FpdCwgc3RydWN0IGJsa19tcV9o
+d19jdHgsIGRpc3BhdGNoX3dhaXQpOw0KPiA+ICsNCj4gPiArI2lmZGVmIENPTkZJR19MT0NLREVQ
+DQo+ID4gKwlzdHJ1Y3Qgc2JxX3dhaXRfc3RhdGUgKndzID0gYnRfd2FpdF9wdHIoJmhjdHgtPnRh
+Z3MtPmJpdG1hcF90YWdzLCBoY3R4KTsNCj4gPiAgDQo+ID4gLQloY3R4ID0gY29udGFpbmVyX29m
+KHdhaXQsIHN0cnVjdCBibGtfbXFfaHdfY3R4LCBkaXNwYXRjaF93YWl0KTsNCj4gPiArCWxvY2tk
+ZXBfYXNzZXJ0X2hlbGQoJndzLT53YWl0LmxvY2spOw0KPiA+ICsjZW5kaWYNCj4gDQo+IHdlJ3Jl
+IGRlZmluaXRlbHkgbm90IGRvaW5nLg0KDQpDYW4geW91IGV4cGxhaW4gbWUgd2h5IHlvdSB0aGlu
+ayB0aGUgYWJvdmUgaXMgd3Jvbmc/IE15IHVuZGVyc3RhbmRpbmcgaXMNCnRoYXQgdGhlIGNhbGwg
+Y2hhaW4gZm9yIHRoZSBhYm92ZSBmdW5jdGlvbiBpcyBhcyBmb2xsb3dzOg0KDQpibGtfbXFfdGFn
+X3dha2V1cF9hbGwoKQ0KLT4gc2JpdG1hcF9xdWV1ZV93YWtlX2FsbCgpDQogIC0+IHdha2VfdXAo
+KQ0KICAgIC0+IF9fd2FrZV91cCgpDQogICAgICAtPiBfX3dha2VfdXBfY29tbW9uX2xvY2soKQ0K
+ICAgICAgICAtPiBzcGluX2xvY2tfaXJxc2F2ZSgmd3FfaGVhZC0+bG9jaywgZmxhZ3MpOw0KICAg
+ICAgICAtPiBfX3dha2VfdXBfY29tbW9uKCkNCiAgICAgICAgICAtPiBsaXN0X2Zvcl9lYWNoX2Vu
+dHJ5X3NhZmVfZnJvbShjdXJyLCBuZXh0LCAmd3FfaGVhZC0+aGVhZCwgZW50cnkpDQogICAgICAg
+ICAgLT4gICByZXQgPSBjdXJyLT5mdW5jKGN1cnIsIG1vZGUsIHdha2VfZmxhZ3MsIGtleSkNCiAg
+ICAgICAgLT4gc3Bpbl91bmxvY2tfaXJxcmVzdG9yZSgmd3FfaGVhZC0+bG9jaywgZmxhZ3MpOw0K
+DQpJbiBvdGhlciB3b3JkcywgYmxrX21xX2Rpc3BhdGNoX3dha2UoKSBpcyBjYWxsZWQgd2l0aCB0
+aGUgd2FpdCBxdWV1ZSBoZWFkDQpsb2NrIGhlbGQuDQoNCkJhcnQu
