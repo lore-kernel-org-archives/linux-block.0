@@ -1,100 +1,120 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:13823 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751731AbdKUNnm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Nov 2017 08:43:42 -0500
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V14 06/24] mmc: block: Simplify cleaning up the queue
-Date: Tue, 21 Nov 2017 15:42:32 +0200
-Message-Id: <1511271770-3444-7-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
-References: <1511271770-3444-1-git-send-email-adrian.hunter@intel.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Fri, 1 Dec 2017 01:44:44 +0100
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+To: Pavel Machek <pavel@ucw.cz>
+Cc: "Luis R. Rodriguez" <mcgrof@kernel.org>, viro@zeniv.linux.org.uk,
+        bart.vanassche@wdc.com, ming.lei@redhat.com, tytso@mit.edu,
+        darrick.wong@oracle.com, jikos@kernel.org, rjw@rjwysocki.net,
+        len.brown@intel.com, linux-fsdevel@vger.kernel.org,
+        boris.ostrovsky@oracle.com, jgross@suse.com,
+        todd.e.brandt@linux.intel.com, nborisov@suse.com, jack@suse.cz,
+        martin.petersen@oracle.com, ONeukum@suse.com,
+        oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
+        yu.chen.surf@gmail.com, dan.j.williams@intel.com,
+        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 00/11] fs: use freeze_fs on suspend/hibernate
+Message-ID: <20171201004444.GP729@wotan.suse.de>
+References: <20171129232356.28296-1-mcgrof@kernel.org>
+ <20171130215157.GB2808@amd>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171130215157.GB2808@amd>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Use blk_cleanup_queue() to shutdown the queue when the driver is removed,
-and instead get an extra reference to the queue to prevent the queue being
-freed before the final mmc_blk_put().
+On Thu, Nov 30, 2017 at 10:51:57PM +0100, Pavel Machek wrote:
+> Hi!
+> 
+> > Proposed solution:
+> > 
+> > Instead of fixing such semantics and trying to get all filesystems to do it
+> > right, we can easily do away with all freezing calls if the filesystem
+> > implements a proper freeze_fs() callback. The following 9 filesystems have
+> > freeze_fs() implemented as such we can let the kernel issue the callback upon
+> > suspend and thaw on resume automatically on our behalf.
+> > 
+> >   o xfs
+> >   o reiserfs
+> >   o nilfs2
+> >   o jfs
+> >   o f2fs
+> >   o ext4
+> >   o ext2
+> >   o btrfs
+> > 
+> > Of these, the following have freezer helpers, which can then be removed
+> > after the kernel automaticaly calls freeze_fs for us on suspend:
+> > 
+> >   o xfs
+> >   o nilfs2
+> >   o jfs
+> >   o f2fs
+> >   o ext4
+> > 
+> > I've tested this on a system with ext4 and XFS, and have let 0-day go at
+> > without issues. I have branches availabe for linux-next [3] and Linus'
+> > latest tree [4].
+> 
+> Was hibernation tested? uswsusp?
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/core/block.c | 17 ++++++++++++-----
- drivers/mmc/core/queue.c |  2 ++
- 2 files changed, 14 insertions(+), 5 deletions(-)
+I had not done a test before but I just did and it worked, in fact I was able
+to keep my ssh connection to my qemu guest after resume from hibernation with
+this.
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index ccfa98af1dd3..e44f6d90aeb4 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -189,7 +189,7 @@ static void mmc_blk_put(struct mmc_blk_data *md)
- 	md->usage--;
- 	if (md->usage == 0) {
- 		int devidx = mmc_get_devidx(md->disk);
--		blk_cleanup_queue(md->queue.queue);
-+		blk_put_queue(md->queue.queue);
- 		ida_simple_remove(&mmc_blk_ida, devidx);
- 		put_disk(md->disk);
- 		kfree(md);
-@@ -2156,6 +2156,17 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
- 
- 	md->queue.blkdata = md;
- 
-+	/*
-+	 * Keep an extra reference to the queue so that we can shutdown the
-+	 * queue (i.e. call blk_cleanup_queue()) while there are still
-+	 * references to the 'md'. The corresponding blk_put_queue() is in
-+	 * mmc_blk_put().
-+	 */
-+	if (!blk_get_queue(md->queue.queue)) {
-+		mmc_cleanup_queue(&md->queue);
-+		goto err_putdisk;
-+	}
-+
- 	md->disk->major	= MMC_BLOCK_MAJOR;
- 	md->disk->first_minor = devidx * perdev_minors;
- 	md->disk->fops = &mmc_bdops;
-@@ -2471,10 +2482,6 @@ static void mmc_blk_remove_req(struct mmc_blk_data *md)
- 		 * from being accepted.
- 		 */
- 		card = md->queue.card;
--		spin_lock_irq(md->queue.queue->queue_lock);
--		queue_flag_set(QUEUE_FLAG_BYPASS, md->queue.queue);
--		spin_unlock_irq(md->queue.queue->queue_lock);
--		blk_set_queue_dying(md->queue.queue);
- 		mmc_cleanup_queue(&md->queue);
- 		if (md->disk->flags & GENHD_FL_UP) {
- 			device_remove_file(disk_to_dev(md->disk), &md->force_ro);
-diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-index 26f8da30ebe5..ae6d9da68735 100644
---- a/drivers/mmc/core/queue.c
-+++ b/drivers/mmc/core/queue.c
-@@ -268,6 +268,8 @@ void mmc_cleanup_queue(struct mmc_queue *mq)
- 	blk_start_queue(q);
- 	spin_unlock_irqrestore(q->queue_lock, flags);
- 
-+	blk_cleanup_queue(q);
-+
- 	mq->card = NULL;
- }
- 
--- 
-1.9.1
+root@piggy:~# echo shutdown > /sys/power/disk; echo disk > /sys/power/state
+
+[   87.930446] PM: hibernation entry
+[   87.936294] firmware_class: device_cache_fw_images
+[   87.936363] PM: Syncing filesystems ... 
+[   87.979960] PM: done.
+[   87.980594] Freezing user space processes ... (elapsed 0.001 seconds) done.
+[   87.983839] Freezing filesystems ... 
+[   87.983844] xfs (sdb1): freezing
+[   88.013313] ext4 (sda1): freezing
+[   88.057635] done.
+[   88.058242] OOM killer disabled.
+...
+[   88.145364] Freezing remaining freezable tasks ... (elapsed 0.001 seconds) done.
+[   88.221583] Disabling non-boot CPUs ...
+[   88.241231] Unregister pv shared memory for cpu 1
+[   88.244139] smpboot: CPU 1 is now offline
+[   88.273290] Unregister pv shared memory for cpu 2
+[   88.276170] smpboot: CPU 2 is now offline
+[   88.297296] Unregister pv shared memory for cpu 3
+[   88.299991] smpboot: CPU 3 is now offline
+[   88.302665] PM: Creating hibernation image:
+[   88.305633] PM: Need to copy 107866 pages
+[   88.305633] PM: Normal pages needed: 107866 + 1024, available pages: 940488
+...
+
+At this point my qemu session ends. I start it up again.
+
+   88.305633] Enabling non-boot CPUs ...
+[   88.305633] x86: Booting SMP configuration:
+[   88.305633] smpboot: Booting Node 0 Processor 1 APIC 0x1
+[   88.244097] kvm-clock: cpu 1, msr 1:3ffef041, secondary cpu clock
+[   88.334899] KVM setup async PF for cpu 1
+[   88.335174] kvm-stealtime: cpu 1, msr 13fc8d9c0
+...
+[   88.424852] sd 0:0:0:0: [sda] Starting disk
+[   88.424893] sd 0:0:1:0: [sdb] Starting disk
+[   88.424928] sd 1:0:0:0: [sdc] Starting disk
+[   88.473888] PM: Basic memory bitmaps freed
+[   88.473890] OOM killer enabled.
+[   88.474876] ext4 (sda1): thawing
+[   88.585233] ata2.01: NODEV after polling detection
+[   88.587805] ata2.00: configured for MWDMA2
+[   88.589436] ata1.00: configured for MWDMA2
+[   88.592421] ata1.01: configured for MWDMA2
+[   88.601141] xfs (sdb1): thawing
+[   88.602430] Restarting tasks ... done.
+[   88.611055] PM: hibernation exit
+[   90.492926] e1000: ens3 NIC Link is Up 1000 Mbps Full Duplex, Flow Control: RX
+[   98.780159] firmware_class: device_uncache_fw_images
+
+And ssh is working after this, without requiring to initiate another connection.
+
+Let me know if you'd like me to test something else.
+
+  Luis
