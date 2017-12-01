@@ -1,20 +1,11 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-it0-f41.google.com ([209.85.214.41]:43083 "EHLO
-        mail-it0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752900AbdLEKKg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Dec 2017 05:10:36 -0500
-Received: by mail-it0-f41.google.com with SMTP id u62so249620ita.2
-        for <linux-block@vger.kernel.org>; Tue, 05 Dec 2017 02:10:35 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <CAPDyKFrgC91Z3P-5U22gjKDqs_aZiQncGUrShWpFggkWzrRMjw@mail.gmail.com>
-References: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com> <CAPDyKFrgC91Z3P-5U22gjKDqs_aZiQncGUrShWpFggkWzrRMjw@mail.gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 5 Dec 2017 11:10:34 +0100
-Message-ID: <CACRpkda-hgDdTi6rEu3cL41QDzXGxBkY1x6CXJE8kUbLAR-uQQ@mail.gmail.com>
+Received: from mga09.intel.com ([134.134.136.24]:17906 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752745AbdLANOK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 1 Dec 2017 08:14:10 -0500
 Subject: Re: [PATCH V15 00/22] mmc: Add Command Queue support
 To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: Adrian Hunter <adrian.hunter@intel.com>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
+Cc: linux-mmc <linux-mmc@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
         linux-kernel <linux-kernel@vger.kernel.org>,
         Bough Chen <haibo.chen@nxp.com>,
@@ -28,38 +19,46 @@ Cc: Adrian Hunter <adrian.hunter@intel.com>,
         Sahitya Tummala <stummala@codeaurora.org>,
         Harjani Ritesh <riteshh@codeaurora.org>,
         Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
         Shawn Lin <shawn.lin@rock-chips.com>,
         Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
         Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+References: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
+ <CAPDyKFrgC91Z3P-5U22gjKDqs_aZiQncGUrShWpFggkWzrRMjw@mail.gmail.com>
+From: Adrian Hunter <adrian.hunter@intel.com>
+Message-ID: <d35cff56-0923-cd9e-72ac-087819d4fed6@intel.com>
+Date: Fri, 1 Dec 2017 15:13:46 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAPDyKFrgC91Z3P-5U22gjKDqs_aZiQncGUrShWpFggkWzrRMjw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, Nov 29, 2017 at 4:47 PM, Ulf Hansson <ulf.hansson@linaro.org> wrote:
-
+On 29/11/17 17:47, Ulf Hansson wrote:
+> Hi Adrian,
+> 
+> On 29 November 2017 at 14:40, Adrian Hunter <adrian.hunter@intel.com> wrote:
+>> Hi
+>>
+>> Here is V15 of the hardware command queue patches without the software
+>> command queue patches, now using blk-mq and now with blk-mq support for
+>> non-CQE I/O.
+> 
 > I have applied patches 1->19 for next.  Deferring patch 21->23 for a while.
->
+
+Thank you!
+
+> 
 > For those patches that was more or less the same as in v14, I added Linus' ack.
-
-My ACK goes for the new set as well.
-
+> 
 > Hopefully we get some help for the community to test this series on
 > different HW (and I will be checking kernelci's boot reports). I
 > haven't added Bartlomiej's tested-by and neither Linus' (because of
 > the changes that has been made), so I hoping that will happen sooner
 > or later.
+> 
+> Moreover, I will gladly add more peoples acks/reviewed-by and
+> tested-by tags, at any point during this release cycle.
 
-I have run some tests yesterday and today using dd, find and
-iozone, vanilla and with fault injection of 1% errors and 10%
-errors, then stressing it additionally by ejecting the card
-in flight randomly a few times. Everything survived, it's rock solid
-from what I can tell!
-
-Tested-by: Linus Walleij <linus.walleij@linaro.org>
-
-I am eager to see 21->23 applied too so I can see the end result
-and figure out if there is anything left in my patches that need
-to be catered for or if I can just focus on other stuff.
-
-Yours,
-Linus Walleij
+I also encourage anyone testing to report their results even if they don't
+want to have a tested-by tag.
