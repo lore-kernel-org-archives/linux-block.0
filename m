@@ -1,125 +1,77 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from cloudserver094114.home.net.pl ([79.96.170.134]:63335 "EHLO
-        cloudserver094114.home.net.pl" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1750749AbdLMBKc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Dec 2017 20:10:32 -0500
-From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-To: "Luis R. Rodriguez" <mcgrof@kernel.org>
-Cc: viro@zeniv.linux.org.uk, bart.vanassche@wdc.com,
-        ming.lei@redhat.com, tytso@mit.edu, darrick.wong@oracle.com,
-        jikos@kernel.org, pavel@ucw.cz, len.brown@intel.com,
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Sat, 2 Dec 2017 08:51:11 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: Jeff Layton <jlayton@redhat.com>
+Cc: Jiri Kosina <jikos@kernel.org>, Yu Chen <yu.chen.surf@gmail.com>,
+        "Luis R. Rodriguez" <mcgrof@kernel.org>, viro@zeniv.linux.org.uk,
+        bart.vanassche@wdc.com, ming.lei@redhat.com, tytso@mit.edu,
+        darrick.wong@oracle.com, "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
         linux-fsdevel@vger.kernel.org, boris.ostrovsky@oracle.com,
         jgross@suse.com, todd.e.brandt@linux.intel.com, nborisov@suse.com,
         jack@suse.cz, martin.petersen@oracle.com, ONeukum@suse.com,
         oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
-        yu.chen.surf@gmail.com, dan.j.williams@intel.com,
-        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
+        Dan Williams <dan.j.williams@intel.com>,
+        Linux PM list <linux-pm@vger.kernel.org>,
+        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Zhang Rui <rui.zhang@intel.com>
 Subject: Re: [PATCH 00/11] fs: use freeze_fs on suspend/hibernate
-Date: Wed, 13 Dec 2017 02:09:49 +0100
-Message-ID: <7282138.2afjHhBgNp@aspire.rjw.lan>
-In-Reply-To: <20171129232356.28296-1-mcgrof@kernel.org>
+Message-ID: <20171201215111.GQ5858@dastard>
 References: <20171129232356.28296-1-mcgrof@kernel.org>
+ <CADjb_WRG8hxJB3zY5_XnZqeQbCy3jYW5xJaS63_7FGztZymLzg@mail.gmail.com>
+ <nycvar.YFH.7.76.1711301740000.11505@cbobk.fhfr.pm>
+ <1512155144.4322.13.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1512155144.4322.13.camel@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Thursday, November 30, 2017 12:23:45 AM CET Luis R. Rodriguez wrote:
-> This is a followup from the original RFC which proposed to start
-> to kill kthread freezing all together [0]. Instead of going straight
-> out to the jugular for kthread freezing this series only addresses
-> killing freezer calls on filesystems which implement freeze_fs, after
-> we let the kernel freeze these filesystems for us on suspend.
+On Fri, Dec 01, 2017 at 02:05:44PM -0500, Jeff Layton wrote:
+> On Thu, 2017-11-30 at 17:41 +0100, Jiri Kosina wrote:
+> > On Fri, 1 Dec 2017, Yu Chen wrote:
+> > 
+> > > BTW, is nfs able to be included in this set? I also encountered a 
+> > > freeze() failure due to nfs access during that stage recently.
+> > 
+> > The freezer usage in NFS is magnitudes more complicated, so it makes sense 
+> > to first go after the lower hanging fruit to figure out the viability of 
+> > the whole aproach in practice.
+> > 
 > 
-> This approach puts on a slow but steady path towards the original goal
-> though. Each subsystem could look for similar solutions. Even with
-> filesystems we're not all done yet, after this we'll still have to
-> decide what to do about filesystems which do not implement freeze_fs().
+> Agreed that we should do this in stages. It doesn't help that freezer
+> handling in the client is a bit of a mess at this point...
 > 
-> Motivation and problem:
+> At a high level for NFS, I think we need to have freeze_fs make the RPC
+> engine "park" newly issued RPCs for that fs' client onto a
+> rpc_wait_queue. Any RPC that has already been sent however, we need to
+> wait for a reply.
 > 
-> kthreads have some semantics for freezing, which helps the kernel
-> freeze them when a system is going to suspend or hibernation. These
-> semantics are not well defined though, and it actually turns out
-> pretty hard to get it right.
-> 
-> Without a proper solution suspend and hibernation are fragile on filesystems,
-> it can easily break suspend and fixing such issues are in no way trivial [1]
-> [2].
-> 
-> Proposed solution:
-> 
-> Instead of fixing such semantics and trying to get all filesystems to do it
-> right, we can easily do away with all freezing calls if the filesystem
-> implements a proper freeze_fs() callback. The following 9 filesystems have
-> freeze_fs() implemented as such we can let the kernel issue the callback upon
-> suspend and thaw on resume automatically on our behalf.
-> 
->   o xfs
->   o reiserfs
->   o nilfs2
->   o jfs
->   o f2fs
->   o ext4
->   o ext2
->   o btrfs
-> 
-> Of these, the following have freezer helpers, which can then be removed
-> after the kernel automaticaly calls freeze_fs for us on suspend:
-> 
->   o xfs
->   o nilfs2
->   o jfs
->   o f2fs
->   o ext4
-> 
-> I've tested this on a system with ext4 and XFS, and have let 0-day go at
-> without issues. I have branches availabe for linux-next [3] and Linus'
-> latest tree [4].
-> 
-> Further testing, thoughts, reviews, flames are all equally appreciated.
-> 
-> [0] https://lkml.kernel.org/r/20171003185313.1017-1-mcgrof@kernel.org
-> [1] https://bugzilla.suse.com/show_bug.cgi?id=1043449
-> [2] https://lkml.kernel.org/r/20171113103139.GA18936@yu-chen.sh.intel.com
-> [3] https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20171129-fs-freeze-cleanup
-> [4] https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux.git/log/?h=20171129-fs-freeze-cleanup
-> 
-> Luis R. Rodriguez (11):
->   fs: provide unlocked helper for freeze_super()
->   fs: provide unlocked helper thaw_super()
->   fs: add frozen sb state helpers
->   fs: distinguish between user initiated freeze and kernel initiated
->     freeze
->   fs: add iterate_supers_excl() and iterate_supers_reverse_excl()
->   fs: freeze on suspend and thaw on resume
->   xfs: remove not needed freezing calls
->   ext4: remove not needed freezing calls
->   f2fs: remove not needed freezing calls
->   nilfs2: remove not needed freezing calls
->   jfs: remove not needed freezing calls
-> 
->  fs/ext4/ext4_jbd2.c    |   2 +-
->  fs/ext4/super.c        |   2 -
->  fs/f2fs/gc.c           |   5 +-
->  fs/f2fs/segment.c      |   6 +-
->  fs/jfs/jfs_logmgr.c    |  11 +-
->  fs/jfs/jfs_txnmgr.c    |  31 ++---
->  fs/nilfs2/segment.c    |  48 ++++----
->  fs/super.c             | 320 ++++++++++++++++++++++++++++++++++++++++---------
->  fs/xfs/xfs_trans.c     |   2 +-
->  fs/xfs/xfs_trans_ail.c |   7 +-
->  include/linux/fs.h     |  63 +++++++++-
->  kernel/power/process.c |  15 ++-
->  12 files changed, 378 insertions(+), 134 deletions(-)
-> 
+> Once everything is quiesced we can return and call it frozen.
+> unfreeze_fs can then just have the engine stop parking RPCs and wake up
+> the waitq.
 
-I'm assuming an update of this to be posted due to the comments from Jan
-on patch [3/11] and patch [7/11] probably.
+That seems pretty reasonable. freezing is expected to take a bit of
+time to run - local filesystems can do a fair bit of IO draining
+queues, inflight operations and bringing the journal into a
+consistent state on disk before declaring the filesystem is frozen.
 
-Is there anything else that needs to be addressed?
+> That should be enough to make suspend and resume work more reliably. If,
+> however, you're interested in making the cgroup freezer also work, then
+> we may need to do a bit more work to ensure that we don't end up with
+> frozen tasks squatting on VFS locks.
 
-Thanks,
-Rafael
+None of the existing freezing code gives those guarantees. In fact,
+freezing a filesystem pretty much guarantees the opposite - that
+tasks *will freeze when holding VFS locks* - and so the cgroup
+freezer is broken by design if it requires tasks to be frozen
+without holding any VFS/filesystem lock context. So I wouldn't
+really worry about the cgroup freezer....
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
