@@ -1,268 +1,93 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:26989 "EHLO mga14.intel.com"
+Received: from mx1.redhat.com ([209.132.183.28]:50422 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932343AbdK2Nm1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Nov 2017 08:42:27 -0500
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V15 09/22] mmc: sdhci-pci: Add CQHCI support for Intel GLK
-Date: Wed, 29 Nov 2017 15:41:06 +0200
-Message-Id: <1511962879-24262-10-git-send-email-adrian.hunter@intel.com>
-In-Reply-To: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
-References: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
+        id S1751498AbdLACB0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 30 Nov 2017 21:01:26 -0500
+Date: Fri, 1 Dec 2017 10:01:03 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "hare@suse.com" <hare@suse.com>, "osandov@fb.com" <osandov@fb.com>
+Subject: Re: [PATCH V2 1/5] dm-mpath: don't call blk_mq_delay_run_hw_queue()
+ in case of BLK_STS_RESOURCE
+Message-ID: <20171201020058.GA30132@ming.t460p>
+References: <20171127050721.5884-1-ming.lei@redhat.com>
+ <20171127050721.5884-2-ming.lei@redhat.com>
+ <1511802882.2993.4.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1511802882.2993.4.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Add CQHCI initialization and implement CQHCI operations for Intel GLK.
+On Mon, Nov 27, 2017 at 05:14:46PM +0000, Bart Van Assche wrote:
+> On Mon, 2017-11-27 at 13:07 +0800, Ming Lei wrote:
+> > If .queue_rq() returns BLK_STS_RESOURCE, blk-mq will rerun the queue in
+> > the three situations:
+> > 
+> > 1) if BLK_MQ_S_SCHED_RESTART is set
+> > - queue is rerun after one rq is completed, see blk_mq_sched_restart()
+> > which is run from blk_mq_free_request()
+> > 
+> > 2) run out of driver tag
+> > - queue is rerun after one tag is freed
+> > 
+> > 3) otherwise
+> > - queue is run immediately in blk_mq_dispatch_rq_list()
+> > 
+> > This random dealy of running hw queue is introduced by commit 6077c2d706097c0
+> > (dm rq: Avoid that request processing stalls sporadically), which claimed
+> > one request processing stalling is fixed, but never explained the behind
+> > idea, and it is a workaound at most. Even the question isn't explained by
+> > anyone in recent discussion.
+> > 
+> > Also calling blk_mq_delay_run_hw_queue() inside .queue_rq() is a horrible
+> > hack because it makes BLK_MQ_S_SCHED_RESTART not working, and degrades I/O
+> > peformance a lot.
+> > 
+> > Finally this patch makes sure that dm-rq returns BLK_STS_RESOURCE to blk-mq
+> > only when underlying queue is out of resource, so we switch to return
+> > DM_MAPIO_DELAY_REQUEU if either MPATHF_QUEUE_IO or MPATHF_PG_INIT_REQUIRED
+> > is set in multipath_clone_and_map().
+> 
+> Sorry but in my opinion the above description shows that you don't understand
+> the dm-mpath driver completely.
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- drivers/mmc/host/Kconfig          |   1 +
- drivers/mmc/host/sdhci-pci-core.c | 155 +++++++++++++++++++++++++++++++++++++-
- 2 files changed, 155 insertions(+), 1 deletion(-)
+I have to treat your above comment as a noop since you never provide a explanation.
 
-diff --git a/drivers/mmc/host/Kconfig b/drivers/mmc/host/Kconfig
-index 3092b7085cb5..2b02a9788bb6 100644
---- a/drivers/mmc/host/Kconfig
-+++ b/drivers/mmc/host/Kconfig
-@@ -81,6 +81,7 @@ config MMC_SDHCI_BIG_ENDIAN_32BIT_BYTE_SWAPPER
- config MMC_SDHCI_PCI
- 	tristate "SDHCI support on PCI bus"
- 	depends on MMC_SDHCI && PCI
-+	select MMC_CQHCI
- 	help
- 	  This selects the PCI Secure Digital Host Controller Interface.
- 	  Most controllers found today are PCI devices.
-diff --git a/drivers/mmc/host/sdhci-pci-core.c b/drivers/mmc/host/sdhci-pci-core.c
-index 3e4f04fd5175..110c634cfb43 100644
---- a/drivers/mmc/host/sdhci-pci-core.c
-+++ b/drivers/mmc/host/sdhci-pci-core.c
-@@ -30,6 +30,8 @@
- #include <linux/mmc/sdhci-pci-data.h>
- #include <linux/acpi.h>
- 
-+#include "cqhci.h"
-+
- #include "sdhci.h"
- #include "sdhci-pci.h"
- 
-@@ -116,6 +118,28 @@ int sdhci_pci_resume_host(struct sdhci_pci_chip *chip)
- 
- 	return 0;
- }
-+
-+static int sdhci_cqhci_suspend(struct sdhci_pci_chip *chip)
-+{
-+	int ret;
-+
-+	ret = cqhci_suspend(chip->slots[0]->host->mmc);
-+	if (ret)
-+		return ret;
-+
-+	return sdhci_pci_suspend_host(chip);
-+}
-+
-+static int sdhci_cqhci_resume(struct sdhci_pci_chip *chip)
-+{
-+	int ret;
-+
-+	ret = sdhci_pci_resume_host(chip);
-+	if (ret)
-+		return ret;
-+
-+	return cqhci_resume(chip->slots[0]->host->mmc);
-+}
- #endif
- 
- #ifdef CONFIG_PM
-@@ -166,8 +190,48 @@ static int sdhci_pci_runtime_resume_host(struct sdhci_pci_chip *chip)
- 
- 	return 0;
- }
-+
-+static int sdhci_cqhci_runtime_suspend(struct sdhci_pci_chip *chip)
-+{
-+	int ret;
-+
-+	ret = cqhci_suspend(chip->slots[0]->host->mmc);
-+	if (ret)
-+		return ret;
-+
-+	return sdhci_pci_runtime_suspend_host(chip);
-+}
-+
-+static int sdhci_cqhci_runtime_resume(struct sdhci_pci_chip *chip)
-+{
-+	int ret;
-+
-+	ret = sdhci_pci_runtime_resume_host(chip);
-+	if (ret)
-+		return ret;
-+
-+	return cqhci_resume(chip->slots[0]->host->mmc);
-+}
- #endif
- 
-+static u32 sdhci_cqhci_irq(struct sdhci_host *host, u32 intmask)
-+{
-+	int cmd_error = 0;
-+	int data_error = 0;
-+
-+	if (!sdhci_cqe_irq(host, intmask, &cmd_error, &data_error))
-+		return intmask;
-+
-+	cqhci_irq(host->mmc, intmask, cmd_error, data_error);
-+
-+	return 0;
-+}
-+
-+static void sdhci_pci_dumpregs(struct mmc_host *mmc)
-+{
-+	sdhci_dumpregs(mmc_priv(mmc));
-+}
-+
- /*****************************************************************************\
-  *                                                                           *
-  * Hardware specific quirk handling                                          *
-@@ -583,6 +647,18 @@ static void sdhci_intel_voltage_switch(struct sdhci_host *host)
- 	.voltage_switch		= sdhci_intel_voltage_switch,
- };
- 
-+static const struct sdhci_ops sdhci_intel_glk_ops = {
-+	.set_clock		= sdhci_set_clock,
-+	.set_power		= sdhci_intel_set_power,
-+	.enable_dma		= sdhci_pci_enable_dma,
-+	.set_bus_width		= sdhci_set_bus_width,
-+	.reset			= sdhci_reset,
-+	.set_uhs_signaling	= sdhci_set_uhs_signaling,
-+	.hw_reset		= sdhci_pci_hw_reset,
-+	.voltage_switch		= sdhci_intel_voltage_switch,
-+	.irq			= sdhci_cqhci_irq,
-+};
-+
- static void byt_read_dsm(struct sdhci_pci_slot *slot)
- {
- 	struct intel_host *intel_host = sdhci_pci_priv(slot);
-@@ -612,12 +688,80 @@ static int glk_emmc_probe_slot(struct sdhci_pci_slot *slot)
- {
- 	int ret = byt_emmc_probe_slot(slot);
- 
-+	slot->host->mmc->caps2 |= MMC_CAP2_CQE;
-+
- 	if (slot->chip->pdev->device != PCI_DEVICE_ID_INTEL_GLK_EMMC) {
- 		slot->host->mmc->caps2 |= MMC_CAP2_HS400_ES,
- 		slot->host->mmc_host_ops.hs400_enhanced_strobe =
- 						intel_hs400_enhanced_strobe;
-+		slot->host->mmc->caps2 |= MMC_CAP2_CQE_DCMD;
-+	}
-+
-+	return ret;
-+}
-+
-+static void glk_cqe_enable(struct mmc_host *mmc)
-+{
-+	struct sdhci_host *host = mmc_priv(mmc);
-+	u32 reg;
-+
-+	/*
-+	 * CQE gets stuck if it sees Buffer Read Enable bit set, which can be
-+	 * the case after tuning, so ensure the buffer is drained.
-+	 */
-+	reg = sdhci_readl(host, SDHCI_PRESENT_STATE);
-+	while (reg & SDHCI_DATA_AVAILABLE) {
-+		sdhci_readl(host, SDHCI_BUFFER);
-+		reg = sdhci_readl(host, SDHCI_PRESENT_STATE);
-+	}
-+
-+	sdhci_cqe_enable(mmc);
-+}
-+
-+static const struct cqhci_host_ops glk_cqhci_ops = {
-+	.enable		= glk_cqe_enable,
-+	.disable	= sdhci_cqe_disable,
-+	.dumpregs	= sdhci_pci_dumpregs,
-+};
-+
-+static int glk_emmc_add_host(struct sdhci_pci_slot *slot)
-+{
-+	struct device *dev = &slot->chip->pdev->dev;
-+	struct sdhci_host *host = slot->host;
-+	struct cqhci_host *cq_host;
-+	bool dma64;
-+	int ret;
-+
-+	ret = sdhci_setup_host(host);
-+	if (ret)
-+		return ret;
-+
-+	cq_host = devm_kzalloc(dev, sizeof(*cq_host), GFP_KERNEL);
-+	if (!cq_host) {
-+		ret = -ENOMEM;
-+		goto cleanup;
- 	}
- 
-+	cq_host->mmio = host->ioaddr + 0x200;
-+	cq_host->quirks |= CQHCI_QUIRK_SHORT_TXFR_DESC_SZ;
-+	cq_host->ops = &glk_cqhci_ops;
-+
-+	dma64 = host->flags & SDHCI_USE_64_BIT_DMA;
-+	if (dma64)
-+		cq_host->caps |= CQHCI_TASK_DESC_SZ_128;
-+
-+	ret = cqhci_init(cq_host, host->mmc, dma64);
-+	if (ret)
-+		goto cleanup;
-+
-+	ret = __sdhci_add_host(host);
-+	if (ret)
-+		goto cleanup;
-+
-+	return 0;
-+
-+cleanup:
-+	sdhci_cleanup_host(host);
- 	return ret;
- }
- 
-@@ -699,11 +843,20 @@ static int byt_sd_probe_slot(struct sdhci_pci_slot *slot)
- static const struct sdhci_pci_fixes sdhci_intel_glk_emmc = {
- 	.allow_runtime_pm	= true,
- 	.probe_slot		= glk_emmc_probe_slot,
-+	.add_host		= glk_emmc_add_host,
-+#ifdef CONFIG_PM_SLEEP
-+	.suspend		= sdhci_cqhci_suspend,
-+	.resume			= sdhci_cqhci_resume,
-+#endif
-+#ifdef CONFIG_PM
-+	.runtime_suspend	= sdhci_cqhci_runtime_suspend,
-+	.runtime_resume		= sdhci_cqhci_runtime_resume,
-+#endif
- 	.quirks			= SDHCI_QUIRK_NO_ENDATTR_IN_NOPDESC,
- 	.quirks2		= SDHCI_QUIRK2_PRESET_VALUE_BROKEN |
- 				  SDHCI_QUIRK2_CAPS_BIT63_FOR_HS400 |
- 				  SDHCI_QUIRK2_STOP_WITH_TC,
--	.ops			= &sdhci_intel_byt_ops,
-+	.ops			= &sdhci_intel_glk_ops,
- 	.priv_size		= sizeof(struct intel_host),
- };
- 
+Also I don't think it is wrong to deal with MPATHF_QUEUE_IO/MPATHF_PG_INIT_REQUIRED
+via DM_MAPIO_DELAY_REQUEUE, since both can seldom happen, and the delay
+won't cause performance issue.
+
+The idea behind this change is that this patchset switches to return BLK_STS_RESOURCE
+to blk-mq only when we run out of resource, but the above two(MPATHF_QUEUE_IO and
+MPATHF_PG_INIT_REQUIRED) don't belong to 'run out of resource'.
+
+> 
+> > diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
+> > index c8faa2b85842..8fe3f45407ce 100644
+> > --- a/drivers/md/dm-mpath.c
+> > +++ b/drivers/md/dm-mpath.c
+> > @@ -484,9 +484,7 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
+> >  		return DM_MAPIO_KILL;
+> >  	} else if (test_bit(MPATHF_QUEUE_IO, &m->flags) ||
+> >  		   test_bit(MPATHF_PG_INIT_REQUIRED, &m->flags)) {
+> > -		if (pg_init_all_paths(m))
+> > -			return DM_MAPIO_DELAY_REQUEUE;
+> > -		return DM_MAPIO_REQUEUE;
+> > +		return DM_MAPIO_DELAY_REQUEUE;
+> >  	}
+> 
+> This patch removes a pg_init_all_paths() call but you don't explain why you
+> think it is allowed to remove that call. Did you perhaps remove that call by
+> mistake?
+
+OK, that is a problem, will fix it in V2.
+
 -- 
-1.9.1
+Ming
