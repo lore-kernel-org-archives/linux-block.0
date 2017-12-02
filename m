@@ -1,46 +1,99 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from LGEAMRELO13.lge.com ([156.147.23.53]:34221 "EHLO
-        lgeamrelo13.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753219AbdLDFQr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Dec 2017 00:16:47 -0500
-From: Byungchul Park <byungchul.park@lge.com>
-To: peterz@infradead.org, mingo@kernel.org, akpm@linux-foundation.org
-Cc: tglx@linutronix.de, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org,
-        kernel-team@lge.com, jack@suse.cz, jlayton@redhat.com,
-        viro@zeniv.linux.org.uk, hannes@cmpxchg.org, npiggin@gmail.com,
-        rgoldwyn@suse.com, vbabka@suse.cz, mhocko@suse.com,
-        pombredanne@nexb.com, vinmenon@codeaurora.org,
-        gregkh@linuxfoundation.org
-Subject: [PATCH v2 0/4] lockdep/crossrelease: Apply crossrelease to page locks
-Date: Mon,  4 Dec 2017 14:16:19 +0900
-Message-Id: <1512364583-26070-1-git-send-email-byungchul.park@lge.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH] block, bfq: remove batches of confusing ifdefs
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <a64f4962-8736-75df-71ae-509342b0be8a@kernel.dk>
+Date: Sat, 2 Dec 2017 18:22:33 +0100
+Cc: linux-block <linux-block@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Ulf Hansson <ulf.hansson@linaro.org>,
+ broonie@kernel.org,
+ linus.walleij@linaro.org,
+ lucmiccio@gmail.com,
+ bfq-iosched@googlegroups.com
+Message-Id: <8B7D21FA-155B-4311-8C12-7C520BE78EFE@linaro.org>
+References: <20171128093734.1918-1-paolo.valente@linaro.org> <5892a41d-4677-937a-a56e-5d4554724dd6@kernel.dk> <5B4C446D-99EB-4698-B86A-5629AADA3D7B@linaro.org> <a64f4962-8736-75df-71ae-509342b0be8a@kernel.dk>
+To: Jens Axboe <axboe@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-For now, wait_for_completion() / complete() works with lockdep, add
-lock_page() / unlock_page() and its family to lockdep support.
 
-Changes from v1
- - Move lockdep_map_cross outside of page_ext to make it flexible
- - Prevent allocating lockdep_map per page by default
- - Add a boot parameter allowing the allocation for debugging
+> Il giorno 02 dic 2017, alle ore 17:06, Jens Axboe <axboe@kernel.dk> ha =
+scritto:
+>=20
+> On 12/02/2017 03:04 AM, Paolo Valente wrote:
+>>=20
+>>> Il giorno 30 nov 2017, alle ore 22:21, Jens Axboe <axboe@kernel.dk> =
+ha scritto:
+>>>=20
+>>> On 11/28/2017 02:37 AM, Paolo Valente wrote:
+>>>> Commit a33801e8b473 ("block, bfq: move debug blkio stats behind
+>>>> CONFIG_DEBUG_BLK_CGROUP") introduced two batches of confusing =
+ifdefs:
+>>>> one reported in [1], plus a similar one in another function. This
+>>>> commit removes both batches, in the way suggested in [1].
+>>>=20
+>>> Some comments below.
+>>>=20
+>>>> +static inline void bfq_update_dispatch_stats(struct request *rq,
+>>>> +					     spinlock_t *queue_lock,
+>>>> +					     struct bfq_queue =
+*in_serv_queue,
+>>>> +					     bool idle_timer_disabled)
+>>>> +{
+>>>=20
+>>> Don't pass in the queue lock. The normal convention is to pass in =
+the
+>>> queue, thus making this:
+>>>=20
+>>> static void bfq_update_dispatch_stats(struct request_queue *q,
+>>> 				      struct request *rq,
+>>> 				      struct bfq_queue *in_serv_queue,
+>>> 				      bool idle_timer_disabled)
+>>>=20
+>>=20
+>> Ok, thanks.  One question, just to try to learn, if you have time and
+>> patience for a brief explanation.  Was this convention originated by
+>> some rationale?  My concern is that bfq_update_dispatch_stats works =
+on
+>> no field of q but the lock, and this fact would have been made
+>> explicit by passing only that exact field.
+>=20
+> When you just pass in a lock, nobody knows what that lock is without
+> looking at the caller. If you pass in the queue, it's apparent
+> what is being locked.
+>=20
 
-Byungchul Park (4):
-  lockdep: Apply crossrelease to PG_locked locks
-  lockdep: Apply lock_acquire(release) on __Set(__Clear)PageLocked
-  lockdep: Move data of CONFIG_LOCKDEP_PAGELOCK from page to page_ext
-  lockdep: Add a boot parameter enabling to track page locks using
-    lockdep and disable it by default
+Got it, thanks a lot.
 
- Documentation/admin-guide/kernel-parameters.txt |   7 ++
- include/linux/mm_types.h                        |   4 +
- include/linux/page-flags.h                      |  43 +++++++-
- include/linux/pagemap.h                         | 125 ++++++++++++++++++++++--
- lib/Kconfig.debug                               |  11 +++
- mm/filemap.c                                    | 114 ++++++++++++++++++++-
- mm/page_ext.c                                   |   4 +
- 7 files changed, 299 insertions(+), 9 deletions(-)
+>>> which also gets rid of the inline. In general, never inline =
+anything.
+>>> The compiler should figure it out for you. This function is way too =
+big
+>>> to inline, plus the cost of what it's doing completely dwarfes =
+function
+>>> call overhead.
+>>>=20
+>>=20
+>> Actually, I did so because of Linus' suggestion in [1]: "So for
+>> example, the functions that can go away should obviously be inline
+>> functions so that you don't end up having the compiler generate the
+>> arguments and the call to an empty function body ..."
+>>=20
+>> Maybe I misinterpreted his suggestion, and he meant that the function
+>> should be designed in such a way to be (almost) certainly considered
+>> inline by the compiler?
+>=20
+> You can do that for the empty version, don't do it for the non-empty
+> version. That will go away, the other one will not.
+>=20
 
--- 
-1.9.1
+Of course, thanks, and sorry for the silly question.
+
+I'll make and submit a new patch according to your comments.
+
+Paolo
+
+> --=20
+> Jens Axboe
