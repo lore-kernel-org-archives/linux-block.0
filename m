@@ -1,63 +1,93 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:36683 "EHLO mx2.suse.de"
+Received: from mx1.redhat.com ([209.132.183.28]:48072 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753282AbdLDITf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 4 Dec 2017 03:19:35 -0500
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        id S1751776AbdLBQcM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 2 Dec 2017 11:32:12 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
         linux-scsi@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>
-Subject: Re: [PATCH] SCSI: delay run queue if device is blocked in scsi_dev_queue_ready()
-References: <20171202163150.1273-1-ming.lei@redhat.com>
-Date: Mon, 04 Dec 2017 09:19:33 +0100
-In-Reply-To: <20171202163150.1273-1-ming.lei@redhat.com> (Ming Lei's message
-        of "Sun, 3 Dec 2017 00:31:50 +0800")
-Message-ID: <mqdindmoqga.fsf@linux-x5ow.site>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] SCSI: delay run queue if device is blocked in scsi_dev_queue_ready()
+Date: Sun,  3 Dec 2017 00:31:50 +0800
+Message-Id: <20171202163150.1273-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+Before commit 0df21c86bdbf ("scsi: implement .get_budget and .put_budget
+for blk-mq"), we run queue after 3ms if device is blocked and queue is
+idle, which is done in handling BLK_STS_RESOURCE. After commit 0df21c86bdbf
+is introduced, queue won't be run any more under this situation.
 
-Hi Ming,
+IO hang is observed when timeout happened, and this patch fixes the IO
+hang issue by running queue after delay in scsi_dev_queue_ready, just like
+non-mq.
 
-Ming Lei <ming.lei@redhat.com> writes:
-> This issue can be triggered by the following script:
->
-> 	#!/bin/sh
-> 	rmmod scsi_debug
-> 	modprobe scsi_debug max_queue=1
->
-> 	DEVICE=`ls -d /sys/bus/pseudo/drivers/scsi_debug/adapter*/host*/target*/*/block/* | head -1 | xargs basename`
->
-> 	DISK_DIR=`ls -d /sys/block/$DEVICE/device/scsi_disk/*`
->
-> 	echo "using scsi device $DEVICE"
-> 	echo "-1" >/sys/bus/pseudo/drivers/scsi_debug/every_nth
-> 	echo starting loop $i
-> 	echo "temporary write through" >$DISK_DIR/cache_type
-> 	echo "128" >/sys/bus/pseudo/drivers/scsi_debug/opts
-> 	echo none > /sys/block/$DEVICE/queue/scheduler
-> 	dd if=/dev/$DEVICE of=/dev/null bs=1M iflag=direct count=1 &
-> 	sleep 5
-> 	echo "0" >/sys/bus/pseudo/drivers/scsi_debug/opts
-> 	wait
-> 	echo "SUCCESS"
+This issue can be triggered by the following script:
 
-Can you please submit a test-case for blktest as well, given you have a
-nice reproducer?
+	#!/bin/sh
+	rmmod scsi_debug
+	modprobe scsi_debug max_queue=1
 
-Thanks,
-        Johannes
+	DEVICE=`ls -d /sys/bus/pseudo/drivers/scsi_debug/adapter*/host*/target*/*/block/* | head -1 | xargs basename`
+
+	DISK_DIR=`ls -d /sys/block/$DEVICE/device/scsi_disk/*`
+
+	echo "using scsi device $DEVICE"
+	echo "-1" >/sys/bus/pseudo/drivers/scsi_debug/every_nth
+	echo starting loop $i
+	echo "temporary write through" >$DISK_DIR/cache_type
+	echo "128" >/sys/bus/pseudo/drivers/scsi_debug/opts
+	echo none > /sys/block/$DEVICE/queue/scheduler
+	dd if=/dev/$DEVICE of=/dev/null bs=1M iflag=direct count=1 &
+	sleep 5
+	echo "0" >/sys/bus/pseudo/drivers/scsi_debug/opts
+	wait
+	echo "SUCCESS"
+
+Fixes: 0df21c86bdbf ("scsi: implement .get_budget and .put_budget for blk-mq")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/scsi/scsi_lib.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index cf9f36a1113f..9aada86055d3 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1387,6 +1387,15 @@ static void scsi_unprep_fn(struct request_queue *q, struct request *req)
+ 	scsi_uninit_cmd(blk_mq_rq_to_pdu(req));
+ }
+ 
++static void scsi_mq_delay_queue(struct request_queue *q, unsigned long msecs)
++{
++	struct blk_mq_hw_ctx *hctx;
++	int i;
++
++	queue_for_each_hw_ctx(q, hctx, i)
++		blk_mq_delay_run_hw_queue(hctx, msecs);
++}
++
+ /*
+  * scsi_dev_queue_ready: if we can send requests to sdev, return 1 else
+  * return 0.
+@@ -1407,11 +1416,10 @@ static inline int scsi_dev_queue_ready(struct request_queue *q,
+ 		 * unblock after device_blocked iterates to zero
+ 		 */
+ 		if (atomic_dec_return(&sdev->device_blocked) > 0) {
+-			/*
+-			 * For the MQ case we take care of this in the caller.
+-			 */
+ 			if (!q->mq_ops)
+ 				blk_delay_queue(q, SCSI_QUEUE_DELAY);
++			else
++				scsi_mq_delay_queue(q, SCSI_QUEUE_DELAY);
+ 			goto out_dec;
+ 		}
+ 		SCSI_LOG_MLQUEUE(3, sdev_printk(KERN_INFO, sdev,
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.9.5
