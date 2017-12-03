@@ -1,45 +1,68 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f176.google.com ([209.85.192.176]:44348 "EHLO
-        mail-pf0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753088AbdLDIS1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Dec 2017 03:18:27 -0500
-Received: by mail-pf0-f176.google.com with SMTP id m26so7960795pfj.11
-        for <linux-block@vger.kernel.org>; Mon, 04 Dec 2017 00:18:27 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20171204081408.oyp46roxbkjbxxkw@mwanda>
-References: <f403043d11ccfea019055f705d18@google.com> <20171203201608.GC844@zzz.localdomain>
- <20171204081408.oyp46roxbkjbxxkw@mwanda>
-From: Dmitry Vyukov <dvyukov@google.com>
-Date: Mon, 4 Dec 2017 09:18:05 +0100
-Message-ID: <CACT4Y+aE-Q-PeUaY99d2UbK4BHnf18OoV0MBXyOXzXttf1=nYw@mail.gmail.com>
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:36195 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751781AbdLCUQL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Dec 2017 15:16:11 -0500
+Date: Sun, 3 Dec 2017 12:16:08 -0800
+From: Eric Biggers <ebiggers3@gmail.com>
+To: syzbot
+        <bot+2797c18fc195e3e240c3c3e7837a14130e157fb0@syzkaller.appspotmail.com>
+Cc: adobriyan@gmail.com, akpm@linux-foundation.org, arnd@arndb.de,
+        dan.carpenter@oracle.com, dave.jiang@intel.com,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        viro@zeniv.linux.org.uk, linux-block@vger.kernel.org
 Subject: Re: WARNING in kmalloc_slab (3)
-To: Dan Carpenter <dan.carpenter@oracle.com>
-Cc: Eric Biggers <ebiggers3@gmail.com>,
-        syzbot
-        <bot+2797c18fc195e3e240c3c3e7837a14130e157fb0@syzkaller.appspotmail.com>,
-        Alexey Dobriyan <adobriyan@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Arnd Bergmann <arnd@arndb.de>, dave.jiang@intel.com,
-        LKML <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs@googlegroups.com, Al Viro <viro@zeniv.linux.org.uk>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20171203201608.GC844@zzz.localdomain>
+References: <f403043d11ccfea019055f705d18@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <f403043d11ccfea019055f705d18@google.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, Dec 4, 2017 at 9:14 AM, Dan Carpenter <dan.carpenter@oracle.com> wrote:
-> On Sun, Dec 03, 2017 at 12:16:08PM -0800, Eric Biggers wrote:
->> Looks like BLKTRACESETUP doesn't limit the '.buf_nr' parameter, allowing anyone
->> who can open a block device to cause an extremely large kmalloc.  Here's a
->> simplified reproducer:
->>
->
-> There are lots of places which allow people to allocate as much as they
-> want.  With Syzcaller, you might want to just hard code a __GFP_NOWARN
-> in to disable it.
++Cc linux-block
 
-Hi,
+On Sun, Dec 03, 2017 at 06:25:01AM -0800, syzbot wrote:
+> WARNING: CPU: 0 PID: 3081 at mm/slab_common.c:971 kmalloc_slab+0x5d/0x70
+> mm/slab_common.c:971
+> Kernel panic - not syncing: panic_on_warn set ...
+> 
+[...]
+>  __do_kmalloc mm/slab.c:3706 [inline]
+>  __kmalloc+0x25/0x760 mm/slab.c:3720
+>  kmalloc include/linux/slab.h:504 [inline]
+>  relay_create_buf kernel/relay.c:172 [inline]
+>  relay_open_buf.part.10+0xc8/0x9b0 kernel/relay.c:449
+>  relay_open_buf kernel/relay.c:446 [inline]
+>  relay_open+0x57a/0xa40 kernel/relay.c:596
+>  do_blk_trace_setup+0x4a4/0xcd0 kernel/trace/blktrace.c:544
+>  __blk_trace_setup+0xb6/0x140 kernel/trace/blktrace.c:589
+>  blk_trace_ioctl+0x1d5/0x2a0 kernel/trace/blktrace.c:728
+>  blkdev_ioctl+0x1845/0x1e00 block/ioctl.c:587
+>  block_ioctl+0xea/0x130 fs/block_dev.c:1860
+>  vfs_ioctl fs/ioctl.c:46 [inline]
+>  do_vfs_ioctl+0x1b1/0x1530 fs/ioctl.c:686
+>  SYSC_ioctl fs/ioctl.c:701 [inline]
+>  SyS_ioctl+0x8f/0xc0 fs/ioctl.c:692
+>  entry_SYSCALL_64_fastpath+0x1f/0x96
 
-Hard code it where?
+Looks like BLKTRACESETUP doesn't limit the '.buf_nr' parameter, allowing anyone
+who can open a block device to cause an extremely large kmalloc.  Here's a
+simplified reproducer:
 
-User-controllable allocation are supposed to use __GFP_NOWARN.
+#include <fcntl.h>
+#include <linux/blktrace_api.h>
+#include <linux/fs.h>
+#include <sys/ioctl.h>
+
+int main()
+{
+        int fd;
+        struct blk_user_trace_setup setup = {
+                .buf_size = 100,
+                .buf_nr = 1000000,
+        };
+
+        fd = open("/dev/loop0", O_RDWR);
+        ioctl(fd, BLKTRACESETUP, &setup);
+}
