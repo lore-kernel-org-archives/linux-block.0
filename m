@@ -1,98 +1,60 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:28540 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753144AbdLMVtG (ORCPT
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45482 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1751208AbdLDMbN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Dec 2017 16:49:06 -0500
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "mauricfo@linux.vnet.ibm.com" <mauricfo@linux.vnet.ibm.com>,
+        Mon, 4 Dec 2017 07:31:13 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id vB4CTI00105564
+        for <linux-block@vger.kernel.org>; Mon, 4 Dec 2017 07:31:13 -0500
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2en46w72ex-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Mon, 04 Dec 2017 07:31:12 -0500
+Received: from localhost
+        by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-block@vger.kernel.org> from <mauricfo@linux.vnet.ibm.com>;
+        Mon, 4 Dec 2017 05:31:10 -0700
+Subject: Re: [PATCH V2 0/2] block: fix queue freeze and cleanup
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
         "chenxiang66@hisilicon.com" <chenxiang66@hisilicon.com>,
         "hch@infradead.org" <hch@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "osandov@fb.com" <osandov@fb.com>, "hare@suse.com" <hare@suse.com>,
+        "axboe@fb.com" <axboe@fb.com>, "osandov@fb.com" <osandov@fb.com>,
+        "hare@suse.com" <hare@suse.com>,
         "wenxiong@us.ibm.com" <wenxiong@us.ibm.com>,
         "linuxarm@huawei.com" <linuxarm@huawei.com>
-Subject: Re: [PATCH V2 0/2] block: fix queue freeze and cleanup
-Date: Wed, 13 Dec 2017 21:49:03 +0000
-Message-ID: <1513201741.2413.7.camel@wdc.com>
 References: <20171123044800.25251-1-ming.lei@redhat.com>
-         <20171127124147.GA16095@ming.t460p>
-         <fb185d60-9489-d841-c86d-07de5e5f561d@hisilicon.com>
-         <fcc89b28-41f9-ecdc-438b-b593f09866c9@linux.vnet.ibm.com>
-         <1512144528.2520.2.camel@sandisk.com>
-         <ea717cce-a083-1fef-362f-6c302b4434fa@linux.vnet.ibm.com>
-In-Reply-To: <ea717cce-a083-1fef-362f-6c302b4434fa@linux.vnet.ibm.com>
-Content-Type: text/plain; charset="utf-8"
+ <20171127124147.GA16095@ming.t460p>
+ <fb185d60-9489-d841-c86d-07de5e5f561d@hisilicon.com>
+ <fcc89b28-41f9-ecdc-438b-b593f09866c9@linux.vnet.ibm.com>
+ <1512144528.2520.2.camel@sandisk.com>
+ <ea717cce-a083-1fef-362f-6c302b4434fa@linux.vnet.ibm.com>
+ <20171202004953.GB24521@ming.t460p>
+From: Mauricio Faria de Oliveira <mauricfo@linux.vnet.ibm.com>
+Date: Mon, 4 Dec 2017 10:31:01 -0200
 MIME-Version: 1.0
+In-Reply-To: <20171202004953.GB24521@ming.t460p>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <80ff6002-2fa5-a6ce-f6a2-d65df72280b2@linux.vnet.ibm.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gRnJpLCAyMDE3LTEyLTAxIGF0IDE2OjQ5IC0wMjAwLCBNYXVyaWNpbyBGYXJpYSBkZSBPbGl2
-ZWlyYSB3cm90ZToNCj4gTFIgW2MwMDAwMDAwMDA1N2M3ZmNdIF9fYmxrX3J1bl9xdWV1ZSsweDZj
-LzB4YjANCj4gQ2FsbCBUcmFjZToNCj4gW2MwMDAwMDAxZmIwODM5NzBdIFtjMDAwMDAwMWZiMDgz
-OWUwXSAweGMwMDAwMDAxZmIwODM5ZTAgKHVucmVsaWFibGUpDQo+IFtjMDAwMDAwMWZiMDgzOWEw
-XSBbYzAwMDAwMDAwMDU3Y2UwY10gYmxrX3J1bl9xdWV1ZSsweDRjLzB4ODANCj4gW2MwMDAwMDAx
-ZmIwODM5ZDBdIFtjMDAwMDAwMDAwNTkxZjU0XSBibGtfZnJlZXplX3F1ZXVlX3N0YXJ0KzB4YTQv
-MHhiMA0KPiBbYzAwMDAwMDFmYjA4M2EwMF0gW2MwMDAwMDAwMDA1N2Q1Y2NdIGJsa19zZXRfcXVl
-dWVfZHlpbmcrMHg2Yy8weDE5MA0KPiBbYzAwMDAwMDFmYjA4M2EzMF0gW2MwMDAwMDAwMDA4YTNm
-YmNdIF9fZG1fZGVzdHJveSsweGFjLzB4MzAwDQo+IFtjMDAwMDAwMWZiMDgzYWQwXSBbYzAwMDAw
-MDAwMDhhZjZhNF0gZGV2X3JlbW92ZSsweDE1NC8weDFkMA0KPiBbYzAwMDAwMDFmYjA4M2IyMF0g
-W2MwMDAwMDAwMDA4YWZmZDBdIGN0bF9pb2N0bCsweDM2MC8weDRmMA0KPiBbYzAwMDAwMDFmYjA4
-M2QxMF0gW2MwMDAwMDAwMDA4YjAxOThdIGRtX2N0bF9pb2N0bCsweDM4LzB4NTANCj4gW2MwMDAw
-MDAxZmIwODNkNTBdIFtjMDAwMDAwMDAwMzg2M2I4XSBkb192ZnNfaW9jdGwrMHhkOC8weDhjMA0K
-PiBbYzAwMDAwMDFmYjA4M2RmMF0gW2MwMDAwMDAwMDAzODZjMDhdIFN5U19pb2N0bCsweDY4LzB4
-MTAwDQo+IFtjMDAwMDAwMWZiMDgzZTMwXSBbYzAwMDAwMDAwMDAwYjc2MF0gc3lzdGVtX2NhbGwr
-MHg1OC8weDZjDQo+IEluc3RydWN0aW9uIGR1bXA6DQo+IFhYWFhYWFhYIFhYWFhYWFhYIFhYWFhY
-WFhYIFhYWFhYWFhYIFhYWFhYWFhYIFhYWFhYWFhYIFhYWFhYWFhYIFhYWFhYWFhYDQo+IFhYWFhY
-WFhYIFhYWFhYWFhYIFhYWFhYWFhYIFhYWFhYWFhYIFhYWFhYWFhYIFhYWFhYWFhYIFhYWFhYWFhY
-IFhYWFhYWFhYDQo+IC0tLVsgZW5kIHRyYWNlIGUxNzEwZWM4MzZlNTUyNmYgXS0tLQ0KPiANCj4g
-S2VybmVsIHBhbmljIC0gbm90IHN5bmNpbmc6IEF0dGVtcHRlZCB0byBraWxsIGluaXQhIGV4aXRj
-b2RlPTB4MDAwMDAwMGINCg0KSGVsbG8gTWF1cmljaW8sDQoNCldvdWxkIGl0IGJlIHBvc3NpYmxl
-IHRvIHJlcGVhdCB5b3VyIHRlc3Qgd2l0aCB0aGUgcGF0Y2ggYmVsb3cgYXBwbGllZCBvbiB5b3Vy
-DQprZXJuZWwgdHJlZT8gVGhpcyBwYXRjaCBoYXMganVzdCBiZWVuIHBvc3RlZCBvbiB0aGUgZG0t
-ZGV2ZWwgbWFpbGluZyBsaXN0Lg0KDQpUaGFua3MsDQoNCkJhcnQuDQoNCg0KRnJvbTogQmFydCBW
-YW4gQXNzY2hlIDxiYXJ0LnZhbmFzc2NoZUB3ZGMuY29tPg0KRGF0ZTogV2VkLCAxMyBEZWMgMjAx
-NyAxMzowNzoxNCAtMDgwMA0KU3ViamVjdDogW1BBVENIXSBkbTogRml4IGEgcmVjZW50bHkgaW50
-cm9kdWNlZCByZWZlcmVuY2UgY291bnRpbmcgYnVnDQoNClRoaXMgcGF0Y2ggYXZvaWRzIHRoYXQg
-dGhlIGZvbGxvd2luZyBtZXNzYWdlIG9jY3VycyBzcG9yYWRpY2FsbHkNCmluIHRoZSBzeXN0ZW0g
-bG9nIChyZXZlYWxpbmcgdGhhdCBwZ3BhdGgtPnBhdGguZGV2LT5uYW1lIGJlY2FtZQ0KYSBkYW5n
-bGluZyBwb2ludGVyKToNCg0KZGV2aWNlLW1hcHBlcjogdGFibGU6IDI1NDoyOiBkZXZpY2Uga2tr
-a2tra2tra2tra2tra2traz8/Pz8/Pz8/P3gwP2E/Pz8/P0U/Pz8/Pz8/Pz8/Pz8/P0U/Pz8/Pz9G
-Pz8/Pz8yPz8/Pz9wRj8/Pz8/P1BGPz8/Pz85W0Y/Pz8/Pz9dRj8/Pz8/Pz8jPz8/Pz8/PyM/Pz8/
-Pz8nZj8/Pz8/IG5vdCBpbiB0YWJsZSBkZXZpY2VzIGxpc3QNCg0KVGhpcyBwYXRjaCBhbHNvIGZp
-eGVzIHRoZSBmb2xsb3dpbmcga2VybmVsIGNyYXNoOg0KDQpnZW5lcmFsIHByb3RlY3Rpb24gZmF1
-bHQ6IDAwMDAgWyMxXSBQUkVFTVBUIFNNUA0KUklQOiAwMDEwOm11bHRpcGF0aF9idXN5KzB4Nzcv
-MHhkMCBbZG1fbXVsdGlwYXRoXQ0KQ2FsbCBUcmFjZToNCiBkbV9tcV9xdWV1ZV9ycSsweDQ0LzB4
-MTEwIFtkbV9tb2RdDQogYmxrX21xX2Rpc3BhdGNoX3JxX2xpc3QrMHg3My8weDQ0MA0KIGJsa19t
-cV9kb19kaXNwYXRjaF9zY2hlZCsweDYwLzB4ZTANCiBibGtfbXFfc2NoZWRfZGlzcGF0Y2hfcmVx
-dWVzdHMrMHgxMWEvMHgxYTANCiBfX2Jsa19tcV9ydW5faHdfcXVldWUrMHgxMWYvMHgxYzANCiBf
-X2Jsa19tcV9kZWxheV9ydW5faHdfcXVldWUrMHg5NS8weGUwDQogYmxrX21xX3J1bl9od19xdWV1
-ZSsweDI1LzB4ODANCiBibGtfbXFfZmx1c2hfcGx1Z19saXN0KzB4MTk3LzB4NDIwDQogYmxrX2Zs
-dXNoX3BsdWdfbGlzdCsweGU0LzB4MjcwDQogYmxrX2ZpbmlzaF9wbHVnKzB4MjcvMHg0MA0KIF9f
-ZG9fcGFnZV9jYWNoZV9yZWFkYWhlYWQrMHgyYjQvMHgzNzANCiBmb3JjZV9wYWdlX2NhY2hlX3Jl
-YWRhaGVhZCsweGI0LzB4MTEwDQogZ2VuZXJpY19maWxlX3JlYWRfaXRlcisweDc1NS8weDk3MA0K
-IF9fdmZzX3JlYWQrMHhkMi8weDE0MA0KIHZmc19yZWFkKzB4OWIvMHgxNDANCiBTeVNfcmVhZCsw
-eDQ1LzB4YTANCiBkb19zeXNjYWxsXzY0KzB4NTYvMHgxYTANCiBlbnRyeV9TWVNDQUxMNjRfc2xv
-d19wYXRoKzB4MjUvMHgyNQ0KDQpGcm9tIHRoZSBkaXNhc3NlbWJseSBvZiBtdWx0aXBhdGhfYnVz
-eSAoMHg3NyA9IDExOSk6DQoNCi4vaW5jbHVkZS9saW51eC9ibGtkZXYuaDoNCjk5MiAgICAgICAg
-ICAgICByZXR1cm4gYmRldi0+YmRfZGlzay0+cXVldWU7ICAgIC8qIHRoaXMgaXMgbmV2ZXIgTlVM
-TCAqLw0KICAgMHgwMDAwMDAwMDAwMDAwNmI0IDwrMTE2PjogICBtb3YgICAgKCVyYXgpLCVyYXgN
-CiAgIDB4MDAwMDAwMDAwMDAwMDZiNyA8KzExOT46ICAgbW92ICAgIDB4ZTAoJXJheCksJXJheA0K
-DQpGaXhlczogY29tbWl0IDJhMGI0NjgyZTA5ZCAoImRtOiBjb252ZXJ0IGRtX2Rldl9pbnRlcm5h
-bC5jb3VudCBmcm9tIGF0b21pY190IHRvIHJlZmNvdW50X3QiKQ0KU2lnbmVkLW9mZi1ieTogQmFy
-dCBWYW4gQXNzY2hlIDxiYXJ0LnZhbmFzc2NoZUB3ZGMuY29tPg0KQ2M6IEVsZW5hIFJlc2hldG92
-YSA8ZWxlbmEucmVzaGV0b3ZhQGludGVsLmNvbT4NCkNjOiBLZWVzIENvb2sgPGtlZXNjb29rQGNo
-cm9taXVtLm9yZz4NCkNjOiBEYXZpZCBXaW5kc29yIDxkd2luZHNvckBnbWFpbC5jb20+DQpDYzog
-SGFucyBMaWxqZXN0cmFuZCA8aXNoa2FtaWVsQGdtYWlsLmNvbT4NCkNjOiBIYW5uZXMgUmVpbmVj
-a2UgPGhhcmVAc3VzZS5jb20+DQpDYzogc3RhYmxlQHZnZXIua2VybmVsLm9yZyAjIHY0LjE1DQot
-LS0NCiBkcml2ZXJzL21kL2RtLXRhYmxlLmMgfCAyICsrDQogMSBmaWxlIGNoYW5nZWQsIDIgaW5z
-ZXJ0aW9ucygrKQ0KDQpkaWZmIC0tZ2l0IGEvZHJpdmVycy9tZC9kbS10YWJsZS5jIGIvZHJpdmVy
-cy9tZC9kbS10YWJsZS5jDQppbmRleCA4ODEzMGI1ZDk1ZjkuLmVlNWMzODllNzI1NiAxMDA2NDQN
-Ci0tLSBhL2RyaXZlcnMvbWQvZG0tdGFibGUuYw0KKysrIGIvZHJpdmVycy9tZC9kbS10YWJsZS5j
-DQpAQCAtNDU5LDYgKzQ1OSw4IEBAIGludCBkbV9nZXRfZGV2aWNlKHN0cnVjdCBkbV90YXJnZXQg
-KnRpLCBjb25zdCBjaGFyICpwYXRoLCBmbW9kZV90IG1vZGUsDQogCQlpZiAocikNCiAJCQlyZXR1
-cm4gcjsNCiAJCXJlZmNvdW50X2luYygmZGQtPmNvdW50KTsNCisJfSBlbHNlIHsNCisJCXJlZmNv
-dW50X2luYygmZGQtPmNvdW50KTsNCiAJfQ0KIA0KIAkqcmVzdWx0ID0gZGQtPmRtX2RldjsNCi0t
-IA0KMi4xNS4xDQoNCg==
+On 12/01/2017 10:49 PM, Ming Lei wrote:
+>> Unfortunately v2 has been found to exhibit another problem, an Oops in
+>> the systemd shutdown path for device-mapper LVM volumes at least, when
+>> calling 'q->request_fn(q)' if 'q->request_fn' is NULL.
+> That issue can be fixed easily in V2 and we understand DM's case clearly.
+
+Yes. It just had not been mentioned upstream yet.
+
+> But the most important thing is that V2 can't fix Chenxiang's issue, but
+> V3/V1 can.
+
+Agree.
+
+
+-- 
+Mauricio Faria de Oliveira
+IBM Linux Technology Center
