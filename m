@@ -1,97 +1,120 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:45390 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752007AbdLLLDv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Dec 2017 06:03:51 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Yi Zhang <yi.zhang@redhat.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 4/6] blk-mq: avoid to map CPU into stale hw queue
-Date: Tue, 12 Dec 2017 19:02:30 +0800
-Message-Id: <20171212110232.12495-5-ming.lei@redhat.com>
-In-Reply-To: <20171212110232.12495-1-ming.lei@redhat.com>
-References: <20171212110232.12495-1-ming.lei@redhat.com>
+Received: from LGEAMRELO11.lge.com ([156.147.23.51]:47011 "EHLO
+        lgeamrelo11.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753372AbdLDFQs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Dec 2017 00:16:48 -0500
+From: Byungchul Park <byungchul.park@lge.com>
+To: peterz@infradead.org, mingo@kernel.org, akpm@linux-foundation.org
+Cc: tglx@linutronix.de, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org,
+        kernel-team@lge.com, jack@suse.cz, jlayton@redhat.com,
+        viro@zeniv.linux.org.uk, hannes@cmpxchg.org, npiggin@gmail.com,
+        rgoldwyn@suse.com, vbabka@suse.cz, mhocko@suse.com,
+        pombredanne@nexb.com, vinmenon@codeaurora.org,
+        gregkh@linuxfoundation.org
+Subject: [PATCH v2 4/4] lockdep: Add a boot parameter enabling to track page locks using lockdep and disable it by default
+Date: Mon,  4 Dec 2017 14:16:23 +0900
+Message-Id: <1512364583-26070-5-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <1512364583-26070-1-git-send-email-byungchul.park@lge.com>
+References: <1512364583-26070-1-git-send-email-byungchul.park@lge.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-blk_mq_pci_map_queues() may not map one CPU into any hw queue, but its
-previous map isn't cleared yet, and may point to one stale hw queue
-index.
+To track page locks using lockdep, we need a huge memory space for
+lockdep_map per page. So, it would be better to make it disabled by
+default and provide a boot parameter to turn it on. Do it.
 
-This patch fixes the following issue by clearing the mapping table before
-setting it up in blk_mq_pci_map_queues().
-
-This patches fixes this following issue reported by Zhang Yi:
-
-[  101.202734] BUG: unable to handle kernel NULL pointer dereference at 0000000094d3013f
-[  101.211487] IP: blk_mq_map_swqueue+0xbc/0x200
-[  101.216346] PGD 0 P4D 0
-[  101.219171] Oops: 0000 [#1] SMP
-[  101.222674] Modules linked in: sunrpc ipmi_ssif vfat fat intel_rapl sb_edac x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel kvm irqbypass crct10dif_pclmul crc32_pclmul ghash_clmulni_intel intel_cstate intel_uncore mxm_wmi intel_rapl_perf iTCO_wdt ipmi_si ipmi_devintf pcspkr iTCO_vendor_support sg dcdbas ipmi_msghandler wmi mei_me lpc_ich shpchp mei acpi_power_meter dm_multipath ip_tables xfs libcrc32c sd_mod mgag200 i2c_algo_bit drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops ttm drm ahci libahci crc32c_intel libata tg3 nvme nvme_core megaraid_sas ptp i2c_core pps_core dm_mirror dm_region_hash dm_log dm_mod
-[  101.284881] CPU: 0 PID: 504 Comm: kworker/u25:5 Not tainted 4.15.0-rc2 #1
-[  101.292455] Hardware name: Dell Inc. PowerEdge R730xd/072T6D, BIOS 2.5.5 08/16/2017
-[  101.301001] Workqueue: nvme-wq nvme_reset_work [nvme]
-[  101.306636] task: 00000000f2c53190 task.stack: 000000002da874f9
-[  101.313241] RIP: 0010:blk_mq_map_swqueue+0xbc/0x200
-[  101.318681] RSP: 0018:ffffc9000234fd70 EFLAGS: 00010282
-[  101.324511] RAX: ffff88047ffc9480 RBX: ffff88047e130850 RCX: 0000000000000000
-[  101.332471] RDX: ffffe8ffffd40580 RSI: ffff88047e509b40 RDI: ffff88046f37a008
-[  101.340432] RBP: 000000000000000b R08: ffff88046f37a008 R09: 0000000011f94280
-[  101.348392] R10: ffff88047ffd4d00 R11: 0000000000000000 R12: ffff88046f37a008
-[  101.356353] R13: ffff88047e130f38 R14: 000000000000000b R15: ffff88046f37a558
-[  101.364314] FS:  0000000000000000(0000) GS:ffff880277c00000(0000) knlGS:0000000000000000
-[  101.373342] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  101.379753] CR2: 0000000000000098 CR3: 000000047f409004 CR4: 00000000001606f0
-[  101.387714] Call Trace:
-[  101.390445]  blk_mq_update_nr_hw_queues+0xbf/0x130
-[  101.395791]  nvme_reset_work+0x6f4/0xc06 [nvme]
-[  101.400848]  ? pick_next_task_fair+0x290/0x5f0
-[  101.405807]  ? __switch_to+0x1f5/0x430
-[  101.409988]  ? put_prev_entity+0x2f/0xd0
-[  101.414365]  process_one_work+0x141/0x340
-[  101.418836]  worker_thread+0x47/0x3e0
-[  101.422921]  kthread+0xf5/0x130
-[  101.426424]  ? rescuer_thread+0x380/0x380
-[  101.430896]  ? kthread_associate_blkcg+0x90/0x90
-[  101.436048]  ret_from_fork+0x1f/0x30
-[  101.440034] Code: 48 83 3c ca 00 0f 84 2b 01 00 00 48 63 cd 48 8b 93 10 01 00 00 8b 0c 88 48 8b 83 20 01 00 00 4a 03 14 f5 60 04 af 81 48 8b 0c c8 <48> 8b 81 98 00 00 00 f0 4c 0f ab 30 8b 81 f8 00 00 00 89 42 44
-[  101.461116] RIP: blk_mq_map_swqueue+0xbc/0x200 RSP: ffffc9000234fd70
-[  101.468205] CR2: 0000000000000098
-[  101.471907] ---[ end trace 5fe710f98228a3ca ]---
-[  101.482489] Kernel panic - not syncing: Fatal exception
-[  101.488505] Kernel Offset: disabled
-[  101.497752] ---[ end Kernel panic - not syncing: Fatal exception
-
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Suggested-by: Michal Hocko <mhocko@kernel.org>
+Signed-off-by: Byungchul Park <byungchul.park@lge.com>
 ---
- block/blk-mq-pci.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ Documentation/admin-guide/kernel-parameters.txt |  7 +++++++
+ lib/Kconfig.debug                               |  5 ++++-
+ mm/filemap.c                                    | 23 +++++++++++++++++++++++
+ 3 files changed, 34 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-mq-pci.c b/block/blk-mq-pci.c
-index 76944e3271bf..b62212cb8060 100644
---- a/block/blk-mq-pci.c
-+++ b/block/blk-mq-pci.c
-@@ -33,6 +33,14 @@ int blk_mq_pci_map_queues(struct blk_mq_tag_set *set, struct pci_dev *pdev)
- 	const struct cpumask *mask;
- 	unsigned int queue, cpu;
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index f20ed5e..5e8d15d 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -712,6 +712,13 @@
+ 	crossrelease_fullstack
+ 			[KNL] Allow to record full stack trace in cross-release
  
-+	/*
-+	 * When nr_hw_queue is resized, we have to reset the map table
-+	 * for avoiding stale mapping since one CPU may not be mapped
-+	 * to any hw queue.
-+	 */
-+	for_each_possible_cpu(cpu)
-+		set->mq_map[cpu] = 0;
++	lockdep_pagelock=
++			[KNL] Boot-time lockdep_pagelock enabling option.
++			Storage of lockdep_map per page to track lock_page()/
++			unlock_page() is disabled by default. With this switch,
++			we can turn it on.
++			on: enable the feature
 +
- 	for (queue = 0; queue < set->nr_hw_queues; queue++) {
- 		mask = pci_irq_get_affinity(pdev, queue);
- 		if (!mask)
+ 	cryptomgr.notests
+                         [KNL] Disable crypto self-tests
+ 
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 45fdb3a..c609e97 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -1185,7 +1185,10 @@ config LOCKDEP_PAGELOCK
+ 	select PAGE_EXTENSION
+ 	help
+ 	 PG_locked lock is a kind of crosslock. Using crossrelease feature,
+-	 PG_locked lock can work with lockdep.
++	 PG_locked lock can work with lockdep. Even if you include this
++	 feature on your build, it is disabled in default. You should pass
++	 "lockdep_pagelock=on" to boot parameter in order to enable it. It
++	 consumes a fair amount of memory if enabled.
+ 
+ config BOOTPARAM_LOCKDEP_CROSSRELEASE_FULLSTACK
+ 	bool "Enable the boot parameter, crossrelease_fullstack"
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 34251fb..cb7b20b 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1231,8 +1231,24 @@ int __lock_page_or_retry(struct page *page, struct mm_struct *mm,
+ 
+ #ifdef CONFIG_LOCKDEP_PAGELOCK
+ 
++static int lockdep_pagelock;
++static int __init allow_lockdep_pagelock(char *str)
++{
++	if (!str)
++		return -EINVAL;
++
++	if (!strcmp(str, "on"))
++		lockdep_pagelock = 1;
++
++	return 0;
++}
++early_param("lockdep_pagelock", allow_lockdep_pagelock);
++
+ static bool need_lockdep_pagelock(void)
+ {
++	if (!lockdep_pagelock)
++		return false;
++
+ 	return true;
+ }
+ 
+@@ -1286,6 +1302,10 @@ static void init_zones_in_node(pg_data_t *pgdat)
+ static void init_lockdep_pagelock(void)
+ {
+ 	pg_data_t *pgdat;
++
++	if (!lockdep_pagelock)
++		return;
++
+ 	for_each_online_pgdat(pgdat)
+ 		init_zones_in_node(pgdat);
+ }
+@@ -1305,6 +1325,9 @@ struct lockdep_map *get_page_map(struct page *p)
+ {
+ 	struct page_ext *e;
+ 
++	if (!lockdep_pagelock)
++		return NULL;
++
+ 	e = lookup_page_ext(p);
+ 	if (!e)
+ 		return NULL;
 -- 
-2.9.5
+1.9.1
