@@ -1,16 +1,16 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:42462 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751443AbdLEVzs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Dec 2017 16:55:48 -0500
-Received: by mail-pg0-f65.google.com with SMTP id e14so1125415pgr.9
-        for <linux-block@vger.kernel.org>; Tue, 05 Dec 2017 13:55:47 -0800 (PST)
-Date: Tue, 5 Dec 2017 13:49:31 -0800
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:44528 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751200AbdLDXRj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Dec 2017 18:17:39 -0500
+Received: by mail-pg0-f68.google.com with SMTP id j9so9315629pgc.11
+        for <linux-block@vger.kernel.org>; Mon, 04 Dec 2017 15:17:38 -0800 (PST)
+Date: Mon, 4 Dec 2017 15:17:36 -0800
 From: Omar Sandoval <osandov@osandov.com>
 To: linux-block@vger.kernel.org
 Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
 Subject: Re: [PATCH] kyber: fix another domain token wait queue hang
-Message-ID: <20171205214931.GA14100@vader.DHCP.thefacebook.com>
+Message-ID: <20171204231736.GA29306@vader.DHCP.thefacebook.com>
 References: <c3ac90a0ef5fc19319f50c6be1a4bf1f50a15ccb.1512428537.git.osandov@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -36,6 +36,9 @@ On Mon, Dec 04, 2017 at 03:12:15PM -0800, Omar Sandoval wrote:
 > fixed by remembering which wait queue we were put on.
 > 
 > While we're here, only initialize the wait queue entry once instead on
+
+s/instead on/instead of on/
+
 > every wait, and use spin_lock_irq() instead of spin_lock_irqsave(),
 > since this is always called from process context with irqs enabled.
 > 
@@ -96,10 +99,7 @@ On Mon, Dec 04, 2017 at 03:12:15PM -0800, Omar Sandoval wrote:
 > -		add_wait_queue(&ws->wait, wait);
 > +		khd->domain_ws[sched_domain] = ws;
 > +		add_wait_queue_exclusive(&ws->wait, wait);
-
-Hm, just realized that I changed this to add_wait_queue_exclusive()...
-That wasn't intentional. I'll send a v2.
-
+>  
 >  		/*
 >  		 * Try again in case a token was freed before we got on the wait
 > -		 * queue. The waker may have already removed the entry from the
