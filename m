@@ -1,52 +1,39 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from [195.159.176.226] ([195.159.176.226]:56637 "EHLO
-        blaine.gmane.org" rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org
-        with ESMTP id S1751546AbdLDXsX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Dec 2017 18:48:23 -0500
-Received: from list by blaine.gmane.org with local (Exim 4.84_2)
-        (envelope-from <glb-linux-block@m.gmane.org>)
-        id 1eM0T7-0002jf-LD
-        for linux-block@vger.kernel.org; Tue, 05 Dec 2017 00:48:13 +0100
-To: linux-block@vger.kernel.org
-From: Holger =?iso-8859-1?q?Hoffst=E4tte?=
-        <holger@applied-asynchrony.com>
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:38014 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752217AbdLDWuF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Dec 2017 17:50:05 -0500
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>, "hare@suse.com" <hare@suse.com>,
+        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>
 Subject: Re: [PATCH] SCSI: delay run queue if device is blocked in
  scsi_dev_queue_ready()
-Date: Mon, 4 Dec 2017 23:48:07 +0000 (UTC)
-Message-ID: <pan$2c3c7$7c7c04a5$f22df3ad$bef841cb@applied-asynchrony.com>
+Date: Mon, 4 Dec 2017 22:49:55 +0000
+Message-ID: <1512427794.2795.15.camel@wdc.com>
 References: <20171202163150.1273-1-ming.lei@redhat.com>
-        <1512400159.23838.1.camel@wdc.com> <20171204224507.GB6888@ming.t460p>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org
+         <1512400159.23838.1.camel@wdc.com> <20171204224507.GB6888@ming.t460p>
+In-Reply-To: <20171204224507.GB6888@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, 05 Dec 2017 06:45:08 +0800, Ming Lei wrote:
-
-> On Mon, Dec 04, 2017 at 03:09:20PM +0000, Bart Van Assche wrote:
->> On Sun, 2017-12-03 at 00:31 +0800, Ming Lei wrote:
->> > Fixes: 0df21c86bdbf ("scsi: implement .get_budget and .put_budget for blk-mq")
->> 
->> It might be safer to revert commit 0df21c86bdbf instead of trying to fix all
->> issues introduced by that commit for kernel version v4.15 ...
-> 
-> What are all issues in v4.15-rc? Up to now, it is the only issue reported,
-> and can be fixed by this simple patch, which one can be thought as cleanup
-> too.
-
-Even with this patch I've encountered at least one hang that
-seemed related. I'm using most of block/scsi-4.15 on top of 4.14 and
-the hang in question was on a rotating disk. It could be solved by activating
-a different scheduler on the hanging device; all hanging sync/df processes got
-unstuck and all was fine again, which leads me to believe that there is at least
-one more rare condition where delaying requests (as done in the budget patch)
-leads to a hang.
-
-This happened with mq-deadline which I was testing specifically to avoid
-any BFQ-related side effects.
-
-I didn't do anything specific to trigger the hang and have not been able
-to reproduce it during regular usage.
-
--h
+T24gVHVlLCAyMDE3LTEyLTA1IGF0IDA2OjQ1ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
+TW9uLCBEZWMgMDQsIDIwMTcgYXQgMDM6MDk6MjBQTSArMDAwMCwgQmFydCBWYW4gQXNzY2hlIHdy
+b3RlOg0KPiA+IE9uIFN1biwgMjAxNy0xMi0wMyBhdCAwMDozMSArMDgwMCwgTWluZyBMZWkgd3Jv
+dGU6DQo+ID4gPiBGaXhlczogMGRmMjFjODZiZGJmICgic2NzaTogaW1wbGVtZW50IC5nZXRfYnVk
+Z2V0IGFuZCAucHV0X2J1ZGdldCBmb3IgYmxrLW1xIikNCj4gPiANCj4gPiBJdCBtaWdodCBiZSBz
+YWZlciB0byByZXZlcnQgY29tbWl0IDBkZjIxYzg2YmRiZiBpbnN0ZWFkIG9mIHRyeWluZyB0byBm
+aXggYWxsDQo+ID4gaXNzdWVzIGludHJvZHVjZWQgYnkgdGhhdCBjb21taXQgZm9yIGtlcm5lbCB2
+ZXJzaW9uIHY0LjE1IC4uLg0KPiANCj4gV2hhdCBhcmUgYWxsIGlzc3VlcyBpbiB2NC4xNS1yYz8g
+VXAgdG8gbm93LCBpdCBpcyB0aGUgb25seSBpc3N1ZSByZXBvcnRlZCwNCj4gYW5kIGNhbiBiZSBm
+aXhlZCBieSB0aGlzIHNpbXBsZSBwYXRjaCwgd2hpY2ggb25lIGNhbiBiZSB0aG91Z2h0IGFzIGNs
+ZWFudXANCj4gdG9vLg0KDQpUaGUgdGhyZWUgaXNzdWVzIEkgZGVzY3JpYmVkIGluIHRoZSBjb21t
+aXQgbWVzc2FnZSBvZiB0aGUgcGF0Y2ggdGhhdCBpcyBhdmFpbGFibGUgYXQ6DQpodHRwczovL21h
+cmMuaW5mby8/bD1saW51eC1ibG9jayZtPTE1MTI0MDg2NjAxMDU3Mi4NCg0KQmFydC4=
