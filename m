@@ -1,74 +1,36 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>,
-        =?UTF-8?q?Holger=20Hoffst=C3=A4tte?=
-        <holger@applied-asynchrony.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] SCSI: run queue if SCSI device queue isn't ready and queue is idle
-Date: Tue,  5 Dec 2017 15:52:56 +0800
-Message-Id: <20171205075256.10319-1-ming.lei@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: <efault@gmx.de>
+Message-ID: <1512359270.8335.7.camel@gmx.de>
+Subject: Re: possible deadlock in blk_trace_remove
+From: Mike Galbraith <efault@gmx.de>
+To: Jens Axboe <axboe@kernel.dk>, Eric Biggers <ebiggers3@gmail.com>
+Cc: syzbot
+ <bot+583353673e394aa41e5fb68ddc8b8d9d5c8d576f@syzkaller.appspotmail.com>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ mingo@redhat.com,  rostedt@goodmis.org, syzkaller-bugs@googlegroups.com
+Date: Mon, 04 Dec 2017 04:47:50 +0100
+In-Reply-To: <33f25849-1aff-8464-6467-47ce55d1c0b1@kernel.dk>
+References: <001a1141f8dc4440a9055e53896e@google.com>
+	 <20171203202434.GD844@zzz.localdomain>
+	 <9f7ab661-7d57-3e84-769c-6d103557f342@kernel.dk>
+	 <20171204004427.GA13374@zzz.localdomain>
+	 <33f25849-1aff-8464-6467-47ce55d1c0b1@kernel.dk>
+Content-Type: text/plain; charset="ISO-8859-15"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Before commit 0df21c86bdbf ("scsi: implement .get_budget and .put_budget
-for blk-mq"), we run queue after 3ms if queue is idle and SCSI device
-queue isn't ready, which is done in handling BLK_STS_RESOURCE. After
-commit 0df21c86bdbf is introduced, queue won't be run any more under
-this situation.
+On Sun, 2017-12-03 at 17:47 -0700, Jens Axboe wrote:
+> On 12/03/2017 05:44 PM, Eric Biggers wrote:
+> > 
+> >>> #syz fix: blktrace: fix trace mutex deadlock
+> >>
+> >> This is fixed in current -git.
+> >>
+> > 
+> > I know, but syzbot needed to be told what commit fixes the bug.
+> > See https://github.com/google/syzkaller/blob/master/docs/syzbot.md
+> 
+> Ah gotcha.
 
-IO hang is observed when timeout happened, and this patch fixes the IO
-hang issue by running queue after delay in scsi_dev_queue_ready, just like
-non-mq. This issue can be triggered by the following script[1].
+"@syzbot fix: bla" syntax would have been intuitive.
 
-There is another issue which can be covered by running idle queue:
-when .get_budget() is called on request coming from hctx->dispatch_list,
-if one request just completes during .get_budget(), we can't depend on
-SCSI's restart to make progress any more. This patch fixes the race too.
-
-With this patch, we basically recover to previous behaviour(before commit
-0df21c86bdbf) of handling idle queue when running out of resource.
-
-[1] script for test/verify SCSI timeout
-rmmod scsi_debug
-modprobe scsi_debug max_queue=1
-
-DEVICE=`ls -d /sys/bus/pseudo/drivers/scsi_debug/adapter*/host*/target*/*/block/* | head -1 | xargs basename`
-DISK_DIR=`ls -d /sys/block/$DEVICE/device/scsi_disk/*`
-
-echo "using scsi device $DEVICE"
-echo "-1" >/sys/bus/pseudo/drivers/scsi_debug/every_nth
-echo "temporary write through" >$DISK_DIR/cache_type
-echo "128" >/sys/bus/pseudo/drivers/scsi_debug/opts
-echo none > /sys/block/$DEVICE/queue/scheduler
-dd if=/dev/$DEVICE of=/dev/null bs=1M iflag=direct count=1 &
-sleep 5
-echo "0" >/sys/bus/pseudo/drivers/scsi_debug/opts
-wait
-echo "SUCCESS"
-
-Fixes: 0df21c86bdbf ("scsi: implement .get_budget and .put_budget for blk-mq")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/scsi_lib.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index db9556662e27..1816dd8259b3 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1967,6 +1967,8 @@ static bool scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
- out_put_device:
- 	put_device(&sdev->sdev_gendev);
- out:
-+	if (atomic_read(&sdev->device_busy) == 0 && !scsi_device_blocked(sdev))
-+		blk_mq_delay_run_hw_queue(hctx, SCSI_QUEUE_DELAY);
- 	return false;
- }
- 
--- 
-2.9.5
+	-Mike
