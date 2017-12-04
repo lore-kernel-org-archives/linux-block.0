@@ -1,102 +1,109 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:58334 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752126AbdLEQ4U (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 5 Dec 2017 11:56:20 -0500
-Date: Wed, 6 Dec 2017 00:55:45 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc: Jens Axboe <axboe@fb.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Omar Sandoval <osandov@fb.com>, Hannes Reinecke <hare@suse.com>
-Subject: Re: [PATCH V4] scsi_debugfs: fix crash in scsi_show_rq()
-Message-ID: <20171205165543.GD23788@ming.t460p>
-References: <20171110090144.11791-1-ming.lei@redhat.com>
- <1510332718.3095.2.camel@HansenPartnership.com>
- <20171111024337.GB20382@ming.t460p>
- <1510599352.3336.20.camel@HansenPartnership.com>
- <20171114005544.GA20889@ming.t460p>
- <1510683292.3077.3.camel@HansenPartnership.com>
- <20171115100949.GC908@ming.t460p>
- <1510741680.3088.1.camel@HansenPartnership.com>
- <20171115120449.GD908@ming.t460p>
+Return-Path: <ktkhai@virtuozzo.com>
+Subject: [PATCH 3/5] blkcg: Add blkcg::blkg_aio_nr and blkcg::blkg_aio_max_nr
+From: Kirill Tkhai <ktkhai@virtuozzo.com>
+To: axboe@kernel.dk, bcrl@kvack.org, viro@zeniv.linux.org.uk, tj@kernel.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-aio@kvack.org,
+ oleg@redhat.com, ktkhai@virtuozzo.com
+Date: Mon, 04 Dec 2017 19:13:18 +0300
+Message-ID: <151240399812.10164.2619089470139011328.stgit@localhost.localdomain>
+In-Reply-To: <151240305010.10164.15584502480037205018.stgit@localhost.localdomain>
+References: <151240305010.10164.15584502480037205018.stgit@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20171115120449.GD908@ming.t460p>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Return-Path: ktkhai@virtuozzo.com
+List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Nov 15, 2017 at 08:04:49PM +0800, Ming Lei wrote:
-> On Wed, Nov 15, 2017 at 07:28:00PM +0900, James Bottomley wrote:
-> > On Wed, 2017-11-15 at 18:09 +0800, Ming Lei wrote:
-> > > On Tue, Nov 14, 2017 at 10:14:52AM -0800, James Bottomley wrote:
-> > > > 
-> > > > On Tue, 2017-11-14 at 08:55 +0800, Ming Lei wrote:
-> > > > > 
-> > > > > Hi James,
-> > > > > 
-> > > > > On Mon, Nov 13, 2017 at 10:55:52AM -0800, James Bottomley wrote:
-> > > > > > 
-> > > > > > 
-> > > > > > On Sat, 2017-11-11 at 10:43 +0800, Ming Lei wrote:
-> > > > > > > 
-> > > > > > > 
-> > > > > > > So from CPU1's review, cmd->cmnd is in a remote NUMA node,
-> > > > > > > __scsi_format_command() is executed much slower than
-> > > > > > > mempool_free().
-> > > > > > > So when mempool_free() returns, __scsi_format_command() may
-> > > > > > > not fetched the buffer in L1 cache yet, then use-after-free
-> > > > > > > is still triggered.
-> > > > > > > 
-> > > > > > > That is why I say this use-after-free is inevitable no matter
-> > > > > > > 'setting SCpnt->cmnd to NULL before calling mempool_free()'
-> > > > > > > or not.
-> > > > > > 
-> > > > > > The bottom line is that there are several creative ways around
-> > > > > > this but the proposed code is currently broken and simply
-> > > > > > putting a comment in saying so doesn't make it acceptable.
-> > > > > 
-> > > > > As I explained above, I didn't see one really workable way. Or
-> > > > > please correct it if I am wrong.
-> > > > 
-> > > > I simply can't believe it's beyond the wit of man to solve a use
-> > > > after free race. �About 40% of kernel techniques are devoted to
-> > > > this. �All I really care about is not losing the PI information we
-> > > > previously had. �I agree with Bart that NULL cmnd is a good
-> > > > indicator, so it seems reasonable to use it. �If you have another
-> > > > mechanism, feel free to propose it.
-> > > 
-> > > Hi James,
-> > > 
-> > > This patch is my proposal, no others thought of yet.
-> > > 
-> > > We can fix the use-after-free easily via lock, rcu and ..., but some
-> > > cost has to pay. In this case, we can't wait too long in show_rq(),
-> > > otherwise we may lose important debug info, so I do not have better
-> > > way.
-> > > 
-> > > IMO this use-after-free is actually no harm, I don't think we have to
-> > > fix it, but it should be better to not let utility warn on this case.
-> > 
-> > Fine, so lose the snide comment and set the cmnd to NULL *before*
-> > calling free so we narrow the race window.
-> 
-> Hi James,
-> 
-> Given we can't avoid the use-after-free, how about not do that way so
-> we won't lose the precious debug info too early?
+This adds new members of struct blkcg, which will
+be used to account numbers of cgroup's aio requests.
 
-Hi James,
+Also, blkcg_root is used to store sysctl variables
+aio_nr and aio_max_nr.
 
-Are you fine with V4?
+Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
+---
+ block/blk-cgroup.c         |    4 ++++
+ fs/aio.c                   |    2 ++
+ include/linux/aio.h        |    6 ++++++
+ include/linux/blk-cgroup.h |    4 ++++
+ 4 files changed, 16 insertions(+)
 
-As I explained, the use-after-free can't be avoided, we have to make
-scsi_show_rq() to survive that, so we don't need to touch code in free path.
-Also we won't lose debug info too early in this way, not like 'set the cmnd
-to NULL *before* calling free'.
-
-Thanks,
-Ming
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index d3f56baee936..774560469b01 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -27,6 +27,7 @@
+ #include <linux/atomic.h>
+ #include <linux/ctype.h>
+ #include <linux/blk-cgroup.h>
++#include <linux/aio.h>
+ #include "blk.h"
+ 
+ #define MAX_KEY_LEN 100
+@@ -1101,6 +1102,9 @@ blkcg_css_alloc(struct cgroup_subsys_state *parent_css)
+ 	INIT_HLIST_HEAD(&blkcg->blkg_list);
+ #ifdef CONFIG_CGROUP_WRITEBACK
+ 	INIT_LIST_HEAD(&blkcg->cgwb_list);
++#endif
++#ifdef CONFIG_AIO
++	blkcg->blkg_aio_max_nr = parent_css ? AIO_NR_INF : AIO_NR_DEF;
+ #endif
+ 	list_add_tail(&blkcg->all_blkcgs_node, &all_blkcgs);
+ 
+diff --git a/fs/aio.c b/fs/aio.c
+index 9dc98a29077c..755f97a42ebe 100644
+--- a/fs/aio.c
++++ b/fs/aio.c
+@@ -189,10 +189,12 @@ struct aio_kiocb {
+ };
+ 
+ DEFINE_SPINLOCK(aio_nr_lock);
++#ifndef CONFIG_BLK_CGROUP
+ /*------ sysctl variables----*/
+ unsigned long aio_nr;		/* current system wide number of aio requests */
+ unsigned long aio_max_nr = AIO_NR_DEF; /* system wide maximum number of aio requests */
+ /*----end sysctl variables---*/
++#endif
+ 
+ static struct kmem_cache	*kiocb_cachep;
+ static struct kmem_cache	*kioctx_cachep;
+diff --git a/include/linux/aio.h b/include/linux/aio.h
+index 5dda2663802f..de929a8c9c59 100644
+--- a/include/linux/aio.h
++++ b/include/linux/aio.h
+@@ -2,6 +2,7 @@
+ #ifndef __LINUX__AIO_H
+ #define __LINUX__AIO_H
+ 
++#include <linux/blk-cgroup.h>
+ #include <linux/aio_abi.h>
+ 
+ struct kioctx;
+@@ -26,8 +27,13 @@ static inline void kiocb_set_cancel_fn(struct kiocb *req,
+ 				       kiocb_cancel_fn *cancel) { }
+ #endif /* CONFIG_AIO */
+ 
++#if !defined(CONFIG_BLK_CGROUP) || !defined(CONFIG_AIO)
+ /* for sysctl: */
+ extern unsigned long aio_nr;
+ extern unsigned long aio_max_nr;
++#else
++#define aio_nr		blkcg_root.blkg_aio_nr
++#define aio_max_nr	blkcg_root.blkg_aio_max_nr
++#endif /* !CONFIG_BLK_CGROUP || !CONFIG_AIO */
+ 
+ #endif /* __LINUX__AIO_H */
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index 8bbc3716507a..3d9c176fc173 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -55,6 +55,10 @@ struct blkcg {
+ #ifdef CONFIG_CGROUP_WRITEBACK
+ 	struct list_head		cgwb_list;
+ #endif
++#ifdef CONFIG_AIO
++	unsigned long			blkg_aio_nr;
++	unsigned long			blkg_aio_max_nr;
++#endif
+ };
+ 
+ /*
