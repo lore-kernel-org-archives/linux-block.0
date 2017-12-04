@@ -1,46 +1,83 @@
-Return-Path: <ktkhai@virtuozzo.com>
-Subject: Re: [PATCH 0/5] blkcg: Limit maximum number of aio requests available
- for cgroup
-To: Tejun Heo <tj@kernel.org>
-Cc: axboe@kernel.dk, bcrl@kvack.org, viro@zeniv.linux.org.uk,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-aio@kvack.org, oleg@redhat.com
+Return-Path: <jmoyer@redhat.com>
+From: Jeff Moyer <jmoyer@redhat.com>
+To: Kirill Tkhai <ktkhai@virtuozzo.com>
+Cc: Benjamin LaHaise <ben@communityfibre.ca>,  axboe@kernel.dk,  viro@zeniv.linux.org.uk,  tj@kernel.org,  linux-block@vger.kernel.org,  linux-kernel@vger.kernel.org,  linux-aio@kvack.org,  oleg@redhat.com
+Subject: Re: [PATCH 0/5] blkcg: Limit maximum number of aio requests available for cgroup
 References: <151240305010.10164.15584502480037205018.stgit@localhost.localdomain>
- <20171204200756.GC2421075@devbig577.frc2.facebook.com>
-From: Kirill Tkhai <ktkhai@virtuozzo.com>
-Message-ID: <17b22d53-ad3d-1ba8-854f-fc2a43d86c44@virtuozzo.com>
-Date: Tue, 5 Dec 2017 00:44:00 +0300
+	<20171204165213.GF11494@kvack.org>
+	<08b9cab6-5237-c027-3bf3-08a69de7fe41@virtuozzo.com>
+Date: Mon, 04 Dec 2017 16:35:23 -0500
+In-Reply-To: <08b9cab6-5237-c027-3bf3-08a69de7fe41@virtuozzo.com> (Kirill
+	Tkhai's message of "Tue, 5 Dec 2017 00:27:37 +0300")
+Message-ID: <x49indmw50k.fsf@segfault.boston.devel.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20171204200756.GC2421075@devbig577.frc2.facebook.com>
-Content-Type: text/plain; charset=utf-8
-Return-Path: ktkhai@virtuozzo.com
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-Hello, Tejun,
+Kirill Tkhai <ktkhai@virtuozzo.com> writes:
 
-On 04.12.2017 23:07, Tejun Heo wrote:
-> On Mon, Dec 04, 2017 at 07:12:51PM +0300, Kirill Tkhai wrote:
->> this patch set introduces accounting aio_nr and aio_max_nr per blkio cgroup.
->> It may be used to limit number of aio requests, which are available for
->> a cgroup, and could be useful for containers.
-> 
-> Can you please explain how this is a fundamental resource which can't
-> be controlled otherwise?
+> Hi, Benjamin,
+>
+> On 04.12.2017 19:52, Benjamin LaHaise wrote:
+>> Hi Kirill,
+>> 
+>> On Mon, Dec 04, 2017 at 07:12:51PM +0300, Kirill Tkhai wrote:
+>>> Hi,
+>>>
+>>> this patch set introduces accounting aio_nr and aio_max_nr per blkio cgroup.
+>>> It may be used to limit number of aio requests, which are available for
+>>> a cgroup, and could be useful for containers.
+>>>
+>>> The accounting is hierarchical, and aio contexts, allocated in child cgroup,
+>>> are accounted in parent cgroups too.
+>>>
+>>> Also, new cgroup file "io.aio_nr" is introduced. It's used to set cgroup
+>>> aio requests limit, to show current limit and number of currenly occupied
+>>> requests.
+>> 
+>> Where are your test cases to check this functionality in the libaio test
+>> suite?
+>
+> I tried to find actual libaio test suite repository url in google,
+> but there is no certain answer. Also, there is no information in kernel
+> anywhere (I hope I grepped right).
+>
+> Could you please provide url where actual upstream libaio could be obtained?
 
-Currently, aio_nr and aio_max_nr are global. In case of containers this
-means that a single container may occupy all aio requests, which are
-available in the system, and to deprive others possibility to use aio
-at all. This may happen because of evil intentions of the container's
-user or because of the program error, when the user makes this occasionally.
+https://pagure.io/libaio
 
-My patch set allows to guarantee that every container or cgroup has
-its own number of allowed aios, and nobody can steal it, and therefore
-can't slow down another containers, and to force programs to use direct io.
+Patches can be sent to this list (linux-aio).
 
-AIO gives certain advantages to its user, so this patchset just doesn't
-allow to rob the advantages without any possibility to protect against that.
+Cheers,
+Jeff
 
-This could be used by LXC or for starting some critical micro-services,
-for example. 
-
-Kirill
+>>> Patches 1-3 are refactoring.
+>>> Patch 4 is the place where the accounting actually introduced.
+>>> Patch 5 adds "io.aio_nr" file.
+>>>
+>>> ---
+>>>
+>>> Kirill Tkhai (5):
+>>>       aio: Move aio_nr increment to separate function
+>>>       aio: Export aio_nr_lock and aio_max_nr initial value to include/linux/aio.h
+>>>       blkcg: Add blkcg::blkg_aio_nr and blkcg::blkg_aio_max_nr
+>>>       blkcg: Charge aio requests in blkio cgroup hierarchy
+>>>       blkcg: Add cgroup file to configure blkcg::blkg_aio_max_nr
+>>>
+>>>
+>>>  block/blk-cgroup.c         |   88 +++++++++++++++++++++++++-
+>>>  fs/aio.c                   |  151 ++++++++++++++++++++++++++++++++++++++++----
+>>>  include/linux/aio.h        |   21 ++++++
+>>>  include/linux/blk-cgroup.h |    4 +
+>>>  4 files changed, 247 insertions(+), 17 deletions(-)
+>>>
+>>> --
+>>> Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
+>>>
+>> 
+>
+> --
+> To unsubscribe, send a message with 'unsubscribe linux-aio' in
+> the body to majordomo@kvack.org.  For more info on Linux AIO,
+> see: http://www.kvack.org/aio/
+> Don't email: <a href=mailto:"aart@kvack.org">aart@kvack.org</a>
