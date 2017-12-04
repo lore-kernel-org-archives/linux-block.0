@@ -1,128 +1,21 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:38754 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752160AbdLDXMe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Dec 2017 18:12:34 -0500
-Received: by mail-pg0-f65.google.com with SMTP id f12so9313900pgo.5
-        for <linux-block@vger.kernel.org>; Mon, 04 Dec 2017 15:12:33 -0800 (PST)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
-Subject: [PATCH] kyber: fix another domain token wait queue hang
-Date: Mon,  4 Dec 2017 15:12:15 -0800
-Message-Id: <c3ac90a0ef5fc19319f50c6be1a4bf1f50a15ccb.1512428537.git.osandov@fb.com>
+Received: from bombadil.infradead.org ([65.50.211.133]:57076 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752677AbdLDQgD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Dec 2017 11:36:03 -0500
+From: Christoph Hellwig <hch@lst.de>
+To: iommu@lists.linux-foundation.org, linux-arch@vger.kernel.org,
+        linux-block@vger.kernel.org, netdev@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org
+Subject: replace PCI_DMA_BUS_IS_PHYS with a per-instance flag
+Date: Mon,  4 Dec 2017 08:35:58 -0800
+Message-Id: <20171204163601.3055-1-hch@lst.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+Hi all,
 
-Commit 8cf466602028 ("kyber: fix hang on domain token wait queue") fixed
-a hang caused by leaving wait entries on the domain token wait queue
-after the __sbitmap_queue_get() retry succeeded, making that wait entry
-a "dud" which won't in turn wake more entries up. However, we can also
-get a dud entry if kyber_get_domain_token() fails once but is then
-called again and succeeds. This can happen if the hardware queue is
-rerun for some other reason, or, more likely, kyber_dispatch_request()
-tries the same domain twice.
-
-The fix is to remove our entry from the wait queue whenever we
-successfully get a token. The only complication is that we might be on
-one of many wait queues in the struct sbitmap_queue, but that's easily
-fixed by remembering which wait queue we were put on.
-
-While we're here, only initialize the wait queue entry once instead on
-every wait, and use spin_lock_irq() instead of spin_lock_irqsave(),
-since this is always called from process context with irqs enabled.
-
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
-I have another, rarer hang I'm still working out, but I can get this one
-out of the way.
-
- block/kyber-iosched.c | 39 +++++++++++++++++++++++++--------------
- 1 file changed, 25 insertions(+), 14 deletions(-)
-
-diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-index b4df317c2916..00cf624ce3ed 100644
---- a/block/kyber-iosched.c
-+++ b/block/kyber-iosched.c
-@@ -100,9 +100,13 @@ struct kyber_hctx_data {
- 	unsigned int cur_domain;
- 	unsigned int batching;
- 	wait_queue_entry_t domain_wait[KYBER_NUM_DOMAINS];
-+	struct sbq_wait_state *domain_ws[KYBER_NUM_DOMAINS];
- 	atomic_t wait_index[KYBER_NUM_DOMAINS];
- };
- 
-+static int kyber_domain_wake(wait_queue_entry_t *wait, unsigned mode, int flags,
-+			     void *key);
-+
- static int rq_sched_domain(const struct request *rq)
- {
- 	unsigned int op = rq->cmd_flags;
-@@ -385,6 +389,9 @@ static int kyber_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
- 
- 	for (i = 0; i < KYBER_NUM_DOMAINS; i++) {
- 		INIT_LIST_HEAD(&khd->rqs[i]);
-+		init_waitqueue_func_entry(&khd->domain_wait[i],
-+					  kyber_domain_wake);
-+		khd->domain_wait[i].private = hctx;
- 		INIT_LIST_HEAD(&khd->domain_wait[i].entry);
- 		atomic_set(&khd->wait_index[i], 0);
- 	}
-@@ -524,35 +531,39 @@ static int kyber_get_domain_token(struct kyber_queue_data *kqd,
- 	int nr;
- 
- 	nr = __sbitmap_queue_get(domain_tokens);
--	if (nr >= 0)
--		return nr;
- 
- 	/*
- 	 * If we failed to get a domain token, make sure the hardware queue is
- 	 * run when one becomes available. Note that this is serialized on
- 	 * khd->lock, but we still need to be careful about the waker.
- 	 */
--	if (list_empty_careful(&wait->entry)) {
--		init_waitqueue_func_entry(wait, kyber_domain_wake);
--		wait->private = hctx;
-+	if (nr < 0 && list_empty_careful(&wait->entry)) {
- 		ws = sbq_wait_ptr(domain_tokens,
- 				  &khd->wait_index[sched_domain]);
--		add_wait_queue(&ws->wait, wait);
-+		khd->domain_ws[sched_domain] = ws;
-+		add_wait_queue_exclusive(&ws->wait, wait);
- 
- 		/*
- 		 * Try again in case a token was freed before we got on the wait
--		 * queue. The waker may have already removed the entry from the
--		 * wait queue, but list_del_init() is okay with that.
-+		 * queue.
- 		 */
- 		nr = __sbitmap_queue_get(domain_tokens);
--		if (nr >= 0) {
--			unsigned long flags;
-+	}
- 
--			spin_lock_irqsave(&ws->wait.lock, flags);
--			list_del_init(&wait->entry);
--			spin_unlock_irqrestore(&ws->wait.lock, flags);
--		}
-+	/*
-+	 * If we got a token while we were on the wait queue, remove ourselves
-+	 * from the wait queue to ensure that all wake ups make forward
-+	 * progress. It's possible that the waker already deleted the entry
-+	 * between the !list_empty_careful() check and us grabbing the lock, but
-+	 * list_del_init() is okay with that.
-+	 */
-+	if (nr >= 0 && !list_empty_careful(&wait->entry)) {
-+		ws = khd->domain_ws[sched_domain];
-+		spin_lock_irq(&ws->wait.lock);
-+		list_del_init(&wait->entry);
-+		spin_unlock_irq(&ws->wait.lock);
- 	}
-+
- 	return nr;
- }
- 
--- 
-2.15.1
+this small series tries to get rid of the global and misnamed
+PCI_DMA_BUS_IS_PHYS flag, and replace it with a setting in each
+struct dma_map_ops instance.
