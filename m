@@ -1,63 +1,99 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f52.google.com ([74.125.83.52]:42513 "EHLO
-        mail-pg0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751112AbdLEHRI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Dec 2017 02:17:08 -0500
-Received: by mail-pg0-f52.google.com with SMTP id e14so10091570pgr.9
-        for <linux-block@vger.kernel.org>; Mon, 04 Dec 2017 23:17:08 -0800 (PST)
-Subject: Re: [PATCH] [PATCH v2] bcache: segregate flash only volume write
- streams from cached devices
-To: tang.junhui@zte.com.cn, colyli@suse.de
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-References: <1512367914-9257-1-git-send-email-tang.junhui@zte.com.cn>
-From: Michael Lyle <mlyle@lyle.org>
-Message-ID: <b7474776-7126-2d7d-43e4-f956b66d1fdb@lyle.org>
-Date: Mon, 4 Dec 2017 23:17:04 -0800
-MIME-Version: 1.0
-In-Reply-To: <1512367914-9257-1-git-send-email-tang.junhui@zte.com.cn>
-Content-Type: text/plain; charset=utf-8
+Received: from out1.zte.com.cn ([202.103.147.172]:36298 "EHLO mxct.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751205AbdLDGME (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 4 Dec 2017 01:12:04 -0500
+From: tang.junhui@zte.com.cn
+To: colyli@suse.de, mlyle@lyle.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        tang.junhui@zte.com.cn
+Subject: Re: [PATCH] [PATCH v2] bcache: segregate flash only volume write streams from cached devices
+Date: Mon, 4 Dec 2017 14:11:54 +0800
+Message-Id: <1512367914-9257-1-git-send-email-tang.junhui@zte.com.cn>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Tang Junhui--
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-Hi
+Hello Mike & Coly
 
-On 12/03/2017 10:11 PM, tang.junhui@zte.com.cn wrote:
+Could you please have a reveiw for this patch?
+
 > From: Tang Junhui <tang.junhui@zte.com.cn>
 > 
-> Hello Mike & Coly
+> In such scenario that there are some flash only volumes
+> , and some cached devices, when many tasks request these devices in
+> writeback mode, the write IOs may fall to the same bucket as bellow:
+> | cached data | flash data | cached data | cached data| flash data|
+> then after writeback of these cached devices, the bucket would
+> be like bellow bucket:
+> | free | flash data | free | free | flash data |
 > 
-> Could you please have a reveiw for this patch?
+> So, there are many free space in this bucket, but since data of flash
+> only volumes still exists, so this bucket cannot be reclaimable,
+> which would cause waste of bucket space.
 > 
->> From: Tang Junhui <tang.junhui@zte.com.cn>
->>
->> In such scenario that there are some flash only volumes
->> , and some cached devices, when many tasks request these devices in
->> writeback mode, the write IOs may fall to the same bucket as bellow:
->> | cached data | flash data | cached data | cached data| flash data|
->> then after writeback of these cached devices, the bucket would
->> be like bellow bucket:
->> | free | flash data | free | free | flash data |
->>
->> So, there are many free space in this bucket, but since data of flash
->> only volumes still exists, so this bucket cannot be reclaimable,
->> which would cause waste of bucket space.
->>
->> In this patch, we segregate flash only volume write streams from
->> cached devices, so data from flash only volumes and cached devices
->> can store in different buckets.
->>
->> Compare to v1 patch, this patch do not add a additionally open bucket
->> list, and it is try best to segregate flash only volume write streams
->> from cached devices, sectors of flash only volumes may still be mixed
->> with dirty sectors of cached device, but the number is very small.
->>
->> Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-
-LGTM, and I have added to my staging tree, though it required
-cleanpatch. (executable, line ending).
+> In this patch, we segregate flash only volume write streams from
+> cached devices, so data from flash only volumes and cached devices
+> can store in different buckets.
+> 
+> Compare to v1 patch, this patch do not add a additionally open bucket
+> list, and it is try best to segregate flash only volume write streams
+> from cached devices, sectors of flash only volumes may still be mixed
+> with dirty sectors of cached device, but the number is very small.
+> 
+> Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+> ---
+>  drivers/md/bcache/alloc.c | 19 ++++++++++++++-----
+>  1 file changed, 14 insertions(+), 5 deletions(-)
+>  mode change 100644 => 100755 drivers/md/bcache/alloc.c
+> 
+> diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
+> old mode 100644
+> new mode 100755
+> index 0803563..4302922
+> --- a/drivers/md/bcache/alloc.c
+> +++ b/drivers/md/bcache/alloc.c
+> @@ -514,15 +514,21 @@ struct open_bucket {
+>  
+>  /*
+>   * We keep multiple buckets open for writes, and try to segregate different
+> - * write streams for better cache utilization: first we look for a bucket where
+> - * the last write to it was sequential with the current write, and failing that
+> - * we look for a bucket that was last used by the same task.
+> + * write streams for better cache utilization: first we try to segregate flash
+> + * only volume write streams from cached devices, secondly we look for a bucket
+> + * where the last write to it was sequential with the current write, and
+> + * failing that we look for a bucket that was last used by the same task.
+>   *
+>   * The ideas is if you've got multiple tasks pulling data into the cache at the
+>   * same time, you'll get better cache utilization if you try to segregate their
+>   * data and preserve locality.
+>   *
+> - * For example, say you've starting Firefox at the same time you're copying a
+> + * For example, dirty sectors of flash only volume is not reclaimable, if their
+> + * dirty sectors mixed with dirty sectors of cached device, such buckets will 
+> + * be marked as dirty and won't be reclaimed, though the dirty data of cached 
+> + * device have been written back to backend device.
+> + *
+> + * And say you've starting Firefox at the same time you're copying a
+>   * bunch of files. Firefox will likely end up being fairly hot and stay in the
+>   * cache awhile, but the data you copied might not be; if you wrote all that
+>   * data to the same buckets it'd get invalidated at the same time.
+> @@ -539,7 +545,10 @@ static struct open_bucket *pick_data_bucket(struct cache_set *c,
+>      struct open_bucket *ret, *ret_task = NULL;
+>  
+>      list_for_each_entry_reverse(ret, &c->data_buckets, list)
+> -        if (!bkey_cmp(&ret->key, search))
+> +        if (UUID_FLASH_ONLY(&c->uuids[KEY_INODE(&ret->key)]) != 
+> +            UUID_FLASH_ONLY(&c->uuids[KEY_INODE(search)]))
+> +            continue;
+> +        else if (!bkey_cmp(&ret->key, search))
+>              goto found;
+>          else if (ret->last_write_point == write_point)
+>              ret_task = ret;
+> -- 
+> 1.8.3.1
 
 Thanks,
-
-Mike
+Tang
