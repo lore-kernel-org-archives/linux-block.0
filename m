@@ -1,62 +1,47 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-From: Tejun Heo <tj@kernel.org>
-To: axboe@kernel.dk
-Cc: linux-kernel@vger.kernel.org,
-	oleg@redhat.com,
-	peterz@infradead.org,
-	kernel-team@fb.com,
-	osandov@fb.com,
-	linux-block@vger.kernel.org,
-	hch@lst.de,
-	Tejun Heo <tj@kernel.org>
-Subject: [PATCH 1/6] blk-mq: protect completion path with RCU
-Date: Tue, 12 Dec 2017 11:01:29 -0800
-Message-Id: <20171212190134.535941-2-tj@kernel.org>
-In-Reply-To: <20171212190134.535941-1-tj@kernel.org>
-References: <20171212190134.535941-1-tj@kernel.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:33323 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752959AbdLDQgD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Dec 2017 11:36:03 -0500
+From: Christoph Hellwig <hch@lst.de>
+To: iommu@lists.linux-foundation.org, linux-arch@vger.kernel.org,
+        linux-block@vger.kernel.org, netdev@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org
+Subject: [PATCH 2/3] arm64: don't override dma_max_pfn
+Date: Mon,  4 Dec 2017 08:36:00 -0800
+Message-Id: <20171204163601.3055-3-hch@lst.de>
+In-Reply-To: <20171204163601.3055-1-hch@lst.de>
+References: <20171204163601.3055-1-hch@lst.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Currently, blk-mq protects only the issue path with RCU.  This patch
-puts the completion path under the same RCU protection.  This will be
-used to synchronize issue/completion against timeout by later patches,
-which will also add the comments.
+The generic version now takes dma_pfn_offset into account, so there is no
+more need for an architecture override.
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/dma-mapping.h | 9 ---------
+ 1 file changed, 9 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1109747..acf4fbb 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -568,11 +568,23 @@ static void __blk_mq_complete_request(struct request *rq)
- void blk_mq_complete_request(struct request *rq)
+diff --git a/arch/arm64/include/asm/dma-mapping.h b/arch/arm64/include/asm/dma-mapping.h
+index 0df756b24863..eada887a93bf 100644
+--- a/arch/arm64/include/asm/dma-mapping.h
++++ b/arch/arm64/include/asm/dma-mapping.h
+@@ -76,14 +76,5 @@ static inline void dma_mark_clean(void *addr, size_t size)
  {
- 	struct request_queue *q = rq->q;
-+	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, rq->mq_ctx->cpu);
-+	int srcu_idx;
- 
- 	if (unlikely(blk_should_fake_timeout(q)))
- 		return;
--	if (!blk_mark_rq_complete(rq))
--		__blk_mq_complete_request(rq);
-+
-+	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
-+		rcu_read_lock();
-+		if (!blk_mark_rq_complete(rq))
-+			__blk_mq_complete_request(rq);
-+		rcu_read_unlock();
-+	} else {
-+		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
-+		if (!blk_mark_rq_complete(rq))
-+			__blk_mq_complete_request(rq);
-+		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
-+	}
  }
- EXPORT_SYMBOL(blk_mq_complete_request);
  
+-/* Override for dma_max_pfn() */
+-static inline unsigned long dma_max_pfn(struct device *dev)
+-{
+-	dma_addr_t dma_max = (dma_addr_t)*dev->dma_mask;
+-
+-	return (ulong)dma_to_phys(dev, dma_max) >> PAGE_SHIFT;
+-}
+-#define dma_max_pfn(dev) dma_max_pfn(dev)
+-
+ #endif	/* __KERNEL__ */
+ #endif	/* __ASM_DMA_MAPPING_H */
 -- 
-2.9.5
+2.14.2
