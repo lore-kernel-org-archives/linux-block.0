@@ -1,86 +1,49 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Tue, 5 Dec 2017 07:01:52 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "jthumshirn@suse.de" <jthumshirn@suse.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"hch@lst.de" <hch@lst.de>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"hare@suse.com" <hare@suse.com>,
-	"jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>
+Return-Path: <prvs=5045c664d=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "jthumshirn@suse.de" <jthumshirn@suse.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "hch@lst.de" <hch@lst.de>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"hare@suse.com" <hare@suse.com>, "jejb@linux.vnet.ibm.com"
+	<jejb@linux.vnet.ibm.com>
 Subject: Re: [PATCH] blk-mq: Fix several SCSI request queue lockups
-Message-ID: <20171204230151.GD6888@ming.t460p>
+Date: Mon, 4 Dec 2017 22:48:18 +0000
+Message-ID: <1512427697.2795.14.camel@wdc.com>
 References: <20171204173032.16330-1-bart.vanassche@wdc.com>
- <20171204224200.GA6888@ming.t460p>
- <1512427697.2795.14.camel@wdc.com>
+	 <20171204224200.GA6888@ming.t460p>
+In-Reply-To: <20171204224200.GA6888@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1512427697.2795.14.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Dec 04, 2017 at 10:48:18PM +0000, Bart Van Assche wrote:
-> On Tue, 2017-12-05 at 06:42 +0800, Ming Lei wrote:
-> > On Mon, Dec 04, 2017 at 09:30:32AM -0800, Bart Van Assche wrote:
-> > > * A systematic lockup for SCSI queues with queue depth 1. The
-> > >   following test reproduces that bug systematically:
-> > >   - Change the SRP initiator such that SCSI target queue depth is
-> > >     limited to 1.
-> > >   - Run the following command:
-> > >       srp-test/run_tests -f xfs -d -e none -r 60 -t 01
-> > >   See also "[PATCH 4/7] blk-mq: Avoid that request processing
-> > >   stalls when sharing tags"
-> > >   (https://marc.info/?l=linux-block&m=151208695316857). Note:
-> > >   reverting commit 0df21c86bdbf also fixes a sporadic SCSI request
-> > >   queue lockup while inserting a blk_mq_sched_mark_restart_hctx()
-> > >   before all blk_mq_dispatch_rq_list() calls only fixes the
-> > >   systematic lockup for queue depth 1.
-> > 
-> > You are the only reproducer [ ... ]
-> 
-> That's not correct. I'm pretty sure if you try to reproduce this that
-> you will see the same hang I ran into. Does this mean that you have not
-> yet tried to reproduce the hang I reported?
-
-Do you mean every kernel developer has to own one SRP/IB hardware?
-I don't have your hardware to reproduce that, and I don't think most
-of guys have that. Otherwise, there should have be such similar reports
-from others, not from only you.
-
-More importantly I don't understand why you can't share the kernel
-log/debugfs log when IO hang happens?
-
-Without any kernel log, how can we confirm that it is a valid report?
-
-> 
-> > You said that your patch fixes 'commit b347689ffbca ("blk-mq-sched:
-> > improve dispatching from sw queue")', but you don't mention any issue
-> > about that commit.
-> 
-> That's not correct either. From the commit message "A systematic lockup
-> for SCSI queues with queue depth 1."
-
-I mean you mentioned your patch can fix 'commit b347689ffbca
-("blk-mq-sched: improve dispatching from sw queue")', but you never
-point where the commit b347689ffbca is wrong, how your patch fixes
-the mistake of that commit.
-
-> 
-> > > I think the above means that it is too risky to try to fix all bugs
-> > > introduced by commit 0df21c86bdbf before kernel v4.15 is released.
-> > > Hence revert that commit.
-> > 
-> > What is the risk?
-> 
-> That more bugs were introduced by commit 0df21c86bdbf than the ones that
-> have been discovered so far.
-
-If you don't provide any log, I have to ignore your report simply.
-So there is only one real issue which can be addressed easily by
-the following patch:
-
-https://marc.info/?l=linux-scsi&m=151223234607157&w=2
-
--- 
-Ming
+T24gVHVlLCAyMDE3LTEyLTA1IGF0IDA2OjQyICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
+TW9uLCBEZWMgMDQsIDIwMTcgYXQgMDk6MzA6MzJBTSAtMDgwMCwgQmFydCBWYW4gQXNzY2hlIHdy
+b3RlOg0KPiA+ICogQSBzeXN0ZW1hdGljIGxvY2t1cCBmb3IgU0NTSSBxdWV1ZXMgd2l0aCBxdWV1
+ZSBkZXB0aCAxLiBUaGUNCj4gPiAgIGZvbGxvd2luZyB0ZXN0IHJlcHJvZHVjZXMgdGhhdCBidWcg
+c3lzdGVtYXRpY2FsbHk6DQo+ID4gICAtIENoYW5nZSB0aGUgU1JQIGluaXRpYXRvciBzdWNoIHRo
+YXQgU0NTSSB0YXJnZXQgcXVldWUgZGVwdGggaXMNCj4gPiAgICAgbGltaXRlZCB0byAxLg0KPiA+
+ICAgLSBSdW4gdGhlIGZvbGxvd2luZyBjb21tYW5kOg0KPiA+ICAgICAgIHNycC10ZXN0L3J1bl90
+ZXN0cyAtZiB4ZnMgLWQgLWUgbm9uZSAtciA2MCAtdCAwMQ0KPiA+ICAgU2VlIGFsc28gIltQQVRD
+SCA0LzddIGJsay1tcTogQXZvaWQgdGhhdCByZXF1ZXN0IHByb2Nlc3NpbmcNCj4gPiAgIHN0YWxs
+cyB3aGVuIHNoYXJpbmcgdGFncyINCj4gPiAgIChodHRwczovL21hcmMuaW5mby8/bD1saW51eC1i
+bG9jayZtPTE1MTIwODY5NTMxNjg1NykuIE5vdGU6DQo+ID4gICByZXZlcnRpbmcgY29tbWl0IDBk
+ZjIxYzg2YmRiZiBhbHNvIGZpeGVzIGEgc3BvcmFkaWMgU0NTSSByZXF1ZXN0DQo+ID4gICBxdWV1
+ZSBsb2NrdXAgd2hpbGUgaW5zZXJ0aW5nIGEgYmxrX21xX3NjaGVkX21hcmtfcmVzdGFydF9oY3R4
+KCkNCj4gPiAgIGJlZm9yZSBhbGwgYmxrX21xX2Rpc3BhdGNoX3JxX2xpc3QoKSBjYWxscyBvbmx5
+IGZpeGVzIHRoZQ0KPiA+ICAgc3lzdGVtYXRpYyBsb2NrdXAgZm9yIHF1ZXVlIGRlcHRoIDEuDQo+
+IA0KPiBZb3UgYXJlIHRoZSBvbmx5IHJlcHJvZHVjZXIgWyAuLi4gXQ0KDQpUaGF0J3Mgbm90IGNv
+cnJlY3QuIEknbSBwcmV0dHkgc3VyZSBpZiB5b3UgdHJ5IHRvIHJlcHJvZHVjZSB0aGlzIHRoYXQN
+CnlvdSB3aWxsIHNlZSB0aGUgc2FtZSBoYW5nIEkgcmFuIGludG8uIERvZXMgdGhpcyBtZWFuIHRo
+YXQgeW91IGhhdmUgbm90DQp5ZXQgdHJpZWQgdG8gcmVwcm9kdWNlIHRoZSBoYW5nIEkgcmVwb3J0
+ZWQ/DQoNCj4gWW91IHNhaWQgdGhhdCB5b3VyIHBhdGNoIGZpeGVzICdjb21taXQgYjM0NzY4OWZm
+YmNhICgiYmxrLW1xLXNjaGVkOg0KPiBpbXByb3ZlIGRpc3BhdGNoaW5nIGZyb20gc3cgcXVldWUi
+KScsIGJ1dCB5b3UgZG9uJ3QgbWVudGlvbiBhbnkgaXNzdWUNCj4gYWJvdXQgdGhhdCBjb21taXQu
+DQoNClRoYXQncyBub3QgY29ycmVjdCBlaXRoZXIuIEZyb20gdGhlIGNvbW1pdCBtZXNzYWdlICJB
+IHN5c3RlbWF0aWMgbG9ja3VwDQpmb3IgU0NTSSBxdWV1ZXMgd2l0aCBxdWV1ZSBkZXB0aCAxLiIN
+Cg0KPiA+IEkgdGhpbmsgdGhlIGFib3ZlIG1lYW5zIHRoYXQgaXQgaXMgdG9vIHJpc2t5IHRvIHRy
+eSB0byBmaXggYWxsIGJ1Z3MNCj4gPiBpbnRyb2R1Y2VkIGJ5IGNvbW1pdCAwZGYyMWM4NmJkYmYg
+YmVmb3JlIGtlcm5lbCB2NC4xNSBpcyByZWxlYXNlZC4NCj4gPiBIZW5jZSByZXZlcnQgdGhhdCBj
+b21taXQuDQo+IA0KPiBXaGF0IGlzIHRoZSByaXNrPw0KDQpUaGF0IG1vcmUgYnVncyB3ZXJlIGlu
+dHJvZHVjZWQgYnkgY29tbWl0IDBkZjIxYzg2YmRiZiB0aGFuIHRoZSBvbmVzIHRoYXQNCmhhdmUg
+YmVlbiBkaXNjb3ZlcmVkIHNvIGZhci4NCg0KQmFydC4=
