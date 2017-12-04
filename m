@@ -1,85 +1,90 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Tue, 5 Dec 2017 06:42:06 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>,
+Return-Path: <prvs=5045c664d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Hannes Reinecke <hare@suse.com>,
 	Johannes Thumshirn <jthumshirn@suse.de>,
 	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
 	"Martin K . Petersen" <martin.petersen@oracle.com>,
 	linux-scsi@vger.kernel.org
-Subject: Re: [PATCH] blk-mq: Fix several SCSI request queue lockups
-Message-ID: <20171204224200.GA6888@ming.t460p>
-References: <20171204173032.16330-1-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171204173032.16330-1-bart.vanassche@wdc.com>
+Subject: [PATCH] blk-mq: Fix several SCSI request queue lockups
+Date: Mon,  4 Dec 2017 09:30:32 -0800
+Message-Id: <20171204173032.16330-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Dec 04, 2017 at 09:30:32AM -0800, Bart Van Assche wrote:
-> Commit 0df21c86bdbf introduced several bugs:
-> * A SCSI queue stall for queue depths > 1, addressed by commit
->   88022d7201e9 ("blk-mq: don't handle failure in .get_budget")
+Commit 0df21c86bdbf introduced several bugs:
+* A SCSI queue stall for queue depths > 1, addressed by commit
+  88022d7201e9 ("blk-mq: don't handle failure in .get_budget")
+* A systematic lockup for SCSI queues with queue depth 1. The
+  following test reproduces that bug systematically:
+  - Change the SRP initiator such that SCSI target queue depth is
+    limited to 1.
+  - Run the following command:
+      srp-test/run_tests -f xfs -d -e none -r 60 -t 01
+  See also "[PATCH 4/7] blk-mq: Avoid that request processing
+  stalls when sharing tags"
+  (https://marc.info/?l=linux-block&m=151208695316857). Note:
+  reverting commit 0df21c86bdbf also fixes a sporadic SCSI request
+  queue lockup while inserting a blk_mq_sched_mark_restart_hctx()
+  before all blk_mq_dispatch_rq_list() calls only fixes the
+  systematic lockup for queue depth 1.
+* A scsi_debug lockup - see also "[PATCH] SCSI: delay run queue if
+  device is blocked in scsi_dev_queue_ready()"
+  (https://marc.info/?l=linux-block&m=151223233407154).
 
-This one is committed already.
+I think the above means that it is too risky to try to fix all bugs
+introduced by commit 0df21c86bdbf before kernel v4.15 is released.
+Hence revert that commit.
 
-> * A systematic lockup for SCSI queues with queue depth 1. The
->   following test reproduces that bug systematically:
->   - Change the SRP initiator such that SCSI target queue depth is
->     limited to 1.
->   - Run the following command:
->       srp-test/run_tests -f xfs -d -e none -r 60 -t 01
->   See also "[PATCH 4/7] blk-mq: Avoid that request processing
->   stalls when sharing tags"
->   (https://marc.info/?l=linux-block&m=151208695316857). Note:
->   reverting commit 0df21c86bdbf also fixes a sporadic SCSI request
->   queue lockup while inserting a blk_mq_sched_mark_restart_hctx()
->   before all blk_mq_dispatch_rq_list() calls only fixes the
->   systematic lockup for queue depth 1.
+Fixes: commit 0df21c86bdbf ("scsi: implement .get_budget and .put_budget for blk-mq")
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: James E.J. Bottomley <jejb@linux.vnet.ibm.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org
+---
+ drivers/scsi/scsi_lib.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-You are the only reproducer, and you don't want to provide any kernel
-log about this issue, so how can we help you fix your issue?
-
-You said that your patch fixes 'commit b347689ffbca ("blk-mq-sched:
-improve dispatching from sw queue")', but you don't mention any issue
-about that commit, and your patch is actually nothing to do with
-commit b347689ffbca, and seems your work style is just try and guess.
-
-Also both Jens and I have run tests on null_blk and scsi_debug by setting
-queue_depth as one, and we all can't see IO hang with current blk-mq.
-
-> * A scsi_debug lockup - see also "[PATCH] SCSI: delay run queue if
->   device is blocked in scsi_dev_queue_ready()"
->   (https://marc.info/?l=linux-block&m=151223233407154).
-
-This issue is clearly explained in theory, and can be reproduced/verified
-by scsi_debug, so why can't we apply it to fix the issue? And the fix is
-simply and can be thought as cleanup too, since the handling for this case
-becomes same with non-mq path now.
-
-> 
-> I think the above means that it is too risky to try to fix all bugs
-> introduced by commit 0df21c86bdbf before kernel v4.15 is released.
-> Hence revert that commit.
-
-What is the risk?
-
-> 
-> Fixes: commit 0df21c86bdbf ("scsi: implement .get_budget and .put_budget for blk-mq")
-> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Hannes Reinecke <hare@suse.com>
-> Cc: Johannes Thumshirn <jthumshirn@suse.de>
-> Cc: James E.J. Bottomley <jejb@linux.vnet.ibm.com>
-> Cc: Martin K. Petersen <martin.petersen@oracle.com>
-> Cc: linux-scsi@vger.kernel.org
-
-This commit fixes one important SCSI_MQ performance issue, we can't
-simply revert it just because of one un-confirmed report from you
-only(without any kernel log provided).
-
-So Nak.
-
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 84bd2b16d216..a7e7966f1477 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1976,9 +1976,11 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	struct scsi_device *sdev = q->queuedata;
+ 	struct Scsi_Host *shost = sdev->host;
+ 	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(req);
+-	blk_status_t ret;
++	blk_status_t ret = BLK_STS_RESOURCE;
+ 	int reason;
+ 
++	if (!scsi_mq_get_budget(hctx))
++		goto out;
+ 	ret = prep_to_mq(scsi_prep_state_check(sdev, req));
+ 	if (ret != BLK_STS_OK)
+ 		goto out_put_budget;
+@@ -2022,6 +2024,7 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 		atomic_dec(&scsi_target(sdev)->target_busy);
+ out_put_budget:
+ 	scsi_mq_put_budget(hctx);
++out:
+ 	switch (ret) {
+ 	case BLK_STS_OK:
+ 		break;
+@@ -2225,8 +2228,6 @@ struct request_queue *scsi_old_alloc_queue(struct scsi_device *sdev)
+ }
+ 
+ static const struct blk_mq_ops scsi_mq_ops = {
+-	.get_budget	= scsi_mq_get_budget,
+-	.put_budget	= scsi_mq_put_budget,
+ 	.queue_rq	= scsi_queue_rq,
+ 	.complete	= scsi_softirq_done,
+ 	.timeout	= scsi_timeout,
 -- 
-Ming
+2.15.0
