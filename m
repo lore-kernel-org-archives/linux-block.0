@@ -1,87 +1,71 @@
-Return-Path: <oleg@redhat.com>
-Date: Tue, 5 Dec 2017 16:19:56 +0100
-From: Oleg Nesterov <oleg@redhat.com>
-To: Kirill Tkhai <ktkhai@virtuozzo.com>
+Return-Path: <ktkhai@virtuozzo.com>
+Subject: Re: [PATCH 0/5] blkcg: Limit maximum number of aio requests available
+ for cgroup
+To: Jeff Moyer <jmoyer@redhat.com>
 Cc: Tejun Heo <tj@kernel.org>, axboe@kernel.dk, bcrl@kvack.org,
-	viro@zeniv.linux.org.uk, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-aio@kvack.org
-Subject: Re: [PATCH 0/5] blkcg: Limit maximum number of aio requests
- available for cgroup
-Message-ID: <20171205151956.GA22836@redhat.com>
+ viro@zeniv.linux.org.uk, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-aio@kvack.org, oleg@redhat.com
 References: <151240305010.10164.15584502480037205018.stgit@localhost.localdomain>
  <20171204200756.GC2421075@devbig577.frc2.facebook.com>
  <17b22d53-ad3d-1ba8-854f-fc2a43d86c44@virtuozzo.com>
+ <20171204215234.GN2421075@devbig577.frc2.facebook.com>
+ <6eaa11a6-a087-42ab-df65-9142b59bf726@virtuozzo.com>
+ <x49a7yyw14n.fsf@segfault.boston.devel.redhat.com>
+From: Kirill Tkhai <ktkhai@virtuozzo.com>
+Message-ID: <707ca8fa-aee1-f068-b8ab-de5004d3d7ac@virtuozzo.com>
+Date: Tue, 5 Dec 2017 02:14:54 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <17b22d53-ad3d-1ba8-854f-fc2a43d86c44@virtuozzo.com>
+In-Reply-To: <x49a7yyw14n.fsf@segfault.boston.devel.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Return-Path: ktkhai@virtuozzo.com
 List-ID: <linux-block@vger.kernel.org>
 
-On 12/05, Kirill Tkhai wrote:
->
-> Currently, aio_nr and aio_max_nr are global.
+On 05.12.2017 01:59, Jeff Moyer wrote:
+> Kirill Tkhai <ktkhai@virtuozzo.com> writes:
+> 
+>> On 05.12.2017 00:52, Tejun Heo wrote:
+>>> Hello, Kirill.
+>>>
+>>> On Tue, Dec 05, 2017 at 12:44:00AM +0300, Kirill Tkhai wrote:
+>>>>> Can you please explain how this is a fundamental resource which can't
+>>>>> be controlled otherwise?
+>>>>
+>>>> Currently, aio_nr and aio_max_nr are global. In case of containers this
+>>>> means that a single container may occupy all aio requests, which are
+>>>> available in the system, and to deprive others possibility to use aio
+>>>> at all. This may happen because of evil intentions of the container's
+>>>> user or because of the program error, when the user makes this occasionally.
+>>>
+>>> Hmm... I see.  It feels really wrong to me to make this a first class
+>>> resource because there is a system wide limit.  The only reason I can
+>>> think of for the system wide limit is to prevent too much kernel
+>>> memory consumed by creating a lot of aios but that squarely falls
+>>> inside cgroup memory controller protection.  If there are other
+>>> reasons why the number of aios should be limited system-wide, please
+>>> bring them up.
+>>>
+>>> If the only reason is kernel memory consumption protection, the only
+>>> thing we need to do is making sure that memory used for aio commands
+>>> are accounted against cgroup kernel memory consumption and
+>>> relaxing/removing system wide limit.
+>>
+>> So, we just use GFP_KERNEL_ACCOUNT flag for allocation of internal aio
+>> structures and pages, and all the memory will be accounted in kmem and
+>> limited by memcg. Looks very good.
+>>
+>> One detail about memory consumption. io_submit() calls primitives
+>> file_operations::write_iter and read_iter. It's not clear for me whether
+>> they consume the same memory as if writev() or readv() system calls
+>> would be used instead. writev() may delay the actual write till dirty
+>> pages limit will be reached, so it seems logic of the accounting should
+>> be the same. So aio mustn't use more not accounted system memory in file
+>> system internals, then simple writev().
+>>
+>> Could you please to say if you have thoughts about this?
+> 
+> I think you just need to account the completion ring.
 
-Yeah, I too tried to complain 2 years ago...
+A request of struct aio_kiocb type consumes much more memory, than
+struct io_event does. Shouldn't we account it too?
 
-> In case of containers this
-> means that a single container may occupy all aio requests, which are
-> available in the system,
-
-and memory. let me quote my old emails...
-
-
-This is off-topic, but the whole "vm" logic in aio_setup_ring()
-looks sub-optimal. I do not mean the code, just it seems to me it
-is pointless to pollute the page cache, and expose the pages we
-can not swap/free to lru. Afaics we _only_ need this for migration.
-
-This memory lives in page-cache/lru, it is visible for shrinker which
-will unmap these pages for no reason on memory shortage. IOW, aio fools
-the kernel, this memory looks reclaimable but it is not. And we only do
-this for migration.
-
-Even if this is not a problem, this does not look right. So perhaps at
-least mapping_set_unevictable() makes sense. But I simply do not know
-if migration will work with this change.
-
-
-
-Perhaps I missed something, doesn't matter. But this means that
-this memory is not accounted, so if I increase aio-max-nr then
-this test-case
-
-	#define __NR_io_setup	206
-
-	int main(void)
-	{
-		int nr;
-
-		for (nr = 0; ;++nr) {
-			void *ctx = NULL;
-			int ret = syscall(__NR_io_setup, 1, &ctx);
-			if (ret) {
-				printf("failed %d %m: ", nr);
-				getchar();
-			}
-		}
-
-		return 0;
-	}
-
-triggers OOM-killer which kills sshd and other daemons on my machine.
-These pages were not even faulted in (or the shrinker can unmap them),
-the kernel can not know who should be blamed.
-
-Shouldn't we account aio events/pages somehow, say per-user, or in
-mm->pinned_vm ?
-
-I do not think this is unkown, and probably this all is fine. IOW,
-this is just a question, not a bug-report or something like this.
-
-And of course, this is not exploitable because aio-max-nr limits
-the number of pages you can steal.
-
-But otoh, aio_max_nr is system-wide, so the unpriviliged user can
-ddos (say) mysqld. And this leads to the same question: shouldn't
-we account nr_events at least?
-
-Oleg.
+Kirill
