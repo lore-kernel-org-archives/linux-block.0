@@ -1,49 +1,85 @@
-Return-Path: <prvs=5045c664d=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "jthumshirn@suse.de" <jthumshirn@suse.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "hch@lst.de" <hch@lst.de>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"hare@suse.com" <hare@suse.com>, "jejb@linux.vnet.ibm.com"
-	<jejb@linux.vnet.ibm.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 5 Dec 2017 06:42:06 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org
 Subject: Re: [PATCH] blk-mq: Fix several SCSI request queue lockups
-Date: Mon, 4 Dec 2017 22:48:18 +0000
-Message-ID: <1512427697.2795.14.camel@wdc.com>
+Message-ID: <20171204224200.GA6888@ming.t460p>
 References: <20171204173032.16330-1-bart.vanassche@wdc.com>
-	 <20171204224200.GA6888@ming.t460p>
-In-Reply-To: <20171204224200.GA6888@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171204173032.16330-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE3LTEyLTA1IGF0IDA2OjQyICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
-TW9uLCBEZWMgMDQsIDIwMTcgYXQgMDk6MzA6MzJBTSAtMDgwMCwgQmFydCBWYW4gQXNzY2hlIHdy
-b3RlOg0KPiA+ICogQSBzeXN0ZW1hdGljIGxvY2t1cCBmb3IgU0NTSSBxdWV1ZXMgd2l0aCBxdWV1
-ZSBkZXB0aCAxLiBUaGUNCj4gPiAgIGZvbGxvd2luZyB0ZXN0IHJlcHJvZHVjZXMgdGhhdCBidWcg
-c3lzdGVtYXRpY2FsbHk6DQo+ID4gICAtIENoYW5nZSB0aGUgU1JQIGluaXRpYXRvciBzdWNoIHRo
-YXQgU0NTSSB0YXJnZXQgcXVldWUgZGVwdGggaXMNCj4gPiAgICAgbGltaXRlZCB0byAxLg0KPiA+
-ICAgLSBSdW4gdGhlIGZvbGxvd2luZyBjb21tYW5kOg0KPiA+ICAgICAgIHNycC10ZXN0L3J1bl90
-ZXN0cyAtZiB4ZnMgLWQgLWUgbm9uZSAtciA2MCAtdCAwMQ0KPiA+ICAgU2VlIGFsc28gIltQQVRD
-SCA0LzddIGJsay1tcTogQXZvaWQgdGhhdCByZXF1ZXN0IHByb2Nlc3NpbmcNCj4gPiAgIHN0YWxs
-cyB3aGVuIHNoYXJpbmcgdGFncyINCj4gPiAgIChodHRwczovL21hcmMuaW5mby8/bD1saW51eC1i
-bG9jayZtPTE1MTIwODY5NTMxNjg1NykuIE5vdGU6DQo+ID4gICByZXZlcnRpbmcgY29tbWl0IDBk
-ZjIxYzg2YmRiZiBhbHNvIGZpeGVzIGEgc3BvcmFkaWMgU0NTSSByZXF1ZXN0DQo+ID4gICBxdWV1
-ZSBsb2NrdXAgd2hpbGUgaW5zZXJ0aW5nIGEgYmxrX21xX3NjaGVkX21hcmtfcmVzdGFydF9oY3R4
-KCkNCj4gPiAgIGJlZm9yZSBhbGwgYmxrX21xX2Rpc3BhdGNoX3JxX2xpc3QoKSBjYWxscyBvbmx5
-IGZpeGVzIHRoZQ0KPiA+ICAgc3lzdGVtYXRpYyBsb2NrdXAgZm9yIHF1ZXVlIGRlcHRoIDEuDQo+
-IA0KPiBZb3UgYXJlIHRoZSBvbmx5IHJlcHJvZHVjZXIgWyAuLi4gXQ0KDQpUaGF0J3Mgbm90IGNv
-cnJlY3QuIEknbSBwcmV0dHkgc3VyZSBpZiB5b3UgdHJ5IHRvIHJlcHJvZHVjZSB0aGlzIHRoYXQN
-CnlvdSB3aWxsIHNlZSB0aGUgc2FtZSBoYW5nIEkgcmFuIGludG8uIERvZXMgdGhpcyBtZWFuIHRo
-YXQgeW91IGhhdmUgbm90DQp5ZXQgdHJpZWQgdG8gcmVwcm9kdWNlIHRoZSBoYW5nIEkgcmVwb3J0
-ZWQ/DQoNCj4gWW91IHNhaWQgdGhhdCB5b3VyIHBhdGNoIGZpeGVzICdjb21taXQgYjM0NzY4OWZm
-YmNhICgiYmxrLW1xLXNjaGVkOg0KPiBpbXByb3ZlIGRpc3BhdGNoaW5nIGZyb20gc3cgcXVldWUi
-KScsIGJ1dCB5b3UgZG9uJ3QgbWVudGlvbiBhbnkgaXNzdWUNCj4gYWJvdXQgdGhhdCBjb21taXQu
-DQoNClRoYXQncyBub3QgY29ycmVjdCBlaXRoZXIuIEZyb20gdGhlIGNvbW1pdCBtZXNzYWdlICJB
-IHN5c3RlbWF0aWMgbG9ja3VwDQpmb3IgU0NTSSBxdWV1ZXMgd2l0aCBxdWV1ZSBkZXB0aCAxLiIN
-Cg0KPiA+IEkgdGhpbmsgdGhlIGFib3ZlIG1lYW5zIHRoYXQgaXQgaXMgdG9vIHJpc2t5IHRvIHRy
-eSB0byBmaXggYWxsIGJ1Z3MNCj4gPiBpbnRyb2R1Y2VkIGJ5IGNvbW1pdCAwZGYyMWM4NmJkYmYg
-YmVmb3JlIGtlcm5lbCB2NC4xNSBpcyByZWxlYXNlZC4NCj4gPiBIZW5jZSByZXZlcnQgdGhhdCBj
-b21taXQuDQo+IA0KPiBXaGF0IGlzIHRoZSByaXNrPw0KDQpUaGF0IG1vcmUgYnVncyB3ZXJlIGlu
-dHJvZHVjZWQgYnkgY29tbWl0IDBkZjIxYzg2YmRiZiB0aGFuIHRoZSBvbmVzIHRoYXQNCmhhdmUg
-YmVlbiBkaXNjb3ZlcmVkIHNvIGZhci4NCg0KQmFydC4=
+On Mon, Dec 04, 2017 at 09:30:32AM -0800, Bart Van Assche wrote:
+> Commit 0df21c86bdbf introduced several bugs:
+> * A SCSI queue stall for queue depths > 1, addressed by commit
+>   88022d7201e9 ("blk-mq: don't handle failure in .get_budget")
+
+This one is committed already.
+
+> * A systematic lockup for SCSI queues with queue depth 1. The
+>   following test reproduces that bug systematically:
+>   - Change the SRP initiator such that SCSI target queue depth is
+>     limited to 1.
+>   - Run the following command:
+>       srp-test/run_tests -f xfs -d -e none -r 60 -t 01
+>   See also "[PATCH 4/7] blk-mq: Avoid that request processing
+>   stalls when sharing tags"
+>   (https://marc.info/?l=linux-block&m=151208695316857). Note:
+>   reverting commit 0df21c86bdbf also fixes a sporadic SCSI request
+>   queue lockup while inserting a blk_mq_sched_mark_restart_hctx()
+>   before all blk_mq_dispatch_rq_list() calls only fixes the
+>   systematic lockup for queue depth 1.
+
+You are the only reproducer, and you don't want to provide any kernel
+log about this issue, so how can we help you fix your issue?
+
+You said that your patch fixes 'commit b347689ffbca ("blk-mq-sched:
+improve dispatching from sw queue")', but you don't mention any issue
+about that commit, and your patch is actually nothing to do with
+commit b347689ffbca, and seems your work style is just try and guess.
+
+Also both Jens and I have run tests on null_blk and scsi_debug by setting
+queue_depth as one, and we all can't see IO hang with current blk-mq.
+
+> * A scsi_debug lockup - see also "[PATCH] SCSI: delay run queue if
+>   device is blocked in scsi_dev_queue_ready()"
+>   (https://marc.info/?l=linux-block&m=151223233407154).
+
+This issue is clearly explained in theory, and can be reproduced/verified
+by scsi_debug, so why can't we apply it to fix the issue? And the fix is
+simply and can be thought as cleanup too, since the handling for this case
+becomes same with non-mq path now.
+
+> 
+> I think the above means that it is too risky to try to fix all bugs
+> introduced by commit 0df21c86bdbf before kernel v4.15 is released.
+> Hence revert that commit.
+
+What is the risk?
+
+> 
+> Fixes: commit 0df21c86bdbf ("scsi: implement .get_budget and .put_budget for blk-mq")
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> Cc: James E.J. Bottomley <jejb@linux.vnet.ibm.com>
+> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+> Cc: linux-scsi@vger.kernel.org
+
+This commit fixes one important SCSI_MQ performance issue, we can't
+simply revert it just because of one un-confirmed report from you
+only(without any kernel log provided).
+
+So Nak.
+
+-- 
+Ming
