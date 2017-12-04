@@ -1,167 +1,97 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Tue, 5 Dec 2017 08:20:46 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "jthumshirn@suse.de" <jthumshirn@suse.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"hch@lst.de" <hch@lst.de>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"hare@suse.com" <hare@suse.com>,
-	"jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>
+Return-Path: <prvs=5045c664d=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "jthumshirn@suse.de" <jthumshirn@suse.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "hch@lst.de" <hch@lst.de>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"hare@suse.com" <hare@suse.com>, "jejb@linux.vnet.ibm.com"
+	<jejb@linux.vnet.ibm.com>
 Subject: Re: [PATCH] blk-mq: Fix several SCSI request queue lockups
-Message-ID: <20171205002040.GA8365@ming.t460p>
+Date: Mon, 4 Dec 2017 23:32:27 +0000
+Message-ID: <1512430346.2795.34.camel@wdc.com>
 References: <20171204173032.16330-1-bart.vanassche@wdc.com>
- <20171204224200.GA6888@ming.t460p>
- <1512427697.2795.14.camel@wdc.com>
- <20171204230151.GD6888@ming.t460p>
- <1512430346.2795.34.camel@wdc.com>
+	 <20171204224200.GA6888@ming.t460p> <1512427697.2795.14.camel@wdc.com>
+	 <20171204230151.GD6888@ming.t460p>
+In-Reply-To: <20171204230151.GD6888@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1512430346.2795.34.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Dec 04, 2017 at 11:32:27PM +0000, Bart Van Assche wrote:
-> On Tue, 2017-12-05 at 07:01 +0800, Ming Lei wrote:
-> > On Mon, Dec 04, 2017 at 10:48:18PM +0000, Bart Van Assche wrote:
-> > > On Tue, 2017-12-05 at 06:42 +0800, Ming Lei wrote:
-> > > > On Mon, Dec 04, 2017 at 09:30:32AM -0800, Bart Van Assche wrote:
-> > > > > * A systematic lockup for SCSI queues with queue depth 1. The
-> > > > >   following test reproduces that bug systematically:
-> > > > >   - Change the SRP initiator such that SCSI target queue depth is
-> > > > >     limited to 1.
-> > > > >   - Run the following command:
-> > > > >       srp-test/run_tests -f xfs -d -e none -r 60 -t 01
-> > > > >   See also "[PATCH 4/7] blk-mq: Avoid that request processing
-> > > > >   stalls when sharing tags"
-> > > > >   (https://marc.info/?l=linux-block&m=151208695316857). Note:
-> > > > >   reverting commit 0df21c86bdbf also fixes a sporadic SCSI request
-> > > > >   queue lockup while inserting a blk_mq_sched_mark_restart_hctx()
-> > > > >   before all blk_mq_dispatch_rq_list() calls only fixes the
-> > > > >   systematic lockup for queue depth 1.
-> > > > 
-> > > > You are the only reproducer [ ... ]
-> > > 
-> > > That's not correct. I'm pretty sure if you try to reproduce this that
-> > > you will see the same hang I ran into. Does this mean that you have not
-> > > yet tried to reproduce the hang I reported?
-> > 
-> > Do you mean every kernel developer has to own one SRP/IB hardware?
-> 
-> When I have the time I will make it possible to run this test on any system
-> equipped with at least one Ethernet port. But the fact that the test I
-> mentioned requires IB hardware should not prevent you from running this test
-> since you have run this test software before.
-> 
-> > I don't have your hardware to reproduce that,
-> 
-> That's not true. Your employer definitely owns IB hardware. E.g. the
-> following message shows that you have run the srp-test yourself on IB hardware
-> only four weeks ago:
-> 
-> https://www.spinics.net/lists/linux-block/msg19511.html
-
-The hardware belongs to Laurence, at that time I can borrow from him, and
-now I am not sure if it is available.
-
-> 
-> > Otherwise, there should have be such similar reports from others, not from
-> > only you.
-> 
-> That's not correct either. How long was it ago that kernel v4.15-rc1 was
-> released? One week? How many SRP users do you think have tried to trigger a
-> queue full condition with that kernel version?
-
-OK, we can wait for further reporters to provide kernel log if you
-don't want.
-
-> 
-> > More importantly I don't understand why you can't share the kernel
-> > log/debugfs log when IO hang happens?
-> > 
-> > Without any kernel log, how can we confirm that it is a valid report?
-> 
-> It's really unfortunate that you are focussing on denying that the bug I
-> reported exists instead of trying to fix the bugs introduced by commit
-
-If you look at bug reports in kenrel mail list, you will see most of
-reports includes some kind of log, that is a common practice to report
-issue with log attached. It can save us much time for talking in mails.
-
-> b347689ffbca. BTW, I have more than enough experience to decide myself what
-> a valid report is and what not. I can easily send you several MB of kernel
-
-As I mentioned, only dmesg with hang trace and debugfs log should be enough,
-both can't be so big, right?
-
-> logs. The reason I have not yet done this is because I'm 99.9% sure that
-> these won't help to root cause the reported issue. But I can tell you what
-
-That is your opinion, most of times, I can find some clue from debugfs
-about hang issue, then I can try to add trace just in some possible
-places for narrowing down the issue.
-
-> I learned from analyzing the information under /sys/kernel/debug/block:
-> every time a hang occurred I noticed that no requests were "busy", that two
-> requests occurred in rq_lists and one request occurred in a hctx dispatch
-
-Then what do other attributes show? Like queue/hctx state?
-
-The following script can get all this info easily:
-
-	http://people.redhat.com/minlei/tests/tools/dump-blk-info
-
-Also it is a bit odd to see request in hctx->dispatch now, and it can only
-happen now when scsi_target_queue_ready() returns false, so I guess you apply
-some change on target->can_queue(such as setting it as 1 in srp/ib code
-manually)?
-
-Please reply, if yes, I will try to see if I can reproduce it with this
-kind of change on scsi_debug.
-
-> list. This is enough to conclude that a queue run was missing. And I think
-
-In this case, seems it isn't related with both commit b347689ff and 0df21c86bdbf,
-since both don't change RESTART for hctx->dispatch, and shouldn't affect
-run queue.
-
-> that the patch at the start of this e-mail thread not only shows that the
-> root cause is in the block layer but also that this bug was introduced by
-> commit b347689ffbca.
-> 
-> > > > You said that your patch fixes 'commit b347689ffbca ("blk-mq-sched:
-> > > > improve dispatching from sw queue")', but you don't mention any issue
-> > > > about that commit.
-> > > 
-> > > That's not correct either. From the commit message "A systematic lockup
-> > > for SCSI queues with queue depth 1."
-> > 
-> > I mean you mentioned your patch can fix 'commit b347689ffbca
-> > ("blk-mq-sched: improve dispatching from sw queue")', but you never
-> > point where the commit b347689ffbca is wrong, how your patch fixes
-> > the mistake of that commit.
-> 
-> You should know that it is not required to perform a root cause analysis
-> before posting a revert. Having performed a bisect is sufficient.
-
-I don't think your issue can't be fixed before releasing V4.15 if enough
-log are provided, and reverting can cause performance regression for all
-SCSI_MQ users.
-
-Also more importantly you may revert a wrong commit, because sometimes
-some commits may make some issue happen easily, not the direct reason
-of the issue.
-
-> 
-> BTW, it seems like you forgot that last Friday I explained to you that there
-> is an obvious bug in commit b347689ffbca, namely that a blk_mq_sched_mark_restart_hctx()
-> call is missing in blk_mq_sched_dispatch_requests() before the blk_mq_do_dispatch_ctx()
-> call. See also https://marc.info/?l=linux-block&m=151215794224401.
-
-No, I have explained to you that your change isn't necessary, see:
-
- https://marc.info/?l=linux-block&m=151217500929341&w=2
-
--- 
-Ming
+T24gVHVlLCAyMDE3LTEyLTA1IGF0IDA3OjAxICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
+TW9uLCBEZWMgMDQsIDIwMTcgYXQgMTA6NDg6MThQTSArMDAwMCwgQmFydCBWYW4gQXNzY2hlIHdy
+b3RlOg0KPiA+IE9uIFR1ZSwgMjAxNy0xMi0wNSBhdCAwNjo0MiArMDgwMCwgTWluZyBMZWkgd3Jv
+dGU6DQo+ID4gPiBPbiBNb24sIERlYyAwNCwgMjAxNyBhdCAwOTozMDozMkFNIC0wODAwLCBCYXJ0
+IFZhbiBBc3NjaGUgd3JvdGU6DQo+ID4gPiA+ICogQSBzeXN0ZW1hdGljIGxvY2t1cCBmb3IgU0NT
+SSBxdWV1ZXMgd2l0aCBxdWV1ZSBkZXB0aCAxLiBUaGUNCj4gPiA+ID4gICBmb2xsb3dpbmcgdGVz
+dCByZXByb2R1Y2VzIHRoYXQgYnVnIHN5c3RlbWF0aWNhbGx5Og0KPiA+ID4gPiAgIC0gQ2hhbmdl
+IHRoZSBTUlAgaW5pdGlhdG9yIHN1Y2ggdGhhdCBTQ1NJIHRhcmdldCBxdWV1ZSBkZXB0aCBpcw0K
+PiA+ID4gPiAgICAgbGltaXRlZCB0byAxLg0KPiA+ID4gPiAgIC0gUnVuIHRoZSBmb2xsb3dpbmcg
+Y29tbWFuZDoNCj4gPiA+ID4gICAgICAgc3JwLXRlc3QvcnVuX3Rlc3RzIC1mIHhmcyAtZCAtZSBu
+b25lIC1yIDYwIC10IDAxDQo+ID4gPiA+ICAgU2VlIGFsc28gIltQQVRDSCA0LzddIGJsay1tcTog
+QXZvaWQgdGhhdCByZXF1ZXN0IHByb2Nlc3NpbmcNCj4gPiA+ID4gICBzdGFsbHMgd2hlbiBzaGFy
+aW5nIHRhZ3MiDQo+ID4gPiA+ICAgKGh0dHBzOi8vbWFyYy5pbmZvLz9sPWxpbnV4LWJsb2NrJm09
+MTUxMjA4Njk1MzE2ODU3KS4gTm90ZToNCj4gPiA+ID4gICByZXZlcnRpbmcgY29tbWl0IDBkZjIx
+Yzg2YmRiZiBhbHNvIGZpeGVzIGEgc3BvcmFkaWMgU0NTSSByZXF1ZXN0DQo+ID4gPiA+ICAgcXVl
+dWUgbG9ja3VwIHdoaWxlIGluc2VydGluZyBhIGJsa19tcV9zY2hlZF9tYXJrX3Jlc3RhcnRfaGN0
+eCgpDQo+ID4gPiA+ICAgYmVmb3JlIGFsbCBibGtfbXFfZGlzcGF0Y2hfcnFfbGlzdCgpIGNhbGxz
+IG9ubHkgZml4ZXMgdGhlDQo+ID4gPiA+ICAgc3lzdGVtYXRpYyBsb2NrdXAgZm9yIHF1ZXVlIGRl
+cHRoIDEuDQo+ID4gPiANCj4gPiA+IFlvdSBhcmUgdGhlIG9ubHkgcmVwcm9kdWNlciBbIC4uLiBd
+DQo+ID4gDQo+ID4gVGhhdCdzIG5vdCBjb3JyZWN0LiBJJ20gcHJldHR5IHN1cmUgaWYgeW91IHRy
+eSB0byByZXByb2R1Y2UgdGhpcyB0aGF0DQo+ID4geW91IHdpbGwgc2VlIHRoZSBzYW1lIGhhbmcg
+SSByYW4gaW50by4gRG9lcyB0aGlzIG1lYW4gdGhhdCB5b3UgaGF2ZSBub3QNCj4gPiB5ZXQgdHJp
+ZWQgdG8gcmVwcm9kdWNlIHRoZSBoYW5nIEkgcmVwb3J0ZWQ/DQo+IA0KPiBEbyB5b3UgbWVhbiBl
+dmVyeSBrZXJuZWwgZGV2ZWxvcGVyIGhhcyB0byBvd24gb25lIFNSUC9JQiBoYXJkd2FyZT8NCg0K
+V2hlbiBJIGhhdmUgdGhlIHRpbWUgSSB3aWxsIG1ha2UgaXQgcG9zc2libGUgdG8gcnVuIHRoaXMg
+dGVzdCBvbiBhbnkgc3lzdGVtDQplcXVpcHBlZCB3aXRoIGF0IGxlYXN0IG9uZSBFdGhlcm5ldCBw
+b3J0LiBCdXQgdGhlIGZhY3QgdGhhdCB0aGUgdGVzdCBJDQptZW50aW9uZWQgcmVxdWlyZXMgSUIg
+aGFyZHdhcmUgc2hvdWxkIG5vdCBwcmV2ZW50IHlvdSBmcm9tIHJ1bm5pbmcgdGhpcyB0ZXN0DQpz
+aW5jZSB5b3UgaGF2ZSBydW4gdGhpcyB0ZXN0IHNvZnR3YXJlIGJlZm9yZS4NCg0KPiBJIGRvbid0
+IGhhdmUgeW91ciBoYXJkd2FyZSB0byByZXByb2R1Y2UgdGhhdCwNCg0KVGhhdCdzIG5vdCB0cnVl
+LiBZb3VyIGVtcGxveWVyIGRlZmluaXRlbHkgb3ducyBJQiBoYXJkd2FyZS4gRS5nLiB0aGUNCmZv
+bGxvd2luZyBtZXNzYWdlIHNob3dzIHRoYXQgeW91IGhhdmUgcnVuIHRoZSBzcnAtdGVzdCB5b3Vy
+c2VsZiBvbiBJQiBoYXJkd2FyZQ0Kb25seSBmb3VyIHdlZWtzIGFnbzoNCg0KaHR0cHM6Ly93d3cu
+c3Bpbmljcy5uZXQvbGlzdHMvbGludXgtYmxvY2svbXNnMTk1MTEuaHRtbA0KDQo+IE90aGVyd2lz
+ZSwgdGhlcmUgc2hvdWxkIGhhdmUgYmUgc3VjaCBzaW1pbGFyIHJlcG9ydHMgZnJvbSBvdGhlcnMs
+IG5vdCBmcm9tDQo+IG9ubHkgeW91Lg0KDQpUaGF0J3Mgbm90IGNvcnJlY3QgZWl0aGVyLiBIb3cg
+bG9uZyB3YXMgaXQgYWdvIHRoYXQga2VybmVsIHY0LjE1LXJjMSB3YXMNCnJlbGVhc2VkPyBPbmUg
+d2Vlaz8gSG93IG1hbnkgU1JQIHVzZXJzIGRvIHlvdSB0aGluayBoYXZlIHRyaWVkIHRvIHRyaWdn
+ZXIgYQ0KcXVldWUgZnVsbCBjb25kaXRpb24gd2l0aCB0aGF0IGtlcm5lbCB2ZXJzaW9uPw0KDQo+
+IE1vcmUgaW1wb3J0YW50bHkgSSBkb24ndCB1bmRlcnN0YW5kIHdoeSB5b3UgY2FuJ3Qgc2hhcmUg
+dGhlIGtlcm5lbA0KPiBsb2cvZGVidWdmcyBsb2cgd2hlbiBJTyBoYW5nIGhhcHBlbnM/DQo+IA0K
+PiBXaXRob3V0IGFueSBrZXJuZWwgbG9nLCBob3cgY2FuIHdlIGNvbmZpcm0gdGhhdCBpdCBpcyBh
+IHZhbGlkIHJlcG9ydD8NCg0KSXQncyByZWFsbHkgdW5mb3J0dW5hdGUgdGhhdCB5b3UgYXJlIGZv
+Y3Vzc2luZyBvbiBkZW55aW5nIHRoYXQgdGhlIGJ1ZyBJDQpyZXBvcnRlZCBleGlzdHMgaW5zdGVh
+ZCBvZiB0cnlpbmcgdG8gZml4IHRoZSBidWdzIGludHJvZHVjZWQgYnkgY29tbWl0DQpiMzQ3Njg5
+ZmZiY2EuIEJUVywgSSBoYXZlIG1vcmUgdGhhbiBlbm91Z2ggZXhwZXJpZW5jZSB0byBkZWNpZGUg
+bXlzZWxmIHdoYXQNCmEgdmFsaWQgcmVwb3J0IGlzIGFuZCB3aGF0IG5vdC4gSSBjYW4gZWFzaWx5
+IHNlbmQgeW91IHNldmVyYWwgTUIgb2Yga2VybmVsDQpsb2dzLiBUaGUgcmVhc29uIEkgaGF2ZSBu
+b3QgeWV0IGRvbmUgdGhpcyBpcyBiZWNhdXNlIEknbSA5OS45JSBzdXJlIHRoYXQNCnRoZXNlIHdv
+bid0IGhlbHAgdG8gcm9vdCBjYXVzZSB0aGUgcmVwb3J0ZWQgaXNzdWUuIEJ1dCBJIGNhbiB0ZWxs
+IHlvdSB3aGF0DQpJIGxlYXJuZWQgZnJvbSBhbmFseXppbmcgdGhlIGluZm9ybWF0aW9uIHVuZGVy
+IC9zeXMva2VybmVsL2RlYnVnL2Jsb2NrOg0KZXZlcnkgdGltZSBhIGhhbmcgb2NjdXJyZWQgSSBu
+b3RpY2VkIHRoYXQgbm8gcmVxdWVzdHMgd2VyZSAiYnVzeSIsIHRoYXQgdHdvDQpyZXF1ZXN0cyBv
+Y2N1cnJlZCBpbiBycV9saXN0cyBhbmQgb25lIHJlcXVlc3Qgb2NjdXJyZWQgaW4gYSBoY3R4IGRp
+c3BhdGNoDQpsaXN0LiBUaGlzIGlzIGVub3VnaCB0byBjb25jbHVkZSB0aGF0IGEgcXVldWUgcnVu
+IHdhcyBtaXNzaW5nLiBBbmQgSSB0aGluaw0KdGhhdCB0aGUgcGF0Y2ggYXQgdGhlIHN0YXJ0IG9m
+IHRoaXMgZS1tYWlsIHRocmVhZCBub3Qgb25seSBzaG93cyB0aGF0IHRoZQ0Kcm9vdCBjYXVzZSBp
+cyBpbiB0aGUgYmxvY2sgbGF5ZXIgYnV0IGFsc28gdGhhdCB0aGlzIGJ1ZyB3YXMgaW50cm9kdWNl
+ZCBieQ0KY29tbWl0IGIzNDc2ODlmZmJjYS4NCg0KPiA+ID4gWW91IHNhaWQgdGhhdCB5b3VyIHBh
+dGNoIGZpeGVzICdjb21taXQgYjM0NzY4OWZmYmNhICgiYmxrLW1xLXNjaGVkOg0KPiA+ID4gaW1w
+cm92ZSBkaXNwYXRjaGluZyBmcm9tIHN3IHF1ZXVlIiknLCBidXQgeW91IGRvbid0IG1lbnRpb24g
+YW55IGlzc3VlDQo+ID4gPiBhYm91dCB0aGF0IGNvbW1pdC4NCj4gPiANCj4gPiBUaGF0J3Mgbm90
+IGNvcnJlY3QgZWl0aGVyLiBGcm9tIHRoZSBjb21taXQgbWVzc2FnZSAiQSBzeXN0ZW1hdGljIGxv
+Y2t1cA0KPiA+IGZvciBTQ1NJIHF1ZXVlcyB3aXRoIHF1ZXVlIGRlcHRoIDEuIg0KPiANCj4gSSBt
+ZWFuIHlvdSBtZW50aW9uZWQgeW91ciBwYXRjaCBjYW4gZml4ICdjb21taXQgYjM0NzY4OWZmYmNh
+DQo+ICgiYmxrLW1xLXNjaGVkOiBpbXByb3ZlIGRpc3BhdGNoaW5nIGZyb20gc3cgcXVldWUiKScs
+IGJ1dCB5b3UgbmV2ZXINCj4gcG9pbnQgd2hlcmUgdGhlIGNvbW1pdCBiMzQ3Njg5ZmZiY2EgaXMg
+d3JvbmcsIGhvdyB5b3VyIHBhdGNoIGZpeGVzDQo+IHRoZSBtaXN0YWtlIG9mIHRoYXQgY29tbWl0
+Lg0KDQpZb3Ugc2hvdWxkIGtub3cgdGhhdCBpdCBpcyBub3QgcmVxdWlyZWQgdG8gcGVyZm9ybSBh
+IHJvb3QgY2F1c2UgYW5hbHlzaXMNCmJlZm9yZSBwb3N0aW5nIGEgcmV2ZXJ0LiBIYXZpbmcgcGVy
+Zm9ybWVkIGEgYmlzZWN0IGlzIHN1ZmZpY2llbnQuDQoNCkJUVywgaXQgc2VlbXMgbGlrZSB5b3Ug
+Zm9yZ290IHRoYXQgbGFzdCBGcmlkYXkgSSBleHBsYWluZWQgdG8geW91IHRoYXQgdGhlcmUNCmlz
+IGFuIG9idmlvdXMgYnVnIGluIGNvbW1pdCBiMzQ3Njg5ZmZiY2EsIG5hbWVseSB0aGF0IGEgYmxr
+X21xX3NjaGVkX21hcmtfcmVzdGFydF9oY3R4KCkNCmNhbGwgaXMgbWlzc2luZyBpbiBibGtfbXFf
+c2NoZWRfZGlzcGF0Y2hfcmVxdWVzdHMoKSBiZWZvcmUgdGhlIGJsa19tcV9kb19kaXNwYXRjaF9j
+dHgoKQ0KY2FsbC4gU2VlIGFsc28gaHR0cHM6Ly9tYXJjLmluZm8vP2w9bGludXgtYmxvY2smbT0x
+NTEyMTU3OTQyMjQ0MDEuDQoNCkJhcnQu
