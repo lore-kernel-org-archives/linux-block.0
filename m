@@ -1,12 +1,7 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:51822 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752126AbdLEQpe (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 5 Dec 2017 11:45:34 -0500
-Date: Wed, 6 Dec 2017 00:45:12 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "hch@infradead.org" <hch@infradead.org>,
         "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
@@ -16,34 +11,27 @@ Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>
 Subject: Re: [PATCH] SCSI: run queue if SCSI device queue isn't ready and
  queue is idle
-Message-ID: <20171205164511.GC23788@ming.t460p>
+Date: Tue, 5 Dec 2017 16:41:46 +0000
+Message-ID: <1512492105.2660.22.camel@wdc.com>
 References: <20171205075256.10319-1-ming.lei@redhat.com>
- <1512490099.2660.6.camel@sandisk.com>
- <20171205162825.GA23788@ming.t460p>
- <1512492105.2660.22.camel@wdc.com>
+         <1512490099.2660.6.camel@sandisk.com> <20171205162825.GA23788@ming.t460p>
+In-Reply-To: <20171205162825.GA23788@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1512492105.2660.22.camel@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Dec 05, 2017 at 04:41:46PM +0000, Bart Van Assche wrote:
-> On Wed, 2017-12-06 at 00:28 +0800, Ming Lei wrote:
-> > This is still a workaround for RESTART, see my comment before:
-> > 
-> > 	https://marc.info/?l=linux-block&m=151217500929341&w=2
-> 
-> A quote from that e-mail: "The theory about using BLK_MQ_S_SCHED_RESTART in
-> current way is that we mark it after requests are added to hctx->dispatch".
-> Reading that makes me wonder whether you understand the purpose of the
-> BLK_MQ_S_SCHED_RESTART flag? That flag is not set after requests are added
-> to the dispatch list but after requests have been *removed*. The purpose of
-> that flag is to detect whether another thread has run the queue after
-> requests were removed from the dispatch list and before these were readded.
-> If so, the queue needs to be rerun.
-
-If you want to discuss that, please reply on that thread of '[PATCH 4/7] blk-mq:
-Avoid that request processing sta', I will reply on you there too.
-
--- 
-Ming
+T24gV2VkLCAyMDE3LTEyLTA2IGF0IDAwOjI4ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gVGhp
+cyBpcyBzdGlsbCBhIHdvcmthcm91bmQgZm9yIFJFU1RBUlQsIHNlZSBteSBjb21tZW50IGJlZm9y
+ZToNCj4gDQo+IAlodHRwczovL21hcmMuaW5mby8/bD1saW51eC1ibG9jayZtPTE1MTIxNzUwMDky
+OTM0MSZ3PTINCg0KQSBxdW90ZSBmcm9tIHRoYXQgZS1tYWlsOiAiVGhlIHRoZW9yeSBhYm91dCB1
+c2luZyBCTEtfTVFfU19TQ0hFRF9SRVNUQVJUIGluDQpjdXJyZW50IHdheSBpcyB0aGF0IHdlIG1h
+cmsgaXQgYWZ0ZXIgcmVxdWVzdHMgYXJlIGFkZGVkIHRvIGhjdHgtPmRpc3BhdGNoIi4NClJlYWRp
+bmcgdGhhdCBtYWtlcyBtZSB3b25kZXIgd2hldGhlciB5b3UgdW5kZXJzdGFuZCB0aGUgcHVycG9z
+ZSBvZiB0aGUNCkJMS19NUV9TX1NDSEVEX1JFU1RBUlQgZmxhZz8gVGhhdCBmbGFnIGlzIG5vdCBz
+ZXQgYWZ0ZXIgcmVxdWVzdHMgYXJlIGFkZGVkDQp0byB0aGUgZGlzcGF0Y2ggbGlzdCBidXQgYWZ0
+ZXIgcmVxdWVzdHMgaGF2ZSBiZWVuICpyZW1vdmVkKi4gVGhlIHB1cnBvc2Ugb2YNCnRoYXQgZmxh
+ZyBpcyB0byBkZXRlY3Qgd2hldGhlciBhbm90aGVyIHRocmVhZCBoYXMgcnVuIHRoZSBxdWV1ZSBh
+ZnRlcg0KcmVxdWVzdHMgd2VyZSByZW1vdmVkIGZyb20gdGhlIGRpc3BhdGNoIGxpc3QgYW5kIGJl
+Zm9yZSB0aGVzZSB3ZXJlIHJlYWRkZWQuDQpJZiBzbywgdGhlIHF1ZXVlIG5lZWRzIHRvIGJlIHJl
+cnVuLg0KDQpCYXJ0Lg==
