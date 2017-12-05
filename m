@@ -1,32 +1,35 @@
-Return-Path: <martin.petersen@oracle.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>
+Return-Path: <prvs=5056bd117=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"jthumshirn@suse.de" <jthumshirn@suse.de>, "hch@lst.de" <hch@lst.de>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"hare@suse.com" <hare@suse.com>, "jejb@linux.vnet.ibm.com"
+	<jejb@linux.vnet.ibm.com>
 Subject: Re: [PATCH 1/2] scsi-mq: Only show the CDB if available
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
+Date: Tue, 5 Dec 2017 01:59:51 +0000
+Message-ID: <1512439190.2739.0.camel@wdc.com>
 References: <20171205003809.1705-1-bart.vanassche@wdc.com>
-	<20171205003809.1705-2-bart.vanassche@wdc.com>
-	<20171205011536.GC8365@ming.t460p>
-Date: Mon, 04 Dec 2017 22:42:28 -0500
-In-Reply-To: <20171205011536.GC8365@ming.t460p> (Ming Lei's message of "Tue, 5
-	Dec 2017 09:15:37 +0800")
-Message-ID: <yq1zi6x3knv.fsf@oracle.com>
+	 <20171205003809.1705-2-bart.vanassche@wdc.com>
+	 <20171205011536.GC8365@ming.t460p>
+In-Reply-To: <20171205011536.GC8365@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-
-Hi Ming,
-
-> Please cook a patch for fixing the crash issue only, since we need
-> to backport the fix to stable kernel.
-
-I thought you were going to submit a V5 that addressed James' concerns?
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+T24gVHVlLCAyMDE3LTEyLTA1IGF0IDA5OjE1ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
+TW9uLCBEZWMgMDQsIDIwMTcgYXQgMDQ6Mzg6MDhQTSAtMDgwMCwgQmFydCBWYW4gQXNzY2hlIHdy
+b3RlOg0KPiA+IFNpbmNlIHRoZSBuZXh0IHBhdGNoIHdpbGwgbWFrZSBpdCBwb3NzaWJsZSB0aGF0
+IHNjc2lfc2hvd19ycSgpIGdldHMNCj4gPiBjYWxsZWQgYmVmb3JlIHRoZSBDREIgcG9pbnRlciBp
+cyBjaGFuZ2VkIGludG8gYSBub24tTlVMTCB2YWx1ZSwNCj4gPiBvbmx5IHNob3cgdGhlIENEQiBp
+ZiB0aGUgQ0RCIHBvaW50ZXIgaXMgbm90IE5VTEwuIEFkZGl0aW9uYWxseSwNCj4gPiBzaG93IHRo
+ZSByZXF1ZXN0IHRpbWVvdXQgYW5kIFNDU0kgY29tbWFuZCBmbGFncy4gVGhpcyBwYXRjaCBhbHNv
+DQo+ID4gZml4ZXMgYSBidWcgdGhhdCB3YXMgcmVwb3J0ZWQgYnkgTWluZyBMZWkuIFNlZSBhbHNv
+IE1pbmcgTGVpLA0KPiA+IHNjc2lfZGVidWdmczogZml4IGNyYXNoIGluIHNjc2lfc2hvd19ycSgp
+LCBsaW51eC1zY3NpLCA3IE5vdmVtYmVyDQo+ID4gMjAxNyAoaHR0cHM6Ly9tYXJjLmluZm8vP2w9
+bGludXgtYmxvY2smbT0xNTEwMDY2NTUzMTcxODgpLg0KPiANCj4gUGxlYXNlIGNvb2sgYSBwYXRj
+aCBmb3IgZml4aW5nIHRoZSBjcmFzaCBpc3N1ZSBvbmx5LCBzaW5jZSB3ZSBuZWVkDQo+IHRvIGJh
+Y2twb3J0IHRoZSBmaXggdG8gc3RhYmxlIGtlcm5lbC4NCg0KVGhlIGNvZGUgdGhhdCBpcyB0b3Vj
+aGVkIGJ5IHRoaXMgcGF0Y2ggaXMgb25seSB1c2VkIGZvciBrZXJuZWwgZGVidWdnaW5nLg0KSSB3
+aWxsIGRvIHRoaXMgaWYgb3RoZXJzIGFncmVlIHdpdGggeW91ciBvcGluaW9uLg0KDQpCYXJ0Lg==
