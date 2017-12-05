@@ -1,37 +1,83 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:52136 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751325AbdLEQ2t (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 5 Dec 2017 11:28:49 -0500
+Date: Wed, 6 Dec 2017 00:28:31 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "hch@infradead.org" <hch@infradead.org>,
+        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
         "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>, "hare@suse.com" <hare@suse.com>,
-        "holger@applied-asynchrony.com" <holger@applied-asynchrony.com>,
-        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "hare@suse.com" <hare@suse.com>,
+        "holger@applied-asynchrony.com" <holger@applied-asynchrony.com>
 Subject: Re: [PATCH] SCSI: run queue if SCSI device queue isn't ready and
  queue is idle
-Date: Tue, 5 Dec 2017 16:41:46 +0000
-Message-ID: <1512492105.2660.22.camel@wdc.com>
+Message-ID: <20171205162825.GA23788@ming.t460p>
 References: <20171205075256.10319-1-ming.lei@redhat.com>
-         <1512490099.2660.6.camel@sandisk.com> <20171205162825.GA23788@ming.t460p>
-In-Reply-To: <20171205162825.GA23788@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
+ <1512490099.2660.6.camel@sandisk.com>
 MIME-Version: 1.0
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1512490099.2660.6.camel@sandisk.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-T24gV2VkLCAyMDE3LTEyLTA2IGF0IDAwOjI4ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gVGhp
-cyBpcyBzdGlsbCBhIHdvcmthcm91bmQgZm9yIFJFU1RBUlQsIHNlZSBteSBjb21tZW50IGJlZm9y
-ZToNCj4gDQo+IAlodHRwczovL21hcmMuaW5mby8/bD1saW51eC1ibG9jayZtPTE1MTIxNzUwMDky
-OTM0MSZ3PTINCg0KQSBxdW90ZSBmcm9tIHRoYXQgZS1tYWlsOiAiVGhlIHRoZW9yeSBhYm91dCB1
-c2luZyBCTEtfTVFfU19TQ0hFRF9SRVNUQVJUIGluDQpjdXJyZW50IHdheSBpcyB0aGF0IHdlIG1h
-cmsgaXQgYWZ0ZXIgcmVxdWVzdHMgYXJlIGFkZGVkIHRvIGhjdHgtPmRpc3BhdGNoIi4NClJlYWRp
-bmcgdGhhdCBtYWtlcyBtZSB3b25kZXIgd2hldGhlciB5b3UgdW5kZXJzdGFuZCB0aGUgcHVycG9z
-ZSBvZiB0aGUNCkJMS19NUV9TX1NDSEVEX1JFU1RBUlQgZmxhZz8gVGhhdCBmbGFnIGlzIG5vdCBz
-ZXQgYWZ0ZXIgcmVxdWVzdHMgYXJlIGFkZGVkDQp0byB0aGUgZGlzcGF0Y2ggbGlzdCBidXQgYWZ0
-ZXIgcmVxdWVzdHMgaGF2ZSBiZWVuICpyZW1vdmVkKi4gVGhlIHB1cnBvc2Ugb2YNCnRoYXQgZmxh
-ZyBpcyB0byBkZXRlY3Qgd2hldGhlciBhbm90aGVyIHRocmVhZCBoYXMgcnVuIHRoZSBxdWV1ZSBh
-ZnRlcg0KcmVxdWVzdHMgd2VyZSByZW1vdmVkIGZyb20gdGhlIGRpc3BhdGNoIGxpc3QgYW5kIGJl
-Zm9yZSB0aGVzZSB3ZXJlIHJlYWRkZWQuDQpJZiBzbywgdGhlIHF1ZXVlIG5lZWRzIHRvIGJlIHJl
-cnVuLg0KDQpCYXJ0Lg==
+On Tue, Dec 05, 2017 at 04:08:20PM +0000, Bart Van Assche wrote:
+> On Tue, 2017-12-05 at 15:52 +0800, Ming Lei wrote:
+> > diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> > index db9556662e27..1816dd8259b3 100644
+> > --- a/drivers/scsi/scsi_lib.c
+> > +++ b/drivers/scsi/scsi_lib.c
+> > @@ -1967,6 +1967,8 @@ static bool scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
+> >  out_put_device:
+> >  	put_device(&sdev->sdev_gendev);
+> >  out:
+> > +	if (atomic_read(&sdev->device_busy) == 0 && !scsi_device_blocked(sdev))
+> > +		blk_mq_delay_run_hw_queue(hctx, SCSI_QUEUE_DELAY);
+> >  	return false;
+> >  }
+> 
+> This cannot work since multiple threads can call scsi_mq_get_budget()
+
+That is exactly the way we are handling these cases before 0df21c86bdbf(scsi:
+implement .get_budget and .put_budget for blk-mq), so if it can't work,
+that is not fault of commit 0df21c86bdbf.
+
+> concurrently and hence it can happen that none of them sees
+> atomic_read(&sdev->device_busy) == 0. BTW, the above patch is something I
+
+If there is concurrent .get_budget(), one of them will see the counter
+becoming zero finally because each sdev->device_busy is inc/dec
+atomically. Or scsi_dev_queue_ready() return true.
+
+Anyway, we need this patch to avoid possible regression. If you think
+there are bugs in blk-mq RESTART, just root cause and and fix it.
+
+> consider as a workaround. Have you considered to fix the root cause and to
+> add blk_mq_sched_mark_restart_hctx() where these are missing, e.g. in 
+> blk_mq_sched_dispatch_requests()? The patch below is not a full solution
+> but resulted in a significant improvement in my tests:
+> 
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index 69e3226e66ca..9d86876ec503 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -226,6 +226,7 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+>  		 * TODO: get more budgets, and dequeue more requests in
+>  		 * one time.
+>  		 */
+> +		blk_mq_sched_mark_restart_hctx(hctx);
+>  		blk_mq_do_dispatch_ctx(hctx);
+>  	} else {
+>  		blk_mq_flush_busy_ctxs(hctx, &rq_list);
+
+This is still a workaround for RESTART, see my comment before:
+
+	https://marc.info/?l=linux-block&m=151217500929341&w=2
+
+-- 
+Ming
