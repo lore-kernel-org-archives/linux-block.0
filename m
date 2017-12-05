@@ -1,56 +1,33 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Tue, 5 Dec 2017 09:04:29 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "jthumshirn@suse.de" <jthumshirn@suse.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"hch@lst.de" <hch@lst.de>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"hare@suse.com" <hare@suse.com>,
-	"jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>
+Return-Path: <prvs=5056bd117=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "jthumshirn@suse.de" <jthumshirn@suse.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "hch@lst.de" <hch@lst.de>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"hare@suse.com" <hare@suse.com>, "jejb@linux.vnet.ibm.com"
+	<jejb@linux.vnet.ibm.com>
 Subject: Re: [PATCH] blk-mq: Fix several SCSI request queue lockups
-Message-ID: <20171205010428.GB8365@ming.t460p>
+Date: Tue, 5 Dec 2017 00:29:59 +0000
+Message-ID: <1512433798.2795.45.camel@wdc.com>
 References: <20171204173032.16330-1-bart.vanassche@wdc.com>
- <20171204224200.GA6888@ming.t460p>
- <1512427697.2795.14.camel@wdc.com>
- <20171204230151.GD6888@ming.t460p>
- <1512430346.2795.34.camel@wdc.com>
- <20171205002040.GA8365@ming.t460p>
- <1512433798.2795.45.camel@wdc.com>
+	 <20171204224200.GA6888@ming.t460p> <1512427697.2795.14.camel@wdc.com>
+	 <20171204230151.GD6888@ming.t460p> <1512430346.2795.34.camel@wdc.com>
+	 <20171205002040.GA8365@ming.t460p>
+In-Reply-To: <20171205002040.GA8365@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1512433798.2795.45.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Dec 05, 2017 at 12:29:59AM +0000, Bart Van Assche wrote:
-> On Tue, 2017-12-05 at 08:20 +0800, Ming Lei wrote:
-> > Also it is a bit odd to see request in hctx->dispatch now, and it can only
-> > happen now when scsi_target_queue_ready() returns false, so I guess you apply
-> > some change on target->can_queue(such as setting it as 1 in srp/ib code
-> > manually)?
-> 
-> Yes, but that had already been mentioned. From the e-mail at the start of
-> this e-mail thread: "Change the SRP initiator such that SCSI target queue
-> depth is limited to 1." The changes I made in the SRP initiator are the same
-> as those described in the following message from about one month ago:
-> https://www.spinics.net/lists/linux-scsi/msg114720.html.
-
-OK, got it.
-
-Then no reason to revert commit(0df21c86bdbf scsi: implement .get_budget an
-.put_budget for blk-mq) for one issue which may never happen in reality since
-this reproducer need out-of-tree patch.
-
-I don't mean it isn't a issue, but I don't think it has top priority
-for reverting commit 0df21c86bdbf. Especially there isn't proof shown
-that 0df21c86bdbf causes this issue since this commit won't change run
-queue for requests in hctx->dispatch_list.
-
-I's like to take a look if someone'd like to cooperate, such as
-providing kernel log, test debug patch, and kind of things. Or when
-I get this hardware to reproduce.
-
---
-Ming
+T24gVHVlLCAyMDE3LTEyLTA1IGF0IDA4OjIwICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gQWxz
+byBpdCBpcyBhIGJpdCBvZGQgdG8gc2VlIHJlcXVlc3QgaW4gaGN0eC0+ZGlzcGF0Y2ggbm93LCBh
+bmQgaXQgY2FuIG9ubHkNCj4gaGFwcGVuIG5vdyB3aGVuIHNjc2lfdGFyZ2V0X3F1ZXVlX3JlYWR5
+KCkgcmV0dXJucyBmYWxzZSwgc28gSSBndWVzcyB5b3UgYXBwbHkNCj4gc29tZSBjaGFuZ2Ugb24g
+dGFyZ2V0LT5jYW5fcXVldWUoc3VjaCBhcyBzZXR0aW5nIGl0IGFzIDEgaW4gc3JwL2liIGNvZGUN
+Cj4gbWFudWFsbHkpPw0KDQpZZXMsIGJ1dCB0aGF0IGhhZCBhbHJlYWR5IGJlZW4gbWVudGlvbmVk
+LiBGcm9tIHRoZSBlLW1haWwgYXQgdGhlIHN0YXJ0IG9mDQp0aGlzIGUtbWFpbCB0aHJlYWQ6ICJD
+aGFuZ2UgdGhlIFNSUCBpbml0aWF0b3Igc3VjaCB0aGF0IFNDU0kgdGFyZ2V0IHF1ZXVlDQpkZXB0
+aCBpcyBsaW1pdGVkIHRvIDEuIiBUaGUgY2hhbmdlcyBJIG1hZGUgaW4gdGhlIFNSUCBpbml0aWF0
+b3IgYXJlIHRoZSBzYW1lDQphcyB0aG9zZSBkZXNjcmliZWQgaW4gdGhlIGZvbGxvd2luZyBtZXNz
+YWdlIGZyb20gYWJvdXQgb25lIG1vbnRoIGFnbzoNCmh0dHBzOi8vd3d3LnNwaW5pY3MubmV0L2xp
+c3RzL2xpbnV4LXNjc2kvbXNnMTE0NzIwLmh0bWwuDQoNCkJhcnQu
