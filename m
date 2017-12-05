@@ -1,65 +1,53 @@
-Return-Path: <oleg@redhat.com>
-Date: Wed, 6 Dec 2017 18:32:56 +0100
-From: Oleg Nesterov <oleg@redhat.com>
-To: Benjamin LaHaise <ben@communityfibre.ca>
-Cc: Kirill Tkhai <ktkhai@virtuozzo.com>, Tejun Heo <tj@kernel.org>,
-	axboe@kernel.dk, viro@zeniv.linux.org.uk,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-aio@kvack.org
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Tue, 5 Dec 2017 07:51:25 -0800
+From: Tejun Heo <tj@kernel.org>
+To: Jeff Moyer <jmoyer@redhat.com>
+Cc: Kirill Tkhai <ktkhai@virtuozzo.com>, axboe@kernel.dk, bcrl@kvack.org,
+	viro@zeniv.linux.org.uk, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-aio@kvack.org, oleg@redhat.com
 Subject: Re: [PATCH 0/5] blkcg: Limit maximum number of aio requests
  available for cgroup
-Message-ID: <20171206173256.GA24254@redhat.com>
+Message-ID: <20171205155125.GS2421075@devbig577.frc2.facebook.com>
 References: <151240305010.10164.15584502480037205018.stgit@localhost.localdomain>
  <20171204200756.GC2421075@devbig577.frc2.facebook.com>
  <17b22d53-ad3d-1ba8-854f-fc2a43d86c44@virtuozzo.com>
- <20171205151956.GA22836@redhat.com>
- <20171205153503.GE15720@kvack.org>
+ <20171204215234.GN2421075@devbig577.frc2.facebook.com>
+ <6eaa11a6-a087-42ab-df65-9142b59bf726@virtuozzo.com>
+ <x49a7yyw14n.fsf@segfault.boston.devel.redhat.com>
+ <707ca8fa-aee1-f068-b8ab-de5004d3d7ac@virtuozzo.com>
+ <x49vahl5giw.fsf@segfault.boston.devel.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171205153503.GE15720@kvack.org>
+In-Reply-To: <x49vahl5giw.fsf@segfault.boston.devel.redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 12/05, Benjamin LaHaise wrote:
->
-> On Tue, Dec 05, 2017 at 04:19:56PM +0100, Oleg Nesterov wrote:
+Hello, Jeff.
+
+On Tue, Dec 05, 2017 at 10:41:11AM -0500, Jeff Moyer wrote:
+> Kirill Tkhai <ktkhai@virtuozzo.com> writes:
+> 
+> >> I think you just need to account the completion ring.
 > >
-> > and memory. let me quote my old emails...
-> >
-> >
-> > This is off-topic, but the whole "vm" logic in aio_setup_ring()
-> > looks sub-optimal. I do not mean the code, just it seems to me it
-> > is pointless to pollute the page cache, and expose the pages we
-> > can not swap/free to lru. Afaics we _only_ need this for migration.
->
-> It is needed for migration, which is needed for hot unplug of memory.
-> There is no way around this.
+> > A request of struct aio_kiocb type consumes much more memory, than
+> > struct io_event does. Shouldn't we account it too?
+> 
+> Not in my opinion.  The completion ring is the part that gets pinned for
+> long periods of time.
 
-I know, and I even mentioned this above.
+For memcg, it should account all possibly significant memory
+consumptions whether long term or transitional.  Otherwise, isolation
+doesn't really work that well.
 
+> Just be sure to document this where appropriate.  Users/admins should
+> know that the aio completion ring now contributes to their memory
+> budget.
 
-> > This memory lives in page-cache/lru, it is visible for shrinker which
-> > will unmap these pages for no reason on memory shortage. IOW, aio fools
-> > the kernel, this memory looks reclaimable but it is not. And we only do
-> > this for migration.
->
-> It's the same as any other memory that's mlock()ed into RAM.
+Yeah, the memory section in cgroup-v2.txt does have a section for
+this.
 
-No. Again, this memory is not properly accounted, and unlike mlock()ed
-memory it is visible to shrinker which will do the unnecessary work on
-memory shortage which in turn will lead to unnecessary page faults.
+Thanks.
 
-So let me repeat, shouldn't we at least do mapping_set_unevictable() in
-aio_private_file() ?
-
-
-> > triggers OOM-killer which kills sshd and other daemons on my machine.
-> > These pages were not even faulted in (or the shrinker can unmap them),
-> > the kernel can not know who should be blamed.
->
-> The OOM-killer killed the wrong process: News at 11.
-
-Well. I do not think we should blame OOM-killer in this case. But as I
-said this is not a bug-report or something like this, I agree this is
-a minor issue.
-
-Oleg.
+-- 
+tejun
