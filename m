@@ -1,89 +1,55 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail02.iobjects.de ([188.40.134.68]:45028 "EHLO
-        mail02.iobjects.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751604AbdLFXLA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Dec 2017 18:11:00 -0500
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:32040 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751711AbdLFQHV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Dec 2017 11:07:21 -0500
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>, "hare@suse.com" <hare@suse.com>,
+        "holger@applied-asynchrony.com" <holger@applied-asynchrony.com>,
+        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>
 Subject: Re: [PATCH] SCSI: run queue if SCSI device queue isn't ready and
  queue is idle
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@fb.com>,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>
+Date: Wed, 6 Dec 2017 16:07:17 +0000
+Message-ID: <1512576435.3297.3.camel@wdc.com>
 References: <20171205075256.10319-1-ming.lei@redhat.com>
-From: =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
-Message-ID: <0352a2f1-d49b-aaa1-f8e9-10486bb5fa9d@applied-asynchrony.com>
-Date: Thu, 7 Dec 2017 00:10:51 +0100
+         <1512490099.2660.6.camel@sandisk.com> <20171205162825.GA23788@ming.t460p>
+         <20171206015212.GB26512@ming.t460p>
+In-Reply-To: <20171206015212.GB26512@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20171205075256.10319-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 12/05/17 08:52, Ming Lei wrote:
-> Before commit 0df21c86bdbf ("scsi: implement .get_budget and .put_budget
-> for blk-mq"), we run queue after 3ms if queue is idle and SCSI device
-> queue isn't ready, which is done in handling BLK_STS_RESOURCE. After
-> commit 0df21c86bdbf is introduced, queue won't be run any more under
-> this situation.
-> 
-> IO hang is observed when timeout happened, and this patch fixes the IO
-> hang issue by running queue after delay in scsi_dev_queue_ready, just like
-> non-mq. This issue can be triggered by the following script[1].
-> 
-> There is another issue which can be covered by running idle queue:
-> when .get_budget() is called on request coming from hctx->dispatch_list,
-> if one request just completes during .get_budget(), we can't depend on
-> SCSI's restart to make progress any more. This patch fixes the race too.
-> 
-> With this patch, we basically recover to previous behaviour(before commit
-> 0df21c86bdbf) of handling idle queue when running out of resource.
-> 
-> [1] script for test/verify SCSI timeout
-> rmmod scsi_debug
-> modprobe scsi_debug max_queue=1
-> 
-> DEVICE=`ls -d /sys/bus/pseudo/drivers/scsi_debug/adapter*/host*/target*/*/block/* | head -1 | xargs basename`
-> DISK_DIR=`ls -d /sys/block/$DEVICE/device/scsi_disk/*`
-> 
-> echo "using scsi device $DEVICE"
-> echo "-1" >/sys/bus/pseudo/drivers/scsi_debug/every_nth
-> echo "temporary write through" >$DISK_DIR/cache_type
-> echo "128" >/sys/bus/pseudo/drivers/scsi_debug/opts
-> echo none > /sys/block/$DEVICE/queue/scheduler
-> dd if=/dev/$DEVICE of=/dev/null bs=1M iflag=direct count=1 &
-> sleep 5
-> echo "0" >/sys/bus/pseudo/drivers/scsi_debug/opts
-> wait
-> echo "SUCCESS"
-> 
-> Fixes: 0df21c86bdbf ("scsi: implement .get_budget and .put_budget for blk-mq")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  drivers/scsi/scsi_lib.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-> index db9556662e27..1816dd8259b3 100644
-> --- a/drivers/scsi/scsi_lib.c
-> +++ b/drivers/scsi/scsi_lib.c
-> @@ -1967,6 +1967,8 @@ static bool scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
->  out_put_device:
->  	put_device(&sdev->sdev_gendev);
->  out:
-> +	if (atomic_read(&sdev->device_busy) == 0 && !scsi_device_blocked(sdev))
-> +		blk_mq_delay_run_hw_queue(hctx, SCSI_QUEUE_DELAY);
->  	return false;
->  }
-
-So just to follow up on this: with this patch I haven't encountered any
-new hangs with blk-mq, regardless of medium (SSD/rotating disk) or scheduler.
-I cannot speak for other hangs that may be reproducible by other means,
-but for now here's my:
-
-Tested-by: Holger Hoffstätte <holger@applied-asynchrony.com>
-
-cheers,
-Holger
+T24gV2VkLCAyMDE3LTEyLTA2IGF0IDA5OjUyICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
+V2VkLCBEZWMgMDYsIDIwMTcgYXQgMTI6Mjg6MjVBTSArMDgwMCwgTWluZyBMZWkgd3JvdGU6DQo+
+ID4gT24gVHVlLCBEZWMgMDUsIDIwMTcgYXQgMDQ6MDg6MjBQTSArMDAwMCwgQmFydCBWYW4gQXNz
+Y2hlIHdyb3RlOg0KPiA+ID4gVGhlIHBhdGNoIGJlbG93IGlzIG5vdCBhIGZ1bGwgc29sdXRpb24g
+YnV0IHJlc3VsdGVkIGluIGEgc2lnbmlmaWNhbnQNCj4gPiA+IGltcHJvdmVtZW50IGluIG15IHRl
+c3RzOg0KPiA+ID4gDQo+ID4gPiBkaWZmIC0tZ2l0IGEvYmxvY2svYmxrLW1xLXNjaGVkLmMgYi9i
+bG9jay9ibGstbXEtc2NoZWQuYw0KPiA+ID4gaW5kZXggNjllMzIyNmU2NmNhLi45ZDg2ODc2ZWM1
+MDMgMTAwNjQ0DQo+ID4gPiAtLS0gYS9ibG9jay9ibGstbXEtc2NoZWQuYw0KPiA+ID4gKysrIGIv
+YmxvY2svYmxrLW1xLXNjaGVkLmMNCj4gPiA+IEBAIC0yMjYsNiArMjI2LDcgQEAgdm9pZCBibGtf
+bXFfc2NoZWRfZGlzcGF0Y2hfcmVxdWVzdHMoc3RydWN0IGJsa19tcV9od19jdHggKmhjdHgpDQo+
+ID4gPiAgCQkgKiBUT0RPOiBnZXQgbW9yZSBidWRnZXRzLCBhbmQgZGVxdWV1ZSBtb3JlIHJlcXVl
+c3RzIGluDQo+ID4gPiAgCQkgKiBvbmUgdGltZS4NCj4gPiA+ICAJCSAqLw0KPiA+ID4gKwkJYmxr
+X21xX3NjaGVkX21hcmtfcmVzdGFydF9oY3R4KGhjdHgpOw0KPiA+ID4gIAkJYmxrX21xX2RvX2Rp
+c3BhdGNoX2N0eChoY3R4KTsNCj4gPiA+ICAJfSBlbHNlIHsNCj4gPiA+ICAJCWJsa19tcV9mbHVz
+aF9idXN5X2N0eHMoaGN0eCwgJnJxX2xpc3QpOw0KPiANCj4gQlRXLCB0aGlzIGtpbmQgb2YgY2hh
+bmdlIGNhbid0IGNvdmVyIHNjc2lfc2V0X2Jsb2NrZWQoKSB3aGljaCBpcw0KPiB0cmlnZ2VyZWQg
+YnkgdGltZW91dCwgc2NzaSBkaXNwYXRjaCBmYWlsdXJlLiBZb3Ugd2lsbCBzZWUgdGhhdA0KPiBl
+YXNpbHkgaWYgeW91IHJ1biB0aGUgU0NTSSB0ZXN0IHNjcmlwdCBJIHByb3ZpZGVkIGluIHRoZSBj
+b21taXQgbG9nLg0KDQpIZWxsbyBNaW5nLA0KDQpJIGFtIGF3YXJlIHRoYXQgdGhlIGFib3ZlIGNo
+YW5nZSBkb2VzIG5vdCBjb3ZlciBhbGwgY2FzZXMuIFRoYXQncyB3aHkgSSB3cm90ZQ0KaW4gbXkg
+cHJldmlvdXMgZS1tYWlsIHRoYXQgdGhhdCBwYXRjaCBpcyBub3QgYSBmdWxsIHNvbHV0aW9uLiBU
+aGUgcmVhc29uIEkNCnBvc3RlZCB0aGF0IGNoYW5nZSBhbnl3YXkgaXMgYmVjYXVzZSBJIHByZWZl
+ciBhIHNvbHV0aW9uIHRoYXQgaXMgbm90IGJhc2VkIG9uDQpkZWxheWVkIHF1ZXVlIHJ1bnMgb3Zl
+ciBhIHNvbHV0aW9uIHRoYXQgaXMgYmFzZWQgb24gZGVsYXllZCBxdWV1ZSBydW5zDQooYmxrX21x
+X2RlbGF5X3J1bl9od19xdWV1ZSgpKS4gTXkgY29uY2VybiBpcyB0aGF0IHBlcmZvcm1hbmNlIG9m
+IGEgc29sdXRpb24NCmJhc2VkIG9uIGRlbGF5ZWQgcXVldWUgcnVucyB3aWxsIGJlIHN1Ym9wdGlt
+YWwuDQoNCkJhcnQu
