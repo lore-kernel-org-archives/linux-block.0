@@ -1,375 +1,70 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:45231 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755908AbdLTRWP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Dec 2017 12:22:15 -0500
-Received: by mail-wm0-f68.google.com with SMTP id 9so11292658wme.4
-        for <linux-block@vger.kernel.org>; Wed, 20 Dec 2017 09:22:15 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 01/25] null_blk: remove lightnvm support
-Date: Wed, 20 Dec 2017 18:21:41 +0100
-Message-Id: <20171220172205.26464-2-m@bjorling.me>
-In-Reply-To: <20171220172205.26464-1-m@bjorling.me>
-References: <20171220172205.26464-1-m@bjorling.me>
+Return-Path: <ktkhai@virtuozzo.com>
+Subject: Re: [PATCH] aio: Add memcg accounting of user used data
+To: Michal Hocko <mhocko@kernel.org>
+Cc: axboe@kernel.dk, bcrl@kvack.org, tj@kernel.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-aio@kvack.org, jmoyer@redhat.com
+References: <151246799787.29619.13497559380263553588.stgit@localhost.localdomain>
+ <20171206122303.GA7515@dhcp22.suse.cz>
+ <da69b3a4-f4a7-f957-5828-2edee2009b02@virtuozzo.com>
+ <20171206124321.GC7515@dhcp22.suse.cz>
+From: Kirill Tkhai <ktkhai@virtuozzo.com>
+Message-ID: <79580666-0f79-def5-dd37-af72108e7ee4@virtuozzo.com>
+Date: Wed, 6 Dec 2017 16:13:15 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20171206124321.GC7515@dhcp22.suse.cz>
+Content-Type: text/plain; charset=utf-8
+Return-Path: ktkhai@virtuozzo.com
+List-ID: <linux-block@vger.kernel.org>
 
-With rrpc to be removed, the null_blk lightnvm support is no longer
-functional. Remove the lightnvm implementation and maybe add it to
-another module in the future if someone takes on the challenge.
+On 06.12.2017 15:43, Michal Hocko wrote:
+> On Wed 06-12-17 15:36:56, Kirill Tkhai wrote:
+>> On 06.12.2017 15:23, Michal Hocko wrote:
+>>> On Tue 05-12-17 13:00:54, Kirill Tkhai wrote:
+>>> [...]
+>>>> This meets the problem in case of many containers
+>>>> are used on the hardware node. Since aio_max_nr is
+>>>> a global limit, any container may occupy the whole
+>>>> available aio requests, and to deprive others the
+>>>> possibility to use aio at all. The situation may
+>>>> happen because of evil intentions of the container's
+>>>> user or because of the program error, when the user
+>>>> makes this occasionally
+>>>
+>>> I am sorry to beat more on this but finally got around to
+>>> http://lkml.kernel.org/r/17b22d53-ad3d-1ba8-854f-fc2a43d86c44@virtuozzo.com
+>>> and read the above paragraph once again. I can see how accounting to
+>>> a memcg helps to reduce the memory footprint but I fail to see how it
+>>> helps the above scenario. Could you clarify wow you set up a limit to
+>>> prevent anybody from DoSing other containers by depleting aio_max_nr?
+>> The memcg limit allows to increase aio_max_nr and the accounting guarantees
+>> container can't exceed the limit. You may configure the limit and aio_max_nr
+>> in the way, all containers requests in sum never reach aio_max_nr.
+> 
+> So you are essentially saying that you make aio_max_nr unlimited and
+> rely on the memory consumption tracking by memcg, right?
 
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/block/null_blk.c | 220 +----------------------------------------------
- 1 file changed, 3 insertions(+), 217 deletions(-)
+Yes, and this is just the way the rest of similar allocated memory
+such as pipes, dcache or page cache are accounted in the kernel.
 
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index bf2c8ca..842bced 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -12,7 +12,6 @@
- #include <linux/slab.h>
- #include <linux/blk-mq.h>
- #include <linux/hrtimer.h>
--#include <linux/lightnvm.h>
- #include <linux/configfs.h>
- #include <linux/badblocks.h>
+If there are worries about accounting of every submitted request,
+it should not be a problem to account page aligned request number only
+(i.e., every PAGE_SIZE/sizeof(struct aio_kiocb) requests).
+But I'm not sure primitives like memcg_kmem_charge() are allowed
+outside mm subsystem.
+
+> Are there any
+> downsides (e.g. clog the AIO subsytem)?
+
+Any new functionality affects the subsystem, where it's used :)
+Just because of new processor instructions, though not only.
+AIO is not something special in this way. But people,
+who are not interested in the accounting, may just turn it off,
+and the performance will remain the same.
+
+If you are interested in some special benchmark results I should
+to execute, please, point the benchmark, and I'll public the results.
  
-@@ -107,7 +106,6 @@ struct nullb_device {
- 	unsigned int hw_queue_depth; /* queue depth */
- 	unsigned int index; /* index of the disk, only valid with a disk */
- 	unsigned int mbps; /* Bandwidth throttle cap (in MB/s) */
--	bool use_lightnvm; /* register as a LightNVM device */
- 	bool blocking; /* blocking blk-mq device */
- 	bool use_per_node_hctx; /* use per-node allocation for hardware context */
- 	bool power; /* power on/off the device */
-@@ -121,7 +119,6 @@ struct nullb {
- 	unsigned int index;
- 	struct request_queue *q;
- 	struct gendisk *disk;
--	struct nvm_dev *ndev;
- 	struct blk_mq_tag_set *tag_set;
- 	struct blk_mq_tag_set __tag_set;
- 	unsigned int queue_depth;
-@@ -139,7 +136,6 @@ static LIST_HEAD(nullb_list);
- static struct mutex lock;
- static int null_major;
- static DEFINE_IDA(nullb_indexes);
--static struct kmem_cache *ppa_cache;
- static struct blk_mq_tag_set tag_set;
- 
- enum {
-@@ -208,10 +204,6 @@ static int nr_devices = 1;
- module_param(nr_devices, int, S_IRUGO);
- MODULE_PARM_DESC(nr_devices, "Number of devices to register");
- 
--static bool g_use_lightnvm;
--module_param_named(use_lightnvm, g_use_lightnvm, bool, S_IRUGO);
--MODULE_PARM_DESC(use_lightnvm, "Register as a LightNVM device");
--
- static bool g_blocking;
- module_param_named(blocking, g_blocking, bool, S_IRUGO);
- MODULE_PARM_DESC(blocking, "Register as a blocking blk-mq driver device");
-@@ -345,7 +337,6 @@ NULLB_DEVICE_ATTR(blocksize, uint);
- NULLB_DEVICE_ATTR(irqmode, uint);
- NULLB_DEVICE_ATTR(hw_queue_depth, uint);
- NULLB_DEVICE_ATTR(index, uint);
--NULLB_DEVICE_ATTR(use_lightnvm, bool);
- NULLB_DEVICE_ATTR(blocking, bool);
- NULLB_DEVICE_ATTR(use_per_node_hctx, bool);
- NULLB_DEVICE_ATTR(memory_backed, bool);
-@@ -455,7 +446,6 @@ static struct configfs_attribute *nullb_device_attrs[] = {
- 	&nullb_device_attr_irqmode,
- 	&nullb_device_attr_hw_queue_depth,
- 	&nullb_device_attr_index,
--	&nullb_device_attr_use_lightnvm,
- 	&nullb_device_attr_blocking,
- 	&nullb_device_attr_use_per_node_hctx,
- 	&nullb_device_attr_power,
-@@ -574,7 +564,6 @@ static struct nullb_device *null_alloc_dev(void)
- 	dev->blocksize = g_bs;
- 	dev->irqmode = g_irqmode;
- 	dev->hw_queue_depth = g_hw_queue_depth;
--	dev->use_lightnvm = g_use_lightnvm;
- 	dev->blocking = g_blocking;
- 	dev->use_per_node_hctx = g_use_per_node_hctx;
- 	return dev;
-@@ -1420,170 +1409,6 @@ static void cleanup_queues(struct nullb *nullb)
- 	kfree(nullb->queues);
- }
- 
--#ifdef CONFIG_NVM
--
--static void null_lnvm_end_io(struct request *rq, blk_status_t status)
--{
--	struct nvm_rq *rqd = rq->end_io_data;
--
--	/* XXX: lighnvm core seems to expect NVM_RSP_* values here.. */
--	rqd->error = status ? -EIO : 0;
--	nvm_end_io(rqd);
--
--	blk_put_request(rq);
--}
--
--static int null_lnvm_submit_io(struct nvm_dev *dev, struct nvm_rq *rqd)
--{
--	struct request_queue *q = dev->q;
--	struct request *rq;
--	struct bio *bio = rqd->bio;
--
--	rq = blk_mq_alloc_request(q,
--		op_is_write(bio_op(bio)) ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN, 0);
--	if (IS_ERR(rq))
--		return -ENOMEM;
--
--	blk_init_request_from_bio(rq, bio);
--
--	rq->end_io_data = rqd;
--
--	blk_execute_rq_nowait(q, NULL, rq, 0, null_lnvm_end_io);
--
--	return 0;
--}
--
--static int null_lnvm_id(struct nvm_dev *dev, struct nvm_id *id)
--{
--	struct nullb *nullb = dev->q->queuedata;
--	sector_t size = (sector_t)nullb->dev->size * 1024 * 1024ULL;
--	sector_t blksize;
--	struct nvm_id_group *grp;
--
--	id->ver_id = 0x1;
--	id->vmnt = 0;
--	id->cap = 0x2;
--	id->dom = 0x1;
--
--	id->ppaf.blk_offset = 0;
--	id->ppaf.blk_len = 16;
--	id->ppaf.pg_offset = 16;
--	id->ppaf.pg_len = 16;
--	id->ppaf.sect_offset = 32;
--	id->ppaf.sect_len = 8;
--	id->ppaf.pln_offset = 40;
--	id->ppaf.pln_len = 8;
--	id->ppaf.lun_offset = 48;
--	id->ppaf.lun_len = 8;
--	id->ppaf.ch_offset = 56;
--	id->ppaf.ch_len = 8;
--
--	sector_div(size, nullb->dev->blocksize); /* convert size to pages */
--	size >>= 8; /* concert size to pgs pr blk */
--	grp = &id->grp;
--	grp->mtype = 0;
--	grp->fmtype = 0;
--	grp->num_ch = 1;
--	grp->num_pg = 256;
--	blksize = size;
--	size >>= 16;
--	grp->num_lun = size + 1;
--	sector_div(blksize, grp->num_lun);
--	grp->num_blk = blksize;
--	grp->num_pln = 1;
--
--	grp->fpg_sz = nullb->dev->blocksize;
--	grp->csecs = nullb->dev->blocksize;
--	grp->trdt = 25000;
--	grp->trdm = 25000;
--	grp->tprt = 500000;
--	grp->tprm = 500000;
--	grp->tbet = 1500000;
--	grp->tbem = 1500000;
--	grp->mpos = 0x010101; /* single plane rwe */
--	grp->cpar = nullb->dev->hw_queue_depth;
--
--	return 0;
--}
--
--static void *null_lnvm_create_dma_pool(struct nvm_dev *dev, char *name)
--{
--	mempool_t *virtmem_pool;
--
--	virtmem_pool = mempool_create_slab_pool(64, ppa_cache);
--	if (!virtmem_pool) {
--		pr_err("null_blk: Unable to create virtual memory pool\n");
--		return NULL;
--	}
--
--	return virtmem_pool;
--}
--
--static void null_lnvm_destroy_dma_pool(void *pool)
--{
--	mempool_destroy(pool);
--}
--
--static void *null_lnvm_dev_dma_alloc(struct nvm_dev *dev, void *pool,
--				gfp_t mem_flags, dma_addr_t *dma_handler)
--{
--	return mempool_alloc(pool, mem_flags);
--}
--
--static void null_lnvm_dev_dma_free(void *pool, void *entry,
--							dma_addr_t dma_handler)
--{
--	mempool_free(entry, pool);
--}
--
--static struct nvm_dev_ops null_lnvm_dev_ops = {
--	.identity		= null_lnvm_id,
--	.submit_io		= null_lnvm_submit_io,
--
--	.create_dma_pool	= null_lnvm_create_dma_pool,
--	.destroy_dma_pool	= null_lnvm_destroy_dma_pool,
--	.dev_dma_alloc		= null_lnvm_dev_dma_alloc,
--	.dev_dma_free		= null_lnvm_dev_dma_free,
--
--	/* Simulate nvme protocol restriction */
--	.max_phys_sect		= 64,
--};
--
--static int null_nvm_register(struct nullb *nullb)
--{
--	struct nvm_dev *dev;
--	int rv;
--
--	dev = nvm_alloc_dev(0);
--	if (!dev)
--		return -ENOMEM;
--
--	dev->q = nullb->q;
--	memcpy(dev->name, nullb->disk_name, DISK_NAME_LEN);
--	dev->ops = &null_lnvm_dev_ops;
--
--	rv = nvm_register(dev);
--	if (rv) {
--		kfree(dev);
--		return rv;
--	}
--	nullb->ndev = dev;
--	return 0;
--}
--
--static void null_nvm_unregister(struct nullb *nullb)
--{
--	nvm_unregister(nullb->ndev);
--}
--#else
--static int null_nvm_register(struct nullb *nullb)
--{
--	pr_err("null_blk: CONFIG_NVM needs to be enabled for LightNVM\n");
--	return -EINVAL;
--}
--static void null_nvm_unregister(struct nullb *nullb) {}
--#endif /* CONFIG_NVM */
--
- static void null_del_dev(struct nullb *nullb)
- {
- 	struct nullb_device *dev = nullb->dev;
-@@ -1592,10 +1417,7 @@ static void null_del_dev(struct nullb *nullb)
- 
- 	list_del_init(&nullb->list);
- 
--	if (dev->use_lightnvm)
--		null_nvm_unregister(nullb);
--	else
--		del_gendisk(nullb->disk);
-+	del_gendisk(nullb->disk);
- 
- 	if (test_bit(NULLB_DEV_FL_THROTTLED, &nullb->dev->flags)) {
- 		hrtimer_cancel(&nullb->bw_timer);
-@@ -1607,8 +1429,7 @@ static void null_del_dev(struct nullb *nullb)
- 	if (dev->queue_mode == NULL_Q_MQ &&
- 	    nullb->tag_set == &nullb->__tag_set)
- 		blk_mq_free_tag_set(nullb->tag_set);
--	if (!dev->use_lightnvm)
--		put_disk(nullb->disk);
-+	put_disk(nullb->disk);
- 	cleanup_queues(nullb);
- 	if (null_cache_active(nullb))
- 		null_free_device_storage(nullb->dev, true);
-@@ -1772,11 +1593,6 @@ static void null_validate_conf(struct nullb_device *dev)
- {
- 	dev->blocksize = round_down(dev->blocksize, 512);
- 	dev->blocksize = clamp_t(unsigned int, dev->blocksize, 512, 4096);
--	if (dev->use_lightnvm && dev->blocksize != 4096)
--		dev->blocksize = 4096;
--
--	if (dev->use_lightnvm && dev->queue_mode != NULL_Q_MQ)
--		dev->queue_mode = NULL_Q_MQ;
- 
- 	if (dev->queue_mode == NULL_Q_MQ && dev->use_per_node_hctx) {
- 		if (dev->submit_queues != nr_online_nodes)
-@@ -1892,11 +1708,7 @@ static int null_add_dev(struct nullb_device *dev)
- 
- 	sprintf(nullb->disk_name, "nullb%d", nullb->index);
- 
--	if (dev->use_lightnvm)
--		rv = null_nvm_register(nullb);
--	else
--		rv = null_gendisk_register(nullb);
--
-+	rv = null_gendisk_register(nullb);
- 	if (rv)
- 		goto out_cleanup_blk_queue;
- 
-@@ -1935,18 +1747,6 @@ static int __init null_init(void)
- 		g_bs = PAGE_SIZE;
- 	}
- 
--	if (g_use_lightnvm && g_bs != 4096) {
--		pr_warn("null_blk: LightNVM only supports 4k block size\n");
--		pr_warn("null_blk: defaults block size to 4k\n");
--		g_bs = 4096;
--	}
--
--	if (g_use_lightnvm && g_queue_mode != NULL_Q_MQ) {
--		pr_warn("null_blk: LightNVM only supported for blk-mq\n");
--		pr_warn("null_blk: defaults queue mode to blk-mq\n");
--		g_queue_mode = NULL_Q_MQ;
--	}
--
- 	if (g_queue_mode == NULL_Q_MQ && g_use_per_node_hctx) {
- 		if (g_submit_queues != nr_online_nodes) {
- 			pr_warn("null_blk: submit_queues param is set to %u.\n",
-@@ -1979,16 +1779,6 @@ static int __init null_init(void)
- 		goto err_conf;
- 	}
- 
--	if (g_use_lightnvm) {
--		ppa_cache = kmem_cache_create("ppa_cache", 64 * sizeof(u64),
--								0, 0, NULL);
--		if (!ppa_cache) {
--			pr_err("null_blk: unable to create ppa cache\n");
--			ret = -ENOMEM;
--			goto err_ppa;
--		}
--	}
--
- 	for (i = 0; i < nr_devices; i++) {
- 		dev = null_alloc_dev();
- 		if (!dev)
-@@ -2010,8 +1800,6 @@ static int __init null_init(void)
- 		null_del_dev(nullb);
- 		null_free_dev(dev);
- 	}
--	kmem_cache_destroy(ppa_cache);
--err_ppa:
- 	unregister_blkdev(null_major, "nullb");
- err_conf:
- 	configfs_unregister_subsystem(&nullb_subsys);
-@@ -2042,8 +1830,6 @@ static void __exit null_exit(void)
- 
- 	if (g_queue_mode == NULL_Q_MQ && shared_tags)
- 		blk_mq_free_tag_set(&tag_set);
--
--	kmem_cache_destroy(ppa_cache);
- }
- 
- module_init(null_init);
--- 
-2.9.3
+> Please make sure that all this in the changelog
+
+OK
