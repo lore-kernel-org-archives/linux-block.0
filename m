@@ -1,46 +1,42 @@
-Return-Path: <BATV+f9b51a8ca15fdac5c6a2+5227+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Fri, 15 Dec 2017 17:48:28 +0100
-From: Christoph Hellwig <hch@infradead.org>
+Return-Path: <prvs=5062bafe5=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Sagi Grimberg <sagi@grimberg.me>, Keith Busch <keith.busch@intel.com>,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [GIT PULLL] nvme fixes for Linux 4.15
-Message-ID: <20171215164828.ztoycqf5wettwkkg@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH v2 0/3] Show all commands in debugfs
+Date: Tue,  5 Dec 2017 16:57:50 -0800
+Message-Id: <20171206005753.28734-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+Hello Jens,
 
-below are a couple important one or two liners fixes for Linux 4.15:
+While debugging an issue with the SCSI error handler I noticed that commands
+that got stuck in that error handler are not shown in debugfs. That is very
+annoying for anyone who relies on the information in debugfs for root-causing
+such an issue. Hence this patch series that makes sure that commands that got
+stuck in a block driver timeout handler are also shown in debugfs. Please
+consider these patches for kernel v4.16.
 
+Thanks,
 
-The following changes since commit fcf38cdf332a81b20a59e3ebaea81f6b316bbe0c:
+Bart.
 
-  kyber: fix another domain token wait queue hang (2017-12-06 12:33:07 -0700)
+Changes compared to v1:
+- Split the SCSI patch into two patches.
+- Added the tag "Cc: stable" to two of the three patches.
+- Included a change for the SCSI sd driver.
 
-are available in the git repository at:
+Bart Van Assche (3):
+  scsi: Fix a scsi_show_rq() NULL pointer dereference
+  blk-mq-debugfs: Also show requests that have not yet been started
+  scsi-mq-debugfs: Show more information
 
-  git://git.infradead.org/nvme.git nvme-4.15
+ block/blk-mq-debugfs.c      |  2 +-
+ drivers/scsi/scsi_debugfs.c | 47 ++++++++++++++++++++++++++++++++++++++++-----
+ drivers/scsi/sd.c           |  4 +++-
+ 3 files changed, 46 insertions(+), 7 deletions(-)
 
-for you to fetch changes up to 654b4a4acd8b52a4272114b95896e9a10d382cde:
-
-  nvme: setup streams after initializing namespace head (2017-12-15 15:18:07 +0100)
-
-----------------------------------------------------------------
-David Disseldorp (1):
-      nvme: set discard_alignment to zero
-
-James Smart (1):
-      nvme-fc: remove double put reference if admin connect fails
-
-Keith Busch (2):
-      nvme: check hw sectors before setting chunk sectors
-      nvme: setup streams after initializing namespace head
-
-Ming Lei (1):
-      nvme: call blk_integrity_unregister after queue is cleaned up
-
- drivers/nvme/host/core.c | 11 ++++++-----
- drivers/nvme/host/fc.c   |  1 -
- 2 files changed, 6 insertions(+), 6 deletions(-)
+-- 
+2.15.0
