@@ -5,66 +5,79 @@ References: <20171114231022.42961-1-khazhy@google.com> <20171116165033.4noofd6gk
  <CACGdZY+OdN-yfTGFgd1qmXBn+z3OkKMX3FeCnwSdYVHj7HdQyw@mail.gmail.com>
  <20171117192614.4knf72v26iir6tpi@kernel.org> <CACGdZYLo+EBC-1Q03YVJjwd=TVEMH9zErKJE2ebtEtLpqLyqjQ@mail.gmail.com>
 From: Khazhismel Kumykov <khazhy@google.com>
-Date: Wed, 6 Dec 2017 16:41:53 -0800
-Message-ID: <CACGdZY+vepaLXqe=pq12Ei-sYyGL=wuYwoy66bqV2FB8J7YPsA@mail.gmail.com>
+Date: Wed, 6 Dec 2017 16:29:59 -0800
+Message-ID: <CACGdZYLeFNmUJWVP8B0wMo1mktG3xgW0fJSnchzp1P4+R0XsFg@mail.gmail.com>
 Subject: Re: [RFC PATCH] blk-throttle: add burst allowance.
 To: Shaohua Li <shli@kernel.org>
 Cc: shli@fb.com, vgoyal@redhat.com, tj@kernel.org,
 	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, axboe@kernel.dk
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="001a113cdfc2b13557055fb555d4"
+	boundary="001a11397b841596ea055fb52b81"
 List-ID: <linux-block@vger.kernel.org>
 
---001a113cdfc2b13557055fb555d4
+--001a11397b841596ea055fb52b81
+Content-Type: multipart/alternative; boundary="001a11397b840eea24055fb52b9b"
+
+--001a11397b840eea24055fb52b9b
 Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Nov 20, 2017 at 8:36 PM, Khazhismel Kumykov <khazhy@google.com> wrote:
+On Mon, Nov 20, 2017 at 8:36 PM, Khazhismel Kumykov <khazhy@google.com>
+wrote:
+
 > On Fri, Nov 17, 2017 at 11:26 AM, Shaohua Li <shli@kernel.org> wrote:
->> On Thu, Nov 16, 2017 at 08:25:58PM -0800, Khazhismel Kumykov wrote:
->>> On Thu, Nov 16, 2017 at 8:50 AM, Shaohua Li <shli@kernel.org> wrote:
->>> > On Tue, Nov 14, 2017 at 03:10:22PM -0800, Khazhismel Kumykov wrote:
->>> >> Allows configuration additional bytes or ios before a throttle is
->>> >> triggered.
->>> >>
->>> >> This allows implementation of a bucket style rate-limit/throttle on a
->>> >> block device. Previously, bursting to a device was limited to allowance
->>> >> granted in a single throtl_slice (similar to a bucket with limit N and
->>> >> refill rate N/slice).
->>> >>
->>> >> Additional parameters bytes/io_burst_conf defined for tg, which define a
->>> >> number of bytes/ios that must be depleted before throttling happens. A
->>> >> tg that does not deplete this allowance functions as though it has no
->>> >> configured limits. tgs earn additional allowance at rate defined by
->>> >> bps/iops for the tg. Once a tg has *_disp > *_burst_conf, throttling
->>> >> kicks in. If a tg is idle for a while, it will again have some burst
->>> >> allowance before it gets throttled again.
->>> >>
->>> >> slice_end for a tg is extended until io_disp/byte_disp would fall to 0,
->>> >> when all "used" burst allowance would be earned back. trim_slice still
->>> >> does progress slice_start as before and decrements *_disp as before, and
->>> >> tgs continue to get bytes/ios in throtl_slice intervals.
->>> >
->>> > Can you describe why we need this? It would be great if you can describe the
->>> > usage model and an example. Does this work for io.low/io.max or both?
->>> >
->>> > Thanks,
->>> > Shaohua
->>> >
->>>
->>> Use case that brought this up was configuring limits for a remote
->>> shared device. Bursting beyond io.max is desired but only for so much
->>> before the limit kicks in, afterwards with sustained usage throughput
->>> is capped. (This proactively avoids remote-side limits). In that case
->>> one would configure in a root container io.max + io.burst, and
->>> configure low/other limits on descendants sharing the resource on the
->>> same node.
->>>
->>> With this patch, so long as tg has not dispatched more than the burst,
->>> no limit is applied at all by that tg, including limit imposed by
->>> io.low in tg_iops_limit, etc.
->>
->> I'd appreciate if you can give more details about the 'why'. 'configuring
->> limits for a remote shared device' doesn't justify the change.
+> > On Thu, Nov 16, 2017 at 08:25:58PM -0800, Khazhismel Kumykov wrote:
+> >> On Thu, Nov 16, 2017 at 8:50 AM, Shaohua Li <shli@kernel.org> wrote:
+> >> > On Tue, Nov 14, 2017 at 03:10:22PM -0800, Khazhismel Kumykov wrote:
+> >> >> Allows configuration additional bytes or ios before a throttle is
+> >> >> triggered.
+> >> >>
+> >> >> This allows implementation of a bucket style rate-limit/throttle on a
+> >> >> block device. Previously, bursting to a device was limited to
+> allowance
+> >> >> granted in a single throtl_slice (similar to a bucket with limit N
+> and
+> >> >> refill rate N/slice).
+> >> >>
+> >> >> Additional parameters bytes/io_burst_conf defined for tg, which
+> define a
+> >> >> number of bytes/ios that must be depleted before throttling happens.
+> A
+> >> >> tg that does not deplete this allowance functions as though it has no
+> >> >> configured limits. tgs earn additional allowance at rate defined by
+> >> >> bps/iops for the tg. Once a tg has *_disp > *_burst_conf, throttling
+> >> >> kicks in. If a tg is idle for a while, it will again have some burst
+> >> >> allowance before it gets throttled again.
+> >> >>
+> >> >> slice_end for a tg is extended until io_disp/byte_disp would fall to
+> 0,
+> >> >> when all "used" burst allowance would be earned back. trim_slice
+> still
+> >> >> does progress slice_start as before and decrements *_disp as before,
+> and
+> >> >> tgs continue to get bytes/ios in throtl_slice intervals.
+> >> >
+> >> > Can you describe why we need this? It would be great if you can
+> describe the
+> >> > usage model and an example. Does this work for io.low/io.max or both?
+> >> >
+> >> > Thanks,
+> >> > Shaohua
+> >> >
+> >>
+> >> Use case that brought this up was configuring limits for a remote
+> >> shared device. Bursting beyond io.max is desired but only for so much
+> >> before the limit kicks in, afterwards with sustained usage throughput
+> >> is capped. (This proactively avoids remote-side limits). In that case
+> >> one would configure in a root container io.max + io.burst, and
+> >> configure low/other limits on descendants sharing the resource on the
+> >> same node.
+> >>
+> >> With this patch, so long as tg has not dispatched more than the burst,
+> >> no limit is applied at all by that tg, including limit imposed by
+> >> io.low in tg_iops_limit, etc.
+> >
+> > I'd appreciate if you can give more details about the 'why'. 'configuring
+> > limits for a remote shared device' doesn't justify the change.
 >
 > This is to configure a bursty workload (and associated device) with
 > known/allowed expected burst size, but to not allow full utilization
@@ -79,9 +92,115 @@ On Mon, Nov 20, 2017 at 8:36 PM, Khazhismel Kumykov <khazhy@google.com> wrote:
 > and is limited with constant usage
 >
 > Khazhy
-Ping this time without html (oops)
+>
+Ping? Not sure if this was lost
 
---001a113cdfc2b13557055fb555d4
+--001a11397b840eea24055fb52b9b
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><br><div class=3D"gmail_extra"><br><div class=3D"gmail_quo=
+te">On Mon, Nov 20, 2017 at 8:36 PM, Khazhismel Kumykov <span dir=3D"ltr">&=
+lt;<a href=3D"mailto:khazhy@google.com" target=3D"_blank">khazhy@google.com=
+</a>&gt;</span> wrote:<br><blockquote class=3D"gmail_quote" style=3D"margin=
+:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"=
+><div class=3D"gmail-HOEnZb"><div class=3D"gmail-h5">On Fri, Nov 17, 2017 a=
+t 11:26 AM, Shaohua Li &lt;<a href=3D"mailto:shli@kernel.org">shli@kernel.o=
+rg</a>&gt; wrote:<br>
+&gt; On Thu, Nov 16, 2017 at 08:25:58PM -0800, Khazhismel Kumykov wrote:<br=
+>
+&gt;&gt; On Thu, Nov 16, 2017 at 8:50 AM, Shaohua Li &lt;<a href=3D"mailto:=
+shli@kernel.org">shli@kernel.org</a>&gt; wrote:<br>
+&gt;&gt; &gt; On Tue, Nov 14, 2017 at 03:10:22PM -0800, Khazhismel Kumykov =
+wrote:<br>
+&gt;&gt; &gt;&gt; Allows configuration additional bytes or ios before a thr=
+ottle is<br>
+&gt;&gt; &gt;&gt; triggered.<br>
+&gt;&gt; &gt;&gt;<br>
+&gt;&gt; &gt;&gt; This allows implementation of a bucket style rate-limit/t=
+hrottle on a<br>
+&gt;&gt; &gt;&gt; block device. Previously, bursting to a device was limite=
+d to allowance<br>
+&gt;&gt; &gt;&gt; granted in a single throtl_slice (similar to a bucket wit=
+h limit N and<br>
+&gt;&gt; &gt;&gt; refill rate N/slice).<br>
+&gt;&gt; &gt;&gt;<br>
+&gt;&gt; &gt;&gt; Additional parameters bytes/io_burst_conf defined for tg,=
+ which define a<br>
+&gt;&gt; &gt;&gt; number of bytes/ios that must be depleted before throttli=
+ng happens. A<br>
+&gt;&gt; &gt;&gt; tg that does not deplete this allowance functions as thou=
+gh it has no<br>
+&gt;&gt; &gt;&gt; configured limits. tgs earn additional allowance at rate =
+defined by<br>
+&gt;&gt; &gt;&gt; bps/iops for the tg. Once a tg has *_disp &gt; *_burst_co=
+nf, throttling<br>
+&gt;&gt; &gt;&gt; kicks in. If a tg is idle for a while, it will again have=
+ some burst<br>
+&gt;&gt; &gt;&gt; allowance before it gets throttled again.<br>
+&gt;&gt; &gt;&gt;<br>
+&gt;&gt; &gt;&gt; slice_end for a tg is extended until io_disp/byte_disp wo=
+uld fall to 0,<br>
+&gt;&gt; &gt;&gt; when all &quot;used&quot; burst allowance would be earned=
+ back. trim_slice still<br>
+&gt;&gt; &gt;&gt; does progress slice_start as before and decrements *_disp=
+ as before, and<br>
+&gt;&gt; &gt;&gt; tgs continue to get bytes/ios in throtl_slice intervals.<=
+br>
+&gt;&gt; &gt;<br>
+&gt;&gt; &gt; Can you describe why we need this? It would be great if you c=
+an describe the<br>
+&gt;&gt; &gt; usage model and an example. Does this work for io.low/io.max =
+or both?<br>
+&gt;&gt; &gt;<br>
+&gt;&gt; &gt; Thanks,<br>
+&gt;&gt; &gt; Shaohua<br>
+&gt;&gt; &gt;<br>
+&gt;&gt;<br>
+&gt;&gt; Use case that brought this up was configuring limits for a remote<=
+br>
+&gt;&gt; shared device. Bursting beyond io.max is desired but only for so m=
+uch<br>
+&gt;&gt; before the limit kicks in, afterwards with sustained usage through=
+put<br>
+&gt;&gt; is capped. (This proactively avoids remote-side limits). In that c=
+ase<br>
+&gt;&gt; one would configure in a root container io.max + io.burst, and<br>
+&gt;&gt; configure low/other limits on descendants sharing the resource on =
+the<br>
+&gt;&gt; same node.<br>
+&gt;&gt;<br>
+&gt;&gt; With this patch, so long as tg has not dispatched more than the bu=
+rst,<br>
+&gt;&gt; no limit is applied at all by that tg, including limit imposed by<=
+br>
+&gt;&gt; io.low in tg_iops_limit, etc.<br>
+&gt;<br>
+&gt; I&#39;d appreciate if you can give more details about the &#39;why&#39=
+;. &#39;configuring<br>
+&gt; limits for a remote shared device&#39; doesn&#39;t justify the change.=
+<br>
+<br>
+</div></div>This is to configure a bursty workload (and associated device) =
+with<br>
+known/allowed expected burst size, but to not allow full utilization<br>
+of the device for extended periods of time for QoS. During idle or low<br>
+use periods the burst allowance accrues, and then tasks can burst well<br>
+beyond the configured throttle up to the limit, afterwards is<br>
+throttled. A constant throttle speed isn&#39;t sufficient for this as you<b=
+r>
+can only burst 1 slice worth, but a limit of sorts is desirable for<br>
+preventing over utilization of the shared device. This type of limit<br>
+is also slightly different than what i understand io.low does in local<br>
+cases in that tg is only high priority/unthrottled if it is bursty,<br>
+and is limited with constant usage<br>
+<br>
+Khazhy<br>
+</blockquote></div>Ping? Not sure if this was lost<br></div></div>
+
+--001a11397b840eea24055fb52b9b--
+
+--001a11397b841596ea055fb52b81
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -163,13 +282,13 @@ bEOJaemCXr1UIoEHMoisd0Smdm1NjxLYLk3bK1RDgO0RTu2hNmVAT9WypS9uiquOQWeK3u9QBuUK
 BhOZjgo70YosoRVRBIKNqStZ++IpaDEWfDme3EH4H8tlOzwCvAiO8c1uF7ZX68wXWJPjq6uxu1cZ
 5lT83BZ34AElNAzFvsLhMYICXjCCAloCAQEwXDBMMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xv
 YmFsU2lnbiBudi1zYTEiMCAGA1UEAxMZR2xvYmFsU2lnbiBIViBTL01JTUUgQ0EgMQIMPycjokgk
-Gdp8HTY2MA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEiBCC0VZ0HCUIQHYhO+BcbvNXI
-ZfjWXHciM8nk1kpq5v+edjAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-Fw0xNzEyMDcwMDQxNTRaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZIAWUDBAEqMAsGCWCGSAFlAwQB
+Gdp8HTY2MA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEiBCCNo2qiPkk3+os7ueCLzKf6
+QQepB6UJH9iIhE8al6zWfjAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
+Fw0xNzEyMDcwMDMwMDBaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZIAWUDBAEqMAsGCWCGSAFlAwQB
 FjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEKMAsGCSqGSIb3DQEBBzALBglg
-hkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEAK/6FanimK0EREDhSd+WTig2dN2uo1tMQxg8sXctV
-47zrG9HCN2OsSTyzLnSDx+aDg3F5mPPe/njA/mdSlj9NBN8kQmdwM7Is1N4nq/z4YEeJtJ7zKG+O
-WdvG0lV1ZfB9A0v+HpnYmMHXPoGfXdtNQz4VSSdiL9tz/ny3kSsiJGtDT9/G2AYZ4s5pcm3whdZX
-MrKkS+8bMN5L+yM1jowqFjcktN0U26n8LxJui1zyiliA9VfgJFjDIgH0tT9aIXb7d8bPFqG2B16c
-BZuhWMGTIsAAgB6z93Xv+SDUMK89NVzwZo9xZJ7fiZoK9E73vvUU4wktexey3Wt2HPx336AQAg==
---001a113cdfc2b13557055fb555d4--
+hkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEALY76UwsshCxZ9g2XTIPAHe0RKS98J48Yw/Uazrox
+CFK+Pzdwi3SqOVgJbCvdfPGP6tGDXeV1SEqzWI6FDB5FVm4Agp/o+EWoIHXocZsdozVHyo5HkMfu
+oneFgYY1z3IkZJrVhjkbpcI2Q2DGQBK2r+pRy4zaYfLzvdRMbcqK5lscFtMwwdQsaSP47BHzj2eh
+uwOi8kIS0rIWa7lJYq7NgEFpo46AxY2jG43sMaFkurtIG83NWHKyspjXV74M/o2IDaOIYcA+WOe7
+vDCxF5P/ncS2tAIQjW1qfwRysU1KwWbmQGnRs1HhxpecaPHwwUNhc8ucQYGwzLuEN0octtNu8A==
+--001a11397b841596ea055fb52b81--
