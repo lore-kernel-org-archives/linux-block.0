@@ -1,42 +1,71 @@
-Return-Path: <prvs=5062bafe5=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v2 0/3] Show all commands in debugfs
-Date: Tue,  5 Dec 2017 16:57:50 -0800
-Message-Id: <20171206005753.28734-1-bart.vanassche@wdc.com>
+Return-Path: <oleg@redhat.com>
+Date: Thu, 7 Dec 2017 14:44:47 +0100
+From: Oleg Nesterov <oleg@redhat.com>
+To: Benjamin LaHaise <ben@communityfibre.ca>
+Cc: Kirill Tkhai <ktkhai@virtuozzo.com>, Tejun Heo <tj@kernel.org>,
+	axboe@kernel.dk, viro@zeniv.linux.org.uk,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-aio@kvack.org
+Subject: Re: [PATCH 0/5] blkcg: Limit maximum number of aio requests
+ available for cgroup
+Message-ID: <20171207134447.GA7723@redhat.com>
+References: <151240305010.10164.15584502480037205018.stgit@localhost.localdomain>
+ <20171204200756.GC2421075@devbig577.frc2.facebook.com>
+ <17b22d53-ad3d-1ba8-854f-fc2a43d86c44@virtuozzo.com>
+ <20171205151956.GA22836@redhat.com>
+ <20171205153503.GE15720@kvack.org>
+ <20171206173256.GA24254@redhat.com>
+ <20171206174445.GM1493@kvack.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171206174445.GM1493@kvack.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello Jens,
+On 12/06, Benjamin LaHaise wrote:
+>
+> On Wed, Dec 06, 2017 at 06:32:56PM +0100, Oleg Nesterov wrote:
+> >
+> > No. Again, this memory is not properly accounted, and unlike mlock()ed
+> > memory it is visible to shrinker which will do the unnecessary work on
+> > memory shortage which in turn will lead to unnecessary page faults.
+> >
+> > So let me repeat, shouldn't we at least do mapping_set_unevictable() in
+> > aio_private_file() ?
 
-While debugging an issue with the SCSI error handler I noticed that commands
-that got stuck in that error handler are not shown in debugfs. That is very
-annoying for anyone who relies on the information in debugfs for root-causing
-such an issue. Hence this patch series that makes sure that commands that got
-stuck in a block driver timeout handler are also shown in debugfs. Please
-consider these patches for kernel v4.16.
+... and probably account this memory in ->pinned_vm
 
-Thanks,
+> Send a patch then!
 
-Bart.
+I have no idea how to test this change, and personally I don't reallly care
+about aio,
 
-Changes compared to v1:
-- Split the SCSI patch into two patches.
-- Added the tag "Cc: stable" to two of the three patches.
-- Included a change for the SCSI sd driver.
+> I don't know why you're asking rather than sending a
+> patch to do this if you think it is needed.
 
-Bart Van Assche (3):
-  scsi: Fix a scsi_show_rq() NULL pointer dereference
-  blk-mq-debugfs: Also show requests that have not yet been started
-  scsi-mq-debugfs: Show more information
+Because you are maintainer, and I naively thought it is always fine to
+ask the maintainer if you think the code is not correct or sub-optimal.
+Sorry for bothering you.
 
- block/blk-mq-debugfs.c      |  2 +-
- drivers/scsi/scsi_debugfs.c | 47 ++++++++++++++++++++++++++++++++++++++++-----
- drivers/scsi/sd.c           |  4 +++-
- 3 files changed, 46 insertions(+), 7 deletions(-)
+> > > > triggers OOM-killer which kills sshd and other daemons on my machine.
+> > > > These pages were not even faulted in (or the shrinker can unmap them),
+> > > > the kernel can not know who should be blamed.
+> > >
+> > > The OOM-killer killed the wrong process: News at 11.
+> >
+> > Well. I do not think we should blame OOM-killer in this case. But as I
+> > said this is not a bug-report or something like this, I agree this is
+> > a minor issue.
+>
+> I do think the OOM-killer is doing the wrong thing here.  If process X is
+> the only one that is allocating gobs of memory,
 
--- 
-2.15.0
+aio_setup_ring() does find_or_create_page(file->f_mapping), this adds
+the page to page cache. Again, this memory looks _reclaimable_ but it
+is not because ctx->ring_pages has a reference.
+
+I do not understand how we can blame OOM-killer, it should not kill the
+task which blows the page cache, and this is how io_setup() looks to vm.
+
+Quite possibly I missed something, please correct me.
+
+Oleg.
