@@ -1,12 +1,7 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:56438 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751001AbdLHAgy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 7 Dec 2017 19:36:54 -0500
-Date: Fri, 8 Dec 2017 08:36:38 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "hch@infradead.org" <hch@infradead.org>,
         "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
@@ -16,40 +11,27 @@ Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>
 Subject: Re: [PATCH] SCSI: run queue if SCSI device queue isn't ready and
  queue is idle
-Message-ID: <20171208003637.GA21488@ming.t460p>
+Date: Thu, 7 Dec 2017 21:11:54 +0000
+Message-ID: <1512681113.2624.33.camel@wdc.com>
 References: <20171205075256.10319-1-ming.lei@redhat.com>
- <1512490099.2660.6.camel@sandisk.com>
- <20171205162825.GA23788@ming.t460p>
- <20171206015212.GB26512@ming.t460p>
- <1512576435.3297.3.camel@wdc.com>
- <20171207013122.GA10214@ming.t460p>
- <1512681113.2624.33.camel@wdc.com>
+         <1512490099.2660.6.camel@sandisk.com> <20171205162825.GA23788@ming.t460p>
+         <20171206015212.GB26512@ming.t460p> <1512576435.3297.3.camel@wdc.com>
+         <20171207013122.GA10214@ming.t460p>
+In-Reply-To: <20171207013122.GA10214@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1512681113.2624.33.camel@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Dec 07, 2017 at 09:11:54PM +0000, Bart Van Assche wrote:
-> On Thu, 2017-12-07 at 09:31 +0800, Ming Lei wrote:
-> > But if you always call blk_mq_sched_mark_restart_hctx() before a new
-> > dispatch, that may affect performance on NVMe which may never trigger
-> > BLK_STS_RESOURCE.
-> 
-> Hmm ... only the SCSI core implements .get_budget() and .put_budget() and
-> I proposed to insert a blk_mq_sched_mark_restart_hctx() call under "if
-> (q->mq_ops->get_budget)". In other words, I proposed to insert a
-> blk_mq_sched_mark_restart_hctx() call in a code path that is never triggered
-> by the NVMe driver. So I don't see how the change I proposed could affect
-> the performance of the NVMe driver?
-
-You only add the check on none scheduler, right?
-
-But this race isn't related with scheduler, that means it can't fix the
-race with other schedulers.
-
-I have test case to trigger this issue on both none and mq-deadline, and
-my patch fixes them all.
-
-Thanks,
-Ming
+T24gVGh1LCAyMDE3LTEyLTA3IGF0IDA5OjMxICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gQnV0
+IGlmIHlvdSBhbHdheXMgY2FsbCBibGtfbXFfc2NoZWRfbWFya19yZXN0YXJ0X2hjdHgoKSBiZWZv
+cmUgYSBuZXcNCj4gZGlzcGF0Y2gsIHRoYXQgbWF5IGFmZmVjdCBwZXJmb3JtYW5jZSBvbiBOVk1l
+IHdoaWNoIG1heSBuZXZlciB0cmlnZ2VyDQo+IEJMS19TVFNfUkVTT1VSQ0UuDQoNCkhtbSAuLi4g
+b25seSB0aGUgU0NTSSBjb3JlIGltcGxlbWVudHMgLmdldF9idWRnZXQoKSBhbmQgLnB1dF9idWRn
+ZXQoKSBhbmQNCkkgcHJvcG9zZWQgdG8gaW5zZXJ0IGEgYmxrX21xX3NjaGVkX21hcmtfcmVzdGFy
+dF9oY3R4KCkgY2FsbCB1bmRlciAiaWYNCihxLT5tcV9vcHMtPmdldF9idWRnZXQpIi4gSW4gb3Ro
+ZXIgd29yZHMsIEkgcHJvcG9zZWQgdG8gaW5zZXJ0IGENCmJsa19tcV9zY2hlZF9tYXJrX3Jlc3Rh
+cnRfaGN0eCgpIGNhbGwgaW4gYSBjb2RlIHBhdGggdGhhdCBpcyBuZXZlciB0cmlnZ2VyZWQNCmJ5
+IHRoZSBOVk1lIGRyaXZlci4gU28gSSBkb24ndCBzZWUgaG93IHRoZSBjaGFuZ2UgSSBwcm9wb3Nl
+ZCBjb3VsZCBhZmZlY3QNCnRoZSBwZXJmb3JtYW5jZSBvZiB0aGUgTlZNZSBkcml2ZXI/DQoNCkJh
+cnQu
