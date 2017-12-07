@@ -1,61 +1,102 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>, "hare@suse.com" <hare@suse.com>,
-        "holger@applied-asynchrony.com" <holger@applied-asynchrony.com>,
-        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:50396 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751718AbdLGBkW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 6 Dec 2017 20:40:22 -0500
+Date: Thu, 7 Dec 2017 09:40:04 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Holger =?iso-8859-1?Q?Hoffst=E4tte?=
+        <holger@applied-asynchrony.com>, Jens Axboe <axboe@fb.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        linux-scsi@vger.kernel.org,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        linux-kernel@vger.kernel.org, Hannes Reinecke <hare@suse.com>
 Subject: Re: [PATCH] SCSI: run queue if SCSI device queue isn't ready and
  queue is idle
-Date: Thu, 7 Dec 2017 21:06:58 +0000
-Message-ID: <1512680817.2624.29.camel@wdc.com>
+Message-ID: <20171207014002.GB10214@ming.t460p>
 References: <20171205075256.10319-1-ming.lei@redhat.com>
-         <1512490099.2660.6.camel@sandisk.com> <20171205162825.GA23788@ming.t460p>
-In-Reply-To: <20171205162825.GA23788@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
+ <0352a2f1-d49b-aaa1-f8e9-10486bb5fa9d@applied-asynchrony.com>
 MIME-Version: 1.0
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <0352a2f1-d49b-aaa1-f8e9-10486bb5fa9d@applied-asynchrony.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-T24gV2VkLCAyMDE3LTEyLTA2IGF0IDAwOjI4ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
-VHVlLCBEZWMgMDUsIDIwMTcgYXQgMDQ6MDg6MjBQTSArMDAwMCwgQmFydCBWYW4gQXNzY2hlIHdy
-b3RlOg0KPiA+IE9uIFR1ZSwgMjAxNy0xMi0wNSBhdCAxNTo1MiArMDgwMCwgTWluZyBMZWkgd3Jv
-dGU6DQo+ID4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9zY3NpL3Njc2lfbGliLmMgYi9kcml2ZXJz
-L3Njc2kvc2NzaV9saWIuYw0KPiA+ID4gaW5kZXggZGI5NTU2NjYyZTI3Li4xODE2ZGQ4MjU5YjMg
-MTAwNjQ0DQo+ID4gPiAtLS0gYS9kcml2ZXJzL3Njc2kvc2NzaV9saWIuYw0KPiA+ID4gKysrIGIv
-ZHJpdmVycy9zY3NpL3Njc2lfbGliLmMNCj4gPiA+IEBAIC0xOTY3LDYgKzE5NjcsOCBAQCBzdGF0
-aWMgYm9vbCBzY3NpX21xX2dldF9idWRnZXQoc3RydWN0IGJsa19tcV9od19jdHggKmhjdHgpDQo+
-ID4gPiAgb3V0X3B1dF9kZXZpY2U6DQo+ID4gPiAgCXB1dF9kZXZpY2UoJnNkZXYtPnNkZXZfZ2Vu
-ZGV2KTsNCj4gPiA+ICBvdXQ6DQo+ID4gPiArCWlmIChhdG9taWNfcmVhZCgmc2Rldi0+ZGV2aWNl
-X2J1c3kpID09IDAgJiYgIXNjc2lfZGV2aWNlX2Jsb2NrZWQoc2RldikpDQo+ID4gPiArCQlibGtf
-bXFfZGVsYXlfcnVuX2h3X3F1ZXVlKGhjdHgsIFNDU0lfUVVFVUVfREVMQVkpOw0KPiA+ID4gIAly
-ZXR1cm4gZmFsc2U7DQo+ID4gPiAgfQ0KPiA+IA0KPiA+IFRoaXMgY2Fubm90IHdvcmsgc2luY2Ug
-bXVsdGlwbGUgdGhyZWFkcyBjYW4gY2FsbCBzY3NpX21xX2dldF9idWRnZXQoKQ0KPiANCj4gVGhh
-dCBpcyBleGFjdGx5IHRoZSB3YXkgd2UgYXJlIGhhbmRsaW5nIHRoZXNlIGNhc2VzIGJlZm9yZSAw
-ZGYyMWM4NmJkYmYoc2NzaToNCj4gaW1wbGVtZW50IC5nZXRfYnVkZ2V0IGFuZCAucHV0X2J1ZGdl
-dCBmb3IgYmxrLW1xKSwgc28gaWYgaXQgY2FuJ3Qgd29yaywNCj4gdGhhdCBpcyBub3QgZmF1bHQg
-b2YgY29tbWl0IDBkZjIxYzg2YmRiZi4NCj4gDQo+ID4gY29uY3VycmVudGx5IGFuZCBoZW5jZSBp
-dCBjYW4gaGFwcGVuIHRoYXQgbm9uZSBvZiB0aGVtIHNlZXMNCj4gPiBhdG9taWNfcmVhZCgmc2Rl
-di0+ZGV2aWNlX2J1c3kpID09IDAuIEJUVywgdGhlIGFib3ZlIHBhdGNoIGlzIHNvbWV0aGluZyBJ
-DQo+IA0KPiBJZiB0aGVyZSBpcyBjb25jdXJyZW50IC5nZXRfYnVkZ2V0KCksIG9uZSBvZiB0aGVt
-IHdpbGwgc2VlIHRoZSBjb3VudGVyDQo+IGJlY29taW5nIHplcm8gZmluYWxseSBiZWNhdXNlIGVh
-Y2ggc2Rldi0+ZGV2aWNlX2J1c3kgaXMgaW5jL2RlYw0KPiBhdG9taWNhbGx5LiBPciBzY3NpX2Rl
-dl9xdWV1ZV9yZWFkeSgpIHJldHVybiB0cnVlLg0KPiANCj4gQW55d2F5LCB3ZSBuZWVkIHRoaXMg
-cGF0Y2ggdG8gYXZvaWQgcG9zc2libGUgcmVncmVzc2lvbi4gSWYgeW91IHRoaW5rDQo+IHRoZXJl
-IGFyZSBidWdzIGluIGJsay1tcSBSRVNUQVJULCBqdXN0IHJvb3QgY2F1c2UgYW5kIGFuZCBmaXgg
-aXQuDQoNCkhlbGxvIE1pbmcsDQoNCldoZW4gSSBsb29rZWQgYXQgdGhlIHBhdGNoIGF0IHRoZSBz
-dGFydCBvZiB0aGlzIHRocmVhZCBmb3IgdGhlIGZpcnN0IHRpbWUgSQ0KZ290IGZydXN0cmF0ZWQg
-YmVjYXVzZSBJIGRpZG4ndCBzZWUgaG93IHRoaXMgcGF0Y2ggY291bGQgZml4IHRoZSBxdWV1ZSBz
-dGFsbA0KSSByYW4gaW50byBteXNlbGYuIFRvZGF5IEkgc3RhcnRlZCByZWFsaXppbmcgdGhhdCB3
-aGF0IEhvbGdlciByZXBvcnRlZCBpcw0KcHJvYmFibHkgYW5vdGhlciBpc3N1ZSB0aGFuIHdoYXQg
-SSByYW4gaW50byBteXNlbGYuIFNpbmNlIHRoaXMgcGF0Y2ggYnkNCml0c2VsZiBsb29rcyBub3cg
-dXNlZnVsIHRvIG1lOg0KDQpSZXZpZXdlZC1ieTogQmFydCBWYW4gQXNzY2hlIDxiYXJ0LnZhbmFz
-c2NoZUB3ZGMuY29tPg0KDQpCVFcsIGRvIHlvdSB0aGluayB0aGUgcGF0Y2ggYXQgdGhlIHN0YXJ0
-IG9mIHRoaXMgdGhyZWFkIGFsc28gZml4ZXMgdGhlIGlzc3VlDQp0aGF0IHJlc3VsdGVkIGluIGNv
-bW1pdCA4MjZhNzBhMDhiMTIgKCJTQ1NJOiBkb24ndCBnZXQgdGFyZ2V0L2hvc3QgYnVzeV9jb3Vu
-dA0KaW4gc2NzaV9tcV9nZXRfYnVkZ2V0KCkiKT8gRG8geW91IHRoaW5rIHdlIHN0aWxsIG5lZWQg
-dGhhdCBwYXRjaD8NCg0KQmFydC4=
+On Thu, Dec 07, 2017 at 12:10:51AM +0100, Holger Hoffst�tte wrote:
+> On 12/05/17 08:52, Ming Lei wrote:
+> > Before commit 0df21c86bdbf ("scsi: implement .get_budget and .put_budget
+> > for blk-mq"), we run queue after 3ms if queue is idle and SCSI device
+> > queue isn't ready, which is done in handling BLK_STS_RESOURCE. After
+> > commit 0df21c86bdbf is introduced, queue won't be run any more under
+> > this situation.
+> > 
+> > IO hang is observed when timeout happened, and this patch fixes the IO
+> > hang issue by running queue after delay in scsi_dev_queue_ready, just like
+> > non-mq. This issue can be triggered by the following script[1].
+> > 
+> > There is another issue which can be covered by running idle queue:
+> > when .get_budget() is called on request coming from hctx->dispatch_list,
+> > if one request just completes during .get_budget(), we can't depend on
+> > SCSI's restart to make progress any more. This patch fixes the race too.
+> > 
+> > With this patch, we basically recover to previous behaviour(before commit
+> > 0df21c86bdbf) of handling idle queue when running out of resource.
+> > 
+> > [1] script for test/verify SCSI timeout
+> > rmmod scsi_debug
+> > modprobe scsi_debug max_queue=1
+> > 
+> > DEVICE=`ls -d /sys/bus/pseudo/drivers/scsi_debug/adapter*/host*/target*/*/block/* | head -1 | xargs basename`
+> > DISK_DIR=`ls -d /sys/block/$DEVICE/device/scsi_disk/*`
+> > 
+> > echo "using scsi device $DEVICE"
+> > echo "-1" >/sys/bus/pseudo/drivers/scsi_debug/every_nth
+> > echo "temporary write through" >$DISK_DIR/cache_type
+> > echo "128" >/sys/bus/pseudo/drivers/scsi_debug/opts
+> > echo none > /sys/block/$DEVICE/queue/scheduler
+> > dd if=/dev/$DEVICE of=/dev/null bs=1M iflag=direct count=1 &
+> > sleep 5
+> > echo "0" >/sys/bus/pseudo/drivers/scsi_debug/opts
+> > wait
+> > echo "SUCCESS"
+> > 
+> > Fixes: 0df21c86bdbf ("scsi: implement .get_budget and .put_budget for blk-mq")
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  drivers/scsi/scsi_lib.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> > index db9556662e27..1816dd8259b3 100644
+> > --- a/drivers/scsi/scsi_lib.c
+> > +++ b/drivers/scsi/scsi_lib.c
+> > @@ -1967,6 +1967,8 @@ static bool scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
+> >  out_put_device:
+> >  	put_device(&sdev->sdev_gendev);
+> >  out:
+> > +	if (atomic_read(&sdev->device_busy) == 0 && !scsi_device_blocked(sdev))
+> > +		blk_mq_delay_run_hw_queue(hctx, SCSI_QUEUE_DELAY);
+> >  	return false;
+> >  }
+> 
+> So just to follow up on this: with this patch I haven't encountered any
+> new hangs with blk-mq, regardless of medium (SSD/rotating disk) or scheduler.
+> I cannot speak for other hangs that may be reproducible by other means,
+> but for now here's my:
+> 
+> Tested-by: Holger Hoffst�tte <holger@applied-asynchrony.com>
+
+Hi Holger,
+
+That is great to see this patch fixes your issue, and thanks for your
+test!
+
+Jens, Martin, would any of you mind making this patch in V4.15? Since
+it fixes real use cases and this way is exact what we do before
+0df21c86bdbf("scsi: implement .get_budget and .put_budget for blk-mq").
+
+
+Thanks,
+Ming
