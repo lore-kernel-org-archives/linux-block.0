@@ -1,48 +1,183 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:40131 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756008AbdLTRWe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Dec 2017 12:22:34 -0500
-Received: by mail-wm0-f66.google.com with SMTP id f206so11105702wmf.5
-        for <linux-block@vger.kernel.org>; Wed, 20 Dec 2017 09:22:33 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 19/25] lightnvm: pblk: ignore high ecc errors on recovery
-Date: Wed, 20 Dec 2017 18:21:59 +0100
-Message-Id: <20171220172205.26464-20-m@bjorling.me>
-In-Reply-To: <20171220172205.26464-1-m@bjorling.me>
-References: <20171220172205.26464-1-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mx1.redhat.com ([209.132.183.28]:44582 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752884AbdLHNOw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Dec 2017 08:14:52 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 02/10] block: conver to bio_first_bvec() & bio_first_page()
+Date: Fri,  8 Dec 2017 21:14:01 +0800
+Message-Id: <20171208131409.11889-3-ming.lei@redhat.com>
+In-Reply-To: <20171208131409.11889-1-ming.lei@redhat.com>
+References: <20171208131409.11889-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Javier González <javier@cnexlabs.com>
+This patch converts to bio_first_bvec() & bio_first_page() for retrieve
+the 1st bvec/page, and prepares for supporting multipage bvec.
 
-On recovery, do not stop L2P recovery if reads report high ECC error
-as the data is still available.
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/pblk-recovery.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/drbd/drbd_bitmap.c | 2 +-
+ drivers/block/zram/zram_drv.c    | 2 +-
+ drivers/md/bcache/super.c        | 8 ++++----
+ fs/btrfs/compression.c           | 2 +-
+ fs/btrfs/inode.c                 | 4 ++--
+ fs/f2fs/data.c                   | 2 +-
+ kernel/power/swap.c              | 2 +-
+ mm/page_io.c                     | 4 ++--
+ 8 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index fd38036..1d5e961 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -288,7 +288,7 @@ static int pblk_recov_read_oob(struct pblk *pblk, struct pblk_line *line,
- 	/* At this point, the read should not fail. If it does, it is a problem
- 	 * we cannot recover from here. Need FTL log.
- 	 */
--	if (rqd->error) {
-+	if (rqd->error && rqd->error != NVM_RSP_WARN_HIGHECC) {
- 		pr_err("pblk: L2P recovery failed (%d)\n", rqd->error);
- 		return -EINTR;
+diff --git a/drivers/block/drbd/drbd_bitmap.c b/drivers/block/drbd/drbd_bitmap.c
+index bd97908c766f..0fe155123c8c 100644
+--- a/drivers/block/drbd/drbd_bitmap.c
++++ b/drivers/block/drbd/drbd_bitmap.c
+@@ -953,7 +953,7 @@ static void drbd_bm_endio(struct bio *bio)
+ 	struct drbd_bm_aio_ctx *ctx = bio->bi_private;
+ 	struct drbd_device *device = ctx->device;
+ 	struct drbd_bitmap *b = device->bitmap;
+-	unsigned int idx = bm_page_to_idx(bio->bi_io_vec[0].bv_page);
++	unsigned int idx = bm_page_to_idx(bio_first_page(bio));
+ 
+ 	if ((ctx->flags & BM_AIO_COPY_PAGES) == 0 &&
+ 	    !bm_test_page_unchanged(b->bm_pages[idx]))
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index d70eba30003a..36885b037ad3 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -430,7 +430,7 @@ static void put_entry_bdev(struct zram *zram, unsigned long entry)
+ 
+ static void zram_page_end_io(struct bio *bio)
+ {
+-	struct page *page = bio->bi_io_vec[0].bv_page;
++	struct page *page = bio_first_page(bio);
+ 
+ 	page_endio(page, op_is_write(bio_op(bio)),
+ 			blk_status_to_errno(bio->bi_status));
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index b4d28928dec5..da1a953d9545 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -211,7 +211,7 @@ static void write_bdev_super_endio(struct bio *bio)
+ 
+ static void __write_super(struct cache_sb *sb, struct bio *bio)
+ {
+-	struct cache_sb *out = page_address(bio->bi_io_vec[0].bv_page);
++	struct cache_sb *out = page_address(bio_first_page(bio));
+ 	unsigned i;
+ 
+ 	bio->bi_iter.bi_sector	= SB_SECTOR;
+@@ -1166,7 +1166,7 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
+ 	dc->bdev->bd_holder = dc;
+ 
+ 	bio_init(&dc->sb_bio, dc->sb_bio.bi_inline_vecs, 1);
+-	dc->sb_bio.bi_io_vec[0].bv_page = sb_page;
++	bio_first_bvec(&dc->sb_bio)->bv_page = sb_page;
+ 	get_page(sb_page);
+ 
+ 	if (cached_dev_init(dc, sb->block_size << 9))
+@@ -1810,7 +1810,7 @@ void bch_cache_release(struct kobject *kobj)
+ 		free_fifo(&ca->free[i]);
+ 
+ 	if (ca->sb_bio.bi_inline_vecs[0].bv_page)
+-		put_page(ca->sb_bio.bi_io_vec[0].bv_page);
++		put_page(bio_first_page(&ca->sb_bio));
+ 
+ 	if (!IS_ERR_OR_NULL(ca->bdev))
+ 		blkdev_put(ca->bdev, FMODE_READ|FMODE_WRITE|FMODE_EXCL);
+@@ -1864,7 +1864,7 @@ static int register_cache(struct cache_sb *sb, struct page *sb_page,
+ 	ca->bdev->bd_holder = ca;
+ 
+ 	bio_init(&ca->sb_bio, ca->sb_bio.bi_inline_vecs, 1);
+-	ca->sb_bio.bi_io_vec[0].bv_page = sb_page;
++	bio_first_bvec(&ca->sb_bio)->bv_page = sb_page;
+ 	get_page(sb_page);
+ 
+ 	if (blk_queue_discard(bdev_get_queue(ca->bdev)))
+diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
+index 5982c8a71f02..fc0386c18574 100644
+--- a/fs/btrfs/compression.c
++++ b/fs/btrfs/compression.c
+@@ -563,7 +563,7 @@ blk_status_t btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
+ 	/* we need the actual starting offset of this extent in the file */
+ 	read_lock(&em_tree->lock);
+ 	em = lookup_extent_mapping(em_tree,
+-				   page_offset(bio->bi_io_vec->bv_page),
++				   page_offset(bio_first_page(bio)),
+ 				   PAGE_SIZE);
+ 	read_unlock(&em_tree->lock);
+ 	if (!em)
+diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
+index 993061f83067..d28b66019d54 100644
+--- a/fs/btrfs/inode.c
++++ b/fs/btrfs/inode.c
+@@ -8072,7 +8072,7 @@ static void btrfs_retry_endio_nocsum(struct bio *bio)
+ 	ASSERT(bio->bi_vcnt == 1);
+ 	io_tree = &BTRFS_I(inode)->io_tree;
+ 	failure_tree = &BTRFS_I(inode)->io_failure_tree;
+-	ASSERT(bio->bi_io_vec->bv_len == btrfs_inode_sectorsize(inode));
++	ASSERT(bio_first_bvec(bio)->bv_len == btrfs_inode_sectorsize(inode));
+ 
+ 	done->uptodate = 1;
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+@@ -8162,7 +8162,7 @@ static void btrfs_retry_endio(struct bio *bio)
+ 	uptodate = 1;
+ 
+ 	ASSERT(bio->bi_vcnt == 1);
+-	ASSERT(bio->bi_io_vec->bv_len == btrfs_inode_sectorsize(done->inode));
++	ASSERT(bio_first_bvec(bio)->bv_len == btrfs_inode_sectorsize(done->inode));
+ 
+ 	io_tree = &BTRFS_I(inode)->io_tree;
+ 	failure_tree = &BTRFS_I(inode)->io_failure_tree;
+diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
+index 516fa0d3ff9c..9c2463f9272d 100644
+--- a/fs/f2fs/data.c
++++ b/fs/f2fs/data.c
+@@ -56,7 +56,7 @@ static void f2fs_read_end_io(struct bio *bio)
+ 	int i;
+ 
+ #ifdef CONFIG_F2FS_FAULT_INJECTION
+-	if (time_to_inject(F2FS_P_SB(bio->bi_io_vec->bv_page), FAULT_IO)) {
++	if (time_to_inject(F2FS_P_SB(bio_first_page(bio)), FAULT_IO)) {
+ 		f2fs_show_injection_info(FAULT_IO);
+ 		bio->bi_status = BLK_STS_IOERR;
  	}
+diff --git a/kernel/power/swap.c b/kernel/power/swap.c
+index 293ead59eccc..488e4a490dfa 100644
+--- a/kernel/power/swap.c
++++ b/kernel/power/swap.c
+@@ -240,7 +240,7 @@ static void hib_init_batch(struct hib_bio_batch *hb)
+ static void hib_end_io(struct bio *bio)
+ {
+ 	struct hib_bio_batch *hb = bio->bi_private;
+-	struct page *page = bio->bi_io_vec[0].bv_page;
++	struct page *page = bio_first_page(bio);
+ 
+ 	if (bio->bi_status) {
+ 		pr_alert("Read-error on swap-device (%u:%u:%Lu)\n",
+diff --git a/mm/page_io.c b/mm/page_io.c
+index e93f1a4cacd7..edcf5389eab7 100644
+--- a/mm/page_io.c
++++ b/mm/page_io.c
+@@ -50,7 +50,7 @@ static struct bio *get_swap_bio(gfp_t gfp_flags,
+ 
+ void end_swap_bio_write(struct bio *bio)
+ {
+-	struct page *page = bio->bi_io_vec[0].bv_page;
++	struct page *page = bio_first_page(bio);
+ 
+ 	if (bio->bi_status) {
+ 		SetPageError(page);
+@@ -122,7 +122,7 @@ static void swap_slot_free_notify(struct page *page)
+ 
+ static void end_swap_bio_read(struct bio *bio)
+ {
+-	struct page *page = bio->bi_io_vec[0].bv_page;
++	struct page *page = bio_first_page(bio);
+ 	struct task_struct *waiter = bio->bi_private;
+ 
+ 	if (bio->bi_status) {
 -- 
-2.9.3
+2.9.5
