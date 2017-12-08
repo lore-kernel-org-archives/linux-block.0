@@ -1,64 +1,68 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:17906 "EHLO mga09.intel.com"
+Received: from mx1.redhat.com ([209.132.183.28]:38282 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752745AbdLANOK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 1 Dec 2017 08:14:10 -0500
-Subject: Re: [PATCH V15 00/22] mmc: Add Command Queue support
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: linux-mmc <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Bough Chen <haibo.chen@nxp.com>,
-        Alex Lemberg <alex.lemberg@sandisk.com>,
-        Mateusz Nowak <mateusz.nowak@intel.com>,
-        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Dong Aisheng <dongas86@gmail.com>,
-        Das Asutosh <asutoshd@codeaurora.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Sahitya Tummala <stummala@codeaurora.org>,
-        Harjani Ritesh <riteshh@codeaurora.org>,
-        Venu Byravarasu <vbyravarasu@nvidia.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Christoph Hellwig <hch@lst.de>
-References: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
- <CAPDyKFrgC91Z3P-5U22gjKDqs_aZiQncGUrShWpFggkWzrRMjw@mail.gmail.com>
-From: Adrian Hunter <adrian.hunter@intel.com>
-Message-ID: <d35cff56-0923-cd9e-72ac-087819d4fed6@intel.com>
-Date: Fri, 1 Dec 2017 15:13:46 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAPDyKFrgC91Z3P-5U22gjKDqs_aZiQncGUrShWpFggkWzrRMjw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+        id S1752470AbdLHNPD (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Dec 2017 08:15:03 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 03/10] fs: convert to bio_last_bvec()
+Date: Fri,  8 Dec 2017 21:14:02 +0800
+Message-Id: <20171208131409.11889-4-ming.lei@redhat.com>
+In-Reply-To: <20171208131409.11889-1-ming.lei@redhat.com>
+References: <20171208131409.11889-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 29/11/17 17:47, Ulf Hansson wrote:
-> Hi Adrian,
-> 
-> On 29 November 2017 at 14:40, Adrian Hunter <adrian.hunter@intel.com> wrote:
->> Hi
->>
->> Here is V15 of the hardware command queue patches without the software
->> command queue patches, now using blk-mq and now with blk-mq support for
->> non-CQE I/O.
-> 
-> I have applied patches 1->19 for next.  Deferring patch 21->23 for a while.
+This patch convers 3 users to bio_last_bvec(), so that we can go ahread
+to convert to multipage bvec.
 
-Thank you!
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ fs/btrfs/compression.c | 2 +-
+ fs/btrfs/extent_io.c   | 2 +-
+ fs/buffer.c            | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-> 
-> For those patches that was more or less the same as in v14, I added Linus' ack.
-> 
-> Hopefully we get some help for the community to test this series on
-> different HW (and I will be checking kernelci's boot reports). I
-> haven't added Bartlomiej's tested-by and neither Linus' (because of
-> the changes that has been made), so I hoping that will happen sooner
-> or later.
-> 
-> Moreover, I will gladly add more peoples acks/reviewed-by and
-> tested-by tags, at any point during this release cycle.
-
-I also encourage anyone testing to report their results even if they don't
-want to have a tested-by tag.
+diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
+index fc0386c18574..726e1b5b06fe 100644
+--- a/fs/btrfs/compression.c
++++ b/fs/btrfs/compression.c
+@@ -411,7 +411,7 @@ blk_status_t btrfs_submit_compressed_write(struct inode *inode, u64 start,
+ 
+ static u64 bio_end_offset(struct bio *bio)
+ {
+-	struct bio_vec *last = &bio->bi_io_vec[bio->bi_vcnt - 1];
++	struct bio_vec *last = bio_last_bvec(bio);
+ 
+ 	return page_offset(last->bv_page) + last->bv_len + last->bv_offset;
+ }
+diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+index 012d63870b99..6f6669f93beb 100644
+--- a/fs/btrfs/extent_io.c
++++ b/fs/btrfs/extent_io.c
+@@ -2724,7 +2724,7 @@ static int __must_check submit_one_bio(struct bio *bio, int mirror_num,
+ 				       unsigned long bio_flags)
+ {
+ 	blk_status_t ret = 0;
+-	struct bio_vec *bvec = bio->bi_io_vec + bio->bi_vcnt - 1;
++	struct bio_vec *bvec = bio_last_bvec(bio);
+ 	struct page *page = bvec->bv_page;
+ 	struct extent_io_tree *tree = bio->bi_private;
+ 	u64 start;
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 0736a6a2e2f0..ceb705ba939f 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -3014,7 +3014,7 @@ static void end_bio_bh_io_sync(struct bio *bio)
+ void guard_bio_eod(int op, struct bio *bio)
+ {
+ 	sector_t maxsector;
+-	struct bio_vec *bvec = &bio->bi_io_vec[bio->bi_vcnt - 1];
++	struct bio_vec *bvec = bio_last_bvec(bio);
+ 	unsigned truncated_bytes;
+ 	struct hd_struct *part;
+ 
+-- 
+2.9.5
