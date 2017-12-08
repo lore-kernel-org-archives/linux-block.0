@@ -1,102 +1,62 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:55568 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:44506 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933363AbdLRMZJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Dec 2017 07:25:09 -0500
+        id S1752884AbdLHNOk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Dec 2017 08:14:40 -0500
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>, Chris Mason <clm@fb.com>,
-        Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>,
-        linux-btrfs@vger.kernel.org
-Subject: [PATCH V4 09/45] btrfs: avoid access to .bi_vcnt directly
-Date: Mon, 18 Dec 2017 20:22:11 +0800
-Message-Id: <20171218122247.3488-10-ming.lei@redhat.com>
-In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
-References: <20171218122247.3488-1-ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 01/10] block: introduce bio helpers for converting to multipage bvec
+Date: Fri,  8 Dec 2017 21:14:00 +0800
+Message-Id: <20171208131409.11889-2-ming.lei@redhat.com>
+In-Reply-To: <20171208131409.11889-1-ming.lei@redhat.com>
+References: <20171208131409.11889-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-BTRFS uses bio->bi_vcnt to figure out page numbers, this way becomes not
-correct once we start to enable multipage bvec.
+These helpers are introduced for converting current users of direct
+access to bvec table, and prepares for supporting multipage bvec.
 
-So use bio_nr_pages() to do that instead.
-
-Cc: Chris Mason <clm@fb.com>
-Cc: Josef Bacik <jbacik@fb.com>
-Cc: David Sterba <dsterba@suse.com>
-Cc: linux-btrfs@vger.kernel.org
-Acked-by: David Sterba <dsterba@suse.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/btrfs/extent_io.c | 9 +++++----
- fs/btrfs/extent_io.h | 2 +-
- 2 files changed, 6 insertions(+), 5 deletions(-)
+ include/linux/bio.h | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index 69cd63d4503d..d43360b33ef6 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -2257,7 +2257,7 @@ int btrfs_get_io_failure_record(struct inode *inode, u64 start, u64 end,
- 	return 0;
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 82f0c8fd7be8..3f314e17364a 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -300,6 +300,30 @@ static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
+ 		bv->bv_len = iter.bi_bvec_done;
  }
  
--bool btrfs_check_repairable(struct inode *inode, struct bio *failed_bio,
-+bool btrfs_check_repairable(struct inode *inode, unsigned failed_bio_pages,
- 			   struct io_failure_record *failrec, int failed_mirror)
- {
- 	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
-@@ -2281,7 +2281,7 @@ bool btrfs_check_repairable(struct inode *inode, struct bio *failed_bio,
- 	 *	a) deliver good data to the caller
- 	 *	b) correct the bad sectors on disk
- 	 */
--	if (failed_bio->bi_vcnt > 1) {
-+	if (failed_bio_pages > 1) {
- 		/*
- 		 * to fulfill b), we need to know the exact failing sectors, as
- 		 * we don't want to rewrite any more than the failed ones. thus,
-@@ -2374,6 +2374,7 @@ static int bio_readpage_error(struct bio *failed_bio, u64 phy_offset,
- 	int read_mode = 0;
- 	blk_status_t status;
- 	int ret;
-+	unsigned failed_bio_pages = bio_pages_all(failed_bio);
- 
- 	BUG_ON(bio_op(failed_bio) == REQ_OP_WRITE);
- 
-@@ -2381,13 +2382,13 @@ static int bio_readpage_error(struct bio *failed_bio, u64 phy_offset,
- 	if (ret)
- 		return ret;
- 
--	if (!btrfs_check_repairable(inode, failed_bio, failrec,
-+	if (!btrfs_check_repairable(inode, failed_bio_pages, failrec,
- 				    failed_mirror)) {
- 		free_io_failure(failure_tree, tree, failrec);
- 		return -EIO;
- 	}
- 
--	if (failed_bio->bi_vcnt > 1)
-+	if (failed_bio_pages > 1)
- 		read_mode |= REQ_FAILFAST_DEV;
- 
- 	phy_offset >>= inode->i_sb->s_blocksize_bits;
-diff --git a/fs/btrfs/extent_io.h b/fs/btrfs/extent_io.h
-index 93dcae0c3183..20854d63c75b 100644
---- a/fs/btrfs/extent_io.h
-+++ b/fs/btrfs/extent_io.h
-@@ -540,7 +540,7 @@ void btrfs_free_io_failure_record(struct btrfs_inode *inode, u64 start,
- 		u64 end);
- int btrfs_get_io_failure_record(struct inode *inode, u64 start, u64 end,
- 				struct io_failure_record **failrec_ret);
--bool btrfs_check_repairable(struct inode *inode, struct bio *failed_bio,
-+bool btrfs_check_repairable(struct inode *inode, unsigned failed_bio_pages,
- 			    struct io_failure_record *failrec, int fail_mirror);
- struct bio *btrfs_create_repair_bio(struct inode *inode, struct bio *failed_bio,
- 				    struct io_failure_record *failrec,
++static inline unsigned bio_nr_pages(struct bio *bio)
++{
++	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
++
++	return bio->bi_vcnt;
++}
++
++static inline struct bio_vec *bio_first_bvec(struct bio *bio)
++{
++	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
++	return bio->bi_io_vec;
++}
++
++static inline struct page *bio_first_page(struct bio *bio)
++{
++	return bio_first_bvec(bio)->bv_page;
++}
++
++static inline struct bio_vec *bio_last_bvec(struct bio *bio)
++{
++	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
++	return &bio->bi_io_vec[bio->bi_vcnt - 1];
++}
++
+ enum bip_flags {
+ 	BIP_BLOCK_INTEGRITY	= 1 << 0, /* block layer owns integrity data */
+ 	BIP_MAPPED_INTEGRITY	= 1 << 1, /* ref tag has been remapped */
 -- 
 2.9.5
