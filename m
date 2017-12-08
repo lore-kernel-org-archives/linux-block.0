@@ -1,87 +1,96 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.15-rc
-Message-ID: <fd786646-141c-c7d1-e7eb-f33f698bf2f2@kernel.dk>
-Date: Thu, 21 Dec 2017 10:53:15 -0700
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:41308 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752989AbdLHNQM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Dec 2017 08:16:12 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>, Chris Mason <clm@fb.com>,
+        Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>,
+        linux-btrfs@vger.kernel.org
+Subject: [PATCH 09/10] btrfs: avoid access to .bi_vcnt directly
+Date: Fri,  8 Dec 2017 21:14:08 +0800
+Message-Id: <20171208131409.11889-10-ming.lei@redhat.com>
+In-Reply-To: <20171208131409.11889-1-ming.lei@redhat.com>
+References: <20171208131409.11889-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Linus,
+BTRFS uses bio->bi_vcnt to figure out page numbers, this way becomes not
+correct once we start to enable multipage bvec.
 
-It's been a few weeks, so here's a small collection of fixes that
-should go into the current series.
+So use bio_nr_pages() to do that instead.
 
-This pull request contains:
+Cc: Chris Mason <clm@fb.com>
+Cc: Josef Bacik <jbacik@fb.com>
+Cc: David Sterba <dsterba@suse.com>
+Cc: linux-btrfs@vger.kernel.org
+Acked-by: David Sterba <dsterba@suse.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ fs/btrfs/extent_io.c | 9 +++++----
+ fs/btrfs/extent_io.h | 2 +-
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
-- NVMe pull request from Christoph, with a few important fixes.
-
-- kyber hang fix from Omar.
-
-- A blk-throttl fix from Shaohua, fixing a case where we double charge
-  a bio.
-
-- Two call_single_data alignment fixes from me, fixing up some unfortunate
-  changes that went into 4.14 without being properly reviewed on the
-  block side (since nobody was CC'ed on the patch...).
-
-- A bounce buffer fix in two parts, one from me and one from Ming.
-
-- Revert bdi debug error handling patch. It's causing boot issues for some
-  folks, and a week down the line, we're still no closer to a fix. Revert
-  this patch for now until it's figured out, then we can retry for 4.16.
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-David Disseldorp (1):
-      nvme: set discard_alignment to zero
-
-James Smart (1):
-      nvme-fc: remove double put reference if admin connect fails
-
-Jens Axboe (5):
-      Merge branch 'nvme-4.15' of git://git.infradead.org/nvme into for-linus
-      block: fix blk_rq_append_bio
-      block: unalign call_single_data in struct request
-      null_blk: unalign call_single_data
-      Revert "bdi: add error handle for bdi_debug_register"
-
-Keith Busch (2):
-      nvme: check hw sectors before setting chunk sectors
-      nvme: setup streams after initializing namespace head
-
-Ming Lei (2):
-      nvme: call blk_integrity_unregister after queue is cleaned up
-      block: don't let passthrough IO go into .make_request_fn()
-
-Omar Sandoval (1):
-      kyber: fix another domain token wait queue hang
-
-Shaohua Li (1):
-      block-throttle: avoid double charge
-
- block/bio.c                        |  2 ++
- block/blk-map.c                    | 38 ++++++++++++++++++++++----------------
- block/blk-throttle.c               |  8 +-------
- block/bounce.c                     |  6 ++++--
- block/kyber-iosched.c              | 37 ++++++++++++++++++++++++-------------
- drivers/block/null_blk.c           |  4 ++--
- drivers/nvme/host/core.c           | 11 ++++++-----
- drivers/nvme/host/fc.c             |  1 -
- drivers/scsi/osd/osd_initiator.c   |  4 +++-
- drivers/target/target_core_pscsi.c |  4 ++--
- include/linux/bio.h                |  2 ++
- include/linux/blk_types.h          |  9 ++++-----
- include/linux/blkdev.h             | 25 +++++++++++++++++++++----
- mm/backing-dev.c                   |  5 +----
- 14 files changed, 94 insertions(+), 62 deletions(-)
-
+diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+index 6f6669f93beb..27795bf2507c 100644
+--- a/fs/btrfs/extent_io.c
++++ b/fs/btrfs/extent_io.c
+@@ -2257,7 +2257,7 @@ int btrfs_get_io_failure_record(struct inode *inode, u64 start, u64 end,
+ 	return 0;
+ }
+ 
+-bool btrfs_check_repairable(struct inode *inode, struct bio *failed_bio,
++bool btrfs_check_repairable(struct inode *inode, unsigned failed_bio_pages,
+ 			   struct io_failure_record *failrec, int failed_mirror)
+ {
+ 	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
+@@ -2281,7 +2281,7 @@ bool btrfs_check_repairable(struct inode *inode, struct bio *failed_bio,
+ 	 *	a) deliver good data to the caller
+ 	 *	b) correct the bad sectors on disk
+ 	 */
+-	if (failed_bio->bi_vcnt > 1) {
++	if (failed_bio_pages > 1) {
+ 		/*
+ 		 * to fulfill b), we need to know the exact failing sectors, as
+ 		 * we don't want to rewrite any more than the failed ones. thus,
+@@ -2374,6 +2374,7 @@ static int bio_readpage_error(struct bio *failed_bio, u64 phy_offset,
+ 	int read_mode = 0;
+ 	blk_status_t status;
+ 	int ret;
++	unsigned failed_bio_pages = bio_nr_pages(failed_bio);
+ 
+ 	BUG_ON(bio_op(failed_bio) == REQ_OP_WRITE);
+ 
+@@ -2381,13 +2382,13 @@ static int bio_readpage_error(struct bio *failed_bio, u64 phy_offset,
+ 	if (ret)
+ 		return ret;
+ 
+-	if (!btrfs_check_repairable(inode, failed_bio, failrec,
++	if (!btrfs_check_repairable(inode, failed_bio_pages, failrec,
+ 				    failed_mirror)) {
+ 		free_io_failure(failure_tree, tree, failrec);
+ 		return -EIO;
+ 	}
+ 
+-	if (failed_bio->bi_vcnt > 1)
++	if (failed_bio_pages > 1)
+ 		read_mode |= REQ_FAILFAST_DEV;
+ 
+ 	phy_offset >>= inode->i_sb->s_blocksize_bits;
+diff --git a/fs/btrfs/extent_io.h b/fs/btrfs/extent_io.h
+index 93dcae0c3183..20854d63c75b 100644
+--- a/fs/btrfs/extent_io.h
++++ b/fs/btrfs/extent_io.h
+@@ -540,7 +540,7 @@ void btrfs_free_io_failure_record(struct btrfs_inode *inode, u64 start,
+ 		u64 end);
+ int btrfs_get_io_failure_record(struct inode *inode, u64 start, u64 end,
+ 				struct io_failure_record **failrec_ret);
+-bool btrfs_check_repairable(struct inode *inode, struct bio *failed_bio,
++bool btrfs_check_repairable(struct inode *inode, unsigned failed_bio_pages,
+ 			    struct io_failure_record *failrec, int fail_mirror);
+ struct bio *btrfs_create_repair_bio(struct inode *inode, struct bio *failed_bio,
+ 				    struct io_failure_record *failrec,
 -- 
-Jens Axboe
+2.9.5
