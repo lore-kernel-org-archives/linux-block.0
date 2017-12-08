@@ -1,63 +1,59 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:38440 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:40924 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753274AbdLHNPM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Dec 2017 08:15:12 -0500
+        id S1753115AbdLHNPq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Dec 2017 08:15:46 -0500
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
 Cc: Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>
-Subject: [PATCH 04/10] block: bounce: avoid direct access to bvec table
-Date: Fri,  8 Dec 2017 21:14:03 +0800
-Message-Id: <20171208131409.11889-5-ming.lei@redhat.com>
+        Ming Lei <ming.lei@redhat.com>, linux-bcache@vger.kernel.org
+Subject: [PATCH 07/10] bcache: comment on direct access to bvec table
+Date: Fri,  8 Dec 2017 21:14:06 +0800
+Message-Id: <20171208131409.11889-8-ming.lei@redhat.com>
 In-Reply-To: <20171208131409.11889-1-ming.lei@redhat.com>
 References: <20171208131409.11889-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-We will support multipage bvecs in the future, so change to iterator way
-for getting bv_page of bvec from original bio.
+All direct access to bvec table are safe even after multipage bvec is supported.
 
-Cc: Matthew Wilcox <willy@infradead.org>
+Cc: linux-bcache@vger.kernel.org
+Acked-by: Coly Li <colyli@suse.de>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/bounce.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+ drivers/md/bcache/btree.c | 1 +
+ drivers/md/bcache/util.c  | 7 +++++++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/block/bounce.c b/block/bounce.c
-index fceb1a96480b..0274c31d6c05 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -137,21 +137,20 @@ static void copy_to_high_bio_irq(struct bio *to, struct bio *from)
- static void bounce_end_io(struct bio *bio, mempool_t *pool)
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index 11c5503d31dc..c09f3dd4bf07 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -432,6 +432,7 @@ static void do_btree_node_write(struct btree *b)
+ 
+ 		continue_at(cl, btree_node_write_done, NULL);
+ 	} else {
++		/* No problem for multipage bvec since the bio is just allocated */
+ 		b->bio->bi_vcnt = 0;
+ 		bch_bio_map(b->bio, i);
+ 
+diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
+index e548b8b51322..61813d230015 100644
+--- a/drivers/md/bcache/util.c
++++ b/drivers/md/bcache/util.c
+@@ -249,6 +249,13 @@ uint64_t bch_next_delay(struct bch_ratelimit *d, uint64_t done)
+ 		: 0;
+ }
+ 
++/*
++ * Generally it isn't good to access .bi_io_vec and .bi_vcnt directly,
++ * the preferred way is bio_add_page, but in this case, bch_bio_map()
++ * supposes that the bvec table is empty, so it is safe to access
++ * .bi_vcnt & .bi_io_vec in this way even after multipage bvec is
++ * supported.
++ */
+ void bch_bio_map(struct bio *bio, void *base)
  {
- 	struct bio *bio_orig = bio->bi_private;
--	struct bio_vec *bvec, *org_vec;
-+	struct bio_vec *bvec, orig_vec;
- 	int i;
--	int start = bio_orig->bi_iter.bi_idx;
-+	struct bvec_iter orig_iter = bio_orig->bi_iter;
- 
- 	/*
- 	 * free up bounce indirect pages used
- 	 */
- 	bio_for_each_segment_all(bvec, bio, i) {
--		org_vec = bio_orig->bi_io_vec + i + start;
--
--		if (bvec->bv_page == org_vec->bv_page)
--			continue;
--
--		dec_zone_page_state(bvec->bv_page, NR_BOUNCE);
--		mempool_free(bvec->bv_page, pool);
-+		orig_vec = bio_iter_iovec(bio_orig, orig_iter);
-+		if (bvec->bv_page != orig_vec.bv_page) {
-+			dec_zone_page_state(bvec->bv_page, NR_BOUNCE);
-+			mempool_free(bvec->bv_page, pool);
-+		}
-+		bio_advance_iter(bio_orig, &orig_iter, orig_vec.bv_len);
- 	}
- 
- 	bio_orig->bi_status = bio->bi_status;
+ 	size_t size = bio->bi_iter.bi_size;
 -- 
 2.9.5
