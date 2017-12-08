@@ -1,41 +1,52 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:48271 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752957AbdLDQgD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Dec 2017 11:36:03 -0500
-From: Christoph Hellwig <hch@lst.de>
-To: iommu@lists.linux-foundation.org, linux-arch@vger.kernel.org,
-        linux-block@vger.kernel.org, netdev@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] dma-mapping: take dma_pfn_offset into account in dma_max_pfn
-Date: Mon,  4 Dec 2017 08:35:59 -0800
-Message-Id: <20171204163601.3055-2-hch@lst.de>
-In-Reply-To: <20171204163601.3055-1-hch@lst.de>
-References: <20171204163601.3055-1-hch@lst.de>
+Received: from mx1.redhat.com ([209.132.183.28]:50734 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753123AbdLHNPi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Dec 2017 08:15:38 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>
+Subject: [PATCH 06/10] dm: limit the max bio size as BIO_MAX_PAGES * PAGE_SIZE
+Date: Fri,  8 Dec 2017 21:14:05 +0800
+Message-Id: <20171208131409.11889-7-ming.lei@redhat.com>
+In-Reply-To: <20171208131409.11889-1-ming.lei@redhat.com>
+References: <20171208131409.11889-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This makes sure the generic version can be used with architectures /
-devices that have a DMA offset in the direct mapping.
+For BIO based DM, some targets aren't ready for dealing with bigger
+incoming bio than 1Mbyte, such as crypt target.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc:dm-devel@redhat.com
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- include/linux/dma-mapping.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/md/dm.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
-index e8f8e8fb244d..86beb9861618 100644
---- a/include/linux/dma-mapping.h
-+++ b/include/linux/dma-mapping.h
-@@ -692,7 +692,7 @@ static inline int dma_set_seg_boundary(struct device *dev, unsigned long mask)
- #ifndef dma_max_pfn
- static inline unsigned long dma_max_pfn(struct device *dev)
- {
--	return *dev->dma_mask >> PAGE_SHIFT;
-+	return (*dev->dma_mask >> PAGE_SHIFT) + dev->dma_pfn_offset;
- }
- #endif
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index de17b7193299..7475739fee49 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -920,7 +920,15 @@ int dm_set_target_max_io_len(struct dm_target *ti, sector_t len)
+ 		return -EINVAL;
+ 	}
  
+-	ti->max_io_len = (uint32_t) len;
++	/*
++	 * BIO based queue uses its own splitting. When multipage bvecs
++	 * is switched on, size of the incoming bio may be too big to
++	 * be handled in some targets, such as crypt.
++	 *
++	 * When these targets are ready for the big bio, we can remove
++	 * the limit.
++	 */
++	ti->max_io_len = min_t(uint32_t, len, BIO_MAX_PAGES * PAGE_SIZE);
+ 
+ 	return 0;
+ }
 -- 
-2.14.2
+2.9.5
