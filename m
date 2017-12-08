@@ -1,86 +1,63 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-From: Tejun Heo <tj@kernel.org>
-To: axboe@kernel.dk
-Cc: linux-kernel@vger.kernel.org,
-	oleg@redhat.com,
-	peterz@infradead.org,
-	kernel-team@fb.com,
-	osandov@fb.com,
-	linux-block@vger.kernel.org,
-	hch@lst.de,
-	Tejun Heo <tj@kernel.org>,
-	"jianchao.wang" <jianchao.w.wang@oracle.com>
-Subject: [PATCH 5/6] blk-mq: remove REQ_ATOM_COMPLETE usages from blk-mq
-Date: Tue, 12 Dec 2017 11:01:33 -0800
-Message-Id: <20171212190134.535941-6-tj@kernel.org>
-In-Reply-To: <20171212190134.535941-1-tj@kernel.org>
-References: <20171212190134.535941-1-tj@kernel.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:38440 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753274AbdLHNPM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Dec 2017 08:15:12 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>
+Subject: [PATCH 04/10] block: bounce: avoid direct access to bvec table
+Date: Fri,  8 Dec 2017 21:14:03 +0800
+Message-Id: <20171208131409.11889-5-ming.lei@redhat.com>
+In-Reply-To: <20171208131409.11889-1-ming.lei@redhat.com>
+References: <20171208131409.11889-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-After the recent updates to use generation number and state based
-synchronization, blk-mq no longer depends on REQ_ATOM_COMPLETE for
-anything.
+We will support multipage bvecs in the future, so change to iterator way
+for getting bv_page of bvec from original bio.
 
-Remove all REQ_ATOM_COMPLETE usages.  This removes atomic bitops from
-hot paths too.
-
-v2: Removed blk_clear_rq_complete() from blk_mq_rq_timed_out().
-
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Cc: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Cc: Matthew Wilcox <willy@infradead.org>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
+ block/bounce.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 73d6444..7269552 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -596,14 +596,12 @@ void blk_mq_complete_request(struct request *rq)
+diff --git a/block/bounce.c b/block/bounce.c
+index fceb1a96480b..0274c31d6c05 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -137,21 +137,20 @@ static void copy_to_high_bio_irq(struct bio *to, struct bio *from)
+ static void bounce_end_io(struct bio *bio, mempool_t *pool)
+ {
+ 	struct bio *bio_orig = bio->bi_private;
+-	struct bio_vec *bvec, *org_vec;
++	struct bio_vec *bvec, orig_vec;
+ 	int i;
+-	int start = bio_orig->bi_iter.bi_idx;
++	struct bvec_iter orig_iter = bio_orig->bi_iter;
+ 
+ 	/*
+ 	 * free up bounce indirect pages used
  	 */
- 	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
- 		rcu_read_lock();
--		if (blk_mq_rq_aborted_gstate(rq) != rq->gstate &&
--		    !blk_mark_rq_complete(rq))
-+		if (blk_mq_rq_aborted_gstate(rq) != rq->gstate)
- 			__blk_mq_complete_request(rq);
- 		rcu_read_unlock();
- 	} else {
- 		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
--		if (blk_mq_rq_aborted_gstate(rq) != rq->gstate &&
--		    !blk_mark_rq_complete(rq))
-+		if (blk_mq_rq_aborted_gstate(rq) != rq->gstate)
- 			__blk_mq_complete_request(rq);
- 		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
+ 	bio_for_each_segment_all(bvec, bio, i) {
+-		org_vec = bio_orig->bi_io_vec + i + start;
+-
+-		if (bvec->bv_page == org_vec->bv_page)
+-			continue;
+-
+-		dec_zone_page_state(bvec->bv_page, NR_BOUNCE);
+-		mempool_free(bvec->bv_page, pool);
++		orig_vec = bio_iter_iovec(bio_orig, orig_iter);
++		if (bvec->bv_page != orig_vec.bv_page) {
++			dec_zone_page_state(bvec->bv_page, NR_BOUNCE);
++			mempool_free(bvec->bv_page, pool);
++		}
++		bio_advance_iter(bio_orig, &orig_iter, orig_vec.bv_len);
  	}
-@@ -650,8 +648,6 @@ void blk_mq_start_request(struct request *rq)
- 	write_seqcount_end(&rq->gstate_seq);
  
- 	set_bit(REQ_ATOM_STARTED, &rq->atomic_flags);
--	if (test_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags))
--		clear_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags);
- 
- 	if (q->dma_drain_size && blk_rq_bytes(rq)) {
- 		/*
-@@ -819,7 +815,6 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
- 		req->aborted_gstate = 0;
- 		u64_stats_update_end(&req->aborted_gstate_sync);
- 		blk_add_timer(req);
--		blk_clear_rq_complete(req);
- 		break;
- 	case BLK_EH_NOT_HANDLED:
- 		break;
-@@ -870,8 +865,7 @@ static void blk_mq_terminate_expired(struct blk_mq_hw_ctx *hctx,
- 	 * now guaranteed to see @rq->aborted_gstate and yield.  If
- 	 * @rq->aborted_gstate still matches @rq->gstate, @rq is ours.
- 	 */
--	if (READ_ONCE(rq->gstate) == rq->aborted_gstate &&
--	    !blk_mark_rq_complete(rq))
-+	if (READ_ONCE(rq->gstate) == rq->aborted_gstate)
- 		blk_mq_rq_timed_out(rq, reserved);
- }
- 
+ 	bio_orig->bi_status = bio->bi_status;
 -- 
 2.9.5
