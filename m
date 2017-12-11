@@ -1,43 +1,48 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-it0-f67.google.com ([209.85.214.67]:38840 "EHLO
-        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751927AbdLKVG5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Dec 2017 16:06:57 -0500
-MIME-Version: 1.0
-In-Reply-To: <20171211035017.32678-1-tytso@mit.edu>
-References: <20171211035017.32678-1-tytso@mit.edu>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Mon, 11 Dec 2017 13:06:55 -0800
-Message-ID: <CA+55aFxU6A5doeHh6QagAPpTKvdHzUimAcq+gnnrva=TUtLzhg@mail.gmail.com>
-Subject: Re: [PATCH] locking/lockdep: Add CONFIG_LOCKDEP_AGGRESSIVE
-To: "Theodore Ts'o" <tytso@mit.edu>
-Cc: Byungchul Park <byungchul.park@lge.com>,
+Received: from imap.thunk.org ([74.207.234.97]:57282 "EHLO imap.thunk.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752048AbdLKD53 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 10 Dec 2017 22:57:29 -0500
+Date: Sun, 10 Dec 2017 22:57:12 -0500
+From: Theodore Ts'o <tytso@mit.edu>
+To: Byungchul Park <byungchul.park@lge.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
         Peter Zijlstra <peterz@infradead.org>,
         Thomas Gleixner <tglx@linutronix.de>, kernel-team@lge.com,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Oleg Nesterov <oleg@redhat.com>, Tejun Heo <tj@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        oleg@redhat.com, tj@kernel.org
+Subject: Re: [PATCH] locking/lockdep: Add CONFIG_LOCKDEP_AGGRESSIVE
+Message-ID: <20171211035712.okj5azpzo32juvs4@thunk.org>
+References: <20171211035017.32678-1-tytso@mit.edu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171211035017.32678-1-tytso@mit.edu>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Sun, Dec 10, 2017 at 7:50 PM, Theodore Ts'o <tytso@mit.edu> wrote:
+On Sun, Dec 10, 2017 at 10:50:17PM -0500, Theodore Ts'o wrote:
 > CONFIG_LOCKDEP_CROSSRELEASE and CONFIG_LOCKDEP_COMPLETIONS can result
 > in a large number of false positives because lockdep doesn't
 > understand how to deal with multiple stacked loop or MD devices.
+> 
+> Until someone can figure out how to automatically add annotations to
+> all file system and storage devices --- hopefully without forcing
+> developers to insert a large number of calls to undocumented lockdep
+> macros into the the loop device, every single file system, and every
+> single device-mapper backend --- let's add an option to allow these
+> lockdep features to be disabled.  Otherwise, many file system
+> developers will disable LOCKDEP entirely since it results in far too
+> many false positives when trying to use xfstests.
 
-Guys, can we just remove this nasty crud already?
+Note --- this is going to be in the ext4 git tree because otherwise
+using Lockdep would greatly interfere with ext4 development --- and
+I'd prefer not to completely give up on Lockdep as a lost cause.  As
+such, it will appear in linux-next.
 
-It's not working. Give it up. It was complex, it was buggy, it was slow.
+I'll drop it from the ext4 git branch before I send a pull request to
+Linus, unless I get an OK for me to merge this patch to mainline via
+the ext4 git tree.
 
-Now it's causing people to disable lockdep entirely, or play these
-kinds of games in unrelated trees.
+Cheers,
 
-It's time to give up on bad debugging, and definitely _not_ enable it
-by default for PROVE_LOCKING.
-
-Ted: in the meantime, don't use PROVE_LOCKING. Just use
-DEBUG_LOCK_ALLOC instead. Please drop this patch from your tree.
-
-                      Linus
+						- Ted
