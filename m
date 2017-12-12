@@ -1,48 +1,54 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Tue, 12 Dec 2017 13:44:32 -0800
-From: "tj@kernel.org" <tj@kernel.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "axboe@kernel.dk" <axboe@kernel.dk>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"peterz@infradead.org" <peterz@infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"kernel-team@fb.com" <kernel-team@fb.com>,
+Return-Path: <prvs=512cf1024=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "tj@kernel.org" <tj@kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"peterz@infradead.org" <peterz@infradead.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "kernel-team@fb.com" <kernel-team@fb.com>,
 	"oleg@redhat.com" <oleg@redhat.com>, "hch@lst.de" <hch@lst.de>,
-	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
-	"osandov@fb.com" <osandov@fb.com>
+	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>, "osandov@fb.com"
+	<osandov@fb.com>
 Subject: Re: [PATCH 2/6] blk-mq: replace timeout synchronization with a RCU
  and generation based scheme
-Message-ID: <20171212214432.GL3919388@devbig577.frc2.facebook.com>
+Date: Tue, 12 Dec 2017 21:37:11 +0000
+Message-ID: <1513114630.2999.48.camel@wdc.com>
 References: <20171212190134.535941-1-tj@kernel.org>
- <20171212190134.535941-3-tj@kernel.org>
- <1513114630.2999.48.camel@wdc.com>
+	 <20171212190134.535941-3-tj@kernel.org>
+In-Reply-To: <20171212190134.535941-3-tj@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1513114630.2999.48.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello, Bart.
-
-On Tue, Dec 12, 2017 at 09:37:11PM +0000, Bart Van Assche wrote:
-> Have you considered the following instead of introducing MQ_RQ_IDLE and
-> MQ_RQ_IN_FLIGHT? I think this could help to limit the number of new atomic
-> operations introduced in the hot path by this patch series.
-
-But nothing in the hot paths is atomic.
-
-> static inline bool blk_mq_rq_in_flight(struct request *rq)
-> {
-> 	return list_empty(&rq->queuelist);
-> }
-
-And the fact that we encode the generation number and state into a
-single variable contributes to not needing atomic operations.
-Breaking up the state and generation like the above would need more
-synchronization, not less.
-
-Thanks.
-
--- 
-tejun
+T24gVHVlLCAyMDE3LTEyLTEyIGF0IDExOjAxIC0wODAwLCBUZWp1biBIZW8gd3JvdGU6DQo+ICsv
+Kg0KPiArICogQml0cyBmb3IgcmVxdWVzdC0+Z3N0YXRlLiAgVGhlIGxvd2VyIHR3byBiaXRzIGNh
+cnJ5IE1RX1JRXyogc3RhdGUgdmFsdWUNCj4gKyAqIGFuZCB0aGUgdXBwZXIgYml0cyB0aGUgZ2Vu
+ZXJhdGlvbiBudW1iZXIuDQo+ICsgKi8NCj4gK2VudW0gbXFfcnFfc3RhdGUgew0KPiArCU1RX1JR
+X0lETEUJCT0gMCwNCj4gKwlNUV9SUV9JTl9GTElHSFQJCT0gMSwNCj4gKw0KPiArCU1RX1JRX1NU
+QVRFX0JJVFMJPSAyLA0KPiArCU1RX1JRX1NUQVRFX01BU0sJPSAoMSA8PCBNUV9SUV9TVEFURV9C
+SVRTKSAtIDEsDQo+ICsJTVFfUlFfR0VOX0lOQwkJPSAxIDw8IE1RX1JRX1NUQVRFX0JJVFMsDQo+
+ICt9Ow0KPiArDQo+IEBAIC04NSw2ICs5OCwzOCBAQCBleHRlcm4gdm9pZCBibGtfbXFfcnFfdGlt
+ZWRfb3V0KHN0cnVjdCByZXF1ZXN0ICpyZXEsIGJvb2wgcmVzZXJ2ZWQpOw0KPiArLyoqDQo+ICsg
+KiBibGtfbXFfcnFfc3RhdGUoKSAtIHJlYWQgdGhlIGN1cnJlbnQgTVFfUlFfKiBzdGF0ZSBvZiBh
+IHJlcXVlc3QNCj4gKyAqIEBycTogdGFyZ2V0IHJlcXVlc3QuDQo+ICsgKi8NCj4gK3N0YXRpYyBp
+bmxpbmUgaW50IGJsa19tcV9ycV9zdGF0ZShzdHJ1Y3QgcmVxdWVzdCAqcnEpDQo+ICt7DQo+ICsJ
+cmV0dXJuIFJFQURfT05DRShycS0+Z3N0YXRlKSAmIE1RX1JRX1NUQVRFX01BU0s7DQo+ICt9DQo+
+ICsNCj4gKy8qKg0KPiArICogYmxrX21xX3JxX3VwZGF0ZV9zdGF0ZSgpIC0gc2V0IHRoZSBjdXJy
+ZW50IE1RX1JRXyogc3RhdGUgb2YgYSByZXF1ZXN0DQo+ICsgKiBAcnE6IHRhcmdldCByZXF1ZXN0
+Lg0KPiArICogQHN0YXRlOiBuZXcgc3RhdGUgdG8gc2V0Lg0KPiArICoNCj4gKyAqIFNldCBAcnEn
+cyBzdGF0ZSB0byBAc3RhdGUuICBUaGUgY2FsbGVyIGlzIHJlc3BvbnNpYmxlIGZvciBlbnN1cmlu
+ZyB0aGF0DQo+ICsgKiB0aGVyZSBhcmUgbm8gb3RoZXIgdXBkYXRlcnMuICBBIHJlcXVlc3QgY2Fu
+IHRyYW5zaXRpb24gaW50byBJTl9GTElHSFQNCj4gKyAqIG9ubHkgZnJvbSBJRExFIGFuZCBkb2lu
+ZyBzbyBpbmNyZW1lbnRzIHRoZSBnZW5lcmF0aW9uIG51bWJlci4NCj4gKyAqLw0KPiArc3RhdGlj
+IGlubGluZSB2b2lkIGJsa19tcV9ycV91cGRhdGVfc3RhdGUoc3RydWN0IHJlcXVlc3QgKnJxLA0K
+PiArCQkJCQkgIGVudW0gbXFfcnFfc3RhdGUgc3RhdGUpDQo+ICt7DQo+ICsJdTY0IG5ld192YWwg
+PSAoUkVBRF9PTkNFKHJxLT5nc3RhdGUpICYgfk1RX1JRX1NUQVRFX01BU0spIHwgc3RhdGU7DQo+
+ICsNCj4gKwlpZiAoc3RhdGUgPT0gTVFfUlFfSU5fRkxJR0hUKSB7DQo+ICsJCVdBUk5fT05fT05D
+RShibGtfbXFfcnFfc3RhdGUocnEpICE9IE1RX1JRX0lETEUpOw0KPiArCQluZXdfdmFsICs9IE1R
+X1JRX0dFTl9JTkM7DQo+ICsJfQ0KPiArDQo+ICsJLyogYXZvaWQgZXhwb3NpbmcgaW50ZXJpbSB2
+YWx1ZXMgKi8NCj4gKwlXUklURV9PTkNFKHJxLT5nc3RhdGUsIG5ld192YWwpOw0KPiArfQ0KDQpI
+ZWxsbyBUZWp1biwNCg0KSGF2ZSB5b3UgY29uc2lkZXJlZCB0aGUgZm9sbG93aW5nIGluc3RlYWQg
+b2YgaW50cm9kdWNpbmcgTVFfUlFfSURMRSBhbmQNCk1RX1JRX0lOX0ZMSUdIVD8gSSB0aGluayB0
+aGlzIGNvdWxkIGhlbHAgdG8gbGltaXQgdGhlIG51bWJlciBvZiBuZXcgYXRvbWljDQpvcGVyYXRp
+b25zIGludHJvZHVjZWQgaW4gdGhlIGhvdCBwYXRoIGJ5IHRoaXMgcGF0Y2ggc2VyaWVzLg0KDQpz
+dGF0aWMgaW5saW5lIGJvb2wgYmxrX21xX3JxX2luX2ZsaWdodChzdHJ1Y3QgcmVxdWVzdCAqcnEp
+DQp7DQoJcmV0dXJuIGxpc3RfZW1wdHkoJnJxLT5xdWV1ZWxpc3QpOw0KfQ0KDQpUaGFua3MsDQoN
+CkJhcnQu
