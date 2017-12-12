@@ -1,39 +1,35 @@
 Return-Path: <martin.petersen@oracle.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        Hannes Reinecke <hare@suse.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.com>,
         Johannes Thumshirn <jthumshirn@suse.de>, stable@vger.kernel.org
 Subject: Re: [PATCH v2 1/3] scsi: Fix a scsi_show_rq() NULL pointer dereference
 From: "Martin K. Petersen" <martin.petersen@oracle.com>
 References: <20171206005753.28734-1-bart.vanassche@wdc.com>
 	<20171206005753.28734-2-bart.vanassche@wdc.com>
-	<20171208014528.GD21488@ming.t460p> <yq1374muebm.fsf@oracle.com>
-	<20171208084455.GF21488@ming.t460p>
-	<20171208104410.GA10667@ming.t460p>
-Date: Mon, 11 Dec 2017 22:11:29 -0500
-In-Reply-To: <20171208104410.GA10667@ming.t460p> (Ming Lei's message of "Fri,
-	8 Dec 2017 18:44:17 +0800")
-Message-ID: <yq1vahcprmm.fsf@oracle.com>
+Date: Mon, 11 Dec 2017 21:57:46 -0500
+In-Reply-To: <20171206005753.28734-2-bart.vanassche@wdc.com> (Bart Van
+	Assche's message of "Tue, 5 Dec 2017 16:57:51 -0800")
+Message-ID: <yq1zi6ops9h.fsf@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
 
-Hi Ming,
+Bart,
 
-> This patch allocates one array for T10_PI_TYPE2_PROTECTION command,
-> size of each element is SD_EXT_CDB_SIZE, and the length is
-> host->can_queue, then we can retrieve one command buffer runtime
-> via rq->tag.
->
-> So we can avoid to allocate the command buffer runtime, also the
-> recent use-after-free report[1] in scsi_show_rq() can be fixed too.
+> Avoid that scsi_show_rq() triggers a NULL pointer dereference if
+> called after sd_uninit_command(). Swap the NULL pointer assignment
+> and the mempool_free() call in sd_uninit_command() to make it less
+> likely that scsi_show_rq() triggers a use-after-free. Note: even
+> with these changes scsi_show_rq() can trigger a use-after-free but
+> that's a lesser evil than e.g. suppressing debug information for
+> T10-PI commands completely. This patch fixes the following oops:
 
-I'm still mulling over the pros and cons of this one for 4.16+...
+Applied to 4.15/scsi-fixes. Thanks, Bart.
 
 -- 
 Martin K. Petersen	Oracle Linux Engineering
