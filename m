@@ -1,50 +1,59 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:54624 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751552AbdLLLEH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 12 Dec 2017 06:04:07 -0500
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+To: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Yi Zhang <yi.zhang@redhat.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 25/45] block: implement bio_pages_all() via bio_for_each_page_all()
-Date: Mon, 18 Dec 2017 20:22:27 +0800
-Message-Id: <20171218122247.3488-26-ming.lei@redhat.com>
-In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
-References: <20171218122247.3488-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Subject: [PATCH 5/6] blk-mq: fix race between updating nr_hw_queues and switching io sched
+Date: Tue, 12 Dec 2017 19:02:31 +0800
+Message-Id: <20171212110232.12495-6-ming.lei@redhat.com>
+In-Reply-To: <20171212110232.12495-1-ming.lei@redhat.com>
+References: <20171212110232.12495-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-As multipage bvec will be enabled soon, bio->bi_vcnt isn't same with
-page count in the bio any more, so use bio_for_each_page_all() to
-compute the number.
+In both elevator_switch_mq() and blk_mq_update_nr_hw_queues(), sched tags
+can be allocated, and q->nr_hw_queue is used, and race is inevitable, for
+example: blk_mq_init_sched() may trigger use-after-free on hctx, which is
+freed in blk_mq_realloc_hw_ctxs() when nr_hw_queues is decreased.
 
+This patch fixes the race be holding q->sysfs_lock.
+
+Reported-by: Yi Zhang <yi.zhang@redhat.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- include/linux/bio.h | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ block/blk-mq.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 0cb29c73ff27..2dd1ca0285e1 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -330,8 +330,14 @@ static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 85954a0b4394..4e97c40e7a0f 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2418,6 +2418,9 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ 	struct blk_mq_hw_ctx **hctxs = q->queue_hw_ctx;
  
- static inline unsigned bio_pages_all(struct bio *bio)
- {
-+	unsigned i;
-+	struct bio_vec *bv;
+ 	blk_mq_sysfs_unregister(q);
 +
- 	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
--	return bio->bi_vcnt;
-+
-+	bio_for_each_page_all(bv, bio, i)
-+		;
-+	return i;
++	/* protect against switching io scheduler  */
++	mutex_lock(&q->sysfs_lock);
+ 	for (i = 0; i < set->nr_hw_queues; i++) {
+ 		int node;
+ 
+@@ -2462,6 +2465,7 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ 		}
+ 	}
+ 	q->nr_hw_queues = i;
++	mutex_unlock(&q->sysfs_lock);
+ 	blk_mq_sysfs_register(q);
  }
  
- static inline struct bio_vec *bio_first_bvec_all(struct bio *bio)
 -- 
 2.9.5
