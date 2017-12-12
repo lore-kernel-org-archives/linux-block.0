@@ -1,115 +1,71 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Fri, 1 Dec 2017 12:47:24 +0100
-From: Jan Kara <jack@suse.cz>
-To: "Luis R. Rodriguez" <mcgrof@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, viro@zeniv.linux.org.uk,
-        bart.vanassche@wdc.com, ming.lei@redhat.com, tytso@mit.edu,
-        darrick.wong@oracle.com, jikos@kernel.org, rjw@rjwysocki.net,
-        pavel@ucw.cz, len.brown@intel.com, linux-fsdevel@vger.kernel.org,
-        boris.ostrovsky@oracle.com, jgross@suse.com,
-        todd.e.brandt@linux.intel.com, nborisov@suse.com,
-        martin.petersen@oracle.com, ONeukum@suse.com,
-        oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
-        yu.chen.surf@gmail.com, dan.j.williams@intel.com,
-        linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 03/11] fs: add frozen sb state helpers
-Message-ID: <20171201114724.GC8365@quack2.suse.cz>
-References: <20171129232356.28296-1-mcgrof@kernel.org>
- <20171129232356.28296-4-mcgrof@kernel.org>
- <20171130171310.GG28180@quack2.suse.cz>
- <20171130190548.GJ729@wotan.suse.de>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-io0-f193.google.com ([209.85.223.193]:38530 "EHLO
+        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752346AbdLLVWw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 12 Dec 2017 16:22:52 -0500
+Date: Tue, 12 Dec 2017 13:22:48 -0800
+From: Eric Biggers <ebiggers3@gmail.com>
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Cc: Dmitry Vyukov <dvyukov@google.com>,
+        syzbot
+        <bot+2797c18fc195e3e240c3c3e7837a14130e157fb0@syzkaller.appspotmail.com>,
+        Alexey Dobriyan <adobriyan@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Arnd Bergmann <arnd@arndb.de>, dave.jiang@intel.com,
+        LKML <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs@googlegroups.com, Al Viro <viro@zeniv.linux.org.uk>,
+        linux-block@vger.kernel.org
+Subject: Re: WARNING in kmalloc_slab (3)
+Message-ID: <20171212212248.GD185376@gmail.com>
+References: <f403043d11ccfea019055f705d18@google.com>
+ <20171203201608.GC844@zzz.localdomain>
+ <20171204081408.oyp46roxbkjbxxkw@mwanda>
+ <CACT4Y+aE-Q-PeUaY99d2UbK4BHnf18OoV0MBXyOXzXttf1=nYw@mail.gmail.com>
+ <20171204092632.mh772rjaqahgslvp@mwanda>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171130190548.GJ729@wotan.suse.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20171204092632.mh772rjaqahgslvp@mwanda>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Thu 30-11-17 20:05:48, Luis R. Rodriguez wrote:
-> On Thu, Nov 30, 2017 at 06:13:10PM +0100, Jan Kara wrote:
-> > ... I dislike the _by_user() suffix as there may be different places that
-> > call freeze_super() (e.g. device mapper does this during some operations).
-> > Clearly we need to distinguish "by system suspend" and "the other" cases.
-> > So please make this clear in the naming.
+On Mon, Dec 04, 2017 at 12:26:32PM +0300, Dan Carpenter wrote:
+> On Mon, Dec 04, 2017 at 09:18:05AM +0100, Dmitry Vyukov wrote:
+> > On Mon, Dec 4, 2017 at 9:14 AM, Dan Carpenter <dan.carpenter@oracle.com> wrote:
+> > > On Sun, Dec 03, 2017 at 12:16:08PM -0800, Eric Biggers wrote:
+> > >> Looks like BLKTRACESETUP doesn't limit the '.buf_nr' parameter, allowing anyone
+> > >> who can open a block device to cause an extremely large kmalloc.  Here's a
+> > >> simplified reproducer:
+> > >>
+> > >
+> > > There are lots of places which allow people to allocate as much as they
+> > > want.  With Syzcaller, you might want to just hard code a __GFP_NOWARN
+> > > in to disable it.
+> > 
+> > Hi,
+> > 
+> > Hard code it where?
 > 
-> Ah. How about sb_frozen_by_cb() ?
-
-And what does 'cb' stand for? :)
-
-> > In fact, what might be a cleaner solution is to introduce a 'freeze_count'
-> > for superblock freezing (we already do have this for block devices). Then
-> > you don't need to differentiate these two cases - but you'd still need to
-> > properly handle cleanup if freezing of all superblocks fails in the middle.
-> > So I'm not 100% this works out nicely in the end. But it's certainly worth
-> > a consideration.
+> My idea was to just make warn_alloc() a no-op.
 > 
-> Ah, there are three important reasons for doing it the way I did it which are
-> easy to miss, unless you read the commit log message very carefully.
+> > 
+> > User-controllable allocation are supposed to use __GFP_NOWARN.
 > 
-> 0) The ioctl interface causes a failure to be sent back to userspace if
-> you issue two consecutive freezes, or two thaws. Ie, once a filesystem is
-> frozen, a secondary call will result in an error. Likewise for thaw.
+> No that's not right.  What we don't want is unprivileged users to use
+> all the memory and we don't want unprivileged users to spam
+> /var/log/messages.  But you have to have slightly elevated permissions
+> to open block devices right?  The warning is helpful.  Admins should
+> "don't do that" if they don't want the warning.
 
-Yep. But also note that there's *another* interface to filesystem freezing
-which behaves differently - freeze_bdev() (used internally by dm). That
-interface uses the counter and freezing of already frozen device succeeds.
-IOW it is a mess. We cannot change the behavior of the ioctl but we could
-still provide an in-kernel interface to freeze_super() with the same
-semantics as freeze_bdev() which might be easier to use by suspend - maybe
-we could call it 'exclusive' (for the current freeze_super() semantics) and
-'non-exclusive' (for the freeze_bdev() semantics) since this is very much
-like O_EXCL open of block devices...
+WARN_ON() should only be used for kernel bugs.  printk can be a different story.
+If it's a "userspace shouldn't do this" kind of thing, then if there is any
+message at all it should be a rate-limited printk that actually explains what
+the problem is, not a random WARN_ON() that can only be interpreted by kernel
+developers.
 
-> 1) The new iterate supers stuff I added bail on the first error and return that
-> error. If we kept the ioctl() interface error scheme we'd be erroring out
-> if on suspend if userspace had already frozen a filesystem. Clearly that'd
-> be silly so we need to distinguish between the automatic kernel freezing
-> and the old userspace ioctl initiated interface, so that we can keep the
-> old behaviour but allow in-kernel auto freeze on suspend to work properly.
+And yes, the fact that anyone with read access to any block device, even e.g. a
+loop device, can cause the kernel to do an unbounded kmalloc *is* a bug.  It
+needs to have a reasonable limit.  It is not a problem on all systems, but on
+some systems "the admin" might give users read access to some block devices.
 
-This would work fine with the non-exclusive semantics I believe.
-
-> 2) If we fail to suspend we need to then thaw up all filesystems. The order
-> in which we try to freeze is in reverse order on the super_block list. If we
-> fail though we iterate in proper order on the super_block list and thaw. If
-> you had two filesystems this means that if a failure happened on freezing
-> the first filesystem, we'd first thaw the other filesystem -- and because of
-> 0) if we don't distinguish between the ioctl interface or auto freezing, we'd
-> also fail on thaw'ing given the other superblock wouldn't have been frozen.
-> 
-> So we need to keep two separate approaches. The count stuff would not suffice
-> to distinguish origin of source for freeze call.
-> 
-> Come to think of it, I think I forgot to avoid thaw if the freeze was ioctl
-> initiated..
-> 
-> thaw_unlocked(bool cb_call)
-> {
->   if (sb_frozen_by_cb(sb) && !cb_call)
->     return 0; /* skip as the user wanted to keep this fs frozen */
->   ...
-> }
-> 
-> Even though the kernel auto call is new I think we need to keep ioctl initiated
-> frozen filesystems frozen to not break old userspace assumptions.
-> 
-> So, keeping all this in mind, does a count method still suffice?
-
-The count method would need a different error recovery method - i.e. if you
-fail freezing filesystems somewhere in the middle of iteration through
-superblock list, you'd need to iterate from that point on to the superblock
-where you've started. This is somewhat more complicated than your approach
-but it seems cleaner to me:
-
-1) Function freezing all superblocks either succeeds and all superblocks
-are frozen or fails and no superblocks are (additionally) frozen.
-
-2) It is not that normal users + one special user (who owns the "flag" in
-the superblock in form of a special freeze state) setup. We'd simply have
-exclusive and non-exclusive users of superblock freezing and there can be
-arbitrary numbers of them.
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Eric
