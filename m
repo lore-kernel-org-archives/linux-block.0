@@ -1,111 +1,86 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:59413 "EHLO
-        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S933857AbdLSKeJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Dec 2017 05:34:09 -0500
-From: xiao yang <yangx.jy@cn.fujitsu.com>
-To: <osandov@osandov.com>
-CC: <eguan@redhat.com>, <fstests@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, xiao yang <yangx.jy@cn.fujitsu.com>
-Subject: [PATCH blktests] block/013: Add test for BLKRRPART ioctl
-Date: Tue, 19 Dec 2017 18:30:23 +0800
-Message-ID: <1513679423-13067-1-git-send-email-yangx.jy@cn.fujitsu.com>
-In-Reply-To: <20171204182953.GA16308@vader.DHCP.thefacebook.com>
-References: <20171204182953.GA16308@vader.DHCP.thefacebook.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+From: Tejun Heo <tj@kernel.org>
+To: axboe@kernel.dk
+Cc: linux-kernel@vger.kernel.org,
+	oleg@redhat.com,
+	peterz@infradead.org,
+	kernel-team@fb.com,
+	osandov@fb.com,
+	linux-block@vger.kernel.org,
+	hch@lst.de,
+	Tejun Heo <tj@kernel.org>,
+	"jianchao.wang" <jianchao.w.wang@oracle.com>
+Subject: [PATCH 5/6] blk-mq: remove REQ_ATOM_COMPLETE usages from blk-mq
+Date: Tue, 12 Dec 2017 11:01:33 -0800
+Message-Id: <20171212190134.535941-6-tj@kernel.org>
+In-Reply-To: <20171212190134.535941-1-tj@kernel.org>
+References: <20171212190134.535941-1-tj@kernel.org>
+List-ID: <linux-block@vger.kernel.org>
 
-If the entire block device is formatted with a filesystem and
-mounted, running "blockdev --rereadpt" should fail and return
-EBUSY instead of pass.
+After the recent updates to use generation number and state based
+synchronization, blk-mq no longer depends on REQ_ATOM_COMPLETE for
+anything.
 
-Signed-off-by: xiao yang <yangx.jy@cn.fujitsu.com>
+Remove all REQ_ATOM_COMPLETE usages.  This removes atomic bitops from
+hot paths too.
+
+v2: Removed blk_clear_rq_complete() from blk_mq_rq_timed_out().
+
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Cc: "jianchao.wang" <jianchao.w.wang@oracle.com>
 ---
- tests/block/013     | 62 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- tests/block/013.out |  3 +++
- 2 files changed, 65 insertions(+)
- create mode 100755 tests/block/013
- create mode 100644 tests/block/013.out
+ block/blk-mq.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/tests/block/013 b/tests/block/013
-new file mode 100755
-index 0000000..77ae55c
---- /dev/null
-+++ b/tests/block/013
-@@ -0,0 +1,62 @@
-+#!/bin/bash
-+#
-+# If the entire block device is formatted with a filesystem and
-+# mounted, running "blockdev --rereadpt" should fail and return
-+# EBUSY.  On buggy kernel, it passes unexpectedly.
-+#
-+# Regression test for commit 77032ca66f86 ("Return EBUSY from
-+# BLKRRPART for mounted whole-dev fs").
-+#
-+# Copyright (c) 2017 FUJITSU LIMITED. All rights reserved.
-+# Author: Xiao Yang <yangx.jy@cn.fujitsu.com>
-+#
-+# This program is free software: you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation, either version 3 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+
-+DESCRIPTION="test return EBUSY from BLKRRPART for mounted whole-dev"
-+QUICK=1
-+
-+requires() {
-+	_have_program mkfs.ext3
-+}
-+
-+test_device() {
-+	echo "Running ${TEST_NAME}"
-+
-+	rm -f "$FULL"
-+	mkdir "$TMPDIR/mntpoint"
-+
-+	# Format
-+	mkfs.ext3 -F "$TEST_DEV" >> "$FULL" 2>&1
-+
-+	# Mount
-+	mount "$TEST_DEV" "$TMPDIR/mntpoint"
-+
-+	# Check mounted whole-dev
-+	local out=$(blockdev --rereadpt "$TEST_DEV" 2>&1)
-+	echo $out | grep -q "Device or resource busy"
-+	if [ $? -eq 0 ]; then
-+		echo "Return EBUSY for mounted whole-dev"
-+	else
-+		echo "Don't return EBUSY for mounted whole-dev"
-+	fi
-+
-+	echo $out >> "$FULL"
-+
-+	# Umount
-+	umount "$TMPDIR/mntpoint"
-+
-+	rm -rf "$TMPDIR/mntpoint"
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/block/013.out b/tests/block/013.out
-new file mode 100644
-index 0000000..74d1d08
---- /dev/null
-+++ b/tests/block/013.out
-@@ -0,0 +1,3 @@
-+Running block/013
-+Return EBUSY for mounted whole-dev
-+Test complete
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 73d6444..7269552 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -596,14 +596,12 @@ void blk_mq_complete_request(struct request *rq)
+ 	 */
+ 	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
+ 		rcu_read_lock();
+-		if (blk_mq_rq_aborted_gstate(rq) != rq->gstate &&
+-		    !blk_mark_rq_complete(rq))
++		if (blk_mq_rq_aborted_gstate(rq) != rq->gstate)
+ 			__blk_mq_complete_request(rq);
+ 		rcu_read_unlock();
+ 	} else {
+ 		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
+-		if (blk_mq_rq_aborted_gstate(rq) != rq->gstate &&
+-		    !blk_mark_rq_complete(rq))
++		if (blk_mq_rq_aborted_gstate(rq) != rq->gstate)
+ 			__blk_mq_complete_request(rq);
+ 		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
+ 	}
+@@ -650,8 +648,6 @@ void blk_mq_start_request(struct request *rq)
+ 	write_seqcount_end(&rq->gstate_seq);
+ 
+ 	set_bit(REQ_ATOM_STARTED, &rq->atomic_flags);
+-	if (test_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags))
+-		clear_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags);
+ 
+ 	if (q->dma_drain_size && blk_rq_bytes(rq)) {
+ 		/*
+@@ -819,7 +815,6 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
+ 		req->aborted_gstate = 0;
+ 		u64_stats_update_end(&req->aborted_gstate_sync);
+ 		blk_add_timer(req);
+-		blk_clear_rq_complete(req);
+ 		break;
+ 	case BLK_EH_NOT_HANDLED:
+ 		break;
+@@ -870,8 +865,7 @@ static void blk_mq_terminate_expired(struct blk_mq_hw_ctx *hctx,
+ 	 * now guaranteed to see @rq->aborted_gstate and yield.  If
+ 	 * @rq->aborted_gstate still matches @rq->gstate, @rq is ours.
+ 	 */
+-	if (READ_ONCE(rq->gstate) == rq->aborted_gstate &&
+-	    !blk_mark_rq_complete(rq))
++	if (READ_ONCE(rq->gstate) == rq->aborted_gstate)
+ 		blk_mq_rq_timed_out(rq, reserved);
+ }
+ 
 -- 
-1.8.3.1
+2.9.5
