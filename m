@@ -1,56 +1,29 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:48470 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:48988 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752434AbdLMRzV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Dec 2017 12:55:21 -0500
-Date: Thu, 14 Dec 2017 01:55:07 +0800
+        id S1750715AbdLLJS7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 12 Dec 2017 04:18:59 -0500
+Date: Tue, 12 Dec 2017 17:18:45 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: Christoph Hellwig <hch@infradead.org>
 Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
 Subject: Re: [PATCH 00/10] block: cleanup on direct access to bvec
  table(prepare for multipage bvec)
-Message-ID: <20171213175506.GA17305@ming.t460p>
+Message-ID: <20171212091844.GB8529@ming.t460p>
 References: <20171208131409.11889-1-ming.lei@redhat.com>
  <20171212075738.GA26646@infradead.org>
- <20171212091844.GB8529@ming.t460p>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171212091844.GB8529@ming.t460p>
+In-Reply-To: <20171212075738.GA26646@infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, Dec 12, 2017 at 05:18:44PM +0800, Ming Lei wrote:
-> On Mon, Dec 11, 2017 at 11:57:38PM -0800, Christoph Hellwig wrote:
-> > Most of this looks sane, but I'd really like to see it in context
-> > of the actual multipage bvec patches.  Do you have an updated branch
-> > on top of these?
-> 
-> I will post it out soon after addressing some of last comments.
+On Mon, Dec 11, 2017 at 11:57:38PM -0800, Christoph Hellwig wrote:
+> Most of this looks sane, but I'd really like to see it in context
+> of the actual multipage bvec patches.  Do you have an updated branch
+> on top of these?
 
-You can find the actual multipage bvec patches in the following tree,
-which is on top this prepare patchset.
-
-	tree: https://github.com/ming1/linux.git #v4.15-rc-mp-bvec_v4-rc1
-	gitweb: https://github.com/ming1/linux/commits/v4.15-rc-mp-bvec_v4-rc1
-
-In this tree, all the current bio_for_each_segment* are converted to
-bio_for_each_page*() first, then after multipage bvec is enabled, we
-have the following helpers:
-
-1) bio_for_each_segment()/bio_for_each_segment_all()
-	
-	iterate bio segment by segment which is real multipage bvec
-
-2) bio_for_each_page()/bio_for_each_page_all()
-
-	iterate bio page by page, which is the current in-tree bio_for_each_segment()/
-	bio_for_each_segment_all()
-
-3) rq_for_each_page()/rq_for_each_segment()
-	similar with above
-
-
-Not run full test yet, but it works on my VM, will start xfstest later.
+I will post it out soon after addressing some of last comments.
 
 Thanks,
 Ming
