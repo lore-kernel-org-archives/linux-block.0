@@ -1,132 +1,84 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:41192 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752989AbdLHNP7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Dec 2017 08:15:59 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 08/10] block: move bio_alloc_pages() to bcache
-Date: Fri,  8 Dec 2017 21:14:07 +0800
-Message-Id: <20171208131409.11889-9-ming.lei@redhat.com>
-In-Reply-To: <20171208131409.11889-1-ming.lei@redhat.com>
-References: <20171208131409.11889-1-ming.lei@redhat.com>
+Received: from LGEAMRELO11.lge.com ([156.147.23.51]:49009 "EHLO
+        lgeamrelo11.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751274AbdLLHPb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 12 Dec 2017 02:15:31 -0500
+Subject: Re: [PATCH] locking/lockdep: Make CONFIG_LOCKDEP_CROSSRELEASE and
+ CONFIG_LOCKDEP_COMPLETIONS optional
+From: Byungchul Park <byungchul.park@lge.com>
+To: peterz@infradead.org, mingo@kernel.org
+Cc: tglx@linutronix.de, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org,
+        kernel-team@lge.com, david@fromorbit.com, tytso@mit.edu,
+        willy@infradead.org, torvalds@linux-foundation.org,
+        Amir Goldstein <amir73il@gmail.com>
+References: <1513062681-5995-1-git-send-email-byungchul.park@lge.com>
+Message-ID: <55a0928a-4b62-70f8-577d-a63a21199279@lge.com>
+Date: Tue, 12 Dec 2017 16:15:28 +0900
+MIME-Version: 1.0
+In-Reply-To: <1513062681-5995-1-git-send-email-byungchul.park@lge.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-bcache is the only user of bio_alloc_pages(), and all users should use
-bio_add_page() instead, so move this function into bcache, and avoid
-it misused in future.
++cc david@fromorbit.com
++cc tytso@mit.edu
++cc willy@infradead.org
++cc torvalds@linux-foundation.org
++cc amir73il@gmail.com
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/bio.c              | 28 ----------------------------
- drivers/md/bcache/util.c | 27 +++++++++++++++++++++++++++
- drivers/md/bcache/util.h |  1 +
- include/linux/bio.h      |  1 -
- 4 files changed, 28 insertions(+), 29 deletions(-)
+On 12/12/2017 4:11 PM, Byungchul Park wrote:
+> At the moment, it's rather premature to enable
+> CONFIG_LOCKDEP_CROSSRELEASE and CONFIG_LOCKDEP_COMPLETIONS by default,
+> because we face a lot of false positives for now since all locks and
+> waiters are not classified properly yet.
+> 
+> Until most of them get annotated properly, it'd be better to be optional.
+> 
+> Signed-off-by: Byungchul Park <byungchul.park@lge.com>
+> ---
+>   lib/Kconfig.debug | 11 +++++++----
+>   1 file changed, 7 insertions(+), 4 deletions(-)
+> 
+> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+> index 2689b7c..bc099f1 100644
+> --- a/lib/Kconfig.debug
+> +++ b/lib/Kconfig.debug
+> @@ -1092,8 +1092,6 @@ config PROVE_LOCKING
+>   	select DEBUG_MUTEXES
+>   	select DEBUG_RT_MUTEXES if RT_MUTEXES
+>   	select DEBUG_LOCK_ALLOC
+> -	select LOCKDEP_CROSSRELEASE
+> -	select LOCKDEP_COMPLETIONS
+>   	select TRACE_IRQFLAGS
+>   	default n
+>   	help
+> @@ -1164,7 +1162,9 @@ config LOCK_STAT
+>   	 (CONFIG_LOCKDEP defines "acquire" and "release" events.)
+>   
+>   config LOCKDEP_CROSSRELEASE
+> -	bool
+> +	bool "Lock debugging: enable cross-locking checks in lockdep"
+> +	depends on PROVE_LOCKING
+> +	default n
+>   	help
+>   	 This makes lockdep work for crosslock which is a lock allowed to
+>   	 be released in a different context from the acquisition context.
+> @@ -1174,7 +1174,10 @@ config LOCKDEP_CROSSRELEASE
+>   	 detector, lockdep.
+>   
+>   config LOCKDEP_COMPLETIONS
+> -	bool
+> +	bool "Lock debugging: allow completions to use deadlock detector"
+> +	depends on PROVE_LOCKING
+> +	select LOCKDEP_CROSSRELEASE
+> +	default n
+>   	help
+>   	 A deadlock caused by wait_for_completion() and complete() can be
+>   	 detected by lockdep using crossrelease feature.
+> 
 
-diff --git a/block/bio.c b/block/bio.c
-index 228229f3bb76..76bb3dafffea 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -969,34 +969,6 @@ void bio_advance(struct bio *bio, unsigned bytes)
- EXPORT_SYMBOL(bio_advance);
- 
- /**
-- * bio_alloc_pages - allocates a single page for each bvec in a bio
-- * @bio: bio to allocate pages for
-- * @gfp_mask: flags for allocation
-- *
-- * Allocates pages up to @bio->bi_vcnt.
-- *
-- * Returns 0 on success, -ENOMEM on failure. On failure, any allocated pages are
-- * freed.
-- */
--int bio_alloc_pages(struct bio *bio, gfp_t gfp_mask)
--{
--	int i;
--	struct bio_vec *bv;
--
--	bio_for_each_segment_all(bv, bio, i) {
--		bv->bv_page = alloc_page(gfp_mask);
--		if (!bv->bv_page) {
--			while (--bv >= bio->bi_io_vec)
--				__free_page(bv->bv_page);
--			return -ENOMEM;
--		}
--	}
--
--	return 0;
--}
--EXPORT_SYMBOL(bio_alloc_pages);
--
--/**
-  * bio_copy_data - copy contents of data buffers from one chain of bios to
-  * another
-  * @src: source bio list
-diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
-index 61813d230015..ac557e8c7ef5 100644
---- a/drivers/md/bcache/util.c
-+++ b/drivers/md/bcache/util.c
-@@ -283,6 +283,33 @@ start:		bv->bv_len	= min_t(size_t, PAGE_SIZE - bv->bv_offset,
- 	}
- }
- 
-+/**
-+ * bio_alloc_pages - allocates a single page for each bvec in a bio
-+ * @bio: bio to allocate pages for
-+ * @gfp_mask: flags for allocation
-+ *
-+ * Allocates pages up to @bio->bi_vcnt.
-+ *
-+ * Returns 0 on success, -ENOMEM on failure. On failure, any allocated pages are
-+ * freed.
-+ */
-+int bio_alloc_pages(struct bio *bio, gfp_t gfp_mask)
-+{
-+	int i;
-+	struct bio_vec *bv;
-+
-+	bio_for_each_segment_all(bv, bio, i) {
-+		bv->bv_page = alloc_page(gfp_mask);
-+		if (!bv->bv_page) {
-+			while (--bv >= bio->bi_io_vec)
-+				__free_page(bv->bv_page);
-+			return -ENOMEM;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- /*
-  * Portions Copyright (c) 1996-2001, PostgreSQL Global Development Group (Any
-  * use permitted, subject to terms of PostgreSQL license; see.)
-diff --git a/drivers/md/bcache/util.h b/drivers/md/bcache/util.h
-index ed5e8a412eb8..c92de937bcab 100644
---- a/drivers/md/bcache/util.h
-+++ b/drivers/md/bcache/util.h
-@@ -558,6 +558,7 @@ static inline unsigned fract_exp_two(unsigned x, unsigned fract_bits)
- }
- 
- void bch_bio_map(struct bio *bio, void *base);
-+int bio_alloc_pages(struct bio *bio, gfp_t gfp_mask);
- 
- static inline sector_t bdev_sectors(struct block_device *bdev)
- {
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 3f314e17364a..46cdbe0335a5 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -501,7 +501,6 @@ static inline void bio_flush_dcache_pages(struct bio *bi)
- #endif
- 
- extern void bio_copy_data(struct bio *dst, struct bio *src);
--extern int bio_alloc_pages(struct bio *bio, gfp_t gfp);
- extern void bio_free_pages(struct bio *bio);
- 
- extern struct bio *bio_copy_user_iov(struct request_queue *,
 -- 
-2.9.5
+Thanks,
+Byungchul
