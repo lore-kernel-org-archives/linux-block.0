@@ -1,67 +1,122 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from LGEAMRELO12.lge.com ([156.147.23.52]:37954 "EHLO
-        lgeamrelo12.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751507AbdLLHLu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Dec 2017 02:11:50 -0500
-From: Byungchul Park <byungchul.park@lge.com>
-To: peterz@infradead.org, mingo@kernel.org
-Cc: tglx@linutronix.de, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org,
-        kernel-team@lge.com
-Subject: [PATCH] locking/lockdep: Make CONFIG_LOCKDEP_CROSSRELEASE and CONFIG_LOCKDEP_COMPLETIONS optional
-Date: Tue, 12 Dec 2017 16:11:21 +0900
-Message-Id: <1513062681-5995-1-git-send-email-byungchul.park@lge.com>
+Received: from mx1.redhat.com ([209.132.183.28]:41516 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751663AbdLLLDi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 12 Dec 2017 06:03:38 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Yi Zhang <yi.zhang@redhat.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 3/6] blk-mq: quiesce queue during switching io sched and updating nr_requests
+Date: Tue, 12 Dec 2017 19:02:29 +0800
+Message-Id: <20171212110232.12495-4-ming.lei@redhat.com>
+In-Reply-To: <20171212110232.12495-1-ming.lei@redhat.com>
+References: <20171212110232.12495-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-At the moment, it's rather premature to enable
-CONFIG_LOCKDEP_CROSSRELEASE and CONFIG_LOCKDEP_COMPLETIONS by default,
-because we face a lot of false positives for now since all locks and
-waiters are not classified properly yet.
+Dispatch may still be in-progress after queue is frozen, so we have to
+quiesce queue before switching IO scheduler and updating nr_requests.
 
-Until most of them get annotated properly, it'd be better to be optional.
+Also when switching io schedulers, blk_mq_run_hw_queue() may still be
+called somewhere(such as from nvme_reset_work()), and io scheduler's
+per-hctx data may not be setup yet, so cause oops even inside
+blk_mq_hctx_has_pending(), such as it can be run just between:
 
-Signed-off-by: Byungchul Park <byungchul.park@lge.com>
+        ret = e->ops.mq.init_sched(q, e);
+AND
+        ret = e->ops.mq.init_hctx(hctx, i)
+
+inside blk_mq_init_sched().
+
+This reverts commit 7a148c2fcff8330(block: don't call blk_mq_quiesce_queue()
+after queue is frozen) basically, and makes sure blk_mq_hctx_has_pending
+won't be called if queue is quiesced.
+
+Fixes: 7a148c2fcff83309(block: don't call blk_mq_quiesce_queue() after queue is frozen)
+Reported-by: Yi Zhang <yi.zhang@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- lib/Kconfig.debug | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ block/blk-mq.c   | 27 ++++++++++++++++++++++++++-
+ block/elevator.c |  2 ++
+ 2 files changed, 28 insertions(+), 1 deletion(-)
 
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 2689b7c..bc099f1 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -1092,8 +1092,6 @@ config PROVE_LOCKING
- 	select DEBUG_MUTEXES
- 	select DEBUG_RT_MUTEXES if RT_MUTEXES
- 	select DEBUG_LOCK_ALLOC
--	select LOCKDEP_CROSSRELEASE
--	select LOCKDEP_COMPLETIONS
- 	select TRACE_IRQFLAGS
- 	default n
- 	help
-@@ -1164,7 +1162,9 @@ config LOCK_STAT
- 	 (CONFIG_LOCKDEP defines "acquire" and "release" events.)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 5d69c8075339..85954a0b4394 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1296,7 +1296,30 @@ EXPORT_SYMBOL(blk_mq_delay_run_hw_queue);
  
- config LOCKDEP_CROSSRELEASE
--	bool
-+	bool "Lock debugging: enable cross-locking checks in lockdep"
-+	depends on PROVE_LOCKING
-+	default n
- 	help
- 	 This makes lockdep work for crosslock which is a lock allowed to
- 	 be released in a different context from the acquisition context.
-@@ -1174,7 +1174,10 @@ config LOCKDEP_CROSSRELEASE
- 	 detector, lockdep.
+ bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ {
+-	if (blk_mq_hctx_has_pending(hctx)) {
++	int srcu_idx;
++	bool need_run;
++
++	/*
++	 * When queue is quiesced, we may be switching io scheduler, or
++	 * updating nr_hw_queues, or other things, and we can't run queue
++	 * any more, even __blk_mq_hctx_has_pending() can't be called safely.
++	 *
++	 * And queue will be rerun in blk_mq_unquiesce_queue() if it is
++	 * quiesced.
++	 */
++	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
++		rcu_read_lock();
++		need_run = !blk_queue_quiesced(hctx->queue) &&
++			blk_mq_hctx_has_pending(hctx);
++		rcu_read_unlock();
++	} else {
++		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
++		need_run = !blk_queue_quiesced(hctx->queue) &&
++			blk_mq_hctx_has_pending(hctx);
++		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
++	}
++
++	if (need_run) {
+ 		__blk_mq_delay_run_hw_queue(hctx, async, 0);
+ 		return true;
+ 	}
+@@ -2721,6 +2744,7 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+ 		return -EINVAL;
  
- config LOCKDEP_COMPLETIONS
--	bool
-+	bool "Lock debugging: allow completions to use deadlock detector"
-+	depends on PROVE_LOCKING
-+	select LOCKDEP_CROSSRELEASE
-+	default n
- 	help
- 	 A deadlock caused by wait_for_completion() and complete() can be
- 	 detected by lockdep using crossrelease feature.
+ 	blk_mq_freeze_queue(q);
++	blk_mq_quiesce_queue(q);
+ 
+ 	ret = 0;
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+@@ -2744,6 +2768,7 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+ 	if (!ret)
+ 		q->nr_requests = nr;
+ 
++	blk_mq_unquiesce_queue(q);
+ 	blk_mq_unfreeze_queue(q);
+ 
+ 	return ret;
+diff --git a/block/elevator.c b/block/elevator.c
+index 7bda083d5968..138faeb08a7c 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -968,6 +968,7 @@ static int elevator_switch_mq(struct request_queue *q,
+ 	int ret;
+ 
+ 	blk_mq_freeze_queue(q);
++	blk_mq_quiesce_queue(q);
+ 
+ 	if (q->elevator) {
+ 		if (q->elevator->registered)
+@@ -994,6 +995,7 @@ static int elevator_switch_mq(struct request_queue *q,
+ 		blk_add_trace_msg(q, "elv switch: none");
+ 
+ out:
++	blk_mq_unquiesce_queue(q);
+ 	blk_mq_unfreeze_queue(q);
+ 	return ret;
+ }
 -- 
-1.9.1
+2.9.5
