@@ -1,79 +1,29 @@
-Return-Path: <prvs=514719b63=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "tj@kernel.org" <tj@kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"peterz@infradead.org" <peterz@infradead.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "kernel-team@fb.com" <kernel-team@fb.com>,
-	"oleg@redhat.com" <oleg@redhat.com>, "hch@lst.de" <hch@lst.de>,
-	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>, "osandov@fb.com"
-	<osandov@fb.com>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 13 Dec 2017 08:13:52 -0800
+From: Tejun Heo <tj@kernel.org>
+To: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Cc: axboe@kernel.dk, linux-kernel@vger.kernel.org, oleg@redhat.com,
+	peterz@infradead.org, kernel-team@fb.com, osandov@fb.com,
+	linux-block@vger.kernel.org, hch@lst.de
 Subject: Re: [PATCH 2/6] blk-mq: replace timeout synchronization with a RCU
  and generation based scheme
-Date: Thu, 14 Dec 2017 18:51:11 +0000
-Message-ID: <1513277469.2475.43.camel@wdc.com>
+Message-ID: <20171213161352.GT3919388@devbig577.frc2.facebook.com>
 References: <20171212190134.535941-1-tj@kernel.org>
-	 <20171212190134.535941-3-tj@kernel.org>
-In-Reply-To: <20171212190134.535941-3-tj@kernel.org>
-Content-Type: text/plain; charset="utf-8"
+ <20171212190134.535941-3-tj@kernel.org>
+ <83fa38dc-ce9c-054a-43e9-38b339e5fb27@oracle.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <83fa38dc-ce9c-054a-43e9-38b339e5fb27@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE3LTEyLTEyIGF0IDExOjAxIC0wODAwLCBUZWp1biBIZW8gd3JvdGU6DQo+IHJ1
-bGVzLiAgVW5mb3J0dW5hdGxleSwgaXQgY29udGFpbnMgcXVpdGUgYSBmZXcgaG9sZXMuDQogICAg
-ICAgICAgXl5eXl5eXl5eXl5eXg0KICAgICAgICAgIFVuZm9ydHVuYXRlbHk/DQoNCj4gV2hpbGUg
-dGhpcyBjaGFuZ2UgbWFrZXMgUkVRX0FUT01fQ09NUExFVEUgc3luY2hvcm5pemF0aW9uIHVubmVj
-ZXNzYXJ5DQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5eXl5e
-Xl5eXl5eXl5eXg0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBz
-eW5jaHJvbml6YXRpb24/DQoNCj4gLS0tIGEvYmxvY2svYmxrLWNvcmUuYw0KPiArKysgYi9ibG9j
-ay9ibGstY29yZS5jDQo+IEBAIC0xMjYsNiArMTI2LDggQEAgdm9pZCBibGtfcnFfaW5pdChzdHJ1
-Y3QgcmVxdWVzdF9xdWV1ZSAqcSwgc3RydWN0IHJlcXVlc3QgKnJxKQ0KPiAgCXJxLT5zdGFydF90
-aW1lID0gamlmZmllczsNCj4gIAlzZXRfc3RhcnRfdGltZV9ucyhycSk7DQo+ICAJcnEtPnBhcnQg
-PSBOVUxMOw0KPiArCXNlcWNvdW50X2luaXQoJnJxLT5nc3RhdGVfc2VxKTsNCj4gKwl1NjRfc3Rh
-dHNfaW5pdCgmcnEtPmFib3J0ZWRfZ3N0YXRlX3N5bmMpOw0KPiAgfQ0KPiAgRVhQT1JUX1NZTUJP
-TChibGtfcnFfaW5pdCk7DQoNClNvcnJ5IGJ1dCB0aGUgYWJvdmUgY2hhbmdlIGxvb2tzIHVnbHkg
-dG8gbWUuIE15IHVuZGVyc3RhbmRpbmcgaXMgdGhhdCANCmJsa19ycV9pbml0KCkgaXMgb25seSB1
-c2VkIGluc2lkZSB0aGUgYmxvY2sgbGF5ZXIgdG8gaW5pdGlhbGl6ZSBsZWdhY3kgYmxvY2sNCmxh
-eWVyIHJlcXVlc3RzIHdoaWxlIGdzdGF0ZV9zZXEgYW5kIGFib3J0ZWRfZ3N0YXRlX3N5bmMgYXJl
-IG9ubHkgcmVsZXZhbnQNCmZvciBibGstbXEgcmVxdWVzdHMuIFdvdWxkbid0IGl0IGJlIGJldHRl
-ciB0byBhdm9pZCB0aGF0IGJsa19ycV9pbml0KCkgaXMNCmNhbGxlZCBmb3IgYmxrLW1xIHJlcXVl
-c3RzIHN1Y2ggdGhhdCB0aGUgYWJvdmUgY2hhbmdlIGNhbiBiZSBsZWZ0IG91dD8gVGhlDQpvbmx5
-IGNhbGxlcnMgb3V0c2lkZSB0aGUgYmxvY2sgbGF5ZXIgY29yZSBvZiBibGtfcnFfaW5pdCgpIEkg
-a25vdyBvZiBhcmUNCmlkZV9wcmVwX3NlbnNlKCkgYW5kIHNjc2lfaW9jdGxfcmVzZXQoKS4gSSBj
-YW4gaGVscCB3aXRoIGNvbnZlcnRpbmcgdGhlIFNDU0kNCmNvZGUgaWYgeW91IHdhbnQuDQoNCj4g
-Kwl3cml0ZV9zZXFjb3VudF9iZWdpbigmcnEtPmdzdGF0ZV9zZXEpOw0KPiArCWJsa19tcV9ycV91
-cGRhdGVfc3RhdGUocnEsIE1RX1JRX0lOX0ZMSUdIVCk7DQo+ICsJYmxrX2FkZF90aW1lcihycSk7
-DQo+ICsJd3JpdGVfc2VxY291bnRfZW5kKCZycS0+Z3N0YXRlX3NlcSk7DQoNCk15IHVuZGVyc3Rh
-bmRpbmcgaXMgdGhhdCBib3RoIHdyaXRlX3NlcWNvdW50X2JlZ2luKCkgYW5kIHdyaXRlX3NlcWNv
-dW50X2VuZCgpDQp0cmlnZ2VyIGEgd3JpdGUgbWVtb3J5IGJhcnJpZXIuIElzIGEgc2VxY291bnQg
-cmVhbGx5IGZhc3RlciB0aGFuIGEgc3BpbmxvY2s/DQoNCj4gDQo+IEBAIC03OTIsNiArODExLDE0
-IEBAIHZvaWQgYmxrX21xX3JxX3RpbWVkX291dChzdHJ1Y3QgcmVxdWVzdCAqcmVxLCBib29sIHJl
-c2VydmVkKQ0KPiAgCQlfX2Jsa19tcV9jb21wbGV0ZV9yZXF1ZXN0KHJlcSk7DQo+ICAJCWJyZWFr
-Ow0KPiAgCWNhc2UgQkxLX0VIX1JFU0VUX1RJTUVSOg0KPiArCQkvKg0KPiArCQkgKiBBcyBub3Ro
-aW5nIHByZXZlbnRzIGZyb20gY29tcGxldGlvbiBoYXBwZW5pbmcgd2hpbGUNCj4gKwkJICogLT5h
-Ym9ydGVkX2dzdGF0ZSBpcyBzZXQsIHRoaXMgbWF5IGxlYWQgdG8gaWdub3JlZA0KPiArCQkgKiBj
-b21wbGV0aW9ucyBhbmQgZnVydGhlciBzcHVyaW91cyB0aW1lb3V0cy4NCj4gKwkJICovDQo+ICsJ
-CXU2NF9zdGF0c191cGRhdGVfYmVnaW4oJnJlcS0+YWJvcnRlZF9nc3RhdGVfc3luYyk7DQo+ICsJ
-CXJlcS0+YWJvcnRlZF9nc3RhdGUgPSAwOw0KPiArCQl1NjRfc3RhdHNfdXBkYXRlX2VuZCgmcmVx
-LT5hYm9ydGVkX2dzdGF0ZV9zeW5jKTsNCg0KSWYgYSBibGstbXEgcmVxdWVzdCBpcyByZXN1Ym1p
-dHRlZCAyKio2MiB0aW1lcywgY2FuIHRoYXQgcmVzdWx0IGluIHRoZSBhYm92ZQ0KY29kZSBzZXR0
-aW5nIGFib3J0ZWRfZ3N0YXRlIHRvIHRoZSBzYW1lIHZhbHVlIGFzIGdzdGF0ZT8gSXNuJ3QgdGhh
-dCBhIGJ1Zz8NCklmIHNvLCBob3cgYWJvdXQgc2V0dGluZyBhYm9ydGVkX2dzdGF0ZSBpbiB0aGUg
-YWJvdmUgY29kZSB0byBlLmcuIGdzdGF0ZSBeICgyKio2Myk/DQoNCj4gQEAgLTIyOCw2ICsyMzAs
-MjcgQEAgc3RydWN0IHJlcXVlc3Qgew0KPiAgDQo+ICAJdW5zaWduZWQgc2hvcnQgd3JpdGVfaGlu
-dDsNCj4gIA0KPiArCS8qDQo+ICsJICogT24gYmxrLW1xLCB0aGUgbG93ZXIgYml0cyBvZiAtPmdz
-dGF0ZSBjYXJyeSB0aGUgTVFfUlFfKiBzdGF0ZQ0KPiArCSAqIHZhbHVlIGFuZCB0aGUgdXBwZXIg
-Yml0cyB0aGUgZ2VuZXJhdGlvbiBudW1iZXIgd2hpY2ggaXMNCj4gKwkgKiBtb25vdG9uaWNhbGx5
-IGluY3JlbWVudGVkIGFuZCB1c2VkIHRvIGRpc3Rpbmd1aXNoIHRoZSByZXVzZQ0KPiArCSAqIGlu
-c3RhbmNlcy4NCj4gKwkgKg0KPiArCSAqIC0+Z3N0YXRlX3NlcSBhbGxvd3MgdXBkYXRlcyB0byAt
-PmdzdGF0ZSBhbmQgb3RoZXIgZmllbGRzDQo+ICsJICogKGN1cnJlbnRseSAtPmRlYWRsaW5lKSBk
-dXJpbmcgcmVxdWVzdCBzdGFydCB0byBiZSByZWFkDQo+ICsJICogYXRvbWljYWxseSBmcm9tIHRo
-ZSB0aW1lb3V0IHBhdGgsIHNvIHRoYXQgaXQgY2FuIG9wZXJhdGUgb24gYQ0KPiArCSAqIGNvaGVy
-ZW50IHNldCBvZiBpbmZvcm1hdGlvbi4NCj4gKwkgKi8NCj4gKwlzZXFjb3VudF90IGdzdGF0ZV9z
-ZXE7DQo+ICsJdTY0IGdzdGF0ZTsNCj4gKw0KPiArCS8qDQo+ICsJICogLT5hYm9ydGVkX2dzdGF0
-ZSBpcyB1c2VkIGJ5IHRoZSB0aW1lb3V0IHRvIGNsYWltIGEgc3BlY2lmaWMNCj4gKwkgKiByZWN5
-Y2xlIGluc3RhbmNlIG9mIHRoaXMgcmVxdWVzdC4gIFNlZSBibGtfbXFfdGltZW91dF93b3JrKCku
-DQo+ICsJICovDQo+ICsJc3RydWN0IHU2NF9zdGF0c19zeW5jIGFib3J0ZWRfZ3N0YXRlX3N5bmM7
-DQo+ICsJdTY0IGFib3J0ZWRfZ3N0YXRlOw0KPiArDQo+ICAJdW5zaWduZWQgbG9uZyBkZWFkbGlu
-ZTsNCj4gIAlzdHJ1Y3QgbGlzdF9oZWFkIHRpbWVvdXRfbGlzdDsNCg0KV2h5IGFyZSBnc3RhdGUg
-YW5kIGFib3J0ZWRfZ3N0YXRlIDY0LWJpdCB2YXJpYWJsZXM/IFdoYXQgbWFrZXMgeW91IHRoaW5r
-IHRoYXQNCjMyIGJpdHMgd291bGQgbm90IGJlIGVub3VnaD8NCg0KVGhhbmtzLA0KDQpCYXJ0Lg==
+Hi, Jianchao.
+
+On Wed, Dec 13, 2017 at 01:07:30PM +0800, jianchao.wang wrote:
+> Test ok with NVMe
+
+Awesome, thanks for testing!
+
+-- 
+tejun
