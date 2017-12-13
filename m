@@ -1,96 +1,65 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:41308 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752989AbdLHNQM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Dec 2017 08:16:12 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>, Chris Mason <clm@fb.com>,
-        Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>,
-        linux-btrfs@vger.kernel.org
-Subject: [PATCH 09/10] btrfs: avoid access to .bi_vcnt directly
-Date: Fri,  8 Dec 2017 21:14:08 +0800
-Message-Id: <20171208131409.11889-10-ming.lei@redhat.com>
-In-Reply-To: <20171208131409.11889-1-ming.lei@redhat.com>
-References: <20171208131409.11889-1-ming.lei@redhat.com>
+Received: from LGEAMRELO11.lge.com ([156.147.23.51]:48202 "EHLO
+        lgeamrelo11.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750749AbdLMFi0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Dec 2017 00:38:26 -0500
+Subject: Re: [PATCH] locking/lockdep: Add CONFIG_LOCKDEP_AGGRESSIVE
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Theodore Ts'o <tytso@mit.edu>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>, kernel-team@lge.com,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Oleg Nesterov <oleg@redhat.com>, Tejun Heo <tj@kernel.org>
+References: <20171211035017.32678-1-tytso@mit.edu>
+ <CA+55aFxU6A5doeHh6QagAPpTKvdHzUimAcq+gnnrva=TUtLzhg@mail.gmail.com>
+ <c4a4b7be-b3c4-ed56-21a5-d3396b8a4e25@lge.com>
+ <CA+55aFw3kiLObrtMTTiJBJW44gWV=cc=-rZs46XyuLjaTvxcHg@mail.gmail.com>
+From: Byungchul Park <byungchul.park@lge.com>
+Message-ID: <ccb7fefe-29a7-2868-424b-bf4f9135d8bb@lge.com>
+Date: Wed, 13 Dec 2017 14:38:24 +0900
+MIME-Version: 1.0
+In-Reply-To: <CA+55aFw3kiLObrtMTTiJBJW44gWV=cc=-rZs46XyuLjaTvxcHg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-BTRFS uses bio->bi_vcnt to figure out page numbers, this way becomes not
-correct once we start to enable multipage bvec.
+On 12/13/2017 2:00 AM, Linus Torvalds wrote:
+> On Mon, Dec 11, 2017 at 9:20 PM, Byungchul Park <byungchul.park@lge.com> wrote:
+>>
+>> The *problem* is false positives, since locks and waiters in
+>> kernel are not classified properly
+> 
+> So the problem is that those false positives apparently end up being a
+> big deal for the filesystem people.
+> 
+> I personally don't think the code itself has to be removed, but I do
+> think that it should never have been added on as part of the generic
+> lock proving, and should always have been a separate config option.
 
-So use bio_nr_pages() to do that instead.
+I admit it.
 
-Cc: Chris Mason <clm@fb.com>
-Cc: Josef Bacik <jbacik@fb.com>
-Cc: David Sterba <dsterba@suse.com>
-Cc: linux-btrfs@vger.kernel.org
-Acked-by: David Sterba <dsterba@suse.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- fs/btrfs/extent_io.c | 9 +++++----
- fs/btrfs/extent_io.h | 2 +-
- 2 files changed, 6 insertions(+), 5 deletions(-)
+> I also feel that you dismiss "false positives" much too easily. A
 
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index 6f6669f93beb..27795bf2507c 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -2257,7 +2257,7 @@ int btrfs_get_io_failure_record(struct inode *inode, u64 start, u64 end,
- 	return 0;
- }
- 
--bool btrfs_check_repairable(struct inode *inode, struct bio *failed_bio,
-+bool btrfs_check_repairable(struct inode *inode, unsigned failed_bio_pages,
- 			   struct io_failure_record *failrec, int failed_mirror)
- {
- 	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
-@@ -2281,7 +2281,7 @@ bool btrfs_check_repairable(struct inode *inode, struct bio *failed_bio,
- 	 *	a) deliver good data to the caller
- 	 *	b) correct the bad sectors on disk
- 	 */
--	if (failed_bio->bi_vcnt > 1) {
-+	if (failed_bio_pages > 1) {
- 		/*
- 		 * to fulfill b), we need to know the exact failing sectors, as
- 		 * we don't want to rewrite any more than the failed ones. thus,
-@@ -2374,6 +2374,7 @@ static int bio_readpage_error(struct bio *failed_bio, u64 phy_offset,
- 	int read_mode = 0;
- 	blk_status_t status;
- 	int ret;
-+	unsigned failed_bio_pages = bio_nr_pages(failed_bio);
- 
- 	BUG_ON(bio_op(failed_bio) == REQ_OP_WRITE);
- 
-@@ -2381,13 +2382,13 @@ static int bio_readpage_error(struct bio *failed_bio, u64 phy_offset,
- 	if (ret)
- 		return ret;
- 
--	if (!btrfs_check_repairable(inode, failed_bio, failrec,
-+	if (!btrfs_check_repairable(inode, failed_bio_pages, failrec,
- 				    failed_mirror)) {
- 		free_io_failure(failure_tree, tree, failrec);
- 		return -EIO;
- 	}
- 
--	if (failed_bio->bi_vcnt > 1)
-+	if (failed_bio_pages > 1)
- 		read_mode |= REQ_FAILFAST_DEV;
- 
- 	phy_offset >>= inode->i_sb->s_blocksize_bits;
-diff --git a/fs/btrfs/extent_io.h b/fs/btrfs/extent_io.h
-index 93dcae0c3183..20854d63c75b 100644
---- a/fs/btrfs/extent_io.h
-+++ b/fs/btrfs/extent_io.h
-@@ -540,7 +540,7 @@ void btrfs_free_io_failure_record(struct btrfs_inode *inode, u64 start,
- 		u64 end);
- int btrfs_get_io_failure_record(struct inode *inode, u64 start, u64 end,
- 				struct io_failure_record **failrec_ret);
--bool btrfs_check_repairable(struct inode *inode, struct bio *failed_bio,
-+bool btrfs_check_repairable(struct inode *inode, unsigned failed_bio_pages,
- 			    struct io_failure_record *failrec, int fail_mirror);
- struct bio *btrfs_create_repair_bio(struct inode *inode, struct bio *failed_bio,
- 				    struct io_failure_record *failrec,
+I don't dismiss the ones easily...
+
+Anyway, I mostly agree with your whole opinion.
+
+Thanks for replying.
+
+> false positive is a big problem - because it makes people ignore the
+> real cases (or just disable the functionality entirely).
+> 
+> It's why I am very quick to disable compiler warnings that have false
+> positives, for example. Just a couple of "harmless" false positive
+> warnings will poison the real warnings for people because they'll get
+> used to seeing warnings while building, and no longer actually look at
+> them.
+> 
+>                   Linus
+> 
+
 -- 
-2.9.5
+Thanks,
+Byungchul
