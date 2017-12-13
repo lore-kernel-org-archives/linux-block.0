@@ -1,47 +1,56 @@
-Return-Path: <ebiggers3@gmail.com>
-Return-Path: <ebiggers3@gmail.com>
-Date: Sun, 3 Dec 2017 12:24:34 -0800
-From: Eric Biggers <ebiggers3@gmail.com>
-To: syzbot <bot+583353673e394aa41e5fb68ddc8b8d9d5c8d576f@syzkaller.appspotmail.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, mingo@redhat.com, rostedt@goodmis.org,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: possible deadlock in blk_trace_remove
-Message-ID: <20171203202434.GD844@zzz.localdomain>
-References: <001a1141f8dc4440a9055e53896e@google.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:48470 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752434AbdLMRzV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Dec 2017 12:55:21 -0500
+Date: Thu, 14 Dec 2017 01:55:07 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 00/10] block: cleanup on direct access to bvec
+ table(prepare for multipage bvec)
+Message-ID: <20171213175506.GA17305@ming.t460p>
+References: <20171208131409.11889-1-ming.lei@redhat.com>
+ <20171212075738.GA26646@infradead.org>
+ <20171212091844.GB8529@ming.t460p>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <001a1141f8dc4440a9055e53896e@google.com>
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20171212091844.GB8529@ming.t460p>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Sun, Nov 19, 2017 at 02:36:01AM -0800, syzbot wrote:
-> Hello,
+On Tue, Dec 12, 2017 at 05:18:44PM +0800, Ming Lei wrote:
+> On Mon, Dec 11, 2017 at 11:57:38PM -0800, Christoph Hellwig wrote:
+> > Most of this looks sane, but I'd really like to see it in context
+> > of the actual multipage bvec patches.  Do you have an updated branch
+> > on top of these?
 > 
-> syzkaller hit the following crash on
-> d9e0e63d9a6f88440eb201e1491fcf730272c706
-> git://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/master
-> compiler: gcc (GCC) 7.1.1 20170620
-> .config is attached
-> Raw console output is attached.
-> 
-> Unfortunately, I don't have any reproducer for this bug yet.
-> 
-> 
-> Use struct sctp_sack_info instead
-> 
-> ============================================
-> WARNING: possible recursive locking detected
-> 4.14.0-rc8-next-20171110+ #40 Not tainted
-> --------------------------------------------
-> syz-executor6/21462 is trying to acquire lock:
->  (&q->blk_trace_mutex){+.+.}, at: [<ffffffff81760261>]
-> blk_trace_remove+0x21/0x40 kernel/trace/blktrace.c:373
-> 
-> but task is already holding lock:
->  (&q->blk_trace_mutex){+.+.}, at: [<ffffffff81763b38>]
-> blk_trace_setup+0x38/0x70 kernel/trace/blktrace.c:606
-> 
-> other info that might help us debug this:
->  Possible unsafe locking scenario:
+> I will post it out soon after addressing some of last comments.
 
-#syz fix: blktrace: fix trace mutex deadlock
+You can find the actual multipage bvec patches in the following tree,
+which is on top this prepare patchset.
+
+	tree: https://github.com/ming1/linux.git #v4.15-rc-mp-bvec_v4-rc1
+	gitweb: https://github.com/ming1/linux/commits/v4.15-rc-mp-bvec_v4-rc1
+
+In this tree, all the current bio_for_each_segment* are converted to
+bio_for_each_page*() first, then after multipage bvec is enabled, we
+have the following helpers:
+
+1) bio_for_each_segment()/bio_for_each_segment_all()
+	
+	iterate bio segment by segment which is real multipage bvec
+
+2) bio_for_each_page()/bio_for_each_page_all()
+
+	iterate bio page by page, which is the current in-tree bio_for_each_segment()/
+	bio_for_each_segment_all()
+
+3) rq_for_each_page()/rq_for_each_segment()
+	similar with above
+
+
+Not run full test yet, but it works on my VM, will start xfstest later.
+
+Thanks,
+Ming
