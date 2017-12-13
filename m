@@ -1,40 +1,65 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Wed, 13 Dec 2017 08:13:12 -0800
-From: Tejun Heo <tj@kernel.org>
-To: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Cc: axboe@kernel.dk, linux-kernel@vger.kernel.org, oleg@redhat.com,
-	peterz@infradead.org, kernel-team@fb.com, osandov@fb.com,
-	linux-block@vger.kernel.org, hch@lst.de
+Return-Path: <jianchao.w.wang@oracle.com>
 Subject: Re: [PATCH 1/6] blk-mq: protect completion path with RCU
-Message-ID: <20171213161312.GS3919388@devbig577.frc2.facebook.com>
+To: Tejun Heo <tj@kernel.org>, axboe@kernel.dk
+Cc: linux-kernel@vger.kernel.org, oleg@redhat.com, peterz@infradead.org,
+        kernel-team@fb.com, osandov@fb.com, linux-block@vger.kernel.org,
+        hch@lst.de
 References: <20171212190134.535941-1-tj@kernel.org>
  <20171212190134.535941-2-tj@kernel.org>
- <402aea05-8d04-99e2-5e31-803d2423283d@oracle.com>
+From: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <402aea05-8d04-99e2-5e31-803d2423283d@oracle.com>
+Date: Wed, 13 Dec 2017 11:30:48 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <402aea05-8d04-99e2-5e31-803d2423283d@oracle.com>
+In-Reply-To: <20171212190134.535941-2-tj@kernel.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hello,
-
-On Wed, Dec 13, 2017 at 11:30:48AM +0800, jianchao.wang wrote:
-> > +	} else {
-> > +		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
-> > +		if (!blk_mark_rq_complete(rq))
-> > +			__blk_mq_complete_request(rq);
-> > +		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
+Hello tejun
+Sorry for missing the V2, same comment again.
+ 
+On 12/13/2017 03:01 AM, Tejun Heo wrote:
+> Currently, blk-mq protects only the issue path with RCU.  This patch
+> puts the completion path under the same RCU protection.  This will be
+> used to synchronize issue/completion against timeout by later patches,
+> which will also add the comments.
 > 
-> The __blk_mq_complete_request() could be executed in irq context. There should not be any 
-> sleeping operations in it. If just synchronize with the timeout path to ensure the aborted_gstate
-> to be seen, only rcu is needed here ,as well as the blk_mq_timeout_work.
+> Signed-off-by: Tejun Heo <tj@kernel.org>
+> ---
+>  block/blk-mq.c | 16 ++++++++++++++--
+>  1 file changed, 14 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 1109747..acf4fbb 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -568,11 +568,23 @@ static void __blk_mq_complete_request(struct request *rq)
+>  void blk_mq_complete_request(struct request *rq)
+>  {
+>  	struct request_queue *q = rq->q;
+> +	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, rq->mq_ctx->cpu);
+> +	int srcu_idx;
+>  
+>  	if (unlikely(blk_should_fake_timeout(q)))
+>  		return;
+> -	if (!blk_mark_rq_complete(rq))
+> -		__blk_mq_complete_request(rq);
+> +
+> +	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
+> +		rcu_read_lock();
+> +		if (!blk_mark_rq_complete(rq))
+> +			__blk_mq_complete_request(rq);
+> +		rcu_read_unlock();
+> +	} else {
+> +		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
+> +		if (!blk_mark_rq_complete(rq))
+> +			__blk_mq_complete_request(rq);
+> +		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
 
-Sure, but it's just a lot cleaner to use the same to protect both
-issue and completion; otherwise, whoever who wants to synchronize
-against them have to do awkward double rcu locking.
-
-Thanks.
-
--- 
-tejun
+The __blk_mq_complete_request() could be executed in irq context. There should not be any 
+sleeping operations in it. If just synchronize with the timeout path to ensure the aborted_gstate
+to be seen, only rcu is needed here ,as well as the blk_mq_timeout_work.
+> +	}
+>  }
+>  EXPORT_SYMBOL(blk_mq_complete_request);
+>  
+> 
