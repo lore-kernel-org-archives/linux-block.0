@@ -1,74 +1,125 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:32902 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751906AbdLSQuv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Dec 2017 11:50:51 -0500
-Date: Tue, 19 Dec 2017 17:50:48 +0100
-From: "Luis R. Rodriguez" <mcgrof@kernel.org>
-To: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-Cc: "Luis R. Rodriguez" <mcgrof@kernel.org>, viro@zeniv.linux.org.uk,
-        bart.vanassche@wdc.com, ming.lei@redhat.com, tytso@mit.edu,
-        darrick.wong@oracle.com, jikos@kernel.org, pavel@ucw.cz,
-        len.brown@intel.com, linux-fsdevel@vger.kernel.org,
-        boris.ostrovsky@oracle.com, jgross@suse.com,
-        todd.e.brandt@linux.intel.com, nborisov@suse.com, jack@suse.cz,
-        martin.petersen@oracle.com, ONeukum@suse.com,
+Received: from cloudserver094114.home.net.pl ([79.96.170.134]:63335 "EHLO
+        cloudserver094114.home.net.pl" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1750749AbdLMBKc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 12 Dec 2017 20:10:32 -0500
+From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+To: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Cc: viro@zeniv.linux.org.uk, bart.vanassche@wdc.com,
+        ming.lei@redhat.com, tytso@mit.edu, darrick.wong@oracle.com,
+        jikos@kernel.org, pavel@ucw.cz, len.brown@intel.com,
+        linux-fsdevel@vger.kernel.org, boris.ostrovsky@oracle.com,
+        jgross@suse.com, todd.e.brandt@linux.intel.com, nborisov@suse.com,
+        jack@suse.cz, martin.petersen@oracle.com, ONeukum@suse.com,
         oleksandr@natalenko.name, oleg.b.antonyan@gmail.com,
         yu.chen.surf@gmail.com, dan.j.williams@intel.com,
         linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
         linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH 00/11] fs: use freeze_fs on suspend/hibernate
-Message-ID: <20171219165048.GE729@wotan.suse.de>
+Date: Wed, 13 Dec 2017 02:09:49 +0100
+Message-ID: <7282138.2afjHhBgNp@aspire.rjw.lan>
+In-Reply-To: <20171129232356.28296-1-mcgrof@kernel.org>
 References: <20171129232356.28296-1-mcgrof@kernel.org>
- <7282138.2afjHhBgNp@aspire.rjw.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <7282138.2afjHhBgNp@aspire.rjw.lan>
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, Dec 13, 2017 at 02:09:49AM +0100, Rafael J. Wysocki wrote:
-> I'm assuming an update of this to be posted due to the comments from Jan
-> on patch [3/11] and patch [7/11] probably.
+On Thursday, November 30, 2017 12:23:45 AM CET Luis R. Rodriguez wrote:
+> This is a followup from the original RFC which proposed to start
+> to kill kthread freezing all together [0]. Instead of going straight
+> out to the jugular for kthread freezing this series only addresses
+> killing freezer calls on filesystems which implement freeze_fs, after
+> we let the kernel freeze these filesystems for us on suspend.
 > 
-> Is there anything else that needs to be addressed?
+> This approach puts on a slow but steady path towards the original goal
+> though. Each subsystem could look for similar solutions. Even with
+> filesystems we're not all done yet, after this we'll still have to
+> decide what to do about filesystems which do not implement freeze_fs().
+> 
+> Motivation and problem:
+> 
+> kthreads have some semantics for freezing, which helps the kernel
+> freeze them when a system is going to suspend or hibernation. These
+> semantics are not well defined though, and it actually turns out
+> pretty hard to get it right.
+> 
+> Without a proper solution suspend and hibernation are fragile on filesystems,
+> it can easily break suspend and fixing such issues are in no way trivial [1]
+> [2].
+> 
+> Proposed solution:
+> 
+> Instead of fixing such semantics and trying to get all filesystems to do it
+> right, we can easily do away with all freezing calls if the filesystem
+> implements a proper freeze_fs() callback. The following 9 filesystems have
+> freeze_fs() implemented as such we can let the kernel issue the callback upon
+> suspend and thaw on resume automatically on our behalf.
+> 
+>   o xfs
+>   o reiserfs
+>   o nilfs2
+>   o jfs
+>   o f2fs
+>   o ext4
+>   o ext2
+>   o btrfs
+> 
+> Of these, the following have freezer helpers, which can then be removed
+> after the kernel automaticaly calls freeze_fs for us on suspend:
+> 
+>   o xfs
+>   o nilfs2
+>   o jfs
+>   o f2fs
+>   o ext4
+> 
+> I've tested this on a system with ext4 and XFS, and have let 0-day go at
+> without issues. I have branches availabe for linux-next [3] and Linus'
+> latest tree [4].
+> 
+> Further testing, thoughts, reviews, flames are all equally appreciated.
+> 
+> [0] https://lkml.kernel.org/r/20171003185313.1017-1-mcgrof@kernel.org
+> [1] https://bugzilla.suse.com/show_bug.cgi?id=1043449
+> [2] https://lkml.kernel.org/r/20171113103139.GA18936@yu-chen.sh.intel.com
+> [3] https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20171129-fs-freeze-cleanup
+> [4] https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux.git/log/?h=20171129-fs-freeze-cleanup
+> 
+> Luis R. Rodriguez (11):
+>   fs: provide unlocked helper for freeze_super()
+>   fs: provide unlocked helper thaw_super()
+>   fs: add frozen sb state helpers
+>   fs: distinguish between user initiated freeze and kernel initiated
+>     freeze
+>   fs: add iterate_supers_excl() and iterate_supers_reverse_excl()
+>   fs: freeze on suspend and thaw on resume
+>   xfs: remove not needed freezing calls
+>   ext4: remove not needed freezing calls
+>   f2fs: remove not needed freezing calls
+>   nilfs2: remove not needed freezing calls
+>   jfs: remove not needed freezing calls
+> 
+>  fs/ext4/ext4_jbd2.c    |   2 +-
+>  fs/ext4/super.c        |   2 -
+>  fs/f2fs/gc.c           |   5 +-
+>  fs/f2fs/segment.c      |   6 +-
+>  fs/jfs/jfs_logmgr.c    |  11 +-
+>  fs/jfs/jfs_txnmgr.c    |  31 ++---
+>  fs/nilfs2/segment.c    |  48 ++++----
+>  fs/super.c             | 320 ++++++++++++++++++++++++++++++++++++++++---------
+>  fs/xfs/xfs_trans.c     |   2 +-
+>  fs/xfs/xfs_trans_ail.c |   7 +-
+>  include/linux/fs.h     |  63 +++++++++-
+>  kernel/power/process.c |  15 ++-
+>  12 files changed, 378 insertions(+), 134 deletions(-)
+> 
 
-I was waiting on Jan Kara's feedback on how he'd like to proceed with the
-unthawing on error given his point on that the device mapper API seems to match
-the in kernel automatic freezing just that I didn't use that same interface.
+I'm assuming an update of this to be posted due to the comments from Jan
+on patch [3/11] and patch [7/11] probably.
 
-0-day did come back with one RCU issue which I also have to address:
+Is there anything else that needs to be addressed?
 
-[  422.919958] kernel BUG at kernel/rcu/sync.c:228!                                                                                                                                           
-[  422.920115] invalid opcode: 0000 [#1] SMP                                                                                                                                                  
-[  422.920212] Modules linked in: rpcsec_gss_krb5 auth_rpcgss nfsv4 dns_resolver netconsole sr_mod cdrom sd_mod sg snd_hda_codec_idt snd_hda_codec_generic intel_rapl x86_pkg_temp_thermal    
-+intel_powerclamp coretemp kvm irqbypass crct10dif_pclmul snd_hda_intel crc32_pclmul crc32c_intel snd_hda_codec snd_hda_core snd_hwdep i915 ghash_clmulni_intel cryptd snd_pcm pcspkr         
-+drm_kms_helper snd_timer ahci libahci syscopyarea sysfillrect sysimgblt fb_sys_fops snd libata shpchp soundcore drm video ip_tables                                                          
-[  422.921168] CPU: 2 PID: 237 Comm: kworker/2:3 Not tainted 4.15.0-rc1-00030-gf95c16a #1                                                                                                     
-[  422.921347] Hardware name: Hewlett-Packard p6-1451cx/2ADA, BIOS 8.15 02/05/2013                                                                                                            
-[  422.921515] Workqueue: events destroy_super_work                                                                                                                                           
-[  422.921628] task: ffff8801bfcd0000 task.stack: ffffc90001128000                                                                                                                            
-[  422.921768] RIP: 0010:rcu_sync_dtor+0x65/0x70                                                                                                                                              
-[  422.921874] RSP: 0000:ffffc9000112be60 EFLAGS: 00010286                                                                                                                                    
-[  422.921985] RAX: 0000000000080000 RBX: ffff8801c00793d8 RCX: 000000000001fece                                                                                                              
-[  422.922133] RDX: 00000000fffffff6 RSI: 0000000000000282 RDI: ffff8801c00793d8                                                                                                              
-[  422.922283] RBP: ffff880212f1b6c0 R08: 0000000000000000 R09: 000000000000009c                                                                                                              
-[  422.922432] R10: 0000000000000000 R11: 0000000000000000 R12: ffff880212f1f800                                                                                                              
-[  422.922579] R13: 0000000000000000 R14: ffff8801c036db40 R15: ffff8801c00795b0                                                                                                              
-[  422.922728] FS:  0000000000000000(0000) GS:ffff880212f00000(0000) knlGS:0000000000000000                                                                                                   
-[  422.922931] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033                                                                                                                              
-[  422.923054] CR2: 00007ffe2f820ff8 CR3: 0000000001e09002 CR4: 00000000001606e0                                                                                                              
-[  422.923203] Call Trace:                                                                                                                                                                    
-[  422.923266]  percpu_free_rwsem+0x15/0x30                                                                                                                                                   
-[  422.923357]  destroy_super_work+0x3d/0x50                                                                                                                                                  
-[  422.923449]  process_one_work+0x18f/0x3e0                                                                                                                                                  
-[  422.923540]  worker_thread+0x3a/0x3b0                                                                                                                                                      
-[  422.923623]  ? process_one_work+0x3e0/0x3e0                                                                                                                                                
-[  422.923716]  kthread+0x11c/0x140                                                                                                                                                           
-[  422.923792]  ? kthread_create_worker_on_cpu+0x50/0x50                                                                                                                                      
-[  422.923905]  ret_from_fork+0x1f/0x30                                                                                                                                                       
-[  422.923986] Code: 00 fb 66 0f 1f 44 00 00 65 ff 0d 57 6c f2 7e 85 d2 74 15 8b 43 38 48 8d 04 40 ff 14 c5 f0 f5 a1 81 8b 43 20 85 c0 75 05 5b 5d c3 <0f> 0b 0f 0b 90 90 90 90 90 90 90 0f 1f
-+44 00 00 8b 87 c8 c3 00                                                                                                                                                                      
-[  422.924405] RIP: rcu_sync_dtor+0x65/0x70 RSP: ffffc9000112be60 
-
-  Luis
+Thanks,
+Rafael
