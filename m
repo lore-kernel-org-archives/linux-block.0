@@ -1,28 +1,59 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:51947 "EHLO newverein.lst.de"
+Received: from mx1.redhat.com ([209.132.183.28]:42362 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751208AbdL2J7k (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Dec 2017 04:59:40 -0500
-Date: Fri, 29 Dec 2017 10:59:39 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
+        id S1751802AbdLNCcj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Dec 2017 21:32:39 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
         Keith Busch <keith.busch@intel.com>,
         Sagi Grimberg <sagi@grimberg.me>,
         Yi Zhang <yi.zhang@redhat.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: Re: [PATCH V2 5/6] blk-mq: fix race between updating nr_hw_queues
-        and switching io sched
-Message-ID: <20171229095939.GE24507@lst.de>
-References: <20171214023103.18272-1-ming.lei@redhat.com> <20171214023103.18272-6-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171214023103.18272-6-ming.lei@redhat.com>
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 5/6] blk-mq: fix race between updating nr_hw_queues and switching io sched
+Date: Thu, 14 Dec 2017 10:31:02 +0800
+Message-Id: <20171214023103.18272-6-ming.lei@redhat.com>
+In-Reply-To: <20171214023103.18272-1-ming.lei@redhat.com>
+References: <20171214023103.18272-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Looks good,
+In both elevator_switch_mq() and blk_mq_update_nr_hw_queues(), sched tags
+can be allocated, and q->nr_hw_queue is used, and race is inevitable, for
+example: blk_mq_init_sched() may trigger use-after-free on hctx, which is
+freed in blk_mq_realloc_hw_ctxs() when nr_hw_queues is decreased.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+This patch fixes the race be holding q->sysfs_lock.
+
+Reported-by: Yi Zhang <yi.zhang@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 6dae8f631253..d6c75daec41b 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2418,6 +2418,9 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ 	struct blk_mq_hw_ctx **hctxs = q->queue_hw_ctx;
+ 
+ 	blk_mq_sysfs_unregister(q);
++
++	/* protect against switching io scheduler  */
++	mutex_lock(&q->sysfs_lock);
+ 	for (i = 0; i < set->nr_hw_queues; i++) {
+ 		int node;
+ 
+@@ -2462,6 +2465,7 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ 		}
+ 	}
+ 	q->nr_hw_queues = i;
++	mutex_unlock(&q->sysfs_lock);
+ 	blk_mq_sysfs_register(q);
+ }
+ 
+-- 
+2.9.5
