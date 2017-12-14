@@ -1,99 +1,63 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Fri, 29 Dec 2017 10:47:36 +0900
-From: Byungchul Park <byungchul.park@lge.com>
-To: Byungchul Park <max.byungchul.park@gmail.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f53.google.com ([209.85.215.53]:42155 "EHLO
+        mail-lf0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752016AbdLNNa1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 Dec 2017 08:30:27 -0500
+MIME-Version: 1.0
+In-Reply-To: <20171214111817.xnyxgtremfspjk7f@hirez.programming.kicks-ass.net>
+References: <CANrsvRPQcWz-p_3TYfNf+Waek3bcNNPniXhFzyyS=7qbCqzGyg@mail.gmail.com>
+ <CANrsvRMAci5Vxj0kKsgW4-cgK4X4BAvq9jOwkAx0TWHqBjogVw@mail.gmail.com>
+ <20171214030711.gtxzm57h7h4hwbfe@thunk.org> <20171214111817.xnyxgtremfspjk7f@hirez.programming.kicks-ass.net>
+From: Byungchul Park <max.byungchul.park@gmail.com>
+Date: Thu, 14 Dec 2017 22:30:24 +0900
+Message-ID: <CANrsvRP8hHUJZAYUnJ5Vbu79O+HRrWfWou=Q0stRiLO9SaidCw@mail.gmail.com>
+Subject: Re: About the try to remove cross-release feature entirely by Ingo
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: "Theodore Ts'o" <tytso@mit.edu>,
+        Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@kernel.org>, david@fromorbit.com,
-        tytso@mit.edu, willy@infradead.org,
+        willy@infradead.org,
         Linus Torvalds <torvalds@linux-foundation.org>,
-        Amir Goldstein <amir73il@gmail.com>,
+        Amir Goldstein <amir73il@gmail.com>, byungchul.park@lge.com,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        oleg@redhat.com, kernel-team@lge.com
-Subject: Re: About the try to remove cross-release feature entirely by Ingo
-Message-ID: <20171229014736.GA10341@X58A-UD3R>
-References: <CANrsvRPQcWz-p_3TYfNf+Waek3bcNNPniXhFzyyS=7qbCqzGyg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CANrsvRPQcWz-p_3TYfNf+Waek3bcNNPniXhFzyyS=7qbCqzGyg@mail.gmail.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+        oleg@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Wed, Dec 13, 2017 at 03:24:29PM +0900, Byungchul Park wrote:
-> Lockdep works, based on the following:
-> 
->    (1) Classifying locks properly
->    (2) Checking relationship between the classes
-> 
-> If (1) is not good or (2) is not good, then we
-> might get false positives.
-> 
-> For (1), we don't have to classify locks 100%
-> properly but need as enough as lockdep works.
-> 
-> For (2), we should have a mechanism w/o
-> logical defects.
-> 
-> Cross-release added an additional capacity to
-> (2) and requires (1) to get more precisely classified.
-> 
-> Since the current classification level is too low for
-> cross-release to work, false positives are being
-> reported frequently with enabling cross-release.
-> Yes. It's a obvious problem. It needs to be off by
-> default until the classification is done by the level
-> that cross-release requires.
-> 
-> But, the logic (2) is valid and logically true. Please
-> keep the code, mechanism, and logic.
+On Thu, Dec 14, 2017 at 8:18 PM, Peter Zijlstra <peterz@infradead.org> wrote:
+> On Wed, Dec 13, 2017 at 10:07:11PM -0500, Theodore Ts'o wrote:
+>> interpreted this as the lockdep maintainers saying, "hey, not my
+>> fault, it's the subsystem maintainer's fault for not properly
+>> classifying the locks" --- and thus dumping the responsibility in the
+>> subsystem maintainers' laps.
+>
+> Let me clarify that I (as lockdep maintainer) disagree with that
+> sentiment. I have spend a lot of time over the years staring at random
+> code trying to fix lockdep splats. Its awesome if corresponding
+> subsystem maintainers help out and many have, but I very much do not
+> agree its their problem and their problem alone.
 
-I admit the cross-release feature had introduced several false positives
-about 4 times(?), maybe. And I suggested roughly 3 ways to solve it. I
-should have explained each in more detail. The lack might have led some
-to misunderstand.
+I apologize to all of you. That's really not what I intended to say.
 
-   (1) The best way: To classify all waiters correctly.
+I said that other folks can annotate it for the sub-system better
+than lockdep developer, so suggested to invalidate locks making
+trouble and wanting to avoid annotating it at the moment, and
+validate those back when necessary with additional annotations.
 
-      Ultimately the problems should be solved in this way. But it
-      takes a lot of time so it's not easy to use the way right away.
-      And I need helps from experts of other sub-systems.
+It's my fault. I'm not sure how I should express what I want to say,
+but, I didn't intend to charge the responsibility to other folks.
 
-      While talking about this way, I made a trouble.. I still believe
-      that each sub-system expert knows how to solve dependency problems
-      most, since each has own dependency rule, but it was not about
-      responsibility. I've never wanted to charge someone else it but me.
+Ideally, I think it's best to solve it with co-work. I should've been
+more careful to say that.
 
-   (2) The 2nd way: To make cross-release off by default.
+Again, I apologize for that, to lockdep and fs maintainers.
 
-      At the beginning, I proposed cross-release being off by default.
-      Honestly, I was happy and did it when Ingo suggested it on by
-      default once lockdep on. But I shouldn't have done that but kept
-      it off by default. Cross-release can make some happy but some
-      unhappy until problems go away through (1) or (2).
+Of course, for cross-release, I have the will to annotate it or
+find a better way to avoid false positives. And I think I have to.
 
-   (3) The 3rd way: To invalidate waiters making trouble.
-
-      Of course, this is not the best. Now that you have already spent
-      a lot of time to fix original lockdep's problems since lockdep was
-      introduced in 2006, we don't need to use this way for typical
-      locks except a few special cases. Lockdep is fairly robust by now.
-
-      And I understand you don't want to spend more time to fix
-      additional problems again. Now that the situation is different
-      from the time, 2006, it's not too bad to use this way to handle
-      the issues.
-
-IMO, the ways can be considered together at a time, which perhaps would
-be even better.
-
-Talking about what Ingo said in the commit msg.. I want to ask him back,
-if he did it with no false positives at the moment merging it in 2006,
-without using (2) or (3) method. I bet he know what it means.. And
-classifying locks/waiters correctly is not something uglifying code but
-a way to document code better. I've felt ill at ease because of the
-unnatural and forced explanation.
-
---
+-- 
 Thanks,
 Byungchul
