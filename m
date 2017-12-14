@@ -1,43 +1,55 @@
 Return-Path: <prvs=514719b63=Bart.VanAssche@wdc.com>
 From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "peterz@infradead.org" <peterz@infradead.org>
+To: "tj@kernel.org" <tj@kernel.org>
 CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"kernel-team@fb.com" <kernel-team@fb.com>, "oleg@redhat.com"
-	<oleg@redhat.com>, "hch@lst.de" <hch@lst.de>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
-	"osandov@fb.com" <osandov@fb.com>, "tj@kernel.org" <tj@kernel.org>
+	"peterz@infradead.org" <peterz@infradead.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "kernel-team@fb.com" <kernel-team@fb.com>,
+	"oleg@redhat.com" <oleg@redhat.com>, "hch@lst.de" <hch@lst.de>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "jianchao.w.wang@oracle.com"
+	<jianchao.w.wang@oracle.com>, "osandov@fb.com" <osandov@fb.com>
 Subject: Re: [PATCH 2/6] blk-mq: replace timeout synchronization with a RCU
  and generation based scheme
-Date: Thu, 14 Dec 2017 21:42:48 +0000
-Message-ID: <1513287766.2475.73.camel@wdc.com>
+Date: Thu, 14 Dec 2017 21:13:32 +0000
+Message-ID: <1513286010.2475.58.camel@wdc.com>
 References: <20171212190134.535941-1-tj@kernel.org>
 	 <20171212190134.535941-3-tj@kernel.org> <1513277469.2475.43.camel@wdc.com>
-	 <20171214202042.GG3326@worktop>
-In-Reply-To: <20171214202042.GG3326@worktop>
+	 <20171214191935.GB3919388@devbig577.frc2.facebook.com>
+In-Reply-To: <20171214191935.GB3919388@devbig577.frc2.facebook.com>
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVGh1LCAyMDE3LTEyLTE0IGF0IDIxOjIwICswMTAwLCBQZXRlciBaaWpsc3RyYSB3cm90ZToN
-Cj4gT24gVGh1LCBEZWMgMTQsIDIwMTcgYXQgMDY6NTE6MTFQTSArMDAwMCwgQmFydCBWYW4gQXNz
-Y2hlIHdyb3RlOg0KPiA+IE9uIFR1ZSwgMjAxNy0xMi0xMiBhdCAxMTowMSAtMDgwMCwgVGVqdW4g
-SGVvIHdyb3RlOg0KPiA+ID4gKwl3cml0ZV9zZXFjb3VudF9iZWdpbigmcnEtPmdzdGF0ZV9zZXEp
-Ow0KPiA+ID4gKwlibGtfbXFfcnFfdXBkYXRlX3N0YXRlKHJxLCBNUV9SUV9JTl9GTElHSFQpOw0K
-PiA+ID4gKwlibGtfYWRkX3RpbWVyKHJxKTsNCj4gPiA+ICsJd3JpdGVfc2VxY291bnRfZW5kKCZy
-cS0+Z3N0YXRlX3NlcSk7DQo+ID4gDQo+ID4gTXkgdW5kZXJzdGFuZGluZyBpcyB0aGF0IGJvdGgg
-d3JpdGVfc2VxY291bnRfYmVnaW4oKSBhbmQgd3JpdGVfc2VxY291bnRfZW5kKCkNCj4gPiB0cmln
-Z2VyIGEgd3JpdGUgbWVtb3J5IGJhcnJpZXIuIElzIGEgc2VxY291bnQgcmVhbGx5IGZhc3RlciB0
-aGFuIGEgc3BpbmxvY2s/DQo+IA0KPiBZZXMgbG90cywgbm8gYXRvbWljIG9wZXJhdGlvbnMgYW5k
-IG5vIHdhaXRpbmcuDQo+IA0KPiBUaGUgb25seSBjb25zdHJhaW50IGZvciB3cml0ZV9zZXFsb2Nr
-IGlzIHRoYXQgdGhlcmUgbXVzdCBub3QgYmUgYW55DQo+IGNvbmN1cnJlbmN5Lg0KPiANCj4gQnV0
-IG5vdyB0aGF0IEkgbG9vayBhdCB0aGlzIGFnYWluLCBUSiwgd2h5IGNhbid0IHRoZSBiZWxvdyBo
-YXBwZW4/DQo+IA0KPiAJd3JpdGVfc2VxbG9ja19iZWdpbigpOw0KPiAJYmxrX21xX3JxX3VwZGF0
-ZV9zdGF0ZShycSwgSU5fRkxJR0hUKTsNCj4gCWJsa19hZGRfdGltZXIocnEpOw0KPiAJPHRpbWVy
-LWlycT4NCj4gCQlyZWFkX3NlcWNvdW50X2JlZ2luKCkNCj4gCQkJd2hpbGUgKHNlcSAmIDEpDQo+
-IAkJCQljcHVyZWxheCgpOw0KPiAJCS8vIGxpZmUtbG9jaw0KPiAJPC90aW1lci1pcnE+DQo+IAl3
-cml0ZV9zZXFsb2NrX2VuZCgpOw0KDQpIZWxsbyBQZXRlciwNCg0KU29tZSB0aW1lIGFnbyB0aGUg
-YmxvY2sgbGF5ZXIgd2FzIGNoYW5nZWQgdG8gaGFuZGxlIHRpbWVvdXRzIGluIHRocmVhZCBjb250
-ZXh0DQppbnN0ZWFkIG9mIGludGVycnVwdCBjb250ZXh0LiBTZWUgYWxzbyBjb21taXQgMjg3OTIy
-ZWIwYjE4ICgiYmxvY2s6IGRlZmVyDQp0aW1lb3V0cyB0byBhIHdvcmtxdWV1ZSIpLg0KDQpCYXJ0
-Lg==
+T24gVGh1LCAyMDE3LTEyLTE0IGF0IDExOjE5IC0wODAwLCB0akBrZXJuZWwub3JnIHdyb3RlOg0K
+PiBPbiBUaHUsIERlYyAxNCwgMjAxNyBhdCAwNjo1MToxMVBNICswMDAwLCBCYXJ0IFZhbiBBc3Nj
+aGUgd3JvdGU6DQo+ID4gT24gVHVlLCAyMDE3LTEyLTEyIGF0IDExOjAxIC0wODAwLCBUZWp1biBI
+ZW8gd3JvdGU6DQo+ID4gPiAtLS0gYS9ibG9jay9ibGstY29yZS5jDQo+ID4gPiArKysgYi9ibG9j
+ay9ibGstY29yZS5jDQo+ID4gPiBAQCAtMTI2LDYgKzEyNiw4IEBAIHZvaWQgYmxrX3JxX2luaXQo
+c3RydWN0IHJlcXVlc3RfcXVldWUgKnEsIHN0cnVjdCByZXF1ZXN0ICpycSkNCj4gPiA+ICAJcnEt
+PnN0YXJ0X3RpbWUgPSBqaWZmaWVzOw0KPiA+ID4gIAlzZXRfc3RhcnRfdGltZV9ucyhycSk7DQo+
+ID4gPiAgCXJxLT5wYXJ0ID0gTlVMTDsNCj4gPiA+ICsJc2VxY291bnRfaW5pdCgmcnEtPmdzdGF0
+ZV9zZXEpOw0KPiA+ID4gKwl1NjRfc3RhdHNfaW5pdCgmcnEtPmFib3J0ZWRfZ3N0YXRlX3N5bmMp
+Ow0KPiA+ID4gIH0NCj4gPiA+ICBFWFBPUlRfU1lNQk9MKGJsa19ycV9pbml0KTsNCj4gPiANCj4g
+PiBTb3JyeSBidXQgdGhlIGFib3ZlIGNoYW5nZSBsb29rcyB1Z2x5IHRvIG1lLiBNeSB1bmRlcnN0
+YW5kaW5nIGlzIHRoYXQgDQo+ID4gYmxrX3JxX2luaXQoKSBpcyBvbmx5IHVzZWQgaW5zaWRlIHRo
+ZSBibG9jayBsYXllciB0byBpbml0aWFsaXplIGxlZ2FjeSBibG9jaw0KPiA+IGxheWVyIHJlcXVl
+c3RzIHdoaWxlIGdzdGF0ZV9zZXEgYW5kIGFib3J0ZWRfZ3N0YXRlX3N5bmMgYXJlIG9ubHkgcmVs
+ZXZhbnQNCj4gPiBmb3IgYmxrLW1xIHJlcXVlc3RzLiBXb3VsZG4ndCBpdCBiZSBiZXR0ZXIgdG8g
+YXZvaWQgdGhhdCBibGtfcnFfaW5pdCgpIGlzDQo+ID4gY2FsbGVkIGZvciBibGstbXEgcmVxdWVz
+dHMgc3VjaCB0aGF0IHRoZSBhYm92ZSBjaGFuZ2UgY2FuIGJlIGxlZnQgb3V0PyBUaGUNCj4gPiBv
+bmx5IGNhbGxlcnMgb3V0c2lkZSB0aGUgYmxvY2sgbGF5ZXIgY29yZSBvZiBibGtfcnFfaW5pdCgp
+IEkga25vdyBvZiBhcmUNCj4gPiBpZGVfcHJlcF9zZW5zZSgpIGFuZCBzY3NpX2lvY3RsX3Jlc2V0
+KCkuIEkgY2FuIGhlbHAgd2l0aCBjb252ZXJ0aW5nIHRoZSBTQ1NJDQo+ID4gY29kZSBpZiB5b3Ug
+d2FudC4NCj4gDQo+IFRoaXMgaXMgYWxzbyB1c2VkIGJ5IGZsdXNoIHBhdGguICBXZSBwcm9iYWJs
+eSBzaG91bGQgY2xlYW4gdGhhdCB1cCwNCj4gYnV0IGxldCdzIHdvcnJ5IGFib3V0IHRoYXQgbGF0
+ZXIgY3V6IGZsdXNoIGhhbmRsaW5nIGhhcyBlbm91Z2ggb2YgaXRzDQo+IG93biBjb21wbGljYXRp
+b25zLg0KDQpXZSBtYXkgaGF2ZSBhIGRpZmZlcmVudCBvcGluaW9uIGFib3V0IHRoaXMgYnV0IEkg
+dGhpbmsgaXQgaXMgbW9yZSB0aGFuIGENCmRldGFpbC4gVGhpcyBwYXRjaCBuZWVkcyBnc3RhdGVf
+c2VxIGFuZCBhYm9ydGVkX2dzdGF0ZV9zeW5jIHRvIGJlIHByZXNlcnZlZA0KYWNyb3NzIHJlcXVl
+c3Qgc3RhdGUgdHJhbnNpdGlvbnMgZnJvbSBNUV9SUV9JTl9GTElHSFQgdG8gTVJfUlFfSURMRS4N
+CmJsa19tcV9pbml0X3JlcXVlc3QoKSBpcyBjYWxsZWQgYXQgcmVxdWVzdCBhbGxvY2F0aW9uIHRp
+bWUgc28gaXQncyB0aGUgcmlnaHQNCmNvbnRleHQgdG8gaW5pdGlhbGl6ZSBnc3RhdGVfc2VxIGFu
+ZCBhYm9ydGVkX2dzdGF0ZV9zeW5jLiBibGtfcnFfaW5pdCgpDQpob3dldmVyIGlzIGNhbGxlZCBi
+ZWZvcmUgYSBldmVyeSB1c2Ugb2YgYSByZXF1ZXN0LiBTb3JyeSBidXQgSSdtIG5vdA0KZW50aHVz
+aWFzdCBhYm91dCB0aGUgY29kZSBpbiBibGtfcnFfaW5pdCgpIHRoYXQgcmVpbml0aWFsaXplcyBz
+dGF0ZQ0KaW5mb3JtYXRpb24gdGhhdCBzaG91bGQgc3Vydml2ZSByZXF1ZXN0IHJldXNlLg0KDQpC
+YXJ0Lg==
