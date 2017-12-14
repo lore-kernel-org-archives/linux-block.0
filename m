@@ -1,55 +1,49 @@
-Return-Path: <prvs=514719b63=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "tj@kernel.org" <tj@kernel.org>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"peterz@infradead.org" <peterz@infradead.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "kernel-team@fb.com" <kernel-team@fb.com>,
+Return-Path: <peterz@infradead.org>
+Date: Thu, 14 Dec 2017 21:20:42 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "tj@kernel.org" <tj@kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"kernel-team@fb.com" <kernel-team@fb.com>,
 	"oleg@redhat.com" <oleg@redhat.com>, "hch@lst.de" <hch@lst.de>,
-	"axboe@kernel.dk" <axboe@kernel.dk>, "jianchao.w.wang@oracle.com"
-	<jianchao.w.wang@oracle.com>, "osandov@fb.com" <osandov@fb.com>
+	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
+	"osandov@fb.com" <osandov@fb.com>
 Subject: Re: [PATCH 2/6] blk-mq: replace timeout synchronization with a RCU
  and generation based scheme
-Date: Thu, 14 Dec 2017 21:13:32 +0000
-Message-ID: <1513286010.2475.58.camel@wdc.com>
+Message-ID: <20171214202042.GG3326@worktop>
 References: <20171212190134.535941-1-tj@kernel.org>
-	 <20171212190134.535941-3-tj@kernel.org> <1513277469.2475.43.camel@wdc.com>
-	 <20171214191935.GB3919388@devbig577.frc2.facebook.com>
-In-Reply-To: <20171214191935.GB3919388@devbig577.frc2.facebook.com>
-Content-Type: text/plain; charset="utf-8"
+ <20171212190134.535941-3-tj@kernel.org>
+ <1513277469.2475.43.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1513277469.2475.43.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVGh1LCAyMDE3LTEyLTE0IGF0IDExOjE5IC0wODAwLCB0akBrZXJuZWwub3JnIHdyb3RlOg0K
-PiBPbiBUaHUsIERlYyAxNCwgMjAxNyBhdCAwNjo1MToxMVBNICswMDAwLCBCYXJ0IFZhbiBBc3Nj
-aGUgd3JvdGU6DQo+ID4gT24gVHVlLCAyMDE3LTEyLTEyIGF0IDExOjAxIC0wODAwLCBUZWp1biBI
-ZW8gd3JvdGU6DQo+ID4gPiAtLS0gYS9ibG9jay9ibGstY29yZS5jDQo+ID4gPiArKysgYi9ibG9j
-ay9ibGstY29yZS5jDQo+ID4gPiBAQCAtMTI2LDYgKzEyNiw4IEBAIHZvaWQgYmxrX3JxX2luaXQo
-c3RydWN0IHJlcXVlc3RfcXVldWUgKnEsIHN0cnVjdCByZXF1ZXN0ICpycSkNCj4gPiA+ICAJcnEt
-PnN0YXJ0X3RpbWUgPSBqaWZmaWVzOw0KPiA+ID4gIAlzZXRfc3RhcnRfdGltZV9ucyhycSk7DQo+
-ID4gPiAgCXJxLT5wYXJ0ID0gTlVMTDsNCj4gPiA+ICsJc2VxY291bnRfaW5pdCgmcnEtPmdzdGF0
-ZV9zZXEpOw0KPiA+ID4gKwl1NjRfc3RhdHNfaW5pdCgmcnEtPmFib3J0ZWRfZ3N0YXRlX3N5bmMp
-Ow0KPiA+ID4gIH0NCj4gPiA+ICBFWFBPUlRfU1lNQk9MKGJsa19ycV9pbml0KTsNCj4gPiANCj4g
-PiBTb3JyeSBidXQgdGhlIGFib3ZlIGNoYW5nZSBsb29rcyB1Z2x5IHRvIG1lLiBNeSB1bmRlcnN0
-YW5kaW5nIGlzIHRoYXQgDQo+ID4gYmxrX3JxX2luaXQoKSBpcyBvbmx5IHVzZWQgaW5zaWRlIHRo
-ZSBibG9jayBsYXllciB0byBpbml0aWFsaXplIGxlZ2FjeSBibG9jaw0KPiA+IGxheWVyIHJlcXVl
-c3RzIHdoaWxlIGdzdGF0ZV9zZXEgYW5kIGFib3J0ZWRfZ3N0YXRlX3N5bmMgYXJlIG9ubHkgcmVs
-ZXZhbnQNCj4gPiBmb3IgYmxrLW1xIHJlcXVlc3RzLiBXb3VsZG4ndCBpdCBiZSBiZXR0ZXIgdG8g
-YXZvaWQgdGhhdCBibGtfcnFfaW5pdCgpIGlzDQo+ID4gY2FsbGVkIGZvciBibGstbXEgcmVxdWVz
-dHMgc3VjaCB0aGF0IHRoZSBhYm92ZSBjaGFuZ2UgY2FuIGJlIGxlZnQgb3V0PyBUaGUNCj4gPiBv
-bmx5IGNhbGxlcnMgb3V0c2lkZSB0aGUgYmxvY2sgbGF5ZXIgY29yZSBvZiBibGtfcnFfaW5pdCgp
-IEkga25vdyBvZiBhcmUNCj4gPiBpZGVfcHJlcF9zZW5zZSgpIGFuZCBzY3NpX2lvY3RsX3Jlc2V0
-KCkuIEkgY2FuIGhlbHAgd2l0aCBjb252ZXJ0aW5nIHRoZSBTQ1NJDQo+ID4gY29kZSBpZiB5b3Ug
-d2FudC4NCj4gDQo+IFRoaXMgaXMgYWxzbyB1c2VkIGJ5IGZsdXNoIHBhdGguICBXZSBwcm9iYWJs
-eSBzaG91bGQgY2xlYW4gdGhhdCB1cCwNCj4gYnV0IGxldCdzIHdvcnJ5IGFib3V0IHRoYXQgbGF0
-ZXIgY3V6IGZsdXNoIGhhbmRsaW5nIGhhcyBlbm91Z2ggb2YgaXRzDQo+IG93biBjb21wbGljYXRp
-b25zLg0KDQpXZSBtYXkgaGF2ZSBhIGRpZmZlcmVudCBvcGluaW9uIGFib3V0IHRoaXMgYnV0IEkg
-dGhpbmsgaXQgaXMgbW9yZSB0aGFuIGENCmRldGFpbC4gVGhpcyBwYXRjaCBuZWVkcyBnc3RhdGVf
-c2VxIGFuZCBhYm9ydGVkX2dzdGF0ZV9zeW5jIHRvIGJlIHByZXNlcnZlZA0KYWNyb3NzIHJlcXVl
-c3Qgc3RhdGUgdHJhbnNpdGlvbnMgZnJvbSBNUV9SUV9JTl9GTElHSFQgdG8gTVJfUlFfSURMRS4N
-CmJsa19tcV9pbml0X3JlcXVlc3QoKSBpcyBjYWxsZWQgYXQgcmVxdWVzdCBhbGxvY2F0aW9uIHRp
-bWUgc28gaXQncyB0aGUgcmlnaHQNCmNvbnRleHQgdG8gaW5pdGlhbGl6ZSBnc3RhdGVfc2VxIGFu
-ZCBhYm9ydGVkX2dzdGF0ZV9zeW5jLiBibGtfcnFfaW5pdCgpDQpob3dldmVyIGlzIGNhbGxlZCBi
-ZWZvcmUgYSBldmVyeSB1c2Ugb2YgYSByZXF1ZXN0LiBTb3JyeSBidXQgSSdtIG5vdA0KZW50aHVz
-aWFzdCBhYm91dCB0aGUgY29kZSBpbiBibGtfcnFfaW5pdCgpIHRoYXQgcmVpbml0aWFsaXplcyBz
-dGF0ZQ0KaW5mb3JtYXRpb24gdGhhdCBzaG91bGQgc3Vydml2ZSByZXF1ZXN0IHJldXNlLg0KDQpC
-YXJ0Lg==
+On Thu, Dec 14, 2017 at 06:51:11PM +0000, Bart Van Assche wrote:
+> On Tue, 2017-12-12 at 11:01 -0800, Tejun Heo wrote:
+> > +	write_seqcount_begin(&rq->gstate_seq);
+> > +	blk_mq_rq_update_state(rq, MQ_RQ_IN_FLIGHT);
+> > +	blk_add_timer(rq);
+> > +	write_seqcount_end(&rq->gstate_seq);
+> 
+> My understanding is that both write_seqcount_begin() and write_seqcount_end()
+> trigger a write memory barrier. Is a seqcount really faster than a spinlock?
+
+Yes lots, no atomic operations and no waiting.
+
+The only constraint for write_seqlock is that there must not be any
+concurrency.
+
+But now that I look at this again, TJ, why can't the below happen?
+
+	write_seqlock_begin();
+	blk_mq_rq_update_state(rq, IN_FLIGHT);
+	blk_add_timer(rq);
+	<timer-irq>
+		read_seqcount_begin()
+			while (seq & 1)
+				cpurelax();
+		// life-lock
+	</timer-irq>
+	write_seqlock_end();
