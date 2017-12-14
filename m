@@ -1,28 +1,122 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from verein.lst.de ([213.95.11.211]:51935 "EHLO newverein.lst.de"
+Received: from mx1.redhat.com ([209.132.183.28]:59620 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754665AbdL2J66 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Dec 2017 04:58:58 -0500
-Date: Fri, 29 Dec 2017 10:58:56 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
+        id S1751101AbdLNCcR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Dec 2017 21:32:17 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
         Keith Busch <keith.busch@intel.com>,
         Sagi Grimberg <sagi@grimberg.me>,
         Yi Zhang <yi.zhang@redhat.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: Re: [PATCH V2 3/6] blk-mq: quiesce queue during switching io sched
-        and updating nr_requests
-Message-ID: <20171229095856.GC24507@lst.de>
-References: <20171214023103.18272-1-ming.lei@redhat.com> <20171214023103.18272-4-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171214023103.18272-4-ming.lei@redhat.com>
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 3/6] blk-mq: quiesce queue during switching io sched and updating nr_requests
+Date: Thu, 14 Dec 2017 10:31:00 +0800
+Message-Id: <20171214023103.18272-4-ming.lei@redhat.com>
+In-Reply-To: <20171214023103.18272-1-ming.lei@redhat.com>
+References: <20171214023103.18272-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Looks good,
+Dispatch may still be in-progress after queue is frozen, so we have to
+quiesce queue before switching IO scheduler and updating nr_requests.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Also when switching io schedulers, blk_mq_run_hw_queue() may still be
+called somewhere(such as from nvme_reset_work()), and io scheduler's
+per-hctx data may not be setup yet, so cause oops even inside
+blk_mq_hctx_has_pending(), such as it can be run just between:
+
+        ret = e->ops.mq.init_sched(q, e);
+AND
+        ret = e->ops.mq.init_hctx(hctx, i)
+
+inside blk_mq_init_sched().
+
+This reverts commit 7a148c2fcff8330(block: don't call blk_mq_quiesce_queue()
+after queue is frozen) basically, and makes sure blk_mq_hctx_has_pending
+won't be called if queue is quiesced.
+
+Fixes: 7a148c2fcff83309(block: don't call blk_mq_quiesce_queue() after queue is frozen)
+Reported-by: Yi Zhang <yi.zhang@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c   | 27 ++++++++++++++++++++++++++-
+ block/elevator.c |  2 ++
+ 2 files changed, 28 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 5d69c8075339..85954a0b4394 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1296,7 +1296,30 @@ EXPORT_SYMBOL(blk_mq_delay_run_hw_queue);
+ 
+ bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ {
+-	if (blk_mq_hctx_has_pending(hctx)) {
++	int srcu_idx;
++	bool need_run;
++
++	/*
++	 * When queue is quiesced, we may be switching io scheduler, or
++	 * updating nr_hw_queues, or other things, and we can't run queue
++	 * any more, even __blk_mq_hctx_has_pending() can't be called safely.
++	 *
++	 * And queue will be rerun in blk_mq_unquiesce_queue() if it is
++	 * quiesced.
++	 */
++	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
++		rcu_read_lock();
++		need_run = !blk_queue_quiesced(hctx->queue) &&
++			blk_mq_hctx_has_pending(hctx);
++		rcu_read_unlock();
++	} else {
++		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
++		need_run = !blk_queue_quiesced(hctx->queue) &&
++			blk_mq_hctx_has_pending(hctx);
++		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
++	}
++
++	if (need_run) {
+ 		__blk_mq_delay_run_hw_queue(hctx, async, 0);
+ 		return true;
+ 	}
+@@ -2721,6 +2744,7 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+ 		return -EINVAL;
+ 
+ 	blk_mq_freeze_queue(q);
++	blk_mq_quiesce_queue(q);
+ 
+ 	ret = 0;
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+@@ -2744,6 +2768,7 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+ 	if (!ret)
+ 		q->nr_requests = nr;
+ 
++	blk_mq_unquiesce_queue(q);
+ 	blk_mq_unfreeze_queue(q);
+ 
+ 	return ret;
+diff --git a/block/elevator.c b/block/elevator.c
+index 7bda083d5968..138faeb08a7c 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -968,6 +968,7 @@ static int elevator_switch_mq(struct request_queue *q,
+ 	int ret;
+ 
+ 	blk_mq_freeze_queue(q);
++	blk_mq_quiesce_queue(q);
+ 
+ 	if (q->elevator) {
+ 		if (q->elevator->registered)
+@@ -994,6 +995,7 @@ static int elevator_switch_mq(struct request_queue *q,
+ 		blk_add_trace_msg(q, "elv switch: none");
+ 
+ out:
++	blk_mq_unquiesce_queue(q);
+ 	blk_mq_unfreeze_queue(q);
+ 	return ret;
+ }
+-- 
+2.9.5
