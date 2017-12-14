@@ -1,54 +1,29 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 14 Dec 2017 11:26:26 -0800
-From: "tj@kernel.org" <tj@kernel.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "axboe@kernel.dk" <axboe@kernel.dk>,
-	"kernel-team@fb.com" <kernel-team@fb.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"peterz@infradead.org" <peterz@infradead.org>,
-	"osandov@fb.com" <osandov@fb.com>,
+Return-Path: <prvs=514719b63=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "tj@kernel.org" <tj@kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "kernel-team@fb.com" <kernel-team@fb.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "peterz@infradead.org"
+	<peterz@infradead.org>, "osandov@fb.com" <osandov@fb.com>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	"oleg@redhat.com" <oleg@redhat.com>, "hch@lst.de" <hch@lst.de>
 Subject: Re: [PATCH 4/6] blk-mq: make blk_abort_request() trigger timeout path
-Message-ID: <20171214192626.GC3919388@devbig577.frc2.facebook.com>
+Date: Thu, 14 Dec 2017 18:56:55 +0000
+Message-ID: <1513277814.2475.45.camel@wdc.com>
 References: <20171212190134.535941-1-tj@kernel.org>
- <20171212190134.535941-5-tj@kernel.org>
- <1513277814.2475.45.camel@wdc.com>
+	 <20171212190134.535941-5-tj@kernel.org>
+In-Reply-To: <20171212190134.535941-5-tj@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1513277814.2475.45.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello,
-
-On Thu, Dec 14, 2017 at 06:56:55PM +0000, Bart Van Assche wrote:
-> On Tue, 2017-12-12 at 11:01 -0800, Tejun Heo wrote:
-> >  void blk_abort_request(struct request *req)
-> >  {
-> > -	if (blk_mark_rq_complete(req))
-> > -		return;
-> >  
-> >  	if (req->q->mq_ops) {
-> > -		blk_mq_rq_timed_out(req, false);
-> > +		req->deadline = jiffies;
-> > +		mod_timer(&req->q->timeout, 0);
-> >  	} else {
-> > +		if (blk_mark_rq_complete(req))
-> > +			return;
-> >  		blk_delete_timer(req);
-> >  		blk_rq_timed_out(req);
-> >  	}
-> 
-> This patch makes blk_abort_request() asynchronous for blk-mq. Have all callers
-> been audited to verify whether this change is safe?
-
-I *think* so.  For all the ata related parts, I know they're.
-mtip32xx and dasd_ioctl, it seems safe, but I can't tell for sure.
-Will cc the respective maintainers on the next posting.
-
-Thanks.
-
--- 
-tejun
+T24gVHVlLCAyMDE3LTEyLTEyIGF0IDExOjAxIC0wODAwLCBUZWp1biBIZW8gd3JvdGU6DQo+ICB2
+b2lkIGJsa19hYm9ydF9yZXF1ZXN0KHN0cnVjdCByZXF1ZXN0ICpyZXEpDQo+ICB7DQo+IC0JaWYg
+KGJsa19tYXJrX3JxX2NvbXBsZXRlKHJlcSkpDQo+IC0JCXJldHVybjsNCj4gIA0KPiAgCWlmIChy
+ZXEtPnEtPm1xX29wcykgew0KPiAtCQlibGtfbXFfcnFfdGltZWRfb3V0KHJlcSwgZmFsc2UpOw0K
+PiArCQlyZXEtPmRlYWRsaW5lID0gamlmZmllczsNCj4gKwkJbW9kX3RpbWVyKCZyZXEtPnEtPnRp
+bWVvdXQsIDApOw0KPiAgCX0gZWxzZSB7DQo+ICsJCWlmIChibGtfbWFya19ycV9jb21wbGV0ZShy
+ZXEpKQ0KPiArCQkJcmV0dXJuOw0KPiAgCQlibGtfZGVsZXRlX3RpbWVyKHJlcSk7DQo+ICAJCWJs
+a19ycV90aW1lZF9vdXQocmVxKTsNCj4gIAl9DQoNClRoaXMgcGF0Y2ggbWFrZXMgYmxrX2Fib3J0
+X3JlcXVlc3QoKSBhc3luY2hyb25vdXMgZm9yIGJsay1tcS4gSGF2ZSBhbGwgY2FsbGVycw0KYmVl
+biBhdWRpdGVkIHRvIHZlcmlmeSB3aGV0aGVyIHRoaXMgY2hhbmdlIGlzIHNhZmU/DQoNClRoYW5r
+cywNCg0KQmFydC4=
