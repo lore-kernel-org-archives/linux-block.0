@@ -1,112 +1,79 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 14 Dec 2017 11:19:35 -0800
-From: "tj@kernel.org" <tj@kernel.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "axboe@kernel.dk" <axboe@kernel.dk>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"peterz@infradead.org" <peterz@infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"kernel-team@fb.com" <kernel-team@fb.com>,
+Return-Path: <prvs=514719b63=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "tj@kernel.org" <tj@kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"peterz@infradead.org" <peterz@infradead.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "kernel-team@fb.com" <kernel-team@fb.com>,
 	"oleg@redhat.com" <oleg@redhat.com>, "hch@lst.de" <hch@lst.de>,
-	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
-	"osandov@fb.com" <osandov@fb.com>
+	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>, "osandov@fb.com"
+	<osandov@fb.com>
 Subject: Re: [PATCH 2/6] blk-mq: replace timeout synchronization with a RCU
  and generation based scheme
-Message-ID: <20171214191935.GB3919388@devbig577.frc2.facebook.com>
+Date: Thu, 14 Dec 2017 18:51:11 +0000
+Message-ID: <1513277469.2475.43.camel@wdc.com>
 References: <20171212190134.535941-1-tj@kernel.org>
- <20171212190134.535941-3-tj@kernel.org>
- <1513277469.2475.43.camel@wdc.com>
+	 <20171212190134.535941-3-tj@kernel.org>
+In-Reply-To: <20171212190134.535941-3-tj@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1513277469.2475.43.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello,
-
-On Thu, Dec 14, 2017 at 06:51:11PM +0000, Bart Van Assche wrote:
-> On Tue, 2017-12-12 at 11:01 -0800, Tejun Heo wrote:
-> > rules.  Unfortunatley, it contains quite a few holes.
->           ^^^^^^^^^^^^^
->           Unfortunately?
-> 
-> > While this change makes REQ_ATOM_COMPLETE synchornization unnecessary
->                                             ^^^^^^^^^^^^^^^
->                                             synchronization?
-
-lol, believe it or not, my english spelling is a lot better than my
-korean.  Will fix them.
-
-> > --- a/block/blk-core.c
-> > +++ b/block/blk-core.c
-> > @@ -126,6 +126,8 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
-> >  	rq->start_time = jiffies;
-> >  	set_start_time_ns(rq);
-> >  	rq->part = NULL;
-> > +	seqcount_init(&rq->gstate_seq);
-> > +	u64_stats_init(&rq->aborted_gstate_sync);
-> >  }
-> >  EXPORT_SYMBOL(blk_rq_init);
-> 
-> Sorry but the above change looks ugly to me. My understanding is that 
-> blk_rq_init() is only used inside the block layer to initialize legacy block
-> layer requests while gstate_seq and aborted_gstate_sync are only relevant
-> for blk-mq requests. Wouldn't it be better to avoid that blk_rq_init() is
-> called for blk-mq requests such that the above change can be left out? The
-> only callers outside the block layer core of blk_rq_init() I know of are
-> ide_prep_sense() and scsi_ioctl_reset(). I can help with converting the SCSI
-> code if you want.
-
-This is also used by flush path.  We probably should clean that up,
-but let's worry about that later cuz flush handling has enough of its
-own complications.
-
-> > +	write_seqcount_begin(&rq->gstate_seq);
-> > +	blk_mq_rq_update_state(rq, MQ_RQ_IN_FLIGHT);
-> > +	blk_add_timer(rq);
-> > +	write_seqcount_end(&rq->gstate_seq);
-> 
-> My understanding is that both write_seqcount_begin() and write_seqcount_end()
-> trigger a write memory barrier. Is a seqcount really faster than a spinlock?
-
-Write memory barrier has no cost on x86 and usually pretty low cost
-elsewhere too and they're likely in the same cacheline as other rq
-fields.
-
-> > @@ -792,6 +811,14 @@ void blk_mq_rq_timed_out(struct request *req, bool reserved)
-> >  		__blk_mq_complete_request(req);
-> >  		break;
-> >  	case BLK_EH_RESET_TIMER:
-> > +		/*
-> > +		 * As nothing prevents from completion happening while
-> > +		 * ->aborted_gstate is set, this may lead to ignored
-> > +		 * completions and further spurious timeouts.
-> > +		 */
-> > +		u64_stats_update_begin(&req->aborted_gstate_sync);
-> > +		req->aborted_gstate = 0;
-> > +		u64_stats_update_end(&req->aborted_gstate_sync);
-> 
-> If a blk-mq request is resubmitted 2**62 times, can that result in the above
-> code setting aborted_gstate to the same value as gstate? Isn't that a bug?
-> If so, how about setting aborted_gstate in the above code to e.g. gstate ^ (2**63)?
-
-A request gets aborted only if the state is in-flight, 0 isn't that.
-Also, how many years would 2^62 times be?
-
-> > +	struct u64_stats_sync aborted_gstate_sync;
-> > +	u64 aborted_gstate;
-> > +
-> >  	unsigned long deadline;
-> >  	struct list_head timeout_list;
-> 
-> Why are gstate and aborted_gstate 64-bit variables? What makes you think that
-> 32 bits would not be enough?
-
-Because 32 bits puts it in the rance where a false hit is still
-theoretically possible in a reasonable amount of time.
-
-Thanks.
-
--- 
-tejun
+T24gVHVlLCAyMDE3LTEyLTEyIGF0IDExOjAxIC0wODAwLCBUZWp1biBIZW8gd3JvdGU6DQo+IHJ1
+bGVzLiAgVW5mb3J0dW5hdGxleSwgaXQgY29udGFpbnMgcXVpdGUgYSBmZXcgaG9sZXMuDQogICAg
+ICAgICAgXl5eXl5eXl5eXl5eXg0KICAgICAgICAgIFVuZm9ydHVuYXRlbHk/DQoNCj4gV2hpbGUg
+dGhpcyBjaGFuZ2UgbWFrZXMgUkVRX0FUT01fQ09NUExFVEUgc3luY2hvcm5pemF0aW9uIHVubmVj
+ZXNzYXJ5DQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5eXl5e
+Xl5eXl5eXl5eXg0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBz
+eW5jaHJvbml6YXRpb24/DQoNCj4gLS0tIGEvYmxvY2svYmxrLWNvcmUuYw0KPiArKysgYi9ibG9j
+ay9ibGstY29yZS5jDQo+IEBAIC0xMjYsNiArMTI2LDggQEAgdm9pZCBibGtfcnFfaW5pdChzdHJ1
+Y3QgcmVxdWVzdF9xdWV1ZSAqcSwgc3RydWN0IHJlcXVlc3QgKnJxKQ0KPiAgCXJxLT5zdGFydF90
+aW1lID0gamlmZmllczsNCj4gIAlzZXRfc3RhcnRfdGltZV9ucyhycSk7DQo+ICAJcnEtPnBhcnQg
+PSBOVUxMOw0KPiArCXNlcWNvdW50X2luaXQoJnJxLT5nc3RhdGVfc2VxKTsNCj4gKwl1NjRfc3Rh
+dHNfaW5pdCgmcnEtPmFib3J0ZWRfZ3N0YXRlX3N5bmMpOw0KPiAgfQ0KPiAgRVhQT1JUX1NZTUJP
+TChibGtfcnFfaW5pdCk7DQoNClNvcnJ5IGJ1dCB0aGUgYWJvdmUgY2hhbmdlIGxvb2tzIHVnbHkg
+dG8gbWUuIE15IHVuZGVyc3RhbmRpbmcgaXMgdGhhdCANCmJsa19ycV9pbml0KCkgaXMgb25seSB1
+c2VkIGluc2lkZSB0aGUgYmxvY2sgbGF5ZXIgdG8gaW5pdGlhbGl6ZSBsZWdhY3kgYmxvY2sNCmxh
+eWVyIHJlcXVlc3RzIHdoaWxlIGdzdGF0ZV9zZXEgYW5kIGFib3J0ZWRfZ3N0YXRlX3N5bmMgYXJl
+IG9ubHkgcmVsZXZhbnQNCmZvciBibGstbXEgcmVxdWVzdHMuIFdvdWxkbid0IGl0IGJlIGJldHRl
+ciB0byBhdm9pZCB0aGF0IGJsa19ycV9pbml0KCkgaXMNCmNhbGxlZCBmb3IgYmxrLW1xIHJlcXVl
+c3RzIHN1Y2ggdGhhdCB0aGUgYWJvdmUgY2hhbmdlIGNhbiBiZSBsZWZ0IG91dD8gVGhlDQpvbmx5
+IGNhbGxlcnMgb3V0c2lkZSB0aGUgYmxvY2sgbGF5ZXIgY29yZSBvZiBibGtfcnFfaW5pdCgpIEkg
+a25vdyBvZiBhcmUNCmlkZV9wcmVwX3NlbnNlKCkgYW5kIHNjc2lfaW9jdGxfcmVzZXQoKS4gSSBj
+YW4gaGVscCB3aXRoIGNvbnZlcnRpbmcgdGhlIFNDU0kNCmNvZGUgaWYgeW91IHdhbnQuDQoNCj4g
+Kwl3cml0ZV9zZXFjb3VudF9iZWdpbigmcnEtPmdzdGF0ZV9zZXEpOw0KPiArCWJsa19tcV9ycV91
+cGRhdGVfc3RhdGUocnEsIE1RX1JRX0lOX0ZMSUdIVCk7DQo+ICsJYmxrX2FkZF90aW1lcihycSk7
+DQo+ICsJd3JpdGVfc2VxY291bnRfZW5kKCZycS0+Z3N0YXRlX3NlcSk7DQoNCk15IHVuZGVyc3Rh
+bmRpbmcgaXMgdGhhdCBib3RoIHdyaXRlX3NlcWNvdW50X2JlZ2luKCkgYW5kIHdyaXRlX3NlcWNv
+dW50X2VuZCgpDQp0cmlnZ2VyIGEgd3JpdGUgbWVtb3J5IGJhcnJpZXIuIElzIGEgc2VxY291bnQg
+cmVhbGx5IGZhc3RlciB0aGFuIGEgc3BpbmxvY2s/DQoNCj4gDQo+IEBAIC03OTIsNiArODExLDE0
+IEBAIHZvaWQgYmxrX21xX3JxX3RpbWVkX291dChzdHJ1Y3QgcmVxdWVzdCAqcmVxLCBib29sIHJl
+c2VydmVkKQ0KPiAgCQlfX2Jsa19tcV9jb21wbGV0ZV9yZXF1ZXN0KHJlcSk7DQo+ICAJCWJyZWFr
+Ow0KPiAgCWNhc2UgQkxLX0VIX1JFU0VUX1RJTUVSOg0KPiArCQkvKg0KPiArCQkgKiBBcyBub3Ro
+aW5nIHByZXZlbnRzIGZyb20gY29tcGxldGlvbiBoYXBwZW5pbmcgd2hpbGUNCj4gKwkJICogLT5h
+Ym9ydGVkX2dzdGF0ZSBpcyBzZXQsIHRoaXMgbWF5IGxlYWQgdG8gaWdub3JlZA0KPiArCQkgKiBj
+b21wbGV0aW9ucyBhbmQgZnVydGhlciBzcHVyaW91cyB0aW1lb3V0cy4NCj4gKwkJICovDQo+ICsJ
+CXU2NF9zdGF0c191cGRhdGVfYmVnaW4oJnJlcS0+YWJvcnRlZF9nc3RhdGVfc3luYyk7DQo+ICsJ
+CXJlcS0+YWJvcnRlZF9nc3RhdGUgPSAwOw0KPiArCQl1NjRfc3RhdHNfdXBkYXRlX2VuZCgmcmVx
+LT5hYm9ydGVkX2dzdGF0ZV9zeW5jKTsNCg0KSWYgYSBibGstbXEgcmVxdWVzdCBpcyByZXN1Ym1p
+dHRlZCAyKio2MiB0aW1lcywgY2FuIHRoYXQgcmVzdWx0IGluIHRoZSBhYm92ZQ0KY29kZSBzZXR0
+aW5nIGFib3J0ZWRfZ3N0YXRlIHRvIHRoZSBzYW1lIHZhbHVlIGFzIGdzdGF0ZT8gSXNuJ3QgdGhh
+dCBhIGJ1Zz8NCklmIHNvLCBob3cgYWJvdXQgc2V0dGluZyBhYm9ydGVkX2dzdGF0ZSBpbiB0aGUg
+YWJvdmUgY29kZSB0byBlLmcuIGdzdGF0ZSBeICgyKio2Myk/DQoNCj4gQEAgLTIyOCw2ICsyMzAs
+MjcgQEAgc3RydWN0IHJlcXVlc3Qgew0KPiAgDQo+ICAJdW5zaWduZWQgc2hvcnQgd3JpdGVfaGlu
+dDsNCj4gIA0KPiArCS8qDQo+ICsJICogT24gYmxrLW1xLCB0aGUgbG93ZXIgYml0cyBvZiAtPmdz
+dGF0ZSBjYXJyeSB0aGUgTVFfUlFfKiBzdGF0ZQ0KPiArCSAqIHZhbHVlIGFuZCB0aGUgdXBwZXIg
+Yml0cyB0aGUgZ2VuZXJhdGlvbiBudW1iZXIgd2hpY2ggaXMNCj4gKwkgKiBtb25vdG9uaWNhbGx5
+IGluY3JlbWVudGVkIGFuZCB1c2VkIHRvIGRpc3Rpbmd1aXNoIHRoZSByZXVzZQ0KPiArCSAqIGlu
+c3RhbmNlcy4NCj4gKwkgKg0KPiArCSAqIC0+Z3N0YXRlX3NlcSBhbGxvd3MgdXBkYXRlcyB0byAt
+PmdzdGF0ZSBhbmQgb3RoZXIgZmllbGRzDQo+ICsJICogKGN1cnJlbnRseSAtPmRlYWRsaW5lKSBk
+dXJpbmcgcmVxdWVzdCBzdGFydCB0byBiZSByZWFkDQo+ICsJICogYXRvbWljYWxseSBmcm9tIHRo
+ZSB0aW1lb3V0IHBhdGgsIHNvIHRoYXQgaXQgY2FuIG9wZXJhdGUgb24gYQ0KPiArCSAqIGNvaGVy
+ZW50IHNldCBvZiBpbmZvcm1hdGlvbi4NCj4gKwkgKi8NCj4gKwlzZXFjb3VudF90IGdzdGF0ZV9z
+ZXE7DQo+ICsJdTY0IGdzdGF0ZTsNCj4gKw0KPiArCS8qDQo+ICsJICogLT5hYm9ydGVkX2dzdGF0
+ZSBpcyB1c2VkIGJ5IHRoZSB0aW1lb3V0IHRvIGNsYWltIGEgc3BlY2lmaWMNCj4gKwkgKiByZWN5
+Y2xlIGluc3RhbmNlIG9mIHRoaXMgcmVxdWVzdC4gIFNlZSBibGtfbXFfdGltZW91dF93b3JrKCku
+DQo+ICsJICovDQo+ICsJc3RydWN0IHU2NF9zdGF0c19zeW5jIGFib3J0ZWRfZ3N0YXRlX3N5bmM7
+DQo+ICsJdTY0IGFib3J0ZWRfZ3N0YXRlOw0KPiArDQo+ICAJdW5zaWduZWQgbG9uZyBkZWFkbGlu
+ZTsNCj4gIAlzdHJ1Y3QgbGlzdF9oZWFkIHRpbWVvdXRfbGlzdDsNCg0KV2h5IGFyZSBnc3RhdGUg
+YW5kIGFib3J0ZWRfZ3N0YXRlIDY0LWJpdCB2YXJpYWJsZXM/IFdoYXQgbWFrZXMgeW91IHRoaW5r
+IHRoYXQNCjMyIGJpdHMgd291bGQgbm90IGJlIGVub3VnaD8NCg0KVGhhbmtzLA0KDQpCYXJ0Lg==
