@@ -1,41 +1,22 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:56686 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:57284 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752758AbdLSPaR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Dec 2017 10:30:17 -0500
-Date: Tue, 19 Dec 2017 10:30:16 -0500 (EST)
-From: Yi Zhang <yi.zhang@redhat.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
+        id S1751101AbdLNCbm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Dec 2017 21:31:42 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
         Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Yi Zhang <yi.zhang@redhat.com>,
         Johannes Thumshirn <jthumshirn@suse.de>,
-        Bart Van Assche <bart.vanassche@sandisk.com>
-Message-ID: <1119473730.1189848.1513697416782.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20171214023103.18272-1-ming.lei@redhat.com>
-References: <20171214023103.18272-1-ming.lei@redhat.com>
-Subject: Re: [PATCH V2 0/6] blk-mq: fix race related with device
- deletion/reset/switching sched
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 0/6] blk-mq: fix race related with device deletion/reset/switching sched
+Date: Thu, 14 Dec 2017 10:30:57 +0800
+Message-Id: <20171214023103.18272-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
-
-Thanks ming.
-
-Tested-by: Yi Zhang <yi.zhang@redhat.com>
-
-Best Regards,
-  Yi Zhang
-
-
------ Original Message -----
-From: "Ming Lei" <ming.lei@redhat.com>
-To: linux-nvme@lists.infradead.org, "Christoph Hellwig" <hch@lst.de>, "Jens Axboe" <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: "Yi Zhang" <yi.zhang@redhat.com>, "Sagi Grimberg" <sagi@grimberg.me>, "Ming Lei" <ming.lei@redhat.com>, "Keith Busch" <keith.busch@intel.com>, "Johannes Thumshirn" <jthumshirn@suse.de>, "Bart Van Assche" <bart.vanassche@sandisk.com>
-Sent: Thursday, December 14, 2017 10:30:57 AM
-Subject: [PATCH V2 0/6] blk-mq: fix race related with device deletion/reset/switching sched
 
 Hi,
 
@@ -77,9 +58,3 @@ Ming Lei (6):
 
 -- 
 2.9.5
-
-
-_______________________________________________
-Linux-nvme mailing list
-Linux-nvme@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-nvme
