@@ -1,14 +1,21 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:55124 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751721AbdLNLS3 (ORCPT
+Received: from mail-lf0-f42.google.com ([209.85.215.42]:44957 "EHLO
+        mail-lf0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751107AbdLNF6o (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Dec 2017 06:18:29 -0500
-Date: Thu, 14 Dec 2017 12:18:17 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Theodore Ts'o <tytso@mit.edu>,
+        Thu, 14 Dec 2017 00:58:44 -0500
+MIME-Version: 1.0
+In-Reply-To: <20171214030711.gtxzm57h7h4hwbfe@thunk.org>
+References: <CANrsvRPQcWz-p_3TYfNf+Waek3bcNNPniXhFzyyS=7qbCqzGyg@mail.gmail.com>
+ <CANrsvRMAci5Vxj0kKsgW4-cgK4X4BAvq9jOwkAx0TWHqBjogVw@mail.gmail.com> <20171214030711.gtxzm57h7h4hwbfe@thunk.org>
+From: Byungchul Park <max.byungchul.park@gmail.com>
+Date: Thu, 14 Dec 2017 14:58:41 +0900
+Message-ID: <CANrsvRMnRF06NLcHkEChLDCTpTemvKCunk+nJ13Kj+avT0vf4Q@mail.gmail.com>
+Subject: Re: About the try to remove cross-release feature entirely by Ingo
+To: "Theodore Ts'o" <tytso@mit.edu>,
         Byungchul Park <max.byungchul.park@gmail.com>,
         Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
         Ingo Molnar <mingo@kernel.org>, david@fromorbit.com,
         willy@infradead.org,
         Linus Torvalds <torvalds@linux-foundation.org>,
@@ -16,28 +23,106 @@ To: Theodore Ts'o <tytso@mit.edu>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         oleg@redhat.com
-Subject: Re: About the try to remove cross-release feature entirely by Ingo
-Message-ID: <20171214111817.xnyxgtremfspjk7f@hirez.programming.kicks-ass.net>
-References: <CANrsvRPQcWz-p_3TYfNf+Waek3bcNNPniXhFzyyS=7qbCqzGyg@mail.gmail.com>
- <CANrsvRMAci5Vxj0kKsgW4-cgK4X4BAvq9jOwkAx0TWHqBjogVw@mail.gmail.com>
- <20171214030711.gtxzm57h7h4hwbfe@thunk.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171214030711.gtxzm57h7h4hwbfe@thunk.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Wed, Dec 13, 2017 at 10:07:11PM -0500, Theodore Ts'o wrote:
+On Thu, Dec 14, 2017 at 12:07 PM, Theodore Ts'o <tytso@mit.edu> wrote:
+> On Wed, Dec 13, 2017 at 04:13:07PM +0900, Byungchul Park wrote:
+>>
+>> Therefore, I want to say the fundamental problem
+>> comes from classification, not cross-release
+>> specific.
+>
+> You keep saying that it is "just" a matter of classificaion.
+
+But, it's a fact.
+
+> However, it is not obvious how to do the classification in a sane
+> manner.  And this is why I keep pointing out that there is no
+> documentation on how to do this, and somehow you never respond to this
+> point....
+
+I can write a document explaining what lock class is but.. I
+cannot explain how to assign it perfectly since there's no right
+answer. It's something we need to improve more and more.
+
+> In the case where you have multiple unrelated subsystems that can be
+> stacked in different ways, with potentially multiple instances stacked
+> on top of each other, it is not at all clear to me how this problem
+> should be solved.
+
+I cannot give you a perfect solution immediately. I know, and
+as you know, it's a very difficult problem to solve.
+
+> It was said on one of these threads (perhaps by you, perhaps by
+> someone else), that we can't expect the lockdep maintainers to
+> understand all of the subsystems in the kernels, and so therefore it
+> must be up to the subsystem maintainers to classify the locks.  I
 > interpreted this as the lockdep maintainers saying, "hey, not my
 > fault, it's the subsystem maintainer's fault for not properly
 > classifying the locks" --- and thus dumping the responsibility in the
 > subsystem maintainers' laps.
 
-Let me clarify that I (as lockdep maintainer) disagree with that
-sentiment. I have spend a lot of time over the years staring at random
-code trying to fix lockdep splats. Its awesome if corresponding
-subsystem maintainers help out and many have, but I very much do not
-agree its their problem and their problem alone.
+Sorry to say, making you feel like that.
 
-This attitude is one of the biggest issues I have with the crossrelease
-stuff and why I don't disagree with Ingo taking it out (for now).
+Precisely speaking, the responsibility for something caused by
+cross-release is on me, and the responsibility for something caused
+by lockdep itselt is on lockdep.
+
+I meant, in the current way to assign lock class automatically, it's
+inevitable for someone to annotate places manually, and it can be
+done best by each expert. But, anyway fundamentally I think the
+responsibility is on lockdep.
+
+> I don't know if the situation is just that lockdep is insufficiently
+> documented, and with the proper tutorial, it would be obvious how to
+> solve the classification problem.
+>
+> Or, if perhaps, there *is* no way to solve the classification problem,
+> at least not in a general form.
+
+Agree. It's a very difficult one to solve.
+
+> For example --- suppose we have a network block device on which there
+> is an btrfs file system, which is then exported via NFS.  Now all of
+> the TCP locks will be used twice for two different instances, once for
+> the TCP connection for the network block device, and then for the NFS
+> export.
+>
+> How exactly are we supposed to classify the locks to make it all work?
+>
+> Or the loop device built on top of an ext4 file system which on a
+> LVM/device mapper device.  And suppose the loop device is then layered
+> with a dm-error device for regression testing, and with another ext4
+> file system on top of that?
+
+Ditto.
+
+> How exactly are we supposed to classify the locks in that situation?
+> Where's the documentation and tutorials which explain how to make this
+> work, if the responsibility is going to be dumped on the subsystem
+> maintainers' laps?  Or if the lockdep maintainers are expected to fix
+> and classify all of these locks, are you volunteering to do this?
+
+I have the will. I will.
+
+> How hard is it exactly to do all of this classification work, no
+> matter whose responsibility it will ultimately be?
+>
+> And if the answer is that it is too hard, then let me gently suggest
+> to you that perhaps, if this is a case, that maybe this is a
+> fundamental and fatal flaw with the cross-release and completion
+> lockdep feature?
+
+I don't understand this.
+
+> Best regards,
+>
+>                                                 - Ted
+
+
+
+-- 
+Thanks,
+Byungchul
