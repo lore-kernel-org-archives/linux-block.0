@@ -1,170 +1,54 @@
-Return-Path: <msnitzer@redhat.com>
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk,
-	hch@lst.de,
-	emilne@redhat.com,
-	james.smart@broadcom.com
-Cc: hare@suse.de,
-	Bart.VanAssche@wdc.com,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	dm-devel@redhat.com
-Subject: [for-4.16 PATCH 3/5] nvme: move nvme_req_needs_failover() from multipath to core
-Date: Tue, 19 Dec 2017 16:05:44 -0500
-Message-Id: <20171219210546.65928-4-snitzer@redhat.com>
-In-Reply-To: <20171219210546.65928-1-snitzer@redhat.com>
-References: <20171219210546.65928-1-snitzer@redhat.com>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Thu, 14 Dec 2017 11:26:26 -0800
+From: "tj@kernel.org" <tj@kernel.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "axboe@kernel.dk" <axboe@kernel.dk>,
+	"kernel-team@fb.com" <kernel-team@fb.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"peterz@infradead.org" <peterz@infradead.org>,
+	"osandov@fb.com" <osandov@fb.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"oleg@redhat.com" <oleg@redhat.com>, "hch@lst.de" <hch@lst.de>
+Subject: Re: [PATCH 4/6] blk-mq: make blk_abort_request() trigger timeout path
+Message-ID: <20171214192626.GC3919388@devbig577.frc2.facebook.com>
+References: <20171212190134.535941-1-tj@kernel.org>
+ <20171212190134.535941-5-tj@kernel.org>
+ <1513277814.2475.45.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1513277814.2475.45.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-nvme_req_needs_failover() could be usable regardless of whether
-CONFIG_NVME_MULTIPATH is set.
+Hello,
 
-DM multipath will also make use of it.
+On Thu, Dec 14, 2017 at 06:56:55PM +0000, Bart Van Assche wrote:
+> On Tue, 2017-12-12 at 11:01 -0800, Tejun Heo wrote:
+> >  void blk_abort_request(struct request *req)
+> >  {
+> > -	if (blk_mark_rq_complete(req))
+> > -		return;
+> >  
+> >  	if (req->q->mq_ops) {
+> > -		blk_mq_rq_timed_out(req, false);
+> > +		req->deadline = jiffies;
+> > +		mod_timer(&req->q->timeout, 0);
+> >  	} else {
+> > +		if (blk_mark_rq_complete(req))
+> > +			return;
+> >  		blk_delete_timer(req);
+> >  		blk_rq_timed_out(req);
+> >  	}
+> 
+> This patch makes blk_abort_request() asynchronous for blk-mq. Have all callers
+> been audited to verify whether this change is safe?
 
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
----
- drivers/nvme/host/core.c      | 46 ++++++++++++++++++++++++++++++++++++++++++
- drivers/nvme/host/multipath.c | 47 -------------------------------------------
- drivers/nvme/host/nvme.h      |  5 -----
- 3 files changed, 46 insertions(+), 52 deletions(-)
+I *think* so.  For all the ata related parts, I know they're.
+mtip32xx and dasd_ioctl, it seems safe, but I can't tell for sure.
+Will cc the respective maintainers on the next posting.
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 0c0a52fa78e4..63691e251f8c 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -188,6 +188,52 @@ static inline bool nvme_req_needs_retry(struct request *req)
- 	return true;
- }
- 
-+static bool nvme_req_needs_failover(struct request *req)
-+{
-+	/* Caller verifies req->failover_rq is set */
-+
-+	switch (nvme_req(req)->status & 0x7ff) {
-+	/*
-+	 * Generic command status:
-+	 */
-+	case NVME_SC_INVALID_OPCODE:
-+	case NVME_SC_INVALID_FIELD:
-+	case NVME_SC_INVALID_NS:
-+	case NVME_SC_LBA_RANGE:
-+	case NVME_SC_CAP_EXCEEDED:
-+	case NVME_SC_RESERVATION_CONFLICT:
-+		return false;
-+
-+	/*
-+	 * I/O command set specific error.  Unfortunately these values are
-+	 * reused for fabrics commands, but those should never get here.
-+	 */
-+	case NVME_SC_BAD_ATTRIBUTES:
-+	case NVME_SC_INVALID_PI:
-+	case NVME_SC_READ_ONLY:
-+	case NVME_SC_ONCS_NOT_SUPPORTED:
-+		WARN_ON_ONCE(nvme_req(req)->cmd->common.opcode ==
-+			nvme_fabrics_command);
-+		return false;
-+
-+	/*
-+	 * Media and Data Integrity Errors:
-+	 */
-+	case NVME_SC_WRITE_FAULT:
-+	case NVME_SC_READ_ERROR:
-+	case NVME_SC_GUARD_CHECK:
-+	case NVME_SC_APPTAG_CHECK:
-+	case NVME_SC_REFTAG_CHECK:
-+	case NVME_SC_COMPARE_FAILED:
-+	case NVME_SC_ACCESS_DENIED:
-+	case NVME_SC_UNWRITTEN_BLOCK:
-+		return false;
-+	}
-+
-+	/* Everything else could be a path failure, so should be retried */
-+	return true;
-+}
-+
- void nvme_complete_rq(struct request *req)
- {
- 	if (unlikely(nvme_req(req)->status && nvme_req_needs_retry(req))) {
-diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-index 0ab51c184df9..8df01a8d6c02 100644
---- a/drivers/nvme/host/multipath.c
-+++ b/drivers/nvme/host/multipath.c
-@@ -33,53 +33,6 @@ static void nvme_failover_req(struct request *req)
- 	kblockd_schedule_work(&ns->head->requeue_work);
- }
- 
--bool nvme_req_needs_failover(struct request *req)
--{
--	if (!req->failover_rq)
--		return false;
--
--	switch (nvme_req(req)->status & 0x7ff) {
--	/*
--	 * Generic command status:
--	 */
--	case NVME_SC_INVALID_OPCODE:
--	case NVME_SC_INVALID_FIELD:
--	case NVME_SC_INVALID_NS:
--	case NVME_SC_LBA_RANGE:
--	case NVME_SC_CAP_EXCEEDED:
--	case NVME_SC_RESERVATION_CONFLICT:
--		return false;
--
--	/*
--	 * I/O command set specific error.  Unfortunately these values are
--	 * reused for fabrics commands, but those should never get here.
--	 */
--	case NVME_SC_BAD_ATTRIBUTES:
--	case NVME_SC_INVALID_PI:
--	case NVME_SC_READ_ONLY:
--	case NVME_SC_ONCS_NOT_SUPPORTED:
--		WARN_ON_ONCE(nvme_req(req)->cmd->common.opcode ==
--			nvme_fabrics_command);
--		return false;
--
--	/*
--	 * Media and Data Integrity Errors:
--	 */
--	case NVME_SC_WRITE_FAULT:
--	case NVME_SC_READ_ERROR:
--	case NVME_SC_GUARD_CHECK:
--	case NVME_SC_APPTAG_CHECK:
--	case NVME_SC_REFTAG_CHECK:
--	case NVME_SC_COMPARE_FAILED:
--	case NVME_SC_ACCESS_DENIED:
--	case NVME_SC_UNWRITTEN_BLOCK:
--		return false;
--	}
--
--	/* Everything else could be a path failure, so should be retried */
--	return true;
--}
--
- void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl)
- {
- 	struct nvme_ns *ns;
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 5195b4850eb0..130eed526e1f 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -395,7 +395,6 @@ extern const struct attribute_group nvme_ns_id_attr_group;
- extern const struct block_device_operations nvme_ns_head_ops;
- 
- #ifdef CONFIG_NVME_MULTIPATH
--bool nvme_req_needs_failover(struct request *req);
- void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl);
- int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl,struct nvme_ns_head *head);
- void nvme_mpath_add_disk(struct nvme_ns_head *head);
-@@ -412,10 +411,6 @@ static inline void nvme_mpath_clear_current_path(struct nvme_ns *ns)
- }
- struct nvme_ns *nvme_find_path(struct nvme_ns_head *head);
- #else
--static inline bool nvme_req_needs_failover(struct request *req)
--{
--	return false;
--}
- static inline void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl)
- {
- }
+Thanks.
+
 -- 
-2.15.0
+tejun
