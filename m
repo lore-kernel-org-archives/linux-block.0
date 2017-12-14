@@ -1,68 +1,48 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59088 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752845AbdLHNO3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Dec 2017 08:14:29 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 00/10] block: cleanup on direct access to bvec table(prepare for multipage bvec)
-Date: Fri,  8 Dec 2017 21:13:59 +0800
-Message-Id: <20171208131409.11889-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Thu, 14 Dec 2017 10:14:01 -0800
+From: "tj@kernel.org" <tj@kernel.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "axboe@kernel.dk" <axboe@kernel.dk>,
+	"kernel-team@fb.com" <kernel-team@fb.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"peterz@infradead.org" <peterz@infradead.org>,
+	"osandov@fb.com" <osandov@fb.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"oleg@redhat.com" <oleg@redhat.com>, "hch@lst.de" <hch@lst.de>
+Subject: Re: [PATCH 1/6] blk-mq: protect completion path with RCU
+Message-ID: <20171214181401.GA3919388@devbig577.frc2.facebook.com>
+References: <20171212190134.535941-1-tj@kernel.org>
+ <20171212190134.535941-2-tj@kernel.org>
+ <1513270860.2475.14.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1513270860.2475.14.camel@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+On Thu, Dec 14, 2017 at 05:01:06PM +0000, Bart Van Assche wrote:
+> On Tue, 2017-12-12 at 11:01 -0800, Tejun Heo wrote:
+> > +	} else {
+> > +		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
+> > +		if (!blk_mark_rq_complete(rq))
+> > +			__blk_mq_complete_request(rq);
+> > +		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
+> 
+> Hello Tejun,
+> 
+> The name queue_rq_srcu was chosen to reflect the original use of that structure,
+> namely to protect .queue_rq() calls. Your patch series broadens the use of that
 
-This patchse cleans up most of direct access to bvec table in tree, and
-these patches are the follow-up of patch1 ~ 16 in the patchset of 'block:
-support multipage bvec(V3)'[1]. 
+Yeah, will add a patch to rename it.
 
-Changes against [1]:
-1) split the cleanup patches from [1]
-2) address comments from Christoph:
-	- introduce bio helpers for dealing with the cleanup
-	- move bio_alloc_pages() to bcache
+> srcu structure so I would appreciate it if it would be renamed, e.g. into "srcu".
+> See also commit 6a83e74d214a ("blk-mq: Introduce blk_mq_quiesce_queue()").
 
+Ah yeah, it'd be nice to have the [s]rcu synchronize calls factored
+out.
 
-[1] https://marc.info/?t=150218197600001&r=1&w=2
-
-Thanks,
-Ming
-
-Ming Lei (10):
-  block: introduce bio helpers for converting to multipage bvec
-  block: conver to bio_first_bvec() & bio_first_page()
-  fs: convert to bio_last_bvec()
-  block: bounce: avoid direct access to bvec table
-  block: bounce: don't access bio->bi_io_vec in copy_to_high_bio_irq
-  dm: limit the max bio size as BIO_MAX_PAGES * PAGE_SIZE
-  bcache: comment on direct access to bvec table
-  block: move bio_alloc_pages() to bcache
-  btrfs: avoid access to .bi_vcnt directly
-  btrfs: avoid to access bvec table directly for a cloned bio
-
- block/bio.c                      | 28 ----------------------------
- block/bounce.c                   | 33 +++++++++++++++++++--------------
- drivers/block/drbd/drbd_bitmap.c |  2 +-
- drivers/block/zram/zram_drv.c    |  2 +-
- drivers/md/bcache/btree.c        |  1 +
- drivers/md/bcache/super.c        |  8 ++++----
- drivers/md/bcache/util.c         | 34 ++++++++++++++++++++++++++++++++++
- drivers/md/bcache/util.h         |  1 +
- drivers/md/dm.c                  | 10 +++++++++-
- fs/btrfs/compression.c           |  4 ++--
- fs/btrfs/extent_io.c             | 11 ++++++-----
- fs/btrfs/extent_io.h             |  2 +-
- fs/btrfs/inode.c                 |  8 +++++---
- fs/buffer.c                      |  2 +-
- fs/f2fs/data.c                   |  2 +-
- include/linux/bio.h              | 25 ++++++++++++++++++++++++-
- include/linux/bvec.h             |  9 +++++++++
- kernel/power/swap.c              |  2 +-
- mm/page_io.c                     |  4 ++--
- 19 files changed, 122 insertions(+), 66 deletions(-)
+Thanks.
 
 -- 
-2.9.5
+tejun
