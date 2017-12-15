@@ -1,46 +1,180 @@
-Return-Path: <peterz@infradead.org>
-Date: Mon, 18 Dec 2017 12:34:26 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Josh Snyder <joshs@netflix.com>
-Cc: linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Brendan Gregg <bgregg@netflix.com>, linux-block@vger.kernel.org,
-	Tejun Heo <tj@kernel.org>, Balbir Singh <bsingharora@gmail.com>,
-	Ingo Molnar <mingo@redhat.com>
-Subject: Re: [PATCH] Pass the task_struct explicitly to delayacct_blkio_end
-Message-ID: <20171218113426.vndsy2m5qhxrkesg@hirez.programming.kicks-ass.net>
-References: <1513361505-275-1-git-send-email-joshs@netflix.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1513361505-275-1-git-send-email-joshs@netflix.com>
+Return-Path: <joshs@netflix.com>
+Return-Path: <joshs@netflix.com>
+From: Josh Snyder <joshs@netflix.com>
+To: linux-kernel@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Brendan Gregg <bgregg@netflix.com>,
+	linux-block@vger.kernel.org,
+	Tejun Heo <tj@kernel.org>,
+	Josh Snyder <joshs@netflix.com>,
+	Balbir Singh <bsingharora@gmail.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>
+Subject: [PATCH] Pass the task_struct explicitly to delayacct_blkio_end
+Date: Fri, 15 Dec 2017 18:11:43 +0000
+Message-Id: <1513361505-275-1-git-send-email-joshs@netflix.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Dec 15, 2017 at 06:11:43PM +0000, Josh Snyder wrote:
+Before e33a9bba85a8, delayacct_blkio_end was called after
+context-switching into the task which completed I/O. This resulted in
+double counting: the task would account a delay both waiting for I/O and
+for time spent in the runqueue.
 
-> Subject: [PATCH] Pass the task_struct explicitly to delayacct_blkio_end
+With e33a9bba85a8, delayacct_blkio_end is called by try_to_wake_up. In
+ttwu, we have not yet context-switched. This is more correct, in that the
+delay accounting ends when the I/O is complete. But delayacct_blkio_end
+relies upon `get_current()`, and we have not yet context-switched into the
+task whose I/O completed. This results in the wrong task having its delay
+accounting statistics updated.
 
-That subject is crap; it needs a subsystem prefix and it needs to
-describe what is done, not how its done.
+Instead of doing that, pass the task_struct being woken to
+delayacct_blkio_end, so that it can update the statistics of the correct
+task_struct.
+---
+ include/linux/delayacct.h |  8 ++++----
+ kernel/delayacct.c        | 42 ++++++++++++++++++++++++++----------------
+ kernel/sched/core.c       |  6 +++---
+ 3 files changed, 33 insertions(+), 23 deletions(-)
 
-Something like:
-
-  delayacct: Fix double accounting for blk-io
-
-> Before e33a9bba85a8, delayacct_blkio_end was called after
-> context-switching into the task which completed I/O. This resulted in
-> double counting: the task would account a delay both waiting for I/O and
-> for time spent in the runqueue.
-> 
-> With e33a9bba85a8, delayacct_blkio_end is called by try_to_wake_up. In
-> ttwu, we have not yet context-switched. This is more correct, in that the
-> delay accounting ends when the I/O is complete. But delayacct_blkio_end
-> relies upon `get_current()`, and we have not yet context-switched into the
-> task whose I/O completed. This results in the wrong task having its delay
-> accounting statistics updated.
-
-The correct way to quote a commit is like:
-
-  e33a9bba85a8 ("sched/core: move IO scheduling accounting from io_schedule_timeout() into scheduler")
-
-> Instead of doing that, pass the task_struct being woken to
-> delayacct_blkio_end, so that it can update the statistics of the correct
-> task_struct.
+diff --git a/include/linux/delayacct.h b/include/linux/delayacct.h
+index 4178d24..f2ad868 100644
+--- a/include/linux/delayacct.h
++++ b/include/linux/delayacct.h
+@@ -71,7 +71,7 @@ extern void delayacct_init(void);
+ extern void __delayacct_tsk_init(struct task_struct *);
+ extern void __delayacct_tsk_exit(struct task_struct *);
+ extern void __delayacct_blkio_start(void);
+-extern void __delayacct_blkio_end(void);
++extern void __delayacct_blkio_end(struct task_struct *);
+ extern int __delayacct_add_tsk(struct taskstats *, struct task_struct *);
+ extern __u64 __delayacct_blkio_ticks(struct task_struct *);
+ extern void __delayacct_freepages_start(void);
+@@ -122,10 +122,10 @@ static inline void delayacct_blkio_start(void)
+ 		__delayacct_blkio_start();
+ }
+ 
+-static inline void delayacct_blkio_end(void)
++static inline void delayacct_blkio_end(struct task_struct *p)
+ {
+ 	if (current->delays)
+-		__delayacct_blkio_end();
++		__delayacct_blkio_end(p);
+ 	delayacct_clear_flag(DELAYACCT_PF_BLKIO);
+ }
+ 
+@@ -169,7 +169,7 @@ static inline void delayacct_tsk_free(struct task_struct *tsk)
+ {}
+ static inline void delayacct_blkio_start(void)
+ {}
+-static inline void delayacct_blkio_end(void)
++static inline void delayacct_blkio_end(struct task_struct *p)
+ {}
+ static inline int delayacct_add_tsk(struct taskstats *d,
+ 					struct task_struct *tsk)
+diff --git a/kernel/delayacct.c b/kernel/delayacct.c
+index 4a1c334..e2ec808 100644
+--- a/kernel/delayacct.c
++++ b/kernel/delayacct.c
+@@ -51,16 +51,16 @@ void __delayacct_tsk_init(struct task_struct *tsk)
+  * Finish delay accounting for a statistic using its timestamps (@start),
+  * accumalator (@total) and @count
+  */
+-static void delayacct_end(u64 *start, u64 *total, u32 *count)
++static void delayacct_end(spinlock_t *lock, u64 *start, u64 *total, u32 *count)
+ {
+ 	s64 ns = ktime_get_ns() - *start;
+ 	unsigned long flags;
+ 
+ 	if (ns > 0) {
+-		spin_lock_irqsave(&current->delays->lock, flags);
++		spin_lock_irqsave(lock, flags);
+ 		*total += ns;
+ 		(*count)++;
+-		spin_unlock_irqrestore(&current->delays->lock, flags);
++		spin_unlock_irqrestore(lock, flags);
+ 	}
+ }
+ 
+@@ -69,17 +69,25 @@ void __delayacct_blkio_start(void)
+ 	current->delays->blkio_start = ktime_get_ns();
+ }
+ 
+-void __delayacct_blkio_end(void)
++/*
++ * We cannot rely on the `current` macro, as we haven't yet switched back to
++ * the process being woken.
++ */
++void __delayacct_blkio_end(struct task_struct *p)
+ {
+-	if (current->delays->flags & DELAYACCT_PF_SWAPIN)
+-		/* Swapin block I/O */
+-		delayacct_end(&current->delays->blkio_start,
+-			&current->delays->swapin_delay,
+-			&current->delays->swapin_count);
+-	else	/* Other block I/O */
+-		delayacct_end(&current->delays->blkio_start,
+-			&current->delays->blkio_delay,
+-			&current->delays->blkio_count);
++	struct task_delay_info * delays = p->delays;
++	u64 *total;
++	u32 *count;
++
++	if (p->delays->flags & DELAYACCT_PF_SWAPIN) {
++		total = &delays->swapin_delay;
++		count = &delays->swapin_count;
++	} else {
++		total = &delays->blkio_delay;
++		count = &delays->blkio_count;
++	}
++
++	delayacct_end(&delays->lock, &delays->blkio_start, total, count);
+ }
+ 
+ int __delayacct_add_tsk(struct taskstats *d, struct task_struct *tsk)
+@@ -153,8 +161,10 @@ void __delayacct_freepages_start(void)
+ 
+ void __delayacct_freepages_end(void)
+ {
+-	delayacct_end(&current->delays->freepages_start,
+-			&current->delays->freepages_delay,
+-			&current->delays->freepages_count);
++	delayacct_end(
++		&current->delays->lock,
++		&current->delays->freepages_start,
++		&current->delays->freepages_delay,
++		&current->delays->freepages_count);
+ }
+ 
+diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+index 75554f3..deda018 100644
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -2056,7 +2056,7 @@ try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
+ 	p->state = TASK_WAKING;
+ 
+ 	if (p->in_iowait) {
+-		delayacct_blkio_end();
++		delayacct_blkio_end(p);
+ 		atomic_dec(&task_rq(p)->nr_iowait);
+ 	}
+ 
+@@ -2069,7 +2069,7 @@ try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
+ #else /* CONFIG_SMP */
+ 
+ 	if (p->in_iowait) {
+-		delayacct_blkio_end();
++		delayacct_blkio_end(p);
+ 		atomic_dec(&task_rq(p)->nr_iowait);
+ 	}
+ 
+@@ -2122,7 +2122,7 @@ static void try_to_wake_up_local(struct task_struct *p, struct rq_flags *rf)
+ 
+ 	if (!task_on_rq_queued(p)) {
+ 		if (p->in_iowait) {
+-			delayacct_blkio_end();
++			delayacct_blkio_end(p);
+ 			atomic_dec(&rq->nr_iowait);
+ 		}
+ 		ttwu_activate(rq, p, ENQUEUE_WAKEUP | ENQUEUE_NOCLOCK);
+-- 
+2.7.4
