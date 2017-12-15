@@ -1,61 +1,50 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-bcache@vger.kernel.org
-Subject: [PATCH V4 07/45] bcache: comment on direct access to bvec table
-Date: Mon, 18 Dec 2017 20:22:09 +0800
-Message-Id: <20171218122247.3488-8-ming.lei@redhat.com>
-In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
-References: <20171218122247.3488-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [GIT PULLL] nvme fixes for Linux 4.15
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Sagi Grimberg <sagi@grimberg.me>, Keith Busch <keith.busch@intel.com>,
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+References: <20171215164828.ztoycqf5wettwkkg@infradead.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <d0bb89eb-a660-2d09-9662-3c4b6d409958@kernel.dk>
+Date: Fri, 15 Dec 2017 14:49:37 -0700
+MIME-Version: 1.0
+In-Reply-To: <20171215164828.ztoycqf5wettwkkg@infradead.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-All direct access to bvec table are safe even after multipage bvec is supported.
+On 12/15/2017 09:48 AM, Christoph Hellwig wrote:
+> Hi Jens,
+> 
+> below are a couple important one or two liners fixes for Linux 4.15:
+> 
+> 
+> The following changes since commit fcf38cdf332a81b20a59e3ebaea81f6b316bbe0c:
+> 
+>   kyber: fix another domain token wait queue hang (2017-12-06 12:33:07 -0700)
+> 
+> are available in the git repository at:
+> 
+>   git://git.infradead.org/nvme.git nvme-4.15
+> 
+> for you to fetch changes up to 654b4a4acd8b52a4272114b95896e9a10d382cde:
+> 
+>   nvme: setup streams after initializing namespace head (2017-12-15 15:18:07 +0100)
+> 
+> ----------------------------------------------------------------
+> David Disseldorp (1):
+>       nvme: set discard_alignment to zero
+> 
+> James Smart (1):
+>       nvme-fc: remove double put reference if admin connect fails
+> 
+> Keith Busch (2):
+>       nvme: check hw sectors before setting chunk sectors
+>       nvme: setup streams after initializing namespace head
+> 
+> Ming Lei (1):
+>       nvme: call blk_integrity_unregister after queue is cleaned up
 
-Cc: linux-bcache@vger.kernel.org
-Acked-by: Coly Li <colyli@suse.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/md/bcache/btree.c | 1 +
- drivers/md/bcache/util.c  | 7 +++++++
- 2 files changed, 8 insertions(+)
+Thanks, looks fine, pulled for 4.15.
 
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index 81e8dc3dbe5e..02a4cf646fdc 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -432,6 +432,7 @@ static void do_btree_node_write(struct btree *b)
- 
- 		continue_at(cl, btree_node_write_done, NULL);
- 	} else {
-+		/* No problem for multipage bvec since the bio is just allocated */
- 		b->bio->bi_vcnt = 0;
- 		bch_bio_map(b->bio, i);
- 
-diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
-index e548b8b51322..61813d230015 100644
---- a/drivers/md/bcache/util.c
-+++ b/drivers/md/bcache/util.c
-@@ -249,6 +249,13 @@ uint64_t bch_next_delay(struct bch_ratelimit *d, uint64_t done)
- 		: 0;
- }
- 
-+/*
-+ * Generally it isn't good to access .bi_io_vec and .bi_vcnt directly,
-+ * the preferred way is bio_add_page, but in this case, bch_bio_map()
-+ * supposes that the bvec table is empty, so it is safe to access
-+ * .bi_vcnt & .bi_io_vec in this way even after multipage bvec is
-+ * supported.
-+ */
- void bch_bio_map(struct bio *bio, void *base)
- {
- 	size_t size = bio->bi_iter.bi_size;
 -- 
-2.9.5
+Jens Axboe
