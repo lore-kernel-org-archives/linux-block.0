@@ -1,17 +1,12 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f52.google.com ([209.85.215.52]:39108 "EHLO
-        mail-lf0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753236AbdLOIj1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Dec 2017 03:39:27 -0500
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 MIME-Version: 1.0
 In-Reply-To: <20171215062428.5dyv7wjbzn2ggxvz@thunk.org>
 References: <CANrsvRPQcWz-p_3TYfNf+Waek3bcNNPniXhFzyyS=7qbCqzGyg@mail.gmail.com>
  <20171213104617.7lffucjhaa6xb7lp@gmail.com> <CANrsvRPuhPyh1nFnzdYj8ph7e1FQRw_W_WN2a1tm9fzpAYks4g@mail.gmail.com>
  <CANrsvRP3-bWatoaq1teNFG1RXRbazqnHvOKXe458eAxSdAnsfg@mail.gmail.com> <20171215062428.5dyv7wjbzn2ggxvz@thunk.org>
 From: Byungchul Park <max.byungchul.park@gmail.com>
-Date: Fri, 15 Dec 2017 17:39:25 +0900
-Message-ID: <CANrsvROwvaZzAmTGFH=BaPohkXEB=HhDRdM3xdmPu0m4mjDpfw@mail.gmail.com>
+Date: Fri, 15 Dec 2017 16:38:47 +0900
+Message-ID: <CANrsvROu_Y6nOwnTGxyL8UbMcFpYdhZrQpa=ECNUsVxNftC=zQ@mail.gmail.com>
 Subject: Re: [PATCH] locking/lockdep: Remove the cross-release locking checks
 To: "Theodore Ts'o" <tytso@mit.edu>,
         Byungchul Park <max.byungchul.park@gmail.com>,
@@ -25,38 +20,46 @@ To: "Theodore Ts'o" <tytso@mit.edu>,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         oleg@redhat.com
 Content-Type: text/plain; charset="UTF-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
 On Fri, Dec 15, 2017 at 3:24 PM, Theodore Ts'o <tytso@mit.edu> wrote:
+> On Fri, Dec 15, 2017 at 01:05:43PM +0900, Byungchul Park wrote:
+>> For example, in the case of fs issues, for now we can
+>> invalidate wait_for_completion() in submit_bio_wait()....
+>
+> And this will spawn a checkpatch.pl ERROR:
+>
+>                     ERROR("LOCKDEP",
+>                     "lockdep_no_validate class is reserved for device->mutex.\n" . $herecurr);
+>
+> This mention in checkpatch.pl is the only documentation I've been able
+> to find about lockdep_set_novalidate_class(), by the way.
+>
+>> ... and re-validate it later, of course, I really want to find more
+>> fundamental solution though.
+>
+> Oh, and I was finally able to find the quote that the *only* people
+> who are likely to be able to deal with lock annotations are the
+
+Right. Using the word, "only", is one that I should not have done
+and I apologize for.
+
+They are just "only" people who solve and classify locks quickly,
+assuming all of kernel guys are familiar with lockdep annotations.
+Thus, even this statement is bad as well, since no good
+document for that exists, as you pointed out. I agree.
+
+> subsystem maintainers.  But if the ways of dealing with lock
+> annotations are not documented, such that subsystem maintainers are
+> going to have a very hard time figuring out *how* to deal with it, it
+
+Right. I've agreed with this, since you pointed out it's problem not
+to be documented well.
+
 > seems that lock classification as a solution to cross-release false
 > positives seems.... unlikely:
-
-For this, let me explain more.
-
-For example, either to use cross-release or to consider
-wait_for_completion() in submit_bio_wait() manually using
-lock_acquire() someday, classifying locks or waiters precisely
-is needed.
-
-All locks should belong to one class if each path of acquisition
-can be switchable each other within the class at any time.
-Otherwise, they should belong to a different class.
-
-Even though they are different classes but belong to one class
-roughly, no problem comes into view unless they are connected
-each other via extra dependency chains. But, once they get
-connected, we can see problems by the wrong classification.
-That can happen even w/o cross-release.
-
-Of course, as you pointed out, cross-release generates many
-chains between classes, assuming all classes are well-
-classified. But, practically well-classifying is not an easy work.
-
-So that's why I suggested the way since anyway that's better
-than removing all. If that's allowed, I can invalidate those waiters,
-using e.g. completion_init_nomap().
-
+>
 >    From: Byungchul Park <byungchul.park@lge.com>
 >    Date: Fri, 8 Dec 2017 18:27:45 +0900
 >    Subject: Re: [PATCH v4 72/73] xfs: Convert mru cache to XArray
