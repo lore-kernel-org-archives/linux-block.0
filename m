@@ -1,44 +1,74 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Fri, 15 Dec 2017 05:30:48 -0800
-From: "tj@kernel.org" <tj@kernel.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"peterz@infradead.org" <peterz@infradead.org>,
+Return-Path: <peterz@infradead.org>
+Date: Fri, 15 Dec 2017 08:31:51 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	"kernel-team@fb.com" <kernel-team@fb.com>,
 	"oleg@redhat.com" <oleg@redhat.com>, "hch@lst.de" <hch@lst.de>,
 	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>,
-	"osandov@fb.com" <osandov@fb.com>
+	"osandov@fb.com" <osandov@fb.com>, "tj@kernel.org" <tj@kernel.org>
 Subject: Re: [PATCH 2/6] blk-mq: replace timeout synchronization with a RCU
  and generation based scheme
-Message-ID: <20171215133048.GI3919388@devbig577.frc2.facebook.com>
+Message-ID: <20171215073151.y5nme76arcg7ra23@hirez.programming.kicks-ass.net>
 References: <20171212190134.535941-1-tj@kernel.org>
  <20171212190134.535941-3-tj@kernel.org>
  <1513277469.2475.43.camel@wdc.com>
- <20171214191935.GB3919388@devbig577.frc2.facebook.com>
- <1513286010.2475.58.camel@wdc.com>
+ <20171214202042.GG3326@worktop>
+ <1513287766.2475.73.camel@wdc.com>
+ <20171214215404.GK3326@worktop>
+ <007e5a56-83fb-23b0-64d9-4725f15c596d@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1513286010.2475.58.camel@wdc.com>
+In-Reply-To: <007e5a56-83fb-23b0-64d9-4725f15c596d@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello, Bart.
+On Fri, Dec 15, 2017 at 10:12:50AM +0800, jianchao.wang wrote:
+> > That only makes it a little better:
+> > 
+> > 	Task-A					Worker
+> > 
+> > 	write_seqcount_begin()
+> > 	blk_mq_rw_update_state(rq, IN_FLIGHT)
+> > 	blk_add_timer(rq)
+> > 	<timer>
+> > 		schedule_work()
+> > 	</timer>
+> > 	<context-switch to worker>
+> > 						read_seqcount_begin()
+> > 							while(seq & 1)
+> > 								cpu_relax();
+> > 
+> Hi Peter
+> 
+> The current seqcount read side is as below:
+> 	do {
+> 		start = read_seqcount_begin(&rq->gstate_seq);
 
-On Thu, Dec 14, 2017 at 09:13:32PM +0000, Bart Van Assche wrote:
-...
-> however is called before a every use of a request. Sorry but I'm not
-> enthusiast about the code in blk_rq_init() that reinitializes state
-> information that should survive request reuse.
 
-If it wasn't clear, me neither.  I think what'd be better is making
-those paths use the usual request allocation path instead of custom
-one but for flush handling, that's not gonna be trivial, so let's deal
-with that later.
+static inline unsigned read_seqcount_begin(const seqcount_t *s)
+{
+	seqcount_lockdep_reader_access(s);
+	return raw_read_seqcount_begin(s);
+}
 
-Thanks.
+static inline unsigned raw_read_seqcount_begin(const seqcount_t *s)
+{
+	unsigned ret = __read_seqcount_begin(s);
+	smp_rmb();
+	return ret;
+}
 
--- 
-tejun
+static inline unsigned __read_seqcount_begin(const seqcount_t *s)
+{
+	unsigned ret;
+
+repeat:
+	ret = READ_ONCE(s->sequence);
+	if (unlikely(ret & 1)) {
+		cpu_relax();
+		goto repeat;
+	}
+	return ret;
+}
