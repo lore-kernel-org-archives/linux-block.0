@@ -1,5 +1,5 @@
 Return-Path: <bruno@wolff.to>
-Date: Mon, 18 Dec 2017 15:53:51 -0600
+Date: Sun, 17 Dec 2017 09:54:48 -0600
 From: Bruno Wolff III <bruno@wolff.to>
 To: weiping zhang <zwp10758@gmail.com>
 Cc: Laura Abbott <labbott@redhat.com>, Jan Kara <jack@suse.cz>,
@@ -8,7 +8,7 @@ Cc: Laura Abbott <labbott@redhat.com>, Jan Kara <jack@suse.cz>,
   regressions@leemhuis.info, linux-block@vger.kernel.org
 Subject: Re: Regression with a0747a859ef6 ("bdi: add error handle for
  bdi_debug_register")
-Message-ID: <20171218215351.GA24604@wolff.to>
+Message-ID: <20171217155448.GA20370@wolff.to>
 References: <20171214100927.GA26167@localhost.didichuxing.com>
  <20171214154136.GA12936@wolff.to>
  <CAA70yB6yofLz8pfhxXfq29sYqcGmBYLOvSruXi9XS_HM6mUrxg@mail.gmail.com>
@@ -29,10 +29,12 @@ On Sun, Dec 17, 2017 at 21:43:50 +0800,
 >Hi, thanks for testing, I think you first reproduce this issue(got WARNING
 >at device_add_disk) by your own build, then add my debug patch.
 
-I'm going to try testing warnings with a kernel I've built, to try to 
-determine if warnings are working at all for the ones I'm building. However 
-it might be that the WARN_ONs are not being reached for the kernels I've 
-built. If that turns out to be the case, I may not be able to get you both 
-the output from the WARN_ONs and the output from your debugging patch at 
-the same time.
-My next kernel build isn't going to finish in time to test today.
+No, the first log (that Laura copied) was from the Fedora bug and it was 
+from a Fedora kernel before I started doing the bisect. That warnings are 
+missing from all of my builds, not just the ones from the patches.
+
+I didn't spot anything obvious going through the kernel spec file when 
+I looked, but I could easily have missed something.
+
+Hopefully it is just a boot default that is different and that I can 
+override it with a kernel boot parameter.
