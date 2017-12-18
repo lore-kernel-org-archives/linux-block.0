@@ -8,56 +8,71 @@ Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
         linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
         "Darrick J . Wong" <darrick.wong@oracle.com>,
         Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>, Chris Mason <clm@fb.com>,
-        Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>,
-        linux-btrfs@vger.kernel.org, Liu Bo <bo.li.liu@oracle.com>
-Subject: [PATCH V4 10/45] btrfs: avoid to access bvec table directly for a cloned bio
-Date: Mon, 18 Dec 2017 20:22:12 +0800
-Message-Id: <20171218122247.3488-11-ming.lei@redhat.com>
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 36/45] f2fs: conver to bio_for_each_page_all2
+Date: Mon, 18 Dec 2017 20:22:38 +0800
+Message-Id: <20171218122247.3488-37-ming.lei@redhat.com>
 In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
 References: <20171218122247.3488-1-ming.lei@redhat.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Commit 17347cec15f919901c90(Btrfs: change how we iterate bios in endio)
-mentioned that for dio the submitted bio may be fast cloned, we
-can't access the bvec table directly for a cloned bio, so use
-bio_get_first_bvec() to retrieve the 1st bvec.
+bio_for_each_page_all() can't be used any more after multipage bvec is
+enabled, so we have to convert to bio_for_each_page_all2().
 
-Cc: Chris Mason <clm@fb.com>
-Cc: Josef Bacik <jbacik@fb.com>
-Cc: David Sterba <dsterba@suse.com>
-Cc: linux-btrfs@vger.kernel.org
-Cc: Liu Bo <bo.li.liu@oracle.com>
-Reviewed-by: Liu Bo <bo.li.liu@oracle.com>
-Acked: David Sterba <dsterba@suse.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/btrfs/inode.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ fs/f2fs/data.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index 4d5cb6e93c80..cb1e2d201434 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -8015,6 +8015,7 @@ static blk_status_t dio_read_error(struct inode *inode, struct bio *failed_bio,
- 	int segs;
- 	int ret;
- 	blk_status_t status;
-+	struct bio_vec bvec;
+diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
+index c404bd86169e..dc76e0b38ebb 100644
+--- a/fs/f2fs/data.c
++++ b/fs/f2fs/data.c
+@@ -54,6 +54,7 @@ static void f2fs_read_end_io(struct bio *bio)
+ {
+ 	struct bio_vec *bvec;
+ 	int i;
++	struct bvec_iter_all bia;
  
- 	BUG_ON(bio_op(failed_bio) == REQ_OP_WRITE);
- 
-@@ -8030,8 +8031,9 @@ static blk_status_t dio_read_error(struct inode *inode, struct bio *failed_bio,
+ #ifdef CONFIG_F2FS_FAULT_INJECTION
+ 	if (time_to_inject(F2FS_P_SB(bio_first_page_all(bio)), FAULT_IO)) {
+@@ -71,7 +72,7 @@ static void f2fs_read_end_io(struct bio *bio)
+ 		}
  	}
  
- 	segs = bio_segments(failed_bio);
-+	bio_get_first_bvec(failed_bio, &bvec);
- 	if (segs > 1 ||
--	    (failed_bio->bi_io_vec->bv_len > btrfs_inode_sectorsize(inode)))
-+	    (bvec.bv_len > btrfs_inode_sectorsize(inode)))
- 		read_mode |= REQ_FAILFAST_DEV;
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		struct page *page = bvec->bv_page;
  
- 	isector = start - btrfs_io_bio(failed_bio)->logical;
+ 		if (!bio->bi_status) {
+@@ -91,8 +92,9 @@ static void f2fs_write_end_io(struct bio *bio)
+ 	struct f2fs_sb_info *sbi = bio->bi_private;
+ 	struct bio_vec *bvec;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		struct page *page = bvec->bv_page;
+ 		enum count_type type = WB_DATA_TYPE(page);
+ 
+@@ -253,6 +255,7 @@ static bool __has_merged_page(struct f2fs_bio_info *io,
+ 	struct bio_vec *bvec;
+ 	struct page *target;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+ 	if (!io->bio)
+ 		return false;
+@@ -260,7 +263,7 @@ static bool __has_merged_page(struct f2fs_bio_info *io,
+ 	if (!inode && !ino)
+ 		return true;
+ 
+-	bio_for_each_page_all(bvec, io->bio, i) {
++	bio_for_each_page_all2(bvec, io->bio, i, bia) {
+ 
+ 		if (bvec->bv_page->mapping)
+ 			target = bvec->bv_page;
 -- 
 2.9.5
