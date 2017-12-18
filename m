@@ -1,197 +1,205 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:40522 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751612AbdLLLEY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Dec 2017 06:04:24 -0500
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
 From: Ming Lei <ming.lei@redhat.com>
-To: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Yi Zhang <yi.zhang@redhat.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 6/6] nvme: remove .init_request callback
-Date: Tue, 12 Dec 2017 19:02:32 +0800
-Message-Id: <20171212110232.12495-7-ming.lei@redhat.com>
-In-Reply-To: <20171212110232.12495-1-ming.lei@redhat.com>
-References: <20171212110232.12495-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Subject: [PATCH V4 08/45] block: move bio_alloc_pages() to bcache
+Date: Mon, 18 Dec 2017 20:22:10 +0800
+Message-Id: <20171218122247.3488-9-ming.lei@redhat.com>
+In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
+References: <20171218122247.3488-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-It may cause race by setting 'nvmeq' in nvme_init_request()
-because .init_request is called inside switching io scheduler, which
-may happen when the NVMe device is being resetted and its nvme queues
-are being freed and created. We don't have any sync between the two
-pathes.
+bcache is the only user of bio_alloc_pages(), so move this function into
+bcache, and avoid it misused in future.
 
-This patch removes the .init_request callback and sets the nvmeq runtime,
-and fixes the following bug:
+Also rename it as bch_bio_allo_pages() since it is bcache only.
 
-[   93.268391] kernel BUG at drivers/nvme/host/pci.c:408!
-[   93.274146] invalid opcode: 0000 [#1] SMP
-[   93.278618] Modules linked in: nfsv3 nfs_acl rpcsec_gss_krb5 auth_rpcgss
-nfsv4 dns_resolver nfs lockd grace fscache sunrpc ipmi_ssif vfat fat
-intel_rapl sb_edac x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel
-kvm irqbypass crct10dif_pclmul crc32_pclmul ghash_clmulni_intel iTCO_wdt
-intel_cstate ipmi_si iTCO_vendor_support intel_uncore mxm_wmi mei_me
-ipmi_devintf intel_rapl_perf pcspkr sg ipmi_msghandler lpc_ich dcdbas mei
-shpchp acpi_power_meter wmi dm_multipath ip_tables xfs libcrc32c sd_mod
-mgag200 i2c_algo_bit drm_kms_helper syscopyarea sysfillrect sysimgblt
-fb_sys_fops ttm drm ahci libahci nvme libata crc32c_intel nvme_core tg3
-megaraid_sas ptp i2c_core pps_core dm_mirror dm_region_hash dm_log dm_mod
-[   93.349071] CPU: 5 PID: 1842 Comm: sh Not tainted 4.15.0-rc2.ming+ #4
-[   93.356256] Hardware name: Dell Inc. PowerEdge R730xd/072T6D, BIOS 2.5.5 08/16/2017
-[   93.364801] task: 00000000fb8abf2a task.stack: 0000000028bd82d1
-[   93.371408] RIP: 0010:nvme_init_request+0x36/0x40 [nvme]
-[   93.377333] RSP: 0018:ffffc90002537ca8 EFLAGS: 00010246
-[   93.383161] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000008
-[   93.391122] RDX: 0000000000000000 RSI: ffff880276ae0000 RDI: ffff88047bae9008
-[   93.399084] RBP: ffff88047bae9008 R08: ffff88047bae9008 R09: 0000000009dabc00
-[   93.407045] R10: 0000000000000004 R11: 000000000000299c R12: ffff880186bc1f00
-[   93.415007] R13: ffff880276ae0000 R14: 0000000000000000 R15: 0000000000000071
-[   93.422969] FS:  00007f33cf288740(0000) GS:ffff88047ba80000(0000) knlGS:0000000000000000
-[   93.431996] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   93.438407] CR2: 00007f33cf28e000 CR3: 000000047e5bb006 CR4: 00000000001606e0
-[   93.446368] Call Trace:
-[   93.449103]  blk_mq_alloc_rqs+0x231/0x2a0
-[   93.453579]  blk_mq_sched_alloc_tags.isra.8+0x42/0x80
-[   93.459214]  blk_mq_init_sched+0x7e/0x140
-[   93.463687]  elevator_switch+0x5a/0x1f0
-[   93.467966]  ? elevator_get.isra.17+0x52/0xc0
-[   93.472826]  elv_iosched_store+0xde/0x150
-[   93.477299]  queue_attr_store+0x4e/0x90
-[   93.481580]  kernfs_fop_write+0xfa/0x180
-[   93.485958]  __vfs_write+0x33/0x170
-[   93.489851]  ? __inode_security_revalidate+0x4c/0x60
-[   93.495390]  ? selinux_file_permission+0xda/0x130
-[   93.500641]  ? _cond_resched+0x15/0x30
-[   93.504815]  vfs_write+0xad/0x1a0
-[   93.508512]  SyS_write+0x52/0xc0
-[   93.512113]  do_syscall_64+0x61/0x1a0
-[   93.516199]  entry_SYSCALL64_slow_path+0x25/0x25
-[   93.521351] RIP: 0033:0x7f33ce96aab0
-[   93.525337] RSP: 002b:00007ffe57570238 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-[   93.533785] RAX: ffffffffffffffda RBX: 0000000000000006 RCX: 00007f33ce96aab0
-[   93.541746] RDX: 0000000000000006 RSI: 00007f33cf28e000 RDI: 0000000000000001
-[   93.549707] RBP: 00007f33cf28e000 R08: 000000000000000a R09: 00007f33cf288740
-[   93.557669] R10: 00007f33cf288740 R11: 0000000000000246 R12: 00007f33cec42400
-[   93.565630] R13: 0000000000000006 R14: 0000000000000001 R15: 0000000000000000
-[   93.573592] Code: 4c 8d 40 08 4c 39 c7 74 16 48 8b 00 48 8b 04 08 48 85 c0
-74 16 48 89 86 78 01 00 00 31 c0 c3 8d 4a 01 48 63 c9 48 c1 e1 03 eb de <0f>
-0b 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 85 f6 53 48 89
-[   93.594676] RIP: nvme_init_request+0x36/0x40 [nvme] RSP: ffffc90002537ca8
-[   93.602273] ---[ end trace 810dde3993e5f14e ]---
-
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/nvme/host/pci.c | 40 ++++++++++++++++++++--------------------
- 1 file changed, 20 insertions(+), 20 deletions(-)
+ block/bio.c                   | 28 ----------------------------
+ drivers/md/bcache/btree.c     |  2 +-
+ drivers/md/bcache/debug.c     |  2 +-
+ drivers/md/bcache/movinggc.c  |  2 +-
+ drivers/md/bcache/request.c   |  2 +-
+ drivers/md/bcache/util.c      | 27 +++++++++++++++++++++++++++
+ drivers/md/bcache/util.h      |  1 +
+ drivers/md/bcache/writeback.c |  2 +-
+ include/linux/bio.h           |  1 -
+ 9 files changed, 33 insertions(+), 34 deletions(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index f5800c3c9082..1e9a617e728b 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -397,19 +397,6 @@ static int nvme_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
- 	return 0;
- }
+diff --git a/block/bio.c b/block/bio.c
+index 8bfdea58159b..fe1efbeaf4aa 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -969,34 +969,6 @@ void bio_advance(struct bio *bio, unsigned bytes)
+ EXPORT_SYMBOL(bio_advance);
  
--static int nvme_init_request(struct blk_mq_tag_set *set, struct request *req,
--		unsigned int hctx_idx, unsigned int numa_node)
+ /**
+- * bio_alloc_pages - allocates a single page for each bvec in a bio
+- * @bio: bio to allocate pages for
+- * @gfp_mask: flags for allocation
+- *
+- * Allocates pages up to @bio->bi_vcnt.
+- *
+- * Returns 0 on success, -ENOMEM on failure. On failure, any allocated pages are
+- * freed.
+- */
+-int bio_alloc_pages(struct bio *bio, gfp_t gfp_mask)
 -{
--	struct nvme_dev *dev = set->driver_data;
--	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
--	int queue_idx = (set == &dev->tagset) ? hctx_idx + 1 : 0;
--	struct nvme_queue *nvmeq = dev->queues[queue_idx];
+-	int i;
+-	struct bio_vec *bv;
 -
--	BUG_ON(!nvmeq);
--	iod->nvmeq = nvmeq;
+-	bio_for_each_segment_all(bv, bio, i) {
+-		bv->bv_page = alloc_page(gfp_mask);
+-		if (!bv->bv_page) {
+-			while (--bv >= bio->bi_io_vec)
+-				__free_page(bv->bv_page);
+-			return -ENOMEM;
+-		}
+-	}
+-
 -	return 0;
 -}
+-EXPORT_SYMBOL(bio_alloc_pages);
 -
- static int nvme_pci_map_queues(struct blk_mq_tag_set *set)
- {
- 	struct nvme_dev *dev = set->driver_data;
-@@ -448,7 +435,8 @@ static void **nvme_pci_iod_list(struct request *req)
- 	return (void **)(iod->sg + blk_rq_nr_phys_segments(req));
+-/**
+  * bio_copy_data - copy contents of data buffers from one chain of bios to
+  * another
+  * @src: source bio list
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index 02a4cf646fdc..ebb1874218e7 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -419,7 +419,7 @@ static void do_btree_node_write(struct btree *b)
+ 	SET_PTR_OFFSET(&k.key, 0, PTR_OFFSET(&k.key, 0) +
+ 		       bset_sector_offset(&b->keys, i));
+ 
+-	if (!bio_alloc_pages(b->bio, __GFP_NOWARN|GFP_NOWAIT)) {
++	if (!bch_bio_alloc_pages(b->bio, __GFP_NOWARN|GFP_NOWAIT)) {
+ 		int j;
+ 		struct bio_vec *bv;
+ 		void *base = (void *) ((unsigned long) i & ~(PAGE_SIZE - 1));
+diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
+index c7a02c4900da..879ab21074c6 100644
+--- a/drivers/md/bcache/debug.c
++++ b/drivers/md/bcache/debug.c
+@@ -116,7 +116,7 @@ void bch_data_verify(struct cached_dev *dc, struct bio *bio)
+ 		return;
+ 	check->bi_opf = REQ_OP_READ;
+ 
+-	if (bio_alloc_pages(check, GFP_NOIO))
++	if (bch_bio_alloc_pages(check, GFP_NOIO))
+ 		goto out_put;
+ 
+ 	submit_bio_wait(check);
+diff --git a/drivers/md/bcache/movinggc.c b/drivers/md/bcache/movinggc.c
+index d50c1c97da68..a24c3a95b2c0 100644
+--- a/drivers/md/bcache/movinggc.c
++++ b/drivers/md/bcache/movinggc.c
+@@ -162,7 +162,7 @@ static void read_moving(struct cache_set *c)
+ 		bio_set_op_attrs(bio, REQ_OP_READ, 0);
+ 		bio->bi_end_io	= read_moving_endio;
+ 
+-		if (bio_alloc_pages(bio, GFP_KERNEL))
++		if (bch_bio_alloc_pages(bio, GFP_KERNEL))
+ 			goto err;
+ 
+ 		trace_bcache_gc_copy(&w->key);
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 643c3021624f..c493fb947dc9 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -841,7 +841,7 @@ static int cached_dev_cache_miss(struct btree *b, struct search *s,
+ 	cache_bio->bi_private	= &s->cl;
+ 
+ 	bch_bio_map(cache_bio, NULL);
+-	if (bio_alloc_pages(cache_bio, __GFP_NOWARN|GFP_NOIO))
++	if (bch_bio_alloc_pages(cache_bio, __GFP_NOWARN|GFP_NOIO))
+ 		goto out_put;
+ 
+ 	if (reada)
+diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
+index 61813d230015..a23cd6a14b74 100644
+--- a/drivers/md/bcache/util.c
++++ b/drivers/md/bcache/util.c
+@@ -283,6 +283,33 @@ start:		bv->bv_len	= min_t(size_t, PAGE_SIZE - bv->bv_offset,
+ 	}
  }
  
--static blk_status_t nvme_init_iod(struct request *rq, struct nvme_dev *dev)
-+static blk_status_t nvme_init_iod(struct request *rq,
-+		struct nvme_dev *dev, int queue_idx)
- {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(rq);
- 	int nseg = blk_rq_nr_phys_segments(rq);
-@@ -469,6 +457,7 @@ static blk_status_t nvme_init_iod(struct request *rq, struct nvme_dev *dev)
- 	iod->npages = -1;
- 	iod->nents = 0;
- 	iod->length = size;
-+	iod->nvmeq = dev->queues[queue_idx];
- 
- 	return BLK_STS_OK;
- }
-@@ -862,8 +851,9 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
++/**
++ * bch_bio_alloc_pages - allocates a single page for each bvec in a bio
++ * @bio: bio to allocate pages for
++ * @gfp_mask: flags for allocation
++ *
++ * Allocates pages up to @bio->bi_vcnt.
++ *
++ * Returns 0 on success, -ENOMEM on failure. On failure, any allocated pages are
++ * freed.
++ */
++int bch_bio_alloc_pages(struct bio *bio, gfp_t gfp_mask)
++{
++	int i;
++	struct bio_vec *bv;
++
++	bio_for_each_segment_all(bv, bio, i) {
++		bv->bv_page = alloc_page(gfp_mask);
++		if (!bv->bv_page) {
++			while (--bv >= bio->bi_io_vec)
++				__free_page(bv->bv_page);
++			return -ENOMEM;
++		}
++	}
++
++	return 0;
++}
++
  /*
-  * NOTE: ns is NULL when called on the admin queue.
-  */
--static blk_status_t nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
--			 const struct blk_mq_queue_data *bd)
-+static blk_status_t __nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
-+			 const struct blk_mq_queue_data *bd,
-+			 int queue_idx)
- {
- 	struct nvme_ns *ns = hctx->queue->queuedata;
- 	struct nvme_queue *nvmeq = hctx->driver_data;
-@@ -876,7 +866,7 @@ static blk_status_t nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	if (ret)
- 		return ret;
- 
--	ret = nvme_init_iod(req, dev);
-+	ret = nvme_init_iod(req, dev, queue_idx);
- 	if (ret)
- 		goto out_free_cmd;
- 
-@@ -905,6 +895,18 @@ static blk_status_t nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	return ret;
+  * Portions Copyright (c) 1996-2001, PostgreSQL Global Development Group (Any
+  * use permitted, subject to terms of PostgreSQL license; see.)
+diff --git a/drivers/md/bcache/util.h b/drivers/md/bcache/util.h
+index ed5e8a412eb8..4df4c5c1cab2 100644
+--- a/drivers/md/bcache/util.h
++++ b/drivers/md/bcache/util.h
+@@ -558,6 +558,7 @@ static inline unsigned fract_exp_two(unsigned x, unsigned fract_bits)
  }
  
-+static blk_status_t nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
-+			 const struct blk_mq_queue_data *bd)
-+{
-+	return __nvme_queue_rq(hctx, bd, hctx->queue_num + 1);
-+}
-+
-+static blk_status_t nvme_admin_queue_rq(struct blk_mq_hw_ctx *hctx,
-+		const struct blk_mq_queue_data *bd)
-+{
-+	return __nvme_queue_rq(hctx, bd, 0);
-+}
-+
- static void nvme_pci_complete_rq(struct request *req)
+ void bch_bio_map(struct bio *bio, void *base);
++int bch_bio_alloc_pages(struct bio *bio, gfp_t gfp_mask);
+ 
+ static inline sector_t bdev_sectors(struct block_device *bdev)
  {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-@@ -1480,11 +1482,10 @@ static int nvme_create_queue(struct nvme_queue *nvmeq, int qid)
- }
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index 56a37884ca8b..1ac2af6128b1 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -278,7 +278,7 @@ static void read_dirty(struct cached_dev *dc)
+ 		bio_set_dev(&io->bio, PTR_CACHE(dc->disk.c, &w->key, 0)->bdev);
+ 		io->bio.bi_end_io	= read_dirty_endio;
  
- static const struct blk_mq_ops nvme_mq_admin_ops = {
--	.queue_rq	= nvme_queue_rq,
-+	.queue_rq	= nvme_admin_queue_rq,
- 	.complete	= nvme_pci_complete_rq,
- 	.init_hctx	= nvme_admin_init_hctx,
- 	.exit_hctx      = nvme_admin_exit_hctx,
--	.init_request	= nvme_init_request,
- 	.timeout	= nvme_timeout,
- };
+-		if (bio_alloc_pages(&io->bio, GFP_KERNEL))
++		if (bch_bio_alloc_pages(&io->bio, GFP_KERNEL))
+ 			goto err_free;
  
-@@ -1492,7 +1493,6 @@ static const struct blk_mq_ops nvme_mq_ops = {
- 	.queue_rq	= nvme_queue_rq,
- 	.complete	= nvme_pci_complete_rq,
- 	.init_hctx	= nvme_init_hctx,
--	.init_request	= nvme_init_request,
- 	.map_queues	= nvme_pci_map_queues,
- 	.timeout	= nvme_timeout,
- 	.poll		= nvme_poll,
+ 		trace_bcache_writeback(&w->key);
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 435ddf04e889..367a979fd4a6 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -500,7 +500,6 @@ static inline void bio_flush_dcache_pages(struct bio *bi)
+ #endif
+ 
+ extern void bio_copy_data(struct bio *dst, struct bio *src);
+-extern int bio_alloc_pages(struct bio *bio, gfp_t gfp);
+ extern void bio_free_pages(struct bio *bio);
+ 
+ extern struct bio *bio_copy_user_iov(struct request_queue *,
 -- 
 2.9.5
