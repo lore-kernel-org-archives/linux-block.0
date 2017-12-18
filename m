@@ -1,98 +1,50 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f68.google.com ([209.85.160.68]:42217 "EHLO
-        mail-pl0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752052AbdL1AsM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Dec 2017 19:48:12 -0500
-Received: by mail-pl0-f68.google.com with SMTP id bd8so20251081plb.9
-        for <linux-block@vger.kernel.org>; Wed, 27 Dec 2017 16:48:12 -0800 (PST)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: Michael Lyle <mlyle@lyle.org>
-Subject: [for-416 PATCH 3/3] bcache: allow quick writeback when backing idle
-Date: Wed, 27 Dec 2017 16:47:44 -0800
-Message-Id: <20171228004744.3522-3-mlyle@lyle.org>
-In-Reply-To: <20171228004744.3522-1-mlyle@lyle.org>
-References: <20171228004744.3522-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 25/45] block: implement bio_pages_all() via bio_for_each_page_all()
+Date: Mon, 18 Dec 2017 20:22:27 +0800
+Message-Id: <20171218122247.3488-26-ming.lei@redhat.com>
+In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
+References: <20171218122247.3488-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-If the control system would wait for at least half a second, and there's
-been no reqs hitting the backing disk for awhile: use an alternate mode
-where we have at most one contiguous set of writebacks in flight at a
-time. (But don't otherwise delay).  If front-end IO appears, it will
-still be quick, as it will only have to contend with one real operation
-in flight.  But otherwise, we'll be sending data to the backing disk as
-quickly as it can accept it (with one op at a time).
+As multipage bvec will be enabled soon, bio->bi_vcnt isn't same with
+page count in the bio any more, so use bio_for_each_page_all() to
+compute the number.
 
-Signed-off-by: Michael Lyle <mlyle@lyle.org>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/bcache/bcache.h    |  7 +++++++
- drivers/md/bcache/request.c   |  1 +
- drivers/md/bcache/writeback.c | 21 +++++++++++++++++++++
- 3 files changed, 29 insertions(+)
+ include/linux/bio.h | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 3be0fcc19b1f..5f7b0b2513cc 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -320,6 +320,13 @@ struct cached_dev {
- 	 */
- 	atomic_t		has_dirty;
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 0cb29c73ff27..2dd1ca0285e1 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -330,8 +330,14 @@ static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
  
-+	/*
-+	 * Set to zero by things that touch the backing volume-- except
-+	 * writeback.  Incremented by writeback.  Used to determine when to
-+	 * accelerate idle writeback.
-+	 */
-+	atomic_t		backing_idle;
+ static inline unsigned bio_pages_all(struct bio *bio)
+ {
++	unsigned i;
++	struct bio_vec *bv;
 +
- 	struct bch_ratelimit	writeback_rate;
- 	struct delayed_work	writeback_rate_update;
- 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index d1faaba6b93f..3b4defbdcbbd 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -996,6 +996,7 @@ static blk_qc_t cached_dev_make_request(struct request_queue *q,
- 	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
- 	int rw = bio_data_dir(bio);
- 
-+	atomic_set(&dc->backing_idle, 0);
- 	generic_start_io_acct(q, rw, bio_sectors(bio), &d->disk->part0);
- 
- 	bio_set_dev(bio, dc->bdev);
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 4084586d5991..bf309a480335 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -383,6 +383,27 @@ static void read_dirty(struct cached_dev *dc)
- 
- 		delay = writeback_delay(dc, size);
- 
-+		/* If the control system would wait for at least half a
-+		 * second, and there's been no reqs hitting the backing disk
-+		 * for awhile: use an alternate mode where we have at most
-+		 * one contiguous set of writebacks in flight at a time.  If
-+		 * someone wants to do IO it will be quick, as it will only
-+		 * have to contend with one operation in flight, and we'll
-+		 * be round-tripping data to the backing disk as quickly as
-+		 * it can accept it.
-+		 */
-+		if (delay >= HZ / 2) {
-+			/* 3 means at least 1.5 seconds, up to 7.5 if we
-+			 * have slowed way down.
-+			 */
-+			if (atomic_inc_return(&dc->backing_idle) >= 3) {
-+				/* Wait for current I/Os to finish */
-+				closure_sync(&cl);
-+				/* And immediately launch a new set. */
-+				delay = 0;
-+			}
-+		}
+ 	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
+-	return bio->bi_vcnt;
 +
- 		while (!kthread_should_stop() && delay) {
- 			schedule_timeout_interruptible(delay);
- 			delay = writeback_delay(dc, 0);
++	bio_for_each_page_all(bv, bio, i)
++		;
++	return i;
+ }
+ 
+ static inline struct bio_vec *bio_first_bvec_all(struct bio *bio)
 -- 
-2.14.1
+2.9.5
