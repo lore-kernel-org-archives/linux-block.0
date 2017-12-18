@@ -1,117 +1,78 @@
-Return-Path: <prvs=5218034d2=damien.lemoal@wdc.com>
-From: Damien Le Moal <damien.lemoal@wdc.com>
-To: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: [PATCH V9 2/7] mq-deadline: Introduce dispatch helpers
-Date: Thu, 21 Dec 2017 15:43:39 +0900
-Message-Id: <20171221064344.6228-3-damien.lemoal@wdc.com>
-In-Reply-To: <20171221064344.6228-1-damien.lemoal@wdc.com>
-References: <20171221064344.6228-1-damien.lemoal@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:37534 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1759228AbdLRM3k (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Dec 2017 07:29:40 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 26/45] block: introduce bio_segments()
+Date: Mon, 18 Dec 2017 20:22:28 +0800
+Message-Id: <20171218122247.3488-27-ming.lei@redhat.com>
+In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
+References: <20171218122247.3488-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Avoid directly referencing the next_rq and fifo_list arrays using the
-helper functions deadline_next_request() and deadline_fifo_request() to
-facilitate changes in the dispatch request selection in
-__dd_dispatch_request() for zoned block devices.
+There are still cases in which we need to use bio_segments() for get the
+number of segment, so introduce it.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Bart Van Assche <Bart.VanAssche@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/mq-deadline.c | 45 +++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 37 insertions(+), 8 deletions(-)
+ include/linux/bio.h | 25 ++++++++++++++++++++-----
+ 1 file changed, 20 insertions(+), 5 deletions(-)
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 0179e484ec98..8bd6db9e69c7 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -191,6 +191,35 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
- 	return 0;
- }
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 2dd1ca0285e1..205a914ee3c0 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -223,9 +223,9 @@ static inline bool bio_rewind_iter(struct bio *bio, struct bvec_iter *iter,
  
-+/*
-+ * For the specified data direction, return the next request to
-+ * dispatch using arrival ordered lists.
-+ */
-+static struct request *
-+deadline_fifo_request(struct deadline_data *dd, int data_dir)
-+{
-+	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
-+		return NULL;
-+
-+	if (list_empty(&dd->fifo_list[data_dir]))
-+		return NULL;
-+
-+	return rq_entry_fifo(dd->fifo_list[data_dir].next);
-+}
-+
-+/*
-+ * For the specified data direction, return the next request to
-+ * dispatch using sector position sorted lists.
-+ */
-+static struct request *
-+deadline_next_request(struct deadline_data *dd, int data_dir)
-+{
-+	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
-+		return NULL;
-+
-+	return dd->next_rq[data_dir];
-+}
-+
- /*
-  * deadline_dispatch_requests selects the best request according to
-  * read/write expire, fifo_batch, etc
-@@ -198,7 +227,7 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
- static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ #define bio_iter_last(bvec, iter) ((iter).bi_size == (bvec).bv_len)
+ 
+-static inline unsigned bio_pages(struct bio *bio)
++static inline unsigned __bio_elements(struct bio *bio, bool seg)
  {
- 	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
--	struct request *rq;
-+	struct request *rq, *next_rq;
- 	bool reads, writes;
- 	int data_dir;
+-	unsigned segs = 0;
++	unsigned elems = 0;
+ 	struct bio_vec bv;
+ 	struct bvec_iter iter;
  
-@@ -214,10 +243,9 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	/*
- 	 * batches are currently reads XOR writes
- 	 */
--	if (dd->next_rq[WRITE])
--		rq = dd->next_rq[WRITE];
--	else
--		rq = dd->next_rq[READ];
-+	rq = deadline_next_request(dd, WRITE);
-+	if (!rq)
-+		rq = deadline_next_request(dd, READ);
- 
- 	if (rq && dd->batching < dd->fifo_batch)
- 		/* we have a next request are still entitled to batch */
-@@ -260,19 +288,20 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	/*
- 	 * we are not running a batch, find best request for selected data_dir
- 	 */
--	if (deadline_check_fifo(dd, data_dir) || !dd->next_rq[data_dir]) {
-+	next_rq = deadline_next_request(dd, data_dir);
-+	if (deadline_check_fifo(dd, data_dir) || !next_rq) {
- 		/*
- 		 * A deadline has expired, the last request was in the other
- 		 * direction, or we have run out of higher-sectored requests.
- 		 * Start again from the request with the earliest expiry time.
- 		 */
--		rq = rq_entry_fifo(dd->fifo_list[data_dir].next);
-+		rq = deadline_fifo_request(dd, data_dir);
- 	} else {
- 		/*
- 		 * The last req was the same dir and we have a next request in
- 		 * sort order. No expired requests so continue on from here.
- 		 */
--		rq = dd->next_rq[data_dir];
-+		rq = next_rq;
+@@ -245,10 +245,25 @@ static inline unsigned bio_pages(struct bio *bio)
+ 		break;
  	}
  
- 	dd->batching = 0;
+-	bio_for_each_page(bv, bio, iter)
+-		segs++;
++	if (!seg) {
++		bio_for_each_page(bv, bio, iter)
++			elems++;
++	} else {
++		bio_for_each_segment(bv, bio, iter)
++			elems++;
++	}
++
++	return elems;
++}
++
++static inline unsigned bio_pages(struct bio *bio)
++{
++	return __bio_elements(bio, false);
++}
+ 
+-	return segs;
++static inline unsigned bio_segments(struct bio *bio)
++{
++	return __bio_elements(bio, true);
+ }
+ 
+ /*
 -- 
-2.14.3
+2.9.5
