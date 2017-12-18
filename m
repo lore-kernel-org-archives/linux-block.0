@@ -1,120 +1,130 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from LGEAMRELO11.lge.com ([156.147.23.51]:47011 "EHLO
-        lgeamrelo11.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753372AbdLDFQs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Dec 2017 00:16:48 -0500
-From: Byungchul Park <byungchul.park@lge.com>
-To: peterz@infradead.org, mingo@kernel.org, akpm@linux-foundation.org
-Cc: tglx@linutronix.de, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org,
-        kernel-team@lge.com, jack@suse.cz, jlayton@redhat.com,
-        viro@zeniv.linux.org.uk, hannes@cmpxchg.org, npiggin@gmail.com,
-        rgoldwyn@suse.com, vbabka@suse.cz, mhocko@suse.com,
-        pombredanne@nexb.com, vinmenon@codeaurora.org,
-        gregkh@linuxfoundation.org
-Subject: [PATCH v2 4/4] lockdep: Add a boot parameter enabling to track page locks using lockdep and disable it by default
-Date: Mon,  4 Dec 2017 14:16:23 +0900
-Message-Id: <1512364583-26070-5-git-send-email-byungchul.park@lge.com>
-In-Reply-To: <1512364583-26070-1-git-send-email-byungchul.park@lge.com>
-References: <1512364583-26070-1-git-send-email-byungchul.park@lge.com>
+Received: from mx1.redhat.com ([209.132.183.28]:44842 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752743AbdLRM1y (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Dec 2017 07:27:54 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 18/45] block: introduce multipage page bvec helpers
+Date: Mon, 18 Dec 2017 20:22:20 +0800
+Message-Id: <20171218122247.3488-19-ming.lei@redhat.com>
+In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
+References: <20171218122247.3488-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-To track page locks using lockdep, we need a huge memory space for
-lockdep_map per page. So, it would be better to make it disabled by
-default and provide a boot parameter to turn it on. Do it.
+This patch introduces helpers of 'bvec_iter_segment_*' for multipage
+bvec(segment) support.
 
-Suggested-by: Michal Hocko <mhocko@kernel.org>
-Signed-off-by: Byungchul Park <byungchul.park@lge.com>
+The introduced interfaces treate one bvec as real multipage segment,
+for example, .bv_len is the total length of the multipage segment.
+
+The existed helpers of bvec_iter_* are interfaces for supporting current
+bvec iterator which is thought as singlepage only by drivers, fs, dm and
+etc. These helpers will build singlepage bvec in flight, so users of
+current bio/bvec iterator still can work well and needn't change even
+though we store real multipage segment into bvec table.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- Documentation/admin-guide/kernel-parameters.txt |  7 +++++++
- lib/Kconfig.debug                               |  5 ++++-
- mm/filemap.c                                    | 23 +++++++++++++++++++++++
- 3 files changed, 34 insertions(+), 1 deletion(-)
+ include/linux/bvec.h | 63 +++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 60 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index f20ed5e..5e8d15d 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -712,6 +712,13 @@
- 	crossrelease_fullstack
- 			[KNL] Allow to record full stack trace in cross-release
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index fe7a22dd133b..2433c73fa5ea 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -23,6 +23,44 @@
+ #include <linux/kernel.h>
+ #include <linux/bug.h>
+ #include <linux/errno.h>
++#include <linux/mm.h>
++
++/*
++ * What is multipage bvecs(segment)?
++ *
++ * - bvec stored in bio->bi_io_vec is always multipage(mp) style
++ *
++ * - bvec(struct bio_vec) represents one physically contiguous I/O
++ *   buffer, now the buffer may include more than one pages since
++ *   multipage(mp) bvec is supported, and all these pages represented
++ *   by one bvec is physically contiguous. Before mp support, at most
++ *   one page can be included in one bvec, we call it singlepage(sp)
++ *   bvec.
++ *
++ * - .bv_page of th bvec represents the 1st page in the mp segment
++ *
++ * - .bv_offset of the bvec represents offset of the buffer in the bvec
++ *
++ * The effect on the current drivers/filesystem/dm/bcache/...:
++ *
++ * - almost everyone supposes that one bvec only includes one single
++ *   page, so we keep the sp interface not changed, for example,
++ *   bio_for_each_page() still returns bvec with single page
++ *
++ * - bio_for_each_page_all() will be changed to return singlepage
++ *   bvec too
++ *
++ * - during iterating, iterator variable(struct bvec_iter) is always
++ *   updated in multipage bvec style and that means bvec_iter_advance()
++ *   is kept not changed
++ *
++ * - returned(copied) singlepage bvec is generated in flight by bvec
++ *   helpers from the stored multipage bvec(segment)
++ *
++ * - In case that some components(such as iov_iter) need to support
++ *   multipage segment, we introduce new helpers(bvec_iter_segment_*) for
++ *   them.
++ */
  
-+	lockdep_pagelock=
-+			[KNL] Boot-time lockdep_pagelock enabling option.
-+			Storage of lockdep_map per page to track lock_page()/
-+			unlock_page() is disabled by default. With this switch,
-+			we can turn it on.
-+			on: enable the feature
-+
- 	cryptomgr.notests
-                         [KNL] Disable crypto self-tests
+ /*
+  * was unsigned short, but we might as well be ready for > 64kB I/O pages
+@@ -52,16 +90,35 @@ struct bvec_iter {
+  */
+ #define __bvec_iter_bvec(bvec, iter)	(&(bvec)[(iter).bi_idx])
  
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 45fdb3a..c609e97 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -1185,7 +1185,10 @@ config LOCKDEP_PAGELOCK
- 	select PAGE_EXTENSION
- 	help
- 	 PG_locked lock is a kind of crosslock. Using crossrelease feature,
--	 PG_locked lock can work with lockdep.
-+	 PG_locked lock can work with lockdep. Even if you include this
-+	 feature on your build, it is disabled in default. You should pass
-+	 "lockdep_pagelock=on" to boot parameter in order to enable it. It
-+	 consumes a fair amount of memory if enabled.
+-#define bvec_iter_page(bvec, iter)				\
++#define bvec_iter_segment_page(bvec, iter)				\
+ 	(__bvec_iter_bvec((bvec), (iter))->bv_page)
  
- config BOOTPARAM_LOCKDEP_CROSSRELEASE_FULLSTACK
- 	bool "Enable the boot parameter, crossrelease_fullstack"
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 34251fb..cb7b20b 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -1231,8 +1231,24 @@ int __lock_page_or_retry(struct page *page, struct mm_struct *mm,
+-#define bvec_iter_len(bvec, iter)				\
++#define bvec_iter_segment_len(bvec, iter)				\
+ 	min((iter).bi_size,					\
+ 	    __bvec_iter_bvec((bvec), (iter))->bv_len - (iter).bi_bvec_done)
  
- #ifdef CONFIG_LOCKDEP_PAGELOCK
+-#define bvec_iter_offset(bvec, iter)				\
++#define bvec_iter_segment_offset(bvec, iter)				\
+ 	(__bvec_iter_bvec((bvec), (iter))->bv_offset + (iter).bi_bvec_done)
  
-+static int lockdep_pagelock;
-+static int __init allow_lockdep_pagelock(char *str)
-+{
-+	if (!str)
-+		return -EINVAL;
++#define bvec_iter_page_idx_in_seg(bvec, iter)			\
++	(bvec_iter_segment_offset((bvec), (iter)) / PAGE_SIZE)
 +
-+	if (!strcmp(str, "on"))
-+		lockdep_pagelock = 1;
++/*
++ * <page, offset,length> of singlepage(sp) segment.
++ *
++ * This helpers will be implemented for building sp bvec in flight.
++ */
++#define bvec_iter_offset(bvec, iter)					\
++	(bvec_iter_segment_offset((bvec), (iter)) % PAGE_SIZE)
 +
-+	return 0;
-+}
-+early_param("lockdep_pagelock", allow_lockdep_pagelock);
++#define bvec_iter_len(bvec, iter)					\
++	min_t(unsigned, bvec_iter_segment_len((bvec), (iter)),		\
++	    (PAGE_SIZE - (bvec_iter_offset((bvec), (iter)))))
 +
- static bool need_lockdep_pagelock(void)
- {
-+	if (!lockdep_pagelock)
-+		return false;
++#define bvec_iter_page(bvec, iter)					\
++	nth_page(bvec_iter_segment_page((bvec), (iter)),		\
++		 bvec_iter_page_idx_in_seg((bvec), (iter)))
 +
- 	return true;
- }
- 
-@@ -1286,6 +1302,10 @@ static void init_zones_in_node(pg_data_t *pgdat)
- static void init_lockdep_pagelock(void)
- {
- 	pg_data_t *pgdat;
-+
-+	if (!lockdep_pagelock)
-+		return;
-+
- 	for_each_online_pgdat(pgdat)
- 		init_zones_in_node(pgdat);
- }
-@@ -1305,6 +1325,9 @@ struct lockdep_map *get_page_map(struct page *p)
- {
- 	struct page_ext *e;
- 
-+	if (!lockdep_pagelock)
-+		return NULL;
-+
- 	e = lookup_page_ext(p);
- 	if (!e)
- 		return NULL;
+ #define bvec_iter_bvec(bvec, iter)				\
+ ((struct bio_vec) {						\
+ 	.bv_page	= bvec_iter_page((bvec), (iter)),	\
 -- 
-1.9.1
+2.9.5
