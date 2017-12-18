@@ -1,67 +1,71 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from vps-vb.mhejs.net ([37.28.154.113]:51162 "EHLO vps-vb.mhejs.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750971AbdL3Vl0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Dec 2017 16:41:26 -0500
-Subject: Re: [v2,4/6] pktcdvd: Check queue type before attaching to a queue
-To: Bart Van Assche <bart.vanassche@sandisk.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, Omar Sandoval <osandov@fb.com>
-References: <20170531214350.31157-5-bart.vanassche@sandisk.com>
-From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Message-ID: <d237f623-ce22-6360-306f-3460ddba25ef@maciej.szmigiero.name>
-Date: Sat, 30 Dec 2017 22:41:22 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170531214350.31157-5-bart.vanassche@sandisk.com>
-Content-Type: text/plain; charset=utf-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>, Chris Mason <clm@fb.com>,
+        Josef Bacik <jbacik@fb.com>, David Sterba <dsterba@suse.com>,
+        linux-btrfs@vger.kernel.org
+Subject: [PATCH V4 24/45] btrfs: use segment_last_page to get bio's last page
+Date: Mon, 18 Dec 2017 20:22:26 +0800
+Message-Id: <20171218122247.3488-25-ming.lei@redhat.com>
+In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
+References: <20171218122247.3488-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On 31.05.2017 23:43, Bart Van Assche wrote:
-> Since the pktcdvd driver only supports request queues for which
-> struct scsi_request is the first member of their private request
-> data, refuse to register block layer queues for which struct
-> scsi_request is not the first member of the private data.
-> 
-> References: commit 82ed4db499b8 ("block: split scsi_request out of struct request")
-> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-> Reviewed-by: Hannes Reinecke <hare@suse.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Cc: Omar Sandoval <osandov@fb.com>
-> ---
->  drivers/block/pktcdvd.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-> index 205b865ebeb9..42e3c880a8a5 100644
-> --- a/drivers/block/pktcdvd.c
-> +++ b/drivers/block/pktcdvd.c
-> @@ -2583,6 +2583,11 @@ static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
->  	bdev = bdget(dev);
->  	if (!bdev)
->  		return -ENOMEM;
-> +	if (!blk_queue_scsi_passthrough(bdev_get_queue(bdev))) {
-> +		WARN_ONCE(true, "Attempt to register a non-SCSI queue\n");
-> +		bdput(bdev);
-> +		return -EINVAL;
-> +	}
->  	ret = blkdev_get(bdev, FMODE_READ | FMODE_NDELAY, NULL);
->  	if (ret)
->  		return ret;
-> 
+Preparing for supporting multipage bvec.
 
-This commit causes a NULL pointer dereference when adding a pktcdvd
-mapping.
+Cc: Chris Mason <clm@fb.com>
+Cc: Josef Bacik <jbacik@fb.com>
+Cc: David Sterba <dsterba@suse.com>
+Cc: linux-btrfs@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ fs/btrfs/compression.c | 5 ++++-
+ fs/btrfs/extent_io.c   | 5 +++--
+ 2 files changed, 7 insertions(+), 3 deletions(-)
 
-Reproducing it is simple:
-# pktsetup 1 /dev/cdrom 
-
-Specifically, the NULL dereference happens inside bdev_get_queue(bdev),
-which is supposed to return bdev->bd_disk->queue, but in this case
-bdev->bd_disk is NULL.
-
-If I revert this commit the mapping is added correctly (tested on 4.14.10,
-but there haven't been any changes to pktcdvd.c and bdev_get_queue() in
-4.15-rc5).
-
-Maciej
+diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
+index 15430c9fc6d7..1a62725a5f08 100644
+--- a/fs/btrfs/compression.c
++++ b/fs/btrfs/compression.c
+@@ -412,8 +412,11 @@ blk_status_t btrfs_submit_compressed_write(struct inode *inode, u64 start,
+ static u64 bio_end_offset(struct bio *bio)
+ {
+ 	struct bio_vec *last = bio_last_bvec_all(bio);
++	struct bio_vec bv;
+ 
+-	return page_offset(last->bv_page) + last->bv_len + last->bv_offset;
++	segment_last_page(last, &bv);
++
++	return page_offset(bv.bv_page) + bv.bv_len + bv.bv_offset;
+ }
+ 
+ static noinline int add_ra_bio_pages(struct inode *inode,
+diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+index 6984e0d5b00d..f466289b66a3 100644
+--- a/fs/btrfs/extent_io.c
++++ b/fs/btrfs/extent_io.c
+@@ -2726,11 +2726,12 @@ static int __must_check submit_one_bio(struct bio *bio, int mirror_num,
+ {
+ 	blk_status_t ret = 0;
+ 	struct bio_vec *bvec = bio_last_bvec_all(bio);
+-	struct page *page = bvec->bv_page;
++	struct bio_vec bv;
+ 	struct extent_io_tree *tree = bio->bi_private;
+ 	u64 start;
+ 
+-	start = page_offset(page) + bvec->bv_offset;
++	segment_last_page(bvec, &bv);
++	start = page_offset(bv.bv_page) + bv.bv_offset;
+ 
+ 	bio->bi_private = NULL;
+ 	bio_get(bio);
+-- 
+2.9.5
