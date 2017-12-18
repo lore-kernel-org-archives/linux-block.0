@@ -1,102 +1,129 @@
-Return-Path: <prvs=5062bafe5=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	"James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	stable@vger.kernel.org
-Subject: [PATCH v2 1/3] scsi: Fix a scsi_show_rq() NULL pointer dereference
-Date: Tue,  5 Dec 2017 16:57:51 -0800
-Message-Id: <20171206005753.28734-2-bart.vanassche@wdc.com>
-In-Reply-To: <20171206005753.28734-1-bart.vanassche@wdc.com>
-References: <20171206005753.28734-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:53812 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S933748AbdLRMbH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Dec 2017 07:31:07 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 33/45] fs: conver to bio_for_each_page_all2
+Date: Mon, 18 Dec 2017 20:22:35 +0800
+Message-Id: <20171218122247.3488-34-ming.lei@redhat.com>
+In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
+References: <20171218122247.3488-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Avoid that scsi_show_rq() triggers a NULL pointer dereference if
-called after sd_uninit_command(). Swap the NULL pointer assignment
-and the mempool_free() call in sd_uninit_command() to make it less
-likely that scsi_show_rq() triggers a use-after-free. Note: even
-with these changes scsi_show_rq() can trigger a use-after-free but
-that's a lesser evil than e.g. suppressing debug information for
-T10-PI commands completely. This patch fixes the following oops:
+bio_for_each_page_all() can't be used any more after multipage bvec is
+enabled, so we have to convert to bio_for_each_page_all2().
 
-BUG: unable to handle kernel NULL pointer dereference at (null)
-IP: scsi_format_opcode_name+0x1a/0x1c0
-CPU: 1 PID: 1881 Comm: cat Not tainted 4.14.0-rc2.blk_mq_io_hang+ #516
-Call Trace:
- __scsi_format_command+0x27/0xc0
- scsi_show_rq+0x5c/0xc0
- __blk_mq_debugfs_rq_show+0x116/0x130
- blk_mq_debugfs_rq_show+0xe/0x10
- seq_read+0xfe/0x3b0
- full_proxy_read+0x54/0x90
- __vfs_read+0x37/0x160
- vfs_read+0x96/0x130
- SyS_read+0x55/0xc0
- entry_SYSCALL_64_fastpath+0x1a/0xa5
-
-Fixes: 0eebd005dd07 ("scsi: Implement blk_mq_ops.show_rq()")
-Reported-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: James E.J. Bottomley <jejb@linux.vnet.ibm.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: stable@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/scsi/scsi_debugfs.c | 6 ++++--
- drivers/scsi/sd.c           | 4 +++-
- 2 files changed, 7 insertions(+), 3 deletions(-)
+ fs/block_dev.c  | 6 ++++--
+ fs/crypto/bio.c | 3 ++-
+ fs/direct-io.c  | 4 +++-
+ fs/iomap.c      | 3 ++-
+ fs/mpage.c      | 3 ++-
+ 5 files changed, 13 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/scsi/scsi_debugfs.c b/drivers/scsi/scsi_debugfs.c
-index 01f08c03f2c1..c3765d29fd3f 100644
---- a/drivers/scsi/scsi_debugfs.c
-+++ b/drivers/scsi/scsi_debugfs.c
-@@ -8,9 +8,11 @@ void scsi_show_rq(struct seq_file *m, struct request *rq)
- {
- 	struct scsi_cmnd *cmd = container_of(scsi_req(rq), typeof(*cmd), req);
- 	int msecs = jiffies_to_msecs(jiffies - cmd->jiffies_at_alloc);
--	char buf[80];
-+	const u8 *const cdb = READ_ONCE(cmd->cmnd);
-+	char buf[80] = "(?)";
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index e73f635502e7..41e1fc90f048 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -197,6 +197,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+ 	ssize_t ret;
+ 	blk_qc_t qc;
+ 	int i;
++	struct bvec_iter_all bia;
  
--	__scsi_format_command(buf, sizeof(buf), cmd->cmnd, cmd->cmd_len);
-+	if (cdb)
-+		__scsi_format_command(buf, sizeof(buf), cdb, cmd->cmd_len);
- 	seq_printf(m, ", .cmd=%s, .retries=%d, allocated %d.%03d s ago", buf,
- 		   cmd->retries, msecs / 1000, msecs % 1000);
- }
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index d175c5c5ccf8..d841743b2107 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -1284,6 +1284,7 @@ static int sd_init_command(struct scsi_cmnd *cmd)
- static void sd_uninit_command(struct scsi_cmnd *SCpnt)
- {
- 	struct request *rq = SCpnt->request;
-+	u8 *cmnd;
- 
- 	if (SCpnt->flags & SCMD_ZONE_WRITE_LOCK)
- 		sd_zbc_write_unlock_zone(SCpnt);
-@@ -1292,9 +1293,10 @@ static void sd_uninit_command(struct scsi_cmnd *SCpnt)
- 		__free_page(rq->special_vec.bv_page);
- 
- 	if (SCpnt->cmnd != scsi_req(rq)->cmd) {
--		mempool_free(SCpnt->cmnd, sd_cdb_pool);
-+		cmnd = SCpnt->cmnd;
- 		SCpnt->cmnd = NULL;
- 		SCpnt->cmd_len = 0;
-+		mempool_free(cmnd, sd_cdb_pool);
+ 	if ((pos | iov_iter_alignment(iter)) &
+ 	    (bdev_logical_block_size(bdev) - 1))
+@@ -242,7 +243,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
  	}
- }
+ 	__set_current_state(TASK_RUNNING);
  
+-	bio_for_each_page_all(bvec, &bio, i) {
++	bio_for_each_page_all2(bvec, &bio, i, bia) {
+ 		if (should_dirty && !PageCompound(bvec->bv_page))
+ 			set_page_dirty_lock(bvec->bv_page);
+ 		put_page(bvec->bv_page);
+@@ -309,8 +310,9 @@ static void blkdev_bio_end_io(struct bio *bio)
+ 	} else {
+ 		struct bio_vec *bvec;
+ 		int i;
++		struct bvec_iter_all bia;
+ 
+-		bio_for_each_page_all(bvec, bio, i)
++		bio_for_each_page_all2(bvec, bio, i, bia)
+ 			put_page(bvec->bv_page);
+ 		bio_put(bio);
+ 	}
+diff --git a/fs/crypto/bio.c b/fs/crypto/bio.c
+index 2dda77c3a89a..743c3ecb7f97 100644
+--- a/fs/crypto/bio.c
++++ b/fs/crypto/bio.c
+@@ -37,8 +37,9 @@ static void completion_pages(struct work_struct *work)
+ 	struct bio *bio = ctx->r.bio;
+ 	struct bio_vec *bv;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+-	bio_for_each_page_all(bv, bio, i) {
++	bio_for_each_page_all2(bv, bio, i, bia) {
+ 		struct page *page = bv->bv_page;
+ 		int ret = fscrypt_decrypt_page(page->mapping->host, page,
+ 				PAGE_SIZE, 0, page->index);
+diff --git a/fs/direct-io.c b/fs/direct-io.c
+index 5e6f4a5772d2..578a3a854115 100644
+--- a/fs/direct-io.c
++++ b/fs/direct-io.c
+@@ -530,7 +530,9 @@ static blk_status_t dio_bio_complete(struct dio *dio, struct bio *bio)
+ 	if (dio->is_async && dio->op == REQ_OP_READ && dio->should_dirty) {
+ 		bio_check_pages_dirty(bio);	/* transfers ownership */
+ 	} else {
+-		bio_for_each_page_all(bvec, bio, i) {
++		struct bvec_iter_all bia;
++
++		bio_for_each_page_all2(bvec, bio, i, bia) {
+ 			struct page *page = bvec->bv_page;
+ 
+ 			if (dio->op == REQ_OP_READ && !PageCompound(page) &&
+diff --git a/fs/iomap.c b/fs/iomap.c
+index 286daad10ba2..fa4b6e15d29c 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -814,8 +814,9 @@ static void iomap_dio_bio_end_io(struct bio *bio)
+ 	} else {
+ 		struct bio_vec *bvec;
+ 		int i;
++		struct bvec_iter_all bia;
+ 
+-		bio_for_each_page_all(bvec, bio, i)
++		bio_for_each_page_all2(bvec, bio, i, bia)
+ 			put_page(bvec->bv_page);
+ 		bio_put(bio);
+ 	}
+diff --git a/fs/mpage.c b/fs/mpage.c
+index 1cf322c4d6f8..f2da0f9ec0f2 100644
+--- a/fs/mpage.c
++++ b/fs/mpage.c
+@@ -48,8 +48,9 @@ static void mpage_end_io(struct bio *bio)
+ {
+ 	struct bio_vec *bv;
+ 	int i;
++	struct bvec_iter_all bia;
+ 
+-	bio_for_each_page_all(bv, bio, i) {
++	bio_for_each_page_all2(bv, bio, i, bia) {
+ 		struct page *page = bv->bv_page;
+ 		page_endio(page, op_is_write(bio_op(bio)),
+ 				blk_status_to_errno(bio->bi_status));
 -- 
-2.15.0
+2.9.5
