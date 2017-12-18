@@ -1,8 +1,8 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:53812 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:39834 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933748AbdLRMbH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Dec 2017 07:31:07 -0500
+        id S1759063AbdLRMdJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Dec 2017 07:33:09 -0500
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
@@ -13,117 +13,54 @@ Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
         "Darrick J . Wong" <darrick.wong@oracle.com>,
         Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 33/45] fs: conver to bio_for_each_page_all2
-Date: Mon, 18 Dec 2017 20:22:35 +0800
-Message-Id: <20171218122247.3488-34-ming.lei@redhat.com>
+Subject: [PATCH V4 42/45] block: enable multipage bvecs
+Date: Mon, 18 Dec 2017 20:22:44 +0800
+Message-Id: <20171218122247.3488-43-ming.lei@redhat.com>
 In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
 References: <20171218122247.3488-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-bio_for_each_page_all() can't be used any more after multipage bvec is
-enabled, so we have to convert to bio_for_each_page_all2().
+This patch pulls the trigger for multipage bvecs.
+
+Now any request queue which supports queue cluster will see multipage
+bvecs.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/block_dev.c  | 6 ++++--
- fs/crypto/bio.c | 3 ++-
- fs/direct-io.c  | 4 +++-
- fs/iomap.c      | 3 ++-
- fs/mpage.c      | 3 ++-
- 5 files changed, 13 insertions(+), 6 deletions(-)
+ block/bio.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index e73f635502e7..41e1fc90f048 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -197,6 +197,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
- 	ssize_t ret;
- 	blk_qc_t qc;
- 	int i;
-+	struct bvec_iter_all bia;
- 
- 	if ((pos | iov_iter_alignment(iter)) &
- 	    (bdev_logical_block_size(bdev) - 1))
-@@ -242,7 +243,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
- 	}
- 	__set_current_state(TASK_RUNNING);
- 
--	bio_for_each_page_all(bvec, &bio, i) {
-+	bio_for_each_page_all2(bvec, &bio, i, bia) {
- 		if (should_dirty && !PageCompound(bvec->bv_page))
- 			set_page_dirty_lock(bvec->bv_page);
- 		put_page(bvec->bv_page);
-@@ -309,8 +310,9 @@ static void blkdev_bio_end_io(struct bio *bio)
- 	} else {
- 		struct bio_vec *bvec;
- 		int i;
-+		struct bvec_iter_all bia;
- 
--		bio_for_each_page_all(bvec, bio, i)
-+		bio_for_each_page_all2(bvec, bio, i, bia)
- 			put_page(bvec->bv_page);
- 		bio_put(bio);
- 	}
-diff --git a/fs/crypto/bio.c b/fs/crypto/bio.c
-index 2dda77c3a89a..743c3ecb7f97 100644
---- a/fs/crypto/bio.c
-+++ b/fs/crypto/bio.c
-@@ -37,8 +37,9 @@ static void completion_pages(struct work_struct *work)
- 	struct bio *bio = ctx->r.bio;
- 	struct bio_vec *bv;
- 	int i;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_page_all(bv, bio, i) {
-+	bio_for_each_page_all2(bv, bio, i, bia) {
- 		struct page *page = bv->bv_page;
- 		int ret = fscrypt_decrypt_page(page->mapping->host, page,
- 				PAGE_SIZE, 0, page->index);
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index 5e6f4a5772d2..578a3a854115 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -530,7 +530,9 @@ static blk_status_t dio_bio_complete(struct dio *dio, struct bio *bio)
- 	if (dio->is_async && dio->op == REQ_OP_READ && dio->should_dirty) {
- 		bio_check_pages_dirty(bio);	/* transfers ownership */
- 	} else {
--		bio_for_each_page_all(bvec, bio, i) {
-+		struct bvec_iter_all bia;
+diff --git a/block/bio.c b/block/bio.c
+index e82e4c815dbb..34af328681a8 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -845,6 +845,11 @@ int bio_add_page(struct bio *bio, struct page *page,
+ 	 * a consecutive offset.  Optimize this special case.
+ 	 */
+ 	if (bio->bi_vcnt > 0) {
++		struct request_queue *q = NULL;
 +
-+		bio_for_each_page_all2(bvec, bio, i, bia) {
- 			struct page *page = bvec->bv_page;
++		if (bio->bi_disk)
++			q = bio->bi_disk->queue;
++
+ 		bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
  
- 			if (dio->op == REQ_OP_READ && !PageCompound(page) &&
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 286daad10ba2..fa4b6e15d29c 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -814,8 +814,9 @@ static void iomap_dio_bio_end_io(struct bio *bio)
- 	} else {
- 		struct bio_vec *bvec;
- 		int i;
-+		struct bvec_iter_all bia;
- 
--		bio_for_each_page_all(bvec, bio, i)
-+		bio_for_each_page_all2(bvec, bio, i, bia)
- 			put_page(bvec->bv_page);
- 		bio_put(bio);
+ 		if (page == bv->bv_page &&
+@@ -852,6 +857,14 @@ int bio_add_page(struct bio *bio, struct page *page,
+ 			bv->bv_len += len;
+ 			goto done;
+ 		}
++
++		/* disable multipage bvec too if cluster isn't enabled */
++		if (q && blk_queue_cluster(q) &&
++		    (bvec_to_phys(bv) + bv->bv_len ==
++		     page_to_phys(page) + offset)) {
++			bv->bv_len += len;
++			goto done;
++		}
  	}
-diff --git a/fs/mpage.c b/fs/mpage.c
-index 1cf322c4d6f8..f2da0f9ec0f2 100644
---- a/fs/mpage.c
-+++ b/fs/mpage.c
-@@ -48,8 +48,9 @@ static void mpage_end_io(struct bio *bio)
- {
- 	struct bio_vec *bv;
- 	int i;
-+	struct bvec_iter_all bia;
  
--	bio_for_each_page_all(bv, bio, i) {
-+	bio_for_each_page_all2(bv, bio, i, bia) {
- 		struct page *page = bv->bv_page;
- 		page_endio(page, op_is_write(bio_op(bio)),
- 				blk_status_to_errno(bio->bi_status));
+ 	if (bio->bi_vcnt >= bio->bi_max_vecs)
 -- 
 2.9.5
