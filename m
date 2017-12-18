@@ -1,78 +1,186 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 36/45] f2fs: conver to bio_for_each_page_all2
-Date: Mon, 18 Dec 2017 20:22:38 +0800
-Message-Id: <20171218122247.3488-37-ming.lei@redhat.com>
-In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
-References: <20171218122247.3488-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <joshs@netflix.com>
+Return-Path: <joshs@netflix.com>
+From: Josh Snyder <joshs@netflix.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Brendan Gregg <bgregg@netflix.com>,
+	Tejun Heo <tj@kernel.org>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Josh Snyder <joshs@netflix.com>,
+	Balbir Singh <bsingharora@gmail.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH v2] delayacct: Account blkio completion on the correct task
+Date: Mon, 18 Dec 2017 16:15:10 +0000
+Message-Id: <1513613712-571-1-git-send-email-joshs@netflix.com>
+In-Reply-To: <20171218113426.vndsy2m5qhxrkesg@hirez.programming.kicks-ass.net>
+References: <20171218113426.vndsy2m5qhxrkesg@hirez.programming.kicks-ass.net>
 List-ID: <linux-block@vger.kernel.org>
 
-bio_for_each_page_all() can't be used any more after multipage bvec is
-enabled, so we have to convert to bio_for_each_page_all2().
+Before commit e33a9bba85a8 ("sched/core: move IO scheduling accounting from
+io_schedule_timeout() into scheduler"), delayacct_blkio_end was called after
+context-switching into the task which completed I/O. This resulted in double
+counting: the task would account a delay both waiting for I/O and for time
+spent in the runqueue.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+With e33a9bba85a8, delayacct_blkio_end is called by try_to_wake_up. In
+ttwu, we have not yet context-switched. This is more correct, in that the
+delay accounting ends when the I/O is complete. But delayacct_blkio_end
+relies upon `get_current()`, and we have not yet context-switched into the
+task whose I/O completed. This results in the wrong task having its delay
+accounting statistics updated.
+
+Instead of doing that, pass the task_struct being woken to
+delayacct_blkio_end, so that it can update the statistics of the correct
+task.
+
+Fixes: e33a9bba85a8 ("sched/core: move IO scheduling accounting from io_schedule_timeout() into scheduler")
+Signed-off-by: Josh Snyder <joshs@netflix.com>
 ---
- fs/f2fs/data.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ include/linux/delayacct.h |  8 ++++----
+ kernel/delayacct.c        | 42 ++++++++++++++++++++++++++----------------
+ kernel/sched/core.c       |  6 +++---
+ 3 files changed, 33 insertions(+), 23 deletions(-)
 
-diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-index c404bd86169e..dc76e0b38ebb 100644
---- a/fs/f2fs/data.c
-+++ b/fs/f2fs/data.c
-@@ -54,6 +54,7 @@ static void f2fs_read_end_io(struct bio *bio)
- {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
+diff --git a/include/linux/delayacct.h b/include/linux/delayacct.h
+index 4178d24..f2ad868 100644
+--- a/include/linux/delayacct.h
++++ b/include/linux/delayacct.h
+@@ -71,7 +71,7 @@ extern void delayacct_init(void);
+ extern void __delayacct_tsk_init(struct task_struct *);
+ extern void __delayacct_tsk_exit(struct task_struct *);
+ extern void __delayacct_blkio_start(void);
+-extern void __delayacct_blkio_end(void);
++extern void __delayacct_blkio_end(struct task_struct *);
+ extern int __delayacct_add_tsk(struct taskstats *, struct task_struct *);
+ extern __u64 __delayacct_blkio_ticks(struct task_struct *);
+ extern void __delayacct_freepages_start(void);
+@@ -122,10 +122,10 @@ static inline void delayacct_blkio_start(void)
+ 		__delayacct_blkio_start();
+ }
  
- #ifdef CONFIG_F2FS_FAULT_INJECTION
- 	if (time_to_inject(F2FS_P_SB(bio_first_page_all(bio)), FAULT_IO)) {
-@@ -71,7 +72,7 @@ static void f2fs_read_end_io(struct bio *bio)
- 		}
+-static inline void delayacct_blkio_end(void)
++static inline void delayacct_blkio_end(struct task_struct *p)
+ {
+ 	if (current->delays)
+-		__delayacct_blkio_end();
++		__delayacct_blkio_end(p);
+ 	delayacct_clear_flag(DELAYACCT_PF_BLKIO);
+ }
+ 
+@@ -169,7 +169,7 @@ static inline void delayacct_tsk_free(struct task_struct *tsk)
+ {}
+ static inline void delayacct_blkio_start(void)
+ {}
+-static inline void delayacct_blkio_end(void)
++static inline void delayacct_blkio_end(struct task_struct *p)
+ {}
+ static inline int delayacct_add_tsk(struct taskstats *d,
+ 					struct task_struct *tsk)
+diff --git a/kernel/delayacct.c b/kernel/delayacct.c
+index 4a1c334..e2ec808 100644
+--- a/kernel/delayacct.c
++++ b/kernel/delayacct.c
+@@ -51,16 +51,16 @@ void __delayacct_tsk_init(struct task_struct *tsk)
+  * Finish delay accounting for a statistic using its timestamps (@start),
+  * accumalator (@total) and @count
+  */
+-static void delayacct_end(u64 *start, u64 *total, u32 *count)
++static void delayacct_end(spinlock_t *lock, u64 *start, u64 *total, u32 *count)
+ {
+ 	s64 ns = ktime_get_ns() - *start;
+ 	unsigned long flags;
+ 
+ 	if (ns > 0) {
+-		spin_lock_irqsave(&current->delays->lock, flags);
++		spin_lock_irqsave(lock, flags);
+ 		*total += ns;
+ 		(*count)++;
+-		spin_unlock_irqrestore(&current->delays->lock, flags);
++		spin_unlock_irqrestore(lock, flags);
+ 	}
+ }
+ 
+@@ -69,17 +69,25 @@ void __delayacct_blkio_start(void)
+ 	current->delays->blkio_start = ktime_get_ns();
+ }
+ 
+-void __delayacct_blkio_end(void)
++/*
++ * We cannot rely on the `current` macro, as we haven't yet switched back to
++ * the process being woken.
++ */
++void __delayacct_blkio_end(struct task_struct *p)
+ {
+-	if (current->delays->flags & DELAYACCT_PF_SWAPIN)
+-		/* Swapin block I/O */
+-		delayacct_end(&current->delays->blkio_start,
+-			&current->delays->swapin_delay,
+-			&current->delays->swapin_count);
+-	else	/* Other block I/O */
+-		delayacct_end(&current->delays->blkio_start,
+-			&current->delays->blkio_delay,
+-			&current->delays->blkio_count);
++	struct task_delay_info *delays = p->delays;
++	u64 *total;
++	u32 *count;
++
++	if (p->delays->flags & DELAYACCT_PF_SWAPIN) {
++		total = &delays->swapin_delay;
++		count = &delays->swapin_count;
++	} else {
++		total = &delays->blkio_delay;
++		count = &delays->blkio_count;
++	}
++
++	delayacct_end(&delays->lock, &delays->blkio_start, total, count);
+ }
+ 
+ int __delayacct_add_tsk(struct taskstats *d, struct task_struct *tsk)
+@@ -153,8 +161,10 @@ void __delayacct_freepages_start(void)
+ 
+ void __delayacct_freepages_end(void)
+ {
+-	delayacct_end(&current->delays->freepages_start,
+-			&current->delays->freepages_delay,
+-			&current->delays->freepages_count);
++	delayacct_end(
++		&current->delays->lock,
++		&current->delays->freepages_start,
++		&current->delays->freepages_delay,
++		&current->delays->freepages_count);
+ }
+ 
+diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+index 75554f3..deda018 100644
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -2056,7 +2056,7 @@ try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
+ 	p->state = TASK_WAKING;
+ 
+ 	if (p->in_iowait) {
+-		delayacct_blkio_end();
++		delayacct_blkio_end(p);
+ 		atomic_dec(&task_rq(p)->nr_iowait);
  	}
  
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
+@@ -2069,7 +2069,7 @@ try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
+ #else /* CONFIG_SMP */
  
- 		if (!bio->bi_status) {
-@@ -91,8 +92,9 @@ static void f2fs_write_end_io(struct bio *bio)
- 	struct f2fs_sb_info *sbi = bio->bi_private;
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
+ 	if (p->in_iowait) {
+-		delayacct_blkio_end();
++		delayacct_blkio_end(p);
+ 		atomic_dec(&task_rq(p)->nr_iowait);
+ 	}
  
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
- 		enum count_type type = WB_DATA_TYPE(page);
+@@ -2122,7 +2122,7 @@ static void try_to_wake_up_local(struct task_struct *p, struct rq_flags *rf)
  
-@@ -253,6 +255,7 @@ static bool __has_merged_page(struct f2fs_bio_info *io,
- 	struct bio_vec *bvec;
- 	struct page *target;
- 	int i;
-+	struct bvec_iter_all bia;
- 
- 	if (!io->bio)
- 		return false;
-@@ -260,7 +263,7 @@ static bool __has_merged_page(struct f2fs_bio_info *io,
- 	if (!inode && !ino)
- 		return true;
- 
--	bio_for_each_page_all(bvec, io->bio, i) {
-+	bio_for_each_page_all2(bvec, io->bio, i, bia) {
- 
- 		if (bvec->bv_page->mapping)
- 			target = bvec->bv_page;
+ 	if (!task_on_rq_queued(p)) {
+ 		if (p->in_iowait) {
+-			delayacct_blkio_end();
++			delayacct_blkio_end(p);
+ 			atomic_dec(&rq->nr_iowait);
+ 		}
+ 		ttwu_activate(rq, p, ENQUEUE_WAKEUP | ENQUEUE_NOCLOCK);
 -- 
-2.9.5
+2.7.4
