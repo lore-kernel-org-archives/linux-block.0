@@ -8,139 +8,47 @@ Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
         linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
         "Darrick J . Wong" <darrick.wong@oracle.com>,
         Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 34/45] btrfs: conver to bio_for_each_page_all2
-Date: Mon, 18 Dec 2017 20:22:36 +0800
-Message-Id: <20171218122247.3488-35-ming.lei@redhat.com>
+        Ming Lei <ming.lei@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>
+Subject: [PATCH V4 06/45] dm: limit the max bio size as BIO_MAX_PAGES * PAGE_SIZE
+Date: Mon, 18 Dec 2017 20:22:08 +0800
+Message-Id: <20171218122247.3488-7-ming.lei@redhat.com>
 In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
 References: <20171218122247.3488-1-ming.lei@redhat.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-bio_for_each_page_all() can't be used any more after multipage bvec is
-enabled, so we have to convert to bio_for_each_page_all2().
+For BIO based DM, some targets aren't ready for dealing with bigger
+incoming bio than 1Mbyte, such as crypt target.
 
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc:dm-devel@redhat.com
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/btrfs/compression.c | 3 ++-
- fs/btrfs/disk-io.c     | 3 ++-
- fs/btrfs/extent_io.c   | 9 ++++++---
- fs/btrfs/inode.c       | 6 ++++--
- 4 files changed, 14 insertions(+), 7 deletions(-)
+ drivers/md/dm.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
-index 1a62725a5f08..f399f298b446 100644
---- a/fs/btrfs/compression.c
-+++ b/fs/btrfs/compression.c
-@@ -165,13 +165,14 @@ static void end_compressed_bio_read(struct bio *bio)
- 	} else {
- 		int i;
- 		struct bio_vec *bvec;
-+		struct bvec_iter_all bia;
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index de17b7193299..7475739fee49 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -920,7 +920,15 @@ int dm_set_target_max_io_len(struct dm_target *ti, sector_t len)
+ 		return -EINVAL;
+ 	}
  
- 		/*
- 		 * we have verified the checksum already, set page
- 		 * checked so the end_io handlers know about it
- 		 */
- 		ASSERT(!bio_flagged(bio, BIO_CLONED));
--		bio_for_each_page_all(bvec, cb->orig_bio, i)
-+		bio_for_each_page_all2(bvec, cb->orig_bio, i, bia)
- 			SetPageChecked(bvec->bv_page);
+-	ti->max_io_len = (uint32_t) len;
++	/*
++	 * BIO based queue uses its own splitting. When multipage bvecs
++	 * is switched on, size of the incoming bio may be too big to
++	 * be handled in some targets, such as crypt.
++	 *
++	 * When these targets are ready for the big bio, we can remove
++	 * the limit.
++	 */
++	ti->max_io_len = min_t(uint32_t, len, BIO_MAX_PAGES * PAGE_SIZE);
  
- 		bio_endio(cb->orig_bio);
-diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
-index 4f80361fbea9..8f2afdbd0a27 100644
---- a/fs/btrfs/disk-io.c
-+++ b/fs/btrfs/disk-io.c
-@@ -803,9 +803,10 @@ static blk_status_t btree_csum_one_bio(struct bio *bio)
- 	struct bio_vec *bvec;
- 	struct btrfs_root *root;
- 	int i, ret = 0;
-+	struct bvec_iter_all bia;
- 
- 	ASSERT(!bio_flagged(bio, BIO_CLONED));
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		root = BTRFS_I(bvec->bv_page->mapping->host)->root;
- 		ret = csum_dirty_buffer(root->fs_info, bvec->bv_page);
- 		if (ret)
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index f466289b66a3..9df1b70cfa9b 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -2451,9 +2451,10 @@ static void end_bio_extent_writepage(struct bio *bio)
- 	u64 start;
- 	u64 end;
- 	int i;
-+	struct bvec_iter_all bia;
- 
- 	ASSERT(!bio_flagged(bio, BIO_CLONED));
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
- 		struct inode *inode = page->mapping->host;
- 		struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
-@@ -2522,9 +2523,10 @@ static void end_bio_extent_readpage(struct bio *bio)
- 	int mirror;
- 	int ret;
- 	int i;
-+	struct bvec_iter_all bia;
- 
- 	ASSERT(!bio_flagged(bio, BIO_CLONED));
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
- 		struct inode *inode = page->mapping->host;
- 		struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
-@@ -3682,9 +3684,10 @@ static void end_bio_extent_buffer_writepage(struct bio *bio)
- 	struct bio_vec *bvec;
- 	struct extent_buffer *eb;
- 	int i, done;
-+	struct bvec_iter_all bia;
- 
- 	ASSERT(!bio_flagged(bio, BIO_CLONED));
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
- 
- 		eb = (struct extent_buffer *)page->private;
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index fda9f2a92f7a..1da401c60b9c 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -8069,6 +8069,7 @@ static void btrfs_retry_endio_nocsum(struct bio *bio)
- 	struct bio_vec *bvec;
- 	struct extent_io_tree *io_tree, *failure_tree;
- 	int i;
-+	struct bvec_iter_all bia;
- 
- 	if (bio->bi_status)
- 		goto end;
-@@ -8080,7 +8081,7 @@ static void btrfs_retry_endio_nocsum(struct bio *bio)
- 
- 	done->uptodate = 1;
- 	ASSERT(!bio_flagged(bio, BIO_CLONED));
--	bio_for_each_page_all(bvec, bio, i)
-+	bio_for_each_page_all2(bvec, bio, i, bia)
- 		clean_io_failure(BTRFS_I(inode)->root->fs_info, failure_tree,
- 				 io_tree, done->start, bvec->bv_page,
- 				 btrfs_ino(BTRFS_I(inode)), 0);
-@@ -8159,6 +8160,7 @@ static void btrfs_retry_endio(struct bio *bio)
- 	int uptodate;
- 	int ret;
- 	int i;
-+	struct bvec_iter_all bia;
- 
- 	if (bio->bi_status)
- 		goto end;
-@@ -8172,7 +8174,7 @@ static void btrfs_retry_endio(struct bio *bio)
- 	failure_tree = &BTRFS_I(inode)->io_failure_tree;
- 
- 	ASSERT(!bio_flagged(bio, BIO_CLONED));
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		ret = __readpage_endio_check(inode, io_bio, i, bvec->bv_page,
- 					     bvec->bv_offset, done->start,
- 					     bvec->bv_len);
+ 	return 0;
+ }
 -- 
 2.9.5
