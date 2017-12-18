@@ -1,48 +1,71 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:44261 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755937AbdLTRWT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Dec 2017 12:22:19 -0500
-Received: by mail-wm0-f68.google.com with SMTP id t8so11277043wmc.3
-        for <linux-block@vger.kernel.org>; Wed, 20 Dec 2017 09:22:19 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 05/25] lightnvm: remove unnecessary field from nvm_rq
-Date: Wed, 20 Dec 2017 18:21:45 +0100
-Message-Id: <20171220172205.26464-6-m@bjorling.me>
-In-Reply-To: <20171220172205.26464-1-m@bjorling.me>
-References: <20171220172205.26464-1-m@bjorling.me>
+Return-Path: <koalinux@gmail.com>
+Return-Path: <koalinux@gmail.com>
+From: =?ISO-8859-1?Q?Jos=E9?= Pekkarinen <koalinux@gmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org
+Subject: Disable pm on runtime.
+Date: Mon, 18 Dec 2017 15:07:22 +0200
+Message-ID: <1874121.sq8PTU63rf@bee>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: multipart/mixed; boundary="nextPart94610231.tJ3FLDs05r"
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <javier@cnexlabs.com>
+This is a multi-part message in MIME format.
 
-Remove the wait filed in nvm_rq. It is not used anymore, as targets rely
-on the functionality provided by the LightNVM subsystem when sending
-sync I/O.
+--nextPart94610231.tJ3FLDs05r
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- include/linux/lightnvm.h | 1 -
- 1 file changed, 1 deletion(-)
+	Hi,
 
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 13f0b70..900fe9f 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -234,7 +234,6 @@ struct nvm_rq {
- 	void *meta_list;
- 	dma_addr_t dma_meta_list;
- 
--	struct completion *wait;
- 	nvm_end_io_fn *end_io;
- 
- 	uint8_t opcode;
--- 
-2.9.3
+	I hit issues booting my laptop when running on battery thanks to commit=20
+765e40b675a9566459ddcb8358ad16f3b8344bbe given that I don't have any ssd/nv=
+me=20
+on it. Given that I decided to disable the option to default scsi to=20
+multiqueue, but still my booting issues persist. For a while I was revertin=
+g=20
+this patch successfully but nowadays that is not anymore possible. Would it=
+ be=20
+possible to accept some patch like the one attached to ease this situation?
+
+	Thanks!
+
+	Jos=E9 Pekkarinen.
+--nextPart94610231.tJ3FLDs05r
+Content-Disposition: attachment; filename="0001-Disable-pm-only-when-scsi-mq-is-default-by-config.patch"
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/x-patch; charset="UTF-8"; name="0001-Disable-pm-only-when-scsi-mq-is-default-by-config.patch"
+
+=46rom 05ca41296d7c4c2494ac08c94ad5539914e5131a Mon Sep 17 00:00:00 2001
+=46rom: =3D?UTF-8?q?Jos=3DC3=3DA9=3D20Pekkarinen?=3D <koalinux@gmail.com>
+Date: Mon, 18 Dec 2017 14:52:12 +0200
+Subject: [PATCH] Disable pm only when scsi mq is default by config.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=3DUTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Jos=C3=A9 Pekkarinen <koalinux@gmail.com>
+=2D--
+ block/blk-core.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 33ee583cfe45..68183bc5933f 100644
+=2D-- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -3440,9 +3440,11 @@ EXPORT_SYMBOL(blk_finish_plug);
+  */
+ void blk_pm_runtime_init(struct request_queue *q, struct device *dev)
+ {
++#ifdef CONFIG_SCSI_MQ_DEFAULT
+ 	/* not support for RQF_PM and ->rpm_status in blk-mq yet */
+ 	if (q->mq_ops)
+ 		return;
++#endif
+=20
+ 	q->dev =3D dev;
+ 	q->rpm_status =3D RPM_ACTIVE;
+=2D-=20
+2.13.6
+
+
+--nextPart94610231.tJ3FLDs05r--
