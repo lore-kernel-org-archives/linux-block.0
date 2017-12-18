@@ -1,29 +1,65 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: random call_single_data alignment
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: Huang Ying <ying.huang@intel.com>, Ingo Molnar <mingo@kernel.org>,
- Peter Zijlstra <peterz@infradead.org>
-Message-ID: <a9beb452-7344-9e2d-fc80-094d8f5a0394@kernel.dk>
-Date: Wed, 20 Dec 2017 12:10:32 -0700
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>
+Subject: [PATCH V4 04/45] block: bounce: avoid direct access to bvec table
+Date: Mon, 18 Dec 2017 20:22:06 +0800
+Message-Id: <20171218122247.3488-5-ming.lei@redhat.com>
+In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
+References: <20171218122247.3488-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-For some reason, commit 966a967116e6 was added to the tree without
-CC'ing relevant maintainers, even though it's touching random subsystems.
-One example is struct request, a core structure in the block layer.
-After this change, struct request grows from 296 to 320 bytes on my
-setup.
+We will support multipage bvecs in the future, so change to iterator way
+for getting bv_page of bvec from original bio.
 
-Why are we blindly aligning to 32 bytes? The comment says to avoid
-it spanning two cache lines - but if that's the case, look at the
-actual use case and see if that's actually a problem. For struct
-request, it is not.
+Cc: Matthew Wilcox <willy@infradead.org>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/bounce.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-Seems to me, this should have been applied in the specific area
-where it was needed. Keep struct call_single_data (instead of some
-__ version), and just manually align it where it matters.
-
+diff --git a/block/bounce.c b/block/bounce.c
+index fceb1a96480b..0274c31d6c05 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -137,21 +137,20 @@ static void copy_to_high_bio_irq(struct bio *to, struct bio *from)
+ static void bounce_end_io(struct bio *bio, mempool_t *pool)
+ {
+ 	struct bio *bio_orig = bio->bi_private;
+-	struct bio_vec *bvec, *org_vec;
++	struct bio_vec *bvec, orig_vec;
+ 	int i;
+-	int start = bio_orig->bi_iter.bi_idx;
++	struct bvec_iter orig_iter = bio_orig->bi_iter;
+ 
+ 	/*
+ 	 * free up bounce indirect pages used
+ 	 */
+ 	bio_for_each_segment_all(bvec, bio, i) {
+-		org_vec = bio_orig->bi_io_vec + i + start;
+-
+-		if (bvec->bv_page == org_vec->bv_page)
+-			continue;
+-
+-		dec_zone_page_state(bvec->bv_page, NR_BOUNCE);
+-		mempool_free(bvec->bv_page, pool);
++		orig_vec = bio_iter_iovec(bio_orig, orig_iter);
++		if (bvec->bv_page != orig_vec.bv_page) {
++			dec_zone_page_state(bvec->bv_page, NR_BOUNCE);
++			mempool_free(bvec->bv_page, pool);
++		}
++		bio_advance_iter(bio_orig, &orig_iter, orig_vec.bv_len);
+ 	}
+ 
+ 	bio_orig->bi_status = bio->bi_status;
 -- 
-Jens Axboe
+2.9.5
