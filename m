@@ -1,84 +1,101 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:38391 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755830AbdLTRWf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Dec 2017 12:22:35 -0500
-Received: by mail-wm0-f67.google.com with SMTP id 64so11125850wme.3
-        for <linux-block@vger.kernel.org>; Wed, 20 Dec 2017 09:22:34 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 20/25] lightnvm: pblk: do not log recovery read errors
-Date: Wed, 20 Dec 2017 18:22:00 +0100
-Message-Id: <20171220172205.26464-21-m@bjorling.me>
-In-Reply-To: <20171220172205.26464-1-m@bjorling.me>
-References: <20171220172205.26464-1-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 32/45] md/dm/bcache: conver to bio_for_each_page_all2 and bio_for_each_segment
+Date: Mon, 18 Dec 2017 20:22:34 +0800
+Message-Id: <20171218122247.3488-33-ming.lei@redhat.com>
+In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
+References: <20171218122247.3488-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <javier@cnexlabs.com>
+In bch_bio_alloc_pages(), bio_for_each_segment() is fine because this
+helper can only be used on a freshly new bio.
 
-On scan recovery, reads can fail. This happens because the first page
-for each line is read in order to determined if the line has been used
-(and thus needs to be recovered), or not. This can lead to "empty page"
-read errors.
+For other cases, we conver to bio_for_each_page_all2() since they needn't
+to update bvec table.
 
-Since these errors are normal, do not log them, as they are confusing
-when reviewing the logs.
+bio_for_each_page_all() can't be used any more after multipage bvec is
+enabled, so we have to convert to bio_for_each_page_all2().
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/pblk-core.c | 6 +++---
- drivers/lightnvm/pblk.h      | 1 +
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ drivers/md/bcache/btree.c | 3 ++-
+ drivers/md/bcache/util.c  | 2 +-
+ drivers/md/dm-crypt.c     | 3 ++-
+ drivers/md/raid1.c        | 3 ++-
+ 4 files changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 22cdafd..5692d33 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -742,7 +742,7 @@ static int pblk_line_submit_smeta_io(struct pblk *pblk, struct pblk_line *line,
- 		cmd_op = NVM_OP_PWRITE;
- 		flags = pblk_set_progr_mode(pblk, PBLK_WRITE);
- 		lba_list = emeta_to_lbas(pblk, line->emeta->buf);
--	} else if (dir == PBLK_READ) {
-+	} else if (dir == PBLK_READ_RECOV || dir == PBLK_READ) {
- 		bio_op = REQ_OP_READ;
- 		cmd_op = NVM_OP_PREAD;
- 		flags = pblk_set_read_mode(pblk, PBLK_READ_SEQUENTIAL);
-@@ -802,7 +802,7 @@ static int pblk_line_submit_smeta_io(struct pblk *pblk, struct pblk_line *line,
- 	if (rqd.error) {
- 		if (dir == PBLK_WRITE)
- 			pblk_log_write_err(pblk, &rqd);
--		else
-+		else if (dir == PBLK_READ)
- 			pblk_log_read_err(pblk, &rqd);
- 	}
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index a82100527495..ac7bac6e6a29 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -423,8 +423,9 @@ static void do_btree_node_write(struct btree *b)
+ 		int j;
+ 		struct bio_vec *bv;
+ 		void *base = (void *) ((unsigned long) i & ~(PAGE_SIZE - 1));
++		struct bvec_iter_all bia;
  
-@@ -816,7 +816,7 @@ int pblk_line_read_smeta(struct pblk *pblk, struct pblk_line *line)
+-		bio_for_each_page_all(bv, b->bio, j)
++		bio_for_each_page_all2(bv, b->bio, j, bia)
+ 			memcpy(page_address(bv->bv_page),
+ 			       base + j * PAGE_SIZE, PAGE_SIZE);
+ 
+diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
+index 8f2d522822b1..a23cd6a14b74 100644
+--- a/drivers/md/bcache/util.c
++++ b/drivers/md/bcache/util.c
+@@ -298,7 +298,7 @@ int bch_bio_alloc_pages(struct bio *bio, gfp_t gfp_mask)
+ 	int i;
+ 	struct bio_vec *bv;
+ 
+-	bio_for_each_page_all(bv, bio, i) {
++	bio_for_each_segment_all(bv, bio, i) {
+ 		bv->bv_page = alloc_page(gfp_mask);
+ 		if (!bv->bv_page) {
+ 			while (--bv >= bio->bi_io_vec)
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index 970a761de621..19dc1f6b523a 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -1442,8 +1442,9 @@ static void crypt_free_buffer_pages(struct crypt_config *cc, struct bio *clone)
  {
- 	u64 bpaddr = pblk_line_smeta_start(pblk, line);
+ 	unsigned int i;
+ 	struct bio_vec *bv;
++	struct bvec_iter_all bia;
  
--	return pblk_line_submit_smeta_io(pblk, line, bpaddr, PBLK_READ);
-+	return pblk_line_submit_smeta_io(pblk, line, bpaddr, PBLK_READ_RECOV);
- }
+-	bio_for_each_page_all(bv, clone, i) {
++	bio_for_each_page_all2(bv, clone, i, bia) {
+ 		BUG_ON(!bv->bv_page);
+ 		mempool_free(bv->bv_page, cc->page_pool);
+ 	}
+diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+index e64b49929b8d..da5d7ea5504b 100644
+--- a/drivers/md/raid1.c
++++ b/drivers/md/raid1.c
+@@ -2083,13 +2083,14 @@ static void process_checks(struct r1bio *r1_bio)
+ 		struct page **spages = get_resync_pages(sbio)->pages;
+ 		struct bio_vec *bi;
+ 		int page_len[RESYNC_PAGES] = { 0 };
++		struct bvec_iter_all bia;
  
- int pblk_line_read_emeta(struct pblk *pblk, struct pblk_line *line,
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 430d076..cb38990 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -60,6 +60,7 @@ enum {
- 	PBLK_READ		= READ,
- 	PBLK_WRITE		= WRITE,/* Write from write buffer */
- 	PBLK_WRITE_INT,			/* Internal write - no write buffer */
-+	PBLK_READ_RECOV,		/* Recovery read - errors allowed */
- 	PBLK_ERASE,
- };
+ 		if (sbio->bi_end_io != end_sync_read)
+ 			continue;
+ 		/* Now we can 'fixup' the error value */
+ 		sbio->bi_status = 0;
  
+-		bio_for_each_page_all(bi, sbio, j)
++		bio_for_each_page_all2(bi, sbio, j, bia)
+ 			page_len[j] = bi->bv_len;
+ 
+ 		if (!status) {
 -- 
-2.9.3
+2.9.5
