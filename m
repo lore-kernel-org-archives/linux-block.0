@@ -1,218 +1,189 @@
-Return-Path: <msnitzer@redhat.com>
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk,
-	hch@lst.de,
-	keith.busch@intel.com
-Cc: emilne@redhat.com,
-	james.smart@broadcom.com,
-	hare@suse.de,
-	Bart.VanAssche@wdc.com,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	dm-devel@redhat.com
-Subject: [for-4.16 PATCH v2 4/5] dm mpath: use NVMe error handling to know when an error is retryable
-Date: Tue, 26 Dec 2017 22:22:56 -0500
-Message-Id: <20171227032257.8182-5-snitzer@redhat.com>
-In-Reply-To: <20171227032257.8182-1-snitzer@redhat.com>
-References: <20171227032257.8182-1-snitzer@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:34540 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751529AbdLRMXe (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Dec 2017 07:23:34 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 02/45] block: conver to bio_first_bvec_all & bio_first_page_all
+Date: Mon, 18 Dec 2017 20:22:04 +0800
+Message-Id: <20171218122247.3488-3-ming.lei@redhat.com>
+In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
+References: <20171218122247.3488-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Like NVMe's native multipath support, DM multipath's NVMe bio-based
-support now allows NVMe core's error handling to requeue an NVMe blk-mq
-request's bios onto DM multipath's queued_bios list for resubmission
-once fail_path() occurs.  multipath_failover_rq() serves as a
-replacement for the traditional multipath_end_io_bio().
+This patch converts to bio_first_bvec_all() & bio_first_page_all() for
+retrieving the 1st bvec/page, and prepares for supporting multipage bvec.
 
-DM multipath's bio submission to NVMe must be done in terms that allow
-the reuse of NVMe core's error handling.  The following care is taken to
-realize this reuse:
-
-- NVMe core won't attempt to retry an IO if it has
-  REQ_FAILFAST_TRANSPORT set; so only set it in __map_bio().
-
-- Setup underlying request_queue's 'failover_rq_fn' callback, to use
-  multipath_failover_rq, so that NVMe blk-mq requests use it
-  if/when NVMe core determines a request must be retried.
-  (a new target_type 'cleanup_device' hook is established to properly
-   reset each underlying requests_queue's 'failover_rq_fn' on final
-   teardown of the multipath device)
-
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/dm-mpath.c         | 71 +++++++++++++++++++++++++++++++++++++++++--
- drivers/md/dm-table.c         |  2 ++
- include/linux/device-mapper.h |  3 ++
- 3 files changed, 73 insertions(+), 3 deletions(-)
+ drivers/block/drbd/drbd_bitmap.c | 2 +-
+ drivers/block/zram/zram_drv.c    | 2 +-
+ drivers/md/bcache/super.c        | 8 ++++----
+ fs/btrfs/compression.c           | 2 +-
+ fs/btrfs/inode.c                 | 4 ++--
+ fs/f2fs/data.c                   | 2 +-
+ kernel/power/swap.c              | 2 +-
+ mm/page_io.c                     | 4 ++--
+ 8 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-index 3198093006e4..875df8ad6efe 100644
---- a/drivers/md/dm-mpath.c
-+++ b/drivers/md/dm-mpath.c
-@@ -584,6 +584,8 @@ static struct pgpath *__map_bio(struct multipath *m, struct bio *bio)
- 		return ERR_PTR(-EAGAIN);
- 	}
+diff --git a/drivers/block/drbd/drbd_bitmap.c b/drivers/block/drbd/drbd_bitmap.c
+index bd97908c766f..9f4e6f502b84 100644
+--- a/drivers/block/drbd/drbd_bitmap.c
++++ b/drivers/block/drbd/drbd_bitmap.c
+@@ -953,7 +953,7 @@ static void drbd_bm_endio(struct bio *bio)
+ 	struct drbd_bm_aio_ctx *ctx = bio->bi_private;
+ 	struct drbd_device *device = ctx->device;
+ 	struct drbd_bitmap *b = device->bitmap;
+-	unsigned int idx = bm_page_to_idx(bio->bi_io_vec[0].bv_page);
++	unsigned int idx = bm_page_to_idx(bio_first_page_all(bio));
  
-+	bio->bi_opf |= REQ_FAILFAST_TRANSPORT;
-+
- 	return pgpath;
- }
+ 	if ((ctx->flags & BM_AIO_COPY_PAGES) == 0 &&
+ 	    !bm_test_page_unchanged(b->bm_pages[idx]))
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index d70eba30003a..0afa6c8c3857 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -430,7 +430,7 @@ static void put_entry_bdev(struct zram *zram, unsigned long entry)
  
-@@ -641,7 +643,6 @@ static int __multipath_map_bio(struct multipath *m, struct bio *bio,
- 
- 	bio->bi_status = 0;
- 	bio_set_dev(bio, pgpath->path.dev->bdev);
--	bio->bi_opf |= REQ_FAILFAST_TRANSPORT;
- 
- 	if (pgpath->pg->ps.type->start_io)
- 		pgpath->pg->ps.type->start_io(&pgpath->pg->ps,
-@@ -855,6 +856,8 @@ static int setup_scsi_dh(struct block_device *bdev, struct multipath *m, char **
- 	return 0;
- }
- 
-+static void multipath_failover_rq(struct request *rq);
-+
- static struct pgpath *parse_path(struct dm_arg_set *as, struct path_selector *ps,
- 				 struct dm_target *ti)
+ static void zram_page_end_io(struct bio *bio)
  {
-@@ -879,7 +882,10 @@ static struct pgpath *parse_path(struct dm_arg_set *as, struct path_selector *ps
- 		goto bad;
+-	struct page *page = bio->bi_io_vec[0].bv_page;
++	struct page *page = bio_first_page_all(bio);
+ 
+ 	page_endio(page, op_is_write(bio_op(bio)),
+ 			blk_status_to_errno(bio->bi_status));
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index b4d28928dec5..8399fe0651f2 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -211,7 +211,7 @@ static void write_bdev_super_endio(struct bio *bio)
+ 
+ static void __write_super(struct cache_sb *sb, struct bio *bio)
+ {
+-	struct cache_sb *out = page_address(bio->bi_io_vec[0].bv_page);
++	struct cache_sb *out = page_address(bio_first_page_all(bio));
+ 	unsigned i;
+ 
+ 	bio->bi_iter.bi_sector	= SB_SECTOR;
+@@ -1166,7 +1166,7 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
+ 	dc->bdev->bd_holder = dc;
+ 
+ 	bio_init(&dc->sb_bio, dc->sb_bio.bi_inline_vecs, 1);
+-	dc->sb_bio.bi_io_vec[0].bv_page = sb_page;
++	bio_first_bvec_all(&dc->sb_bio)->bv_page = sb_page;
+ 	get_page(sb_page);
+ 
+ 	if (cached_dev_init(dc, sb->block_size << 9))
+@@ -1810,7 +1810,7 @@ void bch_cache_release(struct kobject *kobj)
+ 		free_fifo(&ca->free[i]);
+ 
+ 	if (ca->sb_bio.bi_inline_vecs[0].bv_page)
+-		put_page(ca->sb_bio.bi_io_vec[0].bv_page);
++		put_page(bio_first_page_all(&ca->sb_bio));
+ 
+ 	if (!IS_ERR_OR_NULL(ca->bdev))
+ 		blkdev_put(ca->bdev, FMODE_READ|FMODE_WRITE|FMODE_EXCL);
+@@ -1864,7 +1864,7 @@ static int register_cache(struct cache_sb *sb, struct page *sb_page,
+ 	ca->bdev->bd_holder = ca;
+ 
+ 	bio_init(&ca->sb_bio, ca->sb_bio.bi_inline_vecs, 1);
+-	ca->sb_bio.bi_io_vec[0].bv_page = sb_page;
++	bio_first_bvec_all(&ca->sb_bio)->bv_page = sb_page;
+ 	get_page(sb_page);
+ 
+ 	if (blk_queue_discard(bdev_get_queue(ca->bdev)))
+diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
+index 5982c8a71f02..38a6b091bc25 100644
+--- a/fs/btrfs/compression.c
++++ b/fs/btrfs/compression.c
+@@ -563,7 +563,7 @@ blk_status_t btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
+ 	/* we need the actual starting offset of this extent in the file */
+ 	read_lock(&em_tree->lock);
+ 	em = lookup_extent_mapping(em_tree,
+-				   page_offset(bio->bi_io_vec->bv_page),
++				   page_offset(bio_first_page_all(bio)),
+ 				   PAGE_SIZE);
+ 	read_unlock(&em_tree->lock);
+ 	if (!em)
+diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
+index e1a7f3cb5be9..4d5cb6e93c80 100644
+--- a/fs/btrfs/inode.c
++++ b/fs/btrfs/inode.c
+@@ -8074,7 +8074,7 @@ static void btrfs_retry_endio_nocsum(struct bio *bio)
+ 	ASSERT(bio->bi_vcnt == 1);
+ 	io_tree = &BTRFS_I(inode)->io_tree;
+ 	failure_tree = &BTRFS_I(inode)->io_failure_tree;
+-	ASSERT(bio->bi_io_vec->bv_len == btrfs_inode_sectorsize(inode));
++	ASSERT(bio_first_bvec_all(bio)->bv_len == btrfs_inode_sectorsize(inode));
+ 
+ 	done->uptodate = 1;
+ 	ASSERT(!bio_flagged(bio, BIO_CLONED));
+@@ -8164,7 +8164,7 @@ static void btrfs_retry_endio(struct bio *bio)
+ 	uptodate = 1;
+ 
+ 	ASSERT(bio->bi_vcnt == 1);
+-	ASSERT(bio->bi_io_vec->bv_len == btrfs_inode_sectorsize(done->inode));
++	ASSERT(bio_first_bvec_all(bio)->bv_len == btrfs_inode_sectorsize(done->inode));
+ 
+ 	io_tree = &BTRFS_I(inode)->io_tree;
+ 	failure_tree = &BTRFS_I(inode)->io_failure_tree;
+diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
+index 516fa0d3ff9c..455f086cce3d 100644
+--- a/fs/f2fs/data.c
++++ b/fs/f2fs/data.c
+@@ -56,7 +56,7 @@ static void f2fs_read_end_io(struct bio *bio)
+ 	int i;
+ 
+ #ifdef CONFIG_F2FS_FAULT_INJECTION
+-	if (time_to_inject(F2FS_P_SB(bio->bi_io_vec->bv_page), FAULT_IO)) {
++	if (time_to_inject(F2FS_P_SB(bio_first_page_all(bio)), FAULT_IO)) {
+ 		f2fs_show_injection_info(FAULT_IO);
+ 		bio->bi_status = BLK_STS_IOERR;
  	}
+diff --git a/kernel/power/swap.c b/kernel/power/swap.c
+index 293ead59eccc..96c736313faa 100644
+--- a/kernel/power/swap.c
++++ b/kernel/power/swap.c
+@@ -240,7 +240,7 @@ static void hib_init_batch(struct hib_bio_batch *hb)
+ static void hib_end_io(struct bio *bio)
+ {
+ 	struct hib_bio_batch *hb = bio->bi_private;
+-	struct page *page = bio->bi_io_vec[0].bv_page;
++	struct page *page = bio_first_page_all(bio);
  
--	if (m->queue_mode != DM_TYPE_NVME_BIO_BASED) {
-+	if (m->queue_mode == DM_TYPE_NVME_BIO_BASED) {
-+		struct request_queue *q = bdev_get_queue(p->path.dev->bdev);
-+		q->failover_rq_fn = multipath_failover_rq;
-+	} else {
- 		INIT_DELAYED_WORK(&p->activate_path, activate_path_work);
- 		if (setup_scsi_dh(p->path.dev->bdev, m, &ti->error)) {
- 			dm_put_device(ti, p->path.dev);
-@@ -1610,6 +1616,14 @@ static int multipath_end_io_bio(struct dm_target *ti, struct bio *clone,
- 	unsigned long flags;
- 	int r = DM_ENDIO_DONE;
+ 	if (bio->bi_status) {
+ 		pr_alert("Read-error on swap-device (%u:%u:%Lu)\n",
+diff --git a/mm/page_io.c b/mm/page_io.c
+index e93f1a4cacd7..b41cf9644585 100644
+--- a/mm/page_io.c
++++ b/mm/page_io.c
+@@ -50,7 +50,7 @@ static struct bio *get_swap_bio(gfp_t gfp_flags,
  
-+	/*
-+	 * NVMe bio-based only needs to update path selector (on
-+	 * success or errors that NVMe deemed non-retryable)
-+	 * - retryable errors are handled by multipath_failover_rq
-+	 */
-+	if (m->queue_mode == DM_TYPE_NVME_BIO_BASED)
-+		goto done;
-+
- 	if (!*error || !retry_error(*error))
- 		goto done;
+ void end_swap_bio_write(struct bio *bio)
+ {
+-	struct page *page = bio->bi_io_vec[0].bv_page;
++	struct page *page = bio_first_page_all(bio);
  
-@@ -1645,6 +1659,43 @@ static int multipath_end_io_bio(struct dm_target *ti, struct bio *clone,
- 	return r;
- }
+ 	if (bio->bi_status) {
+ 		SetPageError(page);
+@@ -122,7 +122,7 @@ static void swap_slot_free_notify(struct page *page)
  
-+/*
-+ * multipath_failover_rq serves as a replacement for multipath_end_io_bio
-+ * for all bios in a request with a retryable error.
-+ */
-+static void multipath_failover_rq(struct request *rq)
-+{
-+	struct dm_target *ti = dm_bio_get_target(rq->bio);
-+	struct multipath *m = ti->private;
-+	struct dm_mpath_io *mpio = get_mpio_from_bio(rq->bio);
-+	struct pgpath *pgpath = mpio->pgpath;
-+	unsigned long flags;
-+
-+	if (pgpath) {
-+		struct path_selector *ps = &pgpath->pg->ps;
-+
-+		if (ps->type->end_io)
-+			ps->type->end_io(ps, &pgpath->path, blk_rq_bytes(rq));
-+
-+		fail_path(pgpath);
-+	}
-+
-+	if (atomic_read(&m->nr_valid_paths) == 0 &&
-+	    !test_bit(MPATHF_QUEUE_IF_NO_PATH, &m->flags) &&
-+	    !must_push_back_bio(m)) {
-+		dm_report_EIO(m);
-+		blk_mq_end_request(rq, BLK_STS_IOERR);
-+		return;
-+	}
-+
-+	spin_lock_irqsave(&m->lock, flags);
-+	blk_steal_bios(&m->queued_bios, rq);
-+	spin_unlock_irqrestore(&m->lock, flags);
-+	queue_work(kmultipathd, &m->process_queued_bios);
-+
-+	blk_mq_end_request(rq, 0);
-+}
-+
- /*
-  * Suspend can't complete until all the I/O is processed so if
-  * the last path fails we must error any remaining I/O.
-@@ -2029,12 +2080,25 @@ static int multipath_busy(struct dm_target *ti)
- 	return busy;
- }
+ static void end_swap_bio_read(struct bio *bio)
+ {
+-	struct page *page = bio->bi_io_vec[0].bv_page;
++	struct page *page = bio_first_page_all(bio);
+ 	struct task_struct *waiter = bio->bi_private;
  
-+static void multipath_cleanup_device(struct dm_target *ti, struct dm_dev *dev)
-+{
-+	struct multipath *m = ti->private;
-+	struct request_queue *q;
-+
-+	if (m->queue_mode != DM_TYPE_NVME_BIO_BASED)
-+		return;
-+
-+	q = bdev_get_queue(dev->bdev);
-+	if (q)
-+		q->failover_rq_fn = NULL;
-+}
-+
- /*-----------------------------------------------------------------
-  * Module setup
-  *---------------------------------------------------------------*/
- static struct target_type multipath_target = {
- 	.name = "multipath",
--	.version = {1, 12, 0},
-+	.version = {1, 13, 0},
- 	.features = DM_TARGET_SINGLETON | DM_TARGET_IMMUTABLE,
- 	.module = THIS_MODULE,
- 	.ctr = multipath_ctr,
-@@ -2052,6 +2116,7 @@ static struct target_type multipath_target = {
- 	.prepare_ioctl = multipath_prepare_ioctl,
- 	.iterate_devices = multipath_iterate_devices,
- 	.busy = multipath_busy,
-+	.cleanup_device = multipath_cleanup_device,
- };
- 
- static int __init dm_multipath_init(void)
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index ad4ac294dd57..86d7530384c3 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -517,6 +517,8 @@ void dm_put_device(struct dm_target *ti, struct dm_dev *d)
- 		return;
- 	}
- 	if (refcount_dec_and_test(&dd->count)) {
-+		if (ti->type->cleanup_device)
-+			ti->type->cleanup_device(ti, d);
- 		dm_put_table_device(ti->table->md, d);
- 		list_del(&dd->list);
- 		kfree(dd);
-diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
-index e46ad2ada674..758feae899f9 100644
---- a/include/linux/device-mapper.h
-+++ b/include/linux/device-mapper.h
-@@ -92,6 +92,8 @@ typedef int (*dm_message_fn) (struct dm_target *ti, unsigned argc, char **argv);
- typedef int (*dm_prepare_ioctl_fn) (struct dm_target *ti,
- 			    struct block_device **bdev, fmode_t *mode);
- 
-+typedef void (*dm_cleanup_device_fn) (struct dm_target *ti, struct dm_dev *dev);
-+
- /*
-  * These iteration functions are typically used to check (and combine)
-  * properties of underlying devices.
-@@ -181,6 +183,7 @@ struct target_type {
- 	dm_message_fn message;
- 	dm_prepare_ioctl_fn prepare_ioctl;
- 	dm_busy_fn busy;
-+	dm_cleanup_device_fn cleanup_device;
- 	dm_iterate_devices_fn iterate_devices;
- 	dm_io_hints_fn io_hints;
- 	dm_dax_direct_access_fn direct_access;
+ 	if (bio->bi_status) {
 -- 
-2.15.0
+2.9.5
