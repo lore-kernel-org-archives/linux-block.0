@@ -1,94 +1,44 @@
-Return-Path: <msnitzer@redhat.com>
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk,
-	hch@lst.de,
-	keith.busch@intel.com
-Cc: emilne@redhat.com,
-	james.smart@broadcom.com,
-	hare@suse.de,
-	Bart.VanAssche@wdc.com,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	dm-devel@redhat.com
-Subject: [for-4.16 PATCH v2 2/5] nvme: use request_queue's failover_rq_fn callback for multipath failover
-Date: Tue, 26 Dec 2017 22:22:54 -0500
-Message-Id: <20171227032257.8182-3-snitzer@redhat.com>
-In-Reply-To: <20171227032257.8182-1-snitzer@redhat.com>
-References: <20171227032257.8182-1-snitzer@redhat.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>
+Subject: [PATCH V4 11/45] dm-crypt: don't clear bvec->bv_page in crypt_free_buffer_pages()
+Date: Mon, 18 Dec 2017 20:22:13 +0800
+Message-Id: <20171218122247.3488-12-ming.lei@redhat.com>
+In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
+References: <20171218122247.3488-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Also, remove NVMe-local REQ_NVME_MPATH since setting request_queue's
-failover_rq_fn serves the same purpose.  NVMe's error handling gives a
-request further consideration about it being retryable if its
-request_queue has failover_rq_fn set.
+The bio is always freed after running crypt_free_buffer_pages(), so it
+isn't necessary to clear the bv->bv_page.
 
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc:dm-devel@redhat.com
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/nvme/host/core.c      | 5 +++--
- drivers/nvme/host/multipath.c | 4 +---
- drivers/nvme/host/nvme.h      | 5 -----
- 3 files changed, 4 insertions(+), 10 deletions(-)
+ drivers/md/dm-crypt.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index f837d666cbd4..99f1c7d8514e 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -191,8 +191,8 @@ static inline bool nvme_req_needs_retry(struct request *req)
- void nvme_complete_rq(struct request *req)
- {
- 	if (unlikely(nvme_req(req)->status && nvme_req_needs_retry(req))) {
--		if (nvme_req_needs_failover(req)) {
--			nvme_failover_req(req);
-+		if (req->q->failover_rq_fn && nvme_req_needs_failover(req)) {
-+			req->q->failover_rq_fn(req);
- 			return;
- 		}
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index 9fc12f556534..48332666fc38 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -1446,7 +1446,6 @@ static void crypt_free_buffer_pages(struct crypt_config *cc, struct bio *clone)
+ 	bio_for_each_segment_all(bv, clone, i) {
+ 		BUG_ON(!bv->bv_page);
+ 		mempool_free(bv->bv_page, cc->page_pool);
+-		bv->bv_page = NULL;
+ 	}
+ }
  
-@@ -2893,6 +2893,7 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 		sprintf(disk_name, "nvme%dc%dn%d", ctrl->subsys->instance,
- 				ctrl->cntlid, ns->head->instance);
- 		flags = GENHD_FL_HIDDEN;
-+		ns->queue->failover_rq_fn = nvme_failover_req;
- 	} else {
- 		sprintf(disk_name, "nvme%dn%d", ctrl->subsys->instance,
- 				ns->head->instance);
-diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-index 1218a9fca846..b576942b96b2 100644
---- a/drivers/nvme/host/multipath.c
-+++ b/drivers/nvme/host/multipath.c
-@@ -35,8 +35,7 @@ void nvme_failover_req(struct request *req)
- 
- bool nvme_req_needs_failover(struct request *req)
- {
--	if (!(req->cmd_flags & REQ_NVME_MPATH))
--		return false;
-+	/* Caller verifies req->q->failover_rq_fn is set */
- 
- 	switch (nvme_req(req)->status & 0x7ff) {
- 	/*
-@@ -128,7 +127,6 @@ static blk_qc_t nvme_ns_head_make_request(struct request_queue *q,
- 	ns = nvme_find_path(head);
- 	if (likely(ns)) {
- 		bio->bi_disk = ns->disk;
--		bio->bi_opf |= REQ_NVME_MPATH;
- 		ret = direct_make_request(bio);
- 	} else if (!list_empty_careful(&head->list)) {
- 		dev_warn_ratelimited(dev, "no path available - requeuing I/O\n");
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index ea1aa5283e8e..5ec44935690f 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -95,11 +95,6 @@ struct nvme_request {
- 	u16			status;
- };
- 
--/*
-- * Mark a bio as coming in through the mpath node.
-- */
--#define REQ_NVME_MPATH		REQ_DRV
--
- enum {
- 	NVME_REQ_CANCELLED		= (1 << 0),
- };
 -- 
-2.15.0
+2.9.5
