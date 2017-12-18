@@ -1,105 +1,83 @@
-Return-Path: <ktkhai@virtuozzo.com>
-Subject: [PATCH 1/5] aio: Move aio_nr increment to separate function
-From: Kirill Tkhai <ktkhai@virtuozzo.com>
-To: axboe@kernel.dk, bcrl@kvack.org, viro@zeniv.linux.org.uk, tj@kernel.org,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-aio@kvack.org,
- oleg@redhat.com, ktkhai@virtuozzo.com
-Date: Mon, 04 Dec 2017 19:12:59 +0300
-Message-ID: <151240397905.10164.6467631934054020994.stgit@localhost.localdomain>
-In-Reply-To: <151240305010.10164.15584502480037205018.stgit@localhost.localdomain>
-References: <151240305010.10164.15584502480037205018.stgit@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Return-Path: ktkhai@virtuozzo.com
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:43496 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1758763AbdLRMcZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Dec 2017 07:32:25 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 39/45] gfs2: conver to bio_for_each_page_all2
+Date: Mon, 18 Dec 2017 20:22:41 +0800
+Message-Id: <20171218122247.3488-40-ming.lei@redhat.com>
+In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
+References: <20171218122247.3488-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-There is no functional changes, only a preparation
-for next patches.
+bio_for_each_page_all() can't be used any more after multipage bvec is
+enabled, so we have to convert to bio_for_each_page_all2().
 
-Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
+Given bvec can't be changed inside bio_for_each_page_all2(), this patch
+marks the bvec parameter as 'const' for gfs2_end_log_write_bh().
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/aio.c |   44 ++++++++++++++++++++++++++++++++------------
- 1 file changed, 32 insertions(+), 12 deletions(-)
+ fs/gfs2/lops.c    | 6 ++++--
+ fs/gfs2/meta_io.c | 3 ++-
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/fs/aio.c b/fs/aio.c
-index e6de7715228c..04209c0561b2 100644
---- a/fs/aio.c
-+++ b/fs/aio.c
-@@ -694,13 +694,39 @@ static int ioctx_add_table(struct kioctx *ctx, struct mm_struct *mm)
- 	}
- }
+diff --git a/fs/gfs2/lops.c b/fs/gfs2/lops.c
+index 4579b8433955..29c8751f9672 100644
+--- a/fs/gfs2/lops.c
++++ b/fs/gfs2/lops.c
+@@ -167,7 +167,8 @@ static u64 gfs2_log_bmap(struct gfs2_sbd *sdp)
+  * that is pinned in the pagecache.
+  */
  
--static void aio_nr_sub(unsigned nr)
-+static bool __try_to_charge_aio_nr(unsigned nr)
-+{
-+	if (aio_nr + nr > aio_max_nr ||
-+	    aio_nr + nr < aio_nr)
-+		return false;
-+
-+	aio_nr += nr;
-+	return true;
-+}
-+
-+static void __uncharge_aio_nr(unsigned nr)
+-static void gfs2_end_log_write_bh(struct gfs2_sbd *sdp, struct bio_vec *bvec,
++static void gfs2_end_log_write_bh(struct gfs2_sbd *sdp,
++				  const struct bio_vec *bvec,
+ 				  blk_status_t error)
  {
--	spin_lock(&aio_nr_lock);
- 	if (WARN_ON(aio_nr - nr > aio_nr))
- 		aio_nr = 0;
- 	else
- 		aio_nr -= nr;
-+}
-+
-+static bool try_to_charge_aio_nr(unsigned nr)
-+{
-+	bool ret;
-+
-+	spin_lock(&aio_nr_lock);
-+	ret = __try_to_charge_aio_nr(nr);
-+	spin_unlock(&aio_nr_lock);
-+
-+	return ret;
-+}
-+
-+static void uncharge_aio_nr(unsigned nr)
-+{
-+	spin_lock(&aio_nr_lock);
-+	__uncharge_aio_nr(nr);
- 	spin_unlock(&aio_nr_lock);
- }
+ 	struct buffer_head *bh, *next;
+@@ -206,6 +207,7 @@ static void gfs2_end_log_write(struct bio *bio)
+ 	struct bio_vec *bvec;
+ 	struct page *page;
+ 	int i;
++	struct bvec_iter_all bia;
  
-@@ -776,15 +802,9 @@ static struct kioctx *ioctx_alloc(unsigned nr_events)
- 		ctx->req_batch = 1;
+ 	if (bio->bi_status) {
+ 		fs_err(sdp, "Error %d writing to journal, jid=%u\n",
+@@ -213,7 +215,7 @@ static void gfs2_end_log_write(struct bio *bio)
+ 		wake_up(&sdp->sd_logd_waitq);
+ 	}
  
- 	/* limit the number of system wide aios */
--	spin_lock(&aio_nr_lock);
--	if (aio_nr + ctx->max_reqs > aio_max_nr ||
--	    aio_nr + ctx->max_reqs < aio_nr) {
--		spin_unlock(&aio_nr_lock);
--		err = -EAGAIN;
-+	err = -EAGAIN;
-+	if (!try_to_charge_aio_nr(ctx->max_reqs))
- 		goto err_ctx;
--	}
--	aio_nr += ctx->max_reqs;
--	spin_unlock(&aio_nr_lock);
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		page = bvec->bv_page;
+ 		if (page_has_buffers(page))
+ 			gfs2_end_log_write_bh(sdp, bvec, bio->bi_status);
+diff --git a/fs/gfs2/meta_io.c b/fs/gfs2/meta_io.c
+index 1d720352310a..a945c9fa1dc6 100644
+--- a/fs/gfs2/meta_io.c
++++ b/fs/gfs2/meta_io.c
+@@ -190,8 +190,9 @@ static void gfs2_meta_read_endio(struct bio *bio)
+ {
+ 	struct bio_vec *bvec;
+ 	int i;
++	struct bvec_iter_all bia;
  
- 	percpu_ref_get(&ctx->users);	/* io_setup() will drop this ref */
- 	percpu_ref_get(&ctx->reqs);	/* free_ioctx_users() will drop this */
-@@ -801,7 +821,7 @@ static struct kioctx *ioctx_alloc(unsigned nr_events)
- 	return ctx;
- 
- err_cleanup:
--	aio_nr_sub(ctx->max_reqs);
-+	uncharge_aio_nr(ctx->max_reqs);
- err_ctx:
- 	atomic_set(&ctx->dead, 1);
- 	if (ctx->mmap_size)
-@@ -848,7 +868,7 @@ static int kill_ioctx(struct mm_struct *mm, struct kioctx *ctx,
- 	 * -EAGAIN with no ioctxs actually in use (as far as userspace
- 	 *  could tell).
- 	 */
--	aio_nr_sub(ctx->max_reqs);
-+	uncharge_aio_nr(ctx->max_reqs);
- 
- 	if (ctx->mmap_size)
- 		vm_munmap(ctx->mmap_base, ctx->mmap_size);
+-	bio_for_each_page_all(bvec, bio, i) {
++	bio_for_each_page_all2(bvec, bio, i, bia) {
+ 		struct page *page = bvec->bv_page;
+ 		struct buffer_head *bh = page_buffers(page);
+ 		unsigned int len = bvec->bv_len;
+-- 
+2.9.5
