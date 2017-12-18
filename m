@@ -1,48 +1,46 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:42300 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756015AbdLTRWi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Dec 2017 12:22:38 -0500
-Received: by mail-wm0-f65.google.com with SMTP id b199so11381861wme.1
-        for <linux-block@vger.kernel.org>; Wed, 20 Dec 2017 09:22:37 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 23/25] lightnvm: pblk: print instance name on instance info
-Date: Wed, 20 Dec 2017 18:22:03 +0100
-Message-Id: <20171220172205.26464-24-m@bjorling.me>
-In-Reply-To: <20171220172205.26464-1-m@bjorling.me>
-References: <20171220172205.26464-1-m@bjorling.me>
+Return-Path: <peterz@infradead.org>
+Date: Mon, 18 Dec 2017 12:34:26 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Josh Snyder <joshs@netflix.com>
+Cc: linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Brendan Gregg <bgregg@netflix.com>, linux-block@vger.kernel.org,
+	Tejun Heo <tj@kernel.org>, Balbir Singh <bsingharora@gmail.com>,
+	Ingo Molnar <mingo@redhat.com>
+Subject: Re: [PATCH] Pass the task_struct explicitly to delayacct_blkio_end
+Message-ID: <20171218113426.vndsy2m5qhxrkesg@hirez.programming.kicks-ass.net>
+References: <1513361505-275-1-git-send-email-joshs@netflix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1513361505-275-1-git-send-email-joshs@netflix.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <javier@cnexlabs.com>
+On Fri, Dec 15, 2017 at 06:11:43PM +0000, Josh Snyder wrote:
 
-Add the instance name to the information printed out on target creation.
+> Subject: [PATCH] Pass the task_struct explicitly to delayacct_blkio_end
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/lightnvm/pblk-init.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+That subject is crap; it needs a subsystem prefix and it needs to
+describe what is done, not how its done.
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index d603b94..55d3b42 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -1069,7 +1069,8 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
- 	blk_queue_max_discard_sectors(tqueue, UINT_MAX >> 9);
- 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, tqueue);
- 
--	pr_info("pblk init: luns:%u, lines:%d, secs:%llu, buf entries:%u\n",
-+	pr_info("pblk(%s): luns:%u, lines:%d, secs:%llu, buf entries:%u\n",
-+			tdisk->disk_name,
- 			geo->all_luns, pblk->l_mg.nr_lines,
- 			(unsigned long long)pblk->rl.nr_secs,
- 			pblk->rwb.nr_entries);
--- 
-2.9.3
+Something like:
+
+  delayacct: Fix double accounting for blk-io
+
+> Before e33a9bba85a8, delayacct_blkio_end was called after
+> context-switching into the task which completed I/O. This resulted in
+> double counting: the task would account a delay both waiting for I/O and
+> for time spent in the runqueue.
+> 
+> With e33a9bba85a8, delayacct_blkio_end is called by try_to_wake_up. In
+> ttwu, we have not yet context-switched. This is more correct, in that the
+> delay accounting ends when the I/O is complete. But delayacct_blkio_end
+> relies upon `get_current()`, and we have not yet context-switched into the
+> task whose I/O completed. This results in the wrong task having its delay
+> accounting statistics updated.
+
+The correct way to quote a commit is like:
+
+  e33a9bba85a8 ("sched/core: move IO scheduling accounting from io_schedule_timeout() into scheduler")
+
+> Instead of doing that, pass the task_struct being woken to
+> delayacct_blkio_end, so that it can update the statistics of the correct
+> task_struct.
