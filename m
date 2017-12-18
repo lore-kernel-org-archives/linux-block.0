@@ -1,307 +1,178 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:39677 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755808AbdLTRWd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Dec 2017 12:22:33 -0500
-Received: by mail-wm0-f68.google.com with SMTP id i11so11131614wmf.4
-        for <linux-block@vger.kernel.org>; Wed, 20 Dec 2017 09:22:32 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 18/25] lightnvm: set target over-provision on create ioctl
-Date: Wed, 20 Dec 2017 18:21:58 +0100
-Message-Id: <20171220172205.26464-19-m@bjorling.me>
-In-Reply-To: <20171220172205.26464-1-m@bjorling.me>
-References: <20171220172205.26464-1-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>,
+	linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@infradead.org>,
+	NeilBrown <neilb@suse.com>,
+	Michele Ballabio <barra_cuda@katamail.com>,
+	Vincent Batts <vbatts@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 2/2] block: fix blk_rq_append_bio
+Date: Mon, 18 Dec 2017 15:40:44 +0800
+Message-Id: <20171218074044.1369-3-ming.lei@redhat.com>
+In-Reply-To: <20171218074044.1369-1-ming.lei@redhat.com>
+References: <20171218074044.1369-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <javier@cnexlabs.com>
+From: Jens Axboe <axboe@kernel.dk>
 
-Allow to set the over-provision percentage on target creation. In case
-that the value is not provided, fall back to the default value set by
-the target.
+Commit caa4b02476e3(blk-map: call blk_queue_bounce from blk_rq_append_bio)
+moves blk_queue_bounce() into blk_rq_append_bio(), but don't consider
+that the bounced bio becomes invisiable to caller since the parameter type is
+'struct bio *', which should have been 'struct bio **'.
 
-In pblk, set the default OP to 11% of the total size of the device
+This patch fixes this issue by passing 'struct bio **' to
+blk_rq_append_bio(), then the bounced bio can be returned to caller.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Also failure handling is considered too.
+
+Fixes: caa4b02476e3 ("blk-map: call blk_queue_bounce from blk_rq_append_bio")
+Cc: Christoph Hellwig <hch@lst.de>
+Reported-by: Michele Ballabio <barra_cuda@katamail.com>
+(handling failure of blk_rq_append_bio(), only call bio_get() after
+blk_rq_append_bio() returns OK)
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/core.c       | 106 +++++++++++++++++++++++++++++++++---------
- drivers/lightnvm/pblk-init.c  |   5 +-
- drivers/lightnvm/pblk.h       |   2 +
- include/linux/lightnvm.h      |   6 +++
- include/uapi/linux/lightnvm.h |   9 ++++
- 5 files changed, 104 insertions(+), 24 deletions(-)
+ block/blk-map.c                    | 38 ++++++++++++++++++++++----------------
+ drivers/scsi/osd/osd_initiator.c   |  4 +++-
+ drivers/target/target_core_pscsi.c |  4 ++--
+ include/linux/blkdev.h             |  2 +-
+ 4 files changed, 28 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index d5f231c..dcc9e62 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -140,7 +140,8 @@ static void nvm_remove_tgt_dev(struct nvm_tgt_dev *tgt_dev, int clear)
- }
+diff --git a/block/blk-map.c b/block/blk-map.c
+index b21f8e86f120..d3a94719f03f 100644
+--- a/block/blk-map.c
++++ b/block/blk-map.c
+@@ -12,22 +12,29 @@
+ #include "blk.h"
  
- static struct nvm_tgt_dev *nvm_create_tgt_dev(struct nvm_dev *dev,
--					      int lun_begin, int lun_end)
-+					      u16 lun_begin, u16 lun_end,
-+					      u16 op)
+ /*
+- * Append a bio to a passthrough request.  Only works can be merged into
+- * the request based on the driver constraints.
++ * Append a bio to a passthrough request.  Only works if the bio can be merged
++ * into the request based on the driver constraints.
+  */
+-int blk_rq_append_bio(struct request *rq, struct bio *bio)
++int blk_rq_append_bio(struct request *rq, struct bio **bio)
  {
- 	struct nvm_tgt_dev *tgt_dev = NULL;
- 	struct nvm_dev_map *dev_rmap = dev->rmap;
-@@ -219,6 +220,7 @@ static struct nvm_tgt_dev *nvm_create_tgt_dev(struct nvm_dev *dev,
- 	tgt_dev->geo.nr_chnls = nr_chnls;
- 	tgt_dev->geo.all_luns = nr_luns;
- 	tgt_dev->geo.nr_luns = (lun_balanced) ? prev_nr_luns : -1;
-+	tgt_dev->geo.op = op;
- 	tgt_dev->total_secs = nr_luns * tgt_dev->geo.sec_per_lun;
- 	tgt_dev->q = dev->q;
- 	tgt_dev->map = dev_map;
-@@ -266,9 +268,57 @@ static struct nvm_tgt_type *nvm_find_target_type(const char *name)
- 	return tt;
- }
+-	blk_queue_bounce(rq->q, &bio);
++	struct bio *orig_bio = *bio;
++
++	blk_queue_bounce(rq->q, bio);
  
-+static int nvm_config_check_luns(struct nvm_geo *geo, int lun_begin,
-+				 int lun_end)
-+{
-+	if (lun_begin > lun_end || lun_end >= geo->all_luns) {
-+		pr_err("nvm: lun out of bound (%u:%u > %u)\n",
-+			lun_begin, lun_end, geo->all_luns - 1);
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int __nvm_config_simple(struct nvm_dev *dev,
-+			       struct nvm_ioctl_create_simple *s)
-+{
-+	struct nvm_geo *geo = &dev->geo;
-+
-+	if (s->lun_begin == -1 && s->lun_end == -1) {
-+		s->lun_begin = 0;
-+		s->lun_end = geo->all_luns - 1;
-+	}
-+
-+	return nvm_config_check_luns(geo, s->lun_begin, s->lun_end);
-+}
-+
-+static int __nvm_config_extended(struct nvm_dev *dev,
-+				 struct nvm_ioctl_create_extended *e)
-+{
-+	struct nvm_geo *geo = &dev->geo;
-+
-+	if (e->lun_begin == 0xFFFF && e->lun_end == 0xFFFF) {
-+		e->lun_begin = 0;
-+		e->lun_end = dev->geo.all_luns - 1;
-+	}
-+
-+	/* op not set falls into target's default */
-+	if (e->op == 0xFFFF)
-+		e->op = NVM_TARGET_DEFAULT_OP;
-+
-+	if (e->op < NVM_TARGET_MIN_OP ||
-+	    e->op > NVM_TARGET_MAX_OP) {
-+		pr_err("nvm: invalid over provisioning value\n");
-+		return -EINVAL;
-+	}
-+
-+	return nvm_config_check_luns(geo, e->lun_begin, e->lun_end);
-+}
-+
- static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- {
--	struct nvm_ioctl_create_simple *s = &create->conf.s;
-+	struct nvm_ioctl_create_extended e;
- 	struct request_queue *tqueue;
- 	struct gendisk *tdisk;
- 	struct nvm_tgt_type *tt;
-@@ -277,6 +327,28 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 	void *targetdata;
+ 	if (!rq->bio) {
+-		blk_rq_bio_prep(rq->q, rq, bio);
++		blk_rq_bio_prep(rq->q, rq, *bio);
+ 	} else {
+-		if (!ll_back_merge_fn(rq->q, rq, bio))
++		if (!ll_back_merge_fn(rq->q, rq, *bio)) {
++			if (orig_bio != *bio) {
++				bio_put(*bio);
++				*bio = orig_bio;
++			}
+ 			return -EINVAL;
++		}
+ 
+-		rq->biotail->bi_next = bio;
+-		rq->biotail = bio;
+-		rq->__data_len += bio->bi_iter.bi_size;
++		rq->biotail->bi_next = *bio;
++		rq->biotail = *bio;
++		rq->__data_len += (*bio)->bi_iter.bi_size;
+ 	}
+ 
+ 	return 0;
+@@ -73,14 +80,12 @@ static int __blk_rq_map_user_iov(struct request *rq,
+ 	 * We link the bounce buffer in and could have to traverse it
+ 	 * later so we have to get a ref to prevent it from being freed
+ 	 */
+-	ret = blk_rq_append_bio(rq, bio);
+-	bio_get(bio);
++	ret = blk_rq_append_bio(rq, &bio);
+ 	if (ret) {
+-		bio_endio(bio);
+ 		__blk_rq_unmap_user(orig_bio);
+-		bio_put(bio);
+ 		return ret;
+ 	}
++	bio_get(bio);
+ 
+ 	return 0;
+ }
+@@ -213,7 +218,7 @@ int blk_rq_map_kern(struct request_queue *q, struct request *rq, void *kbuf,
+ 	int reading = rq_data_dir(rq) == READ;
+ 	unsigned long addr = (unsigned long) kbuf;
+ 	int do_copy = 0;
+-	struct bio *bio;
++	struct bio *bio, *orig_bio;
  	int ret;
  
-+	switch (create->conf.type) {
-+	case NVM_CONFIG_TYPE_SIMPLE:
-+		ret = __nvm_config_simple(dev, &create->conf.s);
-+		if (ret)
-+			return ret;
-+
-+		e.lun_begin = create->conf.s.lun_begin;
-+		e.lun_end = create->conf.s.lun_end;
-+		e.op = NVM_TARGET_DEFAULT_OP;
-+		break;
-+	case NVM_CONFIG_TYPE_EXTENDED:
-+		ret = __nvm_config_extended(dev, &create->conf.e);
-+		if (ret)
-+			return ret;
-+
-+		e = create->conf.e;
-+		break;
-+	default:
-+		pr_err("nvm: config type not valid\n");
-+		return -EINVAL;
-+	}
-+
- 	tt = nvm_find_target_type(create->tgttype);
- 	if (!tt) {
- 		pr_err("nvm: target type %s not found\n", create->tgttype);
-@@ -289,7 +361,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 		return -EINVAL;
- 	}
+ 	if (len > (queue_max_hw_sectors(q) << 9))
+@@ -236,10 +241,11 @@ int blk_rq_map_kern(struct request_queue *q, struct request *rq, void *kbuf,
+ 	if (do_copy)
+ 		rq->rq_flags |= RQF_COPY_USER;
  
--	ret = nvm_reserve_luns(dev, s->lun_begin, s->lun_end);
-+	ret = nvm_reserve_luns(dev, e.lun_begin, e.lun_end);
- 	if (ret)
+-	ret = blk_rq_append_bio(rq, bio);
++	orig_bio = bio;
++	ret = blk_rq_append_bio(rq, &bio);
+ 	if (unlikely(ret)) {
+ 		/* request is too big */
+-		bio_put(bio);
++		bio_put(orig_bio);
  		return ret;
- 
-@@ -299,7 +371,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 		goto err_reserve;
  	}
  
--	tgt_dev = nvm_create_tgt_dev(dev, s->lun_begin, s->lun_end);
-+	tgt_dev = nvm_create_tgt_dev(dev, e.lun_begin, e.lun_end, e.op);
- 	if (!tgt_dev) {
- 		pr_err("nvm: could not create target device\n");
- 		ret = -ENOMEM;
-@@ -369,7 +441,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- err_t:
- 	kfree(t);
- err_reserve:
--	nvm_release_luns_err(dev, s->lun_begin, s->lun_end);
-+	nvm_release_luns_err(dev, e.lun_begin, e.lun_end);
- 	return ret;
- }
+diff --git a/drivers/scsi/osd/osd_initiator.c b/drivers/scsi/osd/osd_initiator.c
+index a4f28b7e4c65..e18877177f1b 100644
+--- a/drivers/scsi/osd/osd_initiator.c
++++ b/drivers/scsi/osd/osd_initiator.c
+@@ -1576,7 +1576,9 @@ static struct request *_make_request(struct request_queue *q, bool has_write,
+ 		return req;
  
-@@ -949,7 +1021,6 @@ EXPORT_SYMBOL(nvm_unregister);
- static int __nvm_configure_create(struct nvm_ioctl_create *create)
- {
- 	struct nvm_dev *dev;
--	struct nvm_ioctl_create_simple *s;
+ 	for_each_bio(bio) {
+-		ret = blk_rq_append_bio(req, bio);
++		struct bio *bounce_bio = bio;
++
++		ret = blk_rq_append_bio(req, &bounce_bio);
+ 		if (ret)
+ 			return ERR_PTR(ret);
+ 	}
+diff --git a/drivers/target/target_core_pscsi.c b/drivers/target/target_core_pscsi.c
+index 7c69b4a9694d..0d99b242e82e 100644
+--- a/drivers/target/target_core_pscsi.c
++++ b/drivers/target/target_core_pscsi.c
+@@ -920,7 +920,7 @@ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
+ 					" %d i: %d bio: %p, allocating another"
+ 					" bio\n", bio->bi_vcnt, i, bio);
  
- 	down_write(&nvm_lock);
- 	dev = nvm_find_nvm_dev(create->dev);
-@@ -960,23 +1031,6 @@ static int __nvm_configure_create(struct nvm_ioctl_create *create)
- 		return -EINVAL;
+-				rc = blk_rq_append_bio(req, bio);
++				rc = blk_rq_append_bio(req, &bio);
+ 				if (rc) {
+ 					pr_err("pSCSI: failed to append bio\n");
+ 					goto fail;
+@@ -938,7 +938,7 @@ pscsi_map_sg(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
  	}
  
--	if (create->conf.type != NVM_CONFIG_TYPE_SIMPLE) {
--		pr_err("nvm: config type not valid\n");
--		return -EINVAL;
--	}
--	s = &create->conf.s;
--
--	if (s->lun_begin == -1 && s->lun_end == -1) {
--		s->lun_begin = 0;
--		s->lun_end = dev->geo.all_luns - 1;
--	}
--
--	if (s->lun_begin > s->lun_end || s->lun_end >= dev->geo.all_luns) {
--		pr_err("nvm: lun out of bound (%u:%u > %u)\n",
--			s->lun_begin, s->lun_end, dev->geo.all_luns - 1);
--		return -EINVAL;
--	}
--
- 	return nvm_create_tgt(dev, create);
- }
- 
-@@ -1076,6 +1130,12 @@ static long nvm_ioctl_dev_create(struct file *file, void __user *arg)
- 	if (copy_from_user(&create, arg, sizeof(struct nvm_ioctl_create)))
- 		return -EFAULT;
- 
-+	if (create.conf.type == NVM_CONFIG_TYPE_EXTENDED &&
-+	    create.conf.e.rsv != 0) {
-+		pr_err("nvm: reserved config field in use\n");
-+		return -EINVAL;
-+	}
-+
- 	create.dev[DISK_NAME_LEN - 1] = '\0';
- 	create.tgttype[NVM_TTYPE_NAME_MAX - 1] = '\0';
- 	create.tgtname[DISK_NAME_LEN - 1] = '\0';
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index e939f0a..30ea592 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -585,7 +585,10 @@ static void pblk_set_provision(struct pblk *pblk, long nr_free_blks)
- 	sector_t provisioned;
- 	int sec_meta, blk_meta;
- 
--	pblk->op = 20;
-+	if (geo->op == NVM_TARGET_DEFAULT_OP)
-+		pblk->op = PBLK_DEFAULT_OP;
-+	else
-+		pblk->op = geo->op;
- 
- 	provisioned = nr_free_blks;
- 	provisioned *= (100 - pblk->op);
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 9a21d36..430d076 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -54,6 +54,8 @@
- /* Static pool sizes */
- #define PBLK_GEN_WS_POOL_SIZE (2)
- 
-+#define PBLK_DEFAULT_OP (11)
-+
- enum {
- 	PBLK_READ		= READ,
- 	PBLK_WRITE		= WRITE,/* Write from write buffer */
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index b14ca84..b6df451 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -214,6 +214,10 @@ struct nvm_target {
- 
- #define ADDR_EMPTY (~0ULL)
- 
-+#define NVM_TARGET_DEFAULT_OP (101)
-+#define NVM_TARGET_MIN_OP (3)
-+#define NVM_TARGET_MAX_OP (80)
-+
- #define NVM_VERSION_MAJOR 1
- #define NVM_VERSION_MINOR 0
- #define NVM_VERSION_PATCH 0
-@@ -287,6 +291,8 @@ struct nvm_geo {
- 
- 	int max_rq_size;
- 
-+	int op;
-+
- 	struct nvm_addr_format ppaf;
- 
- 	/* Legacy 1.2 specific geometry */
-diff --git a/include/uapi/linux/lightnvm.h b/include/uapi/linux/lightnvm.h
-index c8aec4b..c937160 100644
---- a/include/uapi/linux/lightnvm.h
-+++ b/include/uapi/linux/lightnvm.h
-@@ -74,14 +74,23 @@ struct nvm_ioctl_create_simple {
- 	__u32 lun_end;
- };
- 
-+struct nvm_ioctl_create_extended {
-+	__u16 lun_begin;
-+	__u16 lun_end;
-+	__u16 op;
-+	__u16 rsv;
-+};
-+
- enum {
- 	NVM_CONFIG_TYPE_SIMPLE = 0,
-+	NVM_CONFIG_TYPE_EXTENDED = 1,
- };
- 
- struct nvm_ioctl_create_conf {
- 	__u32 type;
- 	union {
- 		struct nvm_ioctl_create_simple s;
-+		struct nvm_ioctl_create_extended e;
- 	};
- };
- 
+ 	if (bio) {
+-		rc = blk_rq_append_bio(req, bio);
++		rc = blk_rq_append_bio(req, &bio);
+ 		if (rc) {
+ 			pr_err("pSCSI: failed to append bio\n");
+ 			goto fail;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index abd06f540863..100d0df38026 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -965,7 +965,7 @@ extern int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
+ extern void blk_rq_unprep_clone(struct request *rq);
+ extern blk_status_t blk_insert_cloned_request(struct request_queue *q,
+ 				     struct request *rq);
+-extern int blk_rq_append_bio(struct request *rq, struct bio *bio);
++extern int blk_rq_append_bio(struct request *rq, struct bio **bio);
+ extern void blk_delay_queue(struct request_queue *, unsigned long);
+ extern void blk_queue_split(struct request_queue *, struct bio **);
+ extern void blk_recount_segments(struct request_queue *, struct bio *);
 -- 
-2.9.3
+2.9.5
