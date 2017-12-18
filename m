@@ -1,101 +1,65 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:40072 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755918AbdLTRWR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Dec 2017 12:22:17 -0500
-Received: by mail-wm0-f67.google.com with SMTP id f206so11104173wmf.5
-        for <linux-block@vger.kernel.org>; Wed, 20 Dec 2017 09:22:16 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 03/25] lightnvm: use internal pblk methods
-Date: Wed, 20 Dec 2017 18:21:43 +0100
-Message-Id: <20171220172205.26464-4-m@bjorling.me>
-In-Reply-To: <20171220172205.26464-1-m@bjorling.me>
-References: <20171220172205.26464-1-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mx1.redhat.com ([209.132.183.28]:45584 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1759251AbdLRMaD (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Dec 2017 07:30:03 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 28/45] block: loop: pass segments to iov_iter
+Date: Mon, 18 Dec 2017 20:22:30 +0800
+Message-Id: <20171218122247.3488-29-ming.lei@redhat.com>
+In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
+References: <20171218122247.3488-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Now that rrpc has been removed, the only users of the ppa helpers
-is pblk. However, pblk already defines similar functions.
+iov_iter is implemented with bvec itererator, so it is safe to pass
+segment to it, and this way is much more efficient than passing one
+page in each bvec.
 
-Switch pblk to use the internal ones, and remove the generic ppa
-helpers.
-
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/pblk-map.c   |  2 +-
- drivers/lightnvm/pblk-write.c |  4 ++--
- include/linux/lightnvm.h      | 19 -------------------
- 3 files changed, 3 insertions(+), 22 deletions(-)
+ drivers/block/loop.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
-index 6f3ecde..7445e64 100644
---- a/drivers/lightnvm/pblk-map.c
-+++ b/drivers/lightnvm/pblk-map.c
-@@ -146,7 +146,7 @@ void pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
- 		return;
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 8e30d081ad2a..90e3f402af62 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -499,7 +499,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 		struct bio_vec tmp;
  
- 	/* Erase blocks that are bad in this line but might not be in next */
--	if (unlikely(ppa_empty(*erase_ppa)) &&
-+	if (unlikely(pblk_ppa_empty(*erase_ppa)) &&
- 			bitmap_weight(d_line->blk_bitmap, lm->blk_per_line)) {
- 		int bit = -1;
- 
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 6c1cafa..6c30b7a 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -439,7 +439,7 @@ static int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd)
- 	struct pblk_line *meta_line;
- 	int err;
- 
--	ppa_set_empty(&erase_ppa);
-+	pblk_ppa_set_empty(&erase_ppa);
- 
- 	/* Assign lbas to ppas and populate request structure */
- 	err = pblk_setup_w_rq(pblk, rqd, &erase_ppa);
-@@ -457,7 +457,7 @@ static int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd)
- 		return NVM_IO_ERR;
+ 		__rq_for_each_bio(bio, rq)
+-			segments += bio_pages(bio);
++			segments += bio_segments(bio);
+ 		bvec = kmalloc(sizeof(struct bio_vec) * segments, GFP_NOIO);
+ 		if (!bvec)
+ 			return -EIO;
+@@ -511,7 +511,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 		 * copy bio->bi_iov_vec to new bvec. The rq_for_each_page
+ 		 * API will take care of all details for us.
+ 		 */
+-		rq_for_each_page(tmp, rq, iter) {
++		rq_for_each_segment(tmp, rq, iter) {
+ 			*bvec = tmp;
+ 			bvec++;
+ 		}
+@@ -525,7 +525,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 		 */
+ 		offset = bio->bi_iter.bi_bvec_done;
+ 		bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+-		segments = bio_pages(bio);
++		segments = bio_segments(bio);
  	}
+ 	atomic_set(&cmd->ref, 2);
  
--	if (!ppa_empty(erase_ppa)) {
-+	if (!pblk_ppa_empty(erase_ppa)) {
- 		/* Submit erase for next data line */
- 		if (pblk_blk_erase_async(pblk, erase_ppa)) {
- 			struct pblk_line *e_line = pblk_line_get_erase(pblk);
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index b7f111f..c506e5d 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -417,25 +417,6 @@ static inline struct ppa_addr dev_to_generic_addr(struct nvm_tgt_dev *tgt_dev,
- 	return l;
- }
- 
--static inline int ppa_empty(struct ppa_addr ppa_addr)
--{
--	return (ppa_addr.ppa == ADDR_EMPTY);
--}
--
--static inline void ppa_set_empty(struct ppa_addr *ppa_addr)
--{
--	ppa_addr->ppa = ADDR_EMPTY;
--}
--
--static inline int ppa_cmp_blk(struct ppa_addr ppa1, struct ppa_addr ppa2)
--{
--	if (ppa_empty(ppa1) || ppa_empty(ppa2))
--		return 0;
--
--	return ((ppa1.g.ch == ppa2.g.ch) && (ppa1.g.lun == ppa2.g.lun) &&
--					(ppa1.g.blk == ppa2.g.blk));
--}
--
- typedef blk_qc_t (nvm_tgt_make_rq_fn)(struct request_queue *, struct bio *);
- typedef sector_t (nvm_tgt_capacity_fn)(void *);
- typedef void *(nvm_tgt_init_fn)(struct nvm_tgt_dev *, struct gendisk *,
 -- 
-2.9.3
+2.9.5
