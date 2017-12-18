@@ -1,234 +1,101 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
+Return-Path: <bruschi.chiara@outlook.it>
+From: Chiara Bruschi <bruschi.chiara@outlook.it>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	lucmiccio@gmail.com,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH V2] block, bfq: remove batches of confusing ifdefs
-Date: Mon,  4 Dec 2017 11:42:05 +0100
-Message-Id: <20171204104205.3290-1-paolo.valente@linaro.org>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"paolo.valente@linaro.org" <paolo.valente@linaro.org>, "federico@willer.it"
+	<federico@willer.it>, Chiara Bruschi <bruschi.chiara@outlook.it>
+Subject: [PATCH] block, bfq: fix occurrences of request finish method's old
+ name
+Date: Mon, 18 Dec 2017 16:21:59 +0000
+Message-ID: <DB5PR09MB0263012F008A9B927BF94FFAEA0E0@DB5PR09MB0263.eurprd09.prod.outlook.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Commit a33801e8b473 ("block, bfq: move debug blkio stats behind
-CONFIG_DEBUG_BLK_CGROUP") introduced two batches of confusing ifdefs:
-one reported in [1], plus a similar one in another function. This
-commit removes both batches, in the way suggested in [1].
+Commit '7b9e93616399' ("blk-mq-sched: unify request finished methods")
+changed the old name of current bfq_finish_request method, but left it
+unchanged elsewhere in the code (related comments, part of function
+name bfq_put_rq_priv_body).
 
-[1] https://www.spinics.net/lists/linux-block/msg20043.html
+This commit fixes all occurrences of the old name of this method by
+changing them into the current name.
 
-Fixes: a33801e8b473 ("block, bfq: move debug blkio stats behind CONFIG_DEBUG_BLK_CGROUP")
-Reported-by: Linus Torvalds <torvalds@linux-foundation.org>
-Tested-by: Luca Miccio <lucmiccio@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Fixes: 7b9e93616399 ("blk-mq-sched: unify request finished methods")
+Reviewed-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Federico Motta <federico@willer.it>
+Signed-off-by: Chiara Bruschi <bruschi.chiara@outlook.it>
 ---
- block/bfq-iosched.c | 127 +++++++++++++++++++++++++++++-----------------------
- 1 file changed, 72 insertions(+), 55 deletions(-)
+ block/bfq-iosched.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index bcb6d21..3feed64 100644
+index bcb6d21..6da7f71 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -3689,35 +3689,16 @@ static struct request *__bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	return rq;
- }
- 
--static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
--{
--	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
--	struct request *rq;
- #if defined(CONFIG_BFQ_GROUP_IOSCHED) && defined(CONFIG_DEBUG_BLK_CGROUP)
--	struct bfq_queue *in_serv_queue, *bfqq;
--	bool waiting_rq, idle_timer_disabled;
--#endif
--
--	spin_lock_irq(&bfqd->lock);
--
--#if defined(CONFIG_BFQ_GROUP_IOSCHED) && defined(CONFIG_DEBUG_BLK_CGROUP)
--	in_serv_queue = bfqd->in_service_queue;
--	waiting_rq = in_serv_queue && bfq_bfqq_wait_request(in_serv_queue);
--
--	rq = __bfq_dispatch_request(hctx);
--
--	idle_timer_disabled =
--		waiting_rq && !bfq_bfqq_wait_request(in_serv_queue);
--
--#else
--	rq = __bfq_dispatch_request(hctx);
--#endif
--	spin_unlock_irq(&bfqd->lock);
-+static void bfq_update_dispatch_stats(struct request_queue *q,
-+				      struct request *rq,
-+				      struct bfq_queue *in_serv_queue,
-+				      bool idle_timer_disabled)
-+{
-+	struct bfq_queue *bfqq = rq ? RQ_BFQQ(rq) : NULL;
- 
--#if defined(CONFIG_BFQ_GROUP_IOSCHED) && defined(CONFIG_DEBUG_BLK_CGROUP)
--	bfqq = rq ? RQ_BFQQ(rq) : NULL;
- 	if (!idle_timer_disabled && !bfqq)
--		return rq;
-+		return;
- 
- 	/*
- 	 * rq and bfqq are guaranteed to exist until this function
-@@ -3732,7 +3713,7 @@ static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	 * In addition, the following queue lock guarantees that
- 	 * bfqq_group(bfqq) exists as well.
- 	 */
--	spin_lock_irq(hctx->queue->queue_lock);
-+	spin_lock_irq(q->queue_lock);
- 	if (idle_timer_disabled)
- 		/*
- 		 * Since the idle timer has been disabled,
-@@ -3751,9 +3732,37 @@ static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 		bfqg_stats_set_start_empty_time(bfqg);
- 		bfqg_stats_update_io_remove(bfqg, rq->cmd_flags);
- 	}
--	spin_unlock_irq(hctx->queue->queue_lock);
-+	spin_unlock_irq(q->queue_lock);
-+}
-+#else
-+static inline void bfq_update_dispatch_stats(struct request_queue *q,
-+					     struct request *rq,
-+					     struct bfq_queue *in_serv_queue,
-+					     bool idle_timer_disabled) {}
- #endif
- 
-+static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
-+	struct request *rq;
-+	struct bfq_queue *in_serv_queue;
-+	bool waiting_rq, idle_timer_disabled;
-+
-+	spin_lock_irq(&bfqd->lock);
-+
-+	in_serv_queue = bfqd->in_service_queue;
-+	waiting_rq = in_serv_queue && bfq_bfqq_wait_request(in_serv_queue);
-+
-+	rq = __bfq_dispatch_request(hctx);
-+
-+	idle_timer_disabled =
-+		waiting_rq && !bfq_bfqq_wait_request(in_serv_queue);
-+
-+	spin_unlock_irq(&bfqd->lock);
-+
-+	bfq_update_dispatch_stats(hctx->queue, rq, in_serv_queue,
-+				  idle_timer_disabled);
-+
- 	return rq;
- }
- 
-@@ -4276,16 +4285,46 @@ static bool __bfq_insert_request(struct bfq_data *bfqd, struct request *rq)
- 	return idle_timer_disabled;
- }
- 
-+#if defined(CONFIG_BFQ_GROUP_IOSCHED) && defined(CONFIG_DEBUG_BLK_CGROUP)
-+static void bfq_update_insert_stats(struct request_queue *q,
-+				    struct bfq_queue *bfqq,
-+				    bool idle_timer_disabled,
-+				    unsigned int cmd_flags)
-+{
-+	if (!bfqq)
-+		return;
-+
-+	/*
-+	 * bfqq still exists, because it can disappear only after
-+	 * either it is merged with another queue, or the process it
-+	 * is associated with exits. But both actions must be taken by
-+	 * the same process currently executing this flow of
-+	 * instructions.
-+	 *
-+	 * In addition, the following queue lock guarantees that
-+	 * bfqq_group(bfqq) exists as well.
-+	 */
-+	spin_lock_irq(q->queue_lock);
-+	bfqg_stats_update_io_add(bfqq_group(bfqq), bfqq, cmd_flags);
-+	if (idle_timer_disabled)
-+		bfqg_stats_update_idle_time(bfqq_group(bfqq));
-+	spin_unlock_irq(q->queue_lock);
-+}
-+#else
-+static inline void bfq_update_insert_stats(struct request_queue *q,
-+					   struct bfq_queue *bfqq,
-+					   bool idle_timer_disabled,
-+					   unsigned int cmd_flags) {}
-+#endif
-+
- static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 			       bool at_head)
- {
- 	struct request_queue *q = hctx->queue;
- 	struct bfq_data *bfqd = q->elevator->elevator_data;
--#if defined(CONFIG_BFQ_GROUP_IOSCHED) && defined(CONFIG_DEBUG_BLK_CGROUP)
- 	struct bfq_queue *bfqq = RQ_BFQQ(rq);
- 	bool idle_timer_disabled = false;
- 	unsigned int cmd_flags;
--#endif
- 
- 	spin_lock_irq(&bfqd->lock);
- 	if (blk_mq_sched_try_insert_merge(q, rq)) {
-@@ -4304,7 +4343,6 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 		else
- 			list_add_tail(&rq->queuelist, &bfqd->dispatch);
- 	} else {
--#if defined(CONFIG_BFQ_GROUP_IOSCHED) && defined(CONFIG_DEBUG_BLK_CGROUP)
- 		idle_timer_disabled = __bfq_insert_request(bfqd, rq);
- 		/*
- 		 * Update bfqq, because, if a queue merge has occurred
-@@ -4312,9 +4350,6 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 		 * redirected into a new queue.
- 		 */
- 		bfqq = RQ_BFQQ(rq);
--#else
--		__bfq_insert_request(bfqd, rq);
--#endif
- 
- 		if (rq_mergeable(rq)) {
- 			elv_rqhash_add(q, rq);
-@@ -4323,35 +4358,17 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+@@ -3630,8 +3630,8 @@ static struct request *__bfq_dispatch_request(struct =
+blk_mq_hw_ctx *hctx)
  		}
- 	}
- 
--#if defined(CONFIG_BFQ_GROUP_IOSCHED) && defined(CONFIG_DEBUG_BLK_CGROUP)
- 	/*
- 	 * Cache cmd_flags before releasing scheduler lock, because rq
- 	 * may disappear afterwards (for example, because of a request
- 	 * merge).
- 	 */
- 	cmd_flags = rq->cmd_flags;
--#endif
-+
- 	spin_unlock_irq(&bfqd->lock);
- 
--#if defined(CONFIG_BFQ_GROUP_IOSCHED) && defined(CONFIG_DEBUG_BLK_CGROUP)
--	if (!bfqq)
--		return;
--	/*
--	 * bfqq still exists, because it can disappear only after
--	 * either it is merged with another queue, or the process it
--	 * is associated with exits. But both actions must be taken by
--	 * the same process currently executing this flow of
--	 * instruction.
--	 *
--	 * In addition, the following queue lock guarantees that
--	 * bfqq_group(bfqq) exists as well.
--	 */
--	spin_lock_irq(q->queue_lock);
--	bfqg_stats_update_io_add(bfqq_group(bfqq), bfqq, cmd_flags);
--	if (idle_timer_disabled)
--		bfqg_stats_update_idle_time(bfqq_group(bfqq));
--	spin_unlock_irq(q->queue_lock);
--#endif
-+	bfq_update_insert_stats(q, bfqq, idle_timer_disabled,
-+				cmd_flags);
+=20
+ 		/*
+-		 * We exploit the put_rq_private hook to decrement
+-		 * rq_in_driver, but put_rq_private will not be
++		 * We exploit the bfq_finish_request hook to decrement
++		 * rq_in_driver, but bfq_finish_request will not be
+ 		 * invoked on this request. So, to avoid unbalance,
+ 		 * just start this request, without incrementing
+ 		 * rq_in_driver. As a negative consequence,
+@@ -3640,14 +3640,14 @@ static struct request *__bfq_dispatch_request(struc=
+t blk_mq_hw_ctx *hctx)
+ 		 * bfq_schedule_dispatch to be invoked uselessly.
+ 		 *
+ 		 * As for implementing an exact solution, the
+-		 * put_request hook, if defined, is probably invoked
+-		 * also on this request. So, by exploiting this hook,
+-		 * we could 1) increment rq_in_driver here, and 2)
+-		 * decrement it in put_request. Such a solution would
+-		 * let the value of the counter be always accurate,
+-		 * but it would entail using an extra interface
+-		 * function. This cost seems higher than the benefit,
+-		 * being the frequency of non-elevator-private
++		 * bfq_finish_request hook, if defined, is probably
++		 * invoked also on this request. So, by exploiting
++		 * this hook, we could 1) increment rq_in_driver here,
++		 * and 2) decrement it in bfq_finish_request. Such a
++		 * solution would let the value of the counter be
++		 * always accurate, but it would entail using an extra
++		 * interface function. This cost seems higher than the
++		 * benefit, being the frequency of non-elevator-private
+ 		 * requests very low.
+ 		 */
+ 		goto start_rq;
+@@ -4482,7 +4482,7 @@ static void bfq_completed_request(struct bfq_queue *b=
+fqq, struct bfq_data *bfqd)
+ 		bfq_schedule_dispatch(bfqd);
  }
- 
- static void bfq_insert_requests(struct blk_mq_hw_ctx *hctx,
--- 
-2.10.0
+=20
+-static void bfq_put_rq_priv_body(struct bfq_queue *bfqq)
++static void bfq_finish_request_body(struct bfq_queue *bfqq)
+ {
+ 	bfqq->allocated--;
+=20
+@@ -4512,7 +4512,7 @@ static void bfq_finish_request(struct request *rq)
+ 		spin_lock_irqsave(&bfqd->lock, flags);
+=20
+ 		bfq_completed_request(bfqq, bfqd);
+-		bfq_put_rq_priv_body(bfqq);
++		bfq_finish_request_body(bfqq);
+=20
+ 		spin_unlock_irqrestore(&bfqd->lock, flags);
+ 	} else {
+@@ -4533,7 +4533,7 @@ static void bfq_finish_request(struct request *rq)
+ 			bfqg_stats_update_io_remove(bfqq_group(bfqq),
+ 						    rq->cmd_flags);
+ 		}
+-		bfq_put_rq_priv_body(bfqq);
++		bfq_finish_request_body(bfqq);
+ 	}
+=20
+ 	rq->elv.priv[0] =3D NULL;
+--=20
+2.1.4
