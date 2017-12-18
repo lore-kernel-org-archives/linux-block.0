@@ -1,56 +1,112 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:40141 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756013AbdLTRWg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Dec 2017 12:22:36 -0500
-Received: by mail-wm0-f67.google.com with SMTP id f206so11105957wmf.5
-        for <linux-block@vger.kernel.org>; Wed, 20 Dec 2017 09:22:36 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 22/25] lightnvm: pblk: free write buffer on init failure
-Date: Wed, 20 Dec 2017 18:22:02 +0100
-Message-Id: <20171220172205.26464-23-m@bjorling.me>
-In-Reply-To: <20171220172205.26464-1-m@bjorling.me>
-References: <20171220172205.26464-1-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 43/45] block: bio: pass segments to bio if bio_add_page() is bypassed
+Date: Mon, 18 Dec 2017 20:22:45 +0800
+Message-Id: <20171218122247.3488-44-ming.lei@redhat.com>
+In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
+References: <20171218122247.3488-1-ming.lei@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <javier@cnexlabs.com>
+Under some situations, such as block direct I/O, we can't use
+bio_add_page() for merging pages into multipage bvec, so
+a new function is implemented for converting page array into one
+segment array, then these cases can benefit from multipage bvec
+too.
 
-Refactor the way we free the write buffer to ensure that all entries get
-freed in case of an error on the init sequence.
-
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/pblk-init.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ block/bio.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 48 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 3150b8f..d603b94 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -355,6 +355,8 @@ static void pblk_core_free(struct pblk *pblk)
- 	mempool_destroy(pblk->e_rq_pool);
- 	mempool_destroy(pblk->w_rq_pool);
- 
-+	pblk_rwb_free(pblk);
-+
- 	pblk_free_global_caches(pblk);
+diff --git a/block/bio.c b/block/bio.c
+index 34af328681a8..e808d8352067 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -882,6 +882,41 @@ int bio_add_page(struct bio *bio, struct page *page,
  }
+ EXPORT_SYMBOL(bio_add_page);
  
-@@ -931,7 +933,6 @@ static void pblk_tear_down(struct pblk *pblk)
- 	pblk_pipeline_stop(pblk);
- 	pblk_writer_stop(pblk);
- 	pblk_rb_sync_l2p(&pblk->rwb);
--	pblk_rwb_free(pblk);
- 	pblk_rl_free(&pblk->rl);
++static unsigned convert_to_segs(struct bio* bio, struct page **pages,
++				unsigned char *page_cnt,
++				unsigned nr_pages)
++{
++
++	unsigned idx;
++	unsigned nr_seg = 0;
++	struct request_queue *q = NULL;
++
++	if (bio->bi_disk)
++		q = bio->bi_disk->queue;
++
++	if (!q || !blk_queue_cluster(q)) {
++		memset(page_cnt, 0, nr_pages);
++		return nr_pages;
++	}
++
++	page_cnt[nr_seg] = 0;
++	for (idx = 1; idx < nr_pages; idx++) {
++		struct page *pg_s = pages[nr_seg];
++		struct page *pg = pages[idx];
++
++		if (page_to_pfn(pg_s) + page_cnt[nr_seg] + 1 ==
++		    page_to_pfn(pg)) {
++			page_cnt[nr_seg]++;
++		} else {
++			page_cnt[++nr_seg] = 0;
++			if (nr_seg < idx)
++				pages[nr_seg] = pg;
++		}
++	}
++
++	return nr_seg + 1;
++}
++
+ /**
+  * bio_iov_iter_get_pages - pin user or kernel pages and add them to a bio
+  * @bio: bio to add pages to
+@@ -897,6 +932,8 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	struct page **pages = (struct page **)bv;
+ 	size_t offset, diff;
+ 	ssize_t size;
++	unsigned short nr_segs;
++	unsigned char page_cnt[nr_pages];	/* at most 256 pages */
  
- 	pr_debug("pblk: consistent tear down\n");
+ 	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
+ 	if (unlikely(size <= 0))
+@@ -912,13 +949,18 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	 * need to be reflected here as well.
+ 	 */
+ 	bio->bi_iter.bi_size += size;
+-	bio->bi_vcnt += nr_pages;
+-
+ 	diff = (nr_pages * PAGE_SIZE - offset) - size;
+-	while (nr_pages--) {
+-		bv[nr_pages].bv_page = pages[nr_pages];
+-		bv[nr_pages].bv_len = PAGE_SIZE;
+-		bv[nr_pages].bv_offset = 0;
++
++	/* convert into segments */
++	nr_segs = convert_to_segs(bio, pages, page_cnt, nr_pages);
++	bio->bi_vcnt += nr_segs;
++
++	while (nr_segs--) {
++		unsigned cnt = (unsigned)page_cnt[nr_segs] + 1;
++
++		bv[nr_segs].bv_page = pages[nr_segs];
++		bv[nr_segs].bv_len = PAGE_SIZE * cnt;
++		bv[nr_segs].bv_offset = 0;
+ 	}
+ 
+ 	bv[0].bv_offset += offset;
 -- 
-2.9.3
+2.9.5
