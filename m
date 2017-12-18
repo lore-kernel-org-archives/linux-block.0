@@ -1,124 +1,207 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:32922 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755968AbdLTRW1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Dec 2017 12:22:27 -0500
-Received: by mail-wm0-f68.google.com with SMTP id g130so16680840wme.0
-        for <linux-block@vger.kernel.org>; Wed, 20 Dec 2017 09:22:26 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 12/25] lightnvm: pblk: refactor emeta consistency check
-Date: Wed, 20 Dec 2017 18:21:52 +0100
-Message-Id: <20171220172205.26464-13-m@bjorling.me>
-In-Reply-To: <20171220172205.26464-1-m@bjorling.me>
-References: <20171220172205.26464-1-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mx1.redhat.com ([209.132.183.28]:45070 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1759046AbdLRM20 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Dec 2017 07:28:26 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 20/45] block: use bio_for_each_segment() to compute segments count
+Date: Mon, 18 Dec 2017 20:22:22 +0800
+Message-Id: <20171218122247.3488-21-ming.lei@redhat.com>
+In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
+References: <20171218122247.3488-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Firstly it is more efficient to use bio_for_each_segment() in both
+blk_bio_segment_split() and __blk_recalc_rq_segments() to compute how many
+segments there are in the bio.
 
-Currently pblk_recov_get_lba list does two separate things:
-it checks the consistency of the emeta and extracts the lba list.
+Secondaly once bio_for_each_segment() is used, the bvec may need to
+be splitted because its length can be very longer than max segment size,
+so we have to split the big bvec into several segments.
 
-This patch separates the consistency check to make the code easier
-to read and to prepare for version checks of the line emeta
-persistent data format version.
+Thirdly during splitting multipage bvec into segments, max segment number
+may be reached, then the bio need to be splitted when this happens.
 
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/pblk-gc.c       |  9 ++++++++-
- drivers/lightnvm/pblk-recovery.c | 15 ++++++++++-----
- drivers/lightnvm/pblk.h          |  2 +-
- 3 files changed, 19 insertions(+), 7 deletions(-)
+ block/blk-merge.c | 97 ++++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 79 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-index 00d5698..9e3f22b 100644
---- a/drivers/lightnvm/pblk-gc.c
-+++ b/drivers/lightnvm/pblk-gc.c
-@@ -169,7 +169,14 @@ static void pblk_gc_line_prepare_ws(struct work_struct *work)
- 	 * the line untouched. TODO: Implement a recovery routine that scans and
- 	 * moves all sectors on the line.
- 	 */
--	lba_list = pblk_recov_get_lba_list(pblk, emeta_buf);
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 25ffb84be058..f65546b46fff 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -97,6 +97,62 @@ static inline unsigned get_max_io_size(struct request_queue *q,
+ 	return sectors;
+ }
+ 
++/*
++ * Split the bvec @bv into segments, and update all kinds of
++ * variables.
++ */
++static bool bvec_split_segs(struct request_queue *q, struct bio_vec *bv,
++		unsigned *nsegs, unsigned *last_seg_size,
++		unsigned *front_seg_size, unsigned *sectors)
++{
++	bool need_split = false;
++	unsigned len = bv->bv_len;
++	unsigned total_len = 0;
++	unsigned new_nsegs = 0, seg_size = 0;
 +
-+	ret = pblk_recov_check_emeta(pblk, emeta_buf);
-+	if (ret) {
-+		pr_err("pblk: inconsistent emeta (line %d)\n", line->id);
-+		goto fail_free_emeta;
++	if ((*nsegs >= queue_max_segments(q)) || !len)
++		return need_split;
++
++	/*
++	 * Multipage bvec may be too big to hold in one segment,
++	 * so the current bvec has to be splitted as multiple
++	 * segments.
++	 */
++	while (new_nsegs + *nsegs < queue_max_segments(q)) {
++		seg_size = min(queue_max_segment_size(q), len);
++
++		new_nsegs++;
++		total_len += seg_size;
++		len -= seg_size;
++
++		if ((queue_virt_boundary(q) && ((bv->bv_offset +
++		    total_len) & queue_virt_boundary(q))) || !len)
++			break;
 +	}
 +
-+	lba_list = emeta_to_lbas(pblk, emeta_buf);
- 	if (!lba_list) {
- 		pr_err("pblk: could not interpret emeta (line %d)\n", line->id);
- 		goto fail_free_emeta;
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index 1b272ae..39a2e19 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -111,18 +111,18 @@ int pblk_recov_setup_rq(struct pblk *pblk, struct pblk_c_ctx *c_ctx,
- 	return 0;
- }
- 
--__le64 *pblk_recov_get_lba_list(struct pblk *pblk, struct line_emeta *emeta_buf)
-+int pblk_recov_check_emeta(struct pblk *pblk, struct line_emeta *emeta_buf)
- {
- 	u32 crc;
- 
- 	crc = pblk_calc_emeta_crc(pblk, emeta_buf);
- 	if (le32_to_cpu(emeta_buf->crc) != crc)
--		return NULL;
-+		return 1;
- 
- 	if (le32_to_cpu(emeta_buf->header.identifier) != PBLK_MAGIC)
--		return NULL;
-+		return 1;
- 
--	return emeta_to_lbas(pblk, emeta_buf);
-+	return 0;
- }
- 
- static int pblk_recov_l2p_from_emeta(struct pblk *pblk, struct pblk_line *line)
-@@ -137,7 +137,7 @@ static int pblk_recov_l2p_from_emeta(struct pblk *pblk, struct pblk_line *line)
- 	u64 nr_valid_lbas, nr_lbas = 0;
- 	u64 i;
- 
--	lba_list = pblk_recov_get_lba_list(pblk, emeta_buf);
-+	lba_list = emeta_to_lbas(pblk, emeta_buf);
- 	if (!lba_list)
- 		return 1;
- 
-@@ -938,6 +938,11 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
- 			goto next;
- 		}
- 
-+		if (pblk_recov_check_emeta(pblk, line->emeta->buf)) {
-+			pblk_recov_l2p_from_oob(pblk, line);
-+			goto next;
-+		}
++	/* split in the middle of the bvec */
++	if (len)
++		need_split = true;
 +
- 		if (pblk_recov_l2p_from_emeta(pblk, line))
- 			pblk_recov_l2p_from_oob(pblk, line);
++	/* update front segment size */
++	if (!*nsegs) {
++		unsigned first_seg_size = seg_size;
++
++		if (new_nsegs > 1)
++			first_seg_size = queue_max_segment_size(q);
++		if (*front_seg_size < first_seg_size)
++			*front_seg_size = first_seg_size;
++	}
++
++	/* update other varibles */
++	*last_seg_size = seg_size;
++	*nsegs += new_nsegs;
++	if (sectors)
++		*sectors += total_len >> 9;
++
++	return need_split;
++}
++
+ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 					 struct bio *bio,
+ 					 struct bio_set *bs,
+@@ -111,7 +167,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 	const unsigned max_sectors = get_max_io_size(q, bio);
+ 	unsigned advance = 0;
  
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 7b09fb2..f324a7e 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -808,7 +808,7 @@ int pblk_submit_read_gc(struct pblk *pblk, struct pblk_gc_rq *gc_rq);
- void pblk_submit_rec(struct work_struct *work);
- struct pblk_line *pblk_recov_l2p(struct pblk *pblk);
- int pblk_recov_pad(struct pblk *pblk);
--__le64 *pblk_recov_get_lba_list(struct pblk *pblk, struct line_emeta *emeta);
-+int pblk_recov_check_emeta(struct pblk *pblk, struct line_emeta *emeta);
- int pblk_recov_setup_rq(struct pblk *pblk, struct pblk_c_ctx *c_ctx,
- 			struct pblk_rec_ctx *recovery, u64 *comp_bits,
- 			unsigned int comp);
+-	bio_for_each_page(bv, bio, iter) {
++	bio_for_each_segment(bv, bio, iter) {
+ 		/*
+ 		 * If the queue doesn't support SG gaps and adding this
+ 		 * offset would create a gap, disallow it.
+@@ -126,8 +182,12 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 			 */
+ 			if (nsegs < queue_max_segments(q) &&
+ 			    sectors < max_sectors) {
+-				nsegs++;
+-				sectors = max_sectors;
++				/* split in the middle of bvec */
++				bv.bv_len = (max_sectors - sectors) << 9;
++				bvec_split_segs(q, &bv, &nsegs,
++						&seg_size,
++						&front_seg_size,
++						&sectors);
+ 			}
+ 			goto split;
+ 		}
+@@ -139,10 +199,9 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 				goto new_segment;
+ 			if (seg_size + bv.bv_len > queue_max_segment_size(q)) {
+ 				/*
+-				 * On assumption is that initial value of
+-				 * @seg_size(equals to bv.bv_len) won't be
+-				 * bigger than max segment size, but will
+-				 * becomes false after multipage bvec comes.
++				 * The initial value of @seg_size won't be
++				 * bigger than max segment size, because we
++				 * split the bvec via bvec_split_segs().
+ 				 */
+ 				advance = queue_max_segment_size(q) - seg_size;
+ 
+@@ -174,11 +233,12 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 		if (nsegs == 1 && seg_size > front_seg_size)
+ 			front_seg_size = seg_size;
+ 
+-		nsegs++;
+ 		bvprv = bv;
+ 		bvprvp = &bvprv;
+-		seg_size = bv.bv_len;
+-		sectors += bv.bv_len >> 9;
++
++		if (bvec_split_segs(q, &bv, &nsegs, &seg_size,
++					&front_seg_size, &sectors))
++			goto split;
+ 
+ 		/* restore the bvec for iterator */
+ 		if (advance) {
+@@ -252,6 +312,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+ 	struct bio_vec bv, bvprv = { NULL };
+ 	int cluster, prev = 0;
+ 	unsigned int seg_size, nr_phys_segs;
++	unsigned front_seg_size = bio->bi_seg_front_size;
+ 	struct bio *fbio, *bbio;
+ 	struct bvec_iter iter;
+ 
+@@ -272,7 +333,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+ 	seg_size = 0;
+ 	nr_phys_segs = 0;
+ 	for_each_bio(bio) {
+-		bio_for_each_page(bv, bio, iter) {
++		bio_for_each_segment(bv, bio, iter) {
+ 			/*
+ 			 * If SG merging is disabled, each bio vector is
+ 			 * a segment
+@@ -294,20 +355,20 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+ 				continue;
+ 			}
+ new_segment:
+-			if (nr_phys_segs == 1 && seg_size >
+-			    fbio->bi_seg_front_size)
+-				fbio->bi_seg_front_size = seg_size;
++			if (nr_phys_segs == 1 && seg_size > front_seg_size)
++				front_seg_size = seg_size;
+ 
+-			nr_phys_segs++;
+ 			bvprv = bv;
+ 			prev = 1;
+-			seg_size = bv.bv_len;
++			bvec_split_segs(q, &bv, &nr_phys_segs, &seg_size,
++					&front_seg_size, NULL);
+ 		}
+ 		bbio = bio;
+ 	}
+ 
+-	if (nr_phys_segs == 1 && seg_size > fbio->bi_seg_front_size)
+-		fbio->bi_seg_front_size = seg_size;
++	if (nr_phys_segs == 1 && seg_size > front_seg_size)
++		front_seg_size = seg_size;
++	fbio->bi_seg_front_size = front_seg_size;
+ 	if (seg_size > bbio->bi_seg_back_size)
+ 		bbio->bi_seg_back_size = seg_size;
+ 
 -- 
-2.9.3
+2.9.5
