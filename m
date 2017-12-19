@@ -1,115 +1,32 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:38292 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1758060AbdLRHlG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Dec 2017 02:41:06 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@infradead.org>, NeilBrown <neilb@suse.com>,
-        Michele Ballabio <barra_cuda@katamail.com>,
-        Vincent Batts <vbatts@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 1/2] block: don't let passthrough IO go into .make_request_fn()
-Date: Mon, 18 Dec 2017 15:40:43 +0800
-Message-Id: <20171218074044.1369-2-ming.lei@redhat.com>
-In-Reply-To: <20171218074044.1369-1-ming.lei@redhat.com>
-References: <20171218074044.1369-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <vbatts@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <8d1baf35-3f94-a6d7-7e05-0f90acbefde0@kernel.dk>
+References: <20171218074044.1369-1-ming.lei@redhat.com> <8d1baf35-3f94-a6d7-7e05-0f90acbefde0@kernel.dk>
+From: Vincent Batts <vbatts@redhat.com>
+Date: Tue, 19 Dec 2017 11:25:10 -0500
+Message-ID: <CANcsyS5uP5C-Qb0QhnyrQFKe9cVPkY-_cW8BdV4QtRC79YOKsA@mail.gmail.com>
+Subject: Re: [PATCH 0/2] block: fix two regressiones on bounce
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>, NeilBrown <neilb@suse.com>,
+	Michele Ballabio <barra_cuda@katamail.com>
+Content-Type: text/plain; charset="UTF-8"
+List-ID: <linux-block@vger.kernel.org>
 
-Commit a8821f3f3("block: Improvements to bounce-buffer handling") tries
-to make sure that the bio to .make_request_fn won't exceed BIO_MAX_PAGES,
-but ignores that passthrough I/O can use blk_queue_bounce() too.
-Especially, passthrough IO may not be sector-aligned, and the check
-of 'sectors < bio_sectors(*bio_orig)' inside __blk_queue_bounce() may
-become true even though the max bvec number doesn't exceed BIO_MAX_PAGES,
-then cause the bio splitted, and the original passthrough bio is submited
-to generic_make_request().
+Just got a confirmation that this patch set, when applied to the 4.14
+branch, fixes the issue.
 
-This patch fixes this issue by checking if the bio is passthrough IO,
-and use bio_kmalloc() to allocate the cloned passthrough bio.
-
-Cc: NeilBrown <neilb@suse.com>
-Fixes: a8821f3f3("block: Improvements to bounce-buffer handling")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/bounce.c         |  6 ++++--
- include/linux/blkdev.h | 21 +++++++++++++++++++--
- 2 files changed, 23 insertions(+), 4 deletions(-)
-
-diff --git a/block/bounce.c b/block/bounce.c
-index fceb1a96480b..1d05c422c932 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -200,6 +200,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
- 	unsigned i = 0;
- 	bool bounce = false;
- 	int sectors = 0;
-+	bool passthrough = bio_is_passthrough(*bio_orig);
- 
- 	bio_for_each_segment(from, *bio_orig, iter) {
- 		if (i++ < BIO_MAX_PAGES)
-@@ -210,13 +211,14 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
- 	if (!bounce)
- 		return;
- 
--	if (sectors < bio_sectors(*bio_orig)) {
-+	if (!passthrough && sectors < bio_sectors(*bio_orig)) {
- 		bio = bio_split(*bio_orig, sectors, GFP_NOIO, bounce_bio_split);
- 		bio_chain(bio, *bio_orig);
- 		generic_make_request(*bio_orig);
- 		*bio_orig = bio;
- 	}
--	bio = bio_clone_bioset(*bio_orig, GFP_NOIO, bounce_bio_set);
-+	bio = bio_clone_bioset(*bio_orig, GFP_NOIO, passthrough ? NULL :
-+			bounce_bio_set);
- 
- 	bio_for_each_segment_all(to, bio, i) {
- 		struct page *page = to->bv_page;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 8089ca17db9a..abd06f540863 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -241,14 +241,24 @@ struct request {
- 	struct request *next_rq;
- };
- 
-+static inline bool blk_op_is_scsi(unsigned int op)
-+{
-+	return op == REQ_OP_SCSI_IN || op == REQ_OP_SCSI_OUT;
-+}
-+
-+static inline bool blk_op_is_private(unsigned int op)
-+{
-+	return op == REQ_OP_DRV_IN || op == REQ_OP_DRV_OUT;
-+}
-+
- static inline bool blk_rq_is_scsi(struct request *rq)
- {
--	return req_op(rq) == REQ_OP_SCSI_IN || req_op(rq) == REQ_OP_SCSI_OUT;
-+	return blk_op_is_scsi(req_op(rq));
- }
- 
- static inline bool blk_rq_is_private(struct request *rq)
- {
--	return req_op(rq) == REQ_OP_DRV_IN || req_op(rq) == REQ_OP_DRV_OUT;
-+	return blk_op_is_private(req_op(rq));
- }
- 
- static inline bool blk_rq_is_passthrough(struct request *rq)
-@@ -256,6 +266,13 @@ static inline bool blk_rq_is_passthrough(struct request *rq)
- 	return blk_rq_is_scsi(rq) || blk_rq_is_private(rq);
- }
- 
-+static inline bool bio_is_passthrough(struct bio *bio)
-+{
-+	unsigned op = bio_op(bio);
-+
-+	return blk_op_is_scsi(op) || blk_op_is_private(op);
-+}
-+
- static inline unsigned short req_get_ioprio(struct request *req)
- {
- 	return req->ioprio;
--- 
-2.9.5
+On Mon, Dec 18, 2017 at 3:22 PM, Jens Axboe <axboe@kernel.dk> wrote:
+> On 12/18/2017 12:40 AM, Ming Lei wrote:
+>> Hi Jens,
+>>
+>> The 1st patch makes sure that passthrough IO won't enter .make_request_fn.
+>>
+>> The 2nd one fixes blk_rq_append_bio(), which is from your post with
+>> small change on failure handling.
+>
+> Thanks Ming, queued up.
+>
+> --
+> Jens Axboe
+>
