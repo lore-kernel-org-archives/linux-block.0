@@ -1,183 +1,113 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:44582 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752884AbdLHNOw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Dec 2017 08:14:52 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 02/10] block: conver to bio_first_bvec() & bio_first_page()
-Date: Fri,  8 Dec 2017 21:14:01 +0800
-Message-Id: <20171208131409.11889-3-ming.lei@redhat.com>
-In-Reply-To: <20171208131409.11889-1-ming.lei@redhat.com>
-References: <20171208131409.11889-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <msnitzer@redhat.com>
+From: Mike Snitzer <snitzer@redhat.com>
+To: axboe@kernel.dk,
+	hch@lst.de,
+	emilne@redhat.com,
+	james.smart@broadcom.com
+Cc: hare@suse.de,
+	Bart.VanAssche@wdc.com,
+	linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	dm-devel@redhat.com
+Subject: [for-4.16 PATCH 2/5] nvme: use request's failover callback for multipath failover
+Date: Tue, 19 Dec 2017 16:05:43 -0500
+Message-Id: <20171219210546.65928-3-snitzer@redhat.com>
+In-Reply-To: <20171219210546.65928-1-snitzer@redhat.com>
+References: <20171219210546.65928-1-snitzer@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-This patch converts to bio_first_bvec() & bio_first_page() for retrieve
-the 1st bvec/page, and prepares for supporting multipage bvec.
+Also, remove NVMe-local REQ_NVME_MPATH since setting bio's
+bi_failover_rq serves the same purpose: flag the request as being from
+multipath (which NVMe's error handler then gives further consideration
+about it being retryable).
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Mike Snitzer <snitzer@redhat.com>
 ---
- drivers/block/drbd/drbd_bitmap.c | 2 +-
- drivers/block/zram/zram_drv.c    | 2 +-
- drivers/md/bcache/super.c        | 8 ++++----
- fs/btrfs/compression.c           | 2 +-
- fs/btrfs/inode.c                 | 4 ++--
- fs/f2fs/data.c                   | 2 +-
- kernel/power/swap.c              | 2 +-
- mm/page_io.c                     | 4 ++--
- 8 files changed, 13 insertions(+), 13 deletions(-)
+ drivers/nvme/host/core.c      | 4 ++--
+ drivers/nvme/host/multipath.c | 7 ++++---
+ drivers/nvme/host/nvme.h      | 9 ---------
+ 3 files changed, 6 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_bitmap.c b/drivers/block/drbd/drbd_bitmap.c
-index bd97908c766f..0fe155123c8c 100644
---- a/drivers/block/drbd/drbd_bitmap.c
-+++ b/drivers/block/drbd/drbd_bitmap.c
-@@ -953,7 +953,7 @@ static void drbd_bm_endio(struct bio *bio)
- 	struct drbd_bm_aio_ctx *ctx = bio->bi_private;
- 	struct drbd_device *device = ctx->device;
- 	struct drbd_bitmap *b = device->bitmap;
--	unsigned int idx = bm_page_to_idx(bio->bi_io_vec[0].bv_page);
-+	unsigned int idx = bm_page_to_idx(bio_first_page(bio));
- 
- 	if ((ctx->flags & BM_AIO_COPY_PAGES) == 0 &&
- 	    !bm_test_page_unchanged(b->bm_pages[idx]))
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index d70eba30003a..36885b037ad3 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -430,7 +430,7 @@ static void put_entry_bdev(struct zram *zram, unsigned long entry)
- 
- static void zram_page_end_io(struct bio *bio)
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index f837d666cbd4..0c0a52fa78e4 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -191,8 +191,8 @@ static inline bool nvme_req_needs_retry(struct request *req)
+ void nvme_complete_rq(struct request *req)
  {
--	struct page *page = bio->bi_io_vec[0].bv_page;
-+	struct page *page = bio_first_page(bio);
+ 	if (unlikely(nvme_req(req)->status && nvme_req_needs_retry(req))) {
+-		if (nvme_req_needs_failover(req)) {
+-			nvme_failover_req(req);
++		if (req->failover_rq && nvme_req_needs_failover(req)) {
++			req->failover_rq(req);
+ 			return;
+ 		}
  
- 	page_endio(page, op_is_write(bio_op(bio)),
- 			blk_status_to_errno(bio->bi_status));
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index b4d28928dec5..da1a953d9545 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -211,7 +211,7 @@ static void write_bdev_super_endio(struct bio *bio)
+diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
+index 1218a9fca846..0ab51c184df9 100644
+--- a/drivers/nvme/host/multipath.c
++++ b/drivers/nvme/host/multipath.c
+@@ -19,7 +19,7 @@ module_param(multipath, bool, 0644);
+ MODULE_PARM_DESC(multipath,
+ 	"turn on native support for multiple controllers per subsystem");
  
- static void __write_super(struct cache_sb *sb, struct bio *bio)
+-void nvme_failover_req(struct request *req)
++static void nvme_failover_req(struct request *req)
  {
--	struct cache_sb *out = page_address(bio->bi_io_vec[0].bv_page);
-+	struct cache_sb *out = page_address(bio_first_page(bio));
- 	unsigned i;
+ 	struct nvme_ns *ns = req->q->queuedata;
+ 	unsigned long flags;
+@@ -35,7 +35,7 @@ void nvme_failover_req(struct request *req)
  
- 	bio->bi_iter.bi_sector	= SB_SECTOR;
-@@ -1166,7 +1166,7 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
- 	dc->bdev->bd_holder = dc;
- 
- 	bio_init(&dc->sb_bio, dc->sb_bio.bi_inline_vecs, 1);
--	dc->sb_bio.bi_io_vec[0].bv_page = sb_page;
-+	bio_first_bvec(&dc->sb_bio)->bv_page = sb_page;
- 	get_page(sb_page);
- 
- 	if (cached_dev_init(dc, sb->block_size << 9))
-@@ -1810,7 +1810,7 @@ void bch_cache_release(struct kobject *kobj)
- 		free_fifo(&ca->free[i]);
- 
- 	if (ca->sb_bio.bi_inline_vecs[0].bv_page)
--		put_page(ca->sb_bio.bi_io_vec[0].bv_page);
-+		put_page(bio_first_page(&ca->sb_bio));
- 
- 	if (!IS_ERR_OR_NULL(ca->bdev))
- 		blkdev_put(ca->bdev, FMODE_READ|FMODE_WRITE|FMODE_EXCL);
-@@ -1864,7 +1864,7 @@ static int register_cache(struct cache_sb *sb, struct page *sb_page,
- 	ca->bdev->bd_holder = ca;
- 
- 	bio_init(&ca->sb_bio, ca->sb_bio.bi_inline_vecs, 1);
--	ca->sb_bio.bi_io_vec[0].bv_page = sb_page;
-+	bio_first_bvec(&ca->sb_bio)->bv_page = sb_page;
- 	get_page(sb_page);
- 
- 	if (blk_queue_discard(bdev_get_queue(ca->bdev)))
-diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
-index 5982c8a71f02..fc0386c18574 100644
---- a/fs/btrfs/compression.c
-+++ b/fs/btrfs/compression.c
-@@ -563,7 +563,7 @@ blk_status_t btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
- 	/* we need the actual starting offset of this extent in the file */
- 	read_lock(&em_tree->lock);
- 	em = lookup_extent_mapping(em_tree,
--				   page_offset(bio->bi_io_vec->bv_page),
-+				   page_offset(bio_first_page(bio)),
- 				   PAGE_SIZE);
- 	read_unlock(&em_tree->lock);
- 	if (!em)
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index 993061f83067..d28b66019d54 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -8072,7 +8072,7 @@ static void btrfs_retry_endio_nocsum(struct bio *bio)
- 	ASSERT(bio->bi_vcnt == 1);
- 	io_tree = &BTRFS_I(inode)->io_tree;
- 	failure_tree = &BTRFS_I(inode)->io_failure_tree;
--	ASSERT(bio->bi_io_vec->bv_len == btrfs_inode_sectorsize(inode));
-+	ASSERT(bio_first_bvec(bio)->bv_len == btrfs_inode_sectorsize(inode));
- 
- 	done->uptodate = 1;
- 	ASSERT(!bio_flagged(bio, BIO_CLONED));
-@@ -8162,7 +8162,7 @@ static void btrfs_retry_endio(struct bio *bio)
- 	uptodate = 1;
- 
- 	ASSERT(bio->bi_vcnt == 1);
--	ASSERT(bio->bi_io_vec->bv_len == btrfs_inode_sectorsize(done->inode));
-+	ASSERT(bio_first_bvec(bio)->bv_len == btrfs_inode_sectorsize(done->inode));
- 
- 	io_tree = &BTRFS_I(inode)->io_tree;
- 	failure_tree = &BTRFS_I(inode)->io_failure_tree;
-diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-index 516fa0d3ff9c..9c2463f9272d 100644
---- a/fs/f2fs/data.c
-+++ b/fs/f2fs/data.c
-@@ -56,7 +56,7 @@ static void f2fs_read_end_io(struct bio *bio)
- 	int i;
- 
- #ifdef CONFIG_F2FS_FAULT_INJECTION
--	if (time_to_inject(F2FS_P_SB(bio->bi_io_vec->bv_page), FAULT_IO)) {
-+	if (time_to_inject(F2FS_P_SB(bio_first_page(bio)), FAULT_IO)) {
- 		f2fs_show_injection_info(FAULT_IO);
- 		bio->bi_status = BLK_STS_IOERR;
- 	}
-diff --git a/kernel/power/swap.c b/kernel/power/swap.c
-index 293ead59eccc..488e4a490dfa 100644
---- a/kernel/power/swap.c
-+++ b/kernel/power/swap.c
-@@ -240,7 +240,7 @@ static void hib_init_batch(struct hib_bio_batch *hb)
- static void hib_end_io(struct bio *bio)
+ bool nvme_req_needs_failover(struct request *req)
  {
- 	struct hib_bio_batch *hb = bio->bi_private;
--	struct page *page = bio->bi_io_vec[0].bv_page;
-+	struct page *page = bio_first_page(bio);
+-	if (!(req->cmd_flags & REQ_NVME_MPATH))
++	if (!req->failover_rq)
+ 		return false;
  
- 	if (bio->bi_status) {
- 		pr_alert("Read-error on swap-device (%u:%u:%Lu)\n",
-diff --git a/mm/page_io.c b/mm/page_io.c
-index e93f1a4cacd7..edcf5389eab7 100644
---- a/mm/page_io.c
-+++ b/mm/page_io.c
-@@ -50,7 +50,7 @@ static struct bio *get_swap_bio(gfp_t gfp_flags,
+ 	switch (nvme_req(req)->status & 0x7ff) {
+@@ -128,7 +128,8 @@ static blk_qc_t nvme_ns_head_make_request(struct request_queue *q,
+ 	ns = nvme_find_path(head);
+ 	if (likely(ns)) {
+ 		bio->bi_disk = ns->disk;
+-		bio->bi_opf |= REQ_NVME_MPATH;
++		/* Mark bio as coming in through the mpath node. */
++		bio->bi_failover_rq = nvme_failover_req;
+ 		ret = direct_make_request(bio);
+ 	} else if (!list_empty_careful(&head->list)) {
+ 		dev_warn_ratelimited(dev, "no path available - requeuing I/O\n");
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index ea1aa5283e8e..5195b4850eb0 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -95,11 +95,6 @@ struct nvme_request {
+ 	u16			status;
+ };
  
- void end_swap_bio_write(struct bio *bio)
+-/*
+- * Mark a bio as coming in through the mpath node.
+- */
+-#define REQ_NVME_MPATH		REQ_DRV
+-
+ enum {
+ 	NVME_REQ_CANCELLED		= (1 << 0),
+ };
+@@ -400,7 +395,6 @@ extern const struct attribute_group nvme_ns_id_attr_group;
+ extern const struct block_device_operations nvme_ns_head_ops;
+ 
+ #ifdef CONFIG_NVME_MULTIPATH
+-void nvme_failover_req(struct request *req);
+ bool nvme_req_needs_failover(struct request *req);
+ void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl);
+ int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl,struct nvme_ns_head *head);
+@@ -418,9 +412,6 @@ static inline void nvme_mpath_clear_current_path(struct nvme_ns *ns)
+ }
+ struct nvme_ns *nvme_find_path(struct nvme_ns_head *head);
+ #else
+-static inline void nvme_failover_req(struct request *req)
+-{
+-}
+ static inline bool nvme_req_needs_failover(struct request *req)
  {
--	struct page *page = bio->bi_io_vec[0].bv_page;
-+	struct page *page = bio_first_page(bio);
- 
- 	if (bio->bi_status) {
- 		SetPageError(page);
-@@ -122,7 +122,7 @@ static void swap_slot_free_notify(struct page *page)
- 
- static void end_swap_bio_read(struct bio *bio)
- {
--	struct page *page = bio->bi_io_vec[0].bv_page;
-+	struct page *page = bio_first_page(bio);
- 	struct task_struct *waiter = bio->bi_private;
- 
- 	if (bio->bi_status) {
+ 	return false;
 -- 
-2.9.5
+2.15.0
