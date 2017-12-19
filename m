@@ -1,45 +1,111 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:53254 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S936739AbdLSKrL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Dec 2017 05:47:11 -0500
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: xiao yang <yangx.jy@cn.fujitsu.com>
-Cc: <osandov@osandov.com>, <eguan@redhat.com>,
-        <fstests@vger.kernel.org>, <linux-block@vger.kernel.org>
-Subject: Re: [PATCH blktests] block/013: Add test for BLKRRPART ioctl
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:59413 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S933857AbdLSKeJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 19 Dec 2017 05:34:09 -0500
+From: xiao yang <yangx.jy@cn.fujitsu.com>
+To: <osandov@osandov.com>
+CC: <eguan@redhat.com>, <fstests@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, xiao yang <yangx.jy@cn.fujitsu.com>
+Subject: [PATCH blktests] block/013: Add test for BLKRRPART ioctl
+Date: Tue, 19 Dec 2017 18:30:23 +0800
+Message-ID: <1513679423-13067-1-git-send-email-yangx.jy@cn.fujitsu.com>
+In-Reply-To: <20171204182953.GA16308@vader.DHCP.thefacebook.com>
 References: <20171204182953.GA16308@vader.DHCP.thefacebook.com>
-        <1513679423-13067-1-git-send-email-yangx.jy@cn.fujitsu.com>
-Date: Tue, 19 Dec 2017 11:47:09 +0100
-In-Reply-To: <1513679423-13067-1-git-send-email-yangx.jy@cn.fujitsu.com> (xiao
-        yang's message of "Tue, 19 Dec 2017 18:30:23 +0800")
-Message-ID: <mqd8tdzataq.fsf@linux-x5ow.site>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-xiao yang <yangx.jy@cn.fujitsu.com> writes:
+If the entire block device is formatted with a filesystem and
+mounted, running "blockdev --rereadpt" should fail and return
+EBUSY instead of pass.
 
-> +requires() {
-> +	_have_program mkfs.ext3
-> +}
-[...]
-> +	# Format
-> +	mkfs.ext3 -F "$TEST_DEV" >> "$FULL" 2>&1
+Signed-off-by: xiao yang <yangx.jy@cn.fujitsu.com>
+---
+ tests/block/013     | 62 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/block/013.out |  3 +++
+ 2 files changed, 65 insertions(+)
+ create mode 100755 tests/block/013
+ create mode 100644 tests/block/013.out
 
-What's the reason to limit the test case to ext3 only? Can you switch it
-to the generic 'mkfs' command? IIRC we require 'util-linux' to be
-present for blktests but mkfs.ext3 is (at least in SUSE based distros)
-in the e2fsprogs package.
-
-apart from that:
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-
+diff --git a/tests/block/013 b/tests/block/013
+new file mode 100755
+index 0000000..77ae55c
+--- /dev/null
++++ b/tests/block/013
+@@ -0,0 +1,62 @@
++#!/bin/bash
++#
++# If the entire block device is formatted with a filesystem and
++# mounted, running "blockdev --rereadpt" should fail and return
++# EBUSY.  On buggy kernel, it passes unexpectedly.
++#
++# Regression test for commit 77032ca66f86 ("Return EBUSY from
++# BLKRRPART for mounted whole-dev fs").
++#
++# Copyright (c) 2017 FUJITSU LIMITED. All rights reserved.
++# Author: Xiao Yang <yangx.jy@cn.fujitsu.com>
++#
++# This program is free software: you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation, either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++DESCRIPTION="test return EBUSY from BLKRRPART for mounted whole-dev"
++QUICK=1
++
++requires() {
++	_have_program mkfs.ext3
++}
++
++test_device() {
++	echo "Running ${TEST_NAME}"
++
++	rm -f "$FULL"
++	mkdir "$TMPDIR/mntpoint"
++
++	# Format
++	mkfs.ext3 -F "$TEST_DEV" >> "$FULL" 2>&1
++
++	# Mount
++	mount "$TEST_DEV" "$TMPDIR/mntpoint"
++
++	# Check mounted whole-dev
++	local out=$(blockdev --rereadpt "$TEST_DEV" 2>&1)
++	echo $out | grep -q "Device or resource busy"
++	if [ $? -eq 0 ]; then
++		echo "Return EBUSY for mounted whole-dev"
++	else
++		echo "Don't return EBUSY for mounted whole-dev"
++	fi
++
++	echo $out >> "$FULL"
++
++	# Umount
++	umount "$TMPDIR/mntpoint"
++
++	rm -rf "$TMPDIR/mntpoint"
++
++	echo "Test complete"
++}
+diff --git a/tests/block/013.out b/tests/block/013.out
+new file mode 100644
+index 0000000..74d1d08
+--- /dev/null
++++ b/tests/block/013.out
+@@ -0,0 +1,3 @@
++Running block/013
++Return EBUSY for mounted whole-dev
++Test complete
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+1.8.3.1
