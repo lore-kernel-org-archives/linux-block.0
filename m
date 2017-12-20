@@ -1,144 +1,361 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 30/45] block: deal with dirtying pages for multipage bvec
-Date: Mon, 18 Dec 2017 20:22:32 +0800
-Message-Id: <20171218122247.3488-31-ming.lei@redhat.com>
-In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
-References: <20171218122247.3488-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:36890 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755855AbdLTRWS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Dec 2017 12:22:18 -0500
+Received: by mail-wm0-f68.google.com with SMTP id f140so11144470wmd.2
+        for <linux-block@vger.kernel.org>; Wed, 20 Dec 2017 09:22:18 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 04/25] lightnvm: remove hybrid ocssd 1.2 support
+Date: Wed, 20 Dec 2017 18:21:44 +0100
+Message-Id: <20171220172205.26464-5-m@bjorling.me>
+In-Reply-To: <20171220172205.26464-1-m@bjorling.me>
+References: <20171220172205.26464-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-In bio_check_pages_dirty(), bvec->bv_page is used as flag for marking
-if the page has been dirtied & released, and if no, it will be dirtied
-in deferred workqueue.
+Now that rrpc have been removed. Also remove the hybrid 1.2 support
+from the core.
 
-With multipage bvec, we can't do that any more, so change the logic into
-checking all pages in one mp bvec, and only release all these pages if all
-are dirtied, otherwise dirty them all in deferred wrokqueue.
-
-This patch introduces segment_for_each_page_all() to deal with the case
-a bit easier.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- block/bio.c          | 45 +++++++++++++++++++++++++++++++++++++--------
- include/linux/bvec.h |  7 +++++++
- 2 files changed, 44 insertions(+), 8 deletions(-)
+ drivers/lightnvm/core.c      | 141 -------------------------------------------
+ drivers/nvme/host/lightnvm.c |  59 ------------------
+ include/linux/lightnvm.h     |  41 -------------
+ 3 files changed, 241 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 1649dc465af7..1c90b8473196 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1574,8 +1574,9 @@ void bio_set_pages_dirty(struct bio *bio)
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 83249b4..390d5ef 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -45,12 +45,6 @@ struct nvm_dev_map {
+ 	int nr_chnls;
+ };
+ 
+-struct nvm_area {
+-	struct list_head list;
+-	sector_t begin;
+-	sector_t end;	/* end is excluded */
+-};
+-
+ static struct nvm_target *nvm_find_target(struct nvm_dev *dev, const char *name)
  {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
- 
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		struct page *page = bvec->bv_page;
- 
- 		if (page && !PageCompound(page))
-@@ -1583,16 +1584,26 @@ void bio_set_pages_dirty(struct bio *bio)
- 	}
+ 	struct nvm_target *tgt;
+@@ -524,35 +518,6 @@ static void nvm_rq_dev_to_tgt(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
+ 	nvm_ppa_dev_to_tgt(tgt_dev, rqd->ppa_list, rqd->nr_ppas);
  }
  
-+static inline void release_mp_bvec_pages(struct bio_vec *bvec)
-+{
-+	struct bio_vec bv;
-+	struct bvec_iter iter;
-+
-+	segment_for_each_page_all(bv, bvec, iter)
-+		put_page(bv.bv_page);
-+}
-+
- static void bio_release_pages(struct bio *bio)
+-void nvm_part_to_tgt(struct nvm_dev *dev, sector_t *entries,
+-		     int len)
+-{
+-	struct nvm_geo *geo = &dev->geo;
+-	struct nvm_dev_map *dev_rmap = dev->rmap;
+-	u64 i;
+-
+-	for (i = 0; i < len; i++) {
+-		struct nvm_ch_map *ch_rmap;
+-		int *lun_roffs;
+-		struct ppa_addr gaddr;
+-		u64 pba = le64_to_cpu(entries[i]);
+-		u64 diff;
+-
+-		if (!pba)
+-			continue;
+-
+-		gaddr = linear_to_generic_addr(geo, pba);
+-		ch_rmap = &dev_rmap->chnls[gaddr.g.ch];
+-		lun_roffs = ch_rmap->lun_offs;
+-
+-		diff = ((ch_rmap->ch_off * geo->luns_per_chnl) +
+-				(lun_roffs[gaddr.g.lun])) * geo->sec_per_lun;
+-
+-		entries[i] -= cpu_to_le64(diff);
+-	}
+-}
+-EXPORT_SYMBOL(nvm_part_to_tgt);
+-
+ int nvm_register_tgt_type(struct nvm_tgt_type *tt)
  {
- 	struct bio_vec *bvec;
- 	int i;
- 
--	bio_for_each_page_all(bvec, bio, i) {
-+	/* iterate each mp bvec */
-+	bio_for_each_segment_all(bvec, bio, i) {
- 		struct page *page = bvec->bv_page;
- 
- 		if (page)
--			put_page(page);
-+			release_mp_bvec_pages(bvec);
- 	}
+ 	int ret = 0;
+@@ -726,112 +691,6 @@ int nvm_submit_io_sync(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
  }
+ EXPORT_SYMBOL(nvm_submit_io_sync);
  
-@@ -1636,20 +1647,38 @@ static void bio_dirty_fn(struct work_struct *work)
- 	}
- }
- 
-+static inline void check_mp_bvec_pages(struct bio_vec *bvec,
-+		int *nr_dirty, int *nr_pages)
-+{
-+	struct bio_vec bv;
-+	struct bvec_iter iter;
-+
-+	segment_for_each_page_all(bv, bvec, iter) {
-+		struct page *page = bv.bv_page;
-+
-+		if (PageDirty(page) || PageCompound(page))
-+			(*nr_dirty)++;
-+		(*nr_pages)++;
-+	}
-+}
-+
- void bio_check_pages_dirty(struct bio *bio)
+-int nvm_erase_sync(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas,
+-								int nr_ppas)
+-{
+-	struct nvm_geo *geo = &tgt_dev->geo;
+-	struct nvm_rq rqd;
+-	int ret;
+-
+-	memset(&rqd, 0, sizeof(struct nvm_rq));
+-
+-	rqd.opcode = NVM_OP_ERASE;
+-	rqd.flags = geo->plane_mode >> 1;
+-
+-	ret = nvm_set_rqd_ppalist(tgt_dev, &rqd, ppas, nr_ppas);
+-	if (ret)
+-		return ret;
+-
+-	ret = nvm_submit_io_sync(tgt_dev, &rqd);
+-	if (ret) {
+-		pr_err("rrpr: erase I/O submission failed: %d\n", ret);
+-		goto free_ppa_list;
+-	}
+-
+-free_ppa_list:
+-	nvm_free_rqd_ppalist(tgt_dev, &rqd);
+-
+-	return ret;
+-}
+-EXPORT_SYMBOL(nvm_erase_sync);
+-
+-int nvm_get_l2p_tbl(struct nvm_tgt_dev *tgt_dev, u64 slba, u32 nlb,
+-		    nvm_l2p_update_fn *update_l2p, void *priv)
+-{
+-	struct nvm_dev *dev = tgt_dev->parent;
+-
+-	if (!dev->ops->get_l2p_tbl)
+-		return 0;
+-
+-	return dev->ops->get_l2p_tbl(dev, slba, nlb, update_l2p, priv);
+-}
+-EXPORT_SYMBOL(nvm_get_l2p_tbl);
+-
+-int nvm_get_area(struct nvm_tgt_dev *tgt_dev, sector_t *lba, sector_t len)
+-{
+-	struct nvm_dev *dev = tgt_dev->parent;
+-	struct nvm_geo *geo = &dev->geo;
+-	struct nvm_area *area, *prev, *next;
+-	sector_t begin = 0;
+-	sector_t max_sectors = (geo->sec_size * dev->total_secs) >> 9;
+-
+-	if (len > max_sectors)
+-		return -EINVAL;
+-
+-	area = kmalloc(sizeof(struct nvm_area), GFP_KERNEL);
+-	if (!area)
+-		return -ENOMEM;
+-
+-	prev = NULL;
+-
+-	spin_lock(&dev->lock);
+-	list_for_each_entry(next, &dev->area_list, list) {
+-		if (begin + len > next->begin) {
+-			begin = next->end;
+-			prev = next;
+-			continue;
+-		}
+-		break;
+-	}
+-
+-	if ((begin + len) > max_sectors) {
+-		spin_unlock(&dev->lock);
+-		kfree(area);
+-		return -EINVAL;
+-	}
+-
+-	area->begin = *lba = begin;
+-	area->end = begin + len;
+-
+-	if (prev) /* insert into sorted order */
+-		list_add(&area->list, &prev->list);
+-	else
+-		list_add(&area->list, &dev->area_list);
+-	spin_unlock(&dev->lock);
+-
+-	return 0;
+-}
+-EXPORT_SYMBOL(nvm_get_area);
+-
+-void nvm_put_area(struct nvm_tgt_dev *tgt_dev, sector_t begin)
+-{
+-	struct nvm_dev *dev = tgt_dev->parent;
+-	struct nvm_area *area;
+-
+-	spin_lock(&dev->lock);
+-	list_for_each_entry(area, &dev->area_list, list) {
+-		if (area->begin != begin)
+-			continue;
+-
+-		list_del(&area->list);
+-		spin_unlock(&dev->lock);
+-		kfree(area);
+-		return;
+-	}
+-	spin_unlock(&dev->lock);
+-}
+-EXPORT_SYMBOL(nvm_put_area);
+-
+ void nvm_end_io(struct nvm_rq *rqd)
  {
- 	struct bio_vec *bvec;
- 	int nr_clean_pages = 0;
- 	int i;
+ 	struct nvm_tgt_dev *tgt_dev = rqd->dev;
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index 8fc949c..da2d6fe 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -31,7 +31,6 @@
  
--	bio_for_each_page_all(bvec, bio, i) {
--		struct page *page = bvec->bv_page;
-+	bio_for_each_segment_all(bvec, bio, i) {
-+		int nr_dirty = 0, nr_pages = 0;
-+
-+		check_mp_bvec_pages(bvec, &nr_dirty, &nr_pages);
- 
--		if (PageDirty(page) || PageCompound(page)) {
--			put_page(page);
-+		/* release all pages in the mp bvec if all are dirtied */
-+		if (nr_dirty == nr_pages) {
-+			release_mp_bvec_pages(bvec);
- 			bvec->bv_page = NULL;
- 		} else {
--			nr_clean_pages++;
-+			nr_clean_pages += nr_pages;
- 		}
- 	}
- 
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index 2deee87b823e..893e8fef0dd0 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -225,6 +225,13 @@ static inline bool bvec_iter_seg_advance(const struct bio_vec *bv,
- 	.bi_bvec_done	= 0,						\
+ enum nvme_nvm_admin_opcode {
+ 	nvme_nvm_admin_identity		= 0xe2,
+-	nvme_nvm_admin_get_l2p_tbl	= 0xea,
+ 	nvme_nvm_admin_get_bb_tbl	= 0xf2,
+ 	nvme_nvm_admin_set_bb_tbl	= 0xf1,
+ };
+@@ -332,62 +331,6 @@ static int nvme_nvm_identity(struct nvm_dev *nvmdev, struct nvm_id *nvm_id)
+ 	return ret;
  }
  
-+#define segment_for_each_page_all(pg_bvl, seg_bvec, iter)		\
-+	for (iter = BVEC_ITER_ALL_INIT,					\
-+	     (iter).bi_size = (seg_bvec)->bv_len  - (iter).bi_bvec_done;\
-+	     (iter).bi_size &&						\
-+		((pg_bvl = bvec_iter_bvec((seg_bvec), (iter))), 1);	\
-+	     bvec_iter_advance((seg_bvec), &(iter), (pg_bvl).bv_len))
-+
- /* get the last page from the multipage bvec and store it in @pg */
- static inline void segment_last_page(const struct bio_vec *seg,
- 		struct bio_vec *pg)
+-static int nvme_nvm_get_l2p_tbl(struct nvm_dev *nvmdev, u64 slba, u32 nlb,
+-				nvm_l2p_update_fn *update_l2p, void *priv)
+-{
+-	struct nvme_ns *ns = nvmdev->q->queuedata;
+-	struct nvme_nvm_command c = {};
+-	u32 len = queue_max_hw_sectors(ns->ctrl->admin_q) << 9;
+-	u32 nlb_pr_rq = len / sizeof(u64);
+-	u64 cmd_slba = slba;
+-	void *entries;
+-	int ret = 0;
+-
+-	c.l2p.opcode = nvme_nvm_admin_get_l2p_tbl;
+-	c.l2p.nsid = cpu_to_le32(ns->ns_id);
+-	entries = kmalloc(len, GFP_KERNEL);
+-	if (!entries)
+-		return -ENOMEM;
+-
+-	while (nlb) {
+-		u32 cmd_nlb = min(nlb_pr_rq, nlb);
+-		u64 elba = slba + cmd_nlb;
+-
+-		c.l2p.slba = cpu_to_le64(cmd_slba);
+-		c.l2p.nlb = cpu_to_le32(cmd_nlb);
+-
+-		ret = nvme_submit_sync_cmd(ns->ctrl->admin_q,
+-				(struct nvme_command *)&c, entries, len);
+-		if (ret) {
+-			dev_err(ns->ctrl->device,
+-				"L2P table transfer failed (%d)\n", ret);
+-			ret = -EIO;
+-			goto out;
+-		}
+-
+-		if (unlikely(elba > nvmdev->total_secs)) {
+-			pr_err("nvm: L2P data from device is out of bounds!\n");
+-			ret = -EINVAL;
+-			goto out;
+-		}
+-
+-		/* Transform physical address to target address space */
+-		nvm_part_to_tgt(nvmdev, entries, cmd_nlb);
+-
+-		if (update_l2p(cmd_slba, cmd_nlb, entries, priv)) {
+-			ret = -EINTR;
+-			goto out;
+-		}
+-
+-		cmd_slba += cmd_nlb;
+-		nlb -= cmd_nlb;
+-	}
+-
+-out:
+-	kfree(entries);
+-	return ret;
+-}
+-
+ static int nvme_nvm_get_bb_tbl(struct nvm_dev *nvmdev, struct ppa_addr ppa,
+ 								u8 *blks)
+ {
+@@ -597,8 +540,6 @@ static void nvme_nvm_dev_dma_free(void *pool, void *addr,
+ static struct nvm_dev_ops nvme_nvm_dev_ops = {
+ 	.identity		= nvme_nvm_identity,
+ 
+-	.get_l2p_tbl		= nvme_nvm_get_l2p_tbl,
+-
+ 	.get_bb_tbl		= nvme_nvm_get_bb_tbl,
+ 	.set_bb_tbl		= nvme_nvm_set_bb_tbl,
+ 
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index c506e5d..13f0b70 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -49,10 +49,7 @@ struct nvm_id;
+ struct nvm_dev;
+ struct nvm_tgt_dev;
+ 
+-typedef int (nvm_l2p_update_fn)(u64, u32, __le64 *, void *);
+ typedef int (nvm_id_fn)(struct nvm_dev *, struct nvm_id *);
+-typedef int (nvm_get_l2p_tbl_fn)(struct nvm_dev *, u64, u32,
+-				nvm_l2p_update_fn *, void *);
+ typedef int (nvm_op_bb_tbl_fn)(struct nvm_dev *, struct ppa_addr, u8 *);
+ typedef int (nvm_op_set_bb_fn)(struct nvm_dev *, struct ppa_addr *, int, int);
+ typedef int (nvm_submit_io_fn)(struct nvm_dev *, struct nvm_rq *);
+@@ -65,7 +62,6 @@ typedef void (nvm_dev_dma_free_fn)(void *, void*, dma_addr_t);
+ 
+ struct nvm_dev_ops {
+ 	nvm_id_fn		*identity;
+-	nvm_get_l2p_tbl_fn	*get_l2p_tbl;
+ 	nvm_op_bb_tbl_fn	*get_bb_tbl;
+ 	nvm_op_set_bb_fn	*set_bb_tbl;
+ 
+@@ -345,36 +341,6 @@ struct nvm_dev {
+ 	struct list_head targets;
+ };
+ 
+-static inline struct ppa_addr linear_to_generic_addr(struct nvm_geo *geo,
+-						     u64 pba)
+-{
+-	struct ppa_addr l;
+-	int secs, pgs, blks, luns;
+-	sector_t ppa = pba;
+-
+-	l.ppa = 0;
+-
+-	div_u64_rem(ppa, geo->sec_per_pg, &secs);
+-	l.g.sec = secs;
+-
+-	sector_div(ppa, geo->sec_per_pg);
+-	div_u64_rem(ppa, geo->pgs_per_blk, &pgs);
+-	l.g.pg = pgs;
+-
+-	sector_div(ppa, geo->pgs_per_blk);
+-	div_u64_rem(ppa, geo->blks_per_lun, &blks);
+-	l.g.blk = blks;
+-
+-	sector_div(ppa, geo->blks_per_lun);
+-	div_u64_rem(ppa, geo->luns_per_chnl, &luns);
+-	l.g.lun = luns;
+-
+-	sector_div(ppa, geo->luns_per_chnl);
+-	l.g.ch = ppa;
+-
+-	return l;
+-}
+-
+ static inline struct ppa_addr generic_to_dev_addr(struct nvm_tgt_dev *tgt_dev,
+ 						  struct ppa_addr r)
+ {
+@@ -461,17 +427,10 @@ extern int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr *,
+ extern int nvm_max_phys_sects(struct nvm_tgt_dev *);
+ extern int nvm_submit_io(struct nvm_tgt_dev *, struct nvm_rq *);
+ extern int nvm_submit_io_sync(struct nvm_tgt_dev *, struct nvm_rq *);
+-extern int nvm_erase_sync(struct nvm_tgt_dev *, struct ppa_addr *, int);
+-extern int nvm_get_l2p_tbl(struct nvm_tgt_dev *, u64, u32, nvm_l2p_update_fn *,
+-			   void *);
+-extern int nvm_get_area(struct nvm_tgt_dev *, sector_t *, sector_t);
+-extern void nvm_put_area(struct nvm_tgt_dev *, sector_t);
+ extern void nvm_end_io(struct nvm_rq *);
+ extern int nvm_bb_tbl_fold(struct nvm_dev *, u8 *, int);
+ extern int nvm_get_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr, u8 *);
+ 
+-extern void nvm_part_to_tgt(struct nvm_dev *, sector_t *, int);
+-
+ #else /* CONFIG_NVM */
+ struct nvm_dev_ops;
+ 
 -- 
-2.9.5
+2.9.3
