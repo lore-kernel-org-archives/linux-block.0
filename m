@@ -1,60 +1,47 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:57284 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751101AbdLNCbm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Dec 2017 21:31:42 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Yi Zhang <yi.zhang@redhat.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 0/6] blk-mq: fix race related with device deletion/reset/switching sched
-Date: Thu, 14 Dec 2017 10:30:57 +0800
-Message-Id: <20171214023103.18272-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Received: from [192.168.1.154] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id l129sm5984770ioa.77.2017.12.20.11.34.56
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 20 Dec 2017 11:34:56 -0800 (PST)
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] null_blk: unalign call_single_data
+Message-ID: <eef1f996-e8dd-46a5-f0e2-b41a86c13fe6@kernel.dk>
+Date: Wed, 20 Dec 2017 12:34:55 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+Commit 966a967116e6 randomly added alignment to this structure, but
+it's actually detrimental to performance of null_blk. Test case:
 
-The 1st patch fixes one kernel oops triggered by IOs vs. deleting SCSI
-device, and this issue can be triggered easily on scsi_debug.
+# modprobe null_blk queue_mode=1 irqmode=1 home_node={0,1}
+# echo noop > /sys/block/nullb0/queue/scheduler
+# fio --name=csd --filename=/dev/nullb0 --numjobs=8 --direct=1 --rw=randread --norandommap --cpus_allowed=$(cat /sys/devices/system/node/node0/cpulist) --group_reporting=1
 
-The other 5 patch fixes recent Yi Zhang's reports about his NVMe stress
-tests, most of them are related with switching io sched, NVMe reset or
-updating nr_hw_queues.
+Running on both the home and remote node shows a ~5% degradation
+in performance.
 
-V2:
-	- address stale queue mapping in blk_mq_update_queue_map(), instead
-	of PCI transport, since such issue exists on other transport too,
-	as suggested by Christoph
-	- avoid to introduce nvme_admin_queue_rq() since the nvme queue can
-	be got from hctx->driver_data, which is reliable
+Fixes: 966a967116e69 ("smp: Avoid using two cache lines for struct call_single_data")
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
+---
 
-Thanks,
-Ming
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index ccb9975a97fa..8c6912dd5142 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -35,7 +35,7 @@ static inline u64 mb_per_tick(int mbps)
+ struct nullb_cmd {
+ 	struct list_head list;
+ 	struct llist_node ll_list;
+-	call_single_data_t csd;
++	struct __call_single_data csd;
+ 	struct request *rq;
+ 	struct bio *bio;
+ 	unsigned int tag;
 
-Ming Lei (6):
-  blk-mq: quiesce queue before freeing queue
-  blk-mq: support concurrent blk_mq_quiesce_queue()
-  blk-mq: quiesce queue during switching io sched and updating
-    nr_requests
-  blk-mq: avoid to map CPU into stale hw queue
-  blk-mq: fix race between updating nr_hw_queues and switching io sched
-  nvme-pci: remove .init_request callback
-
- block/blk-core.c         |  9 ++++++
- block/blk-mq.c           | 74 ++++++++++++++++++++++++++++++++++++++++++------
- block/elevator.c         |  2 ++
- drivers/nvme/host/core.c |  4 +--
- drivers/nvme/host/pci.c  | 21 +++-----------
- include/linux/blk-mq.h   |  7 ++++-
- include/linux/blkdev.h   |  2 ++
- 7 files changed, 91 insertions(+), 28 deletions(-)
 
 -- 
-2.9.5
+Jens Axboe
