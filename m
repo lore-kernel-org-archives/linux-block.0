@@ -1,66 +1,48 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:39834 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1759063AbdLRMdJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Dec 2017 07:33:09 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 42/45] block: enable multipage bvecs
-Date: Mon, 18 Dec 2017 20:22:44 +0800
-Message-Id: <20171218122247.3488-43-ming.lei@redhat.com>
-In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
-References: <20171218122247.3488-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <naby88@gmail.com>
+Return-Path: <naby88@gmail.com>
+From: Khan M Rashedun-Naby <naby88@gmail.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Khan M Rashedun-Naby <naby88@gmail.com>
+Subject: [PATCH] Block: blk-flush: removed an unnecessary else statement
+Date: Wed, 20 Dec 2017 22:23:55 +0600
+Message-Id: <1513787035-18973-1-git-send-email-naby88@gmail.com>
+List-ID: <linux-block@vger.kernel.org>
 
-This patch pulls the trigger for multipage bvecs.
+As both of the if and else statement block is returning something then 
+there is no need of the else statement. Thus this else statement 
+has been removed.
 
-Now any request queue which supports queue cluster will see multipage
-bvecs.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Khan M Rashedun-Naby <naby88@gmail.com>
 ---
- block/bio.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ block/blk-flush.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index e82e4c815dbb..34af328681a8 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -845,6 +845,11 @@ int bio_add_page(struct bio *bio, struct page *page,
- 	 * a consecutive offset.  Optimize this special case.
- 	 */
- 	if (bio->bi_vcnt > 0) {
-+		struct request_queue *q = NULL;
-+
-+		if (bio->bi_disk)
-+			q = bio->bi_disk->queue;
-+
- 		bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
- 
- 		if (page == bv->bv_page &&
-@@ -852,6 +857,14 @@ int bio_add_page(struct bio *bio, struct page *page,
- 			bv->bv_len += len;
- 			goto done;
- 		}
-+
-+		/* disable multipage bvec too if cluster isn't enabled */
-+		if (q && blk_queue_cluster(q) &&
-+		    (bvec_to_phys(bv) + bv->bv_len ==
-+		     page_to_phys(page) + offset)) {
-+			bv->bv_len += len;
-+			goto done;
-+		}
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index f171706..b629014 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -137,13 +137,14 @@ static bool blk_flush_queue_rq(struct request *rq, bool add_front)
+ 	if (rq->q->mq_ops) {
+ 		blk_mq_add_to_requeue_list(rq, add_front, true);
+ 		return false;
+-	} else {
+-		if (add_front)
+-			list_add(&rq->queuelist, &rq->q->queue_head);
+-		else
+-			list_add_tail(&rq->queuelist, &rq->q->queue_head);
+-		return true;
  	}
++
++	if (add_front)
++		list_add(&rq->queuelist, &rq->q->queue_head);
++	else
++		list_add_tail(&rq->queuelist, &rq->q->queue_head);
++
++	return true;
+ }
  
- 	if (bio->bi_vcnt >= bio->bi_max_vecs)
+ /**
 -- 
-2.9.5
+2.7.4
