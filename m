@@ -1,72 +1,197 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 01/45] block: introduce bio helpers for converting to multipage bvec
-Date: Mon, 18 Dec 2017 20:22:03 +0800
-Message-Id: <20171218122247.3488-2-ming.lei@redhat.com>
-In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
-References: <20171218122247.3488-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	linus.walleij@linaro.org,
+	angeloruocco90@gmail.com,
+	bfq-iosched@googlegroups.com,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH IMPROVEMENT/BUGFIX 3/4] block, bfq: let a queue be merged only shortly after starting I/O
+Date: Wed, 20 Dec 2017 12:38:33 +0100
+Message-Id: <20171220113834.2578-4-paolo.valente@linaro.org>
+In-Reply-To: <20171220113834.2578-1-paolo.valente@linaro.org>
+References: <20171220113834.2578-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-The following helpers are introduced for converting current users of
-direct access to bvec table, and prepares for supporting multipage bvec:
+In BFQ and CFQ, two processes are said to be cooperating if they do
+I/O in such a way that the union of their I/O requests yields a
+sequential I/O pattern. To get such a sequential I/O pattern out of
+the non-sequential pattern of each cooperating process, BFQ and CFQ
+merge the queues associated with these processes. In more detail,
+cooperating processes, and thus their associated queues, usually
+start, or restart, to do I/O shortly after each other. This is the
+case, e.g., for the I/O threads of KVM/QEMU and of the dump
+utility. Basing on this assumption, this commit allows a bfq_queue to
+be merged only during a short time interval (100ms) after it starts,
+or re-starts, to do I/O.  This filtering provides two important
+benefits.
 
-	bio_pages_all()
-	bio_first_bvec_all()
-	bio_first_page_all()
-	bio_last_bvec_all()
+First, it greatly reduces the probability that two non-cooperating
+processes have their queues merged by mistake, if they just happen to
+do I/O close to each other for a short time interval. These spurious
+merges cause loss of service guarantees. A low-weight bfq_queue may
+unjustly get more than its expected share of the throughput: if such a
+low-weight queue is merged with a high-weight queue, then the I/O for
+the low-weight queue is served as if the queue had a high weight. This
+may damage other high-weight queues unexpectedly.  For instance,
+because of this issue, lxterminal occasionally took 7.5 seconds to
+start, instead of 6.5 seconds, when some sequential readers and
+writers did I/O in the background on a FUJITSU MHX2300BT HDD.  The
+reason is that the bfq_queues associated with some of the readers or
+the writers were merged with the high-weight queues of some processes
+that had to do some urgent but little I/O. The readers then exploited
+the inherited high weight for all or most of their I/O, during the
+start-up of terminal. The filtering introduced by this commit
+eliminated any outlier caused by spurious queue merges in our start-up
+time tests.
 
-All are named as bio_*_all() to following bio_for_each_segment_all(),
-they can only be used on bio of !bio_flagged(bio, BIO_CLONED), that means
-the whole bvec table is covered.
+This filtering also provides a little boost of the throughput
+sustainable by BFQ: 3-4%, depending on the CPU. The reason is that,
+once a bfq_queue cannot be merged any longer, this commit makes BFQ
+stop updating the data needed to handle merging for the queue.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Angelo Ruocco <angeloruocco90@gmail.com>
 ---
- include/linux/bio.h | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ block/bfq-iosched.c | 57 ++++++++++++++++++++++++++++++++++++++++++-----------
+ block/bfq-iosched.h |  2 ++
+ block/bfq-wf2q.c    |  4 ++++
+ 3 files changed, 52 insertions(+), 11 deletions(-)
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 82f0c8fd7be8..435ddf04e889 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -300,6 +300,29 @@ static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
- 		bv->bv_len = iter.bi_bvec_done;
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index f58367ef98c1..320022135dc8 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -166,6 +166,20 @@ static const int bfq_async_charge_factor = 10;
+ /* Default timeout values, in jiffies, approximating CFQ defaults. */
+ const int bfq_timeout = HZ / 8;
+ 
++/*
++ * Time limit for merging (see comments in bfq_setup_cooperator). Set
++ * to the slowest value that, in our tests, proved to be effective in
++ * removing false positives, while not causing true positives to miss
++ * queue merging.
++ *
++ * As can be deduced from the low time limit below, queue merging, if
++ * successful, happens at the very beggining of the I/O of the involved
++ * cooperating processes, as a consequence of the arrival of the very
++ * first requests from each cooperator.  After that, there is very
++ * little chance to find cooperators.
++ */
++static const unsigned long bfq_merge_time_limit = HZ/10;
++
+ static struct kmem_cache *bfq_pool;
+ 
+ /* Below this threshold (in ns), we consider thinktime immediate. */
+@@ -444,6 +458,13 @@ bfq_rq_pos_tree_lookup(struct bfq_data *bfqd, struct rb_root *root,
+ 	return bfqq;
  }
  
-+static inline unsigned bio_pages_all(struct bio *bio)
++static bool bfq_too_late_for_merging(struct bfq_queue *bfqq)
 +{
-+	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
-+	return bio->bi_vcnt;
++	return bfqq->service_from_backlogged > 0 &&
++		time_is_before_jiffies(bfqq->first_IO_time +
++				       bfq_merge_time_limit);
 +}
 +
-+static inline struct bio_vec *bio_first_bvec_all(struct bio *bio)
-+{
-+	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
-+	return bio->bi_io_vec;
-+}
+ void bfq_pos_tree_add_move(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ {
+ 	struct rb_node **p, *parent;
+@@ -454,6 +475,14 @@ void bfq_pos_tree_add_move(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 		bfqq->pos_root = NULL;
+ 	}
+ 
++	/*
++	 * bfqq cannot be merged any longer (see comments in
++	 * bfq_setup_cooperator): no point in adding bfqq into the
++	 * position tree.
++	 */
++	if (bfq_too_late_for_merging(bfqq))
++		return;
 +
-+static inline struct page *bio_first_page_all(struct bio *bio)
-+{
-+	return bio_first_bvec_all(bio)->bv_page;
-+}
+ 	if (bfq_class_idle(bfqq))
+ 		return;
+ 	if (!bfqq->next_rq)
+@@ -1935,6 +1964,9 @@ bfq_setup_merge(struct bfq_queue *bfqq, struct bfq_queue *new_bfqq)
+ static bool bfq_may_be_close_cooperator(struct bfq_queue *bfqq,
+ 					struct bfq_queue *new_bfqq)
+ {
++	if (bfq_too_late_for_merging(new_bfqq))
++		return false;
 +
-+static inline struct bio_vec *bio_last_bvec_all(struct bio *bio)
-+{
-+	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
-+	return &bio->bi_io_vec[bio->bi_vcnt - 1];
-+}
+ 	if (bfq_class_idle(bfqq) || bfq_class_idle(new_bfqq) ||
+ 	    (bfqq->ioprio_class != new_bfqq->ioprio_class))
+ 		return false;
+@@ -2003,6 +2035,20 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ {
+ 	struct bfq_queue *in_service_bfqq, *new_bfqq;
+ 
++	/*
++	 * Prevent bfqq from being merged if it has been created too
++	 * long ago. The idea is that true cooperating processes, and
++	 * thus their associated bfq_queues, are supposed to be
++	 * created shortly after each other. This is the case, e.g.,
++	 * for KVM/QEMU and dump I/O threads. Basing on this
++	 * assumption, the following filtering greatly reduces the
++	 * probability that two non-cooperating processes, which just
++	 * happen to do close I/O for some short time interval, have
++	 * their queues merged by mistake.
++	 */
++	if (bfq_too_late_for_merging(bfqq))
++		return NULL;
 +
- enum bip_flags {
- 	BIP_BLOCK_INTEGRITY	= 1 << 0, /* block layer owns integrity data */
- 	BIP_MAPPED_INTEGRITY	= 1 << 1, /* ref tag has been remapped */
+ 	if (bfqq->new_bfqq)
+ 		return bfqq->new_bfqq;
+ 
+@@ -3044,17 +3090,6 @@ void bfq_bfqq_expire(struct bfq_data *bfqd,
+ 	 */
+ 	slow = bfq_bfqq_is_slow(bfqd, bfqq, compensate, reason, &delta);
+ 
+-	/*
+-	 * Increase service_from_backlogged before next statement,
+-	 * because the possible next invocation of
+-	 * bfq_bfqq_charge_time would likely inflate
+-	 * entity->service. In contrast, service_from_backlogged must
+-	 * contain real service, to enable the soft real-time
+-	 * heuristic to correctly compute the bandwidth consumed by
+-	 * bfqq.
+-	 */
+-	bfqq->service_from_backlogged += entity->service;
+-
+ 	/*
+ 	 * As above explained, charge slow (typically seeky) and
+ 	 * timed-out queues with the time and not the service
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 91c4390903a1..5d47b58d5fc8 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -344,6 +344,8 @@ struct bfq_queue {
+ 	unsigned long wr_start_at_switch_to_srt;
+ 
+ 	unsigned long split_time; /* time of last split */
++
++	unsigned long first_IO_time; /* time of first I/O for this queue */
+ };
+ 
+ /**
+diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+index e495d3f9b4b0..4456eda34e48 100644
+--- a/block/bfq-wf2q.c
++++ b/block/bfq-wf2q.c
+@@ -835,6 +835,10 @@ void bfq_bfqq_served(struct bfq_queue *bfqq, int served)
+ 	struct bfq_entity *entity = &bfqq->entity;
+ 	struct bfq_service_tree *st;
+ 
++	if (!bfqq->service_from_backlogged)
++		bfqq->first_IO_time = jiffies;
++
++	bfqq->service_from_backlogged += served;
+ 	for_each_entity(entity) {
+ 		st = bfq_entity_service_tree(entity);
+ 
 -- 
-2.9.5
+2.15.1
