@@ -1,216 +1,70 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	angeloruocco90@gmail.com,
-	bfq-iosched@googlegroups.com,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH IMPROVEMENT] block, bfq: consider also past I/O in soft real-time detection
-Date: Fri, 15 Dec 2017 07:23:12 +0100
-Message-Id: <20171215062312.1836-2-paolo.valente@linaro.org>
-In-Reply-To: <20171215062312.1836-1-paolo.valente@linaro.org>
-References: <20171215062312.1836-1-paolo.valente@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:35047 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755995AbdLTRWa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Dec 2017 12:22:30 -0500
+Received: by mail-wm0-f66.google.com with SMTP id f9so11237529wmh.0
+        for <linux-block@vger.kernel.org>; Wed, 20 Dec 2017 09:22:29 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 15/25] lightnvm: pblk: prevent premature sync point resets
+Date: Wed, 20 Dec 2017 18:21:55 +0100
+Message-Id: <20171220172205.26464-16-m@bjorling.me>
+In-Reply-To: <20171220172205.26464-1-m@bjorling.me>
+References: <20171220172205.26464-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-BFQ privileges the I/O of soft real-time applications, such as video
-players, to guarantee to these application a high bandwidth and a low
-latency. In this respect, it is not easy to correctly detect when an
-application is soft real-time. A particularly nasty false positive is
-that of an I/O-bound application that occasionally happens to meet all
-requirements to be deemed as soft real-time. After being detected as
-soft real-time, such an application monopolizes the device. Fortunately,
-BFQ will realize soon that the application is actually not soft
-real-time and suspend every privilege. Yet, the application may happen
-again to be wrongly detected as soft real-time, and so on.
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-As highlighted by our tests, this problem causes BFQ to occasionally
-fail to guarantee a high responsiveness, in the presence of heavy
-background I/O workloads. The reason is that the background workload
-happens to be detected as soft real-time, more or less frequently,
-during the execution of the interactive task under test. To give an
-idea, because of this problem, Libreoffice Writer occasionally takes 8
-seconds, instead of 3, to start up, if there are sequential reads and
-writes in the background, on a Kingston SSDNow V300.
+Unless we protect flush pointer updates with a lock, we risk
+resetting new flush points before we've synced all sectors
+up to that point.
 
-This commit addresses this issue by leveraging the following facts.
+This patch protects new flush points with the same spin lock
+that is being held when advancing the sync pointer and
+resetting completed flush points.
 
-The reason why some applications are detected as soft real-time despite
-all BFQ checks to avoid false positives, is simply that, during high
-CPU or storage-device load, I/O-bound applications may happen to do
-I/O slowly enough to meet all soft real-time requirements, and pass
-all BFQ extra checks. Yet, this happens only for limited time periods:
-slow-speed time intervals are usually interspersed between other time
-intervals during which these applications do I/O at a very high speed.
-To exploit these facts, this commit introduces a little change, in the
-detection of soft real-time behavior, to systematically consider also
-the recent past: the higher the speed was in the recent past, the
-later next I/O should arrive for the application to be considered as
-soft real-time. At the beginning of a slow-speed interval, the minimum
-arrival time allowed for the next I/O usually happens to still be so
-high, to fall *after* the end of the slow-speed period itself. As a
-consequence, the application does not risk to be deemed as soft
-real-time during the slow-speed interval. Then, during the next
-high-speed interval, the application cannot, evidently, be deemed as
-soft real-time (exactly because of its speed), and so on.
-
-This extra filtering proved to be rather effective: in the above test,
-the frequency of false positives became so low that the start-up time
-was 3 seconds in all iterations (apart from occasional outliers,
-caused by page-cache-management issues, which are out of the scope of
-this commit, and cannot be solved by an I/O scheduler).
-
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Angelo Ruocco <angeloruocco90@gmail.com>
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- block/bfq-iosched.c | 115 ++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 81 insertions(+), 34 deletions(-)
+ drivers/lightnvm/pblk-rb.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index bcb6d21..a9e06217 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -2917,45 +2917,87 @@ static bool bfq_bfqq_is_slow(struct bfq_data *bfqd, struct bfq_queue *bfqq,
-  * whereas soft_rt_next_start is set to infinity for applications that do
-  * not.
-  *
-- * Unfortunately, even a greedy application may happen to behave in an
-- * isochronous way if the CPU load is high. In fact, the application may
-- * stop issuing requests while the CPUs are busy serving other processes,
-- * then restart, then stop again for a while, and so on. In addition, if
-- * the disk achieves a low enough throughput with the request pattern
-- * issued by the application (e.g., because the request pattern is random
-- * and/or the device is slow), then the application may meet the above
-- * bandwidth requirement too. To prevent such a greedy application to be
-- * deemed as soft real-time, a further rule is used in the computation of
-- * soft_rt_next_start: soft_rt_next_start must be higher than the current
-- * time plus the maximum time for which the arrival of a request is waited
-- * for when a sync queue becomes idle, namely bfqd->bfq_slice_idle.
-- * This filters out greedy applications, as the latter issue instead their
-- * next request as soon as possible after the last one has been completed
-- * (in contrast, when a batch of requests is completed, a soft real-time
-- * application spends some time processing data).
-+ * Unfortunately, even a greedy (i.e., I/O-bound) application may
-+ * happen to meet, occasionally or systematically, both the above
-+ * bandwidth and isochrony requirements. This may happen at least in
-+ * the following circumstances. First, if the CPU load is high. The
-+ * application may stop issuing requests while the CPUs are busy
-+ * serving other processes, then restart, then stop again for a while,
-+ * and so on. The other circumstances are related to the storage
-+ * device: the storage device is highly loaded or reaches a low-enough
-+ * throughput with the I/O of the application (e.g., because the I/O
-+ * is random and/or the device is slow). In all these cases, the
-+ * I/O of the application may be simply slowed down enough to meet
-+ * the bandwidth and isochrony requirements. To reduce the probability
-+ * that greedy applications are deemed as soft real-time in these
-+ * corner cases, a further rule is used in the computation of
-+ * soft_rt_next_start: the return value of this function is forced to
-+ * be higher than the maximum between the following two quantities.
-  *
-- * Unfortunately, the last filter may easily generate false positives if
-- * only bfqd->bfq_slice_idle is used as a reference time interval and one
-- * or both the following cases occur:
-- * 1) HZ is so low that the duration of a jiffy is comparable to or higher
-- *    than bfqd->bfq_slice_idle. This happens, e.g., on slow devices with
-- *    HZ=100.
-+ * (a) Current time plus: (1) the maximum time for which the arrival
-+ *     of a request is waited for when a sync queue becomes idle,
-+ *     namely bfqd->bfq_slice_idle, and (2) a few extra jiffies. We
-+ *     postpone for a moment the reason for adding a few extra
-+ *     jiffies; we get back to it after next item (b).  Lower-bounding
-+ *     the return value of this function with the current time plus
-+ *     bfqd->bfq_slice_idle tends to filter out greedy applications,
-+ *     because the latter issue their next request as soon as possible
-+ *     after the last one has been completed. In contrast, a soft
-+ *     real-time application spends some time processing data, after a
-+ *     batch of its requests has been completed.
-+ *
-+ * (b) Current value of bfqq->soft_rt_next_start. As pointed out
-+ *     above, greedy applications may happen to meet both the
-+ *     bandwidth and isochrony requirements under heavy CPU or
-+ *     storage-device load. In more detail, in these scenarios, these
-+ *     applications happen, only for limited time periods, to do I/O
-+ *     slowly enough to meet all the requirements described so far,
-+ *     including the filtering in above item (a). These slow-speed
-+ *     time intervals are usually interspersed between other time
-+ *     intervals during which these applications do I/O at a very high
-+ *     speed. Fortunately, exactly because of the high speed of the
-+ *     I/O in the high-speed intervals, the values returned by this
-+ *     function happen to be so high, near the end of any such
-+ *     high-speed interval, to be likely to fall *after* the end of
-+ *     the low-speed time interval that follows. These high values are
-+ *     stored in bfqq->soft_rt_next_start after each invocation of
-+ *     this function. As a consequence, if the last value of
-+ *     bfqq->soft_rt_next_start is constantly used to lower-bound the
-+ *     next value that this function may return, then, from the very
-+ *     beginning of a low-speed interval, bfqq->soft_rt_next_start is
-+ *     likely to be constantly kept so high that any I/O request
-+ *     issued during the low-speed interval is considered as arriving
-+ *     to soon for the application to be deemed as soft
-+ *     real-time. Then, in the high-speed interval that follows, the
-+ *     application will not be deemed as soft real-time, just because
-+ *     it will do I/O at a high speed. And so on.
-+ *
-+ * Getting back to the filtering in item (a), in the following two
-+ * cases this filtering might be easily passed by a greedy
-+ * application, if the reference quantity was just
-+ * bfqd->bfq_slice_idle:
-+ * 1) HZ is so low that the duration of a jiffy is comparable to or
-+ *    higher than bfqd->bfq_slice_idle. This happens, e.g., on slow
-+ *    devices with HZ=100. The time granularity may be so coarse
-+ *    that the approximation, in jiffies, of bfqd->bfq_slice_idle
-+ *    is rather lower than the exact value.
-  * 2) jiffies, instead of increasing at a constant rate, may stop increasing
-  *    for a while, then suddenly 'jump' by several units to recover the lost
-  *    increments. This seems to happen, e.g., inside virtual machines.
-- * To address this issue, we do not use as a reference time interval just
-- * bfqd->bfq_slice_idle, but bfqd->bfq_slice_idle plus a few jiffies. In
-- * particular we add the minimum number of jiffies for which the filter
-- * seems to be quite precise also in embedded systems and KVM/QEMU virtual
-- * machines.
-+ * To address this issue, in the filtering in (a) we do not use as a
-+ * reference time interval just bfqd->bfq_slice_idle, but
-+ * bfqd->bfq_slice_idle plus a few jiffies. In particular, we add the
-+ * minimum number of jiffies for which the filter seems to be quite
-+ * precise also in embedded systems and KVM/QEMU virtual machines.
-  */
- static unsigned long bfq_bfqq_softrt_next_start(struct bfq_data *bfqd,
- 						struct bfq_queue *bfqq)
- {
--	return max(bfqq->last_idle_bklogged +
--		   HZ * bfqq->service_from_backlogged /
--		   bfqd->bfq_wr_max_softrt_rate,
--		   jiffies + nsecs_to_jiffies(bfqq->bfqd->bfq_slice_idle) + 4);
-+	return max3(bfqq->soft_rt_next_start,
-+		    bfqq->last_idle_bklogged +
-+		    HZ * bfqq->service_from_backlogged /
-+		    bfqd->bfq_wr_max_softrt_rate,
-+		    jiffies + nsecs_to_jiffies(bfqq->bfqd->bfq_slice_idle) + 4);
+diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
+index 9a4100c..3d33d77 100644
+--- a/drivers/lightnvm/pblk-rb.c
++++ b/drivers/lightnvm/pblk-rb.c
+@@ -367,17 +367,17 @@ static int pblk_rb_flush_point_set(struct pblk_rb *rb, struct bio *bio,
+ 	flush_point = (pos == 0) ? (rb->nr_entries - 1) : (pos - 1);
+ 	entry = &rb->entries[flush_point];
+ 
++	pblk_rb_sync_init(rb, NULL);
++
+ 	/* Protect flush points */
+ 	smp_store_release(&rb->flush_point, flush_point);
+ 
+-	if (!bio)
+-		return 0;
++	if (bio)
++		bio_list_add(&entry->w_ctx.bios, bio);
+ 
+-	spin_lock_irq(&rb->s_lock);
+-	bio_list_add(&entry->w_ctx.bios, bio);
+-	spin_unlock_irq(&rb->s_lock);
++	pblk_rb_sync_end(rb, NULL);
+ 
+-	return 1;
++	return bio ? 1 : 0;
  }
  
- /**
-@@ -4002,10 +4044,15 @@ static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 	bfqq->split_time = bfq_smallest_from_now();
- 
- 	/*
--	 * Set to the value for which bfqq will not be deemed as
--	 * soft rt when it becomes backlogged.
-+	 * To not forget the possibly high bandwidth consumed by a
-+	 * process/queue in the recent past,
-+	 * bfq_bfqq_softrt_next_start() returns a value at least equal
-+	 * to the current value of bfqq->soft_rt_next_start (see
-+	 * comments on bfq_bfqq_softrt_next_start).  Set
-+	 * soft_rt_next_start to now, to mean that bfqq has consumed
-+	 * no bandwidth so far.
- 	 */
--	bfqq->soft_rt_next_start = bfq_greatest_from_now();
-+	bfqq->soft_rt_next_start = jiffies;
- 
- 	/* first request is almost certainly seeky */
- 	bfqq->seek_history = 1;
+ static int __pblk_rb_may_write(struct pblk_rb *rb, unsigned int nr_entries,
 -- 
-2.10.0
+2.9.3
