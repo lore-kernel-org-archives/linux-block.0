@@ -1,43 +1,65 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Wed, 20 Dec 2017 16:08:05 -0800
-From: "tj@kernel.org" <tj@kernel.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "axboe@kernel.dk" <axboe@kernel.dk>,
-	"kernel-team@fb.com" <kernel-team@fb.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"peterz@infradead.org" <peterz@infradead.org>,
-	"osandov@fb.com" <osandov@fb.com>,
+Return-Path: <prvs=5200f992e=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "tj@kernel.org" <tj@kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "kernel-team@fb.com" <kernel-team@fb.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "peterz@infradead.org"
+	<peterz@infradead.org>, "osandov@fb.com" <osandov@fb.com>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	"oleg@redhat.com" <oleg@redhat.com>, "hch@lst.de" <hch@lst.de>
 Subject: Re: [PATCHSET v2] blk-mq: reimplement timeout handling
-Message-ID: <20171221000805.GC1084507@devbig577.frc2.facebook.com>
+Date: Wed, 20 Dec 2017 23:41:02 +0000
+Message-ID: <1513813261.2603.36.camel@wdc.com>
 References: <20171212190134.535941-1-tj@kernel.org>
- <1513813261.2603.36.camel@wdc.com>
+In-Reply-To: <20171212190134.535941-1-tj@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1513813261.2603.36.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Dec 20, 2017 at 11:41:02PM +0000, Bart Van Assche wrote:
-> On Tue, 2017-12-12 at 11:01 -0800, Tejun Heo wrote:
-> > Currently, blk-mq timeout path synchronizes against the usual
-> > issue/completion path using a complex scheme involving atomic
-> > bitflags, REQ_ATOM_*, memory barriers and subtle memory coherence
-> > rules.  Unfortunatley, it contains quite a few holes.
-> 
-> Hello Tejun,
-> 
-> An attempt to run SCSI I/O with this patch series applied resulted in
-> the following:
-
-Can you please try the v3?  There were a couple bugs that I missed
-while testing earlier versions.
-
- http://lkml.kernel.org/r/20171216120726.517153-1-tj@kernel.org
-
-Thanks.
-
--- 
-tejun
+T24gVHVlLCAyMDE3LTEyLTEyIGF0IDExOjAxIC0wODAwLCBUZWp1biBIZW8gd3JvdGU6DQo+IEN1
+cnJlbnRseSwgYmxrLW1xIHRpbWVvdXQgcGF0aCBzeW5jaHJvbml6ZXMgYWdhaW5zdCB0aGUgdXN1
+YWwNCj4gaXNzdWUvY29tcGxldGlvbiBwYXRoIHVzaW5nIGEgY29tcGxleCBzY2hlbWUgaW52b2x2
+aW5nIGF0b21pYw0KPiBiaXRmbGFncywgUkVRX0FUT01fKiwgbWVtb3J5IGJhcnJpZXJzIGFuZCBz
+dWJ0bGUgbWVtb3J5IGNvaGVyZW5jZQ0KPiBydWxlcy4gIFVuZm9ydHVuYXRsZXksIGl0IGNvbnRh
+aW5zIHF1aXRlIGEgZmV3IGhvbGVzLg0KDQpIZWxsbyBUZWp1biwNCg0KQW4gYXR0ZW1wdCB0byBy
+dW4gU0NTSSBJL08gd2l0aCB0aGlzIHBhdGNoIHNlcmllcyBhcHBsaWVkIHJlc3VsdGVkIGluDQp0
+aGUgZm9sbG93aW5nOg0KDQpCVUc6IHVuYWJsZSB0byBoYW5kbGUga2VybmVsIE5VTEwgcG9pbnRl
+ciBkZXJlZmVyZW5jZSBhdCAgICAgICAgICAgKG51bGwpDQpJUDogc2NzaV90aW1lc19vdXQrMHgx
+Yy8weDJkMA0KUEdEIDAgUDREIDANCk9vcHM6IDAwMDAgWyMxXSBQUkVFTVBUIFNNUA0KQ1BVOiAx
+IFBJRDogNDM3IENvbW06IGt3b3JrZXIvMToxSCBUYWludGVkOiBHICAgICAgICBXICAgICAgICA0
+LjE1LjAtcmM0LWRiZysgIzENCkhhcmR3YXJlIG5hbWU6IERlbGwgSW5jLiBQb3dlckVkZ2UgUjcy
+MC8wVldUOTAsIEJJT1MgMi41LjQgMDEvMjIvMjAxNg0KV29ya3F1ZXVlOiBrYmxvY2tkIGJsa19t
+cV90aW1lb3V0X3dvcmsNClJJUDogMDAxMDpzY3NpX3RpbWVzX291dCsweDFjLzB4MmQwDQpSU1A6
+IDAwMTg6ZmZmZmM5MDAwN2VmM2Q1OCBFRkxBR1M6IDAwMDEwMjQ2DQpSQVg6IDAwMDAwMDAwMDAw
+MDAwMDAgUkJYOiBmZmZmODgwODc4ZWFiMDAwIFJDWDogMDAwMDAwMDAwMDAwMDAwMA0KUkRYOiAw
+MDAwMDAwMDAwMDAwMDAwIFJTSTogMDAwMDAwMDAwMDAwMDAwMCBSREk6IGZmZmY4ODA4NzhlYWIw
+MDANClJCUDogZmZmZjg4MDg3OGVhYjFhMCBSMDg6IGZmZmZmZmZmZmZmZmZmZmYgUjA5OiAwMDAw
+MDAwMDAwMDAwMDAxDQpSMTA6IDAwMDAwMDAwMDAwMDAwMDAgUjExOiAwMDAwMDAwMDAwMDAwMDAw
+IFIxMjogMDAwMDAwMDAwMDAwMDAwNA0KUjEzOiAwMDAwMDAwMDAwMDAwMDAwIFIxNDogZmZmZjg4
+MDg1ZTRhNWNlOCBSMTU6IGZmZmY4ODA4NzhlOWY4NDgNCkZTOiAgMDAwMDAwMDAwMDAwMDAwMCgw
+MDAwKSBHUzpmZmZmODgwOTNmNjAwMDAwKDAwMDApIGtubEdTOjAwMDAwMDAwMDAwMDAwMDANCkNT
+OiAgMDAxMCBEUzogMDAwMCBFUzogMDAwMCBDUjA6IDAwMDAwMDAwODAwNTAwMzMNCkNSMjogMDAw
+MDAwMDAwMDAwMDAwMCBDUjM6IDAwMDAwMDAwMDFjMGYwMDIgQ1I0OiAwMDAwMDAwMDAwMDYwNmUw
+DQpDYWxsIFRyYWNlOg0KIGJsa19tcV90ZXJtaW5hdGVfZXhwaXJlZCsweDM2LzB4NzANCiBidF9p
+dGVyKzB4NDMvMHg1MA0KIGJsa19tcV9xdWV1ZV90YWdfYnVzeV9pdGVyKzB4ZWUvMHgyMDANCiBi
+bGtfbXFfdGltZW91dF93b3JrKzB4MTg2LzB4MmUwDQogcHJvY2Vzc19vbmVfd29yaysweDIyMS8w
+eDZlMA0KIHdvcmtlcl90aHJlYWQrMHgzYS8weDM5MA0KIGt0aHJlYWQrMHgxMWMvMHgxNDANCiBy
+ZXRfZnJvbV9mb3JrKzB4MjQvMHgzMA0KUklQOiBzY3NpX3RpbWVzX291dCsweDFjLzB4MmQwIFJT
+UDogZmZmZmM5MDAwN2VmM2Q1OA0KQ1IyOiAwMDAwMDAwMDAwMDAwMDAwDQoNCihnZGIpIGxpc3Qg
+KihzY3NpX3RpbWVzX291dCsweDFjKQ0KMHhmZmZmZmZmZjgxNDdhZGJjIGlzIGluIHNjc2lfdGlt
+ZXNfb3V0IChkcml2ZXJzL3Njc2kvc2NzaV9lcnJvci5jOjI4NSkuDQoyODAgICAgICAqLw0KMjgx
+ICAgICBlbnVtIGJsa19laF90aW1lcl9yZXR1cm4gc2NzaV90aW1lc19vdXQoc3RydWN0IHJlcXVl
+c3QgKnJlcSkNCjI4MiAgICAgew0KMjgzICAgICAgICAgICAgIHN0cnVjdCBzY3NpX2NtbmQgKnNj
+bWQgPSBibGtfbXFfcnFfdG9fcGR1KHJlcSk7DQoyODQgICAgICAgICAgICAgZW51bSBibGtfZWhf
+dGltZXJfcmV0dXJuIHJ0biA9IEJMS19FSF9OT1RfSEFORExFRDsNCjI4NSAgICAgICAgICAgICBz
+dHJ1Y3QgU2NzaV9Ib3N0ICpob3N0ID0gc2NtZC0+ZGV2aWNlLT5ob3N0Ow0KMjg2DQoyODcgICAg
+ICAgICAgICAgdHJhY2Vfc2NzaV9kaXNwYXRjaF9jbWRfdGltZW91dChzY21kKTsNCjI4OCAgICAg
+ICAgICAgICBzY3NpX2xvZ19jb21wbGV0aW9uKHNjbWQsIFRJTUVPVVRfRVJST1IpOw0KMjg5DQoN
+CihnZGIpIGRpc2FzIC9zIHNjc2lfdGltZXNfb3V0DQpbIC4uLiBdDQoyODMgICAgICAgICAgICAg
+c3RydWN0IHNjc2lfY21uZCAqc2NtZCA9IGJsa19tcV9ycV90b19wZHUocmVxKTsNCjI4NCAgICAg
+ICAgICAgICBlbnVtIGJsa19laF90aW1lcl9yZXR1cm4gcnRuID0gQkxLX0VIX05PVF9IQU5ETEVE
+Ow0KMjg1ICAgICAgICAgICAgIHN0cnVjdCBTY3NpX0hvc3QgKmhvc3QgPSBzY21kLT5kZXZpY2Ut
+Pmhvc3Q7DQogICAweGZmZmZmZmZmODE0N2FkYjIgPCsxOD46ICAgIG1vdiAgICAweDFkOCglcmRp
+KSwlcmF4DQogICAweGZmZmZmZmZmODE0N2FkYjkgPCsyNT46ICAgIG1vdiAgICAlcmRpLCVyYngN
+CiAgIDB4ZmZmZmZmZmY4MTQ3YWRiYyA8KzI4PjogICAgbW92ICAgICglcmF4KSwlcjEzDQogICAw
+eGZmZmZmZmZmODE0N2FkYmYgPCszMT46ICAgIG5vcGwgICAweDAoJXJheCwlcmF4LDEpDQoNCkJh
+cnQu
