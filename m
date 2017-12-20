@@ -1,78 +1,124 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:37534 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1759228AbdLRM3k (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Dec 2017 07:29:40 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 26/45] block: introduce bio_segments()
-Date: Mon, 18 Dec 2017 20:22:28 +0800
-Message-Id: <20171218122247.3488-27-ming.lei@redhat.com>
-In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
-References: <20171218122247.3488-1-ming.lei@redhat.com>
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:32922 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755968AbdLTRW1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Dec 2017 12:22:27 -0500
+Received: by mail-wm0-f68.google.com with SMTP id g130so16680840wme.0
+        for <linux-block@vger.kernel.org>; Wed, 20 Dec 2017 09:22:26 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 12/25] lightnvm: pblk: refactor emeta consistency check
+Date: Wed, 20 Dec 2017 18:21:52 +0100
+Message-Id: <20171220172205.26464-13-m@bjorling.me>
+In-Reply-To: <20171220172205.26464-1-m@bjorling.me>
+References: <20171220172205.26464-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-There are still cases in which we need to use bio_segments() for get the
-number of segment, so introduce it.
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Currently pblk_recov_get_lba list does two separate things:
+it checks the consistency of the emeta and extracts the lba list.
+
+This patch separates the consistency check to make the code easier
+to read and to prepare for version checks of the line emeta
+persistent data format version.
+
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- include/linux/bio.h | 25 ++++++++++++++++++++-----
- 1 file changed, 20 insertions(+), 5 deletions(-)
+ drivers/lightnvm/pblk-gc.c       |  9 ++++++++-
+ drivers/lightnvm/pblk-recovery.c | 15 ++++++++++-----
+ drivers/lightnvm/pblk.h          |  2 +-
+ 3 files changed, 19 insertions(+), 7 deletions(-)
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 2dd1ca0285e1..205a914ee3c0 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -223,9 +223,9 @@ static inline bool bio_rewind_iter(struct bio *bio, struct bvec_iter *iter,
- 
- #define bio_iter_last(bvec, iter) ((iter).bi_size == (bvec).bv_len)
- 
--static inline unsigned bio_pages(struct bio *bio)
-+static inline unsigned __bio_elements(struct bio *bio, bool seg)
- {
--	unsigned segs = 0;
-+	unsigned elems = 0;
- 	struct bio_vec bv;
- 	struct bvec_iter iter;
- 
-@@ -245,10 +245,25 @@ static inline unsigned bio_pages(struct bio *bio)
- 		break;
- 	}
- 
--	bio_for_each_page(bv, bio, iter)
--		segs++;
-+	if (!seg) {
-+		bio_for_each_page(bv, bio, iter)
-+			elems++;
-+	} else {
-+		bio_for_each_segment(bv, bio, iter)
-+			elems++;
+diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
+index 00d5698..9e3f22b 100644
+--- a/drivers/lightnvm/pblk-gc.c
++++ b/drivers/lightnvm/pblk-gc.c
+@@ -169,7 +169,14 @@ static void pblk_gc_line_prepare_ws(struct work_struct *work)
+ 	 * the line untouched. TODO: Implement a recovery routine that scans and
+ 	 * moves all sectors on the line.
+ 	 */
+-	lba_list = pblk_recov_get_lba_list(pblk, emeta_buf);
++
++	ret = pblk_recov_check_emeta(pblk, emeta_buf);
++	if (ret) {
++		pr_err("pblk: inconsistent emeta (line %d)\n", line->id);
++		goto fail_free_emeta;
 +	}
 +
-+	return elems;
-+}
-+
-+static inline unsigned bio_pages(struct bio *bio)
-+{
-+	return __bio_elements(bio, false);
-+}
- 
--	return segs;
-+static inline unsigned bio_segments(struct bio *bio)
-+{
-+	return __bio_elements(bio, true);
++	lba_list = emeta_to_lbas(pblk, emeta_buf);
+ 	if (!lba_list) {
+ 		pr_err("pblk: could not interpret emeta (line %d)\n", line->id);
+ 		goto fail_free_emeta;
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index 1b272ae..39a2e19 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -111,18 +111,18 @@ int pblk_recov_setup_rq(struct pblk *pblk, struct pblk_c_ctx *c_ctx,
+ 	return 0;
  }
  
- /*
+-__le64 *pblk_recov_get_lba_list(struct pblk *pblk, struct line_emeta *emeta_buf)
++int pblk_recov_check_emeta(struct pblk *pblk, struct line_emeta *emeta_buf)
+ {
+ 	u32 crc;
+ 
+ 	crc = pblk_calc_emeta_crc(pblk, emeta_buf);
+ 	if (le32_to_cpu(emeta_buf->crc) != crc)
+-		return NULL;
++		return 1;
+ 
+ 	if (le32_to_cpu(emeta_buf->header.identifier) != PBLK_MAGIC)
+-		return NULL;
++		return 1;
+ 
+-	return emeta_to_lbas(pblk, emeta_buf);
++	return 0;
+ }
+ 
+ static int pblk_recov_l2p_from_emeta(struct pblk *pblk, struct pblk_line *line)
+@@ -137,7 +137,7 @@ static int pblk_recov_l2p_from_emeta(struct pblk *pblk, struct pblk_line *line)
+ 	u64 nr_valid_lbas, nr_lbas = 0;
+ 	u64 i;
+ 
+-	lba_list = pblk_recov_get_lba_list(pblk, emeta_buf);
++	lba_list = emeta_to_lbas(pblk, emeta_buf);
+ 	if (!lba_list)
+ 		return 1;
+ 
+@@ -938,6 +938,11 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+ 			goto next;
+ 		}
+ 
++		if (pblk_recov_check_emeta(pblk, line->emeta->buf)) {
++			pblk_recov_l2p_from_oob(pblk, line);
++			goto next;
++		}
++
+ 		if (pblk_recov_l2p_from_emeta(pblk, line))
+ 			pblk_recov_l2p_from_oob(pblk, line);
+ 
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 7b09fb2..f324a7e 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -808,7 +808,7 @@ int pblk_submit_read_gc(struct pblk *pblk, struct pblk_gc_rq *gc_rq);
+ void pblk_submit_rec(struct work_struct *work);
+ struct pblk_line *pblk_recov_l2p(struct pblk *pblk);
+ int pblk_recov_pad(struct pblk *pblk);
+-__le64 *pblk_recov_get_lba_list(struct pblk *pblk, struct line_emeta *emeta);
++int pblk_recov_check_emeta(struct pblk *pblk, struct line_emeta *emeta);
+ int pblk_recov_setup_rq(struct pblk *pblk, struct pblk_c_ctx *c_ctx,
+ 			struct pblk_rec_ctx *recovery, u64 *comp_bits,
+ 			unsigned int comp);
 -- 
-2.9.5
+2.9.3
