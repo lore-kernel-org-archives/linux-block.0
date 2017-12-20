@@ -1,66 +1,53 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:42561 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752016AbdL1AnH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Dec 2017 19:43:07 -0500
-Received: by mail-pg0-f65.google.com with SMTP id q67so10094501pga.9
-        for <linux-block@vger.kernel.org>; Wed, 27 Dec 2017 16:43:07 -0800 (PST)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: Michael Lyle <mlyle@lyle.org>
-Subject: [for-416 PATCH] bcache: fix writeback target calc on large devices
-Date: Wed, 27 Dec 2017 16:42:30 -0800
-Message-Id: <20171228004230.3295-1-mlyle@lyle.org>
+Received: from mx1.redhat.com ([209.132.183.28]:52864 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754303AbdLTXMc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Dec 2017 18:12:32 -0500
+Date: Thu, 21 Dec 2017 07:12:14 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Omar Sandoval <osandov@fb.com>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Hannes Reinecke <hare@suse.com>,
+        chenxiang <chenxiang66@hisilicon.com>,
+        Mauricio Faria de Oliveira <mauricfo@linux.vnet.ibm.com>,
+        Wen Xiong <wenxiong@us.ibm.com>
+Subject: Re: [PATCH V3] block: drain queue before waiting for q_usage_counter
+ becoming zero
+Message-ID: <20171220231213.GA15493@ming.t460p>
+References: <20171129235635.20292-1-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171129235635.20292-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Bcache needs to scale the dirty data in the cache over the multiple
-backing disks in order to calculate writeback rates for each.
-The previous code did this by multiplying the target number of dirty
-sectors by the backing device size, and expected it to fit into a
-uint64_t; this blows up on relatively small backing devices.
+On Thu, Nov 30, 2017 at 07:56:35AM +0800, Ming Lei wrote:
+> Now we track legacy requests with .q_usage_counter in commit 055f6e18e08f
+> ("block: Make q_usage_counter also track legacy requests"), but that
+> commit never runs and drains legacy queue before waiting for this counter
+> becoming zero, then IO hang is caused in the test of pulling disk during IO.
+> 
+> This patch fixes the issue by draining requests before waiting for
+> q_usage_counter becoming zero, both Mauricio and chenxiang reported this
+> issue, and observed that it can be fixed by this patch.
+> 
+> Link: https://marc.info/?l=linux-block&m=151192424731797&w=2
+> Fixes: 055f6e18e08f("block: Make q_usage_counter also track legacy requests")
+> Cc: Wen Xiong <wenxiong@us.ibm.com>
+> Tested-by: "chenxiang (M)" <chenxiang66@hisilicon.com>
+> Tested-by: Mauricio Faria de Oliveira <mauricfo@linux.vnet.ibm.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+> V3:
+> 	- V2 can't cover chenxiang's issue, so we have to drain queue via
+> 	blk_drain_queue(), and fallback to original post(V1)
 
-The new approach figures out the bdev's share in 16384ths of the overall
-cached data.  This is chosen to cope well when bdevs drastically vary in
-size and to ensure that bcache can cross the petabyte boundary for each
-backing device.
+Hi Jens,
 
-Reported-by: Jack Douglas <jack@douglastechnology.co.uk>
-Signed-off-by: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/writeback.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+This patch fixes regression caused by 055f6e18e08f merged to v4.15-rc,
+could you consider it for v4.15?
 
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 56a37884ca8b..ddbbeec1f0ee 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -24,10 +24,23 @@ static void __update_writeback_rate(struct cached_dev *dc)
- 	struct cache_set *c = dc->disk.c;
- 	uint64_t cache_sectors = c->nbuckets * c->sb.bucket_size -
- 				bcache_flash_devs_sectors_dirty(c);
-+	/*
-+	 * Unfortunately we don't know the exact share of dirty data for
-+	 * each backing device.  Therefore, we need to infer the writeback
-+	 * for each disk based on its assumed proportion of dirty data.
-+	 *
-+	 * 16384 is chosen here as something that each backing device should
-+	 * be a reasonable fraction of the share, and not to blow up until
-+	 * individual backing devices are a petabyte.
-+	 */
-+	uint32_t bdev_share_per16k =
-+		div64_u64(bdev_sectors(dc->bdev) << 14,
-+				c->cached_dev_sectors);
-+
- 	uint64_t cache_dirty_target =
- 		div_u64(cache_sectors * dc->writeback_percent, 100);
--	int64_t target = div64_u64(cache_dirty_target * bdev_sectors(dc->bdev),
--				   c->cached_dev_sectors);
-+
-+	int64_t target = (cache_dirty_target * bdev_share_per16k) >> 14;
- 
- 	/*
- 	 * PI controller:
--- 
-2.14.1
+Thanks,
+Ming
