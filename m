@@ -1,112 +1,183 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 43/45] block: bio: pass segments to bio if bio_add_page() is bypassed
-Date: Mon, 18 Dec 2017 20:22:45 +0800
-Message-Id: <20171218122247.3488-44-ming.lei@redhat.com>
-In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
-References: <20171218122247.3488-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:38401 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756018AbdLTRWj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Dec 2017 12:22:39 -0500
+Received: by mail-wm0-f66.google.com with SMTP id 64so11126187wme.3
+        for <linux-block@vger.kernel.org>; Wed, 20 Dec 2017 09:22:38 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 24/25] lightnvm: pblk: add iostat support
+Date: Wed, 20 Dec 2017 18:22:04 +0100
+Message-Id: <20171220172205.26464-25-m@bjorling.me>
+In-Reply-To: <20171220172205.26464-1-m@bjorling.me>
+References: <20171220172205.26464-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Under some situations, such as block direct I/O, we can't use
-bio_add_page() for merging pages into multipage bvec, so
-a new function is implemented for converting page array into one
-segment array, then these cases can benefit from multipage bvec
-too.
+From: Javier González <javier@cnexlabs.com>
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Since pblk registers its own block device, the iostat accounting is
+not automatically done for us. Therefore, add the necessary
+accounting logic to satisfy the iostat interface.
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- block/bio.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 48 insertions(+), 6 deletions(-)
+ drivers/lightnvm/pblk-cache.c |  5 +++++
+ drivers/lightnvm/pblk-read.c  | 31 +++++++++++++++++++------------
+ drivers/lightnvm/pblk.h       |  1 +
+ 3 files changed, 25 insertions(+), 12 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 34af328681a8..e808d8352067 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -882,6 +882,41 @@ int bio_add_page(struct bio *bio, struct page *page,
+diff --git a/drivers/lightnvm/pblk-cache.c b/drivers/lightnvm/pblk-cache.c
+index 0d227ef..000fcad 100644
+--- a/drivers/lightnvm/pblk-cache.c
++++ b/drivers/lightnvm/pblk-cache.c
+@@ -19,12 +19,16 @@
+ 
+ int pblk_write_to_cache(struct pblk *pblk, struct bio *bio, unsigned long flags)
+ {
++	struct request_queue *q = pblk->dev->q;
+ 	struct pblk_w_ctx w_ctx;
+ 	sector_t lba = pblk_get_lba(bio);
++	unsigned long start_time = jiffies;
+ 	unsigned int bpos, pos;
+ 	int nr_entries = pblk_get_secs(bio);
+ 	int i, ret;
+ 
++	generic_start_io_acct(q, WRITE, bio_sectors(bio), &pblk->disk->part0);
++
+ 	/* Update the write buffer head (mem) with the entries that we can
+ 	 * write. The write in itself cannot fail, so there is no need to
+ 	 * rollback from here on.
+@@ -67,6 +71,7 @@ int pblk_write_to_cache(struct pblk *pblk, struct bio *bio, unsigned long flags)
+ 	pblk_rl_inserted(&pblk->rl, nr_entries);
+ 
+ out:
++	generic_end_io_acct(q, WRITE, &pblk->disk->part0, start_time);
+ 	pblk_write_should_kick(pblk);
+ 	return ret;
  }
- EXPORT_SYMBOL(bio_add_page);
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index 0fe0c04..2f76128 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -158,8 +158,12 @@ static void pblk_end_user_read(struct bio *bio)
+ static void __pblk_end_io_read(struct pblk *pblk, struct nvm_rq *rqd,
+ 			       bool put_line)
+ {
++	struct nvm_tgt_dev *dev = pblk->dev;
+ 	struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
+ 	struct bio *bio = rqd->bio;
++	unsigned long start_time = r_ctx->start_time;
++
++	generic_end_io_acct(dev->q, READ, &pblk->disk->part0, start_time);
  
-+static unsigned convert_to_segs(struct bio* bio, struct page **pages,
-+				unsigned char *page_cnt,
-+				unsigned nr_pages)
-+{
-+
-+	unsigned idx;
-+	unsigned nr_seg = 0;
-+	struct request_queue *q = NULL;
-+
-+	if (bio->bi_disk)
-+		q = bio->bi_disk->queue;
-+
-+	if (!q || !blk_queue_cluster(q)) {
-+		memset(page_cnt, 0, nr_pages);
-+		return nr_pages;
-+	}
-+
-+	page_cnt[nr_seg] = 0;
-+	for (idx = 1; idx < nr_pages; idx++) {
-+		struct page *pg_s = pages[nr_seg];
-+		struct page *pg = pages[idx];
-+
-+		if (page_to_pfn(pg_s) + page_cnt[nr_seg] + 1 ==
-+		    page_to_pfn(pg)) {
-+			page_cnt[nr_seg]++;
-+		} else {
-+			page_cnt[++nr_seg] = 0;
-+			if (nr_seg < idx)
-+				pages[nr_seg] = pg;
-+		}
-+	}
-+
-+	return nr_seg + 1;
-+}
-+
- /**
-  * bio_iov_iter_get_pages - pin user or kernel pages and add them to a bio
-  * @bio: bio to add pages to
-@@ -897,6 +932,8 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	struct page **pages = (struct page **)bv;
- 	size_t offset, diff;
- 	ssize_t size;
-+	unsigned short nr_segs;
-+	unsigned char page_cnt[nr_pages];	/* at most 256 pages */
+ 	if (rqd->error)
+ 		pblk_log_read_err(pblk, rqd);
+@@ -193,9 +197,9 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
+ 	__pblk_end_io_read(pblk, rqd, true);
+ }
  
- 	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
- 	if (unlikely(size <= 0))
-@@ -912,13 +949,18 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	 * need to be reflected here as well.
- 	 */
- 	bio->bi_iter.bi_size += size;
--	bio->bi_vcnt += nr_pages;
--
- 	diff = (nr_pages * PAGE_SIZE - offset) - size;
--	while (nr_pages--) {
--		bv[nr_pages].bv_page = pages[nr_pages];
--		bv[nr_pages].bv_len = PAGE_SIZE;
--		bv[nr_pages].bv_offset = 0;
+-static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+-				      unsigned int bio_init_idx,
+-				      unsigned long *read_bitmap)
++static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
++				 unsigned int bio_init_idx,
++				 unsigned long *read_bitmap)
+ {
+ 	struct bio *new_bio, *bio = rqd->bio;
+ 	struct pblk_sec_meta *meta_list = rqd->meta_list;
+@@ -306,6 +310,8 @@ static int pblk_fill_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 	return NVM_IO_OK;
+ 
+ err:
++	pr_err("pblk: failed to perform partial read\n");
 +
-+	/* convert into segments */
-+	nr_segs = convert_to_segs(bio, pages, page_cnt, nr_pages);
-+	bio->bi_vcnt += nr_segs;
-+
-+	while (nr_segs--) {
-+		unsigned cnt = (unsigned)page_cnt[nr_segs] + 1;
-+
-+		bv[nr_segs].bv_page = pages[nr_segs];
-+		bv[nr_segs].bv_len = PAGE_SIZE * cnt;
-+		bv[nr_segs].bv_offset = 0;
+ 	/* Free allocated pages in new bio */
+ 	pblk_bio_free_pages(pblk, bio, 0, new_bio->bi_vcnt);
+ 	__pblk_end_io_read(pblk, rqd, false);
+@@ -357,6 +363,7 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ {
+ 	struct nvm_tgt_dev *dev = pblk->dev;
++	struct request_queue *q = dev->q;
+ 	sector_t blba = pblk_get_lba(bio);
+ 	unsigned int nr_secs = pblk_get_secs(bio);
+ 	struct pblk_g_ctx *r_ctx;
+@@ -372,6 +379,8 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ 		return NVM_IO_ERR;
  	}
  
- 	bv[0].bv_offset += offset;
++	generic_start_io_acct(q, READ, bio_sectors(bio), &pblk->disk->part0);
++
+ 	bitmap_zero(&read_bitmap, nr_secs);
+ 
+ 	rqd = pblk_alloc_rqd(pblk, PBLK_READ);
+@@ -383,6 +392,7 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ 	rqd->end_io = pblk_end_io_read;
+ 
+ 	r_ctx = nvm_rq_to_pdu(rqd);
++	r_ctx->start_time = jiffies;
+ 	r_ctx->lba = blba;
+ 
+ 	/* Save the index for this bio's start. This is needed in case
+@@ -422,7 +432,7 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ 		int_bio = bio_clone_fast(bio, GFP_KERNEL, pblk_bio_set);
+ 		if (!int_bio) {
+ 			pr_err("pblk: could not clone read bio\n");
+-			return NVM_IO_ERR;
++			goto fail_end_io;
+ 		}
+ 
+ 		rqd->bio = int_bio;
+@@ -433,7 +443,7 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ 			pr_err("pblk: read IO submission failed\n");
+ 			if (int_bio)
+ 				bio_put(int_bio);
+-			return ret;
++			goto fail_end_io;
+ 		}
+ 
+ 		return NVM_IO_OK;
+@@ -442,17 +452,14 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ 	/* The read bio request could be partially filled by the write buffer,
+ 	 * but there are some holes that need to be read from the drive.
+ 	 */
+-	ret = pblk_fill_partial_read_bio(pblk, rqd, bio_init_idx, &read_bitmap);
+-	if (ret) {
+-		pr_err("pblk: failed to perform partial read\n");
+-		return ret;
+-	}
+-
+-	return NVM_IO_OK;
++	return pblk_partial_read_bio(pblk, rqd, bio_init_idx, &read_bitmap);
+ 
+ fail_rqd_free:
+ 	pblk_free_rqd(pblk, rqd, PBLK_READ);
+ 	return ret;
++fail_end_io:
++	__pblk_end_io_read(pblk, rqd, false);
++	return ret;
+ }
+ 
+ static int read_ppalist_rq_gc(struct pblk *pblk, struct nvm_rq *rqd,
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index cb38990..1e9eafd 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -113,6 +113,7 @@ struct pblk_c_ctx {
+ /* read context */
+ struct pblk_g_ctx {
+ 	void *private;
++	unsigned long start_time;
+ 	u64 lba;
+ };
+ 
 -- 
-2.9.5
+2.9.3
