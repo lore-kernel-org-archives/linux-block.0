@@ -1,43 +1,78 @@
-Return-Path: <prvs=5014e5409=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "hch@lst.de" <hch@lst.de>, "hare@suse.de" <hare@suse.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "osandov@fb.com"
-	<osandov@fb.com>, "jthumshirn@suse.de" <jthumshirn@suse.de>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: [PATCH 4/7] blk-mq: Avoid that request processing stalls when
- sharing tags
-Date: Fri, 1 Dec 2017 19:52:14 +0000
-Message-ID: <1512157932.2520.27.camel@wdc.com>
-References: <20171201000848.2656-1-bart.vanassche@wdc.com>
-	 <20171201000848.2656-5-bart.vanassche@wdc.com>
-	 <20171201025803.GA29741@ming.t460p>
-In-Reply-To: <20171201025803.GA29741@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	linus.walleij@linaro.org,
+	angeloruocco90@gmail.com,
+	bfq-iosched@googlegroups.com,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH IMPROVEMENT] block, bfq: increase threshold to deem I/O as random
+Date: Wed, 20 Dec 2017 17:27:36 +0100
+Message-Id: <20171220162736.5067-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gRnJpLCAyMDE3LTEyLTAxIGF0IDEwOjU4ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
-VGh1LCBOb3YgMzAsIDIwMTcgYXQgMDQ6MDg6NDVQTSAtMDgwMCwgQmFydCBWYW4gQXNzY2hlIHdy
-b3RlOg0KPiA+IGJsa19tcV9zY2hlZF9tYXJrX3Jlc3RhcnRfaGN0eCgpIG11c3QgYmUgY2FsbGVk
-IGJlZm9yZQ0KPiANCj4gQ291bGQgeW91IHBsZWFzZSBkZXNjcmliZSB0aGUgdGhlb3J5IG9uIGNv
-bW1pdCBsb2c/IExpa2UsIHdoeSBpcyBpdA0KPiBhIG11c3Q/IGFuZCB3aGF0IGlzIHRoZSBpc3N1
-ZSB0byBiZSBmaXhlZD8gDQoNClRoZSBCTEtfTVFfU19TQ0hFRF9SRVNUQVJUIHRlc3QgYXQgdGhl
-IGVuZCBvZiBibGtfbXFfZGlzcGF0Y2hfcnFfbGlzdCgpIGNhbg0Kb25seSB3b3JrIGlmIEJMS19N
-UV9TX1NDSEVEX1JFU1RBUlQgaXMgc2V0IGJlZm9yZSBibGtfbXFfZGlzcGF0Y2hfcnFfbGlzdCgp
-DQppcyBjYWxsZWQuIEJUVywgd2l0aG91dCB0aGlzIHBhdGNoIGV2ZXJ5IGl0ZXJhdGlvbiBvZiBt
-eSB0ZXN0IHRyaWdnZXJzIGENCnF1ZXVlIHN0YWxsLiBXaXRoIHRoaXMgcGF0Y2ggYSBxdWV1ZSBz
-dGFsbCBvbmx5IG9jY3VycyBzcG9yYWRpY2FsbHkgc28gSQ0KdGhpbmsgd2UgcmVhbGx5IG5lZWQg
-c29tZXRoaW5nIGxpa2UgdGhpcyBwYXRjaC4NCg0KPiA+IGJsa19tcV9kaXNwYXRjaF9ycV9saXN0
-KCkgaXMgY2FsbGVkLiBNYWtlIHN1cmUgdGhhdA0KPiA+IEJMS19NUV9TX1NDSEVEX1JFU1RBUlQg
-aXMgc2V0IGJlZm9yZSBhbnkgYmxrX21xX2Rpc3BhdGNoX3JxX2xpc3QoKQ0KPiA+IGNhbGwgb2Nj
-dXJzLg0KPiA+IA0KPiA+IEZpeGVzOiBjb21taXQgYjM0NzY4OWZmYmNhICgiYmxrLW1xLXNjaGVk
-OiBpbXByb3ZlIGRpc3BhdGNoaW5nIGZyb20gc3cgcXVldWUiKQ0KPiANCj4gV2UgYWx3YXlzIG1h
-cmsgUkVTVEFSVCBzdGF0ZSBiaXQganVzdCBiZWZvcmUgZGlzcGF0Y2hpbmcgZnJvbSAtPmRpc3Bh
-dGNoX2xpc3QsDQo+IHRoaXMgd2F5IGhhcyBiZWVuIHRoZXJlIGJlZm9yZSBiMzQ3Njg5ZmZiY2Es
-IHdoaWNoIGRvZXNuJ3QgY2hhbmdlIHRoaXMNCj4gUkVTVEFSVCBtZWNoYW5pc20sIHNvIHBsZWFz
-ZSBleHBsYWluIGEgYml0IHdoeSBpdCBpcyBhIGZpeCBvbiBjb21taXQNCj4gYjM0NzY4OWZmYmNh
-Lg0KDQpJJ20gbm90IGNvbXBsZXRlbHkgc3VyZSB3aGljaCBwYXRjaCBpbnRyb2R1Y2VkIHRoZSBs
-b2NrdXAgZml4ZWQgYnkgdGhpcyBwYXRjaA0KYnV0IEkgd2lsbCBoYXZlIGFub3RoZXIgbG9vayB3
-aGV0aGVyIHRoaXMgd2FzIHJlYWxseSBpbnRyb2R1Y2VkIGJ5IGNvbW1pdA0KYjM0NzY4OWZmYmNh
-Lg0KDQpCYXJ0Lg==
+If two processes do I/O close to each other, i.e., are cooperating
+processes in BFQ (and CFQ'S) nomenclature, then BFQ merges their
+associated bfq_queues, so as to get sequential I/O from the union of
+the I/O requests of the processes, and thus reach a higher
+throughput. A merged queue is then split if its I/O stops being
+sequential. In this respect, BFQ deems the I/O of a bfq_queue as
+(mostly) sequential only if less than 4 I/O requests are random, out
+of the last 32 requests inserted into the queue.
+
+Unfortunately, extensive testing (with the interleaved_io benchmark of
+the S suite [1], and with real applications spawning cooperating
+processes) has clearly shown that, with such a low threshold, only a
+rather low I/O throughput may be reached when several cooperating
+processes do I/O. In particular, the outcome of each test run was
+bimodal: if queue merging occurred and was stable during the test,
+then the throughput was close to the peak rate of the storage device,
+otherwise the throughput was arbitrarily low (usually around 1/10 of
+the peak rate with a rotational device). The probability to get the
+unlucky outcomes grew with the number of cooperating processes: it was
+already significant with 5 processes, and close to one with 7 or more
+processes.
+
+The cause of the low throughput in the unlucky runs was that the
+merged queues containing the I/O of these cooperating processes were
+soon split, because they contained more random I/O requests than those
+tolerated by the 4/32 threshold, but
+- that I/O would have however allowed the storage device to reach
+  peak throughput or almost peak throughput;
+- in contrast, the I/O of these processes, if served individually
+  (from separate queues) yielded a rather low throughput.
+
+So we repeated our tests with increasing values of the threshold,
+until we found the minimum value (19) for which we obtained maximum
+throughput, reliably, with at least up to 9 cooperating
+processes. Then we checked that the use of that higher threshold value
+did not cause any regression for any other benchmark in the suite [1].
+This commit raises the threshold to such a higher value.
+
+[1] https://github.com/Algodev-github/S
+
+Signed-off-by: Angelo Ruocco <angeloruocco90@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+---
+ block/bfq-iosched.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index c66578592c9e..e33c5c4c9856 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -192,7 +192,7 @@ static struct kmem_cache *bfq_pool;
+ #define BFQQ_SEEK_THR		(sector_t)(8 * 100)
+ #define BFQQ_SECT_THR_NONROT	(sector_t)(2 * 32)
+ #define BFQQ_CLOSE_THR		(sector_t)(8 * 1024)
+-#define BFQQ_SEEKY(bfqq)	(hweight32(bfqq->seek_history) > 32/8)
++#define BFQQ_SEEKY(bfqq)	(hweight32(bfqq->seek_history) > 19)
+ 
+ /* Min number of samples required to perform peak-rate update */
+ #define BFQ_RATE_MIN_SAMPLES	32
+-- 
+2.15.1
