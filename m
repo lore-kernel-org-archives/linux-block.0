@@ -1,54 +1,62 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f67.google.com ([209.85.215.67]:39048 "EHLO
-        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750751AbdLMGYc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Dec 2017 01:24:32 -0500
-MIME-Version: 1.0
-From: Byungchul Park <max.byungchul.park@gmail.com>
-Date: Wed, 13 Dec 2017 15:24:29 +0900
-Message-ID: <CANrsvRPQcWz-p_3TYfNf+Waek3bcNNPniXhFzyyS=7qbCqzGyg@mail.gmail.com>
-Subject: About the try to remove cross-release feature entirely by Ingo
-To: Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@kernel.org>, david@fromorbit.com,
-        tytso@mit.edu, willy@infradead.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Amir Goldstein <amir73il@gmail.com>, byungchul.park@lge.com,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        oleg@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	linus.walleij@linaro.org,
+	angeloruocco90@gmail.com,
+	bfq-iosched@googlegroups.com,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH IMPROVEMENT/BUGFIX 2/4] block, bfq: check low_latency flag in bfq_bfqq_save_state()
+Date: Wed, 20 Dec 2017 12:38:32 +0100
+Message-Id: <20171220113834.2578-3-paolo.valente@linaro.org>
+In-Reply-To: <20171220113834.2578-1-paolo.valente@linaro.org>
+References: <20171220113834.2578-1-paolo.valente@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Lockdep works, based on the following:
+From: Angelo Ruocco <angeloruocco90@gmail.com>
 
-   (1) Classifying locks properly
-   (2) Checking relationship between the classes
+A just-created bfq_queue will certainly be deemed as interactive on
+the arrival of its first I/O request, if the low_latency flag is
+set. Yet, if the queue is merged with another queue on the arrival of
+its first I/O request, it will not have the chance to be flagged as
+interactive. Nevertheless, if the queue is then split soon enough, it
+has to be flagged as interactive after the split.
 
-If (1) is not good or (2) is not good, then we
-might get false positives.
+To handle this early-merge scenario correctly, BFQ saves the state of
+the queue, on the merge, as if the latter had already been deemed
+interactive. So, if the queue is split soon, it will get
+weight-raised, because the previous state of the queue is resumed on
+the split.
 
-For (1), we don't have to classify locks 100%
-properly but need as enough as lockdep works.
+Unfortunately, in the act of saving the state of the newly-created
+queue, BFQ doesn't check whether the low_latency flag is set, and this
+causes early-merged queues to be then weight-raised, on queue splits,
+even if low_latency is off. This commit addresses this problem by
+adding the missing check.
 
-For (2), we should have a mechanism w/o
-logical defects.
+Signed-off-by: Angelo Ruocco <angeloruocco90@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+---
+ block/bfq-iosched.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Cross-release added an additional capacity to
-(2) and requires (1) to get more precisely classified.
-
-Since the current classification level is too low for
-cross-release to work, false positives are being
-reported frequently with enabling cross-release.
-Yes. It's a obvious problem. It needs to be off by
-default until the classification is done by the level
-that cross-release requires.
-
-But, the logic (2) is valid and logically true. Please
-keep the code, mechanism, and logic.
-
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index c6f0b93a769c..f58367ef98c1 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -2064,7 +2064,8 @@ static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
+ 	bic->saved_in_large_burst = bfq_bfqq_in_large_burst(bfqq);
+ 	bic->was_in_burst_list = !hlist_unhashed(&bfqq->burst_list_node);
+ 	if (unlikely(bfq_bfqq_just_created(bfqq) &&
+-		     !bfq_bfqq_in_large_burst(bfqq))) {
++		     !bfq_bfqq_in_large_burst(bfqq) &&
++		     bfqq->bfqd->low_latency)) {
+ 		/*
+ 		 * bfqq being merged right after being created: bfqq
+ 		 * would have deserved interactive weight raising, but
 -- 
-Thanks,
-Byungchul
+2.15.1
