@@ -1,44 +1,42 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:35350 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753362AbdL1NVk (ORCPT
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:34211 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755983AbdLTRW3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Dec 2017 08:21:40 -0500
-Received: by mail-lf0-f68.google.com with SMTP id h5so1628440lfj.2
-        for <linux-block@vger.kernel.org>; Thu, 28 Dec 2017 05:21:39 -0800 (PST)
-From: Hans Holmberg <hans@owltronix.com>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+        Wed, 20 Dec 2017 12:22:29 -0500
+Received: by mail-wm0-f68.google.com with SMTP id y82so16621404wmg.1
+        for <linux-block@vger.kernel.org>; Wed, 20 Dec 2017 09:22:28 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc: Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH v2] lightnvm: pblk: clear flush point on completed writes
-Date: Thu, 28 Dec 2017 14:19:52 +0100
-Message-Id: <1514467192-5694-1-git-send-email-hans.holmberg@cnexlabs.com>
-In-Reply-To: <20171220172205.26464-15-m@bjorling.me>
-References: <20171220172205.26464-15-m@bjorling.me>
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 14/25] lightnvm: pblk: clear flush point on completed writes
+Date: Wed, 20 Dec 2017 18:21:54 +0100
+Message-Id: <20171220172205.26464-15-m@bjorling.me>
+In-Reply-To: <20171220172205.26464-1-m@bjorling.me>
+References: <20171220172205.26464-1-m@bjorling.me>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+
 Move completion of syncs and clearing of flush points to the
 write completion path - this ensures that the data has been
-comitted to the media before completing bios containing syncs.
+committed to the media before completing bios containing syncs.
 
 Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
 Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
-
-Changes since v1:
-
-* Fixed an off-by one issue when clearing flush points
-
  drivers/lightnvm/pblk-rb.c    | 58 +++++++++++++++++++++----------------------
  drivers/lightnvm/pblk-write.c | 17 ++++++++++++-
  2 files changed, 44 insertions(+), 31 deletions(-)
 
 diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
-index 2c61d74..fe5465d 100644
+index 941842e..9a4100c 100644
 --- a/drivers/lightnvm/pblk-rb.c
 +++ b/drivers/lightnvm/pblk-rb.c
 @@ -353,17 +353,17 @@ static int pblk_rb_flush_point_set(struct pblk_rb *rb, struct bio *bio,
@@ -64,7 +62,7 @@ index 2c61d74..fe5465d 100644
  	flush_point = (pos == 0) ? (rb->nr_entries - 1) : (pos - 1);
  	entry = &rb->entries[flush_point];
  
-@@ -604,22 +604,6 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
+@@ -606,22 +606,6 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
  			return NVM_IO_ERR;
  		}
  
@@ -87,7 +85,7 @@ index 2c61d74..fe5465d 100644
  		flags &= ~PBLK_WRITTEN_DATA;
  		flags |= PBLK_SUBMITTED_ENTRY;
  
-@@ -735,15 +719,24 @@ void pblk_rb_sync_end(struct pblk_rb *rb, unsigned long *flags)
+@@ -731,15 +715,24 @@ void pblk_rb_sync_end(struct pblk_rb *rb, unsigned long *flags)
  
  unsigned int pblk_rb_sync_advance(struct pblk_rb *rb, unsigned int nr_entries)
  {
@@ -107,7 +105,7 @@ index 2c61d74..fe5465d 100644
 +
 +		secs_to_flush = pblk_rb_ring_count(flush_point, sync,
 +					rb->nr_entries);
-+		if (secs_to_flush < nr_entries) {
++		if (secs_to_flush <= nr_entries) {
 +			/* Protect flush points */
 +			smp_store_release(&rb->flush_point, EMPTY_ENTRY);
 +		}
@@ -117,7 +115,7 @@ index 2c61d74..fe5465d 100644
  
  	/* Protect from counts */
  	smp_store_release(&rb->sync, sync);
-@@ -751,22 +744,27 @@ unsigned int pblk_rb_sync_advance(struct pblk_rb *rb, unsigned int nr_entries)
+@@ -747,22 +740,27 @@ unsigned int pblk_rb_sync_advance(struct pblk_rb *rb, unsigned int nr_entries)
  	return sync;
  }
  
@@ -184,4 +182,4 @@ index 018af87..aae86ed 100644
  			bio_endio(original_bio);
  	}
 -- 
-2.7.4
+2.9.3
