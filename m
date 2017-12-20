@@ -1,54 +1,56 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f67.google.com ([209.85.160.67]:44967 "EHLO
-        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750937AbdL3XJs (ORCPT
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:40141 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756013AbdLTRWg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Dec 2017 18:09:48 -0500
-Received: by mail-pl0-f67.google.com with SMTP id n13so24956626plp.11
-        for <linux-block@vger.kernel.org>; Sat, 30 Dec 2017 15:09:47 -0800 (PST)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: Kent Overstreet <kent.overstreet@gmail.com>,
-        Michael Lyle <mlyle@lyle.org>
-Subject: [for-416 PATCH 2/2] bcache: mark closure_sync() __sched
-Date: Sat, 30 Dec 2017 15:09:34 -0800
-Message-Id: <20171230230934.910-2-mlyle@lyle.org>
-In-Reply-To: <20171230230934.910-1-mlyle@lyle.org>
-References: <20171230230934.910-1-mlyle@lyle.org>
+        Wed, 20 Dec 2017 12:22:36 -0500
+Received: by mail-wm0-f67.google.com with SMTP id f206so11105957wmf.5
+        for <linux-block@vger.kernel.org>; Wed, 20 Dec 2017 09:22:36 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 22/25] lightnvm: pblk: free write buffer on init failure
+Date: Wed, 20 Dec 2017 18:22:02 +0100
+Message-Id: <20171220172205.26464-23-m@bjorling.me>
+In-Reply-To: <20171220172205.26464-1-m@bjorling.me>
+References: <20171220172205.26464-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Kent Overstreet <kent.overstreet@gmail.com>
+From: Javier González <javier@cnexlabs.com>
 
-[edit by mlyle: include sched/debug.h to get __sched]
+Refactor the way we free the write buffer to ensure that all entries get
+freed in case of an error on the init sequence.
 
-Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
-Signed-off-by: Michael Lyle <mlyle@lyle.org>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- drivers/md/bcache/closure.c | 3 ++-
+ drivers/lightnvm/pblk-init.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/md/bcache/closure.c b/drivers/md/bcache/closure.c
-index 8a4f4e4f5537..23eb3d1223e7 100644
---- a/drivers/md/bcache/closure.c
-+++ b/drivers/md/bcache/closure.c
-@@ -8,6 +8,7 @@
- #include <linux/debugfs.h>
- #include <linux/module.h>
- #include <linux/seq_file.h>
-+#include <linux/sched/debug.h>
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 3150b8f..d603b94 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -355,6 +355,8 @@ static void pblk_core_free(struct pblk *pblk)
+ 	mempool_destroy(pblk->e_rq_pool);
+ 	mempool_destroy(pblk->w_rq_pool);
  
- #include "closure.h"
- 
-@@ -107,7 +108,7 @@ static void closure_sync_fn(struct closure *cl)
- 	wake_up_process(cl->s->task);
++	pblk_rwb_free(pblk);
++
+ 	pblk_free_global_caches(pblk);
  }
  
--void __closure_sync(struct closure *cl)
-+void __sched __closure_sync(struct closure *cl)
- {
- 	struct closure_syncer s = { .task = current };
+@@ -931,7 +933,6 @@ static void pblk_tear_down(struct pblk *pblk)
+ 	pblk_pipeline_stop(pblk);
+ 	pblk_writer_stop(pblk);
+ 	pblk_rb_sync_l2p(&pblk->rwb);
+-	pblk_rwb_free(pblk);
+ 	pblk_rl_free(&pblk->rl);
  
+ 	pr_debug("pblk: consistent tear down\n");
 -- 
-2.14.1
+2.9.3
