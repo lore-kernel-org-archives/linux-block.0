@@ -1,36 +1,126 @@
-Return-Path: <naby88@gmail.com>
-Return-Path: <naby88@gmail.com>
-From: Khan M Rashedun-Naby <naby88@gmail.com>
-To: axboe@kernel.dk
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Khan M Rashedun-Naby <naby88@gmail.com>
-Subject: [PATCH] BLOCK: blk-flush: fixed line with more than 80 character
-Date: Wed, 20 Dec 2017 23:05:17 +0600
-Message-Id: <1513789517-26756-1-git-send-email-naby88@gmail.com>
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	linus.walleij@linaro.org,
+	angeloruocco90@gmail.com,
+	bfq-iosched@googlegroups.com,
+	Paolo Valente <paolo.valente@linaro.com>
+Subject: [PATCH IMPROVEMENT/BUGFIX 4/4] block, bfq: remove superfluous check in queue-merging setup
+Date: Wed, 20 Dec 2017 12:38:34 +0100
+Message-Id: <20171220113834.2578-5-paolo.valente@linaro.org>
+In-Reply-To: <20171220113834.2578-1-paolo.valente@linaro.org>
+References: <20171220113834.2578-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-The line has more than 80 character which is not linux kernel coding
-style. Thus it has rewritten into two lines.
+From: Angelo Ruocco <angeloruocco90@gmail.com>
 
-Signed-off-by: Khan M Rashedun-Naby <naby88@gmail.com>
+When two or more processes do I/O in a way that the their requests are
+sequential in respect to one another, BFQ merges the bfq_queues associated
+with the processes. This way the overall I/O pattern becomes sequential,
+and thus there is a boost in througput.
+These cooperating processes usually start or restart to do I/O shortly
+after each other. So, in order to avoid merging non-cooperating processes,
+BFQ ensures that none of these queues has been in weight raising for too
+long.
+
+In this respect, from commit "block, bfq-sq, bfq-mq: let a queue be merged
+only shortly after being created", BFQ checks whether any queue (and not
+only weight-raised ones) is doing I/O continuously from too long to be
+merged.
+
+This new additional check makes the first one useless: a queue doing
+I/O from long enough, if being weight-raised, is also a queue in
+weight raising for too long to be merged. Accordingly, this commit
+removes the first check.
+
+Signed-off-by: Angelo Ruocco <angeloruocco90@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.com>
 ---
- block/blk-flush.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ block/bfq-iosched.c | 36 +++++-------------------------------
+ 1 file changed, 5 insertions(+), 31 deletions(-)
 
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index f171706..7ab46bb 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -299,7 +299,8 @@ static bool blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq)
- 	struct request *flush_rq = fq->flush_rq;
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 320022135dc8..c66578592c9e 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -1990,20 +1990,6 @@ static bool bfq_may_be_close_cooperator(struct bfq_queue *bfqq,
+ 	return true;
+ }
  
- 	/* C1 described at the top of this file */
--	if (fq->flush_pending_idx != fq->flush_running_idx || list_empty(pending))
-+	if (fq->flush_pending_idx != fq->flush_running_idx ||
-+		list_empty(pending))
- 		return false;
+-/*
+- * If this function returns true, then bfqq cannot be merged. The idea
+- * is that true cooperation happens very early after processes start
+- * to do I/O. Usually, late cooperations are just accidental false
+- * positives. In case bfqq is weight-raised, such false positives
+- * would evidently degrade latency guarantees for bfqq.
+- */
+-static bool wr_from_too_long(struct bfq_queue *bfqq)
+-{
+-	return bfqq->wr_coeff > 1 &&
+-		time_is_before_jiffies(bfqq->last_wr_start_finish +
+-				       msecs_to_jiffies(100));
+-}
+-
+ /*
+  * Attempt to schedule a merge of bfqq with the currently in-service
+  * queue or with a close queue among the scheduled queues.  Return
+@@ -2017,11 +2003,6 @@ static bool wr_from_too_long(struct bfq_queue *bfqq)
+  * to maintain. Besides, in such a critical condition as an out of memory,
+  * the benefits of queue merging may be little relevant, or even negligible.
+  *
+- * Weight-raised queues can be merged only if their weight-raising
+- * period has just started. In fact cooperating processes are usually
+- * started together. Thus, with this filter we avoid false positives
+- * that would jeopardize low-latency guarantees.
+- *
+  * WARNING: queue merging may impair fairness among non-weight raised
+  * queues, for at least two reasons: 1) the original weight of a
+  * merged queue may change during the merged state, 2) even being the
+@@ -2052,9 +2033,7 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 	if (bfqq->new_bfqq)
+ 		return bfqq->new_bfqq;
  
- 	/* C2 and C3
+-	if (!io_struct ||
+-	    wr_from_too_long(bfqq) ||
+-	    unlikely(bfqq == &bfqd->oom_bfqq))
++	if (!io_struct || unlikely(bfqq == &bfqd->oom_bfqq))
+ 		return NULL;
+ 
+ 	/* If there is only one backlogged queue, don't search. */
+@@ -2063,12 +2042,9 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 
+ 	in_service_bfqq = bfqd->in_service_queue;
+ 
+-	if (!in_service_bfqq || in_service_bfqq == bfqq
+-	    || wr_from_too_long(in_service_bfqq) ||
+-	    unlikely(in_service_bfqq == &bfqd->oom_bfqq))
+-		goto check_scheduled;
+-
+-	if (bfq_rq_close_to_sector(io_struct, request, bfqd->last_position) &&
++	if (in_service_bfqq && in_service_bfqq != bfqq &&
++	    likely(in_service_bfqq != &bfqd->oom_bfqq) &&
++	    bfq_rq_close_to_sector(io_struct, request, bfqd->last_position) &&
+ 	    bfqq->entity.parent == in_service_bfqq->entity.parent &&
+ 	    bfq_may_be_close_cooperator(bfqq, in_service_bfqq)) {
+ 		new_bfqq = bfq_setup_merge(bfqq, in_service_bfqq);
+@@ -2080,12 +2056,10 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 	 * queues. The only thing we need is that the bio/request is not
+ 	 * NULL, as we need it to establish whether a cooperator exists.
+ 	 */
+-check_scheduled:
+ 	new_bfqq = bfq_find_close_cooperator(bfqd, bfqq,
+ 			bfq_io_struct_pos(io_struct, request));
+ 
+-	if (new_bfqq && !wr_from_too_long(new_bfqq) &&
+-	    likely(new_bfqq != &bfqd->oom_bfqq) &&
++	if (new_bfqq && likely(new_bfqq != &bfqd->oom_bfqq) &&
+ 	    bfq_may_be_close_cooperator(bfqq, new_bfqq))
+ 		return bfq_setup_merge(bfqq, new_bfqq);
+ 
 -- 
-2.7.4
+2.15.1
