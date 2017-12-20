@@ -1,86 +1,48 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-From: Tejun Heo <tj@kernel.org>
-To: axboe@kernel.dk
-Cc: linux-kernel@vger.kernel.org,
-	oleg@redhat.com,
-	peterz@infradead.org,
-	kernel-team@fb.com,
-	osandov@fb.com,
-	linux-block@vger.kernel.org,
-	hch@lst.de,
-	Tejun Heo <tj@kernel.org>
-Subject: [PATCH 4/6] blk-mq: make blk_abort_request() trigger timeout path
-Date: Tue, 12 Dec 2017 11:01:32 -0800
-Message-Id: <20171212190134.535941-5-tj@kernel.org>
-In-Reply-To: <20171212190134.535941-1-tj@kernel.org>
-References: <20171212190134.535941-1-tj@kernel.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:42300 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756015AbdLTRWi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Dec 2017 12:22:38 -0500
+Received: by mail-wm0-f65.google.com with SMTP id b199so11381861wme.1
+        for <linux-block@vger.kernel.org>; Wed, 20 Dec 2017 09:22:37 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 23/25] lightnvm: pblk: print instance name on instance info
+Date: Wed, 20 Dec 2017 18:22:03 +0100
+Message-Id: <20171220172205.26464-24-m@bjorling.me>
+In-Reply-To: <20171220172205.26464-1-m@bjorling.me>
+References: <20171220172205.26464-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-With issue/complete and timeout paths now using the generation number
-and state based synchronization, blk_abort_request() is the only one
-which depends on REQ_ATOM_COMPLETE for arbitrating completion.
+From: Javier González <javier@cnexlabs.com>
 
-There's no reason for blk_abort_request() to be a completely separate
-path.  This patch makes blk_abort_request() piggyback on the timeout
-path instead of trying to terminate the request directly.
+Add the instance name to the information printed out on target creation.
 
-This removes the last dependency on REQ_ATOM_COMPLETE in blk-mq.
-
-Signed-off-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- block/blk-mq.c      | 2 +-
- block/blk-mq.h      | 2 --
- block/blk-timeout.c | 7 ++++---
- 3 files changed, 5 insertions(+), 6 deletions(-)
+ drivers/lightnvm/pblk-init.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3a08d7a..73d6444 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -785,7 +785,7 @@ struct blk_mq_timeout_data {
- 	unsigned int nr_expired;
- };
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index d603b94..55d3b42 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -1069,7 +1069,8 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
+ 	blk_queue_max_discard_sectors(tqueue, UINT_MAX >> 9);
+ 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, tqueue);
  
--void blk_mq_rq_timed_out(struct request *req, bool reserved)
-+static void blk_mq_rq_timed_out(struct request *req, bool reserved)
- {
- 	const struct blk_mq_ops *ops = req->q->mq_ops;
- 	enum blk_eh_timer_return ret = BLK_EH_RESET_TIMER;
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 154b2fa..1fa83fa 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -94,8 +94,6 @@ extern int blk_mq_sysfs_register(struct request_queue *q);
- extern void blk_mq_sysfs_unregister(struct request_queue *q);
- extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
- 
--extern void blk_mq_rq_timed_out(struct request *req, bool reserved);
--
- void blk_mq_release(struct request_queue *q);
- 
- /**
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index 6427be7..051924f 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -156,12 +156,13 @@ void blk_timeout_work(struct work_struct *work)
-  */
- void blk_abort_request(struct request *req)
- {
--	if (blk_mark_rq_complete(req))
--		return;
- 
- 	if (req->q->mq_ops) {
--		blk_mq_rq_timed_out(req, false);
-+		req->deadline = jiffies;
-+		mod_timer(&req->q->timeout, 0);
- 	} else {
-+		if (blk_mark_rq_complete(req))
-+			return;
- 		blk_delete_timer(req);
- 		blk_rq_timed_out(req);
- 	}
+-	pr_info("pblk init: luns:%u, lines:%d, secs:%llu, buf entries:%u\n",
++	pr_info("pblk(%s): luns:%u, lines:%d, secs:%llu, buf entries:%u\n",
++			tdisk->disk_name,
+ 			geo->all_luns, pblk->l_mg.nr_lines,
+ 			(unsigned long long)pblk->rl.nr_secs,
+ 			pblk->rwb.nr_entries);
 -- 
-2.9.5
+2.9.3
