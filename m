@@ -1,131 +1,48 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from szxga07-in.huawei.com ([45.249.212.35]:45638 "EHLO huawei.com"
-        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751086AbdL1G4r (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Dec 2017 01:56:47 -0500
-From: Hou Tao <houtao1@huawei.com>
-To: <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>
-CC: <shli@kernel.org>, <tj@kernel.org>, <houtao1@huawei.com>
-Subject: [PATCH] blktrace: output io cgroup name for cgroup v1
-Date: Thu, 28 Dec 2017 15:04:00 +0800
-Message-ID: <20171228070400.26328-1-houtao1@huawei.com>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:40131 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756008AbdLTRWe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Dec 2017 12:22:34 -0500
+Received: by mail-wm0-f66.google.com with SMTP id f206so11105702wmf.5
+        for <linux-block@vger.kernel.org>; Wed, 20 Dec 2017 09:22:33 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [PATCH 19/25] lightnvm: pblk: ignore high ecc errors on recovery
+Date: Wed, 20 Dec 2017 18:21:59 +0100
+Message-Id: <20171220172205.26464-20-m@bjorling.me>
+In-Reply-To: <20171220172205.26464-1-m@bjorling.me>
+References: <20171220172205.26464-1-m@bjorling.me>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Now the output of io cgroup name in blktrace is controlled by
-blk_cgroup & blk_cgname options in trace_options files. When
-using cgroup v1 for io controller, there is no output of cgroup
-name in trace file, because cgroup_path_from_kernfs_id() uses
-cgrp_dfl_root.kf_root to find the cgroup file and cgrp_dfl_root
-is only valid for cgroup v2.
+From: Javier González <javier@cnexlabs.com>
 
-So fix cgroup_path_from_kernfs_id() to support both cgroup v1 and v2.
+On recovery, do not stop L2P recovery if reads report high ECC error
+as the data is still available.
 
-Fixes: 69fd5c3 ("blktrace: add an option to allow displaying cgroup path")
-Signed-off-by: Hou Tao <houtao1@huawei.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- include/linux/cgroup.h  |  6 +++---
- kernel/cgroup/cgroup.c  | 39 ++++++++++++++++++++++++++++++++++++---
- kernel/trace/blktrace.c |  4 ++--
- 3 files changed, 41 insertions(+), 8 deletions(-)
+ drivers/lightnvm/pblk-recovery.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
-index 473e0c0..ed80490 100644
---- a/include/linux/cgroup.h
-+++ b/include/linux/cgroup.h
-@@ -651,7 +651,7 @@ static inline union kernfs_node_id *cgroup_get_kernfs_id(struct cgroup *cgrp)
- 	return &cgrp->kn->id;
- }
- 
--void cgroup_path_from_kernfs_id(const union kernfs_node_id *id,
-+void cgroup_path_from_kernfs_id(int ssid, const union kernfs_node_id *id,
- 					char *buf, size_t buflen);
- #else /* !CONFIG_CGROUPS */
- 
-@@ -686,8 +686,8 @@ static inline bool task_under_cgroup_hierarchy(struct task_struct *task,
- 	return true;
- }
- 
--static inline void cgroup_path_from_kernfs_id(const union kernfs_node_id *id,
--	char *buf, size_t buflen) {}
-+static inline void cgroup_path_from_kernfs_id(int ssid,
-+		const union kernfs_node_id *id, char *buf, size_t buflen) {}
- #endif /* !CONFIG_CGROUPS */
- 
- /*
-diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
-index 0b1ffe1..49d63c6 100644
---- a/kernel/cgroup/cgroup.c
-+++ b/kernel/cgroup/cgroup.c
-@@ -5354,16 +5354,49 @@ static int __init cgroup_wq_init(void)
- }
- core_initcall(cgroup_wq_init);
- 
--void cgroup_path_from_kernfs_id(const union kernfs_node_id *id,
-+void cgroup_path_from_kernfs_id(int ssid, const union kernfs_node_id *id,
- 					char *buf, size_t buflen)
- {
-+	struct kernfs_root *root;
- 	struct kernfs_node *kn;
-+	struct cgroup *root_cgrp = NULL;
- 
--	kn = kernfs_get_node_by_id(cgrp_dfl_root.kf_root, id);
--	if (!kn)
-+	if (ssid >= CGROUP_SUBSYS_COUNT)
- 		return;
-+
-+	if (likely(static_key_enabled(cgroup_subsys_on_dfl_key[ssid]))) {
-+		root = cgrp_dfl_root.kf_root;
-+	} else {
-+		struct cgroup_subsys *subsys = cgroup_subsys[ssid];
-+
-+		/*
-+		 * It seems we can not use rcu_read_lock() to protect
-+		 * the liveness check of subsys->root->cgrp. Although
-+		 * root->cgrp is freed by RCU, when we dereference the
-+		 * old root, the old root may been destroying by
-+		 * cgroup_destroy_root().
-+		 */
-+		mutex_lock(&cgroup_mutex);
-+		if (percpu_ref_tryget_live(&subsys->root->cgrp.self.refcnt)) {
-+			root_cgrp = &subsys->root->cgrp;
-+			root = subsys->root->kf_root;
-+		}
-+		mutex_unlock(&cgroup_mutex);
-+
-+		if (!root_cgrp)
-+			goto out;
-+	}
-+
-+	kn = kernfs_get_node_by_id(root, id);
-+	if (!kn)
-+		goto out;
-+
- 	kernfs_path(kn, buf, buflen);
- 	kernfs_put(kn);
-+
-+out:
-+	if (root_cgrp)
-+		cgroup_put(root_cgrp);
- }
- 
- /*
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 987d9a9a..79890e0 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -1279,8 +1279,8 @@ static void blk_log_action(struct trace_iterator *iter, const char *act,
- 		if (blk_tracer_flags.val & TRACE_BLK_OPT_CGNAME) {
- 			char blkcg_name_buf[NAME_MAX + 1] = "<...>";
- 
--			cgroup_path_from_kernfs_id(id, blkcg_name_buf,
--				sizeof(blkcg_name_buf));
-+			cgroup_path_from_kernfs_id(io_cgrp_id, id,
-+				blkcg_name_buf, sizeof(blkcg_name_buf));
- 			trace_seq_printf(&iter->seq, "%3d,%-3d %s %2s %3s ",
- 				 MAJOR(t->device), MINOR(t->device),
- 				 blkcg_name_buf, act, rwbs);
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index fd38036..1d5e961 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -288,7 +288,7 @@ static int pblk_recov_read_oob(struct pblk *pblk, struct pblk_line *line,
+ 	/* At this point, the read should not fail. If it does, it is a problem
+ 	 * we cannot recover from here. Need FTL log.
+ 	 */
+-	if (rqd->error) {
++	if (rqd->error && rqd->error != NVM_RSP_WARN_HIGHECC) {
+ 		pr_err("pblk: L2P recovery failed (%d)\n", rqd->error);
+ 		return -EINTR;
+ 	}
 -- 
-2.9.5
+2.9.3
