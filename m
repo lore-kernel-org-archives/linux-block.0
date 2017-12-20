@@ -1,24 +1,37 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f169.google.com ([209.85.128.169]:42421 "EHLO
-        mail-wr0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S936079AbdLSIZy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Dec 2017 03:25:54 -0500
-Received: by mail-wr0-f169.google.com with SMTP id s66so17809961wrc.9
-        for <linux-block@vger.kernel.org>; Tue, 19 Dec 2017 00:25:53 -0800 (PST)
-Received: from smtp.gmail.com:465 (uk.sesame.canonical.com. [91.189.88.154])
-        by smtp.gmail.com with ESMTPSA id e25sm12147486edc.64.2017.12.19.00.25.50
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 19 Dec 2017 00:25:52 -0800 (PST)
-From: =?UTF-8?q?Jos=C3=A9=20Pekkarinen?= <koalinux@gmail.com>
-To: linux-block@vger.kernel.org
-Subject: 
-Date: Tue, 19 Dec 2017 10:26:11 +0200
-Message-Id: <20171219082612.16584-1-koalinux@gmail.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH V2] block-throttle: avoid double charge
+To: Shaohua Li <shli@fb.com>, linux-block@vger.kernel.org
+Cc: Kernel-team@fb.com, Tejun Heo <tj@kernel.org>,
+ Vivek Goyal <vgoyal@redhat.com>, stable@vger.kernel.org
+References: <23857cbf1d586e904bd01196fa05705fb0161785.1510605343.git.shli@fb.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <0381171c-7d88-77f4-6df0-5f321b93de0e@kernel.dk>
+Date: Wed, 20 Dec 2017 11:12:44 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <23857cbf1d586e904bd01196fa05705fb0161785.1510605343.git.shli@fb.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-This patch enables scsi pm on systems where mq is explicitly disabled.
+On 11/13/17 1:37 PM, Shaohua Li wrote:
+> If a bio is throttled and splitted after throttling, the bio could be
+> resubmited and enters the throttling again. This will cause part of the
+> bio is charged multiple times. If the cgroup has an IO limit, the double
+> charge will significantly harm the performance. The bio split becomes
+> quite common after arbitrary bio size change.
+> 
+> To fix this, we always set the BIO_THROTTLED flag if a bio is throttled.
+> If the bio is cloned/slitted, we copy the flag to new bio too to avoid
+> double charge. However cloned bio could be directed to a new disk,
+> keeping the flag will have problem. The observation is we always set new
+> disk for the bio in this case, so we can clear the flag in
+> bio_set_dev().
+> 
+> This issue exists a long time, arbitrary bio size change makes it worse,
+> so this should go into stable at least since v4.2.
+> 
+> V1-> V2: Not add extra field in bio based on discussion with Tejun
+
+Applied, thanks Shaohua.
+
+-- 
+Jens Axboe
