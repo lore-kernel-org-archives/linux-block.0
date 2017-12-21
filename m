@@ -1,78 +1,130 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	angeloruocco90@gmail.com,
-	bfq-iosched@googlegroups.com,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH IMPROVEMENT] block, bfq: increase threshold to deem I/O as random
-Date: Wed, 20 Dec 2017 17:27:36 +0100
-Message-Id: <20171220162736.5067-1-paolo.valente@linaro.org>
+Return-Path: <prvs=5218034d2=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V9 0/7] blk-mq support for ZBC disks
+Date: Thu, 21 Dec 2017 15:43:37 +0900
+Message-Id: <20171221064344.6228-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-If two processes do I/O close to each other, i.e., are cooperating
-processes in BFQ (and CFQ'S) nomenclature, then BFQ merges their
-associated bfq_queues, so as to get sequential I/O from the union of
-the I/O requests of the processes, and thus reach a higher
-throughput. A merged queue is then split if its I/O stops being
-sequential. In this respect, BFQ deems the I/O of a bfq_queue as
-(mostly) sequential only if less than 4 I/O requests are random, out
-of the last 32 requests inserted into the queue.
+This series, formerly titled "scsi-mq support for ZBC disks", implements
+support for ZBC disks for system using the scsi-mq I/O path.
 
-Unfortunately, extensive testing (with the interleaved_io benchmark of
-the S suite [1], and with real applications spawning cooperating
-processes) has clearly shown that, with such a low threshold, only a
-rather low I/O throughput may be reached when several cooperating
-processes do I/O. In particular, the outcome of each test run was
-bimodal: if queue merging occurred and was stable during the test,
-then the throughput was close to the peak rate of the storage device,
-otherwise the throughput was arbitrarily low (usually around 1/10 of
-the peak rate with a rotational device). The probability to get the
-unlucky outcomes grew with the number of cooperating processes: it was
-already significant with 5 processes, and close to one with 7 or more
-processes.
+The current scsi level support of ZBC disks guarantees write request ordering
+using a per-zone write lock which prevents issuing simultaneously multiple
+write commands to a zone, doing so avoid reordering of sequential writes to
+sequential zones. This method is however ineffective when scsi-mq is used with
+zoned block devices. This is due to the different execution model of blk-mq
+which passes a request to the scsi layer for dispatching after the request has
+been removed from the I/O scheduler queue. That is, when the scsi layer tries
+to lock the target zone of the request, the request may already be out of
+order and zone write locking fails to prevent that.
 
-The cause of the low throughput in the unlucky runs was that the
-merged queues containing the I/O of these cooperating processes were
-soon split, because they contained more random I/O requests than those
-tolerated by the 4/32 threshold, but
-- that I/O would have however allowed the storage device to reach
-  peak throughput or almost peak throughput;
-- in contrast, the I/O of these processes, if served individually
-  (from separate queues) yielded a rather low throughput.
+Various approaches have been tried to solve this problem directly from the core
+code of blk-mq. All of them had the serious disadvantage of cluttering blk-mq
+code with zoned block device specific conditions and processing, making
+maintenance and testing difficult.
 
-So we repeated our tests with increasing values of the threshold,
-until we found the minimum value (19) for which we obtained maximum
-throughput, reliably, with at least up to 9 cooperating
-processes. Then we checked that the use of that higher threshold value
-did not cause any regression for any other benchmark in the suite [1].
-This commit raises the threshold to such a higher value.
+This series adds blk-mq support for zoned block devices at the I/O scheduler
+level with simple modifications of the mq-deadline scheduler. Implementation
+is done with reusable helpers defined in the zoned block device support file
+(blk-zoned.c). These helpers provide per zone write locking control functions
+similar to what was implemented directly in the SCSI layer in sd_zbc.c.
+The zone write locking mechanism is used by mq-deadline for the exact same
+purpose, that is, to limit writes per zone to at most one request to avoid
+reordering.
 
-[1] https://github.com/Algodev-github/S
+The changes to mq-deadline do not affect its operation with regular disks. The
+same scheduling behavior is maintained for these devices. Compared to the SCSI
+layer zone locking implementation, this series optimizes avoids locking
+conventional zones which result in a use of these zone that is comparable to a
+regular disk.
 
-Signed-off-by: Angelo Ruocco <angeloruocco90@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This series also implements changes to the legacy deadline-iosched. Doing so,
+the zone locking code at the SCSI layer in sd.c and sd_zbc.c can be removed.
+This results in a significant simplification of the sd driver command handling.
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index c66578592c9e..e33c5c4c9856 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -192,7 +192,7 @@ static struct kmem_cache *bfq_pool;
- #define BFQQ_SEEK_THR		(sector_t)(8 * 100)
- #define BFQQ_SECT_THR_NONROT	(sector_t)(2 * 32)
- #define BFQQ_CLOSE_THR		(sector_t)(8 * 1024)
--#define BFQQ_SEEKY(bfqq)	(hweight32(bfqq->seek_history) > 32/8)
-+#define BFQQ_SEEKY(bfqq)	(hweight32(bfqq->seek_history) > 19)
- 
- /* Min number of samples required to perform peak-rate update */
- #define BFQ_RATE_MIN_SAMPLES	32
+Patch 1 to 5 introduce the zone locking helpers in the block layer and modify
+the deadline and mq-deadline schedulers.
+Patch 6 and 7 remove the SCSI layer zone locking and initialize the device
+request queue zone information.
+
+All patches apply without conflicts to the scsi tree branch 4.16/scsi-queue, to
+the block tree branch for-linus as well as to the current 4.15-rc4 tree.
+
+Of note is that this series imposes the use of the deadline and mq-deadline
+schedulers with zoned block devices. A system can trivialy enforce this using
+a udev rule such as:
+
+ACTION=="add|change", KERNEL=="sd[a-z]", ATTRS{queue/zoned}=="host-managed", \
+ATTR{queue/scheduler}="deadline"
+
+This rules applies equally for the legacy SCSI path as well as the scsi-mq path
+thanks to "mq-deadline" being aliased to "deadline".
+
+Comments are as always very much appreciated.
+
+Changes from v8:
+* Rebased on 4.15-rc4
+
+Changes from v7:
+* Merged patch 8 into patch 6
+* Fixed various typos and commit messages
+
+Changes from v6:
+* Implement zone write locking helpers in the block layer
+* Also modify legacy path deadline scheduler to remove all zone write locking
+  code from the scsi layer
+
+Changes from v5:
+* Refactor patches to introduce the zone_lock spinlock only when needed
+* Addressed Bart's comments (in particular explanations of the zone_lock
+  spinlock use)
+
+Changes from v4:
+* Various fixes and improvements (From Christoph's comments)
+* Dropped zones_wlock scheduler tunable attribute
+
+Changes from v3:
+* Integrated support directly into mq-deadline instead of creating a new I/O
+  scheduler.
+* Disable setting of default mq scheduler for single queue devices
+
+Changes from v2:
+* Introduced blk_zoned structure
+* Moved I/O scheduler from drivers/scsi to block
+
+Changes from v1:
+* Addressed Bart's comments for the blk-mq patches (declarations files)
+* Split (former) patch 4 into multiple patches to facilitate review
+* Fixed scsi disk lookup from io scheduler by introducing
+  scsi_disk_from_queue()
+
+Christoph Hellwig (1):
+  block: introduce zoned block devices zone write locking
+
+Damien Le Moal (6):
+  mq-deadline: Introduce dispatch helpers
+  mq-deadline: Introduce zone locking support
+  deadline-iosched: Introduce dispatch helpers
+  deadline-iosched: Introduce zone locking support
+  sd_zbc: Initialize device request queue zoned data
+  sd: Remove zone write locking
+
+ block/blk-core.c         |   1 +
+ block/blk-zoned.c        |  42 +++++++++
+ block/deadline-iosched.c | 114 ++++++++++++++++++++---
+ block/mq-deadline.c      | 130 ++++++++++++++++++++++++--
+ drivers/scsi/sd.c        |  41 +--------
+ drivers/scsi/sd.h        |  11 ---
+ drivers/scsi/sd_zbc.c    | 235 +++++++++++++++++++++++++++++------------------
+ include/linux/blkdev.h   | 111 ++++++++++++++++++++++
+ include/scsi/scsi_cmnd.h |   3 +-
+ 9 files changed, 528 insertions(+), 160 deletions(-)
+
 -- 
-2.15.1
+2.14.3
