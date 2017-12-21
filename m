@@ -1,56 +1,40 @@
-Return-Path: <James.Bottomley@hansenpartnership.com>
-Message-ID: <1513902570.3132.22.camel@HansenPartnership.com>
+Return-Path: <bruno@wolff.to>
+Date: Thu, 21 Dec 2017 17:16:03 -0600
+From: Bruno Wolff III <bruno@wolff.to>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: weiping zhang <zwp10758@gmail.com>, Laura Abbott <labbott@redhat.com>,
+  Jan Kara <jack@suse.cz>, linux-mm@kvack.org,
+  Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+  regressions@leemhuis.info, weiping zhang <zhangweiping@didichuxing.com>,
+  linux-block@vger.kernel.org
 Subject: Re: Regression with a0747a859ef6 ("bdi: add error handle for
  bdi_debug_register")
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: Jens Axboe <axboe@kernel.dk>, Bruno Wolff III <bruno@wolff.to>, weiping
-	zhang <zwp10758@gmail.com>
-Cc: Laura Abbott <labbott@redhat.com>, Jan Kara <jack@suse.cz>,
- linux-mm@kvack.org, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>,  regressions@leemhuis.info, weiping zhang
- <zhangweiping@didichuxing.com>,  linux-block@vger.kernel.org
-Date: Thu, 21 Dec 2017 16:29:30 -0800
-In-Reply-To: <14f04d43-728a-953f-e07c-e7f9d5e3392d@kernel.dk>
+Message-ID: <20171221231603.GA15702@wolff.to>
 References: <b1415a6d-fccd-31d0-ffa2-9b54fa699692@redhat.com>
-	 <20171221130057.GA26743@wolff.to>
-	 <CAA70yB6Z=r+zO7E+ZP74jXNk_XM2CggYthAD=TKOdBVsHLLV-w@mail.gmail.com>
-	 <20171221151843.GA453@wolff.to>
-	 <CAA70yB496Nuy2FM5idxLZthBwOVbhtsZ4VtXNJ_9mj2cvNC4kA@mail.gmail.com>
-	 <20171221153631.GA2300@wolff.to>
-	 <CAA70yB6nD7CiDZUpVPy7cGhi7ooQ5SPkrcXPDKqSYD2ezLrGHA@mail.gmail.com>
-	 <20171221164221.GA23680@wolff.to>
-	 <14f04d43-728a-953f-e07c-e7f9d5e3392d@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+ <20171221130057.GA26743@wolff.to>
+ <CAA70yB6Z=r+zO7E+ZP74jXNk_XM2CggYthAD=TKOdBVsHLLV-w@mail.gmail.com>
+ <20171221151843.GA453@wolff.to>
+ <CAA70yB496Nuy2FM5idxLZthBwOVbhtsZ4VtXNJ_9mj2cvNC4kA@mail.gmail.com>
+ <20171221153631.GA2300@wolff.to>
+ <CAA70yB6nD7CiDZUpVPy7cGhi7ooQ5SPkrcXPDKqSYD2ezLrGHA@mail.gmail.com>
+ <20171221164221.GA23680@wolff.to>
+ <14f04d43-728a-953f-e07c-e7f9d5e3392d@kernel.dk>
+ <20171221181531.GA21050@wolff.to>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <20171221181531.GA21050@wolff.to>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, 2017-12-21 at 10:02 -0700, Jens Axboe wrote:
-> On 12/21/17 9:42 AM, Bruno Wolff III wrote:
-> > 
-> > On Thu, Dec 21, 2017 at 23:48:19 +0800,
-> >   weiping zhang <zwp10758@gmail.com> wrote:
-> > > 
-> > > > 
-> > > > output you want. I never saw it for any kernels I compiled
-> > > > myself. Only when I test kernels built by Fedora do I see it.
-> > > > see it every boot ?
-> > 
-> > I don't look every boot. The warning gets scrolled of the screen.
-> > Once I see the CPU hang warnings I know the boot is failing. I
-> > don't always look at journalctl later to see what's there.
-> 
-> I'm going to revert a0747a859ef6 for now, since we're now 8 days into
-> this and no progress has been made on fixing it.
+On Thu, Dec 21, 2017 at 12:15:31 -0600,
+  Bruno Wolff III <bruno@wolff.to> wrote:
+>
+>One important thing I have just found is that it looks like the 
+>problem only happens when booting in enforcing mode. If I boot in 
+>permissive mode it does not happen. My home machines are currently set 
+>to boot in permissive mode and I'll test this evening to see if I can 
+>reproduce the problem if I change them to enforcing mode. If so I'll 
+>be able to do lots of testing during my vacation.
 
-I think this is correct.  If you build the kernel with
-CONFIG_DEBUG_FS=N, you're definitely going to get the same hang
-(because the debugfs_ functions fail with -ENODEV and the bdi will
-never get registered).  This alone leads me to suspect the commit is
-bogus because it's a randconfig/test accident waiting to happen.
-
-We should still root cause the debugfs failure in this case, but I
-really think debugfs files should be treated as optional, so a failure
-in setting them up should translate to some sort of warning not a
-failure to set up the bdi.
-
-James
+Enforcing mode alone isn't enough as I tested that one one machine at 
+home and it didn't trigger the problem. I'll try another machine late 
+tonight.
