@@ -1,116 +1,126 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:57096 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750915AbdLLLDN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Dec 2017 06:03:13 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Yi Zhang <yi.zhang@redhat.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Ming Lei <ming.lei@redhat.com>, stable@vger.kernel.org
-Subject: [PATCH 1/6] blk-mq: quiesce queue before freeing queue
-Date: Tue, 12 Dec 2017 19:02:27 +0800
-Message-Id: <20171212110232.12495-2-ming.lei@redhat.com>
-In-Reply-To: <20171212110232.12495-1-ming.lei@redhat.com>
-References: <20171212110232.12495-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=5218034d2=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V9 4/7] deadline-iosched: Introduce dispatch helpers
+Date: Thu, 21 Dec 2017 15:43:41 +0900
+Message-Id: <20171221064344.6228-5-damien.lemoal@wdc.com>
+In-Reply-To: <20171221064344.6228-1-damien.lemoal@wdc.com>
+References: <20171221064344.6228-1-damien.lemoal@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-After queue is frozen, dispatch still may happen, for example:
+Avoid directly referencing the next_rq and fifo_list arrays using the
+helper functions deadline_next_request() and deadline_fifo_request() to
+facilitate changes in the dispatch request selection in
+deadline_dispatch_requests() for zoned block devices.
 
-1) requests are submitted from several contexts
-2) requests from all these contexts are inserted to queue, but may dispatch
-to LLD in one of these paths, but other paths sill need to move on even all
-these requests are completed(that means blk_mq_freeze_queue_wait() returns
-at that time)
-3) dispatch after queue freezing still moves on and causes use-after-free,
-because request queue is freed
+While at it, also remove the unnecessary forward declaration of the
+function deadline_move_request().
 
-This patch quiesces queue after it is frozen, and makes sure all
-in-progress dispatch are completed.
-
-This patch fixes the following kernel crash when running heavy IOs vs.
-deleting device:
-
-[   36.719251] BUG: unable to handle kernel NULL pointer dereference at 0000000000000008
-[   36.720318] IP: kyber_has_work+0x14/0x40
-[   36.720847] PGD 254bf5067 P4D 254bf5067 PUD 255e6a067 PMD 0
-[   36.721584] Oops: 0000 [#1] PREEMPT SMP
-[   36.722105] Dumping ftrace buffer:
-[   36.722570]    (ftrace buffer empty)
-[   36.723057] Modules linked in: scsi_debug ebtable_filter ebtables ip6table_filter ip6_tables tcm_loop iscsi_target_mod target_core_file target_core_iblock target_core_pscsi target_core_mod xt_CHECKSUM iptable_mangle ipt_MASQUERADE nf_nat_masquerade_ipv4 iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 nf_nat nf_conntrack libcrc32c bridge stp llc fuse iptable_filter ip_tables sd_mod sg btrfs xor zstd_decompress zstd_compress xxhash raid6_pq mptsas mptscsih bcache crc32c_intel ahci mptbase libahci serio_raw scsi_transport_sas nvme libata shpchp lpc_ich virtio_scsi nvme_core binfmt_misc dm_mod iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi null_blk configs
-[   36.733438] CPU: 2 PID: 2374 Comm: fio Not tainted 4.15.0-rc2.blk_mq_quiesce+ #714
-[   36.735143] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.9.3-1.fc25 04/01/2014
-[   36.736688] RIP: 0010:kyber_has_work+0x14/0x40
-[   36.737515] RSP: 0018:ffffc9000209bca0 EFLAGS: 00010202
-[   36.738431] RAX: 0000000000000008 RBX: ffff88025578bfc8 RCX: ffff880257bf4ed0
-[   36.739581] RDX: 0000000000000038 RSI: ffffffff81a98c6d RDI: ffff88025578bfc8
-[   36.740730] RBP: ffff880253cebfc8 R08: ffffc9000209bda0 R09: ffff8802554f3480
-[   36.741885] R10: ffffc9000209be60 R11: ffff880263f72538 R12: ffff88025573e9e8
-[   36.743036] R13: ffff88025578bfd0 R14: 0000000000000001 R15: 0000000000000000
-[   36.744189] FS:  00007f9b9bee67c0(0000) GS:ffff88027fc80000(0000) knlGS:0000000000000000
-[   36.746617] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   36.748483] CR2: 0000000000000008 CR3: 0000000254bf4001 CR4: 00000000003606e0
-[   36.750164] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[   36.751455] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[   36.752796] Call Trace:
-[   36.753992]  blk_mq_do_dispatch_sched+0x7f/0xe0
-[   36.755110]  blk_mq_sched_dispatch_requests+0x119/0x190
-[   36.756179]  __blk_mq_run_hw_queue+0x83/0x90
-[   36.757144]  __blk_mq_delay_run_hw_queue+0xaf/0x110
-[   36.758046]  blk_mq_run_hw_queue+0x24/0x70
-[   36.758845]  blk_mq_flush_plug_list+0x1e7/0x270
-[   36.759676]  blk_flush_plug_list+0xd6/0x240
-[   36.760463]  blk_finish_plug+0x27/0x40
-[   36.761195]  do_io_submit+0x19b/0x780
-[   36.761921]  ? entry_SYSCALL_64_fastpath+0x1a/0x7d
-[   36.762788]  entry_SYSCALL_64_fastpath+0x1a/0x7d
-[   36.763639] RIP: 0033:0x7f9b9699f697
-[   36.764352] RSP: 002b:00007ffc10f991b8 EFLAGS: 00000206 ORIG_RAX: 00000000000000d1
-[   36.765773] RAX: ffffffffffffffda RBX: 00000000008f6f00 RCX: 00007f9b9699f697
-[   36.766965] RDX: 0000000000a5e6c0 RSI: 0000000000000001 RDI: 00007f9b8462a000
-[   36.768377] RBP: 0000000000000000 R08: 0000000000000001 R09: 00000000008f6420
-[   36.769649] R10: 00007f9b846e5000 R11: 0000000000000206 R12: 00007f9b795d6a70
-[   36.770807] R13: 00007f9b795e4140 R14: 00007f9b795e3fe0 R15: 0000000100000000
-[   36.771955] Code: 83 c7 10 e9 3f 68 d1 ff 0f 1f 44 00 00 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 8b 97 b0 00 00 00 48 8d 42 08 48 83 c2 38 <48> 3b 00 74 06 b8 01 00 00 00 c3 48 3b 40 08 75 f4 48 83 c0 10
-[   36.775004] RIP: kyber_has_work+0x14/0x40 RSP: ffffc9000209bca0
-[   36.776012] CR2: 0000000000000008
-[   36.776690] ---[ end trace 4045cbce364ff2a4 ]---
-[   36.777527] Kernel panic - not syncing: Fatal exception
-[   36.778526] Dumping ftrace buffer:
-[   36.779313]    (ftrace buffer empty)
-[   36.780081] Kernel Offset: disabled
-[   36.780877] ---[ end Kernel panic - not syncing: Fatal exception
-
-Cc: stable@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 ---
- block/blk-core.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ block/deadline-iosched.c | 47 +++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 37 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index b8881750a3ac..071a0fb29597 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -694,6 +694,15 @@ void blk_cleanup_queue(struct request_queue *q)
- 	queue_flag_set(QUEUE_FLAG_DEAD, q);
- 	spin_unlock_irq(lock);
+diff --git a/block/deadline-iosched.c b/block/deadline-iosched.c
+index b83f77460d28..81e3f0897457 100644
+--- a/block/deadline-iosched.c
++++ b/block/deadline-iosched.c
+@@ -50,8 +50,6 @@ struct deadline_data {
+ 	int front_merges;
+ };
  
-+	/*
-+	 * make sure all in-progress dispatch are completed because
-+	 * blk_freeze_queue() can only complete all requests, and
-+	 * dispatch may still be in-progress since we dispatch requests
-+	 * from more than one contexts
-+	 */
-+	if (q->mq_ops)
-+		blk_mq_quiesce_queue(q);
+-static void deadline_move_request(struct deadline_data *, struct request *);
+-
+ static inline struct rb_root *
+ deadline_rb_root(struct deadline_data *dd, struct request *rq)
+ {
+@@ -230,6 +228,35 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
+ 	return 0;
+ }
+ 
++/*
++ * For the specified data direction, return the next request to dispatch using
++ * arrival ordered lists.
++ */
++static struct request *
++deadline_fifo_request(struct deadline_data *dd, int data_dir)
++{
++	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
++		return NULL;
 +
- 	/* for synchronous bio-based driver finish in-flight integrity i/o */
- 	blk_flush_integrity();
++	if (list_empty(&dd->fifo_list[data_dir]))
++		return NULL;
++
++	return rq_entry_fifo(dd->fifo_list[data_dir].next);
++}
++
++/*
++ * For the specified data direction, return the next request to dispatch using
++ * sector position sorted lists.
++ */
++static struct request *
++deadline_next_request(struct deadline_data *dd, int data_dir)
++{
++	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
++		return NULL;
++
++	return dd->next_rq[data_dir];
++}
++
+ /*
+  * deadline_dispatch_requests selects the best request according to
+  * read/write expire, fifo_batch, etc
+@@ -239,16 +266,15 @@ static int deadline_dispatch_requests(struct request_queue *q, int force)
+ 	struct deadline_data *dd = q->elevator->elevator_data;
+ 	const int reads = !list_empty(&dd->fifo_list[READ]);
+ 	const int writes = !list_empty(&dd->fifo_list[WRITE]);
+-	struct request *rq;
++	struct request *rq, *next_rq;
+ 	int data_dir;
  
+ 	/*
+ 	 * batches are currently reads XOR writes
+ 	 */
+-	if (dd->next_rq[WRITE])
+-		rq = dd->next_rq[WRITE];
+-	else
+-		rq = dd->next_rq[READ];
++	rq = deadline_next_request(dd, WRITE);
++	if (!rq)
++		rq = deadline_next_request(dd, READ);
+ 
+ 	if (rq && dd->batching < dd->fifo_batch)
+ 		/* we have a next request are still entitled to batch */
+@@ -291,19 +317,20 @@ static int deadline_dispatch_requests(struct request_queue *q, int force)
+ 	/*
+ 	 * we are not running a batch, find best request for selected data_dir
+ 	 */
+-	if (deadline_check_fifo(dd, data_dir) || !dd->next_rq[data_dir]) {
++	next_rq = deadline_next_request(dd, data_dir);
++	if (deadline_check_fifo(dd, data_dir) || !next_rq) {
+ 		/*
+ 		 * A deadline has expired, the last request was in the other
+ 		 * direction, or we have run out of higher-sectored requests.
+ 		 * Start again from the request with the earliest expiry time.
+ 		 */
+-		rq = rq_entry_fifo(dd->fifo_list[data_dir].next);
++		rq = deadline_fifo_request(dd, data_dir);
+ 	} else {
+ 		/*
+ 		 * The last req was the same dir and we have a next request in
+ 		 * sort order. No expired requests so continue on from here.
+ 		 */
+-		rq = dd->next_rq[data_dir];
++		rq = next_rq;
+ 	}
+ 
+ 	dd->batching = 0;
 -- 
-2.9.5
+2.14.3
