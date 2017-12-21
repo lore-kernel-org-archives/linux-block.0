@@ -1,206 +1,135 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH IMPROVEMENT] block, bfq: limit sectors served with interactive weight raising
-Date: Thu, 28 Dec 2017 12:19:17 +0100
-Message-Id: <20171228111917.2767-1-paolo.valente@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from smtp2.provo.novell.com ([137.65.250.81]:51700 "EHLO
+        smtp2.provo.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752141AbdLUJOk (ORCPT
+        <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
+        Thu, 21 Dec 2017 04:14:40 -0500
+Subject: Re: bfq: BUG bfq_queue: Objects remaining in bfq_queue on
+ __kmem_cache_shutdown() after rmmod
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        DAVIDE FERRARI <162996@studenti.unimore.it>
+References: <b46422e2-3614-858f-4861-75c67ce38faa@applied-asynchrony.com>
+ <9c96f320-a7db-4db0-adbc-34f9510ce84d@suse.com>
+ <AA4ED17E-BDF6-41F6-84CF-85B591AFB17C@linaro.org>
+From: Guoqing Jiang <gqjiang@suse.com>
+Message-ID: <a00667a1-8fa0-9064-9925-da0432f94663@suse.com>
+Date: Thu, 21 Dec 2017 17:14:32 +0800
+MIME-Version: 1.0
+In-Reply-To: <AA4ED17E-BDF6-41F6-84CF-85B591AFB17C@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-To maximise responsiveness, BFQ raises the weight, and performs device
-idling, for bfq_queues associated with processes deemed as
-interactive. In particular, weight raising has a maximum duration,
-equal to the time needed to start a large application. If a
-weight-raised process goes on doing I/O beyond this maximum duration,
-it loses weight-raising.
 
-This mechanism is evidently vulnerable to the following false
-positives: I/O-bound applications that will go on doing I/O for much
-longer than the duration of weight-raising. These applications have
-basically no benefit from being weight-raised at the beginning of
-their I/O. On the opposite end, while being weight-raised, these
-applications
-a) unjustly steal throughput to applications that may truly need
-low latency;
-b) make BFQ uselessly perform device idling; device idling results
-in loss of device throughput with most flash-based storage, and may
-increase latencies when used purposelessly.
 
-This commit adds a countermeasure to reduce both the above
-problems. To introduce this countermeasure, we provide the following
-extra piece of information (full details in the comments added by this
-commit). During the start-up of the large application used as a
-reference to set the duration of weight-raising, involved processes
-transfer at most ~110K sectors each. Accordingly, a process initially
-deemed as interactive has no right to be weight-raised any longer,
-once transferred 110K sectors or more.
+On 12/21/2017 03:53 PM, Paolo Valente wrote:
+>
+>> Il giorno 21 dic 2017, alle ore 08:08, Guoqing Jiang <gqjiang@suse.com> ha scritto:
+>>
+>> Hi,
+>>
+>>
+>> On 12/08/2017 08:34 AM, Holger Hoffstätte wrote:
+>>> So plugging in a device on USB with BFQ as scheduler now works without
+>>> hiccup (probably thanks to Ming Lei's last patch), but of course I found
+>>> another problem. Unmounting the device after use, changing the scheduler
+>>> back to deadline or kyber and rmmod'ing the BFQ module reproducibly gives me:
+>>>
+>>> kernel: =============================================================================
+>>> kernel: BUG bfq_queue (Tainted: G    B          ): Objects remaining in bfq_queue on __kmem_cache_shutdown()
+>>> kernel: -----------------------------------------------------------------------------
+>>> kernel:
+>>> kernel: INFO: Slab 0xffffea001601fc00 objects=37 used=3 fp=0xffff8805807f0360 flags=0x8000000000008100
+>>> kernel: CPU: 0 PID: 9967 Comm: rmmod Tainted: G    B           4.14.5 #1
+>>> kernel: Hardware name: Gigabyte Technology Co., Ltd. P67-DS3-B3/P67-DS3-B3, BIOS F1 05/06/2011
+>>> kernel: Call Trace:
+>>> kernel:  dump_stack+0x46/0x5e
+>>> kernel:  slab_err+0x9e/0xb0
+>>> kernel:  ? on_each_cpu_mask+0x35/0x40
+>>> kernel:  ? ksm_migrate_page+0x60/0x60
+>>> kernel:  ? __kmalloc+0x1c9/0x1d0
+>>> kernel:  __kmem_cache_shutdown+0x177/0x350
+>>> kernel:  shutdown_cache+0xf/0x130
+>>> kernel:  kmem_cache_destroy+0x19e/0x1b0
+>>> kernel:  SyS_delete_module+0x168/0x230
+>>> kernel:  ? exit_to_usermode_loop+0x39/0x80
+>>> kernel:  entry_SYSCALL_64_fastpath+0x13/0x94
+>>> kernel: RIP: 0033:0x7f53e4136b97
+>>> kernel: RSP: 002b:00007ffd660061d8 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
+>>> kernel: RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f53e4136b97
+>>> kernel: RDX: 000000000000000a RSI: 0000000000000800 RDI: 00000000006247f8
+>>> kernel: RBP: 0000000000000000 R08: 00007ffd66005171 R09: 0000000000000000
+>>> kernel: R10: 00007f53e41acbc0 R11: 0000000000000206 R12: 0000000000624790
+>>> kernel: R13: 00007ffd660051d0 R14: 0000000000624790 R15: 0000000000623260
+>>> kernel: INFO: Object 0xffff8805807f0000 @offset=0
+>>> kernel: INFO: Object 0xffff8805807f01b0 @offset=432
+>>> kernel: INFO: Object 0xffff8805807f3cc0 @offset=15552
+>>> kernel: kmem_cache_destroy bfq_queue: Slab cache still has objects
+>>> kernel: CPU: 0 PID: 9967 Comm: rmmod Tainted: G    B           4.14.5 #1
+>>> kernel: Hardware name: Gigabyte Technology Co., Ltd. P67-DS3-B3/P67-DS3-B3, BIOS F1 05/06/2011
+>>> kernel: Call Trace:
+>>> kernel:  dump_stack+0x46/0x5e
+>>> kernel:  kmem_cache_destroy+0x191/0x1b0
+>>> kernel:  SyS_delete_module+0x168/0x230
+>>> kernel:  ? exit_to_usermode_loop+0x39/0x80
+>>> kernel:  entry_SYSCALL_64_fastpath+0x13/0x94
+>>> kernel: RIP: 0033:0x7f53e4136b97
+>>> kernel: RSP: 002b:00007ffd660061d8 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
+>>> kernel: RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f53e4136b97
+>>> kernel: RDX: 000000000000000a RSI: 0000000000000800 RDI: 00000000006247f8
+>>> kernel: RBP: 0000000000000000 R08: 00007ffd66005171 R09: 0000000000000000
+>>> kernel: R10: 00007f53e41acbc0 R11: 0000000000000206 R12: 0000000000624790
+>>> kernel: R13: 00007ffd660051d0 R14: 0000000000624790 R15: 0000000000623260
+>>>
+>> I also encountered the similar bug, seems there are some async objects which are not freed with
+>> BFQ_GROUP_IOSCHED build as "Y".
+>>
+>> If revert part of commit e21b7a0b988772e82e7147e1c659a5afe2ae003c ("block, bfq: add full hierarchical
+>> scheduling and cgroups support")like below, then I can't see the bug again with simple test.
+>>
+>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+>> index 889a8549d97f..c640e64e042f 100644
+>> --- a/block/bfq-iosched.c
+>> +++ b/block/bfq-iosched.c
+>> @@ -4710,6 +4710,7 @@ static void bfq_exit_queue(struct elevator_queue *e)
+>>          spin_lock_irq(&bfqd->lock);
+>>          list_for_each_entry_safe(bfqq, n, &bfqd->idle_list, bfqq_list)
+>>                  bfq_deactivate_bfqq(bfqd, bfqq, false, false);
+>> +       bfq_put_async_queues(bfqd, bfqd->root_group);
+>>          spin_unlock_irq(&bfqd->lock);
+>>
+>>          hrtimer_cancel(&bfqd->idle_slice_timer);
+>> @@ -4718,7 +4719,6 @@ static void bfq_exit_queue(struct elevator_queue *e)
+>>          blkcg_deactivate_policy(bfqd->queue, &blkcg_policy_bfq);
+>>   #else
+>>          spin_lock_irq(&bfqd->lock);
+>> -       bfq_put_async_queues(bfqd, bfqd->root_group);
+>>          kfree(bfqd->root_group);
+>>          spin_unlock_irq(&bfqd->lock);
+>>
+>> But perhaps we should do it inside blkcg_deactivate_policy, right?
+>>
+> Thank you very much for investigating this. And yes, I removed that bfq_put_async_queues invocation a long ago, because it had to be done in blkcg_deactivate_policy; and actually it was invoked as expected. We are trying to understand what is going wrong now.
 
-Basing on this consideration, this commit early-ends weight-raising
-for a bfq_queue if the latter happens to have received an amount of
-service at least equal to 110K sectors (actually, a little bit more,
-to keep a safety margin). I/O-bound applications that reach a high
-throughput, such as file copy, get to this threshold much before the
-allowed weight-raising period finishes. Thus this early ending of
-weight-raising reduces the amount of time during which these
-applications cause the problems described above.
+Thanks for the in formations. I find another way, does it make sense?
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 81 +++++++++++++++++++++++++++++++++++++++++++++++------
- block/bfq-iosched.h |  5 ++++
- block/bfq-wf2q.c    |  3 ++
- 3 files changed, 80 insertions(+), 9 deletions(-)
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index da1525ec4c87..0a070daf96c7 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -474,7 +474,10 @@ static void bfq_pd_init(struct blkg_policy_data *pd)
+  static void bfq_pd_free(struct blkg_policy_data *pd)
+  {
+         struct bfq_group *bfqg = pd_to_bfqg(pd);
++       struct bfq_data *bfqd = bfqg->bfqd;
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 6f75015d18c0..ea48b5c8f088 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -209,15 +209,17 @@ static struct kmem_cache *bfq_pool;
-  * interactive applications automatically, using the following formula:
-  * duration = (R / r) * T, where r is the peak rate of the device, and
-  * R and T are two reference parameters.
-- * In particular, R is the peak rate of the reference device (see below),
-- * and T is a reference time: given the systems that are likely to be
-- * installed on the reference device according to its speed class, T is
-- * about the maximum time needed, under BFQ and while reading two files in
-- * parallel, to load typical large applications on these systems.
-- * In practice, the slower/faster the device at hand is, the more/less it
-- * takes to load applications with respect to the reference device.
-- * Accordingly, the longer/shorter BFQ grants weight raising to interactive
-- * applications.
-+ * In particular, R is the peak rate of the reference device (see
-+ * below), and T is a reference time: given the systems that are
-+ * likely to be installed on the reference device according to its
-+ * speed class, T is about the maximum time needed, under BFQ and
-+ * while reading two files in parallel, to load typical large
-+ * applications on these systems (see the comments on
-+ * max_service_from_wr below, for more details on how T is obtained).
-+ * In practice, the slower/faster the device at hand is, the more/less
-+ * it takes to load applications with respect to the reference device.
-+ * Accordingly, the longer/shorter BFQ grants weight raising to
-+ * interactive applications.
-  *
-  * BFQ uses four different reference pairs (R, T), depending on:
-  * . whether the device is rotational or non-rotational;
-@@ -254,6 +256,60 @@ static int T_slow[2];
- static int T_fast[2];
- static int device_speed_thresh[2];
- 
-+/*
-+ * BFQ uses the above-detailed, time-based weight-raising mechanism to
-+ * privilege interactive tasks. This mechanism is vulnerable to the
-+ * following false positives: I/O-bound applications that will go on
-+ * doing I/O for much longer than the duration of weight
-+ * raising. These applications have basically no benefit from being
-+ * weight-raised at the beginning of their I/O. On the opposite end,
-+ * while being weight-raised, these applications
-+ * a) unjustly steal throughput to applications that may actually need
-+ * low latency;
-+ * b) make BFQ uselessly perform device idling; device idling results
-+ * in loss of device throughput with most flash-based storage, and may
-+ * increase latencies when used purposelessly.
-+ *
-+ * BFQ tries to reduce these problems, by adopting the following
-+ * countermeasure. To introduce this countermeasure, we need first to
-+ * finish explaining how the duration of weight-raising for
-+ * interactive tasks is computed.
-+ *
-+ * For a bfq_queue deemed as interactive, the duration of weight
-+ * raising is dynamically adjusted, as a function of the estimated
-+ * peak rate of the device, so as to be equal to the time needed to
-+ * execute the 'largest' interactive task we benchmarked so far. By
-+ * largest task, we mean the task for which each involved process has
-+ * to do more I/O than for any of the other tasks we benchmarked. This
-+ * reference interactive task is the start-up of LibreOffice Writer,
-+ * and in this task each process/bfq_queue needs to have at most ~110K
-+ * sectors transferred.
-+ *
-+ * This last piece of information enables BFQ to reduce the actual
-+ * duration of weight-raising for at least one class of I/O-bound
-+ * applications: those doing sequential or quasi-sequential I/O. An
-+ * example is file copy. In fact, once started, the main I/O-bound
-+ * processes of these applications usually consume the above 110K
-+ * sectors in much less time than the processes of an application that
-+ * is starting, because these I/O-bound processes will greedily devote
-+ * almost all their CPU cycles only to their target,
-+ * throughput-friendly I/O operations. This is even more true if BFQ
-+ * happens to be underestimating the device peak rate, and thus
-+ * overestimating the duration of weight raising. But, according to
-+ * our measurements, once transferred 110K sectors, these processes
-+ * have no right to be weight-raised any longer.
-+ *
-+ * Basing on the last consideration, BFQ ends weight-raising for a
-+ * bfq_queue if the latter happens to have received an amount of
-+ * service at least equal to the following constant. The constant is
-+ * set to slightly more than 110K, to have a minimum safety margin.
-+ *
-+ * This early ending of weight-raising reduces the amount of time
-+ * during which interactive false positives cause the two problems
-+ * described at the beginning of these comments.
-+ */
-+static const unsigned long max_service_from_wr = 120000;
-+
- #define RQ_BIC(rq)		icq_to_bic((rq)->elv.priv[0])
- #define RQ_BFQQ(rq)		((rq)->elv.priv[1])
- 
-@@ -1352,6 +1408,7 @@ static void bfq_update_bfqq_wr_on_rq_arrival(struct bfq_data *bfqd,
- 	if (old_wr_coeff == 1 && wr_or_deserves_wr) {
- 		/* start a weight-raising period */
- 		if (interactive) {
-+			bfqq->service_from_wr = 0;
- 			bfqq->wr_coeff = bfqd->bfq_wr_coeff;
- 			bfqq->wr_cur_max_time = bfq_wr_duration(bfqd);
- 		} else {
-@@ -3665,6 +3722,12 @@ static void bfq_update_wr_data(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- 				bfqq->entity.prio_changed = 1;
- 			}
- 		}
-+		if (bfqq->wr_coeff > 1 &&
-+		    bfqq->wr_cur_max_time != bfqd->bfq_wr_rt_max_time &&
-+		    bfqq->service_from_wr > max_service_from_wr) {
-+			/* see comments on max_service_from_wr */
-+			bfq_bfqq_end_wr(bfqq);
-+		}
- 	}
- 	/*
- 	 * To improve latency (for this or other queues), immediately
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index fcd941008127..350c39ae2896 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -337,6 +337,11 @@ struct bfq_queue {
- 	 * last transition from idle to backlogged.
- 	 */
- 	unsigned long service_from_backlogged;
-+	/*
-+	 * Cumulative service received from the @bfq_queue since its
-+	 * last transition to weight-raised state.
-+	 */
-+	unsigned long service_from_wr;
- 
- 	/*
- 	 * Value of wr start time when switching to soft rt
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 4456eda34e48..4498c43245e2 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -838,6 +838,9 @@ void bfq_bfqq_served(struct bfq_queue *bfqq, int served)
- 	if (!bfqq->service_from_backlogged)
- 		bfqq->first_IO_time = jiffies;
- 
-+	if (bfqq->wr_coeff > 1)
-+		bfqq->service_from_wr += served;
-+
- 	bfqq->service_from_backlogged += served;
- 	for_each_entity(entity) {
- 		st = bfq_entity_service_tree(entity);
--- 
-2.15.1
++       if (bfqd)
++               bfq_put_async_queues(bfqd, bfqg);
+         bfqg_stats_exit(&bfqg->stats);
+         bfqg_put(bfqg);
+  }
+
+Regards,
+Guoqing
