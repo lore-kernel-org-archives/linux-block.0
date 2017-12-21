@@ -1,62 +1,59 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f49.google.com ([74.125.82.49]:45919 "EHLO
+        mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751389AbdLULJu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Dec 2017 06:09:50 -0500
+Received: by mail-wm0-f49.google.com with SMTP id 9so15178523wme.4
+        for <linux-block@vger.kernel.org>; Thu, 21 Dec 2017 03:09:49 -0800 (PST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: severe regression with random I/O from (at least) 4.14?
 From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	angeloruocco90@gmail.com,
-	bfq-iosched@googlegroups.com,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH IMPROVEMENT/BUGFIX 2/4] block, bfq: check low_latency flag in bfq_bfqq_save_state()
-Date: Wed, 20 Dec 2017 12:38:32 +0100
-Message-Id: <20171220113834.2578-3-paolo.valente@linaro.org>
-In-Reply-To: <20171220113834.2578-1-paolo.valente@linaro.org>
-References: <20171220113834.2578-1-paolo.valente@linaro.org>
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <DA18383E-B4BE-4491-B49E-84D1A555B89B@linaro.org>
+Date: Thu, 21 Dec 2017 12:09:47 +0100
+Cc: Linus Walleij <linus.walleij@linaro.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Mark Brown <broonie@kernel.org>,
+        DAVIDE FERRARI <162996@studenti.unimore.it>
+Message-Id: <EC5420CE-8EB2-4E29-8C3E-FB961F616327@linaro.org>
+References: <DA18383E-B4BE-4491-B49E-84D1A555B89B@linaro.org>
+To: linux-block <linux-block@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Angelo Ruocco <angeloruocco90@gmail.com>
 
-A just-created bfq_queue will certainly be deemed as interactive on
-the arrival of its first I/O request, if the low_latency flag is
-set. Yet, if the queue is merged with another queue on the arrival of
-its first I/O request, it will not have the chance to be flagged as
-interactive. Nevertheless, if the queue is then split soon enough, it
-has to be flagged as interactive after the split.
 
-To handle this early-merge scenario correctly, BFQ saves the state of
-the queue, on the merge, as if the latter had already been deemed
-interactive. So, if the queue is split soon, it will get
-weight-raised, because the previous state of the queue is resumed on
-the split.
+> Il giorno 21 dic 2017, alle ore 11:57, Paolo Valente =
+<paolo.valente@linaro.org> ha scritto:
+>=20
+> Hi,
+> a few minutes ago I bumped into this apparent severe regression, with =
+4.15-rc4 and an SSD PLEXTOR PX-256M5S. If, with none as I/O scheduler, I =
+do
+> fio --name=3Dglobal --rw=3Drandread --size=3D512m --name=3Djob1
+>=20
+> I get
+> read : io=3D524288KB, bw=3D34402KB/s, iops=3D8600, runt=3D 15240msec
+>=20
+> This device had to reach at least 40 KIOPS. I retried with mq-deadline =
+too, and then with a 4.14, same outcome in all cases. I asked some =
+colleague to repeat the test with his/her device. Same outcome, so far, =
+also with an SSD 850 EVO 250GB.
+>=20
+> I'm sorry if I'm making some colossal mistake.
+>=20
 
-Unfortunately, in the act of saving the state of the newly-created
-queue, BFQ doesn't check whether the low_latency flag is set, and this
-causes early-merged queues to be then weight-raised, on queue splits,
-even if low_latency is off. This commit addresses this problem by
-adding the missing check.
+Forget it, sorry. I was confused by a failed test where iodepth was =
+higher than 1, and I am sleeping too little ...
 
-Signed-off-by: Angelo Ruocco <angeloruocco90@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Thanks,
+Paolo
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index c6f0b93a769c..f58367ef98c1 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -2064,7 +2064,8 @@ static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
- 	bic->saved_in_large_burst = bfq_bfqq_in_large_burst(bfqq);
- 	bic->was_in_burst_list = !hlist_unhashed(&bfqq->burst_list_node);
- 	if (unlikely(bfq_bfqq_just_created(bfqq) &&
--		     !bfq_bfqq_in_large_burst(bfqq))) {
-+		     !bfq_bfqq_in_large_burst(bfqq) &&
-+		     bfqq->bfqd->low_latency)) {
- 		/*
- 		 * bfqq being merged right after being created: bfqq
- 		 * would have deserved interactive weight raising, but
--- 
-2.15.1
+> Thanks,
+> Paolo
+>=20
+>=20
+>=20
