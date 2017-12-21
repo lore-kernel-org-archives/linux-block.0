@@ -1,53 +1,220 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	angeloruocco90@gmail.com,
-	bfq-iosched@googlegroups.com,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH IMPROVEMENT/BUGFIX 1/4] block, bfq: add missing rq_pos_tree update on rq removal
-Date: Wed, 20 Dec 2017 12:38:31 +0100
-Message-Id: <20171220113834.2578-2-paolo.valente@linaro.org>
-In-Reply-To: <20171220113834.2578-1-paolo.valente@linaro.org>
-References: <20171220113834.2578-1-paolo.valente@linaro.org>
+Return-Path: <prvs=5218034d2=damien.lemoal@wdc.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
+To: linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <Bart.VanAssche@wdc.com>
+Subject: [PATCH V9 3/7] mq-deadline: Introduce zone locking support
+Date: Thu, 21 Dec 2017 15:43:40 +0900
+Message-Id: <20171221064344.6228-4-damien.lemoal@wdc.com>
+In-Reply-To: <20171221064344.6228-1-damien.lemoal@wdc.com>
+References: <20171221064344.6228-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-If two processes do I/O close to each other, then BFQ merges the
-bfq_queues associated with these processes, to get a more sequential
-I/O, and thus a higher throughput.  In this respect, to detect whether
-two processes are doing I/O close to each other, BFQ keeps a list of
-the head-of-line I/O requests of all active bfq_queues.  The list is
-ordered by initial sectors, and implemented through a red-black tree
-(rq_pos_tree).
+Introduce zone write locking to avoid write request reordering with
+zoned block devices. This is achieved using a finer selection of the
+next request to dispatch:
+1) Any non-write request is always allowed to proceed.
+2) Any write to a conventional zone is always allowed to proceed.
+3) For a write to a sequential zone, the zone lock is first checked.
+   a) If the zone is not locked, the write is allowed to proceed after
+      its target zone is locked.
+   b) If the zone is locked, the write request is skipped and the next
+      request in the dispatch queue tested (back to step 1).
 
-Unfortunately, the update of the rq_pos_tree was incomplete, because
-the tree was not updated on the removal of the head-of-line I/O
-request of a bfq_queue, in case the queue did not remain empty. This
-commit adds the missing update.
+For a write request that has locked its target zone, the zone is
+unlocked either when the request completes with a call to the method
+deadline_request_completed() or when the request is requeued using
+dd_insert_request().
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Angelo Ruocco <angeloruocco90@gmail.com>
+Requests targeting a locked zone are always left in the scheduler queue
+to preserve the lba ordering for write requests. If no write request
+can be dispatched, allow reads to be dispatched even if the write batch
+is not done.
+
+If the device used is not a zoned block device, or if zoned block device
+support is disabled, this patch does not modify mq-deadline behavior.
+
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 ---
- block/bfq-iosched.c | 2 ++
- 1 file changed, 2 insertions(+)
+ block/mq-deadline.c | 89 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 86 insertions(+), 3 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index a9e06217e64d..c6f0b93a769c 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -1627,6 +1627,8 @@ static void bfq_remove_request(struct request_queue *q,
- 			rb_erase(&bfqq->pos_node, bfqq->pos_root);
- 			bfqq->pos_root = NULL;
- 		}
-+	} else {
-+		bfq_pos_tree_add_move(bfqd, bfqq);
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index 8bd6db9e69c7..d56972e8ebda 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -59,6 +59,7 @@ struct deadline_data {
+ 	int front_merges;
+ 
+ 	spinlock_t lock;
++	spinlock_t zone_lock;
+ 	struct list_head dispatch;
+ };
+ 
+@@ -198,13 +199,33 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
+ static struct request *
+ deadline_fifo_request(struct deadline_data *dd, int data_dir)
+ {
++	struct request *rq;
++	unsigned long flags;
++
+ 	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
+ 		return NULL;
+ 
+ 	if (list_empty(&dd->fifo_list[data_dir]))
+ 		return NULL;
+ 
+-	return rq_entry_fifo(dd->fifo_list[data_dir].next);
++	rq = rq_entry_fifo(dd->fifo_list[data_dir].next);
++	if (data_dir == READ || !blk_queue_is_zoned(rq->q))
++		return rq;
++
++	/*
++	 * Look for a write request that can be dispatched, that is one with
++	 * an unlocked target zone.
++	 */
++	spin_lock_irqsave(&dd->zone_lock, flags);
++	list_for_each_entry(rq, &dd->fifo_list[WRITE], queuelist) {
++		if (blk_req_can_dispatch_to_zone(rq))
++			goto out;
++	}
++	rq = NULL;
++out:
++	spin_unlock_irqrestore(&dd->zone_lock, flags);
++
++	return rq;
+ }
+ 
+ /*
+@@ -214,10 +235,32 @@ deadline_fifo_request(struct deadline_data *dd, int data_dir)
+ static struct request *
+ deadline_next_request(struct deadline_data *dd, int data_dir)
+ {
++	struct request *rq;
++	unsigned long flags;
++
+ 	if (WARN_ON_ONCE(data_dir != READ && data_dir != WRITE))
+ 		return NULL;
+ 
+-	return dd->next_rq[data_dir];
++	rq = dd->next_rq[data_dir];
++	if (!rq)
++		return NULL;
++
++	if (data_dir == READ || !blk_queue_is_zoned(rq->q))
++		return rq;
++
++	/*
++	 * Look for a write request that can be dispatched, that is one with
++	 * an unlocked target zone.
++	 */
++	spin_lock_irqsave(&dd->zone_lock, flags);
++	while (rq) {
++		if (blk_req_can_dispatch_to_zone(rq))
++			break;
++		rq = deadline_latter_request(rq);
++	}
++	spin_unlock_irqrestore(&dd->zone_lock, flags);
++
++	return rq;
+ }
+ 
+ /*
+@@ -259,7 +302,8 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	if (reads) {
+ 		BUG_ON(RB_EMPTY_ROOT(&dd->sort_list[READ]));
+ 
+-		if (writes && (dd->starved++ >= dd->writes_starved))
++		if (deadline_fifo_request(dd, WRITE) &&
++		    (dd->starved++ >= dd->writes_starved))
+ 			goto dispatch_writes;
+ 
+ 		data_dir = READ;
+@@ -304,6 +348,13 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 		rq = next_rq;
  	}
  
- 	if (rq->cmd_flags & REQ_META)
++	/*
++	 * For a zoned block device, if we only have writes queued and none of
++	 * them can be dispatched, rq will be NULL.
++	 */
++	if (!rq)
++		return NULL;
++
+ 	dd->batching = 0;
+ 
+ dispatch_request:
+@@ -313,6 +364,10 @@ static struct request *__dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	dd->batching++;
+ 	deadline_move_request(dd, rq);
+ done:
++	/*
++	 * If the request needs its target zone locked, do it.
++	 */
++	blk_req_zone_write_lock(rq);
+ 	rq->rq_flags |= RQF_STARTED;
+ 	return rq;
+ }
+@@ -368,6 +423,7 @@ static int dd_init_queue(struct request_queue *q, struct elevator_type *e)
+ 	dd->front_merges = 1;
+ 	dd->fifo_batch = fifo_batch;
+ 	spin_lock_init(&dd->lock);
++	spin_lock_init(&dd->zone_lock);
+ 	INIT_LIST_HEAD(&dd->dispatch);
+ 
+ 	q->elevator = eq;
+@@ -424,6 +480,12 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ 	struct deadline_data *dd = q->elevator->elevator_data;
+ 	const int data_dir = rq_data_dir(rq);
+ 
++	/*
++	 * This may be a requeue of a write request that has locked its
++	 * target zone. If it is the case, this releases the zone lock.
++	 */
++	blk_req_zone_write_unlock(rq);
++
+ 	if (blk_mq_sched_try_insert_merge(q, rq))
+ 		return;
+ 
+@@ -468,6 +530,26 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
+ 	spin_unlock(&dd->lock);
+ }
+ 
++/*
++ * For zoned block devices, write unlock the target zone of
++ * completed write requests. Do this while holding the zone lock
++ * spinlock so that the zone is never unlocked while deadline_fifo_request()
++ * while deadline_next_request() are executing.
++ */
++static void dd_completed_request(struct request *rq)
++{
++	struct request_queue *q = rq->q;
++
++	if (blk_queue_is_zoned(q)) {
++		struct deadline_data *dd = q->elevator->elevator_data;
++		unsigned long flags;
++
++		spin_lock_irqsave(&dd->zone_lock, flags);
++		blk_req_zone_write_unlock(rq);
++		spin_unlock_irqrestore(&dd->zone_lock, flags);
++	}
++}
++
+ static bool dd_has_work(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
+@@ -669,6 +751,7 @@ static struct elevator_type mq_deadline = {
+ 	.ops.mq = {
+ 		.insert_requests	= dd_insert_requests,
+ 		.dispatch_request	= dd_dispatch_request,
++		.completed_request	= dd_completed_request,
+ 		.next_request		= elv_rb_latter_request,
+ 		.former_request		= elv_rb_former_request,
+ 		.bio_merge		= dd_bio_merge,
 -- 
-2.15.1
+2.14.3
