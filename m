@@ -1,32 +1,29 @@
-Return-Path: <keith.busch@intel.com>
-Date: Tue, 26 Dec 2017 13:35:18 -0700
-From: Keith Busch <keith.busch@intel.com>
-To: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
 Subject: Re: [PATCH 1/3] nvme/pci: Start request after doorbell ring
-Message-ID: <20171226203518.GA13188@localhost.localdomain>
+To: Keith Busch <keith.busch@intel.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>
 References: <20171221204636.2924-1-keith.busch@intel.com>
  <20171221204636.2924-2-keith.busch@intel.com>
- <8c7c2b8a-7e26-c1a1-4681-8c7721184d39@grimberg.me>
+ <45a16b4c-fbc0-106d-df37-439374c7b5dc@kernel.dk>
+ <118beb1f-54eb-c65d-1c9c-4775ebde1fa8@kernel.dk>
+ <20171221210250.GA2975@localhost.localdomain>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <f980d842-7995-61cf-ece2-36af67b626dc@grimberg.me>
+Date: Mon, 25 Dec 2017 12:12:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <8c7c2b8a-7e26-c1a1-4681-8c7721184d39@grimberg.me>
+In-Reply-To: <20171221210250.GA2975@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Dec 25, 2017 at 12:11:47PM +0200, Sagi Grimberg wrote:
-> > This is a performance optimization that allows the hardware to work on
-> > a command in parallel with the kernel's stats and timeout tracking.
+
+>> But that does bring up the fact if we should always be doing the
+>> nvme_process_cq(nvmeq) after IO submission. For direct/hipri IO,
+>> maybe it's better to make the submission path faster and skip it?
 > 
-> Curious to know what does this buy us?
+> Yes, I am okay to remove the opprotunistic nvme_process_cq in the
+> submission path. Even under deeply queued IO, I've not seen this provide
+> any measurable benefit.
 
-blk_mq_start_request doesn't do anything to make the command ready to
-submit to hardware, so this is pure software overhead, somewhere between
-200-300 nanoseconds as far as I can measure (YMMV). We can post the command
-to hardware before taking on this software overhead so the hardware gets
-to fetch the command that much sooner.
-
-One thing to remember is we need to ensure the driver can't complete the
-request before starting it. The driver's exisitng locking does ensure
-that with this patch, so it's just something to keep in mind if anything
-should ever change in the future.
++100 for removing it. Never really understood why it gets us anything...
