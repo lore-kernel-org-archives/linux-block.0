@@ -1,262 +1,168 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:40115 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755975AbdLTRW2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Dec 2017 12:22:28 -0500
-Received: by mail-wm0-f67.google.com with SMTP id f206so11105173wmf.5
-        for <linux-block@vger.kernel.org>; Wed, 20 Dec 2017 09:22:27 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 13/25] lightnvm: pblk: rename sync_point to flush_point
-Date: Wed, 20 Dec 2017 18:21:53 +0100
-Message-Id: <20171220172205.26464-14-m@bjorling.me>
-In-Reply-To: <20171220172205.26464-1-m@bjorling.me>
-References: <20171220172205.26464-1-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	linus.walleij@linaro.org,
+	bfq-iosched@googlegroups.com,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH IMPROVEMENT/BUGFIX 1/1] block, bfq: limit tags for writes and async I/O
+Date: Wed, 27 Dec 2017 13:15:07 +0100
+Message-Id: <20171227121507.4280-2-paolo.valente@linaro.org>
+In-Reply-To: <20171227121507.4280-1-paolo.valente@linaro.org>
+References: <20171227121507.4280-1-paolo.valente@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Asynchronous I/O can easily starve synchronous I/O (both sync reads
+and sync writes), by consuming all request tags. Similarly, storms of
+synchronous writes, such as those that sync(2) may trigger, can starve
+synchronous reads. In their turn, these two problems may also cause
+BFQ to loose control on latency for interactive and soft real-time
+applications. For example, on a PLEXTOR PX-256M5S SSD, LibreOffice
+Writer takes 0.6 seconds to start if the device is idle, but it takes
+more than 45 seconds (!) if there are sequential writes in the
+background.
 
-Sync point is a really confusing name for keeping track of
-the last entry that needs to be flushed so change the name
-to to flush_point instead.
+This commit addresses this issue by limiting the maximum percentage of
+tags that asynchronous I/O requests and synchronous write requests can
+consume. In particular, this commit grants a higher threshold to
+synchronous writes, to prevent the latter from being starved by
+asynchronous I/O.
 
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+According to the above test, LibreOffice Writer now starts in about
+1.2 seconds on average, regardless of the background workload, and
+apart from some rare outlier. To check this improvement, run, e.g.,
+sudo ./comm_startup_lat.sh bfq 5 5 seq 10 "lowriter --terminate_after_init"
+for the comm_startup_lat benchmark in the S suite [1].
+
+[1] https://github.com/Algodev-github/S
+
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- drivers/lightnvm/pblk-rb.c    | 61 ++++++++++++++++++++++---------------------
- drivers/lightnvm/pblk-write.c |  2 +-
- drivers/lightnvm/pblk.h       |  6 ++---
- 3 files changed, 35 insertions(+), 34 deletions(-)
+ block/bfq-iosched.c | 77 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ block/bfq-iosched.h | 12 +++++++++
+ 2 files changed, 89 insertions(+)
 
-diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
-index 62db408..941842e 100644
---- a/drivers/lightnvm/pblk-rb.c
-+++ b/drivers/lightnvm/pblk-rb.c
-@@ -54,7 +54,7 @@ int pblk_rb_init(struct pblk_rb *rb, struct pblk_rb_entry *rb_entry_base,
- 	rb->seg_size = (1 << power_seg_sz);
- 	rb->nr_entries = (1 << power_size);
- 	rb->mem = rb->subm = rb->sync = rb->l2p_update = 0;
--	rb->sync_point = EMPTY_ENTRY;
-+	rb->flush_point = EMPTY_ENTRY;
- 
- 	spin_lock_init(&rb->w_lock);
- 	spin_lock_init(&rb->s_lock);
-@@ -112,7 +112,7 @@ int pblk_rb_init(struct pblk_rb *rb, struct pblk_rb_entry *rb_entry_base,
- 	up_write(&pblk_rb_lock);
- 
- #ifdef CONFIG_NVM_DEBUG
--	atomic_set(&rb->inflight_sync_point, 0);
-+	atomic_set(&rb->inflight_flush_point, 0);
- #endif
- 
- 	/*
-@@ -349,26 +349,26 @@ void pblk_rb_write_entry_gc(struct pblk_rb *rb, void *data,
- 	smp_store_release(&entry->w_ctx.flags, flags);
- }
- 
--static int pblk_rb_sync_point_set(struct pblk_rb *rb, struct bio *bio,
-+static int pblk_rb_flush_point_set(struct pblk_rb *rb, struct bio *bio,
- 				  unsigned int pos)
- {
- 	struct pblk_rb_entry *entry;
--	unsigned int subm, sync_point;
-+	unsigned int subm, flush_point;
- 
- 	subm = READ_ONCE(rb->subm);
- 
- #ifdef CONFIG_NVM_DEBUG
--	atomic_inc(&rb->inflight_sync_point);
-+	atomic_inc(&rb->inflight_flush_point);
- #endif
- 
- 	if (pos == subm)
- 		return 0;
- 
--	sync_point = (pos == 0) ? (rb->nr_entries - 1) : (pos - 1);
--	entry = &rb->entries[sync_point];
-+	flush_point = (pos == 0) ? (rb->nr_entries - 1) : (pos - 1);
-+	entry = &rb->entries[flush_point];
- 
--	/* Protect syncs */
--	smp_store_release(&rb->sync_point, sync_point);
-+	/* Protect flush points */
-+	smp_store_release(&rb->flush_point, flush_point);
- 
- 	if (!bio)
- 		return 0;
-@@ -416,7 +416,7 @@ void pblk_rb_flush(struct pblk_rb *rb)
- 	struct pblk *pblk = container_of(rb, struct pblk, rwb);
- 	unsigned int mem = READ_ONCE(rb->mem);
- 
--	if (pblk_rb_sync_point_set(rb, NULL, mem))
-+	if (pblk_rb_flush_point_set(rb, NULL, mem))
- 		return;
- 
- 	pblk_write_should_kick(pblk);
-@@ -440,7 +440,7 @@ static int pblk_rb_may_write_flush(struct pblk_rb *rb, unsigned int nr_entries,
- #ifdef CONFIG_NVM_DEBUG
- 		atomic_long_inc(&pblk->nr_flush);
- #endif
--		if (pblk_rb_sync_point_set(&pblk->rwb, bio, mem))
-+		if (pblk_rb_flush_point_set(&pblk->rwb, bio, mem))
- 			*io_ret = NVM_IO_OK;
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index e33c5c4c9856..6f75015d18c0 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -417,6 +417,82 @@ static struct request *bfq_choose_req(struct bfq_data *bfqd,
  	}
- 
-@@ -607,17 +607,18 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
- 		}
- 
- 		if (flags & PBLK_FLUSH_ENTRY) {
--			unsigned int sync_point;
-+			unsigned int flush_point;
- 
--			sync_point = READ_ONCE(rb->sync_point);
--			if (sync_point == pos) {
--				/* Protect syncs */
--				smp_store_release(&rb->sync_point, EMPTY_ENTRY);
-+			flush_point = READ_ONCE(rb->flush_point);
-+			if (flush_point == pos) {
-+				/* Protect flush points */
-+				smp_store_release(&rb->flush_point,
-+							EMPTY_ENTRY);
- 			}
- 
- 			flags &= ~PBLK_FLUSH_ENTRY;
- #ifdef CONFIG_NVM_DEBUG
--			atomic_dec(&rb->inflight_sync_point);
-+			atomic_dec(&rb->inflight_flush_point);
- #endif
- 		}
- 
-@@ -746,20 +747,20 @@ unsigned int pblk_rb_sync_advance(struct pblk_rb *rb, unsigned int nr_entries)
- 	return sync;
  }
  
--unsigned int pblk_rb_sync_point_count(struct pblk_rb *rb)
-+unsigned int pblk_rb_flush_point_count(struct pblk_rb *rb)
- {
--	unsigned int subm, sync_point;
-+	unsigned int subm, flush_point;
- 	unsigned int count;
++/*
++ * See the comments on bfq_limit_depth for the purpose of
++ * the depths set in the function.
++ */
++static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
++{
++	bfqd->sb_shift = bt->sb.shift;
++
++	/*
++	 * In-word depths if no bfq_queue is being weight-raised:
++	 * leaving 25% of tags only for sync reads.
++	 *
++	 * In next formulas, right-shift the value
++	 * (1U<<bfqd->sb_shift), instead of computing directly
++	 * (1U<<(bfqd->sb_shift - something)), to be robust against
++	 * any possible value of bfqd->sb_shift, without having to
++	 * limit 'something'.
++	 */
++	/* no more than 50% of tags for async I/O */
++	bfqd->word_depths[0][0] = max((1U<<bfqd->sb_shift)>>1, 1U);
++	/*
++	 * no more than 75% of tags for sync writes (25% extra tags
++	 * w.r.t. async I/O, to prevent async I/O from starving sync
++	 * writes)
++	 */
++	bfqd->word_depths[0][1] = max(((1U<<bfqd->sb_shift) * 3)>>2, 1U);
++
++	/*
++	 * In-word depths in case some bfq_queue is being weight-
++	 * raised: leaving ~63% of tags for sync reads. This is the
++	 * highest percentage for which, in our tests, application
++	 * start-up times didn't suffer from any regression due to tag
++	 * shortage.
++	 */
++	/* no more than ~18% of tags for async I/O */
++	bfqd->word_depths[1][0] = max(((1U<<bfqd->sb_shift) * 3)>>4, 1U);
++	/* no more than ~37% of tags for sync writes (~20% extra tags) */
++	bfqd->word_depths[1][1] = max(((1U<<bfqd->sb_shift) * 6)>>4, 1U);
++}
++
++/*
++ * Async I/O can easily starve sync I/O (both sync reads and sync
++ * writes), by consuming all tags. Similarly, storms of sync writes,
++ * such as those that sync(2) may trigger, can starve sync reads.
++ * Limit depths of async I/O and sync writes so as to counter both
++ * problems.
++ */
++static void bfq_limit_depth(unsigned int op, struct blk_mq_alloc_data *data)
++{
++	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
++	struct bfq_data *bfqd = data->q->elevator->elevator_data;
++	struct sbitmap_queue *bt;
++
++	if (op_is_sync(op) && !op_is_write(op))
++		return;
++
++	if (data->flags & BLK_MQ_REQ_RESERVED) {
++		if (unlikely(!tags->nr_reserved_tags)) {
++			WARN_ON_ONCE(1);
++			return;
++		}
++		bt = &tags->breserved_tags;
++	} else
++		bt = &tags->bitmap_tags;
++
++	if (unlikely(bfqd->sb_shift != bt->sb.shift))
++		bfq_update_depths(bfqd, bt);
++
++	data->shallow_depth =
++		bfqd->word_depths[!!bfqd->wr_busy_queues][op_is_sync(op)];
++
++	bfq_log(bfqd, "[%s] wr_busy %d sync %d depth %u",
++			__func__, bfqd->wr_busy_queues, op_is_sync(op),
++			data->shallow_depth);
++}
++
+ static struct bfq_queue *
+ bfq_rq_pos_tree_lookup(struct bfq_data *bfqd, struct rb_root *root,
+ 		     sector_t sector, struct rb_node **ret_parent,
+@@ -5265,6 +5341,7 @@ static struct elv_fs_entry bfq_attrs[] = {
  
--	/* Protect syncs */
--	sync_point = smp_load_acquire(&rb->sync_point);
--	if (sync_point == EMPTY_ENTRY)
-+	/* Protect flush points */
-+	flush_point = smp_load_acquire(&rb->flush_point);
-+	if (flush_point == EMPTY_ENTRY)
- 		return 0;
- 
- 	subm = READ_ONCE(rb->subm);
- 
- 	/* The sync point itself counts as a sector to sync */
--	count = pblk_rb_ring_count(sync_point, subm, rb->nr_entries) + 1;
-+	count = pblk_rb_ring_count(flush_point, subm, rb->nr_entries) + 1;
- 
- 	return count;
- }
-@@ -801,7 +802,7 @@ int pblk_rb_tear_down_check(struct pblk_rb *rb)
- 
- 	if ((rb->mem == rb->subm) && (rb->subm == rb->sync) &&
- 				(rb->sync == rb->l2p_update) &&
--				(rb->sync_point == EMPTY_ENTRY)) {
-+				(rb->flush_point == EMPTY_ENTRY)) {
- 		goto out;
- 	}
- 
-@@ -848,7 +849,7 @@ ssize_t pblk_rb_sysfs(struct pblk_rb *rb, char *buf)
- 		queued_entries++;
- 	spin_unlock_irq(&rb->s_lock);
- 
--	if (rb->sync_point != EMPTY_ENTRY)
-+	if (rb->flush_point != EMPTY_ENTRY)
- 		offset = scnprintf(buf, PAGE_SIZE,
- 			"%u\t%u\t%u\t%u\t%u\t%u\t%u - %u/%u/%u - %d\n",
- 			rb->nr_entries,
-@@ -857,14 +858,14 @@ ssize_t pblk_rb_sysfs(struct pblk_rb *rb, char *buf)
- 			rb->sync,
- 			rb->l2p_update,
- #ifdef CONFIG_NVM_DEBUG
--			atomic_read(&rb->inflight_sync_point),
-+			atomic_read(&rb->inflight_flush_point),
- #else
- 			0,
- #endif
--			rb->sync_point,
-+			rb->flush_point,
- 			pblk_rb_read_count(rb),
- 			pblk_rb_space(rb),
--			pblk_rb_sync_point_count(rb),
-+			pblk_rb_flush_point_count(rb),
- 			queued_entries);
- 	else
- 		offset = scnprintf(buf, PAGE_SIZE,
-@@ -875,13 +876,13 @@ ssize_t pblk_rb_sysfs(struct pblk_rb *rb, char *buf)
- 			rb->sync,
- 			rb->l2p_update,
- #ifdef CONFIG_NVM_DEBUG
--			atomic_read(&rb->inflight_sync_point),
-+			atomic_read(&rb->inflight_flush_point),
- #else
- 			0,
- #endif
- 			pblk_rb_read_count(rb),
- 			pblk_rb_space(rb),
--			pblk_rb_sync_point_count(rb),
-+			pblk_rb_flush_point_count(rb),
- 			queued_entries);
- 
- 	return offset;
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 6c30b7a..018af87 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -508,7 +508,7 @@ static int pblk_submit_write(struct pblk *pblk)
- 	if (!secs_avail)
- 		return 1;
- 
--	secs_to_flush = pblk_rb_sync_point_count(&pblk->rwb);
-+	secs_to_flush = pblk_rb_flush_point_count(&pblk->rwb);
- 	if (!secs_to_flush && secs_avail < pblk->min_write_pgs)
- 		return 1;
- 
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index f324a7e..6f5fbd1 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -166,7 +166,7 @@ struct pblk_rb {
- 					 * the last submitted entry that has
- 					 * been successfully persisted to media
- 					 */
--	unsigned int sync_point;	/* Sync point - last entry that must be
-+	unsigned int flush_point;	/* Sync point - last entry that must be
- 					 * flushed to the media. Used with
- 					 * REQ_FLUSH and REQ_FUA
- 					 */
-@@ -189,7 +189,7 @@ struct pblk_rb {
- 	spinlock_t s_lock;		/* Sync lock */
- 
- #ifdef CONFIG_NVM_DEBUG
--	atomic_t inflight_sync_point;	/* Not served REQ_FLUSH | REQ_FUA */
-+	atomic_t inflight_flush_point;	/* Not served REQ_FLUSH | REQ_FUA */
- #endif
+ static struct elevator_type iosched_bfq_mq = {
+ 	.ops.mq = {
++		.limit_depth		= bfq_limit_depth,
+ 		.prepare_request	= bfq_prepare_request,
+ 		.finish_request		= bfq_finish_request,
+ 		.exit_icq		= bfq_exit_icq,
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 5d47b58d5fc8..fcd941008127 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -629,6 +629,18 @@ struct bfq_data {
+ 	struct bfq_io_cq *bio_bic;
+ 	/* bfqq associated with the task issuing current bio for merging */
+ 	struct bfq_queue *bio_bfqq;
++
++	/*
++	 * Cached sbitmap shift, used to compute depth limits in
++	 * bfq_update_depths.
++	 */
++	unsigned int sb_shift;
++
++	/*
++	 * Depth limits used in bfq_limit_depth (see comments on the
++	 * function)
++	 */
++	unsigned int word_depths[2][2];
  };
  
-@@ -687,7 +687,7 @@ unsigned int pblk_rb_sync_advance(struct pblk_rb *rb, unsigned int nr_entries);
- struct pblk_rb_entry *pblk_rb_sync_scan_entry(struct pblk_rb *rb,
- 					      struct ppa_addr *ppa);
- void pblk_rb_sync_end(struct pblk_rb *rb, unsigned long *flags);
--unsigned int pblk_rb_sync_point_count(struct pblk_rb *rb);
-+unsigned int pblk_rb_flush_point_count(struct pblk_rb *rb);
- 
- unsigned int pblk_rb_read_count(struct pblk_rb *rb);
- unsigned int pblk_rb_sync_count(struct pblk_rb *rb);
+ enum bfqq_state_flags {
 -- 
-2.9.3
+2.15.1
