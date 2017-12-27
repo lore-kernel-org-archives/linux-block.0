@@ -1,159 +1,39 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:60542 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751101AbdLNCcI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Dec 2017 21:32:08 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Yi Zhang <yi.zhang@redhat.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 2/6] blk-mq: support concurrent blk_mq_quiesce_queue()
-Date: Thu, 14 Dec 2017 10:30:59 +0800
-Message-Id: <20171214023103.18272-3-ming.lei@redhat.com>
-In-Reply-To: <20171214023103.18272-1-ming.lei@redhat.com>
-References: <20171214023103.18272-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	linus.walleij@linaro.org,
+	bfq-iosched@googlegroups.com,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH IMPROVEMENT/BUGFIX 0/1] block, bfq: address starvation caused by tag consumption
+Date: Wed, 27 Dec 2017 13:15:06 +0100
+Message-Id: <20171227121507.4280-1-paolo.valente@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Turns out that blk_mq_freeze_queue() isn't stronger[1] than
-blk_mq_quiesce_queue() because dispatch may still be in-progress after
-queue is frozen, and in several cases, such as switching io scheduler,
-and updating hw queues, we still need to quiesce queue as a supplement
-of freezing queue.
+Hi Jens, all,
+here's the patch I anticipated in my last email. It addresses
+(serious) starvation problems caused by request-tag exhaustion, as
+explained in more detail in the commit message. I started from the
+solution in the function kyber_limit_depth, but then I had to define
+more articulate limits, to counter starvation also in cases not
+covered in kyber_limit_depth.
 
-As we need to extend uses of blk_mq_quiesce_queue(), it is inevitable
-for us to need support cucurrent quiesce, especailly we can't let
-unquiesce happen when there is quiesce happenning from other contexts.
+If this solution proves to be effective, I'm willing to port it
+somehow to the other schedulers.
 
-This patch introduces q->mq_quiesce_depth to deal concurrent quiesce,
-and we only unquiesce queue when it is the last one from all contexts.
+Thanks,
+Paolo
 
-[1] https://marc.info/?l=linux-block&m=150993988115872&w=2
+Paolo Valente (1):
+  block, bfq: limit tags for writes and async I/O
 
-Suggested-by: Bart Van Assche <bart.vanassche@wdc.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c           | 21 ++++++++++++++++-----
- drivers/nvme/host/core.c |  4 ++--
- include/linux/blk-mq.h   |  7 ++++++-
- include/linux/blkdev.h   |  2 ++
- 4 files changed, 26 insertions(+), 8 deletions(-)
+ block/bfq-iosched.c | 77 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ block/bfq-iosched.h | 12 +++++++++
+ 2 files changed, 89 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 11097477eeab..5d69c8075339 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -196,7 +196,8 @@ void blk_mq_quiesce_queue_nowait(struct request_queue *q)
- 	unsigned long flags;
- 
- 	spin_lock_irqsave(q->queue_lock, flags);
--	queue_flag_set(QUEUE_FLAG_QUIESCED, q);
-+	if (!q->quiesce_depth++)
-+		queue_flag_set(QUEUE_FLAG_QUIESCED, q);
- 	spin_unlock_irqrestore(q->queue_lock, flags);
- }
- EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_nowait);
-@@ -232,22 +233,32 @@ EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
- /*
-  * blk_mq_unquiesce_queue() - counterpart of blk_mq_quiesce_queue()
-  * @q: request queue.
-+ * @force: force to unquiesce if set
-  *
-  * This function recovers queue into the state before quiescing
-  * which is done by blk_mq_quiesce_queue.
-+ *
-+ * Note: @force should be passed as true only when it is done before
-+ * cleanup queue, for other cases, please don't use this way.
-  */
--void blk_mq_unquiesce_queue(struct request_queue *q)
-+void __blk_mq_unquiesce_queue(struct request_queue *q, bool force)
- {
- 	unsigned long flags;
-+	int depth;
- 
- 	spin_lock_irqsave(q->queue_lock, flags);
--	queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
-+	if (q->quiesce_depth > 0)
-+		q->quiesce_depth--;
-+	depth = q->quiesce_depth;
-+	if (!depth || force)
-+		queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
- 	spin_unlock_irqrestore(q->queue_lock, flags);
- 
- 	/* dispatch requests which are inserted during quiescing */
--	blk_mq_run_hw_queues(q, true);
-+	if (!depth || force)
-+		blk_mq_run_hw_queues(q, true);
- }
--EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
-+EXPORT_SYMBOL_GPL(__blk_mq_unquiesce_queue);
- 
- void blk_mq_wake_waiters(struct request_queue *q)
- {
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index f837d666cbd4..1ab1168cd46a 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -3371,7 +3371,7 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
- 
- 	/* Forcibly unquiesce queues to avoid blocking dispatch */
- 	if (ctrl->admin_q)
--		blk_mq_unquiesce_queue(ctrl->admin_q);
-+		__blk_mq_unquiesce_queue(ctrl->admin_q, true);
- 
- 	list_for_each_entry(ns, &ctrl->namespaces, list) {
- 		/*
-@@ -3384,7 +3384,7 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
- 		blk_set_queue_dying(ns->queue);
- 
- 		/* Forcibly unquiesce queues to avoid blocking dispatch */
--		blk_mq_unquiesce_queue(ns->queue);
-+		__blk_mq_unquiesce_queue(ns->queue, true);
- 	}
- 	mutex_unlock(&ctrl->namespaces_mutex);
- }
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 95c9a5c862e2..8a01822dc09e 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -265,7 +265,7 @@ void blk_mq_start_hw_queues(struct request_queue *q);
- void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
- void blk_mq_quiesce_queue(struct request_queue *q);
--void blk_mq_unquiesce_queue(struct request_queue *q);
-+void __blk_mq_unquiesce_queue(struct request_queue *q, bool force);
- void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
- bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_run_hw_queues(struct request_queue *q, bool async);
-@@ -286,6 +286,11 @@ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues);
- 
- void blk_mq_quiesce_queue_nowait(struct request_queue *q);
- 
-+static inline void blk_mq_unquiesce_queue(struct request_queue *q)
-+{
-+	__blk_mq_unquiesce_queue(q, false);
-+}
-+
- /*
-  * Driver command data is immediately after the request. So subtract request
-  * size to get back to the original request, add request size to get the PDU.
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 8089ca17db9a..ee3731f417c0 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -570,6 +570,8 @@ struct request_queue {
- 	int			bypass_depth;
- 	atomic_t		mq_freeze_depth;
- 
-+	int			quiesce_depth;
-+
- #if defined(CONFIG_BLK_DEV_BSG)
- 	bsg_job_fn		*bsg_job_fn;
- 	struct bsg_class_device bsg_dev;
--- 
-2.9.5
+--
+2.15.1
