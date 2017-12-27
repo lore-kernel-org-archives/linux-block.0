@@ -1,59 +1,170 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:40924 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753115AbdLHNPq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Dec 2017 08:15:46 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>, linux-bcache@vger.kernel.org
-Subject: [PATCH 07/10] bcache: comment on direct access to bvec table
-Date: Fri,  8 Dec 2017 21:14:06 +0800
-Message-Id: <20171208131409.11889-8-ming.lei@redhat.com>
-In-Reply-To: <20171208131409.11889-1-ming.lei@redhat.com>
-References: <20171208131409.11889-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <msnitzer@redhat.com>
+From: Mike Snitzer <snitzer@redhat.com>
+To: axboe@kernel.dk,
+	hch@lst.de,
+	keith.busch@intel.com
+Cc: emilne@redhat.com,
+	james.smart@broadcom.com,
+	hare@suse.de,
+	Bart.VanAssche@wdc.com,
+	linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	dm-devel@redhat.com
+Subject: [for-4.16 PATCH v2 3/5] nvme: move nvme_req_needs_failover() from multipath to core
+Date: Tue, 26 Dec 2017 22:22:55 -0500
+Message-Id: <20171227032257.8182-4-snitzer@redhat.com>
+In-Reply-To: <20171227032257.8182-1-snitzer@redhat.com>
+References: <20171227032257.8182-1-snitzer@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-All direct access to bvec table are safe even after multipage bvec is supported.
+nvme_req_needs_failover() could be used regardless of whether
+CONFIG_NVME_MULTIPATH is set.
 
-Cc: linux-bcache@vger.kernel.org
-Acked-by: Coly Li <colyli@suse.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+DM multipath will also make use of it.
+
+Signed-off-by: Mike Snitzer <snitzer@redhat.com>
 ---
- drivers/md/bcache/btree.c | 1 +
- drivers/md/bcache/util.c  | 7 +++++++
- 2 files changed, 8 insertions(+)
+ drivers/nvme/host/core.c      | 46 +++++++++++++++++++++++++++++++++++++++++++
+ drivers/nvme/host/multipath.c | 46 -------------------------------------------
+ drivers/nvme/host/nvme.h      |  5 -----
+ 3 files changed, 46 insertions(+), 51 deletions(-)
 
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index 11c5503d31dc..c09f3dd4bf07 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -432,6 +432,7 @@ static void do_btree_node_write(struct btree *b)
- 
- 		continue_at(cl, btree_node_write_done, NULL);
- 	} else {
-+		/* No problem for multipage bvec since the bio is just allocated */
- 		b->bio->bi_vcnt = 0;
- 		bch_bio_map(b->bio, i);
- 
-diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
-index e548b8b51322..61813d230015 100644
---- a/drivers/md/bcache/util.c
-+++ b/drivers/md/bcache/util.c
-@@ -249,6 +249,13 @@ uint64_t bch_next_delay(struct bch_ratelimit *d, uint64_t done)
- 		: 0;
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 99f1c7d8514e..381d19c9e431 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -188,6 +188,52 @@ static inline bool nvme_req_needs_retry(struct request *req)
+ 	return true;
  }
  
-+/*
-+ * Generally it isn't good to access .bi_io_vec and .bi_vcnt directly,
-+ * the preferred way is bio_add_page, but in this case, bch_bio_map()
-+ * supposes that the bvec table is empty, so it is safe to access
-+ * .bi_vcnt & .bi_io_vec in this way even after multipage bvec is
-+ * supported.
-+ */
- void bch_bio_map(struct bio *bio, void *base)
++static bool nvme_req_needs_failover(struct request *req)
++{
++	/* Caller verifies req->q->failover_rq_fn is set */
++
++	switch (nvme_req(req)->status & 0x7ff) {
++	/*
++	 * Generic command status:
++	 */
++	case NVME_SC_INVALID_OPCODE:
++	case NVME_SC_INVALID_FIELD:
++	case NVME_SC_INVALID_NS:
++	case NVME_SC_LBA_RANGE:
++	case NVME_SC_CAP_EXCEEDED:
++	case NVME_SC_RESERVATION_CONFLICT:
++		return false;
++
++	/*
++	 * I/O command set specific error.  Unfortunately these values are
++	 * reused for fabrics commands, but those should never get here.
++	 */
++	case NVME_SC_BAD_ATTRIBUTES:
++	case NVME_SC_INVALID_PI:
++	case NVME_SC_READ_ONLY:
++	case NVME_SC_ONCS_NOT_SUPPORTED:
++		WARN_ON_ONCE(nvme_req(req)->cmd->common.opcode ==
++			nvme_fabrics_command);
++		return false;
++
++	/*
++	 * Media and Data Integrity Errors:
++	 */
++	case NVME_SC_WRITE_FAULT:
++	case NVME_SC_READ_ERROR:
++	case NVME_SC_GUARD_CHECK:
++	case NVME_SC_APPTAG_CHECK:
++	case NVME_SC_REFTAG_CHECK:
++	case NVME_SC_COMPARE_FAILED:
++	case NVME_SC_ACCESS_DENIED:
++	case NVME_SC_UNWRITTEN_BLOCK:
++		return false;
++	}
++
++	/* Everything else could be a path failure, so should be retried */
++	return true;
++}
++
+ void nvme_complete_rq(struct request *req)
  {
- 	size_t size = bio->bi_iter.bi_size;
+ 	if (unlikely(nvme_req(req)->status && nvme_req_needs_retry(req))) {
+diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
+index b576942b96b2..9cc6b80f3530 100644
+--- a/drivers/nvme/host/multipath.c
++++ b/drivers/nvme/host/multipath.c
+@@ -33,52 +33,6 @@ void nvme_failover_req(struct request *req)
+ 	kblockd_schedule_work(&ns->head->requeue_work);
+ }
+ 
+-bool nvme_req_needs_failover(struct request *req)
+-{
+-	/* Caller verifies req->q->failover_rq_fn is set */
+-
+-	switch (nvme_req(req)->status & 0x7ff) {
+-	/*
+-	 * Generic command status:
+-	 */
+-	case NVME_SC_INVALID_OPCODE:
+-	case NVME_SC_INVALID_FIELD:
+-	case NVME_SC_INVALID_NS:
+-	case NVME_SC_LBA_RANGE:
+-	case NVME_SC_CAP_EXCEEDED:
+-	case NVME_SC_RESERVATION_CONFLICT:
+-		return false;
+-
+-	/*
+-	 * I/O command set specific error.  Unfortunately these values are
+-	 * reused for fabrics commands, but those should never get here.
+-	 */
+-	case NVME_SC_BAD_ATTRIBUTES:
+-	case NVME_SC_INVALID_PI:
+-	case NVME_SC_READ_ONLY:
+-	case NVME_SC_ONCS_NOT_SUPPORTED:
+-		WARN_ON_ONCE(nvme_req(req)->cmd->common.opcode ==
+-			nvme_fabrics_command);
+-		return false;
+-
+-	/*
+-	 * Media and Data Integrity Errors:
+-	 */
+-	case NVME_SC_WRITE_FAULT:
+-	case NVME_SC_READ_ERROR:
+-	case NVME_SC_GUARD_CHECK:
+-	case NVME_SC_APPTAG_CHECK:
+-	case NVME_SC_REFTAG_CHECK:
+-	case NVME_SC_COMPARE_FAILED:
+-	case NVME_SC_ACCESS_DENIED:
+-	case NVME_SC_UNWRITTEN_BLOCK:
+-		return false;
+-	}
+-
+-	/* Everything else could be a path failure, so should be retried */
+-	return true;
+-}
+-
+ void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl)
+ {
+ 	struct nvme_ns *ns;
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 5ec44935690f..f31b496c863f 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -396,7 +396,6 @@ extern const struct block_device_operations nvme_ns_head_ops;
+ 
+ #ifdef CONFIG_NVME_MULTIPATH
+ void nvme_failover_req(struct request *req);
+-bool nvme_req_needs_failover(struct request *req);
+ void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl);
+ int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl,struct nvme_ns_head *head);
+ void nvme_mpath_add_disk(struct nvme_ns_head *head);
+@@ -416,10 +415,6 @@ struct nvme_ns *nvme_find_path(struct nvme_ns_head *head);
+ static inline void nvme_failover_req(struct request *req)
+ {
+ }
+-static inline bool nvme_req_needs_failover(struct request *req)
+-{
+-	return false;
+-}
+ static inline void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl)
+ {
+ }
 -- 
-2.9.5
+2.15.0
