@@ -1,67 +1,131 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-it0-f52.google.com ([209.85.214.52]:46732 "EHLO
-        mail-it0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754887AbdLOEIb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Dec 2017 23:08:31 -0500
-Received: by mail-it0-f52.google.com with SMTP id t1so16424070ite.5
-        for <linux-block@vger.kernel.org>; Thu, 14 Dec 2017 20:08:31 -0800 (PST)
+Received: from szxga07-in.huawei.com ([45.249.212.35]:45638 "EHLO huawei.com"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751086AbdL1G4r (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 28 Dec 2017 01:56:47 -0500
+From: Hou Tao <houtao1@huawei.com>
+To: <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>
+CC: <shli@kernel.org>, <tj@kernel.org>, <houtao1@huawei.com>
+Subject: [PATCH] blktrace: output io cgroup name for cgroup v1
+Date: Thu, 28 Dec 2017 15:04:00 +0800
+Message-ID: <20171228070400.26328-1-houtao1@huawei.com>
 MIME-Version: 1.0
-From: Tony Yang <yyt168@gmail.com>
-Date: Fri, 15 Dec 2017 12:08:30 +0800
-Message-ID: <CADL4p-pigDQBM8oi+XU+qm+hkEJO68yee14n_u+ej2Mu3R4tNA@mail.gmail.com>
-Subject: How to Persistent nvme Storage?
-To: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-nvme-bounces@lists.infradead.org,
-        Christoph Hellwig <hch@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Dear All:
+Now the output of io cgroup name in blktrace is controlled by
+blk_cgroup & blk_cgname options in trace_options files. When
+using cgroup v1 for io controller, there is no output of cgroup
+name in trace file, because cgroup_path_from_kernfs_id() uses
+cgrp_dfl_root.kf_root to find the cgroup file and cgrp_dfl_root
+is only valid for cgroup v2.
 
-      I download the new nvme multipath version (git clone
-git.infradead.org/nvme.git),I want to know how to use the
-      multipath, because I want use udev to Persistent Storage,But
-when use scsi_id command not found any messages.
-      What method can nvme achieve multi-path? Can you provide an
-example? Thank you
+So fix cgroup_path_from_kernfs_id() to support both cgroup v1 and v2.
 
-      [root@udev]# lsblk
-NAME          MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
-sdb             8:16   0   1.8T  0 disk
-dfa           252:0    0   2.9T  0 disk
-=E2=94=9C=E2=94=80dfa5        252:5    0 734.8G  0 part
-=E2=94=9C=E2=94=80dfa3        252:3    0 745.1G  0 part
-=E2=94=9C=E2=94=80dfa1        252:1    0   9.3G  0 part
-=E2=94=9C=E2=94=80dfa4        252:4    0 745.1G  0 part
-=E2=94=94=E2=94=80dfa2        252:2    0 745.1G  0 part
-nvme1n1       259:10   0   2.9T  0 disk
-=E2=94=9C=E2=94=80nvme1n1p5   259:15   0 734.8G  0 part
-=E2=94=9C=E2=94=80nvme1n1p3   259:13   0 745.1G  0 part
-=E2=94=9C=E2=94=80nvme1n1p1   259:11   0   9.3G  0 part
-=E2=94=9C=E2=94=80nvme1n1p4   259:14   0 745.1G  0 part
-=E2=94=94=E2=94=80nvme1n1p2   259:12   0 745.1G  0 part
-loop0           7:0    0   3.8G  0 loop /mnt/cdrom
-sdc             8:32   0 557.9G  0 disk
-=E2=94=9C=E2=94=80sdc2          8:34   0   512M  0 part /boot
-=E2=94=9C=E2=94=80sdc3          8:35   0 557.3G  0 part
-=E2=94=82 =E2=94=9C=E2=94=80rhel-swap 253:1    0     4G  0 lvm  [SWAP]
-=E2=94=82 =E2=94=94=E2=94=80rhel-root 253:0    0 553.3G  0 lvm  /
-=E2=94=94=E2=94=80sdc1          8:33   0   100M  0 part /boot/efi
-sda             8:0    0   1.8T  0 disk
-nvme0n1       259:0    0   1.8T  0 disk
-=E2=94=9C=E2=94=80nvme0n1p5   259:5    0   100G  0 part
-=E2=94=9C=E2=94=80nvme0n1p3   259:3    0     8G  0 part
-=E2=94=9C=E2=94=80nvme0n1p1   259:1    0     8G  0 part
-=E2=94=9C=E2=94=80nvme0n1p8   259:8    0   100G  0 part
-=E2=94=9C=E2=94=80nvme0n1p6   259:6    0   100G  0 part
-=E2=94=9C=E2=94=80nvme0n1p4   259:4    0     1K  0 part
-=E2=94=9C=E2=94=80nvme0n1p2   259:2    0     8G  0 part
-=E2=94=9C=E2=94=80nvme0n1p9   259:9    0   100G  0 part
-=E2=94=94=E2=94=80nvme0n1p7   259:7    0   100G  0 part
-[root@udev]# /usr/lib/udev/scsi_id -g -u -d /dev/sdb
-3518f2920201113ff
-[root@udev]# /usr/lib/udev/scsi_id -g -u -d /dev/dfa
-[root@udev]# /usr/lib/udev/scsi_id -g -u -d /dev/dfa5
-[root@udev]# /usr/lib/udev/scsi_id -g -u -d /dev/nvme1n1p5
+Fixes: 69fd5c3 ("blktrace: add an option to allow displaying cgroup path")
+Signed-off-by: Hou Tao <houtao1@huawei.com>
+---
+ include/linux/cgroup.h  |  6 +++---
+ kernel/cgroup/cgroup.c  | 39 ++++++++++++++++++++++++++++++++++++---
+ kernel/trace/blktrace.c |  4 ++--
+ 3 files changed, 41 insertions(+), 8 deletions(-)
+
+diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
+index 473e0c0..ed80490 100644
+--- a/include/linux/cgroup.h
++++ b/include/linux/cgroup.h
+@@ -651,7 +651,7 @@ static inline union kernfs_node_id *cgroup_get_kernfs_id(struct cgroup *cgrp)
+ 	return &cgrp->kn->id;
+ }
+ 
+-void cgroup_path_from_kernfs_id(const union kernfs_node_id *id,
++void cgroup_path_from_kernfs_id(int ssid, const union kernfs_node_id *id,
+ 					char *buf, size_t buflen);
+ #else /* !CONFIG_CGROUPS */
+ 
+@@ -686,8 +686,8 @@ static inline bool task_under_cgroup_hierarchy(struct task_struct *task,
+ 	return true;
+ }
+ 
+-static inline void cgroup_path_from_kernfs_id(const union kernfs_node_id *id,
+-	char *buf, size_t buflen) {}
++static inline void cgroup_path_from_kernfs_id(int ssid,
++		const union kernfs_node_id *id, char *buf, size_t buflen) {}
+ #endif /* !CONFIG_CGROUPS */
+ 
+ /*
+diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
+index 0b1ffe1..49d63c6 100644
+--- a/kernel/cgroup/cgroup.c
++++ b/kernel/cgroup/cgroup.c
+@@ -5354,16 +5354,49 @@ static int __init cgroup_wq_init(void)
+ }
+ core_initcall(cgroup_wq_init);
+ 
+-void cgroup_path_from_kernfs_id(const union kernfs_node_id *id,
++void cgroup_path_from_kernfs_id(int ssid, const union kernfs_node_id *id,
+ 					char *buf, size_t buflen)
+ {
++	struct kernfs_root *root;
+ 	struct kernfs_node *kn;
++	struct cgroup *root_cgrp = NULL;
+ 
+-	kn = kernfs_get_node_by_id(cgrp_dfl_root.kf_root, id);
+-	if (!kn)
++	if (ssid >= CGROUP_SUBSYS_COUNT)
+ 		return;
++
++	if (likely(static_key_enabled(cgroup_subsys_on_dfl_key[ssid]))) {
++		root = cgrp_dfl_root.kf_root;
++	} else {
++		struct cgroup_subsys *subsys = cgroup_subsys[ssid];
++
++		/*
++		 * It seems we can not use rcu_read_lock() to protect
++		 * the liveness check of subsys->root->cgrp. Although
++		 * root->cgrp is freed by RCU, when we dereference the
++		 * old root, the old root may been destroying by
++		 * cgroup_destroy_root().
++		 */
++		mutex_lock(&cgroup_mutex);
++		if (percpu_ref_tryget_live(&subsys->root->cgrp.self.refcnt)) {
++			root_cgrp = &subsys->root->cgrp;
++			root = subsys->root->kf_root;
++		}
++		mutex_unlock(&cgroup_mutex);
++
++		if (!root_cgrp)
++			goto out;
++	}
++
++	kn = kernfs_get_node_by_id(root, id);
++	if (!kn)
++		goto out;
++
+ 	kernfs_path(kn, buf, buflen);
+ 	kernfs_put(kn);
++
++out:
++	if (root_cgrp)
++		cgroup_put(root_cgrp);
+ }
+ 
+ /*
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 987d9a9a..79890e0 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -1279,8 +1279,8 @@ static void blk_log_action(struct trace_iterator *iter, const char *act,
+ 		if (blk_tracer_flags.val & TRACE_BLK_OPT_CGNAME) {
+ 			char blkcg_name_buf[NAME_MAX + 1] = "<...>";
+ 
+-			cgroup_path_from_kernfs_id(id, blkcg_name_buf,
+-				sizeof(blkcg_name_buf));
++			cgroup_path_from_kernfs_id(io_cgrp_id, id,
++				blkcg_name_buf, sizeof(blkcg_name_buf));
+ 			trace_seq_printf(&iter->seq, "%3d,%-3d %s %2s %3s ",
+ 				 MAJOR(t->device), MINOR(t->device),
+ 				 blkcg_name_buf, act, rwbs);
+-- 
+2.9.5
