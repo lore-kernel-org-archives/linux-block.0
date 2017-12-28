@@ -1,238 +1,121 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f65.google.com ([209.85.160.65]:39565 "EHLO
-        mail-pl0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752641AbdL1AsG (ORCPT
+Received: from mail-wm0-f49.google.com ([74.125.82.49]:37976 "EHLO
+        mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751100AbdL1Isr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Dec 2017 19:48:06 -0500
-Received: by mail-pl0-f65.google.com with SMTP id bi12so20253195plb.6
-        for <linux-block@vger.kernel.org>; Wed, 27 Dec 2017 16:48:06 -0800 (PST)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: Michael Lyle <mlyle@lyle.org>
-Subject: [for-416 PATCH 1/3] bcache: writeback: collapse contiguous IO better
-Date: Wed, 27 Dec 2017 16:47:42 -0800
-Message-Id: <20171228004744.3522-1-mlyle@lyle.org>
+        Thu, 28 Dec 2017 03:48:47 -0500
+Received: by mail-wm0-f49.google.com with SMTP id 64so42647202wme.3
+        for <linux-block@vger.kernel.org>; Thu, 28 Dec 2017 00:48:47 -0800 (PST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [RFC] distinguish foreground and background IOs in block throttle
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <02a6f8ff-2f13-9590-93ac-002240f00815@gmail.com>
+Date: Thu, 28 Dec 2017 09:48:43 +0100
+Cc: xuejiufei <xuejiufei@gmail.com>, Tejun Heo <tj@kernel.org>,
+        Jens Axboe <axboe@fb.com>, Shaohua Li <shli@kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        cgroups@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>
+Message-Id: <D3E04C58-031C-4BDE-99B1-5F9EF680A533@linaro.org>
+References: <1fa623a6-e374-de5e-477e-e604cb760f82@gmail.com>
+ <A491ADB3-5487-4161-A526-E0C3AF416437@linaro.org>
+ <02a6f8ff-2f13-9590-93ac-002240f00815@gmail.com>
+To: Joseph Qi <jiangqi903@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Previously, there was some logic that attempted to immediately issue
-writeback of backing-contiguous blocks when the writeback rate was
-fast.
 
-The previous logic did not have any limits on the aggregate size it
-would issue, nor the number of keys it would combine at once.  It
-would also discard the chance to do a contiguous write when the
-writeback rate was low-- e.g. at "background" writeback of target
-rate = 8, it would not combine two adjacent 4k writes and would
-instead seek the disk twice.
 
-This patch imposes limits and explicitly understands the size of
-contiguous I/O during issue.  It also will combine contiguous I/O
-in all circumstances, not just when writeback is requested to be
-relatively fast.
+> Il giorno 28 dic 2017, alle ore 02:51, Joseph Qi =
+<jiangqi903@gmail.com> ha scritto:
+>=20
+> Hi Paolo,
+>=20
+> On 17/12/27 20:36, Paolo Valente wrote:
+>>=20
+>>=20
+>>> Il giorno 25 dic 2017, alle ore 03:44, xuejiufei =
+<xuejiufei@gmail.com> ha scritto:
+>>>=20
+>>> Hi all,
+>>>=20
+>>> Cgroup writeback is supported since v4.2. I found there exists a
+>>> problem in the following case.
+>>>=20
+>>> A cgroup may send both buffer and direct/sync IOs. The foreground
+>>> thread will be stalled when periodic writeback IOs is flushed =
+because
+>>> the service queue already has a plenty of writeback IOs, then
+>>> foreground IOs should be enqueued with its FIFO policy.
+>>>=20
+>>> I wonder if we can distinguish foreground and background IOs in =
+block
+>>> throttle to fix the above problem.
+>>>=20
+>>> Any suggestion are always appreciated.
+>>>=20
+>>=20
+>> Hi,
+>> to address similar issues, I have just sent a patch [1] for the BFQ
+>> I/O scheduler.  If you want to give it a try, it might solve, or at
+>> least mitigate, your problem (the patch does not involve groups,
+>> though, at least for the moment).
+>>=20
+>> There are still pending patches related to the low_latency mode of
+>> BFQ, so I suggest you to try with low_latency disabled, i.e., as =
+root:
+>> echo bfq > /sys/block/<your-device>/queue/scheduler
+>> echo 0 > /sys/block/<your-device>/queue/iosched/low_latency=20
+>>=20
+>> For your possible convenience, I have attached the patch, gzipped, to
+>> this email too.
+>>> Thanks,
+>> Paolo
+>>=20
+>> [1] https://www.spinics.net/lists/kernel/msg2684463.html
+>>=20
+> I don't get why the issue Jiufei described has relations with =
+scheduler.
+>=20
+> IMO, the core reason is current we only have read/write queues in =
+block
+> throttle. That means all sync/async writes will go into the same =
+queue.
+> Once writeback IOs flush out and throttle happens, sync write will =
+also
+> have to be queued up. Since there are more async writes ahead of sync
+> writes in the queue, and the current policy is dispatching 6 reads and =
+2
+> writes during each round, sync writes will get significantly delay,
+> which we don't expect.
+>=20
+> So like read/write queue design, we may add another queue in block
+> throttle to distinguish sync/async writes, and then we can dispatch =
+more
+> sync writes than async writes.
+>=20
 
-It is a win on its own, but also lays the groundwork for skip writes to
-short keys to make the I/O more sequential/contiguous.  It also gets
-ready to start using blk_*_plug, and to allow issuing of non-contig
-I/O in parallel if requested by the user (to make use of disk
-throughput benefits available from higher queue depths).
+Hi Joseph,
+your description of the problem would be complete *if* sync write
+requests were issued as expected.  But the problem I have seen, and
+tried to solve with my patch, is that async requests easily eat all
+request tags (I'm referring to blk-mq of course).  So sync I/O has a
+hard time finding free tags for its requests, and is then throttled
+upstream.  Differentiating throttling downstream may not solve this
+problem, because async requests will accumulate upstream as before.
+The problem may even get worse, because downstream throttling may
+increase the duration of upstream congestion.
 
-This patch fixes a previous version where the contiguous information
-was not calculated properly.
+My patch tries to solve this upstream problem.  BFQ then does the
+rest, downstream, for me.  Things may change in your scenario, though:
+you may not have this upstream problem at all, or you may have both
+the upstream and the downstream problems.
 
-Signed-off-by: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/bcache.h    |   6 --
- drivers/md/bcache/writeback.c | 133 ++++++++++++++++++++++++++++++------------
- drivers/md/bcache/writeback.h |   3 +
- 3 files changed, 98 insertions(+), 44 deletions(-)
+Thanks,
+Paolo
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 843877e017e1..1784e50eb857 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -323,12 +323,6 @@ struct cached_dev {
- 	struct bch_ratelimit	writeback_rate;
- 	struct delayed_work	writeback_rate_update;
- 
--	/*
--	 * Internal to the writeback code, so read_dirty() can keep track of
--	 * where it's at.
--	 */
--	sector_t		last_read;
--
- 	/* Limit number of writeback bios in flight */
- 	struct semaphore	in_flight;
- 	struct task_struct	*writeback_thread;
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index f3d680c907ae..4e4836c6e7cf 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -248,10 +248,25 @@ static void read_dirty_submit(struct closure *cl)
- 	continue_at(cl, write_dirty, io->dc->writeback_write_wq);
- }
- 
-+static inline bool keys_contiguous(struct cached_dev *dc,
-+		struct keybuf_key *first, struct keybuf_key *second)
-+{
-+	if (KEY_INODE(&second->key) != KEY_INODE(&first->key))
-+		return false;
-+
-+	if (KEY_OFFSET(&second->key) !=
-+			KEY_OFFSET(&first->key) + KEY_SIZE(&first->key))
-+		return false;
-+
-+	return true;
-+}
-+
- static void read_dirty(struct cached_dev *dc)
- {
- 	unsigned delay = 0;
--	struct keybuf_key *w;
-+	struct keybuf_key *next, *keys[MAX_WRITEBACKS_IN_PASS], *w;
-+	size_t size;
-+	int nk, i;
- 	struct dirty_io *io;
- 	struct closure cl;
- 
-@@ -262,45 +277,87 @@ static void read_dirty(struct cached_dev *dc)
- 	 * mempools.
- 	 */
- 
--	while (!kthread_should_stop()) {
--
--		w = bch_keybuf_next(&dc->writeback_keys);
--		if (!w)
--			break;
--
--		BUG_ON(ptr_stale(dc->disk.c, &w->key, 0));
--
--		if (KEY_START(&w->key) != dc->last_read ||
--		    jiffies_to_msecs(delay) > 50)
--			while (!kthread_should_stop() && delay)
--				delay = schedule_timeout_interruptible(delay);
--
--		dc->last_read	= KEY_OFFSET(&w->key);
--
--		io = kzalloc(sizeof(struct dirty_io) + sizeof(struct bio_vec)
--			     * DIV_ROUND_UP(KEY_SIZE(&w->key), PAGE_SECTORS),
--			     GFP_KERNEL);
--		if (!io)
--			goto err;
--
--		w->private	= io;
--		io->dc		= dc;
--
--		dirty_init(w);
--		bio_set_op_attrs(&io->bio, REQ_OP_READ, 0);
--		io->bio.bi_iter.bi_sector = PTR_OFFSET(&w->key, 0);
--		bio_set_dev(&io->bio, PTR_CACHE(dc->disk.c, &w->key, 0)->bdev);
--		io->bio.bi_end_io	= read_dirty_endio;
--
--		if (bio_alloc_pages(&io->bio, GFP_KERNEL))
--			goto err_free;
--
--		trace_bcache_writeback(&w->key);
-+	next = bch_keybuf_next(&dc->writeback_keys);
-+
-+	while (!kthread_should_stop() && next) {
-+		size = 0;
-+		nk = 0;
-+
-+		do {
-+			BUG_ON(ptr_stale(dc->disk.c, &next->key, 0));
-+
-+			/*
-+			 * Don't combine too many operations, even if they
-+			 * are all small.
-+			 */
-+			if (nk >= MAX_WRITEBACKS_IN_PASS)
-+				break;
-+
-+			/*
-+			 * If the current operation is very large, don't
-+			 * further combine operations.
-+			 */
-+			if (size >= MAX_WRITESIZE_IN_PASS)
-+				break;
-+
-+			/*
-+			 * Operations are only eligible to be combined
-+			 * if they are contiguous.
-+			 *
-+			 * TODO: add a heuristic willing to fire a
-+			 * certain amount of non-contiguous IO per pass,
-+			 * so that we can benefit from backing device
-+			 * command queueing.
-+			 */
-+			if (nk != 0 && !keys_contiguous(dc, keys[nk-1], next))
-+				break;
-+
-+			size += KEY_SIZE(&next->key);
-+			keys[nk++] = next;
-+		} while ((next = bch_keybuf_next(&dc->writeback_keys)));
-+
-+		/* Now we have gathered a set of 1..5 keys to write back. */
-+
-+		for (i = 0; i < nk; i++) {
-+			w = keys[i];
-+
-+			io = kzalloc(sizeof(struct dirty_io) +
-+				     sizeof(struct bio_vec) *
-+				     DIV_ROUND_UP(KEY_SIZE(&w->key), PAGE_SECTORS),
-+				     GFP_KERNEL);
-+			if (!io)
-+				goto err;
-+
-+			w->private	= io;
-+			io->dc		= dc;
-+
-+			dirty_init(w);
-+			bio_set_op_attrs(&io->bio, REQ_OP_READ, 0);
-+			io->bio.bi_iter.bi_sector = PTR_OFFSET(&w->key, 0);
-+			bio_set_dev(&io->bio,
-+				    PTR_CACHE(dc->disk.c, &w->key, 0)->bdev);
-+			io->bio.bi_end_io	= read_dirty_endio;
-+
-+			if (bio_alloc_pages(&io->bio, GFP_KERNEL))
-+				goto err_free;
-+
-+			trace_bcache_writeback(&w->key);
-+
-+			down(&dc->in_flight);
-+
-+			/* We've acquired a semaphore for the maximum
-+			 * simultaneous number of writebacks; from here
-+			 * everything happens asynchronously.
-+			 */
-+			closure_call(&io->cl, read_dirty_submit, NULL, &cl);
-+		}
- 
--		down(&dc->in_flight);
--		closure_call(&io->cl, read_dirty_submit, NULL, &cl);
-+		delay = writeback_delay(dc, size);
- 
--		delay = writeback_delay(dc, KEY_SIZE(&w->key));
-+		while (!kthread_should_stop() && delay) {
-+			schedule_timeout_interruptible(delay);
-+			delay = writeback_delay(dc, 0);
-+		}
- 	}
- 
- 	if (0) {
-diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
-index a9e3ffb4b03c..6d26927267f8 100644
---- a/drivers/md/bcache/writeback.h
-+++ b/drivers/md/bcache/writeback.h
-@@ -5,6 +5,9 @@
- #define CUTOFF_WRITEBACK	40
- #define CUTOFF_WRITEBACK_SYNC	70
- 
-+#define MAX_WRITEBACKS_IN_PASS  5
-+#define MAX_WRITESIZE_IN_PASS   5000	/* *512b */
-+
- static inline uint64_t bcache_dev_sectors_dirty(struct bcache_device *d)
- {
- 	uint64_t i, ret = 0;
--- 
-2.14.1
+> Thanks,
+> Joseph
