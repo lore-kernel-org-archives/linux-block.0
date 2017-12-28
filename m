@@ -1,170 +1,98 @@
-Return-Path: <msnitzer@redhat.com>
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk,
-	hch@lst.de,
-	keith.busch@intel.com
-Cc: emilne@redhat.com,
-	james.smart@broadcom.com,
-	hare@suse.de,
-	Bart.VanAssche@wdc.com,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	dm-devel@redhat.com
-Subject: [for-4.16 PATCH v2 3/5] nvme: move nvme_req_needs_failover() from multipath to core
-Date: Tue, 26 Dec 2017 22:22:55 -0500
-Message-Id: <20171227032257.8182-4-snitzer@redhat.com>
-In-Reply-To: <20171227032257.8182-1-snitzer@redhat.com>
-References: <20171227032257.8182-1-snitzer@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pl0-f68.google.com ([209.85.160.68]:42217 "EHLO
+        mail-pl0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752052AbdL1AsM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Dec 2017 19:48:12 -0500
+Received: by mail-pl0-f68.google.com with SMTP id bd8so20251081plb.9
+        for <linux-block@vger.kernel.org>; Wed, 27 Dec 2017 16:48:12 -0800 (PST)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: Michael Lyle <mlyle@lyle.org>
+Subject: [for-416 PATCH 3/3] bcache: allow quick writeback when backing idle
+Date: Wed, 27 Dec 2017 16:47:44 -0800
+Message-Id: <20171228004744.3522-3-mlyle@lyle.org>
+In-Reply-To: <20171228004744.3522-1-mlyle@lyle.org>
+References: <20171228004744.3522-1-mlyle@lyle.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-nvme_req_needs_failover() could be used regardless of whether
-CONFIG_NVME_MULTIPATH is set.
+If the control system would wait for at least half a second, and there's
+been no reqs hitting the backing disk for awhile: use an alternate mode
+where we have at most one contiguous set of writebacks in flight at a
+time. (But don't otherwise delay).  If front-end IO appears, it will
+still be quick, as it will only have to contend with one real operation
+in flight.  But otherwise, we'll be sending data to the backing disk as
+quickly as it can accept it (with one op at a time).
 
-DM multipath will also make use of it.
-
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Michael Lyle <mlyle@lyle.org>
 ---
- drivers/nvme/host/core.c      | 46 +++++++++++++++++++++++++++++++++++++++++++
- drivers/nvme/host/multipath.c | 46 -------------------------------------------
- drivers/nvme/host/nvme.h      |  5 -----
- 3 files changed, 46 insertions(+), 51 deletions(-)
+ drivers/md/bcache/bcache.h    |  7 +++++++
+ drivers/md/bcache/request.c   |  1 +
+ drivers/md/bcache/writeback.c | 21 +++++++++++++++++++++
+ 3 files changed, 29 insertions(+)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 99f1c7d8514e..381d19c9e431 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -188,6 +188,52 @@ static inline bool nvme_req_needs_retry(struct request *req)
- 	return true;
- }
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 3be0fcc19b1f..5f7b0b2513cc 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -320,6 +320,13 @@ struct cached_dev {
+ 	 */
+ 	atomic_t		has_dirty;
  
-+static bool nvme_req_needs_failover(struct request *req)
-+{
-+	/* Caller verifies req->q->failover_rq_fn is set */
-+
-+	switch (nvme_req(req)->status & 0x7ff) {
 +	/*
-+	 * Generic command status:
++	 * Set to zero by things that touch the backing volume-- except
++	 * writeback.  Incremented by writeback.  Used to determine when to
++	 * accelerate idle writeback.
 +	 */
-+	case NVME_SC_INVALID_OPCODE:
-+	case NVME_SC_INVALID_FIELD:
-+	case NVME_SC_INVALID_NS:
-+	case NVME_SC_LBA_RANGE:
-+	case NVME_SC_CAP_EXCEEDED:
-+	case NVME_SC_RESERVATION_CONFLICT:
-+		return false;
++	atomic_t		backing_idle;
 +
-+	/*
-+	 * I/O command set specific error.  Unfortunately these values are
-+	 * reused for fabrics commands, but those should never get here.
-+	 */
-+	case NVME_SC_BAD_ATTRIBUTES:
-+	case NVME_SC_INVALID_PI:
-+	case NVME_SC_READ_ONLY:
-+	case NVME_SC_ONCS_NOT_SUPPORTED:
-+		WARN_ON_ONCE(nvme_req(req)->cmd->common.opcode ==
-+			nvme_fabrics_command);
-+		return false;
-+
-+	/*
-+	 * Media and Data Integrity Errors:
-+	 */
-+	case NVME_SC_WRITE_FAULT:
-+	case NVME_SC_READ_ERROR:
-+	case NVME_SC_GUARD_CHECK:
-+	case NVME_SC_APPTAG_CHECK:
-+	case NVME_SC_REFTAG_CHECK:
-+	case NVME_SC_COMPARE_FAILED:
-+	case NVME_SC_ACCESS_DENIED:
-+	case NVME_SC_UNWRITTEN_BLOCK:
-+		return false;
-+	}
-+
-+	/* Everything else could be a path failure, so should be retried */
-+	return true;
-+}
-+
- void nvme_complete_rq(struct request *req)
- {
- 	if (unlikely(nvme_req(req)->status && nvme_req_needs_retry(req))) {
-diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-index b576942b96b2..9cc6b80f3530 100644
---- a/drivers/nvme/host/multipath.c
-+++ b/drivers/nvme/host/multipath.c
-@@ -33,52 +33,6 @@ void nvme_failover_req(struct request *req)
- 	kblockd_schedule_work(&ns->head->requeue_work);
- }
+ 	struct bch_ratelimit	writeback_rate;
+ 	struct delayed_work	writeback_rate_update;
  
--bool nvme_req_needs_failover(struct request *req)
--{
--	/* Caller verifies req->q->failover_rq_fn is set */
--
--	switch (nvme_req(req)->status & 0x7ff) {
--	/*
--	 * Generic command status:
--	 */
--	case NVME_SC_INVALID_OPCODE:
--	case NVME_SC_INVALID_FIELD:
--	case NVME_SC_INVALID_NS:
--	case NVME_SC_LBA_RANGE:
--	case NVME_SC_CAP_EXCEEDED:
--	case NVME_SC_RESERVATION_CONFLICT:
--		return false;
--
--	/*
--	 * I/O command set specific error.  Unfortunately these values are
--	 * reused for fabrics commands, but those should never get here.
--	 */
--	case NVME_SC_BAD_ATTRIBUTES:
--	case NVME_SC_INVALID_PI:
--	case NVME_SC_READ_ONLY:
--	case NVME_SC_ONCS_NOT_SUPPORTED:
--		WARN_ON_ONCE(nvme_req(req)->cmd->common.opcode ==
--			nvme_fabrics_command);
--		return false;
--
--	/*
--	 * Media and Data Integrity Errors:
--	 */
--	case NVME_SC_WRITE_FAULT:
--	case NVME_SC_READ_ERROR:
--	case NVME_SC_GUARD_CHECK:
--	case NVME_SC_APPTAG_CHECK:
--	case NVME_SC_REFTAG_CHECK:
--	case NVME_SC_COMPARE_FAILED:
--	case NVME_SC_ACCESS_DENIED:
--	case NVME_SC_UNWRITTEN_BLOCK:
--		return false;
--	}
--
--	/* Everything else could be a path failure, so should be retried */
--	return true;
--}
--
- void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl)
- {
- 	struct nvme_ns *ns;
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 5ec44935690f..f31b496c863f 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -396,7 +396,6 @@ extern const struct block_device_operations nvme_ns_head_ops;
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index d1faaba6b93f..3b4defbdcbbd 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -996,6 +996,7 @@ static blk_qc_t cached_dev_make_request(struct request_queue *q,
+ 	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
+ 	int rw = bio_data_dir(bio);
  
- #ifdef CONFIG_NVME_MULTIPATH
- void nvme_failover_req(struct request *req);
--bool nvme_req_needs_failover(struct request *req);
- void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl);
- int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl,struct nvme_ns_head *head);
- void nvme_mpath_add_disk(struct nvme_ns_head *head);
-@@ -416,10 +415,6 @@ struct nvme_ns *nvme_find_path(struct nvme_ns_head *head);
- static inline void nvme_failover_req(struct request *req)
- {
- }
--static inline bool nvme_req_needs_failover(struct request *req)
--{
--	return false;
--}
- static inline void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl)
- {
- }
++	atomic_set(&dc->backing_idle, 0);
+ 	generic_start_io_acct(q, rw, bio_sectors(bio), &d->disk->part0);
+ 
+ 	bio_set_dev(bio, dc->bdev);
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index 4084586d5991..bf309a480335 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -383,6 +383,27 @@ static void read_dirty(struct cached_dev *dc)
+ 
+ 		delay = writeback_delay(dc, size);
+ 
++		/* If the control system would wait for at least half a
++		 * second, and there's been no reqs hitting the backing disk
++		 * for awhile: use an alternate mode where we have at most
++		 * one contiguous set of writebacks in flight at a time.  If
++		 * someone wants to do IO it will be quick, as it will only
++		 * have to contend with one operation in flight, and we'll
++		 * be round-tripping data to the backing disk as quickly as
++		 * it can accept it.
++		 */
++		if (delay >= HZ / 2) {
++			/* 3 means at least 1.5 seconds, up to 7.5 if we
++			 * have slowed way down.
++			 */
++			if (atomic_inc_return(&dc->backing_idle) >= 3) {
++				/* Wait for current I/Os to finish */
++				closure_sync(&cl);
++				/* And immediately launch a new set. */
++				delay = 0;
++			}
++		}
++
+ 		while (!kthread_should_stop() && delay) {
+ 			schedule_timeout_interruptible(delay);
+ 			delay = writeback_delay(dc, 0);
 -- 
-2.15.0
+2.14.1
