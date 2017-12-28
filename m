@@ -1,61 +1,66 @@
-Return-Path: <msnitzer@redhat.com>
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk,
-	hch@lst.de,
-	keith.busch@intel.com
-Cc: emilne@redhat.com,
-	james.smart@broadcom.com,
-	hare@suse.de,
-	Bart.VanAssche@wdc.com,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	dm-devel@redhat.com
-Subject: [for-4.16 PATCH v2 1/5] block: establish request failover callback
-Date: Tue, 26 Dec 2017 22:22:53 -0500
-Message-Id: <20171227032257.8182-2-snitzer@redhat.com>
-In-Reply-To: <20171227032257.8182-1-snitzer@redhat.com>
-References: <20171227032257.8182-1-snitzer@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:42561 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752016AbdL1AnH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Dec 2017 19:43:07 -0500
+Received: by mail-pg0-f65.google.com with SMTP id q67so10094501pga.9
+        for <linux-block@vger.kernel.org>; Wed, 27 Dec 2017 16:43:07 -0800 (PST)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: Michael Lyle <mlyle@lyle.org>
+Subject: [for-416 PATCH] bcache: fix writeback target calc on large devices
+Date: Wed, 27 Dec 2017 16:42:30 -0800
+Message-Id: <20171228004230.3295-1-mlyle@lyle.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-All requests allocated from a request_queue with this callback set can
-failover their requests during completion.
+Bcache needs to scale the dirty data in the cache over the multiple
+backing disks in order to calculate writeback rates for each.
+The previous code did this by multiplying the target number of dirty
+sectors by the backing device size, and expected it to fit into a
+uint64_t; this blows up on relatively small backing devices.
 
-This callback is expected to use the blk_steal_bios() interface to
-transfer a request's bios back to an upper-layer bio-based
-request_queue.
+The new approach figures out the bdev's share in 16384ths of the overall
+cached data.  This is chosen to cope well when bdevs drastically vary in
+size and to ensure that bcache can cross the petabyte boundary for each
+backing device.
 
-This will be used by both NVMe multipath and DM multipath.  Without it
-DM multipath cannot get access to NVMe-specific error handling that NVMe
-core provides in nvme_complete_rq().
-
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Reported-by: Jack Douglas <jack@douglastechnology.co.uk>
+Signed-off-by: Michael Lyle <mlyle@lyle.org>
 ---
- include/linux/blkdev.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/md/bcache/writeback.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 8089ca17db9a..f45f5925e100 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -278,6 +278,7 @@ typedef int (lld_busy_fn) (struct request_queue *q);
- typedef int (bsg_job_fn) (struct bsg_job *);
- typedef int (init_rq_fn)(struct request_queue *, struct request *, gfp_t);
- typedef void (exit_rq_fn)(struct request_queue *, struct request *);
-+typedef void (failover_rq_fn)(struct request *);
- 
- enum blk_eh_timer_return {
- 	BLK_EH_NOT_HANDLED,
-@@ -423,6 +424,11 @@ struct request_queue {
- 	exit_rq_fn		*exit_rq_fn;
- 	/* Called from inside blk_get_request() */
- 	void (*initialize_rq_fn)(struct request *rq);
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index 56a37884ca8b..ddbbeec1f0ee 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -24,10 +24,23 @@ static void __update_writeback_rate(struct cached_dev *dc)
+ 	struct cache_set *c = dc->disk.c;
+ 	uint64_t cache_sectors = c->nbuckets * c->sb.bucket_size -
+ 				bcache_flash_devs_sectors_dirty(c);
 +	/*
-+	 * Callback to failover request's bios back to upper layer
-+	 * bio-based request_queue using blk_steal_bios().
++	 * Unfortunately we don't know the exact share of dirty data for
++	 * each backing device.  Therefore, we need to infer the writeback
++	 * for each disk based on its assumed proportion of dirty data.
++	 *
++	 * 16384 is chosen here as something that each backing device should
++	 * be a reasonable fraction of the share, and not to blow up until
++	 * individual backing devices are a petabyte.
 +	 */
-+	failover_rq_fn		*failover_rq_fn;
++	uint32_t bdev_share_per16k =
++		div64_u64(bdev_sectors(dc->bdev) << 14,
++				c->cached_dev_sectors);
++
+ 	uint64_t cache_dirty_target =
+ 		div_u64(cache_sectors * dc->writeback_percent, 100);
+-	int64_t target = div64_u64(cache_dirty_target * bdev_sectors(dc->bdev),
+-				   c->cached_dev_sectors);
++
++	int64_t target = (cache_dirty_target * bdev_share_per16k) >> 14;
  
- 	const struct blk_mq_ops	*mq_ops;
- 
+ 	/*
+ 	 * PI controller:
 -- 
-2.15.0
+2.14.1
