@@ -1,196 +1,187 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 31/45] block: convert to bio_for_each_page_all2()
-Date: Mon, 18 Dec 2017 20:22:33 +0800
-Message-Id: <20171218122247.3488-32-ming.lei@redhat.com>
-In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
-References: <20171218122247.3488-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:35350 "EHLO
+        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753362AbdL1NVk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 28 Dec 2017 08:21:40 -0500
+Received: by mail-lf0-f68.google.com with SMTP id h5so1628440lfj.2
+        for <linux-block@vger.kernel.org>; Thu, 28 Dec 2017 05:21:39 -0800 (PST)
+From: Hans Holmberg <hans@owltronix.com>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Cc: Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH v2] lightnvm: pblk: clear flush point on completed writes
+Date: Thu, 28 Dec 2017 14:19:52 +0100
+Message-Id: <1514467192-5694-1-git-send-email-hans.holmberg@cnexlabs.com>
+In-Reply-To: <20171220172205.26464-15-m@bjorling.me>
+References: <20171220172205.26464-15-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We have to convert to bio_for_each_page_all2() for iterating page by
-page.
+Move completion of syncs and clearing of flush points to the
+write completion path - this ensures that the data has been
+comitted to the media before completing bios containing syncs.
 
-bio_for_each_page_all() can't be used any more after multipage bvec is
-enabled.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- block/bio.c         | 18 ++++++++++++------
- block/blk-zoned.c   |  5 +++--
- block/bounce.c      |  6 ++++--
- include/linux/bio.h |  3 ++-
- 4 files changed, 21 insertions(+), 11 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 1c90b8473196..21d621e07ac9 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1063,8 +1063,9 @@ static int bio_copy_from_iter(struct bio *bio, struct iov_iter *iter)
+Changes since v1:
+
+* Fixed an off-by one issue when clearing flush points
+
+ drivers/lightnvm/pblk-rb.c    | 58 +++++++++++++++++++++----------------------
+ drivers/lightnvm/pblk-write.c | 17 ++++++++++++-
+ 2 files changed, 44 insertions(+), 31 deletions(-)
+
+diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
+index 2c61d74..fe5465d 100644
+--- a/drivers/lightnvm/pblk-rb.c
++++ b/drivers/lightnvm/pblk-rb.c
+@@ -353,17 +353,17 @@ static int pblk_rb_flush_point_set(struct pblk_rb *rb, struct bio *bio,
+ 				  unsigned int pos)
  {
- 	int i;
- 	struct bio_vec *bvec;
-+	struct bvec_iter_all bia;
+ 	struct pblk_rb_entry *entry;
+-	unsigned int subm, flush_point;
++	unsigned int sync, flush_point;
  
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		ssize_t ret;
+-	subm = READ_ONCE(rb->subm);
++	sync = READ_ONCE(rb->sync);
++
++	if (pos == sync)
++		return 0;
  
- 		ret = copy_page_from_iter(bvec->bv_page,
-@@ -1094,8 +1095,9 @@ static int bio_copy_to_iter(struct bio *bio, struct iov_iter iter)
+ #ifdef CONFIG_NVM_DEBUG
+ 	atomic_inc(&rb->inflight_flush_point);
+ #endif
+ 
+-	if (pos == subm)
+-		return 0;
+-
+ 	flush_point = (pos == 0) ? (rb->nr_entries - 1) : (pos - 1);
+ 	entry = &rb->entries[flush_point];
+ 
+@@ -604,22 +604,6 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
+ 			return NVM_IO_ERR;
+ 		}
+ 
+-		if (flags & PBLK_FLUSH_ENTRY) {
+-			unsigned int flush_point;
+-
+-			flush_point = READ_ONCE(rb->flush_point);
+-			if (flush_point == pos) {
+-				/* Protect flush points */
+-				smp_store_release(&rb->flush_point,
+-							EMPTY_ENTRY);
+-			}
+-
+-			flags &= ~PBLK_FLUSH_ENTRY;
+-#ifdef CONFIG_NVM_DEBUG
+-			atomic_dec(&rb->inflight_flush_point);
+-#endif
+-		}
+-
+ 		flags &= ~PBLK_WRITTEN_DATA;
+ 		flags |= PBLK_SUBMITTED_ENTRY;
+ 
+@@ -735,15 +719,24 @@ void pblk_rb_sync_end(struct pblk_rb *rb, unsigned long *flags)
+ 
+ unsigned int pblk_rb_sync_advance(struct pblk_rb *rb, unsigned int nr_entries)
  {
- 	int i;
- 	struct bio_vec *bvec;
-+	struct bvec_iter_all bia;
+-	unsigned int sync;
+-	unsigned int i;
+-
++	unsigned int sync, flush_point;
+ 	lockdep_assert_held(&rb->s_lock);
  
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		ssize_t ret;
+ 	sync = READ_ONCE(rb->sync);
++	flush_point = READ_ONCE(rb->flush_point);
  
- 		ret = copy_page_to_iter(bvec->bv_page,
-@@ -1117,8 +1119,9 @@ void bio_free_pages(struct bio *bio)
- {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
+-	for (i = 0; i < nr_entries; i++)
+-		sync = (sync + 1) & (rb->nr_entries - 1);
++	if (flush_point != EMPTY_ENTRY) {
++		unsigned int secs_to_flush;
++
++		secs_to_flush = pblk_rb_ring_count(flush_point, sync,
++					rb->nr_entries);
++		if (secs_to_flush < nr_entries) {
++			/* Protect flush points */
++			smp_store_release(&rb->flush_point, EMPTY_ENTRY);
++		}
++	}
++
++	sync = (sync + nr_entries) & (rb->nr_entries - 1);
  
--	bio_for_each_page_all(bvec, bio, i)
-+	bio_for_each_page_all2(bvec, bio, i, bia)
- 		__free_page(bvec->bv_page);
+ 	/* Protect from counts */
+ 	smp_store_release(&rb->sync, sync);
+@@ -751,22 +744,27 @@ unsigned int pblk_rb_sync_advance(struct pblk_rb *rb, unsigned int nr_entries)
+ 	return sync;
  }
- EXPORT_SYMBOL(bio_free_pages);
-@@ -1284,6 +1287,7 @@ struct bio *bio_map_user_iov(struct request_queue *q,
- 	struct bio *bio;
- 	int ret;
- 	struct bio_vec *bvec;
-+	struct bvec_iter_all bia;
  
- 	if (!iov_iter_count(iter))
- 		return ERR_PTR(-EINVAL);
-@@ -1357,7 +1361,7 @@ struct bio *bio_map_user_iov(struct request_queue *q,
- 	return bio;
- 
-  out_unmap:
--	bio_for_each_page_all(bvec, bio, j) {
-+	bio_for_each_page_all2(bvec, bio, j, bia) {
- 		put_page(bvec->bv_page);
- 	}
- 	bio_put(bio);
-@@ -1368,11 +1372,12 @@ static void __bio_unmap_user(struct bio *bio)
++/* Calculate how many sectors to submit up to the current flush point. */
+ unsigned int pblk_rb_flush_point_count(struct pblk_rb *rb)
  {
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
+-	unsigned int subm, flush_point;
+-	unsigned int count;
++	unsigned int subm, sync, flush_point;
++	unsigned int submitted, to_flush;
  
- 	/*
- 	 * make sure we dirty pages we wrote to
- 	 */
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		if (bio_data_dir(bio) == READ)
- 			set_page_dirty_lock(bvec->bv_page);
+ 	/* Protect flush points */
+ 	flush_point = smp_load_acquire(&rb->flush_point);
+ 	if (flush_point == EMPTY_ENTRY)
+ 		return 0;
  
-@@ -1464,8 +1469,9 @@ static void bio_copy_kern_endio_read(struct bio *bio)
- 	char *p = bio->bi_private;
- 	struct bio_vec *bvec;
- 	int i;
-+	struct bvec_iter_all bia;
++	/* Protect syncs */
++	sync = smp_load_acquire(&rb->sync);
++
+ 	subm = READ_ONCE(rb->subm);
++	submitted = pblk_rb_ring_count(subm, sync, rb->nr_entries);
  
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		memcpy(p, page_address(bvec->bv_page), bvec->bv_len);
- 		p += bvec->bv_len;
- 	}
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 99f6e2cb6fd5..2899adfa23f4 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -81,6 +81,7 @@ int blkdev_report_zones(struct block_device *bdev,
- 	unsigned int ofst;
- 	void *addr;
- 	int ret;
-+	struct bvec_iter_all bia;
+ 	/* The sync point itself counts as a sector to sync */
+-	count = pblk_rb_ring_count(flush_point, subm, rb->nr_entries) + 1;
++	to_flush = pblk_rb_ring_count(flush_point, sync, rb->nr_entries) + 1;
  
- 	if (!q)
- 		return -ENXIO;
-@@ -148,7 +149,7 @@ int blkdev_report_zones(struct block_device *bdev,
- 	n = 0;
- 	nz = 0;
- 	nr_rep = 0;
--	bio_for_each_page_all(bv, bio, i) {
-+	bio_for_each_page_all2(bv, bio, i, bia) {
- 
- 		if (!bv->bv_page)
- 			break;
-@@ -181,7 +182,7 @@ int blkdev_report_zones(struct block_device *bdev,
- 
- 	*nr_zones = nz;
- out:
--	bio_for_each_page_all(bv, bio, i)
-+	bio_for_each_page_all2(bv, bio, i, bia)
- 		__free_page(bv->bv_page);
- 	bio_put(bio);
- 
-diff --git a/block/bounce.c b/block/bounce.c
-index 67aa6cff16d6..6436c07179f0 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -146,11 +146,12 @@ static void bounce_end_io(struct bio *bio, mempool_t *pool)
- 	struct bio_vec *bvec, orig_vec;
- 	int i;
- 	struct bvec_iter orig_iter = bio_orig->bi_iter;
-+	struct bvec_iter_all bia;
- 
- 	/*
- 	 * free up bounce indirect pages used
- 	 */
--	bio_for_each_page_all(bvec, bio, i) {
-+	bio_for_each_page_all2(bvec, bio, i, bia) {
- 		orig_vec = bio_iter_iovec(bio_orig, orig_iter);
- 		if (bvec->bv_page != orig_vec.bv_page) {
- 			dec_zone_page_state(bvec->bv_page, NR_BOUNCE);
-@@ -205,6 +206,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
- 	unsigned i = 0;
- 	bool bounce = false;
- 	int sectors = 0;
-+	struct bvec_iter_all bia;
- 
- 	bio_for_each_page(from, *bio_orig, iter) {
- 		if (i++ < BIO_MAX_PAGES)
-@@ -223,7 +225,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
- 	}
- 	bio = bio_clone_bioset(*bio_orig, GFP_NOIO, bounce_bio_set);
- 
--	bio_for_each_page_all(to, bio, i) {
-+	bio_for_each_page_all2(to, bio, i, bia) {
- 		struct page *page = to->bv_page;
- 
- 		if (page_to_pfn(page) <= q->limits.bounce_pfn)
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index f96c9f662f92..899db6701f0d 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -365,10 +365,11 @@ static inline unsigned bio_pages_all(struct bio *bio)
- {
- 	unsigned i;
- 	struct bio_vec *bv;
-+	struct bvec_iter_all bia;
- 
- 	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
- 
--	bio_for_each_page_all(bv, bio, i)
-+	bio_for_each_page_all2(bv, bio, i, bia)
- 		;
- 	return i;
+-	return count;
++	return (submitted < to_flush) ? (to_flush - submitted) : 0;
  }
+ 
+ /*
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index 018af87..aae86ed 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -21,13 +21,28 @@ static unsigned long pblk_end_w_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 				    struct pblk_c_ctx *c_ctx)
+ {
+ 	struct bio *original_bio;
++	struct pblk_rb *rwb = &pblk->rwb;
+ 	unsigned long ret;
+ 	int i;
+ 
+ 	for (i = 0; i < c_ctx->nr_valid; i++) {
+ 		struct pblk_w_ctx *w_ctx;
++		int pos = c_ctx->sentry + i;
++		int flags;
++
++		w_ctx = pblk_rb_w_ctx(rwb, pos);
++		flags = READ_ONCE(w_ctx->flags);
++
++		if (flags & PBLK_FLUSH_ENTRY) {
++			flags &= ~PBLK_FLUSH_ENTRY;
++			/* Release flags on context. Protect from writes */
++			smp_store_release(&w_ctx->flags, flags);
++
++#ifdef CONFIG_NVM_DEBUG
++			atomic_dec(&rwb->inflight_flush_point);
++#endif
++		}
+ 
+-		w_ctx = pblk_rb_w_ctx(&pblk->rwb, c_ctx->sentry + i);
+ 		while ((original_bio = bio_list_pop(&w_ctx->bios)))
+ 			bio_endio(original_bio);
+ 	}
 -- 
-2.9.5
+2.7.4
