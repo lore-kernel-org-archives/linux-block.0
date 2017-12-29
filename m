@@ -1,85 +1,70 @@
 Return-Path: <msnitzer@redhat.com>
+Date: Fri, 29 Dec 2017 15:19:04 -0500
 From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk,
-	hch@lst.de,
-	emilne@redhat.com,
-	james.smart@broadcom.com
-Cc: hare@suse.de,
-	Bart.VanAssche@wdc.com,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	dm-devel@redhat.com
-Subject: [for-4.16 PATCH 0/5] block, nvme, dm: allow DM multipath to use NVMe's error handler
-Date: Tue, 19 Dec 2017 16:05:41 -0500
-Message-Id: <20171219210546.65928-1-snitzer@redhat.com>
+To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
+Cc: keith.busch@intel.com, emilne@redhat.com, james.smart@broadcom.com,
+	hare@suse.de, Bart.VanAssche@wdc.com, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, dm-devel@redhat.com
+Subject: Re: [for-4.16 PATCH v2 1/5] block: establish request failover
+ callback
+Message-ID: <20171229201904.GA8876@redhat.com>
+References: <20171227032257.8182-1-snitzer@redhat.com>
+ <20171227032257.8182-2-snitzer@redhat.com>
+ <20171229101013.GA25333@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171229101013.GA25333@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-These patches enable DM multipath to work well on NVMe over Fabrics
-devices.  Currently that implies CONFIG_NVME_MULTIPATH is _not_ set.
+On Fri, Dec 29 2017 at  5:10am -0500,
+Christoph Hellwig <hch@lst.de> wrote:
 
-But follow-on work will be to make it so that native NVMe multipath
-and DM multipath can be made to co-exist (e.g. blacklisting certain
-NVMe devices from being consumed by native NVMe multipath?)
+> On Tue, Dec 26, 2017 at 10:22:53PM -0500, Mike Snitzer wrote:
+> > All requests allocated from a request_queue with this callback set can
+> > failover their requests during completion.
+> > 
+> > This callback is expected to use the blk_steal_bios() interface to
+> > transfer a request's bios back to an upper-layer bio-based
+> > request_queue.
+> > 
+> > This will be used by both NVMe multipath and DM multipath.  Without it
+> > DM multipath cannot get access to NVMe-specific error handling that NVMe
+> > core provides in nvme_complete_rq().
+> 
+> And the whole point is that it should not get any such access.
 
-Patch 1 updates block core to formalize a recent construct that
-Christoph embeedded into NVMe core (and native NVMe multipath):
-callback into a bio-based driver from the blk-mq driver's .complete
-hook to blk_steal_bios() a request's bios.
+No the whole point is you hijacked multipathing for little to no gain.
 
-Patch 2 switches NVMe over to using the block infrastructure
-established by Patch 1.
+> The reason why we did nvme multipathing differently is because the
+> design of dm-multipath inflicts so much pain on users that we absolutely
+> want to avoid it this time around.
 
-Patch 3 moves the nvme_req_needs_failover() from NVMe multipath to
-core.  Which allow sstacked devices (like DM multipath) to make use of
-NVMe's enhanced error handling.
+Is that the royal "we"?
 
-Patch 4 updates DM multipath to also make use of the block
-infrastructure established by Patch 1.
+_You_ are the one subjecting users to pain.  There is no reason users
+should need to have multiple management domains for multipathing unless
+they opt-in.  Linux _is_ about choice, yet you're working overtime to
+limit that choice.
 
-Patch 5 can be largely ignored.. but it illustrates that Patch 1 - 4
-enable DM multipath to avoid extra DM endio callbacks.
+You are blatantly ignoring/rejecting both Hannes [1] and I.  Your
+attempt to impose _how_ NVMe multipathing must be done is unacceptable.
 
-These patches have been developed ontop of numerous DM changes I've
-staged for 4.16, see:
-https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/log/?h=dm-4.16
-(which happens to include these 5 patches at the end, purely for
-interim linux-next coverage purposes as these changes land in the
-appropriate maintainer tree).
+Hopefully Jens can see through your senseless position and will accept
+patches 1 - 3 for 4.16.  They offer very minimal change that enables
+users to decide which multipathing they'd prefer to use with NVMe.
 
-I've updated the "mptest" DM multipath testsuite to provide NVMe test
-coverage (using NVMe fcloop), see: https://github.com/snitm/mptest
+Just wish you could stop with this petty bullshit and actually
+collaborate with people.
 
-The tree I've been testing includes all of 'dm-4.16' and all but one
-of the commits from 'nvme-4.16', see:
-https://git.kernel.org/pub/scm/linux/kernel/git/snitzer/linux.git/log/?h=dm-4.16_nvme-4.16
-(I've let James Smart know that commit a0b69cc8 causes "nvme connect"
-to not work on my fcloop testbed).
+I've shown how easy it is to enable NVMe multipathing in terms of DM
+multipath (yet preserve your native NVMe multipathing).  Please stop
+being so dogmatic.  Are you scared of being proven wrong about what the
+market wants?
 
-Jens, provided review is favorable, I'd very much appreciate it you'd
-pick up patches 1 - 3 for 4.16.
+If you'd allow progress toward native NVMe and DM multipathing
+coexisting we'd let the users decide what they prefer.  I don't need to
+impose one way or the other, but I _do_ need to preserve DM multipath
+compatibility given the extensive use of DM multipath in the enterprise
+and increased tooling that builds upon it.
 
-Thanks,
-Mike
-
-Mike Snitzer (5):
-  block: establish request failover callback infrastructure
-  nvme: use request's failover callback for multipath failover
-  nvme: move nvme_req_needs_failover() from multipath to core
-  dm mpath: use NVMe error handling to know when an error is retryable
-  dm mpath: skip calls to end_io_bio if using NVMe bio-based and round-robin
-
- block/blk-core.c              |  2 ++
- block/blk-mq.c                |  1 +
- drivers/md/dm-mpath.c         | 68 ++++++++++++++++++++++++++++++++++++++++++-
- drivers/md/dm-rq.c            |  8 ++---
- drivers/md/dm.c               |  7 +++--
- drivers/nvme/host/core.c      | 50 +++++++++++++++++++++++++++++--
- drivers/nvme/host/multipath.c | 52 ++-------------------------------
- drivers/nvme/host/nvme.h      | 14 ---------
- include/linux/blk_types.h     |  4 +++
- include/linux/blkdev.h        |  6 ++++
- include/linux/device-mapper.h |  6 ++++
- 11 files changed, 145 insertions(+), 73 deletions(-)
-
--- 
-2.15.0
+[1] http://lists.infradead.org/pipermail/linux-nvme/2017-October/013719.html
