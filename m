@@ -1,118 +1,179 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-yb0-f174.google.com ([209.85.213.174]:39592 "EHLO
-        mail-yb0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755336AbdL2IJH (ORCPT
+Received: from LGEAMRELO12.lge.com ([156.147.23.52]:33979 "EHLO
+        lgeamrelo12.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755309AbdL2H3g (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Dec 2017 03:09:07 -0500
-MIME-Version: 1.0
-In-Reply-To: <20171229014736.GA10341@X58A-UD3R>
-References: <CANrsvRPQcWz-p_3TYfNf+Waek3bcNNPniXhFzyyS=7qbCqzGyg@mail.gmail.com>
- <20171229014736.GA10341@X58A-UD3R>
-From: Amir Goldstein <amir73il@gmail.com>
-Date: Fri, 29 Dec 2017 10:09:05 +0200
-Message-ID: <CAOQ4uxin+OEZrkb_fQvJHP2jU_DBRqC9w7uwcPUDaOYv-MrvXg@mail.gmail.com>
-Subject: Re: About the try to remove cross-release feature entirely by Ingo
-To: Byungchul Park <byungchul.park@lge.com>
-Cc: Byungchul Park <max.byungchul.park@gmail.com>,
+        Fri, 29 Dec 2017 02:29:36 -0500
+Date: Fri, 29 Dec 2017 16:28:51 +0900
+From: Byungchul Park <byungchul.park@lge.com>
+To: Theodore Ts'o <tytso@mit.edu>,
+        Byungchul Park <max.byungchul.park@gmail.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Dave Chinner <david@fromorbit.com>,
-        Theodore Tso <tytso@mit.edu>, willy@infradead.org,
+        Ingo Molnar <mingo@kernel.org>, david@fromorbit.com,
+        willy@infradead.org,
         Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>, linux-mm@kvack.org,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Oleg Nesterov <oleg@redhat.com>, kernel-team@lge.com
-Content-Type: text/plain; charset="UTF-8"
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        oleg@redhat.com, kernel-team@lge.com
+Cc: daniel@ffwll.ch
+Subject: Re: About the try to remove cross-release feature entirely by Ingo
+Message-ID: <20171229072851.GA12235@X58A-UD3R>
+References: <CANrsvRPQcWz-p_3TYfNf+Waek3bcNNPniXhFzyyS=7qbCqzGyg@mail.gmail.com>
+ <20171229014736.GA10341@X58A-UD3R>
+ <20171229035146.GA11757@thunk.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171229035146.GA11757@thunk.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Dec 29, 2017 at 3:47 AM, Byungchul Park <byungchul.park@lge.com> wrote:
-> On Wed, Dec 13, 2017 at 03:24:29PM +0900, Byungchul Park wrote:
->> Lockdep works, based on the following:
->>
->>    (1) Classifying locks properly
->>    (2) Checking relationship between the classes
->>
->> If (1) is not good or (2) is not good, then we
->> might get false positives.
->>
->> For (1), we don't have to classify locks 100%
->> properly but need as enough as lockdep works.
->>
->> For (2), we should have a mechanism w/o
->> logical defects.
->>
->> Cross-release added an additional capacity to
->> (2) and requires (1) to get more precisely classified.
->>
->> Since the current classification level is too low for
->> cross-release to work, false positives are being
->> reported frequently with enabling cross-release.
->> Yes. It's a obvious problem. It needs to be off by
->> default until the classification is done by the level
->> that cross-release requires.
->>
->> But, the logic (2) is valid and logically true. Please
->> keep the code, mechanism, and logic.
->
-> I admit the cross-release feature had introduced several false positives
-> about 4 times(?), maybe. And I suggested roughly 3 ways to solve it. I
-> should have explained each in more detail. The lack might have led some
-> to misunderstand.
->
->    (1) The best way: To classify all waiters correctly.
->
->       Ultimately the problems should be solved in this way. But it
->       takes a lot of time so it's not easy to use the way right away.
->       And I need helps from experts of other sub-systems.
->
->       While talking about this way, I made a trouble.. I still believe
->       that each sub-system expert knows how to solve dependency problems
->       most, since each has own dependency rule, but it was not about
->       responsibility. I've never wanted to charge someone else it but me.
->
->    (2) The 2nd way: To make cross-release off by default.
->
->       At the beginning, I proposed cross-release being off by default.
->       Honestly, I was happy and did it when Ingo suggested it on by
->       default once lockdep on. But I shouldn't have done that but kept
->       it off by default. Cross-release can make some happy but some
->       unhappy until problems go away through (1) or (2).
->
->    (3) The 3rd way: To invalidate waiters making trouble.
->
->       Of course, this is not the best. Now that you have already spent
->       a lot of time to fix original lockdep's problems since lockdep was
->       introduced in 2006, we don't need to use this way for typical
->       locks except a few special cases. Lockdep is fairly robust by now.
->
->       And I understand you don't want to spend more time to fix
->       additional problems again. Now that the situation is different
->       from the time, 2006, it's not too bad to use this way to handle
->       the issues.
->
+On Thu, Dec 28, 2017 at 10:51:46PM -0500, Theodore Ts'o wrote:
+> On Fri, Dec 29, 2017 at 10:47:36AM +0900, Byungchul Park wrote:
+> > 
+> >    (1) The best way: To classify all waiters correctly.
+> 
+> It's really not all waiters, but all *locks*, no?
 
-Purely logically, aren't you missing a 4th option:
+Thanks for your opinion. I will add my opinion on you.
 
-    (4) The 4th way: To validate specific waiters.
+I meant *waiters*. Locks are only a sub set of potential waiters, which
+actually cause deadlocks. Cross-release was designed to consider the
+super set including all general waiters such as typical locks,
+wait_for_completion(), and lock_page() and so on..
 
-Is it not an option for a subsystem to opt-in for cross-release validation
-of specific locks/waiters? This may be a much preferred route for cross-
-release. I remember seeing a post from a graphic driver developer that
-found cross-release useful for finding bugs in his code.
+> >       Ultimately the problems should be solved in this way. But it
+> >       takes a lot of time so it's not easy to use the way right away.
+> >       And I need helps from experts of other sub-systems.
+> > 
+> >       While talking about this way, I made a trouble.. I still believe
+> >       that each sub-system expert knows how to solve dependency problems
+> >       most, since each has own dependency rule, but it was not about
+> >       responsibility. I've never wanted to charge someone else it but me.
+> 
+> The problem is that it's not one subsystem, but *many*.  And it's the
+> interactions between the subsystems.
+> 
+> Consider the example I gave of a network block device, on which a
+> local disk file system is mounted, which is then exported over NFS.
+> So we have the Networking (TCP) stack involved, the NBD device driver,
+> the local disk file system, the NFS file system, and the networking
+> stack a second time.  That is *many* subsystem maintainers who have to
+> get involved.
 
-For example, many waiters in kernel can be waiting for userspace code,
-so does that mean the cross-release is going to free the world from
-userspace deadlocks as well?? Possibly I am missing something.
+I admit that it's not simple one to solve..
 
-In any way, it seem logical to me that some waiters should particpate
-in lock chain dependencies, while other waiters should break the chain
-to avoid false positives and to avoid protecting against user configurable
-deadlocks (like loop mount over file inside the loop mounted fs).
-And if you agree that this logic claim is correct, than surely, an inclusive
-approach is the best way forward.
+> In addition, the lock classification system is not documented at all,
+> so now you also need someone who understands the lockdep code.  And
+> since some of these classifications involve transient objects, and
+> lockdep doesn't have a way of dealing with transient locks, and has a
+> hard compile time limit of the number of locks that it supports, to
+> expect a subsystem maintainer to figure out all of the interactions,
+> plus figure out lockdep, and work around lockdep's limitations
+> seems.... not realistic.
 
-Cheers,
-Amir.
+I have to think it more to find out how to solve it simply enough to be
+acceptable. The only solution I come up with for now is too complex.
+
+> (By the way, I've tried reading the crosslock and crossrelease
+> documentation --- and I'm lost.  Sorry, I'm just not smart enough to
+> understand how it works, at least not from reading the documentation
+> that was in the patch series.  And honestly, I don't care.  All I do
+
+I am sorry for that. My english is too bad.. I can explain whatever you
+wonder if you ask me.
+
+> need is some practical instructions for how to "classify locks
+> properly", and how this interacts with lockdep's limitations.)
+
+I see what you consider. As you know, it's not something that I can
+solve right away. That's why I suggested (2) or (3)..
+
+> >    (2) The 2nd way: To make cross-release off by default.
+> > 
+> >       At the beginning, I proposed cross-release being off by default.
+> >       Honestly, I was happy and did it when Ingo suggested it on by
+> >       default once lockdep on. But I shouldn't have done that but kept
+> >       it off by default. Cross-release can make some happy but some
+> >       unhappy until problems go away through (1) or (2).
+                                                         ^
+                                                 should be (3)
+
+> Ingo's argument is that (1) is not going to be happening any time
+> soon, and in the meantime, code which is turned off will bitrot.
+
+The root cause of the problem is that locks, generally speaking, waiters
+are roughly classified. IOW, having the new code with a better
+classification is worth, even it would be done later.
+
+> Given that once Lockdep reports a locking violation, it doesn't report
+> any more lockdep violations, if there are a large number of false
+> positives, people will not want to turn on cross-release, since it
+> will report the false positive and then turn itself off, so it won't
+> report anything useful.  So if no one turns it on because of the false
+> positives, how does the bitrot problem get resolved?
+
+The problems come from wrong classification. Waiters either classfied
+well or invalidated properly won't bitrot.
+
+> And if the answer is that some small number of lockdep experts will be
+> trying to figure out how to do (1) in a tractable way, then Ingo has
+> argued it can be handled via an out-of-tree patch.
+> 
+> >    (3) The 3rd way: To invalidate waiters making trouble.
+> 
+> Hmm, can we make cross-release and cross-lock off by default on a per
+> lock basis?  With a well documented to enable it?  I'm still not sure
+
+Yes. More precisely speaking, we can make cross-release check off on a
+per waiter basis, for example, by using init_completion_nomap() or its
+family which I can provide if needed, leaving other traditional lockdep
+checking *unchanged*. For that issue we talked about, we could use it in
+submit_bio_wait() to invalidate the checking for the waiter.
+
+> how this works given the cross-subsystem problem, though.
+
+It works because the invalidation make lockdep not generate the link
+between a set of fs locks on a layer and another set on another layer.
+
+> So if networking enables it because there are no problems with their
+> TCP-only test, and then it blows up when someone is doing NBD or NFS
+> testing, what's the recourse?  The file system developer submitting a
+> patch against the networking subsystem to turn off the lockdep
+> tracking on that particular lock because it's causing pain for the
+> file system developer?  I can see that potentially causing all sorts
+> of inter-subsystem conflicts.
+
+If it can never be solved anyway, we can invalidate the waiter. What I
+want to say is that it's better than nothing, since cross-release would
+work and give the benefit in most cases, except that complicated case.
+
+> > Talking about what Ingo said in the commit msg.. I want to ask him back,
+> > if he did it with no false positives at the moment merging it in 2006,
+> > without using (2) or (3) method. I bet he know what it means.. And
+> > classifying locks/waiters correctly is not something uglifying code but
+> > a way to document code better. I've felt ill at ease because of the
+> > unnatural and forced explanation.
+> 
+> So I think this is the big difference is that potential for
+> cross-subsystem false positives is dramatically higher than with
+> cross-release compared with the traditional lockdep.  And I'm not sure
+> there is a clean solution --- how do you "cleanly classify" locks when
+> in some cases each object's locks needs to be considered individual
+> locks, and when that must not be done lest there is an explosion of
+> the number of locks which lockdep needs to track (which is strictly
+> limited due to memory and CPU overhead, as I understand things)?  I
+> haven't seen an explanation for how to solve this in a clean, general
+> way --- and I strongly suspect it doesn't exist.
+
+I think this is the main point you want to point out anyway. Couldn't we
+why, if we try in one way or another?
+
+For example, we can introduce the concept of group so classes in each
+group can be distinguished from another, of course, there might also be
+many things to discuss though.
+
+--
+Thanks,
+Byungchul
