@@ -1,35 +1,27 @@
-Return-Path: <prvs=5056bd117=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH 0/2] Show commands stuck in a timeout handler in debugfs
-Date: Mon,  4 Dec 2017 16:38:07 -0800
-Message-Id: <20171205003809.1705-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from verein.lst.de ([213.95.11.211]:51909 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751208AbdL2JzA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 29 Dec 2017 04:55:00 -0500
+Date: Fri, 29 Dec 2017 10:54:59 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Yi Zhang <yi.zhang@redhat.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>, stable@vger.kernel.org
+Subject: Re: [PATCH V2 1/6] blk-mq: quiesce queue before freeing queue
+Message-ID: <20171229095459.GA24507@lst.de>
+References: <20171214023103.18272-1-ming.lei@redhat.com> <20171214023103.18272-2-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171214023103.18272-2-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hello Jens,
+Looks good,
 
-While debugging an issue with the SCSI error handler I noticed that commands
-that got stuck in that error handler are not shown in debugfs. That is very
-annoying for anyone who relies on the information in debugfs for root-causing
-such an issue. Hence this patch series that makes sure that commands that got
-stuck in a block driver timeout handler are also shown in debugfs. Please
-consider these patches for kernel v4.16.
-
-Thanks,
-
-Bart.
-
-Bart Van Assche (2):
-  scsi-mq: Only show the CDB if available
-  blk-mq-debugfs: Also show requests that have not yet been started
-
- block/blk-mq-debugfs.c      |  2 +-
- drivers/scsi/scsi_debugfs.c | 47 ++++++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 43 insertions(+), 6 deletions(-)
-
--- 
-2.15.0
+Reviewed-by: Christoph Hellwig <hch@lst.de>
