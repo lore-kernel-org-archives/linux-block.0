@@ -1,16 +1,21 @@
-Return-Path: <zhangweiping@didichuxing.com>
-Date: Sat, 30 Dec 2017 00:36:17 +0800
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.didichuxing.com ([111.202.154.82]:16059 "EHLO
+        BJEXMBX012.didichuxing.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1750869AbdL2Qaw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 29 Dec 2017 11:30:52 -0500
+Date: Sat, 30 Dec 2017 00:30:32 +0800
 From: weiping zhang <zhangweiping@didichuxing.com>
 To: Bruno Wolff III <bruno@wolff.to>
-CC: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@kernel.dk>, Laura Abbott
-	<labbott@redhat.com>, Jan Kara <jack@suse.cz>, James Bottomley
-	<James.Bottomley@HansenPartnership.com>, weiping zhang <zwp10758@gmail.com>,
-	<linux-mm@kvack.org>, Linux Kernel Mailing List
-	<linux-kernel@vger.kernel.org>, <regressions@leemhuis.info>,
-	<linux-block@vger.kernel.org>
+CC: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Laura Abbott <labbott@redhat.com>, Jan Kara <jack@suse.cz>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>,
+        weiping zhang <zwp10758@gmail.com>, <linux-mm@kvack.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        <regressions@leemhuis.info>, <linux-block@vger.kernel.org>
 Subject: Re: Regression with a0747a859ef6 ("bdi: add error handle for
  bdi_debug_register")
-Message-ID: <20171229163617.GB9150@bogon.didichuxing.com>
+Message-ID: <20171229163021.GA9150@bogon.didichuxing.com>
 References: <CAA70yB496Nuy2FM5idxLZthBwOVbhtsZ4VtXNJ_9mj2cvNC4kA@mail.gmail.com>
  <20171221153631.GA2300@wolff.to>
  <CAA70yB6nD7CiDZUpVPy7cGhi7ooQ5SPkrcXPDKqSYD2ezLrGHA@mail.gmail.com>
@@ -24,8 +29,8 @@ References: <CAA70yB496Nuy2FM5idxLZthBwOVbhtsZ4VtXNJ_9mj2cvNC4kA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 In-Reply-To: <20171222140423.GA23107@wolff.to>
-Return-Path: zhangweiping@didichuxing.com
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 On Fri, Dec 22, 2017 at 08:04:23AM -0600, Bruno Wolff III wrote:
 > On Fri, Dec 22, 2017 at 21:20:10 +0800,
@@ -49,23 +54,23 @@ On Fri, Dec 22, 2017 at 08:04:23AM -0600, Bruno Wolff III wrote:
 > >that warning, I'll debug it later.
 > 
 > Great. When you have a fix, I can test it.
-This issue can trigger easily in Centos7.3, if meet two factors:
+This issue can trigger easily in Centos7.3 + kernel-4.15-rc3, if meet two factors:
 1. SELINUX in enforceing mode
 2. mdadm try to create new gendisk.
 
 if disable SELINUX or let it in permissive mode, issue disappear.
 As Jens has revert that commit, it seems boot normally, actually
-this is no diretor created under /sys/kernel/debug/bdi/, though
+there is no diretory created under /sys/kernel/debug/bdi/, though
 has no effect on disk workflow.
 
-As james said before, "debugfs files should be treated as optional",
+As James said before, "debugfs files should be treated as optional",
 so kernel give warning here is enough.
 
-So there are 2 ways to fix this issue:
-1. Add proper SELINUX policy allow mdadm create dir at debugfs
-2. mdadm don't create gendisk directly, first mdadm trigger a kwork and
-wait it done, let kwork create gendisk.
-A possible change for MD like following:
+So, we may solve this issue in two ways:
+1. Add proper SELINUX policy that give permission to mdadm for debugfs.
+2. Split mdadm into 2 part, Firstly, user proccess mdadm trigger a kwork,
+secondly kwork will create gendisk)and mdadm wait it done, Like
+following: 
 
 diff --git a/drivers/md/md.c b/drivers/md/md.c
 index 4e4dee0..86ead5a 100644
