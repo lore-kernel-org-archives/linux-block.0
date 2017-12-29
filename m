@@ -1,73 +1,34 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Huang Ying <ying.huang@intel.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Coly Li <colyli@suse.de>, Filipe Manana <fdmanana@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 12/45] blk-merge: compute bio->bi_seg_front_size efficiently
-Date: Mon, 18 Dec 2017 20:22:14 +0800
-Message-Id: <20171218122247.3488-13-ming.lei@redhat.com>
-In-Reply-To: <20171218122247.3488-1-ming.lei@redhat.com>
-References: <20171218122247.3488-1-ming.lei@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Return-Path: <msnitzer@redhat.com>
+Date: Fri, 29 Dec 2017 15:22:00 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, keith.busch@intel.com, emilne@redhat.com,
+	james.smart@broadcom.com, hare@suse.de, Bart.VanAssche@wdc.com,
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+	dm-devel@redhat.com
+Subject: Re: [for-4.16 PATCH v2 2/5] nvme: use request_queue's failover_rq_fn
+ callback for multipath failover
+Message-ID: <20171229202200.GB8876@redhat.com>
+References: <20171227032257.8182-1-snitzer@redhat.com>
+ <20171227032257.8182-3-snitzer@redhat.com>
+ <20171229101119.GB25333@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171229101119.GB25333@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-It is enough to check and compute bio->bi_seg_front_size just
-after the 1st segment is found, but current code checks that
-for each bvec, which is inefficient.
+On Fri, Dec 29 2017 at  5:11am -0500,
+Christoph Hellwig <hch@lst.de> wrote:
 
-This patch follows the way in  __blk_recalc_rq_segments()
-for computing bio->bi_seg_front_size, and it is more efficient
-and code becomes more readable too.
+> Independent on any policy question as raised in reply to the previous
+> patch:  until the ANA (ALUA equivalent for NVMe) spec has been finalized
+> and our code for it has landed there is no way we're going to expose
+> anything from this code based as it will be highly in flux.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-merge.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+Please stop hiding behind specs like they are governing this aspect of
+Linux's NVMe implementation.
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index f5dedd57dff6..a476337a8ff4 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -146,22 +146,21 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 			bvprvp = &bvprv;
- 			sectors += bv.bv_len >> 9;
- 
--			if (nsegs == 1 && seg_size > front_seg_size)
--				front_seg_size = seg_size;
- 			continue;
- 		}
- new_segment:
- 		if (nsegs == queue_max_segments(q))
- 			goto split;
- 
-+		if (nsegs == 1 && seg_size > front_seg_size)
-+			front_seg_size = seg_size;
-+
- 		nsegs++;
- 		bvprv = bv;
- 		bvprvp = &bvprv;
- 		seg_size = bv.bv_len;
- 		sectors += bv.bv_len >> 9;
- 
--		if (nsegs == 1 && seg_size > front_seg_size)
--			front_seg_size = seg_size;
- 	}
- 
- 	do_split = false;
-@@ -174,6 +173,8 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 			bio = new;
- 	}
- 
-+	if (nsegs == 1 && seg_size > front_seg_size)
-+		front_seg_size = seg_size;
- 	bio->bi_seg_front_size = front_seg_size;
- 	if (seg_size > bio->bi_seg_back_size)
- 		bio->bi_seg_back_size = seg_size;
--- 
-2.9.5
+Please just own the need for NVMe to provide DM multipathing
+compatibility.
+
+Thanks.
