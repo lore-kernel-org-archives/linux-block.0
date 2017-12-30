@@ -1,143 +1,54 @@
-Return-Path: <msnitzer@redhat.com>
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk,
-	hch@lst.de,
-	keith.busch@intel.com
-Cc: emilne@redhat.com,
-	james.smart@broadcom.com,
-	hare@suse.de,
-	Bart.VanAssche@wdc.com,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	dm-devel@redhat.com
-Subject: [for-4.16 PATCH v2 5/5] dm mpath: skip calls to end_io_bio if using NVMe bio-based and round-robin
-Date: Tue, 26 Dec 2017 22:22:57 -0500
-Message-Id: <20171227032257.8182-6-snitzer@redhat.com>
-In-Reply-To: <20171227032257.8182-1-snitzer@redhat.com>
-References: <20171227032257.8182-1-snitzer@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pl0-f67.google.com ([209.85.160.67]:44967 "EHLO
+        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750937AbdL3XJs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 Dec 2017 18:09:48 -0500
+Received: by mail-pl0-f67.google.com with SMTP id n13so24956626plp.11
+        for <linux-block@vger.kernel.org>; Sat, 30 Dec 2017 15:09:47 -0800 (PST)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: Kent Overstreet <kent.overstreet@gmail.com>,
+        Michael Lyle <mlyle@lyle.org>
+Subject: [for-416 PATCH 2/2] bcache: mark closure_sync() __sched
+Date: Sat, 30 Dec 2017 15:09:34 -0800
+Message-Id: <20171230230934.910-2-mlyle@lyle.org>
+In-Reply-To: <20171230230934.910-1-mlyle@lyle.org>
+References: <20171230230934.910-1-mlyle@lyle.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Add a 'skip_endio_hook' flag member to 'struct dm_target' that if set
-instructs calls to .end_io (or .rq_end_io) to be skipped.
+From: Kent Overstreet <kent.overstreet@gmail.com>
 
-NVMe bio-based doesn't use multipath_end_io_bio() for anything other
-than updating the path-selector.  So it can be avoided completely if the
-round-robin path selector is used (because round-robin doesn't have an
-end_io hook).
+[edit by mlyle: include sched/debug.h to get __sched]
 
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
+Signed-off-by: Michael Lyle <mlyle@lyle.org>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
 ---
- drivers/md/dm-mpath.c         | 24 ++++++++++++++++++++----
- drivers/md/dm-rq.c            |  8 ++++----
- drivers/md/dm.c               |  7 ++++---
- include/linux/device-mapper.h |  6 ++++++
- 4 files changed, 34 insertions(+), 11 deletions(-)
+ drivers/md/bcache/closure.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-index 875df8ad6efe..fc0f1940b107 100644
---- a/drivers/md/dm-mpath.c
-+++ b/drivers/md/dm-mpath.c
-@@ -1187,6 +1187,21 @@ static int multipath_ctr(struct dm_target *ti, unsigned argc, char **argv)
- 		goto bad;
- 	}
+diff --git a/drivers/md/bcache/closure.c b/drivers/md/bcache/closure.c
+index 8a4f4e4f5537..23eb3d1223e7 100644
+--- a/drivers/md/bcache/closure.c
++++ b/drivers/md/bcache/closure.c
+@@ -8,6 +8,7 @@
+ #include <linux/debugfs.h>
+ #include <linux/module.h>
+ #include <linux/seq_file.h>
++#include <linux/sched/debug.h>
  
-+	/*
-+	 * If NVMe bio-based and all path selectors don't provide .end_io hook:
-+	 * inform DM core that there is no need to call this target's end_io hook.
-+	 */
-+	if (m->queue_mode == DM_TYPE_NVME_BIO_BASED) {
-+		struct priority_group *pg;
-+		if (!m->nr_priority_groups)
-+			goto finish;
-+		list_for_each_entry(pg, &m->priority_groups, list) {
-+			if (pg->ps.type->end_io)
-+				goto finish;
-+		}
-+		ti->skip_end_io_hook = true;
-+	}
-+finish:
- 	ti->num_flush_bios = 1;
- 	ti->num_discard_bios = 1;
- 	ti->num_write_same_bios = 1;
-@@ -1672,11 +1687,12 @@ static void multipath_failover_rq(struct request *rq)
- 	unsigned long flags;
+ #include "closure.h"
  
- 	if (pgpath) {
--		struct path_selector *ps = &pgpath->pg->ps;
--
--		if (ps->type->end_io)
--			ps->type->end_io(ps, &pgpath->path, blk_rq_bytes(rq));
-+		if (!ti->skip_end_io_hook) {
-+			struct path_selector *ps = &pgpath->pg->ps;
+@@ -107,7 +108,7 @@ static void closure_sync_fn(struct closure *cl)
+ 	wake_up_process(cl->s->task);
+ }
  
-+			if (ps->type->end_io)
-+				ps->type->end_io(ps, &pgpath->path, blk_rq_bytes(rq));
-+		}
- 		fail_path(pgpath);
- 	}
- 
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index 9d32f25489c2..64206743da8f 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -285,12 +285,12 @@ static void dm_done(struct request *clone, blk_status_t error, bool mapped)
+-void __closure_sync(struct closure *cl)
++void __sched __closure_sync(struct closure *cl)
  {
- 	int r = DM_ENDIO_DONE;
- 	struct dm_rq_target_io *tio = clone->end_io_data;
--	dm_request_endio_fn rq_end_io = NULL;
-+	struct dm_target *ti = tio->ti;
+ 	struct closure_syncer s = { .task = current };
  
--	if (tio->ti) {
--		rq_end_io = tio->ti->type->rq_end_io;
-+	if (ti) {
-+		dm_request_endio_fn rq_end_io = ti->type->rq_end_io;
- 
--		if (mapped && rq_end_io)
-+		if (mapped && rq_end_io && !ti->skip_end_io_hook)
- 			r = rq_end_io(tio->ti, clone, error, &tio->info);
- 	}
- 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 9f4c4a7fd40d..5c83d9dcbfe8 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -937,7 +937,8 @@ static void clone_endio(struct bio *bio)
- 	struct dm_target_io *tio = container_of(bio, struct dm_target_io, clone);
- 	struct dm_io *io = tio->io;
- 	struct mapped_device *md = tio->io->md;
--	dm_endio_fn endio = tio->ti->type->end_io;
-+	struct dm_target *ti = tio->ti;
-+	dm_endio_fn endio = ti->type->end_io;
- 
- 	if (unlikely(error == BLK_STS_TARGET) && md->type != DM_TYPE_NVME_BIO_BASED) {
- 		if (bio_op(bio) == REQ_OP_WRITE_SAME &&
-@@ -948,8 +949,8 @@ static void clone_endio(struct bio *bio)
- 			disable_write_zeroes(md);
- 	}
- 
--	if (endio) {
--		int r = endio(tio->ti, bio, &error);
-+	if (endio && !ti->skip_end_io_hook) {
-+		int r = endio(ti, bio, &error);
- 		switch (r) {
- 		case DM_ENDIO_REQUEUE:
- 			error = BLK_STS_DM_REQUEUE;
-diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
-index 758feae899f9..f3c4bd29083f 100644
---- a/include/linux/device-mapper.h
-+++ b/include/linux/device-mapper.h
-@@ -310,6 +310,12 @@ struct dm_target {
- 	 * on max_io_len boundary.
- 	 */
- 	bool split_discard_bios:1;
-+
-+	/*
-+	 * Set if there is no need to call this target's end_io hook
-+	 * (be it .end_io or .end_io_rq).
-+	 */
-+	bool skip_end_io_hook:1;
- };
- 
- /* Each target can link one of these into the table */
 -- 
-2.15.0
+2.14.1
