@@ -1,54 +1,71 @@
-Return-Path: <keith.busch@intel.com>
-From: Keith Busch <keith.busch@intel.com>
-To: linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sagi Grimberg <sagi@grimberg.me>
-Cc: Keith Busch <keith.busch@intel.com>
-Subject: [PATCH 0/3] Performance enhancements
-Date: Thu, 21 Dec 2017 13:46:33 -0700
-Message-Id: <20171221204636.2924-1-keith.busch@intel.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from imap.thunk.org ([74.207.234.97]:38036 "EHLO imap.thunk.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750982AbdL3XBP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 Dec 2017 18:01:15 -0500
+Date: Sat, 30 Dec 2017 18:00:57 -0500
+From: Theodore Ts'o <tytso@mit.edu>
+To: Matthew Wilcox <willy@infradead.org>,
+        Byungchul Park <byungchul.park@lge.com>,
+        Byungchul Park <max.byungchul.park@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@kernel.org>, david@fromorbit.com,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        oleg@redhat.com, kernel-team@lge.com, daniel@ffwll.ch
+Subject: Re: About the try to remove cross-release feature entirely by Ingo
+Message-ID: <20171230230057.GB12995@thunk.org>
+References: <CANrsvRPQcWz-p_3TYfNf+Waek3bcNNPniXhFzyyS=7qbCqzGyg@mail.gmail.com>
+ <20171229014736.GA10341@X58A-UD3R>
+ <20171229035146.GA11757@thunk.org>
+ <20171229072851.GA12235@X58A-UD3R>
+ <20171230061624.GA27959@bombadil.infradead.org>
+ <20171230154041.GB3366@thunk.org>
+ <20171230204417.GF27959@bombadil.infradead.org>
+ <20171230224028.GC3366@thunk.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171230224028.GC3366@thunk.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-A few IO micro-optimizations for IO polling and NVMe. I'm really working
-to close the performance gap with userspace drivers, and this gets me
-halfway there on latency. The fastest hardware I could get measured
-roundtrip read latency at 5usec with this series that was previously
-measuring 5.7usec.
+On Sat, Dec 30, 2017 at 05:40:28PM -0500, Theodore Ts'o wrote:
+> On Sat, Dec 30, 2017 at 12:44:17PM -0800, Matthew Wilcox wrote:
+> > 
+> > I'm not sure I agree with this part.  What if we add a new TCP lock class
+> > for connections which are used for filesystems/network block devices/...?
+> > Yes, it'll be up to each user to set the lockdep classification correctly,
+> > but that's a relatively small number of places to add annotations,
+> > and I don't see why it wouldn't work.
+> 
+> I was exagerrating a bit for effect, I admit.  (but only a bit).
+> 
+> It can probably be for all TCP connections that are used by kernel
+> code (as opposed to userspace-only TCP connections).  But it would
+> probably have to be each and every device-mapper instance, each and
+> every block device, each and every mounted file system, each and every
+> bdi object, etc.
 
-Note with NVMe, you really need to crank up the interrupt coalescing to
-see the completion polling benefit.
+Clarification: all TCP connections that are used by kernel code would
+need to be in their own separate lock class.  All TCP connections used
+only by userspace could be in their own shared lock class.  You can't
+use a one lock class for all kernel-used TCP connections, because of
+the Network Block Device mounted on a local file system which is then
+exported via NFS and squirted out yet another TCP connection problem.
 
-Test pre-setup:
+Also, what to do with TCP connections which are created in userspace
+(with some authentication exchanges happening in userspace), and then
+passed into kernel space for use in kernel space, is an interesting
+question.
 
-  echo performance | tee /sys/devices/system/cpu/cpufreq/policy*/scaling_governor
-  echo 0 > /sys/block/nvme0n1/queue/iostats
-  echo -1 > /sys/block/nvme0n1/queue/io_poll_delay
-  nvme set-feature /dev/nvme0 -f 8 -v 0x4ff
+So "all you have to do is classify the locks 'properly'" is much like
+the apocrophal, "all you have to do is bell the cat"[1].  Or like the
+saying, "colonizing the stars is *easy*; all you have to do is figure
+out faster than light travel."
 
-fio profile:
+[1] https://en.wikipedia.org/wiki/Belling_the_cat
 
-  [global]
-  ioengine=pvsync2
-  rw=randread
-  norandommap
-  direct=1
-  bs=4k
-  hipri
-
-  [hi-pri]
-  filename=/dev/nvme0n1
-  cpus_allowed=2
-
-Keith Busch (3):
-  nvme/pci: Start request after doorbell ring
-  nvme/pci: Remove cq_vector check in IO path
-  block: Polling completion performance optimization
-
- drivers/nvme/host/pci.c | 14 +++-----------
- fs/block_dev.c          |  5 ++++-
- 2 files changed, 7 insertions(+), 12 deletions(-)
-
--- 
-2.13.6
+							- Ted
