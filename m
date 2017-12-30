@@ -1,96 +1,67 @@
-Return-Path: <prvs=531d13839=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>, "mail@maciej.szmigiero.name"
-	<mail@maciej.szmigiero.name>
-CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "osandov@fb.com" <osandov@fb.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from vps-vb.mhejs.net ([37.28.154.113]:51162 "EHLO vps-vb.mhejs.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750971AbdL3Vl0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 Dec 2017 16:41:26 -0500
 Subject: Re: [v2,4/6] pktcdvd: Check queue type before attaching to a queue
-Date: Sun, 31 Dec 2017 00:53:16 +0000
-Message-ID: <1514681596.11082.1.camel@wdc.com>
+To: Bart Van Assche <bart.vanassche@sandisk.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, Omar Sandoval <osandov@fb.com>
 References: <20170531214350.31157-5-bart.vanassche@sandisk.com>
-	 <d237f623-ce22-6360-306f-3460ddba25ef@maciej.szmigiero.name>
-In-Reply-To: <d237f623-ce22-6360-306f-3460ddba25ef@maciej.szmigiero.name>
-Content-Type: multipart/mixed; boundary="_003_1514681596110821camelwdccom_"
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Message-ID: <d237f623-ce22-6360-306f-3460ddba25ef@maciej.szmigiero.name>
+Date: Sat, 30 Dec 2017 22:41:22 +0100
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20170531214350.31157-5-bart.vanassche@sandisk.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
---_003_1514681596110821camelwdccom_
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E274EFB817D7B040A682C8631633FC30@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+On 31.05.2017 23:43, Bart Van Assche wrote:
+> Since the pktcdvd driver only supports request queues for which
+> struct scsi_request is the first member of their private request
+> data, refuse to register block layer queues for which struct
+> scsi_request is not the first member of the private data.
+> 
+> References: commit 82ed4db499b8 ("block: split scsi_request out of struct request")
+> Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+> Reviewed-by: Hannes Reinecke <hare@suse.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Cc: Omar Sandoval <osandov@fb.com>
+> ---
+>  drivers/block/pktcdvd.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+> index 205b865ebeb9..42e3c880a8a5 100644
+> --- a/drivers/block/pktcdvd.c
+> +++ b/drivers/block/pktcdvd.c
+> @@ -2583,6 +2583,11 @@ static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
+>  	bdev = bdget(dev);
+>  	if (!bdev)
+>  		return -ENOMEM;
+> +	if (!blk_queue_scsi_passthrough(bdev_get_queue(bdev))) {
+> +		WARN_ONCE(true, "Attempt to register a non-SCSI queue\n");
+> +		bdput(bdev);
+> +		return -EINVAL;
+> +	}
+>  	ret = blkdev_get(bdev, FMODE_READ | FMODE_NDELAY, NULL);
+>  	if (ret)
+>  		return ret;
+> 
 
-T24gU2F0LCAyMDE3LTEyLTMwIGF0IDIyOjQxICswMTAwLCBNYWNpZWogUy4gU3ptaWdpZXJvIHdy
-b3RlOg0KPiBUaGlzIGNvbW1pdCBjYXVzZXMgYSBOVUxMIHBvaW50ZXIgZGVyZWZlcmVuY2Ugd2hl
-biBhZGRpbmcgYSBwa3RjZHZkDQo+IG1hcHBpbmcuDQo+IA0KPiBSZXByb2R1Y2luZyBpdCBpcyBz
-aW1wbGU6DQo+ICMgcGt0c2V0dXAgMSAvZGV2L2Nkcm9tIA0KPiANCj4gU3BlY2lmaWNhbGx5LCB0
-aGUgTlVMTCBkZXJlZmVyZW5jZSBoYXBwZW5zIGluc2lkZSBiZGV2X2dldF9xdWV1ZShiZGV2KSwN
-Cj4gd2hpY2ggaXMgc3VwcG9zZWQgdG8gcmV0dXJuIGJkZXYtPmJkX2Rpc2stPnF1ZXVlLCBidXQg
-aW4gdGhpcyBjYXNlDQo+IGJkZXYtPmJkX2Rpc2sgaXMgTlVMTC4NCg0KV291bGQgaXQgYmUgcG9z
-c2libGUgdG8gdGVzdCB0aGUgdHdvIGF0dGFjaGVkIHBhdGNoZXM/DQoNClRoYW5rcywNCg0KQmFy
-dC4=
+This commit causes a NULL pointer dereference when adding a pktcdvd
+mapping.
 
---_003_1514681596110821camelwdccom_
-Content-Type: text/x-patch;
-	name="0001-pktcdvd-Fix-a-recently-introduced-NULL-pointer-deref.patch"
-Content-Description: 0001-pktcdvd-Fix-a-recently-introduced-NULL-pointer-deref.patch
-Content-Disposition: attachment;
-	filename="0001-pktcdvd-Fix-a-recently-introduced-NULL-pointer-deref.patch";
-	size=1348; creation-date="Sun, 31 Dec 2017 00:53:16 GMT";
-	modification-date="Sun, 31 Dec 2017 00:53:16 GMT"
-Content-ID: <CCDEB5E8FD418546A88E82FCCA04AB7E@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Reproducing it is simple:
+# pktsetup 1 /dev/cdrom 
 
-RnJvbSA4ZWYwMzA4NzE4YTNmM2Y2MGMwYzY5ODNkM2ZmNjA2YWM4ZDNkYjhkIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBCYXJ0IFZhbiBBc3NjaGUgPGJhcnQudmFuYXNzY2hlQHdkYy5j
-b20+CkRhdGU6IFNhdCwgMzAgRGVjIDIwMTcgMTU6Mjg6MjUgLTA4MDAKU3ViamVjdDogW1BBVENI
-IDEvMl0gcGt0Y2R2ZDogRml4IGEgcmVjZW50bHkgaW50cm9kdWNlZCBOVUxMIHBvaW50ZXIKIGRl
-cmVmZXJlbmNlCgpSZXBvcnRlZC1ieTogTWFjaWVqIFMuIFN6bWlnaWVybyA8bWFpbEBtYWNpZWou
-c3ptaWdpZXJvLm5hbWU+CkZpeGVzOiBjb21taXQgY2ExOGQ2Zjc2OWQyICgiYmxvY2s6IE1ha2Ug
-bW9zdCBzY3NpX3JlcV9pbml0KCkgY2FsbHMgaW1wbGljaXQiKQpTaWduZWQtb2ZmLWJ5OiBCYXJ0
-IFZhbiBBc3NjaGUgPGJhcnQudmFuYXNzY2hlQHdkYy5jb20+CkNjOiA8c3RhYmxlQHZnZXIua2Vy
-bmVsLm9yZz4gIyB2NC4xMwotLS0KIGRyaXZlcnMvYmxvY2svcGt0Y2R2ZC5jIHwgOCArKysrLS0t
-LQogMSBmaWxlIGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkKCmRpZmYg
-LS1naXQgYS9kcml2ZXJzL2Jsb2NrL3BrdGNkdmQuYyBiL2RyaXZlcnMvYmxvY2svcGt0Y2R2ZC5j
-CmluZGV4IDY3OTc0Nzk2YzM1MC4uZmM4YTgwZWM5MGU1IDEwMDY0NAotLS0gYS9kcml2ZXJzL2Js
-b2NrL3BrdGNkdmQuYworKysgYi9kcml2ZXJzL2Jsb2NrL3BrdGNkdmQuYwpAQCAtMjU3OSwxNCAr
-MjU3OSwxNCBAQCBzdGF0aWMgaW50IHBrdF9uZXdfZGV2KHN0cnVjdCBwa3RjZHZkX2RldmljZSAq
-cGQsIGRldl90IGRldikKIAliZGV2ID0gYmRnZXQoZGV2KTsKIAlpZiAoIWJkZXYpCiAJCXJldHVy
-biAtRU5PTUVNOworCXJldCA9IGJsa2Rldl9nZXQoYmRldiwgRk1PREVfUkVBRCB8IEZNT0RFX05E
-RUxBWSwgTlVMTCk7CisJaWYgKHJldCkKKwkJcmV0dXJuIHJldDsKIAlpZiAoIWJsa19xdWV1ZV9z
-Y3NpX3Bhc3N0aHJvdWdoKGJkZXZfZ2V0X3F1ZXVlKGJkZXYpKSkgewogCQlXQVJOX09OQ0UodHJ1
-ZSwgIkF0dGVtcHQgdG8gcmVnaXN0ZXIgYSBub24tU0NTSSBxdWV1ZVxuIik7Ci0JCWJkcHV0KGJk
-ZXYpOworCQlibGtkZXZfcHV0KGJkZXYsIEZNT0RFX1JFQUQgfCBGTU9ERV9OREVMQVkpOwogCQly
-ZXR1cm4gLUVJTlZBTDsKIAl9Ci0JcmV0ID0gYmxrZGV2X2dldChiZGV2LCBGTU9ERV9SRUFEIHwg
-Rk1PREVfTkRFTEFZLCBOVUxMKTsKLQlpZiAocmV0KQotCQlyZXR1cm4gcmV0OwogCiAJLyogVGhp
-cyBpcyBzYWZlLCBzaW5jZSB3ZSBoYXZlIGEgcmVmZXJlbmNlIGZyb20gb3BlbigpLiAqLwogCV9f
-bW9kdWxlX2dldChUSElTX01PRFVMRSk7Ci0tIAoyLjE1LjEKCg==
+Specifically, the NULL dereference happens inside bdev_get_queue(bdev),
+which is supposed to return bdev->bd_disk->queue, but in this case
+bdev->bd_disk is NULL.
 
---_003_1514681596110821camelwdccom_
-Content-Type: text/x-patch;
-	name="0002-pktcdvd-Fix-pkt_setup_dev-error-path.patch"
-Content-Description: 0002-pktcdvd-Fix-pkt_setup_dev-error-path.patch
-Content-Disposition: attachment;
-	filename="0002-pktcdvd-Fix-pkt_setup_dev-error-path.patch"; size=848;
-	creation-date="Sun, 31 Dec 2017 00:53:16 GMT";
-	modification-date="Sun, 31 Dec 2017 00:53:16 GMT"
-Content-ID: <1CE166B921CB1B438E992AA907A5EC4B@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+If I revert this commit the mapping is added correctly (tested on 4.14.10,
+but there haven't been any changes to pktcdvd.c and bdev_get_queue() in
+4.15-rc5).
 
-RnJvbSAzMTkyY2M1ZjYyYjNiYTlmODY2YmNiMjQ1ZDIxMjMxYTM5NzQ1ZDhkIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBCYXJ0IFZhbiBBc3NjaGUgPGJhcnQudmFuYXNzY2hlQHdkYy5j
-b20+CkRhdGU6IFNhdCwgMzAgRGVjIDIwMTcgMTY6NDQ6MzUgLTA4MDAKU3ViamVjdDogW1BBVENI
-IDIvMl0gcGt0Y2R2ZDogRml4IHBrdF9zZXR1cF9kZXYoKSBlcnJvciBwYXRoCgpTaW5jZSBkaXNr
-X3JlbGVhc2UoZGlzaykgY2FsbHMgYmxrX3B1dF9xdWV1ZSgpIGlmIGRpc2stPnF1ZXVlICE9IE5V
-TEwsCmNsZWFyIGRpc2stPnF1ZXVlIGJlZm9yZSBjYWxsaW5nIHB1dF9kaXNrKCkuCgpTaWduZWQt
-b2ZmLWJ5OiBCYXJ0IFZhbiBBc3NjaGUgPGJhcnQudmFuYXNzY2hlQHdkYy5jb20+CkNjOiA8c3Rh
-YmxlQHZnZXIua2VybmVsLm9yZz4KLS0tCiBkcml2ZXJzL2Jsb2NrL3BrdGNkdmQuYyB8IDEgKwog
-MSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspCgpkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibG9j
-ay9wa3RjZHZkLmMgYi9kcml2ZXJzL2Jsb2NrL3BrdGNkdmQuYwppbmRleCBmYzhhODBlYzkwZTUu
-LmM1ZTkzMGQyM2E2MyAxMDA2NDQKLS0tIGEvZHJpdmVycy9ibG9jay9wa3RjZHZkLmMKKysrIGIv
-ZHJpdmVycy9ibG9jay9wa3RjZHZkLmMKQEAgLTI3NjUsNiArMjc2NSw3IEBAIHN0YXRpYyBpbnQg
-cGt0X3NldHVwX2RldihkZXZfdCBkZXYsIGRldl90KiBwa3RfZGV2KQogCiBvdXRfbmV3X2RldjoK
-IAlibGtfY2xlYW51cF9xdWV1ZShkaXNrLT5xdWV1ZSk7CisJZGlzay0+cXVldWUgPSBOVUxMOwog
-b3V0X21lbTI6CiAJcHV0X2Rpc2soZGlzayk7CiBvdXRfbWVtOgotLSAKMi4xNS4xCgo=
-
---_003_1514681596110821camelwdccom_--
+Maciej
