@@ -1,12 +1,13 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:37996 "EHLO imap.thunk.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750854AbdL3Wkt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Dec 2017 17:40:49 -0500
-Date: Sat, 30 Dec 2017 17:40:28 -0500
-From: Theodore Ts'o <tytso@mit.edu>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Byungchul Park <byungchul.park@lge.com>,
+Received: from bombadil.infradead.org ([65.50.211.133]:56586 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750828AbdL3UoZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 30 Dec 2017 15:44:25 -0500
+Date: Sat, 30 Dec 2017 12:44:17 -0800
+From: Matthew Wilcox <willy@infradead.org>
+To: Theodore Ts'o <tytso@mit.edu>,
+        Byungchul Park <byungchul.park@lge.com>,
         Byungchul Park <max.byungchul.park@gmail.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Peter Zijlstra <peterz@infradead.org>,
@@ -17,40 +18,40 @@ Cc: Byungchul Park <byungchul.park@lge.com>,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         oleg@redhat.com, kernel-team@lge.com, daniel@ffwll.ch
 Subject: Re: About the try to remove cross-release feature entirely by Ingo
-Message-ID: <20171230224028.GC3366@thunk.org>
+Message-ID: <20171230204417.GF27959@bombadil.infradead.org>
 References: <CANrsvRPQcWz-p_3TYfNf+Waek3bcNNPniXhFzyyS=7qbCqzGyg@mail.gmail.com>
  <20171229014736.GA10341@X58A-UD3R>
  <20171229035146.GA11757@thunk.org>
  <20171229072851.GA12235@X58A-UD3R>
  <20171230061624.GA27959@bombadil.infradead.org>
  <20171230154041.GB3366@thunk.org>
- <20171230204417.GF27959@bombadil.infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171230204417.GF27959@bombadil.infradead.org>
+In-Reply-To: <20171230154041.GB3366@thunk.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Sat, Dec 30, 2017 at 12:44:17PM -0800, Matthew Wilcox wrote:
+On Sat, Dec 30, 2017 at 10:40:41AM -0500, Theodore Ts'o wrote:
+> On Fri, Dec 29, 2017 at 10:16:24PM -0800, Matthew Wilcox wrote:
+> > > The problems come from wrong classification. Waiters either classfied
+> > > well or invalidated properly won't bitrot.
+> > 
+> > I disagree here.  As Ted says, it's the interactions between the
+> > subsystems that leads to problems.  Everything's goig to work great
+> > until somebody does something in a way that's never been tried before.
 > 
-> I'm not sure I agree with this part.  What if we add a new TCP lock class
-> for connections which are used for filesystems/network block devices/...?
-> Yes, it'll be up to each user to set the lockdep classification correctly,
-> but that's a relatively small number of places to add annotations,
-> and I don't see why it wouldn't work.
+> The question what is classified *well* mean?  At the extreme, we could
+> put the locks for every single TCP connection into their own lockdep
+> class.  But that would blow the limits in terms of the number of locks
+> out of the water super-quickly --- and it would destroy the ability
+> for lockdep to learn what the proper locking order should be.  Yet
+> given Lockdep's current implementation, the only way to guarantee that
+> there won't be any interactions between subsystems that cause false
+> positives would be to categorizes locks for each TCP connection into
+> their own class.
 
-I was exagerrating a bit for effect, I admit.  (but only a bit).
-
-It can probably be for all TCP connections that are used by kernel
-code (as opposed to userspace-only TCP connections).  But it would
-probably have to be each and every device-mapper instance, each and
-every block device, each and every mounted file system, each and every
-bdi object, etc.
-
-The point I was trying to drive home is that "all we have to do is
-just classify everything well or just invalidate the right lock
-objects" is a massive understatement of the complexity level of what
-would be required, or the number of locks/completion handlers that
-would have to be blacklisted.
-
-						- Ted
+I'm not sure I agree with this part.  What if we add a new TCP lock class
+for connections which are used for filesystems/network block devices/...?
+Yes, it'll be up to each user to set the lockdep classification correctly,
+but that's a relatively small number of places to add annotations,
+and I don't see why it wouldn't work.
