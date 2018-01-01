@@ -1,11 +1,12 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from LGEAMRELO11.lge.com ([156.147.23.51]:49672 "EHLO
-        lgeamrelo11.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751255AbeABH53 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jan 2018 02:57:29 -0500
-Subject: Re: About the try to remove cross-release feature entirely by Ingo
+Received: from imap.thunk.org ([74.207.234.97]:40552 "EHLO imap.thunk.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751231AbeAAQAi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 1 Jan 2018 11:00:38 -0500
+Date: Mon, 1 Jan 2018 11:00:11 -0500
+From: Theodore Ts'o <tytso@mit.edu>
 To: Matthew Wilcox <willy@infradead.org>
-Cc: Theodore Ts'o <tytso@mit.edu>,
+Cc: Byungchul Park <byungchul.park@lge.com>,
         Byungchul Park <max.byungchul.park@gmail.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Peter Zijlstra <peterz@infradead.org>,
@@ -15,63 +16,101 @@ Cc: Theodore Ts'o <tytso@mit.edu>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         oleg@redhat.com, kernel-team@lge.com, daniel@ffwll.ch
+Subject: Re: About the try to remove cross-release feature entirely by Ingo
+Message-ID: <20180101160011.GA27417@thunk.org>
 References: <CANrsvRPQcWz-p_3TYfNf+Waek3bcNNPniXhFzyyS=7qbCqzGyg@mail.gmail.com>
- <20171229014736.GA10341@X58A-UD3R> <20171229035146.GA11757@thunk.org>
+ <20171229014736.GA10341@X58A-UD3R>
+ <20171229035146.GA11757@thunk.org>
  <20171229072851.GA12235@X58A-UD3R>
  <20171230061624.GA27959@bombadil.infradead.org>
-From: Byungchul Park <byungchul.park@lge.com>
-Message-ID: <5256580e-27d3-8c16-5ba6-45f5a06e857a@lge.com>
-Date: Tue, 2 Jan 2018 16:57:23 +0900
+ <20171230154041.GB3366@thunk.org>
+ <20171230204417.GF27959@bombadil.infradead.org>
+ <20171230224028.GC3366@thunk.org>
+ <20171230230057.GB12995@thunk.org>
+ <20180101101855.GA23567@bombadil.infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20171230061624.GA27959@bombadil.infradead.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180101101855.GA23567@bombadil.infradead.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 12/30/2017 3:16 PM, Matthew Wilcox wrote:
-> On Fri, Dec 29, 2017 at 04:28:51PM +0900, Byungchul Park wrote:
->> On Thu, Dec 28, 2017 at 10:51:46PM -0500, Theodore Ts'o wrote:
->>> On Fri, Dec 29, 2017 at 10:47:36AM +0900, Byungchul Park wrote:
->>>>
->>>>     (1) The best way: To classify all waiters correctly.
->>>
->>> It's really not all waiters, but all *locks*, no?
->>
->> Thanks for your opinion. I will add my opinion on you.
->>
->> I meant *waiters*. Locks are only a sub set of potential waiters, which
->> actually cause deadlocks. Cross-release was designed to consider the
->> super set including all general waiters such as typical locks,
->> wait_for_completion(), and lock_page() and so on..
+On Mon, Jan 01, 2018 at 02:18:55AM -0800, Matthew Wilcox wrote:
+> > Clarification: all TCP connections that are used by kernel code would
+> > need to be in their own separate lock class.  All TCP connections used
+> > only by userspace could be in their own shared lock class.  You can't
+> > use a one lock class for all kernel-used TCP connections, because of
+> > the Network Block Device mounted on a local file system which is then
+> > exported via NFS and squirted out yet another TCP connection problem.
 > 
-> I think this is a terminology problem.  To me (and, I suspect Ted), a
-> waiter is a subject of a verb while a lock is an object.  So Ted is asking
-> whether we have to classify the users, while I think you're saying we
-> have extra objects to classify.
+> So the false positive you're concerned about is write-comes-in-over-NFS
+> (with socket lock held), NFS sends a write request to local filesystem,
+> local filesystem sends write to block device, block device sends a
+> packet to a socket which takes that socket lock.
+
+It's not just the socket lock, but any of the locks/mutexes/"waiters"
+that might be taken in the TCP code path and below, including in the
+NIC driver.
+
+> I don't think we need to be as drastic as giving each socket its own lock
+> class to solve this.  All NFS sockets can be in lock class A; all NBD
+> sockets can be in lock class B; all user sockets can be in lock class
+> C; etc.
+
+But how do you know which of the locks taken in the networking stack
+are for the NBD versus the NFS sockets?  What manner of horrific
+abstraction violation is going to pass that information all the way
+down to all of the locks that might be taken at the socket layer and
+below?
+
+How is this "proper clasification" supposed to happen?  It's the
+repeated handwaving which claims this is easy which is rather
+frustrating.  The simple thing is to use a unique ID which is bumped
+for each struct sock, each struct super, struct block_device, struct
+request_queue, struct bdi, etc, but that runs into lockdep scalability
+issues.
+
+Anything else means that you have to somehow pass down through the
+layers so that, in the general case, the socket knows that it is "an
+NFS socket" versus "an NBD socket" --- and remember, if there is any
+kind of completion handling done in the NIC driver, it's going to have
+to passed down well below the TCP layer all the way down to the
+network device drivers.  Or is the plan to do this add a bit ad hoc of
+plumbing for each false positive which cross-release lockdep failures
+are reported?
+
+> > Also, what to do with TCP connections which are created in userspace
+> > (with some authentication exchanges happening in userspace), and then
+> > passed into kernel space for use in kernel space, is an interesting
+> > question.
 > 
-> I'd be comfortable continuing to refer to completions as locks.  We could
-> try to come up with a new object name like waitpoints though?
+> Yes!  I'd love to have a lockdep expert weigh in here.  I believe it's
+> legitimate to change a lock's class after it's been used, essentially
+> destroying it and reinitialising it.  If not, it should be because it's
+> a reasonable design for an object to need different lock classes for
+> different phases of its existance.
 
-Right. Then "event" should be used as an object name than "waiter".
+We just also need to be destroy a lock class after the transient
+object has been deleted.  This is especially true for file system
+testing, since we are constantly mounting and unmounting file systems,
+and creating and destroying loop devices, potentially hundreds or
+thousands of times during a test run.  So if we have to create a
+unique lock class for "proper classification" each time a file system
+is mounted, or loop device or device-mapper device (dm-error, etc.) is
+created, we'll run into lockdep scalability issues really quickly.
 
->> The problems come from wrong classification. Waiters either classfied
->> well or invalidated properly won't bitrot.
+So this is yet another example where the handwaving, "all you have to
+do is proper classification" just doesn't work.
+
+> > So "all you have to do is classify the locks 'properly'" is much like
+> > the apocrophal, "all you have to do is bell the cat"[1].  Or like the
+> > saying, "colonizing the stars is *easy*; all you have to do is figure
+> > out faster than light travel."
 > 
-> I disagree here.  As Ted says, it's the interactions between the
+> This is only computer programming, not rocket surgery :-)
 
-As you know, the classification is something already considering
-the interactions between the subsystems and classified. But, yes.
-That is just what we have to do untimately but not what we can do
-right away. That's why I suggested all 3 ways + 1 way (by Amir).
+Given the current state of the lockdep technology, merging cross-lock
+certainly feels like requiring the use of sledgehammers to do rocket
+surgery in order to avoid false positives --- sorry, "proper
+classification".
 
-> subsystems that leads to problems.  Everything's goig to work great
-> until somebody does something in a way that's never been tried before.
-
-Yes. Everything has worked great so far, since the classification
-by now is done well enough at least to avoid such problems, not
-perfect though. IMO, the classification does not have to be perfect
-but needs to be good enough to work.
-
---
-Thanks,
-Byungchul
+					- Ted
