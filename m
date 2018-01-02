@@ -1,55 +1,49 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:46289 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932079AbeAQSbs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Jan 2018 13:31:48 -0500
-Received: from 77.117.185.35.wireless.dyn.drei.com ([77.117.185.35] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.89 #1 (Red Hat Linux))
-        id 1ebsV0-0004aa-5P
-        for linux-block@vger.kernel.org; Wed, 17 Jan 2018 18:31:47 +0000
-Date: Wed, 17 Jan 2018 19:31:42 +0100
-From: Christoph Hellwig <hch@infradead.org>
-To: linux-block@vger.kernel.org
-Subject: [ANNOUNCE] Participate at the Linux FAST Summit '18
-Message-ID: <20180117183142.vcrm2dt36cx4lrqu@infradead.org>
+Received: from mail-pf0-f174.google.com ([209.85.192.174]:36487 "EHLO
+        mail-pf0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750715AbeABTCK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jan 2018 14:02:10 -0500
+Received: by mail-pf0-f174.google.com with SMTP id p84so25997410pfd.3
+        for <linux-block@vger.kernel.org>; Tue, 02 Jan 2018 11:02:10 -0800 (PST)
+Subject: Re: [for-416 PATCH v2] bcache: fix writeback target calculation
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: tang.junhui@zte.com.cn
+References: <1514885112-12218-1-git-send-email-tang.junhui@zte.com.cn>
+ <20180102190049.29237-1-mlyle@lyle.org>
+From: Michael Lyle <mlyle@lyle.org>
+Message-ID: <1dfbbe4d-d445-7b54-de87-93be150b5597@lyle.org>
+Date: Tue, 2 Jan 2018 11:02:07 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180102190049.29237-1-mlyle@lyle.org>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-We are pleased to announce that the Call for Participation [1] for the
-2018 USENIX Research in Linux File and Storage Technologies Summit (Linux
-FAST Summit '18) [2] is now available.  Linux FAST Summit '18 will take
-place at the Oakland Marriott City Center on February 15 and will be
-co-located with the 16th USENIX Conference on File and Storage Technologies
-(FAST '18) [3].
+Please note I have not tested this version yet: I'm just putting it out
+for review.
 
-Linux is one of the most frequently used platforms in file and storage
-research, and FAST is the premier conference for publishing research
-results from the file and storage research community.  This summit will
-bring together key Linux kernel developers and academic researchers.  The
-goal is to provide a forum for presenting and discussing current ideas in
-research with a group of active practitioners in the Linux Kernel.
+Mike
 
-The format will be a single session of short 25-minute talks with
-5-minute questions and answers, as well as 45-minute Birds-of-a-Feather
-sessions (BoFs).
-
-If you have an idea you'd like to share, or a project in the Linux Kernel
-that you'd like to talk about, please send a 400-word summary of the idea
-or project and a short description of the benefits that would be achieved
-by discussion with kernel practitioners and/or academics to
-linuxfast18chairs@usenix.org.  Submissions are due by Friday, January 26,
-2018.
-
-We look forward to receiving your submissions!
-
-Christoph Hellwig
-Erik Riedel, Dell EMC
-Linux FAST Summit '18 Program Co-Chairs
-linuxfast18chairs@usenix.org
-
-[1] https://www.usenix.org/conference/linuxfastsummit18/call-for-participation
-[2] https://www.usenix.org/conference/linuxfastsummit18
-[3] https://www.usenix.org/conference/fast18
+On 01/02/2018 11:00 AM, Michael Lyle wrote:
+> This fixes bcache writeback target calculation, for defects relating to
+> large cache sets and calculation errors when there are multiple backing
+> devices.
+> 
+> Bcache needs to scale the dirty data in the cache over the multiple
+> backing disks in order to calculate writeback rates for each.
+> The previous code did this by multiplying the target number of dirty
+> sectors by the backing device size, and expected it to fit into a
+> uint64_t; this blows up on relatively small backing devices.
+> 
+> The new approach figures out the bdev's share in 16384ths of the overall
+> cached data.  This is chosen to cope well when bdevs drastically vary in
+> size and to ensure that bcache can cross the petabyte boundary for each
+> backing device.
+> 
+> Per review, we ensure that every device gets at least 1/16384th of the
+> writeback share.  This also differs from v1 of the patchset in scaling
+> the error, which corrects previous problems with writeback rate
+> calculation across multiple devices.
+> 
+> Reported-by: Jack Douglas <jack@douglastechnology.co.uk>
+> Signed-off-by: Michael Lyle <mlyle@lyle.org>
