@@ -1,60 +1,61 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-From: Tejun Heo <tj@kernel.org>
-To: jack@suse.cz,
-	axboe@kernel.dk,
-	clm@fb.com,
-	jbacik@fb.com
-Cc: kernel-team@fb.com,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	peterz@infradead.org,
-	jianchao.w.wang@oracle.com,
-	Bart.VanAssche@wdc.com,
-	linux-block@vger.kernel.org,
-	Tejun Heo <tj@kernel.org>
-Subject: [PATCH 4/8] blk-mq: use blk_mq_rq_state() instead of testing REQ_ATOM_COMPLETE
-Date: Mon,  8 Jan 2018 11:15:38 -0800
-Message-Id: <20180108191542.379478-5-tj@kernel.org>
-In-Reply-To: <20180108191542.379478-1-tj@kernel.org>
-References: <20180108191542.379478-1-tj@kernel.org>
+Return-Path: <prvs=533ff182d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Tejun Heo <tj@kernel.org>,
+	"Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+	stable@vger.kernel.org
+Subject: [PATCH 1/2] pktcdvd: Fix pkt_setup_dev() error path
+Date: Tue,  2 Jan 2018 11:39:47 -0800
+Message-Id: <20180102193948.22656-2-bart.vanassche@wdc.com>
+In-Reply-To: <20180102193948.22656-1-bart.vanassche@wdc.com>
+References: <20180102193948.22656-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-blk_mq_check_inflight() and blk_mq_poll_hybrid_sleep() test
-REQ_ATOM_COMPLETE to determine the request state.  Both uses are
-speculative and we can test REQ_ATOM_STARTED and blk_mq_rq_state() for
-equivalent results.  Replace the tests.  This will allow removing
-REQ_ATOM_COMPLETE usages from blk-mq.
+Commit 523e1d399ce0 ("block: make gendisk hold a reference to its queue")
+modified add_disk() and disk_release() but did not update any of the
+error paths that trigger a put_disk() call after disk->queue has been
+assigned. That introduced the following behavior in the pktcdvd driver
+if pkt_new_dev() fails:
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
+Kernel BUG at 00000000e98fd882 [verbose debug info unavailable]
+
+Since disk_release() calls blk_put_queue() anyway if disk->queue != NULL,
+fix this by removing the blk_cleanup_queue() call from the pkt_setup_dev()
+error path.
+
+Fixes: commit 523e1d399ce0 ("block: make gendisk hold a reference to its queue")
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
+Cc: <stable@vger.kernel.org> # v3.2
 ---
- block/blk-mq.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/block/pktcdvd.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 6587f0c..41bfd27 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -95,8 +95,7 @@ static void blk_mq_check_inflight(struct blk_mq_hw_ctx *hctx,
- {
- 	struct mq_inflight *mi = priv;
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index 67974796c350..2659b2534073 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -2745,7 +2745,7 @@ static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev)
+ 	pd->pkt_dev = MKDEV(pktdev_major, idx);
+ 	ret = pkt_new_dev(pd, dev);
+ 	if (ret)
+-		goto out_new_dev;
++		goto out_mem2;
  
--	if (test_bit(REQ_ATOM_STARTED, &rq->atomic_flags) &&
--	    !test_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags)) {
-+	if (blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT) {
- 		/*
- 		 * index[0] counts the specific partition that was asked
- 		 * for. index[1] counts the ones that are active on the
-@@ -3017,7 +3016,8 @@ static bool blk_mq_poll_hybrid_sleep(struct request_queue *q,
+ 	/* inherit events of the host device */
+ 	disk->events = pd->bdev->bd_disk->events;
+@@ -2763,8 +2763,6 @@ static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev)
+ 	mutex_unlock(&ctl_mutex);
+ 	return 0;
  
- 	hrtimer_init_sleeper(&hs, current);
- 	do {
--		if (test_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags))
-+		if (test_bit(REQ_ATOM_STARTED, &rq->atomic_flags) &&
-+		    blk_mq_rq_state(rq) != MQ_RQ_IN_FLIGHT)
- 			break;
- 		set_current_state(TASK_UNINTERRUPTIBLE);
- 		hrtimer_start_expires(&hs.timer, mode);
+-out_new_dev:
+-	blk_cleanup_queue(disk->queue);
+ out_mem2:
+ 	put_disk(disk);
+ out_mem:
 -- 
-2.9.5
+2.15.1
