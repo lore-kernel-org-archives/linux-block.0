@@ -1,52 +1,82 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qt0-f182.google.com ([209.85.216.182]:42992 "EHLO
-        mail-qt0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750736AbeABIMO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jan 2018 03:12:14 -0500
-Received: by mail-qt0-f182.google.com with SMTP id g9so61866259qth.9
-        for <linux-block@vger.kernel.org>; Tue, 02 Jan 2018 00:12:14 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1514874831-10255-1-git-send-email-tang.junhui@zte.com.cn>
-References: <1514874831-10255-1-git-send-email-tang.junhui@zte.com.cn>
-From: Michael Lyle <mlyle@lyle.org>
-Date: Tue, 2 Jan 2018 00:12:13 -0800
-Message-ID: <CAJ+L6qcbp92KkfzBWkpwZRX9fc6sFkXSs306YP7qcoJsVuybLg@mail.gmail.com>
+Received: from out1.zte.com.cn ([202.103.147.172]:52678 "EHLO mxct.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752346AbeABGcl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 2 Jan 2018 01:32:41 -0500
+From: tang.junhui@zte.com.cn
+To: mlyle@lyle.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        tang.junhui@zte.com.cn
 Subject: Re: [for-416 PATCH] bcache: fix writeback target calc on large devices
-To: Junhui Tang <tang.junhui@zte.com.cn>
-Cc: linux-bcache <linux-bcache@vger.kernel.org>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 2 Jan 2018 14:33:51 +0800
+Message-Id: <1514874831-10255-1-git-send-email-tang.junhui@zte.com.cn>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Tang Junhui--
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-Thank you for the feedback.
+This patch is useful for preventing the overflow of the expression
+(cache_dirty_target * bdev_sectors(dc->bdev)), but it also
+lead into a calc error, for example, when there is a 1G and
+100*164G cached device, it would cause the "target" value to
+be aways zero of the 1G device, which would cause write-back 
+threshold losing efficacy.
 
-On Mon, Jan 1, 2018 at 10:33 PM,  <tang.junhui@zte.com.cn> wrote:
-> From: Tang Junhui <tang.junhui@zte.com.cn>
+Maybe at first we can judge if it overflows or not of the expression 
+(cache_dirty_target * bdev_sectors(dc->bdev)), if it overflows,
+We can calc the value of target as the patch, otherwise, 
+we calc it as old way.
+
+>Bcache needs to scale the dirty data in the cache over the multiple
+>backing disks in order to calculate writeback rates for each.
+>The previous code did this by multiplying the target number of dirty
+>sectors by the backing device size, and expected it to fit into a
+>uint64_t; this blows up on relatively small backing devices.
 >
-> This patch is useful for preventing the overflow of the expression
-> (cache_dirty_target * bdev_sectors(dc->bdev)), but it also
-> lead into a calc error, for example, when there is a 1G and
-> 100*164G cached device, it would cause the "target" value to
-> be aways zero of the 1G device, which would cause write-back
-> threshold losing efficacy.
+>The new approach figures out the bdev's share in 16384ths of the overall
+>cached data.  This is chosen to cope well when bdevs drastically vary in
+>size and to ensure that bcache can cross the petabyte boundary for each
+>backing device.
 >
-> Maybe at first we can judge if it overflows or not of the expression
-> (cache_dirty_target * bdev_sectors(dc->bdev)), if it overflows,
-> We can calc the value of target as the patch, otherwise,
-> we calc it as old way.
+>Reported-by: Jack Douglas <jack@douglastechnology.co.uk>
+>Signed-off-by: Michael Lyle <mlyle@lyle.org>
+>---
+> drivers/md/bcache/writeback.c | 17 +++++++++++++++--
+> 1 file changed, 15 insertions(+), 2 deletions(-)
+>
+>diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+>index 56a37884ca8b..ddbbeec1f0ee 100644
+>--- a/drivers/md/bcache/writeback.c
+>+++ b/drivers/md/bcache/writeback.c
+>@@ -24,10 +24,23 @@ static void __update_writeback_rate(struct cached_dev *dc)
+>     struct cache_set *c = dc->disk.c;
+>     uint64_t cache_sectors = c->nbuckets * c->sb.bucket_size -
+>                 bcache_flash_devs_sectors_dirty(c);
+>+    /*
+>+     * Unfortunately we don't know the exact share of dirty data for
+>+     * each backing device.  Therefore, we need to infer the writeback
+>+     * for each disk based on its assumed proportion of dirty data.
+>+     *
+>+     * 16384 is chosen here as something that each backing device should
+>+     * be a reasonable fraction of the share, and not to blow up until
+>+     * individual backing devices are a petabyte.
+>+     */
+>+    uint32_t bdev_share_per16k =
+>+        div64_u64(bdev_sectors(dc->bdev) << 14,
+>+                c->cached_dev_sectors);
+>+
+>     uint64_t cache_dirty_target =
+>         div_u64(cache_sectors * dc->writeback_percent, 100);
+>-    int64_t target = div64_u64(cache_dirty_target * bdev_sectors(dc->bdev),
+>-                   c->cached_dev_sectors);
+>+
+>+    int64_t target = (cache_dirty_target * bdev_share_per16k) >> 14;
+> 
+>     /*
+>      * PI controller:
+>-- 
+>2.14.1
+>
 
-Maybe it'd be preferable just to ensure that share always >=1.  It
-seems like a pretty narrow set of cases where the current math works
-and the new math doesn't work, though, as I expect that it's
-relatively rare to have such a variation in sizes, and even so 16.4TB
-uses up 35 bits of the 64 bit quantity.
-
-I don't really like special cases or trying two different ways to do
-the math, because then it's very difficult to test.
-
-What do you think?
-
-Mike
+Thanks,
+Tang Junhui
