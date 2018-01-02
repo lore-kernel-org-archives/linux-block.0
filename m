@@ -1,61 +1,76 @@
-Return-Path: <prvs=533ff182d=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Tejun Heo <tj@kernel.org>,
-	"Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-	stable@vger.kernel.org
-Subject: [PATCH 1/2] pktcdvd: Fix pkt_setup_dev() error path
-Date: Tue,  2 Jan 2018 11:39:47 -0800
-Message-Id: <20180102193948.22656-2-bart.vanassche@wdc.com>
-In-Reply-To: <20180102193948.22656-1-bart.vanassche@wdc.com>
-References: <20180102193948.22656-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-it0-f67.google.com ([209.85.214.67]:35348 "EHLO
+        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751152AbeABQc6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jan 2018 11:32:58 -0500
+Date: Tue, 2 Jan 2018 08:32:54 -0800
+From: Tejun Heo <tj@kernel.org>
+To: Hou Tao <houtao1@huawei.com>
+Cc: linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        shli@kernel.org
+Subject: Re: [PATCH] blktrace: output io cgroup name for cgroup v1
+Message-ID: <20180102163254.GE3668920@devbig577.frc2.facebook.com>
+References: <20171228070400.26328-1-houtao1@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171228070400.26328-1-houtao1@huawei.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Commit 523e1d399ce0 ("block: make gendisk hold a reference to its queue")
-modified add_disk() and disk_release() but did not update any of the
-error paths that trigger a put_disk() call after disk->queue has been
-assigned. That introduced the following behavior in the pktcdvd driver
-if pkt_new_dev() fails:
+Hello, Hou.
 
-Kernel BUG at 00000000e98fd882 [verbose debug info unavailable]
+On Thu, Dec 28, 2017 at 03:04:00PM +0800, Hou Tao wrote:
+> Now the output of io cgroup name in blktrace is controlled by
+> blk_cgroup & blk_cgname options in trace_options files. When
+> using cgroup v1 for io controller, there is no output of cgroup
+> name in trace file, because cgroup_path_from_kernfs_id() uses
+> cgrp_dfl_root.kf_root to find the cgroup file and cgrp_dfl_root
+> is only valid for cgroup v2.
+> 
+> So fix cgroup_path_from_kernfs_id() to support both cgroup v1 and v2.
+>
+> Fixes: 69fd5c3 ("blktrace: add an option to allow displaying cgroup path")
 
-Since disk_release() calls blk_put_queue() anyway if disk->queue != NULL,
-fix this by removing the blk_cleanup_queue() call from the pkt_setup_dev()
-error path.
+This isn't a bug fix, so the above tag probably isn't necessary.
 
-Fixes: commit 523e1d399ce0 ("block: make gendisk hold a reference to its queue")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
-Cc: <stable@vger.kernel.org> # v3.2
----
- drivers/block/pktcdvd.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+> +void cgroup_path_from_kernfs_id(int ssid, const union kernfs_node_id *id,
+>  					char *buf, size_t buflen)
+>  {
+> +	struct kernfs_root *root;
+>  	struct kernfs_node *kn;
+> +	struct cgroup *root_cgrp = NULL;
+>  
+> +	if (ssid >= CGROUP_SUBSYS_COUNT)
+>  		return;
+> +
+> +	if (likely(static_key_enabled(cgroup_subsys_on_dfl_key[ssid]))) {
+> +		root = cgrp_dfl_root.kf_root;
+> +	} else {
+> +		struct cgroup_subsys *subsys = cgroup_subsys[ssid];
+> +
+> +		/*
+> +		 * It seems we can not use rcu_read_lock() to protect
+> +		 * the liveness check of subsys->root->cgrp. Although
+> +		 * root->cgrp is freed by RCU, when we dereference the
+> +		 * old root, the old root may been destroying by
+> +		 * cgroup_destroy_root().
+> +		 */
+> +		mutex_lock(&cgroup_mutex);
+> +		if (percpu_ref_tryget_live(&subsys->root->cgrp.self.refcnt)) {
+> +			root_cgrp = &subsys->root->cgrp;
+> +			root = subsys->root->kf_root;
+> +		}
+> +		mutex_unlock(&cgroup_mutex);
 
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 67974796c350..2659b2534073 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -2745,7 +2745,7 @@ static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev)
- 	pd->pkt_dev = MKDEV(pktdev_major, idx);
- 	ret = pkt_new_dev(pd, dev);
- 	if (ret)
--		goto out_new_dev;
-+		goto out_mem2;
- 
- 	/* inherit events of the host device */
- 	disk->events = pd->bdev->bd_disk->events;
-@@ -2763,8 +2763,6 @@ static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev)
- 	mutex_unlock(&ctl_mutex);
- 	return 0;
- 
--out_new_dev:
--	blk_cleanup_queue(disk->queue);
- out_mem2:
- 	put_disk(disk);
- out_mem:
+I don't know.  Controllers can be rebound dynamically and we may end
+up applying ino+gen to the wrong root.  For tracing, it's not a big
+problem, but I'd much prefer to keep the interface strict so that we
+can always depend on the correctness of these lookups.  Given that
+blkio in cgroup1 is severely deficient (buffered writes aren't
+supported at all), I feel reluctant about adding new features to it at
+cost and this has some possibility of becoming a long term headache.
+
+Thanks.
+
 -- 
-2.15.1
+tejun
