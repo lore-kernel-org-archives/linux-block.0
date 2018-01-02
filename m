@@ -1,39 +1,96 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f54.google.com ([209.85.160.54]:33284 "EHLO
-        mail-pl0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751091AbeACSB3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Jan 2018 13:01:29 -0500
-Received: by mail-pl0-f54.google.com with SMTP id 1so1689858plv.0
-        for <linux-block@vger.kernel.org>; Wed, 03 Jan 2018 10:01:29 -0800 (PST)
+Received: from out1.zte.com.cn ([202.103.147.172]:42110 "EHLO mxct.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751149AbeACGxG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 Jan 2018 01:53:06 -0500
+From: tang.junhui@zte.com.cn
+To: mlyle@lyle.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        tang.junhui@zte.com.cn
 Subject: Re: [for-416 PATCH v2] bcache: fix writeback target calculation
-To: tang.junhui@zte.com.cn
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-References: <1514913607-22144-1-git-send-email-tang.junhui@zte.com.cn>
-From: Michael Lyle <mlyle@lyle.org>
-Message-ID: <2d7f9a54-d60c-2600-8a0f-9caec2a7f8d8@lyle.org>
-Date: Wed, 3 Jan 2018 10:01:26 -0800
-MIME-Version: 1.0
-In-Reply-To: <1514913607-22144-1-git-send-email-tang.junhui@zte.com.cn>
-Content-Type: text/plain; charset=utf-8
+Date: Wed, 3 Jan 2018 01:20:07 +0800
+Message-Id: <1514913607-22144-1-git-send-email-tang.junhui@zte.com.cn>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 01/02/2018 09:20 AM, tang.junhui@zte.com.cn wrote:
-> From: Tang Junhui <tang.junhui@zte.com.cn>
-> 
-> When I saw the code "int64_t error = dirty - cache_dirty_target", I was 
-> totally lost, I will try my best to get out. 
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-Don't waste your time, let me think about this more.  I think the
-previous version was correct and now I screwed it up.  I need to really
-read how the dirty block accounting happens to do this properly.
+When I saw the code "int64_t error = dirty - cache_dirty_target", I was 
+totally lost, I will try my best to get out. 
+And this patch dependent on your earlier patch(PI controller), did that
+patch have applied to upstreams branch? I searched in 4.14 branch, 
+and did not find it.
 
-I will send a v3, and make sure that I'm fully confident in it.
+> drivers/md/bcache/writeback.c | 38 ++++++++++++++++++++++++++++++--------    
+> 1 file changed, 30 insertions(+), 8 deletions(-)                             
+>                                                                              
+>diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c    
+>index 56a37884ca8b..be2840ad02d4 100644                                       
+>--- a/drivers/md/bcache/writeback.c                                           
+>+++ b/drivers/md/bcache/writeback.c                                           
+>@@ -26,16 +26,28 @@ static void __update_writeback_rate(struct cached_dev *dc)
+>                 bcache_flash_devs_sectors_dirty(c);                          
+>     uint64_t cache_dirty_target =                                            
+>         div_u64(cache_sectors * dc->writeback_percent, 100);                 
+>-    int64_t target = div64_u64(cache_dirty_target * bdev_sectors(dc->bdev),  
+>-                   c->cached_dev_sectors);                                   
+>+                                                                             
+>+    /*                                                                       
+>+     * 16384 is chosen here as something that each backing device should     
+>+     * be a reasonable fraction of the share, and to not blow up until       
+>+     * individual backing devices are a petabyte.                            
+>+     */                                                                      
+>+    uint32_t bdev_share_per16k =                                             
+>+        div64_u64(16384 * bdev_sectors(dc->bdev),                            
+>+                c->cached_dev_sectors);                                      
+>                                                                              
+>     /*                                                                       
+>      * PI controller:                                                        
+>      * Figures out the amount that should be written per second.             
+>      *                                                                       
+>      * First, the error (number of sectors that are dirty beyond our         
+>-     * target) is calculated.  The error is accumulated (numerically         
+>-     * integrated).                                                          
+>+     * target) is calculated.                                                
+>+     *                                                                       
+>+     * Unfortunately we don't know the exact share of dirty data for         
+>+     * each backing device; therefore the error is adjusted for this         
+>+     * backing disk's share of the overall error based on size.              
+>+     *                                                                       
+>+     * The error is accumulated (numerically integrated).                    
+>      *                                                                       
+>      * Then, the proportional value and integral value are scaled            
+>      * based on configured values.  These are stored as inverses to  
+>              
+>@@ -50,12 +62,22 @@ static void __update_writeback_rate(struct cached_dev *dc)
+>      * variations in usage like the p term.                                  
+>      */                                                                      
+>     int64_t dirty = bcache_dev_sectors_dirty(&dc->disk);                     
+>-    int64_t error = dirty - target;                                          
+>-    int64_t proportional_scaled =                                            
+>-        div_s64(error, dc->writeback_rate_p_term_inverse);                   
+>-    int64_t integral_scaled;                                                 
+>+    int64_t error = dirty - cache_dirty_target;                              
+>+    int64_t proportional_scaled, integral_scaled;                            
+>     uint32_t new_rate;                                                       
+>                                                                              
+>+    /*                                                                       
+>+     * Ensure even with large device size disparities that we still          
+>+     * writeback at least some.                                              
+>+     */                                                                      
+>+    if (bdev_share_per16k < 1)                                               
+>+        bdev_share_per16k = 1;                                               
+>+                                                                             
+>+    target = div_s64(error * bdev_share_per16k, 16384)                       
+>+                                                                             
+>+    proportional_scaled = div_s64(error,                                     
+>+            dc->writeback_rate_p_term_inverse);                              
+>+                                                                             
+>     if ((error < 0 && dc->writeback_rate_integral > 0) ||                    
+>         (error > 0 && time_before64(local_clock(),                           
+>              dc->writeback_rate.next + NSEC_PER_MSEC))) {                    
+>--                                                                            
+>2.14.1                                                                        
 
-> And this patch dependent on your earlier patch(PI controller), did that
-> patch have applied to upstreams branch? I searched in 4.14 branch, 
-> and did not find it.
-
-It's 1d316e658374f700fdfff9299c70ce65d8d145e6 on linus/master.
-
-Mike
+Thanks,
+Tang Junhui
