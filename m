@@ -1,36 +1,60 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f48.google.com ([209.85.160.48]:41820 "EHLO
-        mail-pl0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751246AbeABREo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jan 2018 12:04:44 -0500
-Received: by mail-pl0-f48.google.com with SMTP id g2so28989834pli.8
-        for <linux-block@vger.kernel.org>; Tue, 02 Jan 2018 09:04:43 -0800 (PST)
-Subject: Re: [for-416 PATCH] bcache: fix writeback target calc on large
- devices
-To: tang.junhui@zte.com.cn
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-References: <1514885112-12218-1-git-send-email-tang.junhui@zte.com.cn>
-From: Michael Lyle <mlyle@lyle.org>
-Message-ID: <e53d3218-d121-7bdb-005b-caa0732e1ea1@lyle.org>
-Date: Tue, 2 Jan 2018 09:04:40 -0800
-MIME-Version: 1.0
-In-Reply-To: <1514885112-12218-1-git-send-email-tang.junhui@zte.com.cn>
-Content-Type: text/plain; charset=utf-8
+Received: from mxhk.zte.com.cn ([63.217.80.70]:46882 "EHLO mxhk.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751422AbeABJXx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 2 Jan 2018 04:23:53 -0500
+From: tang.junhui@zte.com.cn
+To: mlyle@lyle.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        tang.junhui@zte.com.cn
+Subject: Re: Re: [for-416 PATCH] bcache: fix writeback target calc on large devices
+Date: Tue, 2 Jan 2018 17:25:12 +0800
+Message-Id: <1514885112-12218-1-git-send-email-tang.junhui@zte.com.cn>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-I'm withdrawing this patch.  Reading the entire function more carefully,
-I think the rate calculation is completely wrong both in the original
-code and in this change.
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-That is, the top of __update_writeback_rate calculates a dirty data
-target for one backing device.  However, the target for one backing
-device is compared to the amount of dirty data in the entire cache.  If
-there is more than one cache device, the writeback rate will be far too
-high.
 
-I will attempt to write a new version of this scaling functionality soon
-that fixes both the overflow issue and ... corrects it to calculate the
-correct thing.
+>Thank you for the feedback.
+>
+>On Mon, Jan 1, 2018 at 10:33 PM,  <tang.junhui@zte.com.cn> wrote:
+>> From: Tang Junhui <tang.junhui@zte.com.cn>
+>>
+>> This patch is useful for preventing the overflow of the expression
+>> (cache_dirty_target * bdev_sectors(dc->bdev)), but it also
+>> lead into a calc error, for example, when there is a 1G and
+>> 100*164G cached device, it would cause the "target" value to
+>> be aways zero of the 1G device, which would cause write-back
+>> threshold losing efficacy.
+>>
+>> Maybe at first we can judge if it overflows or not of the expression
+>> (cache_dirty_target * bdev_sectors(dc->bdev)), if it overflows,
+>> We can calc the value of target as the patch, otherwise,
+>> we calc it as old way.
+>
+>Maybe it'd be preferable just to ensure that share always >=1. 
+Yes, this is a good and simple way.
+ 
+>It
+>seems like a pretty narrow set of cases where the current math works
+>and the new math doesn't work, though, as I expect that it's
+>relatively rare to have such a variation in sizes, and even so 16.4TB
+>uses up 35 bits of the 64 bit quantity.
+>
+Truely, this issue is rare. But as we known, cache set is a sharable pool,
+we may attach various devices on it, such as petabyte big device or gigabyte
+small device. We would better to make them all works well in the same 
+cache set.
 
-Mike
+>I don't really like special cases or trying two different ways to do
+>the math, because then it's very difficult to test.
+>
+>What do you think?
+Ha, I don't think it is difficult to do, actually you have provided a 
+simple and effective way above, and we can use a small partition device
+and a big partition device to test (such as a 100M device and a 2T device). 
+I believe you can do it better.
+
+Thanks,
+Tang Junhui
