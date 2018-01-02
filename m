@@ -1,25 +1,31 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH 0/2] Two bug fixes for the pktcdvd driver
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-References: <20180102193948.22656-1-bart.vanassche@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <1b5ff0e6-68b2-cd24-5ddf-114188a20164@kernel.dk>
-Date: Fri, 5 Jan 2018 09:02:45 -0700
-MIME-Version: 1.0
-In-Reply-To: <20180102193948.22656-1-bart.vanassche@wdc.com>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <prvs=533ff182d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH 0/2] Two bug fixes for the pktcdvd driver
+Date: Tue,  2 Jan 2018 11:39:46 -0800
+Message-Id: <20180102193948.22656-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 1/2/18 12:39 PM, Bart Van Assche wrote:
-> Hello Jens,
-> 
-> This patch series fixes two bugs in the pktcdvd driver. The second patch fixes
-> a recently introduced regression while the first patch fixes a regression that
-> was introduced a long time ago. Please consider these patches for the upstream
-> kernel.
+Hello Jens,
 
-Thanks Bart, applied.
+This patch series fixes two bugs in the pktcdvd driver. The second patch fixes
+a recently introduced regression while the first patch fixes a regression that
+was introduced a long time ago. Please consider these patches for the upstream
+kernel.
+
+Thanks,
+
+Bart.
+
+Bart Van Assche (2):
+  pktcdvd: Fix pkt_setup_dev() error path
+  pktcdvd: Fix a recently introduced NULL pointer dereference
+
+ drivers/block/pktcdvd.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
 -- 
-Jens Axboe
+2.15.1
