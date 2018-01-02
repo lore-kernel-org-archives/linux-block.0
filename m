@@ -1,77 +1,67 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:35975 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754498AbeAKNJW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jan 2018 08:09:22 -0500
-Received: by mail-wm0-f67.google.com with SMTP id b76so5389944wmg.1
-        for <linux-block@vger.kernel.org>; Thu, 11 Jan 2018 05:09:21 -0800 (PST)
-From: Ilya Dryomov <idryomov@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Tejun Heo <tj@kernel.org>, David Disseldorp <ddiss@suse.de>,
-        Sagi Grimberg <sagi@grimberg.me>
-Subject: [PATCH v3 2/2] block: add bdev_read_only() checks to common helpers
-Date: Thu, 11 Jan 2018 14:09:12 +0100
-Message-Id: <1515676152-18476-3-git-send-email-idryomov@gmail.com>
-In-Reply-To: <1515676152-18476-1-git-send-email-idryomov@gmail.com>
-References: <1515676152-18476-1-git-send-email-idryomov@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=533ff182d=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	"Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+	stable@vger.kernel.org
+Subject: [PATCH 2/2] pktcdvd: Fix a recently introduced NULL pointer dereference
+Date: Tue,  2 Jan 2018 11:39:48 -0800
+Message-Id: <20180102193948.22656-3-bart.vanassche@wdc.com>
+In-Reply-To: <20180102193948.22656-1-bart.vanassche@wdc.com>
+References: <20180102193948.22656-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Similar to blkdev_write_iter(), return -EPERM if the partition is
-read-only.  This covers ioctl(), fallocate() and most in-kernel users
-but isn't meant to be exhaustive -- everything else will be caught in
-generic_make_request_checks(), fail with -EIO and can be fixed later.
+Call bdev_get_queue(bdev) after bdev->bd_disk has been initialized
+instead of just before that pointer has been initialized. This patch
+avoids that the following command
 
-Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
+pktsetup 1 /dev/sr0
+
+triggers the following kernel crash:
+
+BUG: unable to handle kernel NULL pointer dereference at 0000000000000548
+IP: pkt_setup_dev+0x2db/0x670 [pktcdvd]
+CPU: 2 PID: 724 Comm: pktsetup Not tainted 4.15.0-rc4-dbg+ #1
+Call Trace:
+ pkt_ctl_ioctl+0xce/0x1c0 [pktcdvd]
+ do_vfs_ioctl+0x8e/0x670
+ SyS_ioctl+0x3c/0x70
+ entry_SYSCALL_64_fastpath+0x23/0x9a
+
+Reported-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
+Fixes: commit ca18d6f769d2 ("block: Make most scsi_req_init() calls implicit")
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Tested-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
+Cc: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
+Cc: <stable@vger.kernel.org> # v4.13
 ---
- block/blk-lib.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ drivers/block/pktcdvd.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 2bc544ce3d2e..a676084d4740 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -37,6 +37,9 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 	if (!q)
- 		return -ENXIO;
- 
-+	if (bdev_read_only(bdev))
-+		return -EPERM;
-+
- 	if (flags & BLKDEV_DISCARD_SECURE) {
- 		if (!blk_queue_secure_erase(q))
- 			return -EOPNOTSUPP;
-@@ -156,6 +159,9 @@ static int __blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
- 	if (!q)
- 		return -ENXIO;
- 
-+	if (bdev_read_only(bdev))
-+		return -EPERM;
-+
- 	bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
- 	if ((sector | nr_sects) & bs_mask)
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index 2659b2534073..531a0915066b 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -2579,14 +2579,14 @@ static int pkt_new_dev(struct pktcdvd_device *pd, dev_t dev)
+ 	bdev = bdget(dev);
+ 	if (!bdev)
+ 		return -ENOMEM;
++	ret = blkdev_get(bdev, FMODE_READ | FMODE_NDELAY, NULL);
++	if (ret)
++		return ret;
+ 	if (!blk_queue_scsi_passthrough(bdev_get_queue(bdev))) {
+ 		WARN_ONCE(true, "Attempt to register a non-SCSI queue\n");
+-		bdput(bdev);
++		blkdev_put(bdev, FMODE_READ | FMODE_NDELAY);
  		return -EINVAL;
-@@ -233,6 +239,9 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
- 	if (!q)
- 		return -ENXIO;
+ 	}
+-	ret = blkdev_get(bdev, FMODE_READ | FMODE_NDELAY, NULL);
+-	if (ret)
+-		return ret;
  
-+	if (bdev_read_only(bdev))
-+		return -EPERM;
-+
- 	/* Ensure that max_write_zeroes_sectors doesn't overflow bi_size */
- 	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bdev);
- 
-@@ -287,6 +296,9 @@ static int __blkdev_issue_zero_pages(struct block_device *bdev,
- 	if (!q)
- 		return -ENXIO;
- 
-+	if (bdev_read_only(bdev))
-+		return -EPERM;
-+
- 	while (nr_sects != 0) {
- 		bio = next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),
- 			       gfp_mask);
+ 	/* This is safe, since we have a reference from open(). */
+ 	__module_get(THIS_MODULE);
 -- 
-2.4.3
+2.15.1
