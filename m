@@ -1,47 +1,49 @@
-Return-Path: <msnitzer@redhat.com>
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk
-Cc: Ming Lei <tom.leiming@gmail.com>,
-	hare@suse.de,
-	Bart.VanAssche@wdc.com,
-	dm-devel@redhat.com,
-	linux-block@vger.kernel.org
-Subject: [for-4.16 PATCH v4 1/4] block: only bdi_unregister() in del_gendisk() if !GENHD_FL_HIDDEN
-Date: Thu, 11 Jan 2018 15:14:14 -0500
-Message-Id: <20180111201417.2042-2-snitzer@redhat.com>
-In-Reply-To: <20180111201417.2042-1-snitzer@redhat.com>
-References: <20180111201417.2042-1-snitzer@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:41726 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750837AbeACQyg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 Jan 2018 11:54:36 -0500
+Subject: Re: [for-416 PATCH 3/3] bcache: allow quick writeback when backing
+ idle
+To: Michael Lyle <mlyle@lyle.org>, tang.junhui@zte.com.cn
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <1514883236-11844-1-git-send-email-tang.junhui@zte.com.cn>
+ <0fdcfaaf-af7a-adb8-075d-b321b9df4ef7@lyle.org>
+From: Coly Li <colyli@suse.de>
+Message-ID: <42e6fd64-1ab3-3b4d-4dfe-70a76152d9d2@suse.de>
+Date: Thu, 4 Jan 2018 00:54:28 +0800
+MIME-Version: 1.0
+In-Reply-To: <0fdcfaaf-af7a-adb8-075d-b321b9df4ef7@lyle.org>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-device_add_disk() will only call bdi_register_owner() if
-!GENHD_FL_HIDDEN, so it follows that del_gendisk() should only call
-bdi_unregister() if !GENHD_FL_HIDDEN.
+On 03/01/2018 12:23 AM, Michael Lyle wrote:
+> On 01/02/2018 12:53 AM, tang.junhui@zte.com.cn wrote:
+>> If no front-end I/O coming, would this cause write-back IOs one by one
+>> (one write-back IO issued must after the completion of the previous IO)?
+>> though with zero delay time, is the write-back performance still good?
+> 
 
-Found with code inspection.  bdi_unregister() won't do any harm if
-bdi_register_owner() wasn't used but best to avoid the unnecessary
-call to bdi_unregister().
+Hi Mike,
 
-Fixes: 8ddcd65325 ("block: introduce GENHD_FL_HIDDEN")
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
----
- block/genhd.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> Yes-- this speeds up writeback during idle from 4k/sec to about 10MB/sec
+> on my slow 5400RPM disk.  (It writes back at about 20MB/sec with deep
+> queues in the same scenario).  So in this case it's about 2500x faster
+> than current idle writeback, but half as fast as writeback with full
+> device utilization.
+> 
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 96a66f671720..00620e01e043 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -725,7 +725,8 @@ void del_gendisk(struct gendisk *disk)
- 		 * Unregister bdi before releasing device numbers (as they can
- 		 * get reused and we'd get clashes in sysfs).
- 		 */
--		bdi_unregister(disk->queue->backing_dev_info);
-+		if (!(disk->flags & GENHD_FL_HIDDEN))
-+			bdi_unregister(disk->queue->backing_dev_info);
- 		blk_unregister_queue(disk);
- 	} else {
- 		WARN_ON(1);
--- 
-2.15.0
+Nice performance data!
+
+
+> With only one I/O outstanding at a time, if front-end I/O starts latency
+> for the first request is still good.
+
+It is good idea, I like it.
+
+Acked-by: Coly Li <colyli@suse.de>
+
+Thanks for the effort :-)
+
+Coly Li
