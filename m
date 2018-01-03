@@ -1,49 +1,56 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:41726 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750837AbeACQyg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Jan 2018 11:54:36 -0500
-Subject: Re: [for-416 PATCH 3/3] bcache: allow quick writeback when backing
- idle
-To: Michael Lyle <mlyle@lyle.org>, tang.junhui@zte.com.cn
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-References: <1514883236-11844-1-git-send-email-tang.junhui@zte.com.cn>
- <0fdcfaaf-af7a-adb8-075d-b321b9df4ef7@lyle.org>
-From: Coly Li <colyli@suse.de>
-Message-ID: <42e6fd64-1ab3-3b4d-4dfe-70a76152d9d2@suse.de>
-Date: Thu, 4 Jan 2018 00:54:28 +0800
+Received: from mail-qt0-f193.google.com ([209.85.216.193]:44270 "EHLO
+        mail-qt0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751148AbeACCwv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jan 2018 21:52:51 -0500
+Received: by mail-qt0-f193.google.com with SMTP id m59so682739qte.11
+        for <linux-block@vger.kernel.org>; Tue, 02 Jan 2018 18:52:51 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <0fdcfaaf-af7a-adb8-075d-b321b9df4ef7@lyle.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1514903698-19103-1-git-send-email-tang.junhui@zte.com.cn>
+References: <1514903698-19103-1-git-send-email-tang.junhui@zte.com.cn>
+From: Michael Lyle <mlyle@lyle.org>
+Date: Tue, 2 Jan 2018 18:52:49 -0800
+Message-ID: <CAJ+L6qfzd-MKABBhoeumuOGtR-TJy-DTxR_J7qh9i+mYjdnYJA@mail.gmail.com>
+Subject: Re: Re: Re: [for-416 PATCH 3/3] bcache: allow quick writeback when backingidle
+To: Junhui Tang <tang.junhui@zte.com.cn>
+Cc: linux-bcache <linux-bcache@vger.kernel.org>,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 03/01/2018 12:23 AM, Michael Lyle wrote:
-> On 01/02/2018 12:53 AM, tang.junhui@zte.com.cn wrote:
->> If no front-end I/O coming, would this cause write-back IOs one by one
->> (one write-back IO issued must after the completion of the previous IO)?
->> though with zero delay time, is the write-back performance still good?
-> 
+On Tue, Jan 2, 2018 at 6:34 AM,  <tang.junhui@zte.com.cn> wrote:
+> From: Tang Junhui <tang.junhui@zte.com.cn>
+>
+>>On 01/02/2018 12:53 AM, tang.junhui@zte.com.cn wrote:
+>>> If no front-end I/O coming, would this cause write-back IOs one by one
+>>> (one write-back IO issued must after the completion of the previous IO)?
+>>> though with zero delay time, is the write-back performance still good?
+>>
+>>Yes-- this speeds up writeback during idle from 4k/sec to about 10MB/sec
+>>on my slow 5400RPM disk.  (It writes back at about 20MB/sec with deep
+>>queues in the same scenario).  So in this case it's about 2500x faster
+>>than current idle writeback, but half as fast as writeback with full
+>>device utilization.
+>>
+>>With only one I/O outstanding at a time, if front-end I/O starts latency
+>>for the first request is still good.
+>>
+>
+> OK, LGTM.
 
-Hi Mike,
+Excellent, thank you!
 
-> Yes-- this speeds up writeback during idle from 4k/sec to about 10MB/sec
-> on my slow 5400RPM disk.  (It writes back at about 20MB/sec with deep
-> queues in the same scenario).  So in this case it's about 2500x faster
-> than current idle writeback, but half as fast as writeback with full
-> device utilization.
-> 
+> Reviewed-by: Tang Junhui <tang.junhui@zte.com.cn>
 
-Nice performance data!
+Added to bcache-for-next.
 
+Mike
 
-> With only one I/O outstanding at a time, if front-end I/O starts latency
-> for the first request is still good.
-
-It is good idea, I like it.
-
-Acked-by: Coly Li <colyli@suse.de>
-
-Thanks for the effort :-)
-
-Coly Li
+>
+> Thanks,
+> Tang Junhui
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bcache" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
