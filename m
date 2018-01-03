@@ -1,12 +1,12 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from fieldses.org ([173.255.197.46]:57994 "EHLO fieldses.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752290AbeAEQtm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 5 Jan 2018 11:49:42 -0500
-Date: Fri, 5 Jan 2018 11:49:41 -0500
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Theodore Ts'o <tytso@mit.edu>,
-        Byungchul Park <byungchul.park@lge.com>,
+Received: from LGEAMRELO11.lge.com ([156.147.23.51]:46035 "EHLO
+        lgeamrelo11.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751046AbeACIXK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Jan 2018 03:23:10 -0500
+Subject: Re: About the try to remove cross-release feature entirely by Ingo
+From: Byungchul Park <byungchul.park@lge.com>
+To: Theodore Ts'o <tytso@mit.edu>,
+        Matthew Wilcox <willy@infradead.org>,
         Byungchul Park <max.byungchul.park@gmail.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Peter Zijlstra <peterz@infradead.org>,
@@ -16,58 +16,69 @@ Cc: Theodore Ts'o <tytso@mit.edu>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         oleg@redhat.com, kernel-team@lge.com, daniel@ffwll.ch
-Subject: Re: About the try to remove cross-release feature entirely by Ingo
-Message-ID: <20180105164941.GA4032@fieldses.org>
 References: <CANrsvRPQcWz-p_3TYfNf+Waek3bcNNPniXhFzyyS=7qbCqzGyg@mail.gmail.com>
- <20171229014736.GA10341@X58A-UD3R>
- <20171229035146.GA11757@thunk.org>
+ <20171229014736.GA10341@X58A-UD3R> <20171229035146.GA11757@thunk.org>
  <20171229072851.GA12235@X58A-UD3R>
  <20171230061624.GA27959@bombadil.infradead.org>
  <20171230154041.GB3366@thunk.org>
  <20171230204417.GF27959@bombadil.infradead.org>
  <20171230224028.GC3366@thunk.org>
- <20171230230057.GB12995@thunk.org>
- <20180101101855.GA23567@bombadil.infradead.org>
+ <f2bc220a-a363-122a-dbf9-e5416c550899@lge.com>
+ <20180103070556.GA22583@thunk.org>
+ <66296fcb-8df0-9697-2825-efa37c234ad9@lge.com>
+Message-ID: <45973bf8-f20c-ec0c-7e82-71b4d0a64998@lge.com>
+Date: Wed, 3 Jan 2018 17:23:07 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180101101855.GA23567@bombadil.infradead.org>
-From: bfields@fieldses.org (J. Bruce Fields)
+In-Reply-To: <66296fcb-8df0-9697-2825-efa37c234ad9@lge.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Mon, Jan 01, 2018 at 02:18:55AM -0800, Matthew Wilcox wrote:
-> On Sat, Dec 30, 2017 at 06:00:57PM -0500, Theodore Ts'o wrote:
-> > On Sat, Dec 30, 2017 at 05:40:28PM -0500, Theodore Ts'o wrote:
-> > > On Sat, Dec 30, 2017 at 12:44:17PM -0800, Matthew Wilcox wrote:
-> > > > 
-> > > > I'm not sure I agree with this part.  What if we add a new TCP lock class
-> > > > for connections which are used for filesystems/network block devices/...?
-> > > > Yes, it'll be up to each user to set the lockdep classification correctly,
-> > > > but that's a relatively small number of places to add annotations,
-> > > > and I don't see why it wouldn't work.
-> > > 
-> > > I was exagerrating a bit for effect, I admit.  (but only a bit).
+On 1/3/2018 5:10 PM, Byungchul Park wrote:
+> On 1/3/2018 4:05 PM, Theodore Ts'o wrote:
+>> On Wed, Jan 03, 2018 at 11:10:37AM +0900, Byungchul Park wrote:
+>>>> The point I was trying to drive home is that "all we have to do is
+>>>> just classify everything well or just invalidate the right lock
+>>>
+>>> Just to be sure, we don't have to invalidate lock objects at all but
+>>> a problematic waiter only.
+>>
+>> So essentially you are proposing that we have to play "whack-a-mole"
+>> as we find false positives, and where we may have to put in ad-hoc
+>> plumbing to only invalidate "a problematic waiter" when it's
+>> problematic --- or to entirely suppress the problematic waiter
 > 
-> I feel like there's been rather too much of that recently.  Can we stick
-> to facts as far as possible, please?
+> If we have too many problematic completions(waiters) to handle it,
+> then I agree with you. But so far, only one exits and it seems able
+> to be handled even in the future on my own.
 > 
-> > > It can probably be for all TCP connections that are used by kernel
-> > > code (as opposed to userspace-only TCP connections).  But it would
-> > > probably have to be each and every device-mapper instance, each and
-> > > every block device, each and every mounted file system, each and every
-> > > bdi object, etc.
-> > 
-> > Clarification: all TCP connections that are used by kernel code would
-> > need to be in their own separate lock class.  All TCP connections used
-> > only by userspace could be in their own shared lock class.  You can't
-> > use a one lock class for all kernel-used TCP connections, because of
-> > the Network Block Device mounted on a local file system which is then
-> > exported via NFS and squirted out yet another TCP connection problem.
+> Or if you believe that we have a lot of those kind of completions
+> making trouble so we cannot handle it, the (4) by Amir would work,
+> no? I'm asking because I'm really curious about your opinion..
 > 
-> So the false positive you're concerned about is write-comes-in-over-NFS
-> (with socket lock held), NFS sends a write request to local filesystem,
+>> altogether.  And in that case, a file system developer might be forced
+>> to invalidate a lock/"waiter"/"completion" in another subsystem.
+> 
+> As I said, with regard to the invalidation, we don't have to
+> consider locks at all. It's enough to invalidate the waiter only.
+> 
+>> I will also remind you that doing this will trigger a checkpatch.pl
+>> *error*:
+> 
+> This is what we decided. And I think the decision is reasonable for
+> original lockdep. But I wonder if we should apply the same decision
+> on waiters. I don't insist but just wonder.
 
-I'm confused, what lock does Ted think the NFS server is holding over
-NFS processing?
+What if we adopt the (4) in which waiters are validated one by one
+and no explicit invalidation is involved?
 
---b.
+>> ERROR("LOCKDEP", "lockdep_no_validate class is reserved for 
+>> device->mutex.\n" . $herecurr);
+>>
+>>                                       - Ted
+>>
+> 
+
+-- 
+Thanks,
+Byungchul
