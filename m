@@ -1,24 +1,26 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:38856 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755278AbeAHH17 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 8 Jan 2018 02:27:59 -0500
+Received: from mail-pl0-f50.google.com ([209.85.160.50]:36839 "EHLO
+        mail-pl0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751159AbeACROW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Jan 2018 12:14:22 -0500
+Received: by mail-pl0-f50.google.com with SMTP id b12so1614506plm.3
+        for <linux-block@vger.kernel.org>; Wed, 03 Jan 2018 09:14:22 -0800 (PST)
 Subject: Re: [PATCH v1 08/10] bcache: fix misleading error message in
  bch_count_io_errors()
 To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, mlyle@lyle.org, tang.junhui@zte.com.cn
+Cc: linux-block@vger.kernel.org, tang.junhui@zte.com.cn
 References: <20180103140325.63175-1-colyli@suse.de>
  <20180103140325.63175-9-colyli@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <9216d1c3-7f52-b90c-0be5-ed03e3cb13f3@suse.de>
-Date: Mon, 8 Jan 2018 08:27:54 +0100
+From: Michael Lyle <mlyle@lyle.org>
+Message-ID: <5facb1d8-1b98-8c5d-99ff-1c5d78c665c8@lyle.org>
+Date: Wed, 3 Jan 2018 09:14:20 -0800
 MIME-Version: 1.0
 In-Reply-To: <20180103140325.63175-9-colyli@suse.de>
 Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 01/03/2018 03:03 PM, Coly Li wrote:
+On 01/03/2018 06:03 AM, Coly Li wrote:
 > Bcache only does recoverable I/O for read operations by calling
 > cached_dev_read_error(). For write opertions there is no I/O recovery for
 > failed requests.
@@ -32,21 +34,5 @@ On 01/03/2018 03:03 PM, Coly Li wrote:
 > prints "recovering" by pr_err() when the bio direction is READ.
 > 
 > Signed-off-by: Coly Li <colyli@suse.de>
-> ---
->  drivers/md/bcache/bcache.h    |  2 +-
->  drivers/md/bcache/io.c        | 13 +++++++++----
->  drivers/md/bcache/super.c     |  4 +++-
->  drivers/md/bcache/writeback.c |  4 +++-
->  4 files changed, 16 insertions(+), 7 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
