@@ -1,50 +1,78 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out1.zte.com.cn ([202.103.147.172]:40638 "EHLO mxct.zte.com.cn"
+Received: from mx2.suse.de ([195.135.220.15]:54993 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750789AbeADGWN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 4 Jan 2018 01:22:13 -0500
-From: tang.junhui@zte.com.cn
-To: colyli@suse.de
-Cc: mlyle@lyle.org, linux-bcache@vger.kernel.org,
-        linux-block@vger.kernel.org, tang.junhui@zte.com.cn
-Subject: Re: [PATCH v1 05/10] bcache: stop dc->writeback_rate_update if cache set is stopping
-Date: Thu, 4 Jan 2018 00:47:51 +0800
-Message-Id: <1514998071-5562-1-git-send-email-tang.junhui@zte.com.cn>
+        id S1752624AbeACOEL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 Jan 2018 09:04:11 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, mlyle@lyle.org,
+        tang.junhui@zte.com.cn, Coly Li <colyli@suse.de>
+Subject: [PATCH v1 05/10] bcache: stop dc->writeback_rate_update if cache set is stopping
+Date: Wed,  3 Jan 2018 22:03:20 +0800
+Message-Id: <20180103140325.63175-6-colyli@suse.de>
+In-Reply-To: <20180103140325.63175-1-colyli@suse.de>
+References: <20180103140325.63175-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+struct delayed_work writeback_rate_update in struct cache_dev is a delayed
+worker to call function update_writeback_rate() in period (the interval is
+defined by dc->writeback_rate_update_seconds).
 
-Hello Coly,
+When a metadate I/O error happens on cache device, bcache error handling
+routine bch_cache_set_error() will call bch_cache_set_unregister() to
+retire whole cache set. On the unregister code path, cached_dev_free()
+calls cancel_delayed_work_sync(&dc->writeback_rate_update) to stop this
+delayed work.
 
->dc->writeback_rate_update is a special delayed worker, it re-arms itself
->to run after several seconds by,
->>>     schedule_delayed_work(&dc->writeback_rate_update,
->>>                   dc->writeback_rate_update_seconds * HZ);
->
->I check the workqueue code, it seems cancel_delayed_work_sync() does not
->prevent a delayed work to re-arm itself inside worker routine. And in my
->test, around 5 seconds after cancel_delayed_work_sync() called, a NULL
->pointer difference oops happens. 
-I think I got how this issue would be occured:
-1)work writeback_rate_update is running;
-2)cancel_delayed_work_sync() is called, and waiting for work 
-  writeback_rate_update to run over, and conntinue to release cche set 
-  and cached device resources.
-3)In the end of step 1, work writeback_rate_update re-armed again, and
-  5s later, the work runs again.
+dc->writeback_rate_update is a special delayed work from others in bcache.
+In its routine update_writeback_rate(), this delayed work is re-armed
+after a piece of time. That means when cancel_delayed_work_sync() returns,
+this delayed work can still be executed after several seconds defined by
+dc->writeback_rate_update_seconds.
 
->Cache set memory is freed within 2 seconds
->after __cache_set_unregister() called, so inside
->__update_writeback_rate() struct cache_set is referenced and causes the
->NULL pointer deference bug.
->
-So, if it occured like I said above, it is not safty to judged by:
->    struct cache_set *c = dc->disk.c;
->    if (test_bit(CACHE_SET_STOPPING, &c->flags))
->        return;
-because cache_set, even bcache device and cache device are all released.                                             
-Is that right?
+The problem is, after cancel_delayed_work_sync() returns, the cache set
+unregister code path will eventually release memory of struct cache set.
+Then the delayed work is scheduled to run, and inside its routine
+update_writeback_rate() that already released cache set NULL pointer will
+be accessed. Now a NULL pointer deference panic is triggered.
 
-Thanks,
-Tang Junhui
+In order to avoid the above problem, this patch checks cache set flags in
+delayed work routine update_writeback_rate(). If flag CACHE_SET_STOPPING
+is set, this routine will quit without re-arm the delayed work. Then the
+NULL pointer deference panic won't happen after cache set is released.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+---
+ drivers/md/bcache/writeback.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index 0789a9e18337..745d9b2a326f 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -91,6 +91,11 @@ static void update_writeback_rate(struct work_struct *work)
+ 	struct cached_dev *dc = container_of(to_delayed_work(work),
+ 					     struct cached_dev,
+ 					     writeback_rate_update);
++	struct cache_set *c = dc->disk.c;
++
++	/* quit directly if cache set is stopping */
++	if (test_bit(CACHE_SET_STOPPING, &c->flags))
++		return;
+ 
+ 	down_read(&dc->writeback_lock);
+ 
+@@ -100,6 +105,10 @@ static void update_writeback_rate(struct work_struct *work)
+ 
+ 	up_read(&dc->writeback_lock);
+ 
++	/* do not schedule delayed work if cache set is stopping */
++	if (test_bit(CACHE_SET_STOPPING, &c->flags))
++		return;
++
+ 	schedule_delayed_work(&dc->writeback_rate_update,
+ 			      dc->writeback_rate_update_seconds * HZ);
+ }
+-- 
+2.15.1
