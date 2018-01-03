@@ -1,78 +1,56 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:54993 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752624AbeACOEL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Jan 2018 09:04:11 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, mlyle@lyle.org,
-        tang.junhui@zte.com.cn, Coly Li <colyli@suse.de>
-Subject: [PATCH v1 05/10] bcache: stop dc->writeback_rate_update if cache set is stopping
-Date: Wed,  3 Jan 2018 22:03:20 +0800
-Message-Id: <20180103140325.63175-6-colyli@suse.de>
-In-Reply-To: <20180103140325.63175-1-colyli@suse.de>
-References: <20180103140325.63175-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "terraluna977@gmail.com" <terraluna977@gmail.com>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: 4.15-rcX 32-bit SCSI suspend2ram warning
+Date: Wed, 3 Jan 2018 17:51:22 +0000
+Message-ID: <1515001882.2582.15.camel@wdc.com>
+References: <CAM6Zs0XZ1ejXq6-DtKS19ZNU2-jQa++YTQZ-LWuaOOQECbrS9Q@mail.gmail.com>
+In-Reply-To: <CAM6Zs0XZ1ejXq6-DtKS19ZNU2-jQa++YTQZ-LWuaOOQECbrS9Q@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-struct delayed_work writeback_rate_update in struct cache_dev is a delayed
-worker to call function update_writeback_rate() in period (the interval is
-defined by dc->writeback_rate_update_seconds).
-
-When a metadate I/O error happens on cache device, bcache error handling
-routine bch_cache_set_error() will call bch_cache_set_unregister() to
-retire whole cache set. On the unregister code path, cached_dev_free()
-calls cancel_delayed_work_sync(&dc->writeback_rate_update) to stop this
-delayed work.
-
-dc->writeback_rate_update is a special delayed work from others in bcache.
-In its routine update_writeback_rate(), this delayed work is re-armed
-after a piece of time. That means when cancel_delayed_work_sync() returns,
-this delayed work can still be executed after several seconds defined by
-dc->writeback_rate_update_seconds.
-
-The problem is, after cancel_delayed_work_sync() returns, the cache set
-unregister code path will eventually release memory of struct cache set.
-Then the delayed work is scheduled to run, and inside its routine
-update_writeback_rate() that already released cache set NULL pointer will
-be accessed. Now a NULL pointer deference panic is triggered.
-
-In order to avoid the above problem, this patch checks cache set flags in
-delayed work routine update_writeback_rate(). If flag CACHE_SET_STOPPING
-is set, this routine will quit without re-arm the delayed work. Then the
-NULL pointer deference panic won't happen after cache set is released.
-
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/writeback.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 0789a9e18337..745d9b2a326f 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -91,6 +91,11 @@ static void update_writeback_rate(struct work_struct *work)
- 	struct cached_dev *dc = container_of(to_delayed_work(work),
- 					     struct cached_dev,
- 					     writeback_rate_update);
-+	struct cache_set *c = dc->disk.c;
-+
-+	/* quit directly if cache set is stopping */
-+	if (test_bit(CACHE_SET_STOPPING, &c->flags))
-+		return;
- 
- 	down_read(&dc->writeback_lock);
- 
-@@ -100,6 +105,10 @@ static void update_writeback_rate(struct work_struct *work)
- 
- 	up_read(&dc->writeback_lock);
- 
-+	/* do not schedule delayed work if cache set is stopping */
-+	if (test_bit(CACHE_SET_STOPPING, &c->flags))
-+		return;
-+
- 	schedule_delayed_work(&dc->writeback_rate_update,
- 			      dc->writeback_rate_update_seconds * HZ);
- }
--- 
-2.15.1
+T24gV2VkLCAyMDE4LTAxLTAzIGF0IDEyOjE2IC0wNTAwLCBXb29keSBTdXdhbHNraSB3cm90ZToN
+Cj4gU3RhcnRpbmcgd2l0aCBhIDMyLWJpdCA0LjE1LXJjWCBJIGhhdmUgb2JzZXJ2ZWQgYSB3YXJu
+aW5nIGluIGRtZXNnLA0KPiBoYXBwZW5pbmcgd2hlbiB0aGUgc3lzdGVtIGdvZXMgdG8gc3VzcGVu
+ZDJyYW0uIElmIGl0IGlzIGp1c3QgYSB3YXJuaW5nDQo+IC0gY291bGQgd2UgaGF2ZSBpdCBxdWll
+dCdldCBkb3duPw0KDQooK2xpbnV4LXNjc2kpDQoNClRoYW5rIHlvdSBmb3IgaGF2aW5nIHJlcG9y
+dGVkIHRoaXMuIFRoZSBjb21tZW50IGFib3ZlIHRoZSB3YXJuaW5nIHRoYXQgaGFzDQpiZWVuIHRy
+aWdnZXJlZCBpcyBhcyBmb2xsb3dzOg0KDQoJLyoNCgkgKiBJdCBpcyBhbGxvd2VkIHRvIGNhbGwg
+c2NzaV9kZXZpY2VfcXVpZXNjZSgpIG11bHRpcGxlIHRpbWVzIGZyb20NCgkgKiB0aGUgc2FtZSBj
+b250ZXh0IGJ1dCBjb25jdXJyZW50IHNjc2lfZGV2aWNlX3F1aWVzY2UoKSBjYWxscyBhcmUNCgkg
+KiBub3QgYWxsb3dlZC4NCgkgKi8NCglXQVJOX09OX09OQ0Uoc2Rldi0+cXVpZXNjZWRfYnkgJiYg
+c2Rldi0+cXVpZXNjZWRfYnkgIT0gY3VycmVudCk7DQoNClRoYXQgbWVhbnMgdGhhdCBzdXBwcmVz
+c2luZyB0aGUgd2FybmluZyB3b3VsZCBiZSB3cm9uZyAtIGl0IHdvdWxkIGhpZGUgdGhlDQpyYWNl
+IGNvbmRpdGlvbiBidXQgbm90IGZpeCBpdC4gQW55d2F5LCB3b3VsZCBpdCBiZSBwb3NzaWJsZSB0
+byB0ZXN0IHRoZQ0KKGVudGlyZWx5IHVudGVzdGVkKSBwYXRjaCBiZWxvdz8gU29ycnkgYnV0IEkg
+Y3VycmVudGx5IGRvbid0IGhhdmUgYWNjZXNzIHRvDQphIHRlc3Qgc2V0dXAgdGhhdCB0cmlnZ2Vy
+cyB0aGUgU1BJIERWIGNvZGUuDQoNClRoYW5rcywNCg0KQmFydC4NCg0KDQpkaWZmIC0tZ2l0IGEv
+ZHJpdmVycy9zY3NpL3Njc2lfdHJhbnNwb3J0X3NwaS5jIGIvZHJpdmVycy9zY3NpL3Njc2lfdHJh
+bnNwb3J0X3NwaS5jDQppbmRleCAxMGViYjIxM2RkYjMuLmFiZDQ4Y2ZmYjI4MiAxMDA2NDQNCi0t
+LSBhL2RyaXZlcnMvc2NzaS9zY3NpX3RyYW5zcG9ydF9zcGkuYw0KKysrIGIvZHJpdmVycy9zY3Np
+L3Njc2lfdHJhbnNwb3J0X3NwaS5jDQpAQCAtMjYsNiArMjYsNyBAQA0KICNpbmNsdWRlIDxsaW51
+eC9tdXRleC5oPg0KICNpbmNsdWRlIDxsaW51eC9zeXNmcy5oPg0KICNpbmNsdWRlIDxsaW51eC9z
+bGFiLmg+DQorI2luY2x1ZGUgPGxpbnV4L3N1c3BlbmQuaD4NCiAjaW5jbHVkZSA8c2NzaS9zY3Np
+Lmg+DQogI2luY2x1ZGUgInNjc2lfcHJpdi5oIg0KICNpbmNsdWRlIDxzY3NpL3Njc2lfZGV2aWNl
+Lmg+DQpAQCAtMTAwOSwxMSArMTAxMCwyMCBAQCBzcGlfZHZfZGV2aWNlKHN0cnVjdCBzY3NpX2Rl
+dmljZSAqc2RldikNCiAJdTggKmJ1ZmZlcjsNCiAJY29uc3QgaW50IGxlbiA9IFNQSV9NQVhfRUNI
+T19CVUZGRVJfU0laRSoyOw0KIA0KKwkvKg0KKwkgKiBCZWNhdXNlIHRoaXMgZnVuY3Rpb24gYW5k
+IHRoZSBwb3dlciBtYW5hZ2VtZW50IGNvZGUgYm90aCBjYWxsDQorCSAqIHNjc2lfZGV2aWNlX3F1
+aWVzY2UoKSwgaXQgaXMgbm90IHNhZmUgdG8gcGVyZm9ybSBkb21haW4gdmFsaWRhdGlvbg0KKwkg
+KiB3aGlsZSBzdXNwZW5kIG9yIHJlc3VtZSBpcyBpbiBwcm9ncmVzcy4gSGVuY2UgdGhlDQorCSAq
+IGxvY2svdW5sb2NrX3N5c3RlbV9zbGVlcCgpIGNhbGxzLg0KKwkgKi8NCisJbG9ja19zeXN0ZW1f
+c2xlZXAoKTsNCisNCiAJaWYgKHVubGlrZWx5KHNwaV9kdl9pbl9wcm9ncmVzcyhzdGFyZ2V0KSkp
+DQotCQlyZXR1cm47DQorCQlnb3RvIHVubG9jazsNCiANCiAJaWYgKHVubGlrZWx5KHNjc2lfZGV2
+aWNlX2dldChzZGV2KSkpDQotCQlyZXR1cm47DQorCQlnb3RvIHVubG9jazsNCisNCiAJc3BpX2R2
+X2luX3Byb2dyZXNzKHN0YXJnZXQpID0gMTsNCiANCiAJYnVmZmVyID0ga3phbGxvYyhsZW4sIEdG
+UF9LRVJORUwpOw0KQEAgLTEwNDQsMTEgKzEwNTQsMTMgQEAgc3BpX2R2X2RldmljZShzdHJ1Y3Qg
+c2NzaV9kZXZpY2UgKnNkZXYpDQogDQogCXNwaV9pbml0aWFsX2R2KHN0YXJnZXQpID0gMTsNCiAN
+Ci0gb3V0X2ZyZWU6DQorb3V0X2ZyZWU6DQogCWtmcmVlKGJ1ZmZlcik7DQotIG91dF9wdXQ6DQor
+b3V0X3B1dDoNCiAJc3BpX2R2X2luX3Byb2dyZXNzKHN0YXJnZXQpID0gMDsNCiAJc2NzaV9kZXZp
+Y2VfcHV0KHNkZXYpOw0KK3VubG9jazoNCisJdW5sb2NrX3N5c3RlbV9zbGVlcCgpOw0KIH0NCiBF
+WFBPUlRfU1lNQk9MKHNwaV9kdl9kZXZpY2UpOw0KIA0KLS0gDQoyLjE1LjENCg==
