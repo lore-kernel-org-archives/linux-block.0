@@ -1,173 +1,51 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX/IMPROVEMENT 1/2] block, bfq: limit tags for writes and async I/O
-Date: Sat, 13 Jan 2018 12:05:17 +0100
-Message-Id: <20180113110518.2519-2-paolo.valente@linaro.org>
-In-Reply-To: <20180113110518.2519-1-paolo.valente@linaro.org>
-References: <20180113110518.2519-1-paolo.valente@linaro.org>
+Return-Path: <ming.lei@redhat.com>
+Date: Wed, 3 Jan 2018 09:29:32 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Vincent Batts <vbatts@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>, NeilBrown <neilb@suse.com>,
+	Michele Ballabio <barra_cuda@katamail.com>
+Subject: Re: [PATCH 0/2] block: fix two regressiones on bounce
+Message-ID: <20180103012931.GA9787@ming.t460p>
+References: <20171218074044.1369-1-ming.lei@redhat.com>
+ <8d1baf35-3f94-a6d7-7e05-0f90acbefde0@kernel.dk>
+ <CANcsyS5YJZJO_JutN_WAusJjxHQ5-Gg3atNg76AEU+-48caS1g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CANcsyS5YJZJO_JutN_WAusJjxHQ5-Gg3atNg76AEU+-48caS1g@mail.gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Asynchronous I/O can easily starve synchronous I/O (both sync reads
-and sync writes), by consuming all request tags. Similarly, storms of
-synchronous writes, such as those that sync(2) may trigger, can starve
-synchronous reads. In their turn, these two problems may also cause
-BFQ to loose control on latency for interactive and soft real-time
-applications. For example, on a PLEXTOR PX-256M5S SSD, LibreOffice
-Writer takes 0.6 seconds to start if the device is idle, but it takes
-more than 45 seconds (!) if there are sequential writes in the
-background.
+Hi Vincent,
 
-This commit addresses this issue by limiting the maximum percentage of
-tags that asynchronous I/O requests and synchronous write requests can
-consume. In particular, this commit grants a higher threshold to
-synchronous writes, to prevent the latter from being starved by
-asynchronous I/O.
+On Tue, Jan 02, 2018 at 04:16:44PM -0500, Vincent Batts wrote:
+> Will this set make it to the 4.14.x stable branch?
 
-According to the above test, LibreOffice Writer now starts in about
-1.2 seconds on average, regardless of the background workload, and
-apart from some rare outlier. To check this improvement, run, e.g.,
-sudo ./comm_startup_lat.sh bfq 5 5 seq 10 "lowriter --terminate_after_init"
-for the comm_startup_lat benchmark in the S suite [1].
+Greg has posted out the two patches for 4.14-stable review:
 
-[1] https://github.com/Algodev-github/S
+	https://marc.info/?l=linux-kernel&m=151481772722222&w=2
 
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Tested-by: Holger Hoffstätte <holger@applied-asynchrony.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 77 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- block/bfq-iosched.h | 12 +++++++++
- 2 files changed, 89 insertions(+)
+So it will be in 4.14.x stable branch soon.
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 1caeecad7af1..527bd2ccda51 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -417,6 +417,82 @@ static struct request *bfq_choose_req(struct bfq_data *bfqd,
- 	}
- }
- 
-+/*
-+ * See the comments on bfq_limit_depth for the purpose of
-+ * the depths set in the function.
-+ */
-+static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
-+{
-+	bfqd->sb_shift = bt->sb.shift;
-+
-+	/*
-+	 * In-word depths if no bfq_queue is being weight-raised:
-+	 * leaving 25% of tags only for sync reads.
-+	 *
-+	 * In next formulas, right-shift the value
-+	 * (1U<<bfqd->sb_shift), instead of computing directly
-+	 * (1U<<(bfqd->sb_shift - something)), to be robust against
-+	 * any possible value of bfqd->sb_shift, without having to
-+	 * limit 'something'.
-+	 */
-+	/* no more than 50% of tags for async I/O */
-+	bfqd->word_depths[0][0] = max((1U<<bfqd->sb_shift)>>1, 1U);
-+	/*
-+	 * no more than 75% of tags for sync writes (25% extra tags
-+	 * w.r.t. async I/O, to prevent async I/O from starving sync
-+	 * writes)
-+	 */
-+	bfqd->word_depths[0][1] = max(((1U<<bfqd->sb_shift) * 3)>>2, 1U);
-+
-+	/*
-+	 * In-word depths in case some bfq_queue is being weight-
-+	 * raised: leaving ~63% of tags for sync reads. This is the
-+	 * highest percentage for which, in our tests, application
-+	 * start-up times didn't suffer from any regression due to tag
-+	 * shortage.
-+	 */
-+	/* no more than ~18% of tags for async I/O */
-+	bfqd->word_depths[1][0] = max(((1U<<bfqd->sb_shift) * 3)>>4, 1U);
-+	/* no more than ~37% of tags for sync writes (~20% extra tags) */
-+	bfqd->word_depths[1][1] = max(((1U<<bfqd->sb_shift) * 6)>>4, 1U);
-+}
-+
-+/*
-+ * Async I/O can easily starve sync I/O (both sync reads and sync
-+ * writes), by consuming all tags. Similarly, storms of sync writes,
-+ * such as those that sync(2) may trigger, can starve sync reads.
-+ * Limit depths of async I/O and sync writes so as to counter both
-+ * problems.
-+ */
-+static void bfq_limit_depth(unsigned int op, struct blk_mq_alloc_data *data)
-+{
-+	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
-+	struct bfq_data *bfqd = data->q->elevator->elevator_data;
-+	struct sbitmap_queue *bt;
-+
-+	if (op_is_sync(op) && !op_is_write(op))
-+		return;
-+
-+	if (data->flags & BLK_MQ_REQ_RESERVED) {
-+		if (unlikely(!tags->nr_reserved_tags)) {
-+			WARN_ON_ONCE(1);
-+			return;
-+		}
-+		bt = &tags->breserved_tags;
-+	} else
-+		bt = &tags->bitmap_tags;
-+
-+	if (unlikely(bfqd->sb_shift != bt->sb.shift))
-+		bfq_update_depths(bfqd, bt);
-+
-+	data->shallow_depth =
-+		bfqd->word_depths[!!bfqd->wr_busy_queues][op_is_sync(op)];
-+
-+	bfq_log(bfqd, "[%s] wr_busy %d sync %d depth %u",
-+			__func__, bfqd->wr_busy_queues, op_is_sync(op),
-+			data->shallow_depth);
-+}
-+
- static struct bfq_queue *
- bfq_rq_pos_tree_lookup(struct bfq_data *bfqd, struct rb_root *root,
- 		     sector_t sector, struct rb_node **ret_parent,
-@@ -5267,6 +5343,7 @@ static struct elv_fs_entry bfq_attrs[] = {
- 
- static struct elevator_type iosched_bfq_mq = {
- 	.ops.mq = {
-+		.limit_depth		= bfq_limit_depth,
- 		.prepare_request	= bfq_prepare_request,
- 		.finish_request		= bfq_finish_request,
- 		.exit_icq		= bfq_exit_icq,
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 5d47b58d5fc8..fcd941008127 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -629,6 +629,18 @@ struct bfq_data {
- 	struct bfq_io_cq *bio_bic;
- 	/* bfqq associated with the task issuing current bio for merging */
- 	struct bfq_queue *bio_bfqq;
-+
-+	/*
-+	 * Cached sbitmap shift, used to compute depth limits in
-+	 * bfq_update_depths.
-+	 */
-+	unsigned int sb_shift;
-+
-+	/*
-+	 * Depth limits used in bfq_limit_depth (see comments on the
-+	 * function)
-+	 */
-+	unsigned int word_depths[2][2];
- };
- 
- enum bfqq_state_flags {
+Thanks,
+Ming
+
+> 
+> vb
+> 
+> On Mon, Dec 18, 2017 at 3:22 PM, Jens Axboe <axboe@kernel.dk> wrote:
+> > On 12/18/2017 12:40 AM, Ming Lei wrote:
+> >> Hi Jens,
+> >>
+> >> The 1st patch makes sure that passthrough IO won't enter .make_request_fn.
+> >>
+> >> The 2nd one fixes blk_rq_append_bio(), which is from your post with
+> >> small change on failure handling.
+> >
+> > Thanks Ming, queued up.
+> >
+> > --
+> > Jens Axboe
+> >
+
 -- 
-2.15.1
+Ming
