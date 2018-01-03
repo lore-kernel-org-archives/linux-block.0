@@ -1,102 +1,39 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-From: Tejun Heo <tj@kernel.org>
-To: jack@suse.cz,
-	axboe@kernel.dk,
-	clm@fb.com,
-	jbacik@fb.com
-Cc: kernel-team@fb.com,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	peterz@infradead.org,
-	jianchao.w.wang@oracle.com,
-	Bart.VanAssche@wdc.com,
-	linux-block@vger.kernel.org,
-	Tejun Heo <tj@kernel.org>,
-	Asai Thambi SP <asamymuthupa@micron.com>,
-	Stefan Haberland <sth@linux.vnet.ibm.com>,
-	Jan Hoeppner <hoeppner@linux.vnet.ibm.com>
-Subject: [PATCH 5/8] blk-mq: make blk_abort_request() trigger timeout path
-Date: Mon,  8 Jan 2018 11:15:39 -0800
-Message-Id: <20180108191542.379478-6-tj@kernel.org>
-In-Reply-To: <20180108191542.379478-1-tj@kernel.org>
-References: <20180108191542.379478-1-tj@kernel.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pl0-f54.google.com ([209.85.160.54]:33284 "EHLO
+        mail-pl0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751091AbeACSB3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Jan 2018 13:01:29 -0500
+Received: by mail-pl0-f54.google.com with SMTP id 1so1689858plv.0
+        for <linux-block@vger.kernel.org>; Wed, 03 Jan 2018 10:01:29 -0800 (PST)
+Subject: Re: [for-416 PATCH v2] bcache: fix writeback target calculation
+To: tang.junhui@zte.com.cn
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <1514913607-22144-1-git-send-email-tang.junhui@zte.com.cn>
+From: Michael Lyle <mlyle@lyle.org>
+Message-ID: <2d7f9a54-d60c-2600-8a0f-9caec2a7f8d8@lyle.org>
+Date: Wed, 3 Jan 2018 10:01:26 -0800
+MIME-Version: 1.0
+In-Reply-To: <1514913607-22144-1-git-send-email-tang.junhui@zte.com.cn>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-With issue/complete and timeout paths now using the generation number
-and state based synchronization, blk_abort_request() is the only one
-which depends on REQ_ATOM_COMPLETE for arbitrating completion.
+On 01/02/2018 09:20 AM, tang.junhui@zte.com.cn wrote:
+> From: Tang Junhui <tang.junhui@zte.com.cn>
+> 
+> When I saw the code "int64_t error = dirty - cache_dirty_target", I was 
+> totally lost, I will try my best to get out. 
 
-There's no reason for blk_abort_request() to be a completely separate
-path.  This patch makes blk_abort_request() piggyback on the timeout
-path instead of trying to terminate the request directly.
+Don't waste your time, let me think about this more.  I think the
+previous version was correct and now I screwed it up.  I need to really
+read how the dirty block accounting happens to do this properly.
 
-This removes the last dependency on REQ_ATOM_COMPLETE in blk-mq.
+I will send a v3, and make sure that I'm fully confident in it.
 
-Note that this makes blk_abort_request() asynchronous - it initiates
-abortion but the actual termination will happen after a short while,
-even when the caller owns the request.  AFAICS, SCSI and ATA should be
-fine with that and I think mtip32xx and dasd should be safe but not
-completely sure.  It'd be great if people who know the drivers take a
-look.
+> And this patch dependent on your earlier patch(PI controller), did that
+> patch have applied to upstreams branch? I searched in 4.14 branch, 
+> and did not find it.
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Cc: Asai Thambi SP <asamymuthupa@micron.com>
-Cc: Stefan Haberland <sth@linux.vnet.ibm.com>
-Cc: Jan Hoeppner <hoeppner@linux.vnet.ibm.com>
----
- block/blk-mq.c      | 2 +-
- block/blk-mq.h      | 2 --
- block/blk-timeout.c | 8 ++++----
- 3 files changed, 5 insertions(+), 7 deletions(-)
+It's 1d316e658374f700fdfff9299c70ce65d8d145e6 on linus/master.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 41bfd27..bed4cb8 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -814,7 +814,7 @@ struct blk_mq_timeout_data {
- 	unsigned int nr_expired;
- };
- 
--void blk_mq_rq_timed_out(struct request *req, bool reserved)
-+static void blk_mq_rq_timed_out(struct request *req, bool reserved)
- {
- 	const struct blk_mq_ops *ops = req->q->mq_ops;
- 	enum blk_eh_timer_return ret = BLK_EH_RESET_TIMER;
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index cf01f6f..6b2d616 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -94,8 +94,6 @@ extern int blk_mq_sysfs_register(struct request_queue *q);
- extern void blk_mq_sysfs_unregister(struct request_queue *q);
- extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
- 
--extern void blk_mq_rq_timed_out(struct request *req, bool reserved);
--
- void blk_mq_release(struct request_queue *q);
- 
- /**
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index 6427be7..d580af3 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -156,12 +156,12 @@ void blk_timeout_work(struct work_struct *work)
-  */
- void blk_abort_request(struct request *req)
- {
--	if (blk_mark_rq_complete(req))
--		return;
--
- 	if (req->q->mq_ops) {
--		blk_mq_rq_timed_out(req, false);
-+		req->deadline = jiffies;
-+		mod_timer(&req->q->timeout, 0);
- 	} else {
-+		if (blk_mark_rq_complete(req))
-+			return;
- 		blk_delete_timer(req);
- 		blk_rq_timed_out(req);
- 	}
--- 
-2.9.5
+Mike
