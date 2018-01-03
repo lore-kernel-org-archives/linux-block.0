@@ -1,67 +1,50 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:51548 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750766AbeACFqO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Jan 2018 00:46:14 -0500
-Subject: Re: [PATCH] bcache: fix unmatched generic_end_io_acct() &
- generic_start_io_acct()
-To: Zhai Zhaoxuan <kxuanobj@gmail.com>, linux-bcache@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc: tang.junhui@zte.com.cn, Michael Lyle <mlyle@lyle.org>
-References: <20180103043937.28235-1-kxuanobj@gmail.com>
-From: Coly Li <colyli@suse.de>
-Message-ID: <58e10ebe-0a40-c866-94d7-50cd7a6872ea@suse.de>
-Date: Wed, 3 Jan 2018 13:45:58 +0800
-MIME-Version: 1.0
-In-Reply-To: <20180103043937.28235-1-kxuanobj@gmail.com>
-Content-Type: text/plain; charset=utf-8
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:43825 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750749AbeACEjv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jan 2018 23:39:51 -0500
+From: Zhai Zhaoxuan <kxuanobj@gmail.com>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: tang.junhui@zte.com.cn, Michael Lyle <mlyle@lyle.org>,
+        Zhai Zhaoxuan <kxuanobj@gmail.com>
+Subject: [PATCH] bcache: fix unmatched generic_end_io_acct() & generic_start_io_acct()
+Date: Wed,  3 Jan 2018 12:39:37 +0800
+Message-Id: <20180103043937.28235-1-kxuanobj@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 03/01/2018 12:39 PM, Zhai Zhaoxuan wrote:
-> The function cached_dev_make_request() and flash_dev_make_request() call
-> generic_start_io_acct() with (struct bcache_device)->disk when they start a
-> closure. Then the function bio_complete() calls generic_end_io_acct() with
-> (struct search)->orig_bio->bi_disk when the closure has done.
-> Since the `bi_disk` is not the bcache device, the generic_end_io_acct() is
-> called with a wrong device queue.
-> 
-> It causes the "inflight" (in struct hd_struct) counter keep increasing
-> without decreasing.
-> 
-> This patch fix the problem by calling generic_end_io_acct() with
-> (struct bcache_device)->disk.
-> 
-> Signed-off-by: Zhai Zhaoxuan <kxuanobj@gmail.com>
+The function cached_dev_make_request() and flash_dev_make_request() call
+generic_start_io_acct() with (struct bcache_device)->disk when they start a
+closure. Then the function bio_complete() calls generic_end_io_acct() with
+(struct search)->orig_bio->bi_disk when the closure has done.
+Since the `bi_disk` is not the bcache device, the generic_end_io_acct() is
+called with a wrong device queue.
 
-Hi Zhaoxuan,
+It causes the "inflight" (in struct hd_struct) counter keep increasing
+without decreasing.
 
-Nice catch, it makes sense. Thanks.
+This patch fix the problem by calling generic_end_io_acct() with
+(struct bcache_device)->disk.
 
-Reviewed-by: Coly Li <colyli@suse.de>
+Signed-off-by: Zhai Zhaoxuan <kxuanobj@gmail.com>
+---
+ drivers/md/bcache/request.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-One more question, do you experience any problem when inflight counter
-increases only ? I just wondering.
-
-Coly
-
-> ---
->  drivers/md/bcache/request.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-> index 643c3021624f..83de85fe4542 100644
-> --- a/drivers/md/bcache/request.c
-> +++ b/drivers/md/bcache/request.c
-> @@ -611,8 +611,8 @@ static void request_endio(struct bio *bio)
->  static void bio_complete(struct search *s)
->  {
->  	if (s->orig_bio) {
-> -		struct request_queue *q = s->orig_bio->bi_disk->queue;
-> -		generic_end_io_acct(q, bio_data_dir(s->orig_bio),
-> +		generic_end_io_acct(s->d->disk->queue,
-> +				    bio_data_dir(s->orig_bio),
->  				    &s->d->disk->part0, s->start_time);
->  
->  		trace_bcache_request_end(s->d, s->orig_bio);
-> 
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 643c3021624f..83de85fe4542 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -611,8 +611,8 @@ static void request_endio(struct bio *bio)
+ static void bio_complete(struct search *s)
+ {
+ 	if (s->orig_bio) {
+-		struct request_queue *q = s->orig_bio->bi_disk->queue;
+-		generic_end_io_acct(q, bio_data_dir(s->orig_bio),
++		generic_end_io_acct(s->d->disk->queue,
++				    bio_data_dir(s->orig_bio),
+ 				    &s->d->disk->part0, s->start_time);
+ 
+ 		trace_bcache_request_end(s->d, s->orig_bio);
+-- 
+2.15.1
