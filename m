@@ -1,54 +1,47 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-it0-f67.google.com ([209.85.214.67]:53300 "EHLO
-        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751590AbeA2S6v (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Jan 2018 13:58:51 -0500
-Received: by mail-it0-f67.google.com with SMTP id b5so9558720itc.3
-        for <linux-block@vger.kernel.org>; Mon, 29 Jan 2018 10:58:51 -0800 (PST)
+Return-Path: <jiangqi903@gmail.com>
+Return-Path: <jiangqi903@gmail.com>
+From: Joseph Qi <jiangqi903@gmail.com>
+Subject: [PATCH 1/3] blk-throttle: fix NULL pointer dereference risk in
+ throtl_select_dispatch
+To: Jens Axboe <axboe@kernel.dk>
+Cc: jinli.zjl@alibaba-inc.com, qijiang.qj@alibaba-inc.com,
+ linux-block <linux-block@vger.kernel.org>
+Message-ID: <63f2dcbe-6524-82b8-adff-66a860443f65@gmail.com>
+Date: Thu, 4 Jan 2018 19:06:07 +0800
 MIME-Version: 1.0
-From: Bryan Gurney <bgurney@redhat.com>
-Date: Mon, 29 Jan 2018 13:58:50 -0500
-Message-ID: <CAHhmqcQWi12He=P1uMOopwVPS3RYgXa60joLK+w9j1fJQ3fOjw@mail.gmail.com>
-Subject: [LSF/MM TOPIC] Bringing Virtual Data Optimizer (VDO) to upstream
-To: lsf-pc@lists.linux-foundation.org
-Cc: linux-block@vger.kernel.org, dm-devel@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Hello,
+From: Joseph Qi <qijiang.qj@alibaba-inc.com>
 
-I'd like to talk about Virtual Data Optimizer (VDO), which is a
-device-mapper target that provides deduplication, compression, thin
-provisioning, and zero-block elimination for primary storage.  Now
-that VDO is open-source, LSF/MM would be a good time to open a
-dialogue between other upstream developers as we work to bring VDO
-upstream.
+tg in throtl_select_dispatch is used first and then do check. Since tg
+may be NULL, it has potential NULL pointer dereference risk. So fix it.
 
-VDO was originally developed by Permabit Technology Corporation as a
-proprietary set of kernel modules and userspace tools.  After being
-acquired by Red Hat, VDO has been re-licensed under the GNU General
-Public License, version 2.  The VDO team has also been working a lot
-closer with Mike Snitzer and other developers of device-mapper and
-LVM.
+Signed-off-by: Joseph Qi <qijiang.qj@alibaba-inc.com>
+---
+ block/blk-throttle.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-The source for VDO is available at the following repositories:
-
-https://github.com/dm-vdo/kvdo (kernel modules)
-https://github.com/dm-vdo/vdo (userspace tools)
-
-As the README files in the repositories above indicate, development on
-VDO is currently focusing on upstream integration, which includes
-various coding standards compliance changes, refactoring efforts, and
-various other changes that become possible now that VDO is re-licensed
-under the GPL.
-
-That being said, VDO has been in production use since 2014 in its
-previous proprietary form, and continues to undergo thorough testing,
-including real-world test scenarios.
-
-
-Thanks,
-
-Bryan
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 9052f4e..a0bae2c 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1228,7 +1228,7 @@ static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
+ 
+ 	while (1) {
+ 		struct throtl_grp *tg = throtl_rb_first(parent_sq);
+-		struct throtl_service_queue *sq = &tg->service_queue;
++		struct throtl_service_queue *sq;
+ 
+ 		if (!tg)
+ 			break;
+@@ -1240,6 +1240,7 @@ static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
+ 
+ 		nr_disp += throtl_dispatch_tg(tg);
+ 
++		sq = &tg->service_queue;
+ 		if (sq->nr_queued[0] || sq->nr_queued[1])
+ 			tg_update_disptime(tg);
+ 
+-- 
+1.9.4
