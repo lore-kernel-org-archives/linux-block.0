@@ -1,142 +1,137 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from smtp2.provo.novell.com ([137.65.250.81]:55352 "EHLO
-        smtp2.provo.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750749AbeACD7L (ORCPT
-        <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
-        Tue, 2 Jan 2018 22:59:11 -0500
-From: Guoqing Jiang <gqjiang@suse.com>
-Subject: Bug report - issue with bfq?
-To: linux-block <linux-block@vger.kernel.org>
-Cc: Paolo Valente <paolo.valente@linaro.org>
-Message-ID: <c0e98cce-b8b9-643a-40f2-5f2bbd492a0c@suse.com>
-Date: Wed, 3 Jan 2018 11:58:58 +0800
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <gunthorp@deltatee.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org,
+	linux-nvdimm@lists.01.org,
+	linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Logan Gunthorpe <logang@deltatee.com>
+Date: Thu,  4 Jan 2018 12:01:25 -0700
+Message-Id: <20180104190137.7654-1-logang@deltatee.com>
+Subject: [PATCH 00/11] Copy Offload in NVMe Fabrics with P2P PCI Memory
+List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+Hello,
 
-In my test, I found some issues when try bfq with xfs.
-The test basically just set the disk's scheduler to bfq,
-create xfs on top of it, mount fs and write something,
-then umount the fs. After several rounds of iteration,
-I can see different calltraces appeared.
+This is a continuation of our work to enable using Peer-to-Peer PCI
+memory in NVMe fabrics targets. Many thanks go to Christoph Hellwig who
+provided valuable feedback to get these patches to where they are today.
 
-For example, the one which happened frequently:
+The concept here is to use memory that's exposed on a PCI BAR as
+data buffers in the NVME target code such that data can be transferred
+from an RDMA NIC to the special memory and then directly to an NVMe
+device avoiding system memory entirely. The upside of this is better
+QoS for applications running on the CPU utilizing memory and lower
+PCI bandwidth required to the CPU (such that systems could be designed
+with fewer lanes connected to the CPU). However, presently, the
+trade-off is currently a reduction in overall throughput. (Largely due
+to hardware issues that would certainly improve in the future).
 
-Jan 03 11:35:19 linux-mainline kernel: XFS (vdd): Mounting V5 Filesystem
-Jan 03 11:35:19 linux-mainline kernel: XFS (vdd): Ending clean mount
-Jan 03 11:35:19 linux-mainline kernel: XFS (vdd): Unmounting Filesystem
-Jan 03 11:35:19 linux-mainline kernel: XFS (vdd): Mounting V5 Filesystem
-Jan 03 11:35:19 linux-mainline kernel: XFS (vdd): Ending clean mount
-Jan 03 11:35:19 linux-mainline kernel: BUG: unable to handle kernel 
-paging request at 0000000000029ec0
-Jan 03 11:35:19 linux-mainline kernel: IP: __mod_node_page_state+0x5/0x50
-Jan 03 11:35:19 linux-mainline kernel: PGD 0 P4D 0
-Jan 03 11:35:19 linux-mainline kernel: Oops: 0000 [#1] SMP KASAN
-Jan 03 11:35:19 linux-mainline kernel: Modules linked in: bfq(E) 
-joydev(E) uinput(E) fuse(E) af_packet(E) iscsi_ibft(E) 
-iscsi_boot_sysfs(E) snd_hda_codec_generic(E) crct10dif_pclmul(E) 
-crc32_pclmul(E) xfs(E) ghash_clmulni_intel(E) libcrc32c(E) 
-crc32c_intel(E) pcbc(E) snd_hda_intel(E) snd_hda_codec(E) 
-snd_hda_core(E) snd_hwdep(E) snd_pcm(E) ppdev(E) aesni_intel(E) 
-snd_timer(E) aes_x86_64(E) crypto_simd(E) snd(E) glue_helper(E) 
-cryptd(E) pcspkr(E) virtio_balloon(E) virtio_net(E) parport_pc(E) 
-parport(E) soundcore(E) i2c_piix4(E) ext4(E) crc16(E) mbcache(E) jbd2(E) 
-virtio_console(E) virtio_rng(E) virtio_blk(E) ata_generic(E) ata_piix(E) 
-ahci(E) libahci(E) floppy(E) ehci_pci(E) qxl(E) serio_raw(E) 
-drm_kms_helper(E) syscopyarea(E) sysfillrect(E) sysimgblt(E) 
-fb_sys_fops(E) sym53c8xx(E) scsi_transport_spi(E) button(E) libata(E)
-Jan 03 11:35:19 linux-mainline kernel:  ttm(E) drm(E) uhci_hcd(E) 
-ehci_hcd(E) usbcore(E) virtio_pci(E) virtio_ring(E) virtio(E) sg(E) 
-dm_multipath(E) dm_mod(E) scsi_dh_rdac(E) scsi_dh_emc(E) scsi_dh_alua(E) 
-scsi_mod(E) autofs4(E)
-Jan 03 11:35:19 linux-mainline kernel: CPU: 0 PID: 3349 Comm: ps 
-Tainted: G            E    4.15.0-rc1-69-default #1
-Jan 03 11:35:19 linux-mainline kernel: Hardware name: QEMU Standard PC 
-(i440FX + PIIX, 1996), BIOS 
-rel-1.9.1-0-gb3ef39f-prebuilt.qemu-project.org 04/01/2014
-Jan 03 11:35:19 linux-mainline kernel: task: ffff880061efce80 
-task.stack: ffff880058bd0000
-Jan 03 11:35:19 linux-mainline kernel: RIP: 
-0010:__mod_node_page_state+0x5/0x50
-Jan 03 11:35:19 linux-mainline kernel: RSP: 0018:ffff880058bd7ce8 
-EFLAGS: 00010a07
-Jan 03 11:35:19 linux-mainline kernel: RAX: 00000000000003ff RBX: 
-ffffea00011a3d80 RCX: 00000000011a3d80
-Jan 03 11:35:19 linux-mainline kernel: RDX: ffffffffffffffff RSI: 
-000000000000000d RDI: 0000000000000000
-Jan 03 11:35:19 linux-mainline kernel: RBP: ffffffffffffffff R08: 
-ffff88006378a630 R09: ffff880058bd7d98
-Jan 03 11:35:19 linux-mainline kernel: R10: 00007f7f4d806280 R11: 
-0000000000000000 R12: ffffea00011a3d80
-Jan 03 11:35:19 linux-mainline kernel: R13: 00007f7f4f318000 R14: 
-00007f7f4f31c000 R15: ffff880058bd7e18
-Jan 03 11:35:19 linux-mainline kernel: FS:  0000000000000000(0000) 
-GS:ffff880066c00000(0000) knlGS:0000000000000000
-Jan 03 11:35:19 linux-mainline kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 
-0000000080050033
-Jan 03 11:35:19 linux-mainline kernel: CR2: 0000000000029ec0 CR3: 
-0000000001c0d006 CR4: 00000000001606f0
-Jan 03 11:35:19 linux-mainline kernel: Call Trace:
-Jan 03 11:35:19 linux-mainline kernel: page_remove_rmap+0x11a/0x2b0
-Jan 03 11:35:19 linux-mainline kernel: unmap_page_range+0x547/0xa30
-Jan 03 11:35:19 linux-mainline kernel:  unmap_vmas+0x42/0x90
-Jan 03 11:35:19 linux-mainline kernel:  exit_mmap+0x86/0x180
-Jan 03 11:35:19 linux-mainline kernel:  mmput+0x4a/0x110
-Jan 03 11:35:19 linux-mainline kernel:  do_exit+0x25d/0xae0
-Jan 03 11:35:19 linux-mainline kernel:  do_group_exit+0x39/0xa0
-Jan 03 11:35:19 linux-mainline kernel:  SyS_exit_group+0x10/0x10
-Jan 03 11:35:19 linux-mainline kernel: entry_SYSCALL_64_fastpath+0x1a/0x7d
-Jan 03 11:35:19 linux-mainline kernel: RIP: 0033:0x7f7f4eb8c338
-Jan 03 11:35:19 linux-mainline kernel: RSP: 002b:00007ffca4400d48 
-EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-Jan 03 11:35:19 linux-mainline kernel: RAX: ffffffffffffffda RBX: 
-0000000000000000 RCX: 00007f7f4eb8c338
-Jan 03 11:35:19 linux-mainline kernel: RDX: 0000000000000000 RSI: 
-000000000000003c RDI: 0000000000000000
-Jan 03 11:35:19 linux-mainline kernel: RBP: 00007ffca4400d40 R08: 
-00000000000000e7 R09: fffffffffffffef8
-Jan 03 11:35:19 linux-mainline kernel: R10: 00007f7f4d806280 R11: 
-0000000000000246 R12: 00007f7f4f756000
-Jan 03 11:35:19 linux-mainline kernel: R13: 00007ffca4400cc8 R14: 
-00007f7f4f732b20 R15: 00007f7f4d5ebc70
-Jan 03 11:35:19 linux-mainline kernel: Code: f7 d9 48 39 ca 7c 05 65 88 
-50 0f c3 f0 48 01 94 f7 00 05 00 00 f0 48 01 14 f5 c0 c4 c0 81 31 d2 eb 
-e5 0f 1f 40 00 0f 1f 44 00 00 <48> 8b 8f c0 9e 02 00 89 f6 48 8d 04 31 
-65 44 8a 40 01 4d 0f be
-Jan 03 11:35:19 linux-mainline kernel: RIP: 
-__mod_node_page_state+0x5/0x50 RSP: ffff880058bd7ce8
-Jan 03 11:35:19 linux-mainline kernel: CR2: 0000000000029ec0
-Jan 03 11:35:19 linux-mainline kernel: ---[ end trace b5314eeef943a473 ]---
-Jan 03 11:35:19 linux-mainline kernel: Fixing recursive fault but reboot 
-is needed!
-Jan 03 11:35:19 linux-mainline kernel: XFS (vdd): Unmounting Filesystem
+Due to these trade-offs we've designed the system to only enable using
+the PCI memory in cases where the NIC, NVMe devices and memory are all
+behind the same PCI switch. This will mean many setups that could likely
+work well will not be supported so that we can be more confident it
+will work and not place any responsibility on the user to understand
+their topology. (We chose to go this route based on feedback we
+received at the last LSF). Future work may enable these transfers behind
+a fabric of PCI switches or perhaps using a white list of known good
+root complexes.
 
+In order to enable this functionality, we introduce a few new PCI
+functions such that a driver can register P2P memory with the system.
+Struct pages are created for this memory using devm_memremap_pages()
+and the PCI bus offset is stored in the corresponding pagemap structure.
 
-Occasionally mount process hangs forever.
-linux-mainline:~ # cat /proc/19627/stack
-[<ffffffff810a65f2>] io_schedule+0x12/0x40
-[<ffffffff8119fbb7>] wait_on_page_bit+0xd7/0x100
-[<ffffffff811b3713>] truncate_inode_pages_range+0x423/0x7c0
-[<ffffffff81273768>] set_blocksize+0x98/0xb0
-[<ffffffff81273798>] sb_set_blocksize+0x18/0x40
-[<ffffffffa06a2e58>] xfs_fs_fill_super+0x1b8/0x590 [xfs]
-[<ffffffff8123bd4d>] mount_bdev+0x17d/0x1b0
-[<ffffffff8123c6d4>] mount_fs+0x34/0x150
-[<ffffffff81259702>] vfs_kern_mount+0x62/0x110
-[<ffffffff8125bd1a>] do_mount+0x1ca/0xc30
-[<ffffffff8125ca6e>] SyS_mount+0x7e/0xd0
-[<ffffffff8172fff3>] entry_SYSCALL_64_fastpath+0x1a/0x7d
-[<ffffffffffffffff>] 0xffffffffffffffff
+Another set of functions allow a client driver to create a list of
+client devices that will be used in a given P2P transactions and then
+use that list to find any P2P memory that is supported by all the
+client devices. This list is then also used to selectively disable the
+ACS bits for the downstream ports behind these devices.
 
+In the block layer, we also introduce a P2P request flag to indicate a
+given request targets P2P memory as well as a flag for a request queue
+to indicate a given queue supports targeting P2P memory. P2P requests
+will only be accepted by queues that support it. Also, P2P requests
+are marked to not be merged seeing a non-homogenous request would
+complicate the DMA mapping requirements.
 
-The test against bfq+ext4 have issues as well. However,
-if I change the scheduler to mq-deadline or kyber, then
-I can't see any calltrace, so I guess it is related with
-bfq.
+In the PCI NVMe driver, we modify the existing CMB support to utilize
+the new PCI P2P memory infrastructure and also add support for P2P
+memory in its request queue. When a P2P request is received it uses the
+pci_p2pmem_map_sg() function which applies the necessary transformation
+to get the corrent pci_bus_addr_t for the DMA transactions.
 
+In the RDMA core, we also adjust rdma_rw_ctx_init() and
+rdma_rw_ctx_destroy() to take a flags argument which indicates whether
+to use the PCI P2P mapping functions or not.
 
-Thanks,
-Guoqing
+Finally, in the NVMe fabrics target port we introduce a new
+configuration boolean: 'allow_p2pmem'. When set, the port will attempt
+to find P2P memory supported by the RDMA NIC and all namespaces. If
+supported memory is found, it will be used in all IO transfers. And if
+a port is using P2P memory, adding new namespaces that are not supported
+by that memory will fail.
+
+This series is based off of Christoph's v3 series to revamp
+dev_pagemap. A git repo of the patches is available here[2].
+
+Logan
+
+Christoph Hellwig (2):
+  nvme-pci: clean up CMB initialization
+  nvme-pci: clean up SMBSZ bit definitions
+
+Logan Gunthorpe (10):
+  pci-p2p: Support peer to peer memory
+  pci-p2p: Add sysfs group to display p2pmem stats
+  pci-p2p: Add PCI p2pmem dma mappings to adjust the bus offset
+  pci-p2p: Clear ACS P2P flags for all client devices
+  block: Introduce PCI P2P flags for request and request queue
+  IB/core: Add optional PCI P2P flag to rdma_rw_ctx_[init|destroy]()
+  nvme-pci: Use PCI p2pmem subsystem to manage the CMB
+  nvme-pci: Add support for P2P memory in requests
+  nvme-pci: Add a quirk for a pseudo CMB
+  nvmet: Optionally use PCI P2P memory
+
+ Documentation/ABI/testing/sysfs-bus-pci |  25 +
+ block/blk-core.c                        |   3 +
+ drivers/infiniband/core/rw.c            |  22 +-
+ drivers/infiniband/ulp/isert/ib_isert.c |   5 +-
+ drivers/infiniband/ulp/srpt/ib_srpt.c   |   7 +-
+ drivers/nvme/host/core.c                |   4 +
+ drivers/nvme/host/nvme.h                |   8 +
+ drivers/nvme/host/pci.c                 | 164 ++++---
+ drivers/nvme/target/configfs.c          |  29 ++
+ drivers/nvme/target/core.c              |  95 +++-
+ drivers/nvme/target/io-cmd.c            |   3 +
+ drivers/nvme/target/nvmet.h             |  10 +
+ drivers/nvme/target/rdma.c              |  41 +-
+ drivers/pci/Kconfig                     |  14 +
+ drivers/pci/Makefile                    |   1 +
+ drivers/pci/p2p.c                       | 781 ++++++++++++++++++++++++++++++++
+ include/linux/blk_types.h               |  18 +-
+ include/linux/blkdev.h                  |   2 +
+ include/linux/memremap.h                |  19 +
+ include/linux/nvme.h                    |  22 +-
+ include/linux/pci-p2p.h                 |  94 ++++
+ include/linux/pci.h                     |   6 +
+ include/rdma/rw.h                       |   7 +-
+ net/sunrpc/xprtrdma/svc_rdma_rw.c       |   6 +-
+ 24 files changed, 1291 insertions(+), 95 deletions(-)
+ create mode 100644 drivers/pci/p2p.c
+ create mode 100644 include/linux/pci-p2p.h
+
+--
+2.11.0
