@@ -1,95 +1,139 @@
-Return-Path: <msnitzer@redhat.com>
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk
-Cc: Ming Lei <tom.leiming@gmail.com>,
-	hch@lst.de,
-	dm-devel@redhat.com,
+Return-Path: <gunthorp@deltatee.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org,
+	linux-nvdimm@lists.01.org,
 	linux-block@vger.kernel.org
-Subject: [for-4.16 PATCH v4-mike 1/2] blk-mq: return dispatch result from blk_mq_try_issue_directly
-Date: Tue, 16 Jan 2018 10:01:47 -0500
-Message-Id: <20180116150148.21145-1-snitzer@redhat.com>
-In-Reply-To: <20180116015710.GF3213@ming.t460p>
+Cc: Stephen Bates <sbates@raithlin.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Logan Gunthorpe <logang@deltatee.com>
+Date: Thu,  4 Jan 2018 12:01:28 -0700
+Message-Id: <20180104190137.7654-4-logang@deltatee.com>
+In-Reply-To: <20180104190137.7654-1-logang@deltatee.com>
+References: <20180104190137.7654-1-logang@deltatee.com>
+Subject: [PATCH 03/12] pci-p2p: Add PCI p2pmem dma mappings to adjust the bus offset
 List-ID: <linux-block@vger.kernel.org>
 
-From: Ming Lei <ming.lei@redhat.com>
+The DMA address used when mapping PCI P2P memory must be the PCI bus
+address. Thus, introduce pci_p2pmem_[un]map_sg() to map the correct
+addresses when using P2P memory.
 
-In the following patch, we will use blk_mq_try_issue_directly() for DM
-to return the dispatch result.  DM needs this information to improve
-IO merging.
+For this, we assume that an SGL passed to these functions contain all
+p2p memory or no p2p memory.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- block/blk-mq.c | 23 ++++++++++++++---------
- 1 file changed, 14 insertions(+), 9 deletions(-)
+ drivers/pci/p2p.c        | 43 +++++++++++++++++++++++++++++++++++++++++++
+ include/linux/memremap.h |  1 +
+ include/linux/pci-p2p.h  |  9 +++++++++
+ 3 files changed, 53 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c8f62e6be6b6..55f3a27fb2e6 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1694,9 +1694,9 @@ static blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx, struct request *rq)
- 	return blk_tag_to_qc_t(rq->internal_tag, hctx->queue_num, true);
+diff --git a/drivers/pci/p2p.c b/drivers/pci/p2p.c
+index 03330c7b5e6d..87cec87b02e3 100644
+--- a/drivers/pci/p2p.c
++++ b/drivers/pci/p2p.c
+@@ -184,6 +184,8 @@ int pci_p2pmem_add_resource(struct pci_dev *pdev, int bar, size_t size,
+ 	pgmap->res.end = pgmap->res.start + size - 1;
+ 	pgmap->ref = &pdev->p2p->devmap_ref;
+ 	pgmap->type = MEMORY_DEVICE_PCI_P2P;
++	pgmap->pci_p2p_bus_offset = pci_bus_address(pdev, bar) -
++		pci_resource_start(pdev, bar);
+ 
+ 	addr = devm_memremap_pages(&pdev->dev, pgmap);
+ 	if (IS_ERR(addr))
+@@ -598,3 +600,44 @@ void pci_p2pmem_publish(struct pci_dev *pdev, bool publish)
+ 	pdev->p2p->published = publish;
  }
- 
--static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
--					struct request *rq,
--					blk_qc_t *cookie)
-+static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-+						struct request *rq,
-+						blk_qc_t *cookie)
- {
- 	struct request_queue *q = rq->q;
- 	struct blk_mq_queue_data bd = {
-@@ -1704,7 +1704,7 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 		.last = true,
- 	};
- 	blk_qc_t new_cookie;
--	blk_status_t ret;
-+	blk_status_t ret = BLK_STS_OK;
- 	bool run_queue = true;
- 
- 	/* RCU or SRCU read lock is needed before checking quiesced flag */
-@@ -1735,31 +1735,36 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	switch (ret) {
- 	case BLK_STS_OK:
- 		*cookie = new_cookie;
--		return;
-+		return ret;
- 	case BLK_STS_RESOURCE:
- 		__blk_mq_requeue_request(rq);
- 		goto insert;
- 	default:
- 		*cookie = BLK_QC_T_NONE;
- 		blk_mq_end_request(rq, ret);
--		return;
-+		return ret;
- 	}
- 
- insert:
- 	blk_mq_sched_insert_request(rq, false, run_queue, false,
- 					hctx->flags & BLK_MQ_F_BLOCKING);
-+	return ret;
- }
- 
--static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
--		struct request *rq, blk_qc_t *cookie)
-+static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-+					      struct request *rq,
-+					      blk_qc_t *cookie)
- {
- 	int srcu_idx;
-+	blk_status_t ret;
- 
- 	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
- 
- 	hctx_lock(hctx, &srcu_idx);
--	__blk_mq_try_issue_directly(hctx, rq, cookie);
-+	ret = __blk_mq_try_issue_directly(hctx, rq, cookie);
- 	hctx_unlock(hctx, srcu_idx);
+ EXPORT_SYMBOL_GPL(pci_p2pmem_publish);
 +
-+	return ret;
- }
++/*
++ * pci_p2pmem_map_sg - map a pci p2p sg for dma
++ * @sg:scatter list to map
++ * @nents:elements in the scatter list
++ *
++ * Returns the number of sgls mapped
++ */
++int pci_p2pmem_map_sg(struct scatterlist *sg, int nents)
++{
++	struct dev_pagemap *pgmap;
++	struct scatterlist *s;
++	phys_addr_t paddr;
++	int i;
++
++	for_each_sg(sg, s, nents, i) {
++		pgmap = sg_page(s)->pgmap;
++		paddr = sg_phys(s);
++
++		s->dma_address = paddr - pgmap->pci_p2p_bus_offset;
++		sg_dma_len(s) = s->length;
++	}
++
++	return nents;
++}
++EXPORT_SYMBOL_GPL(pci_p2pmem_map_sg);
++
++/**
++ * pci_p2pmem_unmap_sg - unmap a pci p2p sg for dma
++ * @sg:scatter list to map
++ * @nents:elements in the scatter list
++ */
++void pci_p2pmem_unmap_sg(struct scatterlist *sg, int nents)
++{
++	struct scatterlist *s;
++	int i;
++
++	for_each_sg(sg, s, nents, i)
++		dma_mark_clean(phys_to_virt(sg_phys(s)), sg_dma_len(s));
++}
++EXPORT_SYMBOL_GPL(pci_p2pmem_unmap_sg);
+diff --git a/include/linux/memremap.h b/include/linux/memremap.h
+index c17a6d167d48..a792f87b9dc3 100644
+--- a/include/linux/memremap.h
++++ b/include/linux/memremap.h
+@@ -125,6 +125,7 @@ struct dev_pagemap {
+ 	struct device *dev;
+ 	void *data;
+ 	enum memory_type type;
++	u64 pci_p2p_bus_offset;
+ };
  
- static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ #ifdef CONFIG_ZONE_DEVICE
+diff --git a/include/linux/pci-p2p.h b/include/linux/pci-p2p.h
+index f811c97a5886..154c39905fc9 100644
+--- a/include/linux/pci-p2p.h
++++ b/include/linux/pci-p2p.h
+@@ -34,6 +34,8 @@ int pci_p2pmem_alloc_sgl(struct pci_dev *pdev, struct scatterlist **sgl,
+ void pci_p2pmem_free_sgl(struct pci_dev *pdev, struct scatterlist *sgl,
+ 		unsigned int nents);
+ void pci_p2pmem_publish(struct pci_dev *pdev, bool publish);
++int pci_p2pmem_map_sg(struct scatterlist *sg, int nents);
++void pci_p2pmem_unmap_sg(struct scatterlist *sg, int nents);
+ #else /* CONFIG_PCI_P2P */
+ static inline int pci_p2pmem_add_resource(struct pci_dev *pdev, int bar,
+ 		size_t size, u64 offset)
+@@ -81,5 +83,12 @@ static inline void pci_p2pmem_free_sgl(struct pci_dev *pdev,
+ static inline void pci_p2pmem_publish(struct pci_dev *pdev, bool publish)
+ {
+ }
++static inline int pci_p2pmem_map_sg(struct scatterlist *sg, int nents)
++{
++	return -ENODEV;
++}
++static inline void pci_p2pmem_unmap_sg(struct scatterlist *sg, int nents)
++{
++}
+ #endif /* CONFIG_PCI_P2P */
+ #endif /* _LINUX_PCI_P2P_H */
 -- 
-2.15.0
+2.11.0
