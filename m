@@ -1,76 +1,121 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:56496 "EHLO mx1.redhat.com"
+Received: from mx2.suse.de ([195.135.220.15]:55966 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753457AbeAIN3A (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 9 Jan 2018 08:29:00 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Yi Zhang <yi.zhang@redhat.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] blk-mq: fix kernel oops in blk_mq_tag_idle()
-Date: Tue,  9 Jan 2018 21:28:29 +0800
-Message-Id: <20180109132829.31479-1-ming.lei@redhat.com>
+        id S1751735AbeADDc4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 Jan 2018 22:32:56 -0500
+Subject: Re: [PATCH v1 05/10] bcache: stop dc->writeback_rate_update if cache
+ set is stopping
+To: tang.junhui@zte.com.cn
+Cc: mlyle@lyle.org, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <1514985359-3210-1-git-send-email-tang.junhui@zte.com.cn>
+From: Coly Li <colyli@suse.de>
+Message-ID: <cb78a63a-a064-e13c-849e-2c6712fd2560@suse.de>
+Date: Thu, 4 Jan 2018 11:32:47 +0800
+MIME-Version: 1.0
+In-Reply-To: <1514985359-3210-1-git-send-email-tang.junhui@zte.com.cn>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-HW queues may be unmapped in some cases, such as blk_mq_update_nr_hw_queues(),
-then we need to check it before calling blk_mq_tag_idle(), otherwise
-the following kernel oops can be triggered, so fix it by checking if
-the hw queue is unmapped since it doesn't make sense to idle the tags
-any more after hw queues are unmapped.
+On 03/01/2018 9:15 PM, tang.junhui@zte.com.cn wrote:
+> From: Tang Junhui <tang.junhui@zte.com.cn>
+> 
+> Hello Coly,
+> 
+> Thanks for this serials.
+> 
+>> struct delayed_work writeback_rate_update in struct cache_dev is a delayed
+>> worker to call function update_writeback_rate() in period (the interval is
+>> defined by dc->writeback_rate_update_seconds).
+>>
+>> When a metadate I/O error happens on cache device, bcache error handling
+>> routine bch_cache_set_error() will call bch_cache_set_unregister() to
+>> retire whole cache set. On the unregister code path, cached_dev_free()
+>> calls cancel_delayed_work_sync(&dc->writeback_rate_update) to stop this
+>> delayed work.
+>>
+>> dc->writeback_rate_update is a special delayed work from others in bcache.
+>> In its routine update_writeback_rate(), this delayed work is re-armed
+>> after a piece of time. That means when cancel_delayed_work_sync() returns,
+>> this delayed work can still be executed after several seconds defined by
+>> dc->writeback_rate_update_seconds.
+>>
+>> The problem is, after cancel_delayed_work_sync() returns, the cache set
+>> unregister code path will eventually release memory of struct cache set.
+>> Then the delayed work is scheduled to run, and inside its routine
+>> update_writeback_rate() that already released cache set NULL pointer will
+>> be accessed. Now a NULL pointer deference panic is triggered.
+>>
+> As I known that, after calling cancel_delayed_work_sync(), if the work queue
+> is running, cancel_delayed_work_sync() would return only AFTER the work queue
+> runs over, else if the work queue does not run yet, cancel_delayed_work_sync()
+> will cancel the work queue imediately, so I think it is safe in 
+> update_writeback_rate() to access the cache set resource. Point me out if I
+> am wrong.
+> 
 
-[  440.771298] Workqueue: nvme-wq nvme_rdma_del_ctrl_work [nvme_rdma]
-[  440.779104] task: ffff894bae755ee0 ti: ffff893bf9bc8000 task.ti: ffff893bf9bc8000
-[  440.788359] RIP: 0010:[<ffffffffb730e2b4>]  [<ffffffffb730e2b4>] __blk_mq_tag_idle+0x24/0x40
-[  440.798697] RSP: 0018:ffff893bf9bcbd10  EFLAGS: 00010286
-[  440.805538] RAX: 0000000000000000 RBX: ffff895bb131dc00 RCX: 000000000000011f
-[  440.814426] RDX: 00000000ffffffff RSI: 0000000000000120 RDI: ffff895bb131dc00
-[  440.823301] RBP: ffff893bf9bcbd10 R08: 000000000001b860 R09: 4a51d361c00c0000
-[  440.832193] R10: b5907f32b4cc7003 R11: ffffd6cabfb57000 R12: ffff894bafd1e008
-[  440.841091] R13: 0000000000000001 R14: ffff895baf770000 R15: 0000000000000080
-[  440.849988] FS:  0000000000000000(0000) GS:ffff894bbdcc0000(0000) knlGS:0000000000000000
-[  440.859955] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  440.867274] CR2: 0000000000000008 CR3: 000000103d098000 CR4: 00000000001407e0
-[  440.876169] Call Trace:
-[  440.879818]  [<ffffffffb7309d68>] blk_mq_exit_hctx+0xd8/0xe0
-[  440.887051]  [<ffffffffb730dc40>] blk_mq_free_queue+0xf0/0x160
-[  440.894465]  [<ffffffffb72ff679>] blk_cleanup_queue+0xd9/0x150
-[  440.901881]  [<ffffffffc08a802b>] nvme_ns_remove+0x5b/0xb0 [nvme_core]
-[  440.910068]  [<ffffffffc08a811b>] nvme_remove_namespaces+0x3b/0x60 [nvme_core]
-[  440.919026]  [<ffffffffc08b817b>] __nvme_rdma_remove_ctrl+0x2b/0xb0 [nvme_rdma]
-[  440.928079]  [<ffffffffc08b8237>] nvme_rdma_del_ctrl_work+0x17/0x20 [nvme_rdma]
-[  440.937126]  [<ffffffffb70ab58a>] process_one_work+0x17a/0x440
-[  440.944517]  [<ffffffffb70ac3a8>] worker_thread+0x278/0x3c0
-[  440.951607]  [<ffffffffb70ac130>] ? manage_workers.isra.24+0x2a0/0x2a0
-[  440.959760]  [<ffffffffb70b352f>] kthread+0xcf/0xe0
-[  440.966055]  [<ffffffffb70b3460>] ? insert_kthread_work+0x40/0x40
-[  440.973715]  [<ffffffffb76d8658>] ret_from_fork+0x58/0x90
-[  440.980586]  [<ffffffffb70b3460>] ? insert_kthread_work+0x40/0x40
-[  440.988229] Code: 5b 41 5c 5d c3 66 90 0f 1f 44 00 00 48 8b 87 20 01 00 00 f0 0f ba 77 40 01 19 d2 85 d2 75 08 c3 0f 1f 80 00 00 00 00 55 48 89 e5 <f0> ff 48 08 48 8d 78 10 e8 7f 0f 05 00 5d c3 0f 1f 00 66 2e 0f
-[  441.011620] RIP  [<ffffffffb730e2b4>] __blk_mq_tag_idle+0x24/0x40
-[  441.019301]  RSP <ffff893bf9bcbd10>
-[  441.024052] CR2: 0000000000000008
+Hi Junhui,
 
-Reported-by: Zhang Yi <yizhan@redhat.com>
-Tested-by: Zhang Yi <yizhan@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+dc->writeback_rate_update is a special delayed worker, it re-arms itself
+to run after several seconds by,
+>>     schedule_delayed_work(&dc->writeback_rate_update,
+>>                   dc->writeback_rate_update_seconds * HZ);
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 111e1aa5562f..e258ad8dc171 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2015,7 +2015,8 @@ static void blk_mq_exit_hctx(struct request_queue *q,
- {
- 	blk_mq_debugfs_unregister_hctx(hctx);
- 
--	blk_mq_tag_idle(hctx);
-+	if (blk_mq_hw_queue_mapped(hctx))
-+		blk_mq_tag_idle(hctx);
- 
- 	if (set->ops->exit_request)
- 		set->ops->exit_request(set, hctx->fq->flush_rq, hctx_idx);
--- 
-2.9.5
+I check the workqueue code, it seems cancel_delayed_work_sync() does not
+prevent a delayed work to re-arm itself inside worker routine. And in my
+test, around 5 seconds after cancel_delayed_work_sync() called, a NULL
+pointer
+difference oops happens. Cache set memory is freed within 2 seconds
+after __cache_set_unregister() called, so inside
+__update_writeback_rate() struct cache_set is referenced and causes the
+NULL pointer deference bug.
+
+There are several delayed work in bcache code, but only
+dc->writeback_rate_update is special to re-arm itself.
+
+Coly Li
+
+>> In order to avoid the above problem, this patch checks cache set flags in
+>> delayed work routine update_writeback_rate(). If flag CACHE_SET_STOPPING
+>> is set, this routine will quit without re-arm the delayed work. Then the
+>> NULL pointer deference panic won't happen after cache set is released.
+>>
+>> Signed-off-by: Coly Li <colyli@suse.de>
+>> ---
+>> drivers/md/bcache/writeback.c | 9 +++++++++
+>> 1 file changed, 9 insertions(+)
+>>
+>> diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+>> index 0789a9e18337..745d9b2a326f 100644
+>> --- a/drivers/md/bcache/writeback.c
+>> +++ b/drivers/md/bcache/writeback.c
+>> @@ -91,6 +91,11 @@ static void update_writeback_rate(struct work_struct *work)
+>>     struct cached_dev *dc = container_of(to_delayed_work(work),
+>>                          struct cached_dev,
+>>                          writeback_rate_update);
+>> +    struct cache_set *c = dc->disk.c;
+>> +
+>> +    /* quit directly if cache set is stopping */
+>> +    if (test_bit(CACHE_SET_STOPPING, &c->flags))
+>> +        return;
+>>
+>>     down_read(&dc->writeback_lock);
+>>
+>> @@ -100,6 +105,10 @@ static void update_writeback_rate(struct work_struct *work)
+>>
+>>     up_read(&dc->writeback_lock);
+>>
+>> +    /* do not schedule delayed work if cache set is stopping */
+>> +    if (test_bit(CACHE_SET_STOPPING, &c->flags))
+>> +        return;
+>> +
+>>     schedule_delayed_work(&dc->writeback_rate_update,
+>>                   dc->writeback_rate_update_seconds * HZ);
+>> }
+>> -- 
+>> 2.15.1                                                             
+> 
+> Thanks,
+> Tang Junhui
+> 
