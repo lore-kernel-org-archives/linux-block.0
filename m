@@ -1,13 +1,14 @@
 Return-Path: <msnitzer@redhat.com>
-Date: Thu, 4 Jan 2018 11:26:03 -0500
+Date: Thu, 4 Jan 2018 09:08:52 -0500
 From: Mike Snitzer <snitzer@redhat.com>
-To: Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@intel.com>
-Cc: axboe@kernel.dk, emilne@redhat.com, james.smart@broadcom.com,
-	hare@suse.de, Bart.VanAssche@wdc.com, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, dm-devel@redhat.com
+To: Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <keith.busch@intel.com>, axboe@kernel.dk, emilne@redhat.com,
+	james.smart@broadcom.com, hare@suse.de, Bart.VanAssche@wdc.com,
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+	dm-devel@redhat.com
 Subject: Re: [for-4.16 PATCH v2 0/5] block, nvme, dm: allow DM multipath to
  use NVMe's error handler
-Message-ID: <20180104162603.GA20081@redhat.com>
+Message-ID: <20180104140852.GA13288@redhat.com>
 References: <20171227032257.8182-1-snitzer@redhat.com>
  <20180102232943.GC26533@localhost.localdomain>
  <20180104102631.GA4864@lst.de>
@@ -37,40 +38,26 @@ Christoph Hellwig <hch@lst.de> wrote:
 > > satisfies the need.
 > 
 > You'll need to update nvme_error_status to account for all errors
-> handled in nvme_req_needs_failover
+> handled in nvme_req_needs_failover, and you will probably have to
+> add additional BLK_STS_* code.  But if this is all that the rage was
+> about I'm perfectly fine with it.
 
-These weren't accounted for (I may have mis-categorized them in this
-patch, so please feel free to correct):
+Glad you're fine with it.  I thought you'd balk at this too.  Mainly
+because I was unaware nvme_error_status() existed; so I thought any
+amount of new NVMe error translation for upper-layer consumption would
+be met with resistence.
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 25ef349fd4e4..835a9c60200e 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -165,10 +165,18 @@ static blk_status_t nvme_error_status(struct request *req)
- 	case NVME_SC_ACCESS_DENIED:
- 	case NVME_SC_READ_ONLY:
- 		return BLK_STS_MEDIUM;
-+	case NVME_SC_INVALID_OPCODE:
-+	case NVME_SC_INVALID_FIELD:
-+	case NVME_SC_INVALID_NS:
-+	case NVME_SC_LBA_RANGE:
-+	case NVME_SC_CAP_EXCEEDED:
-+	case NVME_SC_BAD_ATTRIBUTES:
-+		return BLK_STS_TARGET;
- 	case NVME_SC_GUARD_CHECK:
- 	case NVME_SC_APPTAG_CHECK:
- 	case NVME_SC_REFTAG_CHECK:
- 	case NVME_SC_INVALID_PI:
-+	case NVME_SC_COMPARE_FAILED:
- 		return BLK_STS_PROTECTION;
- 	case NVME_SC_RESERVATION_CONFLICT:
- 		return BLK_STS_NEXUS;
+Keith arrived at this approach based on an exchange we had in private.
 
-And of those, these aren't currently used:
+I gave him context for DM multipath's need to access the code NVMe uses
+to determine if an NVMe-specific error is retryable or not.  Explained
+how SCSI uses scsi_dh error handling and
+drivers/scsi/scsi_lib.c:__scsi_error_from_host_byte() to establish a
+"differentiated IO error", and then
+drivers/md/dm-mpath.c:noretry_error() consumes the resulting BLK_STS_*.
 
-NVME_SC_LBA_RANGE
-NVME_SC_CAP_EXCEEDED
-NVME_SC_BAD_ATTRIBUTES
-NVME_SC_COMPARE_FAILED
+Armed with this context Keith was able to take his NVMe knowledge and
+arrive at something you're fine with.  Glad it worked out.
 
-At least not that I can see.
+Thanks,
+Mike
