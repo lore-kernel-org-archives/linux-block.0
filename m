@@ -1,157 +1,121 @@
-Return-Path: <msnitzer@redhat.com>
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk
-Cc: Ming Lei <tom.leiming@gmail.com>,
-	hare@suse.de,
-	Bart.VanAssche@wdc.com,
-	David Jeffery <djeffery@redhat.com>,
-	dm-devel@redhat.com,
+Return-Path: <gunthorp@deltatee.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org,
+	linux-nvdimm@lists.01.org,
 	linux-block@vger.kernel.org
-Subject: [for-4.16 PATCH v5 3/4] block: allow gendisk's request_queue registration to be deferred
-Date: Fri, 12 Jan 2018 10:06:05 -0500
-Message-Id: <20180112150606.6037-4-snitzer@redhat.com>
-In-Reply-To: <20180112150606.6037-1-snitzer@redhat.com>
-References: <20180112150606.6037-1-snitzer@redhat.com>
+Cc: Stephen Bates <sbates@raithlin.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Logan Gunthorpe <logang@deltatee.com>
+Date: Thu,  4 Jan 2018 12:01:35 -0700
+Message-Id: <20180104190137.7654-11-logang@deltatee.com>
+In-Reply-To: <20180104190137.7654-1-logang@deltatee.com>
+References: <20180104190137.7654-1-logang@deltatee.com>
+Subject: [PATCH 10/12] nvme-pci: Add support for P2P memory in requests
 List-ID: <linux-block@vger.kernel.org>
 
-Since I can remember DM has forced the block layer to allow the
-allocation and initialization of the request_queue to be distinct
-operations.  Reason for this is block/genhd.c:add_disk() has requires
-that the request_queue (and associated bdi) be tied to the gendisk
-before add_disk() is called -- because add_disk() also deals with
-exposing the request_queue via blk_register_queue().
+For P2P requests we must use the pci_p2pmem_[un]map_sg() functions
+instead of the dma_map_sg functions.
 
-DM's dynamic creation of arbitrary device types (and associated
-request_queue types) requires the DM device's gendisk be available so
-that DM table loads can establish a master/slave relationship with
-subordinate devices that are referenced by loaded DM tables -- using
-bd_link_disk_holder().  But until these DM tables, and their associated
-subordinate devices, are known DM cannot know what type of request_queue
-it needs -- nor what its queue_limits should be.
+With that, we can then indicate PCI_P2P support in the request queue.
+For this, we create an NVME_F_PCI_P2P flag which tells the core to
+set QUEUE_FLAG_PCI_P2P in the request queue.
 
-This chicken and egg scenario has created all manner of problems for DM
-and, at times, the block layer.
-
-Summary of changes:
-
-- Add device_add_disk_no_queue_reg() and add_disk_no_queue_reg() variant
-  that drivers may use to add a disk without also calling
-  blk_register_queue().  Driver must call blk_register_queue() once its
-  request_queue is fully initialized.
-
-- Return early from blk_unregister_queue() if QUEUE_FLAG_REGISTERED
-  is not set.  It won't be set if driver used add_disk_no_queue_reg()
-  but driver encounters an error and must del_gendisk() before calling
-  blk_register_queue().
-
-- Export blk_register_queue().
-
-These changes allow DM to use add_disk_no_queue_reg() to anchor its
-gendisk as the "master" for master/slave relationships DM must establish
-with subordinate devices referenced in DM tables that get loaded.  Once
-all "slave" devices for a DM device are known its request_queue can be
-properly initialized and then advertised via sysfs -- important
-improvement being that no request_queue resource initialization
-performed by blk_register_queue() is missed for DM devices anymore.
-
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- block/blk-sysfs.c     |  5 +++++
- block/genhd.c         | 20 +++++++++++++++++---
- include/linux/genhd.h |  5 +++++
- 3 files changed, 27 insertions(+), 3 deletions(-)
+ drivers/nvme/host/core.c |  4 ++++
+ drivers/nvme/host/nvme.h |  1 +
+ drivers/nvme/host/pci.c  | 18 ++++++++++++++----
+ 3 files changed, 19 insertions(+), 4 deletions(-)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 9272452ff456..4a6a40ffd78e 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -921,6 +921,7 @@ int blk_register_queue(struct gendisk *disk)
- 	mutex_unlock(&q->sysfs_lock);
- 	return ret;
- }
-+EXPORT_SYMBOL_GPL(blk_register_queue);
- 
- void blk_unregister_queue(struct gendisk *disk)
- {
-@@ -929,6 +930,10 @@ void blk_unregister_queue(struct gendisk *disk)
- 	if (WARN_ON(!q))
- 		return;
- 
-+	/* Return early if disk->queue was never registered. */
-+	if (!test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags))
-+		return;
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 1e46e60b8f10..8a7caaa5ee49 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2861,7 +2861,11 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
+ 	ns->queue = blk_mq_init_queue(ctrl->tagset);
+ 	if (IS_ERR(ns->queue))
+ 		goto out_free_ns;
 +
- 	/*
- 	 * Protect against the 'queue' kobj being accessed
- 	 * while/after it is removed.
-diff --git a/block/genhd.c b/block/genhd.c
-index 00620e01e043..d4aaf0cae9ad 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -629,7 +629,7 @@ static void register_disk(struct device *parent, struct gendisk *disk)
- }
- 
- /**
-- * device_add_disk - add partitioning information to kernel list
-+ * device_add_disk_no_queue_reg - add partitioning information to kernel list
-  * @parent: parent device for the disk
-  * @disk: per-device partitioning information
-  *
-@@ -638,7 +638,7 @@ static void register_disk(struct device *parent, struct gendisk *disk)
-  *
-  * FIXME: error handling
-  */
--void device_add_disk(struct device *parent, struct gendisk *disk)
-+void device_add_disk_no_queue_reg(struct device *parent, struct gendisk *disk)
- {
- 	dev_t devt;
- 	int retval;
-@@ -682,7 +682,6 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
- 				    exact_match, exact_lock, disk);
- 	}
- 	register_disk(parent, disk);
--	blk_register_queue(disk);
- 
- 	/*
- 	 * Take an extra ref on queue which will be put on disk_release()
-@@ -693,6 +692,21 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
- 	disk_add_events(disk);
- 	blk_integrity_add(disk);
- }
-+EXPORT_SYMBOL(device_add_disk_no_queue_reg);
+ 	queue_flag_set_unlocked(QUEUE_FLAG_NONROT, ns->queue);
++	if (ctrl->ops->flags & NVME_F_PCI_P2P)
++		queue_flag_set_unlocked(QUEUE_FLAG_PCI_P2P, ns->queue);
 +
-+/**
-+ * device_add_disk - add disk information to kernel list
-+ * @parent: parent device for the disk
-+ * @disk: per-device disk information
-+ *
-+ * Adds partitioning information and also registers the
-+ * associated request_queue to @disk.
-+ */
-+void device_add_disk(struct device *parent, struct gendisk *disk)
-+{
-+	device_add_disk_no_queue_reg(parent, disk);
-+	blk_register_queue(disk);
-+}
- EXPORT_SYMBOL(device_add_disk);
+ 	ns->queue->queuedata = ns;
+ 	ns->ctrl = ctrl;
  
- void del_gendisk(struct gendisk *disk)
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 5144ebe046c9..5e3531027b51 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -395,6 +395,11 @@ static inline void add_disk(struct gendisk *disk)
- {
- 	device_add_disk(NULL, disk);
- }
-+extern void device_add_disk_no_queue_reg(struct device *parent, struct gendisk *disk);
-+static inline void add_disk_no_queue_reg(struct gendisk *disk)
-+{
-+	device_add_disk_no_queue_reg(NULL, disk);
-+}
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index ea1aa5283e8e..ae1453238250 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -286,6 +286,7 @@ struct nvme_ctrl_ops {
+ 	unsigned int flags;
+ #define NVME_F_FABRICS			(1 << 0)
+ #define NVME_F_METADATA_SUPPORTED	(1 << 1)
++#define NVME_F_PCI_P2P			(1 << 2)
+ 	int (*reg_read32)(struct nvme_ctrl *ctrl, u32 off, u32 *val);
+ 	int (*reg_write32)(struct nvme_ctrl *ctrl, u32 off, u32 val);
+ 	int (*reg_read64)(struct nvme_ctrl *ctrl, u32 off, u64 *val);
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 71893babb982..29ef3fd24938 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -792,6 +792,7 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
+ 	enum dma_data_direction dma_dir = rq_data_dir(req) ?
+ 			DMA_TO_DEVICE : DMA_FROM_DEVICE;
+ 	blk_status_t ret = BLK_STS_IOERR;
++	int nents;
  
- extern void del_gendisk(struct gendisk *gp);
- extern struct gendisk *get_gendisk(dev_t dev, int *partno);
+ 	sg_init_table(iod->sg, blk_rq_nr_phys_segments(req));
+ 	iod->nents = blk_rq_map_sg(q, req, iod->sg);
+@@ -799,8 +800,13 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
+ 		goto out;
+ 
+ 	ret = BLK_STS_RESOURCE;
+-	if (!dma_map_sg_attrs(dev->dev, iod->sg, iod->nents, dma_dir,
+-				DMA_ATTR_NO_WARN))
++
++	if (REQ_IS_PCI_P2P(req))
++		nents = pci_p2pmem_map_sg(iod->sg, iod->nents);
++	else
++		nents = dma_map_sg_attrs(dev->dev, iod->sg, iod->nents,
++					 dma_dir, DMA_ATTR_NO_WARN);
++	if (!nents)
+ 		goto out;
+ 
+ 	if (nvme_pci_use_sgls(dev, req))
+@@ -844,7 +850,11 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
+ 			DMA_TO_DEVICE : DMA_FROM_DEVICE;
+ 
+ 	if (iod->nents) {
+-		dma_unmap_sg(dev->dev, iod->sg, iod->nents, dma_dir);
++		if (REQ_IS_PCI_P2P(req))
++			pci_p2pmem_unmap_sg(iod->sg, iod->nents);
++		else
++			dma_unmap_sg(dev->dev, iod->sg, iod->nents, dma_dir);
++
+ 		if (blk_integrity_rq(req)) {
+ 			if (req_op(req) == REQ_OP_READ)
+ 				nvme_dif_remap(req, nvme_dif_complete);
+@@ -2417,7 +2427,7 @@ static int nvme_pci_reg_read64(struct nvme_ctrl *ctrl, u32 off, u64 *val)
+ static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
+ 	.name			= "pcie",
+ 	.module			= THIS_MODULE,
+-	.flags			= NVME_F_METADATA_SUPPORTED,
++	.flags			= NVME_F_METADATA_SUPPORTED | NVME_F_PCI_P2P,
+ 	.reg_read32		= nvme_pci_reg_read32,
+ 	.reg_write32		= nvme_pci_reg_write32,
+ 	.reg_read64		= nvme_pci_reg_read64,
 -- 
-2.15.0
+2.11.0
