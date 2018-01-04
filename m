@@ -1,43 +1,52 @@
-Return-Path: <msnitzer@redhat.com>
-Date: Thu, 4 Jan 2018 18:36:27 -0500
-From: Mike Snitzer <snitzer@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Linux Block <linux-block@vger.kernel.org>,
+Return-Path: <keith.busch@intel.com>
+From: Keith Busch <keith.busch@intel.com>
+To: Linux Block <linux-block@vger.kernel.org>,
 	Linux NVMe <linux-nvme@lists.infradead.org>,
-	Device Mapper <dm-devel@redhat.com>, Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Bart VanAssche <bart.vanassche@wdc.com>,
+	Device Mapper <dm-devel@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Bart VanAssche <bart.vanassche@wdc.com>,
 	James Smart <james.smart@broadcom.com>,
 	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Hannes Reinecke <hare@suse.com>, Sagi Grimberg <sagi@grimberg.me>
-Subject: Re: [PATCH 0/5] Failover criteria unification
-Message-ID: <20180104233627.GA16051@redhat.com>
-References: <20180104224623.8944-1-keith.busch@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180104224623.8944-1-keith.busch@intel.com>
+	Hannes Reinecke <hare@suse.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <keith.busch@intel.com>
+Subject: [PATCH 0/5] Failover criteria unification
+Date: Thu,  4 Jan 2018 15:46:18 -0700
+Message-Id: <20180104224623.8944-1-keith.busch@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Jan 04 2018 at  5:46pm -0500,
-Keith Busch <keith.busch@intel.com> wrote:
+The nvme native multipath provided a separate NVMe status decoder,
+complicating maintenance as new statuses need to be accounted for. This
+was already diverging from the generic nvme status decoder, which has
+implications for other components that rely on accurate generic block
+errors.
 
-> The nvme native multipath provided a separate NVMe status decoder,
-> complicating maintenance as new statuses need to be accounted for. This
-> was already diverging from the generic nvme status decoder, which has
-> implications for other components that rely on accurate generic block
-> errors.
-> 
-> This series unifies common code among nvme and device-mapper multipath
-> so that user experience regarding the failover fate of a command is the
-> same.
-> 
-> Mike:
-> 
-> I split this up because I thought there'd be trouble merging the dm
-> mpath update with the inverted retry logic, but I think you may have
-> rebased the dm-4.16 without that patch, as I'm not seeing it in the most
-> current branch.
+This series unifies common code among nvme and device-mapper multipath
+so that user experience regarding the failover fate of a command is the
+same.
 
-Right, I dropped that patch since it'd have only resulted in conflicts
-come merge time.  As such, this series can easily go through the nvme
-tree to Jens.
+Mike:
+
+I split this up because I thought there'd be trouble merging the dm
+mpath update with the inverted retry logic, but I think you may have
+rebased the dm-4.16 without that patch, as I'm not seeing it in the most
+current branch.
+
+Keith Busch (5):
+  nvme: Add more command status translation
+  nvme/multipath: Consult blk_status_t for failover
+  block: Provide blk_status_t decoding for retryable errors
+  nvme/multipath: Use blk_retryable
+  dm mpath: Use blk_retryable
+
+ drivers/md/dm-mpath.c         | 19 ++-----------------
+ drivers/nvme/host/core.c      | 15 +++++++++++----
+ drivers/nvme/host/multipath.c | 44 ++-----------------------------------------
+ drivers/nvme/host/nvme.h      |  4 ++--
+ include/linux/blk_types.h     | 16 ++++++++++++++++
+ 5 files changed, 33 insertions(+), 65 deletions(-)
+
+-- 
+2.13.6
