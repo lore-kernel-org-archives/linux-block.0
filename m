@@ -1,133 +1,375 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:43510 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757242AbeAHUVz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jan 2018 15:21:55 -0500
-Received: by mail-pg0-f66.google.com with SMTP id f14so3730661pga.10
-        for <linux-block@vger.kernel.org>; Mon, 08 Jan 2018 12:21:54 -0800 (PST)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Coly Li <colyli@suse.de>
-Subject: [416 PATCH 12/13] bcache: fix misleading error message in bch_count_io_errors()
-Date: Mon,  8 Jan 2018 12:21:29 -0800
-Message-Id: <20180108202130.31303-13-mlyle@lyle.org>
-In-Reply-To: <20180108202130.31303-1-mlyle@lyle.org>
-References: <20180108202130.31303-1-mlyle@lyle.org>
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:44423 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751316AbeAENQl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jan 2018 08:16:41 -0500
+Received: by mail-wm0-f65.google.com with SMTP id t8so2389777wmc.3
+        for <linux-block@vger.kernel.org>; Fri, 05 Jan 2018 05:16:40 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 01/25] null_blk: remove lightnvm support
+Date: Fri,  5 Jan 2018 14:15:57 +0100
+Message-Id: <20180105131621.20808-2-m@bjorling.me>
+In-Reply-To: <20180105131621.20808-1-m@bjorling.me>
+References: <20180105131621.20808-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Coly Li <colyli@suse.de>
+With rrpc to be removed, the null_blk lightnvm support is no longer
+functional. Remove the lightnvm implementation and maybe add it to
+another module in the future if someone takes on the challenge.
 
-Bcache only does recoverable I/O for read operations by calling
-cached_dev_read_error(). For write opertions there is no I/O recovery for
-failed requests.
-
-But in bch_count_io_errors() no matter read or write I/Os, before errors
-counter reaches io error limit, pr_err() always prints "IO error on %,
-recoverying". For write requests this information is misleading, because
-there is no I/O recovery at all.
-
-This patch adds a parameter 'is_read' to bch_count_io_errors(), and only
-prints "recovering" by pr_err() when the bio direction is READ.
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
-Reviewed-by: Tang Junhui <tang.junhui@zte.com.cn>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- drivers/md/bcache/bcache.h    |  2 +-
- drivers/md/bcache/io.c        | 13 +++++++++----
- drivers/md/bcache/super.c     |  4 +++-
- drivers/md/bcache/writeback.c |  4 +++-
- 4 files changed, 16 insertions(+), 7 deletions(-)
+ drivers/block/null_blk.c | 220 +----------------------------------------------
+ 1 file changed, 3 insertions(+), 217 deletions(-)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 9117da5f494b..5e2d4e80198e 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -862,7 +862,7 @@ static inline void wake_up_allocators(struct cache_set *c)
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index ccb9975..1e1981c 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -12,7 +12,6 @@
+ #include <linux/slab.h>
+ #include <linux/blk-mq.h>
+ #include <linux/hrtimer.h>
+-#include <linux/lightnvm.h>
+ #include <linux/configfs.h>
+ #include <linux/badblocks.h>
  
- /* Forward declarations */
+@@ -107,7 +106,6 @@ struct nullb_device {
+ 	unsigned int hw_queue_depth; /* queue depth */
+ 	unsigned int index; /* index of the disk, only valid with a disk */
+ 	unsigned int mbps; /* Bandwidth throttle cap (in MB/s) */
+-	bool use_lightnvm; /* register as a LightNVM device */
+ 	bool blocking; /* blocking blk-mq device */
+ 	bool use_per_node_hctx; /* use per-node allocation for hardware context */
+ 	bool power; /* power on/off the device */
+@@ -121,7 +119,6 @@ struct nullb {
+ 	unsigned int index;
+ 	struct request_queue *q;
+ 	struct gendisk *disk;
+-	struct nvm_dev *ndev;
+ 	struct blk_mq_tag_set *tag_set;
+ 	struct blk_mq_tag_set __tag_set;
+ 	unsigned int queue_depth;
+@@ -139,7 +136,6 @@ static LIST_HEAD(nullb_list);
+ static struct mutex lock;
+ static int null_major;
+ static DEFINE_IDA(nullb_indexes);
+-static struct kmem_cache *ppa_cache;
+ static struct blk_mq_tag_set tag_set;
  
--void bch_count_io_errors(struct cache *, blk_status_t, const char *);
-+void bch_count_io_errors(struct cache *, blk_status_t, int, const char *);
- void bch_bbio_count_io_errors(struct cache_set *, struct bio *,
- 			      blk_status_t, const char *);
- void bch_bbio_endio(struct cache_set *, struct bio *, blk_status_t,
-diff --git a/drivers/md/bcache/io.c b/drivers/md/bcache/io.c
-index fac97ec2d0e2..a783c5a41ff1 100644
---- a/drivers/md/bcache/io.c
-+++ b/drivers/md/bcache/io.c
-@@ -51,7 +51,10 @@ void bch_submit_bbio(struct bio *bio, struct cache_set *c,
+ enum {
+@@ -208,10 +204,6 @@ static int nr_devices = 1;
+ module_param(nr_devices, int, S_IRUGO);
+ MODULE_PARM_DESC(nr_devices, "Number of devices to register");
  
- /* IO errors */
+-static bool g_use_lightnvm;
+-module_param_named(use_lightnvm, g_use_lightnvm, bool, S_IRUGO);
+-MODULE_PARM_DESC(use_lightnvm, "Register as a LightNVM device");
+-
+ static bool g_blocking;
+ module_param_named(blocking, g_blocking, bool, S_IRUGO);
+ MODULE_PARM_DESC(blocking, "Register as a blocking blk-mq driver device");
+@@ -345,7 +337,6 @@ NULLB_DEVICE_ATTR(blocksize, uint);
+ NULLB_DEVICE_ATTR(irqmode, uint);
+ NULLB_DEVICE_ATTR(hw_queue_depth, uint);
+ NULLB_DEVICE_ATTR(index, uint);
+-NULLB_DEVICE_ATTR(use_lightnvm, bool);
+ NULLB_DEVICE_ATTR(blocking, bool);
+ NULLB_DEVICE_ATTR(use_per_node_hctx, bool);
+ NULLB_DEVICE_ATTR(memory_backed, bool);
+@@ -455,7 +446,6 @@ static struct configfs_attribute *nullb_device_attrs[] = {
+ 	&nullb_device_attr_irqmode,
+ 	&nullb_device_attr_hw_queue_depth,
+ 	&nullb_device_attr_index,
+-	&nullb_device_attr_use_lightnvm,
+ 	&nullb_device_attr_blocking,
+ 	&nullb_device_attr_use_per_node_hctx,
+ 	&nullb_device_attr_power,
+@@ -573,7 +563,6 @@ static struct nullb_device *null_alloc_dev(void)
+ 	dev->blocksize = g_bs;
+ 	dev->irqmode = g_irqmode;
+ 	dev->hw_queue_depth = g_hw_queue_depth;
+-	dev->use_lightnvm = g_use_lightnvm;
+ 	dev->blocking = g_blocking;
+ 	dev->use_per_node_hctx = g_use_per_node_hctx;
+ 	return dev;
+@@ -1423,170 +1412,6 @@ static void cleanup_queues(struct nullb *nullb)
+ 	kfree(nullb->queues);
+ }
  
--void bch_count_io_errors(struct cache *ca, blk_status_t error, const char *m)
-+void bch_count_io_errors(struct cache *ca,
-+			 blk_status_t error,
-+			 int is_read,
-+			 const char *m)
+-#ifdef CONFIG_NVM
+-
+-static void null_lnvm_end_io(struct request *rq, blk_status_t status)
+-{
+-	struct nvm_rq *rqd = rq->end_io_data;
+-
+-	/* XXX: lighnvm core seems to expect NVM_RSP_* values here.. */
+-	rqd->error = status ? -EIO : 0;
+-	nvm_end_io(rqd);
+-
+-	blk_put_request(rq);
+-}
+-
+-static int null_lnvm_submit_io(struct nvm_dev *dev, struct nvm_rq *rqd)
+-{
+-	struct request_queue *q = dev->q;
+-	struct request *rq;
+-	struct bio *bio = rqd->bio;
+-
+-	rq = blk_mq_alloc_request(q,
+-		op_is_write(bio_op(bio)) ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN, 0);
+-	if (IS_ERR(rq))
+-		return -ENOMEM;
+-
+-	blk_init_request_from_bio(rq, bio);
+-
+-	rq->end_io_data = rqd;
+-
+-	blk_execute_rq_nowait(q, NULL, rq, 0, null_lnvm_end_io);
+-
+-	return 0;
+-}
+-
+-static int null_lnvm_id(struct nvm_dev *dev, struct nvm_id *id)
+-{
+-	struct nullb *nullb = dev->q->queuedata;
+-	sector_t size = (sector_t)nullb->dev->size * 1024 * 1024ULL;
+-	sector_t blksize;
+-	struct nvm_id_group *grp;
+-
+-	id->ver_id = 0x1;
+-	id->vmnt = 0;
+-	id->cap = 0x2;
+-	id->dom = 0x1;
+-
+-	id->ppaf.blk_offset = 0;
+-	id->ppaf.blk_len = 16;
+-	id->ppaf.pg_offset = 16;
+-	id->ppaf.pg_len = 16;
+-	id->ppaf.sect_offset = 32;
+-	id->ppaf.sect_len = 8;
+-	id->ppaf.pln_offset = 40;
+-	id->ppaf.pln_len = 8;
+-	id->ppaf.lun_offset = 48;
+-	id->ppaf.lun_len = 8;
+-	id->ppaf.ch_offset = 56;
+-	id->ppaf.ch_len = 8;
+-
+-	sector_div(size, nullb->dev->blocksize); /* convert size to pages */
+-	size >>= 8; /* concert size to pgs pr blk */
+-	grp = &id->grp;
+-	grp->mtype = 0;
+-	grp->fmtype = 0;
+-	grp->num_ch = 1;
+-	grp->num_pg = 256;
+-	blksize = size;
+-	size >>= 16;
+-	grp->num_lun = size + 1;
+-	sector_div(blksize, grp->num_lun);
+-	grp->num_blk = blksize;
+-	grp->num_pln = 1;
+-
+-	grp->fpg_sz = nullb->dev->blocksize;
+-	grp->csecs = nullb->dev->blocksize;
+-	grp->trdt = 25000;
+-	grp->trdm = 25000;
+-	grp->tprt = 500000;
+-	grp->tprm = 500000;
+-	grp->tbet = 1500000;
+-	grp->tbem = 1500000;
+-	grp->mpos = 0x010101; /* single plane rwe */
+-	grp->cpar = nullb->dev->hw_queue_depth;
+-
+-	return 0;
+-}
+-
+-static void *null_lnvm_create_dma_pool(struct nvm_dev *dev, char *name)
+-{
+-	mempool_t *virtmem_pool;
+-
+-	virtmem_pool = mempool_create_slab_pool(64, ppa_cache);
+-	if (!virtmem_pool) {
+-		pr_err("null_blk: Unable to create virtual memory pool\n");
+-		return NULL;
+-	}
+-
+-	return virtmem_pool;
+-}
+-
+-static void null_lnvm_destroy_dma_pool(void *pool)
+-{
+-	mempool_destroy(pool);
+-}
+-
+-static void *null_lnvm_dev_dma_alloc(struct nvm_dev *dev, void *pool,
+-				gfp_t mem_flags, dma_addr_t *dma_handler)
+-{
+-	return mempool_alloc(pool, mem_flags);
+-}
+-
+-static void null_lnvm_dev_dma_free(void *pool, void *entry,
+-							dma_addr_t dma_handler)
+-{
+-	mempool_free(entry, pool);
+-}
+-
+-static struct nvm_dev_ops null_lnvm_dev_ops = {
+-	.identity		= null_lnvm_id,
+-	.submit_io		= null_lnvm_submit_io,
+-
+-	.create_dma_pool	= null_lnvm_create_dma_pool,
+-	.destroy_dma_pool	= null_lnvm_destroy_dma_pool,
+-	.dev_dma_alloc		= null_lnvm_dev_dma_alloc,
+-	.dev_dma_free		= null_lnvm_dev_dma_free,
+-
+-	/* Simulate nvme protocol restriction */
+-	.max_phys_sect		= 64,
+-};
+-
+-static int null_nvm_register(struct nullb *nullb)
+-{
+-	struct nvm_dev *dev;
+-	int rv;
+-
+-	dev = nvm_alloc_dev(0);
+-	if (!dev)
+-		return -ENOMEM;
+-
+-	dev->q = nullb->q;
+-	memcpy(dev->name, nullb->disk_name, DISK_NAME_LEN);
+-	dev->ops = &null_lnvm_dev_ops;
+-
+-	rv = nvm_register(dev);
+-	if (rv) {
+-		kfree(dev);
+-		return rv;
+-	}
+-	nullb->ndev = dev;
+-	return 0;
+-}
+-
+-static void null_nvm_unregister(struct nullb *nullb)
+-{
+-	nvm_unregister(nullb->ndev);
+-}
+-#else
+-static int null_nvm_register(struct nullb *nullb)
+-{
+-	pr_err("null_blk: CONFIG_NVM needs to be enabled for LightNVM\n");
+-	return -EINVAL;
+-}
+-static void null_nvm_unregister(struct nullb *nullb) {}
+-#endif /* CONFIG_NVM */
+-
+ static void null_del_dev(struct nullb *nullb)
  {
- 	/*
- 	 * The halflife of an error is:
-@@ -94,8 +97,9 @@ void bch_count_io_errors(struct cache *ca, blk_status_t error, const char *m)
- 		errors >>= IO_ERROR_SHIFT;
+ 	struct nullb_device *dev = nullb->dev;
+@@ -1595,10 +1420,7 @@ static void null_del_dev(struct nullb *nullb)
  
- 		if (errors < ca->set->error_limit)
--			pr_err("%s: IO error on %s, recovering",
--			       bdevname(ca->bdev, buf), m);
-+			pr_err("%s: IO error on %s%s",
-+			       bdevname(ca->bdev, buf), m,
-+			       is_read ? ", recovering." : ".");
- 		else
- 			bch_cache_set_error(ca->set,
- 					    "%s: too many IO errors %s",
-@@ -108,6 +112,7 @@ void bch_bbio_count_io_errors(struct cache_set *c, struct bio *bio,
+ 	list_del_init(&nullb->list);
+ 
+-	if (dev->use_lightnvm)
+-		null_nvm_unregister(nullb);
+-	else
+-		del_gendisk(nullb->disk);
++	del_gendisk(nullb->disk);
+ 
+ 	if (test_bit(NULLB_DEV_FL_THROTTLED, &nullb->dev->flags)) {
+ 		hrtimer_cancel(&nullb->bw_timer);
+@@ -1610,8 +1432,7 @@ static void null_del_dev(struct nullb *nullb)
+ 	if (dev->queue_mode == NULL_Q_MQ &&
+ 	    nullb->tag_set == &nullb->__tag_set)
+ 		blk_mq_free_tag_set(nullb->tag_set);
+-	if (!dev->use_lightnvm)
+-		put_disk(nullb->disk);
++	put_disk(nullb->disk);
+ 	cleanup_queues(nullb);
+ 	if (null_cache_active(nullb))
+ 		null_free_device_storage(nullb->dev, true);
+@@ -1775,11 +1596,6 @@ static void null_validate_conf(struct nullb_device *dev)
  {
- 	struct bbio *b = container_of(bio, struct bbio, bio);
- 	struct cache *ca = PTR_CACHE(c, &b->key, 0);
-+	int is_read = (bio_data_dir(bio) == READ ? 1 : 0);
+ 	dev->blocksize = round_down(dev->blocksize, 512);
+ 	dev->blocksize = clamp_t(unsigned int, dev->blocksize, 512, 4096);
+-	if (dev->use_lightnvm && dev->blocksize != 4096)
+-		dev->blocksize = 4096;
+-
+-	if (dev->use_lightnvm && dev->queue_mode != NULL_Q_MQ)
+-		dev->queue_mode = NULL_Q_MQ;
  
- 	unsigned threshold = op_is_write(bio_op(bio))
- 		? c->congested_write_threshold_us
-@@ -129,7 +134,7 @@ void bch_bbio_count_io_errors(struct cache_set *c, struct bio *bio,
- 			atomic_inc(&c->congested);
+ 	if (dev->queue_mode == NULL_Q_MQ && dev->use_per_node_hctx) {
+ 		if (dev->submit_queues != nr_online_nodes)
+@@ -1895,11 +1711,7 @@ static int null_add_dev(struct nullb_device *dev)
+ 
+ 	sprintf(nullb->disk_name, "nullb%d", nullb->index);
+ 
+-	if (dev->use_lightnvm)
+-		rv = null_nvm_register(nullb);
+-	else
+-		rv = null_gendisk_register(nullb);
+-
++	rv = null_gendisk_register(nullb);
+ 	if (rv)
+ 		goto out_cleanup_blk_queue;
+ 
+@@ -1938,18 +1750,6 @@ static int __init null_init(void)
+ 		g_bs = PAGE_SIZE;
  	}
  
--	bch_count_io_errors(ca, error, m);
-+	bch_count_io_errors(ca, error, is_read, m);
+-	if (g_use_lightnvm && g_bs != 4096) {
+-		pr_warn("null_blk: LightNVM only supports 4k block size\n");
+-		pr_warn("null_blk: defaults block size to 4k\n");
+-		g_bs = 4096;
+-	}
+-
+-	if (g_use_lightnvm && g_queue_mode != NULL_Q_MQ) {
+-		pr_warn("null_blk: LightNVM only supported for blk-mq\n");
+-		pr_warn("null_blk: defaults queue mode to blk-mq\n");
+-		g_queue_mode = NULL_Q_MQ;
+-	}
+-
+ 	if (g_queue_mode == NULL_Q_MQ && g_use_per_node_hctx) {
+ 		if (g_submit_queues != nr_online_nodes) {
+ 			pr_warn("null_blk: submit_queues param is set to %u.\n",
+@@ -1982,16 +1782,6 @@ static int __init null_init(void)
+ 		goto err_conf;
+ 	}
+ 
+-	if (g_use_lightnvm) {
+-		ppa_cache = kmem_cache_create("ppa_cache", 64 * sizeof(u64),
+-								0, 0, NULL);
+-		if (!ppa_cache) {
+-			pr_err("null_blk: unable to create ppa cache\n");
+-			ret = -ENOMEM;
+-			goto err_ppa;
+-		}
+-	}
+-
+ 	for (i = 0; i < nr_devices; i++) {
+ 		dev = null_alloc_dev();
+ 		if (!dev) {
+@@ -2015,8 +1805,6 @@ static int __init null_init(void)
+ 		null_del_dev(nullb);
+ 		null_free_dev(dev);
+ 	}
+-	kmem_cache_destroy(ppa_cache);
+-err_ppa:
+ 	unregister_blkdev(null_major, "nullb");
+ err_conf:
+ 	configfs_unregister_subsystem(&nullb_subsys);
+@@ -2047,8 +1835,6 @@ static void __exit null_exit(void)
+ 
+ 	if (g_queue_mode == NULL_Q_MQ && shared_tags)
+ 		blk_mq_free_tag_set(&tag_set);
+-
+-	kmem_cache_destroy(ppa_cache);
  }
  
- void bch_bbio_endio(struct cache_set *c, struct bio *bio,
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index d13e4ccb30a0..133b81225ea9 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -274,7 +274,9 @@ static void write_super_endio(struct bio *bio)
- {
- 	struct cache *ca = bio->bi_private;
- 
--	bch_count_io_errors(ca, bio->bi_status, "writing superblock");
-+	/* is_read = 0 */
-+	bch_count_io_errors(ca, bio->bi_status, 0,
-+			    "writing superblock");
- 	closure_put(&ca->set->sb_write);
- }
- 
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index f82ffb2e9b9b..31b0a292a619 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -244,8 +244,10 @@ static void read_dirty_endio(struct bio *bio)
- 	struct keybuf_key *w = bio->bi_private;
- 	struct dirty_io *io = w->private;
- 
-+	/* is_read = 1 */
- 	bch_count_io_errors(PTR_CACHE(io->dc->disk.c, &w->key, 0),
--			    bio->bi_status, "reading dirty data from cache");
-+			    bio->bi_status, 1,
-+			    "reading dirty data from cache");
- 
- 	dirty_endio(bio);
- }
+ module_init(null_init);
 -- 
-2.14.1
+2.9.3
