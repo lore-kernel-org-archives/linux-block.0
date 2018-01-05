@@ -1,278 +1,186 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:48993 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751709AbeANOny (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 Jan 2018 09:43:54 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Michael Lyle <mlyle@lyle.org>, Hannes Reinecke <hare@suse.com>,
-        Junhui Tang <tang.junhui@zte.com.cn>
-Subject: [PATCH v3 06/13] bcache: stop dc->writeback_rate_update properly
-Date: Sun, 14 Jan 2018 22:42:29 +0800
-Message-Id: <20180114144236.28213-7-colyli@suse.de>
-In-Reply-To: <20180114144236.28213-1-colyli@suse.de>
-References: <20180114144236.28213-1-colyli@suse.de>
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:39435 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751979AbeAENQz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jan 2018 08:16:55 -0500
+Received: by mail-wm0-f67.google.com with SMTP id i11so2418634wmf.4
+        for <linux-block@vger.kernel.org>; Fri, 05 Jan 2018 05:16:54 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans@owltronix.com>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 14/25] lightnvm: pblk: clear flush point on completed writes
+Date: Fri,  5 Jan 2018 14:16:10 +0100
+Message-Id: <20180105131621.20808-15-m@bjorling.me>
+In-Reply-To: <20180105131621.20808-1-m@bjorling.me>
+References: <20180105131621.20808-1-m@bjorling.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-struct delayed_work writeback_rate_update in struct cache_dev is a delayed
-worker to call function update_writeback_rate() in period (the interval is
-defined by dc->writeback_rate_update_seconds).
+From: Hans Holmberg <hans@owltronix.com>
 
-When a metadate I/O error happens on cache device, bcache error handling
-routine bch_cache_set_error() will call bch_cache_set_unregister() to
-retire whole cache set. On the unregister code path, this delayed work is
-stopped by calling cancel_delayed_work_sync(&dc->writeback_rate_update).
+Move completion of syncs and clearing of flush points to the
+write completion path - this ensures that the data has been
+comitted to the media before completing bios containing syncs.
 
-dc->writeback_rate_update is a special delayed work from others in bcache.
-In its routine update_writeback_rate(), this delayed work is re-armed
-itself. That means when cancel_delayed_work_sync() returns, this delayed
-work can still be executed after several seconds defined by
-dc->writeback_rate_update_seconds.
-
-The problem is, after cancel_delayed_work_sync() returns, the cache set
-unregister code path will continue and release memory of struct cache set.
-Then the delayed work is scheduled to run, __update_writeback_rate()
-will reference the already released cache_set memory, and trigger a NULL
-pointer deference fault.
-
-This patch introduces two more bcache device flags,
-- BCACHE_DEV_WB_RUNNING
-  bit set:  bcache device is in writeback mode and running, it is OK for
-            dc->writeback_rate_update to re-arm itself.
-  bit clear:bcache device is trying to stop dc->writeback_rate_update,
-            this delayed work should not re-arm itself and quit.
-- BCACHE_DEV_RATE_DW_RUNNING
-  bit set:  routine update_writeback_rate() is executing.
-  bit clear: routine update_writeback_rate() quits.
-
-This patch also adds a function cancel_writeback_rate_update_dwork() to
-wait for dc->writeback_rate_update quits before cancel it by calling
-cancel_delayed_work_sync(). In order to avoid a deadlock by unexpected
-quit dc->writeback_rate_update, after time_out seconds this function will
-give up and continue to call cancel_delayed_work_sync().
-
-And here I explain how this patch stops self re-armed delayed work properly
-with the above stuffs.
-
-update_writeback_rate() sets BCACHE_DEV_RATE_DW_RUNNING at its beginning
-and clears BCACHE_DEV_RATE_DW_RUNNING at its end. Before calling
-cancel_writeback_rate_update_dwork() clear flag BCACHE_DEV_WB_RUNNING.
-
-Before calling cancel_delayed_work_sync() wait utill flag
-BCACHE_DEV_RATE_DW_RUNNING is clear. So when calling
-cancel_delayed_work_sync(), dc->writeback_rate_update must be already re-
-armed, or quite by seeing BCACHE_DEV_WB_RUNNING cleared. In both cases
-delayed work routine update_writeback_rate() won't be executed after
-cancel_delayed_work_sync() returns.
-
-Inside update_writeback_rate() before calling schedule_delayed_work(), flag
-BCACHE_DEV_WB_RUNNING is checked before. If this flag is cleared, it means
-someone is about to stop the delayed work. Because flag
-BCACHE_DEV_RATE_DW_RUNNING is set already and cancel_delayed_work_sync()
-has to wait for this flag to be cleared, we don't need to worry about race
-condition here.
-
-If update_writeback_rate() is scheduled to run after checking
-BCACHE_DEV_RATE_DW_RUNNING and before calling cancel_delayed_work_sync()
-in cancel_writeback_rate_update_dwork(), it is also safe. Because at this
-moment BCACHE_DEV_WB_RUNNING is cleared with memory barrier. As I mentioned
-previously, update_writeback_rate() will see BCACHE_DEV_WB_RUNNING is clear
-and quit immediately.
-
-Because there are more dependences inside update_writeback_rate() to struct
-cache_set memory, dc->writeback_rate_update is not a simple self re-arm
-delayed work. After trying many different methods (e.g. hold dc->count, or
-use locks), this is the only way I can find which works to properly stop
-dc->writeback_rate_update delayed work.
-
-Changelog:
-v2: Try to fix the race issue which is pointed out by Junhui.
-v1: The initial version for review
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Michael Lyle <mlyle@lyle.org>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- drivers/md/bcache/bcache.h    |  9 +++++----
- drivers/md/bcache/super.c     | 39 +++++++++++++++++++++++++++++++++++----
- drivers/md/bcache/sysfs.c     |  3 ++-
- drivers/md/bcache/writeback.c | 29 ++++++++++++++++++++++++++++-
- 4 files changed, 70 insertions(+), 10 deletions(-)
+ drivers/lightnvm/pblk-rb.c    | 58 +++++++++++++++++++++----------------------
+ drivers/lightnvm/pblk-write.c | 17 ++++++++++++-
+ 2 files changed, 44 insertions(+), 31 deletions(-)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 5e2d4e80198e..88d938c8d027 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -258,10 +258,11 @@ struct bcache_device {
- 	struct gendisk		*disk;
- 
- 	unsigned long		flags;
--#define BCACHE_DEV_CLOSING	0
--#define BCACHE_DEV_DETACHING	1
--#define BCACHE_DEV_UNLINK_DONE	2
--
-+#define BCACHE_DEV_CLOSING		0
-+#define BCACHE_DEV_DETACHING		1
-+#define BCACHE_DEV_UNLINK_DONE		2
-+#define BCACHE_DEV_WB_RUNNING		4
-+#define BCACHE_DEV_RATE_DW_RUNNING	8
- 	unsigned		nr_stripes;
- 	unsigned		stripe_size;
- 	atomic_t		*stripe_sectors_dirty;
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index d14e09cce2f6..6d888e8fea8c 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -899,6 +899,32 @@ void bch_cached_dev_run(struct cached_dev *dc)
- 		pr_debug("error creating sysfs link");
- }
- 
-+/*
-+ * If BCACHE_DEV_RATE_DW_RUNNING is set, it means routine of the delayed
-+ * work dc->writeback_rate_update is running. Wait until the routine
-+ * quits (BCACHE_DEV_RATE_DW_RUNNING is clear), then continue to
-+ * cancel it. If BCACHE_DEV_RATE_DW_RUNNING is not clear after time_out
-+ * seconds, give up waiting here and continue to cancel it too.
-+ */
-+static void cancel_writeback_rate_update_dwork(struct cached_dev *dc)
-+{
-+	int time_out = WRITEBACK_RATE_UPDATE_SECS_MAX * HZ;
-+
-+	do {
-+		if (!test_bit(BCACHE_DEV_RATE_DW_RUNNING,
-+			      &dc->disk.flags))
-+			break;
-+		time_out--;
-+		schedule_timeout_interruptible(1);
-+	} while (time_out > 0);
-+
-+	if (time_out == 0)
-+		pr_warn("bcache: give up waiting for "
-+			"dc->writeback_write_update to quit");
-+
-+	cancel_delayed_work_sync(&dc->writeback_rate_update);
-+}
-+
- static void cached_dev_detach_finish(struct work_struct *w)
+diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
+index 941842e..672ef8c 100644
+--- a/drivers/lightnvm/pblk-rb.c
++++ b/drivers/lightnvm/pblk-rb.c
+@@ -353,17 +353,17 @@ static int pblk_rb_flush_point_set(struct pblk_rb *rb, struct bio *bio,
+ 				  unsigned int pos)
  {
- 	struct cached_dev *dc = container_of(w, struct cached_dev, detach);
-@@ -911,7 +937,9 @@ static void cached_dev_detach_finish(struct work_struct *w)
+ 	struct pblk_rb_entry *entry;
+-	unsigned int subm, flush_point;
++	unsigned int sync, flush_point;
  
- 	mutex_lock(&bch_register_lock);
- 
--	cancel_delayed_work_sync(&dc->writeback_rate_update);
-+	if (test_and_clear_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags))
-+		cancel_writeback_rate_update_dwork(dc);
+-	subm = READ_ONCE(rb->subm);
++	sync = READ_ONCE(rb->sync);
 +
- 	if (!IS_ERR_OR_NULL(dc->writeback_thread)) {
- 		kthread_stop(dc->writeback_thread);
- 		dc->writeback_thread = NULL;
-@@ -954,6 +982,7 @@ void bch_cached_dev_detach(struct cached_dev *dc)
- 	closure_get(&dc->disk.cl);
++	if (pos == sync)
++		return 0;
  
- 	bch_writeback_queue(dc);
-+
- 	cached_dev_put(dc);
- }
+ #ifdef CONFIG_NVM_DEBUG
+ 	atomic_inc(&rb->inflight_flush_point);
+ #endif
  
-@@ -1079,14 +1108,16 @@ static void cached_dev_free(struct closure *cl)
- {
- 	struct cached_dev *dc = container_of(cl, struct cached_dev, disk.cl);
- 
--	cancel_delayed_work_sync(&dc->writeback_rate_update);
-+	mutex_lock(&bch_register_lock);
-+
-+	if (test_and_clear_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags))
-+		cancel_writeback_rate_update_dwork(dc);
-+
- 	if (!IS_ERR_OR_NULL(dc->writeback_thread))
- 		kthread_stop(dc->writeback_thread);
- 	if (dc->writeback_write_wq)
- 		destroy_workqueue(dc->writeback_write_wq);
- 
--	mutex_lock(&bch_register_lock);
+-	if (pos == subm)
+-		return 0;
 -
- 	if (atomic_read(&dc->running))
- 		bd_unlink_disk_holder(dc->bdev, dc->disk.disk);
- 	bcache_device_free(&dc->disk);
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index a74a752c9e0f..b7166c504cdb 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -304,7 +304,8 @@ STORE(bch_cached_dev)
- 		bch_writeback_queue(dc);
+ 	flush_point = (pos == 0) ? (rb->nr_entries - 1) : (pos - 1);
+ 	entry = &rb->entries[flush_point];
  
- 	if (attr == &sysfs_writeback_percent)
--		schedule_delayed_work(&dc->writeback_rate_update,
-+		if (!test_and_set_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags))
-+			schedule_delayed_work(&dc->writeback_rate_update,
- 				      dc->writeback_rate_update_seconds * HZ);
+@@ -606,22 +606,6 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
+ 			return NVM_IO_ERR;
+ 		}
  
- 	mutex_unlock(&bch_register_lock);
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 4dbeaaa575bf..8f98ef1038d3 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -115,6 +115,21 @@ static void update_writeback_rate(struct work_struct *work)
- 					     struct cached_dev,
- 					     writeback_rate_update);
+-		if (flags & PBLK_FLUSH_ENTRY) {
+-			unsigned int flush_point;
+-
+-			flush_point = READ_ONCE(rb->flush_point);
+-			if (flush_point == pos) {
+-				/* Protect flush points */
+-				smp_store_release(&rb->flush_point,
+-							EMPTY_ENTRY);
+-			}
+-
+-			flags &= ~PBLK_FLUSH_ENTRY;
+-#ifdef CONFIG_NVM_DEBUG
+-			atomic_dec(&rb->inflight_flush_point);
+-#endif
+-		}
+-
+ 		flags &= ~PBLK_WRITTEN_DATA;
+ 		flags |= PBLK_SUBMITTED_ENTRY;
  
-+	/*
-+	 * should check BCACHE_DEV_RATE_DW_RUNNING before calling
-+	 * cancel_delayed_work_sync().
-+	 */
-+	set_bit(BCACHE_DEV_RATE_DW_RUNNING, &dc->disk.flags);
-+	/* paired with where BCACHE_DEV_RATE_DW_RUNNING is tested */
-+	smp_mb();
+@@ -731,15 +715,24 @@ void pblk_rb_sync_end(struct pblk_rb *rb, unsigned long *flags)
+ 
+ unsigned int pblk_rb_sync_advance(struct pblk_rb *rb, unsigned int nr_entries)
+ {
+-	unsigned int sync;
+-	unsigned int i;
+-
++	unsigned int sync, flush_point;
+ 	lockdep_assert_held(&rb->s_lock);
+ 
+ 	sync = READ_ONCE(rb->sync);
++	flush_point = READ_ONCE(rb->flush_point);
+ 
+-	for (i = 0; i < nr_entries; i++)
+-		sync = (sync + 1) & (rb->nr_entries - 1);
++	if (flush_point != EMPTY_ENTRY) {
++		unsigned int secs_to_flush;
 +
-+	if (!test_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags)) {
-+		clear_bit(BCACHE_DEV_RATE_DW_RUNNING, &dc->disk.flags);
-+		/* paired with where BCACHE_DEV_RATE_DW_RUNNING is tested */
-+		smp_mb();
-+		return;
++		secs_to_flush = pblk_rb_ring_count(flush_point, sync,
++					rb->nr_entries);
++		if (secs_to_flush < nr_entries) {
++			/* Protect flush points */
++			smp_store_release(&rb->flush_point, EMPTY_ENTRY);
++		}
 +	}
 +
- 	down_read(&dc->writeback_lock);
++	sync = (sync + nr_entries) & (rb->nr_entries - 1);
  
- 	if (atomic_read(&dc->has_dirty) &&
-@@ -123,8 +138,18 @@ static void update_writeback_rate(struct work_struct *work)
+ 	/* Protect from counts */
+ 	smp_store_release(&rb->sync, sync);
+@@ -747,22 +740,27 @@ unsigned int pblk_rb_sync_advance(struct pblk_rb *rb, unsigned int nr_entries)
+ 	return sync;
+ }
  
- 	up_read(&dc->writeback_lock);
++/* Calculate how many sectors to submit up to the current flush point. */
+ unsigned int pblk_rb_flush_point_count(struct pblk_rb *rb)
+ {
+-	unsigned int subm, flush_point;
+-	unsigned int count;
++	unsigned int subm, sync, flush_point;
++	unsigned int submitted, to_flush;
  
--	schedule_delayed_work(&dc->writeback_rate_update,
-+	if (test_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags)) {
-+		schedule_delayed_work(&dc->writeback_rate_update,
- 			      dc->writeback_rate_update_seconds * HZ);
-+	}
+ 	/* Protect flush points */
+ 	flush_point = smp_load_acquire(&rb->flush_point);
+ 	if (flush_point == EMPTY_ENTRY)
+ 		return 0;
+ 
++	/* Protect syncs */
++	sync = smp_load_acquire(&rb->sync);
 +
-+	/*
-+	 * should check BCACHE_DEV_RATE_DW_RUNNING before calling
-+	 * cancel_delayed_work_sync().
-+	 */
-+	clear_bit(BCACHE_DEV_RATE_DW_RUNNING, &dc->disk.flags);
-+	/* paired with where BCACHE_DEV_RATE_DW_RUNNING is tested */
-+	smp_mb();
+ 	subm = READ_ONCE(rb->subm);
++	submitted = pblk_rb_ring_count(subm, sync, rb->nr_entries);
+ 
+ 	/* The sync point itself counts as a sector to sync */
+-	count = pblk_rb_ring_count(flush_point, subm, rb->nr_entries) + 1;
++	to_flush = pblk_rb_ring_count(flush_point, sync, rb->nr_entries) + 1;
+ 
+-	return count;
++	return (submitted < to_flush) ? (to_flush - submitted) : 0;
  }
  
- static unsigned writeback_delay(struct cached_dev *dc, unsigned sectors)
-@@ -675,6 +700,7 @@ void bch_cached_dev_writeback_init(struct cached_dev *dc)
- 	dc->writeback_rate_p_term_inverse = 40;
- 	dc->writeback_rate_i_term_inverse = 10000;
+ /*
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index 018af87..aae86ed 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -21,13 +21,28 @@ static unsigned long pblk_end_w_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 				    struct pblk_c_ctx *c_ctx)
+ {
+ 	struct bio *original_bio;
++	struct pblk_rb *rwb = &pblk->rwb;
+ 	unsigned long ret;
+ 	int i;
  
-+	WARN_ON(test_and_clear_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags));
- 	INIT_DELAYED_WORK(&dc->writeback_rate_update, update_writeback_rate);
- }
+ 	for (i = 0; i < c_ctx->nr_valid; i++) {
+ 		struct pblk_w_ctx *w_ctx;
++		int pos = c_ctx->sentry + i;
++		int flags;
++
++		w_ctx = pblk_rb_w_ctx(rwb, pos);
++		flags = READ_ONCE(w_ctx->flags);
++
++		if (flags & PBLK_FLUSH_ENTRY) {
++			flags &= ~PBLK_FLUSH_ENTRY;
++			/* Release flags on context. Protect from writes */
++			smp_store_release(&w_ctx->flags, flags);
++
++#ifdef CONFIG_NVM_DEBUG
++			atomic_dec(&rwb->inflight_flush_point);
++#endif
++		}
  
-@@ -693,6 +719,7 @@ int bch_cached_dev_writeback_start(struct cached_dev *dc)
- 		return PTR_ERR(dc->writeback_thread);
+-		w_ctx = pblk_rb_w_ctx(&pblk->rwb, c_ctx->sentry + i);
+ 		while ((original_bio = bio_list_pop(&w_ctx->bios)))
+ 			bio_endio(original_bio);
  	}
- 
-+	WARN_ON(test_and_set_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags));
- 	schedule_delayed_work(&dc->writeback_rate_update,
- 			      dc->writeback_rate_update_seconds * HZ);
- 
 -- 
-2.15.1
+2.9.3
