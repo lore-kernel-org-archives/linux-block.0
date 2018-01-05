@@ -1,39 +1,307 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:32768 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752166AbeAETdv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jan 2018 14:33:51 -0500
-Subject: Re: [GIT PULL 18/25] lightnvm: set target over-provision on create
- ioctl
-To: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <m@bjorling.me>, axboe@fb.com
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:37983 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751999AbeAENQ7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jan 2018 08:16:59 -0500
+Received: by mail-wm0-f68.google.com with SMTP id 64so2416462wme.3
+        for <linux-block@vger.kernel.org>; Fri, 05 Jan 2018 05:16:59 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@cnexlabs.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 18/25] lightnvm: set target over-provision on create ioctl
+Date: Fri,  5 Jan 2018 14:16:14 +0100
+Message-Id: <20180105131621.20808-19-m@bjorling.me>
+In-Reply-To: <20180105131621.20808-1-m@bjorling.me>
 References: <20180105131621.20808-1-m@bjorling.me>
- <20180105131621.20808-19-m@bjorling.me>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <fd47bd97-8ff7-1f6a-b07f-c86449ec1834@infradead.org>
-Date: Fri, 5 Jan 2018 11:33:49 -0800
 MIME-Version: 1.0
-In-Reply-To: <20180105131621.20808-19-m@bjorling.me>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 01/05/2018 05:16 AM, Matias Bjørling wrote:
-> From: Javier González <javier@cnexlabs.com>
-> 
-> Allow to set the over-provision percentage on target creation. In case
-> that the value is not provided, fall back to the default value set by
-> the target.
-> 
-> In pblk, set the default OP to 11% of the total size of the device
+From: Javier González <javier@cnexlabs.com>
 
-> +#define PBLK_DEFAULT_OP (11)
+Allow to set the over-provision percentage on target creation. In case
+that the value is not provided, fall back to the default value set by
+the target.
 
-Hi,
-Just curious -- where does 11 come from?  Is it a spec value?
+In pblk, set the default OP to 11% of the total size of the device
 
-thanks,
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
+---
+ drivers/lightnvm/core.c       | 106 +++++++++++++++++++++++++++++++++---------
+ drivers/lightnvm/pblk-init.c  |   5 +-
+ drivers/lightnvm/pblk.h       |   2 +
+ include/linux/lightnvm.h      |   6 +++
+ include/uapi/linux/lightnvm.h |   9 ++++
+ 5 files changed, 104 insertions(+), 24 deletions(-)
+
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index d5f231c..dcc9e62 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -140,7 +140,8 @@ static void nvm_remove_tgt_dev(struct nvm_tgt_dev *tgt_dev, int clear)
+ }
+ 
+ static struct nvm_tgt_dev *nvm_create_tgt_dev(struct nvm_dev *dev,
+-					      int lun_begin, int lun_end)
++					      u16 lun_begin, u16 lun_end,
++					      u16 op)
+ {
+ 	struct nvm_tgt_dev *tgt_dev = NULL;
+ 	struct nvm_dev_map *dev_rmap = dev->rmap;
+@@ -219,6 +220,7 @@ static struct nvm_tgt_dev *nvm_create_tgt_dev(struct nvm_dev *dev,
+ 	tgt_dev->geo.nr_chnls = nr_chnls;
+ 	tgt_dev->geo.all_luns = nr_luns;
+ 	tgt_dev->geo.nr_luns = (lun_balanced) ? prev_nr_luns : -1;
++	tgt_dev->geo.op = op;
+ 	tgt_dev->total_secs = nr_luns * tgt_dev->geo.sec_per_lun;
+ 	tgt_dev->q = dev->q;
+ 	tgt_dev->map = dev_map;
+@@ -266,9 +268,57 @@ static struct nvm_tgt_type *nvm_find_target_type(const char *name)
+ 	return tt;
+ }
+ 
++static int nvm_config_check_luns(struct nvm_geo *geo, int lun_begin,
++				 int lun_end)
++{
++	if (lun_begin > lun_end || lun_end >= geo->all_luns) {
++		pr_err("nvm: lun out of bound (%u:%u > %u)\n",
++			lun_begin, lun_end, geo->all_luns - 1);
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++static int __nvm_config_simple(struct nvm_dev *dev,
++			       struct nvm_ioctl_create_simple *s)
++{
++	struct nvm_geo *geo = &dev->geo;
++
++	if (s->lun_begin == -1 && s->lun_end == -1) {
++		s->lun_begin = 0;
++		s->lun_end = geo->all_luns - 1;
++	}
++
++	return nvm_config_check_luns(geo, s->lun_begin, s->lun_end);
++}
++
++static int __nvm_config_extended(struct nvm_dev *dev,
++				 struct nvm_ioctl_create_extended *e)
++{
++	struct nvm_geo *geo = &dev->geo;
++
++	if (e->lun_begin == 0xFFFF && e->lun_end == 0xFFFF) {
++		e->lun_begin = 0;
++		e->lun_end = dev->geo.all_luns - 1;
++	}
++
++	/* op not set falls into target's default */
++	if (e->op == 0xFFFF)
++		e->op = NVM_TARGET_DEFAULT_OP;
++
++	if (e->op < NVM_TARGET_MIN_OP ||
++	    e->op > NVM_TARGET_MAX_OP) {
++		pr_err("nvm: invalid over provisioning value\n");
++		return -EINVAL;
++	}
++
++	return nvm_config_check_luns(geo, e->lun_begin, e->lun_end);
++}
++
+ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ {
+-	struct nvm_ioctl_create_simple *s = &create->conf.s;
++	struct nvm_ioctl_create_extended e;
+ 	struct request_queue *tqueue;
+ 	struct gendisk *tdisk;
+ 	struct nvm_tgt_type *tt;
+@@ -277,6 +327,28 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ 	void *targetdata;
+ 	int ret;
+ 
++	switch (create->conf.type) {
++	case NVM_CONFIG_TYPE_SIMPLE:
++		ret = __nvm_config_simple(dev, &create->conf.s);
++		if (ret)
++			return ret;
++
++		e.lun_begin = create->conf.s.lun_begin;
++		e.lun_end = create->conf.s.lun_end;
++		e.op = NVM_TARGET_DEFAULT_OP;
++		break;
++	case NVM_CONFIG_TYPE_EXTENDED:
++		ret = __nvm_config_extended(dev, &create->conf.e);
++		if (ret)
++			return ret;
++
++		e = create->conf.e;
++		break;
++	default:
++		pr_err("nvm: config type not valid\n");
++		return -EINVAL;
++	}
++
+ 	tt = nvm_find_target_type(create->tgttype);
+ 	if (!tt) {
+ 		pr_err("nvm: target type %s not found\n", create->tgttype);
+@@ -289,7 +361,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ 		return -EINVAL;
+ 	}
+ 
+-	ret = nvm_reserve_luns(dev, s->lun_begin, s->lun_end);
++	ret = nvm_reserve_luns(dev, e.lun_begin, e.lun_end);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -299,7 +371,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ 		goto err_reserve;
+ 	}
+ 
+-	tgt_dev = nvm_create_tgt_dev(dev, s->lun_begin, s->lun_end);
++	tgt_dev = nvm_create_tgt_dev(dev, e.lun_begin, e.lun_end, e.op);
+ 	if (!tgt_dev) {
+ 		pr_err("nvm: could not create target device\n");
+ 		ret = -ENOMEM;
+@@ -369,7 +441,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ err_t:
+ 	kfree(t);
+ err_reserve:
+-	nvm_release_luns_err(dev, s->lun_begin, s->lun_end);
++	nvm_release_luns_err(dev, e.lun_begin, e.lun_end);
+ 	return ret;
+ }
+ 
+@@ -949,7 +1021,6 @@ EXPORT_SYMBOL(nvm_unregister);
+ static int __nvm_configure_create(struct nvm_ioctl_create *create)
+ {
+ 	struct nvm_dev *dev;
+-	struct nvm_ioctl_create_simple *s;
+ 
+ 	down_write(&nvm_lock);
+ 	dev = nvm_find_nvm_dev(create->dev);
+@@ -960,23 +1031,6 @@ static int __nvm_configure_create(struct nvm_ioctl_create *create)
+ 		return -EINVAL;
+ 	}
+ 
+-	if (create->conf.type != NVM_CONFIG_TYPE_SIMPLE) {
+-		pr_err("nvm: config type not valid\n");
+-		return -EINVAL;
+-	}
+-	s = &create->conf.s;
+-
+-	if (s->lun_begin == -1 && s->lun_end == -1) {
+-		s->lun_begin = 0;
+-		s->lun_end = dev->geo.all_luns - 1;
+-	}
+-
+-	if (s->lun_begin > s->lun_end || s->lun_end >= dev->geo.all_luns) {
+-		pr_err("nvm: lun out of bound (%u:%u > %u)\n",
+-			s->lun_begin, s->lun_end, dev->geo.all_luns - 1);
+-		return -EINVAL;
+-	}
+-
+ 	return nvm_create_tgt(dev, create);
+ }
+ 
+@@ -1076,6 +1130,12 @@ static long nvm_ioctl_dev_create(struct file *file, void __user *arg)
+ 	if (copy_from_user(&create, arg, sizeof(struct nvm_ioctl_create)))
+ 		return -EFAULT;
+ 
++	if (create.conf.type == NVM_CONFIG_TYPE_EXTENDED &&
++	    create.conf.e.rsv != 0) {
++		pr_err("nvm: reserved config field in use\n");
++		return -EINVAL;
++	}
++
+ 	create.dev[DISK_NAME_LEN - 1] = '\0';
+ 	create.tgttype[NVM_TTYPE_NAME_MAX - 1] = '\0';
+ 	create.tgtname[DISK_NAME_LEN - 1] = '\0';
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index c8a7182..533f690 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -585,7 +585,10 @@ static void pblk_set_provision(struct pblk *pblk, long nr_free_blks)
+ 	sector_t provisioned;
+ 	int sec_meta, blk_meta;
+ 
+-	pblk->op = 20;
++	if (geo->op == NVM_TARGET_DEFAULT_OP)
++		pblk->op = PBLK_DEFAULT_OP;
++	else
++		pblk->op = geo->op;
+ 
+ 	provisioned = nr_free_blks;
+ 	provisioned *= (100 - pblk->op);
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 1e719d4..19e622c 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -54,6 +54,8 @@
+ /* Static pool sizes */
+ #define PBLK_GEN_WS_POOL_SIZE (2)
+ 
++#define PBLK_DEFAULT_OP (11)
++
+ enum {
+ 	PBLK_READ		= READ,
+ 	PBLK_WRITE		= WRITE,/* Write from write buffer */
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 8e43bfe..7f4b60a 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -218,6 +218,10 @@ struct nvm_target {
+ 
+ #define ADDR_EMPTY (~0ULL)
+ 
++#define NVM_TARGET_DEFAULT_OP (101)
++#define NVM_TARGET_MIN_OP (3)
++#define NVM_TARGET_MAX_OP (80)
++
+ #define NVM_VERSION_MAJOR 1
+ #define NVM_VERSION_MINOR 0
+ #define NVM_VERSION_PATCH 0
+@@ -291,6 +295,8 @@ struct nvm_geo {
+ 
+ 	int max_rq_size;
+ 
++	int op;
++
+ 	struct nvm_addr_format ppaf;
+ 
+ 	/* Legacy 1.2 specific geometry */
+diff --git a/include/uapi/linux/lightnvm.h b/include/uapi/linux/lightnvm.h
+index 42d1a43..f9a1be7 100644
+--- a/include/uapi/linux/lightnvm.h
++++ b/include/uapi/linux/lightnvm.h
+@@ -75,14 +75,23 @@ struct nvm_ioctl_create_simple {
+ 	__u32 lun_end;
+ };
+ 
++struct nvm_ioctl_create_extended {
++	__u16 lun_begin;
++	__u16 lun_end;
++	__u16 op;
++	__u16 rsv;
++};
++
+ enum {
+ 	NVM_CONFIG_TYPE_SIMPLE = 0,
++	NVM_CONFIG_TYPE_EXTENDED = 1,
+ };
+ 
+ struct nvm_ioctl_create_conf {
+ 	__u32 type;
+ 	union {
+ 		struct nvm_ioctl_create_simple s;
++		struct nvm_ioctl_create_extended e;
+ 	};
+ };
+ 
 -- 
-~Randy
+2.9.3
