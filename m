@@ -1,202 +1,188 @@
-Return-Path: <gunthorp@deltatee.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvdimm@lists.01.org,
-	linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
+Return-Path: <prvs=53600bcc8=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Logan Gunthorpe <logang@deltatee.com>
-Date: Thu,  4 Jan 2018 12:01:34 -0700
-Message-Id: <20180104190137.7654-10-logang@deltatee.com>
-In-Reply-To: <20180104190137.7654-1-logang@deltatee.com>
-References: <20180104190137.7654-1-logang@deltatee.com>
-Subject: [PATCH 09/12] nvme-pci: Use PCI p2pmem subsystem to manage the CMB
+	Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-nvme@lists.infradead.org,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH v4 1/5] lib/scatterlist: Introduce sgl_alloc() and sgl_free()
+Date: Fri,  5 Jan 2018 08:26:46 -0800
+Message-Id: <20180105162650.31083-2-bart.vanassche@wdc.com>
+In-Reply-To: <20180105162650.31083-1-bart.vanassche@wdc.com>
+References: <20180105162650.31083-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Register the CMB buffer as p2pmem and use the appropriate allocation
-functions to create and destroy the IO SQ.
+Many kernel drivers contain code that allocates and frees both a
+scatterlist and the pages that populate that scatterlist.
+Introduce functions in lib/scatterlist.c that perform these tasks
+instead of duplicating this functionality in multiple drivers.
+Only include these functions in the build if CONFIG_SGL_ALLOC=y
+to avoid that the kernel size increases if this functionality is
+not used.
 
-If the CMB supports WDS and RDS, publish it for use as p2p memory
-by other devices.
-
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/nvme/host/pci.c | 74 +++++++++++++++++++++++++++++--------------------
- 1 file changed, 44 insertions(+), 30 deletions(-)
+ include/linux/scatterlist.h |  10 +++++
+ lib/Kconfig                 |   4 ++
+ lib/scatterlist.c           | 105 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 119 insertions(+)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 5af239e46f52..71893babb982 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -29,6 +29,7 @@
- #include <linux/types.h>
- #include <linux/io-64-nonatomic-lo-hi.h>
- #include <linux/sed-opal.h>
-+#include <linux/pci-p2p.h>
+diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
+index b7c83254c566..b8a7c1d1dbe3 100644
+--- a/include/linux/scatterlist.h
++++ b/include/linux/scatterlist.h
+@@ -276,6 +276,16 @@ int sg_alloc_table_from_pages(struct sg_table *sgt, struct page **pages,
+ 			      unsigned int n_pages, unsigned int offset,
+ 			      unsigned long size, gfp_t gfp_mask);
  
- #include "nvme.h"
- 
-@@ -91,9 +92,8 @@ struct nvme_dev {
- 	struct work_struct remove_work;
- 	struct mutex shutdown_lock;
- 	bool subsystem;
--	void __iomem *cmb;
--	pci_bus_addr_t cmb_bus_addr;
- 	u64 cmb_size;
-+	bool cmb_use_sqes;
- 	u32 cmbsz;
- 	u32 cmbloc;
- 	struct nvme_ctrl ctrl;
-@@ -148,7 +148,7 @@ struct nvme_queue {
- 	struct nvme_dev *dev;
- 	spinlock_t q_lock;
- 	struct nvme_command *sq_cmds;
--	struct nvme_command __iomem *sq_cmds_io;
-+	bool sq_cmds_is_io;
- 	volatile struct nvme_completion *cqes;
- 	struct blk_mq_tags **tags;
- 	dma_addr_t sq_dma_addr;
-@@ -429,10 +429,7 @@ static void __nvme_submit_cmd(struct nvme_queue *nvmeq,
- {
- 	u16 tail = nvmeq->sq_tail;
- 
--	if (nvmeq->sq_cmds_io)
--		memcpy_toio(&nvmeq->sq_cmds_io[tail], cmd, sizeof(*cmd));
--	else
--		memcpy(&nvmeq->sq_cmds[tail], cmd, sizeof(*cmd));
-+	memcpy(&nvmeq->sq_cmds[tail], cmd, sizeof(*cmd));
- 
- 	if (++tail == nvmeq->q_depth)
- 		tail = 0;
-@@ -1279,9 +1276,21 @@ static void nvme_free_queue(struct nvme_queue *nvmeq)
- {
- 	dma_free_coherent(nvmeq->q_dmadev, CQ_SIZE(nvmeq->q_depth),
- 				(void *)nvmeq->cqes, nvmeq->cq_dma_addr);
--	if (nvmeq->sq_cmds)
--		dma_free_coherent(nvmeq->q_dmadev, SQ_SIZE(nvmeq->q_depth),
--					nvmeq->sq_cmds, nvmeq->sq_dma_addr);
++#ifdef CONFIG_SGL_ALLOC
++struct scatterlist *sgl_alloc_order(unsigned long long length,
++				    unsigned int order, bool chainable,
++				    gfp_t gfp, unsigned int *nent_p);
++struct scatterlist *sgl_alloc(unsigned long long length, gfp_t gfp,
++			      unsigned int *nent_p);
++void sgl_free_order(struct scatterlist *sgl, int order);
++void sgl_free(struct scatterlist *sgl);
++#endif /* CONFIG_SGL_ALLOC */
 +
-+	if (nvmeq->sq_cmds) {
-+		if (nvmeq->sq_cmds_is_io)
-+			pci_free_p2pmem(to_pci_dev(nvmeq->q_dmadev),
-+					nvmeq->sq_cmds,
-+					SQ_SIZE(nvmeq->q_depth));
-+		else
-+			dma_free_coherent(nvmeq->q_dmadev,
-+					  SQ_SIZE(nvmeq->q_depth),
-+					  nvmeq->sq_cmds,
-+					  nvmeq->sq_dma_addr);
+ size_t sg_copy_buffer(struct scatterlist *sgl, unsigned int nents, void *buf,
+ 		      size_t buflen, off_t skip, bool to_buffer);
+ 
+diff --git a/lib/Kconfig b/lib/Kconfig
+index c5e84fbcb30b..4dd5c11366f9 100644
+--- a/lib/Kconfig
++++ b/lib/Kconfig
+@@ -409,6 +409,10 @@ config HAS_DMA
+ 	depends on !NO_DMA
+ 	default y
+ 
++config SGL_ALLOC
++	bool
++	default n
++
+ config DMA_NOOP_OPS
+ 	bool
+ 	depends on HAS_DMA && (!64BIT || ARCH_DMA_ADDR_T_64BIT)
+diff --git a/lib/scatterlist.c b/lib/scatterlist.c
+index 7c1c55f7daaa..9afc9b432083 100644
+--- a/lib/scatterlist.c
++++ b/lib/scatterlist.c
+@@ -474,6 +474,111 @@ int sg_alloc_table_from_pages(struct sg_table *sgt, struct page **pages,
+ }
+ EXPORT_SYMBOL(sg_alloc_table_from_pages);
+ 
++#ifdef CONFIG_SGL_ALLOC
++
++/**
++ * sgl_alloc_order - allocate a scatterlist and its pages
++ * @length: Length in bytes of the scatterlist. Must be at least one
++ * @order: Second argument for alloc_pages()
++ * @chainable: Whether or not to allocate an extra element in the scatterlist
++ *	for scatterlist chaining purposes
++ * @gfp: Memory allocation flags
++ * @nent_p: [out] Number of entries in the scatterlist that have pages
++ *
++ * Returns: A pointer to an initialized scatterlist or %NULL upon failure.
++ */
++struct scatterlist *sgl_alloc_order(unsigned long long length,
++				    unsigned int order, bool chainable,
++				    gfp_t gfp, unsigned int *nent_p)
++{
++	struct scatterlist *sgl, *sg;
++	struct page *page;
++	unsigned int nent, nalloc;
++	u32 elem_len;
++
++	nent = round_up(length, PAGE_SIZE << order) >> (PAGE_SHIFT + order);
++	/* Check for integer overflow */
++	if (length > (nent << (PAGE_SHIFT + order)))
++		return NULL;
++	nalloc = nent;
++	if (chainable) {
++		/* Check for integer overflow */
++		if (nalloc + 1 < nalloc)
++			return NULL;
++		nalloc++;
 +	}
++	sgl = kmalloc_array(nalloc, sizeof(struct scatterlist),
++			    (gfp & ~GFP_DMA) | __GFP_ZERO);
++	if (!sgl)
++		return NULL;
 +
-+	nvmeq->sq_cmds = NULL;
++	sg_init_table(sgl, nent);
++	sg = sgl;
++	while (length) {
++		elem_len = min_t(u64, length, PAGE_SIZE << order);
++		page = alloc_pages(gfp, order);
++		if (!page) {
++			sgl_free(sgl);
++			return NULL;
++		}
 +
- 	kfree(nvmeq);
- }
- 
-@@ -1369,18 +1378,24 @@ static int nvme_cmb_qdepth(struct nvme_dev *dev, int nr_io_queues,
- static int nvme_alloc_sq_cmds(struct nvme_dev *dev, struct nvme_queue *nvmeq,
- 				int qid, int depth)
- {
--	if (qid && dev->cmb && use_cmb_sqes && (dev->cmbsz & NVME_CMBSZ_SQS)) {
--		unsigned offset = (qid - 1) * roundup(SQ_SIZE(depth),
--						      dev->ctrl.page_size);
--		nvmeq->sq_dma_addr = dev->cmb_bus_addr + offset;
--		nvmeq->sq_cmds_io = dev->cmb + offset;
--	} else {
-+	struct pci_dev *pdev = to_pci_dev(dev->dev);
-+
-+	if (qid && dev->cmb_use_sqes) {
-+		nvmeq->sq_cmds = pci_alloc_p2pmem(pdev, SQ_SIZE(depth));
-+		nvmeq->sq_dma_addr = pci_p2pmem_virt_to_bus(pdev,
-+							    nvmeq->sq_cmds);
-+		nvmeq->sq_cmds_is_io = true;
++		sg_set_page(sg, page, elem_len, 0);
++		length -= elem_len;
++		sg = sg_next(sg);
 +	}
++	WARN_ON_ONCE(sg);
++	if (nent_p)
++		*nent_p = nent;
++	return sgl;
++}
++EXPORT_SYMBOL(sgl_alloc_order);
 +
-+	if (!nvmeq->sq_cmds) {
- 		nvmeq->sq_cmds = dma_alloc_coherent(dev->dev, SQ_SIZE(depth),
- 					&nvmeq->sq_dma_addr, GFP_KERNEL);
--		if (!nvmeq->sq_cmds)
--			return -ENOMEM;
-+		nvmeq->sq_cmds_is_io = false;
- 	}
- 
-+	if (!nvmeq->sq_cmds)
-+		return -ENOMEM;
++/**
++ * sgl_alloc - allocate a scatterlist and its pages
++ * @length: Length in bytes of the scatterlist
++ * @gfp: Memory allocation flags
++ * @nent_p: [out] Number of entries in the scatterlist
++ *
++ * Returns: A pointer to an initialized scatterlist or %NULL upon failure.
++ */
++struct scatterlist *sgl_alloc(unsigned long long length, gfp_t gfp,
++			      unsigned int *nent_p)
++{
++	return sgl_alloc_order(length, 0, false, gfp, nent_p);
++}
++EXPORT_SYMBOL(sgl_alloc);
 +
- 	return 0;
- }
- 
-@@ -1687,9 +1702,6 @@ static void nvme_map_cmb(struct nvme_dev *dev)
- 		return;
- 	dev->cmbloc = readl(dev->bar + NVME_REG_CMBLOC);
- 
--	if (!use_cmb_sqes)
--		return;
--
- 	size = nvme_cmb_size_unit(dev) * nvme_cmb_size(dev);
- 	offset = nvme_cmb_size_unit(dev) * NVME_CMB_OFST(dev->cmbloc);
- 	bar = NVME_CMB_BIR(dev->cmbloc);
-@@ -1706,11 +1718,15 @@ static void nvme_map_cmb(struct nvme_dev *dev)
- 	if (size > bar_size - offset)
- 		size = bar_size - offset;
- 
--	dev->cmb = ioremap_wc(pci_resource_start(pdev, bar) + offset, size);
--	if (!dev->cmb)
-+	if (pci_p2pmem_add_resource(pdev, bar, size, offset))
- 		return;
--	dev->cmb_bus_addr = pci_bus_address(pdev, bar) + offset;
++/**
++ * sgl_free_order - free a scatterlist and its pages
++ * @sgl: Scatterlist with one or more elements
++ * @order: Second argument for __free_pages()
++ */
++void sgl_free_order(struct scatterlist *sgl, int order)
++{
++	struct scatterlist *sg;
++	struct page *page;
 +
- 	dev->cmb_size = size;
-+	dev->cmb_use_sqes = use_cmb_sqes && (dev->cmbsz & NVME_CMBSZ_SQS);
++	for (sg = sgl; sg; sg = sg_next(sg)) {
++		page = sg_page(sg);
++		if (page)
++			__free_pages(page, order);
++	}
++	kfree(sgl);
++}
++EXPORT_SYMBOL(sgl_free_order);
 +
-+	if ((dev->cmbsz & (NVME_CMBSZ_WDS | NVME_CMBSZ_RDS)) ==
-+			(NVME_CMBSZ_WDS | NVME_CMBSZ_RDS))
-+		pci_p2pmem_publish(pdev, true);
- 
- 	if (sysfs_add_file_to_group(&dev->ctrl.device->kobj,
- 				    &dev_attr_cmb.attr, NULL))
-@@ -1720,12 +1736,10 @@ static void nvme_map_cmb(struct nvme_dev *dev)
- 
- static inline void nvme_release_cmb(struct nvme_dev *dev)
- {
--	if (dev->cmb) {
--		iounmap(dev->cmb);
--		dev->cmb = NULL;
-+	if (dev->cmb_size) {
- 		sysfs_remove_file_from_group(&dev->ctrl.device->kobj,
- 					     &dev_attr_cmb.attr, NULL);
--		dev->cmbsz = 0;
-+		dev->cmb_size = 0;
- 	}
- }
- 
-@@ -1920,13 +1934,13 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
- 	if (nr_io_queues == 0)
- 		return 0;
- 
--	if (dev->cmb && (dev->cmbsz & NVME_CMBSZ_SQS)) {
-+	if (dev->cmb_use_sqes) {
- 		result = nvme_cmb_qdepth(dev, nr_io_queues,
- 				sizeof(struct nvme_command));
- 		if (result > 0)
- 			dev->q_depth = result;
- 		else
--			nvme_release_cmb(dev);
-+			dev->cmb_use_sqes = false;
- 	}
- 
- 	do {
++/**
++ * sgl_free - free a scatterlist and its pages
++ * @sgl: Scatterlist with one or more elements
++ */
++void sgl_free(struct scatterlist *sgl)
++{
++	sgl_free_order(sgl, 0);
++}
++EXPORT_SYMBOL(sgl_free);
++
++#endif /* CONFIG_SGL_ALLOC */
++
+ void __sg_page_iter_start(struct sg_page_iter *piter,
+ 			  struct scatterlist *sglist, unsigned int nents,
+ 			  unsigned long pgoffset)
 -- 
-2.11.0
+2.15.1
