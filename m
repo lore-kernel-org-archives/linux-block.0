@@ -1,46 +1,37 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:45407 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752082AbeAENRG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jan 2018 08:17:06 -0500
-Received: by mail-wm0-f66.google.com with SMTP id 9so2389079wme.4
-        for <linux-block@vger.kernel.org>; Fri, 05 Jan 2018 05:17:06 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 25/25] lightnvm: pblk: refactor pblk_ppa_comp function
-Date: Fri,  5 Jan 2018 14:16:21 +0100
-Message-Id: <20180105131621.20808-26-m@bjorling.me>
-In-Reply-To: <20180105131621.20808-1-m@bjorling.me>
-References: <20180105131621.20808-1-m@bjorling.me>
+Return-Path: <james.smart@broadcom.com>
+Return-Path: <james.smart@broadcom.com>
+Subject: Re: [PATCH v4 3/5] nvmet/fc: Use sgl_alloc() and sgl_free()
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>, linux-nvme@lists.infradead.org,
+ Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>
+References: <20180105162650.31083-1-bart.vanassche@wdc.com>
+ <20180105162650.31083-4-bart.vanassche@wdc.com>
+From: James Smart <james.smart@broadcom.com>
+Message-ID: <b456f605-76e4-d47a-d525-7176a78103e6@broadcom.com>
+Date: Fri, 5 Jan 2018 08:33:35 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180105162650.31083-4-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-Shorten function to simply return the value of the if statement.
+On 1/5/2018 8:26 AM, Bart Van Assche wrote:
+> Use the sgl_alloc() and sgl_free() functions instead of open coding
+> these functions.
+>
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+> Reviewed-by: Hannes Reinecke <hare@suse.com>
+> Cc: Keith Busch <keith.busch@intel.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: James Smart <james.smart@broadcom.com>
+> Cc: Sagi Grimberg <sagi@grimberg.me>
+> ---
+>   drivers/nvme/target/Kconfig |  1 +
+>   drivers/nvme/target/fc.c    | 36 ++----------------------------------
+>   2 files changed, 3 insertions(+), 34 deletions(-)
 
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/lightnvm/pblk.h | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+Reviewed-by:  James Smart <james.smart@broadcom.com>
 
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 8af374e..8c357fb 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -1047,10 +1047,7 @@ static inline void pblk_ppa_set_empty(struct ppa_addr *ppa_addr)
- 
- static inline bool pblk_ppa_comp(struct ppa_addr lppa, struct ppa_addr rppa)
- {
--	if (lppa.ppa == rppa.ppa)
--		return true;
--
--	return false;
-+	return (lppa.ppa == rppa.ppa);
- }
- 
- static inline int pblk_addr_in_cache(struct ppa_addr ppa)
--- 
-2.9.3
+-- james
