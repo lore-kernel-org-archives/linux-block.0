@@ -1,212 +1,262 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX/IMPROVEMENT 2/2] block, bfq: limit sectors served with interactive weight raising
-Date: Sat, 13 Jan 2018 12:05:18 +0100
-Message-Id: <20180113110518.2519-3-paolo.valente@linaro.org>
-In-Reply-To: <20180113110518.2519-1-paolo.valente@linaro.org>
-References: <20180113110518.2519-1-paolo.valente@linaro.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:39431 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751977AbeAENQy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jan 2018 08:16:54 -0500
+Received: by mail-wm0-f65.google.com with SMTP id i11so2418556wmf.4
+        for <linux-block@vger.kernel.org>; Fri, 05 Jan 2018 05:16:53 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 13/25] lightnvm: pblk: rename sync_point to flush_point
+Date: Fri,  5 Jan 2018 14:16:09 +0100
+Message-Id: <20180105131621.20808-14-m@bjorling.me>
+In-Reply-To: <20180105131621.20808-1-m@bjorling.me>
+References: <20180105131621.20808-1-m@bjorling.me>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-To maximise responsiveness, BFQ raises the weight, and performs device
-idling, for bfq_queues associated with processes deemed as
-interactive. In particular, weight raising has a maximum duration,
-equal to the time needed to start a large application. If a
-weight-raised process goes on doing I/O beyond this maximum duration,
-it loses weight-raising.
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-This mechanism is evidently vulnerable to the following false
-positives: I/O-bound applications that will go on doing I/O for much
-longer than the duration of weight-raising. These applications have
-basically no benefit from being weight-raised at the beginning of
-their I/O. On the opposite end, while being weight-raised, these
-applications
-a) unjustly steal throughput to applications that may truly need
-low latency;
-b) make BFQ uselessly perform device idling; device idling results
-in loss of device throughput with most flash-based storage, and may
-increase latencies when used purposelessly.
+Sync point is a really confusing name for keeping track of
+the last entry that needs to be flushed so change the name
+to to flush_point instead.
 
-This commit adds a countermeasure to reduce both the above
-problems. To introduce this countermeasure, we provide the following
-extra piece of information (full details in the comments added by this
-commit). During the start-up of the large application used as a
-reference to set the duration of weight-raising, involved processes
-transfer at most ~110K sectors each. Accordingly, a process initially
-deemed as interactive has no right to be weight-raised any longer,
-once transferred 110K sectors or more.
-
-Basing on this consideration, this commit early-ends weight-raising
-for a bfq_queue if the latter happens to have received an amount of
-service at least equal to 110K sectors (actually, a little bit more,
-to keep a safety margin). I/O-bound applications that reach a high
-throughput, such as file copy, get to this threshold much before the
-allowed weight-raising period finishes. Thus this early ending of
-weight-raising reduces the amount of time during which these
-applications cause the problems described above.
-
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Tested-by: Holger Hoffstätte <holger@applied-asynchrony.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- block/bfq-iosched.c | 81 +++++++++++++++++++++++++++++++++++++++++++++++------
- block/bfq-iosched.h |  5 ++++
- block/bfq-wf2q.c    |  3 ++
- 3 files changed, 80 insertions(+), 9 deletions(-)
+ drivers/lightnvm/pblk-rb.c    | 61 ++++++++++++++++++++++---------------------
+ drivers/lightnvm/pblk-write.c |  2 +-
+ drivers/lightnvm/pblk.h       |  6 ++---
+ 3 files changed, 35 insertions(+), 34 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 527bd2ccda51..93a97a7fe519 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -209,15 +209,17 @@ static struct kmem_cache *bfq_pool;
-  * interactive applications automatically, using the following formula:
-  * duration = (R / r) * T, where r is the peak rate of the device, and
-  * R and T are two reference parameters.
-- * In particular, R is the peak rate of the reference device (see below),
-- * and T is a reference time: given the systems that are likely to be
-- * installed on the reference device according to its speed class, T is
-- * about the maximum time needed, under BFQ and while reading two files in
-- * parallel, to load typical large applications on these systems.
-- * In practice, the slower/faster the device at hand is, the more/less it
-- * takes to load applications with respect to the reference device.
-- * Accordingly, the longer/shorter BFQ grants weight raising to interactive
-- * applications.
-+ * In particular, R is the peak rate of the reference device (see
-+ * below), and T is a reference time: given the systems that are
-+ * likely to be installed on the reference device according to its
-+ * speed class, T is about the maximum time needed, under BFQ and
-+ * while reading two files in parallel, to load typical large
-+ * applications on these systems (see the comments on
-+ * max_service_from_wr below, for more details on how T is obtained).
-+ * In practice, the slower/faster the device at hand is, the more/less
-+ * it takes to load applications with respect to the reference device.
-+ * Accordingly, the longer/shorter BFQ grants weight raising to
-+ * interactive applications.
-  *
-  * BFQ uses four different reference pairs (R, T), depending on:
-  * . whether the device is rotational or non-rotational;
-@@ -254,6 +256,60 @@ static int T_slow[2];
- static int T_fast[2];
- static int device_speed_thresh[2];
+diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
+index 62db408..941842e 100644
+--- a/drivers/lightnvm/pblk-rb.c
++++ b/drivers/lightnvm/pblk-rb.c
+@@ -54,7 +54,7 @@ int pblk_rb_init(struct pblk_rb *rb, struct pblk_rb_entry *rb_entry_base,
+ 	rb->seg_size = (1 << power_seg_sz);
+ 	rb->nr_entries = (1 << power_size);
+ 	rb->mem = rb->subm = rb->sync = rb->l2p_update = 0;
+-	rb->sync_point = EMPTY_ENTRY;
++	rb->flush_point = EMPTY_ENTRY;
  
-+/*
-+ * BFQ uses the above-detailed, time-based weight-raising mechanism to
-+ * privilege interactive tasks. This mechanism is vulnerable to the
-+ * following false positives: I/O-bound applications that will go on
-+ * doing I/O for much longer than the duration of weight
-+ * raising. These applications have basically no benefit from being
-+ * weight-raised at the beginning of their I/O. On the opposite end,
-+ * while being weight-raised, these applications
-+ * a) unjustly steal throughput to applications that may actually need
-+ * low latency;
-+ * b) make BFQ uselessly perform device idling; device idling results
-+ * in loss of device throughput with most flash-based storage, and may
-+ * increase latencies when used purposelessly.
-+ *
-+ * BFQ tries to reduce these problems, by adopting the following
-+ * countermeasure. To introduce this countermeasure, we need first to
-+ * finish explaining how the duration of weight-raising for
-+ * interactive tasks is computed.
-+ *
-+ * For a bfq_queue deemed as interactive, the duration of weight
-+ * raising is dynamically adjusted, as a function of the estimated
-+ * peak rate of the device, so as to be equal to the time needed to
-+ * execute the 'largest' interactive task we benchmarked so far. By
-+ * largest task, we mean the task for which each involved process has
-+ * to do more I/O than for any of the other tasks we benchmarked. This
-+ * reference interactive task is the start-up of LibreOffice Writer,
-+ * and in this task each process/bfq_queue needs to have at most ~110K
-+ * sectors transferred.
-+ *
-+ * This last piece of information enables BFQ to reduce the actual
-+ * duration of weight-raising for at least one class of I/O-bound
-+ * applications: those doing sequential or quasi-sequential I/O. An
-+ * example is file copy. In fact, once started, the main I/O-bound
-+ * processes of these applications usually consume the above 110K
-+ * sectors in much less time than the processes of an application that
-+ * is starting, because these I/O-bound processes will greedily devote
-+ * almost all their CPU cycles only to their target,
-+ * throughput-friendly I/O operations. This is even more true if BFQ
-+ * happens to be underestimating the device peak rate, and thus
-+ * overestimating the duration of weight raising. But, according to
-+ * our measurements, once transferred 110K sectors, these processes
-+ * have no right to be weight-raised any longer.
-+ *
-+ * Basing on the last consideration, BFQ ends weight-raising for a
-+ * bfq_queue if the latter happens to have received an amount of
-+ * service at least equal to the following constant. The constant is
-+ * set to slightly more than 110K, to have a minimum safety margin.
-+ *
-+ * This early ending of weight-raising reduces the amount of time
-+ * during which interactive false positives cause the two problems
-+ * described at the beginning of these comments.
-+ */
-+static const unsigned long max_service_from_wr = 120000;
-+
- #define RQ_BIC(rq)		icq_to_bic((rq)->elv.priv[0])
- #define RQ_BFQQ(rq)		((rq)->elv.priv[1])
+ 	spin_lock_init(&rb->w_lock);
+ 	spin_lock_init(&rb->s_lock);
+@@ -112,7 +112,7 @@ int pblk_rb_init(struct pblk_rb *rb, struct pblk_rb_entry *rb_entry_base,
+ 	up_write(&pblk_rb_lock);
  
-@@ -1352,6 +1408,7 @@ static void bfq_update_bfqq_wr_on_rq_arrival(struct bfq_data *bfqd,
- 	if (old_wr_coeff == 1 && wr_or_deserves_wr) {
- 		/* start a weight-raising period */
- 		if (interactive) {
-+			bfqq->service_from_wr = 0;
- 			bfqq->wr_coeff = bfqd->bfq_wr_coeff;
- 			bfqq->wr_cur_max_time = bfq_wr_duration(bfqd);
- 		} else {
-@@ -3665,6 +3722,12 @@ static void bfq_update_wr_data(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- 				bfqq->entity.prio_changed = 1;
- 			}
- 		}
-+		if (bfqq->wr_coeff > 1 &&
-+		    bfqq->wr_cur_max_time != bfqd->bfq_wr_rt_max_time &&
-+		    bfqq->service_from_wr > max_service_from_wr) {
-+			/* see comments on max_service_from_wr */
-+			bfq_bfqq_end_wr(bfqq);
-+		}
+ #ifdef CONFIG_NVM_DEBUG
+-	atomic_set(&rb->inflight_sync_point, 0);
++	atomic_set(&rb->inflight_flush_point, 0);
+ #endif
+ 
+ 	/*
+@@ -349,26 +349,26 @@ void pblk_rb_write_entry_gc(struct pblk_rb *rb, void *data,
+ 	smp_store_release(&entry->w_ctx.flags, flags);
+ }
+ 
+-static int pblk_rb_sync_point_set(struct pblk_rb *rb, struct bio *bio,
++static int pblk_rb_flush_point_set(struct pblk_rb *rb, struct bio *bio,
+ 				  unsigned int pos)
+ {
+ 	struct pblk_rb_entry *entry;
+-	unsigned int subm, sync_point;
++	unsigned int subm, flush_point;
+ 
+ 	subm = READ_ONCE(rb->subm);
+ 
+ #ifdef CONFIG_NVM_DEBUG
+-	atomic_inc(&rb->inflight_sync_point);
++	atomic_inc(&rb->inflight_flush_point);
+ #endif
+ 
+ 	if (pos == subm)
+ 		return 0;
+ 
+-	sync_point = (pos == 0) ? (rb->nr_entries - 1) : (pos - 1);
+-	entry = &rb->entries[sync_point];
++	flush_point = (pos == 0) ? (rb->nr_entries - 1) : (pos - 1);
++	entry = &rb->entries[flush_point];
+ 
+-	/* Protect syncs */
+-	smp_store_release(&rb->sync_point, sync_point);
++	/* Protect flush points */
++	smp_store_release(&rb->flush_point, flush_point);
+ 
+ 	if (!bio)
+ 		return 0;
+@@ -416,7 +416,7 @@ void pblk_rb_flush(struct pblk_rb *rb)
+ 	struct pblk *pblk = container_of(rb, struct pblk, rwb);
+ 	unsigned int mem = READ_ONCE(rb->mem);
+ 
+-	if (pblk_rb_sync_point_set(rb, NULL, mem))
++	if (pblk_rb_flush_point_set(rb, NULL, mem))
+ 		return;
+ 
+ 	pblk_write_should_kick(pblk);
+@@ -440,7 +440,7 @@ static int pblk_rb_may_write_flush(struct pblk_rb *rb, unsigned int nr_entries,
+ #ifdef CONFIG_NVM_DEBUG
+ 		atomic_long_inc(&pblk->nr_flush);
+ #endif
+-		if (pblk_rb_sync_point_set(&pblk->rwb, bio, mem))
++		if (pblk_rb_flush_point_set(&pblk->rwb, bio, mem))
+ 			*io_ret = NVM_IO_OK;
  	}
- 	/*
- 	 * To improve latency (for this or other queues), immediately
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index fcd941008127..350c39ae2896 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -337,6 +337,11 @@ struct bfq_queue {
- 	 * last transition from idle to backlogged.
- 	 */
- 	unsigned long service_from_backlogged;
-+	/*
-+	 * Cumulative service received from the @bfq_queue since its
-+	 * last transition to weight-raised state.
-+	 */
-+	unsigned long service_from_wr;
  
- 	/*
- 	 * Value of wr start time when switching to soft rt
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 4456eda34e48..4498c43245e2 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -838,6 +838,9 @@ void bfq_bfqq_served(struct bfq_queue *bfqq, int served)
- 	if (!bfqq->service_from_backlogged)
- 		bfqq->first_IO_time = jiffies;
+@@ -607,17 +607,18 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
+ 		}
  
-+	if (bfqq->wr_coeff > 1)
-+		bfqq->service_from_wr += served;
-+
- 	bfqq->service_from_backlogged += served;
- 	for_each_entity(entity) {
- 		st = bfq_entity_service_tree(entity);
+ 		if (flags & PBLK_FLUSH_ENTRY) {
+-			unsigned int sync_point;
++			unsigned int flush_point;
+ 
+-			sync_point = READ_ONCE(rb->sync_point);
+-			if (sync_point == pos) {
+-				/* Protect syncs */
+-				smp_store_release(&rb->sync_point, EMPTY_ENTRY);
++			flush_point = READ_ONCE(rb->flush_point);
++			if (flush_point == pos) {
++				/* Protect flush points */
++				smp_store_release(&rb->flush_point,
++							EMPTY_ENTRY);
+ 			}
+ 
+ 			flags &= ~PBLK_FLUSH_ENTRY;
+ #ifdef CONFIG_NVM_DEBUG
+-			atomic_dec(&rb->inflight_sync_point);
++			atomic_dec(&rb->inflight_flush_point);
+ #endif
+ 		}
+ 
+@@ -746,20 +747,20 @@ unsigned int pblk_rb_sync_advance(struct pblk_rb *rb, unsigned int nr_entries)
+ 	return sync;
+ }
+ 
+-unsigned int pblk_rb_sync_point_count(struct pblk_rb *rb)
++unsigned int pblk_rb_flush_point_count(struct pblk_rb *rb)
+ {
+-	unsigned int subm, sync_point;
++	unsigned int subm, flush_point;
+ 	unsigned int count;
+ 
+-	/* Protect syncs */
+-	sync_point = smp_load_acquire(&rb->sync_point);
+-	if (sync_point == EMPTY_ENTRY)
++	/* Protect flush points */
++	flush_point = smp_load_acquire(&rb->flush_point);
++	if (flush_point == EMPTY_ENTRY)
+ 		return 0;
+ 
+ 	subm = READ_ONCE(rb->subm);
+ 
+ 	/* The sync point itself counts as a sector to sync */
+-	count = pblk_rb_ring_count(sync_point, subm, rb->nr_entries) + 1;
++	count = pblk_rb_ring_count(flush_point, subm, rb->nr_entries) + 1;
+ 
+ 	return count;
+ }
+@@ -801,7 +802,7 @@ int pblk_rb_tear_down_check(struct pblk_rb *rb)
+ 
+ 	if ((rb->mem == rb->subm) && (rb->subm == rb->sync) &&
+ 				(rb->sync == rb->l2p_update) &&
+-				(rb->sync_point == EMPTY_ENTRY)) {
++				(rb->flush_point == EMPTY_ENTRY)) {
+ 		goto out;
+ 	}
+ 
+@@ -848,7 +849,7 @@ ssize_t pblk_rb_sysfs(struct pblk_rb *rb, char *buf)
+ 		queued_entries++;
+ 	spin_unlock_irq(&rb->s_lock);
+ 
+-	if (rb->sync_point != EMPTY_ENTRY)
++	if (rb->flush_point != EMPTY_ENTRY)
+ 		offset = scnprintf(buf, PAGE_SIZE,
+ 			"%u\t%u\t%u\t%u\t%u\t%u\t%u - %u/%u/%u - %d\n",
+ 			rb->nr_entries,
+@@ -857,14 +858,14 @@ ssize_t pblk_rb_sysfs(struct pblk_rb *rb, char *buf)
+ 			rb->sync,
+ 			rb->l2p_update,
+ #ifdef CONFIG_NVM_DEBUG
+-			atomic_read(&rb->inflight_sync_point),
++			atomic_read(&rb->inflight_flush_point),
+ #else
+ 			0,
+ #endif
+-			rb->sync_point,
++			rb->flush_point,
+ 			pblk_rb_read_count(rb),
+ 			pblk_rb_space(rb),
+-			pblk_rb_sync_point_count(rb),
++			pblk_rb_flush_point_count(rb),
+ 			queued_entries);
+ 	else
+ 		offset = scnprintf(buf, PAGE_SIZE,
+@@ -875,13 +876,13 @@ ssize_t pblk_rb_sysfs(struct pblk_rb *rb, char *buf)
+ 			rb->sync,
+ 			rb->l2p_update,
+ #ifdef CONFIG_NVM_DEBUG
+-			atomic_read(&rb->inflight_sync_point),
++			atomic_read(&rb->inflight_flush_point),
+ #else
+ 			0,
+ #endif
+ 			pblk_rb_read_count(rb),
+ 			pblk_rb_space(rb),
+-			pblk_rb_sync_point_count(rb),
++			pblk_rb_flush_point_count(rb),
+ 			queued_entries);
+ 
+ 	return offset;
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index 6c30b7a..018af87 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -508,7 +508,7 @@ static int pblk_submit_write(struct pblk *pblk)
+ 	if (!secs_avail)
+ 		return 1;
+ 
+-	secs_to_flush = pblk_rb_sync_point_count(&pblk->rwb);
++	secs_to_flush = pblk_rb_flush_point_count(&pblk->rwb);
+ 	if (!secs_to_flush && secs_avail < pblk->min_write_pgs)
+ 		return 1;
+ 
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 8851b18..5f7cd6f 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -166,7 +166,7 @@ struct pblk_rb {
+ 					 * the last submitted entry that has
+ 					 * been successfully persisted to media
+ 					 */
+-	unsigned int sync_point;	/* Sync point - last entry that must be
++	unsigned int flush_point;	/* Sync point - last entry that must be
+ 					 * flushed to the media. Used with
+ 					 * REQ_FLUSH and REQ_FUA
+ 					 */
+@@ -189,7 +189,7 @@ struct pblk_rb {
+ 	spinlock_t s_lock;		/* Sync lock */
+ 
+ #ifdef CONFIG_NVM_DEBUG
+-	atomic_t inflight_sync_point;	/* Not served REQ_FLUSH | REQ_FUA */
++	atomic_t inflight_flush_point;	/* Not served REQ_FLUSH | REQ_FUA */
+ #endif
+ };
+ 
+@@ -687,7 +687,7 @@ unsigned int pblk_rb_sync_advance(struct pblk_rb *rb, unsigned int nr_entries);
+ struct pblk_rb_entry *pblk_rb_sync_scan_entry(struct pblk_rb *rb,
+ 					      struct ppa_addr *ppa);
+ void pblk_rb_sync_end(struct pblk_rb *rb, unsigned long *flags);
+-unsigned int pblk_rb_sync_point_count(struct pblk_rb *rb);
++unsigned int pblk_rb_flush_point_count(struct pblk_rb *rb);
+ 
+ unsigned int pblk_rb_read_count(struct pblk_rb *rb);
+ unsigned int pblk_rb_sync_count(struct pblk_rb *rb);
 -- 
-2.15.1
+2.9.3
