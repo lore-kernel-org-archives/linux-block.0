@@ -1,50 +1,25 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:43825 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750749AbeACEjv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Jan 2018 23:39:51 -0500
-From: Zhai Zhaoxuan <kxuanobj@gmail.com>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: tang.junhui@zte.com.cn, Michael Lyle <mlyle@lyle.org>,
-        Zhai Zhaoxuan <kxuanobj@gmail.com>
-Subject: [PATCH] bcache: fix unmatched generic_end_io_acct() & generic_start_io_acct()
-Date: Wed,  3 Jan 2018 12:39:37 +0800
-Message-Id: <20180103043937.28235-1-kxuanobj@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH V2] block, bfq: remove batches of confusing ifdefs
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: linux-block <linux-block@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Ulf Hansson <ulf.hansson@linaro.org>, broonie@kernel.org,
+ linus.walleij@linaro.org, lucmiccio@gmail.com
+References: <20171204104205.3290-1-paolo.valente@linaro.org>
+ <2C37D091-F207-4E9E-B8A8-06BDCDF47A28@linaro.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <4f7bf566-c827-1c57-f895-3336aad7cfc1@kernel.dk>
+Date: Fri, 5 Jan 2018 09:33:27 -0700
+MIME-Version: 1.0
+In-Reply-To: <2C37D091-F207-4E9E-B8A8-06BDCDF47A28@linaro.org>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-The function cached_dev_make_request() and flash_dev_make_request() call
-generic_start_io_acct() with (struct bcache_device)->disk when they start a
-closure. Then the function bio_complete() calls generic_end_io_acct() with
-(struct search)->orig_bio->bi_disk when the closure has done.
-Since the `bi_disk` is not the bcache device, the generic_end_io_acct() is
-called with a wrong device queue.
+On 12/13/17 11:10 PM, Paolo Valente wrote:
+> Hi Jens,
+> do you think this version could be ok?
 
-It causes the "inflight" (in struct hd_struct) counter keep increasing
-without decreasing.
+It's definitely an improvement. I will add it for 4.16.
 
-This patch fix the problem by calling generic_end_io_acct() with
-(struct bcache_device)->disk.
-
-Signed-off-by: Zhai Zhaoxuan <kxuanobj@gmail.com>
----
- drivers/md/bcache/request.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 643c3021624f..83de85fe4542 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -611,8 +611,8 @@ static void request_endio(struct bio *bio)
- static void bio_complete(struct search *s)
- {
- 	if (s->orig_bio) {
--		struct request_queue *q = s->orig_bio->bi_disk->queue;
--		generic_end_io_acct(q, bio_data_dir(s->orig_bio),
-+		generic_end_io_acct(s->d->disk->queue,
-+				    bio_data_dir(s->orig_bio),
- 				    &s->d->disk->part0, s->start_time);
- 
- 		trace_bcache_request_end(s->d, s->orig_bio);
 -- 
-2.15.1
+Jens Axboe
