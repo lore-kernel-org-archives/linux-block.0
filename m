@@ -1,96 +1,35 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:38163 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755746AbeAHHJU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 8 Jan 2018 02:09:20 -0500
+Received: from mail-qk0-f175.google.com ([209.85.220.175]:44363 "EHLO
+        mail-qk0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752209AbeAERJC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jan 2018 12:09:02 -0500
+Received: by mail-qk0-f175.google.com with SMTP id v188so6711671qkh.11
+        for <linux-block@vger.kernel.org>; Fri, 05 Jan 2018 09:09:02 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <1fcdcfe6-9fa0-a853-6b86-6049953815f6@suse.de>
+References: <20180103140325.63175-1-colyli@suse.de> <20180103140325.63175-2-colyli@suse.de>
+ <5cd9f028-366a-ba94-3bdf-0aefd5028c21@lyle.org> <1fcdcfe6-9fa0-a853-6b86-6049953815f6@suse.de>
+From: Michael Lyle <mlyle@lyle.org>
+Date: Fri, 5 Jan 2018 09:09:01 -0800
+Message-ID: <CAJ+L6qf9Xizpmkd1hzTraPFToAUKSgjFHXSUjE6C4dKsP8cxoQ@mail.gmail.com>
 Subject: Re: [PATCH v1 01/10] bcache: exit bch_writeback_thread() with proper
  task state
-To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, mlyle@lyle.org, tang.junhui@zte.com.cn
-References: <20180103140325.63175-1-colyli@suse.de>
- <20180103140325.63175-2-colyli@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <c4183dae-0381-f510-1929-410b9a7a2b9d@suse.de>
-Date: Mon, 8 Jan 2018 08:09:16 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180103140325.63175-2-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8
+To: Coly Li <colyli@suse.de>
+Cc: linux-bcache <linux-bcache@vger.kernel.org>,
+        linux-block@vger.kernel.org, Junhui Tang <tang.junhui@zte.com.cn>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 01/03/2018 03:03 PM, Coly Li wrote:
-> Kernel thread routine bch_writeback_thread() has the following code block,
-> 
-> 452                         set_current_state(TASK_INTERRUPTIBLE);
-> 453
-> 454                         if (kthread_should_stop())
-> 455                                 return 0;
-> 456
-> 457                         schedule();
-> 458                         continue;
-> 
-> At line 452, its status is set to TASK_INTERRUPTIBLE, and at line 454 if
-> kthread_should_stop() is true, a "return 0" at line 455 will to function
-> kernel/kthread.c:kthread() and call do_exit().
-> 
-> It is not good to enter do_exit() with task state TASK_INTERRUPTIBLE, in
-> following code path might_sleep() is called and a warning message is
-> reported by __might_sleep(): "WARNING: do not call blocking ops when
-> !TASK_RUNNING; state=1 set at [xxxx]".
-> 
-> Indeed it does not hurt when kernel thread exits with TASK_INTERRUPTIBLE
-> state, but this warning message scares users, makes them feel there might
-> be something risky with bcache and hurt their data.
-> 
-> In this patch, TASK_INTERRUPTIBLE is set after kthread_should_stop(),
-> so writeback kernel thread can exist and enter do_exit() with
-> TASK_RUNNING state. Warning message from might_sleep() is removed.
-> 
-> Signed-off-by: Coly Li <colyli@suse.de>
-> ---
->  drivers/md/bcache/writeback.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-> index 56a37884ca8b..a57149803df6 100644
-> --- a/drivers/md/bcache/writeback.c
-> +++ b/drivers/md/bcache/writeback.c
-> @@ -449,11 +449,11 @@ static int bch_writeback_thread(void *arg)
->  		    (!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags) &&
->  		     !dc->writeback_running)) {
->  			up_write(&dc->writeback_lock);
-> -			set_current_state(TASK_INTERRUPTIBLE);
->  
->  			if (kthread_should_stop())
->  				return 0;
->  
-> +			set_current_state(TASK_INTERRUPTIBLE);
->  			schedule();
->  			continue;
->  		}
-> 
-Actually, TASK_INTERRUPTIBLE is okay for kthread_should_stop(); you just
-need to set it to 'TASK_RUNNING' before calling 'return 0'.
+Coly---
 
-So I think a fix like
+On Fri, Jan 5, 2018 at 9:05 AM, Coly Li <colyli@suse.de> wrote:
+> It seems I need to call set_current_state(TASK_INTERRUPTIBLE) before
+> up_write(&dc->writeback_lock), then dc->writeback_lock will protect and
+> avoid the race. Or move set_current_state(TASK_INTERRUPTIBLE) to the
+> location before the condition checks in line 469-471.
 
-set_current_state(TASK_INTERRUPTIBLE);
+I think you're right.  Sorry I missed this in my review.  I will pull
+this from my testing/for-416 set.
 
-if (kthread_should_stop()) {
-    set_current_state(TASK_RUNNING);
-    return 0;
-}
-
-schedule();
-
-would be better.
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+Mike
