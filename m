@@ -1,37 +1,121 @@
-Return-Path: <james.smart@broadcom.com>
-Return-Path: <james.smart@broadcom.com>
-Subject: Re: [PATCH v4 3/5] nvmet/fc: Use sgl_alloc() and sgl_free()
-To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>,
- Herbert Xu <herbert@gondor.apana.org.au>, linux-nvme@lists.infradead.org,
- Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>
+Return-Path: <prvs=53600bcc8=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-nvme@lists.infradead.org,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Keith Busch <keith.busch@intel.com>,
+	James Smart <james.smart@broadcom.com>,
+	Sagi Grimberg <sagi@grimberg.me>
+Subject: [PATCH v4 3/5] nvmet/fc: Use sgl_alloc() and sgl_free()
+Date: Fri,  5 Jan 2018 08:26:48 -0800
+Message-Id: <20180105162650.31083-4-bart.vanassche@wdc.com>
+In-Reply-To: <20180105162650.31083-1-bart.vanassche@wdc.com>
 References: <20180105162650.31083-1-bart.vanassche@wdc.com>
- <20180105162650.31083-4-bart.vanassche@wdc.com>
-From: James Smart <james.smart@broadcom.com>
-Message-ID: <b456f605-76e4-d47a-d525-7176a78103e6@broadcom.com>
-Date: Fri, 5 Jan 2018 08:33:35 -0800
-MIME-Version: 1.0
-In-Reply-To: <20180105162650.31083-4-bart.vanassche@wdc.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On 1/5/2018 8:26 AM, Bart Van Assche wrote:
-> Use the sgl_alloc() and sgl_free() functions instead of open coding
-> these functions.
->
-> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-> Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-> Reviewed-by: Hannes Reinecke <hare@suse.com>
-> Cc: Keith Busch <keith.busch@intel.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: James Smart <james.smart@broadcom.com>
-> Cc: Sagi Grimberg <sagi@grimberg.me>
-> ---
->   drivers/nvme/target/Kconfig |  1 +
->   drivers/nvme/target/fc.c    | 36 ++----------------------------------
->   2 files changed, 3 insertions(+), 34 deletions(-)
+Use the sgl_alloc() and sgl_free() functions instead of open coding
+these functions.
 
-Reviewed-by:  James Smart <james.smart@broadcom.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Cc: Keith Busch <keith.busch@intel.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: James Smart <james.smart@broadcom.com>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+---
+ drivers/nvme/target/Kconfig |  1 +
+ drivers/nvme/target/fc.c    | 36 ++----------------------------------
+ 2 files changed, 3 insertions(+), 34 deletions(-)
 
--- james
+diff --git a/drivers/nvme/target/Kconfig b/drivers/nvme/target/Kconfig
+index 03e4ab65fe77..4d9715630e21 100644
+--- a/drivers/nvme/target/Kconfig
++++ b/drivers/nvme/target/Kconfig
+@@ -39,6 +39,7 @@ config NVME_TARGET_FC
+ 	tristate "NVMe over Fabrics FC target driver"
+ 	depends on NVME_TARGET
+ 	depends on HAS_DMA
++	select SGL_ALLOC
+ 	help
+ 	  This enables the NVMe FC target support, which allows exporting NVMe
+ 	  devices over FC.
+diff --git a/drivers/nvme/target/fc.c b/drivers/nvme/target/fc.c
+index 5fd86039e353..840d1a39de33 100644
+--- a/drivers/nvme/target/fc.c
++++ b/drivers/nvme/target/fc.c
+@@ -1697,31 +1697,12 @@ static int
+ nvmet_fc_alloc_tgt_pgs(struct nvmet_fc_fcp_iod *fod)
+ {
+ 	struct scatterlist *sg;
+-	struct page *page;
+ 	unsigned int nent;
+-	u32 page_len, length;
+-	int i = 0;
+ 
+-	length = fod->req.transfer_len;
+-	nent = DIV_ROUND_UP(length, PAGE_SIZE);
+-	sg = kmalloc_array(nent, sizeof(struct scatterlist), GFP_KERNEL);
++	sg = sgl_alloc(fod->req.transfer_len, GFP_KERNEL, &nent);
+ 	if (!sg)
+ 		goto out;
+ 
+-	sg_init_table(sg, nent);
+-
+-	while (length) {
+-		page_len = min_t(u32, length, PAGE_SIZE);
+-
+-		page = alloc_page(GFP_KERNEL);
+-		if (!page)
+-			goto out_free_pages;
+-
+-		sg_set_page(&sg[i], page, page_len, 0);
+-		length -= page_len;
+-		i++;
+-	}
+-
+ 	fod->data_sg = sg;
+ 	fod->data_sg_cnt = nent;
+ 	fod->data_sg_cnt = fc_dma_map_sg(fod->tgtport->dev, sg, nent,
+@@ -1731,14 +1712,6 @@ nvmet_fc_alloc_tgt_pgs(struct nvmet_fc_fcp_iod *fod)
+ 
+ 	return 0;
+ 
+-out_free_pages:
+-	while (i > 0) {
+-		i--;
+-		__free_page(sg_page(&sg[i]));
+-	}
+-	kfree(sg);
+-	fod->data_sg = NULL;
+-	fod->data_sg_cnt = 0;
+ out:
+ 	return NVME_SC_INTERNAL;
+ }
+@@ -1746,18 +1719,13 @@ nvmet_fc_alloc_tgt_pgs(struct nvmet_fc_fcp_iod *fod)
+ static void
+ nvmet_fc_free_tgt_pgs(struct nvmet_fc_fcp_iod *fod)
+ {
+-	struct scatterlist *sg;
+-	int count;
+-
+ 	if (!fod->data_sg || !fod->data_sg_cnt)
+ 		return;
+ 
+ 	fc_dma_unmap_sg(fod->tgtport->dev, fod->data_sg, fod->data_sg_cnt,
+ 				((fod->io_dir == NVMET_FCP_WRITE) ?
+ 					DMA_FROM_DEVICE : DMA_TO_DEVICE));
+-	for_each_sg(fod->data_sg, sg, fod->data_sg_cnt, count)
+-		__free_page(sg_page(sg));
+-	kfree(fod->data_sg);
++	sgl_free(fod->data_sg);
+ 	fod->data_sg = NULL;
+ 	fod->data_sg_cnt = 0;
+ }
+-- 
+2.15.1
