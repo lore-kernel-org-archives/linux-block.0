@@ -1,98 +1,43 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.15.4]:54491 "EHLO mout.web.de"
+Received: from mx2.suse.de ([195.135.220.15]:42078 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752131AbeA3BnL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Jan 2018 20:43:11 -0500
-From: Jiri Palecek <jpalecek@web.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [2/2] block: fix blk_rq_append_bio
-References: <20171218074044.1369-3-ming.lei@redhat.com>
-Date: Tue, 30 Jan 2018 02:42:41 +0100
-In-Reply-To: <20171218074044.1369-3-ming.lei@redhat.com> (Ming Lei's message
-        of "Mon, 18 Dec 2017 15:40:44 +0800")
-Message-ID: <87tvv4p1f2.fsf@debian.i-did-not-set--mail-host-address--so-tickle-me>
+        id S1751364AbeAEEEh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 4 Jan 2018 23:04:37 -0500
+Subject: Re: [PATCH v1 00/10] cache device failure handling improvement
+To: Michael Lyle <mlyle@lyle.org>, linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, tang.junhui@zte.com.cn
+References: <20180103140325.63175-1-colyli@suse.de>
+ <e53e363e-740d-5974-d989-6bf2c3a37dac@lyle.org>
+ <d0c930bf-ea36-9fe5-3cce-b8f56e1b163e@suse.de>
+ <59499361-3823-1cfb-1306-c0ef16125e8d@lyle.org>
+From: Coly Li <colyli@suse.de>
+Message-ID: <5738e67e-9eed-34a7-c71b-29aa1265555f@suse.de>
+Date: Fri, 5 Jan 2018 12:04:26 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <59499361-3823-1cfb-1306-c0ef16125e8d@lyle.org>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hello,
+On 05/01/2018 1:46 AM, Michael Lyle wrote:
+> Coly--
+> 
+> On 01/03/2018 06:20 PM, Coly Li wrote:
+>> Thanks for doing this. When you test the patch set, please apply them
+>> together, because the bugs that the first 8 patches try to fix won't be
+>> triggered without applying the last 2 patches, especially the io_disable
+>> patch.
+> 
+> Eventually I will test & review the whole set, but I need to concentrate
+> on testing something for a first submission to 4.16.  So I've taken
+> 1,2,3 and 8 because they're easiest and have some benefit on their own
+> without 9 & 10.
+> 
+> This means that next pass through the review we'll at least have a few
+> fewer patches to look at, too.
 
-I see a problem with this patch:
+Hi Mike,
 
-Ming Lei <ming.lei@redhat.com> writes:
+Sure, I agree with you. Thanks :-)
 
-> From: Jens Axboe <axboe@kernel.dk>
->
-> Commit caa4b02476e3(blk-map: call blk_queue_bounce from blk_rq_append_bio)
-> moves blk_queue_bounce() into blk_rq_append_bio(), but don't consider
-> that the bounced bio becomes invisiable to caller since the parameter type is
-> 'struct bio *', which should have been 'struct bio **'.
->
-> This patch fixes this issue by passing 'struct bio **' to
-> blk_rq_append_bio(), then the bounced bio can be returned to caller.
->
-> Also failure handling is considered too.
->
-> Fixes: caa4b02476e3 ("blk-map: call blk_queue_bounce from blk_rq_append_bio")
-> Cc: Christoph Hellwig <hch@lst.de>
-> Reported-by: Michele Ballabio <barra_cuda@katamail.com>
-> (handling failure of blk_rq_append_bio(), only call bio_get() after
-> blk_rq_append_bio() returns OK)
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-map.c                    | 38 ++++++++++++++++++++++----------------
->  drivers/scsi/osd/osd_initiator.c   |  4 +++-
->  drivers/target/target_core_pscsi.c |  4 ++--
->  include/linux/blkdev.h             |  2 +-
->  4 files changed, 28 insertions(+), 20 deletions(-)
->
-> diff --git a/block/blk-map.c b/block/blk-map.c
-> index b21f8e86f120..d3a94719f03f 100644
-> --- a/block/blk-map.c
-> +++ b/block/blk-map.c
-> @@ -12,22 +12,29 @@
->  #include "blk.h"
->  
->  /*
-> - * Append a bio to a passthrough request.  Only works can be merged into
-> - * the request based on the driver constraints.
-> + * Append a bio to a passthrough request.  Only works if the bio can be merged
-> + * into the request based on the driver constraints.
->   */
-> -int blk_rq_append_bio(struct request *rq, struct bio *bio)
-> +int blk_rq_append_bio(struct request *rq, struct bio **bio)
->  {
-> -	blk_queue_bounce(rq->q, &bio);
-> +	struct bio *orig_bio = *bio;
-> +
-> +	blk_queue_bounce(rq->q, bio);
->  
->  	if (!rq->bio) {
-> -		blk_rq_bio_prep(rq->q, rq, bio);
-> +		blk_rq_bio_prep(rq->q, rq, *bio);
->  	} else {
-> -		if (!ll_back_merge_fn(rq->q, rq, bio))
-> +		if (!ll_back_merge_fn(rq->q, rq, *bio)) {
-> +			if (orig_bio != *bio) {
-> +				bio_put(*bio);
-> +				*bio = orig_bio;
-
-1) Suppose the bio *does* bounce, which allocates some pages from the
-DMA pool, and subsequently this test fails. bio_put won't deallocate
-those pages. Prior to caa4b02476e3, it would be done by bio_endio, which
-is IMHO the correct way to do it.
-
-2) What if the bio bounces and goes into the splitting path of
-__blk_queue_bounce. That would submit the request, which would be a
-problem should this test or some other later fail, cancelling the whole
-request.
-
-For 1, I will send a patch. As for 2, it would be a problem for a long
-time so I have a hunch it doesn't actually happen, however, I'd like to
-know if it is somehow guaranteed.
-
-Regards
-    Jiri Palecek
+Coly Li
