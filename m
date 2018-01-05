@@ -1,67 +1,124 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:46944 "EHLO
-        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752855AbeASDJY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Jan 2018 22:09:24 -0500
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block <linux-block@vger.kernel.org>,
-        device-mapper development <dm-devel@redhat.com>,
-        Shaohua Li <shli@kernel.org>,
-        Mike Snitzer <snitzer@redhat.com>, caspar@linux.alibaba.com
-From: Joseph Qi <joseph.qi@linux.alibaba.com>
-Subject: [PATCH v3 RESEND 2/2] blk-throttle: fix wrong initialization in case
- of dm device
-Message-ID: <d644ea70-4130-7cbb-fdd8-240a77481f9f@linux.alibaba.com>
-Date: Fri, 19 Jan 2018 11:09:18 +0800
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:40247 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751963AbeAENQx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jan 2018 08:16:53 -0500
+Received: by mail-wm0-f67.google.com with SMTP id f206so2405695wmf.5
+        for <linux-block@vger.kernel.org>; Fri, 05 Jan 2018 05:16:52 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 12/25] lightnvm: pblk: refactor emeta consistency check
+Date: Fri,  5 Jan 2018 14:16:08 +0100
+Message-Id: <20180105131621.20808-13-m@bjorling.me>
+In-Reply-To: <20180105131621.20808-1-m@bjorling.me>
+References: <20180105131621.20808-1-m@bjorling.me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Joseph Qi <joseph.qi@linux.alibaba.com>
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-DM device sets QUEUE_FLAG_NONROT after the queue is registered. That is
-to mean, the previous initialization in blk_throtl_register_queue is
-wrong in this case.
-Fix it by checking and then updating the info during root tg
-initialization as we don't have a better choice.
+Currently pblk_recov_get_lba list does two separate things:
+it checks the consistency of the emeta and extracts the lba list.
 
-Signed-off-by: Joseph Qi <joseph.qi@linux.alibaba.com>
-Reviewed-by: Shaohua Li <shli@kernel.org>
+This patch separates the consistency check to make the code easier
+to read and to prepare for version checks of the line emeta
+persistent data format version.
+
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- block/blk-throttle.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ drivers/lightnvm/pblk-gc.c       |  9 ++++++++-
+ drivers/lightnvm/pblk-recovery.c | 15 ++++++++++-----
+ drivers/lightnvm/pblk.h          |  2 +-
+ 3 files changed, 19 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index bf52035..7150f14 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -541,6 +541,25 @@ static void throtl_pd_init(struct blkg_policy_data *pd)
- 	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && blkg->parent)
- 		sq->parent_sq = &blkg_to_tg(blkg->parent)->service_queue;
- 	tg->td = td;
+diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
+index 6f0ff2c..a270337 100644
+--- a/drivers/lightnvm/pblk-gc.c
++++ b/drivers/lightnvm/pblk-gc.c
+@@ -169,7 +169,14 @@ static void pblk_gc_line_prepare_ws(struct work_struct *work)
+ 	 * the line untouched. TODO: Implement a recovery routine that scans and
+ 	 * moves all sectors on the line.
+ 	 */
+-	lba_list = pblk_recov_get_lba_list(pblk, emeta_buf);
 +
-+#ifdef CONFIG_BLK_DEV_THROTTLING_LOW
-+	/*
-+	 * DM device sets QUEUE_FLAG_NONROT after the queue is registered,
-+	 * so the previous initialization is wrong in this case. Check and
-+	 * update it here.
-+	 */
-+	if (blk_queue_nonrot(blkg->q) &&
-+	    td->filtered_latency != LATENCY_FILTERED_SSD) {
-+		int i;
-+
-+		td->throtl_slice = DFL_THROTL_SLICE_SSD;
-+		td->filtered_latency = LATENCY_FILTERED_SSD;
-+		for (i = 0; i < LATENCY_BUCKET_SIZE; i++) {
-+			td->avg_buckets[READ][i].latency = 0;
-+			td->avg_buckets[WRITE][i].latency = 0;
-+		}
++	ret = pblk_recov_check_emeta(pblk, emeta_buf);
++	if (ret) {
++		pr_err("pblk: inconsistent emeta (line %d)\n", line->id);
++		goto fail_free_emeta;
 +	}
-+#endif
++
++	lba_list = emeta_to_lbas(pblk, emeta_buf);
+ 	if (!lba_list) {
+ 		pr_err("pblk: could not interpret emeta (line %d)\n", line->id);
+ 		goto fail_free_emeta;
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index 1b272ae..39a2e19 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -111,18 +111,18 @@ int pblk_recov_setup_rq(struct pblk *pblk, struct pblk_c_ctx *c_ctx,
+ 	return 0;
  }
  
- /*
+-__le64 *pblk_recov_get_lba_list(struct pblk *pblk, struct line_emeta *emeta_buf)
++int pblk_recov_check_emeta(struct pblk *pblk, struct line_emeta *emeta_buf)
+ {
+ 	u32 crc;
+ 
+ 	crc = pblk_calc_emeta_crc(pblk, emeta_buf);
+ 	if (le32_to_cpu(emeta_buf->crc) != crc)
+-		return NULL;
++		return 1;
+ 
+ 	if (le32_to_cpu(emeta_buf->header.identifier) != PBLK_MAGIC)
+-		return NULL;
++		return 1;
+ 
+-	return emeta_to_lbas(pblk, emeta_buf);
++	return 0;
+ }
+ 
+ static int pblk_recov_l2p_from_emeta(struct pblk *pblk, struct pblk_line *line)
+@@ -137,7 +137,7 @@ static int pblk_recov_l2p_from_emeta(struct pblk *pblk, struct pblk_line *line)
+ 	u64 nr_valid_lbas, nr_lbas = 0;
+ 	u64 i;
+ 
+-	lba_list = pblk_recov_get_lba_list(pblk, emeta_buf);
++	lba_list = emeta_to_lbas(pblk, emeta_buf);
+ 	if (!lba_list)
+ 		return 1;
+ 
+@@ -938,6 +938,11 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+ 			goto next;
+ 		}
+ 
++		if (pblk_recov_check_emeta(pblk, line->emeta->buf)) {
++			pblk_recov_l2p_from_oob(pblk, line);
++			goto next;
++		}
++
+ 		if (pblk_recov_l2p_from_emeta(pblk, line))
+ 			pblk_recov_l2p_from_oob(pblk, line);
+ 
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 1dbb0bf..8851b18 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -808,7 +808,7 @@ int pblk_submit_read_gc(struct pblk *pblk, struct pblk_gc_rq *gc_rq);
+ void pblk_submit_rec(struct work_struct *work);
+ struct pblk_line *pblk_recov_l2p(struct pblk *pblk);
+ int pblk_recov_pad(struct pblk *pblk);
+-__le64 *pblk_recov_get_lba_list(struct pblk *pblk, struct line_emeta *emeta);
++int pblk_recov_check_emeta(struct pblk *pblk, struct line_emeta *emeta);
+ int pblk_recov_setup_rq(struct pblk *pblk, struct pblk_c_ctx *c_ctx,
+ 			struct pblk_rec_ctx *recovery, u64 *comp_bits,
+ 			unsigned int comp);
 -- 
-1.9.4
+2.9.3
