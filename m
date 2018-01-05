@@ -1,56 +1,25 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-From: Tejun Heo <tj@kernel.org>
-To: jack@suse.cz,
-	axboe@kernel.dk,
-	clm@fb.com,
-	jbacik@fb.com
-Cc: kernel-team@fb.com,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	peterz@infradead.org,
-	jianchao.w.wang@oracle.com,
-	Bart.VanAssche@wdc.com,
-	linux-block@vger.kernel.org,
-	Tejun Heo <tj@kernel.org>
-Subject: [PATCH 2/8] blk-mq: protect completion path with RCU
-Date: Mon,  8 Jan 2018 11:15:36 -0800
-Message-Id: <20180108191542.379478-3-tj@kernel.org>
-In-Reply-To: <20180108191542.379478-1-tj@kernel.org>
-References: <20180108191542.379478-1-tj@kernel.org>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] blk-mq: remove confusing comment of
+ blk_mq_sched_dispatch_requests
+To: Liu Bo <bo.li.liu@oracle.com>, linux-block@vger.kernel.org
+Cc: trivial@kernel.org
+References: <20180105070906.29664-1-bo.li.liu@oracle.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <a4953449-3f6e-4bd7-24b6-06c3822e02d6@kernel.dk>
+Date: Fri, 5 Jan 2018 08:36:15 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180105070906.29664-1-bo.li.liu@oracle.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Currently, blk-mq protects only the issue path with RCU.  This patch
-puts the completion path under the same RCU protection.  This will be
-used to synchronize issue/completion against timeout by later patches,
-which will also add the comments.
+On 1/5/18 12:09 AM, Liu Bo wrote:
+> Commit de1482974080
+> ("blk-mq: introduce .get_budget and .put_budget in blk_mq_ops")
+> changes the function to return bool type, and then commit 1f460b63d4b3
+> ("blk-mq: don't restart queue when .get_budget returns BLK_STS_RESOURCE")
+> changes it back to void, but the comment remains.
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
----
- block/blk-mq.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Thanks, applied.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ddc9261..6741c3e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -584,11 +584,16 @@ static void hctx_lock(struct blk_mq_hw_ctx *hctx, int *srcu_idx)
- void blk_mq_complete_request(struct request *rq)
- {
- 	struct request_queue *q = rq->q;
-+	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, rq->mq_ctx->cpu);
-+	int srcu_idx;
- 
- 	if (unlikely(blk_should_fake_timeout(q)))
- 		return;
-+
-+	hctx_lock(hctx, &srcu_idx);
- 	if (!blk_mark_rq_complete(rq))
- 		__blk_mq_complete_request(rq);
-+	hctx_unlock(hctx, srcu_idx);
- }
- EXPORT_SYMBOL(blk_mq_complete_request);
- 
 -- 
-2.9.5
+Jens Axboe
