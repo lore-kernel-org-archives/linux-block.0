@@ -1,141 +1,101 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4159 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752922AbeAKECa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Jan 2018 23:02:30 -0500
-From: Hou Tao <houtao1@huawei.com>
-To: <linux-block@vger.kernel.org>
-CC: <axboe@kernel.dk>, <shli@fb.com>
-Subject: [PATCH] blktrace: support enabling cgroup info per-device
-Date: Thu, 11 Jan 2018 12:09:46 +0800
-Message-ID: <20180111040946.21674-1-houtao1@huawei.com>
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:37937 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751693AbeAENQn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jan 2018 08:16:43 -0500
+Received: by mail-wm0-f67.google.com with SMTP id 64so2415147wme.3
+        for <linux-block@vger.kernel.org>; Fri, 05 Jan 2018 05:16:42 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+Subject: [GIT PULL 03/25] lightnvm: use internal pblk methods
+Date: Fri,  5 Jan 2018 14:15:59 +0100
+Message-Id: <20180105131621.20808-4-m@bjorling.me>
+In-Reply-To: <20180105131621.20808-1-m@bjorling.me>
+References: <20180105131621.20808-1-m@bjorling.me>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Now blktrace supports outputting cgroup info for trace action and
-trace message, however, it can only be enabled globally by writing
-"blk_cgroup" to trace_options file, and there is no per-device API
-for the new functionality.
+Now that rrpc has been removed, the only users of the ppa helpers
+is pblk. However, pblk already defines similar functions.
 
-Adding a new field (enable_cg_info) by using the pad after act_mask
-in struct blk_user_trace_setup and a new attr file (cgroup_info) under
-/sys/block/$dev/trace dir, so BLKTRACESETUP ioctl and sysfs file
-can be used to enable cgroup info for selected block devices.
+Switch pblk to use the internal ones, and remove the generic ppa
+helpers.
 
-Signed-off-by: Hou Tao <houtao1@huawei.com>
+Signed-off-by: Matias Bjørling <m@bjorling.me>
 ---
- include/linux/blktrace_api.h      |  2 ++
- include/uapi/linux/blktrace_api.h |  1 +
- kernel/trace/blktrace.c           | 14 ++++++++++++--
- 3 files changed, 15 insertions(+), 2 deletions(-)
+ drivers/lightnvm/pblk-map.c   |  2 +-
+ drivers/lightnvm/pblk-write.c |  4 ++--
+ include/linux/lightnvm.h      | 19 -------------------
+ 3 files changed, 3 insertions(+), 22 deletions(-)
 
-diff --git a/include/linux/blktrace_api.h b/include/linux/blktrace_api.h
-index 8804753..f120c6a 100644
---- a/include/linux/blktrace_api.h
-+++ b/include/linux/blktrace_api.h
-@@ -18,6 +18,7 @@ struct blk_trace {
- 	unsigned long __percpu *sequence;
- 	unsigned char __percpu *msg_data;
- 	u16 act_mask;
-+	bool enable_cg_info;
- 	u64 start_lba;
- 	u64 end_lba;
- 	u32 pid;
-@@ -102,6 +103,7 @@ static inline int blk_trace_init_sysfs(struct device *dev)
- struct compat_blk_user_trace_setup {
- 	char name[BLKTRACE_BDEV_SIZE];
- 	u16 act_mask;
-+	u8  enable_cg_info;
- 	u32 buf_size;
- 	u32 buf_nr;
- 	compat_u64 start_lba;
-diff --git a/include/uapi/linux/blktrace_api.h b/include/uapi/linux/blktrace_api.h
-index 20d1490d..d9d9fca 100644
---- a/include/uapi/linux/blktrace_api.h
-+++ b/include/uapi/linux/blktrace_api.h
-@@ -136,6 +136,7 @@ enum {
- struct blk_user_trace_setup {
- 	char name[BLKTRACE_BDEV_SIZE];	/* output */
- 	__u16 act_mask;			/* input */
-+	__u8  enable_cg_info;   /* input */
- 	__u32 buf_size;			/* input */
- 	__u32 buf_nr;			/* input */
- 	__u64 start_lba;
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 987d9a9a..f420400 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -180,7 +180,8 @@ void __trace_note_message(struct blk_trace *bt, struct blkcg *blkcg,
- 	n = vscnprintf(buf, BLK_TN_MAX_MSG, fmt, args);
- 	va_end(args);
+diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
+index 6f3ecde..7445e64 100644
+--- a/drivers/lightnvm/pblk-map.c
++++ b/drivers/lightnvm/pblk-map.c
+@@ -146,7 +146,7 @@ void pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 		return;
  
--	if (!(blk_tracer_flags.val & TRACE_BLK_OPT_CGROUP))
-+	if (!((blk_tracer_flags.val & TRACE_BLK_OPT_CGROUP) ||
-+		  bt->enable_cg_info))
- 		blkcg = NULL;
- #ifdef CONFIG_BLK_CGROUP
- 	trace_note(bt, 0, BLK_TN_MESSAGE, buf, n,
-@@ -549,6 +550,7 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
- 	bt->act_mask = buts->act_mask;
- 	if (!bt->act_mask)
- 		bt->act_mask = (u16) -1;
-+	bt->enable_cg_info = buts->enable_cg_info;
+ 	/* Erase blocks that are bad in this line but might not be in next */
+-	if (unlikely(ppa_empty(*erase_ppa)) &&
++	if (unlikely(pblk_ppa_empty(*erase_ppa)) &&
+ 			bitmap_weight(d_line->blk_bitmap, lm->blk_per_line)) {
+ 		int bit = -1;
  
- 	blk_trace_setup_lba(bt, bdev);
+diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+index 6c1cafa..6c30b7a 100644
+--- a/drivers/lightnvm/pblk-write.c
++++ b/drivers/lightnvm/pblk-write.c
+@@ -439,7 +439,7 @@ static int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd)
+ 	struct pblk_line *meta_line;
+ 	int err;
  
-@@ -625,6 +627,7 @@ static int compat_blk_trace_setup(struct request_queue *q, char *name,
+-	ppa_set_empty(&erase_ppa);
++	pblk_ppa_set_empty(&erase_ppa);
  
- 	buts = (struct blk_user_trace_setup) {
- 		.act_mask = cbuts.act_mask,
-+		.enable_cg_info = cbuts.enable_cg_info,
- 		.buf_size = cbuts.buf_size,
- 		.buf_nr = cbuts.buf_nr,
- 		.start_lba = cbuts.start_lba,
-@@ -773,7 +776,8 @@ blk_trace_bio_get_cgid(struct request_queue *q, struct bio *bio)
- {
- 	struct blk_trace *bt = q->blk_trace;
- 
--	if (!bt || !(blk_tracer_flags.val & TRACE_BLK_OPT_CGROUP))
-+	if (!(bt && (bt->enable_cg_info ||
-+			 (blk_tracer_flags.val & TRACE_BLK_OPT_CGROUP))))
- 		return NULL;
- 
- 	if (!bio->bi_css)
-@@ -1664,6 +1668,7 @@ static BLK_TRACE_DEVICE_ATTR(act_mask);
- static BLK_TRACE_DEVICE_ATTR(pid);
- static BLK_TRACE_DEVICE_ATTR(start_lba);
- static BLK_TRACE_DEVICE_ATTR(end_lba);
-+static BLK_TRACE_DEVICE_ATTR(cgroup_info);
- 
- static struct attribute *blk_trace_attrs[] = {
- 	&dev_attr_enable.attr,
-@@ -1671,6 +1676,7 @@ static struct attribute *blk_trace_attrs[] = {
- 	&dev_attr_pid.attr,
- 	&dev_attr_start_lba.attr,
- 	&dev_attr_end_lba.attr,
-+	&dev_attr_cgroup_info.attr,
- 	NULL
- };
- 
-@@ -1794,6 +1800,8 @@ static ssize_t sysfs_blk_trace_attr_show(struct device *dev,
- 		ret = sprintf(buf, "%llu\n", q->blk_trace->start_lba);
- 	else if (attr == &dev_attr_end_lba)
- 		ret = sprintf(buf, "%llu\n", q->blk_trace->end_lba);
-+	else if (attr == &dev_attr_cgroup_info)
-+		ret = sprintf(buf, "%u\n", q->blk_trace->enable_cg_info);
- 
- out_unlock_bdev:
- 	mutex_unlock(&q->blk_trace_mutex);
-@@ -1861,6 +1869,8 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
- 			q->blk_trace->start_lba = value;
- 		else if (attr == &dev_attr_end_lba)
- 			q->blk_trace->end_lba = value;
-+		else if (attr == &dev_attr_cgroup_info)
-+			q->blk_trace->enable_cg_info = !!value;
+ 	/* Assign lbas to ppas and populate request structure */
+ 	err = pblk_setup_w_rq(pblk, rqd, &erase_ppa);
+@@ -457,7 +457,7 @@ static int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd)
+ 		return NVM_IO_ERR;
  	}
  
- out_unlock_bdev:
+-	if (!ppa_empty(erase_ppa)) {
++	if (!pblk_ppa_empty(erase_ppa)) {
+ 		/* Submit erase for next data line */
+ 		if (pblk_blk_erase_async(pblk, erase_ppa)) {
+ 			struct pblk_line *e_line = pblk_line_get_erase(pblk);
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 2d1d9de..14e274b 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -418,25 +418,6 @@ static inline struct ppa_addr dev_to_generic_addr(struct nvm_tgt_dev *tgt_dev,
+ 	return l;
+ }
+ 
+-static inline int ppa_empty(struct ppa_addr ppa_addr)
+-{
+-	return (ppa_addr.ppa == ADDR_EMPTY);
+-}
+-
+-static inline void ppa_set_empty(struct ppa_addr *ppa_addr)
+-{
+-	ppa_addr->ppa = ADDR_EMPTY;
+-}
+-
+-static inline int ppa_cmp_blk(struct ppa_addr ppa1, struct ppa_addr ppa2)
+-{
+-	if (ppa_empty(ppa1) || ppa_empty(ppa2))
+-		return 0;
+-
+-	return ((ppa1.g.ch == ppa2.g.ch) && (ppa1.g.lun == ppa2.g.lun) &&
+-					(ppa1.g.blk == ppa2.g.blk));
+-}
+-
+ typedef blk_qc_t (nvm_tgt_make_rq_fn)(struct request_queue *, struct bio *);
+ typedef sector_t (nvm_tgt_capacity_fn)(void *);
+ typedef void *(nvm_tgt_init_fn)(struct nvm_tgt_dev *, struct gendisk *,
 -- 
-2.9.5
+2.9.3
