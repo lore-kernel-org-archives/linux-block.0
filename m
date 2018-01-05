@@ -1,65 +1,83 @@
-Return-Path: <dvyukov@google.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Fri, 5 Jan 2018 12:05:06 -0500
+From: "J. Bruce Fields" <bfields@fieldses.org>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Theodore Ts'o <tytso@mit.edu>,
+        Byungchul Park <byungchul.park@lge.com>,
+        Byungchul Park <max.byungchul.park@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@kernel.org>, david@fromorbit.com,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Amir Goldstein <amir73il@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        oleg@redhat.com, kernel-team@lge.com, daniel@ffwll.ch
+Subject: Re: About the try to remove cross-release feature entirely by Ingo
+Message-ID: <20180105170506.GB4032@fieldses.org>
+References: <20171229014736.GA10341@X58A-UD3R>
+ <20171229035146.GA11757@thunk.org>
+ <20171229072851.GA12235@X58A-UD3R>
+ <20171230061624.GA27959@bombadil.infradead.org>
+ <20171230154041.GB3366@thunk.org>
+ <20171230204417.GF27959@bombadil.infradead.org>
+ <20171230224028.GC3366@thunk.org>
+ <20171230230057.GB12995@thunk.org>
+ <20180101101855.GA23567@bombadil.infradead.org>
+ <20180105164941.GA4032@fieldses.org>
 MIME-Version: 1.0
-From: Dmitry Vyukov <dvyukov@google.com>
-Date: Tue, 9 Jan 2018 17:05:24 +0100
-Message-ID: <CACT4Y+aqgtL37SkUAro4dKqxp4GynmfTLio1qGUbGTChFU7fpA@mail.gmail.com>
-Subject: scsi: memory leak in sg_start_req
-To: Doug Gilbert <dgilbert@interlog.com>, jejb@linux.vnet.ibm.com,
-	"Martin K. Petersen" <martin.petersen@oracle.com>, linux-scsi <linux-scsi@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, syzkaller <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180105164941.GA4032@fieldses.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Hello,
+On Fri, Jan 05, 2018 at 11:49:41AM -0500, bfields wrote:
+> On Mon, Jan 01, 2018 at 02:18:55AM -0800, Matthew Wilcox wrote:
+> > On Sat, Dec 30, 2017 at 06:00:57PM -0500, Theodore Ts'o wrote:
+> > > On Sat, Dec 30, 2017 at 05:40:28PM -0500, Theodore Ts'o wrote:
+> > > > On Sat, Dec 30, 2017 at 12:44:17PM -0800, Matthew Wilcox wrote:
+> > > > > 
+> > > > > I'm not sure I agree with this part.  What if we add a new TCP lock class
+> > > > > for connections which are used for filesystems/network block devices/...?
+> > > > > Yes, it'll be up to each user to set the lockdep classification correctly,
+> > > > > but that's a relatively small number of places to add annotations,
+> > > > > and I don't see why it wouldn't work.
+> > > > 
+> > > > I was exagerrating a bit for effect, I admit.  (but only a bit).
+> > 
+> > I feel like there's been rather too much of that recently.  Can we stick
+> > to facts as far as possible, please?
+> > 
+> > > > It can probably be for all TCP connections that are used by kernel
+> > > > code (as opposed to userspace-only TCP connections).  But it would
+> > > > probably have to be each and every device-mapper instance, each and
+> > > > every block device, each and every mounted file system, each and every
+> > > > bdi object, etc.
+> > > 
+> > > Clarification: all TCP connections that are used by kernel code would
+> > > need to be in their own separate lock class.  All TCP connections used
+> > > only by userspace could be in their own shared lock class.  You can't
+> > > use a one lock class for all kernel-used TCP connections, because of
+> > > the Network Block Device mounted on a local file system which is then
+> > > exported via NFS and squirted out yet another TCP connection problem.
+> > 
+> > So the false positive you're concerned about is write-comes-in-over-NFS
+> > (with socket lock held), NFS sends a write request to local filesystem,
+> 
+> I'm confused, what lock does Ted think the NFS server is holding over
+> NFS processing?
 
-syzkaller has found the following memory leak:
+Sorry, I meant "over RPC processing".
 
-unreferenced object 0xffff88004c190000 (size 8328):
-  comm "syz-executor", pid 4627, jiffies 4294749150 (age 45.507s)
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    20 00 00 00 22 01 00 00 00 00 00 00 04 00 00 00   ..."...........
-  backtrace:
-    [<000000005955b5a9>] kmalloc_order+0x59/0x80 mm/slab_common.c:1124
-    [<0000000043ae006e>] kmalloc_order_trace+0x1f/0x160 mm/slab_common.c:1133
-    [<00000000d33b2e16>] kmalloc_large include/linux/slab.h:433 [inline]
-    [<00000000d33b2e16>] __kmalloc+0x2c4/0x340 mm/slub.c:3751
-    [<00000000e7430040>] kmalloc include/linux/slab.h:504 [inline]
-    [<00000000e7430040>] bio_alloc_bioset+0x4d5/0x7e0 block/bio.c:450
-    [<00000000f370e717>] bio_kmalloc include/linux/bio.h:410 [inline]
-    [<00000000f370e717>] bio_copy_user_iov+0x2be/0xcb0 block/bio.c:1226
-    [<000000001d0b79ed>] __blk_rq_map_user_iov block/blk-map.c:67 [inline]
-    [<000000001d0b79ed>] blk_rq_map_user_iov+0x2b6/0x7d0 block/blk-map.c:136
-    [<000000004200a869>] blk_rq_map_user+0x11e/0x170 block/blk-map.c:166
-    [<000000008f21739e>] sg_start_req drivers/scsi/sg.c:1794 [inline]
-    [<000000008f21739e>] sg_common_write.isra.16+0x14df/0x1ed0
-drivers/scsi/sg.c:777
-    [<00000000093f61e3>] sg_write+0x8a7/0xd7b drivers/scsi/sg.c:677
-    [<00000000b67dafdc>] __vfs_write+0x10d/0x8f0 fs/read_write.c:480
-    [<000000000638f16f>] vfs_write+0x1fd/0x570 fs/read_write.c:544
-    [<000000006a7e6867>] SYSC_write fs/read_write.c:589 [inline]
-    [<000000006a7e6867>] SyS_write+0xfa/0x250 fs/read_write.c:581
+I'll confess to no understanding of socket locking.  The server RPC code
+doesn't take any itself except in a couple places on setup and tear
+down of a connection.  We wouldn't actually want any exclusive
+per-connection lock held across RPC processing because we want to be
+able to handle multiple concurrent RPCs per connection.
 
-can be reproduced with the following program:
+We do need a little locking just to make sure multiple server threads
+replying to the same client don't accidentally corrupt their replies by
+interleaving.  But even there we're using our own lock, held only while
+transmitting the reply (after all the work's done and reply encoded).
 
-// autogenerated by syzkaller (http://github.com/google/syzkaller)
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-
-int main()
-{
-  int fd = open("/dev/sg1", O_RDWR);
-  const char *data =
-         "\xb6\x3d\xb8\x5e\x1e\x8d\x22\x00\x00\x00\x00\x00\x00\x08\xaf\xd6\x1d"
-         "\xcc\x43\x6a\xed\x5e\xd2\xbc\x70\x18\xce\xbc\x9b\x97\xae\x21\x91\x4d"
-         "\x87\x2c\x67\x8c\xe2\x2c\x9b\x16\x0e\x96\xaa\x1f\xae\x1a";
-  write(fd, data, 0x30);
-  return 0;
-}
-
-if executed in a loop, memory consumption grows infinitely.
-
-on upstream commit b2cd1df66037e7c4697c7e40496bf7e4a5e16a2d
+--b.
