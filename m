@@ -1,46 +1,88 @@
-Return-Path: <rgoldwyn@suse.de>
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	axboe@kernel.dk,
-	ak@linux.intel.com,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH 2/2] xfs: remove assert to check bytes returned
-Date: Mon, 29 Jan 2018 08:57:41 -0600
-Message-Id: <20180129145741.29486-2-rgoldwyn@suse.de>
-In-Reply-To: <20180129145741.29486-1-rgoldwyn@suse.de>
-References: <20180129145741.29486-1-rgoldwyn@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:38078 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752575AbeAFJDN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 6 Jan 2018 04:03:13 -0500
+Date: Sat, 6 Jan 2018 17:02:54 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        reddot.rocks@gmail.com, linux-fsdevel@vger.kernel.org,
+        Stefan Haberland <sth@linux.vnet.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.vnet.ibm.com>,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH] block: loop: remove & invalidate partitions when
+ detaching
+Message-ID: <20180106090244.GA13472@ming.t460p>
+References: <20180104103924.8814-1-ming.lei@redhat.com>
+ <20180104123803.GA8437@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180104123803.GA8437@infradead.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+On Thu, Jan 04, 2018 at 04:38:03AM -0800, Christoph Hellwig wrote:
+> On Thu, Jan 04, 2018 at 06:39:24PM +0800, Ming Lei wrote:
+> > When detaching loop disk, neither we remove loop partitions, nor
+> > invalidate them. This way may cause data loss, and often confuse
+> > people.
+> > 
+> > This patch fixes the above issue by removing & invalidating loop
+> > partitions in loop_clr_fd(),
+> 
+> Please add a comment explaining the call (e.g. the weird loop
+> case of keeping unbound devices around).
 
-Since we can return less than count in case of partial direct
-writes, remove the ASSERT.
+OK.
 
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
-Acked-by: Dave Chinner <dchinner@redhat.com>
-Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
----
- fs/xfs/xfs_file.c | 6 ------
- 1 file changed, 6 deletions(-)
+> 
+> Also dasd seems to implement this functionality by iterating over
+> all partitions and then calling ioctl_by_bdev(bdev, BLKPG, ..) on
+> it.  Please switch it to you new helper assuming there is a good
+> reason to even do this to start with.  CCing the maintainers to
+> confirm that.
 
-diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-index 8601275cc5e6..8fc4dbf66910 100644
---- a/fs/xfs/xfs_file.c
-+++ b/fs/xfs/xfs_file.c
-@@ -590,12 +590,6 @@ xfs_file_dio_aio_write(
- 	ret = iomap_dio_rw(iocb, from, &xfs_iomap_ops, xfs_dio_write_end_io);
- out:
- 	xfs_iunlock(ip, iolock);
--
--	/*
--	 * No fallback to buffered IO on errors for XFS, direct IO will either
--	 * complete fully or fail.
--	 */
--	ASSERT(ret < 0 || ret == count);
- 	return ret;
- }
- 
+This patch doesn't consider to hold bdev lock, and loop's case can
+be a bit complicated since loop_clr_fd() can be called in release
+path. I will investigate a bit if it is possible to figure out a
+general helper to cover both.
+
+> 
+> And while you'e at it split the block and loop bits into separate
+> patches.
+
+OK.
+
+> 
+> > +void del_gendisk_partitions(struct gendisk *disk)
+> 
+> Add a comment explanining the function, please.
+
+OK.
+
+> 
+> >  	struct disk_part_iter piter;
+> >  	struct hd_struct *part;
+> >  
+> > -	blk_integrity_del(disk);
+> > -	disk_del_events(disk);
+> > -
+> >  	/* invalidate stuff */
+> >  	disk_part_iter_init(&piter, disk,
+> >  			     DISK_PITER_INCL_EMPTY | DISK_PITER_REVERSE);
+> > @@ -714,7 +711,17 @@ void del_gendisk(struct gendisk *disk)
+> >  	disk_part_iter_exit(&piter);
+> >  
+> >  	invalidate_partition(disk, 0);
+> > +}
+> > +EXPORT_SYMBOL(del_gendisk_partitions);
+> 
+> EXPORT_SYMBOL_GPL, please.
+
+OK.
+
 -- 
-2.16.1
+Ming
