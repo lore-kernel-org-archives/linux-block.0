@@ -1,67 +1,54 @@
-Return-Path: <rakesh@tuxera.com>
-Date: Mon, 8 Jan 2018 13:51:20 +0200
-From: Rakesh Pandit <rakesh@tuxera.com>
-To: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bart.vanassche@wdc.com>,
-	Omar Sandoval <osandov@fb.com>, Jan Kara <jack@suse.cz>
-Subject: [PATCH] block: remove unused return type for invalidate_partitions
-Message-ID: <20180108115119.GA3852@dhcp-108-107.ws.tuxera.com>
+Return-Path: <axboe@kernel.dk>
+Date: Sat, 6 Jan 2018 09:21:31 -0700
+From: Jens Axboe <axboe@kernel.dk>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH 00/10] block: cleanup on direct access to bvec
+ table(prepare for multipage bvec)
+Message-ID: <20180106162130.GB6343@kernel.dk>
+References: <20171208131409.11889-1-ming.lei@redhat.com>
+ <dd24b1c7-ac28-89dd-985a-bab54d8192c0@fb.com>
+ <20180106091800.GB13472@ming.t460p>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180106091800.GB13472@ming.t460p>
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Rakesh Pandit <rakesh@tuxera.com>
----
- block/partition-generic.c | 8 ++++----
- include/linux/genhd.h     | 3 ++-
- 2 files changed, 6 insertions(+), 5 deletions(-)
+On Sat, Jan 06 2018, Ming Lei wrote:
+> On Fri, Jan 05, 2018 at 12:02:10PM -0700, Jens Axboe wrote:
+> > On 12/8/17 6:13 AM, Ming Lei wrote:
+> > > Hi,
+> > > 
+> > > This patchse cleans up most of direct access to bvec table in tree, and
+> > > these patches are the follow-up of patch1 ~ 16 in the patchset of 'block:
+> > > support multipage bvec(V3)'[1]. 
+> > > 
+> > > Changes against [1]:
+> > > 1) split the cleanup patches from [1]
+> > > 2) address comments from Christoph:
+> > > 	- introduce bio helpers for dealing with the cleanup
+> > > 	- move bio_alloc_pages() to bcache
+> > > 
+> > > 
+> > > [1] https://marc.info/?t=150218197600001&r=1&w=2
+> > 
+> > Looks like good cleanups to me. I will apply this for 4.16, thanks.
+> 
+> Hi Jens,
+> 
+> Sorry for forgetting to update in this thread, the latest cleanup patchset
+> has been included into the following patchset of '[PATCH V4 00/45] block: support
+> multipage bvec' as patch 1 ~ 17: 
+> 
+> 	https://marc.info/?t=151359981400006&r=1&w=2
+> 
+> If possible, please revert this 10 patches in your block-tree, and apply
+> the whole patchset of '[PATCH V4 00/45] block: support multipage bvec'
+> on the above link, and the V4 is much more clean than before.
 
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index 91622db..8df0d03 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -623,16 +623,16 @@ int rescan_partitions(struct gendisk *disk, struct block_device *bdev)
- 	return 0;
- }
- 
--int invalidate_partitions(struct gendisk *disk, struct block_device *bdev)
-+void invalidate_partitions(struct gendisk *disk, struct block_device *bdev)
- {
- 	int res;
- 
- 	if (!bdev->bd_invalidated)
--		return 0;
-+		return;
- 
- 	res = drop_partitions(disk, bdev);
- 	if (res)
--		return res;
-+		return;
- 
- 	set_capacity(disk, 0);
- 	check_disk_size_change(disk, bdev);
-@@ -640,7 +640,7 @@ int invalidate_partitions(struct gendisk *disk, struct block_device *bdev)
- 	/* tell userspace that the media / partition table may have changed */
- 	kobject_uevent(&disk_to_dev(disk)->kobj, KOBJ_CHANGE);
- 
--	return 0;
-+	return;
- }
- 
- unsigned char *read_dev_sector(struct block_device *bdev, sector_t n, Sector *p)
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 5144ebe..683de33 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -584,7 +584,8 @@ extern char *disk_name (struct gendisk *hd, int partno, char *buf);
- 
- extern int disk_expand_part_tbl(struct gendisk *disk, int target);
- extern int rescan_partitions(struct gendisk *disk, struct block_device *bdev);
--extern int invalidate_partitions(struct gendisk *disk, struct block_device *bdev);
-+extern void invalidate_partitions(struct gendisk *disk, struct block_device
-+			*bdev);
- extern struct hd_struct * __must_check add_partition(struct gendisk *disk,
- 						     int partno, sector_t start,
- 						     sector_t len, int flags,
+OK, we can do that, even if I generally dislike doing it. I applied the
+first part of the series, I haven't had time to review the latter part,
+and others haven't either. So timing isn't great for 4.16.
+
 -- 
-2.5.5
+Jens Axboe
