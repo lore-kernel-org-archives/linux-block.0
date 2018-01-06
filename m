@@ -1,153 +1,115 @@
-Return-Path: <ming.lei@redhat.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:47634 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752450AbeAFI2L (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 6 Jan 2018 03:28:11 -0500
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Mike Snitzer <snitzer@redhat.com>,
-	dm-devel@redhat.com
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	linux-kernel@vger.kernel.org,
-	Omar Sandoval <osandov@fb.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [RFC PATCH] blk-mq: fixup RESTART when queue becomes idle
-Date: Thu, 18 Jan 2018 10:41:24 +0800
-Message-Id: <20180118024124.8079-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Yi Zhang <yi.zhang@redhat.com>, Ming Lei <ming.lei@redhat.com>,
+        stable@vger.kernel.org
+Subject: [PATCH V3 1/4] blk-mq: quiesce queue before freeing queue
+Date: Sat,  6 Jan 2018 16:27:37 +0800
+Message-Id: <20180106082740.26442-2-ming.lei@redhat.com>
+In-Reply-To: <20180106082740.26442-1-ming.lei@redhat.com>
+References: <20180106082740.26442-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-BLK_STS_RESOURCE can be returned from driver when any resource
-is running out of. And the resource may not be related with tags,
-such as kmalloc(GFP_ATOMIC), when queue is idle under this kind of
-BLK_STS_RESOURCE, restart can't work any more, then IO hang may
-be caused.
+After queue is frozen, dispatch still may happen, for example:
 
-Most of drivers may call kmalloc(GFP_ATOMIC) in IO path, and almost
-all returns BLK_STS_RESOURCE under this situation. But for dm-mpath,
-it may be triggered a bit easier since the request pool of underlying
-queue may be consumed up much easier. But in reality, it is still not
-easy to trigger it. I run all kinds of test on dm-mpath/scsi-debug
-with all kinds of scsi_debug parameters, can't trigger this issue
-at all. But finally it is triggered in Bart's SRP test, which seems
-made by genius, :-)
+1) requests are submitted from several contexts
+2) requests from all these contexts are inserted to queue, but may dispatch
+to LLD in one of these paths, but other paths sill need to move on even all
+these requests are completed(that means blk_mq_freeze_queue_wait() returns
+at that time)
+3) dispatch after queue freezing still moves on and causes use-after-free,
+because request queue is freed
 
-This patch deals with this situation by running the queue again when
-queue is found idle in timeout handler.
+This patch quiesces queue after it is frozen, and makes sure all
+in-progress dispatch are completed.
 
+This patch fixes the following kernel crash when running heavy IOs vs.
+deleting device:
+
+[   36.719251] BUG: unable to handle kernel NULL pointer dereference at 0000000000000008
+[   36.720318] IP: kyber_has_work+0x14/0x40
+[   36.720847] PGD 254bf5067 P4D 254bf5067 PUD 255e6a067 PMD 0
+[   36.721584] Oops: 0000 [#1] PREEMPT SMP
+[   36.722105] Dumping ftrace buffer:
+[   36.722570]    (ftrace buffer empty)
+[   36.723057] Modules linked in: scsi_debug ebtable_filter ebtables ip6table_filter ip6_tables tcm_loop iscsi_target_mod target_core_file target_core_iblock target_core_pscsi target_core_mod xt_CHECKSUM iptable_mangle ipt_MASQUERADE nf_nat_masquerade_ipv4 iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 nf_nat nf_conntrack libcrc32c bridge stp llc fuse iptable_filter ip_tables sd_mod sg btrfs xor zstd_decompress zstd_compress xxhash raid6_pq mptsas mptscsih bcache crc32c_intel ahci mptbase libahci serio_raw scsi_transport_sas nvme libata shpchp lpc_ich virtio_scsi nvme_core binfmt_misc dm_mod iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi null_blk configs
+[   36.733438] CPU: 2 PID: 2374 Comm: fio Not tainted 4.15.0-rc2.blk_mq_quiesce+ #714
+[   36.735143] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.9.3-1.fc25 04/01/2014
+[   36.736688] RIP: 0010:kyber_has_work+0x14/0x40
+[   36.737515] RSP: 0018:ffffc9000209bca0 EFLAGS: 00010202
+[   36.738431] RAX: 0000000000000008 RBX: ffff88025578bfc8 RCX: ffff880257bf4ed0
+[   36.739581] RDX: 0000000000000038 RSI: ffffffff81a98c6d RDI: ffff88025578bfc8
+[   36.740730] RBP: ffff880253cebfc8 R08: ffffc9000209bda0 R09: ffff8802554f3480
+[   36.741885] R10: ffffc9000209be60 R11: ffff880263f72538 R12: ffff88025573e9e8
+[   36.743036] R13: ffff88025578bfd0 R14: 0000000000000001 R15: 0000000000000000
+[   36.744189] FS:  00007f9b9bee67c0(0000) GS:ffff88027fc80000(0000) knlGS:0000000000000000
+[   36.746617] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   36.748483] CR2: 0000000000000008 CR3: 0000000254bf4001 CR4: 00000000003606e0
+[   36.750164] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[   36.751455] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[   36.752796] Call Trace:
+[   36.753992]  blk_mq_do_dispatch_sched+0x7f/0xe0
+[   36.755110]  blk_mq_sched_dispatch_requests+0x119/0x190
+[   36.756179]  __blk_mq_run_hw_queue+0x83/0x90
+[   36.757144]  __blk_mq_delay_run_hw_queue+0xaf/0x110
+[   36.758046]  blk_mq_run_hw_queue+0x24/0x70
+[   36.758845]  blk_mq_flush_plug_list+0x1e7/0x270
+[   36.759676]  blk_flush_plug_list+0xd6/0x240
+[   36.760463]  blk_finish_plug+0x27/0x40
+[   36.761195]  do_io_submit+0x19b/0x780
+[   36.761921]  ? entry_SYSCALL_64_fastpath+0x1a/0x7d
+[   36.762788]  entry_SYSCALL_64_fastpath+0x1a/0x7d
+[   36.763639] RIP: 0033:0x7f9b9699f697
+[   36.764352] RSP: 002b:00007ffc10f991b8 EFLAGS: 00000206 ORIG_RAX: 00000000000000d1
+[   36.765773] RAX: ffffffffffffffda RBX: 00000000008f6f00 RCX: 00007f9b9699f697
+[   36.766965] RDX: 0000000000a5e6c0 RSI: 0000000000000001 RDI: 00007f9b8462a000
+[   36.768377] RBP: 0000000000000000 R08: 0000000000000001 R09: 00000000008f6420
+[   36.769649] R10: 00007f9b846e5000 R11: 0000000000000206 R12: 00007f9b795d6a70
+[   36.770807] R13: 00007f9b795e4140 R14: 00007f9b795e3fe0 R15: 0000000100000000
+[   36.771955] Code: 83 c7 10 e9 3f 68 d1 ff 0f 1f 44 00 00 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 8b 97 b0 00 00 00 48 8d 42 08 48 83 c2 38 <48> 3b 00 74 06 b8 01 00 00 00 c3 48 3b 40 08 75 f4 48 83 c0 10
+[   36.775004] RIP: kyber_has_work+0x14/0x40 RSP: ffffc9000209bca0
+[   36.776012] CR2: 0000000000000008
+[   36.776690] ---[ end trace 4045cbce364ff2a4 ]---
+[   36.777527] Kernel panic - not syncing: Fatal exception
+[   36.778526] Dumping ftrace buffer:
+[   36.779313]    (ftrace buffer empty)
+[   36.780081] Kernel Offset: disabled
+[   36.780877] ---[ end Kernel panic - not syncing: Fatal exception
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: stable@vger.kernel.org
+Tested-by: Yi Zhang <yi.zhang@redhat.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
+ block/blk-core.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-Another approach is to do the check after BLK_STS_RESOURCE is returned
-from .queue_rq() and BLK_MQ_S_SCHED_RESTART is set, that way may introduce
-a bit cost in hot path, and it was V1 of this patch actually, please see
-that in the following link:
-
-	https://github.com/ming1/linux/commit/68a66900f3647ea6751aab2848b1e5eef508feaa
-
-Or other better ways?
-
- block/blk-mq.c | 83 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 82 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 6e3f77829dcc..4d4af8d712da 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -896,6 +896,85 @@ static void blk_mq_terminate_expired(struct blk_mq_hw_ctx *hctx,
- 		blk_mq_rq_timed_out(rq, reserved);
- }
+diff --git a/block/blk-core.c b/block/blk-core.c
+index b8881750a3ac..071a0fb29597 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -694,6 +694,15 @@ void blk_cleanup_queue(struct request_queue *q)
+ 	queue_flag_set(QUEUE_FLAG_DEAD, q);
+ 	spin_unlock_irq(lock);
  
-+struct hctx_busy_data {
-+	struct blk_mq_hw_ctx *hctx;
-+	bool reserved;
-+	bool busy;
-+};
++	/*
++	 * make sure all in-progress dispatch are completed because
++	 * blk_freeze_queue() can only complete all requests, and
++	 * dispatch may still be in-progress since we dispatch requests
++	 * from more than one contexts
++	 */
++	if (q->mq_ops)
++		blk_mq_quiesce_queue(q);
 +
-+static bool check_busy_hctx(struct sbitmap *sb, unsigned int bitnr, void *data)
-+{
-+	struct hctx_busy_data *busy_data = data;
-+	struct blk_mq_hw_ctx *hctx = busy_data->hctx;
-+	struct request *rq;
-+
-+	if (busy_data->reserved)
-+		bitnr += hctx->tags->nr_reserved_tags;
-+
-+	rq = hctx->tags->static_rqs[bitnr];
-+	if (blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT) {
-+		busy_data->busy = true;
-+		return false;
-+	}
-+	return true;
-+}
-+
-+/* Check if there is any in-flight request */
-+static bool blk_mq_hctx_is_busy(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct hctx_busy_data data = {
-+		.hctx = hctx,
-+		.busy = false,
-+		.reserved = true,
-+	};
-+
-+	sbitmap_for_each_set(&hctx->tags->breserved_tags.sb,
-+			check_busy_hctx, &data);
-+	if (data.busy)
-+		return true;
-+
-+	data.reserved = false;
-+	sbitmap_for_each_set(&hctx->tags->bitmap_tags.sb,
-+			check_busy_hctx, &data);
-+	if (data.busy)
-+		return true;
-+
-+	return false;
-+}
-+
-+static void blk_mq_fixup_restart(struct blk_mq_hw_ctx *hctx)
-+{
-+	if (test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state)) {
-+		bool busy;
-+
-+		/*
-+		 * If this hctx is still marked as RESTART, and there
-+		 * isn't any in-flight requests, we have to run queue
-+		 * here to prevent IO from hanging.
-+		 *
-+		 * BLK_STS_RESOURCE can be returned from driver when any
-+		 * resource is running out of. And the resource may not
-+		 * be related with tags, such as kmalloc(GFP_ATOMIC), when
-+		 * queue is idle under this kind of BLK_STS_RESOURCE, restart
-+		 * can't work any more, then IO hang may be caused.
-+		 *
-+		 * The counter-pair of the following barrier is the one
-+		 * in blk_mq_put_driver_tag() after returning BLK_STS_RESOURCE
-+		 * from ->queue_rq().
-+		 */
-+		smp_mb();
-+
-+		busy = blk_mq_hctx_is_busy(hctx);
-+		if (!busy) {
-+			printk(KERN_WARNING "blk-mq: fixup RESTART\n");
-+			printk(KERN_WARNING "\t If this message is shown"
-+			       " a bit often, please report the issue to"
-+			       " linux-block@vger.kernel.org\n");
-+			blk_mq_run_hw_queue(hctx, true);
-+		}
-+	}
-+}
-+
- static void blk_mq_timeout_work(struct work_struct *work)
- {
- 	struct request_queue *q =
-@@ -966,8 +1045,10 @@ static void blk_mq_timeout_work(struct work_struct *work)
- 		 */
- 		queue_for_each_hw_ctx(q, hctx, i) {
- 			/* the hctx may be unmapped, so check it here */
--			if (blk_mq_hw_queue_mapped(hctx))
-+			if (blk_mq_hw_queue_mapped(hctx)) {
- 				blk_mq_tag_idle(hctx);
-+				blk_mq_fixup_restart(hctx);
-+			}
- 		}
- 	}
- 	blk_queue_exit(q);
+ 	/* for synchronous bio-based driver finish in-flight integrity i/o */
+ 	blk_flush_integrity();
+ 
 -- 
 2.9.5
