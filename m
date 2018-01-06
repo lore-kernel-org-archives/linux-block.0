@@ -1,81 +1,120 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:46909 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965951AbeAJQTI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Jan 2018 11:19:08 -0500
-Received: by mail-wm0-f68.google.com with SMTP id 143so24134wma.5
-        for <linux-block@vger.kernel.org>; Wed, 10 Jan 2018 08:19:07 -0800 (PST)
-From: Ilya Dryomov <idryomov@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Tejun Heo <tj@kernel.org>, David Disseldorp <ddiss@suse.de>,
-        Sagi Grimberg <sagi@grimberg.me>
-Subject: [PATCH v2 1/2] block: fail op_is_write() requests to read-only partitions
-Date: Wed, 10 Jan 2018 17:18:37 +0100
-Message-Id: <1515601118-23192-2-git-send-email-idryomov@gmail.com>
-In-Reply-To: <1515601118-23192-1-git-send-email-idryomov@gmail.com>
-References: <1515601118-23192-1-git-send-email-idryomov@gmail.com>
+Received: from mx1.redhat.com ([209.132.183.28]:60762 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752450AbeAFI20 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 6 Jan 2018 03:28:26 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Yi Zhang <yi.zhang@redhat.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 2/4] blk-mq: quiesce queue during switching io sched and updating nr_requests
+Date: Sat,  6 Jan 2018 16:27:38 +0800
+Message-Id: <20180106082740.26442-3-ming.lei@redhat.com>
+In-Reply-To: <20180106082740.26442-1-ming.lei@redhat.com>
+References: <20180106082740.26442-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Regular block device writes go through blkdev_write_iter(), which does
-bdev_read_only(), while zeroout/discard/etc requests are never checked,
-both userspace- and kernel-triggered.  Add a generic catch-all check to
-generic_make_request_checks() to actually enforce ioctl(BLKROSET) and
-set_disk_ro(), which is used by quite a few drivers for things like
-snapshots, read-only backing files/images, etc.
+Dispatch may still be in-progress after queue is frozen, so we have to
+quiesce queue before switching IO scheduler and updating nr_requests.
 
-Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Also when switching io schedulers, blk_mq_run_hw_queue() may still be
+called somewhere(such as from nvme_reset_work()), and io scheduler's
+per-hctx data may not be setup yet, so cause oops even inside
+blk_mq_hctx_has_pending(), such as it can be run just between:
+
+        ret = e->ops.mq.init_sched(q, e);
+AND
+        ret = e->ops.mq.init_hctx(hctx, i)
+
+inside blk_mq_init_sched().
+
+This reverts commit 7a148c2fcff8330(block: don't call blk_mq_quiesce_queue()
+after queue is frozen) basically, and makes sure blk_mq_hctx_has_pending
+won't be called if queue is quiesced.
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Fixes: 7a148c2fcff83309(block: don't call blk_mq_quiesce_queue() after queue is frozen)
+Reported-by: Yi Zhang <yi.zhang@redhat.com>
+Tested-by: Yi Zhang <yi.zhang@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-core.c | 23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
+ block/blk-mq.c   | 27 ++++++++++++++++++++++++++-
+ block/elevator.c |  2 ++
+ 2 files changed, 28 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index f843ae4f858d..d132bec4a266 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2123,6 +2123,20 @@ static inline int bio_check_eod(struct bio *bio, unsigned int nr_sectors)
- 	return 0;
- }
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 11097477eeab..1c66c319325c 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1285,7 +1285,30 @@ EXPORT_SYMBOL(blk_mq_delay_run_hw_queue);
  
-+static inline bool bio_check_ro(struct bio *bio)
-+{
-+	struct hd_struct *p;
-+	bool ret = false;
-+
-+	rcu_read_lock();
-+	p = __disk_get_part(bio->bi_disk, bio->bi_partno);
-+	if (!p || (p->policy && op_is_write(bio_op(bio))))
-+		ret = true;
-+	rcu_read_unlock();
-+
-+	return ret;
-+}
-+
- static noinline_for_stack bool
- generic_make_request_checks(struct bio *bio)
+ bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
  {
-@@ -2145,11 +2159,18 @@ generic_make_request_checks(struct bio *bio)
- 		goto end_io;
- 	}
- 
-+	if (unlikely(bio_check_ro(bio))) {
-+		printk(KERN_ERR
-+		       "generic_make_request: Trying to write "
-+			"to read-only block-device %s (partno %d)\n",
-+			bio_devname(bio, b), bio->bi_partno);
-+		goto end_io;
+-	if (blk_mq_hctx_has_pending(hctx)) {
++	int srcu_idx;
++	bool need_run;
++
++	/*
++	 * When queue is quiesced, we may be switching io scheduler, or
++	 * updating nr_hw_queues, or other things, and we can't run queue
++	 * any more, even __blk_mq_hctx_has_pending() can't be called safely.
++	 *
++	 * And queue will be rerun in blk_mq_unquiesce_queue() if it is
++	 * quiesced.
++	 */
++	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
++		rcu_read_lock();
++		need_run = !blk_queue_quiesced(hctx->queue) &&
++			blk_mq_hctx_has_pending(hctx);
++		rcu_read_unlock();
++	} else {
++		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
++		need_run = !blk_queue_quiesced(hctx->queue) &&
++			blk_mq_hctx_has_pending(hctx);
++		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
 +	}
 +
- 	/*
- 	 * For a REQ_NOWAIT based request, return -EOPNOTSUPP
- 	 * if queue is not a request based queue.
- 	 */
--
- 	if ((bio->bi_opf & REQ_NOWAIT) && !queue_is_rq_based(q))
- 		goto not_supported;
++	if (need_run) {
+ 		__blk_mq_delay_run_hw_queue(hctx, async, 0);
+ 		return true;
+ 	}
+@@ -2710,6 +2733,7 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+ 		return -EINVAL;
  
+ 	blk_mq_freeze_queue(q);
++	blk_mq_quiesce_queue(q);
+ 
+ 	ret = 0;
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+@@ -2733,6 +2757,7 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+ 	if (!ret)
+ 		q->nr_requests = nr;
+ 
++	blk_mq_unquiesce_queue(q);
+ 	blk_mq_unfreeze_queue(q);
+ 
+ 	return ret;
+diff --git a/block/elevator.c b/block/elevator.c
+index 7bda083d5968..138faeb08a7c 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -968,6 +968,7 @@ static int elevator_switch_mq(struct request_queue *q,
+ 	int ret;
+ 
+ 	blk_mq_freeze_queue(q);
++	blk_mq_quiesce_queue(q);
+ 
+ 	if (q->elevator) {
+ 		if (q->elevator->registered)
+@@ -994,6 +995,7 @@ static int elevator_switch_mq(struct request_queue *q,
+ 		blk_add_trace_msg(q, "elv switch: none");
+ 
+ out:
++	blk_mq_unquiesce_queue(q);
+ 	blk_mq_unfreeze_queue(q);
+ 	return ret;
+ }
 -- 
-2.4.3
+2.9.5
