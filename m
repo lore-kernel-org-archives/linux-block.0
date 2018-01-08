@@ -1,34 +1,44 @@
-Return-Path: <hch@lst.de>
-Date: Mon, 8 Jan 2018 10:57:07 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Linux Block <linux-block@vger.kernel.org>,
-	Linux NVMe <linux-nvme@lists.infradead.org>,
-	Device Mapper <dm-devel@redhat.com>, Christoph Hellwig <hch@lst.de>,
-	Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Bart VanAssche <bart.vanassche@wdc.com>,
-	James Smart <james.smart@broadcom.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Hannes Reinecke <hare@suse.com>, Sagi Grimberg <sagi@grimberg.me>
+Return-Path: <hare@suse.com>
 Subject: Re: [PATCH 2/5] nvme/multipath: Consult blk_status_t for failover
-Message-ID: <20180108095707.GD4673@lst.de>
-References: <20180104224623.8944-1-keith.busch@intel.com> <20180104224623.8944-3-keith.busch@intel.com>
+To: Keith Busch <keith.busch@intel.com>,
+ Linux Block <linux-block@vger.kernel.org>,
+ Linux NVMe <linux-nvme@lists.infradead.org>,
+ Device Mapper <dm-devel@redhat.com>, Christoph Hellwig <hch@lst.de>,
+ Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc: Bart VanAssche <bart.vanassche@wdc.com>,
+ James Smart <james.smart@broadcom.com>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ Sagi Grimberg <sagi@grimberg.me>
+References: <20180104224623.8944-1-keith.busch@intel.com>
+ <20180104224623.8944-3-keith.busch@intel.com>
+From: Hannes Reinecke <hare@suse.com>
+Message-ID: <1fbfce0c-2666-95c8-34e8-e0c1dd5f58af@suse.com>
+Date: Mon, 8 Jan 2018 09:57:13 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180104224623.8944-3-keith.busch@intel.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-> -	if (unlikely(nvme_req(req)->status && nvme_req_needs_retry(req))) {
-> -		if (nvme_req_needs_failover(req)) {
-> +	blk_status_t status = nvme_error_status(req);
-> +
-> +	if (unlikely(status != BLK_STS_OK && nvme_req_needs_retry(req))) {
-> +		if (nvme_req_needs_failover(req, status)) {
+On 01/04/2018 11:46 PM, Keith Busch wrote:
+> This removes nvme multipath's specific status decoding to see if failover
+> is needed, using the generic blk_status_t that was translated earlier. This
+> abstraction from the raw NVMe status means nvme status decoding exists
+> in just one place.
+> 
+> Signed-off-by: Keith Busch <keith.busch@intel.com>
+> ---
+>  drivers/nvme/host/core.c      |  9 +++++----
+>  drivers/nvme/host/multipath.c | 44 ++++++++-----------------------------------
+>  drivers/nvme/host/nvme.h      |  4 ++--
+>  3 files changed, 15 insertions(+), 42 deletions(-)
+> Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-We don't really need to call nvme_error_status if nvme_req(req)->status
-is zero.
+Cheers,
 
-> -static inline bool nvme_req_needs_failover(struct request *req)
-> +static inline bool nvme_req_needs_failover(struct request *req, blk_status_t error)
-
-line break after 80 characters, please.
+Hannes
+-- 
+Dr. Hannes Reinecke		               zSeries & Storage
+hare@suse.com			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
