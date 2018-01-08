@@ -1,46 +1,40 @@
-Return-Path: <prvs=5392d374c=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Doug Ledford <dledford@redhat.com>,
-	linux-scsi@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH 0/4] Make SCSI transport recovery more robust
-Date: Mon,  8 Jan 2018 10:50:07 -0800
-Message-Id: <20180108185011.30018-1-bart.vanassche@wdc.com>
+Return-Path: <prvs=5392d374c=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "jbacik@fb.com" <jbacik@fb.com>, "tj@kernel.org" <tj@kernel.org>,
+	"jack@suse.cz" <jack@suse.cz>, "clm@fb.com" <clm@fb.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
+CC: "kernel-team@fb.com" <kernel-team@fb.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "peterz@infradead.org"
+	<peterz@infradead.org>, "linux-btrfs@vger.kernel.org"
+	<linux-btrfs@vger.kernel.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "jianchao.w.wang@oracle.com"
+	<jianchao.w.wang@oracle.com>
+Subject: Re: [PATCH 6/8] blk-mq: remove REQ_ATOM_COMPLETE usages from blk-mq
+Date: Mon, 8 Jan 2018 23:36:20 +0000
+Message-ID: <1515454580.2909.39.camel@wdc.com>
+References: <20180108191542.379478-1-tj@kernel.org>
+	 <20180108191542.379478-7-tj@kernel.org>
+In-Reply-To: <20180108191542.379478-7-tj@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Hello Jens,
-
-A longstanding issue with the SCSI core is that several SCSI transport drivers
-use scsi_target_block() and scsi_target_unblock() to avoid concurrent
-.queuecommand() calls during e.g. transport recovery but that this is not
-sufficient to protect from such calls. Hence this patch series. Please
-consider this patch series for kernel v4.16.
-
-Thanks,
-
-Bart.
-
-Bart Van Assche (4):
-  blk-mq: Rename request_queue.mq_freeze_wq into mq_wq
-  block: Introduce blk_wait_if_quiesced() and
-    blk_finish_wait_if_quiesced()
-  scsi: Avoid that .queuecommand() gets called for a quiesced SCSI
-    device
-  IB/srp: Fix a sleep-in-invalid-context bug
-
- block/blk-core.c                    | 11 +++---
- block/blk-mq.c                      | 71 ++++++++++++++++++++++++++++++++++---
- drivers/infiniband/ulp/srp/ib_srp.c | 21 ++---------
- drivers/scsi/scsi_error.c           |  3 ++
- include/linux/blk-mq.h              |  2 ++
- include/linux/blkdev.h              |  2 +-
- 6 files changed, 80 insertions(+), 30 deletions(-)
-
--- 
-2.15.1
+T24gTW9uLCAyMDE4LTAxLTA4IGF0IDExOjE1IC0wODAwLCBUZWp1biBIZW8gd3JvdGU6DQo+IEFm
+dGVyIHRoZSByZWNlbnQgdXBkYXRlcyB0byB1c2UgZ2VuZXJhdGlvbiBudW1iZXIgYW5kIHN0YXRl
+IGJhc2VkDQo+IHN5bmNocm9uaXphdGlvbiwgYmxrLW1xIG5vIGxvbmdlciBkZXBlbmRzIG9uIFJF
+UV9BVE9NX0NPTVBMRVRFIGV4Y2VwdA0KPiB0byBhdm9pZCBmaXJpbmcgdGhlIHNhbWUgdGltZW91
+dCBtdWx0aXBsZSB0aW1lcy4NCj4gDQo+IFJlbW92ZSBhbGwgUkVRX0FUT01fQ09NUExFVEUgdXNh
+Z2VzIGFuZCB1c2UgYSBuZXcgcnFfZmxhZ3MgZmxhZw0KPiBSUUZfTVFfVElNRU9VVF9FWFBJUkVE
+IHRvIGF2b2lkIGZpcmluZyB0aGUgc2FtZSB0aW1lb3V0IG11bHRpcGxlDQo+IHRpbWVzLiAgVGhp
+cyByZW1vdmVzIGF0b21pYyBiaXRvcHMgZnJvbSBob3QgcGF0aHMgdG9vLg0KPiANCj4gdjI6IFJl
+bW92ZWQgYmxrX2NsZWFyX3JxX2NvbXBsZXRlKCkgZnJvbSBibGtfbXFfcnFfdGltZWRfb3V0KCku
+DQo+IA0KPiB2MzogQWRkZWQgUlFGX01RX1RJTUVPVVRfRVhQSVJFRCBmbGFnLg0KDQpJIHRoaW5r
+IGl0J3MgdW5mb3J0dW5hdGUgdGhhdCB0aGlzIHBhdGNoIHNwcmVhZHMgdGhlIHJlcXVlc3Qgc3Rh
+dGUgb3ZlciB0d28NCnN0cnVjdCByZXF1ZXN0IG1lbWJlcnMsIG5hbWVseSB0aGUgbG93ZXIgdHdv
+IGJpdHMgb2YgZ3N0YXRlIGFuZCB0aGUNClJRRl9NUV9USU1FT1VUX0VYUElSRUQgZmxhZyBpbiBy
+ZXEtPnJxX2ZsYWdzLiBQbGVhc2UgY29uc2lkZXIgdG8gZHJvcCB0aGUNClJRRl9NUV9USU1FT1VU
+X0VYUElSRUQgZmxhZyBhbmQgdG8gcmVwcmVzZW50IHRoZSAidGltZW91dCBoYXMgYmVlbiBwcm9j
+ZXNzZWQiDQpzdGF0ZSBhcyBhIE1RX1JRXyogc3RhdGUgaW4gZ3N0YXRlLiBUaGF0IHdpbGwgYXZv
+aWQgdGhhdCBldmVyeSBzdGF0ZSB1cGRhdGUNCmhhcyB0byBiZSByZXZpZXdlZCB3aGV0aGVyIG9y
+IG5vdCBwZXJoYXBzIGFuIHVwZGF0ZSBvZiB0aGUNClJRRl9NUV9USU1FT1VUX0VYUElSRUQgZmxh
+ZyBpcyBtaXNzaW5nLg0KDQpUaGFua3MsDQoNCkJhcnQu
