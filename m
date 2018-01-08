@@ -1,73 +1,67 @@
-Return-Path: <keith.busch@intel.com>
-From: Keith Busch <keith.busch@intel.com>
-To: Linux Block <linux-block@vger.kernel.org>,
-	Linux NVMe <linux-nvme@lists.infradead.org>,
-	Device Mapper <dm-devel@redhat.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Mike Snitzer <snitzer@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>
+Return-Path: <hare@suse.com>
+Subject: Re: [PATCH 4/5] nvme/multipath: Use blk_retryable
+To: Keith Busch <keith.busch@intel.com>,
+ Linux Block <linux-block@vger.kernel.org>,
+ Linux NVMe <linux-nvme@lists.infradead.org>,
+ Device Mapper <dm-devel@redhat.com>, Christoph Hellwig <hch@lst.de>,
+ Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc: Bart VanAssche <bart.vanassche@wdc.com>,
-	James Smart <james.smart@broadcom.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <keith.busch@intel.com>
-Subject: [PATCHv2 3/5] block: Provide blk_status_t decoding for path errors
-Date: Tue,  9 Jan 2018 12:04:16 -0700
-Message-Id: <20180109190418.7123-4-keith.busch@intel.com>
-In-Reply-To: <20180109190418.7123-1-keith.busch@intel.com>
-References: <20180109190418.7123-1-keith.busch@intel.com>
+ James Smart <james.smart@broadcom.com>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ Sagi Grimberg <sagi@grimberg.me>
+References: <20180104224623.8944-1-keith.busch@intel.com>
+ <20180104224623.8944-5-keith.busch@intel.com>
+From: Hannes Reinecke <hare@suse.com>
+Message-ID: <724fb25f-ad34-d4f1-4351-90289efca7fb@suse.com>
+Date: Mon, 8 Jan 2018 09:58:30 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180104224623.8944-5-keith.busch@intel.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This patch provides a common decoder for block status path related errors
-that may be retried so various entities wishing to consult this do not
-have to duplicate this decision.
-
-Acked-by: Mike Snitzer <snitzer@redhat.com>
+On 01/04/2018 11:46 PM, Keith Busch wrote:
+> Uses common code for determining if an error should be retried on
+> alternate path.
+> 
+> Signed-off-by: Keith Busch <keith.busch@intel.com>
+> ---
+>  drivers/nvme/host/multipath.c | 14 +-------------
+>  1 file changed, 1 insertion(+), 13 deletions(-)
+> 
+> diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
+> index ae9abb600c0f..93bb72b6efb6 100644
+> --- a/drivers/nvme/host/multipath.c
+> +++ b/drivers/nvme/host/multipath.c
+> @@ -37,19 +37,7 @@ bool nvme_req_needs_failover(struct request *req, blk_status_t error)
+>  {
+>  	if (!(req->cmd_flags & REQ_NVME_MPATH))
+>  		return false;
+> -
+> -	switch (error) {
+> -	case BLK_STS_NOTSUPP:
+> -	case BLK_STS_NOSPC:
+> -	case BLK_STS_TARGET:
+> -	case BLK_STS_NEXUS:
+> -	case BLK_STS_MEDIUM:
+> -	case BLK_STS_PROTECTION:
+> -		return false;
+> -	}
+> -
+> -	/* Everything else could be a path failure, so should be retried */
+> -	return true;
+> +	return blk_retryable(error);
+>  }
+>  
+>  void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl)
+> 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Keith Busch <keith.busch@intel.com>
----
- include/linux/blk_types.h | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index a1e628e032da..2d973ac54b09 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -39,6 +39,34 @@ typedef u8 __bitwise blk_status_t;
- 
- #define BLK_STS_AGAIN		((__force blk_status_t)12)
- 
-+/**
-+ * blk_path_error - returns true if error may be path related
-+ * @error: status the request was completed with
-+ *
-+ * Description:
-+ *     This classifies block error status into non-retryable errors and ones
-+ *     that may be successful if retried on a failover path.
-+ *
-+ * Return:
-+ *     %false - retrying failover path will not help
-+ *     %true  - may succeed if retried
-+ */
-+static inline bool blk_path_error(blk_status_t error)
-+{
-+	switch (error) {
-+	case BLK_STS_NOTSUPP:
-+	case BLK_STS_NOSPC:
-+	case BLK_STS_TARGET:
-+	case BLK_STS_NEXUS:
-+	case BLK_STS_MEDIUM:
-+	case BLK_STS_PROTECTION:
-+		return false;
-+	}
-+
-+	/* Anything else could be a path failure, so should be retried */
-+	return true;
-+}
-+
- struct blk_issue_stat {
- 	u64 stat;
- };
+Cheers,
+
+Hannes
 -- 
-2.13.6
+Dr. Hannes Reinecke		               zSeries & Storage
+hare@suse.com			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
