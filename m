@@ -1,181 +1,252 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:54978 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751756AbeACOEG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Jan 2018 09:04:06 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, mlyle@lyle.org,
-        tang.junhui@zte.com.cn, Coly Li <colyli@suse.de>
-Subject: [PATCH v1 04/10] bcache: fix cached_dev->count usage for bch_cache_set_error()
-Date: Wed,  3 Jan 2018 22:03:19 +0800
-Message-Id: <20180103140325.63175-5-colyli@suse.de>
-In-Reply-To: <20180103140325.63175-1-colyli@suse.de>
-References: <20180103140325.63175-1-colyli@suse.de>
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:40717 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754258AbeAHUVt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jan 2018 15:21:49 -0500
+Received: by mail-pf0-f193.google.com with SMTP id v26so6774644pfl.7
+        for <linux-block@vger.kernel.org>; Mon, 08 Jan 2018 12:21:49 -0800 (PST)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Kent Overstreet <kent.overstreet@gmail.com>,
+        Michael Lyle <mlyle@lyle.org>
+Subject: [416 PATCH 08/13] bcache: Fix, improve efficiency of closure_sync()
+Date: Mon,  8 Jan 2018 12:21:25 -0800
+Message-Id: <20180108202130.31303-9-mlyle@lyle.org>
+In-Reply-To: <20180108202130.31303-1-mlyle@lyle.org>
+References: <20180108202130.31303-1-mlyle@lyle.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-When bcache metadata I/O fails, bcache will call bch_cache_set_error()
-to retire the whole cache set. The expected behavior to retire a cache
-set is to unregister the cache set, and unregister all backing device
-attached to this cache set, then remove sysfs entries of the cache set
-and all attached backing devices, finally release memory of structs
-cache_set, cache, cached_dev and bcache_device.
+From: Kent Overstreet <kent.overstreet@gmail.com>
 
-In my testing when journal I/O failure triggered by disconnected cache
-device, sometimes the cache set cannot be retired, and its sysfs
-entry /sys/fs/bcache/<uuid> still exits and the backing device also
-references it. This is not expected behavior.
+Eliminates cases where sync can race and fail to complete / get stuck.
+Removes many status flags and simplifies entering-and-exiting closure
+sleeping behaviors.
 
-When metadata I/O failes, the call senquence to retire whole cache set is,
-	bch_cache_set_error()
-	bch_cache_set_unregister()
-	bch_cache_set_stop()
-	__cache_set_unregister()     <- called as callback by calling
-					clousre_queue(&c->caching)
-	cache_set_flush()            <- called as a callback when refcount
-					of cache_set->caching is 0
-	cache_set_free()             <- called as a callback when refcount
-					of catch_set->cl is 0
-	bch_cache_set_release()      <- called as a callback when refcount
-					of catch_set->kobj is 0
+[mlyle: fixed conflicts due to changed return behavior in mainline.
+extended commit comment, and squashed down two commits that were mostly
+contradictory to get to this state.  Changed __set_current_state to
+_set_current_state per Jens review comment]
 
-I find if kernel thread bch_writeback_thread() quits while-loop when
-kthread_should_stop() is true and searched_full_index is false, clousre
-callback cache_set_flush() set by continue_at() will never be called. The
-result is, bcache fails to retire whole cache set.
-
-cache_set_flush() will be called when refcount of closure c->caching is 0,
-and in function bcache_device_detach() refcount of closure c->caching is
-released to 0 by clousre_put(). In metadata error code path, function
-bcache_device_detach() is called by cached_dev_detach_finish(). This is a
-callback routine being called when cached_dev->count is 0. This refcount
-is decreased by cached_dev_put().
-
-The above dependence indicates, cache_set_flush() will be called when
-refcount of cache_set->cl is 0, and refcount of cache_set->cl to be 0
-when refcount of cache_dev->count is 0.
-
-The reason why sometimes cache_dev->count is not 0 (when metadata I/O fails
-and bch_cache_set_error() called) is, in bch_writeback_thread(), refcount
-of cache_dev is not decreased properly.
-
-In bch_writeback_thread(), cached_dev_put() is called only when
-searched_full_index is true and cached_dev->writeback_keys is empty, a.k.a
-there is no dirty data on cache. In most of run time it is correct, but
-when bch_writeback_thread() quits the while-loop while cache is still
-dirty, current code forget to call cached_dev_put() before this kernel
-thread exits. This is why sometimes cache_set_flush() is not executed and
-cache set fails to be retired.
-
-The reason to call cached_dev_put() in bch_writeback_rate() is, when the
-cache device changes from clean to dirty, cached_dev_get() is called, to
-make sure during writeback operatiions both backing and cache devices
-won't be released.
-
-Adding following code in bch_writeback_thread() does not work,
-    static int bch_writeback_thread(void *arg)
-    [code snip]
-
-    +       if (atomic_read(&dc->has_dirty))
-    +               cached_dev_put()
-    +
-        return 0;
-    [code snip]
-
-because writeback kernel thread can be waken up and start via sysfs entry:
-	echo 1 > /sys/block/bcache<N>/bcache/writeback_running
-It is difficult to check whether backing device is dirty without race and
-extra lock. So the above modification will introduce potential refcount
-underflow in some conditions.
-
-The correct fix is, to take cached dev refcount when creating the kernel
-thread, and put it before the kernel thread exits. Then bcache does not
-need to take a cached dev refcount when cache turns from clean to dirty,
-or to put a cached dev refcount when cache turns from ditry to clean. The
-writeback kernel thread is alwasy safe to reference data structure from
-cache set, cache and cached device (because a refcount of cache device is
-taken for it already), and no matter the kernel thread is stopped by I/O
-errors or system reboot, cached_dev->count can always be used correctly.
-
-The patch is simple, but understanding how it works is quite complicated.
-
-Signed-off-by: Coly Li <colyli@suse.de>
+Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
+Signed-off-by: Michael Lyle <mlyle@lyle.org>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
 ---
- drivers/md/bcache/super.c     |  1 -
- drivers/md/bcache/writeback.c | 10 +++++++---
- drivers/md/bcache/writeback.h |  2 --
- 3 files changed, 7 insertions(+), 6 deletions(-)
+ drivers/md/bcache/closure.c | 46 +++++++++++++++++-----------------
+ drivers/md/bcache/closure.h | 60 +++++++++++++++++----------------------------
+ 2 files changed, 46 insertions(+), 60 deletions(-)
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 064efd869017..5401d2356aa3 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1044,7 +1044,6 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c)
- 	if (BDEV_STATE(&dc->sb) == BDEV_STATE_DIRTY) {
- 		bch_sectors_dirty_init(&dc->disk);
- 		atomic_set(&dc->has_dirty, 1);
--		refcount_inc(&dc->count);
- 		bch_writeback_queue(dc);
- 	}
+diff --git a/drivers/md/bcache/closure.c b/drivers/md/bcache/closure.c
+index 1841d0359bac..ca7ace6962a4 100644
+--- a/drivers/md/bcache/closure.c
++++ b/drivers/md/bcache/closure.c
+@@ -18,10 +18,6 @@ static inline void closure_put_after_sub(struct closure *cl, int flags)
+ 	BUG_ON(flags & CLOSURE_GUARD_MASK);
+ 	BUG_ON(!r && (flags & ~CLOSURE_DESTRUCTOR));
  
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index a57149803df6..0789a9e18337 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -451,7 +451,7 @@ static int bch_writeback_thread(void *arg)
- 			up_write(&dc->writeback_lock);
+-	/* Must deliver precisely one wakeup */
+-	if (r == 1 && (flags & CLOSURE_SLEEPING))
+-		wake_up_process(cl->task);
+-
+ 	if (!r) {
+ 		if (cl->fn && !(flags & CLOSURE_DESTRUCTOR)) {
+ 			atomic_set(&cl->remaining,
+@@ -100,28 +96,34 @@ bool closure_wait(struct closure_waitlist *waitlist, struct closure *cl)
+ }
+ EXPORT_SYMBOL(closure_wait);
  
- 			if (kthread_should_stop())
--				return 0;
-+				break;
- 
- 			set_current_state(TASK_INTERRUPTIBLE);
- 			schedule();
-@@ -463,7 +463,6 @@ static int bch_writeback_thread(void *arg)
- 		if (searched_full_index &&
- 		    RB_EMPTY_ROOT(&dc->writeback_keys.keys)) {
- 			atomic_set(&dc->has_dirty, 0);
--			cached_dev_put(dc);
- 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_CLEAN);
- 			bch_write_bdev_super(dc, NULL);
- 		}
-@@ -484,6 +483,8 @@ static int bch_writeback_thread(void *arg)
- 		}
- 	}
- 
-+	cached_dev_put(dc);
+-/**
+- * closure_sync - sleep until a closure has nothing left to wait on
+- *
+- * Sleeps until the refcount hits 1 - the thread that's running the closure owns
+- * the last refcount.
+- */
+-void closure_sync(struct closure *cl)
++struct closure_syncer {
++	struct task_struct	*task;
++	int			done;
++};
 +
- 	return 0;
++static void closure_sync_fn(struct closure *cl)
+ {
+-	while (1) {
+-		__closure_start_sleep(cl);
+-		closure_set_ret_ip(cl);
++	cl->s->done = 1;
++	wake_up_process(cl->s->task);
++}
+ 
+-		if ((atomic_read(&cl->remaining) &
+-		     CLOSURE_REMAINING_MASK) == 1)
+-			break;
++void __closure_sync(struct closure *cl)
++{
++	struct closure_syncer s = { .task = current };
+ 
++	cl->s = &s;
++	continue_at(cl, closure_sync_fn, NULL);
++
++	while (1) {
++		set_current_state(TASK_UNINTERRUPTIBLE);
++		if (s.done)
++			break;
+ 		schedule();
+ 	}
+ 
+-	__closure_end_sleep(cl);
++	__set_current_state(TASK_RUNNING);
+ }
+-EXPORT_SYMBOL(closure_sync);
++EXPORT_SYMBOL(__closure_sync);
+ 
+ #ifdef CONFIG_BCACHE_CLOSURES_DEBUG
+ 
+@@ -168,12 +170,10 @@ static int debug_seq_show(struct seq_file *f, void *data)
+ 			   cl, (void *) cl->ip, cl->fn, cl->parent,
+ 			   r & CLOSURE_REMAINING_MASK);
+ 
+-		seq_printf(f, "%s%s%s%s\n",
++		seq_printf(f, "%s%s\n",
+ 			   test_bit(WORK_STRUCT_PENDING_BIT,
+ 				    work_data_bits(&cl->work)) ? "Q" : "",
+-			   r & CLOSURE_RUNNING	? "R" : "",
+-			   r & CLOSURE_STACK	? "S" : "",
+-			   r & CLOSURE_SLEEPING	? "Sl" : "");
++			   r & CLOSURE_RUNNING	? "R" : "");
+ 
+ 		if (r & CLOSURE_WAITING)
+ 			seq_printf(f, " W %pF\n",
+diff --git a/drivers/md/bcache/closure.h b/drivers/md/bcache/closure.h
+index ccfbea6f9f6b..392a87cf1b92 100644
+--- a/drivers/md/bcache/closure.h
++++ b/drivers/md/bcache/closure.h
+@@ -103,6 +103,7 @@
+  */
+ 
+ struct closure;
++struct closure_syncer;
+ typedef void (closure_fn) (struct closure *);
+ 
+ struct closure_waitlist {
+@@ -115,10 +116,6 @@ enum closure_state {
+ 	 * the thread that owns the closure, and cleared by the thread that's
+ 	 * waking up the closure.
+ 	 *
+-	 * CLOSURE_SLEEPING: Must be set before a thread uses a closure to sleep
+-	 * - indicates that cl->task is valid and closure_put() may wake it up.
+-	 * Only set or cleared by the thread that owns the closure.
+-	 *
+ 	 * The rest are for debugging and don't affect behaviour:
+ 	 *
+ 	 * CLOSURE_RUNNING: Set when a closure is running (i.e. by
+@@ -128,22 +125,16 @@ enum closure_state {
+ 	 * continue_at() and closure_return() clear it for you, if you're doing
+ 	 * something unusual you can use closure_set_dead() which also helps
+ 	 * annotate where references are being transferred.
+-	 *
+-	 * CLOSURE_STACK: Sanity check - remaining should never hit 0 on a
+-	 * closure with this flag set
+ 	 */
+ 
+-	CLOSURE_BITS_START	= (1 << 23),
+-	CLOSURE_DESTRUCTOR	= (1 << 23),
+-	CLOSURE_WAITING		= (1 << 25),
+-	CLOSURE_SLEEPING	= (1 << 27),
+-	CLOSURE_RUNNING		= (1 << 29),
+-	CLOSURE_STACK		= (1 << 31),
++	CLOSURE_BITS_START	= (1U << 27),
++	CLOSURE_DESTRUCTOR	= (1U << 27),
++	CLOSURE_WAITING		= (1U << 29),
++	CLOSURE_RUNNING		= (1U << 31),
+ };
+ 
+ #define CLOSURE_GUARD_MASK					\
+-	((CLOSURE_DESTRUCTOR|CLOSURE_WAITING|CLOSURE_SLEEPING|	\
+-	  CLOSURE_RUNNING|CLOSURE_STACK) << 1)
++	((CLOSURE_DESTRUCTOR|CLOSURE_WAITING|CLOSURE_RUNNING) << 1)
+ 
+ #define CLOSURE_REMAINING_MASK		(CLOSURE_BITS_START - 1)
+ #define CLOSURE_REMAINING_INITIALIZER	(1|CLOSURE_RUNNING)
+@@ -152,7 +143,7 @@ struct closure {
+ 	union {
+ 		struct {
+ 			struct workqueue_struct *wq;
+-			struct task_struct	*task;
++			struct closure_syncer	*s;
+ 			struct llist_node	list;
+ 			closure_fn		*fn;
+ 		};
+@@ -178,7 +169,19 @@ void closure_sub(struct closure *cl, int v);
+ void closure_put(struct closure *cl);
+ void __closure_wake_up(struct closure_waitlist *list);
+ bool closure_wait(struct closure_waitlist *list, struct closure *cl);
+-void closure_sync(struct closure *cl);
++void __closure_sync(struct closure *cl);
++
++/**
++ * closure_sync - sleep until a closure a closure has nothing left to wait on
++ *
++ * Sleeps until the refcount hits 1 - the thread that's running the closure owns
++ * the last refcount.
++ */
++static inline void closure_sync(struct closure *cl)
++{
++	if ((atomic_read(&cl->remaining) & CLOSURE_REMAINING_MASK) != 1)
++		__closure_sync(cl);
++}
+ 
+ #ifdef CONFIG_BCACHE_CLOSURES_DEBUG
+ 
+@@ -215,24 +218,6 @@ static inline void closure_set_waiting(struct closure *cl, unsigned long f)
+ #endif
  }
  
-@@ -547,10 +548,13 @@ int bch_cached_dev_writeback_start(struct cached_dev *dc)
- 	if (!dc->writeback_write_wq)
- 		return -ENOMEM;
- 
-+	cached_dev_get(dc);
- 	dc->writeback_thread = kthread_create(bch_writeback_thread, dc,
- 					      "bcache_writeback");
--	if (IS_ERR(dc->writeback_thread))
-+	if (IS_ERR(dc->writeback_thread)) {
-+		cached_dev_put(dc);
- 		return PTR_ERR(dc->writeback_thread);
-+	}
- 
- 	schedule_delayed_work(&dc->writeback_rate_update,
- 			      dc->writeback_rate_update_seconds * HZ);
-diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
-index 1d284f3d0363..aab21afe49cf 100644
---- a/drivers/md/bcache/writeback.h
-+++ b/drivers/md/bcache/writeback.h
-@@ -92,8 +92,6 @@ static inline void bch_writeback_add(struct cached_dev *dc)
- {
- 	if (!atomic_read(&dc->has_dirty) &&
- 	    !atomic_xchg(&dc->has_dirty, 1)) {
--		refcount_inc(&dc->count);
+-static inline void __closure_end_sleep(struct closure *cl)
+-{
+-	__set_current_state(TASK_RUNNING);
 -
- 		if (BDEV_STATE(&dc->sb) != BDEV_STATE_DIRTY) {
- 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_DIRTY);
- 			/* XXX: should do this synchronously */
+-	if (atomic_read(&cl->remaining) & CLOSURE_SLEEPING)
+-		atomic_sub(CLOSURE_SLEEPING, &cl->remaining);
+-}
+-
+-static inline void __closure_start_sleep(struct closure *cl)
+-{
+-	closure_set_ip(cl);
+-	cl->task = current;
+-	set_current_state(TASK_UNINTERRUPTIBLE);
+-
+-	if (!(atomic_read(&cl->remaining) & CLOSURE_SLEEPING))
+-		atomic_add(CLOSURE_SLEEPING, &cl->remaining);
+-}
+-
+ static inline void closure_set_stopped(struct closure *cl)
+ {
+ 	atomic_sub(CLOSURE_RUNNING, &cl->remaining);
+@@ -241,7 +226,6 @@ static inline void closure_set_stopped(struct closure *cl)
+ static inline void set_closure_fn(struct closure *cl, closure_fn *fn,
+ 				  struct workqueue_struct *wq)
+ {
+-	BUG_ON(object_is_on_stack(cl));
+ 	closure_set_ip(cl);
+ 	cl->fn = fn;
+ 	cl->wq = wq;
+@@ -300,7 +284,7 @@ static inline void closure_init(struct closure *cl, struct closure *parent)
+ static inline void closure_init_stack(struct closure *cl)
+ {
+ 	memset(cl, 0, sizeof(struct closure));
+-	atomic_set(&cl->remaining, CLOSURE_REMAINING_INITIALIZER|CLOSURE_STACK);
++	atomic_set(&cl->remaining, CLOSURE_REMAINING_INITIALIZER);
+ }
+ 
+ /**
+@@ -322,6 +306,8 @@ static inline void closure_wake_up(struct closure_waitlist *list)
+  * This is because after calling continue_at() you no longer have a ref on @cl,
+  * and whatever @cl owns may be freed out from under you - a running closure fn
+  * has a ref on its own closure which continue_at() drops.
++ *
++ * Note you are expected to immediately return after using this macro.
+  */
+ #define continue_at(_cl, _fn, _wq)					\
+ do {									\
 -- 
-2.15.1
+2.14.1
