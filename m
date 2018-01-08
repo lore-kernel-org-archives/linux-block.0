@@ -1,39 +1,134 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	162996@studenti.unimore.it,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX 0/2] block, bfq: fix two memory leaks related to cgroups
-Date: Tue,  9 Jan 2018 10:17:25 +0100
-Message-Id: <20180109091727.5262-1-paolo.valente@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:38129 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754258AbeAHUVx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jan 2018 15:21:53 -0500
+Received: by mail-pg0-f68.google.com with SMTP id t67so6300297pgc.5
+        for <linux-block@vger.kernel.org>; Mon, 08 Jan 2018 12:21:53 -0800 (PST)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Coly Li <colyli@suse.de>
+Subject: [416 PATCH 11/13] bcache: reduce cache_set devices iteration by devices_max_used
+Date: Mon,  8 Jan 2018 12:21:28 -0800
+Message-Id: <20180108202130.31303-12-mlyle@lyle.org>
+In-Reply-To: <20180108202130.31303-1-mlyle@lyle.org>
+References: <20180108202130.31303-1-mlyle@lyle.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Jens,
-these two patches fix two related memory leaks, the first reported in
-[1], and the second found by ourselves while fixing the first.
+From: Coly Li <colyli@suse.de>
 
-Thanks,
-Paolo
+Member devices of struct cache_set is used to reference all attached
+bcache devices to this cache set. If it is treated as array of pointers,
+size of devices[] is indicated by member nr_uuids of struct cache_set.
 
-[1] https://www.mail-archive.com/linux-block@vger.kernel.org/msg16258.html
+nr_uuids is calculated in drivers/md/super.c:bch_cache_set_alloc(),
+	bucket_bytes(c) / sizeof(struct uuid_entry)
+Bucket size is determined by user space tool "make-bcache", by default it
+is 1024 sectors (defined in bcache-tools/make-bcache.c:main()). So default
+nr_uuids value is 4096 from the above calculation.
 
-Paolo Valente (2):
-  block, bfq: put async queues for root bfq groups too
-  bfq-sq, bfq-mq: release oom-queue ref to root group on exit
+Every time when bcache code iterates bcache devices of a cache set, all
+the 4096 pointers are checked even only 1 bcache device is attached to the
+cache set, that's a wast of time and unncessary.
 
- block/bfq-cgroup.c  | 7 +++++--
- block/bfq-iosched.c | 3 +++
- 2 files changed, 8 insertions(+), 2 deletions(-)
+This patch adds a member devices_max_used to struct cache_set. Its value
+is 1 + the maximum used index of devices[] in a cache set. When iterating
+all valid bcache devices of a cache set, use c->devices_max_used in
+for-loop may reduce a lot of useless checking.
 
---
-2.15.1
+Personally, my motivation of this patch is not for performance, I use it
+in bcache debugging, which helps me to narrow down the scape to check
+valid bcached devices of a cache set.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
+Reviewed-by: Tang Junhui <tang.junhui@zte.com.cn>
+---
+ drivers/md/bcache/bcache.h    | 1 +
+ drivers/md/bcache/btree.c     | 2 +-
+ drivers/md/bcache/super.c     | 9 ++++++---
+ drivers/md/bcache/writeback.h | 2 +-
+ 4 files changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 5f7b0b2513cc..9117da5f494b 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -497,6 +497,7 @@ struct cache_set {
+ 	int			caches_loaded;
+ 
+ 	struct bcache_device	**devices;
++	unsigned		devices_max_used;
+ 	struct list_head	cached_devs;
+ 	uint64_t		cached_dev_sectors;
+ 	struct closure		caching;
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index 9e30713dbdb8..bf3a48aa9a9a 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -1679,7 +1679,7 @@ static void bch_btree_gc_finish(struct cache_set *c)
+ 
+ 	/* don't reclaim buckets to which writeback keys point */
+ 	rcu_read_lock();
+-	for (i = 0; i < c->nr_uuids; i++) {
++	for (i = 0; i < c->devices_max_used; i++) {
+ 		struct bcache_device *d = c->devices[i];
+ 		struct cached_dev *dc;
+ 		struct keybuf_key *w, *n;
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 553e841e897d..d13e4ccb30a0 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -721,6 +721,9 @@ static void bcache_device_attach(struct bcache_device *d, struct cache_set *c,
+ 	d->c = c;
+ 	c->devices[id] = d;
+ 
++	if (id >= c->devices_max_used)
++		c->devices_max_used = id + 1;
++
+ 	closure_get(&c->caching);
+ }
+ 
+@@ -1267,7 +1270,7 @@ static int flash_devs_run(struct cache_set *c)
+ 	struct uuid_entry *u;
+ 
+ 	for (u = c->uuids;
+-	     u < c->uuids + c->nr_uuids && !ret;
++	     u < c->uuids + c->devices_max_used && !ret;
+ 	     u++)
+ 		if (UUID_FLASH_ONLY(u))
+ 			ret = flash_dev_run(c, u);
+@@ -1433,7 +1436,7 @@ static void __cache_set_unregister(struct closure *cl)
+ 
+ 	mutex_lock(&bch_register_lock);
+ 
+-	for (i = 0; i < c->nr_uuids; i++)
++	for (i = 0; i < c->devices_max_used; i++)
+ 		if (c->devices[i]) {
+ 			if (!UUID_FLASH_ONLY(&c->uuids[i]) &&
+ 			    test_bit(CACHE_SET_UNREGISTERING, &c->flags)) {
+@@ -1496,7 +1499,7 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
+ 	c->bucket_bits		= ilog2(sb->bucket_size);
+ 	c->block_bits		= ilog2(sb->block_size);
+ 	c->nr_uuids		= bucket_bytes(c) / sizeof(struct uuid_entry);
+-
++	c->devices_max_used	= 0;
+ 	c->btree_pages		= bucket_pages(c);
+ 	if (c->btree_pages > BTREE_MAX_PAGES)
+ 		c->btree_pages = max_t(int, c->btree_pages / 4,
+diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
+index 6d26927267f8..f102b1f9bc51 100644
+--- a/drivers/md/bcache/writeback.h
++++ b/drivers/md/bcache/writeback.h
+@@ -24,7 +24,7 @@ static inline uint64_t  bcache_flash_devs_sectors_dirty(struct cache_set *c)
+ 
+ 	mutex_lock(&bch_register_lock);
+ 
+-	for (i = 0; i < c->nr_uuids; i++) {
++	for (i = 0; i < c->devices_max_used; i++) {
+ 		struct bcache_device *d = c->devices[i];
+ 
+ 		if (!d || !UUID_FLASH_ONLY(&c->uuids[i]))
+-- 
+2.14.1
