@@ -1,170 +1,146 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: dm-devel@redhat.com,
-	Ming Lei <ming.lei@redhat.com>,
-	Laurence Oberman <loberman@redhat.com>,
-	Bart Van Assche <bart.vanassche@sandisk.com>
-Subject: [PATCH 5/5] dm-mpath: use blk_mq_alloc_request_notify for allocating blk-mq req
-Date: Mon, 22 Jan 2018 11:35:50 +0800
-Message-Id: <20180122033550.27855-6-ming.lei@redhat.com>
-In-Reply-To: <20180122033550.27855-1-ming.lei@redhat.com>
-References: <20180122033550.27855-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:38239 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755012AbeAHHMo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 8 Jan 2018 02:12:44 -0500
+Subject: Re: [PATCH v1 03/10] bcache: reduce cache_set devices iteration by
+ devices_max_used
+To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, mlyle@lyle.org, tang.junhui@zte.com.cn
+References: <20180103140325.63175-1-colyli@suse.de>
+ <20180103140325.63175-4-colyli@suse.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <a4ff7a4d-d0b4-5151-8bcd-1f9ab50d10f5@suse.de>
+Date: Mon, 8 Jan 2018 08:12:41 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180103140325.63175-4-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When blk_get_request() fails to allocate one request, there is no way
-to make underlying queue's RESTART to restart DM's queue, this patch
-applies the new introduced blk_mq_alloc_request_notify() to deal with
-this issue.
+On 01/03/2018 03:03 PM, Coly Li wrote:
+> Member devices of struct cache_set is used to reference all attached
+> bcache devices to this cache set. If it is treated as array of pointers,
+> size of devices[] is indicated by member nr_uuids of struct cache_set.
+> 
+> nr_uuids is calculated in drivers/md/super.c:bch_cache_set_alloc(),
+> 	bucket_bytes(c) / sizeof(struct uuid_entry)
+> Bucket size is determined by user space tool "make-bcache", by default it
+> is 1024 sectors (defined in bcache-tools/make-bcache.c:main()). So default
+> nr_uuids value is 4096 from the above calculation.
+> 
+> Every time when bcache code iterates bcache devices of a cache set, all
+> the 4096 pointers are checked even only 1 bcache device is attached to the
+> cache set, that's a wast of time and unncessary.
+> 
+> This patch adds a member devices_max_used to struct cache_set. Its value
+> is 1 + the maximum used index of devices[] in a cache set. When iterating
+> all valid bcache devices of a cache set, use c->devices_max_used in
+> for-loop may reduce a lot of useless checking.
+> 
+> Personally, my motivation of this patch is not for performance, I use it
+> in bcache debugging, which helps me to narrow down the scape to check
+> valid bcached devices of a cache set.
+> 
+> Signed-off-by: Coly Li <colyli@suse.de>
+> ---
+>  drivers/md/bcache/bcache.h    | 1 +
+>  drivers/md/bcache/btree.c     | 2 +-
+>  drivers/md/bcache/super.c     | 9 ++++++---
+>  drivers/md/bcache/writeback.h | 2 +-
+>  4 files changed, 9 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+> index 843877e017e1..83c569942bd0 100644
+> --- a/drivers/md/bcache/bcache.h
+> +++ b/drivers/md/bcache/bcache.h
+> @@ -488,6 +488,7 @@ struct cache_set {
+>  	int			caches_loaded;
+>  
+>  	struct bcache_device	**devices;
+> +	unsigned		devices_max_used;
+>  	struct list_head	cached_devs;
+>  	uint64_t		cached_dev_sectors;
+>  	struct closure		caching;
+> diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+> index 81e8dc3dbe5e..bf0d7978bc3d 100644
+> --- a/drivers/md/bcache/btree.c
+> +++ b/drivers/md/bcache/btree.c
+> @@ -1678,7 +1678,7 @@ static void bch_btree_gc_finish(struct cache_set *c)
+>  
+>  	/* don't reclaim buckets to which writeback keys point */
+>  	rcu_read_lock();
+> -	for (i = 0; i < c->nr_uuids; i++) {
+> +	for (i = 0; i < c->devices_max_used; i++) {
+>  		struct bcache_device *d = c->devices[i];
+>  		struct cached_dev *dc;
+>  		struct keybuf_key *w, *n;
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index b4d28928dec5..064efd869017 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -721,6 +721,9 @@ static void bcache_device_attach(struct bcache_device *d, struct cache_set *c,
+>  	d->c = c;
+>  	c->devices[id] = d;
+>  
+> +	if (id >= c->devices_max_used)
+> +		c->devices_max_used = id + 1;
+> +
+>  	closure_get(&c->caching);
+>  }
+>  
+> @@ -1261,7 +1264,7 @@ static int flash_devs_run(struct cache_set *c)
+>  	struct uuid_entry *u;
+>  
+>  	for (u = c->uuids;
+> -	     u < c->uuids + c->nr_uuids && !ret;
+> +	     u < c->uuids + c->devices_max_used && !ret;
+>  	     u++)
+>  		if (UUID_FLASH_ONLY(u))
+>  			ret = flash_dev_run(c, u);
+> @@ -1427,7 +1430,7 @@ static void __cache_set_unregister(struct closure *cl)
+>  
+>  	mutex_lock(&bch_register_lock);
+>  
+> -	for (i = 0; i < c->nr_uuids; i++)
+> +	for (i = 0; i < c->devices_max_used; i++)
+>  		if (c->devices[i]) {
+>  			if (!UUID_FLASH_ONLY(&c->uuids[i]) &&
+>  			    test_bit(CACHE_SET_UNREGISTERING, &c->flags)) {
+> @@ -1490,7 +1493,7 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
+>  	c->bucket_bits		= ilog2(sb->bucket_size);
+>  	c->block_bits		= ilog2(sb->block_size);
+>  	c->nr_uuids		= bucket_bytes(c) / sizeof(struct uuid_entry);
+> -
+> +	c->devices_max_used	= 0;
+>  	c->btree_pages		= bucket_pages(c);
+>  	if (c->btree_pages > BTREE_MAX_PAGES)
+>  		c->btree_pages = max_t(int, c->btree_pages / 4,
+> diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
+> index a9e3ffb4b03c..1d284f3d0363 100644
+> --- a/drivers/md/bcache/writeback.h
+> +++ b/drivers/md/bcache/writeback.h
+> @@ -21,7 +21,7 @@ static inline uint64_t  bcache_flash_devs_sectors_dirty(struct cache_set *c)
+>  
+>  	mutex_lock(&bch_register_lock);
+>  
+> -	for (i = 0; i < c->nr_uuids; i++) {
+> +	for (i = 0; i < c->devices_max_used; i++) {
+>  		struct bcache_device *d = c->devices[i];
+>  
+>  		if (!d || !UUID_FLASH_ONLY(&c->uuids[i]))
+> 
+Hmm. This just cries out for using IDA ...
+but maybe for a later patchset.
 
-The following issues can be addressed:
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-1) When the blk_get_request() fails, finaly dm-rq will return
-BLK_STS_RESOURCE to blk-mq, then blk-mq will run queue after 10ms, this
-delay may degrade dm-rq performance a lot when any underlying device
-attached to the same host is accessed directly.
+Cheers,
 
-2) there can't be a way to figure out a perfect delay for running queue
-in the situation 1), and if the delay is too small, request can be dequeued
-from DM queue too quick, then sequential IO performance gets hurt.
-
-This approach is suggested by Jens, and has been used in blk-mq dispatch
-patch for a while, see blk_mq_mark_tag_wait().
-
-Suggested-by: Jens Axboe <axboe@kernel.dk>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Laurence Oberman <loberman@redhat.com>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/md/dm-mpath.c | 50 +++++++++++++++++++++++++++++++++++++++++++++++++-
- drivers/md/dm.c       |  1 +
- 2 files changed, 50 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-index 7d3e572072f5..f7753a2e9229 100644
---- a/drivers/md/dm-mpath.c
-+++ b/drivers/md/dm-mpath.c
-@@ -11,6 +11,7 @@
- #include "dm-bio-record.h"
- #include "dm-path-selector.h"
- #include "dm-uevent.h"
-+#include "dm.h"
- 
- #include <linux/blkdev.h>
- #include <linux/ctype.h>
-@@ -30,6 +31,15 @@
- #define DM_PG_INIT_DELAY_MSECS 2000
- #define DM_PG_INIT_DELAY_DEFAULT ((unsigned) -1)
- 
-+/*
-+ * When running out of request from underlying request, use this
-+ * structure to get notified from blk-mq
-+ */
-+struct underlying_notifier {
-+	struct request_queue *q;
-+	wait_queue_entry_t wait;
-+};
-+
- /* Path properties */
- struct pgpath {
- 	struct list_head list;
-@@ -40,6 +50,7 @@ struct pgpath {
- 	struct dm_path path;
- 	struct delayed_work activate_path;
- 
-+	struct underlying_notifier notifier;
- 	bool is_active:1;		/* Path status */
- };
- 
-@@ -125,6 +136,17 @@ static void process_queued_bios(struct work_struct *work);
-  * Allocation routines
-  *-----------------------------------------------*/
- 
-+static int req_notify(wait_queue_entry_t *wait, unsigned mode, int flags,
-+		void *key)
-+{
-+	struct underlying_notifier *notifier;
-+
-+	notifier = container_of(wait, struct underlying_notifier, wait);
-+	list_del_init(&notifier->wait.entry);
-+	blk_mq_run_hw_queues(notifier->q, true);
-+	return 1;
-+}
-+
- static struct pgpath *alloc_pgpath(void)
- {
- 	struct pgpath *pgpath = kzalloc(sizeof(*pgpath), GFP_KERNEL);
-@@ -490,6 +512,27 @@ static bool must_push_back_bio(struct multipath *m)
- 	return __must_push_back(m, flags);
- }
- 
-+static struct request *
-+multipath_get_req(struct pgpath *pgpath, struct request_queue *q,
-+		  struct request *rq)
-+{
-+	if (!q->mq_ops)
-+		return blk_get_request(q, rq->cmd_flags | REQ_NOMERGE,
-+				GFP_ATOMIC);
-+
-+	/*
-+	 * Even BLK_MQ_REQ_ALLOC_NOTIFY is passed, we can't return
-+	 * BLK_STS_DEV_RESOUCE to blk-mq if this allocation fails because
-+	 * the notification can come before adding dm's request to
-+	 * dispatch list, so still need to return BLK_STS_RESOUCE to
-+	 * blk-mq, and the notification will run queue and cancel the
-+	 * delay caused by BLK_STS_RESOUCE immediately.
-+	 */
-+	return blk_mq_alloc_request_notify(q, rq->cmd_flags | REQ_NOMERGE,
-+                                BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_ALLOC_NOTIFY,
-+				&pgpath->notifier.wait);
-+}
-+
- /*
-  * Map cloned requests (request-based multipath)
-  */
-@@ -526,7 +569,7 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
- 
- 	bdev = pgpath->path.dev->bdev;
- 	q = bdev_get_queue(bdev);
--	clone = blk_get_request(q, rq->cmd_flags | REQ_NOMERGE, GFP_ATOMIC);
-+	clone = multipath_get_req(pgpath, q, rq);
- 	if (IS_ERR(clone)) {
- 		/* EBUSY, ENODEV or EWOULDBLOCK: requeue */
- 		if (blk_queue_dying(q)) {
-@@ -873,6 +916,7 @@ static struct pgpath *parse_path(struct dm_arg_set *as, struct path_selector *ps
- 	int r;
- 	struct pgpath *p;
- 	struct multipath *m = ti->private;
-+	struct mapped_device *md = dm_table_get_md((m)->ti->table);
- 
- 	/* we need at least a path arg */
- 	if (as->argc < 1) {
-@@ -906,6 +950,10 @@ static struct pgpath *parse_path(struct dm_arg_set *as, struct path_selector *ps
- 		goto bad;
- 	}
- 
-+	p->notifier.q = dm_get_md_queue(md);
-+	init_waitqueue_func_entry(&p->notifier.wait, req_notify);
-+	INIT_LIST_HEAD(&p->notifier.wait.entry);
-+
- 	return p;
-  bad:
- 	free_pgpath(p);
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index d6de00f367ef..ff06efcaf36e 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -445,6 +445,7 @@ struct request_queue *dm_get_md_queue(struct mapped_device *md)
- {
- 	return md->queue;
- }
-+EXPORT_SYMBOL_GPL(dm_get_md_queue);
- 
- struct dm_stats *dm_get_stats(struct mapped_device *md)
- {
+Hannes
 -- 
-2.9.5
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
