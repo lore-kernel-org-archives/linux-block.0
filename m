@@ -1,38 +1,102 @@
-Return-Path: <prvs=5392d374c=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "jbacik@fb.com" <jbacik@fb.com>, "tj@kernel.org" <tj@kernel.org>,
-	"jack@suse.cz" <jack@suse.cz>, "clm@fb.com" <clm@fb.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
-CC: "hoeppner@linux.vnet.ibm.com" <hoeppner@linux.vnet.ibm.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"peterz@infradead.org" <peterz@infradead.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "sth@linux.vnet.ibm.com"
-	<sth@linux.vnet.ibm.com>, "kernel-team@fb.com" <kernel-team@fb.com>,
-	"asamymuthupa@micron.com" <asamymuthupa@micron.com>,
-	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>
-Subject: Re: [PATCH 5/8] blk-mq: make blk_abort_request() trigger timeout path
-Date: Mon, 8 Jan 2018 22:10:01 +0000
-Message-ID: <1515449400.2909.31.camel@wdc.com>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+From: Tejun Heo <tj@kernel.org>
+To: jack@suse.cz,
+	axboe@kernel.dk,
+	clm@fb.com,
+	jbacik@fb.com
+Cc: kernel-team@fb.com,
+	linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	peterz@infradead.org,
+	jianchao.w.wang@oracle.com,
+	Bart.VanAssche@wdc.com,
+	linux-block@vger.kernel.org,
+	Tejun Heo <tj@kernel.org>,
+	Asai Thambi SP <asamymuthupa@micron.com>,
+	Stefan Haberland <sth@linux.vnet.ibm.com>,
+	Jan Hoeppner <hoeppner@linux.vnet.ibm.com>
+Subject: [PATCH 5/8] blk-mq: make blk_abort_request() trigger timeout path
+Date: Mon,  8 Jan 2018 11:15:39 -0800
+Message-Id: <20180108191542.379478-6-tj@kernel.org>
+In-Reply-To: <20180108191542.379478-1-tj@kernel.org>
 References: <20180108191542.379478-1-tj@kernel.org>
-	 <20180108191542.379478-6-tj@kernel.org>
-In-Reply-To: <20180108191542.379478-6-tj@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE4LTAxLTA4IGF0IDExOjE1IC0wODAwLCBUZWp1biBIZW8gd3JvdGU6DQo+IEBA
-IC0xNTYsMTIgKzE1NiwxMiBAQCB2b2lkIGJsa190aW1lb3V0X3dvcmsoc3RydWN0IHdvcmtfc3Ry
-dWN0ICp3b3JrKQ0KPiAgICovDQo+ICB2b2lkIGJsa19hYm9ydF9yZXF1ZXN0KHN0cnVjdCByZXF1
-ZXN0ICpyZXEpDQo+ICB7DQo+IC0JaWYgKGJsa19tYXJrX3JxX2NvbXBsZXRlKHJlcSkpDQo+IC0J
-CXJldHVybjsNCj4gLQ0KPiAgCWlmIChyZXEtPnEtPm1xX29wcykgew0KPiAtCQlibGtfbXFfcnFf
-dGltZWRfb3V0KHJlcSwgZmFsc2UpOw0KPiArCQlyZXEtPmRlYWRsaW5lID0gamlmZmllczsNCj4g
-KwkJbW9kX3RpbWVyKCZyZXEtPnEtPnRpbWVvdXQsIDApOw0KPiAgCX0gZWxzZSB7DQo+ICsJCWlm
-IChibGtfbWFya19ycV9jb21wbGV0ZShyZXEpKQ0KPiArCQkJcmV0dXJuOw0KPiAgCQlibGtfZGVs
-ZXRlX3RpbWVyKHJlcSk7DQo+ICAJCWJsa19ycV90aW1lZF9vdXQocmVxKTsNCj4gIAl9DQoNCk90
-aGVyIHJlcS0+ZGVhZGxpbmUgd3JpdGVzIGFyZSBwcm90ZWN0ZWQgYnkgcHJlZW1wdF9kaXNhYmxl
-KCksDQp3cml0ZV9zZXFjb3VudF9iZWdpbigmcnEtPmdzdGF0ZV9zZXEpLCB3cml0ZV9zZXFjb3Vu
-dF9lbmQoJnJxLT5nc3RhdGVfc2VxKQ0KYW5kIHByZWVtcHRfZW5hYmxlKCkuIEkgdGhpbmsgaXQn
-cyBmaW5lIHRoYXQgdGhlIGFib3ZlIHJlcS0+ZGVhZGxpbmUgc3RvcmUNCmRvZXMgbm90IGhhdmUg
-dGhhdCBwcm90ZWN0aW9uIGJ1dCBJIGFsc28gdGhpbmsgdGhhdCB0aGF0IGRlc2VydmVzIGEgY29t
-bWVudC4NCg0KVGhhbmtzLA0KDQpCYXJ0Lg==
+With issue/complete and timeout paths now using the generation number
+and state based synchronization, blk_abort_request() is the only one
+which depends on REQ_ATOM_COMPLETE for arbitrating completion.
+
+There's no reason for blk_abort_request() to be a completely separate
+path.  This patch makes blk_abort_request() piggyback on the timeout
+path instead of trying to terminate the request directly.
+
+This removes the last dependency on REQ_ATOM_COMPLETE in blk-mq.
+
+Note that this makes blk_abort_request() asynchronous - it initiates
+abortion but the actual termination will happen after a short while,
+even when the caller owns the request.  AFAICS, SCSI and ATA should be
+fine with that and I think mtip32xx and dasd should be safe but not
+completely sure.  It'd be great if people who know the drivers take a
+look.
+
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Cc: Asai Thambi SP <asamymuthupa@micron.com>
+Cc: Stefan Haberland <sth@linux.vnet.ibm.com>
+Cc: Jan Hoeppner <hoeppner@linux.vnet.ibm.com>
+---
+ block/blk-mq.c      | 2 +-
+ block/blk-mq.h      | 2 --
+ block/blk-timeout.c | 8 ++++----
+ 3 files changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 41bfd27..bed4cb8 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -814,7 +814,7 @@ struct blk_mq_timeout_data {
+ 	unsigned int nr_expired;
+ };
+ 
+-void blk_mq_rq_timed_out(struct request *req, bool reserved)
++static void blk_mq_rq_timed_out(struct request *req, bool reserved)
+ {
+ 	const struct blk_mq_ops *ops = req->q->mq_ops;
+ 	enum blk_eh_timer_return ret = BLK_EH_RESET_TIMER;
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index cf01f6f..6b2d616 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -94,8 +94,6 @@ extern int blk_mq_sysfs_register(struct request_queue *q);
+ extern void blk_mq_sysfs_unregister(struct request_queue *q);
+ extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
+ 
+-extern void blk_mq_rq_timed_out(struct request *req, bool reserved);
+-
+ void blk_mq_release(struct request_queue *q);
+ 
+ /**
+diff --git a/block/blk-timeout.c b/block/blk-timeout.c
+index 6427be7..d580af3 100644
+--- a/block/blk-timeout.c
++++ b/block/blk-timeout.c
+@@ -156,12 +156,12 @@ void blk_timeout_work(struct work_struct *work)
+  */
+ void blk_abort_request(struct request *req)
+ {
+-	if (blk_mark_rq_complete(req))
+-		return;
+-
+ 	if (req->q->mq_ops) {
+-		blk_mq_rq_timed_out(req, false);
++		req->deadline = jiffies;
++		mod_timer(&req->q->timeout, 0);
+ 	} else {
++		if (blk_mark_rq_complete(req))
++			return;
+ 		blk_delete_timer(req);
+ 		blk_rq_timed_out(req);
+ 	}
+-- 
+2.9.5
