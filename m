@@ -1,85 +1,107 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:36088 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751914AbeAISLB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Jan 2018 13:11:01 -0500
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH] block: Fix kernel-doc warnings reported when building with W=1
-Date: Tue,  9 Jan 2018 10:11:00 -0800
-Message-Id: <20180109181100.14968-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+From: Tejun Heo <tj@kernel.org>
+To: jack@suse.cz,
+	axboe@kernel.dk,
+	clm@fb.com,
+	jbacik@fb.com
+Cc: kernel-team@fb.com,
+	linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	peterz@infradead.org,
+	jianchao.w.wang@oracle.com,
+	Bart.VanAssche@wdc.com,
+	linux-block@vger.kernel.org
+Subject: [PATCHSET v4] blk-mq: reimplement timeout handling
+Date: Mon,  8 Jan 2018 11:15:34 -0800
+Message-Id: <20180108191542.379478-1-tj@kernel.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Commit 3a025e1d1c2e ("Add optional check for bad kernel-doc comments")
-causes W=1 the kernel-doc script to be run and thereby causes several
-new warnings to appear when building the kernel with W=1. Fix the
-block layer kernel-doc headers such that the block layer again builds
-cleanly with W=1.
+Hello,
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- block/bsg-lib.c    | 3 ++-
- block/scsi_ioctl.c | 5 +++--
- 2 files changed, 5 insertions(+), 3 deletions(-)
+Changes from [v3]
 
-diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-index 15d25ccd51a5..1474153f73e3 100644
---- a/block/bsg-lib.c
-+++ b/block/bsg-lib.c
-@@ -30,7 +30,7 @@
- 
- /**
-  * bsg_teardown_job - routine to teardown a bsg job
-- * @job: bsg_job that is to be torn down
-+ * @kref: kref inside bsg_job that is to be torn down
-  */
- static void bsg_teardown_job(struct kref *kref)
- {
-@@ -251,6 +251,7 @@ static void bsg_exit_rq(struct request_queue *q, struct request *req)
-  * @name: device to give bsg device
-  * @job_fn: bsg job handler
-  * @dd_job_size: size of LLD data needed for each job
-+ * @release: @dev release function
-  */
- struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
- 		bsg_job_fn *job_fn, int dd_job_size,
-diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
-index edcfff974527..5cddff44a2f8 100644
---- a/block/scsi_ioctl.c
-+++ b/block/scsi_ioctl.c
-@@ -384,9 +384,10 @@ static int sg_io(struct request_queue *q, struct gendisk *bd_disk,
- 
- /**
-  * sg_scsi_ioctl  --  handle deprecated SCSI_IOCTL_SEND_COMMAND ioctl
-- * @file:	file this ioctl operates on (optional)
-  * @q:		request queue to send scsi commands down
-  * @disk:	gendisk to operate on (option)
-+ * @mode:	mode used to open the file through which the ioctl has been
-+ *		submitted
-  * @sic:	userspace structure describing the command to perform
-  *
-  * Send down the scsi command described by @sic to the device below
-@@ -415,10 +416,10 @@ static int sg_io(struct request_queue *q, struct gendisk *bd_disk,
-  *      Positive numbers returned are the compacted SCSI error codes (4
-  *      bytes in one int) where the lowest byte is the SCSI status.
-  */
--#define OMAX_SB_LEN 16          /* For backward compatibility */
- int sg_scsi_ioctl(struct request_queue *q, struct gendisk *disk, fmode_t mode,
- 		struct scsi_ioctl_command __user *sic)
- {
-+	enum { OMAX_SB_LEN = 16 };	/* For backward compatibility */
- 	struct request *rq;
- 	struct scsi_request *req;
- 	int err;
--- 
-2.15.1
+- Rebased on top of for-4.16/block.
+
+- Integrated Jens's hctx_[un]lock() factoring patch and refreshed the
+  patches accordingly.
+
+- Added comment explaining the use of hctx_lock() instead of
+  rcu_read_lock() in completion path.
+
+Changes from [v2]
+
+- Possible extended looping around seqcount and u64_stat_sync fixed.
+
+- Misplaced MQ_RQ_IDLE state setting fixed.
+
+- RQF_MQ_TIMEOUT_EXPIRED added to prevent firing the same timeout
+  multiple times.
+
+- s/queue_rq_src/srcu/ patch added.
+
+- Other misc changes.
+
+Changes from [v1]
+
+- BLK_EH_RESET_TIMER handling fixed.
+
+- s/request->gstate_seqc/request->gstate_seq/
+
+- READ_ONCE() added to blk_mq_rq_udpate_state().
+
+- Removed left over blk_clear_rq_complete() invocation from
+  blk_mq_rq_timed_out().
+
+Currently, blk-mq timeout path synchronizes against the usual
+issue/completion path using a complex scheme involving atomic
+bitflags, REQ_ATOM_*, memory barriers and subtle memory coherence
+rules.  Unfortunatley, it contains quite a few holes.
+
+It's pretty easy to make blk_mq_check_expired() terminate a later
+instance of a request.  If we induce 5 sec delay before
+time_after_eq() test in blk_mq_check_expired(), shorten the timeout to
+2s, and issue back-to-back large IOs, blk-mq starts timing out
+requests spuriously pretty quickly.  Nothing actually timed out.  It
+just made the call on a recycle instance of a request and then
+terminated a later instance long after the original instance finished.
+The scenario isn't theoretical either.
+
+This patchset replaces the broken synchronization mechanism with a RCU
+and generation number based one.  Please read the patch description of
+the second path for more details.
+
+This patchset contains the following eight patches.
+
+0001-blk-mq-move-hctx-lock-unlock-into-a-helper.patch
+0002-blk-mq-protect-completion-path-with-RCU.patch
+0003-blk-mq-replace-timeout-synchronization-with-a-RCU-an.patch
+0004-blk-mq-use-blk_mq_rq_state-instead-of-testing-REQ_AT.patch
+0005-blk-mq-make-blk_abort_request-trigger-timeout-path.patch
+0006-blk-mq-remove-REQ_ATOM_COMPLETE-usages-from-blk-mq.patch
+0007-blk-mq-remove-REQ_ATOM_STARTED.patch
+0008-blk-mq-rename-blk_mq_hw_ctx-queue_rq_srcu-to-srcu.patch
+
+and is available in the following git branch.
+
+ git://git.kernel.org/pub/scm/linux/kernel/git/tj/misc.git blk-mq-timeout-v4
+
+diffstat follows.  Thanks.
+
+ block/blk-core.c       |    2 
+ block/blk-mq-debugfs.c |    4 
+ block/blk-mq.c         |  340 ++++++++++++++++++++++++++++---------------------
+ block/blk-mq.h         |   49 ++++++-
+ block/blk-timeout.c    |   11 -
+ block/blk.h            |    7 -
+ include/linux/blk-mq.h |    3 
+ include/linux/blkdev.h |   25 +++
+ 8 files changed, 283 insertions(+), 158 deletions(-)
+
+--
+tejun
+
+[v3] http://lkml.kernel.org/r/20171216120726.517153-1-tj@kernel.org
+[v2] http://lkml.kernel.org/r/20171010155441.753966-1-tj@kernel.org
+[v1] http://lkml.kernel.org/r/20171209192525.982030-1-tj@kernel.org
