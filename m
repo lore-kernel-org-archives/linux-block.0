@@ -1,65 +1,37 @@
-Return-Path: <hare@suse.de>
+Return-Path: <holger@applied-asynchrony.com>
 Subject: Re: [PATCH 2/8] blk-mq: protect completion path with RCU
-To: Tejun Heo <tj@kernel.org>, jack@suse.cz, axboe@kernel.dk, clm@fb.com,
- jbacik@fb.com
+From: =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
+To: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, jack@suse.cz,
+ clm@fb.com, jbacik@fb.com
 Cc: kernel-team@fb.com, linux-kernel@vger.kernel.org,
  linux-btrfs@vger.kernel.org, peterz@infradead.org,
  jianchao.w.wang@oracle.com, Bart.VanAssche@wdc.com,
  linux-block@vger.kernel.org
 References: <20180108191542.379478-1-tj@kernel.org>
  <20180108191542.379478-3-tj@kernel.org>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <b4fdf1c4-2728-5537-a00f-09db0a4b25e4@suse.de>
-Date: Tue, 9 Jan 2018 08:08:04 +0100
+ <774b9fa0-c1f9-f528-09c3-2f3bd67e0fd5@applied-asynchrony.com>
+ <93157cfd-7c3c-c260-14e2-25784fe43314@kernel.dk>
+ <7b22068e-85a5-06e0-c699-d1e970bbb3a6@kernel.dk>
+ <229f2475-733d-d20a-ccef-6f2c0c5ae7b7@applied-asynchrony.com>
+Message-ID: <44929fcd-05eb-f67d-e9dc-14f7f6c02c72@applied-asynchrony.com>
+Date: Tue, 9 Jan 2018 00:33:35 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180108191542.379478-3-tj@kernel.org>
+In-Reply-To: <229f2475-733d-d20a-ccef-6f2c0c5ae7b7@applied-asynchrony.com>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 01/08/2018 08:15 PM, Tejun Heo wrote:
-> Currently, blk-mq protects only the issue path with RCU.  This patch
-> puts the completion path under the same RCU protection.  This will be
-> used to synchronize issue/completion against timeout by later patches,
-> which will also add the comments.
+On 01/09/18 00:27, Holger Hoffstätte wrote:
+> On 01/08/18 23:55, Jens Axboe wrote:
+>> the good old
+>>
+>> int srcu_idx = srcu_idx;
+>>
+>> should get the job done.
 > 
-> Signed-off-by: Tejun Heo <tj@kernel.org>
-> ---
->  block/blk-mq.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index ddc9261..6741c3e 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -584,11 +584,16 @@ static void hctx_lock(struct blk_mq_hw_ctx *hctx, int *srcu_idx)
->  void blk_mq_complete_request(struct request *rq)
->  {
->  	struct request_queue *q = rq->q;
-> +	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, rq->mq_ctx->cpu);
-> +	int srcu_idx;
->  
->  	if (unlikely(blk_should_fake_timeout(q)))
->  		return;
-> +
-> +	hctx_lock(hctx, &srcu_idx);
->  	if (!blk_mark_rq_complete(rq))
->  		__blk_mq_complete_request(rq);
-> +	hctx_unlock(hctx, srcu_idx);
->  }
->  EXPORT_SYMBOL(blk_mq_complete_request);
->  
-> 
-Hmm. Why do we need to call blk_mq_map_queue() here?
-Is there a chance that we end up with a _different_ hctx on completion
-than that one used for submission?
-If not, why can't we just keep a pointer to the hctx in struct request?
+> (Narrator: It didn't.)
 
-Cheers,
+Narrator: we retract our previous statement and apologize for the
+confusion. It works fine when you correctly replace all occurrences,
+not just one. <:)
 
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+Holger
