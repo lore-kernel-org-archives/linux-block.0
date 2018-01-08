@@ -1,54 +1,58 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f54.google.com ([74.125.83.54]:43989 "EHLO
-        mail-pg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934227AbeAHUVj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jan 2018 15:21:39 -0500
-Received: by mail-pg0-f54.google.com with SMTP id f14so3730102pga.10
-        for <linux-block@vger.kernel.org>; Mon, 08 Jan 2018 12:21:39 -0800 (PST)
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:44297 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757236AbeAHUVw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jan 2018 15:21:52 -0500
+Received: by mail-pf0-f194.google.com with SMTP id m26so6767252pfj.11
+        for <linux-block@vger.kernel.org>; Mon, 08 Jan 2018 12:21:52 -0800 (PST)
 From: Michael Lyle <mlyle@lyle.org>
 To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com
-Subject: [416 PATCH 00/13] Bcache changes for 4.16
-Date: Mon,  8 Jan 2018 12:21:17 -0800
-Message-Id: <20180108202130.31303-1-mlyle@lyle.org>
+Cc: axboe@fb.com, Zhai Zhaoxuan <kxuanobj@gmail.com>
+Subject: [416 PATCH 10/13] bcache: fix unmatched generic_end_io_acct() & generic_start_io_acct()
+Date: Mon,  8 Jan 2018 12:21:27 -0800
+Message-Id: <20180108202130.31303-11-mlyle@lyle.org>
+In-Reply-To: <20180108202130.31303-1-mlyle@lyle.org>
+References: <20180108202130.31303-1-mlyle@lyle.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Jens,
+From: Zhai Zhaoxuan <kxuanobj@gmail.com>
 
-Please pick up the following reviewed changes for 4.16.  There's some
-small cleanliness changes, a few minor bug fixes (some in preparation
-for larger work), and ongoing work on writeback performance:
+The function cached_dev_make_request() and flash_dev_make_request() call
+generic_start_io_acct() with (struct bcache_device)->disk when they start a
+closure. Then the function bio_complete() calls generic_end_io_acct() with
+(struct search)->orig_bio->bi_disk when the closure has done.
+Since the `bi_disk` is not the bcache device, the generic_end_io_acct() is
+called with a wrong device queue.
 
- 11 files changed, 303 insertions(+), 133 deletions(-)
+It causes the "inflight" (in struct hd_struct) counter keep increasing
+without decreasing.
 
-Coly Li (2):
-      bcache: reduce cache_set devices iteration by devices_max_used
-      bcache: fix misleading error message in bch_count_io_errors()
+This patch fix the problem by calling generic_end_io_acct() with
+(struct bcache_device)->disk.
 
-Kent Overstreet (2):
-      bcache: Fix, improve efficiency of closure_sync()
-      bcache: mark closure_sync() __sched
+Signed-off-by: Zhai Zhaoxuan <kxuanobj@gmail.com>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
+Reviewed-by: Coly Li <colyli@suse.de>
+Reviewed-by: Tang Junhui <tang.junhui@zte.com.cn>
+---
+ drivers/md/bcache/request.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Michael Lyle (3):
-      bcache: writeback: properly order backing device IO
-      bcache: allow quick writeback when backing idle
-      bcache: fix writeback target calc on large devices
-
-Rui Hua (1):
-      bcache: ret IOERR when read meets metadata error
-
-Tang Junhui (3):
-      bcache: stop writeback thread after detaching
-      bcache: segregate flash only volume write streams
-      bcache: fix wrong return value in bch_debug_init()
-
-Vasyl Gomonovych (1):
-      bcache: Use PTR_ERR_OR_ZERO()
-
-Zhai Zhaoxuan (1):
-      bcache: fix unmatched generic_end_io_acct() & generic_start_io_acct()
-
-Thanks,
-
-Mike
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index ddd941056f3c..1a46b41dac70 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -633,8 +633,8 @@ static void request_endio(struct bio *bio)
+ static void bio_complete(struct search *s)
+ {
+ 	if (s->orig_bio) {
+-		struct request_queue *q = s->orig_bio->bi_disk->queue;
+-		generic_end_io_acct(q, bio_data_dir(s->orig_bio),
++		generic_end_io_acct(s->d->disk->queue,
++				    bio_data_dir(s->orig_bio),
+ 				    &s->d->disk->part0, s->start_time);
+ 
+ 		trace_bcache_request_end(s->d, s->orig_bio);
+-- 
+2.14.1
