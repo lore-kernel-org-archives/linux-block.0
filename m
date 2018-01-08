@@ -1,109 +1,53 @@
-Return-Path: <jiangqi903@gmail.com>
-Return-Path: <jiangqi903@gmail.com>
-From: Joseph Qi <jiangqi903@gmail.com>
-Subject: [PATCH 3/3] blk-throttle: do downgrade/upgrade check when issuing io
- to lower layer
-To: Jens Axboe <axboe@kernel.dk>, Shaohua Li <shli@kernel.org>
-Cc: jinli.zjl@alibaba-inc.com, qijiang.qj@alibaba-inc.com,
- linux-block <linux-block@vger.kernel.org>
-Message-ID: <21feac46-091c-8a41-a69c-ebb44646f5be@gmail.com>
-Date: Thu, 4 Jan 2018 19:08:32 +0800
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [416 PATCH 00/13] Bcache changes for 4.16
+To: Michael Lyle <mlyle@lyle.org>, linux-bcache@vger.kernel.org,
+ linux-block@vger.kernel.org
+References: <20180108202130.31303-1-mlyle@lyle.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <0692a21d-8465-9c1e-93a5-cf96dfb36cda@kernel.dk>
+Date: Mon, 8 Jan 2018 13:42:41 -0700
 MIME-Version: 1.0
+In-Reply-To: <20180108202130.31303-1-mlyle@lyle.org>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Joseph Qi <qijiang.qj@alibaba-inc.com>
+On 1/8/18 1:21 PM, Michael Lyle wrote:
+> Jens,
+> 
+> Please pick up the following reviewed changes for 4.16.  There's some
+> small cleanliness changes, a few minor bug fixes (some in preparation
+> for larger work), and ongoing work on writeback performance:
+> 
+>  11 files changed, 303 insertions(+), 133 deletions(-)
+> 
+> Coly Li (2):
+>       bcache: reduce cache_set devices iteration by devices_max_used
+>       bcache: fix misleading error message in bch_count_io_errors()
+> 
+> Kent Overstreet (2):
+>       bcache: Fix, improve efficiency of closure_sync()
+>       bcache: mark closure_sync() __sched
+> 
+> Michael Lyle (3):
+>       bcache: writeback: properly order backing device IO
+>       bcache: allow quick writeback when backing idle
+>       bcache: fix writeback target calc on large devices
+> 
+> Rui Hua (1):
+>       bcache: ret IOERR when read meets metadata error
+> 
+> Tang Junhui (3):
+>       bcache: stop writeback thread after detaching
+>       bcache: segregate flash only volume write streams
+>       bcache: fix wrong return value in bch_debug_init()
+> 
+> Vasyl Gomonovych (1):
+>       bcache: Use PTR_ERR_OR_ZERO()
+> 
+> Zhai Zhaoxuan (1):
+>       bcache: fix unmatched generic_end_io_acct() & generic_start_io_acct()
 
-Currently downgrade/upgrade check is done when io firstly comes to block
-throttle layer. In case of writeback, a large number of ios will firstly
-be throttled in throttle queue and then dispatched when timer kicked,
-which won't be checked because REQ_THROTTLED is set. This will lead to
-low limit not guaranteed most of time.
-Fix this case by moving check logic down, in which we are ready to issue
-io to lower layer.
+Looks good, thanks Mike. Applied for 4.16.
 
-Signed-off-by: Joseph Qi <qijiang.qj@alibaba-inc.com>
----
- block/blk-throttle.c | 23 +++++++++++------------
- 1 file changed, 11 insertions(+), 12 deletions(-)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 9c0b5ff..6207554 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -1065,8 +1065,6 @@ static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
- 	/* Charge the bio to the group */
- 	tg->bytes_disp[rw] += bio_size;
- 	tg->io_disp[rw]++;
--	tg->last_bytes_disp[rw] += bio_size;
--	tg->last_io_disp[rw]++;
- 
- 	/*
- 	 * BIO_THROTTLED is used to prevent the same bio to be throttled
-@@ -2166,7 +2164,8 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 		    struct bio *bio)
- {
- 	struct throtl_qnode *qn = NULL;
--	struct throtl_grp *tg = blkg_to_tg(blkg ?: q->root_blkg);
-+	struct throtl_grp *orig_tg = blkg_to_tg(blkg ?: q->root_blkg);
-+	struct throtl_grp *tg = orig_tg;
- 	struct throtl_service_queue *sq;
- 	bool rw = bio_data_dir(bio);
- 	bool throttled = false;
-@@ -2174,11 +2173,11 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 
- 	WARN_ON_ONCE(!rcu_read_lock_held());
- 
-+	spin_lock_irq(q->queue_lock);
-+
- 	/* see throtl_charge_bio() */
- 	if (bio_flagged(bio, BIO_THROTTLED) || !tg->has_rules[rw])
--		goto out;
--
--	spin_lock_irq(q->queue_lock);
-+		goto out_unlock;
- 
- 	throtl_update_latency_buckets(td);
- 
-@@ -2194,15 +2193,12 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 	while (true) {
- 		if (tg->last_low_overflow_time[rw] == 0)
- 			tg->last_low_overflow_time[rw] = jiffies;
--		throtl_downgrade_check(tg);
--		throtl_upgrade_check(tg);
- 		/* throtl is FIFO - if bios are already queued, should queue */
- 		if (sq->nr_queued[rw])
- 			break;
- 
- 		/* if above limits, break to queue */
- 		if (!tg_may_dispatch(tg, bio, NULL)) {
--			tg->last_low_overflow_time[rw] = jiffies;
- 			if (throtl_can_upgrade(td, tg)) {
- 				throtl_upgrade_state(td);
- 				goto again;
-@@ -2246,8 +2242,6 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 		   tg->io_disp[rw], tg_iops_limit(tg, rw),
- 		   sq->nr_queued[READ], sq->nr_queued[WRITE]);
- 
--	tg->last_low_overflow_time[rw] = jiffies;
--
- 	td->nr_queued[rw]++;
- 	throtl_add_bio_tg(bio, qn, tg);
- 	throttled = true;
-@@ -2264,8 +2258,13 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 	}
- 
- out_unlock:
-+	throtl_downgrade_check(orig_tg);
-+	throtl_upgrade_check(orig_tg);
-+	if (!throttled) {
-+		orig_tg->last_bytes_disp[rw] += throtl_bio_data_size(bio);
-+		orig_tg->last_io_disp[rw]++;
-+	}
- 	spin_unlock_irq(q->queue_lock);
--out:
- 	bio_set_flag(bio, BIO_THROTTLED);
- 
- #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
 -- 
-1.9.4
+Jens Axboe
