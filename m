@@ -1,60 +1,45 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:41232 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752450AbeAFI16 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 6 Jan 2018 03:27:58 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Yi Zhang <yi.zhang@redhat.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 0/4] blk-mq: fix race related with device deletion/reset/switching sched
-Date: Sat,  6 Jan 2018 16:27:36 +0800
-Message-Id: <20180106082740.26442-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hare@suse.de>
+Subject: Re: [for-4.16 PATCH v2 0/5] block, nvme, dm: allow DM multipath to
+ use NVMe's error handler
+To: Keith Busch <keith.busch@intel.com>, Mike Snitzer <snitzer@redhat.com>
+Cc: axboe@kernel.dk, hch@lst.de, emilne@redhat.com, james.smart@broadcom.com,
+ Bart.VanAssche@wdc.com, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org, dm-devel@redhat.com
+References: <20171227032257.8182-1-snitzer@redhat.com>
+ <20180102232943.GC26533@localhost.localdomain>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <31d7df8b-1197-c7aa-3c05-d8e7b5a63854@suse.de>
+Date: Mon, 8 Jan 2018 07:52:46 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180102232943.GC26533@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+On 01/03/2018 12:29 AM, Keith Busch wrote:
+> Instead of hiding NVMe path related errors, the NVMe driver needs to
+> code an appropriate generic block status from an NVMe status.
+> 
+> We already do this translation whether or not CONFIG_NVME_MULTIPATHING is
+> set, so I think it's silly NVMe native multipathing has a second status
+> decoder. This just doubles the work if we need to handle any new NVMe
+> status codes in the future.
+> 
+> I have a counter-proposal below that unifies NVMe-to-block status
+> translations, and combines common code for determining if an error is a
+> path failure. This should work for both NVMe and DM, and DM won't need
+> NVMe specifics.
+> 
+> I can split this into a series if there's indication this is ok and
+> satisfies the need.
+> 
+I'm all for it. Go.
 
-The 1st patch fixes one kernel oops triggered by IOs vs. deleting SCSI
-device, and this issue can be triggered easily on scsi_debug.
+Cheers,
 
-The other 3 patch fixes recent Yi Zhang's reports about his NVMe stress
-tests, most of them are related with switching io sched, NVMe reset or
-updating nr_hw_queues.
-
-V3:
-	- fix 'blk-mq: support concurrent blk_mq_quiesce_queue' on SCSI,
-	  which calls quiesce two times, and split blk_quiesce_queue into
-	  two parts and fix this issue
-	- remove previous patch 6, and Sagi provides one better patch to
-	fix that, see '[PATCH v2] nvme-pci: allocate device queues storage space at probe'
-	- remove patch 2 of 'blk-mq: support concurrent blk_mq_quiesce_queue()'
-	  which need a bit much more work, especially we need to cleanup
-	  NVMe's usage on quiesce & unquiesce first, so delay it for V4.17.
-
-V2:
-	- address stale queue mapping in blk_mq_update_queue_map(), instead
-	of PCI transport, since such issue exists on other transport too,
-	as suggested by Christoph
-	- avoid to introduce nvme_admin_queue_rq() since the nvme queue can
-	be got from hctx->driver_data, which is reliable
-
-
-Thanks,
-Ming
-
-Ming Lei (4):
-  blk-mq: quiesce queue before freeing queue
-  blk-mq: quiesce queue during switching io sched and updating
-    nr_requests
-  blk-mq: avoid to map CPU into stale hw queue
-  blk-mq: fix race between updating nr_hw_queues and switching io sched
-
- block/blk-core.c |  9 +++++++++
- block/blk-mq.c   | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++---
- block/elevator.c |  2 ++
- 3 files changed, 61 insertions(+), 3 deletions(-)
-
+Hannes
 -- 
-2.9.5
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
