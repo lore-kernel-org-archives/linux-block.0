@@ -1,112 +1,121 @@
-Return-Path: <prvs=541b0d852=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Omar Sandoval <osandov@fb.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH] blk-mq: Rework blk_mq_mark_tag_wait()
-Date: Wed, 10 Jan 2018 10:04:28 -0800
-Message-Id: <20180110180428.22587-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:38936 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757227AbeAHUV4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jan 2018 15:21:56 -0500
+Received: by mail-pf0-f194.google.com with SMTP id e11so3061039pff.6
+        for <linux-block@vger.kernel.org>; Mon, 08 Jan 2018 12:21:56 -0800 (PST)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Michael Lyle <mlyle@lyle.org>
+Subject: [416 PATCH 13/13] bcache: fix writeback target calc on large devices
+Date: Mon,  8 Jan 2018 12:21:30 -0800
+Message-Id: <20180108202130.31303-14-mlyle@lyle.org>
+In-Reply-To: <20180108202130.31303-1-mlyle@lyle.org>
+References: <20180108202130.31303-1-mlyle@lyle.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Use prepare_to_wait() and finish_wait() instead of open-coding these
-functions. Reduce the number of if-statements to make
-blk_mq_mark_tag_wait() easier to read. Both add_wait_queue() and
-blk_mq_dispatch_wake() protect wait queue manipulations with the wait
-queue lock. Hence also protect the !list_empty(&wait->entry) test with
-the wait queue lock instead of the hctx lock.
+Bcache needs to scale the dirty data in the cache over the multiple
+backing disks in order to calculate writeback rates for each.
+The previous code did this by multiplying the target number of dirty
+sectors by the backing device size, and expected it to fit into a
+uint64_t; this blows up on relatively small backing devices.
 
-Note: a side effect of this patch is that the task state is changed
-for shared queues before and after the blk_mq_get_driver_tag().
-Since blk_mq_dispatch_wake() ignores the task state these task state
-changes do not affect which task gets woken up.
+The new approach figures out the bdev's share in 16384ths of the overall
+cached data.  This is chosen to cope well when bdevs drastically vary in
+size and to ensure that bcache can cross the petabyte boundary for each
+backing device.
 
-See also commit f906a6a0f426 ("blk-mq: improve tag waiting setup for
-non-shared tags").
+This has been improved based on Tang Junhui's feedback to ensure that
+every device gets a share of dirty data, no matter how small it is
+compared to the total backing pool.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+The existing mechanism is very limited; this is purely a bug fix to
+remove limits on volume size.  However, there still needs to be change
+to make this "fair" over many volumes where some are idle.
+
+Reported-by: Jack Douglas <jack@douglastechnology.co.uk>
+Signed-off-by: Michael Lyle <mlyle@lyle.org>
+Reviewed-by: Tang Junhui <tang.junhui@zte.com.cn>
 ---
- block/blk-mq.c | 49 +++++++++++++++++--------------------------------
- 1 file changed, 17 insertions(+), 32 deletions(-)
+ drivers/md/bcache/writeback.c | 31 +++++++++++++++++++++++++++----
+ drivers/md/bcache/writeback.h |  7 +++++++
+ 2 files changed, 34 insertions(+), 4 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 61bdbf45c3be..29f140b4dbf7 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1121,50 +1121,35 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx **hctx,
- 	if (!shared_tags) {
- 		if (!test_bit(BLK_MQ_S_SCHED_RESTART, &this_hctx->state))
- 			set_bit(BLK_MQ_S_SCHED_RESTART, &this_hctx->state);
-+		ret = blk_mq_get_driver_tag(rq, hctx, false);
-+		/*
-+		 * Don't clear RESTART here, someone else could have set it.
-+		 * At most this will cost an extra queue run.
-+		 */
- 	} else {
- 		wait = &this_hctx->dispatch_wait;
- 		if (!list_empty_careful(&wait->entry))
- 			return false;
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index 31b0a292a619..51306a19ab03 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -18,17 +18,39 @@
+ #include <trace/events/bcache.h>
  
--		spin_lock(&this_hctx->lock);
--		if (!list_empty(&wait->entry)) {
--			spin_unlock(&this_hctx->lock);
--			return false;
--		}
+ /* Rate limiting */
 -
- 		ws = bt_wait_ptr(&this_hctx->tags->bitmap_tags, this_hctx);
--		add_wait_queue(&ws->wait, wait);
--	}
--
--	/*
--	 * It's possible that a tag was freed in the window between the
--	 * allocation failure and adding the hardware queue to the wait
--	 * queue.
--	 */
--	ret = blk_mq_get_driver_tag(rq, hctx, false);
-+		prepare_to_wait(&ws->wait, wait, TASK_UNINTERRUPTIBLE);
+-static void __update_writeback_rate(struct cached_dev *dc)
++static uint64_t __calc_target_rate(struct cached_dev *dc)
+ {
+ 	struct cache_set *c = dc->disk.c;
++
++	/*
++	 * This is the size of the cache, minus the amount used for
++	 * flash-only devices
++	 */
+ 	uint64_t cache_sectors = c->nbuckets * c->sb.bucket_size -
+ 				bcache_flash_devs_sectors_dirty(c);
++
++	/*
++	 * Unfortunately there is no control of global dirty data.  If the
++	 * user states that they want 10% dirty data in the cache, and has,
++	 * e.g., 5 backing volumes of equal size, we try and ensure each
++	 * backing volume uses about 2% of the cache for dirty data.
++	 */
++	uint32_t bdev_share =
++		div64_u64(bdev_sectors(dc->bdev) << WRITEBACK_SHARE_SHIFT,
++				c->cached_dev_sectors);
++
+ 	uint64_t cache_dirty_target =
+ 		div_u64(cache_sectors * dc->writeback_percent, 100);
+-	int64_t target = div64_u64(cache_dirty_target * bdev_sectors(dc->bdev),
+-				   c->cached_dev_sectors);
  
--	if (!shared_tags) {
- 		/*
--		 * Don't clear RESTART here, someone else could have set it.
--		 * At most this will cost an extra queue run.
-+		 * It's possible that a tag was freed in the window between the
-+		 * allocation failure and adding the hardware queue to the wait
-+		 * queue.
- 		 */
--		return ret;
--	} else {
--		if (!ret) {
--			spin_unlock(&this_hctx->lock);
--			return false;
--		}
--
-+		ret = blk_mq_get_driver_tag(rq, hctx, false);
- 		/*
--		 * We got a tag, remove ourselves from the wait queue to ensure
--		 * someone else gets the wakeup.
-+		 * If we got a tag, remove ourselves from the wait queue to
-+		 * ensure someone else gets the wakeup.
- 		 */
--		spin_lock_irq(&ws->wait.lock);
--		list_del_init(&wait->entry);
--		spin_unlock_irq(&ws->wait.lock);
--		spin_unlock(&this_hctx->lock);
--		return true;
-+		if (ret)
-+			finish_wait(&ws->wait, wait);
-+		else
-+			__set_current_state(TASK_RUNNING);
- 	}
-+	return ret;
- }
++	/* Ensure each backing dev gets at least one dirty share */
++	if (bdev_share < 1)
++		bdev_share = 1;
++
++	return (cache_dirty_target * bdev_share) >> WRITEBACK_SHARE_SHIFT;
++}
++
++static void __update_writeback_rate(struct cached_dev *dc)
++{
+ 	/*
+ 	 * PI controller:
+ 	 * Figures out the amount that should be written per second.
+@@ -49,6 +71,7 @@ static void __update_writeback_rate(struct cached_dev *dc)
+ 	 * This acts as a slow, long-term average that is not subject to
+ 	 * variations in usage like the p term.
+ 	 */
++	int64_t target = __calc_target_rate(dc);
+ 	int64_t dirty = bcache_dev_sectors_dirty(&dc->disk);
+ 	int64_t error = dirty - target;
+ 	int64_t proportional_scaled =
+diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
+index f102b1f9bc51..66f1c527fa24 100644
+--- a/drivers/md/bcache/writeback.h
++++ b/drivers/md/bcache/writeback.h
+@@ -8,6 +8,13 @@
+ #define MAX_WRITEBACKS_IN_PASS  5
+ #define MAX_WRITESIZE_IN_PASS   5000	/* *512b */
  
- bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
++/*
++ * 14 (16384ths) is chosen here as something that each backing device
++ * should be a reasonable fraction of the share, and not to blow up
++ * until individual backing devices are a petabyte.
++ */
++#define WRITEBACK_SHARE_SHIFT   14
++
+ static inline uint64_t bcache_dev_sectors_dirty(struct bcache_device *d)
+ {
+ 	uint64_t i, ret = 0;
 -- 
-2.15.1
+2.14.1
