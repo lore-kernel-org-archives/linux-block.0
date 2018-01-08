@@ -1,137 +1,132 @@
-Return-Path: <gunthorp@deltatee.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvdimm@lists.01.org,
-	linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Logan Gunthorpe <logang@deltatee.com>
-Date: Thu,  4 Jan 2018 12:01:25 -0700
-Message-Id: <20180104190137.7654-1-logang@deltatee.com>
-Subject: [PATCH 00/11] Copy Offload in NVMe Fabrics with P2P PCI Memory
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:33224 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757225AbeAHUVr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jan 2018 15:21:47 -0500
+Received: by mail-pg0-f67.google.com with SMTP id i196so6309231pgd.0
+        for <linux-block@vger.kernel.org>; Mon, 08 Jan 2018 12:21:47 -0800 (PST)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Michael Lyle <mlyle@lyle.org>
+Subject: [416 PATCH 06/13] bcache: writeback: properly order backing device IO
+Date: Mon,  8 Jan 2018 12:21:23 -0800
+Message-Id: <20180108202130.31303-7-mlyle@lyle.org>
+In-Reply-To: <20180108202130.31303-1-mlyle@lyle.org>
+References: <20180108202130.31303-1-mlyle@lyle.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hello,
+Writeback keys are presently iterated and dispatched for writeback in
+order of the logical block address on the backing device.  Multiple may
+be, in parallel, read from the cache device and then written back
+(especially when there are contiguous I/O).
 
-This is a continuation of our work to enable using Peer-to-Peer PCI
-memory in NVMe fabrics targets. Many thanks go to Christoph Hellwig who
-provided valuable feedback to get these patches to where they are today.
+However-- there was no guarantee with the existing code that the writes
+would be issued in LBA order, as the reads from the cache device are
+often re-ordered.  In turn, when writing back quickly, the backing disk
+often has to seek backwards-- this slows writeback and increases
+utilization.
 
-The concept here is to use memory that's exposed on a PCI BAR as
-data buffers in the NVME target code such that data can be transferred
-from an RDMA NIC to the special memory and then directly to an NVMe
-device avoiding system memory entirely. The upside of this is better
-QoS for applications running on the CPU utilizing memory and lower
-PCI bandwidth required to the CPU (such that systems could be designed
-with fewer lanes connected to the CPU). However, presently, the
-trade-off is currently a reduction in overall throughput. (Largely due
-to hardware issues that would certainly improve in the future).
+This patch introduces an ordering mechanism that guarantees that the
+original order of issue is maintained for the write portion of the I/O.
+Performance for writeback is significantly improved when there are
+multiple contiguous keys or high writeback rates.
 
-Due to these trade-offs we've designed the system to only enable using
-the PCI memory in cases where the NIC, NVMe devices and memory are all
-behind the same PCI switch. This will mean many setups that could likely
-work well will not be supported so that we can be more confident it
-will work and not place any responsibility on the user to understand
-their topology. (We chose to go this route based on feedback we
-received at the last LSF). Future work may enable these transfers behind
-a fabric of PCI switches or perhaps using a white list of known good
-root complexes.
+Signed-off-by: Michael Lyle <mlyle@lyle.org>
+Reviewed-by: Tang Junhui <tang.junhui@zte.com.cn>
+Tested-by: Tang Junhui <tang.junhui@zte.com.cn>
+---
+ drivers/md/bcache/bcache.h    |  8 ++++++++
+ drivers/md/bcache/writeback.c | 29 +++++++++++++++++++++++++++++
+ 2 files changed, 37 insertions(+)
 
-In order to enable this functionality, we introduce a few new PCI
-functions such that a driver can register P2P memory with the system.
-Struct pages are created for this memory using devm_memremap_pages()
-and the PCI bus offset is stored in the corresponding pagemap structure.
-
-Another set of functions allow a client driver to create a list of
-client devices that will be used in a given P2P transactions and then
-use that list to find any P2P memory that is supported by all the
-client devices. This list is then also used to selectively disable the
-ACS bits for the downstream ports behind these devices.
-
-In the block layer, we also introduce a P2P request flag to indicate a
-given request targets P2P memory as well as a flag for a request queue
-to indicate a given queue supports targeting P2P memory. P2P requests
-will only be accepted by queues that support it. Also, P2P requests
-are marked to not be merged seeing a non-homogenous request would
-complicate the DMA mapping requirements.
-
-In the PCI NVMe driver, we modify the existing CMB support to utilize
-the new PCI P2P memory infrastructure and also add support for P2P
-memory in its request queue. When a P2P request is received it uses the
-pci_p2pmem_map_sg() function which applies the necessary transformation
-to get the corrent pci_bus_addr_t for the DMA transactions.
-
-In the RDMA core, we also adjust rdma_rw_ctx_init() and
-rdma_rw_ctx_destroy() to take a flags argument which indicates whether
-to use the PCI P2P mapping functions or not.
-
-Finally, in the NVMe fabrics target port we introduce a new
-configuration boolean: 'allow_p2pmem'. When set, the port will attempt
-to find P2P memory supported by the RDMA NIC and all namespaces. If
-supported memory is found, it will be used in all IO transfers. And if
-a port is using P2P memory, adding new namespaces that are not supported
-by that memory will fail.
-
-This series is based off of Christoph's v3 series to revamp
-dev_pagemap. A git repo of the patches is available here[2].
-
-Logan
-
-Christoph Hellwig (2):
-  nvme-pci: clean up CMB initialization
-  nvme-pci: clean up SMBSZ bit definitions
-
-Logan Gunthorpe (10):
-  pci-p2p: Support peer to peer memory
-  pci-p2p: Add sysfs group to display p2pmem stats
-  pci-p2p: Add PCI p2pmem dma mappings to adjust the bus offset
-  pci-p2p: Clear ACS P2P flags for all client devices
-  block: Introduce PCI P2P flags for request and request queue
-  IB/core: Add optional PCI P2P flag to rdma_rw_ctx_[init|destroy]()
-  nvme-pci: Use PCI p2pmem subsystem to manage the CMB
-  nvme-pci: Add support for P2P memory in requests
-  nvme-pci: Add a quirk for a pseudo CMB
-  nvmet: Optionally use PCI P2P memory
-
- Documentation/ABI/testing/sysfs-bus-pci |  25 +
- block/blk-core.c                        |   3 +
- drivers/infiniband/core/rw.c            |  22 +-
- drivers/infiniband/ulp/isert/ib_isert.c |   5 +-
- drivers/infiniband/ulp/srpt/ib_srpt.c   |   7 +-
- drivers/nvme/host/core.c                |   4 +
- drivers/nvme/host/nvme.h                |   8 +
- drivers/nvme/host/pci.c                 | 164 ++++---
- drivers/nvme/target/configfs.c          |  29 ++
- drivers/nvme/target/core.c              |  95 +++-
- drivers/nvme/target/io-cmd.c            |   3 +
- drivers/nvme/target/nvmet.h             |  10 +
- drivers/nvme/target/rdma.c              |  41 +-
- drivers/pci/Kconfig                     |  14 +
- drivers/pci/Makefile                    |   1 +
- drivers/pci/p2p.c                       | 781 ++++++++++++++++++++++++++++++++
- include/linux/blk_types.h               |  18 +-
- include/linux/blkdev.h                  |   2 +
- include/linux/memremap.h                |  19 +
- include/linux/nvme.h                    |  22 +-
- include/linux/pci-p2p.h                 |  94 ++++
- include/linux/pci.h                     |   6 +
- include/rdma/rw.h                       |   7 +-
- net/sunrpc/xprtrdma/svc_rdma_rw.c       |   6 +-
- 24 files changed, 1291 insertions(+), 95 deletions(-)
- create mode 100644 drivers/pci/p2p.c
- create mode 100644 include/linux/pci-p2p.h
-
---
-2.11.0
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 1784e50eb857..3be0fcc19b1f 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -330,6 +330,14 @@ struct cached_dev {
+ 
+ 	struct keybuf		writeback_keys;
+ 
++	/*
++	 * Order the write-half of writeback operations strongly in dispatch
++	 * order.  (Maintain LBA order; don't allow reads completing out of
++	 * order to re-order the writes...)
++	 */
++	struct closure_waitlist writeback_ordering_wait;
++	atomic_t		writeback_sequence_next;
++
+ 	/* For tracking sequential IO */
+ #define RECENT_IO_BITS	7
+ #define RECENT_IO	(1 << RECENT_IO_BITS)
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index 479095987f22..6e1d2fde43df 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -116,6 +116,7 @@ static unsigned writeback_delay(struct cached_dev *dc, unsigned sectors)
+ struct dirty_io {
+ 	struct closure		cl;
+ 	struct cached_dev	*dc;
++	uint16_t		sequence;
+ 	struct bio		bio;
+ };
+ 
+@@ -194,6 +195,27 @@ static void write_dirty(struct closure *cl)
+ {
+ 	struct dirty_io *io = container_of(cl, struct dirty_io, cl);
+ 	struct keybuf_key *w = io->bio.bi_private;
++	struct cached_dev *dc = io->dc;
++
++	uint16_t next_sequence;
++
++	if (atomic_read(&dc->writeback_sequence_next) != io->sequence) {
++		/* Not our turn to write; wait for a write to complete */
++		closure_wait(&dc->writeback_ordering_wait, cl);
++
++		if (atomic_read(&dc->writeback_sequence_next) == io->sequence) {
++			/*
++			 * Edge case-- it happened in indeterminate order
++			 * relative to when we were added to wait list..
++			 */
++			closure_wake_up(&dc->writeback_ordering_wait);
++		}
++
++		continue_at(cl, write_dirty, io->dc->writeback_write_wq);
++		return;
++	}
++
++	next_sequence = io->sequence + 1;
+ 
+ 	/*
+ 	 * IO errors are signalled using the dirty bit on the key.
+@@ -211,6 +233,9 @@ static void write_dirty(struct closure *cl)
+ 		closure_bio_submit(&io->bio, cl);
+ 	}
+ 
++	atomic_set(&dc->writeback_sequence_next, next_sequence);
++	closure_wake_up(&dc->writeback_ordering_wait);
++
+ 	continue_at(cl, write_dirty_finish, io->dc->writeback_write_wq);
+ }
+ 
+@@ -242,7 +267,10 @@ static void read_dirty(struct cached_dev *dc)
+ 	int nk, i;
+ 	struct dirty_io *io;
+ 	struct closure cl;
++	uint16_t sequence = 0;
+ 
++	BUG_ON(!llist_empty(&dc->writeback_ordering_wait.list));
++	atomic_set(&dc->writeback_sequence_next, sequence);
+ 	closure_init_stack(&cl);
+ 
+ 	/*
+@@ -303,6 +331,7 @@ static void read_dirty(struct cached_dev *dc)
+ 
+ 			w->private	= io;
+ 			io->dc		= dc;
++			io->sequence    = sequence++;
+ 
+ 			dirty_init(w);
+ 			bio_set_op_attrs(&io->bio, REQ_OP_READ, 0);
+-- 
+2.14.1
