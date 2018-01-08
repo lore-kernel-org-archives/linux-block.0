@@ -1,30 +1,60 @@
-Return-Path: <prvs=5392d374c=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "jbacik@fb.com" <jbacik@fb.com>, "tj@kernel.org" <tj@kernel.org>,
-	"jack@suse.cz" <jack@suse.cz>, "clm@fb.com" <clm@fb.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
-CC: "kernel-team@fb.com" <kernel-team@fb.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "peterz@infradead.org"
-	<peterz@infradead.org>, "linux-btrfs@vger.kernel.org"
-	<linux-btrfs@vger.kernel.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "jianchao.w.wang@oracle.com"
-	<jianchao.w.wang@oracle.com>
-Subject: Re: [PATCH 4/8] blk-mq: use blk_mq_rq_state() instead of testing
- REQ_ATOM_COMPLETE
-Date: Mon, 8 Jan 2018 22:03:53 +0000
-Message-ID: <1515449032.2909.27.camel@wdc.com>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+From: Tejun Heo <tj@kernel.org>
+To: jack@suse.cz,
+	axboe@kernel.dk,
+	clm@fb.com,
+	jbacik@fb.com
+Cc: kernel-team@fb.com,
+	linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	peterz@infradead.org,
+	jianchao.w.wang@oracle.com,
+	Bart.VanAssche@wdc.com,
+	linux-block@vger.kernel.org,
+	Tejun Heo <tj@kernel.org>
+Subject: [PATCH 4/8] blk-mq: use blk_mq_rq_state() instead of testing REQ_ATOM_COMPLETE
+Date: Mon,  8 Jan 2018 11:15:38 -0800
+Message-Id: <20180108191542.379478-5-tj@kernel.org>
+In-Reply-To: <20180108191542.379478-1-tj@kernel.org>
 References: <20180108191542.379478-1-tj@kernel.org>
-	 <20180108191542.379478-5-tj@kernel.org>
-In-Reply-To: <20180108191542.379478-5-tj@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE4LTAxLTA4IGF0IDExOjE1IC0wODAwLCBUZWp1biBIZW8gd3JvdGU6DQo+IGJs
-a19tcV9jaGVja19pbmZsaWdodCgpIGFuZCBibGtfbXFfcG9sbF9oeWJyaWRfc2xlZXAoKSB0ZXN0
-DQo+IFJFUV9BVE9NX0NPTVBMRVRFIHRvIGRldGVybWluZSB0aGUgcmVxdWVzdCBzdGF0ZS4gIEJv
-dGggdXNlcyBhcmUNCj4gc3BlY3VsYXRpdmUgYW5kIHdlIGNhbiB0ZXN0IFJFUV9BVE9NX1NUQVJU
-RUQgYW5kIGJsa19tcV9ycV9zdGF0ZSgpIGZvcg0KPiBlcXVpdmFsZW50IHJlc3VsdHMuICBSZXBs
-YWNlIHRoZSB0ZXN0cy4gIFRoaXMgd2lsbCBhbGxvdyByZW1vdmluZw0KPiBSRVFfQVRPTV9DT01Q
-TEVURSB1c2FnZXMgZnJvbSBibGstbXEuDQoNClJldmlld2VkLWJ5OiBCYXJ0IFZhbiBBc3NjaGUg
-PGJhcnQudmFuYXNzY2hlQHdkYy5jb20+DQoNCg==
+blk_mq_check_inflight() and blk_mq_poll_hybrid_sleep() test
+REQ_ATOM_COMPLETE to determine the request state.  Both uses are
+speculative and we can test REQ_ATOM_STARTED and blk_mq_rq_state() for
+equivalent results.  Replace the tests.  This will allow removing
+REQ_ATOM_COMPLETE usages from blk-mq.
+
+Signed-off-by: Tejun Heo <tj@kernel.org>
+---
+ block/blk-mq.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 6587f0c..41bfd27 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -95,8 +95,7 @@ static void blk_mq_check_inflight(struct blk_mq_hw_ctx *hctx,
+ {
+ 	struct mq_inflight *mi = priv;
+ 
+-	if (test_bit(REQ_ATOM_STARTED, &rq->atomic_flags) &&
+-	    !test_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags)) {
++	if (blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT) {
+ 		/*
+ 		 * index[0] counts the specific partition that was asked
+ 		 * for. index[1] counts the ones that are active on the
+@@ -3017,7 +3016,8 @@ static bool blk_mq_poll_hybrid_sleep(struct request_queue *q,
+ 
+ 	hrtimer_init_sleeper(&hs, current);
+ 	do {
+-		if (test_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags))
++		if (test_bit(REQ_ATOM_STARTED, &rq->atomic_flags) &&
++		    blk_mq_rq_state(rq) != MQ_RQ_IN_FLIGHT)
+ 			break;
+ 		set_current_state(TASK_UNINTERRUPTIBLE);
+ 		hrtimer_start_expires(&hs.timer, mode);
+-- 
+2.9.5
