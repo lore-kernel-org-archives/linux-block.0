@@ -1,48 +1,41 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:39695 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932967AbeAITNg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Jan 2018 14:13:36 -0500
-Received: by mail-pf0-f195.google.com with SMTP id e11so5524994pff.6
-        for <linux-block@vger.kernel.org>; Tue, 09 Jan 2018 11:13:36 -0800 (PST)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: Michael Lyle <mlyle@lyle.org>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Subject: [PATCH] bcache: closures: move control bits one bit right
-Date: Tue,  9 Jan 2018 11:13:23 -0800
-Message-Id: <20180109191323.5816-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hare@suse.com>
+Subject: Re: [PATCH 5/5] dm mpath: Use blk_retryable
+To: Keith Busch <keith.busch@intel.com>,
+ Linux Block <linux-block@vger.kernel.org>,
+ Linux NVMe <linux-nvme@lists.infradead.org>,
+ Device Mapper <dm-devel@redhat.com>, Christoph Hellwig <hch@lst.de>,
+ Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc: Bart VanAssche <bart.vanassche@wdc.com>,
+ James Smart <james.smart@broadcom.com>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ Sagi Grimberg <sagi@grimberg.me>
+References: <20180104224623.8944-1-keith.busch@intel.com>
+ <20180104224623.8944-6-keith.busch@intel.com>
+From: Hannes Reinecke <hare@suse.com>
+Message-ID: <cc35a658-5a88-05e9-8c0b-a173037390a9@suse.com>
+Date: Mon, 8 Jan 2018 09:59:28 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180104224623.8944-6-keith.busch@intel.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Otherwise, architectures that do negated adds of atomics (e.g. s390)
-to do atomic_sub fail in closure_set_stopped.
+On 01/04/2018 11:46 PM, Keith Busch wrote:
+> Uses common code for determining if an error should be retried on
+> alternate path.
+> 
+> Signed-off-by: Keith Busch <keith.busch@intel.com>
+> ---
+>  drivers/md/dm-mpath.c | 19 ++-----------------
+>  1 file changed, 2 insertions(+), 17 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Michael Lyle <mlyle@lyle.org>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Reported-by: kbuild test robot <lkp@intel.com>
----
- drivers/md/bcache/closure.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Cheers,
 
-diff --git a/drivers/md/bcache/closure.h b/drivers/md/bcache/closure.h
-index 392a87cf1b92..3b9dfc9962ad 100644
---- a/drivers/md/bcache/closure.h
-+++ b/drivers/md/bcache/closure.h
-@@ -127,10 +127,10 @@ enum closure_state {
- 	 * annotate where references are being transferred.
- 	 */
- 
--	CLOSURE_BITS_START	= (1U << 27),
--	CLOSURE_DESTRUCTOR	= (1U << 27),
--	CLOSURE_WAITING		= (1U << 29),
--	CLOSURE_RUNNING		= (1U << 31),
-+	CLOSURE_BITS_START	= (1U << 26),
-+	CLOSURE_DESTRUCTOR	= (1U << 26),
-+	CLOSURE_WAITING		= (1U << 28),
-+	CLOSURE_RUNNING		= (1U << 30),
- };
- 
- #define CLOSURE_GUARD_MASK					\
+Hannes
 -- 
-2.14.1
+Dr. Hannes Reinecke		               zSeries & Storage
+hare@suse.com			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
