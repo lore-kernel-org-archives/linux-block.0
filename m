@@ -1,37 +1,17 @@
-Return-Path: <msnitzer@redhat.com>
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk
-Cc: Ming Lei <tom.leiming@gmail.com>,
-	hch@lst.de,
-	dm-devel@redhat.com,
+Return-Path: <hch@lst.de>
+Date: Mon, 8 Jan 2018 12:25:33 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Hannes Reinecke <hare@suse.de>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+	Christoph Hellwig <hch@lst.de>, Johannes Thumshirn <jth@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org,
 	linux-block@vger.kernel.org
-Subject: [for-4.16 PATCH v6 0/3] blk-mq: improve DM's blk-mq IO merging via blk_insert_cloned_request feedback
-Date: Wed, 17 Jan 2018 11:25:55 -0500
-Message-Id: <20180117162558.28553-1-snitzer@redhat.com>
+Subject: Re: [PATCH 0/4]  mylex: Replace DAC960 block driver
+Message-ID: <20180108112533.GB7106@lst.de>
+References: <1501683208-5240-1-git-send-email-hare@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1501683208-5240-1-git-send-email-hare@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
-
-Think this finally takes care of it! ;)
-
-Thanks,
-Mike
-
-Mike Snitzer (2):
-  blk-mq: factor out a few helpers from __blk_mq_try_issue_directly
-  blk-mq-sched: remove unused 'can_block' arg from blk_mq_sched_insert_request
-
-Ming Lei (1):
-  blk-mq: improve DM's blk-mq IO merging via blk_insert_cloned_request feedback
-
- block/blk-core.c     |   3 +-
- block/blk-exec.c     |   2 +-
- block/blk-mq-sched.c |   2 +-
- block/blk-mq-sched.h |   2 +-
- block/blk-mq.c       | 106 ++++++++++++++++++++++++++++++++++++---------------
- block/blk-mq.h       |   3 ++
- drivers/md/dm-rq.c   |  19 +++++++--
- 7 files changed, 98 insertions(+), 39 deletions(-)
-
--- 
-2.15.0
+Btw, did you manage to get any further with these new drivers?
