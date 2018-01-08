@@ -1,158 +1,99 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:37182 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932973AbeALCx5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jan 2018 21:53:57 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
-        Stefan Haberland <sth@linux.vnet.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 1/2] genirq/affinity: assign vectors to all possible CPUs
-Date: Fri, 12 Jan 2018 10:53:05 +0800
-Message-Id: <20180112025306.28004-2-ming.lei@redhat.com>
-In-Reply-To: <20180112025306.28004-1-ming.lei@redhat.com>
-References: <20180112025306.28004-1-ming.lei@redhat.com>
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:33847 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757228AbeAHUVs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jan 2018 15:21:48 -0500
+Received: by mail-pf0-f193.google.com with SMTP id e76so1992656pfk.1
+        for <linux-block@vger.kernel.org>; Mon, 08 Jan 2018 12:21:48 -0800 (PST)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Michael Lyle <mlyle@lyle.org>
+Subject: [416 PATCH 07/13] bcache: allow quick writeback when backing idle
+Date: Mon,  8 Jan 2018 12:21:24 -0800
+Message-Id: <20180108202130.31303-8-mlyle@lyle.org>
+In-Reply-To: <20180108202130.31303-1-mlyle@lyle.org>
+References: <20180108202130.31303-1-mlyle@lyle.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Christoph Hellwig <hch@lst.de>
+If the control system would wait for at least half a second, and there's
+been no reqs hitting the backing disk for awhile: use an alternate mode
+where we have at most one contiguous set of writebacks in flight at a
+time. (But don't otherwise delay).  If front-end IO appears, it will
+still be quick, as it will only have to contend with one real operation
+in flight.  But otherwise, we'll be sending data to the backing disk as
+quickly as it can accept it (with one op at a time).
 
-Currently we assign managed interrupt vectors to all present CPUs.  This
-works fine for systems were we only online/offline CPUs.  But in case of
-systems that support physical CPU hotplug (or the virtualized version of
-it) this means the additional CPUs covered for in the ACPI tables or on
-the command line are not catered for.  To fix this we'd either need to
-introduce new hotplug CPU states just for this case, or we can start
-assining vectors to possible but not present CPUs.
-
-Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Tested-by: Stefan Haberland <sth@linux.vnet.ibm.com>
-Cc: linux-kernel@vger.kernel.org
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Michael Lyle <mlyle@lyle.org>
+Reviewed-by: Tang Junhui <tang.junhui@zte.com.cn>
+Acked-by: Coly Li <colyli@suse.de>
 ---
- kernel/irq/affinity.c | 30 +++++++++++++++---------------
- 1 file changed, 15 insertions(+), 15 deletions(-)
+ drivers/md/bcache/bcache.h    |  7 +++++++
+ drivers/md/bcache/request.c   |  1 +
+ drivers/md/bcache/writeback.c | 21 +++++++++++++++++++++
+ 3 files changed, 29 insertions(+)
 
-diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
-index e12d35108225..a37a3b4b6342 100644
---- a/kernel/irq/affinity.c
-+++ b/kernel/irq/affinity.c
-@@ -39,7 +39,7 @@ static void irq_spread_init_one(struct cpumask *irqmsk, struct cpumask *nmsk,
- 	}
- }
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 3be0fcc19b1f..5f7b0b2513cc 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -320,6 +320,13 @@ struct cached_dev {
+ 	 */
+ 	atomic_t		has_dirty;
  
--static cpumask_var_t *alloc_node_to_present_cpumask(void)
-+static cpumask_var_t *alloc_node_to_possible_cpumask(void)
- {
- 	cpumask_var_t *masks;
- 	int node;
-@@ -62,7 +62,7 @@ static cpumask_var_t *alloc_node_to_present_cpumask(void)
- 	return NULL;
- }
++	/*
++	 * Set to zero by things that touch the backing volume-- except
++	 * writeback.  Incremented by writeback.  Used to determine when to
++	 * accelerate idle writeback.
++	 */
++	atomic_t		backing_idle;
++
+ 	struct bch_ratelimit	writeback_rate;
+ 	struct delayed_work	writeback_rate_update;
  
--static void free_node_to_present_cpumask(cpumask_var_t *masks)
-+static void free_node_to_possible_cpumask(cpumask_var_t *masks)
- {
- 	int node;
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 52b4ce24f9e2..ddd941056f3c 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -996,6 +996,7 @@ static blk_qc_t cached_dev_make_request(struct request_queue *q,
+ 	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
+ 	int rw = bio_data_dir(bio);
  
-@@ -71,22 +71,22 @@ static void free_node_to_present_cpumask(cpumask_var_t *masks)
- 	kfree(masks);
- }
++	atomic_set(&dc->backing_idle, 0);
+ 	generic_start_io_acct(q, rw, bio_sectors(bio), &d->disk->part0);
  
--static void build_node_to_present_cpumask(cpumask_var_t *masks)
-+static void build_node_to_possible_cpumask(cpumask_var_t *masks)
- {
- 	int cpu;
+ 	bio_set_dev(bio, dc->bdev);
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index 6e1d2fde43df..f82ffb2e9b9b 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -356,6 +356,27 @@ static void read_dirty(struct cached_dev *dc)
  
--	for_each_present_cpu(cpu)
-+	for_each_possible_cpu(cpu)
- 		cpumask_set_cpu(cpu, masks[cpu_to_node(cpu)]);
- }
+ 		delay = writeback_delay(dc, size);
  
--static int get_nodes_in_cpumask(cpumask_var_t *node_to_present_cpumask,
-+static int get_nodes_in_cpumask(cpumask_var_t *node_to_possible_cpumask,
- 				const struct cpumask *mask, nodemask_t *nodemsk)
- {
- 	int n, nodes = 0;
- 
- 	/* Calculate the number of nodes in the supplied affinity mask */
- 	for_each_node(n) {
--		if (cpumask_intersects(mask, node_to_present_cpumask[n])) {
-+		if (cpumask_intersects(mask, node_to_possible_cpumask[n])) {
- 			node_set(n, *nodemsk);
- 			nodes++;
- 		}
-@@ -109,7 +109,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 	int last_affv = affv + affd->pre_vectors;
- 	nodemask_t nodemsk = NODE_MASK_NONE;
- 	struct cpumask *masks;
--	cpumask_var_t nmsk, *node_to_present_cpumask;
-+	cpumask_var_t nmsk, *node_to_possible_cpumask;
- 
- 	/*
- 	 * If there aren't any vectors left after applying the pre/post
-@@ -125,8 +125,8 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 	if (!masks)
- 		goto out;
- 
--	node_to_present_cpumask = alloc_node_to_present_cpumask();
--	if (!node_to_present_cpumask)
-+	node_to_possible_cpumask = alloc_node_to_possible_cpumask();
-+	if (!node_to_possible_cpumask)
- 		goto out;
- 
- 	/* Fill out vectors at the beginning that don't need affinity */
-@@ -135,8 +135,8 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 
- 	/* Stabilize the cpumasks */
- 	get_online_cpus();
--	build_node_to_present_cpumask(node_to_present_cpumask);
--	nodes = get_nodes_in_cpumask(node_to_present_cpumask, cpu_present_mask,
-+	build_node_to_possible_cpumask(node_to_possible_cpumask);
-+	nodes = get_nodes_in_cpumask(node_to_possible_cpumask, cpu_possible_mask,
- 				     &nodemsk);
- 
- 	/*
-@@ -146,7 +146,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 	if (affv <= nodes) {
- 		for_each_node_mask(n, nodemsk) {
- 			cpumask_copy(masks + curvec,
--				     node_to_present_cpumask[n]);
-+				     node_to_possible_cpumask[n]);
- 			if (++curvec == last_affv)
- 				break;
- 		}
-@@ -160,7 +160,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 		vecs_per_node = (affv - (curvec - affd->pre_vectors)) / nodes;
- 
- 		/* Get the cpus on this node which are in the mask */
--		cpumask_and(nmsk, cpu_present_mask, node_to_present_cpumask[n]);
-+		cpumask_and(nmsk, cpu_possible_mask, node_to_possible_cpumask[n]);
- 
- 		/* Calculate the number of cpus per vector */
- 		ncpus = cpumask_weight(nmsk);
-@@ -192,7 +192,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 	/* Fill out vectors at the end that don't need affinity */
- 	for (; curvec < nvecs; curvec++)
- 		cpumask_copy(masks + curvec, irq_default_affinity);
--	free_node_to_present_cpumask(node_to_present_cpumask);
-+	free_node_to_possible_cpumask(node_to_possible_cpumask);
- out:
- 	free_cpumask_var(nmsk);
- 	return masks;
-@@ -214,7 +214,7 @@ int irq_calc_affinity_vectors(int minvec, int maxvec, const struct irq_affinity
- 		return 0;
- 
- 	get_online_cpus();
--	ret = min_t(int, cpumask_weight(cpu_present_mask), vecs) + resv;
-+	ret = min_t(int, cpumask_weight(cpu_possible_mask), vecs) + resv;
- 	put_online_cpus();
- 	return ret;
- }
++		/* If the control system would wait for at least half a
++		 * second, and there's been no reqs hitting the backing disk
++		 * for awhile: use an alternate mode where we have at most
++		 * one contiguous set of writebacks in flight at a time.  If
++		 * someone wants to do IO it will be quick, as it will only
++		 * have to contend with one operation in flight, and we'll
++		 * be round-tripping data to the backing disk as quickly as
++		 * it can accept it.
++		 */
++		if (delay >= HZ / 2) {
++			/* 3 means at least 1.5 seconds, up to 7.5 if we
++			 * have slowed way down.
++			 */
++			if (atomic_inc_return(&dc->backing_idle) >= 3) {
++				/* Wait for current I/Os to finish */
++				closure_sync(&cl);
++				/* And immediately launch a new set. */
++				delay = 0;
++			}
++		}
++
+ 		while (!kthread_should_stop() && delay) {
+ 			schedule_timeout_interruptible(delay);
+ 			delay = writeback_delay(dc, 0);
 -- 
-2.9.5
+2.14.1
