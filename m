@@ -1,56 +1,151 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:40280 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752068AbeAENRD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jan 2018 08:17:03 -0500
-Received: by mail-wm0-f66.google.com with SMTP id f206so2406506wmf.5
-        for <linux-block@vger.kernel.org>; Fri, 05 Jan 2018 05:17:02 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 22/25] lightnvm: pblk: free write buffer on init failure
-Date: Fri,  5 Jan 2018 14:16:18 +0100
-Message-Id: <20180105131621.20808-23-m@bjorling.me>
-In-Reply-To: <20180105131621.20808-1-m@bjorling.me>
-References: <20180105131621.20808-1-m@bjorling.me>
+Received: from mx2.suse.de ([195.135.220.15]:38742 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755352AbeAHHZU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 8 Jan 2018 02:25:20 -0500
+Subject: Re: [PATCH v1 06/10] bcache: stop dc->writeback_rate_update,
+ dc->writeback_thread earlier
+To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, mlyle@lyle.org, tang.junhui@zte.com.cn
+References: <20180103140325.63175-1-colyli@suse.de>
+ <20180103140325.63175-7-colyli@suse.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <a9b94a34-d74e-881b-4dfd-d0a007eb64f9@suse.de>
+Date: Mon, 8 Jan 2018 08:25:17 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20180103140325.63175-7-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Javier González <javier@cnexlabs.com>
+On 01/03/2018 03:03 PM, Coly Li wrote:
+> Delayed worker dc->writeback_rate_update and kernel thread
+> dc->writeback_thread reference cache set data structure in their routine,
+> Therefor, before they are stopped, cache set should not be release. Other-
+> wise, NULL pointer deference will be triggered.
+> 
+> Currenly delayed worker dc->writeback_rate_update and kernel thread
+> dc->writeback_thread are stopped in cached_dev_free(). When cache set is
+> retiring by too many I/O errors, cached_dev_free() is called when refcount
+> of bcache device's closure (disk.cl) reaches 0. In most of cases, last
+> refcount of disk.cl is dropped in last line of cached_dev_detach_finish().
+> But in cached_dev_detach_finish() before calling closure_put(&dc->disk.cl),
+> bcache_device_detach() is called, and inside bcache_device_detach()
+> refcount of cache_set->caching is dropped by closure_put(&d->c->caching).
+> 
+> It is very probably this is the last refcount of this closure, so routine
+> cache_set_flush() will be called (it is set in __cache_set_unregister()),
+> and its parent closure cache_set->cl may also drop its last refcount and
+> cache_set_free() is called too. In cache_set_free() the last refcount of
+> cache_set->kobj is dropped and then bch_cache_set_release() is called. Now
+> in bch_cache_set_release(), the memory of struct cache_set is freeed.
+> 
+> bch_cache_set_release() is called before cached_dev_free(), then there is a
+> time window after cache set memory freed and before dc->writeback_thread
+> and dc->writeback_rate_update stopped, if one of them is scheduled to run,
+> a NULL pointer deference will be triggered.
+> 
+> This patch fixes the above problem by stopping dc->writeback_thread and
+> dc->writeback_rate_update earlier in bcache_device_detach() before calling
+> closure_put(&d->c->caching). Because cancel_delayed_work_sync() and
+> kthread_stop() are synchronized operations, we can make sure cache set
+> is available when the delayed work and kthread are stopping.
+> 
+> Because cached_dev_free() can also be called by writing 1 to sysfs file
+> /sys/block/bcache<N>/bcache/stop, this code path may not call
+> bcache_device_detach() if d-c is NULL. So stopping dc->writeback_thread
+> and dc->writeback_rate_update in cached_dev_free() is still necessary. In
+> order to avoid stop them twice, dc->rate_update_canceled is added to
+> indicate dc->writeback_rate_update is canceled, and dc->writeback_thread
+> is set to NULL to indicate it is stopped.
+> 
+> Signed-off-by: Coly Li <colyli@suse.de>
+> ---
+>  drivers/md/bcache/bcache.h    |  1 +
+>  drivers/md/bcache/super.c     | 21 +++++++++++++++++++--
+>  drivers/md/bcache/writeback.c |  1 +
+>  3 files changed, 21 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+> index 83c569942bd0..395b87942a2f 100644
+> --- a/drivers/md/bcache/bcache.h
+> +++ b/drivers/md/bcache/bcache.h
+> @@ -322,6 +322,7 @@ struct cached_dev {
+>  
+>  	struct bch_ratelimit	writeback_rate;
+>  	struct delayed_work	writeback_rate_update;
+> +	bool			rate_update_canceled;
+>  
+>  	/*
+>  	 * Internal to the writeback code, so read_dirty() can keep track of
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index 5401d2356aa3..8912be4165c5 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -696,8 +696,20 @@ static void bcache_device_link(struct bcache_device *d, struct cache_set *c,
+>  
+>  static void bcache_device_detach(struct bcache_device *d)
+>  {
+> +	struct cached_dev *dc;
+> +
+>  	lockdep_assert_held(&bch_register_lock);
+>  
+> +	dc = container_of(d, struct cached_dev, disk);
+> +	if (!IS_ERR_OR_NULL(dc->writeback_thread)) {
+> +		kthread_stop(dc->writeback_thread);
+> +		dc->writeback_thread = NULL;
+> +	}
+> +	if (!dc->rate_update_canceled) {
+> +		cancel_delayed_work_sync(&dc->writeback_rate_update);
+> +		dc->rate_update_canceled = true;
+> +	}
+> +
+>  	if (test_bit(BCACHE_DEV_DETACHING, &d->flags)) {
+>  		struct uuid_entry *u = d->c->uuids + d->id;
+>  
+> @@ -1071,9 +1083,14 @@ static void cached_dev_free(struct closure *cl)
+>  {
+>  	struct cached_dev *dc = container_of(cl, struct cached_dev, disk.cl);
+>  
+> -	cancel_delayed_work_sync(&dc->writeback_rate_update);
+> -	if (!IS_ERR_OR_NULL(dc->writeback_thread))
+> +	if (!dc->rate_update_canceled) {
+> +		cancel_delayed_work_sync(&dc->writeback_rate_update);
+> +		dc->rate_update_canceled = true;
+> +	}
+> +	if (!IS_ERR_OR_NULL(dc->writeback_thread)) {
+>  		kthread_stop(dc->writeback_thread);
+> +		dc->writeback_thread = NULL;
+> +	}
+>  	if (dc->writeback_write_wq)
+>  		destroy_workqueue(dc->writeback_write_wq);
+>  
+> diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+> index 745d9b2a326f..ab2ac3d72393 100644
+> --- a/drivers/md/bcache/writeback.c
+> +++ b/drivers/md/bcache/writeback.c
+> @@ -548,6 +548,7 @@ void bch_cached_dev_writeback_init(struct cached_dev *dc)
+>  	dc->writeback_rate_i_term_inverse = 10000;
+>  
+>  	INIT_DELAYED_WORK(&dc->writeback_rate_update, update_writeback_rate);
+> +	dc->rate_update_canceled = false;
+>  }
+>  
+>  int bch_cached_dev_writeback_start(struct cached_dev *dc)
+> 
+Hehe. Just as I said in the comment to the previous patch.
+I would suggest merge this and the previous patch :-)
 
-Refactor the way we free the write buffer to ensure that all entries get
-freed in case of an error on the init sequence.
+But in general, I don't think you need 'rate_update_canceled'.
+cancel_delayed_work_sync() will be a no-op if no work item has been
+scheduled.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/lightnvm/pblk-init.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Cheers,
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 7e11926..8c40bc3 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -355,6 +355,8 @@ static void pblk_core_free(struct pblk *pblk)
- 	mempool_destroy(pblk->e_rq_pool);
- 	mempool_destroy(pblk->w_rq_pool);
- 
-+	pblk_rwb_free(pblk);
-+
- 	pblk_free_global_caches(pblk);
- }
- 
-@@ -931,7 +933,6 @@ static void pblk_tear_down(struct pblk *pblk)
- 	pblk_pipeline_stop(pblk);
- 	pblk_writer_stop(pblk);
- 	pblk_rb_sync_l2p(&pblk->rwb);
--	pblk_rwb_free(pblk);
- 	pblk_rl_free(&pblk->rl);
- 
- 	pr_debug("pblk: consistent tear down\n");
+Hannes
 -- 
-2.9.3
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
