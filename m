@@ -1,64 +1,46 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:46434 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934270AbeAHUVm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jan 2018 15:21:42 -0500
-Received: by mail-pg0-f66.google.com with SMTP id r2so6298704pgq.13
-        for <linux-block@vger.kernel.org>; Mon, 08 Jan 2018 12:21:42 -0800 (PST)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Tang Junhui <tang.junhui@zte.com.cn>,
-        Michael Lyle <mlyle@lyle.org>
-Subject: [416 PATCH 02/13] bcache: stop writeback thread after detaching
-Date: Mon,  8 Jan 2018 12:21:19 -0800
-Message-Id: <20180108202130.31303-3-mlyle@lyle.org>
-In-Reply-To: <20180108202130.31303-1-mlyle@lyle.org>
-References: <20180108202130.31303-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=5392d374c=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Doug Ledford <dledford@redhat.com>,
+	linux-scsi@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH 0/4] Make SCSI transport recovery more robust
+Date: Mon,  8 Jan 2018 10:50:07 -0800
+Message-Id: <20180108185011.30018-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+Hello Jens,
 
-Currently, when a cached device detaching from cache, writeback thread is
-not stopped, and writeback_rate_update work is not canceled. For example,
-after the following command:
-echo 1 >/sys/block/sdb/bcache/detach
-you can still see the writeback thread. Then you attach the device to the
-cache again, bcache will create another writeback thread, for example,
-after below command:
-echo  ba0fb5cd-658a-4533-9806-6ce166d883b9 > /sys/block/sdb/bcache/attach
-then you will see 2 writeback threads.
-This patch stops writeback thread and cancels writeback_rate_update work
-when cached device detaching from cache.
+A longstanding issue with the SCSI core is that several SCSI transport drivers
+use scsi_target_block() and scsi_target_unblock() to avoid concurrent
+.queuecommand() calls during e.g. transport recovery but that this is not
+sufficient to protect from such calls. Hence this patch series. Please
+consider this patch series for kernel v4.16.
 
-Compare with patch v1, this v2 patch moves code down into the register
-lock for safety in case of any future changes as Coly and Mike suggested.
+Thanks,
 
-[edit by mlyle: commit log spelling/formatting]
+Bart.
 
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
-Signed-off-by: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/super.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Bart Van Assche (4):
+  blk-mq: Rename request_queue.mq_freeze_wq into mq_wq
+  block: Introduce blk_wait_if_quiesced() and
+    blk_finish_wait_if_quiesced()
+  scsi: Avoid that .queuecommand() gets called for a quiesced SCSI
+    device
+  IB/srp: Fix a sleep-in-invalid-context bug
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 8399fe0651f2..553e841e897d 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -906,6 +906,12 @@ static void cached_dev_detach_finish(struct work_struct *w)
- 
- 	mutex_lock(&bch_register_lock);
- 
-+	cancel_delayed_work_sync(&dc->writeback_rate_update);
-+	if (!IS_ERR_OR_NULL(dc->writeback_thread)) {
-+		kthread_stop(dc->writeback_thread);
-+		dc->writeback_thread = NULL;
-+	}
-+
- 	memset(&dc->sb.set_uuid, 0, 16);
- 	SET_BDEV_STATE(&dc->sb, BDEV_STATE_NONE);
- 
+ block/blk-core.c                    | 11 +++---
+ block/blk-mq.c                      | 71 ++++++++++++++++++++++++++++++++++---
+ drivers/infiniband/ulp/srp/ib_srp.c | 21 ++---------
+ drivers/scsi/scsi_error.c           |  3 ++
+ include/linux/blk-mq.h              |  2 ++
+ include/linux/blkdev.h              |  2 +-
+ 6 files changed, 80 insertions(+), 30 deletions(-)
+
 -- 
-2.14.1
+2.15.1
