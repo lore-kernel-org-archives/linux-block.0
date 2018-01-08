@@ -1,162 +1,133 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:37088 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751715AbeAMRN1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 13 Jan 2018 12:13:27 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Michael Lyle <mlyle@lyle.org>, Hannes Reinecke <hare@suse.com>,
-        Junhui Tang <tang.junhui@zte.com.cn>
-Subject: [PATCH v2 12/12] bcache: stop bcache device when backing device is offline
-Date: Sun, 14 Jan 2018 01:10:50 +0800
-Message-Id: <20180113171050.22467-13-colyli@suse.de>
-In-Reply-To: <20180113171050.22467-1-colyli@suse.de>
-References: <20180113171050.22467-1-colyli@suse.de>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:43510 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757242AbeAHUVz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jan 2018 15:21:55 -0500
+Received: by mail-pg0-f66.google.com with SMTP id f14so3730661pga.10
+        for <linux-block@vger.kernel.org>; Mon, 08 Jan 2018 12:21:54 -0800 (PST)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Coly Li <colyli@suse.de>
+Subject: [416 PATCH 12/13] bcache: fix misleading error message in bch_count_io_errors()
+Date: Mon,  8 Jan 2018 12:21:29 -0800
+Message-Id: <20180108202130.31303-13-mlyle@lyle.org>
+In-Reply-To: <20180108202130.31303-1-mlyle@lyle.org>
+References: <20180108202130.31303-1-mlyle@lyle.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Currently bcache does not handle backing device failure, if backing
-device is offline and disconnected from system, its bcache device can still
-be accessible. If the bcache device is in writeback mode, I/O requests even
-can success if the requests hit on cache device. That is to say, when and
-how bcache handles offline backing device is undefined.
+From: Coly Li <colyli@suse.de>
 
-This patch tries to handle backing device offline in a rather simple way,
-- Add cached_dev->status_update_thread kernel thread to update backing
-  device status in every 1 second.
-- Add cached_dev->offline_seconds to record how many seconds the backing
-  device is observed to be offline. If the backing device is offline for
-  BACKING_DEV_OFFLINE_TIMEOUT (30) seconds, set dc->io_disable to 1 and
-  call bcache_device_stop() to stop the bache device which linked to the
-  offline backing device.
+Bcache only does recoverable I/O for read operations by calling
+cached_dev_read_error(). For write opertions there is no I/O recovery for
+failed requests.
 
-Now if a backing device is offline for BACKING_DEV_OFFLINE_TIMEOUT seconds,
-its bcache device will be removed, then user space application writing on
-it will get error immediately, and handler the device failure in time.
+But in bch_count_io_errors() no matter read or write I/Os, before errors
+counter reaches io error limit, pr_err() always prints "IO error on %,
+recoverying". For write requests this information is misleading, because
+there is no I/O recovery at all.
 
-This patch is quite simple, does not handle more complicated situations.
-Once the bcache device is stopped, users need to recovery the backing
-device, register and attach it manually.
-
-Changelog:
-v2: this is new added in v2 patch set.
+This patch adds a parameter 'is_read' to bch_count_io_errors(), and only
+prints "recovering" by pr_err() when the bio direction is READ.
 
 Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Michael Lyle <mlyle@lyle.org>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
+Reviewed-by: Tang Junhui <tang.junhui@zte.com.cn>
 ---
- drivers/md/bcache/bcache.h |  2 ++
- drivers/md/bcache/super.c  | 55 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 57 insertions(+)
+ drivers/md/bcache/bcache.h    |  2 +-
+ drivers/md/bcache/io.c        | 13 +++++++++----
+ drivers/md/bcache/super.c     |  4 +++-
+ drivers/md/bcache/writeback.c |  4 +++-
+ 4 files changed, 16 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 5a811959392d..9eedb35d01bc 100644
+index 9117da5f494b..5e2d4e80198e 100644
 --- a/drivers/md/bcache/bcache.h
 +++ b/drivers/md/bcache/bcache.h
-@@ -338,6 +338,7 @@ struct cached_dev {
+@@ -862,7 +862,7 @@ static inline void wake_up_allocators(struct cache_set *c)
  
- 	struct keybuf		writeback_keys;
+ /* Forward declarations */
  
-+	struct task_struct	*status_update_thread;
+-void bch_count_io_errors(struct cache *, blk_status_t, const char *);
++void bch_count_io_errors(struct cache *, blk_status_t, int, const char *);
+ void bch_bbio_count_io_errors(struct cache_set *, struct bio *,
+ 			      blk_status_t, const char *);
+ void bch_bbio_endio(struct cache_set *, struct bio *, blk_status_t,
+diff --git a/drivers/md/bcache/io.c b/drivers/md/bcache/io.c
+index fac97ec2d0e2..a783c5a41ff1 100644
+--- a/drivers/md/bcache/io.c
++++ b/drivers/md/bcache/io.c
+@@ -51,7 +51,10 @@ void bch_submit_bbio(struct bio *bio, struct cache_set *c,
+ 
+ /* IO errors */
+ 
+-void bch_count_io_errors(struct cache *ca, blk_status_t error, const char *m)
++void bch_count_io_errors(struct cache *ca,
++			 blk_status_t error,
++			 int is_read,
++			 const char *m)
+ {
  	/*
- 	 * Order the write-half of writeback operations strongly in dispatch
- 	 * order.  (Maintain LBA order; don't allow reads completing out of
-@@ -384,6 +385,7 @@ struct cached_dev {
- #define DEFAULT_CACHED_DEV_ERROR_LIMIT 64
- 	atomic_t		io_errors;
- 	unsigned		error_limit;
-+	unsigned		offline_seconds;
- };
+ 	 * The halflife of an error is:
+@@ -94,8 +97,9 @@ void bch_count_io_errors(struct cache *ca, blk_status_t error, const char *m)
+ 		errors >>= IO_ERROR_SHIFT;
  
- enum alloc_reserve {
+ 		if (errors < ca->set->error_limit)
+-			pr_err("%s: IO error on %s, recovering",
+-			       bdevname(ca->bdev, buf), m);
++			pr_err("%s: IO error on %s%s",
++			       bdevname(ca->bdev, buf), m,
++			       is_read ? ", recovering." : ".");
+ 		else
+ 			bch_cache_set_error(ca->set,
+ 					    "%s: too many IO errors %s",
+@@ -108,6 +112,7 @@ void bch_bbio_count_io_errors(struct cache_set *c, struct bio *bio,
+ {
+ 	struct bbio *b = container_of(bio, struct bbio, bio);
+ 	struct cache *ca = PTR_CACHE(c, &b->key, 0);
++	int is_read = (bio_data_dir(bio) == READ ? 1 : 0);
+ 
+ 	unsigned threshold = op_is_write(bio_op(bio))
+ 		? c->congested_write_threshold_us
+@@ -129,7 +134,7 @@ void bch_bbio_count_io_errors(struct cache_set *c, struct bio *bio,
+ 			atomic_inc(&c->congested);
+ 	}
+ 
+-	bch_count_io_errors(ca, error, m);
++	bch_count_io_errors(ca, error, is_read, m);
+ }
+ 
+ void bch_bbio_endio(struct cache_set *c, struct bio *bio,
 diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 14fce3623770..85adf1e29d11 100644
+index d13e4ccb30a0..133b81225ea9 100644
 --- a/drivers/md/bcache/super.c
 +++ b/drivers/md/bcache/super.c
-@@ -646,6 +646,11 @@ static int ioctl_dev(struct block_device *b, fmode_t mode,
- 		     unsigned int cmd, unsigned long arg)
+@@ -274,7 +274,9 @@ static void write_super_endio(struct bio *bio)
  {
- 	struct bcache_device *d = b->bd_disk->private_data;
-+	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
-+
-+	if (dc->io_disable)
-+		return -EIO;
-+
- 	return d->ioctl(d, mode, cmd, arg);
+ 	struct cache *ca = bio->bi_private;
+ 
+-	bch_count_io_errors(ca, bio->bi_status, "writing superblock");
++	/* is_read = 0 */
++	bch_count_io_errors(ca, bio->bi_status, 0,
++			    "writing superblock");
+ 	closure_put(&ca->set->sb_write);
  }
  
-@@ -856,6 +861,45 @@ static void calc_cached_dev_sectors(struct cache_set *c)
- 	c->cached_dev_sectors = sectors;
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index f82ffb2e9b9b..31b0a292a619 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -244,8 +244,10 @@ static void read_dirty_endio(struct bio *bio)
+ 	struct keybuf_key *w = bio->bi_private;
+ 	struct dirty_io *io = w->private;
+ 
++	/* is_read = 1 */
+ 	bch_count_io_errors(PTR_CACHE(io->dc->disk.c, &w->key, 0),
+-			    bio->bi_status, "reading dirty data from cache");
++			    bio->bi_status, 1,
++			    "reading dirty data from cache");
+ 
+ 	dirty_endio(bio);
  }
- 
-+#define BACKING_DEV_OFFLINE_TIMEOUT 5
-+static int cached_dev_status_update(void *arg)
-+{
-+	struct cached_dev *dc = arg;
-+	struct request_queue *q;
-+	char buf[BDEVNAME_SIZE];
-+
-+	/*
-+	 * If this delayed worker is stopping outside, directly quit here.
-+	 * dc->io_disable might be set via sysfs interface, so check it
-+	 * here too.
-+	 */
-+	while (!kthread_should_stop() && !dc->io_disable) {
-+		q = bdev_get_queue(dc->bdev);
-+		if (blk_queue_dying(q))
-+			dc->offline_seconds++;
-+		else
-+			dc->offline_seconds = 0;
-+
-+		if (dc->offline_seconds >= BACKING_DEV_OFFLINE_TIMEOUT) {
-+			pr_err("%s: device offline for %d seconds",
-+				bdevname(dc->bdev, buf),
-+				BACKING_DEV_OFFLINE_TIMEOUT);
-+			pr_err("%s: disable I/O request due to backing "
-+				"device offline", dc->disk.name);
-+			dc->io_disable = true;
-+			/* let others know earlier that io_disable is true */
-+			smp_mb();
-+			bcache_device_stop(&dc->disk);
-+			break;
-+		}
-+
-+		schedule_timeout_interruptible(HZ);
-+	}
-+
-+	dc->status_update_thread = NULL;
-+	return 0;
-+}
-+
- void bch_cached_dev_run(struct cached_dev *dc)
- {
- 	struct bcache_device *d = &dc->disk;
-@@ -898,6 +942,15 @@ void bch_cached_dev_run(struct cached_dev *dc)
- 	if (sysfs_create_link(&d->kobj, &disk_to_dev(d->disk)->kobj, "dev") ||
- 	    sysfs_create_link(&disk_to_dev(d->disk)->kobj, &d->kobj, "bcache"))
- 		pr_debug("error creating sysfs link");
-+
-+	dc->status_update_thread = kthread_run(cached_dev_status_update,
-+					       dc,
-+					      "bcache_status_update");
-+	if (IS_ERR(dc->status_update_thread)) {
-+		pr_warn("bcache: failed to create bcache_status_update "
-+			"kthread, continue to run without monitoring backing "
-+			"device status");
-+	}
- }
- 
- /*
-@@ -1118,6 +1171,8 @@ static void cached_dev_free(struct closure *cl)
- 		kthread_stop(dc->writeback_thread);
- 	if (dc->writeback_write_wq)
- 		destroy_workqueue(dc->writeback_write_wq);
-+	if (!IS_ERR_OR_NULL(dc->status_update_thread))
-+		kthread_stop(dc->status_update_thread);
- 
- 	if (atomic_read(&dc->running))
- 		bd_unlink_disk_holder(dc->bdev, dc->disk.disk);
 -- 
-2.15.1
+2.14.1
