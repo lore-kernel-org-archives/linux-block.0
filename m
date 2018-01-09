@@ -1,14 +1,12 @@
 Return-Path: <axboe@kernel.dk>
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
-Cc: osandov@fb.com,
-	bart.vanassche@wdc.com,
-	Jens Axboe <axboe@kernel.dk>
+Cc: Jens Axboe <axboe@kernel.dk>
 Subject: [PATCH 4/4] block: rearrange a few request fields for better cache layout
-Date: Tue,  9 Jan 2018 17:29:27 -0700
-Message-Id: <1515544167-10751-5-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1515544167-10751-1-git-send-email-axboe@kernel.dk>
-References: <1515544167-10751-1-git-send-email-axboe@kernel.dk>
+Date: Tue,  9 Jan 2018 11:27:02 -0700
+Message-Id: <1515522422-21596-5-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1515522422-21596-1-git-send-email-axboe@kernel.dk>
+References: <1515522422-21596-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
 Move completion related items (like the call single data) near the
@@ -24,69 +22,11 @@ sync and for high thread count access. Sync test goes form 975K to
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-mq.c         | 19 ++++++++++---------
- include/linux/blkdev.h | 28 +++++++++++++++-------------
- 2 files changed, 25 insertions(+), 22 deletions(-)
+ include/linux/blkdev.h | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 7248ee043651..ec128001ea8b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -270,8 +270,6 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
- 	struct request *rq = tags->static_rqs[tag];
- 
--	rq->rq_flags = 0;
--
- 	if (data->flags & BLK_MQ_REQ_INTERNAL) {
- 		rq->tag = -1;
- 		rq->internal_tag = tag;
-@@ -285,26 +283,23 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 		data->hctx->tags->rqs[rq->tag] = rq;
- 	}
- 
--	INIT_LIST_HEAD(&rq->queuelist);
- 	/* csd/requeue_work/fifo_time is initialized before use */
- 	rq->q = data->q;
- 	rq->mq_ctx = data->ctx;
-+	rq->rq_flags = 0;
-+	rq->cpu = -1;
- 	rq->cmd_flags = op;
- 	if (data->flags & BLK_MQ_REQ_PREEMPT)
- 		rq->rq_flags |= RQF_PREEMPT;
- 	if (blk_queue_io_stat(data->q))
- 		rq->rq_flags |= RQF_IO_STAT;
--	rq->cpu = -1;
-+	/* do not touch atomic flags, it needs atomic ops against the timer */
-+	INIT_LIST_HEAD(&rq->queuelist);
- 	INIT_HLIST_NODE(&rq->hash);
- 	RB_CLEAR_NODE(&rq->rb_node);
- 	rq->rq_disk = NULL;
- 	rq->part = NULL;
- 	rq->start_time = jiffies;
--#ifdef CONFIG_BLK_CGROUP
--	rq->rl = NULL;
--	set_start_time_ns(rq);
--	rq->io_start_time_ns = 0;
--#endif
- 	rq->nr_phys_segments = 0;
- #if defined(CONFIG_BLK_DEV_INTEGRITY)
- 	rq->nr_integrity_segments = 0;
-@@ -321,6 +316,12 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 	rq->end_io_data = NULL;
- 	rq->next_rq = NULL;
- 
-+#ifdef CONFIG_BLK_CGROUP
-+	rq->rl = NULL;
-+	set_start_time_ns(rq);
-+	rq->io_start_time_ns = 0;
-+#endif
-+
- 	data->ctx->rq_dispatched[op_is_sync(op)]++;
- 	return rq;
- }
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index d4b2f7bb18d6..71a9371c8182 100644
+index d4b2f7bb18d6..1b2472f6662e 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
 @@ -141,12 +141,6 @@ typedef __u32 __bitwise req_flags_t;
@@ -111,38 +51,7 @@ index d4b2f7bb18d6..71a9371c8182 100644
  	/*
  	 * The hash is used inside the scheduler, and killed once the
  	 * request reaches the dispatch list. The ipi_list is only used
-@@ -211,19 +207,16 @@ struct request {
- 	struct hd_struct *part;
- 	unsigned long start_time;
- 	struct blk_issue_stat issue_stat;
--#ifdef CONFIG_BLK_CGROUP
--	struct request_list *rl;		/* rl this rq is alloced from */
--	unsigned long long start_time_ns;
--	unsigned long long io_start_time_ns;    /* when passed to hardware */
--#endif
- 	/* Number of scatter-gather DMA addr+len pairs after
- 	 * physical address coalescing is performed.
- 	 */
- 	unsigned short nr_phys_segments;
-+
- #if defined(CONFIG_BLK_DEV_INTEGRITY)
- 	unsigned short nr_integrity_segments;
- #endif
- 
-+	unsigned short write_hint;
- 	unsigned short ioprio;
- 
- 	unsigned int timeout;
-@@ -232,8 +225,6 @@ struct request {
- 
- 	unsigned int extra_len;	/* length of alignment and padding */
- 
--	unsigned short write_hint;
--
- 	/*
- 	 * On blk-mq, the lower bits of ->gstate (generation number and
- 	 * state) carry the MQ_RQ_* state value and the upper bits the
-@@ -260,6 +251,11 @@ struct request {
+@@ -260,6 +256,11 @@ struct request {
  
  	struct list_head timeout_list;
  
@@ -154,18 +63,5 @@ index d4b2f7bb18d6..71a9371c8182 100644
  	/*
  	 * completion callback.
  	 */
-@@ -268,6 +264,12 @@ struct request {
- 
- 	/* for bidi */
- 	struct request *next_rq;
-+
-+#ifdef CONFIG_BLK_CGROUP
-+	struct request_list *rl;		/* rl this rq is alloced from */
-+	unsigned long long start_time_ns;
-+	unsigned long long io_start_time_ns;    /* when passed to hardware */
-+#endif
- };
- 
- static inline bool blk_rq_is_scsi(struct request *rq)
 -- 
 2.7.4
