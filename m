@@ -1,49 +1,65 @@
-Return-Path: <prvs=540be3476=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "jbacik@fb.com" <jbacik@fb.com>, "tj@kernel.org" <tj@kernel.org>,
-	"jack@suse.cz" <jack@suse.cz>, "clm@fb.com" <clm@fb.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
-CC: "kernel-team@fb.com" <kernel-team@fb.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "peterz@infradead.org"
-	<peterz@infradead.org>, "linux-btrfs@vger.kernel.org"
-	<linux-btrfs@vger.kernel.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "jianchao.w.wang@oracle.com"
-	<jianchao.w.wang@oracle.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH 2/8] blk-mq: protect completion path with RCU
-Date: Tue, 9 Jan 2018 16:12:40 +0000
-Message-ID: <1515514359.2721.9.camel@wdc.com>
+To: Hannes Reinecke <hare@suse.de>, Tejun Heo <tj@kernel.org>, jack@suse.cz,
+ axboe@kernel.dk, clm@fb.com, jbacik@fb.com
+Cc: kernel-team@fb.com, linux-kernel@vger.kernel.org,
+ linux-btrfs@vger.kernel.org, peterz@infradead.org,
+ jianchao.w.wang@oracle.com, Bart.VanAssche@wdc.com,
+ linux-block@vger.kernel.org
 References: <20180108191542.379478-1-tj@kernel.org>
-	 <20180108191542.379478-3-tj@kernel.org>
-In-Reply-To: <20180108191542.379478-3-tj@kernel.org>
-Content-Type: text/plain; charset="utf-8"
+ <20180108191542.379478-3-tj@kernel.org>
+ <b4fdf1c4-2728-5537-a00f-09db0a4b25e4@suse.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <9e10e315-fc97-a365-035c-7b88e1be0971@kernel.dk>
+Date: Tue, 9 Jan 2018 08:22:36 -0700
 MIME-Version: 1.0
+In-Reply-To: <b4fdf1c4-2728-5537-a00f-09db0a4b25e4@suse.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE4LTAxLTA4IGF0IDExOjE1IC0wODAwLCBUZWp1biBIZW8gd3JvdGU6DQo+IEN1
-cnJlbnRseSwgYmxrLW1xIHByb3RlY3RzIG9ubHkgdGhlIGlzc3VlIHBhdGggd2l0aCBSQ1UuICBU
-aGlzIHBhdGNoDQo+IHB1dHMgdGhlIGNvbXBsZXRpb24gcGF0aCB1bmRlciB0aGUgc2FtZSBSQ1Ug
-cHJvdGVjdGlvbi4gIFRoaXMgd2lsbCBiZQ0KPiB1c2VkIHRvIHN5bmNocm9uaXplIGlzc3VlL2Nv
-bXBsZXRpb24gYWdhaW5zdCB0aW1lb3V0IGJ5IGxhdGVyIHBhdGNoZXMsDQo+IHdoaWNoIHdpbGwg
-YWxzbyBhZGQgdGhlIGNvbW1lbnRzLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogVGVqdW4gSGVvIDx0
-akBrZXJuZWwub3JnPg0KPiAtLS0NCj4gIGJsb2NrL2Jsay1tcS5jIHwgNSArKysrKw0KPiAgMSBm
-aWxlIGNoYW5nZWQsIDUgaW5zZXJ0aW9ucygrKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Js
-ay1tcS5jIGIvYmxvY2svYmxrLW1xLmMNCj4gaW5kZXggZGRjOTI2MS4uNjc0MWMzZSAxMDA2NDQN
-Cj4gLS0tIGEvYmxvY2svYmxrLW1xLmMNCj4gKysrIGIvYmxvY2svYmxrLW1xLmMNCj4gQEAgLTU4
-NCwxMSArNTg0LDE2IEBAIHN0YXRpYyB2b2lkIGhjdHhfbG9jayhzdHJ1Y3QgYmxrX21xX2h3X2N0
-eCAqaGN0eCwgaW50ICpzcmN1X2lkeCkNCj4gIHZvaWQgYmxrX21xX2NvbXBsZXRlX3JlcXVlc3Qo
-c3RydWN0IHJlcXVlc3QgKnJxKQ0KPiAgew0KPiAgCXN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxID0g
-cnEtPnE7DQo+ICsJc3RydWN0IGJsa19tcV9od19jdHggKmhjdHggPSBibGtfbXFfbWFwX3F1ZXVl
-KHEsIHJxLT5tcV9jdHgtPmNwdSk7DQo+ICsJaW50IHNyY3VfaWR4Ow0KPiAgDQo+ICAJaWYgKHVu
-bGlrZWx5KGJsa19zaG91bGRfZmFrZV90aW1lb3V0KHEpKSkNCj4gIAkJcmV0dXJuOw0KPiArDQo+
-ICsJaGN0eF9sb2NrKGhjdHgsICZzcmN1X2lkeCk7DQo+ICAJaWYgKCFibGtfbWFya19ycV9jb21w
-bGV0ZShycSkpDQo+ICAJCV9fYmxrX21xX2NvbXBsZXRlX3JlcXVlc3QocnEpOw0KPiArCWhjdHhf
-dW5sb2NrKGhjdHgsIHNyY3VfaWR4KTsNCj4gIH0NCj4gIEVYUE9SVF9TWU1CT0woYmxrX21xX2Nv
-bXBsZXRlX3JlcXVlc3QpOw0KDQpIZWxsbyBUZWp1biwNCg0KSSdtIGNvbmNlcm5lZCBhYm91dCB0
-aGUgYWRkaXRpb25hbCBDUFUgY3ljbGVzIG5lZWRlZCBmb3IgdGhlIG5ldyBibGtfbXFfbWFwX3F1
-ZXVlKCkNCmNhbGwsIGFsdGhvdWdoIEkga25vdyB0aGlzIGNhbGwgaXMgY2hlYXAuIFdvdWxkIHRo
-ZSB0aW1lb3V0IGNvZGUgcmVhbGx5IGdldCB0aGF0DQptdWNoIG1vcmUgY29tcGxpY2F0ZWQgaWYg
-dGhlIGhjdHhfbG9jaygpIGFuZCBoY3R4X3VubG9jaygpIGNhbGxzIHdvdWxkIGJlIGNoYW5nZWQN
-CmludG8gcmN1X3JlYWRfbG9jaygpIGFuZCByY3VfcmVhZF91bmxvY2soKSBjYWxscz8gV291bGQg
-aXQgYmUgc3VmZmljaWVudCBpZg0KImlmIChoYXNfcmN1KSBzeW5jaHJvbml6ZV9yY3UoKTsiIHdv
-dWxkIGJlIGNoYW5nZWQgaW50byAic3luY2hyb25pemVfcmN1KCk7IiBpbg0KYmxrX21xX3RpbWVv
-dXRfd29yaygpPw0KDQpUaGFua3MsDQoNCkJhcnQu
+On 1/9/18 12:08 AM, Hannes Reinecke wrote:
+> On 01/08/2018 08:15 PM, Tejun Heo wrote:
+>> Currently, blk-mq protects only the issue path with RCU.  This patch
+>> puts the completion path under the same RCU protection.  This will be
+>> used to synchronize issue/completion against timeout by later patches,
+>> which will also add the comments.
+>>
+>> Signed-off-by: Tejun Heo <tj@kernel.org>
+>> ---
+>>  block/blk-mq.c | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>>
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index ddc9261..6741c3e 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -584,11 +584,16 @@ static void hctx_lock(struct blk_mq_hw_ctx *hctx, int *srcu_idx)
+>>  void blk_mq_complete_request(struct request *rq)
+>>  {
+>>  	struct request_queue *q = rq->q;
+>> +	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, rq->mq_ctx->cpu);
+>> +	int srcu_idx;
+>>  
+>>  	if (unlikely(blk_should_fake_timeout(q)))
+>>  		return;
+>> +
+>> +	hctx_lock(hctx, &srcu_idx);
+>>  	if (!blk_mark_rq_complete(rq))
+>>  		__blk_mq_complete_request(rq);
+>> +	hctx_unlock(hctx, srcu_idx);
+>>  }
+>>  EXPORT_SYMBOL(blk_mq_complete_request);
+>>  
+>>
+> Hmm. Why do we need to call blk_mq_map_queue() here?
+> Is there a chance that we end up with a _different_ hctx on completion
+> than that one used for submission?
+> If not, why can't we just keep a pointer to the hctx in struct request?
+
+Mapping is the right thing to do. We cache the software queue, which
+allows us to map back to the same hardware queue. There would be no
+point in storing both, the mapping is very cheap. No point in bloating
+the request with redundant information.
+
+-- 
+Jens Axboe
