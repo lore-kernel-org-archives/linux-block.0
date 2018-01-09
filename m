@@ -1,30 +1,77 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Wed, 10 Jan 2018 09:07:14 +0100
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Linux Block <linux-block@vger.kernel.org>,
+Return-Path: <keith.busch@intel.com>
+From: Keith Busch <keith.busch@intel.com>
+To: Linux Block <linux-block@vger.kernel.org>,
 	Linux NVMe <linux-nvme@lists.infradead.org>,
-	Device Mapper <dm-devel@redhat.com>, Christoph Hellwig <hch@lst.de>,
-	Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Hannes Reinecke <hare@suse.com>, Sagi Grimberg <sagi@grimberg.me>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Device Mapper <dm-devel@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Bart VanAssche <bart.vanassche@wdc.com>,
 	James Smart <james.smart@broadcom.com>,
-	Bart VanAssche <bart.vanassche@wdc.com>
-Subject: Re: [dm-devel] [PATCHv2 5/5] dm mpath: Use blk_path_error
-Message-ID: <20180110080714.gjpjacyzgq3k3j5k@linux-x5ow.site>
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <keith.busch@intel.com>
+Subject: [PATCHv2 5/5] dm mpath: Use blk_path_error
+Date: Tue,  9 Jan 2018 12:04:18 -0700
+Message-Id: <20180109190418.7123-6-keith.busch@intel.com>
+In-Reply-To: <20180109190418.7123-1-keith.busch@intel.com>
 References: <20180109190418.7123-1-keith.busch@intel.com>
- <20180109190418.7123-6-keith.busch@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20180109190418.7123-6-keith.busch@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Uses common code for determining if an error should be retried on
+alternate path.
+
+Acked-by: Mike Snitzer <snitzer@redhat.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Keith Busch <keith.busch@intel.com>
+---
+ drivers/md/dm-mpath.c | 19 ++-----------------
+ 1 file changed, 2 insertions(+), 17 deletions(-)
+
+diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
+index f7810cc869ac..ef57c6d1c887 100644
+--- a/drivers/md/dm-mpath.c
++++ b/drivers/md/dm-mpath.c
+@@ -1475,21 +1475,6 @@ static void activate_path_work(struct work_struct *work)
+ 	activate_or_offline_path(pgpath);
+ }
+ 
+-static int noretry_error(blk_status_t error)
+-{
+-	switch (error) {
+-	case BLK_STS_NOTSUPP:
+-	case BLK_STS_NOSPC:
+-	case BLK_STS_TARGET:
+-	case BLK_STS_NEXUS:
+-	case BLK_STS_MEDIUM:
+-		return 1;
+-	}
+-
+-	/* Anything else could be a path failure, so should be retried */
+-	return 0;
+-}
+-
+ static int multipath_end_io(struct dm_target *ti, struct request *clone,
+ 			    blk_status_t error, union map_info *map_context)
+ {
+@@ -1508,7 +1493,7 @@ static int multipath_end_io(struct dm_target *ti, struct request *clone,
+ 	 * request into dm core, which will remake a clone request and
+ 	 * clone bios for it and resubmit it later.
+ 	 */
+-	if (error && !noretry_error(error)) {
++	if (error && blk_path_error(error)) {
+ 		struct multipath *m = ti->private;
+ 
+ 		r = DM_ENDIO_REQUEUE;
+@@ -1544,7 +1529,7 @@ static int multipath_end_io_bio(struct dm_target *ti, struct bio *clone,
+ 	unsigned long flags;
+ 	int r = DM_ENDIO_DONE;
+ 
+-	if (!*error || noretry_error(*error))
++	if (!*error || !blk_path_error(*error))
+ 		goto done;
+ 
+ 	if (pgpath)
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.13.6
