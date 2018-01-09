@@ -1,14 +1,12 @@
 Return-Path: <axboe@kernel.dk>
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
-Cc: osandov@fb.com,
-	bart.vanassche@wdc.com,
-	Jens Axboe <axboe@kernel.dk>
+Cc: Jens Axboe <axboe@kernel.dk>
 Subject: [PATCH 1/4] block: remove REQ_ATOM_POLL_SLEPT
-Date: Tue,  9 Jan 2018 17:29:24 -0700
-Message-Id: <1515544167-10751-2-git-send-email-axboe@kernel.dk>
-In-Reply-To: <1515544167-10751-1-git-send-email-axboe@kernel.dk>
-References: <1515544167-10751-1-git-send-email-axboe@kernel.dk>
+Date: Tue,  9 Jan 2018 11:26:59 -0700
+Message-Id: <1515522422-21596-2-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1515522422-21596-1-git-send-email-axboe@kernel.dk>
+References: <1515522422-21596-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
 We don't need this to be an atomic flag, it can be a regular
