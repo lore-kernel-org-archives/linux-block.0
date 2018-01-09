@@ -1,517 +1,645 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-oi0-f68.google.com ([209.85.218.68]:39203 "EHLO
-        mail-oi0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751220AbeAEFQd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jan 2018 00:16:33 -0500
-From: xuejiufei <xuejiufei@gmail.com>
-Subject: [RFC PATCH] blk-throttle: dispatch more sync writes in block throttle
- layer
-To: Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@fb.com>,
-        Shaohua Li <shli@kernel.org>
-Cc: linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        jinli.zjl@alibaba-inc.com, qijiang.qj@alibaba-inc.com
-Message-ID: <f6f59e3c-456a-8275-8af0-32e4f2e5cdd6@gmail.com>
-Date: Fri, 5 Jan 2018 13:16:26 +0800
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+From: Tejun Heo <tj@kernel.org>
+To: jack@suse.cz,
+	axboe@kernel.dk,
+	clm@fb.com,
+	jbacik@fb.com
+Cc: kernel-team@fb.com,
+	linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	peterz@infradead.org,
+	jianchao.w.wang@oracle.com,
+	Bart.VanAssche@wdc.com,
+	linux-block@vger.kernel.org,
+	Tejun Heo <tj@kernel.org>,
+	Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 3/8] blk-mq: replace timeout synchronization with a RCU and generation based scheme
+Date: Tue,  9 Jan 2018 08:29:48 -0800
+Message-Id: <20180109162953.1211451-4-tj@kernel.org>
+In-Reply-To: <20180109162953.1211451-1-tj@kernel.org>
+References: <20180109162953.1211451-1-tj@kernel.org>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Jiufei Xue <jiufei.xjf@alibaba-inc.com>
+Currently, blk-mq timeout path synchronizes against the usual
+issue/completion path using a complex scheme involving atomic
+bitflags, REQ_ATOM_*, memory barriers and subtle memory coherence
+rules.  Unfortunately, it contains quite a few holes.
 
-Cgroup writeback is supported since v4.2. But there exists a problem
-in the following case.
+There's a complex dancing around REQ_ATOM_STARTED and
+REQ_ATOM_COMPLETE between issue/completion and timeout paths; however,
+they don't have a synchronization point across request recycle
+instances and it isn't clear what the barriers add.
+blk_mq_check_expired() can easily read STARTED from N-2'th iteration,
+deadline from N-1'th, blk_mark_rq_complete() against Nth instance.
 
-A cgroup may send both buffer and direct/sync IOs. The foreground
-thread will be stalled when periodic writeback IOs is flushed because
-the service queue in block throttle layer already has a plenty of
-writeback IOs, then foreground IOs should be enqueued with its FIFO
-policy. The current policy is dispatching 6 reads and 2 writes during
-each round, sync writes will be significantly delayed.
+In fact, it's pretty easy to make blk_mq_check_expired() terminate a
+later instance of a request.  If we induce 5 sec delay before
+time_after_eq() test in blk_mq_check_expired(), shorten the timeout to
+2s, and issue back-to-back large IOs, blk-mq starts timing out
+requests spuriously pretty quickly.  Nothing actually timed out.  It
+just made the call on a recycle instance of a request and then
+terminated a later instance long after the original instance finished.
+The scenario isn't theoretical either.
 
-This patch adds another queue in block throttle. Now there are 3 queues
-in a service queue: read, sync write, async write, and we can dispatch
-more sync writes than aync writes.
+This patch replaces the broken synchronization mechanism with a RCU
+and generation number based one.
 
-Test:
-1) setup a memcg and a blkcg with uplimit bandwidth 20m/s;
-2) start a script writing 5G buffer to page cache and start to sync
-3) start sync writes:
-    dd if=/dev/zero of=test bs=4k count=12800 oflag=direct conv=notrunc
+1. Each request has a u64 generation + state value, which can be
+   updated only by the request owner.  Whenever a request becomes
+   in-flight, the generation number gets bumped up too.  This provides
+   the basis for the timeout path to distinguish different recycle
+   instances of the request.
 
-Unpatched:
-52428800 bytes (52 MB) copied, 307.065 s, 171 kB/s
+   Also, marking a request in-flight and setting its deadline are
+   protected with a seqcount so that the timeout path can fetch both
+   values coherently.
 
-Patched:
-52428800 bytes (52 MB) copied, 13.8192 s, 3.8 MB/s
+2. The timeout path fetches the generation, state and deadline.  If
+   the verdict is timeout, it records the generation into a dedicated
+   request abortion field and does RCU wait.
 
-Signed-off-by: Jiufei Xue <jiufei.xjf@alibaba-inc.com>
+3. The completion path is also protected by RCU (from the previous
+   patch) and checks whether the current generation number and state
+   match the abortion field.  If so, it skips completion.
+
+4. The timeout path, after RCU wait, scans requests again and
+   terminates the ones whose generation and state still match the ones
+   requested for abortion.
+
+   By now, the timeout path knows that either the generation number
+   and state changed if it lost the race or the completion will yield
+   to it and can safely timeout the request.
+
+While it's more lines of code, it's conceptually simpler, doesn't
+depend on direct use of subtle memory ordering or coherence, and
+hopefully doesn't terminate the wrong instance.
+
+While this change makes REQ_ATOM_COMPLETE synchronization unnecessary
+between issue/complete and timeout paths, REQ_ATOM_COMPLETE isn't
+removed yet as it's still used in other places.  Future patches will
+move all state tracking to the new mechanism and remove all bitops in
+the hot paths.
+
+Note that this patch adds a comment explaining a race condition in
+BLK_EH_RESET_TIMER path.  The race has always been there and this
+patch doesn't change it.  It's just documenting the existing race.
+
+v2: - Fixed BLK_EH_RESET_TIMER handling as pointed out by Jianchao.
+    - s/request->gstate_seqc/request->gstate_seq/ as suggested by Peter.
+    - READ_ONCE() added in blk_mq_rq_update_state() as suggested by Peter.
+
+v3: - Fixed possible extended seqcount / u64_stats_sync read looping
+      spotted by Peter.
+    - MQ_RQ_IDLE was incorrectly being set in complete_request instead
+      of free_request.  Fixed.
+
+v4: - Rebased on top of hctx_lock() refactoring patch.
+    - Added comment explaining the use of hctx_lock() in completion path.
+
+v5: - Added comments requested by Bart.
+    - Note the addition of BLK_EH_RESET_TIMER race condition in the
+      commit message.
+
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Cc: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>
 ---
- block/blk-throttle.c | 195 ++++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 129 insertions(+), 66 deletions(-)
+ block/blk-core.c       |   2 +
+ block/blk-mq.c         | 229 +++++++++++++++++++++++++++++++++----------------
+ block/blk-mq.h         |  46 ++++++++++
+ block/blk-timeout.c    |   2 +-
+ block/blk.h            |   6 --
+ include/linux/blk-mq.h |   1 +
+ include/linux/blkdev.h |  23 +++++
+ 7 files changed, 230 insertions(+), 79 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index d19f416..842257e 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -14,10 +14,10 @@
- #include "blk.h"
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 2e0d041..f843ae4f 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -126,6 +126,8 @@ void blk_rq_init(struct request_queue *q, struct request *rq)
+ 	rq->start_time = jiffies;
+ 	set_start_time_ns(rq);
+ 	rq->part = NULL;
++	seqcount_init(&rq->gstate_seq);
++	u64_stats_init(&rq->aborted_gstate_sync);
+ }
+ EXPORT_SYMBOL(blk_rq_init);
  
- /* Max dispatch from a group in 1 round */
--static int throtl_grp_quantum = 8;
-+static int throtl_grp_quantum = 32;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 6741c3e..052fee5 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -483,6 +483,7 @@ void blk_mq_free_request(struct request *rq)
+ 	if (blk_rq_rl(rq))
+ 		blk_put_rl(blk_rq_rl(rq));
  
- /* Total max dispatch from all groups in one round */
--static int throtl_quantum = 32;
-+static int throtl_quantum = 128;
++	blk_mq_rq_update_state(rq, MQ_RQ_IDLE);
+ 	clear_bit(REQ_ATOM_STARTED, &rq->atomic_flags);
+ 	clear_bit(REQ_ATOM_POLL_SLEPT, &rq->atomic_flags);
+ 	if (rq->tag != -1)
+@@ -530,6 +531,8 @@ static void __blk_mq_complete_request(struct request *rq)
+ 	bool shared = false;
+ 	int cpu;
  
- /* Throttling is performed over a slice and after that slice is renewed */
- #define DFL_THROTL_SLICE_HD (HZ / 10)
-@@ -43,6 +43,12 @@
- /* A workqueue to queue throttle related work */
- static struct workqueue_struct *kthrotld_workqueue;
- 
-+enum wl_type {
-+	READ_WORKLOAD = 0,
-+	SYNC_WRITE_WORKLOAD = 1,
-+	ASYNC_WRITE_WORKLOAD = 2
-+};
++	WARN_ON_ONCE(blk_mq_rq_state(rq) != MQ_RQ_IN_FLIGHT);
 +
- /*
-  * To implement hierarchical throttling, throtl_grps form a tree and bios
-  * are dispatched upwards level by level until they reach the top and get
-@@ -79,8 +85,11 @@ struct throtl_service_queue {
- 	 * Bios queued directly to this service_queue or dispatched from
- 	 * children throtl_grp's.
- 	 */
--	struct list_head	queued[2];	/* throtl_qnode [READ/WRITE] */
--	unsigned int		nr_queued[2];	/* number of queued bios */
-+	/* throtl_qnode [READ/WRITE/ASYNC_WRITE] */
-+	struct list_head	queued[3];
-+
-+	unsigned int		nr_queued[3];	/* number of queued bios */
-+
- 
- 	/*
- 	 * RB tree of active children throtl_grp's, which are sorted by
-@@ -127,8 +136,8 @@ struct throtl_grp {
- 	 * with the sibling qnode_on_parents and the parent's
- 	 * qnode_on_self.
- 	 */
--	struct throtl_qnode qnode_on_self[2];
--	struct throtl_qnode qnode_on_parent[2];
-+	struct throtl_qnode qnode_on_self[3];
-+	struct throtl_qnode qnode_on_parent[3];
- 
- 	/*
- 	 * Dispatch time in jiffies. This is the estimated time when group
-@@ -202,7 +211,7 @@ struct throtl_data
- 	struct request_queue *queue;
- 
- 	/* Total Number of queued bios on READ and WRITE lists */
--	unsigned int nr_queued[2];
-+	unsigned int nr_queued[3];
- 
- 	unsigned int throtl_slice;
- 
-@@ -274,6 +283,18 @@ static struct throtl_data *sq_to_td(struct throtl_service_queue *sq)
- 		return container_of(sq, struct throtl_data, service_queue);
+ 	if (rq->internal_tag != -1)
+ 		blk_mq_sched_completed_request(rq);
+ 	if (rq->rq_flags & RQF_STATS) {
+@@ -573,6 +576,36 @@ static void hctx_lock(struct blk_mq_hw_ctx *hctx, int *srcu_idx)
+ 		*srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
  }
  
-+static inline enum wl_type bio_workload_type(struct bio *bio)
++static void blk_mq_rq_update_aborted_gstate(struct request *rq, u64 gstate)
 +{
-+	return bio_data_dir(bio) ?
-+	       ((bio->bi_opf & REQ_SYNC) ? SYNC_WRITE_WORKLOAD :
-+	       ASYNC_WRITE_WORKLOAD) : READ_WORKLOAD;
++	unsigned long flags;
++
++	/*
++	 * blk_mq_rq_aborted_gstate() is used from the completion path and
++	 * can thus be called from irq context.  u64_stats_fetch in the
++	 * middle of update on the same CPU leads to lockup.  Disable irq
++	 * while updating.
++	 */
++	local_irq_save(flags);
++	u64_stats_update_begin(&rq->aborted_gstate_sync);
++	rq->aborted_gstate = gstate;
++	u64_stats_update_end(&rq->aborted_gstate_sync);
++	local_irq_restore(flags);
 +}
 +
-+static inline bool wl_to_rw(enum wl_type type)
++static u64 blk_mq_rq_aborted_gstate(struct request *rq)
 +{
-+	return type >= SYNC_WRITE_WORKLOAD;
++	unsigned int start;
++	u64 aborted_gstate;
++
++	do {
++		start = u64_stats_fetch_begin(&rq->aborted_gstate_sync);
++		aborted_gstate = rq->aborted_gstate;
++	} while (u64_stats_fetch_retry(&rq->aborted_gstate_sync, start));
++
++	return aborted_gstate;
 +}
 +
- /*
-  * cgroup's limit in LIMIT_MAX is scaled if low limit is set. This scale is to
-  * make the IO dispatch more smooth.
-@@ -475,8 +496,9 @@ static struct bio *throtl_pop_queued(struct list_head *queued,
- /* init a service_queue, assumes the caller zeroed it */
- static void throtl_service_queue_init(struct throtl_service_queue *sq)
- {
--	INIT_LIST_HEAD(&sq->queued[0]);
--	INIT_LIST_HEAD(&sq->queued[1]);
-+	INIT_LIST_HEAD(&sq->queued[READ_WORKLOAD]);
-+	INIT_LIST_HEAD(&sq->queued[SYNC_WRITE_WORKLOAD]);
-+	INIT_LIST_HEAD(&sq->queued[ASYNC_WRITE_WORKLOAD]);
- 	sq->pending_tree = RB_ROOT;
- 	timer_setup(&sq->pending_timer, throtl_pending_timer_fn, 0);
+ /**
+  * blk_mq_complete_request - end I/O on a request
+  * @rq:		the request being processed
+@@ -590,8 +623,20 @@ void blk_mq_complete_request(struct request *rq)
+ 	if (unlikely(blk_should_fake_timeout(q)))
+ 		return;
+ 
++	/*
++	 * If @rq->aborted_gstate equals the current instance, timeout is
++	 * claiming @rq and we lost.  This is synchronized through
++	 * hctx_lock().  See blk_mq_timeout_work() for details.
++	 *
++	 * Completion path never blocks and we can directly use RCU here
++	 * instead of hctx_lock() which can be either RCU or SRCU.
++	 * However, that would complicate paths which want to synchronize
++	 * against us.  Let stay in sync with the issue path so that
++	 * hctx_lock() covers both issue and completion paths.
++	 */
+ 	hctx_lock(hctx, &srcu_idx);
+-	if (!blk_mark_rq_complete(rq))
++	if (blk_mq_rq_aborted_gstate(rq) != rq->gstate &&
++	    !blk_mark_rq_complete(rq))
+ 		__blk_mq_complete_request(rq);
+ 	hctx_unlock(hctx, srcu_idx);
  }
-@@ -484,7 +506,7 @@ static void throtl_service_queue_init(struct throtl_service_queue *sq)
- static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
- {
- 	struct throtl_grp *tg;
--	int rw;
-+	enum wl_type type;
- 
- 	tg = kzalloc_node(sizeof(*tg), gfp, node);
- 	if (!tg)
-@@ -492,9 +514,9 @@ static struct blkg_policy_data *throtl_pd_alloc(gfp_t gfp, int node)
- 
- 	throtl_service_queue_init(&tg->service_queue);
- 
--	for (rw = READ; rw <= WRITE; rw++) {
--		throtl_qnode_init(&tg->qnode_on_self[rw], tg);
--		throtl_qnode_init(&tg->qnode_on_parent[rw], tg);
-+	for (type = READ_WORKLOAD; type <= ASYNC_WRITE_WORKLOAD; type++) {
-+		throtl_qnode_init(&tg->qnode_on_self[type], tg);
-+		throtl_qnode_init(&tg->qnode_on_parent[type], tg);
+@@ -617,34 +662,32 @@ void blk_mq_start_request(struct request *rq)
+ 		wbt_issue(q->rq_wb, &rq->issue_stat);
  	}
  
- 	RB_CLEAR_NODE(&tg->rb_node);
-@@ -985,6 +1007,7 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
- 			    unsigned long *wait)
- {
- 	bool rw = bio_data_dir(bio);
-+	enum wl_type type = bio_workload_type(bio);
- 	unsigned long bps_wait = 0, iops_wait = 0, max_wait = 0;
- 
- 	/*
-@@ -993,8 +1016,8 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
- 	 * this function with a different bio if there are other bios
- 	 * queued.
- 	 */
--	BUG_ON(tg->service_queue.nr_queued[rw] &&
--	       bio != throtl_peek_queued(&tg->service_queue.queued[rw]));
-+	BUG_ON(tg->service_queue.nr_queued[type] &&
-+	       bio != throtl_peek_queued(&tg->service_queue.queued[type]));
- 
- 	/* If tg->bps = -1, then BW is unlimited */
- 	if (tg_bps_limit(tg, rw) == U64_MAX &&
-@@ -1011,7 +1034,12 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
- 	 * If there is queued bio, that means there should be an active
- 	 * slice and it should be extended instead.
- 	 */
--	if (throtl_slice_used(tg, rw) && !(tg->service_queue.nr_queued[rw]))
-+	if (throtl_slice_used(tg, rw) &&
-+	   ((rw == READ &&
-+	    !tg->service_queue.nr_queued[READ_WORKLOAD]) ||
-+	    (rw == WRITE &&
-+	    !tg->service_queue.nr_queued[SYNC_WRITE_WORKLOAD] &&
-+	    !tg->service_queue.nr_queued[ASYNC_WRITE_WORKLOAD])))
- 		throtl_start_new_slice(tg, rw);
- 	else {
- 		if (time_before(tg->slice_end[rw],
-@@ -1072,10 +1100,10 @@ static void throtl_add_bio_tg(struct bio *bio, struct throtl_qnode *qn,
- 			      struct throtl_grp *tg)
- {
- 	struct throtl_service_queue *sq = &tg->service_queue;
--	bool rw = bio_data_dir(bio);
-+	int type = bio_workload_type(bio);
- 
- 	if (!qn)
--		qn = &tg->qnode_on_self[rw];
-+		qn = &tg->qnode_on_self[type];
- 
- 	/*
- 	 * If @tg doesn't currently have any bios queued in the same
-@@ -1083,12 +1111,12 @@ static void throtl_add_bio_tg(struct bio *bio, struct throtl_qnode *qn,
- 	 * dispatched.  Mark that @tg was empty.  This is automatically
- 	 * cleaered on the next tg_update_disptime().
- 	 */
--	if (!sq->nr_queued[rw])
-+	if (!sq->nr_queued[type])
- 		tg->flags |= THROTL_TG_WAS_EMPTY;
- 
--	throtl_qnode_add_bio(bio, qn, &sq->queued[rw]);
-+	throtl_qnode_add_bio(bio, qn, &sq->queued[type]);
- 
--	sq->nr_queued[rw]++;
-+	sq->nr_queued[type]++;
- 	throtl_enqueue_tg(tg);
- }
- 
-@@ -1096,16 +1124,22 @@ static void tg_update_disptime(struct throtl_grp *tg)
- {
- 	struct throtl_service_queue *sq = &tg->service_queue;
- 	unsigned long read_wait = -1, write_wait = -1, min_wait = -1, disptime;
-+	unsigned long sync_write_wait, async_write_wait;
- 	struct bio *bio;
- 
--	bio = throtl_peek_queued(&sq->queued[READ]);
-+	bio = throtl_peek_queued(&sq->queued[READ_WORKLOAD]);
- 	if (bio)
- 		tg_may_dispatch(tg, bio, &read_wait);
- 
--	bio = throtl_peek_queued(&sq->queued[WRITE]);
-+	bio = throtl_peek_queued(&sq->queued[SYNC_WRITE_WORKLOAD]);
-+	if (bio)
-+		tg_may_dispatch(tg, bio, &sync_write_wait);
-+
-+	bio = throtl_peek_queued(&sq->queued[ASYNC_WRITE_WORKLOAD]);
- 	if (bio)
--		tg_may_dispatch(tg, bio, &write_wait);
-+		tg_may_dispatch(tg, bio, &async_write_wait);
- 
-+	write_wait = min(sync_write_wait, async_write_wait);
- 	min_wait = min(read_wait, write_wait);
- 	disptime = jiffies + min_wait;
- 
-@@ -1125,16 +1159,16 @@ static void start_parent_slice_with_credit(struct throtl_grp *child_tg,
- 		throtl_start_new_slice_with_credit(parent_tg, rw,
- 				child_tg->slice_start[rw]);
- 	}
+-	blk_add_timer(rq);
 -
- }
- 
--static void tg_dispatch_one_bio(struct throtl_grp *tg, bool rw)
-+static void tg_dispatch_one_bio(struct throtl_grp *tg, enum wl_type type)
- {
- 	struct throtl_service_queue *sq = &tg->service_queue;
- 	struct throtl_service_queue *parent_sq = sq->parent_sq;
- 	struct throtl_grp *parent_tg = sq_to_tg(parent_sq);
- 	struct throtl_grp *tg_to_put = NULL;
- 	struct bio *bio;
-+	bool rw = wl_to_rw(type);
++	WARN_ON_ONCE(blk_mq_rq_state(rq) != MQ_RQ_IDLE);
+ 	WARN_ON_ONCE(test_bit(REQ_ATOM_STARTED, &rq->atomic_flags));
  
  	/*
- 	 * @bio is being transferred from @tg to @parent_sq.  Popping a bio
-@@ -1142,8 +1176,8 @@ static void tg_dispatch_one_bio(struct throtl_grp *tg, bool rw)
- 	 * getting released prematurely.  Remember the tg to put and put it
- 	 * after @bio is transferred to @parent_sq.
+-	 * Mark us as started and clear complete. Complete might have been
+-	 * set if requeue raced with timeout, which then marked it as
+-	 * complete. So be sure to clear complete again when we start
+-	 * the request, otherwise we'll ignore the completion event.
++	 * Mark @rq in-flight which also advances the generation number,
++	 * and register for timeout.  Protect with a seqcount to allow the
++	 * timeout path to read both @rq->gstate and @rq->deadline
++	 * coherently.
+ 	 *
+-	 * Ensure that ->deadline is visible before we set STARTED, such that
+-	 * blk_mq_check_expired() is guaranteed to observe our ->deadline when
+-	 * it observes STARTED.
++	 * This is the only place where a request is marked in-flight.  If
++	 * the timeout path reads an in-flight @rq->gstate, the
++	 * @rq->deadline it reads together under @rq->gstate_seq is
++	 * guaranteed to be the matching one.
  	 */
--	bio = throtl_pop_queued(&sq->queued[rw], &tg_to_put);
--	sq->nr_queued[rw]--;
-+	bio = throtl_pop_queued(&sq->queued[type], &tg_to_put);
-+	sq->nr_queued[type]--;
+-	smp_wmb();
++	preempt_disable();
++	write_seqcount_begin(&rq->gstate_seq);
++
++	blk_mq_rq_update_state(rq, MQ_RQ_IN_FLIGHT);
++	blk_add_timer(rq);
++
++	write_seqcount_end(&rq->gstate_seq);
++	preempt_enable();
++
+ 	set_bit(REQ_ATOM_STARTED, &rq->atomic_flags);
+-	if (test_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags)) {
+-		/*
+-		 * Coherence order guarantees these consecutive stores to a
+-		 * single variable propagate in the specified order. Thus the
+-		 * clear_bit() is ordered _after_ the set bit. See
+-		 * blk_mq_check_expired().
+-		 *
+-		 * (the bits must be part of the same byte for this to be
+-		 * true).
+-		 */
++	if (test_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags))
+ 		clear_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags);
+-	}
  
- 	throtl_charge_bio(tg, bio);
+ 	if (q->dma_drain_size && blk_rq_bytes(rq)) {
+ 		/*
+@@ -677,6 +720,7 @@ static void __blk_mq_requeue_request(struct request *rq)
+ 	blk_mq_sched_requeue_request(rq);
  
-@@ -1155,13 +1189,13 @@ static void tg_dispatch_one_bio(struct throtl_grp *tg, bool rw)
- 	 * responsible for issuing these bios.
- 	 */
- 	if (parent_tg) {
--		throtl_add_bio_tg(bio, &tg->qnode_on_parent[rw], parent_tg);
-+		throtl_add_bio_tg(bio, &tg->qnode_on_parent[type], parent_tg);
- 		start_parent_slice_with_credit(tg, parent_tg, rw);
- 	} else {
--		throtl_qnode_add_bio(bio, &tg->qnode_on_parent[rw],
--				     &parent_sq->queued[rw]);
--		BUG_ON(tg->td->nr_queued[rw] <= 0);
--		tg->td->nr_queued[rw]--;
-+		throtl_qnode_add_bio(bio, &tg->qnode_on_parent[type],
-+				     &parent_sq->queued[type]);
-+		BUG_ON(tg->td->nr_queued[type] <= 0);
-+		tg->td->nr_queued[type]--;
+ 	if (test_and_clear_bit(REQ_ATOM_STARTED, &rq->atomic_flags)) {
++		blk_mq_rq_update_state(rq, MQ_RQ_IDLE);
+ 		if (q->dma_drain_size && blk_rq_bytes(rq))
+ 			rq->nr_phys_segments--;
  	}
+@@ -774,6 +818,7 @@ EXPORT_SYMBOL(blk_mq_tag_to_rq);
+ struct blk_mq_timeout_data {
+ 	unsigned long next;
+ 	unsigned int next_set;
++	unsigned int nr_expired;
+ };
  
- 	throtl_trim_slice(tg, rw);
-@@ -1173,34 +1207,45 @@ static void tg_dispatch_one_bio(struct throtl_grp *tg, bool rw)
- static int throtl_dispatch_tg(struct throtl_grp *tg)
+ void blk_mq_rq_timed_out(struct request *req, bool reserved)
+@@ -801,6 +846,12 @@ void blk_mq_rq_timed_out(struct request *req, bool reserved)
+ 		__blk_mq_complete_request(req);
+ 		break;
+ 	case BLK_EH_RESET_TIMER:
++		/*
++		 * As nothing prevents from completion happening while
++		 * ->aborted_gstate is set, this may lead to ignored
++		 * completions and further spurious timeouts.
++		 */
++		blk_mq_rq_update_aborted_gstate(req, 0);
+ 		blk_add_timer(req);
+ 		blk_clear_rq_complete(req);
+ 		break;
+@@ -816,50 +867,51 @@ static void blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
+ 		struct request *rq, void *priv, bool reserved)
  {
- 	struct throtl_service_queue *sq = &tg->service_queue;
--	unsigned int nr_reads = 0, nr_writes = 0;
-+	unsigned int nr_reads = 0, nr_async_writes = 0, nr_sync_writes = 0;
- 	unsigned int max_nr_reads = throtl_grp_quantum*3/4;
--	unsigned int max_nr_writes = throtl_grp_quantum - max_nr_reads;
-+	unsigned int max_sync_writes = (throtl_grp_quantum - max_nr_reads)*7/8;
-+	unsigned int max_async_writes = throtl_grp_quantum - max_nr_reads
-+					- max_sync_writes;
- 	struct bio *bio;
+ 	struct blk_mq_timeout_data *data = priv;
+-	unsigned long deadline;
++	unsigned long gstate, deadline;
++	int start;
++
++	might_sleep();
  
- 	/* Try to dispatch 75% READS and 25% WRITES */
+ 	if (!test_bit(REQ_ATOM_STARTED, &rq->atomic_flags))
+ 		return;
+ 
+-	/*
+-	 * Ensures that if we see STARTED we must also see our
+-	 * up-to-date deadline, see blk_mq_start_request().
+-	 */
+-	smp_rmb();
 -
--	while ((bio = throtl_peek_queued(&sq->queued[READ])) &&
-+	while ((bio = throtl_peek_queued(&sq->queued[READ_WORKLOAD])) &&
- 	       tg_may_dispatch(tg, bio, NULL)) {
- 
--		tg_dispatch_one_bio(tg, bio_data_dir(bio));
-+		tg_dispatch_one_bio(tg, READ_WORKLOAD);
- 		nr_reads++;
- 
- 		if (nr_reads >= max_nr_reads)
- 			break;
- 	}
- 
--	while ((bio = throtl_peek_queued(&sq->queued[WRITE])) &&
-+	while ((bio = throtl_peek_queued(&sq->queued[SYNC_WRITE_WORKLOAD])) &&
- 	       tg_may_dispatch(tg, bio, NULL)) {
- 
--		tg_dispatch_one_bio(tg, bio_data_dir(bio));
--		nr_writes++;
-+		tg_dispatch_one_bio(tg, SYNC_WRITE_WORKLOAD);
-+		nr_sync_writes++;
- 
--		if (nr_writes >= max_nr_writes)
-+		if (nr_sync_writes >= max_sync_writes)
- 			break;
- 	}
- 
--	return nr_reads + nr_writes;
-+	while ((bio = throtl_peek_queued(&sq->queued[ASYNC_WRITE_WORKLOAD])) &&
-+	       tg_may_dispatch(tg, bio, NULL)) {
-+
-+		tg_dispatch_one_bio(tg, ASYNC_WRITE_WORKLOAD);
-+		nr_async_writes++;
-+
-+		if (nr_async_writes >= max_async_writes)
+-	deadline = READ_ONCE(rq->deadline);
++	/* read coherent snapshots of @rq->state_gen and @rq->deadline */
++	while (true) {
++		start = read_seqcount_begin(&rq->gstate_seq);
++		gstate = READ_ONCE(rq->gstate);
++		deadline = rq->deadline;
++		if (!read_seqcount_retry(&rq->gstate_seq, start))
 +			break;
++		cond_resched();
++	}
+ 
+-	/*
+-	 * The rq being checked may have been freed and reallocated
+-	 * out already here, we avoid this race by checking rq->deadline
+-	 * and REQ_ATOM_COMPLETE flag together:
+-	 *
+-	 * - if rq->deadline is observed as new value because of
+-	 *   reusing, the rq won't be timed out because of timing.
+-	 * - if rq->deadline is observed as previous value,
+-	 *   REQ_ATOM_COMPLETE flag won't be cleared in reuse path
+-	 *   because we put a barrier between setting rq->deadline
+-	 *   and clearing the flag in blk_mq_start_request(), so
+-	 *   this rq won't be timed out too.
+-	 */
+-	if (time_after_eq(jiffies, deadline)) {
+-		if (!blk_mark_rq_complete(rq)) {
+-			/*
+-			 * Again coherence order ensures that consecutive reads
+-			 * from the same variable must be in that order. This
+-			 * ensures that if we see COMPLETE clear, we must then
+-			 * see STARTED set and we'll ignore this timeout.
+-			 *
+-			 * (There's also the MB implied by the test_and_clear())
+-			 */
+-			blk_mq_rq_timed_out(rq, reserved);
+-		}
++	/* if in-flight && overdue, mark for abortion */
++	if ((gstate & MQ_RQ_STATE_MASK) == MQ_RQ_IN_FLIGHT &&
++	    time_after_eq(jiffies, deadline)) {
++		blk_mq_rq_update_aborted_gstate(rq, gstate);
++		data->nr_expired++;
++		hctx->nr_expired++;
+ 	} else if (!data->next_set || time_after(data->next, deadline)) {
+ 		data->next = deadline;
+ 		data->next_set = 1;
+ 	}
+ }
+ 
++static void blk_mq_terminate_expired(struct blk_mq_hw_ctx *hctx,
++		struct request *rq, void *priv, bool reserved)
++{
++	/*
++	 * We marked @rq->aborted_gstate and waited for RCU.  If there were
++	 * completions that we lost to, they would have finished and
++	 * updated @rq->gstate by now; otherwise, the completion path is
++	 * now guaranteed to see @rq->aborted_gstate and yield.  If
++	 * @rq->aborted_gstate still matches @rq->gstate, @rq is ours.
++	 */
++	if (READ_ONCE(rq->gstate) == rq->aborted_gstate &&
++	    !blk_mark_rq_complete(rq))
++		blk_mq_rq_timed_out(rq, reserved);
++}
++
+ static void blk_mq_timeout_work(struct work_struct *work)
+ {
+ 	struct request_queue *q =
+@@ -867,7 +919,9 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ 	struct blk_mq_timeout_data data = {
+ 		.next		= 0,
+ 		.next_set	= 0,
++		.nr_expired	= 0,
+ 	};
++	struct blk_mq_hw_ctx *hctx;
+ 	int i;
+ 
+ 	/* A deadlock might occur if a request is stuck requiring a
+@@ -886,14 +940,40 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ 	if (!percpu_ref_tryget(&q->q_usage_counter))
+ 		return;
+ 
++	/* scan for the expired ones and set their ->aborted_gstate */
+ 	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &data);
+ 
++	if (data.nr_expired) {
++		bool has_rcu = false;
++
++		/*
++		 * Wait till everyone sees ->aborted_gstate.  The
++		 * sequential waits for SRCUs aren't ideal.  If this ever
++		 * becomes a problem, we can add per-hw_ctx rcu_head and
++		 * wait in parallel.
++		 */
++		queue_for_each_hw_ctx(q, hctx, i) {
++			if (!hctx->nr_expired)
++				continue;
++
++			if (!(hctx->flags & BLK_MQ_F_BLOCKING))
++				has_rcu = true;
++			else
++				synchronize_srcu(hctx->queue_rq_srcu);
++
++			hctx->nr_expired = 0;
++		}
++		if (has_rcu)
++			synchronize_rcu();
++
++		/* terminate the ones we won */
++		blk_mq_queue_tag_busy_iter(q, blk_mq_terminate_expired, NULL);
 +	}
 +
-+	return nr_reads + nr_sync_writes + nr_async_writes;
+ 	if (data.next_set) {
+ 		data.next = blk_rq_timeout(round_jiffies_up(data.next));
+ 		mod_timer(&q->timeout, data.next);
+ 	} else {
+-		struct blk_mq_hw_ctx *hctx;
+-
+ 		queue_for_each_hw_ctx(q, hctx, i) {
+ 			/* the hctx may be unmapped, so check it here */
+ 			if (blk_mq_hw_queue_mapped(hctx))
+@@ -1893,6 +1973,22 @@ static size_t order_to_size(unsigned int order)
+ 	return (size_t)PAGE_SIZE << order;
  }
  
- static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
-@@ -1221,7 +1266,9 @@ static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
++static int blk_mq_init_request(struct blk_mq_tag_set *set, struct request *rq,
++			       unsigned int hctx_idx, int node)
++{
++	int ret;
++
++	if (set->ops->init_request) {
++		ret = set->ops->init_request(set, rq, hctx_idx, node);
++		if (ret)
++			return ret;
++	}
++
++	seqcount_init(&rq->gstate_seq);
++	u64_stats_init(&rq->aborted_gstate_sync);
++	return 0;
++}
++
+ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+ 		     unsigned int hctx_idx, unsigned int depth)
+ {
+@@ -1954,12 +2050,9 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+ 			struct request *rq = p;
  
- 		nr_disp += throtl_dispatch_tg(tg);
+ 			tags->static_rqs[i] = rq;
+-			if (set->ops->init_request) {
+-				if (set->ops->init_request(set, rq, hctx_idx,
+-						node)) {
+-					tags->static_rqs[i] = NULL;
+-					goto fail;
+-				}
++			if (blk_mq_init_request(set, rq, hctx_idx, node)) {
++				tags->static_rqs[i] = NULL;
++				goto fail;
+ 			}
  
--		if (sq->nr_queued[0] || sq->nr_queued[1])
-+		if (sq->nr_queued[READ_WORKLOAD] ||
-+		    sq->nr_queued[SYNC_WRITE_WORKLOAD] ||
-+		    sq->nr_queued[ASYNC_WRITE_WORKLOAD])
- 			tg_update_disptime(tg);
+ 			p += rq_size;
+@@ -2098,9 +2191,7 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ 	if (!hctx->fq)
+ 		goto sched_exit_hctx;
  
- 		if (nr_disp >= throtl_quantum)
-@@ -1267,9 +1314,14 @@ static void throtl_pending_timer_fn(struct timer_list *t)
- 	dispatched = false;
+-	if (set->ops->init_request &&
+-	    set->ops->init_request(set, hctx->fq->flush_rq, hctx_idx,
+-				   node))
++	if (blk_mq_init_request(set, hctx->fq->flush_rq, hctx_idx, node))
+ 		goto free_fq;
  
- 	while (true) {
--		throtl_log(sq, "dispatch nr_queued=%u read=%u write=%u",
--			   sq->nr_queued[READ] + sq->nr_queued[WRITE],
--			   sq->nr_queued[READ], sq->nr_queued[WRITE]);
-+		throtl_log(sq,
-+			  "dispatch nr_queued=%u read=%u sync_write=%u async_write=%u",
-+			   sq->nr_queued[READ_WORKLOAD] +
-+			   sq->nr_queued[SYNC_WRITE_WORKLOAD] +
-+			   sq->nr_queued[ASYNC_WRITE_WORKLOAD],
-+			   sq->nr_queued[READ_WORKLOAD],
-+			   sq->nr_queued[SYNC_WRITE_WORKLOAD],
-+			   sq->nr_queued[ASYNC_WRITE_WORKLOAD]);
+ 	if (hctx->flags & BLK_MQ_F_BLOCKING)
+@@ -3018,12 +3109,6 @@ static bool blk_mq_poll(struct request_queue *q, blk_qc_t cookie)
  
- 		ret = throtl_select_dispatch(sq);
- 		if (ret) {
-@@ -1325,13 +1377,13 @@ static void blk_throtl_dispatch_work_fn(struct work_struct *work)
- 	struct bio_list bio_list_on_stack;
- 	struct bio *bio;
- 	struct blk_plug plug;
--	int rw;
-+	enum wl_type type;
+ static int __init blk_mq_init(void)
+ {
+-	/*
+-	 * See comment in block/blk.h rq_atomic_flags enum
+-	 */
+-	BUILD_BUG_ON((REQ_ATOM_STARTED / BITS_PER_BYTE) !=
+-			(REQ_ATOM_COMPLETE / BITS_PER_BYTE));
+-
+ 	cpuhp_setup_state_multi(CPUHP_BLK_MQ_DEAD, "block/mq:dead", NULL,
+ 				blk_mq_hctx_notify_dead);
+ 	return 0;
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 6c7c3ff..cf01f6f 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -27,6 +27,19 @@ struct blk_mq_ctx {
+ 	struct kobject		kobj;
+ } ____cacheline_aligned_in_smp;
  
- 	bio_list_init(&bio_list_on_stack);
++/*
++ * Bits for request->gstate.  The lower two bits carry MQ_RQ_* state value
++ * and the upper bits the generation number.
++ */
++enum mq_rq_state {
++	MQ_RQ_IDLE		= 0,
++	MQ_RQ_IN_FLIGHT		= 1,
++
++	MQ_RQ_STATE_BITS	= 2,
++	MQ_RQ_STATE_MASK	= (1 << MQ_RQ_STATE_BITS) - 1,
++	MQ_RQ_GEN_INC		= 1 << MQ_RQ_STATE_BITS,
++};
++
+ void blk_mq_freeze_queue(struct request_queue *q);
+ void blk_mq_free_queue(struct request_queue *q);
+ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr);
+@@ -85,6 +98,39 @@ extern void blk_mq_rq_timed_out(struct request *req, bool reserved);
  
- 	spin_lock_irq(q->queue_lock);
--	for (rw = READ; rw <= WRITE; rw++)
--		while ((bio = throtl_pop_queued(&td_sq->queued[rw], NULL)))
-+	for (type = READ_WORKLOAD; type <= ASYNC_WRITE_WORKLOAD; type++)
-+		while ((bio = throtl_pop_queued(&td_sq->queued[type], NULL)))
- 			bio_list_add(&bio_list_on_stack, bio);
- 	spin_unlock_irq(q->queue_lock);
+ void blk_mq_release(struct request_queue *q);
  
-@@ -1820,11 +1872,13 @@ static bool throtl_tg_can_upgrade(struct throtl_grp *tg)
- 	write_limit = tg->bps[WRITE][LIMIT_LOW] || tg->iops[WRITE][LIMIT_LOW];
- 	if (!read_limit && !write_limit)
- 		return true;
--	if (read_limit && sq->nr_queued[READ] &&
--	    (!write_limit || sq->nr_queued[WRITE]))
-+	if (read_limit && sq->nr_queued[READ_WORKLOAD] &&
-+	    (!write_limit || sq->nr_queued[SYNC_WRITE_WORKLOAD] ||
-+			     sq->nr_queued[ASYNC_WRITE_WORKLOAD]))
- 		return true;
--	if (write_limit && sq->nr_queued[WRITE] &&
--	    (!read_limit || sq->nr_queued[READ]))
-+	if (write_limit && (sq->nr_queued[SYNC_WRITE_WORKLOAD] ||
-+			    sq->nr_queued[ASYNC_WRITE_WORKLOAD]) &&
-+	    (!read_limit || sq->nr_queued[READ_WORKLOAD]))
- 		return true;
++/**
++ * blk_mq_rq_state() - read the current MQ_RQ_* state of a request
++ * @rq: target request.
++ */
++static inline int blk_mq_rq_state(struct request *rq)
++{
++	return READ_ONCE(rq->gstate) & MQ_RQ_STATE_MASK;
++}
++
++/**
++ * blk_mq_rq_update_state() - set the current MQ_RQ_* state of a request
++ * @rq: target request.
++ * @state: new state to set.
++ *
++ * Set @rq's state to @state.  The caller is responsible for ensuring that
++ * there are no other updaters.  A request can transition into IN_FLIGHT
++ * only from IDLE and doing so increments the generation number.
++ */
++static inline void blk_mq_rq_update_state(struct request *rq,
++					  enum mq_rq_state state)
++{
++	u64 old_val = READ_ONCE(rq->gstate);
++	u64 new_val = (old_val & ~MQ_RQ_STATE_MASK) | state;
++
++	if (state == MQ_RQ_IN_FLIGHT) {
++		WARN_ON_ONCE((old_val & MQ_RQ_STATE_MASK) != MQ_RQ_IDLE);
++		new_val += MQ_RQ_GEN_INC;
++	}
++
++	/* avoid exposing interim values */
++	WRITE_ONCE(rq->gstate, new_val);
++}
++
+ static inline struct blk_mq_ctx *__blk_mq_get_ctx(struct request_queue *q,
+ 					   unsigned int cpu)
+ {
+diff --git a/block/blk-timeout.c b/block/blk-timeout.c
+index 764ecf9..6427be7 100644
+--- a/block/blk-timeout.c
++++ b/block/blk-timeout.c
+@@ -208,7 +208,7 @@ void blk_add_timer(struct request *req)
+ 	if (!req->timeout)
+ 		req->timeout = q->rq_timeout;
  
- 	if (time_after_eq(jiffies,
-@@ -2129,6 +2183,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 	struct throtl_grp *tg = blkg_to_tg(blkg ?: q->root_blkg);
- 	struct throtl_service_queue *sq;
- 	bool rw = bio_data_dir(bio);
-+	enum wl_type type = bio_workload_type(bio);
- 	bool throttled = false;
- 	struct throtl_data *td = tg->td;
+-	WRITE_ONCE(req->deadline, jiffies + req->timeout);
++	req->deadline = jiffies + req->timeout;
  
-@@ -2157,7 +2212,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 		throtl_downgrade_check(tg);
- 		throtl_upgrade_check(tg);
- 		/* throtl is FIFO - if bios are already queued, should queue */
--		if (sq->nr_queued[rw])
-+		if (sq->nr_queued[type])
- 			break;
+ 	/*
+ 	 * Only the non-mq case needs to add the request to a protected list.
+diff --git a/block/blk.h b/block/blk.h
+index 3f14469..9cb2739 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -123,12 +123,6 @@ void blk_account_io_done(struct request *req);
+  * Internal atomic flags for request handling
+  */
+ enum rq_atomic_flags {
+-	/*
+-	 * Keep these two bits first - not because we depend on the
+-	 * value of them, but we do depend on them being in the same
+-	 * byte of storage to ensure ordering on writes. Keeping them
+-	 * first will achieve that nicely.
+-	 */
+ 	REQ_ATOM_COMPLETE = 0,
+ 	REQ_ATOM_STARTED,
  
- 		/* if above limits, break to queue */
-@@ -2191,7 +2246,7 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 		 * Climb up the ladder.  If we''re already at the top, it
- 		 * can be executed directly.
- 		 */
--		qn = &tg->qnode_on_parent[rw];
-+		qn = &tg->qnode_on_parent[type];
- 		sq = sq->parent_sq;
- 		tg = sq_to_tg(sq);
- 		if (!tg)
-@@ -2199,16 +2254,19 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
- 	}
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 95c9a5c..460798d 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -51,6 +51,7 @@ struct blk_mq_hw_ctx {
+ 	unsigned int		queue_num;
  
- 	/* out-of-limit, queue to @tg */
--	throtl_log(sq, "[%c] bio. bdisp=%llu sz=%u bps=%llu iodisp=%u iops=%u queued=%d/%d",
-+	throtl_log(sq, "[%c] bio. bdisp=%llu sz=%u bps=%llu iodisp=%u "
-+		   "iops=%u queued=%d/%d/%d",
- 		   rw == READ ? 'R' : 'W',
- 		   tg->bytes_disp[rw], bio->bi_iter.bi_size,
- 		   tg_bps_limit(tg, rw),
- 		   tg->io_disp[rw], tg_iops_limit(tg, rw),
--		   sq->nr_queued[READ], sq->nr_queued[WRITE]);
-+		   sq->nr_queued[READ_WORKLOAD],
-+		   sq->nr_queued[SYNC_WRITE_WORKLOAD],
-+		   sq->nr_queued[ASYNC_WRITE_WORKLOAD]);
+ 	atomic_t		nr_active;
++	unsigned int		nr_expired;
  
- 	tg->last_low_overflow_time[rw] = jiffies;
+ 	struct hlist_node	cpuhp_dead;
+ 	struct kobject		kobj;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 46e606f..ae563d0 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -27,6 +27,8 @@
+ #include <linux/percpu-refcount.h>
+ #include <linux/scatterlist.h>
+ #include <linux/blkzoned.h>
++#include <linux/seqlock.h>
++#include <linux/u64_stats_sync.h>
  
--	td->nr_queued[rw]++;
-+	td->nr_queued[type]++;
- 	throtl_add_bio_tg(bio, qn, tg);
- 	throttled = true;
+ struct module;
+ struct scsi_ioctl_command;
+@@ -230,6 +232,27 @@ struct request {
  
-@@ -2334,10 +2392,15 @@ static void tg_drain_bios(struct throtl_service_queue *parent_sq)
+ 	unsigned short write_hint;
  
- 		throtl_dequeue_tg(tg);
- 
--		while ((bio = throtl_peek_queued(&sq->queued[READ])))
--			tg_dispatch_one_bio(tg, bio_data_dir(bio));
--		while ((bio = throtl_peek_queued(&sq->queued[WRITE])))
--			tg_dispatch_one_bio(tg, bio_data_dir(bio));
-+		while ((bio =
-+		      throtl_peek_queued(&sq->queued[READ_WORKLOAD])))
-+			tg_dispatch_one_bio(tg, READ_WORKLOAD);
-+		while ((bio =
-+		      throtl_peek_queued(&sq->queued[SYNC_WRITE_WORKLOAD])))
-+			tg_dispatch_one_bio(tg, SYNC_WRITE_WORKLOAD);
-+		while ((bio =
-+		      throtl_peek_queued(&sq->queued[ASYNC_WRITE_WORKLOAD])))
-+			tg_dispatch_one_bio(tg, ASYNC_WRITE_WORKLOAD);
- 	}
- }
- 
-@@ -2354,7 +2417,7 @@ void blk_throtl_drain(struct request_queue *q)
- 	struct blkcg_gq *blkg;
- 	struct cgroup_subsys_state *pos_css;
- 	struct bio *bio;
--	int rw;
-+	enum wl_type type;
- 
- 	queue_lockdep_assert_held(q);
- 	rcu_read_lock();
-@@ -2375,8 +2438,8 @@ void blk_throtl_drain(struct request_queue *q)
- 	spin_unlock_irq(q->queue_lock);
- 
- 	/* all bios now should be in td->service_queue, issue them */
--	for (rw = READ; rw <= WRITE; rw++)
--		while ((bio = throtl_pop_queued(&td->service_queue.queued[rw],
-+	for (type = READ_WORKLOAD; type <= ASYNC_WRITE_WORKLOAD; type++)
-+		while ((bio = throtl_pop_queued(&td->service_queue.queued[type],
- 						NULL)))
- 			generic_make_request(bio);
++	/*
++	 * On blk-mq, the lower bits of ->gstate (generation number and
++	 * state) carry the MQ_RQ_* state value and the upper bits the
++	 * generation number which is monotonically incremented and used to
++	 * distinguish the reuse instances.
++	 *
++	 * ->gstate_seq allows updates to ->gstate and other fields
++	 * (currently ->deadline) during request start to be read
++	 * atomically from the timeout path, so that it can operate on a
++	 * coherent set of information.
++	 */
++	seqcount_t gstate_seq;
++	u64 gstate;
++
++	/*
++	 * ->aborted_gstate is used by the timeout to claim a specific
++	 * recycle instance of this request.  See blk_mq_timeout_work().
++	 */
++	struct u64_stats_sync aborted_gstate_sync;
++	u64 aborted_gstate;
++
+ 	unsigned long deadline;
+ 	struct list_head timeout_list;
  
 -- 
-1.8.3.1
+2.9.5
