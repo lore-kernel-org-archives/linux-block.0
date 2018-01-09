@@ -1,73 +1,60 @@
 Return-Path: <msnitzer@redhat.com>
-Date: Tue, 9 Jan 2018 19:33:03 -0500
+Date: Tue, 9 Jan 2018 18:41:33 -0500
 From: Mike Snitzer <snitzer@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>, hch@lst.de
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
 Cc: "axboe@kernel.dk" <axboe@kernel.dk>,
 	"dm-devel@redhat.com" <dm-devel@redhat.com>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: [for-4.16 PATCH 1/2] block: cope with gendisk's 'queue' being
  added later
-Message-ID: <20180110003302.GA19063@redhat.com>
+Message-ID: <20180109234133.GA18842@redhat.com>
 References: <20180109221039.33282-1-snitzer@redhat.com>
  <20180109221039.33282-2-snitzer@redhat.com>
  <1515539064.2721.34.camel@wdc.com>
- <20180109234133.GA18842@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180109234133.GA18842@redhat.com>
+In-Reply-To: <1515539064.2721.34.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Jan 09 2018 at  6:41pm -0500,
-Mike Snitzer <snitzer@redhat.com> wrote:
+On Tue, Jan 09 2018 at  6:04pm -0500,
+Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
 
-> On Tue, Jan 09 2018 at  6:04pm -0500,
-> Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
+> On Tue, 2018-01-09 at 17:10 -0500, Mike Snitzer wrote:
+> > diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> > index 870484eaed1f..0b0dda8e2420 100644
+> > --- a/block/blk-sysfs.c
+> > +++ b/block/blk-sysfs.c
+> > @@ -919,8 +919,20 @@ int blk_register_queue(struct gendisk *disk)
+> >  	ret = 0;
+> >  unlock:
+> >  	mutex_unlock(&q->sysfs_lock);
+> > +
+> > +	/*
+> > +	 * Take an extra ref on queue which will be put on disk_release()
+> > +	 * so that it sticks around as long as @disk is there.
+> > +	 */
+> > +	WARN_ON_ONCE(!blk_get_queue(q));
+> > +
+> > +	WARN_ON(sysfs_create_link(&dev->kobj,
+> > +				  &q->backing_dev_info->dev->kobj,
+> > +				  "bdi"));
+> > +
+> >  	return ret;
+> >  }
+> > +EXPORT_SYMBOL_GPL(blk_register_queue);
 > 
-> > On Tue, 2018-01-09 at 17:10 -0500, Mike Snitzer wrote:
-> > > diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> > > index 870484eaed1f..0b0dda8e2420 100644
-> > > --- a/block/blk-sysfs.c
-> > > +++ b/block/blk-sysfs.c
-> > > @@ -919,8 +919,20 @@ int blk_register_queue(struct gendisk *disk)
-> > >  	ret = 0;
-> > >  unlock:
-> > >  	mutex_unlock(&q->sysfs_lock);
-> > > +
-> > > +	/*
-> > > +	 * Take an extra ref on queue which will be put on disk_release()
-> > > +	 * so that it sticks around as long as @disk is there.
-> > > +	 */
-> > > +	WARN_ON_ONCE(!blk_get_queue(q));
-> > > +
-> > > +	WARN_ON(sysfs_create_link(&dev->kobj,
-> > > +				  &q->backing_dev_info->dev->kobj,
-> > > +				  "bdi"));
-> > > +
-> > >  	return ret;
-> > >  }
-> > > +EXPORT_SYMBOL_GPL(blk_register_queue);
-> > 
-> > Hello Mike,
-> > 
-> > So the sysfs_create_link() call is moved from register_disk() into
-> > blk_register_queue() but the sysfs_remove_link() call stays in del_gendisk()?
-> > Are you sure that you want this asymmetry?
+> Hello Mike,
 > 
-> My focus was on the add_disk() side of things, due to disk->queue
-> possibly being NULL on add.  But on remove all was basically left
-> unmodified (aside from removing the WARN_ON).
-> 
-> I dont think the asymmetry is a big deal but I can fix it.  I'll wait
-> for more feedback before sending out a v2 though.
+> So the sysfs_create_link() call is moved from register_disk() into
+> blk_register_queue() but the sysfs_remove_link() call stays in del_gendisk()?
+> Are you sure that you want this asymmetry?
 
-But while reviewing this asymetry I found that the sysfs_create_link()
-that I moved to blk_register_queue() needs to be guarded against
-GENHD_FL_HIDDEN -- I didn't notice the GENHD_FL_HIDDEN early return in
-register_disk().  I'll get that fixed up.
+My focus was on the add_disk() side of things, due to disk->queue
+possibly being NULL on add.  But on remove all was basically left
+unmodified (aside from removing the WARN_ON).
 
-But unrelated to my patch: I think I found another curious imbalance, in
-current upstream code, relative to GENHD_FL_HIDDEN.
-bdi_register_owner() is only called if !GENHD_FL_HIDDEN but
-bdi_unregister() is called unconditionally.  Not sure what is needed to
-address that issue because I'd have thought that the bdi would be needed
-regardless of GENHD_FL_HIDDEN.  Christoph?
+I dont think the asymmetry is a big deal but I can fix it.  I'll wait
+for more feedback before sending out a v2 though.
+
+Thanks,
+Mike
