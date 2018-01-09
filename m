@@ -1,262 +1,116 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:39431 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751977AbeAENQy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jan 2018 08:16:54 -0500
-Received: by mail-wm0-f65.google.com with SMTP id i11so2418556wmf.4
-        for <linux-block@vger.kernel.org>; Fri, 05 Jan 2018 05:16:53 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 13/25] lightnvm: pblk: rename sync_point to flush_point
-Date: Fri,  5 Jan 2018 14:16:09 +0100
-Message-Id: <20180105131621.20808-14-m@bjorling.me>
-In-Reply-To: <20180105131621.20808-1-m@bjorling.me>
-References: <20180105131621.20808-1-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+From: Tejun Heo <tj@kernel.org>
+To: jack@suse.cz,
+	axboe@kernel.dk,
+	clm@fb.com,
+	jbacik@fb.com
+Cc: kernel-team@fb.com,
+	linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	peterz@infradead.org,
+	jianchao.w.wang@oracle.com,
+	Bart.VanAssche@wdc.com,
+	linux-block@vger.kernel.org,
+	Tejun Heo <tj@kernel.org>
+Subject: [PATCH 8/8] blk-mq: rename blk_mq_hw_ctx->queue_rq_srcu to ->srcu
+Date: Tue,  9 Jan 2018 08:29:53 -0800
+Message-Id: <20180109162953.1211451-9-tj@kernel.org>
+In-Reply-To: <20180109162953.1211451-1-tj@kernel.org>
+References: <20180109162953.1211451-1-tj@kernel.org>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+The RCU protection has been expanded to cover both queueing and
+completion paths making ->queue_rq_srcu a misnomer.  Rename it to
+->srcu as suggested by Bart.
 
-Sync point is a really confusing name for keeping track of
-the last entry that needs to be flushed so change the name
-to to flush_point instead.
-
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>
 ---
- drivers/lightnvm/pblk-rb.c    | 61 ++++++++++++++++++++++---------------------
- drivers/lightnvm/pblk-write.c |  2 +-
- drivers/lightnvm/pblk.h       |  6 ++---
- 3 files changed, 35 insertions(+), 34 deletions(-)
+ block/blk-mq.c         | 14 +++++++-------
+ include/linux/blk-mq.h |  2 +-
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
-index 62db408..941842e 100644
---- a/drivers/lightnvm/pblk-rb.c
-+++ b/drivers/lightnvm/pblk-rb.c
-@@ -54,7 +54,7 @@ int pblk_rb_init(struct pblk_rb *rb, struct pblk_rb_entry *rb_entry_base,
- 	rb->seg_size = (1 << power_seg_sz);
- 	rb->nr_entries = (1 << power_size);
- 	rb->mem = rb->subm = rb->sync = rb->l2p_update = 0;
--	rb->sync_point = EMPTY_ENTRY;
-+	rb->flush_point = EMPTY_ENTRY;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e6e74c0..5fb25e6 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -219,7 +219,7 @@ void blk_mq_quiesce_queue(struct request_queue *q)
  
- 	spin_lock_init(&rb->w_lock);
- 	spin_lock_init(&rb->s_lock);
-@@ -112,7 +112,7 @@ int pblk_rb_init(struct pblk_rb *rb, struct pblk_rb_entry *rb_entry_base,
- 	up_write(&pblk_rb_lock);
- 
- #ifdef CONFIG_NVM_DEBUG
--	atomic_set(&rb->inflight_sync_point, 0);
-+	atomic_set(&rb->inflight_flush_point, 0);
- #endif
- 
- 	/*
-@@ -349,26 +349,26 @@ void pblk_rb_write_entry_gc(struct pblk_rb *rb, void *data,
- 	smp_store_release(&entry->w_ctx.flags, flags);
- }
- 
--static int pblk_rb_sync_point_set(struct pblk_rb *rb, struct bio *bio,
-+static int pblk_rb_flush_point_set(struct pblk_rb *rb, struct bio *bio,
- 				  unsigned int pos)
- {
- 	struct pblk_rb_entry *entry;
--	unsigned int subm, sync_point;
-+	unsigned int subm, flush_point;
- 
- 	subm = READ_ONCE(rb->subm);
- 
- #ifdef CONFIG_NVM_DEBUG
--	atomic_inc(&rb->inflight_sync_point);
-+	atomic_inc(&rb->inflight_flush_point);
- #endif
- 
- 	if (pos == subm)
- 		return 0;
- 
--	sync_point = (pos == 0) ? (rb->nr_entries - 1) : (pos - 1);
--	entry = &rb->entries[sync_point];
-+	flush_point = (pos == 0) ? (rb->nr_entries - 1) : (pos - 1);
-+	entry = &rb->entries[flush_point];
- 
--	/* Protect syncs */
--	smp_store_release(&rb->sync_point, sync_point);
-+	/* Protect flush points */
-+	smp_store_release(&rb->flush_point, flush_point);
- 
- 	if (!bio)
- 		return 0;
-@@ -416,7 +416,7 @@ void pblk_rb_flush(struct pblk_rb *rb)
- 	struct pblk *pblk = container_of(rb, struct pblk, rwb);
- 	unsigned int mem = READ_ONCE(rb->mem);
- 
--	if (pblk_rb_sync_point_set(rb, NULL, mem))
-+	if (pblk_rb_flush_point_set(rb, NULL, mem))
- 		return;
- 
- 	pblk_write_should_kick(pblk);
-@@ -440,7 +440,7 @@ static int pblk_rb_may_write_flush(struct pblk_rb *rb, unsigned int nr_entries,
- #ifdef CONFIG_NVM_DEBUG
- 		atomic_long_inc(&pblk->nr_flush);
- #endif
--		if (pblk_rb_sync_point_set(&pblk->rwb, bio, mem))
-+		if (pblk_rb_flush_point_set(&pblk->rwb, bio, mem))
- 			*io_ret = NVM_IO_OK;
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		if (hctx->flags & BLK_MQ_F_BLOCKING)
+-			synchronize_srcu(hctx->queue_rq_srcu);
++			synchronize_srcu(hctx->srcu);
+ 		else
+ 			rcu = true;
  	}
- 
-@@ -607,17 +607,18 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
- 		}
- 
- 		if (flags & PBLK_FLUSH_ENTRY) {
--			unsigned int sync_point;
-+			unsigned int flush_point;
- 
--			sync_point = READ_ONCE(rb->sync_point);
--			if (sync_point == pos) {
--				/* Protect syncs */
--				smp_store_release(&rb->sync_point, EMPTY_ENTRY);
-+			flush_point = READ_ONCE(rb->flush_point);
-+			if (flush_point == pos) {
-+				/* Protect flush points */
-+				smp_store_release(&rb->flush_point,
-+							EMPTY_ENTRY);
- 			}
- 
- 			flags &= ~PBLK_FLUSH_ENTRY;
- #ifdef CONFIG_NVM_DEBUG
--			atomic_dec(&rb->inflight_sync_point);
-+			atomic_dec(&rb->inflight_flush_point);
- #endif
- 		}
- 
-@@ -746,20 +747,20 @@ unsigned int pblk_rb_sync_advance(struct pblk_rb *rb, unsigned int nr_entries)
- 	return sync;
- }
- 
--unsigned int pblk_rb_sync_point_count(struct pblk_rb *rb)
-+unsigned int pblk_rb_flush_point_count(struct pblk_rb *rb)
- {
--	unsigned int subm, sync_point;
-+	unsigned int subm, flush_point;
- 	unsigned int count;
- 
--	/* Protect syncs */
--	sync_point = smp_load_acquire(&rb->sync_point);
--	if (sync_point == EMPTY_ENTRY)
-+	/* Protect flush points */
-+	flush_point = smp_load_acquire(&rb->flush_point);
-+	if (flush_point == EMPTY_ENTRY)
- 		return 0;
- 
- 	subm = READ_ONCE(rb->subm);
- 
- 	/* The sync point itself counts as a sector to sync */
--	count = pblk_rb_ring_count(sync_point, subm, rb->nr_entries) + 1;
-+	count = pblk_rb_ring_count(flush_point, subm, rb->nr_entries) + 1;
- 
- 	return count;
- }
-@@ -801,7 +802,7 @@ int pblk_rb_tear_down_check(struct pblk_rb *rb)
- 
- 	if ((rb->mem == rb->subm) && (rb->subm == rb->sync) &&
- 				(rb->sync == rb->l2p_update) &&
--				(rb->sync_point == EMPTY_ENTRY)) {
-+				(rb->flush_point == EMPTY_ENTRY)) {
- 		goto out;
- 	}
- 
-@@ -848,7 +849,7 @@ ssize_t pblk_rb_sysfs(struct pblk_rb *rb, char *buf)
- 		queued_entries++;
- 	spin_unlock_irq(&rb->s_lock);
- 
--	if (rb->sync_point != EMPTY_ENTRY)
-+	if (rb->flush_point != EMPTY_ENTRY)
- 		offset = scnprintf(buf, PAGE_SIZE,
- 			"%u\t%u\t%u\t%u\t%u\t%u\t%u - %u/%u/%u - %d\n",
- 			rb->nr_entries,
-@@ -857,14 +858,14 @@ ssize_t pblk_rb_sysfs(struct pblk_rb *rb, char *buf)
- 			rb->sync,
- 			rb->l2p_update,
- #ifdef CONFIG_NVM_DEBUG
--			atomic_read(&rb->inflight_sync_point),
-+			atomic_read(&rb->inflight_flush_point),
- #else
- 			0,
- #endif
--			rb->sync_point,
-+			rb->flush_point,
- 			pblk_rb_read_count(rb),
- 			pblk_rb_space(rb),
--			pblk_rb_sync_point_count(rb),
-+			pblk_rb_flush_point_count(rb),
- 			queued_entries);
+@@ -564,7 +564,7 @@ static void hctx_unlock(struct blk_mq_hw_ctx *hctx, int srcu_idx)
+ 	if (!(hctx->flags & BLK_MQ_F_BLOCKING))
+ 		rcu_read_unlock();
  	else
- 		offset = scnprintf(buf, PAGE_SIZE,
-@@ -875,13 +876,13 @@ ssize_t pblk_rb_sysfs(struct pblk_rb *rb, char *buf)
- 			rb->sync,
- 			rb->l2p_update,
- #ifdef CONFIG_NVM_DEBUG
--			atomic_read(&rb->inflight_sync_point),
-+			atomic_read(&rb->inflight_flush_point),
- #else
- 			0,
+-		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
++		srcu_read_unlock(hctx->srcu, srcu_idx);
+ }
+ 
+ static void hctx_lock(struct blk_mq_hw_ctx *hctx, int *srcu_idx)
+@@ -572,7 +572,7 @@ static void hctx_lock(struct blk_mq_hw_ctx *hctx, int *srcu_idx)
+ 	if (!(hctx->flags & BLK_MQ_F_BLOCKING))
+ 		rcu_read_lock();
+ 	else
+-		*srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
++		*srcu_idx = srcu_read_lock(hctx->srcu);
+ }
+ 
+ static void blk_mq_rq_update_aborted_gstate(struct request *rq, u64 gstate)
+@@ -937,7 +937,7 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ 			if (!(hctx->flags & BLK_MQ_F_BLOCKING))
+ 				has_rcu = true;
+ 			else
+-				synchronize_srcu(hctx->queue_rq_srcu);
++				synchronize_srcu(hctx->srcu);
+ 
+ 			hctx->nr_expired = 0;
+ 		}
+@@ -2100,7 +2100,7 @@ static void blk_mq_exit_hctx(struct request_queue *q,
+ 		set->ops->exit_hctx(hctx, hctx_idx);
+ 
+ 	if (hctx->flags & BLK_MQ_F_BLOCKING)
+-		cleanup_srcu_struct(hctx->queue_rq_srcu);
++		cleanup_srcu_struct(hctx->srcu);
+ 
+ 	blk_mq_remove_cpuhp(hctx);
+ 	blk_free_flush_queue(hctx->fq);
+@@ -2173,7 +2173,7 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ 		goto free_fq;
+ 
+ 	if (hctx->flags & BLK_MQ_F_BLOCKING)
+-		init_srcu_struct(hctx->queue_rq_srcu);
++		init_srcu_struct(hctx->srcu);
+ 
+ 	blk_mq_debugfs_register_hctx(q, hctx);
+ 
+@@ -2462,7 +2462,7 @@ static int blk_mq_hw_ctx_size(struct blk_mq_tag_set *tag_set)
+ {
+ 	int hw_ctx_size = sizeof(struct blk_mq_hw_ctx);
+ 
+-	BUILD_BUG_ON(ALIGN(offsetof(struct blk_mq_hw_ctx, queue_rq_srcu),
++	BUILD_BUG_ON(ALIGN(offsetof(struct blk_mq_hw_ctx, srcu),
+ 			   __alignof__(struct blk_mq_hw_ctx)) !=
+ 		     sizeof(struct blk_mq_hw_ctx));
+ 
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 460798d..8efcf49 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -66,7 +66,7 @@ struct blk_mq_hw_ctx {
  #endif
- 			pblk_rb_read_count(rb),
- 			pblk_rb_space(rb),
--			pblk_rb_sync_point_count(rb),
-+			pblk_rb_flush_point_count(rb),
- 			queued_entries);
  
- 	return offset;
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 6c30b7a..018af87 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -508,7 +508,7 @@ static int pblk_submit_write(struct pblk *pblk)
- 	if (!secs_avail)
- 		return 1;
- 
--	secs_to_flush = pblk_rb_sync_point_count(&pblk->rwb);
-+	secs_to_flush = pblk_rb_flush_point_count(&pblk->rwb);
- 	if (!secs_to_flush && secs_avail < pblk->min_write_pgs)
- 		return 1;
- 
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 8851b18..5f7cd6f 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -166,7 +166,7 @@ struct pblk_rb {
- 					 * the last submitted entry that has
- 					 * been successfully persisted to media
- 					 */
--	unsigned int sync_point;	/* Sync point - last entry that must be
-+	unsigned int flush_point;	/* Sync point - last entry that must be
- 					 * flushed to the media. Used with
- 					 * REQ_FLUSH and REQ_FUA
- 					 */
-@@ -189,7 +189,7 @@ struct pblk_rb {
- 	spinlock_t s_lock;		/* Sync lock */
- 
- #ifdef CONFIG_NVM_DEBUG
--	atomic_t inflight_sync_point;	/* Not served REQ_FLUSH | REQ_FUA */
-+	atomic_t inflight_flush_point;	/* Not served REQ_FLUSH | REQ_FUA */
- #endif
+ 	/* Must be the last member - see also blk_mq_hw_ctx_size(). */
+-	struct srcu_struct	queue_rq_srcu[0];
++	struct srcu_struct	srcu[0];
  };
  
-@@ -687,7 +687,7 @@ unsigned int pblk_rb_sync_advance(struct pblk_rb *rb, unsigned int nr_entries);
- struct pblk_rb_entry *pblk_rb_sync_scan_entry(struct pblk_rb *rb,
- 					      struct ppa_addr *ppa);
- void pblk_rb_sync_end(struct pblk_rb *rb, unsigned long *flags);
--unsigned int pblk_rb_sync_point_count(struct pblk_rb *rb);
-+unsigned int pblk_rb_flush_point_count(struct pblk_rb *rb);
- 
- unsigned int pblk_rb_read_count(struct pblk_rb *rb);
- unsigned int pblk_rb_sync_count(struct pblk_rb *rb);
+ struct blk_mq_tag_set {
 -- 
-2.9.3
+2.9.5
