@@ -1,89 +1,131 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f169.google.com ([209.85.128.169]:34936 "EHLO
-        mail-wr0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752486AbeADTAG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Jan 2018 14:00:06 -0500
-Received: by mail-wr0-f169.google.com with SMTP id l19so2402550wrc.2
-        for <linux-block@vger.kernel.org>; Thu, 04 Jan 2018 11:00:05 -0800 (PST)
-From: Paolo Valente <paolo.valente@linaro.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: unify the interface of the proportional-share policy in blkio/io
-Message-Id: <56EFD7A1-A894-410D-A923-E33911ED4647@linaro.org>
-Date: Thu, 4 Jan 2018 20:00:02 +0100
-Cc: Ulf Hansson <ulf.hansson@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Mark Brown <broonie@kernel.org>,
-        ANGELO RUOCCO <220530@studenti.unimore.it>
-To: Tejun Heo <tj@kernel.org>, lennart@poettering.net,
-        Jens Axboe <axboe@fb.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+From: Tejun Heo <tj@kernel.org>
+To: jack@suse.cz,
+	axboe@kernel.dk,
+	clm@fb.com,
+	jbacik@fb.com
+Cc: kernel-team@fb.com,
+	linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	peterz@infradead.org,
+	jianchao.w.wang@oracle.com,
+	Bart.VanAssche@wdc.com,
+	linux-block@vger.kernel.org,
+	Tejun Heo <tj@kernel.org>
+Subject: [PATCH 6/8] blk-mq: remove REQ_ATOM_COMPLETE usages from blk-mq
+Date: Tue,  9 Jan 2018 08:29:51 -0800
+Message-Id: <20180109162953.1211451-7-tj@kernel.org>
+In-Reply-To: <20180109162953.1211451-1-tj@kernel.org>
+References: <20180109162953.1211451-1-tj@kernel.org>
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Tejun, Jens, all,
-the shares of storage resources are controlled through weights in the
-proportional-share policy of the blkio/io controllers of the cgroups
-subsystem.  But, on blk-mq, this control doesn't work for any legacy
-application, service or tool.  In a similar vein, in most of the
-interface files where legacy code expects to find statistics,
-statistics are not updated at all.  The cause is as follows.
+After the recent updates to use generation number and state based
+synchronization, blk-mq no longer depends on REQ_ATOM_COMPLETE except
+to avoid firing the same timeout multiple times.
 
-For devices using blk-mq, the proportional-share policy is enforced by
-BFQ, while CFQ enforces this policy for blk.  But the current
-implementation of blkio/io doesn't allow two I/O schedulers to share
-the same interface sysfs files; so, if CFQ creates these files for the
-proportional-share policy for blk, BFQ cannot attach somehow to them,
-and viceversa.  One of these parameters is the weight of blkio/io
-groups, used to control resource shares.  So, to still allow people to
-set group weights with BFQ, I resorted to making BFQ create its own
-weight parameter, with a different name: bfq.weight.  I used a similar
-approach to replicate all statistic files.
+Remove all REQ_ATOM_COMPLETE usages and use a new rq_flags flag
+RQF_MQ_TIMEOUT_EXPIRED to avoid firing the same timeout multiple
+times.  This removes atomic bitops from hot paths too.
 
-Of course, no legacy code uses these different names, or is likely to
-do so.  Having these two sets of names is simply a source of
-confusion, as also pointed out, e.g., by Lennart Poettering, and
-acknowledged by Tejun [1].
+v2: Removed blk_clear_rq_complete() from blk_mq_rq_timed_out().
 
-So, I started to work on getting a unified interface, with a
-collaborator.  And we designed a solution that seems sensible to us.
-Before proceeding with the implementation, we would need some feedback
-on this solution, especially to avoid wasting time on the wrong
-solution.
+v3: Added RQF_MQ_TIMEOUT_EXPIRED flag.
 
-The code that shows or reads values through blkio/io parameters, for
-the proportional-share policy, is currently fully contained in the BFQ
-and CFQ schedulers.  We want to split this code into two parts:
-1.  I/O part, which reads the value passed by the user, and shows the
-value to the user; we want to move this part, which becomes common
-among schedulers, into blk-cgroup.c or the like.
-2.  get/set part, which gets/gives the value from/to the above part,
-reading/writing this value from/to the internal state of the
-scheduler; each scheduler knows what to do exactly for each of these
-get/set function, so this part will stay in the scheduler.
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Cc: "jianchao.wang" <jianchao.w.wang@oracle.com>
+---
+ block/blk-mq.c         | 15 +++++++--------
+ block/blk-timeout.c    |  1 +
+ include/linux/blkdev.h |  2 ++
+ 3 files changed, 10 insertions(+), 8 deletions(-)
 
-In addition, we consider two types of parameters:
-1. exact parameters, such as the weight, for which: (a) the
-read-from-user function (I/O part moved to blk-cgroup) must pass the
-value read to both I/O schedulers, through the set functions of the
-schedulers, and (b) the show-to-user function (I/O part moved to
-blk-cgroup) assumes that it would get the same value from any of the
-two schedulers;
-2. cumulative parameters such as the statistics, for which the related
-code is identical (and replicated) in CFQ and BFQ.  Our idea, in this
-case, is to move the common code into blk-cgroup, and leave in the
-schedulers only the parts that may differ.  In practice, to update
-statistics, CFQ and BFQ will invoke common blk-cgroup functions, and
-the latter will take care of properly cumulating/combining statistics.
-
-The solution for the second type of parameters may prove useful to
-unify also the computation of statistics for the throttling policy.
-
-Does this proposal sound reasonable?
-
-Thanks,
-Paolo
-
-[1] https://github.com/systemd/systemd/issues/7057
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index b419746..3f297f0 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -634,8 +634,7 @@ void blk_mq_complete_request(struct request *rq)
+ 	 * hctx_lock() covers both issue and completion paths.
+ 	 */
+ 	hctx_lock(hctx, &srcu_idx);
+-	if (blk_mq_rq_aborted_gstate(rq) != rq->gstate &&
+-	    !blk_mark_rq_complete(rq))
++	if (blk_mq_rq_aborted_gstate(rq) != rq->gstate)
+ 		__blk_mq_complete_request(rq);
+ 	hctx_unlock(hctx, srcu_idx);
+ }
+@@ -685,8 +684,6 @@ void blk_mq_start_request(struct request *rq)
+ 	preempt_enable();
+ 
+ 	set_bit(REQ_ATOM_STARTED, &rq->atomic_flags);
+-	if (test_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags))
+-		clear_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags);
+ 
+ 	if (q->dma_drain_size && blk_rq_bytes(rq)) {
+ 		/*
+@@ -837,6 +834,8 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
+ 	if (!test_bit(REQ_ATOM_STARTED, &req->atomic_flags))
+ 		return;
+ 
++	req->rq_flags |= RQF_MQ_TIMEOUT_EXPIRED;
++
+ 	if (ops->timeout)
+ 		ret = ops->timeout(req, reserved);
+ 
+@@ -852,7 +851,6 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
+ 		 */
+ 		blk_mq_rq_update_aborted_gstate(req, 0);
+ 		blk_add_timer(req);
+-		blk_clear_rq_complete(req);
+ 		break;
+ 	case BLK_EH_NOT_HANDLED:
+ 		break;
+@@ -871,7 +869,8 @@ static void blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
+ 
+ 	might_sleep();
+ 
+-	if (!test_bit(REQ_ATOM_STARTED, &rq->atomic_flags))
++	if ((rq->rq_flags & RQF_MQ_TIMEOUT_EXPIRED) ||
++	    !test_bit(REQ_ATOM_STARTED, &rq->atomic_flags))
+ 		return;
+ 
+ 	/* read coherent snapshots of @rq->state_gen and @rq->deadline */
+@@ -906,8 +905,8 @@ static void blk_mq_terminate_expired(struct blk_mq_hw_ctx *hctx,
+ 	 * now guaranteed to see @rq->aborted_gstate and yield.  If
+ 	 * @rq->aborted_gstate still matches @rq->gstate, @rq is ours.
+ 	 */
+-	if (READ_ONCE(rq->gstate) == rq->aborted_gstate &&
+-	    !blk_mark_rq_complete(rq))
++	if (!(rq->rq_flags & RQF_MQ_TIMEOUT_EXPIRED) &&
++	    READ_ONCE(rq->gstate) == rq->aborted_gstate)
+ 		blk_mq_rq_timed_out(rq, reserved);
+ }
+ 
+diff --git a/block/blk-timeout.c b/block/blk-timeout.c
+index 4f04cd1..ebe9996 100644
+--- a/block/blk-timeout.c
++++ b/block/blk-timeout.c
+@@ -214,6 +214,7 @@ void blk_add_timer(struct request *req)
+ 		req->timeout = q->rq_timeout;
+ 
+ 	req->deadline = jiffies + req->timeout;
++	req->rq_flags &= ~RQF_MQ_TIMEOUT_EXPIRED;
+ 
+ 	/*
+ 	 * Only the non-mq case needs to add the request to a protected list.
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index ae563d0..007a7cf 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -125,6 +125,8 @@ typedef __u32 __bitwise req_flags_t;
+ #define RQF_SPECIAL_PAYLOAD	((__force req_flags_t)(1 << 18))
+ /* The per-zone write lock is held for this request */
+ #define RQF_ZONE_WRITE_LOCKED	((__force req_flags_t)(1 << 19))
++/* timeout is expired */
++#define RQF_MQ_TIMEOUT_EXPIRED	((__force req_flags_t)(1 << 20))
+ 
+ /* flags that prevent us from merging requests: */
+ #define RQF_NOMERGE_FLAGS \
+-- 
+2.9.5
