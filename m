@@ -1,186 +1,48 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:39435 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751979AbeAENQz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jan 2018 08:16:55 -0500
-Received: by mail-wm0-f67.google.com with SMTP id i11so2418634wmf.4
-        for <linux-block@vger.kernel.org>; Fri, 05 Jan 2018 05:16:54 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hans Holmberg <hans@owltronix.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 14/25] lightnvm: pblk: clear flush point on completed writes
-Date: Fri,  5 Jan 2018 14:16:10 +0100
-Message-Id: <20180105131621.20808-15-m@bjorling.me>
-In-Reply-To: <20180105131621.20808-1-m@bjorling.me>
-References: <20180105131621.20808-1-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	linus.walleij@linaro.org,
+	bfq-iosched@googlegroups.com,
+	oleksandr@natalenko.name,
+	162996@studenti.unimore.it,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX 2/2] bfq-sq, bfq-mq: release oom-queue ref to root group on exit
+Date: Tue,  9 Jan 2018 10:17:27 +0100
+Message-Id: <20180109091727.5262-3-paolo.valente@linaro.org>
+In-Reply-To: <20180109091727.5262-1-paolo.valente@linaro.org>
+References: <20180109091727.5262-1-paolo.valente@linaro.org>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans@owltronix.com>
+On scheduler init, a reference to the root group, and a reference to
+its corresponding blkg are taken for the oom queue. Yet these
+references are not released on scheduler exit, which prevents these
+objects from be freed. This commit adds the missing reference
+releases.
 
-Move completion of syncs and clearing of flush points to the
-write completion path - this ensures that the data has been
-comitted to the media before completing bios containing syncs.
-
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+Reported-by: Davide Ferrari <davideferrari8@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- drivers/lightnvm/pblk-rb.c    | 58 +++++++++++++++++++++----------------------
- drivers/lightnvm/pblk-write.c | 17 ++++++++++++-
- 2 files changed, 44 insertions(+), 31 deletions(-)
+ block/bfq-iosched.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
-index 941842e..672ef8c 100644
---- a/drivers/lightnvm/pblk-rb.c
-+++ b/drivers/lightnvm/pblk-rb.c
-@@ -353,17 +353,17 @@ static int pblk_rb_flush_point_set(struct pblk_rb *rb, struct bio *bio,
- 				  unsigned int pos)
- {
- 	struct pblk_rb_entry *entry;
--	unsigned int subm, flush_point;
-+	unsigned int sync, flush_point;
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index ea48b5c8f088..c56a495af2e8 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -5015,6 +5015,9 @@ static void bfq_exit_queue(struct elevator_queue *e)
  
--	subm = READ_ONCE(rb->subm);
-+	sync = READ_ONCE(rb->sync);
+ 	hrtimer_cancel(&bfqd->idle_slice_timer);
+ 
++	/* release oom-queue reference to root group */
++	bfqg_and_blkg_put(bfqd->root_group);
 +
-+	if (pos == sync)
-+		return 0;
- 
- #ifdef CONFIG_NVM_DEBUG
- 	atomic_inc(&rb->inflight_flush_point);
- #endif
- 
--	if (pos == subm)
--		return 0;
--
- 	flush_point = (pos == 0) ? (rb->nr_entries - 1) : (pos - 1);
- 	entry = &rb->entries[flush_point];
- 
-@@ -606,22 +606,6 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
- 			return NVM_IO_ERR;
- 		}
- 
--		if (flags & PBLK_FLUSH_ENTRY) {
--			unsigned int flush_point;
--
--			flush_point = READ_ONCE(rb->flush_point);
--			if (flush_point == pos) {
--				/* Protect flush points */
--				smp_store_release(&rb->flush_point,
--							EMPTY_ENTRY);
--			}
--
--			flags &= ~PBLK_FLUSH_ENTRY;
--#ifdef CONFIG_NVM_DEBUG
--			atomic_dec(&rb->inflight_flush_point);
--#endif
--		}
--
- 		flags &= ~PBLK_WRITTEN_DATA;
- 		flags |= PBLK_SUBMITTED_ENTRY;
- 
-@@ -731,15 +715,24 @@ void pblk_rb_sync_end(struct pblk_rb *rb, unsigned long *flags)
- 
- unsigned int pblk_rb_sync_advance(struct pblk_rb *rb, unsigned int nr_entries)
- {
--	unsigned int sync;
--	unsigned int i;
--
-+	unsigned int sync, flush_point;
- 	lockdep_assert_held(&rb->s_lock);
- 
- 	sync = READ_ONCE(rb->sync);
-+	flush_point = READ_ONCE(rb->flush_point);
- 
--	for (i = 0; i < nr_entries; i++)
--		sync = (sync + 1) & (rb->nr_entries - 1);
-+	if (flush_point != EMPTY_ENTRY) {
-+		unsigned int secs_to_flush;
-+
-+		secs_to_flush = pblk_rb_ring_count(flush_point, sync,
-+					rb->nr_entries);
-+		if (secs_to_flush < nr_entries) {
-+			/* Protect flush points */
-+			smp_store_release(&rb->flush_point, EMPTY_ENTRY);
-+		}
-+	}
-+
-+	sync = (sync + nr_entries) & (rb->nr_entries - 1);
- 
- 	/* Protect from counts */
- 	smp_store_release(&rb->sync, sync);
-@@ -747,22 +740,27 @@ unsigned int pblk_rb_sync_advance(struct pblk_rb *rb, unsigned int nr_entries)
- 	return sync;
- }
- 
-+/* Calculate how many sectors to submit up to the current flush point. */
- unsigned int pblk_rb_flush_point_count(struct pblk_rb *rb)
- {
--	unsigned int subm, flush_point;
--	unsigned int count;
-+	unsigned int subm, sync, flush_point;
-+	unsigned int submitted, to_flush;
- 
- 	/* Protect flush points */
- 	flush_point = smp_load_acquire(&rb->flush_point);
- 	if (flush_point == EMPTY_ENTRY)
- 		return 0;
- 
-+	/* Protect syncs */
-+	sync = smp_load_acquire(&rb->sync);
-+
- 	subm = READ_ONCE(rb->subm);
-+	submitted = pblk_rb_ring_count(subm, sync, rb->nr_entries);
- 
- 	/* The sync point itself counts as a sector to sync */
--	count = pblk_rb_ring_count(flush_point, subm, rb->nr_entries) + 1;
-+	to_flush = pblk_rb_ring_count(flush_point, sync, rb->nr_entries) + 1;
- 
--	return count;
-+	return (submitted < to_flush) ? (to_flush - submitted) : 0;
- }
- 
- /*
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 018af87..aae86ed 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -21,13 +21,28 @@ static unsigned long pblk_end_w_bio(struct pblk *pblk, struct nvm_rq *rqd,
- 				    struct pblk_c_ctx *c_ctx)
- {
- 	struct bio *original_bio;
-+	struct pblk_rb *rwb = &pblk->rwb;
- 	unsigned long ret;
- 	int i;
- 
- 	for (i = 0; i < c_ctx->nr_valid; i++) {
- 		struct pblk_w_ctx *w_ctx;
-+		int pos = c_ctx->sentry + i;
-+		int flags;
-+
-+		w_ctx = pblk_rb_w_ctx(rwb, pos);
-+		flags = READ_ONCE(w_ctx->flags);
-+
-+		if (flags & PBLK_FLUSH_ENTRY) {
-+			flags &= ~PBLK_FLUSH_ENTRY;
-+			/* Release flags on context. Protect from writes */
-+			smp_store_release(&w_ctx->flags, flags);
-+
-+#ifdef CONFIG_NVM_DEBUG
-+			atomic_dec(&rwb->inflight_flush_point);
-+#endif
-+		}
- 
--		w_ctx = pblk_rb_w_ctx(&pblk->rwb, c_ctx->sentry + i);
- 		while ((original_bio = bio_list_pop(&w_ctx->bios)))
- 			bio_endio(original_bio);
- 	}
+ #ifdef CONFIG_BFQ_GROUP_IOSCHED
+ 	blkcg_deactivate_policy(bfqd->queue, &blkcg_policy_bfq);
+ #else
 -- 
-2.9.3
+2.15.1
