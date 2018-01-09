@@ -1,17 +1,153 @@
-Return-Path: <hch@lst.de>
-Date: Mon, 8 Jan 2018 12:25:33 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Hannes Reinecke <hare@suse.de>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@lst.de>, Johannes Thumshirn <jth@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH 0/4]  mylex: Replace DAC960 block driver
-Message-ID: <20180108112533.GB7106@lst.de>
-References: <1501683208-5240-1-git-send-email-hare@suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1501683208-5240-1-git-send-email-hare@suse.de>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+From: Tejun Heo <tj@kernel.org>
+To: jack@suse.cz,
+	axboe@kernel.dk,
+	clm@fb.com,
+	jbacik@fb.com
+Cc: kernel-team@fb.com,
+	linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	peterz@infradead.org,
+	jianchao.w.wang@oracle.com,
+	Bart.VanAssche@wdc.com,
+	linux-block@vger.kernel.org,
+	Tejun Heo <tj@kernel.org>
+Subject: [PATCH 1/8] blk-mq: move hctx lock/unlock into a helper
+Date: Tue,  9 Jan 2018 08:29:46 -0800
+Message-Id: <20180109162953.1211451-2-tj@kernel.org>
+In-Reply-To: <20180109162953.1211451-1-tj@kernel.org>
+References: <20180109162953.1211451-1-tj@kernel.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Btw, did you manage to get any further with these new drivers?
+From: Jens Axboe <axboe@kernel.dk>
+
+Move the RCU vs SRCU logic into lock/unlock helpers, which makes
+the actual functional bits within the locked region much easier
+to read.
+
+tj: Reordered in front of timeout revamp patches and added the missing
+    blk_mq_run_hw_queue() conversion.
+
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Tejun Heo <tj@kernel.org>
+---
+ block/blk-mq.c | 66 ++++++++++++++++++++++++++++------------------------------
+ 1 file changed, 32 insertions(+), 34 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 111e1aa..ddc9261 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -557,6 +557,22 @@ static void __blk_mq_complete_request(struct request *rq)
+ 	put_cpu();
+ }
+ 
++static void hctx_unlock(struct blk_mq_hw_ctx *hctx, int srcu_idx)
++{
++	if (!(hctx->flags & BLK_MQ_F_BLOCKING))
++		rcu_read_unlock();
++	else
++		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
++}
++
++static void hctx_lock(struct blk_mq_hw_ctx *hctx, int *srcu_idx)
++{
++	if (!(hctx->flags & BLK_MQ_F_BLOCKING))
++		rcu_read_lock();
++	else
++		*srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
++}
++
+ /**
+  * blk_mq_complete_request - end I/O on a request
+  * @rq:		the request being processed
+@@ -1214,17 +1230,11 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+ 	 */
+ 	WARN_ON_ONCE(in_interrupt());
+ 
+-	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
+-		rcu_read_lock();
+-		blk_mq_sched_dispatch_requests(hctx);
+-		rcu_read_unlock();
+-	} else {
+-		might_sleep();
++	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
+ 
+-		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
+-		blk_mq_sched_dispatch_requests(hctx);
+-		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
+-	}
++	hctx_lock(hctx, &srcu_idx);
++	blk_mq_sched_dispatch_requests(hctx);
++	hctx_unlock(hctx, srcu_idx);
+ }
+ 
+ /*
+@@ -1296,17 +1306,10 @@ bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ 	 * And queue will be rerun in blk_mq_unquiesce_queue() if it is
+ 	 * quiesced.
+ 	 */
+-	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
+-		rcu_read_lock();
+-		need_run = !blk_queue_quiesced(hctx->queue) &&
+-			blk_mq_hctx_has_pending(hctx);
+-		rcu_read_unlock();
+-	} else {
+-		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
+-		need_run = !blk_queue_quiesced(hctx->queue) &&
+-			blk_mq_hctx_has_pending(hctx);
+-		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
+-	}
++	hctx_lock(hctx, &srcu_idx);
++	need_run = !blk_queue_quiesced(hctx->queue) &&
++		blk_mq_hctx_has_pending(hctx);
++	hctx_unlock(hctx, srcu_idx);
+ 
+ 	if (need_run) {
+ 		__blk_mq_delay_run_hw_queue(hctx, async, 0);
+@@ -1618,7 +1621,7 @@ static blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx, struct request *rq)
+ 
+ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 					struct request *rq,
+-					blk_qc_t *cookie, bool may_sleep)
++					blk_qc_t *cookie)
+ {
+ 	struct request_queue *q = rq->q;
+ 	struct blk_mq_queue_data bd = {
+@@ -1668,25 +1671,20 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	}
+ 
+ insert:
+-	blk_mq_sched_insert_request(rq, false, run_queue, false, may_sleep);
++	blk_mq_sched_insert_request(rq, false, run_queue, false,
++					hctx->flags & BLK_MQ_F_BLOCKING);
+ }
+ 
+ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 		struct request *rq, blk_qc_t *cookie)
+ {
+-	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
+-		rcu_read_lock();
+-		__blk_mq_try_issue_directly(hctx, rq, cookie, false);
+-		rcu_read_unlock();
+-	} else {
+-		unsigned int srcu_idx;
++	int srcu_idx;
+ 
+-		might_sleep();
++	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
+ 
+-		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
+-		__blk_mq_try_issue_directly(hctx, rq, cookie, true);
+-		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
+-	}
++	hctx_lock(hctx, &srcu_idx);
++	__blk_mq_try_issue_directly(hctx, rq, cookie);
++	hctx_unlock(hctx, srcu_idx);
+ }
+ 
+ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+-- 
+2.9.5
