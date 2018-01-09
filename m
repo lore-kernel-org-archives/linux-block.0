@@ -1,108 +1,83 @@
-Return-Path: <prvs=54311c032=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "jbacik@fb.com" <jbacik@fb.com>, "tj@kernel.org" <tj@kernel.org>,
-	"jack@suse.cz" <jack@suse.cz>, "clm@fb.com" <clm@fb.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
-CC: "kernel-team@fb.com" <kernel-team@fb.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "peterz@infradead.org"
-	<peterz@infradead.org>, "linux-btrfs@vger.kernel.org"
-	<linux-btrfs@vger.kernel.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "jianchao.w.wang@oracle.com"
-	<jianchao.w.wang@oracle.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCHSET v5] blk-mq: reimplement timeout handling
-Date: Fri, 12 Jan 2018 20:57:10 +0000
-Message-ID: <1515790585.2396.50.camel@wdc.com>
+To: Tejun Heo <tj@kernel.org>, jack@suse.cz, clm@fb.com, jbacik@fb.com
+Cc: kernel-team@fb.com, linux-kernel@vger.kernel.org,
+ linux-btrfs@vger.kernel.org, peterz@infradead.org,
+ jianchao.w.wang@oracle.com, Bart.VanAssche@wdc.com,
+ linux-block@vger.kernel.org
 References: <20180109162953.1211451-1-tj@kernel.org>
-In-Reply-To: <20180109162953.1211451-1-tj@kernel.org>
-Content-Type: text/plain; charset="utf-8"
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <275130f6-b970-f746-14e0-1b064304822b@kernel.dk>
+Date: Tue, 9 Jan 2018 09:53:20 -0700
 MIME-Version: 1.0
+In-Reply-To: <20180109162953.1211451-1-tj@kernel.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE4LTAxLTA5IGF0IDA4OjI5IC0wODAwLCBUZWp1biBIZW8gd3JvdGU6DQo+IEN1
-cnJlbnRseSwgYmxrLW1xIHRpbWVvdXQgcGF0aCBzeW5jaHJvbml6ZXMgYWdhaW5zdCB0aGUgdXN1
-YWwNCj4gaXNzdWUvY29tcGxldGlvbiBwYXRoIHVzaW5nIGEgY29tcGxleCBzY2hlbWUgaW52b2x2
-aW5nIGF0b21pYw0KPiBiaXRmbGFncywgUkVRX0FUT01fKiwgbWVtb3J5IGJhcnJpZXJzIGFuZCBz
-dWJ0bGUgbWVtb3J5IGNvaGVyZW5jZQ0KPiBydWxlcy4gIFVuZm9ydHVuYXRsZXksIGl0IGNvbnRh
-aW5zIHF1aXRlIGEgZmV3IGhvbGVzLg0KDQpIZWxsbyBUZWp1biwNCg0KV2l0aCB0aGlzIHBhdGNo
-IHNlcmllcyBhcHBsaWVkIEkgc2VlIHdlaXJkIGhhbmdzIGluIGJsa19tcV9nZXRfdGFnKCkgd2hl
-biBJDQpydW4gdGhlIHNycC10ZXN0IHNvZnR3YXJlLiBJZiBJIHB1bGwgSmVucycgbGF0ZXN0IGZv
-ci1uZXh0IGJyYW5jaCBhbmQgcmV2ZXJ0DQp0aGlzIHBhdGNoIHNlcmllcyB0aGVuIHRoZSBzcnAt
-dGVzdCBzb2Z0d2FyZSBydW5zIHN1Y2Nlc3NmdWxseS4gTm90ZTogaWYgeW91DQpkb24ndCBoYXZl
-IEluZmluaUJhbmQgaGFyZHdhcmUgYXZhaWxhYmxlIHRoZW4geW91IHdpbGwgbmVlZCB0aGUgUkRN
-QS9DTQ0KcGF0Y2hlcyBmb3IgdGhlIFNSUCBpbml0aWF0b3IgYW5kIHRhcmdldCBkcml2ZXJzIHRo
-YXQgaGF2ZSBiZWVuIHBvc3RlZA0KcmVjZW50bHkgb24gdGhlIGxpbnV4LXJkbWEgbWFpbGluZyBs
-aXN0IHRvIHJ1biB0aGUgc3JwLXRlc3Qgc29mdHdhcmUuDQoNClRoaXMgaXMgaG93IEkgcnVuIHRo
-ZSBzcnAtdGVzdCBzb2Z0d2FyZSBpbiBhIFZNOg0KDQouL3J1bl90ZXN0cyAtYyAtZCAtciAxMA0K
-DQpIZXJlIGlzIGFuIGV4YW1wbGUgb2Ygd2hhdCBTeXNScS13IHJlcG9ydGVkIHdoZW4gdGhlIGhh
-bmcgb2NjdXJyZWQ6DQoNCnN5c3JxOiBTeXNScSA6IFNob3cgQmxvY2tlZCBTdGF0ZQ0KIHRhc2sg
-ICAgICAgICAgICAgICAgICAgICAgICBQQyBzdGFjayAgIHBpZCBmYXRoZXINCmt3b3JrZXIvdTg6
-MCAgICBEMTI4NjQgICAgIDUgICAgICAyIDB4ODAwMDAwMDANCldvcmtxdWV1ZTogZXZlbnRzX3Vu
-Ym91bmQgc2RfcHJvYmVfYXN5bmMgW3NkX21vZF0NCkNhbGwgVHJhY2U6DQo/IF9fc2NoZWR1bGUr
-MHgyYjQvMHhiYjANCnNjaGVkdWxlKzB4MmQvMHg5MA0KaW9fc2NoZWR1bGUrMHhkLzB4MzANCmJs
-a19tcV9nZXRfdGFnKzB4MTY5LzB4MjkwDQo/IGZpbmlzaF93YWl0KzB4ODAvMHg4MA0KYmxrX21x
-X2dldF9yZXF1ZXN0KzB4MTZhLzB4NGYwDQpibGtfbXFfYWxsb2NfcmVxdWVzdCsweDU5LzB4YzAN
-CmJsa19nZXRfcmVxdWVzdF9mbGFncysweDNmLzB4MjYwDQpzY3NpX2V4ZWN1dGUrMHgzMy8weDFl
-MCBbc2NzaV9tb2RdDQpyZWFkX2NhcGFjaXR5XzE2LnBhcnQuMzUrMHg5Yy8weDQ2MCBbc2RfbW9k
-XQ0Kc2RfcmV2YWxpZGF0ZV9kaXNrKzB4MTRiYi8weDFjYjAgW3NkX21vZF0NCnNkX3Byb2JlX2Fz
-eW5jKzB4ZjIvMHgxYTAgW3NkX21vZF0NCnByb2Nlc3Nfb25lX3dvcmsrMHgyMWMvMHg2ZDANCndv
-cmtlcl90aHJlYWQrMHgzNS8weDM4MA0KPyBwcm9jZXNzX29uZV93b3JrKzB4NmQwLzB4NmQwDQpr
-dGhyZWFkKzB4MTE3LzB4MTMwDQo/IGt0aHJlYWRfY3JlYXRlX3dvcmtlcl9vbl9jcHUrMHg0MC8w
-eDQwDQpyZXRfZnJvbV9mb3JrKzB4MjQvMHgzMA0Kc3lzdGVtZC11ZGV2ZCAgIEQxMzY3MiAgMTA0
-OCAgICAyODUgMHgwMDAwMDEwMA0KQ2FsbCBUcmFjZToNCj8gX19zY2hlZHVsZSsweDJiNC8weGJi
-MA0Kc2NoZWR1bGUrMHgyZC8weDkwDQppb19zY2hlZHVsZSsweGQvMHgzMA0KZ2VuZXJpY19maWxl
-X3JlYWRfaXRlcisweDMyZi8weDk3MA0KPyBwYWdlX2NhY2hlX3RyZWVfaW5zZXJ0KzB4MTAwLzB4
-MTAwDQpfX3Zmc19yZWFkKzB4Y2MvMHgxMjANCnZmc19yZWFkKzB4OTYvMHgxNDANClN5U19yZWFk
-KzB4NDAvMHhhMA0KZG9fc3lzY2FsbF82NCsweDVmLzB4MWIwDQplbnRyeV9TWVNDQUxMNjRfc2xv
-d19wYXRoKzB4MjUvMHgyNQ0KUklQOiAwMDMzOjB4N2Y4Y2U2ZDA4ZDExDQpSU1A6IDAwMmI6MDAw
-MDdmZmY5NmRlYzI4OCBFRkxBR1M6IDAwMDAwMjQ2IE9SSUdfUkFYOiAwMDAwMDAwMDAwMDAwMDAw
-DQpSQVg6IGZmZmZmZmZmZmZmZmZmZGEgUkJYOiAwMDAwNTY1MWRlN2Y2ZTEwIFJDWDogMDAwMDdm
-OGNlNmQwOGQxMQ0KUkRYOiAwMDAwMDAwMDAwMDAwMDQwIFJTSTogMDAwMDU2NTFkZTdmNmUzOCBS
-REk6IDAwMDAwMDAwMDAwMDAwMDcNClJCUDogMDAwMDU2NTFkZTdlYTUwMCBSMDg6IDAwMDA3Zjhj
-ZTZjZjFjMjAgUjA5OiAwMDAwNTY1MWRlN2Y2ZTEwDQpSMTA6IDAwMDAwMDAwMDAwMDAwNmYgUjEx
-OiAwMDAwMDAwMDAwMDAwMjQ2IFIxMjogMDAwMDAwMDAwMWZmMDAwMA0KUjEzOiAwMDAwMDAwMDAx
-ZmYwMDQwIFIxNDogMDAwMDU2NTFkZTdlYTU1MCBSMTU6IDAwMDAwMDAwMDAwMDAwNDANCnN5c3Rl
-bWQtdWRldmQgICBEMTM0OTYgIDEwNDkgICAgMjg1IDB4MDAwMDAxMDANCkNhbGwgVHJhY2U6DQo/
-IF9fc2NoZWR1bGUrMHgyYjQvMHhiYjANCnNjaGVkdWxlKzB4MmQvMHg5MA0KaW9fc2NoZWR1bGUr
-MHhkLzB4MzANCmJsa19tcV9nZXRfdGFnKzB4MTY5LzB4MjkwDQo/IGZpbmlzaF93YWl0KzB4ODAv
-MHg4MA0KYmxrX21xX2dldF9yZXF1ZXN0KzB4MTZhLzB4NGYwDQpibGtfbXFfbWFrZV9yZXF1ZXN0
-KzB4MTA1LzB4OGUwDQo/IGdlbmVyaWNfbWFrZV9yZXF1ZXN0KzB4ZDYvMHgzZDANCmdlbmVyaWNf
-bWFrZV9yZXF1ZXN0KzB4MTAzLzB4M2QwDQo/IHN1Ym1pdF9iaW8rMHg1Ny8weDExMA0Kc3VibWl0
-X2JpbysweDU3LzB4MTEwDQptcGFnZV9yZWFkcGFnZXMrMHgxM2IvMHgxNjANCj8gSV9CREVWKzB4
-MTAvMHgxMA0KPyByY3VfcmVhZF9sb2NrX3NjaGVkX2hlbGQrMHg2Ni8weDcwDQo/IF9fYWxsb2Nf
-cGFnZXNfbm9kZW1hc2srMHgyZTgvMHgzNjANCl9fZG9fcGFnZV9jYWNoZV9yZWFkYWhlYWQrMHgy
-YTQvMHgzNzANCj8gZm9yY2VfcGFnZV9jYWNoZV9yZWFkYWhlYWQrMHhhZi8weDExMA0KZm9yY2Vf
-cGFnZV9jYWNoZV9yZWFkYWhlYWQrMHhhZi8weDExMA0KZ2VuZXJpY19maWxlX3JlYWRfaXRlcisw
-eDc0My8weDk3MA0KPyBmaW5kX2hlbGRfbG9jaysweDJkLzB4OTANCj8gX3Jhd19zcGluX3VubG9j
-aysweDI5LzB4NDANCl9fdmZzX3JlYWQrMHhjYy8weDEyMA0KdmZzX3JlYWQrMHg5Ni8weDE0MA0K
-U3lTX3JlYWQrMHg0MC8weGEwDQpkb19zeXNjYWxsXzY0KzB4NWYvMHgxYjANCmVudHJ5X1NZU0NB
-TEw2NF9zbG93X3BhdGgrMHgyNS8weDI1DQpSSVA6IDAwMzM6MHg3ZjhjZTZkMDhkMTENClJTUDog
-MDAyYjowMDAwN2ZmZjk2ZGVjOGI4IEVGTEFHUzogMDAwMDAyNDYgT1JJR19SQVg6IDAwMDAwMDAw
-MDAwMDAwMDANClJBWDogZmZmZmZmZmZmZmZmZmZkYSBSQlg6IDAwMDA3ZjhjZTcwODUwMTAgUkNY
-OiAwMDAwN2Y4Y2U2ZDA4ZDExDQpSRFg6IDAwMDAwMDAwMDAwNDAwMDAgUlNJOiAwMDAwN2Y4Y2U3
-MDg1MDM4IFJESTogMDAwMDAwMDAwMDAwMDAwZg0KUkJQOiAwMDAwNTY1MWRlN2VjODQwIFIwODog
-ZmZmZmZmZmZmZmZmZmZmZiBSMDk6IDAwMDA3ZjhjZTcwODUwMTANClIxMDogMDAwMDdmOGNlNzA4
-NTAyOCBSMTE6IDAwMDAwMDAwMDAwMDAyNDYgUjEyOiAwMDAwMDAwMDAwMDAwMDAwDQpSMTM6IDAw
-MDAwMDAwMDAwNDAwMDAgUjE0OiAwMDAwNTY1MWRlN2VjODkwIFIxNTogMDAwMDAwMDAwMDA0MDAw
-MA0Kc3lzdGVtZC11ZGV2ZCAgIEQxMzY3MiAgMTA1NSAgICAyODUgMHgwMDAwMDEwMA0KQ2FsbCBU
-cmFjZToNCj8gX19zY2hlZHVsZSsweDJiNC8weGJiMA0Kc2NoZWR1bGUrMHgyZC8weDkwDQppb19z
-Y2hlZHVsZSsweGQvMHgzMA0KYmxrX21xX2dldF90YWcrMHgxNjkvMHgyOTANCj8gZmluaXNoX3dh
-aXQrMHg4MC8weDgwDQpibGtfbXFfZ2V0X3JlcXVlc3QrMHgxNmEvMHg0ZjANCmJsa19tcV9tYWtl
-X3JlcXVlc3QrMHgxMDUvMHg4ZTANCj8gZ2VuZXJpY19tYWtlX3JlcXVlc3QrMHhkNi8weDNkMA0K
-Z2VuZXJpY19tYWtlX3JlcXVlc3QrMHgxMDMvMHgzZDANCj8gc3VibWl0X2JpbysweDU3LzB4MTEw
-DQpzdWJtaXRfYmlvKzB4NTcvMHgxMTANCm1wYWdlX3JlYWRwYWdlcysweDEzYi8weDE2MA0KPyBJ
-X0JERVYrMHgxMC8weDEwDQo/IHJjdV9yZWFkX2xvY2tfc2NoZWRfaGVsZCsweDY2LzB4NzANCj8g
-X19hbGxvY19wYWdlc19ub2RlbWFzaysweDJlOC8weDM2MA0KX19kb19wYWdlX2NhY2hlX3JlYWRh
-aGVhZCsweDJhNC8weDM3MA0KPyBmb3JjZV9wYWdlX2NhY2hlX3JlYWRhaGVhZCsweGFmLzB4MTEw
-DQpmb3JjZV9wYWdlX2NhY2hlX3JlYWRhaGVhZCsweGFmLzB4MTEwDQpnZW5lcmljX2ZpbGVfcmVh
-ZF9pdGVyKzB4NzQzLzB4OTcwDQpfX3Zmc19yZWFkKzB4Y2MvMHgxMjANCnZmc19yZWFkKzB4OTYv
-MHgxNDANClN5U19yZWFkKzB4NDAvMHhhMA0KZG9fc3lzY2FsbF82NCsweDVmLzB4MWIwDQplbnRy
-eV9TWVNDQUxMNjRfc2xvd19wYXRoKzB4MjUvMHgyNQ0KUklQOiAwMDMzOjB4N2Y4Y2U2ZDA4ZDEx
-DQpSU1A6IDAwMmI6MDAwMDdmZmY5NmRlYzg0OCBFRkxBR1M6IDAwMDAwMjQ2IE9SSUdfUkFYOiAw
-MDAwMDAwMDAwMDAwMDAwDQpSQVg6IGZmZmZmZmZmZmZmZmZmZGEgUkJYOiAwMDAwNTY1MWRlN2Vj
-MzAwIFJDWDogMDAwMDdmOGNlNmQwOGQxMQ0KUkRYOiAwMDAwMDAwMDAwMDAwMTAwIFJTSTogMDAw
-MDU2NTFkZTdlYzMyOCBSREk6IDAwMDAwMDAwMDAwMDAwMGYNClJCUDogMDAwMDU2NTFkZTdlYTUw
-MCBSMDg6IDAwMDAwMDAwMDAwMDAwMDAgUjA5OiAwMDAwNTY1MWRlN2VjMzAwDQpSMTA6IDAwMDA1
-NjUxZGU3ZWMzMTggUjExOiAwMDAwMDAwMDAwMDAwMjQ2IFIxMjogMDAwMDAwMDAwMWZmZTAwMA0K
-UjEzOiAwMDAwMDAwMDAxZmZlMTAwIFIxNDogMDAwMDU2NTFkZTdlYTU1MCBSMTU6IDAwMDAwMDAw
-MDAwMDAxMDANCg0KUGxlYXNlIGxldCBtZSBrbm93IGlmIHlvdSBuZWVkIG1vcmUgaW5mb3JtYXRp
-b24uDQoNCkJhcnQu
+On 1/9/18 9:29 AM, Tejun Heo wrote:
+> Hello,
+> 
+> Changes from [v4]
+> 
+> - Comments added.  Patch description updated.
+> 
+> Changes from [v3]
+> 
+> - Rebased on top of for-4.16/block.
+> 
+> - Integrated Jens's hctx_[un]lock() factoring patch and refreshed the
+>   patches accordingly.
+> 
+> - Added comment explaining the use of hctx_lock() instead of
+>   rcu_read_lock() in completion path.
+> 
+> Changes from [v2]
+> 
+> - Possible extended looping around seqcount and u64_stat_sync fixed.
+> 
+> - Misplaced MQ_RQ_IDLE state setting fixed.
+> 
+> - RQF_MQ_TIMEOUT_EXPIRED added to prevent firing the same timeout
+>   multiple times.
+> 
+> - s/queue_rq_src/srcu/ patch added.
+> 
+> - Other misc changes.
+> 
+> Changes from [v1]
+> 
+> - BLK_EH_RESET_TIMER handling fixed.
+> 
+> - s/request->gstate_seqc/request->gstate_seq/
+> 
+> - READ_ONCE() added to blk_mq_rq_udpate_state().
+> 
+> - Removed left over blk_clear_rq_complete() invocation from
+>   blk_mq_rq_timed_out().
+> 
+> Currently, blk-mq timeout path synchronizes against the usual
+> issue/completion path using a complex scheme involving atomic
+> bitflags, REQ_ATOM_*, memory barriers and subtle memory coherence
+> rules.  Unfortunatley, it contains quite a few holes.
+> 
+> It's pretty easy to make blk_mq_check_expired() terminate a later
+> instance of a request.  If we induce 5 sec delay before
+> time_after_eq() test in blk_mq_check_expired(), shorten the timeout to
+> 2s, and issue back-to-back large IOs, blk-mq starts timing out
+> requests spuriously pretty quickly.  Nothing actually timed out.  It
+> just made the call on a recycle instance of a request and then
+> terminated a later instance long after the original instance finished.
+> The scenario isn't theoretical either.
+> 
+> This patchset replaces the broken synchronization mechanism with a RCU
+> and generation number based one.  Please read the patch description of
+> the second path for more details.
+
+Applied for 4.16, and added a patch to silence that false positive
+srcu_idx for hctx_unlock() that got reported.
+
+This grows the request a bit, which sucks, but probably unavoidable.
+There's some room for improvement with a hole or two, however.
+
+-- 
+Jens Axboe
