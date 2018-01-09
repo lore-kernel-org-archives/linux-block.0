@@ -1,65 +1,56 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.15 final
-Message-ID: <4b6bed5f-dda4-359e-d9bc-d8d85818d742@kernel.dk>
-Date: Tue, 9 Jan 2018 09:09:48 -0700
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+From: Tejun Heo <tj@kernel.org>
+To: jack@suse.cz,
+	axboe@kernel.dk,
+	clm@fb.com,
+	jbacik@fb.com
+Cc: kernel-team@fb.com,
+	linux-kernel@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	peterz@infradead.org,
+	jianchao.w.wang@oracle.com,
+	Bart.VanAssche@wdc.com,
+	linux-block@vger.kernel.org,
+	Tejun Heo <tj@kernel.org>
+Subject: [PATCH 2/8] blk-mq: protect completion path with RCU
+Date: Tue,  9 Jan 2018 08:29:47 -0800
+Message-Id: <20180109162953.1211451-3-tj@kernel.org>
+In-Reply-To: <20180109162953.1211451-1-tj@kernel.org>
+References: <20180109162953.1211451-1-tj@kernel.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+Currently, blk-mq protects only the issue path with RCU.  This patch
+puts the completion path under the same RCU protection.  This will be
+used to synchronize issue/completion against timeout by later patches,
+which will also add the comments.
 
-A set of fixes that should go into this release. This pull request
-contains:
+Signed-off-by: Tejun Heo <tj@kernel.org>
+---
+ block/blk-mq.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-- An NVMe pull request from Christoph, with a few critical fixes for
-  NVMe.
-
-- A block drain queue fix from Ming.
-
-- The concurrent lo_open/release fix for loop.
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git for-linus
-
-
-----------------------------------------------------------------
-James Smart (1):
-      nvme-fcloop: avoid possible uninitialized variable warning
-
-Jeff Lien (1):
-      nvme: fix sector units when going between formats
-
-Jens Axboe (1):
-      Merge branch 'nvme-4.15' of git://git.infradead.org/nvme into for-linus
-
-Linus Torvalds (1):
-      loop: fix concurrent lo_open/lo_release
-
-Ming Lei (1):
-      block: drain queue before waiting for q_usage_counter becoming zero
-
-Minwoo Im (1):
-      nvme-pci: move use_sgl initialization to nvme_init_iod()
-
-Sagi Grimberg (2):
-      nvme-rdma: fix concurrent reset and reconnect
-      nvme-mpath: fix last path removal during traffic
-
- block/blk-core.c             |  9 +++++++--
- block/blk-mq.c               |  2 ++
- block/blk.h                  |  2 ++
- drivers/block/loop.c         | 10 ++++++++--
- drivers/nvme/host/core.c     |  7 ++++++-
- drivers/nvme/host/nvme.h     | 12 ++++++++++++
- drivers/nvme/host/pci.c      | 42 ++++++++++++++++++++----------------------
- drivers/nvme/host/rdma.c     | 14 +++++++++++++-
- drivers/nvme/target/fcloop.c |  2 +-
- 9 files changed, 71 insertions(+), 29 deletions(-)
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index ddc9261..6741c3e 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -584,11 +584,16 @@ static void hctx_lock(struct blk_mq_hw_ctx *hctx, int *srcu_idx)
+ void blk_mq_complete_request(struct request *rq)
+ {
+ 	struct request_queue *q = rq->q;
++	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, rq->mq_ctx->cpu);
++	int srcu_idx;
+ 
+ 	if (unlikely(blk_should_fake_timeout(q)))
+ 		return;
++
++	hctx_lock(hctx, &srcu_idx);
+ 	if (!blk_mark_rq_complete(rq))
+ 		__blk_mq_complete_request(rq);
++	hctx_unlock(hctx, srcu_idx);
+ }
+ EXPORT_SYMBOL(blk_mq_complete_request);
+ 
 -- 
-Jens Axboe
+2.9.5
