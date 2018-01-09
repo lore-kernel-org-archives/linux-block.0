@@ -11,14 +11,12 @@ Cc: linux-block@vger.kernel.org,
 	oleksandr@natalenko.name,
 	162996@studenti.unimore.it,
 	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX V2 0/2] block, bfq: fix two memory leaks related to cgroups
-Date: Tue,  9 Jan 2018 10:27:57 +0100
-Message-Id: <20180109092759.5454-1-paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX 0/2] block, bfq: fix two memory leaks related to cgroups
+Date: Tue,  9 Jan 2018 10:17:25 +0100
+Message-Id: <20180109091727.5262-1-paolo.valente@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
-
-[There was a mistake in the subject of the second patch, sorry]
 
 Hi Jens,
 these two patches fix two related memory leaks, the first reported in
@@ -31,7 +29,7 @@ Paolo
 
 Paolo Valente (2):
   block, bfq: put async queues for root bfq groups too
-  block, bfq: release oom-queue ref to root group on exit
+  bfq-sq, bfq-mq: release oom-queue ref to root group on exit
 
  block/bfq-cgroup.c  | 7 +++++--
  block/bfq-iosched.c | 3 +++
