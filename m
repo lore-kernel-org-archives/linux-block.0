@@ -1,206 +1,65 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-From: Tejun Heo <tj@kernel.org>
-To: jack@suse.cz,
-	axboe@kernel.dk,
-	clm@fb.com,
-	jbacik@fb.com
-Cc: kernel-team@fb.com,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	peterz@infradead.org,
-	jianchao.w.wang@oracle.com,
-	Bart.VanAssche@wdc.com,
-	linux-block@vger.kernel.org,
-	Tejun Heo <tj@kernel.org>
-Subject: [PATCH 7/8] blk-mq: remove REQ_ATOM_STARTED
-Date: Tue,  9 Jan 2018 08:29:52 -0800
-Message-Id: <20180109162953.1211451-8-tj@kernel.org>
-In-Reply-To: <20180109162953.1211451-1-tj@kernel.org>
-References: <20180109162953.1211451-1-tj@kernel.org>
+Return-Path: <axboe@kernel.dk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 4.15 final
+Message-ID: <4b6bed5f-dda4-359e-d9bc-d8d85818d742@kernel.dk>
+Date: Tue, 9 Jan 2018 09:09:48 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-After the recent updates to use generation number and state based
-synchronization, we can easily replace REQ_ATOM_STARTED usages by
-adding an extra state to distinguish completed but not yet freed
-state.
+Hi Linus,
 
-Add MQ_RQ_COMPLETE and replace REQ_ATOM_STARTED usages with
-blk_mq_rq_state() tests.  REQ_ATOM_STARTED no longer has any users
-left and is removed.
+A set of fixes that should go into this release. This pull request
+contains:
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
----
- block/blk-mq-debugfs.c |  4 +---
- block/blk-mq.c         | 37 ++++++++-----------------------------
- block/blk-mq.h         |  1 +
- block/blk.h            |  1 -
- 4 files changed, 10 insertions(+), 33 deletions(-)
+- An NVMe pull request from Christoph, with a few critical fixes for
+  NVMe.
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index b56a4f3..8adc837 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -271,7 +271,6 @@ static const char *const cmd_flag_name[] = {
- #define RQF_NAME(name) [ilog2((__force u32)RQF_##name)] = #name
- static const char *const rqf_name[] = {
- 	RQF_NAME(SORTED),
--	RQF_NAME(STARTED),
- 	RQF_NAME(QUEUED),
- 	RQF_NAME(SOFTBARRIER),
- 	RQF_NAME(FLUSH_SEQ),
-@@ -295,7 +294,6 @@ static const char *const rqf_name[] = {
- #define RQAF_NAME(name) [REQ_ATOM_##name] = #name
- static const char *const rqaf_name[] = {
- 	RQAF_NAME(COMPLETE),
--	RQAF_NAME(STARTED),
- 	RQAF_NAME(POLL_SLEPT),
- };
- #undef RQAF_NAME
-@@ -409,7 +407,7 @@ static void hctx_show_busy_rq(struct request *rq, void *data, bool reserved)
- 	const struct show_busy_params *params = data;
- 
- 	if (blk_mq_map_queue(rq->q, rq->mq_ctx->cpu) == params->hctx &&
--	    test_bit(REQ_ATOM_STARTED, &rq->atomic_flags))
-+	    blk_mq_rq_state(rq) != MQ_RQ_IDLE)
- 		__blk_mq_debugfs_rq_show(params->m,
- 					 list_entry_rq(&rq->queuelist));
- }
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3f297f0..e6e74c0 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -483,7 +483,6 @@ void blk_mq_free_request(struct request *rq)
- 		blk_put_rl(blk_rq_rl(rq));
- 
- 	blk_mq_rq_update_state(rq, MQ_RQ_IDLE);
--	clear_bit(REQ_ATOM_STARTED, &rq->atomic_flags);
- 	clear_bit(REQ_ATOM_POLL_SLEPT, &rq->atomic_flags);
- 	if (rq->tag != -1)
- 		blk_mq_put_tag(hctx, hctx->tags, ctx, rq->tag);
-@@ -531,6 +530,7 @@ static void __blk_mq_complete_request(struct request *rq)
- 	int cpu;
- 
- 	WARN_ON_ONCE(blk_mq_rq_state(rq) != MQ_RQ_IN_FLIGHT);
-+	blk_mq_rq_update_state(rq, MQ_RQ_COMPLETE);
- 
- 	if (rq->internal_tag != -1)
- 		blk_mq_sched_completed_request(rq);
-@@ -642,7 +642,7 @@ EXPORT_SYMBOL(blk_mq_complete_request);
- 
- int blk_mq_request_started(struct request *rq)
- {
--	return test_bit(REQ_ATOM_STARTED, &rq->atomic_flags);
-+	return blk_mq_rq_state(rq) != MQ_RQ_IDLE;
- }
- EXPORT_SYMBOL_GPL(blk_mq_request_started);
- 
-@@ -661,7 +661,6 @@ void blk_mq_start_request(struct request *rq)
- 	}
- 
- 	WARN_ON_ONCE(blk_mq_rq_state(rq) != MQ_RQ_IDLE);
--	WARN_ON_ONCE(test_bit(REQ_ATOM_STARTED, &rq->atomic_flags));
- 
- 	/*
- 	 * Mark @rq in-flight which also advances the generation number,
-@@ -683,8 +682,6 @@ void blk_mq_start_request(struct request *rq)
- 	write_seqcount_end(&rq->gstate_seq);
- 	preempt_enable();
- 
--	set_bit(REQ_ATOM_STARTED, &rq->atomic_flags);
--
- 	if (q->dma_drain_size && blk_rq_bytes(rq)) {
- 		/*
- 		 * Make sure space for the drain appears.  We know we can do
-@@ -697,13 +694,9 @@ void blk_mq_start_request(struct request *rq)
- EXPORT_SYMBOL(blk_mq_start_request);
- 
- /*
-- * When we reach here because queue is busy, REQ_ATOM_COMPLETE
-- * flag isn't set yet, so there may be race with timeout handler,
-- * but given rq->deadline is just set in .queue_rq() under
-- * this situation, the race won't be possible in reality because
-- * rq->timeout should be set as big enough to cover the window
-- * between blk_mq_start_request() called from .queue_rq() and
-- * clearing REQ_ATOM_STARTED here.
-+ * When we reach here because queue is busy, it's safe to change the state
-+ * to IDLE without checking @rq->aborted_gstate because we should still be
-+ * holding the RCU read lock and thus protected against timeout.
-  */
- static void __blk_mq_requeue_request(struct request *rq)
- {
-@@ -715,7 +708,7 @@ static void __blk_mq_requeue_request(struct request *rq)
- 	wbt_requeue(q->rq_wb, &rq->issue_stat);
- 	blk_mq_sched_requeue_request(rq);
- 
--	if (test_and_clear_bit(REQ_ATOM_STARTED, &rq->atomic_flags)) {
-+	if (blk_mq_rq_state(rq) != MQ_RQ_IDLE) {
- 		blk_mq_rq_update_state(rq, MQ_RQ_IDLE);
- 		if (q->dma_drain_size && blk_rq_bytes(rq))
- 			rq->nr_phys_segments--;
-@@ -822,18 +815,6 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
- 	const struct blk_mq_ops *ops = req->q->mq_ops;
- 	enum blk_eh_timer_return ret = BLK_EH_RESET_TIMER;
- 
--	/*
--	 * We know that complete is set at this point. If STARTED isn't set
--	 * anymore, then the request isn't active and the "timeout" should
--	 * just be ignored. This can happen due to the bitflag ordering.
--	 * Timeout first checks if STARTED is set, and if it is, assumes
--	 * the request is active. But if we race with completion, then
--	 * both flags will get cleared. So check here again, and ignore
--	 * a timeout event with a request that isn't active.
--	 */
--	if (!test_bit(REQ_ATOM_STARTED, &req->atomic_flags))
--		return;
--
- 	req->rq_flags |= RQF_MQ_TIMEOUT_EXPIRED;
- 
- 	if (ops->timeout)
-@@ -869,8 +850,7 @@ static void blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
- 
- 	might_sleep();
- 
--	if ((rq->rq_flags & RQF_MQ_TIMEOUT_EXPIRED) ||
--	    !test_bit(REQ_ATOM_STARTED, &rq->atomic_flags))
-+	if (rq->rq_flags & RQF_MQ_TIMEOUT_EXPIRED)
- 		return;
- 
- 	/* read coherent snapshots of @rq->state_gen and @rq->deadline */
-@@ -3021,8 +3001,7 @@ static bool blk_mq_poll_hybrid_sleep(struct request_queue *q,
- 
- 	hrtimer_init_sleeper(&hs, current);
- 	do {
--		if (test_bit(REQ_ATOM_STARTED, &rq->atomic_flags) &&
--		    blk_mq_rq_state(rq) != MQ_RQ_IN_FLIGHT)
-+		if (blk_mq_rq_state(rq) == MQ_RQ_COMPLETE)
- 			break;
- 		set_current_state(TASK_UNINTERRUPTIBLE);
- 		hrtimer_start_expires(&hs.timer, mode);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 6b2d616..8591a54 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -34,6 +34,7 @@ struct blk_mq_ctx {
- enum mq_rq_state {
- 	MQ_RQ_IDLE		= 0,
- 	MQ_RQ_IN_FLIGHT		= 1,
-+	MQ_RQ_COMPLETE		= 2,
- 
- 	MQ_RQ_STATE_BITS	= 2,
- 	MQ_RQ_STATE_MASK	= (1 << MQ_RQ_STATE_BITS) - 1,
-diff --git a/block/blk.h b/block/blk.h
-index 9cb2739..a68dbe3 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -124,7 +124,6 @@ void blk_account_io_done(struct request *req);
-  */
- enum rq_atomic_flags {
- 	REQ_ATOM_COMPLETE = 0,
--	REQ_ATOM_STARTED,
- 
- 	REQ_ATOM_POLL_SLEPT,
- };
+- A block drain queue fix from Ming.
+
+- The concurrent lo_open/release fix for loop.
+
+Please pull!
+
+
+  git://git.kernel.dk/linux-block.git for-linus
+
+
+----------------------------------------------------------------
+James Smart (1):
+      nvme-fcloop: avoid possible uninitialized variable warning
+
+Jeff Lien (1):
+      nvme: fix sector units when going between formats
+
+Jens Axboe (1):
+      Merge branch 'nvme-4.15' of git://git.infradead.org/nvme into for-linus
+
+Linus Torvalds (1):
+      loop: fix concurrent lo_open/lo_release
+
+Ming Lei (1):
+      block: drain queue before waiting for q_usage_counter becoming zero
+
+Minwoo Im (1):
+      nvme-pci: move use_sgl initialization to nvme_init_iod()
+
+Sagi Grimberg (2):
+      nvme-rdma: fix concurrent reset and reconnect
+      nvme-mpath: fix last path removal during traffic
+
+ block/blk-core.c             |  9 +++++++--
+ block/blk-mq.c               |  2 ++
+ block/blk.h                  |  2 ++
+ drivers/block/loop.c         | 10 ++++++++--
+ drivers/nvme/host/core.c     |  7 ++++++-
+ drivers/nvme/host/nvme.h     | 12 ++++++++++++
+ drivers/nvme/host/pci.c      | 42 ++++++++++++++++++++----------------------
+ drivers/nvme/host/rdma.c     | 14 +++++++++++++-
+ drivers/nvme/target/fcloop.c |  2 +-
+ 9 files changed, 71 insertions(+), 29 deletions(-)
+
 -- 
-2.9.5
+Jens Axboe
