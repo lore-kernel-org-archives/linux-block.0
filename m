@@ -1,15 +1,13 @@
 Return-Path: <msnitzer@redhat.com>
 From: Mike Snitzer <snitzer@redhat.com>
 To: axboe@kernel.dk
-Cc: hch@lst.de,
-	Bart.VanAssche@wdc.com,
-	dm-devel@redhat.com,
+Cc: dm-devel@redhat.com,
 	linux-block@vger.kernel.org
-Subject: [for-4.16 PATCH v2 3/3] dm: fix awkward request_queue initialization
-Date: Tue,  9 Jan 2018 21:41:04 -0500
-Message-Id: <20180110024104.34885-4-snitzer@redhat.com>
-In-Reply-To: <20180110024104.34885-1-snitzer@redhat.com>
-References: <20180110024104.34885-1-snitzer@redhat.com>
+Subject: [for-4.16 PATCH 2/2] dm: fix awkward request_queue initialization
+Date: Tue,  9 Jan 2018 17:10:39 -0500
+Message-Id: <20180109221039.33282-3-snitzer@redhat.com>
+In-Reply-To: <20180109221039.33282-1-snitzer@redhat.com>
+References: <20180109221039.33282-1-snitzer@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
 Fix DM so that it no longer creates a place-holder request_queue that
@@ -68,10 +66,10 @@ Signed-off-by: Mike Snitzer <snitzer@redhat.com>
  5 files changed, 44 insertions(+), 46 deletions(-)
 
 diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
-index 6a14f945783c..f955123b4765 100644
+index 124ffa2d6b9a..3222e21cbbf8 100644
 --- a/drivers/md/dm-core.h
 +++ b/drivers/md/dm-core.h
-@@ -130,8 +130,6 @@ struct mapped_device {
+@@ -129,8 +129,6 @@ struct mapped_device {
  	struct srcu_struct io_barrier;
  };
  
@@ -149,10 +147,10 @@ index 9d32f25489c2..ab95cc3f2f29 100644
  	blk_mq_free_tag_set(md->tag_set);
  out_kfree_tag_set:
 diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index aaffd0c0ee9a..4cd9a8f69b55 100644
+index ad4ac294dd57..905e0947325a 100644
 --- a/drivers/md/dm-table.c
 +++ b/drivers/md/dm-table.c
-@@ -1161,7 +1161,7 @@ static int dm_table_build_index(struct dm_table *t)
+@@ -1192,7 +1192,7 @@ static int dm_table_build_index(struct dm_table *t)
  
  static bool integrity_profile_exists(struct gendisk *disk)
  {
@@ -162,10 +160,10 @@ index aaffd0c0ee9a..4cd9a8f69b55 100644
  
  /*
 diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 7475739fee49..0dff9b131884 100644
+index 67bf11610e4d..bf8e86087489 100644
 --- a/drivers/md/dm.c
 +++ b/drivers/md/dm.c
-@@ -1626,20 +1626,9 @@ static const struct dax_operations dm_dax_ops;
+@@ -1733,20 +1733,9 @@ static const struct dax_operations dm_dax_ops;
  
  static void dm_wq_work(struct work_struct *work);
  
@@ -187,7 +185,7 @@ index 7475739fee49..0dff9b131884 100644
  
  	/*
  	 * Initialize aspects of queue that aren't relevant for blk-mq
-@@ -1731,13 +1720,7 @@ static struct mapped_device *alloc_dev(int minor)
+@@ -1843,13 +1832,7 @@ static struct mapped_device *alloc_dev(int minor)
  	INIT_LIST_HEAD(&md->table_devices);
  	spin_lock_init(&md->uevent_lock);
  
@@ -202,7 +200,7 @@ index 7475739fee49..0dff9b131884 100644
  	if (!md->disk)
  		goto bad;
  
-@@ -1752,7 +1735,7 @@ static struct mapped_device *alloc_dev(int minor)
+@@ -1864,7 +1847,7 @@ static struct mapped_device *alloc_dev(int minor)
  	md->disk->major = _major;
  	md->disk->first_minor = minor;
  	md->disk->fops = &dm_blk_dops;
@@ -211,7 +209,7 @@ index 7475739fee49..0dff9b131884 100644
  	md->disk->private_data = md;
  	sprintf(md->disk->disk_name, "dm-%d", minor);
  
-@@ -1962,13 +1945,18 @@ static struct dm_table *__unbind(struct mapped_device *md)
+@@ -2082,13 +2065,18 @@ static struct dm_table *__unbind(struct mapped_device *md)
   */
  int dm_create(int minor, struct mapped_device **result)
  {
@@ -231,7 +229,7 @@ index 7475739fee49..0dff9b131884 100644
  
  	*result = md;
  	return 0;
-@@ -2021,21 +2009,31 @@ EXPORT_SYMBOL_GPL(dm_get_queue_limits);
+@@ -2141,21 +2129,31 @@ EXPORT_SYMBOL_GPL(dm_get_queue_limits);
  int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t)
  {
  	int r;
@@ -266,7 +264,7 @@ index 7475739fee49..0dff9b131884 100644
  		}
  		break;
  	case DM_TYPE_BIO_BASED:
-@@ -2057,7 +2055,23 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t)
+@@ -2172,7 +2170,23 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t)
  		break;
  	}
  
@@ -290,7 +288,7 @@ index 7475739fee49..0dff9b131884 100644
  }
  
  struct mapped_device *dm_get_md(dev_t dev)
-@@ -2121,7 +2135,6 @@ EXPORT_SYMBOL_GPL(dm_device_name);
+@@ -2236,7 +2250,6 @@ EXPORT_SYMBOL_GPL(dm_device_name);
  
  static void __dm_destroy(struct mapped_device *md, bool wait)
  {
@@ -298,7 +296,7 @@ index 7475739fee49..0dff9b131884 100644
  	struct dm_table *map;
  	int srcu_idx;
  
-@@ -2132,7 +2145,8 @@ static void __dm_destroy(struct mapped_device *md, bool wait)
+@@ -2247,7 +2260,8 @@ static void __dm_destroy(struct mapped_device *md, bool wait)
  	set_bit(DMF_FREEING, &md->flags);
  	spin_unlock(&_minor_lock);
  
