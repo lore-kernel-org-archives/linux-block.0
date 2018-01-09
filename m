@@ -1,30 +1,58 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Wed, 10 Jan 2018 09:06:45 +0100
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Linux Block <linux-block@vger.kernel.org>,
+Return-Path: <keith.busch@intel.com>
+From: Keith Busch <keith.busch@intel.com>
+To: Linux Block <linux-block@vger.kernel.org>,
 	Linux NVMe <linux-nvme@lists.infradead.org>,
-	Device Mapper <dm-devel@redhat.com>, Christoph Hellwig <hch@lst.de>,
-	Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Hannes Reinecke <hare@suse.com>, Sagi Grimberg <sagi@grimberg.me>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Device Mapper <dm-devel@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Bart VanAssche <bart.vanassche@wdc.com>,
 	James Smart <james.smart@broadcom.com>,
-	Bart VanAssche <bart.vanassche@wdc.com>
-Subject: Re: [dm-devel] [PATCHv2 4/5] nvme/multipath: Use blk_path_error
-Message-ID: <20180110080645.rgcegffzusipawds@linux-x5ow.site>
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <keith.busch@intel.com>
+Subject: [PATCHv2 4/5] nvme/multipath: Use blk_path_error
+Date: Tue,  9 Jan 2018 12:04:17 -0700
+Message-Id: <20180109190418.7123-5-keith.busch@intel.com>
+In-Reply-To: <20180109190418.7123-1-keith.busch@intel.com>
 References: <20180109190418.7123-1-keith.busch@intel.com>
- <20180109190418.7123-5-keith.busch@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20180109190418.7123-5-keith.busch@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Uses common code for determining if an error should be retried on
+alternate path.
+
+Acked-by: Mike Snitzer <snitzer@redhat.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Keith Busch <keith.busch@intel.com>
+---
+ drivers/nvme/host/multipath.c | 14 +-------------
+ 1 file changed, 1 insertion(+), 13 deletions(-)
+
+diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
+index ae9abb600c0f..3b211d9e58b8 100644
+--- a/drivers/nvme/host/multipath.c
++++ b/drivers/nvme/host/multipath.c
+@@ -37,19 +37,7 @@ bool nvme_req_needs_failover(struct request *req, blk_status_t error)
+ {
+ 	if (!(req->cmd_flags & REQ_NVME_MPATH))
+ 		return false;
+-
+-	switch (error) {
+-	case BLK_STS_NOTSUPP:
+-	case BLK_STS_NOSPC:
+-	case BLK_STS_TARGET:
+-	case BLK_STS_NEXUS:
+-	case BLK_STS_MEDIUM:
+-	case BLK_STS_PROTECTION:
+-		return false;
+-	}
+-
+-	/* Everything else could be a path failure, so should be retried */
+-	return true;
++	return blk_path_error(error);
+ }
+ 
+ void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl)
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.13.6
