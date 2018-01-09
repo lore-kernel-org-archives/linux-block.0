@@ -1,221 +1,139 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:33842 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934227AbeAHUVq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jan 2018 15:21:46 -0500
-Received: by mail-pf0-f193.google.com with SMTP id e76so1992582pfk.1
-        for <linux-block@vger.kernel.org>; Mon, 08 Jan 2018 12:21:46 -0800 (PST)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Tang Junhui <tang.junhui@zte.com.cn>
-Subject: [416 PATCH 05/13] bcache: fix wrong return value in bch_debug_init()
-Date: Mon,  8 Jan 2018 12:21:22 -0800
-Message-Id: <20180108202130.31303-6-mlyle@lyle.org>
-In-Reply-To: <20180108202130.31303-1-mlyle@lyle.org>
-References: <20180108202130.31303-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc: Omar Sandoval <osandov@osandov.com>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] null_blk: add option for managing IO timeouts
+Message-ID: <c7bc30f1-84c1-c86d-4dc2-cece44f13572@kernel.dk>
+Date: Tue, 9 Jan 2018 15:03:52 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+Use the fault injection framework to provide a way for null_blk
+to configure timeouts. This only works for queue_mode 1 and 2,
+since the bio mode doesn't have code for tracking timeouts.
 
-in bch_debug_init(), ret is always 0, and the return value is useless,
-change it to return 0 if be success after calling debugfs_create_dir(),
-else return a non-zero value.
+Let's say you want to have a 10% chance of timing out every
+100,000 requests, and for 5 total timeouts, you could do:
 
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
+modprobe null_blk timeout="100000,10,0,5"
+
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/md/bcache/bcache.h    |   6 ---
- drivers/md/bcache/debug.c     |   5 +-
- drivers/md/bcache/writeback.c | 120 +++++++++++++++++++++++++++++-------------
- drivers/md/bcache/writeback.h |   3 ++
- 4 files changed, 87 insertions(+), 47 deletions(-)
+ drivers/block/Kconfig    |  1 +
+ drivers/block/null_blk.c | 36 ++++++++++++++++++++++++++++++++----
+ 2 files changed, 33 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 843877e017e1..1784e50eb857 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -323,12 +323,6 @@ struct cached_dev {
- 	struct bch_ratelimit	writeback_rate;
- 	struct delayed_work	writeback_rate_update;
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index 40579d0cb3d1..622d9a2c8dae 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -19,6 +19,7 @@ if BLK_DEV
+ config BLK_DEV_NULL_BLK
+ 	tristate "Null test block driver"
+ 	select CONFIGFS_FS
++	select FAULT_INJECTION
  
--	/*
--	 * Internal to the writeback code, so read_dirty() can keep track of
--	 * where it's at.
--	 */
--	sector_t		last_read;
--
- 	/* Limit number of writeback bios in flight */
- 	struct semaphore	in_flight;
- 	struct task_struct	*writeback_thread;
-diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
-index 879ab21074c6..af89408befe8 100644
---- a/drivers/md/bcache/debug.c
-+++ b/drivers/md/bcache/debug.c
-@@ -251,8 +251,7 @@ void bch_debug_exit(void)
+ config BLK_DEV_FD
+ 	tristate "Normal floppy disk support"
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index 78267e3e4fa5..f66b3bd6eeba 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -14,6 +14,7 @@
+ #include <linux/hrtimer.h>
+ #include <linux/configfs.h>
+ #include <linux/badblocks.h>
++#include <linux/fault-inject.h>
  
- int __init bch_debug_init(struct kobject *kobj)
- {
--	int ret = 0;
--
- 	debug = debugfs_create_dir("bcache", NULL);
--	return ret;
+ #define SECTOR_SHIFT		9
+ #define PAGE_SECTORS_SHIFT	(PAGE_SHIFT - SECTOR_SHIFT)
+@@ -26,6 +27,8 @@
+ #define TICKS_PER_SEC		50ULL
+ #define TIMER_INTERVAL		(NSEC_PER_SEC / TICKS_PER_SEC)
+ 
++static DECLARE_FAULT_ATTR(null_timeout_attr);
 +
-+	return IS_ERR_OR_NULL(debug);
+ static inline u64 mb_per_tick(int mbps)
+ {
+ 	return (1 << 20) / TICKS_PER_SEC * ((u64) mbps);
+@@ -162,6 +165,9 @@ static int g_home_node = NUMA_NO_NODE;
+ module_param_named(home_node, g_home_node, int, S_IRUGO);
+ MODULE_PARM_DESC(home_node, "Home node for the device");
+ 
++static char g_timeout_str[80];
++module_param_string(timeout, g_timeout_str, sizeof(g_timeout_str), S_IRUGO);
++
+ static int g_queue_mode = NULL_Q_MQ;
+ 
+ static int null_param_store_val(const char *str, int *val, int min, int max)
+@@ -1364,6 +1370,14 @@ static int null_rq_prep_fn(struct request_queue *q, struct request *req)
+ 	return BLKPREP_DEFER;
  }
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 1ac2af6128b1..479095987f22 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -237,7 +237,9 @@ static void read_dirty_submit(struct closure *cl)
- static void read_dirty(struct cached_dev *dc)
+ 
++static bool should_timeout_request(struct request *rq)
++{
++	if (g_timeout_str[0])
++		return should_fail(&null_timeout_attr, 1);
++
++	return false;
++}
++
+ static void null_request_fn(struct request_queue *q)
  {
- 	unsigned delay = 0;
--	struct keybuf_key *w;
-+	struct keybuf_key *next, *keys[MAX_WRITEBACKS_IN_PASS], *w;
-+	size_t size;
-+	int nk, i;
- 	struct dirty_io *io;
- 	struct closure cl;
+ 	struct request *rq;
+@@ -1371,9 +1385,11 @@ static void null_request_fn(struct request_queue *q)
+ 	while ((rq = blk_fetch_request(q)) != NULL) {
+ 		struct nullb_cmd *cmd = rq->special;
  
-@@ -248,45 +250,87 @@ static void read_dirty(struct cached_dev *dc)
- 	 * mempools.
- 	 */
- 
--	while (!kthread_should_stop()) {
--
--		w = bch_keybuf_next(&dc->writeback_keys);
--		if (!w)
--			break;
--
--		BUG_ON(ptr_stale(dc->disk.c, &w->key, 0));
--
--		if (KEY_START(&w->key) != dc->last_read ||
--		    jiffies_to_msecs(delay) > 50)
--			while (!kthread_should_stop() && delay)
--				delay = schedule_timeout_interruptible(delay);
--
--		dc->last_read	= KEY_OFFSET(&w->key);
--
--		io = kzalloc(sizeof(struct dirty_io) + sizeof(struct bio_vec)
--			     * DIV_ROUND_UP(KEY_SIZE(&w->key), PAGE_SECTORS),
--			     GFP_KERNEL);
--		if (!io)
--			goto err;
--
--		w->private	= io;
--		io->dc		= dc;
--
--		dirty_init(w);
--		bio_set_op_attrs(&io->bio, REQ_OP_READ, 0);
--		io->bio.bi_iter.bi_sector = PTR_OFFSET(&w->key, 0);
--		bio_set_dev(&io->bio, PTR_CACHE(dc->disk.c, &w->key, 0)->bdev);
--		io->bio.bi_end_io	= read_dirty_endio;
--
--		if (bch_bio_alloc_pages(&io->bio, GFP_KERNEL))
--			goto err_free;
--
--		trace_bcache_writeback(&w->key);
-+	next = bch_keybuf_next(&dc->writeback_keys);
-+
-+	while (!kthread_should_stop() && next) {
-+		size = 0;
-+		nk = 0;
-+
-+		do {
-+			BUG_ON(ptr_stale(dc->disk.c, &next->key, 0));
-+
-+			/*
-+			 * Don't combine too many operations, even if they
-+			 * are all small.
-+			 */
-+			if (nk >= MAX_WRITEBACKS_IN_PASS)
-+				break;
-+
-+			/*
-+			 * If the current operation is very large, don't
-+			 * further combine operations.
-+			 */
-+			if (size >= MAX_WRITESIZE_IN_PASS)
-+				break;
-+
-+			/*
-+			 * Operations are only eligible to be combined
-+			 * if they are contiguous.
-+			 *
-+			 * TODO: add a heuristic willing to fire a
-+			 * certain amount of non-contiguous IO per pass,
-+			 * so that we can benefit from backing device
-+			 * command queueing.
-+			 */
-+			if ((nk != 0) && bkey_cmp(&keys[nk-1]->key,
-+						&START_KEY(&next->key)))
-+				break;
-+
-+			size += KEY_SIZE(&next->key);
-+			keys[nk++] = next;
-+		} while ((next = bch_keybuf_next(&dc->writeback_keys)));
-+
-+		/* Now we have gathered a set of 1..5 keys to write back. */
-+		for (i = 0; i < nk; i++) {
-+			w = keys[i];
-+
-+			io = kzalloc(sizeof(struct dirty_io) +
-+				     sizeof(struct bio_vec) *
-+				     DIV_ROUND_UP(KEY_SIZE(&w->key), PAGE_SECTORS),
-+				     GFP_KERNEL);
-+			if (!io)
-+				goto err;
-+
-+			w->private	= io;
-+			io->dc		= dc;
-+
-+			dirty_init(w);
-+			bio_set_op_attrs(&io->bio, REQ_OP_READ, 0);
-+			io->bio.bi_iter.bi_sector = PTR_OFFSET(&w->key, 0);
-+			bio_set_dev(&io->bio,
-+				    PTR_CACHE(dc->disk.c, &w->key, 0)->bdev);
-+			io->bio.bi_end_io	= read_dirty_endio;
-+
-+			if (bch_bio_alloc_pages(&io->bio, GFP_KERNEL))
-+				goto err_free;
-+
-+			trace_bcache_writeback(&w->key);
-+
-+			down(&dc->in_flight);
-+
-+			/* We've acquired a semaphore for the maximum
-+			 * simultaneous number of writebacks; from here
-+			 * everything happens asynchronously.
-+			 */
-+			closure_call(&io->cl, read_dirty_submit, NULL, &cl);
-+		}
- 
--		down(&dc->in_flight);
--		closure_call(&io->cl, read_dirty_submit, NULL, &cl);
-+		delay = writeback_delay(dc, size);
- 
--		delay = writeback_delay(dc, KEY_SIZE(&w->key));
-+		while (!kthread_should_stop() && delay) {
-+			schedule_timeout_interruptible(delay);
-+			delay = writeback_delay(dc, 0);
+-		spin_unlock_irq(q->queue_lock);
+-		null_handle_cmd(cmd);
+-		spin_lock_irq(q->queue_lock);
++		if (!should_timeout_request(rq)) {
++			spin_unlock_irq(q->queue_lock);
++			null_handle_cmd(cmd);
++			spin_lock_irq(q->queue_lock);
 +		}
  	}
+ }
  
- 	if (0) {
-diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
-index a9e3ffb4b03c..6d26927267f8 100644
---- a/drivers/md/bcache/writeback.h
-+++ b/drivers/md/bcache/writeback.h
-@@ -5,6 +5,9 @@
- #define CUTOFF_WRITEBACK	40
- #define CUTOFF_WRITEBACK_SYNC	70
+@@ -1400,7 +1416,10 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
  
-+#define MAX_WRITEBACKS_IN_PASS  5
-+#define MAX_WRITESIZE_IN_PASS   5000	/* *512b */
+ 	blk_mq_start_request(bd->rq);
+ 
+-	return null_handle_cmd(cmd);
++	if (!should_timeout_request(bd->rq))
++		return null_handle_cmd(cmd);
 +
- static inline uint64_t bcache_dev_sectors_dirty(struct bcache_device *d)
- {
- 	uint64_t i, ret = 0;
++	return BLK_STS_OK;
+ }
+ 
+ static const struct blk_mq_ops null_mq_ops = {
+@@ -1667,6 +1686,10 @@ static int null_add_dev(struct nullb_device *dev)
+ 		if (rv)
+ 			goto out_cleanup_queues;
+ 
++		if (g_timeout_str[0] &&
++		    !setup_fault_attr(&null_timeout_attr, g_timeout_str))
++			goto out_cleanup_queues;
++
+ 		nullb->tag_set->timeout = 5 * HZ;
+ 		nullb->q = blk_mq_init_queue(nullb->tag_set);
+ 		if (IS_ERR(nullb->q)) {
+@@ -1691,6 +1714,11 @@ static int null_add_dev(struct nullb_device *dev)
+ 			rv = -ENOMEM;
+ 			goto out_cleanup_queues;
+ 		}
++
++		if (g_timeout_str[0] &&
++		    !setup_fault_attr(&null_timeout_attr, g_timeout_str))
++			goto out_cleanup_blk_queue;
++
+ 		blk_queue_prep_rq(nullb->q, null_rq_prep_fn);
+ 		blk_queue_softirq_done(nullb->q, null_softirq_done_fn);
+ 		blk_queue_rq_timed_out(nullb->q, null_rq_timed_out_fn);
 -- 
-2.14.1
+2.7.4
+
+-- 
+Jens Axboe
