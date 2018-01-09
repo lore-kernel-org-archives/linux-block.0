@@ -1,110 +1,85 @@
-Return-Path: <prvs=53600bcc8=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-nvme@lists.infradead.org,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Sagi Grimberg <sagi@grimberg.me>
-Subject: [PATCH v4 5/5] target: Use sgl_alloc_order() and sgl_free()
-Date: Fri,  5 Jan 2018 08:26:50 -0800
-Message-Id: <20180105162650.31083-6-bart.vanassche@wdc.com>
-In-Reply-To: <20180105162650.31083-1-bart.vanassche@wdc.com>
-References: <20180105162650.31083-1-bart.vanassche@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Received: from [192.168.1.154] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id 15sm8670767iti.15.2018.01.09.11.47.25
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 09 Jan 2018 11:47:25 -0800 (PST)
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] null_blk: wire up timeouts
+Message-ID: <262d382f-8ce5-7230-fb45-3eb57d48e099@kernel.dk>
+Date: Tue, 9 Jan 2018 12:47:24 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Use the sgl_alloc_order() and sgl_free() functions instead of open
-coding these functions.
+This is needed to ensure that we actually handle timeouts.
+Without it, the queue_mode=1 path will never call blk_add_timer(),
+and the queue_mode=2 path will continually just return
+EH_RESET_TIMER and we never actually complete the offending request.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Acked-by: Nicholas A. Bellinger <nab@linux-iscsi.org>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
+This was used to test the new timeout code, and the changes around
+killing off REQ_ATOM_COMPLETE.
+
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
 ---
- drivers/target/Kconfig                 |  1 +
- drivers/target/target_core_transport.c | 46 +++-------------------------------
- 2 files changed, 5 insertions(+), 42 deletions(-)
 
-diff --git a/drivers/target/Kconfig b/drivers/target/Kconfig
-index e2bc99980f75..4c44d7bed01a 100644
---- a/drivers/target/Kconfig
-+++ b/drivers/target/Kconfig
-@@ -5,6 +5,7 @@ menuconfig TARGET_CORE
- 	select CONFIGFS_FS
- 	select CRC_T10DIF
- 	select BLK_SCSI_REQUEST # only for scsi_command_size_tbl..
-+	select SGL_ALLOC
- 	default n
- 	help
- 	Say Y or M here to enable the TCM Storage Engine and ConfigFS enabled
-diff --git a/drivers/target/target_core_transport.c b/drivers/target/target_core_transport.c
-index 58caacd54a3b..a001ba711cca 100644
---- a/drivers/target/target_core_transport.c
-+++ b/drivers/target/target_core_transport.c
-@@ -2300,13 +2300,7 @@ static void target_complete_ok_work(struct work_struct *work)
- 
- void target_free_sgl(struct scatterlist *sgl, int nents)
- {
--	struct scatterlist *sg;
--	int count;
--
--	for_each_sg(sgl, sg, nents, count)
--		__free_page(sg_page(sg));
--
--	kfree(sgl);
-+	sgl_free(sgl);
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index b58e506d278b..6388d60c9c0f 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -1341,6 +1341,12 @@ static blk_qc_t null_queue_bio(struct request_queue *q, struct bio *bio)
+ 	return BLK_QC_T_NONE;
  }
- EXPORT_SYMBOL(target_free_sgl);
  
-@@ -2414,42 +2408,10 @@ int
- target_alloc_sgl(struct scatterlist **sgl, unsigned int *nents, u32 length,
- 		 bool zero_page, bool chainable)
++static enum blk_eh_timer_return null_rq_timed_out_fn(struct request *rq)
++{
++	pr_info("null: rq %p timed out\n", rq);
++	return BLK_EH_HANDLED;
++}
++
+ static int null_rq_prep_fn(struct request_queue *q, struct request *req)
  {
--	struct scatterlist *sg;
--	struct page *page;
--	gfp_t zero_flag = (zero_page) ? __GFP_ZERO : 0;
--	unsigned int nalloc, nent;
--	int i = 0;
--
--	nalloc = nent = DIV_ROUND_UP(length, PAGE_SIZE);
--	if (chainable)
--		nalloc++;
--	sg = kmalloc_array(nalloc, sizeof(struct scatterlist), GFP_KERNEL);
--	if (!sg)
--		return -ENOMEM;
-+	gfp_t gfp = GFP_KERNEL | (zero_page ? __GFP_ZERO : 0);
- 
--	sg_init_table(sg, nalloc);
--
--	while (length) {
--		u32 page_len = min_t(u32, length, PAGE_SIZE);
--		page = alloc_page(GFP_KERNEL | zero_flag);
--		if (!page)
--			goto out;
--
--		sg_set_page(&sg[i], page, page_len, 0);
--		length -= page_len;
--		i++;
--	}
--	*sgl = sg;
--	*nents = nent;
--	return 0;
--
--out:
--	while (i > 0) {
--		i--;
--		__free_page(sg_page(&sg[i]));
--	}
--	kfree(sg);
--	return -ENOMEM;
-+	*sgl = sgl_alloc_order(length, 0, chainable, gfp, nents);
-+	return *sgl ? 0 : -ENOMEM;
+ 	struct nullb *nullb = q->queuedata;
+@@ -1371,6 +1377,12 @@ static void null_request_fn(struct request_queue *q)
+ 	}
  }
- EXPORT_SYMBOL(target_alloc_sgl);
  
++static enum blk_eh_timer_return null_timeout_rq(struct request *rq, bool res)
++{
++	pr_info("null: rq %p timed out\n", rq);
++	return BLK_EH_HANDLED;
++}
++
+ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 			 const struct blk_mq_queue_data *bd)
+ {
+@@ -1394,6 +1406,7 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
+ static const struct blk_mq_ops null_mq_ops = {
+ 	.queue_rq       = null_queue_rq,
+ 	.complete	= null_softirq_done_fn,
++	.timeout	= null_timeout_rq,
+ };
+ 
+ static void cleanup_queue(struct nullb_queue *nq)
+@@ -1654,6 +1667,7 @@ static int null_add_dev(struct nullb_device *dev)
+ 		if (rv)
+ 			goto out_cleanup_queues;
+ 
++		nullb->tag_set->timeout = 5 * HZ;
+ 		nullb->q = blk_mq_init_queue(nullb->tag_set);
+ 		if (IS_ERR(nullb->q)) {
+ 			rv = -ENOMEM;
+@@ -1679,6 +1693,8 @@ static int null_add_dev(struct nullb_device *dev)
+ 		}
+ 		blk_queue_prep_rq(nullb->q, null_rq_prep_fn);
+ 		blk_queue_softirq_done(nullb->q, null_softirq_done_fn);
++		blk_queue_rq_timed_out(nullb->q, null_rq_timed_out_fn);
++		nullb->q->rq_timeout = 5 * HZ;
+ 		rv = init_driver_queues(nullb);
+ 		if (rv)
+ 			goto out_cleanup_blk_queue;
+
 -- 
-2.15.1
+Jens Axboe
