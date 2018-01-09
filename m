@@ -1,60 +1,76 @@
-Return-Path: <axboe@kernel.dk>
-Date: Tue, 9 Jan 2018 08:29:56 -0700
-From: Jens Axboe <axboe@kernel.dk>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-	Yi Zhang <yi.zhang@redhat.com>
-Subject: Re: [PATCH] blk-mq: fix kernel oops in blk_mq_tag_idle()
-Message-ID: <20180109152954.GA5512@kernel.dk>
-References: <20180109132829.31479-1-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180109132829.31479-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:56496 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753457AbeAIN3A (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 9 Jan 2018 08:29:00 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Yi Zhang <yi.zhang@redhat.com>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] blk-mq: fix kernel oops in blk_mq_tag_idle()
+Date: Tue,  9 Jan 2018 21:28:29 +0800
+Message-Id: <20180109132829.31479-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Tue, Jan 09 2018, Ming Lei wrote:
-> HW queues may be unmapped in some cases, such as blk_mq_update_nr_hw_queues(),
-> then we need to check it before calling blk_mq_tag_idle(), otherwise
-> the following kernel oops can be triggered, so fix it by checking if
-> the hw queue is unmapped since it doesn't make sense to idle the tags
-> any more after hw queues are unmapped.
+HW queues may be unmapped in some cases, such as blk_mq_update_nr_hw_queues(),
+then we need to check it before calling blk_mq_tag_idle(), otherwise
+the following kernel oops can be triggered, so fix it by checking if
+the hw queue is unmapped since it doesn't make sense to idle the tags
+any more after hw queues are unmapped.
 
-Seems cleaner to just move the mapped check to the idling function,
-especially since we already have the same check in the other spot where
-we call the idling.
+[  440.771298] Workqueue: nvme-wq nvme_rdma_del_ctrl_work [nvme_rdma]
+[  440.779104] task: ffff894bae755ee0 ti: ffff893bf9bc8000 task.ti: ffff893bf9bc8000
+[  440.788359] RIP: 0010:[<ffffffffb730e2b4>]  [<ffffffffb730e2b4>] __blk_mq_tag_idle+0x24/0x40
+[  440.798697] RSP: 0018:ffff893bf9bcbd10  EFLAGS: 00010286
+[  440.805538] RAX: 0000000000000000 RBX: ffff895bb131dc00 RCX: 000000000000011f
+[  440.814426] RDX: 00000000ffffffff RSI: 0000000000000120 RDI: ffff895bb131dc00
+[  440.823301] RBP: ffff893bf9bcbd10 R08: 000000000001b860 R09: 4a51d361c00c0000
+[  440.832193] R10: b5907f32b4cc7003 R11: ffffd6cabfb57000 R12: ffff894bafd1e008
+[  440.841091] R13: 0000000000000001 R14: ffff895baf770000 R15: 0000000000000080
+[  440.849988] FS:  0000000000000000(0000) GS:ffff894bbdcc0000(0000) knlGS:0000000000000000
+[  440.859955] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  440.867274] CR2: 0000000000000008 CR3: 000000103d098000 CR4: 00000000001407e0
+[  440.876169] Call Trace:
+[  440.879818]  [<ffffffffb7309d68>] blk_mq_exit_hctx+0xd8/0xe0
+[  440.887051]  [<ffffffffb730dc40>] blk_mq_free_queue+0xf0/0x160
+[  440.894465]  [<ffffffffb72ff679>] blk_cleanup_queue+0xd9/0x150
+[  440.901881]  [<ffffffffc08a802b>] nvme_ns_remove+0x5b/0xb0 [nvme_core]
+[  440.910068]  [<ffffffffc08a811b>] nvme_remove_namespaces+0x3b/0x60 [nvme_core]
+[  440.919026]  [<ffffffffc08b817b>] __nvme_rdma_remove_ctrl+0x2b/0xb0 [nvme_rdma]
+[  440.928079]  [<ffffffffc08b8237>] nvme_rdma_del_ctrl_work+0x17/0x20 [nvme_rdma]
+[  440.937126]  [<ffffffffb70ab58a>] process_one_work+0x17a/0x440
+[  440.944517]  [<ffffffffb70ac3a8>] worker_thread+0x278/0x3c0
+[  440.951607]  [<ffffffffb70ac130>] ? manage_workers.isra.24+0x2a0/0x2a0
+[  440.959760]  [<ffffffffb70b352f>] kthread+0xcf/0xe0
+[  440.966055]  [<ffffffffb70b3460>] ? insert_kthread_work+0x40/0x40
+[  440.973715]  [<ffffffffb76d8658>] ret_from_fork+0x58/0x90
+[  440.980586]  [<ffffffffb70b3460>] ? insert_kthread_work+0x40/0x40
+[  440.988229] Code: 5b 41 5c 5d c3 66 90 0f 1f 44 00 00 48 8b 87 20 01 00 00 f0 0f ba 77 40 01 19 d2 85 d2 75 08 c3 0f 1f 80 00 00 00 00 55 48 89 e5 <f0> ff 48 08 48 8d 78 10 e8 7f 0f 05 00 5d c3 0f 1f 00 66 2e 0f
+[  441.011620] RIP  [<ffffffffb730e2b4>] __blk_mq_tag_idle+0x24/0x40
+[  441.019301]  RSP <ffff893bf9bcbd10>
+[  441.024052] CR2: 0000000000000008
 
+Reported-by: Zhang Yi <yizhan@redhat.com>
+Tested-by: Zhang Yi <yizhan@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index 61deab0b5a5a..10e7e1ef8297 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -63,6 +63,8 @@ static inline bool blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
- 
- static inline void blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
- {
-+	if (!blk_mq_hw_queue_mapped(hctx))
-+		return;
- 	if (!(hctx->flags & BLK_MQ_F_TAG_SHARED))
- 		return;
- 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 111e1aa5562f..4d9f79bfdca2 100644
+index 111e1aa5562f..e258ad8dc171 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -873,11 +873,8 @@ static void blk_mq_timeout_work(struct work_struct *work)
- 	} else {
- 		struct blk_mq_hw_ctx *hctx;
+@@ -2015,7 +2015,8 @@ static void blk_mq_exit_hctx(struct request_queue *q,
+ {
+ 	blk_mq_debugfs_unregister_hctx(hctx);
  
--		queue_for_each_hw_ctx(q, hctx, i) {
--			/* the hctx may be unmapped, so check it here */
--			if (blk_mq_hw_queue_mapped(hctx))
--				blk_mq_tag_idle(hctx);
--		}
-+		queue_for_each_hw_ctx(q, hctx, i)
-+			blk_mq_tag_idle(hctx);
- 	}
- 	blk_queue_exit(q);
- }
-
+-	blk_mq_tag_idle(hctx);
++	if (blk_mq_hw_queue_mapped(hctx))
++		blk_mq_tag_idle(hctx);
+ 
+ 	if (set->ops->exit_request)
+ 		set->ops->exit_request(set, hctx->fq->flush_rq, hctx_idx);
 -- 
-Jens Axboe
+2.9.5
