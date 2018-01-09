@@ -1,31 +1,73 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Wed, 10 Jan 2018 09:06:13 +0100
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Linux Block <linux-block@vger.kernel.org>,
+Return-Path: <keith.busch@intel.com>
+From: Keith Busch <keith.busch@intel.com>
+To: Linux Block <linux-block@vger.kernel.org>,
 	Linux NVMe <linux-nvme@lists.infradead.org>,
-	Device Mapper <dm-devel@redhat.com>, Christoph Hellwig <hch@lst.de>,
-	Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Hannes Reinecke <hare@suse.com>, Sagi Grimberg <sagi@grimberg.me>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Device Mapper <dm-devel@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Bart VanAssche <bart.vanassche@wdc.com>,
 	James Smart <james.smart@broadcom.com>,
-	Bart VanAssche <bart.vanassche@wdc.com>
-Subject: Re: [dm-devel] [PATCHv2 3/5] block: Provide blk_status_t decoding
- for path errors
-Message-ID: <20180110080613.hklbnsxgumyw4s5h@linux-x5ow.site>
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <keith.busch@intel.com>
+Subject: [PATCHv2 3/5] block: Provide blk_status_t decoding for path errors
+Date: Tue,  9 Jan 2018 12:04:16 -0700
+Message-Id: <20180109190418.7123-4-keith.busch@intel.com>
+In-Reply-To: <20180109190418.7123-1-keith.busch@intel.com>
 References: <20180109190418.7123-1-keith.busch@intel.com>
- <20180109190418.7123-4-keith.busch@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20180109190418.7123-4-keith.busch@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+This patch provides a common decoder for block status path related errors
+that may be retried so various entities wishing to consult this do not
+have to duplicate this decision.
+
+Acked-by: Mike Snitzer <snitzer@redhat.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Keith Busch <keith.busch@intel.com>
+---
+ include/linux/blk_types.h | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index a1e628e032da..2d973ac54b09 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -39,6 +39,34 @@ typedef u8 __bitwise blk_status_t;
+ 
+ #define BLK_STS_AGAIN		((__force blk_status_t)12)
+ 
++/**
++ * blk_path_error - returns true if error may be path related
++ * @error: status the request was completed with
++ *
++ * Description:
++ *     This classifies block error status into non-retryable errors and ones
++ *     that may be successful if retried on a failover path.
++ *
++ * Return:
++ *     %false - retrying failover path will not help
++ *     %true  - may succeed if retried
++ */
++static inline bool blk_path_error(blk_status_t error)
++{
++	switch (error) {
++	case BLK_STS_NOTSUPP:
++	case BLK_STS_NOSPC:
++	case BLK_STS_TARGET:
++	case BLK_STS_NEXUS:
++	case BLK_STS_MEDIUM:
++	case BLK_STS_PROTECTION:
++		return false;
++	}
++
++	/* Anything else could be a path failure, so should be retried */
++	return true;
++}
++
+ struct blk_issue_stat {
+ 	u64 stat;
+ };
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.13.6
