@@ -12,11 +12,11 @@ Cc: linux-block@vger.kernel.org,
 	162996@studenti.unimore.it,
 	Paolo Valente <paolo.valente@linaro.org>,
 	Davide Ferrari <davideferrari8@gmail.com>
-Subject: [PATCH BUGFIX V2 1/2] block, bfq: put async queues for root bfq groups too
-Date: Tue,  9 Jan 2018 10:27:58 +0100
-Message-Id: <20180109092759.5454-2-paolo.valente@linaro.org>
-In-Reply-To: <20180109092759.5454-1-paolo.valente@linaro.org>
-References: <20180109092759.5454-1-paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX 1/2] block, bfq: put async queues for root bfq groups too
+Date: Tue,  9 Jan 2018 10:17:26 +0100
+Message-Id: <20180109091727.5262-2-paolo.valente@linaro.org>
+In-Reply-To: <20180109091727.5262-1-paolo.valente@linaro.org>
+References: <20180109091727.5262-1-paolo.valente@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
