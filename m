@@ -1,11 +1,14 @@
 Return-Path: <axboe@kernel.dk>
+Received: from localhost.localdomain ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id 202sm8885084ioz.84.2018.01.09.10.27.05
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Tue, 09 Jan 2018 10:27:05 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org
-Cc: osandov@fb.com,
-	bart.vanassche@wdc.com
-Subject: [PATCHSET v2 0/4] struct request optimizations
-Date: Tue,  9 Jan 2018 17:29:23 -0700
-Message-Id: <1515544167-10751-1-git-send-email-axboe@kernel.dk>
+Subject: [PATCHSET 0/4] struct request optimizations
+Date: Tue,  9 Jan 2018 11:26:58 -0700
+Message-Id: <1515522422-21596-1-git-send-email-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
 With the latest patchset from Tejun, we grew the request structure
@@ -24,15 +27,5 @@ select members.
 We end up doing better in synthetic testing after this, details
 in the last patch.
 
-Testing with timeouts on blk-mq and the legacy path work fine,
-no regressions introduced.
-
-Changes since v1:
-- Add comment on blk_rq_set_deadline() clearing COMPLETE bit.
-  Decided to keep it like that after discussing with Omar,
-  as it doesn't false convey safety wrt completions atomicity.
-- Rearrange a tiny bit more, and move CGROUP stuff to the end
-  so that enabling that doesn't screw everything up. Also
-  move hole near INTEGRITY, so that if that does get enabled,
-  we simply fill the hole.
-- Improve layout in mq rq filling.
+-- 
+Jens Axboe
