@@ -1,70 +1,120 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:55098 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752506AbeACOEm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Jan 2018 09:04:42 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, mlyle@lyle.org,
-        tang.junhui@zte.com.cn, Coly Li <colyli@suse.de>
-Subject: [PATCH v1 10/10] bcache: stop all attached bcache devices for a retired cache set
-Date: Wed,  3 Jan 2018 22:03:25 +0800
-Message-Id: <20180103140325.63175-11-colyli@suse.de>
-In-Reply-To: <20180103140325.63175-1-colyli@suse.de>
-References: <20180103140325.63175-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Wed, 10 Jan 2018 10:48:30 -0800
+From: Omar Sandoval <osandov@osandov.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Omar Sandoval <osandov@fb.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: Re: [PATCH] blk-mq: Rework blk_mq_mark_tag_wait()
+Message-ID: <20180110184830.GE30831@vader.DHCP.thefacebook.com>
+References: <20180110180428.22587-1-bart.vanassche@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180110180428.22587-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-When there are too many I/O errors on cache device, current bcache code
-will retire the whole cache set, and detach all bcache devices. But the
-detached bcache devices are not stopped, which is problematic when bcache
-is in writeback mode.
+On Wed, Jan 10, 2018 at 10:04:28AM -0800, Bart Van Assche wrote:
+> Use prepare_to_wait() and finish_wait() instead of open-coding these
+> functions. Reduce the number of if-statements to make
+> blk_mq_mark_tag_wait() easier to read. Both add_wait_queue() and
+> blk_mq_dispatch_wake() protect wait queue manipulations with the wait
+> queue lock. Hence also protect the !list_empty(&wait->entry) test with
+> the wait queue lock instead of the hctx lock.
+> 
+> Note: a side effect of this patch is that the task state is changed
+> for shared queues before and after the blk_mq_get_driver_tag().
+> Since blk_mq_dispatch_wake() ignores the task state these task state
+> changes do not affect which task gets woken up.
 
-If the retired cache set has dirty data of backing devices, continue
-writing to bcache device will write to backing device directly. If the
-LBA of write request has a dirty version cached on cache device, next time
-when the cache device is re-registered and backing device re-attached to
-it again, the stale dirty data on cache device will be written to backing
-device, and overwrite latest directly written data. This situation causes
-a quite data corruption.
+I'm not a fan of this. The reason it's open-coded is exactly because we
+don't want to mess around with the task state.
 
-This patch checkes whether cache_set->io_disable is true in
-__cache_set_unregister(). If cache_set->io_disable is true, it means cache
-set is unregistering by too many I/O errors, then all attached bcache
-devices will be stopped as well. If cache_set->io_disable is not true, it
-means __cache_set_unregister() is triggered by writing 1 to sysfs file
-/sys/fs/bcache/<UUID>/bcache/stop. This is an exception because users do
-it explicitly, this patch keeps existing behavior and does not stop any
-bcache device.
-
-Even the failed cache device has no dirty data, stopping bcache device is
-still a desired behavior by many Ceph and data base users. Then their
-application will report I/O errors due to disappeared bcache device, and
-operation people will know the cache device is broken or disconnected.
-
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/super.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 49d6fedf89c3..20a7a6959506 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1458,6 +1458,14 @@ static void __cache_set_unregister(struct closure *cl)
- 				dc = container_of(c->devices[i],
- 						  struct cached_dev, disk);
- 				bch_cached_dev_detach(dc);
-+				/*
-+				 * If we come here by too many I/O errors,
-+				 * bcache device should be stopped too, to
-+				 * keep data consistency on cache and
-+				 * backing devices.
-+				 */
-+				if (c->io_disable)
-+					bcache_device_stop(c->devices[i]);
- 			} else {
- 				bcache_device_stop(c->devices[i]);
- 			}
--- 
-2.15.1
+> See also commit f906a6a0f426 ("blk-mq: improve tag waiting setup for
+> non-shared tags").
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Cc: Hannes Reinecke <hare@suse.de>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
+>  block/blk-mq.c | 49 +++++++++++++++++--------------------------------
+>  1 file changed, 17 insertions(+), 32 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 61bdbf45c3be..29f140b4dbf7 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1121,50 +1121,35 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx **hctx,
+>  	if (!shared_tags) {
+>  		if (!test_bit(BLK_MQ_S_SCHED_RESTART, &this_hctx->state))
+>  			set_bit(BLK_MQ_S_SCHED_RESTART, &this_hctx->state);
+> +		ret = blk_mq_get_driver_tag(rq, hctx, false);
+> +		/*
+> +		 * Don't clear RESTART here, someone else could have set it.
+> +		 * At most this will cost an extra queue run.
+> +		 */
+>  	} else {
+>  		wait = &this_hctx->dispatch_wait;
+>  		if (!list_empty_careful(&wait->entry))
+>  			return false;
+>  
+> -		spin_lock(&this_hctx->lock);
+> -		if (!list_empty(&wait->entry)) {
+> -			spin_unlock(&this_hctx->lock);
+> -			return false;
+> -		}
+> -
+>  		ws = bt_wait_ptr(&this_hctx->tags->bitmap_tags, this_hctx);
+> -		add_wait_queue(&ws->wait, wait);
+> -	}
+> -
+> -	/*
+> -	 * It's possible that a tag was freed in the window between the
+> -	 * allocation failure and adding the hardware queue to the wait
+> -	 * queue.
+> -	 */
+> -	ret = blk_mq_get_driver_tag(rq, hctx, false);
+> +		prepare_to_wait(&ws->wait, wait, TASK_UNINTERRUPTIBLE);
+>  
+> -	if (!shared_tags) {
+>  		/*
+> -		 * Don't clear RESTART here, someone else could have set it.
+> -		 * At most this will cost an extra queue run.
+> +		 * It's possible that a tag was freed in the window between the
+> +		 * allocation failure and adding the hardware queue to the wait
+> +		 * queue.
+>  		 */
+> -		return ret;
+> -	} else {
+> -		if (!ret) {
+> -			spin_unlock(&this_hctx->lock);
+> -			return false;
+> -		}
+> -
+> +		ret = blk_mq_get_driver_tag(rq, hctx, false);
+>  		/*
+> -		 * We got a tag, remove ourselves from the wait queue to ensure
+> -		 * someone else gets the wakeup.
+> +		 * If we got a tag, remove ourselves from the wait queue to
+> +		 * ensure someone else gets the wakeup.
+>  		 */
+> -		spin_lock_irq(&ws->wait.lock);
+> -		list_del_init(&wait->entry);
+> -		spin_unlock_irq(&ws->wait.lock);
+> -		spin_unlock(&this_hctx->lock);
+> -		return true;
+> +		if (ret)
+> +			finish_wait(&ws->wait, wait);
+> +		else
+> +			__set_current_state(TASK_RUNNING);
+>  	}
+> +	return ret;
+>  }
+>  
+>  bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+> -- 
+> 2.15.1
+> 
