@@ -1,133 +1,146 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:49021 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751709AbeANOoA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 Jan 2018 09:44:00 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Michael Lyle <mlyle@lyle.org>,
-        Junhui Tang <tang.junhui@zte.com.cn>
-Subject: [PATCH v3 07/13] bcache: set error_limit correctly
-Date: Sun, 14 Jan 2018 22:42:30 +0800
-Message-Id: <20180114144236.28213-8-colyli@suse.de>
-In-Reply-To: <20180114144236.28213-1-colyli@suse.de>
-References: <20180114144236.28213-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=541b0d852=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Hannes Reinecke <hare@suse.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Doug Ledford <dledford@redhat.com>,
+	linux-scsi@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v2 2/4] block: Introduce blk_start_wait_if_quiesced() and blk_finish_wait_if_quiesced()
+Date: Wed, 10 Jan 2018 10:18:15 -0800
+Message-Id: <20180110181817.25166-3-bart.vanassche@wdc.com>
+In-Reply-To: <20180110181817.25166-1-bart.vanassche@wdc.com>
+References: <20180110181817.25166-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Struct cache uses io_errors for two purposes,
-- Error decay: when cache set error_decay is set, io_errors is used to
-  generate a small piece of delay when I/O error happens.
-- I/O errors counter: in order to generate big enough value for error
-  decay, I/O errors counter value is stored by left shifting 20 bits (a.k.a
-  IO_ERROR_SHIFT).
+Introduce functions that allow block drivers to wait while a request
+queue is in the quiesced state (blk-mq) or in the stopped state (legacy
+block layer). The next patch will add calls to these functions in the
+SCSI core.
 
-In function bch_count_io_errors(), if I/O errors counter reaches cache set
-error limit, bch_cache_set_error() will be called to retire the whold cache
-set. But current code is problematic when checking the error limit, see the
-following code piece from bch_count_io_errors(),
-
- 90     if (error) {
- 91             char buf[BDEVNAME_SIZE];
- 92             unsigned errors = atomic_add_return(1 << IO_ERROR_SHIFT,
- 93                                                 &ca->io_errors);
- 94             errors >>= IO_ERROR_SHIFT;
- 95
- 96             if (errors < ca->set->error_limit)
- 97                     pr_err("%s: IO error on %s, recovering",
- 98                            bdevname(ca->bdev, buf), m);
- 99             else
-100                     bch_cache_set_error(ca->set,
-101                                         "%s: too many IO errors %s",
-102                                         bdevname(ca->bdev, buf), m);
-103     }
-
-At line 94, errors is right shifting IO_ERROR_SHIFT bits, now it is real
-errors counter to compare at line 96. But ca->set->error_limit is initia-
-lized with an amplified value in bch_cache_set_alloc(),
-1545         c->error_limit  = 8 << IO_ERROR_SHIFT;
-
-It means by default, in bch_count_io_errors(), before 8<<20 errors happened
-bch_cache_set_error() won't be called to retire the problematic cache
-device. If the average request size is 64KB, it means bcache won't handle
-failed device until 512GB data is requested. This is too large to be an I/O
-threashold. So I believe the correct error limit should be much less.
-
-This patch sets default cache set error limit to 8, then in
-bch_count_io_errors() when errors counter reaches 8 (if it is default
-value), function bch_cache_set_error() will be called to retire the whole
-cache set. This patch also removes bits shifting when store or show
-io_error_limit value via sysfs interface.
-
-Nowadays most of SSDs handle internal flash failure automatically by LBA
-address re-indirect mapping. If an I/O error can be observed by upper layer
-code, it will be a notable error because that SSD can not re-indirect
-map the problematic LBA address to an available flash block. This situation
-indicates the whole SSD will be failed very soon. Therefore setting 8 as
-the default io error limit value makes sense, it is enough for most of
-cache devices.
-
-Changelog:
-v2: add reviewed-by from Hannes.
-v1: initial version for review.
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Cc: Michael Lyle <mlyle@lyle.org>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/bcache/bcache.h | 1 +
- drivers/md/bcache/super.c  | 2 +-
- drivers/md/bcache/sysfs.c  | 4 ++--
- 3 files changed, 4 insertions(+), 3 deletions(-)
+ block/blk-core.c       |  1 +
+ block/blk-mq.c         | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/blk-mq.h |  2 ++
+ 3 files changed, 67 insertions(+)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 88d938c8d027..7d7512fa4f09 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -663,6 +663,7 @@ struct cache_set {
- 		ON_ERROR_UNREGISTER,
- 		ON_ERROR_PANIC,
- 	}			on_error;
-+#define DEFAULT_IO_ERROR_LIMIT 8
- 	unsigned		error_limit;
- 	unsigned		error_decay;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index c10b4ce95248..06eaea15bae9 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -287,6 +287,7 @@ void blk_start_queue(struct request_queue *q)
+ 	WARN_ON_ONCE(q->mq_ops);
  
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 6d888e8fea8c..a373648b5d4b 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1583,7 +1583,7 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
+ 	queue_flag_clear(QUEUE_FLAG_STOPPED, q);
++	wake_up_all(&q->mq_wq);
+ 	__blk_run_queue(q);
+ }
+ EXPORT_SYMBOL(blk_start_queue);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a05ea7e9b415..87455977ad34 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -247,11 +247,75 @@ void blk_mq_unquiesce_queue(struct request_queue *q)
+ 	queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
+ 	spin_unlock_irqrestore(q->queue_lock, flags);
  
- 	c->congested_read_threshold_us	= 2000;
- 	c->congested_write_threshold_us	= 20000;
--	c->error_limit	= 8 << IO_ERROR_SHIFT;
-+	c->error_limit	= DEFAULT_IO_ERROR_LIMIT;
++	wake_up_all(&q->mq_wq);
++
+ 	/* dispatch requests which are inserted during quiescing */
+ 	blk_mq_run_hw_queues(q, true);
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
  
- 	return c;
- err:
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index b7166c504cdb..ba62e987b503 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -560,7 +560,7 @@ SHOW(__bch_cache_set)
- 
- 	/* See count_io_errors for why 88 */
- 	sysfs_print(io_error_halflife,	c->error_decay * 88);
--	sysfs_print(io_error_limit,	c->error_limit >> IO_ERROR_SHIFT);
-+	sysfs_print(io_error_limit,	c->error_limit);
- 
- 	sysfs_hprint(congested,
- 		     ((uint64_t) bch_get_congested(c)) << 9);
-@@ -660,7 +660,7 @@ STORE(__bch_cache_set)
- 	}
- 
- 	if (attr == &sysfs_io_error_limit)
--		c->error_limit = strtoul_or_return(buf) << IO_ERROR_SHIFT;
-+		c->error_limit = strtoul_or_return(buf);
- 
- 	/* See count_io_errors() for why 88 */
- 	if (attr == &sysfs_io_error_halflife)
++/**
++ * blk_start_wait_if_quiesced() - wait if a queue is quiesced (blk-mq) or stopped (legacy block layer)
++ * @q: Request queue pointer.
++ *
++ * Some block drivers, e.g. the SCSI core, can bypass the block layer core
++ * request submission mechanism. Surround such code with
++ * blk_start_wait_if_quiesced() / blk_finish_wait_if_quiesced() to avoid that
++ * request submission can happen while a queue is quiesced or stopped.
++ *
++ * Returns with the RCU read lock held (blk-mq) or with q->queue_lock held
++ * (legacy block layer).
++ *
++ * Notes:
++ * - Every call of this function must be followed by a call of
++ *   blk_finish_wait_if_quiesced().
++ * - This function does not support block drivers whose .queue_rq()
++ *   implementation can sleep (BLK_MQ_F_BLOCKING).
++ */
++int blk_start_wait_if_quiesced(struct request_queue *q)
++{
++	struct blk_mq_hw_ctx *hctx;
++	unsigned int i;
++
++	might_sleep();
++
++	if (q->mq_ops) {
++		queue_for_each_hw_ctx(q, hctx, i)
++			WARN_ON(hctx->flags & BLK_MQ_F_BLOCKING);
++
++		rcu_read_lock();
++		while (!blk_queue_dying(q) && blk_queue_quiesced(q)) {
++			rcu_read_unlock();
++			wait_event(q->mq_wq, blk_queue_dying(q) ||
++				   !blk_queue_quiesced(q));
++			rcu_read_lock();
++		}
++	} else {
++		spin_lock_irq(q->queue_lock);
++		wait_event_lock_irq(q->mq_wq,
++				    blk_queue_dying(q) || !blk_queue_stopped(q),
++				    *q->queue_lock);
++		q->request_fn_active++;
++	}
++	return blk_queue_dying(q) ? -ENODEV : 0;
++}
++EXPORT_SYMBOL(blk_start_wait_if_quiesced);
++
++/**
++ * blk_finish_wait_if_quiesced() - counterpart of blk_start_wait_if_quiesced()
++ * @q: Request queue pointer.
++ */
++void blk_finish_wait_if_quiesced(struct request_queue *q)
++{
++	if (q->mq_ops) {
++		rcu_read_unlock();
++	} else {
++		q->request_fn_active--;
++		spin_unlock_irq(q->queue_lock);
++	}
++}
++EXPORT_SYMBOL(blk_finish_wait_if_quiesced);
++
+ void blk_mq_wake_waiters(struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 8efcf49796a3..15912cd348b5 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -267,6 +267,8 @@ void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
+ void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
+ void blk_mq_quiesce_queue(struct request_queue *q);
+ void blk_mq_unquiesce_queue(struct request_queue *q);
++int blk_start_wait_if_quiesced(struct request_queue *q);
++void blk_finish_wait_if_quiesced(struct request_queue *q);
+ void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
+ bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
+ void blk_mq_run_hw_queues(struct request_queue *q, bool async);
 -- 
 2.15.1
