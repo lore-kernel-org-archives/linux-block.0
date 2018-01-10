@@ -1,131 +1,54 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-From: Tejun Heo <tj@kernel.org>
-To: jack@suse.cz,
-	axboe@kernel.dk,
-	clm@fb.com,
-	jbacik@fb.com
-Cc: kernel-team@fb.com,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	peterz@infradead.org,
-	jianchao.w.wang@oracle.com,
-	Bart.VanAssche@wdc.com,
-	linux-block@vger.kernel.org,
-	Tejun Heo <tj@kernel.org>
-Subject: [PATCH 6/8] blk-mq: remove REQ_ATOM_COMPLETE usages from blk-mq
-Date: Tue,  9 Jan 2018 08:29:51 -0800
-Message-Id: <20180109162953.1211451-7-tj@kernel.org>
-In-Reply-To: <20180109162953.1211451-1-tj@kernel.org>
-References: <20180109162953.1211451-1-tj@kernel.org>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Wed, 10 Jan 2018 10:45:39 -0800
+From: Omar Sandoval <osandov@osandov.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"osandov@fb.com" <osandov@fb.com>
+Subject: Re: [PATCH 3/4] block: convert REQ_ATOM_COMPLETE to stealing
+ rq->__deadline bit
+Message-ID: <20180110184539.GD30831@vader.DHCP.thefacebook.com>
+References: <1515544167-10751-1-git-send-email-axboe@kernel.dk>
+ <1515544167-10751-4-git-send-email-axboe@kernel.dk>
+ <1515608975.2745.14.camel@wdc.com>
+ <1ce2cc85-1217-c0a8-2ca3-afe3e1c3845c@kernel.dk>
+ <1515609201.2745.15.camel@wdc.com>
+ <6a128067-6a29-ed07-9d2e-511bc72d18f2@kernel.dk>
+ <1515609735.2745.21.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1515609735.2745.21.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-After the recent updates to use generation number and state based
-synchronization, blk-mq no longer depends on REQ_ATOM_COMPLETE except
-to avoid firing the same timeout multiple times.
+On Wed, Jan 10, 2018 at 06:42:17PM +0000, Bart Van Assche wrote:
+> On Wed, 2018-01-10 at 11:35 -0700, Jens Axboe wrote:
+> > On 1/10/18 11:33 AM, Bart Van Assche wrote:
+> > > On Wed, 2018-01-10 at 11:32 -0700, Jens Axboe wrote:
+> > > > On 1/10/18 11:29 AM, Bart Van Assche wrote:
+> > > > > On Tue, 2018-01-09 at 17:29 -0700, Jens Axboe wrote:
+> > > > > > @@ -313,8 +307,6 @@ int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq)
+> > > > > >  	seq_puts(m, ", .rq_flags=");
+> > > > > >  	blk_flags_show(m, (__force unsigned int)rq->rq_flags, rqf_name,
+> > > > > >  		       ARRAY_SIZE(rqf_name));
+> > > > > > -	seq_puts(m, ", .atomic_flags=");
+> > > > > > -	blk_flags_show(m, rq->atomic_flags, rqaf_name, ARRAY_SIZE(rqaf_name));
+> > > > > >  	seq_printf(m, ", .tag=%d, .internal_tag=%d", rq->tag,
+> > > > > >  		   rq->internal_tag);
+> > > > > >  	if (mq_ops->show_rq)
+> > > > > 
+> > > > > Whether or not a request has been marked complete is very useful to know. Have you
+> > > > > considered to show the return value of blk_rq_is_complete() in the debugfs output?
+> > > > 
+> > > > Yeah, that's a good point. Let me add that in lieu of the atomic flags that
+> > > > are being killed. Are you fine with the patch then?
+> > > 
+> > > The rest of the patch looks fine to me. This is the only comment I had about this patch.
+> > 
+> > http://git.kernel.dk/cgit/linux-block/commit/?h=blk-kill-atomic-flags&id=3d34009082f5e72137d6bb38cbc2ff6047f03fd1
+> > 
+> > Added a complete= entry for it.
+> 
+> For that patch: Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
 
-Remove all REQ_ATOM_COMPLETE usages and use a new rq_flags flag
-RQF_MQ_TIMEOUT_EXPIRED to avoid firing the same timeout multiple
-times.  This removes atomic bitops from hot paths too.
-
-v2: Removed blk_clear_rq_complete() from blk_mq_rq_timed_out().
-
-v3: Added RQF_MQ_TIMEOUT_EXPIRED flag.
-
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Cc: "jianchao.wang" <jianchao.w.wang@oracle.com>
----
- block/blk-mq.c         | 15 +++++++--------
- block/blk-timeout.c    |  1 +
- include/linux/blkdev.h |  2 ++
- 3 files changed, 10 insertions(+), 8 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b419746..3f297f0 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -634,8 +634,7 @@ void blk_mq_complete_request(struct request *rq)
- 	 * hctx_lock() covers both issue and completion paths.
- 	 */
- 	hctx_lock(hctx, &srcu_idx);
--	if (blk_mq_rq_aborted_gstate(rq) != rq->gstate &&
--	    !blk_mark_rq_complete(rq))
-+	if (blk_mq_rq_aborted_gstate(rq) != rq->gstate)
- 		__blk_mq_complete_request(rq);
- 	hctx_unlock(hctx, srcu_idx);
- }
-@@ -685,8 +684,6 @@ void blk_mq_start_request(struct request *rq)
- 	preempt_enable();
- 
- 	set_bit(REQ_ATOM_STARTED, &rq->atomic_flags);
--	if (test_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags))
--		clear_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags);
- 
- 	if (q->dma_drain_size && blk_rq_bytes(rq)) {
- 		/*
-@@ -837,6 +834,8 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
- 	if (!test_bit(REQ_ATOM_STARTED, &req->atomic_flags))
- 		return;
- 
-+	req->rq_flags |= RQF_MQ_TIMEOUT_EXPIRED;
-+
- 	if (ops->timeout)
- 		ret = ops->timeout(req, reserved);
- 
-@@ -852,7 +851,6 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
- 		 */
- 		blk_mq_rq_update_aborted_gstate(req, 0);
- 		blk_add_timer(req);
--		blk_clear_rq_complete(req);
- 		break;
- 	case BLK_EH_NOT_HANDLED:
- 		break;
-@@ -871,7 +869,8 @@ static void blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
- 
- 	might_sleep();
- 
--	if (!test_bit(REQ_ATOM_STARTED, &rq->atomic_flags))
-+	if ((rq->rq_flags & RQF_MQ_TIMEOUT_EXPIRED) ||
-+	    !test_bit(REQ_ATOM_STARTED, &rq->atomic_flags))
- 		return;
- 
- 	/* read coherent snapshots of @rq->state_gen and @rq->deadline */
-@@ -906,8 +905,8 @@ static void blk_mq_terminate_expired(struct blk_mq_hw_ctx *hctx,
- 	 * now guaranteed to see @rq->aborted_gstate and yield.  If
- 	 * @rq->aborted_gstate still matches @rq->gstate, @rq is ours.
- 	 */
--	if (READ_ONCE(rq->gstate) == rq->aborted_gstate &&
--	    !blk_mark_rq_complete(rq))
-+	if (!(rq->rq_flags & RQF_MQ_TIMEOUT_EXPIRED) &&
-+	    READ_ONCE(rq->gstate) == rq->aborted_gstate)
- 		blk_mq_rq_timed_out(rq, reserved);
- }
- 
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index 4f04cd1..ebe9996 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -214,6 +214,7 @@ void blk_add_timer(struct request *req)
- 		req->timeout = q->rq_timeout;
- 
- 	req->deadline = jiffies + req->timeout;
-+	req->rq_flags &= ~RQF_MQ_TIMEOUT_EXPIRED;
- 
- 	/*
- 	 * Only the non-mq case needs to add the request to a protected list.
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index ae563d0..007a7cf 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -125,6 +125,8 @@ typedef __u32 __bitwise req_flags_t;
- #define RQF_SPECIAL_PAYLOAD	((__force req_flags_t)(1 << 18))
- /* The per-zone write lock is held for this request */
- #define RQF_ZONE_WRITE_LOCKED	((__force req_flags_t)(1 << 19))
-+/* timeout is expired */
-+#define RQF_MQ_TIMEOUT_EXPIRED	((__force req_flags_t)(1 << 20))
- 
- /* flags that prevent us from merging requests: */
- #define RQF_NOMERGE_FLAGS \
--- 
-2.9.5
+Also Reviewed-by: Omar Sandoval <osandov@fb.com>
