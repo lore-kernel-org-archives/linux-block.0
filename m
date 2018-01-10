@@ -1,99 +1,25 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:33847 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757228AbeAHUVs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jan 2018 15:21:48 -0500
-Received: by mail-pf0-f193.google.com with SMTP id e76so1992656pfk.1
-        for <linux-block@vger.kernel.org>; Mon, 08 Jan 2018 12:21:48 -0800 (PST)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Michael Lyle <mlyle@lyle.org>
-Subject: [416 PATCH 07/13] bcache: allow quick writeback when backing idle
-Date: Mon,  8 Jan 2018 12:21:24 -0800
-Message-Id: <20180108202130.31303-8-mlyle@lyle.org>
-In-Reply-To: <20180108202130.31303-1-mlyle@lyle.org>
-References: <20180108202130.31303-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] blk-mq: Add locking annotations to hctx_lock() and
+ hctx_unlock()
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Tejun Heo <tj@kernel.org>
+References: <20180110193427.6601-1-bart.vanassche@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <0c2e7dbf-b124-f448-ea39-51e1de4aa682@kernel.dk>
+Date: Wed, 10 Jan 2018 12:36:22 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180110193427.6601-1-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-If the control system would wait for at least half a second, and there's
-been no reqs hitting the backing disk for awhile: use an alternate mode
-where we have at most one contiguous set of writebacks in flight at a
-time. (But don't otherwise delay).  If front-end IO appears, it will
-still be quick, as it will only have to contend with one real operation
-in flight.  But otherwise, we'll be sending data to the backing disk as
-quickly as it can accept it (with one op at a time).
+On 1/10/18 12:34 PM, Bart Van Assche wrote:
+> This patch avoids that sparse reports the following:
+> 
+> block/blk-mq.c:637:33: warning: context imbalance in 'hctx_unlock' - unexpected unlock
+> block/blk-mq.c:642:9: warning: context imbalance in 'hctx_lock' - wrong count at exit
 
-Signed-off-by: Michael Lyle <mlyle@lyle.org>
-Reviewed-by: Tang Junhui <tang.junhui@zte.com.cn>
-Acked-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/bcache.h    |  7 +++++++
- drivers/md/bcache/request.c   |  1 +
- drivers/md/bcache/writeback.c | 21 +++++++++++++++++++++
- 3 files changed, 29 insertions(+)
+Thanks Bart, applied.
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 3be0fcc19b1f..5f7b0b2513cc 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -320,6 +320,13 @@ struct cached_dev {
- 	 */
- 	atomic_t		has_dirty;
- 
-+	/*
-+	 * Set to zero by things that touch the backing volume-- except
-+	 * writeback.  Incremented by writeback.  Used to determine when to
-+	 * accelerate idle writeback.
-+	 */
-+	atomic_t		backing_idle;
-+
- 	struct bch_ratelimit	writeback_rate;
- 	struct delayed_work	writeback_rate_update;
- 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 52b4ce24f9e2..ddd941056f3c 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -996,6 +996,7 @@ static blk_qc_t cached_dev_make_request(struct request_queue *q,
- 	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
- 	int rw = bio_data_dir(bio);
- 
-+	atomic_set(&dc->backing_idle, 0);
- 	generic_start_io_acct(q, rw, bio_sectors(bio), &d->disk->part0);
- 
- 	bio_set_dev(bio, dc->bdev);
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 6e1d2fde43df..f82ffb2e9b9b 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -356,6 +356,27 @@ static void read_dirty(struct cached_dev *dc)
- 
- 		delay = writeback_delay(dc, size);
- 
-+		/* If the control system would wait for at least half a
-+		 * second, and there's been no reqs hitting the backing disk
-+		 * for awhile: use an alternate mode where we have at most
-+		 * one contiguous set of writebacks in flight at a time.  If
-+		 * someone wants to do IO it will be quick, as it will only
-+		 * have to contend with one operation in flight, and we'll
-+		 * be round-tripping data to the backing disk as quickly as
-+		 * it can accept it.
-+		 */
-+		if (delay >= HZ / 2) {
-+			/* 3 means at least 1.5 seconds, up to 7.5 if we
-+			 * have slowed way down.
-+			 */
-+			if (atomic_inc_return(&dc->backing_idle) >= 3) {
-+				/* Wait for current I/Os to finish */
-+				closure_sync(&cl);
-+				/* And immediately launch a new set. */
-+				delay = 0;
-+			}
-+		}
-+
- 		while (!kthread_should_stop() && delay) {
- 			schedule_timeout_interruptible(delay);
- 			delay = writeback_delay(dc, 0);
 -- 
-2.14.1
+Jens Axboe
