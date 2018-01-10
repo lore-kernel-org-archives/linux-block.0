@@ -1,121 +1,90 @@
-Return-Path: <prvs=53600bcc8=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-nvme@lists.infradead.org,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Keith Busch <keith.busch@intel.com>,
-	James Smart <james.smart@broadcom.com>,
-	Sagi Grimberg <sagi@grimberg.me>
-Subject: [PATCH v4 3/5] nvmet/fc: Use sgl_alloc() and sgl_free()
-Date: Fri,  5 Jan 2018 08:26:48 -0800
-Message-Id: <20180105162650.31083-4-bart.vanassche@wdc.com>
-In-Reply-To: <20180105162650.31083-1-bart.vanassche@wdc.com>
-References: <20180105162650.31083-1-bart.vanassche@wdc.com>
+Return-Path: <msnitzer@redhat.com>
+Date: Wed, 10 Jan 2018 09:20:19 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <Bart.VanAssche@wdc.com>,
+	linux-block <linux-block@vger.kernel.org>,
+	"open list:DEVICE-MAPPER (LVM)" <dm-devel@redhat.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [for-4.16 PATCH v2 2/3] block: cope with gendisk's 'queue' being
+ added later
+Message-ID: <20180110142019.GB23410@redhat.com>
+References: <20180110024104.34885-1-snitzer@redhat.com>
+ <20180110024104.34885-3-snitzer@redhat.com>
+ <CACVXFVPWEsfv+xEWiAL5nT1p9FazgMcH1U7h7zCA_CSQqrEMiw@mail.gmail.com>
+ <20180110042113.GA20494@redhat.com>
+ <CACVXFVPGesRgLCShzLkXYw+fbefPMLEEqc05Xa_w3qiXqrDFvA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CACVXFVPGesRgLCShzLkXYw+fbefPMLEEqc05Xa_w3qiXqrDFvA@mail.gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Use the sgl_alloc() and sgl_free() functions instead of open coding
-these functions.
+On Wed, Jan 10 2018 at  2:55am -0500,
+Ming Lei <tom.leiming@gmail.com> wrote:
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Cc: Keith Busch <keith.busch@intel.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: James Smart <james.smart@broadcom.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/nvme/target/Kconfig |  1 +
- drivers/nvme/target/fc.c    | 36 ++----------------------------------
- 2 files changed, 3 insertions(+), 34 deletions(-)
+> On Wed, Jan 10, 2018 at 12:21 PM, Mike Snitzer <snitzer@redhat.com> wrote:
+> > On Tue, Jan 09 2018 at 10:46pm -0500,
+> > Ming Lei <tom.leiming@gmail.com> wrote:
+> >
+> >> Another related issue is that blk-mq debugfs can't work yet for dm-mpath.
+> >
+> > Not sure how that is a related issue to this thread.
+> > But can you expand on that?  I'm not familiar with "blk-mq debugfs".
+> > Any pointer to code that activates it?  Could be that my changes make it
+> > work now...
+> 
+> Hi,
+> 
+> blk_mq_debugfs_register() is called in blk_register_queue() from add_disk(),
+> and blk_mq_debugfs_register() need queue's information to setup mq debugfs
+> stuff.
+> 
+> But your patch does fix this issue, cool!
 
-diff --git a/drivers/nvme/target/Kconfig b/drivers/nvme/target/Kconfig
-index 03e4ab65fe77..4d9715630e21 100644
---- a/drivers/nvme/target/Kconfig
-+++ b/drivers/nvme/target/Kconfig
-@@ -39,6 +39,7 @@ config NVME_TARGET_FC
- 	tristate "NVMe over Fabrics FC target driver"
- 	depends on NVME_TARGET
- 	depends on HAS_DMA
-+	select SGL_ALLOC
- 	help
- 	  This enables the NVMe FC target support, which allows exporting NVMe
- 	  devices over FC.
-diff --git a/drivers/nvme/target/fc.c b/drivers/nvme/target/fc.c
-index 5fd86039e353..840d1a39de33 100644
---- a/drivers/nvme/target/fc.c
-+++ b/drivers/nvme/target/fc.c
-@@ -1697,31 +1697,12 @@ static int
- nvmet_fc_alloc_tgt_pgs(struct nvmet_fc_fcp_iod *fod)
- {
- 	struct scatterlist *sg;
--	struct page *page;
- 	unsigned int nent;
--	u32 page_len, length;
--	int i = 0;
+Great, thought it might.
  
--	length = fod->req.transfer_len;
--	nent = DIV_ROUND_UP(length, PAGE_SIZE);
--	sg = kmalloc_array(nent, sizeof(struct scatterlist), GFP_KERNEL);
-+	sg = sgl_alloc(fod->req.transfer_len, GFP_KERNEL, &nent);
- 	if (!sg)
- 		goto out;
- 
--	sg_init_table(sg, nent);
--
--	while (length) {
--		page_len = min_t(u32, length, PAGE_SIZE);
--
--		page = alloc_page(GFP_KERNEL);
--		if (!page)
--			goto out_free_pages;
--
--		sg_set_page(&sg[i], page, page_len, 0);
--		length -= page_len;
--		i++;
--	}
--
- 	fod->data_sg = sg;
- 	fod->data_sg_cnt = nent;
- 	fod->data_sg_cnt = fc_dma_map_sg(fod->tgtport->dev, sg, nent,
-@@ -1731,14 +1712,6 @@ nvmet_fc_alloc_tgt_pgs(struct nvmet_fc_fcp_iod *fod)
- 
- 	return 0;
- 
--out_free_pages:
--	while (i > 0) {
--		i--;
--		__free_page(sg_page(&sg[i]));
--	}
--	kfree(sg);
--	fod->data_sg = NULL;
--	fod->data_sg_cnt = 0;
- out:
- 	return NVME_SC_INTERNAL;
- }
-@@ -1746,18 +1719,13 @@ nvmet_fc_alloc_tgt_pgs(struct nvmet_fc_fcp_iod *fod)
- static void
- nvmet_fc_free_tgt_pgs(struct nvmet_fc_fcp_iod *fod)
- {
--	struct scatterlist *sg;
--	int count;
--
- 	if (!fod->data_sg || !fod->data_sg_cnt)
- 		return;
- 
- 	fc_dma_unmap_sg(fod->tgtport->dev, fod->data_sg, fod->data_sg_cnt,
- 				((fod->io_dir == NVMET_FCP_WRITE) ?
- 					DMA_FROM_DEVICE : DMA_TO_DEVICE));
--	for_each_sg(fod->data_sg, sg, fod->data_sg_cnt, count)
--		__free_page(sg_page(sg));
--	kfree(fod->data_sg);
-+	sgl_free(fod->data_sg);
- 	fod->data_sg = NULL;
- 	fod->data_sg_cnt = 0;
- }
--- 
-2.15.1
+> >> So I am just wondering if it is possible to follow the usual way to add disk
+> >> after setting up queue for DM? If it is possible, it may avoid lots of trouble
+> >> for us.
+> >
+> > As I explained in the header (quoted above actually) it is _not_
+> > possible.  It is the gendisk that enables the device stack to be
+> > constructed (at least how DM's stacking is currently implemented with
+> > bd_link_disk_holder() and taking references on devices found in a DM
+> > device's table).  And from that gendisk I can then walk the devices to
+> > establish the request_queue as needed, its stacked limits, etc.
+> >
+> > The approach I've taken in these patches is the closest I've gotten to
+> > make DM _much_ more sane about how its request_queue is established.
+> > But its still off the beaten path due to needing "block: cope with
+> > gendisk's 'queue' being added later".
+> 
+> OK, thanks for your explanation.
+> 
+> After taking close look at your patches, I think this approach is clean.
+> But there are still corner cases which need to be addressed:
+> 
+> 1) in the following disk attributes, queue is referenced, so we have
+> to add check in their show/store operations since the attributes
+> are shown up just after disk is added.
+> 
+>      disk_alignment_offset_show
+>      disk_discard_alignment_show
+>      part_timeout_show/part_timeout_store
+> 
+> 2) same issue on /proc/diskstats: see diskstats_show()
+> 
+> 3) in IO path, looks we already checked disk->queue in
+> generic_make_request_checks(), so it should be fine, and you set
+> disk->queue after the queue is fully initialized in the 3rd patch.
+
+I'll work through these and see what I can do.
+
+Will likely deal with each independent of the 2/3 patch (otherwise
+if I just keep folding changes in to the original patch review will get
+too hard).
+
+So hopefully I'll have a v3 to share later today.
+
+Thanks,
+Mike
