@@ -1,128 +1,27 @@
-Return-Path: <prvs=541b0d852=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Omar Sandoval <osandov@fb.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v3 1/2] blk-mq: Reduce the number of if-statements in blk_mq_mark_tag_wait()
-Date: Wed, 10 Jan 2018 13:41:21 -0800
-Message-Id: <20180110214122.15452-2-bart.vanassche@wdc.com>
-In-Reply-To: <20180110214122.15452-1-bart.vanassche@wdc.com>
-References: <20180110214122.15452-1-bart.vanassche@wdc.com>
+Return-Path: <prvs=541b0d852=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>, "jthumshirn@suse.de" <jthumshirn@suse.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "osandov@fb.com"
+	<osandov@fb.com>, "hare@suse.de" <hare@suse.de>
+Subject: Re: [PATCH v2 1/2] blk-mq: Reduce the number of if-statements in
+ blk_mq_mark_tag_wait()
+Date: Wed, 10 Jan 2018 21:03:22 +0000
+Message-ID: <1515618201.2745.28.camel@wdc.com>
+References: <20180110193919.6886-1-bart.vanassche@wdc.com>
+	 <20180110193919.6886-2-bart.vanassche@wdc.com>
+	 <8557bbde-0923-e6d3-b1d3-54e429aadb9f@kernel.dk>
+In-Reply-To: <8557bbde-0923-e6d3-b1d3-54e429aadb9f@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-This patch does not change any functionality but makes the
-blk_mq_mark_tag_wait() code slightly easier to read.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
----
- block/blk-mq.c | 69 +++++++++++++++++++++++++++++-----------------------------
- 1 file changed, 35 insertions(+), 34 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1d705e25852e..f27bcb6f6751 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1181,58 +1181,59 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx **hctx,
- 				 struct request *rq)
- {
- 	struct blk_mq_hw_ctx *this_hctx = *hctx;
--	bool shared_tags = (this_hctx->flags & BLK_MQ_F_TAG_SHARED) != 0;
- 	struct sbq_wait_state *ws;
- 	wait_queue_entry_t *wait;
- 	bool ret;
- 
--	if (!shared_tags) {
-+	if (!(this_hctx->flags & BLK_MQ_F_TAG_SHARED)) {
- 		if (!test_bit(BLK_MQ_S_SCHED_RESTART, &this_hctx->state))
- 			set_bit(BLK_MQ_S_SCHED_RESTART, &this_hctx->state);
--	} else {
--		wait = &this_hctx->dispatch_wait;
--		if (!list_empty_careful(&wait->entry))
--			return false;
- 
--		spin_lock(&this_hctx->lock);
--		if (!list_empty(&wait->entry)) {
--			spin_unlock(&this_hctx->lock);
--			return false;
--		}
-+		/*
-+		 * It's possible that a tag was freed in the window between the
-+		 * allocation failure and adding the hardware queue to the wait
-+		 * queue.
-+		 *
-+		 * Don't clear RESTART here, someone else could have set it.
-+		 * At most this will cost an extra queue run.
-+		 */
-+		return blk_mq_get_driver_tag(rq, hctx, false);
-+	}
-+
-+	wait = &this_hctx->dispatch_wait;
-+	if (!list_empty_careful(&wait->entry))
-+		return false;
- 
--		ws = bt_wait_ptr(&this_hctx->tags->bitmap_tags, this_hctx);
--		add_wait_queue(&ws->wait, wait);
-+	spin_lock(&this_hctx->lock);
-+	if (!list_empty(&wait->entry)) {
-+		spin_unlock(&this_hctx->lock);
-+		return false;
- 	}
- 
-+	ws = bt_wait_ptr(&this_hctx->tags->bitmap_tags, this_hctx);
-+	add_wait_queue(&ws->wait, wait);
-+
- 	/*
- 	 * It's possible that a tag was freed in the window between the
- 	 * allocation failure and adding the hardware queue to the wait
- 	 * queue.
- 	 */
- 	ret = blk_mq_get_driver_tag(rq, hctx, false);
--
--	if (!shared_tags) {
--		/*
--		 * Don't clear RESTART here, someone else could have set it.
--		 * At most this will cost an extra queue run.
--		 */
--		return ret;
--	} else {
--		if (!ret) {
--			spin_unlock(&this_hctx->lock);
--			return false;
--		}
--
--		/*
--		 * We got a tag, remove ourselves from the wait queue to ensure
--		 * someone else gets the wakeup.
--		 */
--		spin_lock_irq(&ws->wait.lock);
--		list_del_init(&wait->entry);
--		spin_unlock_irq(&ws->wait.lock);
-+	if (!ret) {
- 		spin_unlock(&this_hctx->lock);
--		return true;
-+		return false;
- 	}
-+
-+	/*
-+	 * We got a tag, remove ourselves from the wait queue to ensure
-+	 * someone else gets the wakeup.
-+	 */
-+	spin_lock_irq(&ws->wait.lock);
-+	list_del_init(&wait->entry);
-+	spin_unlock_irq(&ws->wait.lock);
-+	spin_unlock(&this_hctx->lock);
-+
-+	return true;
- }
- 
- bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
--- 
-2.15.1
+T24gV2VkLCAyMDE4LTAxLTEwIGF0IDEzOjMwIC0wNzAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
+biAxLzEwLzE4IDEyOjM5IFBNLCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6DQo+ID4gVGhpcyBwYXRj
+aCBkb2VzIG5vdCBjaGFuZ2UgYW55IGZ1bmN0aW9uYWxpdHkgYnV0IG1ha2VzIHRoZQ0KPiA+IGJs
+a19tcV9tYXJrX3RhZ193YWl0KCkgY29kZSBzbGlnaHRseSBlYXNpZXIgdG8gcmVhZC4NCj4gDQo+
+IEkgYWdyZWUgaXQgY291bGQgZG8gd2l0aCBhIGNsZWFudXAsIGJ1dCBob3cgYWJvdXQgc29tZXRo
+aW5nIGxpa2UgdGhlDQo+IGJlbG93PyBJIHRoaW5rIHRoYXQncyBlYXNpZXIgdG8gcmVhZC4NCj4g
+DQo+IFsgLi4uIF0NCg0KSGVsbG8gSmVucywNCg0KVGhhdCBzb3VuZHMgbGlrZSBhIGdvb2QgaWRl
+YSB0byBtZS4gSSB3aWxsIHVwZGF0ZSB0aGUgcGF0Y2ggc2VyaWVzLCByZXRlc3QNCml0IGFuZCBy
+ZXBvc3QuDQoNCkJhcnQu
