@@ -1,132 +1,31 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:33224 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757225AbeAHUVr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jan 2018 15:21:47 -0500
-Received: by mail-pg0-f67.google.com with SMTP id i196so6309231pgd.0
-        for <linux-block@vger.kernel.org>; Mon, 08 Jan 2018 12:21:47 -0800 (PST)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Michael Lyle <mlyle@lyle.org>
-Subject: [416 PATCH 06/13] bcache: writeback: properly order backing device IO
-Date: Mon,  8 Jan 2018 12:21:23 -0800
-Message-Id: <20180108202130.31303-7-mlyle@lyle.org>
-In-Reply-To: <20180108202130.31303-1-mlyle@lyle.org>
-References: <20180108202130.31303-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jthumshirn@suse.de>
+Date: Wed, 10 Jan 2018 09:06:13 +0100
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Linux Block <linux-block@vger.kernel.org>,
+	Linux NVMe <linux-nvme@lists.infradead.org>,
+	Device Mapper <dm-devel@redhat.com>, Christoph Hellwig <hch@lst.de>,
+	Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Hannes Reinecke <hare@suse.com>, Sagi Grimberg <sagi@grimberg.me>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	James Smart <james.smart@broadcom.com>,
+	Bart VanAssche <bart.vanassche@wdc.com>
+Subject: Re: [dm-devel] [PATCHv2 3/5] block: Provide blk_status_t decoding
+ for path errors
+Message-ID: <20180110080613.hklbnsxgumyw4s5h@linux-x5ow.site>
+References: <20180109190418.7123-1-keith.busch@intel.com>
+ <20180109190418.7123-4-keith.busch@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20180109190418.7123-4-keith.busch@intel.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Writeback keys are presently iterated and dispatched for writeback in
-order of the logical block address on the backing device.  Multiple may
-be, in parallel, read from the cache device and then written back
-(especially when there are contiguous I/O).
-
-However-- there was no guarantee with the existing code that the writes
-would be issued in LBA order, as the reads from the cache device are
-often re-ordered.  In turn, when writing back quickly, the backing disk
-often has to seek backwards-- this slows writeback and increases
-utilization.
-
-This patch introduces an ordering mechanism that guarantees that the
-original order of issue is maintained for the write portion of the I/O.
-Performance for writeback is significantly improved when there are
-multiple contiguous keys or high writeback rates.
-
-Signed-off-by: Michael Lyle <mlyle@lyle.org>
-Reviewed-by: Tang Junhui <tang.junhui@zte.com.cn>
-Tested-by: Tang Junhui <tang.junhui@zte.com.cn>
----
- drivers/md/bcache/bcache.h    |  8 ++++++++
- drivers/md/bcache/writeback.c | 29 +++++++++++++++++++++++++++++
- 2 files changed, 37 insertions(+)
-
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 1784e50eb857..3be0fcc19b1f 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -330,6 +330,14 @@ struct cached_dev {
- 
- 	struct keybuf		writeback_keys;
- 
-+	/*
-+	 * Order the write-half of writeback operations strongly in dispatch
-+	 * order.  (Maintain LBA order; don't allow reads completing out of
-+	 * order to re-order the writes...)
-+	 */
-+	struct closure_waitlist writeback_ordering_wait;
-+	atomic_t		writeback_sequence_next;
-+
- 	/* For tracking sequential IO */
- #define RECENT_IO_BITS	7
- #define RECENT_IO	(1 << RECENT_IO_BITS)
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 479095987f22..6e1d2fde43df 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -116,6 +116,7 @@ static unsigned writeback_delay(struct cached_dev *dc, unsigned sectors)
- struct dirty_io {
- 	struct closure		cl;
- 	struct cached_dev	*dc;
-+	uint16_t		sequence;
- 	struct bio		bio;
- };
- 
-@@ -194,6 +195,27 @@ static void write_dirty(struct closure *cl)
- {
- 	struct dirty_io *io = container_of(cl, struct dirty_io, cl);
- 	struct keybuf_key *w = io->bio.bi_private;
-+	struct cached_dev *dc = io->dc;
-+
-+	uint16_t next_sequence;
-+
-+	if (atomic_read(&dc->writeback_sequence_next) != io->sequence) {
-+		/* Not our turn to write; wait for a write to complete */
-+		closure_wait(&dc->writeback_ordering_wait, cl);
-+
-+		if (atomic_read(&dc->writeback_sequence_next) == io->sequence) {
-+			/*
-+			 * Edge case-- it happened in indeterminate order
-+			 * relative to when we were added to wait list..
-+			 */
-+			closure_wake_up(&dc->writeback_ordering_wait);
-+		}
-+
-+		continue_at(cl, write_dirty, io->dc->writeback_write_wq);
-+		return;
-+	}
-+
-+	next_sequence = io->sequence + 1;
- 
- 	/*
- 	 * IO errors are signalled using the dirty bit on the key.
-@@ -211,6 +233,9 @@ static void write_dirty(struct closure *cl)
- 		closure_bio_submit(&io->bio, cl);
- 	}
- 
-+	atomic_set(&dc->writeback_sequence_next, next_sequence);
-+	closure_wake_up(&dc->writeback_ordering_wait);
-+
- 	continue_at(cl, write_dirty_finish, io->dc->writeback_write_wq);
- }
- 
-@@ -242,7 +267,10 @@ static void read_dirty(struct cached_dev *dc)
- 	int nk, i;
- 	struct dirty_io *io;
- 	struct closure cl;
-+	uint16_t sequence = 0;
- 
-+	BUG_ON(!llist_empty(&dc->writeback_ordering_wait.list));
-+	atomic_set(&dc->writeback_sequence_next, sequence);
- 	closure_init_stack(&cl);
- 
- 	/*
-@@ -303,6 +331,7 @@ static void read_dirty(struct cached_dev *dc)
- 
- 			w->private	= io;
- 			io->dc		= dc;
-+			io->sequence    = sequence++;
- 
- 			dirty_init(w);
- 			bio_set_op_attrs(&io->bio, REQ_OP_READ, 0);
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.14.1
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
