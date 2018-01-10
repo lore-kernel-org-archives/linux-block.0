@@ -1,37 +1,29 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <prvs=541b0d852=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+CC: "osandov@fb.com" <osandov@fb.com>
 Subject: Re: [PATCH 3/4] block: convert REQ_ATOM_COMPLETE to stealing
  rq->__deadline bit
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: "osandov@fb.com" <osandov@fb.com>
+Date: Wed, 10 Jan 2018 18:29:36 +0000
+Message-ID: <1515608975.2745.14.camel@wdc.com>
 References: <1515544167-10751-1-git-send-email-axboe@kernel.dk>
- <1515544167-10751-4-git-send-email-axboe@kernel.dk>
- <1515608975.2745.14.camel@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <1ce2cc85-1217-c0a8-2ca3-afe3e1c3845c@kernel.dk>
-Date: Wed, 10 Jan 2018 11:32:14 -0700
+	 <1515544167-10751-4-git-send-email-axboe@kernel.dk>
+In-Reply-To: <1515544167-10751-4-git-send-email-axboe@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1515608975.2745.14.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 1/10/18 11:29 AM, Bart Van Assche wrote:
-> On Tue, 2018-01-09 at 17:29 -0700, Jens Axboe wrote:
->> @@ -313,8 +307,6 @@ int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq)
->>  	seq_puts(m, ", .rq_flags=");
->>  	blk_flags_show(m, (__force unsigned int)rq->rq_flags, rqf_name,
->>  		       ARRAY_SIZE(rqf_name));
->> -	seq_puts(m, ", .atomic_flags=");
->> -	blk_flags_show(m, rq->atomic_flags, rqaf_name, ARRAY_SIZE(rqaf_name));
->>  	seq_printf(m, ", .tag=%d, .internal_tag=%d", rq->tag,
->>  		   rq->internal_tag);
->>  	if (mq_ops->show_rq)
-> 
-> Whether or not a request has been marked complete is very useful to know. Have you
-> considered to show the return value of blk_rq_is_complete() in the debugfs output?
-
-Yeah, that's a good point. Let me add that in lieu of the atomic flags that
-are being killed. Are you fine with the patch then?
-
--- 
-Jens Axboe
+T24gVHVlLCAyMDE4LTAxLTA5IGF0IDE3OjI5IC0wNzAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBA
+QCAtMzEzLDggKzMwNyw2IEBAIGludCBfX2Jsa19tcV9kZWJ1Z2ZzX3JxX3Nob3coc3RydWN0IHNl
+cV9maWxlICptLCBzdHJ1Y3QgcmVxdWVzdCAqcnEpDQo+ICAJc2VxX3B1dHMobSwgIiwgLnJxX2Zs
+YWdzPSIpOw0KPiAgCWJsa19mbGFnc19zaG93KG0sIChfX2ZvcmNlIHVuc2lnbmVkIGludClycS0+
+cnFfZmxhZ3MsIHJxZl9uYW1lLA0KPiAgCQkgICAgICAgQVJSQVlfU0laRShycWZfbmFtZSkpOw0K
+PiAtCXNlcV9wdXRzKG0sICIsIC5hdG9taWNfZmxhZ3M9Iik7DQo+IC0JYmxrX2ZsYWdzX3Nob3co
+bSwgcnEtPmF0b21pY19mbGFncywgcnFhZl9uYW1lLCBBUlJBWV9TSVpFKHJxYWZfbmFtZSkpOw0K
+PiAgCXNlcV9wcmludGYobSwgIiwgLnRhZz0lZCwgLmludGVybmFsX3RhZz0lZCIsIHJxLT50YWcs
+DQo+ICAJCSAgIHJxLT5pbnRlcm5hbF90YWcpOw0KPiAgCWlmIChtcV9vcHMtPnNob3dfcnEpDQoN
+CldoZXRoZXIgb3Igbm90IGEgcmVxdWVzdCBoYXMgYmVlbiBtYXJrZWQgY29tcGxldGUgaXMgdmVy
+eSB1c2VmdWwgdG8ga25vdy4gSGF2ZSB5b3UNCmNvbnNpZGVyZWQgdG8gc2hvdyB0aGUgcmV0dXJu
+IHZhbHVlIG9mIGJsa19ycV9pc19jb21wbGV0ZSgpIGluIHRoZSBkZWJ1Z2ZzIG91dHB1dD8NCg0K
+VGhhbmtzLA0KDQpCYXJ0Lg==
