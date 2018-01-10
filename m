@@ -1,32 +1,32 @@
-Return-Path: <jiangqi903@gmail.com>
-Return-Path: <jiangqi903@gmail.com>
-Subject: Re: [PATCH v3 RESEND 1/2] blk-throttle: track read and write request
- individually
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block <linux-block@vger.kernel.org>, Shaohua Li <shli@fb.com>,
- qijiang.qj@alibaba-inc.com
-References: <ce8504cb-d3ad-d8cb-4db0-11788578d1af@gmail.com>
- <ee08d6bf-dea8-2b80-b20d-1229409f3542@gmail.com>
- <ea069c52-1080-3ff7-1e52-66a9fbea79c1@kernel.dk>
-From: Joseph Qi <jiangqi903@gmail.com>
-Message-ID: <4226471b-a610-0a4a-6588-752fb0300481@gmail.com>
-Date: Mon, 8 Jan 2018 20:05:32 +0800
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCHv2 0/5] nvme/dm failover unification
+To: Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@intel.com>
+Cc: Linux Block <linux-block@vger.kernel.org>,
+ Linux NVMe <linux-nvme@lists.infradead.org>,
+ Device Mapper <dm-devel@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
+ Bart VanAssche <bart.vanassche@wdc.com>,
+ James Smart <james.smart@broadcom.com>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ Hannes Reinecke <hare@suse.com>, Sagi Grimberg <sagi@grimberg.me>
+References: <20180109190418.7123-1-keith.busch@intel.com>
+ <20180110082835.GA10185@lst.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <599f627a-cb0d-de65-f20b-61fed9c6cd22@kernel.dk>
+Date: Wed, 10 Jan 2018 10:52:57 -0700
 MIME-Version: 1.0
-In-Reply-To: <ea069c52-1080-3ff7-1e52-66a9fbea79c1@kernel.dk>
+In-Reply-To: <20180110082835.GA10185@lst.de>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-A polite ping for the two pending patches...
-
-Thanks,
-Joseph
-
-On 17/11/24 13:13, Jens Axboe wrote:
-> On 11/23/2017 06:31 PM, Joseph Qi wrote:
->> Hi Jens,
->> Could you please give your advice for the two patches or pick them up if
->> you think they are good?
+On 1/10/18 1:28 AM, Christoph Hellwig wrote:
+> The whole series looks fine to me:
 > 
-> It looks OK to me, but my preference would be to push this until
-> 4.16.
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 > 
+> Jens, do you want me to apply this to the nvme tree, or pick it up
+> directly?
+
+I queued it up, thanks.
+
+-- 
+Jens Axboe
