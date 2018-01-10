@@ -1,81 +1,106 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:36468 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755196AbeAMRCX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 13 Jan 2018 12:02:23 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH v2 01/12] bcache: set writeback_rate_update_seconds in range [1, 60] seconds
-Date: Sun, 14 Jan 2018 01:01:38 +0800
-Message-Id: <20180113170149.22365-2-colyli@suse.de>
-In-Reply-To: <20180113170149.22365-1-colyli@suse.de>
-References: <20180113170149.22365-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <gqjiang@suse.com>
+Subject: Re: [PATCH BUGFIX V2 1/2] block, bfq: put async queues for root bfq
+ groups too
+To: Paolo Valente <paolo.valente@linaro.org>, Guoqing Jiang <gqjiang@suse.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block <linux-block@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Ulf Hansson <ulf.hansson@linaro.org>, Mark Brown <broonie@kernel.org>,
+ linus.walleij@linaro.org, bfq-iosched@googlegroups.com,
+ oleksandr@natalenko.name, 162996@studenti.unimore.it,
+ Davide Ferrari <davideferrari8@gmail.com>
+References: <20180109092759.5454-1-paolo.valente@linaro.org>
+ <20180109092759.5454-2-paolo.valente@linaro.org>
+ <b24f17b0-7594-fd78-fdc7-85ffabbc2fed@suse.com>
+ <D75A2C53-9012-481B-986B-88F9040A3FB3@linaro.org>
+From: Guoqing Jiang <gqjiang@suse.com>
+Message-ID: <c885b566-9a3d-4a82-015b-a6f71e6ce1a3@suse.com>
+Date: Wed, 10 Jan 2018 14:31:37 +0800
+MIME-Version: 1.0
+In-Reply-To: <D75A2C53-9012-481B-986B-88F9040A3FB3@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-dc->writeback_rate_update_seconds can be set via sysfs and its value can
-be set to [1, ULONG_MAX].  It does not make sense to set such a large
-value, 60 seconds is long enough value considering the default 5 seconds
-works well for long time.
 
-Because dc->writeback_rate_update is a special delayed work, it re-arms
-itself inside the delayed work routine update_writeback_rate(). When
-stopping it by cancel_delayed_work_sync(), there should be a timeout to
-wait and make sure the re-armed delayed work is stopped too. A small max
-value of dc->writeback_rate_update_seconds is also helpful to decide a
-reasonable small timeout.
 
-This patch limits sysfs interface to set dc->writeback_rate_update_seconds
-in range of [1, 60] seconds, and replaces the hand-coded number by macros.
+On 01/10/2018 02:13 PM, Paolo Valente wrote:
+>
+>> Il giorno 10 gen 2018, alle ore 02:41, Guoqing Jiang <gqjiang@suse.com> ha scritto:
+>>
+>>
+>>
+>> On 01/09/2018 05:27 PM, Paolo Valente wrote:
+>>> For each pair [device for which bfq is selected as I/O scheduler,
+>>> group in blkio/io], bfq maintains a corresponding bfq group. Each such
+>>> bfq group contains a set of async queues, with each async queue
+>>> created on demand, i.e., when some I/O request arrives for it.  On
+>>> creation, an async queue gets an extra reference, to make sure that
+>>> the queue is not freed as long as its bfq group exists.  Accordingly,
+>>> to allow the queue to be freed after the group exited, this extra
+>>> reference must released on group exit.
+>>>
+>>> The above holds also for a bfq root group, i.e., for the bfq group
+>>> corresponding to the root blkio/io root for a given device. Yet, by
+>>> mistake, the references to the existing async queues of a root group
+>>> are not released when the latter exits. This causes a memory leak when
+>>> the instance of bfq for a given device exits. In a similar vein,
+>>> bfqg_stats_xfer_dead is not executed for a root group.
+>>>
+>>> This commit fixes bfq_pd_offline so that the latter executes the above
+>>> missing operations for a root group too.
+>>>
+>>> Reported-by: Holger Hoffstätte <holger@applied-asynchrony.com>
+>>> Reported-by: Guoqing Jiang <gqjiang@suse.com>
+>>> Signed-off-by: Davide Ferrari <davideferrari8@gmail.com>
+>>> Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+>>> ---
+>>>   block/bfq-cgroup.c | 7 +++++--
+>>>   1 file changed, 5 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+>>> index da1525ec4c87..d819dc77fe65 100644
+>>> --- a/block/bfq-cgroup.c
+>>> +++ b/block/bfq-cgroup.c
+>>> @@ -775,10 +775,11 @@ static void bfq_pd_offline(struct blkg_policy_data *pd)
+>>>   	unsigned long flags;
+>>>   	int i;
+>>>   +	spin_lock_irqsave(&bfqd->lock, flags);
+>>> +
+>>>   	if (!entity) /* root group */
+>>> -		return;
+>>> +		goto put_async_queues;
+>>>   -	spin_lock_irqsave(&bfqd->lock, flags);
+>>>   	/*
+>>>   	 * Empty all service_trees belonging to this group before
+>>>   	 * deactivating the group itself.
+>>> @@ -809,6 +810,8 @@ static void bfq_pd_offline(struct blkg_policy_data *pd)
+>>>   	}
+>>>     	__bfq_deactivate_entity(entity, false);
+>>> +
+>>> +put_async_queues:
+>>>   	bfq_put_async_queues(bfqd, bfqg);
+>>>     	spin_unlock_irqrestore(&bfqd->lock, flags);
+>> With this change, bfqg_stats_xfer_dead will be called even entity is not existed,
+> Actually, the entity associated with the bfq group being offlined
+> exists even if the local variable entity is NULL here.  Simply, that
+> variable gets NULL if the bfq group is the bfq root group for a
+> device.
+>
+>> is it necessary?
+> No, I opted for this solution to not shake the code too much, and
+> considering that
+> - bfqg_stats_xfer_dead simply does nothing if applied
+> to a root group
+> - who knows, in the future that function may need
+> do be invoked for a root group too.
+>
+> Yet, if you guys think that it would be cleaner to not invoke
+> bfqg_stats_xfer_dead at all for a root group, I'll change the code
+> accordingly (this would introduce a little asymmetry with
+> cfq_pd_offline, which invokes cfqg_stats_xfer_dead unconditionally).
 
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/sysfs.c     | 3 +++
- drivers/md/bcache/writeback.c | 2 +-
- drivers/md/bcache/writeback.h | 3 +++
- 3 files changed, 7 insertions(+), 1 deletion(-)
+Thanks a lot for the explanation, I am fine with it.
 
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index b4184092c727..a74a752c9e0f 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -215,6 +215,9 @@ STORE(__cached_dev)
- 	sysfs_strtoul_clamp(writeback_rate,
- 			    dc->writeback_rate.rate, 1, INT_MAX);
- 
-+	sysfs_strtoul_clamp(writeback_rate_update_seconds,
-+			    dc->writeback_rate_update_seconds,
-+			    1, WRITEBACK_RATE_UPDATE_SECS_MAX);
- 	d_strtoul_nonzero(writeback_rate_update_seconds);
- 	d_strtoul(writeback_rate_i_term_inverse);
- 	d_strtoul_nonzero(writeback_rate_p_term_inverse);
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 51306a19ab03..0ade883b6316 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -652,7 +652,7 @@ void bch_cached_dev_writeback_init(struct cached_dev *dc)
- 	dc->writeback_rate.rate		= 1024;
- 	dc->writeback_rate_minimum	= 8;
- 
--	dc->writeback_rate_update_seconds = 5;
-+	dc->writeback_rate_update_seconds = WRITEBACK_RATE_UPDATE_SECS_DEFAULT;
- 	dc->writeback_rate_p_term_inverse = 40;
- 	dc->writeback_rate_i_term_inverse = 10000;
- 
-diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
-index 66f1c527fa24..587b25599856 100644
---- a/drivers/md/bcache/writeback.h
-+++ b/drivers/md/bcache/writeback.h
-@@ -8,6 +8,9 @@
- #define MAX_WRITEBACKS_IN_PASS  5
- #define MAX_WRITESIZE_IN_PASS   5000	/* *512b */
- 
-+#define WRITEBACK_RATE_UPDATE_SECS_MAX		60
-+#define WRITEBACK_RATE_UPDATE_SECS_DEFAULT	5
-+
- /*
-  * 14 (16384ths) is chosen here as something that each backing device
-  * should be a reasonable fraction of the share, and not to blow up
--- 
-2.15.1
+Acked-by: Guoqing Jiang <gqjiang@suse.com>
+
+Regards,
+Guoqing
