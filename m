@@ -1,33 +1,53 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH BUGFIX 1/1] block, bfq: compile group put for oom queue
- only if BFQ_GROUP_IOSCHED is set
-To: Paolo Valente <paolo.valente@linaro.org>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- ulf.hansson@linaro.org, broonie@kernel.org, linus.walleij@linaro.org,
- bfq-iosched@googlegroups.com, oleksandr@natalenko.name
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	linus.walleij@linaro.org,
+	bfq-iosched@googlegroups.com,
+	oleksandr@natalenko.name,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX 1/1] block, bfq: compile group put for oom queue only if BFQ_GROUP_IOSCHED is set
+Date: Wed, 10 Jan 2018 15:58:56 +0100
+Message-Id: <20180110145856.4040-2-paolo.valente@linaro.org>
+In-Reply-To: <20180110145856.4040-1-paolo.valente@linaro.org>
 References: <20180110145856.4040-1-paolo.valente@linaro.org>
- <20180110145856.4040-2-paolo.valente@linaro.org>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <b1fcbfe2-e8da-5a6f-b62e-cd8dc4bf2b6f@kernel.dk>
-Date: Wed, 10 Jan 2018 08:23:58 -0700
-MIME-Version: 1.0
-In-Reply-To: <20180110145856.4040-2-paolo.valente@linaro.org>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 1/10/18 7:58 AM, Paolo Valente wrote:
-> Commit ("block, bfq: release oom-queue ref to root group on exit")
-> added a missing put of the root bfq group for the oom queue. That put
-> has to be, and can be, performed only if CONFIG_BFQ_GROUP_IOSCHED is
-> defined: the function doing the put is even not defined at all if
-> CONFIG_BFQ_GROUP_IOSCHED is not defined. But that commit makes that
-> put be invoked regardless of whether CONFIG_BFQ_GROUP_IOSCHED is
-> defined. This commit fixes this mistake, by making that invocation be
-> compiled only if CONFIG_BFQ_GROUP_IOSCHED is actually defined.
+Commit ("block, bfq: release oom-queue ref to root group on exit")
+added a missing put of the root bfq group for the oom queue. That put
+has to be, and can be, performed only if CONFIG_BFQ_GROUP_IOSCHED is
+defined: the function doing the put is even not defined at all if
+CONFIG_BFQ_GROUP_IOSCHED is not defined. But that commit makes that
+put be invoked regardless of whether CONFIG_BFQ_GROUP_IOSCHED is
+defined. This commit fixes this mistake, by making that invocation be
+compiled only if CONFIG_BFQ_GROUP_IOSCHED is actually defined.
 
-I already fixed that up yesterday:
+Fixes ("block, bfq: release oom-queue ref to root group on exit")
+Reported-by: Jan Alexander Steffens <jan.steffens@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+---
+ block/bfq-iosched.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-http://git.kernel.dk/cgit/linux-block/commit/?h=for-4.16/block&id=8abef10b3de1144cfe968f454946f13eb1ac3d0a
-
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index c56a495af2e8..93a97a7fe519 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -5015,10 +5015,9 @@ static void bfq_exit_queue(struct elevator_queue *e)
+ 
+ 	hrtimer_cancel(&bfqd->idle_slice_timer);
+ 
++#ifdef CONFIG_BFQ_GROUP_IOSCHED
+ 	/* release oom-queue reference to root group */
+ 	bfqg_and_blkg_put(bfqd->root_group);
+-
+-#ifdef CONFIG_BFQ_GROUP_IOSCHED
+ 	blkcg_deactivate_policy(bfqd->queue, &blkcg_policy_bfq);
+ #else
+ 	spin_lock_irq(&bfqd->lock);
 -- 
-Jens Axboe
+2.15.1
