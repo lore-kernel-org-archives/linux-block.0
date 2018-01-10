@@ -1,31 +1,49 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [for-416 PATCH 1/2] bcache: Fix, improve efficiency of
- closure_sync()
-To: Michael Lyle <mlyle@lyle.org>, linux-bcache@vger.kernel.org,
- linux-block@vger.kernel.org
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-References: <20171230230934.910-1-mlyle@lyle.org>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <cfee0947-24bd-c45a-5219-81ae6a208069@kernel.dk>
-Date: Fri, 5 Jan 2018 09:05:14 -0700
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-oi0-f46.google.com ([209.85.218.46]:46620 "EHLO
+        mail-oi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932320AbeAJBou (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Jan 2018 20:44:50 -0500
+Subject: Re: [RFC PATCH] blk-throttle: dispatch more sync writes in block
+ throttle layer
+To: Tejun Heo <tj@kernel.org>
+Cc: Jens Axboe <axboe@fb.com>, Shaohua Li <shli@kernel.org>,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        jinli.zjl@alibaba-inc.com, qijiang.qj@alibaba-inc.com
+References: <f6f59e3c-456a-8275-8af0-32e4f2e5cdd6@gmail.com>
+ <20180108120742.GJ3668920@devbig577.frc2.facebook.com>
+ <5ff01c31-5277-909f-4c35-9b9be513d8e1@gmail.com>
+ <20180109145659.GG3668920@devbig577.frc2.facebook.com>
+From: xuejiufei <xuejiufei@gmail.com>
+Message-ID: <37158a6a-ff0d-10e7-c39b-9d588b5f50d2@gmail.com>
+Date: Wed, 10 Jan 2018 09:44:43 +0800
 MIME-Version: 1.0
-In-Reply-To: <20171230230934.910-1-mlyle@lyle.org>
+In-Reply-To: <20180109145659.GG3668920@devbig577.frc2.facebook.com>
 Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 12/30/17 4:09 PM, Michael Lyle wrote:
-> +void __closure_sync(struct closure *cl)
-> +{
-> +	struct closure_syncer s = { .task = current };
->  
-> +	cl->s = &s;
-> +	continue_at(cl, closure_sync_fn, NULL);
-> +
-> +	while (1) {
-> +		__set_current_state(TASK_UNINTERRUPTIBLE);
-> +		smp_mb(); /* Ensure task state set before load of done flag */
+Hi Tejun,
 
-That's why we have set_current_state().
+On 2018/1/9 下午10:56, Tejun Heo wrote:
+> Hello,
+> 
+> On Tue, Jan 09, 2018 at 12:45:13PM +0800, xuejiufei wrote:
+>> 1. A bio is charged according to the direction, if we put the reads
+>> and sync writes together, we need to search the queue to pick a
+>> certain number of read and write IOs when the limit is not reached.
+> 
+> Ah, you're right.
+> 
+>> 2. I found that the multi-queue scheduler kyber also has three queues:
+>> one for read, one for sync write and one for others. This patch
+>> introduces another queue for async writes and others just like kyber.
+> 
+> Yeah, it'd make sense to make that a separate queue then.
+> 
+Could you please review this patch and give some advice?
 
--- 
-Jens Axboe
+Thanks.
+Jiufei Xue
+
+> Thanks.
+> 
