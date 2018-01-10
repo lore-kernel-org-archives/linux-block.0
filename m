@@ -1,32 +1,26 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCHv2 0/5] nvme/dm failover unification
-To: Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@intel.com>
+Return-Path: <hch@lst.de>
+Date: Wed, 10 Jan 2018 09:28:35 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <keith.busch@intel.com>
 Cc: Linux Block <linux-block@vger.kernel.org>,
- Linux NVMe <linux-nvme@lists.infradead.org>,
- Device Mapper <dm-devel@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
- Bart VanAssche <bart.vanassche@wdc.com>,
- James Smart <james.smart@broadcom.com>,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- Hannes Reinecke <hare@suse.com>, Sagi Grimberg <sagi@grimberg.me>
+	Linux NVMe <linux-nvme@lists.infradead.org>,
+	Device Mapper <dm-devel@redhat.com>, Christoph Hellwig <hch@lst.de>,
+	Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Bart VanAssche <bart.vanassche@wdc.com>,
+	James Smart <james.smart@broadcom.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Hannes Reinecke <hare@suse.com>, Sagi Grimberg <sagi@grimberg.me>
+Subject: Re: [PATCHv2 0/5] nvme/dm failover unification
+Message-ID: <20180110082835.GA10185@lst.de>
 References: <20180109190418.7123-1-keith.busch@intel.com>
- <20180110082835.GA10185@lst.de>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <599f627a-cb0d-de65-f20b-61fed9c6cd22@kernel.dk>
-Date: Wed, 10 Jan 2018 10:52:57 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180110082835.GA10185@lst.de>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180109190418.7123-1-keith.busch@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 1/10/18 1:28 AM, Christoph Hellwig wrote:
-> The whole series looks fine to me:
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> 
-> Jens, do you want me to apply this to the nvme tree, or pick it up
-> directly?
+The whole series looks fine to me:
 
-I queued it up, thanks.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
--- 
-Jens Axboe
+Jens, do you want me to apply this to the nvme tree, or pick it up
+directly?
