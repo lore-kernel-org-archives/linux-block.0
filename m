@@ -1,55 +1,31 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:33713 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965934AbeAJQTG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Jan 2018 11:19:06 -0500
-Received: by mail-wm0-f66.google.com with SMTP id 123so6050531wme.0
-        for <linux-block@vger.kernel.org>; Wed, 10 Jan 2018 08:19:05 -0800 (PST)
-From: Ilya Dryomov <idryomov@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Tejun Heo <tj@kernel.org>, David Disseldorp <ddiss@suse.de>,
-        Sagi Grimberg <sagi@grimberg.me>
-Subject: [PATCH v2 0/2] block: enforce ioctl(BLKROSET) and set_disk_ro()
-Date: Wed, 10 Jan 2018 17:18:36 +0100
-Message-Id: <1515601118-23192-1-git-send-email-idryomov@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=541b0d852=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hare@suse.de" <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"jthumshirn@suse.de" <jthumshirn@suse.de>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "jgg@mellanox.com" <jgg@mellanox.com>,
+	"hch@lst.de" <hch@lst.de>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"dledford@redhat.com" <dledford@redhat.com>
+Subject: Re: [PATCH 2/4] block: Introduce blk_wait_if_quiesced() and
+ blk_finish_wait_if_quiesced()
+Date: Wed, 10 Jan 2018 00:23:33 +0000
+Message-ID: <1515543812.2721.35.camel@wdc.com>
+References: <20180108185011.30018-1-bart.vanassche@wdc.com>
+	 <20180108185011.30018-3-bart.vanassche@wdc.com>
+	 <8dbe62ad-be38-a35d-df3e-b6f5486292ab@suse.de>
+In-Reply-To: <8dbe62ad-be38-a35d-df3e-b6f5486292ab@suse.de>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-Hello,
-
-I was doing some cleanup work on rbd BLKROSET handler and discovered
-that we ignore partition rw/ro setting (hd_struct->policy) for pretty
-much everything but straight writes.
-
-David (CCed) has blktests patches standing by.
-
-(Another aspect of this is that we don't enforce open(2) mode.  Tejun
-took a stab at this a few years ago, but his patch had to be reverted:
-
-  75f1dc0d076d ("block: check bdev_read_only() from blkdev_get()")
-  e51900f7d38c ("block: revert block_dev read-only check")
-
-It is a separate issue and refusing writes to read-only devices is
-obviously more important, but perhaps it's time to revisit that as
-well?)
-
-v1 -> v2:
-- added unlikely() per Sagi's suggestion
-
-Thanks,
-
-                Ilya
-
-
-Ilya Dryomov (2):
-  block: fail op_is_write() requests to read-only partitions
-  block: add bdev_read_only() checks to common helpers
-
- block/blk-core.c | 23 ++++++++++++++++++++++-
- block/blk-lib.c  | 12 ++++++++++++
- 2 files changed, 34 insertions(+), 1 deletion(-)
-
--- 
-2.4.3
+T24gVHVlLCAyMDE4LTAxLTA5IGF0IDA3OjQxICswMTAwLCBIYW5uZXMgUmVpbmVja2Ugd3JvdGU6
+DQo+IEknbSBhbHdheXMgYSBiaXQgY2F1dGlvdXMgd2hlbiBoYXZpbmcgcmN1X3JlYWRfbG9jaygp
+IGFuZA0KPiByY3VfcmVhZF91bmxvY2soKSBpbiB0d28gc2VwYXJhdGUgZnVuY3Rpb25zLg0KPiBD
+YW4gd2UgbWFrZSB0aGlzIGRlcGVuZGVuY3kgbW9yZSBleHBsaWNpdCBieSByZW5hbWluZyB0aGUg
+Zmlyc3QgZnVuY3Rpb24NCj4gdG8gYmxrX3N0YXJ0X3dhaXRfaWZfcXVpZXNjZWQoKSBhbmQgdXBk
+YXRpbmcgdGhlIGNvbW1lbnQgdG8gdGhlIGVmZmVjdA0KPiB0aGF0IGJvdGggZnVuY3Rpb25zIG11
+c3QgYmUgdXNlZCBpbiB0YW5kZW0/DQoNCkhlbGxvIEhhbm5lcywNCg0KVGhhdCBzb3VuZHMgbGlr
+ZSBhIGdvb2QgaWRlYSB0byBtZS4gSSB3aWxsIG1ha2UgdGhlc2UgY2hhbmdlcyBhbmQgcmVwb3N0
+IHRoaXMNCnBhdGNoIHNlcmllcy4NCg0KQmFydC4=
