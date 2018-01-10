@@ -1,78 +1,54 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:49090 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751709AbeANOoL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 Jan 2018 09:44:11 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Junhui Tang <tang.junhui@zte.com.cn>,
-        Michael Lyle <mlyle@lyle.org>
-Subject: [PATCH v3 09/13] bcache: stop all attached bcache devices for a retired cache set
-Date: Sun, 14 Jan 2018 22:42:32 +0800
-Message-Id: <20180114144236.28213-10-colyli@suse.de>
-In-Reply-To: <20180114144236.28213-1-colyli@suse.de>
-References: <20180114144236.28213-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=541b0d852=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Hannes Reinecke <hare@suse.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Doug Ledford <dledford@redhat.com>,
+	linux-scsi@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH v2 0/4] Make SCSI transport recovery more robust
+Date: Wed, 10 Jan 2018 10:18:13 -0800
+Message-Id: <20180110181817.25166-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-When there are too many I/O errors on cache device, current bcache code
-will retire the whole cache set, and detach all bcache devices. But the
-detached bcache devices are not stopped, which is problematic when bcache
-is in writeback mode.
+Hello Jens,
 
-If the retired cache set has dirty data of backing devices, continue
-writing to bcache device will write to backing device directly. If the
-LBA of write request has a dirty version cached on cache device, next time
-when the cache device is re-registered and backing device re-attached to
-it again, the stale dirty data on cache device will be written to backing
-device, and overwrite latest directly written data. This situation causes
-a quite data corruption.
+A longstanding issue with the SCSI core is that several SCSI transport drivers
+use scsi_target_block() and scsi_target_unblock() to avoid concurrent
+.queuecommand() calls during e.g. transport recovery but that this is not
+sufficient to protect from such calls. Hence this patch series. An additional
+benefit of this patch series is that it allows to remove an ugly hack from
+the SRP initiator driver. Please consider this patch series for kernel v4.16.
 
-This patch checkes whether cache_set->io_disable is true in
-__cache_set_unregister(). If cache_set->io_disable is true, it means cache
-set is unregistering by too many I/O errors, then all attached bcache
-devices will be stopped as well. If cache_set->io_disable is not true, it
-means __cache_set_unregister() is triggered by writing 1 to sysfs file
-/sys/fs/bcache/<UUID>/bcache/stop. This is an exception because users do
-it explicitly, this patch keeps existing behavior and does not stop any
-bcache device.
+Thanks,
 
-Even the failed cache device has no dirty data, stopping bcache device is
-still a desired behavior by many Ceph and data base users. Then their
-application will report I/O errors due to disappeared bcache device, and
-operation people will know the cache device is broken or disconnected.
+Bart.
 
-Changelog:
-v2: add Reviewed-by from Hannes.
-v1: initial version for review.
+Changes compared to v1:
+- Renamed blk_wait_if_quiesced() into blk_start_wait_if_quiesced().
+- Mentioned in the comment above blk_start_wait_if_quiesced() that every call
+  of this function has to be followed by a call of
+  blk_finish_wait_if_quiesced().
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
-Cc: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/super.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Bart Van Assche (4):
+  blk-mq: Rename request_queue.mq_freeze_wq into mq_wq
+  block: Introduce blk_start_wait_if_quiesced() and
+    blk_finish_wait_if_quiesced()
+  scsi: Avoid that .queuecommand() gets called for a quiesced SCSI
+    device
+  IB/srp: Fix a sleep-in-invalid-context bug
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 4204d75aee7b..97e3bb8e1aee 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1478,6 +1478,14 @@ static void __cache_set_unregister(struct closure *cl)
- 				dc = container_of(c->devices[i],
- 						  struct cached_dev, disk);
- 				bch_cached_dev_detach(dc);
-+				/*
-+				 * If we come here by too many I/O errors,
-+				 * bcache device should be stopped too, to
-+				 * keep data consistency on cache and
-+				 * backing devices.
-+				 */
-+				if (test_bit(CACHE_SET_IO_DISABLE, &c->flags))
-+					bcache_device_stop(c->devices[i]);
- 			} else {
- 				bcache_device_stop(c->devices[i]);
- 			}
+ block/blk-core.c                    | 11 +++---
+ block/blk-mq.c                      | 74 ++++++++++++++++++++++++++++++++++---
+ drivers/infiniband/ulp/srp/ib_srp.c | 21 +----------
+ drivers/scsi/scsi_error.c           |  3 ++
+ include/linux/blk-mq.h              |  2 +
+ include/linux/blkdev.h              |  2 +-
+ 6 files changed, 83 insertions(+), 30 deletions(-)
+
 -- 
 2.15.1
