@@ -1,146 +1,55 @@
-Return-Path: <prvs=541b0d852=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Hannes Reinecke <hare@suse.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Doug Ledford <dledford@redhat.com>,
-	linux-scsi@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 2/4] block: Introduce blk_start_wait_if_quiesced() and blk_finish_wait_if_quiesced()
-Date: Wed, 10 Jan 2018 10:18:15 -0800
-Message-Id: <20180110181817.25166-3-bart.vanassche@wdc.com>
-In-Reply-To: <20180110181817.25166-1-bart.vanassche@wdc.com>
-References: <20180110181817.25166-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:33713 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965934AbeAJQTG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 10 Jan 2018 11:19:06 -0500
+Received: by mail-wm0-f66.google.com with SMTP id 123so6050531wme.0
+        for <linux-block@vger.kernel.org>; Wed, 10 Jan 2018 08:19:05 -0800 (PST)
+From: Ilya Dryomov <idryomov@gmail.com>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Tejun Heo <tj@kernel.org>, David Disseldorp <ddiss@suse.de>,
+        Sagi Grimberg <sagi@grimberg.me>
+Subject: [PATCH v2 0/2] block: enforce ioctl(BLKROSET) and set_disk_ro()
+Date: Wed, 10 Jan 2018 17:18:36 +0100
+Message-Id: <1515601118-23192-1-git-send-email-idryomov@gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Introduce functions that allow block drivers to wait while a request
-queue is in the quiesced state (blk-mq) or in the stopped state (legacy
-block layer). The next patch will add calls to these functions in the
-SCSI core.
+Hello,
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Ming Lei <ming.lei@redhat.com>
----
- block/blk-core.c       |  1 +
- block/blk-mq.c         | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++
- include/linux/blk-mq.h |  2 ++
- 3 files changed, 67 insertions(+)
+I was doing some cleanup work on rbd BLKROSET handler and discovered
+that we ignore partition rw/ro setting (hd_struct->policy) for pretty
+much everything but straight writes.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index c10b4ce95248..06eaea15bae9 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -287,6 +287,7 @@ void blk_start_queue(struct request_queue *q)
- 	WARN_ON_ONCE(q->mq_ops);
- 
- 	queue_flag_clear(QUEUE_FLAG_STOPPED, q);
-+	wake_up_all(&q->mq_wq);
- 	__blk_run_queue(q);
- }
- EXPORT_SYMBOL(blk_start_queue);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a05ea7e9b415..87455977ad34 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -247,11 +247,75 @@ void blk_mq_unquiesce_queue(struct request_queue *q)
- 	queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
- 	spin_unlock_irqrestore(q->queue_lock, flags);
- 
-+	wake_up_all(&q->mq_wq);
-+
- 	/* dispatch requests which are inserted during quiescing */
- 	blk_mq_run_hw_queues(q, true);
- }
- EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
- 
-+/**
-+ * blk_start_wait_if_quiesced() - wait if a queue is quiesced (blk-mq) or stopped (legacy block layer)
-+ * @q: Request queue pointer.
-+ *
-+ * Some block drivers, e.g. the SCSI core, can bypass the block layer core
-+ * request submission mechanism. Surround such code with
-+ * blk_start_wait_if_quiesced() / blk_finish_wait_if_quiesced() to avoid that
-+ * request submission can happen while a queue is quiesced or stopped.
-+ *
-+ * Returns with the RCU read lock held (blk-mq) or with q->queue_lock held
-+ * (legacy block layer).
-+ *
-+ * Notes:
-+ * - Every call of this function must be followed by a call of
-+ *   blk_finish_wait_if_quiesced().
-+ * - This function does not support block drivers whose .queue_rq()
-+ *   implementation can sleep (BLK_MQ_F_BLOCKING).
-+ */
-+int blk_start_wait_if_quiesced(struct request_queue *q)
-+{
-+	struct blk_mq_hw_ctx *hctx;
-+	unsigned int i;
-+
-+	might_sleep();
-+
-+	if (q->mq_ops) {
-+		queue_for_each_hw_ctx(q, hctx, i)
-+			WARN_ON(hctx->flags & BLK_MQ_F_BLOCKING);
-+
-+		rcu_read_lock();
-+		while (!blk_queue_dying(q) && blk_queue_quiesced(q)) {
-+			rcu_read_unlock();
-+			wait_event(q->mq_wq, blk_queue_dying(q) ||
-+				   !blk_queue_quiesced(q));
-+			rcu_read_lock();
-+		}
-+	} else {
-+		spin_lock_irq(q->queue_lock);
-+		wait_event_lock_irq(q->mq_wq,
-+				    blk_queue_dying(q) || !blk_queue_stopped(q),
-+				    *q->queue_lock);
-+		q->request_fn_active++;
-+	}
-+	return blk_queue_dying(q) ? -ENODEV : 0;
-+}
-+EXPORT_SYMBOL(blk_start_wait_if_quiesced);
-+
-+/**
-+ * blk_finish_wait_if_quiesced() - counterpart of blk_start_wait_if_quiesced()
-+ * @q: Request queue pointer.
-+ */
-+void blk_finish_wait_if_quiesced(struct request_queue *q)
-+{
-+	if (q->mq_ops) {
-+		rcu_read_unlock();
-+	} else {
-+		q->request_fn_active--;
-+		spin_unlock_irq(q->queue_lock);
-+	}
-+}
-+EXPORT_SYMBOL(blk_finish_wait_if_quiesced);
-+
- void blk_mq_wake_waiters(struct request_queue *q)
- {
- 	struct blk_mq_hw_ctx *hctx;
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 8efcf49796a3..15912cd348b5 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -267,6 +267,8 @@ void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
- void blk_mq_quiesce_queue(struct request_queue *q);
- void blk_mq_unquiesce_queue(struct request_queue *q);
-+int blk_start_wait_if_quiesced(struct request_queue *q);
-+void blk_finish_wait_if_quiesced(struct request_queue *q);
- void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
- bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_run_hw_queues(struct request_queue *q, bool async);
+David (CCed) has blktests patches standing by.
+
+(Another aspect of this is that we don't enforce open(2) mode.  Tejun
+took a stab at this a few years ago, but his patch had to be reverted:
+
+  75f1dc0d076d ("block: check bdev_read_only() from blkdev_get()")
+  e51900f7d38c ("block: revert block_dev read-only check")
+
+It is a separate issue and refusing writes to read-only devices is
+obviously more important, but perhaps it's time to revisit that as
+well?)
+
+v1 -> v2:
+- added unlikely() per Sagi's suggestion
+
+Thanks,
+
+                Ilya
+
+
+Ilya Dryomov (2):
+  block: fail op_is_write() requests to read-only partitions
+  block: add bdev_read_only() checks to common helpers
+
+ block/blk-core.c | 23 ++++++++++++++++++++++-
+ block/blk-lib.c  | 12 ++++++++++++
+ 2 files changed, 34 insertions(+), 1 deletion(-)
+
 -- 
-2.15.1
+2.4.3
