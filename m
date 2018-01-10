@@ -1,54 +1,47 @@
-Return-Path: <osandov@osandov.com>
-Return-Path: <osandov@osandov.com>
-Date: Wed, 10 Jan 2018 10:45:39 -0800
-From: Omar Sandoval <osandov@osandov.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"osandov@fb.com" <osandov@fb.com>
+Return-Path: <prvs=541b0d852=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+CC: "osandov@fb.com" <osandov@fb.com>
 Subject: Re: [PATCH 3/4] block: convert REQ_ATOM_COMPLETE to stealing
  rq->__deadline bit
-Message-ID: <20180110184539.GD30831@vader.DHCP.thefacebook.com>
+Date: Wed, 10 Jan 2018 18:42:17 +0000
+Message-ID: <1515609735.2745.21.camel@wdc.com>
 References: <1515544167-10751-1-git-send-email-axboe@kernel.dk>
- <1515544167-10751-4-git-send-email-axboe@kernel.dk>
- <1515608975.2745.14.camel@wdc.com>
- <1ce2cc85-1217-c0a8-2ca3-afe3e1c3845c@kernel.dk>
- <1515609201.2745.15.camel@wdc.com>
- <6a128067-6a29-ed07-9d2e-511bc72d18f2@kernel.dk>
- <1515609735.2745.21.camel@wdc.com>
+	 <1515544167-10751-4-git-send-email-axboe@kernel.dk>
+	 <1515608975.2745.14.camel@wdc.com>
+	 <1ce2cc85-1217-c0a8-2ca3-afe3e1c3845c@kernel.dk>
+	 <1515609201.2745.15.camel@wdc.com>
+	 <6a128067-6a29-ed07-9d2e-511bc72d18f2@kernel.dk>
+In-Reply-To: <6a128067-6a29-ed07-9d2e-511bc72d18f2@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1515609735.2745.21.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Jan 10, 2018 at 06:42:17PM +0000, Bart Van Assche wrote:
-> On Wed, 2018-01-10 at 11:35 -0700, Jens Axboe wrote:
-> > On 1/10/18 11:33 AM, Bart Van Assche wrote:
-> > > On Wed, 2018-01-10 at 11:32 -0700, Jens Axboe wrote:
-> > > > On 1/10/18 11:29 AM, Bart Van Assche wrote:
-> > > > > On Tue, 2018-01-09 at 17:29 -0700, Jens Axboe wrote:
-> > > > > > @@ -313,8 +307,6 @@ int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq)
-> > > > > >  	seq_puts(m, ", .rq_flags=");
-> > > > > >  	blk_flags_show(m, (__force unsigned int)rq->rq_flags, rqf_name,
-> > > > > >  		       ARRAY_SIZE(rqf_name));
-> > > > > > -	seq_puts(m, ", .atomic_flags=");
-> > > > > > -	blk_flags_show(m, rq->atomic_flags, rqaf_name, ARRAY_SIZE(rqaf_name));
-> > > > > >  	seq_printf(m, ", .tag=%d, .internal_tag=%d", rq->tag,
-> > > > > >  		   rq->internal_tag);
-> > > > > >  	if (mq_ops->show_rq)
-> > > > > 
-> > > > > Whether or not a request has been marked complete is very useful to know. Have you
-> > > > > considered to show the return value of blk_rq_is_complete() in the debugfs output?
-> > > > 
-> > > > Yeah, that's a good point. Let me add that in lieu of the atomic flags that
-> > > > are being killed. Are you fine with the patch then?
-> > > 
-> > > The rest of the patch looks fine to me. This is the only comment I had about this patch.
-> > 
-> > http://git.kernel.dk/cgit/linux-block/commit/?h=blk-kill-atomic-flags&id=3d34009082f5e72137d6bb38cbc2ff6047f03fd1
-> > 
-> > Added a complete= entry for it.
-> 
-> For that patch: Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
-
-Also Reviewed-by: Omar Sandoval <osandov@fb.com>
+T24gV2VkLCAyMDE4LTAxLTEwIGF0IDExOjM1IC0wNzAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
+biAxLzEwLzE4IDExOjMzIEFNLCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6DQo+ID4gT24gV2VkLCAy
+MDE4LTAxLTEwIGF0IDExOjMyIC0wNzAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiA+ID4gT24gMS8x
+MC8xOCAxMToyOSBBTSwgQmFydCBWYW4gQXNzY2hlIHdyb3RlOg0KPiA+ID4gPiBPbiBUdWUsIDIw
+MTgtMDEtMDkgYXQgMTc6MjkgLTA3MDAsIEplbnMgQXhib2Ugd3JvdGU6DQo+ID4gPiA+ID4gQEAg
+LTMxMyw4ICszMDcsNiBAQCBpbnQgX19ibGtfbXFfZGVidWdmc19ycV9zaG93KHN0cnVjdCBzZXFf
+ZmlsZSAqbSwgc3RydWN0IHJlcXVlc3QgKnJxKQ0KPiA+ID4gPiA+ICAJc2VxX3B1dHMobSwgIiwg
+LnJxX2ZsYWdzPSIpOw0KPiA+ID4gPiA+ICAJYmxrX2ZsYWdzX3Nob3cobSwgKF9fZm9yY2UgdW5z
+aWduZWQgaW50KXJxLT5ycV9mbGFncywgcnFmX25hbWUsDQo+ID4gPiA+ID4gIAkJICAgICAgIEFS
+UkFZX1NJWkUocnFmX25hbWUpKTsNCj4gPiA+ID4gPiAtCXNlcV9wdXRzKG0sICIsIC5hdG9taWNf
+ZmxhZ3M9Iik7DQo+ID4gPiA+ID4gLQlibGtfZmxhZ3Nfc2hvdyhtLCBycS0+YXRvbWljX2ZsYWdz
+LCBycWFmX25hbWUsIEFSUkFZX1NJWkUocnFhZl9uYW1lKSk7DQo+ID4gPiA+ID4gIAlzZXFfcHJp
+bnRmKG0sICIsIC50YWc9JWQsIC5pbnRlcm5hbF90YWc9JWQiLCBycS0+dGFnLA0KPiA+ID4gPiA+
+ICAJCSAgIHJxLT5pbnRlcm5hbF90YWcpOw0KPiA+ID4gPiA+ICAJaWYgKG1xX29wcy0+c2hvd19y
+cSkNCj4gPiA+ID4gDQo+ID4gPiA+IFdoZXRoZXIgb3Igbm90IGEgcmVxdWVzdCBoYXMgYmVlbiBt
+YXJrZWQgY29tcGxldGUgaXMgdmVyeSB1c2VmdWwgdG8ga25vdy4gSGF2ZSB5b3UNCj4gPiA+ID4g
+Y29uc2lkZXJlZCB0byBzaG93IHRoZSByZXR1cm4gdmFsdWUgb2YgYmxrX3JxX2lzX2NvbXBsZXRl
+KCkgaW4gdGhlIGRlYnVnZnMgb3V0cHV0Pw0KPiA+ID4gDQo+ID4gPiBZZWFoLCB0aGF0J3MgYSBn
+b29kIHBvaW50LiBMZXQgbWUgYWRkIHRoYXQgaW4gbGlldSBvZiB0aGUgYXRvbWljIGZsYWdzIHRo
+YXQNCj4gPiA+IGFyZSBiZWluZyBraWxsZWQuIEFyZSB5b3UgZmluZSB3aXRoIHRoZSBwYXRjaCB0
+aGVuPw0KPiA+IA0KPiA+IFRoZSByZXN0IG9mIHRoZSBwYXRjaCBsb29rcyBmaW5lIHRvIG1lLiBU
+aGlzIGlzIHRoZSBvbmx5IGNvbW1lbnQgSSBoYWQgYWJvdXQgdGhpcyBwYXRjaC4NCj4gDQo+IGh0
+dHA6Ly9naXQua2VybmVsLmRrL2NnaXQvbGludXgtYmxvY2svY29tbWl0Lz9oPWJsay1raWxsLWF0
+b21pYy1mbGFncyZpZD0zZDM0MDA5MDgyZjVlNzIxMzdkNmJiMzhjYmMyZmY2MDQ3ZjAzZmQxDQo+
+IA0KPiBBZGRlZCBhIGNvbXBsZXRlPSBlbnRyeSBmb3IgaXQuDQoNCkZvciB0aGF0IHBhdGNoOiBS
+ZXZpZXdlZC1ieTogQmFydCBWYW4gQXNzY2hlIDxiYXJ0LnZhbmFzc2NoZUB3ZGMuY29tPg0KDQpU
+aGFua3MsDQoNCkJhcnQu
