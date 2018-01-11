@@ -1,20 +1,21 @@
-Return-Path: <hare@suse.de>
+Return-Path: <ming.lei@redhat.com>
+Date: Thu, 11 Jan 2018 10:54:45 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: axboe@kernel.dk, Ming Lei <tom.leiming@gmail.com>, hch@lst.de,
+	Bart.VanAssche@wdc.com, dm-devel@redhat.com,
+	linux-block@vger.kernel.org
 Subject: Re: [for-4.16 PATCH v3 2/3] block: allow gendisk's request_queue
  registration to be deferred
-To: Mike Snitzer <snitzer@redhat.com>, axboe@kernel.dk
-Cc: Ming Lei <tom.leiming@gmail.com>, hch@lst.de, Bart.VanAssche@wdc.com,
- dm-devel@redhat.com, linux-block@vger.kernel.org
+Message-ID: <20180111025444.GD7290@ming.t460p>
 References: <20180111021256.37490-1-snitzer@redhat.com>
  <20180111021256.37490-3-snitzer@redhat.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <804df5df-2598-df69-757d-85df18185d4c@suse.de>
-Date: Thu, 11 Jan 2018 08:46:35 +0100
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180111021256.37490-3-snitzer@redhat.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 01/11/2018 03:12 AM, Mike Snitzer wrote:
+On Wed, Jan 10, 2018 at 09:12:55PM -0500, Mike Snitzer wrote:
 > Since I can remember DM has forced the block layer to allow the
 > allocation and initialization of the request_queue to be distinct
 > operations.  Reason for this is block/genhd.c:add_disk() has requires
@@ -85,9 +86,6 @@ On 01/11/2018 03:12 AM, Mike Snitzer wrote:
 >  	mutex_lock(&q->sysfs_lock);
 >  	queue_flag_clear_unlocked(QUEUE_FLAG_REGISTERED, q);
 >  	mutex_unlock(&q->sysfs_lock);
-Why can't we use test_and_clear_bit() here?
-Shouldn't that relieve the need for the mutex_lock() here, too?
-
 > diff --git a/block/genhd.c b/block/genhd.c
 > index 00620e01e043..3912a82ecc4f 100644
 > --- a/block/genhd.c
@@ -122,15 +120,16 @@ Shouldn't that relieve the need for the mutex_lock() here, too?
 >  
 >  #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
 >  				 (1 << QUEUE_FLAG_SAME_COMP)	|	\
-> 
-Where is this flag used?
+> -- 
+> 2.15.0
 
-Cheers,
+This way is safe for all other devices, even for DM it is safe too since
+block does deal with NULL .make_request_fn well for legacy path.
 
-Hannes
+Maybe QUEUE_FLAG_DEFER_REG can be renamed as QUEUE_FLAG_REG_BY_DRIVER,
+but not a big deal, so
+
+	Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+Ming
