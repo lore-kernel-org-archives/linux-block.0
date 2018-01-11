@@ -1,47 +1,48 @@
-Return-Path: <hch@lst.de>
-Date: Thu, 4 Jan 2018 11:28:44 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, keith.busch@intel.com,
-	emilne@redhat.com, james.smart@broadcom.com, hare@suse.de,
-	Bart.VanAssche@wdc.com, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, dm-devel@redhat.com,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Hannes Reinecke <hare@suse.com>
-Subject: Re: [for-4.16 PATCH v2 1/5] block: establish request failover
-	callback
-Message-ID: <20180104102844.GB4864@lst.de>
-References: <20171227032257.8182-1-snitzer@redhat.com> <20171227032257.8182-2-snitzer@redhat.com> <20171229101013.GA25333@lst.de> <20171229201904.GA8876@redhat.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:56354 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S933341AbeAKWmw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Jan 2018 17:42:52 -0500
+Date: Thu, 11 Jan 2018 17:42:49 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>, dm-devel@redhat.com,
+        Bart Van Assche <bart.vanassche@sandisk.com>
+Subject: Re: [PATCH V3 5/5] blk-mq: issue request directly for
+ blk_insert_cloned_request
+Message-ID: <20180111224249.GD31944@redhat.com>
+References: <20180111060159.12991-1-ming.lei@redhat.com>
+ <20180111060159.12991-6-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171229201904.GA8876@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20180111060159.12991-6-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Fri, Dec 29, 2017 at 03:19:04PM -0500, Mike Snitzer wrote:
-> On Fri, Dec 29 2017 at  5:10am -0500,
-> Christoph Hellwig <hch@lst.de> wrote:
+On Thu, Jan 11 2018 at  1:01am -0500,
+Ming Lei <ming.lei@redhat.com> wrote:
+
+> blk_insert_cloned_request() is called in fast path of dm-rq driver, and
+> in this function we append request to hctx->dispatch_list of the underlying
+> queue directly.
 > 
-> > On Tue, Dec 26, 2017 at 10:22:53PM -0500, Mike Snitzer wrote:
-> > > All requests allocated from a request_queue with this callback set can
-> > > failover their requests during completion.
-> > > 
-> > > This callback is expected to use the blk_steal_bios() interface to
-> > > transfer a request's bios back to an upper-layer bio-based
-> > > request_queue.
-> > > 
-> > > This will be used by both NVMe multipath and DM multipath.  Without it
-> > > DM multipath cannot get access to NVMe-specific error handling that NVMe
-> > > core provides in nvme_complete_rq().
-> > 
-> > And the whole point is that it should not get any such access.
+> 1) This way isn't efficient enough because hctx lock is always required
 > 
-> No the whole point is you hijacked multipathing for little to no gain.
+> 2) With blk_insert_cloned_request(), we bypass underlying queue's IO scheduler
+> totally, and depend on DM rq driver to do IO schedule completely. But DM
+> rq driver can't get underlying queue's dispatch feedback at all, and this
+> information is extreamly useful for IO merge. Without that IO merge can't
+> be done basically by blk-mq, and causes very bad sequential IO performance.
+> 
+> This patch makes use of blk_mq_try_issue_directly() to dispatch rq to
+> underlying queue and provides disptch result to dm-rq and blk-mq, and
+> improves the above situations very much.
+> 
+> With this patch, seqential IO is improved by 3X in my test over
+> mpath/virtio-scsi.
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-That is your idea.  In the end there have been a lot of complains about
-dm-multipath, and there was a lot of discussion how to do things better,
-with a broad agreement on this approach.  Up to the point where Hannes
-has started considering doing something similar for scsi.
-
-And to be honest if this is the tone you'd like to set for technical
-discussions I'm not really interested.  Please calm down and stick
-to a technical discussion.
+Tested-by: Mike Snitzer <snitzer@redhat.com>
+Reviewed-by: Mike Snitzer <snitzer@redhat.com>
