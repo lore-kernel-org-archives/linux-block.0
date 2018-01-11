@@ -1,20 +1,21 @@
-Return-Path: <hare@suse.de>
+Return-Path: <ming.lei@redhat.com>
+Date: Thu, 11 Jan 2018 10:48:20 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: axboe@kernel.dk, Ming Lei <tom.leiming@gmail.com>, hch@lst.de,
+	Bart.VanAssche@wdc.com, dm-devel@redhat.com,
+	linux-block@vger.kernel.org
 Subject: Re: [for-4.16 PATCH v3 1/3] block: only bdi_unregister() in
  del_gendisk() if !GENHD_FL_HIDDEN
-To: Mike Snitzer <snitzer@redhat.com>, axboe@kernel.dk
-Cc: Ming Lei <tom.leiming@gmail.com>, hch@lst.de, Bart.VanAssche@wdc.com,
- dm-devel@redhat.com, linux-block@vger.kernel.org
+Message-ID: <20180111024819.GC7290@ming.t460p>
 References: <20180111021256.37490-1-snitzer@redhat.com>
  <20180111021256.37490-2-snitzer@redhat.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <c8a687ce-f269-983a-a292-51d4fb88f770@suse.de>
-Date: Thu, 11 Jan 2018 08:40:25 +0100
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180111021256.37490-2-snitzer@redhat.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 01/11/2018 03:12 AM, Mike Snitzer wrote:
+On Wed, Jan 10, 2018 at 09:12:54PM -0500, Mike Snitzer wrote:
 > device_add_disk() will only call bdi_register_owner() if
 > !GENHD_FL_HIDDEN, so it follows that del_gendisk() should only call
 > bdi_unregister() if !GENHD_FL_HIDDEN.
@@ -43,15 +44,11 @@ On 01/11/2018 03:12 AM, Mike Snitzer wrote:
 >  		blk_unregister_queue(disk);
 >  	} else {
 >  		WARN_ON(1);
+> -- 
+> 2.15.0
 > 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Cheers,
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Hannes
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+Ming
