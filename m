@@ -1,50 +1,116 @@
-Return-Path: <prvs=5429ea774=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "syzkaller@googlegroups.com" <syzkaller@googlegroups.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"dgilbert@interlog.com" <dgilbert@interlog.com>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "dvyukov@google.com" <dvyukov@google.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>, "linux-scsi@vger.kernel.org"
-	<linux-scsi@vger.kernel.org>, "jejb@linux.vnet.ibm.com"
-	<jejb@linux.vnet.ibm.com>
-Subject: Re: scsi: memory leak in sg_start_req
-Date: Thu, 11 Jan 2018 16:28:28 +0000
-Message-ID: <1515688107.2752.12.camel@wdc.com>
-References: <CACT4Y+aqgtL37SkUAro4dKqxp4GynmfTLio1qGUbGTChFU7fpA@mail.gmail.com>
-	 <f30afef5-5123-72c2-aa41-4fbbde334fb4@interlog.com>
-In-Reply-To: <f30afef5-5123-72c2-aa41-4fbbde334fb4@interlog.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <dvyukov@google.com>
 MIME-Version: 1.0
+In-Reply-To: <f30afef5-5123-72c2-aa41-4fbbde334fb4@interlog.com>
+References: <CACT4Y+aqgtL37SkUAro4dKqxp4GynmfTLio1qGUbGTChFU7fpA@mail.gmail.com>
+ <f30afef5-5123-72c2-aa41-4fbbde334fb4@interlog.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Thu, 11 Jan 2018 09:23:53 +0100
+Message-ID: <CACT4Y+bEy0GQ-Fjqx=Od1wiTAwRp0KXE+tLCvjNR4xOfeeLLyA@mail.gmail.com>
+Subject: Re: scsi: memory leak in sg_start_req
+To: Doug Gilbert <dgilbert@interlog.com>
+Cc: jejb@linux.vnet.ibm.com, "Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-scsi <linux-scsi@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	syzkaller <syzkaller@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVGh1LCAyMDE4LTAxLTExIGF0IDAxOjA0IC0wNTAwLCBEb3VnbGFzIEdpbGJlcnQgd3JvdGU6
-DQo+IE1vbml0b3JpbmcgdGhhdCBwcm9ncmFtIHdpdGggJ2ZyZWUnIGZyb20gYW5vdGhlciB0ZXJt
-aW5hbCBJIHNlZQ0KPiBhYm91dCAyLjUgR0J5dGVzIG9mIHJhbSAic3dhbGxvd2VkIiBhbG1vc3Qg
-aW1tZWRpYXRlbHkgd2hlbiB0aGUgdGVzdA0KPiBwcm9ncmFtIHJ1bnMuIFdoZW4gdGhlIHByb2dy
-YW0gZXhpdHMgKGFib3V0IDUwIHNlY29uZHMgbGF0ZXIpIGFzIGZhcg0KPiBhcyBJIGNhbiBzZWUg
-YWxsIHRoYXQgcmFtIGlzIGdpdmVuIGJhY2suDQoNCkhlbGxvIERvdWcsDQoNClRoZXJlIGlzIHBy
-b2JhYmx5IHNvbWV0aGluZyB0aGF0J3MgbGVha2luZyBtZW1vcnkgaW4gb25lIG9mIHRoZSBmdW5j
-dGlvbnMgaW4NCnRoZSByZXBvcnRlZCBjYWxsIHN0YWNrLiBrbWVtbGVhayByZXBvcnRzIHRoZSBm
-b2xsb3dpbmcgaW4gbXkgdGVzdHMgKEkgaGF2ZW4ndA0KaGFkIHRoZSB0aW1lIHlldCB0byBhbmFs
-eXplIHRoaXMgZnVydGhlcik6DQoNCnVucmVmZXJlbmNlZCBvYmplY3QgMHhmZmZmODgwMzYzYzA5
-MDg4IChzaXplIDE5Mik6IA0KIGNvbW0gIm11bHRpcGF0aCIsIHBpZCAyMDA4OCwgamlmZmllcyA0
-Mjk1MDM0NzA2IChhZ2UgNjU0NC45ODBzKSANCiBoZXggZHVtcCAoZmlyc3QgMzIgYnl0ZXMpOiAN
-CiAgIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwICAuLi4u
-Li4uLi4uLi4uLi4uIA0KICAgMDAgMDAgMDAgMDAgMjAgMDAgMDAgMDAgMTIgMDEgMDAgMDAgMDAg
-MDAgMDAgMDAgIC4uLi4gLi4uLi4uLi4uLi4gDQogYmFja3RyYWNlOiANCiAgIFs8ZmZmZmZmZmY4
-MTY1OWUxYT5dIGttZW1sZWFrX2FsbG9jKzB4NGEvMHhhMCANCiAgIFs8ZmZmZmZmZmY4MTFmNTFm
-ZT5dIF9fa21hbGxvYysweDE2ZS8weDMyMCANCiAgIFs8ZmZmZmZmZmY4MTJlNDg0OD5dIGJpb19h
-bGxvY19iaW9zZXQrMHgxOTgvMHgxZjAgDQogICBbPGZmZmZmZmZmODEyZTUxYjk+XSBiaW9fbWFw
-X3VzZXJfaW92KzB4MTI5LzB4M2YwIA0KICAgWzxmZmZmZmZmZjgxMmY1ODYzPl0gYmxrX3JxX21h
-cF91c2VyX2lvdisweDEyMy8weDIxMCANCiAgIFs8ZmZmZmZmZmY4MTJmNWEwMj5dIGJsa19ycV9t
-YXBfdXNlcisweDUyLzB4NjAgDQogICBbPGZmZmZmZmZmODEzMGI3YjU+XSBzZ19pbysweDM4NS8w
-eDNjMCANCiAgIFs8ZmZmZmZmZmY4MTMwYmFkMz5dIHNjc2lfY21kX2lvY3RsKzB4MmUzLzB4NDUw
-IA0KICAgWzxmZmZmZmZmZjgxMzBiYzgyPl0gc2NzaV9jbWRfYmxrX2lvY3RsKzB4NDIvMHg1MCAN
-CiAgIFs8ZmZmZmZmZmY4MTQ4ZDgzNT5dIHNkX2lvY3RsKzB4ODUvMHgxMTAgDQogICBbPGZmZmZm
-ZmZmODEzMDJiZmI+XSBibGtkZXZfaW9jdGwrMHg0ZGIvMHg5NzAgDQogICBbPGZmZmZmZmZmODEy
-NjYwZmQ+XSBibG9ja19pb2N0bCsweDNkLzB4NTAgDQogICBbPGZmZmZmZmZmODEyMzQ4ZDQ+XSBk
-b192ZnNfaW9jdGwrMHg5NC8weDY3MCANCiAgIFs8ZmZmZmZmZmY4MTIzNGVmMT5dIFN5U19pb2N0
-bCsweDQxLzB4NzAgDQogICBbPGZmZmZmZmZmODEwMDFlNWM+XSBkb19zeXNjYWxsXzY0KzB4NWMv
-MHgxMTAgDQogICBbPGZmZmZmZmZmODE2Njc1NjQ+XSByZXR1cm5fZnJvbV9TWVNDQUxMXzY0KzB4
-MC8weDdhDQoNCkJhcnQu
+On Thu, Jan 11, 2018 at 7:04 AM, Douglas Gilbert <dgilbert@interlog.com> wrote:
+> On 2018-01-09 11:05 AM, Dmitry Vyukov wrote:
+>>
+>> Hello,
+>>
+>> syzkaller has found the following memory leak:
+>>
+>> unreferenced object 0xffff88004c190000 (size 8328):
+>>    comm "syz-executor", pid 4627, jiffies 4294749150 (age 45.507s)
+>>    hex dump (first 32 bytes):
+>>      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>>      20 00 00 00 22 01 00 00 00 00 00 00 04 00 00 00   ..."...........
+>>    backtrace:
+>>      [<000000005955b5a9>] kmalloc_order+0x59/0x80 mm/slab_common.c:1124
+>>      [<0000000043ae006e>] kmalloc_order_trace+0x1f/0x160
+>> mm/slab_common.c:1133
+>>      [<00000000d33b2e16>] kmalloc_large include/linux/slab.h:433 [inline]
+>>      [<00000000d33b2e16>] __kmalloc+0x2c4/0x340 mm/slub.c:3751
+>>      [<00000000e7430040>] kmalloc include/linux/slab.h:504 [inline]
+>>      [<00000000e7430040>] bio_alloc_bioset+0x4d5/0x7e0 block/bio.c:450
+>>      [<00000000f370e717>] bio_kmalloc include/linux/bio.h:410 [inline]
+>>      [<00000000f370e717>] bio_copy_user_iov+0x2be/0xcb0 block/bio.c:1226
+>>      [<000000001d0b79ed>] __blk_rq_map_user_iov block/blk-map.c:67
+>> [inline]
+>>      [<000000001d0b79ed>] blk_rq_map_user_iov+0x2b6/0x7d0
+>> block/blk-map.c:136
+>>      [<000000004200a869>] blk_rq_map_user+0x11e/0x170 block/blk-map.c:166
+>>      [<000000008f21739e>] sg_start_req drivers/scsi/sg.c:1794 [inline]
+>>      [<000000008f21739e>] sg_common_write.isra.16+0x14df/0x1ed0
+>> drivers/scsi/sg.c:777
+>>      [<00000000093f61e3>] sg_write+0x8a7/0xd7b drivers/scsi/sg.c:677
+>>      [<00000000b67dafdc>] __vfs_write+0x10d/0x8f0 fs/read_write.c:480
+>>      [<000000000638f16f>] vfs_write+0x1fd/0x570 fs/read_write.c:544
+>>      [<000000006a7e6867>] SYSC_write fs/read_write.c:589 [inline]
+>>      [<000000006a7e6867>] SyS_write+0xfa/0x250 fs/read_write.c:581
+>>
+>> can be reproduced with the following program:
+>>
+>> // autogenerated by syzkaller (http://github.com/google/syzkaller)
+>> #include <sys/types.h>
+>> #include <sys/stat.h>
+>> #include <fcntl.h>
+>> #include <unistd.h>
+>>
+>> int main()
+>> {
+>>    int fd = open("/dev/sg1", O_RDWR);
+>>    const char *data =
+>>
+>> "\xb6\x3d\xb8\x5e\x1e\x8d\x22\x00\x00\x00\x00\x00\x00\x08\xaf\xd6\x1d"
+>>
+>> "\xcc\x43\x6a\xed\x5e\xd2\xbc\x70\x18\xce\xbc\x9b\x97\xae\x21\x91\x4d"
+>>           "\x87\x2c\x67\x8c\xe2\x2c\x9b\x16\x0e\x96\xaa\x1f\xae\x1a";
+>>    write(fd, data, 0x30);
+>>    return 0;
+>> }
+>>
+>> if executed in a loop, memory consumption grows infinitely.
+>>
+>> on upstream commit b2cd1df66037e7c4697c7e40496bf7e4a5e16a2d
+>>
+> The seemingly random data that program is sending is asking for
+> a buffer of 2,264,314 bytes which the sg driver procures and waits
+> for the caller to either issue a read() or close() the file
+> or shutdown the program. The test program does none of those
+> expected operations, it simply asks for the same resources again.
+
+
+But the process exits which implicitly closes all files. There is
+nothing in user-space to hold onto these resources. I would understand
+if the same process would open infinite amount of files and never
+close old ones (like in your test). But here it seems that kernel must
+free up all associated resources. What am I missing?
+
+
+> In my version of your test code (attached), that happens 1,021 times
+> at which point the file handles in that process are exhausted and
+> all subsequent open()s fail with EBADF (as do the write()s). The
+> output from my program was this on one run:
+>
+> # ./sg_syzk_grow
+> First errno=9 [Bad file descriptor] index=1021
+> done_count=50000, err_count=48979, last_errno=9 [Bad file descriptor]
+>
+> # lsscsi -gs
+> [0:0:0:0]  disk  Linux  scsi_debug  0186  /dev/sda  /dev/sg0  2.14GB
+>
+> Monitoring that program with 'free' from another terminal I see
+> about 2.5 GBytes of ram "swallowed" almost immediately when the test
+> program runs. When the program exits (about 50 seconds later) as far
+> as I can see all that ram is given back.
+>
+>
+> If you used the same program and wrote to a regular file rather than
+> a sg device, then that program would eventually fill any file system,
+> at the rate of 48 bytes per iteration (given enough file descriptor
+> resources). The sg driver, using its original 1994 interface,
+> deprecated for around 18 years, just gets a system to resource
+> exhaustion quicker.
