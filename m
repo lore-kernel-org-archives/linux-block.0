@@ -1,32 +1,94 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:53492 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:54182 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933147AbeAKWKQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jan 2018 17:10:16 -0500
-Date: Thu, 11 Jan 2018 17:10:08 -0500
-From: Mike Snitzer <snitzer@redhat.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>, dm-devel@redhat.com,
-        Bart Van Assche <bart.vanassche@sandisk.com>
-Subject: Re: [PATCH V3 4/5] blk-mq: return dispatch result to caller in
- blk_mq_try_issue_directly
-Message-ID: <20180111221007.GC31944@redhat.com>
+        id S1750916AbeAKGDh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Jan 2018 01:03:37 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 4/5] blk-mq: return dispatch result to caller in blk_mq_try_issue_directly
+Date: Thu, 11 Jan 2018 14:01:58 +0800
+Message-Id: <20180111060159.12991-5-ming.lei@redhat.com>
+In-Reply-To: <20180111060159.12991-1-ming.lei@redhat.com>
 References: <20180111060159.12991-1-ming.lei@redhat.com>
- <20180111060159.12991-5-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180111060159.12991-5-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Jan 11 2018 at  1:01am -0500,
-Ming Lei <ming.lei@redhat.com> wrote:
+In the following patch, we will use blk_mq_try_issue_directly() for DM
+to return the dispatch result, and DM need this informatin to improve
+IO merge.
 
-> In the following patch, we will use blk_mq_try_issue_directly() for DM
-> to return the dispatch result, and DM need this informatin to improve
-> IO merge.
-> 
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
 
-Reviewed-by: Mike Snitzer <snitzer@redhat.com>
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d27c1a265d54..444a4bf9705f 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1711,13 +1711,13 @@ static bool __blk_mq_issue_req(struct blk_mq_hw_ctx *hctx,
+ 	return false;
+ }
+ 
+-static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+-					struct request *rq,
+-					blk_qc_t *cookie)
++static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
++						struct request *rq,
++						blk_qc_t *cookie)
+ {
+ 	struct request_queue *q = rq->q;
+ 	blk_qc_t new_cookie;
+-	blk_status_t ret;
++	blk_status_t ret = BLK_STS_OK;
+ 	bool run_queue = true;
+ 
+ 	/* RCU or SRCU read lock is needed before checking quiesced flag */
+@@ -1740,31 +1740,36 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	switch (ret) {
+ 	case BLK_STS_OK:
+ 		*cookie = new_cookie;
+-		return;
++		return ret;
+ 	case BLK_STS_RESOURCE:
+ 		__blk_mq_requeue_request(rq);
+ 		goto insert;
+ 	default:
+ 		*cookie = BLK_QC_T_NONE;
+ 		blk_mq_end_request(rq, ret);
+-		return;
++		return ret;
+ 	}
+ 
+ insert:
+ 	blk_mq_sched_insert_request(rq, false, run_queue, false,
+ 					hctx->flags & BLK_MQ_F_BLOCKING);
++	return ret;
+ }
+ 
+-static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+-		struct request *rq, blk_qc_t *cookie)
++static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
++					      struct request *rq,
++					      blk_qc_t *cookie)
+ {
+ 	int srcu_idx;
++	blk_status_t ret;
+ 
+ 	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
+ 
+ 	hctx_lock(hctx, &srcu_idx);
+-	__blk_mq_try_issue_directly(hctx, rq, cookie);
++	ret = __blk_mq_try_issue_directly(hctx, rq, cookie);
+ 	hctx_unlock(hctx, srcu_idx);
++
++	return ret;
+ }
+ 
+ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+-- 
+2.9.5
