@@ -1,78 +1,32 @@
-Return-Path: <prvs=547e67762=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Mike Snitzer <snitzer@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH 3/3] block: Protect less code with sysfs_lock in blk_{un,}register_queue()
-Date: Tue, 16 Jan 2018 10:17:52 -0800
-Message-Id: <20180116181752.25847-4-bart.vanassche@wdc.com>
-In-Reply-To: <20180116181752.25847-1-bart.vanassche@wdc.com>
-References: <20180116181752.25847-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:53492 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S933147AbeAKWKQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Jan 2018 17:10:16 -0500
+Date: Thu, 11 Jan 2018 17:10:08 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>, dm-devel@redhat.com,
+        Bart Van Assche <bart.vanassche@sandisk.com>
+Subject: Re: [PATCH V3 4/5] blk-mq: return dispatch result to caller in
+ blk_mq_try_issue_directly
+Message-ID: <20180111221007.GC31944@redhat.com>
+References: <20180111060159.12991-1-ming.lei@redhat.com>
+ <20180111060159.12991-5-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180111060159.12991-5-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The __blk_mq_register_dev(), blk_mq_unregister_dev(),
-elv_register_queue() and elv_unregister_queue() calls need to be
-protected with sysfs_lock but other code in these functions not.
-Hence protect only this code with sysfs_lock. This patch fixes a
-locking inversion issue in blk_unregister_queue() and also in an
-error path of blk_register_queue(): it is not allowed to hold
-sysfs_lock around the kobject_del(&q->kobj) call.
+On Thu, Jan 11 2018 at  1:01am -0500,
+Ming Lei <ming.lei@redhat.com> wrote:
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
----
- block/blk-sysfs.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+> In the following patch, we will use blk_mq_try_issue_directly() for DM
+> to return the dispatch result, and DM need this informatin to improve
+> IO merge.
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 4a6a40ffd78e..e9ce45ff0ef2 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -909,11 +909,12 @@ int blk_register_queue(struct gendisk *disk)
- 	if (q->request_fn || (q->mq_ops && q->elevator)) {
- 		ret = elv_register_queue(q);
- 		if (ret) {
-+			mutex_unlock(&q->sysfs_lock);
- 			kobject_uevent(&q->kobj, KOBJ_REMOVE);
- 			kobject_del(&q->kobj);
- 			blk_trace_remove_sysfs(dev);
- 			kobject_put(&dev->kobj);
--			goto unlock;
-+			return ret;
- 		}
- 	}
- 	ret = 0;
-@@ -934,28 +935,22 @@ void blk_unregister_queue(struct gendisk *disk)
- 	if (!test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags))
- 		return;
- 
--	/*
--	 * Protect against the 'queue' kobj being accessed
--	 * while/after it is removed.
--	 */
--	mutex_lock(&q->sysfs_lock);
--
- 	spin_lock_irq(q->queue_lock);
- 	queue_flag_clear(QUEUE_FLAG_REGISTERED, q);
- 	spin_unlock_irq(q->queue_lock);
- 
- 	wbt_exit(q);
- 
-+	mutex_lock(&q->sysfs_lock);
- 	if (q->mq_ops)
- 		blk_mq_unregister_dev(disk_to_dev(disk), q);
- 
- 	if (q->request_fn || (q->mq_ops && q->elevator))
- 		elv_unregister_queue(q);
-+	mutex_unlock(&q->sysfs_lock);
- 
- 	kobject_uevent(&q->kobj, KOBJ_REMOVE);
- 	kobject_del(&q->kobj);
- 	blk_trace_remove_sysfs(disk_to_dev(disk));
- 	kobject_put(&disk_to_dev(disk)->kobj);
--
--	mutex_unlock(&q->sysfs_lock);
- }
--- 
-2.15.1
+Reviewed-by: Mike Snitzer <snitzer@redhat.com>
