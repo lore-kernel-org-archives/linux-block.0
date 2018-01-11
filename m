@@ -1,77 +1,43 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:33723 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965935AbeAJQTJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Jan 2018 11:19:09 -0500
-Received: by mail-wm0-f65.google.com with SMTP id 123so6050761wme.0
-        for <linux-block@vger.kernel.org>; Wed, 10 Jan 2018 08:19:09 -0800 (PST)
-From: Ilya Dryomov <idryomov@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
-        Tejun Heo <tj@kernel.org>, David Disseldorp <ddiss@suse.de>,
-        Sagi Grimberg <sagi@grimberg.me>
-Subject: [PATCH v2 2/2] block: add bdev_read_only() checks to common helpers
-Date: Wed, 10 Jan 2018 17:18:38 +0100
-Message-Id: <1515601118-23192-3-git-send-email-idryomov@gmail.com>
-In-Reply-To: <1515601118-23192-1-git-send-email-idryomov@gmail.com>
-References: <1515601118-23192-1-git-send-email-idryomov@gmail.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <msnitzer@redhat.com>
+From: Mike Snitzer <snitzer@redhat.com>
+To: axboe@kernel.dk
+Cc: Ming Lei <tom.leiming@gmail.com>,
+	hare@suse.de,
+	Bart.VanAssche@wdc.com,
+	dm-devel@redhat.com,
+	linux-block@vger.kernel.org
+Subject: [for-4.16 PATCH v4 0/4] block/dm: allow DM to defer blk_register_queue() until ready
+Date: Thu, 11 Jan 2018 15:14:13 -0500
+Message-Id: <20180111201417.2042-1-snitzer@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Similar to blkdev_write_iter(), return -EPERM if the partition is
-read-only.  This covers ioctl(), fallocate() and most in-kernel users
-but isn't meant to be exhaustive -- everything else will be caught in
-generic_make_request_checks(), fail with -EIO and can be fixed later.
+Hi Jens,
 
-Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
----
- block/blk-lib.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+I think this set is now ready for you to pick up for 4.16.
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 2bc544ce3d2e..a676084d4740 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -37,6 +37,9 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 	if (!q)
- 		return -ENXIO;
- 
-+	if (bdev_read_only(bdev))
-+		return -EPERM;
-+
- 	if (flags & BLKDEV_DISCARD_SECURE) {
- 		if (!blk_queue_secure_erase(q))
- 			return -EOPNOTSUPP;
-@@ -156,6 +159,9 @@ static int __blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
- 	if (!q)
- 		return -ENXIO;
- 
-+	if (bdev_read_only(bdev))
-+		return -EPERM;
-+
- 	bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
- 	if ((sector | nr_sects) & bs_mask)
- 		return -EINVAL;
-@@ -233,6 +239,9 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
- 	if (!q)
- 		return -ENXIO;
- 
-+	if (bdev_read_only(bdev))
-+		return -EPERM;
-+
- 	/* Ensure that max_write_zeroes_sectors doesn't overflow bi_size */
- 	max_write_zeroes_sectors = bdev_write_zeroes_sectors(bdev);
- 
-@@ -287,6 +296,9 @@ static int __blkdev_issue_zero_pages(struct block_device *bdev,
- 	if (!q)
- 		return -ENXIO;
- 
-+	if (bdev_read_only(bdev))
-+		return -EPERM;
-+
- 	while (nr_sects != 0) {
- 		bio = next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),
- 			       gfp_mask);
+Hannes, I ran with your review feedback and think the result is
+cleaner (avoids frivolously using another QUEUE_FLAG).
+
+Ming, I didn't add your Reviewed-by to "block: allow gendisk's
+request_queue registration to be deferred" because it changed enough,
+albeit for the better, that it is best for you to review again.
+
+Thanks,
+Mike
+
+Mike Snitzer (4):
+  block: only bdi_unregister() in del_gendisk() if !GENHD_FL_HIDDEN
+  block: use queue_lock when clearing QUEUE_FLAG_REGISTERED in blk_unregister_queue
+  block: allow gendisk's request_queue registration to be deferred
+  dm: fix awkward and incomplete request_queue initialization
+
+ block/blk-sysfs.c     | 12 ++++++++----
+ block/genhd.c         | 23 +++++++++++++++++++----
+ drivers/md/dm-core.h  |  2 --
+ drivers/md/dm-rq.c    | 11 -----------
+ drivers/md/dm.c       | 41 ++++++++++++++++++++++-------------------
+ include/linux/genhd.h |  5 +++++
+ 6 files changed, 54 insertions(+), 40 deletions(-)
+
 -- 
-2.4.3
+2.15.0
