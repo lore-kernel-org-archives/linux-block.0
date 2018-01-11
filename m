@@ -1,42 +1,61 @@
-Return-Path: <prvs=5429ea774=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "axboe@kernel.dk" <axboe@kernel.dk>, "snitzer@redhat.com"
-	<snitzer@redhat.com>, "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "dm-devel@redhat.com" <dm-devel@redhat.com>, "hch@infradead.org"
-	<hch@infradead.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "axboe@fb.com" <axboe@fb.com>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>
+Return-Path: <msnitzer@redhat.com>
+Date: Thu, 11 Jan 2018 17:07:42 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: Ming Lei <ming.lei@redhat.com>, axboe@kernel.dk
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>, dm-devel@redhat.com,
+	Bart Van Assche <bart.vanassche@sandisk.com>
 Subject: Re: [PATCH V3 0/5]  dm-rq: improve sequential I/O performance
-Date: Thu, 11 Jan 2018 22:37:37 +0000
-Message-ID: <1515710256.2752.72.camel@sandisk.com>
+Message-ID: <20180111220742.GA31944@redhat.com>
 References: <20180111060159.12991-1-ming.lei@redhat.com>
-	 <20180111220742.GA31944@redhat.com>
-In-Reply-To: <20180111220742.GA31944@redhat.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180111060159.12991-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVGh1LCAyMDE4LTAxLTExIGF0IDE3OjA3IC0wNTAwLCBNaWtlIFNuaXR6ZXIgd3JvdGU6DQo+
-IEJhcnQsIGlmIGZvciBzb21lIHJlYXNvbiB3ZSByZWdyZXNzIGZvciBzb21lIHdvcmtsb2FkIHlv
-dSdyZSBhYmxlIHRvDQo+IG1vcmUgcmVhZGlseSB0ZXN0IHdlIGNhbiBkZWFsIHdpdGggaXQuICBC
-dXQgSSdtIHRvbyBlbmNvdXJhZ2VkIGJ5IE1pbmcncw0KPiBwZXJmb3JtYW5jZSBpbXByb3ZlbWVu
-dHMgdG8gaG9sZCB0aGVzZSBjaGFuZ2VzIGJhY2sgYW55IGZ1cnRoZXIuDQoNClNvcnJ5IE1pa2Ug
-YnV0IEkgdGhpbmsgTWluZydzIG1lYXN1cmVtZW50IHJlc3VsdHMgYXJlIG5vdCBzdWZmaWNpZW50
-IHRvDQptb3RpdmF0ZSB1cHN0cmVhbWluZyBvZiB0aGVzZSBwYXRjaGVzLiBXaGF0IEkgcmVtZW1i
-ZXIgZnJvbSBwcmV2aW91cyB2ZXJzaW9ucw0Kb2YgdGhpcyBwYXRjaCBzZXJpZXMgaXMgdGhhdCBN
-aW5nIG1lYXN1cmVkIHRoZSBwZXJmb3JtYW5jZSBpbXBhY3Qgb2YgdGhpcw0KcGF0Y2ggc2VyaWVz
-IG9ubHkgZm9yIHRoZSBFbXVsZXggRkMgZHJpdmVyIChscGZjKS4gVGhhdCBkcml2ZXIgbGltaXRz
-IHF1ZXVlDQpkZXB0aCB0byAzLiBJbnN0ZWFkIG9mIG1vZGlmeWluZyB0aGUgZG0gY29kZSwgdGhh
-dCBkcml2ZXIgbmVlZHMgdG8gYmUgZml4ZWQNCnN1Y2ggdGhhdCBpdCBhbGxvd3MgbGFyZ2VyIHF1
-ZXVlIGRlcHRocy4NCg0KQWRkaXRpb25hbGx5LCBzb21lIHRpbWUgYWdvIEkgaGFkIGV4cGxhaW5l
-ZCBpbiBkZXRhaWwgd2h5IEkgdGhpbmsgdGhhdCBwYXRjaA0KMi81IGluIHRoaXMgc2VyaWVzIGlz
-IHdyb25nIGFuZCB3aHkgaXQgd2lsbCBpbnRyb2R1Y2UgZmFpcm5lc3MgcmVncmVzc2lvbnMNCmlu
-IG11bHRpLUxVTiB3b3JrbG9hZHMuIEkgdGhpbmsgd2UgbmVlZCBwZXJmb3JtYW5jZSBtZWFzdXJl
-bWVudHMgZm9yIHRoaXMNCnBhdGNoIHNlcmllcyBmb3IgYXQgbGVhc3QgdGhlIGZvbGxvd2luZyB0
-d28gY29uZmlndXJhdGlvbnMgYmVmb3JlIHRoaXMgcGF0Y2gNCnNlcmllcyBjYW4gYmUgY29uc2lk
-ZXJlZCBmb3IgdXBzdHJlYW0gaW5jbHVzaW9uOg0KKiBUaGUgcGVyZm9ybWFuY2UgaW1wYWN0IG9m
-IHRoaXMgcGF0Y2ggc2VyaWVzIGZvciBTQ1NJIGRldmljZXMgd2l0aCBhDQogIHJlYWxpc3RpYyBx
-dWV1ZSBkZXB0aCAoZS5nLiA2NCBvciAxMjgpLg0KKiBUaGUgcGVyZm9ybWFuY2UgaW1wYWN0IGZv
-ciB0aGlzIHBhdGNoIHNlcmllcyBmb3IgYSBTQ1NJIGhvc3Qgd2l0aCB3aGljaA0KICBtdWx0aXBs
-ZSBMVU5zIGFyZSBhc3NvY2lhdGVkIGFuZCBmb3Igd2hpY2ggdGhlIHRhcmdldCBzeXN0ZW0gb2Z0
-ZW4gcmVwbGllcw0KICB3aXRoIHRoZSBTQ1NJICJCVVNZIiBzdGF0dXMuDQoNCkJhcnQu
+On Thu, Jan 11 2018 at  1:01am -0500,
+Ming Lei <ming.lei@redhat.com> wrote:
+
+> Hi Guys,
+> 
+> The 1st patch removes the workaround of blk_mq_delay_run_hw_queue() in
+> case of requeue, this way isn't necessary, and more worse, it makes
+> BLK_MQ_S_SCHED_RESTART not working, and degarde I/O performance.
+> 
+> The 2nd patch return DM_MAPIO_REQUEUE to dm-rq if underlying request
+> allocation fails, then we can return BLK_STS_RESOURCE from dm-rq to
+> blk-mq, so that blk-mq can hold the requests to be dequeued.
+
+In general the delayed requeue was meant to cope (slightly better) with
+queue_if_no_path and no paths being available.  I think patch 1 respect
+that intent.  And patch 2 looks right to me, BLK_STS_RESOURCE definitely
+should be returned if blk_get_request() fails.
+
+So I picked these up for dm-4.16 (and staged them in linux-next).  I
+reworded both headers and the 2nd patch's block comment, see:
+https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=dm-4.16&id=64e4e12bf474cf3aaaf59245bbeba3057d2fedf9
+https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=dm-4.16&id=c50de17c1cc7d5910df58aba9b950e99579e239d
+
+Bart, if for some reason we regress for some workload you're able to
+more readily test we can deal with it.  But I'm too encouraged by Ming's
+performance improvements to hold these changes back any further.
+
+> The other 3 paches changes the blk-mq part of blk_insert_cloned_request(),
+> in which we switch to blk_mq_try_issue_directly(), so that both dm-rq
+> and blk-mq can get the dispatch result of underlying queue, and with
+> this information, blk-mq can handle IO merge much better, then
+> sequential I/O performance is improved much.
+> 
+> In my dm-mpath over virtio-scsi test, this whole patchset improves
+> sequential IO by 3X ~ 5X.
+
+I've merged dm-4.16 and for-4.16/block and patched 3 - 5 apply cleanly
+(so we won't have any merge conflicts during 4.16), resulting git branch
+is here:
+https://git.kernel.org/pub/scm/linux/kernel/git/snitzer/linux.git/log/?h=block-4.16_dm-4.16
+
+I'll reply to patches 3 - 5 individually with my Reviewed-by.
+Jens, please feel free to pick them up for 4.16.
+
+Thanks,
+Mike
