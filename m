@@ -1,20 +1,21 @@
-Return-Path: <hare@suse.de>
+Return-Path: <ming.lei@redhat.com>
+Date: Thu, 11 Jan 2018 10:56:51 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: axboe@kernel.dk, Ming Lei <tom.leiming@gmail.com>, hch@lst.de,
+	Bart.VanAssche@wdc.com, dm-devel@redhat.com,
+	linux-block@vger.kernel.org
 Subject: Re: [for-4.16 PATCH v3 3/3] dm: fix awkward and incomplete
  request_queue initialization
-To: Mike Snitzer <snitzer@redhat.com>, axboe@kernel.dk
-Cc: Ming Lei <tom.leiming@gmail.com>, hch@lst.de, Bart.VanAssche@wdc.com,
- dm-devel@redhat.com, linux-block@vger.kernel.org
+Message-ID: <20180111025649.GE7290@ming.t460p>
 References: <20180111021256.37490-1-snitzer@redhat.com>
  <20180111021256.37490-4-snitzer@redhat.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <a1b6522a-ef02-0af3-d7b0-5cfec6d87539@suse.de>
-Date: Thu, 11 Jan 2018 08:57:40 +0100
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180111021256.37490-4-snitzer@redhat.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 01/11/2018 03:12 AM, Mike Snitzer wrote:
+On Wed, Jan 10, 2018 at 09:12:56PM -0500, Mike Snitzer wrote:
 > DM is now no longer prone to having its request_queue be improperly
 > initialized.
 > 
@@ -216,17 +217,14 @@ On 01/11/2018 03:12 AM, Mike Snitzer wrote:
 >  
 >  	if (dm_request_based(md) && md->kworker_task)
 >  		kthread_flush_worker(&md->kworker);
+> -- 
+> 2.15.0
 > 
-As mentioned in the other mail, maybe one should consider using a
-wrapper function for 'add_disk()' to avoid having to set the magic queue
-flag.
 
-Cheers,
+Pass some of my block/DM sanity test, and blk-mq debugfs can be used
+with this patch on DM-MPATH.
 
-Hannes
+	Tested-by: Ming Lei <ming.lei@redhat.com>
+
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+Ming
