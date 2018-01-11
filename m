@@ -1,78 +1,42 @@
-Return-Path: <msnitzer@redhat.com>
-Date: Thu, 11 Jan 2018 17:58:30 -0500
-From: Mike Snitzer <snitzer@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "axboe@kernel.dk" <axboe@kernel.dk>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>,
-	"dm-devel@redhat.com" <dm-devel@redhat.com>,
-	"hch@infradead.org" <hch@infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@fb.com" <axboe@fb.com>,
+Return-Path: <prvs=5429ea774=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "axboe@kernel.dk" <axboe@kernel.dk>, "snitzer@redhat.com"
+	<snitzer@redhat.com>, "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "dm-devel@redhat.com" <dm-devel@redhat.com>, "hch@infradead.org"
+	<hch@infradead.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "axboe@fb.com" <axboe@fb.com>,
 	"martin.petersen@oracle.com" <martin.petersen@oracle.com>
 Subject: Re: [PATCH V3 0/5]  dm-rq: improve sequential I/O performance
-Message-ID: <20180111225830.GE31944@redhat.com>
+Date: Thu, 11 Jan 2018 22:37:37 +0000
+Message-ID: <1515710256.2752.72.camel@sandisk.com>
 References: <20180111060159.12991-1-ming.lei@redhat.com>
- <20180111220742.GA31944@redhat.com>
- <1515710256.2752.72.camel@sandisk.com>
+	 <20180111220742.GA31944@redhat.com>
+In-Reply-To: <20180111220742.GA31944@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1515710256.2752.72.camel@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Jan 11 2018 at  5:37pm -0500,
-Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
-
-> On Thu, 2018-01-11 at 17:07 -0500, Mike Snitzer wrote:
-> > Bart, if for some reason we regress for some workload you're able to
-> > more readily test we can deal with it.  But I'm too encouraged by Ming's
-> > performance improvements to hold these changes back any further.
-> 
-> Sorry Mike but I think Ming's measurement results are not sufficient to
-> motivate upstreaming of these patches. What I remember from previous versions
-> of this patch series is that Ming measured the performance impact of this
-> patch series only for the Emulex FC driver (lpfc). That driver limits queue
-> depth to 3. Instead of modifying the dm code, that driver needs to be fixed
-> such that it allows larger queue depths.
-
-Sorry Bart but even in my test (using null_blk with queue depth of 8, 12
-hw queues on 12 cpu system, with 12 fio jobs) it is yielding performance
-improvement.  Going from 1350K iops to 1420K iops.  And 5275MB/s to
-5532MB/s.  For sequential fio workload.
-
-This test has been a staple of mine for a very long time.  The
-improvement is very real (and hard to come by).  The iops improvement is
-a bellweather for improved efficiency in the fast path.
-
-So all your concern about Ming's testing is fine.  But you'd really help
-me out a lot if you could give these changes a test.
- 
-> Additionally, some time ago I had explained in detail why I think that patch
-> 2/5 in this series is wrong and why it will introduce fairness regressions
-> in multi-LUN workloads.
-
-You may think you explained it.. but IIRC it was very hand-wavvy.  If
-you can provide a pointer to what you think was a compelling argument
-then please do.
-
-But I'm left very much unconvinced with your argument given what I see
-in patch 2.  If blk_get_request() fails it follows that BLK_STS_RESOURCE
-should be returned.  Why is the 100ms delay meaningful in that case for
-SCSI?
-
-> I think we need performance measurements for this
-> patch series for at least the following two configurations before this patch
-> series can be considered for upstream inclusion:
-> * The performance impact of this patch series for SCSI devices with a
->   realistic queue depth (e.g. 64 or 128).
-> * The performance impact for this patch series for a SCSI host with which
->   multiple LUNs are associated and for which the target system often replies
->   with the SCSI "BUSY" status.
-
-OK, so please test it.
-
-The changes are pretty easy to review.  This notion that these changes
-are problematic rings very hollow given your lack of actual numbers (or
-some other concerning observation rooted in testing fact) to back up
-your position.
-
-Mike
+T24gVGh1LCAyMDE4LTAxLTExIGF0IDE3OjA3IC0wNTAwLCBNaWtlIFNuaXR6ZXIgd3JvdGU6DQo+
+IEJhcnQsIGlmIGZvciBzb21lIHJlYXNvbiB3ZSByZWdyZXNzIGZvciBzb21lIHdvcmtsb2FkIHlv
+dSdyZSBhYmxlIHRvDQo+IG1vcmUgcmVhZGlseSB0ZXN0IHdlIGNhbiBkZWFsIHdpdGggaXQuICBC
+dXQgSSdtIHRvbyBlbmNvdXJhZ2VkIGJ5IE1pbmcncw0KPiBwZXJmb3JtYW5jZSBpbXByb3ZlbWVu
+dHMgdG8gaG9sZCB0aGVzZSBjaGFuZ2VzIGJhY2sgYW55IGZ1cnRoZXIuDQoNClNvcnJ5IE1pa2Ug
+YnV0IEkgdGhpbmsgTWluZydzIG1lYXN1cmVtZW50IHJlc3VsdHMgYXJlIG5vdCBzdWZmaWNpZW50
+IHRvDQptb3RpdmF0ZSB1cHN0cmVhbWluZyBvZiB0aGVzZSBwYXRjaGVzLiBXaGF0IEkgcmVtZW1i
+ZXIgZnJvbSBwcmV2aW91cyB2ZXJzaW9ucw0Kb2YgdGhpcyBwYXRjaCBzZXJpZXMgaXMgdGhhdCBN
+aW5nIG1lYXN1cmVkIHRoZSBwZXJmb3JtYW5jZSBpbXBhY3Qgb2YgdGhpcw0KcGF0Y2ggc2VyaWVz
+IG9ubHkgZm9yIHRoZSBFbXVsZXggRkMgZHJpdmVyIChscGZjKS4gVGhhdCBkcml2ZXIgbGltaXRz
+IHF1ZXVlDQpkZXB0aCB0byAzLiBJbnN0ZWFkIG9mIG1vZGlmeWluZyB0aGUgZG0gY29kZSwgdGhh
+dCBkcml2ZXIgbmVlZHMgdG8gYmUgZml4ZWQNCnN1Y2ggdGhhdCBpdCBhbGxvd3MgbGFyZ2VyIHF1
+ZXVlIGRlcHRocy4NCg0KQWRkaXRpb25hbGx5LCBzb21lIHRpbWUgYWdvIEkgaGFkIGV4cGxhaW5l
+ZCBpbiBkZXRhaWwgd2h5IEkgdGhpbmsgdGhhdCBwYXRjaA0KMi81IGluIHRoaXMgc2VyaWVzIGlz
+IHdyb25nIGFuZCB3aHkgaXQgd2lsbCBpbnRyb2R1Y2UgZmFpcm5lc3MgcmVncmVzc2lvbnMNCmlu
+IG11bHRpLUxVTiB3b3JrbG9hZHMuIEkgdGhpbmsgd2UgbmVlZCBwZXJmb3JtYW5jZSBtZWFzdXJl
+bWVudHMgZm9yIHRoaXMNCnBhdGNoIHNlcmllcyBmb3IgYXQgbGVhc3QgdGhlIGZvbGxvd2luZyB0
+d28gY29uZmlndXJhdGlvbnMgYmVmb3JlIHRoaXMgcGF0Y2gNCnNlcmllcyBjYW4gYmUgY29uc2lk
+ZXJlZCBmb3IgdXBzdHJlYW0gaW5jbHVzaW9uOg0KKiBUaGUgcGVyZm9ybWFuY2UgaW1wYWN0IG9m
+IHRoaXMgcGF0Y2ggc2VyaWVzIGZvciBTQ1NJIGRldmljZXMgd2l0aCBhDQogIHJlYWxpc3RpYyBx
+dWV1ZSBkZXB0aCAoZS5nLiA2NCBvciAxMjgpLg0KKiBUaGUgcGVyZm9ybWFuY2UgaW1wYWN0IGZv
+ciB0aGlzIHBhdGNoIHNlcmllcyBmb3IgYSBTQ1NJIGhvc3Qgd2l0aCB3aGljaA0KICBtdWx0aXBs
+ZSBMVU5zIGFyZSBhc3NvY2lhdGVkIGFuZCBmb3Igd2hpY2ggdGhlIHRhcmdldCBzeXN0ZW0gb2Z0
+ZW4gcmVwbGllcw0KICB3aXRoIHRoZSBTQ1NJICJCVVNZIiBzdGF0dXMuDQoNCkJhcnQu
