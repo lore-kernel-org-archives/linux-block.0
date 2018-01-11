@@ -1,100 +1,50 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:36454 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755254AbeAMRCP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 13 Jan 2018 12:02:15 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH v2 00/12] bcache: device failure handling improvement 
-Date: Sun, 14 Jan 2018 01:01:37 +0800
-Message-Id: <20180113170149.22365-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=5429ea774=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "syzkaller@googlegroups.com" <syzkaller@googlegroups.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"dgilbert@interlog.com" <dgilbert@interlog.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "dvyukov@google.com" <dvyukov@google.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>, "jejb@linux.vnet.ibm.com"
+	<jejb@linux.vnet.ibm.com>
+Subject: Re: scsi: memory leak in sg_start_req
+Date: Thu, 11 Jan 2018 16:28:28 +0000
+Message-ID: <1515688107.2752.12.camel@wdc.com>
+References: <CACT4Y+aqgtL37SkUAro4dKqxp4GynmfTLio1qGUbGTChFU7fpA@mail.gmail.com>
+	 <f30afef5-5123-72c2-aa41-4fbbde334fb4@interlog.com>
+In-Reply-To: <f30afef5-5123-72c2-aa41-4fbbde334fb4@interlog.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-Hi maintainers and folks,
-
-This patch set tries to improve bcache device failure handling, including
-cache device and backing device failures.
-
-The basic idea to handle failed cache device is,
-- Unregister cache set
-- Detach all backing devices attached to this cache set
-- Stop all bcache devices linked to this cache set
-The above process is named 'cache set retire' by me. The result of cache
-set retire is, cache set and bcache devices are all removed, following
-I/O requests will get failed immediately to notift upper layer or user
-space coce that the cache device is failed or disconnected.
-
-For failed backing device, there are two ways to handle them,
-- If device is disconnected, when kernel thread dc->status_update_thread
-  finds it is offline for BACKING_DEV_OFFLINE_TIMEOUT (5) seconds, the
-  kernel thread will set dc->io_disable and call bcache_device_stop() to
-  stop and remove the bcache device from system.
-- If device is connected but too many I/O errors happen, after errors
-  number exceeds dc->error_limit, call bch_cached_dev_error() to set
-  dc->io_disable and stop bcache device. Then the broken backing device
-  and its bcache device will be removed from system. 
-
-The v2 patch set fixes the problems addressed in v1 patch reviews, adds
-failure handling for backing device. This patch set also includes a patch
-from Junhui Tang. And the v2 patch set does not include 2 patches which are
-in bcache-for-next already. 
-
-A basic testing covered with writethrough, writeback, writearound mode, and
-read/write/readwrite workloads, cache set or bcache device can be removed
-by too many I/O errors or delete the device. For plugging out physical
-disks, a kernel bug triggers rcu oops in __do_softirq() and locks up all
-following accesses to the disconnected disk, this blocks my testing.
-
-While posting v2 patch set, I also continue to test the code from my side.
-Any comment, question and review are warmly welcome.
-
-Open issues:
-1, Detach backing device by writing sysfs detach file does not work, it is
-   because writeback thread does not drop dc->count refcount when cache
-   device turns from dirty into clean. This issue will be fixed in v3
-   patch set.
-2, A kernel bug in __do_softirq() when plugging out hard disk with heavy
-   I/O blocks my physical disk disconnection test. If any one knows this
-   bug, please give me a hint.
-
-Changelog:
-v2: fixes all problems found in v1 review.
-    add patches to handle backing device failure.
-    add one more patch to set writeback_rate_update_seconds range.
-    include a patch from Junhui Tang.
-v1: the initial version, only handles cache device failure.
-
-Coly Li (11):
-  bcache: set writeback_rate_update_seconds in range [1, 60] seconds
-  bcache: properly set task state in bch_writeback_thread()
-  bcache: set task properly in allocator_wait()
-  bcache: fix cached_dev->count usage for bch_cache_set_error()
-  bcache: stop dc->writeback_rate_update properly
-  bcache: set error_limit correctly
-  bcache: add CACHE_SET_IO_DISABLE to struct cache_set flags
-  bcache: stop all attached bcache devices for a retired cache set
-  bcache: add backing_request_endio() for bi_end_io of attached backing
-    device I/O
-  bcache: add io_disable to struct cached_dev
-  bcache: stop bcache device when backing device is offline
-
-Tang Junhui (1):
-  bcache: fix inaccurate io state for detached bcache devices
-
- drivers/md/bcache/alloc.c     |   5 +-
- drivers/md/bcache/bcache.h    |  37 ++++++++-
- drivers/md/bcache/btree.c     |  10 ++-
- drivers/md/bcache/io.c        |  16 +++-
- drivers/md/bcache/journal.c   |   4 +-
- drivers/md/bcache/request.c   | 188 +++++++++++++++++++++++++++++++++++-------
- drivers/md/bcache/super.c     | 134 ++++++++++++++++++++++++++++--
- drivers/md/bcache/sysfs.c     |  45 +++++++++-
- drivers/md/bcache/util.h      |   6 --
- drivers/md/bcache/writeback.c |  79 +++++++++++++++---
- drivers/md/bcache/writeback.h |   5 +-
- 11 files changed, 458 insertions(+), 71 deletions(-)
-
--- 
-2.15.1
+T24gVGh1LCAyMDE4LTAxLTExIGF0IDAxOjA0IC0wNTAwLCBEb3VnbGFzIEdpbGJlcnQgd3JvdGU6
+DQo+IE1vbml0b3JpbmcgdGhhdCBwcm9ncmFtIHdpdGggJ2ZyZWUnIGZyb20gYW5vdGhlciB0ZXJt
+aW5hbCBJIHNlZQ0KPiBhYm91dCAyLjUgR0J5dGVzIG9mIHJhbSAic3dhbGxvd2VkIiBhbG1vc3Qg
+aW1tZWRpYXRlbHkgd2hlbiB0aGUgdGVzdA0KPiBwcm9ncmFtIHJ1bnMuIFdoZW4gdGhlIHByb2dy
+YW0gZXhpdHMgKGFib3V0IDUwIHNlY29uZHMgbGF0ZXIpIGFzIGZhcg0KPiBhcyBJIGNhbiBzZWUg
+YWxsIHRoYXQgcmFtIGlzIGdpdmVuIGJhY2suDQoNCkhlbGxvIERvdWcsDQoNClRoZXJlIGlzIHBy
+b2JhYmx5IHNvbWV0aGluZyB0aGF0J3MgbGVha2luZyBtZW1vcnkgaW4gb25lIG9mIHRoZSBmdW5j
+dGlvbnMgaW4NCnRoZSByZXBvcnRlZCBjYWxsIHN0YWNrLiBrbWVtbGVhayByZXBvcnRzIHRoZSBm
+b2xsb3dpbmcgaW4gbXkgdGVzdHMgKEkgaGF2ZW4ndA0KaGFkIHRoZSB0aW1lIHlldCB0byBhbmFs
+eXplIHRoaXMgZnVydGhlcik6DQoNCnVucmVmZXJlbmNlZCBvYmplY3QgMHhmZmZmODgwMzYzYzA5
+MDg4IChzaXplIDE5Mik6IA0KIGNvbW0gIm11bHRpcGF0aCIsIHBpZCAyMDA4OCwgamlmZmllcyA0
+Mjk1MDM0NzA2IChhZ2UgNjU0NC45ODBzKSANCiBoZXggZHVtcCAoZmlyc3QgMzIgYnl0ZXMpOiAN
+CiAgIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwICAuLi4u
+Li4uLi4uLi4uLi4uIA0KICAgMDAgMDAgMDAgMDAgMjAgMDAgMDAgMDAgMTIgMDEgMDAgMDAgMDAg
+MDAgMDAgMDAgIC4uLi4gLi4uLi4uLi4uLi4gDQogYmFja3RyYWNlOiANCiAgIFs8ZmZmZmZmZmY4
+MTY1OWUxYT5dIGttZW1sZWFrX2FsbG9jKzB4NGEvMHhhMCANCiAgIFs8ZmZmZmZmZmY4MTFmNTFm
+ZT5dIF9fa21hbGxvYysweDE2ZS8weDMyMCANCiAgIFs8ZmZmZmZmZmY4MTJlNDg0OD5dIGJpb19h
+bGxvY19iaW9zZXQrMHgxOTgvMHgxZjAgDQogICBbPGZmZmZmZmZmODEyZTUxYjk+XSBiaW9fbWFw
+X3VzZXJfaW92KzB4MTI5LzB4M2YwIA0KICAgWzxmZmZmZmZmZjgxMmY1ODYzPl0gYmxrX3JxX21h
+cF91c2VyX2lvdisweDEyMy8weDIxMCANCiAgIFs8ZmZmZmZmZmY4MTJmNWEwMj5dIGJsa19ycV9t
+YXBfdXNlcisweDUyLzB4NjAgDQogICBbPGZmZmZmZmZmODEzMGI3YjU+XSBzZ19pbysweDM4NS8w
+eDNjMCANCiAgIFs8ZmZmZmZmZmY4MTMwYmFkMz5dIHNjc2lfY21kX2lvY3RsKzB4MmUzLzB4NDUw
+IA0KICAgWzxmZmZmZmZmZjgxMzBiYzgyPl0gc2NzaV9jbWRfYmxrX2lvY3RsKzB4NDIvMHg1MCAN
+CiAgIFs8ZmZmZmZmZmY4MTQ4ZDgzNT5dIHNkX2lvY3RsKzB4ODUvMHgxMTAgDQogICBbPGZmZmZm
+ZmZmODEzMDJiZmI+XSBibGtkZXZfaW9jdGwrMHg0ZGIvMHg5NzAgDQogICBbPGZmZmZmZmZmODEy
+NjYwZmQ+XSBibG9ja19pb2N0bCsweDNkLzB4NTAgDQogICBbPGZmZmZmZmZmODEyMzQ4ZDQ+XSBk
+b192ZnNfaW9jdGwrMHg5NC8weDY3MCANCiAgIFs8ZmZmZmZmZmY4MTIzNGVmMT5dIFN5U19pb2N0
+bCsweDQxLzB4NzAgDQogICBbPGZmZmZmZmZmODEwMDFlNWM+XSBkb19zeXNjYWxsXzY0KzB4NWMv
+MHgxMTAgDQogICBbPGZmZmZmZmZmODE2Njc1NjQ+XSByZXR1cm5fZnJvbV9TWVNDQUxMXzY0KzB4
+MC8weDdhDQoNCkJhcnQu
