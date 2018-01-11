@@ -1,104 +1,83 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:49072 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:50350 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752276AbeAQMfJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Jan 2018 07:35:09 -0500
+        id S1751680AbeAKGCm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Jan 2018 01:02:42 -0500
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>
-Cc: Christoph Hellwig <hch@infradead.org>,
-        "jianchao . wang" <jianchao.w.wang@oracle.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Stefan Haberland <sth@linux.vnet.ibm.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 1/2] blk-mq: make sure hctx->next_cpu is set correctly
-Date: Wed, 17 Jan 2018 20:34:43 +0800
-Message-Id: <20180117123444.18393-2-ming.lei@redhat.com>
-In-Reply-To: <20180117123444.18393-1-ming.lei@redhat.com>
-References: <20180117123444.18393-1-ming.lei@redhat.com>
+        Christoph Hellwig <hch@infradead.org>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 1/5] dm-mpath: don't call blk_mq_delay_run_hw_queue() in case of BLK_STS_RESOURCE
+Date: Thu, 11 Jan 2018 14:01:55 +0800
+Message-Id: <20180111060159.12991-2-ming.lei@redhat.com>
+In-Reply-To: <20180111060159.12991-1-ming.lei@redhat.com>
+References: <20180111060159.12991-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-When hctx->next_cpu is set from possible online CPUs, there is one
-race in which hctx->next_cpu may be set as >= nr_cpu_ids, and finally
-break workqueue.
+If .queue_rq() returns BLK_STS_RESOURCE, blk-mq will rerun the queue in
+the three situations:
 
-The race is triggered when one CPU is becoming DEAD, blk_mq_hctx_notify_dead()
-is called to dispatch requests from the DEAD cpu context, but at that
-time, this DEAD CPU has been cleared from 'cpu_online_mask', so all
-CPUs in hctx->cpumask may become offline, and cause hctx->next_cpu set
-a bad value.
+1) if BLK_MQ_S_SCHED_RESTART is set
+- queue is rerun after one rq is completed, see blk_mq_sched_restart()
+which is run from blk_mq_free_request()
 
-This patch deals with this issue by re-selecting next CPU, and make
-sure it is set correctly.
+2) run out of driver tag
+- queue is rerun after one tag is freed
 
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Stefan Haberland <sth@linux.vnet.ibm.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Reported-by: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Tested-by: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Fixes: 20e4d81393 ("blk-mq: simplify queue mapping & schedule with each possisble CPU")
+3) otherwise
+- queue is run immediately in blk_mq_dispatch_rq_list()
+
+This random dealy of running hw queue is introduced by commit 6077c2d706097c0
+(dm rq: Avoid that request processing stalls sporadically), which claimed
+one request processing stalling is fixed, but never explained the behind
+idea, and it is a workaound at most. Even the question isn't explained by
+anyone in recent discussion.
+
+Also calling blk_mq_delay_run_hw_queue() inside .queue_rq() is a horrible
+hack because it makes BLK_MQ_S_SCHED_RESTART not working, and degrades I/O
+peformance a lot.
+
+Finally this patch makes sure that dm-rq returns BLK_STS_RESOURCE to blk-mq
+only when underlying queue is out of resource, so we switch to return
+DM_MAPIO_DELAY_REQUEU if either MPATHF_QUEUE_IO or MPATHF_PG_INIT_REQUIRED
+is set in multipath_clone_and_map().
+
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 31 +++++++++++++++++++++++++++++--
- 1 file changed, 29 insertions(+), 2 deletions(-)
+ drivers/md/dm-mpath.c | 5 ++---
+ drivers/md/dm-rq.c    | 1 -
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c376d1b6309a..dc4066d28323 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1416,21 +1416,48 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
-  */
- static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- {
-+	bool tried = false;
-+
- 	if (hctx->queue->nr_hw_queues == 1)
- 		return WORK_CPU_UNBOUND;
- 
- 	if (--hctx->next_cpu_batch <= 0) {
- 		int next_cpu;
--
-+select_cpu:
- 		next_cpu = cpumask_next_and(hctx->next_cpu, hctx->cpumask,
- 				cpu_online_mask);
- 		if (next_cpu >= nr_cpu_ids)
- 			next_cpu = cpumask_first_and(hctx->cpumask,cpu_online_mask);
- 
--		hctx->next_cpu = next_cpu;
-+		/*
-+		 * No online CPU is found here, and this may happen when
-+		 * running from blk_mq_hctx_notify_dead(), and make sure
-+		 * hctx->next_cpu is set correctly for not breaking workqueue.
-+		 */
-+		if (next_cpu >= nr_cpu_ids)
-+			hctx->next_cpu = cpumask_first(hctx->cpumask);
-+		else
-+			hctx->next_cpu = next_cpu;
- 		hctx->next_cpu_batch = BLK_MQ_CPU_WORK_BATCH;
+diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
+index f7810cc869ac..86bf502a8e51 100644
+--- a/drivers/md/dm-mpath.c
++++ b/drivers/md/dm-mpath.c
+@@ -516,9 +516,8 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
+ 		return DM_MAPIO_KILL;
+ 	} else if (test_bit(MPATHF_QUEUE_IO, &m->flags) ||
+ 		   test_bit(MPATHF_PG_INIT_REQUIRED, &m->flags)) {
+-		if (pg_init_all_paths(m))
+-			return DM_MAPIO_DELAY_REQUEUE;
+-		return DM_MAPIO_REQUEUE;
++		pg_init_all_paths(m);
++		return DM_MAPIO_DELAY_REQUEUE;
  	}
  
-+	/*
-+	 * Do unbound schedule if we can't find a online CPU for this hctx,
-+	 * and it should only happen in the path of handling CPU DEAD.
-+	 */
-+	if (!cpu_online(hctx->next_cpu)) {
-+		if (!tried) {
-+			tried = true;
-+			goto select_cpu;
-+		}
-+
-+		/*
-+		 * Make sure to re-select CPU next time once after CPUs
-+		 * in hctx->cpumask become online again.
-+		 */
-+		hctx->next_cpu_batch = 1;
-+		return WORK_CPU_UNBOUND;
-+	}
- 	return hctx->next_cpu;
- }
+ 	memset(mpio, 0, sizeof(*mpio));
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index 3b319776d80c..4d157b14d302 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -755,7 +755,6 @@ static blk_status_t dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 		/* Undo dm_start_request() before requeuing */
+ 		rq_end_stats(md, rq);
+ 		rq_completed(md, rq_data_dir(rq), false);
+-		blk_mq_delay_run_hw_queue(hctx, 100/*ms*/);
+ 		return BLK_STS_RESOURCE;
+ 	}
  
 -- 
 2.9.5
