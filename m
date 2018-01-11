@@ -1,26 +1,58 @@
-Return-Path: <prvs=5429ea774=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hare@suse.de" <hare@suse.de>, "snitzer@redhat.com" <snitzer@redhat.com>
-CC: "hch@lst.de" <hch@lst.de>, "dm-devel@redhat.com" <dm-devel@redhat.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"tom.leiming@gmail.com" <tom.leiming@gmail.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:43972 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932773AbeAKREk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Jan 2018 12:04:40 -0500
+Date: Thu, 11 Jan 2018 12:04:31 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: Hannes Reinecke <hare@suse.de>
+Cc: axboe@kernel.dk, Ming Lei <tom.leiming@gmail.com>, hch@lst.de,
+        Bart.VanAssche@wdc.com, dm-devel@redhat.com,
+        linux-block@vger.kernel.org
 Subject: Re: [for-4.16 PATCH v3 2/3] block: allow gendisk's request_queue
  registration to be deferred
-Date: Thu, 11 Jan 2018 17:18:33 +0000
-Message-ID: <1515691112.2752.21.camel@wdc.com>
+Message-ID: <20180111170430.GA30621@redhat.com>
 References: <20180111021256.37490-1-snitzer@redhat.com>
-	 <20180111021256.37490-3-snitzer@redhat.com>
-	 <804df5df-2598-df69-757d-85df18185d4c@suse.de>
-	 <20180111170430.GA30621@redhat.com>
-In-Reply-To: <20180111170430.GA30621@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+ <20180111021256.37490-3-snitzer@redhat.com>
+ <804df5df-2598-df69-757d-85df18185d4c@suse.de>
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <804df5df-2598-df69-757d-85df18185d4c@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-T24gVGh1LCAyMDE4LTAxLTExIGF0IDEyOjA0IC0wNTAwLCBNaWtlIFNuaXR6ZXIgd3JvdGU6DQo+
-IFNvIG15IHY0LCB0aGF0IEknbGwgc2VuZCBvdXQgc2hvcnRseSwgd29uJ3QgYmUgdXNpbmcgdGVz
-dF9hbmRfY2xlYXJfYml0KCkNCg0KUGxlYXNlIHVzZSBxdWV1ZV9mbGFnX3NldCgpLCBxdWV1ZV9m
-bGFnX2NsZWFyKCksIHF1ZXVlX2ZsYWdfdGVzdF9hbmRfY2xlYXIoKSBhbmQvb3INCnF1ZXVlX2Zs
-YWdfdGVzdF9hbmRfc2V0KCkgdG8gbWFuaXB1bGF0ZSBxdWV1ZSBmbGFncy4NCg0KVGhhbmtzLA0K
-DQpCYXJ0Lg==
+On Thu, Jan 11 2018 at  2:46am -0500,
+Hannes Reinecke <hare@suse.de> wrote:
+
+> On 01/11/2018 03:12 AM, Mike Snitzer wrote:
+> > 
+> > diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> > index 870484eaed1f..2395122875b4 100644
+> > --- a/block/blk-sysfs.c
+> > +++ b/block/blk-sysfs.c
+> > @@ -929,6 +930,9 @@ void blk_unregister_queue(struct gendisk *disk)
+> >  	if (WARN_ON(!q))
+> >  		return;
+> >  
+> > +	if (!test_bit(QUEUE_FLAG_REGISTERED, &disk->queue->queue_flags))
+> > +		return;
+> > +
+> >  	mutex_lock(&q->sysfs_lock);
+> >  	queue_flag_clear_unlocked(QUEUE_FLAG_REGISTERED, q);
+> >  	mutex_unlock(&q->sysfs_lock);
+> Why can't we use test_and_clear_bit() here?
+> Shouldn't that relieve the need for the mutex_lock() here, too?
+
+FYI, I looked at this and then got concerned with it enough to chat with
+Mikulas (cc'd) about it, here is what he said:
+
+11:54 <mikulas> if (!test_and_clear_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags))
+11:55 <mikulas> this is buggy - the operation test_and_clear_bit is atomic - but if it races with some non-atomic read-modify-write operation on q->queue_flags, then the atomic modification would be lost
+11:56 <mikulas> you must use always atomic accesses on q->queue_flags or always non-atomic accesses inside a mutex
+11:56 <mikulas> queue_flag_clear_unlocked uses non-atomic __clear_bit
+11:57 <mikulas> other functions in include/linux/blkdev.h also use non-atomic operations - so you cannot mix them with atomic operations
+
+So my v4, that I'll send out shortly, won't be using test_and_clear_bit()
+
+Thanks,
+Mike
