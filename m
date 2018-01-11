@@ -1,60 +1,223 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out1.zte.com.cn ([202.103.147.172]:56328 "EHLO mxct.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751225AbeAMHvw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 13 Jan 2018 02:51:52 -0500
-From: tang.junhui@zte.com.cn
-To: hare@suse.de, kartilak@cisco.com, sebaddel@cisco.com,
-        linux-scsi@vger.kernel.org
-Cc: linux-block@vger.kernel.org, tang.junhui@zte.com.cn
-Subject: how to enlarge value of max_sectors_kb  
-Date: Sat, 13 Jan 2018 15:53:24 +0800
-Message-Id: <1515830004-5476-1-git-send-email-tang.junhui@zte.com.cn>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <msnitzer@redhat.com>
+From: Mike Snitzer <snitzer@redhat.com>
+To: axboe@kernel.dk
+Cc: Ming Lei <tom.leiming@gmail.com>,
+	hare@suse.de,
+	Bart.VanAssche@wdc.com,
+	dm-devel@redhat.com,
+	linux-block@vger.kernel.org
+Subject: [for-4.16 PATCH v4 4/4] dm: fix awkward and incomplete request_queue initialization
+Date: Thu, 11 Jan 2018 15:14:17 -0500
+Message-Id: <20180111201417.2042-5-snitzer@redhat.com>
+In-Reply-To: <20180111201417.2042-1-snitzer@redhat.com>
+References: <20180111201417.2042-1-snitzer@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+DM is now no longer prone to having its request_queue be improperly
+initialized.
 
-There is a machine with very little max_sectors_kb size:
-[root@ceph151 queue]# pwd
-/sys/block/sdd/queue
-[root@ceph151 queue]# cat max_hw_sectors_kb 
-256
-[root@ceph151 queue]# cat max_sectors_kb 
-256
+Summary of changes:
 
-The performance is very low when I run big I/Os.
-I can not modify it directly, I need a little bigger,
-so how can I enlarge it?
+- defer DM's blk_register_queue() from add_disk()-time until
+  dm_setup_md_queue() by using add_disk_no_queue_reg() in alloc_dev().
 
-the system info:
+- dm_setup_md_queue() is updated to fully initialize DM's request_queue
+  (_after_ all table loads have occurred and the request_queue's type,
+  features and limits are known).
 
-[root@ceph151 queue]# uname -r
-3.10.0-327.22.2.el7.x86_64
+- various other small improvements that were noticed along the way.
 
-[root@ceph151 queue]# lsmod |grep scsi
-scsi_transport_fc      64056  1 lpfc
-scsi_tgt               20027  1 scsi_transport_fc
+A very welcome side-effect of these changes is DM no longer needs to:
+1) backfill the "mq" sysfs entry (because historically DM didn't
+initialize the request_queue to use blk-mq until _after_
+blk_register_queue() was called via add_disk()).
+2) call elv_register_queue() to get .request_fn request-based DM
+device's "queue" exposed in syfs.
 
-[root@ceph151 queue]# lsscsi
-[0:0:0:0]    disk    ASR7805  system           V1.0  /dev/sda 
-[0:1:8:0]    disk    ATA      Hitachi HUA72201 JP4O  /dev/sdb 
-[0:1:9:0]    disk    ATA      Hitachi HUA72201 JP4O  /dev/sdc 
-[0:1:10:0]   disk    ATA      Hitachi HUA72201 JP4O  /dev/sdd 
-[0:1:11:0]   disk    ATA      Hitachi HUA72201 JP4O  /dev/sde 
-[0:1:12:0]   disk    ATA      Hitachi HUA72201 JP4O  /dev/sdf 
-[0:1:13:0]   disk    ATA      Hitachi HUA72201 JP4O  /dev/sdg 
-[0:1:14:0]   disk    ATA      Hitachi HUA72201 JP4O  /dev/sdh 
-[0:1:15:0]   disk    ATA      Hitachi HUA72201 JP4O  /dev/sdi 
-[0:1:16:0]   disk    ATA      Hitachi HUA72201 JP4O  /dev/sdj 
-[0:1:17:0]   disk    ATA      Hitachi HUA72201 JP4O  /dev/sdk 
-[0:1:18:0]   disk    ATA      Hitachi HUA72201 JP4O  /dev/sdl 
-[0:1:19:0]   disk    ATA      Hitachi HUA72201 JP4O  /dev/sdm 
-[0:1:20:0]   disk    TOSHIBA  AL13SEB600       0101  -        
-[0:1:21:0]   disk    TOSHIBA  AL13SEB600       0101  -        
-[0:3:0:0]    enclosu ZTE CORP 720381 EvBd 255  1     - 
+In addition, blk-mq debugfs support is now made available because
+request-based DM's blk-mq request_queue is now properly initialized
+before dm_setup_md_queue() calls blk_register_queue().
 
-Any comment would be wellcome.
+These changes also stave off the need to introduce new DM-specific
+workarounds in block core, e.g. this proposal:
+https://patchwork.kernel.org/patch/10067961/
 
-Thanks,
-Tang Junhui
+In the end DM devices should be less unicorn in nature (relative to
+initialization and availability of block core infrastructure).
+
+Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Tested-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/md/dm-core.h |  2 --
+ drivers/md/dm-rq.c   | 11 -----------
+ drivers/md/dm.c      | 41 ++++++++++++++++++++++-------------------
+ 3 files changed, 22 insertions(+), 32 deletions(-)
+
+diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
+index 6a14f945783c..f955123b4765 100644
+--- a/drivers/md/dm-core.h
++++ b/drivers/md/dm-core.h
+@@ -130,8 +130,6 @@ struct mapped_device {
+ 	struct srcu_struct io_barrier;
+ };
+ 
+-void dm_init_md_queue(struct mapped_device *md);
+-void dm_init_normal_md_queue(struct mapped_device *md);
+ int md_in_flight(struct mapped_device *md);
+ void disable_write_same(struct mapped_device *md);
+ void disable_write_zeroes(struct mapped_device *md);
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index 9d32f25489c2..3b319776d80c 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -700,7 +700,6 @@ int dm_old_init_request_queue(struct mapped_device *md, struct dm_table *t)
+ 	/* disable dm_old_request_fn's merge heuristic by default */
+ 	md->seq_rq_merge_deadline_usecs = 0;
+ 
+-	dm_init_normal_md_queue(md);
+ 	blk_queue_softirq_done(md->queue, dm_softirq_done);
+ 
+ 	/* Initialize the request-based DM worker thread */
+@@ -713,8 +712,6 @@ int dm_old_init_request_queue(struct mapped_device *md, struct dm_table *t)
+ 		return error;
+ 	}
+ 
+-	elv_register_queue(md->queue);
+-
+ 	return 0;
+ }
+ 
+@@ -810,17 +807,9 @@ int dm_mq_init_request_queue(struct mapped_device *md, struct dm_table *t)
+ 		err = PTR_ERR(q);
+ 		goto out_tag_set;
+ 	}
+-	dm_init_md_queue(md);
+-
+-	/* backfill 'mq' sysfs registration normally done in blk_register_queue */
+-	err = blk_mq_register_dev(disk_to_dev(md->disk), q);
+-	if (err)
+-		goto out_cleanup_queue;
+ 
+ 	return 0;
+ 
+-out_cleanup_queue:
+-	blk_cleanup_queue(q);
+ out_tag_set:
+ 	blk_mq_free_tag_set(md->tag_set);
+ out_kfree_tag_set:
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 7475739fee49..c84d4a0c6bf7 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1626,20 +1626,9 @@ static const struct dax_operations dm_dax_ops;
+ 
+ static void dm_wq_work(struct work_struct *work);
+ 
+-void dm_init_md_queue(struct mapped_device *md)
+-{
+-	/*
+-	 * Initialize data that will only be used by a non-blk-mq DM queue
+-	 * - must do so here (in alloc_dev callchain) before queue is used
+-	 */
+-	md->queue->queuedata = md;
+-	md->queue->backing_dev_info->congested_data = md;
+-}
+-
+-void dm_init_normal_md_queue(struct mapped_device *md)
++static void dm_init_normal_md_queue(struct mapped_device *md)
+ {
+ 	md->use_blk_mq = false;
+-	dm_init_md_queue(md);
+ 
+ 	/*
+ 	 * Initialize aspects of queue that aren't relevant for blk-mq
+@@ -1734,10 +1723,10 @@ static struct mapped_device *alloc_dev(int minor)
+ 	md->queue = blk_alloc_queue_node(GFP_KERNEL, numa_node_id);
+ 	if (!md->queue)
+ 		goto bad;
++	md->queue->queuedata = md;
++	md->queue->backing_dev_info->congested_data = md;
+ 
+-	dm_init_md_queue(md);
+-
+-	md->disk = alloc_disk_node(1, numa_node_id);
++	md->disk = alloc_disk_node(1, md->numa_node_id);
+ 	if (!md->disk)
+ 		goto bad;
+ 
+@@ -1761,7 +1750,7 @@ static struct mapped_device *alloc_dev(int minor)
+ 		goto bad;
+ 	md->dax_dev = dax_dev;
+ 
+-	add_disk(md->disk);
++	add_disk_no_queue_reg(md->disk);
+ 	format_dev_t(md->name, MKDEV(_major, minor));
+ 
+ 	md->wq = alloc_workqueue("kdmflush", WQ_MEM_RECLAIM, 0);
+@@ -1962,13 +1951,18 @@ static struct dm_table *__unbind(struct mapped_device *md)
+  */
+ int dm_create(int minor, struct mapped_device **result)
+ {
++	int r;
+ 	struct mapped_device *md;
+ 
+ 	md = alloc_dev(minor);
+ 	if (!md)
+ 		return -ENXIO;
+ 
+-	dm_sysfs_init(md);
++	r = dm_sysfs_init(md);
++	if (r) {
++		free_dev(md);
++		return r;
++	}
+ 
+ 	*result = md;
+ 	return 0;
+@@ -2021,10 +2015,12 @@ EXPORT_SYMBOL_GPL(dm_get_queue_limits);
+ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t)
+ {
+ 	int r;
++	struct queue_limits limits;
+ 	enum dm_queue_mode type = dm_get_md_type(md);
+ 
+ 	switch (type) {
+ 	case DM_TYPE_REQUEST_BASED:
++		dm_init_normal_md_queue(md);
+ 		r = dm_old_init_request_queue(md, t);
+ 		if (r) {
+ 			DMERR("Cannot initialize queue for request-based mapped device");
+@@ -2057,6 +2053,14 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t)
+ 		break;
+ 	}
+ 
++	r = dm_calculate_queue_limits(t, &limits);
++	if (r) {
++		DMERR("Cannot calculate initial queue limits");
++		return r;
++	}
++	dm_table_set_restrictions(t, md->queue, &limits);
++	blk_register_queue(md->disk);
++
+ 	return 0;
+ }
+ 
+@@ -2121,7 +2125,6 @@ EXPORT_SYMBOL_GPL(dm_device_name);
+ 
+ static void __dm_destroy(struct mapped_device *md, bool wait)
+ {
+-	struct request_queue *q = dm_get_md_queue(md);
+ 	struct dm_table *map;
+ 	int srcu_idx;
+ 
+@@ -2132,7 +2135,7 @@ static void __dm_destroy(struct mapped_device *md, bool wait)
+ 	set_bit(DMF_FREEING, &md->flags);
+ 	spin_unlock(&_minor_lock);
+ 
+-	blk_set_queue_dying(q);
++	blk_set_queue_dying(md->queue);
+ 
+ 	if (dm_request_based(md) && md->kworker_task)
+ 		kthread_flush_worker(&md->kworker);
+-- 
+2.15.0
