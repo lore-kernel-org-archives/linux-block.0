@@ -1,34 +1,48 @@
-Return-Path: <zhangweiping@didichuxing.com>
-Date: Sat, 20 Jan 2018 01:40:58 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>
-Subject: [PATCH] blk-throttle: use queue_is_rq_based
-Message-ID: <20180119174053.GA967@localhost.didichuxing.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Return-Path: zhangweiping@didichuxing.com
+Return-Path: <msnitzer@redhat.com>
+From: Mike Snitzer <snitzer@redhat.com>
+To: axboe@kernel.dk
+Cc: Ming Lei <tom.leiming@gmail.com>,
+	hare@suse.de,
+	Bart.VanAssche@wdc.com,
+	David Jeffery <djeffery@redhat.com>,
+	dm-devel@redhat.com,
+	linux-block@vger.kernel.org
+Subject: [for-4.16 PATCH v5 1/4] block: only bdi_unregister() in del_gendisk() if !GENHD_FL_HIDDEN
+Date: Fri, 12 Jan 2018 10:06:03 -0500
+Message-Id: <20180112150606.6037-2-snitzer@redhat.com>
+In-Reply-To: <20180112150606.6037-1-snitzer@redhat.com>
+References: <20180112150606.6037-1-snitzer@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-use queue_is_rq_based instead of open code.
+device_add_disk() will only call bdi_register_owner() if
+!GENHD_FL_HIDDEN, so it follows that del_gendisk() should only call
+bdi_unregister() if !GENHD_FL_HIDDEN.
 
-Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
+Found with code inspection.  bdi_unregister() won't do any harm if
+bdi_register_owner() wasn't used but best to avoid the unnecessary
+call to bdi_unregister().
+
+Fixes: 8ddcd65325 ("block: introduce GENHD_FL_HIDDEN")
+Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 ---
- block/blk-throttle.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/genhd.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 96ad326..457e985 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -2456,7 +2456,7 @@ void blk_throtl_register_queue(struct request_queue *q)
- 	td->throtl_slice = DFL_THROTL_SLICE_HD;
- #endif
- 
--	td->track_bio_latency = !q->mq_ops && !q->request_fn;
-+	td->track_bio_latency = !(queue_is_rq_based(q));
- 	if (!td->track_bio_latency)
- 		blk_stat_enable_accounting(q);
- }
+diff --git a/block/genhd.c b/block/genhd.c
+index 96a66f671720..00620e01e043 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -725,7 +725,8 @@ void del_gendisk(struct gendisk *disk)
+ 		 * Unregister bdi before releasing device numbers (as they can
+ 		 * get reused and we'd get clashes in sysfs).
+ 		 */
+-		bdi_unregister(disk->queue->backing_dev_info);
++		if (!(disk->flags & GENHD_FL_HIDDEN))
++			bdi_unregister(disk->queue->backing_dev_info);
+ 		blk_unregister_queue(disk);
+ 	} else {
+ 		WARN_ON(1);
 -- 
-2.9.4
+2.15.0
