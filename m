@@ -1,43 +1,158 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from Galois.linutronix.de ([146.0.238.70]:35481 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S964998AbeALTfz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Jan 2018 14:35:55 -0500
-Date: Fri, 12 Jan 2018 20:35:46 +0100 (CET)
-From: Thomas Gleixner <tglx@linutronix.de>
-To: Ming Lei <ming.lei@redhat.com>
-cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
+Received: from mx1.redhat.com ([209.132.183.28]:37182 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932973AbeALCx5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Jan 2018 21:53:57 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
         Stefan Haberland <sth@linux.vnet.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
         linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 1/2] genirq/affinity: assign vectors to all possible
- CPUs
-In-Reply-To: <20180112025306.28004-2-ming.lei@redhat.com>
-Message-ID: <alpine.DEB.2.20.1801122035220.2371@nanos>
-References: <20180112025306.28004-1-ming.lei@redhat.com> <20180112025306.28004-2-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: [PATCH 1/2] genirq/affinity: assign vectors to all possible CPUs
+Date: Fri, 12 Jan 2018 10:53:05 +0800
+Message-Id: <20180112025306.28004-2-ming.lei@redhat.com>
+In-Reply-To: <20180112025306.28004-1-ming.lei@redhat.com>
+References: <20180112025306.28004-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, 12 Jan 2018, Ming Lei wrote:
+From: Christoph Hellwig <hch@lst.de>
 
-> From: Christoph Hellwig <hch@lst.de>
-> 
-> Currently we assign managed interrupt vectors to all present CPUs.  This
-> works fine for systems were we only online/offline CPUs.  But in case of
-> systems that support physical CPU hotplug (or the virtualized version of
-> it) this means the additional CPUs covered for in the ACPI tables or on
-> the command line are not catered for.  To fix this we'd either need to
-> introduce new hotplug CPU states just for this case, or we can start
-> assining vectors to possible but not present CPUs.
-> 
-> Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Tested-by: Stefan Haberland <sth@linux.vnet.ibm.com>
-> Cc: linux-kernel@vger.kernel.org
-> Cc: Thomas Gleixner <tglx@linutronix.de>
+Currently we assign managed interrupt vectors to all present CPUs.  This
+works fine for systems were we only online/offline CPUs.  But in case of
+systems that support physical CPU hotplug (or the virtualized version of
+it) this means the additional CPUs covered for in the ACPI tables or on
+the command line are not catered for.  To fix this we'd either need to
+introduce new hotplug CPU states just for this case, or we can start
+assining vectors to possible but not present CPUs.
 
-FWIW, Acked-by: Thomas Gleixner <tglx@linutronix.de>
+Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Tested-by: Stefan Haberland <sth@linux.vnet.ibm.com>
+Cc: linux-kernel@vger.kernel.org
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ kernel/irq/affinity.c | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
+index e12d35108225..a37a3b4b6342 100644
+--- a/kernel/irq/affinity.c
++++ b/kernel/irq/affinity.c
+@@ -39,7 +39,7 @@ static void irq_spread_init_one(struct cpumask *irqmsk, struct cpumask *nmsk,
+ 	}
+ }
+ 
+-static cpumask_var_t *alloc_node_to_present_cpumask(void)
++static cpumask_var_t *alloc_node_to_possible_cpumask(void)
+ {
+ 	cpumask_var_t *masks;
+ 	int node;
+@@ -62,7 +62,7 @@ static cpumask_var_t *alloc_node_to_present_cpumask(void)
+ 	return NULL;
+ }
+ 
+-static void free_node_to_present_cpumask(cpumask_var_t *masks)
++static void free_node_to_possible_cpumask(cpumask_var_t *masks)
+ {
+ 	int node;
+ 
+@@ -71,22 +71,22 @@ static void free_node_to_present_cpumask(cpumask_var_t *masks)
+ 	kfree(masks);
+ }
+ 
+-static void build_node_to_present_cpumask(cpumask_var_t *masks)
++static void build_node_to_possible_cpumask(cpumask_var_t *masks)
+ {
+ 	int cpu;
+ 
+-	for_each_present_cpu(cpu)
++	for_each_possible_cpu(cpu)
+ 		cpumask_set_cpu(cpu, masks[cpu_to_node(cpu)]);
+ }
+ 
+-static int get_nodes_in_cpumask(cpumask_var_t *node_to_present_cpumask,
++static int get_nodes_in_cpumask(cpumask_var_t *node_to_possible_cpumask,
+ 				const struct cpumask *mask, nodemask_t *nodemsk)
+ {
+ 	int n, nodes = 0;
+ 
+ 	/* Calculate the number of nodes in the supplied affinity mask */
+ 	for_each_node(n) {
+-		if (cpumask_intersects(mask, node_to_present_cpumask[n])) {
++		if (cpumask_intersects(mask, node_to_possible_cpumask[n])) {
+ 			node_set(n, *nodemsk);
+ 			nodes++;
+ 		}
+@@ -109,7 +109,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 	int last_affv = affv + affd->pre_vectors;
+ 	nodemask_t nodemsk = NODE_MASK_NONE;
+ 	struct cpumask *masks;
+-	cpumask_var_t nmsk, *node_to_present_cpumask;
++	cpumask_var_t nmsk, *node_to_possible_cpumask;
+ 
+ 	/*
+ 	 * If there aren't any vectors left after applying the pre/post
+@@ -125,8 +125,8 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 	if (!masks)
+ 		goto out;
+ 
+-	node_to_present_cpumask = alloc_node_to_present_cpumask();
+-	if (!node_to_present_cpumask)
++	node_to_possible_cpumask = alloc_node_to_possible_cpumask();
++	if (!node_to_possible_cpumask)
+ 		goto out;
+ 
+ 	/* Fill out vectors at the beginning that don't need affinity */
+@@ -135,8 +135,8 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 
+ 	/* Stabilize the cpumasks */
+ 	get_online_cpus();
+-	build_node_to_present_cpumask(node_to_present_cpumask);
+-	nodes = get_nodes_in_cpumask(node_to_present_cpumask, cpu_present_mask,
++	build_node_to_possible_cpumask(node_to_possible_cpumask);
++	nodes = get_nodes_in_cpumask(node_to_possible_cpumask, cpu_possible_mask,
+ 				     &nodemsk);
+ 
+ 	/*
+@@ -146,7 +146,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 	if (affv <= nodes) {
+ 		for_each_node_mask(n, nodemsk) {
+ 			cpumask_copy(masks + curvec,
+-				     node_to_present_cpumask[n]);
++				     node_to_possible_cpumask[n]);
+ 			if (++curvec == last_affv)
+ 				break;
+ 		}
+@@ -160,7 +160,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 		vecs_per_node = (affv - (curvec - affd->pre_vectors)) / nodes;
+ 
+ 		/* Get the cpus on this node which are in the mask */
+-		cpumask_and(nmsk, cpu_present_mask, node_to_present_cpumask[n]);
++		cpumask_and(nmsk, cpu_possible_mask, node_to_possible_cpumask[n]);
+ 
+ 		/* Calculate the number of cpus per vector */
+ 		ncpus = cpumask_weight(nmsk);
+@@ -192,7 +192,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 	/* Fill out vectors at the end that don't need affinity */
+ 	for (; curvec < nvecs; curvec++)
+ 		cpumask_copy(masks + curvec, irq_default_affinity);
+-	free_node_to_present_cpumask(node_to_present_cpumask);
++	free_node_to_possible_cpumask(node_to_possible_cpumask);
+ out:
+ 	free_cpumask_var(nmsk);
+ 	return masks;
+@@ -214,7 +214,7 @@ int irq_calc_affinity_vectors(int minvec, int maxvec, const struct irq_affinity
+ 		return 0;
+ 
+ 	get_online_cpus();
+-	ret = min_t(int, cpumask_weight(cpu_present_mask), vecs) + resv;
++	ret = min_t(int, cpumask_weight(cpu_possible_mask), vecs) + resv;
+ 	put_online_cpus();
+ 	return ret;
+ }
+-- 
+2.9.5
