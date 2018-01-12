@@ -1,83 +1,82 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:50350 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751680AbeAKGCm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jan 2018 01:02:42 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 1/5] dm-mpath: don't call blk_mq_delay_run_hw_queue() in case of BLK_STS_RESOURCE
-Date: Thu, 11 Jan 2018 14:01:55 +0800
-Message-Id: <20180111060159.12991-2-ming.lei@redhat.com>
-In-Reply-To: <20180111060159.12991-1-ming.lei@redhat.com>
-References: <20180111060159.12991-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <msnitzer@redhat.com>
+Date: Fri, 12 Jan 2018 10:05:06 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: axboe@kernel.dk, Ming Lei <tom.leiming@gmail.com>, hare@suse.de,
+	Bart.VanAssche@wdc.com, dm-devel@redhat.com,
+	linux-block@vger.kernel.org, David Jeffery <djeffery@redhat.com>
+Subject: Re: [for-4.16 PATCH v4 2/4] block: use queue_lock when clearing
+ QUEUE_FLAG_REGISTERED in blk_unregister_queue
+Message-ID: <20180112150506.GA4462@redhat.com>
+References: <20180111201417.2042-1-snitzer@redhat.com>
+ <20180111201417.2042-3-snitzer@redhat.com>
+ <20180112070936.GB31164@ming.t460p>
+ <20180112125340.GA1824@redhat.com>
+ <20180112141408.GA28061@ming.t460p>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180112141408.GA28061@ming.t460p>
+List-ID: <linux-block@vger.kernel.org>
 
-If .queue_rq() returns BLK_STS_RESOURCE, blk-mq will rerun the queue in
-the three situations:
+On Fri, Jan 12 2018 at  9:14am -0500,
+Ming Lei <ming.lei@redhat.com> wrote:
 
-1) if BLK_MQ_S_SCHED_RESTART is set
-- queue is rerun after one rq is completed, see blk_mq_sched_restart()
-which is run from blk_mq_free_request()
+> On Fri, Jan 12, 2018 at 07:53:40AM -0500, Mike Snitzer wrote:
+> > On Fri, Jan 12 2018 at  2:09am -0500,
+> > Ming Lei <ming.lei@redhat.com> wrote:
+> > 
+> > > On Thu, Jan 11, 2018 at 03:14:15PM -0500, Mike Snitzer wrote:
+> > > > blk_unregister_queue() must protect against any modifications of
+> > > > q->queue_flags (not just those performed in blk-sysfs.c).  Therefore
+> > > > q->queue_lock needs to be used rather than q->sysfs_lock.
+> > > > 
+> > > > Fixes: e9a823fb34a8b ("block: fix warning when I/O elevator is changed as request_queue is being removed")
+> > > > Cc: stable@vger.kernel.org # 4.14+
+> > > > Reported-by: Bart Van Assche <Bart.VanAssche@wdc.com>
+> > > > Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+> > > > ---
+> > > >  block/blk-sysfs.c | 4 ++--
+> > > >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > > > 
+> > > > diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> > > > index 870484eaed1f..52f57539f1c7 100644
+> > > > --- a/block/blk-sysfs.c
+> > > > +++ b/block/blk-sysfs.c
+> > > > @@ -929,9 +929,9 @@ void blk_unregister_queue(struct gendisk *disk)
+> > > >  	if (WARN_ON(!q))
+> > > >  		return;
+> > > >  
+> > > > -	mutex_lock(&q->sysfs_lock);
+> > > > +	spin_lock_irq(q->queue_lock);
+> > > >  	queue_flag_clear_unlocked(QUEUE_FLAG_REGISTERED, q);
+> > > > -	mutex_unlock(&q->sysfs_lock);
+> > > > +	spin_unlock_irq(q->queue_lock);
+> > > >  
+> > > >  	wbt_exit(q);
+> > > 
+> > > Hi Mike,
+> > > 
+> > > This change may not be correct, since at least e9a823fb34a8b depends
+> > > on q->sysfs_lock to sync between testing the flag in __elevator_change()
+> > > and clearing it here.
+> > 
+> > The header for commit e9a823fb34a8b says:
+> >     To fix this warning, we can check the QUEUE_FLAG_REGISTERED flag when
+> >     changing the elevator and use the request_queue's sysfs_lock to
+> >     serialize between clearing the flag and the elevator testing the flag.
+> > 
+> > The reality is sysfs_lock isn't needed to serialize between
+> > blk_unregister_queue() clearing the flag and __elevator_change() testing
+> > the flag.
+> 
+> Without holding sysfs_lock, __elevator_change() may just be called after
+> q->kobj is deleted from blk_unregister_queue(), then the warning of
+> 'WARNING: CPU: 3 PID: 14075 at lib/kobject.c:244 kobject_add_internal+0x103/0x2d0'
+> can be triggered again.
+> 
+> BTW, __elevator_change() is always run with holding sysfs_lock.
 
-2) run out of driver tag
-- queue is rerun after one tag is freed
+Yes, I'm well aware.  Please see v5's PATCH 02/04 which is inbound now.
 
-3) otherwise
-- queue is run immediately in blk_mq_dispatch_rq_list()
-
-This random dealy of running hw queue is introduced by commit 6077c2d706097c0
-(dm rq: Avoid that request processing stalls sporadically), which claimed
-one request processing stalling is fixed, but never explained the behind
-idea, and it is a workaound at most. Even the question isn't explained by
-anyone in recent discussion.
-
-Also calling blk_mq_delay_run_hw_queue() inside .queue_rq() is a horrible
-hack because it makes BLK_MQ_S_SCHED_RESTART not working, and degrades I/O
-peformance a lot.
-
-Finally this patch makes sure that dm-rq returns BLK_STS_RESOURCE to blk-mq
-only when underlying queue is out of resource, so we switch to return
-DM_MAPIO_DELAY_REQUEU if either MPATHF_QUEUE_IO or MPATHF_PG_INIT_REQUIRED
-is set in multipath_clone_and_map().
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/md/dm-mpath.c | 5 ++---
- drivers/md/dm-rq.c    | 1 -
- 2 files changed, 2 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-index f7810cc869ac..86bf502a8e51 100644
---- a/drivers/md/dm-mpath.c
-+++ b/drivers/md/dm-mpath.c
-@@ -516,9 +516,8 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
- 		return DM_MAPIO_KILL;
- 	} else if (test_bit(MPATHF_QUEUE_IO, &m->flags) ||
- 		   test_bit(MPATHF_PG_INIT_REQUIRED, &m->flags)) {
--		if (pg_init_all_paths(m))
--			return DM_MAPIO_DELAY_REQUEUE;
--		return DM_MAPIO_REQUEUE;
-+		pg_init_all_paths(m);
-+		return DM_MAPIO_DELAY_REQUEUE;
- 	}
- 
- 	memset(mpio, 0, sizeof(*mpio));
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index 3b319776d80c..4d157b14d302 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -755,7 +755,6 @@ static blk_status_t dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		/* Undo dm_start_request() before requeuing */
- 		rq_end_stats(md, rq);
- 		rq_completed(md, rq_data_dir(rq), false);
--		blk_mq_delay_run_hw_queue(hctx, 100/*ms*/);
- 		return BLK_STS_RESOURCE;
- 	}
- 
--- 
-2.9.5
+Thanks,
+Mike
