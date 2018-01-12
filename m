@@ -1,64 +1,48 @@
-Return-Path: <prvs=54311c032=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "axboe@kernel.dk" <axboe@kernel.dk>
-CC: "hch@lst.de" <hch@lst.de>, "jthumshirn@suse.de" <jthumshirn@suse.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "hare@suse.com"
-	<hare@suse.com>, "ming.lei@redhat.com" <ming.lei@redhat.com>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH] blk-mq-debugfs: Also show requests that have not yet been
  started
-Date: Fri, 12 Jan 2018 22:11:16 +0000
-Message-ID: <1515795074.2396.75.camel@wdc.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>, "jthumshirn@suse.de" <jthumshirn@suse.de>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "hare@suse.com" <hare@suse.com>,
+ "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+ "ming.lei@redhat.com" <ming.lei@redhat.com>
 References: <20180112215207.17852-1-bart.vanassche@wdc.com>
-	 <78a60ddb-7e5f-3dac-2024-390e17da02f8@kernel.dk>
-	 <1515794417.2396.72.camel@wdc.com>
-	 <9ae89a07-7ade-f0c6-cc54-ed56bcc4d5cf@kernel.dk>
-In-Reply-To: <9ae89a07-7ade-f0c6-cc54-ed56bcc4d5cf@kernel.dk>
-Content-Type: text/plain; charset="utf-8"
+ <78a60ddb-7e5f-3dac-2024-390e17da02f8@kernel.dk>
+ <1515794417.2396.72.camel@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <9ae89a07-7ade-f0c6-cc54-ed56bcc4d5cf@kernel.dk>
+Date: Fri, 12 Jan 2018 15:05:03 -0700
 MIME-Version: 1.0
+In-Reply-To: <1515794417.2396.72.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-T24gRnJpLCAyMDE4LTAxLTEyIGF0IDE1OjA1IC0wNzAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBP
-biAxLzEyLzE4IDM6MDAgUE0sIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gPiBPbiBGcmksIDIw
-MTgtMDEtMTIgYXQgMTQ6NTUgLTA3MDAsIEplbnMgQXhib2Ugd3JvdGU6DQo+ID4gPiBPbiAxLzEy
-LzE4IDI6NTIgUE0sIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gPiA+ID4gV2hlbiBkZWJ1Z2dp
-bmcgZS5nLiB0aGUgU0NTSSB0aW1lb3V0IGhhbmRsZXIgaXQgaXMgaW1wb3J0YW50IHRoYXQNCj4g
-PiA+ID4gcmVxdWVzdHMgdGhhdCBoYXZlIG5vdCB5ZXQgYmVlbiBzdGFydGVkIG9yIHRoYXQgYWxy
-ZWFkeSBoYXZlDQo+ID4gPiA+IGNvbXBsZXRlZCBhcmUgYWxzbyByZXBvcnRlZCB0aHJvdWdoIGRl
-YnVnZnMuDQo+ID4gPiA+IA0KPiA+ID4gPiBUaGlzIHBhdGNoIGRlcGVuZHMgb24gYSBwYXRjaCB0
-aGF0IHdlbnQgdXBzdHJlYW0gcmVjZW50bHksIG5hbWVseQ0KPiA+ID4gPiBjb21taXQgMTRlMzA2
-MmZiMTg1ICgic2NzaTogY29yZTogRml4IGEgc2NzaV9zaG93X3JxKCkgTlVMTCBwb2ludGVyDQo+
-ID4gPiA+IGRlcmVmZXJlbmNlIikuDQo+ID4gPiANCj4gPiA+IFdoeSBkb24ndCB3ZSBqdXN0IGtp
-bGwgdGhlIGNoZWNrLCBhbmQgZHVtcCBhbnkgcmVxdWVzdCB0aGF0IGhhcyBhDQo+ID4gPiBtYXRj
-aGluZyBoY3R4PyBXZSBhbHJlYWR5IGtub3cgdGhlIGJpdCB3YXMgc2V0LCBzbyBqdXN0IHByaW50
-DQo+ID4gPiBhbGwgb2YgdGhlbS4NCj4gPiANCj4gPiBJdCBpcyB2ZXJ5IGhlbHBmdWwgZHVyaW5n
-IGRlYnVnZ2luZyB0aGF0IHJlcXVlc3RzIG93bmVkIGJ5IGEgYmxvY2sgZHJpdmVyIGFuZA0KPiA+
-IHJlcXVlc3RzIG93bmVkIGJ5IHRoZSBibG9jayBsYXllciBjb3JlIHNob3cgdXAgaW4gZGlmZmVy
-ZW50IGRlYnVnZnMgZmlsZXMuDQo+ID4gUmVtb3ZpbmcgdGhlIGNoZWNrIGNvbXBsZXRlbHkgd291
-bGQgY2F1c2UgYWxsIHJlcXVlc3RzIHRvIHNob3cgdXAgaW4gdGhlIHNhbWUNCj4gPiBkZWJ1Z2Zz
-IGZpbGUgYW5kIHdvdWxkIG1ha2UgaW50ZXJwcmV0aW5nIHRoZSBjb250ZW50cyBvZiB0aGVzZSBk
-ZWJ1Z2ZzIGZpbGVzDQo+ID4gbXVjaCBoYXJkZXIuDQo+IA0KPiBZZWFoLCB3ZSdkIGhhdmUgdG8g
-bWFrZSBpdCBqdXN0IG9uZSBmaWxlIGF0IHRoYXQgcG9pbnQuIEknbSBub3QgaHVnZWx5DQo+IGFn
-YWluc3QgdGhlIHF1ZXVlbGlzdCBjaGVjaywgYnV0IHByb2JhYmx5IHdhcnJhbnRzIGEgY29tbWVu
-dCBhcyBpdCdzIG5vdA0KPiBpbW1lZGlhdGVseSBjbGVhciAoYXMgb3Bwb3NlZCB0byB0aGUgaWRs
-ZSBjaGVjaywgb3IgdGhlIHByZXZpb3VzIFNUQVJUDQo+IGJpdCBjaGVjaykuDQoNCkhvdyBhYm91
-dCB0aGUgYmVsb3c/DQoNCmRpZmYgLS1naXQgYS9ibG9jay9ibGstbXEtZGVidWdmcy5jIGIvYmxv
-Y2svYmxrLW1xLWRlYnVnZnMuYw0KaW5kZXggMTlkYjNmNTgzYmYxLi5kYTg1OWRhYzQ0MmIgMTAw
-NjQ0DQotLS0gYS9ibG9jay9ibGstbXEtZGVidWdmcy5jDQorKysgYi9ibG9jay9ibGstbXEtZGVi
-dWdmcy5jDQpAQCAtMzk0LDYgKzM5NCwxMiBAQCBzdHJ1Y3Qgc2hvd19idXN5X3BhcmFtcyB7DQog
-fTsNCiANCiAvKg0KKyAqIFNob3cgImJ1c3kiIHJlcXVlc3RzIC0gdGhlc2UgYXJlIHRoZSByZXF1
-ZXN0cyBvd25lZCBieSB0aGUgYmxvY2sgZHJpdmVyLg0KKyAqIFRoZSB0ZXN0IGxpc3RfZW1wdHko
-JnJxLT5xdWV1ZWxpc3QpIGlzIHVzZWQgdG8gZmlndXJlIG91dCB3aGV0aGVyIG9yIG5vdA0KKyAq
-IGEgcmVxdWVzdCBpcyBvd25lZCBieSB0aGUgYmxvY2sgZHJpdmVyLiBUaGF0IHRlc3Qgd29ya3Mg
-YmVjYXVzZSB0aGUgYmxvY2sNCisgKiBsYXllciBjb3JlIHVzZXMgbGlzdF9kZWxfaW5pdCgpIGNv
-bnNpc3RlbnRseSB0byByZW1vdmUgYSByZXF1ZXN0IGZyb20gb25lDQorICogb2YgdGhlIHJlcXVl
-c3QgbGlzdHMuDQorICoNCiAgKiBOb3RlOiB0aGUgc3RhdGUgb2YgYSByZXF1ZXN0IG1heSBjaGFu
-Z2Ugd2hpbGUgdGhpcyBmdW5jdGlvbiBpcyBpbiBwcm9ncmVzcywNCiAgKiBlLmcuIGR1ZSB0byBh
-IGNvbmN1cnJlbnQgYmxrX21xX2ZpbmlzaF9yZXF1ZXN0KCkgY2FsbC4NCiAgKi8NCkBAIC00MDIs
-NyArNDA4LDcgQEAgc3RhdGljIHZvaWQgaGN0eF9zaG93X2J1c3lfcnEoc3RydWN0IHJlcXVlc3Qg
-KnJxLCB2b2lkICpkYXRhLCBib29sIHJlc2VydmVkKQ0KIAljb25zdCBzdHJ1Y3Qgc2hvd19idXN5
-X3BhcmFtcyAqcGFyYW1zID0gZGF0YTsNCiANCiAJaWYgKGJsa19tcV9tYXBfcXVldWUocnEtPnEs
-IHJxLT5tcV9jdHgtPmNwdSkgPT0gcGFyYW1zLT5oY3R4ICYmDQotCSAgICBibGtfbXFfcnFfc3Rh
-dGUocnEpICE9IE1RX1JRX0lETEUpDQorCSAgICBsaXN0X2VtcHR5KCZycS0+cXVldWVsaXN0KSkN
-CiAJCV9fYmxrX21xX2RlYnVnZnNfcnFfc2hvdyhwYXJhbXMtPm0sDQogCQkJCQkgbGlzdF9lbnRy
-eV9ycSgmcnEtPnF1ZXVlbGlzdCkpOw0KIH0NCg0KVGhhbmtzLA0KDQpCYXJ0Lg==
+On 1/12/18 3:00 PM, Bart Van Assche wrote:
+> On Fri, 2018-01-12 at 14:55 -0700, Jens Axboe wrote:
+>> On 1/12/18 2:52 PM, Bart Van Assche wrote:
+>>> When debugging e.g. the SCSI timeout handler it is important that
+>>> requests that have not yet been started or that already have
+>>> completed are also reported through debugfs.
+>>>
+>>> This patch depends on a patch that went upstream recently, namely
+>>> commit 14e3062fb185 ("scsi: core: Fix a scsi_show_rq() NULL pointer
+>>> dereference").
+>>
+>> Why don't we just kill the check, and dump any request that has a
+>> matching hctx? We already know the bit was set, so just print
+>> all of them.
+> 
+> It is very helpful during debugging that requests owned by a block driver and
+> requests owned by the block layer core show up in different debugfs files.
+> Removing the check completely would cause all requests to show up in the same
+> debugfs file and would make interpreting the contents of these debugfs files
+> much harder.
+
+Yeah, we'd have to make it just one file at that point. I'm not hugely
+against the queuelist check, but probably warrants a comment as it's not
+immediately clear (as opposed to the idle check, or the previous START
+bit check).
+
+-- 
+Jens Axboe
