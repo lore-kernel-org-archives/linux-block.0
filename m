@@ -1,68 +1,42 @@
-Return-Path: <msnitzer@redhat.com>
-Date: Thu, 11 Jan 2018 21:53:43 -0500
-From: Mike Snitzer <snitzer@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "axboe@kernel.dk" <axboe@kernel.dk>,
-	"dm-devel@redhat.com" <dm-devel@redhat.com>,
-	"hare@suse.de" <hare@suse.de>,
-	"tom.leiming@gmail.com" <tom.leiming@gmail.com>,
+Return-Path: <prvs=54311c032=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "snitzer@redhat.com" <snitzer@redhat.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
+CC: "dm-devel@redhat.com" <dm-devel@redhat.com>, "hare@suse.de"
+	<hare@suse.de>, "tom.leiming@gmail.com" <tom.leiming@gmail.com>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: [for-4.16 PATCH v4 2/4] block: use queue_lock when clearing
  QUEUE_FLAG_REGISTERED in blk_unregister_queue
-Message-ID: <20180112025343.GD32298@redhat.com>
+Date: Fri, 12 Jan 2018 00:28:41 +0000
+Message-ID: <1515716920.2752.79.camel@wdc.com>
 References: <20180111201417.2042-1-snitzer@redhat.com>
- <20180111201417.2042-3-snitzer@redhat.com>
- <1515716920.2752.79.camel@wdc.com>
+	 <20180111201417.2042-3-snitzer@redhat.com>
+In-Reply-To: <20180111201417.2042-3-snitzer@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1515716920.2752.79.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Jan 11 2018 at  7:28pm -0500,
-Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
-
-> On Thu, 2018-01-11 at 15:14 -0500, Mike Snitzer wrote:
-> > blk_unregister_queue() must protect against any modifications of
-> > q->queue_flags (not just those performed in blk-sysfs.c).  Therefore
-> > q->queue_lock needs to be used rather than q->sysfs_lock.
-> > 
-> > Fixes: e9a823fb34a8b ("block: fix warning when I/O elevator is changed as request_queue is being removed")
-> > Cc: stable@vger.kernel.org # 4.14+
-> > Reported-by: Bart Van Assche <Bart.VanAssche@wdc.com>
-> > Signed-off-by: Mike Snitzer <snitzer@redhat.com>
-> > ---
-> >  block/blk-sysfs.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> > index 870484eaed1f..52f57539f1c7 100644
-> > --- a/block/blk-sysfs.c
-> > +++ b/block/blk-sysfs.c
-> > @@ -929,9 +929,9 @@ void blk_unregister_queue(struct gendisk *disk)
-> >  	if (WARN_ON(!q))
-> >  		return;
-> >  
-> > -	mutex_lock(&q->sysfs_lock);
-> > +	spin_lock_irq(q->queue_lock);
-> >  	queue_flag_clear_unlocked(QUEUE_FLAG_REGISTERED, q);
-> > -	mutex_unlock(&q->sysfs_lock);
-> > +	spin_unlock_irq(q->queue_lock);
-> 
-> Hello Mike,
-> 
-> The function name queue_flag_clear_unlocked() means "clear a queue flag
-> without holding the queue lock". So at least to me the above code is confusing.
-> Please consider to change queue_flag_clear_unlocked() into queue_flag_clear().
-
-If Jens would like to change it when applying the patch to his tree
-that is fine by me.
-
-But as you know, it doesn't matter:
-queue_flag_clear() just has extra queue_lockdep_assert_held(q);
-
-So I see no reason to respin this patch for this.  Especially when you
-consider patch 3 replaces it with queue_flag_test_and_clear() -- and no
-it isn't a problem for stable@ to carry on using
-queue_flag_clear_unlocked
-
-Mike
+T24gVGh1LCAyMDE4LTAxLTExIGF0IDE1OjE0IC0wNTAwLCBNaWtlIFNuaXR6ZXIgd3JvdGU6DQo+
+IGJsa191bnJlZ2lzdGVyX3F1ZXVlKCkgbXVzdCBwcm90ZWN0IGFnYWluc3QgYW55IG1vZGlmaWNh
+dGlvbnMgb2YNCj4gcS0+cXVldWVfZmxhZ3MgKG5vdCBqdXN0IHRob3NlIHBlcmZvcm1lZCBpbiBi
+bGstc3lzZnMuYykuICBUaGVyZWZvcmUNCj4gcS0+cXVldWVfbG9jayBuZWVkcyB0byBiZSB1c2Vk
+IHJhdGhlciB0aGFuIHEtPnN5c2ZzX2xvY2suDQo+IA0KPiBGaXhlczogZTlhODIzZmIzNGE4YiAo
+ImJsb2NrOiBmaXggd2FybmluZyB3aGVuIEkvTyBlbGV2YXRvciBpcyBjaGFuZ2VkIGFzIHJlcXVl
+c3RfcXVldWUgaXMgYmVpbmcgcmVtb3ZlZCIpDQo+IENjOiBzdGFibGVAdmdlci5rZXJuZWwub3Jn
+ICMgNC4xNCsNCj4gUmVwb3J0ZWQtYnk6IEJhcnQgVmFuIEFzc2NoZSA8QmFydC5WYW5Bc3NjaGVA
+d2RjLmNvbT4NCj4gU2lnbmVkLW9mZi1ieTogTWlrZSBTbml0emVyIDxzbml0emVyQHJlZGhhdC5j
+b20+DQo+IC0tLQ0KPiAgYmxvY2svYmxrLXN5c2ZzLmMgfCA0ICsrLS0NCj4gIDEgZmlsZSBjaGFu
+Z2VkLCAyIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEv
+YmxvY2svYmxrLXN5c2ZzLmMgYi9ibG9jay9ibGstc3lzZnMuYw0KPiBpbmRleCA4NzA0ODRlYWVk
+MWYuLjUyZjU3NTM5ZjFjNyAxMDA2NDQNCj4gLS0tIGEvYmxvY2svYmxrLXN5c2ZzLmMNCj4gKysr
+IGIvYmxvY2svYmxrLXN5c2ZzLmMNCj4gQEAgLTkyOSw5ICs5MjksOSBAQCB2b2lkIGJsa191bnJl
+Z2lzdGVyX3F1ZXVlKHN0cnVjdCBnZW5kaXNrICpkaXNrKQ0KPiAgCWlmIChXQVJOX09OKCFxKSkN
+Cj4gIAkJcmV0dXJuOw0KPiAgDQo+IC0JbXV0ZXhfbG9jaygmcS0+c3lzZnNfbG9jayk7DQo+ICsJ
+c3Bpbl9sb2NrX2lycShxLT5xdWV1ZV9sb2NrKTsNCj4gIAlxdWV1ZV9mbGFnX2NsZWFyX3VubG9j
+a2VkKFFVRVVFX0ZMQUdfUkVHSVNURVJFRCwgcSk7DQo+IC0JbXV0ZXhfdW5sb2NrKCZxLT5zeXNm
+c19sb2NrKTsNCj4gKwlzcGluX3VubG9ja19pcnEocS0+cXVldWVfbG9jayk7DQoNCkhlbGxvIE1p
+a2UsDQoNClRoZSBmdW5jdGlvbiBuYW1lIHF1ZXVlX2ZsYWdfY2xlYXJfdW5sb2NrZWQoKSBtZWFu
+cyAiY2xlYXIgYSBxdWV1ZSBmbGFnDQp3aXRob3V0IGhvbGRpbmcgdGhlIHF1ZXVlIGxvY2siLiBT
+byBhdCBsZWFzdCB0byBtZSB0aGUgYWJvdmUgY29kZSBpcyBjb25mdXNpbmcuDQpQbGVhc2UgY29u
+c2lkZXIgdG8gY2hhbmdlIHF1ZXVlX2ZsYWdfY2xlYXJfdW5sb2NrZWQoKSBpbnRvIHF1ZXVlX2Zs
+YWdfY2xlYXIoKS4NCg0KVGhhbmtzLA0KDQpCYXJ0Lg==
