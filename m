@@ -1,121 +1,80 @@
-Return-Path: <msnitzer@redhat.com>
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk
-Cc: Ming Lei <tom.leiming@gmail.com>,
-	hch@lst.de,
-	Bart.VanAssche@wdc.com,
-	dm-devel@redhat.com,
-	linux-block@vger.kernel.org
-Subject: [for-4.16 PATCH v3 2/3] block: allow gendisk's request_queue registration to be deferred
-Date: Wed, 10 Jan 2018 21:12:55 -0500
-Message-Id: <20180111021256.37490-3-snitzer@redhat.com>
-In-Reply-To: <20180111021256.37490-1-snitzer@redhat.com>
-References: <20180111021256.37490-1-snitzer@redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH IMPROVEMENT] block, bfq: limit sectors served with
+ interactive weight raising
+To: Paolo Valente <paolo.valente@linaro.org>,
+ =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
+Cc: linux-block <linux-block@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Ulf Hansson <ulf.hansson@linaro.org>, Mark Brown <broonie@kernel.org>,
+ Linus Walleij <linus.walleij@linaro.org>, bfq-iosched@googlegroups.com,
+ oleksandr@natalenko.name
+References: <20171228111917.2767-1-paolo.valente@linaro.org>
+ <5a9c6573-84a6-ae7b-7058-f202c7187065@applied-asynchrony.com>
+ <12660CC7-AD89-434A-9BEA-BA0B4C362807@linaro.org>
+ <c1cb979a-007c-7607-0c02-4f9110f90a13@applied-asynchrony.com>
+ <9F56E963-E99C-4B7A-B66A-83FC29B544CD@linaro.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <309e2981-c7dc-9be9-8ad8-0d8c7b864a3d@kernel.dk>
+Date: Fri, 12 Jan 2018 08:13:22 -0700
+MIME-Version: 1.0
+In-Reply-To: <9F56E963-E99C-4B7A-B66A-83FC29B544CD@linaro.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Since I can remember DM has forced the block layer to allow the
-allocation and initialization of the request_queue to be distinct
-operations.  Reason for this is block/genhd.c:add_disk() has requires
-that the request_queue (and associated bdi) be tied to the gendisk
-before add_disk() is called -- because add_disk() also deals with
-exposing the request_queue via blk_register_queue().
+On 1/12/18 3:20 AM, Paolo Valente wrote:
+> 
+> 
+>> Il giorno 12 gen 2018, alle ore 11:15, Holger Hoffstätte <holger@applied-asynchrony.com> ha scritto:
+>>
+>> On 01/12/18 06:58, Paolo Valente wrote:
+>>>
+>>>
+>>>> Il giorno 28 dic 2017, alle ore 15:00, Holger Hoffstätte <holger@applied-asynchrony.com> ha scritto:
+>>>>
+>>>>
+>>>> On 12/28/17 12:19, Paolo Valente wrote:
+>>>> (snip half a tech report ;)
+>>>>
+>>>> So either this or the previous patch ("limit tags for writes and async I/O"
+>>>> can lead to a hard, unrecoverable hang with heavy writes. Since I couldn't
+>>>> log into the affected system anymore I couldn't get any stack traces, blk-mq
+>>>> debug output etc. but there was nothing in dmesg/on the console, so it
+>>>> wasn't a BUG/OOPS.
+>>>>
+>>>> -h
+>>>
+>>> Hi Holger,
+>>> if, as I guess, this problem hasn't gone away for you, I have two
+>>> requests:
+>>> 1) could you share your exact test
+>>> 2) if nothing happens in my systems with your test, would you be
+>>> willing to retry with the dev version of bfq?  It should be able to
+>>> tell us what takes to your hang.  If you are willing to do this test,
+>>> I'll prepare a branch with everything already configured for you.
+>>
+>> Hi,
+>>
+>> thanks for following up but there's no need for any of that; it turned out
+>> to be something else since I got the same hang without those patches at
+>> least once (during a btrfs balance, even though it didn't look like btrfs'
+>> fault directly; more like block/mm/helpers.
+>>
+>> So on January 7 I posted to linux-block et.al. where I said
+>> "So this turned out to be something else, sorry for the false alarm."
+>> but apparently that didn't make it through since it's not in the
+>> archives either. Sorry.
+>>
+>> Long story short, the good news is that I've been running with both patches
+>> since then without any issue. :)
+>>
+> 
+> Wow, what a relief! :)
+> 
+> So, Jens, being the only issue reported gone, can you please consider
+> queueing this patch and the other pending one [1]?  They are both
+> critical for bfq performance.
 
-DM's dynamic creation of arbitrary device types (and associated
-request_queue types) requires the DM device's gendisk be available so
-that DM table loads can establish a master/slave relationship with
-subordinate devices that are referenced by loaded DM tables -- using
-bd_link_disk_holder().  But until these DM tables, and their associated
-subordinate devices, are known DM cannot know what type of request_queue
-it needs -- nor what its queue_limits should be.
+Please just resend them.
 
-This chicken and egg scenario has created all manner of problems for DM
-and, at times, the block layer.
-
-Summary of changes:
-
-- Add QUEUE_FLAG_DEFER_REG that a block driver can set to defer the
-  required blk_register_queue() until the block driver's request_queue
-  is fully initialized.
-
-- Return early from blk_unregister_queue() if QUEUE_FLAG_REGISTERED
-  is not set.  It won't be set if a request_queue with
-  QUEUE_FLAG_DEFER_REG set never called blk_register_queue() -- as can
-  happen if a driver encounters an error and must del_gendisk() before
-  calling blk_register_queue().
-
-- Export blk_register_queue().
-
-These changes allow DM to use device_add_disk() to anchor its gendisk as
-the "master" for master/slave relationships DM must establish with
-subordinate devices referenced in DM tables that get loaded.  Once all
-"slave" devices for a DM device are known a request_queue can be
-properly initialized and then advertised via sysfs -- important
-improvement being that no request_queue resource initialization is
-missed -- before these changes DM was known to be missing blk-mq debugfs
-and proper block throttle initialization.
-
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
----
- block/blk-sysfs.c      | 4 ++++
- block/genhd.c          | 4 +++-
- include/linux/blkdev.h | 1 +
- 3 files changed, 8 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 870484eaed1f..2395122875b4 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -921,6 +921,7 @@ int blk_register_queue(struct gendisk *disk)
- 	mutex_unlock(&q->sysfs_lock);
- 	return ret;
- }
-+EXPORT_SYMBOL_GPL(blk_register_queue);
- 
- void blk_unregister_queue(struct gendisk *disk)
- {
-@@ -929,6 +930,9 @@ void blk_unregister_queue(struct gendisk *disk)
- 	if (WARN_ON(!q))
- 		return;
- 
-+	if (!test_bit(QUEUE_FLAG_REGISTERED, &disk->queue->queue_flags))
-+		return;
-+
- 	mutex_lock(&q->sysfs_lock);
- 	queue_flag_clear_unlocked(QUEUE_FLAG_REGISTERED, q);
- 	mutex_unlock(&q->sysfs_lock);
-diff --git a/block/genhd.c b/block/genhd.c
-index 00620e01e043..3912a82ecc4f 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -682,7 +682,6 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
- 				    exact_match, exact_lock, disk);
- 	}
- 	register_disk(parent, disk);
--	blk_register_queue(disk);
- 
- 	/*
- 	 * Take an extra ref on queue which will be put on disk_release()
-@@ -692,6 +691,9 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
- 
- 	disk_add_events(disk);
- 	blk_integrity_add(disk);
-+
-+	if (!test_bit(QUEUE_FLAG_DEFER_REG, &disk->queue->queue_flags))
-+		blk_register_queue(disk);
- }
- EXPORT_SYMBOL(device_add_disk);
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 71a9371c8182..84d144c7b025 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -681,6 +681,7 @@ struct request_queue {
- #define QUEUE_FLAG_SCSI_PASSTHROUGH 27	/* queue supports SCSI commands */
- #define QUEUE_FLAG_QUIESCED    28	/* queue has been quiesced */
- #define QUEUE_FLAG_PREEMPT_ONLY	29	/* only process REQ_PREEMPT requests */
-+#define QUEUE_FLAG_DEFER_REG	30	/* defer registering queue to a disk */
- 
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_SAME_COMP)	|	\
 -- 
-2.15.0
+Jens Axboe
