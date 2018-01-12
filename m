@@ -1,53 +1,36 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX 1/1] block, bfq: compile group put for oom queue only if BFQ_GROUP_IOSCHED is set
-Date: Wed, 10 Jan 2018 15:58:56 +0100
-Message-Id: <20180110145856.4040-2-paolo.valente@linaro.org>
-In-Reply-To: <20180110145856.4040-1-paolo.valente@linaro.org>
-References: <20180110145856.4040-1-paolo.valente@linaro.org>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 0/2] blk-mq: support physical CPU hotplug
+To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+ Christoph Hellwig <hch@infradead.org>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
+ Stefan Haberland <sth@linux.vnet.ibm.com>,
+ Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org
+References: <20180112025306.28004-1-ming.lei@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <0b61848b-a911-9115-524d-60e778f8a300@kernel.dk>
+Date: Fri, 12 Jan 2018 11:02:13 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180112025306.28004-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Commit ("block, bfq: release oom-queue ref to root group on exit")
-added a missing put of the root bfq group for the oom queue. That put
-has to be, and can be, performed only if CONFIG_BFQ_GROUP_IOSCHED is
-defined: the function doing the put is even not defined at all if
-CONFIG_BFQ_GROUP_IOSCHED is not defined. But that commit makes that
-put be invoked regardless of whether CONFIG_BFQ_GROUP_IOSCHED is
-defined. This commit fixes this mistake, by making that invocation be
-compiled only if CONFIG_BFQ_GROUP_IOSCHED is actually defined.
+On 1/11/18 7:53 PM, Ming Lei wrote:
+> Hi,
+> 
+> This two patches support physical CPU hotplug, so that we can make blk-mq
+> scale well when new physical CPU is added or removed, and this use case
+> is normal for VM world.
+> 
+> Also this patchset fixes the following warning reported by Christian
+> Borntraeger:
+> 
+> 	https://marc.info/?l=linux-block&m=151092973417143&w=2
+> 
+> Christoph Hellwig (2):
+>   genirq/affinity: assign vectors to all possible CPUs
+>   blk-mq: simplify queue mapping & schedule with each possisble CPU
 
-Fixes ("block, bfq: release oom-queue ref to root group on exit")
-Reported-by: Jan Alexander Steffens <jan.steffens@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Applied, thanks Ming.
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index c56a495af2e8..93a97a7fe519 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -5015,10 +5015,9 @@ static void bfq_exit_queue(struct elevator_queue *e)
- 
- 	hrtimer_cancel(&bfqd->idle_slice_timer);
- 
-+#ifdef CONFIG_BFQ_GROUP_IOSCHED
- 	/* release oom-queue reference to root group */
- 	bfqg_and_blkg_put(bfqd->root_group);
--
--#ifdef CONFIG_BFQ_GROUP_IOSCHED
- 	blkcg_deactivate_policy(bfqd->queue, &blkcg_policy_bfq);
- #else
- 	spin_lock_irq(&bfqd->lock);
 -- 
-2.15.1
+Jens Axboe
