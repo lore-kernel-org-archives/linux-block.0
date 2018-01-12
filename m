@@ -1,58 +1,35 @@
-Return-Path: <msnitzer@redhat.com>
-Date: Thu, 11 Jan 2018 21:03:20 -0500
-From: Mike Snitzer <snitzer@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "axboe@kernel.dk" <axboe@kernel.dk>,
-	"dm-devel@redhat.com" <dm-devel@redhat.com>,
-	"hare@suse.de" <hare@suse.de>,
-	"tom.leiming@gmail.com" <tom.leiming@gmail.com>,
+Return-Path: <prvs=54311c032=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "snitzer@redhat.com" <snitzer@redhat.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
+CC: "dm-devel@redhat.com" <dm-devel@redhat.com>, "hare@suse.de"
+	<hare@suse.de>, "tom.leiming@gmail.com" <tom.leiming@gmail.com>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: [for-4.16 PATCH v4 3/4] block: allow gendisk's request_queue
  registration to be deferred
-Message-ID: <20180112020319.GC32298@redhat.com>
+Date: Fri, 12 Jan 2018 00:37:37 +0000
+Message-ID: <1515717455.2752.82.camel@wdc.com>
 References: <20180111201417.2042-1-snitzer@redhat.com>
- <20180111201417.2042-4-snitzer@redhat.com>
- <1515717455.2752.82.camel@wdc.com>
+	 <20180111201417.2042-4-snitzer@redhat.com>
+In-Reply-To: <20180111201417.2042-4-snitzer@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1515717455.2752.82.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Jan 11 2018 at  7:37pm -0500,
-Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
-
-> On Thu, 2018-01-11 at 15:14 -0500, Mike Snitzer wrote:
-> > -void device_add_disk(struct device *parent, struct gendisk *disk)
-> > +void device_add_disk_no_queue_reg(struct device *parent, struct gendisk *disk)
-> >  {
-> >  	dev_t devt;
-> >  	int retval;
-> > @@ -682,7 +682,6 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
-> >  				    exact_match, exact_lock, disk);
-> >  	}
-> >  	register_disk(parent, disk);
-> > -	blk_register_queue(disk);
-> >  
-> >  	/*
-> >  	 * Take an extra ref on queue which will be put on disk_release()
-> > @@ -693,6 +692,21 @@ void device_add_disk(struct device *parent, struct gendisk *disk)
-> >  	disk_add_events(disk);
-> >  	blk_integrity_add(disk);
-> >  }
-> > +EXPORT_SYMBOL(device_add_disk_no_queue_reg);
-> 
-> Hello Mike,
-> 
-> This change can increase the time between the generation of the disk uevent
-> and the registration of the request queue sysfs attributes. Can this cause
-> any udev rules to fail?
-
-Certainly not for DM (DM has very sophisticated udev rules that wait for
-the final dm generated "CHANGE" event before considering a device to be
-"ready").
-
-But are you asking about non-DM devices?  I cannot see, what amounts to,
-moving blk_register_queue() to the end of device_add_disk() as reason for
-concern.  If it were there technically would already be that race.
-
-Mike
+T24gVGh1LCAyMDE4LTAxLTExIGF0IDE1OjE0IC0wNTAwLCBNaWtlIFNuaXR6ZXIgd3JvdGU6DQo+
+IC12b2lkIGRldmljZV9hZGRfZGlzayhzdHJ1Y3QgZGV2aWNlICpwYXJlbnQsIHN0cnVjdCBnZW5k
+aXNrICpkaXNrKQ0KPiArdm9pZCBkZXZpY2VfYWRkX2Rpc2tfbm9fcXVldWVfcmVnKHN0cnVjdCBk
+ZXZpY2UgKnBhcmVudCwgc3RydWN0IGdlbmRpc2sgKmRpc2spDQo+ICB7DQo+ICAJZGV2X3QgZGV2
+dDsNCj4gIAlpbnQgcmV0dmFsOw0KPiBAQCAtNjgyLDcgKzY4Miw2IEBAIHZvaWQgZGV2aWNlX2Fk
+ZF9kaXNrKHN0cnVjdCBkZXZpY2UgKnBhcmVudCwgc3RydWN0IGdlbmRpc2sgKmRpc2spDQo+ICAJ
+CQkJICAgIGV4YWN0X21hdGNoLCBleGFjdF9sb2NrLCBkaXNrKTsNCj4gIAl9DQo+ICAJcmVnaXN0
+ZXJfZGlzayhwYXJlbnQsIGRpc2spOw0KPiAtCWJsa19yZWdpc3Rlcl9xdWV1ZShkaXNrKTsNCj4g
+IA0KPiAgCS8qDQo+ICAJICogVGFrZSBhbiBleHRyYSByZWYgb24gcXVldWUgd2hpY2ggd2lsbCBi
+ZSBwdXQgb24gZGlza19yZWxlYXNlKCkNCj4gQEAgLTY5Myw2ICs2OTIsMjEgQEAgdm9pZCBkZXZp
+Y2VfYWRkX2Rpc2soc3RydWN0IGRldmljZSAqcGFyZW50LCBzdHJ1Y3QgZ2VuZGlzayAqZGlzaykN
+Cj4gIAlkaXNrX2FkZF9ldmVudHMoZGlzayk7DQo+ICAJYmxrX2ludGVncml0eV9hZGQoZGlzayk7
+DQo+ICB9DQo+ICtFWFBPUlRfU1lNQk9MKGRldmljZV9hZGRfZGlza19ub19xdWV1ZV9yZWcpOw0K
+DQpIZWxsbyBNaWtlLA0KDQpUaGlzIGNoYW5nZSBjYW4gaW5jcmVhc2UgdGhlIHRpbWUgYmV0d2Vl
+biB0aGUgZ2VuZXJhdGlvbiBvZiB0aGUgZGlzayB1ZXZlbnQNCmFuZCB0aGUgcmVnaXN0cmF0aW9u
+IG9mIHRoZSByZXF1ZXN0IHF1ZXVlIHN5c2ZzIGF0dHJpYnV0ZXMuIENhbiB0aGlzIGNhdXNlDQph
+bnkgdWRldiBydWxlcyB0byBmYWlsPw0KDQpUaGFua3MsDQoNCkJhcnQu
