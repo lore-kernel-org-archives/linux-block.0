@@ -1,32 +1,48 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] blk-mq-debugfs: Also show requests that have not yet been
- started
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.com>,
- Johannes Thumshirn <jthumshirn@suse.de>,
- "Martin K . Petersen" <martin.petersen@oracle.com>
-References: <20180112215207.17852-1-bart.vanassche@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <78a60ddb-7e5f-3dac-2024-390e17da02f8@kernel.dk>
-Date: Fri, 12 Jan 2018 14:55:57 -0700
-MIME-Version: 1.0
-In-Reply-To: <20180112215207.17852-1-bart.vanassche@wdc.com>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <prvs=54311c032=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: [PATCH] blk-mq-debugfs: Also show requests that have not yet been started
+Date: Fri, 12 Jan 2018 13:52:07 -0800
+Message-Id: <20180112215207.17852-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On 1/12/18 2:52 PM, Bart Van Assche wrote:
-> When debugging e.g. the SCSI timeout handler it is important that
-> requests that have not yet been started or that already have
-> completed are also reported through debugfs.
-> 
-> This patch depends on a patch that went upstream recently, namely
-> commit 14e3062fb185 ("scsi: core: Fix a scsi_show_rq() NULL pointer
-> dereference").
+When debugging e.g. the SCSI timeout handler it is important that
+requests that have not yet been started or that already have
+completed are also reported through debugfs.
 
-Why don't we just kill the check, and dump any request that has a
-matching hctx? We already know the bit was set, so just print
-all of them.
+This patch depends on a patch that went upstream recently, namely
+commit 14e3062fb185 ("scsi: core: Fix a scsi_show_rq() NULL pointer
+dereference").
 
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+---
+ block/blk-mq-debugfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 19db3f583bf1..ccd5ef08c3f0 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -402,7 +402,7 @@ static void hctx_show_busy_rq(struct request *rq, void *data, bool reserved)
+ 	const struct show_busy_params *params = data;
+ 
+ 	if (blk_mq_map_queue(rq->q, rq->mq_ctx->cpu) == params->hctx &&
+-	    blk_mq_rq_state(rq) != MQ_RQ_IDLE)
++	    list_empty(&rq->queuelist))
+ 		__blk_mq_debugfs_rq_show(params->m,
+ 					 list_entry_rq(&rq->queuelist));
+ }
 -- 
-Jens Axboe
+2.15.1
