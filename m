@@ -1,36 +1,43 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:35442 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754576AbeALKrD (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 Jan 2018 05:47:03 -0500
+Date: Fri, 12 Jan 2018 11:47:01 +0100
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@fb.com>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Stefan Haberland <sth@linux.vnet.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-kernel@vger.kernel.org
 Subject: Re: [PATCH 0/2] blk-mq: support physical CPU hotplug
-To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
- Christoph Hellwig <hch@infradead.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
- Stefan Haberland <sth@linux.vnet.ibm.com>,
- Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org
+Message-ID: <20180112104701.4nxixn4nru4f7uib@linux-x5ow.site>
 References: <20180112025306.28004-1-ming.lei@redhat.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <0b61848b-a911-9115-524d-60e778f8a300@kernel.dk>
-Date: Fri, 12 Jan 2018 11:02:13 -0700
+ <64c62449-27d2-a0a1-c7db-d2d08a3eb893@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20180112025306.28004-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <64c62449-27d2-a0a1-c7db-d2d08a3eb893@de.ibm.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 1/11/18 7:53 PM, Ming Lei wrote:
-> Hi,
+On Fri, Jan 12, 2018 at 09:12:24AM +0100, Christian Borntraeger wrote:
+> I think we also need cc stable for this. The bug was introduced with 
+>  
+> commit 4b855ad37194f7bdbb200ce7a1c7051fecb56a08 upstream.
+> ("blk-mq: Create hctx for each present CPU")
 > 
-> This two patches support physical CPU hotplug, so that we can make blk-mq
-> scale well when new physical CPU is added or removed, and this use case
-> is normal for VM world.
-> 
-> Also this patchset fixes the following warning reported by Christian
-> Borntraeger:
-> 
-> 	https://marc.info/?l=linux-block&m=151092973417143&w=2
-> 
-> Christoph Hellwig (2):
->   genirq/affinity: assign vectors to all possible CPUs
->   blk-mq: simplify queue mapping & schedule with each possisble CPU
+> and that was even backported into 4.12 stable.
 
-Applied, thanks Ming.
+Yes, and Ming (or Jens?), can you please add a Fixes tag as well? It helps
+with identifying patches which fix backports.
 
+Thanks,
+	Johannes
 -- 
-Jens Axboe
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+GF: Felix Imend�rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N�rnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
