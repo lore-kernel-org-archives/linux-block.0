@@ -1,85 +1,108 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <prvs=54311c032=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "jbacik@fb.com" <jbacik@fb.com>, "tj@kernel.org" <tj@kernel.org>,
+	"jack@suse.cz" <jack@suse.cz>, "clm@fb.com" <clm@fb.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
+CC: "kernel-team@fb.com" <kernel-team@fb.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "peterz@infradead.org"
+	<peterz@infradead.org>, "linux-btrfs@vger.kernel.org"
+	<linux-btrfs@vger.kernel.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "jianchao.w.wang@oracle.com"
+	<jianchao.w.wang@oracle.com>
 Subject: Re: [PATCHSET v5] blk-mq: reimplement timeout handling
-To: Bart Van Assche <Bart.VanAssche@wdc.com>, "jbacik@fb.com"
- <jbacik@fb.com>, "tj@kernel.org" <tj@kernel.org>, "jack@suse.cz"
- <jack@suse.cz>, "clm@fb.com" <clm@fb.com>
-Cc: "kernel-team@fb.com" <kernel-team@fb.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>
+Date: Fri, 12 Jan 2018 20:57:10 +0000
+Message-ID: <1515790585.2396.50.camel@wdc.com>
 References: <20180109162953.1211451-1-tj@kernel.org>
- <1515790585.2396.50.camel@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <3b2ad58c-837a-a084-fdb5-7e8913e5e285@kernel.dk>
-Date: Fri, 12 Jan 2018 14:07:33 -0700
+In-Reply-To: <20180109162953.1211451-1-tj@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1515790585.2396.50.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 1/12/18 1:57 PM, Bart Van Assche wrote:
-> On Tue, 2018-01-09 at 08:29 -0800, Tejun Heo wrote:
->> Currently, blk-mq timeout path synchronizes against the usual
->> issue/completion path using a complex scheme involving atomic
->> bitflags, REQ_ATOM_*, memory barriers and subtle memory coherence
->> rules.  Unfortunatley, it contains quite a few holes.
-> 
-> Hello Tejun,
-> 
-> With this patch series applied I see weird hangs in blk_mq_get_tag() when I
-> run the srp-test software. If I pull Jens' latest for-next branch and revert
-> this patch series then the srp-test software runs successfully. Note: if you
-> don't have InfiniBand hardware available then you will need the RDMA/CM
-> patches for the SRP initiator and target drivers that have been posted
-> recently on the linux-rdma mailing list to run the srp-test software.
-
-You're really not making it easy for folks to run this :-)
-
-> This is how I run the srp-test software in a VM:
-> 
-> ./run_tests -c -d -r 10
-> 
-> Here is an example of what SysRq-w reported when the hang occurred:
-> 
-> sysrq: SysRq : Show Blocked State
->  task                        PC stack   pid father
-> kworker/u8:0    D12864     5      2 0x80000000
-> Workqueue: events_unbound sd_probe_async [sd_mod]
-> Call Trace:
-> ? __schedule+0x2b4/0xbb0
-> schedule+0x2d/0x90
-> io_schedule+0xd/0x30
-> blk_mq_get_tag+0x169/0x290
-> ? finish_wait+0x80/0x80
-> blk_mq_get_request+0x16a/0x4f0
-> blk_mq_alloc_request+0x59/0xc0
-> blk_get_request_flags+0x3f/0x260
-> scsi_execute+0x33/0x1e0 [scsi_mod]
-> read_capacity_16.part.35+0x9c/0x460 [sd_mod]
-> sd_revalidate_disk+0x14bb/0x1cb0 [sd_mod]
-> sd_probe_async+0xf2/0x1a0 [sd_mod]
-> process_one_work+0x21c/0x6d0
-> worker_thread+0x35/0x380
-> ? process_one_work+0x6d0/0x6d0
-> kthread+0x117/0x130
-> ? kthread_create_worker_on_cpu+0x40/0x40
-> ret_from_fork+0x24/0x30
-> systemd-udevd   D13672  1048    285 0x00000100
-> Call Trace:
-> ? __schedule+0x2b4/0xbb0
-> schedule+0x2d/0x90
-> io_schedule+0xd/0x30
-> generic_file_read_iter+0x32f/0x970
-> ? page_cache_tree_insert+0x100/0x100
-> __vfs_read+0xcc/0x120
-> vfs_read+0x96/0x140
-> SyS_read+0x40/0xa0
-> do_syscall_64+0x5f/0x1b0
-> entry_SYSCALL64_slow_path+0x25/0x25
-
-Do you have the matching blk-mq debugfs output for the device?
-
--- 
-Jens Axboe
+T24gVHVlLCAyMDE4LTAxLTA5IGF0IDA4OjI5IC0wODAwLCBUZWp1biBIZW8gd3JvdGU6DQo+IEN1
+cnJlbnRseSwgYmxrLW1xIHRpbWVvdXQgcGF0aCBzeW5jaHJvbml6ZXMgYWdhaW5zdCB0aGUgdXN1
+YWwNCj4gaXNzdWUvY29tcGxldGlvbiBwYXRoIHVzaW5nIGEgY29tcGxleCBzY2hlbWUgaW52b2x2
+aW5nIGF0b21pYw0KPiBiaXRmbGFncywgUkVRX0FUT01fKiwgbWVtb3J5IGJhcnJpZXJzIGFuZCBz
+dWJ0bGUgbWVtb3J5IGNvaGVyZW5jZQ0KPiBydWxlcy4gIFVuZm9ydHVuYXRsZXksIGl0IGNvbnRh
+aW5zIHF1aXRlIGEgZmV3IGhvbGVzLg0KDQpIZWxsbyBUZWp1biwNCg0KV2l0aCB0aGlzIHBhdGNo
+IHNlcmllcyBhcHBsaWVkIEkgc2VlIHdlaXJkIGhhbmdzIGluIGJsa19tcV9nZXRfdGFnKCkgd2hl
+biBJDQpydW4gdGhlIHNycC10ZXN0IHNvZnR3YXJlLiBJZiBJIHB1bGwgSmVucycgbGF0ZXN0IGZv
+ci1uZXh0IGJyYW5jaCBhbmQgcmV2ZXJ0DQp0aGlzIHBhdGNoIHNlcmllcyB0aGVuIHRoZSBzcnAt
+dGVzdCBzb2Z0d2FyZSBydW5zIHN1Y2Nlc3NmdWxseS4gTm90ZTogaWYgeW91DQpkb24ndCBoYXZl
+IEluZmluaUJhbmQgaGFyZHdhcmUgYXZhaWxhYmxlIHRoZW4geW91IHdpbGwgbmVlZCB0aGUgUkRN
+QS9DTQ0KcGF0Y2hlcyBmb3IgdGhlIFNSUCBpbml0aWF0b3IgYW5kIHRhcmdldCBkcml2ZXJzIHRo
+YXQgaGF2ZSBiZWVuIHBvc3RlZA0KcmVjZW50bHkgb24gdGhlIGxpbnV4LXJkbWEgbWFpbGluZyBs
+aXN0IHRvIHJ1biB0aGUgc3JwLXRlc3Qgc29mdHdhcmUuDQoNClRoaXMgaXMgaG93IEkgcnVuIHRo
+ZSBzcnAtdGVzdCBzb2Z0d2FyZSBpbiBhIFZNOg0KDQouL3J1bl90ZXN0cyAtYyAtZCAtciAxMA0K
+DQpIZXJlIGlzIGFuIGV4YW1wbGUgb2Ygd2hhdCBTeXNScS13IHJlcG9ydGVkIHdoZW4gdGhlIGhh
+bmcgb2NjdXJyZWQ6DQoNCnN5c3JxOiBTeXNScSA6IFNob3cgQmxvY2tlZCBTdGF0ZQ0KIHRhc2sg
+ICAgICAgICAgICAgICAgICAgICAgICBQQyBzdGFjayAgIHBpZCBmYXRoZXINCmt3b3JrZXIvdTg6
+MCAgICBEMTI4NjQgICAgIDUgICAgICAyIDB4ODAwMDAwMDANCldvcmtxdWV1ZTogZXZlbnRzX3Vu
+Ym91bmQgc2RfcHJvYmVfYXN5bmMgW3NkX21vZF0NCkNhbGwgVHJhY2U6DQo/IF9fc2NoZWR1bGUr
+MHgyYjQvMHhiYjANCnNjaGVkdWxlKzB4MmQvMHg5MA0KaW9fc2NoZWR1bGUrMHhkLzB4MzANCmJs
+a19tcV9nZXRfdGFnKzB4MTY5LzB4MjkwDQo/IGZpbmlzaF93YWl0KzB4ODAvMHg4MA0KYmxrX21x
+X2dldF9yZXF1ZXN0KzB4MTZhLzB4NGYwDQpibGtfbXFfYWxsb2NfcmVxdWVzdCsweDU5LzB4YzAN
+CmJsa19nZXRfcmVxdWVzdF9mbGFncysweDNmLzB4MjYwDQpzY3NpX2V4ZWN1dGUrMHgzMy8weDFl
+MCBbc2NzaV9tb2RdDQpyZWFkX2NhcGFjaXR5XzE2LnBhcnQuMzUrMHg5Yy8weDQ2MCBbc2RfbW9k
+XQ0Kc2RfcmV2YWxpZGF0ZV9kaXNrKzB4MTRiYi8weDFjYjAgW3NkX21vZF0NCnNkX3Byb2JlX2Fz
+eW5jKzB4ZjIvMHgxYTAgW3NkX21vZF0NCnByb2Nlc3Nfb25lX3dvcmsrMHgyMWMvMHg2ZDANCndv
+cmtlcl90aHJlYWQrMHgzNS8weDM4MA0KPyBwcm9jZXNzX29uZV93b3JrKzB4NmQwLzB4NmQwDQpr
+dGhyZWFkKzB4MTE3LzB4MTMwDQo/IGt0aHJlYWRfY3JlYXRlX3dvcmtlcl9vbl9jcHUrMHg0MC8w
+eDQwDQpyZXRfZnJvbV9mb3JrKzB4MjQvMHgzMA0Kc3lzdGVtZC11ZGV2ZCAgIEQxMzY3MiAgMTA0
+OCAgICAyODUgMHgwMDAwMDEwMA0KQ2FsbCBUcmFjZToNCj8gX19zY2hlZHVsZSsweDJiNC8weGJi
+MA0Kc2NoZWR1bGUrMHgyZC8weDkwDQppb19zY2hlZHVsZSsweGQvMHgzMA0KZ2VuZXJpY19maWxl
+X3JlYWRfaXRlcisweDMyZi8weDk3MA0KPyBwYWdlX2NhY2hlX3RyZWVfaW5zZXJ0KzB4MTAwLzB4
+MTAwDQpfX3Zmc19yZWFkKzB4Y2MvMHgxMjANCnZmc19yZWFkKzB4OTYvMHgxNDANClN5U19yZWFk
+KzB4NDAvMHhhMA0KZG9fc3lzY2FsbF82NCsweDVmLzB4MWIwDQplbnRyeV9TWVNDQUxMNjRfc2xv
+d19wYXRoKzB4MjUvMHgyNQ0KUklQOiAwMDMzOjB4N2Y4Y2U2ZDA4ZDExDQpSU1A6IDAwMmI6MDAw
+MDdmZmY5NmRlYzI4OCBFRkxBR1M6IDAwMDAwMjQ2IE9SSUdfUkFYOiAwMDAwMDAwMDAwMDAwMDAw
+DQpSQVg6IGZmZmZmZmZmZmZmZmZmZGEgUkJYOiAwMDAwNTY1MWRlN2Y2ZTEwIFJDWDogMDAwMDdm
+OGNlNmQwOGQxMQ0KUkRYOiAwMDAwMDAwMDAwMDAwMDQwIFJTSTogMDAwMDU2NTFkZTdmNmUzOCBS
+REk6IDAwMDAwMDAwMDAwMDAwMDcNClJCUDogMDAwMDU2NTFkZTdlYTUwMCBSMDg6IDAwMDA3Zjhj
+ZTZjZjFjMjAgUjA5OiAwMDAwNTY1MWRlN2Y2ZTEwDQpSMTA6IDAwMDAwMDAwMDAwMDAwNmYgUjEx
+OiAwMDAwMDAwMDAwMDAwMjQ2IFIxMjogMDAwMDAwMDAwMWZmMDAwMA0KUjEzOiAwMDAwMDAwMDAx
+ZmYwMDQwIFIxNDogMDAwMDU2NTFkZTdlYTU1MCBSMTU6IDAwMDAwMDAwMDAwMDAwNDANCnN5c3Rl
+bWQtdWRldmQgICBEMTM0OTYgIDEwNDkgICAgMjg1IDB4MDAwMDAxMDANCkNhbGwgVHJhY2U6DQo/
+IF9fc2NoZWR1bGUrMHgyYjQvMHhiYjANCnNjaGVkdWxlKzB4MmQvMHg5MA0KaW9fc2NoZWR1bGUr
+MHhkLzB4MzANCmJsa19tcV9nZXRfdGFnKzB4MTY5LzB4MjkwDQo/IGZpbmlzaF93YWl0KzB4ODAv
+MHg4MA0KYmxrX21xX2dldF9yZXF1ZXN0KzB4MTZhLzB4NGYwDQpibGtfbXFfbWFrZV9yZXF1ZXN0
+KzB4MTA1LzB4OGUwDQo/IGdlbmVyaWNfbWFrZV9yZXF1ZXN0KzB4ZDYvMHgzZDANCmdlbmVyaWNf
+bWFrZV9yZXF1ZXN0KzB4MTAzLzB4M2QwDQo/IHN1Ym1pdF9iaW8rMHg1Ny8weDExMA0Kc3VibWl0
+X2JpbysweDU3LzB4MTEwDQptcGFnZV9yZWFkcGFnZXMrMHgxM2IvMHgxNjANCj8gSV9CREVWKzB4
+MTAvMHgxMA0KPyByY3VfcmVhZF9sb2NrX3NjaGVkX2hlbGQrMHg2Ni8weDcwDQo/IF9fYWxsb2Nf
+cGFnZXNfbm9kZW1hc2srMHgyZTgvMHgzNjANCl9fZG9fcGFnZV9jYWNoZV9yZWFkYWhlYWQrMHgy
+YTQvMHgzNzANCj8gZm9yY2VfcGFnZV9jYWNoZV9yZWFkYWhlYWQrMHhhZi8weDExMA0KZm9yY2Vf
+cGFnZV9jYWNoZV9yZWFkYWhlYWQrMHhhZi8weDExMA0KZ2VuZXJpY19maWxlX3JlYWRfaXRlcisw
+eDc0My8weDk3MA0KPyBmaW5kX2hlbGRfbG9jaysweDJkLzB4OTANCj8gX3Jhd19zcGluX3VubG9j
+aysweDI5LzB4NDANCl9fdmZzX3JlYWQrMHhjYy8weDEyMA0KdmZzX3JlYWQrMHg5Ni8weDE0MA0K
+U3lTX3JlYWQrMHg0MC8weGEwDQpkb19zeXNjYWxsXzY0KzB4NWYvMHgxYjANCmVudHJ5X1NZU0NB
+TEw2NF9zbG93X3BhdGgrMHgyNS8weDI1DQpSSVA6IDAwMzM6MHg3ZjhjZTZkMDhkMTENClJTUDog
+MDAyYjowMDAwN2ZmZjk2ZGVjOGI4IEVGTEFHUzogMDAwMDAyNDYgT1JJR19SQVg6IDAwMDAwMDAw
+MDAwMDAwMDANClJBWDogZmZmZmZmZmZmZmZmZmZkYSBSQlg6IDAwMDA3ZjhjZTcwODUwMTAgUkNY
+OiAwMDAwN2Y4Y2U2ZDA4ZDExDQpSRFg6IDAwMDAwMDAwMDAwNDAwMDAgUlNJOiAwMDAwN2Y4Y2U3
+MDg1MDM4IFJESTogMDAwMDAwMDAwMDAwMDAwZg0KUkJQOiAwMDAwNTY1MWRlN2VjODQwIFIwODog
+ZmZmZmZmZmZmZmZmZmZmZiBSMDk6IDAwMDA3ZjhjZTcwODUwMTANClIxMDogMDAwMDdmOGNlNzA4
+NTAyOCBSMTE6IDAwMDAwMDAwMDAwMDAyNDYgUjEyOiAwMDAwMDAwMDAwMDAwMDAwDQpSMTM6IDAw
+MDAwMDAwMDAwNDAwMDAgUjE0OiAwMDAwNTY1MWRlN2VjODkwIFIxNTogMDAwMDAwMDAwMDA0MDAw
+MA0Kc3lzdGVtZC11ZGV2ZCAgIEQxMzY3MiAgMTA1NSAgICAyODUgMHgwMDAwMDEwMA0KQ2FsbCBU
+cmFjZToNCj8gX19zY2hlZHVsZSsweDJiNC8weGJiMA0Kc2NoZWR1bGUrMHgyZC8weDkwDQppb19z
+Y2hlZHVsZSsweGQvMHgzMA0KYmxrX21xX2dldF90YWcrMHgxNjkvMHgyOTANCj8gZmluaXNoX3dh
+aXQrMHg4MC8weDgwDQpibGtfbXFfZ2V0X3JlcXVlc3QrMHgxNmEvMHg0ZjANCmJsa19tcV9tYWtl
+X3JlcXVlc3QrMHgxMDUvMHg4ZTANCj8gZ2VuZXJpY19tYWtlX3JlcXVlc3QrMHhkNi8weDNkMA0K
+Z2VuZXJpY19tYWtlX3JlcXVlc3QrMHgxMDMvMHgzZDANCj8gc3VibWl0X2JpbysweDU3LzB4MTEw
+DQpzdWJtaXRfYmlvKzB4NTcvMHgxMTANCm1wYWdlX3JlYWRwYWdlcysweDEzYi8weDE2MA0KPyBJ
+X0JERVYrMHgxMC8weDEwDQo/IHJjdV9yZWFkX2xvY2tfc2NoZWRfaGVsZCsweDY2LzB4NzANCj8g
+X19hbGxvY19wYWdlc19ub2RlbWFzaysweDJlOC8weDM2MA0KX19kb19wYWdlX2NhY2hlX3JlYWRh
+aGVhZCsweDJhNC8weDM3MA0KPyBmb3JjZV9wYWdlX2NhY2hlX3JlYWRhaGVhZCsweGFmLzB4MTEw
+DQpmb3JjZV9wYWdlX2NhY2hlX3JlYWRhaGVhZCsweGFmLzB4MTEwDQpnZW5lcmljX2ZpbGVfcmVh
+ZF9pdGVyKzB4NzQzLzB4OTcwDQpfX3Zmc19yZWFkKzB4Y2MvMHgxMjANCnZmc19yZWFkKzB4OTYv
+MHgxNDANClN5U19yZWFkKzB4NDAvMHhhMA0KZG9fc3lzY2FsbF82NCsweDVmLzB4MWIwDQplbnRy
+eV9TWVNDQUxMNjRfc2xvd19wYXRoKzB4MjUvMHgyNQ0KUklQOiAwMDMzOjB4N2Y4Y2U2ZDA4ZDEx
+DQpSU1A6IDAwMmI6MDAwMDdmZmY5NmRlYzg0OCBFRkxBR1M6IDAwMDAwMjQ2IE9SSUdfUkFYOiAw
+MDAwMDAwMDAwMDAwMDAwDQpSQVg6IGZmZmZmZmZmZmZmZmZmZGEgUkJYOiAwMDAwNTY1MWRlN2Vj
+MzAwIFJDWDogMDAwMDdmOGNlNmQwOGQxMQ0KUkRYOiAwMDAwMDAwMDAwMDAwMTAwIFJTSTogMDAw
+MDU2NTFkZTdlYzMyOCBSREk6IDAwMDAwMDAwMDAwMDAwMGYNClJCUDogMDAwMDU2NTFkZTdlYTUw
+MCBSMDg6IDAwMDAwMDAwMDAwMDAwMDAgUjA5OiAwMDAwNTY1MWRlN2VjMzAwDQpSMTA6IDAwMDA1
+NjUxZGU3ZWMzMTggUjExOiAwMDAwMDAwMDAwMDAwMjQ2IFIxMjogMDAwMDAwMDAwMWZmZTAwMA0K
+UjEzOiAwMDAwMDAwMDAxZmZlMTAwIFIxNDogMDAwMDU2NTFkZTdlYTU1MCBSMTU6IDAwMDAwMDAw
+MDAwMDAxMDANCg0KUGxlYXNlIGxldCBtZSBrbm93IGlmIHlvdSBuZWVkIG1vcmUgaW5mb3JtYXRp
+b24uDQoNCkJhcnQu
