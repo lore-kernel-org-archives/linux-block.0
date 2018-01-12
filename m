@@ -1,77 +1,60 @@
-Return-Path: <msnitzer@redhat.com>
-Date: Fri, 12 Jan 2018 14:29:19 -0500
-From: Mike Snitzer <snitzer@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "dm-devel@redhat.com" <dm-devel@redhat.com>,
-	"hch@infradead.org" <hch@infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-	"axboe@fb.com" <axboe@fb.com>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>
+Return-Path: <prvs=54311c032=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "snitzer@redhat.com" <snitzer@redhat.com>
+CC: "dm-devel@redhat.com" <dm-devel@redhat.com>, "hch@infradead.org"
+	<hch@infradead.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@fb.com"
+	<axboe@fb.com>, "ming.lei@redhat.com" <ming.lei@redhat.com>
 Subject: Re: [PATCH V3 0/5]  dm-rq: improve sequential I/O performance
-Message-ID: <20180112192918.GA5712@redhat.com>
-References: <1515710256.2752.72.camel@sandisk.com>
- <20180112014232.GB25090@ming.t460p>
- <20180112015721.GB32298@redhat.com>
- <20180112033308.GC25090@ming.t460p>
- <20180112171840.GA4541@redhat.com>
- <1515778013.2396.3.camel@wdc.com>
- <20180112174000.GB5134@redhat.com>
- <1515779211.2396.11.camel@wdc.com>
- <20180112180635.GD5134@redhat.com>
- <1515783288.2396.37.camel@wdc.com>
+Date: Fri, 12 Jan 2018 18:54:49 +0000
+Message-ID: <1515783288.2396.37.camel@wdc.com>
+References: <20180111060159.12991-1-ming.lei@redhat.com>
+	 <20180111220742.GA31944@redhat.com> <1515710256.2752.72.camel@sandisk.com>
+	 <20180112014232.GB25090@ming.t460p> <20180112015721.GB32298@redhat.com>
+	 <20180112033308.GC25090@ming.t460p> <20180112171840.GA4541@redhat.com>
+	 <1515778013.2396.3.camel@wdc.com> <20180112174000.GB5134@redhat.com>
+	 <1515779211.2396.11.camel@wdc.com> <20180112180635.GD5134@redhat.com>
+In-Reply-To: <20180112180635.GD5134@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1515783288.2396.37.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Jan 12 2018 at  1:54pm -0500,
-Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
-
-> On Fri, 2018-01-12 at 13:06 -0500, Mike Snitzer wrote:
-> > OK, you have the stage: please give me a pointer to your best
-> > explaination of the several.
-> 
-> Since the previous discussion about this topic occurred more than a month
-> ago it could take more time to look up an explanation than to explain it
-> again. Anyway, here we go. As you know a block layer request queue needs to
-> be rerun if one or more requests are waiting and a previous condition that
-> prevented the request to be executed has been cleared. For the dm-mpath
-> driver, examples of such conditions are no tags available, a path that is
-> busy (see also pgpath_busy()), path initialization that is in progress
-> (pg_init_in_progress) or a request completes with status, e.g. if the
-> SCSI core calls __blk_mq_end_request(req, error) with error != 0. For some
-> of these conditions, e.g. path initialization completes, a callback
-> function in the dm-mpath driver is called and it is possible to explicitly
-> rerun the queue. I agree that for such scenario's a delayed queue run should
-> not be triggered. For other scenario's, e.g. if a SCSI initiator submits a
-> SCSI request over a fabric and the SCSI target replies with "BUSY" then the
-> SCSI core will end the I/O request with status BLK_STS_RESOURCE after the
-> maximum number of retries has been reached (see also scsi_io_completion()).
-> In that last case, if a SCSI target sends a "BUSY" reply over the wire back
-> to the initiator, there is no other approach for the SCSI initiator to
-> figure out whether it can queue another request than to resubmit the
-> request. The worst possible strategy is to resubmit a request immediately
-> because that will cause a significant fraction of the fabric bandwidth to
-> be used just for replying "BUSY" to requests that can't be processed
-> immediately.
-> 
-> The intention of commit 6077c2d706097c0 was to address the last mentioned
-> case. It may be possible to move the delayed queue rerun from the
-> dm_queue_rq() into dm_requeue_original_request(). But I think it would be
-> wrong to rerun the queue immediately in case a SCSI target system returns
-> "BUSY".
-
-OK, thank you very much for this.  Really helps.
-
-For starters multipath_clone_and_map() could do a fair amount more with
-the insight that a SCSI "BUSY" was transmitted back.  If both blk-mq
-being out of tags and SCSI "BUSY" simply return BLK_STS_RESOURCE then
-dm-mpath doesn't have the ability to behave more intelligently.
-
-Anyway, armed with this info I'll have a think about what we might do to
-tackle this problem head on.
-
-Thanks,
-Mike
+T24gRnJpLCAyMDE4LTAxLTEyIGF0IDEzOjA2IC0wNTAwLCBNaWtlIFNuaXR6ZXIgd3JvdGU6DQo+
+IE9LLCB5b3UgaGF2ZSB0aGUgc3RhZ2U6IHBsZWFzZSBnaXZlIG1lIGEgcG9pbnRlciB0byB5b3Vy
+IGJlc3QNCj4gZXhwbGFpbmF0aW9uIG9mIHRoZSBzZXZlcmFsLg0KDQpTaW5jZSB0aGUgcHJldmlv
+dXMgZGlzY3Vzc2lvbiBhYm91dCB0aGlzIHRvcGljIG9jY3VycmVkIG1vcmUgdGhhbiBhIG1vbnRo
+DQphZ28gaXQgY291bGQgdGFrZSBtb3JlIHRpbWUgdG8gbG9vayB1cCBhbiBleHBsYW5hdGlvbiB0
+aGFuIHRvIGV4cGxhaW4gaXQNCmFnYWluLiBBbnl3YXksIGhlcmUgd2UgZ28uIEFzIHlvdSBrbm93
+IGEgYmxvY2sgbGF5ZXIgcmVxdWVzdCBxdWV1ZSBuZWVkcyB0bw0KYmUgcmVydW4gaWYgb25lIG9y
+IG1vcmUgcmVxdWVzdHMgYXJlIHdhaXRpbmcgYW5kIGEgcHJldmlvdXMgY29uZGl0aW9uIHRoYXQN
+CnByZXZlbnRlZCB0aGUgcmVxdWVzdCB0byBiZSBleGVjdXRlZCBoYXMgYmVlbiBjbGVhcmVkLiBG
+b3IgdGhlIGRtLW1wYXRoDQpkcml2ZXIsIGV4YW1wbGVzIG9mIHN1Y2ggY29uZGl0aW9ucyBhcmUg
+bm8gdGFncyBhdmFpbGFibGUsIGEgcGF0aCB0aGF0IGlzDQpidXN5IChzZWUgYWxzbyBwZ3BhdGhf
+YnVzeSgpKSwgcGF0aCBpbml0aWFsaXphdGlvbiB0aGF0IGlzIGluIHByb2dyZXNzDQoocGdfaW5p
+dF9pbl9wcm9ncmVzcykgb3IgYSByZXF1ZXN0IGNvbXBsZXRlcyB3aXRoIHN0YXR1cywgZS5nLiBp
+ZiB0aGUNClNDU0kgY29yZSBjYWxscyBfX2Jsa19tcV9lbmRfcmVxdWVzdChyZXEsIGVycm9yKSB3
+aXRoIGVycm9yICE9IDAuIEZvciBzb21lDQpvZiB0aGVzZSBjb25kaXRpb25zLCBlLmcuIHBhdGgg
+aW5pdGlhbGl6YXRpb24gY29tcGxldGVzLCBhIGNhbGxiYWNrDQpmdW5jdGlvbiBpbiB0aGUgZG0t
+bXBhdGggZHJpdmVyIGlzIGNhbGxlZCBhbmQgaXQgaXMgcG9zc2libGUgdG8gZXhwbGljaXRseQ0K
+cmVydW4gdGhlIHF1ZXVlLiBJIGFncmVlIHRoYXQgZm9yIHN1Y2ggc2NlbmFyaW8ncyBhIGRlbGF5
+ZWQgcXVldWUgcnVuIHNob3VsZA0Kbm90IGJlIHRyaWdnZXJlZC4gRm9yIG90aGVyIHNjZW5hcmlv
+J3MsIGUuZy4gaWYgYSBTQ1NJIGluaXRpYXRvciBzdWJtaXRzIGENClNDU0kgcmVxdWVzdCBvdmVy
+IGEgZmFicmljIGFuZCB0aGUgU0NTSSB0YXJnZXQgcmVwbGllcyB3aXRoICJCVVNZIiB0aGVuIHRo
+ZQ0KU0NTSSBjb3JlIHdpbGwgZW5kIHRoZSBJL08gcmVxdWVzdCB3aXRoIHN0YXR1cyBCTEtfU1RT
+X1JFU09VUkNFIGFmdGVyIHRoZQ0KbWF4aW11bSBudW1iZXIgb2YgcmV0cmllcyBoYXMgYmVlbiBy
+ZWFjaGVkIChzZWUgYWxzbyBzY3NpX2lvX2NvbXBsZXRpb24oKSkuDQpJbiB0aGF0IGxhc3QgY2Fz
+ZSwgaWYgYSBTQ1NJIHRhcmdldCBzZW5kcyBhICJCVVNZIiByZXBseSBvdmVyIHRoZSB3aXJlIGJh
+Y2sNCnRvIHRoZSBpbml0aWF0b3IsIHRoZXJlIGlzIG5vIG90aGVyIGFwcHJvYWNoIGZvciB0aGUg
+U0NTSSBpbml0aWF0b3IgdG8NCmZpZ3VyZSBvdXQgd2hldGhlciBpdCBjYW4gcXVldWUgYW5vdGhl
+ciByZXF1ZXN0IHRoYW4gdG8gcmVzdWJtaXQgdGhlDQpyZXF1ZXN0LiBUaGUgd29yc3QgcG9zc2li
+bGUgc3RyYXRlZ3kgaXMgdG8gcmVzdWJtaXQgYSByZXF1ZXN0IGltbWVkaWF0ZWx5DQpiZWNhdXNl
+IHRoYXQgd2lsbCBjYXVzZSBhIHNpZ25pZmljYW50IGZyYWN0aW9uIG9mIHRoZSBmYWJyaWMgYmFu
+ZHdpZHRoIHRvDQpiZSB1c2VkIGp1c3QgZm9yIHJlcGx5aW5nICJCVVNZIiB0byByZXF1ZXN0cyB0
+aGF0IGNhbid0IGJlIHByb2Nlc3NlZA0KaW1tZWRpYXRlbHkuDQoNClRoZSBpbnRlbnRpb24gb2Yg
+Y29tbWl0IDYwNzdjMmQ3MDYwOTdjMCB3YXMgdG8gYWRkcmVzcyB0aGUgbGFzdCBtZW50aW9uZWQN
+CmNhc2UuIEl0IG1heSBiZSBwb3NzaWJsZSB0byBtb3ZlIHRoZSBkZWxheWVkIHF1ZXVlIHJlcnVu
+IGZyb20gdGhlDQpkbV9xdWV1ZV9ycSgpIGludG8gZG1fcmVxdWV1ZV9vcmlnaW5hbF9yZXF1ZXN0
+KCkuIEJ1dCBJIHRoaW5rIGl0IHdvdWxkIGJlDQp3cm9uZyB0byByZXJ1biB0aGUgcXVldWUgaW1t
+ZWRpYXRlbHkgaW4gY2FzZSBhIFNDU0kgdGFyZ2V0IHN5c3RlbSByZXR1cm5zDQoiQlVTWSIuDQoN
+CkJhcnQu
