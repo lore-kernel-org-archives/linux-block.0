@@ -1,52 +1,48 @@
 Return-Path: <msnitzer@redhat.com>
-Date: Fri, 12 Jan 2018 11:13:48 -0500
 From: Mike Snitzer <snitzer@redhat.com>
 To: axboe@kernel.dk
-Cc: David Jeffery <djeffery@redhat.com>, Ming Lei <tom.leiming@gmail.com>,
-	linux-block@vger.kernel.org, dm-devel@redhat.com,
-	Bart.VanAssche@wdc.com
-Subject: Re: [for-4.16 PATCH v5 0/4] block/dm: allow DM to defer
- blk_register_queue() until ready
-Message-ID: <20180112161348.GA4782@redhat.com>
-References: <20180112150606.6037-1-snitzer@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180112150606.6037-1-snitzer@redhat.com>
+Cc: Ming Lei <tom.leiming@gmail.com>,
+	hare@suse.de,
+	Bart.VanAssche@wdc.com,
+	David Jeffery <djeffery@redhat.com>,
+	dm-devel@redhat.com,
+	linux-block@vger.kernel.org
+Subject: [for-4.16 PATCH v5 0/4] block/dm: allow DM to defer blk_register_queue() until ready
+Date: Fri, 12 Jan 2018 10:06:02 -0500
+Message-Id: <20180112150606.6037-1-snitzer@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Jan 12 2018 at 10:06am -0500,
-Mike Snitzer <snitzer@redhat.com> wrote:
+Hi Jens,
 
-> Hi Jens,
-> 
-> I'm submitting this v5 with more feeling now ;)
+I'm submitting this v5 with more feeling now ;)
 
-Of course PATCH 02/04 needed a v6.
+I've distilled the changes down to be quite minimal.  Hopefully this
+will help you and others review.
 
-> I've distilled the changes down to be quite minimal.  Hopefully this
-> will help you and others review.
+I've also done a dry-run of applying 4.16 block changes and then
+merging dm-4.16; no merge conflicts:
+https://git.kernel.org/pub/scm/linux/kernel/git/snitzer/linux.git/log/?h=block-4.16
+https://git.kernel.org/pub/scm/linux/kernel/git/snitzer/linux.git/log/?h=dm-4.16
+https://git.kernel.org/pub/scm/linux/kernel/git/snitzer/linux.git/log/?h=block-4.16_dm-4.16
 
-I could make it even simpler by dropping 02/04 entirely.  But I do think
-it worthwhile to try to get 02/04 in at this time too.
+And all tests very well for me.
 
-> I've also done a dry-run of applying 4.16 block changes and then
-> merging dm-4.16; no merge conflicts:
-> https://git.kernel.org/pub/scm/linux/kernel/git/snitzer/linux.git/log/?h=block-4.16
-> https://git.kernel.org/pub/scm/linux/kernel/git/snitzer/linux.git/log/?h=dm-4.16
-> https://git.kernel.org/pub/scm/linux/kernel/git/snitzer/linux.git/log/?h=block-4.16_dm-4.16
-> 
-> And all tests very well for me.
-> 
-> Please consider for 4.16, thanks!
+Please consider for 4.16, thanks!
 
-Anyway, I've genuinely tested with blk-mq now.  Sorry for all the
-iterations on this patchset in such rapid succession.  Obviously I know
-it doesn't instill confidence...
-
-But I really would appreciate you giving this patchset serious
-consideration.
-
-DM is long overdue for this fix.
-
-Thanks,
 Mike
+
+Mike Snitzer (4):
+  block: only bdi_unregister() in del_gendisk() if !GENHD_FL_HIDDEN
+  block: properly protect the 'queue' kobj in blk_unregister_queue
+  block: allow gendisk's request_queue registration to be deferred
+  dm: fix incomplete request_queue initialization
+
+ block/blk-sysfs.c     | 18 +++++++++++++++---
+ block/genhd.c         | 23 +++++++++++++++++++----
+ drivers/md/dm-rq.c    |  9 ---------
+ drivers/md/dm.c       | 11 ++++++++++-
+ include/linux/genhd.h |  5 +++++
+ 5 files changed, 49 insertions(+), 17 deletions(-)
+
+-- 
+2.15.0
