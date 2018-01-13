@@ -1,82 +1,67 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Sat, 13 Jan 2018 22:34:07 +0800
-From: Ming Lei <ming.lei@redhat.com>
+Return-Path: <msnitzer@redhat.com>
+Date: Fri, 12 Jan 2018 20:37:05 -0500
+From: Mike Snitzer <snitzer@redhat.com>
 To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "snitzer@redhat.com" <snitzer@redhat.com>,
-	"dm-devel@redhat.com" <dm-devel@redhat.com>,
-	"hch@infradead.org" <hch@infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+Cc: "elliott@hpe.com" <elliott@hpe.com>,
 	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-	"axboe@fb.com" <axboe@fb.com>
-Subject: Re: [PATCH V3 0/5]  dm-rq: improve sequential I/O performance
-Message-ID: <20180113143356.GA10690@ming.t460p>
-References: <1515710256.2752.72.camel@sandisk.com>
- <20180112014232.GB25090@ming.t460p>
- <20180112015721.GB32298@redhat.com>
- <20180112033308.GC25090@ming.t460p>
+	"axboe@fb.com" <axboe@fb.com>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>,
+	"hch@infradead.org" <hch@infradead.org>,
+	"dm-devel@redhat.com" <dm-devel@redhat.com>
+Subject: Re: [PATCH V3 0/5] dm-rq: improve sequential I/O performance
+Message-ID: <20180113013705.GC7207@redhat.com>
+References: <20180112033308.GC25090@ming.t460p>
  <20180112171840.GA4541@redhat.com>
  <1515778013.2396.3.camel@wdc.com>
  <20180112174000.GB5134@redhat.com>
  <1515779211.2396.11.camel@wdc.com>
  <20180112180635.GD5134@redhat.com>
  <1515783288.2396.37.camel@wdc.com>
+ <AT5PR8401MB0387801D9DC1686503921AE5AB170@AT5PR8401MB0387.NAMPRD84.PROD.OUTLOOK.COM>
+ <20180113005213.GB7207@redhat.com>
+ <1515805255.2396.94.camel@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1515783288.2396.37.camel@wdc.com>
+In-Reply-To: <1515805255.2396.94.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Jan 12, 2018 at 06:54:49PM +0000, Bart Van Assche wrote:
-> On Fri, 2018-01-12 at 13:06 -0500, Mike Snitzer wrote:
-> > OK, you have the stage: please give me a pointer to your best
-> > explaination of the several.
+On Fri, Jan 12 2018 at  8:00pm -0500,
+Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
+
+> On Fri, 2018-01-12 at 19:52 -0500, Mike Snitzer wrote:
+> > It was 50 ms before it was 100 ms.  No real explaination for these
+> > values other than they seem to make Bart's IB SRP testbed happy?
 > 
-> Since the previous discussion about this topic occurred more than a month
-> ago it could take more time to look up an explanation than to explain it
-> again. Anyway, here we go. As you know a block layer request queue needs to
-> be rerun if one or more requests are waiting and a previous condition that
-> prevented the request to be executed has been cleared. For the dm-mpath
-> driver, examples of such conditions are no tags available, a path that is
-> busy (see also pgpath_busy()), path initialization that is in progress
-> (pg_init_in_progress) or a request completes with status, e.g. if the
-> SCSI core calls __blk_mq_end_request(req, error) with error != 0. For some
-> of these conditions, e.g. path initialization completes, a callback
-> function in the dm-mpath driver is called and it is possible to explicitly
-> rerun the queue. I agree that for such scenario's a delayed queue run should
-> not be triggered. For other scenario's, e.g. if a SCSI initiator submits a
-> SCSI request over a fabric and the SCSI target replies with "BUSY" then the
-> SCSI core will end the I/O request with status BLK_STS_RESOURCE after the
-> maximum number of retries has been reached (see also scsi_io_completion()).
-> In that last case, if a SCSI target sends a "BUSY" reply over the wire back
-> to the initiator, there is no other approach for the SCSI initiator to
-> figure out whether it can queue another request than to resubmit the
-> request. The worst possible strategy is to resubmit a request immediately
-> because that will cause a significant fraction of the fabric bandwidth to
-> be used just for replying "BUSY" to requests that can't be processed
-> immediately.
+> But that constant was not introduced by me in the dm code.
 
-That isn't true, when BLK_STS_RESOURCE is returned to blk-mq, blk-mq
-will apply BLK_MQ_S_SCHED_RESTART to hold the queue until one in-flight
-request is completed, please see blk_mq_sched_restart() which is called
-from blk_mq_free_request().
+No actually it was (not that there's anything wrong with that):
 
-Also now we have IO schedulers, when blk_get_request() in dm-mpath returns
-NULL, it doesn't provide underlying queue's BUSY accurately or in time, since
-at default size of scheduler tags is double size of driver tags. So it isn't
-good to depend blk_get_request() only to evaluate queue's busy status, this
-patchset provides underlying's dispatch result directly to blk-mq, and can deal
-with this case much better.
+commit 06eb061f48594aa369f6e852b352410298b317a8
+Author: Bart Van Assche <bart.vanassche@sandisk.com>
+Date:   Fri Apr 7 16:50:44 2017 -0700
 
-> 
-> The intention of commit 6077c2d706097c0 was to address the last mentioned
-> case. It may be possible to move the delayed queue rerun from the
-> dm_queue_rq() into dm_requeue_original_request(). But I think it would be
-> wrong to rerun the queue immediately in case a SCSI target system returns
-> "BUSY".
+    dm mpath: requeue after a small delay if blk_get_request() fails
 
-Again, queue won't be rerun immediately after STS_RESOURCE is returned to
-blk-mq. And BLK_MQ_S_SCHED_RESTART should address your concern on continuous
-resubmission in case of running out of requests, right?
+    If blk_get_request() returns ENODEV then multipath_clone_and_map()
+    causes a request to be requeued immediately. This can cause a kworker
+    thread to spend 100% of the CPU time of a single core in
+    __blk_mq_run_hw_queue() and also can cause device removal to never
+    finish.
 
-Thanks,
-Ming
+    Avoid this by only requeuing after a delay if blk_get_request() fails.
+    Additionally, reduce the requeue delay.
+
+    Cc: stable@vger.kernel.org # 4.9+
+    Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+    Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+
+Note that this commit actually details a different case where a
+blk_get_request() (in existing code) return of -ENODEV is a very
+compelling case to use DM_MAPIO_DELAY_REQUEUE.
+
+SO I'll revisit what is appropriate in multipath_clone_and_map() on
+Monday.
+
+I need a break... have a good weekend Bart.
