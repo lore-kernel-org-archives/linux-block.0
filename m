@@ -1,35 +1,81 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] blk-mq: don't clear RQF_MQ_INFLIGHT in
- blk_mq_rq_ctx_init()
-To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
- Christoph Hellwig <hch@infradead.org>
-Cc: Laurence Oberman <loberman@redhat.com>, Mike Snitzer <snitzer@redhat.com>
-References: <20180113174915.19404-1-ming.lei@redhat.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <5fd4a57e-cc9a-e3da-fe3b-1db2460423f8@kernel.dk>
-Date: Sun, 14 Jan 2018 10:38:42 -0700
-MIME-Version: 1.0
-In-Reply-To: <20180113174915.19404-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:49866 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751026AbeAMRtc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 13 Jan 2018 12:49:32 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Cc: Ming Lei <ming.lei@redhat.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>
+Subject: [PATCH] blk-mq: don't clear RQF_MQ_INFLIGHT in blk_mq_rq_ctx_init()
+Date: Sun, 14 Jan 2018 01:49:15 +0800
+Message-Id: <20180113174915.19404-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 1/13/18 10:49 AM, Ming Lei wrote:
-> In case of no IO scheduler, RQF_MQ_INFLIGHT is set in blk_mq_rq_ctx_init(),
-> but 7c3fb70f0341 clears it mistakenly, so fix it.
+In case of no IO scheduler, RQF_MQ_INFLIGHT is set in blk_mq_rq_ctx_init(),
+but 7c3fb70f0341 clears it mistakenly, so fix it.
 
-Oops yeah, that's my bad. However, I think the below fix is cleaner
-and avoids a conditional.
+This patch fixes systemd-udevd hang when starting multipathd service:
 
+[  914.409660] systemd-journald[213]: Successfully sent stream file descriptor to service manager.
+[  984.028104] INFO: task systemd-udevd:1518 blocked for more than 120 seconds.
+[  984.030916]       Not tainted 4.15.0-rc6+ #62
+[  984.032709] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[  984.035818] systemd-udevd   D    0  1518    232 0x80000006
+[  984.035826] Call Trace:
+[  984.035846]  ? __schedule+0x626/0x759
+[  984.035855]  schedule+0x88/0x9b
+[  984.035861]  io_schedule+0x12/0x33
+[  984.035867]  __lock_page+0xef/0x127
+[  984.035874]  ? add_to_page_cache_lru+0xd4/0xd4
+[  984.035889]  truncate_inode_pages_range+0x533/0x62f
+[  984.035929]  ? cpumask_next+0x17/0x18
+[  984.035937]  ? cpumask_next+0x17/0x18
+[  984.035943]  ? smp_call_function_many+0x1e4/0x218
+[  984.035949]  ? __find_get_block+0x2ba/0x2ba
+[  984.035961]  ? __find_get_block+0x216/0x2ba
+[  984.035977]  ? on_each_cpu_cond+0xbf/0x143
+[  984.035992]  __blkdev_put+0x69/0x1a5
+[  984.036009]  blkdev_close+0x21/0x24
+[  984.036025]  __fput+0xdb/0x18a
+[  984.036039]  task_work_run+0x6f/0x80
+[  984.036048]  do_exit+0x452/0x96b
+[  984.036055]  ? preempt_count_add+0x7a/0x8c
+[  984.036061]  do_group_exit+0x3c/0x98
+[  984.036067]  get_signal+0x47c/0x4fd
+[  984.036076]  do_signal+0x36/0x51f
+[  984.036090]  exit_to_usermode_loop+0x3a/0x73
+[  984.036096]  syscall_return_slowpath+0x97/0xcf
+[  984.036103]  entry_SYSCALL_64_fastpath+0x7b/0x7d
+[  984.036109] RIP: 0033:0x7f2ffce94540
+[  984.036112] RSP: 002b:00007ffffd1cb888 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
+[  984.036117] RAX: fffffffffffffffc RBX: 000055d9840e72d0 RCX: 00007f2ffce94540
+[  984.036120] RDX: 0000000000000018 RSI: 000055d9840e72f8 RDI: 0000000000000007
+[  984.036122] RBP: 000055d984111860 R08: 000055d9840e72d0 R09: 0000000000000092
+[  984.036125] R10: 00007f2ffce7ebb8 R11: 0000000000000246 R12: 0000000000000018
+[  984.036127] R13: 000000020014e200 R14: 000055d9841118b0 R15: 000055d9840e72e8
+[ 1034.410125] systemd-journald[213]: Sent WATCHDOG=1 notification.
+
+Cc: Laurence Oberman <loberman@redhat.com>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Fixes: 7c3fb70f0341 ("block: rearrange a few request fields for better cache layout")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b3b2003b7429..c8f62e6be6b6 100644
+index ef9beca2d117..c1c74d891ce7 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
 @@ -269,13 +269,14 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
  {
  	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
  	struct request *rq = tags->static_rqs[tag];
-+	req_flags_t rq_flags = 0;
++	bool inflight = false;
  
  	if (data->flags & BLK_MQ_REQ_INTERNAL) {
  		rq->tag = -1;
@@ -37,7 +83,7 @@ index b3b2003b7429..c8f62e6be6b6 100644
  	} else {
  		if (blk_mq_tag_busy(data->hctx)) {
 -			rq->rq_flags = RQF_MQ_INFLIGHT;
-+			rq_flags = RQF_MQ_INFLIGHT;
++			inflight = true;
  			atomic_inc(&data->hctx->nr_active);
  		}
  		rq->tag = tag;
@@ -46,14 +92,9 @@ index b3b2003b7429..c8f62e6be6b6 100644
  	rq->q = data->q;
  	rq->mq_ctx = data->ctx;
 -	rq->rq_flags = 0;
-+	rq->rq_flags = rq_flags;
++	rq->rq_flags = inflight ? RQF_MQ_INFLIGHT : 0;
  	rq->cpu = -1;
  	rq->cmd_flags = op;
  	if (data->flags & BLK_MQ_REQ_PREEMPT)
-
 -- 
-Jens Axboe
-
-
--- 
-Jens Axboe
+2.9.5
