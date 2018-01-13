@@ -1,95 +1,81 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:34827 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757214AbeAHUVp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jan 2018 15:21:45 -0500
-Received: by mail-pg0-f65.google.com with SMTP id d6so5243895pgv.2
-        for <linux-block@vger.kernel.org>; Mon, 08 Jan 2018 12:21:44 -0800 (PST)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Tang Junhui <tang.junhui@zte.com.cn>,
-        Michael Lyle <mlyle@lyle.org>
-Subject: [416 PATCH 04/13] bcache: segregate flash only volume write streams
-Date: Mon,  8 Jan 2018 12:21:21 -0800
-Message-Id: <20180108202130.31303-5-mlyle@lyle.org>
-In-Reply-To: <20180108202130.31303-1-mlyle@lyle.org>
-References: <20180108202130.31303-1-mlyle@lyle.org>
+Received: from mx2.suse.de ([195.135.220.15]:36894 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755231AbeAMRLM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 13 Jan 2018 12:11:12 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH v2 01/12] bcache: set writeback_rate_update_seconds in range [1, 60] seconds
+Date: Sun, 14 Jan 2018 01:10:39 +0800
+Message-Id: <20180113171050.22467-2-colyli@suse.de>
+In-Reply-To: <20180113171050.22467-1-colyli@suse.de>
+References: <20180113171050.22467-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+dc->writeback_rate_update_seconds can be set via sysfs and its value can
+be set to [1, ULONG_MAX].  It does not make sense to set such a large
+value, 60 seconds is long enough value considering the default 5 seconds
+works well for long time.
 
-In such scenario that there are some flash only volumes
-, and some cached devices, when many tasks request these devices in
-writeback mode, the write IOs may fall to the same bucket as bellow:
-| cached data | flash data | cached data | cached data| flash data|
-then after writeback of these cached devices, the bucket would
-be like bellow bucket:
-| free | flash data | free | free | flash data |
+Because dc->writeback_rate_update is a special delayed work, it re-arms
+itself inside the delayed work routine update_writeback_rate(). When
+stopping it by cancel_delayed_work_sync(), there should be a timeout to
+wait and make sure the re-armed delayed work is stopped too. A small max
+value of dc->writeback_rate_update_seconds is also helpful to decide a
+reasonable small timeout.
 
-So, there are many free space in this bucket, but since data of flash
-only volumes still exists, so this bucket cannot be reclaimable,
-which would cause waste of bucket space.
+This patch limits sysfs interface to set dc->writeback_rate_update_seconds
+in range of [1, 60] seconds, and replaces the hand-coded number by macros.
 
-In this patch, we segregate flash only volume write streams from
-cached devices, so data from flash only volumes and cached devices
-can store in different buckets.
-
-Compare to v1 patch, this patch do not add a additionally open bucket
-list, and it is try best to segregate flash only volume write streams
-from cached devices, sectors of flash only volumes may still be mixed
-with dirty sectors of cached device, but the number is very small.
-
-[mlyle: fixed commit log formatting, permissions, line endings]
-
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
-Signed-off-by: Michael Lyle <mlyle@lyle.org>
+Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/md/bcache/alloc.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+ drivers/md/bcache/sysfs.c     | 3 +++
+ drivers/md/bcache/writeback.c | 2 +-
+ drivers/md/bcache/writeback.h | 3 +++
+ 3 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
-index a0cc1bc6d884..6cc6c0f9c3a9 100644
---- a/drivers/md/bcache/alloc.c
-+++ b/drivers/md/bcache/alloc.c
-@@ -525,15 +525,21 @@ struct open_bucket {
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index b4184092c727..a74a752c9e0f 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -215,6 +215,9 @@ STORE(__cached_dev)
+ 	sysfs_strtoul_clamp(writeback_rate,
+ 			    dc->writeback_rate.rate, 1, INT_MAX);
  
++	sysfs_strtoul_clamp(writeback_rate_update_seconds,
++			    dc->writeback_rate_update_seconds,
++			    1, WRITEBACK_RATE_UPDATE_SECS_MAX);
+ 	d_strtoul_nonzero(writeback_rate_update_seconds);
+ 	d_strtoul(writeback_rate_i_term_inverse);
+ 	d_strtoul_nonzero(writeback_rate_p_term_inverse);
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index 51306a19ab03..0ade883b6316 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -652,7 +652,7 @@ void bch_cached_dev_writeback_init(struct cached_dev *dc)
+ 	dc->writeback_rate.rate		= 1024;
+ 	dc->writeback_rate_minimum	= 8;
+ 
+-	dc->writeback_rate_update_seconds = 5;
++	dc->writeback_rate_update_seconds = WRITEBACK_RATE_UPDATE_SECS_DEFAULT;
+ 	dc->writeback_rate_p_term_inverse = 40;
+ 	dc->writeback_rate_i_term_inverse = 10000;
+ 
+diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
+index 66f1c527fa24..587b25599856 100644
+--- a/drivers/md/bcache/writeback.h
++++ b/drivers/md/bcache/writeback.h
+@@ -8,6 +8,9 @@
+ #define MAX_WRITEBACKS_IN_PASS  5
+ #define MAX_WRITESIZE_IN_PASS   5000	/* *512b */
+ 
++#define WRITEBACK_RATE_UPDATE_SECS_MAX		60
++#define WRITEBACK_RATE_UPDATE_SECS_DEFAULT	5
++
  /*
-  * We keep multiple buckets open for writes, and try to segregate different
-- * write streams for better cache utilization: first we look for a bucket where
-- * the last write to it was sequential with the current write, and failing that
-- * we look for a bucket that was last used by the same task.
-+ * write streams for better cache utilization: first we try to segregate flash
-+ * only volume write streams from cached devices, secondly we look for a bucket
-+ * where the last write to it was sequential with the current write, and
-+ * failing that we look for a bucket that was last used by the same task.
-  *
-  * The ideas is if you've got multiple tasks pulling data into the cache at the
-  * same time, you'll get better cache utilization if you try to segregate their
-  * data and preserve locality.
-  *
-- * For example, say you've starting Firefox at the same time you're copying a
-+ * For example, dirty sectors of flash only volume is not reclaimable, if their
-+ * dirty sectors mixed with dirty sectors of cached device, such buckets will
-+ * be marked as dirty and won't be reclaimed, though the dirty data of cached
-+ * device have been written back to backend device.
-+ *
-+ * And say you've starting Firefox at the same time you're copying a
-  * bunch of files. Firefox will likely end up being fairly hot and stay in the
-  * cache awhile, but the data you copied might not be; if you wrote all that
-  * data to the same buckets it'd get invalidated at the same time.
-@@ -550,7 +556,10 @@ static struct open_bucket *pick_data_bucket(struct cache_set *c,
- 	struct open_bucket *ret, *ret_task = NULL;
- 
- 	list_for_each_entry_reverse(ret, &c->data_buckets, list)
--		if (!bkey_cmp(&ret->key, search))
-+		if (UUID_FLASH_ONLY(&c->uuids[KEY_INODE(&ret->key)]) !=
-+		    UUID_FLASH_ONLY(&c->uuids[KEY_INODE(search)]))
-+			continue;
-+		else if (!bkey_cmp(&ret->key, search))
- 			goto found;
- 		else if (ret->last_write_point == write_point)
- 			ret_task = ret;
+  * 14 (16384ths) is chosen here as something that each backing device
+  * should be a reasonable fraction of the share, and not to blow up
 -- 
-2.14.1
+2.15.1
