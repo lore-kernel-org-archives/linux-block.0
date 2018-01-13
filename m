@@ -1,48 +1,173 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:45402 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752079AbeAENRE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jan 2018 08:17:04 -0500
-Received: by mail-wm0-f65.google.com with SMTP id 9so2388902wme.4
-        for <linux-block@vger.kernel.org>; Fri, 05 Jan 2018 05:17:03 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 23/25] lightnvm: pblk: print instance name on instance info
-Date: Fri,  5 Jan 2018 14:16:19 +0100
-Message-Id: <20180105131621.20808-24-m@bjorling.me>
-In-Reply-To: <20180105131621.20808-1-m@bjorling.me>
-References: <20180105131621.20808-1-m@bjorling.me>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	broonie@kernel.org,
+	linus.walleij@linaro.org,
+	bfq-iosched@googlegroups.com,
+	oleksandr@natalenko.name,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENT 1/2] block, bfq: limit tags for writes and async I/O
+Date: Sat, 13 Jan 2018 12:05:17 +0100
+Message-Id: <20180113110518.2519-2-paolo.valente@linaro.org>
+In-Reply-To: <20180113110518.2519-1-paolo.valente@linaro.org>
+References: <20180113110518.2519-1-paolo.valente@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <javier@cnexlabs.com>
+Asynchronous I/O can easily starve synchronous I/O (both sync reads
+and sync writes), by consuming all request tags. Similarly, storms of
+synchronous writes, such as those that sync(2) may trigger, can starve
+synchronous reads. In their turn, these two problems may also cause
+BFQ to loose control on latency for interactive and soft real-time
+applications. For example, on a PLEXTOR PX-256M5S SSD, LibreOffice
+Writer takes 0.6 seconds to start if the device is idle, but it takes
+more than 45 seconds (!) if there are sequential writes in the
+background.
 
-Add the instance name to the information printed out on target creation.
+This commit addresses this issue by limiting the maximum percentage of
+tags that asynchronous I/O requests and synchronous write requests can
+consume. In particular, this commit grants a higher threshold to
+synchronous writes, to prevent the latter from being starved by
+asynchronous I/O.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+According to the above test, LibreOffice Writer now starts in about
+1.2 seconds on average, regardless of the background workload, and
+apart from some rare outlier. To check this improvement, run, e.g.,
+sudo ./comm_startup_lat.sh bfq 5 5 seq 10 "lowriter --terminate_after_init"
+for the comm_startup_lat benchmark in the S suite [1].
+
+[1] https://github.com/Algodev-github/S
+
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+Tested-by: Holger Hoffstätte <holger@applied-asynchrony.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- drivers/lightnvm/pblk-init.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ block/bfq-iosched.c | 77 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ block/bfq-iosched.h | 12 +++++++++
+ 2 files changed, 89 insertions(+)
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 8c40bc3..93d671c 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -1069,7 +1069,8 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
- 	blk_queue_max_discard_sectors(tqueue, UINT_MAX >> 9);
- 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, tqueue);
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 1caeecad7af1..527bd2ccda51 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -417,6 +417,82 @@ static struct request *bfq_choose_req(struct bfq_data *bfqd,
+ 	}
+ }
  
--	pr_info("pblk init: luns:%u, lines:%d, secs:%llu, buf entries:%u\n",
-+	pr_info("pblk(%s): luns:%u, lines:%d, secs:%llu, buf entries:%u\n",
-+			tdisk->disk_name,
- 			geo->all_luns, pblk->l_mg.nr_lines,
- 			(unsigned long long)pblk->rl.nr_secs,
- 			pblk->rwb.nr_entries);
++/*
++ * See the comments on bfq_limit_depth for the purpose of
++ * the depths set in the function.
++ */
++static void bfq_update_depths(struct bfq_data *bfqd, struct sbitmap_queue *bt)
++{
++	bfqd->sb_shift = bt->sb.shift;
++
++	/*
++	 * In-word depths if no bfq_queue is being weight-raised:
++	 * leaving 25% of tags only for sync reads.
++	 *
++	 * In next formulas, right-shift the value
++	 * (1U<<bfqd->sb_shift), instead of computing directly
++	 * (1U<<(bfqd->sb_shift - something)), to be robust against
++	 * any possible value of bfqd->sb_shift, without having to
++	 * limit 'something'.
++	 */
++	/* no more than 50% of tags for async I/O */
++	bfqd->word_depths[0][0] = max((1U<<bfqd->sb_shift)>>1, 1U);
++	/*
++	 * no more than 75% of tags for sync writes (25% extra tags
++	 * w.r.t. async I/O, to prevent async I/O from starving sync
++	 * writes)
++	 */
++	bfqd->word_depths[0][1] = max(((1U<<bfqd->sb_shift) * 3)>>2, 1U);
++
++	/*
++	 * In-word depths in case some bfq_queue is being weight-
++	 * raised: leaving ~63% of tags for sync reads. This is the
++	 * highest percentage for which, in our tests, application
++	 * start-up times didn't suffer from any regression due to tag
++	 * shortage.
++	 */
++	/* no more than ~18% of tags for async I/O */
++	bfqd->word_depths[1][0] = max(((1U<<bfqd->sb_shift) * 3)>>4, 1U);
++	/* no more than ~37% of tags for sync writes (~20% extra tags) */
++	bfqd->word_depths[1][1] = max(((1U<<bfqd->sb_shift) * 6)>>4, 1U);
++}
++
++/*
++ * Async I/O can easily starve sync I/O (both sync reads and sync
++ * writes), by consuming all tags. Similarly, storms of sync writes,
++ * such as those that sync(2) may trigger, can starve sync reads.
++ * Limit depths of async I/O and sync writes so as to counter both
++ * problems.
++ */
++static void bfq_limit_depth(unsigned int op, struct blk_mq_alloc_data *data)
++{
++	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
++	struct bfq_data *bfqd = data->q->elevator->elevator_data;
++	struct sbitmap_queue *bt;
++
++	if (op_is_sync(op) && !op_is_write(op))
++		return;
++
++	if (data->flags & BLK_MQ_REQ_RESERVED) {
++		if (unlikely(!tags->nr_reserved_tags)) {
++			WARN_ON_ONCE(1);
++			return;
++		}
++		bt = &tags->breserved_tags;
++	} else
++		bt = &tags->bitmap_tags;
++
++	if (unlikely(bfqd->sb_shift != bt->sb.shift))
++		bfq_update_depths(bfqd, bt);
++
++	data->shallow_depth =
++		bfqd->word_depths[!!bfqd->wr_busy_queues][op_is_sync(op)];
++
++	bfq_log(bfqd, "[%s] wr_busy %d sync %d depth %u",
++			__func__, bfqd->wr_busy_queues, op_is_sync(op),
++			data->shallow_depth);
++}
++
+ static struct bfq_queue *
+ bfq_rq_pos_tree_lookup(struct bfq_data *bfqd, struct rb_root *root,
+ 		     sector_t sector, struct rb_node **ret_parent,
+@@ -5267,6 +5343,7 @@ static struct elv_fs_entry bfq_attrs[] = {
+ 
+ static struct elevator_type iosched_bfq_mq = {
+ 	.ops.mq = {
++		.limit_depth		= bfq_limit_depth,
+ 		.prepare_request	= bfq_prepare_request,
+ 		.finish_request		= bfq_finish_request,
+ 		.exit_icq		= bfq_exit_icq,
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 5d47b58d5fc8..fcd941008127 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -629,6 +629,18 @@ struct bfq_data {
+ 	struct bfq_io_cq *bio_bic;
+ 	/* bfqq associated with the task issuing current bio for merging */
+ 	struct bfq_queue *bio_bfqq;
++
++	/*
++	 * Cached sbitmap shift, used to compute depth limits in
++	 * bfq_update_depths.
++	 */
++	unsigned int sb_shift;
++
++	/*
++	 * Depth limits used in bfq_limit_depth (see comments on the
++	 * function)
++	 */
++	unsigned int word_depths[2][2];
+ };
+ 
+ enum bfqq_state_flags {
 -- 
-2.9.3
+2.15.1
