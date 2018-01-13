@@ -1,67 +1,46 @@
-Return-Path: <msnitzer@redhat.com>
-Date: Fri, 12 Jan 2018 20:37:05 -0500
-From: Mike Snitzer <snitzer@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "elliott@hpe.com" <elliott@hpe.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-	"axboe@fb.com" <axboe@fb.com>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>,
-	"hch@infradead.org" <hch@infradead.org>,
-	"dm-devel@redhat.com" <dm-devel@redhat.com>
-Subject: Re: [PATCH V3 0/5] dm-rq: improve sequential I/O performance
-Message-ID: <20180113013705.GC7207@redhat.com>
-References: <20180112033308.GC25090@ming.t460p>
- <20180112171840.GA4541@redhat.com>
- <1515778013.2396.3.camel@wdc.com>
- <20180112174000.GB5134@redhat.com>
- <1515779211.2396.11.camel@wdc.com>
- <20180112180635.GD5134@redhat.com>
- <1515783288.2396.37.camel@wdc.com>
- <AT5PR8401MB0387801D9DC1686503921AE5AB170@AT5PR8401MB0387.NAMPRD84.PROD.OUTLOOK.COM>
- <20180113005213.GB7207@redhat.com>
- <1515805255.2396.94.camel@wdc.com>
+Return-Path: <prvs=5444e354b=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "snitzer@redhat.com" <snitzer@redhat.com>, "elliott@hpe.com"
+	<elliott@hpe.com>
+CC: "dm-devel@redhat.com" <dm-devel@redhat.com>, "hch@infradead.org"
+	<hch@infradead.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "axboe@fb.com" <axboe@fb.com>
+Subject: Re: [PATCH V3 0/5]  dm-rq: improve sequential I/O performance
+Date: Sat, 13 Jan 2018 01:00:57 +0000
+Message-ID: <1515805255.2396.94.camel@wdc.com>
+References: <20180112014232.GB25090@ming.t460p>
+	 <20180112015721.GB32298@redhat.com> <20180112033308.GC25090@ming.t460p>
+	 <20180112171840.GA4541@redhat.com> <1515778013.2396.3.camel@wdc.com>
+	 <20180112174000.GB5134@redhat.com> <1515779211.2396.11.camel@wdc.com>
+	 <20180112180635.GD5134@redhat.com> <1515783288.2396.37.camel@wdc.com>
+	 <AT5PR8401MB0387801D9DC1686503921AE5AB170@AT5PR8401MB0387.NAMPRD84.PROD.OUTLOOK.COM>
+	 <20180113005213.GB7207@redhat.com>
+In-Reply-To: <20180113005213.GB7207@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1515805255.2396.94.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Jan 12 2018 at  8:00pm -0500,
-Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
-
-> On Fri, 2018-01-12 at 19:52 -0500, Mike Snitzer wrote:
-> > It was 50 ms before it was 100 ms.  No real explaination for these
-> > values other than they seem to make Bart's IB SRP testbed happy?
-> 
-> But that constant was not introduced by me in the dm code.
-
-No actually it was (not that there's anything wrong with that):
-
-commit 06eb061f48594aa369f6e852b352410298b317a8
-Author: Bart Van Assche <bart.vanassche@sandisk.com>
-Date:   Fri Apr 7 16:50:44 2017 -0700
-
-    dm mpath: requeue after a small delay if blk_get_request() fails
-
-    If blk_get_request() returns ENODEV then multipath_clone_and_map()
-    causes a request to be requeued immediately. This can cause a kworker
-    thread to spend 100% of the CPU time of a single core in
-    __blk_mq_run_hw_queue() and also can cause device removal to never
-    finish.
-
-    Avoid this by only requeuing after a delay if blk_get_request() fails.
-    Additionally, reduce the requeue delay.
-
-    Cc: stable@vger.kernel.org # 4.9+
-    Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
-    Signed-off-by: Mike Snitzer <snitzer@redhat.com>
-
-Note that this commit actually details a different case where a
-blk_get_request() (in existing code) return of -ENODEV is a very
-compelling case to use DM_MAPIO_DELAY_REQUEUE.
-
-SO I'll revisit what is appropriate in multipath_clone_and_map() on
-Monday.
-
-I need a break... have a good weekend Bart.
+T24gRnJpLCAyMDE4LTAxLTEyIGF0IDE5OjUyIC0wNTAwLCBNaWtlIFNuaXR6ZXIgd3JvdGU6DQo+
+IEl0IHdhcyA1MCBtcyBiZWZvcmUgaXQgd2FzIDEwMCBtcy4gIE5vIHJlYWwgZXhwbGFpbmF0aW9u
+IGZvciB0aGVzZQ0KPiB2YWx1ZXMgb3RoZXIgdGhhbiB0aGV5IHNlZW0gdG8gbWFrZSBCYXJ0J3Mg
+SUIgU1JQIHRlc3RiZWQgaGFwcHk/DQoNCkJ1dCB0aGF0IGNvbnN0YW50IHdhcyBub3QgaW50cm9k
+dWNlZCBieSBtZSBpbiB0aGUgZG0gY29kZS4gU2VlIGUuZy4gdGhlDQpmb2xsb3dpbmcgY29tbWl0
+czoNCg0KY29tbWl0IGQ1NDhiMzRiMDYyYjYwYjRmNGRmMjk1YTBiNDgyM2RmZGExZjFmYzQNCkF1
+dGhvcjogTWlrZSBTbml0emVyIDxzbml0emVyQHJlZGhhdC5jb20+DQpEYXRlOiAgIFRodSBNYXIg
+NSAyMjoyMToxMCAyMDE1IC0wNTAwDQoNCiAgICBkbTogcmVkdWNlIHRoZSBxdWV1ZSBkZWxheSB1
+c2VkIGluIGRtX3JlcXVlc3RfZm4gZnJvbSAxMDBtcyB0byAxMG1zDQogICAgIA0KICAgIENvbW1p
+dCA3ZWFjZWFjY2FiICgiYmxvY2s6IHJlbW92ZSBwZXItcXVldWUgcGx1Z2dpbmciKSBkaWRuJ3Qg
+anVzdGlmeQ0KICAgIERNJ3MgdXNlIG9mIGEgMTAwbXMgZGVsYXk7IHN1Y2ggYW4gZXh0ZW5kZWQg
+ZGVsYXkgaXMgYSBsaWFiaWxpdHkgd2hlbg0KICAgIHRoZXJlIGlzIHJlYXNvbiB0byByZS1raWNr
+IHRoZSBxdWV1ZS4NCiAgICAgDQogICAgU2lnbmVkLW9mZi1ieTogTWlrZSBTbml0emVyIDxzbml0
+emVyQHJlZGhhdC5jb20+DQoNCmNvbW1pdCA3ZWFjZWFjY2FiNWY0MGJiZmRhMDQ0NjI5YTYyOTg2
+MTZhZWFlZDUwDQpBdXRob3I6IEplbnMgQXhib2UgPGpheGJvZUBmdXNpb25pby5jb20+DQpEYXRl
+OiAgIFRodSBNYXIgMTAgMDg6NTI6MDcgMjAxMSArMDEwMA0KDQogICAgYmxvY2s6IHJlbW92ZSBw
+ZXItcXVldWUgcGx1Z2dpbmcNCiAgICAgDQogICAgQ29kZSBoYXMgYmVlbiBjb252ZXJ0ZWQgb3Zl
+ciB0byB0aGUgbmV3IGV4cGxpY2l0IG9uLXN0YWNrIHBsdWdnaW5nLA0KICAgIGFuZCBkZWxheSB1
+c2VycyBoYXZlIGJlZW4gY29udmVydGVkIHRvIHVzZSB0aGUgbmV3IEFQSSBmb3IgdGhhdC4NCiAg
+ICBTbyBsZXRzIGtpbGwgb2ZmIHRoZSBvbGQgcGx1Z2dpbmcgYWxvbmcgd2l0aCBhb3BzLT5zeW5j
+X3BhZ2UoKS4NCiAgICAgDQogICAgU2lnbmVkLW9mZi1ieTogSmVucyBBeGJvZSA8amF4Ym9lQGZ1
+c2lvbmlvLmNvbT4NCg0KQmFydC4g
