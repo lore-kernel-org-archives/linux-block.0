@@ -1,142 +1,278 @@
-Return-Path: <prvs=5392d374c=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Doug Ledford <dledford@redhat.com>,
-	linux-scsi@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 2/4] block: Introduce blk_wait_if_quiesced() and blk_finish_wait_if_quiesced()
-Date: Mon,  8 Jan 2018 10:50:09 -0800
-Message-Id: <20180108185011.30018-3-bart.vanassche@wdc.com>
-In-Reply-To: <20180108185011.30018-1-bart.vanassche@wdc.com>
-References: <20180108185011.30018-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:36953 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755102AbeAMRMM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 13 Jan 2018 12:12:12 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Michael Lyle <mlyle@lyle.org>, Hannes Reinecke <hare@suse.com>,
+        Junhui Tang <tang.junhui@zte.com.cn>
+Subject: [PATCH v2 05/12] bcache: stop dc->writeback_rate_update properly
+Date: Sun, 14 Jan 2018 01:10:43 +0800
+Message-Id: <20180113171050.22467-6-colyli@suse.de>
+In-Reply-To: <20180113171050.22467-1-colyli@suse.de>
+References: <20180113171050.22467-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Introduce functions that allow block drivers to wait while a request
-queue is in the quiesced state (blk-mq) or in the stopped state (legacy
-block layer). The next patch will add calls to these functions in the
-SCSI core.
+struct delayed_work writeback_rate_update in struct cache_dev is a delayed
+worker to call function update_writeback_rate() in period (the interval is
+defined by dc->writeback_rate_update_seconds).
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Ming Lei <ming.lei@redhat.com>
+When a metadate I/O error happens on cache device, bcache error handling
+routine bch_cache_set_error() will call bch_cache_set_unregister() to
+retire whole cache set. On the unregister code path, this delayed work is
+stopped by calling cancel_delayed_work_sync(&dc->writeback_rate_update).
+
+dc->writeback_rate_update is a special delayed work from others in bcache.
+In its routine update_writeback_rate(), this delayed work is re-armed
+itself. That means when cancel_delayed_work_sync() returns, this delayed
+work can still be executed after several seconds defined by
+dc->writeback_rate_update_seconds.
+
+The problem is, after cancel_delayed_work_sync() returns, the cache set
+unregister code path will continue and release memory of struct cache set.
+Then the delayed work is scheduled to run, __update_writeback_rate()
+will reference the already released cache_set memory, and trigger a NULL
+pointer deference fault.
+
+This patch introduces two more bcache device flags,
+- BCACHE_DEV_WB_RUNNING
+  bit set:  bcache device is in writeback mode and running, it is OK for
+            dc->writeback_rate_update to re-arm itself.
+  bit clear:bcache device is trying to stop dc->writeback_rate_update,
+            this delayed work should not re-arm itself and quit.
+- BCACHE_DEV_RATE_DW_RUNNING
+  bit set:  routine update_writeback_rate() is executing.
+  bit clear: routine update_writeback_rate() quits.
+
+This patch also adds a function cancel_writeback_rate_update_dwork() to
+wait for dc->writeback_rate_update quits before cancel it by calling
+cancel_delayed_work_sync(). In order to avoid a deadlock by unexpected
+quit dc->writeback_rate_update, after time_out seconds this function will
+give up and continue to call cancel_delayed_work_sync().
+
+And here I explain how this patch stops self re-armed delayed work properly
+with the above stuffs.
+
+update_writeback_rate() sets BCACHE_DEV_RATE_DW_RUNNING at its beginning
+and clears BCACHE_DEV_RATE_DW_RUNNING at its end. Before calling
+cancel_writeback_rate_update_dwork() clear flag BCACHE_DEV_WB_RUNNING.
+
+Before calling cancel_delayed_work_sync() wait utill flag
+BCACHE_DEV_RATE_DW_RUNNING is clear. So when calling
+cancel_delayed_work_sync(), dc->writeback_rate_update must be already re-
+armed, or quite by seeing BCACHE_DEV_WB_RUNNING cleared. In both cases
+delayed work routine update_writeback_rate() won't be executed after
+cancel_delayed_work_sync() returns.
+
+Inside update_writeback_rate() before calling schedule_delayed_work(), flag
+BCACHE_DEV_WB_RUNNING is checked before. If this flag is cleared, it means
+someone is about to stop the delayed work. Because flag
+BCACHE_DEV_RATE_DW_RUNNING is set already and cancel_delayed_work_sync()
+has to wait for this flag to be cleared, we don't need to worry about race
+condition here.
+
+If update_writeback_rate() is scheduled to run after checking
+BCACHE_DEV_RATE_DW_RUNNING and before calling cancel_delayed_work_sync()
+in cancel_writeback_rate_update_dwork(), it is also safe. Because at this
+moment BCACHE_DEV_WB_RUNNING is cleared with memory barrier. As I mentioned
+previously, update_writeback_rate() will see BCACHE_DEV_WB_RUNNING is clear
+and quit immediately.
+
+Because there are more dependences inside update_writeback_rate() to struct
+cache_set memory, dc->writeback_rate_update is not a simple self re-arm
+delayed work. After trying many different methods (e.g. hold dc->count, or
+use locks), this is the only way I can find which works to properly stop
+dc->writeback_rate_update delayed work.
+
+Changelog:
+v2: Try to fix the race issue which is pointed out by Junhui.
+v1: The initial version for review
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Cc: Michael Lyle <mlyle@lyle.org>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
 ---
- block/blk-core.c       |  1 +
- block/blk-mq.c         | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++
- include/linux/blk-mq.h |  2 ++
- 3 files changed, 64 insertions(+)
+ drivers/md/bcache/bcache.h    |  9 +++++----
+ drivers/md/bcache/super.c     | 39 +++++++++++++++++++++++++++++++++++----
+ drivers/md/bcache/sysfs.c     |  3 ++-
+ drivers/md/bcache/writeback.c | 29 ++++++++++++++++++++++++++++-
+ 4 files changed, 70 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 605599a2ab3b..d70ff53e6505 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -285,6 +285,7 @@ void blk_start_queue(struct request_queue *q)
- 	WARN_ON_ONCE(q->mq_ops);
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 5e2d4e80198e..88d938c8d027 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -258,10 +258,11 @@ struct bcache_device {
+ 	struct gendisk		*disk;
  
- 	queue_flag_clear(QUEUE_FLAG_STOPPED, q);
-+	wake_up_all(&q->mq_wq);
- 	__blk_run_queue(q);
+ 	unsigned long		flags;
+-#define BCACHE_DEV_CLOSING	0
+-#define BCACHE_DEV_DETACHING	1
+-#define BCACHE_DEV_UNLINK_DONE	2
+-
++#define BCACHE_DEV_CLOSING		0
++#define BCACHE_DEV_DETACHING		1
++#define BCACHE_DEV_UNLINK_DONE		2
++#define BCACHE_DEV_WB_RUNNING		4
++#define BCACHE_DEV_RATE_DW_RUNNING	8
+ 	unsigned		nr_stripes;
+ 	unsigned		stripe_size;
+ 	atomic_t		*stripe_sectors_dirty;
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index d14e09cce2f6..6d888e8fea8c 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -899,6 +899,32 @@ void bch_cached_dev_run(struct cached_dev *dc)
+ 		pr_debug("error creating sysfs link");
  }
- EXPORT_SYMBOL(blk_start_queue);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8118890fb66f..c79b102680fe 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -248,11 +248,72 @@ void blk_mq_unquiesce_queue(struct request_queue *q)
- 	queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
- 	spin_unlock_irqrestore(q->queue_lock, flags);
  
-+	wake_up_all(&q->mq_wq);
-+
- 	/* dispatch requests which are inserted during quiescing */
- 	blk_mq_run_hw_queues(q, true);
- }
- EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
- 
-+/**
-+ * blk_wait_if_quiesced() - wait if a queue is quiesced (blk-mq) or stopped (legacy block layer)
-+ * @q: Request queue pointer.
-+ *
-+ * Some block drivers, e.g. the SCSI core, can bypass the block layer core
-+ * request submission mechanism. Surround such code with blk_wait_if_quiesced()
-+ * / blk_finish_wait_if_quiesced() to avoid that request submission can happen
-+ * while a queue is quiesced or stopped.
-+ *
-+ * Returns with the RCU read lock held (blk-mq) or with q->queue_lock held
-+ * (legacy block layer).
-+ *
-+ * Note: this function does not support block drivers whose .queue_rq()
-+ * implementation can sleep (BLK_MQ_F_BLOCKING).
++/*
++ * If BCACHE_DEV_RATE_DW_RUNNING is set, it means routine of the delayed
++ * work dc->writeback_rate_update is running. Wait until the routine
++ * quits (BCACHE_DEV_RATE_DW_RUNNING is clear), then continue to
++ * cancel it. If BCACHE_DEV_RATE_DW_RUNNING is not clear after time_out
++ * seconds, give up waiting here and continue to cancel it too.
 + */
-+int blk_wait_if_quiesced(struct request_queue *q)
++static void cancel_writeback_rate_update_dwork(struct cached_dev *dc)
 +{
-+	struct blk_mq_hw_ctx *hctx;
-+	unsigned int i;
++	int time_out = WRITEBACK_RATE_UPDATE_SECS_MAX * HZ;
 +
-+	might_sleep();
++	do {
++		if (!test_bit(BCACHE_DEV_RATE_DW_RUNNING,
++			      &dc->disk.flags))
++			break;
++		time_out--;
++		schedule_timeout_interruptible(1);
++	} while (time_out > 0);
 +
-+	if (q->mq_ops) {
-+		queue_for_each_hw_ctx(q, hctx, i)
-+			WARN_ON(hctx->flags & BLK_MQ_F_BLOCKING);
++	if (time_out == 0)
++		pr_warn("bcache: give up waiting for "
++			"dc->writeback_write_update to quit");
 +
-+		rcu_read_lock();
-+		while (!blk_queue_dying(q) && blk_queue_quiesced(q)) {
-+			rcu_read_unlock();
-+			wait_event(q->mq_wq, blk_queue_dying(q) ||
-+				   !blk_queue_quiesced(q));
-+			rcu_read_lock();
-+		}
-+	} else {
-+		spin_lock_irq(q->queue_lock);
-+		wait_event_lock_irq(q->mq_wq,
-+				    blk_queue_dying(q) || !blk_queue_stopped(q),
-+				    *q->queue_lock);
-+		q->request_fn_active++;
-+	}
-+	return blk_queue_dying(q) ? -ENODEV : 0;
++	cancel_delayed_work_sync(&dc->writeback_rate_update);
 +}
-+EXPORT_SYMBOL(blk_wait_if_quiesced);
 +
-+/**
-+ * blk_finish_wait_if_quiesced() - counterpart of blk_wait_if_quiesced()
-+ * @q: Request queue pointer.
-+ */
-+void blk_finish_wait_if_quiesced(struct request_queue *q)
-+{
-+	if (q->mq_ops) {
-+		rcu_read_unlock();
-+	} else {
-+		q->request_fn_active--;
-+		spin_unlock_irq(q->queue_lock);
-+	}
-+}
-+EXPORT_SYMBOL(blk_finish_wait_if_quiesced);
-+
- void blk_mq_wake_waiters(struct request_queue *q)
+ static void cached_dev_detach_finish(struct work_struct *w)
  {
- 	struct blk_mq_hw_ctx *hctx;
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 95c9a5c862e2..f6b787bd244e 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -266,6 +266,8 @@ void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
- void blk_mq_quiesce_queue(struct request_queue *q);
- void blk_mq_unquiesce_queue(struct request_queue *q);
-+int blk_wait_if_quiesced(struct request_queue *q);
-+void blk_finish_wait_if_quiesced(struct request_queue *q);
- void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
- bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_run_hw_queues(struct request_queue *q, bool async);
+ 	struct cached_dev *dc = container_of(w, struct cached_dev, detach);
+@@ -911,7 +937,9 @@ static void cached_dev_detach_finish(struct work_struct *w)
+ 
+ 	mutex_lock(&bch_register_lock);
+ 
+-	cancel_delayed_work_sync(&dc->writeback_rate_update);
++	if (test_and_clear_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags))
++		cancel_writeback_rate_update_dwork(dc);
++
+ 	if (!IS_ERR_OR_NULL(dc->writeback_thread)) {
+ 		kthread_stop(dc->writeback_thread);
+ 		dc->writeback_thread = NULL;
+@@ -954,6 +982,7 @@ void bch_cached_dev_detach(struct cached_dev *dc)
+ 	closure_get(&dc->disk.cl);
+ 
+ 	bch_writeback_queue(dc);
++
+ 	cached_dev_put(dc);
+ }
+ 
+@@ -1079,14 +1108,16 @@ static void cached_dev_free(struct closure *cl)
+ {
+ 	struct cached_dev *dc = container_of(cl, struct cached_dev, disk.cl);
+ 
+-	cancel_delayed_work_sync(&dc->writeback_rate_update);
++	mutex_lock(&bch_register_lock);
++
++	if (test_and_clear_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags))
++		cancel_writeback_rate_update_dwork(dc);
++
+ 	if (!IS_ERR_OR_NULL(dc->writeback_thread))
+ 		kthread_stop(dc->writeback_thread);
+ 	if (dc->writeback_write_wq)
+ 		destroy_workqueue(dc->writeback_write_wq);
+ 
+-	mutex_lock(&bch_register_lock);
+-
+ 	if (atomic_read(&dc->running))
+ 		bd_unlink_disk_holder(dc->bdev, dc->disk.disk);
+ 	bcache_device_free(&dc->disk);
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index a74a752c9e0f..b7166c504cdb 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -304,7 +304,8 @@ STORE(bch_cached_dev)
+ 		bch_writeback_queue(dc);
+ 
+ 	if (attr == &sysfs_writeback_percent)
+-		schedule_delayed_work(&dc->writeback_rate_update,
++		if (!test_and_set_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags))
++			schedule_delayed_work(&dc->writeback_rate_update,
+ 				      dc->writeback_rate_update_seconds * HZ);
+ 
+ 	mutex_unlock(&bch_register_lock);
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index b280c134dd4d..69957f97bf13 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -115,6 +115,21 @@ static void update_writeback_rate(struct work_struct *work)
+ 					     struct cached_dev,
+ 					     writeback_rate_update);
+ 
++	/*
++	 * should check BCACHE_DEV_RATE_DW_RUNNING before calling
++	 * cancel_delayed_work_sync().
++	 */
++	set_bit(BCACHE_DEV_RATE_DW_RUNNING, &dc->disk.flags);
++	/* paired with where BCACHE_DEV_RATE_DW_RUNNING is tested */
++	smp_mb();
++
++	if (!test_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags)) {
++		clear_bit(BCACHE_DEV_RATE_DW_RUNNING, &dc->disk.flags);
++		/* paired with where BCACHE_DEV_RATE_DW_RUNNING is tested */
++		smp_mb();
++		return;
++	}
++
+ 	down_read(&dc->writeback_lock);
+ 
+ 	if (atomic_read(&dc->has_dirty) &&
+@@ -123,8 +138,18 @@ static void update_writeback_rate(struct work_struct *work)
+ 
+ 	up_read(&dc->writeback_lock);
+ 
+-	schedule_delayed_work(&dc->writeback_rate_update,
++	if (test_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags)) {
++		schedule_delayed_work(&dc->writeback_rate_update,
+ 			      dc->writeback_rate_update_seconds * HZ);
++	}
++
++	/*
++	 * should check BCACHE_DEV_RATE_DW_RUNNING before calling
++	 * cancel_delayed_work_sync().
++	 */
++	clear_bit(BCACHE_DEV_RATE_DW_RUNNING, &dc->disk.flags);
++	/* paired with where BCACHE_DEV_RATE_DW_RUNNING is tested */
++	smp_mb();
+ }
+ 
+ static unsigned writeback_delay(struct cached_dev *dc, unsigned sectors)
+@@ -661,6 +686,7 @@ void bch_cached_dev_writeback_init(struct cached_dev *dc)
+ 	dc->writeback_rate_p_term_inverse = 40;
+ 	dc->writeback_rate_i_term_inverse = 10000;
+ 
++	WARN_ON(test_and_clear_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags));
+ 	INIT_DELAYED_WORK(&dc->writeback_rate_update, update_writeback_rate);
+ }
+ 
+@@ -679,6 +705,7 @@ int bch_cached_dev_writeback_start(struct cached_dev *dc)
+ 		return PTR_ERR(dc->writeback_thread);
+ 	}
+ 
++	WARN_ON(test_and_set_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags));
+ 	schedule_delayed_work(&dc->writeback_rate_update,
+ 			      dc->writeback_rate_update_seconds * HZ);
+ 
 -- 
 2.15.1
