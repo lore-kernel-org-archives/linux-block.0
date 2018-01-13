@@ -1,139 +1,117 @@
-Return-Path: <gunthorp@deltatee.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvdimm@lists.01.org,
-	linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Logan Gunthorpe <logang@deltatee.com>
-Date: Thu,  4 Jan 2018 12:01:28 -0700
-Message-Id: <20180104190137.7654-4-logang@deltatee.com>
-In-Reply-To: <20180104190137.7654-1-logang@deltatee.com>
-References: <20180104190137.7654-1-logang@deltatee.com>
-Subject: [PATCH 03/12] pci-p2p: Add PCI p2pmem dma mappings to adjust the bus offset
+Return-Path: <ming.lei@redhat.com>
+Date: Sat, 13 Jan 2018 20:57:59 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: axboe@kernel.dk, David Jeffery <djeffery@redhat.com>,
+	Ming Lei <tom.leiming@gmail.com>, linux-block@vger.kernel.org,
+	dm-devel@redhat.com, Bart.VanAssche@wdc.com
+Subject: Re: [for-4.16 PATCH v6 2/4] block: properly protect the 'queue' kobj
+ in blk_unregister_queue
+Message-ID: <20180113125758.GB10021@ming.t460p>
+References: <20180112150606.6037-1-snitzer@redhat.com>
+ <20180112150606.6037-3-snitzer@redhat.com>
+ <20180112160352.GA6270@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180112160352.GA6270@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The DMA address used when mapping PCI P2P memory must be the PCI bus
-address. Thus, introduce pci_p2pmem_[un]map_sg() to map the correct
-addresses when using P2P memory.
+On Fri, Jan 12, 2018 at 11:03:52AM -0500, Mike Snitzer wrote:
+> The original commit e9a823fb34a8b (block: fix warning when I/O elevator
+> is changed as request_queue is being removed) is pretty conflated.
+> "conflated" because the resource being protected by q->sysfs_lock isn't
+> the queue_flags (it is the 'queue' kobj).
+> 
+> q->sysfs_lock serializes __elevator_change() (via elv_iosched_store)
+> from racing with blk_unregister_queue():
+> 1) By holding q->sysfs_lock first, __elevator_change() can complete
+> before a racing blk_unregister_queue().
+> 2) Conversely, __elevator_change() is testing for QUEUE_FLAG_REGISTERED
+> in case elv_iosched_store() loses the race with blk_unregister_queue(),
+> it needs a way to know the 'queue' kobj isn't there.
+> 
+> Expand the scope of blk_unregister_queue()'s q->sysfs_lock use so it is
+> held until after the 'queue' kobj is removed.
+> 
+> To do so blk_mq_unregister_dev() must not also take q->sysfs_lock.  So
+> rename __blk_mq_unregister_dev() to blk_mq_unregister_dev().
+> 
+> Also, blk_unregister_queue() should use q->queue_lock to protect against
+> any concurrent writes to q->queue_flags -- even though chances are the
+> queue is being cleaned up so no concurrent writes are likely.
+> 
+> Fixes: e9a823fb34a8b ("block: fix warning when I/O elevator is changed as request_queue is being removed")
+> Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+> ---
+>  block/blk-mq-sysfs.c |  9 +--------
+>  block/blk-sysfs.c    | 13 ++++++++++---
+>  2 files changed, 11 insertions(+), 11 deletions(-)
+> 
+> v6: blk_mq_unregister_dev now requires q->sysfs_lock be held, Ming: I am
+> not seeing any lockdep complaints with this.  I've tested bio-based,
+> blk-mq and old .request_fn request-based.
+> 
+> diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+> index 79969c3c234f..a54b4b070f1c 100644
+> --- a/block/blk-mq-sysfs.c
+> +++ b/block/blk-mq-sysfs.c
+> @@ -248,7 +248,7 @@ static int blk_mq_register_hctx(struct blk_mq_hw_ctx *hctx)
+>  	return ret;
+>  }
+>  
+> -static void __blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
+> +void blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
+>  {
+>  	struct blk_mq_hw_ctx *hctx;
+>  	int i;
+> @@ -265,13 +265,6 @@ static void __blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
+>  	q->mq_sysfs_init_done = false;
+>  }
+>  
+> -void blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
+> -{
+> -	mutex_lock(&q->sysfs_lock);
+> -	__blk_mq_unregister_dev(dev, q);
+> -	mutex_unlock(&q->sysfs_lock);
+> -}
+> -
+>  void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx)
+>  {
+>  	kobject_init(&hctx->kobj, &blk_mq_hw_ktype);
+> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> index 870484eaed1f..9272452ff456 100644
+> --- a/block/blk-sysfs.c
+> +++ b/block/blk-sysfs.c
+> @@ -929,12 +929,17 @@ void blk_unregister_queue(struct gendisk *disk)
+>  	if (WARN_ON(!q))
+>  		return;
+>  
+> +	/*
+> +	 * Protect against the 'queue' kobj being accessed
+> +	 * while/after it is removed.
+> +	 */
+>  	mutex_lock(&q->sysfs_lock);
+> -	queue_flag_clear_unlocked(QUEUE_FLAG_REGISTERED, q);
+> -	mutex_unlock(&q->sysfs_lock);
+>  
+> -	wbt_exit(q);
+> +	spin_lock_irq(q->queue_lock);
+> +	queue_flag_clear(QUEUE_FLAG_REGISTERED, q);
+> +	spin_unlock_irq(q->queue_lock);
+>  
+> +	wbt_exit(q);
+>  
+>  	if (q->mq_ops)
+>  		blk_mq_unregister_dev(disk_to_dev(disk), q);
+> @@ -946,4 +951,6 @@ void blk_unregister_queue(struct gendisk *disk)
+>  	kobject_del(&q->kobj);
+>  	blk_trace_remove_sysfs(disk_to_dev(disk));
+>  	kobject_put(&disk_to_dev(disk)->kobj);
+> +
+> +	mutex_unlock(&q->sysfs_lock);
+>  }
 
-For this, we assume that an SGL passed to these functions contain all
-p2p memory or no p2p memory.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
----
- drivers/pci/p2p.c        | 43 +++++++++++++++++++++++++++++++++++++++++++
- include/linux/memremap.h |  1 +
- include/linux/pci-p2p.h  |  9 +++++++++
- 3 files changed, 53 insertions(+)
-
-diff --git a/drivers/pci/p2p.c b/drivers/pci/p2p.c
-index 03330c7b5e6d..87cec87b02e3 100644
---- a/drivers/pci/p2p.c
-+++ b/drivers/pci/p2p.c
-@@ -184,6 +184,8 @@ int pci_p2pmem_add_resource(struct pci_dev *pdev, int bar, size_t size,
- 	pgmap->res.end = pgmap->res.start + size - 1;
- 	pgmap->ref = &pdev->p2p->devmap_ref;
- 	pgmap->type = MEMORY_DEVICE_PCI_P2P;
-+	pgmap->pci_p2p_bus_offset = pci_bus_address(pdev, bar) -
-+		pci_resource_start(pdev, bar);
- 
- 	addr = devm_memremap_pages(&pdev->dev, pgmap);
- 	if (IS_ERR(addr))
-@@ -598,3 +600,44 @@ void pci_p2pmem_publish(struct pci_dev *pdev, bool publish)
- 	pdev->p2p->published = publish;
- }
- EXPORT_SYMBOL_GPL(pci_p2pmem_publish);
-+
-+/*
-+ * pci_p2pmem_map_sg - map a pci p2p sg for dma
-+ * @sg:scatter list to map
-+ * @nents:elements in the scatter list
-+ *
-+ * Returns the number of sgls mapped
-+ */
-+int pci_p2pmem_map_sg(struct scatterlist *sg, int nents)
-+{
-+	struct dev_pagemap *pgmap;
-+	struct scatterlist *s;
-+	phys_addr_t paddr;
-+	int i;
-+
-+	for_each_sg(sg, s, nents, i) {
-+		pgmap = sg_page(s)->pgmap;
-+		paddr = sg_phys(s);
-+
-+		s->dma_address = paddr - pgmap->pci_p2p_bus_offset;
-+		sg_dma_len(s) = s->length;
-+	}
-+
-+	return nents;
-+}
-+EXPORT_SYMBOL_GPL(pci_p2pmem_map_sg);
-+
-+/**
-+ * pci_p2pmem_unmap_sg - unmap a pci p2p sg for dma
-+ * @sg:scatter list to map
-+ * @nents:elements in the scatter list
-+ */
-+void pci_p2pmem_unmap_sg(struct scatterlist *sg, int nents)
-+{
-+	struct scatterlist *s;
-+	int i;
-+
-+	for_each_sg(sg, s, nents, i)
-+		dma_mark_clean(phys_to_virt(sg_phys(s)), sg_dma_len(s));
-+}
-+EXPORT_SYMBOL_GPL(pci_p2pmem_unmap_sg);
-diff --git a/include/linux/memremap.h b/include/linux/memremap.h
-index c17a6d167d48..a792f87b9dc3 100644
---- a/include/linux/memremap.h
-+++ b/include/linux/memremap.h
-@@ -125,6 +125,7 @@ struct dev_pagemap {
- 	struct device *dev;
- 	void *data;
- 	enum memory_type type;
-+	u64 pci_p2p_bus_offset;
- };
- 
- #ifdef CONFIG_ZONE_DEVICE
-diff --git a/include/linux/pci-p2p.h b/include/linux/pci-p2p.h
-index f811c97a5886..154c39905fc9 100644
---- a/include/linux/pci-p2p.h
-+++ b/include/linux/pci-p2p.h
-@@ -34,6 +34,8 @@ int pci_p2pmem_alloc_sgl(struct pci_dev *pdev, struct scatterlist **sgl,
- void pci_p2pmem_free_sgl(struct pci_dev *pdev, struct scatterlist *sgl,
- 		unsigned int nents);
- void pci_p2pmem_publish(struct pci_dev *pdev, bool publish);
-+int pci_p2pmem_map_sg(struct scatterlist *sg, int nents);
-+void pci_p2pmem_unmap_sg(struct scatterlist *sg, int nents);
- #else /* CONFIG_PCI_P2P */
- static inline int pci_p2pmem_add_resource(struct pci_dev *pdev, int bar,
- 		size_t size, u64 offset)
-@@ -81,5 +83,12 @@ static inline void pci_p2pmem_free_sgl(struct pci_dev *pdev,
- static inline void pci_p2pmem_publish(struct pci_dev *pdev, bool publish)
- {
- }
-+static inline int pci_p2pmem_map_sg(struct scatterlist *sg, int nents)
-+{
-+	return -ENODEV;
-+}
-+static inline void pci_p2pmem_unmap_sg(struct scatterlist *sg, int nents)
-+{
-+}
- #endif /* CONFIG_PCI_P2P */
- #endif /* _LINUX_PCI_P2P_H */
 -- 
-2.11.0
+Ming
