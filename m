@@ -1,80 +1,160 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx.ewheeler.net ([66.155.3.69]:38166 "EHLO mail.ewheeler.net"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752368AbeAQS6Z (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Jan 2018 13:58:25 -0500
-Received: from localhost (localhost [127.0.0.1])
-        by mail.ewheeler.net (Postfix) with ESMTP id AA22EA0674
-        for <linux-block@vger.kernel.org>; Wed, 17 Jan 2018 18:53:09 +0000 (UTC)
-Received: from mail.ewheeler.net ([127.0.0.1])
-        by localhost (mail.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
-        with LMTP id wdWSHoQWR3Mc for <linux-block@vger.kernel.org>;
-        Wed, 17 Jan 2018 18:53:09 +0000 (UTC)
-Received: from mx.ewheeler.net (mx.ewheeler.net [66.155.3.69])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mail.ewheeler.net (Postfix) with ESMTPSA id 2BBA6A066F
-        for <linux-block@vger.kernel.org>; Wed, 17 Jan 2018 18:53:09 +0000 (UTC)
-Date: Wed, 17 Jan 2018 18:53:04 +0000 (UTC)
-From: Eric Wheeler <linux-block@lists.ewheeler.net>
-To: linux-block@vger.kernel.org
-Subject: WARNING: bi_status >= ARRAY_SIZE(blk_errors): bi_status=201
-Message-ID: <alpine.LRH.2.11.1801171850040.10175@mail.ewheeler.net>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Received: from mx2.suse.de ([195.135.220.15]:37160 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755184AbeAMROd (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 13 Jan 2018 12:14:33 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Michael Lyle <mlyle@lyle.org>, Hannes Reinecke <hare@suse.com>,
+        Junhui Tang <tang.junhui@zte.com.cn>
+Subject: [PATCH v2 12/12] bcache: stop bcache device when backing device is offline
+Date: Sun, 14 Jan 2018 01:14:03 +0800
+Message-Id: <20180113171403.22531-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hello all,
+Currently bcache does not handle backing device failure, if backing
+device is offline and disconnected from system, its bcache device can still
+be accessible. If the bcache device is in writeback mode, I/O requests even
+can success if the requests hit on cache device. That is to say, when and
+how bcache handles offline backing device is undefined.
 
-We are getting the following on 4.14.13:
+This patch tries to handle backing device offline in a rather simple way,
+- Add cached_dev->status_update_thread kernel thread to update backing
+  device status in every 1 second.
+- Add cached_dev->offline_seconds to record how many seconds the backing
+  device is observed to be offline. If the backing device is offline for
+  BACKING_DEV_OFFLINE_TIMEOUT (30) seconds, set dc->io_disable to 1 and
+  call bcache_device_stop() to stop the bache device which linked to the
+  offline backing device.
 
-[33418.520838] bi_status >= ARRAY_SIZE(blk_errors): bi_status=201
+Now if a backing device is offline for BACKING_DEV_OFFLINE_TIMEOUT seconds,
+its bcache device will be removed, then user space application writing on
+it will get error immediately, and handler the device failure in time.
 
-The line above is our debug output showing the value of "idx" in 
-block/blk-core.c:174 blk_status_to_errno where the WARN_ON is located.
+This patch is quite simple, does not handle more complicated situations.
+Once the bcache device is stopped, users need to recovery the backing
+device, register and attach it manually.
 
-Why would bi_status have a value of 201?
+Changelog:
+v2: this is new added in v2 patch set.
 
--Eric
+Signed-off-by: Coly Li <colyli@suse.de>
+Cc: Michael Lyle <mlyle@lyle.org>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
+---
+ drivers/md/bcache/bcache.h |  2 ++
+ drivers/md/bcache/super.c  | 55 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 57 insertions(+)
 
-[33418.523591] ------------[ cut here ]------------
-[33418.526319] WARNING: CPU: 2 PID: 8484 at block/blk-core.c:174 blk_status_to_errno+0x41/0x50
-[33418.529326] Modules linked in: btrfs xor zstd_decompress zstd_compress xxhash raid6_pq dm_crypt binfmt_misc dm_snapshot lz4 lz4_compress zram drbd lru_cache ebtable_filter ebtables ip6table_filter ip6_tables iptable_nat nf_nat_ipv4 nf_nat xt_connbytes xt_DSCP iptable_mangle ipt_REJECT nf_reject_ipv4 xt_limit nf_log_ipv4 nf_log_common xt_LOG nf_conntrack_ipv4 nf_defrag_ipv4 xt_comment xt_owner mpt3sas raid_class scsi_transport_sas mptctl mptbase xt_recent xt_conntrack nf_conntrack xt_set iptable_filter ip_set_hash_net ip_set nfnetlink netconsole dm_thin_pool dm_persistent_data dm_bio_prison dm_bufio libcrc32c 8021q garp mrp bridge stp llc sb_edac x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel kvm irqbypass bcache crct10dif_pclmul crc32_pclmul iTCO_wdt iTCO_vendor_support ghash_clmulni_intel
-[33418.553475]  mxm_wmi dcdbas pcspkr sg ipmi_si lpc_ich ipmi_devintf mfd_core ipmi_msghandler wmi mei_me mei shpchp acpi_power_meter nfsd auth_rpcgss nfs_acl lockd grace sunrpc ip_tables ext4 mbcache jbd2 mgag200 drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops ttm igb crc32c_intel ptp drm pps_core dca megaraid_sas i2c_algo_bit i2c_core dm_mirror dm_region_hash dm_log dm_mod dax bonding
-[33418.568770] CPU: 2 PID: 8484 Comm: kworker/2:0 Not tainted 4.14.13 #66
-[33418.573012] Hardware name: Dell Inc. PowerEdge R730xd/0599V5, BIOS 2.7.0 12/005/2017
-[33418.577148] Workqueue: bcache bch_data_insert_keys [bcache]
-[33418.581315] task: ffff977748e54380 task.stack: ffffa42a0fd58000
-[33418.585623] RIP: 0010:blk_status_to_errno+0x41/0x50
-[33418.589742] RSP: 0018:ffffa42a0fd5bd70 EFLAGS: 00010246
-[33418.594016] RAX: 0000000000000032 RBX: ffff977721daa800 RCX: 0000000000000000
-[33418.598305] RDX: 0000000000000000 RSI: ffff9777bfc96938 RDI: ffff9777bfc96938
-[33418.602638] RBP: ffff9776e6a25a40 R08: 0000000000000001 R09: 0000000000006d9a
-[33418.606801] R10: 000000000000006c R11: ffffa42a06e1c160 R12: ffff9775c22e1300
-[33418.611008] R13: 0000000000000015 R14: 0000000000000000 R15: ffff977734664cf0
-[33418.615231] FS:  0000000000000000(0000) GS:ffff9777bfc80000(0000) knlGS:0000000000000000
-[33418.619818] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[33418.624355] CR2: ffffffffff600400 CR3: 0000000a2800a006 CR4: 00000000001626e0
-[33418.628596] Call Trace:
-[33418.632290]  drbd_request_endio+0x5d/0x290 [drbd]
-[33418.636713]  clone_endio+0x8e/0x130 [dm_mod]
-[33418.640879]  clone_endio+0x8e/0x130 [dm_mod]
-[33418.646070]  clone_endio+0x8e/0x130 [dm_mod]
-[33418.651681]  bio_complete+0x74/0xd0 [bcache]
-[33418.657139]  search_free+0xe/0x40 [bcache]
-[33418.663005]  cached_dev_write_complete+0x2c/0x60 [bcache]
-[33418.668419]  process_one_work+0x141/0x340
-[33418.673814]  worker_thread+0x47/0x3e0
-[33418.679164]  kthread+0xfc/0x130
-[33418.684400]  ? rescuer_thread+0x380/0x380
-[33418.689763]  ? kthread_park+0x60/0x60
-[33418.694955]  ? do_syscall_64+0x61/0x1a0
-[33418.700193]  ? SyS_exit_group+0x10/0x10
-[33418.705528]  ret_from_fork+0x1f/0x30
-[33418.710839] Code: 8b 80 40 ba c7 ba c3 80 3d cc 55 e8 00 00 74 06 b8 fb ff ff ff c3 48 c7 c7 c8 3b e8 ba 31 c0 c6 05 b4 55 e8 00 01 e8 bc 87 da ff <0f> ff eb e1 90 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 53 
-[33418.722086] ---[ end trace dc46edef7ad4baac ]---
-
-
---
-Eric Wheeler
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 5a811959392d..9eedb35d01bc 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -338,6 +338,7 @@ struct cached_dev {
+ 
+ 	struct keybuf		writeback_keys;
+ 
++	struct task_struct	*status_update_thread;
+ 	/*
+ 	 * Order the write-half of writeback operations strongly in dispatch
+ 	 * order.  (Maintain LBA order; don't allow reads completing out of
+@@ -384,6 +385,7 @@ struct cached_dev {
+ #define DEFAULT_CACHED_DEV_ERROR_LIMIT 64
+ 	atomic_t		io_errors;
+ 	unsigned		error_limit;
++	unsigned		offline_seconds;
+ };
+ 
+ enum alloc_reserve {
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 14fce3623770..85adf1e29d11 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -646,6 +646,11 @@ static int ioctl_dev(struct block_device *b, fmode_t mode,
+ 		     unsigned int cmd, unsigned long arg)
+ {
+ 	struct bcache_device *d = b->bd_disk->private_data;
++	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
++
++	if (dc->io_disable)
++		return -EIO;
++
+ 	return d->ioctl(d, mode, cmd, arg);
+ }
+ 
+@@ -856,6 +861,45 @@ static void calc_cached_dev_sectors(struct cache_set *c)
+ 	c->cached_dev_sectors = sectors;
+ }
+ 
++#define BACKING_DEV_OFFLINE_TIMEOUT 5
++static int cached_dev_status_update(void *arg)
++{
++	struct cached_dev *dc = arg;
++	struct request_queue *q;
++	char buf[BDEVNAME_SIZE];
++
++	/*
++	 * If this delayed worker is stopping outside, directly quit here.
++	 * dc->io_disable might be set via sysfs interface, so check it
++	 * here too.
++	 */
++	while (!kthread_should_stop() && !dc->io_disable) {
++		q = bdev_get_queue(dc->bdev);
++		if (blk_queue_dying(q))
++			dc->offline_seconds++;
++		else
++			dc->offline_seconds = 0;
++
++		if (dc->offline_seconds >= BACKING_DEV_OFFLINE_TIMEOUT) {
++			pr_err("%s: device offline for %d seconds",
++				bdevname(dc->bdev, buf),
++				BACKING_DEV_OFFLINE_TIMEOUT);
++			pr_err("%s: disable I/O request due to backing "
++				"device offline", dc->disk.name);
++			dc->io_disable = true;
++			/* let others know earlier that io_disable is true */
++			smp_mb();
++			bcache_device_stop(&dc->disk);
++			break;
++		}
++
++		schedule_timeout_interruptible(HZ);
++	}
++
++	dc->status_update_thread = NULL;
++	return 0;
++}
++
+ void bch_cached_dev_run(struct cached_dev *dc)
+ {
+ 	struct bcache_device *d = &dc->disk;
+@@ -898,6 +942,15 @@ void bch_cached_dev_run(struct cached_dev *dc)
+ 	if (sysfs_create_link(&d->kobj, &disk_to_dev(d->disk)->kobj, "dev") ||
+ 	    sysfs_create_link(&disk_to_dev(d->disk)->kobj, &d->kobj, "bcache"))
+ 		pr_debug("error creating sysfs link");
++
++	dc->status_update_thread = kthread_run(cached_dev_status_update,
++					       dc,
++					      "bcache_status_update");
++	if (IS_ERR(dc->status_update_thread)) {
++		pr_warn("bcache: failed to create bcache_status_update "
++			"kthread, continue to run without monitoring backing "
++			"device status");
++	}
+ }
+ 
+ /*
+@@ -1118,6 +1171,8 @@ static void cached_dev_free(struct closure *cl)
+ 		kthread_stop(dc->writeback_thread);
+ 	if (dc->writeback_write_wq)
+ 		destroy_workqueue(dc->writeback_write_wq);
++	if (!IS_ERR_OR_NULL(dc->status_update_thread))
++		kthread_stop(dc->status_update_thread);
+ 
+ 	if (atomic_read(&dc->running))
+ 		bd_unlink_disk_holder(dc->bdev, dc->disk.disk);
+-- 
+2.15.1
