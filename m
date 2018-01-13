@@ -1,130 +1,77 @@
-Return-Path: <gunthorp@deltatee.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvdimm@lists.01.org,
-	linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Date: Thu,  4 Jan 2018 12:01:33 -0700
-Message-Id: <20180104190137.7654-9-logang@deltatee.com>
-In-Reply-To: <20180104190137.7654-1-logang@deltatee.com>
-References: <20180104190137.7654-1-logang@deltatee.com>
-Subject: [PATCH 08/12] nvme-pci: clean up SMBSZ bit definitions
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:36917 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755266AbeAMRLj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 13 Jan 2018 12:11:39 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Michael Lyle <mlyle@lyle.org>, Hannes Reinecke <hare@suse.de>,
+        Junhui Tang <tang.junhui@zte.com.cn>
+Subject: [PATCH v2 03/12] bcache: set task properly in allocator_wait()
+Date: Sun, 14 Jan 2018 01:10:41 +0800
+Message-Id: <20180113171050.22467-4-colyli@suse.de>
+In-Reply-To: <20180113171050.22467-1-colyli@suse.de>
+References: <20180113171050.22467-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Christoph Hellwig <hch@lst.de>
+Kernel thread routine bch_allocator_thread() references macro
+allocator_wait() to wait for a condition or quit to do_exit()
+when kthread_should_stop() is true. Here is the code block,
 
-Define the bit positions instead of macros using the magic values,
-and move the expanded helpers to calculate the size and size unit into
-the implementation C file.
+284         while (1) {                                                   \
+285                 set_current_state(TASK_INTERRUPTIBLE);                \
+286                 if (cond)                                             \
+287                         break;                                        \
+288                                                                       \
+289                 mutex_unlock(&(ca)->set->bucket_lock);                \
+290                 if (kthread_should_stop())                            \
+291                         return 0;                                     \
+292                                                                       \
+293                 schedule();                                           \
+294                 mutex_lock(&(ca)->set->bucket_lock);                  \
+295         }                                                             \
+296         __set_current_state(TASK_RUNNING);                            \
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+At line 285, task state is set to TASK_INTERRUPTIBLE, if at line 290
+kthread_should_stop() is true, the kernel thread will terminate and return
+to kernel/kthread.s:kthread(), then calls do_exit() with TASK_INTERRUPTIBLE
+state. This is not a suggested behavior and a warning message will be
+reported by might_sleep() in do_exit() code path: "WARNING: do not call
+blocking ops when !TASK_RUNNING; state=1 set at [xxxx]".
+
+This patch fixes this problem by setting task state to TASK_RUNNING if
+kthread_should_stop() is true and before kernel thread returns back to
+kernel/kthread.s:kthread().
+
+Changelog:
+v2: fix the race issue in v1 patch.
+v1: initial buggy fix.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Cc: Michael Lyle <mlyle@lyle.org>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
 ---
- drivers/nvme/host/pci.c | 23 +++++++++++++++++------
- include/linux/nvme.h    | 22 ++++++++++++++--------
- 2 files changed, 31 insertions(+), 14 deletions(-)
+ drivers/md/bcache/alloc.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 58c379af6fb4..5af239e46f52 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1369,7 +1369,7 @@ static int nvme_cmb_qdepth(struct nvme_dev *dev, int nr_io_queues,
- static int nvme_alloc_sq_cmds(struct nvme_dev *dev, struct nvme_queue *nvmeq,
- 				int qid, int depth)
- {
--	if (qid && dev->cmb && use_cmb_sqes && NVME_CMB_SQS(dev->cmbsz)) {
-+	if (qid && dev->cmb && use_cmb_sqes && (dev->cmbsz & NVME_CMBSZ_SQS)) {
- 		unsigned offset = (qid - 1) * roundup(SQ_SIZE(depth),
- 						      dev->ctrl.page_size);
- 		nvmeq->sq_dma_addr = dev->cmb_bus_addr + offset;
-@@ -1663,9 +1663,21 @@ static ssize_t nvme_cmb_show(struct device *dev,
- }
- static DEVICE_ATTR(cmb, S_IRUGO, nvme_cmb_show, NULL);
- 
-+static u64 nvme_cmb_size_unit(struct nvme_dev *dev)
-+{
-+	u8 szu = (dev->cmbsz >> NVME_CMBSZ_SZU_SHIFT) & NVME_CMBSZ_SZU_MASK;
-+
-+	return 1ULL << (12 + 4 * szu);
-+}
-+
-+static u32 nvme_cmb_size(struct nvme_dev *dev)
-+{
-+	return (dev->cmbsz >> NVME_CMBSZ_SZ_SHIFT) & NVME_CMBSZ_SZ_MASK;
-+}
-+
- static void nvme_map_cmb(struct nvme_dev *dev)
- {
--	u64 szu, size, offset;
-+	u64 size, offset;
- 	resource_size_t bar_size;
- 	struct pci_dev *pdev = to_pci_dev(dev->dev);
- 	int bar;
-@@ -1678,9 +1690,8 @@ static void nvme_map_cmb(struct nvme_dev *dev)
- 	if (!use_cmb_sqes)
- 		return;
- 
--	szu = (u64)1 << (12 + 4 * NVME_CMB_SZU(dev->cmbsz));
--	size = szu * NVME_CMB_SZ(dev->cmbsz);
--	offset = szu * NVME_CMB_OFST(dev->cmbloc);
-+	size = nvme_cmb_size_unit(dev) * nvme_cmb_size(dev);
-+	offset = nvme_cmb_size_unit(dev) * NVME_CMB_OFST(dev->cmbloc);
- 	bar = NVME_CMB_BIR(dev->cmbloc);
- 	bar_size = pci_resource_len(pdev, bar);
- 
-@@ -1909,7 +1920,7 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
- 	if (nr_io_queues == 0)
- 		return 0;
- 
--	if (dev->cmb && NVME_CMB_SQS(dev->cmbsz)) {
-+	if (dev->cmb && (dev->cmbsz & NVME_CMBSZ_SQS)) {
- 		result = nvme_cmb_qdepth(dev, nr_io_queues,
- 				sizeof(struct nvme_command));
- 		if (result > 0)
-diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-index aea87f0d917b..4112e2bd747f 100644
---- a/include/linux/nvme.h
-+++ b/include/linux/nvme.h
-@@ -124,14 +124,20 @@ enum {
- 
- #define NVME_CMB_BIR(cmbloc)	((cmbloc) & 0x7)
- #define NVME_CMB_OFST(cmbloc)	(((cmbloc) >> 12) & 0xfffff)
--#define NVME_CMB_SZ(cmbsz)	(((cmbsz) >> 12) & 0xfffff)
--#define NVME_CMB_SZU(cmbsz)	(((cmbsz) >> 8) & 0xf)
--
--#define NVME_CMB_WDS(cmbsz)	((cmbsz) & 0x10)
--#define NVME_CMB_RDS(cmbsz)	((cmbsz) & 0x8)
--#define NVME_CMB_LISTS(cmbsz)	((cmbsz) & 0x4)
--#define NVME_CMB_CQS(cmbsz)	((cmbsz) & 0x2)
--#define NVME_CMB_SQS(cmbsz)	((cmbsz) & 0x1)
-+
-+enum {
-+	NVME_CMBSZ_SQS		= 1 << 0,
-+	NVME_CMBSZ_CQS		= 1 << 1,
-+	NVME_CMBSZ_LISTS	= 1 << 2,
-+	NVME_CMBSZ_RDS		= 1 << 3,
-+	NVME_CMBSZ_WDS		= 1 << 4,
-+
-+	NVME_CMBSZ_SZ_SHIFT	= 12,
-+	NVME_CMBSZ_SZ_MASK	= 0xfffff,
-+
-+	NVME_CMBSZ_SZU_SHIFT	= 8,
-+	NVME_CMBSZ_SZU_MASK	= 0xf,
-+};
- 
- /*
-  * Submission and Completion Queue Entry Sizes for the NVM command set.
+diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
+index 6cc6c0f9c3a9..458e1d38577d 100644
+--- a/drivers/md/bcache/alloc.c
++++ b/drivers/md/bcache/alloc.c
+@@ -287,8 +287,10 @@ do {									\
+ 			break;						\
+ 									\
+ 		mutex_unlock(&(ca)->set->bucket_lock);			\
+-		if (kthread_should_stop())				\
++		if (kthread_should_stop()) {				\
++			set_current_state(TASK_RUNNING);		\
+ 			return 0;					\
++		}							\
+ 									\
+ 		schedule();						\
+ 		mutex_lock(&(ca)->set->bucket_lock);			\
 -- 
-2.11.0
+2.15.1
