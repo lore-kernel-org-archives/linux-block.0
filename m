@@ -1,125 +1,85 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:55044 "EHLO mx2.suse.de"
+Received: from mx1.redhat.com ([209.132.183.28]:55448 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752676AbeACOE0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Jan 2018 09:04:26 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, mlyle@lyle.org,
-        tang.junhui@zte.com.cn, Coly Li <colyli@suse.de>
-Subject: [PATCH v1 07/10] bcache: set error_limit correctly
-Date: Wed,  3 Jan 2018 22:03:22 +0800
-Message-Id: <20180103140325.63175-8-colyli@suse.de>
-In-Reply-To: <20180103140325.63175-1-colyli@suse.de>
-References: <20180103140325.63175-1-colyli@suse.de>
+        id S965304AbeAMB3p (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 Jan 2018 20:29:45 -0500
+Date: Sat, 13 Jan 2018 09:29:25 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@fb.com" <axboe@fb.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>
+Subject: Re: [PATCH V3 2/5] dm-mpath: return DM_MAPIO_REQUEUE in case of rq
+ allocation failure
+Message-ID: <20180113012920.GA6150@ming.t460p>
+References: <20180111060159.12991-1-ming.lei@redhat.com>
+ <20180111060159.12991-3-ming.lei@redhat.com>
+ <1515783866.2396.43.camel@sandisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1515783866.2396.43.camel@sandisk.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Struct cache uses io_errors for two purposes,
-- Error decay: when cache set error_decay is set, io_errors is used to
-  generate a small piece of delay when I/O error happens.
-- I/O errors counter: in order to generate big enough value for error
-  decay, I/O errors counter value is stored by left shifting 20 bits (a.k.a
-  IO_ERROR_SHIFT).
+On Fri, Jan 12, 2018 at 07:04:28PM +0000, Bart Van Assche wrote:
+> On Thu, 2018-01-11 at 14:01 +0800, Ming Lei wrote:
+> > diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
+> > index 86bf502a8e51..fcddf5a62581 100644
+> > --- a/drivers/md/dm-mpath.c
+> > +++ b/drivers/md/dm-mpath.c
+> > @@ -533,8 +533,20 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
+> >  		if (queue_dying) {
+> >  			atomic_inc(&m->pg_init_in_progress);
+> >  			activate_or_offline_path(pgpath);
+> > +			return DM_MAPIO_DELAY_REQUEUE;
+> >  		}
+> > -		return DM_MAPIO_DELAY_REQUEUE;
+> > +
+> > +		/*
+> > +		 * blk-mq's SCHED_RESTART can cover this requeue, so
+> > +		 * we needn't to deal with it by DELAY_REQUEUE. More
+> > +		 * importantly, we have to return DM_MAPIO_REQUEUE
+> > +		 * so that blk-mq can get the queue busy feedback,
+> > +		 * otherwise I/O merge can be hurt.
+> > +		 */
+> > +		if (q->mq_ops)
+> > +			return DM_MAPIO_REQUEUE;
+> > +		else
+> > +			return DM_MAPIO_DELAY_REQUEUE;
+> >  	}
+> 
+> Sorry but the approach of this patch looks wrong to me. I'm afraid that this
+> approach will cause 100% CPU consumption if the underlying .queue_rq()
+> function returns BLK_STS_RESOURCE for another reason than what can be detected
+> by the .get_budget() call. This can happen if e.g. a SCSI LLD .queuecommand()
+> implementation returns SCSI_MLQUEUE_HOST_BUSY. Many SCSI LLDs can do this:
+> $ git grep 'SCSI_MLQUEUE_[^_]*_BUSY' | wc -l
+> 204
+> 
+> Isn't this a severe regression?
 
-In function bch_count_io_errors(), if I/O errors counter reaches cache set
-error limit, bch_cache_set_error() will be called to retire the whold cache
-set. But current code is problematic when checking the error limit, see the
-following code piece from bch_count_io_errors(),
+No, it is not.
 
- 90   if (error) {
- 91           char buf[BDEVNAME_SIZE];
- 92           unsigned errors = atomic_add_return(1 << IO_ERROR_SHIFT,
- 93                                               &ca->io_errors);
- 94           errors >>= IO_ERROR_SHIFT;
- 95
- 96           if (errors < ca->set->error_limit)
- 97                   pr_err("%s: IO error on %s, recovering",
- 98                          bdevname(ca->bdev, buf), m);
- 99           else
-100                   bch_cache_set_error(ca->set,
-101                                       "%s: too many IO errors %s",
-102                                       bdevname(ca->bdev, buf), m);
-103   }
+This DM_MAPIO_REQUEUE will be converted to BLK_STS_RESOURCE in dm-rq, then
+it is returned to blk-mq. That means when running out of resource for
+dispatching the underlying request, we tell blk-mq the truth. This
+way has been used for other blk-mq drivers, such NVMe,..., more
+importantly we have to provide this real feedback to blk-mq for fixing
+the performance issue.
 
-At line 94, errors is right shifting IO_ERROR_SHIFT bits, now it is real
-errors counter to compare at line 96. But ca->set->error_limit is initia-
-lized with an amplified value in bch_cache_set_alloc(),
-1545   c->error_limit  = 8 << IO_ERROR_SHIFT;
+The blk_get_request(GFP_ATOMIC) is just like a kmalloc(ATOMIC),
+and memory is shared system-wide too. You can see there are lots kmalloc(ATOMIC)
+in NVMe IO path, when it fails, BLK_STS_RESOURCE is returned to blk-mq.
 
-It means by default, in bch_count_io_errors(), before 8<<20 errors happened
-bch_cache_set_error() won't be called to retire the problematic cache
-device. If the average request size is 64KB, it means bcache won't handle
-failed device until 512GB data is requested. This is too large to be an I/O
-threashold. So I believe the correct error limit should be much less.
+blk-mq has built-in SCHED_RESTART mechanism to handle out of RESOURCE
+when BLK_STS_RESOURCE is observed.
 
-This patch sets default cache set error limit to 8, then in
-bch_count_io_errors() when errors counter reaches 8 (if it is default
-value), function bch_cache_set_error() will be called to retire the whole
-cache set. This patch also removes bits shifting when store or show
-io_error_limit value via sysfs interface.
+We only implements .get_bugdet() in SCSI only, and other blk-mq drivers: NVMe,
+..., often returns BLK_STS_RESOURCE to blk-mq too, so wrt. this usage there
+isn't any difference between dm-mpath and other cases, right?
 
-Nowadays most of SSDs handle internal flash failure automatically by LBA
-address re-indirect mapping. If an I/O error can be observed by upper layer
-code, it will be a notable error because that SSD can not re-indirect
-map the problematic LBA address to an available flash block. This situation
-indicates the whole SSD will be failed very soon. Therefore setting 8 as
-the default io error limit value makes sense, it is enough for most of
-cache devices.
 
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/bcache.h | 1 +
- drivers/md/bcache/super.c  | 2 +-
- drivers/md/bcache/sysfs.c  | 4 ++--
- 3 files changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 395b87942a2f..a31dc3737dae 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -654,6 +654,7 @@ struct cache_set {
- 		ON_ERROR_UNREGISTER,
- 		ON_ERROR_PANIC,
- 	}			on_error;
-+#define DEFAULT_IO_ERROR_LIMIT 8
- 	unsigned		error_limit;
- 	unsigned		error_decay;
- 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 8912be4165c5..02d9d7110769 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1561,7 +1561,7 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
- 
- 	c->congested_read_threshold_us	= 2000;
- 	c->congested_write_threshold_us	= 20000;
--	c->error_limit	= 8 << IO_ERROR_SHIFT;
-+	c->error_limit	= DEFAULT_IO_ERROR_LIMIT;
- 
- 	return c;
- err:
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index b4184092c727..d7ce9a05b304 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -556,7 +556,7 @@ SHOW(__bch_cache_set)
- 
- 	/* See count_io_errors for why 88 */
- 	sysfs_print(io_error_halflife,	c->error_decay * 88);
--	sysfs_print(io_error_limit,	c->error_limit >> IO_ERROR_SHIFT);
-+	sysfs_print(io_error_limit,	c->error_limit);
- 
- 	sysfs_hprint(congested,
- 		     ((uint64_t) bch_get_congested(c)) << 9);
-@@ -656,7 +656,7 @@ STORE(__bch_cache_set)
- 	}
- 
- 	if (attr == &sysfs_io_error_limit)
--		c->error_limit = strtoul_or_return(buf) << IO_ERROR_SHIFT;
-+		c->error_limit = strtoul_or_return(buf);
- 
- 	/* See count_io_errors() for why 88 */
- 	if (attr == &sysfs_io_error_halflife)
--- 
-2.15.1
+Thanks,
+Ming
