@@ -1,326 +1,133 @@
-Return-Path: <msnitzer@redhat.com>
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	dm-devel@redhat.com,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: [PATCH v5] blk-mq: introduce BLK_STS_DEV_RESOURCE
-Date: Tue, 30 Jan 2018 09:24:59 -0500
-Message-Id: <20180130142459.52668-1-snitzer@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:36972 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755102AbeAMRM1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 13 Jan 2018 12:12:27 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Michael Lyle <mlyle@lyle.org>,
+        Junhui Tang <tang.junhui@zte.com.cn>
+Subject: [PATCH v2 06/12] bcache: set error_limit correctly
+Date: Sun, 14 Jan 2018 01:10:44 +0800
+Message-Id: <20180113171050.22467-7-colyli@suse.de>
+In-Reply-To: <20180113171050.22467-1-colyli@suse.de>
+References: <20180113171050.22467-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Ming Lei <ming.lei@redhat.com>
+Struct cache uses io_errors for two purposes,
+- Error decay: when cache set error_decay is set, io_errors is used to
+  generate a small piece of delay when I/O error happens.
+- I/O errors counter: in order to generate big enough value for error
+  decay, I/O errors counter value is stored by left shifting 20 bits (a.k.a
+  IO_ERROR_SHIFT).
 
-This status is returned from driver to block layer if device related
-resource is unavailable, but driver can guarantee that IO dispatch
-will be triggered in future when the resource is available.
+In function bch_count_io_errors(), if I/O errors counter reaches cache set
+error limit, bch_cache_set_error() will be called to retire the whold cache
+set. But current code is problematic when checking the error limit, see the
+following code piece from bch_count_io_errors(),
 
-Convert some drivers to return BLK_STS_DEV_RESOURCE.  Also, if driver
-returns BLK_STS_RESOURCE and SCHED_RESTART is set, rerun queue after
-a delay (BLK_MQ_DELAY_QUEUE) to avoid IO stalls.  BLK_MQ_DELAY_QUEUE is
-3 ms because both scsi-mq and nvmefc are using that magic value.
+ 90     if (error) {
+ 91             char buf[BDEVNAME_SIZE];
+ 92             unsigned errors = atomic_add_return(1 << IO_ERROR_SHIFT,
+ 93                                                 &ca->io_errors);
+ 94             errors >>= IO_ERROR_SHIFT;
+ 95
+ 96             if (errors < ca->set->error_limit)
+ 97                     pr_err("%s: IO error on %s, recovering",
+ 98                            bdevname(ca->bdev, buf), m);
+ 99             else
+100                     bch_cache_set_error(ca->set,
+101                                         "%s: too many IO errors %s",
+102                                         bdevname(ca->bdev, buf), m);
+103     }
 
-If a driver can make sure there is in-flight IO, it is safe to return
-BLK_STS_DEV_RESOURCE because:
+At line 94, errors is right shifting IO_ERROR_SHIFT bits, now it is real
+errors counter to compare at line 96. But ca->set->error_limit is initia-
+lized with an amplified value in bch_cache_set_alloc(),
+1545         c->error_limit  = 8 << IO_ERROR_SHIFT;
 
-1) If all in-flight IOs complete before examining SCHED_RESTART in
-blk_mq_dispatch_rq_list(), SCHED_RESTART must be cleared, so queue
-is run immediately in this case by blk_mq_dispatch_rq_list();
+It means by default, in bch_count_io_errors(), before 8<<20 errors happened
+bch_cache_set_error() won't be called to retire the problematic cache
+device. If the average request size is 64KB, it means bcache won't handle
+failed device until 512GB data is requested. This is too large to be an I/O
+threashold. So I believe the correct error limit should be much less.
 
-2) if there is any in-flight IO after/when examining SCHED_RESTART
-in blk_mq_dispatch_rq_list():
-- if SCHED_RESTART isn't set, queue is run immediately as handled in 1)
-- otherwise, this request will be dispatched after any in-flight IO is
-  completed via blk_mq_sched_restart()
+This patch sets default cache set error limit to 8, then in
+bch_count_io_errors() when errors counter reaches 8 (if it is default
+value), function bch_cache_set_error() will be called to retire the whole
+cache set. This patch also removes bits shifting when store or show
+io_error_limit value via sysfs interface.
 
-3) if SCHED_RESTART is set concurently in context because of
-BLK_STS_RESOURCE, blk_mq_delay_run_hw_queue() will cover the above two
-cases and make sure IO hang can be avoided.
+Nowadays most of SSDs handle internal flash failure automatically by LBA
+address re-indirect mapping. If an I/O error can be observed by upper layer
+code, it will be a notable error because that SSD can not re-indirect
+map the problematic LBA address to an available flash block. This situation
+indicates the whole SSD will be failed very soon. Therefore setting 8 as
+the default io error limit value makes sense, it is enough for most of
+cache devices.
 
-One invariant is that queue will be rerun if SCHED_RESTART is set.
+Changelog:
+v2: add reviewed-by from Hannes.
+v1: initial version for review.
 
-Suggested-by: Jens Axboe <axboe@kernel.dk>
-Tested-by: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Cc: Michael Lyle <mlyle@lyle.org>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
 ---
-V5:
-        - fixed stale reference to 10ms delay in blk-mq.c comment
-        - revised commit header to include Ming's proof of how
-          blk-mq drivers will make progress (serves to document how
-	  scsi_queue_rq now works)
-V4:
-        - cleanup header and code comments
-        - rerun queue after BLK_MQ_QUEUE_DELAY (3ms) instead of 10ms
-        - eliminate nvmefc's queue rerun now that blk-mq does it
-V3:
-        - fix typo, and improvement document
-        - add tested-by tag
-V2:
-        - add comments on the new introduced status
-        - patch style fix
-        - both are suggested by Christoph
+ drivers/md/bcache/bcache.h | 1 +
+ drivers/md/bcache/super.c  | 2 +-
+ drivers/md/bcache/sysfs.c  | 4 ++--
+ 3 files changed, 4 insertions(+), 3 deletions(-)
 
- block/blk-core.c             |  1 +
- block/blk-mq.c               | 20 ++++++++++++++++----
- drivers/block/null_blk.c     |  2 +-
- drivers/block/virtio_blk.c   |  2 +-
- drivers/block/xen-blkfront.c |  2 +-
- drivers/md/dm-rq.c           |  5 ++---
- drivers/nvme/host/fc.c       | 12 ++----------
- drivers/scsi/scsi_lib.c      |  6 +++---
- include/linux/blk_types.h    | 17 +++++++++++++++++
- 9 files changed, 44 insertions(+), 23 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index cdae69be68e9..38279d4ae08b 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -145,6 +145,7 @@ static const struct {
- 	[BLK_STS_MEDIUM]	= { -ENODATA,	"critical medium" },
- 	[BLK_STS_PROTECTION]	= { -EILSEQ,	"protection" },
- 	[BLK_STS_RESOURCE]	= { -ENOMEM,	"kernel resource" },
-+	[BLK_STS_DEV_RESOURCE]	= { -ENOMEM,	"device resource" },
- 	[BLK_STS_AGAIN]		= { -EAGAIN,	"nonblocking retry" },
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 88d938c8d027..7d7512fa4f09 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -663,6 +663,7 @@ struct cache_set {
+ 		ON_ERROR_UNREGISTER,
+ 		ON_ERROR_PANIC,
+ 	}			on_error;
++#define DEFAULT_IO_ERROR_LIMIT 8
+ 	unsigned		error_limit;
+ 	unsigned		error_decay;
  
- 	/* device mapper special case, should not leak out: */
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 43e7449723e0..e39b4e2a63db 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1160,6 +1160,8 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx **hctx,
- 	return true;
- }
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 6d888e8fea8c..a373648b5d4b 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1583,7 +1583,7 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
  
-+#define BLK_MQ_QUEUE_DELAY	3		/* ms units */
-+
- bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 			     bool got_budget)
- {
-@@ -1167,6 +1169,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 	struct request *rq, *nxt;
- 	bool no_tag = false;
- 	int errors, queued;
-+	blk_status_t ret = BLK_STS_OK;
+ 	c->congested_read_threshold_us	= 2000;
+ 	c->congested_write_threshold_us	= 20000;
+-	c->error_limit	= 8 << IO_ERROR_SHIFT;
++	c->error_limit	= DEFAULT_IO_ERROR_LIMIT;
  
- 	if (list_empty(list))
- 		return false;
-@@ -1179,7 +1182,6 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 	errors = queued = 0;
- 	do {
- 		struct blk_mq_queue_data bd;
--		blk_status_t ret;
+ 	return c;
+ err:
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index b7166c504cdb..ba62e987b503 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -560,7 +560,7 @@ SHOW(__bch_cache_set)
  
- 		rq = list_first_entry(list, struct request, queuelist);
- 		if (!blk_mq_get_driver_tag(rq, &hctx, false)) {
-@@ -1224,7 +1226,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 		}
+ 	/* See count_io_errors for why 88 */
+ 	sysfs_print(io_error_halflife,	c->error_decay * 88);
+-	sysfs_print(io_error_limit,	c->error_limit >> IO_ERROR_SHIFT);
++	sysfs_print(io_error_limit,	c->error_limit);
  
- 		ret = q->mq_ops->queue_rq(hctx, &bd);
--		if (ret == BLK_STS_RESOURCE) {
-+		if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE) {
- 			/*
- 			 * If an I/O scheduler has been configured and we got a
- 			 * driver tag for the next request already, free it
-@@ -1255,6 +1257,8 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 	 * that is where we will continue on next queue run.
- 	 */
- 	if (!list_empty(list)) {
-+		bool needs_restart;
-+
- 		spin_lock(&hctx->lock);
- 		list_splice_init(list, &hctx->dispatch);
- 		spin_unlock(&hctx->lock);
-@@ -1278,10 +1282,17 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 		 * - Some but not all block drivers stop a queue before
- 		 *   returning BLK_STS_RESOURCE. Two exceptions are scsi-mq
- 		 *   and dm-rq.
-+		 *
-+		 * If driver returns BLK_STS_RESOURCE and SCHED_RESTART
-+		 * bit is set, run queue after a delay to avoid IO stalls
-+		 * that could otherwise occur if the queue is idle.
- 		 */
--		if (!blk_mq_sched_needs_restart(hctx) ||
-+		needs_restart = blk_mq_sched_needs_restart(hctx);
-+		if (!needs_restart ||
- 		    (no_tag && list_empty_careful(&hctx->dispatch_wait.entry)))
- 			blk_mq_run_hw_queue(hctx, true);
-+		else if (needs_restart && (ret == BLK_STS_RESOURCE))
-+			blk_mq_delay_run_hw_queue(hctx, BLK_MQ_QUEUE_DELAY);
+ 	sysfs_hprint(congested,
+ 		     ((uint64_t) bch_get_congested(c)) << 9);
+@@ -660,7 +660,7 @@ STORE(__bch_cache_set)
  	}
  
- 	return (queued + errors) != 0;
-@@ -1762,6 +1773,7 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
- 		*cookie = new_cookie;
- 		break;
- 	case BLK_STS_RESOURCE:
-+	case BLK_STS_DEV_RESOURCE:
- 		__blk_mq_requeue_request(rq);
- 		break;
- 	default:
-@@ -1824,7 +1836,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	hctx_lock(hctx, &srcu_idx);
+ 	if (attr == &sysfs_io_error_limit)
+-		c->error_limit = strtoul_or_return(buf) << IO_ERROR_SHIFT;
++		c->error_limit = strtoul_or_return(buf);
  
- 	ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false);
--	if (ret == BLK_STS_RESOURCE)
-+	if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
- 		blk_mq_sched_insert_request(rq, false, true, false);
- 	else if (ret != BLK_STS_OK)
- 		blk_mq_end_request(rq, ret);
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index 5b94e530570c..4bc25fc4e73c 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -1230,7 +1230,7 @@ static blk_status_t null_handle_cmd(struct nullb_cmd *cmd)
- 				return BLK_STS_OK;
- 			} else
- 				/* requeue request */
--				return BLK_STS_RESOURCE;
-+				return BLK_STS_DEV_RESOURCE;
- 		}
- 	}
- 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 68846897d213..79908e6ddbf2 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -276,7 +276,7 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		/* Out of mem doesn't actually happen, since we fall back
- 		 * to direct descriptors */
- 		if (err == -ENOMEM || err == -ENOSPC)
--			return BLK_STS_RESOURCE;
-+			return BLK_STS_DEV_RESOURCE;
- 		return BLK_STS_IOERR;
- 	}
- 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index 891265acb10e..e126e4cac2ca 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -911,7 +911,7 @@ static blk_status_t blkif_queue_rq(struct blk_mq_hw_ctx *hctx,
- out_busy:
- 	blk_mq_stop_hw_queue(hctx);
- 	spin_unlock_irqrestore(&rinfo->ring_lock, flags);
--	return BLK_STS_RESOURCE;
-+	return BLK_STS_DEV_RESOURCE;
- }
- 
- static void blkif_complete_rq(struct request *rq)
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index b7d175e94a02..348a0cb6963a 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -404,7 +404,7 @@ static blk_status_t dm_dispatch_clone_request(struct request *clone, struct requ
- 
- 	clone->start_time = jiffies;
- 	r = blk_insert_cloned_request(clone->q, clone);
--	if (r != BLK_STS_OK && r != BLK_STS_RESOURCE)
-+	if (r != BLK_STS_OK && r != BLK_STS_RESOURCE && r != BLK_STS_DEV_RESOURCE)
- 		/* must complete clone in terms of original request */
- 		dm_complete_request(rq, r);
- 	return r;
-@@ -496,7 +496,7 @@ static int map_request(struct dm_rq_target_io *tio)
- 		trace_block_rq_remap(clone->q, clone, disk_devt(dm_disk(md)),
- 				     blk_rq_pos(rq));
- 		ret = dm_dispatch_clone_request(clone, rq);
--		if (ret == BLK_STS_RESOURCE) {
-+		if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE) {
- 			blk_rq_unprep_clone(clone);
- 			tio->ti->type->release_clone_rq(clone);
- 			tio->clone = NULL;
-@@ -769,7 +769,6 @@ static blk_status_t dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		/* Undo dm_start_request() before requeuing */
- 		rq_end_stats(md, rq);
- 		rq_completed(md, rq_data_dir(rq), false);
--		blk_mq_delay_run_hw_queue(hctx, 100/*ms*/);
- 		return BLK_STS_RESOURCE;
- 	}
- 
-diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index b76ba4629e02..54e679541ad6 100644
---- a/drivers/nvme/host/fc.c
-+++ b/drivers/nvme/host/fc.c
-@@ -35,8 +35,6 @@ enum nvme_fc_queue_flags {
- 	NVME_FC_Q_LIVE,
- };
- 
--#define NVMEFC_QUEUE_DELAY	3		/* ms units */
--
- #define NVME_FC_DEFAULT_DEV_LOSS_TMO	60	/* seconds */
- 
- struct nvme_fc_queue {
-@@ -2231,7 +2229,7 @@ nvme_fc_start_fcp_op(struct nvme_fc_ctrl *ctrl, struct nvme_fc_queue *queue,
- 	 * the target device is present
- 	 */
- 	if (ctrl->rport->remoteport.port_state != FC_OBJSTATE_ONLINE)
--		goto busy;
-+		return BLK_STS_RESOURCE;
- 
- 	if (!nvme_fc_ctrl_get(ctrl))
- 		return BLK_STS_IOERR;
-@@ -2311,16 +2309,10 @@ nvme_fc_start_fcp_op(struct nvme_fc_ctrl *ctrl, struct nvme_fc_queue *queue,
- 				ret != -EBUSY)
- 			return BLK_STS_IOERR;
- 
--		goto busy;
-+		return BLK_STS_RESOURCE;
- 	}
- 
- 	return BLK_STS_OK;
--
--busy:
--	if (!(op->flags & FCOP_FLAGS_AEN) && queue->hctx)
--		blk_mq_delay_run_hw_queue(queue->hctx, NVMEFC_QUEUE_DELAY);
--
--	return BLK_STS_RESOURCE;
- }
- 
- static inline blk_status_t nvme_fc_is_ready(struct nvme_fc_queue *queue,
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index d9ca1dfab154..55be2550c555 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2030,9 +2030,9 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	case BLK_STS_OK:
- 		break;
- 	case BLK_STS_RESOURCE:
--		if (atomic_read(&sdev->device_busy) == 0 &&
--		    !scsi_device_blocked(sdev))
--			blk_mq_delay_run_hw_queue(hctx, SCSI_QUEUE_DELAY);
-+		if (atomic_read(&sdev->device_busy) ||
-+		    scsi_device_blocked(sdev))
-+			ret = BLK_STS_DEV_RESOURCE;
- 		break;
- 	default:
- 		/*
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 2d973ac54b09..f41d2057215f 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -39,6 +39,23 @@ typedef u8 __bitwise blk_status_t;
- 
- #define BLK_STS_AGAIN		((__force blk_status_t)12)
- 
-+/*
-+ * BLK_STS_DEV_RESOURCE is returned from driver to block layer if device
-+ * related resource is unavailable, but driver can guarantee that queue
-+ * will be rerun in future once the resource is available (whereby
-+ * dispatching requests).
-+ *
-+ * To safely return BLK_STS_DEV_RESOURCE, and allow forward progress, a
-+ * driver just needs to make sure there is in-flight IO.
-+ *
-+ * Difference with BLK_STS_RESOURCE:
-+ * If driver isn't sure if the queue will be rerun once device resource
-+ * is made available, please return BLK_STS_RESOURCE.  For example: when
-+ * memory allocation, DMA Mapping or other system resource allocation
-+ * fails and IO can't be submitted to device.
-+ */
-+#define BLK_STS_DEV_RESOURCE	((__force blk_status_t)13)
-+
- /**
-  * blk_path_error - returns true if error may be path related
-  * @error: status the request was completed with
+ 	/* See count_io_errors() for why 88 */
+ 	if (attr == &sysfs_io_error_halflife)
 -- 
-2.15.0
+2.15.1
