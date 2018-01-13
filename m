@@ -1,48 +1,79 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	162996@studenti.unimore.it,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX 2/2] bfq-sq, bfq-mq: release oom-queue ref to root group on exit
-Date: Tue,  9 Jan 2018 10:17:27 +0100
-Message-Id: <20180109091727.5262-3-paolo.valente@linaro.org>
-In-Reply-To: <20180109091727.5262-1-paolo.valente@linaro.org>
-References: <20180109091727.5262-1-paolo.valente@linaro.org>
+Return-Path: <msnitzer@redhat.com>
+Date: Sat, 13 Jan 2018 10:14:47 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "elliott@hpe.com" <elliott@hpe.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+	"axboe@fb.com" <axboe@fb.com>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>,
+	"hch@infradead.org" <hch@infradead.org>,
+	"dm-devel@redhat.com" <dm-devel@redhat.com>
+Subject: Re: [PATCH V3 0/5] dm-rq: improve sequential I/O performance
+Message-ID: <20180113151446.GB11158@redhat.com>
+References: <20180112171840.GA4541@redhat.com>
+ <1515778013.2396.3.camel@wdc.com>
+ <20180112174000.GB5134@redhat.com>
+ <1515779211.2396.11.camel@wdc.com>
+ <20180112180635.GD5134@redhat.com>
+ <1515783288.2396.37.camel@wdc.com>
+ <AT5PR8401MB0387801D9DC1686503921AE5AB170@AT5PR8401MB0387.NAMPRD84.PROD.OUTLOOK.COM>
+ <20180113005213.GB7207@redhat.com>
+ <1515805255.2396.94.camel@wdc.com>
+ <20180113013705.GC7207@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180113013705.GC7207@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On scheduler init, a reference to the root group, and a reference to
-its corresponding blkg are taken for the oom queue. Yet these
-references are not released on scheduler exit, which prevents these
-objects from be freed. This commit adds the missing reference
-releases.
+On Fri, Jan 12 2018 at  8:37pm -0500,
+Mike Snitzer <snitzer@redhat.com> wrote:
 
-Reported-by: Davide Ferrari <davideferrari8@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 3 +++
- 1 file changed, 3 insertions(+)
+> On Fri, Jan 12 2018 at  8:00pm -0500,
+> Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
+> 
+> > On Fri, 2018-01-12 at 19:52 -0500, Mike Snitzer wrote:
+> > > It was 50 ms before it was 100 ms.  No real explaination for these
+> > > values other than they seem to make Bart's IB SRP testbed happy?
+> > 
+> > But that constant was not introduced by me in the dm code.
+> 
+> No actually it was (not that there's anything wrong with that):
+> 
+> commit 06eb061f48594aa369f6e852b352410298b317a8
+> Author: Bart Van Assche <bart.vanassche@sandisk.com>
+> Date:   Fri Apr 7 16:50:44 2017 -0700
+> 
+>     dm mpath: requeue after a small delay if blk_get_request() fails
+> 
+>     If blk_get_request() returns ENODEV then multipath_clone_and_map()
+>     causes a request to be requeued immediately. This can cause a kworker
+>     thread to spend 100% of the CPU time of a single core in
+>     __blk_mq_run_hw_queue() and also can cause device removal to never
+>     finish.
+> 
+>     Avoid this by only requeuing after a delay if blk_get_request() fails.
+>     Additionally, reduce the requeue delay.
+> 
+>     Cc: stable@vger.kernel.org # 4.9+
+>     Signed-off-by: Bart Van Assche <bart.vanassche@sandisk.com>
+>     Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+> 
+> Note that this commit actually details a different case where a
+> blk_get_request() (in existing code) return of -ENODEV is a very
+> compelling case to use DM_MAPIO_DELAY_REQUEUE.
+> 
+> SO I'll revisit what is appropriate in multipath_clone_and_map() on
+> Monday.
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index ea48b5c8f088..c56a495af2e8 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -5015,6 +5015,9 @@ static void bfq_exit_queue(struct elevator_queue *e)
- 
- 	hrtimer_cancel(&bfqd->idle_slice_timer);
- 
-+	/* release oom-queue reference to root group */
-+	bfqg_and_blkg_put(bfqd->root_group);
-+
- #ifdef CONFIG_BFQ_GROUP_IOSCHED
- 	blkcg_deactivate_policy(bfqd->queue, &blkcg_policy_bfq);
- #else
--- 
-2.15.1
+Sleep helped.  I had another look and it is only the old .request_fn
+blk_get_request() code that even sets -ENODEV (if blk_queue_dying).
+
+But thankfully the blk_get_request() error handling in
+multipath_clone_and_map() checks for blk_queue_dying() and will return
+DM_MAPIO_DELAY_REQUEUE.
+
+So we're all set for this case.
+
+Mike
