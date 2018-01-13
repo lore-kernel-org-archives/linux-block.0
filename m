@@ -1,107 +1,78 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-From: Tejun Heo <tj@kernel.org>
-To: jack@suse.cz,
-	axboe@kernel.dk,
-	clm@fb.com,
-	jbacik@fb.com
-Cc: kernel-team@fb.com,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	peterz@infradead.org,
-	jianchao.w.wang@oracle.com,
-	Bart.VanAssche@wdc.com,
-	linux-block@vger.kernel.org
-Subject: [PATCHSET v4] blk-mq: reimplement timeout handling
-Date: Mon,  8 Jan 2018 11:15:34 -0800
-Message-Id: <20180108191542.379478-1-tj@kernel.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:37021 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932071AbeAMRMq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 13 Jan 2018 12:12:46 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Junhui Tang <tang.junhui@zte.com.cn>,
+        Michael Lyle <mlyle@lyle.org>
+Subject: [PATCH v2 08/12] bcache: stop all attached bcache devices for a retired cache set
+Date: Sun, 14 Jan 2018 01:10:46 +0800
+Message-Id: <20180113171050.22467-9-colyli@suse.de>
+In-Reply-To: <20180113171050.22467-1-colyli@suse.de>
+References: <20180113171050.22467-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hello,
+When there are too many I/O errors on cache device, current bcache code
+will retire the whole cache set, and detach all bcache devices. But the
+detached bcache devices are not stopped, which is problematic when bcache
+is in writeback mode.
 
-Changes from [v3]
+If the retired cache set has dirty data of backing devices, continue
+writing to bcache device will write to backing device directly. If the
+LBA of write request has a dirty version cached on cache device, next time
+when the cache device is re-registered and backing device re-attached to
+it again, the stale dirty data on cache device will be written to backing
+device, and overwrite latest directly written data. This situation causes
+a quite data corruption.
 
-- Rebased on top of for-4.16/block.
+This patch checkes whether cache_set->io_disable is true in
+__cache_set_unregister(). If cache_set->io_disable is true, it means cache
+set is unregistering by too many I/O errors, then all attached bcache
+devices will be stopped as well. If cache_set->io_disable is not true, it
+means __cache_set_unregister() is triggered by writing 1 to sysfs file
+/sys/fs/bcache/<UUID>/bcache/stop. This is an exception because users do
+it explicitly, this patch keeps existing behavior and does not stop any
+bcache device.
 
-- Integrated Jens's hctx_[un]lock() factoring patch and refreshed the
-  patches accordingly.
+Even the failed cache device has no dirty data, stopping bcache device is
+still a desired behavior by many Ceph and data base users. Then their
+application will report I/O errors due to disappeared bcache device, and
+operation people will know the cache device is broken or disconnected.
 
-- Added comment explaining the use of hctx_lock() instead of
-  rcu_read_lock() in completion path.
+Changelog:
+v2: add reviewed-by from Hannes.
+v1: initial version for review.
 
-Changes from [v2]
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
+Cc: Michael Lyle <mlyle@lyle.org>
+---
+ drivers/md/bcache/super.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-- Possible extended looping around seqcount and u64_stat_sync fixed.
-
-- Misplaced MQ_RQ_IDLE state setting fixed.
-
-- RQF_MQ_TIMEOUT_EXPIRED added to prevent firing the same timeout
-  multiple times.
-
-- s/queue_rq_src/srcu/ patch added.
-
-- Other misc changes.
-
-Changes from [v1]
-
-- BLK_EH_RESET_TIMER handling fixed.
-
-- s/request->gstate_seqc/request->gstate_seq/
-
-- READ_ONCE() added to blk_mq_rq_udpate_state().
-
-- Removed left over blk_clear_rq_complete() invocation from
-  blk_mq_rq_timed_out().
-
-Currently, blk-mq timeout path synchronizes against the usual
-issue/completion path using a complex scheme involving atomic
-bitflags, REQ_ATOM_*, memory barriers and subtle memory coherence
-rules.  Unfortunatley, it contains quite a few holes.
-
-It's pretty easy to make blk_mq_check_expired() terminate a later
-instance of a request.  If we induce 5 sec delay before
-time_after_eq() test in blk_mq_check_expired(), shorten the timeout to
-2s, and issue back-to-back large IOs, blk-mq starts timing out
-requests spuriously pretty quickly.  Nothing actually timed out.  It
-just made the call on a recycle instance of a request and then
-terminated a later instance long after the original instance finished.
-The scenario isn't theoretical either.
-
-This patchset replaces the broken synchronization mechanism with a RCU
-and generation number based one.  Please read the patch description of
-the second path for more details.
-
-This patchset contains the following eight patches.
-
-0001-blk-mq-move-hctx-lock-unlock-into-a-helper.patch
-0002-blk-mq-protect-completion-path-with-RCU.patch
-0003-blk-mq-replace-timeout-synchronization-with-a-RCU-an.patch
-0004-blk-mq-use-blk_mq_rq_state-instead-of-testing-REQ_AT.patch
-0005-blk-mq-make-blk_abort_request-trigger-timeout-path.patch
-0006-blk-mq-remove-REQ_ATOM_COMPLETE-usages-from-blk-mq.patch
-0007-blk-mq-remove-REQ_ATOM_STARTED.patch
-0008-blk-mq-rename-blk_mq_hw_ctx-queue_rq_srcu-to-srcu.patch
-
-and is available in the following git branch.
-
- git://git.kernel.org/pub/scm/linux/kernel/git/tj/misc.git blk-mq-timeout-v4
-
-diffstat follows.  Thanks.
-
- block/blk-core.c       |    2 
- block/blk-mq-debugfs.c |    4 
- block/blk-mq.c         |  340 ++++++++++++++++++++++++++++---------------------
- block/blk-mq.h         |   49 ++++++-
- block/blk-timeout.c    |   11 -
- block/blk.h            |    7 -
- include/linux/blk-mq.h |    3 
- include/linux/blkdev.h |   25 +++
- 8 files changed, 283 insertions(+), 158 deletions(-)
-
---
-tejun
-
-[v3] http://lkml.kernel.org/r/20171216120726.517153-1-tj@kernel.org
-[v2] http://lkml.kernel.org/r/20171010155441.753966-1-tj@kernel.org
-[v1] http://lkml.kernel.org/r/20171209192525.982030-1-tj@kernel.org
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 4204d75aee7b..97e3bb8e1aee 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1478,6 +1478,14 @@ static void __cache_set_unregister(struct closure *cl)
+ 				dc = container_of(c->devices[i],
+ 						  struct cached_dev, disk);
+ 				bch_cached_dev_detach(dc);
++				/*
++				 * If we come here by too many I/O errors,
++				 * bcache device should be stopped too, to
++				 * keep data consistency on cache and
++				 * backing devices.
++				 */
++				if (test_bit(CACHE_SET_IO_DISABLE, &c->flags))
++					bcache_device_stop(c->devices[i]);
+ 			} else {
+ 				bcache_device_stop(c->devices[i]);
+ 			}
+-- 
+2.15.1
