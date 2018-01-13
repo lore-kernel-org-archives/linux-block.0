@@ -1,51 +1,41 @@
-Return-Path: <ebiggers3@gmail.com>
-Return-Path: <ebiggers3@gmail.com>
-From: Eric Biggers <ebiggers3@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: Zhouyi Zhou <yizhouzhou@ict.ac.cn>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	Eric Biggers <ebiggers@google.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] Revert "kernel/relay.c: fix potential memory leak"
-Date: Fri, 26 Jan 2018 16:47:59 -0800
-Message-Id: <20180127004759.101823-1-ebiggers3@gmail.com>
-In-Reply-To: <089e082d01d08b36a6055cd763ca@google.com>
-References: <089e082d01d08b36a6055cd763ca@google.com>
+Return-Path: <bsingharora@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1513613712-571-1-git-send-email-joshs@netflix.com>
+References: <20171218113426.vndsy2m5qhxrkesg@hirez.programming.kicks-ass.net> <1513613712-571-1-git-send-email-joshs@netflix.com>
+From: Balbir Singh <bsingharora@gmail.com>
+Date: Sat, 13 Jan 2018 13:56:44 +0530
+Message-ID: <CAKTCnzkojkc6g575EQ0FXaNsgRTeNWKHq__QNp6MUVBOuQw=hw@mail.gmail.com>
+Subject: Re: [PATCH v2] delayacct: Account blkio completion on the correct task
+To: Josh Snyder <joshs@netflix.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Brendan Gregg <bgregg@netflix.com>, Tejun Heo <tj@kernel.org>,
+	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Ingo Molnar <mingo@redhat.com>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+On Mon, Dec 18, 2017 at 9:45 PM, Josh Snyder <joshs@netflix.com> wrote:
+> Before commit e33a9bba85a8 ("sched/core: move IO scheduling accounting from
+> io_schedule_timeout() into scheduler"), delayacct_blkio_end was called after
+> context-switching into the task which completed I/O. This resulted in double
+> counting: the task would account a delay both waiting for I/O and for time
+> spent in the runqueue.
+>
 
-This reverts commit ba62bafe942b159a6109cbec780d36496e06b6c5.
+Yes, we included the time spent in the runqueue to delays on account of I/O.
 
-This commit introduced a double free bug, because 'chan' is already
-freed by the line:
+> With e33a9bba85a8, delayacct_blkio_end is called by try_to_wake_up. In
+> ttwu, we have not yet context-switched. This is more correct, in that the
+> delay accounting ends when the I/O is complete. But delayacct_blkio_end
+> relies upon `get_current()`, and we have not yet context-switched into the
+> task whose I/O completed. This results in the wrong task having its delay
+> accounting statistics updated.
+>
+> Instead of doing that, pass the task_struct being woken to
+> delayacct_blkio_end, so that it can update the statistics of the correct
+> task.
+>
+> Fixes: e33a9bba85a8 ("sched/core: move IO scheduling accounting from io_schedule_timeout() into scheduler")
+> Signed-off-by: Josh Snyder <joshs@netflix.com>
+> ---
 
-    kref_put(&chan->kref, relay_destroy_channel);
-
-This bug was found by syzkaller, using the BLKTRACESETUP ioctl.
-
-Fixes: ba62bafe942b ("kernel/relay.c: fix potential memory leak")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Cc: <stable@vger.kernel.org> # v4.7+
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- kernel/relay.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/kernel/relay.c b/kernel/relay.c
-index 39a9dfc69486..55da824f4adc 100644
---- a/kernel/relay.c
-+++ b/kernel/relay.c
-@@ -611,7 +611,6 @@ struct rchan *relay_open(const char *base_filename,
- 
- 	kref_put(&chan->kref, relay_destroy_channel);
- 	mutex_unlock(&relay_channels_mutex);
--	kfree(chan);
- 	return NULL;
- }
- EXPORT_SYMBOL_GPL(relay_open);
--- 
-2.16.0.rc1.238.g530d649a79-goog
+Acked-by: Balbir Singh <bsingharora@gmail.com>
