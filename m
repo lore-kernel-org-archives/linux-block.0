@@ -1,5 +1,5 @@
 Return-Path: <ming.lei@redhat.com>
-Date: Sat, 13 Jan 2018 22:45:20 +0800
+Date: Sat, 13 Jan 2018 20:39:21 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: Laurence Oberman <loberman@redhat.com>
 Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
@@ -13,7 +13,7 @@ Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	"jianchao.w.wang@oracle.com" <jianchao.w.wang@oracle.com>
 Subject: Re: [PATCHSET v5] blk-mq: reimplement timeout handling
-Message-ID: <20180113144514.GA8013@ming.t460p>
+Message-ID: <20180113123915.GA10021@ming.t460p>
 References: <20180109162953.1211451-1-tj@kernel.org>
  <1515790585.2396.50.camel@wdc.com>
  <1515794134.28222.4.camel@redhat.com>
@@ -178,66 +178,19 @@ On Fri, Jan 12, 2018 at 04:55:34PM -0500, Laurence Oberman wrote:
 > 
 > My concern is that I tried a 4.15-rc1 kernel as well and still saw
 > issues so have to sanitize all of this first and report back.
-> 
-> My trace was this
-> 
-> [��615.714199]�������Tainted: G����������I������4.15.0-rc4+ #1
-> [��615.746226] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-> disables this message.
-> [��615.790597] systemd-udevd���D����0��2247����745 0x80000086
-> [��615.821048] Call Trace:
-> [��615.833971]��? __schedule+0x28d/0x870
-> [��615.854226]��schedule+0x32/0x80
-> [��615.871819]��io_schedule+0x12/0x40
-> [��615.890850]��__lock_page+0x105/0x150
-> [��615.910378]��? page_cache_tree_insert+0xd0/0xd0
-> [��615.935932]��truncate_inode_pages_range+0x49d/0x810
-> [��615.963371]��__blkdev_put+0x73/0x200
-> [��615.983351]��blkdev_close+0x21/0x30
-> [��616.002910]��__fput+0xd5/0x210
-> [��616.019812]��task_work_run+0x82/0xa0
-> [��616.040506]��do_exit+0x2ce/0xb30
-> [��616.058622]��do_group_exit+0x39/0xa0
-> [��616.079506]��get_signal+0x1d0/0x5b0
-> [��616.100116]��do_signal+0x36/0x610
-> [��616.118889]��? page_cache_tree_insert+0xd0/0xd0
-> [��616.144958]��exit_to_usermode_loop+0x47/0x93
-> [��616.169040]��do_syscall_64+0x172/0x1a0
-> [��616.190514]��entry_SYSCALL64_slow_path+0x25/0x25
-> [��616.216566] RIP: 0033:0x7fb247dd86f0
-> [��616.237395] RSP: 002b:00007ffea3c56cb8 EFLAGS: 00000246 ORIG_RAX:
-> 0000000000000000
-> [��616.279551] RAX: fffffffffffffffc RBX: 0000000000200000 RCX:
-> 00007fb247dd86f0
-> [��616.318057] RDX: 0000000000000400 RSI: 000055855eeefea8 RDI:
-> 0000000000000008
-> [��616.357320] RBP: 000055855eeefe80 R08: 0000000005231994 R09:
-> 0000000000000428
-> [��616.397099] R10: 0000000000000040 R11: 0000000000000246 R12:
-> 000055855eeea550
-> [��616.436999] R13: 0000000000000400 R14: 000055855eeea5a0 R15:
-> 000055855eeefe98
-> [��616.477831] INFO: task systemd-udevd:2248 blocked for more than 120
-> seconds.
-> [��616.518289]�������Tainted: G����������I������4.15.0-rc4+ #1
-> [��616.549323] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-> disables this message.
 
-I can trigger this hang too, looks it happens after starting multipathd,
-and 'lsblk' also complains:
+Hi Laurence,
 
-	lsblk: dm-0: failed to get device path
-	lsblk: dm-0: failed to get device path
+Please collect blk-mq debugfs log via the following script after the hang is
+triggered:
 
-And one SCSI device can't be attached to dm-mpath.
+	http://people.redhat.com/minlei/tests/tools/dump-blk-info
 
-But it may not be related with IO, since when this hang happens,
-there isn't any pending IO observed from blk-mq debugfs.
+This script needn't any parameter.
 
-I also tries Jan's 6 patches for fixing race between bdev open and
-gendisk shutdown, and looks they can't help the issue.
+>From Bart's log, looks the request is requeued by dm-rq, but is never kicked
+off, and your log can show if yours is same with Bart's.
 
-	https://marc.info/?l=linux-block&m=151569001430678&w=2
 
 Thanks,
 Ming
