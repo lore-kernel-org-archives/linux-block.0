@@ -1,88 +1,78 @@
-Return-Path: <prvs=541b0d852=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Omar Sandoval <osandov@fb.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v2 1/2] blk-mq: Reduce the number of if-statements in blk_mq_mark_tag_wait()
-Date: Wed, 10 Jan 2018 11:39:18 -0800
-Message-Id: <20180110193919.6886-2-bart.vanassche@wdc.com>
-In-Reply-To: <20180110193919.6886-1-bart.vanassche@wdc.com>
-References: <20180110193919.6886-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:49090 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751709AbeANOoL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 14 Jan 2018 09:44:11 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Junhui Tang <tang.junhui@zte.com.cn>,
+        Michael Lyle <mlyle@lyle.org>
+Subject: [PATCH v3 09/13] bcache: stop all attached bcache devices for a retired cache set
+Date: Sun, 14 Jan 2018 22:42:32 +0800
+Message-Id: <20180114144236.28213-10-colyli@suse.de>
+In-Reply-To: <20180114144236.28213-1-colyli@suse.de>
+References: <20180114144236.28213-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This patch does not change any functionality but makes the
-blk_mq_mark_tag_wait() code slightly easier to read.
+When there are too many I/O errors on cache device, current bcache code
+will retire the whole cache set, and detach all bcache devices. But the
+detached bcache devices are not stopped, which is problematic when bcache
+is in writeback mode.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+If the retired cache set has dirty data of backing devices, continue
+writing to bcache device will write to backing device directly. If the
+LBA of write request has a dirty version cached on cache device, next time
+when the cache device is re-registered and backing device re-attached to
+it again, the stale dirty data on cache device will be written to backing
+device, and overwrite latest directly written data. This situation causes
+a quite data corruption.
+
+This patch checkes whether cache_set->io_disable is true in
+__cache_set_unregister(). If cache_set->io_disable is true, it means cache
+set is unregistering by too many I/O errors, then all attached bcache
+devices will be stopped as well. If cache_set->io_disable is not true, it
+means __cache_set_unregister() is triggered by writing 1 to sysfs file
+/sys/fs/bcache/<UUID>/bcache/stop. This is an exception because users do
+it explicitly, this patch keeps existing behavior and does not stop any
+bcache device.
+
+Even the failed cache device has no dirty data, stopping bcache device is
+still a desired behavior by many Ceph and data base users. Then their
+application will report I/O errors due to disappeared bcache device, and
+operation people will know the cache device is broken or disconnected.
+
+Changelog:
+v2: add Reviewed-by from Hannes.
+v1: initial version for review.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
+Cc: Michael Lyle <mlyle@lyle.org>
 ---
- block/blk-mq.c | 30 +++++++++++++++---------------
- 1 file changed, 15 insertions(+), 15 deletions(-)
+ drivers/md/bcache/super.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1d705e25852e..e770e8814f60 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1189,6 +1189,16 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx **hctx,
- 	if (!shared_tags) {
- 		if (!test_bit(BLK_MQ_S_SCHED_RESTART, &this_hctx->state))
- 			set_bit(BLK_MQ_S_SCHED_RESTART, &this_hctx->state);
-+		/*
-+		 * It's possible that a tag was freed in the window between the
-+		 * allocation failure and adding the hardware queue to the wait
-+		 * queue.
-+		 */
-+		ret = blk_mq_get_driver_tag(rq, hctx, false);
-+		/*
-+		 * Don't clear RESTART here, someone else could have set it.
-+		 * At most this will cost an extra queue run.
-+		 */
- 	} else {
- 		wait = &this_hctx->dispatch_wait;
- 		if (!list_empty_careful(&wait->entry))
-@@ -1202,22 +1212,12 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx **hctx,
- 
- 		ws = bt_wait_ptr(&this_hctx->tags->bitmap_tags, this_hctx);
- 		add_wait_queue(&ws->wait, wait);
--	}
--
--	/*
--	 * It's possible that a tag was freed in the window between the
--	 * allocation failure and adding the hardware queue to the wait
--	 * queue.
--	 */
--	ret = blk_mq_get_driver_tag(rq, hctx, false);
--
--	if (!shared_tags) {
- 		/*
--		 * Don't clear RESTART here, someone else could have set it.
--		 * At most this will cost an extra queue run.
-+		 * It's possible that a tag was freed in the window between the
-+		 * allocation failure and adding the hardware queue to the wait
-+		 * queue.
- 		 */
--		return ret;
--	} else {
-+		ret = blk_mq_get_driver_tag(rq, hctx, false);
- 		if (!ret) {
- 			spin_unlock(&this_hctx->lock);
- 			return false;
-@@ -1231,8 +1231,8 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx **hctx,
- 		list_del_init(&wait->entry);
- 		spin_unlock_irq(&ws->wait.lock);
- 		spin_unlock(&this_hctx->lock);
--		return true;
- 	}
-+	return ret;
- }
- 
- bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 4204d75aee7b..97e3bb8e1aee 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1478,6 +1478,14 @@ static void __cache_set_unregister(struct closure *cl)
+ 				dc = container_of(c->devices[i],
+ 						  struct cached_dev, disk);
+ 				bch_cached_dev_detach(dc);
++				/*
++				 * If we come here by too many I/O errors,
++				 * bcache device should be stopped too, to
++				 * keep data consistency on cache and
++				 * backing devices.
++				 */
++				if (test_bit(CACHE_SET_IO_DISABLE, &c->flags))
++					bcache_device_stop(c->devices[i]);
+ 			} else {
+ 				bcache_device_stop(c->devices[i]);
+ 			}
 -- 
 2.15.1
