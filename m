@@ -1,54 +1,25 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: dm-devel@redhat.com,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 0/5] blk-mq & dm: fix IO hang and deal with one performance issue
-Date: Mon, 22 Jan 2018 11:35:45 +0800
-Message-Id: <20180122033550.27855-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f53.google.com ([74.125.82.53]:43419 "EHLO
+        mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750927AbeANJfP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 14 Jan 2018 04:35:15 -0500
+Received: by mail-wm0-f53.google.com with SMTP id g1so19536256wmg.2
+        for <linux-block@vger.kernel.org>; Sun, 14 Jan 2018 01:35:15 -0800 (PST)
+Subject: Re: [PATCH v3 2/2] block: add bdev_read_only() checks to common
+ helpers
+To: Ilya Dryomov <idryomov@gmail.com>, linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Tejun Heo <tj@kernel.org>, David Disseldorp <ddiss@suse.de>
+References: <1515676152-18476-1-git-send-email-idryomov@gmail.com>
+ <1515676152-18476-3-git-send-email-idryomov@gmail.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <5a6fe1df-df7a-b8e7-697b-3f098b1fd4e4@grimberg.me>
+Date: Sun, 14 Jan 2018 11:35:12 +0200
+MIME-Version: 1.0
+In-Reply-To: <1515676152-18476-3-git-send-email-idryomov@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Jens,
-
-This 1st patch introduces BLK_STS_DEV_RESOURCE for dealing with IO hang
-when non-device resource is run out of and queue is idle, and this
-approach is suggested by you.
-
-The 2nd and 3rd patches cleans dm-rq a bit and prepares for applying
-blk_get_request_notify().
-
-The 4th patch introduces blk_get_request_notify(), still suggested by
-you.
-
-The last patch applies blk_get_request_notify() and avoids one
-DM specific performance issue which is introduced by the 1st patch.
-
-These 5 patches are against both dm(dm-4.16) and block tree(for-4.16/block).
-
-Ming Lei (5):
-  blk-mq: introduce BLK_STS_DEV_RESOURCE
-  dm-rq: handle dispatch exception in dm_dispatch_clone_request()
-  dm-rq: return BLK_STS_* from map_request()
-  blk-mq: introduce blk_get_request_notify
-  dm-mpath: use blk_mq_alloc_request_notify for allocating blk-mq req
-
- block/blk-core.c             |  1 +
- block/blk-mq-tag.c           | 27 +++++++++++++++++++++-
- block/blk-mq.c               | 43 +++++++++++++++++++++++++++++------
- block/blk-mq.h               |  1 +
- drivers/block/null_blk.c     |  2 +-
- drivers/block/virtio_blk.c   |  2 +-
- drivers/block/xen-blkfront.c |  2 +-
- drivers/md/dm-mpath.c        | 50 ++++++++++++++++++++++++++++++++++++++++-
- drivers/md/dm-rq.c           | 53 +++++++++++++++++++++++++++-----------------
- drivers/md/dm.c              |  1 +
- drivers/scsi/scsi_lib.c      |  6 ++---
- include/linux/blk-mq.h       |  5 +++++
- include/linux/blk_types.h    |  7 ++++++
- 13 files changed, 165 insertions(+), 35 deletions(-)
-
--- 
-2.9.5
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
