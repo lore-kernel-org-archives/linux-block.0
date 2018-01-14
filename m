@@ -1,39 +1,25 @@
-Return-Path: <zhangweiping@didichuxing.com>
-Date: Thu, 11 Jan 2018 00:36:37 +0800
-From: weiping zhang <zhangweiping@didichuxing.com>
-To: <axboe@kernel.dk>, <jack@suse.cz>, <Bart.VanAssche@wdc.com>
-CC: <linux-block@vger.kernel.org>
-Subject: [PATCH v2] bdi: show error log when fail to create bdi debugfs entry
-Message-ID: <20180110163633.GA24230@bogon.didichuxing.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:45492 "EHLO
+        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750818AbeANJfE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 14 Jan 2018 04:35:04 -0500
+Received: by mail-wm0-f45.google.com with SMTP id i186so19510767wmi.4
+        for <linux-block@vger.kernel.org>; Sun, 14 Jan 2018 01:35:04 -0800 (PST)
+Subject: Re: [PATCH v3 1/2] block: fail op_is_write() requests to read-only
+ partitions
+To: Ilya Dryomov <idryomov@gmail.com>, linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@infradead.org>,
+        Tejun Heo <tj@kernel.org>, David Disseldorp <ddiss@suse.de>
+References: <1515676152-18476-1-git-send-email-idryomov@gmail.com>
+ <1515676152-18476-2-git-send-email-idryomov@gmail.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <faa8f6ee-2bf3-0863-e9fd-5b1e782c5106@grimberg.me>
+Date: Sun, 14 Jan 2018 11:35:01 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Return-Path: zhangweiping@didichuxing.com
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <1515676152-18476-2-git-send-email-idryomov@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-bdi debugfs dir/file may create fail, add error log here.
-
-Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
----
-V1->V2:
-fix indentation and make log message more clear
-
- mm/backing-dev.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/mm/backing-dev.c b/mm/backing-dev.c
-index b5f940c..0a49665 100644
---- a/mm/backing-dev.c
-+++ b/mm/backing-dev.c
-@@ -885,7 +885,9 @@ int bdi_register_va(struct backing_dev_info *bdi, const char *fmt, va_list args)
- 	cgwb_bdi_register(bdi);
- 	bdi->dev = dev;
- 
--	bdi_debug_register(bdi, dev_name(dev));
-+	if (bdi_debug_register(bdi, dev_name(dev)))
-+		pr_warn("blkdev %s: creation of bdi debugfs entries failed.\n",
-+			dev_name(dev));
- 	set_bit(WB_registered, &bdi->wb.state);
- 
- 	spin_lock_bh(&bdi_lock);
--- 
-2.9.4
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
