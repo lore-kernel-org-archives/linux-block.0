@@ -1,418 +1,278 @@
-Return-Path: <gunthorp@deltatee.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvdimm@lists.01.org,
-	linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Steve Wise <swise@opengridcomputing.com>
-Date: Thu,  4 Jan 2018 12:01:37 -0700
-Message-Id: <20180104190137.7654-13-logang@deltatee.com>
-In-Reply-To: <20180104190137.7654-1-logang@deltatee.com>
-References: <20180104190137.7654-1-logang@deltatee.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Subject: [PATCH 12/12] nvmet: Optionally use PCI P2P memory
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:48993 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751709AbeANOny (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 14 Jan 2018 09:43:54 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Michael Lyle <mlyle@lyle.org>, Hannes Reinecke <hare@suse.com>,
+        Junhui Tang <tang.junhui@zte.com.cn>
+Subject: [PATCH v3 06/13] bcache: stop dc->writeback_rate_update properly
+Date: Sun, 14 Jan 2018 22:42:29 +0800
+Message-Id: <20180114144236.28213-7-colyli@suse.de>
+In-Reply-To: <20180114144236.28213-1-colyli@suse.de>
+References: <20180114144236.28213-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We create a configfs attribute in each nvme-fabrics target port to
-enable p2p memory use. When enabled, the port will only then use the
-p2p memory if a p2p memory device can be found which is behind the
-same switch as the RDMA port and all the block devices in use. If
-the user enabled it an no devices are found, then the system will
-silently fall back on using regular memory.
+struct delayed_work writeback_rate_update in struct cache_dev is a delayed
+worker to call function update_writeback_rate() in period (the interval is
+defined by dc->writeback_rate_update_seconds).
 
-If appropriate, that port will allocate memory for the RDMA buffers
-for queues from the p2pmem device falling back to system memory should
-anything fail.
+When a metadate I/O error happens on cache device, bcache error handling
+routine bch_cache_set_error() will call bch_cache_set_unregister() to
+retire whole cache set. On the unregister code path, this delayed work is
+stopped by calling cancel_delayed_work_sync(&dc->writeback_rate_update).
 
-Ideally, we'd want to use an NVME CMB buffer as p2p memory. This would
-save an extra PCI transfer as the NVME card could just take the data
-out of it's own memory. However, at this time, cards with CMB buffers
-don't seem to be available.
+dc->writeback_rate_update is a special delayed work from others in bcache.
+In its routine update_writeback_rate(), this delayed work is re-armed
+itself. That means when cancel_delayed_work_sync() returns, this delayed
+work can still be executed after several seconds defined by
+dc->writeback_rate_update_seconds.
 
-Signed-off-by: Stephen Bates <sbates@raithlin.com>
-Signed-off-by: Steve Wise <swise@opengridcomputing.com>
-[hch: partial rewrite of the initial code]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+The problem is, after cancel_delayed_work_sync() returns, the cache set
+unregister code path will continue and release memory of struct cache set.
+Then the delayed work is scheduled to run, __update_writeback_rate()
+will reference the already released cache_set memory, and trigger a NULL
+pointer deference fault.
+
+This patch introduces two more bcache device flags,
+- BCACHE_DEV_WB_RUNNING
+  bit set:  bcache device is in writeback mode and running, it is OK for
+            dc->writeback_rate_update to re-arm itself.
+  bit clear:bcache device is trying to stop dc->writeback_rate_update,
+            this delayed work should not re-arm itself and quit.
+- BCACHE_DEV_RATE_DW_RUNNING
+  bit set:  routine update_writeback_rate() is executing.
+  bit clear: routine update_writeback_rate() quits.
+
+This patch also adds a function cancel_writeback_rate_update_dwork() to
+wait for dc->writeback_rate_update quits before cancel it by calling
+cancel_delayed_work_sync(). In order to avoid a deadlock by unexpected
+quit dc->writeback_rate_update, after time_out seconds this function will
+give up and continue to call cancel_delayed_work_sync().
+
+And here I explain how this patch stops self re-armed delayed work properly
+with the above stuffs.
+
+update_writeback_rate() sets BCACHE_DEV_RATE_DW_RUNNING at its beginning
+and clears BCACHE_DEV_RATE_DW_RUNNING at its end. Before calling
+cancel_writeback_rate_update_dwork() clear flag BCACHE_DEV_WB_RUNNING.
+
+Before calling cancel_delayed_work_sync() wait utill flag
+BCACHE_DEV_RATE_DW_RUNNING is clear. So when calling
+cancel_delayed_work_sync(), dc->writeback_rate_update must be already re-
+armed, or quite by seeing BCACHE_DEV_WB_RUNNING cleared. In both cases
+delayed work routine update_writeback_rate() won't be executed after
+cancel_delayed_work_sync() returns.
+
+Inside update_writeback_rate() before calling schedule_delayed_work(), flag
+BCACHE_DEV_WB_RUNNING is checked before. If this flag is cleared, it means
+someone is about to stop the delayed work. Because flag
+BCACHE_DEV_RATE_DW_RUNNING is set already and cancel_delayed_work_sync()
+has to wait for this flag to be cleared, we don't need to worry about race
+condition here.
+
+If update_writeback_rate() is scheduled to run after checking
+BCACHE_DEV_RATE_DW_RUNNING and before calling cancel_delayed_work_sync()
+in cancel_writeback_rate_update_dwork(), it is also safe. Because at this
+moment BCACHE_DEV_WB_RUNNING is cleared with memory barrier. As I mentioned
+previously, update_writeback_rate() will see BCACHE_DEV_WB_RUNNING is clear
+and quit immediately.
+
+Because there are more dependences inside update_writeback_rate() to struct
+cache_set memory, dc->writeback_rate_update is not a simple self re-arm
+delayed work. After trying many different methods (e.g. hold dc->count, or
+use locks), this is the only way I can find which works to properly stop
+dc->writeback_rate_update delayed work.
+
+Changelog:
+v2: Try to fix the race issue which is pointed out by Junhui.
+v1: The initial version for review
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Cc: Michael Lyle <mlyle@lyle.org>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
 ---
- drivers/nvme/target/configfs.c | 29 +++++++++++++
- drivers/nvme/target/core.c     | 95 +++++++++++++++++++++++++++++++++++++++++-
- drivers/nvme/target/io-cmd.c   |  3 ++
- drivers/nvme/target/nvmet.h    | 10 +++++
- drivers/nvme/target/rdma.c     | 39 ++++++++++++++---
- 5 files changed, 169 insertions(+), 7 deletions(-)
+ drivers/md/bcache/bcache.h    |  9 +++++----
+ drivers/md/bcache/super.c     | 39 +++++++++++++++++++++++++++++++++++----
+ drivers/md/bcache/sysfs.c     |  3 ++-
+ drivers/md/bcache/writeback.c | 29 ++++++++++++++++++++++++++++-
+ 4 files changed, 70 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/nvme/target/configfs.c b/drivers/nvme/target/configfs.c
-index e6b2d2af81b6..12933ca39e62 100644
---- a/drivers/nvme/target/configfs.c
-+++ b/drivers/nvme/target/configfs.c
-@@ -867,12 +867,41 @@ static void nvmet_port_release(struct config_item *item)
- 	kfree(port);
- }
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 5e2d4e80198e..88d938c8d027 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -258,10 +258,11 @@ struct bcache_device {
+ 	struct gendisk		*disk;
  
-+#ifdef CONFIG_PCI_P2P
-+static ssize_t nvmet_allow_p2pmem_show(struct config_item *item, char *page)
-+{
-+	return sprintf(page, "%d\n", to_nvmet_port(item)->allow_p2pmem);
-+}
-+
-+static ssize_t nvmet_allow_p2pmem_store(struct config_item *item,
-+					const char *page, size_t count)
-+{
-+	struct nvmet_port *port = to_nvmet_port(item);
-+	bool allow;
-+	int ret;
-+
-+	ret = strtobool(page, &allow);
-+	if (ret)
-+		return ret;
-+
-+	down_write(&nvmet_config_sem);
-+	port->allow_p2pmem = allow;
-+	up_write(&nvmet_config_sem);
-+
-+	return count;
-+}
-+CONFIGFS_ATTR(nvmet_, allow_p2pmem);
-+#endif /* CONFIG_PCI_P2P */
-+
- static struct configfs_attribute *nvmet_port_attrs[] = {
- 	&nvmet_attr_addr_adrfam,
- 	&nvmet_attr_addr_treq,
- 	&nvmet_attr_addr_traddr,
- 	&nvmet_attr_addr_trsvcid,
- 	&nvmet_attr_addr_trtype,
-+#ifdef CONFIG_PCI_P2P
-+	&nvmet_attr_allow_p2pmem,
-+#endif
- 	NULL,
- };
- 
-diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
-index b54748ad5f48..77d1975388da 100644
---- a/drivers/nvme/target/core.c
-+++ b/drivers/nvme/target/core.c
-@@ -15,6 +15,7 @@
- #include <linux/module.h>
- #include <linux/random.h>
- #include <linux/rculist.h>
-+#include <linux/pci-p2p.h>
- 
- #include "nvmet.h"
- 
-@@ -271,6 +272,25 @@ void nvmet_put_namespace(struct nvmet_ns *ns)
- 	percpu_ref_put(&ns->ref);
- }
- 
-+static int nvmet_p2pmem_add_client(struct nvmet_ctrl *ctrl,
-+				   struct nvmet_ns *ns)
-+{
-+	int ret;
-+
-+	if (!blk_queue_pci_p2p(ns->bdev->bd_queue)) {
-+		pr_err("p2p is not supported by %s\n",
-+		       ns->device_path);
-+		return -EINVAL;
-+	}
-+
-+	ret = pci_p2pmem_add_client(&ctrl->p2p_clients, nvmet_ns_dev(ns));
-+	if (ret)
-+		pr_err("failed to add p2pmem client %s: %d\n",
-+		       ns->device_path, ret);
-+
-+	return ret;
-+}
-+
- int nvmet_ns_enable(struct nvmet_ns *ns)
- {
- 	struct nvmet_subsys *subsys = ns->subsys;
-@@ -299,6 +319,14 @@ int nvmet_ns_enable(struct nvmet_ns *ns)
- 	if (ret)
- 		goto out_blkdev_put;
- 
-+	list_for_each_entry(ctrl, &subsys->ctrls, subsys_entry) {
-+		if (ctrl->p2p_dev) {
-+			ret = nvmet_p2pmem_add_client(ctrl, ns);
-+			if (ret)
-+				goto out_remove_clients;
-+		}
-+	}
-+
- 	if (ns->nsid > subsys->max_nsid)
- 		subsys->max_nsid = ns->nsid;
- 
-@@ -328,6 +356,9 @@ int nvmet_ns_enable(struct nvmet_ns *ns)
- out_unlock:
- 	mutex_unlock(&subsys->lock);
- 	return ret;
-+out_remove_clients:
-+	list_for_each_entry(ctrl, &subsys->ctrls, subsys_entry)
-+		pci_p2pmem_remove_client(&ctrl->p2p_clients, nvmet_ns_dev(ns));
- out_blkdev_put:
- 	blkdev_put(ns->bdev, FMODE_WRITE|FMODE_READ);
- 	ns->bdev = NULL;
-@@ -363,8 +394,10 @@ void nvmet_ns_disable(struct nvmet_ns *ns)
- 	percpu_ref_exit(&ns->ref);
- 
- 	mutex_lock(&subsys->lock);
--	list_for_each_entry(ctrl, &subsys->ctrls, subsys_entry)
-+	list_for_each_entry(ctrl, &subsys->ctrls, subsys_entry) {
-+		pci_p2pmem_remove_client(&ctrl->p2p_clients, nvmet_ns_dev(ns));
- 		nvmet_add_async_event(ctrl, NVME_AER_TYPE_NOTICE, 0, 0);
-+	}
- 
- 	if (ns->bdev)
- 		blkdev_put(ns->bdev, FMODE_WRITE|FMODE_READ);
-@@ -758,6 +791,63 @@ bool nvmet_host_allowed(struct nvmet_req *req, struct nvmet_subsys *subsys,
- 		return __nvmet_host_allowed(subsys, hostnqn);
+ 	unsigned long		flags;
+-#define BCACHE_DEV_CLOSING	0
+-#define BCACHE_DEV_DETACHING	1
+-#define BCACHE_DEV_UNLINK_DONE	2
+-
++#define BCACHE_DEV_CLOSING		0
++#define BCACHE_DEV_DETACHING		1
++#define BCACHE_DEV_UNLINK_DONE		2
++#define BCACHE_DEV_WB_RUNNING		4
++#define BCACHE_DEV_RATE_DW_RUNNING	8
+ 	unsigned		nr_stripes;
+ 	unsigned		stripe_size;
+ 	atomic_t		*stripe_sectors_dirty;
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index d14e09cce2f6..6d888e8fea8c 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -899,6 +899,32 @@ void bch_cached_dev_run(struct cached_dev *dc)
+ 		pr_debug("error creating sysfs link");
  }
  
 +/*
-+ * If allow_p2pmem is set, we will try to use P2P memory for the SGL lists for
-+ * Ι/O commands. This requires the PCI p2p device to be compatible with the
-+ * backing device for every namespace on this controller.
++ * If BCACHE_DEV_RATE_DW_RUNNING is set, it means routine of the delayed
++ * work dc->writeback_rate_update is running. Wait until the routine
++ * quits (BCACHE_DEV_RATE_DW_RUNNING is clear), then continue to
++ * cancel it. If BCACHE_DEV_RATE_DW_RUNNING is not clear after time_out
++ * seconds, give up waiting here and continue to cancel it too.
 + */
-+static void nvmet_setup_p2pmem(struct nvmet_ctrl *ctrl, struct nvmet_req *req)
++static void cancel_writeback_rate_update_dwork(struct cached_dev *dc)
 +{
-+	struct nvmet_ns *ns;
-+	int ret;
++	int time_out = WRITEBACK_RATE_UPDATE_SECS_MAX * HZ;
 +
-+	if (!req->port->allow_p2pmem || !req->p2p_client)
-+		return;
++	do {
++		if (!test_bit(BCACHE_DEV_RATE_DW_RUNNING,
++			      &dc->disk.flags))
++			break;
++		time_out--;
++		schedule_timeout_interruptible(1);
++	} while (time_out > 0);
 +
-+	mutex_lock(&ctrl->subsys->lock);
++	if (time_out == 0)
++		pr_warn("bcache: give up waiting for "
++			"dc->writeback_write_update to quit");
 +
-+	ret = pci_p2pmem_add_client(&ctrl->p2p_clients, req->p2p_client);
-+	if (ret) {
-+		pr_err("failed adding p2pmem client %s: %d\n",
-+		       dev_name(req->p2p_client), ret);
-+		goto free_devices;
-+	}
-+
-+	list_for_each_entry_rcu(ns, &ctrl->subsys->namespaces, dev_link) {
-+		ret = nvmet_p2pmem_add_client(ctrl, ns);
-+		if (ret)
-+			goto free_devices;
-+	}
-+
-+	ctrl->p2p_dev = pci_p2pmem_find(&ctrl->p2p_clients);
-+	if (!ctrl->p2p_dev) {
-+		pr_info("no supported p2pmem devices found\n");
-+		goto free_devices;
-+	}
-+	mutex_unlock(&ctrl->subsys->lock);
-+
-+	pr_info("using p2pmem on %s\n", pci_name(ctrl->p2p_dev));
-+	return;
-+
-+free_devices:
-+	pci_p2pmem_client_list_free(&ctrl->p2p_clients);
-+	mutex_unlock(&ctrl->subsys->lock);
++	cancel_delayed_work_sync(&dc->writeback_rate_update);
 +}
 +
-+static void nvmet_release_p2pmem(struct nvmet_ctrl *ctrl)
-+{
-+	if (!ctrl->p2p_dev)
-+		return;
-+
-+	mutex_lock(&ctrl->subsys->lock);
-+
-+	pci_p2pmem_client_list_free(&ctrl->p2p_clients);
-+	pci_dev_put(ctrl->p2p_dev);
-+	ctrl->p2p_dev = NULL;
-+
-+	mutex_unlock(&ctrl->subsys->lock);
-+}
-+
- u16 nvmet_alloc_ctrl(const char *subsysnqn, const char *hostnqn,
- 		struct nvmet_req *req, u32 kato, struct nvmet_ctrl **ctrlp)
+ static void cached_dev_detach_finish(struct work_struct *w)
  {
-@@ -797,6 +887,7 @@ u16 nvmet_alloc_ctrl(const char *subsysnqn, const char *hostnqn,
+ 	struct cached_dev *dc = container_of(w, struct cached_dev, detach);
+@@ -911,7 +937,9 @@ static void cached_dev_detach_finish(struct work_struct *w)
  
- 	INIT_WORK(&ctrl->async_event_work, nvmet_async_event_work);
- 	INIT_LIST_HEAD(&ctrl->async_events);
-+	INIT_LIST_HEAD(&ctrl->p2p_clients);
+ 	mutex_lock(&bch_register_lock);
  
- 	memcpy(ctrl->subsysnqn, subsysnqn, NVMF_NQN_SIZE);
- 	memcpy(ctrl->hostnqn, hostnqn, NVMF_NQN_SIZE);
-@@ -852,6 +943,7 @@ u16 nvmet_alloc_ctrl(const char *subsysnqn, const char *hostnqn,
- 		ctrl->kato = DIV_ROUND_UP(kato, 1000);
- 	}
- 	nvmet_start_keep_alive_timer(ctrl);
-+	nvmet_setup_p2pmem(ctrl, req);
- 
- 	mutex_lock(&subsys->lock);
- 	list_add_tail(&ctrl->subsys_entry, &subsys->ctrls);
-@@ -886,6 +978,7 @@ static void nvmet_ctrl_free(struct kref *ref)
- 	flush_work(&ctrl->async_event_work);
- 	cancel_work_sync(&ctrl->fatal_err_work);
- 
-+	nvmet_release_p2pmem(ctrl);
- 	ida_simple_remove(&cntlid_ida, ctrl->cntlid);
- 	nvmet_subsys_put(subsys);
- 
-diff --git a/drivers/nvme/target/io-cmd.c b/drivers/nvme/target/io-cmd.c
-index 0a4372a016f2..c05368c6579c 100644
---- a/drivers/nvme/target/io-cmd.c
-+++ b/drivers/nvme/target/io-cmd.c
-@@ -56,6 +56,9 @@ static void nvmet_execute_rw(struct nvmet_req *req)
- 		op = REQ_OP_READ;
- 	}
- 
-+	if (is_pci_p2p_page(sg_page(req->sg)))
-+		op_flags |= REQ_PCI_P2P;
+-	cancel_delayed_work_sync(&dc->writeback_rate_update);
++	if (test_and_clear_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags))
++		cancel_writeback_rate_update_dwork(dc);
 +
- 	sector = le64_to_cpu(req->cmd->rw.slba);
- 	sector <<= (req->ns->blksize_shift - 9);
+ 	if (!IS_ERR_OR_NULL(dc->writeback_thread)) {
+ 		kthread_stop(dc->writeback_thread);
+ 		dc->writeback_thread = NULL;
+@@ -954,6 +982,7 @@ void bch_cached_dev_detach(struct cached_dev *dc)
+ 	closure_get(&dc->disk.cl);
  
-diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
-index 417f6c0331cc..85a170914588 100644
---- a/drivers/nvme/target/nvmet.h
-+++ b/drivers/nvme/target/nvmet.h
-@@ -64,6 +64,11 @@ static inline struct nvmet_ns *to_nvmet_ns(struct config_item *item)
- 	return container_of(to_config_group(item), struct nvmet_ns, group);
+ 	bch_writeback_queue(dc);
++
+ 	cached_dev_put(dc);
  }
  
-+static inline struct device *nvmet_ns_dev(struct nvmet_ns *ns)
-+{
-+	return disk_to_dev(ns->bdev->bd_disk);
-+}
+@@ -1079,14 +1108,16 @@ static void cached_dev_free(struct closure *cl)
+ {
+ 	struct cached_dev *dc = container_of(cl, struct cached_dev, disk.cl);
+ 
+-	cancel_delayed_work_sync(&dc->writeback_rate_update);
++	mutex_lock(&bch_register_lock);
 +
- struct nvmet_cq {
- 	u16			qid;
- 	u16			size;
-@@ -98,6 +103,7 @@ struct nvmet_port {
- 	struct list_head		referrals;
- 	void				*priv;
- 	bool				enabled;
-+	bool				allow_p2pmem;
- };
- 
- static inline struct nvmet_port *to_nvmet_port(struct config_item *item)
-@@ -131,6 +137,8 @@ struct nvmet_ctrl {
- 	struct work_struct	fatal_err_work;
- 
- 	struct nvmet_fabrics_ops *ops;
-+	struct pci_dev		*p2p_dev;
-+	struct list_head	p2p_clients;
- 
- 	char			subsysnqn[NVMF_NQN_FIELD_LEN];
- 	char			hostnqn[NVMF_NQN_FIELD_LEN];
-@@ -232,6 +240,8 @@ struct nvmet_req {
- 
- 	void (*execute)(struct nvmet_req *req);
- 	struct nvmet_fabrics_ops *ops;
++	if (test_and_clear_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags))
++		cancel_writeback_rate_update_dwork(dc);
 +
-+	struct device *p2p_client;
- };
+ 	if (!IS_ERR_OR_NULL(dc->writeback_thread))
+ 		kthread_stop(dc->writeback_thread);
+ 	if (dc->writeback_write_wq)
+ 		destroy_workqueue(dc->writeback_write_wq);
  
- static inline void nvmet_set_status(struct nvmet_req *req, u16 status)
-diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
-index d4d0662ab071..fb4a7fa03015 100644
---- a/drivers/nvme/target/rdma.c
-+++ b/drivers/nvme/target/rdma.c
-@@ -23,6 +23,7 @@
- #include <linux/string.h>
- #include <linux/wait.h>
- #include <linux/inet.h>
-+#include <linux/pci-p2p.h>
- #include <asm/unaligned.h>
+-	mutex_lock(&bch_register_lock);
+-
+ 	if (atomic_read(&dc->running))
+ 		bd_unlink_disk_holder(dc->bdev, dc->disk.disk);
+ 	bcache_device_free(&dc->disk);
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index a74a752c9e0f..b7166c504cdb 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -304,7 +304,8 @@ STORE(bch_cached_dev)
+ 		bch_writeback_queue(dc);
  
- #include <rdma/ib_verbs.h>
-@@ -68,6 +69,7 @@ struct nvmet_rdma_rsp {
- 	u8			n_rdma;
- 	u32			flags;
- 	u32			invalidate_rkey;
-+	struct pci_dev		*p2p_dev;
+ 	if (attr == &sysfs_writeback_percent)
+-		schedule_delayed_work(&dc->writeback_rate_update,
++		if (!test_and_set_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags))
++			schedule_delayed_work(&dc->writeback_rate_update,
+ 				      dc->writeback_rate_update_seconds * HZ);
  
- 	struct list_head	wait_list;
- 	struct list_head	free_list;
-@@ -480,11 +482,18 @@ static void nvmet_rdma_release_rsp(struct nvmet_rdma_rsp *rsp)
- 	if (rsp->n_rdma) {
- 		rdma_rw_ctx_destroy(&rsp->rw, queue->cm_id->qp,
- 				queue->cm_id->port_num, rsp->req.sg,
--				rsp->req.sg_cnt, nvmet_data_dir(&rsp->req), 0);
-+				rsp->req.sg_cnt, nvmet_data_dir(&rsp->req),
-+				rsp->p2p_dev ? RDMA_RW_CTX_FLAG_PCI_P2P : 0);
+ 	mutex_unlock(&bch_register_lock);
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index 4dbeaaa575bf..8f98ef1038d3 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -115,6 +115,21 @@ static void update_writeback_rate(struct work_struct *work)
+ 					     struct cached_dev,
+ 					     writeback_rate_update);
+ 
++	/*
++	 * should check BCACHE_DEV_RATE_DW_RUNNING before calling
++	 * cancel_delayed_work_sync().
++	 */
++	set_bit(BCACHE_DEV_RATE_DW_RUNNING, &dc->disk.flags);
++	/* paired with where BCACHE_DEV_RATE_DW_RUNNING is tested */
++	smp_mb();
++
++	if (!test_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags)) {
++		clear_bit(BCACHE_DEV_RATE_DW_RUNNING, &dc->disk.flags);
++		/* paired with where BCACHE_DEV_RATE_DW_RUNNING is tested */
++		smp_mb();
++		return;
++	}
++
+ 	down_read(&dc->writeback_lock);
+ 
+ 	if (atomic_read(&dc->has_dirty) &&
+@@ -123,8 +138,18 @@ static void update_writeback_rate(struct work_struct *work)
+ 
+ 	up_read(&dc->writeback_lock);
+ 
+-	schedule_delayed_work(&dc->writeback_rate_update,
++	if (test_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags)) {
++		schedule_delayed_work(&dc->writeback_rate_update,
+ 			      dc->writeback_rate_update_seconds * HZ);
++	}
++
++	/*
++	 * should check BCACHE_DEV_RATE_DW_RUNNING before calling
++	 * cancel_delayed_work_sync().
++	 */
++	clear_bit(BCACHE_DEV_RATE_DW_RUNNING, &dc->disk.flags);
++	/* paired with where BCACHE_DEV_RATE_DW_RUNNING is tested */
++	smp_mb();
+ }
+ 
+ static unsigned writeback_delay(struct cached_dev *dc, unsigned sectors)
+@@ -675,6 +700,7 @@ void bch_cached_dev_writeback_init(struct cached_dev *dc)
+ 	dc->writeback_rate_p_term_inverse = 40;
+ 	dc->writeback_rate_i_term_inverse = 10000;
+ 
++	WARN_ON(test_and_clear_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags));
+ 	INIT_DELAYED_WORK(&dc->writeback_rate_update, update_writeback_rate);
+ }
+ 
+@@ -693,6 +719,7 @@ int bch_cached_dev_writeback_start(struct cached_dev *dc)
+ 		return PTR_ERR(dc->writeback_thread);
  	}
  
--	if (rsp->req.sg != &rsp->cmd->inline_sg)
--		nvmet_rdma_free_sgl(rsp->req.sg, rsp->req.sg_cnt);
-+	if (rsp->req.sg != &rsp->cmd->inline_sg) {
-+		if (rsp->p2p_dev)
-+			pci_p2pmem_free_sgl(rsp->p2p_dev, rsp->req.sg,
-+					    rsp->req.sg_cnt);
-+		else
-+			nvmet_rdma_free_sgl(rsp->req.sg, rsp->req.sg_cnt);
-+
-+	}
++	WARN_ON(test_and_set_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags));
+ 	schedule_delayed_work(&dc->writeback_rate_update,
+ 			      dc->writeback_rate_update_seconds * HZ);
  
- 	if (unlikely(!list_empty_careful(&queue->rsp_wr_wait_list)))
- 		nvmet_rdma_process_wr_wait_list(queue);
-@@ -620,6 +629,7 @@ static u16 nvmet_rdma_map_sgl_keyed(struct nvmet_rdma_rsp *rsp,
- 	u64 addr = le64_to_cpu(sgl->addr);
- 	u32 len = get_unaligned_le24(sgl->length);
- 	u32 key = get_unaligned_le32(sgl->key);
-+	struct pci_dev *p2p_dev = NULL;
- 	int ret;
- 	u16 status;
- 
-@@ -627,14 +637,29 @@ static u16 nvmet_rdma_map_sgl_keyed(struct nvmet_rdma_rsp *rsp,
- 	if (!len)
- 		return 0;
- 
--	status = nvmet_rdma_alloc_sgl(&rsp->req.sg, &rsp->req.sg_cnt,
--			len);
-+	if (rsp->queue->nvme_sq.ctrl)
-+		p2p_dev = rsp->queue->nvme_sq.ctrl->p2p_dev;
-+
-+	rsp->p2p_dev = NULL;
-+	if (rsp->queue->nvme_sq.qid && p2p_dev) {
-+		status = pci_p2pmem_alloc_sgl(p2p_dev, &rsp->req.sg,
-+					      &rsp->req.sg_cnt, len);
-+		if (!status)
-+			rsp->p2p_dev = p2p_dev;
-+	}
-+
-+	if (!rsp->p2p_dev) {
-+		status = nvmet_rdma_alloc_sgl(&rsp->req.sg, &rsp->req.sg_cnt,
-+				len);
-+	}
-+
- 	if (status)
- 		return status;
- 
- 	ret = rdma_rw_ctx_init(&rsp->rw, cm_id->qp, cm_id->port_num,
- 			rsp->req.sg, rsp->req.sg_cnt, 0, addr, key,
--			nvmet_data_dir(&rsp->req), 0);
-+			nvmet_data_dir(&rsp->req),
-+			rsp->p2p_dev ? RDMA_RW_CTX_FLAG_PCI_P2P : 0);
- 	if (ret < 0)
- 		return NVME_SC_INTERNAL;
- 	rsp->req.transfer_len += len;
-@@ -713,6 +738,8 @@ static void nvmet_rdma_handle_command(struct nvmet_rdma_queue *queue,
- 		cmd->send_sge.addr, cmd->send_sge.length,
- 		DMA_TO_DEVICE);
- 
-+	cmd->req.p2p_client = &queue->dev->device->dev;
-+
- 	if (!nvmet_req_init(&cmd->req, &queue->nvme_cq,
- 			&queue->nvme_sq, &nvmet_rdma_ops))
- 		return;
 -- 
-2.11.0
+2.15.1
