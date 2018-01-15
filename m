@@ -1,93 +1,55 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59612 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754951AbeAOQ6s (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jan 2018 11:58:48 -0500
+Return-Path: <ming.lei@redhat.com>
+Date: Mon, 15 Jan 2018 23:33:01 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Mike Snitzer <snitzer@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 2/3] blk-mq: return dispatch result to caller in blk_mq_try_issue_directly
-Date: Tue, 16 Jan 2018 00:58:09 +0800
-Message-Id: <20180115165810.2515-3-ming.lei@redhat.com>
-In-Reply-To: <20180115165810.2515-1-ming.lei@redhat.com>
-References: <20180115165810.2515-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
+	Alasdair G Kergon <agk@redhat.com>,
+	Linux-Next Mailing List <linux-next@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Laurence Oberman <loberman@redhat.com>, axboe@kernel.dk,
+	linux-block@vger.kernel.org, hch@lst.de
+Subject: Re: 4.16 genirq change prevents HP servers from booting [was: Re:
+ linux-next: Signed-off-by missing for commit in the device-mapper tree]
+Message-ID: <20180115153300.GB13816@ming.t460p>
+References: <20180116002736.4d464214@canb.auug.org.au>
+ <20180115152501.GA24239@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180115152501.GA24239@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-In the following patch, we will use blk_mq_try_issue_directly() for DM
-to return the dispatch result, and DM need this informatin to improve
-IO merge.
+On Mon, Jan 15, 2018 at 10:25:01AM -0500, Mike Snitzer wrote:
+> On Mon, Jan 15 2018 at  8:27am -0500,
+> Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+> 
+> > Hi all,
+> > 
+> > Commit
+> > 
+> >   34e1467da673 ("Revert "genirq/affinity: assign vectors to all possible CPUs"")
+> > 
+> > is missing a Signed-off-by from its author and committer.
+> > 
+> > Reverts are commits as well.
+> 
+> Right, I'm aware.  I staged the tree that made some HP servers finally
+> work with the latest linux-block 4.16 changes.  Without thinking about
+> the broader implications.  Anyway, I'll drop the revert from
+> linux-dm.git's 'for-next'.
+> 
+> Because I'm confident others will hunt down the irq issues.
+> 
+> I think Ming was looking to grab the queue mapping info and CPU related
+> info from the affected server.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 23 ++++++++++++++---------
- 1 file changed, 14 insertions(+), 9 deletions(-)
+Hi Mike,
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index bf8d6651f40e..1654c9c284d8 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1722,13 +1722,13 @@ static blk_status_t __blk_mq_issue_req(struct blk_mq_hw_ctx *hctx,
- 	return ret;
- }
- 
--static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
--					struct request *rq,
--					blk_qc_t *cookie)
-+static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-+						struct request *rq,
-+						blk_qc_t *cookie)
- {
- 	struct request_queue *q = rq->q;
- 	blk_qc_t new_cookie;
--	blk_status_t ret;
-+	blk_status_t ret = BLK_STS_OK;
- 	bool run_queue = true;
- 
- 	/* RCU or SRCU read lock is needed before checking quiesced flag */
-@@ -1752,31 +1752,36 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	switch (ret) {
- 	case BLK_STS_OK:
- 		*cookie = new_cookie;
--		return;
-+		return ret;
- 	case BLK_STS_RESOURCE:
- 		__blk_mq_requeue_request(rq);
- 		goto insert;
- 	default:
- 		*cookie = BLK_QC_T_NONE;
- 		blk_mq_end_request(rq, ret);
--		return;
-+		return ret;
- 	}
- 
- insert:
- 	blk_mq_sched_insert_request(rq, false, run_queue, false,
- 					hctx->flags & BLK_MQ_F_BLOCKING);
-+	return ret;
- }
- 
--static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
--		struct request *rq, blk_qc_t *cookie)
-+static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-+					      struct request *rq,
-+					      blk_qc_t *cookie)
- {
- 	int srcu_idx;
-+	blk_status_t ret;
- 
- 	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
- 
- 	hctx_lock(hctx, &srcu_idx);
--	__blk_mq_try_issue_directly(hctx, rq, cookie);
-+	ret = __blk_mq_try_issue_directly(hctx, rq, cookie);
- 	hctx_unlock(hctx, srcu_idx);
-+
-+	return ret;
- }
- 
- static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+I have cooked a fix today, please see the following link:
+
+	https://marc.info/?l=linux-kernel&m=151601867018444&w=2
+
+This issue is clear, and has been described in above link and the
+patch. If no objection, I will prepare a formal version.
+
 -- 
-2.9.5
+Ming
