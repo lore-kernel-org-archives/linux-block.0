@@ -1,108 +1,50 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:45132 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:33294 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755040AbeAOQ7C (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jan 2018 11:59:02 -0500
+        id S1752400AbeAOQ60 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 Jan 2018 11:58:26 -0500
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
 Cc: Mike Snitzer <snitzer@redhat.com>,
         Christoph Hellwig <hch@infradead.org>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 3/3] blk-mq: issue request directly for blk_insert_cloned_request
-Date: Tue, 16 Jan 2018 00:58:10 +0800
-Message-Id: <20180115165810.2515-4-ming.lei@redhat.com>
-In-Reply-To: <20180115165810.2515-1-ming.lei@redhat.com>
-References: <20180115165810.2515-1-ming.lei@redhat.com>
+Subject: [PATCH V4 0/3] blk-mq: issue request directly for blk_insert_cloned_request
+Date: Tue, 16 Jan 2018 00:58:07 +0800
+Message-Id: <20180115165810.2515-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-blk_insert_cloned_request() is called in fast path of dm-rq driver, and
-in this function we append request to hctx->dispatch_list of the underlying
-queue directly.
+Hi Guys,
 
-1) This way isn't efficient enough because hctx lock is always required
+The 3 paches changes the blk-mq part of blk_insert_cloned_request(),
+in which we switch to blk_mq_try_issue_directly(), so that both dm-rq
+and blk-mq can get the dispatch result of underlying queue, and with
+this information, blk-mq can handle IO merge much better, then
+sequential I/O performance is improved much.
 
-2) With blk_insert_cloned_request(), we bypass underlying queue's IO scheduler
-totally, and depend on DM rq driver to do IO schedule completely. But DM
-rq driver can't get underlying queue's dispatch feedback at all, and this
-information is extreamly useful for IO merge. Without that IO merge can't
-be done basically by blk-mq, and causes very bad sequential IO performance.
+In my dm-mpath over virtio-scsi test, this whole patchset improves
+sequential IO by 3X ~ 5X.
 
-This patch makes use of blk_mq_try_issue_directly() to dispatch rq to
-underlying queue and provides disptch result to dm-rq and blk-mq, and
-improves the above situations very much.
+V4:
+	- remove dm patches which are in DM tree already
+	- cleanup __blk_mq_issue_req as suggested by Jens
 
-With this patch, seqential IO is improved by 3X in my test over
-mpath/virtio-scsi.
+V3:
+	- rebase on the latest for-4.16/block of block tree
+	- add missed pg_init_all_paths() in patch 1, according to Bart's review
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 29 ++++++++++++++++++++++++++---
- 1 file changed, 26 insertions(+), 3 deletions(-)
+V2:
+	- drop 'dm-mpath: cache ti->clone during requeue', which is a bit
+	too complicated, and not see obvious performance improvement.
+	- make change on blk-mq part cleaner
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1654c9c284d8..ce3965f271e3 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1730,6 +1730,11 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	blk_qc_t new_cookie;
- 	blk_status_t ret = BLK_STS_OK;
- 	bool run_queue = true;
-+	/*
-+	 * This function is called from blk_insert_cloned_request() if
-+	 * 'cookie' is NULL, and for dispatching this request only.
-+	 */
-+	bool dispatch_only = !cookie;
- 
- 	/* RCU or SRCU read lock is needed before checking quiesced flag */
- 	if (blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)) {
-@@ -1737,10 +1742,17 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 		goto insert;
- 	}
- 
--	if (q->elevator)
-+	if (q->elevator && !dispatch_only)
- 		goto insert;
- 
- 	ret = __blk_mq_issue_req(hctx, rq, &new_cookie);
-+	if (dispatch_only) {
-+		if (ret == BLK_STS_AGAIN)
-+			return BLK_STS_RESOURCE;
-+		if (ret == BLK_STS_RESOURCE)
-+			__blk_mq_requeue_request(rq);
-+		return ret;
-+	}
- 	if (ret == BLK_STS_AGAIN)
- 		goto insert;
- 
-@@ -1763,8 +1775,11 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	}
- 
- insert:
--	blk_mq_sched_insert_request(rq, false, run_queue, false,
--					hctx->flags & BLK_MQ_F_BLOCKING);
-+	if (!dispatch_only)
-+		blk_mq_sched_insert_request(rq, false, run_queue, false,
-+				hctx->flags & BLK_MQ_F_BLOCKING);
-+	else
-+		blk_mq_request_bypass_insert(rq, run_queue);
- 	return ret;
- }
- 
-@@ -1784,6 +1799,14 @@ static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	return ret;
- }
- 
-+blk_status_t blk_mq_request_direct_issue(struct request *rq)
-+{
-+	struct blk_mq_ctx *ctx = rq->mq_ctx;
-+	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(rq->q, ctx->cpu);
-+
-+	return blk_mq_try_issue_directly(hctx, rq, NULL);
-+}
-+
- static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- {
- 	const int is_sync = op_is_sync(bio->bi_opf);
+Ming Lei (3):
+  blk-mq: move actual issue into one helper
+  blk-mq: return dispatch result to caller in blk_mq_try_issue_directly
+  blk-mq: issue request directly for blk_insert_cloned_request
+
+ block/blk-mq.c | 85 +++++++++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 64 insertions(+), 21 deletions(-)
+
 -- 
 2.9.5
