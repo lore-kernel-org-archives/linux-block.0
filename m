@@ -1,28 +1,23 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:42194 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751113AbeAPBgc (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jan 2018 20:36:32 -0500
-Date: Tue, 16 Jan 2018 09:36:16 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Mike Snitzer <snitzer@redhat.com>
-Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
+Return-Path: <msnitzer@redhat.com>
+Date: Mon, 15 Jan 2018 14:41:12 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>
 Subject: Re: [PATCH V4 1/3] blk-mq: move actual issue into one helper
-Message-ID: <20180116013615.GC3213@ming.t460p>
+Message-ID: <20180115194112.GA25341@redhat.com>
 References: <20180115165810.2515-1-ming.lei@redhat.com>
  <20180115165810.2515-2-ming.lei@redhat.com>
- <20180115171547.GA24260@redhat.com>
+ <2b698c6c-9d9d-8555-7fe8-272bcdd65086@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180115171547.GA24260@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <2b698c6c-9d9d-8555-7fe8-272bcdd65086@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jan 15, 2018 at 12:15:47PM -0500, Mike Snitzer wrote:
-> On Mon, Jan 15 2018 at 11:58am -0500,
-> Ming Lei <ming.lei@redhat.com> wrote:
-> 
+On Mon, Jan 15 2018 at 12:29pm -0500,
+Jens Axboe <axboe@kernel.dk> wrote:
+
+> On 1/15/18 9:58 AM, Ming Lei wrote:
 > > No functional change, just to clean up code a bit, so that the following
 > > change of using direct issue for blk_mq_request_bypass_insert() which is
 > > needed by DM can be easier to do.
@@ -67,29 +62,31 @@ On Mon, Jan 15, 2018 at 12:15:47PM -0500, Mike Snitzer wrote:
 > > +	ret = q->mq_ops->queue_rq(hctx, &bd);
 > > +
 > > +	return ret;
-> > +}
-> > +
-> > +static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-> > +					struct request *rq,
-> > +					blk_qc_t *cookie)
-> > +{
-> > +	struct request_queue *q = rq->q;
-> >  	blk_qc_t new_cookie;
-> >  	blk_status_t ret;
-> >  	bool run_queue = true;
-> > @@ -1718,22 +1740,15 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-> >  	if (q->elevator)
-> >  		goto insert;
-> >  
-> > -	if (!blk_mq_get_driver_tag(rq, NULL, false))
-> > +	ret = __blk_mq_issue_req(hctx, rq, &new_cookie);
-> > +	if (ret == BLK_STS_AGAIN)
-> >  		goto insert;
 > 
-> You're (ab)using BLK_STS_AGAIN as a means to an end...
-> But what if in the future q->mq_ops->queue_rq() returns BLK_STS_AGAIN?
+> 	return q->mq_ops->queue_rq(hctx, &bd);
+> 
+> and kill 'ret', it's not used.
 
-Yeah, but now only dio uses that, so I let Jens decide it.
+Yeap, good point.
 
--- 
-Ming
+> But more importantly, who puts the
+> driver tag and the budget if we get != OK for ->queue_rq()?
+
+__blk_mq_try_issue_directly() processes the returned value same as before
+this patch.  Means this patch isn't making any functional change:
+If BLK_STS_RESOURCE: __blk_mq_requeue_request() is called.
+__blk_mq_requeue_request() will blk_mq_put_driver_tag().
+Otherwise, all other errors result in blk_mq_end_request(rq, ret);
+
+So ignoring this patch, are you concerned that:
+1) Does blk_mq_end_request() put both?  Looks like blk_mq_free_request()
+handles rq->tag != -1 but why not have it use __blk_mq_put_driver_tag()?
+I'm not seeing where the budget is put from blk_mq_end_request()...
+
+2) Nothing seems to be putting the budget in
+__blk_mq_try_issue_directly()'s BLK_STS_RESOURCE error path?  I share
+your concern now (for drivers who set {get,put}_budget in mq_ops).
+Should __blk_mq_requeue_request() be updated to also
+blk_mq_put_dispatch_budget()?
+
+Mike
