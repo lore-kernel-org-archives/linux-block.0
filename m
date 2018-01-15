@@ -1,30 +1,93 @@
-Return-Path: <BATV+b628242e4f103a69f336+5255+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Fri, 12 Jan 2018 16:09:13 +0100
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
-Subject: [GIT PULL] one nvme fix for Linux 4.15
-Message-ID: <20180112150913.yu6cs6xzn5vue3v3@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:59612 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754951AbeAOQ6s (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 Jan 2018 11:58:48 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
+Cc: Mike Snitzer <snitzer@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 2/3] blk-mq: return dispatch result to caller in blk_mq_try_issue_directly
+Date: Tue, 16 Jan 2018 00:58:09 +0800
+Message-Id: <20180115165810.2515-3-ming.lei@redhat.com>
+In-Reply-To: <20180115165810.2515-1-ming.lei@redhat.com>
+References: <20180115165810.2515-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The following changes since commit 254beb84faccbe2f4eda0b51924857bdfb679969:
+In the following patch, we will use blk_mq_try_issue_directly() for DM
+to return the dispatch result, and DM need this informatin to improve
+IO merge.
 
-  nvme-fcloop: avoid possible uninitialized variable warning (2017-12-29 10:37:21 +0100)
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
 
-are available in the git repository at:
-
-  git://git.infradead.org/nvme.git nvme-4.15
-
-for you to fetch changes up to 6b018235b4daabae96d855219fae59c3fb8be417:
-
-  nvme-fabrics: initialize default host->id in nvmf_host_default() (2018-01-08 10:52:03 +0100)
-
-----------------------------------------------------------------
-Ewan D. Milne (1):
-      nvme-fabrics: initialize default host->id in nvmf_host_default()
-
- drivers/nvme/host/fabrics.c | 1 +
- 1 file changed, 1 insertion(+)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index bf8d6651f40e..1654c9c284d8 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1722,13 +1722,13 @@ static blk_status_t __blk_mq_issue_req(struct blk_mq_hw_ctx *hctx,
+ 	return ret;
+ }
+ 
+-static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+-					struct request *rq,
+-					blk_qc_t *cookie)
++static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
++						struct request *rq,
++						blk_qc_t *cookie)
+ {
+ 	struct request_queue *q = rq->q;
+ 	blk_qc_t new_cookie;
+-	blk_status_t ret;
++	blk_status_t ret = BLK_STS_OK;
+ 	bool run_queue = true;
+ 
+ 	/* RCU or SRCU read lock is needed before checking quiesced flag */
+@@ -1752,31 +1752,36 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	switch (ret) {
+ 	case BLK_STS_OK:
+ 		*cookie = new_cookie;
+-		return;
++		return ret;
+ 	case BLK_STS_RESOURCE:
+ 		__blk_mq_requeue_request(rq);
+ 		goto insert;
+ 	default:
+ 		*cookie = BLK_QC_T_NONE;
+ 		blk_mq_end_request(rq, ret);
+-		return;
++		return ret;
+ 	}
+ 
+ insert:
+ 	blk_mq_sched_insert_request(rq, false, run_queue, false,
+ 					hctx->flags & BLK_MQ_F_BLOCKING);
++	return ret;
+ }
+ 
+-static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+-		struct request *rq, blk_qc_t *cookie)
++static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
++					      struct request *rq,
++					      blk_qc_t *cookie)
+ {
+ 	int srcu_idx;
++	blk_status_t ret;
+ 
+ 	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
+ 
+ 	hctx_lock(hctx, &srcu_idx);
+-	__blk_mq_try_issue_directly(hctx, rq, cookie);
++	ret = __blk_mq_try_issue_directly(hctx, rq, cookie);
+ 	hctx_unlock(hctx, srcu_idx);
++
++	return ret;
+ }
+ 
+ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+-- 
+2.9.5
