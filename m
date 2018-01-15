@@ -1,55 +1,103 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f66.google.com ([209.85.215.66]:36150 "EHLO
-        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752421AbeA3N0R (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jan 2018 08:26:17 -0500
-Received: by mail-lf0-f66.google.com with SMTP id t79so15333767lfe.3
-        for <linux-block@vger.kernel.org>; Tue, 30 Jan 2018 05:26:16 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [PATCH 2/2] lightnvm: remove multiple groups in 1.2 data structure
-Date: Tue, 30 Jan 2018 14:26:05 +0100
-Message-Id: <20180130132605.28635-2-m@bjorling.me>
-In-Reply-To: <20180130132605.28635-1-m@bjorling.me>
-References: <20180130132605.28635-1-m@bjorling.me>
+Return-Path: <linux-ide-owner@vger.kernel.org>
+Date: Mon, 15 Jan 2018 11:39:52 -0500
+From: Johannes Weiner <hannes@cmpxchg.org>
+To: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-ide@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Cc: lsf-pc@lists.linux-foundation.org
+Subject: LSF/MM 2018: Call for Proposals
+Message-ID: <20180115163952.GB26120@cmpxchg.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-ide-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Only one id group from the 1.2 specification is supported. Make
-sure that only the first group is accessible.
+The annual Linux Storage, Filesystem and Memory Management (LSF/MM)
+Summit for 2018 will be held from April 23-25 at the Deer Valley
+Lodges in Park City, Utah. LSF/MM is an invitation-only technical
+workshop to map out improvements to the Linux storage, filesystem and
+memory management subsystems that will make their way into the
+mainline kernel within the coming years.
 
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/nvme/host/lightnvm.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+	http://events.linuxfoundation.org/events/linux-storage-filesystem-and-mm-summit
 
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index 16906327645e..e5544806fb0e 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -167,7 +167,8 @@ struct nvme_nvm_id {
- 	__le32			dom;
- 	struct nvme_nvm_addr_format ppaf;
- 	__u8			resv[228];
--	struct nvme_nvm_id_group groups[4];
-+	struct nvme_nvm_id_group group;
-+	__u8			resv2[2880];
- } __packed;
- 
- struct nvme_nvm_bb_tbl {
-@@ -209,7 +210,7 @@ static int init_grps(struct nvm_id *nvm_id, struct nvme_nvm_id *nvme_nvm_id)
- 	if (nvme_nvm_id->cgrps != 1)
- 		return -EINVAL;
- 
--	src = &nvme_nvm_id->groups[0];
-+	src = &nvme_nvm_id->group;
- 	grp = &nvm_id->grp;
- 
- 	grp->mtype = src->mtype;
--- 
-2.11.0
+LSF/MM 2018 will be a three day, stand-alone conference with three
+subsystem-specific tracks, cross-track discussions, as well as BoF and
+hacking sessions.
+
+On behalf of the committee I am issuing a call for agenda proposals
+that are suitable for cross-track discussion as well as technical
+subjects for the breakout sessions.
+
+If advance notice is required for visa applications then please point
+that out in your proposal or request to attend, and submit the topic
+as soon as possible.
+
+1) Proposals for agenda topics should be sent before January 31st,
+2018 to:
+
+	lsf-pc@lists.linux-foundation.org
+
+and CC the mailing lists that are relevant for the topic in question:
+
+	FS:	linux-fsdevel@vger.kernel.org
+	MM:	linux-mm@kvack.org
+	Block:	linux-block@vger.kernel.org
+	ATA:	linux-ide@vger.kernel.org
+	SCSI:	linux-scsi@vger.kernel.org
+	NVMe:	linux-nvme@lists.infradead.org
+
+Please tag your proposal with [LSF/MM TOPIC] to make it easier to
+track. In addition, please make sure to start a new thread for each
+topic rather than following up to an existing one. Agenda topics and
+attendees will be selected by the program committee, but the final
+agenda will be formed by consensus of the attendees on the day.
+
+2) Requests to attend the summit for those that are not proposing a
+topic should be sent to:
+
+	lsf-pc@lists.linux-foundation.org
+
+Please summarize what expertise you will bring to the meeting, and
+what you would like to discuss. Please also tag your email with
+[LSF/MM ATTEND] and send it as a new thread so there is less chance of
+it getting lost.
+
+We will try to cap attendance at around 25-30 per track to facilitate
+discussions although the final numbers will depend on the room sizes
+at the venue.
+
+For discussion leaders, slides and visualizations are encouraged to
+outline the subject matter and focus the discussions. Please refrain
+from lengthy presentations and talks; the sessions are supposed to be
+interactive, inclusive discussions.
+
+There will be no recording or audio bridge. However, we expect that
+written minutes will be published as we did in previous years:
+
+2017: https://lwn.net/Articles/lsfmm2017/
+
+2016: https://lwn.net/Articles/lsfmm2016/
+
+2015: https://lwn.net/Articles/lsfmm2015/
+
+2014: http://lwn.net/Articles/LSFMM2014/
+
+2013: http://lwn.net/Articles/548089/
+
+3) If you have feedback on last year's meeting that we can use to
+improve this year's, please also send that to:
+
+	lsf-pc@lists.linux-foundation.org
+
+Thank you on behalf of the program committee:
+
+	Anna Schumaker (Filesystems)
+	Jens Axboe (Storage)
+	Josef Bacik (Filesystems)
+	Martin K. Petersen (Storage)
+	Michal Hocko (MM)
+	Rik van Riel (MM)
+
+Johannes Weiner
