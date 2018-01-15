@@ -1,50 +1,78 @@
-Return-Path: <msnitzer@redhat.com>
-Date: Mon, 15 Jan 2018 12:29:29 -0500
-From: Mike Snitzer <snitzer@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "axboe@kernel.dk" <axboe@kernel.dk>,
-	"dm-devel@redhat.com" <dm-devel@redhat.com>,
-	"hare@suse.de" <hare@suse.de>,
-	"tom.leiming@gmail.com" <tom.leiming@gmail.com>,
-	"djeffery@redhat.com" <djeffery@redhat.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Return-Path: <prvs=5462a50b7=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "snitzer@redhat.com" <snitzer@redhat.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
+CC: "dm-devel@redhat.com" <dm-devel@redhat.com>, "hare@suse.de"
+	<hare@suse.de>, "tom.leiming@gmail.com" <tom.leiming@gmail.com>,
+	"djeffery@redhat.com" <djeffery@redhat.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>
 Subject: Re: [for-4.16 PATCH v5 0/4] block/dm: allow DM to defer
  blk_register_queue() until ready
-Message-ID: <20180115172928.GB24260@redhat.com>
+Date: Mon, 15 Jan 2018 17:16:53 +0000
+Message-ID: <1516036612.10386.2.camel@wdc.com>
 References: <20180112150606.6037-1-snitzer@redhat.com>
- <1516036612.10386.2.camel@wdc.com>
+In-Reply-To: <20180112150606.6037-1-snitzer@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1516036612.10386.2.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jan 15 2018 at 12:16pm -0500,
-Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
-
-> On Fri, 2018-01-12 at 10:06 -0500, Mike Snitzer wrote:
-> > I'm submitting this v5 with more feeling now ;)
-> 
-> Hello Mike,
-> 
-> Have these patches been tested with lockdep enabled? The following appeared in
-> the kernel log when after I started testing Jens' for-next tree of this morning:
-
-So you replied to v5, I emailed a v6 out for the relevant patch.  Just
-want to make sure you're testing with either Jens' latest tree or are
-using my v6 that fixed blk_mq_unregister_dev() to require caller holds
-q->sysfs_lock ?
-
-With the latest code that Jens merged, I do have lockdep enabled in my
-kernel... but haven't seen any issues on the 2 testbeds I've been
-hammering the changes on.
-
-Ming was concerned about the potential for a lockdep splat (said he
-tried expanding the scope of q->sysfs_lock in blk_unregister_queue
-before and in doing so got lockdep to trigger).
-
-Once you respond with what it is you're testing, and if it is latest
-code, I'll look closer at what you've provided and see if it is real or
-that lockdep just needs some training.
-
-Thanks,
-Mike
+T24gRnJpLCAyMDE4LTAxLTEyIGF0IDEwOjA2IC0wNTAwLCBNaWtlIFNuaXR6ZXIgd3JvdGU6DQo+
+IEknbSBzdWJtaXR0aW5nIHRoaXMgdjUgd2l0aCBtb3JlIGZlZWxpbmcgbm93IDspDQoNCkhlbGxv
+IE1pa2UsDQoNCkhhdmUgdGhlc2UgcGF0Y2hlcyBiZWVuIHRlc3RlZCB3aXRoIGxvY2tkZXAgZW5h
+YmxlZD8gVGhlIGZvbGxvd2luZyBhcHBlYXJlZCBpbg0KdGhlIGtlcm5lbCBsb2cgd2hlbiBhZnRl
+ciBJIHN0YXJ0ZWQgdGVzdGluZyBKZW5zJyBmb3ItbmV4dCB0cmVlIG9mIHRoaXMgbW9ybmluZzoN
+Cg0KPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+DQpXQVJOSU5HOiBwb3NzaWJsZSBjaXJjdWxhciBsb2NraW5nIGRlcGVuZGVuY3kgZGV0ZWN0ZWQN
+CjQuMTUuMC1yYzctZGJnKyAjMSBOb3QgdGFpbnRlZA0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQowMi1tcS8xMjExIGlzIHRyeWluZyB0byBh
+Y3F1aXJlIGxvY2s6DQogKCZxLT5zeXNmc19sb2NrKXsrLisufSwgYXQ6IFs8MDAwMDAwMDA4YjY1
+YmRhZD5dIHF1ZXVlX2F0dHJfc3RvcmUrMHgzNS8weDgwDQoNCmJ1dCB0YXNrIGlzIGFscmVhZHkg
+aG9sZGluZyBsb2NrOg0KIChrbi0+Y291bnQjMjEzKXsrKysrfSwgYXQ6IFs8MDAwMDAwMDA3YTE4
+YWQxOD5dIGtlcm5mc19mb3Bfd3JpdGUrMHhlNS8weDE5MA0KDQp3aGljaCBsb2NrIGFscmVhZHkg
+ZGVwZW5kcyBvbiB0aGUgbmV3IGxvY2suDQoNCg0KdGhlIGV4aXN0aW5nIGRlcGVuZGVuY3kgY2hh
+aW4gKGluIHJldmVyc2Ugb3JkZXIpIGlzOg0KDQotPiAjMSAoa24tPmNvdW50IzIxMyl7KysrK306
+DQogICAgICAga2VybmZzX3JlbW92ZSsweDFhLzB4MzANCiAgICAgICBrb2JqZWN0X2RlbC5wYXJ0
+LjMrMHhlLzB4NDANCiAgICAgICBibGtfdW5yZWdpc3Rlcl9xdWV1ZSsweGE3LzB4ZTANCiAgICAg
+ICBkZWxfZ2VuZGlzaysweDEyZi8weDI2MA0KICAgICAgIHNkX3JlbW92ZSsweDU4LzB4YzAgW3Nk
+X21vZF0NCiAgICAgICBkZXZpY2VfcmVsZWFzZV9kcml2ZXJfaW50ZXJuYWwrMHgxNWEvMHgyMjAN
+CiAgICAgICBidXNfcmVtb3ZlX2RldmljZSsweGY0LzB4MTcwDQogICAgICAgZGV2aWNlX2RlbCsw
+eDEyZi8weDMzMA0KICAgICAgIF9fc2NzaV9yZW1vdmVfZGV2aWNlKzB4ZWYvMHgxMjAgW3Njc2lf
+bW9kXQ0KICAgICAgIHNjc2lfZm9yZ2V0X2hvc3QrMHgxYi8weDYwIFtzY3NpX21vZF0NCiAgICAg
+ICBzY3NpX3JlbW92ZV9ob3N0KzB4NmYvMHgxMTAgW3Njc2lfbW9kXQ0KICAgICAgIDB4ZmZmZmZm
+ZmZjMDllZDZlNA0KICAgICAgIHByb2Nlc3Nfb25lX3dvcmsrMHgyMWMvMHg2ZDANCiAgICAgICB3
+b3JrZXJfdGhyZWFkKzB4MzUvMHgzODANCiAgICAgICBrdGhyZWFkKzB4MTE3LzB4MTMwDQogICAg
+ICAgcmV0X2Zyb21fZm9yaysweDI0LzB4MzANCg0KLT4gIzAgKCZxLT5zeXNmc19sb2NrKXsrLisu
+fToNCiAgICAgICBfX211dGV4X2xvY2srMHg2Yy8weDllMA0KICAgICAgIHF1ZXVlX2F0dHJfc3Rv
+cmUrMHgzNS8weDgwDQogICAgICAga2VybmZzX2ZvcF93cml0ZSsweDEwOS8weDE5MA0KICAgICAg
+IF9fdmZzX3dyaXRlKzB4MWUvMHgxMzANCiAgICAgICB2ZnNfd3JpdGUrMHhiOS8weDFiMA0KICAg
+ICAgIFN5U193cml0ZSsweDQwLzB4YTANCiAgICAgICBlbnRyeV9TWVNDQUxMXzY0X2Zhc3RwYXRo
+KzB4MjMvMHg5YQ0KDQpvdGhlciBpbmZvIHRoYXQgbWlnaHQgaGVscCB1cyBkZWJ1ZyB0aGlzOg0K
+DQogUG9zc2libGUgdW5zYWZlIGxvY2tpbmcgc2NlbmFyaW86DQoNCiAgICAgICBDUFUwICAgICAg
+ICAgICAgICAgICAgICBDUFUxDQogICAgICAgLS0tLSAgICAgICAgICAgICAgICAgICAgLS0tLQ0K
+ICBsb2NrKGtuLT5jb3VudCMyMTMpOw0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGxv
+Y2soJnEtPnN5c2ZzX2xvY2spOw0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGxvY2so
+a24tPmNvdW50IzIxMyk7DQogIGxvY2soJnEtPnN5c2ZzX2xvY2spOw0KDQogKioqIERFQURMT0NL
+ICoqKg0KDQozIGxvY2tzIGhlbGQgYnkgMDItbXEvMTIxMToNCiAjMDogIChzYl93cml0ZXJzIzYp
+ey4rLit9LCBhdDogWzwwMDAwMDAwMGFmZGI2MWQzPl0gdmZzX3dyaXRlKzB4MTdmLzB4MWIwDQog
+IzE6ICAoJm9mLT5tdXRleCl7Ky4rLn0sIGF0OiBbPDAwMDAwMDAwYjI5MWNhYmI+XSBrZXJuZnNf
+Zm9wX3dyaXRlKzB4ZGQvMHgxOTANCiAjMjogIChrbi0+Y291bnQjMjEzKXsrKysrfSwgYXQ6IFs8
+MDAwMDAwMDA3YTE4YWQxOD5dIGtlcm5mc19mb3Bfd3JpdGUrMHhlNS8weDE5MA0KDQpzdGFjayBi
+YWNrdHJhY2U6DQpDUFU6IDIgUElEOiAxMjExIENvbW06IDAyLW1xIE5vdCB0YWludGVkIDQuMTUu
+MC1yYzctZGJnKyAjMQ0KSGFyZHdhcmUgbmFtZTogUUVNVSBTdGFuZGFyZCBQQyAoaTQ0MEZYICsg
+UElJWCwgMTk5NiksIEJJT1MgMS4wLjAtcHJlYnVpbHQucWVtdS1wcm9qZWN0Lm9yZyAwNC8wMS8y
+MDE0DQpDYWxsIFRyYWNlOg0KIGR1bXBfc3RhY2srMHg4NS8weGJmDQogcHJpbnRfY2lyY3VsYXJf
+YnVnLmlzcmEuMzUrMHgxZDcvMHgxZTQNCiBfX2xvY2tfYWNxdWlyZSsweDEyYWYvMHgxMzcwDQog
+PyBsb2NrX2FjcXVpcmUrMHhhOC8weDIzMA0KIGxvY2tfYWNxdWlyZSsweGE4LzB4MjMwDQogPyBx
+dWV1ZV9hdHRyX3N0b3JlKzB4MzUvMHg4MA0KID8gcXVldWVfYXR0cl9zdG9yZSsweDM1LzB4ODAN
+CiBfX211dGV4X2xvY2srMHg2Yy8weDllMA0KID8gcXVldWVfYXR0cl9zdG9yZSsweDM1LzB4ODAN
+CiA/IGtlcm5mc19mb3Bfd3JpdGUrMHhkZC8weDE5MA0KID8gX19tdXRleF9sb2NrKzB4NmMvMHg5
+ZTANCiA/IF9fbXV0ZXhfbG9jaysweDNkMC8weDllMA0KID8gbG9ja19hY3F1aXJlKzB4YTgvMHgy
+MzANCiA/IF9fbG9ja19pc19oZWxkKzB4NTUvMHg5MA0KID8gcXVldWVfYXR0cl9zdG9yZSsweDM1
+LzB4ODANCiBxdWV1ZV9hdHRyX3N0b3JlKzB4MzUvMHg4MA0KIGtlcm5mc19mb3Bfd3JpdGUrMHgx
+MDkvMHgxOTANCiBfX3Zmc193cml0ZSsweDFlLzB4MTMwDQogPyByY3VfcmVhZF9sb2NrX3NjaGVk
+X2hlbGQrMHg2Ni8weDcwDQogPyByY3Vfc3luY19sb2NrZGVwX2Fzc2VydCsweDIzLzB4NTANCiA/
+IF9fc2Jfc3RhcnRfd3JpdGUrMHgxNTIvMHgxZjANCiA/IF9fc2Jfc3RhcnRfd3JpdGUrMHgxNjgv
+MHgxZjANCiB2ZnNfd3JpdGUrMHhiOS8weDFiMA0KIFN5U193cml0ZSsweDQwLzB4YTANCiBlbnRy
+eV9TWVNDQUxMXzY0X2Zhc3RwYXRoKzB4MjMvMHg5YQ0KUklQOiAwMDMzOjB4N2ZhYjhiZThkMDU0
+DQpSU1A6IDAwMmI6MDAwMDdmZmQzOWYwZGVmOCBFRkxBR1M6IDAwMDAwMjQ2DQoNClRoYW5rcywN
+Cg0KQmFydC4=
