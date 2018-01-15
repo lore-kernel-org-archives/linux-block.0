@@ -1,111 +1,114 @@
-Return-Path: <lars.ellenberg@linbit.com>
-Return-Path: <lars.ellenberg@linbit.com>
-Date: Tue, 16 Jan 2018 09:55:45 +0100
-From: Lars Ellenberg <lars.ellenberg@linbit.com>
-To: Mike Snitzer <snitzer@redhat.com>
-Cc: Eric Wheeler <drbd-dev@lists.ewheeler.net>,
+Return-Path: <msnitzer@redhat.com>
+Date: Mon, 15 Jan 2018 10:07:38 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: Eric Wheeler <drbd-dev@lists.ewheeler.net>,
 	Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
 	martin.petersen@oracle.com, agk@redhat.com, shli@kernel.org,
 	philipp.reisner@linbit.com, linux-block@vger.kernel.org,
 	linux-raid@vger.kernel.org, dm-devel@redhat.com,
-	linux-scsi@vger.kernel.org, drbd-dev@lists.linbit.com,
-	ejt@redhat.com
-Subject: Re: [Drbd-dev] [PATCH 23/27] drbd: make intelligent use of
- blkdev_issue_zeroout
-Message-ID: <20180116085545.GB4107@soda.linbit>
+	linux-scsi@vger.kernel.org, drbd-dev@lists.linbit.com
+Cc: ejt@redhat.com
+Subject: Re: [PATCH 23/27] drbd: make intelligent use of blkdev_issue_zeroout
+Message-ID: <20180115150738.GA20967@redhat.com>
 References: <20170405172125.22600-1-hch@lst.de>
  <20170405172125.22600-24-hch@lst.de>
  <alpine.LRH.2.11.1801130035010.13147@mail.ewheeler.net>
  <20180115124635.GA4107@soda.linbit>
- <20180115150738.GA20967@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180115150738.GA20967@redhat.com>
+In-Reply-To: <20180115124635.GA4107@soda.linbit>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jan 15, 2018 at 10:07:38AM -0500, Mike Snitzer wrote:
-> > See also:
-> > https://www.redhat.com/archives/dm-devel/2017-March/msg00213.html
-> > https://www.redhat.com/archives/dm-devel/2017-March/msg00226.html
+On Mon, Jan 15 2018 at  7:46am -0500,
+Lars Ellenberg <lars.ellenberg@linbit.com> wrote:
+ 
+> As I understood it,
+> blkdev_issue_zeroout() was supposed to "always try to unmap",
+> deprovision, the relevant region, and zero-out any unaligned
+> head or tail, just like my work around above was doing.
 > 
-> Right, now that you mention it it is starting to ring a bell (especially
-> after I read your 2nd dm-devel archive url above).
-
-> > In tree, either dm-thin learns to do REQ_OP_WRITE_ZEROES "properly",
-> > so the result in this scenario is what we expect:
-> > 
-> >   _: unprovisioned, not allocated, returns zero on read anyways
-> >   *: provisioned, some arbitrary data
-> >   0: explicitly zeroed:
-> > 
-> >   |gran|ular|ity |    |    |    |
-> >   |****|****|____|****|
-> >      to|-be-|zero|ed
-> >   |**00|____|____|00**|
-> > 
-> > (leave unallocated blocks alone,
-> >  de-allocate full blocks just like with discard,
-> >  explicitly zero unaligned head and tail)
+> And that device mapper thin was "about to" learn this, "soon",
+> or maybe block core would do the equivalent of my workaround
+> described above.
 > 
-> "de-allocate full blocks just like with discard" is an interesting take
-> what it means for dm-thin to handle REQ_OP_WRITE_ZEROES "properly".
+> But it then did not.
 > 
-> > Or DRBD will have to resurrect that reinvented zeroout again,
-> > with exactly those semantics. I did reinvent it for a reason ;)
+> See also:
+> https://www.redhat.com/archives/dm-devel/2017-March/msg00213.html
+> https://www.redhat.com/archives/dm-devel/2017-March/msg00226.html
+
+Right, now that you mention it it is starting to ring a bell (especially
+after I read your 2nd dm-devel archive url above).
+
+> I then did not follow this closely enough anymore,
+> and I missed that with recent enough kernel,
+> discard on DRBD on dm-thin would fully allocate.
 > 
-> Yeah, I now recall dropping that line of development because it
-> became "hard" (or at least harder than originally thought).
+> In our out-of-tree module, we had to keep the older code for
+> compat reasons, anyways. I will just re-enable our zeroout
+> workaround there again.
 > 
-> Don't people use REQ_OP_WRITE_ZEROES to initialize a portion of the
-> disk?  E.g. zeroing superblocks, metadata areas, or whatever?
+> In tree, either dm-thin learns to do REQ_OP_WRITE_ZEROES "properly",
+> so the result in this scenario is what we expect:
 > 
-> If we just discarded the logical extent and then a user did a partial
-> write to the block, areas that a user might expect to be zeroed wouldn't
-> be (at least in the case of dm-thinp if "skip_block_zeroing" is
-> enabled).
+>   _: unprovisioned, not allocated, returns zero on read anyways
+>   *: provisioned, some arbitrary data
+>   0: explicitly zeroed:
+> 
+>   |gran|ular|ity |    |    |    |
+>   |****|****|____|****|
+>      to|-be-|zero|ed
+>   |**00|____|____|00**|
+> 
+> (leave unallocated blocks alone,
+>  de-allocate full blocks just like with discard,
+>  explicitly zero unaligned head and tail)
 
+"de-allocate full blocks just like with discard" is an interesting take
+what it means for dm-thin to handle REQ_OP_WRITE_ZEROES "properly".
 
-Oh-kay.
-So "immediately after" such an operation
-("zero-out head and tail and de-alloc full blocks")
-a read to that area would return all zeros, as expected.
+> Or DRBD will have to resurrect that reinvented zeroout again,
+> with exactly those semantics. I did reinvent it for a reason ;)
 
-But once you do a partial write of something to one of those
-de-allocated blocks (and skip_block_zeroing is enabled,
-which it likely is due to "performance"),
-"magically" arbitrary old garbage data springs into existence
-on the LBAs that just before read as zeros.
+Yeah, I now recall dropping that line of development because it
+became "hard" (or at least harder than originally thought).
 
-lvmthin lvm.conf
-Would that not break a lot of other things
-(any read-modify-write of "upper layers")?
-Would that not even be a serious "information leak"
-(old garbage of other completely unrelated LVs leaking into this one)?
+Don't people use REQ_OP_WRITE_ZEROES to initialize a portion of the
+disk?  E.g. zeroing superblocks, metadata areas, or whatever?
 
-But thank you for that, I start to see the problem ;-)
+If we just discarded the logical extent and then a user did a partial
+write to the block, areas that a user might expect to be zeroed wouldn't
+be (at least in the case of dm-thinp if "skip_block_zeroing" is
+enabled).  And yes if discard passdown is enabled and the device's
+discard implementation does "discard_zeroes_data" then it'd be
+fine.. but there are a lot of things that need to line up for drbd's
+REQ_OP_WRITE_ZEROES to "just work" (as it expects).
 
-> No, dm-thinp doesn't have an easy way to mark an allocated block as
-> containing zeroes (without actually zeroing).  I toyed with adding that
-> but then realized that even if we had it it'd still require block
-> zeroing be enabled.  But block zeroing is done at allocation time.  So
-> we'd need to interpret the "this block is zeroes" flag to mean "on first
-> write or read to this block it needs to first zero it".  Fugly to say
-> the least...
+(now I'm just echoing the kinds of concerns I had in that 2nd dm-devel
+post above).
 
+This post from mkp is interesting:
+https://www.redhat.com/archives/dm-devel/2017-March/msg00228.html
 
-Maybe have a "known zeroed block" pool, allocate only from there,
-and "lazy zero" unallocated blocks, add to the known-zero pool?
-Fallback to zero-on-alloc if that known-zero-pool is depleted.
+Specifically:
+"You don't have a way to mark those blocks as being full of zeroes
+without actually writing them?
 
-Easier said than done, I know.
+Note that the fallback to a zeroout command is to do a regular write. So
+if DM doesn't zero the blocks, the block layer is going to it."
 
-> But sadly, in general, this is a low priority for me, so you might do
-> well to reintroduce your drbd workaround.. sorry about that :(
+No, dm-thinp doesn't have an easy way to mark an allocated block as
+containing zeroes (without actually zeroing).  I toyed with adding that
+but then realized that even if we had it it'd still require block
+zeroing be enabled.  But block zeroing is done at allocation time.  So
+we'd need to interpret the "this block is zeroes" flag to mean "on first
+write or read to this block it needs to first zero it".  Fugly to say
+the least...
 
-No problem.
-I'll put that back in, and document that we strongly recommend to
-NOT skip_block_zeroing in those setups.
+I've been quite busy with other things but I can revisit all this with
+Joe Thornber and see what we come up with after a 2nd discussion.
 
-Thanks,
+But sadly, in general, this is a low priority for me, so you might do
+well to reintroduce your drbd workaround.. sorry about that :(
 
-    Lars
+Mike
