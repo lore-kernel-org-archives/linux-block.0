@@ -1,46 +1,37 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from Galois.linutronix.de ([146.0.238.70]:40844 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756009AbeAORnx (ORCPT
+Received: from bombadil.infradead.org ([65.50.211.133]:41644 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755690AbeAORkk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jan 2018 12:43:53 -0500
-Date: Mon, 15 Jan 2018 18:43:47 +0100 (CET)
-From: Thomas Gleixner <tglx@linutronix.de>
+        Mon, 15 Jan 2018 12:40:40 -0500
+Date: Mon, 15 Jan 2018 09:40:36 -0800
+From: Christoph Hellwig <hch@infradead.org>
 To: Ming Lei <ming.lei@redhat.com>
-cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
         Laurence Oberman <loberman@redhat.com>,
         Mike Snitzer <snitzer@redhat.com>
 Subject: Re: [PATCH 0/2] genirq/affinity: try to make sure online CPU is
  assgined to irq vector
-In-Reply-To: <20180115160345.2611-1-ming.lei@redhat.com>
-Message-ID: <alpine.DEB.2.20.1801151842080.2143@nanos>
+Message-ID: <20180115174036.GA20191@infradead.org>
 References: <20180115160345.2611-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180115160345.2611-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, 16 Jan 2018, Ming Lei wrote:
+On Tue, Jan 16, 2018 at 12:03:43AM +0800, Ming Lei wrote:
+> Hi,
+> 
 > These two patches fixes IO hang issue reported by Laurence.
 > 
 > 84676c1f21 ("genirq/affinity: assign vectors to all possible CPUs")
 > may cause one irq vector assigned to all offline CPUs, then this vector
 > can't handle irq any more.
-> 
-> The 1st patch moves irq vectors spread into one function, and prepares
-> for the fix done in 2nd patch.
-> 
-> The 2nd patch fixes the issue by trying to make sure online CPUs assigned
-> to irq vector.
 
-Which means it's completely undoing the intent and mechanism of managed
-interrupts. Not going to happen.
-
-Which driver is that which abuses managed interrupts and does not keep its
-queues properly sorted on cpu hotplug?
-
-Thanks,
-
-	tglx
+Well, that very much was the intention of managed interrupts.  Why
+does the device raise an interrupt for a queue that has no online
+cpu assigned to it?
