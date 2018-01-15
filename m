@@ -1,75 +1,82 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:48728 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750716AbeAPBer (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jan 2018 20:34:47 -0500
-Date: Mon, 15 Jan 2018 20:34:38 -0500
+Return-Path: <msnitzer@redhat.com>
+Date: Mon, 15 Jan 2018 12:43:44 -0500
 From: Mike Snitzer <snitzer@redhat.com>
-To: Ming Lei <ming.lei@redhat.com>
+To: Ming Lei <ming.lei@redhat.com>, axboe@kernel.dk
 Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH V4 3/3] blk-mq: issue request directly for
+	Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH V4 0/3] blk-mq: issue request directly for
  blk_insert_cloned_request
-Message-ID: <20180116013437.GA27125@redhat.com>
+Message-ID: <20180115174344.GA17634@redhat.com>
 References: <20180115165810.2515-1-ming.lei@redhat.com>
- <20180115165810.2515-4-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180115165810.2515-4-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180115165810.2515-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
 On Mon, Jan 15 2018 at 11:58am -0500,
 Ming Lei <ming.lei@redhat.com> wrote:
 
-> blk_insert_cloned_request() is called in fast path of dm-rq driver, and
-> in this function we append request to hctx->dispatch_list of the underlying
-> queue directly.
+> Hi Guys,
 > 
-> 1) This way isn't efficient enough because hctx lock is always required
+> The 3 paches changes the blk-mq part of blk_insert_cloned_request(),
+> in which we switch to blk_mq_try_issue_directly(), so that both dm-rq
+> and blk-mq can get the dispatch result of underlying queue, and with
+> this information, blk-mq can handle IO merge much better, then
+> sequential I/O performance is improved much.
 > 
-> 2) With blk_insert_cloned_request(), we bypass underlying queue's IO scheduler
-> totally, and depend on DM rq driver to do IO schedule completely. But DM
-> rq driver can't get underlying queue's dispatch feedback at all, and this
-> information is extreamly useful for IO merge. Without that IO merge can't
-> be done basically by blk-mq, and causes very bad sequential IO performance.
+> In my dm-mpath over virtio-scsi test, this whole patchset improves
+> sequential IO by 3X ~ 5X.
 > 
-> This patch makes use of blk_mq_try_issue_directly() to dispatch rq to
-> underlying queue and provides disptch result to dm-rq and blk-mq, and
-> improves the above situations very much.
+> V4:
+> 	- remove dm patches which are in DM tree already
+> 	- cleanup __blk_mq_issue_req as suggested by Jens
 > 
-> With this patch, seqential IO is improved by 3X in my test over
-> mpath/virtio-scsi.
-> 
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-mq.c | 29 ++++++++++++++++++++++++++---
->  1 file changed, 26 insertions(+), 3 deletions(-)
 
-Hey Ming,
+Ming,
 
-I also just noticed your V4 of this patch only includes the
-block/blk-mq.c changes.
+You dropped the header cleanups that I did in v3 ("blk-mq: issue request
+directly for blk_insert_cloned_request") being the one header I care
+about being updated).
 
-You're missing:
+I also worked in parallel on my own v4 to address Jens' dislike for v3's
+3 returns.  But I skinned the cat a different way, by dropping your
+first patch that introduces the __blk_mq_issue_req helper, please see
+these 2 commits:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=block-4.16&id=40f8947784128bb83dc5f7a6aed7ed230222f675
+https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=block-4.16&id=f641015f42f41df75220313ee62e8241f2feeeed
+
+I think it makes the changes more obvious (not spread across 2 methods
+and doesn't require use of BLK_STS_AGAIN).
+
+Happy to yield to Jens to decide which he prefers.
+
+Jens, if you'd like to pick my variant of v4 up they are here, thanks!
+
+The following changes since commit c100ec49fdd2222836ff8a17c7bfcc7611d2ee2b:
+
+  dm: fix incomplete request_queue initialization (2018-01-15 08:54:32 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-block-4.16/dm-changes-2
+
+for you to fetch changes up to d86beab5712a8f18123011487dee797a1e3a07e1:
+
+  blk-mq: issue request directly for blk_insert_cloned_request (2018-01-15 12:40:44 -0500)
+
+----------------------------------------------------------------
+- Ming's blk-mq improvements to blk_insert_cloned_request(), which is
+  used exclusively by request-based DM's blk-mq mode, that enable
+  substantial dm-mpath sequential IO performance improvements.
+
+----------------------------------------------------------------
+Ming Lei (2):
+      blk-mq: return dispatch result from blk_mq_try_issue_directly
+      blk-mq: issue request directly for blk_insert_cloned_request
 
  block/blk-core.c   |  3 +--
+ block/blk-mq.c     | 65 +++++++++++++++++++++++++++++++++++++++++-------------
  block/blk-mq.h     |  3 +++
  drivers/md/dm-rq.c | 19 +++++++++++++---
-
-Please let Jens know if you're OK with my V4, tagged here:
-https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/tag/?h=for-block-4.16/dm-changes-2
-And also detailed in this message from earlier in this thread:
-https://marc.info/?l=linux-block&m=151603824725438&w=2
-
-Or please generate V5 of your series.  Hopefully it'd include the header
-I revised for this 3/3 patch, see:
-https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=for-block-4.16/dm-changes-2&id=d86beab5712a8f18123011487dee797a1e3a07e1
-
-We also need to address the issues Jens noticed and I looked at a bit
-closer: https://marc.info/?l=linux-block&m=151604528127707&w=2
-(those issues might need fixing first, and marked for stable@, and the
-series rebased ontop of it?)
-
-Thanks!
-Mie
+ 4 files changed, 70 insertions(+), 20 deletions(-)
