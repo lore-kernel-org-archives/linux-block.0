@@ -1,92 +1,67 @@
-Return-Path: <msnitzer@redhat.com>
-Date: Mon, 15 Jan 2018 14:41:12 -0500
-From: Mike Snitzer <snitzer@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH V4 1/3] blk-mq: move actual issue into one helper
-Message-ID: <20180115194112.GA25341@redhat.com>
+To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
+Cc: Mike Snitzer <snitzer@redhat.com>, Christoph Hellwig <hch@infradead.org>
 References: <20180115165810.2515-1-ming.lei@redhat.com>
  <20180115165810.2515-2-ming.lei@redhat.com>
- <2b698c6c-9d9d-8555-7fe8-272bcdd65086@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <2b698c6c-9d9d-8555-7fe8-272bcdd65086@kernel.dk>
+Date: Mon, 15 Jan 2018 10:29:46 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <2b698c6c-9d9d-8555-7fe8-272bcdd65086@kernel.dk>
+In-Reply-To: <20180115165810.2515-2-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jan 15 2018 at 12:29pm -0500,
-Jens Axboe <axboe@kernel.dk> wrote:
-
-> On 1/15/18 9:58 AM, Ming Lei wrote:
-> > No functional change, just to clean up code a bit, so that the following
-> > change of using direct issue for blk_mq_request_bypass_insert() which is
-> > needed by DM can be easier to do.
-> > 
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  block/blk-mq.c | 39 +++++++++++++++++++++++++++------------
-> >  1 file changed, 27 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index edb1291a42c5..bf8d6651f40e 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -1696,15 +1696,37 @@ static blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx, struct request *rq)
-> >  	return blk_tag_to_qc_t(rq->internal_tag, hctx->queue_num, true);
-> >  }
-> >  
-> > -static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-> > -					struct request *rq,
-> > -					blk_qc_t *cookie)
-> > +static blk_status_t __blk_mq_issue_req(struct blk_mq_hw_ctx *hctx,
-> > +				       struct request *rq,
-> > +				       blk_qc_t *new_cookie)
-> >  {
-> > +	blk_status_t ret;
-> >  	struct request_queue *q = rq->q;
-> >  	struct blk_mq_queue_data bd = {
-> >  		.rq = rq,
-> >  		.last = true,
-> >  	};
-> > +
-> > +	if (!blk_mq_get_driver_tag(rq, NULL, false))
-> > +		return BLK_STS_AGAIN;
-> > +
-> > +	if (!blk_mq_get_dispatch_budget(hctx)) {
-> > +		blk_mq_put_driver_tag(rq);
-> > +		return BLK_STS_AGAIN;
-> > +	}
-> > +
-> > +	*new_cookie = request_to_qc_t(hctx, rq);
-> > +
-> > +	ret = q->mq_ops->queue_rq(hctx, &bd);
-> > +
-> > +	return ret;
+On 1/15/18 9:58 AM, Ming Lei wrote:
+> No functional change, just to clean up code a bit, so that the following
+> change of using direct issue for blk_mq_request_bypass_insert() which is
+> needed by DM can be easier to do.
 > 
-> 	return q->mq_ops->queue_rq(hctx, &bd);
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-mq.c | 39 +++++++++++++++++++++++++++------------
+>  1 file changed, 27 insertions(+), 12 deletions(-)
 > 
-> and kill 'ret', it's not used.
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index edb1291a42c5..bf8d6651f40e 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1696,15 +1696,37 @@ static blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx, struct request *rq)
+>  	return blk_tag_to_qc_t(rq->internal_tag, hctx->queue_num, true);
+>  }
+>  
+> -static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+> -					struct request *rq,
+> -					blk_qc_t *cookie)
+> +static blk_status_t __blk_mq_issue_req(struct blk_mq_hw_ctx *hctx,
+> +				       struct request *rq,
+> +				       blk_qc_t *new_cookie)
+>  {
+> +	blk_status_t ret;
+>  	struct request_queue *q = rq->q;
+>  	struct blk_mq_queue_data bd = {
+>  		.rq = rq,
+>  		.last = true,
+>  	};
+> +
+> +	if (!blk_mq_get_driver_tag(rq, NULL, false))
+> +		return BLK_STS_AGAIN;
+> +
+> +	if (!blk_mq_get_dispatch_budget(hctx)) {
+> +		blk_mq_put_driver_tag(rq);
+> +		return BLK_STS_AGAIN;
+> +	}
+> +
+> +	*new_cookie = request_to_qc_t(hctx, rq);
+> +
+> +	ret = q->mq_ops->queue_rq(hctx, &bd);
+> +
+> +	return ret;
 
-Yeap, good point.
+	return q->mq_ops->queue_rq(hctx, &bd);
 
-> But more importantly, who puts the
-> driver tag and the budget if we get != OK for ->queue_rq()?
+and kill 'ret', it's not used. But more importantly, who puts the
+driver tag and the budget if we get != OK for ->queue_rq()?
 
-__blk_mq_try_issue_directly() processes the returned value same as before
-this patch.  Means this patch isn't making any functional change:
-If BLK_STS_RESOURCE: __blk_mq_requeue_request() is called.
-__blk_mq_requeue_request() will blk_mq_put_driver_tag().
-Otherwise, all other errors result in blk_mq_end_request(rq, ret);
-
-So ignoring this patch, are you concerned that:
-1) Does blk_mq_end_request() put both?  Looks like blk_mq_free_request()
-handles rq->tag != -1 but why not have it use __blk_mq_put_driver_tag()?
-I'm not seeing where the budget is put from blk_mq_end_request()...
-
-2) Nothing seems to be putting the budget in
-__blk_mq_try_issue_directly()'s BLK_STS_RESOURCE error path?  I share
-your concern now (for drivers who set {get,put}_budget in mq_ops).
-Should __blk_mq_requeue_request() be updated to also
-blk_mq_put_dispatch_budget()?
-
-Mike
+-- 
+Jens Axboe
