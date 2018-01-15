@@ -1,114 +1,127 @@
-Return-Path: <prvs=541b0d852=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Hannes Reinecke <hare@suse.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Doug Ledford <dledford@redhat.com>,
-	linux-scsi@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v2 4/4] IB/srp: Fix a sleep-in-invalid-context bug
-Date: Wed, 10 Jan 2018 10:18:17 -0800
-Message-Id: <20180110181817.25166-5-bart.vanassche@wdc.com>
-In-Reply-To: <20180110181817.25166-1-bart.vanassche@wdc.com>
-References: <20180110181817.25166-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:45760 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S933878AbeAOQEb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 Jan 2018 11:04:31 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>
+Cc: Laurence Oberman <loberman@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 1/2] genirq/affinity: move irq vectors spread into one function
+Date: Tue, 16 Jan 2018 00:03:44 +0800
+Message-Id: <20180115160345.2611-2-ming.lei@redhat.com>
+In-Reply-To: <20180115160345.2611-1-ming.lei@redhat.com>
+References: <20180115160345.2611-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The previous two patches guarantee that srp_queuecommand() does not get
-invoked while reconnecting occurs. Hence remove the code from
-srp_queuecommand() that prevents command queueing while reconnecting.
-This patch avoids that the following can appear in the kernel log:
+This patch is preparing for doing two steps spread:
 
-BUG: sleeping function called from invalid context at kernel/locking/mutex.c:747
-in_atomic(): 1, irqs_disabled(): 0, pid: 5600, name: scsi_eh_9
-1 lock held by scsi_eh_9/5600:
- #0:  (rcu_read_lock){....}, at: [<00000000cbb798c7>] __blk_mq_run_hw_queue+0xf1/0x1e0
-Preemption disabled at:
-[<00000000139badf2>] __blk_mq_delay_run_hw_queue+0x78/0xf0
-CPU: 9 PID: 5600 Comm: scsi_eh_9 Tainted: G        W        4.15.0-rc4-dbg+ #1
-Hardware name: Dell Inc. PowerEdge R720/0VWT90, BIOS 2.5.4 01/22/2016
-Call Trace:
- dump_stack+0x67/0x99
- ___might_sleep+0x16a/0x250 [ib_srp]
- __mutex_lock+0x46/0x9d0
- srp_queuecommand+0x356/0x420 [ib_srp]
- scsi_dispatch_cmd+0xf6/0x3f0
- scsi_queue_rq+0x4a8/0x5f0
- blk_mq_dispatch_rq_list+0x73/0x440
- blk_mq_sched_dispatch_requests+0x109/0x1a0
- __blk_mq_run_hw_queue+0x131/0x1e0
- __blk_mq_delay_run_hw_queue+0x9a/0xf0
- blk_mq_run_hw_queue+0xc0/0x1e0
- blk_mq_start_hw_queues+0x2c/0x40
- scsi_run_queue+0x18e/0x2d0
- scsi_run_host_queues+0x22/0x40
- scsi_error_handler+0x18d/0x5f0
- kthread+0x11c/0x140
- ret_from_fork+0x24/0x30
+	- spread vectors across non-online CPUs
+	- spread vectors across online CPUs
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Cc: Jason Gunthorpe <jgg@mellanox.com>
-Cc: Doug Ledford <dledford@redhat.com>
+This way is applied for trying best to avoid allocating all offline CPUs
+to one single vector.
+
+No functional change, and code gets cleaned up too.
+
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/infiniband/ulp/srp/ib_srp.c | 21 ++-------------------
- 1 file changed, 2 insertions(+), 19 deletions(-)
+ kernel/irq/affinity.c | 56 +++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 34 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/infiniband/ulp/srp/ib_srp.c b/drivers/infiniband/ulp/srp/ib_srp.c
-index 972d4b3c5223..670f187ecb91 100644
---- a/drivers/infiniband/ulp/srp/ib_srp.c
-+++ b/drivers/infiniband/ulp/srp/ib_srp.c
-@@ -2149,7 +2149,6 @@ static void srp_handle_qp_err(struct ib_cq *cq, struct ib_wc *wc,
- static int srp_queuecommand(struct Scsi_Host *shost, struct scsi_cmnd *scmnd)
- {
- 	struct srp_target_port *target = host_to_target(shost);
--	struct srp_rport *rport = target->rport;
- 	struct srp_rdma_ch *ch;
- 	struct srp_request *req;
- 	struct srp_iu *iu;
-@@ -2159,16 +2158,6 @@ static int srp_queuecommand(struct Scsi_Host *shost, struct scsi_cmnd *scmnd)
- 	u32 tag;
- 	u16 idx;
- 	int len, ret;
--	const bool in_scsi_eh = !in_interrupt() && current == shost->ehandler;
--
--	/*
--	 * The SCSI EH thread is the only context from which srp_queuecommand()
--	 * can get invoked for blocked devices (SDEV_BLOCK /
--	 * SDEV_CREATED_BLOCK). Avoid racing with srp_reconnect_rport() by
--	 * locking the rport mutex if invoked from inside the SCSI EH.
--	 */
--	if (in_scsi_eh)
--		mutex_lock(&rport->mutex);
- 
- 	scmnd->result = srp_chkready(target->rport);
- 	if (unlikely(scmnd->result))
-@@ -2230,13 +2219,7 @@ static int srp_queuecommand(struct Scsi_Host *shost, struct scsi_cmnd *scmnd)
- 		goto err_unmap;
- 	}
- 
--	ret = 0;
--
--unlock_rport:
--	if (in_scsi_eh)
--		mutex_unlock(&rport->mutex);
--
--	return ret;
-+	return 0;
- 
- err_unmap:
- 	srp_unmap_data(scmnd, ch, req);
-@@ -2258,7 +2241,7 @@ static int srp_queuecommand(struct Scsi_Host *shost, struct scsi_cmnd *scmnd)
- 		ret = SCSI_MLQUEUE_HOST_BUSY;
- 	}
- 
--	goto unlock_rport;
-+	return ret;
+diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
+index a37a3b4b6342..99eb38a4cc83 100644
+--- a/kernel/irq/affinity.c
++++ b/kernel/irq/affinity.c
+@@ -94,6 +94,35 @@ static int get_nodes_in_cpumask(cpumask_var_t *node_to_possible_cpumask,
+ 	return nodes;
  }
  
- /*
++/* Spread irq vectors, and the result is stored to @irqmsk. */
++static int irq_vecs_spread_affinity(struct cpumask *irqmsk,
++				    int max_irqmsks,
++				    int max_vecs,
++				    struct cpumask *nmsk)
++{
++	int v, ncpus = cpumask_weight(nmsk);
++	int vecs_to_assign, extra_vecs;
++
++	/* How many vectors we will try to spread */
++	vecs_to_assign = min(max_vecs, ncpus);
++
++	/* Account for rounding errors */
++	extra_vecs = ncpus - vecs_to_assign * (ncpus / vecs_to_assign);
++
++	for (v = 0; v < min(max_irqmsks, vecs_to_assign); v++) {
++		int cpus_per_vec = ncpus / vecs_to_assign;
++
++		/* Account for extra vectors to compensate rounding errors */
++		if (extra_vecs) {
++			cpus_per_vec++;
++			--extra_vecs;
++		}
++		irq_spread_init_one(irqmsk + v, nmsk, cpus_per_vec);
++	}
++
++	return v;
++}
++
+ /**
+  * irq_create_affinity_masks - Create affinity masks for multiqueue spreading
+  * @nvecs:	The total number of vectors
+@@ -104,7 +133,7 @@ static int get_nodes_in_cpumask(cpumask_var_t *node_to_possible_cpumask,
+ struct cpumask *
+ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ {
+-	int n, nodes, cpus_per_vec, extra_vecs, curvec;
++	int n, nodes, curvec;
+ 	int affv = nvecs - affd->pre_vectors - affd->post_vectors;
+ 	int last_affv = affv + affd->pre_vectors;
+ 	nodemask_t nodemsk = NODE_MASK_NONE;
+@@ -154,33 +183,16 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 	}
+ 
+ 	for_each_node_mask(n, nodemsk) {
+-		int ncpus, v, vecs_to_assign, vecs_per_node;
++		int vecs_per_node;
+ 
+ 		/* Spread the vectors per node */
+ 		vecs_per_node = (affv - (curvec - affd->pre_vectors)) / nodes;
+ 
+-		/* Get the cpus on this node which are in the mask */
+ 		cpumask_and(nmsk, cpu_possible_mask, node_to_possible_cpumask[n]);
+ 
+-		/* Calculate the number of cpus per vector */
+-		ncpus = cpumask_weight(nmsk);
+-		vecs_to_assign = min(vecs_per_node, ncpus);
+-
+-		/* Account for rounding errors */
+-		extra_vecs = ncpus - vecs_to_assign * (ncpus / vecs_to_assign);
+-
+-		for (v = 0; curvec < last_affv && v < vecs_to_assign;
+-		     curvec++, v++) {
+-			cpus_per_vec = ncpus / vecs_to_assign;
+-
+-			/* Account for extra vectors to compensate rounding errors */
+-			if (extra_vecs) {
+-				cpus_per_vec++;
+-				--extra_vecs;
+-			}
+-			irq_spread_init_one(masks + curvec, nmsk, cpus_per_vec);
+-		}
+-
++		curvec += irq_vecs_spread_affinity(&masks[curvec],
++						   last_affv - curvec,
++						   vecs_per_node, nmsk);
+ 		if (curvec >= last_affv)
+ 			break;
+ 		--nodes;
 -- 
-2.15.1
+2.9.5
