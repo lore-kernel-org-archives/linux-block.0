@@ -1,118 +1,63 @@
-Return-Path: <prvs=53600bcc8=bart.vanassche@wdc.com>
+Return-Path: <prvs=547e67762=bart.vanassche@wdc.com>
 From: Bart Van Assche <bart.vanassche@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
-	Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-nvme@lists.infradead.org,
+	Mike Snitzer <snitzer@redhat.com>,
 	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v4 2/5] crypto: scompress - use sgl_alloc() and sgl_free()
-Date: Fri,  5 Jan 2018 08:26:47 -0800
-Message-Id: <20180105162650.31083-3-bart.vanassche@wdc.com>
-In-Reply-To: <20180105162650.31083-1-bart.vanassche@wdc.com>
-References: <20180105162650.31083-1-bart.vanassche@wdc.com>
+Subject: [PATCH 2/3] block: Document scheduler change code locking requirements
+Date: Tue, 16 Jan 2018 10:17:51 -0800
+Message-Id: <20180116181752.25847-3-bart.vanassche@wdc.com>
+In-Reply-To: <20180116181752.25847-1-bart.vanassche@wdc.com>
+References: <20180116181752.25847-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Use the sgl_alloc() and sgl_free() functions instead of open coding
-these functions.
+This patch does not change any functionality.
 
 Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- crypto/Kconfig     |  1 +
- crypto/scompress.c | 51 ++-------------------------------------------------
- 2 files changed, 3 insertions(+), 49 deletions(-)
+ block/elevator.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index f7911963bb79..20360e040425 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -106,6 +106,7 @@ config CRYPTO_KPP
- config CRYPTO_ACOMP2
- 	tristate
- 	select CRYPTO_ALGAPI2
-+	select SGL_ALLOC
+diff --git a/block/elevator.c b/block/elevator.c
+index 4f00b53cd5fd..e87e9b43aba0 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -869,6 +869,8 @@ int elv_register_queue(struct request_queue *q)
+ 	struct elevator_queue *e = q->elevator;
+ 	int error;
  
- config CRYPTO_ACOMP
- 	tristate
-diff --git a/crypto/scompress.c b/crypto/scompress.c
-index 2075e2c4e7df..968bbcf65c94 100644
---- a/crypto/scompress.c
-+++ b/crypto/scompress.c
-@@ -140,53 +140,6 @@ static int crypto_scomp_init_tfm(struct crypto_tfm *tfm)
- 	return ret;
- }
++	lockdep_assert_held(&q->sysfs_lock);
++
+ 	error = kobject_add(&e->kobj, &q->kobj, "%s", "iosched");
+ 	if (!error) {
+ 		struct elv_fs_entry *attr = e->type->elevator_attrs;
+@@ -889,6 +891,8 @@ int elv_register_queue(struct request_queue *q)
  
--static void crypto_scomp_sg_free(struct scatterlist *sgl)
--{
--	int i, n;
--	struct page *page;
--
--	if (!sgl)
--		return;
--
--	n = sg_nents(sgl);
--	for_each_sg(sgl, sgl, n, i) {
--		page = sg_page(sgl);
--		if (page)
--			__free_page(page);
--	}
--
--	kfree(sgl);
--}
--
--static struct scatterlist *crypto_scomp_sg_alloc(size_t size, gfp_t gfp)
--{
--	struct scatterlist *sgl;
--	struct page *page;
--	int i, n;
--
--	n = ((size - 1) >> PAGE_SHIFT) + 1;
--
--	sgl = kmalloc_array(n, sizeof(struct scatterlist), gfp);
--	if (!sgl)
--		return NULL;
--
--	sg_init_table(sgl, n);
--
--	for (i = 0; i < n; i++) {
--		page = alloc_page(gfp);
--		if (!page)
--			goto err;
--		sg_set_page(sgl + i, page, PAGE_SIZE, 0);
--	}
--
--	return sgl;
--
--err:
--	sg_mark_end(sgl + i);
--	crypto_scomp_sg_free(sgl);
--	return NULL;
--}
--
- static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
+ void elv_unregister_queue(struct request_queue *q)
  {
- 	struct crypto_acomp *tfm = crypto_acomp_reqtfm(req);
-@@ -220,7 +173,7 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- 					      scratch_dst, &req->dlen, *ctx);
- 	if (!ret) {
- 		if (!req->dst) {
--			req->dst = crypto_scomp_sg_alloc(req->dlen, GFP_ATOMIC);
-+			req->dst = sgl_alloc(req->dlen, GFP_ATOMIC, NULL);
- 			if (!req->dst)
- 				goto out;
- 		}
-@@ -274,7 +227,7 @@ int crypto_init_scomp_ops_async(struct crypto_tfm *tfm)
++	lockdep_assert_held(&q->sysfs_lock);
++
+ 	if (q) {
+ 		struct elevator_queue *e = q->elevator;
  
- 	crt->compress = scomp_acomp_compress;
- 	crt->decompress = scomp_acomp_decompress;
--	crt->dst_free = crypto_scomp_sg_free;
-+	crt->dst_free = sgl_free;
- 	crt->reqsize = sizeof(void *);
+@@ -965,6 +969,8 @@ static int elevator_switch_mq(struct request_queue *q,
+ {
+ 	int ret;
  
- 	return 0;
++	lockdep_assert_held(&q->sysfs_lock);
++
+ 	blk_mq_freeze_queue(q);
+ 	blk_mq_quiesce_queue(q);
+ 
+@@ -1010,6 +1016,8 @@ static int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
+ 	bool old_registered = false;
+ 	int err;
+ 
++	lockdep_assert_held(&q->sysfs_lock);
++
+ 	if (q->mq_ops)
+ 		return elevator_switch_mq(q, new_e);
+ 
 -- 
 2.15.1
