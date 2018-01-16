@@ -1,82 +1,76 @@
-Return-Path: <axboe@kernel.dk>
-Date: Fri, 5 Jan 2018 09:21:52 -0700
-From: Jens Axboe <axboe@kernel.dk>
-To: Damien Le Moal <damien.lemoal@wdc.com>
-Cc: linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: Re: [PATCH V9 0/7] blk-mq support for ZBC disks
-Message-ID: <20180105162150.GA16978@kernel.dk>
-References: <20171221064344.6228-1-damien.lemoal@wdc.com>
+Return-Path: <prvs=547e67762=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "snitzer@redhat.com" <snitzer@redhat.com>
+CC: "dm-devel@redhat.com" <dm-devel@redhat.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "hare@suse.de" <hare@suse.de>,
+	"tom.leiming@gmail.com" <tom.leiming@gmail.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "djeffery@redhat.com" <djeffery@redhat.com>
+Subject: Re: [for-4.16 PATCH v5 0/4] block/dm: allow DM to defer
+ blk_register_queue() until ready
+Date: Tue, 16 Jan 2018 18:19:32 +0000
+Message-ID: <1516126771.2844.17.camel@wdc.com>
+References: <20180112150606.6037-1-snitzer@redhat.com>
+	 <1516036612.10386.2.camel@wdc.com> <20180115221511.GA25858@redhat.com>
+	 <1516056697.3951.30.camel@wdc.com> <20180115231010.GA26447@redhat.com>
+	 <20180115231331.GA18564@redhat.com>
+In-Reply-To: <20180115231331.GA18564@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171221064344.6228-1-damien.lemoal@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Dec 21 2017, Damien Le Moal wrote:
-> This series, formerly titled "scsi-mq support for ZBC disks", implements
-> support for ZBC disks for system using the scsi-mq I/O path.
-> 
-> The current scsi level support of ZBC disks guarantees write request ordering
-> using a per-zone write lock which prevents issuing simultaneously multiple
-> write commands to a zone, doing so avoid reordering of sequential writes to
-> sequential zones. This method is however ineffective when scsi-mq is used with
-> zoned block devices. This is due to the different execution model of blk-mq
-> which passes a request to the scsi layer for dispatching after the request has
-> been removed from the I/O scheduler queue. That is, when the scsi layer tries
-> to lock the target zone of the request, the request may already be out of
-> order and zone write locking fails to prevent that.
-> 
-> Various approaches have been tried to solve this problem directly from the core
-> code of blk-mq. All of them had the serious disadvantage of cluttering blk-mq
-> code with zoned block device specific conditions and processing, making
-> maintenance and testing difficult.
-> 
-> This series adds blk-mq support for zoned block devices at the I/O scheduler
-> level with simple modifications of the mq-deadline scheduler. Implementation
-> is done with reusable helpers defined in the zoned block device support file
-> (blk-zoned.c). These helpers provide per zone write locking control functions
-> similar to what was implemented directly in the SCSI layer in sd_zbc.c.
-> The zone write locking mechanism is used by mq-deadline for the exact same
-> purpose, that is, to limit writes per zone to at most one request to avoid
-> reordering.
-> 
-> The changes to mq-deadline do not affect its operation with regular disks. The
-> same scheduling behavior is maintained for these devices. Compared to the SCSI
-> layer zone locking implementation, this series optimizes avoids locking
-> conventional zones which result in a use of these zone that is comparable to a
-> regular disk.
-> 
-> This series also implements changes to the legacy deadline-iosched. Doing so,
-> the zone locking code at the SCSI layer in sd.c and sd_zbc.c can be removed.
-> This results in a significant simplification of the sd driver command handling.
-> 
-> Patch 1 to 5 introduce the zone locking helpers in the block layer and modify
-> the deadline and mq-deadline schedulers.
-> Patch 6 and 7 remove the SCSI layer zone locking and initialize the device
-> request queue zone information.
-> 
-> All patches apply without conflicts to the scsi tree branch 4.16/scsi-queue, to
-> the block tree branch for-linus as well as to the current 4.15-rc4 tree.
-> 
-> Of note is that this series imposes the use of the deadline and mq-deadline
-> schedulers with zoned block devices. A system can trivialy enforce this using
-> a udev rule such as:
-> 
-> ACTION=="add|change", KERNEL=="sd[a-z]", ATTRS{queue/zoned}=="host-managed", \
-> ATTR{queue/scheduler}="deadline"
-> 
-> This rules applies equally for the legacy SCSI path as well as the scsi-mq path
-> thanks to "mq-deadline" being aliased to "deadline".
-> 
-> Comments are as always very much appreciated.
-
-This looks OK for me for 4.16. I can grab all of them, or I can leave
-the last two for Martin to apply if he prefers that, though that will
-add a block tree dependency for SCSI.
-
-Martin?
-
--- 
-Jens Axboe
+T24gTW9uLCAyMDE4LTAxLTE1IGF0IDE4OjEzIC0wNTAwLCBNaWtlIFNuaXR6ZXIgd3JvdGU6DQo+
+IE9uIE1vbiwgSmFuIDE1IDIwMTggYXQgIDY6MTBQIC0wNTAwLA0KPiBNaWtlIFNuaXR6ZXIgPHNu
+aXR6ZXJAcmVkaGF0LmNvbT4gd3JvdGU6DQo+IA0KPiA+IE9uIE1vbiwgSmFuIDE1IDIwMTggYXQg
+IDU6NTFwbSAtMDUwMCwNCj4gPiBCYXJ0IFZhbiBBc3NjaGUgPEJhcnQuVmFuQXNzY2hlQHdkYy5j
+b20+IHdyb3RlOg0KPiA+IA0KPiA+ID4gT24gTW9uLCAyMDE4LTAxLTE1IGF0IDE3OjE1IC0wNTAw
+LCBNaWtlIFNuaXR6ZXIgd3JvdGU6DQo+ID4gPiA+IHN5c2ZzIHdyaXRlIG9wIGNhbGxzIGtlcm5m
+c19mb3Bfd3JpdGUgd2hpY2ggdGFrZXM6DQo+ID4gPiA+IG9mLT5tdXRleCB0aGVuIGtuLT5jb3Vu
+dCMyMTMgKG5vIGlkZWEgd2hhdCB0aGF0IGlzKQ0KPiA+ID4gPiB0aGVuIHEtPnN5c2ZzX2xvY2sg
+KHZpYSBxdWV1ZV9hdHRyX3N0b3JlKQ0KPiA+ID4gPiANCj4gPiA+ID4gdnMgDQo+ID4gPiA+IA0K
+PiA+ID4gPiBibGtfdW5yZWdpc3Rlcl9xdWV1ZSB0YWtlczoNCj4gPiA+ID4gcS0+c3lzZnNfbG9j
+ayB0aGVuDQo+ID4gPiA+IGtlcm5mc19tdXRleCAodmlhIGtlcm5mc19yZW1vdmUpDQo+ID4gPiA+
+IHNlZW1zIGxvY2tkZXAgdGhpbmtzICJrZXJuZnNfbXV0ZXgiIGlzICJrbi0+Y291bnQjMjEzIj8N
+Cj4gPiA+ID4gDQo+ID4gPiA+IEZlZWxzIGxpa2UgbG9ja2RlcCBjb2RlIGluIGZzL2tlcm5mcy9m
+aWxlLmMgYW5kIGZzL2tlcm5mcy9kaXIuYyBpcw0KPiA+ID4gPiB0cmlnZ2VyaW5nIGZhbHNlIHBv
+c2l0aXZlcy4uIGJlY2F1c2UgdGhlc2Ugc2VlbSBsaWtlIGRpZmZlcmVudCBrZXJuZnMNCj4gPiA+
+ID4gbG9ja3MgeWV0IHRoZXkgYXJlIHJlcG9ydGVkIGFzICJrbi0+Y291bnQjMjEzIi4NCj4gPiA+
+ID4gDQo+ID4gPiA+IENlcnRhaW5seSBmZWVsaW5nIG91dCBvZiBteSBkZXB0aCB3aXRoIGtlcm5m
+cydzIGxvY2tpbmcgdGhvdWdoLg0KPiA+ID4gDQo+ID4gPiBIZWxsbyBNaWtlLA0KPiA+ID4gDQo+
+ID4gPiBJIGRvbid0IHRoaW5rIHRoYXQgdGhpcyBpcyBhIGZhbHNlIHBvc2l0aXZlIGJ1dCByYXRo
+ZXIgdGhlIGZvbGxvd2luZyB0cmFkaXRpb25hbA0KPiA+ID4gcGF0dGVybiBvZiBhIHBvdGVudGlh
+bCBkZWFkbG9jayBpbnZvbHZpbmcgc3lzZnMgYXR0cmlidXRlczoNCj4gPiA+ICogT25lIGNvbnRl
+eHQgb2J0YWlucyBhIG11dGV4IGZyb20gaW5zaWRlIGEgc3lzZnMgYXR0cmlidXRlIG1ldGhvZDoN
+Cj4gPiA+ICAgcXVldWVfYXR0cl9zdG9yZSgpIG9idGFpbnMgcS0+c3lzZnNfbG9jay4NCj4gPiA+
+ICogQW5vdGhlciBjb250ZXh0IHJlbW92ZXMgYSBzeXNmcyBhdHRyaWJ1dGUgd2hpbGUgaG9sZGlu
+ZyBhIG11dGV4Og0KPiA+ID4gICBibGtfdW5yZWdpc3Rlcl9xdWV1ZSgpIHJlbW92ZXMgdGhlIHF1
+ZXVlIHN5c2ZzIGF0dHJpYnV0ZXMgd2hpbGUgaG9sZGluZw0KPiA+ID4gICBxLT5zeXNmc19sb2Nr
+Lg0KPiA+ID4gDQo+ID4gPiBUaGlzIGNhbiByZXN1bHQgaW4gYSByZWFsIGRlYWRsb2NrIGJlY2F1
+c2UgdGhlIGNvZGUgdGhhdCByZW1vdmVzIHN5c2ZzIG9iamVjdHMNCj4gPiA+IHdhaXRzIHVudGls
+IGFsbCBvbmdvaW5nIGF0dHJpYnV0ZSBjYWxsYmFja3MgaGF2ZSBmaW5pc2hlZC4NCj4gPiA+IA0K
+PiA+ID4gU2luY2UgY29tbWl0IDY2NzI1N2U4YjI5OCAoImJsb2NrOiBwcm9wZXJseSBwcm90ZWN0
+IHRoZSAncXVldWUnIGtvYmogaW4NCj4gPiA+IGJsa191bnJlZ2lzdGVyX3F1ZXVlIikgbW9kaWZp
+ZWQgYmxrX3VucmVnaXN0ZXJfcXVldWUoKSBzdWNoIHRoYXQgcS0+c3lzZnNfbG9jaw0KPiA+ID4g
+aXMgaGVsZCBhcm91bmQgdGhlIGtvYmplY3RfZGVsKCZxLT5rb2JqKSBjYWxsIEkgdGhpbmsgdGhp
+cyBpcyBhIHJlZ3Jlc3Npb24NCj4gPiA+IGludHJvZHVjZWQgYnkgdGhhdCBjb21taXQuDQo+ID4g
+DQo+ID4gU3VyZSwgb2YgY291cnNlIGl0IGlzIGEgcmVncmVzc2lvbi4NCj4gPiANCj4gPiBBc2lk
+ZSBmcm9tIG1vdmluZyB0aGUgbXV0ZXhfdW5sb2NrKCZxLT5zeXNmc19sb2NrKSBhYm92ZSB0aGUN
+Cj4gPiBrb2JqZWN0X2RlbCgmcS0+a29iaikgSSBkb24ndCBrbm93IGhvdyB0byBmaXggaXQuDQo+
+ID4gDQo+ID4gVGhvdWdoLCByZWFsaXN0aWNhbGx5IHRoYXQnZCBiZSBhbiBhZGVxdWF0ZSBmaXgg
+KGdpdmVuIHRoZSB3YXkgdGhlIGNvZGUNCj4gPiB3YXMgYmVmb3JlKS4NCj4gDQo+IEFueSBjaGFu
+Y2UgeW91IGFwcGx5IHRoaXMgYW5kIHJlLXJ1biB5b3VyIHNycF90ZXN0IHRoYXQgdHJpZ2dlcmVk
+IHRoZQ0KPiBsb2NrZGVwIHNwbGF0Pw0KPiANCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1zeXNm
+cy5jIGIvYmxvY2svYmxrLXN5c2ZzLmMNCj4gaW5kZXggNGE2YTQwZmZkNzhlLi5jNTBlMDhlOWJm
+MTcgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2Jsay1zeXNmcy5jDQo+ICsrKyBiL2Jsb2NrL2Jsay1z
+eXNmcy5jDQo+IEBAIC05NTIsMTAgKzk1MiwxMCBAQCB2b2lkIGJsa191bnJlZ2lzdGVyX3F1ZXVl
+KHN0cnVjdCBnZW5kaXNrICpkaXNrKQ0KPiAgCWlmIChxLT5yZXF1ZXN0X2ZuIHx8IChxLT5tcV9v
+cHMgJiYgcS0+ZWxldmF0b3IpKQ0KPiAgCQllbHZfdW5yZWdpc3Rlcl9xdWV1ZShxKTsNCj4gIA0K
+PiArCW11dGV4X3VubG9jaygmcS0+c3lzZnNfbG9jayk7DQo+ICsNCj4gIAlrb2JqZWN0X3VldmVu
+dCgmcS0+a29iaiwgS09CSl9SRU1PVkUpOw0KPiAgCWtvYmplY3RfZGVsKCZxLT5rb2JqKTsNCj4g
+IAlibGtfdHJhY2VfcmVtb3ZlX3N5c2ZzKGRpc2tfdG9fZGV2KGRpc2spKTsNCj4gIAlrb2JqZWN0
+X3B1dCgmZGlza190b19kZXYoZGlzayktPmtvYmopOw0KPiAtDQo+IC0JbXV0ZXhfdW5sb2NrKCZx
+LT5zeXNmc19sb2NrKTsNCj4gIH0NCg0KSGVsbG8gTWlrZSwNCg0KVG9kYXkgc3lzZnNfbG9jayBw
+cm90ZWN0cyBhIHdob2xlIGJ1bmNoIG9mIHN0YXRlIGluZm9ybWF0aW9uLiBJIHRoaW5rIGZvciB0
+aGUNCmxvbmdlciB0ZXJtIHdlIHNob3VsZCBzcGxpdCBpdCBpbnRvIG11bHRpcGxlIG11dGV4ZXMu
+IEZvciB0aGUgc2hvcnQgdGVybSwgcGxlYXNlDQpoYXZlIGEgbG9vayBhdCB0aGUgcGF0Y2ggc2Vy
+aWVzIEkganVzdCBwb3N0ZWQgb24gdGhlIGxpbnV4LWJsb2NrIG1haWxpbmcgbGlzdC4NCg0KVGhh
+bmtzLA0KDQpCYXJ0Lg==
