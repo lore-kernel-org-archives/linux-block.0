@@ -1,78 +1,111 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:35828 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751251AbeA1DRW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Jan 2018 22:17:22 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Junhui Tang <tang.junhui@zte.com.cn>,
-        Michael Lyle <mlyle@lyle.org>
-Subject: [PATCH v4 08/13] bcache: stop all attached bcache devices for a retired cache set
-Date: Sun, 28 Jan 2018 09:56:20 +0800
-Message-Id: <20180128015625.128497-9-colyli@suse.de>
-In-Reply-To: <20180128015625.128497-1-colyli@suse.de>
-References: <20180128015625.128497-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <lars.ellenberg@linbit.com>
+Return-Path: <lars.ellenberg@linbit.com>
+Date: Tue, 16 Jan 2018 09:55:45 +0100
+From: Lars Ellenberg <lars.ellenberg@linbit.com>
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: Eric Wheeler <drbd-dev@lists.ewheeler.net>,
+	Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+	martin.petersen@oracle.com, agk@redhat.com, shli@kernel.org,
+	philipp.reisner@linbit.com, linux-block@vger.kernel.org,
+	linux-raid@vger.kernel.org, dm-devel@redhat.com,
+	linux-scsi@vger.kernel.org, drbd-dev@lists.linbit.com,
+	ejt@redhat.com
+Subject: Re: [Drbd-dev] [PATCH 23/27] drbd: make intelligent use of
+ blkdev_issue_zeroout
+Message-ID: <20180116085545.GB4107@soda.linbit>
+References: <20170405172125.22600-1-hch@lst.de>
+ <20170405172125.22600-24-hch@lst.de>
+ <alpine.LRH.2.11.1801130035010.13147@mail.ewheeler.net>
+ <20180115124635.GA4107@soda.linbit>
+ <20180115150738.GA20967@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180115150738.GA20967@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-When there are too many I/O errors on cache device, current bcache code
-will retire the whole cache set, and detach all bcache devices. But the
-detached bcache devices are not stopped, which is problematic when bcache
-is in writeback mode.
+On Mon, Jan 15, 2018 at 10:07:38AM -0500, Mike Snitzer wrote:
+> > See also:
+> > https://www.redhat.com/archives/dm-devel/2017-March/msg00213.html
+> > https://www.redhat.com/archives/dm-devel/2017-March/msg00226.html
+> 
+> Right, now that you mention it it is starting to ring a bell (especially
+> after I read your 2nd dm-devel archive url above).
 
-If the retired cache set has dirty data of backing devices, continue
-writing to bcache device will write to backing device directly. If the
-LBA of write request has a dirty version cached on cache device, next time
-when the cache device is re-registered and backing device re-attached to
-it again, the stale dirty data on cache device will be written to backing
-device, and overwrite latest directly written data. This situation causes
-a quite data corruption.
+> > In tree, either dm-thin learns to do REQ_OP_WRITE_ZEROES "properly",
+> > so the result in this scenario is what we expect:
+> > 
+> >   _: unprovisioned, not allocated, returns zero on read anyways
+> >   *: provisioned, some arbitrary data
+> >   0: explicitly zeroed:
+> > 
+> >   |gran|ular|ity |    |    |    |
+> >   |****|****|____|****|
+> >      to|-be-|zero|ed
+> >   |**00|____|____|00**|
+> > 
+> > (leave unallocated blocks alone,
+> >  de-allocate full blocks just like with discard,
+> >  explicitly zero unaligned head and tail)
+> 
+> "de-allocate full blocks just like with discard" is an interesting take
+> what it means for dm-thin to handle REQ_OP_WRITE_ZEROES "properly".
+> 
+> > Or DRBD will have to resurrect that reinvented zeroout again,
+> > with exactly those semantics. I did reinvent it for a reason ;)
+> 
+> Yeah, I now recall dropping that line of development because it
+> became "hard" (or at least harder than originally thought).
+> 
+> Don't people use REQ_OP_WRITE_ZEROES to initialize a portion of the
+> disk?  E.g. zeroing superblocks, metadata areas, or whatever?
+> 
+> If we just discarded the logical extent and then a user did a partial
+> write to the block, areas that a user might expect to be zeroed wouldn't
+> be (at least in the case of dm-thinp if "skip_block_zeroing" is
+> enabled).
 
-This patch checkes whether cache_set->io_disable is true in
-__cache_set_unregister(). If cache_set->io_disable is true, it means cache
-set is unregistering by too many I/O errors, then all attached bcache
-devices will be stopped as well. If cache_set->io_disable is not true, it
-means __cache_set_unregister() is triggered by writing 1 to sysfs file
-/sys/fs/bcache/<UUID>/bcache/stop. This is an exception because users do
-it explicitly, this patch keeps existing behavior and does not stop any
-bcache device.
 
-Even the failed cache device has no dirty data, stopping bcache device is
-still a desired behavior by many Ceph and data base users. Then their
-application will report I/O errors due to disappeared bcache device, and
-operation people will know the cache device is broken or disconnected.
+Oh-kay.
+So "immediately after" such an operation
+("zero-out head and tail and de-alloc full blocks")
+a read to that area would return all zeros, as expected.
 
-Changelog:
-v2: add reviewed-by from Hannes.
-v1: initial version for review.
+But once you do a partial write of something to one of those
+de-allocated blocks (and skip_block_zeroing is enabled,
+which it likely is due to "performance"),
+"magically" arbitrary old garbage data springs into existence
+on the LBAs that just before read as zeros.
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
-Cc: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/super.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+lvmthin lvm.conf
+Would that not break a lot of other things
+(any read-modify-write of "upper layers")?
+Would that not even be a serious "information leak"
+(old garbage of other completely unrelated LVs leaking into this one)?
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 4204d75aee7b..97e3bb8e1aee 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1478,6 +1478,14 @@ static void __cache_set_unregister(struct closure *cl)
- 				dc = container_of(c->devices[i],
- 						  struct cached_dev, disk);
- 				bch_cached_dev_detach(dc);
-+				/*
-+				 * If we come here by too many I/O errors,
-+				 * bcache device should be stopped too, to
-+				 * keep data consistency on cache and
-+				 * backing devices.
-+				 */
-+				if (test_bit(CACHE_SET_IO_DISABLE, &c->flags))
-+					bcache_device_stop(c->devices[i]);
- 			} else {
- 				bcache_device_stop(c->devices[i]);
- 			}
--- 
-2.15.1
+But thank you for that, I start to see the problem ;-)
+
+> No, dm-thinp doesn't have an easy way to mark an allocated block as
+> containing zeroes (without actually zeroing).  I toyed with adding that
+> but then realized that even if we had it it'd still require block
+> zeroing be enabled.  But block zeroing is done at allocation time.  So
+> we'd need to interpret the "this block is zeroes" flag to mean "on first
+> write or read to this block it needs to first zero it".  Fugly to say
+> the least...
+
+
+Maybe have a "known zeroed block" pool, allocate only from there,
+and "lazy zero" unallocated blocks, add to the known-zero pool?
+Fallback to zero-on-alloc if that known-zero-pool is depleted.
+
+Easier said than done, I know.
+
+> But sadly, in general, this is a low priority for me, so you might do
+> well to reintroduce your drbd workaround.. sorry about that :(
+
+No problem.
+I'll put that back in, and document that we strongly recommend to
+NOT skip_block_zeroing in those setups.
+
+Thanks,
+
+    Lars
