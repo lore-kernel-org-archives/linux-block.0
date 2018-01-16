@@ -1,99 +1,103 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:59197 "EHLO mx2.suse.de"
+Received: from mx1.redhat.com ([209.132.183.28]:41732 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751493AbeA0TsW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Jan 2018 14:48:22 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH v4 00/13] bcache: device failure handling improvement 
-Date: Sat, 27 Jan 2018 22:23:53 +0800
-Message-Id: <20180127142406.89741-1-colyli@suse.de>
+        id S1750892AbeAPPrl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Jan 2018 10:47:41 -0500
+Date: Tue, 16 Jan 2018 23:47:02 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Don Brace <don.brace@microsemi.com>
+Cc: Laurence Oberman <loberman@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@fb.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Mike Snitzer <snitzer@redhat.com>
+Subject: Re: [PATCH 0/2] genirq/affinity: try to make sure online CPU is
+ assgined to irq vector
+Message-ID: <20180116154701.GB3018@ming.t460p>
+References: <20180115160345.2611-1-ming.lei@redhat.com>
+ <20180115174036.GA20191@infradead.org>
+ <20180116013043.GA3213@ming.t460p>
+ <alpine.DEB.2.20.1801161223500.1823@nanos>
+ <1516109317.9574.1.camel@redhat.com>
+ <a6086631efd54749a298add3d6b9a134@microsemi.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <a6086631efd54749a298add3d6b9a134@microsemi.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi maintainers and folks,
+On Tue, Jan 16, 2018 at 03:22:18PM +0000, Don Brace wrote:
+> > -----Original Message-----
+> > From: Laurence Oberman [mailto:loberman@redhat.com]
+> > Sent: Tuesday, January 16, 2018 7:29 AM
+> > To: Thomas Gleixner <tglx@linutronix.de>; Ming Lei <ming.lei@redhat.com>
+> > Cc: Christoph Hellwig <hch@infradead.org>; Jens Axboe <axboe@fb.com>;
+> > linux-block@vger.kernel.org; linux-kernel@vger.kernel.org; Mike Snitzer
+> > <snitzer@redhat.com>; Don Brace <don.brace@microsemi.com>
+> > Subject: Re: [PATCH 0/2] genirq/affinity: try to make sure online CPU is assgined
+> > to irq vector
+> > 
+> > > > It is because of irq_create_affinity_masks().
+> > >
+> > > That still does not answer the question. If the interrupt for a queue
+> > > is
+> > > assigned to an offline CPU, then the queue should not be used and
+> > > never
+> > > raise an interrupt. That's how managed interrupts have been designed.
+> > >
+> > > Thanks,
+> > >
+> > >       tglx
+> > >
+> > >
+> > >
+> > >
+> > 
+> > I captured a full boot log for this issue for Microsemi, I will send it
+> > to Don Brace.
+> > I enabled all the HPSA debug and here is snippet
+> > 
+> > 
+> > ..
+> > ..
+> > ..
+> >   246.751135] INFO: task systemd-udevd:413 blocked for more than 120
+> > seconds.
+> > [��246.788008]�������Tainted: G          I      4.15.0-rc4.noming+ #1
+> > [��246.822380] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+> > disables this message.
+> > [��246.865594] systemd-udevd   D    0   413    411 0x80000004
+> > [��246.895519] Call Trace:
+> > [��246.909713]��? __schedule+0x340/0xc20
+> > [��246.930236]��schedule+0x32/0x80
+> > [��246.947905]��schedule_timeout+0x23d/0x450
+> > [  246.970047]��? find_held_lock+0x2d/0x90
+> > [��246.991774]��? wait_for_completion_io+0x108/0x170
+> > [��247.018172]��io_schedule_timeout+0x19/0x40
+> > [��247.041208]��wait_for_completion_io+0x110/0x170
+> > [��247.067326]��? wake_up_q+0x70/0x70
+> > [��247.086801]��hpsa_scsi_do_simple_cmd+0xc6/0x100 [hpsa]
+> > [��247.114315]��hpsa_scsi_do_simple_cmd_with_retry+0xb7/0x1c0 [hpsa]
+> > [��247.146629]��hpsa_scsi_do_inquiry+0x73/0xd0 [hpsa]
+> > [��247.174118]��hpsa_init_one+0x12cb/0x1a59 [hpsa]
+> 
+> This trace comes from internally generated discovery commands. No SCSI devices have
+> been presented to the SML yet.
+> 
+> At this point we should be running on only one CPU. These commands are meant to use
+> reply queue 0 which are tied to CPU 0. It's interesting that the patch helps.
 
-This patch set tries to improve bcache device failure handling, includes
-cache device and backing device failures.
+In hpsa_interrupt_mode(), you pass PCI_IRQ_AFFINITY to pci_alloc_irq_vectors(),
+which may spread one irq vector across all offline CPUs. That is the cause of
+this hang reported by Laurence from my observation.
 
-The basic idea to handle failed cache device is,
-- Unregister cache set
-- Detach all backing devices which are attached to this cache set
-- Stop all the detached bcache devices (configurable)
-- Stop all flash only volume on the cache set
-The above process is named 'cache set retire' by me. The result of cache
-set retire is, cache set and bcache devices are all removed, following
-I/O requests will get failed immediately to notift upper layer or user
-space coce that the cache device is failed or disconnected.
+BTW, if the interrupt handler for the reply queue isn't performance sensitive,
+maybe PCI_IRQ_AFFINITY can be removed for avoiding this issue.
 
-For failed backing device, there are two kinds of failures to handle,
-- If device is disconnected, and kernel thread dc->status_update_thread
-  finds it is offline for BACKING_DEV_OFFLINE_TIMEOUT (5) seconds, the
-  kernel thread will set dc->io_disable and call bcache_device_stop() to
-  stop and remove the bcache device from system.
-- If device is alive but returns too many I/O errors, after errors number
-  exceeds dc->error_limit, call bch_cached_dev_error() to set
-  dc->io_disable and stop bcache device. Then the broken backing device
-  and its bcache device will be removed from system.
+But anyway, as I replied in this thread, this patch still improves irq
+vectors spread.
 
-The v4 patch set combines two v3 patches into one, and adds one more patch
-to permit users to explicitly avoid stopping attached bcache device from a
-retiring cache set. This is a configurable option suggested by
-Nix <nix@esperi.org.uk>.
-
-Some patches of this patch set is already in bcache-for-next and not
-included here anymore. Most of the patches are reviewed by Hannes Reinecke
-and Junhui Tang. There are still severl patches need to be reviewed,
-- [PATCH v4 05/13] bcache: stop dc->writeback_rate_update properly
-- [PATCH v4 13/13] bcache: add stop_attached_devs_on_fail to struct
-  cached_dev 
-
-Any comment, question and review are warmly welcome. Thanks in advance.
-
-Changelog:
-v4: add per-cached_dev option stop_attached_devs_on_fail to avoid stopping
-    attached bcache device from a retiring cache set.
-v3: fix detach issue find in v2 patch set.
-v2: fixes all problems found in v1 review.
-    add patches to handle backing device failure.
-    add one more patch to set writeback_rate_update_seconds range.
-    include a patch from Junhui Tang.
-v1: the initial version, only handles cache device failure.
-
-Coly Li
----
-
-Coly Li (12):
-  bcache: set writeback_rate_update_seconds in range [1, 60] seconds
-  bcache: properly set task state in bch_writeback_thread()
-  bcache: fix cached_dev->count usage for bch_cache_set_error()
-  bcache: quit dc->writeback_thread when BCACHE_DEV_DETACHING is set
-  bcache: stop dc->writeback_rate_update properly
-  bcache: set error_limit correctly
-  bcache: add CACHE_SET_IO_DISABLE to struct cache_set flags
-  bcache: stop all attached bcache devices for a retired cache set
-  bcache: add backing_request_endio() for bi_end_io of attached backing
-    device I/O
-  bcache: add io_disable to struct cached_dev
-  bcache: stop bcache device when backing device is offline
-  bcache: add stop_attached_devs_on_fail to struct cached_dev
-
-Tang Junhui (1):
-  bcache: fix inaccurate io state for detached bcache devices
-
- drivers/md/bcache/alloc.c     |   5 +-
- drivers/md/bcache/bcache.h    |  38 ++++++++-
- drivers/md/bcache/btree.c     |  10 ++-
- drivers/md/bcache/io.c        |  16 +++-
- drivers/md/bcache/journal.c   |   4 +-
- drivers/md/bcache/request.c   | 187 +++++++++++++++++++++++++++++++++++-------
- drivers/md/bcache/super.c     | 181 ++++++++++++++++++++++++++++++++++++----
- drivers/md/bcache/sysfs.c     |  55 ++++++++++++-
- drivers/md/bcache/util.h      |   6 --
- drivers/md/bcache/writeback.c |  99 ++++++++++++++++++----
- drivers/md/bcache/writeback.h |   5 +-
- 11 files changed, 522 insertions(+), 84 deletions(-)
-
--- 
-2.15.1
+Thanks,
+Ming
