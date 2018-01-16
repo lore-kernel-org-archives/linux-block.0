@@ -1,124 +1,134 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:40247 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751963AbeAENQx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jan 2018 08:16:53 -0500
-Received: by mail-wm0-f67.google.com with SMTP id f206so2405695wmf.5
-        for <linux-block@vger.kernel.org>; Fri, 05 Jan 2018 05:16:52 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 12/25] lightnvm: pblk: refactor emeta consistency check
-Date: Fri,  5 Jan 2018 14:16:08 +0100
-Message-Id: <20180105131621.20808-13-m@bjorling.me>
-In-Reply-To: <20180105131621.20808-1-m@bjorling.me>
-References: <20180105131621.20808-1-m@bjorling.me>
+Received: from mx2.suse.de ([195.135.220.15]:59815 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750903AbeAPEqn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 Jan 2018 23:46:43 -0500
+Subject: Re: [PATCH] bcache: fix for allocator and register thread race
+To: tang.junhui@zte.com.cn, huarui.dev@gmail.com, mlyle@lyle.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <1515574275-10782-1-git-send-email-tang.junhui@zte.com.cn>
+From: Coly Li <colyli@suse.de>
+Message-ID: <5f38197c-58d8-4e85-b152-41454871b919@suse.de>
+Date: Tue, 16 Jan 2018 12:46:31 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1515574275-10782-1-git-send-email-tang.junhui@zte.com.cn>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+On 10/01/2018 4:51 PM, tang.junhui@zte.com.cn wrote:
+> From: Tang Junhui <tang.junhui@zte.com.cn>
+> 
+> After long time run of random small IO writing,
+> reboot the machine, and after the machine power on,
+> bcache got stuck, the stack is:
+> [root@ceph153 ~]# cat /proc/2510/task/*/stack
+> [<ffffffffa06b2455>] closure_sync+0x25/0x90 [bcache]
+> [<ffffffffa06b6be8>] bch_journal+0x118/0x2b0 [bcache]
+> [<ffffffffa06b6dc7>] bch_journal_meta+0x47/0x70 [bcache]
+> [<ffffffffa06be8f7>] bch_prio_write+0x237/0x340 [bcache]
+> [<ffffffffa06a8018>] bch_allocator_thread+0x3c8/0x3d0 [bcache]
+> [<ffffffff810a631f>] kthread+0xcf/0xe0
+> [<ffffffff8164c318>] ret_from_fork+0x58/0x90
+> [<ffffffffffffffff>] 0xffffffffffffffff
+> [root@ceph153 ~]# cat /proc/2038/task/*/stack
+> [<ffffffffa06b1abd>] __bch_btree_map_nodes+0x12d/0x150 [bcache]
+> [<ffffffffa06b1bd1>] bch_btree_insert+0xf1/0x170 [bcache]
+> [<ffffffffa06b637f>] bch_journal_replay+0x13f/0x230 [bcache]
+> [<ffffffffa06c75fe>] run_cache_set+0x79a/0x7c2 [bcache]
+> [<ffffffffa06c0cf8>] register_bcache+0xd48/0x1310 [bcache]
+> [<ffffffff812f702f>] kobj_attr_store+0xf/0x20
+> [<ffffffff8125b216>] sysfs_write_file+0xc6/0x140
+> [<ffffffff811dfbfd>] vfs_write+0xbd/0x1e0
+> [<ffffffff811e069f>] SyS_write+0x7f/0xe0
+> [<ffffffff8164c3c9>] system_call_fastpath+0x16/0x1
+> The stack shows the register thread and allocator thread
+> were getting stuck when registering cache device.
+> 
+> we reboot the machine several times, the issue always
+> exsit in this machine.
+> 
+> We debug the code, and found the call trace as bellow:
+> register_bcache()
+>   ==>run_cache_set()
+>      ==>bch_journal_replay()
+>         ==>bch_btree_insert()
+>            ==>__bch_btree_map_nodes()
+>               ==>btree_insert_fn()
+>                  ==>btree_split() //node need split
+>                     ==>btree_check_reserve()
+> In btree_check_reserve(), It will check if there is enough buckets
+> of RESERVE_BTREE type, since allocator thread did not work yet, so
+> no buckets of RESERVE_BTREE type allocated, so the register thread
+> waits on c->btree_cache_wait, and goes to sleep.
+> 
+> Then the allocator thread initialized, and goes to work,
+> the call trace is bellow:
+> bch_allocator_thread()
+>   ==>bch_prio_write()
+>      ==>bch_journal_meta()
+>         ==>bch_journal()
+>            ==>journal_wait_for_write()
+> In journal_wait_for_write(), It will check if journal is full by
+> journal_full(), but the long time random small IO writing
+> causes the exhaustion of journal buckets(journal.blocks_free=0),
+> In order to release the journal buckets,
+> the allocator calls btree_flush_write() to flush keys to
+> btree nodes, and waits on c->journal.wait until btree nodes writing over
+> or there has already some journal buckets space, then the allocator
+> thread goes to sleep. but in btree_flush_write(), since
+> bch_journal_replay() is not finished, so no btree nodes have journal
+> (condition "if (btree_current_write(b)->journal)" never satisfied),
+> so we got no btree node to flush, no journal bucket released,
+> and allocator sleep all the times.
+> 
+> Through the above analysis, we can see that:
+> 1) Register thread wait for allocator thread to allocate buckets of
+>    RESERVE_BTREE type;
+> 2) Alloctor thread wait for register thread to replay journal, so it
+>    can flush btree nodes and get journal bucket.
+>    then they are all got stuck by waiting for each other.
+> 
+> Hua Rui provided a patch for me, by allocating some buckets of
+> RESERVE_BTREE type in advance, so the register thread can get bucket
+> when btree node splitting and no need to waiting for the allocator thread.
+> I tested it, it has effect, and register thread run a step forward, but
+> finally are still got stuck, the reason is only 8 bucket of RESERVE_BTREE
+> type were allocated, and in bch_journal_replay(), after 2 btree nodes
+> splitting, only 4 bucket of RESERVE_BTREE type left, then
+> btree_check_reserve() is not satisfied anymore, so it goes to sleep again,
+> and in the same time, alloctor thread did not flush enough btree nodes to
+> release a journal bucket, so they all got stuck again.
+> 
+> So we need to allocate more buckets of RESERVE_BTREE type in advance,
+> but how much is enough?  By experience and test, I think it should be
+> as much as journal buckets. Then I modify the code as this patch,
+> and test in the machine, and it works.
+> 
+> This patch modified base on Hua Rui’s patch, and allocate more buckets
+> of RESERVE_BTREE type in advance to avoid register thread and allocate
+> thread going to wait for each other.
+> 
+> Signed-off-by: Hua Rui <huarui.dev@gmail.com>
+> Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
 
-Currently pblk_recov_get_lba list does two separate things:
-it checks the consistency of the emeta and extracts the lba list.
+Hi Junhui,
 
-This patch separates the consistency check to make the code easier
-to read and to prepare for version checks of the line emeta
-persistent data format version.
+It spent some time for me to understand the problem and the fix :-)
+The root cause is because bcache journal does not reserve space
+previously, and allocates journal slot when btree node split by insert a
+node from journal to btree. If we reserve journal space previously, then
+we will need something like commit record to make sure the operation is
+atomic. That is complicated and I doubt whether bcache is deserved for it.
 
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/lightnvm/pblk-gc.c       |  9 ++++++++-
- drivers/lightnvm/pblk-recovery.c | 15 ++++++++++-----
- drivers/lightnvm/pblk.h          |  2 +-
- 3 files changed, 19 insertions(+), 7 deletions(-)
+This fix is much simpler and it makes things work. I am OK with it.
 
-diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-index 6f0ff2c..a270337 100644
---- a/drivers/lightnvm/pblk-gc.c
-+++ b/drivers/lightnvm/pblk-gc.c
-@@ -169,7 +169,14 @@ static void pblk_gc_line_prepare_ws(struct work_struct *work)
- 	 * the line untouched. TODO: Implement a recovery routine that scans and
- 	 * moves all sectors on the line.
- 	 */
--	lba_list = pblk_recov_get_lba_list(pblk, emeta_buf);
-+
-+	ret = pblk_recov_check_emeta(pblk, emeta_buf);
-+	if (ret) {
-+		pr_err("pblk: inconsistent emeta (line %d)\n", line->id);
-+		goto fail_free_emeta;
-+	}
-+
-+	lba_list = emeta_to_lbas(pblk, emeta_buf);
- 	if (!lba_list) {
- 		pr_err("pblk: could not interpret emeta (line %d)\n", line->id);
- 		goto fail_free_emeta;
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index 1b272ae..39a2e19 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -111,18 +111,18 @@ int pblk_recov_setup_rq(struct pblk *pblk, struct pblk_c_ctx *c_ctx,
- 	return 0;
- }
- 
--__le64 *pblk_recov_get_lba_list(struct pblk *pblk, struct line_emeta *emeta_buf)
-+int pblk_recov_check_emeta(struct pblk *pblk, struct line_emeta *emeta_buf)
- {
- 	u32 crc;
- 
- 	crc = pblk_calc_emeta_crc(pblk, emeta_buf);
- 	if (le32_to_cpu(emeta_buf->crc) != crc)
--		return NULL;
-+		return 1;
- 
- 	if (le32_to_cpu(emeta_buf->header.identifier) != PBLK_MAGIC)
--		return NULL;
-+		return 1;
- 
--	return emeta_to_lbas(pblk, emeta_buf);
-+	return 0;
- }
- 
- static int pblk_recov_l2p_from_emeta(struct pblk *pblk, struct pblk_line *line)
-@@ -137,7 +137,7 @@ static int pblk_recov_l2p_from_emeta(struct pblk *pblk, struct pblk_line *line)
- 	u64 nr_valid_lbas, nr_lbas = 0;
- 	u64 i;
- 
--	lba_list = pblk_recov_get_lba_list(pblk, emeta_buf);
-+	lba_list = emeta_to_lbas(pblk, emeta_buf);
- 	if (!lba_list)
- 		return 1;
- 
-@@ -938,6 +938,11 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
- 			goto next;
- 		}
- 
-+		if (pblk_recov_check_emeta(pblk, line->emeta->buf)) {
-+			pblk_recov_l2p_from_oob(pblk, line);
-+			goto next;
-+		}
-+
- 		if (pblk_recov_l2p_from_emeta(pblk, line))
- 			pblk_recov_l2p_from_oob(pblk, line);
- 
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 1dbb0bf..8851b18 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -808,7 +808,7 @@ int pblk_submit_read_gc(struct pblk *pblk, struct pblk_gc_rq *gc_rq);
- void pblk_submit_rec(struct work_struct *work);
- struct pblk_line *pblk_recov_l2p(struct pblk *pblk);
- int pblk_recov_pad(struct pblk *pblk);
--__le64 *pblk_recov_get_lba_list(struct pblk *pblk, struct line_emeta *emeta);
-+int pblk_recov_check_emeta(struct pblk *pblk, struct line_emeta *emeta);
- int pblk_recov_setup_rq(struct pblk *pblk, struct pblk_c_ctx *c_ctx,
- 			struct pblk_rec_ctx *recovery, u64 *comp_bits,
- 			unsigned int comp);
--- 
-2.9.3
+Reviewed-by: Coly Li <colyli@suse.de>
+
+> ---
+>  drivers/md/bcache/btree.c |  9 ++++++---
+>  drivers/md/bcache/super.c | 12 +++++++++++-
+>  2 files changed, 17 insertions(+), 4 deletions(-)
+[code snipped]
+
+Coly Li
