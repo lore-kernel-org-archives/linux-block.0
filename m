@@ -1,129 +1,87 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:37033 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:50238 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755317AbeAMRM4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 13 Jan 2018 12:12:56 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Tang Junhui <tang.junhui@zte.com.cn>
-Subject: [PATCH v2 09/12] bcache: fix inaccurate io state for detached bcache devices
-Date: Sun, 14 Jan 2018 01:10:47 +0800
-Message-Id: <20180113171050.22467-10-colyli@suse.de>
-In-Reply-To: <20180113171050.22467-1-colyli@suse.de>
-References: <20180113171050.22467-1-colyli@suse.de>
+        id S1750812AbeAPJC3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Jan 2018 04:02:29 -0500
+Subject: Re: [PATCH v3 02/13] bcache: properly set task state in
+ bch_writeback_thread()
+To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Michael Lyle <mlyle@lyle.org>,
+        Junhui Tang <tang.junhui@zte.com.cn>
+References: <20180114144236.28213-1-colyli@suse.de>
+ <20180114144236.28213-3-colyli@suse.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <9d834b70-f35b-4ca3-017c-d923900c98a0@suse.de>
+Date: Tue, 16 Jan 2018 10:02:27 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180114144236.28213-3-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+On 01/14/2018 03:42 PM, Coly Li wrote:
+> Kernel thread routine bch_writeback_thread() has the following code block,
+> 
+> 447         down_write(&dc->writeback_lock);
+> 448~450     if (check conditions) {
+> 451                 up_write(&dc->writeback_lock);
+> 452                 set_current_state(TASK_INTERRUPTIBLE);
+> 453
+> 454                 if (kthread_should_stop())
+> 455                         return 0;
+> 456
+> 457                 schedule();
+> 458                 continue;
+> 459         }
+> 
+> If condition check is true, its task state is set to TASK_INTERRUPTIBLE
+> and call schedule() to wait for others to wake up it.
+> 
+> There are 2 issues in current code,
+> 1, Task state is set to TASK_INTERRUPTIBLE after the condition checks, if
+>    another process changes the condition and call wake_up_process(dc->
+>    writeback_thread), then at line 452 task state is set back to
+>    TASK_INTERRUPTIBLE, the writeback kernel thread will lose a chance to be
+>    waken up.
+> 2, At line 454 if kthread_should_stop() is true, writeback kernel thread
+>    will return to kernel/kthread.c:kthread() with TASK_INTERRUPTIBLE and
+>    call do_exit(). It is not good to enter do_exit() with task state
+>    TASK_INTERRUPTIBLE, in following code path might_sleep() is called and a
+>    warning message is reported by __might_sleep(): "WARNING: do not call
+>    blocking ops when !TASK_RUNNING; state=1 set at [xxxx]".
+> 
+> For the first issue, task state should be set before condition checks.
+> Ineed because dc->writeback_lock is required when modifying all the
+> conditions, calling set_current_state() inside code block where dc->
+> writeback_lock is hold is safe. But this is quite implicit, so I still move
+> set_current_state() before all the condition checks.
+> 
+> For the second issue, frankley speaking it does not hurt when kernel thread
+> exits with TASK_INTERRUPTIBLE state, but this warning message scares users,
+> makes them feel there might be something risky with bcache and hurt their
+> data.  Setting task state to TASK_RUNNING before returning fixes this
+> problem.
+> 
+> Changelog:
+> v2: fix the race issue in v1 patch.
+> v1: initial buggy fix.
+> 
+> Signed-off-by: Coly Li <colyli@suse.de>
+> Cc: Michael Lyle <mlyle@lyle.org>
+> Cc: Hannes Reinecke <hare@suse.de>
+> Cc: Junhui Tang <tang.junhui@zte.com.cn>
+> ---
+>  drivers/md/bcache/writeback.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-When we run IO in a detached device,  and run iostat to shows IO status,
-normally it will show like bellow (Omitted some fields):
-Device: ... avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
-sdd        ... 15.89     0.53    1.82    0.20    2.23   1.81  52.30
-bcache0    ... 15.89   115.42    0.00    0.00    0.00   2.40  69.60
-but after IO stopped, there are still very big avgqu-sz and %util
-values as bellow:
-Device: ... avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
-bcache0   ...      0   5326.32    0.00    0.00    0.00   0.00 100.10
+Cheers,
 
-The reason for this issue is that, only generic_start_io_acct() called
-and no generic_end_io_acct() called for detached device in
-cached_dev_make_request(). See the code:
-//start generic_start_io_acct()
-generic_start_io_acct(q, rw, bio_sectors(bio), &d->disk->part0);
-if (cached_dev_get(dc)) {
-	//will callback generic_end_io_acct()
-}
-else {
-	//will not call generic_end_io_acct()
-}
-
-This patch calls generic_end_io_acct() in the end of IO for detached
-devices, so we can show IO state correctly.
-
-(Modified to use GFP_NOIO in kzalloc() by Coly Li)
-
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-Reviewed-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/request.c | 58 +++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 51 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 02296bda6384..e09c5ae745be 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -986,6 +986,55 @@ static void cached_dev_nodata(struct closure *cl)
- 	continue_at(cl, cached_dev_bio_complete, NULL);
- }
- 
-+struct detached_dev_io_private {
-+	struct bcache_device	*d;
-+	unsigned long		start_time;
-+	bio_end_io_t		*bi_end_io;
-+	void			*bi_private;
-+};
-+
-+static void detatched_dev_end_io(struct bio *bio)
-+{
-+	struct detached_dev_io_private *ddip;
-+
-+	ddip = bio->bi_private;
-+	bio->bi_end_io = ddip->bi_end_io;
-+	bio->bi_private = ddip->bi_private;
-+
-+	generic_end_io_acct(ddip->d->disk->queue,
-+			    bio_data_dir(bio),
-+			    &ddip->d->disk->part0, ddip->start_time);
-+
-+	kfree(ddip);
-+
-+	bio->bi_end_io(bio);
-+}
-+
-+static void detached_dev_do_request(struct bcache_device *d, struct bio *bio)
-+{
-+	struct detached_dev_io_private *ddip;
-+	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
-+
-+	/*
-+	 * no need to call closure_get(&dc->disk.cl),
-+	 * because upper layer had already opened bcache device,
-+	 * which would call closure_get(&dc->disk.cl)
-+	 */
-+	ddip = kzalloc(sizeof(struct detached_dev_io_private), GFP_NOIO);
-+	ddip->d = d;
-+	ddip->start_time = jiffies;
-+	ddip->bi_end_io = bio->bi_end_io;
-+	ddip->bi_private = bio->bi_private;
-+	bio->bi_end_io = detatched_dev_end_io;
-+	bio->bi_private = ddip;
-+
-+	if ((bio_op(bio) == REQ_OP_DISCARD) &&
-+	    !blk_queue_discard(bdev_get_queue(dc->bdev)))
-+		bio->bi_end_io(bio);
-+	else
-+		generic_make_request(bio);
-+}
-+
- /* Cached devices - read & write stuff */
- 
- static blk_qc_t cached_dev_make_request(struct request_queue *q,
-@@ -1028,13 +1077,8 @@ static blk_qc_t cached_dev_make_request(struct request_queue *q,
- 			else
- 				cached_dev_read(dc, s);
- 		}
--	} else {
--		if ((bio_op(bio) == REQ_OP_DISCARD) &&
--		    !blk_queue_discard(bdev_get_queue(dc->bdev)))
--			bio_endio(bio);
--		else
--			generic_make_request(bio);
--	}
-+	} else
-+		detached_dev_do_request(d, bio);
- 
- 	return BLK_QC_T_NONE;
- }
+Hannes
 -- 
-2.15.1
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
