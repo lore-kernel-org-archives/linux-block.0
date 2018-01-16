@@ -1,92 +1,115 @@
-Return-Path: <prvs=5482b108a=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "snitzer@redhat.com" <snitzer@redhat.com>
-CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <msnitzer@redhat.com>
+Date: Tue, 16 Jan 2018 17:32:08 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>
 Subject: Re: [PATCH 3/3] block: Protect less code with sysfs_lock in
  blk_{un,}register_queue()
-Date: Wed, 17 Jan 2018 00:03:42 +0000
-Message-ID: <1516147421.2844.70.camel@wdc.com>
+Message-ID: <20180116223207.GA32637@redhat.com>
 References: <20180116181752.25847-1-bart.vanassche@wdc.com>
-	 <20180116181752.25847-4-bart.vanassche@wdc.com>
-	 <20180116223207.GA32637@redhat.com>
-In-Reply-To: <20180116223207.GA32637@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+ <20180116181752.25847-4-bart.vanassche@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180116181752.25847-4-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE4LTAxLTE2IGF0IDE3OjMyIC0wNTAwLCBNaWtlIFNuaXR6ZXIgd3JvdGU6DQo+
-IFRoZXJlZm9yZSBpdCBzZWVtcyB0byBtZSB0aGF0IGFsbCBxdWV1ZV9hdHRyX3tzaG93LHN0b3Jl
-fSBhcmUgcmFjZXkgdnMNCj4gYmxrX3VucmVnaXN0ZXJfcXVldWUoKSByZW1vdmluZyB0aGUgJ3F1
-ZXVlJyBrb2JqZWN0Lg0KPiANCj4gQW5kIGl0IHdhcyBqdXN0IHRoYXQgX19lbGV2YXRvcl9jaGFu
-Z2UoKSB3YXMgbXlvcGljbHkgZml4ZWQgdG8gYWRkcmVzcw0KPiB0aGUgcmFjZSB3aGVyZWFzIGEg
-bW9yZSBnZW5lcmljIHNvbHV0aW9uIHdhcy9pcyBuZWVkZWQuICBCdXQgc2hvcnQgb2YNCj4gdGhh
-dCBtb3JlIGdlbmVyaWMgZml4IHlvdXIgY2hhbmdlIHdpbGwgcmVpbnRyb2R1Y2UgdGhlIHBvdGVu
-dGlhbCBmb3INCj4gaGl0dGluZyB0aGUgaXNzdWUgdGhhdCBjb21taXQgZTlhODIzZmIzNGE4YiBm
-aXhlZC4NCj4gDQo+IEluIHRoYXQgbGlnaHQsIHRoaW5rIGl0IGJlc3QgdG8gbGVhdmUgYmxrX3Vu
-cmVnaXN0ZXJfcXVldWUoKSdzDQo+IG11dGV4X2xvY2soKSBhYm92ZSB0aGUgUVVFVUVfRkxBR19S
-RUdJU1RFUkVEIGNsZWFyaW5nIF9hbmRfIHVwZGF0ZQ0KPiBxdWV1ZV9hdHRyX3tzaG93LHN0b3Jl
-fSB0byB0ZXN0IGZvciBRVUVVRV9GTEFHX1JFR0lTVEVSRUQgd2hpbGUgaG9sZGluZw0KPiBzeXNm
-c19sb2NrLg0KPiANCj4gVGhlbiByZW1vdmUgdGhlIHVuaWNvcm4gdGVzdF9iaXQgZm9yIFFVRVVF
-X0ZMQUdfUkVHSVNURVJFRCBmcm9tDQo+IF9fZWxldmF0b3JfY2hhbmdlKCkuDQoNClRoYW5rcyBN
-aWtlIGZvciB0aGUgZmVlZGJhY2suIEhvd2V2ZXIsIEkgdGhpbmsgYSBzaW1wbGVyIGFwcHJvYWNo
-IGV4aXN0cyB0aGFuDQp3aGF0IGhhcyBiZWVuIGRlc2NyaWJlZCBhYm92ZSwgbmFtZWx5IGJ5IHVu
-cmVnaXN0ZXJpbmcgdGhlIHN5c2ZzIGF0dHJpYnV0ZXMNCmVhcmxpZXIuIEhvdyBhYm91dCB0aGUg
-cGF0Y2ggYmVsb3c/DQoNCltQQVRDSF0gYmxvY2s6IFByb3RlY3QgbGVzcyBjb2RlIHdpdGggc3lz
-ZnNfbG9jayBpbiBibGtfe3VuLH1yZWdpc3Rlcl9xdWV1ZSgpDQotLS0NCiBibG9jay9ibGstc3lz
-ZnMuYyB8IDM5ICsrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLQ0KIGJsb2Nr
-L2VsZXZhdG9yLmMgIHwgIDQgLS0tLQ0KIDIgZmlsZXMgY2hhbmdlZCwgMjYgaW5zZXJ0aW9ucygr
-KSwgMTcgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS9ibG9jay9ibGstc3lzZnMuYyBiL2Js
-b2NrL2Jsay1zeXNmcy5jDQppbmRleCA0YTZhNDBmZmQ3OGUuLmNlMzIzNjZjNmRiNyAxMDA2NDQN
-Ci0tLSBhL2Jsb2NrL2Jsay1zeXNmcy5jDQorKysgYi9ibG9jay9ibGstc3lzZnMuYw0KQEAgLTg1
-Myw2ICs4NTMsMTAgQEAgc3RydWN0IGtvYmpfdHlwZSBibGtfcXVldWVfa3R5cGUgPSB7DQogCS5y
-ZWxlYXNlCT0gYmxrX3JlbGVhc2VfcXVldWUsDQogfTsNCiANCisvKioNCisgKiBibGtfcmVnaXN0
-ZXJfcXVldWUgLSByZWdpc3RlciBhIGJsb2NrIGxheWVyIHF1ZXVlIHdpdGggc3lzZnMNCisgKiBA
-ZGlzazogRGlzayBvZiB3aGljaCB0aGUgcmVxdWVzdCBxdWV1ZSBzaG91bGQgYmUgcmVnaXN0ZXJl
-ZCB3aXRoIHN5c2ZzLg0KKyAqLw0KIGludCBibGtfcmVnaXN0ZXJfcXVldWUoc3RydWN0IGdlbmRp
-c2sgKmRpc2spDQogew0KIAlpbnQgcmV0Ow0KQEAgLTkwOSwxMSArOTEzLDEyIEBAIGludCBibGtf
-cmVnaXN0ZXJfcXVldWUoc3RydWN0IGdlbmRpc2sgKmRpc2spDQogCWlmIChxLT5yZXF1ZXN0X2Zu
-IHx8IChxLT5tcV9vcHMgJiYgcS0+ZWxldmF0b3IpKSB7DQogCQlyZXQgPSBlbHZfcmVnaXN0ZXJf
-cXVldWUocSk7DQogCQlpZiAocmV0KSB7DQorCQkJbXV0ZXhfdW5sb2NrKCZxLT5zeXNmc19sb2Nr
-KTsNCiAJCQlrb2JqZWN0X3VldmVudCgmcS0+a29iaiwgS09CSl9SRU1PVkUpOw0KIAkJCWtvYmpl
-Y3RfZGVsKCZxLT5rb2JqKTsNCiAJCQlibGtfdHJhY2VfcmVtb3ZlX3N5c2ZzKGRldik7DQogCQkJ
-a29iamVjdF9wdXQoJmRldi0+a29iaik7DQotCQkJZ290byB1bmxvY2s7DQorCQkJcmV0dXJuIHJl
-dDsNCiAJCX0NCiAJfQ0KIAlyZXQgPSAwOw0KQEAgLTkyMyw2ICs5MjgsMTMgQEAgaW50IGJsa19y
-ZWdpc3Rlcl9xdWV1ZShzdHJ1Y3QgZ2VuZGlzayAqZGlzaykNCiB9DQogRVhQT1JUX1NZTUJPTF9H
-UEwoYmxrX3JlZ2lzdGVyX3F1ZXVlKTsNCiANCisvKioNCisgKiBibGtfdW5yZWdpc3Rlcl9xdWV1
-ZSAtIGNvdW50ZXJwYXJ0IG9mIGJsa19yZWdpc3Rlcl9xdWV1ZSgpDQorICogQGRpc2s6IERpc2sg
-b2Ygd2hpY2ggdGhlIHJlcXVlc3QgcXVldWUgc2hvdWxkIGJlIHVucmVnaXN0ZXJlZCBmcm9tIHN5
-c2ZzLg0KKyAqDQorICogTm90ZTogdGhlIGNhbGxlciBpcyByZXNwb25zaWJsZSBmb3IgZ3VhcmFu
-dGVlaW5nIHRoYXQgdGhpcyBmdW5jdGlvbiBpcyBjYWxsZWQNCisgKiBhZnRlciBibGtfcmVnaXN0
-ZXJfcXVldWUoKSBoYXMgZmluaXNoZWQuDQorICovDQogdm9pZCBibGtfdW5yZWdpc3Rlcl9xdWV1
-ZShzdHJ1Y3QgZ2VuZGlzayAqZGlzaykNCiB7DQogCXN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxID0g
-ZGlzay0+cXVldWU7DQpAQCAtOTM0LDI4ICs5NDYsMjkgQEAgdm9pZCBibGtfdW5yZWdpc3Rlcl9x
-dWV1ZShzdHJ1Y3QgZ2VuZGlzayAqZGlzaykNCiAJaWYgKCF0ZXN0X2JpdChRVUVVRV9GTEFHX1JF
-R0lTVEVSRUQsICZxLT5xdWV1ZV9mbGFncykpDQogCQlyZXR1cm47DQogDQotCS8qDQotCSAqIFBy
-b3RlY3QgYWdhaW5zdCB0aGUgJ3F1ZXVlJyBrb2JqIGJlaW5nIGFjY2Vzc2VkDQotCSAqIHdoaWxl
-L2FmdGVyIGl0IGlzIHJlbW92ZWQuDQotCSAqLw0KLQltdXRleF9sb2NrKCZxLT5zeXNmc19sb2Nr
-KTsNCi0NCiAJc3Bpbl9sb2NrX2lycShxLT5xdWV1ZV9sb2NrKTsNCiAJcXVldWVfZmxhZ19jbGVh
-cihRVUVVRV9GTEFHX1JFR0lTVEVSRUQsIHEpOw0KIAlzcGluX3VubG9ja19pcnEocS0+cXVldWVf
-bG9jayk7DQogDQotCXdidF9leGl0KHEpOw0KLQ0KKwkvKg0KKwkgKiBSZW1vdmUgdGhlIHN5c2Zz
-IGF0dHJpYnV0ZXMgYmVmb3JlIHVucmVnaXN0ZXJpbmcgdGhlIHF1ZXVlIGRhdGENCisJICogc3Ry
-dWN0dXJlcyB0aGF0IGNhbiBiZSBtb2RpZmllZCB0aHJvdWdoIHN5c2ZzLg0KKwkgKi8NCisJbXV0
-ZXhfbG9jaygmcS0+c3lzZnNfbG9jayk7DQogCWlmIChxLT5tcV9vcHMpDQogCQlibGtfbXFfdW5y
-ZWdpc3Rlcl9kZXYoZGlza190b19kZXYoZGlzayksIHEpOw0KLQ0KLQlpZiAocS0+cmVxdWVzdF9m
-biB8fCAocS0+bXFfb3BzICYmIHEtPmVsZXZhdG9yKSkNCi0JCWVsdl91bnJlZ2lzdGVyX3F1ZXVl
-KHEpOw0KKwltdXRleF91bmxvY2soJnEtPnN5c2ZzX2xvY2spOw0KIA0KIAlrb2JqZWN0X3VldmVu
-dCgmcS0+a29iaiwgS09CSl9SRU1PVkUpOw0KIAlrb2JqZWN0X2RlbCgmcS0+a29iaik7DQogCWJs
-a190cmFjZV9yZW1vdmVfc3lzZnMoZGlza190b19kZXYoZGlzaykpOw0KLQlrb2JqZWN0X3B1dCgm
-ZGlza190b19kZXYoZGlzayktPmtvYmopOw0KIA0KKwl3YnRfZXhpdChxKTsNCisNCisJbXV0ZXhf
-bG9jaygmcS0+c3lzZnNfbG9jayk7DQorCWlmIChxLT5yZXF1ZXN0X2ZuIHx8IChxLT5tcV9vcHMg
-JiYgcS0+ZWxldmF0b3IpKQ0KKwkJZWx2X3VucmVnaXN0ZXJfcXVldWUocSk7DQogCW11dGV4X3Vu
-bG9jaygmcS0+c3lzZnNfbG9jayk7DQorDQorCWtvYmplY3RfcHV0KCZkaXNrX3RvX2RldihkaXNr
-KS0+a29iaik7DQogfQ0KZGlmZiAtLWdpdCBhL2Jsb2NrL2VsZXZhdG9yLmMgYi9ibG9jay9lbGV2
-YXRvci5jDQppbmRleCBlODdlOWI0M2FiYTAuLjRiNzk1N2IyOGE5OSAxMDA2NDQNCi0tLSBhL2Js
-b2NrL2VsZXZhdG9yLmMNCisrKyBiL2Jsb2NrL2VsZXZhdG9yLmMNCkBAIC0xMDgwLDEwICsxMDgw
-LDYgQEAgc3RhdGljIGludCBfX2VsZXZhdG9yX2NoYW5nZShzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAq
-cSwgY29uc3QgY2hhciAqbmFtZSkNCiAJY2hhciBlbGV2YXRvcl9uYW1lW0VMVl9OQU1FX01BWF07
-DQogCXN0cnVjdCBlbGV2YXRvcl90eXBlICplOw0KIA0KLQkvKiBNYWtlIHN1cmUgcXVldWUgaXMg
-bm90IGluIHRoZSBtaWRkbGUgb2YgYmVpbmcgcmVtb3ZlZCAqLw0KLQlpZiAoIXRlc3RfYml0KFFV
-RVVFX0ZMQUdfUkVHSVNURVJFRCwgJnEtPnF1ZXVlX2ZsYWdzKSkNCi0JCXJldHVybiAtRU5PRU5U
-Ow0KLQ0KIAkvKg0KIAkgKiBTcGVjaWFsIGNhc2UgZm9yIG1xLCB0dXJuIG9mZiBzY2hlZHVsaW5n
-DQogCSAqLw0KLS0gDQoyLjE1LjENCg==
+On Tue, Jan 16 2018 at  1:17pm -0500,
+Bart Van Assche <bart.vanassche@wdc.com> wrote:
+
+> The __blk_mq_register_dev(), blk_mq_unregister_dev(),
+> elv_register_queue() and elv_unregister_queue() calls need to be
+> protected with sysfs_lock but other code in these functions not.
+> Hence protect only this code with sysfs_lock. This patch fixes a
+> locking inversion issue in blk_unregister_queue() and also in an
+> error path of blk_register_queue(): it is not allowed to hold
+> sysfs_lock around the kobject_del(&q->kobj) call.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> ---
+>  block/blk-sysfs.c | 13 ++++---------
+>  1 file changed, 4 insertions(+), 9 deletions(-)
+> 
+> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> index 4a6a40ffd78e..e9ce45ff0ef2 100644
+> --- a/block/blk-sysfs.c
+> +++ b/block/blk-sysfs.c
+> @@ -909,11 +909,12 @@ int blk_register_queue(struct gendisk *disk)
+>  	if (q->request_fn || (q->mq_ops && q->elevator)) {
+>  		ret = elv_register_queue(q);
+>  		if (ret) {
+> +			mutex_unlock(&q->sysfs_lock);
+>  			kobject_uevent(&q->kobj, KOBJ_REMOVE);
+>  			kobject_del(&q->kobj);
+>  			blk_trace_remove_sysfs(dev);
+>  			kobject_put(&dev->kobj);
+> -			goto unlock;
+> +			return ret;
+>  		}
+>  	}
+>  	ret = 0;
+> @@ -934,28 +935,22 @@ void blk_unregister_queue(struct gendisk *disk)
+>  	if (!test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags))
+>  		return;
+>  
+> -	/*
+> -	 * Protect against the 'queue' kobj being accessed
+> -	 * while/after it is removed.
+> -	 */
+> -	mutex_lock(&q->sysfs_lock);
+> -
+>  	spin_lock_irq(q->queue_lock);
+>  	queue_flag_clear(QUEUE_FLAG_REGISTERED, q);
+>  	spin_unlock_irq(q->queue_lock);
+>  
+>  	wbt_exit(q);
+>  
+> +	mutex_lock(&q->sysfs_lock);
+>  	if (q->mq_ops)
+>  		blk_mq_unregister_dev(disk_to_dev(disk), q);
+>  
+>  	if (q->request_fn || (q->mq_ops && q->elevator))
+>  		elv_unregister_queue(q);
+
+My concern with this change is detailed in the following portion of
+the header for commit 667257e8b2988c0183ba23e2bcd6900e87961606:
+
+    2) Conversely, __elevator_change() is testing for QUEUE_FLAG_REGISTERED
+    in case elv_iosched_store() loses the race with blk_unregister_queue(),
+    it needs a way to know the 'queue' kobj isn't there.
+
+I don't think moving mutex_lock(&q->sysfs_lock); after the clearing of
+QUEUE_FLAG_REGISTERED is a step in the right direction.
+
+Current code shows:
+
+blk_cleanup_queue() calls blk_set_queue_dying() while holding
+the sysfs_lock.
+
+queue_attr_{show,store} both test if blk_queue_dying(q) while holding
+the sysfs_lock.
+
+BUT drivers can/do call del_gendisk() _before_ blk_cleanup_queue().
+(if your proposed change above were to go in all of the block drivers
+would first need to be audited for the need to call blk_cleanup_queue()
+before del_gendisk() -- seems awful).
+
+Therefore it seems to me that all queue_attr_{show,store} are racey vs
+blk_unregister_queue() removing the 'queue' kobject.
+
+And it was just that __elevator_change() was myopicly fixed to address
+the race whereas a more generic solution was/is needed.  But short of
+that more generic fix your change will reintroduce the potential for
+hitting the issue that commit e9a823fb34a8b fixed.
+
+In that light, think it best to leave blk_unregister_queue()'s
+mutex_lock() above the QUEUE_FLAG_REGISTERED clearing _and_ update
+queue_attr_{show,store} to test for QUEUE_FLAG_REGISTERED while holding
+sysfs_lock.
+
+Then remove the unicorn test_bit for QUEUE_FLAG_REGISTERED from
+__elevator_change().
+
+But it could be I'm wrong for some reason.. as you know that happens ;)
+
+Mike
