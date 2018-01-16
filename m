@@ -1,168 +1,95 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-io0-f194.google.com ([209.85.223.194]:39794 "EHLO
-        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750946AbeAWJKi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jan 2018 04:10:38 -0500
-Date: Tue, 23 Jan 2018 14:40:32 +0530
-From: Aishwarya Pant <aishpant@gmail.com>
-To: Thomas Maier <balagi@justmail.de>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc: Julia Lawall <julia.lawall@lip6.fr>
-Subject: [PATCH] Documentation/ABI: clean up sysfs-class-pktcdvd
-Message-ID: <20180123091032.GA18947@mordor.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <msnitzer@redhat.com>
+From: Mike Snitzer <snitzer@redhat.com>
+To: axboe@kernel.dk
+Cc: Ming Lei <tom.leiming@gmail.com>,
+	hch@lst.de,
+	dm-devel@redhat.com,
+	linux-block@vger.kernel.org
+Subject: [for-4.16 PATCH v4-mike 1/2] blk-mq: return dispatch result from blk_mq_try_issue_directly
+Date: Tue, 16 Jan 2018 10:01:47 -0500
+Message-Id: <20180116150148.21145-1-snitzer@redhat.com>
+In-Reply-To: <20180116015710.GF3213@ming.t460p>
+List-ID: <linux-block@vger.kernel.org>
 
-Clean up the sysfs documentation such that it is in the same format as
-described in Documentation/ABI/README. Mainly, the patch moves the
-attribute names to the 'What:' field. This might be useful for scripting
-and tracking changes in the ABI.
+From: Ming Lei <ming.lei@redhat.com>
 
-Signed-off-by: Aishwarya Pant <aishpant@gmail.com>
+In the following patch, we will use blk_mq_try_issue_directly() for DM
+to return the dispatch result.  DM needs this information to improve
+IO merging.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Mike Snitzer <snitzer@redhat.com>
 ---
- Documentation/ABI/testing/sysfs-class-pktcdvd | 122 +++++++++++++++-----------
- 1 file changed, 71 insertions(+), 51 deletions(-)
+ block/blk-mq.c | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
 
-diff --git a/Documentation/ABI/testing/sysfs-class-pktcdvd b/Documentation/ABI/testing/sysfs-class-pktcdvd
-index b1c3f0263359..e85ec99c6e31 100644
---- a/Documentation/ABI/testing/sysfs-class-pktcdvd
-+++ b/Documentation/ABI/testing/sysfs-class-pktcdvd
-@@ -1,60 +1,80 @@
--What:           /sys/class/pktcdvd/
-+sysfs interface
-+---------------
-+The pktcdvd module (packet writing driver) creates the following files in the
-+sysfs: (<devid> is in format major:minor)
-+
-+What:           /sys/class/pktcdvd/add
-+What:           /sys/class/pktcdvd/remove
-+What:           /sys/class/pktcdvd/device_map
- Date:           Oct. 2006
- KernelVersion:  2.6.20
- Contact:        Thomas Maier <balagi@justmail.de>
- Description:
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c8f62e6be6b6..55f3a27fb2e6 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1694,9 +1694,9 @@ static blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx, struct request *rq)
+ 	return blk_tag_to_qc_t(rq->internal_tag, hctx->queue_num, true);
+ }
  
--sysfs interface
-----------------
-+		add:        (WO) Write a block device id (major:minor) to create
-+			    a new pktcdvd device and map it to the block device.
-+
-+		remove:	    (WO) Write the pktcdvd device id (major:minor) to it to
-+			    remove the pktcdvd device.
-+
-+		device_map: (RO) Shows the device mapping in format:
-+			    pktcdvd[0-7] <pktdevid> <blkdevid>
-+
-+
-+What:           /sys/class/pktcdvd/pktcdvd[0-7]/dev
-+What:		/sys/class/pktcdvd/pktcdvd[0-7]/uevent
-+Date:           Oct. 2006
-+KernelVersion:  2.6.20
-+Contact:        Thomas Maier <balagi@justmail.de>
-+Description:
-+		dev:    (RO) Device id
-+
-+		uevent: (WO) To send an uevent
-+
-+
-+What:		/sys/class/pktcdvd/pktcdvd[0-7]/stat/packets_started
-+What:		/sys/class/pktcdvd/pktcdvd[0-7]/stat/packets_finished
-+What:		/sys/class/pktcdvd/pktcdvd[0-7]/stat/kb_written
-+What:		/sys/class/pktcdvd/pktcdvd[0-7]/stat/kb_read
-+What:		/sys/class/pktcdvd/pktcdvd[0-7]/stat/kb_read_gather
-+What:		/sys/class/pktcdvd/pktcdvd[0-7]/stat/reset
-+Date:           Oct. 2006
-+KernelVersion:  2.6.20
-+Contact:        Thomas Maier <balagi@justmail.de>
-+Description:
-+		packets_started:  (RO) Number of started packets.
-+
-+		packets_finished: (RO) Number of finished packets.
-+
-+		kb_written:	  (RO) kBytes written.
-+
-+		kb_read:	  (RO) kBytes read.
-+
-+		kb_read_gather:   (RO) kBytes read to fill write packets.
-+
-+		reset:            (WO) Write any value to it to reset pktcdvd
-+				  device statistic values, like bytes
-+				  read/written.
-+
-+
-+What:		/sys/class/pktcdvd/pktcdvd[0-7]/write_queue/size
-+What:		/sys/class/pktcdvd/pktcdvd[0-7]/write_queue/congestion_off
-+What:		/sys/class/pktcdvd/pktcdvd[0-7]/write_queue/congestion_on
-+Date:           Oct. 2006
-+KernelVersion:  2.6.20
-+Contact:        Thomas Maier <balagi@justmail.de>
-+Description:
-+		size:           (RO) Contains the size of the bio write queue.
-+
-+		congestion_off: (RW) If bio write queue size is below this mark,
-+				accept new bio requests from the block layer.
+-static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+-					struct request *rq,
+-					blk_qc_t *cookie)
++static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
++						struct request *rq,
++						blk_qc_t *cookie)
+ {
+ 	struct request_queue *q = rq->q;
+ 	struct blk_mq_queue_data bd = {
+@@ -1704,7 +1704,7 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 		.last = true,
+ 	};
+ 	blk_qc_t new_cookie;
+-	blk_status_t ret;
++	blk_status_t ret = BLK_STS_OK;
+ 	bool run_queue = true;
  
--The pktcdvd module (packet writing driver) creates
--these files in the sysfs:
--(<devid> is in format  major:minor )
--
--/sys/class/pktcdvd/
--    add            (0200)  Write a block device id (major:minor)
--                           to create a new pktcdvd device and map
--                           it to the block device.
--
--    remove         (0200)  Write the pktcdvd device id (major:minor)
--                           to it to remove the pktcdvd device.
--
--    device_map     (0444)  Shows the device mapping in format:
--                             pktcdvd[0-7] <pktdevid> <blkdevid>
--
--/sys/class/pktcdvd/pktcdvd[0-7]/
--    dev                   (0444) Device id
--    uevent                (0200) To send an uevent.
--
--/sys/class/pktcdvd/pktcdvd[0-7]/stat/
--    packets_started       (0444) Number of started packets.
--    packets_finished      (0444) Number of finished packets.
--
--    kb_written            (0444) kBytes written.
--    kb_read               (0444) kBytes read.
--    kb_read_gather        (0444) kBytes read to fill write packets.
--
--    reset                 (0200) Write any value to it to reset
--                                 pktcdvd device statistic values, like
--                                 bytes read/written.
--
--/sys/class/pktcdvd/pktcdvd[0-7]/write_queue/
--    size                  (0444) Contains the size of the bio write
--                                 queue.
--
--    congestion_off        (0644) If bio write queue size is below
--                                 this mark, accept new bio requests
--                                 from the block layer.
--
--    congestion_on         (0644) If bio write queue size is higher
--                                 as this mark, do no longer accept
--                                 bio write requests from the block
--                                 layer and wait till the pktcdvd
--                                 device has processed enough bio's
--                                 so that bio write queue size is
--                                 below congestion off mark.
--                                 A value of <= 0 disables congestion
--                                 control.
-+		congestion_on:  (RW) If bio write queue size is higher as this
-+				mark, do no longer accept bio write requests
-+				from the block layer and wait till the pktcdvd
-+				device has processed enough bio's so that bio
-+				write queue size is below congestion off mark.
-+				A value of <= 0 disables congestion control.
+ 	/* RCU or SRCU read lock is needed before checking quiesced flag */
+@@ -1735,31 +1735,36 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	switch (ret) {
+ 	case BLK_STS_OK:
+ 		*cookie = new_cookie;
+-		return;
++		return ret;
+ 	case BLK_STS_RESOURCE:
+ 		__blk_mq_requeue_request(rq);
+ 		goto insert;
+ 	default:
+ 		*cookie = BLK_QC_T_NONE;
+ 		blk_mq_end_request(rq, ret);
+-		return;
++		return ret;
+ 	}
  
+ insert:
+ 	blk_mq_sched_insert_request(rq, false, run_queue, false,
+ 					hctx->flags & BLK_MQ_F_BLOCKING);
++	return ret;
+ }
  
- Example:
+-static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+-		struct request *rq, blk_qc_t *cookie)
++static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
++					      struct request *rq,
++					      blk_qc_t *cookie)
+ {
+ 	int srcu_idx;
++	blk_status_t ret;
+ 
+ 	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
+ 
+ 	hctx_lock(hctx, &srcu_idx);
+-	__blk_mq_try_issue_directly(hctx, rq, cookie);
++	ret = __blk_mq_try_issue_directly(hctx, rq, cookie);
+ 	hctx_unlock(hctx, srcu_idx);
++
++	return ret;
+ }
+ 
+ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
 -- 
-2.16.1
+2.15.0
