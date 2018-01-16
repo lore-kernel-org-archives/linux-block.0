@@ -1,153 +1,52 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-From: Tejun Heo <tj@kernel.org>
-To: jack@suse.cz,
-	axboe@kernel.dk,
-	clm@fb.com,
-	jbacik@fb.com
-Cc: kernel-team@fb.com,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	peterz@infradead.org,
-	jianchao.w.wang@oracle.com,
-	Bart.VanAssche@wdc.com,
-	linux-block@vger.kernel.org,
-	Tejun Heo <tj@kernel.org>
-Subject: [PATCH 1/8] blk-mq: move hctx lock/unlock into a helper
-Date: Mon,  8 Jan 2018 11:15:35 -0800
-Message-Id: <20180108191542.379478-2-tj@kernel.org>
-In-Reply-To: <20180108191542.379478-1-tj@kernel.org>
-References: <20180108191542.379478-1-tj@kernel.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:52812 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751117AbeAPJ2u (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Jan 2018 04:28:50 -0500
+Subject: Re: [PATCH v3 11/13] bcache: add backing_request_endio() for
+ bi_end_io of attached backing device I/O
+To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Junhui Tang <tang.junhui@zte.com.cn>,
+        Michael Lyle <mlyle@lyle.org>
+References: <20180114144236.28213-1-colyli@suse.de>
+ <20180114144236.28213-12-colyli@suse.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <de288b3a-5c95-dc79-133b-d5ce1f538e67@suse.de>
+Date: Tue, 16 Jan 2018 10:28:48 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180114144236.28213-12-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Jens Axboe <axboe@kernel.dk>
+On 01/14/2018 03:42 PM, Coly Li wrote:
+> In order to catch I/O error of backing device, a separate bi_end_io
+> call back is required. Then a per backing device counter can record I/O
+> errors number and retire the backing device if the counter reaches a
+> per backing device I/O error limit.
+> 
+> This patch adds backing_request_endio() to bcache backing device I/O code
+> path, this is a preparation for further complicated backing device failure
+> handling. So far there is no real code logic change, I make this change a
+> separate patch to make sure it is stable and reliable for further work.
+> 
+> Signed-off-by: Coly Li <colyli@suse.de>
+> Cc: Junhui Tang <tang.junhui@zte.com.cn>
+> Cc: Michael Lyle <mlyle@lyle.org>
+> ---
+>  drivers/md/bcache/request.c   | 95 +++++++++++++++++++++++++++++++++++--------
+>  drivers/md/bcache/super.c     |  1 +
+>  drivers/md/bcache/writeback.c |  1 +
+>  3 files changed, 81 insertions(+), 16 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Move the RCU vs SRCU logic into lock/unlock helpers, which makes
-the actual functional bits within the locked region much easier
-to read.
+Cheers,
 
-tj: Reordered in front of timeout revamp patches and added the missing
-    blk_mq_run_hw_queue() conversion.
-
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Tejun Heo <tj@kernel.org>
----
- block/blk-mq.c | 66 ++++++++++++++++++++++++++++------------------------------
- 1 file changed, 32 insertions(+), 34 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 111e1aa..ddc9261 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -557,6 +557,22 @@ static void __blk_mq_complete_request(struct request *rq)
- 	put_cpu();
- }
- 
-+static void hctx_unlock(struct blk_mq_hw_ctx *hctx, int srcu_idx)
-+{
-+	if (!(hctx->flags & BLK_MQ_F_BLOCKING))
-+		rcu_read_unlock();
-+	else
-+		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
-+}
-+
-+static void hctx_lock(struct blk_mq_hw_ctx *hctx, int *srcu_idx)
-+{
-+	if (!(hctx->flags & BLK_MQ_F_BLOCKING))
-+		rcu_read_lock();
-+	else
-+		*srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
-+}
-+
- /**
-  * blk_mq_complete_request - end I/O on a request
-  * @rq:		the request being processed
-@@ -1214,17 +1230,11 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
- 	 */
- 	WARN_ON_ONCE(in_interrupt());
- 
--	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
--		rcu_read_lock();
--		blk_mq_sched_dispatch_requests(hctx);
--		rcu_read_unlock();
--	} else {
--		might_sleep();
-+	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
- 
--		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
--		blk_mq_sched_dispatch_requests(hctx);
--		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
--	}
-+	hctx_lock(hctx, &srcu_idx);
-+	blk_mq_sched_dispatch_requests(hctx);
-+	hctx_unlock(hctx, srcu_idx);
- }
- 
- /*
-@@ -1296,17 +1306,10 @@ bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- 	 * And queue will be rerun in blk_mq_unquiesce_queue() if it is
- 	 * quiesced.
- 	 */
--	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
--		rcu_read_lock();
--		need_run = !blk_queue_quiesced(hctx->queue) &&
--			blk_mq_hctx_has_pending(hctx);
--		rcu_read_unlock();
--	} else {
--		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
--		need_run = !blk_queue_quiesced(hctx->queue) &&
--			blk_mq_hctx_has_pending(hctx);
--		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
--	}
-+	hctx_lock(hctx, &srcu_idx);
-+	need_run = !blk_queue_quiesced(hctx->queue) &&
-+		blk_mq_hctx_has_pending(hctx);
-+	hctx_unlock(hctx, srcu_idx);
- 
- 	if (need_run) {
- 		__blk_mq_delay_run_hw_queue(hctx, async, 0);
-@@ -1618,7 +1621,7 @@ static blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx, struct request *rq)
- 
- static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 					struct request *rq,
--					blk_qc_t *cookie, bool may_sleep)
-+					blk_qc_t *cookie)
- {
- 	struct request_queue *q = rq->q;
- 	struct blk_mq_queue_data bd = {
-@@ -1668,25 +1671,20 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	}
- 
- insert:
--	blk_mq_sched_insert_request(rq, false, run_queue, false, may_sleep);
-+	blk_mq_sched_insert_request(rq, false, run_queue, false,
-+					hctx->flags & BLK_MQ_F_BLOCKING);
- }
- 
- static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 		struct request *rq, blk_qc_t *cookie)
- {
--	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
--		rcu_read_lock();
--		__blk_mq_try_issue_directly(hctx, rq, cookie, false);
--		rcu_read_unlock();
--	} else {
--		unsigned int srcu_idx;
-+	int srcu_idx;
- 
--		might_sleep();
-+	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
- 
--		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
--		__blk_mq_try_issue_directly(hctx, rq, cookie, true);
--		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
--	}
-+	hctx_lock(hctx, &srcu_idx);
-+	__blk_mq_try_issue_directly(hctx, rq, cookie);
-+	hctx_unlock(hctx, srcu_idx);
- }
- 
- static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+Hannes
 -- 
-2.9.5
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
