@@ -1,86 +1,73 @@
-Return-Path: <msnitzer@redhat.com>
-Date: Sun, 14 Jan 2018 21:59:13 -0500
-From: Mike Snitzer <snitzer@redhat.com>
+Return-Path: <prvs=547e67762=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>, dm-devel@redhat.com,
-	linux-block@vger.kernel.org
-Subject: [GIT PULL] block changes to improve device mapper for 4.16
-Message-ID: <20180115025913.GA20727@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Mike Snitzer <snitzer@redhat.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH 1/3] block: Unexport elv_register_queue() and elv_unregister_queue()
+Date: Tue, 16 Jan 2018 10:17:50 -0800
+Message-Id: <20180116181752.25847-2-bart.vanassche@wdc.com>
+In-Reply-To: <20180116181752.25847-1-bart.vanassche@wdc.com>
+References: <20180116181752.25847-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens,
+These two functions are only called from inside the block layer so
+unexport them.
 
-I prepared this pull request in the hope that it may help you review and
-stage these changes for 4.16.
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+---
+ block/blk.h              | 3 +++
+ block/elevator.c         | 2 --
+ include/linux/elevator.h | 2 --
+ 3 files changed, 3 insertions(+), 4 deletions(-)
 
-I went over Ming's changes again to refine the headers and code comments
-for clarity to help ease review and inclussion.
-
-I've done extensive testing of the changes in this pull request in
-combination with all the dm-4.16 changes I'll be sending to Linus, using
-this tree (which gets pulled into linux-next, I wanted some coverage):
-https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/log/?h=for-next
-I'll obviously drop these changes from dm's linux-next once you pick
-them up.
-
-FYI, this dm-4.16 commit addresses the concerns Bart raised last week
-against Ming's dm-mpath changes:
-https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=dm-4.16&id=7a9d12664a183c4a1e2fa86b0a9206006b95138e
-
-The following changes since commit bf9ae8c5325c0070d0ec81a849bba8d156f65993:
-
-  blk-mq: fix bad clear of RQF_MQ_INFLIGHT in blk_mq_ct_ctx_init() (2018-01-14 10:46:24 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-block-4.16/dm
-
-for you to fetch changes up to 0e94dfab56071a7afd0a9de9b8f6a0535148fb36:
-
-  blk-mq: issue request directly for blk_insert_cloned_request (2018-01-14 13:00:02 -0500)
-
-Please pull, thanks!
-Mike
-
-----------------------------------------------------------------
-- Small correctness fix in del_gendisk() if GENHD_FL_HIDDEN is used.
-
-- Cleanup blk_unregister_queue() to more precisely protect against
-  concurrent sysfs changes, blk_mq_unregister_dev() now requires caller
-  to hold q->sysfslock (blk_unregister_queue is only caller).
-
-- Introduce add_disk() variant, add_disk_no_queue_reg(), that allows the
-  gendisk to be registered but the associated disk->queue's
-  blk_register_queue() is left for the driver to do once its
-  request_queue is fully initialized.  Fixes long-standing DM
-  request_queue initialization issues.
-
-- Ming's blk-mq improvements to blk_insert_cloned_request(), which is
-  used exclusively by request-based DM's blk-mq mode, that enable
-  substantial dm-mpath sequential IO performance improvements.
-
-----------------------------------------------------------------
-Mike Snitzer (4):
-      block: only bdi_unregister() in del_gendisk() if !GENHD_FL_HIDDEN
-      block: properly protect the 'queue' kobj in blk_unregister_queue
-      block: allow gendisk's request_queue registration to be deferred
-      dm: fix incomplete request_queue initialization
-
-Ming Lei (3):
-      blk-mq: move actual issue into __blk_mq_issue_req helper
-      blk-mq: return dispatch result from blk_mq_try_issue_directly
-      blk-mq: issue request directly for blk_insert_cloned_request
-
- block/blk-core.c      |  3 +-
- block/blk-mq-sysfs.c  |  9 +-----
- block/blk-mq.c        | 86 +++++++++++++++++++++++++++++++++++++++------------
- block/blk-mq.h        |  3 ++
- block/blk-sysfs.c     | 18 +++++++++--
- block/genhd.c         | 23 +++++++++++---
- drivers/md/dm-rq.c    | 28 ++++++++++-------
- drivers/md/dm.c       | 11 ++++++-
- include/linux/genhd.h |  5 +++
- 9 files changed, 136 insertions(+), 50 deletions(-)
+diff --git a/block/blk.h b/block/blk.h
+index 662005e46560..46db5dc83dcb 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -162,6 +162,9 @@ static inline void elv_deactivate_rq(struct request_queue *q, struct request *rq
+ 		e->type->ops.sq.elevator_deactivate_req_fn(q, rq);
+ }
+ 
++int elv_register_queue(struct request_queue *q);
++void elv_unregister_queue(struct request_queue *q);
++
+ struct hd_struct *__disk_get_part(struct gendisk *disk, int partno);
+ 
+ #ifdef CONFIG_FAIL_IO_TIMEOUT
+diff --git a/block/elevator.c b/block/elevator.c
+index 138faeb08a7c..4f00b53cd5fd 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -886,7 +886,6 @@ int elv_register_queue(struct request_queue *q)
+ 	}
+ 	return error;
+ }
+-EXPORT_SYMBOL(elv_register_queue);
+ 
+ void elv_unregister_queue(struct request_queue *q)
+ {
+@@ -900,7 +899,6 @@ void elv_unregister_queue(struct request_queue *q)
+ 		wbt_enable_default(q);
+ 	}
+ }
+-EXPORT_SYMBOL(elv_unregister_queue);
+ 
+ int elv_register(struct elevator_type *e)
+ {
+diff --git a/include/linux/elevator.h b/include/linux/elevator.h
+index 3d794b3dc532..6d9e230dffd2 100644
+--- a/include/linux/elevator.h
++++ b/include/linux/elevator.h
+@@ -198,8 +198,6 @@ extern bool elv_attempt_insert_merge(struct request_queue *, struct request *);
+ extern void elv_requeue_request(struct request_queue *, struct request *);
+ extern struct request *elv_former_request(struct request_queue *, struct request *);
+ extern struct request *elv_latter_request(struct request_queue *, struct request *);
+-extern int elv_register_queue(struct request_queue *q);
+-extern void elv_unregister_queue(struct request_queue *q);
+ extern int elv_may_queue(struct request_queue *, unsigned int);
+ extern void elv_completed_request(struct request_queue *, struct request *);
+ extern int elv_set_request(struct request_queue *q, struct request *rq,
+-- 
+2.15.1
