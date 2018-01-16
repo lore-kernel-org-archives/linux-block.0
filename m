@@ -1,129 +1,127 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-qt0-f173.google.com ([209.85.216.173]:45466 "EHLO
-        mail-qt0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751139AbeAPPfd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Jan 2018 10:35:33 -0500
-Received: by mail-qt0-f173.google.com with SMTP id x27so10641588qtm.12
-        for <linux-block@vger.kernel.org>; Tue, 16 Jan 2018 07:35:33 -0800 (PST)
-Message-ID: <1516116931.9574.3.camel@redhat.com>
-Subject: Re: [PATCH 0/2] genirq/affinity: try to make sure online CPU is
- assgined to irq vector
-From: Laurence Oberman <loberman@redhat.com>
-To: Don Brace <don.brace@microsemi.com>,
+Received: from mail-co1nam03on0057.outbound.protection.outlook.com ([104.47.40.57]:39856
+        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750779AbeAPPWz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Jan 2018 10:22:55 -0500
+From: Don Brace <don.brace@microsemi.com>
+To: Laurence Oberman <loberman@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@fb.com>,
+CC: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@fb.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         Mike Snitzer <snitzer@redhat.com>
-Date: Tue, 16 Jan 2018 10:35:31 -0500
-In-Reply-To: <a6086631efd54749a298add3d6b9a134@microsemi.com>
+Subject: RE: [PATCH 0/2] genirq/affinity: try to make sure online CPU is
+ assgined to irq vector
+Date: Tue, 16 Jan 2018 15:22:18 +0000
+Message-ID: <a6086631efd54749a298add3d6b9a134@microsemi.com>
 References: <20180115160345.2611-1-ming.lei@redhat.com>
          <20180115174036.GA20191@infradead.org> <20180116013043.GA3213@ming.t460p>
          <alpine.DEB.2.20.1801161223500.1823@nanos>
-         <1516109317.9574.1.camel@redhat.com>
-         <a6086631efd54749a298add3d6b9a134@microsemi.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+ <1516109317.9574.1.camel@redhat.com>
+In-Reply-To: <1516109317.9574.1.camel@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, 2018-01-16 at 15:22 +0000, Don Brace wrote:
-> > -----Original Message-----
-> > From: Laurence Oberman [mailto:loberman@redhat.com]
-> > Sent: Tuesday, January 16, 2018 7:29 AM
-> > To: Thomas Gleixner <tglx@linutronix.de>; Ming Lei <ming.lei@redhat
-> > .com>
-> > Cc: Christoph Hellwig <hch@infradead.org>; Jens Axboe <axboe@fb.com
-> > >;
-> > linux-block@vger.kernel.org; linux-kernel@vger.kernel.org; Mike
-> > Snitzer
-> > <snitzer@redhat.com>; Don Brace <don.brace@microsemi.com>
-> > Subject: Re: [PATCH 0/2] genirq/affinity: try to make sure online
-> > CPU is assgined
-> > to irq vector
-> > 
-> > > > It is because of irq_create_affinity_masks().
-> > > 
-> > > That still does not answer the question. If the interrupt for a
-> > > queue
-> > > is
-> > > assigned to an offline CPU, then the queue should not be used and
-> > > never
-> > > raise an interrupt. That's how managed interrupts have been
-> > > designed.
-> > > 
-> > > Thanks,
-> > > 
-> > >       tglx
-> > > 
-> > > 
-> > > 
-> > > 
-> > 
-> > I captured a full boot log for this issue for Microsemi, I will
-> > send it
-> > to Don Brace.
-> > I enabled all the HPSA debug and here is snippet
-> > 
-> > 
-> > ..
-> > ..
-> > ..
-> >   246.751135] INFO: task systemd-udevd:413 blocked for more than
-> > 120
-> > seconds.
-> > [  246.788008]       Tainted: G          I      4.15.0-rc4.noming+
-> > #1
-> > [  246.822380] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-> > disables this message.
-> > [  246.865594] systemd-udevd   D    0   413    411 0x80000004
-> > [  246.895519] Call Trace:
-> > [  246.909713]  ? __schedule+0x340/0xc20
-> > [  246.930236]  schedule+0x32/0x80
-> > [  246.947905]  schedule_timeout+0x23d/0x450
-> > [  246.970047]  ? find_held_lock+0x2d/0x90
-> > [  246.991774]  ? wait_for_completion_io+0x108/0x170
-> > [  247.018172]  io_schedule_timeout+0x19/0x40
-> > [  247.041208]  wait_for_completion_io+0x110/0x170
-> > [  247.067326]  ? wake_up_q+0x70/0x70
-> > [  247.086801]  hpsa_scsi_do_simple_cmd+0xc6/0x100 [hpsa]
-> > [  247.114315]  hpsa_scsi_do_simple_cmd_with_retry+0xb7/0x1c0
-> > [hpsa]
-> > [  247.146629]  hpsa_scsi_do_inquiry+0x73/0xd0 [hpsa]
-> > [  247.174118]  hpsa_init_one+0x12cb/0x1a59 [hpsa]
-> 
-> This trace comes from internally generated discovery commands. No
-> SCSI devices have
-> been presented to the SML yet.
-> 
-> At this point we should be running on only one CPU. These commands
-> are meant to use
-> reply queue 0 which are tied to CPU 0. It's interesting that the
-> patch helps.
-> 
-> However, I was wondering if you could inspect the iLo IML logs and
-> send the
-> AHS logs for inspection.
-> 
-> Thanks,
-> Don Brace
-> ESC - Smart Storage
-> Microsemi Corporation
-
-
-Hello Don
-
-I took two other dl380 g7's and ran the same kernel and it hangs in the
-identical place. Its absolutely consistent here.
-
-I doubt all three have hardware issues.
-
-Nothing is logged of interest in the IML.
-
-Ming will have more to share on specifically why it helps.
-I think he sent that along to you already.
-
-Regards
-Laurence
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBMYXVyZW5jZSBPYmVybWFuIFtt
+YWlsdG86bG9iZXJtYW5AcmVkaGF0LmNvbV0NCj4gU2VudDogVHVlc2RheSwgSmFudWFyeSAxNiwg
+MjAxOCA3OjI5IEFNDQo+IFRvOiBUaG9tYXMgR2xlaXhuZXIgPHRnbHhAbGludXRyb25peC5kZT47
+IE1pbmcgTGVpIDxtaW5nLmxlaUByZWRoYXQuY29tPg0KPiBDYzogQ2hyaXN0b3BoIEhlbGx3aWcg
+PGhjaEBpbmZyYWRlYWQub3JnPjsgSmVucyBBeGJvZSA8YXhib2VAZmIuY29tPjsNCj4gbGludXgt
+YmxvY2tAdmdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBNaWtl
+IFNuaXR6ZXINCj4gPHNuaXR6ZXJAcmVkaGF0LmNvbT47IERvbiBCcmFjZSA8ZG9uLmJyYWNlQG1p
+Y3Jvc2VtaS5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggMC8yXSBnZW5pcnEvYWZmaW5pdHk6
+IHRyeSB0byBtYWtlIHN1cmUgb25saW5lIENQVSBpcyBhc3NnaW5lZA0KPiB0byBpcnEgdmVjdG9y
+DQo+IA0KPiA+ID4gSXQgaXMgYmVjYXVzZSBvZiBpcnFfY3JlYXRlX2FmZmluaXR5X21hc2tzKCku
+DQo+ID4NCj4gPiBUaGF0IHN0aWxsIGRvZXMgbm90IGFuc3dlciB0aGUgcXVlc3Rpb24uIElmIHRo
+ZSBpbnRlcnJ1cHQgZm9yIGEgcXVldWUNCj4gPiBpcw0KPiA+IGFzc2lnbmVkIHRvIGFuIG9mZmxp
+bmUgQ1BVLCB0aGVuIHRoZSBxdWV1ZSBzaG91bGQgbm90IGJlIHVzZWQgYW5kDQo+ID4gbmV2ZXIN
+Cj4gPiByYWlzZSBhbiBpbnRlcnJ1cHQuIFRoYXQncyBob3cgbWFuYWdlZCBpbnRlcnJ1cHRzIGhh
+dmUgYmVlbiBkZXNpZ25lZC4NCj4gPg0KPiA+IFRoYW5rcywNCj4gPg0KPiA+ICAgICAgIHRnbHgN
+Cj4gPg0KPiA+DQo+ID4NCj4gPg0KPiANCj4gSSBjYXB0dXJlZCBhIGZ1bGwgYm9vdCBsb2cgZm9y
+IHRoaXMgaXNzdWUgZm9yIE1pY3Jvc2VtaSwgSSB3aWxsIHNlbmQgaXQNCj4gdG8gRG9uIEJyYWNl
+Lg0KPiBJIGVuYWJsZWQgYWxsIHRoZSBIUFNBIGRlYnVnIGFuZCBoZXJlIGlzIHNuaXBwZXQNCj4g
+DQo+IA0KPiAuLg0KPiAuLg0KPiAuLg0KPiAgIDI0Ni43NTExMzVdIElORk86IHRhc2sgc3lzdGVt
+ZC11ZGV2ZDo0MTMgYmxvY2tlZCBmb3IgbW9yZSB0aGFuIDEyMA0KPiBzZWNvbmRzLg0KPiBbwqDC
+oDI0Ni43ODgwMDhdwqDCoMKgwqDCoMKgwqBUYWludGVkOiBHICAgICAgICAgIEkgICAgICA0LjE1
+LjAtcmM0Lm5vbWluZysgIzENCj4gW8KgwqAyNDYuODIyMzgwXSAiZWNobyAwID4gL3Byb2Mvc3lz
+L2tlcm5lbC9odW5nX3Rhc2tfdGltZW91dF9zZWNzIg0KPiBkaXNhYmxlcyB0aGlzIG1lc3NhZ2Uu
+DQo+IFvCoMKgMjQ2Ljg2NTU5NF0gc3lzdGVtZC11ZGV2ZCAgIEQgICAgMCAgIDQxMyAgICA0MTEg
+MHg4MDAwMDAwNA0KPiBbwqDCoDI0Ni44OTU1MTldIENhbGwgVHJhY2U6DQo+IFvCoMKgMjQ2Ljkw
+OTcxM13CoMKgPyBfX3NjaGVkdWxlKzB4MzQwLzB4YzIwDQo+IFvCoMKgMjQ2LjkzMDIzNl3CoMKg
+c2NoZWR1bGUrMHgzMi8weDgwDQo+IFvCoMKgMjQ2Ljk0NzkwNV3CoMKgc2NoZWR1bGVfdGltZW91
+dCsweDIzZC8weDQ1MA0KPiBbICAyNDYuOTcwMDQ3XcKgwqA/IGZpbmRfaGVsZF9sb2NrKzB4MmQv
+MHg5MA0KPiBbwqDCoDI0Ni45OTE3NzRdwqDCoD8gd2FpdF9mb3JfY29tcGxldGlvbl9pbysweDEw
+OC8weDE3MA0KPiBbwqDCoDI0Ny4wMTgxNzJdwqDCoGlvX3NjaGVkdWxlX3RpbWVvdXQrMHgxOS8w
+eDQwDQo+IFvCoMKgMjQ3LjA0MTIwOF3CoMKgd2FpdF9mb3JfY29tcGxldGlvbl9pbysweDExMC8w
+eDE3MA0KPiBbwqDCoDI0Ny4wNjczMjZdwqDCoD8gd2FrZV91cF9xKzB4NzAvMHg3MA0KPiBbwqDC
+oDI0Ny4wODY4MDFdwqDCoGhwc2Ffc2NzaV9kb19zaW1wbGVfY21kKzB4YzYvMHgxMDAgW2hwc2Fd
+DQo+IFvCoMKgMjQ3LjExNDMxNV3CoMKgaHBzYV9zY3NpX2RvX3NpbXBsZV9jbWRfd2l0aF9yZXRy
+eSsweGI3LzB4MWMwIFtocHNhXQ0KPiBbwqDCoDI0Ny4xNDY2MjldwqDCoGhwc2Ffc2NzaV9kb19p
+bnF1aXJ5KzB4NzMvMHhkMCBbaHBzYV0NCj4gW8KgwqAyNDcuMTc0MTE4XcKgwqBocHNhX2luaXRf
+b25lKzB4MTJjYi8weDFhNTkgW2hwc2FdDQoNClRoaXMgdHJhY2UgY29tZXMgZnJvbSBpbnRlcm5h
+bGx5IGdlbmVyYXRlZCBkaXNjb3ZlcnkgY29tbWFuZHMuIE5vIFNDU0kgZGV2aWNlcyBoYXZlDQpi
+ZWVuIHByZXNlbnRlZCB0byB0aGUgU01MIHlldC4NCg0KQXQgdGhpcyBwb2ludCB3ZSBzaG91bGQg
+YmUgcnVubmluZyBvbiBvbmx5IG9uZSBDUFUuIFRoZXNlIGNvbW1hbmRzIGFyZSBtZWFudCB0byB1
+c2UNCnJlcGx5IHF1ZXVlIDAgd2hpY2ggYXJlIHRpZWQgdG8gQ1BVIDAuIEl0J3MgaW50ZXJlc3Rp
+bmcgdGhhdCB0aGUgcGF0Y2ggaGVscHMuDQoNCkhvd2V2ZXIsIEkgd2FzIHdvbmRlcmluZyBpZiB5
+b3UgY291bGQgaW5zcGVjdCB0aGUgaUxvIElNTCBsb2dzIGFuZCBzZW5kIHRoZQ0KQUhTIGxvZ3Mg
+Zm9yIGluc3BlY3Rpb24uDQoNClRoYW5rcywNCkRvbiBCcmFjZQ0KRVNDIC0gU21hcnQgU3RvcmFn
+ZQ0KTWljcm9zZW1pIENvcnBvcmF0aW9uDQoNCj4gW8KgwqAyNDcuMTk5ODUxXcKgwqA/IF9fcG1f
+cnVudGltZV9yZXN1bWUrMHg1NS8weDcwDQo+IFvCoMKgMjQ3LjIyNDUyN13CoMKgbG9jYWxfcGNp
+X3Byb2JlKzB4M2YvMHhhMA0KPiBbwqDCoDI0Ny4yNDYwMzRdwqDCoHBjaV9kZXZpY2VfcHJvYmUr
+MHgxNDYvMHgxYjANCj4gW8KgwqAyNDcuMjY4NDEzXcKgwqBkcml2ZXJfcHJvYmVfZGV2aWNlKzB4
+MmIzLzB4NGEwDQo+IFvCoMKgMjQ3LjI5MTg2OF3CoMKgX19kcml2ZXJfYXR0YWNoKzB4ZGEvMHhl
+MA0KPiBbwqDCoDI0Ny4zMTMzNzBdwqDCoD8gZHJpdmVyX3Byb2JlX2RldmljZSsweDRhMC8weDRh
+MA0KPiBbwqDCoDI0Ny4zMzgzOTldwqDCoGJ1c19mb3JfZWFjaF9kZXYrMHg2YS8weGIwDQo+IFvC
+oMKgMjQ3LjM1OTkxMl3CoMKgYnVzX2FkZF9kcml2ZXIrMHg0MS8weDI2MA0KPiBbwqDCoDI0Ny4z
+ODAyNDRdwqDCoGRyaXZlcl9yZWdpc3RlcisweDViLzB4ZDANCj4gW8KgwqAyNDcuNDAwODExXcKg
+wqA/IDB4ZmZmZmZmZmZjMDE2YjAwMA0KPiBbwqDCoDI0Ny40MTg4MTldwqDCoGhwc2FfaW5pdCsw
+eDM4LzB4MTAwMCBbaHBzYV0NCj4gW8KgwqAyNDcuNDQwNzYzXcKgwqA/IDB4ZmZmZmZmZmZjMDE2
+YjAwMA0KPiBbwqDCoDI0Ny40NTk0NTFdwqDCoGRvX29uZV9pbml0Y2FsbCsweDRkLzB4MTljDQo+
+IFvCoMKgMjQ3LjQ4MDUzOV3CoMKgPyBkb19pbml0X21vZHVsZSsweDIyLzB4MjIwDQo+IFvCoMKg
+MjQ3LjUwMjU3NV3CoMKgPyByY3VfcmVhZF9sb2NrX3NjaGVkX2hlbGQrMHg2NC8weDcwDQo+IFvC
+oMKgMjQ3LjUyOTU0OV3CoMKgPyBrbWVtX2NhY2hlX2FsbG9jX3RyYWNlKzB4MWY3LzB4MjYwDQo+
+IFvCoMKgMjQ3LjU1NjIwNF3CoMKgPyBkb19pbml0X21vZHVsZSsweDIyLzB4MjIwDQo+IFvCoMKg
+MjQ3LjU3ODYzM13CoMKgZG9faW5pdF9tb2R1bGUrMHg1YS8weDIyMA0KPiBbwqDCoDI0Ny42MDAz
+MjJdwqDCoGxvYWRfbW9kdWxlKzB4MjFlOC8weDJhNTANCj4gW8KgwqAyNDcuNjIxNjQ4XcKgwqA/
+IF9fc3ltYm9sX3B1dCsweDYwLzB4NjANCj4gW8KgwqAyNDcuNjQyNzk2XcKgwqBTWVNDX2Zpbml0
+X21vZHVsZSsweDk0LzB4ZTANCj4gW8KgwqAyNDcuNjY1MzM2XcKgwqBlbnRyeV9TWVNDQUxMXzY0
+X2Zhc3RwYXRoKzB4MWYvMHg5Ng0KPiBbwqDCoDI0Ny42OTE3NTFdIFJJUDogMDAzMzoweDdmYzYz
+ZDY1MjdmOQ0KPiBbwqDCoDI0Ny43MTIzMDhdIFJTUDogMDAyYjowMDAwN2ZmZGYxNjU5YmE4IEVG
+TEFHUzogMDAwMDAyNDYgT1JJR19SQVg6DQo+IDAwMDAwMDAwMDAwMDAxMzkNCj4gW8KgwqAyNDcu
+NzU1MjcyXSBSQVg6IGZmZmZmZmZmZmZmZmZmZGEgUkJYOiAwMDAwNTU2YjUyNGM1ZjcwIFJDWDoN
+Cj4gMDAwMDdmYzYzZDY1MjdmOQ0KPiBbwqDCoDI0Ny43OTU3NzldIFJEWDogMDAwMDAwMDAwMDAw
+MDAwMCBSU0k6IDAwMDA3ZmM2M2RmNmYwOTkgUkRJOg0KPiAwMDAwMDAwMDAwMDAwMDA4DQo+IFvC
+oMKgMjQ3LjgzNjQxM10gUkJQOiAwMDAwN2ZjNjNkZjZmMDk5IFIwODogMDAwMDAwMDAwMDAwMDAw
+MCBSMDk6DQo+IDAwMDA1NTZiNTI0YmU3NjANCj4gW8KgwqAyNDcuODc2Mzk1XSBSMTA6IDAwMDAw
+MDAwMDAwMDAwMDggUjExOiAwMDAwMDAwMDAwMDAwMjQ2IFIxMjoNCj4gMDAwMDAwMDAwMDAwMDAw
+MA0KPiBbwqDCoDI0Ny45MTc1OTddIFIxMzogMDAwMDU1NmI1MjRjNWYxMCBSMTQ6IDAwMDAwMDAw
+MDAwMjAwMDAgUjE1Og0KPiAwMDAwMDAwMDAwMDAwMDAwDQo+IFvCoMKgMjQ3Ljk1NzI3Ml0NCj4g
+W8KgwqAyNDcuOTU3MjcyXSBTaG93aW5nIGFsbCBsb2NrcyBoZWxkIGluIHRoZSBzeXN0ZW06DQo+
+IFvCoMKgMjQ3Ljk5MjAxOV0gMSBsb2NrIGhlbGQgYnkga2h1bmd0YXNrZC8xMTg6DQo+IFvCoMKg
+MjQ4LjAxNTAxOV3CoMKgIzA6ICAodGFza2xpc3RfbG9jayl7LisuK30sIGF0OiBbPDAwMDAwMDAw
+NGVmMzUzOGQ+XQ0KPiBkZWJ1Z19zaG93X2FsbF9sb2NrcysweDM5LzB4MWIwDQo+IFvCoMKgMjQ4
+LjA2NDYwMF0gMiBsb2NrcyBoZWxkIGJ5IHN5c3RlbWQtdWRldmQvNDEzOg0KPiBbwqDCoDI0OC4w
+OTAwMzFdwqDCoCMwOiAgKCZkZXYtPm11dGV4KXsuLi4ufSwgYXQ6IFs8MDAwMDAwMDAyYTM5NWVj
+OD5dDQo+IF9fZHJpdmVyX2F0dGFjaCsweDRhLzB4ZTANCj4gW8KgwqAyNDguMTM2NjIwXcKgwqAj
+MTogICgmZGV2LT5tdXRleCl7Li4uLn0sIGF0OiBbPDAwMDAwMDAwZDlkZWYyM2M+XQ0KPiBfX2Ry
+aXZlcl9hdHRhY2grMHg1OC8weGUwDQo+IFvCoMKgMjQ4LjE4MzI0NV0NCj4gW8KgwqAyNDguMTkx
+Njc1XSA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCj4gW8Kg
+wqAyNDguMTkxNjc1XQ0KPiBbwqDCoDMxNC44MjUxMzRdIGRyYWN1dC1pbml0cXVldWVbNDM3XTog
+V2FybmluZzogZHJhY3V0LWluaXRxdWV1ZSB0aW1lb3V0DQo+IC0gc3RhcnRpbmcgdGltZW91dCBz
+Y3JpcHRzDQo+IFvCoMKgMzE1LjM2ODQyMV0gZHJhY3V0LWluaXRxdWV1ZVs0MzddOiBXYXJuaW5n
+OiBkcmFjdXQtaW5pdHF1ZXVlIHRpbWVvdXQNCj4gLSBzdGFydGluZyB0aW1lb3V0IHNjcmlwdHMN
+Cj4gW8KgwqAzMTUuODk0MzczXSBkcmFjdXQtaW5pdHF1ZXVlWzQzN106IFdhcm5pbmc6IGRyYWN1
+dC1pbml0cXVldWUgdGltZW91dA0KPiAtIHN0YXJ0aW5nIHRpbWVvdXQgc2NyaXB0cw0KPiBbwqDC
+oDMxNi40MTgzODVdIGRyYWN1dC1pbml0cXVldWVbNDM3XTogV2FybmluZzogZHJhY3V0LWluaXRx
+dWV1ZSB0aW1lb3V0DQo+IC0gc3RhcnRpbmcgdGltZW91dCBzY3JpcHRzDQo+IFvCoMKgMzE2Ljk0
+NDQ2MV0gZHJhY3V0LWluaXRxdWV1ZVs0MzddOiBXYXJuaW5nOiBkcmFjdXQtaW5pdHF1ZXVlIHRp
+bWVvdXQNCj4gLSBzdGFydGluZyB0aW1lb3V0IHNjcmlwdHMNCj4gW8KgwqAzMTcuNDY2NzA4XSBk
+cmFjdXQtaW5pdHF1ZXVlWzQzN106IFdhcm5pbmc6IGRyYWN1dC1pbml0cXVldWUgdGltZW91dA0K
+PiAtIHN0YXJ0aW5nIHRpbWVvdXQgc2NyaXB0cw0KPiBbwqDCoDMxNy45OTQzODBdIGRyYWN1dC1p
+bml0cXVldWVbNDM3XTogV2FybmluZzogZHJhY3V0LWluaXRxdWV1ZSB0aW1lb3V0DQo+IC0gc3Rh
+cnRpDQoNCg==
