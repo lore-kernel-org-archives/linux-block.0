@@ -1,112 +1,54 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-From: Tejun Heo <tj@kernel.org>
-To: jack@suse.cz,
-	axboe@kernel.dk,
-	clm@fb.com,
-	jbacik@fb.com
-Cc: kernel-team@fb.com,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	peterz@infradead.org,
-	jianchao.w.wang@oracle.com,
-	Bart.VanAssche@wdc.com,
-	linux-block@vger.kernel.org
-Subject: [PATCHSET v5] blk-mq: reimplement timeout handling
-Date: Tue,  9 Jan 2018 08:29:45 -0800
-Message-Id: <20180109162953.1211451-1-tj@kernel.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:50275 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750908AbeAPJDF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Jan 2018 04:03:05 -0500
+Subject: Re: [PATCH v3 01/13] bcache: set writeback_rate_update_seconds in
+ range [1, 60] seconds
+To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+References: <20180114144236.28213-1-colyli@suse.de>
+ <20180114144236.28213-2-colyli@suse.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <da1324d5-de5b-7b67-6fe1-1827b5dea329@suse.de>
+Date: Tue, 16 Jan 2018 10:03:03 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180114144236.28213-2-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hello,
+On 01/14/2018 03:42 PM, Coly Li wrote:
+> dc->writeback_rate_update_seconds can be set via sysfs and its value can
+> be set to [1, ULONG_MAX].  It does not make sense to set such a large
+> value, 60 seconds is long enough value considering the default 5 seconds
+> works well for long time.
+> 
+> Because dc->writeback_rate_update is a special delayed work, it re-arms
+> itself inside the delayed work routine update_writeback_rate(). When
+> stopping it by cancel_delayed_work_sync(), there should be a timeout to
+> wait and make sure the re-armed delayed work is stopped too. A small max
+> value of dc->writeback_rate_update_seconds is also helpful to decide a
+> reasonable small timeout.
+> 
+> This patch limits sysfs interface to set dc->writeback_rate_update_seconds
+> in range of [1, 60] seconds, and replaces the hand-coded number by macros.
+> 
+> Signed-off-by: Coly Li <colyli@suse.de>
+> ---
+>  drivers/md/bcache/sysfs.c     | 3 +++
+>  drivers/md/bcache/writeback.c | 2 +-
+>  drivers/md/bcache/writeback.h | 3 +++
+>  3 files changed, 7 insertions(+), 1 deletion(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Changes from [v4]
+Cheers,
 
-- Comments added.  Patch description updated.
-
-Changes from [v3]
-
-- Rebased on top of for-4.16/block.
-
-- Integrated Jens's hctx_[un]lock() factoring patch and refreshed the
-  patches accordingly.
-
-- Added comment explaining the use of hctx_lock() instead of
-  rcu_read_lock() in completion path.
-
-Changes from [v2]
-
-- Possible extended looping around seqcount and u64_stat_sync fixed.
-
-- Misplaced MQ_RQ_IDLE state setting fixed.
-
-- RQF_MQ_TIMEOUT_EXPIRED added to prevent firing the same timeout
-  multiple times.
-
-- s/queue_rq_src/srcu/ patch added.
-
-- Other misc changes.
-
-Changes from [v1]
-
-- BLK_EH_RESET_TIMER handling fixed.
-
-- s/request->gstate_seqc/request->gstate_seq/
-
-- READ_ONCE() added to blk_mq_rq_udpate_state().
-
-- Removed left over blk_clear_rq_complete() invocation from
-  blk_mq_rq_timed_out().
-
-Currently, blk-mq timeout path synchronizes against the usual
-issue/completion path using a complex scheme involving atomic
-bitflags, REQ_ATOM_*, memory barriers and subtle memory coherence
-rules.  Unfortunatley, it contains quite a few holes.
-
-It's pretty easy to make blk_mq_check_expired() terminate a later
-instance of a request.  If we induce 5 sec delay before
-time_after_eq() test in blk_mq_check_expired(), shorten the timeout to
-2s, and issue back-to-back large IOs, blk-mq starts timing out
-requests spuriously pretty quickly.  Nothing actually timed out.  It
-just made the call on a recycle instance of a request and then
-terminated a later instance long after the original instance finished.
-The scenario isn't theoretical either.
-
-This patchset replaces the broken synchronization mechanism with a RCU
-and generation number based one.  Please read the patch description of
-the second path for more details.
-
-This patchset contains the following eight patches.
-
-0001-blk-mq-move-hctx-lock-unlock-into-a-helper.patch
-0002-blk-mq-protect-completion-path-with-RCU.patch
-0003-blk-mq-replace-timeout-synchronization-with-a-RCU-an.patch
-0004-blk-mq-use-blk_mq_rq_state-instead-of-testing-REQ_AT.patch
-0005-blk-mq-make-blk_abort_request-trigger-timeout-path.patch
-0006-blk-mq-remove-REQ_ATOM_COMPLETE-usages-from-blk-mq.patch
-0007-blk-mq-remove-REQ_ATOM_STARTED.patch
-0008-blk-mq-rename-blk_mq_hw_ctx-queue_rq_srcu-to-srcu.patch
-
-and is available in the following git branch.
-
- git://git.kernel.org/pub/scm/linux/kernel/git/tj/misc.git blk-mq-timeout-v5
-
-diffstat follows.  Thanks.
-
- block/blk-core.c       |    2 
- block/blk-mq-debugfs.c |    4 
- block/blk-mq.c         |  346 +++++++++++++++++++++++++++++--------------------
- block/blk-mq.h         |   49 ++++++
- block/blk-timeout.c    |   16 +-
- block/blk.h            |    7 
- include/linux/blk-mq.h |    3 
- include/linux/blkdev.h |   25 +++
- 8 files changed, 294 insertions(+), 158 deletions(-)
-
---
-tejun
-
-[v4] http://lkml.kernel.org/r/20180108191542.379478-1-tj@kernel.org
-[v3] http://lkml.kernel.org/r/20171216120726.517153-1-tj@kernel.org
-[v2] http://lkml.kernel.org/r/20171010155441.753966-1-tj@kernel.org
-[v1] http://lkml.kernel.org/r/20171209192525.982030-1-tj@kernel.org
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
