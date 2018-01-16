@@ -1,27 +1,31 @@
-Return-Path: <martin.petersen@oracle.com>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH] block: Fix __bio_integrity_endio() documentation
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <20180116183139.29777-1-bart.vanassche@wdc.com>
-Date: Tue, 16 Jan 2018 23:31:26 -0500
-In-Reply-To: <20180116183139.29777-1-bart.vanassche@wdc.com> (Bart Van
-	Assche's message of "Tue, 16 Jan 2018 10:31:39 -0800")
-Message-ID: <yq1lggxumw1.fsf@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <prvs=547e67762=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH] block: Fix __bio_integrity_endio() documentation
+Date: Tue, 16 Jan 2018 10:31:39 -0800
+Message-Id: <20180116183139.29777-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
+Fixes: 4246a0b63bd8 ("block: add a bi_error field to struct bio")
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+---
+ block/bio-integrity.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Bart,
-
-> Fixes: 4246a0b63bd8 ("block: add a bi_error field to struct bio")
-> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-
-Looks fine.
-
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 23b42e8aa03e..9cfdd6c83b5b 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -374,7 +374,6 @@ static void bio_integrity_verify_fn(struct work_struct *work)
+ /**
+  * __bio_integrity_endio - Integrity I/O completion function
+  * @bio:	Protected bio
+- * @error:	Pointer to errno
+  *
+  * Description: Completion for integrity I/O
+  *
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+2.15.1
