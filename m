@@ -1,21 +1,27 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH] block: Fix __bio_integrity_endio() documentation
+Return-Path: <martin.petersen@oracle.com>
 To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] block: Fix __bio_integrity_endio() documentation
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
 References: <20180116183139.29777-1-bart.vanassche@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <ffb9de06-9d24-888f-7698-7b3307d16079@kernel.dk>
-Date: Wed, 17 Jan 2018 09:59:47 -0700
+Date: Tue, 16 Jan 2018 23:31:26 -0500
+In-Reply-To: <20180116183139.29777-1-bart.vanassche@wdc.com> (Bart Van
+	Assche's message of "Tue, 16 Jan 2018 10:31:39 -0800")
+Message-ID: <yq1lggxumw1.fsf@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20180116183139.29777-1-bart.vanassche@wdc.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-On 1/16/18 11:31 AM, Bart Van Assche wrote:
+
+Bart,
+
 > Fixes: 4246a0b63bd8 ("block: add a bi_error field to struct bio")
 > Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
 
-Applied, thanks.
+Looks fine.
+
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
 -- 
-Jens Axboe
+Martin K. Petersen	Oracle Linux Engineering
