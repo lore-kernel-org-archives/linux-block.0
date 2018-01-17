@@ -1,71 +1,263 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59378 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752276AbeAQMfU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Jan 2018 07:35:20 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>
-Cc: Christoph Hellwig <hch@infradead.org>,
-        "jianchao . wang" <jianchao.w.wang@oracle.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Stefan Haberland <sth@linux.vnet.ibm.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 2/2] blk-mq: convert WARN_ON in __blk_mq_run_hw_queue to printk
-Date: Wed, 17 Jan 2018 20:34:44 +0800
-Message-Id: <20180117123444.18393-3-ming.lei@redhat.com>
-In-Reply-To: <20180117123444.18393-1-ming.lei@redhat.com>
-References: <20180117123444.18393-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <msnitzer@redhat.com>
+Date: Tue, 16 Jan 2018 23:39:06 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>,
+	dm-devel@redhat.com, hch@lst.de
+Subject: Re: [for-4.16 PATCH v5 2/3] blk-mq: improve DM's blk-mq IO merging
+ performance
+Message-ID: <20180117043905.GA2186@redhat.com>
+References: <20180117043338.25839-1-snitzer@redhat.com>
+ <20180117043338.25839-3-snitzer@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180117043338.25839-3-snitzer@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-We know this WARN_ON is harmless and the stack trace isn't useful too,
-so convert it to printk(), and avoid to confuse people.
+This one is redundant and should be dropped.  I ran git-format-patch
+twice after a quick rebase to tweak the subject and header.
 
-Also add comment about two releated races here.
+Sorry for the confusion.
 
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Stefan Haberland <sth@linux.vnet.ibm.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 20 ++++++++++++++++++--
- 1 file changed, 18 insertions(+), 2 deletions(-)
+On Tue, Jan 16 2018 at 11:33pm -0500,
+Mike Snitzer <snitzer@redhat.com> wrote:
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index dc4066d28323..6562360bf108 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1391,9 +1391,25 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
- 	/*
- 	 * We should be running this queue from one of the CPUs that
- 	 * are mapped to it.
-+	 *
-+	 * There are at least two related races now between setting
-+	 * hctx->next_cpu from blk_mq_hctx_next_cpu() and running
-+	 * __blk_mq_run_hw_queue():
-+	 *
-+	 * - hctx->next_cpu is found offline in blk_mq_hctx_next_cpu(),
-+	 *   but later it becomes online, then this warning is harmless
-+	 *   at all
-+	 *
-+	 * - hctx->next_cpu is found online in blk_mq_hctx_next_cpu(),
-+	 *   but later it becomes offline, then the warning can't be
-+	 *   triggered, and we depend on blk-mq timeout handler to
-+	 *   handle dispatched requests to this hctx
- 	 */
--	WARN_ON(!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) &&
--		cpu_online(hctx->next_cpu));
-+	if (!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) &&
-+		cpu_online(hctx->next_cpu))
-+		printk(KERN_WARNING "run queue from wrong CPU %d, hctx %s\n",
-+			raw_smp_processor_id(),
-+			cpumask_empty(hctx->cpumask) ? "inactive": "active");
- 
- 	/*
- 	 * We can't run the queue inline with ints disabled. Ensure that
--- 
-2.9.5
+> From: Ming Lei <ming.lei@redhat.com>
+> 
+> blk_insert_cloned_request() is called in the fast path of a dm-rq driver
+> (e.g. blk-mq request-based DM mpath).  blk_insert_cloned_request() uses
+> blk_mq_request_bypass_insert() to directly append the request to the
+> blk-mq hctx->dispatch_list of the underlying queue.
+> 
+> 1) This way isn't efficient enough because the hctx spinlock is always
+> used.
+> 
+> 2) With blk_insert_cloned_request(), we completely bypass underlying
+> queue's elevator and depend on the upper-level dm-rq driver's elevator
+> to schedule IO.  But dm-rq currently can't get the underlying queue's
+> dispatch feedback at all.  Without knowing whether a request was issued
+> or not (e.g. due to underlying queue being busy) the dm-rq elevator will
+> not be able to provide effective IO merging (as a side-effect of dm-rq
+> currently blindly destaging a request from its elevator only to requeue
+> it after a delay, which kills any opportunity for merging).  This
+> obviously causes very bad sequential IO performance.
+> 
+> Fix this by updating blk_insert_cloned_request() to use
+> blk_mq_request_direct_issue().  blk_mq_request_direct_issue() allows a
+> request to be issued directly to the underlying queue and returns the
+> dispatch feedback (blk_status_t).  If blk_mq_request_direct_issue()
+> returns BLK_SYS_RESOURCE the dm-rq driver will now use DM_MAPIO_REQUEUE
+> to _not_ destage the request.  Whereby preserving the opportunity to
+> merge IO.
+> 
+> With this, request-based DM's blk-mq sequential IO performance is vastly
+> improved (as much as 3X in mpath/virtio-scsi testing).
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> [based _heavily_ on Ming Lei's initial solution, but blk-mq.c changes
+> were refactored to make them less fragile and easier to read/review]
+> Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+> ---
+>  block/blk-core.c   |  3 +--
+>  block/blk-mq.c     | 42 +++++++++++++++++++++++++++++++++---------
+>  block/blk-mq.h     |  3 +++
+>  drivers/md/dm-rq.c | 19 ++++++++++++++++---
+>  4 files changed, 53 insertions(+), 14 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 7ba607527487..55f338020254 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -2500,8 +2500,7 @@ blk_status_t blk_insert_cloned_request(struct request_queue *q, struct request *
+>  		 * bypass a potential scheduler on the bottom device for
+>  		 * insert.
+>  		 */
+> -		blk_mq_request_bypass_insert(rq, true);
+> -		return BLK_STS_OK;
+> +		return blk_mq_request_direct_issue(rq);
+>  	}
+>  
+>  	spin_lock_irqsave(q->queue_lock, flags);
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index f30e34a22a6c..81ee3f9124dc 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1706,7 +1706,8 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
+>  	blk_qc_t new_cookie;
+>  	blk_status_t ret;
+>  
+> -	new_cookie = request_to_qc_t(hctx, rq);
+> +	if (cookie)
+> +		new_cookie = request_to_qc_t(hctx, rq);
+>  
+>  	/*
+>  	 * For OK queue, we are done. For error, caller may kill it.
+> @@ -1716,13 +1717,15 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
+>  	ret = q->mq_ops->queue_rq(hctx, &bd);
+>  	switch (ret) {
+>  	case BLK_STS_OK:
+> -		*cookie = new_cookie;
+> +		if (cookie)
+> +			*cookie = new_cookie;
+>  		break;
+>  	case BLK_STS_RESOURCE:
+>  		__blk_mq_requeue_request(rq);
+>  		break;
+>  	default:
+> -		*cookie = BLK_QC_T_NONE;
+> +		if (cookie)
+> +			*cookie = BLK_QC_T_NONE;
+>  		break;
+>  	}
+>  
+> @@ -1731,15 +1734,20 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
+>  
+>  static void __blk_mq_fallback_to_insert(struct blk_mq_hw_ctx *hctx,
+>  					struct request *rq,
+> -					bool run_queue)
+> +					bool run_queue, bool bypass_insert)
+>  {
+> +	if (bypass_insert) {
+> +		blk_mq_request_bypass_insert(rq, run_queue);
+> +		return;
+> +	}
+>  	blk_mq_sched_insert_request(rq, false, run_queue, false,
+>  					hctx->flags & BLK_MQ_F_BLOCKING);
+>  }
+>  
+>  static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+>  						struct request *rq,
+> -						blk_qc_t *cookie)
+> +						blk_qc_t *cookie,
+> +						bool bypass_insert)
+>  {
+>  	struct request_queue *q = rq->q;
+>  	bool run_queue = true;
+> @@ -1750,7 +1758,7 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+>  		goto insert;
+>  	}
+>  
+> -	if (q->elevator)
+> +	if (q->elevator && !bypass_insert)
+>  		goto insert;
+>  
+>  	if (!blk_mq_get_driver_tag(rq, NULL, false))
+> @@ -1763,7 +1771,9 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+>  
+>  	return __blk_mq_issue_directly(hctx, rq, cookie);
+>  insert:
+> -	__blk_mq_fallback_to_insert(hctx. rq, run_queue);
+> +	__blk_mq_fallback_to_insert(hctx. rq, run_queue, bypass_insert);
+> +	if (bypass_insert)
+> +		return BLK_STS_RESOURCE;
+>  
+>  	return BLK_STS_OK;
+>  }
+> @@ -1778,15 +1788,29 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+>  
+>  	hctx_lock(hctx, &srcu_idx);
+>  
+> -	ret = __blk_mq_try_issue_directly(hctx, rq, cookie);
+> +	ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false);
+>  	if (ret == BLK_STS_RESOURCE)
+> -		__blk_mq_fallback_to_insert(hctx. rq, true);
+> +		__blk_mq_fallback_to_insert(hctx. rq, true, false);
+>  	else if (ret != BLK_STS_OK)
+>  		blk_mq_end_request(rq, ret);
+>  
+>  	hctx_unlock(hctx, srcu_idx);
+>  }
+>  
+> +blk_status_t blk_mq_request_direct_issue(struct request *rq)
+> +{
+> +	blk_status_t ret;
+> +	int srcu_idx;
+> +	struct blk_mq_ctx *ctx = rq->mq_ctx;
+> +	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(rq->q, ctx->cpu);
+> +
+> +	hctx_lock(hctx, &srcu_idx);
+> +	ret = __blk_mq_try_issue_directly(hctx, rq, NULL, true);
+> +	hctx_unlock(hctx, srcu_idx);
+> +
+> +	return ret;
+> +}
+> +
+>  static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+>  {
+>  	const int is_sync = op_is_sync(bio->bi_opf);
+> diff --git a/block/blk-mq.h b/block/blk-mq.h
+> index 8591a54d989b..e3ebc93646ca 100644
+> --- a/block/blk-mq.h
+> +++ b/block/blk-mq.h
+> @@ -74,6 +74,9 @@ void blk_mq_request_bypass_insert(struct request *rq, bool run_queue);
+>  void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
+>  				struct list_head *list);
+>  
+> +/* Used by blk_insert_cloned_request() to issue request directly */
+> +blk_status_t blk_mq_request_direct_issue(struct request *rq);
+> +
+>  /*
+>   * CPU -> queue mappings
+>   */
+> diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+> index c28357f5cb0e..b7d175e94a02 100644
+> --- a/drivers/md/dm-rq.c
+> +++ b/drivers/md/dm-rq.c
+> @@ -395,7 +395,7 @@ static void end_clone_request(struct request *clone, blk_status_t error)
+>  	dm_complete_request(tio->orig, error);
+>  }
+>  
+> -static void dm_dispatch_clone_request(struct request *clone, struct request *rq)
+> +static blk_status_t dm_dispatch_clone_request(struct request *clone, struct request *rq)
+>  {
+>  	blk_status_t r;
+>  
+> @@ -404,9 +404,10 @@ static void dm_dispatch_clone_request(struct request *clone, struct request *rq)
+>  
+>  	clone->start_time = jiffies;
+>  	r = blk_insert_cloned_request(clone->q, clone);
+> -	if (r)
+> +	if (r != BLK_STS_OK && r != BLK_STS_RESOURCE)
+>  		/* must complete clone in terms of original request */
+>  		dm_complete_request(rq, r);
+> +	return r;
+>  }
+>  
+>  static int dm_rq_bio_constructor(struct bio *bio, struct bio *bio_orig,
+> @@ -476,8 +477,10 @@ static int map_request(struct dm_rq_target_io *tio)
+>  	struct mapped_device *md = tio->md;
+>  	struct request *rq = tio->orig;
+>  	struct request *clone = NULL;
+> +	blk_status_t ret;
+>  
+>  	r = ti->type->clone_and_map_rq(ti, rq, &tio->info, &clone);
+> +check_again:
+>  	switch (r) {
+>  	case DM_MAPIO_SUBMITTED:
+>  		/* The target has taken the I/O to submit by itself later */
+> @@ -492,7 +495,17 @@ static int map_request(struct dm_rq_target_io *tio)
+>  		/* The target has remapped the I/O so dispatch it */
+>  		trace_block_rq_remap(clone->q, clone, disk_devt(dm_disk(md)),
+>  				     blk_rq_pos(rq));
+> -		dm_dispatch_clone_request(clone, rq);
+> +		ret = dm_dispatch_clone_request(clone, rq);
+> +		if (ret == BLK_STS_RESOURCE) {
+> +			blk_rq_unprep_clone(clone);
+> +			tio->ti->type->release_clone_rq(clone);
+> +			tio->clone = NULL;
+> +			if (!rq->q->mq_ops)
+> +				r = DM_MAPIO_DELAY_REQUEUE;
+> +			else
+> +				r = DM_MAPIO_REQUEUE;
+> +			goto check_again;
+> +		}
+>  		break;
+>  	case DM_MAPIO_REQUEUE:
+>  		/* The target wants to requeue the I/O */
+> -- 
+> 2.15.0
+> 
+> --
+> dm-devel mailing list
+> dm-devel@redhat.com
+> https://www.redhat.com/mailman/listinfo/dm-devel
