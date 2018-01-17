@@ -1,109 +1,112 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:36822 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753793AbeAQQm7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Jan 2018 11:42:59 -0500
+Return-Path: <ming.lei@redhat.com>
+Date: Thu, 18 Jan 2018 00:14:04 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>
-Cc: Christoph Hellwig <hch@infradead.org>,
-        "jianchao . wang" <jianchao.w.wang@oracle.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Stefan Haberland <sth@linux.vnet.ibm.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V2 1/2] blk-mq: make sure hctx->next_cpu is set correctly
-Date: Thu, 18 Jan 2018 00:41:51 +0800
-Message-Id: <20180117164152.7066-2-ming.lei@redhat.com>
-In-Reply-To: <20180117164152.7066-1-ming.lei@redhat.com>
-References: <20180117164152.7066-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+	Christoph Hellwig <hch@infradead.org>,
+	"jianchao . wang" <jianchao.w.wang@oracle.com>,
+	Christian Borntraeger <borntraeger@de.ibm.com>,
+	Stefan Haberland <sth@linux.vnet.ibm.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 1/2] blk-mq: make sure hctx->next_cpu is set correctly
+Message-ID: <20180117161359.GB21896@ming.t460p>
+References: <20180117123444.18393-1-ming.lei@redhat.com>
+ <20180117123444.18393-2-ming.lei@redhat.com>
+ <19f12f79-2402-df02-0910-7e675fa343c8@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <19f12f79-2402-df02-0910-7e675fa343c8@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-When hctx->next_cpu is set from possible online CPUs, there is one
-race in which hctx->next_cpu may be set as >= nr_cpu_ids, and finally
-break workqueue.
+On Wed, Jan 17, 2018 at 08:45:44AM -0700, Jens Axboe wrote:
+> On 1/17/18 5:34 AM, Ming Lei wrote:
+> > When hctx->next_cpu is set from possible online CPUs, there is one
+> > race in which hctx->next_cpu may be set as >= nr_cpu_ids, and finally
+> > break workqueue.
+> > 
+> > The race is triggered when one CPU is becoming DEAD, blk_mq_hctx_notify_dead()
+> > is called to dispatch requests from the DEAD cpu context, but at that
+> > time, this DEAD CPU has been cleared from 'cpu_online_mask', so all
+> > CPUs in hctx->cpumask may become offline, and cause hctx->next_cpu set
+> > a bad value.
+> > 
+> > This patch deals with this issue by re-selecting next CPU, and make
+> > sure it is set correctly.
+> > 
+> > Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> > Cc: Stefan Haberland <sth@linux.vnet.ibm.com>
+> > Cc: Christoph Hellwig <hch@lst.de>
+> > Cc: Thomas Gleixner <tglx@linutronix.de>
+> > Reported-by: "jianchao.wang" <jianchao.w.wang@oracle.com>
+> > Tested-by: "jianchao.wang" <jianchao.w.wang@oracle.com>
+> > Fixes: 20e4d81393 ("blk-mq: simplify queue mapping & schedule with each possisble CPU")
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  block/blk-mq.c | 31 +++++++++++++++++++++++++++++--
+> >  1 file changed, 29 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index c376d1b6309a..dc4066d28323 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -1416,21 +1416,48 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+> >   */
+> >  static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+> >  {
+> > +	bool tried = false;
+> > +
+> >  	if (hctx->queue->nr_hw_queues == 1)
+> >  		return WORK_CPU_UNBOUND;
+> >  
+> >  	if (--hctx->next_cpu_batch <= 0) {
+> >  		int next_cpu;
+> > -
+> > +select_cpu:
+> >  		next_cpu = cpumask_next_and(hctx->next_cpu, hctx->cpumask,
+> >  				cpu_online_mask);
+> >  		if (next_cpu >= nr_cpu_ids)
+> >  			next_cpu = cpumask_first_and(hctx->cpumask,cpu_online_mask);
+> >  
+> > -		hctx->next_cpu = next_cpu;
+> > +		/*
+> > +		 * No online CPU is found here, and this may happen when
+> > +		 * running from blk_mq_hctx_notify_dead(), and make sure
+> > +		 * hctx->next_cpu is set correctly for not breaking workqueue.
+> > +		 */
+> > +		if (next_cpu >= nr_cpu_ids)
+> > +			hctx->next_cpu = cpumask_first(hctx->cpumask);
+> > +		else
+> > +			hctx->next_cpu = next_cpu;
+> >  		hctx->next_cpu_batch = BLK_MQ_CPU_WORK_BATCH;
+> 
+> Since this should _only_ happen from the offline notification, why don't
+> we move the reset/update logic in that path and out of the hot path?
 
-The race can be triggered in the following two sitations:
+This way is clean, and the only cost introduced is the following two
+'if' in hot path:
 
-1) when one CPU is becoming DEAD, blk_mq_hctx_notify_dead() is called
-to dispatch requests from the DEAD cpu context, but at that
-time, this DEAD CPU has been cleared from 'cpu_online_mask', so all
-CPUs in hctx->cpumask may become offline, and cause hctx->next_cpu set
-a bad value.
+	if (next_cpu >= nr_cpu_ids)
 
-2) blk_mq_delay_run_hw_queue() is called from CPU B, and found the queue
-should be run on the other CPU A, then CPU A may become offline at the
-same time and all CPUs in hctx->cpumask become offline.
+	and 
 
-This patch deals with this issue by re-selecting next CPU, and make
-sure it is set correctly.
+	if (!cpu_online(hctx->next_cpu))
 
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Stefan Haberland <sth@linux.vnet.ibm.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Reported-by: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Tested-by: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Fixes: 20e4d81393 ("blk-mq: simplify queue mapping & schedule with each possisble CPU")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 30 ++++++++++++++++++++++++++++--
- 1 file changed, 28 insertions(+), 2 deletions(-)
+Now I think it can be triggered not only in CPU dead path, but also
+in normal run queue, and it is just easy to trigger it in CPU dead
+path in Jianchao's test:
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c376d1b6309a..69e73b4e32f3 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1416,21 +1416,47 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
-  */
- static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
- {
-+	bool tried = false;
-+
- 	if (hctx->queue->nr_hw_queues == 1)
- 		return WORK_CPU_UNBOUND;
- 
- 	if (--hctx->next_cpu_batch <= 0) {
- 		int next_cpu;
--
-+select_cpu:
- 		next_cpu = cpumask_next_and(hctx->next_cpu, hctx->cpumask,
- 				cpu_online_mask);
- 		if (next_cpu >= nr_cpu_ids)
- 			next_cpu = cpumask_first_and(hctx->cpumask,cpu_online_mask);
- 
--		hctx->next_cpu = next_cpu;
-+		/*
-+		 * No online CPU is found, so have to make sure hctx->next_cpu
-+		 * is set correctly for not breaking workqueue.
-+		 */
-+		if (next_cpu >= nr_cpu_ids)
-+			hctx->next_cpu = cpumask_first(hctx->cpumask);
-+		else
-+			hctx->next_cpu = next_cpu;
- 		hctx->next_cpu_batch = BLK_MQ_CPU_WORK_BATCH;
- 	}
- 
-+	/*
-+	 * Do unbound schedule if we can't find a online CPU for this hctx,
-+	 * and it should only happen in the path of handling CPU DEAD.
-+	 */
-+	if (!cpu_online(hctx->next_cpu)) {
-+		if (!tried) {
-+			tried = true;
-+			goto select_cpu;
-+		}
-+
-+		/*
-+		 * Make sure to re-select CPU next time once after CPUs
-+		 * in hctx->cpumask become online again.
-+		 */
-+		hctx->next_cpu_batch = 1;
-+		return WORK_CPU_UNBOUND;
-+	}
- 	return hctx->next_cpu;
- }
- 
--- 
-2.9.5
+- blk_mq_delay_run_hw_queue() is called from CPU B, and found the queue
+should be run on other CPUs
+
+- then blk_mq_hctx_next_cpu() is called, and we have to check if
+the destination CPU(the computed hctx->next_cpu) is still online.
+
+Then the check is required in hot path too, but given the cost is
+small enough, so it shouldn't be a bid deal.
+
+Or we have to introduce CPU hotplug handler to update hctx->cpumask,
+and it should be doable with help of RCU. We can work towards to
+this direction if you don't mind.
+
+Thanks,
+Ming
