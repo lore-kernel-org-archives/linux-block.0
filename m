@@ -1,256 +1,145 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail5.windriver.com ([192.103.53.11]:59764 "EHLO mail5.wrs.com"
+Received: from mx1.redhat.com ([209.132.183.28]:37590 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751050AbeAVCEw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 21 Jan 2018 21:04:52 -0500
-From: "Hongzhi, Song" <hongzhi.song@windriver.com>
-Subject: (v2. forward to qemu )-Panic with ext4,nbd,qemu-img,block
-CC: <linux-ext4@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <qemu-devel@nongnu.org>,
-        <qemu-discuss@nongnu.org>
-To: <qemu-block@nongnu.org>
-Message-ID: <4ac7d86b-d96d-ef75-6965-284c527cde9b@windriver.com>
-Date: Mon, 22 Jan 2018 10:06:26 +0800
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
+        id S1753710AbeAQQ1X (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 17 Jan 2018 11:27:23 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: axboe@kernel.dk
+Cc: Ming Lei <tom.leiming@gmail.com>, hch@lst.de, dm-devel@redhat.com,
+        linux-block@vger.kernel.org
+Subject: [for-4.16 PATCH v6 1/3] blk-mq: factor out a few helpers from __blk_mq_try_issue_directly
+Date: Wed, 17 Jan 2018 11:25:56 -0500
+Message-Id: <20180117162558.28553-2-snitzer@redhat.com>
+In-Reply-To: <20180117162558.28553-1-snitzer@redhat.com>
+References: <20180117162558.28553-1-snitzer@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hello,
+No functional change.  Just makes code flow more logically.
 
-I create a virtual disk-image using qemu-img.
+In following commit, __blk_mq_try_issue_directly() will be used to
+return the dispatch result (blk_status_t) to DM.  DM needs this
+information to improve IO merging.
 
-And then I use /dev/nbd to map the image.
+Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+---
+ block/blk-mq.c | 79 ++++++++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 52 insertions(+), 27 deletions(-)
 
-I mount the /dev/nbd to a local dir with ext4-format
-
-Finally, I have some trouble about ext4-filesystem and block device, 
-with using demand of rsync or dd to write the image.
-
-Reproduce :
-
-     qemu-img create test.img 2G
-
-     mkfs.ext4 -F test.img
-
-      qemu-nbd -f raw -c /dev/nbd0 test.img
-
-      mount -r ext4 /dev/nbd0 LOCAL_DIR/
-
-     rsync -av META_DATA_DIR/  LOCAL_DIR/
-
-Qemu Version:
-
-     QEMU emulator version 2.10.0
-     Copyright (c) 2003-2017 Fabrice Bellard and the QEMU \
-     Project developers
-
-Kernel Version:
-
-     4.12+HEAD (I have test 4.15-rc7 and 4.12)
-
-Machine:
-
-     intel-x86-64
-
-CPU:
-
-     xeon
-
-Architecture:
-
-     I86
-
-The problem is not always  appear step by step, but often using lava 
-that is a auto-testing method.
-
-And it just appears in some special board.
-
-If someone has similar trouble or has resolution or wants more detail, 
-please connect with me. Thanks.
-
-Detail:
-
-
-329.11 EXT4-fs (nbd0): mounted filesystem with ordered data mode. Opts: 
-(null)
-329.12 block nbd0: Connection timed out
-329.13 block nbd0: shutting down sockets
-329.14 blk_update_request: I/O error, dev nbd0, sector 304384
-329.15 blk_update_request: I/O error, dev nbd0, sector 304640
-329.16 blk_update_request: I/O error, dev nbd0, sector 304896
-329.17 blk_update_request: I/O error, dev nbd0, sector 305152
-329.18 blk_update_request: I/O error, dev nbd0, sector 305408
-329.19 blk_update_request: I/O error, dev nbd0, sector 305664
-329.20 blk_update_request: I/O error, dev nbd0, sector 305920
-329.21 blk_update_request: I/O error, dev nbd0, sector 306176
-329.22 blk_update_request: I/O error, dev nbd0, sector 306432
-329.23 blk_update_request: I/O error, dev nbd0, sector 306688
-329.24 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5 
-writing to inode 160 (offset 8388608 size 8388608 starting block 38400)
-329.25 Buffer I/O error on device nbd0, logical block 38144
-329.26 Buffer I/O error on device nbd0, logical block 38145
-329.27 Buffer I/O error on device nbd0, logical block 38146
-329.28 Buffer I/O error on device nbd0, logical block 38147
-329.29 Buffer I/O error on device nbd0, logical block 38148
-329.30 Buffer I/O error on device nbd0, logical block 38149
-329.31 Buffer I/O error on device nbd0, logical block 38150
-329.32 Buffer I/O error on device nbd0, logical block 38151
-329.33 Buffer I/O error on device nbd0, logical block 38152
-329.34 Buffer I/O error on device nbd0, logical block 38153
-329.35 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5 
-writing to inode 160 (offset 8388608 size 8388608 starting block 38656)
-329.36 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5 
-writing to inode 160 (offset 8388608 size 8388608 starting block 38912)
-329.37 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5 
-writing to inode 160 (offset 16777216 size 8388608 starting block 39168)
-329.38 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5 
-writing to inode 160 (offset 16777216 size 8388608 starting block 39424)
-329.39 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5 
-writing to inode 160 (offset 16777216 size 8388608 starting block 39680)
-329.40 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5 
-writing to inode 160 (offset 16777216 size 8388608 starting block 39936)
-329.41 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5 
-writing to inode 160 (offset 16777216 size 8388608 starting block 40192)
-329.42 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5 
-writing to inode 160 (offset 16777216 size 8388608 starting block 40448)
-329.43 EXT4-fs error (device nbd0): __ext4_get_inode_loc:4520: inode 
-#222: block 174: comm kworker/u113:0: unable to read itable block
-329.44 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5 
-writing to inode 160 (offset 16777216 size 8388608 starting block 40704)
-329.45 ------------[ cut here ]------------
-329.46 kernel BUG at /kernel-source//fs/buffer.c:3091!
-329.47 invalid opcode: 0000 [#1] PREEMPT SMP
-329.48 Modules linked in: nbd xt_CHECKSUM iptable_mangle ipt_REJECT 
-nf_reject_ipv4 xt_tcpudp ebtable_filter ebtables ip6_tables 
-ipt_MASQUERADE nf_nat_masquerade_ipv4 nf_conntrack_netlink nfnetlink 
-xfrm_user iptable_nat xt_addrtype iptable_filter ip_tables xt_conntrack 
-x_tables br_netfilter bridge stp llc intel_rapl sb_edac intel_powerclamp 
-coretemp crct10dif_pclmul crct10dif_common aesni_intel aes_x86_64 
-crypto_simd cryptd glue_helper iTCO_wdt iTCO_vendor_support lpc_ich 
-i2c_i801 wmi acpi_pad acpi_power_meter nfsd openvswitch nf_defrag_ipv6 
-nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 nf_nat nf_conntrack 
-kvm_intel kvm irqbypass fuse
-329.49 CPU: 30 PID: 6 Comm: kworker/u113:0 Not tainted 
-4.12.18-rt0-yocto-preempt-rt #1
-329.50 Hardware name: Intel Corporation S2600WTT/S2600WTT, BIOS 
-GRNDSDP1.86B.0036.R05.1407140519 07/14/2014
-329.51 Workqueue: writeback wb_workfn (flush-43:0)
-329.52 task: ffff977bec759e00 task.stack: ffffa2930524c000
-329.53 RIP: 0010:submit_bh_wbc+0x155/0x160
-329.54 RSP: 0018:ffffa2930524f7e0 EFLAGS: 00010246
-329.55 RAX: 0000000000620005 RBX: ffff977f05cddc18 RCX: 0000000000000000
-329.56 RDX: ffff977f05cddc18 RSI: 0000000000020800 RDI: 0000000000000001
-329.57 RBP: ffffa2930524f808 R08: ff00000000000000 R09: 00ffffffffffffff
-329.58 R10: ffffa2930524f920 R11: 000000000000058c R12: 000000000000a598
-329.59 R13: ffffffffba15c500 R14: ffff977fe1bab400 R15: ffff977fea643000
-329.60 FS: 0000000000000000(0000) GS:ffff977befa00000(0000) 
-knlGS:0000000000000000
-329.61 CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-329.62 CR2: 00007f7d70000010 CR3: 000000035ce0e000 CR4: 00000000001406e0
-329.63 Call Trace:
-329.64 __sync_dirty_buffer+0x41/0xa0
-329.65 ext4_commit_super+0x1d6/0x2a0
-329.66 __ext4_error_inode+0xb2/0x170
-329.67 ? wake_up_bit+0x30/0x30
-329.68 __ext4_get_inode_loc+0x365/0x460
-329.69 ext4_reserve_inode_write+0x51/0xb0
-329.70 ? ext4_writepages+0xd23/0x1090
-329.71 ext4_mark_inode_dirty+0x48/0x200
-329.72 ext4_writepages+0xd23/0x1090
-329.73 ? __schedule+0x25b/0x6a0
-329.74 do_writepages+0x39/0xc0
-329.75 ? do_writepages+0x39/0xc0
-329.76 ? unpin_current_cpu+0x5e/0x80
-329.77 ? migrate_enable+0x2dd/0x3c0
-329.78 __writeback_single_inode+0x4d/0x490
-329.79 ? __writeback_single_inode+0x4d/0x490
-329.80 ? rt_spin_unlock+0x27/0x40
-329.81 writeback_sb_inodes+0x230/0x4d0
-329.82 wb_writeback+0xde/0x3d0
-329.83 wb_workfn+0xb8/0x420
-329.84 ? wb_workfn+0xb8/0x420
-329.85 ? unpin_current_cpu+0x5e/0x80
-329.86 ? migrate_enable+0x2dd/0x3c0
-329.87 ? _raw_spin_lock+0x17/0x40
-329.88 process_one_work+0x1cf/0x470
-329.89 ? migrate_disable+0x12f/0x200
-329.90 worker_thread+0x4b/0x450
-329.91 kthread+0x124/0x140
-329.92 ? process_one_work+0x470/0x470
-329.93 ? kthread_create_on_node+0x40/0x40
-329.94 ret_from_fork+0x22/0x30
-329.95 Code: 89 ef 44 09 f7 41 89 7c 24 14 4c 89 e7 e8 04 c4 22 00 5b 31 
-c0 41 5c 41 5d 41 5e 41 5f 5d c3 f0 80 62 01 f7 e9 19 ff ff ff 0f 0b 
-<0f> 0b 0f 0b 0f 0b 0f 0b 0f 0b 90 0f 1f 44 00 00 55 49 89 f9 48
-329.96 RIP: submit_bh_wbc+0x155/0x160 RSP: ffffa2930524f7e0
-329.97 ---[ end trace 0000000000000002 ]---
-329.98 Buffer I/O error on dev nbd0, logical block 262144, lost sync 
-page write
-329.99 JBD2: Error -5 detected when updating journal superblock for nbd0-8.
-329.100 Aborting journal on device nbd0-8.
-329.101 ------------[ cut here ]------------
-329.102 kernel BUG at /kernel-source//fs/buffer.c:3091!
-329.103 invalid opcode: 0000 [#2] PREEMPT SMP
-329.104 Modules linked in: nbd xt_CHECKSUM iptable_mangle ipt_REJECT 
-nf_reject_ipv4 xt_tcpudp ebtable_filter ebtables ip6_tables 
-ipt_MASQUERADE nf_nat_masquerade_ipv4 nf_conntrack_netlink nfnetlink 
-xfrm_user iptable_nat xt_addrtype iptable_filter ip_tables xt_conntrack 
-x_tables br_netfilter bridge stp llc intel_rapl sb_edac intel_powerclamp 
-coretemp crct10dif_pclmul crct10dif_common aesni_intel aes_x86_64 
-crypto_simd cryptd glue_helper iTCO_wdt iTCO_vendor_support lpc_ich 
-i2c_i801 wmi acpi_pad acpi_power_meter nfsd openvswitch nf_defrag_ipv6 
-nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 nf_nat nf_conntrack 
-kvm_intel kvm irqbypass fuse
-329.105 CPU: 36 PID: 7760 Comm: jbd2/nbd0-8 Tainted: G D 
-4.12.18-rt0-yocto-preempt-rt #1
-329.106 Hardware name: Intel Corporation S2600WTT/S2600WTT, BIOS 
-GRNDSDP1.86B.0036.R05.1407140519 07/14/2014
-329.107 task: ffff977fdd853c00 task.stack: ffffa29308934000
-329.108 RIP: 0010:submit_bh_wbc+0x155/0x160
-329.109 RSP: 0018:ffffa29308937bd0 EFLAGS: 00010246
-329.110 RAX: 0000000004000005 RBX: ffff977f05cf62e8 RCX: 0000000000000000
-329.111 RDX: ffff977f05cf62e8 RSI: 0000000000020800 RDI: 0000000000000001
-329.112 RBP: ffffa29308937bf8 R08: 0000000000000100 R09: 0000000000000000
-329.113 R10: ffff977fdd853f30 R11: 0000000000000000 R12: ffff977fea6bc800
-329.114 R13: 0000000000020800 R14: ffff977fc8a33000 R15: ffff977fea6bc800
-329.115 FS: 0000000000000000(0000) GS:ffff977befb80000(0000) 
-knlGS:0000000000000000
-329.116 CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-329.117 CR2: 0000000000915d50 CR3: 000000035ce0e000 CR4: 00000000001406e0
-329.118 Call Trace:
-329.119 submit_bh+0x10/0x20
-329.120 jbd2_write_superblock+0xaf/0x1e0
-329.121 jbd2_journal_update_sb_errno+0x3f/0x50
-329.122 __journal_abort_soft+0x3d/0x60
-329.123 jbd2_write_superblock+0x1b4/0x1e0
-329.124 jbd2_journal_update_sb_log_tail+0x3a/0x90
-329.125 jbd2_journal_commit_transaction+0xb89/0x18d0
-329.126 ? __this_cpu_preempt_check+0x13/0x20
-329.127 ? __perf_event_task_sched_in+0x66/0x190
-329.128 ? _raw_spin_lock_irqsave+0x1d/0x50
-329.129 ? lock_timer_base+0x81/0xa0
-329.130 ? _raw_spin_unlock_irqrestore+0x18/0x50
-329.131 ? try_to_del_timer_sync+0x44/0x60
-329.132 ? del_timer_sync+0x47/0xf0
-329.133 kjournald2+0xc6/0x250
-329.134 ? kjournald2+0xc6/0x250
-329.135 ? wake_bit_function+0x60/0x60
-329.136 kthread+0x124/0x140
-329.137 ? commit_timeout+0x10/0x10
-329.138 ? kthread_create_on_node+0x40/0x40
-329.139 ret_from_fork+0x22/0x30
-329.140 Code: 89 ef 44 09 f7 41 89 7c 24 14 4c 89 e7 e8 04 c4 22 00 5b 
-31 c0 41 5c 41 5d 41 5e 41 5f 5d c3 f0 80 62 01 f7 e9 19 ff ff ff 0f 0b 
-<0f> 0b 0f 0b 0f 0b 0f 0b 0f 0b 90 0f 1f 44 00 00 55 49 89 f9 48
-329.141 RIP: submit_bh_wbc+0x155/0x160 RSP: ffffa29308937bd0
-329.142 ---[ end trace 0000000000000003 ]---
-329.143 block nbd0: Connection timed out
-329.144 block nbd0: Connection timed out
-329.145 block nbd0: Connection timed out
-329.146 block nbd0: Connection timed out
-329.147 block nbd0: Connection timed out
-329.148 block nbd0: Connection timed out
-329.149 block nbd0: Connection timed out
-329.150 block nbd0: Connection timed out
-329.151 block nbd0: Connection timed out
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c8f62e6be6b6..c117c2baf2c9 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1694,9 +1694,9 @@ static blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx, struct request *rq)
+ 	return blk_tag_to_qc_t(rq->internal_tag, hctx->queue_num, true);
+ }
+ 
+-static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+-					struct request *rq,
+-					blk_qc_t *cookie)
++static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
++					    struct request *rq,
++					    blk_qc_t *cookie)
+ {
+ 	struct request_queue *q = rq->q;
+ 	struct blk_mq_queue_data bd = {
+@@ -1705,6 +1705,43 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	};
+ 	blk_qc_t new_cookie;
+ 	blk_status_t ret;
++
++	new_cookie = request_to_qc_t(hctx, rq);
++
++	/*
++	 * For OK queue, we are done. For error, caller may kill it.
++	 * Any other error (busy), just add it to our list as we
++	 * previously would have done.
++	 */
++	ret = q->mq_ops->queue_rq(hctx, &bd);
++	switch (ret) {
++	case BLK_STS_OK:
++		*cookie = new_cookie;
++		break;
++	case BLK_STS_RESOURCE:
++		__blk_mq_requeue_request(rq);
++		break;
++	default:
++		*cookie = BLK_QC_T_NONE;
++		break;
++	}
++
++	return ret;
++}
++
++static void __blk_mq_fallback_to_insert(struct blk_mq_hw_ctx *hctx,
++					struct request *rq,
++					bool run_queue)
++{
++	blk_mq_sched_insert_request(rq, false, run_queue, false,
++					hctx->flags & BLK_MQ_F_BLOCKING);
++}
++
++static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
++						struct request *rq,
++						blk_qc_t *cookie)
++{
++	struct request_queue *q = rq->q;
+ 	bool run_queue = true;
+ 
+ 	/* RCU or SRCU read lock is needed before checking quiesced flag */
+@@ -1724,41 +1761,29 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 		goto insert;
+ 	}
+ 
+-	new_cookie = request_to_qc_t(hctx, rq);
+-
+-	/*
+-	 * For OK queue, we are done. For error, kill it. Any other
+-	 * error (busy), just add it to our list as we previously
+-	 * would have done
+-	 */
+-	ret = q->mq_ops->queue_rq(hctx, &bd);
+-	switch (ret) {
+-	case BLK_STS_OK:
+-		*cookie = new_cookie;
+-		return;
+-	case BLK_STS_RESOURCE:
+-		__blk_mq_requeue_request(rq);
+-		goto insert;
+-	default:
+-		*cookie = BLK_QC_T_NONE;
+-		blk_mq_end_request(rq, ret);
+-		return;
+-	}
+-
++	return __blk_mq_issue_directly(hctx, rq, cookie);
+ insert:
+-	blk_mq_sched_insert_request(rq, false, run_queue, false,
+-					hctx->flags & BLK_MQ_F_BLOCKING);
++	__blk_mq_fallback_to_insert(hctx, rq, run_queue);
++
++	return BLK_STS_OK;
+ }
+ 
+ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 		struct request *rq, blk_qc_t *cookie)
+ {
++	blk_status_t ret;
+ 	int srcu_idx;
+ 
+ 	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
+ 
+ 	hctx_lock(hctx, &srcu_idx);
+-	__blk_mq_try_issue_directly(hctx, rq, cookie);
++
++	ret = __blk_mq_try_issue_directly(hctx, rq, cookie);
++	if (ret == BLK_STS_RESOURCE)
++		__blk_mq_fallback_to_insert(hctx, rq, true);
++	else if (ret != BLK_STS_OK)
++		blk_mq_end_request(rq, ret);
++
+ 	hctx_unlock(hctx, srcu_idx);
+ }
+ 
+-- 
+2.15.0
