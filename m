@@ -1,30 +1,71 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH 2/2] blk-mq: convert WARN_ON in __blk_mq_run_hw_queue to
- printk
-To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
- Thomas Gleixner <tglx@linutronix.de>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:59378 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752276AbeAQMfU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 17 Jan 2018 07:35:20 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>
 Cc: Christoph Hellwig <hch@infradead.org>,
- "jianchao . wang" <jianchao.w.wang@oracle.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Stefan Haberland <sth@linux.vnet.ibm.com>, Christoph Hellwig <hch@lst.de>
+        "jianchao . wang" <jianchao.w.wang@oracle.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Stefan Haberland <sth@linux.vnet.ibm.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 2/2] blk-mq: convert WARN_ON in __blk_mq_run_hw_queue to printk
+Date: Wed, 17 Jan 2018 20:34:44 +0800
+Message-Id: <20180117123444.18393-3-ming.lei@redhat.com>
+In-Reply-To: <20180117123444.18393-1-ming.lei@redhat.com>
 References: <20180117123444.18393-1-ming.lei@redhat.com>
- <20180117123444.18393-3-ming.lei@redhat.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <39203c80-e718-3aa6-6b21-05a6bf0ad9b0@kernel.dk>
-Date: Wed, 17 Jan 2018 08:46:40 -0700
-MIME-Version: 1.0
-In-Reply-To: <20180117123444.18393-3-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 1/17/18 5:34 AM, Ming Lei wrote:
-> We know this WARN_ON is harmless and the stack trace isn't useful too,
-> so convert it to printk(), and avoid to confuse people.
+We know this WARN_ON is harmless and the stack trace isn't useful too,
+so convert it to printk(), and avoid to confuse people.
 
-I disagree, it is useful to know the exact path it happened from,
-in case it's a valid warning. It could be an inline run and
-we screwed up the logic, or it could be from a workqueue and
-the reason would be entirely different.
+Also add comment about two releated races here.
 
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Stefan Haberland <sth@linux.vnet.ibm.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index dc4066d28323..6562360bf108 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1391,9 +1391,25 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+ 	/*
+ 	 * We should be running this queue from one of the CPUs that
+ 	 * are mapped to it.
++	 *
++	 * There are at least two related races now between setting
++	 * hctx->next_cpu from blk_mq_hctx_next_cpu() and running
++	 * __blk_mq_run_hw_queue():
++	 *
++	 * - hctx->next_cpu is found offline in blk_mq_hctx_next_cpu(),
++	 *   but later it becomes online, then this warning is harmless
++	 *   at all
++	 *
++	 * - hctx->next_cpu is found online in blk_mq_hctx_next_cpu(),
++	 *   but later it becomes offline, then the warning can't be
++	 *   triggered, and we depend on blk-mq timeout handler to
++	 *   handle dispatched requests to this hctx
+ 	 */
+-	WARN_ON(!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) &&
+-		cpu_online(hctx->next_cpu));
++	if (!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) &&
++		cpu_online(hctx->next_cpu))
++		printk(KERN_WARNING "run queue from wrong CPU %d, hctx %s\n",
++			raw_smp_processor_id(),
++			cpumask_empty(hctx->cpumask) ? "inactive": "active");
+ 
+ 	/*
+ 	 * We can't run the queue inline with ints disabled. Ensure that
 -- 
-Jens Axboe
+2.9.5
