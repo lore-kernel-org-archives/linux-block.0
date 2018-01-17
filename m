@@ -1,19 +1,16 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:37590 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753710AbeAQQ1X (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Jan 2018 11:27:23 -0500
+Return-Path: <msnitzer@redhat.com>
 From: Mike Snitzer <snitzer@redhat.com>
 To: axboe@kernel.dk
-Cc: Ming Lei <tom.leiming@gmail.com>, hch@lst.de, dm-devel@redhat.com,
-        linux-block@vger.kernel.org
-Subject: [for-4.16 PATCH v6 1/3] blk-mq: factor out a few helpers from __blk_mq_try_issue_directly
-Date: Wed, 17 Jan 2018 11:25:56 -0500
-Message-Id: <20180117162558.28553-2-snitzer@redhat.com>
-In-Reply-To: <20180117162558.28553-1-snitzer@redhat.com>
-References: <20180117162558.28553-1-snitzer@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Cc: Ming Lei <tom.leiming@gmail.com>,
+	hch@lst.de,
+	dm-devel@redhat.com,
+	linux-block@vger.kernel.org
+Subject: [for-4.16 PATCH v5 1/3] blk-mq: factor out a few helpers from __blk_mq_try_issue_directly
+Date: Tue, 16 Jan 2018 23:33:35 -0500
+Message-Id: <20180117043338.25839-2-snitzer@redhat.com>
+In-Reply-To: <20180117043338.25839-1-snitzer@redhat.com>
+References: <20180117043338.25839-1-snitzer@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
 No functional change.  Just makes code flow more logically.
 
