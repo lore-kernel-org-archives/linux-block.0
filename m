@@ -1,130 +1,50 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:41697 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751101AbeA0WVd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Jan 2018 17:21:33 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Tang Junhui <tang.junhui@zte.com.cn>
-Subject: [PATCH v4 09/13] bcache: fix inaccurate io state for detached bcache devices
-Date: Sat, 27 Jan 2018 22:24:02 +0800
-Message-Id: <20180127142406.89741-10-colyli@suse.de>
-In-Reply-To: <20180127142406.89741-1-colyli@suse.de>
-References: <20180127142406.89741-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+b05e9fb8710da454cfb6+5260+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: keith.busch@intel.com,
+	linux-block@vger.kernel.org,
+	sagi@grimberg.me,
+	linux-nvme@lists.infradead.org
+Subject: [PATCH 1/2] nvme-pci: check segement valid for SGL use
+Date: Wed, 17 Jan 2018 22:04:37 +0100
+Message-Id: <20180117210438.3778-2-hch@lst.de>
+In-Reply-To: <20180117210438.3778-1-hch@lst.de>
+References: <20180117210438.3778-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+From: Keith Busch <keith.busch@intel.com>
 
-When we run IO in a detached device,  and run iostat to shows IO status,
-normally it will show like bellow (Omitted some fields):
-Device: ... avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
-sdd        ... 15.89     0.53    1.82    0.20    2.23   1.81  52.30
-bcache0    ... 15.89   115.42    0.00    0.00    0.00   2.40  69.60
-but after IO stopped, there are still very big avgqu-sz and %util
-values as bellow:
-Device: ... avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
-bcache0   ...      0   5326.32    0.00    0.00    0.00   0.00 100.10
+The driver needs to verify there is a payload with a command before
+seeing if it should use SGLs to map it.
 
-The reason for this issue is that, only generic_start_io_acct() called
-and no generic_end_io_acct() called for detached device in
-cached_dev_make_request(). See the code:
-//start generic_start_io_acct()
-generic_start_io_acct(q, rw, bio_sectors(bio), &d->disk->part0);
-if (cached_dev_get(dc)) {
-	//will callback generic_end_io_acct()
-}
-else {
-	//will not call generic_end_io_acct()
-}
-
-This patch calls generic_end_io_acct() in the end of IO for detached
-devices, so we can show IO state correctly.
-
-(Modified to use GFP_NOIO in kzalloc() by Coly Li)
-
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-Reviewed-by: Coly Li <colyli@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Fixes: 955b1b5a00ba ("nvme-pci: move use_sgl initialization to nvme_init_iod()")
+Reported-by: Paul Menzel <pmenzel+linux-nvme@molgen.mpg.de>
+Reviewed-by: Paul Menzel <pmenzel+linux-nvme@molgen.mpg.de>
+Signed-off-by: Keith Busch <keith.busch@intel.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/md/bcache/request.c | 58 +++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 51 insertions(+), 7 deletions(-)
+ drivers/nvme/host/pci.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 02296bda6384..e09c5ae745be 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -986,6 +986,55 @@ static void cached_dev_nodata(struct closure *cl)
- 	continue_at(cl, cached_dev_bio_complete, NULL);
- }
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index d53550e612bc..a7e94cc3c70e 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -451,10 +451,13 @@ static void **nvme_pci_iod_list(struct request *req)
+ static inline bool nvme_pci_use_sgls(struct nvme_dev *dev, struct request *req)
+ {
+ 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
++	int nseg = blk_rq_nr_phys_segments(req);
+ 	unsigned int avg_seg_size;
  
-+struct detached_dev_io_private {
-+	struct bcache_device	*d;
-+	unsigned long		start_time;
-+	bio_end_io_t		*bi_end_io;
-+	void			*bi_private;
-+};
+-	avg_seg_size = DIV_ROUND_UP(blk_rq_payload_bytes(req),
+-			blk_rq_nr_phys_segments(req));
++	if (nseg == 0)
++		return false;
 +
-+static void detatched_dev_end_io(struct bio *bio)
-+{
-+	struct detached_dev_io_private *ddip;
-+
-+	ddip = bio->bi_private;
-+	bio->bi_end_io = ddip->bi_end_io;
-+	bio->bi_private = ddip->bi_private;
-+
-+	generic_end_io_acct(ddip->d->disk->queue,
-+			    bio_data_dir(bio),
-+			    &ddip->d->disk->part0, ddip->start_time);
-+
-+	kfree(ddip);
-+
-+	bio->bi_end_io(bio);
-+}
-+
-+static void detached_dev_do_request(struct bcache_device *d, struct bio *bio)
-+{
-+	struct detached_dev_io_private *ddip;
-+	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
-+
-+	/*
-+	 * no need to call closure_get(&dc->disk.cl),
-+	 * because upper layer had already opened bcache device,
-+	 * which would call closure_get(&dc->disk.cl)
-+	 */
-+	ddip = kzalloc(sizeof(struct detached_dev_io_private), GFP_NOIO);
-+	ddip->d = d;
-+	ddip->start_time = jiffies;
-+	ddip->bi_end_io = bio->bi_end_io;
-+	ddip->bi_private = bio->bi_private;
-+	bio->bi_end_io = detatched_dev_end_io;
-+	bio->bi_private = ddip;
-+
-+	if ((bio_op(bio) == REQ_OP_DISCARD) &&
-+	    !blk_queue_discard(bdev_get_queue(dc->bdev)))
-+		bio->bi_end_io(bio);
-+	else
-+		generic_make_request(bio);
-+}
-+
- /* Cached devices - read & write stuff */
++	avg_seg_size = DIV_ROUND_UP(blk_rq_payload_bytes(req), nseg);
  
- static blk_qc_t cached_dev_make_request(struct request_queue *q,
-@@ -1028,13 +1077,8 @@ static blk_qc_t cached_dev_make_request(struct request_queue *q,
- 			else
- 				cached_dev_read(dc, s);
- 		}
--	} else {
--		if ((bio_op(bio) == REQ_OP_DISCARD) &&
--		    !blk_queue_discard(bdev_get_queue(dc->bdev)))
--			bio_endio(bio);
--		else
--			generic_make_request(bio);
--	}
-+	} else
-+		detached_dev_do_request(d, bio);
- 
- 	return BLK_QC_T_NONE;
- }
+ 	if (!(dev->ctrl.sgls & ((1 << 0) | (1 << 1))))
+ 		return false;
 -- 
-2.15.1
+2.14.2
