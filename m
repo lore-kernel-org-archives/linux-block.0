@@ -1,114 +1,58 @@
-Return-Path: <prvs=5482b108a=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v2 3/3] block: Protect less code with sysfs_lock in blk_{un,}register_queue()
-Date: Wed, 17 Jan 2018 11:48:10 -0800
-Message-Id: <20180117194810.26583-4-bart.vanassche@wdc.com>
-In-Reply-To: <20180117194810.26583-1-bart.vanassche@wdc.com>
-References: <20180117194810.26583-1-bart.vanassche@wdc.com>
+Return-Path: <prvs=5482b108a=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "tom.leiming@gmail.com" <tom.leiming@gmail.com>
+CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "snitzer@redhat.com" <snitzer@redhat.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH 3/3] block: Protect less code with sysfs_lock in
+ blk_{un,}register_queue()
+Date: Wed, 17 Jan 2018 17:19:06 +0000
+Message-ID: <1516209545.2820.15.camel@wdc.com>
+References: <20180116181752.25847-1-bart.vanassche@wdc.com>
+	 <20180116181752.25847-4-bart.vanassche@wdc.com>
+	 <20180116223207.GA32637@redhat.com> <1516147421.2844.70.camel@wdc.com>
+	 <CACVXFVMtUq8Mru8f7AD+6rQch+59=yRNL0-xOc4k7mmp4VanpA@mail.gmail.com>
+	 <1516155470.3179.6.camel@wdc.com>
+	 <CACVXFVNMkdyudH7VhpiAJbofx8pb8-+Qb86V9vXLyNAijxYvpw@mail.gmail.com>
+In-Reply-To: <CACVXFVNMkdyudH7VhpiAJbofx8pb8-+Qb86V9vXLyNAijxYvpw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-The __blk_mq_register_dev(), blk_mq_unregister_dev(),
-elv_register_queue() and elv_unregister_queue() calls need to be
-protected with sysfs_lock but other code in these functions not.
-Hence protect only this code with sysfs_lock. This patch fixes a
-locking inversion issue in blk_unregister_queue() and also in an
-error path of blk_register_queue(): it is not allowed to hold
-sysfs_lock around the kobject_del(&q->kobj) call.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
----
- block/blk-sysfs.c | 37 ++++++++++++++++++++++++++++---------
- 1 file changed, 28 insertions(+), 9 deletions(-)
-
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 4a6a40ffd78e..cbea895a5547 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -853,6 +853,10 @@ struct kobj_type blk_queue_ktype = {
- 	.release	= blk_release_queue,
- };
- 
-+/**
-+ * blk_register_queue - register a block layer queue with sysfs
-+ * @disk: Disk of which the request queue should be registered with sysfs.
-+ */
- int blk_register_queue(struct gendisk *disk)
- {
- 	int ret;
-@@ -909,11 +913,12 @@ int blk_register_queue(struct gendisk *disk)
- 	if (q->request_fn || (q->mq_ops && q->elevator)) {
- 		ret = elv_register_queue(q);
- 		if (ret) {
-+			mutex_unlock(&q->sysfs_lock);
- 			kobject_uevent(&q->kobj, KOBJ_REMOVE);
- 			kobject_del(&q->kobj);
- 			blk_trace_remove_sysfs(dev);
- 			kobject_put(&dev->kobj);
--			goto unlock;
-+			return ret;
- 		}
- 	}
- 	ret = 0;
-@@ -923,6 +928,13 @@ int blk_register_queue(struct gendisk *disk)
- }
- EXPORT_SYMBOL_GPL(blk_register_queue);
- 
-+/**
-+ * blk_unregister_queue - counterpart of blk_register_queue()
-+ * @disk: Disk of which the request queue should be unregistered from sysfs.
-+ *
-+ * Note: the caller is responsible for guaranteeing that this function is called
-+ * after blk_register_queue() has finished.
-+ */
- void blk_unregister_queue(struct gendisk *disk)
- {
- 	struct request_queue *q = disk->queue;
-@@ -935,8 +947,9 @@ void blk_unregister_queue(struct gendisk *disk)
- 		return;
- 
- 	/*
--	 * Protect against the 'queue' kobj being accessed
--	 * while/after it is removed.
-+	 * Since sysfs_remove_dir() prevents adding new directory entries
-+	 * before removal of existing entries starts, protect against
-+	 * concurrent elv_iosched_store() calls.
- 	 */
- 	mutex_lock(&q->sysfs_lock);
- 
-@@ -944,18 +957,24 @@ void blk_unregister_queue(struct gendisk *disk)
- 	queue_flag_clear(QUEUE_FLAG_REGISTERED, q);
- 	spin_unlock_irq(q->queue_lock);
- 
--	wbt_exit(q);
--
-+	/*
-+	 * Remove the sysfs attributes before unregistering the queue data
-+	 * structures that can be modified through sysfs.
-+	 */
- 	if (q->mq_ops)
- 		blk_mq_unregister_dev(disk_to_dev(disk), q);
--
--	if (q->request_fn || (q->mq_ops && q->elevator))
--		elv_unregister_queue(q);
-+	mutex_unlock(&q->sysfs_lock);
- 
- 	kobject_uevent(&q->kobj, KOBJ_REMOVE);
- 	kobject_del(&q->kobj);
- 	blk_trace_remove_sysfs(disk_to_dev(disk));
--	kobject_put(&disk_to_dev(disk)->kobj);
- 
-+	wbt_exit(q);
-+
-+	mutex_lock(&q->sysfs_lock);
-+	if (q->request_fn || (q->mq_ops && q->elevator))
-+		elv_unregister_queue(q);
- 	mutex_unlock(&q->sysfs_lock);
-+
-+	kobject_put(&disk_to_dev(disk)->kobj);
- }
--- 
-2.15.1
+T24gV2VkLCAyMDE4LTAxLTE3IGF0IDIxOjA0ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
+V2VkLCBKYW4gMTcsIDIwMTggYXQgMTA6MTcgQU0sIEJhcnQgVmFuIEFzc2NoZQ0KPiA8QmFydC5W
+YW5Bc3NjaGVAd2RjLmNvbT4gd3JvdGU6DQo+ID4gU29ycnkgYnV0IEkgdGhpbmsgd2hhdCB5b3Ug
+d3JvdGUgaXMgd3JvbmcuIGtvYmplY3RfZGVsKCZxLT5rb2JqKSB3YWl0cyB1bnRpbCBhbGwNCj4g
+PiBvbmdvaW5nIHN5c2ZzIGNhbGxiYWNrIG1ldGhvZHMsIGluY2x1ZGluZyBlbHZfaW9zY2hlZF9z
+dG9yZSgpLCBoYXZlIGZpbmlzaGVkIGFuZA0KPiA+IHByZXZlbnRzIHRoYXQgYW55IG5ldyBlbHZf
+aW9zY2hlZF9zdG9yZSgpIGNhbGxzIHN0YXJ0LiBUaGF0IGlzIHdoeSBJIHRoaW5rIHRoZQ0KPiA+
+IGFib3ZlIGNoYW5nZXMgZG8gbm90IHJlaW50cm9kdWNlIHRoZSByYWNlIGZpeGVkIGJ5IGNvbW1p
+dCBlOWE4MjNmYjM0YTggKCJibG9jazoNCj4gPiBmaXggd2FybmluZyB3aGVuIEkvTyBlbGV2YXRv
+ciBpcyBjaGFuZ2VkIGFzIHJlcXVlc3RfcXVldWUgaXMgYmVpbmcgcmVtb3ZlZCIpLg0KPiANCj4g
+QnV0IHlvdXIgcGF0Y2ggYmFzaWNhbGx5IHJldmVydHMgY29tbWl0IGU5YTgyM2ZiMzRhOCwgYW5k
+IEkganVzdCBzYXcgdGhlIHdhcm5pbmcNCj4gYWdhaW4gYWZ0ZXIgYXBwbHlpbmcgeW91ciBwYXRj
+aCBpbiBteSBzdHJlc3MgdGVzdCBvZiBzd2l0Y2hpbmcgZWxlbHZhdG86DQo+IA0KPiBbICAyMjUu
+OTk5NTA1XSBrb2JqZWN0X2FkZF9pbnRlcm5hbCBmYWlsZWQgZm9yIGlvc2NoZWQgKGVycm9yOiAt
+MiBwYXJlbnQ6IHF1ZXVlKQ0KPiBbICAyMjUuOTk5NTIxXSBXQVJOSU5HOiBDUFU6IDAgUElEOiAx
+MjcwNyBhdCBsaWIva29iamVjdC5jOjI0NA0KPiBrb2JqZWN0X2FkZF9pbnRlcm5hbCsweDIzNi8w
+eDI0Yw0KPiBbICAyMjUuOTk5NTY2XSBDYWxsIFRyYWNlOg0KPiBbICAyMjUuOTk5NTcwXSAga29i
+amVjdF9hZGQrMHg5ZS8weGM1DQo+IFsgIDIyNS45OTk1NzNdICBlbHZfcmVnaXN0ZXJfcXVldWUr
+MHgzNS8weGEyDQo+IFsgIDIyNS45OTk1NzVdICBlbGV2YXRvcl9zd2l0Y2grMHg3YS8weDFhNA0K
+PiBbICAyMjUuOTk5NTc3XSAgZWx2X2lvc2NoZWRfc3RvcmUrMHhkMi8weDEwMw0KPiBbICAyMjUu
+OTk5NTc5XSAgcXVldWVfYXR0cl9zdG9yZSsweDY2LzB4ODINCj4gWyAgMjI1Ljk5OTU4MV0gIGtl
+cm5mc19mb3Bfd3JpdGUrMHhmMy8weDEzNQ0KPiBbICAyMjUuOTk5NTgzXSAgX192ZnNfd3JpdGUr
+MHgzMS8weDE0Mg0KPiBbICAyMjUuOTk5NTkxXSAgdmZzX3dyaXRlKzB4Y2IvMHgxNmUNCj4gWyAg
+MjI1Ljk5OTU5M10gIFN5U193cml0ZSsweDVkLzB4YWINCj4gWyAgMjI1Ljk5OTU5NV0gIGVudHJ5
+X1NZU0NBTExfNjRfZmFzdHBhdGgrMHgxYS8weDdkDQoNClRoZSBhYm92ZSBjYWxsIHN0YWNrIG1l
+YW5zIHRoYXQgc3lzZnNfY3JlYXRlX2Rpcl9ucygpIHJldHVybmVkIC1FTk9FTlQgYmVjYXVzZQ0K
+a29iai0+cGFyZW50LT5zZCB3YXMgTlVMTCAod2hlcmUga29iaiBpcyB0aGUgZWxldmF0b3Iga2Vy
+bmVsIG9iamVjdCkuIFRoYXQncw0KcHJvYmFibHkgYmVjYXNlIHN5c2ZzX3JlbW92ZV9kaXIoKSBj
+bGVhcnMgdGhlIHNkIHBvaW50ZXIgYmVmb3JlIHBlcmZvcm1pbmcgdGhlDQphY3R1YWwgcmVtb3Zh
+bC4gRnJvbSBmcy9zeXNmcy9kaXIuYzoNCg0KCXNwaW5fbG9jaygmc3lzZnNfc3ltbGlua190YXJn
+ZXRfbG9jayk7DQoJa29iai0+c2QgPSBOVUxMOw0KCXNwaW5fdW5sb2NrKCZzeXNmc19zeW1saW5r
+X3RhcmdldF9sb2NrKTsNCg0KCWlmIChrbikgew0KCQlXQVJOX09OX09OQ0Uoa2VybmZzX3R5cGUo
+a24pICE9IEtFUk5GU19ESVIpOw0KCQlrZXJuZnNfcmVtb3ZlKGtuKTsNCgl9DQoNCkluIHRoZSBw
+YXN0IHRoZXNlIHR3byBhY3Rpb25zIHdlcmUgcGVyZm9ybWVkIGluIHRoZSBvcHBvc2l0ZSBvcmRl
+ci4gU2VlIGFsc28NCmNvbW1pdCBhZWNkY2VkYWFiNDkgKCJzeXNmczogaW1wbGVtZW50IGtvYmpf
+c3lzZnNfYXNzb2NfbG9jayIpLiBBbnl3YXksIEkgd2lsbA0KcmV3b3JrIHRoaXMgcGF0Y2guDQoN
+CkJhcnQu
