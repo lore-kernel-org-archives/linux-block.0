@@ -1,280 +1,104 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:38334 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752419AbeAaCHF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jan 2018 21:07:05 -0500
-Received: by mail-wm0-f65.google.com with SMTP id 141so4862035wme.3
-        for <linux-block@vger.kernel.org>; Tue, 30 Jan 2018 18:07:04 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 4/5] lightnvm: pblk: add padding distribution sysfs attribute
-Date: Wed, 31 Jan 2018 03:06:50 +0100
-Message-Id: <1517364411-22386-4-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1517364411-22386-1-git-send-email-javier@cnexlabs.com>
-References: <1517364411-22386-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [for-4.16 PATCH v5 2/3] blk-mq: improve DM's blk-mq IO merging
+ via blk_insert_cloned_request feedback
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: Ming Lei <tom.leiming@gmail.com>, hch@lst.de, dm-devel@redhat.com,
+ linux-block@vger.kernel.org
+References: <20180117043338.25839-1-snitzer@redhat.com>
+ <20180117043338.25839-4-snitzer@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <a3e24070-6436-c672-14bb-90938823f182@kernel.dk>
+Date: Wed, 17 Jan 2018 08:34:53 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180117043338.25839-4-snitzer@redhat.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+On 1/16/18 9:33 PM, Mike Snitzer wrote:
+> From: Ming Lei <ming.lei@redhat.com>
+> 
+> blk_insert_cloned_request() is called in the fast path of a dm-rq driver
+> (e.g. blk-mq request-based DM mpath).  blk_insert_cloned_request() uses
+> blk_mq_request_bypass_insert() to directly append the request to the
+> blk-mq hctx->dispatch_list of the underlying queue.
+> 
+> 1) This way isn't efficient enough because the hctx spinlock is always
+> used.
+> 
+> 2) With blk_insert_cloned_request(), we completely bypass underlying
+> queue's elevator and depend on the upper-level dm-rq driver's elevator
+> to schedule IO.  But dm-rq currently can't get the underlying queue's
+> dispatch feedback at all.  Without knowing whether a request was issued
+> or not (e.g. due to underlying queue being busy) the dm-rq elevator will
+> not be able to provide effective IO merging (as a side-effect of dm-rq
+> currently blindly destaging a request from its elevator only to requeue
+> it after a delay, which kills any opportunity for merging).  This
+> obviously causes very bad sequential IO performance.
+> 
+> Fix this by updating blk_insert_cloned_request() to use
+> blk_mq_request_direct_issue().  blk_mq_request_direct_issue() allows a
+> request to be issued directly to the underlying queue and returns the
+> dispatch feedback (blk_status_t).  If blk_mq_request_direct_issue()
+> returns BLK_SYS_RESOURCE the dm-rq driver will now use DM_MAPIO_REQUEUE
+> to _not_ destage the request.  Whereby preserving the opportunity to
+> merge IO.
+> 
+> With this, request-based DM's blk-mq sequential IO performance is vastly
+> improved (as much as 3X in mpath/virtio-scsi testing).
 
-When pblk receives a sync, all data up to that point in the write buffer
-must be comitted to persistent storage, and as flash memory comes with a
-minimal write size there is a significant cost involved both in terms
-of time for completing the sync and in terms of write amplification
-padded sectors for filling up to the minimal write size.
+This looks better. Two minor nit picks:
 
-In order to get a better understanding of the costs involved for syncs,
-Add a sysfs attribute to pblk: padded_dist, showing a normalized
-distribution of sectors padded. In order to facilitate measurements of
-specific workloads during the lifetime of the pblk instance, the
-distribution can be reset by writing 0 to the attribute.
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index c117c2baf2c9..0b64f7210a89 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1706,7 +1706,8 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
+>  	blk_qc_t new_cookie;
+>  	blk_status_t ret;
+>  
+> -	new_cookie = request_to_qc_t(hctx, rq);
+> +	if (cookie)
+> +		new_cookie = request_to_qc_t(hctx, rq);
+>  
+>  	/*
+>  	 * For OK queue, we are done. For error, caller may kill it.
+> @@ -1716,13 +1717,15 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
+>  	ret = q->mq_ops->queue_rq(hctx, &bd);
+>  	switch (ret) {
+>  	case BLK_STS_OK:
+> -		*cookie = new_cookie;
+> +		if (cookie)
+> +			*cookie = new_cookie;
+>  		break;
+>  	case BLK_STS_RESOURCE:
+>  		__blk_mq_requeue_request(rq);
+>  		break;
+>  	default:
+> -		*cookie = BLK_QC_T_NONE;
+> +		if (cookie)
+> +			*cookie = BLK_QC_T_NONE;
+>  		break;
+>  	}
 
-Do this by introducing counters for each possible padding:
-{0..(minimal write size - 1)} and calculate the normalized distribution
-when showing the attribute.
+Instead of adding these three conditions, always pass in a valid pointer
+to a cookie and get rid of them.
 
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/pblk-init.c  | 16 ++++++++--
- drivers/lightnvm/pblk-rb.c    | 15 +++++-----
- drivers/lightnvm/pblk-sysfs.c | 68 +++++++++++++++++++++++++++++++++++++++++++
- drivers/lightnvm/pblk.h       |  6 +++-
- 4 files changed, 95 insertions(+), 10 deletions(-)
+> @@ -1731,15 +1734,20 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
+>  
+>  static void __blk_mq_fallback_to_insert(struct blk_mq_hw_ctx *hctx,
+>  					struct request *rq,
+> -					bool run_queue)
+> +					bool run_queue, bool bypass_insert)
+>  {
+> +	if (bypass_insert) {
+> +		blk_mq_request_bypass_insert(rq, run_queue);
+> +		return;
+> +	}
+>  	blk_mq_sched_insert_request(rq, false, run_queue, false,
+>  					hctx->flags & BLK_MQ_F_BLOCKING);
+>  }
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 7eedc5daebc8..a5e3510c0f38 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -921,6 +921,7 @@ static void pblk_free(struct pblk *pblk)
- {
- 	pblk_luns_free(pblk);
- 	pblk_lines_free(pblk);
-+	kfree(pblk->pad_dist);
- 	pblk_line_meta_free(pblk);
- 	pblk_core_free(pblk);
- 	pblk_l2p_free(pblk);
-@@ -998,11 +999,13 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
- 	pblk->pad_rst_wa = 0;
- 	pblk->gc_rst_wa = 0;
- 
-+	atomic_long_set(&pblk->nr_flush, 0);
-+	pblk->nr_flush_rst = 0;
-+
- #ifdef CONFIG_NVM_DEBUG
- 	atomic_long_set(&pblk->inflight_writes, 0);
- 	atomic_long_set(&pblk->padded_writes, 0);
- 	atomic_long_set(&pblk->padded_wb, 0);
--	atomic_long_set(&pblk->nr_flush, 0);
- 	atomic_long_set(&pblk->req_writes, 0);
- 	atomic_long_set(&pblk->sub_writes, 0);
- 	atomic_long_set(&pblk->sync_writes, 0);
-@@ -1034,10 +1037,17 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
- 		goto fail_free_luns;
- 	}
- 
-+	pblk->pad_dist = kzalloc((pblk->min_write_pgs - 1) * sizeof(atomic64_t),
-+				 GFP_KERNEL);
-+	if (!pblk->pad_dist) {
-+		ret = -ENOMEM;
-+		goto fail_free_line_meta;
-+	}
-+
- 	ret = pblk_core_init(pblk);
- 	if (ret) {
- 		pr_err("pblk: could not initialize core\n");
--		goto fail_free_line_meta;
-+		goto fail_free_pad_dist;
- 	}
- 
- 	ret = pblk_l2p_init(pblk);
-@@ -1097,6 +1107,8 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
- 	pblk_l2p_free(pblk);
- fail_free_core:
- 	pblk_core_free(pblk);
-+fail_free_pad_dist:
-+	kfree(pblk->pad_dist);
- fail_free_line_meta:
- 	pblk_line_meta_free(pblk);
- fail_free_luns:
-diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
-index 7044b5599cc4..264372d7b537 100644
---- a/drivers/lightnvm/pblk-rb.c
-+++ b/drivers/lightnvm/pblk-rb.c
-@@ -437,9 +437,7 @@ static int pblk_rb_may_write_flush(struct pblk_rb *rb, unsigned int nr_entries,
- 	if (bio->bi_opf & REQ_PREFLUSH) {
- 		struct pblk *pblk = container_of(rb, struct pblk, rwb);
- 
--#ifdef CONFIG_NVM_DEBUG
- 		atomic_long_inc(&pblk->nr_flush);
--#endif
- 		if (pblk_rb_flush_point_set(&pblk->rwb, bio, mem))
- 			*io_ret = NVM_IO_OK;
- 	}
-@@ -620,14 +618,17 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
- 			pr_err("pblk: could not pad page in write bio\n");
- 			return NVM_IO_ERR;
- 		}
-+
-+		if (pad < pblk->min_write_pgs)
-+			atomic64_inc(&pblk->pad_dist[pad - 1]);
-+		else
-+			pr_warn("pblk: padding more than min. sectors\n");
-+
-+		atomic64_add(pad, &pblk->pad_wa);
- 	}
- 
--	atomic64_add(pad, &((struct pblk *)
--			(container_of(rb, struct pblk, rwb)))->pad_wa);
--
- #ifdef CONFIG_NVM_DEBUG
--	atomic_long_add(pad, &((struct pblk *)
--			(container_of(rb, struct pblk, rwb)))->padded_writes);
-+	atomic_long_add(pad, &pblk->padded_writes);
- #endif
- 
- 	return NVM_IO_OK;
-diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
-index 4804bbd32d5f..f902ac00d071 100644
---- a/drivers/lightnvm/pblk-sysfs.c
-+++ b/drivers/lightnvm/pblk-sysfs.c
-@@ -341,6 +341,38 @@ static ssize_t pblk_sysfs_get_write_amp_trip(struct pblk *pblk, char *page)
- 		atomic64_read(&pblk->pad_wa) - pblk->pad_rst_wa, page);
- }
- 
-+static ssize_t pblk_sysfs_get_padding_dist(struct pblk *pblk, char *page)
-+{
-+	int sz = 0;
-+	unsigned long long total;
-+	unsigned long long total_buckets = 0;
-+	int buckets = pblk->min_write_pgs - 1;
-+	int i;
-+
-+	total = atomic64_read(&pblk->nr_flush) - pblk->nr_flush_rst;
-+
-+	for (i = 0; i < buckets; i++)
-+		total_buckets += atomic64_read(&pblk->pad_dist[i]);
-+
-+	if (!total) {
-+		for (i = 0; i < (buckets + 1); i++)
-+			sz += snprintf(page + sz, PAGE_SIZE - sz,
-+				"%d:0 ", i);
-+		sz += snprintf(page + sz, PAGE_SIZE - sz, "\n");
-+
-+		return sz;
-+	}
-+
-+	sz += snprintf(page + sz, PAGE_SIZE - sz, "0:%lld%% ",
-+		((total - total_buckets) * 100) / total);
-+	for (i = 0; i < buckets; i++)
-+		sz += snprintf(page + sz, PAGE_SIZE - sz, "%d:%lld%% ", i + 1,
-+			(atomic64_read(&pblk->pad_dist[i]) * 100) / total);
-+	sz += snprintf(page + sz, PAGE_SIZE - sz, "\n");
-+
-+	return sz;
-+}
-+
- #ifdef CONFIG_NVM_DEBUG
- static ssize_t pblk_sysfs_stats_debug(struct pblk *pblk, char *page)
- {
-@@ -427,6 +459,32 @@ static ssize_t pblk_sysfs_set_write_amp_trip(struct pblk *pblk,
- }
- 
- 
-+static ssize_t pblk_sysfs_set_padding_dist(struct pblk *pblk,
-+			const char *page, size_t len)
-+{
-+	size_t c_len;
-+	int reset_value;
-+	int buckets = pblk->min_write_pgs - 1;
-+	int i;
-+
-+	c_len = strcspn(page, "\n");
-+	if (c_len >= len)
-+		return -EINVAL;
-+
-+	if (kstrtouint(page, 0, &reset_value))
-+		return -EINVAL;
-+
-+	if (reset_value !=  0)
-+		return -EINVAL;
-+
-+	for (i = 0; i < buckets; i++)
-+		atomic64_set(&pblk->pad_dist[i], 0);
-+
-+	pblk->nr_flush_rst = atomic64_read(&pblk->nr_flush);
-+
-+	return len;
-+}
-+
- static struct attribute sys_write_luns = {
- 	.name = "write_luns",
- 	.mode = 0444,
-@@ -487,6 +545,11 @@ static struct attribute sys_write_amp_trip = {
- 	.mode = 0644,
- };
- 
-+static struct attribute sys_padding_dist = {
-+	.name = "padding_dist",
-+	.mode = 0644,
-+};
-+
- #ifdef CONFIG_NVM_DEBUG
- static struct attribute sys_stats_debug_attr = {
- 	.name = "stats",
-@@ -507,6 +570,7 @@ static struct attribute *pblk_attrs[] = {
- 	&sys_lines_info_attr,
- 	&sys_write_amp_mileage,
- 	&sys_write_amp_trip,
-+	&sys_padding_dist,
- #ifdef CONFIG_NVM_DEBUG
- 	&sys_stats_debug_attr,
- #endif
-@@ -540,6 +604,8 @@ static ssize_t pblk_sysfs_show(struct kobject *kobj, struct attribute *attr,
- 		return pblk_sysfs_get_write_amp_mileage(pblk, buf);
- 	else if (strcmp(attr->name, "write_amp_trip") == 0)
- 		return pblk_sysfs_get_write_amp_trip(pblk, buf);
-+	else if (strcmp(attr->name, "padding_dist") == 0)
-+		return pblk_sysfs_get_padding_dist(pblk, buf);
- #ifdef CONFIG_NVM_DEBUG
- 	else if (strcmp(attr->name, "stats") == 0)
- 		return pblk_sysfs_stats_debug(pblk, buf);
-@@ -558,6 +624,8 @@ static ssize_t pblk_sysfs_store(struct kobject *kobj, struct attribute *attr,
- 		return pblk_sysfs_set_sec_per_write(pblk, buf, len);
- 	else if (strcmp(attr->name, "write_amp_trip") == 0)
- 		return pblk_sysfs_set_write_amp_trip(pblk, buf, len);
-+	else if (strcmp(attr->name, "padding_dist") == 0)
-+		return pblk_sysfs_set_padding_dist(pblk, buf, len);
- 	return 0;
- }
- 
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 4b7d8618631f..88720e2441c0 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -626,12 +626,16 @@ struct pblk {
- 	u64 gc_rst_wa;
- 	u64 pad_rst_wa;
- 
-+	/* Counters used for calculating padding distribution */
-+	atomic64_t *pad_dist;		/* Padding distribution buckets */
-+	u64 nr_flush_rst;		/* Flushes reset value for pad dist.*/
-+	atomic_long_t nr_flush;		/* Number of flush/fua I/O */
-+
- #ifdef CONFIG_NVM_DEBUG
- 	/* Non-persistent debug counters, 4kb sector I/Os */
- 	atomic_long_t inflight_writes;	/* Inflight writes (user and gc) */
- 	atomic_long_t padded_writes;	/* Sectors padded due to flush/fua */
- 	atomic_long_t padded_wb;	/* Sectors padded in write buffer */
--	atomic_long_t nr_flush;		/* Number of flush/fua I/O */
- 	atomic_long_t req_writes;	/* Sectors stored on write buffer */
- 	atomic_long_t sub_writes;	/* Sectors submitted from buffer */
- 	atomic_long_t sync_writes;	/* Sectors synced to media */
+Lose the return and just make it an if/else.
+
 -- 
-2.7.4
+Jens Axboe
