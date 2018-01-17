@@ -1,79 +1,58 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:45706 "EHLO
-        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751090AbeAQCt0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Jan 2018 21:49:26 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180116145240.GD30073@bombadil.infradead.org>
-References: <20180116145240.GD30073@bombadil.infradead.org>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Wed, 17 Jan 2018 10:49:24 +0800
-Message-ID: <CACVXFVPqJ6xYq31Ve5tXCKiNne_S1ve8csA+j_wCPnnZCPahvg@mail.gmail.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "lsf-pc@lists.linux-foundation.org"
+        <lsf-pc@lists.linux-foundation.org>,
+        "willy@infradead.org" <willy@infradead.org>
+CC: "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
 Subject: Re: [LSF/MM TOPIC] A high-performance userspace block driver
-To: Matthew Wilcox <willy@infradead.org>
-Cc: lsf-pc@lists.linux-foundation.org, linux-mm <linux-mm@kvack.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Date: Wed, 17 Jan 2018 00:41:46 +0000
+Message-ID: <1516149705.2844.79.camel@wdc.com>
+References: <20180116145240.GD30073@bombadil.infradead.org>
+In-Reply-To: <20180116145240.GD30073@bombadil.infradead.org>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Jan 16, 2018 at 10:52 PM, Matthew Wilcox <willy@infradead.org> wrote:
->
-> I see the improvements that Facebook have been making to the nbd driver,
-> and I think that's a wonderful thing.  Maybe the outcome of this topic
-> is simply: "Shut up, Matthew, this is good enough".
->
-> It's clear that there's an appetite for userspace block devices; not for
-> swap devices or the root device, but for accessing data that's stored
-> in that silo over there, and I really don't want to bring that entire
-> mess of CORBA / Go / Rust / whatever into the kernel to get to it,
-> but it would be really handy to present it as a block device.
-
-I like the idea, and one line code of Python/... may need thousands
-of C code to be done in kernel.
-
->
-> I've looked at a few block-driver-in-userspace projects that exist, and
-> they all seem pretty bad.  For example, one API maps a few gigabytes of
-> address space and plays games with vm_insert_page() to put page cache
-> pages into the address space of the client process.  Of course, the TLB
-> flush overhead of that solution is criminal.
->
-> I've looked at pipes, and they're not an awful solution.  We've almost
-> got enough syscalls to treat other objects as pipes.  The problem is
-> that they're not seekable.  So essentially you're looking at having one
-> pipe per outstanding command.  If yu want to make good use of a modern
-> NAND device, you want a few hundred outstanding commands, and that's a
-> bit of a shoddy interface.
->
-> Right now, I'm leaning towards combining these two approaches; adding
-> a VM_NOTLB flag so the mmaped bits of the page cache never make it into
-> the process's address space, so the TLB shootdown can be safely skipped.
-> Then check it in follow_page_mask() and return the appropriate struct
-> page.  As long as the userspace process does everything using O_DIRECT,
-> I think this will work.
->
-> It's either that or make pipes seekable ...
-
-Userfaultfd might be another choice:
-
-1) map the block LBA space into a range of process vm space
-
-2) when READ/WRITE req comes, convert it to page fault on the
-mapped range, and let userland to take control of it, and meantime
-kernel req context is slept
-
-3) IO req context in kernel side is waken up after userspace completed
-the IO request via userfaultfd
-
-4) kernel side continue to complete the IO, such as copying page from
-storage range to req(bio) pages.
-
-Seems READ should be fine since it is very similar with the use case
-of QEMU postcopy live migration, WRITE can be a bit different, and
-maybe need some change on userfaultfd.
-
--- 
-Ming Lei
+T24gVHVlLCAyMDE4LTAxLTE2IGF0IDA2OjUyIC0wODAwLCBNYXR0aGV3IFdpbGNveCB3cm90ZToN
+Cj4gSSBzZWUgdGhlIGltcHJvdmVtZW50cyB0aGF0IEZhY2Vib29rIGhhdmUgYmVlbiBtYWtpbmcg
+dG8gdGhlIG5iZCBkcml2ZXIsDQo+IGFuZCBJIHRoaW5rIHRoYXQncyBhIHdvbmRlcmZ1bCB0aGlu
+Zy4gIE1heWJlIHRoZSBvdXRjb21lIG9mIHRoaXMgdG9waWMNCj4gaXMgc2ltcGx5OiAiU2h1dCB1
+cCwgTWF0dGhldywgdGhpcyBpcyBnb29kIGVub3VnaCIuDQo+IA0KPiBJdCdzIGNsZWFyIHRoYXQg
+dGhlcmUncyBhbiBhcHBldGl0ZSBmb3IgdXNlcnNwYWNlIGJsb2NrIGRldmljZXM7IG5vdCBmb3IN
+Cj4gc3dhcCBkZXZpY2VzIG9yIHRoZSByb290IGRldmljZSwgYnV0IGZvciBhY2Nlc3NpbmcgZGF0
+YSB0aGF0J3Mgc3RvcmVkDQo+IGluIHRoYXQgc2lsbyBvdmVyIHRoZXJlLCBhbmQgSSByZWFsbHkg
+ZG9uJ3Qgd2FudCB0byBicmluZyB0aGF0IGVudGlyZQ0KPiBtZXNzIG9mIENPUkJBIC8gR28gLyBS
+dXN0IC8gd2hhdGV2ZXIgaW50byB0aGUga2VybmVsIHRvIGdldCB0byBpdCwNCj4gYnV0IGl0IHdv
+dWxkIGJlIHJlYWxseSBoYW5keSB0byBwcmVzZW50IGl0IGFzIGEgYmxvY2sgZGV2aWNlLg0KPiAN
+Cj4gSSd2ZSBsb29rZWQgYXQgYSBmZXcgYmxvY2stZHJpdmVyLWluLXVzZXJzcGFjZSBwcm9qZWN0
+cyB0aGF0IGV4aXN0LCBhbmQNCj4gdGhleSBhbGwgc2VlbSBwcmV0dHkgYmFkLiAgRm9yIGV4YW1w
+bGUsIG9uZSBBUEkgbWFwcyBhIGZldyBnaWdhYnl0ZXMgb2YNCj4gYWRkcmVzcyBzcGFjZSBhbmQg
+cGxheXMgZ2FtZXMgd2l0aCB2bV9pbnNlcnRfcGFnZSgpIHRvIHB1dCBwYWdlIGNhY2hlDQo+IHBh
+Z2VzIGludG8gdGhlIGFkZHJlc3Mgc3BhY2Ugb2YgdGhlIGNsaWVudCBwcm9jZXNzLiAgT2YgY291
+cnNlLCB0aGUgVExCDQo+IGZsdXNoIG92ZXJoZWFkIG9mIHRoYXQgc29sdXRpb24gaXMgY3JpbWlu
+YWwuDQo+IA0KPiBJJ3ZlIGxvb2tlZCBhdCBwaXBlcywgYW5kIHRoZXkncmUgbm90IGFuIGF3ZnVs
+IHNvbHV0aW9uLiAgV2UndmUgYWxtb3N0DQo+IGdvdCBlbm91Z2ggc3lzY2FsbHMgdG8gdHJlYXQg
+b3RoZXIgb2JqZWN0cyBhcyBwaXBlcy4gIFRoZSBwcm9ibGVtIGlzDQo+IHRoYXQgdGhleSdyZSBu
+b3Qgc2Vla2FibGUuICBTbyBlc3NlbnRpYWxseSB5b3UncmUgbG9va2luZyBhdCBoYXZpbmcgb25l
+DQo+IHBpcGUgcGVyIG91dHN0YW5kaW5nIGNvbW1hbmQuICBJZiB5dSB3YW50IHRvIG1ha2UgZ29v
+ZCB1c2Ugb2YgYSBtb2Rlcm4NCj4gTkFORCBkZXZpY2UsIHlvdSB3YW50IGEgZmV3IGh1bmRyZWQg
+b3V0c3RhbmRpbmcgY29tbWFuZHMsIGFuZCB0aGF0J3MgYQ0KPiBiaXQgb2YgYSBzaG9kZHkgaW50
+ZXJmYWNlLg0KPiANCj4gUmlnaHQgbm93LCBJJ20gbGVhbmluZyB0b3dhcmRzIGNvbWJpbmluZyB0
+aGVzZSB0d28gYXBwcm9hY2hlczsgYWRkaW5nDQo+IGEgVk1fTk9UTEIgZmxhZyBzbyB0aGUgbW1h
+cGVkIGJpdHMgb2YgdGhlIHBhZ2UgY2FjaGUgbmV2ZXIgbWFrZSBpdCBpbnRvDQo+IHRoZSBwcm9j
+ZXNzJ3MgYWRkcmVzcyBzcGFjZSwgc28gdGhlIFRMQiBzaG9vdGRvd24gY2FuIGJlIHNhZmVseSBz
+a2lwcGVkLg0KPiBUaGVuIGNoZWNrIGl0IGluIGZvbGxvd19wYWdlX21hc2soKSBhbmQgcmV0dXJu
+IHRoZSBhcHByb3ByaWF0ZSBzdHJ1Y3QNCj4gcGFnZS4gIEFzIGxvbmcgYXMgdGhlIHVzZXJzcGFj
+ZSBwcm9jZXNzIGRvZXMgZXZlcnl0aGluZyB1c2luZyBPX0RJUkVDVCwNCj4gSSB0aGluayB0aGlz
+IHdpbGwgd29yay4NCj4gDQo+IEl0J3MgZWl0aGVyIHRoYXQgb3IgbWFrZSBwaXBlcyBzZWVrYWJs
+ZSAuLi4NCg0KSG93IGFib3V0IHVzaW5nIHRoZSBSRE1BIEFQSSBhbmQgdGhlIHJkbWFfcnhlIGRy
+aXZlciBvdmVyIGxvb3BiYWNrPyBUaGUgUkRNQQ0KQVBJIHN1cHBvcnRzIHplcm8tY29weSBjb21t
+dW5pY2F0aW9uIHdoaWNoIGlzIHNvbWV0aGluZyB0aGUgQlNEIHNvY2tldCBBUEkNCmRvZXMgbm90
+IHN1cHBvcnQuIFRoZSBSRE1BIEFQSSBhbHNvIHN1cHBvcnRzIGJ5dGUtbGV2ZWwgZ3JhbnVsYXJp
+dHkgYW5kIHRoZQ0KaG90IHBhdGggKGliX3Bvc3Rfc2VuZCgpLCBpYl9wb3N0X3JlY3YoKSwgaWJf
+cG9sbF9jcSgpKSBkb2VzIG5vdCByZXF1aXJlIGFueQ0Kc3lzdGVtIGNhbGxzIGZvciBQQ0llIFJE
+TUEgYWRhcHRlcnMuIFRoZSByZG1hX3J4ZSBkcml2ZXIgaG93ZXZlciB1c2VzIGEgc3lzdGVtDQpj
+YWxsIHRvIHRyaWdnZXIgdGhlIHNlbmQgZG9vcmJlbGwuDQoNCkJhcnQuDQo=
