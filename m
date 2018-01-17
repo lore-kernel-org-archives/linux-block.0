@@ -1,40 +1,43 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Thu, 18 Jan 2018 00:17:32 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-	Christoph Hellwig <hch@infradead.org>,
-	"jianchao . wang" <jianchao.w.wang@oracle.com>,
-	Christian Borntraeger <borntraeger@de.ibm.com>,
-	Stefan Haberland <sth@linux.vnet.ibm.com>,
-	Christoph Hellwig <hch@lst.de>
+Return-Path: <axboe@kernel.dk>
 Subject: Re: [PATCH 2/2] blk-mq: convert WARN_ON in __blk_mq_run_hw_queue to
  printk
-Message-ID: <20180117161731.GC21896@ming.t460p>
+To: Christian Borntraeger <borntraeger@de.ibm.com>,
+ Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+ Thomas Gleixner <tglx@linutronix.de>
+Cc: Christoph Hellwig <hch@infradead.org>,
+ "jianchao . wang" <jianchao.w.wang@oracle.com>,
+ Stefan Haberland <sth@linux.vnet.ibm.com>, Christoph Hellwig <hch@lst.de>
 References: <20180117123444.18393-1-ming.lei@redhat.com>
  <20180117123444.18393-3-ming.lei@redhat.com>
  <39203c80-e718-3aa6-6b21-05a6bf0ad9b0@kernel.dk>
+ <e8acbff6-3263-e4e9-0a5c-025d999a6134@de.ibm.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <8b86704f-24cd-fddb-c9ca-60263bee4174@kernel.dk>
+Date: Wed, 17 Jan 2018 09:07:44 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <39203c80-e718-3aa6-6b21-05a6bf0ad9b0@kernel.dk>
+In-Reply-To: <e8acbff6-3263-e4e9-0a5c-025d999a6134@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Jan 17, 2018 at 08:46:40AM -0700, Jens Axboe wrote:
-> On 1/17/18 5:34 AM, Ming Lei wrote:
-> > We know this WARN_ON is harmless and the stack trace isn't useful too,
-> > so convert it to printk(), and avoid to confuse people.
+On 1/17/18 9:05 AM, Christian Borntraeger wrote:
 > 
-> I disagree, it is useful to know the exact path it happened from,
-> in case it's a valid warning. It could be an inline run and
+> 
+> On 01/17/2018 04:46 PM, Jens Axboe wrote:
+>> On 1/17/18 5:34 AM, Ming Lei wrote:
+>>> We know this WARN_ON is harmless and the stack trace isn't useful too,
+>>> so convert it to printk(), and avoid to confuse people.
+>>
+>> I disagree, it is useful to know the exact path it happened from,
+>> in case it's a valid warning. It could be an inline run and
+>> we screwed up the logic, or it could be from a workqueue and
+>> the reason would be entirely different.
+> 
+> Then add a dump_stack or whatever, but WARN_ON does have fatal effects
+> for some setups. If it can happen then WARN_ON is just wrong.
 
-inline run is only possible in theory, since the window is too
-small.
-
-> we screwed up the logic, or it could be from a workqueue and
-> the reason would be entirely different.
-
-OK, if you don't agree, I will just add the comment on the races
-we found.
+dump_stack() is fine - and the intent is for it to never happen, it
+would be nice to close those holes so we're only catching cases that
+are due to bad code.
 
 -- 
-Ming
+Jens Axboe
