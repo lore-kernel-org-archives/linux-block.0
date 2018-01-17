@@ -1,19 +1,16 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:47878 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753762AbeAQQ2C (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Jan 2018 11:28:02 -0500
+Return-Path: <msnitzer@redhat.com>
 From: Mike Snitzer <snitzer@redhat.com>
 To: axboe@kernel.dk
-Cc: Ming Lei <tom.leiming@gmail.com>, hch@lst.de, dm-devel@redhat.com,
-        linux-block@vger.kernel.org
-Subject: [for-4.16 PATCH v6 3/3] blk-mq-sched: remove unused 'can_block' arg from blk_mq_sched_insert_request
-Date: Wed, 17 Jan 2018 11:25:58 -0500
-Message-Id: <20180117162558.28553-4-snitzer@redhat.com>
-In-Reply-To: <20180117162558.28553-1-snitzer@redhat.com>
-References: <20180117162558.28553-1-snitzer@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Cc: Ming Lei <tom.leiming@gmail.com>,
+	hch@lst.de,
+	dm-devel@redhat.com,
+	linux-block@vger.kernel.org
+Subject: [for-4.16 PATCH v5 3/3] blk-mq-sched: remove unused 'can_block' arg from blk_mq_sched_insert_request
+Date: Tue, 16 Jan 2018 23:33:38 -0500
+Message-Id: <20180117043338.25839-5-snitzer@redhat.com>
+In-Reply-To: <20180117043338.25839-1-snitzer@redhat.com>
+References: <20180117043338.25839-1-snitzer@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
 Signed-off-by: Mike Snitzer <snitzer@redhat.com>
 ---
@@ -63,7 +60,7 @@ index ba1d1418a96d..1e9c9018ace1 100644
  				  struct blk_mq_ctx *ctx,
  				  struct list_head *list, bool run_queue_async);
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f5f0d8456713..02ae1d7b94af 100644
+index 0b64f7210a89..06ef6a7cc29c 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
 @@ -745,13 +745,13 @@ static void blk_mq_requeue_work(struct work_struct *work)
@@ -82,7 +79,7 @@ index f5f0d8456713..02ae1d7b94af 100644
  	}
  
  	blk_mq_run_hw_queues(q, false);
-@@ -1729,13 +1729,11 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
+@@ -1732,16 +1732,14 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
  	return ret;
  }
  
@@ -91,14 +88,17 @@ index f5f0d8456713..02ae1d7b94af 100644
 +static void __blk_mq_fallback_to_insert(struct request *rq,
  					bool run_queue, bool bypass_insert)
  {
- 	if (!bypass_insert)
--		blk_mq_sched_insert_request(rq, false, run_queue, false,
--					    hctx->flags & BLK_MQ_F_BLOCKING);
-+		blk_mq_sched_insert_request(rq, false, run_queue, false);
- 	else
+ 	if (bypass_insert) {
  		blk_mq_request_bypass_insert(rq, run_queue);
+ 		return;
+ 	}
+-	blk_mq_sched_insert_request(rq, false, run_queue, false,
+-					hctx->flags & BLK_MQ_F_BLOCKING);
++	blk_mq_sched_insert_request(rq, false, run_queue, false);
  }
-@@ -1767,7 +1765,7 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 
+ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+@@ -1771,7 +1769,7 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
  
  	return __blk_mq_issue_directly(hctx, rq, cookie);
  insert:
@@ -107,7 +107,7 @@ index f5f0d8456713..02ae1d7b94af 100644
  	if (bypass_insert)
  		return BLK_STS_RESOURCE;
  
-@@ -1786,7 +1784,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+@@ -1790,7 +1788,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
  
  	ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false);
  	if (ret == BLK_STS_RESOURCE)
@@ -116,7 +116,7 @@ index f5f0d8456713..02ae1d7b94af 100644
  	else if (ret != BLK_STS_OK)
  		blk_mq_end_request(rq, ret);
  
-@@ -1916,7 +1914,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+@@ -1919,7 +1917,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
  	} else if (q->elevator) {
  		blk_mq_put_ctx(data.ctx);
  		blk_mq_bio_to_request(rq, bio);
