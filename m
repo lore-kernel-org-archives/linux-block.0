@@ -1,86 +1,129 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: dm-devel@redhat.com,
-	Ming Lei <ming.lei@redhat.com>,
-	Laurence Oberman <loberman@redhat.com>,
-	Bart Van Assche <bart.vanassche@sandisk.com>
-Subject: [PATCH 2/5] dm-rq: handle dispatch exception in dm_dispatch_clone_request()
-Date: Mon, 22 Jan 2018 11:35:47 +0800
-Message-Id: <20180122033550.27855-3-ming.lei@redhat.com>
-In-Reply-To: <20180122033550.27855-1-ming.lei@redhat.com>
-References: <20180122033550.27855-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:47878 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753762AbeAQQ2C (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 17 Jan 2018 11:28:02 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: axboe@kernel.dk
+Cc: Ming Lei <tom.leiming@gmail.com>, hch@lst.de, dm-devel@redhat.com,
+        linux-block@vger.kernel.org
+Subject: [for-4.16 PATCH v6 3/3] blk-mq-sched: remove unused 'can_block' arg from blk_mq_sched_insert_request
+Date: Wed, 17 Jan 2018 11:25:58 -0500
+Message-Id: <20180117162558.28553-4-snitzer@redhat.com>
+In-Reply-To: <20180117162558.28553-1-snitzer@redhat.com>
+References: <20180117162558.28553-1-snitzer@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-So we can clean up map_request() a bit, no functional change.
-
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Laurence Oberman <loberman@redhat.com>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Mike Snitzer <snitzer@redhat.com>
 ---
- drivers/md/dm-rq.c | 23 ++++++++++++++++-------
- 1 file changed, 16 insertions(+), 7 deletions(-)
+ block/blk-exec.c     |  2 +-
+ block/blk-mq-sched.c |  2 +-
+ block/blk-mq-sched.h |  2 +-
+ block/blk-mq.c       | 16 +++++++---------
+ 4 files changed, 10 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index e0bb56723b9b..1408e6664c16 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -12,6 +12,9 @@
+diff --git a/block/blk-exec.c b/block/blk-exec.c
+index 5c0f3dc446dc..f7b292f12449 100644
+--- a/block/blk-exec.c
++++ b/block/blk-exec.c
+@@ -61,7 +61,7 @@ void blk_execute_rq_nowait(struct request_queue *q, struct gendisk *bd_disk,
+ 	 * be reused after dying flag is set
+ 	 */
+ 	if (q->mq_ops) {
+-		blk_mq_sched_insert_request(rq, at_head, true, false, false);
++		blk_mq_sched_insert_request(rq, at_head, true, false);
+ 		return;
+ 	}
  
- #define DM_MSG_PREFIX "core-rq"
- 
-+#define  dispatch_busy(r)  \
-+	(((r) == BLK_STS_RESOURCE) || ((r) == BLK_STS_DEV_RESOURCE))
-+
- #define DM_MQ_NR_HW_QUEUES 1
- #define DM_MQ_QUEUE_DEPTH 2048
- static unsigned dm_mq_nr_hw_queues = DM_MQ_NR_HW_QUEUES;
-@@ -399,7 +402,8 @@ static void end_clone_request(struct request *clone, blk_status_t error)
- 	dm_complete_request(tio->orig, error);
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 2ff7cf0cbf73..55c0a745b427 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -427,7 +427,7 @@ void blk_mq_sched_restart(struct blk_mq_hw_ctx *const hctx)
  }
  
--static blk_status_t dm_dispatch_clone_request(struct request *clone, struct request *rq)
-+static blk_status_t dm_dispatch_clone_request(struct dm_rq_target_io *tio,
-+		struct request *clone, struct request *rq)
+ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
+-				 bool run_queue, bool async, bool can_block)
++				 bool run_queue, bool async)
  {
- 	blk_status_t r;
+ 	struct request_queue *q = rq->q;
+ 	struct elevator_queue *e = q->elevator;
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index ba1d1418a96d..1e9c9018ace1 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -18,7 +18,7 @@ bool blk_mq_sched_try_insert_merge(struct request_queue *q, struct request *rq);
+ void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx);
  
-@@ -408,9 +412,17 @@ static blk_status_t dm_dispatch_clone_request(struct request *clone, struct requ
+ void blk_mq_sched_insert_request(struct request *rq, bool at_head,
+-				 bool run_queue, bool async, bool can_block);
++				 bool run_queue, bool async);
+ void blk_mq_sched_insert_requests(struct request_queue *q,
+ 				  struct blk_mq_ctx *ctx,
+ 				  struct list_head *list, bool run_queue_async);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f5f0d8456713..02ae1d7b94af 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -745,13 +745,13 @@ static void blk_mq_requeue_work(struct work_struct *work)
  
- 	clone->start_time = jiffies;
- 	r = blk_insert_cloned_request(clone->q, clone);
--	if (r != BLK_STS_OK && r != BLK_STS_RESOURCE)
-+	if (dispatch_busy(r)) {
-+		blk_rq_unprep_clone(clone);
-+		tio->ti->type->release_clone_rq(clone);
-+		tio->clone = NULL;
-+	} else if (r != BLK_STS_OK) {
- 		/* must complete clone in terms of original request */
- 		dm_complete_request(rq, r);
-+
-+		/* we handled the failure, so return OK */
-+		r = BLK_STS_OK;
-+	}
- 	return r;
+ 		rq->rq_flags &= ~RQF_SOFTBARRIER;
+ 		list_del_init(&rq->queuelist);
+-		blk_mq_sched_insert_request(rq, true, false, false, true);
++		blk_mq_sched_insert_request(rq, true, false, false);
+ 	}
+ 
+ 	while (!list_empty(&rq_list)) {
+ 		rq = list_entry(rq_list.next, struct request, queuelist);
+ 		list_del_init(&rq->queuelist);
+-		blk_mq_sched_insert_request(rq, false, false, false, true);
++		blk_mq_sched_insert_request(rq, false, false, false);
+ 	}
+ 
+ 	blk_mq_run_hw_queues(q, false);
+@@ -1729,13 +1729,11 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	return ret;
  }
  
-@@ -499,11 +511,8 @@ static int map_request(struct dm_rq_target_io *tio)
- 		/* The target has remapped the I/O so dispatch it */
- 		trace_block_rq_remap(clone->q, clone, disk_devt(dm_disk(md)),
- 				     blk_rq_pos(rq));
--		ret = dm_dispatch_clone_request(clone, rq);
--		if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE) {
--			blk_rq_unprep_clone(clone);
--			tio->ti->type->release_clone_rq(clone);
--			tio->clone = NULL;
-+		ret = dm_dispatch_clone_request(tio, clone, rq);
-+		if (dispatch_busy(ret)) {
- 			if (!rq->q->mq_ops)
- 				r = DM_MAPIO_DELAY_REQUEUE;
- 			else
+-static void __blk_mq_fallback_to_insert(struct blk_mq_hw_ctx *hctx,
+-					struct request *rq,
++static void __blk_mq_fallback_to_insert(struct request *rq,
+ 					bool run_queue, bool bypass_insert)
+ {
+ 	if (!bypass_insert)
+-		blk_mq_sched_insert_request(rq, false, run_queue, false,
+-					    hctx->flags & BLK_MQ_F_BLOCKING);
++		blk_mq_sched_insert_request(rq, false, run_queue, false);
+ 	else
+ 		blk_mq_request_bypass_insert(rq, run_queue);
+ }
+@@ -1767,7 +1765,7 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 
+ 	return __blk_mq_issue_directly(hctx, rq, cookie);
+ insert:
+-	__blk_mq_fallback_to_insert(hctx, rq, run_queue, bypass_insert);
++	__blk_mq_fallback_to_insert(rq, run_queue, bypass_insert);
+ 	if (bypass_insert)
+ 		return BLK_STS_RESOURCE;
+ 
+@@ -1786,7 +1784,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 
+ 	ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false);
+ 	if (ret == BLK_STS_RESOURCE)
+-		__blk_mq_fallback_to_insert(hctx, rq, true, false);
++		__blk_mq_fallback_to_insert(rq, true, false);
+ 	else if (ret != BLK_STS_OK)
+ 		blk_mq_end_request(rq, ret);
+ 
+@@ -1916,7 +1914,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 	} else if (q->elevator) {
+ 		blk_mq_put_ctx(data.ctx);
+ 		blk_mq_bio_to_request(rq, bio);
+-		blk_mq_sched_insert_request(rq, false, true, true, true);
++		blk_mq_sched_insert_request(rq, false, true, true);
+ 	} else {
+ 		blk_mq_put_ctx(data.ctx);
+ 		blk_mq_bio_to_request(rq, bio);
 -- 
-2.9.5
+2.15.0
