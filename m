@@ -1,57 +1,37 @@
-Return-Path: <prvs=5482b108a=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "snitzer@redhat.com" <snitzer@redhat.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
-CC: "hch@lst.de" <hch@lst.de>, "dm-devel@redhat.com" <dm-devel@redhat.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"tom.leiming@gmail.com" <tom.leiming@gmail.com>, "loberman@redhat.com"
-	<loberman@redhat.com>
+Return-Path: <msnitzer@redhat.com>
+Date: Wed, 17 Jan 2018 11:58:32 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <tom.leiming@gmail.com>, hch@lst.de, dm-devel@redhat.com,
+	linux-block@vger.kernel.org
 Subject: Re: [for-4.16 PATCH v6 0/3] blk-mq: improve DM's blk-mq IO merging
  via blk_insert_cloned_request feedback
-Date: Wed, 17 Jan 2018 23:31:10 +0000
-Message-ID: <1516231868.2820.84.camel@wdc.com>
+Message-ID: <20180117165832.GA5573@redhat.com>
 References: <20180117162558.28553-1-snitzer@redhat.com>
-	 <45f70a28-aeea-8278-0b8e-9601ea043595@kernel.dk>
-	 <20180117165832.GA5573@redhat.com>
-In-Reply-To: <20180117165832.GA5573@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+ <45f70a28-aeea-8278-0b8e-9601ea043595@kernel.dk>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <45f70a28-aeea-8278-0b8e-9601ea043595@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gV2VkLCAyMDE4LTAxLTE3IGF0IDExOjU4IC0wNTAwLCBNaWtlIFNuaXR6ZXIgd3JvdGU6DQo+
-IE9uIFdlZCwgSmFuIDE3IDIwMTggYXQgMTE6NTBhbSAtMDUwMCwNCj4gSmVucyBBeGJvZSA8YXhi
-b2VAa2VybmVsLmRrPiB3cm90ZToNCj4gDQo+ID4gT24gMS8xNy8xOCA5OjI1IEFNLCBNaWtlIFNu
-aXR6ZXIgd3JvdGU6DQo+ID4gPiBIaSBKZW5zLA0KPiA+ID4gDQo+ID4gPiBUaGluayB0aGlzIGZp
-bmFsbHkgdGFrZXMgY2FyZSBvZiBpdCEgOykNCj4gPiA+IA0KPiA+ID4gVGhhbmtzLA0KPiA+ID4g
-TWlrZQ0KPiA+ID4gDQo+ID4gPiBNaWtlIFNuaXR6ZXIgKDIpOg0KPiA+ID4gICBibGstbXE6IGZh
-Y3RvciBvdXQgYSBmZXcgaGVscGVycyBmcm9tIF9fYmxrX21xX3RyeV9pc3N1ZV9kaXJlY3RseQ0K
-PiA+ID4gICBibGstbXEtc2NoZWQ6IHJlbW92ZSB1bnVzZWQgJ2Nhbl9ibG9jaycgYXJnIGZyb20g
-YmxrX21xX3NjaGVkX2luc2VydF9yZXF1ZXN0DQo+ID4gPiANCj4gPiA+IE1pbmcgTGVpICgxKToN
-Cj4gPiA+ICAgYmxrLW1xOiBpbXByb3ZlIERNJ3MgYmxrLW1xIElPIG1lcmdpbmcgdmlhIGJsa19p
-bnNlcnRfY2xvbmVkX3JlcXVlc3QgZmVlZGJhY2sNCj4gPiANCj4gPiBBcHBsaWVkIC0gYWRkZWQg
-YWN0dWFsIGNvbW1pdCBtZXNzYWdlIHRvIHBhdGNoIDMuDQo+IA0KPiBHcmVhdCwgdGhhbmtzLg0K
-DQpIZWxsbyBNaWtlLA0KDQpMYXVyZW5jZSBoaXQgdGhlIGZvbGxvd2luZyB3aGlsZSByZXRlc3Rp
-bmcgdGhlIFNSUCBpbml0aWF0b3IgY29kZToNCg0KWyAyMjIzLjc5NzEyOV0gbGlzdF9hZGQgY29y
-cnVwdGlvbi4gcHJldi0+bmV4dCBzaG91bGQgYmUgbmV4dCAoMDAwMDAwMDBlMGRkZDVkZCksIGJ1
-dCB3YXMgMDAwMDAwMDAzZGVmZTVjZC4gKHByZXY9MDAwMDAwMDAzZGVmZTVjZCkuDQpbIDIyMjMu
-ODYyMTY4XSBXQVJOSU5HOiBDUFU6IDE0IFBJRDogNTc3IGF0IGxpYi9saXN0X2RlYnVnLmM6Mjgg
-X19saXN0X2FkZF92YWxpZCsweDZhLzB4NzANClsgMjIyNC40ODExNTFdIENQVTogMTQgUElEOiA1
-NzcgQ29tbToga3dvcmtlci8xNDoxSCBUYWludGVkOiBHICAgICAgICAgIEkgICAgICA0LjE1LjAt
-cmM4LmJhcnQzKyAjMQ0KWyAyMjI0LjUzMTE5M10gSGFyZHdhcmUgbmFtZTogSFAgUHJvTGlhbnQg
-REwzODAgRzcsIEJJT1MgUDY3IDA4LzE2LzIwMTUNClsgMjIyNC41NjcxNTBdIFdvcmtxdWV1ZTog
-a2Jsb2NrZCBibGtfbXFfcnVuX3dvcmtfZm4NClsgMjIyNC41OTMxODJdIFJJUDogMDAxMDpfX2xp
-c3RfYWRkX3ZhbGlkKzB4NmEvMHg3MA0KWyAyMjI0Ljk2NzAwMl0gQ2FsbCBUcmFjZToNClsgMjIy
-NC45ODA5NDFdICBibGtfbXFfcmVxdWVzdF9ieXBhc3NfaW5zZXJ0KzB4NTcvMHhhMA0KWyAyMjI1
-LjAwOTA0NF0gIF9fYmxrX21xX3RyeV9pc3N1ZV9kaXJlY3RseSsweDU2LzB4MWUwDQpbIDIyMjUu
-MDM3MDA3XSAgYmxrX21xX3JlcXVlc3RfZGlyZWN0X2lzc3VlKzB4NWQvMHhjMA0KWyAyMjI1LjA5
-MDYwOF0gIG1hcF9yZXF1ZXN0KzB4MTQyLzB4MjYwIFtkbV9tb2RdDQpbIDIyMjUuMTE0NzU2XSAg
-ZG1fbXFfcXVldWVfcnErMHhhNC8weDEyMCBbZG1fbW9kXQ0KWyAyMjI1LjE0MDgxMl0gIGJsa19t
-cV9kaXNwYXRjaF9ycV9saXN0KzB4OTAvMHg1YjANClsgMjIyNS4yMTE3NjldICBibGtfbXFfc2No
-ZWRfZGlzcGF0Y2hfcmVxdWVzdHMrMHgxMDcvMHgxYTANClsgMjIyNS4yNDA4MjVdICBfX2Jsa19t
-cV9ydW5faHdfcXVldWUrMHg1Zi8weGYwDQpbIDIyMjUuMjY0ODUyXSAgcHJvY2Vzc19vbmVfd29y
-aysweDE0MS8weDM0MA0KWyAyMjI1LjI4Nzg3Ml0gIHdvcmtlcl90aHJlYWQrMHg0Ny8weDNlMA0K
-WyAyMjI1LjMwODM1NF0gIGt0aHJlYWQrMHhmNS8weDEzMA0KWyAyMjI1LjM5NjQwNV0gIHJldF9m
-cm9tX2ZvcmsrMHgzMi8weDQwDQoNClRoYXQgY2FsbCB0cmFjZSBkaWQgbm90IHNob3cgdXAgYmVm
-b3JlIHRoaXMgcGF0Y2ggc2VyaWVzIHdhcyBhZGRlZCB0byBKZW5zJw0KdHJlZS4gVGhpcyBpcyBh
-IHJlZ3Jlc3Npb24uIENvdWxkIHRoaXMgaGF2ZSBiZWVuIGludHJvZHVjZWQgYnkgdGhpcyBwYXRj
-aA0Kc2VyaWVzPw0KDQpUaGFua3MsDQoNCkJhcnQu
+On Wed, Jan 17 2018 at 11:50am -0500,
+Jens Axboe <axboe@kernel.dk> wrote:
+
+> On 1/17/18 9:25 AM, Mike Snitzer wrote:
+> > Hi Jens,
+> > 
+> > Think this finally takes care of it! ;)
+> > 
+> > Thanks,
+> > Mike
+> > 
+> > Mike Snitzer (2):
+> >   blk-mq: factor out a few helpers from __blk_mq_try_issue_directly
+> >   blk-mq-sched: remove unused 'can_block' arg from blk_mq_sched_insert_request
+> > 
+> > Ming Lei (1):
+> >   blk-mq: improve DM's blk-mq IO merging via blk_insert_cloned_request feedback
+> 
+> Applied - added actual commit message to patch 3.
+
+Great, thanks.
