@@ -1,45 +1,55 @@
-Return-Path: <msnitzer@redhat.com>
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk
-Cc: Ming Lei <tom.leiming@gmail.com>,
-	hch@lst.de,
-	Bart.VanAssche@wdc.com,
-	dm-devel@redhat.com,
-	linux-block@vger.kernel.org
-Subject: [for-4.16 PATCH v3 1/3] block: only bdi_unregister() in del_gendisk() if !GENHD_FL_HIDDEN
-Date: Wed, 10 Jan 2018 21:12:54 -0500
-Message-Id: <20180111021256.37490-2-snitzer@redhat.com>
-In-Reply-To: <20180111021256.37490-1-snitzer@redhat.com>
-References: <20180111021256.37490-1-snitzer@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from bombadil.infradead.org ([65.50.211.133]:46289 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932079AbeAQSbs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 17 Jan 2018 13:31:48 -0500
+Received: from 77.117.185.35.wireless.dyn.drei.com ([77.117.185.35] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.89 #1 (Red Hat Linux))
+        id 1ebsV0-0004aa-5P
+        for linux-block@vger.kernel.org; Wed, 17 Jan 2018 18:31:47 +0000
+Date: Wed, 17 Jan 2018 19:31:42 +0100
+From: Christoph Hellwig <hch@infradead.org>
+To: linux-block@vger.kernel.org
+Subject: [ANNOUNCE] Participate at the Linux FAST Summit '18
+Message-ID: <20180117183142.vcrm2dt36cx4lrqu@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-device_add_disk() will only call bdi_register_owner() if
-!GENHD_FL_HIDDEN, so it follows that del_gendisk() should only call
-bdi_unregister() if !GENHD_FL_HIDDEN.
+We are pleased to announce that the Call for Participation [1] for the
+2018 USENIX Research in Linux File and Storage Technologies Summit (Linux
+FAST Summit '18) [2] is now available.  Linux FAST Summit '18 will take
+place at the Oakland Marriott City Center on February 15 and will be
+co-located with the 16th USENIX Conference on File and Storage Technologies
+(FAST '18) [3].
 
-Found with code inspection.  bdi_unregister() won't do any harm if
-bdi_register_owner() wasn't used but best to avoid the unnecessary
-call to bdi_unregister().
+Linux is one of the most frequently used platforms in file and storage
+research, and FAST is the premier conference for publishing research
+results from the file and storage research community.  This summit will
+bring together key Linux kernel developers and academic researchers.  The
+goal is to provide a forum for presenting and discussing current ideas in
+research with a group of active practitioners in the Linux Kernel.
 
-Fixes: 8ddcd65325 ("block: introduce GENHD_FL_HIDDEN")
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
----
- block/genhd.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+The format will be a single session of short 25-minute talks with
+5-minute questions and answers, as well as 45-minute Birds-of-a-Feather
+sessions (BoFs).
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 96a66f671720..00620e01e043 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -725,7 +725,8 @@ void del_gendisk(struct gendisk *disk)
- 		 * Unregister bdi before releasing device numbers (as they can
- 		 * get reused and we'd get clashes in sysfs).
- 		 */
--		bdi_unregister(disk->queue->backing_dev_info);
-+		if (!(disk->flags & GENHD_FL_HIDDEN))
-+			bdi_unregister(disk->queue->backing_dev_info);
- 		blk_unregister_queue(disk);
- 	} else {
- 		WARN_ON(1);
--- 
-2.15.0
+If you have an idea you'd like to share, or a project in the Linux Kernel
+that you'd like to talk about, please send a 400-word summary of the idea
+or project and a short description of the benefits that would be achieved
+by discussion with kernel practitioners and/or academics to
+linuxfast18chairs@usenix.org.  Submissions are due by Friday, January 26,
+2018.
+
+We look forward to receiving your submissions!
+
+Christoph Hellwig
+Erik Riedel, Dell EMC
+Linux FAST Summit '18 Program Co-Chairs
+linuxfast18chairs@usenix.org
+
+[1] https://www.usenix.org/conference/linuxfastsummit18/call-for-participation
+[2] https://www.usenix.org/conference/linuxfastsummit18
+[3] https://www.usenix.org/conference/fast18
