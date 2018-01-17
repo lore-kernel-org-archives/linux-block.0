@@ -1,247 +1,109 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:37068 "EHLO mx2.suse.de"
+Received: from mx1.redhat.com ([209.132.183.28]:36822 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751715AbeAMRNP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 13 Jan 2018 12:13:15 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Michael Lyle <mlyle@lyle.org>, Hannes Reinecke <hare@suse.com>,
-        Junhui Tang <tang.junhui@zte.com.cn>
-Subject: [PATCH v2 11/12] bcache: add io_disable to struct cached_dev
-Date: Sun, 14 Jan 2018 01:10:49 +0800
-Message-Id: <20180113171050.22467-12-colyli@suse.de>
-In-Reply-To: <20180113171050.22467-1-colyli@suse.de>
-References: <20180113171050.22467-1-colyli@suse.de>
+        id S1753793AbeAQQm7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 17 Jan 2018 11:42:59 -0500
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>
+Cc: Christoph Hellwig <hch@infradead.org>,
+        "jianchao . wang" <jianchao.w.wang@oracle.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Stefan Haberland <sth@linux.vnet.ibm.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V2 1/2] blk-mq: make sure hctx->next_cpu is set correctly
+Date: Thu, 18 Jan 2018 00:41:51 +0800
+Message-Id: <20180117164152.7066-2-ming.lei@redhat.com>
+In-Reply-To: <20180117164152.7066-1-ming.lei@redhat.com>
+References: <20180117164152.7066-1-ming.lei@redhat.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-If a bcache device is configured to writeback mode, current code does not
-handle write I/O errors on backing devices properly.
+When hctx->next_cpu is set from possible online CPUs, there is one
+race in which hctx->next_cpu may be set as >= nr_cpu_ids, and finally
+break workqueue.
 
-In writeback mode, write request is written to cache device, and
-latter being flushed to backing device. If I/O failed when writing from
-cache device to the backing device, bcache code just ignores the error and
-upper layer code is NOT noticed that the backing device is broken.
+The race can be triggered in the following two sitations:
 
-This patch tries to handle backing device failure like how the cache device
-failure is handled,
-- Add a error counter 'io_errors' and error limit 'error_limit' in struct
-  cached_dev. Add another io_disable to struct cached_dev to disable I/Os
-  on the problematic backing device.
-- When I/O error happens on backing device, increase io_errors counter. And
-  if io_errors reaches error_limit, set cache_dev->io_disable to true, and
-  stop the bcache device.
+1) when one CPU is becoming DEAD, blk_mq_hctx_notify_dead() is called
+to dispatch requests from the DEAD cpu context, but at that
+time, this DEAD CPU has been cleared from 'cpu_online_mask', so all
+CPUs in hctx->cpumask may become offline, and cause hctx->next_cpu set
+a bad value.
 
-The result is, if backing device is broken of disconnected, and I/O errors
-reach its error limit, backing device will be disabled and the associated
-bcache device will be removed from system.
+2) blk_mq_delay_run_hw_queue() is called from CPU B, and found the queue
+should be run on the other CPU A, then CPU A may become offline at the
+same time and all CPUs in hctx->cpumask become offline.
 
-Changelog:
-v2: indeed this is new added in v2 patch set.
+This patch deals with this issue by re-selecting next CPU, and make
+sure it is set correctly.
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Michael Lyle <mlyle@lyle.org>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Stefan Haberland <sth@linux.vnet.ibm.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Reported-by: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Tested-by: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Fixes: 20e4d81393 ("blk-mq: simplify queue mapping & schedule with each possisble CPU")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/bcache/bcache.h  |  7 +++++++
- drivers/md/bcache/io.c      | 14 ++++++++++++++
- drivers/md/bcache/request.c | 14 ++++++++++++--
- drivers/md/bcache/super.c   | 22 ++++++++++++++++++++++
- drivers/md/bcache/sysfs.c   | 15 ++++++++++++++-
- 5 files changed, 69 insertions(+), 3 deletions(-)
+ block/blk-mq.c | 30 ++++++++++++++++++++++++++++--
+ 1 file changed, 28 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index c41736960045..5a811959392d 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -360,6 +360,7 @@ struct cached_dev {
- 	unsigned		sequential_cutoff;
- 	unsigned		readahead;
- 
-+	unsigned		io_disable:1;
- 	unsigned		verify:1;
- 	unsigned		bypass_torture_test:1;
- 
-@@ -379,6 +380,10 @@ struct cached_dev {
- 	unsigned		writeback_rate_i_term_inverse;
- 	unsigned		writeback_rate_p_term_inverse;
- 	unsigned		writeback_rate_minimum;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c376d1b6309a..69e73b4e32f3 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1416,21 +1416,47 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+  */
+ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+ {
++	bool tried = false;
 +
-+#define DEFAULT_CACHED_DEV_ERROR_LIMIT 64
-+	atomic_t		io_errors;
-+	unsigned		error_limit;
- };
+ 	if (hctx->queue->nr_hw_queues == 1)
+ 		return WORK_CPU_UNBOUND;
  
- enum alloc_reserve {
-@@ -882,6 +887,7 @@ static inline void closure_bio_submit(struct cache_set *c,
+ 	if (--hctx->next_cpu_batch <= 0) {
+ 		int next_cpu;
+-
++select_cpu:
+ 		next_cpu = cpumask_next_and(hctx->next_cpu, hctx->cpumask,
+ 				cpu_online_mask);
+ 		if (next_cpu >= nr_cpu_ids)
+ 			next_cpu = cpumask_first_and(hctx->cpumask,cpu_online_mask);
  
- /* Forward declarations */
- 
-+void bch_count_backing_io_errors(struct cached_dev *dc, struct bio *bio);
- void bch_count_io_errors(struct cache *, blk_status_t, int, const char *);
- void bch_bbio_count_io_errors(struct cache_set *, struct bio *,
- 			      blk_status_t, const char *);
-@@ -909,6 +915,7 @@ int bch_bucket_alloc_set(struct cache_set *, unsigned,
- 			 struct bkey *, int, bool);
- bool bch_alloc_sectors(struct cache_set *, struct bkey *, unsigned,
- 		       unsigned, unsigned, bool);
-+bool bch_cached_dev_error(struct cached_dev *dc);
- 
- __printf(2, 3)
- bool bch_cache_set_error(struct cache_set *, const char *, ...);
-diff --git a/drivers/md/bcache/io.c b/drivers/md/bcache/io.c
-index 8013ecbcdbda..7fac97ae036e 100644
---- a/drivers/md/bcache/io.c
-+++ b/drivers/md/bcache/io.c
-@@ -50,6 +50,20 @@ void bch_submit_bbio(struct bio *bio, struct cache_set *c,
- }
- 
- /* IO errors */
-+void bch_count_backing_io_errors(struct cached_dev *dc, struct bio *bio)
-+{
-+	char buf[BDEVNAME_SIZE];
-+	unsigned errors;
-+
-+	WARN_ONCE(!dc, "NULL pointer of struct cached_dev");
-+
-+	errors = atomic_add_return(1, &dc->io_errors);
-+	if (errors < dc->error_limit)
-+		pr_err("%s: IO error on backing device, unrecoverable",
-+			bio_devname(bio, buf));
-+	else
-+		bch_cached_dev_error(dc);
-+}
- 
- void bch_count_io_errors(struct cache *ca,
- 			 blk_status_t error,
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index ad4cf71f7eab..386b388ce296 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -637,6 +637,8 @@ static void backing_request_endio(struct bio *bio)
- 
- 	if (bio->bi_status) {
- 		struct search *s = container_of(cl, struct search, cl);
-+		struct cached_dev *dc = container_of(s->d,
-+						     struct cached_dev, disk);
- 		/*
- 		 * If a bio has REQ_PREFLUSH for writeback mode, it is
- 		 * speically assembled in cached_dev_write() for a non-zero
-@@ -657,6 +659,7 @@ static void backing_request_endio(struct bio *bio)
- 		}
- 		s->recoverable = false;
- 		/* should count I/O error for backing device here */
-+		bch_count_backing_io_errors(dc, bio);
+-		hctx->next_cpu = next_cpu;
++		/*
++		 * No online CPU is found, so have to make sure hctx->next_cpu
++		 * is set correctly for not breaking workqueue.
++		 */
++		if (next_cpu >= nr_cpu_ids)
++			hctx->next_cpu = cpumask_first(hctx->cpumask);
++		else
++			hctx->next_cpu = next_cpu;
+ 		hctx->next_cpu_batch = BLK_MQ_CPU_WORK_BATCH;
  	}
  
- 	bio_put(bio);
-@@ -1067,8 +1070,14 @@ static void detatched_dev_end_io(struct bio *bio)
- 			    bio_data_dir(bio),
- 			    &ddip->d->disk->part0, ddip->start_time);
- 
--	kfree(ddip);
-+	if (bio->bi_status) {
-+		struct cached_dev *dc = container_of(ddip->d,
-+						     struct cached_dev, disk);
-+		/* should count I/O error for backing device here */
-+		bch_count_backing_io_errors(dc, bio);
++	/*
++	 * Do unbound schedule if we can't find a online CPU for this hctx,
++	 * and it should only happen in the path of handling CPU DEAD.
++	 */
++	if (!cpu_online(hctx->next_cpu)) {
++		if (!tried) {
++			tried = true;
++			goto select_cpu;
++		}
++
++		/*
++		 * Make sure to re-select CPU next time once after CPUs
++		 * in hctx->cpumask become online again.
++		 */
++		hctx->next_cpu_batch = 1;
++		return WORK_CPU_UNBOUND;
 +	}
- 
-+	kfree(ddip);
- 	bio->bi_end_io(bio);
+ 	return hctx->next_cpu;
  }
  
-@@ -1107,7 +1116,8 @@ static blk_qc_t cached_dev_make_request(struct request_queue *q,
- 	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
- 	int rw = bio_data_dir(bio);
- 
--	if (unlikely(d->c && test_bit(CACHE_SET_IO_DISABLE, &d->c->flags))) {
-+	if (unlikely((d->c && test_bit(CACHE_SET_IO_DISABLE, &d->c->flags)) ||
-+		     dc->io_disable)) {
- 		bio->bi_status = BLK_STS_IOERR;
- 		bio_endio(bio);
- 		return BLK_QC_T_NONE;
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 08a0b541a4da..14fce3623770 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1188,6 +1188,10 @@ static int cached_dev_init(struct cached_dev *dc, unsigned block_size)
- 		max(dc->disk.disk->queue->backing_dev_info->ra_pages,
- 		    q->backing_dev_info->ra_pages);
- 
-+	atomic_set(&dc->io_errors, 0);
-+	dc->io_disable = false;
-+	dc->error_limit = DEFAULT_CACHED_DEV_ERROR_LIMIT;
-+
- 	bch_cached_dev_request_init(dc);
- 	bch_cached_dev_writeback_init(dc);
- 	return 0;
-@@ -1339,6 +1343,24 @@ int bch_flash_dev_create(struct cache_set *c, uint64_t size)
- 	return flash_dev_run(c, u);
- }
- 
-+bool bch_cached_dev_error(struct cached_dev *dc)
-+{
-+	char name[BDEVNAME_SIZE];
-+
-+	if (!dc || test_bit(BCACHE_DEV_CLOSING, &dc->disk.flags))
-+		return false;
-+
-+	dc->io_disable = true;
-+	/* make others know io_disable is true earlier */
-+	smp_mb();
-+
-+	pr_err("bcache: stop %s: too many IO errors on backing device %s\n",
-+		dc->disk.name, bdevname(dc->bdev, name));
-+
-+	bcache_device_stop(&dc->disk);
-+	return true;
-+}
-+
- /* Cache set */
- 
- __printf(2, 3)
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index afb051bcfca1..7288927f2a47 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -131,7 +131,9 @@ SHOW(__bch_cached_dev)
- 	var_print(writeback_delay);
- 	var_print(writeback_percent);
- 	sysfs_hprint(writeback_rate,	dc->writeback_rate.rate << 9);
--
-+	sysfs_hprint(io_errors,		atomic_read(&dc->io_errors));
-+	sysfs_printf(io_error_limit,	"%i", dc->error_limit);
-+	sysfs_printf(io_disable,	"%i", dc->io_disable);
- 	var_print(writeback_rate_update_seconds);
- 	var_print(writeback_rate_i_term_inverse);
- 	var_print(writeback_rate_p_term_inverse);
-@@ -223,6 +225,14 @@ STORE(__cached_dev)
- 	d_strtoul(writeback_rate_i_term_inverse);
- 	d_strtoul_nonzero(writeback_rate_p_term_inverse);
- 
-+	sysfs_strtoul_clamp(io_error_limit, dc->error_limit, 0, INT_MAX);
-+
-+	if (attr == &sysfs_io_disable) {
-+		int v = strtoul_or_return(buf);
-+
-+		dc->io_disable = v ? 1 : 0;
-+	}
-+
- 	d_strtoi_h(sequential_cutoff);
- 	d_strtoi_h(readahead);
- 
-@@ -330,6 +340,9 @@ static struct attribute *bch_cached_dev_files[] = {
- 	&sysfs_writeback_rate_i_term_inverse,
- 	&sysfs_writeback_rate_p_term_inverse,
- 	&sysfs_writeback_rate_debug,
-+	&sysfs_errors,
-+	&sysfs_io_error_limit,
-+	&sysfs_io_disable,
- 	&sysfs_dirty_data,
- 	&sysfs_stripe_size,
- 	&sysfs_partial_stripes_expensive,
 -- 
-2.15.1
+2.9.5
