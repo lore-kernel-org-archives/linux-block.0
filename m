@@ -1,153 +1,92 @@
-Return-Path: <tom.leiming@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <1516147421.2844.70.camel@wdc.com>
+Return-Path: <prvs=5482b108a=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "snitzer@redhat.com" <snitzer@redhat.com>
+CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH 3/3] block: Protect less code with sysfs_lock in
+ blk_{un,}register_queue()
+Date: Wed, 17 Jan 2018 00:03:42 +0000
+Message-ID: <1516147421.2844.70.camel@wdc.com>
 References: <20180116181752.25847-1-bart.vanassche@wdc.com>
- <20180116181752.25847-4-bart.vanassche@wdc.com> <20180116223207.GA32637@redhat.com>
- <1516147421.2844.70.camel@wdc.com>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Wed, 17 Jan 2018 09:23:59 +0800
-Message-ID: <CACVXFVMtUq8Mru8f7AD+6rQch+59=yRNL0-xOc4k7mmp4VanpA@mail.gmail.com>
-Subject: Re: [PATCH 3/3] block: Protect less code with sysfs_lock in blk_{un,}register_queue()
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "snitzer@redhat.com" <snitzer@redhat.com>, "hch@lst.de" <hch@lst.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
+	 <20180116181752.25847-4-bart.vanassche@wdc.com>
+	 <20180116223207.GA32637@redhat.com>
+In-Reply-To: <20180116223207.GA32637@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Jan 17, 2018 at 8:03 AM, Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
-> On Tue, 2018-01-16 at 17:32 -0500, Mike Snitzer wrote:
->> Therefore it seems to me that all queue_attr_{show,store} are racey vs
->> blk_unregister_queue() removing the 'queue' kobject.
->>
->> And it was just that __elevator_change() was myopicly fixed to address
->> the race whereas a more generic solution was/is needed.  But short of
->> that more generic fix your change will reintroduce the potential for
->> hitting the issue that commit e9a823fb34a8b fixed.
->>
->> In that light, think it best to leave blk_unregister_queue()'s
->> mutex_lock() above the QUEUE_FLAG_REGISTERED clearing _and_ update
->> queue_attr_{show,store} to test for QUEUE_FLAG_REGISTERED while holding
->> sysfs_lock.
->>
->> Then remove the unicorn test_bit for QUEUE_FLAG_REGISTERED from
->> __elevator_change().
->
-> Thanks Mike for the feedback. However, I think a simpler approach exists than
-> what has been described above, namely by unregistering the sysfs attributes
-> earlier. How about the patch below?
->
-> [PATCH] block: Protect less code with sysfs_lock in blk_{un,}register_queue()
-> ---
->  block/blk-sysfs.c | 39 ++++++++++++++++++++++++++-------------
->  block/elevator.c  |  4 ----
->  2 files changed, 26 insertions(+), 17 deletions(-)
->
-> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> index 4a6a40ffd78e..ce32366c6db7 100644
-> --- a/block/blk-sysfs.c
-> +++ b/block/blk-sysfs.c
-> @@ -853,6 +853,10 @@ struct kobj_type blk_queue_ktype = {
->         .release        = blk_release_queue,
->  };
->
-> +/**
-> + * blk_register_queue - register a block layer queue with sysfs
-> + * @disk: Disk of which the request queue should be registered with sysfs.
-> + */
->  int blk_register_queue(struct gendisk *disk)
->  {
->         int ret;
-> @@ -909,11 +913,12 @@ int blk_register_queue(struct gendisk *disk)
->         if (q->request_fn || (q->mq_ops && q->elevator)) {
->                 ret = elv_register_queue(q);
->                 if (ret) {
-> +                       mutex_unlock(&q->sysfs_lock);
->                         kobject_uevent(&q->kobj, KOBJ_REMOVE);
->                         kobject_del(&q->kobj);
->                         blk_trace_remove_sysfs(dev);
->                         kobject_put(&dev->kobj);
-> -                       goto unlock;
-> +                       return ret;
->                 }
->         }
->         ret = 0;
-> @@ -923,6 +928,13 @@ int blk_register_queue(struct gendisk *disk)
->  }
->  EXPORT_SYMBOL_GPL(blk_register_queue);
->
-> +/**
-> + * blk_unregister_queue - counterpart of blk_register_queue()
-> + * @disk: Disk of which the request queue should be unregistered from sysfs.
-> + *
-> + * Note: the caller is responsible for guaranteeing that this function is called
-> + * after blk_register_queue() has finished.
-> + */
->  void blk_unregister_queue(struct gendisk *disk)
->  {
->         struct request_queue *q = disk->queue;
-> @@ -934,28 +946,29 @@ void blk_unregister_queue(struct gendisk *disk)
->         if (!test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags))
->                 return;
->
-> -       /*
-> -        * Protect against the 'queue' kobj being accessed
-> -        * while/after it is removed.
-> -        */
-> -       mutex_lock(&q->sysfs_lock);
-> -
->         spin_lock_irq(q->queue_lock);
->         queue_flag_clear(QUEUE_FLAG_REGISTERED, q);
->         spin_unlock_irq(q->queue_lock);
->
-> -       wbt_exit(q);
-> -
-> +       /*
-> +        * Remove the sysfs attributes before unregistering the queue data
-> +        * structures that can be modified through sysfs.
-> +        */
-> +       mutex_lock(&q->sysfs_lock);
->         if (q->mq_ops)
->                 blk_mq_unregister_dev(disk_to_dev(disk), q);
-> -
-> -       if (q->request_fn || (q->mq_ops && q->elevator))
-> -               elv_unregister_queue(q);
-> +       mutex_unlock(&q->sysfs_lock);
->
->         kobject_uevent(&q->kobj, KOBJ_REMOVE);
->         kobject_del(&q->kobj);
-
-elevator switch still can come just after the above line code is completed,
-so the previous warning addressed in e9a823fb34a8b can be triggered
-again.
-
->         blk_trace_remove_sysfs(disk_to_dev(disk));
-> -       kobject_put(&disk_to_dev(disk)->kobj);
->
-> +       wbt_exit(q);
-> +
-> +       mutex_lock(&q->sysfs_lock);
-> +       if (q->request_fn || (q->mq_ops && q->elevator))
-> +               elv_unregister_queue(q);
->         mutex_unlock(&q->sysfs_lock);
-> +
-> +       kobject_put(&disk_to_dev(disk)->kobj);
->  }
-> diff --git a/block/elevator.c b/block/elevator.c
-> index e87e9b43aba0..4b7957b28a99 100644
-> --- a/block/elevator.c
-> +++ b/block/elevator.c
-> @@ -1080,10 +1080,6 @@ static int __elevator_change(struct request_queue *q, const char *name)
->         char elevator_name[ELV_NAME_MAX];
->         struct elevator_type *e;
->
-> -       /* Make sure queue is not in the middle of being removed */
-> -       if (!test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags))
-> -               return -ENOENT;
-> -
-
-The above check shouldn't be removed, as I explained above.
-
-
-
--- 
-Ming Lei
+T24gVHVlLCAyMDE4LTAxLTE2IGF0IDE3OjMyIC0wNTAwLCBNaWtlIFNuaXR6ZXIgd3JvdGU6DQo+
+IFRoZXJlZm9yZSBpdCBzZWVtcyB0byBtZSB0aGF0IGFsbCBxdWV1ZV9hdHRyX3tzaG93LHN0b3Jl
+fSBhcmUgcmFjZXkgdnMNCj4gYmxrX3VucmVnaXN0ZXJfcXVldWUoKSByZW1vdmluZyB0aGUgJ3F1
+ZXVlJyBrb2JqZWN0Lg0KPiANCj4gQW5kIGl0IHdhcyBqdXN0IHRoYXQgX19lbGV2YXRvcl9jaGFu
+Z2UoKSB3YXMgbXlvcGljbHkgZml4ZWQgdG8gYWRkcmVzcw0KPiB0aGUgcmFjZSB3aGVyZWFzIGEg
+bW9yZSBnZW5lcmljIHNvbHV0aW9uIHdhcy9pcyBuZWVkZWQuICBCdXQgc2hvcnQgb2YNCj4gdGhh
+dCBtb3JlIGdlbmVyaWMgZml4IHlvdXIgY2hhbmdlIHdpbGwgcmVpbnRyb2R1Y2UgdGhlIHBvdGVu
+dGlhbCBmb3INCj4gaGl0dGluZyB0aGUgaXNzdWUgdGhhdCBjb21taXQgZTlhODIzZmIzNGE4YiBm
+aXhlZC4NCj4gDQo+IEluIHRoYXQgbGlnaHQsIHRoaW5rIGl0IGJlc3QgdG8gbGVhdmUgYmxrX3Vu
+cmVnaXN0ZXJfcXVldWUoKSdzDQo+IG11dGV4X2xvY2soKSBhYm92ZSB0aGUgUVVFVUVfRkxBR19S
+RUdJU1RFUkVEIGNsZWFyaW5nIF9hbmRfIHVwZGF0ZQ0KPiBxdWV1ZV9hdHRyX3tzaG93LHN0b3Jl
+fSB0byB0ZXN0IGZvciBRVUVVRV9GTEFHX1JFR0lTVEVSRUQgd2hpbGUgaG9sZGluZw0KPiBzeXNm
+c19sb2NrLg0KPiANCj4gVGhlbiByZW1vdmUgdGhlIHVuaWNvcm4gdGVzdF9iaXQgZm9yIFFVRVVF
+X0ZMQUdfUkVHSVNURVJFRCBmcm9tDQo+IF9fZWxldmF0b3JfY2hhbmdlKCkuDQoNClRoYW5rcyBN
+aWtlIGZvciB0aGUgZmVlZGJhY2suIEhvd2V2ZXIsIEkgdGhpbmsgYSBzaW1wbGVyIGFwcHJvYWNo
+IGV4aXN0cyB0aGFuDQp3aGF0IGhhcyBiZWVuIGRlc2NyaWJlZCBhYm92ZSwgbmFtZWx5IGJ5IHVu
+cmVnaXN0ZXJpbmcgdGhlIHN5c2ZzIGF0dHJpYnV0ZXMNCmVhcmxpZXIuIEhvdyBhYm91dCB0aGUg
+cGF0Y2ggYmVsb3c/DQoNCltQQVRDSF0gYmxvY2s6IFByb3RlY3QgbGVzcyBjb2RlIHdpdGggc3lz
+ZnNfbG9jayBpbiBibGtfe3VuLH1yZWdpc3Rlcl9xdWV1ZSgpDQotLS0NCiBibG9jay9ibGstc3lz
+ZnMuYyB8IDM5ICsrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLQ0KIGJsb2Nr
+L2VsZXZhdG9yLmMgIHwgIDQgLS0tLQ0KIDIgZmlsZXMgY2hhbmdlZCwgMjYgaW5zZXJ0aW9ucygr
+KSwgMTcgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS9ibG9jay9ibGstc3lzZnMuYyBiL2Js
+b2NrL2Jsay1zeXNmcy5jDQppbmRleCA0YTZhNDBmZmQ3OGUuLmNlMzIzNjZjNmRiNyAxMDA2NDQN
+Ci0tLSBhL2Jsb2NrL2Jsay1zeXNmcy5jDQorKysgYi9ibG9jay9ibGstc3lzZnMuYw0KQEAgLTg1
+Myw2ICs4NTMsMTAgQEAgc3RydWN0IGtvYmpfdHlwZSBibGtfcXVldWVfa3R5cGUgPSB7DQogCS5y
+ZWxlYXNlCT0gYmxrX3JlbGVhc2VfcXVldWUsDQogfTsNCiANCisvKioNCisgKiBibGtfcmVnaXN0
+ZXJfcXVldWUgLSByZWdpc3RlciBhIGJsb2NrIGxheWVyIHF1ZXVlIHdpdGggc3lzZnMNCisgKiBA
+ZGlzazogRGlzayBvZiB3aGljaCB0aGUgcmVxdWVzdCBxdWV1ZSBzaG91bGQgYmUgcmVnaXN0ZXJl
+ZCB3aXRoIHN5c2ZzLg0KKyAqLw0KIGludCBibGtfcmVnaXN0ZXJfcXVldWUoc3RydWN0IGdlbmRp
+c2sgKmRpc2spDQogew0KIAlpbnQgcmV0Ow0KQEAgLTkwOSwxMSArOTEzLDEyIEBAIGludCBibGtf
+cmVnaXN0ZXJfcXVldWUoc3RydWN0IGdlbmRpc2sgKmRpc2spDQogCWlmIChxLT5yZXF1ZXN0X2Zu
+IHx8IChxLT5tcV9vcHMgJiYgcS0+ZWxldmF0b3IpKSB7DQogCQlyZXQgPSBlbHZfcmVnaXN0ZXJf
+cXVldWUocSk7DQogCQlpZiAocmV0KSB7DQorCQkJbXV0ZXhfdW5sb2NrKCZxLT5zeXNmc19sb2Nr
+KTsNCiAJCQlrb2JqZWN0X3VldmVudCgmcS0+a29iaiwgS09CSl9SRU1PVkUpOw0KIAkJCWtvYmpl
+Y3RfZGVsKCZxLT5rb2JqKTsNCiAJCQlibGtfdHJhY2VfcmVtb3ZlX3N5c2ZzKGRldik7DQogCQkJ
+a29iamVjdF9wdXQoJmRldi0+a29iaik7DQotCQkJZ290byB1bmxvY2s7DQorCQkJcmV0dXJuIHJl
+dDsNCiAJCX0NCiAJfQ0KIAlyZXQgPSAwOw0KQEAgLTkyMyw2ICs5MjgsMTMgQEAgaW50IGJsa19y
+ZWdpc3Rlcl9xdWV1ZShzdHJ1Y3QgZ2VuZGlzayAqZGlzaykNCiB9DQogRVhQT1JUX1NZTUJPTF9H
+UEwoYmxrX3JlZ2lzdGVyX3F1ZXVlKTsNCiANCisvKioNCisgKiBibGtfdW5yZWdpc3Rlcl9xdWV1
+ZSAtIGNvdW50ZXJwYXJ0IG9mIGJsa19yZWdpc3Rlcl9xdWV1ZSgpDQorICogQGRpc2s6IERpc2sg
+b2Ygd2hpY2ggdGhlIHJlcXVlc3QgcXVldWUgc2hvdWxkIGJlIHVucmVnaXN0ZXJlZCBmcm9tIHN5
+c2ZzLg0KKyAqDQorICogTm90ZTogdGhlIGNhbGxlciBpcyByZXNwb25zaWJsZSBmb3IgZ3VhcmFu
+dGVlaW5nIHRoYXQgdGhpcyBmdW5jdGlvbiBpcyBjYWxsZWQNCisgKiBhZnRlciBibGtfcmVnaXN0
+ZXJfcXVldWUoKSBoYXMgZmluaXNoZWQuDQorICovDQogdm9pZCBibGtfdW5yZWdpc3Rlcl9xdWV1
+ZShzdHJ1Y3QgZ2VuZGlzayAqZGlzaykNCiB7DQogCXN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxID0g
+ZGlzay0+cXVldWU7DQpAQCAtOTM0LDI4ICs5NDYsMjkgQEAgdm9pZCBibGtfdW5yZWdpc3Rlcl9x
+dWV1ZShzdHJ1Y3QgZ2VuZGlzayAqZGlzaykNCiAJaWYgKCF0ZXN0X2JpdChRVUVVRV9GTEFHX1JF
+R0lTVEVSRUQsICZxLT5xdWV1ZV9mbGFncykpDQogCQlyZXR1cm47DQogDQotCS8qDQotCSAqIFBy
+b3RlY3QgYWdhaW5zdCB0aGUgJ3F1ZXVlJyBrb2JqIGJlaW5nIGFjY2Vzc2VkDQotCSAqIHdoaWxl
+L2FmdGVyIGl0IGlzIHJlbW92ZWQuDQotCSAqLw0KLQltdXRleF9sb2NrKCZxLT5zeXNmc19sb2Nr
+KTsNCi0NCiAJc3Bpbl9sb2NrX2lycShxLT5xdWV1ZV9sb2NrKTsNCiAJcXVldWVfZmxhZ19jbGVh
+cihRVUVVRV9GTEFHX1JFR0lTVEVSRUQsIHEpOw0KIAlzcGluX3VubG9ja19pcnEocS0+cXVldWVf
+bG9jayk7DQogDQotCXdidF9leGl0KHEpOw0KLQ0KKwkvKg0KKwkgKiBSZW1vdmUgdGhlIHN5c2Zz
+IGF0dHJpYnV0ZXMgYmVmb3JlIHVucmVnaXN0ZXJpbmcgdGhlIHF1ZXVlIGRhdGENCisJICogc3Ry
+dWN0dXJlcyB0aGF0IGNhbiBiZSBtb2RpZmllZCB0aHJvdWdoIHN5c2ZzLg0KKwkgKi8NCisJbXV0
+ZXhfbG9jaygmcS0+c3lzZnNfbG9jayk7DQogCWlmIChxLT5tcV9vcHMpDQogCQlibGtfbXFfdW5y
+ZWdpc3Rlcl9kZXYoZGlza190b19kZXYoZGlzayksIHEpOw0KLQ0KLQlpZiAocS0+cmVxdWVzdF9m
+biB8fCAocS0+bXFfb3BzICYmIHEtPmVsZXZhdG9yKSkNCi0JCWVsdl91bnJlZ2lzdGVyX3F1ZXVl
+KHEpOw0KKwltdXRleF91bmxvY2soJnEtPnN5c2ZzX2xvY2spOw0KIA0KIAlrb2JqZWN0X3VldmVu
+dCgmcS0+a29iaiwgS09CSl9SRU1PVkUpOw0KIAlrb2JqZWN0X2RlbCgmcS0+a29iaik7DQogCWJs
+a190cmFjZV9yZW1vdmVfc3lzZnMoZGlza190b19kZXYoZGlzaykpOw0KLQlrb2JqZWN0X3B1dCgm
+ZGlza190b19kZXYoZGlzayktPmtvYmopOw0KIA0KKwl3YnRfZXhpdChxKTsNCisNCisJbXV0ZXhf
+bG9jaygmcS0+c3lzZnNfbG9jayk7DQorCWlmIChxLT5yZXF1ZXN0X2ZuIHx8IChxLT5tcV9vcHMg
+JiYgcS0+ZWxldmF0b3IpKQ0KKwkJZWx2X3VucmVnaXN0ZXJfcXVldWUocSk7DQogCW11dGV4X3Vu
+bG9jaygmcS0+c3lzZnNfbG9jayk7DQorDQorCWtvYmplY3RfcHV0KCZkaXNrX3RvX2RldihkaXNr
+KS0+a29iaik7DQogfQ0KZGlmZiAtLWdpdCBhL2Jsb2NrL2VsZXZhdG9yLmMgYi9ibG9jay9lbGV2
+YXRvci5jDQppbmRleCBlODdlOWI0M2FiYTAuLjRiNzk1N2IyOGE5OSAxMDA2NDQNCi0tLSBhL2Js
+b2NrL2VsZXZhdG9yLmMNCisrKyBiL2Jsb2NrL2VsZXZhdG9yLmMNCkBAIC0xMDgwLDEwICsxMDgw
+LDYgQEAgc3RhdGljIGludCBfX2VsZXZhdG9yX2NoYW5nZShzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAq
+cSwgY29uc3QgY2hhciAqbmFtZSkNCiAJY2hhciBlbGV2YXRvcl9uYW1lW0VMVl9OQU1FX01BWF07
+DQogCXN0cnVjdCBlbGV2YXRvcl90eXBlICplOw0KIA0KLQkvKiBNYWtlIHN1cmUgcXVldWUgaXMg
+bm90IGluIHRoZSBtaWRkbGUgb2YgYmVpbmcgcmVtb3ZlZCAqLw0KLQlpZiAoIXRlc3RfYml0KFFV
+RVVFX0ZMQUdfUkVHSVNURVJFRCwgJnEtPnF1ZXVlX2ZsYWdzKSkNCi0JCXJldHVybiAtRU5PRU5U
+Ow0KLQ0KIAkvKg0KIAkgKiBTcGVjaWFsIGNhc2UgZm9yIG1xLCB0dXJuIG9mZiBzY2hlZHVsaW5n
+DQogCSAqLw0KLS0gDQoyLjE1LjENCg==
