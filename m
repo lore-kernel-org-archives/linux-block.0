@@ -1,161 +1,103 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mxhk.zte.com.cn ([63.217.80.70]:36802 "EHLO mxhk.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752178AbeAZIVp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Jan 2018 03:21:45 -0500
-From: tang.junhui@zte.com.cn
-To: colyli@suse.de, mlyle@lyle.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        tang.junhui@zte.com.cn
-Subject: [PATCH 2/2] bcache: fix high CPU occupancy during journal
-Date: Fri, 26 Jan 2018 16:24:10 +0800
-Message-Id: <1516955050-6271-1-git-send-email-tang.junhui@zte.com.cn>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+Date: Thu, 18 Jan 2018 11:44:47 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: axboe@kernel.dk, Ming Lei <tom.leiming@gmail.com>, hch@lst.de,
+	dm-devel@redhat.com, linux-block@vger.kernel.org
+Subject: Re: [for-4.16 PATCH v6 2/3] blk-mq: improve DM's blk-mq IO merging
+ via blk_insert_cloned_request feedback
+Message-ID: <20180118034446.GD11167@ming.t460p>
+References: <20180117162558.28553-1-snitzer@redhat.com>
+ <20180117162558.28553-3-snitzer@redhat.com>
+ <20180118032509.GB11167@ming.t460p>
+ <20180118033723.GA8475@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180118033723.GA8475@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+On Wed, Jan 17, 2018 at 10:37:23PM -0500, Mike Snitzer wrote:
+> On Wed, Jan 17 2018 at 10:25pm -0500,
+> Ming Lei <ming.lei@redhat.com> wrote:
+> 
+> > Hi Mike,
+> > 
+> > On Wed, Jan 17, 2018 at 11:25:57AM -0500, Mike Snitzer wrote:
+> > > From: Ming Lei <ming.lei@redhat.com>
+> > > 
+> > > blk_insert_cloned_request() is called in the fast path of a dm-rq driver
+> > > (e.g. blk-mq request-based DM mpath).  blk_insert_cloned_request() uses
+> > > blk_mq_request_bypass_insert() to directly append the request to the
+> > > blk-mq hctx->dispatch_list of the underlying queue.
+> > > 
+> > > 1) This way isn't efficient enough because the hctx spinlock is always
+> > > used.
+> > > 
+> > > 2) With blk_insert_cloned_request(), we completely bypass underlying
+> > > queue's elevator and depend on the upper-level dm-rq driver's elevator
+> > > to schedule IO.  But dm-rq currently can't get the underlying queue's
+> > > dispatch feedback at all.  Without knowing whether a request was issued
+> > > or not (e.g. due to underlying queue being busy) the dm-rq elevator will
+> > > not be able to provide effective IO merging (as a side-effect of dm-rq
+> > > currently blindly destaging a request from its elevator only to requeue
+> > > it after a delay, which kills any opportunity for merging).  This
+> > > obviously causes very bad sequential IO performance.
+> > > 
+> > > Fix this by updating blk_insert_cloned_request() to use
+> > > blk_mq_request_direct_issue().  blk_mq_request_direct_issue() allows a
+> > > request to be issued directly to the underlying queue and returns the
+> > > dispatch feedback (blk_status_t).  If blk_mq_request_direct_issue()
+> > > returns BLK_SYS_RESOURCE the dm-rq driver will now use DM_MAPIO_REQUEUE
+> > > to _not_ destage the request.  Whereby preserving the opportunity to
+> > > merge IO.
+> > > 
+> > > With this, request-based DM's blk-mq sequential IO performance is vastly
+> > > improved (as much as 3X in mpath/virtio-scsi testing).
+> > > 
+> > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > > [blk-mq.c changes heavily influenced by Ming Lei's initial solution, but
+> > > they were refactored to make them less fragile and easier to read/review]
+> > > Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+> ...
+> > > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > > index c117c2baf2c9..f5f0d8456713 100644
+> > > --- a/block/blk-mq.c
+> > > +++ b/block/blk-mq.c
+> > > @@ -1731,15 +1731,19 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
+> > >  
+> > >  static void __blk_mq_fallback_to_insert(struct blk_mq_hw_ctx *hctx,
+> > >  					struct request *rq,
+> > > -					bool run_queue)
+> > > +					bool run_queue, bool bypass_insert)
+> > >  {
+> > > -	blk_mq_sched_insert_request(rq, false, run_queue, false,
+> > > -					hctx->flags & BLK_MQ_F_BLOCKING);
+> > > +	if (!bypass_insert)
+> > > +		blk_mq_sched_insert_request(rq, false, run_queue, false,
+> > > +					    hctx->flags & BLK_MQ_F_BLOCKING);
+> > > +	else
+> > > +		blk_mq_request_bypass_insert(rq, run_queue);
+> > >  }
+> > 
+> > If 'bypass_insert' is true, we don't need to insert the request into
+> > hctx->dispatch_list for dm-rq, then it causes the issue(use after free)
+> > reported by Bart and Laurence.
+> > 
+> > Also this way is the exact opposite of the idea of the improvement,
+> > we do not want to dispatch request if underlying queue is busy.
+> 
+> Yeap, please see the patch I just posted to fix it.
 
-After long time small writing I/O running, we found the occupancy of CPU
-is very high and I/O performance has been reduced by about half:
+Looks your patch is a bit complicated, then __blk_mq_fallback_to_insert()
+can be removed.
 
-[root@ceph151 internal]# top
-top - 15:51:05 up 1 day,2:43,  4 users,  load average: 16.89, 15.15, 16.53
-Tasks: 2063 total,   4 running, 2059 sleeping,   0 stopped,   0 zombie
-%Cpu(s):4.3 us, 17.1 sy 0.0 ni, 66.1 id, 12.0 wa,  0.0 hi,  0.5 si,  0.0 st
-KiB Mem : 65450044 total, 24586420 free, 38909008 used,  1954616 buff/cache
-KiB Swap: 65667068 total, 65667068 free,        0 used. 25136812 avail Mem
+> 
+> But your v4 does fallback to using blk_mq_request_bypass_insert() as
+> well, just in a much narrower case -- specifically:
+>        if (blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q))
 
-  PID USER PR NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
- 2023 root 20  0       0      0      0 S 55.1  0.0   0:04.42 kworker/11:191
-14126 root 20  0       0      0      0 S 42.9  0.0   0:08.72 kworker/10:3
- 9292 root 20  0       0      0      0 S 30.4  0.0   1:10.99 kworker/6:1   
- 8553 ceph 20  0 4242492 1.805g  18804 S 30.0  2.9 410:07.04 ceph-osd
-12287 root 20  0       0      0      0 S 26.7  0.0   0:28.13 kworker/7:85
-31019 root 20  0       0      0      0 S 26.1  0.0   1:30.79 kworker/22:1
- 1787 root 20  0       0      0      0 R 25.7  0.0   5:18.45 kworker/8:7
-32169 root 20  0       0      0      0 S 14.5  0.0   1:01.92 kworker/23:1
-21476 root 20  0       0      0      0 S 13.9  0.0   0:05.09 kworker/1:54
- 2204 root 20  0       0      0      0 S 12.5  0.0   1:25.17 kworker/9:10
-16994 root 20  0       0      0      0 S 12.2  0.0   0:06.27 kworker/5:106
-15714 root 20  0       0      0      0 R 10.9  0.0   0:01.85 kworker/19:2
- 9661 ceph 20  0 4246876 1.731g  18800 S 10.6  2.8 403:00.80 ceph-osd
-11460 ceph 20  0 4164692 2.206g  18876 S 10.6  3.5 360:27.19 ceph-osd
- 9960 root 20  0       0      0      0 S 10.2  0.0   0:02.75 kworker/2:139
-11699 ceph 20  0 4169244 1.920g  18920 S 10.2  3.1 355:23.67 ceph-osd
- 6843 ceph 20  0 4197632 1.810g  18900 S  9.6  2.9 380:08.30 ceph-osd
+Yeah, I just found it, and you can add 'bypass_insert = false' under
+condition.
 
-The kernel work consumed a lot of CPU, and I found they are running journal
-work, The journal is reclaiming source and flush btree node with surprising
-frequency.
-
-Through further analysis, we found that in btree_flush_write(), we try to
-get a btree node with the smallest fifo idex to flush by traverse all the
-btree nodein c->bucket_hash, after we getting it, since no locker protects
-it, this btree node may have been written to cache device by other works,
-and if this occurred, we retry to traverse in c->bucket_hash and get
-another btree node. When the problem occurrd, the retry times is very high,
-and we consume a lot of CPU in looking for a appropriate btree node.
-
-In this patch, we try to record 128 btree nodes with the smallest fifo idex
-in heap, and pop one by one when we need to flush btree node. It greatly
-reduces the time for the loop to find the appropriate BTREE node, and also
-reduce the occupancy of CPU.
-
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
----
- drivers/md/bcache/bcache.h  |  2 ++
- drivers/md/bcache/journal.c | 47 ++++++++++++++++++++++++++++++---------------
- 2 files changed, 34 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 0432e28..b343ba4 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -669,6 +669,8 @@ struct cache_set {
- 
- #define BUCKET_HASH_BITS	12
- 	struct hlist_head	bucket_hash[1 << BUCKET_HASH_BITS];
-+
-+	DECLARE_HEAP(struct btree *, flush_btree);
- };
- 
- struct bbio {
-diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
-index 47fd0b8..f42d3ea 100644
---- a/drivers/md/bcache/journal.c
-+++ b/drivers/md/bcache/journal.c
-@@ -363,6 +363,12 @@ int bch_journal_replay(struct cache_set *s, struct list_head *list)
- }
- 
- /* Journalling */
-+#define journal_max_cmp(l, r) \
-+	(fifo_idx(&c->journal.pin, btree_current_write(l)->journal) < \
-+	 fifo_idx(&(c)->journal.pin, btree_current_write(r)->journal))
-+#define journal_min_cmp(l, r) \
-+	(fifo_idx(&c->journal.pin, btree_current_write(l)->journal) > \
-+	 fifo_idx(&(c)->journal.pin, btree_current_write(r)->journal))
- 
- static void btree_flush_write(struct cache_set *c)
- {
-@@ -370,25 +376,35 @@ static void btree_flush_write(struct cache_set *c)
- 	 * Try to find the btree node with that references the oldest journal
- 	 * entry, best is our current candidate and is locked if non NULL:
- 	 */
--	struct btree *b, *best;
--	unsigned i;
-+	struct btree *b;
-+	int i;
- 
- 	atomic_long_inc(&c->flush_write);
-+
- retry:
--	best = NULL;
--
--	for_each_cached_btree(b, c, i)
--		if (btree_current_write(b)->journal) {
--			if (!best)
--				best = b;
--			else if (journal_pin_cmp(c,
--					btree_current_write(best)->journal,
--					btree_current_write(b)->journal)) {
--				best = b;
-+	spin_lock(&c->journal.lock);
-+	if (heap_empty(&c->flush_btree)) {
-+		for_each_cached_btree(b, c, i)
-+			if (btree_current_write(b)->journal) {
-+				if (!heap_full(&c->flush_btree))
-+					heap_add(&c->flush_btree, b,
-+						 journal_max_cmp);
-+				else if (journal_max_cmp(b,
-+					 heap_peek(&c->flush_btree))) {
-+					c->flush_btree.data[0] = b;
-+					heap_sift(&c->flush_btree, 0,
-+						  journal_max_cmp);
-+				}
- 			}
--		}
- 
--	b = best;
-+		for (i = c->flush_btree.used / 2 - 1; i >= 0; --i)
-+			heap_sift(&c->flush_btree, i, journal_min_cmp);
-+	}
-+
-+	b = NULL;
-+	heap_pop(&c->flush_btree, b, journal_min_cmp);
-+	spin_unlock(&c->journal.lock);
-+
- 	if (b) {
- 		mutex_lock(&b->write_lock);
- 		if (!btree_current_write(b)->journal) {
-@@ -819,7 +835,8 @@ int bch_journal_alloc(struct cache_set *c)
- 	j->w[0].c = c;
- 	j->w[1].c = c;
- 
--	if (!(init_fifo(&j->pin, JOURNAL_PIN, GFP_KERNEL)) ||
-+	if (!(init_heap(&c->flush_btree, 128, GFP_KERNEL)) ||
-+	    !(init_fifo(&j->pin, JOURNAL_PIN, GFP_KERNEL)) ||
- 	    !(j->w[0].data = (void *) __get_free_pages(GFP_KERNEL, JSET_BITS)) ||
- 	    !(j->w[1].data = (void *) __get_free_pages(GFP_KERNEL, JSET_BITS)))
- 		return -ENOMEM;
 -- 
-1.8.3.1
+Ming
