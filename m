@@ -1,92 +1,65 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35656 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1750955AbeAVMC5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Jan 2018 07:02:57 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id w0MC2AfN146605
-        for <linux-block@vger.kernel.org>; Mon, 22 Jan 2018 07:02:57 -0500
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2fne8juf4h-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 22 Jan 2018 07:02:56 -0500
-Received: from localhost
-        by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <rppt@linux.vnet.ibm.com>;
-        Mon, 22 Jan 2018 12:02:54 -0000
-Date: Mon, 22 Jan 2018 14:02:48 +0200
-From: Mike Rapoport <rppt@linux.vnet.ibm.com>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Ming Lei <tom.leiming@gmail.com>,
-        lsf-pc@lists.linux-foundation.org, linux-mm <linux-mm@kvack.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-Subject: Re: [LSF/MM TOPIC] A high-performance userspace block driver
-References: <20180116145240.GD30073@bombadil.infradead.org>
- <CACVXFVPqJ6xYq31Ve5tXCKiNne_S1ve8csA+j_wCPnnZCPahvg@mail.gmail.com>
- <20180117212144.GD25862@bombadil.infradead.org>
+Return-Path: <lsf-pc-bounces@lists.linux-foundation.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180117212144.GD25862@bombadil.infradead.org>
-Message-Id: <20180122120248.GB7984@rapoport-lnx>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180116145240.GD30073@bombadil.infradead.org>
+References: <20180116145240.GD30073@bombadil.infradead.org>
+From: "Figo.zhang" <figo1802@gmail.com>
+Date: Thu, 18 Jan 2018 13:27:24 +0800
+Message-ID: <CAF7GXvonnUNGMWXnR1gM0LhqQ_gjktcv50V7WGdBtbufbc-8eg@mail.gmail.com>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	Linux MM <linux-mm@kvack.org>, lsf-pc@lists.linux-foundation.org,
+	linux-block@vger.kernel.org
+Subject: Re: [Lsf-pc] [LSF/MM TOPIC] A high-performance userspace block
+	driver
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/lsf-pc>,
+	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=unsubscribe>
+List-Archive: <https://lists.linuxfoundation.org/mailman/private/lsf-pc/>
+List-Post: <mailto:lsf-pc@lists.linux-foundation.org>
+List-Help: <mailto:lsf-pc-request@lists.linux-foundation.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/lsf-pc>,
+	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=subscribe>
+Content-Type: text/plain; charset="utf-8"
+Sender: lsf-pc-bounces@lists.linux-foundation.org
+Errors-To: lsf-pc-bounces@lists.linux-foundation.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Jan 17, 2018 at 01:21:44PM -0800, Matthew Wilcox wrote:
-> On Wed, Jan 17, 2018 at 10:49:24AM +0800, Ming Lei wrote:
-> > Userfaultfd might be another choice:
-> > 
-> > 1) map the block LBA space into a range of process vm space
-> 
-> That would limit the size of a block device to ~200TB (with my laptop's
-> CPU).  That's probably OK for most users, but I suspect there are some
-> who would chafe at such a restriction (before the 57-bit CPUs arrive).
-> 
-> > 2) when READ/WRITE req comes, convert it to page fault on the
-> > mapped range, and let userland to take control of it, and meantime
-> > kernel req context is slept
-> 
-> You don't want to sleep the request; you want it to be able to submit
-> more I/O.  But we have infrastructure in place to inform the submitter
-> when I/Os have completed.
-
-It's possible to queue IO requests and have a kthread that will convert
-those requests to page faults. The thread indeed will sleep on each page
-fault, though.
- 
-> > 3) IO req context in kernel side is waken up after userspace completed
-> > the IO request via userfaultfd
-> > 
-> > 4) kernel side continue to complete the IO, such as copying page from
-> > storage range to req(bio) pages.
-> > 
-> > Seems READ should be fine since it is very similar with the use case
-> > of QEMU postcopy live migration, WRITE can be a bit different, and
-> > maybe need some change on userfaultfd.
-> 
-> I like this idea, and maybe extending UFFD is the way to solve this
-> problem.  Perhaps I should explain a little more what the requirements
-> are.  At the point the driver gets the I/O, pages to copy data into (for
-> a read) or copy data from (for a write) have already been allocated.
-> At all costs, we need to avoid playing VM tricks (because TLB flushes
-> are expensive).  So one copy is probably OK, but we'd like to avoid it
-> if reasonable.
-> 
-> Let's assume that the userspace program looks at the request metadata and
-> decides that it needs to send a network request.  Ideally, it would find
-> a way to have the data from the response land in the pre-allocated pages
-> (for a read) or send the data straight from the pages in the request
-> (for a write).  I'm not sure UFFD helps us with that part of the problem.
-
-As of now it does not. UFFD allocates pages when userland asks to copy the
-data into UFFD controlled VMA.
-In your example, after the data had arrives from the network userland it
-can be copied into a page UFFD will allocate.
-
-Unrelated to block device, I've been thinking of implementing splice for
-userfaultfd...
-
--- 
-Sincerely yours,
-Mike.
+MjAxOC0wMS0xNiAyMjo1MiBHTVQrMDg6MDAgTWF0dGhldyBXaWxjb3ggPHdpbGx5QGluZnJhZGVh
+ZC5vcmc+OgoKPgo+IEkgc2VlIHRoZSBpbXByb3ZlbWVudHMgdGhhdCBGYWNlYm9vayBoYXZlIGJl
+ZW4gbWFraW5nIHRvIHRoZSBuYmQgZHJpdmVyLAo+IGFuZCBJIHRoaW5rIHRoYXQncyBhIHdvbmRl
+cmZ1bCB0aGluZy4gIE1heWJlIHRoZSBvdXRjb21lIG9mIHRoaXMgdG9waWMKPiBpcyBzaW1wbHk6
+ICJTaHV0IHVwLCBNYXR0aGV3LCB0aGlzIGlzIGdvb2QgZW5vdWdoIi4KPgo+IEl0J3MgY2xlYXIg
+dGhhdCB0aGVyZSdzIGFuIGFwcGV0aXRlIGZvciB1c2Vyc3BhY2UgYmxvY2sgZGV2aWNlczsgbm90
+IGZvcgo+IHN3YXAgZGV2aWNlcyBvciB0aGUgcm9vdCBkZXZpY2UsIGJ1dCBmb3IgYWNjZXNzaW5n
+IGRhdGEgdGhhdCdzIHN0b3JlZAo+IGluIHRoYXQgc2lsbyBvdmVyIHRoZXJlLCBhbmQgSSByZWFs
+bHkgZG9uJ3Qgd2FudCB0byBicmluZyB0aGF0IGVudGlyZQo+IG1lc3Mgb2YgQ09SQkEgLyBHbyAv
+IFJ1c3QgLyB3aGF0ZXZlciBpbnRvIHRoZSBrZXJuZWwgdG8gZ2V0IHRvIGl0LAo+IGJ1dCBpdCB3
+b3VsZCBiZSByZWFsbHkgaGFuZHkgdG8gcHJlc2VudCBpdCBhcyBhIGJsb2NrIGRldmljZS4KPgo+
+IEkndmUgbG9va2VkIGF0IGEgZmV3IGJsb2NrLWRyaXZlci1pbi11c2Vyc3BhY2UgcHJvamVjdHMg
+dGhhdCBleGlzdCwgYW5kCj4gdGhleSBhbGwgc2VlbSBwcmV0dHkgYmFkLgoKCmhvdyBhYm91dCB0
+aGUgU1BES++8nwoKCj4gRm9yIGV4YW1wbGUsIG9uZSBBUEkgbWFwcyBhIGZldyBnaWdhYnl0ZXMg
+b2YKPiBhZGRyZXNzIHNwYWNlIGFuZCBwbGF5cyBnYW1lcyB3aXRoIHZtX2luc2VydF9wYWdlKCkg
+dG8gcHV0IHBhZ2UgY2FjaGUKPiBwYWdlcyBpbnRvIHRoZSBhZGRyZXNzIHNwYWNlIG9mIHRoZSBj
+bGllbnQgcHJvY2Vzcy4gIE9mIGNvdXJzZSwgdGhlIFRMQgo+IGZsdXNoIG92ZXJoZWFkIG9mIHRo
+YXQgc29sdXRpb24gaXMgY3JpbWluYWwuCj4KPiBJJ3ZlIGxvb2tlZCBhdCBwaXBlcywgYW5kIHRo
+ZXkncmUgbm90IGFuIGF3ZnVsIHNvbHV0aW9uLiAgV2UndmUgYWxtb3N0Cj4gZ290IGVub3VnaCBz
+eXNjYWxscyB0byB0cmVhdCBvdGhlciBvYmplY3RzIGFzIHBpcGVzLiAgVGhlIHByb2JsZW0gaXMK
+PiB0aGF0IHRoZXkncmUgbm90IHNlZWthYmxlLiAgU28gZXNzZW50aWFsbHkgeW91J3JlIGxvb2tp
+bmcgYXQgaGF2aW5nIG9uZQo+IHBpcGUgcGVyIG91dHN0YW5kaW5nIGNvbW1hbmQuICBJZiB5dSB3
+YW50IHRvIG1ha2UgZ29vZCB1c2Ugb2YgYSBtb2Rlcm4KPiBOQU5EIGRldmljZSwgeW91IHdhbnQg
+YSBmZXcgaHVuZHJlZCBvdXRzdGFuZGluZyBjb21tYW5kcywgYW5kIHRoYXQncyBhCj4gYml0IG9m
+IGEgc2hvZGR5IGludGVyZmFjZS4KPgo+IFJpZ2h0IG5vdywgSSdtIGxlYW5pbmcgdG93YXJkcyBj
+b21iaW5pbmcgdGhlc2UgdHdvIGFwcHJvYWNoZXM7IGFkZGluZwo+IGEgVk1fTk9UTEIgZmxhZyBz
+byB0aGUgbW1hcGVkIGJpdHMgb2YgdGhlIHBhZ2UgY2FjaGUgbmV2ZXIgbWFrZSBpdCBpbnRvCj4g
+dGhlIHByb2Nlc3MncyBhZGRyZXNzIHNwYWNlLCBzbyB0aGUgVExCIHNob290ZG93biBjYW4gYmUg
+c2FmZWx5IHNraXBwZWQuCj4gVGhlbiBjaGVjayBpdCBpbiBmb2xsb3dfcGFnZV9tYXNrKCkgYW5k
+IHJldHVybiB0aGUgYXBwcm9wcmlhdGUgc3RydWN0Cj4gcGFnZS4gIEFzIGxvbmcgYXMgdGhlIHVz
+ZXJzcGFjZSBwcm9jZXNzIGRvZXMgZXZlcnl0aGluZyB1c2luZyBPX0RJUkVDVCwKPiBJIHRoaW5r
+IHRoaXMgd2lsbCB3b3JrLgo+Cj4gSXQncyBlaXRoZXIgdGhhdCBvciBtYWtlIHBpcGVzIHNlZWth
+YmxlIC4uLgo+Cj4gLS0KPiBUbyB1bnN1YnNjcmliZSwgc2VuZCBhIG1lc3NhZ2Ugd2l0aCAndW5z
+dWJzY3JpYmUgbGludXgtbW0nIGluCj4gdGhlIGJvZHkgdG8gbWFqb3Jkb21vQGt2YWNrLm9yZy4g
+IEZvciBtb3JlIGluZm8gb24gTGludXggTU0sCj4gc2VlOiBodHRwOi8vd3d3LmxpbnV4LW1tLm9y
+Zy8gLgo+IERvbid0IGVtYWlsOiA8YSBocmVmPW1haWx0bzoiZG9udEBrdmFjay5vcmciPiBlbWFp
+bEBrdmFjay5vcmcgPC9hPgo+Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fCkxzZi1wYyBtYWlsaW5nIGxpc3QKTHNmLXBjQGxpc3RzLmxpbnV4LWZvdW5kYXRp
+b24ub3JnCmh0dHBzOi8vbGlzdHMubGludXhmb3VuZGF0aW9uLm9yZy9tYWlsbWFuL2xpc3RpbmZv
+L2xzZi1wYwo=
