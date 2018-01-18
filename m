@@ -1,64 +1,45 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:52662 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755361AbeASALv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Jan 2018 19:11:51 -0500
-Date: Fri, 19 Jan 2018 08:11:37 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] dm rq: Avoid that request processing stalls sporadically
-Message-ID: <20180119001136.GA4712@ming.t460p>
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:27209 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755200AbeARRN4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 18 Jan 2018 12:13:56 -0500
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "snitzer@redhat.com" <snitzer@redhat.com>
+CC: "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+Subject: Re: dm rq: Avoid that request processing stalls sporadically
+Date: Thu, 18 Jan 2018 17:13:53 +0000
+Message-ID: <1516295632.2676.16.camel@wdc.com>
 References: <20180118163707.11825-1-bart.vanassche@wdc.com>
+         <20180118165050.GA19734@redhat.com>
+In-Reply-To: <20180118165050.GA19734@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180118163707.11825-1-bart.vanassche@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Thu, Jan 18, 2018 at 08:37:07AM -0800, Bart Van Assche wrote:
-> If the .queue_rq() implementation of a block driver returns
-> BLK_STS_RESOURCE then that block driver is responsible for
-> rerunning the queue once the condition that caused it to return
-> BLK_STS_RESOURCE has been cleared. The dm-mpath driver tells the
-> dm core to requeue a request if e.g. not enough memory is
-> available for cloning a request or if the underlying path is
-> busy. Since the dm-mpath driver does not receive any kind of
-> notification if the condition that caused it to return "requeue"
-> is cleared, the only solution to avoid that dm-mpath request
-> processing stalls is to call blk_mq_delay_run_hw_queue(). Hence
-> this patch.
-> 
-> Fixes: ec3eaf9a6731 ("dm mpath: don't call blk_mq_delay_run_hw_queue() in case of BLK_STS_RESOURCE")
-> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> ---
->  drivers/md/dm-rq.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-> index f16096af879a..c59c59cfd2a5 100644
-> --- a/drivers/md/dm-rq.c
-> +++ b/drivers/md/dm-rq.c
-> @@ -761,6 +761,7 @@ static blk_status_t dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
->  		/* Undo dm_start_request() before requeuing */
->  		rq_end_stats(md, rq);
->  		rq_completed(md, rq_data_dir(rq), false);
-> +		blk_mq_delay_run_hw_queue(hctx, 100/*ms*/);
->  		return BLK_STS_RESOURCE;
->  	}
->  
-
-Nak.
-
-It still takes a bit time to add this request to hctx->dispatch_list
-from here, so suppose the time is longer than 100ms because of interrupt
-, preemption or whatever, this request can't be observed in the scheduled
-run queue(__blk_mq_run_hw_queue).
-
-Not mention it is just a ugly workaround, which degrades performance
-a lot.
-
--- 
-Ming
+T24gVGh1LCAyMDE4LTAxLTE4IGF0IDExOjUwIC0wNTAwLCBNaWtlIFNuaXR6ZXIgd3JvdGU6DQo+
+IFRoZSBpc3N1ZSB5b3Ugc2F5IGl0IHdhcyBvcmlnaW5hbGx5IGludGVuZGVkIHRvIGZpeCBfc2hv
+dWxkXyBiZQ0KPiBhZGRyZXNzZWQgd2l0aCB0aGlzIGNoYW5nZToNCj4gaHR0cHM6Ly9naXQua2Vy
+bmVsLm9yZy9wdWIvc2NtL2xpbnV4L2tlcm5lbC9naXQvZGV2aWNlLW1hcHBlci9saW51eC1kbS5n
+aXQvY29tbWl0Lz9oPWRtLTQuMTYmaWQ9NGRkNmVkZDIzZTdlYTk3MWVmZGRjMzAzZjllNjdlYjc5
+ZTk1ODA4ZQ0KDQpIZWxsbyBNaWtlLA0KDQpTb3JyeSBidXQgSSdtIG5vdCBjb252aW5jZWQgdGhh
+dCB0aGF0IHBhdGNoIGlzIHN1ZmZpY2llbnQuIFRoYXQgcGF0Y2ggaGVscHMNCmlmIC5lbmRfaW8o
+KSBpcyBjYWxsZWQgd2l0aCBzdGF0dXMgQkxLX1NUU19SRVNPVVJDRSBhbmQgYWxzbyBpZg0KYmxr
+X2luc2VydF9jbG9uZWRfcmVxdWVzdCgpIHJldHVybnMgdGhlIC5xdWV1ZV9ycSgpIHJldHVybiB2
+YWx1ZS4gSXQgZG9lcyBub3QNCmhlbHAgaWYgLnF1ZXVlX3JxKCkgcmV0dXJucyBCTEtfU1RTX1JF
+U09VUkNFIGFuZCB0aGF0IHJldHVybiB2YWx1ZSBnZXRzDQppZ25vcmVkLiBJIHRoaW5rIHRoYXQg
+Y2FuIGhhcHBlbiBhcyBmb2xsb3dzOg0KLSBSZXF1ZXN0IGNsb25pbmcgaW4gbXVsdGlwYXRoX2Ns
+b25lX2FuZF9tYXAoKSBzdWNjZWVkcyBhbmQgdGhhdCBmdW5jdGlvbg0KICByZXR1cm5zIERNX01B
+UElPX1JFTUFQUEVELg0KLSBkbV9kaXNwYXRjaF9jbG9uZV9yZXF1ZXN0KCkgY2FsbHMgYmxrX2lu
+c2VydF9jbG9uZWRfcmVxdWVzdCgpLg0KLSBibGtfaW5zZXJ0X2Nsb25lZF9yZXF1ZXN0KCkgY2Fs
+bHMgYmxrX21xX3JlcXVlc3RfZGlyZWN0X2lzc3VlKCksIHdoaWNoDQogIHJlc3VsdHMgaW4gYSBj
+YWxsIG9mIF9fYmxrX21xX3RyeV9pc3N1ZV9kaXJlY3RseSgpLg0KLSBfX2Jsa19tcV90cnlfaXNz
+dWVfZGlyZWN0bHkoKSBjYWxscyBibGtfbXFfc2NoZWRfaW5zZXJ0X3JlcXVlc3QoKS4gSW4gdGhp
+cw0KICBjYXNlIHRoZSBCTEtfU1RTX1JFU09VUkNFIHJldHVybmVkIGJ5IHRoZSAucXVldWVfcnEo
+KSBpbXBsZW1lbnRhdGlvbiBvZiB0aGUNCiAgdW5kZXJseWluZyBwYXRoIHdpbGwgYmUgaWdub3Jl
+ZC4NCg0KUGxlYXNlIG5vdGUgdGhhdCBJIGhhdmUgbm90IHRyaWVkIHRvIGZpbmQgYWxsIHBhdGhz
+IHRoYXQgaWdub3JlIHRoZQ0KLnF1ZXVlX3JxKCkgcmV0dXJuIHZhbHVlLg0KDQpUaGFua3MsDQoN
+CkJhcnQu
