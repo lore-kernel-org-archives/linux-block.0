@@ -1,173 +1,49 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:35860 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751735AbeAaCHD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jan 2018 21:07:03 -0500
-Received: by mail-wm0-f66.google.com with SMTP id f3so4913201wmc.1
-        for <linux-block@vger.kernel.org>; Tue, 30 Jan 2018 18:07:02 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 2/5] lightnvm: pblk: check data lines version on recovery
-Date: Wed, 31 Jan 2018 03:06:48 +0100
-Message-Id: <1517364411-22386-2-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1517364411-22386-1-git-send-email-javier@cnexlabs.com>
-References: <1517364411-22386-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from out1.zte.com.cn ([202.103.147.172]:37838 "EHLO mxct.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752588AbeARGTC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 18 Jan 2018 01:19:02 -0500
+From: tang.junhui@zte.com.cn
+To: colyli@suse.de
+Cc: mlyle@lyle.org, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org, tang.junhui@zte.com.cn
+Subject: Re: [PATCH v2 06/12] bcache: set error_limit correctly  
+Date: Thu, 18 Jan 2018 14:20:29 +0800
+Message-Id: <1516256429-19225-1-git-send-email-tang.junhui@zte.com.cn>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-As a preparation for future bumps of data line persistent storage
-versions, we need to start checking the emeta line version during
-recovery. Also slit up the current emeta/smeta version into two
-bytes (major,minor).
+Hello Coly:
 
-Recovering lines with the same major number as the current pblk data
-line version must succeed. This means that any changes in the
-persistent format must be:
+>It is because of ca->set->error_decay. When error_decay is set, bcache
+>tries to do an exponential decay for error count. That is, error numbers
+>is decaying against the quantity of io count, this is to avoid long time
+>accumulated errors exceeds error_limit and trigger bch_cache_set_error().
+>
+>The I/O error counter, uses most significant 12 bits to record real
+>errors number. And too many I/Os may decay the errors number too fast,
+>so left shit it by 20 bits to make sure there are still enough errors
+>number after a while (e.g. the halflife).
+>
+>The we don't use the left shifting, when error_deay is set, and too many
+>I/Os happen, after a small piece of time, number of I/O errors will be
+>decayed too fast to reach error_limit. Therefore IMHO the left shifting
+>is necessary.
+>
+>BTW, I doubt whether current exponential error decay in
+>bch_count_io_errors() works properly. Because I don't catch the
+>connection between IO counter (ca->io_count) and error counter
+>(ca->io_errors). By default ca->set->error_decay is 0, so I doubt how
+>many people use/test this piece of code. (Maybe I am wrong)
 
- (1) Backward compatible: if we switch back to and older
-     kernel, recovery of lines stored with major == current_major
-     and minor > current_minor must succeed.
+OK, LGTM.
 
- (2) Forward compatible: switching to a newer kernel,
-     recovery of lines stored with major=current_major and
-     minor < minor must handle the data format differences
-     gracefully(i.e. initialize new data structures to default values).
+Reviewed-by: Tang Junhui <tang.junhui@zte.com.cn>
 
-If we detect lines that have a different major number than
-the current we must abort recovery. The user must manually
-migrate the data in this case.
+And ping Mike?
 
-Previously the version stored in the emeta header was copied
-from smeta, which has version 1, so we need to set the minor
-version to 1.
 
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/pblk-core.c     |  9 ++++++++-
- drivers/lightnvm/pblk-recovery.c | 26 ++++++++++++++++++++++++--
- drivers/lightnvm/pblk.h          | 16 ++++++++++++++--
- 3 files changed, 46 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 9027cf2ed1d8..155e42a26293 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -975,7 +975,8 @@ static int pblk_line_init_metadata(struct pblk *pblk, struct pblk_line *line,
- 	memcpy(smeta_buf->header.uuid, pblk->instance_uuid, 16);
- 	smeta_buf->header.id = cpu_to_le32(line->id);
- 	smeta_buf->header.type = cpu_to_le16(line->type);
--	smeta_buf->header.version = SMETA_VERSION;
-+	smeta_buf->header.version_major = SMETA_VERSION_MAJOR;
-+	smeta_buf->header.version_minor = SMETA_VERSION_MINOR;
- 
- 	/* Start metadata */
- 	smeta_buf->seq_nr = cpu_to_le64(line->seq_nr);
-@@ -998,6 +999,12 @@ static int pblk_line_init_metadata(struct pblk *pblk, struct pblk_line *line,
- 	/* End metadata */
- 	memcpy(&emeta_buf->header, &smeta_buf->header,
- 						sizeof(struct line_header));
-+
-+	emeta_buf->header.version_major = EMETA_VERSION_MAJOR;
-+	emeta_buf->header.version_minor = EMETA_VERSION_MINOR;
-+	emeta_buf->header.crc = cpu_to_le32(
-+			pblk_calc_meta_header_crc(pblk, &emeta_buf->header));
-+
- 	emeta_buf->seq_nr = cpu_to_le64(line->seq_nr);
- 	emeta_buf->nr_lbas = cpu_to_le64(line->sec_in_line);
- 	emeta_buf->nr_valid_lbas = cpu_to_le64(0);
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index 1d5e961bf5e0..a30fe203d454 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -826,6 +826,25 @@ static u64 pblk_line_emeta_start(struct pblk *pblk, struct pblk_line *line)
- 	return emeta_start;
- }
- 
-+static int pblk_recov_check_line_version(struct pblk *pblk,
-+					 struct line_emeta *emeta)
-+{
-+	struct line_header *header = &emeta->header;
-+
-+	if (header->version_major != EMETA_VERSION_MAJOR) {
-+		pr_err("pblk: line major version mismatch: %d, expected: %d\n",
-+		       header->version_major, EMETA_VERSION_MAJOR);
-+		return 1;
-+	}
-+
-+#ifdef NVM_DEBUG
-+	if (header->version_minor > EMETA_VERSION_MINOR)
-+		pr_info("pblk: newer line minor version found: %d\n", line_v);
-+#endif
-+
-+	return 0;
-+}
-+
- struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
- {
- 	struct pblk_line_meta *lm = &pblk->lm;
-@@ -873,9 +892,9 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
- 		if (le32_to_cpu(smeta_buf->header.identifier) != PBLK_MAGIC)
- 			continue;
- 
--		if (smeta_buf->header.version != SMETA_VERSION) {
-+		if (smeta_buf->header.version_major != SMETA_VERSION_MAJOR) {
- 			pr_err("pblk: found incompatible line version %u\n",
--					le16_to_cpu(smeta_buf->header.version));
-+					smeta_buf->header.version_major);
- 			return ERR_PTR(-EINVAL);
- 		}
- 
-@@ -943,6 +962,9 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
- 			goto next;
- 		}
- 
-+		if (pblk_recov_check_line_version(pblk, line->emeta->buf))
-+			return ERR_PTR(-EINVAL);
-+
- 		if (pblk_recov_l2p_from_emeta(pblk, line))
- 			pblk_recov_l2p_from_oob(pblk, line);
- 
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 8c357fb6538e..fae2526f80b2 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -320,14 +320,26 @@ enum {
- };
- 
- #define PBLK_MAGIC 0x70626c6b /*pblk*/
--#define SMETA_VERSION cpu_to_le16(1)
-+
-+/* emeta/smeta persistent storage format versions:
-+ * Changes in major version requires offline migration.
-+ * Changes in minor version are handled automatically during
-+ * recovery.
-+ */
-+
-+#define SMETA_VERSION_MAJOR (0)
-+#define SMETA_VERSION_MINOR (1)
-+
-+#define EMETA_VERSION_MAJOR (0)
-+#define EMETA_VERSION_MINOR (1)
- 
- struct line_header {
- 	__le32 crc;
- 	__le32 identifier;	/* pblk identifier */
- 	__u8 uuid[16];		/* instance uuid */
- 	__le16 type;		/* line type */
--	__le16 version;		/* type version */
-+	__u8 version_major;	/* version major */
-+	__u8 version_minor;	/* version minor */
- 	__le32 id;		/* line id for current line */
- };
- 
--- 
-2.7.4
+Thanks,
+Tang Junhui
