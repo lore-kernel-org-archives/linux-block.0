@@ -1,45 +1,72 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:27209 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755200AbeARRN4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Jan 2018 12:13:56 -0500
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "snitzer@redhat.com" <snitzer@redhat.com>
-CC: "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
+Received: from mx1.redhat.com ([209.132.183.28]:45678 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932228AbeARQu7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 18 Jan 2018 11:50:59 -0500
+Date: Thu, 18 Jan 2018 11:50:51 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>
 Subject: Re: dm rq: Avoid that request processing stalls sporadically
-Date: Thu, 18 Jan 2018 17:13:53 +0000
-Message-ID: <1516295632.2676.16.camel@wdc.com>
+Message-ID: <20180118165050.GA19734@redhat.com>
 References: <20180118163707.11825-1-bart.vanassche@wdc.com>
-         <20180118165050.GA19734@redhat.com>
-In-Reply-To: <20180118165050.GA19734@redhat.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180118163707.11825-1-bart.vanassche@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gVGh1LCAyMDE4LTAxLTE4IGF0IDExOjUwIC0wNTAwLCBNaWtlIFNuaXR6ZXIgd3JvdGU6DQo+
-IFRoZSBpc3N1ZSB5b3Ugc2F5IGl0IHdhcyBvcmlnaW5hbGx5IGludGVuZGVkIHRvIGZpeCBfc2hv
-dWxkXyBiZQ0KPiBhZGRyZXNzZWQgd2l0aCB0aGlzIGNoYW5nZToNCj4gaHR0cHM6Ly9naXQua2Vy
-bmVsLm9yZy9wdWIvc2NtL2xpbnV4L2tlcm5lbC9naXQvZGV2aWNlLW1hcHBlci9saW51eC1kbS5n
-aXQvY29tbWl0Lz9oPWRtLTQuMTYmaWQ9NGRkNmVkZDIzZTdlYTk3MWVmZGRjMzAzZjllNjdlYjc5
-ZTk1ODA4ZQ0KDQpIZWxsbyBNaWtlLA0KDQpTb3JyeSBidXQgSSdtIG5vdCBjb252aW5jZWQgdGhh
-dCB0aGF0IHBhdGNoIGlzIHN1ZmZpY2llbnQuIFRoYXQgcGF0Y2ggaGVscHMNCmlmIC5lbmRfaW8o
-KSBpcyBjYWxsZWQgd2l0aCBzdGF0dXMgQkxLX1NUU19SRVNPVVJDRSBhbmQgYWxzbyBpZg0KYmxr
-X2luc2VydF9jbG9uZWRfcmVxdWVzdCgpIHJldHVybnMgdGhlIC5xdWV1ZV9ycSgpIHJldHVybiB2
-YWx1ZS4gSXQgZG9lcyBub3QNCmhlbHAgaWYgLnF1ZXVlX3JxKCkgcmV0dXJucyBCTEtfU1RTX1JF
-U09VUkNFIGFuZCB0aGF0IHJldHVybiB2YWx1ZSBnZXRzDQppZ25vcmVkLiBJIHRoaW5rIHRoYXQg
-Y2FuIGhhcHBlbiBhcyBmb2xsb3dzOg0KLSBSZXF1ZXN0IGNsb25pbmcgaW4gbXVsdGlwYXRoX2Ns
-b25lX2FuZF9tYXAoKSBzdWNjZWVkcyBhbmQgdGhhdCBmdW5jdGlvbg0KICByZXR1cm5zIERNX01B
-UElPX1JFTUFQUEVELg0KLSBkbV9kaXNwYXRjaF9jbG9uZV9yZXF1ZXN0KCkgY2FsbHMgYmxrX2lu
-c2VydF9jbG9uZWRfcmVxdWVzdCgpLg0KLSBibGtfaW5zZXJ0X2Nsb25lZF9yZXF1ZXN0KCkgY2Fs
-bHMgYmxrX21xX3JlcXVlc3RfZGlyZWN0X2lzc3VlKCksIHdoaWNoDQogIHJlc3VsdHMgaW4gYSBj
-YWxsIG9mIF9fYmxrX21xX3RyeV9pc3N1ZV9kaXJlY3RseSgpLg0KLSBfX2Jsa19tcV90cnlfaXNz
-dWVfZGlyZWN0bHkoKSBjYWxscyBibGtfbXFfc2NoZWRfaW5zZXJ0X3JlcXVlc3QoKS4gSW4gdGhp
-cw0KICBjYXNlIHRoZSBCTEtfU1RTX1JFU09VUkNFIHJldHVybmVkIGJ5IHRoZSAucXVldWVfcnEo
-KSBpbXBsZW1lbnRhdGlvbiBvZiB0aGUNCiAgdW5kZXJseWluZyBwYXRoIHdpbGwgYmUgaWdub3Jl
-ZC4NCg0KUGxlYXNlIG5vdGUgdGhhdCBJIGhhdmUgbm90IHRyaWVkIHRvIGZpbmQgYWxsIHBhdGhz
-IHRoYXQgaWdub3JlIHRoZQ0KLnF1ZXVlX3JxKCkgcmV0dXJuIHZhbHVlLg0KDQpUaGFua3MsDQoN
-CkJhcnQu
+On Thu, Jan 18 2018 at 11:37am -0500,
+Bart Van Assche <bart.vanassche@wdc.com> wrote:
+
+> If the .queue_rq() implementation of a block driver returns
+> BLK_STS_RESOURCE then that block driver is responsible for
+> rerunning the queue once the condition that caused it to return
+> BLK_STS_RESOURCE has been cleared. The dm-mpath driver tells the
+> dm core to requeue a request if e.g. not enough memory is
+> available for cloning a request or if the underlying path is
+> busy. Since the dm-mpath driver does not receive any kind of
+> notification if the condition that caused it to return "requeue"
+> is cleared, the only solution to avoid that dm-mpath request
+> processing stalls is to call blk_mq_delay_run_hw_queue(). Hence
+> this patch.
+> 
+> Fixes: ec3eaf9a6731 ("dm mpath: don't call blk_mq_delay_run_hw_queue() in case of BLK_STS_RESOURCE")
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/md/dm-rq.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+> index f16096af879a..c59c59cfd2a5 100644
+> --- a/drivers/md/dm-rq.c
+> +++ b/drivers/md/dm-rq.c
+> @@ -761,6 +761,7 @@ static blk_status_t dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
+>  		/* Undo dm_start_request() before requeuing */
+>  		rq_end_stats(md, rq);
+>  		rq_completed(md, rq_data_dir(rq), false);
+> +		blk_mq_delay_run_hw_queue(hctx, 100/*ms*/);
+>  		return BLK_STS_RESOURCE;
+>  	}
+>  
+> -- 
+> 2.15.1
+> 
+
+Sorry but we need to understand why you still need this.
+
+The issue you say it was originally intended to fix _should_ be
+addressed with this change:
+https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=dm-4.16&id=4dd6edd23e7ea971efddc303f9e67eb79e95808e
+
+So if you still feel you need to blindly kick the queue then it is very
+likely a bug in blk-mq (either its RESTART hueristics or whatever
+internal implementation is lacking)
+
+Did you try Ming's RFC patch to "fixup RESTART" before resorting to the
+above again?, see: https://patchwork.kernel.org/patch/10172315/
+
+Thanks,
+Mike
