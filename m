@@ -1,58 +1,54 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:45748 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753476AbeASA0b (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Jan 2018 19:26:31 -0500
-Date: Fri, 19 Jan 2018 08:26:17 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "snitzer@redhat.com" <snitzer@redhat.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: dm rq: Avoid that request processing stalls sporadically
-Message-ID: <20180119002616.GC4712@ming.t460p>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] dm rq: Avoid that request processing stalls sporadically
+To: Ming Lei <ming.lei@redhat.com>, Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "dm-devel@redhat.com" <dm-devel@redhat.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "snitzer@redhat.com" <snitzer@redhat.com>
 References: <20180118163707.11825-1-bart.vanassche@wdc.com>
- <20180118165050.GA19734@redhat.com>
- <1516295632.2676.16.camel@wdc.com>
+ <20180119001136.GA4712@ming.t460p> <1516320863.2676.104.camel@wdc.com>
+ <20180119001834.GB4712@ming.t460p>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <040c195c-732e-70e8-3a54-89c5939e815c@kernel.dk>
+Date: Thu, 18 Jan 2018 17:24:29 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1516295632.2676.16.camel@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180119001834.GB4712@ming.t460p>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Jan 18, 2018 at 05:13:53PM +0000, Bart Van Assche wrote:
-> On Thu, 2018-01-18 at 11:50 -0500, Mike Snitzer wrote:
-> > The issue you say it was originally intended to fix _should_ be
-> > addressed with this change:
-> > https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=dm-4.16&id=4dd6edd23e7ea971efddc303f9e67eb79e95808e
+On 1/18/18 5:18 PM, Ming Lei wrote:
+> On Fri, Jan 19, 2018 at 12:14:24AM +0000, Bart Van Assche wrote:
+>> On Fri, 2018-01-19 at 08:11 +0800, Ming Lei wrote:
+>>> On Thu, Jan 18, 2018 at 08:37:07AM -0800, Bart Van Assche wrote:
+>>>> diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+>>>> index f16096af879a..c59c59cfd2a5 100644
+>>>> --- a/drivers/md/dm-rq.c
+>>>> +++ b/drivers/md/dm-rq.c
+>>>> @@ -761,6 +761,7 @@ static blk_status_t dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
+>>>>  		/* Undo dm_start_request() before requeuing */
+>>>>  		rq_end_stats(md, rq);
+>>>>  		rq_completed(md, rq_data_dir(rq), false);
+>>>> +		blk_mq_delay_run_hw_queue(hctx, 100/*ms*/);
+>>>>  		return BLK_STS_RESOURCE;
+>>>>  	}
+>>>>  
+>>>
+>>> Nak.
+>>
+>> This patch fixes a regression that was introduced by you. You should know
+>> that regressions are not acceptable. If you don't agree with this patch,
+>> please fix the root cause.
 > 
-> Hello Mike,
-> 
-> Sorry but I'm not convinced that that patch is sufficient. That patch helps
-> if .end_io() is called with status BLK_STS_RESOURCE and also if
-> blk_insert_cloned_request() returns the .queue_rq() return value. It does not
-> help if .queue_rq() returns BLK_STS_RESOURCE and that return value gets
-> ignored.
+> Yesterday I sent a patch, did you test that?
 
-The return value from .queue_rq() is handled by blk-mq, why do you think
-it can be ignored? Please see blk_mq_dispatch_rq_list().
+That patch isn't going to be of much help. It might prevent you from
+completely stalling, but it might take you tens of seconds to get there.
 
-> I think that can happen as follows:
-> - Request cloning in multipath_clone_and_map() succeeds and that function
->   returns DM_MAPIO_REMAPPED.
-> - dm_dispatch_clone_request() calls blk_insert_cloned_request().
-> - blk_insert_cloned_request() calls blk_mq_request_direct_issue(), which
->   results in a call of __blk_mq_try_issue_directly().
-> - __blk_mq_try_issue_directly() calls blk_mq_sched_insert_request(). In this
-
-This only happens iff queue is stopped or quiesced, then we return
-BLK_STS_OK to blk-mq via .queue_rq(), please see __blk_mq_try_issue_directly(),
-how does this cause IO hang? 
-
->   case the BLK_STS_RESOURCE returned by the .queue_rq() implementation of the
->   underlying path will be ignored.
-
-No, this case won't return BLK_STS_RESOURCE.
+On top of that, it's a rolling timer that gets added when IO is queued,
+and re-added if IO is pending when it fires. If the latter case is not
+true, then it won't get armed again. So if IO fails to queue without
+any other IO pending, you're pretty much in the same situation as if
+you marked the queue as restart. Nobody is going to be noticing
+either of those conditions.
 
 -- 
-Ming
+Jens Axboe
