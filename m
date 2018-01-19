@@ -1,99 +1,83 @@
-Return-Path: <BATV+b05e9fb8710da454cfb6+5260+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: keith.busch@intel.com,
-	linux-block@vger.kernel.org,
-	sagi@grimberg.me,
-	linux-nvme@lists.infradead.org
-Subject: [PATCH 2/2] nvme-pci: take sglist coalescing in dma_map_sg into account
-Date: Wed, 17 Jan 2018 22:04:38 +0100
-Message-Id: <20180117210438.3778-3-hch@lst.de>
-In-Reply-To: <20180117210438.3778-1-hch@lst.de>
-References: <20180117210438.3778-1-hch@lst.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from ipmail06.adl6.internode.on.net ([150.101.137.145]:65088 "EHLO
+        ipmail06.adl6.internode.on.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1750780AbeASEwP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 18 Jan 2018 23:52:15 -0500
+Date: Fri, 19 Jan 2018 15:51:39 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: Raphael Carvalho <raphael.scarv@gmail.com>
+Cc: Goldwyn Rodrigues <rgoldwyn@suse.de>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, darrick.wong@oracle.com,
+        Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: Re: [PATCH 2/2] xfs: remove assert to check bytes returned
+Message-ID: <20180119045139.GN16421@dastard>
+References: <20180119005741.32058-1-rgoldwyn@suse.de>
+ <20180119005741.32058-2-rgoldwyn@suse.de>
+ <20180119035736.GL16421@dastard>
+ <CACz=WefRiobqX4vfEif2BebQcWjHkeCKE26DFXoxZvGUJ3Hq1w@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CACz=WefRiobqX4vfEif2BebQcWjHkeCKE26DFXoxZvGUJ3Hq1w@mail.gmail.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Some iommu implementations can merge physically and/or virtually
-contiguous segments inside sg_map_dma.  The NVMe SGL support does not take
-this into account and will warn because of falling off a loop.  Pass the
-number of mapped segments to nvme_pci_setup_sgls so that the SGL setup
-can take the number of mapped segments into account.
+On Fri, Jan 19, 2018 at 02:23:16AM -0200, Raphael Carvalho wrote:
+> On Fri, Jan 19, 2018 at 1:57 AM, Dave Chinner <david@fromorbit.com> wrote:
+> >
+> > On Thu, Jan 18, 2018 at 06:57:41PM -0600, Goldwyn Rodrigues wrote:
+> > > From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+> > >
+> > > Since we can return less than count in case of partial direct
+> > > writes, remove the ASSERT.
+> > >
+> > > Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+> > > ---
+> > >  fs/xfs/xfs_file.c | 6 ------
+> > >  1 file changed, 6 deletions(-)
+> > >
+> > > diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+> > > index 8601275cc5e6..8fc4dbf66910 100644
+> > > --- a/fs/xfs/xfs_file.c
+> > > +++ b/fs/xfs/xfs_file.c
+> > > @@ -590,12 +590,6 @@ xfs_file_dio_aio_write(
+> > >       ret = iomap_dio_rw(iocb, from, &xfs_iomap_ops, xfs_dio_write_end_io);
+> > >  out:
+> > >       xfs_iunlock(ip, iolock);
+> > > -
+> > > -     /*
+> > > -      * No fallback to buffered IO on errors for XFS, direct IO will either
+> > > -      * complete fully or fail.
+> > > -      */
+> > > -     ASSERT(ret < 0 || ret == count);
+> > >       return ret;
+> > >  }
+> >
+> > Acked-by: Dave Chinner <dchinner@redhat.com>
+> 
+> 
+> Is this really correct?
 
-Reported-by: Fangjian (Turing) <f.fangjian@huawei.com>
-Fixes: a7a7cbe3 ("nvme-pci: add SGL support")
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Keith Busch <keith.busch@intel.com>
-Reviewed-by: Sagi Grimberg <sagi@rimberg.me>
----
- drivers/nvme/host/pci.c | 21 +++++++++------------
- 1 file changed, 9 insertions(+), 12 deletions(-)
+Yes.
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index a7e94cc3c70e..4276ebfff22b 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -725,20 +725,19 @@ static void nvme_pci_sgl_set_seg(struct nvme_sgl_desc *sge,
- }
- 
- static blk_status_t nvme_pci_setup_sgls(struct nvme_dev *dev,
--		struct request *req, struct nvme_rw_command *cmd)
-+		struct request *req, struct nvme_rw_command *cmd, int entries)
- {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
--	int length = blk_rq_payload_bytes(req);
- 	struct dma_pool *pool;
- 	struct nvme_sgl_desc *sg_list;
- 	struct scatterlist *sg = iod->sg;
--	int entries = iod->nents, i = 0;
- 	dma_addr_t sgl_dma;
-+	int i = 0;
- 
- 	/* setting the transfer type as SGL */
- 	cmd->flags = NVME_CMD_SGL_METABUF;
- 
--	if (length == sg_dma_len(sg)) {
-+	if (entries == 1) {
- 		nvme_pci_sgl_set_data(&cmd->dptr.sgl, sg);
- 		return BLK_STS_OK;
- 	}
-@@ -778,13 +777,9 @@ static blk_status_t nvme_pci_setup_sgls(struct nvme_dev *dev,
- 		}
- 
- 		nvme_pci_sgl_set_data(&sg_list[i++], sg);
--
--		length -= sg_dma_len(sg);
- 		sg = sg_next(sg);
--		entries--;
--	} while (length > 0);
-+	} while (--entries > 0);
- 
--	WARN_ON(entries > 0);
- 	return BLK_STS_OK;
- }
- 
-@@ -796,6 +791,7 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
- 	enum dma_data_direction dma_dir = rq_data_dir(req) ?
- 			DMA_TO_DEVICE : DMA_FROM_DEVICE;
- 	blk_status_t ret = BLK_STS_IOERR;
-+	int nr_mapped;
- 
- 	sg_init_table(iod->sg, blk_rq_nr_phys_segments(req));
- 	iod->nents = blk_rq_map_sg(q, req, iod->sg);
-@@ -803,12 +799,13 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
- 		goto out;
- 
- 	ret = BLK_STS_RESOURCE;
--	if (!dma_map_sg_attrs(dev->dev, iod->sg, iod->nents, dma_dir,
--				DMA_ATTR_NO_WARN))
-+	nr_mapped = dma_map_sg_attrs(dev->dev, iod->sg, iod->nents, dma_dir,
-+			DMA_ATTR_NO_WARN);
-+	if (!nr_mapped)
- 		goto out;
- 
- 	if (iod->use_sgl)
--		ret = nvme_pci_setup_sgls(dev, req, &cmnd->rw);
-+		ret = nvme_pci_setup_sgls(dev, req, &cmnd->rw, nr_mapped);
- 	else
- 		ret = nvme_pci_setup_prps(dev, req, &cmnd->rw);
- 
+> Isn't this check with regards to DIO
+> submission?
+
+Yes, if there is an error during submission.
+
+But it also checked synchronous IO completion (i.e. error or bytes
+written), because iomap_dio_rw() waits for non-AIO DIO to complete
+and returns the IO completion status in that case.
+
+> The bytes written is returned in a different asynchronous
+> path due to AIO support, no?!
+
+That is correct. For AIO we'll get -EIOCBQUEUED here on successful
+submission.
+
+Cheers,
+
+Dave.
 -- 
-2.14.2
+Dave Chinner
+david@fromorbit.com
