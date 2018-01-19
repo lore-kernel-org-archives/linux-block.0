@@ -1,120 +1,62 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Sat, 20 Jan 2018 07:52:48 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
-	"snitzer@redhat.com" <snitzer@redhat.com>,
-	"dm-devel@redhat.com" <dm-devel@redhat.com>,
-	"hch@infradead.org" <hch@infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"osandov@fb.com" <osandov@fb.com>
+Return-Path: <prvs=550bc9d12=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "dm-devel@redhat.com" <dm-devel@redhat.com>, "hch@infradead.org"
+	<hch@infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "osandov@fb.com" <osandov@fb.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "snitzer@redhat.com"
+	<snitzer@redhat.com>
 Subject: Re: [RFC PATCH] blk-mq: fixup RESTART when queue becomes idle
-Message-ID: <20180119235247.GA17195@ming.t460p>
-References: <20180119072623.GB25369@ming.t460p>
- <047f68ec-f51b-190f-2f89-f413325c2540@kernel.dk>
- <20180119154047.GB14827@ming.t460p>
- <540e1239-c415-766b-d4ff-bb0b7f3517a7@kernel.dk>
- <20180119160518.GC14827@ming.t460p>
- <4a5c049f-0fab-bbaf-bfe2-eb5bca73f2c8@kernel.dk>
- <20180119162618.GD14827@ming.t460p>
- <1f072086-533e-4b75-d0e3-9e621b2120d8@kernel.dk>
- <20180119163736.GE14827@ming.t460p>
- <e17362b4-dfee-be8d-ea8d-b07f6d9768e8@kernel.dk>
+Date: Fri, 19 Jan 2018 19:47:42 +0000
+Message-ID: <1516391260.2968.27.camel@wdc.com>
+References: <20180118024124.8079-1-ming.lei@redhat.com>
+	 <b2e5b7e6-ce4b-6053-adae-63cc44d773af@wdc.com>
+	 <20180118170353.GB19734@redhat.com> <1516296056.2676.23.camel@wdc.com>
+	 <20180118183039.GA20121@redhat.com> <1516301278.2676.35.camel@wdc.com>
+	 <deeb2b2e-6d0e-a144-843d-d08626de8aea@kernel.dk>
+	 <20180119023212.GA25413@ming.t460p> <1516338585.4077.1.camel@wdc.com>
+	 <20180119073423.GC25369@ming.t460p>
+In-Reply-To: <20180119073423.GC25369@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <e17362b4-dfee-be8d-ea8d-b07f6d9768e8@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Jan 19, 2018 at 10:38:41AM -0700, Jens Axboe wrote:
-> On 1/19/18 9:37 AM, Ming Lei wrote:
-> > On Fri, Jan 19, 2018 at 09:27:46AM -0700, Jens Axboe wrote:
-> >> On 1/19/18 9:26 AM, Ming Lei wrote:
-> >>> On Fri, Jan 19, 2018 at 09:19:24AM -0700, Jens Axboe wrote:
-> >>>> On 1/19/18 9:05 AM, Ming Lei wrote:
-> >>>>> On Fri, Jan 19, 2018 at 08:48:55AM -0700, Jens Axboe wrote:
-> >>>>>> On 1/19/18 8:40 AM, Ming Lei wrote:
-> >>>>>>>>>> Where does the dm STS_RESOURCE error usually come from - what's exact
-> >>>>>>>>>> resource are we running out of?
-> >>>>>>>>>
-> >>>>>>>>> It is from blk_get_request(underlying queue), see
-> >>>>>>>>> multipath_clone_and_map().
-> >>>>>>>>
-> >>>>>>>> That's what I thought. So for a low queue depth underlying queue, it's
-> >>>>>>>> quite possible that this situation can happen. Two potential solutions
-> >>>>>>>> I see:
-> >>>>>>>>
-> >>>>>>>> 1) As described earlier in this thread, having a mechanism for being
-> >>>>>>>>    notified when the scarce resource becomes available. It would not
-> >>>>>>>>    be hard to tap into the existing sbitmap wait queue for that.
-> >>>>>>>>
-> >>>>>>>> 2) Have dm set BLK_MQ_F_BLOCKING and just sleep on the resource
-> >>>>>>>>    allocation. I haven't read the dm code to know if this is a
-> >>>>>>>>    possibility or not.
-> >>>>>>>>
-> >>>>>>>> I'd probably prefer #1. It's a classic case of trying to get the
-> >>>>>>>> request, and if it fails, add ourselves to the sbitmap tag wait
-> >>>>>>>> queue head, retry, and bail if that also fails. Connecting the
-> >>>>>>>> scarce resource and the consumer is the only way to really fix
-> >>>>>>>> this, without bogus arbitrary delays.
-> >>>>>>>
-> >>>>>>> Right, as I have replied to Bart, using mod_delayed_work_on() with
-> >>>>>>> returning BLK_STS_NO_DEV_RESOURCE(or sort of name) for the scarce
-> >>>>>>> resource should fix this issue.
-> >>>>>>
-> >>>>>> It'll fix the forever stall, but it won't really fix it, as we'll slow
-> >>>>>> down the dm device by some random amount.
-> >>>>>>
-> >>>>>> A simple test case would be to have a null_blk device with a queue depth
-> >>>>>> of one, and dm on top of that. Start a fio job that runs two jobs: one
-> >>>>>> that does IO to the underlying device, and one that does IO to the dm
-> >>>>>> device. If the job on the dm device runs substantially slower than the
-> >>>>>> one to the underlying device, then the problem isn't really fixed.
-> >>>>>
-> >>>>> I remembered that I tried this test on scsi-debug & dm-mpath over scsi-debug,
-> >>>>> seems not observed this issue, could you explain a bit why IO over dm-mpath
-> >>>>> may be slower? Because both two IO contexts call same get_request(), and
-> >>>>> in theory dm-mpath should be a bit quicker since it uses direct issue for
-> >>>>> underlying queue, without io scheduler involved.
-> >>>>
-> >>>> Because if you lose the race for getting the request, you'll have some
-> >>>> arbitrary delay before trying again, potentially. Compared to the direct
-> >>>
-> >>> But the restart still works, one request is completed, then the queue
-> >>> is return immediately because we use mod_delayed_work_on(0), so looks
-> >>> no such issue.
-> >>
-> >> There are no pending requests for this case, nothing to restart the
-> >> queue. When you fail that blk_get_request(), you are idle, nothing
-> >> is pending.
-> > 
-> > I think we needn't worry about that, once a device is attached to
-> > dm-rq, it can't be mounted any more, and usually user don't use the device
-> > directly and by dm-mpath at the same time.
-> 
-> Here's an example of that, using my current block tree (merged into
-> master).  The setup is dm-mpath on top of null_blk, the latter having
-> just a single request. Both are mq devices.
-> 
-> Fio direct 4k random reads on dm_mq: ~250K iops
-> 
-> Start dd on underlying device (or partition on same device), just doing
-> sequential reads.
-> 
-> Fio direct 4k random reads on dm_mq with dd running: 9 iops
-> 
-> No schedulers involved.
-> 
-> https://i.imgur.com/WTDnnwE.gif
-
-If null_blk's timer mode is used with a bit delay introduced, I guess
-the effect from direct access to underlying queue shouldn't be so
-serious. But it still won't be good as direct access.
-
-Another way may be to introduce a variants blk_get_request(), such as
-blk_get_request_with_notify(), then pass the current dm-rq's hctx to
-it, and use the tag's waitqueue to handle that. But the change can be
-a bit big.
-
--- 
-Ming
+T24gRnJpLCAyMDE4LTAxLTE5IGF0IDE1OjM0ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gQ291
+bGQgeW91IGV4cGxhaW4gYSBiaXQgd2hlbiBTQ1NJIHRhcmdldCByZXBsaWVzIHdpdGggQlVTWSB2
+ZXJ5IG9mdGVuPw0KPiANCj4gSW5zaWRlIGluaXRpYXRvciwgd2UgaGF2ZSBsaW1pdGVkIHRoZSBt
+YXggcGVyLUxVTiByZXF1ZXN0cyBhbmQgcGVyLWhvc3QNCj4gcmVxdWVzdHMgYWxyZWFkeSBiZWZv
+cmUgY2FsbGluZyAucXVldWVfcnEoKS4NCg0KVGhhdCdzIGNvcnJlY3QuIEhvd2V2ZXIsIHdoZW4g
+YSBTQ1NJIGluaXRpYXRvciBhbmQgdGFyZ2V0IHN5c3RlbSBhcmUNCmNvbW11bmljYXRpbmcgd2l0
+aCBlYWNoIG90aGVyIHRoZXJlIGlzIG5vIGd1YXJhbnRlZSB0aGF0IGluaXRpYXRvciBhbmQgdGFy
+Z2V0DQpxdWV1ZSBkZXB0aCBoYXZlIGJlZW4gdHVuZWQgcHJvcGVybHkuIElmIHRoZSBpbml0aWF0
+b3IgcXVldWUgZGVwdGggYW5kIHRoZQ0KbnVtYmVyIG9mIHJlcXVlc3RzIHRoYXQgY2FuIGJlIGlu
+IGZsaWdodCBhY2NvcmRpbmcgdG8gdGhlIG5ldHdvcmsgcHJvdG9jb2wNCmFyZSBib3RoIGxhcmdl
+ciB0aGFuIHRoZSB0YXJnZXQgcXVldWUgZGVwdGggYW5kIGlmIHRoZSB0YXJnZXQgc3lzdGVtIHVz
+ZXMNCnJlbGF0aXZlbHkgc2xvdyBzdG9yYWdlIChlLmcuIGhhcmRkaXNrcykgdGhlbiBpdCBjYW4g
+aGFwcGVuIHRoYXQgdGhlIHRhcmdldA0KcmVwbGllcyB3aXRoIEJVU1kgb2Z0ZW4uDQoNClRoZSBM
+aW51eCBpU0NTSSBpbml0aWF0b3IgbGltaXRzIE1heE91dHN0YW5kaW5nUjJUICh0aGUgbnVtYmVy
+IG9mIHJlcXVlc3RzDQphbiBpbml0aWF0b3IgbWF5IHNlbnQgd2l0aG91dCBoYXZpbmcgcmVjZWl2
+ZWQgYW4gYW5zd2VyIGZyb20gdGhlIHRhcmdldCkgdG8NCm9uZSBzbyBJIGRvbid0IHRoaW5rIHRo
+aXMgY2FuIGhhcHBlbiB3aGVuIHVzaW5nIGlTQ1NJL1RDUC4NCg0KV2l0aCB0aGUgU1JQIGluaXRp
+YXRvciBob3dldmVyIHRoZSBtYXhpbXVtIHJlcXVlc3RzIHRoYXQgY2FuIGJlIGluIGZsaWdodA0K
+YmV0d2VlbiBpbml0aWF0b3IgYW5kIHRhcmdldCBkZXBlbmRzIG9uIHRoZSBudW1iZXIgb2YgY3Jl
+ZGl0cyB0aGF0IHdlcmUNCm5lZ290aWF0ZWQgZHVyaW5nIGxvZ2luIGJldHdlZW4gaW5pdGlhdG9y
+IGFuZCB0YXJnZXQuIFNvbWUgdGltZSBhZ28gSSBtb2RpZmllZA0KdGhlIFNSUCBpbml0aWF0b3Ig
+c3VjaCB0aGF0IGl0IGxpbWl0cyB0aGUgaW5pdGlhdG9yIHF1ZXVlIGRlcHRoIHRvIHRoZSBudW1i
+ZXINCm9mIFNSUCBjcmVkaXRzIG1pbnVzIG9uZSAoZm9yIHRhc2sgbWFuYWdlbWVudCkuIFRoYXQg
+cmVzdWx0ZWQgaW4gYSBwZXJmb3JtYW5jZQ0KaW1wcm92ZW1lbnQgZHVlIHRvIGZld2VyIEJVU1kg
+Y29uZGl0aW9ucyBhdCB0aGUgaW5pdGlhdG9yIHNpZGUgKHNlZSBhbHNvIGNvbW1pdA0KN2FkZTQw
+MGFiYTlhICgiSUIvc3JwOiBSZWR1Y2UgbnVtYmVyIG9mIEJVU1kgY29uZGl0aW9ucyIpKS4gQW5v
+dGhlciBwYXRjaCBmb3INCnRoZSBTQ1NUIFNSUCB0YXJnZXQgZHJpdmVyIGxpbWl0ZWQgdGhlIG51
+bWJlciBvZiBTUlAgY3JlZGl0cyB0byB0aGUgcXVldWUgZGVwdGgNCm9mIHRoZSBibG9jayBkZXZp
+Y2UgYXQgdGhlIHRhcmdldCBzaWRlLiBJJ20gcmVmZXJyaW5nIHRvIHRoZSBmb2xsb3dpbmcgY29k
+ZToNCmNoLT5ycV9zaXplID0gbWluKE1BWF9TUlBUX1JRX1NJWkUsIHNjc3RfZ2V0X21heF9sdW5f
+Y29tbWFuZHMoTlVMTCwgMCkpIChJIGhhdmUNCm5vdCB5ZXQgaGFkIHRoZSB0aW1lIHRvIHBvcnQg
+dGhpcyBjaGFuZ2UgdG8gTElPKS4NCg0KV2l0aG91dCBzdWNoIHR1bmluZyBhY3Jvc3MgaW5pdGlh
+dG9yIGFuZCB0YXJnZXQgaXQgY2FuIGhhcHBlbiBvZnRlbiB0aGF0IHRoZQ0KdGFyZ2V0IHN5c3Rl
+bSBzZW5kcyB0aGUgcmVwbHkgIkJVU1kiIGJhY2sgdG8gdGhlIGluaXRpYXRvci4gSSB0aGluayB0
+aGF0J3Mgd2h5DQp0aGVyZSBpcyBjb2RlIGluIHRoZSBTQ1NJIGNvcmUgdG8gYXV0b21hdGljYWxs
+eSBhZGp1c3QgdGhlIGluaXRpYXRvciBxdWV1ZQ0KZGVwdGggaWYgdGhlICJCVVNZIiBjb25kaXRp
+b24gaXMgZW5jb3VudGVyZWQgZnJlcXVlbnRseS4gU2VlIGFsc28NCnNjc2lfdHJhY2tfcXVldWVf
+ZnVsbCgpLg0KDQpCYXJ0Lg==
