@@ -1,48 +1,37 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:39810 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750762AbeASASr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Jan 2018 19:18:47 -0500
-Date: Fri, 19 Jan 2018 08:18:34 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "dm-devel@redhat.com" <dm-devel@redhat.com>,
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:51870 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750762AbeASAO2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 18 Jan 2018 19:14:28 -0500
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "dm-devel@redhat.com" <dm-devel@redhat.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "snitzer@redhat.com" <snitzer@redhat.com>
 Subject: Re: [PATCH] dm rq: Avoid that request processing stalls sporadically
-Message-ID: <20180119001834.GB4712@ming.t460p>
+Date: Fri, 19 Jan 2018 00:14:24 +0000
+Message-ID: <1516320863.2676.104.camel@wdc.com>
 References: <20180118163707.11825-1-bart.vanassche@wdc.com>
- <20180119001136.GA4712@ming.t460p>
- <1516320863.2676.104.camel@wdc.com>
+         <20180119001136.GA4712@ming.t460p>
+In-Reply-To: <20180119001136.GA4712@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1516320863.2676.104.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Jan 19, 2018 at 12:14:24AM +0000, Bart Van Assche wrote:
-> On Fri, 2018-01-19 at 08:11 +0800, Ming Lei wrote:
-> > On Thu, Jan 18, 2018 at 08:37:07AM -0800, Bart Van Assche wrote:
-> > > diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-> > > index f16096af879a..c59c59cfd2a5 100644
-> > > --- a/drivers/md/dm-rq.c
-> > > +++ b/drivers/md/dm-rq.c
-> > > @@ -761,6 +761,7 @@ static blk_status_t dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
-> > >  		/* Undo dm_start_request() before requeuing */
-> > >  		rq_end_stats(md, rq);
-> > >  		rq_completed(md, rq_data_dir(rq), false);
-> > > +		blk_mq_delay_run_hw_queue(hctx, 100/*ms*/);
-> > >  		return BLK_STS_RESOURCE;
-> > >  	}
-> > >  
-> > 
-> > Nak.
-> 
-> This patch fixes a regression that was introduced by you. You should know
-> that regressions are not acceptable. If you don't agree with this patch,
-> please fix the root cause.
-
-Yesterday I sent a patch, did you test that?
-
--- 
-Ming
+T24gRnJpLCAyMDE4LTAxLTE5IGF0IDA4OjExICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gT24g
+VGh1LCBKYW4gMTgsIDIwMTggYXQgMDg6Mzc6MDdBTSAtMDgwMCwgQmFydCBWYW4gQXNzY2hlIHdy
+b3RlOg0KPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJzL21kL2RtLXJxLmMgYi9kcml2ZXJzL21kL2Rt
+LXJxLmMNCj4gPiBpbmRleCBmMTYwOTZhZjg3OWEuLmM1OWM1OWNmZDJhNSAxMDA2NDQNCj4gPiAt
+LS0gYS9kcml2ZXJzL21kL2RtLXJxLmMNCj4gPiArKysgYi9kcml2ZXJzL21kL2RtLXJxLmMNCj4g
+PiBAQCAtNzYxLDYgKzc2MSw3IEBAIHN0YXRpYyBibGtfc3RhdHVzX3QgZG1fbXFfcXVldWVfcnEo
+c3RydWN0IGJsa19tcV9od19jdHggKmhjdHgsDQo+ID4gIAkJLyogVW5kbyBkbV9zdGFydF9yZXF1
+ZXN0KCkgYmVmb3JlIHJlcXVldWluZyAqLw0KPiA+ICAJCXJxX2VuZF9zdGF0cyhtZCwgcnEpOw0K
+PiA+ICAJCXJxX2NvbXBsZXRlZChtZCwgcnFfZGF0YV9kaXIocnEpLCBmYWxzZSk7DQo+ID4gKwkJ
+YmxrX21xX2RlbGF5X3J1bl9od19xdWV1ZShoY3R4LCAxMDAvKm1zKi8pOw0KPiA+ICAJCXJldHVy
+biBCTEtfU1RTX1JFU09VUkNFOw0KPiA+ICAJfQ0KPiA+ICANCj4gDQo+IE5hay4NCg0KVGhpcyBw
+YXRjaCBmaXhlcyBhIHJlZ3Jlc3Npb24gdGhhdCB3YXMgaW50cm9kdWNlZCBieSB5b3UuIFlvdSBz
+aG91bGQga25vdw0KdGhhdCByZWdyZXNzaW9ucyBhcmUgbm90IGFjY2VwdGFibGUuIElmIHlvdSBk
+b24ndCBhZ3JlZSB3aXRoIHRoaXMgcGF0Y2gsDQpwbGVhc2UgZml4IHRoZSByb290IGNhdXNlLg0K
+DQpCYXJ0Lg==
