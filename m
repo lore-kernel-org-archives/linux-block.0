@@ -1,153 +1,88 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-From: Tejun Heo <tj@kernel.org>
-To: jack@suse.cz,
-	axboe@kernel.dk,
-	clm@fb.com,
-	jbacik@fb.com
-Cc: kernel-team@fb.com,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	peterz@infradead.org,
-	jianchao.w.wang@oracle.com,
-	Bart.VanAssche@wdc.com,
-	linux-block@vger.kernel.org,
-	Tejun Heo <tj@kernel.org>
-Subject: [PATCH 1/8] blk-mq: move hctx lock/unlock into a helper
-Date: Tue,  9 Jan 2018 08:29:46 -0800
-Message-Id: <20180109162953.1211451-2-tj@kernel.org>
-In-Reply-To: <20180109162953.1211451-1-tj@kernel.org>
-References: <20180109162953.1211451-1-tj@kernel.org>
+Return-Path: <joseph.qi@linux.alibaba.com>
+Subject: Re: [PATCH v3 RESEND 2/2] blk-throttle: fix wrong initialization in
+ case of dm device
+To: Mike Snitzer <snitzer@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block <linux-block@vger.kernel.org>,
+ device-mapper development <dm-devel@redhat.com>, Shaohua Li
+ <shli@kernel.org>, caspar@linux.alibaba.com
+References: <d644ea70-4130-7cbb-fdd8-240a77481f9f@linux.alibaba.com>
+ <20180119032908.GA22562@redhat.com>
+From: Joseph Qi <joseph.qi@linux.alibaba.com>
+Message-ID: <47c56350-e27a-245c-14fd-3ed5b1f39765@linux.alibaba.com>
+Date: Fri, 19 Jan 2018 11:57:34 +0800
+MIME-Version: 1.0
+In-Reply-To: <20180119032908.GA22562@redhat.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jens Axboe <axboe@kernel.dk>
+Hi Mike,
 
-Move the RCU vs SRCU logic into lock/unlock helpers, which makes
-the actual functional bits within the locked region much easier
-to read.
+On 18/1/19 11:29, Mike Snitzer wrote:
+> On Thu, Jan 18 2018 at 10:09pm -0500,
+> Joseph Qi <joseph.qi@linux.alibaba.com> wrote:
+> 
+>> From: Joseph Qi <joseph.qi@linux.alibaba.com>
+>>
+>> DM device sets QUEUE_FLAG_NONROT after the queue is registered. That is
+>> to mean, the previous initialization in blk_throtl_register_queue is
+>> wrong in this case.
+>> Fix it by checking and then updating the info during root tg
+>> initialization as we don't have a better choice.
+>>
+>> Signed-off-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+>> Reviewed-by: Shaohua Li <shli@kernel.org>
+>> ---
+>>  block/blk-throttle.c | 19 +++++++++++++++++++
+>>  1 file changed, 19 insertions(+)
+>>
+>> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+>> index bf52035..7150f14 100644
+>> --- a/block/blk-throttle.c
+>> +++ b/block/blk-throttle.c
+>> @@ -541,6 +541,25 @@ static void throtl_pd_init(struct blkg_policy_data *pd)
+>>  	if (cgroup_subsys_on_dfl(io_cgrp_subsys) && blkg->parent)
+>>  		sq->parent_sq = &blkg_to_tg(blkg->parent)->service_queue;
+>>  	tg->td = td;
+>> +
+>> +#ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+>> +	/*
+>> +	 * DM device sets QUEUE_FLAG_NONROT after the queue is registered,
+>> +	 * so the previous initialization is wrong in this case. Check and
+>> +	 * update it here.
+>> +	 */
+>> +	if (blk_queue_nonrot(blkg->q) &&
+>> +	    td->filtered_latency != LATENCY_FILTERED_SSD) {
+>> +		int i;
+>> +
+>> +		td->throtl_slice = DFL_THROTL_SLICE_SSD;
+>> +		td->filtered_latency = LATENCY_FILTERED_SSD;
+>> +		for (i = 0; i < LATENCY_BUCKET_SIZE; i++) {
+>> +			td->avg_buckets[READ][i].latency = 0;
+>> +			td->avg_buckets[WRITE][i].latency = 0;
+>> +		}
+>> +	}
+>> +#endif
+>>  }
+>>  
+>>  /*
+>> -- 
+>> 1.9.4
+> 
+> This should be fixed for 4.16, please see these block tree commits:
+> http://git.kernel.dk/cgit/linux-block/commit/?h=for-4.16/block&id=fa70d2e2c4a0a54ced98260c6a176cc94c876d27
+> http://git.kernel.dk/cgit/linux-block/commit/?h=for-4.16/block&id=c100ec49fdd2222836ff8a17c7bfcc7611d2ee2b
+> 
+> The last commit's patch header even references the previous submission
+> you had for this patch with:
+> 
+> "These changes also stave off the need to introduce new DM-specific
+> workarounds in block core, e.g. this proposal:
+> https://patchwork.kernel.org/patch/10067961/"
+> 
+Yes, if we call dm_table_set_restrictions before blk_register_queue now,
+we can make sure the initialization is correct by checking whether flag
+QUEUE_FLAG_NONROT is set or not. So my patch is no longer needed.
+Jens, please ignore this patch, thanks.
 
-tj: Reordered in front of timeout revamp patches and added the missing
-    blk_mq_run_hw_queue() conversion.
-
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Tejun Heo <tj@kernel.org>
----
- block/blk-mq.c | 66 ++++++++++++++++++++++++++++------------------------------
- 1 file changed, 32 insertions(+), 34 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 111e1aa..ddc9261 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -557,6 +557,22 @@ static void __blk_mq_complete_request(struct request *rq)
- 	put_cpu();
- }
- 
-+static void hctx_unlock(struct blk_mq_hw_ctx *hctx, int srcu_idx)
-+{
-+	if (!(hctx->flags & BLK_MQ_F_BLOCKING))
-+		rcu_read_unlock();
-+	else
-+		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
-+}
-+
-+static void hctx_lock(struct blk_mq_hw_ctx *hctx, int *srcu_idx)
-+{
-+	if (!(hctx->flags & BLK_MQ_F_BLOCKING))
-+		rcu_read_lock();
-+	else
-+		*srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
-+}
-+
- /**
-  * blk_mq_complete_request - end I/O on a request
-  * @rq:		the request being processed
-@@ -1214,17 +1230,11 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
- 	 */
- 	WARN_ON_ONCE(in_interrupt());
- 
--	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
--		rcu_read_lock();
--		blk_mq_sched_dispatch_requests(hctx);
--		rcu_read_unlock();
--	} else {
--		might_sleep();
-+	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
- 
--		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
--		blk_mq_sched_dispatch_requests(hctx);
--		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
--	}
-+	hctx_lock(hctx, &srcu_idx);
-+	blk_mq_sched_dispatch_requests(hctx);
-+	hctx_unlock(hctx, srcu_idx);
- }
- 
- /*
-@@ -1296,17 +1306,10 @@ bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- 	 * And queue will be rerun in blk_mq_unquiesce_queue() if it is
- 	 * quiesced.
- 	 */
--	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
--		rcu_read_lock();
--		need_run = !blk_queue_quiesced(hctx->queue) &&
--			blk_mq_hctx_has_pending(hctx);
--		rcu_read_unlock();
--	} else {
--		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
--		need_run = !blk_queue_quiesced(hctx->queue) &&
--			blk_mq_hctx_has_pending(hctx);
--		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
--	}
-+	hctx_lock(hctx, &srcu_idx);
-+	need_run = !blk_queue_quiesced(hctx->queue) &&
-+		blk_mq_hctx_has_pending(hctx);
-+	hctx_unlock(hctx, srcu_idx);
- 
- 	if (need_run) {
- 		__blk_mq_delay_run_hw_queue(hctx, async, 0);
-@@ -1618,7 +1621,7 @@ static blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx, struct request *rq)
- 
- static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 					struct request *rq,
--					blk_qc_t *cookie, bool may_sleep)
-+					blk_qc_t *cookie)
- {
- 	struct request_queue *q = rq->q;
- 	struct blk_mq_queue_data bd = {
-@@ -1668,25 +1671,20 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	}
- 
- insert:
--	blk_mq_sched_insert_request(rq, false, run_queue, false, may_sleep);
-+	blk_mq_sched_insert_request(rq, false, run_queue, false,
-+					hctx->flags & BLK_MQ_F_BLOCKING);
- }
- 
- static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 		struct request *rq, blk_qc_t *cookie)
- {
--	if (!(hctx->flags & BLK_MQ_F_BLOCKING)) {
--		rcu_read_lock();
--		__blk_mq_try_issue_directly(hctx, rq, cookie, false);
--		rcu_read_unlock();
--	} else {
--		unsigned int srcu_idx;
-+	int srcu_idx;
- 
--		might_sleep();
-+	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
- 
--		srcu_idx = srcu_read_lock(hctx->queue_rq_srcu);
--		__blk_mq_try_issue_directly(hctx, rq, cookie, true);
--		srcu_read_unlock(hctx->queue_rq_srcu, srcu_idx);
--	}
-+	hctx_lock(hctx, &srcu_idx);
-+	__blk_mq_try_issue_directly(hctx, rq, cookie);
-+	hctx_unlock(hctx, srcu_idx);
- }
- 
- static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
--- 
-2.9.5
+Thanks,
+Joseph
