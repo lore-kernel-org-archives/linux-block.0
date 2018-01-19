@@ -1,41 +1,56 @@
-Return-Path: <prvs=550bc9d12=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
-CC: "dm-devel@redhat.com" <dm-devel@redhat.com>, "hch@infradead.org"
-	<hch@infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "osandov@fb.com" <osandov@fb.com>,
+Return-Path: <ming.lei@redhat.com>
+Date: Fri, 19 Jan 2018 15:34:23 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "axboe@kernel.dk" <axboe@kernel.dk>,
+	"dm-devel@redhat.com" <dm-devel@redhat.com>,
+	"hch@infradead.org" <hch@infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"osandov@fb.com" <osandov@fb.com>,
 	"snitzer@redhat.com" <snitzer@redhat.com>
 Subject: Re: [RFC PATCH] blk-mq: fixup RESTART when queue becomes idle
-Date: Fri, 19 Jan 2018 15:20:13 +0000
-Message-ID: <1516375212.3190.4.camel@wdc.com>
+Message-ID: <20180119073423.GC25369@ming.t460p>
 References: <20180118024124.8079-1-ming.lei@redhat.com>
-	 <b2e5b7e6-ce4b-6053-adae-63cc44d773af@wdc.com>
-	 <20180118170353.GB19734@redhat.com> <1516296056.2676.23.camel@wdc.com>
-	 <20180118183039.GA20121@redhat.com> <1516301278.2676.35.camel@wdc.com>
-	 <deeb2b2e-6d0e-a144-843d-d08626de8aea@kernel.dk>
-	 <20180119023212.GA25413@ming.t460p>
-	 <eba1191e-4d59-a763-03b2-acd2d2812ea3@kernel.dk>
-	 <20180119072623.GB25369@ming.t460p>
-In-Reply-To: <20180119072623.GB25369@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
+ <b2e5b7e6-ce4b-6053-adae-63cc44d773af@wdc.com>
+ <20180118170353.GB19734@redhat.com>
+ <1516296056.2676.23.camel@wdc.com>
+ <20180118183039.GA20121@redhat.com>
+ <1516301278.2676.35.camel@wdc.com>
+ <deeb2b2e-6d0e-a144-843d-d08626de8aea@kernel.dk>
+ <20180119023212.GA25413@ming.t460p>
+ <1516338585.4077.1.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1516338585.4077.1.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gRnJpLCAyMDE4LTAxLTE5IGF0IDE1OjI2ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gUGxl
-YXNlIHNlZSBxdWV1ZV9kZWxheWVkX3dvcmtfb24oKSwgaGN0eC0+cnVuX3dvcmsgaXMgc2hhcmVk
-IGJ5IGFsbA0KPiBzY2hlZHVsaW5nLCBvbmNlIGJsa19tcV9kZWxheV9ydW5faHdfcXVldWUoMTAw
-bXMpIHJldHVybnMsIG5vIG5ldw0KPiBzY2hlZHVsaW5nIGNhbiBtYWtlIHByb2dyZXNzIGR1cmlu
-ZyB0aGUgMTAwbXMuDQoNCkhvdyBhYm91dCBhZGRyZXNzaW5nIHRoYXQgYXMgZm9sbG93czoNCg0K
-ZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1tcS5jIGIvYmxvY2svYmxrLW1xLmMNCmluZGV4IGY3NTE1
-ZGQ5NWEzNi4uNTdmODM3OWE0NzZkIDEwMDY0NA0KLS0tIGEvYmxvY2svYmxrLW1xLmMNCisrKyBi
-L2Jsb2NrL2Jsay1tcS5jDQpAQCAtMTQwMyw5ICsxNDAzLDkgQEAgc3RhdGljIHZvaWQgX19ibGtf
-bXFfZGVsYXlfcnVuX2h3X3F1ZXVlKHN0cnVjdCBibGtfbXFfaHdfY3R4ICpoY3R4LCBib29sIGFz
-eW5jLA0KIAkJcHV0X2NwdSgpOw0KIAl9DQogDQotCWtibG9ja2Rfc2NoZWR1bGVfZGVsYXllZF93
-b3JrX29uKGJsa19tcV9oY3R4X25leHRfY3B1KGhjdHgpLA0KLQkJCQkJICZoY3R4LT5ydW5fd29y
-aywNCi0JCQkJCSBtc2Vjc190b19qaWZmaWVzKG1zZWNzKSk7DQorCWtibG9ja2RfbW9kX2RlbGF5
-ZWRfd29ya19vbihibGtfbXFfaGN0eF9uZXh0X2NwdShoY3R4KSwNCisJCQkJICAgICZoY3R4LT5y
-dW5fd29yaywNCisJCQkJICAgIG1zZWNzX3RvX2ppZmZpZXMobXNlY3MpKTsNCiB9DQogDQogdm9p
-ZCBibGtfbXFfZGVsYXlfcnVuX2h3X3F1ZXVlKHN0cnVjdCBibGtfbXFfaHdfY3R4ICpoY3R4LCB1
-bnNpZ25lZCBsb25nIG1zZWNzKQ0KDQpCYXJ0Lg==
+On Fri, Jan 19, 2018 at 05:09:46AM +0000, Bart Van Assche wrote:
+> On Fri, 2018-01-19 at 10:32 +0800, Ming Lei wrote:
+> > Now most of times both NVMe and SCSI won't return BLK_STS_RESOURCE, and
+> > it should be DM-only which returns STS_RESOURCE so often.
+> 
+> That's wrong at least for SCSI. See also https://marc.info/?l=linux-block&m=151578329417076.
+> 
+
+> For other scenario's, e.g. if a SCSI initiator submits a
+> SCSI request over a fabric and the SCSI target replies with "BUSY" then the
+
+Could you explain a bit when SCSI target replies with BUSY very often?
+
+Inside initiator, we have limited the max per-LUN requests and per-host
+requests already before calling .queue_rq().
+
+> SCSI core will end the I/O request with status BLK_STS_RESOURCE after the
+> maximum number of retries has been reached (see also scsi_io_completion()).
+> In that last case, if a SCSI target sends a "BUSY" reply over the wire back
+> to the initiator, there is no other approach for the SCSI initiator to
+> figure out whether it can queue another request than to resubmit the
+> request. The worst possible strategy is to resubmit a request immediately
+> because that will cause a significant fraction of the fabric bandwidth to
+> be used just for replying "BUSY" to requests that can't be processed
+> immediately.
+
+
+-- 
+Ming
