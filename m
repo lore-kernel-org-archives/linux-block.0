@@ -1,89 +1,51 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Mike Snitzer <snitzer@redhat.com>,
-	dm-devel@redhat.com
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	linux-kernel@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] blk-mq: don't dispatch request in blk_mq_request_direct_issue if queue is busy
-Date: Thu, 18 Jan 2018 12:06:59 +0800
-Message-Id: <20180118040659.20202-1-ming.lei@redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] lib/scatterlist: Fix chaining support in
+ sgl_alloc_order()
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ "Nicholas A . Bellinger" <nab@linux-iscsi.org>,
+ Laurence Oberman <loberman@redhat.com>
+References: <20180119190054.10789-1-bart.vanassche@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <b2309bd1-acfd-1853-bde0-c59d1a4d11a1@kernel.dk>
+Date: Fri, 19 Jan 2018 12:31:36 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180119190054.10789-1-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-If we run into blk_mq_request_direct_issue(), when queue is busy, we
-don't want to dispatch this request into hctx->dispatch_list, and
-what we need to do is to return the queue busy info to caller, so
-that caller can deal with it well.
+On 1/19/18 12:00 PM, Bart Van Assche wrote:
+> This patch avoids that workloads with large block sizes (megabytes)
+> can trigger the following call stack with the ib_srpt driver (that
+> driver is the only driver that chains scatterlists allocated by
+> sgl_alloc_order()):
+> 
+> BUG: Bad page state in process kworker/0:1H  pfn:2423a78
+> page:fffffb03d08e9e00 count:-3 mapcount:0 mapping:          (null) index:0x0
+> flags: 0x57ffffc0000000()
+> raw: 0057ffffc0000000 0000000000000000 0000000000000000 fffffffdffffffff
+> raw: dead000000000100 dead000000000200 0000000000000000 0000000000000000
+> page dumped because: nonzero _count
+> CPU: 0 PID: 733 Comm: kworker/0:1H Tainted: G          I      4.15.0-rc7.bart+ #1
+> Hardware name: HP ProLiant DL380 G7, BIOS P67 08/16/2015
+> Workqueue: ib-comp-wq ib_cq_poll_work [ib_core]
+> Call Trace:
+>  dump_stack+0x5c/0x83
+>  bad_page+0xf5/0x10f
+>  get_page_from_freelist+0xa46/0x11b0
+>  __alloc_pages_nodemask+0x103/0x290
+>  sgl_alloc_order+0x101/0x180
+>  target_alloc_sgl+0x2c/0x40 [target_core_mod]
+>  srpt_alloc_rw_ctxs+0x173/0x2d0 [ib_srpt]
+>  srpt_handle_new_iu+0x61e/0x7f0 [ib_srpt]
+>  __ib_process_cq+0x55/0xa0 [ib_core]
+>  ib_cq_poll_work+0x1b/0x60 [ib_core]
+>  process_one_work+0x141/0x340
+>  worker_thread+0x47/0x3e0
+>  kthread+0xf5/0x130
+>  ret_from_fork+0x1f/0x30
 
-Fixes: 396eaf21ee ("blk-mq: improve DM's blk-mq IO merging via blk_insert_cloned_request feedback")
-Reported-by: Laurence Oberman <loberman@redhat.com>
-Reviewed-by: Mike Snitzer <snitzer@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+Applied, thanks.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4d4af8d712da..1af7fa70993b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1856,15 +1856,6 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	return ret;
- }
- 
--static void __blk_mq_fallback_to_insert(struct request *rq,
--					bool run_queue, bool bypass_insert)
--{
--	if (!bypass_insert)
--		blk_mq_sched_insert_request(rq, false, run_queue, false);
--	else
--		blk_mq_request_bypass_insert(rq, run_queue);
--}
--
- static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 						struct request *rq,
- 						blk_qc_t *cookie,
-@@ -1873,9 +1864,16 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	struct request_queue *q = rq->q;
- 	bool run_queue = true;
- 
--	/* RCU or SRCU read lock is needed before checking quiesced flag */
-+	/*
-+	 * RCU or SRCU read lock is needed before checking quiesced flag.
-+	 *
-+	 * When queue is stopped or quiesced, ignore 'bypass_insert' from
-+	 * blk_mq_request_direct_issue(), and return BLK_STS_OK to caller,
-+	 * and avoid driver to try to dispatch again.
-+	 */
- 	if (blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)) {
- 		run_queue = false;
-+		bypass_insert = false;
- 		goto insert;
- 	}
- 
-@@ -1892,10 +1890,10 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 
- 	return __blk_mq_issue_directly(hctx, rq, cookie);
- insert:
--	__blk_mq_fallback_to_insert(rq, run_queue, bypass_insert);
- 	if (bypass_insert)
- 		return BLK_STS_RESOURCE;
- 
-+	blk_mq_sched_insert_request(rq, false, run_queue, false);
- 	return BLK_STS_OK;
- }
- 
-@@ -1911,7 +1909,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 
- 	ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false);
- 	if (ret == BLK_STS_RESOURCE)
--		__blk_mq_fallback_to_insert(rq, true, false);
-+		blk_mq_sched_insert_request(rq, false, true, false);
- 	else if (ret != BLK_STS_OK)
- 		blk_mq_end_request(rq, ret);
- 
 -- 
-2.9.5
+Jens Axboe
