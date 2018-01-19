@@ -1,32 +1,41 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <jiangqi903@gmail.com>
+Return-Path: <jiangqi903@gmail.com>
 Subject: Re: [PATCH v3 RESEND 1/2] blk-throttle: track read and write request
  individually
-To: Joseph Qi <jiangqi903@gmail.com>
+From: Joseph Qi <jiangqi903@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block <linux-block@vger.kernel.org>, Shaohua Li <shli@kernel.org>,
  qijiang.qj@alibaba-inc.com
 References: <ce8504cb-d3ad-d8cb-4db0-11788578d1af@gmail.com>
  <ee08d6bf-dea8-2b80-b20d-1229409f3542@gmail.com>
  <ea069c52-1080-3ff7-1e52-66a9fbea79c1@kernel.dk>
  <4226471b-a610-0a4a-6588-752fb0300481@gmail.com>
- <00cd7d84-ae7c-b904-00bf-106f00ead776@gmail.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <0f5debf1-9afa-7936-9387-f81144df5530@kernel.dk>
-Date: Thu, 18 Jan 2018 19:52:34 -0700
+Message-ID: <00cd7d84-ae7c-b904-00bf-106f00ead776@gmail.com>
+Date: Fri, 19 Jan 2018 10:11:16 +0800
 MIME-Version: 1.0
-In-Reply-To: <00cd7d84-ae7c-b904-00bf-106f00ead776@gmail.com>
+In-Reply-To: <4226471b-a610-0a4a-6588-752fb0300481@gmail.com>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 1/18/18 7:11 PM, Joseph Qi wrote:
-> Hi Jens,
-> Could you please pick the two pending patches for 4.16?
-> They all have been reviewed by Shaohua.
+Hi Jens,
+Could you please pick the two pending patches for 4.16?
+They all have been reviewed by Shaohua.
 
-Sorry, I guess I forgot about this series. I picked up 1/2,
-for some reason I don't have 2/2 and I can't find it on
-linux-block either. The thread only shows the first patch.
+Thanks,
+Joseph
 
-Can you resend 2/2?
-
--- 
-Jens Axboe
+On 18/1/8 20:05, Joseph Qi wrote:
+> A polite ping for the two pending patches...
+> 
+> Thanks,
+> Joseph
+> 
+> On 17/11/24 13:13, Jens Axboe wrote:
+>> On 11/23/2017 06:31 PM, Joseph Qi wrote:
+>>> Hi Jens,
+>>> Could you please give your advice for the two patches or pick them up if
+>>> you think they are good?
+>>
+>> It looks OK to me, but my preference would be to push this until
+>> 4.16.
+>>
