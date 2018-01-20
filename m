@@ -1,38 +1,34 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Andi Kleen <ak@linux.intel.com>
-To: Goldwyn Rodrigues <rgoldwyn@suse.de>
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        darrick.wong@oracle.com, Goldwyn Rodrigues <rgoldwyn@suse.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from zeniv.linux.org.uk ([195.92.253.2]:51686 "EHLO
+        ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756422AbeATTrw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 20 Jan 2018 14:47:52 -0500
+Date: Sat, 20 Jan 2018 19:47:44 +0000
+From: Al Viro <viro@ZenIV.linux.org.uk>
+To: "Darrick J. Wong" <darrick.wong@oracle.com>
+Cc: Dave Chinner <david@fromorbit.com>,
+        Goldwyn Rodrigues <rgoldwyn@suse.de>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Goldwyn Rodrigues <rgoldwyn@suse.com>
 Subject: Re: [PATCH v5 1/2] Return bytes transferred for partial direct I/O
+Message-ID: <20180120194744.GA14716@ZenIV.linux.org.uk>
 References: <20180119005741.32058-1-rgoldwyn@suse.de>
-Date: Sat, 20 Jan 2018 18:11:08 -0800
-In-Reply-To: <20180119005741.32058-1-rgoldwyn@suse.de> (Goldwyn Rodrigues's
-        message of "Thu, 18 Jan 2018 18:57:40 -0600")
-Message-ID: <87zi58rmf7.fsf@linux.intel.com>
+ <20180119021352.GE13338@ZenIV.linux.org.uk>
+ <20180119035951.GM16421@dastard>
+ <20180119063118.GD5597@magnolia>
+ <20180119063356.GI13338@ZenIV.linux.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180119063356.GI13338@ZenIV.linux.org.uk>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Goldwyn Rodrigues <rgoldwyn@suse.de> writes:
+On Fri, Jan 19, 2018 at 06:33:56AM +0000, Al Viro wrote:
+> > For both patches,
+> > Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
+> 
+> Applied; will be in -next tomorrow morning after the tree I'm putting together
+> gets through local beating.
 
-> From: Goldwyn Rodrigues <rgoldwyn@suse.com>
->
-> In case direct I/O encounters an error midway, it returns the error.
-> Instead it should be returning the number of bytes transferred so far.
-
-It's likely there's a lot of code in user space that does
-
-     if (write(..., N) < 0) handle error
-
-With your change it would need to be
-
-     if (write(..., N) != N) handle error
-
-How much code is actually doing that?
-
-I can understand it fixes your artifical test suite, but it seems to me your
-change has a high potential to break a lot of existing user code
-in subtle ways. So it seems to be a bad idea.
-
--Andi
+FWIW, it consistently blows generic/250 and generic/252.
