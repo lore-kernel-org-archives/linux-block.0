@@ -1,29 +1,58 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:50639 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750793AbeAURRu (ORCPT
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:51653 "EHLO
+        out2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1750793AbeAUQTx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 21 Jan 2018 12:17:50 -0500
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "dave@znu.io" <dave@znu.io>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: blk-mq hangs easily with LLVM+clang test suite
-Date: Sun, 21 Jan 2018 17:17:46 +0000
-Message-ID: <1516555064.3434.5.camel@wdc.com>
-References: <83F7B94F-562A-44A5-92F9-939FE4FD5A99@znu.io>
-In-Reply-To: <83F7B94F-562A-44A5-92F9-939FE4FD5A99@znu.io>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+        Sun, 21 Jan 2018 11:19:53 -0500
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailout.nyi.internal (Postfix) with ESMTP id 8386F209AE
+        for <linux-block@vger.kernel.org>; Sun, 21 Jan 2018 11:19:52 -0500 (EST)
+Received: from [10.0.0.24] (unknown [68.175.132.145])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 3975D2463E
+        for <linux-block@vger.kernel.org>; Sun, 21 Jan 2018 11:19:52 -0500 (EST)
+From: David Zarzycki <dave@znu.io>
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: blk-mq hangs easily with LLVM+clang test suite
+Message-Id: <83F7B94F-562A-44A5-92F9-939FE4FD5A99@znu.io>
+Date: Sun, 21 Jan 2018 11:19:51 -0500
+To: linux-block@vger.kernel.org
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gU3VuLCAyMDE4LTAxLTIxIGF0IDExOjE5IC0wNTAwLCBEYXZpZCBaYXJ6eWNraSB3cm90ZToN
-Cj4gSG93IGNhbiBJIGhlbHAgZGVidWcgdGhpcyBmdXJ0aGVyPw0KDQpQbGVhc2UgYXBwbHkgcGF0
-Y2ggWzFdIG9uIHRvcCBvZiBKZW5zJyBmb3ItbmV4dCBicmFuY2ggWzJdLCByZXByb2R1Y2UgdGhl
-DQpoYW5nIGFuZCBwcm92aWRlIHRoZSBvdXRwdXQgb2YgdGhlIGZvbGxvd2luZyBjb21tYW5kOg0K
-DQooY2QgL3N5cy9rZXJuZWwvZGVidWcvYmxvY2sgJiYgZmluZCAuIC10eXBlIGYgLWV4ZWMgZ3Jl
-cCAtYUggLiB7fSBcOykNCg0KVGhhbmtzLA0KDQpCYXJ0Lg0KDQpbMV0gW1BBVENIXSBibGstbXEt
-ZGVidWdmczogQWxzbyBzaG93IHJlcXVlc3RzIHRoYXQgaGF2ZSBub3QgeWV0IGJlZW4gc3RhcnRl
-ZA0KaHR0cHM6Ly93d3cubWFpbC1hcmNoaXZlLmNvbS9saW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5v
-cmcvbXNnMTczMTMuaHRtbA0KWzJdIGh0dHA6Ly9naXQua2VybmVsLmRrL2NnaXQvbGludXgtYmxv
-Y2svbG9nLz9oPWZvci1uZXh0
+Hello,
+
+I think I=E2=80=99ve narrowed down a kernel hang to the multi-queue =
+block layer when running the LLVM+clang test suite. Here is what I=E2=80=99=
+ve gathered:
+
+1) The hang does *not* reproduce on tmpfs or a SATA SSD drive.
+2) The hang does reproduce on blk-mq devices (NVMe or loopback to a file =
+in tmpfs).
+3) The hang does reproduce with ext4 or xfs, so the filesystem doesn=E2=80=
+=99t seem to matter.
+
+How can I help debug this further?
+
+Thanks,
+Dave
+
+For reference, reproduction steps:
+
+cd /to/a/blk-mq/partition
+git clone https://git.llvm.org/git/llvm.git
+cd llvm/tools
+git clone https://git.llvm.org/git/clang.git
+cd ..
+mkdir t
+cd t
+cmake -G Ninja \
+	-DCMAKE_BUILD_TYPE=3DRelease \
+	-DLLVM_ENABLE_ASSERTIONS=3DTRUE \
+	-DLLVM_TARGETS_TO_BUILD=3DX86 ..
+# It only takes a few runs of the test suite on a 48-core system
+while true
+do
+	ninja check-all
+done=
