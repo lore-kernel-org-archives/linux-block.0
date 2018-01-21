@@ -1,13 +1,13 @@
-Return-Path: <msnitzer@redhat.com>
-Date: Sat, 20 Jan 2018 22:52:01 -0500
-From: Mike Snitzer <snitzer@redhat.com>
-To: Ming Lei <ming.lei@redhat.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Sun, 21 Jan 2018 09:32:54 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Mike Snitzer <snitzer@redhat.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@infradead.org>, linux-scsi@vger.kernel.org,
 	Laurence Oberman <loberman@redhat.com>,
 	Bart Van Assche <bart.vanassche@sandisk.com>
 Subject: Re: blk-mq: introduce BLK_STS_DEV_RESOURCE
-Message-ID: <20180121035200.GA6327@redhat.com>
+Message-ID: <20180121013248.GA13715@ming.t460p>
 References: <20180120134813.4446-1-ming.lei@redhat.com>
  <20180120173001.GA3563@redhat.com>
  <20180121005741.GB9684@ming.t460p>
@@ -16,9 +16,7 @@ Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180121005741.GB9684@ming.t460p>
 List-ID: <linux-block@vger.kernel.org>
 
-On Sat, Jan 20 2018 at  7:57pm -0500,
-Ming Lei <ming.lei@redhat.com> wrote:
-
+On Sun, Jan 21, 2018 at 08:57:41AM +0800, Ming Lei wrote:
 > On Sat, Jan 20, 2018 at 12:30:02PM -0500, Mike Snitzer wrote:
 > > On Sat, Jan 20 2018 at  8:48am -0500,
 > > Ming Lei <ming.lei@redhat.com> wrote:
@@ -64,10 +62,8 @@ Ming Lei <ming.lei@redhat.com> wrote:
 > > Just a nit, but this should be on one line.
 > 
 > It is too long, and my editor starts to highlight/complain it, :-)
-
-Look at the lines immediately following it, your isn't longer than
-them..
-
+> 
+> > 
 > > > @@ -1764,6 +1775,7 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
 > > >  		*cookie = new_cookie;
 > > >  		break;
@@ -92,9 +88,8 @@ them..
 > The difference is that if driver returns BLK_STS_DEV_RESOURCE, the queue
 > will be rerun when resource is available, so don't need to run queue after
 > a delay for avoiding IO hang explicitly.
-
-Yes, I understand the intent.
-
+> 
+> > 
 > > > @@ -1826,7 +1838,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
 > > >  	hctx_lock(hctx, &srcu_idx);
 > > >  
@@ -119,13 +114,10 @@ Yes, I understand the intent.
 > and now dm-rq simply frees it(and in my original version, this request
 > is cached for underlying queue, and reused in next dispatch), for others,
 > the request is retained in hctx->dispatch_list, and owned by blk-mq.
->
+> 
+> > 
 > > Or am I'm misunderstanding what __blk_mq_requeue_request() is doing?
-
-OK I was misunderstanding __blk_mq_requeue_request().  Seems
-__blk_mq_requeue_request() is effectively resetting a request for
-reuse.  Not retaining the request for reissue.
-
+> > 
 > > dm_mq_queue_rq
 > > -> multipath_clone_and_map
 > >    -> blk_get_request (scsi_mq)
@@ -166,51 +158,24 @@ reuse.  Not retaining the request for reissue.
 > > Hope this is clear.
 > 
 > Yeah, it is quite clear.
-
-Well I thought there was a problem with __blk_mq_issue_directly calling
-__blk_mq_requeue_request for dm-rq on scsi-mq.. guess not.
-
+> 
 > I also have other dm-mpath specific questions:
 > 
 > 1) when any STS_RESOURCE is returned from underlying queue either
 > because of blk_get_request() or underlying .queue_rq() for a while,
 > will dm-mpath try to switch to other path?
-
-If dm_requeue_original_request() is used, and then we reenter
-multipath_clone_and_map() then a new path may be selected.  Depending on
-whether there are multiple paths and which path selector is being used.
-
+> 
 > 2) what is the basic path switch policy of dm-mpath?
-
-It is selectable, there are 3:
-round-robin, queue-length and service-time
-
-A path will be failed in multipath_end_io() if IO returns with a
-retryable error (as determined by blk_path_error()).  This ensures the
-path that experienced the failure will not be selected again until
-reinstated.
-
+> 
 > 3) is it possible to move the check of 'ti->type->busy' into
 > .clone_and_map_rq()? if it is possible, this way might be more
 > effective to detect underlying queue busy.
-
-Can you elaborate further why it'd make a difference?
-
-It'd be somewhat odd to push that busy check down into
-.clone_and_map_rq().
-
-Are you looking to check the selected path's blk-mq queue before calling
-blk_get_request()?  Why is that any different than blk_get_request()
-returning busy?
-
+> 
 > Actually this patch may has another issue: if the default run queue
 > delay(in this patch, it is 10ms) is too short, the timer may expire
 > before any in-flight underlying request completes, then we may
 > dequeue too quick, and sequential IO performance can be hurt too.
-
-That's the problem with any arbitrary timer based solution.  No value
-that you pick is going to be correct for all hardware.
- 
+> 
 > But my previous patch in github doesn't have this issue.
 > 
 > 	https://github.com/ming1/linux/commit/dfd672c998283a110247152237a9916b8264f3ec
@@ -218,7 +183,9 @@ that you pick is going to be correct for all hardware.
 > Jens, what do you think of this issue? Or do we need to worry about
 > it?
 
-As your follow-up reply pointed out, blk_get_request_notify() is likely
-the better way forward to address this race.
+Just forget we have discussed to introduce blk_get_request_notify() which
+can address this issue too by returning BLK_STS_DEV_RESOURCE in case
+blk_get_request_notify() gets NULL.
 
-Mike
+-- 
+Ming
