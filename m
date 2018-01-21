@@ -1,42 +1,58 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:56230 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:55245 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932145AbeAUC5G (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 20 Jan 2018 21:57:06 -0500
+        id S932231AbeAUCYC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 20 Jan 2018 21:24:02 -0500
 Subject: Re: [PATCH v5 1/2] Return bytes transferred for partial direct I/O
-To: Al Viro <viro@ZenIV.linux.org.uk>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>
-Cc: Dave Chinner <david@fromorbit.com>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        Goldwyn Rodrigues <rgoldwyn@suse.com>
+To: Andi Kleen <ak@linux.intel.com>
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        darrick.wong@oracle.com, Goldwyn Rodrigues <rgoldwyn@suse.com>
 References: <20180119005741.32058-1-rgoldwyn@suse.de>
- <20180119021352.GE13338@ZenIV.linux.org.uk> <20180119035951.GM16421@dastard>
- <20180119063118.GD5597@magnolia> <20180119063356.GI13338@ZenIV.linux.org.uk>
- <20180120194744.GA14716@ZenIV.linux.org.uk>
+ <87zi58rmf7.fsf@linux.intel.com>
 From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-Message-ID: <8e77a39a-304d-020d-086f-6f5093dc6c8d@suse.de>
-Date: Sat, 20 Jan 2018 20:57:01 -0600
+Message-ID: <c7661c89-1deb-c967-4b19-c1897937f4a3@suse.de>
+Date: Sat, 20 Jan 2018 20:23:56 -0600
 MIME-Version: 1.0
-In-Reply-To: <20180120194744.GA14716@ZenIV.linux.org.uk>
+In-Reply-To: <87zi58rmf7.fsf@linux.intel.com>
 Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
 
 
-On 01/20/2018 01:47 PM, Al Viro wrote:
-> On Fri, Jan 19, 2018 at 06:33:56AM +0000, Al Viro wrote:
->>> For both patches,
->>> Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
->>
->> Applied; will be in -next tomorrow morning after the tree I'm putting together
->> gets through local beating.
+On 01/20/2018 08:11 PM, Andi Kleen wrote:
+> Goldwyn Rodrigues <rgoldwyn@suse.de> writes:
 > 
-> FWIW, it consistently blows generic/250 and generic/252.
+>> From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+>>
+>> In case direct I/O encounters an error midway, it returns the error.
+>> Instead it should be returning the number of bytes transferred so far.
+> 
+> It's likely there's a lot of code in user space that does
+> 
+>      if (write(..., N) < 0) handle error
+> 
+> With your change it would need to be
+> 
+>      if (write(..., N) != N) handle error
+> 
+> How much code is actually doing that?
+> 
+> I can understand it fixes your artifical test suite, but it seems to me your
+> change has a high potential to break a lot of existing user code
+> in subtle ways. So it seems to be a bad idea.
+> 
+> -Andi
 > 
 
-Thanks. I will look into it. It is performing direct writes with dm_error.
-Hopefully it should be just updating the md5sum in the output files.
+
+Quoting 'man 2 write':
+
+RETURN VALUE
+ On  success,  the  number  of bytes written is returned (zero indicates
+ nothing was written).  It is not an error if  this  number  is  smaller
+ than the number of bytes requested; this may happen for example because
+ the disk device was filled.  See also NOTES.
 
 -- 
 Goldwyn
