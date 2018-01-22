@@ -1,38 +1,107 @@
-Return-Path: <prvs=550bc9d12=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Mike Snitzer <snitzer@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH 0/3] Avoid that blk_mq_delay_run_hw_queue() introduces unintended delays
-Date: Fri, 19 Jan 2018 08:58:53 -0800
-Message-Id: <20180119165856.17677-1-bart.vanassche@wdc.com>
+Return-Path: <joseph.qi@linux.alibaba.com>
+From: Joseph Qi <joseph.qi@linux.alibaba.com>
+Subject: [PATCH RESEND 3/3] blk-throttle: do downgrade/upgrade check when
+ issuing io to lower layer
+To: Jens Axboe <axboe@kernel.dk>, Shaohua Li <shli@kernel.org>
+Cc: jiufei.xue@linux.alibaba.com, caspar@linux.alibaba.com,
+ linux-block <linux-block@vger.kernel.org>
+Message-ID: <65fa564f-e6c2-6a9d-a626-8aa3d9716ee6@linux.alibaba.com>
+Date: Mon, 22 Jan 2018 09:17:58 +0800
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hello Jens,
+Currently downgrade/upgrade check is done when io firstly comes to block
+throttle layer. In case of writeback, a large number of ios will firstly
+be throttled in throttle queue and then dispatched when timer is kicked,
+which won't be checked because REQ_THROTTLED is set. This will lead to
+low limit not guaranteed most of time.
+Fix this case by moving check logic down, in which we are ready to issue
+io to lower layer.
 
-Earlier today it was agreed that a blk_mq_delay_run_hw_queue() call followed
-by a blk_mq_run_hw_queue() call should result in an immediate queue run. Hence
-this patch series. Please consider this patch series for kernel v4.16.
+Signed-off-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+Reviewed-by: Jiufei Xue <jiufei.xue@linux.alibaba.com>
+---
+ block/blk-throttle.c | 23 +++++++++++------------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
 
-Thanks,
-
-Bart.
-
-Bart Van Assche (3):
-  blk-mq: Rename blk_mq_request_direct_issue() into
-    blk_mq_request_issue_directly()
-  blk-mq: Avoid that blk_mq_delay_run_hw_queue() introduces unintended
-    delays
-  block: Remove kblockd_schedule_delayed_work{,_on}()
-
- block/blk-core.c       | 16 +---------------
- block/blk-mq.c         | 11 +++++------
- block/blk-mq.h         |  2 +-
- include/linux/blkdev.h |  2 --
- 4 files changed, 7 insertions(+), 24 deletions(-)
-
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 9c0b5ff..6207554 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1065,8 +1065,6 @@ static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
+ 	/* Charge the bio to the group */
+ 	tg->bytes_disp[rw] += bio_size;
+ 	tg->io_disp[rw]++;
+-	tg->last_bytes_disp[rw] += bio_size;
+-	tg->last_io_disp[rw]++;
+ 
+ 	/*
+ 	 * BIO_THROTTLED is used to prevent the same bio to be throttled
+@@ -2166,7 +2164,8 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 		    struct bio *bio)
+ {
+ 	struct throtl_qnode *qn = NULL;
+-	struct throtl_grp *tg = blkg_to_tg(blkg ?: q->root_blkg);
++	struct throtl_grp *orig_tg = blkg_to_tg(blkg ?: q->root_blkg);
++	struct throtl_grp *tg = orig_tg;
+ 	struct throtl_service_queue *sq;
+ 	bool rw = bio_data_dir(bio);
+ 	bool throttled = false;
+@@ -2174,11 +2173,11 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 
+ 	WARN_ON_ONCE(!rcu_read_lock_held());
+ 
++	spin_lock_irq(q->queue_lock);
++
+ 	/* see throtl_charge_bio() */
+ 	if (bio_flagged(bio, BIO_THROTTLED) || !tg->has_rules[rw])
+-		goto out;
+-
+-	spin_lock_irq(q->queue_lock);
++		goto out_unlock;
+ 
+ 	throtl_update_latency_buckets(td);
+ 
+@@ -2194,15 +2193,12 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 	while (true) {
+ 		if (tg->last_low_overflow_time[rw] == 0)
+ 			tg->last_low_overflow_time[rw] = jiffies;
+-		throtl_downgrade_check(tg);
+-		throtl_upgrade_check(tg);
+ 		/* throtl is FIFO - if bios are already queued, should queue */
+ 		if (sq->nr_queued[rw])
+ 			break;
+ 
+ 		/* if above limits, break to queue */
+ 		if (!tg_may_dispatch(tg, bio, NULL)) {
+-			tg->last_low_overflow_time[rw] = jiffies;
+ 			if (throtl_can_upgrade(td, tg)) {
+ 				throtl_upgrade_state(td);
+ 				goto again;
+@@ -2246,8 +2242,6 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 		   tg->io_disp[rw], tg_iops_limit(tg, rw),
+ 		   sq->nr_queued[READ], sq->nr_queued[WRITE]);
+ 
+-	tg->last_low_overflow_time[rw] = jiffies;
+-
+ 	td->nr_queued[rw]++;
+ 	throtl_add_bio_tg(bio, qn, tg);
+ 	throttled = true;
+@@ -2264,8 +2258,13 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 	}
+ 
+ out_unlock:
++	throtl_downgrade_check(orig_tg);
++	throtl_upgrade_check(orig_tg);
++	if (!throttled) {
++		orig_tg->last_bytes_disp[rw] += throtl_bio_data_size(bio);
++		orig_tg->last_io_disp[rw]++;
++	}
+ 	spin_unlock_irq(q->queue_lock);
+-out:
+ 	bio_set_flag(bio, BIO_THROTTLED);
+ 
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
 -- 
-2.15.1
+1.9.4
