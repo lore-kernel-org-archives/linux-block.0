@@ -1,60 +1,168 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-From: Tejun Heo <tj@kernel.org>
-To: jack@suse.cz,
-	axboe@kernel.dk,
-	clm@fb.com,
-	jbacik@fb.com
-Cc: kernel-team@fb.com,
-	linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	peterz@infradead.org,
-	jianchao.w.wang@oracle.com,
-	Bart.VanAssche@wdc.com,
-	linux-block@vger.kernel.org,
-	Tejun Heo <tj@kernel.org>
-Subject: [PATCH 4/8] blk-mq: use blk_mq_rq_state() instead of testing REQ_ATOM_COMPLETE
-Date: Tue,  9 Jan 2018 08:29:49 -0800
-Message-Id: <20180109162953.1211451-5-tj@kernel.org>
-In-Reply-To: <20180109162953.1211451-1-tj@kernel.org>
-References: <20180109162953.1211451-1-tj@kernel.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from szxga06-in.huawei.com ([45.249.212.32]:33202 "EHLO huawei.com"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751122AbeAVNA4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 22 Jan 2018 08:00:56 -0500
+Subject: Re: [PATCH] blktrace: support enabling cgroup info per-device
+To: <axboe@kernel.dk>
+References: <20180111040946.21674-1-houtao1@huawei.com>
+ <c2816776-2e1e-65d2-3130-f12c4ff962ad@huawei.com>
+CC: <linux-block@vger.kernel.org>, Shaohua Li <shli@kernel.org>
+From: Hou Tao <houtao1@huawei.com>
+Message-ID: <3b724305-6354-237a-5c1b-536bc5ad0be5@huawei.com>
+Date: Mon, 22 Jan 2018 21:00:34 +0800
+MIME-Version: 1.0
+In-Reply-To: <c2816776-2e1e-65d2-3130-f12c4ff962ad@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-blk_mq_check_inflight() and blk_mq_poll_hybrid_sleep() test
-REQ_ATOM_COMPLETE to determine the request state.  Both uses are
-speculative and we can test REQ_ATOM_STARTED and blk_mq_rq_state() for
-equivalent results.  Replace the tests.  This will allow removing
-REQ_ATOM_COMPLETE usages from blk-mq.
+Hi Jens,
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
----
- block/blk-mq.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Could you please look at this patch and the related patch set for blktrace [1], and
+give some feedback ?
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 052fee5..51e9704 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -95,8 +95,7 @@ static void blk_mq_check_inflight(struct blk_mq_hw_ctx *hctx,
- {
- 	struct mq_inflight *mi = priv;
- 
--	if (test_bit(REQ_ATOM_STARTED, &rq->atomic_flags) &&
--	    !test_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags)) {
-+	if (blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT) {
- 		/*
- 		 * index[0] counts the specific partition that was asked
- 		 * for. index[1] counts the ones that are active on the
-@@ -3023,7 +3022,8 @@ static bool blk_mq_poll_hybrid_sleep(struct request_queue *q,
- 
- 	hrtimer_init_sleeper(&hs, current);
- 	do {
--		if (test_bit(REQ_ATOM_COMPLETE, &rq->atomic_flags))
-+		if (test_bit(REQ_ATOM_STARTED, &rq->atomic_flags) &&
-+		    blk_mq_rq_state(rq) != MQ_RQ_IN_FLIGHT)
- 			break;
- 		set_current_state(TASK_UNINTERRUPTIBLE);
- 		hrtimer_start_expires(&hs.timer, mode);
--- 
-2.9.5
+Regards,
+Tao
+
+[1]: https://www.spinics.net/lists/linux-btrace/msg00790.html
+
+On 2018/1/17 14:10, Hou Tao wrote:
+> Hi Jens,
+> 
+> Any comments on this patch and the related patch set for blktrace [1] ?
+> 
+> Regards,
+> Tao
+> 
+> [1]: https://www.spinics.net/lists/linux-btrace/msg00790.html
+> 
+> On 2018/1/11 12:09, Hou Tao wrote:
+>> Now blktrace supports outputting cgroup info for trace action and
+>> trace message, however, it can only be enabled globally by writing
+>> "blk_cgroup" to trace_options file, and there is no per-device API
+>> for the new functionality.
+>>
+>> Adding a new field (enable_cg_info) by using the pad after act_mask
+>> in struct blk_user_trace_setup and a new attr file (cgroup_info) under
+>> /sys/block/$dev/trace dir, so BLKTRACESETUP ioctl and sysfs file
+>> can be used to enable cgroup info for selected block devices.
+>>
+>> Signed-off-by: Hou Tao <houtao1@huawei.com>
+>> ---
+>>  include/linux/blktrace_api.h      |  2 ++
+>>  include/uapi/linux/blktrace_api.h |  1 +
+>>  kernel/trace/blktrace.c           | 14 ++++++++++++--
+>>  3 files changed, 15 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/include/linux/blktrace_api.h b/include/linux/blktrace_api.h
+>> index 8804753..f120c6a 100644
+>> --- a/include/linux/blktrace_api.h
+>> +++ b/include/linux/blktrace_api.h
+>> @@ -18,6 +18,7 @@ struct blk_trace {
+>>  	unsigned long __percpu *sequence;
+>>  	unsigned char __percpu *msg_data;
+>>  	u16 act_mask;
+>> +	bool enable_cg_info;
+>>  	u64 start_lba;
+>>  	u64 end_lba;
+>>  	u32 pid;
+>> @@ -102,6 +103,7 @@ static inline int blk_trace_init_sysfs(struct device *dev)
+>>  struct compat_blk_user_trace_setup {
+>>  	char name[BLKTRACE_BDEV_SIZE];
+>>  	u16 act_mask;
+>> +	u8  enable_cg_info;
+>>  	u32 buf_size;
+>>  	u32 buf_nr;
+>>  	compat_u64 start_lba;
+>> diff --git a/include/uapi/linux/blktrace_api.h b/include/uapi/linux/blktrace_api.h
+>> index 20d1490d..d9d9fca 100644
+>> --- a/include/uapi/linux/blktrace_api.h
+>> +++ b/include/uapi/linux/blktrace_api.h
+>> @@ -136,6 +136,7 @@ enum {
+>>  struct blk_user_trace_setup {
+>>  	char name[BLKTRACE_BDEV_SIZE];	/* output */
+>>  	__u16 act_mask;			/* input */
+>> +	__u8  enable_cg_info;   /* input */
+>>  	__u32 buf_size;			/* input */
+>>  	__u32 buf_nr;			/* input */
+>>  	__u64 start_lba;
+>> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+>> index 987d9a9a..f420400 100644
+>> --- a/kernel/trace/blktrace.c
+>> +++ b/kernel/trace/blktrace.c
+>> @@ -180,7 +180,8 @@ void __trace_note_message(struct blk_trace *bt, struct blkcg *blkcg,
+>>  	n = vscnprintf(buf, BLK_TN_MAX_MSG, fmt, args);
+>>  	va_end(args);
+>>  
+>> -	if (!(blk_tracer_flags.val & TRACE_BLK_OPT_CGROUP))
+>> +	if (!((blk_tracer_flags.val & TRACE_BLK_OPT_CGROUP) ||
+>> +		  bt->enable_cg_info))
+>>  		blkcg = NULL;
+>>  #ifdef CONFIG_BLK_CGROUP
+>>  	trace_note(bt, 0, BLK_TN_MESSAGE, buf, n,
+>> @@ -549,6 +550,7 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+>>  	bt->act_mask = buts->act_mask;
+>>  	if (!bt->act_mask)
+>>  		bt->act_mask = (u16) -1;
+>> +	bt->enable_cg_info = buts->enable_cg_info;
+>>  
+>>  	blk_trace_setup_lba(bt, bdev);
+>>  
+>> @@ -625,6 +627,7 @@ static int compat_blk_trace_setup(struct request_queue *q, char *name,
+>>  
+>>  	buts = (struct blk_user_trace_setup) {
+>>  		.act_mask = cbuts.act_mask,
+>> +		.enable_cg_info = cbuts.enable_cg_info,
+>>  		.buf_size = cbuts.buf_size,
+>>  		.buf_nr = cbuts.buf_nr,
+>>  		.start_lba = cbuts.start_lba,
+>> @@ -773,7 +776,8 @@ blk_trace_bio_get_cgid(struct request_queue *q, struct bio *bio)
+>>  {
+>>  	struct blk_trace *bt = q->blk_trace;
+>>  
+>> -	if (!bt || !(blk_tracer_flags.val & TRACE_BLK_OPT_CGROUP))
+>> +	if (!(bt && (bt->enable_cg_info ||
+>> +			 (blk_tracer_flags.val & TRACE_BLK_OPT_CGROUP))))
+>>  		return NULL;
+>>  
+>>  	if (!bio->bi_css)
+>> @@ -1664,6 +1668,7 @@ static BLK_TRACE_DEVICE_ATTR(act_mask);
+>>  static BLK_TRACE_DEVICE_ATTR(pid);
+>>  static BLK_TRACE_DEVICE_ATTR(start_lba);
+>>  static BLK_TRACE_DEVICE_ATTR(end_lba);
+>> +static BLK_TRACE_DEVICE_ATTR(cgroup_info);
+>>  
+>>  static struct attribute *blk_trace_attrs[] = {
+>>  	&dev_attr_enable.attr,
+>> @@ -1671,6 +1676,7 @@ static struct attribute *blk_trace_attrs[] = {
+>>  	&dev_attr_pid.attr,
+>>  	&dev_attr_start_lba.attr,
+>>  	&dev_attr_end_lba.attr,
+>> +	&dev_attr_cgroup_info.attr,
+>>  	NULL
+>>  };
+>>  
+>> @@ -1794,6 +1800,8 @@ static ssize_t sysfs_blk_trace_attr_show(struct device *dev,
+>>  		ret = sprintf(buf, "%llu\n", q->blk_trace->start_lba);
+>>  	else if (attr == &dev_attr_end_lba)
+>>  		ret = sprintf(buf, "%llu\n", q->blk_trace->end_lba);
+>> +	else if (attr == &dev_attr_cgroup_info)
+>> +		ret = sprintf(buf, "%u\n", q->blk_trace->enable_cg_info);
+>>  
+>>  out_unlock_bdev:
+>>  	mutex_unlock(&q->blk_trace_mutex);
+>> @@ -1861,6 +1869,8 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
+>>  			q->blk_trace->start_lba = value;
+>>  		else if (attr == &dev_attr_end_lba)
+>>  			q->blk_trace->end_lba = value;
+>> +		else if (attr == &dev_attr_cgroup_info)
+>> +			q->blk_trace->enable_cg_info = !!value;
+>>  	}
+>>  
+>>  out_unlock_bdev:
+>>
+> 
+> 
+> .
+> 
