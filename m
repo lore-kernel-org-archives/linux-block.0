@@ -1,48 +1,207 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:48770 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932220AbeAKUO3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jan 2018 15:14:29 -0500
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk
-Cc: Ming Lei <tom.leiming@gmail.com>, hare@suse.de,
-        Bart.VanAssche@wdc.com, dm-devel@redhat.com,
-        linux-block@vger.kernel.org
-Subject: [for-4.16 PATCH v4 2/4] block: use queue_lock when clearing QUEUE_FLAG_REGISTERED in blk_unregister_queue
-Date: Thu, 11 Jan 2018 15:14:15 -0500
-Message-Id: <20180111201417.2042-3-snitzer@redhat.com>
-In-Reply-To: <20180111201417.2042-1-snitzer@redhat.com>
-References: <20180111201417.2042-1-snitzer@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <gregkh@linuxfoundation.org>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: linux-kernel@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	stable@vger.kernel.org,
+	Josh Snyder <joshs@netflix.com>,
+	Tejun Heo <tj@kernel.org>,
+	Balbir Singh <bsingharora@gmail.com>,
+	Brendan Gregg <bgregg@netflix.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	linux-block@vger.kernel.org,
+	Ingo Molnar <mingo@kernel.org>
+Subject: [PATCH 4.14 28/89] delayacct: Account blkio completion on the correct task
+Date: Mon, 22 Jan 2018 09:45:08 +0100
+Message-Id: <20180122083957.481864595@linuxfoundation.org>
+In-Reply-To: <20180122083954.683903493@linuxfoundation.org>
+References: <20180122083954.683903493@linuxfoundation.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+List-ID: <linux-block@vger.kernel.org>
 
-blk_unregister_queue() must protect against any modifications of
-q->queue_flags (not just those performed in blk-sysfs.c).  Therefore
-q->queue_lock needs to be used rather than q->sysfs_lock.
+4.14-stable review patch.  If anyone has any objections, please let me know.
 
-Fixes: e9a823fb34a8b ("block: fix warning when I/O elevator is changed as request_queue is being removed")
-Cc: stable@vger.kernel.org # 4.14+
-Reported-by: Bart Van Assche <Bart.VanAssche@wdc.com>
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+------------------
+
+From: Josh Snyder <joshs@netflix.com>
+
+commit c96f5471ce7d2aefd0dda560cc23f08ab00bc65d upstream.
+
+Before commit:
+
+  e33a9bba85a8 ("sched/core: move IO scheduling accounting from io_schedule_timeout() into scheduler")
+
+delayacct_blkio_end() was called after context-switching into the task which
+completed I/O.
+
+This resulted in double counting: the task would account a delay both waiting
+for I/O and for time spent in the runqueue.
+
+With e33a9bba85a8, delayacct_blkio_end() is called by try_to_wake_up().
+In ttwu, we have not yet context-switched. This is more correct, in that
+the delay accounting ends when the I/O is complete.
+
+But delayacct_blkio_end() relies on 'get_current()', and we have not yet
+context-switched into the task whose I/O completed. This results in the
+wrong task having its delay accounting statistics updated.
+
+Instead of doing that, pass the task_struct being woken to delayacct_blkio_end(),
+so that it can update the statistics of the correct task.
+
+Signed-off-by: Josh Snyder <joshs@netflix.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Acked-by: Balbir Singh <bsingharora@gmail.com>
+Cc: Brendan Gregg <bgregg@netflix.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: linux-block@vger.kernel.org
+Fixes: e33a9bba85a8 ("sched/core: move IO scheduling accounting from io_schedule_timeout() into scheduler")
+Link: http://lkml.kernel.org/r/1513613712-571-1-git-send-email-joshs@netflix.com
+Signed-off-by: Ingo Molnar <mingo@kernel.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
 ---
- block/blk-sysfs.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/linux/delayacct.h |    8 ++++----
+ kernel/delayacct.c        |   42 ++++++++++++++++++++++++++----------------
+ kernel/sched/core.c       |    6 +++---
+ 3 files changed, 33 insertions(+), 23 deletions(-)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 870484eaed1f..52f57539f1c7 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -929,9 +929,9 @@ void blk_unregister_queue(struct gendisk *disk)
- 	if (WARN_ON(!q))
- 		return;
+--- a/include/linux/delayacct.h
++++ b/include/linux/delayacct.h
+@@ -71,7 +71,7 @@ extern void delayacct_init(void);
+ extern void __delayacct_tsk_init(struct task_struct *);
+ extern void __delayacct_tsk_exit(struct task_struct *);
+ extern void __delayacct_blkio_start(void);
+-extern void __delayacct_blkio_end(void);
++extern void __delayacct_blkio_end(struct task_struct *);
+ extern int __delayacct_add_tsk(struct taskstats *, struct task_struct *);
+ extern __u64 __delayacct_blkio_ticks(struct task_struct *);
+ extern void __delayacct_freepages_start(void);
+@@ -122,10 +122,10 @@ static inline void delayacct_blkio_start
+ 		__delayacct_blkio_start();
+ }
  
--	mutex_lock(&q->sysfs_lock);
-+	spin_lock_irq(q->queue_lock);
- 	queue_flag_clear_unlocked(QUEUE_FLAG_REGISTERED, q);
--	mutex_unlock(&q->sysfs_lock);
-+	spin_unlock_irq(q->queue_lock);
+-static inline void delayacct_blkio_end(void)
++static inline void delayacct_blkio_end(struct task_struct *p)
+ {
+ 	if (current->delays)
+-		__delayacct_blkio_end();
++		__delayacct_blkio_end(p);
+ 	delayacct_clear_flag(DELAYACCT_PF_BLKIO);
+ }
  
- 	wbt_exit(q);
+@@ -169,7 +169,7 @@ static inline void delayacct_tsk_free(st
+ {}
+ static inline void delayacct_blkio_start(void)
+ {}
+-static inline void delayacct_blkio_end(void)
++static inline void delayacct_blkio_end(struct task_struct *p)
+ {}
+ static inline int delayacct_add_tsk(struct taskstats *d,
+ 					struct task_struct *tsk)
+--- a/kernel/delayacct.c
++++ b/kernel/delayacct.c
+@@ -51,16 +51,16 @@ void __delayacct_tsk_init(struct task_st
+  * Finish delay accounting for a statistic using its timestamps (@start),
+  * accumalator (@total) and @count
+  */
+-static void delayacct_end(u64 *start, u64 *total, u32 *count)
++static void delayacct_end(spinlock_t *lock, u64 *start, u64 *total, u32 *count)
+ {
+ 	s64 ns = ktime_get_ns() - *start;
+ 	unsigned long flags;
  
--- 
-2.15.0
+ 	if (ns > 0) {
+-		spin_lock_irqsave(&current->delays->lock, flags);
++		spin_lock_irqsave(lock, flags);
+ 		*total += ns;
+ 		(*count)++;
+-		spin_unlock_irqrestore(&current->delays->lock, flags);
++		spin_unlock_irqrestore(lock, flags);
+ 	}
+ }
+ 
+@@ -69,17 +69,25 @@ void __delayacct_blkio_start(void)
+ 	current->delays->blkio_start = ktime_get_ns();
+ }
+ 
+-void __delayacct_blkio_end(void)
++/*
++ * We cannot rely on the `current` macro, as we haven't yet switched back to
++ * the process being woken.
++ */
++void __delayacct_blkio_end(struct task_struct *p)
+ {
+-	if (current->delays->flags & DELAYACCT_PF_SWAPIN)
+-		/* Swapin block I/O */
+-		delayacct_end(&current->delays->blkio_start,
+-			&current->delays->swapin_delay,
+-			&current->delays->swapin_count);
+-	else	/* Other block I/O */
+-		delayacct_end(&current->delays->blkio_start,
+-			&current->delays->blkio_delay,
+-			&current->delays->blkio_count);
++	struct task_delay_info *delays = p->delays;
++	u64 *total;
++	u32 *count;
++
++	if (p->delays->flags & DELAYACCT_PF_SWAPIN) {
++		total = &delays->swapin_delay;
++		count = &delays->swapin_count;
++	} else {
++		total = &delays->blkio_delay;
++		count = &delays->blkio_count;
++	}
++
++	delayacct_end(&delays->lock, &delays->blkio_start, total, count);
+ }
+ 
+ int __delayacct_add_tsk(struct taskstats *d, struct task_struct *tsk)
+@@ -153,8 +161,10 @@ void __delayacct_freepages_start(void)
+ 
+ void __delayacct_freepages_end(void)
+ {
+-	delayacct_end(&current->delays->freepages_start,
+-			&current->delays->freepages_delay,
+-			&current->delays->freepages_count);
++	delayacct_end(
++		&current->delays->lock,
++		&current->delays->freepages_start,
++		&current->delays->freepages_delay,
++		&current->delays->freepages_count);
+ }
+ 
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -2046,7 +2046,7 @@ try_to_wake_up(struct task_struct *p, un
+ 	p->state = TASK_WAKING;
+ 
+ 	if (p->in_iowait) {
+-		delayacct_blkio_end();
++		delayacct_blkio_end(p);
+ 		atomic_dec(&task_rq(p)->nr_iowait);
+ 	}
+ 
+@@ -2059,7 +2059,7 @@ try_to_wake_up(struct task_struct *p, un
+ #else /* CONFIG_SMP */
+ 
+ 	if (p->in_iowait) {
+-		delayacct_blkio_end();
++		delayacct_blkio_end(p);
+ 		atomic_dec(&task_rq(p)->nr_iowait);
+ 	}
+ 
+@@ -2112,7 +2112,7 @@ static void try_to_wake_up_local(struct
+ 
+ 	if (!task_on_rq_queued(p)) {
+ 		if (p->in_iowait) {
+-			delayacct_blkio_end();
++			delayacct_blkio_end(p);
+ 			atomic_dec(&rq->nr_iowait);
+ 		}
+ 		ttwu_activate(rq, p, ENQUEUE_WAKEUP | ENQUEUE_NOCLOCK);
