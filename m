@@ -1,125 +1,69 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Tue, 23 Jan 2018 08:57:34 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"snitzer@redhat.com" <snitzer@redhat.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"dm-devel@redhat.com" <dm-devel@redhat.com>,
-	"jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-	"loberman@redhat.com" <loberman@redhat.com>
+Return-Path: <prvs=5532d045d=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@infradead.org" <hch@infradead.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "snitzer@redhat.com" <snitzer@redhat.com>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
+CC: "dm-devel@redhat.com" <dm-devel@redhat.com>, "jejb@linux.vnet.ibm.com"
+	<jejb@linux.vnet.ibm.com>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "loberman@redhat.com" <loberman@redhat.com>
 Subject: Re: [PATCH 1/5] blk-mq: introduce BLK_STS_DEV_RESOURCE
-Message-ID: <20180123005728.GB4411@ming.t460p>
+Date: Mon, 22 Jan 2018 16:49:54 +0000
+Message-ID: <1516639793.2545.14.camel@sandisk.com>
 References: <20180122033550.27855-1-ming.lei@redhat.com>
- <20180122033550.27855-2-ming.lei@redhat.com>
- <1516639793.2545.14.camel@sandisk.com>
+	 <20180122033550.27855-2-ming.lei@redhat.com>
+In-Reply-To: <20180122033550.27855-2-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1516639793.2545.14.camel@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jan 22, 2018 at 04:49:54PM +0000, Bart Van Assche wrote:
-> On Mon, 2018-01-22 at 11:35 +0800, Ming Lei wrote:
-> > @@ -1280,10 +1282,18 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
-> >  		 * - Some but not all block drivers stop a queue before
-> >  		 *   returning BLK_STS_RESOURCE. Two exceptions are scsi-mq
-> >  		 *   and dm-rq.
-> > +		 *
-> > +		 * If drivers return BLK_STS_RESOURCE and S_SCHED_RESTART
-> > +		 * bit is set, run queue after 10ms for avoiding IO hang
-> > +		 * because the queue may be idle and the RESTART mechanism
-> > +		 * can't work any more.
-> >  		 */
-> > -		if (!blk_mq_sched_needs_restart(hctx) ||
-> > +		needs_restart = blk_mq_sched_needs_restart(hctx);
-> > +		if (!needs_restart ||
-> >  		    (no_tag && list_empty_careful(&hctx->dispatch_wait.entry)))
-> >  			blk_mq_run_hw_queue(hctx, true);
-> > +		else if (needs_restart && (ret == BLK_STS_RESOURCE))
-> > +			blk_mq_delay_run_hw_queue(hctx, 10);
-> >  	}
-> 
-> In my opinion there are two problems with the above changes:
-> * Only the block driver author can know what a good choice is for the time
-
-The reality is that no one knew that before, if you look at the fact, most of
-BLK_STS_RESOURCE need that, but no one dealt with it at all. Both Jens and I
-concluded that it is a generic issue, which need generic solution.
-
-On the contrary, it is much easier to evaluate if one STS_RESOURCE can be
-converted to STS_DEV_RESOURCE, as you saw, there isn't many, because now we
-call .queue_rq() after getting budget and driver tag.
-
->   after which to rerun the queue. So I think moving the rerun delay (10 ms)
->   constant from block drivers into the core is a step backwards instead of a
->   step forwards.
-
-As I mentioned before, if running out of resource inside .queue_rq(),
-this request is still out of control of blk-mq, and if run queue is
-scheduled inside .queue_rq(), it isn't correct, because when __blk_mq_run_hw_queue()
-is run, the request may not be visible for dispatch.
-
-Even though RCU lock is held during dispatch, preemption or interrupt
-can happen too, so it is simply wrong to depend on the timing to make
-sure __blk_mq_run_hw_queue() can see the request in this situation.
-
-Or driver reinserts the request into scheduler queue, but that way
-involves much big change if we do this in driver, and introduce
-unnecessary cost meantime.
-
-> * The purpose of the BLK_MQ_S_SCHED_RESTART flag is to detect whether or not
->   any of the queue runs triggered by freeing a tag happened concurrently. I
->   don't think that there is any relationship between queue runs happening all
->   or not concurrently and the chance that driver resources become available.
->   So deciding whether or not a queue should be rerun based on the value of
->   the BLK_MQ_S_SCHED_RESTART flag seems wrong to me.
-
-The fact is simple, that once BLK_MQ_S_SCHED_RESTART is set,
-blk_mq_dispatch_rq_list() won't call blk_mq_run_hw_queue() any more, and depends
-on request completion to rerun the queue. If driver can't make sure the queue will be
-restarted in future by returning STS_RESOURCE, we have to call
-blk_mq_delay_run_hw_queue(hctx, 10) for avoiding IO hang.
-
-> 
-> > diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-> > index d9ca1dfab154..55be2550c555 100644
-> > --- a/drivers/scsi/scsi_lib.c
-> > +++ b/drivers/scsi/scsi_lib.c
-> > @@ -2030,9 +2030,9 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
-> >  	case BLK_STS_OK:
-> >  		break;
-> >  	case BLK_STS_RESOURCE:
-> > -		if (atomic_read(&sdev->device_busy) == 0 &&
-> > -		    !scsi_device_blocked(sdev))
-> > -			blk_mq_delay_run_hw_queue(hctx, SCSI_QUEUE_DELAY);
-> > +		if (atomic_read(&sdev->device_busy) ||
-> > +		    scsi_device_blocked(sdev))
-> > +			ret = BLK_STS_DEV_RESOURCE;
-> >  		break;
-> >  	default:
-> >  		/*
-> 
-> The above introduces two changes that have not been mentioned in the
-> description of this patch:
-> - The queue rerunning delay is changed from 3 ms into 10 ms. Where is the
->   explanation of this change? Does this change have a positive or negative
->   performance impact?
-
-How can that be a issue for SCSI? The rerunning delay is only triggered
-when there isn't any in-flight requests in SCSI queue.
-
-> - The above modifies a guaranteed queue rerun into a queue rerun that
->   may or may not happen, depending on whether or not multiple tags get freed
->   concurrently (return BLK_STS_DEV_RESOURCE). Sorry but I think that's wrong.
-
-This patch only moves the rerunning delay from SCSI .queue_rq into
-blk-mq, I don't know what you mean above, please explained a bit.
-
-I know there is a race here in SCSI, but nothing to do with this patch.
-
-
--- 
-Ming
+T24gTW9uLCAyMDE4LTAxLTIyIGF0IDExOjM1ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gQEAg
+LTEyODAsMTAgKzEyODIsMTggQEAgYm9vbCBibGtfbXFfZGlzcGF0Y2hfcnFfbGlzdChzdHJ1Y3Qg
+cmVxdWVzdF9xdWV1ZSAqcSwgc3RydWN0IGxpc3RfaGVhZCAqbGlzdCwNCj4gIAkJICogLSBTb21l
+IGJ1dCBub3QgYWxsIGJsb2NrIGRyaXZlcnMgc3RvcCBhIHF1ZXVlIGJlZm9yZQ0KPiAgCQkgKiAg
+IHJldHVybmluZyBCTEtfU1RTX1JFU09VUkNFLiBUd28gZXhjZXB0aW9ucyBhcmUgc2NzaS1tcQ0K
+PiAgCQkgKiAgIGFuZCBkbS1ycS4NCj4gKwkJICoNCj4gKwkJICogSWYgZHJpdmVycyByZXR1cm4g
+QkxLX1NUU19SRVNPVVJDRSBhbmQgU19TQ0hFRF9SRVNUQVJUDQo+ICsJCSAqIGJpdCBpcyBzZXQs
+IHJ1biBxdWV1ZSBhZnRlciAxMG1zIGZvciBhdm9pZGluZyBJTyBoYW5nDQo+ICsJCSAqIGJlY2F1
+c2UgdGhlIHF1ZXVlIG1heSBiZSBpZGxlIGFuZCB0aGUgUkVTVEFSVCBtZWNoYW5pc20NCj4gKwkJ
+ICogY2FuJ3Qgd29yayBhbnkgbW9yZS4NCj4gIAkJICovDQo+IC0JCWlmICghYmxrX21xX3NjaGVk
+X25lZWRzX3Jlc3RhcnQoaGN0eCkgfHwNCj4gKwkJbmVlZHNfcmVzdGFydCA9IGJsa19tcV9zY2hl
+ZF9uZWVkc19yZXN0YXJ0KGhjdHgpOw0KPiArCQlpZiAoIW5lZWRzX3Jlc3RhcnQgfHwNCj4gIAkJ
+ICAgIChub190YWcgJiYgbGlzdF9lbXB0eV9jYXJlZnVsKCZoY3R4LT5kaXNwYXRjaF93YWl0LmVu
+dHJ5KSkpDQo+ICAJCQlibGtfbXFfcnVuX2h3X3F1ZXVlKGhjdHgsIHRydWUpOw0KPiArCQllbHNl
+IGlmIChuZWVkc19yZXN0YXJ0ICYmIChyZXQgPT0gQkxLX1NUU19SRVNPVVJDRSkpDQo+ICsJCQli
+bGtfbXFfZGVsYXlfcnVuX2h3X3F1ZXVlKGhjdHgsIDEwKTsNCj4gIAl9DQoNCkluIG15IG9waW5p
+b24gdGhlcmUgYXJlIHR3byBwcm9ibGVtcyB3aXRoIHRoZSBhYm92ZSBjaGFuZ2VzOg0KKiBPbmx5
+IHRoZSBibG9jayBkcml2ZXIgYXV0aG9yIGNhbiBrbm93IHdoYXQgYSBnb29kIGNob2ljZSBpcyBm
+b3IgdGhlIHRpbWUNCiAgYWZ0ZXIgd2hpY2ggdG8gcmVydW4gdGhlIHF1ZXVlLiBTbyBJIHRoaW5r
+IG1vdmluZyB0aGUgcmVydW4gZGVsYXkgKDEwIG1zKQ0KICBjb25zdGFudCBmcm9tIGJsb2NrIGRy
+aXZlcnMgaW50byB0aGUgY29yZSBpcyBhIHN0ZXAgYmFja3dhcmRzIGluc3RlYWQgb2YgYQ0KICBz
+dGVwIGZvcndhcmRzLg0KKiBUaGUgcHVycG9zZSBvZiB0aGUgQkxLX01RX1NfU0NIRURfUkVTVEFS
+VCBmbGFnIGlzIHRvIGRldGVjdCB3aGV0aGVyIG9yIG5vdA0KICBhbnkgb2YgdGhlIHF1ZXVlIHJ1
+bnMgdHJpZ2dlcmVkIGJ5IGZyZWVpbmcgYSB0YWcgaGFwcGVuZWQgY29uY3VycmVudGx5LiBJDQog
+IGRvbid0IHRoaW5rIHRoYXQgdGhlcmUgaXMgYW55IHJlbGF0aW9uc2hpcCBiZXR3ZWVuIHF1ZXVl
+IHJ1bnMgaGFwcGVuaW5nIGFsbA0KICBvciBub3QgY29uY3VycmVudGx5IGFuZCB0aGUgY2hhbmNl
+IHRoYXQgZHJpdmVyIHJlc291cmNlcyBiZWNvbWUgYXZhaWxhYmxlLg0KICBTbyBkZWNpZGluZyB3
+aGV0aGVyIG9yIG5vdCBhIHF1ZXVlIHNob3VsZCBiZSByZXJ1biBiYXNlZCBvbiB0aGUgdmFsdWUg
+b2YNCiAgdGhlIEJMS19NUV9TX1NDSEVEX1JFU1RBUlQgZmxhZyBzZWVtcyB3cm9uZyB0byBtZS4N
+Cg0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9zY3NpL3Njc2lfbGliLmMgYi9kcml2ZXJzL3Njc2kv
+c2NzaV9saWIuYw0KPiBpbmRleCBkOWNhMWRmYWIxNTQuLjU1YmUyNTUwYzU1NSAxMDA2NDQNCj4g
+LS0tIGEvZHJpdmVycy9zY3NpL3Njc2lfbGliLmMNCj4gKysrIGIvZHJpdmVycy9zY3NpL3Njc2lf
+bGliLmMNCj4gQEAgLTIwMzAsOSArMjAzMCw5IEBAIHN0YXRpYyBibGtfc3RhdHVzX3Qgc2NzaV9x
+dWV1ZV9ycShzdHJ1Y3QgYmxrX21xX2h3X2N0eCAqaGN0eCwNCj4gIAljYXNlIEJMS19TVFNfT0s6
+DQo+ICAJCWJyZWFrOw0KPiAgCWNhc2UgQkxLX1NUU19SRVNPVVJDRToNCj4gLQkJaWYgKGF0b21p
+Y19yZWFkKCZzZGV2LT5kZXZpY2VfYnVzeSkgPT0gMCAmJg0KPiAtCQkgICAgIXNjc2lfZGV2aWNl
+X2Jsb2NrZWQoc2RldikpDQo+IC0JCQlibGtfbXFfZGVsYXlfcnVuX2h3X3F1ZXVlKGhjdHgsIFND
+U0lfUVVFVUVfREVMQVkpOw0KPiArCQlpZiAoYXRvbWljX3JlYWQoJnNkZXYtPmRldmljZV9idXN5
+KSB8fA0KPiArCQkgICAgc2NzaV9kZXZpY2VfYmxvY2tlZChzZGV2KSkNCj4gKwkJCXJldCA9IEJM
+S19TVFNfREVWX1JFU09VUkNFOw0KPiAgCQlicmVhazsNCj4gIAlkZWZhdWx0Og0KPiAgCQkvKg0K
+DQpUaGUgYWJvdmUgaW50cm9kdWNlcyB0d28gY2hhbmdlcyB0aGF0IGhhdmUgbm90IGJlZW4gbWVu
+dGlvbmVkIGluIHRoZQ0KZGVzY3JpcHRpb24gb2YgdGhpcyBwYXRjaDoNCi0gVGhlIHF1ZXVlIHJl
+cnVubmluZyBkZWxheSBpcyBjaGFuZ2VkIGZyb20gMyBtcyBpbnRvIDEwIG1zLiBXaGVyZSBpcyB0
+aGUNCiAgZXhwbGFuYXRpb24gb2YgdGhpcyBjaGFuZ2U/IERvZXMgdGhpcyBjaGFuZ2UgaGF2ZSBh
+IHBvc2l0aXZlIG9yIG5lZ2F0aXZlDQogIHBlcmZvcm1hbmNlIGltcGFjdD8NCi0gVGhlIGFib3Zl
+IG1vZGlmaWVzIGEgZ3VhcmFudGVlZCBxdWV1ZSByZXJ1biBpbnRvIGEgcXVldWUgcmVydW4gdGhh
+dA0KICBtYXkgb3IgbWF5IG5vdCBoYXBwZW4sIGRlcGVuZGluZyBvbiB3aGV0aGVyIG9yIG5vdCBt
+dWx0aXBsZSB0YWdzIGdldCBmcmVlZA0KICBjb25jdXJyZW50bHkgKHJldHVybiBCTEtfU1RTX0RF
+Vl9SRVNPVVJDRSkuIFNvcnJ5IGJ1dCBJIHRoaW5rIHRoYXQncyB3cm9uZy4NCg0KQmFydC4=
