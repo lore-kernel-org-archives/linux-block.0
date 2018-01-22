@@ -1,60 +1,77 @@
-Return-Path: <prvs=5532d045d=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@infradead.org" <hch@infradead.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "snitzer@redhat.com" <snitzer@redhat.com>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
-CC: "dm-devel@redhat.com" <dm-devel@redhat.com>, "loberman@redhat.com"
-	<loberman@redhat.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Mon, 22 Jan 2018 18:19:03 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Mike Snitzer <snitzer@redhat.com>
+Cc: dm-devel@redhat.com, Laurence Oberman <loberman@redhat.com>,
+	Bart Van Assche <bart.vanassche@sandisk.com>
 Subject: Re: [PATCH 4/5] blk-mq: introduce blk_get_request_notify
-Date: Mon, 22 Jan 2018 17:13:03 +0000
-Message-ID: <1516641182.2545.26.camel@sandisk.com>
+Message-ID: <20180122101902.GD1570@ming.t460p>
 References: <20180122033550.27855-1-ming.lei@redhat.com>
-	 <20180122033550.27855-5-ming.lei@redhat.com>
-In-Reply-To: <20180122033550.27855-5-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+ <20180122033550.27855-5-ming.lei@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180122033550.27855-5-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE4LTAxLTIyIGF0IDExOjM1ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gRE0t
-TVBBVEggbmVlZCB0byBhbGxvY2F0ZSByZXF1ZXN0IGZyb20gdW5kZXJseWluZyBxdWV1ZSwgYnV0
-IHdoZW4gdGhlDQo+IGFsbG9jYXRpb24gZmFpbHMsIHRoZXJlIGlzIG5vIHdheSB0byBtYWtlIHVu
-ZGVybHlpbmcgcXVldWUncyBSRVNUQVJUDQo+IHRvIHJlc3RhcnQgRE0ncyBxdWV1ZS4NCj4gDQo+
-IFRoaXMgcGF0Y2ggaW50cm9kdWNlcyBibGtfZ2V0X3JlcXVlc3Rfbm90aWZ5KCkgZm9yIHRoaXMg
-cHVycG9zZSwgYW5kDQo+IGNhbGxlciBuZWVkIHRvIHBhc3MgJ3dhaXRfcXVldWVfZW50cnlfdCcg
-dG8gdGhpcyBmdW5jdGlvbiwgYW5kIG1ha2UNCj4gc3VyZSBpdCBpcyBpbml0aWFsaXplZCB3ZWxs
-LCBzbyBhZnRlciB0aGUgY3VycmVudCBhbGxvY2F0aW9uIGZhaWxzLA0KPiBETSB3aWxsIGdldCBu
-b3RpZmllZCB3aGVuIHRoZXJlIGlzIHJlcXVlc3QgYXZhaWxhYmxlIGZyb20gdW5kZXJseWluZw0K
-PiBxdWV1ZS4NCg0KUGxlYXNlIG1lbnRpb24gdGhhdCB0aGlzIGlzIG9ubHkgYSBwYXJ0aWFsIHNv
-bHV0aW9uIGJlY2F1c2UgdGhlIGNhc2Ugd2hlbg0KZS5nLiBibGtfaW5zZXJ0X2Nsb25lZF9yZXF1
-ZXN0KCkgcmV0dXJucyBCTEtfU1RTX1JFU09VUkNFIGlzIG5vdCBoYW5kbGVkLg0KVGhpcyBjb3Vs
-ZCBoZWxwIGZvciBkcml2ZXJzIHRoYXQgc3VwcG9ydCBhIHZlcnkgbG93IHF1ZXVlIGRlcHRoIChs
-cGZjKSBidXQNCnByb2JhYmx5IHdvbid0IGJlIHRoYXQgdXNlZnVsIGZvciBvdGhlciBkcml2ZXJz
-Lg0KDQo+ICsJLyoNCj4gKwkgKiBJZiBjYWxsZXIgcmVxdWlyZXMgbm90aWZpY2F0aW9uIHdoZW4g
-dGFnIGlzIGF2YWlsYWJsZSwgYWRkDQo+ICsJICogd2FpdCBlbnRyeSBvZiAnZGF0YS0+bm90aWZp
-ZXInIHRvIHRoZSB3YWl0IHF1ZXVlLg0KPiArCSAqLw0KPiArCWlmIChkYXRhLT5mbGFncyAmIEJM
-S19NUV9SRVFfTk9XQUlUKSB7DQo+ICsJCWJvb2wgYWRkZWQgPSBmYWxzZTsNCj4gKw0KPiArCQlz
-cGluX2xvY2tfaXJxKCZ3cy0+d2FpdC5sb2NrKTsNCj4gKwkJaWYgKGxpc3RfZW1wdHkoJmRhdGEt
-Pm5vdGlmaWVyLT5lbnRyeSkpDQo+ICsJCQlfX2FkZF93YWl0X3F1ZXVlKCZ3cy0+d2FpdCwgZGF0
-YS0+bm90aWZpZXIpOw0KPiArCQllbHNlDQo+ICsJCQlhZGRlZCA9IHRydWU7DQo+ICsJCXNwaW5f
-dW5sb2NrX2lycSgmd3MtPndhaXQubG9jayk7DQo+ICsNCj4gKwkJaWYgKGFkZGVkKQ0KPiArCQkJ
-cmV0dXJuIEJMS19NUV9UQUdfRkFJTDsNCj4gKw0KPiArCQl0YWcgPSBfX2Jsa19tcV9nZXRfdGFn
-KGRhdGEsIGJ0KTsNCj4gKwkJaWYgKHRhZyAhPSAtMSkNCj4gKwkJCWdvdG8gZm91bmRfdGFnOw0K
-PiArCQlyZXR1cm4gQkxLX01RX1RBR19GQUlMOw0KPiArCX0NCg0KU29ycnkgYnV0IEkgZG9uJ3Qg
-bGlrZSB0aGlzIGFwcHJvYWNoLiBBZGRpbmcgImRhdGEtPm5vdGlmaWVyIiB0byB0aGUgd2FpdA0K
-cXVldWUgY3JlYXRlcyBhIGxpbmsgYmV0d2VlbiB0d28gcmVxdWVzdCBxdWV1ZXMsIGUuZy4gYSBk
-bS1tcGF0aCBxdWV1ZSBhbmQNCm9uZSBvZiB0aGUgcGF0aHMgdGhhdCBpcyBhIG1lbWJlciBvZiB0
-aGF0IGRtLW1wYXRoIHF1ZXVlLiBUaGlzIGNyZWF0ZXMgdGhlDQpwb3RlbnRpYWwgZm9yIHVnbHkg
-cmFjZXMgYmV0d2VlbiBlLmcuICJkYXRhLT5ub3RpZmllciIgYmVpbmcgdHJpZ2dlcmVkIGFuZA0K
-cmVtb3ZhbCBvZiB0aGUgZG0tbXBhdGggcXVldWUuDQoNCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Js
-ay1tcS5oIGIvYmxvY2svYmxrLW1xLmgNCj4gaW5kZXggODhjNTU4ZjcxODE5Li5iZWMyZjY3NWY4
-ZjEgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2Jsay1tcS5oDQo+ICsrKyBiL2Jsb2NrL2Jsay1tcS5o
-DQo+IEBAIC0xNjAsNiArMTYwLDcgQEAgc3RydWN0IGJsa19tcV9hbGxvY19kYXRhIHsNCj4gIAlz
-dHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcTsNCj4gIAlibGtfbXFfcmVxX2ZsYWdzX3QgZmxhZ3M7DQo+
-ICAJdW5zaWduZWQgaW50IHNoYWxsb3dfZGVwdGg7DQo+ICsJd2FpdF9xdWV1ZV9lbnRyeV90ICpu
-b3RpZmllcjsNCg0KSWYgb3RoZXJzIHdvdWxkIGFncmVlIHdpdGggdGhlIGFwcHJvYWNoIG9mIHRo
-aXMgcGF0Y2ggcGxlYXNlIHVzZSBhbm90aGVyIG5hbWUNCnRoYW4gIm5vdGlmaWVyIi4gSW4gdGhl
-IGNvbnRleHQgb2YgdGhlIExpbnV4IGtlcm5lbCBhIG5vdGlmaWVyIGlzIGFuIGluc3RhbmNlDQpv
-ZiBzdHJ1Y3Qgbm90aWZpZXJfYmxvY2suIFRoZSBhYm92ZSAibm90aWZpZXIiIG1lbWJlciBpcyBu
-b3QgYSBub3RpZmllciBidXQgYQ0Kd2FpdCBxdWV1ZSBlbnRyeS4NCg0KVGhhbmtzLA0KDQpCYXJ0
-Lg==
+On Mon, Jan 22, 2018 at 11:35:49AM +0800, Ming Lei wrote:
+> DM-MPATH need to allocate request from underlying queue, but when the
+> allocation fails, there is no way to make underlying queue's RESTART
+> to restart DM's queue.
+> 
+> This patch introduces blk_get_request_notify() for this purpose, and
+> caller need to pass 'wait_queue_entry_t' to this function, and make
+> sure it is initialized well, so after the current allocation fails,
+> DM will get notified when there is request available from underlying
+> queue.
+> 
+> This approach is suggested by Jens, and has been used in blk-mq dispatch
+> patch for a while, see blk_mq_mark_tag_wait().
+> 
+> Suggested-by: Jens Axboe <axboe@kernel.dk>
+> Cc: Mike Snitzer <snitzer@redhat.com>
+> Cc: Laurence Oberman <loberman@redhat.com>
+> Cc: Bart Van Assche <bart.vanassche@sandisk.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-mq-tag.c     | 27 ++++++++++++++++++++++++++-
+>  block/blk-mq.c         | 24 +++++++++++++++++++++---
+>  block/blk-mq.h         |  1 +
+>  include/linux/blk-mq.h |  5 +++++
+>  4 files changed, 53 insertions(+), 4 deletions(-)
+> 
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index 336dde07b230..911fc9bd1bab 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -128,10 +128,35 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+>  	if (tag != -1)
+>  		goto found_tag;
+>  
+> -	if (data->flags & BLK_MQ_REQ_NOWAIT)
+> +	if ((data->flags & BLK_MQ_REQ_NOWAIT) && !(data->notifier &&
+> +			(data->flags & BLK_MQ_REQ_ALLOC_NOTIFY)))
+>  		return BLK_MQ_TAG_FAIL;
+>  
+>  	ws = bt_wait_ptr(bt, data->hctx);
+> +
+> +	/*
+> +	 * If caller requires notification when tag is available, add
+> +	 * wait entry of 'data->notifier' to the wait queue.
+> +	 */
+> +	if (data->flags & BLK_MQ_REQ_NOWAIT) {
+> +		bool added = false;
+> +
+> +		spin_lock_irq(&ws->wait.lock);
+> +		if (list_empty(&data->notifier->entry))
+> +			__add_wait_queue(&ws->wait, data->notifier);
+> +		else
+> +			added = true;
+> +		spin_unlock_irq(&ws->wait.lock);
+
+The above need a per-notifier lock too, since the same notifier may
+be added to different wait queues at the same time.
+
+-- 
+Ming
