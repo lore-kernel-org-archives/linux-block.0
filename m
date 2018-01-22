@@ -1,56 +1,76 @@
-Return-Path: <elliott@hpe.com>
-From: "Elliott, Robert (Persistent Memory)" <elliott@hpe.com>
-To: Jens Axboe <axboe@kernel.dk>, Goldwyn Rodrigues <rgoldwyn@suse.de>, "Andi
- Kleen" <ak@linux.intel.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"darrick.wong@oracle.com" <darrick.wong@oracle.com>, "Rodrigues, Goldwyn"
-	<RGoldwyn@suse.com>
-Subject: RE: [PATCH v5 1/2] Return bytes transferred for partial direct I/O
-Date: Mon, 22 Jan 2018 22:25:19 +0000
-Message-ID: <AT5PR8401MB0387219C83BE490226AB427FABEC0@AT5PR8401MB0387.NAMPRD84.PROD.OUTLOOK.COM>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v5 1/2] Return bytes transferred for partial direct I/O
+To: Andreas Dilger <adilger@dilger.ca>
+Cc: Goldwyn Rodrigues <rgoldwyn@suse.de>, Andi Kleen <ak@linux.intel.com>,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ darrick.wong@oracle.com, Goldwyn Rodrigues <rgoldwyn@suse.com>
 References: <20180119005741.32058-1-rgoldwyn@suse.de>
  <87zi58rmf7.fsf@linux.intel.com>
  <c7661c89-1deb-c967-4b19-c1897937f4a3@suse.de>
  <b6847555-6295-0f28-08f2-ad871bf91332@kernel.dk>
-In-Reply-To: <b6847555-6295-0f28-08f2-ad871bf91332@kernel.dk>
-Content-Type: text/plain; charset="utf-8"
+ <C6C37388-622C-451D-B14D-953EBE580995@dilger.ca>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <175784d7-70e7-3be1-47f0-ae67ab37e921@kernel.dk>
+Date: Mon, 22 Jan 2018 12:13:44 -0700
 MIME-Version: 1.0
+In-Reply-To: <C6C37388-622C-451D-B14D-953EBE580995@dilger.ca>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-block@vger.kernel.org>
 
-DQoNCj4gT24gMS8yMC8xOCA3OjIzIFBNLCBHb2xkd3luIFJvZHJpZ3VlcyB3cm90ZToNCj4gPiBP
-biAwMS8yMC8yMDE4IDA4OjExIFBNLCBBbmRpIEtsZWVuIHdyb3RlOg0KPiA+PiBHb2xkd3luIFJv
-ZHJpZ3VlcyA8cmdvbGR3eW5Ac3VzZS5kZT4gd3JpdGVzOg0KPiA+Pj4gRnJvbTogR29sZHd5biBS
-b2RyaWd1ZXMgPHJnb2xkd3luQHN1c2UuY29tPg0KPiA+Pj4gSW4gY2FzZSBkaXJlY3QgSS9PIGVu
-Y291bnRlcnMgYW4gZXJyb3IgbWlkd2F5LCBpdCByZXR1cm5zIHRoZSBlcnJvci4NCj4gPj4+IElu
-c3RlYWQgaXQgc2hvdWxkIGJlIHJldHVybmluZyB0aGUgbnVtYmVyIG9mIGJ5dGVzIHRyYW5zZmVy
-cmVkIHNvIGZhci4NCj4gPj4NCj4gPj4gSXQncyBsaWtlbHkgdGhlcmUncyBhIGxvdCBvZiBjb2Rl
-IGluIHVzZXIgc3BhY2UgdGhhdCBkb2VzDQo+ID4+DQo+ID4+ICAgICAgaWYgKHdyaXRlKC4uLiwg
-TikgPCAwKSBoYW5kbGUgZXJyb3INCj4gPj4NCj4gPj4gV2l0aCB5b3VyIGNoYW5nZSBpdCB3b3Vs
-ZCBuZWVkIHRvIGJlDQo+ID4+DQo+ID4+ICAgICAgaWYgKHdyaXRlKC4uLiwgTikgIT0gTikgaGFu
-ZGxlIGVycm9yDQo+ID4+DQo+ID4+IEhvdyBtdWNoIGNvZGUgaXMgYWN0dWFsbHkgZG9pbmcgdGhh
-dD8NCj4gPj4NCj4gPj4gSSBjYW4gdW5kZXJzdGFuZCBpdCBmaXhlcyB5b3VyIGFydGlmaWNhbCB0
-ZXN0IHN1aXRlLCBidXQgaXQgc2VlbXMgdG8gbWUgeW91cg0KPiA+PiBjaGFuZ2UgaGFzIGEgaGln
-aCBwb3RlbnRpYWwgdG8gYnJlYWsgYSBsb3Qgb2YgZXhpc3RpbmcgdXNlciBjb2RlDQo+ID4+IGlu
-IHN1YnRsZSB3YXlzLiBTbyBpdCBzZWVtcyB0byBiZSBhIGJhZCBpZGVhLg0KPiA+Pg0KPiA+PiAt
-QW5kaQ0KPiA+DQo+ID4gUXVvdGluZyAnbWFuIDIgd3JpdGUnOg0KPiA+DQo+ID4gUkVUVVJOIFZB
-TFVFDQo+ID4gIE9uICBzdWNjZXNzLCAgdGhlICBudW1iZXIgIG9mIGJ5dGVzIHdyaXR0ZW4gaXMg
-cmV0dXJuZWQgKHplcm8gaW5kaWNhdGVzDQo+ID4gIG5vdGhpbmcgd2FzIHdyaXR0ZW4pLiAgSXQg
-aXMgbm90IGFuIGVycm9yIGlmICB0aGlzICBudW1iZXIgIGlzIHNtYWxsZXINCj4gPiAgdGhhbiB0
-aGUgbnVtYmVyIG9mIGJ5dGVzIHJlcXVlc3RlZDsgdGhpcyBtYXkgaGFwcGVuIGZvciBleGFtcGxl
-IGJlY2F1c2UNCj4gPiAgdGhlIGRpc2sgZGV2aWNlIHdhcyBmaWxsZWQuICBTZWUgYWxzbyBOT1RF
-Uy4NCj4gDQo+IFlvdSBjYW4gcXVvdGUgYXMgbXVjaCBtYW4gcGFnZSBhcyB5b3Ugd2FudCAtIEFu
-ZGkgaXMgd2VsbCBhd2FyZSBvZiBob3cNCj4gcmVhZC93cml0ZSBzeXN0ZW0gY2FsbCB3b3Jrcywg
-YXMgSSdtIHN1cmUgYWxsIG9mIHVzIGFyZSwgdGhhdCBpcyBub3QgdGhlDQo+IGlzc3VlLiBUaGUg
-aXNzdWUgaXMgdGhhdCB0aGVyZSBhcmUgcG90ZW50aWFsbHkgTE9UUyBvZiBhcHBsaWNhdGlvbnMg
-b3V0DQo+IHRoZXJlIHRoYXQgZG8gbm90IGNoZWNrIGZvciBzaG9ydCB3cml0ZXMsIHRoZXkgZG8g
-ZXhhY3RseSB3aGF0IEFuZGkNCj4gc3BlY3VsYXRlZCBhYm92ZS4gSWYgeW91IGJyZWFrIGl0IHdp
-dGggdGhpcyBjaGFuZ2UsIGl0IGRvZXNuJ3QgbWF0dGVyDQo+IHdoYXQncyBpbiB0aGUgbWFuIHBh
-Z2UuIFdoYXQgbWF0dGVycyBpcyBwcmV2aW91cyBiZWhhdmlvciwgYW5kIHRoYXQNCj4geW91IGFy
-ZSBicmVha2luZyB1c2VyIHNwYWNlLiBBdCB0aGF0IHBvaW50IG5vYm9keSBjYXJlcyB3aGF0J3Mg
-aW4gdGhlDQo+IG1hbiBwYWdlLg0KIA0KDQpmaW8gZW5naW5lcy9zZy5jIGZpb19zZ2lvX3J3X2Rv
-aW8oKSBoYXMgdGhhdCBwYXR0ZXJuOg0KDQoJcmV0ID0gd3JpdGUoZi0+ZmQsIGhkciwgc2l6ZW9m
-KCpoZHIpKTsNCglpZiAocmV0IDwgMCkNCgkJcmV0dXJuIHJldDsNCgkuLi4NCglyZXR1cm4gRklP
-X1FfUVVFVUVEOyAgIFt3aGljaCBpcyAxXQ0KDQphbHRob3VnaCB0aGVyZSBtaWdodCBiZSBzcGVj
-aWFsIGNpcmN1bXN0YW5jZXMgZm9yIHRoZSBzZyBpbnRlcmZhY2UNCm1ha2luZyB0aGF0IHNhZmUu
-DQoNCg0KDQotLS0NClJvYmVydCBFbGxpb3R0LCBIUEUgUGVyc2lzdGVudCBNZW1vcnkNCg0KDQo=
+On 1/22/18 12:10 PM, Andreas Dilger wrote:
+> 
+>> On Jan 20, 2018, at 8:07 PM, Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> On 1/20/18 7:23 PM, Goldwyn Rodrigues wrote:
+>>>
+>>>
+>>> On 01/20/2018 08:11 PM, Andi Kleen wrote:
+>>>>
+>>>> It's likely there's a lot of code in user space that does
+>>>>
+>>>>     if (write(..., N) < 0) handle error
+>>>>
+>>>> With your change it would need to be
+>>>>
+>>>>     if (write(..., N) != N) handle error
+>>>>
+>>>> How much code is actually doing that?
+>>>>
+>>>> I can understand it fixes your artifical test suite, but it seems to me your
+>>>> change has a high potential to break a lot of existing user code
+>>>> in subtle ways. So it seems to be a bad idea.
+>>>
+>>>
+>>> Quoting 'man 2 write':
+>>>
+>>> RETURN VALUE
+>>> On  success,  the  number  of bytes written is returned (zero indicates
+>>> nothing was written).  It is not an error if  this  number  is  smaller
+>>> than the number of bytes requested; this may happen for example because
+>>> the disk device was filled.  See also NOTES.
+>>
+>> You can quote as much man page as you want - Andi is well aware of how
+>> read/write system call works, as I'm sure all of us are, that is not the
+>> issue. The issue is that there are potentially LOTS of applications out
+>> there that do not check for short writes, they do exactly what Andi
+>> speculated above. If you break it with this change, it doesn't matter
+>> what's in the man page. What matters is previous behavior, and that
+>> you are breaking user space. At that point nobody cares what's in the
+>> man page.
+> 
+> Applications that don't handle partial writes are already broken with
+> buffered I/O, this change doesn't really make them more broken.
+
+Not disagreeing that they are broken, of course they are. But if you've
+been doing direct IO and not seeing short writes, then this could break
+your application. And if that's the case, it doesn't really help to say
+that their application was "already broken". I'd hate for a kernel
+upgrade to break them.
+
+I do wish we could make the change, and maybe we can. But it probably
+needs some safe guard proc entry to toggle the behavior, something we
+can drop in a few years when we're confident it won't break real
+applications.
+
+-- 
+Jens Axboe
