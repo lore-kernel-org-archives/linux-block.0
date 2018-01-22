@@ -1,106 +1,60 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Tue, 23 Jan 2018 09:29:11 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"snitzer@redhat.com" <snitzer@redhat.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"dm-devel@redhat.com" <dm-devel@redhat.com>,
-	"loberman@redhat.com" <loberman@redhat.com>
+Return-Path: <prvs=5532d045d=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@infradead.org" <hch@infradead.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "snitzer@redhat.com" <snitzer@redhat.com>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
+CC: "dm-devel@redhat.com" <dm-devel@redhat.com>, "loberman@redhat.com"
+	<loberman@redhat.com>
 Subject: Re: [PATCH 4/5] blk-mq: introduce blk_get_request_notify
-Message-ID: <20180123012910.GC4411@ming.t460p>
+Date: Mon, 22 Jan 2018 17:13:03 +0000
+Message-ID: <1516641182.2545.26.camel@sandisk.com>
 References: <20180122033550.27855-1-ming.lei@redhat.com>
- <20180122033550.27855-5-ming.lei@redhat.com>
- <1516641182.2545.26.camel@sandisk.com>
+	 <20180122033550.27855-5-ming.lei@redhat.com>
+In-Reply-To: <20180122033550.27855-5-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1516641182.2545.26.camel@sandisk.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jan 22, 2018 at 05:13:03PM +0000, Bart Van Assche wrote:
-> On Mon, 2018-01-22 at 11:35 +0800, Ming Lei wrote:
-> > DM-MPATH need to allocate request from underlying queue, but when the
-> > allocation fails, there is no way to make underlying queue's RESTART
-> > to restart DM's queue.
-> > 
-> > This patch introduces blk_get_request_notify() for this purpose, and
-> > caller need to pass 'wait_queue_entry_t' to this function, and make
-> > sure it is initialized well, so after the current allocation fails,
-> > DM will get notified when there is request available from underlying
-> > queue.
-> 
-> Please mention that this is only a partial solution because the case when
-> e.g. blk_insert_cloned_request() returns BLK_STS_RESOURCE is not handled.
-
-I don't think it is necessary to mention that in comment log, because
-one patch won't deal with all things.
-
-But definitely there will be one patch which deals with that in V2,
-otherwise the performance issue can't be solved completely.
-
-> This could help for drivers that support a very low queue depth (lpfc) but
-> probably won't be that useful for other drivers.
-
-Up to now, it is one dm-mpath specific performance issue under one
-specific situation: IO is submitted to dm-mpath device and the
-underlying queue at the same time, and the underlying queue depth is
-very low, such as 1.
-
-> 
-> > +	/*
-> > +	 * If caller requires notification when tag is available, add
-> > +	 * wait entry of 'data->notifier' to the wait queue.
-> > +	 */
-> > +	if (data->flags & BLK_MQ_REQ_NOWAIT) {
-> > +		bool added = false;
-> > +
-> > +		spin_lock_irq(&ws->wait.lock);
-> > +		if (list_empty(&data->notifier->entry))
-> > +			__add_wait_queue(&ws->wait, data->notifier);
-> > +		else
-> > +			added = true;
-> > +		spin_unlock_irq(&ws->wait.lock);
-> > +
-> > +		if (added)
-> > +			return BLK_MQ_TAG_FAIL;
-> > +
-> > +		tag = __blk_mq_get_tag(data, bt);
-> > +		if (tag != -1)
-> > +			goto found_tag;
-> > +		return BLK_MQ_TAG_FAIL;
-> > +	}
-> 
-> Sorry but I don't like this approach. Adding "data->notifier" to the wait
-> queue creates a link between two request queues, e.g. a dm-mpath queue and
-> one of the paths that is a member of that dm-mpath queue. This creates the
-> potential for ugly races between e.g. "data->notifier" being triggered and
-> removal of the dm-mpath queue.
-
-I thought no such race because the dm request is still in dispatch list before
-the 'notifier' is handled. And now looks this isn't true, but this issue can be
-dealt easily by call blk_queue_enter_live() before the allocation, and
-release them all once the notifier is triggered.
-
-Anyway this interface need to be well documented.
-
-> 
-> > diff --git a/block/blk-mq.h b/block/blk-mq.h
-> > index 88c558f71819..bec2f675f8f1 100644
-> > --- a/block/blk-mq.h
-> > +++ b/block/blk-mq.h
-> > @@ -160,6 +160,7 @@ struct blk_mq_alloc_data {
-> >  	struct request_queue *q;
-> >  	blk_mq_req_flags_t flags;
-> >  	unsigned int shallow_depth;
-> > +	wait_queue_entry_t *notifier;
-> 
-> If others would agree with the approach of this patch please use another name
-> than "notifier". In the context of the Linux kernel a notifier is an instance
-> of struct notifier_block. The above "notifier" member is not a notifier but a
-> wait queue entry.
-
-OK, I will change to 'wait', similar with 'dispatch_wait'.
-
--- 
-Ming
+T24gTW9uLCAyMDE4LTAxLTIyIGF0IDExOjM1ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gRE0t
+TVBBVEggbmVlZCB0byBhbGxvY2F0ZSByZXF1ZXN0IGZyb20gdW5kZXJseWluZyBxdWV1ZSwgYnV0
+IHdoZW4gdGhlDQo+IGFsbG9jYXRpb24gZmFpbHMsIHRoZXJlIGlzIG5vIHdheSB0byBtYWtlIHVu
+ZGVybHlpbmcgcXVldWUncyBSRVNUQVJUDQo+IHRvIHJlc3RhcnQgRE0ncyBxdWV1ZS4NCj4gDQo+
+IFRoaXMgcGF0Y2ggaW50cm9kdWNlcyBibGtfZ2V0X3JlcXVlc3Rfbm90aWZ5KCkgZm9yIHRoaXMg
+cHVycG9zZSwgYW5kDQo+IGNhbGxlciBuZWVkIHRvIHBhc3MgJ3dhaXRfcXVldWVfZW50cnlfdCcg
+dG8gdGhpcyBmdW5jdGlvbiwgYW5kIG1ha2UNCj4gc3VyZSBpdCBpcyBpbml0aWFsaXplZCB3ZWxs
+LCBzbyBhZnRlciB0aGUgY3VycmVudCBhbGxvY2F0aW9uIGZhaWxzLA0KPiBETSB3aWxsIGdldCBu
+b3RpZmllZCB3aGVuIHRoZXJlIGlzIHJlcXVlc3QgYXZhaWxhYmxlIGZyb20gdW5kZXJseWluZw0K
+PiBxdWV1ZS4NCg0KUGxlYXNlIG1lbnRpb24gdGhhdCB0aGlzIGlzIG9ubHkgYSBwYXJ0aWFsIHNv
+bHV0aW9uIGJlY2F1c2UgdGhlIGNhc2Ugd2hlbg0KZS5nLiBibGtfaW5zZXJ0X2Nsb25lZF9yZXF1
+ZXN0KCkgcmV0dXJucyBCTEtfU1RTX1JFU09VUkNFIGlzIG5vdCBoYW5kbGVkLg0KVGhpcyBjb3Vs
+ZCBoZWxwIGZvciBkcml2ZXJzIHRoYXQgc3VwcG9ydCBhIHZlcnkgbG93IHF1ZXVlIGRlcHRoIChs
+cGZjKSBidXQNCnByb2JhYmx5IHdvbid0IGJlIHRoYXQgdXNlZnVsIGZvciBvdGhlciBkcml2ZXJz
+Lg0KDQo+ICsJLyoNCj4gKwkgKiBJZiBjYWxsZXIgcmVxdWlyZXMgbm90aWZpY2F0aW9uIHdoZW4g
+dGFnIGlzIGF2YWlsYWJsZSwgYWRkDQo+ICsJICogd2FpdCBlbnRyeSBvZiAnZGF0YS0+bm90aWZp
+ZXInIHRvIHRoZSB3YWl0IHF1ZXVlLg0KPiArCSAqLw0KPiArCWlmIChkYXRhLT5mbGFncyAmIEJM
+S19NUV9SRVFfTk9XQUlUKSB7DQo+ICsJCWJvb2wgYWRkZWQgPSBmYWxzZTsNCj4gKw0KPiArCQlz
+cGluX2xvY2tfaXJxKCZ3cy0+d2FpdC5sb2NrKTsNCj4gKwkJaWYgKGxpc3RfZW1wdHkoJmRhdGEt
+Pm5vdGlmaWVyLT5lbnRyeSkpDQo+ICsJCQlfX2FkZF93YWl0X3F1ZXVlKCZ3cy0+d2FpdCwgZGF0
+YS0+bm90aWZpZXIpOw0KPiArCQllbHNlDQo+ICsJCQlhZGRlZCA9IHRydWU7DQo+ICsJCXNwaW5f
+dW5sb2NrX2lycSgmd3MtPndhaXQubG9jayk7DQo+ICsNCj4gKwkJaWYgKGFkZGVkKQ0KPiArCQkJ
+cmV0dXJuIEJMS19NUV9UQUdfRkFJTDsNCj4gKw0KPiArCQl0YWcgPSBfX2Jsa19tcV9nZXRfdGFn
+KGRhdGEsIGJ0KTsNCj4gKwkJaWYgKHRhZyAhPSAtMSkNCj4gKwkJCWdvdG8gZm91bmRfdGFnOw0K
+PiArCQlyZXR1cm4gQkxLX01RX1RBR19GQUlMOw0KPiArCX0NCg0KU29ycnkgYnV0IEkgZG9uJ3Qg
+bGlrZSB0aGlzIGFwcHJvYWNoLiBBZGRpbmcgImRhdGEtPm5vdGlmaWVyIiB0byB0aGUgd2FpdA0K
+cXVldWUgY3JlYXRlcyBhIGxpbmsgYmV0d2VlbiB0d28gcmVxdWVzdCBxdWV1ZXMsIGUuZy4gYSBk
+bS1tcGF0aCBxdWV1ZSBhbmQNCm9uZSBvZiB0aGUgcGF0aHMgdGhhdCBpcyBhIG1lbWJlciBvZiB0
+aGF0IGRtLW1wYXRoIHF1ZXVlLiBUaGlzIGNyZWF0ZXMgdGhlDQpwb3RlbnRpYWwgZm9yIHVnbHkg
+cmFjZXMgYmV0d2VlbiBlLmcuICJkYXRhLT5ub3RpZmllciIgYmVpbmcgdHJpZ2dlcmVkIGFuZA0K
+cmVtb3ZhbCBvZiB0aGUgZG0tbXBhdGggcXVldWUuDQoNCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Js
+ay1tcS5oIGIvYmxvY2svYmxrLW1xLmgNCj4gaW5kZXggODhjNTU4ZjcxODE5Li5iZWMyZjY3NWY4
+ZjEgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2Jsay1tcS5oDQo+ICsrKyBiL2Jsb2NrL2Jsay1tcS5o
+DQo+IEBAIC0xNjAsNiArMTYwLDcgQEAgc3RydWN0IGJsa19tcV9hbGxvY19kYXRhIHsNCj4gIAlz
+dHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcTsNCj4gIAlibGtfbXFfcmVxX2ZsYWdzX3QgZmxhZ3M7DQo+
+ICAJdW5zaWduZWQgaW50IHNoYWxsb3dfZGVwdGg7DQo+ICsJd2FpdF9xdWV1ZV9lbnRyeV90ICpu
+b3RpZmllcjsNCg0KSWYgb3RoZXJzIHdvdWxkIGFncmVlIHdpdGggdGhlIGFwcHJvYWNoIG9mIHRo
+aXMgcGF0Y2ggcGxlYXNlIHVzZSBhbm90aGVyIG5hbWUNCnRoYW4gIm5vdGlmaWVyIi4gSW4gdGhl
+IGNvbnRleHQgb2YgdGhlIExpbnV4IGtlcm5lbCBhIG5vdGlmaWVyIGlzIGFuIGluc3RhbmNlDQpv
+ZiBzdHJ1Y3Qgbm90aWZpZXJfYmxvY2suIFRoZSBhYm92ZSAibm90aWZpZXIiIG1lbWJlciBpcyBu
+b3QgYSBub3RpZmllciBidXQgYQ0Kd2FpdCBxdWV1ZSBlbnRyeS4NCg0KVGhhbmtzLA0KDQpCYXJ0
+Lg==
