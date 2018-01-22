@@ -1,30 +1,128 @@
 Return-Path: <ming.lei@redhat.com>
-Date: Mon, 22 Jan 2018 13:35:45 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@infradead.org>,
 	Mike Snitzer <snitzer@redhat.com>
-Cc: dm-devel@redhat.com, Laurence Oberman <loberman@redhat.com>,
+Cc: dm-devel@redhat.com,
+	Ming Lei <ming.lei@redhat.com>,
+	Laurence Oberman <loberman@redhat.com>,
 	Bart Van Assche <bart.vanassche@sandisk.com>
-Subject: Re: [PATCH 3/5] dm-rq: return BLK_STS_* from map_request()
-Message-ID: <20180122053544.GB1570@ming.t460p>
+Subject: [PATCH 3/5] dm-rq: return BLK_STS_* from map_request()
+Date: Mon, 22 Jan 2018 11:35:48 +0800
+Message-Id: <20180122033550.27855-4-ming.lei@redhat.com>
+In-Reply-To: <20180122033550.27855-1-ming.lei@redhat.com>
 References: <20180122033550.27855-1-ming.lei@redhat.com>
- <20180122033550.27855-4-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180122033550.27855-4-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Jan 22, 2018 at 11:35:48AM +0800, Ming Lei wrote:
-> Except for DM_MAPIO_REQUEUE, map_request() handles other dispatch exception
-> already, so return BLK_STS_* from map_request() directly.
-> 
-> Another change is that if dm_dispatch_clone_request() returns
-> BLK_STS_DEV_RESOURCE from underlying queue, this status is returned
-> to blk-mq too, since underlying queue's RESTART can handle dm-rq's
-> RESTART in this case.
+Except for DM_MAPIO_REQUEUE, map_request() handles other dispatch exception
+already, so return BLK_STS_* from map_request() directly.
 
-Hammm, this is obvious wrong, :-(
+Another change is that if dm_dispatch_clone_request() returns
+BLK_STS_DEV_RESOURCE from underlying queue, this status is returned
+to blk-mq too, since underlying queue's RESTART can handle dm-rq's
+RESTART in this case.
 
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc: Laurence Oberman <loberman@redhat.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/md/dm-rq.c | 30 +++++++++++++++++-------------
+ 1 file changed, 17 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index 1408e6664c16..830e1ccfbb44 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -482,9 +482,10 @@ static void init_tio(struct dm_rq_target_io *tio, struct request *rq,
+ 
+ /*
+  * Returns:
+- * DM_MAPIO_*       : the request has been processed as indicated
+- * DM_MAPIO_REQUEUE : the original request needs to be immediately requeued
+- * < 0              : the request was completed due to failure
++ * BLK_STS_OK       : the request has been processed aready, no need to
++ * 		ask block layer to handle it any more
++ * BLK_STS_RESOURCE : the original request needs to be immediately requeued
++ * BLK_STS_DEV_RESOURCE : same with BLK_STS_RESOURCE, but blk-mq need this info
+  */
+ static int map_request(struct dm_rq_target_io *tio)
+ {
+@@ -493,7 +494,7 @@ static int map_request(struct dm_rq_target_io *tio)
+ 	struct mapped_device *md = tio->md;
+ 	struct request *rq = tio->orig;
+ 	struct request *clone = NULL;
+-	blk_status_t ret;
++	blk_status_t ret, result = BLK_STS_OK;
+ 
+ 	r = ti->type->clone_and_map_rq(ti, rq, &tio->info, &clone);
+ check_again:
+@@ -513,15 +514,16 @@ static int map_request(struct dm_rq_target_io *tio)
+ 				     blk_rq_pos(rq));
+ 		ret = dm_dispatch_clone_request(tio, clone, rq);
+ 		if (dispatch_busy(ret)) {
+-			if (!rq->q->mq_ops)
++			if (!rq->q->mq_ops) {
+ 				r = DM_MAPIO_DELAY_REQUEUE;
+-			else
+-				r = DM_MAPIO_REQUEUE;
+-			goto check_again;
++				goto check_again;
++			}
++			result = ret;
+ 		}
+ 		break;
+ 	case DM_MAPIO_REQUEUE:
+ 		/* The target wants to requeue the I/O */
++		result = BLK_STS_RESOURCE;
+ 		break;
+ 	case DM_MAPIO_DELAY_REQUEUE:
+ 		/* The target wants to requeue the I/O after a delay */
+@@ -536,7 +538,7 @@ static int map_request(struct dm_rq_target_io *tio)
+ 		BUG();
+ 	}
+ 
+-	return r;
++	return result;
+ }
+ 
+ static void dm_start_request(struct mapped_device *md, struct request *orig)
+@@ -599,7 +601,7 @@ static void map_tio_request(struct kthread_work *work)
+ {
+ 	struct dm_rq_target_io *tio = container_of(work, struct dm_rq_target_io, work);
+ 
+-	if (map_request(tio) == DM_MAPIO_REQUEUE)
++	if (dispatch_busy(map_request(tio)))
+ 		dm_requeue_original_request(tio, false);
+ }
+ 
+@@ -754,6 +756,7 @@ static blk_status_t dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	struct dm_rq_target_io *tio = blk_mq_rq_to_pdu(rq);
+ 	struct mapped_device *md = tio->md;
+ 	struct dm_target *ti = md->immutable_target;
++	blk_status_t ret;
+ 
+ 	if (unlikely(!ti)) {
+ 		int srcu_idx;
+@@ -777,14 +780,15 @@ static blk_status_t dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	tio->ti = ti;
+ 
+ 	/* Direct call is fine since .queue_rq allows allocations */
+-	if (map_request(tio) == DM_MAPIO_REQUEUE) {
++	ret = map_request(tio);
++	if (dispatch_busy(ret)) {
+ 		/* Undo dm_start_request() before requeuing */
+ 		rq_end_stats(md, rq);
+ 		rq_completed(md, rq_data_dir(rq), false);
+-		return BLK_STS_RESOURCE;
++		return ret;
+ 	}
+ 
+-	return BLK_STS_OK;
++	return ret;
+ }
+ 
+ static const struct blk_mq_ops dm_mq_ops = {
 -- 
-Ming
+2.9.5
