@@ -1,62 +1,54 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:35498 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750867AbeAKGCY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Jan 2018 01:02:24 -0500
+Return-Path: <ming.lei@redhat.com>
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 0/5]  dm-rq: improve sequential I/O performance
-Date: Thu, 11 Jan 2018 14:01:54 +0800
-Message-Id: <20180111060159.12991-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Mike Snitzer <snitzer@redhat.com>
+Cc: dm-devel@redhat.com,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 0/5] blk-mq & dm: fix IO hang and deal with one performance issue
+Date: Mon, 22 Jan 2018 11:35:45 +0800
+Message-Id: <20180122033550.27855-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Guys,
+Hi Jens,
 
-The 1st patch removes the workaround of blk_mq_delay_run_hw_queue() in
-case of requeue, this way isn't necessary, and more worse, it makes
-BLK_MQ_S_SCHED_RESTART not working, and degarde I/O performance.
+This 1st patch introduces BLK_STS_DEV_RESOURCE for dealing with IO hang
+when non-device resource is run out of and queue is idle, and this
+approach is suggested by you.
 
-The 2nd patch return DM_MAPIO_REQUEUE to dm-rq if underlying request
-allocation fails, then we can return BLK_STS_RESOURCE from dm-rq to
-blk-mq, so that blk-mq can hold the requests to be dequeued.
+The 2nd and 3rd patches cleans dm-rq a bit and prepares for applying
+blk_get_request_notify().
 
-The other 3 paches changes the blk-mq part of blk_insert_cloned_request(),
-in which we switch to blk_mq_try_issue_directly(), so that both dm-rq
-and blk-mq can get the dispatch result of underlying queue, and with
-this information, blk-mq can handle IO merge much better, then
-sequential I/O performance is improved much.
+The 4th patch introduces blk_get_request_notify(), still suggested by
+you.
 
-In my dm-mpath over virtio-scsi test, this whole patchset improves
-sequential IO by 3X ~ 5X.
+The last patch applies blk_get_request_notify() and avoids one
+DM specific performance issue which is introduced by the 1st patch.
 
-V3:
-	- rebase on the latest for-4.16/block of block tree
-	- add missed pg_init_all_paths() in patch 1, according to Bart's review
-
-V2:
-	- drop 'dm-mpath: cache ti->clone during requeue', which is a bit
-	too complicated, and not see obvious performance improvement.
-	- make change on blk-mq part cleaner
+These 5 patches are against both dm(dm-4.16) and block tree(for-4.16/block).
 
 Ming Lei (5):
-  dm-mpath: don't call blk_mq_delay_run_hw_queue() in case of
-    BLK_STS_RESOURCE
-  dm-mpath: return DM_MAPIO_REQUEUE in case of rq allocation failure
-  blk-mq: move actual issue into one helper
-  blk-mq: return dispatch result to caller in blk_mq_try_issue_directly
-  blk-mq: issue request directly for blk_insert_cloned_request
+  blk-mq: introduce BLK_STS_DEV_RESOURCE
+  dm-rq: handle dispatch exception in dm_dispatch_clone_request()
+  dm-rq: return BLK_STS_* from map_request()
+  blk-mq: introduce blk_get_request_notify
+  dm-mpath: use blk_mq_alloc_request_notify for allocating blk-mq req
 
- block/blk-core.c      |  3 +-
- block/blk-mq.c        | 86 +++++++++++++++++++++++++++++++++++++++------------
- block/blk-mq.h        |  3 ++
- drivers/md/dm-mpath.c | 19 +++++++++---
- drivers/md/dm-rq.c    | 20 +++++++++---
- 5 files changed, 101 insertions(+), 30 deletions(-)
+ block/blk-core.c             |  1 +
+ block/blk-mq-tag.c           | 27 +++++++++++++++++++++-
+ block/blk-mq.c               | 43 +++++++++++++++++++++++++++++------
+ block/blk-mq.h               |  1 +
+ drivers/block/null_blk.c     |  2 +-
+ drivers/block/virtio_blk.c   |  2 +-
+ drivers/block/xen-blkfront.c |  2 +-
+ drivers/md/dm-mpath.c        | 50 ++++++++++++++++++++++++++++++++++++++++-
+ drivers/md/dm-rq.c           | 53 +++++++++++++++++++++++++++-----------------
+ drivers/md/dm.c              |  1 +
+ drivers/scsi/scsi_lib.c      |  6 ++---
+ include/linux/blk-mq.h       |  5 +++++
+ include/linux/blk_types.h    |  7 ++++++
+ 13 files changed, 165 insertions(+), 35 deletions(-)
 
 -- 
 2.9.5
