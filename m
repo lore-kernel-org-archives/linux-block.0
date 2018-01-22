@@ -1,73 +1,86 @@
-Return-Path: <prvs=547e67762=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Mike Snitzer <snitzer@redhat.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH 1/3] block: Unexport elv_register_queue() and elv_unregister_queue()
-Date: Tue, 16 Jan 2018 10:17:50 -0800
-Message-Id: <20180116181752.25847-2-bart.vanassche@wdc.com>
-In-Reply-To: <20180116181752.25847-1-bart.vanassche@wdc.com>
-References: <20180116181752.25847-1-bart.vanassche@wdc.com>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Mike Snitzer <snitzer@redhat.com>
+Cc: dm-devel@redhat.com,
+	Ming Lei <ming.lei@redhat.com>,
+	Laurence Oberman <loberman@redhat.com>,
+	Bart Van Assche <bart.vanassche@sandisk.com>
+Subject: [PATCH 2/5] dm-rq: handle dispatch exception in dm_dispatch_clone_request()
+Date: Mon, 22 Jan 2018 11:35:47 +0800
+Message-Id: <20180122033550.27855-3-ming.lei@redhat.com>
+In-Reply-To: <20180122033550.27855-1-ming.lei@redhat.com>
+References: <20180122033550.27855-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-These two functions are only called from inside the block layer so
-unexport them.
+So we can clean up map_request() a bit, no functional change.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc: Laurence Oberman <loberman@redhat.com>
+Cc: Bart Van Assche <bart.vanassche@sandisk.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk.h              | 3 +++
- block/elevator.c         | 2 --
- include/linux/elevator.h | 2 --
- 3 files changed, 3 insertions(+), 4 deletions(-)
+ drivers/md/dm-rq.c | 23 ++++++++++++++++-------
+ 1 file changed, 16 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk.h b/block/blk.h
-index 662005e46560..46db5dc83dcb 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -162,6 +162,9 @@ static inline void elv_deactivate_rq(struct request_queue *q, struct request *rq
- 		e->type->ops.sq.elevator_deactivate_req_fn(q, rq);
- }
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index e0bb56723b9b..1408e6664c16 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -12,6 +12,9 @@
  
-+int elv_register_queue(struct request_queue *q);
-+void elv_unregister_queue(struct request_queue *q);
+ #define DM_MSG_PREFIX "core-rq"
+ 
++#define  dispatch_busy(r)  \
++	(((r) == BLK_STS_RESOURCE) || ((r) == BLK_STS_DEV_RESOURCE))
 +
- struct hd_struct *__disk_get_part(struct gendisk *disk, int partno);
- 
- #ifdef CONFIG_FAIL_IO_TIMEOUT
-diff --git a/block/elevator.c b/block/elevator.c
-index 138faeb08a7c..4f00b53cd5fd 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -886,7 +886,6 @@ int elv_register_queue(struct request_queue *q)
- 	}
- 	return error;
+ #define DM_MQ_NR_HW_QUEUES 1
+ #define DM_MQ_QUEUE_DEPTH 2048
+ static unsigned dm_mq_nr_hw_queues = DM_MQ_NR_HW_QUEUES;
+@@ -399,7 +402,8 @@ static void end_clone_request(struct request *clone, blk_status_t error)
+ 	dm_complete_request(tio->orig, error);
  }
--EXPORT_SYMBOL(elv_register_queue);
  
- void elv_unregister_queue(struct request_queue *q)
+-static blk_status_t dm_dispatch_clone_request(struct request *clone, struct request *rq)
++static blk_status_t dm_dispatch_clone_request(struct dm_rq_target_io *tio,
++		struct request *clone, struct request *rq)
  {
-@@ -900,7 +899,6 @@ void elv_unregister_queue(struct request_queue *q)
- 		wbt_enable_default(q);
- 	}
+ 	blk_status_t r;
+ 
+@@ -408,9 +412,17 @@ static blk_status_t dm_dispatch_clone_request(struct request *clone, struct requ
+ 
+ 	clone->start_time = jiffies;
+ 	r = blk_insert_cloned_request(clone->q, clone);
+-	if (r != BLK_STS_OK && r != BLK_STS_RESOURCE)
++	if (dispatch_busy(r)) {
++		blk_rq_unprep_clone(clone);
++		tio->ti->type->release_clone_rq(clone);
++		tio->clone = NULL;
++	} else if (r != BLK_STS_OK) {
+ 		/* must complete clone in terms of original request */
+ 		dm_complete_request(rq, r);
++
++		/* we handled the failure, so return OK */
++		r = BLK_STS_OK;
++	}
+ 	return r;
  }
--EXPORT_SYMBOL(elv_unregister_queue);
  
- int elv_register(struct elevator_type *e)
- {
-diff --git a/include/linux/elevator.h b/include/linux/elevator.h
-index 3d794b3dc532..6d9e230dffd2 100644
---- a/include/linux/elevator.h
-+++ b/include/linux/elevator.h
-@@ -198,8 +198,6 @@ extern bool elv_attempt_insert_merge(struct request_queue *, struct request *);
- extern void elv_requeue_request(struct request_queue *, struct request *);
- extern struct request *elv_former_request(struct request_queue *, struct request *);
- extern struct request *elv_latter_request(struct request_queue *, struct request *);
--extern int elv_register_queue(struct request_queue *q);
--extern void elv_unregister_queue(struct request_queue *q);
- extern int elv_may_queue(struct request_queue *, unsigned int);
- extern void elv_completed_request(struct request_queue *, struct request *);
- extern int elv_set_request(struct request_queue *q, struct request *rq,
+@@ -499,11 +511,8 @@ static int map_request(struct dm_rq_target_io *tio)
+ 		/* The target has remapped the I/O so dispatch it */
+ 		trace_block_rq_remap(clone->q, clone, disk_devt(dm_disk(md)),
+ 				     blk_rq_pos(rq));
+-		ret = dm_dispatch_clone_request(clone, rq);
+-		if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE) {
+-			blk_rq_unprep_clone(clone);
+-			tio->ti->type->release_clone_rq(clone);
+-			tio->clone = NULL;
++		ret = dm_dispatch_clone_request(tio, clone, rq);
++		if (dispatch_busy(ret)) {
+ 			if (!rq->q->mq_ops)
+ 				r = DM_MAPIO_DELAY_REQUEUE;
+ 			else
 -- 
-2.15.1
+2.9.5
