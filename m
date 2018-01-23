@@ -1,43 +1,69 @@
-Return-Path: <prvs=554601a9d=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"hch@infradead.org" <hch@infradead.org>, "snitzer@redhat.com"
-	<snitzer@redhat.com>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
+Return-Path: <ming.lei@redhat.com>
+Date: Wed, 24 Jan 2018 00:59:15 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"hch@infradead.org" <hch@infradead.org>,
+	"snitzer@redhat.com" <snitzer@redhat.com>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
 	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>, "loberman@redhat.com"
-	<loberman@redhat.com>, "dm-devel@redhat.com" <dm-devel@redhat.com>
+	"jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
+	"loberman@redhat.com" <loberman@redhat.com>,
+	"dm-devel@redhat.com" <dm-devel@redhat.com>
 Subject: Re: [PATCH 1/5] blk-mq: introduce BLK_STS_DEV_RESOURCE
-Date: Tue, 23 Jan 2018 22:01:37 +0000
-Message-ID: <1516744896.3339.41.camel@wdc.com>
+Message-ID: <20180123165914.GH13277@ming.t460p>
 References: <20180122033550.27855-2-ming.lei@redhat.com>
-	 <1516639793.2545.14.camel@sandisk.com> <20180123005728.GB4411@ming.t460p>
-	 <54f0c19c-38aa-e788-f476-492e5a5734c9@wdc.com>
-	 <20180123162605.GD13277@ming.t460p>
-	 <4cdb2b42-0097-c64a-d9c0-b7a1727c80de@wdc.com>
-	 <20180123164109.GF13277@ming.t460p> <1516726030.3339.14.camel@wdc.com>
-	 <20180123164951.GG13277@ming.t460p> <1516726441.3339.16.camel@wdc.com>
-	 <20180123165914.GH13277@ming.t460p>
-In-Reply-To: <20180123165914.GH13277@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
+ <1516639793.2545.14.camel@sandisk.com>
+ <20180123005728.GB4411@ming.t460p>
+ <54f0c19c-38aa-e788-f476-492e5a5734c9@wdc.com>
+ <20180123162605.GD13277@ming.t460p>
+ <4cdb2b42-0097-c64a-d9c0-b7a1727c80de@wdc.com>
+ <20180123164109.GF13277@ming.t460p>
+ <1516726030.3339.14.camel@wdc.com>
+ <20180123164951.GG13277@ming.t460p>
+ <1516726441.3339.16.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1516726441.3339.16.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gV2VkLCAyMDE4LTAxLTI0IGF0IDAwOjU5ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gSG93
-IGlzIHRoYXQgZW5vdWdoIHRvIGZpeCB0aGUgSU8gaGFuZyB3aGVuIGRyaXZlciByZXR1cm5zIFNU
-U19SRVNPVVJDRQ0KPiBhbmQgdGhlIHF1ZXVlIGlzIGlkbGU/IElmIHlvdSB3YW50IHRvIGZvbGxv
-dyBwcmV2aW91cyBkbS1ycSdzIHdheSBvZg0KPiBjYWxsIGJsa19tcV9kZWxheV9ydW5faHdfcXVl
-dWUoKSBpbiAucXVldWVfcnEoKSwgdGhlIHNhbWUgdHJpY2sgbmVlZA0KPiB0byBiZSBhcHBsaWVk
-IHRvIG90aGVyIGRyaXZlcnMgdG9vLCByaWdodD8NCj4gDQo+IFVuZm9ydHVuYXRlbHkgbW9zdCBv
-ZiBTVFNfUkVTT1VSQ0UgZG9uJ3QgdXNlIHRoaXMgdHJpY2ssIGJ1dCB0aGV5IG5lZWQNCj4gdG8g
-YmUgaGFuZGxlZC4NCj4gDQo+IFRoZSBwYXRjaCBvZiAnYmxrLW1xOiBpbnRyb2R1Y2UgQkxLX1NU
-U19ERVZfUkVTT1VSQ0UnIGNhbiBmaXggYWxsIHRoZXNlDQo+IGNhc2VzLg0KDQpUaGUgZ29hbCBv
-ZiBteSBwcm9wb3NhbCB3YXMgdG8gYWRkcmVzcyB0aGUgcmFjZSBiZXR3ZWVuIHJ1bm5pbmcgdGhl
-IHF1ZXVlIGFuZA0KYWRkaW5nIHJlcXVlc3RzIGJhY2sgdG8gdGhlIGRpc3BhdGNoIHF1ZXVlIG9u
-bHkuIFJlZ2FyZGluZyB0aGUgSS9PIGhhbmdzIHRoYXQNCmNhbiBvY2N1ciBpZiBhIGJsb2NrIGRy
-aXZlciByZXR1cm5zIEJMS19TVFNfUkVTT1VSQ0U6IHNpbmNlIGFsbCBvZiB0aGVzZSBjYW4NCmJl
-IGFkZHJlc3NlZCBieSBpbnNlcnRpbmcgYmxrX21xX2RlbGF5X3J1bl9od19xdWV1ZSgpIGNhbGxz
-IGluIHRoZSBhZmZlY3RlZA0KYmxvY2sgZHJpdmVycyBJIHByZWZlciB0byBtb2RpZnkgdGhlIGJs
-b2NrIGRyaXZlcnMgaW5zdGVhZCBvZiBtYWtpbmcgdGhlDQpibGstbXEgY29yZSBldmVuIG1vcmUg
-Y29tcGxpY2F0ZWQuDQoNClRoYW5rcywNCg0KQmFydC4=
+On Tue, Jan 23, 2018 at 04:54:02PM +0000, Bart Van Assche wrote:
+> On Wed, 2018-01-24 at 00:49 +0800, Ming Lei wrote:
+> > On Tue, Jan 23, 2018 at 04:47:11PM +0000, Bart Van Assche wrote:
+> > > On Wed, 2018-01-24 at 00:41 +0800, Ming Lei wrote:
+> > > > Could you explain where to call call_rcu()?  call_rcu() can't be used in
+> > > > IO path at all.
+> > > 
+> > > Can you explain what makes you think that call_rcu() can't be used in the
+> > > I/O path? As you know call_rcu() invokes a function asynchronously. From
+> > > Documentation/RCU/Design/Requirements/Requirements.html:
+> > > 
+> > >   The <tt>call_rcu()</tt> function may be used in a number of
+> > >   situations where neither <tt>synchronize_rcu()</tt> nor
+> > >   <tt>synchronize_rcu_expedited()</tt> would be legal,
+> > >   including within preempt-disable code, <tt>local_bh_disable()</tt> code,
+> > >   interrupt-disable code, and interrupt handlers.
+> > 
+> > OK, suppose it is true, do you want to change most of STS_RESOURCE in
+> > all drivers to this way? Why can't we use the generic and simple approach
+> > in this patch?
+> 
+> Please reread my proposal. I did not propose to change any block drivers.
+> What I proposed is to change the blk_mq_delay_run_hw_queue() implementation
+> such that it uses call_rcu() instead of kblockd_mod_delayed_work_on().
+> That's a generic and simple approach.
+
+How is that enough to fix the IO hang when driver returns STS_RESOURCE
+and the queue is idle? If you want to follow previous dm-rq's way of
+call blk_mq_delay_run_hw_queue() in .queue_rq(), the same trick need
+to be applied to other drivers too, right?
+
+Unfortunately most of STS_RESOURCE don't use this trick, but they need
+to be handled.
+
+The patch of 'blk-mq: introduce BLK_STS_DEV_RESOURCE' can fix all these
+cases.
+
+-- 
+Ming
