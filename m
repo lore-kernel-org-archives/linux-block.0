@@ -1,99 +1,71 @@
-Return-Path: <xuejiufei@gmail.com>
-Return-Path: <xuejiufei@gmail.com>
-From: xuejiufei <xuejiufei@gmail.com>
-Subject: [PATCH] blk-throttle: avoid double counted
-To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc: jiufei.xjf@alibaba-inc.com, Shaohua Li <shli@kernel.org>
-Message-ID: <4448dd08-74b5-ef8f-e227-49c8e3dbe3eb@gmail.com>
-Date: Wed, 10 Jan 2018 13:02:29 +0800
+Return-Path: <prvs=554601a9d=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>, "snitzer@redhat.com"
+	<snitzer@redhat.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "dm-devel@redhat.com" <dm-devel@redhat.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"hch@infradead.org" <hch@infradead.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "osandov@fb.com" <osandov@fb.com>
+Subject: Re: [PATCH] block: neutralize blk_insert_cloned_request IO stall
+ regression (was: Re: [RFC PATCH] blk-mq: fixup RESTART when queue becomes
+ idle)
+Date: Tue, 23 Jan 2018 16:43:42 +0000
+Message-ID: <1516725821.3339.11.camel@wdc.com>
+References: <1516296056.2676.23.camel@wdc.com>
+	 <20180118183039.GA20121@redhat.com> <1516301278.2676.35.camel@wdc.com>
+	 <deeb2b2e-6d0e-a144-843d-d08626de8aea@kernel.dk>
+	 <20180118204856.GA31679@redhat.com> <1516309128.2676.38.camel@wdc.com>
+	 <20180118212327.GB31679@redhat.com> <1516311554.2676.50.camel@wdc.com>
+	 <20180118220132.GA20860@redhat.com> <1516314012.2676.76.camel@wdc.com>
+	 <20180123092204.GA39002@redhat.com>
+In-Reply-To: <20180123092204.GA39002@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jiufei Xue <jiufei.xjf@alibaba-inc.com>
-
-If a bio is split after counted to the stat_bytes and stat_ios in
-blkcg_bio_issue_check(), the bio could be resubmited and enters the
-block throttle layer again. This will cause the part of the bio is
-counted twice.
-
-The flag BIO_THROTTLED can not be used to fix this problem considering the
-following two cases.
-1. The bio is throttled and resubmited to the block throttle layer. It
-has the flag BIO_THROTTLED and should be counted.
-2. The bio can be dispathed and has counted, and then is split and
-resubmitted to the block throttle layer. It also has the flag
-BIO_THROTTLED but should not be counted again.
-
-So we add another flag BIO_THROTL_COUNTED to avoid double counted.
-
-Signed-off-by: Jiufei Xue <jiufei.xjf@alibaba-inc.com>
----
- block/bio.c                | 2 ++
- include/linux/bio.h        | 6 ++++--
- include/linux/blk-cgroup.h | 3 ++-
- include/linux/blk_types.h  | 1 +
- 4 files changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 9ef6cf3..4594c2e 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -601,6 +601,8 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
- 	bio_set_flag(bio, BIO_CLONED);
- 	if (bio_flagged(bio_src, BIO_THROTTLED))
- 		bio_set_flag(bio, BIO_THROTTLED);
-+	if (bio_flagged(bio_src, BIO_THROTL_COUNTED))
-+		bio_set_flag(bio, BIO_THROTL_COUNTED);
- 	bio->bi_opf = bio_src->bi_opf;
- 	bio->bi_write_hint = bio_src->bi_write_hint;
- 	bio->bi_iter = bio_src->bi_iter;
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 23d29b3..aefc24c 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -492,8 +492,10 @@ extern struct bio *bio_copy_user_iov(struct request_queue *,
- 
- #define bio_set_dev(bio, bdev) 			\
- do {						\
--	if ((bio)->bi_disk != (bdev)->bd_disk)	\
--		bio_clear_flag(bio, BIO_THROTTLED);\
-+	if ((bio)->bi_disk != (bdev)->bd_disk)	{	\
-+		bio_clear_flag(bio, BIO_THROTTLED);	\
-+		bio_clear_flag(bio, BIO_THROTL_COUNTED);\
-+	}					\
- 	(bio)->bi_disk = (bdev)->bd_disk;	\
- 	(bio)->bi_partno = (bdev)->bd_partno;	\
- } while (0)
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index e9825ff..c151bc9 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -701,11 +701,12 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
- 
- 	throtl = blk_throtl_bio(q, blkg, bio);
- 
--	if (!throtl) {
-+	if (!throtl && !bio_flagged(bio, BIO_THROTL_COUNTED)) {
- 		blkg = blkg ?: q->root_blkg;
- 		blkg_rwstat_add(&blkg->stat_bytes, bio->bi_opf,
- 				bio->bi_iter.bi_size);
- 		blkg_rwstat_add(&blkg->stat_ios, bio->bi_opf, 1);
-+		bio_set_flag(bio, BIO_THROTL_COUNTED);
- 	}
- 
- 	rcu_read_unlock();
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 9e7d8bd..7a3890a 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -135,6 +135,7 @@ struct bio {
- 				 * throttling rules. Don't do it again. */
- #define BIO_TRACE_COMPLETION 10	/* bio_endio() should trace the final completion
- 				 * of this bio. */
-+#define BIO_THROTL_COUNTED 11	/* This bio has already counted to rwstat. */
- /* See BVEC_POOL_OFFSET below before adding new flags */
- 
- /*
--- 
-1.8.3.1
+T24gVHVlLCAyMDE4LTAxLTIzIGF0IDEwOjIyICswMTAwLCBNaWtlIFNuaXR6ZXIgd3JvdGU6DQo+
+IE9uIFRodSwgSmFuIDE4IDIwMTggYXQgIDU6MjBwbSAtMDUwMCwNCj4gQmFydCBWYW4gQXNzY2hl
+IDxCYXJ0LlZhbkFzc2NoZUB3ZGMuY29tPiB3cm90ZToNCj4gDQo+ID4gT24gVGh1LCAyMDE4LTAx
+LTE4IGF0IDE3OjAxIC0wNTAwLCBNaWtlIFNuaXR6ZXIgd3JvdGU6DQo+ID4gPiBBbmQgeWV0IExh
+dXJlbmNlIGNhbm5vdCByZXByb2R1Y2UgYW55IHN1Y2ggbG9ja3VwcyB3aXRoIHlvdXIgdGVzdC4u
+Lg0KPiA+IA0KPiA+IEhtbSAuLi4gbWF5YmUgSSBtaXN1bmRlcnN0b29kIExhdXJlbmNlIGJ1dCBJ
+IGRvbid0IHRoaW5rIHRoYXQgTGF1cmVuY2UgaGFzDQo+ID4gYWxyZWFkeSBzdWNjZWVkZWQgYXQg
+cnVubmluZyBhbiB1bm1vZGlmaWVkIHZlcnNpb24gb2YgbXkgdGVzdHMuIEluIG9uZSBvZiB0aGUN
+Cj4gPiBlLW1haWxzIExhdXJlbmNlIHNlbnQgbWUgdGhpcyBtb3JuaW5nIEkgcmVhZCB0aGF0IGhl
+IG1vZGlmaWVkIHRoZXNlIHNjcmlwdHMNCj4gPiB0byBnZXQgcGFzdCBhIGtlcm5lbCBtb2R1bGUg
+dW5sb2FkIGZhaWx1cmUgdGhhdCB3YXMgcmVwb3J0ZWQgd2hpbGUgc3RhcnRpbmcNCj4gPiB0aGVz
+ZSB0ZXN0cy4gU28gdGhlIG5leHQgc3RlcCBpcyB0byBjaGVjayB3aGljaCBjaGFuZ2VzIHdlcmUg
+bWFkZSB0byB0aGUgdGVzdA0KPiA+IHNjcmlwdHMgYW5kIGFsc28gd2hldGhlciB0aGUgdGVzdCBy
+ZXN1bHRzIGFyZSBzdGlsbCB2YWxpZC4NCj4gPiANCj4gPiA+IEFyZSB5b3UgYWJzb2x1dGVseSBj
+ZXJ0YWluIHRoaXMgcGF0Y2ggZG9lc24ndCBoZWxwIHlvdT8NCj4gPiA+IGh0dHBzOi8vcGF0Y2h3
+b3JrLmtlcm5lbC5vcmcvcGF0Y2gvMTAxNzQwMzcvDQo+ID4gPiANCj4gPiA+IElmIGl0IGRvZXNu
+J3QgdGhlbiB0aGF0IGlzIGFjdHVhbGx5IHZlcnkgdXNlZnVsIHRvIGtub3cuDQo+ID4gDQo+ID4g
+VGhlIGZpcnN0IEkgdHJpZWQgdGhpcyBtb3JuaW5nIGlzIHRvIHJ1biB0aGUgc3JwLXRlc3Qgc29m
+dHdhcmUgYWdhaW5zdCBhIG1lcmdlDQo+ID4gb2YgSmVucycgZm9yLW5leHQgYnJhbmNoIGFuZCB5
+b3VyIGRtLTQuMTYgYnJhbmNoLiBTaW5jZSBJIG5vdGljZWQgdGhhdCB0aGUgZG0NCj4gPiBxdWV1
+ZSBsb2NrZWQgdXAgSSByZWluc2VydGVkIGEgYmxrX21xX2RlbGF5X3J1bl9od19xdWV1ZSgpIGNh
+bGwgaW4gdGhlIGRtIGNvZGUuDQo+ID4gU2luY2UgZXZlbiB0aGF0IHdhcyBub3Qgc3VmZmljaWVu
+dCBJIHRyaWVkIHRvIGtpY2sgdGhlIHF1ZXVlcyB2aWEgZGVidWdmcyAoZm9yDQo+ID4gcyBpbiAv
+c3lzL2tlcm5lbC9kZWJ1Zy9ibG9jay8qL3N0YXRlOyBkbyBlY2hvIGtpY2sgPiRzOyBkb25lKS4g
+U2luY2UgdGhhdCB3YXMNCj4gPiBub3Qgc3VmZmljaWVudCB0byByZXNvbHZlIHRoZSBxdWV1ZSBz
+dGFsbCBJIHJldmVydGVkIHRoZSBmb2xsb3dpbmcgdHJlZSBwYXRjaGVzDQo+ID4gdGhhdCBhcmUg
+aW4gSmVucycgdHJlZToNCj4gPiAqICJibGstbXE6IGltcHJvdmUgRE0ncyBibGstbXEgSU8gbWVy
+Z2luZyB2aWEgYmxrX2luc2VydF9jbG9uZWRfcmVxdWVzdCBmZWVkYmFjayINCj4gPiAqICJibGst
+bXEtc2NoZWQ6IHJlbW92ZSB1bnVzZWQgJ2Nhbl9ibG9jaycgYXJnIGZyb20gYmxrX21xX3NjaGVk
+X2luc2VydF9yZXF1ZXN0Ig0KPiA+ICogImJsay1tcTogZG9uJ3QgZGlzcGF0Y2ggcmVxdWVzdCBp
+biBibGtfbXFfcmVxdWVzdF9kaXJlY3RfaXNzdWUgaWYgcXVldWUgaXMgYnVzeSINCj4gPiANCj4g
+PiBPbmx5IGFmdGVyIEkgaGFkIGRvbmUgdGhpcyB0aGUgc3JwLXRlc3Qgc29mdHdhcmUgcmFuIGFn
+YWluIHdpdGhvdXQgdHJpZ2dlcmluZw0KPiA+IGRtIHF1ZXVlIGxvY2t1cHMuDQoNCkhlbGxvIE1p
+a2UsDQoNCkkgd2FudCB0byB0YWtlIGJhY2sgd2hhdCBJIHdyb3RlIGFib3V0IHRoZSByZXZlcnRz
+LiBJIGhhdmUgbm90IHlldCB0cmllZCB0bw0KYW5hbHl6ZSBleGFjdGx5IHdoaWNoIGNoYW5nZSBt
+YWRlIGJsa19pbnNlcnRfY2xvbmVkX3JlcXVlc3QoKSB3b3JrIHJlbGlhYmx5DQpmb3IgbWUgYnV0
+IHdpdGggSmVucycgbGF0ZXN0IGZvci1uZXh0IGJyYW5jaCBhbmQgeW91ciBmb3ItNC4xNiBicmFu
+Y2ggbWVyZ2VkDQphbGwgSSBuZWVkIHRvIGF2b2lkIHF1ZXVlIHN0YWxscyBpcyB0aGUgZm9sbG93
+aW5nOg0KDQpkaWZmIC0tZ2l0IGEvZHJpdmVycy9tZC9kbS1ycS5jIGIvZHJpdmVycy9tZC9kbS1y
+cS5jDQppbmRleCBmMTYwOTZhZjg3OWEuLmM1OWM1OWNmZDJhNSAxMDA2NDQNCi0tLSBhL2RyaXZl
+cnMvbWQvZG0tcnEuYw0KKysrIGIvZHJpdmVycy9tZC9kbS1ycS5jDQpAQCAtNzYxLDYgKzc2MSw3
+IEBAIHN0YXRpYyBibGtfc3RhdHVzX3QgZG1fbXFfcXVldWVfcnEoc3RydWN0IGJsa19tcV9od19j
+dHggKmhjdHgsDQogCQkvKiBVbmRvIGRtX3N0YXJ0X3JlcXVlc3QoKSBiZWZvcmUgcmVxdWV1aW5n
+ICovDQogCQlycV9lbmRfc3RhdHMobWQsIHJxKTsNCiAJCXJxX2NvbXBsZXRlZChtZCwgcnFfZGF0
+YV9kaXIocnEpLCBmYWxzZSk7DQorCQlibGtfbXFfZGVsYXlfcnVuX2h3X3F1ZXVlKGhjdHgsIDEw
+MC8qbXMqLyk7DQogCQlyZXR1cm4gQkxLX1NUU19SRVNPVVJDRTsNCiAJfQ0KIA0KQmFydC4=
