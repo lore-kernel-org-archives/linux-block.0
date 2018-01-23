@@ -1,128 +1,37 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: dm-devel@redhat.com,
-	Ming Lei <ming.lei@redhat.com>,
-	Laurence Oberman <loberman@redhat.com>,
-	Bart Van Assche <bart.vanassche@sandisk.com>
-Subject: [PATCH 3/5] dm-rq: return BLK_STS_* from map_request()
-Date: Mon, 22 Jan 2018 11:35:48 +0800
-Message-Id: <20180122033550.27855-4-ming.lei@redhat.com>
-In-Reply-To: <20180122033550.27855-1-ming.lei@redhat.com>
-References: <20180122033550.27855-1-ming.lei@redhat.com>
+Return-Path: <keith.busch@intel.com>
+Date: Mon, 22 Jan 2018 17:16:29 -0700
+From: Keith Busch <keith.busch@intel.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
+Subject: Re: [PATCH 1/3] nvme/pci: Start request after doorbell ring
+Message-ID: <20180123001628.GT12043@localhost.localdomain>
+References: <20171221204636.2924-1-keith.busch@intel.com>
+ <20171221204636.2924-2-keith.busch@intel.com>
+ <45a16b4c-fbc0-106d-df37-439374c7b5dc@kernel.dk>
+ <118beb1f-54eb-c65d-1c9c-4775ebde1fa8@kernel.dk>
+ <20171221210250.GA2975@localhost.localdomain>
+ <6ffc074a-3c5b-c76d-d213-6606a77626e0@kernel.dk>
+ <20180103202105.GC11172@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180103202105.GC11172@localhost.localdomain>
 List-ID: <linux-block@vger.kernel.org>
 
-Except for DM_MAPIO_REQUEUE, map_request() handles other dispatch exception
-already, so return BLK_STS_* from map_request() directly.
+On Wed, Jan 03, 2018 at 01:21:05PM -0700, Keith Busch wrote:
+> 
+> I've removed the submission side poll in a local build, and amazingly I
+> am observing a not insignificant increase in latency without it on some
+> workloads with certain hardware. I will have to delay recommending/posting
+> removal of this pending further investigation.
 
-Another change is that if dm_dispatch_clone_request() returns
-BLK_STS_DEV_RESOURCE from underlying queue, this status is returned
-to blk-mq too, since underlying queue's RESTART can handle dm-rq's
-RESTART in this case.
+This took longer to narrow than I hoped. I had been getting very wild
+results, and there were two things to blame: a kernel irq issue[*],
+and a platform bios causing a lot of CPU thermal frequency throttling.
 
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Laurence Oberman <loberman@redhat.com>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/md/dm-rq.c | 30 +++++++++++++++++-------------
- 1 file changed, 17 insertions(+), 13 deletions(-)
+Now that's sorted out, I am back to tuning this and the opprotunistic
+nvme submission side polling once again does not produce a measurable
+difference. My world is sane again. Will try to send an update for
+consideration this week after some more testing.
 
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index 1408e6664c16..830e1ccfbb44 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -482,9 +482,10 @@ static void init_tio(struct dm_rq_target_io *tio, struct request *rq,
- 
- /*
-  * Returns:
-- * DM_MAPIO_*       : the request has been processed as indicated
-- * DM_MAPIO_REQUEUE : the original request needs to be immediately requeued
-- * < 0              : the request was completed due to failure
-+ * BLK_STS_OK       : the request has been processed aready, no need to
-+ * 		ask block layer to handle it any more
-+ * BLK_STS_RESOURCE : the original request needs to be immediately requeued
-+ * BLK_STS_DEV_RESOURCE : same with BLK_STS_RESOURCE, but blk-mq need this info
-  */
- static int map_request(struct dm_rq_target_io *tio)
- {
-@@ -493,7 +494,7 @@ static int map_request(struct dm_rq_target_io *tio)
- 	struct mapped_device *md = tio->md;
- 	struct request *rq = tio->orig;
- 	struct request *clone = NULL;
--	blk_status_t ret;
-+	blk_status_t ret, result = BLK_STS_OK;
- 
- 	r = ti->type->clone_and_map_rq(ti, rq, &tio->info, &clone);
- check_again:
-@@ -513,15 +514,16 @@ static int map_request(struct dm_rq_target_io *tio)
- 				     blk_rq_pos(rq));
- 		ret = dm_dispatch_clone_request(tio, clone, rq);
- 		if (dispatch_busy(ret)) {
--			if (!rq->q->mq_ops)
-+			if (!rq->q->mq_ops) {
- 				r = DM_MAPIO_DELAY_REQUEUE;
--			else
--				r = DM_MAPIO_REQUEUE;
--			goto check_again;
-+				goto check_again;
-+			}
-+			result = ret;
- 		}
- 		break;
- 	case DM_MAPIO_REQUEUE:
- 		/* The target wants to requeue the I/O */
-+		result = BLK_STS_RESOURCE;
- 		break;
- 	case DM_MAPIO_DELAY_REQUEUE:
- 		/* The target wants to requeue the I/O after a delay */
-@@ -536,7 +538,7 @@ static int map_request(struct dm_rq_target_io *tio)
- 		BUG();
- 	}
- 
--	return r;
-+	return result;
- }
- 
- static void dm_start_request(struct mapped_device *md, struct request *orig)
-@@ -599,7 +601,7 @@ static void map_tio_request(struct kthread_work *work)
- {
- 	struct dm_rq_target_io *tio = container_of(work, struct dm_rq_target_io, work);
- 
--	if (map_request(tio) == DM_MAPIO_REQUEUE)
-+	if (dispatch_busy(map_request(tio)))
- 		dm_requeue_original_request(tio, false);
- }
- 
-@@ -754,6 +756,7 @@ static blk_status_t dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	struct dm_rq_target_io *tio = blk_mq_rq_to_pdu(rq);
- 	struct mapped_device *md = tio->md;
- 	struct dm_target *ti = md->immutable_target;
-+	blk_status_t ret;
- 
- 	if (unlikely(!ti)) {
- 		int srcu_idx;
-@@ -777,14 +780,15 @@ static blk_status_t dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	tio->ti = ti;
- 
- 	/* Direct call is fine since .queue_rq allows allocations */
--	if (map_request(tio) == DM_MAPIO_REQUEUE) {
-+	ret = map_request(tio);
-+	if (dispatch_busy(ret)) {
- 		/* Undo dm_start_request() before requeuing */
- 		rq_end_stats(md, rq);
- 		rq_completed(md, rq_data_dir(rq), false);
--		return BLK_STS_RESOURCE;
-+		return ret;
- 	}
- 
--	return BLK_STS_OK;
-+	return ret;
- }
- 
- static const struct blk_mq_ops dm_mq_ops = {
--- 
-2.9.5
+ * https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit?id=a0c9259dc4
