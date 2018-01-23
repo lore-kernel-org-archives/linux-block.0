@@ -1,142 +1,63 @@
-Return-Path: <msnitzer@redhat.com>
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk
-Cc: Ming Lei <tom.leiming@gmail.com>,
-	hch@lst.de,
-	dm-devel@redhat.com,
-	linux-block@vger.kernel.org
-Subject: [for-4.16 PATCH v5 1/3] blk-mq: factor out a few helpers from __blk_mq_try_issue_directly
-Date: Tue, 16 Jan 2018 23:33:35 -0500
-Message-Id: <20180117043338.25839-2-snitzer@redhat.com>
-In-Reply-To: <20180117043338.25839-1-snitzer@redhat.com>
-References: <20180117043338.25839-1-snitzer@redhat.com>
+Return-Path: <dave@znu.io>
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: Hard LOCKUP on 4.15-rc9 + 'blkmq/for-next' branch
+From: David Zarzycki <dave@znu.io>
+In-Reply-To: <07497a18-f638-d764-140a-c0de762571c2@kernel.dk>
+Date: Tue, 23 Jan 2018 13:12:09 -0500
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Message-Id: <E0FF4205-E882-4CDC-9698-29F7CA5BAD1D@znu.io>
+References: <95E75EBE-D01A-4236-8762-FF3522D6DBAD@znu.io>
+ <78e10971-611e-8dd7-104e-8266c3ba3b5c@kernel.dk>
+ <7E93BF17-8476-4A93-BD27-D2E22E5DAB00@znu.io>
+ <6025644f-e147-903a-e836-a2f53d3a61e9@kernel.dk>
+ <79205A92-2997-45D6-9277-6F56EC7CA989@znu.io>
+ <e492ffee-6a04-4f84-a22e-6d71486dbe07@kernel.dk>
+ <5103A5A8-E737-4ADC-939E-ACE84AD7DB70@znu.io>
+ <07497a18-f638-d764-140a-c0de762571c2@kernel.dk>
+To: Jens Axboe <axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-No functional change.  Just makes code flow more logically.
 
-In following commit, __blk_mq_try_issue_directly() will be used to
-return the dispatch result (blk_status_t) to DM.  DM needs this
-information to improve IO merging.
 
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
----
- block/blk-mq.c | 79 ++++++++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 52 insertions(+), 27 deletions(-)
+> On Jan 23, 2018, at 13:00, Jens Axboe <axboe@kernel.dk> wrote:
+>=20
+> On 1/23/18 10:54 AM, David Zarzycki wrote:
+>> Hi Jens,
+>>=20
+>> The bug still reproduces with this change. How confident are we that
+>> kernel objects are properly reference counted while they are
+>> throttled?
+>=20
+> I would be surprised if it made a change, thanks for checking. Since
+> you're not pulling devices out of your system, is really nothing that
+> needs ref counting here.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c8f62e6be6b6..c117c2baf2c9 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1694,9 +1694,9 @@ static blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx, struct request *rq)
- 	return blk_tag_to_qc_t(rq->internal_tag, hctx->queue_num, true);
- }
- 
--static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
--					struct request *rq,
--					blk_qc_t *cookie)
-+static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
-+					    struct request *rq,
-+					    blk_qc_t *cookie)
- {
- 	struct request_queue *q = rq->q;
- 	struct blk_mq_queue_data bd = {
-@@ -1705,6 +1705,43 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	};
- 	blk_qc_t new_cookie;
- 	blk_status_t ret;
-+
-+	new_cookie = request_to_qc_t(hctx, rq);
-+
-+	/*
-+	 * For OK queue, we are done. For error, caller may kill it.
-+	 * Any other error (busy), just add it to our list as we
-+	 * previously would have done.
-+	 */
-+	ret = q->mq_ops->queue_rq(hctx, &bd);
-+	switch (ret) {
-+	case BLK_STS_OK:
-+		*cookie = new_cookie;
-+		break;
-+	case BLK_STS_RESOURCE:
-+		__blk_mq_requeue_request(rq);
-+		break;
-+	default:
-+		*cookie = BLK_QC_T_NONE;
-+		break;
-+	}
-+
-+	return ret;
-+}
-+
-+static void __blk_mq_fallback_to_insert(struct blk_mq_hw_ctx *hctx,
-+					struct request *rq,
-+					bool run_queue)
-+{
-+	blk_mq_sched_insert_request(rq, false, run_queue, false,
-+					hctx->flags & BLK_MQ_F_BLOCKING);
-+}
-+
-+static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-+						struct request *rq,
-+						blk_qc_t *cookie)
-+{
-+	struct request_queue *q = rq->q;
- 	bool run_queue = true;
- 
- 	/* RCU or SRCU read lock is needed before checking quiesced flag */
-@@ -1724,41 +1761,29 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 		goto insert;
- 	}
- 
--	new_cookie = request_to_qc_t(hctx, rq);
--
--	/*
--	 * For OK queue, we are done. For error, kill it. Any other
--	 * error (busy), just add it to our list as we previously
--	 * would have done
--	 */
--	ret = q->mq_ops->queue_rq(hctx, &bd);
--	switch (ret) {
--	case BLK_STS_OK:
--		*cookie = new_cookie;
--		return;
--	case BLK_STS_RESOURCE:
--		__blk_mq_requeue_request(rq);
--		goto insert;
--	default:
--		*cookie = BLK_QC_T_NONE;
--		blk_mq_end_request(rq, ret);
--		return;
--	}
--
-+	return __blk_mq_issue_directly(hctx, rq, cookie);
- insert:
--	blk_mq_sched_insert_request(rq, false, run_queue, false,
--					hctx->flags & BLK_MQ_F_BLOCKING);
-+	__blk_mq_fallback_to_insert(hctx, rq, run_queue);
-+
-+	return BLK_STS_OK;
- }
- 
- static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 		struct request *rq, blk_qc_t *cookie)
- {
-+	blk_status_t ret;
- 	int srcu_idx;
- 
- 	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
- 
- 	hctx_lock(hctx, &srcu_idx);
--	__blk_mq_try_issue_directly(hctx, rq, cookie);
-+
-+	ret = __blk_mq_try_issue_directly(hctx, rq, cookie);
-+	if (ret == BLK_STS_RESOURCE)
-+		__blk_mq_fallback_to_insert(hctx, rq, true);
-+	else if (ret != BLK_STS_OK)
-+		blk_mq_end_request(rq, ret);
-+
- 	hctx_unlock(hctx, srcu_idx);
- }
- 
--- 
-2.15.0
+I=E2=80=99m not talking about hardware object reference counting, just =
+basic memory management reference counting. That being said, I=E2=80=99m =
+not a Linux kernel programmer, so I perhaps Linux avoids classic =
+reference counting somehow.
+
+> You don't have something running turning wbt on/off during the run, I =
+assume?
+
+I doubt it. This is just a plain Red Hat Fedora 27 workstation install =
+with many of frills uninstalled afterwards. I didn=E2=80=99t even know =
+that WBT could be dynamically enabled/disabled.
+
+>=20
+> The whole thing is very odd. You do have lots of processes exiting =
+with
+> segfaults and similar. The only thing I can think of is the wait queue
+> entry becoming invalid since it's on the stack, but I don't see how =
+that
+> can happen. We should exit the wait path normally and remove ourselves
+> from the list.
+
+For whatever it may be worth, I hit this bug once while rebuilding the =
+Fedora kernel RPM, which is similar in that they both have short lived =
+processes, but is different in that the Fedora kernel RPM rebuild =
+doesn=E2=80=99t intentionally segfault to validate correctness.
+
+Dave=
