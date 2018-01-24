@@ -1,29 +1,28 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:43530 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934227AbeAXQYk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Jan 2018 11:24:40 -0500
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "jthumshirn@suse.de" <jthumshirn@suse.de>,
+        "axboe@fb.com" <axboe@fb.com>
+CC: "joe@perches.com" <joe@perches.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: [PATCH v2] bsg: use pr_debug instead of hand craftet macros
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
- "jthumshirn@suse.de" <jthumshirn@suse.de>
-Cc: "joe@perches.com" <joe@perches.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Date: Wed, 24 Jan 2018 16:24:36 +0000
+Message-ID: <1516811073.3873.0.camel@wdc.com>
 References: <20180123105538.24860-1-jthumshirn@suse.de>
- <1516811073.3873.0.camel@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <3f0260d5-078e-7983-d226-4bf79fb0030d@kernel.dk>
-Date: Wed, 24 Jan 2018 09:52:25 -0700
+In-Reply-To: <20180123105538.24860-1-jthumshirn@suse.de>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1516811073.3873.0.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On 1/24/18 9:24 AM, Bart Van Assche wrote:
-> On Tue, 2018-01-23 at 11:55 +0100, Johannes Thumshirn wrote:
->> Use pr_debug instead of hand craftet macros. This way it is not needed to
->> re-compile the kernel to enable bsg debug outputs and it's possible to
->> selectively enable specific prints.
-> 
-> Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
-
-Added, thanks Johannes.
-
--- 
-Jens Axboe
+T24gVHVlLCAyMDE4LTAxLTIzIGF0IDExOjU1ICswMTAwLCBKb2hhbm5lcyBUaHVtc2hpcm4gd3Jv
+dGU6DQo+IFVzZSBwcl9kZWJ1ZyBpbnN0ZWFkIG9mIGhhbmQgY3JhZnRldCBtYWNyb3MuIFRoaXMg
+d2F5IGl0IGlzIG5vdCBuZWVkZWQgdG8NCj4gcmUtY29tcGlsZSB0aGUga2VybmVsIHRvIGVuYWJs
+ZSBic2cgZGVidWcgb3V0cHV0cyBhbmQgaXQncyBwb3NzaWJsZSB0bw0KPiBzZWxlY3RpdmVseSBl
+bmFibGUgc3BlY2lmaWMgcHJpbnRzLg0KDQpSZXZpZXdlZC1ieTogQmFydCBWYW4gQXNzY2hlIDxi
+YXJ0LnZhbmFzc2NoZUB3ZGMuY29tPg0KDQoNCg0K
