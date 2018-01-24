@@ -1,82 +1,141 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out1.zte.com.cn ([202.103.147.172]:52678 "EHLO mxct.zte.com.cn"
+Received: from mx1.redhat.com ([209.132.183.28]:39046 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752346AbeABGcl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 Jan 2018 01:32:41 -0500
-From: tang.junhui@zte.com.cn
-To: mlyle@lyle.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        tang.junhui@zte.com.cn
-Subject: Re: [for-416 PATCH] bcache: fix writeback target calc on large devices
-Date: Tue, 2 Jan 2018 14:33:51 +0800
-Message-Id: <1514874831-10255-1-git-send-email-tang.junhui@zte.com.cn>
+        id S933397AbeAXMsi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Jan 2018 07:48:38 -0500
+Subject: Re: [dm-devel] [PATCH 0/2] dm: add new loop and ram targets
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-block@vger.kernel.org, dm-devel@redhat.com,
+        snitzer@redhat.com, Ming Lei <ming.lei@redhat.com>
+References: <cover.1516124587.git.heinzm@redhat.com>
+ <20180122201944.GA7080@infradead.org>
+From: Heinz Mauelshagen <heinzm@redhat.com>
+Message-ID: <bfb667c8-ea26-cd9b-6a18-9c88252f7b1b@redhat.com>
+Date: Wed, 24 Jan 2018 13:48:17 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180122201944.GA7080@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+On 22/01/18 21:19, Christoph Hellwig wrote:
 
-This patch is useful for preventing the overflow of the expression
-(cache_dirty_target * bdev_sectors(dc->bdev)), but it also
-lead into a calc error, for example, when there is a 1G and
-100*164G cached device, it would cause the "target" value to
-be aways zero of the 1G device, which would cause write-back 
-threshold losing efficacy.
+> On Wed, Jan 17, 2018 at 08:33:59PM +0100, Heinz Mauelshagen wrote:
+>> Enhancing IO performance compared to the kernels existing
+>> loop driver thus better suiting respective requirements in
+>> test setups, this patch series adds new "loop" and "ram" targets.
+> For a fair comparism vs loop you'll need to compare it to the
+> direct I/O mode.
 
-Maybe at first we can judge if it overflows or not of the expression 
-(cache_dirty_target * bdev_sectors(dc->bdev)), if it overflows,
-We can calc the value of target as the patch, otherwise, 
-we calc it as old way.
+True, the tested use cases were based  on backing filesystems
+w/o direct I/O support which is valuable to me.
 
->Bcache needs to scale the dirty data in the cache over the multiple
->backing disks in order to calculate writeback rates for each.
->The previous code did this by multiplying the target number of dirty
->sectors by the backing device size, and expected it to fit into a
->uint64_t; this blows up on relatively small backing devices.
->
->The new approach figures out the bdev's share in 16384ths of the overall
->cached data.  This is chosen to cope well when bdevs drastically vary in
->size and to ensure that bcache can cross the petabyte boundary for each
->backing device.
->
->Reported-by: Jack Douglas <jack@douglastechnology.co.uk>
->Signed-off-by: Michael Lyle <mlyle@lyle.org>
->---
-> drivers/md/bcache/writeback.c | 17 +++++++++++++++--
-> 1 file changed, 15 insertions(+), 2 deletions(-)
->
->diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
->index 56a37884ca8b..ddbbeec1f0ee 100644
->--- a/drivers/md/bcache/writeback.c
->+++ b/drivers/md/bcache/writeback.c
->@@ -24,10 +24,23 @@ static void __update_writeback_rate(struct cached_dev *dc)
->     struct cache_set *c = dc->disk.c;
->     uint64_t cache_sectors = c->nbuckets * c->sb.bucket_size -
->                 bcache_flash_devs_sectors_dirty(c);
->+    /*
->+     * Unfortunately we don't know the exact share of dirty data for
->+     * each backing device.  Therefore, we need to infer the writeback
->+     * for each disk based on its assumed proportion of dirty data.
->+     *
->+     * 16384 is chosen here as something that each backing device should
->+     * be a reasonable fraction of the share, and not to blow up until
->+     * individual backing devices are a petabyte.
->+     */
->+    uint32_t bdev_share_per16k =
->+        div64_u64(bdev_sectors(dc->bdev) << 14,
->+                c->cached_dev_sectors);
->+
->     uint64_t cache_dirty_target =
->         div_u64(cache_sectors * dc->writeback_percent, 100);
->-    int64_t target = div64_u64(cache_dirty_target * bdev_sectors(dc->bdev),
->-                   c->cached_dev_sectors);
->+
->+    int64_t target = (cache_dirty_target * bdev_share_per16k) >> 14;
-> 
->     /*
->      * PI controller:
->-- 
->2.14.1
->
+>    If it is faster than that we have a very serious
+> bug somewhere.
 
-Thanks,
-Tang Junhui
+As a quick test I opened the backing file O_DIRECT in dm-loop on XFS 
+backed by
+NVMe and it's 10-20% slower than loop because it's bio based and thus 
+lags mq.
+
+So, no worries, loop looks ok in regards to direct I/O mode.
+>> For measures see test results below.
+>>
+>>
+>> The "loop" target maps segments to backing files.
+>> Mapping table example:
+>> 0 4192256 loop /tmp/mapper_loop1
+>> 4192256 2097152 loop /dev/nvm/mapper_loop0
+>>
+>>
+>> The "ram" target accesses RAM directly rather than through
+>> tmpfs additionally enhancing performance compared to "loop"
+>> thus avoding filesystem overhead.
+>> Mapping table example:
+>> 0 8388608 ram
+>>
+>> "ram" is a singleton target.
+>>
+>>
+>> Performance test results for 4K and 32K IOPS comparing the loop driver
+>> with dm-loop backed by tmpfs and dm-ram (all 2GiB backing size):
+>>
+>> <TESTSCRIPT>
+>> #!/bin/sh
+>> for f in /tmp/loop0 /tmp/mapper_loop0
+>> do
+>> 	dd if=/dev/zero of=$f bs=256M count=8 iflag=fullblock
+>> done
+>>
+>> losetup /dev/loop0 /tmp/loop0
+>> sectors=`du -s /tmp/mapper_loop0|cut -f1`
+>> dmsetup create loop0 --table "0 $sectors loop /tmp/mapper_loop0"
+>> dmsetup create ram --table "0 $sectors ram"
+>>
+>> for bs in 4K 32K
+>> do
+>> 	for d in /dev/loop0 /dev/mapper/loop0 /dev/mapper/ram
+>> 	do
+>> 		echo 3 > /proc/sys/vm/drop_caches
+>> 		fio --bs=$bs --rw=randrw --numjobs=99 --group_reporting --iodepth=12 --runtime=3 --ioengine=libaio \
+>> 		    --loops=1 --direct=1 --exitall --name dc --filename=$d | egrep "read|write"
+>> 	done
+>> done
+>> </TESTSCRIPT>
+>>
+>> <4K_RESULTS>
+>> loop driver:
+>>     read: IOPS=226k, BW=881MiB/s (924MB/s)(2645MiB/3003msec)
+>>    write: IOPS=225k, BW=880MiB/s (923MB/s)(2643MiB/3003msec)
+>> dm-loop target:
+>>     read: IOPS=425k, BW=1661MiB/s (1742MB/s)(4990MiB/3004msec)
+>>    write: IOPS=425k, BW=1662MiB/s (1743MB/s)(4992MiB/3004msec)
+>> dm-ram target:
+>>     read: IOPS=636k, BW=2484MiB/s (2605MB/s)(7464MiB/3005msec)
+>>    write: IOPS=636k, BW=2484MiB/s (2605MB/s)(7464MiB/3005msec)
+>> </4K_RESULTS>
+>>
+>> <32K_RESULTS>
+>> loop driver:
+>>    read: IOPS=55.5k, BW=1733MiB/s (1817MB/s)(5215MiB/3009msec)
+>>    write: IOPS=55.2k, BW=1726MiB/s (1810MB/s)(5195MiB/3009msec)
+>> dm-loop target:
+>>     read: IOPS=110k, BW=3452MiB/s (3620MB/s)(10.1GiB/3006msec)
+>>    write: IOPS=110k, BW=3448MiB/s (3615MB/s)(10.1GiB/3006msec)
+>> dm-ram target:
+>>     read: IOPS=355k, BW=10.8GiB/s (11.6GB/s)(32.6GiB/3008msec)
+>>    write: IOPS=355k, BW=10.8GiB/s (11.6GB/s)(32.6GiB/3008msec)
+>> </32K_RESULTS>
+>>
+>>
+>> Signed-off-by: Heinz Mauelshagen <heinzm@redhat.com>
+>>
+>> Heinz Mauelshagen (2):
+>>    dm loop: new target redirecting io to backing file(s)
+>>    dm ram: new target redirecting io to RAM
+>>
+>>   Documentation/device-mapper/loop.txt |  20 ++
+>>   Documentation/device-mapper/ram.txt  |  15 ++
+>>   drivers/md/Kconfig                   |  14 ++
+>>   drivers/md/Makefile                  |   2 +
+>>   drivers/md/dm-loop.c                 | 352 +++++++++++++++++++++++++++++++++++
+>>   drivers/md/dm-ram.c                  | 101 ++++++++++
+>>   6 files changed, 504 insertions(+)
+>>   create mode 100644 Documentation/device-mapper/loop.txt
+>>   create mode 100644 Documentation/device-mapper/ram.txt
+>>   create mode 100644 drivers/md/dm-loop.c
+>>   create mode 100644 drivers/md/dm-ram.c
+>>
+>> -- 
+>> 2.14.3
+>>
+>> --
+>> dm-devel mailing list
+>> dm-devel@redhat.com
+>> https://www.redhat.com/mailman/listinfo/dm-devel
+> ---end quoted text---
+>
+> --
+> dm-devel mailing list
+> dm-devel@redhat.com
+> https://www.redhat.com/mailman/listinfo/dm-devel
