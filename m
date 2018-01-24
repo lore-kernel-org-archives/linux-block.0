@@ -1,76 +1,70 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:54418 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751256AbeA2PqX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Jan 2018 10:46:23 -0500
-Date: Mon, 29 Jan 2018 23:46:09 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: lsf-pc@lists.linux-foundation.org, Linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [LSF/MM TOPIC] Two blk-mq related topics
-Message-ID: <20180129154455.GB17176@ming.t460p>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:50548 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S933099AbeAXXXp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Jan 2018 18:23:45 -0500
+From: Howard McLauchlan <hmclauchlan@fb.com>
+To: <linux-block@vger.kernel.org>
+CC: Jens Axboe <axboe@fb.com>, Josef Bacik <jbacik@fb.com>,
+        Omar Sandoval <osandov@osandov.com>,
+        Howard McLauchlan <hmclauchlan@fb.com>
+Subject: [PATCH] block: Add should_fail_bio() for bpf error injection
+Date: Wed, 24 Jan 2018 15:22:58 -0800
+Message-ID: <20180124232258.17164-1-hmclauchlan@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi guys,
+The classic error injection mechanism, should_fail_request() does not
+support use cases where more information is required (from the entire
+struct bio, for example).
 
-Two blk-mq related topics
+To that end, this patch introduces should_fail_bio(), which calls
+should_fail_request() under the hood but provides a convenient
+place for kprobes to hook into if they require the entire struct bio.
+This patch also replaces some existing calls to should_fail_request()
+with should_fail_bio() with no degradation in performance.
 
-1. blk-mq vs. CPU hotplug & IRQ vectors spread on CPUs
+Signed-off-by: Howard McLauchlan <hmclauchlan@fb.com>
+---
+ block/blk-core.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-We have done three big changes in this field before, each time some issues
-are fixed, meantime new ones are introduced
-
-1) freeze all queues during CPU hotplug handler
-- issues: queue dependency such as loop-mq/dm vs underlying queues, NVMe admin
-queue vs. namespace queues, and IO hang may be caused during freezing all
-these queues in CPU hotplug handler.
-
-2) IRQ vectors spread on all present CPUs
-- fix issue on 1)
-- new issues introduced: don't support CPU hotplug physically, and cause blk-mq
-warning during dispatch
-
-3) IRQ vectors spread on all possible CPUs
-- can support CPU hotplug physically
-- warning in __blk_mq_run_hw_queue() still may be triggered if CPU
-  offline/online happens between blk_mq_hctx_next_cpu() and running
-   __blk_mq_run_hw_queue()
-- new issues introduced: queue mapping may be distorted completely,
-patch sent out(https://marc.info/?t=151603230900002&r=1&w=2), but may
-need further discussion about this approach; drivers(such as NVMe) may
-need to pass 'num_possible_cpus()' as the max vectors for allocating
-irq vectors; some drivers(NVMe) uses hard-code hw queue index directly,
-then this way becomes very fragile, since the hw queue may be inactive
-from the beginning.
-
-Also starting from 2), another issue is that IO completion may not be
-delivered to CPUs, for example, IO may be dispatched to hw queue just
-before(or after) all CPUs mapped to the hctx become offline, then IRQ
-vector of the hw queue can be shutdown. Now seems we depend on timeout
-handler to deal with the situation, and is there better way to solve this
-issue?
-
-2. When to enable SCSI_MQ at default again?
-
-SCSI_MQ is enabled on V3.17 firstly, but disabled at default. In V4.13-rc1,
-it is enabled at default, but later the patch is reverted in V4.13-rc7, and
-becomes disabled at default too.
-
-Now both the original reported PM issue(actually SCSI quiesce) and the
-sequential IO performance issue have been addressed. And MQ IO schedulers
-are ready too for traditional disks. Are there other issues to be addressed
-for enabling SCSI_MQ at default? When can we do that again?
-
-Last time, the two issues were reported during V4.13 dev cycle just when it is
-enabled at default, that seems if SCSI_MQ isn't enabled at default, it wouldn't
-be exposed to run/tested completely & fully.  
-
-So if we continue to disable it at default, maybe it can never be exposed to
-full test/production environment.
-
-
-Thanks,
-Ming
+diff --git a/block/blk-core.c b/block/blk-core.c
+index b8881750a3ac..5e73c996d338 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -34,6 +34,7 @@
+ #include <linux/pm_runtime.h>
+ #include <linux/blk-cgroup.h>
+ #include <linux/debugfs.h>
++#include <linux/bpf.h>
+ 
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/block.h>
+@@ -2050,6 +2051,12 @@ static inline bool should_fail_request(struct hd_struct *part,
+ 
+ #endif /* CONFIG_FAIL_MAKE_REQUEST */
+ 
++static noinline bool should_fail_bio(struct bio *bio)
++{
++	return should_fail_request(&bio->bi_disk->part0, bio->bi_iter.bi_size);
++}
++BPF_ALLOW_ERROR_INJECTION(should_fail_bio);
++
+ /*
+  * Remap block n of partition p to block n+start(p) of the disk.
+  */
+@@ -2141,7 +2148,7 @@ generic_make_request_checks(struct bio *bio)
+ 	if ((bio->bi_opf & REQ_NOWAIT) && !queue_is_rq_based(q))
+ 		goto not_supported;
+ 
+-	if (should_fail_request(&bio->bi_disk->part0, bio->bi_iter.bi_size))
++	if (should_fail_bio(bio))
+ 		goto end_io;
+ 
+ 	if (blk_partition_remap(bio))
+-- 
+2.14.1
