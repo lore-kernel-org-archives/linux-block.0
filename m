@@ -1,50 +1,52 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:59317 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750817AbeAPOwl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Jan 2018 09:52:41 -0500
-Date: Tue, 16 Jan 2018 06:52:40 -0800
-From: Matthew Wilcox <willy@infradead.org>
-To: lsf-pc@lists.linux-foundation.org
-Cc: linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [LSF/MM TOPIC] A high-performance userspace block driver
-Message-ID: <20180116145240.GD30073@bombadil.infradead.org>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] blk-mq-debugfs: don't allow write on attributes with
+ seq_operations set
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Eryu Guan <eguan@redhat.com>, linux-block@vger.kernel.org,
+ Omar Sandoval <osandov@osandov.com>
+References: <20180123172000.20919-1-eguan@redhat.com>
+ <9b37df1b-6a3e-2d24-f1f3-de34d8c690d9@kernel.dk>
+ <20180124034925.GA16074@ming.t460p>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <a15d3c9c-36e1-9e41-f584-09bdb90631fb@kernel.dk>
+Date: Wed, 24 Jan 2018 09:45:52 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180124034925.GA16074@ming.t460p>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
+On 1/23/18 8:49 PM, Ming Lei wrote:
+> On Tue, Jan 23, 2018 at 02:32:06PM -0700, Jens Axboe wrote:
+>> On 1/23/18 10:20 AM, Eryu Guan wrote:
+>>> Attributes that only implement .seq_ops are read-only, any write to
+>>> them should be rejected. But currently kernel would crash when
+>>> writing to such debugfs entries, e.g.
+>>>
+>>> chmod +w /sys/kernel/debug/block/<dev>/requeue_list
+>>> echo 0 > /sys/kernel/debug/block/<dev>/requeue_list
+>>> chmod -w /sys/kernel/debug/block/<dev>/requeue_list
+>>>
+>>> Fix it by returning -EPERM in blk_mq_debugfs_write() when writing to
+>>> such attributes.
+>>
+>> I don't particularly like the fix, since it's not really clear why
+>> that comparison makes sense. Can't we just prevent anyone from
+> 
+> It might be the simplest way to check if the attribute defines .seq_ops
+> or not. If it is .seq_ops, it is wrong to interpret m->private as
+> 'struct blk_mq_debugfs_attr *' because it actually points to 'struct
+> request_queue *' or others, which depends on the specific attribute.
+> 
+> So it works for avoiding the oops.
+> 
+>> making the debugfs entries writable? Seems like a much more sane
+>> approach.
+> 
+> I guess fs should allow root user to do 'chmod +w' on files in proc,
+> debugfs or sysfs. I just tried, it works on proc, debugfs and sysfs.
 
-I see the improvements that Facebook have been making to the nbd driver,
-and I think that's a wonderful thing.  Maybe the outcome of this topic
-is simply: "Shut up, Matthew, this is good enough".
+Yeah good point, I guess the proposed fix is the simplest version
+we can do. At least it has a comment. I'll apply it, thanks.
 
-It's clear that there's an appetite for userspace block devices; not for
-swap devices or the root device, but for accessing data that's stored
-in that silo over there, and I really don't want to bring that entire
-mess of CORBA / Go / Rust / whatever into the kernel to get to it,
-but it would be really handy to present it as a block device.
-
-I've looked at a few block-driver-in-userspace projects that exist, and
-they all seem pretty bad.  For example, one API maps a few gigabytes of
-address space and plays games with vm_insert_page() to put page cache
-pages into the address space of the client process.  Of course, the TLB
-flush overhead of that solution is criminal.
-
-I've looked at pipes, and they're not an awful solution.  We've almost
-got enough syscalls to treat other objects as pipes.  The problem is
-that they're not seekable.  So essentially you're looking at having one
-pipe per outstanding command.  If yu want to make good use of a modern
-NAND device, you want a few hundred outstanding commands, and that's a
-bit of a shoddy interface.
-
-Right now, I'm leaning towards combining these two approaches; adding
-a VM_NOTLB flag so the mmaped bits of the page cache never make it into
-the process's address space, so the TLB shootdown can be safely skipped.
-Then check it in follow_page_mask() and return the appropriate struct
-page.  As long as the userspace process does everything using O_DIRECT,
-I think this will work.
-
-It's either that or make pipes seekable ...
+-- 
+Jens Axboe
