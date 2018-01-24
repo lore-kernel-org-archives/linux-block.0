@@ -1,58 +1,55 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:51653 "EHLO
-        out2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1750793AbeAUQTx (ORCPT
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:53273 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934207AbeAXQW3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 21 Jan 2018 11:19:53 -0500
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailout.nyi.internal (Postfix) with ESMTP id 8386F209AE
-        for <linux-block@vger.kernel.org>; Sun, 21 Jan 2018 11:19:52 -0500 (EST)
-Received: from [10.0.0.24] (unknown [68.175.132.145])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 3975D2463E
-        for <linux-block@vger.kernel.org>; Sun, 21 Jan 2018 11:19:52 -0500 (EST)
-From: David Zarzycki <dave@znu.io>
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: blk-mq hangs easily with LLVM+clang test suite
-Message-Id: <83F7B94F-562A-44A5-92F9-939FE4FD5A99@znu.io>
-Date: Sun, 21 Jan 2018 11:19:51 -0500
-To: linux-block@vger.kernel.org
+        Wed, 24 Jan 2018 11:22:29 -0500
+From: Adam Manzanares <Adam.Manzanares@wdc.com>
+To: "lsf-pc@lists.linux-foundation.org"
+        <lsf-pc@lists.linux-foundation.org>
+CC: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: [LSF/MM TOPIC] User Directed Tiered Memory Management
+Date: Wed, 24 Jan 2018 16:22:26 +0000
+Message-ID: <cae10844-35cd-991c-c69d-545e774d5a50@wdc.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hello,
-
-I think I=E2=80=99ve narrowed down a kernel hang to the multi-queue =
-block layer when running the LLVM+clang test suite. Here is what I=E2=80=99=
-ve gathered:
-
-1) The hang does *not* reproduce on tmpfs or a SATA SSD drive.
-2) The hang does reproduce on blk-mq devices (NVMe or loopback to a file =
-in tmpfs).
-3) The hang does reproduce with ext4 or xfs, so the filesystem doesn=E2=80=
-=99t seem to matter.
-
-How can I help debug this further?
-
-Thanks,
-Dave
-
-For reference, reproduction steps:
-
-cd /to/a/blk-mq/partition
-git clone https://git.llvm.org/git/llvm.git
-cd llvm/tools
-git clone https://git.llvm.org/git/clang.git
-cd ..
-mkdir t
-cd t
-cmake -G Ninja \
-	-DCMAKE_BUILD_TYPE=3DRelease \
-	-DLLVM_ENABLE_ASSERTIONS=3DTRUE \
-	-DLLVM_TARGETS_TO_BUILD=3DX86 ..
-# It only takes a few runs of the test suite on a 48-core system
-while true
-do
-	ninja check-all
-done=
+V2l0aCB0aGUgaW50cm9kdWN0aW9uIG9mIGJ5dGUgYWRkcmVzc2FibGUgc3RvcmFnZSBkZXZpY2Vz
+IHRoYXQgaGF2ZSBsb3cgDQpsYXRlbmNpZXMsIGl0IGJlY29tZXMgZGlmZmljdWx0IHRvIGRlY2lk
+ZSBob3cgdG8gZXhwb3NlIHRoZXNlIGRldmljZXMgdG8gDQp1c2VyIHNwYWNlIGFwcGxpY2F0aW9u
+cy4gRG8gd2UgdHJlYXQgdGhlbSBhcyB0cmFkaXRpb25hbCBibG9jayBkZXZpY2VzIA0Kb3IgZXhw
+b3NlIHRoZW0gYXMgYSBEQVggY2FwYWJsZSBkZXZpY2U/IEEgdHJhZGl0aW9uYWwgYmxvY2sgZGV2
+aWNlIA0KYWxsb3dzIHVzIHRvIHVzZSB0aGUgcGFnZSBjYWNoZSB0byB0YWtlIGFkdmFudGFnZSBv
+ZiBsb2NhbGl0eSBpbiBhY2Nlc3MgDQpwYXR0ZXJucywgYnV0IGNvbWVzIGF0IHRoZSBleHBlbnNl
+IG9mIGV4dHJhIG1lbW9yeSBjb3BpZXMgdGhhdCBhcmUgDQpleHRyZW1lbHkgY29zdGx5IGZvciBy
+YW5kb20gd29ya2xvYWRzLiBBIERBWCBjYXBhYmxlIGRldmljZSBzZWVtcyBncmVhdCANCmZvciB0
+aGUgYWZvcmVtZW50aW9uZWQgcmFuZG9tIGFjY2VzcyB3b3JrbG9hZCwgYnV0IHN1ZmZlcnMgb25j
+ZSB0aGVyZSBpcyANCnNvbWUgbG9jYWxpdHkgaW4gdGhlIGFjY2VzcyBwYXR0ZXJuLg0KDQpXaGVu
+IERBWC1jYXBhYmxlIGRldmljZXMgYXJlIHVzZWQgYXMgc2xvd2VyL2NoZWFwZXIgdm9sYXRpbGUg
+bWVtb3J5LCANCnRyZWF0aW5nIHRoZW0gYXMgYSBzbG93ZXIgTlVNQSBub2RlIHdpdGggYW4gYXNz
+b2NpYXRlZCBOVU1BIG1pZ3JhdGlvbiANCnBvbGljeSB3b3VsZCBhbGxvdyBmb3IgdGFraW5nIGFk
+dmFudGFnZSBvZiBhY2Nlc3MgcGF0dGVybiBsb2NhbGl0eS4gDQpIb3dldmVyIHRoaXMgYXBwcm9h
+Y2ggc3VmZmVycyBmcm9tIGEgZmV3IGRyYXdiYWNrcy4gRmlyc3QsIHdoZW4gdGhvc2UgDQpkZXZp
+Y2VzIGFyZSBhbHNvIHBlcnNpc3RlbnQsIHRoZSB0aWVyaW5nIGFwcHJvYWNoIHVzZWQgaW4gTlVN
+QSBtaWdyYXRpb24gDQptYXkgbm90IGd1YXJhbnRlZSBwZXJzaXN0ZW5jZS4gU2Vjb25kbHksIGZv
+ciBkZXZpY2VzIHdpdGggc2lnbmlmaWNhbnRseSANCmhpZ2hlciBsYXRlbmNpZXMgdGhhbiBEUkFN
+LCB0aGUgY29zdCBvZiBtb3ZpbmcgY2xlYW4gcGFnZXMgbWF5IGJlIA0Kc2lnbmlmaWNhbnQuIEZp
+bmFsbHksIHBhZ2VzIGhhbmRsZWQgdmlhIE5VTUEgbWlncmF0aW9uIGFyZSBhIGNvbW1vbiANCnJl
+c291cmNlIHN1YmplY3QgdG8gdGhyYXNoaW5nIGluIGNhc2Ugb2YgbWVtb3J5IHByZXNzdXJlLg0K
+DQpJIHdvdWxkIGxpa2UgdG8gZGlzY3VzcyBhbiBhbHRlcm5hdGl2ZSBhcHByb2FjaCB3aGVyZSBt
+ZW1vcnkgaW50ZW5zaXZlIA0KYXBwbGljYXRpb25zIG1tYXAgdGhlc2Ugc3RvcmFnZSBkZXZpY2Vz
+IGludG8gdGhlaXIgYWRkcmVzcyBzcGFjZS4gVGhlIA0KYXBwbGljYXRpb24gY2FuIHNwZWNpZnkg
+aG93IG11Y2ggRFJBTSBjb3VsZCBiZSB1c2VkIGFzIGEgY2FjaGUgYW5kIGhhdmUgDQpzb21lIGlu
+Zmx1ZW5jZSBvbiBwcmVmZXRjaGluZyBhbmQgZXZpY3Rpb24gcG9saWNpZXMuIFRoZSBnb2FsIG9m
+IHN1Y2ggYW4gDQphcHByb2FjaCB3b3VsZCBiZSB0byBtaW5pbWl6ZSB0aGUgaW1wYWN0IG9mIHRo
+ZSBzbGlnaHRseSBzbG93ZXIgbWVtb3J5IA0KY291bGQgcG90ZW50aWFsbHkgaGF2ZSBvbiBhIHN5
+c3RlbSB3aGVuIGl0IGlzIHRyZWF0ZWQgYXMga2VybmVsIG1hbmFnZWQgDQpnbG9iYWwgcmVzb3Vy
+Y2UsIGFzIHdlbGwgYXMgZW5hYmxlIHVzZSBvZiB0aG9zZSBkZXZpY2VzIGFzIHBlcnNpc3RlbnQg
+DQptZW1vcnkuIEJUVyB3ZSBjcmltaW5hbGx5IDspIHVzZWQgdGhlIHZtX2luc2VydF9wYWdlIGZ1
+bmN0aW9uIGluIGEgDQpwcm90b3R5cGUgYW5kIGhhdmUgZm91bmQgdGhhdCBpdCBpcyBmYXN0ZXIg
+dG8gdXNlIHZzIHBhZ2UgY2FjaGUgYW5kIA0Kc3dhcHBpbmcgbWVjaGFuaXNtcyBsaW1pdGVkIHRv
+IHVzZSBhIHNtYWxsIGFtb3VudCBvZiBEUkFNLg==
