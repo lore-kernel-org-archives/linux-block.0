@@ -1,51 +1,174 @@
-Return-Path: <prvs=5540a0381=luisbg@amazon.com>
-From: Luis de Bethencourt <luisbg@kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Joe Perches <joe@perches.com>, Scott Bauer <scott.bauer@intel.com>,
-        Jonathan Derrick <jonathan.derrick@intel.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Luis de Bethencourt <luisbg@kernel.org>
-Subject: [PATCH] block/sed-opal: Fix trailing semicolon
-Date: Tue, 23 Jan 2018 13:16:03 +0000
-Message-Id: <20180123131603.19919-1-luisbg@kernel.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-io0-f195.google.com ([209.85.223.195]:34879 "EHLO
+        mail-io0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751138AbeAXFzs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Jan 2018 00:55:48 -0500
+Date: Wed, 24 Jan 2018 11:25:40 +0530
+From: Aishwarya Pant <aishpant@gmail.com>
+To: Thomas Maier <balagi@justmail.de>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Greg KH <gregkh@linuxfoundation.org>
+Cc: Julia Lawall <julia.lawall@lip6.fr>
+Subject: [PATCH v2] Documentation/ABI: clean up sysfs-class-pktcdvd
+Message-ID: <20180124055540.GA6759@mordor.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The trailing semicolon is an empty statement that does no operation.
-Removing it since it doesn't do anything.
+Clean up the sysfs documentation such that it is in the same format as
+described in Documentation/ABI/README. Mainly, the patch moves the
+attribute names to the 'What:' field. This might be useful for scripting
+and tracking changes in the ABI.
 
-Signed-off-by: Luis de Bethencourt <luisbg@kernel.org>
+Signed-off-by: Aishwarya Pant <aishpant@gmail.com>
 ---
+Changes in v2:
+- Convert spaces to tabs
 
-Hi,
+ Documentation/ABI/testing/sysfs-class-pktcdvd | 129 +++++++++++++++-----------
+ 1 file changed, 75 insertions(+), 54 deletions(-)
 
-Similar to the other drivers/clocksource/ patch [0].
-
-After fixing the same thing in drivers/staging/rtl8723bs/, Joe Perches
-suggested I fix it treewide [1].
-
-Best regards 
-Luis
-
-
-[0] https://lkml.org/lkml/2018/1/23/213
-[1] http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/2018-January/115410.html
-[2] http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/2018-January/115390.html
-
- block/sed-opal.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 9ed51d0c6b1d..e4929eec547f 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -490,7 +490,7 @@ static int opal_discovery0_end(struct opal_dev *dev)
+diff --git a/Documentation/ABI/testing/sysfs-class-pktcdvd b/Documentation/ABI/testing/sysfs-class-pktcdvd
+index b1c3f0263359..dde4f26d0780 100644
+--- a/Documentation/ABI/testing/sysfs-class-pktcdvd
++++ b/Documentation/ABI/testing/sysfs-class-pktcdvd
+@@ -1,60 +1,81 @@
+-What:           /sys/class/pktcdvd/
+-Date:           Oct. 2006
+-KernelVersion:  2.6.20
+-Contact:        Thomas Maier <balagi@justmail.de>
+-Description:
+-
+ sysfs interface
+ ---------------
++The pktcdvd module (packet writing driver) creates the following files in the
++sysfs: (<devid> is in the format major:minor)
++
++What:		/sys/class/pktcdvd/add
++What:		/sys/class/pktcdvd/remove
++What:		/sys/class/pktcdvd/device_map
++Date:		Oct. 2006
++KernelVersion:	2.6.20
++Contact:	Thomas Maier <balagi@justmail.de>
++Description:
++
++		add:		(WO) Write a block device id (major:minor) to
++				create a new pktcdvd device and map it to the
++				block device.
++
++		remove:		(WO) Write the pktcdvd device id (major:minor)
++				to remove the pktcdvd device.
++
++		device_map:	(RO) Shows the device mapping in format:
++				pktcdvd[0-7] <pktdevid> <blkdevid>
++
++
++What:		/sys/class/pktcdvd/pktcdvd[0-7]/dev
++What:		/sys/class/pktcdvd/pktcdvd[0-7]/uevent
++Date:		Oct. 2006
++KernelVersion:	2.6.20
++Contact:	Thomas Maier <balagi@justmail.de>
++Description:
++		dev:	(RO) Device id
++
++		uevent:	(WO) To send a uevent
++
++
++What:		/sys/class/pktcdvd/pktcdvd[0-7]/stat/packets_started
++What:		/sys/class/pktcdvd/pktcdvd[0-7]/stat/packets_finished
++What:		/sys/class/pktcdvd/pktcdvd[0-7]/stat/kb_written
++What:		/sys/class/pktcdvd/pktcdvd[0-7]/stat/kb_read
++What:		/sys/class/pktcdvd/pktcdvd[0-7]/stat/kb_read_gather
++What:		/sys/class/pktcdvd/pktcdvd[0-7]/stat/reset
++Date:		Oct. 2006
++KernelVersion:	2.6.20
++Contact:	Thomas Maier <balagi@justmail.de>
++Description:
++		packets_started:	(RO) Number of started packets.
++
++		packets_finished:	(RO) Number of finished packets.
++
++		kb_written:		(RO) kBytes written.
++
++		kb_read:		(RO) kBytes read.
++
++		kb_read_gather:		(RO) kBytes read to fill write packets.
++
++		reset:			(WO) Write any value to it to reset
++					pktcdvd device statistic values, like
++					bytes read/written.
++
++
++What:		/sys/class/pktcdvd/pktcdvd[0-7]/write_queue/size
++What:		/sys/class/pktcdvd/pktcdvd[0-7]/write_queue/congestion_off
++What:		/sys/class/pktcdvd/pktcdvd[0-7]/write_queue/congestion_on
++Date:		Oct. 2006
++KernelVersion:	2.6.20
++Contact:	Thomas Maier <balagi@justmail.de>
++Description:
++		size:		(RO) Contains the size of the bio write queue.
++
++		congestion_off:	(RW) If bio write queue size is below this mark,
++				accept new bio requests from the block layer.
  
- 	if (!found_com_id) {
- 		pr_debug("Could not find OPAL comid for device. Returning early\n");
--		return -EOPNOTSUPP;;
-+		return -EOPNOTSUPP;
- 	}
+-The pktcdvd module (packet writing driver) creates
+-these files in the sysfs:
+-(<devid> is in format  major:minor )
+-
+-/sys/class/pktcdvd/
+-    add            (0200)  Write a block device id (major:minor)
+-                           to create a new pktcdvd device and map
+-                           it to the block device.
+-
+-    remove         (0200)  Write the pktcdvd device id (major:minor)
+-                           to it to remove the pktcdvd device.
+-
+-    device_map     (0444)  Shows the device mapping in format:
+-                             pktcdvd[0-7] <pktdevid> <blkdevid>
+-
+-/sys/class/pktcdvd/pktcdvd[0-7]/
+-    dev                   (0444) Device id
+-    uevent                (0200) To send an uevent.
+-
+-/sys/class/pktcdvd/pktcdvd[0-7]/stat/
+-    packets_started       (0444) Number of started packets.
+-    packets_finished      (0444) Number of finished packets.
+-
+-    kb_written            (0444) kBytes written.
+-    kb_read               (0444) kBytes read.
+-    kb_read_gather        (0444) kBytes read to fill write packets.
+-
+-    reset                 (0200) Write any value to it to reset
+-                                 pktcdvd device statistic values, like
+-                                 bytes read/written.
+-
+-/sys/class/pktcdvd/pktcdvd[0-7]/write_queue/
+-    size                  (0444) Contains the size of the bio write
+-                                 queue.
+-
+-    congestion_off        (0644) If bio write queue size is below
+-                                 this mark, accept new bio requests
+-                                 from the block layer.
+-
+-    congestion_on         (0644) If bio write queue size is higher
+-                                 as this mark, do no longer accept
+-                                 bio write requests from the block
+-                                 layer and wait till the pktcdvd
+-                                 device has processed enough bio's
+-                                 so that bio write queue size is
+-                                 below congestion off mark.
+-                                 A value of <= 0 disables congestion
+-                                 control.
++		congestion_on:	(RW) If bio write queue size is higher as this
++				mark, do no longer accept bio write requests
++				from the block layer and wait till the pktcdvd
++				device has processed enough bio's so that bio
++				write queue size is below congestion off mark.
++				A value of <= 0 disables congestion control.
  
- 	dev->comid = comid;
+ 
+ Example:
 -- 
-2.15.1
+2.16.1
