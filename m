@@ -1,58 +1,56 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-by2nam03on0076.outbound.protection.outlook.com ([104.47.42.76]:18400
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750980AbeAYP1B (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Jan 2018 10:27:01 -0500
-From: Javier Gonzalez <javier@cnexlabs.com>
-To: "lsf-pc@lists.linux-foundation.org"
-        <lsf-pc@lists.linux-foundation.org>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "jaegeuk@kernel.org" <jaegeuk@kernel.org>
-Subject: [LSF/MM ATTEND] OCSSD topics
-Date: Thu, 25 Jan 2018 15:26:56 +0000
-Message-ID: <986429B2-A254-4247-AA4F-F631A565DA8B@cnexlabs.com>
-Content-Type: text/plain; charset="us-ascii"
+Return-Path: <rgoldwyn@suse.de>
+Subject: Re: [PATCH v5 1/2] Return bytes transferred for partial direct I/O
+To: Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>
+Cc: Andreas Dilger <adilger@dilger.ca>, Goldwyn Rodrigues
+ <rgoldwyn@suse.com>, Andi Kleen <ak@linux.intel.com>,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ darrick.wong@oracle.com
+References: <20180119005741.32058-1-rgoldwyn@suse.de>
+ <87zi58rmf7.fsf@linux.intel.com>
+ <c7661c89-1deb-c967-4b19-c1897937f4a3@suse.de>
+ <b6847555-6295-0f28-08f2-ad871bf91332@kernel.dk>
+ <C6C37388-622C-451D-B14D-953EBE580995@dilger.ca>
+ <175784d7-70e7-3be1-47f0-ae67ab37e921@kernel.dk>
+ <2b11e24d-d09c-f7c4-db6d-6ecc1ce40719@suse.de>
+ <38e72c8a-c178-7930-3858-83d860e568a2@kernel.dk>
+ <20180123063549.GA1583@bombadil.infradead.org>
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Message-ID: <44793882-fd2b-190e-eda6-22d7054c4677@suse.de>
+Date: Thu, 25 Jan 2018 12:01:28 -0600
 MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180123063549.GA1583@bombadil.infradead.org>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Hi,
 
-There are some topics that I would like to discuss at LSF/MM:
-  - In the past year we have discussed a lot how we can integrate the
-    Open-Channel SSD (OCSSD) spec with zone devices (SMR). This
-    discussion is both at the interface level and at an in-kernel level.
-    Now that Damien's and Hannes' patches are upstreamed in good shape,
-    it would be a good moment to discuss how we can integrate the
-    LightNVM subsystem with the existing code. Specifically, in ALPSS'17
-    we had discussions on how we can extend the kernel zoned device
-    interface with the notion of parallel units that the OCSSD geometry
-    builds upon. We are now bringing the OCSSD spec. to standarization,
-    but we have time to incorporate feedback and changes into the spec.
-   =20
-    Some of the challenges are (i) adding vector I/O interface to the
-    bio structure and (ii) extending the report zone to have the notion
-    of parallelism. I have patches implementing the OCSSD 2.0 spec that
-    abstract the geometry and allow upper layers to deal with write
-    restrictions and the parallelism of the device, but this is still
-    very much OCSSD-specific.
 
-  - I have started to use the above to do a f2fs implementation, where
-    we would implement the data placement and I/O scheduling directly in
-    the FS, as opposed to using pblk - at least for the journaled part.
-    The random I/O partition necessary for metadata can either reside in
-    a different drive or use a pblk instance for it. This is very much
-    work in progress, so having feedback form the f2fs guys (or other
-    journaled file systems) would help to start the work in the right
-    direction. Maybe this is interesting for other file systems too...
+On 01/23/2018 12:35 AM, Matthew Wilcox wrote:
+> On Mon, Jan 22, 2018 at 08:28:54PM -0700, Jens Axboe wrote:
+>> On 1/22/18 8:18 PM, Goldwyn Rodrigues wrote:
+>>>> that their application was "already broken". I'd hate for a kernel
+>>>> upgrade to break them.
+>>>>
+>>>> I do wish we could make the change, and maybe we can. But it probably
+>>>> needs some safe guard proc entry to toggle the behavior, something we
+>>>> can drop in a few years when we're confident it won't break real
+>>>> applications.
+>>>
+>>> Assuming we call it /proc/sys/fs/dio_short_writes(better names/paths?),
+>>> should it be enabled or disabled by default?
+>>
+>> I'd enable it by default, if not, you are never going to be able to
+>> remove it because you'll have no confidence that anyone actually flipped
+>> the switch and ran with it enabled. The point of having it there and on
+>> by default would be that if something does break, people have the option
+>> of turning it off and restoring the previous behavior, without having to
+>> change the kernel.
+> 
+> I think it's an opt-in prctl that's something like PRCTL_SHORT_WRITES_ALLOWED.
+> 
 
-  - Finally, now that pblk is becoming stable, and given the advent of
-    devices imposing sequential-only I/O, would it make sense to
-    generalize pblk as a device mapper translation layer that can be
-    used for random I/O partitions? We have ad internal use cases for
-    using such translation layer for frontswap devices. Maybe others are
-    looking at this too...
+I cannot decide where to stick this bit in the task_struct.
+current->flags/PF_* does not seem right. Don't want to start a new
+fs_flags field. Suggestions?
 
-Javier
+-- 
+Goldwyn
