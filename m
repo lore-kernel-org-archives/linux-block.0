@@ -1,36 +1,37 @@
-Return-Path: <viro@ftp.linux.org.uk>
-Date: Thu, 25 Jan 2018 02:58:11 +0000
-From: Al Viro <viro@ZenIV.linux.org.uk>
-To: Jia-Ju Bai <baijiaju1990@gmail.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block: blk-mq-sched: Replace GFP_ATOMIC with GFP_KERNEL
- in blk_mq_sched_assign_ioc
-Message-ID: <20180125025811.GT13338@ZenIV.linux.org.uk>
-References: <1516848386-5720-1-git-send-email-baijiaju1990@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1516848386-5720-1-git-send-email-baijiaju1990@gmail.com>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+Return-Path: <baijiaju1990@gmail.com>
+Return-Path: <baijiaju1990@gmail.com>
+From: Jia-Ju Bai <baijiaju1990@gmail.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jia-Ju Bai <baijiaju1990@gmail.com>
+Subject: [PATCH] block: blk-mq-sched: Replace GFP_ATOMIC with GFP_KERNEL in blk_mq_sched_assign_ioc
+Date: Thu, 25 Jan 2018 10:46:26 +0800
+Message-Id: <1516848386-5720-1-git-send-email-baijiaju1990@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Jan 25, 2018 at 10:46:26AM +0800, Jia-Ju Bai wrote:
-> The function ioc_create_icq here is not called in atomic context.
-> Thus GFP_ATOMIC is not necessary, and it can be replaced with GFP_KERNEL.
-> 
-> This is found by a static analysis tool named DCNS written by myself.
+The function ioc_create_icq here is not called in atomic context.
+Thus GFP_ATOMIC is not necessary, and it can be replaced with GFP_KERNEL.
 
-Umm...  Some human-readable analysis would be welcome.  FWIW, I've tried to
-put a proof together, but...
-	struct blk_mq_ops->timeout = nvme_timeout
-	nvme_timeout()
-		nvme_alloc_request()
-			blk_mq_alloc_request_hctx()
-				blk_mq_get_request()
-					blk_mq_sched_assign_ioc()
-... and while I have not traced the call chain further, the look of that
-function (nvme_timeout()) strongly suggests that it *is* meant to be
-called from bloody atomic context.
+This is found by a static analysis tool named DCNS written by myself.
 
-"My tool has found that place/put together a proof" is nice, but it
-doesn't replace the proof itself...
+Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
+---
+ block/blk-mq-sched.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index c117bd8..d461e31 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -42,7 +42,7 @@ void blk_mq_sched_assign_ioc(struct request *rq, struct bio *bio)
+ 	spin_unlock_irq(q->queue_lock);
+ 
+ 	if (!icq) {
+-		icq = ioc_create_icq(ioc, q, GFP_ATOMIC);
++		icq = ioc_create_icq(ioc, q, GFP_KERNEL);
+ 		if (!icq)
+ 			return;
+ 	}
+-- 
+1.7.9.5
