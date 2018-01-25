@@ -1,85 +1,178 @@
-Return-Path: <lsf-pc-bounces@lists.linux-foundation.org>
-Date: Thu, 25 Jan 2018 12:57:27 +0100
-From: Jan Kara <jack@suse.cz>
-To: lsf-pc@lists.linux-foundation.org
-Message-ID: <20180125115727.slf6zj4zzevcskkn@quack2.suse.cz>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from out1.zte.com.cn ([202.103.147.172]:47894 "EHLO mxct.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751707AbeAYM2c (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 25 Jan 2018 07:28:32 -0500
+From: tang.junhui@zte.com.cn
+To: colyli@suse.de, mlyle@lyle.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        tang.junhui@zte.com.cn
+Subject: [PATCH] [PATCH v2] bcache: fix for allocator and register thread race
+Date: Thu, 25 Jan 2018 20:30:56 +0800
+Message-Id: <1516883456-4170-1-git-send-email-tang.junhui@zte.com.cn>
 MIME-Version: 1.0
-Cc: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org
-Subject: [Lsf-pc] [LSF/MM TOPIC] get_user_pages() and filesystems
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/lsf-pc>,
-	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=unsubscribe>
-List-Archive: <https://lists.linuxfoundation.org/mailman/private/lsf-pc/>
-List-Post: <mailto:lsf-pc@lists.linux-foundation.org>
-List-Help: <mailto:lsf-pc-request@lists.linux-foundation.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/lsf-pc>,
-	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: lsf-pc-bounces@lists.linux-foundation.org
-Errors-To: lsf-pc-bounces@lists.linux-foundation.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hello,
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-this is about a problem I have identified last month and for which I still
-don't have good solution. Some discussion of the problem happened here [1]
-where also technical details are posted but culprit of the problem is
-relatively simple: Lots of places in kernel (fs code, writeback logic,
-stable-pages framework for DIF/DIX) assume that file pages in page cache
-can be modified either via write(2), truncate(2), fallocate(2) or similar
-code paths explicitely manipulating with file space or via a writeable
-mapping into page tables. In particular we assume that if we block all the
-above paths by taking proper locks, block page faults, and unmap (/ map
-read-only) the page, it cannot be modified. But this assumption is violated
-by get_user_pages() users (such as direct IO or RDMA drivers - and we've
-got reports from such users of weird things happening).
+After long time running of random small IO writing,
+I reboot the machine, and after the machine power on,
+I found bcache got stuck, the stack is:
+[root@ceph153 ~]# cat /proc/2510/task/*/stack
+[<ffffffffa06b2455>] closure_sync+0x25/0x90 [bcache]
+[<ffffffffa06b6be8>] bch_journal+0x118/0x2b0 [bcache]
+[<ffffffffa06b6dc7>] bch_journal_meta+0x47/0x70 [bcache]
+[<ffffffffa06be8f7>] bch_prio_write+0x237/0x340 [bcache]
+[<ffffffffa06a8018>] bch_allocator_thread+0x3c8/0x3d0 [bcache]
+[<ffffffff810a631f>] kthread+0xcf/0xe0
+[<ffffffff8164c318>] ret_from_fork+0x58/0x90
+[<ffffffffffffffff>] 0xffffffffffffffff
+[root@ceph153 ~]# cat /proc/2038/task/*/stack
+[<ffffffffa06b1abd>] __bch_btree_map_nodes+0x12d/0x150 [bcache]
+[<ffffffffa06b1bd1>] bch_btree_insert+0xf1/0x170 [bcache]
+[<ffffffffa06b637f>] bch_journal_replay+0x13f/0x230 [bcache]
+[<ffffffffa06c75fe>] run_cache_set+0x79a/0x7c2 [bcache]
+[<ffffffffa06c0cf8>] register_bcache+0xd48/0x1310 [bcache]
+[<ffffffff812f702f>] kobj_attr_store+0xf/0x20
+[<ffffffff8125b216>] sysfs_write_file+0xc6/0x140
+[<ffffffff811dfbfd>] vfs_write+0xbd/0x1e0
+[<ffffffff811e069f>] SyS_write+0x7f/0xe0
+[<ffffffff8164c3c9>] system_call_fastpath+0x16/0x1
+The stack shows the register thread and allocator thread
+were getting stuck when registering cache device.
 
-The problem with GUP users is that they acquire page reference (at that
-point page is writeably mapped into page tables) and some time in future
-(which can be quite far in case of RDMA) page contents gets modified and
-page marked dirty.
+I reboot the machine several times, the issue always
+exsit in this machine.
 
-The question is how to properly solve this problem. One obvious way is to
-indicate page has a GUP reference and block its unmapping / remapping RO
-until that is dropped. But this has a technical problem (how to find space
-in struct page for such tracking) and a design problem (blocking e.g.
-writeback for hours because some RDMA app used a file mapping as a buffer
-simply is not acceptable). There are also various modifications to this
-solution like refuse to use file pages for RDMA
-(get_user_pages_longterm()) and block waiting for users like direct IO, or
-require that RDMA users provide a way to revoke access from GUPed pages.
+I debug the code, and found the call trace as bellow:
+register_bcache()
+   ==>run_cache_set()
+      ==>bch_journal_replay()
+         ==>bch_btree_insert()
+            ==>__bch_btree_map_nodes()
+               ==>btree_insert_fn()
+                  ==>btree_split() //node need split
+                     ==>btree_check_reserve()
+In btree_check_reserve(), It will check if there is enough buckets
+of RESERVE_BTREE type, since allocator thread did not work yet, so
+no buckets of RESERVE_BTREE type allocated, so the register thread
+waits on c->btree_cache_wait, and goes to sleep.
 
-Another obvious solution is to try to remove the assumption from all those
-places - i.e., use bounce buffers for DIF/DIX, make sure filesystems are
-prepared for dirty pages suddenly appearing in files and handle that as
-good as they can. They really need to sensibly handle only a case when
-underlying storage is already allocated / reserved, in all other cases I
-believe they are fine in just discarding the data. This would be very
-tedious but I believe it could be done. But overall long-term maintenance
-burden of this solution just doesn't seem worth it to me.
+Then the allocator thread initialized, the call trace is bellow:
+bch_allocator_thread()
+==>bch_prio_write()
+   ==>bch_journal_meta()
+      ==>bch_journal()
+         ==>journal_wait_for_write()
+In journal_wait_for_write(), It will check if journal is full by
+journal_full(), but the long time random small IO writing
+causes the exhaustion of journal buckets(journal.blocks_free=0),
+In order to release the journal buckets,
+the allocator calls btree_flush_write() to flush keys to
+btree nodes, and waits on c->journal.wait until btree nodes writing
+over or there has already some journal buckets space, then the
+allocator thread goes to sleep. but in btree_flush_write(), since
+bch_journal_replay() is not finished, so no btree nodes have journal
+(condition "if (btree_current_write(b)->journal)" never satisfied),
+so we got no btree node to flush, no journal bucket released,
+and allocator sleep all the times.
 
-Another possible solution might be that GUP users (at least the long term
-ones) won't get references directly to page cache pages but only to some
-bounce pages (something like cow on private file mappings) and data would
-be just copied to the page cache pages at set_page_dirty_lock() time (we
-would probably have to move these users to a completely new API to keep our
-sanity). This would have userspace visible impacts (data won't be visible
-in the file until GUP user is done with it) but maybe it would be
-acceptable. Also how to keep association to the original pagecache page
-(and how it should be handled when underlying file just goes away) is
-unclear.
+Through the above analysis, we can see that:
+1) Register thread wait for allocator thread to allocate buckets of
+   RESERVE_BTREE type;
+2) Alloctor thread wait for register thread to replay journal, so it
+   can flush btree nodes and get journal bucket.
+   then they are all got stuck by waiting for each other.
 
-So clever ideas are needed and possibly some input from FS / MM / RDMA
-folks about what might be acceptable.
+Hua Rui provided a patch for me, by allocating some buckets of
+RESERVE_BTREE type in advance, so the register thread can get bucket
+when btree node splitting and no need to waiting for the allocator
+thread. I tested it, it has effect, and register thread run a step
+forward, but finally are still got stuck, the reason is only 8 bucket
+of RESERVE_BTREE type were allocated, and in bch_journal_replay(),
+after 2 btree nodes splitting, only 4 bucket of RESERVE_BTREE type left,
+then btree_check_reserve() is not satisfied anymore, so it goes to sleep
+again, and in the same time, alloctor thread did not flush enough btree
+nodes to release a journal bucket, so they all got stuck again.
 
-								Honza
+So we need to allocate more buckets of RESERVE_BTREE type in advance,
+but how much is enough?  By experience and test, I think it should be
+as much as journal buckets. Then I modify the code as this patch,
+and test in the machine, and it works.
 
-[1] https://www.spinics.net/lists/linux-xfs/msg14468.html
+This patch modified base on Hua Rui’s patch, and allocate more buckets
+of RESERVE_BTREE type in advance to avoid register thread and allocate
+thread going to wait for each other.
 
+[patch v2] ca->sb.njournal_buckets would be 0 in the first time after
+cache creation, and no journal exists, so just 8 btree buckets is OK.
+
+Signed-off-by: Hua Rui <huarui.dev@gmail.com>
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+---
+ drivers/md/bcache/btree.c |  9 ++++++---
+ drivers/md/bcache/super.c | 13 ++++++++++++-
+ 2 files changed, 18 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index 658c54b..d222a9b 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -1865,14 +1865,17 @@ void bch_initial_gc_finish(struct cache_set *c)
+ 	 */
+ 	for_each_cache(ca, c, i) {
+ 		for_each_bucket(b, ca) {
+-			if (fifo_full(&ca->free[RESERVE_PRIO]))
++			if (fifo_full(&ca->free[RESERVE_PRIO]) &&
++			    fifo_full(&ca->free[RESERVE_BTREE]))
+ 				break;
+ 
+ 			if (bch_can_invalidate_bucket(ca, b) &&
+ 			    !GC_MARK(b)) {
+ 				__bch_invalidate_one_bucket(ca, b);
+-				fifo_push(&ca->free[RESERVE_PRIO],
+-					  b - ca->buckets);
++				if (!fifo_push(&ca->free[RESERVE_PRIO],
++				   b - ca->buckets))
++					fifo_push(&ca->free[RESERVE_BTREE],
++						  b - ca->buckets);
+ 			}
+ 		}
+ 	}
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index fc0a31b..a000b75 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1812,6 +1812,7 @@ void bch_cache_release(struct kobject *kobj)
+ static int cache_alloc(struct cache *ca)
+ {
+ 	size_t free;
++	size_t btree_buckets;
+ 	struct bucket *b;
+ 
+ 	__module_get(THIS_MODULE);
+@@ -1819,9 +1820,19 @@ static int cache_alloc(struct cache *ca)
+ 
+ 	bio_init(&ca->journal.bio, ca->journal.bio.bi_inline_vecs, 8);
+ 
++	/*
++	 * when ca->sb.njournal_buckets is not zero, journal exists,
++	 * and in bch_journal_replay(), tree node may split,
++	 * so bucket of RESERVE_BTREE type is needed,
++	 * the worst situation is all journal buckets are valid journal,
++	 * and all the keys need to replay,
++	 * so the number of  RESERVE_BTREE type buckets should be as much
++	 * as journal buckets
++	 */
++	btree_buckets = ca->sb.njournal_buckets ?: 8;
+ 	free = roundup_pow_of_two(ca->sb.nbuckets) >> 10;
+ 
+-	if (!init_fifo(&ca->free[RESERVE_BTREE], 8, GFP_KERNEL) ||
++	if (!init_fifo(&ca->free[RESERVE_BTREE], btree_buckets, GFP_KERNEL) ||
+ 	    !init_fifo_exact(&ca->free[RESERVE_PRIO], prio_buckets(ca), GFP_KERNEL) ||
+ 	    !init_fifo(&ca->free[RESERVE_MOVINGGC], free, GFP_KERNEL) ||
+ 	    !init_fifo(&ca->free[RESERVE_NONE], free, GFP_KERNEL) ||
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
-_______________________________________________
-Lsf-pc mailing list
-Lsf-pc@lists.linux-foundation.org
-https://lists.linuxfoundation.org/mailman/listinfo/lsf-pc
+1.8.3.1
