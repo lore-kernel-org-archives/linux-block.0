@@ -1,123 +1,55 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:54499 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751337AbeA0SrC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Jan 2018 13:47:02 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Michael Lyle <mlyle@lyle.org>,
-        Junhui Tang <tang.junhui@zte.com.cn>
-Subject: [PATCH v4 02/13] bcache: properly set task state in bch_writeback_thread()
-Date: Sat, 27 Jan 2018 22:23:55 +0800
-Message-Id: <20180127142406.89741-3-colyli@suse.de>
-In-Reply-To: <20180127142406.89741-1-colyli@suse.de>
-References: <20180127142406.89741-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <baijiaju1990@gmail.com>
+Return-Path: <baijiaju1990@gmail.com>
+Subject: Re: [PATCH 1/2] block: blk-tag: Replace GFP_ATOMIC with GFP_KERNEL in
+ __blk_queue_init_tags
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1516851525-6828-1-git-send-email-baijiaju1990@gmail.com>
+ <7b20dc97-9240-726a-5664-c40c9421ef61@kernel.dk>
+From: Jia-Ju Bai <baijiaju1990@gmail.com>
+Message-ID: <bfb2759d-0f35-7baf-8637-054a669f01b6@gmail.com>
+Date: Thu, 25 Jan 2018 16:03:36 +0800
+MIME-Version: 1.0
+In-Reply-To: <7b20dc97-9240-726a-5664-c40c9421ef61@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-Kernel thread routine bch_writeback_thread() has the following code block,
 
-447         down_write(&dc->writeback_lock);
-448~450     if (check conditions) {
-451                 up_write(&dc->writeback_lock);
-452                 set_current_state(TASK_INTERRUPTIBLE);
-453
-454                 if (kthread_should_stop())
-455                         return 0;
-456
-457                 schedule();
-458                 continue;
-459         }
 
-If condition check is true, its task state is set to TASK_INTERRUPTIBLE
-and call schedule() to wait for others to wake up it.
+On 2018/1/25 11:44, Jens Axboe wrote:
+> On 1/24/18 8:38 PM, Jia-Ju Bai wrote:
+>> After checking all possible call chains to kmalloc here,
+>> my tool finds that kmalloc is never called in atomic context.
+>> Thus GFP_ATOMIC is not necessary, and it can be replaced with GFP_KERNEL.
+>>
+>> This is found by a static analysis tool named DCNS written by myself.
+> These two look OK to me, mostly.
 
-There are 2 issues in current code,
-1, Task state is set to TASK_INTERRUPTIBLE after the condition checks, if
-   another process changes the condition and call wake_up_process(dc->
-   writeback_thread), then at line 452 task state is set back to
-   TASK_INTERRUPTIBLE, the writeback kernel thread will lose a chance to be
-   waken up.
-2, At line 454 if kthread_should_stop() is true, writeback kernel thread
-   will return to kernel/kthread.c:kthread() with TASK_INTERRUPTIBLE and
-   call do_exit(). It is not good to enter do_exit() with task state
-   TASK_INTERRUPTIBLE, in following code path might_sleep() is called and a
-   warning message is reported by __might_sleep(): "WARNING: do not call
-   blocking ops when !TASK_RUNNING; state=1 set at [xxxx]".
+It sounds good :)
 
-For the first issue, task state should be set before condition checks.
-Ineed because dc->writeback_lock is required when modifying all the
-conditions, calling set_current_state() inside code block where dc->
-writeback_lock is hold is safe. But this is quite implicit, so I still move
-set_current_state() before all the condition checks.
+> One issue is that blk_queue_init_tags()
+> can be used to resize tags, in which case it's called with the
+> queue lock held. Nobody is using it like that anymore, though. So I'd
+> prefer if you did a v2 of this patch, and include a correction to that
+> comment.
+>
 
-For the second issue, frankley speaking it does not hurt when kernel thread
-exits with TASK_INTERRUPTIBLE state, but this warning message scares users,
-makes them feel there might be something risky with bcache and hurt their
-data.  Setting task state to TASK_RUNNING before returning fixes this
-problem.
+I am not sure what you mean...
 
-In alloc.c:allocator_wait(), there is also a similar issue, and is also
-fixed in this patch.
+Do you mean that the code in blk_queue_init_tags:
+     else if (q->queue_tags) {
+         ...
+     }
+can be deleted?
 
-Changelog:
-v3: merge two similar fixes into one patch
-v2: fix the race issue in v1 patch.
-v1: initial buggy fix.
+Or just delete the comment before blk_queue_init_tags?
+  * Queue lock must be held here if the function is called to resize an
+  * existing map.
+  **/
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Cc: Michael Lyle <mlyle@lyle.org>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
----
- drivers/md/bcache/alloc.c     | 4 +++-
- drivers/md/bcache/writeback.c | 7 +++++--
- 2 files changed, 8 insertions(+), 3 deletions(-)
+Or add the description "The case that queue lock held is never used" in 
+my patches?
 
-diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
-index 6cc6c0f9c3a9..458e1d38577d 100644
---- a/drivers/md/bcache/alloc.c
-+++ b/drivers/md/bcache/alloc.c
-@@ -287,8 +287,10 @@ do {									\
- 			break;						\
- 									\
- 		mutex_unlock(&(ca)->set->bucket_lock);			\
--		if (kthread_should_stop())				\
-+		if (kthread_should_stop()) {				\
-+			set_current_state(TASK_RUNNING);		\
- 			return 0;					\
-+		}							\
- 									\
- 		schedule();						\
- 		mutex_lock(&(ca)->set->bucket_lock);			\
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 0ade883b6316..f1d2fc15abcc 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -564,18 +564,21 @@ static int bch_writeback_thread(void *arg)
- 
- 	while (!kthread_should_stop()) {
- 		down_write(&dc->writeback_lock);
-+		set_current_state(TASK_INTERRUPTIBLE);
- 		if (!atomic_read(&dc->has_dirty) ||
- 		    (!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags) &&
- 		     !dc->writeback_running)) {
- 			up_write(&dc->writeback_lock);
--			set_current_state(TASK_INTERRUPTIBLE);
- 
--			if (kthread_should_stop())
-+			if (kthread_should_stop()) {
-+				set_current_state(TASK_RUNNING);
- 				return 0;
-+			}
- 
- 			schedule();
- 			continue;
- 		}
-+		set_current_state(TASK_RUNNING);
- 
- 		searched_full_index = refill_dirty(dc);
- 
--- 
-2.15.1
+
+Thanks,
+Jia-Ju Bai
