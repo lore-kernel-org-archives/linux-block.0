@@ -1,49 +1,44 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:3039 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933445AbeAJQde (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Jan 2018 11:33:34 -0500
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH] blk-mq: Explain when 'active_queues' is decremented
-Date: Wed, 10 Jan 2018 08:33:33 -0800
-Message-Id: <20180110163333.14345-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <baijiaju1990@gmail.com>
+Return-Path: <baijiaju1990@gmail.com>
+From: Jia-Ju Bai <baijiaju1990@gmail.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jia-Ju Bai <baijiaju1990@gmail.com>
+Subject: [PATCH 2/2] block: blk-tag: Replace GFP_ATOMIC with GFP_KERNEL in init_tag_map
+Date: Thu, 25 Jan 2018 11:38:56 +0800
+Message-Id: <1516851536-6871-1-git-send-email-baijiaju1990@gmail.com>
+List-ID: <linux-block@vger.kernel.org>
 
-It is nontrivial to derive from the blk-mq source code when
-blk_mq_tags.active_queues is decremented. Hence add a comment that
-explains this.
+After checking all possible call chains to init_tag_map here,
+my tool finds that init_tag_map is never called in atomic context.
+Thus GFP_ATOMIC is not necessary, and it can be replaced with GFP_KERNEL.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+This is found by a static analysis tool named DCNS written by myself.
+
+Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
 ---
- block/blk-mq.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ block/blk-tag.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9aa24c9508f9..266fc4f6b046 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -954,6 +954,12 @@ static void blk_mq_timeout_work(struct work_struct *work)
- 		data.next = blk_rq_timeout(round_jiffies_up(data.next));
- 		mod_timer(&q->timeout, data.next);
- 	} else {
-+		/*
-+		 * Request timeouts are handled as a forward rolling timer. If
-+		 * we end up here it means that no requests are pending and
-+		 * also that no request has been pending for a while. Mark
-+		 * each hctx as idle.
-+		 */
- 		queue_for_each_hw_ctx(q, hctx, i) {
- 			/* the hctx may be unmapped, so check it here */
- 			if (blk_mq_hw_queue_mapped(hctx))
+diff --git a/block/blk-tag.c b/block/blk-tag.c
+index 09f19c6..177b6d1 100644
+--- a/block/blk-tag.c
++++ b/block/blk-tag.c
+@@ -99,12 +99,12 @@ void blk_queue_free_tags(struct request_queue *q)
+ 		       __func__, depth);
+ 	}
+ 
+-	tag_index = kzalloc(depth * sizeof(struct request *), GFP_ATOMIC);
++	tag_index = kzalloc(depth * sizeof(struct request *), GFP_KERNEL);
+ 	if (!tag_index)
+ 		goto fail;
+ 
+ 	nr_ulongs = ALIGN(depth, BITS_PER_LONG) / BITS_PER_LONG;
+-	tag_map = kzalloc(nr_ulongs * sizeof(unsigned long), GFP_ATOMIC);
++	tag_map = kzalloc(nr_ulongs * sizeof(unsigned long), GFP_KERNEL);
+ 	if (!tag_map)
+ 		goto fail;
+ 
 -- 
-2.15.1
+1.7.9.5
