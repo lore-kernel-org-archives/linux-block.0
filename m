@@ -1,80 +1,177 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Wed, 10 Jan 2018 12:58:53 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: linux-block@vger.kernel.org, Paolo Valente <paolo.valente@linaro.org>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: BUG: unable to handle kernel NULL pointer dereference at
- 0000000000000436
-Message-ID: <20180110045852.GC18922@ming.t460p>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:54578 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751105AbeAYO6l (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 25 Jan 2018 09:58:41 -0500
+Subject: Re: [Qemu-devel] (v2. forward to qemu )-Panic with ext4, nbd,
+ qemu-img, block
+To: "Hongzhi, Song" <hongzhi.song@windriver.com>, qemu-block@nongnu.org
+References: <4ac7d86b-d96d-ef75-6965-284c527cde9b@windriver.com>
+Cc: linux-block@vger.kernel.org, qemu-discuss@nongnu.org,
+        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+        qemu-devel@nongnu.org
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <77c33c7b-fb3d-27e7-a694-c0fe5f34e036@redhat.com>
+Date: Thu, 25 Jan 2018 08:58:39 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <4ac7d86b-d96d-ef75-6965-284c527cde9b@windriver.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="bDqO61JGggrCnogO4Bpau2MBb8A8ZyJqp"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Paolo,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--bDqO61JGggrCnogO4Bpau2MBb8A8ZyJqp
+Content-Type: multipart/mixed; boundary="xTkWl5vnnzWx3QB5YDgCVRFF7oRL4eNPo";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: "Hongzhi, Song" <hongzhi.song@windriver.com>, qemu-block@nongnu.org
+Cc: linux-block@vger.kernel.org, qemu-discuss@nongnu.org,
+ linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+ qemu-devel@nongnu.org
+Message-ID: <77c33c7b-fb3d-27e7-a694-c0fe5f34e036@redhat.com>
+Subject: Re: [Qemu-devel] (v2. forward to qemu )-Panic with ext4, nbd,
+ qemu-img, block
+References: <4ac7d86b-d96d-ef75-6965-284c527cde9b@windriver.com>
+In-Reply-To: <4ac7d86b-d96d-ef75-6965-284c527cde9b@windriver.com>
 
-Looks this one is introduced in recent merge, and it is triggered
-in test of IO vs. removing device on the latest for-next of block
-tree:
+--xTkWl5vnnzWx3QB5YDgCVRFF7oRL4eNPo
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-[  296.151615] BUG: unable to handle kernel NULL pointer dereference at 0000000000000436
-[  296.152302] IP: percpu_counter_add_batch+0x25/0x9d
-[  296.152698] PGD 0 P4D 0
-[  296.152916] Oops: 0000 [#1] PREEMPT SMP
-[  296.153233] Dumping ftrace buffer:
-[  296.153517]    (ftrace buffer empty)
-[  296.153817] Modules linked in: scsi_debug(E) null_blk(E) isofs(E) iTCO_wdt(E) iTCO_vendor_support(E) i2c_i801(E) i2c_core(E) lpc_ich(E) mfd_core(E) ip_tables(E) sr_mod(E) cdrom(E) sd_mod(E) usb_storage(E) ahci(E) libahci(E) libata(E) crc32c_intel(E) virtio_scsi(E) qemu_fw_cfg(E) dm_mirror(E) dm_region_hash(E) dm_log(E) dm_mod(E) [last unloaded: scsi_debug]
-[  296.156199] CPU: 2 PID: 2001 Comm: scsi_id Tainted: G            E    4.15.0-rc7790529290ab3_my_v4.15-rc-block-for-next #4
-[  296.156961] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.9.3-1.fc25 04/01/2014
-[  296.157546] RIP: 0010:percpu_counter_add_batch+0x25/0x9d
-[  296.157920] RSP: 0018:ffffc90001133b28 EFLAGS: 00010002
-[  296.158285] RAX: 0000000000000002 RBX: ffffffffffffff6e RCX: 0000000000000001
-[  296.158779] RDX: 000000003fffffff RSI: ffffffff81e95429 RDI: ffffffff81e5e64c
-[  296.159276] RBP: 0000000000000416 R08: 0000000000000001 R09: 0000000000000001
-[  296.159770] R10: ffffc90001133aa0 R11: ffff88007e96caf0 R12: 000000003fffffff
-[  296.160273] R13: 0000000000000001 R14: 0000000000000001 R15: ffffe8ffffd0b180
-[  296.160780] FS:  00007f635988af80(0000) GS:ffff88007cf00000(0000) knlGS:0000000000000000
-[  296.161325] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  296.161744] CR2: 0000000000000436 CR3: 00000000717f1005 CR4: 00000000003606e0
-[  296.162258] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  296.162764] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[  296.163246] Call Trace:
-[  296.163445]  bfqg_stats_update_io_add+0x35/0xdc
-[  296.163754]  bfq_insert_requests+0xbb9/0xbf2
-[  296.164049]  ? blk_rq_bio_prep+0x51/0x5d
-[  296.164353]  ? blk_rq_append_bio+0x32/0x78
-[  296.164633]  ? blk_rq_map_user_iov+0x11b/0x1a0
-[  296.164940]  blk_mq_sched_insert_request+0xaf/0x12f
-[  296.165273]  blk_execute_rq+0x4b/0x93
-[  296.165586]  sg_io+0x236/0x38a
-[  296.165800]  scsi_cmd_ioctl+0x1d4/0x381
-[  296.166065]  ? seccomp_run_filters+0xee/0x12d
-[  296.166362]  ? preempt_count_add+0x6d/0x8c
-[  296.166643]  sd_ioctl+0xbb/0xde [sd_mod]
-[  296.166915]  blkdev_ioctl+0x7f2/0x850
-[  296.167167]  block_ioctl+0x39/0x3c
-[  296.167401]  vfs_ioctl+0x1b/0x28
-[  296.167622]  do_vfs_ioctl+0x4bc/0x542
-[  296.167877]  ? syscall_trace_enter+0x164/0x261
-[  296.168180]  SyS_ioctl+0x3e/0x5a
-[  296.168402]  do_syscall_64+0x71/0x168
-[  296.168654]  entry_SYSCALL64_slow_path+0x25/0x25
-[  296.168970] RIP: 0033:0x7f63593a1dc7
-[  296.169214] RSP: 002b:00007fff87210878 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-[  296.169823] RAX: ffffffffffffffda RBX: 00007fff872108b0 RCX: 00007f63593a1dc7
-[  296.170303] RDX: 00007fff872108b0 RSI: 0000000000002285 RDI: 0000000000000004
-[  296.170783] RBP: 00007fff87210f00 R08: 0000000000002006 R09: 00000000fffffe00
-[  296.171266] R10: 00007fff87210910 R11: 0000000000000246 R12: 00000000ffffffff
-[  296.171745] R13: 00007fff872108b0 R14: 00007fff872108ba R15: 00007fff872112b0
-[  296.172228] Code: 5d 41 5c 41 5d c3 41 55 41 54 49 89 f5 55 53 48 89 fd bf 01 00 00 00 41 89 d4 e8 8c 19 d4 ff 48 c7 c7 29 54 e9 81 e8 fd 3d ff ff <48> 8b 45 20 49 63 d4 65 8b 18 48 63 db 4c 01 eb 48 39 d3 7d 0b
-[  296.173594] RIP: percpu_counter_add_batch+0x25/0x9d RSP: ffffc90001133b28
-[  296.174054] CR2: 0000000000000436
-[  296.174283] ---[ end trace 87b58f9235daac7e ]---
-[  296.174673] Kernel panic - not syncing: Fatal exception
-[  297.270432] Shutting down cpus with NMI
-[  297.271020] Dumping ftrace buffer:
-[  297.271262]    (ftrace buffer empty)
-[  297.271513] Kernel Offset: disabled
-[  297.271760] ---[ end Kernel panic - not syncing: Fatal exception
+On 01/21/2018 08:06 PM, Hongzhi, Song wrote:
+> Hello,
+>=20
+> I create a virtual disk-image using qemu-img.
+>=20
+> And then I use /dev/nbd to map the image.
+>=20
+> I mount the /dev/nbd to a local dir with ext4-format
+>=20
+> Finally, I have some trouble about ext4-filesystem and block device,
+> with using demand of rsync or dd to write the image.
+>=20
+> Reproduce :
+>=20
+> =C2=A0=C2=A0=C2=A0 qemu-img create test.img 2G
+>=20
+> =C2=A0=C2=A0=C2=A0 mkfs.ext4 -F test.img
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0 qemu-nbd -f raw -c /dev/nbd0 test.img
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0 mount -r ext4 /dev/nbd0 LOCAL_DIR/
+>=20
+> =C2=A0=C2=A0=C2=A0 rsync -av META_DATA_DIR/=C2=A0 LOCAL_DIR/
+>=20
+> Qemu Version:
+>=20
+> =C2=A0=C2=A0=C2=A0 QEMU emulator version 2.10.0
 
--- 
-Ming
+There have been some bug fixes in the NBD code in qemu 2.11; does using
+a newer version make a difference in your results?
+
+
+> Detail:
+>=20
+>=20
+> 329.11 EXT4-fs (nbd0): mounted filesystem with ordered data mode. Opts:=
+
+> (null)
+> 329.12 block nbd0: Connection timed out
+> 329.13 block nbd0: shutting down sockets
+
+This sounds like a log of the kernel side; but it is rather sparse on
+details on why the kernel lost the connection to the socket provided by
+qemu-nbd -c.  Is there any chance we can get a corresponding trace from
+qemu-nbd when reproducing the lost connection?
+
+> 329.14 blk_update_request: I/O error, dev nbd0, sector 304384
+> 329.15 blk_update_request: I/O error, dev nbd0, sector 304640
+> 329.16 blk_update_request: I/O error, dev nbd0, sector 304896
+> 329.17 blk_update_request: I/O error, dev nbd0, sector 305152
+> 329.18 blk_update_request: I/O error, dev nbd0, sector 305408
+> 329.19 blk_update_request: I/O error, dev nbd0, sector 305664
+> 329.20 blk_update_request: I/O error, dev nbd0, sector 305920
+> 329.21 blk_update_request: I/O error, dev nbd0, sector 306176
+> 329.22 blk_update_request: I/O error, dev nbd0, sector 306432
+> 329.23 blk_update_request: I/O error, dev nbd0, sector 306688
+> 329.24 EXT4-fs warning (device nbd0): ext4_end_bio:322: I/O error -5
+> writing to inode 160 (offset 8388608 size 8388608 starting block 38400)=
+
+
+Everything else in the trace looks like fallout from the initial lost
+connection - once the kernel can't communicate to the NBD server, it has
+to fail all pending and subsequent I/O requests to /dev/nbd0.  But until
+we can figure out why the connection is dropped, seeing this part of the
+trace doesn't add any information about the root cause.
+
+But oddly enough, once things go south in the kernel nbd module, it
+leads to a full-on kernel bug:
+
+> GRNDSDP1.86B.0036.R05.1407140519 07/14/2014
+> 329.51 Workqueue: writeback wb_workfn (flush-43:0)
+> 329.52 task: ffff977bec759e00 task.stack: ffffa2930524c000
+> 329.53 RIP: 0010:submit_bh_wbc+0x155/0x160
+> 329.54 RSP: 0018:ffffa2930524f7e0 EFLAGS: 00010246
+> 329.55 RAX: 0000000000620005 RBX: ffff977f05cddc18 RCX: 000000000000000=
+0
+> 329.56 RDX: ffff977f05cddc18 RSI: 0000000000020800 RDI: 000000000000000=
+1
+> 329.57 RBP: ffffa2930524f808 R08: ff00000000000000 R09: 00fffffffffffff=
+f
+> 329.58 R10: ffffa2930524f920 R11: 000000000000058c R12: 000000000000a59=
+8
+> 329.59 R13: ffffffffba15c500 R14: ffff977fe1bab400 R15: ffff977fea64300=
+0
+> 329.60 FS: 0000000000000000(0000) GS:ffff977befa00000(0000)
+> knlGS:0000000000000000
+> 329.61 CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> 329.62 CR2: 00007f7d70000010 CR3: 000000035ce0e000 CR4: 00000000001406e=
+0
+> 329.63 Call Trace:
+> 329.64 __sync_dirty_buffer+0x41/0xa0
+> 329.65 ext4_commit_super+0x1d6/0x2a0
+> 329.66 __ext4_error_inode+0xb2/0x170
+
+> 329.99 JBD2: Error -5 detected when updating journal superblock for nbd=
+0-8.
+> 329.100 Aborting journal on device nbd0-8.
+> 329.101 ------------[ cut here ]------------
+> 329.102 kernel BUG at /kernel-source//fs/buffer.c:3091!
+
+Well, that should certainly be reported to the kernel folks; nothing
+qemu can do about it (a userspace socket serving NBD data should not be
+able to cause the kernel NBD client to result in a subsequent kernel
+crash, regardless of how bad data loss is when the socket disappears out
+from under the kernel).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--xTkWl5vnnzWx3QB5YDgCVRFF7oRL4eNPo--
+
+--bDqO61JGggrCnogO4Bpau2MBb8A8ZyJqp
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlpp8J8ACgkQp6FrSiUn
+Q2rJ9wf8CB3dBoOdh+ZFyOYO1q88ZMUg0V4AzZiO49oAvk5yAu9Sq5KdZZDqelQH
+I19yN+X/McmAF+qOhebmIl0jqa0XB2Rc8En5KewCtpiqHSsxLRewe/AhwDQmKGJZ
+QVeG/JjqJMg7SaNsR/NnzAfte94IthCbe7tH/KEZhr+gHX/g5PqmWCB1o7H9W9BB
+PNsWrvZdglzrQO9Gc/w3E0kediwsEQZMMdAzp8vWrFOjhyZaIrtoZRnG9k723xyI
+I2BKPaBgIoLdZbiqAStNf/JaO5b4RJjIlTuI9t3n+WgiE3rYd/st04yxOBFddZj1
+B6YJybA+/mHGx4Qa49O14Wfkj3YyEw==
+=1XT1
+-----END PGP SIGNATURE-----
+
+--bDqO61JGggrCnogO4Bpau2MBb8A8ZyJqp--
