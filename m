@@ -1,189 +1,106 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-by2nam01on0055.outbound.protection.outlook.com ([104.47.34.55]:41040
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751377AbeAZKJ3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Jan 2018 05:09:29 -0500
-From: Javier Gonzalez <javier@cnexlabs.com>
-To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
-CC: "lsf-pc@lists.linux-foundation.org"
-        <lsf-pc@lists.linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "jaegeuk@kernel.org" <jaegeuk@kernel.org>
-Subject: Re: [LSF/MM ATTEND] OCSSD topics
-Date: Fri, 26 Jan 2018 10:09:23 +0000
-Message-ID: <8A03EBCA-3C51-4D57-8C62-A52393E38799@cnexlabs.com>
+Return-Path: <lsf-pc-bounces@lists.linux-foundation.org>
+To: Javier Gonzalez <javier@cnexlabs.com>
 References: <986429B2-A254-4247-AA4F-F631A565DA8B@cnexlabs.com>
- <52189623-69cf-79cd-d2e3-af2e202c01ec@lightnvm.io>
- <0A986779-992D-40A0-A8C6-7AE9049EF48F@cnexlabs.com>
- <c73c736b-894f-2178-bee8-1011748fa26b@lightnvm.io>
-In-Reply-To: <c73c736b-894f-2178-bee8-1011748fa26b@lightnvm.io>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_C7C5ED18-4D37-41D6-8334-735B51DF8B11";
-        protocol="application/pgp-signature"; micalg=pgp-sha512
+	<52189623-69cf-79cd-d2e3-af2e202c01ec@lightnvm.io>
+	<0A986779-992D-40A0-A8C6-7AE9049EF48F@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <c73c736b-894f-2178-bee8-1011748fa26b@lightnvm.io>
+Date: Fri, 26 Jan 2018 10:54:47 +0100
 MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <0A986779-992D-40A0-A8C6-7AE9049EF48F@cnexlabs.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
+	"jaegeuk@kernel.org" <jaegeuk@kernel.org>
+Subject: Re: [Lsf-pc] [LSF/MM ATTEND] OCSSD topics
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/lsf-pc>,
+	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=unsubscribe>
+List-Archive: <https://lists.linuxfoundation.org/mailman/private/lsf-pc/>
+List-Post: <mailto:lsf-pc@lists.linux-foundation.org>
+List-Help: <mailto:lsf-pc-request@lists.linux-foundation.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/lsf-pc>,
+	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=subscribe>
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Sender: lsf-pc-bounces@lists.linux-foundation.org
+Errors-To: lsf-pc-bounces@lists.linux-foundation.org
+List-ID: <linux-block@vger.kernel.org>
 
---Apple-Mail=_C7C5ED18-4D37-41D6-8334-735B51DF8B11
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
-
-> On 26 Jan 2018, at 10.54, Matias Bj=C3=B8rling <mb@lightnvm.io> wrote:
->=20
-> On 01/26/2018 09:30 AM, Javier Gonzalez wrote:
->>> On 25 Jan 2018, at 22.02, Matias Bj=C3=B8rling <mb@lightnvm.io> =
-wrote:
->>>=20
->>> On 01/25/2018 04:26 PM, Javier Gonzalez wrote:
->>>> Hi,
->>>> There are some topics that I would like to discuss at LSF/MM:
->>>>   - In the past year we have discussed a lot how we can integrate =
-the
->>>>     Open-Channel SSD (OCSSD) spec with zone devices (SMR). This
->>>>     discussion is both at the interface level and at an in-kernel =
-level.
->>>>     Now that Damien's and Hannes' patches are upstreamed in good =
-shape,
->>>>     it would be a good moment to discuss how we can integrate the
->>>>     LightNVM subsystem with the existing code.
->>>=20
->>> The ZBC-OCSSD patches
->>> (https://github.com/OpenChannelSSD/linux/tree/zbc-support) that I =
-made
->>> last year is a good starting point.
->> Yes, this patches is a good place to start, but as mentioned below, =
-they
->> do not address how we would expose the parallelism on report_zone.
->> The way I see it, zone-devices impose write constrains to gain =
-capacity;
->> OCSSD does that to enable the parallelism of the device.
->=20
-> Also capacity for OCSSDs, as most raw flash is exposed. It is up to
-> the host to decide if over-provisioning is needed.
->=20
-
-This is a good point. Actually, if we declare a _necessary_ OP area, =
-users
-doing GC could use this OP space to do their job. For journaled-only
-areas, no extra GC will be necessary. For random areas, pblk can do the
-job (in a host managed solution).
-
-> This then can
->> be used by different users to either lower down media wear, reach a
->> stable state at the very early stage or guarantee tight latencies. =
-That
->> depends on how it is used. We can use an OCSSD as a zone-device and =
-it
->> will work, but it is coming back to using an interface that will =
-narrow
->> down the OCSSD scope (at least in its current format).
->>> Specifically, in ALPSS'17
->>>>     we had discussions on how we can extend the kernel zoned device
->>>>     interface with the notion of parallel units that the OCSSD =
-geometry
->>>>     builds upon. We are now bringing the OCSSD spec. to =
-standarization,
->>>>     but we have time to incorporate feedback and changes into the =
-spec.
->>>=20
->>> Which spec? the OCSSD 2 spec that I have copyright on? I don't =
-believe
->>> it has been submitted or is under consideration to any standards =
-body
->>> yet and I don't currently plan to do that.
->>>=20
->>> You might have meant "to be finalized". As you know, I am currently
->>> soliciting feedback and change requests from vendors and partners =
-with
->>> respect to the specification and is planning on closing it soon. If
->>> CNEX is doing their own new specification, please be open about it,
->>> and don't put it under the OCSSD name.
->> As you know, there is a group of cloud providers and vendors that is
->> starting to work on the standarization process with the current state =
-of
->> the 2.0 spec as the staring point - you have been part of these
->> discussions... The goal for this group is to collect the feedback =
-from
->> all parties and come up with a spec. that is useful and covers cloud
->> needs. Exactly for - as you imply -, not to tie the spec. to an
->> organization and/or individual. My hope is that this spec is very
->> similar to the OCSSD 2.0 that _we_ all have worked hard on putting
->> together.
->=20
-> Yes, that is my point. The workgroup device specification you are
-> discussing may or may not be OCSSD 2.0 similar/compatible and is not
-> tied to the process that is currently being run for the OCSSD 2.0
-> specification. Please keep OCSSD out of the discussions until the
-> device specification from the workgroup has been completed and made
-> public. Hopefully the device specification turns out to be OCSSD 2.0
-> compatible and the bits can be added to the 2.0 (2.1) specification.
-> If not, it has to be stand-alone, with its own implementation.
->=20
-
-Then we agree. The reason to open the discussion is to ensure that
-feedback comes from different places. Many times we have experienced a
-mismatch between what is discussed in the standard bodies (e.g., NVMe
-working groups) and the reality of Linux. Ideally, we can avoid this.
-
-I _really_ hope that we can sit down and align OCSSD 2.X since it really
-makes no sense to have different flavours of the same thing in the
-wild...
-
->> Later on, we can try to to checks on lba "batches", defined by this =
-same
->> write restrictions. But you are right that having a fully random lba
->> vector will require individual checks and that is both expensive and
->> intrusive. This can be isolated by flagging the nature of the bvec,
->> something ala (sequential, batched, random).
->=20
-> I think it must still be checked. One cannot trust that the LBAs are
-> as expected. For example, the case where LBAs are out of bounds and
-> accesses another partition.
->=20
-
-Fair point.
-
->>>  For example supported natively in the NVMe specification.
->> Then we agree that aiming at a stardard body is the goal, right?
->=20
-> Vector I/O is orthogonal to proposing a zone/ocssd proposal to the
-> NVMe workgroup.
-
-Sure. But since both are related to the ocssd proposal, I would expect
-them to be discussed in the same context.
-
-I personally don't see much value in ocssd used as a zone device (same
-as I don't see the value of using an ocssd uniquely with pblk) - these
-are building blocks to enable adoption. Thhe real value comes from
-exposing the parallelism, and down the road the vector I/O is a more
-generic way of doing it.
-
-Javier
-
---Apple-Mail=_C7C5ED18-4D37-41D6-8334-735B51DF8B11
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment; filename="signature.asc"
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAlpq/lEACgkQIX4xUKFR
-nnTC7w/8CgxP6ULRXDemoCaMkhQ06O07RGdgdSvtfQKRtexWyu6XmfCpSpX0mZkR
-CoG9195KlBLlj4O5+mn5J2LhDMIfz7DSu35QdFEUzFc8A6L6Eo+mhZD/1E0pv2bL
-jmWI+/gVy9yezT+8Gm4HAOI94j2fyExUcW0wfS03QYmnNwiOzvzTjYnw/HSCgi6j
-dcmk3D0OsNNg4ZvDiOv6uj3zllWuG7/h+GTFybHiqLOXB6+9rTWgc7rVSkRhdUhp
-ICuRh6yp5DzIqItr4YVSlIvAt+BNZz+0tfQgKNR+cfBPSnlhJfG6x7pBKRe73QQp
-BybnymJenmlzPhfjjNN0sZsdqb20JllxVEdKD5+cp+uBFoFtboSF+qbrMXIWAft2
-6HpumD3uJ2i2XssBTMyUO4FScGtRODZrSrPrzsnSwvNjnpmJGNf3iVwFjVwU7amt
-O7rAtM+dGZ4tMNJ+wwoxPldE6cNu6pyB7THYQDUHlLF3j/ptFL1xch8coKkDPdB8
-WwHIQDvXlMHwYs90ZXkKO3Ny6MWHbZ8pt0wY77DH80ItTvsSVCID4s0ehrWcHmH1
-DtEDtrh6p0gWEILEGKTf48gnGv5w8+Vz7QyokzlXNhgKpzeSjcO7gvrDMOFV4QTz
-tW/wGP95bMoIMAsCCD1r36fWX1Yt8Zunb+5eXtliJrlZ+wJbovQ=
-=PdPg
------END PGP SIGNATURE-----
-
---Apple-Mail=_C7C5ED18-4D37-41D6-8334-735B51DF8B11--
+T24gMDEvMjYvMjAxOCAwOTozMCBBTSwgSmF2aWVyIEdvbnphbGV6IHdyb3RlOgo+PiBPbiAyNSBK
+YW4gMjAxOCwgYXQgMjIuMDIsIE1hdGlhcyBCasO4cmxpbmcgPG1iQGxpZ2h0bnZtLmlvPiB3cm90
+ZToKPj4KPj4gT24gMDEvMjUvMjAxOCAwNDoyNiBQTSwgSmF2aWVyIEdvbnphbGV6IHdyb3RlOgo+
+Pj4gSGksCj4+PiBUaGVyZSBhcmUgc29tZSB0b3BpY3MgdGhhdCBJIHdvdWxkIGxpa2UgdG8gZGlz
+Y3VzcyBhdCBMU0YvTU06Cj4+PiAgICAtIEluIHRoZSBwYXN0IHllYXIgd2UgaGF2ZSBkaXNjdXNz
+ZWQgYSBsb3QgaG93IHdlIGNhbiBpbnRlZ3JhdGUgdGhlCj4+PiAgICAgIE9wZW4tQ2hhbm5lbCBT
+U0QgKE9DU1NEKSBzcGVjIHdpdGggem9uZSBkZXZpY2VzIChTTVIpLiBUaGlzCj4+PiAgICAgIGRp
+c2N1c3Npb24gaXMgYm90aCBhdCB0aGUgaW50ZXJmYWNlIGxldmVsIGFuZCBhdCBhbiBpbi1rZXJu
+ZWwgbGV2ZWwuCj4+PiAgICAgIE5vdyB0aGF0IERhbWllbidzIGFuZCBIYW5uZXMnIHBhdGNoZXMg
+YXJlIHVwc3RyZWFtZWQgaW4gZ29vZCBzaGFwZSwKPj4+ICAgICAgaXQgd291bGQgYmUgYSBnb29k
+IG1vbWVudCB0byBkaXNjdXNzIGhvdyB3ZSBjYW4gaW50ZWdyYXRlIHRoZQo+Pj4gICAgICBMaWdo
+dE5WTSBzdWJzeXN0ZW0gd2l0aCB0aGUgZXhpc3RpbmcgY29kZS4KPj4KPj4gVGhlIFpCQy1PQ1NT
+RCBwYXRjaGVzCj4+IChodHRwczovL2dpdGh1Yi5jb20vT3BlbkNoYW5uZWxTU0QvbGludXgvdHJl
+ZS96YmMtc3VwcG9ydCkgdGhhdCBJIG1hZGUKPj4gbGFzdCB5ZWFyIGlzIGEgZ29vZCBzdGFydGlu
+ZyBwb2ludC4KPj4KPiAKPiBZZXMsIHRoaXMgcGF0Y2hlcyBpcyBhIGdvb2QgcGxhY2UgdG8gc3Rh
+cnQsIGJ1dCBhcyBtZW50aW9uZWQgYmVsb3csIHRoZXkKPiBkbyBub3QgYWRkcmVzcyBob3cgd2Ug
+d291bGQgZXhwb3NlIHRoZSBwYXJhbGxlbGlzbSBvbiByZXBvcnRfem9uZS4KPiAKPiBUaGUgd2F5
+IEkgc2VlIGl0LCB6b25lLWRldmljZXMgaW1wb3NlIHdyaXRlIGNvbnN0cmFpbnMgdG8gZ2FpbiBj
+YXBhY2l0eTsKPiBPQ1NTRCBkb2VzIHRoYXQgdG8gZW5hYmxlIHRoZSBwYXJhbGxlbGlzbSBvZiB0
+aGUgZGV2aWNlLiAKCkFsc28gY2FwYWNpdHkgZm9yIE9DU1NEcywgYXMgbW9zdCByYXcgZmxhc2gg
+aXMgZXhwb3NlZC4gSXQgaXMgdXAgdG8gdGhlIApob3N0IHRvIGRlY2lkZSBpZiBvdmVyLXByb3Zp
+c2lvbmluZyBpcyBuZWVkZWQuCgpUaGlzIHRoZW4gY2FuCj4gYmUgdXNlZCBieSBkaWZmZXJlbnQg
+dXNlcnMgdG8gZWl0aGVyIGxvd2VyIGRvd24gbWVkaWEgd2VhciwgcmVhY2ggYQo+IHN0YWJsZSBz
+dGF0ZSBhdCB0aGUgdmVyeSBlYXJseSBzdGFnZSBvciBndWFyYW50ZWUgdGlnaHQgbGF0ZW5jaWVz
+LiBUaGF0Cj4gZGVwZW5kcyBvbiBob3cgaXQgaXMgdXNlZC4gV2UgY2FuIHVzZSBhbiBPQ1NTRCBh
+cyBhIHpvbmUtZGV2aWNlIGFuZCBpdAo+IHdpbGwgd29yaywgYnV0IGl0IGlzIGNvbWluZyBiYWNr
+IHRvIHVzaW5nIGFuIGludGVyZmFjZSB0aGF0IHdpbGwgbmFycm93Cj4gZG93biB0aGUgT0NTU0Qg
+c2NvcGUgKGF0IGxlYXN0IGluIGl0cyBjdXJyZW50IGZvcm1hdCkuCj4gCj4+IFNwZWNpZmljYWxs
+eSwgaW4gQUxQU1MnMTcKPj4+ICAgICAgd2UgaGFkIGRpc2N1c3Npb25zIG9uIGhvdyB3ZSBjYW4g
+ZXh0ZW5kIHRoZSBrZXJuZWwgem9uZWQgZGV2aWNlCj4+PiAgICAgIGludGVyZmFjZSB3aXRoIHRo
+ZSBub3Rpb24gb2YgcGFyYWxsZWwgdW5pdHMgdGhhdCB0aGUgT0NTU0QgZ2VvbWV0cnkKPj4+ICAg
+ICAgYnVpbGRzIHVwb24uIFdlIGFyZSBub3cgYnJpbmdpbmcgdGhlIE9DU1NEIHNwZWMuIHRvIHN0
+YW5kYXJpemF0aW9uLAo+Pj4gICAgICBidXQgd2UgaGF2ZSB0aW1lIHRvIGluY29ycG9yYXRlIGZl
+ZWRiYWNrIGFuZCBjaGFuZ2VzIGludG8gdGhlIHNwZWMuCj4+Cj4+IFdoaWNoIHNwZWM/IHRoZSBP
+Q1NTRCAyIHNwZWMgdGhhdCBJIGhhdmUgY29weXJpZ2h0IG9uPyBJIGRvbid0IGJlbGlldmUKPj4g
+aXQgaGFzIGJlZW4gc3VibWl0dGVkIG9yIGlzIHVuZGVyIGNvbnNpZGVyYXRpb24gdG8gYW55IHN0
+YW5kYXJkcyBib2R5Cj4+IHlldCBhbmQgSSBkb24ndCBjdXJyZW50bHkgcGxhbiB0byBkbyB0aGF0
+Lgo+Pgo+PiBZb3UgbWlnaHQgaGF2ZSBtZWFudCAidG8gYmUgZmluYWxpemVkIi4gQXMgeW91IGtu
+b3csIEkgYW0gY3VycmVudGx5Cj4+IHNvbGljaXRpbmcgZmVlZGJhY2sgYW5kIGNoYW5nZSByZXF1
+ZXN0cyBmcm9tIHZlbmRvcnMgYW5kIHBhcnRuZXJzIHdpdGgKPj4gcmVzcGVjdCB0byB0aGUgc3Bl
+Y2lmaWNhdGlvbiBhbmQgaXMgcGxhbm5pbmcgb24gY2xvc2luZyBpdCBzb29uLiBJZgo+PiBDTkVY
+IGlzIGRvaW5nIHRoZWlyIG93biBuZXcgc3BlY2lmaWNhdGlvbiwgcGxlYXNlIGJlIG9wZW4gYWJv
+dXQgaXQsCj4+IGFuZCBkb24ndCBwdXQgaXQgdW5kZXIgdGhlIE9DU1NEIG5hbWUuCj4gCj4gQXMg
+eW91IGtub3csIHRoZXJlIGlzIGEgZ3JvdXAgb2YgY2xvdWQgcHJvdmlkZXJzIGFuZCB2ZW5kb3Jz
+IHRoYXQgaXMKPiBzdGFydGluZyB0byB3b3JrIG9uIHRoZSBzdGFuZGFyaXphdGlvbiBwcm9jZXNz
+IHdpdGggdGhlIGN1cnJlbnQgc3RhdGUgb2YKPiB0aGUgMi4wIHNwZWMgYXMgdGhlIHN0YXJpbmcg
+cG9pbnQgLSB5b3UgaGF2ZSBiZWVuIHBhcnQgb2YgdGhlc2UKPiBkaXNjdXNzaW9ucy4uLiBUaGUg
+Z29hbCBmb3IgdGhpcyBncm91cCBpcyB0byBjb2xsZWN0IHRoZSBmZWVkYmFjayBmcm9tCj4gYWxs
+IHBhcnRpZXMgYW5kIGNvbWUgdXAgd2l0aCBhIHNwZWMuIHRoYXQgaXMgdXNlZnVsIGFuZCBjb3Zl
+cnMgY2xvdWQKPiBuZWVkcy4gRXhhY3RseSBmb3IgLSBhcyB5b3UgaW1wbHkgLSwgbm90IHRvIHRp
+ZSB0aGUgc3BlYy4gdG8gYW4KPiBvcmdhbml6YXRpb24gYW5kL29yIGluZGl2aWR1YWwuIE15IGhv
+cGUgaXMgdGhhdCB0aGlzIHNwZWMgaXMgdmVyeQo+IHNpbWlsYXIgdG8gdGhlIE9DU1NEIDIuMCB0
+aGF0IF93ZV8gYWxsIGhhdmUgd29ya2VkIGhhcmQgb24gcHV0dGluZwo+IHRvZ2V0aGVyLgoKWWVz
+LCB0aGF0IGlzIG15IHBvaW50LiBUaGUgd29ya2dyb3VwIGRldmljZSBzcGVjaWZpY2F0aW9uIHlv
+dSBhcmUgCmRpc2N1c3NpbmcgbWF5IG9yIG1heSBub3QgYmUgT0NTU0QgMi4wIHNpbWlsYXIvY29t
+cGF0aWJsZSBhbmQgaXMgbm90IAp0aWVkIHRvIHRoZSBwcm9jZXNzIHRoYXQgaXMgY3VycmVudGx5
+IGJlaW5nIHJ1biBmb3IgdGhlIE9DU1NEIDIuMCAKc3BlY2lmaWNhdGlvbi4gUGxlYXNlIGtlZXAg
+T0NTU0Qgb3V0IG9mIHRoZSBkaXNjdXNzaW9ucyB1bnRpbCB0aGUgZGV2aWNlIApzcGVjaWZpY2F0
+aW9uIGZyb20gdGhlIHdvcmtncm91cCBoYXMgYmVlbiBjb21wbGV0ZWQgYW5kIG1hZGUgcHVibGlj
+LiAKSG9wZWZ1bGx5IHRoZSBkZXZpY2Ugc3BlY2lmaWNhdGlvbiB0dXJucyBvdXQgdG8gYmUgT0NT
+U0QgMi4wIGNvbXBhdGlibGUgCmFuZCB0aGUgYml0cyBjYW4gYmUgYWRkZWQgdG8gdGhlIDIuMCAo
+Mi4xKSBzcGVjaWZpY2F0aW9uLiBJZiBub3QsIGl0IGhhcyAKdG8gYmUgc3RhbmQtYWxvbmUsIHdp
+dGggaXRzIG93biBpbXBsZW1lbnRhdGlvbi4KCj4gCj4gTGF0ZXIgb24sIHdlIGNhbiB0cnkgdG8g
+dG8gY2hlY2tzIG9uIGxiYSAiYmF0Y2hlcyIsIGRlZmluZWQgYnkgdGhpcyBzYW1lCj4gd3JpdGUg
+cmVzdHJpY3Rpb25zLiBCdXQgeW91IGFyZSByaWdodCB0aGF0IGhhdmluZyBhIGZ1bGx5IHJhbmRv
+bSBsYmEKPiB2ZWN0b3Igd2lsbCByZXF1aXJlIGluZGl2aWR1YWwgY2hlY2tzIGFuZCB0aGF0IGlz
+IGJvdGggZXhwZW5zaXZlIGFuZAo+IGludHJ1c2l2ZS4gVGhpcyBjYW4gYmUgaXNvbGF0ZWQgYnkg
+ZmxhZ2dpbmcgdGhlIG5hdHVyZSBvZiB0aGUgYnZlYywKPiBzb21ldGhpbmcgYWxhIChzZXF1ZW50
+aWFsLCBiYXRjaGVkLCByYW5kb20pLgoKSSB0aGluayBpdCBtdXN0IHN0aWxsIGJlIGNoZWNrZWQu
+IE9uZSBjYW5ub3QgdHJ1c3QgdGhhdCB0aGUgTEJBcyBhcmUgYXMgCmV4cGVjdGVkLiBGb3IgZXhh
+bXBsZSwgdGhlIGNhc2Ugd2hlcmUgTEJBcyBhcmUgb3V0IG9mIGJvdW5kcyBhbmQgCmFjY2Vzc2Vz
+IGFub3RoZXIgcGFydGl0aW9uLgoKPiAKPj4gICBGb3IgZXhhbXBsZSBzdXBwb3J0ZWQgbmF0aXZl
+bHkgaW4gdGhlIE5WTWUgc3BlY2lmaWNhdGlvbi4KPiAKPiBUaGVuIHdlIGFncmVlIHRoYXQgYWlt
+aW5nIGF0IGEgc3RhcmRhcmQgYm9keSBpcyB0aGUgZ29hbCwgcmlnaHQ/CgpWZWN0b3IgSS9PIGlz
+IG9ydGhvZ29uYWwgdG8gcHJvcG9zaW5nIGEgem9uZS9vY3NzZCBwcm9wb3NhbCB0byB0aGUgTlZN
+ZSAKd29ya2dyb3VwLgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fXwpMc2YtcGMgbWFpbGluZyBsaXN0CkxzZi1wY0BsaXN0cy5saW51eC1mb3VuZGF0aW9uLm9y
+ZwpodHRwczovL2xpc3RzLmxpbnV4Zm91bmRhdGlvbi5vcmcvbWFpbG1hbi9saXN0aW5mby9sc2Yt
+cGMK
