@@ -1,137 +1,126 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f65.google.com ([209.85.160.65]:45379 "EHLO
-        mail-pl0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751001AbeBACaB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Jan 2018 21:30:01 -0500
-Received: by mail-pl0-f65.google.com with SMTP id p5so2348002plo.12
-        for <linux-block@vger.kernel.org>; Wed, 31 Jan 2018 18:30:01 -0800 (PST)
-Subject: Re: [PATCH 1/2] bcache: add journal statistic
-To: tang.junhui@zte.com.cn, colyli@suse.de
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-References: <1516955032-6234-1-git-send-email-tang.junhui@zte.com.cn>
-From: Michael Lyle <mlyle@lyle.org>
-Message-ID: <3390db1e-c6aa-5b41-d84d-facc9e9012cc@lyle.org>
-Date: Wed, 31 Jan 2018 18:29:50 -0800
-MIME-Version: 1.0
-In-Reply-To: <1516955032-6234-1-git-send-email-tang.junhui@zte.com.cn>
-Content-Type: text/plain; charset=utf-8
+Received: from out1.zte.com.cn ([202.103.147.172]:50220 "EHLO mxct.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752065AbeAZIV3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 Jan 2018 03:21:29 -0500
+From: tang.junhui@zte.com.cn
+To: colyli@suse.de, mlyle@lyle.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        tang.junhui@zte.com.cn
+Subject: [PATCH 1/2] bcache: add journal statistic
+Date: Fri, 26 Jan 2018 16:23:52 +0800
+Message-Id: <1516955032-6234-1-git-send-email-tang.junhui@zte.com.cn>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-LGTM except for formatting / an extra newline (will fix) -- in my test
-branch for possible 4.16
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
+Sometimes, Journal takes up a lot of CPU, we need statistics
+to know what's the journal is doing. So this patch provide
+some journal statistics:
+1) reclaim: how many times the journal try to reclaim resource,
+   usually the journal bucket or/and the pin are exhausted.
+2) flush_write: how many times the journal try to flush btree node
+   to cache device, usually the journal bucket are exhausted.
+3) retry_flush_write: how many times the journal retry to flush
+   the next btree node, usually the previous tree node have been
+   flushed by other thread.
+we show these statistic by sysfs interface. Through these statistics
+We can totally see the status of journal module when the CPU is too
+high.
 
-On 01/26/2018 12:23 AM, tang.junhui@zte.com.cn wrote:
-> From: Tang Junhui <tang.junhui@zte.com.cn>
-> 
-> Sometimes, Journal takes up a lot of CPU, we need statistics
-> to know what's the journal is doing. So this patch provide
-> some journal statistics:
-> 1) reclaim: how many times the journal try to reclaim resource,
->    usually the journal bucket or/and the pin are exhausted.
-> 2) flush_write: how many times the journal try to flush btree node
->    to cache device, usually the journal bucket are exhausted.
-> 3) retry_flush_write: how many times the journal retry to flush
->    the next btree node, usually the previous tree node have been
->    flushed by other thread.
-> we show these statistic by sysfs interface. Through these statistics
-> We can totally see the status of journal module when the CPU is too
-> high.
-> 
-> Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-> ---
->  drivers/md/bcache/bcache.h  |  5 +++++
->  drivers/md/bcache/journal.c |  5 +++++
->  drivers/md/bcache/sysfs.c   | 15 +++++++++++++++
->  3 files changed, 25 insertions(+)
-> 
-> diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-> index abd31e8..0432e28 100644
-> --- a/drivers/md/bcache/bcache.h
-> +++ b/drivers/md/bcache/bcache.h
-> @@ -647,6 +647,11 @@ struct cache_set {
->  	atomic_long_t		writeback_keys_done;
->  	atomic_long_t		writeback_keys_failed;
->  
-> +
-> +	atomic_long_t		reclaim;
-> +	atomic_long_t		flush_write;
-> +	atomic_long_t		retry_flush_write;
-> +
->  	enum			{
->  		ON_ERROR_UNREGISTER,
->  		ON_ERROR_PANIC,
-> diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
-> index 02a98dd..47fd0b8 100644
-> --- a/drivers/md/bcache/journal.c
-> +++ b/drivers/md/bcache/journal.c
-> @@ -372,6 +372,8 @@ static void btree_flush_write(struct cache_set *c)
->  	 */
->  	struct btree *b, *best;
->  	unsigned i;
-> +
-> +	atomic_long_inc(&c->flush_write);
->  retry:
->  	best = NULL;
->  
-> @@ -392,6 +394,7 @@ static void btree_flush_write(struct cache_set *c)
->  		if (!btree_current_write(b)->journal) {
->  			mutex_unlock(&b->write_lock);
->  			/* We raced */
-> +			atomic_long_inc(&c->retry_flush_write);
->  			goto retry;
->  		}
->  
-> @@ -471,6 +474,8 @@ static void journal_reclaim(struct cache_set *c)
->  	unsigned iter, n = 0;
->  	atomic_t p;
->  
-> +	atomic_long_inc(&c->reclaim);
-> +
->  	while (!atomic_read(&fifo_front(&c->journal.pin)))
->  		fifo_pop(&c->journal.pin, p);
->  
-> diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-> index 234b2f5..0afbf1a 100644
-> --- a/drivers/md/bcache/sysfs.c
-> +++ b/drivers/md/bcache/sysfs.c
-> @@ -65,6 +65,9 @@
->  
->  read_attribute(state);
->  read_attribute(cache_read_races);
-> +read_attribute(reclaim);
-> +read_attribute(flush_write);
-> +read_attribute(retry_flush_write);
->  read_attribute(writeback_keys_done);
->  read_attribute(writeback_keys_failed);
->  read_attribute(io_errors);
-> @@ -543,6 +546,15 @@ static unsigned bch_average_key_size(struct cache_set *c)
->  	sysfs_print(cache_read_races,
->  		    atomic_long_read(&c->cache_read_races));
->  
-> +	sysfs_print(reclaim,
-> +		    atomic_long_read(&c->reclaim));
-> +
-> +	sysfs_print(flush_write,
-> +		    atomic_long_read(&c->flush_write));
-> +
-> +	sysfs_print(retry_flush_write,
-> +		    atomic_long_read(&c->retry_flush_write));
-> +
->  	sysfs_print(writeback_keys_done,
->  		    atomic_long_read(&c->writeback_keys_done));
->  	sysfs_print(writeback_keys_failed,
-> @@ -729,6 +741,9 @@ static void bch_cache_set_internal_release(struct kobject *k)
->  
->  	&sysfs_bset_tree_stats,
->  	&sysfs_cache_read_races,
-> +	&sysfs_reclaim,
-> +	&sysfs_flush_write,
-> +	&sysfs_retry_flush_write,
->  	&sysfs_writeback_keys_done,
->  	&sysfs_writeback_keys_failed,
->  
-> 
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+---
+ drivers/md/bcache/bcache.h  |  5 +++++
+ drivers/md/bcache/journal.c |  5 +++++
+ drivers/md/bcache/sysfs.c   | 15 +++++++++++++++
+ 3 files changed, 25 insertions(+)
+
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index abd31e8..0432e28 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -647,6 +647,11 @@ struct cache_set {
+ 	atomic_long_t		writeback_keys_done;
+ 	atomic_long_t		writeback_keys_failed;
+ 
++
++	atomic_long_t		reclaim;
++	atomic_long_t		flush_write;
++	atomic_long_t		retry_flush_write;
++
+ 	enum			{
+ 		ON_ERROR_UNREGISTER,
+ 		ON_ERROR_PANIC,
+diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
+index 02a98dd..47fd0b8 100644
+--- a/drivers/md/bcache/journal.c
++++ b/drivers/md/bcache/journal.c
+@@ -372,6 +372,8 @@ static void btree_flush_write(struct cache_set *c)
+ 	 */
+ 	struct btree *b, *best;
+ 	unsigned i;
++
++	atomic_long_inc(&c->flush_write);
+ retry:
+ 	best = NULL;
+ 
+@@ -392,6 +394,7 @@ static void btree_flush_write(struct cache_set *c)
+ 		if (!btree_current_write(b)->journal) {
+ 			mutex_unlock(&b->write_lock);
+ 			/* We raced */
++			atomic_long_inc(&c->retry_flush_write);
+ 			goto retry;
+ 		}
+ 
+@@ -471,6 +474,8 @@ static void journal_reclaim(struct cache_set *c)
+ 	unsigned iter, n = 0;
+ 	atomic_t p;
+ 
++	atomic_long_inc(&c->reclaim);
++
+ 	while (!atomic_read(&fifo_front(&c->journal.pin)))
+ 		fifo_pop(&c->journal.pin, p);
+ 
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index 234b2f5..0afbf1a 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -65,6 +65,9 @@
+ 
+ read_attribute(state);
+ read_attribute(cache_read_races);
++read_attribute(reclaim);
++read_attribute(flush_write);
++read_attribute(retry_flush_write);
+ read_attribute(writeback_keys_done);
+ read_attribute(writeback_keys_failed);
+ read_attribute(io_errors);
+@@ -543,6 +546,15 @@ static unsigned bch_average_key_size(struct cache_set *c)
+ 	sysfs_print(cache_read_races,
+ 		    atomic_long_read(&c->cache_read_races));
+ 
++	sysfs_print(reclaim,
++		    atomic_long_read(&c->reclaim));
++
++	sysfs_print(flush_write,
++		    atomic_long_read(&c->flush_write));
++
++	sysfs_print(retry_flush_write,
++		    atomic_long_read(&c->retry_flush_write));
++
+ 	sysfs_print(writeback_keys_done,
+ 		    atomic_long_read(&c->writeback_keys_done));
+ 	sysfs_print(writeback_keys_failed,
+@@ -729,6 +741,9 @@ static void bch_cache_set_internal_release(struct kobject *k)
+ 
+ 	&sysfs_bset_tree_stats,
+ 	&sysfs_cache_read_races,
++	&sysfs_reclaim,
++	&sysfs_flush_write,
++	&sysfs_retry_flush_write,
+ 	&sysfs_writeback_keys_done,
+ 	&sysfs_writeback_keys_failed,
+ 
+-- 
+1.8.3.1
