@@ -1,111 +1,76 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:38340 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:56096 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752450AbeAFI2m (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 6 Jan 2018 03:28:42 -0500
+        id S1752511AbeAZJb7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 Jan 2018 04:31:59 -0500
+Date: Fri, 26 Jan 2018 17:31:38 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bart.vanassche@sandisk.com>,
-        Yi Zhang <yi.zhang@redhat.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 3/4] blk-mq: avoid to map CPU into stale hw queue
-Date: Sat,  6 Jan 2018 16:27:39 +0800
-Message-Id: <20180106082740.26442-4-ming.lei@redhat.com>
-In-Reply-To: <20180106082740.26442-1-ming.lei@redhat.com>
-References: <20180106082740.26442-1-ming.lei@redhat.com>
+To: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Cc: Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@fb.com>,
+        Stefan Haberland <sth@linux.vnet.ibm.com>,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        James Smart <james.smart@broadcom.com>,
+        linux-block@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 2/2] blk-mq: simplify queue mapping & schedule with each
+ possisble CPU
+Message-ID: <20180126093129.GA10926@ming.t460p>
+References: <20180116121010.GA26429@ming.t460p>
+ <7c24e321-2d3b-cdec-699a-f58c34300aa9@oracle.com>
+ <20180116153248.GA3018@ming.t460p>
+ <7f5bad86-febc-06fc-67c0-393777d172e4@oracle.com>
+ <20180117035159.GA9487@ming.t460p>
+ <8c8efce8-ea02-0a9e-8369-44c885f4731d@oracle.com>
+ <20180117062251.GC9487@ming.t460p>
+ <977e9c62-c7f2-d1df-7d6b-5903f3b21cb6@oracle.com>
+ <20180117095744.GF9487@ming.t460p>
+ <53da00dc-3d46-dcdb-2be4-277f79a9888b@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <53da00dc-3d46-dcdb-2be4-277f79a9888b@oracle.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-blk_mq_pci_map_queues() may not map one CPU into any hw queue, but its
-previous map isn't cleared yet, and may point to one stale hw queue
-index.
+Hi Jianchao,
 
-This patch fixes the following issue by clearing the mapping table before
-setting it up in blk_mq_pci_map_queues().
+On Fri, Jan 19, 2018 at 11:05:35AM +0800, jianchao.wang wrote:
+> Hi ming
+> 
+> Sorry for delayed report this.
+> 
+> On 01/17/2018 05:57 PM, Ming Lei wrote:
+> > 2) hctx->next_cpu can become offline from online before __blk_mq_run_hw_queue
+> > is run, there isn't warning, but once the IO is submitted to hardware,
+> > after it is completed, how does the HBA/hw queue notify CPU since CPUs
+> > assigned to this hw queue(irq vector) are offline? blk-mq's timeout
+> > handler may cover that, but looks too tricky.
+> 
+> In theory, the irq affinity will be migrated to other cpu. This is done by
 
-This patches fixes this following issue reported by Zhang Yi:
+Yes, but the other CPU should belong to this irq's affinity, and if all
+CPUs in the irq's affinity is DEAD, this irq vector will be shutdown,
+and if there is in-flight IO or will be, then the completion for this
+IOs won't be delivered to CPUs. And now seems we depend on queue's timeout
+handler to handle them.
 
-[  101.202734] BUG: unable to handle kernel NULL pointer dereference at 0000000094d3013f
-[  101.211487] IP: blk_mq_map_swqueue+0xbc/0x200
-[  101.216346] PGD 0 P4D 0
-[  101.219171] Oops: 0000 [#1] SMP
-[  101.222674] Modules linked in: sunrpc ipmi_ssif vfat fat intel_rapl sb_edac x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel kvm irqbypass crct10dif_pclmul crc32_pclmul ghash_clmulni_intel intel_cstate intel_uncore mxm_wmi intel_rapl_perf iTCO_wdt ipmi_si ipmi_devintf pcspkr iTCO_vendor_support sg dcdbas ipmi_msghandler wmi mei_me lpc_ich shpchp mei acpi_power_meter dm_multipath ip_tables xfs libcrc32c sd_mod mgag200 i2c_algo_bit drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops ttm drm ahci libahci crc32c_intel libata tg3 nvme nvme_core megaraid_sas ptp i2c_core pps_core dm_mirror dm_region_hash dm_log dm_mod
-[  101.284881] CPU: 0 PID: 504 Comm: kworker/u25:5 Not tainted 4.15.0-rc2 #1
-[  101.292455] Hardware name: Dell Inc. PowerEdge R730xd/072T6D, BIOS 2.5.5 08/16/2017
-[  101.301001] Workqueue: nvme-wq nvme_reset_work [nvme]
-[  101.306636] task: 00000000f2c53190 task.stack: 000000002da874f9
-[  101.313241] RIP: 0010:blk_mq_map_swqueue+0xbc/0x200
-[  101.318681] RSP: 0018:ffffc9000234fd70 EFLAGS: 00010282
-[  101.324511] RAX: ffff88047ffc9480 RBX: ffff88047e130850 RCX: 0000000000000000
-[  101.332471] RDX: ffffe8ffffd40580 RSI: ffff88047e509b40 RDI: ffff88046f37a008
-[  101.340432] RBP: 000000000000000b R08: ffff88046f37a008 R09: 0000000011f94280
-[  101.348392] R10: ffff88047ffd4d00 R11: 0000000000000000 R12: ffff88046f37a008
-[  101.356353] R13: ffff88047e130f38 R14: 000000000000000b R15: ffff88046f37a558
-[  101.364314] FS:  0000000000000000(0000) GS:ffff880277c00000(0000) knlGS:0000000000000000
-[  101.373342] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  101.379753] CR2: 0000000000000098 CR3: 000000047f409004 CR4: 00000000001606f0
-[  101.387714] Call Trace:
-[  101.390445]  blk_mq_update_nr_hw_queues+0xbf/0x130
-[  101.395791]  nvme_reset_work+0x6f4/0xc06 [nvme]
-[  101.400848]  ? pick_next_task_fair+0x290/0x5f0
-[  101.405807]  ? __switch_to+0x1f5/0x430
-[  101.409988]  ? put_prev_entity+0x2f/0xd0
-[  101.414365]  process_one_work+0x141/0x340
-[  101.418836]  worker_thread+0x47/0x3e0
-[  101.422921]  kthread+0xf5/0x130
-[  101.426424]  ? rescuer_thread+0x380/0x380
-[  101.430896]  ? kthread_associate_blkcg+0x90/0x90
-[  101.436048]  ret_from_fork+0x1f/0x30
-[  101.440034] Code: 48 83 3c ca 00 0f 84 2b 01 00 00 48 63 cd 48 8b 93 10 01 00 00 8b 0c 88 48 8b 83 20 01 00 00 4a 03 14 f5 60 04 af 81 48 8b 0c c8 <48> 8b 81 98 00 00 00 f0 4c 0f ab 30 8b 81 f8 00 00 00 89 42 44
-[  101.461116] RIP: blk_mq_map_swqueue+0xbc/0x200 RSP: ffffc9000234fd70
-[  101.468205] CR2: 0000000000000098
-[  101.471907] ---[ end trace 5fe710f98228a3ca ]---
-[  101.482489] Kernel panic - not syncing: Fatal exception
-[  101.488505] Kernel Offset: disabled
-[  101.497752] ---[ end Kernel panic - not syncing: Fatal exception
+> fixup_irqs() in the context of stop_machine.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
-Tested-by: Yi Zhang <yi.zhang@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 22 ++++++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1c66c319325c..dd21051fb251 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2622,9 +2622,27 @@ static int blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
- 
- static int blk_mq_update_queue_map(struct blk_mq_tag_set *set)
- {
--	if (set->ops->map_queues)
-+	if (set->ops->map_queues) {
-+		int cpu;
-+		/*
-+		 * transport .map_queues is usually done in the following
-+		 * way:
-+		 *
-+		 * for (queue = 0; queue < set->nr_hw_queues; queue++) {
-+		 * 	mask = get_cpu_mask(queue)
-+		 * 	for_each_cpu(cpu, mask)
-+		 * 		set->mq_map[cpu] = queue;
-+		 * }
-+		 *
-+		 * When we need to remap, the table has to be cleared for
-+		 * killing stale mapping since one CPU may not be mapped
-+		 * to any hw queue.
-+		 */
-+		for_each_possible_cpu(cpu)
-+			set->mq_map[cpu] = 0;
-+
- 		return set->ops->map_queues(set);
--	else
-+	} else
- 		return blk_mq_map_queues(set);
- }
- 
+> However, in my test, I found this log:
+> 
+> [  267.161043] do_IRQ: 7.33 No irq handler for vector
+> 
+> The 33 is the vector used by nvme cq.
+> The irq seems to be missed and sometimes IO hang occurred.
+
+As I mentioned above, it shouldn't be strange to see in CPU offline/online
+stress test.
+
+
 -- 
-2.9.5
+Ming
