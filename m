@@ -1,106 +1,232 @@
-Return-Path: <lsf-pc-bounces@lists.linux-foundation.org>
-To: Javier Gonzalez <javier@cnexlabs.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-co1nam03on0044.outbound.protection.outlook.com ([104.47.40.44]:46080
+        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752324AbeAZIae (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 Jan 2018 03:30:34 -0500
+From: Javier Gonzalez <javier@cnexlabs.com>
+To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
+CC: "lsf-pc@lists.linux-foundation.org"
+        <lsf-pc@lists.linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "jaegeuk@kernel.org" <jaegeuk@kernel.org>
+Subject: Re: [LSF/MM ATTEND] OCSSD topics
+Date: Fri, 26 Jan 2018 08:30:31 +0000
+Message-ID: <0A986779-992D-40A0-A8C6-7AE9049EF48F@cnexlabs.com>
 References: <986429B2-A254-4247-AA4F-F631A565DA8B@cnexlabs.com>
-	<52189623-69cf-79cd-d2e3-af2e202c01ec@lightnvm.io>
-	<0A986779-992D-40A0-A8C6-7AE9049EF48F@cnexlabs.com>
-From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <c73c736b-894f-2178-bee8-1011748fa26b@lightnvm.io>
-Date: Fri, 26 Jan 2018 10:54:47 +0100
+ <52189623-69cf-79cd-d2e3-af2e202c01ec@lightnvm.io>
+In-Reply-To: <52189623-69cf-79cd-d2e3-af2e202c01ec@lightnvm.io>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_869D24F9-9FF0-4887-9742-582EA13059CB";
+        protocol="application/pgp-signature"; micalg=pgp-sha512
 MIME-Version: 1.0
-In-Reply-To: <0A986779-992D-40A0-A8C6-7AE9049EF48F@cnexlabs.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
-	"jaegeuk@kernel.org" <jaegeuk@kernel.org>
-Subject: Re: [Lsf-pc] [LSF/MM ATTEND] OCSSD topics
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/lsf-pc>,
-	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=unsubscribe>
-List-Archive: <https://lists.linuxfoundation.org/mailman/private/lsf-pc/>
-List-Post: <mailto:lsf-pc@lists.linux-foundation.org>
-List-Help: <mailto:lsf-pc-request@lists.linux-foundation.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/lsf-pc>,
-	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
-Sender: lsf-pc-bounces@lists.linux-foundation.org
-Errors-To: lsf-pc-bounces@lists.linux-foundation.org
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-T24gMDEvMjYvMjAxOCAwOTozMCBBTSwgSmF2aWVyIEdvbnphbGV6IHdyb3RlOgo+PiBPbiAyNSBK
-YW4gMjAxOCwgYXQgMjIuMDIsIE1hdGlhcyBCasO4cmxpbmcgPG1iQGxpZ2h0bnZtLmlvPiB3cm90
-ZToKPj4KPj4gT24gMDEvMjUvMjAxOCAwNDoyNiBQTSwgSmF2aWVyIEdvbnphbGV6IHdyb3RlOgo+
-Pj4gSGksCj4+PiBUaGVyZSBhcmUgc29tZSB0b3BpY3MgdGhhdCBJIHdvdWxkIGxpa2UgdG8gZGlz
-Y3VzcyBhdCBMU0YvTU06Cj4+PiAgICAtIEluIHRoZSBwYXN0IHllYXIgd2UgaGF2ZSBkaXNjdXNz
-ZWQgYSBsb3QgaG93IHdlIGNhbiBpbnRlZ3JhdGUgdGhlCj4+PiAgICAgIE9wZW4tQ2hhbm5lbCBT
-U0QgKE9DU1NEKSBzcGVjIHdpdGggem9uZSBkZXZpY2VzIChTTVIpLiBUaGlzCj4+PiAgICAgIGRp
-c2N1c3Npb24gaXMgYm90aCBhdCB0aGUgaW50ZXJmYWNlIGxldmVsIGFuZCBhdCBhbiBpbi1rZXJu
-ZWwgbGV2ZWwuCj4+PiAgICAgIE5vdyB0aGF0IERhbWllbidzIGFuZCBIYW5uZXMnIHBhdGNoZXMg
-YXJlIHVwc3RyZWFtZWQgaW4gZ29vZCBzaGFwZSwKPj4+ICAgICAgaXQgd291bGQgYmUgYSBnb29k
-IG1vbWVudCB0byBkaXNjdXNzIGhvdyB3ZSBjYW4gaW50ZWdyYXRlIHRoZQo+Pj4gICAgICBMaWdo
-dE5WTSBzdWJzeXN0ZW0gd2l0aCB0aGUgZXhpc3RpbmcgY29kZS4KPj4KPj4gVGhlIFpCQy1PQ1NT
-RCBwYXRjaGVzCj4+IChodHRwczovL2dpdGh1Yi5jb20vT3BlbkNoYW5uZWxTU0QvbGludXgvdHJl
-ZS96YmMtc3VwcG9ydCkgdGhhdCBJIG1hZGUKPj4gbGFzdCB5ZWFyIGlzIGEgZ29vZCBzdGFydGlu
-ZyBwb2ludC4KPj4KPiAKPiBZZXMsIHRoaXMgcGF0Y2hlcyBpcyBhIGdvb2QgcGxhY2UgdG8gc3Rh
-cnQsIGJ1dCBhcyBtZW50aW9uZWQgYmVsb3csIHRoZXkKPiBkbyBub3QgYWRkcmVzcyBob3cgd2Ug
-d291bGQgZXhwb3NlIHRoZSBwYXJhbGxlbGlzbSBvbiByZXBvcnRfem9uZS4KPiAKPiBUaGUgd2F5
-IEkgc2VlIGl0LCB6b25lLWRldmljZXMgaW1wb3NlIHdyaXRlIGNvbnN0cmFpbnMgdG8gZ2FpbiBj
-YXBhY2l0eTsKPiBPQ1NTRCBkb2VzIHRoYXQgdG8gZW5hYmxlIHRoZSBwYXJhbGxlbGlzbSBvZiB0
-aGUgZGV2aWNlLiAKCkFsc28gY2FwYWNpdHkgZm9yIE9DU1NEcywgYXMgbW9zdCByYXcgZmxhc2gg
-aXMgZXhwb3NlZC4gSXQgaXMgdXAgdG8gdGhlIApob3N0IHRvIGRlY2lkZSBpZiBvdmVyLXByb3Zp
-c2lvbmluZyBpcyBuZWVkZWQuCgpUaGlzIHRoZW4gY2FuCj4gYmUgdXNlZCBieSBkaWZmZXJlbnQg
-dXNlcnMgdG8gZWl0aGVyIGxvd2VyIGRvd24gbWVkaWEgd2VhciwgcmVhY2ggYQo+IHN0YWJsZSBz
-dGF0ZSBhdCB0aGUgdmVyeSBlYXJseSBzdGFnZSBvciBndWFyYW50ZWUgdGlnaHQgbGF0ZW5jaWVz
-LiBUaGF0Cj4gZGVwZW5kcyBvbiBob3cgaXQgaXMgdXNlZC4gV2UgY2FuIHVzZSBhbiBPQ1NTRCBh
-cyBhIHpvbmUtZGV2aWNlIGFuZCBpdAo+IHdpbGwgd29yaywgYnV0IGl0IGlzIGNvbWluZyBiYWNr
-IHRvIHVzaW5nIGFuIGludGVyZmFjZSB0aGF0IHdpbGwgbmFycm93Cj4gZG93biB0aGUgT0NTU0Qg
-c2NvcGUgKGF0IGxlYXN0IGluIGl0cyBjdXJyZW50IGZvcm1hdCkuCj4gCj4+IFNwZWNpZmljYWxs
-eSwgaW4gQUxQU1MnMTcKPj4+ICAgICAgd2UgaGFkIGRpc2N1c3Npb25zIG9uIGhvdyB3ZSBjYW4g
-ZXh0ZW5kIHRoZSBrZXJuZWwgem9uZWQgZGV2aWNlCj4+PiAgICAgIGludGVyZmFjZSB3aXRoIHRo
-ZSBub3Rpb24gb2YgcGFyYWxsZWwgdW5pdHMgdGhhdCB0aGUgT0NTU0QgZ2VvbWV0cnkKPj4+ICAg
-ICAgYnVpbGRzIHVwb24uIFdlIGFyZSBub3cgYnJpbmdpbmcgdGhlIE9DU1NEIHNwZWMuIHRvIHN0
-YW5kYXJpemF0aW9uLAo+Pj4gICAgICBidXQgd2UgaGF2ZSB0aW1lIHRvIGluY29ycG9yYXRlIGZl
-ZWRiYWNrIGFuZCBjaGFuZ2VzIGludG8gdGhlIHNwZWMuCj4+Cj4+IFdoaWNoIHNwZWM/IHRoZSBP
-Q1NTRCAyIHNwZWMgdGhhdCBJIGhhdmUgY29weXJpZ2h0IG9uPyBJIGRvbid0IGJlbGlldmUKPj4g
-aXQgaGFzIGJlZW4gc3VibWl0dGVkIG9yIGlzIHVuZGVyIGNvbnNpZGVyYXRpb24gdG8gYW55IHN0
-YW5kYXJkcyBib2R5Cj4+IHlldCBhbmQgSSBkb24ndCBjdXJyZW50bHkgcGxhbiB0byBkbyB0aGF0
-Lgo+Pgo+PiBZb3UgbWlnaHQgaGF2ZSBtZWFudCAidG8gYmUgZmluYWxpemVkIi4gQXMgeW91IGtu
-b3csIEkgYW0gY3VycmVudGx5Cj4+IHNvbGljaXRpbmcgZmVlZGJhY2sgYW5kIGNoYW5nZSByZXF1
-ZXN0cyBmcm9tIHZlbmRvcnMgYW5kIHBhcnRuZXJzIHdpdGgKPj4gcmVzcGVjdCB0byB0aGUgc3Bl
-Y2lmaWNhdGlvbiBhbmQgaXMgcGxhbm5pbmcgb24gY2xvc2luZyBpdCBzb29uLiBJZgo+PiBDTkVY
-IGlzIGRvaW5nIHRoZWlyIG93biBuZXcgc3BlY2lmaWNhdGlvbiwgcGxlYXNlIGJlIG9wZW4gYWJv
-dXQgaXQsCj4+IGFuZCBkb24ndCBwdXQgaXQgdW5kZXIgdGhlIE9DU1NEIG5hbWUuCj4gCj4gQXMg
-eW91IGtub3csIHRoZXJlIGlzIGEgZ3JvdXAgb2YgY2xvdWQgcHJvdmlkZXJzIGFuZCB2ZW5kb3Jz
-IHRoYXQgaXMKPiBzdGFydGluZyB0byB3b3JrIG9uIHRoZSBzdGFuZGFyaXphdGlvbiBwcm9jZXNz
-IHdpdGggdGhlIGN1cnJlbnQgc3RhdGUgb2YKPiB0aGUgMi4wIHNwZWMgYXMgdGhlIHN0YXJpbmcg
-cG9pbnQgLSB5b3UgaGF2ZSBiZWVuIHBhcnQgb2YgdGhlc2UKPiBkaXNjdXNzaW9ucy4uLiBUaGUg
-Z29hbCBmb3IgdGhpcyBncm91cCBpcyB0byBjb2xsZWN0IHRoZSBmZWVkYmFjayBmcm9tCj4gYWxs
-IHBhcnRpZXMgYW5kIGNvbWUgdXAgd2l0aCBhIHNwZWMuIHRoYXQgaXMgdXNlZnVsIGFuZCBjb3Zl
-cnMgY2xvdWQKPiBuZWVkcy4gRXhhY3RseSBmb3IgLSBhcyB5b3UgaW1wbHkgLSwgbm90IHRvIHRp
-ZSB0aGUgc3BlYy4gdG8gYW4KPiBvcmdhbml6YXRpb24gYW5kL29yIGluZGl2aWR1YWwuIE15IGhv
-cGUgaXMgdGhhdCB0aGlzIHNwZWMgaXMgdmVyeQo+IHNpbWlsYXIgdG8gdGhlIE9DU1NEIDIuMCB0
-aGF0IF93ZV8gYWxsIGhhdmUgd29ya2VkIGhhcmQgb24gcHV0dGluZwo+IHRvZ2V0aGVyLgoKWWVz
-LCB0aGF0IGlzIG15IHBvaW50LiBUaGUgd29ya2dyb3VwIGRldmljZSBzcGVjaWZpY2F0aW9uIHlv
-dSBhcmUgCmRpc2N1c3NpbmcgbWF5IG9yIG1heSBub3QgYmUgT0NTU0QgMi4wIHNpbWlsYXIvY29t
-cGF0aWJsZSBhbmQgaXMgbm90IAp0aWVkIHRvIHRoZSBwcm9jZXNzIHRoYXQgaXMgY3VycmVudGx5
-IGJlaW5nIHJ1biBmb3IgdGhlIE9DU1NEIDIuMCAKc3BlY2lmaWNhdGlvbi4gUGxlYXNlIGtlZXAg
-T0NTU0Qgb3V0IG9mIHRoZSBkaXNjdXNzaW9ucyB1bnRpbCB0aGUgZGV2aWNlIApzcGVjaWZpY2F0
-aW9uIGZyb20gdGhlIHdvcmtncm91cCBoYXMgYmVlbiBjb21wbGV0ZWQgYW5kIG1hZGUgcHVibGlj
-LiAKSG9wZWZ1bGx5IHRoZSBkZXZpY2Ugc3BlY2lmaWNhdGlvbiB0dXJucyBvdXQgdG8gYmUgT0NT
-U0QgMi4wIGNvbXBhdGlibGUgCmFuZCB0aGUgYml0cyBjYW4gYmUgYWRkZWQgdG8gdGhlIDIuMCAo
-Mi4xKSBzcGVjaWZpY2F0aW9uLiBJZiBub3QsIGl0IGhhcyAKdG8gYmUgc3RhbmQtYWxvbmUsIHdp
-dGggaXRzIG93biBpbXBsZW1lbnRhdGlvbi4KCj4gCj4gTGF0ZXIgb24sIHdlIGNhbiB0cnkgdG8g
-dG8gY2hlY2tzIG9uIGxiYSAiYmF0Y2hlcyIsIGRlZmluZWQgYnkgdGhpcyBzYW1lCj4gd3JpdGUg
-cmVzdHJpY3Rpb25zLiBCdXQgeW91IGFyZSByaWdodCB0aGF0IGhhdmluZyBhIGZ1bGx5IHJhbmRv
-bSBsYmEKPiB2ZWN0b3Igd2lsbCByZXF1aXJlIGluZGl2aWR1YWwgY2hlY2tzIGFuZCB0aGF0IGlz
-IGJvdGggZXhwZW5zaXZlIGFuZAo+IGludHJ1c2l2ZS4gVGhpcyBjYW4gYmUgaXNvbGF0ZWQgYnkg
-ZmxhZ2dpbmcgdGhlIG5hdHVyZSBvZiB0aGUgYnZlYywKPiBzb21ldGhpbmcgYWxhIChzZXF1ZW50
-aWFsLCBiYXRjaGVkLCByYW5kb20pLgoKSSB0aGluayBpdCBtdXN0IHN0aWxsIGJlIGNoZWNrZWQu
-IE9uZSBjYW5ub3QgdHJ1c3QgdGhhdCB0aGUgTEJBcyBhcmUgYXMgCmV4cGVjdGVkLiBGb3IgZXhh
-bXBsZSwgdGhlIGNhc2Ugd2hlcmUgTEJBcyBhcmUgb3V0IG9mIGJvdW5kcyBhbmQgCmFjY2Vzc2Vz
-IGFub3RoZXIgcGFydGl0aW9uLgoKPiAKPj4gICBGb3IgZXhhbXBsZSBzdXBwb3J0ZWQgbmF0aXZl
-bHkgaW4gdGhlIE5WTWUgc3BlY2lmaWNhdGlvbi4KPiAKPiBUaGVuIHdlIGFncmVlIHRoYXQgYWlt
-aW5nIGF0IGEgc3RhcmRhcmQgYm9keSBpcyB0aGUgZ29hbCwgcmlnaHQ/CgpWZWN0b3IgSS9PIGlz
-IG9ydGhvZ29uYWwgdG8gcHJvcG9zaW5nIGEgem9uZS9vY3NzZCBwcm9wb3NhbCB0byB0aGUgTlZN
-ZSAKd29ya2dyb3VwLgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fXwpMc2YtcGMgbWFpbGluZyBsaXN0CkxzZi1wY0BsaXN0cy5saW51eC1mb3VuZGF0aW9uLm9y
-ZwpodHRwczovL2xpc3RzLmxpbnV4Zm91bmRhdGlvbi5vcmcvbWFpbG1hbi9saXN0aW5mby9sc2Yt
-cGMK
+--Apple-Mail=_869D24F9-9FF0-4887-9742-582EA13059CB
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
+
+> On 25 Jan 2018, at 22.02, Matias Bj=C3=B8rling <mb@lightnvm.io> wrote:
+>=20
+> On 01/25/2018 04:26 PM, Javier Gonzalez wrote:
+>> Hi,
+>> There are some topics that I would like to discuss at LSF/MM:
+>>   - In the past year we have discussed a lot how we can integrate the
+>>     Open-Channel SSD (OCSSD) spec with zone devices (SMR). This
+>>     discussion is both at the interface level and at an in-kernel =
+level.
+>>     Now that Damien's and Hannes' patches are upstreamed in good =
+shape,
+>>     it would be a good moment to discuss how we can integrate the
+>>     LightNVM subsystem with the existing code.
+>=20
+> The ZBC-OCSSD patches
+> (https://github.com/OpenChannelSSD/linux/tree/zbc-support) that I made
+> last year is a good starting point.
+>=20
+
+Yes, this patches is a good place to start, but as mentioned below, they
+do not address how we would expose the parallelism on report_zone.
+
+The way I see it, zone-devices impose write constrains to gain capacity;
+OCSSD does that to enable the parallelism of the device. This then can
+be used by different users to either lower down media wear, reach a
+stable state at the very early stage or guarantee tight latencies. That
+depends on how it is used. We can use an OCSSD as a zone-device and it
+will work, but it is coming back to using an interface that will narrow
+down the OCSSD scope (at least in its current format).
+
+> Specifically, in ALPSS'17
+>>     we had discussions on how we can extend the kernel zoned device
+>>     interface with the notion of parallel units that the OCSSD =
+geometry
+>>     builds upon. We are now bringing the OCSSD spec. to =
+standarization,
+>>     but we have time to incorporate feedback and changes into the =
+spec.
+>=20
+> Which spec? the OCSSD 2 spec that I have copyright on? I don't believe
+> it has been submitted or is under consideration to any standards body
+> yet and I don't currently plan to do that.
+>=20
+> You might have meant "to be finalized". As you know, I am currently
+> soliciting feedback and change requests from vendors and partners with
+> respect to the specification and is planning on closing it soon. If
+> CNEX is doing their own new specification, please be open about it,
+> and don't put it under the OCSSD name.
+
+As you know, there is a group of cloud providers and vendors that is
+starting to work on the standarization process with the current state of
+the 2.0 spec as the staring point - you have been part of these
+discussions... The goal for this group is to collect the feedback from
+all parties and come up with a spec. that is useful and covers cloud
+needs. Exactly for - as you imply -, not to tie the spec. to an
+organization and/or individual. My hope is that this spec is very
+similar to the OCSSD 2.0 that _we_ all have worked hard on putting
+together.
+
+In any case, my intention with this topic is not discussing the name or
+the owners of the spec., but rather seeking feedback from the kernel
+community, which is well experienced in implementing, dealing with and
+supporting specifications.
+
+>>          Some of the challenges are (i) adding vector I/O interface =
+to the
+>>     bio structure and (ii) extending the report zone to have the =
+notion
+>>     of parallelism. I have patches implementing the OCSSD 2.0 spec =
+that
+>>     abstract the geometry and allow upper layers to deal with write
+>>     restrictions and the parallelism of the device, but this is still
+>>     very much OCSSD-specific.
+>=20
+> For the vector part, one can look into Ming's work on multi-page bvec
+> (https://lkml.org/lkml/2017/12/18/496). When that code is in, it
+> should be possible to implement the rest. One nagging feeling I have
+> is that the block core code need to be updated to understand vectors.
+> That will be complex given I/O checks are all based on ranges and is
+> cheap, while for vectors it is significantly more expensive due to
+> each LBA much be checked individually (one reason it is a separate
+> subsystem). It might not be worth it until the vector api has broader
+> market adoption.
+
+Yes, we have discussed this since the first version of the patches :)
+
+One if the things that we could do - at least for a first version - is
+using LBA ranges based on write restrictions (ws_min, ws_opt in oscssd
+terms). This will limit using one parallel unit at a time on I/O
+submission, but allows file systems to have the notion of the
+parallelism for data placement. The device bandwidth should also be
+saturated at fairly low queue depths - namely the number of parallel
+units.
+
+Later on, we can try to to checks on lba "batches", defined by this same
+write restrictions. But you are right that having a fully random lba
+vector will require individual checks and that is both expensive and
+intrusive. This can be isolated by flagging the nature of the bvec,
+something ala (sequential, batched, random).
+
+>  For example supported natively in the NVMe specification.
+
+Then we agree that aiming at a stardard body is the goal, right?
+
+> For extending report zones, one can do (start LBA:end LBA) (similarly
+> to the device mapper interface), and then have a list of those to
+> describe the start and end of each parallel unit.
+
+Good idea. We probably need to describe the parallel unit in its own
+structure, since they might differ. Here I'm thinking of (i) different
+ocssds accessible to the same host and (ii) the possibility of some
+parallel units accepting random I/O, supported by the device (if this is
+relevant at this point...).
+
+>>   - I have started to use the above to do a f2fs implementation, =
+where
+>>     we would implement the data placement and I/O scheduling directly =
+in
+>>     the FS, as opposed to using pblk - at least for the journaled =
+part.
+>>     The random I/O partition necessary for metadata can either reside =
+in
+>>     a different drive or use a pblk instance for it. This is very =
+much
+>>     work in progress, so having feedback form the f2fs guys (or other
+>>     journaled file systems) would help to start the work in the right
+>>     direction. Maybe this is interesting for other file systems =
+too...
+>=20
+> We got much feedback from Jaegeuk. =46rom his feedback, I did the ZBC
+> work with f2fs, which used a single parallel unit. To improve on that,
+> one solution is to extend dm-stripe to understand zones (it can
+> already be configured correctly... but it should expose zone entries
+> as well) and then use that for doing stripes across parallel units
+> with f2fs. This would fit into the standard codebase and doesn't add a
+> whole lot of OCSSD-only bits.
+>=20
+
+It can be a start, though I was thinking more on how we could plug into
+f2fs garbage collection and metadata to place data in a smart way. I
+know this is a matter of sitting down with the code and submitting
+patches, but if we are talking about actually providing a benefit for
+file systems, why not open the discussion to the file system folks?
+
+My experience building the RocksDB backend for Open-Channel is that it =
+is
+fairly simple to build the abstractions that allow using an OCSSD, but
+it is difficult to plug in the right places to take advantage of the
+parallelism, since it requires a good understanding of the placement
+internals.
+
+
+>>   - Finally, now that pblk is becoming stable, and given the advent =
+of
+>>     devices imposing sequential-only I/O, would it make sense to
+>>     generalize pblk as a device mapper translation layer that can be
+>>     used for random I/O partitions?
+>=20
+> dm-zoned fills this niche. Similarly as above, combine it with zone
+> aware dm-stripe and it is a pretty good solution. However, given that
+> pblk does a lot more than making I/Os sequential, I can see why it
+> will be nice to have as a device mapper. It could be the dual-solution
+> that we previously discussed, where pblk can use either the
+> traditional scalar or vector interface, depending if the drive has
+> exposed a separate vector interface.
+
+Exactly. My intention bringing this up is validating the use case before
+starting to implement it.
+
+> We have ad internal use cases for
+>>     using such translation layer for frontswap devices. Maybe others =
+are
+>>     looking at this too...
+>> Javier
+
+Javier
+
+--Apple-Mail=_869D24F9-9FF0-4887-9742-582EA13059CB
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="signature.asc"
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAlpq5yQACgkQIX4xUKFR
+nnTTjxAAuFluImSxiG7reeL1B1mTTmXV4k+QU/wV8RkZSHGdT5vCKZY0Lq727Q3M
+APpkln/GkBvTCFd20WQk7/Um/qydtSro2kiUmdNo6Km6weIixwsPQs2+3sEFgSzg
+h1MAnln9WiEYtTTXrr4W4YHxsqWYwZEZ2mXzZyxbiAKtu25rGF+me+0J7Npj4qk2
++To+TgFM8FFk1VXxtTAU1iAnu634zN3tArkyarPxFX7Fc3tsgXsKCa1C4DB71dxK
+YxaPtsLOTGQCQIwNxaUiL0ercrD/uL60Qr/EsrpQrBTNScXoi51G1BES00dbPi9G
+hy/WM6L3b3cyP4DZg6lz4lk9tAaOgZRAvlc2ELeiwxDSp0K1GLQJ0ujlkf9nguMt
+RUlceJlurQrYFJGmJH2R8hWAacWrAu8uwhwQIgjKcVQoVwNRMCLl3/3kZ31A/HR5
+JQsEfes5xgSD2sJMbrJidQO6RegPASQi4yrmM+06FUtT7TBD3jGeBRCl2ft0KRSG
+CEbRL2zWXMFwXH8hMoMzBWU3S6/njxGfoL8Zq5yxCe5mSzcIuSK5QwX4nytzvxMq
+u49JRkLzChDBBla9He3zpsurLniA/KiOQjEKW4ZE/xl3st6AGD1tUJhUYLx8GyAh
+Qi0Ofk6bHrPA1d9GHiE8ruwWcpbTeLylowVJ4xltRgizfiZcnRA=
+=FDoL
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_869D24F9-9FF0-4887-9742-582EA13059CB--
