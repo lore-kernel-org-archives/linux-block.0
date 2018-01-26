@@ -1,51 +1,21 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:33344 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751534AbeAaIXq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Jan 2018 03:23:46 -0500
-Date: Wed, 31 Jan 2018 16:23:32 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: lsf-pc@lists.linux-foundation.org, Linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [LSF/MM TOPIC] KPTI effect on IO performance
-Message-ID: <20180131082331.GA25888@ming.t460p>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: remove smart1,2.h
+To: Corentin Labbe <clabbe@baylibre.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1516997561-13708-1-git-send-email-clabbe@baylibre.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <55f4f9c9-f851-4ec6-68e1-2e85f12442ab@kernel.dk>
+Date: Fri, 26 Jan 2018 13:20:22 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <1516997561-13708-1-git-send-email-clabbe@baylibre.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Hi All,
+On 1/26/18 1:12 PM, Corentin Labbe wrote:
+> smart1,2.h is unused since commit d436641439e0 ("cpqarray: remove it from the kernel")
+> Remove it from tree.
 
-After KPTI is merged, there is extra load introduced to context switch
-between user space and kernel space. It is observed on my laptop that one
-syscall takes extra ~0.15us[1] compared with 'nopti'.
+Indeed, thanks, applied.
 
-IO performance is affected too, it is observed that IOPS drops by 32% in
-my test[2] on null_blk compared with 'nopti':
-
-randread IOPS on latest linus tree:
--------------------------------------------------
-| randread IOPS     | randread IOPS with 'nopti'|	
-------------------------------------------------
-| 928K              | 1372K                     |	
-------------------------------------------------
-
-
-Two paths are affected, one is IO submission(read, write,... syscall),
-another is the IO completion path in which interrupt may be triggered
-from user space, and context switch is needed.
-
-So is there something we can do for decreasing the effect on IO performance?
-
-This effect may make Hannes's issue[3] worse, and maybe 'irq poll' should be
-used more widely for all high performance IO device, even some optimization
-should be considered for KPTI's effect.
-
-
-[1] http://people.redhat.com/minlei/tests/tools/syscall_speed.c
-[2] http://people.redhat.com/minlei/tests/tools/null_perf
-[3] [LSF/MM TOPIC] irq affinity handling for high CPU count machines
-	https://marc.info/?t=151722156800002&r=1&w=2
-
-Thanks,
-Ming
+-- 
+Jens Axboe
