@@ -1,94 +1,78 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:37960 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751487AbeAENQs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jan 2018 08:16:48 -0500
-Received: by mail-wm0-f68.google.com with SMTP id 64so2415603wme.3
-        for <linux-block@vger.kernel.org>; Fri, 05 Jan 2018 05:16:47 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 08/25] lightnvm: refactor target type lookup
-Date: Fri,  5 Jan 2018 14:16:04 +0100
-Message-Id: <20180105131621.20808-9-m@bjorling.me>
-In-Reply-To: <20180105131621.20808-1-m@bjorling.me>
-References: <20180105131621.20808-1-m@bjorling.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mx2.suse.de ([195.135.220.15]:50105 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751159AbeA1GjQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 28 Jan 2018 01:39:16 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Junhui Tang <tang.junhui@zte.com.cn>,
+        Michael Lyle <mlyle@lyle.org>
+Subject: [PATCH v4 08/13] bcache: stop all attached bcache devices for a retired cache set
+Date: Sat, 27 Jan 2018 22:24:01 +0800
+Message-Id: <20180127142406.89741-9-colyli@suse.de>
+In-Reply-To: <20180127142406.89741-1-colyli@suse.de>
+References: <20180127142406.89741-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Javier González <javier@cnexlabs.com>
+When there are too many I/O errors on cache device, current bcache code
+will retire the whole cache set, and detach all bcache devices. But the
+detached bcache devices are not stopped, which is problematic when bcache
+is in writeback mode.
 
-Refactor target type lookup to use/not use locks explicitly instead of
-using a hidden parameter to make the function locking.
+If the retired cache set has dirty data of backing devices, continue
+writing to bcache device will write to backing device directly. If the
+LBA of write request has a dirty version cached on cache device, next time
+when the cache device is re-registered and backing device re-attached to
+it again, the stale dirty data on cache device will be written to backing
+device, and overwrite latest directly written data. This situation causes
+a quite data corruption.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
+This patch checkes whether cache_set->io_disable is true in
+__cache_set_unregister(). If cache_set->io_disable is true, it means cache
+set is unregistering by too many I/O errors, then all attached bcache
+devices will be stopped as well. If cache_set->io_disable is not true, it
+means __cache_set_unregister() is triggered by writing 1 to sysfs file
+/sys/fs/bcache/<UUID>/bcache/stop. This is an exception because users do
+it explicitly, this patch keeps existing behavior and does not stop any
+bcache device.
+
+Even the failed cache device has no dirty data, stopping bcache device is
+still a desired behavior by many Ceph and data base users. Then their
+application will report I/O errors due to disappeared bcache device, and
+operation people will know the cache device is broken or disconnected.
+
+Changelog:
+v2: add reviewed-by from Hannes.
+v1: initial version for review.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
+Cc: Michael Lyle <mlyle@lyle.org>
 ---
- drivers/lightnvm/core.c | 30 +++++++++++++++++-------------
- 1 file changed, 17 insertions(+), 13 deletions(-)
+ drivers/md/bcache/super.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 6d6d2c1..5c2d0f3 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -220,21 +220,25 @@ static const struct block_device_operations nvm_fops = {
- 	.owner		= THIS_MODULE,
- };
- 
--static struct nvm_tgt_type *nvm_find_target_type(const char *name, int lock)
-+static struct nvm_tgt_type *__nvm_find_target_type(const char *name)
- {
--	struct nvm_tgt_type *tmp, *tt = NULL;
-+	struct nvm_tgt_type *tt;
- 
--	if (lock)
--		down_write(&nvm_tgtt_lock);
-+	list_for_each_entry(tt, &nvm_tgt_types, list)
-+		if (!strcmp(name, tt->name))
-+			return tt;
- 
--	list_for_each_entry(tmp, &nvm_tgt_types, list)
--		if (!strcmp(name, tmp->name)) {
--			tt = tmp;
--			break;
--		}
-+	return NULL;
-+}
-+
-+static struct nvm_tgt_type *nvm_find_target_type(const char *name)
-+{
-+	struct nvm_tgt_type *tt;
-+
-+	down_write(&nvm_tgtt_lock);
-+	tt = __nvm_find_target_type(name);
-+	up_write(&nvm_tgtt_lock);
- 
--	if (lock)
--		up_write(&nvm_tgtt_lock);
- 	return tt;
- }
- 
-@@ -249,7 +253,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 	void *targetdata;
- 	int ret;
- 
--	tt = nvm_find_target_type(create->tgttype, 1);
-+	tt = nvm_find_target_type(create->tgttype);
- 	if (!tt) {
- 		pr_err("nvm: target type %s not found\n", create->tgttype);
- 		return -EINVAL;
-@@ -523,7 +527,7 @@ int nvm_register_tgt_type(struct nvm_tgt_type *tt)
- 	int ret = 0;
- 
- 	down_write(&nvm_tgtt_lock);
--	if (nvm_find_target_type(tt->name, 0))
-+	if (__nvm_find_target_type(tt->name))
- 		ret = -EEXIST;
- 	else
- 		list_add(&tt->list, &nvm_tgt_types);
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 4204d75aee7b..97e3bb8e1aee 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1478,6 +1478,14 @@ static void __cache_set_unregister(struct closure *cl)
+ 				dc = container_of(c->devices[i],
+ 						  struct cached_dev, disk);
+ 				bch_cached_dev_detach(dc);
++				/*
++				 * If we come here by too many I/O errors,
++				 * bcache device should be stopped too, to
++				 * keep data consistency on cache and
++				 * backing devices.
++				 */
++				if (test_bit(CACHE_SET_IO_DISABLE, &c->flags))
++					bcache_device_stop(c->devices[i]);
+ 			} else {
+ 				bcache_device_stop(c->devices[i]);
+ 			}
 -- 
-2.9.3
+2.15.1
