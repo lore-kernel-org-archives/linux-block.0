@@ -1,47 +1,51 @@
-Return-Path: <joseph.qi@linux.alibaba.com>
-From: Joseph Qi <joseph.qi@linux.alibaba.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block <linux-block@vger.kernel.org>,
- Gang Deng <gavin.dg@linux.alibaba.com>
-Subject: [RFC] hard LOCKUP caused by race between blk_init_queue_node and
- blkcg_print_blkgs
-Message-ID: <5ac9562b-b20a-9f5a-90c5-2187552b6f09@linux.alibaba.com>
-Date: Tue, 30 Jan 2018 19:21:43 +0800
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <ebiggers3@gmail.com>
+Return-Path: <ebiggers3@gmail.com>
+From: Eric Biggers <ebiggers3@gmail.com>
+To: linux-kernel@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: Zhouyi Zhou <yizhouzhou@ict.ac.cn>,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	Eric Biggers <ebiggers@google.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] Revert "kernel/relay.c: fix potential memory leak"
+Date: Fri, 26 Jan 2018 16:47:59 -0800
+Message-Id: <20180127004759.101823-1-ebiggers3@gmail.com>
+In-Reply-To: <089e082d01d08b36a6055cd763ca@google.com>
+References: <089e082d01d08b36a6055cd763ca@google.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens and Folks,
+From: Eric Biggers <ebiggers@google.com>
 
-Recently we've gotten a hard LOCKUP issue. After investigating the issue
-we've found a race between blk_init_queue_node and blkcg_print_blkgs.
-The race is described below.
+This reverts commit ba62bafe942b159a6109cbec780d36496e06b6c5.
 
-blk_init_queue_node                 blkcg_print_blkgs
-  blk_alloc_queue_node (1)
-    q->queue_lock = &q->__queue_lock (2)
-    blkcg_init_queue(q) (3)
-                                    spin_lock_irq(blkg->q->queue_lock) (4)
-  q->queue_lock = lock (5)
-                                    spin_unlock_irq(blkg->q->queue_lock) (6)
+This commit introduced a double free bug, because 'chan' is already
+freed by the line:
 
-(1) allocate an uninitialized queue;
-(2) initialize queue_lock to its default internal lock;
-(3) initialize blkcg part of request queue, which will create blkg and
-then insert it to blkg_list;
-(4) traverse blkg_list and find the created blkg, and then take its
-queue lock, here it is the default *internal lock*;
-(5) *race window*, now queue_lock is overridden with *driver specified
-lock*;
-(6) now unlock *driver specified lock*, not the locked *internal lock*,
-unlock balance breaks.
+    kref_put(&chan->kref, relay_destroy_channel);
 
-For the issue above, I think blkcg_init_queue is a bit earlier. We
-can't allow a further use before request queue is fully initialized.
-Since blk_init_queue_node is a really common path and it allows driver
-to override the default internal lock, I'm afraid several other places
-may also have the same issue.
-Am I missing something here?
+This bug was found by syzkaller, using the BLKTRACESETUP ioctl.
 
-Thanks,
-Joseph
+Fixes: ba62bafe942b ("kernel/relay.c: fix potential memory leak")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Cc: <stable@vger.kernel.org> # v4.7+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ kernel/relay.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/kernel/relay.c b/kernel/relay.c
+index 39a9dfc69486..55da824f4adc 100644
+--- a/kernel/relay.c
++++ b/kernel/relay.c
+@@ -611,7 +611,6 @@ struct rchan *relay_open(const char *base_filename,
+ 
+ 	kref_put(&chan->kref, relay_destroy_channel);
+ 	mutex_unlock(&relay_channels_mutex);
+-	kfree(chan);
+ 	return NULL;
+ }
+ EXPORT_SYMBOL_GPL(relay_open);
+-- 
+2.16.0.rc1.238.g530d649a79-goog
