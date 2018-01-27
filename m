@@ -1,40 +1,36 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mxhk.zte.com.cn ([63.217.80.70]:59524 "EHLO mxhk.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753044AbeAaD22 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jan 2018 22:28:28 -0500
-From: tang.junhui@zte.com.cn
-To: colyli@suse.de, mlyle@lyle.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        tang.junhui@zte.com.cn
-Subject: [PATCH] bcache: fix error return value in memory shrink
-Date: Wed, 31 Jan 2018 11:30:53 +0800
-Message-Id: <1517369453-28193-1-git-send-email-tang.junhui@zte.com.cn>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ebiggers3@gmail.com>
+Return-Path: <ebiggers3@gmail.com>
+From: Eric Biggers <ebiggers3@gmail.com>
+To: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Eric Biggers <ebiggers@google.com>
+Subject: [PATCH] blktrace_api.h: fix comment for struct blk_user_trace_setup
+Date: Fri, 26 Jan 2018 16:58:06 -0800
+Message-Id: <20180127005806.105338-1-ebiggers3@gmail.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+From: Eric Biggers <ebiggers@google.com>
 
-In bch_mca_scan(), the return value should not be the number of freed btree
-nodes, but the number of pages of freed btree nodes.
+'struct blk_user_trace_setup' is passed to BLKTRACESETUP, not
+BLKTRACESTART.
 
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/md/bcache/btree.c | 2 +-
+ include/uapi/linux/blktrace_api.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index 81e8dc3..a5fbccc 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -718,7 +718,7 @@ static unsigned long bch_mca_scan(struct shrinker *shrink,
- 	}
- out:
- 	mutex_unlock(&c->bucket_lock);
--	return freed;
-+	return freed * c->btree_pages;
- }
+diff --git a/include/uapi/linux/blktrace_api.h b/include/uapi/linux/blktrace_api.h
+index 20d1490d6377..3c50e07ee833 100644
+--- a/include/uapi/linux/blktrace_api.h
++++ b/include/uapi/linux/blktrace_api.h
+@@ -131,7 +131,7 @@ enum {
+ #define BLKTRACE_BDEV_SIZE	32
  
- static unsigned long bch_mca_count(struct shrinker *shrink,
+ /*
+- * User setup structure passed with BLKTRACESTART
++ * User setup structure passed with BLKTRACESETUP
+  */
+ struct blk_user_trace_setup {
+ 	char name[BLKTRACE_BDEV_SIZE];	/* output */
 -- 
-1.8.3.1
+2.16.0.rc1.238.g530d649a79-goog
