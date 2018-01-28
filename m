@@ -1,101 +1,159 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:43996 "EHLO mx1.redhat.com"
+Received: from mx2.suse.de ([195.135.220.15]:36350 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751562AbeAOQEk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jan 2018 11:04:40 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>
-Cc: Laurence Oberman <loberman@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 2/2] genirq/affinity: try best to make sure online CPU is assigned to vector
-Date: Tue, 16 Jan 2018 00:03:45 +0800
-Message-Id: <20180115160345.2611-3-ming.lei@redhat.com>
-In-Reply-To: <20180115160345.2611-1-ming.lei@redhat.com>
-References: <20180115160345.2611-1-ming.lei@redhat.com>
+        id S1751607AbeA1DZV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 27 Jan 2018 22:25:21 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Michael Lyle <mlyle@lyle.org>,
+        Junhui Tang <tang.junhui@zte.com.cn>
+Subject: [PATCH v4 12/13] bcache: stop bcache device when backing device is offline
+Date: Sun, 28 Jan 2018 09:56:24 +0800
+Message-Id: <20180128015625.128497-13-colyli@suse.de>
+In-Reply-To: <20180128015625.128497-1-colyli@suse.de>
+References: <20180128015625.128497-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-84676c1f21 ("genirq/affinity: assign vectors to all possible CPUs")
-causes irq vector assigned to all offline CPUs, and IO hang is reported
-on HPSA by Laurence.
+Currently bcache does not handle backing device failure, if backing
+device is offline and disconnected from system, its bcache device can still
+be accessible. If the bcache device is in writeback mode, I/O requests even
+can success if the requests hit on cache device. That is to say, when and
+how bcache handles offline backing device is undefined.
 
-This patch fixes this issue by trying best to make sure online CPU can be
-assigned to irq vector. And take two steps to spread irq vectors:
+This patch tries to handle backing device offline in a rather simple way,
+- Add cached_dev->status_update_thread kernel thread to update backing
+  device status in every 1 second.
+- Add cached_dev->offline_seconds to record how many seconds the backing
+  device is observed to be offline. If the backing device is offline for
+  BACKING_DEV_OFFLINE_TIMEOUT (30) seconds, set dc->io_disable to 1 and
+  call bcache_device_stop() to stop the bache device which linked to the
+  offline backing device.
 
-1) spread irq vectors across offline CPUs in the node cpumask
+Now if a backing device is offline for BACKING_DEV_OFFLINE_TIMEOUT seconds,
+its bcache device will be removed, then user space application writing on
+it will get error immediately, and handler the device failure in time.
 
-2) spread irq vectors across online CPUs in the node cpumask
+This patch is quite simple, does not handle more complicated situations.
+Once the bcache device is stopped, users need to recovery the backing
+device, register and attach it manually.
 
-Fixes: 84676c1f21 ("genirq/affinity: assign vectors to all possible CPUs")
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Christoph Hellwig <hch@lst.de>
-Reported-by: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Cc: Michael Lyle <mlyle@lyle.org>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
 ---
- kernel/irq/affinity.c | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
+ drivers/md/bcache/bcache.h |  2 ++
+ drivers/md/bcache/super.c  | 55 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 57 insertions(+)
 
-diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
-index 99eb38a4cc83..8b716548b3db 100644
---- a/kernel/irq/affinity.c
-+++ b/kernel/irq/affinity.c
-@@ -103,6 +103,10 @@ static int irq_vecs_spread_affinity(struct cpumask *irqmsk,
- 	int v, ncpus = cpumask_weight(nmsk);
- 	int vecs_to_assign, extra_vecs;
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 5a811959392d..9eedb35d01bc 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -338,6 +338,7 @@ struct cached_dev {
  
-+	/* May happen when spreading vectors across offline cpus */
-+	if (!ncpus)
-+		return 0;
-+
- 	/* How many vectors we will try to spread */
- 	vecs_to_assign = min(max_vecs, ncpus);
+ 	struct keybuf		writeback_keys;
  
-@@ -165,13 +169,16 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 	/* Stabilize the cpumasks */
- 	get_online_cpus();
- 	build_node_to_possible_cpumask(node_to_possible_cpumask);
--	nodes = get_nodes_in_cpumask(node_to_possible_cpumask, cpu_possible_mask,
--				     &nodemsk);
- 
++	struct task_struct	*status_update_thread;
  	/*
-+	 * Don't spread irq vector across offline node.
-+	 *
- 	 * If the number of nodes in the mask is greater than or equal the
- 	 * number of vectors we just spread the vectors across the nodes.
-+	 *
- 	 */
-+	nodes = get_nodes_in_cpumask(node_to_possible_cpumask, cpu_online_mask,
-+				     &nodemsk);
- 	if (affv <= nodes) {
- 		for_each_node_mask(n, nodemsk) {
- 			cpumask_copy(masks + curvec,
-@@ -182,14 +189,22 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 		goto done;
- 	}
+ 	 * Order the write-half of writeback operations strongly in dispatch
+ 	 * order.  (Maintain LBA order; don't allow reads completing out of
+@@ -384,6 +385,7 @@ struct cached_dev {
+ #define DEFAULT_CACHED_DEV_ERROR_LIMIT 64
+ 	atomic_t		io_errors;
+ 	unsigned		error_limit;
++	unsigned		offline_seconds;
+ };
  
-+	nodes_clear(nodemsk);
-+	nodes = get_nodes_in_cpumask(node_to_possible_cpumask, cpu_possible_mask,
-+				     &nodemsk);
- 	for_each_node_mask(n, nodemsk) {
- 		int vecs_per_node;
+ enum alloc_reserve {
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 14fce3623770..85adf1e29d11 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -646,6 +646,11 @@ static int ioctl_dev(struct block_device *b, fmode_t mode,
+ 		     unsigned int cmd, unsigned long arg)
+ {
+ 	struct bcache_device *d = b->bd_disk->private_data;
++	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
++
++	if (dc->io_disable)
++		return -EIO;
++
+ 	return d->ioctl(d, mode, cmd, arg);
+ }
  
- 		/* Spread the vectors per node */
- 		vecs_per_node = (affv - (curvec - affd->pre_vectors)) / nodes;
+@@ -856,6 +861,45 @@ static void calc_cached_dev_sectors(struct cache_set *c)
+ 	c->cached_dev_sectors = sectors;
+ }
  
--		cpumask_and(nmsk, cpu_possible_mask, node_to_possible_cpumask[n]);
-+		/* spread vectors across offline cpus in the node cpumask */
-+		cpumask_andnot(nmsk, node_to_possible_cpumask[n], cpu_online_mask);
-+		irq_vecs_spread_affinity(&masks[curvec], last_affv - curvec,
-+				vecs_per_node, nmsk);
++#define BACKING_DEV_OFFLINE_TIMEOUT 5
++static int cached_dev_status_update(void *arg)
++{
++	struct cached_dev *dc = arg;
++	struct request_queue *q;
++	char buf[BDEVNAME_SIZE];
++
++	/*
++	 * If this delayed worker is stopping outside, directly quit here.
++	 * dc->io_disable might be set via sysfs interface, so check it
++	 * here too.
++	 */
++	while (!kthread_should_stop() && !dc->io_disable) {
++		q = bdev_get_queue(dc->bdev);
++		if (blk_queue_dying(q))
++			dc->offline_seconds++;
++		else
++			dc->offline_seconds = 0;
++
++		if (dc->offline_seconds >= BACKING_DEV_OFFLINE_TIMEOUT) {
++			pr_err("%s: device offline for %d seconds",
++				bdevname(dc->bdev, buf),
++				BACKING_DEV_OFFLINE_TIMEOUT);
++			pr_err("%s: disable I/O request due to backing "
++				"device offline", dc->disk.name);
++			dc->io_disable = true;
++			/* let others know earlier that io_disable is true */
++			smp_mb();
++			bcache_device_stop(&dc->disk);
++			break;
++		}
++
++		schedule_timeout_interruptible(HZ);
++	}
++
++	dc->status_update_thread = NULL;
++	return 0;
++}
++
+ void bch_cached_dev_run(struct cached_dev *dc)
+ {
+ 	struct bcache_device *d = &dc->disk;
+@@ -898,6 +942,15 @@ void bch_cached_dev_run(struct cached_dev *dc)
+ 	if (sysfs_create_link(&d->kobj, &disk_to_dev(d->disk)->kobj, "dev") ||
+ 	    sysfs_create_link(&disk_to_dev(d->disk)->kobj, &d->kobj, "bcache"))
+ 		pr_debug("error creating sysfs link");
++
++	dc->status_update_thread = kthread_run(cached_dev_status_update,
++					       dc,
++					      "bcache_status_update");
++	if (IS_ERR(dc->status_update_thread)) {
++		pr_warn("bcache: failed to create bcache_status_update "
++			"kthread, continue to run without monitoring backing "
++			"device status");
++	}
+ }
  
-+		/* spread vectors across online cpus in the node cpumask */
-+		cpumask_and(nmsk, node_to_possible_cpumask[n], cpu_online_mask);
- 		curvec += irq_vecs_spread_affinity(&masks[curvec],
- 						   last_affv - curvec,
- 						   vecs_per_node, nmsk);
+ /*
+@@ -1118,6 +1171,8 @@ static void cached_dev_free(struct closure *cl)
+ 		kthread_stop(dc->writeback_thread);
+ 	if (dc->writeback_write_wq)
+ 		destroy_workqueue(dc->writeback_write_wq);
++	if (!IS_ERR_OR_NULL(dc->status_update_thread))
++		kthread_stop(dc->status_update_thread);
+ 
+ 	if (atomic_read(&dc->running))
+ 		bd_unlink_disk_holder(dc->bdev, dc->disk.disk);
 -- 
-2.9.5
+2.15.1
