@@ -1,44 +1,82 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59762 "EHLO mx1.redhat.com"
+Received: from mx2.suse.de ([195.135.220.15]:34386 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751464AbeA3Anu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Jan 2018 19:43:50 -0500
-Date: Mon, 29 Jan 2018 19:43:48 -0500
-From: Jerome Glisse <jglisse@redhat.com>
-To: lsf-pc@lists.linux-foundation.org
-Cc: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org
-Subject: [LSF/MM TOPIC] Killing reliance on struct page->mapping
-Message-ID: <20180130004347.GD4526@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+        id S1751573AbeA1CyZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 27 Jan 2018 21:54:25 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH v4 01/13] bcache: set writeback_rate_update_seconds in range [1, 60] seconds
+Date: Sun, 28 Jan 2018 09:56:13 +0800
+Message-Id: <20180128015625.128497-2-colyli@suse.de>
+In-Reply-To: <20180128015625.128497-1-colyli@suse.de>
+References: <20180128015625.128497-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-I started a patchset about $TOPIC a while ago, right now i am working on other
-thing but i hope to have an RFC for $TOPIC before LSF/MM and thus would like a
-slot during common track to talk about it as it impacts FS, BLOCK and MM (i am
-assuming their will be common track).
+dc->writeback_rate_update_seconds can be set via sysfs and its value can
+be set to [1, ULONG_MAX].  It does not make sense to set such a large
+value, 60 seconds is long enough value considering the default 5 seconds
+works well for long time.
 
-Idea is that mapping (struct address_space) is available in virtualy all the
-places where it is needed and that their should be no reasons to depend only on
-struct page->mapping field. My patchset basicly add mapping to a bunch of vfs
-callback (struct address_space_operations) where it is missing, changing call
-site. Then i do an individual patch per filesystem to leverage the new argument
-instead on struct page.
+Because dc->writeback_rate_update is a special delayed work, it re-arms
+itself inside the delayed work routine update_writeback_rate(). When
+stopping it by cancel_delayed_work_sync(), there should be a timeout to
+wait and make sure the re-armed delayed work is stopped too. A small max
+value of dc->writeback_rate_update_seconds is also helpful to decide a
+reasonable small timeout.
 
-I am doing this for a generic page write protection mechanism which generalize
-KSM to file back page. They are couple other aspect like struct page->index,
-struct page->private which are addressed in similar way. The block layer is
-mostly affected because on block device error it needs the page->mapping to
-report I/O error.
+This patch limits sysfs interface to set dc->writeback_rate_update_seconds
+in range of [1, 60] seconds, and replaces the hand-coded number by macros.
 
-Maybe we can kill page->mapping altogether as a result of this. However this is
-not my motivation at this time.
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+---
+ drivers/md/bcache/sysfs.c     | 3 +++
+ drivers/md/bcache/writeback.c | 2 +-
+ drivers/md/bcache/writeback.h | 3 +++
+ 3 files changed, 7 insertions(+), 1 deletion(-)
 
-
-Sorry for absence of patchset at this time but i wanted to submit the subject
-before LSF/MM deadline.
-
-Cheers,
-J�r�me
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index b4184092c727..a74a752c9e0f 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -215,6 +215,9 @@ STORE(__cached_dev)
+ 	sysfs_strtoul_clamp(writeback_rate,
+ 			    dc->writeback_rate.rate, 1, INT_MAX);
+ 
++	sysfs_strtoul_clamp(writeback_rate_update_seconds,
++			    dc->writeback_rate_update_seconds,
++			    1, WRITEBACK_RATE_UPDATE_SECS_MAX);
+ 	d_strtoul_nonzero(writeback_rate_update_seconds);
+ 	d_strtoul(writeback_rate_i_term_inverse);
+ 	d_strtoul_nonzero(writeback_rate_p_term_inverse);
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index 51306a19ab03..0ade883b6316 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -652,7 +652,7 @@ void bch_cached_dev_writeback_init(struct cached_dev *dc)
+ 	dc->writeback_rate.rate		= 1024;
+ 	dc->writeback_rate_minimum	= 8;
+ 
+-	dc->writeback_rate_update_seconds = 5;
++	dc->writeback_rate_update_seconds = WRITEBACK_RATE_UPDATE_SECS_DEFAULT;
+ 	dc->writeback_rate_p_term_inverse = 40;
+ 	dc->writeback_rate_i_term_inverse = 10000;
+ 
+diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
+index 66f1c527fa24..587b25599856 100644
+--- a/drivers/md/bcache/writeback.h
++++ b/drivers/md/bcache/writeback.h
+@@ -8,6 +8,9 @@
+ #define MAX_WRITEBACKS_IN_PASS  5
+ #define MAX_WRITESIZE_IN_PASS   5000	/* *512b */
+ 
++#define WRITEBACK_RATE_UPDATE_SECS_MAX		60
++#define WRITEBACK_RATE_UPDATE_SECS_DEFAULT	5
++
+ /*
+  * 14 (16384ths) is chosen here as something that each backing device
+  * should be a reasonable fraction of the share, and not to blow up
+-- 
+2.15.1
