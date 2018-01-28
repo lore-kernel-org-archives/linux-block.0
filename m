@@ -1,55 +1,189 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:35250 "EHLO mx1.redhat.com"
+Received: from mx2.suse.de ([195.135.220.15]:49362 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751389AbeAWRUo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Jan 2018 12:20:44 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 0206D355F
-        for <linux-block@vger.kernel.org>; Tue, 23 Jan 2018 17:20:44 +0000 (UTC)
-From: Eryu Guan <eguan@redhat.com>
-To: linux-block@vger.kernel.org
-Cc: Eryu Guan <eguan@redhat.com>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] blk-mq-debugfs: don't allow write on attributes with seq_operations set
-Date: Wed, 24 Jan 2018 01:20:00 +0800
-Message-Id: <20180123172000.20919-1-eguan@redhat.com>
+        id S1751159AbeA1G1k (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 28 Jan 2018 01:27:40 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Michael Lyle <mlyle@lyle.org>,
+        Junhui Tang <tang.junhui@zte.com.cn>
+Subject: [PATCH v4 03/13] bcache: fix cached_dev->count usage for bch_cache_set_error()
+Date: Sun, 28 Jan 2018 09:56:15 +0800
+Message-Id: <20180128015625.128497-4-colyli@suse.de>
+In-Reply-To: <20180128015625.128497-1-colyli@suse.de>
+References: <20180128015625.128497-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Attributes that only implement .seq_ops are read-only, any write to
-them should be rejected. But currently kernel would crash when
-writing to such debugfs entries, e.g.
+When bcache metadata I/O fails, bcache will call bch_cache_set_error()
+to retire the whole cache set. The expected behavior to retire a cache
+set is to unregister the cache set, and unregister all backing device
+attached to this cache set, then remove sysfs entries of the cache set
+and all attached backing devices, finally release memory of structs
+cache_set, cache, cached_dev and bcache_device.
 
-chmod +w /sys/kernel/debug/block/<dev>/requeue_list
-echo 0 > /sys/kernel/debug/block/<dev>/requeue_list
-chmod -w /sys/kernel/debug/block/<dev>/requeue_list
+In my testing when journal I/O failure triggered by disconnected cache
+device, sometimes the cache set cannot be retired, and its sysfs
+entry /sys/fs/bcache/<uuid> still exits and the backing device also
+references it. This is not expected behavior.
 
-Fix it by returning -EPERM in blk_mq_debugfs_write() when writing to
-such attributes.
+When metadata I/O failes, the call senquence to retire whole cache set is,
+        bch_cache_set_error()
+        bch_cache_set_unregister()
+        bch_cache_set_stop()
+        __cache_set_unregister()     <- called as callback by calling
+                                        clousre_queue(&c->caching)
+        cache_set_flush()            <- called as a callback when refcount
+                                        of cache_set->caching is 0
+        cache_set_free()             <- called as a callback when refcount
+                                        of catch_set->cl is 0
+        bch_cache_set_release()      <- called as a callback when refcount
+                                        of catch_set->kobj is 0
 
-Cc: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Eryu Guan <eguan@redhat.com>
+I find if kernel thread bch_writeback_thread() quits while-loop when
+kthread_should_stop() is true and searched_full_index is false, clousre
+callback cache_set_flush() set by continue_at() will never be called. The
+result is, bcache fails to retire whole cache set.
+
+cache_set_flush() will be called when refcount of closure c->caching is 0,
+and in function bcache_device_detach() refcount of closure c->caching is
+released to 0 by clousre_put(). In metadata error code path, function
+bcache_device_detach() is called by cached_dev_detach_finish(). This is a
+callback routine being called when cached_dev->count is 0. This refcount
+is decreased by cached_dev_put().
+
+The above dependence indicates, cache_set_flush() will be called when
+refcount of cache_set->cl is 0, and refcount of cache_set->cl to be 0
+when refcount of cache_dev->count is 0.
+
+The reason why sometimes cache_dev->count is not 0 (when metadata I/O fails
+and bch_cache_set_error() called) is, in bch_writeback_thread(), refcount
+of cache_dev is not decreased properly.
+
+In bch_writeback_thread(), cached_dev_put() is called only when
+searched_full_index is true and cached_dev->writeback_keys is empty, a.k.a
+there is no dirty data on cache. In most of run time it is correct, but
+when bch_writeback_thread() quits the while-loop while cache is still
+dirty, current code forget to call cached_dev_put() before this kernel
+thread exits. This is why sometimes cache_set_flush() is not executed and
+cache set fails to be retired.
+
+The reason to call cached_dev_put() in bch_writeback_rate() is, when the
+cache device changes from clean to dirty, cached_dev_get() is called, to
+make sure during writeback operatiions both backing and cache devices
+won't be released.
+
+Adding following code in bch_writeback_thread() does not work,
+   static int bch_writeback_thread(void *arg)
+        }
+
++       if (atomic_read(&dc->has_dirty))
++               cached_dev_put()
++
+        return 0;
+ }
+because writeback kernel thread can be waken up and start via sysfs entry:
+        echo 1 > /sys/block/bcache<N>/bcache/writeback_running
+It is difficult to check whether backing device is dirty without race and
+extra lock. So the above modification will introduce potential refcount
+underflow in some conditions.
+
+The correct fix is, to take cached dev refcount when creating the kernel
+thread, and put it before the kernel thread exits. Then bcache does not
+need to take a cached dev refcount when cache turns from clean to dirty,
+or to put a cached dev refcount when cache turns from ditry to clean. The
+writeback kernel thread is alwasy safe to reference data structure from
+cache set, cache and cached device (because a refcount of cache device is
+taken for it already), and no matter the kernel thread is stopped by I/O
+errors or system reboot, cached_dev->count can always be used correctly.
+
+The patch is simple, but understanding how it works is quite complicated.
+
+Changelog:
+v2: set dc->writeback_thread to NULL in this patch, as suggested by Hannes.
+v1: initial version for review.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Cc: Michael Lyle <mlyle@lyle.org>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
 ---
- block/blk-mq-debugfs.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ drivers/md/bcache/super.c     |  1 -
+ drivers/md/bcache/writeback.c | 11 ++++++++---
+ drivers/md/bcache/writeback.h |  2 --
+ 3 files changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index b56a4f35720d..54bd8c31b822 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -703,7 +703,11 @@ static ssize_t blk_mq_debugfs_write(struct file *file, const char __user *buf,
- 	const struct blk_mq_debugfs_attr *attr = m->private;
- 	void *data = d_inode(file->f_path.dentry->d_parent)->i_private;
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 133b81225ea9..d14e09cce2f6 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1052,7 +1052,6 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c)
+ 	if (BDEV_STATE(&dc->sb) == BDEV_STATE_DIRTY) {
+ 		bch_sectors_dirty_init(&dc->disk);
+ 		atomic_set(&dc->has_dirty, 1);
+-		refcount_inc(&dc->count);
+ 		bch_writeback_queue(dc);
+ 	}
  
--	if (!attr->write)
-+	/*
-+	 * Attributes that only implement .seq_ops are read-only and 'attr' is
-+	 * the same with 'data' in this case.
-+	 */
-+	if (attr == data || !attr->write)
- 		return -EPERM;
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index f1d2fc15abcc..b280c134dd4d 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -572,7 +572,7 @@ static int bch_writeback_thread(void *arg)
  
- 	return attr->write(data, buf, count, ppos);
+ 			if (kthread_should_stop()) {
+ 				set_current_state(TASK_RUNNING);
+-				return 0;
++				break;
+ 			}
+ 
+ 			schedule();
+@@ -585,7 +585,6 @@ static int bch_writeback_thread(void *arg)
+ 		if (searched_full_index &&
+ 		    RB_EMPTY_ROOT(&dc->writeback_keys.keys)) {
+ 			atomic_set(&dc->has_dirty, 0);
+-			cached_dev_put(dc);
+ 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_CLEAN);
+ 			bch_write_bdev_super(dc, NULL);
+ 		}
+@@ -606,6 +605,9 @@ static int bch_writeback_thread(void *arg)
+ 		}
+ 	}
+ 
++	dc->writeback_thread = NULL;
++	cached_dev_put(dc);
++
+ 	return 0;
+ }
+ 
+@@ -669,10 +671,13 @@ int bch_cached_dev_writeback_start(struct cached_dev *dc)
+ 	if (!dc->writeback_write_wq)
+ 		return -ENOMEM;
+ 
++	cached_dev_get(dc);
+ 	dc->writeback_thread = kthread_create(bch_writeback_thread, dc,
+ 					      "bcache_writeback");
+-	if (IS_ERR(dc->writeback_thread))
++	if (IS_ERR(dc->writeback_thread)) {
++		cached_dev_put(dc);
+ 		return PTR_ERR(dc->writeback_thread);
++	}
+ 
+ 	schedule_delayed_work(&dc->writeback_rate_update,
+ 			      dc->writeback_rate_update_seconds * HZ);
+diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
+index 587b25599856..0bba8f1c6cdf 100644
+--- a/drivers/md/bcache/writeback.h
++++ b/drivers/md/bcache/writeback.h
+@@ -105,8 +105,6 @@ static inline void bch_writeback_add(struct cached_dev *dc)
+ {
+ 	if (!atomic_read(&dc->has_dirty) &&
+ 	    !atomic_xchg(&dc->has_dirty, 1)) {
+-		refcount_inc(&dc->count);
+-
+ 		if (BDEV_STATE(&dc->sb) != BDEV_STATE_DIRTY) {
+ 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_DIRTY);
+ 			/* XXX: should do this synchronously */
 -- 
-2.14.3
+2.15.1
