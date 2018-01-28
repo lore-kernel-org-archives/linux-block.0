@@ -1,192 +1,132 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:51353 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:37055 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932378AbeA2Ceq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 Jan 2018 21:34:46 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        id S1750743AbeA1Jpg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 28 Jan 2018 04:45:36 -0500
+Subject: Re: [PATCH v4 13/13] bcache: add stop_when_cache_set_failed to struct
+ cached_dev
+To: Pavel Goran <via-bcache@pvgoran.name>
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
         Nix <nix@esperi.org.uk>, Michael Lyle <mlyle@lyle.org>,
         Junhui Tang <tang.junhui@zte.com.cn>,
         Hannes Reinecke <hare@suse.com>
-Subject: [PATCH v4 13/13] bcache: add stop_when_cache_set_failed to struct cached_dev
-Date: Sun, 28 Jan 2018 09:56:25 +0800
-Message-Id: <20180128015625.128497-14-colyli@suse.de>
-In-Reply-To: <20180128015625.128497-1-colyli@suse.de>
-References: <20180128015625.128497-1-colyli@suse.de>
+References: <20180127142406.89741-1-colyli@suse.de>
+ <20180127142406.89741-14-colyli@suse.de>
+ <772947374.20180128063333@pvgoran.name>
+ <167389b2-3cd1-26e0-a75b-6c4b382296ae@suse.de>
+ <1693067263.20180128085551@pvgoran.name>
+From: Coly Li <colyli@suse.de>
+Message-ID: <c63e4e9f-1eb2-f90d-b294-ed4342034597@suse.de>
+Date: Sun, 28 Jan 2018 17:39:37 +0800
+MIME-Version: 1.0
+In-Reply-To: <1693067263.20180128085551@pvgoran.name>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Current bcache failure handling code will stop all attached bcache devices
-when the cache set is broken or disconnected. This is desired behavior for
-most of enterprise or cloud use cases, but maybe not for low end
-configuration. Nix <nix@esperi.org.uk> points out, users may still want to
-access the bcache device after cache device failed, for example on laptops.
+On 28/01/2018 1:55 PM, Pavel Goran wrote:
+> Hello Coly,
+> 
+> Sunday, January 28, 2018, 7:32:09 AM, you wrote:
+> 
+>>>> Current bcache failure handling code will stop all attached bcache devices
+>>>> when the cache set is broken or disconnected. This is desired behavior for
+>>>> most of enterprise or cloud use cases, but maybe not for low end
+>>>> configuration. Nix <nix@esperi.org.uk> points out, users may still want to
+>>>> access the bcache device after cache device failed, for example on laptops.
+>>>
+>>> In the current state, this functionality is rather user-unfriendly.
+>>>
+>>> 1. The new "stop_when_cache_set_failed" option doesn't seem to be persistent.
+>>> (At least, I did not see any explicit mechanism of saving/restoring it.) That
+>>> is, users will have to set it on each system startup.
+>>>
+>>> 2. If the new option is set to zero, it will (supposedly) lead to data
+>>> corruption/loss when cache set of a "dirty" bcache device is detached. The
+>>> option that an average home user may want to switch shouldn't be a way to
+>>> shoot oneself in the foot!
+>>>> As a remedy, the option could be changed to have the states "always" and
+>>> "auto" instead of "1" and "0", so that "auto" would still stop the bcache
+>>> device if it (or the entire cache set) is "dirty". (Alternatively, it could be
+>>> renamed to "force_stop_when_cache_set_failed" or
+>>> "always_stop_when_cache_set_failed" with values "1" and "0", if string values
+>>> are undesirable.)
+>>>
+>>> Also, the printed warning is somewhat misleading: it says "To disable this
+>>> warning message, please set /sys/block/%s/bcache/stop_when_cache_set_failed to
+>>> 1", whereas the suggested change would lead to behaviour change rather that to
+>>> just disabling the warning.
+>>>
+>>> 3. If (2) is implemented, the default value for the option could be changed to
+>>> "auto". (The rationale is that enterprise users who want it enabled are better
+>>> prepared to tune their device settings on startup.) However, this is only
+>>> important if (1) is not implemented.
+>>>
+> 
+>> Hi Pavel,
+> 
+>> I don't like "auto" since its behavior is unpredictable, sometimes whole
+>> things are gone, sometimes bcache device exists but slower, for large
+>> scale deployed environment, it is confused and misleading.
+> 
 
-This patch adds a per-cached_dev option stop_when_cache_set_failed, which
-is enabled (1) by default. Its value can be set via sysfs, when it is set
-to 0, the corresponding bcache device won't be stopped when a broken
-or disconnected cache set is retiring. 
+Hi Pavel,
 
-When the cached device has dirty data on retiring cache set, if bcache
-device is not stopped, following I/O request on the bcache device may
-result data corruption on backing device. This patch also prints out warn-
-ing information in kernel message.
+> In fact, during normal operations, this mode can be made rather predictable:
+> the device is stopped if it's "writeback", the device isn't stopped if it's
+> "writearound" or "writethrough". The only time it's unpredictable is when the
+> device is being transitioned from "writeback" to other mode.
+> 
+> However, I can see how this adds a certain informational inconsistency to the
+> picture: an administrator won't be able to say "everything is good" just
+> because all bcache devices work; he'll have to be aware that non-writeback
+> devices get special handling.
+>
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Nix <nix@esperi.org.uk>
-Cc: Michael Lyle <mlyle@lyle.org>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
-Cc: Hannes Reinecke <hare@suse.com>
----
- drivers/md/bcache/bcache.h |  1 +
- drivers/md/bcache/super.c  | 63 +++++++++++++++++++++++++++++++++-------------
- drivers/md/bcache/sysfs.c  | 10 ++++++++
- 3 files changed, 56 insertions(+), 18 deletions(-)
+You got what I meant. I just hope people can know how errors are handled
+without extra document. In auto mode, print out kernel message to
+indicate why bcache device is stopped or not might be useful to users to
+understand what's going on.
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 9eedb35d01bc..3756a196916f 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -362,6 +362,7 @@ struct cached_dev {
- 	unsigned		readahead;
- 
- 	unsigned		io_disable:1;
-+	unsigned		stop_when_cache_set_failed:1;
- 	unsigned		verify:1;
- 	unsigned		bypass_torture_test:1;
- 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 85adf1e29d11..93f720433b40 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1246,6 +1246,7 @@ static int cached_dev_init(struct cached_dev *dc, unsigned block_size)
- 	atomic_set(&dc->io_errors, 0);
- 	dc->io_disable = false;
- 	dc->error_limit = DEFAULT_CACHED_DEV_ERROR_LIMIT;
-+	dc->stop_when_cache_set_failed = 1;
- 
- 	bch_cached_dev_request_init(dc);
- 	bch_cached_dev_writeback_init(dc);
-@@ -1541,33 +1542,59 @@ static void cache_set_flush(struct closure *cl)
- 	closure_return(cl);
- }
- 
-+/*
-+ * dc->stop_when_cache_set_failed is default to true. If it is explicitly
-+ * set to false by user, the bcache device won't be stopped when cache set
-+ * is broken or disconnected. If there is dirty data on failed cache set,
-+ * not stopping bcache device may result data corruption on backing device,
-+ * pr_warn() notices the protential risk in kernel message.
-+ */
-+static void try_stop_bcache_device(struct cache_set *c,
-+				   struct bcache_device *d,
-+				   struct cached_dev *dc)
-+{
-+	if (dc->stop_when_cache_set_failed)
-+		bcache_device_stop(d);
-+	else if (!dc->stop_when_cache_set_failed &&
-+		 atomic_read(&dc->has_dirty))
-+		pr_warn("bcache: device %s won't be stopped while unregistering"
-+			" broken dirty cache set %pU, your data has potential "
-+			"risk to be corrupted. To disable this warning message,"
-+			" please set /sys/block/%s/bcache/stop_when_"
-+			"cache_set_failed to 1.",
-+			d->name, c->sb.set_uuid, d->name);
-+}
-+
- static void __cache_set_unregister(struct closure *cl)
- {
- 	struct cache_set *c = container_of(cl, struct cache_set, caching);
- 	struct cached_dev *dc;
-+	struct bcache_device *d;
- 	size_t i;
- 
- 	mutex_lock(&bch_register_lock);
- 
--	for (i = 0; i < c->devices_max_used; i++)
--		if (c->devices[i]) {
--			if (!UUID_FLASH_ONLY(&c->uuids[i]) &&
--			    test_bit(CACHE_SET_UNREGISTERING, &c->flags)) {
--				dc = container_of(c->devices[i],
--						  struct cached_dev, disk);
--				bch_cached_dev_detach(dc);
--				/*
--				 * If we come here by too many I/O errors,
--				 * bcache device should be stopped too, to
--				 * keep data consistency on cache and
--				 * backing devices.
--				 */
--				if (test_bit(CACHE_SET_IO_DISABLE, &c->flags))
--					bcache_device_stop(c->devices[i]);
--			} else {
--				bcache_device_stop(c->devices[i]);
--			}
-+	for (i = 0; i < c->devices_max_used; i++) {
-+		d = c->devices[i];
-+		if (!d)
-+			continue;
-+
-+		if (!UUID_FLASH_ONLY(&c->uuids[i]) &&
-+		    test_bit(CACHE_SET_UNREGISTERING, &c->flags)) {
-+			dc = container_of(d, struct cached_dev, disk);
-+			bch_cached_dev_detach(dc);
-+			/*
-+			 * If we come here by too many I/O errors,
-+			 * bcache device should be stopped too, to
-+			 * keep data consistency on cache and
-+			 * backing devices.
-+			 */
-+			if (test_bit(CACHE_SET_IO_DISABLE, &c->flags))
-+				try_stop_bcache_device(c, d, dc);
-+		} else {
-+			bcache_device_stop(d);
- 		}
-+	}
- 
- 	mutex_unlock(&bch_register_lock);
- 
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index 7288927f2a47..b096d4c37c9b 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -93,6 +93,7 @@ read_attribute(partial_stripes_expensive);
- rw_attribute(synchronous);
- rw_attribute(journal_delay_ms);
- rw_attribute(io_disable);
-+rw_attribute(stop_when_cache_set_failed);
- rw_attribute(discard);
- rw_attribute(running);
- rw_attribute(label);
-@@ -134,6 +135,8 @@ SHOW(__bch_cached_dev)
- 	sysfs_hprint(io_errors,		atomic_read(&dc->io_errors));
- 	sysfs_printf(io_error_limit,	"%i", dc->error_limit);
- 	sysfs_printf(io_disable,	"%i", dc->io_disable);
-+	sysfs_printf(stop_when_cache_set_failed, "%i",
-+		     dc->stop_when_cache_set_failed);
- 	var_print(writeback_rate_update_seconds);
- 	var_print(writeback_rate_i_term_inverse);
- 	var_print(writeback_rate_p_term_inverse);
-@@ -233,6 +236,12 @@ STORE(__cached_dev)
- 		dc->io_disable = v ? 1 : 0;
- 	}
- 
-+	if (attr == &sysfs_stop_when_cache_set_failed) {
-+		int v = strtoul_or_return(buf);
-+
-+		dc->stop_when_cache_set_failed = v ? 1 : 0;
-+	}
-+
- 	d_strtoi_h(sequential_cutoff);
- 	d_strtoi_h(readahead);
- 
-@@ -343,6 +352,7 @@ static struct attribute *bch_cached_dev_files[] = {
- 	&sysfs_errors,
- 	&sysfs_io_error_limit,
- 	&sysfs_io_disable,
-+	&sysfs_stop_when_cache_set_failed,
- 	&sysfs_dirty_data,
- 	&sysfs_stripe_size,
- 	&sysfs_partial_stripes_expensive,
--- 
-2.15.1
+>> After thinking for a while, I feel the "auto"/"always" options can make
+>> both enterprise and home users get an agreement. I am not able to find
+>> other better solution so far, thank you for the hint, brilliant!
+> 
+>> Personally I intend to set "always" as the default option, because I
+>> maintain bcache for enterprise workloads. The persistent option problem
+>> pointed by you does make sense, I will think how to solve it later
+>> (probably from user space tools).
+> 
+> Providing persistency via user-space tools looks like a bad idea. User-space
+> tools tend to lag behind kernel, so users will not see the new functionality
+> in their distributions for several months or several years. Also, if you're
+> talking about setting the option from user space on each startup, then
+> additionally there is a problem of different incompatible init systems, which
+> will further make things more complicated.
+
+OK, I get your point, it makes sense. This is just a rough thought from
+me, the motivation was to avoid on-disk format change.
+
+> 
+> Is there a way to save the option somewhere in bcache superblock, like the
+> cache mode is saved?
+> 
+
+It is possible to add flag in bcache superblock, but it means on disk
+format modification, this is something I try best to avoid. I need to
+check the code before I have the answer of yes or no.
+
+
+>> How do you think of this ?
+> 
+> Actually, I'd love to hear thoughts from other users and developers. Three
+> opinions is too few for this kind of discussion.
+
+Sure I agree. Indeed the suggestion and feedback for you and Nix helps
+me quite a lot :-) Firstly I try to avoid data corruption and provide
+flexibility to enterprise and personal users, then we can improve it in
+future if someone may provide better suggestion than yours :-)
+
+Thanks.
+
+Coly Li
