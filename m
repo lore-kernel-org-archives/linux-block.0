@@ -1,99 +1,94 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:37586 "EHLO mx1.redhat.com"
+Received: from mx2.suse.de ([195.135.220.15]:38769 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754865AbeAOQ6j (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jan 2018 11:58:39 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Mike Snitzer <snitzer@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 1/3] blk-mq: move actual issue into one helper
-Date: Tue, 16 Jan 2018 00:58:08 +0800
-Message-Id: <20180115165810.2515-2-ming.lei@redhat.com>
-In-Reply-To: <20180115165810.2515-1-ming.lei@redhat.com>
-References: <20180115165810.2515-1-ming.lei@redhat.com>
+        id S1751251AbeA1D5b (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 27 Jan 2018 22:57:31 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Michael Lyle <mlyle@lyle.org>, Hannes Reinecke <hare@suse.com>,
+        Huijun Tang <tang.junhui@zte.com.cn>
+Subject: [PATCH v4 04/13] bcache: quit dc->writeback_thread when BCACHE_DEV_DETACHING is set
+Date: Sun, 28 Jan 2018 09:56:16 +0800
+Message-Id: <20180128015625.128497-5-colyli@suse.de>
+In-Reply-To: <20180128015625.128497-1-colyli@suse.de>
+References: <20180128015625.128497-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-No functional change, just to clean up code a bit, so that the following
-change of using direct issue for blk_mq_request_bypass_insert() which is
-needed by DM can be easier to do.
+In patch "bcache: fix cached_dev->count usage for bch_cache_set_error()",
+cached_dev_get() is called when creating dc->writeback_thread, and
+cached_dev_put() is called when exiting dc->writeback_thread. This
+modification works well unless people detach the bcache device manually by
+    'echo 1 > /sys/block/bcache<N>/bcache/detach'
+Because this sysfs interface only calls bch_cached_dev_detach() which wakes
+up dc->writeback_thread but does not stop it. The reason is, before patch
+"bcache: fix cached_dev->count usage for bch_cache_set_error()", inside
+bch_writeback_thread(), if cache is not dirty after writeback,
+cached_dev_put() will be called here. And in cached_dev_make_request() when
+a new write request makes cache from clean to dirty, cached_dev_get() will
+be called there. Since we don't operate dc->count in these locations,
+refcount d->count cannot be dropped after cache becomes clean, and
+cached_dev_detach_finish() won't be called to detach bcache device.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+This patch fixes the issue by checking whether BCACHE_DEV_DETACHING is
+set inside bch_writeback_thread(). If this bit is set and cache is clean
+(no existing writeback_keys), break the while-loop, call cached_dev_put()
+and quit the writeback thread.
+
+Please note if cache is still dirty, even BCACHE_DEV_DETACHING is set the
+writeback thread should continue to perform writeback, this is the original
+design of manually detach.
+
+I compose a separte patch because that patch "bcache: fix cached_dev->count
+usage for bch_cache_set_error()" already gets a "Reviewed-by:" from Hannes
+Reinecke. Also this fix is not trivial and good for a separate patch.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Cc: Michael Lyle <mlyle@lyle.org>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Huijun Tang <tang.junhui@zte.com.cn>
 ---
- block/blk-mq.c | 39 +++++++++++++++++++++++++++------------
- 1 file changed, 27 insertions(+), 12 deletions(-)
+ drivers/md/bcache/writeback.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index edb1291a42c5..bf8d6651f40e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1696,15 +1696,37 @@ static blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx, struct request *rq)
- 	return blk_tag_to_qc_t(rq->internal_tag, hctx->queue_num, true);
- }
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index b280c134dd4d..4dbeaaa575bf 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -565,9 +565,15 @@ static int bch_writeback_thread(void *arg)
+ 	while (!kthread_should_stop()) {
+ 		down_write(&dc->writeback_lock);
+ 		set_current_state(TASK_INTERRUPTIBLE);
+-		if (!atomic_read(&dc->has_dirty) ||
+-		    (!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags) &&
+-		     !dc->writeback_running)) {
++		/*
++		 * If the bache device is detaching, skip here and continue
++		 * to perform writeback. Otherwise, if no dirty data on cache,
++		 * or there is dirty data on cache but writeback is disabled,
++		 * the writeback thread should sleep here and wait for others
++		 * to wake up it.
++		 */
++		if (!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags) &&
++		    (!atomic_read(&dc->has_dirty) || !dc->writeback_running)) {
+ 			up_write(&dc->writeback_lock);
  
--static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
--					struct request *rq,
--					blk_qc_t *cookie)
-+static blk_status_t __blk_mq_issue_req(struct blk_mq_hw_ctx *hctx,
-+				       struct request *rq,
-+				       blk_qc_t *new_cookie)
- {
-+	blk_status_t ret;
- 	struct request_queue *q = rq->q;
- 	struct blk_mq_queue_data bd = {
- 		.rq = rq,
- 		.last = true,
- 	};
-+
-+	if (!blk_mq_get_driver_tag(rq, NULL, false))
-+		return BLK_STS_AGAIN;
-+
-+	if (!blk_mq_get_dispatch_budget(hctx)) {
-+		blk_mq_put_driver_tag(rq);
-+		return BLK_STS_AGAIN;
-+	}
-+
-+	*new_cookie = request_to_qc_t(hctx, rq);
-+
-+	ret = q->mq_ops->queue_rq(hctx, &bd);
-+
-+	return ret;
-+}
-+
-+static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-+					struct request *rq,
-+					blk_qc_t *cookie)
-+{
-+	struct request_queue *q = rq->q;
- 	blk_qc_t new_cookie;
- 	blk_status_t ret;
- 	bool run_queue = true;
-@@ -1718,22 +1740,15 @@ static void __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	if (q->elevator)
- 		goto insert;
+ 			if (kthread_should_stop()) {
+@@ -587,6 +593,14 @@ static int bch_writeback_thread(void *arg)
+ 			atomic_set(&dc->has_dirty, 0);
+ 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_CLEAN);
+ 			bch_write_bdev_super(dc, NULL);
++			/*
++			 * If bcache device is detaching via sysfs interface,
++			 * writeback thread should stop after there is no dirty
++			 * data on cache. BCACHE_DEV_DETACHING flag is set in
++			 * bch_cached_dev_detach().
++			 */
++			if (test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags))
++				break;
+ 		}
  
--	if (!blk_mq_get_driver_tag(rq, NULL, false))
-+	ret = __blk_mq_issue_req(hctx, rq, &new_cookie);
-+	if (ret == BLK_STS_AGAIN)
- 		goto insert;
- 
--	if (!blk_mq_get_dispatch_budget(hctx)) {
--		blk_mq_put_driver_tag(rq);
--		goto insert;
--	}
--
--	new_cookie = request_to_qc_t(hctx, rq);
--
- 	/*
- 	 * For OK queue, we are done. For error, kill it. Any other
- 	 * error (busy), just add it to our list as we previously
- 	 * would have done
- 	 */
--	ret = q->mq_ops->queue_rq(hctx, &bd);
- 	switch (ret) {
- 	case BLK_STS_OK:
- 		*cookie = new_cookie;
+ 		up_write(&dc->writeback_lock);
 -- 
-2.9.5
+2.15.1
