@@ -1,45 +1,46 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:39692 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751900AbeA2U4d (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Jan 2018 15:56:33 -0500
-Message-ID: <1517259390.3969.41.camel@HansenPartnership.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Mon, 29 Jan 2018 15:40:31 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: lsf-pc@lists.linux-foundation.org, Linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
 Subject: Re: [LSF/MM TOPIC] Two blk-mq related topics
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: Ming Lei <ming.lei@redhat.com>, lsf-pc@lists.linux-foundation.org,
-        Linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Date: Mon, 29 Jan 2018 12:56:30 -0800
-In-Reply-To: <20180129154455.GB17176@ming.t460p>
+Message-ID: <20180129204031.GA5499@redhat.com>
 References: <20180129154455.GB17176@ming.t460p>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180129154455.GB17176@ming.t460p>
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Mon, 2018-01-29 at 23:46 +0800, Ming Lei wrote:
-[...]
+On Mon, Jan 29 2018 at 10:46am -0500,
+Ming Lei <ming.lei@redhat.com> wrote:
+ 
 > 2. When to enable SCSI_MQ at default again?
-
-I'm not sure there's much to discuss ... I think the basic answer is as
-soon as Christoph wants to try it again.
-
-> SCSI_MQ is enabled on V3.17 firstly, but disabled at default. In
-> V4.13-rc1, it is enabled at default, but later the patch is reverted
-> in V4.13-rc7, and becomes disabled at default too.
 > 
-> Now both the original reported PM issue(actually SCSI quiesce) and
-> the sequential IO performance issue have been addressed.
+> SCSI_MQ is enabled on V3.17 firstly, but disabled at default. In V4.13-rc1,
+> it is enabled at default, but later the patch is reverted in V4.13-rc7, and
+> becomes disabled at default too.
+> 
+> Now both the original reported PM issue(actually SCSI quiesce) and the
+> sequential IO performance issue have been addressed. And MQ IO schedulers
+> are ready too for traditional disks. Are there other issues to be addressed
+> for enabling SCSI_MQ at default? When can we do that again?
+> 
+> Last time, the two issues were reported during V4.13 dev cycle just when it is
+> enabled at default, that seems if SCSI_MQ isn't enabled at default, it wouldn't
+> be exposed to run/tested completely & fully.  
+> 
+> So if we continue to disable it at default, maybe it can never be exposed to
+> full test/production environment.
 
-Is the blocker bug just not closed because no-one thought to do it:
+I was going to propose revisiting this as well.
 
-https://bugzilla.kernel.org/show_bug.cgi?id=178381
+I'd really like to see all the old .request_fn block core code removed.
 
-(we have confirmed that this issue is now fixed with the original
-reporter?)
+But maybe we take a first step of enabling:
+CONFIG_SCSI_MQ_DEFAULT=Y
+CONFIG_DM_MQ_DEFAULT=Y
 
-And did the Huawei guy (Jonathan Cameron) confirm his performance issue
-was fixed (I don't think I saw email that he did)?
-
-James
+Thanks,
+Mike
