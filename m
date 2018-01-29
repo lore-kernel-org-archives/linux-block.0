@@ -1,50 +1,39 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:54513 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752746AbeARQhI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Jan 2018 11:37:08 -0500
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Mike Snitzer <snitzer@redhat.com>
-Cc: dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] dm rq: Avoid that request processing stalls sporadically
-Date: Thu, 18 Jan 2018 08:37:07 -0800
-Message-Id: <20180118163707.11825-1-bart.vanassche@wdc.com>
+Received: from mx1.redhat.com ([209.132.183.28]:48774 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751412AbeA2VdF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 29 Jan 2018 16:33:05 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id B4A733B54D
+        for <linux-block@vger.kernel.org>; Mon, 29 Jan 2018 21:33:05 +0000 (UTC)
+Date: Mon, 29 Jan 2018 16:33:00 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: linux-block@vger.kernel.org, dm-devel@redhat.com
+Subject: [LSF/MM TOPIC] block: extend generic biosets to allow per-device
+ frontpad
+Message-ID: <20180129213300.GC5744@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-If the .queue_rq() implementation of a block driver returns
-BLK_STS_RESOURCE then that block driver is responsible for
-rerunning the queue once the condition that caused it to return
-BLK_STS_RESOURCE has been cleared. The dm-mpath driver tells the
-dm core to requeue a request if e.g. not enough memory is
-available for cloning a request or if the underlying path is
-busy. Since the dm-mpath driver does not receive any kind of
-notification if the condition that caused it to return "requeue"
-is cleared, the only solution to avoid that dm-mpath request
-processing stalls is to call blk_mq_delay_run_hw_queue(). Hence
-this patch.
+I'd like to enable bio-based DM to _not_ need to clone bios.  But to do
+so each bio-based DM target's required per-bio-data would need to be
+provided by upper layer biosets (as opposed to the bioset DM currently
+creates).
 
-Fixes: ec3eaf9a6731 ("dm mpath: don't call blk_mq_delay_run_hw_queue() in case of BLK_STS_RESOURCE")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Ming Lei <ming.lei@redhat.com>
----
- drivers/md/dm-rq.c | 1 +
- 1 file changed, 1 insertion(+)
+So my thinking is that all system-level biosets (e.g. fs_bio_set,
+blkdev_dio_pool) would redirect to a device specific variant bioset IFF
+the underlying device advertises the need for a specific per-bio-data
+payload to be provided.
 
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index f16096af879a..c59c59cfd2a5 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -761,6 +761,7 @@ static blk_status_t dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		/* Undo dm_start_request() before requeuing */
- 		rq_end_stats(md, rq);
- 		rq_completed(md, rq_data_dir(rq), false);
-+		blk_mq_delay_run_hw_queue(hctx, 100/*ms*/);
- 		return BLK_STS_RESOURCE;
- 	}
- 
--- 
-2.15.1
+I know this _could_ become a rathole but I'd like to avoid reverting DM
+back to the days of having to worry about managing mempools for the
+purpose of per-io allocations.  I've grown spoiled by the performance
+and elegance that comes with having the bio and per-bio-data allocated
+from the same bioset.
+
+Thoughts?
+Mike
