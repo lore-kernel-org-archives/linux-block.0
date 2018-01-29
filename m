@@ -1,129 +1,46 @@
-Return-Path: <tom.leiming@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <1517260932.2687.42.camel@wdc.com>
-References: <20180129203300.50595-1-snitzer@redhat.com> <1517260932.2687.42.camel@wdc.com>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Tue, 30 Jan 2018 11:16:33 +0800
-Message-ID: <CACVXFVNZVSfqAW23oM3Y0XLm_WRdQ1WWpLhXJ8LVPN=i2OBvig@mail.gmail.com>
+Return-Path: <prvs=560fb3b88=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "snitzer@redhat.com" <snitzer@redhat.com>
+CC: "dm-devel@redhat.com" <dm-devel@redhat.com>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH V4] blk-mq: introduce BLK_STS_DEV_RESOURCE
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "snitzer@redhat.com" <snitzer@redhat.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"dm-devel@redhat.com" <dm-devel@redhat.com>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 29 Jan 2018 22:22:30 +0000
+Message-ID: <1517264549.2687.59.camel@wdc.com>
+References: <20180129203300.50595-1-snitzer@redhat.com>
+	 <1517260932.2687.42.camel@wdc.com> <20180129214446.GD5744@redhat.com>
+	 <1517262713.2687.56.camel@wdc.com> <20180129221436.GA6115@redhat.com>
+In-Reply-To: <20180129221436.GA6115@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Jan 30, 2018 at 5:22 AM, Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
-> On Mon, 2018-01-29 at 15:33 -0500, Mike Snitzer wrote:
->> +              * If driver returns BLK_STS_RESOURCE and SCHED_RESTART
->> +              * bit is set, run queue after 10ms to avoid IO stalls
->> +              * that could otherwise occur if the queue is idle.
->>                */
->> -             if (!blk_mq_sched_needs_restart(hctx) ||
->> +             needs_restart = blk_mq_sched_needs_restart(hctx);
->> +             if (!needs_restart ||
->>                   (no_tag && list_empty_careful(&hctx->dispatch_wait.entry)))
->>                       blk_mq_run_hw_queue(hctx, true);
->> +             else if (needs_restart && (ret == BLK_STS_RESOURCE))
->> +                     blk_mq_delay_run_hw_queue(hctx, BLK_MQ_QUEUE_DELAY);
->>       }
->
-> The above code only calls blk_mq_delay_run_hw_queue() if the following condition
-> is met: !(!needs_restart || (no_tag && list_empty_careful(&hctx->dispatch_wait.entry)))
-> && (needs_restart && (ret == BLK_STS_RESOURCE)). That boolean expression can be
-> simplified into the following: needs_restart && ret == BLK_STS_RESOURCE &&
-> !(no_tag && list_empty_careful(&hctx->dispatch_wait.entry)). From blk-mq-sched.h:
-
-No, the expression of  (needs_restart && (ret == BLK_STS_RESOURCE)) clearly
-expresses what we want to do.
-
-When RESTART is working, and meantime BLK_STS_RESOURCE is returned
-from driver, we need to avoid IO hang by blk_mq_delay_run_hw_queue().
-
->
-> static inline bool blk_mq_sched_needs_restart(struct blk_mq_hw_ctx *hctx)
-> {
->         return test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
-> }
->
-> In other words, the above code will not call blk_mq_delay_run_hw_queue() if
-> BLK_MQ_S_SCHED_RESTART is cleared after it got set and before the above code is
-> reached. The BLK_MQ_S_SCHED_RESTART bit gets cleared if a request completes
-> concurrently with the above code. From blk-mq-sched.c:
-
-That won't be an issue, given any time the SCHED_RESTART is cleared, the queue
-will be run again, so we needn't to worry about that.
-
->
-> static bool blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
-> {
->         if (!test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
->                 return false;
->
->         if (hctx->flags & BLK_MQ_F_TAG_SHARED) {
->                 struct request_queue *q = hctx->queue;
->
->                 if (test_and_clear_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
->                         atomic_dec(&q->shared_hctx_restart);
->         } else
->                 clear_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
->
->         return blk_mq_run_hw_queue(hctx, true);
-> }
->
-> The above blk_mq_run_hw_queue() call may finish either before or after
-
-If the above blk_mq_run_hw_queue() finishes before blk_mq_dispatch_rq_list()
-examines the flag, blk_mq_dispatch_rq_list() will see the flag cleared, and run
-queue again by the following code branch:
-
-                if (!blk_mq_sched_needs_restart(hctx) ||
-                    (no_tag && list_empty_careful(&hctx->dispatch_wait.entry)))
-                        blk_mq_run_hw_queue(hctx, true);
-
-If blk_mq_run_hw_queue() finishes after blk_mq_dispatch_rq_list() examines
-the flag, this blk_mq_run_hw_queue() will see the new added request, and
-still everything is fine. Even blk_mq_delay_run_hw_queue() can be started
-too.
-
-> blk_mq_dispatch_rq_list() examines the BLK_MQ_S_SCHED_RESTART flag.
->
-> That's why I wrote in previous e-mails that this patch and also the previous
-> versions of this patch change a systematic call of blk_mq_delay_run_hw_queue()
-> into a call that may or may not happen, depending on whether or not a request
-> completes concurrently with request queueing. Sorry but I think that means
-> that the above change combined with changing BLK_STS_RESOURCE into
-> BLK_STS_DEV_RESOURCE is wrong and why I expect that this will result in
-> sporadic queue stalls. As you know sporadic queue stalls are annoying and hard
-> to debug.
-
-Now there is debugfs, it isn't difficult to deal with that if
-reporter'd like to cowork.
-
->
-> Plenty of e-mails have already been exchanged about versions one to four of this
-> patch but so far nobody has even tried to contradict the above.
-
-No, I don't see the issue, let's revisit the main change again:
-
-+       needs_restart = blk_mq_sched_needs_restart(hctx);
-+       if (!needs_restart ||
-            (no_tag && list_empty_careful(&hctx->dispatch_wait.entry)))
-            blk_mq_run_hw_queue(hctx, true);
-+       else if (needs_restart && (ret == BLK_STS_RESOURCE))
-+           blk_mq_delay_run_hw_queue(hctx, 10);
-
-If SCHED_RESTART isn't set, queue is run immediately, otherwise when
-BLK_STS_RESOURCE is returned, we avoid IO hang by
-blk_mq_delay_run_hw_queue(hctx, XXX).
-
-And we don't cover  BLK_STS_DEV_RESOURCE above because it is documented
-clearly that  BLK_STS_DEV_RESOURCE is only returned by driver iff queue will be
-rerun in future if resource is available.
-
-Is there  any hole in above code?
-
-Thanks,
-Ming Lei
+T24gTW9uLCAyMDE4LTAxLTI5IGF0IDE3OjE0IC0wNTAwLCBNaWtlIFNuaXR6ZXIgd3JvdGU6DQo+
+IE9uIE1vbiwgSmFuIDI5IDIwMTggYXQgIDQ6NTFwbSAtMDUwMCwNCj4gQmFydCBWYW4gQXNzY2hl
+IDxCYXJ0LlZhbkFzc2NoZUB3ZGMuY29tPiB3cm90ZToNCj4gDQo+ID4gT24gTW9uLCAyMDE4LTAx
+LTI5IGF0IDE2OjQ0IC0wNTAwLCBNaWtlIFNuaXR6ZXIgd3JvdGU6DQo+ID4gPiBCdXQgcmVnYXJk
+bGVzcyBvZiB3aGljaCB3aW5zIHRoZSByYWNlLCB0aGUgcXVldWUgd2lsbCBoYXZlIGJlZW4gcnVu
+Lg0KPiA+ID4gV2hpY2ggaXMgYWxsIHdlIGNhcmUgYWJvdXQgcmlnaHQ/DQo+ID4gDQo+ID4gUnVu
+bmluZyB0aGUgcXVldWUgaXMgbm90IHN1ZmZpY2llbnQuIFdpdGggdGhpcyBwYXRjaCBhcHBsaWVk
+IGl0IGNhbiBoYXBwZW4NCj4gPiB0aGF0IHRoZSBibG9jayBkcml2ZXIgcmV0dXJucyBCTEtfU1RT
+X0RFVl9SRVNPVVJDRSwgdGhhdCB0aGUgdHdvIG9yIG1vcmUNCj4gPiBjb25jdXJyZW50IHF1ZXVl
+IHJ1bnMgZmluaXNoIGJlZm9yZSBzdWZmaWNpZW50IGRldmljZSByZXNvdXJjZXMgYXJlIGF2YWls
+YWJsZQ0KPiA+IHRvIGV4ZWN1dGUgdGhlIHJlcXVlc3QgYW5kIHRoYXQgYmxrX21xX2RlbGF5X3J1
+bl9od19xdWV1ZSgpIGRvZXMgbm90IGdldA0KPiA+IGNhbGxlZCBhdCBhbGwuIElmIG5vIG90aGVy
+IGFjdGl2aXR5IHRyaWdnZXJzIGEgcXVldWUgcnVuLCBlLmcuIHJlcXVlc3QNCj4gPiBjb21wbGV0
+aW9uLCB0aGlzIHdpbGwgcmVzdWx0IGluIGEgcXVldWUgc3RhbGwuDQo+IA0KPiBJZiBCTEtfU1RT
+X0RFVl9SRVNPVVJDRSBpcyByZXR1cm5lZCB0aGVuIHRoZSBkcml2ZXIgZG9lc24ndCBuZWVkIHRv
+IHJlbHkNCj4gb24gYSBmdXR1cmUgcXVldWUgcnVuLiAgSUlVQywgdGhhdCBpcyB0aGUgZW50aXJl
+IHByZW1pc2Ugb2YNCj4gQkxLX1NUU19ERVZfUkVTT1VSQ0UuICBJZiB0aGUgZHJpdmVyIGhhZCBk
+b3VidCBhYm91dCB3aGV0aGVyIHRoZQ0KPiByZXNvdXJjZSB3ZXJlIGdvaW5nIHRvIGJlIGF2YWls
+YWJsZSBpbiB0aGUgZnV0dXJlIGl0IHNob3VsZCByZXR1cm4NCj4gQkxLX1NUU19SRVNPVVJDRS4N
+Cj4gDQo+IFRoYXQgbWF5IHNlZW0gbGlrZSBwdXR0aW5nIGEgbG90IG9uIGEgZHJpdmVyIGRldmVs
+b3BlciAodG8gZGVjaWRlDQo+IGJldHdlZW4gdGhlIDIpIGJ1dCBJJ2xsIGFnYWluIGRlZmVyIHRv
+IEplbnMgaGVyZS4gIFRoaXMgd2FzIHRoZSBhcHByb2FjaA0KPiBoZSB3YXMgYWR2b2NhdGluZyBi
+ZSBwdXJzdWVkLg0KDQpIZWxsbyBNaWtlLA0KDQpUaGVyZSB3YXMgYSB0eXBvIGluIG15IHJlcGx5
+OiBJIHNob3VsZCBoYXZlIHJlZmVycmVkIHRvIEJMS19TVFNfUkVTT1VSQ0UNCmluc3RlYWQgb2Yg
+QkxLX1NUU19ERVZfUkVTT1VSQ0UuIFRoZSBjb252ZW50aW9uIGZvciBCTEtfU1RTX0RFVl9SRVNP
+VVJDRSBpcw0KbmFtZWx5IHRoYXQgaWYgLnF1ZXVlX3JxKCkgcmV0dXJucyB0aGF0IHN0YXR1cyBj
+b2RlIHRoYXQgdGhlIGJsb2NrIGRyaXZlcg0KZ3VhcmFudGVlcyB0aGF0IHRoZSBxdWV1ZSB3aWxs
+IGJlIHJlcnVuLg0KDQpCYXJ0Lg==
