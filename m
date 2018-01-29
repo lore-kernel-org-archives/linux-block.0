@@ -1,50 +1,53 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:33294 "EHLO mx1.redhat.com"
+Received: from mx2.suse.de ([195.135.220.15]:51048 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752400AbeAOQ60 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Jan 2018 11:58:26 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org
-Cc: Mike Snitzer <snitzer@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 0/3] blk-mq: issue request directly for blk_insert_cloned_request
-Date: Tue, 16 Jan 2018 00:58:07 +0800
-Message-Id: <20180115165810.2515-1-ming.lei@redhat.com>
+        id S1751803AbeA2MQf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 29 Jan 2018 07:16:35 -0500
+Subject: Re: [PATCH] bcache: finish incremental GC
+To: tang.junhui@zte.com.cn
+Cc: mlyle@lyle.org, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <1517227093-25602-1-git-send-email-tang.junhui@zte.com.cn>
+From: Coly Li <colyli@suse.de>
+Message-ID: <ed937ba2-63b3-f4ee-b900-8fec8fcba412@suse.de>
+Date: Mon, 29 Jan 2018 20:16:24 +0800
+MIME-Version: 1.0
+In-Reply-To: <1517227093-25602-1-git-send-email-tang.junhui@zte.com.cn>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Guys,
+On 29/01/2018 7:58 PM, tang.junhui@zte.com.cn wrote:
+> From: Tang Junhui <tang.junhui@zte.com.cn>
+> 
+> In GC thread, we record the latest GC key in gc_done, which is expected
+> to be used for incremental GC, but in currently code, we didn't realize
+> it. When GC runs, front side IO would be blocked until the GC over, it
+> would be a long time if there is a lot of btree nodes.
+> 
+> This patch realizes incremental GC, the main ideal is that, when there
+> are front side I/Os, after GC some nodes (100), we stop GC, release locker
+> of the btree node, and go to process the front side I/Os for some times
+> (100 ms), then go back to GC again.
+> 
+> By this patch, when we doing GC, I/Os are not blocked all the time, and
+> there is no obvious I/Os zero jump problem any more.
+> 
+> Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
 
-The 3 paches changes the blk-mq part of blk_insert_cloned_request(),
-in which we switch to blk_mq_try_issue_directly(), so that both dm-rq
-and blk-mq can get the dispatch result of underlying queue, and with
-this information, blk-mq can handle IO merge much better, then
-sequential I/O performance is improved much.
+Hi Junhui,
 
-In my dm-mpath over virtio-scsi test, this whole patchset improves
-sequential IO by 3X ~ 5X.
+It sounds great :-) Currently I am not very familiar with gc code, I
+need some time to understand how bcache GC works before providing my
+feedback. Please give me some time, I hope I am able to provide my
+comment after Chinese Spring Festival.
 
-V4:
-	- remove dm patches which are in DM tree already
-	- cleanup __blk_mq_issue_req as suggested by Jens
+Hope other people may have a look before I am able to.
 
-V3:
-	- rebase on the latest for-4.16/block of block tree
-	- add missed pg_init_all_paths() in patch 1, according to Bart's review
+Thanks.
 
-V2:
-	- drop 'dm-mpath: cache ti->clone during requeue', which is a bit
-	too complicated, and not see obvious performance improvement.
-	- make change on blk-mq part cleaner
+Coly Li
 
-Ming Lei (3):
-  blk-mq: move actual issue into one helper
-  blk-mq: return dispatch result to caller in blk_mq_try_issue_directly
-  blk-mq: issue request directly for blk_insert_cloned_request
 
- block/blk-mq.c | 85 +++++++++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 64 insertions(+), 21 deletions(-)
 
--- 
-2.9.5
+[code snip]
