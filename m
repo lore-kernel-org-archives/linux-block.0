@@ -1,39 +1,57 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:48774 "EHLO mx1.redhat.com"
+Received: from mx2.suse.de ([195.135.220.15]:56416 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751412AbeA2VdF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Jan 2018 16:33:05 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B4A733B54D
-        for <linux-block@vger.kernel.org>; Mon, 29 Jan 2018 21:33:05 +0000 (UTC)
-Date: Mon, 29 Jan 2018 16:33:00 -0500
-From: Mike Snitzer <snitzer@redhat.com>
-To: linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: [LSF/MM TOPIC] block: extend generic biosets to allow per-device
- frontpad
-Message-ID: <20180129213300.GC5744@redhat.com>
+        id S1751599AbeA2NC1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 29 Jan 2018 08:02:27 -0500
+Subject: Re: [PATCH v4 13/13] bcache: add stop_when_cache_set_failed to struct
+ cached_dev
+To: Nix <nix@esperi.org.uk>
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Michael Lyle <mlyle@lyle.org>,
+        Junhui Tang <tang.junhui@zte.com.cn>,
+        Hannes Reinecke <hare@suse.com>
+References: <20180127142406.89741-1-colyli@suse.de>
+ <20180127142406.89741-14-colyli@suse.de> <87inbkesbg.fsf@esperi.org.uk>
+From: Coly Li <colyli@suse.de>
+Message-ID: <9f2e507d-bc5b-333b-eefe-d76a6440fdcf@suse.de>
+Date: Mon, 29 Jan 2018 21:02:18 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <87inbkesbg.fsf@esperi.org.uk>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-I'd like to enable bio-based DM to _not_ need to clone bios.  But to do
-so each bio-based DM target's required per-bio-data would need to be
-provided by upper layer biosets (as opposed to the bioset DM currently
-creates).
+On 29/01/2018 8:57 PM, Nix wrote:
+> On 27 Jan 2018, Coly Li said:
+> 
+>> Current bcache failure handling code will stop all attached bcache devices
+>> when the cache set is broken or disconnected. This is desired behavior for
+>> most of enterprise or cloud use cases, but maybe not for low end
+>> configuration. Nix <nix@esperi.org.uk> points out, users may still want to
+>> access the bcache device after cache device failed, for example on laptops.
+> 
+> Actually I'm much interested in the server use case. On laptops, it's
+> relatively easy to recover if you know what you're doing, because they
+> usually have a user in front of them with console access -- but if a
+> remote headless server with a hundred users a thousand miles away has
+> its cache device wear out I would really rather the hundred users get
+> served, if more slowly, rather than the whole machine going down for
+> hours or days until I can get someone there to bash on the hardware!
+> 
 
-So my thinking is that all system-level biosets (e.g. fs_bio_set,
-blkdev_dio_pool) would redirect to a device specific variant bioset IFF
-the underlying device advertises the need for a specific per-bio-data
-payload to be provided.
+Hi Nix,
 
-I know this _could_ become a rathole but I'd like to avoid reverting DM
-back to the days of having to worry about managing mempools for the
-purpose of per-io allocations.  I've grown spoiled by the performance
-and elegance that comes with having the bio and per-bio-data allocated
-from the same bioset.
+Thanks for the input, I didn't think of such use case before. It makes a
+lot sense !
 
-Thoughts?
-Mike
+> (Sure, ideally you'd detect the wearing out in advance, but SSDs are not
+> always nice and helpful like that and sometimes just go instantly
+> readonly or simply vanish off the bus entirely without warning.)
+> 
+
+Yes. Then in the v5 patch set, I will add an option for "always"/"auto",
+which will leave bcache device alive if the broken cache set is clean.
+
+Thank you all again, for the insight and brilliant suggestion !
+
+Coly Li
