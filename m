@@ -1,16 +1,15 @@
 Return-Path: <lsf-pc-bounces@lists.linux-foundation.org>
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Wols Lists <antlists@youngman.org.uk>
+From: NeilBrown <neilb@suse.com>
+To: Wols Lists <antlists@youngman.org.uk>,
+	Johannes Thumshirn <jthumshirn@suse.de>, lsf-pc@lists.linux-foundation.org
+Date: Tue, 30 Jan 2018 08:50:20 +1100
+In-Reply-To: <5A6F4CA6.5060802@youngman.org.uk>
 References: <mqdvafkhep0.fsf@linux-x5ow.site>
 	<5A6F4CA6.5060802@youngman.org.uk>
-Date: Tue, 30 Jan 2018 10:40:49 +0100
-In-Reply-To: <5A6F4CA6.5060802@youngman.org.uk> (Wols Lists's message of "Mon,
-	29 Jan 2018 16:32:38 +0000")
-Message-ID: <mqd607jn0pq.fsf@linux-x5ow.site>
+Message-ID: <87fu6o5o83.fsf@notabene.neil.brown.name>
 MIME-Version: 1.0
 Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-	Neil Brown <neilb@suse.de>, lsf-pc@lists.linux-foundation.org,
-	Hannes Reinecke <hare@suse.de>
+	Neil Brown <neilb@suse.de>, Hannes Reinecke <hare@suse.de>
 Subject: Re: [Lsf-pc] [LSF/MM TOPIC] De-clustered RAID with MD
 List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/lsf-pc>,
 	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=unsubscribe>
@@ -19,87 +18,152 @@ List-Post: <mailto:lsf-pc@lists.linux-foundation.org>
 List-Help: <mailto:lsf-pc-request@lists.linux-foundation.org?subject=help>
 List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/lsf-pc>,
 	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/mixed; boundary="===============7570522455850665147=="
 Sender: lsf-pc-bounces@lists.linux-foundation.org
 Errors-To: lsf-pc-bounces@lists.linux-foundation.org
 List-ID: <linux-block@vger.kernel.org>
 
-V29scyBMaXN0cyA8YW50bGlzdHNAeW91bmdtYW4ub3JnLnVrPiB3cml0ZXM6Cgo+IE9uIDI5LzAx
-LzE4IDE1OjIzLCBKb2hhbm5lcyBUaHVtc2hpcm4gd3JvdGU6Cj4+IEhpIGxpbnV4LXJhaWQsIGxz
-Zi1wYwo+PiAKPj4gKElmIHlvdSd2ZSByZWNlaXZlZCB0aGlzIG1haWwgbXVsdGlwbGUgdGltZXMs
-IEknbSBzb3JyeSwgSSdtIGhhdmluZwo+PiB0cm91YmxlIHdpdGggdGhlIG1haWwgc2V0dXApLgo+
-Cj4gTXkgaW1tZWRpYXRlIHJlYWN0aW9ucyBhcyBhIGxheSBwZXJzb24gKEkgZWRpdCB0aGUgcmFp
-ZCB3aWtpKSAuLi4KPj4gCj4+IFdpdGggdGhlIHJpc2Ugb2YgYmlnZ2VyIGFuZCBiaWdnZXIgZGlz
-a3MsIGFycmF5IHJlYnVpbGRpbmcgdGltZXMgc3RhcnQKPj4gc2t5cm9ja2V0aW5nLgo+Cj4gQW5k
-PyBZZXMsIHlvdXIgZGF0YSBpcyBhdCByaXNrIGR1cmluZyBhIHJlYnVpbGQsIGJ1dCBtZC1yYWlk
-IHRocm90dGxlcwo+IHRoZSBpL28sIHNvIGl0IGRvZXNuJ3QgaGFtbWVyIHRoZSBzeXN0ZW0uCj4+
-IAo+PiBJbiBhIHBhcGVyIGZvcm0gJzkyIEhvbGxhbmQgYW5kIEdpYnNvbiBbMV0gc3VnZ2VzdCBh
-IG1hcHBpbmcgYWxnb3JpdGhtCj4+IHNpbWlsYXIgdG8gUkFJRDUgYnV0IGluc3RlYWQgb2YgdXRp
-bGl6aW5nIGFsbCBkaXNrcyBpbiBhbiBhcnJheSBmb3IKPj4gZXZlcnkgSS9PIG9wZXJhdGlvbiwg
-YnV0IGltcGxlbWVudCBhIHBlci1JL08gbWFwcGluZyBmdW5jdGlvbiB0byBvbmx5Cj4+IHVzZSBh
-IHN1YnNldCBvZiB0aGUgYXZhaWxhYmxlIGRpc2tzLgo+PiAKPj4gVGhpcyBoYXMgYXQgbGVhc3Qg
-dHdvIGFkdmFudGFnZXM6Cj4+IDEpIElmIG9uZSBkaXNrIGhhcyB0byBiZSByZXBsYWNlZCwgaXQn
-cyBub3QgbmVlZGVkIHRvIHJlYWQgdGhlIGRhdGEgZnJvbQo+PiAgICBhbGwgZGlza3MgdG8gcmVj
-b3ZlciB0aGUgb25lIGZhaWxlZCBkaXNrIHNvIG5vbi1hZmZlY3RlZCBkaXNrcyBjYW4gYmUKPj4g
-ICAgdXNlZCBmb3IgcmVhbCB1c2VyIEkvTyBhbmQgbm90IGp1c3QgcmVjb3ZlcnkgYW5kCj4KPiBB
-Z2FpbiwgdGhhdCdzIHRocm90dGxpbmcsIHNvIHRoYXQncyBub3QgYSBwcm9ibGVtIC4uLgoKQW5k
-IHRocm90dGxpbmcgaW4gYSBwcm9kdWN0aW9uIGVudmlyb25tZW50IGlzIG5vdCBleGFjdGx5CmRl
-c2lyZWQuIEltYWdpbmUgYSA1MDAgZGlzayBhcnJheSAoYW5kIHllcyB0aGlzIGlzIHNvbWV0aGlu
-ZyB3ZSd2ZSBzZWVuCndpdGggTUQpIGFuZCB5b3UgaGF2ZSB0byByZXBsYWNlIGRpc2tzLiBXaGls
-ZSB0aGUgYXJyYXkgaXMgcmVidWlsdCB5b3UKaGF2ZSB0byB0aHJvdHRsZSBhbGwgSS9PIGJlY2F1
-c2Ugd2l0aCByYWlkLXsxLDUsNiwxMH0gYWxsIGRhdGEgaXMKc3RyaXBlZCBhY3Jvc3MgYWxsIGRp
-c2tzLgoKV2l0aCBhIHBhcml0eSBkZWNsdXN0ZXJlZCBSQUlEIChvciBERFAgbGlrZSBEZWxsLCBO
-ZXRBcHAgb3IgSHVhd2VpIGNhbGwKaXQpIHlvdSBkb24ndCBoYXZlIHRvIGFzIHRoZSBJL08gaXMg
-cmVwbGljYXRlZCBpbiBwYXJpdHkgZ3JvdXBzIGFjcm9zcyBhCnN1YnNldCBvZiBkaXNrcy4gQWxs
-IEkvTyB0YXJnZXRpbmcgZGlza3Mgd2hpY2ggYXJlbid0IG5lZWRlZCB0byByZWNvdmVyCnRoZSBk
-YXRhIGZyb20gdGhlIGZhaWxlZCBkaXNrcyBhcmVuJ3QgYWZmZWN0ZWQgYnkgdGhlIHRocm90dGxp
-bmcgYXQgYWxsLgoKPj4gMikgYW4gZWZmaWNpZW50IG1hcHBpbmcgZnVuY3Rpb24gY2FuIGltcHJv
-dmUgcGFyYWxsZWwgSS9PIHN1Ym1pc3Npb24sIGFzCj4+ICAgIHR3byBkaWZmZXJlbnQgSS9PcyBh
-cmUgbm90IG5lY2Vzc2FyaWx5IGdvaW5nIHRvIHRoZSBzYW1lIGRpc2tzIGluIHRoZQo+PiAgICBh
-cnJheS4gCj4+IAo+PiBGb3IgdGhlIG1hcHBpbmcgZnVuY3Rpb24gdXNlZCBhIGhhc2hpbmcgYWxn
-b3JpdGhtIGxpa2UgQ2VwaCdzIENSVVNIIFsyXQo+PiB3b3VsZCBiZSBpZGVhbCwgYXMgaXQgcHJv
-dmlkZXMgYSBwc2V1ZG8gcmFuZG9tIGJ1dCBkZXRlcm1pbmlzdGljIG1hcHBpbmcKPj4gZm9yIHRo
-ZSBJL08gb250byB0aGUgZHJpdmVzLgo+PiAKPj4gVGhpcyB3aG9sZSBkZWNsdXN0ZXJpbmcgb2Yg
-Y2F1c2Ugb25seSBtYWtlcyBzZW5zZSBmb3IgbW9yZSB0aGFuIChhdAo+PiBsZWFzdCkgNCBkcml2
-ZXMgYnV0IHdlIGRvIGhhdmUgY3VzdG9tZXJzIHdpdGggc2V2ZXJhbCBvcmRlcnMgb2YKPj4gbWFn
-bml0dWRlIG1vcmUgZHJpdmVycyBpbiBhbiBNRCBhcnJheS4KPgo+IElmIHlvdSBoYXZlIGZvdXIg
-ZHJpdmVzIG9yIG1vcmUgLSBlc3BlY2lhbGx5IGlmIHRoZXkgYXJlIG11bHRpLXRlcmFieXRlCj4g
-ZHJpdmVzIC0geW91IHNob3VsZCBOT1QgYmUgdXNpbmcgcmFpZC01IC4uLgoKcmFpZC02IHdvbid0
-IGhlbHAgeW91IG11Y2ggaW4gYWJvdmUgc2NlbmFyaW8uCgo+PiAKPj4gQXQgTFNGIEknZCBsaWtl
-IHRvIGRpc2N1c3MgaWY6Cj4+IDEpIFRoZSB3aWRlciBNRCBhdWRpZW5jZSBpcyBpbnRlcmVzdGVk
-IGluIGRlLWNsdXN0ZXJkIFJBSUQgd2l0aCBNRAo+Cj4gSSBoYXZlbid0IHJlYWQgdGhlIHBhcGVy
-cywgc28gbm8gY29tbWVudCwgc29ycnkuCj4KPj4gMikgZGUtY2x1c3RlcmVkIFJBSUQgc2hvdWxk
-IGJlIGltcGxlbWVudGVkIGFzIGEgc3VibGV2ZWwgb2YgUkFJRDUgb3IKPj4gICAgYXMgYSBuZXcg
-cGVyc29uYWxpdHkKPgo+IE5laXRoZXIhIElmIHlvdSdyZSBnb2luZyB0byBkbyBpdCwgaXQgc2hv
-dWxkIGJlIHJhaWQtNi4KPgo+PiAzKSBDUlVTSCBpcyBhIHN1aXRpYmxlIGFsZ29yaXRoIGZvciB0
-aGlzICh0aGVyZSdzIGV2aWRlbmNlIGluIFszXSB0aGF0Cj4+ICAgIHRoZSBOZXRBcHAgRS1TZXJp
-ZXMgQXJyYXlzIGRvIHVzZSBDUlVTSCBmb3IgcGFyaXR5IGRlY2x1c3RlcmluZykKPj4gCj4+IFsx
-XSBodHRwOi8vd3d3LnBkbC5jbXUuZWR1L1BETC1GVFAvRGVjbHVzdGVyaW5nL0FTUExPUy5wZGYg
-Cj4+IFsyXSBodHRwczovL2NlcGguY29tL3dwLWNvbnRlbnQvdXBsb2Fkcy8yMDE2LzA4L3dlaWwt
-Y3J1c2gtc2MwNi5wZGYKPj4gWzNdCj4+IGh0dHBzOi8vd3d3LnNuaWEub3JnL3NpdGVzL2RlZmF1
-bHQvZmlsZXMvZmlsZXMyL2ZpbGVzMi9TREMyMDEzL3ByZXNlbnRhdGlvbnMvRGlzdHJpYnV0ZWRT
-dG9yYWdlL0ppYmJlLUd3YWx0bmV5X01ldGhvZC10b19Fc3RhYmxpc2hfSGlnaF9BdmFpbGFiaWxp
-dHkucGRmCj4+IAo+IE9rYXkgLSBJJ3ZlIG5vdyBza2ltbWVkIHRoZSBjcnVzaCBwYXBlciBbMl0u
-IExvb2tzIHdlbGwgaW50ZXJlc3RpbmcuCj4gQlVULiBJdCBmZWVscyBtb3JlIGxpa2UgYnRyZnMg
-dGhhbiBpdCBkb2VzIGxpa2UgcmFpZC4KPgo+IEJ0cmZzIG1hbmFnZXMgZGlza3MsIGFuZCBkb2Vz
-IHJhaWQsIGl0IHRyaWVzIHRvIGJlIHRoZSAiZXZlcnl0aGluZwo+IGJldHdlZW4gdGhlIGhhcmQg
-ZHJpdmUgYW5kIHRoZSBmaWxlIi4gVGhpcyBjcnVzaCB0aGluZ3kgcmVhZHMgdG8gbWUgbGlrZQo+
-IGl0IHdhbnRzIHRvIGJlIHRoZSBzYW1lLiBUaGVyZSdzIG5vdGhpbmcgd3Jvbmcgd2l0aCB0aGF0
-LCBidXQgbWQgaXMgYQo+IHVuaXgteSAiZG8gb25lIHRoaW5nIChyYWlkKSBhbmQgZG8gaXQgd2Vs
-bCIuCgpXZWxsIENSVVNIIGlzIChvbmUgb2YpIHRoZSBhbGdvcml0aG1zIGJlaGluZCBDZXBoLiBJ
-dCB0YWtlcyB0aGUKZGVjaXNpb25zIHdoZXJlIHRvIHBsYWNlIGEgYmxvY2suIEl0IGlzIGp1c3Qg
-YSBoYXNoICh3ZWxsIHRlY2huaWNhbGx5IGEKd2VpZ2h0ZWQgZGVjaXNpb24tdHJlZSkgZnVuY3Rp
-b24gdGhhdCB0YWtlcyBhIGJsb2NrIG9mIEkvTyBhbmQgYSBzb21lCmNvbmZpZ3VyYXRpb24gcGFy
-YW1ldGVycyBhbmQgImNhbGN1bGF0ZXMiIHRoZSBwbGFjZW1lbnQuCgo+IE15IGtuZWUtamVyayBy
-ZWFjdGlvbiBpcyBpZiB5b3Ugd2FudCB0byBnbyBmb3IgaXQsIGl0IHNvdW5kcyBsaWtlIGEgZ29v
-ZAo+IGlkZWEuIEl0IGp1c3QgZG9lc24ndCByZWFsbHkgZmVlbCBhIGdvb2QgZml0IGZvciBtZC4K
-ClRoYW5rcyBmb3IgdGhlIGlucHV0LgoKICAgICAgIEpvaGFubmVzCi0tIApKb2hhbm5lcyBUaHVt
-c2hpcm4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBTdG9yYWdlCmp0
-aHVtc2hpcm5Ac3VzZS5kZSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgKzQ5IDkxMSA3
-NDA1MyA2ODkKU1VTRSBMSU5VWCBHbWJILCBNYXhmZWxkc3RyLiA1LCA5MDQwOSBOw7xybmJlcmcK
-R0Y6IEZlbGl4IEltZW5kw7ZyZmZlciwgSmFuZSBTbWl0aGFyZCwgR3JhaGFtIE5vcnRvbgpIUkIg
-MjEyODQgKEFHIE7DvHJuYmVyZykKS2V5IGZpbmdlcnByaW50ID0gRUMzOCA5Q0FCIEMyQzQgRjI1
-RCA4NjAwIEQwRDAgMDM5MyA5NjlEIDJENzYgMDg1MApfX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fXwpMc2YtcGMgbWFpbGluZyBsaXN0CkxzZi1wY0BsaXN0cy5s
-aW51eC1mb3VuZGF0aW9uLm9yZwpodHRwczovL2xpc3RzLmxpbnV4Zm91bmRhdGlvbi5vcmcvbWFp
-bG1hbi9saXN0aW5mby9sc2YtcGMK
+--===============7570522455850665147==
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha256; protocol="application/pgp-signature"
+
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Jan 29 2018, Wols Lists wrote:
+
+> On 29/01/18 15:23, Johannes Thumshirn wrote:
+>> Hi linux-raid, lsf-pc
+>>=20
+>> (If you've received this mail multiple times, I'm sorry, I'm having
+>> trouble with the mail setup).
+>
+> My immediate reactions as a lay person (I edit the raid wiki) ...
+>>=20
+>> With the rise of bigger and bigger disks, array rebuilding times start
+>> skyrocketing.
+>
+> And? Yes, your data is at risk during a rebuild, but md-raid throttles
+> the i/o, so it doesn't hammer the system.
+>>=20
+>> In a paper form '92 Holland and Gibson [1] suggest a mapping algorithm
+>> similar to RAID5 but instead of utilizing all disks in an array for
+>> every I/O operation, but implement a per-I/O mapping function to only
+>> use a subset of the available disks.
+>>=20
+>> This has at least two advantages:
+>> 1) If one disk has to be replaced, it's not needed to read the data from
+>>    all disks to recover the one failed disk so non-affected disks can be
+>>    used for real user I/O and not just recovery and
+>
+> Again, that's throttling, so that's not a problem ...
+
+Imagine an array with 100 drives on which we store data in sets of
+(say) 6 data chunks and 2 parity chunks.
+Each group of 8 chunks is distributed over the 100 drives in a
+different way so that (e.g) 600 data chunks and 200 parity chunks are
+distributed over 8 physical stripes using some clever distribution
+function.
+If (when) one drive fails, the 8 chunks in this set of 8 physical
+stripes can be recovered by reading 6*8 =3D=3D 48 chunks which will each be
+on a different drive.  Half the drives deliver only one chunk (in an ideal
+distribution) and the other half deliver none.  Maybe they will deliver
+some for the next set of 100 logical stripes.
+
+You would probably say that even doing raid6 on 100 drives is crazy.
+Better to make, e.g. 10 groups of 10 and do raid6 on each of the 10,
+then LVM them together.
+
+By doing declustered parity you can sanely do raid6 on 100 drives, using
+a logical stripe size that is much smaller than 100.
+When recovering a single drive, the 10-groups-of-10 would put heavy load
+on 9 other drives, while the decluster approach puts light load on 99
+other drives.  No matter how clever md is at throttling recovery, I
+would still rather distribute the load so that md has an easier job.
+
+NeilBrown
+
+>
+>> 2) an efficient mapping function can improve parallel I/O submission, as
+>>    two different I/Os are not necessarily going to the same disks in the
+>>    array.=20
+>>=20
+>> For the mapping function used a hashing algorithm like Ceph's CRUSH [2]
+>> would be ideal, as it provides a pseudo random but deterministic mapping
+>> for the I/O onto the drives.
+>>=20
+>> This whole declustering of cause only makes sense for more than (at
+>> least) 4 drives but we do have customers with several orders of
+>> magnitude more drivers in an MD array.
+>
+> If you have four drives or more - especially if they are multi-terabyte
+> drives - you should NOT be using raid-5 ...
+>>=20
+>> At LSF I'd like to discuss if:
+>> 1) The wider MD audience is interested in de-clusterd RAID with MD
+>
+> I haven't read the papers, so no comment, sorry.
+>
+>> 2) de-clustered RAID should be implemented as a sublevel of RAID5 or
+>>    as a new personality
+>
+> Neither! If you're going to do it, it should be raid-6.
+>
+>> 3) CRUSH is a suitible algorith for this (there's evidence in [3] that
+>>    the NetApp E-Series Arrays do use CRUSH for parity declustering)
+>>=20
+>> [1] http://www.pdl.cmu.edu/PDL-FTP/Declustering/ASPLOS.pdf=20
+>> [2] https://ceph.com/wp-content/uploads/2016/08/weil-crush-sc06.pdf
+>> [3]
+>> https://www.snia.org/sites/default/files/files2/files2/SDC2013/presentat=
+ions/DistributedStorage/Jibbe-Gwaltney_Method-to_Establish_High_Availabilit=
+y.pdf
+>>=20
+> Okay - I've now skimmed the crush paper [2]. Looks well interesting.
+> BUT. It feels more like btrfs than it does like raid.
+>
+> Btrfs manages disks, and does raid, it tries to be the "everything
+> between the hard drive and the file". This crush thingy reads to me like
+> it wants to be the same. There's nothing wrong with that, but md is a
+> unix-y "do one thing (raid) and do it well".
+>
+> My knee-jerk reaction is if you want to go for it, it sounds like a good
+> idea. It just doesn't really feel a good fit for md.
+>
+> Cheers,
+> Wol
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAlpvlxwACgkQOeye3VZi
+gbmqbw/9GtZaOsTvQ0Ob2tC3INRZxyEVZei103CIsWF2U+/RjRlFbZI11xI2mu2G
+Gb216HLjynmE5V/sbH47FKmagYIEs9ItAUdJpmvFtlkdNYf8k9xiLOgcuoOzLmG0
+v6/UloRzcUt/6QReJqbImdtepWReKdoSjPx0bEfhm372tbYT7EmBDJGFQWj450O0
+SohIM0RZwXAs5H8HIZN0BSR43qSpOZ0k3rU/NsS5RVJvVgjnEthllbsmXEu1jNnZ
+KbteO8GPlgwWUZTrJpWozTLLXCh9hv4eF6T1yISR6Ej7VrVBYbJAiIheNbOKwPWk
+3DaOILjCeyo6YyNkSy+H+SPeMqT/2Sr22JXCkINgYIy8WM9nA3zc1iCd0qzjxuIQ
+xE2nUbf6vaxAoxu7BT5NaHomBn2yaygTEsIZmra+HrgKZGoZpengrQ7X4REs95i0
+ypO08nYWc5U4sMG7+0SrV2r6prqr9QuoVfRWK0tKrKoJoUMWrrTFGrFs7V3UjXQ4
+a7UDhOwPk7vjFnK40/LPrGJsouiCdUfBQfx+/V2YCZonmjhmmwBtBzV4kqRncjJm
+LziC8mnX+SOzjHjluV1KkC7l8oKHK0Yiyq11W7wpkVsQT2thTUi+9VXzOunhuvvE
+IF2G9Jau/LU9RjR+kQB46gep1DZYw+br3NKiCT+Nbrlw9fLYRoE=
+=kYSc
+-----END PGP SIGNATURE-----
+--=-=-=--
+
+--===============7570522455850665147==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Lsf-pc mailing list
+Lsf-pc@lists.linux-foundation.org
+https://lists.linuxfoundation.org/mailman/listinfo/lsf-pc
+
+--===============7570522455850665147==--
