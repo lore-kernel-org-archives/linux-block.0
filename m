@@ -1,91 +1,54 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:37560 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751279AbeAENQt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Jan 2018 08:16:49 -0500
-Received: by mail-wm0-f67.google.com with SMTP id f140so2413919wmd.2
-        for <linux-block@vger.kernel.org>; Fri, 05 Jan 2018 05:16:48 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
-Subject: [GIT PULL 09/25] lightnvm: guarantee target unique name across devs.
-Date: Fri,  5 Jan 2018 14:16:05 +0100
-Message-Id: <20180105131621.20808-10-m@bjorling.me>
-In-Reply-To: <20180105131621.20808-1-m@bjorling.me>
-References: <20180105131621.20808-1-m@bjorling.me>
+Received: from mail-it0-f67.google.com ([209.85.214.67]:53300 "EHLO
+        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751590AbeA2S6v (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 29 Jan 2018 13:58:51 -0500
+Received: by mail-it0-f67.google.com with SMTP id b5so9558720itc.3
+        for <linux-block@vger.kernel.org>; Mon, 29 Jan 2018 10:58:51 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+From: Bryan Gurney <bgurney@redhat.com>
+Date: Mon, 29 Jan 2018 13:58:50 -0500
+Message-ID: <CAHhmqcQWi12He=P1uMOopwVPS3RYgXa60joLK+w9j1fJQ3fOjw@mail.gmail.com>
+Subject: [LSF/MM TOPIC] Bringing Virtual Data Optimizer (VDO) to upstream
+To: lsf-pc@lists.linux-foundation.org
+Cc: linux-block@vger.kernel.org, dm-devel@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Javier González <javier@cnexlabs.com>
+Hello,
 
-Until now, target unique naming is only guaranteed per device. This is
-ok from a lightnvm perspective, but not from a sysfs one, since groups
-will collide regardless of the underlying device.
+I'd like to talk about Virtual Data Optimizer (VDO), which is a
+device-mapper target that provides deduplication, compression, thin
+provisioning, and zero-block elimination for primary storage.  Now
+that VDO is open-source, LSF/MM would be a good time to open a
+dialogue between other upstream developers as we work to bring VDO
+upstream.
 
-Check that names are unique across all lightnvm-capable devices.
+VDO was originally developed by Permabit Technology Corporation as a
+proprietary set of kernel modules and userspace tools.  After being
+acquired by Red Hat, VDO has been re-licensed under the GNU General
+Public License, version 2.  The VDO team has also been working a lot
+closer with Mike Snitzer and other developers of device-mapper and
+LVM.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <m@bjorling.me>
----
- drivers/lightnvm/core.c | 33 +++++++++++++++++++++++++++------
- 1 file changed, 27 insertions(+), 6 deletions(-)
+The source for VDO is available at the following repositories:
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 5c2d0f3..d5f231c 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -56,6 +56,30 @@ static struct nvm_target *nvm_find_target(struct nvm_dev *dev, const char *name)
- 	return NULL;
- }
- 
-+static bool nvm_target_exists(const char *name)
-+{
-+	struct nvm_dev *dev;
-+	struct nvm_target *tgt;
-+	bool ret = false;
-+
-+	down_write(&nvm_lock);
-+	list_for_each_entry(dev, &nvm_devices, devices) {
-+		mutex_lock(&dev->mlock);
-+		list_for_each_entry(tgt, &dev->targets, list) {
-+			if (!strcmp(name, tgt->disk->disk_name)) {
-+				ret = true;
-+				mutex_unlock(&dev->mlock);
-+				goto out;
-+			}
-+		}
-+		mutex_unlock(&dev->mlock);
-+	}
-+
-+out:
-+	up_write(&nvm_lock);
-+	return ret;
-+}
-+
- static int nvm_reserve_luns(struct nvm_dev *dev, int lun_begin, int lun_end)
- {
- 	int i;
-@@ -259,14 +283,11 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 		return -EINVAL;
- 	}
- 
--	mutex_lock(&dev->mlock);
--	t = nvm_find_target(dev, create->tgtname);
--	if (t) {
--		pr_err("nvm: target name already exists.\n");
--		mutex_unlock(&dev->mlock);
-+	if (nvm_target_exists(create->tgtname)) {
-+		pr_err("nvm: target name already exists (%s)\n",
-+							create->tgtname);
- 		return -EINVAL;
- 	}
--	mutex_unlock(&dev->mlock);
- 
- 	ret = nvm_reserve_luns(dev, s->lun_begin, s->lun_end);
- 	if (ret)
--- 
-2.9.3
+https://github.com/dm-vdo/kvdo (kernel modules)
+https://github.com/dm-vdo/vdo (userspace tools)
+
+As the README files in the repositories above indicate, development on
+VDO is currently focusing on upstream integration, which includes
+various coding standards compliance changes, refactoring efforts, and
+various other changes that become possible now that VDO is re-licensed
+under the GPL.
+
+That being said, VDO has been in production use since 2014 in its
+previous proprietary form, and continues to undergo thorough testing,
+including real-world test scenarios.
+
+
+Thanks,
+
+Bryan
