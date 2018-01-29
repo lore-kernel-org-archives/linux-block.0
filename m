@@ -1,58 +1,65 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:44297 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757236AbeAHUVw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Jan 2018 15:21:52 -0500
-Received: by mail-pf0-f194.google.com with SMTP id m26so6767252pfj.11
-        for <linux-block@vger.kernel.org>; Mon, 08 Jan 2018 12:21:52 -0800 (PST)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Zhai Zhaoxuan <kxuanobj@gmail.com>
-Subject: [416 PATCH 10/13] bcache: fix unmatched generic_end_io_acct() & generic_start_io_acct()
-Date: Mon,  8 Jan 2018 12:21:27 -0800
-Message-Id: <20180108202130.31303-11-mlyle@lyle.org>
-In-Reply-To: <20180108202130.31303-1-mlyle@lyle.org>
-References: <20180108202130.31303-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=560fb3b88=bart.vanassche@wdc.com>
+Subject: Re: [RFC PATCH] blk-mq: fixup RESTART when queue becomes idle
+To: Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
+Cc: "snitzer@redhat.com" <snitzer@redhat.com>,
+ "dm-devel@redhat.com" <dm-devel@redhat.com>,
+ "hch@infradead.org" <hch@infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "osandov@fb.com" <osandov@fb.com>
+References: <20180118024124.8079-1-ming.lei@redhat.com>
+ <b2e5b7e6-ce4b-6053-adae-63cc44d773af@wdc.com>
+ <20180118170353.GB19734@redhat.com> <1516296056.2676.23.camel@wdc.com>
+ <20180118183039.GA20121@redhat.com> <1516301278.2676.35.camel@wdc.com>
+ <deeb2b2e-6d0e-a144-843d-d08626de8aea@kernel.dk>
+ <20180119023212.GA25413@ming.t460p>
+ <eba1191e-4d59-a763-03b2-acd2d2812ea3@kernel.dk>
+ <20180119072623.GB25369@ming.t460p>
+ <047f68ec-f51b-190f-2f89-f413325c2540@kernel.dk>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+Message-ID: <bb221027-3fcf-fbf8-7535-05569fb850ca@wdc.com>
+Date: Mon, 29 Jan 2018 14:37:00 -0800
+MIME-Version: 1.0
+In-Reply-To: <047f68ec-f51b-190f-2f89-f413325c2540@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-From: Zhai Zhaoxuan <kxuanobj@gmail.com>
+On 01/19/18 07:24, Jens Axboe wrote:
+> That's what I thought. So for a low queue depth underlying queue, it's
+> quite possible that this situation can happen. Two potential solutions
+> I see:
+> 
+> 1) As described earlier in this thread, having a mechanism for being
+>     notified when the scarce resource becomes available. It would not
+>     be hard to tap into the existing sbitmap wait queue for that.
+> 
+> 2) Have dm set BLK_MQ_F_BLOCKING and just sleep on the resource
+>     allocation. I haven't read the dm code to know if this is a
+>     possibility or not.
+> 
+> I'd probably prefer #1. It's a classic case of trying to get the
+> request, and if it fails, add ourselves to the sbitmap tag wait
+> queue head, retry, and bail if that also fails. Connecting the
+> scarce resource and the consumer is the only way to really fix
+> this, without bogus arbitrary delays.
 
-The function cached_dev_make_request() and flash_dev_make_request() call
-generic_start_io_acct() with (struct bcache_device)->disk when they start a
-closure. Then the function bio_complete() calls generic_end_io_acct() with
-(struct search)->orig_bio->bi_disk when the closure has done.
-Since the `bi_disk` is not the bcache device, the generic_end_io_acct() is
-called with a wrong device queue.
+(replying to an e-mail from ten days ago)
 
-It causes the "inflight" (in struct hd_struct) counter keep increasing
-without decreasing.
+Implementing a notification mechanism for all cases in which 
+blk_insert_cloned_request() returns BLK_STS_RESOURCE today would require 
+a lot of work. If e.g. a SCSI LLD returns one of the SCSI_MLQUEUE_*_BUSY 
+return codes from its .queuecommand() implementation then the SCSI core 
+will translate that return code into BLK_STS_RESOURCE. From scsi_queue_rq():
 
-This patch fix the problem by calling generic_end_io_acct() with
-(struct bcache_device)->disk.
+	reason = scsi_dispatch_cmd(cmd);
+	if (reason) {
+		scsi_set_blocked(cmd, reason);
+		ret = BLK_STS_RESOURCE;
+		goto out_dec_host_busy;
+	}
 
-Signed-off-by: Zhai Zhaoxuan <kxuanobj@gmail.com>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
-Reviewed-by: Coly Li <colyli@suse.de>
-Reviewed-by: Tang Junhui <tang.junhui@zte.com.cn>
----
- drivers/md/bcache/request.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+In other words, implementing a notification mechanism for all cases in 
+which blk_insert_cloned_request() can return BLK_STS_RESOURCE would 
+require to modify all SCSI LLDs.
 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index ddd941056f3c..1a46b41dac70 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -633,8 +633,8 @@ static void request_endio(struct bio *bio)
- static void bio_complete(struct search *s)
- {
- 	if (s->orig_bio) {
--		struct request_queue *q = s->orig_bio->bi_disk->queue;
--		generic_end_io_acct(q, bio_data_dir(s->orig_bio),
-+		generic_end_io_acct(s->d->disk->queue,
-+				    bio_data_dir(s->orig_bio),
- 				    &s->d->disk->part0, s->start_time);
- 
- 		trace_bcache_request_end(s->d, s->orig_bio);
--- 
-2.14.1
+Bart.
