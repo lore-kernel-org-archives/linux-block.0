@@ -1,56 +1,59 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:47319 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751665AbeA3PHc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Jan 2018 10:07:32 -0500
 Subject: Re: [dm-devel] [LSF/MM TOPIC] block, dm: restack queue_limits
-From: "Ewan D. Milne" <emilne@redhat.com>
-Reply-To: emilne@redhat.com
-To: Hannes Reinecke <hare@suse.de>
-Cc: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
+To: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
         dm-devel@redhat.com,
         "linux-scsi@vger.kernel.org" <Linux-scsi@vger.kernel.org>
-In-Reply-To: <cb9f601d-4848-1255-f00b-6b3079ab8c40@suse.de>
 References: <20180129210836.GA5744@redhat.com>
-         <cb9f601d-4848-1255-f00b-6b3079ab8c40@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 30 Jan 2018 13:49:33 -0500
-Message-ID: <1517338173.30292.76.camel@localhost.localdomain>
-Mime-Version: 1.0
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <cb9f601d-4848-1255-f00b-6b3079ab8c40@suse.de>
+Date: Tue, 30 Jan 2018 16:07:30 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180129210836.GA5744@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Tue, 2018-01-30 at 16:07 +0100, Hannes Reinecke wrote:
-> On 01/29/2018 10:08 PM, Mike Snitzer wrote:
-> > We currently don't restack the queue_limits if the lowest, or
-> > intermediate, layer of an IO stack changes.
-> > 
-> > This is particularly unfortunate in the case of FLUSH/FUA which may
-> > change if/when a HW controller's BBU fails; whereby requiring the device
-> > advertise that it has a volatile write cache (WCE=1).
-> > 
-> Uh-oh. Device rescan.
-> Would be a valid topic on its own...
+On 01/29/2018 10:08 PM, Mike Snitzer wrote:
+> We currently don't restack the queue_limits if the lowest, or
+> intermediate, layer of an IO stack changes.
 > 
-> > But in the context of DM, really it'd be best if the entire stack of
-> > devices had their limits restacked if any underlying layer's limits
-> > change.
-> > 
-> > In the past, Martin and I discussed that we should "just do it" but
-> > never did.  Not sure we need a lengthy discussion but figured I'd put it
-> > out there.
-> > 
-> > Maybe I'll find time, between now and April, to try implementing it.
-> > 
-> For SCSI the device capabilities are pretty much set in stone after the
-> initial scan; there are hooks for rescanning, but they will only work
-> half of the time.
-> Plus we can't really change the device type on the fly (eg if the SCSI
-> device type changes; if it moves away from '0' we would need to unbind
-> the sd driver, and if it moves to '0' we'll need to rescan the sd
-> device. None of this is happening right now.)
+> This is particularly unfortunate in the case of FLUSH/FUA which may
+> change if/when a HW controller's BBU fails; whereby requiring the device
+> advertise that it has a volatile write cache (WCE=1).
 > 
-> So I'd be glad to have a discussion around this.
+Uh-oh. Device rescan.
+Would be a valid topic on its own...
 
-At least array vendor has also desired the ability to change various
-attributes of the device after the initial scan, such as the model name.
-Not sure what would break if we did this, since who knows what userspace
-software might be caching this info, but...
+> But in the context of DM, really it'd be best if the entire stack of
+> devices had their limits restacked if any underlying layer's limits
+> change.
+> 
+> In the past, Martin and I discussed that we should "just do it" but
+> never did.  Not sure we need a lengthy discussion but figured I'd put it
+> out there.
+> 
+> Maybe I'll find time, between now and April, to try implementing it.
+> 
+For SCSI the device capabilities are pretty much set in stone after the
+initial scan; there are hooks for rescanning, but they will only work
+half of the time.
+Plus we can't really change the device type on the fly (eg if the SCSI
+device type changes; if it moves away from '0' we would need to unbind
+the sd driver, and if it moves to '0' we'll need to rescan the sd
+device. None of this is happening right now.)
 
--Ewan
+So I'd be glad to have a discussion around this.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
