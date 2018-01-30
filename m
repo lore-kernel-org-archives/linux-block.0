@@ -1,92 +1,93 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from auth-3.ukservers.net ([217.10.138.152]:35200 "EHLO
-        auth-3.ukservers.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751554AbeA3RkG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jan 2018 12:40:06 -0500
-Subject: Re: [LSF/MM TOPIC] De-clustered RAID with MD
-To: NeilBrown <neilb@suse.com>,
+Received: from mx2.suse.de ([195.135.220.15]:49829 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751434AbeA3LYh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Jan 2018 06:24:37 -0500
+From: NeilBrown <neilb@suse.com>
+To: Wols Lists <antlists@youngman.org.uk>,
         Johannes Thumshirn <jthumshirn@suse.de>,
         lsf-pc@lists.linux-foundation.org
+Date: Tue, 30 Jan 2018 22:24:23 +1100
 Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
         Hannes Reinecke <hare@suse.de>, Neil Brown <neilb@suse.de>
-References: <mqdvafkhep0.fsf@linux-x5ow.site>
- <5A6F4CA6.5060802@youngman.org.uk> <87fu6o5o83.fsf@notabene.neil.brown.name>
- <5A704C59.4000705@youngman.org.uk> <87372n613s.fsf@notabene.neil.brown.name>
-From: Wol's lists <antlists@youngman.org.uk>
-Message-ID: <337d2541-e8d1-1c2e-e61b-bcca1e7c7388@youngman.org.uk>
-Date: Tue, 30 Jan 2018 17:40:02 +0000
+Subject: Re: [LSF/MM TOPIC] De-clustered RAID with MD
+In-Reply-To: <5A704C59.4000705@youngman.org.uk>
+References: <mqdvafkhep0.fsf@linux-x5ow.site> <5A6F4CA6.5060802@youngman.org.uk> <87fu6o5o83.fsf@notabene.neil.brown.name> <5A704C59.4000705@youngman.org.uk>
+Message-ID: <87372n613s.fsf@notabene.neil.brown.name>
 MIME-Version: 1.0
-In-Reply-To: <87372n613s.fsf@notabene.neil.brown.name>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 30/01/18 11:24, NeilBrown wrote:
-> On Tue, Jan 30 2018, Wols Lists wrote:
-> 
->> On 29/01/18 21:50, NeilBrown wrote:
->>> By doing declustered parity you can sanely do raid6 on 100 drives, using
->>> a logical stripe size that is much smaller than 100.
->>> When recovering a single drive, the 10-groups-of-10 would put heavy load
->>> on 9 other drives, while the decluster approach puts light load on 99
->>> other drives.  No matter how clever md is at throttling recovery, I
->>> would still rather distribute the load so that md has an easier job.
->>
->> Not offering to do it ... :-)
->>
->> But that sounds a bit like linux raid-10. Could a simple approach be to
->> do something like "raid-6,11,100", ie raid-6 with 9 data chunks, two
->> parity, striped across 100 drives? Okay, it's not as good as the
->> decluster approach, but it would spread the stress of a rebuild across
->> 20 drives, not 10. And probably be fairly easy to implement.
-> 
-> If you did that, I think you would be about 80% of the way to fully
-> declustered-parity RAID.
-> If you then tweak the math a bit so that one stripe would was
-> 
-> A1 A2 A3 A4 B1 B2 B3 B4 C1 C2 C3 C4 ....
-> 
-> and the next
-> 
-> A1 C1 A2 C2 A3 C3 A4 C4 B1 D1 B2 D2 ....
-> 
-> and then
-> 
-> A1 B1 C1 D1 A2 B2 C2 D2 A3 B3 C3 D3 ....
-> 
->                    XX
->                    
-> When Ax are a logical stripe and Bx are the next,  then you have a
-> slightly better distribution.  If device XX fails then the reads needed
-> for the first stripe mostly come from different drives than those for
-> the second stripe, which are mostly different again for the 3rd stripe.
-> 
-> Presumably the CRUSH algorithm (which I only skim-read once about a year
-> ago) formalizes how to do this, and does it better.
-> Once you have the data handling in place for your proposal, it should be
-> little more than replacing a couple of calculations to get the full
-> solution.
-> 
-Okay. I think I have it - a definition for raid-16 (or is it raid-61). 
-But I need a bit of help with the maths. And it might need a look-up 
-table :-(
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Okay. Like raid-10, raid-16 would be spec'd as "--level 16,3,8", ie 3 
-mirrors, emulating an 8-drive raid-6.
+On Tue, Jan 30 2018, Wols Lists wrote:
 
-What I'm looking for is a PRNG that has the "bug" that it repeats over a 
-short period, and over that period is guaranteed to repeat each number 
-the same number of times. I saw a wonderful video demonstration of this 
-years ago - if you plot the generated number against the number of times 
-it was generated, after a few rows it "filled up" a rectangle on the graph.
+> On 29/01/18 21:50, NeilBrown wrote:
+>> By doing declustered parity you can sanely do raid6 on 100 drives, using
+>> a logical stripe size that is much smaller than 100.
+>> When recovering a single drive, the 10-groups-of-10 would put heavy load
+>> on 9 other drives, while the decluster approach puts light load on 99
+>> other drives.  No matter how clever md is at throttling recovery, I
+>> would still rather distribute the load so that md has an easier job.
+>
+> Not offering to do it ... :-)
+>
+> But that sounds a bit like linux raid-10. Could a simple approach be to
+> do something like "raid-6,11,100", ie raid-6 with 9 data chunks, two
+> parity, striped across 100 drives? Okay, it's not as good as the
+> decluster approach, but it would spread the stress of a rebuild across
+> 20 drives, not 10. And probably be fairly easy to implement.
 
-At which point the maths becomes very simple. I just need at least as 
-many real drives as "mirrors times emulated".
+If you did that, I think you would be about 80% of the way to fully
+declustered-parity RAID.
+If you then tweak the math a bit so that one stripe would was
 
-If somebody can come up with the algorithm I want, I can spec it, and 
-then maybe someone can implement it? It'll be fun testing - I'll need my 
-new machine when I get it working :-)
+A1 A2 A3 A4 B1 B2 B3 B4 C1 C2 C3 C4 ....
 
-Cheers,
-Wol
+and the next
+
+A1 C1 A2 C2 A3 C3 A4 C4 B1 D1 B2 D2 ....
+
+and then
+
+A1 B1 C1 D1 A2 B2 C2 D2 A3 B3 C3 D3 ....
+
+                  XX
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+When Ax are a logical stripe and Bx are the next,  then you have a
+slightly better distribution.  If device XX fails then the reads needed
+for the first stripe mostly come from different drives than those for
+the second stripe, which are mostly different again for the 3rd stripe.
+
+Presumably the CRUSH algorithm (which I only skim-read once about a year
+ago) formalizes how to do this, and does it better.
+Once you have the data handling in place for your proposal, it should be
+little more than replacing a couple of calculations to get the full
+solution.
+
+NeilBrown
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAlpwVecACgkQOeye3VZi
+gbk/tA/8DNuJ4QJu9nJ/O0YtpsuiH9cb58Az8OB0SH56YLqSPFKlBAPdFWP3UMj8
+68eIav+FkGrSBZ4trnjWhOiuNILHr5EgilarFFg2DnCt5/PZWu6g91TULttMPGBH
+pTsZmbZFfsLlG0/WzspYkDLTviFtPijQSfTpwi749Y52dP/nwoLbyyir5SQDvbpi
+dqAi5JfYOZUPecndGtEPEZ4uXe8HlNPDR7Lmz8+x+XMwa8fmN4TokCbBEeOkaAbT
+FKM7UNXlQbR0Nsz6bI1yCb14KJi5bycQMbamTaDOGpVJN9yeYn4/NmC/krdy4cSx
+Q7OS0/VPx13i2LqFnmZ+tOVdCSBiyjeFXckP2OywXIQ1aCP5TXRdX2hsxlhGBEMP
+B/1orkvFF9bESAhoc6sFA8sHhlluYgsG0W9u+lmoc5m7sdC7FsvDFUk74LVajO3Y
+c6bPJQdtq/KNnl4HWfXmVIYponiHxfwSNHccaBMlDEzviASjaupZx2Z6nHPC2vHA
+4zThW7KY0JNUoUMK/T+oG4cF+ArV4Tw+prnruEy0syYpoVP4owNDp/tj65XVwuuv
+//kLg2LPnynp3VxRVQDeBbqQ7rvGfUh7MO5OXZnBm4H9bpzSdKWyMLLM43fhoV/p
+IEOnlWLh+5RW25gKEGCvrKwBk2zcAG/KRNd2vIbqpTxwyb4yKi0=
+=6L06
+-----END PGP SIGNATURE-----
+--=-=-=--
