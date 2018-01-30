@@ -1,70 +1,92 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:50548 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S933099AbeAXXXp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Jan 2018 18:23:45 -0500
-From: Howard McLauchlan <hmclauchlan@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: Jens Axboe <axboe@fb.com>, Josef Bacik <jbacik@fb.com>,
-        Omar Sandoval <osandov@osandov.com>,
-        Howard McLauchlan <hmclauchlan@fb.com>
-Subject: [PATCH] block: Add should_fail_bio() for bpf error injection
-Date: Wed, 24 Jan 2018 15:22:58 -0800
-Message-ID: <20180124232258.17164-1-hmclauchlan@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Content-Type: text/plain;
+	charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: v4.15 and I/O hang with BFQ
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <20180130144002.GA14401@ming.t460p>
+Date: Tue, 30 Jan 2018 16:40:01 +0100
+Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
+ Ivan Kozik <ivan@ludios.org>,
+ linux-block <linux-block@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ 'Paolo Valente' via bfq-iosched <bfq-iosched@googlegroups.com>,
+ Jens Axboe <axboe@kernel.dk>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ SERENA ZIVIANI <169364@studenti.unimore.it>
+Message-Id: <3E34D175-88F9-4114-B627-A11262A7B470@linaro.org>
+References: <9ad0d544ab2b12f87f44eb4ef88e23a2@natalenko.name>
+ <20180130081925.GA25183@ming.t460p>
+ <38bd4dbe280bd0934abde764fe0916cd@natalenko.name>
+ <20180130144002.GA14401@ming.t460p>
+To: Ming Lei <ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-The classic error injection mechanism, should_fail_request() does not
-support use cases where more information is required (from the entire
-struct bio, for example).
 
-To that end, this patch introduces should_fail_bio(), which calls
-should_fail_request() under the hood but provides a convenient
-place for kprobes to hook into if they require the entire struct bio.
-This patch also replaces some existing calls to should_fail_request()
-with should_fail_bio() with no degradation in performance.
 
-Signed-off-by: Howard McLauchlan <hmclauchlan@fb.com>
----
- block/blk-core.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+> Il giorno 30 gen 2018, alle ore 15:40, Ming Lei <ming.lei@redhat.com> =
+ha scritto:
+>=20
+> On Tue, Jan 30, 2018 at 03:30:28PM +0100, Oleksandr Natalenko wrote:
+>> Hi.
+>>=20
+> ...
+>>   systemd-udevd-271   [000] ....     4.311033: bfq_insert_requests: =
+insert
+>> rq->0
+>>   systemd-udevd-271   [000] ...1     4.311037: =
+blk_mq_do_dispatch_sched:
+>> not get rq, 1
+>>          cfdisk-408   [000] ....    13.484220: bfq_insert_requests: =
+insert
+>> rq->1
+>>    kworker/0:1H-174   [000] ....    13.484253: =
+blk_mq_do_dispatch_sched:
+>> not get rq, 1
+>> =3D=3D=3D
+>>=20
+>> Looks the same, right?
+>=20
+> Yeah, same with before.
+>=20
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index b8881750a3ac..5e73c996d338 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -34,6 +34,7 @@
- #include <linux/pm_runtime.h>
- #include <linux/blk-cgroup.h>
- #include <linux/debugfs.h>
-+#include <linux/bpf.h>
- 
- #define CREATE_TRACE_POINTS
- #include <trace/events/block.h>
-@@ -2050,6 +2051,12 @@ static inline bool should_fail_request(struct hd_struct *part,
- 
- #endif /* CONFIG_FAIL_MAKE_REQUEST */
- 
-+static noinline bool should_fail_bio(struct bio *bio)
-+{
-+	return should_fail_request(&bio->bi_disk->part0, bio->bi_iter.bi_size);
-+}
-+BPF_ALLOW_ERROR_INJECTION(should_fail_bio);
-+
- /*
-  * Remap block n of partition p to block n+start(p) of the disk.
-  */
-@@ -2141,7 +2148,7 @@ generic_make_request_checks(struct bio *bio)
- 	if ((bio->bi_opf & REQ_NOWAIT) && !queue_is_rq_based(q))
- 		goto not_supported;
- 
--	if (should_fail_request(&bio->bi_disk->part0, bio->bi_iter.bi_size))
-+	if (should_fail_bio(bio))
- 		goto end_io;
- 
- 	if (blk_partition_remap(bio))
--- 
-2.14.1
+Hi guys,
+sorry for the delay with this fix.  We are proceeding very slowly on
+this, because I'm super busy.  Anyway, now I can at least explain in
+more detail the cause that leads to this hang.  Commit 'a6a252e64914
+("blk-mq-sched: decide how to handle flush rq via RQF_FLUSH_SEQ")'
+makes all non-flush re-prepared requests be re-inserted into the I/O
+scheduler.  With this change, I/O schedulers may get the same request
+inserted again, even several times, without a finish_request invoked
+on the request before each re-insertion.
+
+For the I/O scheduler, every such re-prepared request is equivalent
+to the insertion of a new request. For schedulers like mq-deadline
+or kyber this fact causes no problems. In contrast, it confuses a =
+stateful
+scheduler like BFQ, which preserves states for an I/O request until
+finish_request is invoked on it. In particular, BFQ has no way
+to know that the above re-insertions concerns the same, already =
+dispatched
+request. So it may get stuck waiting for the completion of these
+re-inserted requests forever, thus preventing any other queue of
+requests to be served.
+
+We are trying to address this issue by adding the hook requeue_request
+to bfq interface.
+
+Unfortunately, with our current implementation of requeue_request in
+place, bfq eventually gets to an incoherent state.  This is apparently
+caused by a requeue of an I/O request, immediately followed by a
+completion of the same request.  This seems rather absurd, and drives
+bfq crazy.  But this is something for which we don't have definite
+results yet.
+
+We're working on it, sorry again for the delay.
+
+Thanks,
+Paolo
+
+> --=20
+> Ming
