@@ -1,254 +1,101 @@
-Return-Path: <drbd-dev@lists.ewheeler.net>
-Date: Sat, 13 Jan 2018 00:46:40 +0000 (UTC)
-From: Eric Wheeler <drbd-dev@lists.ewheeler.net>
-To: Christoph Hellwig <hch@lst.de>
-cc: axboe@kernel.dk, martin.petersen@oracle.com, agk@redhat.com,
-    snitzer@redhat.com, shli@kernel.org, philipp.reisner@linbit.com,
-    lars.ellenberg@linbit.com, linux-block@vger.kernel.org,
-    linux-raid@vger.kernel.org, dm-devel@redhat.com,
-    linux-scsi@vger.kernel.org, drbd-dev@lists.linbit.com
-Subject: Re: [Drbd-dev] [PATCH 23/27] drbd: make intelligent use of
- blkdev_issue_zeroout
-In-Reply-To: <20170405172125.22600-24-hch@lst.de>
-Message-ID: <alpine.LRH.2.11.1801130035010.13147@mail.ewheeler.net>
-References: <20170405172125.22600-1-hch@lst.de> <20170405172125.22600-24-hch@lst.de>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:52388 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752630AbeA3ELR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 29 Jan 2018 23:11:17 -0500
+Date: Tue, 30 Jan 2018 12:10:50 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jiri Palecek <jpalecek@web.de>
+Cc: Jens Axboe <axboe@fb.com>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [2/2] block: fix blk_rq_append_bio
+Message-ID: <20180130041048.GH17176@ming.t460p>
+References: <20171218074044.1369-3-ming.lei@redhat.com>
+ <87tvv4p1f2.fsf@debian.i-did-not-set--mail-host-address--so-tickle-me>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <87tvv4p1f2.fsf@debian.i-did-not-set--mail-host-address--so-tickle-me>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hello All,
-
-We just noticed that discards to DRBD devices backed by dm-thin devices 
-are fully allocating the thin blocks.
-
-This behavior does not exist before 
-ee472d83 block: add a flags argument to (__)blkdev_issue_zeroout
-
-The problem exists somewhere between
-[working] c20cfc27 block: stop using blkdev_issue_write_same for zeroing
-  and
-[broken]  45c21793 drbd: implement REQ_OP_WRITE_ZEROES
-
-Note that c20cfc27 works as expected, but 45c21793 discards blocks 
-being zeroed on the dm-thin backing device. All commits between those two 
-produce the following error:
-
-blkdiscard: /dev/drbd/by-res/test: BLKDISCARD ioctl failed: Input/output error
-
-Also note that issuing a blkdiscard to the backing device directly 
-discards as you would expect. This is just a problem when sending discards 
-through DRBD.
-
-Is there an easy way to solve this in the short term, even if the ultimate 
-fix is more involved?
-
-Thank you for your help!
-
--Eric
-
---
-Eric Wheeler
-
-On Wed, 5 Apr 2017, Christoph Hellwig wrote:
-
-> drbd always wants its discard wire operations to zero the blocks, so
-> use blkdev_issue_zeroout with the BLKDEV_ZERO_UNMAP flag instead of
-> reinventing it poorly.
+On Tue, Jan 30, 2018 at 02:42:41AM +0100, Jiri Palecek wrote:
+> Hello,
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Hannes Reinecke <hare@suse.com>
-> ---
->  drivers/block/drbd/drbd_debugfs.c  |   3 --
->  drivers/block/drbd/drbd_int.h      |   6 ---
->  drivers/block/drbd/drbd_receiver.c | 102 ++-----------------------------------
->  drivers/block/drbd/drbd_req.c      |   6 +--
->  4 files changed, 7 insertions(+), 110 deletions(-)
+> I see a problem with this patch:
 > 
-> diff --git a/drivers/block/drbd/drbd_debugfs.c b/drivers/block/drbd/drbd_debugfs.c
-> index de5c3ee8a790..494837e59f23 100644
-> --- a/drivers/block/drbd/drbd_debugfs.c
-> +++ b/drivers/block/drbd/drbd_debugfs.c
-> @@ -236,9 +236,6 @@ static void seq_print_peer_request_flags(struct seq_file *m, struct drbd_peer_re
->  	seq_print_rq_state_bit(m, f & EE_CALL_AL_COMPLETE_IO, &sep, "in-AL");
->  	seq_print_rq_state_bit(m, f & EE_SEND_WRITE_ACK, &sep, "C");
->  	seq_print_rq_state_bit(m, f & EE_MAY_SET_IN_SYNC, &sep, "set-in-sync");
-> -
-> -	if (f & EE_IS_TRIM)
-> -		__seq_print_rq_state_bit(m, f & EE_IS_TRIM_USE_ZEROOUT, &sep, "zero-out", "trim");
->  	seq_print_rq_state_bit(m, f & EE_WRITE_SAME, &sep, "write-same");
->  	seq_putc(m, '\n');
->  }
-> diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
-> index 724d1c50fc52..d5da45bb03a6 100644
-> --- a/drivers/block/drbd/drbd_int.h
-> +++ b/drivers/block/drbd/drbd_int.h
-> @@ -437,9 +437,6 @@ enum {
->  
->  	/* is this a TRIM aka REQ_DISCARD? */
->  	__EE_IS_TRIM,
-> -	/* our lower level cannot handle trim,
-> -	 * and we want to fall back to zeroout instead */
-> -	__EE_IS_TRIM_USE_ZEROOUT,
->  
->  	/* In case a barrier failed,
->  	 * we need to resubmit without the barrier flag. */
-> @@ -482,7 +479,6 @@ enum {
->  #define EE_CALL_AL_COMPLETE_IO (1<<__EE_CALL_AL_COMPLETE_IO)
->  #define EE_MAY_SET_IN_SYNC     (1<<__EE_MAY_SET_IN_SYNC)
->  #define EE_IS_TRIM             (1<<__EE_IS_TRIM)
-> -#define EE_IS_TRIM_USE_ZEROOUT (1<<__EE_IS_TRIM_USE_ZEROOUT)
->  #define EE_RESUBMITTED         (1<<__EE_RESUBMITTED)
->  #define EE_WAS_ERROR           (1<<__EE_WAS_ERROR)
->  #define EE_HAS_DIGEST          (1<<__EE_HAS_DIGEST)
-> @@ -1561,8 +1557,6 @@ extern void start_resync_timer_fn(unsigned long data);
->  extern void drbd_endio_write_sec_final(struct drbd_peer_request *peer_req);
->  
->  /* drbd_receiver.c */
-> -extern int drbd_issue_discard_or_zero_out(struct drbd_device *device,
-> -		sector_t start, unsigned int nr_sectors, bool discard);
->  extern int drbd_receiver(struct drbd_thread *thi);
->  extern int drbd_ack_receiver(struct drbd_thread *thi);
->  extern void drbd_send_ping_wf(struct work_struct *ws);
-> diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-> index dc9a6dcd431c..bc1d296581f9 100644
-> --- a/drivers/block/drbd/drbd_receiver.c
-> +++ b/drivers/block/drbd/drbd_receiver.c
-> @@ -1448,108 +1448,14 @@ void drbd_bump_write_ordering(struct drbd_resource *resource, struct drbd_backin
->  		drbd_info(resource, "Method to ensure write ordering: %s\n", write_ordering_str[resource->write_ordering]);
->  }
->  
-> -/*
-> - * We *may* ignore the discard-zeroes-data setting, if so configured.
-> - *
-> - * Assumption is that it "discard_zeroes_data=0" is only because the backend
-> - * may ignore partial unaligned discards.
-> - *
-> - * LVM/DM thin as of at least
-> - *   LVM version:     2.02.115(2)-RHEL7 (2015-01-28)
-> - *   Library version: 1.02.93-RHEL7 (2015-01-28)
-> - *   Driver version:  4.29.0
-> - * still behaves this way.
-> - *
-> - * For unaligned (wrt. alignment and granularity) or too small discards,
-> - * we zero-out the initial (and/or) trailing unaligned partial chunks,
-> - * but discard all the aligned full chunks.
-> - *
-> - * At least for LVM/DM thin, the result is effectively "discard_zeroes_data=1".
-> - */
-> -int drbd_issue_discard_or_zero_out(struct drbd_device *device, sector_t start, unsigned int nr_sectors, bool discard)
-> -{
-> -	struct block_device *bdev = device->ldev->backing_bdev;
-> -	struct request_queue *q = bdev_get_queue(bdev);
-> -	sector_t tmp, nr;
-> -	unsigned int max_discard_sectors, granularity;
-> -	int alignment;
-> -	int err = 0;
-> -
-> -	if (!discard)
-> -		goto zero_out;
-> -
-> -	/* Zero-sector (unknown) and one-sector granularities are the same.  */
-> -	granularity = max(q->limits.discard_granularity >> 9, 1U);
-> -	alignment = (bdev_discard_alignment(bdev) >> 9) % granularity;
-> -
-> -	max_discard_sectors = min(q->limits.max_discard_sectors, (1U << 22));
-> -	max_discard_sectors -= max_discard_sectors % granularity;
-> -	if (unlikely(!max_discard_sectors))
-> -		goto zero_out;
-> -
-> -	if (nr_sectors < granularity)
-> -		goto zero_out;
-> -
-> -	tmp = start;
-> -	if (sector_div(tmp, granularity) != alignment) {
-> -		if (nr_sectors < 2*granularity)
-> -			goto zero_out;
-> -		/* start + gran - (start + gran - align) % gran */
-> -		tmp = start + granularity - alignment;
-> -		tmp = start + granularity - sector_div(tmp, granularity);
-> -
-> -		nr = tmp - start;
-> -		err |= blkdev_issue_zeroout(bdev, start, nr, GFP_NOIO,
-> -				BLKDEV_ZERO_NOUNMAP);
-> -		nr_sectors -= nr;
-> -		start = tmp;
-> -	}
-> -	while (nr_sectors >= granularity) {
-> -		nr = min_t(sector_t, nr_sectors, max_discard_sectors);
-> -		err |= blkdev_issue_discard(bdev, start, nr, GFP_NOIO,
-> -				BLKDEV_ZERO_NOUNMAP);
-> -		nr_sectors -= nr;
-> -		start += nr;
-> -	}
-> - zero_out:
-> -	if (nr_sectors) {
-> -		err |= blkdev_issue_zeroout(bdev, start, nr_sectors, GFP_NOIO,
-> -				BLKDEV_ZERO_NOUNMAP);
-> -	}
-> -	return err != 0;
-> -}
-> -
-> -static bool can_do_reliable_discards(struct drbd_device *device)
-> -{
-> -	struct request_queue *q = bdev_get_queue(device->ldev->backing_bdev);
-> -	struct disk_conf *dc;
-> -	bool can_do;
-> -
-> -	if (!blk_queue_discard(q))
-> -		return false;
-> -
-> -	if (q->limits.discard_zeroes_data)
-> -		return true;
-> -
-> -	rcu_read_lock();
-> -	dc = rcu_dereference(device->ldev->disk_conf);
-> -	can_do = dc->discard_zeroes_if_aligned;
-> -	rcu_read_unlock();
-> -	return can_do;
-> -}
-> -
->  static void drbd_issue_peer_discard(struct drbd_device *device, struct drbd_peer_request *peer_req)
->  {
-> -	/* If the backend cannot discard, or does not guarantee
-> -	 * read-back zeroes in discarded ranges, we fall back to
-> -	 * zero-out.  Unless configuration specifically requested
-> -	 * otherwise. */
-> -	if (!can_do_reliable_discards(device))
-> -		peer_req->flags |= EE_IS_TRIM_USE_ZEROOUT;
-> +	struct block_device *bdev = device->ldev->backing_bdev;
->  
-> -	if (drbd_issue_discard_or_zero_out(device, peer_req->i.sector,
-> -	    peer_req->i.size >> 9, !(peer_req->flags & EE_IS_TRIM_USE_ZEROOUT)))
-> +	if (blkdev_issue_zeroout(bdev, peer_req->i.sector, peer_req->i.size >> 9,
-> +			GFP_NOIO, 0))
->  		peer_req->flags |= EE_WAS_ERROR;
-> +
->  	drbd_endio_write_sec_final(peer_req);
->  }
->  
-> diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
-> index 652114ae1a8a..6da9ea8c48b6 100644
-> --- a/drivers/block/drbd/drbd_req.c
-> +++ b/drivers/block/drbd/drbd_req.c
-> @@ -1148,10 +1148,10 @@ static int drbd_process_write_request(struct drbd_request *req)
->  
->  static void drbd_process_discard_req(struct drbd_request *req)
->  {
-> -	int err = drbd_issue_discard_or_zero_out(req->device,
-> -				req->i.sector, req->i.size >> 9, true);
-> +	struct block_device *bdev = req->device->ldev->backing_bdev;
->  
-> -	if (err)
-> +	if (blkdev_issue_zeroout(bdev, req->i.sector, req->i.size >> 9,
-> +			GFP_NOIO, 0))
->  		req->private_bio->bi_error = -EIO;
->  	bio_endio(req->private_bio);
->  }
-> -- 
-> 2.11.0
+> Ming Lei <ming.lei@redhat.com> writes:
 > 
-> _______________________________________________
-> drbd-dev mailing list
-> drbd-dev@lists.linbit.com
-> http://lists.linbit.com/mailman/listinfo/drbd-dev
+> > From: Jens Axboe <axboe@kernel.dk>
+> >
+> > Commit caa4b02476e3(blk-map: call blk_queue_bounce from blk_rq_append_bio)
+> > moves blk_queue_bounce() into blk_rq_append_bio(), but don't consider
+> > that the bounced bio becomes invisiable to caller since the parameter type is
+> > 'struct bio *', which should have been 'struct bio **'.
+> >
+> > This patch fixes this issue by passing 'struct bio **' to
+> > blk_rq_append_bio(), then the bounced bio can be returned to caller.
+> >
+> > Also failure handling is considered too.
+> >
+> > Fixes: caa4b02476e3 ("blk-map: call blk_queue_bounce from blk_rq_append_bio")
+> > Cc: Christoph Hellwig <hch@lst.de>
+> > Reported-by: Michele Ballabio <barra_cuda@katamail.com>
+> > (handling failure of blk_rq_append_bio(), only call bio_get() after
+> > blk_rq_append_bio() returns OK)
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  block/blk-map.c                    | 38 ++++++++++++++++++++++----------------
+> >  drivers/scsi/osd/osd_initiator.c   |  4 +++-
+> >  drivers/target/target_core_pscsi.c |  4 ++--
+> >  include/linux/blkdev.h             |  2 +-
+> >  4 files changed, 28 insertions(+), 20 deletions(-)
+> >
+> > diff --git a/block/blk-map.c b/block/blk-map.c
+> > index b21f8e86f120..d3a94719f03f 100644
+> > --- a/block/blk-map.c
+> > +++ b/block/blk-map.c
+> > @@ -12,22 +12,29 @@
+> >  #include "blk.h"
+> >  
+> >  /*
+> > - * Append a bio to a passthrough request.  Only works can be merged into
+> > - * the request based on the driver constraints.
+> > + * Append a bio to a passthrough request.  Only works if the bio can be merged
+> > + * into the request based on the driver constraints.
+> >   */
+> > -int blk_rq_append_bio(struct request *rq, struct bio *bio)
+> > +int blk_rq_append_bio(struct request *rq, struct bio **bio)
+> >  {
+> > -	blk_queue_bounce(rq->q, &bio);
+> > +	struct bio *orig_bio = *bio;
+> > +
+> > +	blk_queue_bounce(rq->q, bio);
+> >  
+> >  	if (!rq->bio) {
+> > -		blk_rq_bio_prep(rq->q, rq, bio);
+> > +		blk_rq_bio_prep(rq->q, rq, *bio);
+> >  	} else {
+> > -		if (!ll_back_merge_fn(rq->q, rq, bio))
+> > +		if (!ll_back_merge_fn(rq->q, rq, *bio)) {
+> > +			if (orig_bio != *bio) {
+> > +				bio_put(*bio);
+> > +				*bio = orig_bio;
 > 
+> 1) Suppose the bio *does* bounce, which allocates some pages from the
+> DMA pool, and subsequently this test fails. bio_put won't deallocate
+> those pages. Prior to caa4b02476e3, it would be done by bio_endio, which
+> is IMHO the correct way to do it.
+
+You are right, that is my fault, and will review your patch later.
+
+> 
+> 2) What if the bio bounces and goes into the splitting path of
+> __blk_queue_bounce. That would submit the request, which would be a
+> problem should this test or some other later fail, cancelling the whole
+> request.
+
+When bio comes here, bio_is_passthrough() is true, it won't go into that
+path, so needn't to worry.
+
+Thanks,
+Ming
