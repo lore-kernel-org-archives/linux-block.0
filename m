@@ -1,39 +1,69 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.17.11]:52904 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752173AbeA3Bpm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Jan 2018 20:45:42 -0500
-Message-Id: <87o9lcp1aq.fsf@debian.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: [PATCH] Use bio_endio instead of bio_put in error path of
- blk_rq_append_bio
-To: linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@fb.com>,
-        Christoph Hellwig <hch@infradead.org>
-In-Reply-To: <20171218074044.1369-3-ming.lei@redhat.com>
-References: <20171218074044.1369-3-ming.lei@redhat.com>
-From: =?iso8859-2?q?Ji=F8=ED=20Pale=E8ek?= <jpalecek@web.de>
-Date: Thu, 25 Jan 2018 14:58:36 +0100
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <mgorman@novell.com>
+Date: Tue, 30 Jan 2018 10:50:52 +0000
+From: Mel Gorman <mgorman@suse.com>
+To: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	James Bottomley <James.Bottomley@HansenPartnership.com>,
+	Ming Lei <ming.lei@redhat.com>, lsf-pc@lists.linux-foundation.org,
+	Linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Subject: Re: [LSF/MM TOPIC] Two blk-mq related topics
+Message-ID: <20180130105052.gtetsqx3xgsxog7n@novell.com>
+References: <20180129154455.GB17176@ming.t460p>
+ <1517259390.3969.41.camel@HansenPartnership.com>
+ <fc833da8-f9de-d577-e1d3-c46d8c061d35@kernel.dk>
+ <mqdzi4vlkv7.fsf@linux-x5ow.site>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-15
+In-Reply-To: <mqdzi4vlkv7.fsf@linux-x5ow.site>
+List-ID: <linux-block@vger.kernel.org>
 
- Avoids page leak from bounced requests
----
- block/blk-map.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On Tue, Jan 30, 2018 at 11:08:28AM +0100, Johannes Thumshirn wrote:
+> [+Cc Mel]
+> Jens Axboe <axboe@kernel.dk> writes:
+> > On 1/29/18 1:56 PM, James Bottomley wrote:
+> >> On Mon, 2018-01-29 at 23:46 +0800, Ming Lei wrote:
+> >> [...]
+> >>> 2. When to enable SCSI_MQ at default again?
+> >> 
+> >> I'm not sure there's much to discuss ... I think the basic answer is as
+> >> soon as Christoph wants to try it again.
+> >
+> > FWIW, internally I've been running various IO intensive workloads on
+> > what is essentially 4.12 upstream with scsi-mq the default (with
+> > mq-deadline as the scheduler) and comparing IO workloads with a
+> > previous 4.6 kernel (without scsi-mq), and things are looking
+> > great.
+> >
+> > We're never going to iron out the last kinks with it being off
+> > by default, I think we should attempt to flip the switch again
+> > for 4.16.
+> 
+> The 4.12 sounds interesting. I remember Mel ran some test with 4.12 as
+> we where considering to flip the config option for SLES and it showed
+> several road blocks.
+> 
 
-diff --git a/block/blk-map.c b/block/blk-map.c
-index d3a94719f03f..702d68166689 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -26,7 +26,8 @@ int blk_rq_append_bio(struct request *rq, struct bio **bio)
- 	} else {
- 		if (!ll_back_merge_fn(rq->q, rq, *bio)) {
- 			if (orig_bio != *bio) {
--				bio_put(*bio);
-+				bio_inc_remaining(orig_bio);
-+				bio_endio(*bio);
- 				*bio = orig_bio;
- 			}
- 			return -EINVAL;
+Mostly due to slow storage and BFQ where mq-deadline was not a universal
+win as an alternative default. I don't have current data and I archived
+what I had, but it was based on 4.13-rc7 at the time and BFQ has changed
+a lot since so it would need to be redone.
+
+> I'm not sure whether he re-evaluated 4.13/4.14 on his grid though.
+> 
+
+No, it hasn't. Grid time for performance testing has been tight during
+the last few months to say the least.
+
+> But I'm definitively interested in this discussion and can even possibly
+> share some benchmark results we did in our FC Lab.
+> 
+
+If you remind me, I may be able to re-execute the tests in a 4.16-rcX
+before LSF/MM so you have other data to work with.  Unfortunately, I'll
+not be able to make LSF/MM this time due to personal commitments that
+conflict and are unmovable.
+
 -- 
-2.15.1
+Mel Gorman
+SUSE Labs
