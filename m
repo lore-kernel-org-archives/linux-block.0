@@ -1,41 +1,105 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from auth-3.ukservers.net ([217.10.138.152]:57546 "EHLO
-        auth-3.ukservers.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751731AbeA3Knm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jan 2018 05:43:42 -0500
-Subject: Re: [LSF/MM TOPIC] De-clustered RAID with MD
-To: NeilBrown <neilb@suse.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        lsf-pc@lists.linux-foundation.org
+Return-Path: <lsf-pc-bounces@lists.linux-foundation.org>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Wols Lists <antlists@youngman.org.uk>
 References: <mqdvafkhep0.fsf@linux-x5ow.site>
- <5A6F4CA6.5060802@youngman.org.uk> <87fu6o5o83.fsf@notabene.neil.brown.name>
-Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>, Neil Brown <neilb@suse.de>
-From: Wols Lists <antlists@youngman.org.uk>
-Message-ID: <5A704C59.4000705@youngman.org.uk>
-Date: Tue, 30 Jan 2018 10:43:37 +0000
+	<5A6F4CA6.5060802@youngman.org.uk>
+Date: Tue, 30 Jan 2018 10:40:49 +0100
+In-Reply-To: <5A6F4CA6.5060802@youngman.org.uk> (Wols Lists's message of "Mon,
+	29 Jan 2018 16:32:38 +0000")
+Message-ID: <mqd607jn0pq.fsf@linux-x5ow.site>
 MIME-Version: 1.0
-In-Reply-To: <87fu6o5o83.fsf@notabene.neil.brown.name>
-Content-Type: text/plain; charset=windows-1252
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+	Neil Brown <neilb@suse.de>, lsf-pc@lists.linux-foundation.org,
+	Hannes Reinecke <hare@suse.de>
+Subject: Re: [Lsf-pc] [LSF/MM TOPIC] De-clustered RAID with MD
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/lsf-pc>,
+	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=unsubscribe>
+List-Archive: <https://lists.linuxfoundation.org/mailman/private/lsf-pc/>
+List-Post: <mailto:lsf-pc@lists.linux-foundation.org>
+List-Help: <mailto:lsf-pc-request@lists.linux-foundation.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/lsf-pc>,
+	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=subscribe>
+Content-Type: text/plain; charset="utf-8"
+Sender: lsf-pc-bounces@lists.linux-foundation.org
+Errors-To: lsf-pc-bounces@lists.linux-foundation.org
+List-ID: <linux-block@vger.kernel.org>
 
-On 29/01/18 21:50, NeilBrown wrote:
-> By doing declustered parity you can sanely do raid6 on 100 drives, using
-> a logical stripe size that is much smaller than 100.
-> When recovering a single drive, the 10-groups-of-10 would put heavy load
-> on 9 other drives, while the decluster approach puts light load on 99
-> other drives.  No matter how clever md is at throttling recovery, I
-> would still rather distribute the load so that md has an easier job.
-
-Not offering to do it ... :-)
-
-But that sounds a bit like linux raid-10. Could a simple approach be to
-do something like "raid-6,11,100", ie raid-6 with 9 data chunks, two
-parity, striped across 100 drives? Okay, it's not as good as the
-decluster approach, but it would spread the stress of a rebuild across
-20 drives, not 10. And probably be fairly easy to implement.
-
-Cheers,
-Wol
+V29scyBMaXN0cyA8YW50bGlzdHNAeW91bmdtYW4ub3JnLnVrPiB3cml0ZXM6Cgo+IE9uIDI5LzAx
+LzE4IDE1OjIzLCBKb2hhbm5lcyBUaHVtc2hpcm4gd3JvdGU6Cj4+IEhpIGxpbnV4LXJhaWQsIGxz
+Zi1wYwo+PiAKPj4gKElmIHlvdSd2ZSByZWNlaXZlZCB0aGlzIG1haWwgbXVsdGlwbGUgdGltZXMs
+IEknbSBzb3JyeSwgSSdtIGhhdmluZwo+PiB0cm91YmxlIHdpdGggdGhlIG1haWwgc2V0dXApLgo+
+Cj4gTXkgaW1tZWRpYXRlIHJlYWN0aW9ucyBhcyBhIGxheSBwZXJzb24gKEkgZWRpdCB0aGUgcmFp
+ZCB3aWtpKSAuLi4KPj4gCj4+IFdpdGggdGhlIHJpc2Ugb2YgYmlnZ2VyIGFuZCBiaWdnZXIgZGlz
+a3MsIGFycmF5IHJlYnVpbGRpbmcgdGltZXMgc3RhcnQKPj4gc2t5cm9ja2V0aW5nLgo+Cj4gQW5k
+PyBZZXMsIHlvdXIgZGF0YSBpcyBhdCByaXNrIGR1cmluZyBhIHJlYnVpbGQsIGJ1dCBtZC1yYWlk
+IHRocm90dGxlcwo+IHRoZSBpL28sIHNvIGl0IGRvZXNuJ3QgaGFtbWVyIHRoZSBzeXN0ZW0uCj4+
+IAo+PiBJbiBhIHBhcGVyIGZvcm0gJzkyIEhvbGxhbmQgYW5kIEdpYnNvbiBbMV0gc3VnZ2VzdCBh
+IG1hcHBpbmcgYWxnb3JpdGhtCj4+IHNpbWlsYXIgdG8gUkFJRDUgYnV0IGluc3RlYWQgb2YgdXRp
+bGl6aW5nIGFsbCBkaXNrcyBpbiBhbiBhcnJheSBmb3IKPj4gZXZlcnkgSS9PIG9wZXJhdGlvbiwg
+YnV0IGltcGxlbWVudCBhIHBlci1JL08gbWFwcGluZyBmdW5jdGlvbiB0byBvbmx5Cj4+IHVzZSBh
+IHN1YnNldCBvZiB0aGUgYXZhaWxhYmxlIGRpc2tzLgo+PiAKPj4gVGhpcyBoYXMgYXQgbGVhc3Qg
+dHdvIGFkdmFudGFnZXM6Cj4+IDEpIElmIG9uZSBkaXNrIGhhcyB0byBiZSByZXBsYWNlZCwgaXQn
+cyBub3QgbmVlZGVkIHRvIHJlYWQgdGhlIGRhdGEgZnJvbQo+PiAgICBhbGwgZGlza3MgdG8gcmVj
+b3ZlciB0aGUgb25lIGZhaWxlZCBkaXNrIHNvIG5vbi1hZmZlY3RlZCBkaXNrcyBjYW4gYmUKPj4g
+ICAgdXNlZCBmb3IgcmVhbCB1c2VyIEkvTyBhbmQgbm90IGp1c3QgcmVjb3ZlcnkgYW5kCj4KPiBB
+Z2FpbiwgdGhhdCdzIHRocm90dGxpbmcsIHNvIHRoYXQncyBub3QgYSBwcm9ibGVtIC4uLgoKQW5k
+IHRocm90dGxpbmcgaW4gYSBwcm9kdWN0aW9uIGVudmlyb25tZW50IGlzIG5vdCBleGFjdGx5CmRl
+c2lyZWQuIEltYWdpbmUgYSA1MDAgZGlzayBhcnJheSAoYW5kIHllcyB0aGlzIGlzIHNvbWV0aGlu
+ZyB3ZSd2ZSBzZWVuCndpdGggTUQpIGFuZCB5b3UgaGF2ZSB0byByZXBsYWNlIGRpc2tzLiBXaGls
+ZSB0aGUgYXJyYXkgaXMgcmVidWlsdCB5b3UKaGF2ZSB0byB0aHJvdHRsZSBhbGwgSS9PIGJlY2F1
+c2Ugd2l0aCByYWlkLXsxLDUsNiwxMH0gYWxsIGRhdGEgaXMKc3RyaXBlZCBhY3Jvc3MgYWxsIGRp
+c2tzLgoKV2l0aCBhIHBhcml0eSBkZWNsdXN0ZXJlZCBSQUlEIChvciBERFAgbGlrZSBEZWxsLCBO
+ZXRBcHAgb3IgSHVhd2VpIGNhbGwKaXQpIHlvdSBkb24ndCBoYXZlIHRvIGFzIHRoZSBJL08gaXMg
+cmVwbGljYXRlZCBpbiBwYXJpdHkgZ3JvdXBzIGFjcm9zcyBhCnN1YnNldCBvZiBkaXNrcy4gQWxs
+IEkvTyB0YXJnZXRpbmcgZGlza3Mgd2hpY2ggYXJlbid0IG5lZWRlZCB0byByZWNvdmVyCnRoZSBk
+YXRhIGZyb20gdGhlIGZhaWxlZCBkaXNrcyBhcmVuJ3QgYWZmZWN0ZWQgYnkgdGhlIHRocm90dGxp
+bmcgYXQgYWxsLgoKPj4gMikgYW4gZWZmaWNpZW50IG1hcHBpbmcgZnVuY3Rpb24gY2FuIGltcHJv
+dmUgcGFyYWxsZWwgSS9PIHN1Ym1pc3Npb24sIGFzCj4+ICAgIHR3byBkaWZmZXJlbnQgSS9PcyBh
+cmUgbm90IG5lY2Vzc2FyaWx5IGdvaW5nIHRvIHRoZSBzYW1lIGRpc2tzIGluIHRoZQo+PiAgICBh
+cnJheS4gCj4+IAo+PiBGb3IgdGhlIG1hcHBpbmcgZnVuY3Rpb24gdXNlZCBhIGhhc2hpbmcgYWxn
+b3JpdGhtIGxpa2UgQ2VwaCdzIENSVVNIIFsyXQo+PiB3b3VsZCBiZSBpZGVhbCwgYXMgaXQgcHJv
+dmlkZXMgYSBwc2V1ZG8gcmFuZG9tIGJ1dCBkZXRlcm1pbmlzdGljIG1hcHBpbmcKPj4gZm9yIHRo
+ZSBJL08gb250byB0aGUgZHJpdmVzLgo+PiAKPj4gVGhpcyB3aG9sZSBkZWNsdXN0ZXJpbmcgb2Yg
+Y2F1c2Ugb25seSBtYWtlcyBzZW5zZSBmb3IgbW9yZSB0aGFuIChhdAo+PiBsZWFzdCkgNCBkcml2
+ZXMgYnV0IHdlIGRvIGhhdmUgY3VzdG9tZXJzIHdpdGggc2V2ZXJhbCBvcmRlcnMgb2YKPj4gbWFn
+bml0dWRlIG1vcmUgZHJpdmVycyBpbiBhbiBNRCBhcnJheS4KPgo+IElmIHlvdSBoYXZlIGZvdXIg
+ZHJpdmVzIG9yIG1vcmUgLSBlc3BlY2lhbGx5IGlmIHRoZXkgYXJlIG11bHRpLXRlcmFieXRlCj4g
+ZHJpdmVzIC0geW91IHNob3VsZCBOT1QgYmUgdXNpbmcgcmFpZC01IC4uLgoKcmFpZC02IHdvbid0
+IGhlbHAgeW91IG11Y2ggaW4gYWJvdmUgc2NlbmFyaW8uCgo+PiAKPj4gQXQgTFNGIEknZCBsaWtl
+IHRvIGRpc2N1c3MgaWY6Cj4+IDEpIFRoZSB3aWRlciBNRCBhdWRpZW5jZSBpcyBpbnRlcmVzdGVk
+IGluIGRlLWNsdXN0ZXJkIFJBSUQgd2l0aCBNRAo+Cj4gSSBoYXZlbid0IHJlYWQgdGhlIHBhcGVy
+cywgc28gbm8gY29tbWVudCwgc29ycnkuCj4KPj4gMikgZGUtY2x1c3RlcmVkIFJBSUQgc2hvdWxk
+IGJlIGltcGxlbWVudGVkIGFzIGEgc3VibGV2ZWwgb2YgUkFJRDUgb3IKPj4gICAgYXMgYSBuZXcg
+cGVyc29uYWxpdHkKPgo+IE5laXRoZXIhIElmIHlvdSdyZSBnb2luZyB0byBkbyBpdCwgaXQgc2hv
+dWxkIGJlIHJhaWQtNi4KPgo+PiAzKSBDUlVTSCBpcyBhIHN1aXRpYmxlIGFsZ29yaXRoIGZvciB0
+aGlzICh0aGVyZSdzIGV2aWRlbmNlIGluIFszXSB0aGF0Cj4+ICAgIHRoZSBOZXRBcHAgRS1TZXJp
+ZXMgQXJyYXlzIGRvIHVzZSBDUlVTSCBmb3IgcGFyaXR5IGRlY2x1c3RlcmluZykKPj4gCj4+IFsx
+XSBodHRwOi8vd3d3LnBkbC5jbXUuZWR1L1BETC1GVFAvRGVjbHVzdGVyaW5nL0FTUExPUy5wZGYg
+Cj4+IFsyXSBodHRwczovL2NlcGguY29tL3dwLWNvbnRlbnQvdXBsb2Fkcy8yMDE2LzA4L3dlaWwt
+Y3J1c2gtc2MwNi5wZGYKPj4gWzNdCj4+IGh0dHBzOi8vd3d3LnNuaWEub3JnL3NpdGVzL2RlZmF1
+bHQvZmlsZXMvZmlsZXMyL2ZpbGVzMi9TREMyMDEzL3ByZXNlbnRhdGlvbnMvRGlzdHJpYnV0ZWRT
+dG9yYWdlL0ppYmJlLUd3YWx0bmV5X01ldGhvZC10b19Fc3RhYmxpc2hfSGlnaF9BdmFpbGFiaWxp
+dHkucGRmCj4+IAo+IE9rYXkgLSBJJ3ZlIG5vdyBza2ltbWVkIHRoZSBjcnVzaCBwYXBlciBbMl0u
+IExvb2tzIHdlbGwgaW50ZXJlc3RpbmcuCj4gQlVULiBJdCBmZWVscyBtb3JlIGxpa2UgYnRyZnMg
+dGhhbiBpdCBkb2VzIGxpa2UgcmFpZC4KPgo+IEJ0cmZzIG1hbmFnZXMgZGlza3MsIGFuZCBkb2Vz
+IHJhaWQsIGl0IHRyaWVzIHRvIGJlIHRoZSAiZXZlcnl0aGluZwo+IGJldHdlZW4gdGhlIGhhcmQg
+ZHJpdmUgYW5kIHRoZSBmaWxlIi4gVGhpcyBjcnVzaCB0aGluZ3kgcmVhZHMgdG8gbWUgbGlrZQo+
+IGl0IHdhbnRzIHRvIGJlIHRoZSBzYW1lLiBUaGVyZSdzIG5vdGhpbmcgd3Jvbmcgd2l0aCB0aGF0
+LCBidXQgbWQgaXMgYQo+IHVuaXgteSAiZG8gb25lIHRoaW5nIChyYWlkKSBhbmQgZG8gaXQgd2Vs
+bCIuCgpXZWxsIENSVVNIIGlzIChvbmUgb2YpIHRoZSBhbGdvcml0aG1zIGJlaGluZCBDZXBoLiBJ
+dCB0YWtlcyB0aGUKZGVjaXNpb25zIHdoZXJlIHRvIHBsYWNlIGEgYmxvY2suIEl0IGlzIGp1c3Qg
+YSBoYXNoICh3ZWxsIHRlY2huaWNhbGx5IGEKd2VpZ2h0ZWQgZGVjaXNpb24tdHJlZSkgZnVuY3Rp
+b24gdGhhdCB0YWtlcyBhIGJsb2NrIG9mIEkvTyBhbmQgYSBzb21lCmNvbmZpZ3VyYXRpb24gcGFy
+YW1ldGVycyBhbmQgImNhbGN1bGF0ZXMiIHRoZSBwbGFjZW1lbnQuCgo+IE15IGtuZWUtamVyayBy
+ZWFjdGlvbiBpcyBpZiB5b3Ugd2FudCB0byBnbyBmb3IgaXQsIGl0IHNvdW5kcyBsaWtlIGEgZ29v
+ZAo+IGlkZWEuIEl0IGp1c3QgZG9lc24ndCByZWFsbHkgZmVlbCBhIGdvb2QgZml0IGZvciBtZC4K
+ClRoYW5rcyBmb3IgdGhlIGlucHV0LgoKICAgICAgIEpvaGFubmVzCi0tIApKb2hhbm5lcyBUaHVt
+c2hpcm4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBTdG9yYWdlCmp0
+aHVtc2hpcm5Ac3VzZS5kZSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgKzQ5IDkxMSA3
+NDA1MyA2ODkKU1VTRSBMSU5VWCBHbWJILCBNYXhmZWxkc3RyLiA1LCA5MDQwOSBOw7xybmJlcmcK
+R0Y6IEZlbGl4IEltZW5kw7ZyZmZlciwgSmFuZSBTbWl0aGFyZCwgR3JhaGFtIE5vcnRvbgpIUkIg
+MjEyODQgKEFHIE7DvHJuYmVyZykKS2V5IGZpbmdlcnByaW50ID0gRUMzOCA5Q0FCIEMyQzQgRjI1
+RCA4NjAwIEQwRDAgMDM5MyA5NjlEIDJENzYgMDg1MApfX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fXwpMc2YtcGMgbWFpbGluZyBsaXN0CkxzZi1wY0BsaXN0cy5s
+aW51eC1mb3VuZGF0aW9uLm9yZwpodHRwczovL2xpc3RzLmxpbnV4Zm91bmRhdGlvbi5vcmcvbWFp
+bG1hbi9saXN0aW5mby9sc2YtcGMK
