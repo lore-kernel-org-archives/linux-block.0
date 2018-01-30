@@ -1,97 +1,92 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from asav22.altibox.net ([109.247.116.9]:59735 "EHLO
-        asav22.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751800AbeAaILJ (ORCPT
+Received: from auth-3.ukservers.net ([217.10.138.152]:35200 "EHLO
+        auth-3.ukservers.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751554AbeA3RkG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Jan 2018 03:11:09 -0500
-Message-ID: <5A717851.2020909@hesbynett.no>
-Date: Wed, 31 Jan 2018 09:03:29 +0100
-From: David Brown <david.brown@hesbynett.no>
-MIME-Version: 1.0
-To: Johannes Thumshirn <jthumshirn@suse.de>,
-        Wols Lists <antlists@youngman.org.uk>
-CC: lsf-pc@lists.linux-foundation.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
-        Neil Brown <neilb@suse.de>
+        Tue, 30 Jan 2018 12:40:06 -0500
 Subject: Re: [LSF/MM TOPIC] De-clustered RAID with MD
-References: <mqdvafkhep0.fsf@linux-x5ow.site>        <5A6F4CA6.5060802@youngman.org.uk> <mqd607jn0pq.fsf@linux-x5ow.site>
-In-Reply-To: <mqd607jn0pq.fsf@linux-x5ow.site>
-Content-Type: text/plain; charset=UTF-8
+To: NeilBrown <neilb@suse.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        lsf-pc@lists.linux-foundation.org
+Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>, Neil Brown <neilb@suse.de>
+References: <mqdvafkhep0.fsf@linux-x5ow.site>
+ <5A6F4CA6.5060802@youngman.org.uk> <87fu6o5o83.fsf@notabene.neil.brown.name>
+ <5A704C59.4000705@youngman.org.uk> <87372n613s.fsf@notabene.neil.brown.name>
+From: Wol's lists <antlists@youngman.org.uk>
+Message-ID: <337d2541-e8d1-1c2e-e61b-bcca1e7c7388@youngman.org.uk>
+Date: Tue, 30 Jan 2018 17:40:02 +0000
+MIME-Version: 1.0
+In-Reply-To: <87372n613s.fsf@notabene.neil.brown.name>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 30/01/18 10:40, Johannes Thumshirn wrote:
-> Wols Lists <antlists@youngman.org.uk> writes:
+On 30/01/18 11:24, NeilBrown wrote:
+> On Tue, Jan 30 2018, Wols Lists wrote:
 > 
->> On 29/01/18 15:23, Johannes Thumshirn wrote:
->>> Hi linux-raid, lsf-pc
->>>
->>> (If you've received this mail multiple times, I'm sorry, I'm having
->>> trouble with the mail setup).
+>> On 29/01/18 21:50, NeilBrown wrote:
+>>> By doing declustered parity you can sanely do raid6 on 100 drives, using
+>>> a logical stripe size that is much smaller than 100.
+>>> When recovering a single drive, the 10-groups-of-10 would put heavy load
+>>> on 9 other drives, while the decluster approach puts light load on 99
+>>> other drives.  No matter how clever md is at throttling recovery, I
+>>> would still rather distribute the load so that md has an easier job.
 >>
->> My immediate reactions as a lay person (I edit the raid wiki) ...
->>>
->>> With the rise of bigger and bigger disks, array rebuilding times start
->>> skyrocketing.
+>> Not offering to do it ... :-)
 >>
->> And? Yes, your data is at risk during a rebuild, but md-raid throttles
->> the i/o, so it doesn't hammer the system.
->>>
->>> In a paper form '92 Holland and Gibson [1] suggest a mapping algorithm
->>> similar to RAID5 but instead of utilizing all disks in an array for
->>> every I/O operation, but implement a per-I/O mapping function to only
->>> use a subset of the available disks.
->>>
->>> This has at least two advantages:
->>> 1) If one disk has to be replaced, it's not needed to read the data from
->>>    all disks to recover the one failed disk so non-affected disks can be
->>>    used for real user I/O and not just recovery and
->>
->> Again, that's throttling, so that's not a problem ...
+>> But that sounds a bit like linux raid-10. Could a simple approach be to
+>> do something like "raid-6,11,100", ie raid-6 with 9 data chunks, two
+>> parity, striped across 100 drives? Okay, it's not as good as the
+>> decluster approach, but it would spread the stress of a rebuild across
+>> 20 drives, not 10. And probably be fairly easy to implement.
 > 
-> And throttling in a production environment is not exactly
-> desired. Imagine a 500 disk array (and yes this is something we've seen
-> with MD) and you have to replace disks. While the array is rebuilt you
-> have to throttle all I/O because with raid-{1,5,6,10} all data is
-> striped across all disks.
-
-You definitely don't want a stripe across 500 disks!  I'd be inclined to
-have raid1 pairs as the basic block, or perhaps 6-8 drive raid6 if you
-want higher space efficiency.  Then you build your full array on top of
-that, along with a file system that can take advantage of the layout.
-If you have an XFS over a linear concat of these sets, then you have a
-system that can quickly server many parallel loads - but that could be
-poor distribution if you are storing massive streaming data.  And
-rebuilds only delay data from the one block that is involved in the rebuild.
-
-(I have no experience with anything bigger than about 6 disks - this is
-just theory on my part.)
-
+> If you did that, I think you would be about 80% of the way to fully
+> declustered-parity RAID.
+> If you then tweak the math a bit so that one stripe would was
 > 
-> With a parity declustered RAID (or DDP like Dell, NetApp or Huawei call
-> it) you don't have to as the I/O is replicated in parity groups across a
-> subset of disks. All I/O targeting disks which aren't needed to recover
-> the data from the failed disks aren't affected by the throttling at all.
+> A1 A2 A3 A4 B1 B2 B3 B4 C1 C2 C3 C4 ....
 > 
->>> 2) an efficient mapping function can improve parallel I/O submission, as
->>>    two different I/Os are not necessarily going to the same disks in the
->>>    array. 
->>>
->>> For the mapping function used a hashing algorithm like Ceph's CRUSH [2]
->>> would be ideal, as it provides a pseudo random but deterministic mapping
->>> for the I/O onto the drives.
->>>
->>> This whole declustering of cause only makes sense for more than (at
->>> least) 4 drives but we do have customers with several orders of
->>> magnitude more drivers in an MD array.
->>
->> If you have four drives or more - especially if they are multi-terabyte
->> drives - you should NOT be using raid-5 ...
+> and the next
 > 
-> raid-6 won't help you much in above scenario.
+> A1 C1 A2 C2 A3 C3 A4 C4 B1 D1 B2 D2 ....
 > 
+> and then
+> 
+> A1 B1 C1 D1 A2 B2 C2 D2 A3 B3 C3 D3 ....
+> 
+>                    XX
+>                    
+> When Ax are a logical stripe and Bx are the next,  then you have a
+> slightly better distribution.  If device XX fails then the reads needed
+> for the first stripe mostly come from different drives than those for
+> the second stripe, which are mostly different again for the 3rd stripe.
+> 
+> Presumably the CRUSH algorithm (which I only skim-read once about a year
+> ago) formalizes how to do this, and does it better.
+> Once you have the data handling in place for your proposal, it should be
+> little more than replacing a couple of calculations to get the full
+> solution.
+> 
+Okay. I think I have it - a definition for raid-16 (or is it raid-61). 
+But I need a bit of help with the maths. And it might need a look-up 
+table :-(
 
-Raid-6 is still a great deal better than raid-5 :-)
+Okay. Like raid-10, raid-16 would be spec'd as "--level 16,3,8", ie 3 
+mirrors, emulating an 8-drive raid-6.
 
-And for your declustered raid or distributed parity, you can have two
-parities rather than just one.
+What I'm looking for is a PRNG that has the "bug" that it repeats over a 
+short period, and over that period is guaranteed to repeat each number 
+the same number of times. I saw a wonderful video demonstration of this 
+years ago - if you plot the generated number against the number of times 
+it was generated, after a few rows it "filled up" a rectangle on the graph.
+
+At which point the maths becomes very simple. I just need at least as 
+many real drives as "mirrors times emulated".
+
+If somebody can come up with the algorithm I want, I can spec it, and 
+then maybe someone can implement it? It'll be fun testing - I'll need my 
+new machine when I get it working :-)
+
+Cheers,
+Wol
