@@ -1,87 +1,54 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from szxga05-in.huawei.com ([45.249.212.191]:4743 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751405AbeA3Kdp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Jan 2018 05:33:45 -0500
+Return-Path: <jthumshirn@suse.de>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: James Bottomley <James.Bottomley@HansenPartnership.com>,  Ming Lei <ming.lei@redhat.com>,  lsf-pc@lists.linux-foundation.org,  Linux-scsi@vger.kernel.org,  linux-block@vger.kernel.org,  linux-nvme@lists.infradead.org, Mel Gorman <mgorman@suse.com>
 Subject: Re: [LSF/MM TOPIC] Two blk-mq related topics
-To: Ming Lei <ming.lei@redhat.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>
 References: <20180129154455.GB17176@ming.t460p>
- <1517259390.3969.41.camel@HansenPartnership.com>
- <20180130012408.GD17176@ming.t460p>
-CC: <lsf-pc@lists.linux-foundation.org>, <Linux-scsi@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
-        Linuxarm <linuxarm@huawei.com>
-From: John Garry <john.garry@huawei.com>
-Message-ID: <f2cf73ae-d645-6a04-5190-3d0cc91c4581@huawei.com>
-Date: Tue, 30 Jan 2018 10:33:20 +0000
+	<1517259390.3969.41.camel@HansenPartnership.com>
+	<fc833da8-f9de-d577-e1d3-c46d8c061d35@kernel.dk>
+Date: Tue, 30 Jan 2018 11:08:28 +0100
+In-Reply-To: <fc833da8-f9de-d577-e1d3-c46d8c061d35@kernel.dk> (Jens Axboe's
+	message of "Mon, 29 Jan 2018 14:00:11 -0700")
+Message-ID: <mqdzi4vlkv7.fsf@linux-x5ow.site>
 MIME-Version: 1.0
-In-Reply-To: <20180130012408.GD17176@ming.t460p>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-On 30/01/2018 01:24, Ming Lei wrote:
-> On Mon, Jan 29, 2018 at 12:56:30PM -0800, James Bottomley wrote:
+[+Cc Mel]
+Jens Axboe <axboe@kernel.dk> writes:
+> On 1/29/18 1:56 PM, James Bottomley wrote:
 >> On Mon, 2018-01-29 at 23:46 +0800, Ming Lei wrote:
 >> [...]
 >>> 2. When to enable SCSI_MQ at default again?
->>
+>>=20
 >> I'm not sure there's much to discuss ... I think the basic answer is as
 >> soon as Christoph wants to try it again.
 >
-> I guess Christoph still need to evaluate if there are existed issues or
-> blockers before trying it again. And more input may be got from F2F
-> discussion, IMHO.
+> FWIW, internally I've been running various IO intensive workloads on
+> what is essentially 4.12 upstream with scsi-mq the default (with
+> mq-deadline as the scheduler) and comparing IO workloads with a
+> previous 4.6 kernel (without scsi-mq), and things are looking
+> great.
 >
->>
->>> SCSI_MQ is enabled on V3.17 firstly, but disabled at default. In
->>> V4.13-rc1, it is enabled at default, but later the patch is reverted
->>> in V4.13-rc7, and becomes disabled at default too.
->>>
->>> Now both the original reported PM issue(actually SCSI quiesce) and
->>> the sequential IO performance issue have been addressed.
->>
->> Is the blocker bug just not closed because no-one thought to do it:
->>
->> https://bugzilla.kernel.org/show_bug.cgi?id=178381
->>
->> (we have confirmed that this issue is now fixed with the original
->> reporter?)
->
->>>From a developer view, this issue is fixed by the following commit:
-> 3a0a52997(block, scsi: Make SCSI quiesce and resume work reliably),
-> and it is verified by kernel list reporter.
->
->>
->> And did the Huawei guy (Jonathan Cameron) confirm his performance issue
->> was fixed (I don't think I saw email that he did)?
->
-> Last time I talked with John Garry about the issue, and the merged .get_budget
-> based patch improves much on the IO performance, but there is still a bit gap
-> compared with legacy path. Seems a driver specific issue, remembered that removing
-> a driver's lock can improve performance much.
->
-> Garry, could you provide further update on this issue?
+> We're never going to iron out the last kinks with it being off
+> by default, I think we should attempt to flip the switch again
+> for 4.16.
 
-Hi Ming,
+The 4.12 sounds interesting. I remember Mel ran some test with 4.12 as
+we where considering to flip the config option for SLES and it showed
+several road blocks.
 
- From our testing with experimental changes to our driver to support 
-SCSI mq we were almost getting on par performance with legacy path. But 
-without these MQ was hitting performance (and I would not necessarily 
-say it was a driver issue).
+I'm not sure whether he re-evaluated 4.13/4.14 on his grid though.
 
-We can retest from today's mainline and see where we are.
+But I'm definitively interested in this discussion and can even possibly
+share some benchmark results we did in our FC Lab.
 
-BTW, Have you got performance figures for many other single queue HBAs 
-with and without CONFIG_SCSI_MQ_DEFAULT=Y?
-
-Thanks,
-John
-
->
-> Thanks,
-> Ming
->
-> .
->
+Byte,
+        Johannes
+--=20
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
+GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N=C3=BCrnberg)
+Key fingerprint =3D EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
