@@ -1,77 +1,51 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:48804 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751496AbeANOng (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 Jan 2018 09:43:36 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Michael Lyle <mlyle@lyle.org>, Hannes Reinecke <hare@suse.de>,
-        Junhui Tang <tang.junhui@zte.com.cn>
-Subject: [PATCH v3 03/13] bcache: set task properly in allocator_wait()
-Date: Sun, 14 Jan 2018 22:42:26 +0800
-Message-Id: <20180114144236.28213-4-colyli@suse.de>
-In-Reply-To: <20180114144236.28213-1-colyli@suse.de>
-References: <20180114144236.28213-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 30 Jan 2018 11:42:13 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"hch@infradead.org" <hch@infradead.org>,
+	"snitzer@redhat.com" <snitzer@redhat.com>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
+	"loberman@redhat.com" <loberman@redhat.com>,
+	"dm-devel@redhat.com" <dm-devel@redhat.com>
+Subject: Re: [PATCH V3] blk-mq: introduce BLK_STS_DEV_RESOURCE
+Message-ID: <20180130034212.GG17176@ming.t460p>
+References: <1516726653.3339.20.camel@wdc.com>
+ <20180124033109.GA15945@ming.t460p>
+ <20180127190920.GA24759@redhat.com>
+ <1517091161.3055.7.camel@wdc.com>
+ <20180127234151.GA21710@ming.t460p>
+ <1517244510.2687.10.camel@wdc.com>
+ <20180130010701.GC17176@ming.t460p>
+ <1517274681.2687.68.camel@wdc.com>
+ <20180130033118.GF17176@ming.t460p>
+ <1517283456.12842.2.camel@wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1517283456.12842.2.camel@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Kernel thread routine bch_allocator_thread() references macro
-allocator_wait() to wait for a condition or quit to do_exit()
-when kthread_should_stop() is true. Here is the code block,
+On Tue, Jan 30, 2018 at 03:37:38AM +0000, Bart Van Assche wrote:
+> On Tue, 2018-01-30 at 11:31 +0800, Ming Lei wrote:
+> > Please take a look at drivers, when BLK_STS_RESOURCE is returned, who
+> > will call blk_mq_delay_run_hw_queue() for drivers?
+> 
+> As you know the SCSI and dm drivers in kernel v4.15 already call that function
+> whenever necessary.
 
-284         while (1) {                                                   \
-285                 set_current_state(TASK_INTERRUPTIBLE);                \
-286                 if (cond)                                             \
-287                         break;                                        \
-288                                                                       \
-289                 mutex_unlock(&(ca)->set->bucket_lock);                \
-290                 if (kthread_should_stop())                            \
-291                         return 0;                                     \
-292                                                                       \
-293                 schedule();                                           \
-294                 mutex_lock(&(ca)->set->bucket_lock);                  \
-295         }                                                             \
-296         __set_current_state(TASK_RUNNING);                            \
+We have concluded that it is generic issue which need generic solution[1].
 
-At line 285, task state is set to TASK_INTERRUPTIBLE, if at line 290
-kthread_should_stop() is true, the kernel thread will terminate and return
-to kernel/kthread.s:kthread(), then calls do_exit() with TASK_INTERRUPTIBLE
-state. This is not a suggested behavior and a warning message will be
-reported by might_sleep() in do_exit() code path: "WARNING: do not call
-blocking ops when !TASK_RUNNING; state=1 set at [xxxx]".
+[1] https://marc.info/?l=linux-kernel&m=151638176727612&w=2
 
-This patch fixes this problem by setting task state to TASK_RUNNING if
-kthread_should_stop() is true and before kernel thread returns back to
-kernel/kthread.s:kthread().
+[ming@ming linux]$ git grep -n BLK_STS_RESOURCE ./drivers/ | wc -l
+43
 
-Changelog:
-v2: fix the race issue in v1 patch.
-v1: initial buggy fix.
+Almost every driver need this kind of change if BLK_STS_RESOURCE is returned
+from IO path. And the failure can be caused by kmalloc(GFP_ATOMIC), DMA Mapping,
+or what ever.
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Michael Lyle <mlyle@lyle.org>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
----
- drivers/md/bcache/alloc.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
-index 6cc6c0f9c3a9..458e1d38577d 100644
---- a/drivers/md/bcache/alloc.c
-+++ b/drivers/md/bcache/alloc.c
-@@ -287,8 +287,10 @@ do {									\
- 			break;						\
- 									\
- 		mutex_unlock(&(ca)->set->bucket_lock);			\
--		if (kthread_should_stop())				\
-+		if (kthread_should_stop()) {				\
-+			set_current_state(TASK_RUNNING);		\
- 			return 0;					\
-+		}							\
- 									\
- 		schedule();						\
- 		mutex_lock(&(ca)->set->bucket_lock);			\
--- 
-2.15.1
+Thanks,
+Ming
