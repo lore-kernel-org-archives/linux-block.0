@@ -1,54 +1,59 @@
-Return-Path: <jthumshirn@suse.de>
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: James Bottomley <James.Bottomley@HansenPartnership.com>,  Ming Lei <ming.lei@redhat.com>,  lsf-pc@lists.linux-foundation.org,  Linux-scsi@vger.kernel.org,  linux-block@vger.kernel.org,  linux-nvme@lists.infradead.org, Mel Gorman <mgorman@suse.com>
-Subject: Re: [LSF/MM TOPIC] Two blk-mq related topics
+Return-Path: <lsf-pc-bounces@lists.linux-foundation.org>
+From: Martin Steigerwald <martin@lichtvoll.de>
+To: Ming Lei <ming.lei@redhat.com>
+Date: Tue, 30 Jan 2018 09:33:18 +0100
+Message-ID: <1831727.Vh41F2Boqi@merkaba>
+In-Reply-To: <20180130012408.GD17176@ming.t460p>
 References: <20180129154455.GB17176@ming.t460p>
 	<1517259390.3969.41.camel@HansenPartnership.com>
-	<fc833da8-f9de-d577-e1d3-c46d8c061d35@kernel.dk>
-Date: Tue, 30 Jan 2018 11:08:28 +0100
-In-Reply-To: <fc833da8-f9de-d577-e1d3-c46d8c061d35@kernel.dk> (Jens Axboe's
-	message of "Mon, 29 Jan 2018 14:00:11 -0700")
-Message-ID: <mqdzi4vlkv7.fsf@linux-x5ow.site>
+	<20180130012408.GD17176@ming.t460p>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Cc: linux-block@vger.kernel.org, Linux-scsi@vger.kernel.org,
+	John Garry <john.garry@huawei.com>, linux-nvme@lists.infradead.org,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	lsf-pc@lists.linux-foundation.org
+Subject: Re: [Lsf-pc] [LSF/MM TOPIC] Two blk-mq related topics
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/lsf-pc>,
+	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=unsubscribe>
+List-Archive: <https://lists.linuxfoundation.org/mailman/private/lsf-pc/>
+List-Post: <mailto:lsf-pc@lists.linux-foundation.org>
+List-Help: <mailto:lsf-pc-request@lists.linux-foundation.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/lsf-pc>,
+	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=subscribe>
+Content-Type: text/plain; charset="utf-8"
+Sender: lsf-pc-bounces@lists.linux-foundation.org
+Errors-To: lsf-pc-bounces@lists.linux-foundation.org
 List-ID: <linux-block@vger.kernel.org>
 
-[+Cc Mel]
-Jens Axboe <axboe@kernel.dk> writes:
-> On 1/29/18 1:56 PM, James Bottomley wrote:
->> On Mon, 2018-01-29 at 23:46 +0800, Ming Lei wrote:
->> [...]
->>> 2. When to enable SCSI_MQ at default again?
->>=20
->> I'm not sure there's much to discuss ... I think the basic answer is as
->> soon as Christoph wants to try it again.
->
-> FWIW, internally I've been running various IO intensive workloads on
-> what is essentially 4.12 upstream with scsi-mq the default (with
-> mq-deadline as the scheduler) and comparing IO workloads with a
-> previous 4.6 kernel (without scsi-mq), and things are looking
-> great.
->
-> We're never going to iron out the last kinks with it being off
-> by default, I think we should attempt to flip the switch again
-> for 4.16.
-
-The 4.12 sounds interesting. I remember Mel ran some test with 4.12 as
-we where considering to flip the config option for SLES and it showed
-several road blocks.
-
-I'm not sure whether he re-evaluated 4.13/4.14 on his grid though.
-
-But I'm definitively interested in this discussion and can even possibly
-share some benchmark results we did in our FC Lab.
-
-Byte,
-        Johannes
---=20
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
-GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N=C3=BCrnberg)
-Key fingerprint =3D EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+TWluZyBMZWkgLSAzMC4wMS4xOCwgMDI6MjQ6Cj4gPiA+IFNDU0lfTVEgaXMgZW5hYmxlZCBvbiBW
+My4xNyBmaXJzdGx5LCBidXQgZGlzYWJsZWQgYXQgZGVmYXVsdC4gSW4KPiA+ID4gVjQuMTMtcmMx
+LCBpdCBpcyBlbmFibGVkIGF0IGRlZmF1bHQsIGJ1dCBsYXRlciB0aGUgcGF0Y2ggaXMgcmV2ZXJ0
+ZWQKPiA+ID4gaW4gVjQuMTMtcmM3LCBhbmQgYmVjb21lcyBkaXNhYmxlZCBhdCBkZWZhdWx0IHRv
+by4KPiA+ID4gCj4gPiA+IE5vdyBib3RoIHRoZSBvcmlnaW5hbCByZXBvcnRlZCBQTSBpc3N1ZShh
+Y3R1YWxseSBTQ1NJIHF1aWVzY2UpIGFuZAo+ID4gPiB0aGUgc2VxdWVudGlhbCBJTyBwZXJmb3Jt
+YW5jZSBpc3N1ZSBoYXZlIGJlZW4gYWRkcmVzc2VkLgo+ID4gCj4gPiBJcyB0aGUgYmxvY2tlciBi
+dWcganVzdCBub3QgY2xvc2VkIGJlY2F1c2Ugbm8tb25lIHRob3VnaHQgdG8gZG8gaXQ6Cj4gPiAK
+PiA+IGh0dHBzOi8vYnVnemlsbGEua2VybmVsLm9yZy9zaG93X2J1Zy5jZ2k/aWQ9MTc4MzgxCj4g
+PiAKPiA+ICh3ZSBoYXZlIGNvbmZpcm1lZCB0aGF0IHRoaXMgaXNzdWUgaXMgbm93IGZpeGVkIHdp
+dGggdGhlIG9yaWdpbmFsCj4gPiByZXBvcnRlcj8pCj4gCj4gRnJvbSBhIGRldmVsb3BlciB2aWV3
+LCB0aGlzIGlzc3VlIGlzIGZpeGVkIGJ5IHRoZSBmb2xsb3dpbmcgY29tbWl0Ogo+IDNhMGE1Mjk5
+NyhibG9jaywgc2NzaTogTWFrZSBTQ1NJIHF1aWVzY2UgYW5kIHJlc3VtZSB3b3JrIHJlbGlhYmx5
+KSwKPiBhbmQgaXQgaXMgdmVyaWZpZWQgYnkga2VybmVsIGxpc3QgcmVwb3J0ZXIuCgpJIG5ldmVy
+IHNlZW4gYW55IHN1c3BlbmQgLyBoaWJlcm5hdGUgcmVsYXRlZCBpc3N1ZXMgd2l0aCBibGstbXEg
+KyBiZnEgc2luY2UgCnRoZW4uIFVzaW5nIGhlYXZpbHkgdXRpbGl6ZWQgQlRSRlMgZHVhbCBTU0Qg
+UkFJRCAxLgoKJSBlZ3JlcCAiTVF8QkZRIiAvYm9vdC9jb25maWctNC4xNS4wLXRwNTIwLWJ0cmZz
+dHJpbSsKQ09ORklHX1BPU0lYX01RVUVVRT15CkNPTkZJR19QT1NJWF9NUVVFVUVfU1lTQ1RMPXkK
+Q09ORklHX0JMS19XQlRfTVE9eQpDT05GSUdfQkxLX01RX1BDST15CkNPTkZJR19CTEtfTVFfVklS
+VElPPXkKQ09ORklHX01RX0lPU0NIRURfREVBRExJTkU9bQpDT05GSUdfTVFfSU9TQ0hFRF9LWUJF
+Uj1tCkNPTkZJR19JT1NDSEVEX0JGUT1tCkNPTkZJR19CRlFfR1JPVVBfSU9TQ0hFRD15CkNPTkZJ
+R19ORVRfU0NIX01RUFJJTz1tCiMgQ09ORklHX1NDU0lfTVFfREVGQVVMVCBpcyBub3Qgc2V0CiMg
+Q09ORklHX0RNX01RX0RFRkFVTFQgaXMgbm90IHNldApDT05GSUdfRE1fQ0FDSEVfU01RPW0KCiUg
+Y2F0IC9wcm9jL2NtZGxpbmUgCkJPT1RfSU1BR0U9L3ZtbGludXotNC4xNS4wLXRwNTIwLWJ0cmZz
+dHJpbSsgcm9vdD1VVUlEPVvigKZdIHJvIApyb290ZmxhZ3M9c3Vidm9sPWRlYmlhbiByZXN1bWU9
+L2Rldi9tYXBwZXIvc2F0YS1zd2FwIGluaXQ9L2Jpbi9zeXN0ZW1kIAp0aGlua3BhZF9hY3BpLmZh
+bl9jb250cm9sPTEgc3lzdGVtZC5yZXN0b3JlX3N0YXRlPTAgc2NzaV9tb2QudXNlX2Jsa19tcT0x
+CgolIGNhdCAvc3lzL2Jsb2NrL3NkYS9xdWV1ZS9zY2hlZHVsZXIgCltiZnFdIG5vbmUKClRoYW5r
+cywKLS0gCk1hcnRpbgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fXwpMc2YtcGMgbWFpbGluZyBsaXN0CkxzZi1wY0BsaXN0cy5saW51eC1mb3VuZGF0aW9uLm9y
+ZwpodHRwczovL2xpc3RzLmxpbnV4Zm91bmRhdGlvbi5vcmcvbWFpbG1hbi9saXN0aW5mby9sc2Yt
+cGMK
