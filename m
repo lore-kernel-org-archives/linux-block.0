@@ -1,27 +1,45 @@
-Return-Path: <keith.busch@intel.com>
-Date: Wed, 3 Jan 2018 13:21:05 -0700
-From: Keith Busch <keith.busch@intel.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
-Subject: Re: [PATCH 1/3] nvme/pci: Start request after doorbell ring
-Message-ID: <20180103202105.GC11172@localhost.localdomain>
-References: <20171221204636.2924-1-keith.busch@intel.com>
- <20171221204636.2924-2-keith.busch@intel.com>
- <45a16b4c-fbc0-106d-df37-439374c7b5dc@kernel.dk>
- <118beb1f-54eb-c65d-1c9c-4775ebde1fa8@kernel.dk>
- <20171221210250.GA2975@localhost.localdomain>
- <6ffc074a-3c5b-c76d-d213-6606a77626e0@kernel.dk>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:54292 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752221AbeA3CU7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 29 Jan 2018 21:20:59 -0500
+Subject: Re: [PATCH v4 05/13] bcache: stop dc->writeback_rate_update properly
+To: tang.junhui@zte.com.cn
+Cc: mlyle@lyle.org, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <1517277425-3641-1-git-send-email-tang.junhui@zte.com.cn>
+From: Coly Li <colyli@suse.de>
+Message-ID: <ccae3e90-f69a-9804-fe8d-3cfd3c453689@suse.de>
+Date: Tue, 30 Jan 2018 10:20:46 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <6ffc074a-3c5b-c76d-d213-6606a77626e0@kernel.dk>
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <1517277425-3641-1-git-send-email-tang.junhui@zte.com.cn>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Thu, Dec 21, 2017 at 02:01:44PM -0700, Jens Axboe wrote:
-> I haven't either, but curious if others had. It's mostly just extra
-> overhead, I haven't seen it provide a latency reduction of any kind.
+On 30/01/2018 9:57 AM, tang.junhui@zte.com.cn wrote:
+> From: Tang Junhui <tang.junhui@zte.com.cn>
+> 
+> Hello Coly:
+> 
+> OK, I got your point now.
+> Thanks for your patience.
+> 
+> And there is a small issue I hope to be modified:
+> +#define BCACHE_DEV_WB_RUNNING        4
+> +#define BCACHE_DEV_RATE_DW_RUNNING    8
+> Would be OK just as:
+> +#define BCACHE_DEV_WB_RUNNING        3
+> +#define BCACHE_DEV_RATE_DW_RUNNING    4
+> 
+> Reviewed-by: Tang Junhui <tang.junhui@zte.com.cn>
+> 
 
-I've removed the submission side poll in a local build, and amazingly I
-am observing a not insignificant increase in latency without it on some
-workloads with certain hardware. I will have to delay recommending/posting
-removal of this pending further investigation.
+Hi Junhui,
+
+I will fix that in v5 patch. Thanks for your review :-)
+
+Coly Li
+
+
+[snip]
