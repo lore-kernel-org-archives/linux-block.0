@@ -1,67 +1,65 @@
-Return-Path: <lsf-pc-bounces@lists.linux-foundation.org>
-Date: Tue, 30 Jan 2018 09:27:57 +0800
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:34260 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751546AbeA3BYW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 29 Jan 2018 20:24:22 -0500
+Date: Tue, 30 Jan 2018 09:24:09 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Mike Snitzer <snitzer@redhat.com>
-Message-ID: <20180130012755.GE17176@ming.t460p>
+To: James Bottomley <James.Bottomley@HansenPartnership.com>,
+        John Garry <john.garry@huawei.com>
+Cc: lsf-pc@lists.linux-foundation.org, Linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [LSF/MM TOPIC] Two blk-mq related topics
+Message-ID: <20180130012408.GD17176@ming.t460p>
 References: <20180129154455.GB17176@ming.t460p>
-	<20180129204031.GA5499@redhat.com>
+ <1517259390.3969.41.camel@HansenPartnership.com>
 MIME-Version: 1.0
-In-Reply-To: <20180129204031.GA5499@redhat.com>
-Cc: linux-block@vger.kernel.org, lsf-pc@lists.linux-foundation.org,
-	linux-nvme@lists.infradead.org, Linux-scsi@vger.kernel.org
-Subject: Re: [Lsf-pc] [LSF/MM TOPIC] Two blk-mq related topics
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/lsf-pc>,
-	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=unsubscribe>
-List-Archive: <https://lists.linuxfoundation.org/mailman/private/lsf-pc/>
-List-Post: <mailto:lsf-pc@lists.linux-foundation.org>
-List-Help: <mailto:lsf-pc-request@lists.linux-foundation.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/lsf-pc>,
-	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: lsf-pc-bounces@lists.linux-foundation.org
-Errors-To: lsf-pc-bounces@lists.linux-foundation.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1517259390.3969.41.camel@HansenPartnership.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Mon, Jan 29, 2018 at 03:40:31PM -0500, Mike Snitzer wrote:
-> On Mon, Jan 29 2018 at 10:46am -0500,
-> Ming Lei <ming.lei@redhat.com> wrote:
->  
+On Mon, Jan 29, 2018 at 12:56:30PM -0800, James Bottomley wrote:
+> On Mon, 2018-01-29 at 23:46 +0800, Ming Lei wrote:
+> [...]
 > > 2. When to enable SCSI_MQ at default again?
-> > 
-> > SCSI_MQ is enabled on V3.17 firstly, but disabled at default. In V4.13-rc1,
-> > it is enabled at default, but later the patch is reverted in V4.13-rc7, and
-> > becomes disabled at default too.
-> > 
-> > Now both the original reported PM issue(actually SCSI quiesce) and the
-> > sequential IO performance issue have been addressed. And MQ IO schedulers
-> > are ready too for traditional disks. Are there other issues to be addressed
-> > for enabling SCSI_MQ at default? When can we do that again?
-> > 
-> > Last time, the two issues were reported during V4.13 dev cycle just when it is
-> > enabled at default, that seems if SCSI_MQ isn't enabled at default, it wouldn't
-> > be exposed to run/tested completely & fully.  
-> > 
-> > So if we continue to disable it at default, maybe it can never be exposed to
-> > full test/production environment.
 > 
-> I was going to propose revisiting this as well.
-> 
-> I'd really like to see all the old .request_fn block core code removed.
+> I'm not sure there's much to discuss ... I think the basic answer is as
+> soon as Christoph wants to try it again.
 
-Yeah, that should be a final goal, but may take a bit long.
+I guess Christoph still need to evaluate if there are existed issues or
+blockers before trying it again. And more input may be got from F2F
+discussion, IMHO.
 
 > 
-> But maybe we take a first step of enabling:
-> CONFIG_SCSI_MQ_DEFAULT=Y
-> CONFIG_DM_MQ_DEFAULT=Y
+> > SCSI_MQ is enabled on V3.17 firstly, but disabled at default. In
+> > V4.13-rc1, it is enabled at default, but later the patch is reverted
+> > in V4.13-rc7, and becomes disabled at default too.
+> > 
+> > Now both the original reported PM issue(actually SCSI quiesce) and
+> > the sequential IO performance issue have been addressed.
+> 
+> Is the blocker bug just not closed because no-one thought to do it:
+> 
+> https://bugzilla.kernel.org/show_bug.cgi?id=178381
+> 
+> (we have confirmed that this issue is now fixed with the original
+> reporter?)
 
-Maybe you can remove legacy path from DM_RQ first, and take your
-original approach to allow DM/MQ over legacy underlying driver,
-seems we discussed this topic before, :-)
+>From a developer view, this issue is fixed by the following commit:
+3a0a52997(block, scsi: Make SCSI quiesce and resume work reliably),
+and it is verified by kernel list reporter.
+
+> 
+> And did the Huawei guy (Jonathan Cameron) confirm his performance issue
+> was fixed (I don't think I saw email that he did)?
+
+Last time I talked with John Garry about the issue, and the merged .get_budget
+based patch improves much on the IO performance, but there is still a bit gap
+compared with legacy path. Seems a driver specific issue, remembered that removing
+a driver's lock can improve performance much.
+
+Garry, could you provide further update on this issue?
 
 Thanks,
 Ming
-_______________________________________________
-Lsf-pc mailing list
-Lsf-pc@lists.linux-foundation.org
-https://lists.linuxfoundation.org/mailman/listinfo/lsf-pc
