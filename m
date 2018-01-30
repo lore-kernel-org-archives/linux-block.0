@@ -1,92 +1,38 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 30 Jan 2018 22:40:03 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Oleksandr Natalenko <oleksandr@natalenko.name>
+Cc: paolo.valente@linaro.org, Ivan Kozik <ivan@ludios.org>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bfq-iosched@googlegroups.com, Jens Axboe <axboe@kernel.dk>,
+	linus.walleij@linaro.org
 Subject: Re: v4.15 and I/O hang with BFQ
-From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20180130144002.GA14401@ming.t460p>
-Date: Tue, 30 Jan 2018 16:40:01 +0100
-Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
- Ivan Kozik <ivan@ludios.org>,
- linux-block <linux-block@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- 'Paolo Valente' via bfq-iosched <bfq-iosched@googlegroups.com>,
- Jens Axboe <axboe@kernel.dk>,
- Linus Walleij <linus.walleij@linaro.org>,
- SERENA ZIVIANI <169364@studenti.unimore.it>
-Message-Id: <3E34D175-88F9-4114-B627-A11262A7B470@linaro.org>
+Message-ID: <20180130144002.GA14401@ming.t460p>
 References: <9ad0d544ab2b12f87f44eb4ef88e23a2@natalenko.name>
  <20180130081925.GA25183@ming.t460p>
  <38bd4dbe280bd0934abde764fe0916cd@natalenko.name>
- <20180130144002.GA14401@ming.t460p>
-To: Ming Lei <ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <38bd4dbe280bd0934abde764fe0916cd@natalenko.name>
 List-ID: <linux-block@vger.kernel.org>
 
+On Tue, Jan 30, 2018 at 03:30:28PM +0100, Oleksandr Natalenko wrote:
+> Hi.
+> 
+...
+>    systemd-udevd-271   [000] ....     4.311033: bfq_insert_requests: insert
+> rq->0
+>    systemd-udevd-271   [000] ...1     4.311037: blk_mq_do_dispatch_sched:
+> not get rq, 1
+>           cfdisk-408   [000] ....    13.484220: bfq_insert_requests: insert
+> rq->1
+>     kworker/0:1H-174   [000] ....    13.484253: blk_mq_do_dispatch_sched:
+> not get rq, 1
+> ===
+> 
+> Looks the same, right?
 
+Yeah, same with before.
 
-> Il giorno 30 gen 2018, alle ore 15:40, Ming Lei <ming.lei@redhat.com> =
-ha scritto:
->=20
-> On Tue, Jan 30, 2018 at 03:30:28PM +0100, Oleksandr Natalenko wrote:
->> Hi.
->>=20
-> ...
->>   systemd-udevd-271   [000] ....     4.311033: bfq_insert_requests: =
-insert
->> rq->0
->>   systemd-udevd-271   [000] ...1     4.311037: =
-blk_mq_do_dispatch_sched:
->> not get rq, 1
->>          cfdisk-408   [000] ....    13.484220: bfq_insert_requests: =
-insert
->> rq->1
->>    kworker/0:1H-174   [000] ....    13.484253: =
-blk_mq_do_dispatch_sched:
->> not get rq, 1
->> =3D=3D=3D
->>=20
->> Looks the same, right?
->=20
-> Yeah, same with before.
->=20
-
-Hi guys,
-sorry for the delay with this fix.  We are proceeding very slowly on
-this, because I'm super busy.  Anyway, now I can at least explain in
-more detail the cause that leads to this hang.  Commit 'a6a252e64914
-("blk-mq-sched: decide how to handle flush rq via RQF_FLUSH_SEQ")'
-makes all non-flush re-prepared requests be re-inserted into the I/O
-scheduler.  With this change, I/O schedulers may get the same request
-inserted again, even several times, without a finish_request invoked
-on the request before each re-insertion.
-
-For the I/O scheduler, every such re-prepared request is equivalent
-to the insertion of a new request. For schedulers like mq-deadline
-or kyber this fact causes no problems. In contrast, it confuses a =
-stateful
-scheduler like BFQ, which preserves states for an I/O request until
-finish_request is invoked on it. In particular, BFQ has no way
-to know that the above re-insertions concerns the same, already =
-dispatched
-request. So it may get stuck waiting for the completion of these
-re-inserted requests forever, thus preventing any other queue of
-requests to be served.
-
-We are trying to address this issue by adding the hook requeue_request
-to bfq interface.
-
-Unfortunately, with our current implementation of requeue_request in
-place, bfq eventually gets to an incoherent state.  This is apparently
-caused by a requeue of an I/O request, immediately followed by a
-completion of the same request.  This seems rather absurd, and drives
-bfq crazy.  But this is something for which we don't have definite
-results yet.
-
-We're working on it, sorry again for the delay.
-
-Thanks,
-Paolo
-
-> --=20
-> Ming
+-- 
+Ming
