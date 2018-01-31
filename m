@@ -1,35 +1,82 @@
-Return-Path: <prvs=562a2f801=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "joseph.qi@linux.alibaba.com" <joseph.qi@linux.alibaba.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
-CC: "gavin.dg@linux.alibaba.com" <gavin.dg@linux.alibaba.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Return-Path: <joseph.qi@linux.alibaba.com>
 Subject: Re: [RFC] hard LOCKUP caused by race between blk_init_queue_node and
  blkcg_print_blkgs
-Date: Wed, 31 Jan 2018 16:39:17 +0000
-Message-ID: <1517416756.2505.11.camel@wdc.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>,
+ "axboe@kernel.dk" <axboe@kernel.dk>
+Cc: "gavin.dg@linux.alibaba.com" <gavin.dg@linux.alibaba.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 References: <5ac9562b-b20a-9f5a-90c5-2187552b6f09@linux.alibaba.com>
-	 <1517347168.2589.56.camel@wdc.com>
-	 <e34840cd-d317-b195-aad8-f32668608f1f@linux.alibaba.com>
-In-Reply-To: <e34840cd-d317-b195-aad8-f32668608f1f@linux.alibaba.com>
-Content-Type: text/plain; charset="utf-8"
+ <1517347168.2589.56.camel@wdc.com>
+From: Joseph Qi <joseph.qi@linux.alibaba.com>
+Message-ID: <e34840cd-d317-b195-aad8-f32668608f1f@linux.alibaba.com>
+Date: Wed, 31 Jan 2018 09:53:21 +0800
 MIME-Version: 1.0
+In-Reply-To: <1517347168.2589.56.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-T24gV2VkLCAyMDE4LTAxLTMxIGF0IDA5OjUzICswODAwLCBKb3NlcGggUWkgd3JvdGU6DQo+IEF0
-IHRoZSBmaXJzdCBnbGFuY2UsIEknbSB0aGlua2luZyBvZiBtb3ZpbmcgdGhlIGJsa2NnX2luaXRf
-cXVldWUgYWZ0ZXINCj4gdGhlIHF1ZXVlX2xvY2sgaXMgb3ZlcnJpZGRlbi4gQnV0IEkgZG9uJ3Qg
-aGF2ZSBhbiBpZGVhIHlldCB0byBhdm9pZCB0aGUNCj4gcmlzayBkdXJpbmcgY2xlYW51cC4NCj4g
-U2luY2UgdGhlIGluaXRpYWxpemF0aW9uIG9mIHJlcXVlc3QgcXVldWUgaXMgc28gZnVuZGFtZW50
-YWwsIEknbSBub3QNCj4gc3VyZSBpZiB0aGVyZSBpcyB0aGUgc2FtZSByaXNrIGluIHNldmVyYWwg
-b3RoZXIgcGxhY2VzLg0KDQpIZWxsbyBKb3NlcGgsDQoNCk1vdmluZyB0aGUgYmxrY2dfaW5pdF9x
-dWV1ZSgpIGNhbGwgZnJvbSBibGtfYWxsb2NfcXVldWVfbm9kZSgpIGludG8NCmJsa19pbml0X2Fs
-bG9jYXRlZF9xdWV1ZV9ub2RlKCkgd291bGQgZHJvcCBjZ3JvdXAgc3VwcG9ydCBmcm9tIGFsbCBi
-bG9jaw0KZHJpdmVycyB0aGF0IGRvIG5vdCBjYWxsIGJsa19pbml0X2FsbG9jYXRlZF9xdWV1ZV9u
-b2RlKCkuIEkgdGhpbmsgdGhlc2UNCmRyaXZlcnMgYXJlIGJyZCwgZHJiZCwgbnVsbF9ibGssIHBr
-dGNkdmQsIHBzM3ZyYW0sIHJzeHgsIHVtZW0sIHpyYW0sDQpsaWdodG52bSwgYmNhY2hlLCBkbSBp
-biBiaW8gbW9kZSwgbWQsIG52ZGltbSwgdGhlIE5WTWUgbXVsdGlwYXRoIGRyaXZlciwNCmRjc3Ni
-bGsgYW5kIHhwcmFtLiBUaGVzZSBkcml2ZXJzIGNhbiBiZSBmb3VuZCBieSBzZWFyY2hpbmcgZm9y
-DQpibGtfcXVldWVfbWFrZV9yZXF1ZXN0KCkgY2FsbHMgaW4gdGhlIGtlcm5lbCBzb3VyY2UgY29k
-ZS4gSSdtIG5vdCBzdXJlIHdlDQpjYW4gZHJvcCBjZ3JvdXAgc3VwcG9ydCBmcm9tIGFsbCB0aGVz
-ZSBibG9jayBkcml2ZXJzLg0KDQpCYXJ0Lg==
+Hi Bart,
+Thanks very much for the quick response.
+
+On 18/1/31 05:19, Bart Van Assche wrote:
+> On Tue, 2018-01-30 at 19:21 +0800, Joseph Qi wrote:
+>> Hi Jens and Folks,
+>>
+>> Recently we've gotten a hard LOCKUP issue. After investigating the issue
+>> we've found a race between blk_init_queue_node and blkcg_print_blkgs.
+>> The race is described below.
+>>
+>> blk_init_queue_node                 blkcg_print_blkgs
+>>   blk_alloc_queue_node (1)
+>>     q->queue_lock = &q->__queue_lock (2)
+>>     blkcg_init_queue(q) (3)
+>>                                     spin_lock_irq(blkg->q->queue_lock) (4)
+>>   q->queue_lock = lock (5)
+>>                                     spin_unlock_irq(blkg->q->queue_lock) (6)
+>>
+>> (1) allocate an uninitialized queue;
+>> (2) initialize queue_lock to its default internal lock;
+>> (3) initialize blkcg part of request queue, which will create blkg and
+>> then insert it to blkg_list;
+>> (4) traverse blkg_list and find the created blkg, and then take its
+>> queue lock, here it is the default *internal lock*;
+>> (5) *race window*, now queue_lock is overridden with *driver specified
+>> lock*;
+>> (6) now unlock *driver specified lock*, not the locked *internal lock*,
+>> unlock balance breaks.
+>>
+>> For the issue above, I think blkcg_init_queue is a bit earlier. We
+>> can't allow a further use before request queue is fully initialized.
+>> Since blk_init_queue_node is a really common path and it allows driver
+>> to override the default internal lock, I'm afraid several other places
+>> may also have the same issue.
+>> Am I missing something here?
+> 
+> What code triggered the blkcg_print_blkgs() call? Was it perhaps a function
+> related to throttling? If so, I think there are two possible ways to fix this
+> race:
+Yes, it is from block throttle.
+
+> 1. Moving the .queue_lock initialization from blk_init_queue_node() into
+>    blk_alloc_queue_node() such that it happens before the blkcg_init_queue()
+>    call. This however will require a tree-wide change of the blk_alloc_queue()
+>    and all blk_alloc_queue_node() calls in all block drivers.
+> 2. Splitting the blk_throtl_init() function such that the blkcg_activate_policy()
+>    call can occur after the .queue_lock pointer has been initialized, e.g. from
+>    inside blk_init_allocated_queue() or from inside blk_register_queue() instead
+>    of from inside blkcg_init_queue().
+> 
+At the first glance, I'm thinking of moving the blkcg_init_queue after
+the queue_lock is overridden. But I don't have an idea yet to avoid the
+risk during cleanup.
+Since the initialization of request queue is so fundamental, I'm not
+sure if there is the same risk in several other places.
+
+Thanks,
+Joseph
+
+> I'm not sure what the best approach is. Maybe there is even a third approach
+> that is better than the two approaches mentioned above.
+> 
+> Bart.
+> 
