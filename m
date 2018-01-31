@@ -1,300 +1,446 @@
-Return-Path: <msnitzer@redhat.com>
-From: Mike Snitzer <snitzer@redhat.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	dm-devel@redhat.com,
-	linux-scsi@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: [PATCH V4] blk-mq: introduce BLK_STS_DEV_RESOURCE
-Date: Mon, 29 Jan 2018 15:33:00 -0500
-Message-Id: <20180129203300.50595-1-snitzer@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:34121 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752136AbeAaCHE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Jan 2018 21:07:04 -0500
+Received: by mail-wm0-f65.google.com with SMTP id j21so6211252wmh.1
+        for <linux-block@vger.kernel.org>; Tue, 30 Jan 2018 18:07:03 -0800 (PST)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 3/5] lightnvm: pblk: export write amplification counters to sysfs
+Date: Wed, 31 Jan 2018 03:06:49 +0100
+Message-Id: <1517364411-22386-3-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1517364411-22386-1-git-send-email-javier@cnexlabs.com>
+References: <1517364411-22386-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Ming Lei <ming.lei@redhat.com>
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-This status is returned from driver to block layer if device related
-resource is unavailable, but driver can guarantee that IO dispatch
-will be triggered in future when the resource is available.
+In a SSD, write amplification, WA, is defined as the average
+number of page writes per user page write. Write amplification
+negatively affects write performance and decreases the lifetime
+of the disk, so it's a useful metric to add to sysfs.
 
-Convert some drivers to return BLK_STS_DEV_RESOURCE.  Also, if driver
-returns BLK_STS_RESOURCE and SCHED_RESTART is set, rerun queue after
-a delay (BLK_MQ_DELAY_QUEUE) to avoid IO stalls.  BLK_MQ_DELAY_QUEUE is
-3 ms because both scsi-mq and nvmefc are using that magic value.
+In plkb's case, the number of writes per user sector is the sum of:
 
-Suggested-by: Jens Axboe <axboe@kernel.dk>
-Tested-by: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+    (1) number of user writes
+    (2) number of sectors written by the garbage collector
+    (3) number of sectors padded (i.e. due to syncs)
+
+This patch adds persistent counters for 1-3 and two sysfs attributes
+to export these along with WA calculated with five decimals:
+
+    write_amp_mileage: the accumulated write amplification stats
+                      for the lifetime of the pblk instance
+
+    write_amp_trip: resetable stats to facilitate delta measurements,
+                    values reset at creation and if 0 is written
+                    to the attribute.
+
+64-bit counters are used as a 32 bit counter would wrap around
+already after about 17 TB worth of user data. It will take a
+long long time before the 64 bit sector counters wrap around.
+
+The counters are stored after the bad block bitmap in the first
+emeta sector of each written line. There is plenty of space in the
+first emeta sector, so we don't need to bump the major version of
+the line data format.
+
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
+ drivers/lightnvm/pblk-cache.c    |  4 ++
+ drivers/lightnvm/pblk-core.c     |  6 +++
+ drivers/lightnvm/pblk-init.c     | 11 ++++-
+ drivers/lightnvm/pblk-map.c      |  2 +
+ drivers/lightnvm/pblk-rb.c       |  3 ++
+ drivers/lightnvm/pblk-recovery.c | 25 ++++++++++++
+ drivers/lightnvm/pblk-sysfs.c    | 86 +++++++++++++++++++++++++++++++++++++++-
+ drivers/lightnvm/pblk.h          | 42 ++++++++++++++++----
+ 8 files changed, 169 insertions(+), 10 deletions(-)
 
-V4:
-        - cleanup header and code comments
-        - rerun queue after BLK_MQ_QUEUE_DELAY (3ms) instead of 10ms
-        - eliminate nvmefc's queue rerun now that blk-mq does it
-V3:
-        - fix typo, and improvement document
-        - add tested-by tag
-V2:
-        - add comments on the new introduced status
-        - patch style fix
-        - both are suggested by Christoph
-
- block/blk-core.c             |  1 +
- block/blk-mq.c               | 20 ++++++++++++++++----
- drivers/block/null_blk.c     |  2 +-
- drivers/block/virtio_blk.c   |  2 +-
- drivers/block/xen-blkfront.c |  2 +-
- drivers/md/dm-rq.c           |  5 ++---
- drivers/nvme/host/fc.c       | 12 ++----------
- drivers/scsi/scsi_lib.c      |  6 +++---
- include/linux/blk_types.h    | 14 ++++++++++++++
- 9 files changed, 41 insertions(+), 23 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index cdae69be68e9..38279d4ae08b 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -145,6 +145,7 @@ static const struct {
- 	[BLK_STS_MEDIUM]	= { -ENODATA,	"critical medium" },
- 	[BLK_STS_PROTECTION]	= { -EILSEQ,	"protection" },
- 	[BLK_STS_RESOURCE]	= { -ENOMEM,	"kernel resource" },
-+	[BLK_STS_DEV_RESOURCE]	= { -ENOMEM,	"device resource" },
- 	[BLK_STS_AGAIN]		= { -EAGAIN,	"nonblocking retry" },
+diff --git a/drivers/lightnvm/pblk-cache.c b/drivers/lightnvm/pblk-cache.c
+index 000fcad38136..29a23111b31c 100644
+--- a/drivers/lightnvm/pblk-cache.c
++++ b/drivers/lightnvm/pblk-cache.c
+@@ -63,6 +63,8 @@ int pblk_write_to_cache(struct pblk *pblk, struct bio *bio, unsigned long flags)
+ 		bio_advance(bio, PBLK_EXPOSED_PAGE_SIZE);
+ 	}
  
- 	/* device mapper special case, should not leak out: */
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 43e7449723e0..dd097ca5f1e9 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1160,6 +1160,8 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx **hctx,
- 	return true;
++	atomic64_add(nr_entries, &pblk->user_wa);
++
+ #ifdef CONFIG_NVM_DEBUG
+ 	atomic_long_add(nr_entries, &pblk->inflight_writes);
+ 	atomic_long_add(nr_entries, &pblk->req_writes);
+@@ -117,6 +119,8 @@ int pblk_write_gc_to_cache(struct pblk *pblk, struct pblk_gc_rq *gc_rq)
+ 	WARN_ONCE(gc_rq->secs_to_gc != valid_entries,
+ 					"pblk: inconsistent GC write\n");
+ 
++	atomic64_add(valid_entries, &pblk->gc_wa);
++
+ #ifdef CONFIG_NVM_DEBUG
+ 	atomic_long_add(valid_entries, &pblk->inflight_writes);
+ 	atomic_long_add(valid_entries, &pblk->recov_gc_writes);
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 155e42a26293..22e61cd4f801 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -1630,11 +1630,16 @@ void pblk_line_close_meta(struct pblk *pblk, struct pblk_line *line)
+ 	struct pblk_line_meta *lm = &pblk->lm;
+ 	struct pblk_emeta *emeta = line->emeta;
+ 	struct line_emeta *emeta_buf = emeta->buf;
++	struct wa_counters *wa = emeta_to_wa(lm, emeta_buf);
+ 
+ 	/* No need for exact vsc value; avoid a big line lock and take aprox. */
+ 	memcpy(emeta_to_vsc(pblk, emeta_buf), l_mg->vsc_list, lm->vsc_list_len);
+ 	memcpy(emeta_to_bb(emeta_buf), line->blk_bitmap, lm->blk_bitmap_len);
+ 
++	wa->user = cpu_to_le64(atomic64_read(&pblk->user_wa));
++	wa->pad = cpu_to_le64(atomic64_read(&pblk->pad_wa));
++	wa->gc = cpu_to_le64(atomic64_read(&pblk->gc_wa));
++
+ 	emeta_buf->nr_valid_lbas = cpu_to_le64(line->nr_valid_lbas);
+ 	emeta_buf->crc = cpu_to_le32(pblk_calc_emeta_crc(pblk, emeta_buf));
+ 
+@@ -1837,6 +1842,7 @@ void pblk_update_map_dev(struct pblk *pblk, sector_t lba,
+ #endif
+ 	/* Invalidate and discard padded entries */
+ 	if (lba == ADDR_EMPTY) {
++		atomic64_inc(&pblk->pad_wa);
+ #ifdef CONFIG_NVM_DEBUG
+ 		atomic_long_inc(&pblk->padded_wb);
+ #endif
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 93d671ca518e..7eedc5daebc8 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -559,8 +559,8 @@ static unsigned int calc_emeta_len(struct pblk *pblk)
+ 
+ 	/* Round to sector size so that lba_list starts on its own sector */
+ 	lm->emeta_sec[1] = DIV_ROUND_UP(
+-			sizeof(struct line_emeta) + lm->blk_bitmap_len,
+-			geo->sec_size);
++			sizeof(struct line_emeta) + lm->blk_bitmap_len +
++			sizeof(struct wa_counters), geo->sec_size);
+ 	lm->emeta_len[1] = lm->emeta_sec[1] * geo->sec_size;
+ 
+ 	/* Round to sector size so that vsc_list starts on its own sector */
+@@ -991,6 +991,13 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
+ 	if (flags & NVM_TARGET_FACTORY)
+ 		pblk_setup_uuid(pblk);
+ 
++	atomic64_set(&pblk->user_wa, 0);
++	atomic64_set(&pblk->pad_wa, 0);
++	atomic64_set(&pblk->gc_wa, 0);
++	pblk->user_rst_wa = 0;
++	pblk->pad_rst_wa = 0;
++	pblk->gc_rst_wa = 0;
++
+ #ifdef CONFIG_NVM_DEBUG
+ 	atomic_long_set(&pblk->inflight_writes, 0);
+ 	atomic_long_set(&pblk->padded_writes, 0);
+diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
+index 7445e6430c52..04e08d76ea5f 100644
+--- a/drivers/lightnvm/pblk-map.c
++++ b/drivers/lightnvm/pblk-map.c
+@@ -65,6 +65,8 @@ static void pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
+ 			lba_list[paddr] = cpu_to_le64(w_ctx->lba);
+ 			if (lba_list[paddr] != addr_empty)
+ 				line->nr_valid_lbas++;
++			else
++				atomic64_inc(&pblk->pad_wa);
+ 		} else {
+ 			lba_list[paddr] = meta_list[i].lba = addr_empty;
+ 			__pblk_map_invalidate(pblk, line, paddr);
+diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
+index ec8fc314646b..7044b5599cc4 100644
+--- a/drivers/lightnvm/pblk-rb.c
++++ b/drivers/lightnvm/pblk-rb.c
+@@ -622,6 +622,9 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
+ 		}
+ 	}
+ 
++	atomic64_add(pad, &((struct pblk *)
++			(container_of(rb, struct pblk, rwb)))->pad_wa);
++
+ #ifdef CONFIG_NVM_DEBUG
+ 	atomic_long_add(pad, &((struct pblk *)
+ 			(container_of(rb, struct pblk, rwb)))->padded_writes);
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index a30fe203d454..e75a1af2eebe 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -845,6 +845,29 @@ static int pblk_recov_check_line_version(struct pblk *pblk,
+ 	return 0;
  }
  
-+#define BLK_MQ_QUEUE_DELAY	3		/* ms units */
++static void pblk_recov_wa_counters(struct pblk *pblk,
++				   struct line_emeta *emeta)
++{
++	struct pblk_line_meta *lm = &pblk->lm;
++	struct line_header *header = &emeta->header;
++	struct wa_counters *wa = emeta_to_wa(lm, emeta);
 +
- bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 			     bool got_budget)
++	/* WA counters were introduced in emeta version 0.2 */
++	if (header->version_major > 0 || header->version_minor >= 2) {
++		u64 user = le64_to_cpu(wa->user);
++		u64 pad = le64_to_cpu(wa->pad);
++		u64 gc = le64_to_cpu(wa->gc);
++
++		atomic64_set(&pblk->user_wa, user);
++		atomic64_set(&pblk->pad_wa, pad);
++		atomic64_set(&pblk->gc_wa, gc);
++
++		pblk->user_rst_wa = user;
++		pblk->pad_rst_wa = pad;
++		pblk->gc_rst_wa = gc;
++	}
++}
++
+ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
  {
-@@ -1167,6 +1169,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 	struct request *rq, *nxt;
- 	bool no_tag = false;
- 	int errors, queued;
-+	blk_status_t ret = BLK_STS_OK;
+ 	struct pblk_line_meta *lm = &pblk->lm;
+@@ -965,6 +988,8 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+ 		if (pblk_recov_check_line_version(pblk, line->emeta->buf))
+ 			return ERR_PTR(-EINVAL);
  
- 	if (list_empty(list))
- 		return false;
-@@ -1179,7 +1182,6 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 	errors = queued = 0;
- 	do {
- 		struct blk_mq_queue_data bd;
--		blk_status_t ret;
- 
- 		rq = list_first_entry(list, struct request, queuelist);
- 		if (!blk_mq_get_driver_tag(rq, &hctx, false)) {
-@@ -1224,7 +1226,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 		}
- 
- 		ret = q->mq_ops->queue_rq(hctx, &bd);
--		if (ret == BLK_STS_RESOURCE) {
-+		if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE) {
- 			/*
- 			 * If an I/O scheduler has been configured and we got a
- 			 * driver tag for the next request already, free it
-@@ -1255,6 +1257,8 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 	 * that is where we will continue on next queue run.
- 	 */
- 	if (!list_empty(list)) {
-+		bool needs_restart;
++		pblk_recov_wa_counters(pblk, line->emeta->buf);
 +
- 		spin_lock(&hctx->lock);
- 		list_splice_init(list, &hctx->dispatch);
- 		spin_unlock(&hctx->lock);
-@@ -1278,10 +1282,17 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
- 		 * - Some but not all block drivers stop a queue before
- 		 *   returning BLK_STS_RESOURCE. Two exceptions are scsi-mq
- 		 *   and dm-rq.
-+		 *
-+		 * If driver returns BLK_STS_RESOURCE and SCHED_RESTART
-+		 * bit is set, run queue after 10ms to avoid IO stalls
-+		 * that could otherwise occur if the queue is idle.
- 		 */
--		if (!blk_mq_sched_needs_restart(hctx) ||
-+		needs_restart = blk_mq_sched_needs_restart(hctx);
-+		if (!needs_restart ||
- 		    (no_tag && list_empty_careful(&hctx->dispatch_wait.entry)))
- 			blk_mq_run_hw_queue(hctx, true);
-+		else if (needs_restart && (ret == BLK_STS_RESOURCE))
-+			blk_mq_delay_run_hw_queue(hctx, BLK_MQ_QUEUE_DELAY);
- 	}
+ 		if (pblk_recov_l2p_from_emeta(pblk, line))
+ 			pblk_recov_l2p_from_oob(pblk, line);
  
- 	return (queued + errors) != 0;
-@@ -1762,6 +1773,7 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
- 		*cookie = new_cookie;
- 		break;
- 	case BLK_STS_RESOURCE:
-+	case BLK_STS_DEV_RESOURCE:
- 		__blk_mq_requeue_request(rq);
- 		break;
- 	default:
-@@ -1824,7 +1836,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	hctx_lock(hctx, &srcu_idx);
- 
- 	ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false);
--	if (ret == BLK_STS_RESOURCE)
-+	if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
- 		blk_mq_sched_insert_request(rq, false, true, false);
- 	else if (ret != BLK_STS_OK)
- 		blk_mq_end_request(rq, ret);
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index 5b94e530570c..4bc25fc4e73c 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -1230,7 +1230,7 @@ static blk_status_t null_handle_cmd(struct nullb_cmd *cmd)
- 				return BLK_STS_OK;
- 			} else
- 				/* requeue request */
--				return BLK_STS_RESOURCE;
-+				return BLK_STS_DEV_RESOURCE;
- 		}
- 	}
- 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 68846897d213..79908e6ddbf2 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -276,7 +276,7 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		/* Out of mem doesn't actually happen, since we fall back
- 		 * to direct descriptors */
- 		if (err == -ENOMEM || err == -ENOSPC)
--			return BLK_STS_RESOURCE;
-+			return BLK_STS_DEV_RESOURCE;
- 		return BLK_STS_IOERR;
- 	}
- 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index 891265acb10e..e126e4cac2ca 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -911,7 +911,7 @@ static blk_status_t blkif_queue_rq(struct blk_mq_hw_ctx *hctx,
- out_busy:
- 	blk_mq_stop_hw_queue(hctx);
- 	spin_unlock_irqrestore(&rinfo->ring_lock, flags);
--	return BLK_STS_RESOURCE;
-+	return BLK_STS_DEV_RESOURCE;
+diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
+index 620bab853579..4804bbd32d5f 100644
+--- a/drivers/lightnvm/pblk-sysfs.c
++++ b/drivers/lightnvm/pblk-sysfs.c
+@@ -298,6 +298,49 @@ static ssize_t pblk_sysfs_get_sec_per_write(struct pblk *pblk, char *page)
+ 	return snprintf(page, PAGE_SIZE, "%d\n", pblk->sec_per_write);
  }
  
- static void blkif_complete_rq(struct request *rq)
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index b7d175e94a02..348a0cb6963a 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -404,7 +404,7 @@ static blk_status_t dm_dispatch_clone_request(struct request *clone, struct requ
++static ssize_t pblk_get_write_amp(u64 user, u64 gc, u64 pad,
++				  char *page)
++{
++	int sz;
++
++	sz = snprintf(page, PAGE_SIZE,
++			"user:%lld gc:%lld pad:%lld WA:",
++			user, gc, pad);
++
++	if (!user) {
++		sz += snprintf(page + sz, PAGE_SIZE - sz, "NaN\n");
++	} else {
++		u64 wa_int, wa_frac, wa_frac_int;
++
++		wa_int = user + gc + pad;
++		sector_div(wa_int, user);
++
++		wa_frac_int = (user + gc + pad) * 100000;
++		sector_div(wa_frac_int, user);
++		div_u64_rem(wa_frac_int, 100000, (u32 *)&wa_frac);
++
++		sz += snprintf(page + sz, PAGE_SIZE - sz, "%lld.%05lld\n",
++							wa_int, wa_frac);
++	}
++
++	return sz;
++}
++
++static ssize_t pblk_sysfs_get_write_amp_mileage(struct pblk *pblk, char *page)
++{
++	return pblk_get_write_amp(atomic64_read(&pblk->user_wa),
++		atomic64_read(&pblk->gc_wa), atomic64_read(&pblk->pad_wa),
++		page);
++}
++
++static ssize_t pblk_sysfs_get_write_amp_trip(struct pblk *pblk, char *page)
++{
++	return pblk_get_write_amp(
++		atomic64_read(&pblk->user_wa) - pblk->user_rst_wa,
++		atomic64_read(&pblk->gc_wa) - pblk->gc_rst_wa,
++		atomic64_read(&pblk->pad_wa) - pblk->pad_rst_wa, page);
++}
++
+ #ifdef CONFIG_NVM_DEBUG
+ static ssize_t pblk_sysfs_stats_debug(struct pblk *pblk, char *page)
+ {
+@@ -360,6 +403,30 @@ static ssize_t pblk_sysfs_set_sec_per_write(struct pblk *pblk,
+ 	return len;
+ }
  
- 	clone->start_time = jiffies;
- 	r = blk_insert_cloned_request(clone->q, clone);
--	if (r != BLK_STS_OK && r != BLK_STS_RESOURCE)
-+	if (r != BLK_STS_OK && r != BLK_STS_RESOURCE && r != BLK_STS_DEV_RESOURCE)
- 		/* must complete clone in terms of original request */
- 		dm_complete_request(rq, r);
- 	return r;
-@@ -496,7 +496,7 @@ static int map_request(struct dm_rq_target_io *tio)
- 		trace_block_rq_remap(clone->q, clone, disk_devt(dm_disk(md)),
- 				     blk_rq_pos(rq));
- 		ret = dm_dispatch_clone_request(clone, rq);
--		if (ret == BLK_STS_RESOURCE) {
-+		if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE) {
- 			blk_rq_unprep_clone(clone);
- 			tio->ti->type->release_clone_rq(clone);
- 			tio->clone = NULL;
-@@ -769,7 +769,6 @@ static blk_status_t dm_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		/* Undo dm_start_request() before requeuing */
- 		rq_end_stats(md, rq);
- 		rq_completed(md, rq_data_dir(rq), false);
--		blk_mq_delay_run_hw_queue(hctx, 100/*ms*/);
- 		return BLK_STS_RESOURCE;
- 	}
- 
-diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index b76ba4629e02..54e679541ad6 100644
---- a/drivers/nvme/host/fc.c
-+++ b/drivers/nvme/host/fc.c
-@@ -35,8 +35,6 @@ enum nvme_fc_queue_flags {
- 	NVME_FC_Q_LIVE,
++static ssize_t pblk_sysfs_set_write_amp_trip(struct pblk *pblk,
++			const char *page, size_t len)
++{
++	size_t c_len;
++	int reset_value;
++
++	c_len = strcspn(page, "\n");
++	if (c_len >= len)
++		return -EINVAL;
++
++	if (kstrtouint(page, 0, &reset_value))
++		return -EINVAL;
++
++	if (reset_value !=  0)
++		return -EINVAL;
++
++	pblk->user_rst_wa = atomic64_read(&pblk->user_wa);
++	pblk->pad_rst_wa = atomic64_read(&pblk->pad_wa);
++	pblk->gc_rst_wa = atomic64_read(&pblk->gc_wa);
++
++	return len;
++}
++
++
+ static struct attribute sys_write_luns = {
+ 	.name = "write_luns",
+ 	.mode = 0444,
+@@ -410,6 +477,16 @@ static struct attribute sys_max_sec_per_write = {
+ 	.mode = 0644,
  };
  
--#define NVMEFC_QUEUE_DELAY	3		/* ms units */
++static struct attribute sys_write_amp_mileage = {
++	.name = "write_amp_mileage",
++	.mode = 0444,
++};
++
++static struct attribute sys_write_amp_trip = {
++	.name = "write_amp_trip",
++	.mode = 0644,
++};
++
+ #ifdef CONFIG_NVM_DEBUG
+ static struct attribute sys_stats_debug_attr = {
+ 	.name = "stats",
+@@ -428,6 +505,8 @@ static struct attribute *pblk_attrs[] = {
+ 	&sys_stats_ppaf_attr,
+ 	&sys_lines_attr,
+ 	&sys_lines_info_attr,
++	&sys_write_amp_mileage,
++	&sys_write_amp_trip,
+ #ifdef CONFIG_NVM_DEBUG
+ 	&sys_stats_debug_attr,
+ #endif
+@@ -457,6 +536,10 @@ static ssize_t pblk_sysfs_show(struct kobject *kobj, struct attribute *attr,
+ 		return pblk_sysfs_lines_info(pblk, buf);
+ 	else if (strcmp(attr->name, "max_sec_per_write") == 0)
+ 		return pblk_sysfs_get_sec_per_write(pblk, buf);
++	else if (strcmp(attr->name, "write_amp_mileage") == 0)
++		return pblk_sysfs_get_write_amp_mileage(pblk, buf);
++	else if (strcmp(attr->name, "write_amp_trip") == 0)
++		return pblk_sysfs_get_write_amp_trip(pblk, buf);
+ #ifdef CONFIG_NVM_DEBUG
+ 	else if (strcmp(attr->name, "stats") == 0)
+ 		return pblk_sysfs_stats_debug(pblk, buf);
+@@ -473,7 +556,8 @@ static ssize_t pblk_sysfs_store(struct kobject *kobj, struct attribute *attr,
+ 		return pblk_sysfs_gc_force(pblk, buf, len);
+ 	else if (strcmp(attr->name, "max_sec_per_write") == 0)
+ 		return pblk_sysfs_set_sec_per_write(pblk, buf, len);
 -
- #define NVME_FC_DEFAULT_DEV_LOSS_TMO	60	/* seconds */
- 
- struct nvme_fc_queue {
-@@ -2231,7 +2229,7 @@ nvme_fc_start_fcp_op(struct nvme_fc_ctrl *ctrl, struct nvme_fc_queue *queue,
- 	 * the target device is present
- 	 */
- 	if (ctrl->rport->remoteport.port_state != FC_OBJSTATE_ONLINE)
--		goto busy;
-+		return BLK_STS_RESOURCE;
- 
- 	if (!nvme_fc_ctrl_get(ctrl))
- 		return BLK_STS_IOERR;
-@@ -2311,16 +2309,10 @@ nvme_fc_start_fcp_op(struct nvme_fc_ctrl *ctrl, struct nvme_fc_queue *queue,
- 				ret != -EBUSY)
- 			return BLK_STS_IOERR;
- 
--		goto busy;
-+		return BLK_STS_RESOURCE;
- 	}
- 
- 	return BLK_STS_OK;
--
--busy:
--	if (!(op->flags & FCOP_FLAGS_AEN) && queue->hctx)
--		blk_mq_delay_run_hw_queue(queue->hctx, NVMEFC_QUEUE_DELAY);
--
--	return BLK_STS_RESOURCE;
++	else if (strcmp(attr->name, "write_amp_trip") == 0)
++		return pblk_sysfs_set_write_amp_trip(pblk, buf, len);
+ 	return 0;
  }
  
- static inline blk_status_t nvme_fc_is_ready(struct nvme_fc_queue *queue,
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index d9ca1dfab154..55be2550c555 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2030,9 +2030,9 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	case BLK_STS_OK:
- 		break;
- 	case BLK_STS_RESOURCE:
--		if (atomic_read(&sdev->device_busy) == 0 &&
--		    !scsi_device_blocked(sdev))
--			blk_mq_delay_run_hw_queue(hctx, SCSI_QUEUE_DELAY);
-+		if (atomic_read(&sdev->device_busy) ||
-+		    scsi_device_blocked(sdev))
-+			ret = BLK_STS_DEV_RESOURCE;
- 		break;
- 	default:
- 		/*
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 2d973ac54b09..6a8ad60e7f09 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -39,6 +39,20 @@ typedef u8 __bitwise blk_status_t;
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index fae2526f80b2..4b7d8618631f 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -331,7 +331,7 @@ enum {
+ #define SMETA_VERSION_MINOR (1)
  
- #define BLK_STS_AGAIN		((__force blk_status_t)12)
+ #define EMETA_VERSION_MAJOR (0)
+-#define EMETA_VERSION_MINOR (1)
++#define EMETA_VERSION_MINOR (2)
  
-+/*
-+ * BLK_STS_DEV_RESOURCE is returned from driver to block layer if device
-+ * related resource is unavailable, but driver can guarantee that queue
-+ * will be rerun in future once the resource is available (whereby
-+ * dispatching requests).
-+ *
-+ * Difference with BLK_STS_RESOURCE:
-+ * If driver isn't sure if the queue will be rerun once device resource
-+ * is made available, please return BLK_STS_RESOURCE.  For example: when
-+ * memory allocation, DMA Mapping or other system resource allocation
-+ * fails and IO can't be submitted to device.
-+ */
-+#define BLK_STS_DEV_RESOURCE	((__force blk_status_t)13)
+ struct line_header {
+ 	__le32 crc;
+@@ -361,11 +361,13 @@ struct line_smeta {
+ 	__le64 lun_bitmap[];
+ };
+ 
 +
- /**
-  * blk_path_error - returns true if error may be path related
-  * @error: status the request was completed with
+ /*
+  * Metadata layout in media:
+  *	First sector:
+  *		1. struct line_emeta
+  *		2. bad block bitmap (u64 * window_wr_lun)
++ *		3. write amplification counters
+  *	Mid sectors (start at lbas_sector):
+  *		3. nr_lbas (u64) forming lba list
+  *	Last sectors (start at vsc_sector):
+@@ -389,7 +391,15 @@ struct line_emeta {
+ 	__le32 next_id;		/* Line id for next line */
+ 	__le64 nr_lbas;		/* Number of lbas mapped in line */
+ 	__le64 nr_valid_lbas;	/* Number of valid lbas mapped in line */
+-	__le64 bb_bitmap[];	/* Updated bad block bitmap for line */
++	__le64 bb_bitmap[];     /* Updated bad block bitmap for line */
++};
++
++
++/* Write amplification counters stored on media */
++struct wa_counters {
++	__le64 user;		/* Number of user written sectors */
++	__le64 gc;		/* Number of sectors written by GC*/
++	__le64 pad;		/* Number of padded sectors */
+ };
+ 
+ struct pblk_emeta {
+@@ -519,10 +529,11 @@ struct pblk_line_meta {
+ 	unsigned int smeta_sec;		/* Sectors needed for smeta */
+ 
+ 	unsigned int emeta_len[4];	/* Lengths for emeta:
+-					 *  [0]: Total length
+-					 *  [1]: struct line_emeta length
+-					 *  [2]: L2P portion length
+-					 *  [3]: vsc list length
++					 *  [0]: Total
++					 *  [1]: struct line_emeta +
++					 *       bb_bitmap + struct wa_counters
++					 *  [2]: L2P portion
++					 *  [3]: vsc
+ 					 */
+ 	unsigned int emeta_sec[4];	/* Sectors needed for emeta. Same layout
+ 					 * as emeta_len
+@@ -604,8 +615,19 @@ struct pblk {
+ 	int sec_per_write;
+ 
+ 	unsigned char instance_uuid[16];
++
++	/* Persistent write amplification counters, 4kb sector I/Os */
++	atomic64_t user_wa;		/* Sectors written by user */
++	atomic64_t gc_wa;		/* Sectors written by GC */
++	atomic64_t pad_wa;		/* Padded sectors written */
++
++	/* Reset values for delta write amplification measurements */
++	u64 user_rst_wa;
++	u64 gc_rst_wa;
++	u64 pad_rst_wa;
++
+ #ifdef CONFIG_NVM_DEBUG
+-	/* All debug counters apply to 4kb sector I/Os */
++	/* Non-persistent debug counters, 4kb sector I/Os */
+ 	atomic_long_t inflight_writes;	/* Inflight writes (user and gc) */
+ 	atomic_long_t padded_writes;	/* Sectors padded due to flush/fua */
+ 	atomic_long_t padded_wb;	/* Sectors padded in write buffer */
+@@ -900,6 +922,12 @@ static inline void *emeta_to_bb(struct line_emeta *emeta)
+ 	return emeta->bb_bitmap;
+ }
+ 
++static inline void *emeta_to_wa(struct pblk_line_meta *lm,
++				struct line_emeta *emeta)
++{
++	return emeta->bb_bitmap + lm->blk_bitmap_len;
++}
++
+ static inline void *emeta_to_lbas(struct pblk *pblk, struct line_emeta *emeta)
+ {
+ 	return ((void *)emeta + pblk->lm.emeta_len[1]);
 -- 
-2.15.0
+2.7.4
