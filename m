@@ -1,50 +1,47 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 11 Jan 2018 10:04:05 -0800
-From: Tejun Heo <tj@kernel.org>
-To: Josh Snyder <joshs@netflix.com>
-Cc: Peter Zijlstra <peterz@infradead.org>,
-	Brendan Gregg <bgregg@netflix.com>, linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, Balbir Singh <bsingharora@gmail.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2] delayacct: Account blkio completion on the correct
- task
-Message-ID: <20180111180405.GJ3460072@devbig577.frc2.facebook.com>
-References: <20171218113426.vndsy2m5qhxrkesg@hirez.programming.kicks-ass.net>
- <1513613712-571-1-git-send-email-joshs@netflix.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Wed, 31 Jan 2018 11:33:49 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Bart Van Assche <Bart.VanAssche@wdc.com>,
+	"snitzer@redhat.com" <snitzer@redhat.com>,
+	"dm-devel@redhat.com" <dm-devel@redhat.com>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [dm-devel] [PATCH v5] blk-mq: introduce BLK_STS_DEV_RESOURCE
+Message-ID: <20180131033348.GA9985@ming.t460p>
+References: <20180130142459.52668-1-snitzer@redhat.com>
+ <43ac2314-c98d-bb76-0dfb-171d15cc5fd8@wdc.com>
+ <7baf8e0f-7a15-4529-c32b-4ce0ee172598@kernel.dk>
+ <1517368861.4421.2.camel@wdc.com>
+ <d563628f-687d-c463-7e7e-d85a52cdf25b@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1513613712-571-1-git-send-email-joshs@netflix.com>
+In-Reply-To: <d563628f-687d-c463-7e7e-d85a52cdf25b@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello,
-
-On Mon, Dec 18, 2017 at 04:15:10PM +0000, Josh Snyder wrote:
-> Before commit e33a9bba85a8 ("sched/core: move IO scheduling accounting from
-> io_schedule_timeout() into scheduler"), delayacct_blkio_end was called after
-> context-switching into the task which completed I/O. This resulted in double
-> counting: the task would account a delay both waiting for I/O and for time
-> spent in the runqueue.
+On Tue, Jan 30, 2018 at 08:22:27PM -0700, Jens Axboe wrote:
+> On 1/30/18 8:21 PM, Bart Van Assche wrote:
+> > On Tue, 2018-01-30 at 20:17 -0700, Jens Axboe wrote:
+> >> BLK_STS_RESOURCE should always be safe to return, and it should work
+> >> the same as STS_DEV_RESOURCE, except it may cause an extra queue
+> >> run.
+> >>
+> >> Well written drivers should use STS_DEV_RESOURCE where it makes
+> >> sense.
+> > 
+> > Hello Jens,
+> > 
+> > I would appreciate it if other names would be chosen than BLK_STS_RESOURCE
+> > and BLK_STS_DEV_RESOURCE, e.g. names that directly refer to the fact that
+> > one of the two status codes causes the queue to be rerun and the other not.
+> > I'm afraid that the currently chosen names will cause confusion.
 > 
-> With e33a9bba85a8, delayacct_blkio_end is called by try_to_wake_up. In
-> ttwu, we have not yet context-switched. This is more correct, in that the
-> delay accounting ends when the I/O is complete. But delayacct_blkio_end
-> relies upon `get_current()`, and we have not yet context-switched into the
-> task whose I/O completed. This results in the wrong task having its delay
-> accounting statistics updated.
-> 
-> Instead of doing that, pass the task_struct being woken to
-> delayacct_blkio_end, so that it can update the statistics of the correct
-> task.
-> 
-> Fixes: e33a9bba85a8 ("sched/core: move IO scheduling accounting from io_schedule_timeout() into scheduler")
-> Signed-off-by: Josh Snyder <joshs@netflix.com>
+> DEV_RESOURCE is pretty clear I think, but I agree that STS_RESOURCE
+> could perhaps be better. STS_SYSTEM_RESOURCE? It makes the distinction
 
-Acked-by: Tejun Heo <tj@kernel.org>
-
-Thanks.
+I guess it still can't cover all, for example, .queue_rq() may not
+submit rq to hardware successfully because of tansport busy, such FC,..
 
 -- 
-tejun
+Ming
