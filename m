@@ -1,178 +1,54 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out1.zte.com.cn ([202.103.147.172]:47894 "EHLO mxct.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751707AbeAYM2c (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Jan 2018 07:28:32 -0500
-From: tang.junhui@zte.com.cn
-To: colyli@suse.de, mlyle@lyle.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        tang.junhui@zte.com.cn
-Subject: [PATCH] [PATCH v2] bcache: fix for allocator and register thread race
-Date: Thu, 25 Jan 2018 20:30:56 +0800
-Message-Id: <1516883456-4170-1-git-send-email-tang.junhui@zte.com.cn>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: Fix a race between the throttling code and request
+ queue initialization
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Joseph Qi <joseph.qi@linux.alibaba.com>,
+ Philipp Reisner <philipp.reisner@linbit.com>,
+ Ulf Hansson <ulf.hansson@linaro.org>, Kees Cook <keescook@chromium.org>,
+ stable@vger.kernel.org
+References: <20180131191300.25664-1-bart.vanassche@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <d7acd8ee-7256-0a84-1d81-38b15534d138@kernel.dk>
+Date: Wed, 31 Jan 2018 12:22:41 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180131191300.25664-1-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+On 1/31/18 12:13 PM, Bart Van Assche wrote:
+> Initialize the request queue lock earlier such that the following
+> race can no longer occur:
+> 
+> blk_init_queue_node                 blkcg_print_blkgs
+>   blk_alloc_queue_node (1)
+>     q->queue_lock = &q->__queue_lock (2)
+>     blkcg_init_queue(q) (3)
+>                                     spin_lock_irq(blkg->q->queue_lock) (4)
+>   q->queue_lock = lock (5)
+>                                     spin_unlock_irq(blkg->q->queue_lock) (6)
+> 
+> (1) allocate an uninitialized queue;
+> (2) initialize queue_lock to its default internal lock;
+> (3) initialize blkcg part of request queue, which will create blkg and
+>     then insert it to blkg_list;
+> (4) traverse blkg_list and find the created blkg, and then take its
+>     queue lock, here it is the default *internal lock*;
+> (5) *race window*, now queue_lock is overridden with *driver specified
+>     lock*;
+> (6) now unlock *driver specified lock*, not the locked *internal lock*,
+>     unlock balance breaks.
+> 
+> The changes in this patch are as follows:
+> - Rename blk_alloc_queue_node() into blk_alloc_queue_node2() and add
+>   a new queue lock argument.
+> - Introduce a wrapper function with the same name and behavior as the
+>   old blk_alloc_queue_node() function.
 
-After long time running of random small IO writing,
-I reboot the machine, and after the machine power on,
-I found bcache got stuck, the stack is:
-[root@ceph153 ~]# cat /proc/2510/task/*/stack
-[<ffffffffa06b2455>] closure_sync+0x25/0x90 [bcache]
-[<ffffffffa06b6be8>] bch_journal+0x118/0x2b0 [bcache]
-[<ffffffffa06b6dc7>] bch_journal_meta+0x47/0x70 [bcache]
-[<ffffffffa06be8f7>] bch_prio_write+0x237/0x340 [bcache]
-[<ffffffffa06a8018>] bch_allocator_thread+0x3c8/0x3d0 [bcache]
-[<ffffffff810a631f>] kthread+0xcf/0xe0
-[<ffffffff8164c318>] ret_from_fork+0x58/0x90
-[<ffffffffffffffff>] 0xffffffffffffffff
-[root@ceph153 ~]# cat /proc/2038/task/*/stack
-[<ffffffffa06b1abd>] __bch_btree_map_nodes+0x12d/0x150 [bcache]
-[<ffffffffa06b1bd1>] bch_btree_insert+0xf1/0x170 [bcache]
-[<ffffffffa06b637f>] bch_journal_replay+0x13f/0x230 [bcache]
-[<ffffffffa06c75fe>] run_cache_set+0x79a/0x7c2 [bcache]
-[<ffffffffa06c0cf8>] register_bcache+0xd48/0x1310 [bcache]
-[<ffffffff812f702f>] kobj_attr_store+0xf/0x20
-[<ffffffff8125b216>] sysfs_write_file+0xc6/0x140
-[<ffffffff811dfbfd>] vfs_write+0xbd/0x1e0
-[<ffffffff811e069f>] SyS_write+0x7f/0xe0
-[<ffffffff8164c3c9>] system_call_fastpath+0x16/0x1
-The stack shows the register thread and allocator thread
-were getting stuck when registering cache device.
+Let's please not do any of that, that's a horrible name to export. It's
+not like we have hundreds of callers of blk_alloc_queue_node(), just
+change them to pass in a NULL if they use the queue embedded lock.
 
-I reboot the machine several times, the issue always
-exsit in this machine.
 
-I debug the code, and found the call trace as bellow:
-register_bcache()
-   ==>run_cache_set()
-      ==>bch_journal_replay()
-         ==>bch_btree_insert()
-            ==>__bch_btree_map_nodes()
-               ==>btree_insert_fn()
-                  ==>btree_split() //node need split
-                     ==>btree_check_reserve()
-In btree_check_reserve(), It will check if there is enough buckets
-of RESERVE_BTREE type, since allocator thread did not work yet, so
-no buckets of RESERVE_BTREE type allocated, so the register thread
-waits on c->btree_cache_wait, and goes to sleep.
-
-Then the allocator thread initialized, the call trace is bellow:
-bch_allocator_thread()
-==>bch_prio_write()
-   ==>bch_journal_meta()
-      ==>bch_journal()
-         ==>journal_wait_for_write()
-In journal_wait_for_write(), It will check if journal is full by
-journal_full(), but the long time random small IO writing
-causes the exhaustion of journal buckets(journal.blocks_free=0),
-In order to release the journal buckets,
-the allocator calls btree_flush_write() to flush keys to
-btree nodes, and waits on c->journal.wait until btree nodes writing
-over or there has already some journal buckets space, then the
-allocator thread goes to sleep. but in btree_flush_write(), since
-bch_journal_replay() is not finished, so no btree nodes have journal
-(condition "if (btree_current_write(b)->journal)" never satisfied),
-so we got no btree node to flush, no journal bucket released,
-and allocator sleep all the times.
-
-Through the above analysis, we can see that:
-1) Register thread wait for allocator thread to allocate buckets of
-   RESERVE_BTREE type;
-2) Alloctor thread wait for register thread to replay journal, so it
-   can flush btree nodes and get journal bucket.
-   then they are all got stuck by waiting for each other.
-
-Hua Rui provided a patch for me, by allocating some buckets of
-RESERVE_BTREE type in advance, so the register thread can get bucket
-when btree node splitting and no need to waiting for the allocator
-thread. I tested it, it has effect, and register thread run a step
-forward, but finally are still got stuck, the reason is only 8 bucket
-of RESERVE_BTREE type were allocated, and in bch_journal_replay(),
-after 2 btree nodes splitting, only 4 bucket of RESERVE_BTREE type left,
-then btree_check_reserve() is not satisfied anymore, so it goes to sleep
-again, and in the same time, alloctor thread did not flush enough btree
-nodes to release a journal bucket, so they all got stuck again.
-
-So we need to allocate more buckets of RESERVE_BTREE type in advance,
-but how much is enough?  By experience and test, I think it should be
-as much as journal buckets. Then I modify the code as this patch,
-and test in the machine, and it works.
-
-This patch modified base on Hua Rui’s patch, and allocate more buckets
-of RESERVE_BTREE type in advance to avoid register thread and allocate
-thread going to wait for each other.
-
-[patch v2] ca->sb.njournal_buckets would be 0 in the first time after
-cache creation, and no journal exists, so just 8 btree buckets is OK.
-
-Signed-off-by: Hua Rui <huarui.dev@gmail.com>
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
----
- drivers/md/bcache/btree.c |  9 ++++++---
- drivers/md/bcache/super.c | 13 ++++++++++++-
- 2 files changed, 18 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index 658c54b..d222a9b 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -1865,14 +1865,17 @@ void bch_initial_gc_finish(struct cache_set *c)
- 	 */
- 	for_each_cache(ca, c, i) {
- 		for_each_bucket(b, ca) {
--			if (fifo_full(&ca->free[RESERVE_PRIO]))
-+			if (fifo_full(&ca->free[RESERVE_PRIO]) &&
-+			    fifo_full(&ca->free[RESERVE_BTREE]))
- 				break;
- 
- 			if (bch_can_invalidate_bucket(ca, b) &&
- 			    !GC_MARK(b)) {
- 				__bch_invalidate_one_bucket(ca, b);
--				fifo_push(&ca->free[RESERVE_PRIO],
--					  b - ca->buckets);
-+				if (!fifo_push(&ca->free[RESERVE_PRIO],
-+				   b - ca->buckets))
-+					fifo_push(&ca->free[RESERVE_BTREE],
-+						  b - ca->buckets);
- 			}
- 		}
- 	}
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index fc0a31b..a000b75 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1812,6 +1812,7 @@ void bch_cache_release(struct kobject *kobj)
- static int cache_alloc(struct cache *ca)
- {
- 	size_t free;
-+	size_t btree_buckets;
- 	struct bucket *b;
- 
- 	__module_get(THIS_MODULE);
-@@ -1819,9 +1820,19 @@ static int cache_alloc(struct cache *ca)
- 
- 	bio_init(&ca->journal.bio, ca->journal.bio.bi_inline_vecs, 8);
- 
-+	/*
-+	 * when ca->sb.njournal_buckets is not zero, journal exists,
-+	 * and in bch_journal_replay(), tree node may split,
-+	 * so bucket of RESERVE_BTREE type is needed,
-+	 * the worst situation is all journal buckets are valid journal,
-+	 * and all the keys need to replay,
-+	 * so the number of  RESERVE_BTREE type buckets should be as much
-+	 * as journal buckets
-+	 */
-+	btree_buckets = ca->sb.njournal_buckets ?: 8;
- 	free = roundup_pow_of_two(ca->sb.nbuckets) >> 10;
- 
--	if (!init_fifo(&ca->free[RESERVE_BTREE], 8, GFP_KERNEL) ||
-+	if (!init_fifo(&ca->free[RESERVE_BTREE], btree_buckets, GFP_KERNEL) ||
- 	    !init_fifo_exact(&ca->free[RESERVE_PRIO], prio_buckets(ca), GFP_KERNEL) ||
- 	    !init_fifo(&ca->free[RESERVE_MOVINGGC], free, GFP_KERNEL) ||
- 	    !init_fifo(&ca->free[RESERVE_NONE], free, GFP_KERNEL) ||
 -- 
-1.8.3.1
+Jens Axboe
