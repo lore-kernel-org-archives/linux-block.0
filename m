@@ -1,42 +1,30 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <prvs=562a2f801=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "axboe@kernel.dk" <axboe@kernel.dk>, "snitzer@redhat.com"
+	<snitzer@redhat.com>
+CC: "dm-devel@redhat.com" <dm-devel@redhat.com>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>
 Subject: Re: [dm-devel] [PATCH v5] blk-mq: introduce BLK_STS_DEV_RESOURCE
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
- "snitzer@redhat.com" <snitzer@redhat.com>
-Cc: "dm-devel@redhat.com" <dm-devel@redhat.com>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Date: Wed, 31 Jan 2018 03:21:02 +0000
+Message-ID: <1517368861.4421.2.camel@wdc.com>
 References: <20180130142459.52668-1-snitzer@redhat.com>
- <43ac2314-c98d-bb76-0dfb-171d15cc5fd8@wdc.com>
- <7baf8e0f-7a15-4529-c32b-4ce0ee172598@kernel.dk>
- <1517368861.4421.2.camel@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <d563628f-687d-c463-7e7e-d85a52cdf25b@kernel.dk>
-Date: Tue, 30 Jan 2018 20:22:27 -0700
+	 <43ac2314-c98d-bb76-0dfb-171d15cc5fd8@wdc.com>
+	 <7baf8e0f-7a15-4529-c32b-4ce0ee172598@kernel.dk>
+In-Reply-To: <7baf8e0f-7a15-4529-c32b-4ce0ee172598@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1517368861.4421.2.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 1/30/18 8:21 PM, Bart Van Assche wrote:
-> On Tue, 2018-01-30 at 20:17 -0700, Jens Axboe wrote:
->> BLK_STS_RESOURCE should always be safe to return, and it should work
->> the same as STS_DEV_RESOURCE, except it may cause an extra queue
->> run.
->>
->> Well written drivers should use STS_DEV_RESOURCE where it makes
->> sense.
-> 
-> Hello Jens,
-> 
-> I would appreciate it if other names would be chosen than BLK_STS_RESOURCE
-> and BLK_STS_DEV_RESOURCE, e.g. names that directly refer to the fact that
-> one of the two status codes causes the queue to be rerun and the other not.
-> I'm afraid that the currently chosen names will cause confusion.
-
-DEV_RESOURCE is pretty clear I think, but I agree that STS_RESOURCE
-could perhaps be better. STS_SYSTEM_RESOURCE? It makes the distinction
-a bit clearer.
-
--- 
-Jens Axboe
+T24gVHVlLCAyMDE4LTAxLTMwIGF0IDIwOjE3IC0wNzAwLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBC
+TEtfU1RTX1JFU09VUkNFIHNob3VsZCBhbHdheXMgYmUgc2FmZSB0byByZXR1cm4sIGFuZCBpdCBz
+aG91bGQgd29yaw0KPiB0aGUgc2FtZSBhcyBTVFNfREVWX1JFU09VUkNFLCBleGNlcHQgaXQgbWF5
+IGNhdXNlIGFuIGV4dHJhIHF1ZXVlDQo+IHJ1bi4NCj4gDQo+IFdlbGwgd3JpdHRlbiBkcml2ZXJz
+IHNob3VsZCB1c2UgU1RTX0RFVl9SRVNPVVJDRSB3aGVyZSBpdCBtYWtlcw0KPiBzZW5zZS4NCg0K
+SGVsbG8gSmVucywNCg0KSSB3b3VsZCBhcHByZWNpYXRlIGl0IGlmIG90aGVyIG5hbWVzIHdvdWxk
+IGJlIGNob3NlbiB0aGFuIEJMS19TVFNfUkVTT1VSQ0UNCmFuZCBCTEtfU1RTX0RFVl9SRVNPVVJD
+RSwgZS5nLiBuYW1lcyB0aGF0IGRpcmVjdGx5IHJlZmVyIHRvIHRoZSBmYWN0IHRoYXQNCm9uZSBv
+ZiB0aGUgdHdvIHN0YXR1cyBjb2RlcyBjYXVzZXMgdGhlIHF1ZXVlIHRvIGJlIHJlcnVuIGFuZCB0
+aGUgb3RoZXIgbm90Lg0KSSdtIGFmcmFpZCB0aGF0IHRoZSBjdXJyZW50bHkgY2hvc2VuIG5hbWVz
+IHdpbGwgY2F1c2UgY29uZnVzaW9uLg0KDQpUaGFua3MsDQoNCkJhcnQu
