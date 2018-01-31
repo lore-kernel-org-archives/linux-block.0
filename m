@@ -1,48 +1,40 @@
-Return-Path: <prvs=54311c032=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH] blk-mq-debugfs: Also show requests that have not yet been started
-Date: Fri, 12 Jan 2018 13:52:07 -0800
-Message-Id: <20180112215207.17852-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mxhk.zte.com.cn ([63.217.80.70]:59524 "EHLO mxhk.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753044AbeAaD22 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Jan 2018 22:28:28 -0500
+From: tang.junhui@zte.com.cn
+To: colyli@suse.de, mlyle@lyle.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        tang.junhui@zte.com.cn
+Subject: [PATCH] bcache: fix error return value in memory shrink
+Date: Wed, 31 Jan 2018 11:30:53 +0800
+Message-Id: <1517369453-28193-1-git-send-email-tang.junhui@zte.com.cn>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When debugging e.g. the SCSI timeout handler it is important that
-requests that have not yet been started or that already have
-completed are also reported through debugfs.
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-This patch depends on a patch that went upstream recently, namely
-commit 14e3062fb185 ("scsi: core: Fix a scsi_show_rq() NULL pointer
-dereference").
+In bch_mca_scan(), the return value should not be the number of freed btree
+nodes, but the number of pages of freed btree nodes.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
 ---
- block/blk-mq-debugfs.c | 2 +-
+ drivers/md/bcache/btree.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 19db3f583bf1..ccd5ef08c3f0 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -402,7 +402,7 @@ static void hctx_show_busy_rq(struct request *rq, void *data, bool reserved)
- 	const struct show_busy_params *params = data;
- 
- 	if (blk_mq_map_queue(rq->q, rq->mq_ctx->cpu) == params->hctx &&
--	    blk_mq_rq_state(rq) != MQ_RQ_IDLE)
-+	    list_empty(&rq->queuelist))
- 		__blk_mq_debugfs_rq_show(params->m,
- 					 list_entry_rq(&rq->queuelist));
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index 81e8dc3..a5fbccc 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -718,7 +718,7 @@ static unsigned long bch_mca_scan(struct shrinker *shrink,
+ 	}
+ out:
+ 	mutex_unlock(&c->bucket_lock);
+-	return freed;
++	return freed * c->btree_pages;
  }
+ 
+ static unsigned long bch_mca_count(struct shrinker *shrink,
 -- 
-2.15.1
+1.8.3.1
