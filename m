@@ -1,139 +1,74 @@
-Return-Path: <axboe@kernel.dk>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: Omar Sandoval <osandov@osandov.com>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] null_blk: add option for managing IO timeouts
-Message-ID: <c7bc30f1-84c1-c86d-4dc2-cece44f13572@kernel.dk>
-Date: Tue, 9 Jan 2018 15:03:52 -0700
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-io0-f194.google.com ([209.85.223.194]:45673 "EHLO
+        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751628AbeAaBza (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Jan 2018 20:55:30 -0500
+Received: by mail-io0-f194.google.com with SMTP id p188so13640474ioe.12
+        for <linux-block@vger.kernel.org>; Tue, 30 Jan 2018 17:55:29 -0800 (PST)
+From: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
+Message-Id: <0FC27C54-C199-4A6A-9948-E7AD9D3B86BD@lightnvm.io>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_DB1E0402-3C01-4D72-A1DD-86D2A5AFC2B2";
+        protocol="application/pgp-signature";
+        micalg=pgp-sha512
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH] lightnvm: remove chnl_offset in nvme_nvm_identity
+Date: Wed, 31 Jan 2018 09:55:11 +0800
+In-Reply-To: <20180130143050.18355-1-mb@lightnvm.io>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+To: =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>
+References: <20180130143050.18355-1-mb@lightnvm.io>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Use the fault injection framework to provide a way for null_blk
-to configure timeouts. This only works for queue_mode 1 and 2,
-since the bio mode doesn't have code for tracking timeouts.
 
-Let's say you want to have a 10% chance of timing out every
-100,000 requests, and for 5 total timeouts, you could do:
+--Apple-Mail=_DB1E0402-3C01-4D72-A1DD-86D2A5AFC2B2
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-modprobe null_blk timeout="100000,10,0,5"
+> On 30 Jan 2018, at 22.30, Matias Bj=C3=B8rling <mb@lightnvm.io> wrote:
+>=20
+> The identity structure is initialized to zero in the beginning of
+> the nvme_nvm_identity function. The chnl_offset is separately set to
+> zero. Since both the variable and assignment is never changed, remove
+> them.
+>=20
+> Signed-off-by: Matias Bj=C3=B8rling <mb@lightnvm.io>
+> ---
+> drivers/nvme/host/lightnvm.c | 4 +---
+> 1 file changed, 1 insertion(+), 3 deletions(-)
+>=20
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- drivers/block/Kconfig    |  1 +
- drivers/block/null_blk.c | 36 ++++++++++++++++++++++++++++++++----
- 2 files changed, 33 insertions(+), 4 deletions(-)
+Looks good.
 
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index 40579d0cb3d1..622d9a2c8dae 100644
---- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -19,6 +19,7 @@ if BLK_DEV
- config BLK_DEV_NULL_BLK
- 	tristate "Null test block driver"
- 	select CONFIGFS_FS
-+	select FAULT_INJECTION
- 
- config BLK_DEV_FD
- 	tristate "Normal floppy disk support"
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index 78267e3e4fa5..f66b3bd6eeba 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -14,6 +14,7 @@
- #include <linux/hrtimer.h>
- #include <linux/configfs.h>
- #include <linux/badblocks.h>
-+#include <linux/fault-inject.h>
- 
- #define SECTOR_SHIFT		9
- #define PAGE_SECTORS_SHIFT	(PAGE_SHIFT - SECTOR_SHIFT)
-@@ -26,6 +27,8 @@
- #define TICKS_PER_SEC		50ULL
- #define TIMER_INTERVAL		(NSEC_PER_SEC / TICKS_PER_SEC)
- 
-+static DECLARE_FAULT_ATTR(null_timeout_attr);
-+
- static inline u64 mb_per_tick(int mbps)
- {
- 	return (1 << 20) / TICKS_PER_SEC * ((u64) mbps);
-@@ -162,6 +165,9 @@ static int g_home_node = NUMA_NO_NODE;
- module_param_named(home_node, g_home_node, int, S_IRUGO);
- MODULE_PARM_DESC(home_node, "Home node for the device");
- 
-+static char g_timeout_str[80];
-+module_param_string(timeout, g_timeout_str, sizeof(g_timeout_str), S_IRUGO);
-+
- static int g_queue_mode = NULL_Q_MQ;
- 
- static int null_param_store_val(const char *str, int *val, int min, int max)
-@@ -1364,6 +1370,14 @@ static int null_rq_prep_fn(struct request_queue *q, struct request *req)
- 	return BLKPREP_DEFER;
- }
- 
-+static bool should_timeout_request(struct request *rq)
-+{
-+	if (g_timeout_str[0])
-+		return should_fail(&null_timeout_attr, 1);
-+
-+	return false;
-+}
-+
- static void null_request_fn(struct request_queue *q)
- {
- 	struct request *rq;
-@@ -1371,9 +1385,11 @@ static void null_request_fn(struct request_queue *q)
- 	while ((rq = blk_fetch_request(q)) != NULL) {
- 		struct nullb_cmd *cmd = rq->special;
- 
--		spin_unlock_irq(q->queue_lock);
--		null_handle_cmd(cmd);
--		spin_lock_irq(q->queue_lock);
-+		if (!should_timeout_request(rq)) {
-+			spin_unlock_irq(q->queue_lock);
-+			null_handle_cmd(cmd);
-+			spin_lock_irq(q->queue_lock);
-+		}
- 	}
- }
- 
-@@ -1400,7 +1416,10 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
- 
- 	blk_mq_start_request(bd->rq);
- 
--	return null_handle_cmd(cmd);
-+	if (!should_timeout_request(bd->rq))
-+		return null_handle_cmd(cmd);
-+
-+	return BLK_STS_OK;
- }
- 
- static const struct blk_mq_ops null_mq_ops = {
-@@ -1667,6 +1686,10 @@ static int null_add_dev(struct nullb_device *dev)
- 		if (rv)
- 			goto out_cleanup_queues;
- 
-+		if (g_timeout_str[0] &&
-+		    !setup_fault_attr(&null_timeout_attr, g_timeout_str))
-+			goto out_cleanup_queues;
-+
- 		nullb->tag_set->timeout = 5 * HZ;
- 		nullb->q = blk_mq_init_queue(nullb->tag_set);
- 		if (IS_ERR(nullb->q)) {
-@@ -1691,6 +1714,11 @@ static int null_add_dev(struct nullb_device *dev)
- 			rv = -ENOMEM;
- 			goto out_cleanup_queues;
- 		}
-+
-+		if (g_timeout_str[0] &&
-+		    !setup_fault_attr(&null_timeout_attr, g_timeout_str))
-+			goto out_cleanup_blk_queue;
-+
- 		blk_queue_prep_rq(nullb->q, null_rq_prep_fn);
- 		blk_queue_softirq_done(nullb->q, null_softirq_done_fn);
- 		blk_queue_rq_timed_out(nullb->q, null_rq_timed_out_fn);
--- 
-2.7.4
+Reviewed-by: Javier Gonz=C3=A1lez <javier@cnexlabs.com>
 
--- 
-Jens Axboe
+
+--Apple-Mail=_DB1E0402-3C01-4D72-A1DD-86D2A5AFC2B2
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEm1mT7zen+vs9+T8kYx8FO3WZGMoFAlpxIgAACgkQYx8FO3WZ
+GMowKA/9F/+E7j9dKWNC3V3RclaZ16XB2kakTmFGQSObwC/Pir2jl4BJnhGlhkwU
+1CnLDyRA6M3fSHJ4mg6riwVcSJCQNsxBIUG+6tE4hHTdu85yvxNROXoMfq5dLHVW
+rb1wTaGULk5O3lJJS4xNd/l1GGxRhpM+r9rShSbJmHJlx7xVAWJAX39uKFT9YmOq
+jF2yd/i/ZF6+H/uXB9/nGOPdpoXCCzbbwAGIfQu7qhx8WVXdumDxwl8O+rvHf4M/
+dslgwInOZ3sRig+TNhhlDPHk57KxtA1Dkng7OYgEV++wmq8DpgWyljW4Gs2nvr2s
+OIyzsBF8P52y+TaovSxQn6+qL+ZGVWOAt2qzxNzCPm9k5Nv3UIblam39MMYTrw0V
+6RpxEdNW8kWzREb/R0hxKnkZWh2PhfJzwAEzNZ0QM2Ov2fFkfj0t+WHgnWCXmP5+
+UneRECK9z3bygjwDaGIkgTRwTP4O+z8QqiRtePfCPpCGWlysoRjBNlRBN19c+NJY
+5dllLKkVde7LW/2pGz6AJZynokjpSxUkeDrKmALvEw/zpW8JWPT5yna8qE1ZHAHI
+eUvz5Gx3aoji4if7r5fJbg6n6S1CkLOFRxCW1DRGYOCfgkNRmLg3ywsd/4oAZxGL
+b9qnMgXYLFANRaGjXeWWBxFMJ53mJODO+lKlsmqsgv6qYX/GG7s=
+=j6gu
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_DB1E0402-3C01-4D72-A1DD-86D2A5AFC2B2--
