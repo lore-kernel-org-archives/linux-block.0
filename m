@@ -1,48 +1,52 @@
-Return-Path: <BATV+6d2c01d9e32a4b323c25+5248+infradead.org+hch@bombadil.srs.infradead.org>
-Date: Fri, 5 Jan 2018 18:15:02 +0100
-From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme fixes for Linux 4.15
-Message-ID: <20180105171502.tacdqy5kh3knh4hg@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mxhk.zte.com.cn ([63.217.80.70]:58218 "EHLO mxhk.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751927AbeAaCo2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Jan 2018 21:44:28 -0500
+From: tang.junhui@zte.com.cn
+To: colyli@suse.de, mlyle@lyle.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        tang.junhui@zte.com.cn
+Subject: [PATCH] bcache: fix error count in memory shrink
+Date: Wed, 31 Jan 2018 10:46:52 +0800
+Message-Id: <1517366812-26957-1-git-send-email-tang.junhui@zte.com.cn>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Jens,
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-I have a few more small nvme fixes for you for Linux 4.15:
+In bch_mca_scan(), nr btree nodes are expected to shrink, so the for(;;)
+loop need to satisfy the condition freed < nr.
+And since c->btree_cache_used always decrease after mca_data_free() calling
+in for(;;) loop,  so we need a auto variable to record c->btree_cache_used
+before the for(;;) loop.
 
-The following changes since commit 6d0e4827b72afc71349784336d5eb6df4df106e6:
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+---
+ drivers/md/bcache/btree.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-  Revert "bdi: add error handle for bdi_debug_register" (2017-12-21 10:01:30 -0700)
-
-are available in the git repository at:
-
-  git://git.infradead.org/nvme.git nvme-4.15
-
-for you to fetch changes up to 254beb84faccbe2f4eda0b51924857bdfb679969:
-
-  nvme-fcloop: avoid possible uninitialized variable warning (2017-12-29 10:37:21 +0100)
-
-----------------------------------------------------------------
-James Smart (1):
-      nvme-fcloop: avoid possible uninitialized variable warning
-
-Jeff Lien (1):
-      nvme: fix sector units when going between formats
-
-Minwoo Im (1):
-      nvme-pci: move use_sgl initialization to nvme_init_iod()
-
-Sagi Grimberg (2):
-      nvme-rdma: fix concurrent reset and reconnect
-      nvme-mpath: fix last path removal during traffic
-
- drivers/nvme/host/core.c     |  7 ++++++-
- drivers/nvme/host/nvme.h     | 12 ++++++++++++
- drivers/nvme/host/pci.c      | 42 ++++++++++++++++++++----------------------
- drivers/nvme/host/rdma.c     | 14 +++++++++++++-
- drivers/nvme/target/fcloop.c |  2 +-
- 5 files changed, 52 insertions(+), 25 deletions(-)
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index 81e8dc3..7e9ef3d 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -664,6 +664,7 @@ static unsigned long bch_mca_scan(struct shrinker *shrink,
+ 	struct btree *b, *t;
+ 	unsigned long i, nr = sc->nr_to_scan;
+ 	unsigned long freed = 0;
++	unsigned int btree_cache_used;
+ 
+ 	if (c->shrinker_disabled)
+ 		return SHRINK_STOP;
+@@ -700,7 +701,8 @@ static unsigned long bch_mca_scan(struct shrinker *shrink,
+ 		}
+ 	}
+ 
+-	for (i = 0; (nr--) && i < c->btree_cache_used; i++) {
++	btree_cache_used = c->btree_cache_used;
++	for (i = 0; freed < nr && i < btree_cache_used; i++) {
+ 		if (list_empty(&c->btree_cache))
+ 			goto out;
+ 
+-- 
+1.8.3.1
