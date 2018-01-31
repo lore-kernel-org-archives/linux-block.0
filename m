@@ -1,28 +1,66 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from auth-4.ukservers.net ([217.10.138.158]:34763 "EHLO
-        auth-4.ukservers.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752494AbeAaO1c (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Jan 2018 09:27:32 -0500
+Received: from mx2.suse.de ([195.135.220.15]:38524 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752497AbeAaK6h (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 31 Jan 2018 05:58:37 -0500
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: David Brown <david.brown@hesbynett.no>
+Cc: NeilBrown <neilb@suse.com>, Wols Lists <antlists@youngman.org.uk>,
+        lsf-pc@lists.linux-foundation.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
+        Neil Brown <neilb@suse.de>
 Subject: Re: [LSF/MM TOPIC] De-clustered RAID with MD
-To: David Brown <david.brown@hesbynett.no>, NeilBrown <neilb@suse.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        lsf-pc@lists.linux-foundation.org
 References: <mqdvafkhep0.fsf@linux-x5ow.site>
- <5A6F4CA6.5060802@youngman.org.uk> <87fu6o5o83.fsf@notabene.neil.brown.name>
- <5A71933B.1050908@hesbynett.no>
-Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>, Neil Brown <neilb@suse.de>
-From: Wols Lists <antlists@youngman.org.uk>
-Message-ID: <5A71D24F.9090604@youngman.org.uk>
-Date: Wed, 31 Jan 2018 14:27:27 +0000
+        <5A6F4CA6.5060802@youngman.org.uk>
+        <87fu6o5o83.fsf@notabene.neil.brown.name>
+        <5A71933B.1050908@hesbynett.no>
+Date: Wed, 31 Jan 2018 11:58:34 +0100
+In-Reply-To: <5A71933B.1050908@hesbynett.no> (David Brown's message of "Wed,
+        31 Jan 2018 10:58:19 +0100")
+Message-ID: <mqdy3kewazp.fsf@linux-x5ow.site>
 MIME-Version: 1.0
-In-Reply-To: <5A71933B.1050908@hesbynett.no>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 31/01/18 09:58, David Brown wrote:
+David Brown <david.brown@hesbynett.no> writes:
+> That sounds smart.  I don't see that you need anything particularly
+> complicated for how you distribute your data and parity drives across
+> the 100 disks - you just need a fairly even spread.
+
+Exactly.
+
+> I would be more concerned with how you could deal with resizing such an
+> array.  In particular, I think it is not unlikely that someone with a
+> 100 drive array will one day want to add another bank of 24 disks (or
+> whatever fits in a cabinet).  Making that work nicely would, I believe,
+> be more important than making sure the rebuild load distribution is
+> balanced evenly across 99 drives.
+
+I don't think rebuilding is such a big deal, lets consider the following
+hypothetical scenario:
+
+6 Disks with 4 data blocks (3 replicas per block, could be RAID1 like
+duplicates or RAID5 like data + parity, doesn't matter at all for this
+example)
+
+D1  D2  D3  D4  D5  D6
+[A] [B] [C] [ ] [ ] [ ]
+[ ] [ ] [ ] [A] [D] [B] 
+[ ] [A] [B] [ ] [C] [ ]
+[C] [ ] [ ] [D] [ ] [D]
+
+Now we're adding one disk and rebalance:
+
+D1  D2  D3  D4  D5  D6  D7
+[A] [B] [C] [ ] [ ] [ ] [A]
+[ ] [ ] [ ] [ ] [D] [B] [ ]
+[ ] [A] [B] [ ] [ ] [ ] [C]
+[C] [ ] [ ] [D] [ ] [D] [ ]
+
+This moved the "A" from D4 and the "C" from D5 to D7. The whole
+rebalancing affected only 3 disks (read from D4 and D5 write to D7).
+
 > I would also be interested in how the data and parities are distributed
 > across cabinets and disk controllers.  When you manually build from
 > smaller raid sets, you can ensure that in set the data disks and the
@@ -32,34 +70,20 @@ On 31/01/18 09:58, David Brown wrote:
 > don't know how often entire cabinets of disks die, but I once lost both
 > disks of a raid1 mirror when the disk controller card died.)
 
-The more I think about how I plan to spec raid-61, the more a modulo
-approach seems to make sense. That way, it'll be fairly easy to predict
-what ends up where, and make sure your disks are evenly scattered.
+Well this is something CRSUH takes care of. As I said earlier it's a
+weighted decision tree. One of the weights could be to evenly spread all
+blocks across two cabinets.
 
-I think both your and my approach might have problems with losing an
-entire cabinet, however. Depends on how many drives per cabinet ...
+Taking this into account would require a non-trivial user interface and
+I'm not sure if the benefits of this outnumber the costs (at least for
+an initial implementation).
 
-Anyways, my second thoughts are ...
-
-We have what I will call a stripe-block. The lowest common multiple of
-"disks needed" ie number of mirrors times number of drives in the
-raid-6, and the disks available.
-
-Assuming my blocks are all stored sequentially I can then quickly
-calculate their position in this stripe-block. But this will fall foul
-of just hammering the drives nearest to the failed drive. But if I
-pseudo-randomise this position with "position * prime mod drives" where
-"prime" is not common to either the number of drives or the number or
-mirrors or the number of raid-drives, then this should achieve my aim of
-uniquely shuffling the location of all the blocks without collisions.
-
-Pretty simple maths, for efficiency, that smears the data over all the
-drives. Does that sound feasible? All the heavy lifting, calculating the
-least common multiple, finding the prime, etc etc can be done at array
-set-up time.
-
-(If this then allows feasible 100-drive arrays, we won't just need an
-incremental assemble mode, we might need an incremental build mode :-)
-
-Cheers,
-Wol
+Byte,
+        Johannes
+-- 
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
