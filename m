@@ -1,419 +1,273 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:32850 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752497AbeAaSYX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Jan 2018 13:24:23 -0500
-Received: by mail-lf0-f65.google.com with SMTP id t139so22199839lff.0
-        for <linux-block@vger.kernel.org>; Wed, 31 Jan 2018 10:24:22 -0800 (PST)
-Subject: Re: [PATCH 5/5] lightnvm: pblk: refactor bad block identification
-To: Javier Gonzalez <javier@cnexlabs.com>
-Cc: =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <jg@lightnvm.io>,
+Received: from mail-cys01nam02on0086.outbound.protection.outlook.com ([104.47.37.86]:63616
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751320AbeAaJNm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 31 Jan 2018 04:13:42 -0500
+From: Javier Gonzalez <javier@cnexlabs.com>
+To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
+CC: =?utf-8?B?SmF2aWVyIEdvbnrDoWxleg==?= <jg@lightnvm.io>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 5/5] lightnvm: pblk: refactor bad block identification
+Date: Wed, 31 Jan 2018 09:13:39 +0000
+Message-ID: <F1AA3AA6-8F23-43A8-9C4C-5F684A80782C@cnexlabs.com>
 References: <1517364411-22386-1-git-send-email-javier@cnexlabs.com>
- <1517364411-22386-5-git-send-email-javier@cnexlabs.com>
- <bdde0655-0904-0bf1-7029-51708fcff8b3@lightnvm.io>
- <F1AA3AA6-8F23-43A8-9C4C-5F684A80782C@cnexlabs.com>
-From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <33896b20-c555-7c60-ed47-28156f4c93bf@lightnvm.io>
-Date: Wed, 31 Jan 2018 19:24:19 +0100
+ <1517364411-22386-5-git-send-email-javier@cnexlabs.com>,<bdde0655-0904-0bf1-7029-51708fcff8b3@lightnvm.io>
+In-Reply-To: <bdde0655-0904-0bf1-7029-51708fcff8b3@lightnvm.io>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <F1AA3AA6-8F23-43A8-9C4C-5F684A80782C@cnexlabs.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 01/31/2018 10:13 AM, Javier Gonzalez wrote:
-> 
-> 
->> On 31 Jan 2018, at 16.51, Matias Bjørling <mb@lightnvm.io> wrote:
->>
->>> On 01/31/2018 03:06 AM, Javier González wrote:
->>> In preparation for the OCSSD 2.0 spec. bad block identification,
->>> refactor the current code to generalize bad block get/set functions and
->>> structures.
->>> Signed-off-by: Javier González <javier@cnexlabs.com>
->>> ---
->>>   drivers/lightnvm/pblk-init.c | 213 +++++++++++++++++++++++--------------------
->>>   drivers/lightnvm/pblk.h      |   6 --
->>>   2 files changed, 112 insertions(+), 107 deletions(-)
->>> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
->>> index a5e3510c0f38..86a94a7faa96 100644
->>> --- a/drivers/lightnvm/pblk-init.c
->>> +++ b/drivers/lightnvm/pblk-init.c
->>> @@ -365,7 +365,25 @@ static void pblk_luns_free(struct pblk *pblk)
->>>       kfree(pblk->luns);
->>>   }
->>>   -static void pblk_free_line_bitmaps(struct pblk_line *line)
->>> +static void pblk_line_mg_free(struct pblk *pblk)
->>> +{
->>> +    struct pblk_line_mgmt *l_mg = &pblk->l_mg;
->>> +    int i;
->>> +
->>> +    kfree(l_mg->bb_template);
->>> +    kfree(l_mg->bb_aux);
->>> +    kfree(l_mg->vsc_list);
->>> +
->>> +    for (i = 0; i < PBLK_DATA_LINES; i++) {
->>> +        kfree(l_mg->sline_meta[i]);
->>> +        pblk_mfree(l_mg->eline_meta[i]->buf, l_mg->emeta_alloc_type);
->>> +        kfree(l_mg->eline_meta[i]);
->>> +    }
->>> +
->>> +    kfree(pblk->lines);
->>> +}
->>> +
->>> +static void pblk_line_meta_free(struct pblk_line *line)
->>>   {
->>>       kfree(line->blk_bitmap);
->>>       kfree(line->erase_bitmap);
->>> @@ -382,40 +400,16 @@ static void pblk_lines_free(struct pblk *pblk)
->>>           line = &pblk->lines[i];
->>>             pblk_line_free(pblk, line);
->>> -        pblk_free_line_bitmaps(line);
->>> +        pblk_line_meta_free(line);
->>>       }
->>>       spin_unlock(&l_mg->free_lock);
->>>   }
->>>   -static void pblk_line_meta_free(struct pblk *pblk)
->>> +static int pblk_bb_get_tbl(struct nvm_tgt_dev *dev, struct pblk_lun *rlun,
->>> +               u8 *blks, int nr_blks)
->>>   {
->>> -    struct pblk_line_mgmt *l_mg = &pblk->l_mg;
->>> -    int i;
->>> -
->>> -    kfree(l_mg->bb_template);
->>> -    kfree(l_mg->bb_aux);
->>> -    kfree(l_mg->vsc_list);
->>> -
->>> -    for (i = 0; i < PBLK_DATA_LINES; i++) {
->>> -        kfree(l_mg->sline_meta[i]);
->>> -        pblk_mfree(l_mg->eline_meta[i]->buf, l_mg->emeta_alloc_type);
->>> -        kfree(l_mg->eline_meta[i]);
->>> -    }
->>> -
->>> -    kfree(pblk->lines);
->>> -}
->>> -
->>> -static int pblk_bb_discovery(struct nvm_tgt_dev *dev, struct pblk_lun *rlun)
->>> -{
->>> -    struct nvm_geo *geo = &dev->geo;
->>>       struct ppa_addr ppa;
->>> -    u8 *blks;
->>> -    int nr_blks, ret;
->>> -
->>> -    nr_blks = geo->nr_chks * geo->plane_mode;
->>> -    blks = kmalloc(nr_blks, GFP_KERNEL);
->>> -    if (!blks)
->>> -        return -ENOMEM;
->>> +    int ret;
->>>         ppa.ppa = 0;
->>>       ppa.g.ch = rlun->bppa.g.ch;
->>> @@ -423,34 +417,56 @@ static int pblk_bb_discovery(struct nvm_tgt_dev *dev, struct pblk_lun *rlun)
->>>         ret = nvm_get_tgt_bb_tbl(dev, ppa, blks);
->>>       if (ret)
->>> -        goto out;
->>> +        return ret;
->>>         nr_blks = nvm_bb_tbl_fold(dev->parent, blks, nr_blks);
->>> -    if (nr_blks < 0) {
->>> -        ret = nr_blks;
->>> -        goto out;
->>> -    }
->>> -
->>> -    rlun->bb_list = blks;
->>> +    if (nr_blks < 0)
->>> +        return -EIO;
->>>         return 0;
->>> -out:
->>> -    kfree(blks);
->>> -    return ret;
->>> +}
->>> +
->>> +static void *pblk_bb_get_log(struct pblk *pblk)
->>> +{
->>> +    struct nvm_tgt_dev *dev = pblk->dev;
->>> +    struct nvm_geo *geo = &dev->geo;
->>> +    u8 *log;
->>> +    int i, nr_blks, blk_per_lun;
->>> +    int ret;
->>> +
->>> +    blk_per_lun = geo->nr_chks * geo->plane_mode;
->>> +    nr_blks = blk_per_lun * geo->all_luns;
->>> +
->>> +    log = kmalloc(nr_blks, GFP_KERNEL);
->>> +    if (!log)
->>> +        return ERR_PTR(-ENOMEM);
->>> +
->>> +    for (i = 0; i < geo->all_luns; i++) {
->>> +        struct pblk_lun *rlun = &pblk->luns[i];
->>> +        u8 *log_pos = log + i * blk_per_lun;
->>> +
->>> +        ret = pblk_bb_get_tbl(dev, rlun, log_pos, blk_per_lun);
->>> +        if (ret) {
->>> +            kfree(log);
->>> +            return ERR_PTR(-EIO);
->>> +        }
->>> +    }
->>> +
->>> +    return log;
->>>   }
->>>     static int pblk_bb_line(struct pblk *pblk, struct pblk_line *line,
->>> -            int blk_per_line)
->>> +            u8 *bb_log, int blk_per_line)
->>>   {
->>>       struct nvm_tgt_dev *dev = pblk->dev;
->>>       struct nvm_geo *geo = &dev->geo;
->>> -    struct pblk_lun *rlun;
->>> -    int bb_cnt = 0;
->>> -    int i;
->>> +    int i, bb_cnt = 0;
->>>         for (i = 0; i < blk_per_line; i++) {
->>> -        rlun = &pblk->luns[i];
->>> -        if (rlun->bb_list[line->id] == NVM_BLK_T_FREE)
->>> +        struct pblk_lun *rlun = &pblk->luns[i];
->>> +        u8 *lun_bb_log = bb_log + i * blk_per_line;
->>> +
->>> +        if (lun_bb_log[line->id] == NVM_BLK_T_FREE)
->>>               continue;
->>>             set_bit(pblk_ppa_to_pos(geo, rlun->bppa), line->blk_bitmap);
->>> @@ -460,29 +476,12 @@ static int pblk_bb_line(struct pblk *pblk, struct pblk_line *line,
->>>       return bb_cnt;
->>>   }
->>>   -static int pblk_alloc_line_bitmaps(struct pblk *pblk, struct pblk_line *line)
->>> -{
->>> -    struct pblk_line_meta *lm = &pblk->lm;
->>> -
->>> -    line->blk_bitmap = kzalloc(lm->blk_bitmap_len, GFP_KERNEL);
->>> -    if (!line->blk_bitmap)
->>> -        return -ENOMEM;
->>> -
->>> -    line->erase_bitmap = kzalloc(lm->blk_bitmap_len, GFP_KERNEL);
->>> -    if (!line->erase_bitmap) {
->>> -        kfree(line->blk_bitmap);
->>> -        return -ENOMEM;
->>> -    }
->>> -
->>> -    return 0;
->>> -}
->>> -
->>>   static int pblk_luns_init(struct pblk *pblk, struct ppa_addr *luns)
->>>   {
->>>       struct nvm_tgt_dev *dev = pblk->dev;
->>>       struct nvm_geo *geo = &dev->geo;
->>>       struct pblk_lun *rlun;
->>> -    int i, ret;
->>> +    int i;
->>>         /* TODO: Implement unbalanced LUN support */
->>>       if (geo->nr_luns < 0) {
->>> @@ -505,13 +504,6 @@ static int pblk_luns_init(struct pblk *pblk, struct ppa_addr *luns)
->>>           rlun->bppa = luns[lunid];
->>>             sema_init(&rlun->wr_sem, 1);
->>> -
->>> -        ret = pblk_bb_discovery(dev, rlun);
->>> -        if (ret) {
->>> -            while (--i >= 0)
->>> -                kfree(pblk->luns[i].bb_list);
->>> -            return ret;
->>> -        }
->>>       }
->>>         return 0;
->>> @@ -689,6 +681,26 @@ static int pblk_lines_alloc_metadata(struct pblk *pblk)
->>>       return -ENOMEM;
->>>   }
->>>   +static int pblk_setup_line_meta(struct pblk *pblk, struct pblk_line *line,
->>> +                void *chunk_log, long *nr_bad_blks)
->>> +{
->>> +    struct pblk_line_meta *lm = &pblk->lm;
->>> +
->>> +    line->blk_bitmap = kzalloc(lm->blk_bitmap_len, GFP_KERNEL);
->>> +    if (!line->blk_bitmap)
->>> +        return -ENOMEM;
->>> +
->>> +    line->erase_bitmap = kzalloc(lm->blk_bitmap_len, GFP_KERNEL);
->>> +    if (!line->erase_bitmap) {
->>> +        kfree(line->blk_bitmap);
->>> +        return -ENOMEM;
->>> +    }
->>> +
->>> +    *nr_bad_blks = pblk_bb_line(pblk, line, chunk_log, lm->blk_per_line);
->>> +
->>> +    return 0;
->>> +}
->>> +
->>>   static int pblk_lines_init(struct pblk *pblk)
->>>   {
->>>       struct nvm_tgt_dev *dev = pblk->dev;
->>> @@ -696,8 +708,9 @@ static int pblk_lines_init(struct pblk *pblk)
->>>       struct pblk_line_mgmt *l_mg = &pblk->l_mg;
->>>       struct pblk_line_meta *lm = &pblk->lm;
->>>       struct pblk_line *line;
->>> +    void *chunk_log;
->>>       unsigned int smeta_len, emeta_len;
->>> -    long nr_bad_blks, nr_free_blks;
->>> +    long nr_bad_blks = 0, nr_free_blks = 0;
->>>       int bb_distance, max_write_ppas, mod;
->>>       int i, ret;
->>>   @@ -771,13 +784,12 @@ static int pblk_lines_init(struct pblk *pblk)
->>>       if (lm->min_blk_line > lm->blk_per_line) {
->>>           pr_err("pblk: config. not supported. Min. LUN in line:%d\n",
->>>                               lm->blk_per_line);
->>> -        ret = -EINVAL;
->>> -        goto fail;
->>> +        return -EINVAL;
->>>       }
->>>         ret = pblk_lines_alloc_metadata(pblk);
->>>       if (ret)
->>> -        goto fail;
->>> +        return ret;
->>>         l_mg->bb_template = kzalloc(lm->sec_bitmap_len, GFP_KERNEL);
->>>       if (!l_mg->bb_template) {
->>> @@ -821,9 +833,16 @@ static int pblk_lines_init(struct pblk *pblk)
->>>           goto fail_free_bb_aux;
->>>       }
->>>   -    nr_free_blks = 0;
->>> +    chunk_log = pblk_bb_get_log(pblk);
->>> +    if (IS_ERR(chunk_log)) {
->>> +        pr_err("pblk: could not get bad block log (%lu)\n",
->>> +                            PTR_ERR(chunk_log));
->>> +        ret = PTR_ERR(chunk_log);
->>> +        goto fail_free_lines;
->>> +    }
->>> +
->>>       for (i = 0; i < l_mg->nr_lines; i++) {
->>> -        int blk_in_line;
->>> +        int chk_in_line;
->>>             line = &pblk->lines[i];
->>>   @@ -835,26 +854,20 @@ static int pblk_lines_init(struct pblk *pblk)
->>>           line->vsc = &l_mg->vsc_list[i];
->>>           spin_lock_init(&line->lock);
->>>   -        ret = pblk_alloc_line_bitmaps(pblk, line);
->>> +        ret = pblk_setup_line_meta(pblk, line, chunk_log, &nr_bad_blks);
->>>           if (ret)
->>> -            goto fail_free_lines;
->>> +            goto fail_free_chunk_log;
->>>   -        nr_bad_blks = pblk_bb_line(pblk, line, lm->blk_per_line);
->>> -        if (nr_bad_blks < 0 || nr_bad_blks > lm->blk_per_line) {
->>> -            pblk_free_line_bitmaps(line);
->>> -            ret = -EINVAL;
->>> -            goto fail_free_lines;
->>> -        }
->>> -
->>> -        blk_in_line = lm->blk_per_line - nr_bad_blks;
->>> -        if (blk_in_line < lm->min_blk_line) {
->>> +        chk_in_line = lm->blk_per_line - nr_bad_blks;
->>> +        if (nr_bad_blks < 0 || nr_bad_blks > lm->blk_per_line ||
->>> +                    chk_in_line < lm->min_blk_line) {
->>>               line->state = PBLK_LINESTATE_BAD;
->>>               list_add_tail(&line->list, &l_mg->bad_list);
->>>               continue;
->>>           }
->>>   -        nr_free_blks += blk_in_line;
->>> -        atomic_set(&line->blk_in_line, blk_in_line);
->>> +        nr_free_blks += chk_in_line;
->>> +        atomic_set(&line->blk_in_line, chk_in_line);
->>>             l_mg->nr_free_lines++;
->>>           list_add_tail(&line->list, &l_mg->free_list);
->>> @@ -862,23 +875,21 @@ static int pblk_lines_init(struct pblk *pblk)
->>>         pblk_set_provision(pblk, nr_free_blks);
->>>   -    /* Cleanup per-LUN bad block lists - managed within lines on run-time */
->>> -    for (i = 0; i < geo->all_luns; i++)
->>> -        kfree(pblk->luns[i].bb_list);
->>> -
->>> +    kfree(chunk_log);
->>>       return 0;
->>> -fail_free_lines:
->>> +
->>> +fail_free_chunk_log:
->>> +    kfree(chunk_log);
->>>       while (--i >= 0)
->>> -        pblk_free_line_bitmaps(&pblk->lines[i]);
->>> +        pblk_line_meta_free(&pblk->lines[i]);
->>> +fail_free_lines:
->>> +    kfree(pblk->lines);
->>>   fail_free_bb_aux:
->>>       kfree(l_mg->bb_aux);
->>>   fail_free_bb_template:
->>>       kfree(l_mg->bb_template);
->>>   fail_free_meta:
->>> -    pblk_line_meta_free(pblk);
->>> -fail:
->>> -    for (i = 0; i < geo->all_luns; i++)
->>> -        kfree(pblk->luns[i].bb_list);
->>> +    pblk_line_mg_free(pblk);
->>>         return ret;
->>>   }
->>> @@ -922,7 +933,7 @@ static void pblk_free(struct pblk *pblk)
->>>       pblk_luns_free(pblk);
->>>       pblk_lines_free(pblk);
->>>       kfree(pblk->pad_dist);
->>> -    pblk_line_meta_free(pblk);
->>> +    pblk_line_mg_free(pblk);
->>>       pblk_core_free(pblk);
->>>       pblk_l2p_free(pblk);
->>>   @@ -1110,7 +1121,7 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
->>>   fail_free_pad_dist:
->>>       kfree(pblk->pad_dist);
->>>   fail_free_line_meta:
->>> -    pblk_line_meta_free(pblk);
->>> +    pblk_line_mg_free(pblk);
->>>   fail_free_luns:
->>>       pblk_luns_free(pblk);
->>>   fail:
->>> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
->>> index 88720e2441c0..282dfc8780e8 100644
->>> --- a/drivers/lightnvm/pblk.h
->>> +++ b/drivers/lightnvm/pblk.h
->>> @@ -201,12 +201,6 @@ struct pblk_rb {
->>>     struct pblk_lun {
->>>       struct ppa_addr bppa;
->>> -
->>> -    u8 *bb_list;            /* Bad block list for LUN. Only used on
->>> -                     * bring up. Bad blocks are managed
->>> -                     * within lines on run-time.
->>> -                     */
->>> -
->>>       struct semaphore wr_sem;
->>>   };
->>>   
->>
->> Looks good to me.
->>
->> With respect to the 2.0 implementation. I am thinking that get_bb and set_bb should behave in the following way:
->>
->> For get_bb (in nvme/host/lightnvm.c)
->> 1.2: Keep the implementation as is.
->> 2.0: Use the report chunk command, and redo the get_bb format.
->>
->> For set_bb (in nvme/host/lightnvm.c)
->> 1.2: Business as usual
->> 2.0: Report error.
-> 
-> I have a patches abstracting this, which I think it makes it cleaner. I can push it next week for review. I’m traveling this week. (If you want to get a glimpse I can point you to the code).
-> 
-
-Yes, please do. Thanks
-
->>
->> For 2.0, there will be added a function pointer for get report chunk implementation, where the client can ask for full chunk information. Similarly here, client will fail the function call if the drive is 1.2.
->>
->> I hope to post the small 2.0 identify implementation Tomorrow or Friday, and then you can post the report chunk implementation that you have done if you like
-> 
-> Sure. I have patches implementing 2.0 too, but you can push your version. One thing I’d like to get in is a generic geometry structure that simplifies the identify command and puts the logic in the identify path.
-
-Agree, that comes naturally when adding the support.
-
-> 
-> This makes the base group structure from 1.2 go away makes the 1.2 and 2.0 paths easier to maintain at the target level.
-> 
-> I can point you to the patches tomorrow if you want to align with it. Otherwise, I can just rebase and send them next week. But please, consider this before making a new abstraction to make the 2 specs coexist - most of the work is done already...
-
-Thanks. Yes, they should co-exist.
-> 
-> 
->> We also need to take a look at the new error codes, which does not align with the 1.2 specification (now that they actually follow the nvme specification ;))
-> 
-> Cool. Let’s maintain the 1.2 errors for compatibility and make the 2.0 path clean - that is nvme compatible ;)
-> 
-> Javier.
-> 
+DQoNCj4gT24gMzEgSmFuIDIwMTgsIGF0IDE2LjUxLCBNYXRpYXMgQmrDuHJsaW5nIDxtYkBsaWdo
+dG52bS5pbz4gd3JvdGU6DQo+IA0KPj4gT24gMDEvMzEvMjAxOCAwMzowNiBBTSwgSmF2aWVyIEdv
+bnrDoWxleiB3cm90ZToNCj4+IEluIHByZXBhcmF0aW9uIGZvciB0aGUgT0NTU0QgMi4wIHNwZWMu
+IGJhZCBibG9jayBpZGVudGlmaWNhdGlvbiwNCj4+IHJlZmFjdG9yIHRoZSBjdXJyZW50IGNvZGUg
+dG8gZ2VuZXJhbGl6ZSBiYWQgYmxvY2sgZ2V0L3NldCBmdW5jdGlvbnMgYW5kDQo+PiBzdHJ1Y3R1
+cmVzLg0KPj4gU2lnbmVkLW9mZi1ieTogSmF2aWVyIEdvbnrDoWxleiA8amF2aWVyQGNuZXhsYWJz
+LmNvbT4NCj4+IC0tLQ0KPj4gIGRyaXZlcnMvbGlnaHRudm0vcGJsay1pbml0LmMgfCAyMTMgKysr
+KysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPj4gIGRyaXZlcnMvbGln
+aHRudm0vcGJsay5oICAgICAgfCAgIDYgLS0NCj4+ICAyIGZpbGVzIGNoYW5nZWQsIDExMiBpbnNl
+cnRpb25zKCspLCAxMDcgZGVsZXRpb25zKC0pDQo+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9saWdo
+dG52bS9wYmxrLWluaXQuYyBiL2RyaXZlcnMvbGlnaHRudm0vcGJsay1pbml0LmMNCj4+IGluZGV4
+IGE1ZTM1MTBjMGYzOC4uODZhOTRhN2ZhYTk2IDEwMDY0NA0KPj4gLS0tIGEvZHJpdmVycy9saWdo
+dG52bS9wYmxrLWluaXQuYw0KPj4gKysrIGIvZHJpdmVycy9saWdodG52bS9wYmxrLWluaXQuYw0K
+Pj4gQEAgLTM2NSw3ICszNjUsMjUgQEAgc3RhdGljIHZvaWQgcGJsa19sdW5zX2ZyZWUoc3RydWN0
+IHBibGsgKnBibGspDQo+PiAgICAgIGtmcmVlKHBibGstPmx1bnMpOw0KPj4gIH0NCj4+ICAtc3Rh
+dGljIHZvaWQgcGJsa19mcmVlX2xpbmVfYml0bWFwcyhzdHJ1Y3QgcGJsa19saW5lICpsaW5lKQ0K
+Pj4gK3N0YXRpYyB2b2lkIHBibGtfbGluZV9tZ19mcmVlKHN0cnVjdCBwYmxrICpwYmxrKQ0KPj4g
+K3sNCj4+ICsgICAgc3RydWN0IHBibGtfbGluZV9tZ210ICpsX21nID0gJnBibGstPmxfbWc7DQo+
+PiArICAgIGludCBpOw0KPj4gKw0KPj4gKyAgICBrZnJlZShsX21nLT5iYl90ZW1wbGF0ZSk7DQo+
+PiArICAgIGtmcmVlKGxfbWctPmJiX2F1eCk7DQo+PiArICAgIGtmcmVlKGxfbWctPnZzY19saXN0
+KTsNCj4+ICsNCj4+ICsgICAgZm9yIChpID0gMDsgaSA8IFBCTEtfREFUQV9MSU5FUzsgaSsrKSB7
+DQo+PiArICAgICAgICBrZnJlZShsX21nLT5zbGluZV9tZXRhW2ldKTsNCj4+ICsgICAgICAgIHBi
+bGtfbWZyZWUobF9tZy0+ZWxpbmVfbWV0YVtpXS0+YnVmLCBsX21nLT5lbWV0YV9hbGxvY190eXBl
+KTsNCj4+ICsgICAgICAgIGtmcmVlKGxfbWctPmVsaW5lX21ldGFbaV0pOw0KPj4gKyAgICB9DQo+
+PiArDQo+PiArICAgIGtmcmVlKHBibGstPmxpbmVzKTsNCj4+ICt9DQo+PiArDQo+PiArc3RhdGlj
+IHZvaWQgcGJsa19saW5lX21ldGFfZnJlZShzdHJ1Y3QgcGJsa19saW5lICpsaW5lKQ0KPj4gIHsN
+Cj4+ICAgICAga2ZyZWUobGluZS0+YmxrX2JpdG1hcCk7DQo+PiAgICAgIGtmcmVlKGxpbmUtPmVy
+YXNlX2JpdG1hcCk7DQo+PiBAQCAtMzgyLDQwICs0MDAsMTYgQEAgc3RhdGljIHZvaWQgcGJsa19s
+aW5lc19mcmVlKHN0cnVjdCBwYmxrICpwYmxrKQ0KPj4gICAgICAgICAgbGluZSA9ICZwYmxrLT5s
+aW5lc1tpXTsNCj4+ICAgICAgICAgICAgcGJsa19saW5lX2ZyZWUocGJsaywgbGluZSk7DQo+PiAt
+ICAgICAgICBwYmxrX2ZyZWVfbGluZV9iaXRtYXBzKGxpbmUpOw0KPj4gKyAgICAgICAgcGJsa19s
+aW5lX21ldGFfZnJlZShsaW5lKTsNCj4+ICAgICAgfQ0KPj4gICAgICBzcGluX3VubG9jaygmbF9t
+Zy0+ZnJlZV9sb2NrKTsNCj4+ICB9DQo+PiAgLXN0YXRpYyB2b2lkIHBibGtfbGluZV9tZXRhX2Zy
+ZWUoc3RydWN0IHBibGsgKnBibGspDQo+PiArc3RhdGljIGludCBwYmxrX2JiX2dldF90Ymwoc3Ry
+dWN0IG52bV90Z3RfZGV2ICpkZXYsIHN0cnVjdCBwYmxrX2x1biAqcmx1biwNCj4+ICsgICAgICAg
+ICAgICAgICB1OCAqYmxrcywgaW50IG5yX2Jsa3MpDQo+PiAgew0KPj4gLSAgICBzdHJ1Y3QgcGJs
+a19saW5lX21nbXQgKmxfbWcgPSAmcGJsay0+bF9tZzsNCj4+IC0gICAgaW50IGk7DQo+PiAtDQo+
+PiAtICAgIGtmcmVlKGxfbWctPmJiX3RlbXBsYXRlKTsNCj4+IC0gICAga2ZyZWUobF9tZy0+YmJf
+YXV4KTsNCj4+IC0gICAga2ZyZWUobF9tZy0+dnNjX2xpc3QpOw0KPj4gLQ0KPj4gLSAgICBmb3Ig
+KGkgPSAwOyBpIDwgUEJMS19EQVRBX0xJTkVTOyBpKyspIHsNCj4+IC0gICAgICAgIGtmcmVlKGxf
+bWctPnNsaW5lX21ldGFbaV0pOw0KPj4gLSAgICAgICAgcGJsa19tZnJlZShsX21nLT5lbGluZV9t
+ZXRhW2ldLT5idWYsIGxfbWctPmVtZXRhX2FsbG9jX3R5cGUpOw0KPj4gLSAgICAgICAga2ZyZWUo
+bF9tZy0+ZWxpbmVfbWV0YVtpXSk7DQo+PiAtICAgIH0NCj4+IC0NCj4+IC0gICAga2ZyZWUocGJs
+ay0+bGluZXMpOw0KPj4gLX0NCj4+IC0NCj4+IC1zdGF0aWMgaW50IHBibGtfYmJfZGlzY292ZXJ5
+KHN0cnVjdCBudm1fdGd0X2RldiAqZGV2LCBzdHJ1Y3QgcGJsa19sdW4gKnJsdW4pDQo+PiAtew0K
+Pj4gLSAgICBzdHJ1Y3QgbnZtX2dlbyAqZ2VvID0gJmRldi0+Z2VvOw0KPj4gICAgICBzdHJ1Y3Qg
+cHBhX2FkZHIgcHBhOw0KPj4gLSAgICB1OCAqYmxrczsNCj4+IC0gICAgaW50IG5yX2Jsa3MsIHJl
+dDsNCj4+IC0NCj4+IC0gICAgbnJfYmxrcyA9IGdlby0+bnJfY2hrcyAqIGdlby0+cGxhbmVfbW9k
+ZTsNCj4+IC0gICAgYmxrcyA9IGttYWxsb2MobnJfYmxrcywgR0ZQX0tFUk5FTCk7DQo+PiAtICAg
+IGlmICghYmxrcykNCj4+IC0gICAgICAgIHJldHVybiAtRU5PTUVNOw0KPj4gKyAgICBpbnQgcmV0
+Ow0KPj4gICAgICAgIHBwYS5wcGEgPSAwOw0KPj4gICAgICBwcGEuZy5jaCA9IHJsdW4tPmJwcGEu
+Zy5jaDsNCj4+IEBAIC00MjMsMzQgKzQxNyw1NiBAQCBzdGF0aWMgaW50IHBibGtfYmJfZGlzY292
+ZXJ5KHN0cnVjdCBudm1fdGd0X2RldiAqZGV2LCBzdHJ1Y3QgcGJsa19sdW4gKnJsdW4pDQo+PiAg
+ICAgICAgcmV0ID0gbnZtX2dldF90Z3RfYmJfdGJsKGRldiwgcHBhLCBibGtzKTsNCj4+ICAgICAg
+aWYgKHJldCkNCj4+IC0gICAgICAgIGdvdG8gb3V0Ow0KPj4gKyAgICAgICAgcmV0dXJuIHJldDsN
+Cj4+ICAgICAgICBucl9ibGtzID0gbnZtX2JiX3RibF9mb2xkKGRldi0+cGFyZW50LCBibGtzLCBu
+cl9ibGtzKTsNCj4+IC0gICAgaWYgKG5yX2Jsa3MgPCAwKSB7DQo+PiAtICAgICAgICByZXQgPSBu
+cl9ibGtzOw0KPj4gLSAgICAgICAgZ290byBvdXQ7DQo+PiAtICAgIH0NCj4+IC0NCj4+IC0gICAg
+cmx1bi0+YmJfbGlzdCA9IGJsa3M7DQo+PiArICAgIGlmIChucl9ibGtzIDwgMCkNCj4+ICsgICAg
+ICAgIHJldHVybiAtRUlPOw0KPj4gICAgICAgIHJldHVybiAwOw0KPj4gLW91dDoNCj4+IC0gICAg
+a2ZyZWUoYmxrcyk7DQo+PiAtICAgIHJldHVybiByZXQ7DQo+PiArfQ0KPj4gKw0KPj4gK3N0YXRp
+YyB2b2lkICpwYmxrX2JiX2dldF9sb2coc3RydWN0IHBibGsgKnBibGspDQo+PiArew0KPj4gKyAg
+ICBzdHJ1Y3QgbnZtX3RndF9kZXYgKmRldiA9IHBibGstPmRldjsNCj4+ICsgICAgc3RydWN0IG52
+bV9nZW8gKmdlbyA9ICZkZXYtPmdlbzsNCj4+ICsgICAgdTggKmxvZzsNCj4+ICsgICAgaW50IGks
+IG5yX2Jsa3MsIGJsa19wZXJfbHVuOw0KPj4gKyAgICBpbnQgcmV0Ow0KPj4gKw0KPj4gKyAgICBi
+bGtfcGVyX2x1biA9IGdlby0+bnJfY2hrcyAqIGdlby0+cGxhbmVfbW9kZTsNCj4+ICsgICAgbnJf
+YmxrcyA9IGJsa19wZXJfbHVuICogZ2VvLT5hbGxfbHVuczsNCj4+ICsNCj4+ICsgICAgbG9nID0g
+a21hbGxvYyhucl9ibGtzLCBHRlBfS0VSTkVMKTsNCj4+ICsgICAgaWYgKCFsb2cpDQo+PiArICAg
+ICAgICByZXR1cm4gRVJSX1BUUigtRU5PTUVNKTsNCj4+ICsNCj4+ICsgICAgZm9yIChpID0gMDsg
+aSA8IGdlby0+YWxsX2x1bnM7IGkrKykgew0KPj4gKyAgICAgICAgc3RydWN0IHBibGtfbHVuICpy
+bHVuID0gJnBibGstPmx1bnNbaV07DQo+PiArICAgICAgICB1OCAqbG9nX3BvcyA9IGxvZyArIGkg
+KiBibGtfcGVyX2x1bjsNCj4+ICsNCj4+ICsgICAgICAgIHJldCA9IHBibGtfYmJfZ2V0X3RibChk
+ZXYsIHJsdW4sIGxvZ19wb3MsIGJsa19wZXJfbHVuKTsNCj4+ICsgICAgICAgIGlmIChyZXQpIHsN
+Cj4+ICsgICAgICAgICAgICBrZnJlZShsb2cpOw0KPj4gKyAgICAgICAgICAgIHJldHVybiBFUlJf
+UFRSKC1FSU8pOw0KPj4gKyAgICAgICAgfQ0KPj4gKyAgICB9DQo+PiArDQo+PiArICAgIHJldHVy
+biBsb2c7DQo+PiAgfQ0KPj4gICAgc3RhdGljIGludCBwYmxrX2JiX2xpbmUoc3RydWN0IHBibGsg
+KnBibGssIHN0cnVjdCBwYmxrX2xpbmUgKmxpbmUsDQo+PiAtICAgICAgICAgICAgaW50IGJsa19w
+ZXJfbGluZSkNCj4+ICsgICAgICAgICAgICB1OCAqYmJfbG9nLCBpbnQgYmxrX3Blcl9saW5lKQ0K
+Pj4gIHsNCj4+ICAgICAgc3RydWN0IG52bV90Z3RfZGV2ICpkZXYgPSBwYmxrLT5kZXY7DQo+PiAg
+ICAgIHN0cnVjdCBudm1fZ2VvICpnZW8gPSAmZGV2LT5nZW87DQo+PiAtICAgIHN0cnVjdCBwYmxr
+X2x1biAqcmx1bjsNCj4+IC0gICAgaW50IGJiX2NudCA9IDA7DQo+PiAtICAgIGludCBpOw0KPj4g
+KyAgICBpbnQgaSwgYmJfY250ID0gMDsNCj4+ICAgICAgICBmb3IgKGkgPSAwOyBpIDwgYmxrX3Bl
+cl9saW5lOyBpKyspIHsNCj4+IC0gICAgICAgIHJsdW4gPSAmcGJsay0+bHVuc1tpXTsNCj4+IC0g
+ICAgICAgIGlmIChybHVuLT5iYl9saXN0W2xpbmUtPmlkXSA9PSBOVk1fQkxLX1RfRlJFRSkNCj4+
+ICsgICAgICAgIHN0cnVjdCBwYmxrX2x1biAqcmx1biA9ICZwYmxrLT5sdW5zW2ldOw0KPj4gKyAg
+ICAgICAgdTggKmx1bl9iYl9sb2cgPSBiYl9sb2cgKyBpICogYmxrX3Blcl9saW5lOw0KPj4gKw0K
+Pj4gKyAgICAgICAgaWYgKGx1bl9iYl9sb2dbbGluZS0+aWRdID09IE5WTV9CTEtfVF9GUkVFKQ0K
+Pj4gICAgICAgICAgICAgIGNvbnRpbnVlOw0KPj4gICAgICAgICAgICBzZXRfYml0KHBibGtfcHBh
+X3RvX3BvcyhnZW8sIHJsdW4tPmJwcGEpLCBsaW5lLT5ibGtfYml0bWFwKTsNCj4+IEBAIC00NjAs
+MjkgKzQ3NiwxMiBAQCBzdGF0aWMgaW50IHBibGtfYmJfbGluZShzdHJ1Y3QgcGJsayAqcGJsaywg
+c3RydWN0IHBibGtfbGluZSAqbGluZSwNCj4+ICAgICAgcmV0dXJuIGJiX2NudDsNCj4+ICB9DQo+
+PiAgLXN0YXRpYyBpbnQgcGJsa19hbGxvY19saW5lX2JpdG1hcHMoc3RydWN0IHBibGsgKnBibGss
+IHN0cnVjdCBwYmxrX2xpbmUgKmxpbmUpDQo+PiAtew0KPj4gLSAgICBzdHJ1Y3QgcGJsa19saW5l
+X21ldGEgKmxtID0gJnBibGstPmxtOw0KPj4gLQ0KPj4gLSAgICBsaW5lLT5ibGtfYml0bWFwID0g
+a3phbGxvYyhsbS0+YmxrX2JpdG1hcF9sZW4sIEdGUF9LRVJORUwpOw0KPj4gLSAgICBpZiAoIWxp
+bmUtPmJsa19iaXRtYXApDQo+PiAtICAgICAgICByZXR1cm4gLUVOT01FTTsNCj4+IC0NCj4+IC0g
+ICAgbGluZS0+ZXJhc2VfYml0bWFwID0ga3phbGxvYyhsbS0+YmxrX2JpdG1hcF9sZW4sIEdGUF9L
+RVJORUwpOw0KPj4gLSAgICBpZiAoIWxpbmUtPmVyYXNlX2JpdG1hcCkgew0KPj4gLSAgICAgICAg
+a2ZyZWUobGluZS0+YmxrX2JpdG1hcCk7DQo+PiAtICAgICAgICByZXR1cm4gLUVOT01FTTsNCj4+
+IC0gICAgfQ0KPj4gLQ0KPj4gLSAgICByZXR1cm4gMDsNCj4+IC19DQo+PiAtDQo+PiAgc3RhdGlj
+IGludCBwYmxrX2x1bnNfaW5pdChzdHJ1Y3QgcGJsayAqcGJsaywgc3RydWN0IHBwYV9hZGRyICps
+dW5zKQ0KPj4gIHsNCj4+ICAgICAgc3RydWN0IG52bV90Z3RfZGV2ICpkZXYgPSBwYmxrLT5kZXY7
+DQo+PiAgICAgIHN0cnVjdCBudm1fZ2VvICpnZW8gPSAmZGV2LT5nZW87DQo+PiAgICAgIHN0cnVj
+dCBwYmxrX2x1biAqcmx1bjsNCj4+IC0gICAgaW50IGksIHJldDsNCj4+ICsgICAgaW50IGk7DQo+
+PiAgICAgICAgLyogVE9ETzogSW1wbGVtZW50IHVuYmFsYW5jZWQgTFVOIHN1cHBvcnQgKi8NCj4+
+ICAgICAgaWYgKGdlby0+bnJfbHVucyA8IDApIHsNCj4+IEBAIC01MDUsMTMgKzUwNCw2IEBAIHN0
+YXRpYyBpbnQgcGJsa19sdW5zX2luaXQoc3RydWN0IHBibGsgKnBibGssIHN0cnVjdCBwcGFfYWRk
+ciAqbHVucykNCj4+ICAgICAgICAgIHJsdW4tPmJwcGEgPSBsdW5zW2x1bmlkXTsNCj4+ICAgICAg
+ICAgICAgc2VtYV9pbml0KCZybHVuLT53cl9zZW0sIDEpOw0KPj4gLQ0KPj4gLSAgICAgICAgcmV0
+ID0gcGJsa19iYl9kaXNjb3ZlcnkoZGV2LCBybHVuKTsNCj4+IC0gICAgICAgIGlmIChyZXQpIHsN
+Cj4+IC0gICAgICAgICAgICB3aGlsZSAoLS1pID49IDApDQo+PiAtICAgICAgICAgICAgICAgIGtm
+cmVlKHBibGstPmx1bnNbaV0uYmJfbGlzdCk7DQo+PiAtICAgICAgICAgICAgcmV0dXJuIHJldDsN
+Cj4+IC0gICAgICAgIH0NCj4+ICAgICAgfQ0KPj4gICAgICAgIHJldHVybiAwOw0KPj4gQEAgLTY4
+OSw2ICs2ODEsMjYgQEAgc3RhdGljIGludCBwYmxrX2xpbmVzX2FsbG9jX21ldGFkYXRhKHN0cnVj
+dCBwYmxrICpwYmxrKQ0KPj4gICAgICByZXR1cm4gLUVOT01FTTsNCj4+ICB9DQo+PiAgK3N0YXRp
+YyBpbnQgcGJsa19zZXR1cF9saW5lX21ldGEoc3RydWN0IHBibGsgKnBibGssIHN0cnVjdCBwYmxr
+X2xpbmUgKmxpbmUsDQo+PiArICAgICAgICAgICAgICAgIHZvaWQgKmNodW5rX2xvZywgbG9uZyAq
+bnJfYmFkX2Jsa3MpDQo+PiArew0KPj4gKyAgICBzdHJ1Y3QgcGJsa19saW5lX21ldGEgKmxtID0g
+JnBibGstPmxtOw0KPj4gKw0KPj4gKyAgICBsaW5lLT5ibGtfYml0bWFwID0ga3phbGxvYyhsbS0+
+YmxrX2JpdG1hcF9sZW4sIEdGUF9LRVJORUwpOw0KPj4gKyAgICBpZiAoIWxpbmUtPmJsa19iaXRt
+YXApDQo+PiArICAgICAgICByZXR1cm4gLUVOT01FTTsNCj4+ICsNCj4+ICsgICAgbGluZS0+ZXJh
+c2VfYml0bWFwID0ga3phbGxvYyhsbS0+YmxrX2JpdG1hcF9sZW4sIEdGUF9LRVJORUwpOw0KPj4g
+KyAgICBpZiAoIWxpbmUtPmVyYXNlX2JpdG1hcCkgew0KPj4gKyAgICAgICAga2ZyZWUobGluZS0+
+YmxrX2JpdG1hcCk7DQo+PiArICAgICAgICByZXR1cm4gLUVOT01FTTsNCj4+ICsgICAgfQ0KPj4g
+Kw0KPj4gKyAgICAqbnJfYmFkX2Jsa3MgPSBwYmxrX2JiX2xpbmUocGJsaywgbGluZSwgY2h1bmtf
+bG9nLCBsbS0+YmxrX3Blcl9saW5lKTsNCj4+ICsNCj4+ICsgICAgcmV0dXJuIDA7DQo+PiArfQ0K
+Pj4gKw0KPj4gIHN0YXRpYyBpbnQgcGJsa19saW5lc19pbml0KHN0cnVjdCBwYmxrICpwYmxrKQ0K
+Pj4gIHsNCj4+ICAgICAgc3RydWN0IG52bV90Z3RfZGV2ICpkZXYgPSBwYmxrLT5kZXY7DQo+PiBA
+QCAtNjk2LDggKzcwOCw5IEBAIHN0YXRpYyBpbnQgcGJsa19saW5lc19pbml0KHN0cnVjdCBwYmxr
+ICpwYmxrKQ0KPj4gICAgICBzdHJ1Y3QgcGJsa19saW5lX21nbXQgKmxfbWcgPSAmcGJsay0+bF9t
+ZzsNCj4+ICAgICAgc3RydWN0IHBibGtfbGluZV9tZXRhICpsbSA9ICZwYmxrLT5sbTsNCj4+ICAg
+ICAgc3RydWN0IHBibGtfbGluZSAqbGluZTsNCj4+ICsgICAgdm9pZCAqY2h1bmtfbG9nOw0KPj4g
+ICAgICB1bnNpZ25lZCBpbnQgc21ldGFfbGVuLCBlbWV0YV9sZW47DQo+PiAtICAgIGxvbmcgbnJf
+YmFkX2Jsa3MsIG5yX2ZyZWVfYmxrczsNCj4+ICsgICAgbG9uZyBucl9iYWRfYmxrcyA9IDAsIG5y
+X2ZyZWVfYmxrcyA9IDA7DQo+PiAgICAgIGludCBiYl9kaXN0YW5jZSwgbWF4X3dyaXRlX3BwYXMs
+IG1vZDsNCj4+ICAgICAgaW50IGksIHJldDsNCj4+ICBAQCAtNzcxLDEzICs3ODQsMTIgQEAgc3Rh
+dGljIGludCBwYmxrX2xpbmVzX2luaXQoc3RydWN0IHBibGsgKnBibGspDQo+PiAgICAgIGlmIChs
+bS0+bWluX2Jsa19saW5lID4gbG0tPmJsa19wZXJfbGluZSkgew0KPj4gICAgICAgICAgcHJfZXJy
+KCJwYmxrOiBjb25maWcuIG5vdCBzdXBwb3J0ZWQuIE1pbi4gTFVOIGluIGxpbmU6JWRcbiIsDQo+
+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGxtLT5ibGtfcGVyX2xpbmUpOw0KPj4gLSAg
+ICAgICAgcmV0ID0gLUVJTlZBTDsNCj4+IC0gICAgICAgIGdvdG8gZmFpbDsNCj4+ICsgICAgICAg
+IHJldHVybiAtRUlOVkFMOw0KPj4gICAgICB9DQo+PiAgICAgICAgcmV0ID0gcGJsa19saW5lc19h
+bGxvY19tZXRhZGF0YShwYmxrKTsNCj4+ICAgICAgaWYgKHJldCkNCj4+IC0gICAgICAgIGdvdG8g
+ZmFpbDsNCj4+ICsgICAgICAgIHJldHVybiByZXQ7DQo+PiAgICAgICAgbF9tZy0+YmJfdGVtcGxh
+dGUgPSBremFsbG9jKGxtLT5zZWNfYml0bWFwX2xlbiwgR0ZQX0tFUk5FTCk7DQo+PiAgICAgIGlm
+ICghbF9tZy0+YmJfdGVtcGxhdGUpIHsNCj4+IEBAIC04MjEsOSArODMzLDE2IEBAIHN0YXRpYyBp
+bnQgcGJsa19saW5lc19pbml0KHN0cnVjdCBwYmxrICpwYmxrKQ0KPj4gICAgICAgICAgZ290byBm
+YWlsX2ZyZWVfYmJfYXV4Ow0KPj4gICAgICB9DQo+PiAgLSAgICBucl9mcmVlX2Jsa3MgPSAwOw0K
+Pj4gKyAgICBjaHVua19sb2cgPSBwYmxrX2JiX2dldF9sb2cocGJsayk7DQo+PiArICAgIGlmIChJ
+U19FUlIoY2h1bmtfbG9nKSkgew0KPj4gKyAgICAgICAgcHJfZXJyKCJwYmxrOiBjb3VsZCBub3Qg
+Z2V0IGJhZCBibG9jayBsb2cgKCVsdSlcbiIsDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIFBUUl9FUlIoY2h1bmtfbG9nKSk7DQo+PiArICAgICAgICByZXQgPSBQVFJfRVJSKGNodW5r
+X2xvZyk7DQo+PiArICAgICAgICBnb3RvIGZhaWxfZnJlZV9saW5lczsNCj4+ICsgICAgfQ0KPj4g
+Kw0KPj4gICAgICBmb3IgKGkgPSAwOyBpIDwgbF9tZy0+bnJfbGluZXM7IGkrKykgew0KPj4gLSAg
+ICAgICAgaW50IGJsa19pbl9saW5lOw0KPj4gKyAgICAgICAgaW50IGNoa19pbl9saW5lOw0KPj4g
+ICAgICAgICAgICBsaW5lID0gJnBibGstPmxpbmVzW2ldOw0KPj4gIEBAIC04MzUsMjYgKzg1NCwy
+MCBAQCBzdGF0aWMgaW50IHBibGtfbGluZXNfaW5pdChzdHJ1Y3QgcGJsayAqcGJsaykNCj4+ICAg
+ICAgICAgIGxpbmUtPnZzYyA9ICZsX21nLT52c2NfbGlzdFtpXTsNCj4+ICAgICAgICAgIHNwaW5f
+bG9ja19pbml0KCZsaW5lLT5sb2NrKTsNCj4+ICAtICAgICAgICByZXQgPSBwYmxrX2FsbG9jX2xp
+bmVfYml0bWFwcyhwYmxrLCBsaW5lKTsNCj4+ICsgICAgICAgIHJldCA9IHBibGtfc2V0dXBfbGlu
+ZV9tZXRhKHBibGssIGxpbmUsIGNodW5rX2xvZywgJm5yX2JhZF9ibGtzKTsNCj4+ICAgICAgICAg
+IGlmIChyZXQpDQo+PiAtICAgICAgICAgICAgZ290byBmYWlsX2ZyZWVfbGluZXM7DQo+PiArICAg
+ICAgICAgICAgZ290byBmYWlsX2ZyZWVfY2h1bmtfbG9nOw0KPj4gIC0gICAgICAgIG5yX2JhZF9i
+bGtzID0gcGJsa19iYl9saW5lKHBibGssIGxpbmUsIGxtLT5ibGtfcGVyX2xpbmUpOw0KPj4gLSAg
+ICAgICAgaWYgKG5yX2JhZF9ibGtzIDwgMCB8fCBucl9iYWRfYmxrcyA+IGxtLT5ibGtfcGVyX2xp
+bmUpIHsNCj4+IC0gICAgICAgICAgICBwYmxrX2ZyZWVfbGluZV9iaXRtYXBzKGxpbmUpOw0KPj4g
+LSAgICAgICAgICAgIHJldCA9IC1FSU5WQUw7DQo+PiAtICAgICAgICAgICAgZ290byBmYWlsX2Zy
+ZWVfbGluZXM7DQo+PiAtICAgICAgICB9DQo+PiAtDQo+PiAtICAgICAgICBibGtfaW5fbGluZSA9
+IGxtLT5ibGtfcGVyX2xpbmUgLSBucl9iYWRfYmxrczsNCj4+IC0gICAgICAgIGlmIChibGtfaW5f
+bGluZSA8IGxtLT5taW5fYmxrX2xpbmUpIHsNCj4+ICsgICAgICAgIGNoa19pbl9saW5lID0gbG0t
+PmJsa19wZXJfbGluZSAtIG5yX2JhZF9ibGtzOw0KPj4gKyAgICAgICAgaWYgKG5yX2JhZF9ibGtz
+IDwgMCB8fCBucl9iYWRfYmxrcyA+IGxtLT5ibGtfcGVyX2xpbmUgfHwNCj4+ICsgICAgICAgICAg
+ICAgICAgICAgIGNoa19pbl9saW5lIDwgbG0tPm1pbl9ibGtfbGluZSkgew0KPj4gICAgICAgICAg
+ICAgIGxpbmUtPnN0YXRlID0gUEJMS19MSU5FU1RBVEVfQkFEOw0KPj4gICAgICAgICAgICAgIGxp
+c3RfYWRkX3RhaWwoJmxpbmUtPmxpc3QsICZsX21nLT5iYWRfbGlzdCk7DQo+PiAgICAgICAgICAg
+ICAgY29udGludWU7DQo+PiAgICAgICAgICB9DQo+PiAgLSAgICAgICAgbnJfZnJlZV9ibGtzICs9
+IGJsa19pbl9saW5lOw0KPj4gLSAgICAgICAgYXRvbWljX3NldCgmbGluZS0+YmxrX2luX2xpbmUs
+IGJsa19pbl9saW5lKTsNCj4+ICsgICAgICAgIG5yX2ZyZWVfYmxrcyArPSBjaGtfaW5fbGluZTsN
+Cj4+ICsgICAgICAgIGF0b21pY19zZXQoJmxpbmUtPmJsa19pbl9saW5lLCBjaGtfaW5fbGluZSk7
+DQo+PiAgICAgICAgICAgIGxfbWctPm5yX2ZyZWVfbGluZXMrKzsNCj4+ICAgICAgICAgIGxpc3Rf
+YWRkX3RhaWwoJmxpbmUtPmxpc3QsICZsX21nLT5mcmVlX2xpc3QpOw0KPj4gQEAgLTg2MiwyMyAr
+ODc1LDIxIEBAIHN0YXRpYyBpbnQgcGJsa19saW5lc19pbml0KHN0cnVjdCBwYmxrICpwYmxrKQ0K
+Pj4gICAgICAgIHBibGtfc2V0X3Byb3Zpc2lvbihwYmxrLCBucl9mcmVlX2Jsa3MpOw0KPj4gIC0g
+ICAgLyogQ2xlYW51cCBwZXItTFVOIGJhZCBibG9jayBsaXN0cyAtIG1hbmFnZWQgd2l0aGluIGxp
+bmVzIG9uIHJ1bi10aW1lICovDQo+PiAtICAgIGZvciAoaSA9IDA7IGkgPCBnZW8tPmFsbF9sdW5z
+OyBpKyspDQo+PiAtICAgICAgICBrZnJlZShwYmxrLT5sdW5zW2ldLmJiX2xpc3QpOw0KPj4gLQ0K
+Pj4gKyAgICBrZnJlZShjaHVua19sb2cpOw0KPj4gICAgICByZXR1cm4gMDsNCj4+IC1mYWlsX2Zy
+ZWVfbGluZXM6DQo+PiArDQo+PiArZmFpbF9mcmVlX2NodW5rX2xvZzoNCj4+ICsgICAga2ZyZWUo
+Y2h1bmtfbG9nKTsNCj4+ICAgICAgd2hpbGUgKC0taSA+PSAwKQ0KPj4gLSAgICAgICAgcGJsa19m
+cmVlX2xpbmVfYml0bWFwcygmcGJsay0+bGluZXNbaV0pOw0KPj4gKyAgICAgICAgcGJsa19saW5l
+X21ldGFfZnJlZSgmcGJsay0+bGluZXNbaV0pOw0KPj4gK2ZhaWxfZnJlZV9saW5lczoNCj4+ICsg
+ICAga2ZyZWUocGJsay0+bGluZXMpOw0KPj4gIGZhaWxfZnJlZV9iYl9hdXg6DQo+PiAgICAgIGtm
+cmVlKGxfbWctPmJiX2F1eCk7DQo+PiAgZmFpbF9mcmVlX2JiX3RlbXBsYXRlOg0KPj4gICAgICBr
+ZnJlZShsX21nLT5iYl90ZW1wbGF0ZSk7DQo+PiAgZmFpbF9mcmVlX21ldGE6DQo+PiAtICAgIHBi
+bGtfbGluZV9tZXRhX2ZyZWUocGJsayk7DQo+PiAtZmFpbDoNCj4+IC0gICAgZm9yIChpID0gMDsg
+aSA8IGdlby0+YWxsX2x1bnM7IGkrKykNCj4+IC0gICAgICAgIGtmcmVlKHBibGstPmx1bnNbaV0u
+YmJfbGlzdCk7DQo+PiArICAgIHBibGtfbGluZV9tZ19mcmVlKHBibGspOw0KPj4gICAgICAgIHJl
+dHVybiByZXQ7DQo+PiAgfQ0KPj4gQEAgLTkyMiw3ICs5MzMsNyBAQCBzdGF0aWMgdm9pZCBwYmxr
+X2ZyZWUoc3RydWN0IHBibGsgKnBibGspDQo+PiAgICAgIHBibGtfbHVuc19mcmVlKHBibGspOw0K
+Pj4gICAgICBwYmxrX2xpbmVzX2ZyZWUocGJsayk7DQo+PiAgICAgIGtmcmVlKHBibGstPnBhZF9k
+aXN0KTsNCj4+IC0gICAgcGJsa19saW5lX21ldGFfZnJlZShwYmxrKTsNCj4+ICsgICAgcGJsa19s
+aW5lX21nX2ZyZWUocGJsayk7DQo+PiAgICAgIHBibGtfY29yZV9mcmVlKHBibGspOw0KPj4gICAg
+ICBwYmxrX2wycF9mcmVlKHBibGspOw0KPj4gIEBAIC0xMTEwLDcgKzExMjEsNyBAQCBzdGF0aWMg
+dm9pZCAqcGJsa19pbml0KHN0cnVjdCBudm1fdGd0X2RldiAqZGV2LCBzdHJ1Y3QgZ2VuZGlzayAq
+dGRpc2ssDQo+PiAgZmFpbF9mcmVlX3BhZF9kaXN0Og0KPj4gICAgICBrZnJlZShwYmxrLT5wYWRf
+ZGlzdCk7DQo+PiAgZmFpbF9mcmVlX2xpbmVfbWV0YToNCj4+IC0gICAgcGJsa19saW5lX21ldGFf
+ZnJlZShwYmxrKTsNCj4+ICsgICAgcGJsa19saW5lX21nX2ZyZWUocGJsayk7DQo+PiAgZmFpbF9m
+cmVlX2x1bnM6DQo+PiAgICAgIHBibGtfbHVuc19mcmVlKHBibGspOw0KPj4gIGZhaWw6DQo+PiBk
+aWZmIC0tZ2l0IGEvZHJpdmVycy9saWdodG52bS9wYmxrLmggYi9kcml2ZXJzL2xpZ2h0bnZtL3Bi
+bGsuaA0KPj4gaW5kZXggODg3MjBlMjQ0MWMwLi4yODJkZmM4NzgwZTggMTAwNjQ0DQo+PiAtLS0g
+YS9kcml2ZXJzL2xpZ2h0bnZtL3BibGsuaA0KPj4gKysrIGIvZHJpdmVycy9saWdodG52bS9wYmxr
+LmgNCj4+IEBAIC0yMDEsMTIgKzIwMSw2IEBAIHN0cnVjdCBwYmxrX3JiIHsNCj4+ICAgIHN0cnVj
+dCBwYmxrX2x1biB7DQo+PiAgICAgIHN0cnVjdCBwcGFfYWRkciBicHBhOw0KPj4gLQ0KPj4gLSAg
+ICB1OCAqYmJfbGlzdDsgICAgICAgICAgICAvKiBCYWQgYmxvY2sgbGlzdCBmb3IgTFVOLiBPbmx5
+IHVzZWQgb24NCj4+IC0gICAgICAgICAgICAgICAgICAgICAqIGJyaW5nIHVwLiBCYWQgYmxvY2tz
+IGFyZSBtYW5hZ2VkDQo+PiAtICAgICAgICAgICAgICAgICAgICAgKiB3aXRoaW4gbGluZXMgb24g
+cnVuLXRpbWUuDQo+PiAtICAgICAgICAgICAgICAgICAgICAgKi8NCj4+IC0NCj4+ICAgICAgc3Ry
+dWN0IHNlbWFwaG9yZSB3cl9zZW07DQo+PiAgfTsNCj4+ICANCj4gDQo+IExvb2tzIGdvb2QgdG8g
+bWUuDQo+IA0KPiBXaXRoIHJlc3BlY3QgdG8gdGhlIDIuMCBpbXBsZW1lbnRhdGlvbi4gSSBhbSB0
+aGlua2luZyB0aGF0IGdldF9iYiBhbmQgc2V0X2JiIHNob3VsZCBiZWhhdmUgaW4gdGhlIGZvbGxv
+d2luZyB3YXk6DQo+IA0KPiBGb3IgZ2V0X2JiIChpbiBudm1lL2hvc3QvbGlnaHRudm0uYykNCj4g
+MS4yOiBLZWVwIHRoZSBpbXBsZW1lbnRhdGlvbiBhcyBpcy4NCj4gMi4wOiBVc2UgdGhlIHJlcG9y
+dCBjaHVuayBjb21tYW5kLCBhbmQgcmVkbyB0aGUgZ2V0X2JiIGZvcm1hdC4NCj4gDQo+IEZvciBz
+ZXRfYmIgKGluIG52bWUvaG9zdC9saWdodG52bS5jKQ0KPiAxLjI6IEJ1c2luZXNzIGFzIHVzdWFs
+DQo+IDIuMDogUmVwb3J0IGVycm9yLg0KDQpJIGhhdmUgYSBwYXRjaGVzIGFic3RyYWN0aW5nIHRo
+aXMsIHdoaWNoIEkgdGhpbmsgaXQgbWFrZXMgaXQgY2xlYW5lci4gSSBjYW4gcHVzaCBpdCBuZXh0
+IHdlZWsgZm9yIHJldmlldy4gSeKAmW0gdHJhdmVsaW5nIHRoaXMgd2Vlay4gKElmIHlvdSB3YW50
+IHRvIGdldCBhIGdsaW1wc2UgSSBjYW4gcG9pbnQgeW91IHRvIHRoZSBjb2RlKS4gDQoNCj4gDQo+
+IEZvciAyLjAsIHRoZXJlIHdpbGwgYmUgYWRkZWQgYSBmdW5jdGlvbiBwb2ludGVyIGZvciBnZXQg
+cmVwb3J0IGNodW5rIGltcGxlbWVudGF0aW9uLCB3aGVyZSB0aGUgY2xpZW50IGNhbiBhc2sgZm9y
+IGZ1bGwgY2h1bmsgaW5mb3JtYXRpb24uIFNpbWlsYXJseSBoZXJlLCBjbGllbnQgd2lsbCBmYWls
+IHRoZSBmdW5jdGlvbiBjYWxsIGlmIHRoZSBkcml2ZSBpcyAxLjIuDQo+IA0KPiBJIGhvcGUgdG8g
+cG9zdCB0aGUgc21hbGwgMi4wIGlkZW50aWZ5IGltcGxlbWVudGF0aW9uIFRvbW9ycm93IG9yIEZy
+aWRheSwgYW5kIHRoZW4geW91IGNhbiBwb3N0IHRoZSByZXBvcnQgY2h1bmsgaW1wbGVtZW50YXRp
+b24gdGhhdCB5b3UgaGF2ZSBkb25lIGlmIHlvdSBsaWtlDQoNClN1cmUuIEkgaGF2ZSBwYXRjaGVz
+IGltcGxlbWVudGluZyAyLjAgdG9vLCBidXQgeW91IGNhbiBwdXNoIHlvdXIgdmVyc2lvbi4gT25l
+IHRoaW5nIEnigJlkIGxpa2UgdG8gZ2V0IGluIGlzIGEgZ2VuZXJpYyBnZW9tZXRyeSBzdHJ1Y3R1
+cmUgdGhhdCBzaW1wbGlmaWVzIHRoZSBpZGVudGlmeSBjb21tYW5kIGFuZCBwdXRzIHRoZSBsb2dp
+YyBpbiB0aGUgaWRlbnRpZnkgcGF0aC4gDQoNClRoaXMgbWFrZXMgdGhlIGJhc2UgZ3JvdXAgc3Ry
+dWN0dXJlIGZyb20gMS4yIGdvIGF3YXkgbWFrZXMgdGhlIDEuMiBhbmQgMi4wIHBhdGhzIGVhc2ll
+ciB0byBtYWludGFpbiBhdCB0aGUgdGFyZ2V0IGxldmVsLiANCg0KSSBjYW4gcG9pbnQgeW91IHRv
+IHRoZSBwYXRjaGVzIHRvbW9ycm93IGlmIHlvdSB3YW50IHRvIGFsaWduIHdpdGggaXQuIE90aGVy
+d2lzZSwgSSBjYW4ganVzdCByZWJhc2UgYW5kIHNlbmQgdGhlbSBuZXh0IHdlZWsuIEJ1dCBwbGVh
+c2UsIGNvbnNpZGVyIHRoaXMgYmVmb3JlIG1ha2luZyBhIG5ldyBhYnN0cmFjdGlvbiB0byBtYWtl
+IHRoZSAyIHNwZWNzIGNvZXhpc3QgLSBtb3N0IG9mIHRoZSB3b3JrIGlzIGRvbmUgYWxyZWFkeS4u
+Lg0KDQoNCj4gV2UgYWxzbyBuZWVkIHRvIHRha2UgYSBsb29rIGF0IHRoZSBuZXcgZXJyb3IgY29k
+ZXMsIHdoaWNoIGRvZXMgbm90IGFsaWduIHdpdGggdGhlIDEuMiBzcGVjaWZpY2F0aW9uIChub3cg
+dGhhdCB0aGV5IGFjdHVhbGx5IGZvbGxvdyB0aGUgbnZtZSBzcGVjaWZpY2F0aW9uIDspKQ0KDQpD
+b29sLiBMZXTigJlzIG1haW50YWluIHRoZSAxLjIgZXJyb3JzIGZvciBjb21wYXRpYmlsaXR5IGFu
+ZCBtYWtlIHRoZSAyLjAgcGF0aCBjbGVhbiAtIHRoYXQgaXMgbnZtZSBjb21wYXRpYmxlIDspDQoN
+Ckphdmllci4g
