@@ -1,100 +1,75 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:48632 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751496AbeANOmx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 Jan 2018 09:42:53 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH v3 00/13] bcache: device failure handling improvement 
-Date: Sun, 14 Jan 2018 22:42:23 +0800
-Message-Id: <20180114144236.28213-1-colyli@suse.de>
+Received: from mail-it0-f66.google.com ([209.85.214.66]:52077 "EHLO
+        mail-it0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752366AbeAaCC1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Jan 2018 21:02:27 -0500
+Received: by mail-it0-f66.google.com with SMTP id p139so3133496itb.1
+        for <linux-block@vger.kernel.org>; Tue, 30 Jan 2018 18:02:27 -0800 (PST)
+From: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
+Message-Id: <6EDEF0FC-CCC6-4AC8-A816-76D5E8C68DEE@lightnvm.io>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_1CAA5DCF-306F-499D-8456-7D61885DC82A";
+        protocol="application/pgp-signature";
+        micalg=pgp-sha512
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH 2/2] lightnvm: remove multiple groups in 1.2 data
+ structure
+Date: Wed, 31 Jan 2018 10:02:10 +0800
+In-Reply-To: <20180130132605.28635-2-m@bjorling.me>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+To: =?utf-8?Q?Matias_Bj=C3=B8rling?= <m@bjorling.me>
+References: <20180130132605.28635-1-m@bjorling.me>
+ <20180130132605.28635-2-m@bjorling.me>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi maintainers and folks,
 
-This patch set tries to improve bcache device failure handling, includes
-cache device and backing device failures.
+--Apple-Mail=_1CAA5DCF-306F-499D-8456-7D61885DC82A
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-The basic idea to handle failed cache device is,
-- Unregister cache set
-- Detach all backing devices which are attached to this cache set
-- Stop all the detached bcache devices
-- Stop all flash only volume on the cache set
-The above process is named 'cache set retire' by me. The result of cache
-set retire is, cache set and bcache devices are all removed, following
-I/O requests will get failed immediately to notift upper layer or user
-space coce that the cache device is failed or disconnected.
+> On 30 Jan 2018, at 21.26, Matias Bj=C3=B8rling <m@bjorling.me> wrote:
+>=20
+> Only one id group from the 1.2 specification is supported. Make
+> sure that only the first group is accessible.
+>=20
+> Signed-off-by: Matias Bj=C3=B8rling <m@bjorling.me>
+> ---
+> drivers/nvme/host/lightnvm.c | 5 +++--
+> 1 file changed, 3 insertions(+), 2 deletions(-)
+>=20
 
-For failed backing device, there are two kinds of failures to handle,
-- If device is disconnected, and kernel thread dc->status_update_thread
-  finds it is offline for BACKING_DEV_OFFLINE_TIMEOUT (5) seconds, the
-  kernel thread will set dc->io_disable and call bcache_device_stop() to
-  stop and remove the bcache device from system.
-- If device is alive but returns too many I/O errors, after errors number
-  exceeds dc->error_limit, call bch_cached_dev_error() to set
-  dc->io_disable and stop bcache device. Then the broken backing device
-  and its bcache device will be removed from system.
+Same as before. Even though current implementation only uses one group,
+the 1.2 specification relies on 4. At least, the identify structure
+should reflect this.
 
-The v3 patch set adds one more patch to fix the detach issue found in
-v2 patch set.
+Javier
 
-A basic testing covered with writethrough, writeback, writearound mode, and
-read/write/readwrite workloads, cache set or bcache device can be removed
-by too many I/O errors or delete the device. For plugging out physical
-disks, a kernel bug triggers rcu oops in __do_softirq() and locks up all
-following accesses to the disconnected disk, this blocks my testing.
+--Apple-Mail=_1CAA5DCF-306F-499D-8456-7D61885DC82A
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
 
-Open issues:
-1, A kernel bug in __do_softirq() when plugging out hard disk with heavy
-   I/O blocks my physical disk disconnection test. This is not problem
-   introduced from this patch set, if any one knows this bug, please give
-   me a hint.
+-----BEGIN PGP SIGNATURE-----
 
-Changelog:
-v3: fix detach issue find in v2 patch set.
-v2: fixes all problems found in v1 review.
-    add patches to handle backing device failure.
-    add one more patch to set writeback_rate_update_seconds range.
-    include a patch from Junhui Tang.
-v1: the initial version, only handles cache device failure.
+iQIzBAEBCgAdFiEEm1mT7zen+vs9+T8kYx8FO3WZGMoFAlpxI6IACgkQYx8FO3WZ
+GMp3/hAAsh0KFV0zYCi3LzHBE6ZCzFGaV51q+CX5E2aF/G3DTkDMhp1d8p4Nbbyx
+W6xxFrthgC05apmIZY2y3CjAJObNGvTTvthpRpnCKlYPOjSnhF7nKW+DjcTBBQOv
+FK7e0vqlJ8yaNaHlvVTL2RWVpBwDd8L/YYWlhQ0S1jcgihQ533WuZsSJrVOzGc8o
+OloMm3l+Bzq1h22VNOm6OZ0EmPXjTaYapl74vvICxMXcojt+fdQ2iNkYMv5NfaEx
+o6GqDKwsT6PJxQ2gjkEM3m4pdCDc2WOmMdddiixUbCUUQowfpQJipSjnT2/Vpzv4
+155snVRpuiNj96auVRqnNXgI3KOdd7roVAPkxDATQaTvyuozKxEASHNICkEuPg0E
+AtQCrG9x7eY5aUxiTXqY2dYFNIBAIM6py3U6ZxqLi0rBCjY+80sHvUG+OUOoTWff
+EIDzwq3RM7FRztLAc0DDRIiPmjDju7JiJBR/qMrz7gCZwcgclyQhT7452xPxvaU4
+/o/DBWZ21QPayWj3mVJiyZLHeSGMOspCkR8Ucfh5nKNZysc59GLOpOOA4/O641tp
+UvDyoKrqiOOTIfTV6l0yuc+h2HznDRNMyTKmGhi5+UM/mHG1C+9Qg7w1aU9Yn4lB
+cuiIR5M3XZrJkFKjLgm9ygHvatm6RtkzeDjgtnxoUKz/AQGyFZk=
+=Faj3
+-----END PGP SIGNATURE-----
 
-Any comment, question and review are warmly welcome. Thanks in advance.
-
-Coly Li
----
-
-Coly Li (12):
-  bcache: set writeback_rate_update_seconds in range [1, 60] seconds
-  bcache: properly set task state in bch_writeback_thread()
-  bcache: set task properly in allocator_wait()
-  bcache: fix cached_dev->count usage for bch_cache_set_error()
-  bcache: quit dc->writeback_thread when BCACHE_DEV_DETACHING is set
-  bcache: stop dc->writeback_rate_update properly
-  bcache: set error_limit correctly
-  bcache: add CACHE_SET_IO_DISABLE to struct cache_set flags
-  bcache: stop all attached bcache devices for a retired cache set
-  bcache: add backing_request_endio() for bi_end_io of attached backing
-    device I/O
-  bcache: add io_disable to struct cached_dev
-  bcache: stop bcache device when backing device is offline
-
-Tang Junhui (1):
-  bcache: fix inaccurate io state for detached bcache devices
-
- drivers/md/bcache/alloc.c     |   5 +-
- drivers/md/bcache/bcache.h    |  37 ++++++++-
- drivers/md/bcache/btree.c     |  10 ++-
- drivers/md/bcache/io.c        |  16 +++-
- drivers/md/bcache/journal.c   |   4 +-
- drivers/md/bcache/request.c   | 187 +++++++++++++++++++++++++++++++++++-------
- drivers/md/bcache/super.c     | 134 ++++++++++++++++++++++++++++--
- drivers/md/bcache/sysfs.c     |  45 +++++++++-
- drivers/md/bcache/util.h      |   6 --
- drivers/md/bcache/writeback.c |  99 ++++++++++++++++++----
- drivers/md/bcache/writeback.h |   5 +-
- 11 files changed, 474 insertions(+), 74 deletions(-)
-
--- 
-2.15.1
+--Apple-Mail=_1CAA5DCF-306F-499D-8456-7D61885DC82A--
