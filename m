@@ -1,122 +1,173 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from ale.deltatee.com ([207.54.116.67]:39156 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751246AbeADTCA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 4 Jan 2018 14:02:00 -0500
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
-        linux-nvdimm@lists.01.org, linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Logan Gunthorpe <logang@deltatee.com>
-Date: Thu,  4 Jan 2018 12:01:30 -0700
-Message-Id: <20180104190137.7654-6-logang@deltatee.com>
-In-Reply-To: <20180104190137.7654-1-logang@deltatee.com>
-References: <20180104190137.7654-1-logang@deltatee.com>
-Subject: [PATCH 05/12] block: Introduce PCI P2P flags for request and request queue
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:35860 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751735AbeAaCHD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 30 Jan 2018 21:07:03 -0500
+Received: by mail-wm0-f66.google.com with SMTP id f3so4913201wmc.1
+        for <linux-block@vger.kernel.org>; Tue, 30 Jan 2018 18:07:02 -0800 (PST)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 2/5] lightnvm: pblk: check data lines version on recovery
+Date: Wed, 31 Jan 2018 03:06:48 +0100
+Message-Id: <1517364411-22386-2-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1517364411-22386-1-git-send-email-javier@cnexlabs.com>
+References: <1517364411-22386-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-QUEUE_FLAG_PCI_P2P is introduced meaning a driver's request queue
-supports targeting P2P memory.
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-REQ_PCI_P2P is introduced to indicate a particular bio request is
-directed to/from PCI P2P memory. A request with this flag is not
-accepted unless the corresponding queues have the QUEUE_FLAG_PCI_P2P
-flag set.
+As a preparation for future bumps of data line persistent storage
+versions, we need to start checking the emeta line version during
+recovery. Also slit up the current emeta/smeta version into two
+bytes (major,minor).
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Recovering lines with the same major number as the current pblk data
+line version must succeed. This means that any changes in the
+persistent format must be:
+
+ (1) Backward compatible: if we switch back to and older
+     kernel, recovery of lines stored with major == current_major
+     and minor > current_minor must succeed.
+
+ (2) Forward compatible: switching to a newer kernel,
+     recovery of lines stored with major=current_major and
+     minor < minor must handle the data format differences
+     gracefully(i.e. initialize new data structures to default values).
+
+If we detect lines that have a different major number than
+the current we must abort recovery. The user must manually
+migrate the data in this case.
+
+Previously the version stored in the emeta header was copied
+from smeta, which has version 1, so we need to set the minor
+version to 1.
+
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- block/blk-core.c          |  3 +++
- include/linux/blk_types.h | 18 +++++++++++++++++-
- include/linux/blkdev.h    |  2 ++
- 3 files changed, 22 insertions(+), 1 deletion(-)
+ drivers/lightnvm/pblk-core.c     |  9 ++++++++-
+ drivers/lightnvm/pblk-recovery.c | 26 ++++++++++++++++++++++++--
+ drivers/lightnvm/pblk.h          | 16 ++++++++++++++--
+ 3 files changed, 46 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index b8881750a3ac..f347c25731ff 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2141,6 +2141,9 @@ generic_make_request_checks(struct bio *bio)
- 	if ((bio->bi_opf & REQ_NOWAIT) && !queue_is_rq_based(q))
- 		goto not_supported;
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 9027cf2ed1d8..155e42a26293 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -975,7 +975,8 @@ static int pblk_line_init_metadata(struct pblk *pblk, struct pblk_line *line,
+ 	memcpy(smeta_buf->header.uuid, pblk->instance_uuid, 16);
+ 	smeta_buf->header.id = cpu_to_le32(line->id);
+ 	smeta_buf->header.type = cpu_to_le16(line->type);
+-	smeta_buf->header.version = SMETA_VERSION;
++	smeta_buf->header.version_major = SMETA_VERSION_MAJOR;
++	smeta_buf->header.version_minor = SMETA_VERSION_MINOR;
  
-+	if ((bio->bi_opf & REQ_PCI_P2P) && !blk_queue_pci_p2p(q))
-+		goto not_supported;
+ 	/* Start metadata */
+ 	smeta_buf->seq_nr = cpu_to_le64(line->seq_nr);
+@@ -998,6 +999,12 @@ static int pblk_line_init_metadata(struct pblk *pblk, struct pblk_line *line,
+ 	/* End metadata */
+ 	memcpy(&emeta_buf->header, &smeta_buf->header,
+ 						sizeof(struct line_header));
 +
- 	if (should_fail_request(&bio->bi_disk->part0, bio->bi_iter.bi_size))
- 		goto end_io;
++	emeta_buf->header.version_major = EMETA_VERSION_MAJOR;
++	emeta_buf->header.version_minor = EMETA_VERSION_MINOR;
++	emeta_buf->header.crc = cpu_to_le32(
++			pblk_calc_meta_header_crc(pblk, &emeta_buf->header));
++
+ 	emeta_buf->seq_nr = cpu_to_le64(line->seq_nr);
+ 	emeta_buf->nr_lbas = cpu_to_le64(line->sec_in_line);
+ 	emeta_buf->nr_valid_lbas = cpu_to_le64(0);
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index 1d5e961bf5e0..a30fe203d454 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -826,6 +826,25 @@ static u64 pblk_line_emeta_start(struct pblk *pblk, struct pblk_line *line)
+ 	return emeta_start;
+ }
  
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 9e7d8bd776d2..8e1b4d643478 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -228,6 +228,10 @@ enum req_flag_bits {
- 	__REQ_BACKGROUND,	/* background IO */
- 	__REQ_NOWAIT,           /* Don't wait if request will block */
- 
-+#ifdef CONFIG_PCI_P2P
-+	__REQ_PCI_P2P,		/* request is to/from P2P memory */
++static int pblk_recov_check_line_version(struct pblk *pblk,
++					 struct line_emeta *emeta)
++{
++	struct line_header *header = &emeta->header;
++
++	if (header->version_major != EMETA_VERSION_MAJOR) {
++		pr_err("pblk: line major version mismatch: %d, expected: %d\n",
++		       header->version_major, EMETA_VERSION_MAJOR);
++		return 1;
++	}
++
++#ifdef NVM_DEBUG
++	if (header->version_minor > EMETA_VERSION_MINOR)
++		pr_info("pblk: newer line minor version found: %d\n", line_v);
 +#endif
 +
- 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
- 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
- 
-@@ -252,6 +256,18 @@ enum req_flag_bits {
- #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
- #define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
- 
-+#ifdef CONFIG_PCI_P2P
-+/*
-+ * Currently SGLs do not support mixed P2P and regular memory so
-+ * requests with P2P memory must not be merged.
-+ */
-+#define REQ_PCI_P2P		(1ULL << __REQ_PCI_P2P)
-+#define REQ_IS_PCI_P2P(req)	((req)->cmd_flags & REQ_PCI_P2P)
-+#else
-+#define REQ_PCI_P2P		0
-+#define REQ_IS_PCI_P2P(req)	0
-+#endif /* CONFIG_PCI_P2P */
++	return 0;
++}
 +
- #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
+ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+ {
+ 	struct pblk_line_meta *lm = &pblk->lm;
+@@ -873,9 +892,9 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+ 		if (le32_to_cpu(smeta_buf->header.identifier) != PBLK_MAGIC)
+ 			continue;
  
- #define REQ_DRV			(1ULL << __REQ_DRV)
-@@ -260,7 +276,7 @@ enum req_flag_bits {
- 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
+-		if (smeta_buf->header.version != SMETA_VERSION) {
++		if (smeta_buf->header.version_major != SMETA_VERSION_MAJOR) {
+ 			pr_err("pblk: found incompatible line version %u\n",
+-					le16_to_cpu(smeta_buf->header.version));
++					smeta_buf->header.version_major);
+ 			return ERR_PTR(-EINVAL);
+ 		}
  
- #define REQ_NOMERGE_FLAGS \
--	(REQ_NOMERGE | REQ_PREFLUSH | REQ_FUA)
-+	(REQ_NOMERGE | REQ_PREFLUSH | REQ_FUA | REQ_PCI_P2P)
+@@ -943,6 +962,9 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+ 			goto next;
+ 		}
  
- #define bio_op(bio) \
- 	((bio)->bi_opf & REQ_OP_MASK)
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 0ce8a372d506..877b71dd1122 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -651,6 +651,7 @@ struct request_queue {
- #define QUEUE_FLAG_SCSI_PASSTHROUGH 27	/* queue supports SCSI commands */
- #define QUEUE_FLAG_QUIESCED    28	/* queue has been quiesced */
- #define QUEUE_FLAG_PREEMPT_ONLY	29	/* only process REQ_PREEMPT requests */
-+#define QUEUE_FLAG_PCI_P2P     30	/* device supports pci p2p requests */
++		if (pblk_recov_check_line_version(pblk, line->emeta->buf))
++			return ERR_PTR(-EINVAL);
++
+ 		if (pblk_recov_l2p_from_emeta(pblk, line))
+ 			pblk_recov_l2p_from_oob(pblk, line);
  
- #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_SAME_COMP)	|	\
-@@ -746,6 +747,7 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
- #define blk_queue_dax(q)	test_bit(QUEUE_FLAG_DAX, &(q)->queue_flags)
- #define blk_queue_scsi_passthrough(q)	\
- 	test_bit(QUEUE_FLAG_SCSI_PASSTHROUGH, &(q)->queue_flags)
-+#define blk_queue_pci_p2p(q)	test_bit(QUEUE_FLAG_PCI_P2P, &(q)->queue_flags)
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 8c357fb6538e..fae2526f80b2 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -320,14 +320,26 @@ enum {
+ };
  
- #define blk_noretry_request(rq) \
- 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
+ #define PBLK_MAGIC 0x70626c6b /*pblk*/
+-#define SMETA_VERSION cpu_to_le16(1)
++
++/* emeta/smeta persistent storage format versions:
++ * Changes in major version requires offline migration.
++ * Changes in minor version are handled automatically during
++ * recovery.
++ */
++
++#define SMETA_VERSION_MAJOR (0)
++#define SMETA_VERSION_MINOR (1)
++
++#define EMETA_VERSION_MAJOR (0)
++#define EMETA_VERSION_MINOR (1)
+ 
+ struct line_header {
+ 	__le32 crc;
+ 	__le32 identifier;	/* pblk identifier */
+ 	__u8 uuid[16];		/* instance uuid */
+ 	__le16 type;		/* line type */
+-	__le16 version;		/* type version */
++	__u8 version_major;	/* version major */
++	__u8 version_minor;	/* version minor */
+ 	__le32 id;		/* line id for current line */
+ };
+ 
 -- 
-2.11.0
+2.7.4
