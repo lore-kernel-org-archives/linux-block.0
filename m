@@ -1,65 +1,65 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mr11p00im-asmtp003.me.com ([17.110.69.254]:24146 "EHLO
-        mr11p00im-asmtp003.me.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933463AbeBMHrL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Feb 2018 02:47:11 -0500
-From: Chengguang Xu <cgxu519@icloud.com>
-To: tj@kernel.org, axboe@fb.com
-Cc: shli@fb.com, vgoyal@redhat.com, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org, Chengguang Xu <cgxu519@icloud.com>
-Subject: [PATCH] blk-throttle: avoid multiple counting for same bio
-Date: Tue, 13 Feb 2018 14:45:50 +0800
-Message-id: <1518504350-139546-1-git-send-email-cgxu519@icloud.com>
+Received: from mail-pl0-f66.google.com ([209.85.160.66]:33939 "EHLO
+        mail-pl0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751730AbeBAVoG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Feb 2018 16:44:06 -0500
+Received: by mail-pl0-f66.google.com with SMTP id q17so2339632pll.1
+        for <linux-block@vger.kernel.org>; Thu, 01 Feb 2018 13:44:05 -0800 (PST)
+Subject: Re: [PATCH v4 01/13] bcache: set writeback_rate_update_seconds in
+ range [1, 60] seconds
+To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+References: <20180127142406.89741-1-colyli@suse.de>
+ <20180127142406.89741-2-colyli@suse.de>
+From: Michael Lyle <mlyle@lyle.org>
+Message-ID: <37cb226a-2335-89d6-26f7-af611c70586b@lyle.org>
+Date: Thu, 1 Feb 2018 13:44:00 -0800
+MIME-Version: 1.0
+In-Reply-To: <20180127142406.89741-2-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-In current throttling/upper limit policy of blkio cgroup
-blkio.throttle.io_service_bytes does not exactly represent
-the number of bytes issued to the disk by the group, sometimes
-this number could be counted multiple times of real bytes.
-This fix introduces BIO_COUNTED flag to avoid multiple counting
-for same bio.
+On 01/27/2018 06:23 AM, Coly Li wrote:
+> dc->writeback_rate_update_seconds can be set via sysfs and its value can
+> be set to [1, ULONG_MAX].  It does not make sense to set such a large
+> value, 60 seconds is long enough value considering the default 5 seconds
+> works well for long time.
+> 
+> Because dc->writeback_rate_update is a special delayed work, it re-arms
+> itself inside the delayed work routine update_writeback_rate(). When
+> stopping it by cancel_delayed_work_sync(), there should be a timeout to
+> wait and make sure the re-armed delayed work is stopped too. A small max
+> value of dc->writeback_rate_update_seconds is also helpful to decide a
+> reasonable small timeout.
+> 
+> This patch limits sysfs interface to set dc->writeback_rate_update_seconds
+> in range of [1, 60] seconds, and replaces the hand-coded number by macros.
+> 
+> Signed-off-by: Coly Li <colyli@suse.de>
+> Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Chengguang Xu <cgxu519@icloud.com>
----
- include/linux/blk-cgroup.h | 4 ++++
- include/linux/blk_types.h  | 1 +
- 2 files changed, 5 insertions(+)
+[snip]
 
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 69bea82..6c77711 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -686,6 +686,9 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
- 	struct blkcg_gq *blkg;
- 	bool throtl = false;
- 
-+	if (bio_flagged(bio, BIO_COUNTED))
-+		return !throtl;
-+
- 	rcu_read_lock();
- 	blkcg = bio_blkcg(bio);
- 
-@@ -708,6 +711,7 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
- 		blkg_rwstat_add(&blkg->stat_bytes, bio->bi_opf,
- 				bio->bi_iter.bi_size);
- 		blkg_rwstat_add(&blkg->stat_ios, bio->bi_opf, 1);
-+		bio_set_flag(bio, BIO_COUNTED);
- 	}
- 
- 	rcu_read_unlock();
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index bf18b95..23b83e7 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -181,6 +181,7 @@ struct bio {
- 				 * throttling rules. Don't do it again. */
- #define BIO_TRACE_COMPLETION 10	/* bio_endio() should trace the final completion
- 				 * of this bio. */
-+#define BIO_COUNTED	11	/* This bio has already been counted. */
- /* See BVEC_POOL_OFFSET below before adding new flags */
- 
- /*
--- 
-1.8.3.1
+> ---
+>  drivers/md/bcache/sysfs.c     | 3 +++
+>  drivers/md/bcache/writeback.c | 2 +-
+>  drivers/md/bcache/writeback.h | 3 +++
+>  3 files changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+> index b4184092c727..a74a752c9e0f 100644
+> --- a/drivers/md/bcache/sysfs.c
+> +++ b/drivers/md/bcache/sysfs.c
+> @@ -215,6 +215,9 @@ STORE(__cached_dev)
+>  	sysfs_strtoul_clamp(writeback_rate,
+>  			    dc->writeback_rate.rate, 1, INT_MAX);
+>  
+> +	sysfs_strtoul_clamp(writeback_rate_update_seconds,
+> +			    dc->writeback_rate_update_seconds,
+> +			    1, WRITEBACK_RATE_UPDATE_SECS_MAX);
+>  	d_strtoul_nonzero(writeback_rate_update_seconds);
+
+Doesn't the above line need to be removed for this to work?
+
+Mike
