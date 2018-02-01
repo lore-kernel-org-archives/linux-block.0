@@ -1,56 +1,38 @@
-Return-Path: <mpatocka@redhat.com>
-Date: Mon, 5 Feb 2018 14:11:55 -0500 (EST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-cc: linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH] wbt: fix incorrect throttling due to flush latency
-Message-ID: <alpine.LRH.2.02.1802051406190.15867@file01.intranet.prod.int.rdu2.redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] blk-mq-sched: Enable merging discard bio into request
+To: Keith Busch <keith.busch@intel.com>,
+ Linux Block <linux-block@vger.kernel.org>
+Cc: Linux NVMe <linux-nvme@lists.infradead.org>,
+ Christoph Hellwig <hch@lst.de>
+References: <20180201214115.24909-1-keith.busch@intel.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <9e92670b-2e60-c8fb-54f8-84c2959a3c8f@kernel.dk>
+Date: Thu, 1 Feb 2018 14:45:44 -0700
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <20180201214115.24909-1-keith.busch@intel.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-I have a workload where one process sends many asynchronous write bios
-(without waiting for them) and another process sends synchronous flush
-bios. During this workload, writeback throttling throttles down to one
-outstanding bio, and this incorrect throttling causes performance
-degradation (all write bios sleep in __wbt_wait and they couldn't be sent
-in parallel).
+On 2/1/18 2:41 PM, Keith Busch wrote:
+> Signed-off-by: Keith Busch <keith.busch@intel.com>
+> ---
+>  block/blk-mq-sched.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index 55c0a745b427..25c14c58385c 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -259,6 +259,8 @@ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+>  		if (!*merged_request)
+>  			elv_merged_request(q, rq, ELEVATOR_FRONT_MERGE);
+>  		return true;
+> +	case ELEVATOR_DISCARD_MERGE:
+> +		return bio_attempt_discard_merge(q, rq, bio);
+>  	default:
+>  		return false;
 
-The reason for this throttling is that wbt_data_dir counts flush requests
-in the read bucket. The flush requests (that take quite a long time)
-trigger this condition repeatedly:
-	if (stat[READ].min > rwb->min_lat_nsec)
-and that condition causes scale down to one outstanding request, despite
-the fact that there are no read bios at all.
+Thanks Keith, applied.
 
-A similar problem could also show up with REQ_OP_ZONE_REPORT and
-REQ_OP_ZONE_RESET - they are also counted in the read bucket.
-
-This patch fixes the function wbt_data_dir, so that only REQ_OP_READ 
-requests are counted in the read bucket. The patch improves SATA 
-write+flush throughput from 130MB/s to 350MB/s.
-
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-Cc: stable@vger.kernel.org	# v4.12+
-
----
- block/blk-wbt.c |    6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-Index: linux-stable/block/blk-wbt.c
-===================================================================
---- linux-stable.orig/block/blk-wbt.c	2018-02-05 12:30:09.606063908 -0500
-+++ linux-stable/block/blk-wbt.c	2018-02-05 13:50:02.784213501 -0500
-@@ -697,7 +697,11 @@ u64 wbt_default_latency_nsec(struct requ
- 
- static int wbt_data_dir(const struct request *rq)
- {
--	return rq_data_dir(rq);
-+	/*
-+	 * Flushes must be counted in the write bucket, so that high flush
-+	 * latencies don't cause scale down.
-+	 */
-+	return req_op(rq) == REQ_OP_READ ? READ : WRITE;
- }
- 
- int wbt_init(struct request_queue *q)
+-- 
+Jens Axboe
