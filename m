@@ -1,33 +1,66 @@
-Return-Path: <zwp10758@gmail.com>
+Return-Path: <joseph.qi@linux.alibaba.com>
+Subject: Re: [PATCH v2 2/2] block: Fix a race between the throttling code and
+ request queue initialization
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Philipp Reisner <philipp.reisner@linbit.com>,
+ Ulf Hansson <ulf.hansson@linaro.org>, Kees Cook <keescook@chromium.org>,
+ stable@vger.kernel.org
+References: <20180131235300.12773-1-bart.vanassche@wdc.com>
+ <20180131235300.12773-3-bart.vanassche@wdc.com>
+From: Joseph Qi <joseph.qi@linux.alibaba.com>
+Message-ID: <1ff1b2fa-ffe1-20f4-6be9-919c6a5b8227@linux.alibaba.com>
+Date: Thu, 1 Feb 2018 09:53:24 +0800
 MIME-Version: 1.0
-In-Reply-To: <20171211151705.GG2421075@devbig577.frc2.facebook.com>
-References: <20171211145621.GA2115@localhost.didichuxing.com> <20171211151705.GG2421075@devbig577.frc2.facebook.com>
-From: weiping zhang <zwp10758@gmail.com>
-Date: Thu, 18 Jan 2018 23:41:06 +0800
-Message-ID: <CAA70yB6WJcNQqfF7SiT19qJ_sBY-DDDn5kzNmW24SSBgyTLEsw@mail.gmail.com>
-Subject: Re: [RFC] blk-throttle: export io_serviced_recursive, io_service_bytes_recursive
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Tejun Heo <tj@kernel.org>, Shaohua Li <shli@kernel.org>, lizefan@huawei.com,
-	linux-block@vger.kernel.org, cgroups@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20180131235300.12773-3-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-2017-12-11 23:17 GMT+08:00 Tejun Heo <tj@kernel.org>:
-> On Mon, Dec 11, 2017 at 10:56:25PM +0800, weiping zhang wrote:
->> export these two interface for cgroup-v1.
->>
->> Signed-off-by: weiping zhang <zhangweiping@didichuxing.com>
->
-> Acked-by: Tejun Heo <tj@kernel.org>
->
+Hi Bart,
 
-Hi Jens,
+On 18/2/1 07:53, Bart Van Assche wrote:
+> Initialize the request queue lock earlier such that the following
+> race can no longer occur:
+> 
+> blk_init_queue_node                 blkcg_print_blkgs
+>   blk_alloc_queue_node (1)
+>     q->queue_lock = &q->__queue_lock (2)
+>     blkcg_init_queue(q) (3)
+>                                     spin_lock_irq(blkg->q->queue_lock) (4)
+>   q->queue_lock = lock (5)
+>                                     spin_unlock_irq(blkg->q->queue_lock) (6)
+> 
+> (1) allocate an uninitialized queue;
+> (2) initialize queue_lock to its default internal lock;
+> (3) initialize blkcg part of request queue, which will create blkg and
+>     then insert it to blkg_list;
+> (4) traverse blkg_list and find the created blkg, and then take its
+>     queue lock, here it is the default *internal lock*;
+> (5) *race window*, now queue_lock is overridden with *driver specified
+>     lock*;
+> (6) now unlock *driver specified lock*, not the locked *internal lock*,
+>     unlock balance breaks.
+> 
+> The changes in this patch are as follows:
+> - Move the .queue_lock initialization from blk_init_queue_node() into
+>   blk_alloc_queue_node().
+> - For all all block drivers that initialize .queue_lock explicitly,
+>   change the blk_alloc_queue() call in the driver into a
+>   blk_alloc_queue_node() call and remove the explicit .queue_lock
+>   initialization. Additionally, initialize the spin lock that will
+>   be used as queue lock earlier if necessary.
+> 
+I'm afraid the risk may also exist in blk_cleanup_queue, which will
+set queue_lock to to the default internal lock.
 
-Have you got time to check this patch ?
+spin_lock_irq(lock);
+if (q->queue_lock != &q->__queue_lock)
+	q->queue_lock = &q->__queue_lock;
+spin_unlock_irq(lock);
 
-Thanks
+I'm thinking of getting blkg->q->queue_lock to local first, but this
+will result in still using driver lock even the queue_lock has already
+been set to the default internal lock.
 
-> Thanks.
->
-> --
-> tejun
+Thanks,
+Joseph
