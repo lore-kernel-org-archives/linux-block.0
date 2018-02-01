@@ -5,25 +5,23 @@ To: Linux Block <linux-block@vger.kernel.org>,
 	Christoph Hellwig <hch@lst.de>,
 	Jens Axboe <axboe@kernel.dk>
 Cc: Keith Busch <keith.busch@intel.com>
-Subject: [PATCHv2 1/2] block: Merge discard requests as a special case
-Date: Thu,  1 Feb 2018 13:31:57 -0700
-Message-Id: <20180201203158.24761-2-keith.busch@intel.com>
-In-Reply-To: <20180201203158.24761-1-keith.busch@intel.com>
-References: <20180201203158.24761-1-keith.busch@intel.com>
+Subject: [PATCH] block: Merge discard requests as a special case
+Date: Thu,  1 Feb 2018 11:01:28 -0700
+Message-Id: <20180201180128.24470-1-keith.busch@intel.com>
 List-ID: <linux-block@vger.kernel.org>
 
 Discard requests operate under different constraints than other operations
-and have different rules for merging. This patch will handle such requests
+and have different rules for merging. This patch will treat such requests
 as a special case, using the same criteria and segment accounting used
 for merging a discard bio into a reqseut.
 
 Signed-off-by: Keith Busch <keith.busch@intel.com>
 ---
- block/blk-merge.c | 29 ++++++++++++++++++++++++++++-
- 1 file changed, 28 insertions(+), 1 deletion(-)
+ block/blk-merge.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
 diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 8452fc7164cc..e36462bc90f3 100644
+index 8452fc7164cc..37186fb02cf1 100644
 --- a/block/blk-merge.c
 +++ b/block/blk-merge.c
 @@ -550,6 +550,25 @@ static bool req_no_special_merge(struct request *req)
@@ -66,15 +64,5 @@ index 8452fc7164cc..e36462bc90f3 100644
  	if (req_gap_back_merge(req, next->bio))
  		return 0;
  
-@@ -715,7 +741,8 @@ static struct request *attempt_merge(struct request_queue *q,
- 
- 	req->__data_len += blk_rq_bytes(next);
- 
--	elv_merge_requests(q, req, next);
-+	if (req_op(req) != REQ_OP_DISCARD)
-+		elv_merge_requests(q, req, next);
- 
- 	/*
- 	 * 'next' is going away, so update stats accordingly
 -- 
 2.14.3
