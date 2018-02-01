@@ -1,29 +1,27 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:36119 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751190AbeBADID (ORCPT
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:42817 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751168AbeBACb7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Jan 2018 22:08:03 -0500
-Received: by mail-pf0-f193.google.com with SMTP id 23so14665235pfp.3
-        for <linux-block@vger.kernel.org>; Wed, 31 Jan 2018 19:08:03 -0800 (PST)
+        Wed, 31 Jan 2018 21:31:59 -0500
+Received: by mail-pg0-f66.google.com with SMTP id j16so10261651pgn.9
+        for <linux-block@vger.kernel.org>; Wed, 31 Jan 2018 18:31:58 -0800 (PST)
 Subject: Re: [PATCH 2/2] bcache: fix high CPU occupancy during journal
 To: tang.junhui@zte.com.cn, colyli@suse.de
 Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
 References: <1516955050-6271-1-git-send-email-tang.junhui@zte.com.cn>
 From: Michael Lyle <mlyle@lyle.org>
-Message-ID: <b1b31add-aed2-009f-fd70-b62e54951609@lyle.org>
-Date: Wed, 31 Jan 2018 19:07:56 -0800
+Message-ID: <5c819722-13fb-50f3-bd46-603c967a1e32@lyle.org>
+Date: Wed, 31 Jan 2018 18:31:56 -0800
 MIME-Version: 1.0
 In-Reply-To: <1516955050-6271-1-git-send-email-tang.junhui@zte.com.cn>
 Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Unfortunately, this doesn't build because of nonexistent call heap_empty
-(I assume some changes to util.h got left out).  I really need clean
-patches that build and are formatted properly.
+LGTM on first read--  I'll read it again and test in test branch.
 
-Mike
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
 
 On 01/26/2018 12:24 AM, tang.junhui@zte.com.cn wrote:
 > From: Tang Junhui <tang.junhui@zte.com.cn>
