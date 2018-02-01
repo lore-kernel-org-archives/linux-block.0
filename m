@@ -1,44 +1,32 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	stable@vger.kernel.org,
-	Dmitry Monakhov <dmonakhov@openvz.org>
-Subject: [PATCH V2] block: pass inclusive 'lend' parameter to truncate_inode_pages_range
-Date: Sat, 10 Feb 2018 08:46:17 +0800
-Message-Id: <20180210004617.3071-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pl0-f44.google.com ([209.85.160.44]:46243 "EHLO
+        mail-pl0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751994AbeBAVtL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Feb 2018 16:49:11 -0500
+Received: by mail-pl0-f44.google.com with SMTP id 36so4557019ple.13
+        for <linux-block@vger.kernel.org>; Thu, 01 Feb 2018 13:49:11 -0800 (PST)
+Subject: Re: [PATCH v4 06/13] bcache: set error_limit correctly
+To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Junhui Tang <tang.junhui@zte.com.cn>
+References: <20180127142406.89741-1-colyli@suse.de>
+ <20180127142406.89741-7-colyli@suse.de>
+From: Michael Lyle <mlyle@lyle.org>
+Message-ID: <a809420e-c55c-d722-682a-9c8c38da45ee@lyle.org>
+Date: Thu, 1 Feb 2018 13:49:09 -0800
+MIME-Version: 1.0
+In-Reply-To: <20180127142406.89741-7-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The 'lend' parameter of truncate_inode_pages_range is required to be
-inclusive, so follow the rule.
+On 01/27/2018 06:23 AM, Coly Li wrote:
+> Struct cache uses io_errors for two purposes,
+> - Error decay: when cache set error_decay is set, io_errors is used to
+>   generate a small piece of delay when I/O error happens.
+> - I/O errors counter: in order to generate big enough value for error
+>   decay, I/O errors counter value is stored by left shifting 20 bits (a.k.a
+>   IO_ERROR_SHIFT).
 
-This patch fixes one memory corruption triggered by discard.
+This LGTM
 
-Cc: <stable@vger.kernel.org>
-Cc: Dmitry Monakhov <dmonakhov@openvz.org>
-Fixes: 351499a172c0 ("block: Invalidate cache on discard v2")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V2:
-	- Cc stable list and Dmitry as suggested by Bart
-
- block/ioctl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 1668506d8ed8..3884d810efd2 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -225,7 +225,7 @@ static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
- 
- 	if (start + len > i_size_read(bdev->bd_inode))
- 		return -EINVAL;
--	truncate_inode_pages_range(mapping, start, start + len);
-+	truncate_inode_pages_range(mapping, start, start + len - 1);
- 	return blkdev_issue_discard(bdev, start >> 9, len >> 9,
- 				    GFP_KERNEL, flags);
- }
--- 
-2.9.5
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
