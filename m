@@ -1,79 +1,51 @@
-Return-Path: <jiangqi903@gmail.com>
-Return-Path: <jiangqi903@gmail.com>
+Return-Path: <prvs=5639f9be5=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "joseph.qi@linux.alibaba.com" <joseph.qi@linux.alibaba.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>, "ulf.hansson@linaro.org"
+	<ulf.hansson@linaro.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "philipp.reisner@linbit.com"
+	<philipp.reisner@linbit.com>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>, "keescook@chromium.org" <keescook@chromium.org>
 Subject: Re: [PATCH v2 2/2] block: Fix a race between the throttling code and
  request queue initialization
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
- "joseph.qi@linux.alibaba.com" <joseph.qi@linux.alibaba.com>,
- "axboe@kernel.dk" <axboe@kernel.dk>
-Cc: "hch@lst.de" <hch@lst.de>, "ulf.hansson@linaro.org"
- <ulf.hansson@linaro.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "philipp.reisner@linbit.com" <philipp.reisner@linbit.com>,
- "stable@vger.kernel.org" <stable@vger.kernel.org>,
- "keescook@chromium.org" <keescook@chromium.org>
+Date: Thu, 1 Feb 2018 16:16:02 +0000
+Message-ID: <1517501761.2746.21.camel@wdc.com>
 References: <20180131235300.12773-1-bart.vanassche@wdc.com>
- <20180131235300.12773-3-bart.vanassche@wdc.com>
- <1ff1b2fa-ffe1-20f4-6be9-919c6a5b8227@linux.alibaba.com>
- <1517501761.2746.21.camel@wdc.com>
-From: Joseph Qi <jiangqi903@gmail.com>
-Message-ID: <26f758cf-430c-aa7f-0d21-75fbad6db260@gmail.com>
-Date: Fri, 2 Feb 2018 09:02:46 +0800
+	 <20180131235300.12773-3-bart.vanassche@wdc.com>
+	 <1ff1b2fa-ffe1-20f4-6be9-919c6a5b8227@linux.alibaba.com>
+In-Reply-To: <1ff1b2fa-ffe1-20f4-6be9-919c6a5b8227@linux.alibaba.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1517501761.2746.21.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Bart,
-
-On 18/2/2 00:16, Bart Van Assche wrote:
-> On Thu, 2018-02-01 at 09:53 +0800, Joseph Qi wrote:
->> I'm afraid the risk may also exist in blk_cleanup_queue, which will
->> set queue_lock to to the default internal lock.
->>
->> spin_lock_irq(lock);
->> if (q->queue_lock != &q->__queue_lock)
->> 	q->queue_lock = &q->__queue_lock;
->> spin_unlock_irq(lock);
->>
->> I'm thinking of getting blkg->q->queue_lock to local first, but this
->> will result in still using driver lock even the queue_lock has already
->> been set to the default internal lock.
-> 
-> Hello Joseph,
-> 
-> I think the race between the queue_lock assignment in blk_cleanup_queue()
-> and the use of that pointer by cgroup attributes could be solved by
-> removing the visibility of these attributes from blk_cleanup_queue() instead
-> of __blk_release_queue(). However, last time I proposed to move code from
-> __blk_release_queue() into blk_cleanup_queue() I received the feedback that
-> from some kernel developers that they didn't like this.
-> 
-> Is the block driver that triggered the race on the q->queue_lock assignment
-> using legacy (single queue) or multiqueue (blk-mq) mode? If that driver is
-> using legacy mode, are you aware that there are plans to remove legacy mode
-> from the upstream kernel? And if your driver is using multiqueue mode, how
-> about the following change instead of the two patches in this patch series:
-> 
-We triggered this race when using single queue. I'm not sure if it
-exists in multi-queue.
-Do you mean upstream won't fix bugs any more in single queue?
-
-Thanks,
-Joseph
-
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -1093,7 +1093,7 @@ blk_init_queue_node(request_fn_proc *rfn, spinlock_t *lock, int node_id)
->  		return NULL;
->  
->  	q->request_fn = rfn;
-> -	if (lock)
-> +	if (!q->mq_ops && lock)
->  		q->queue_lock = lock;
->  	if (blk_init_allocated_queue(q) < 0) {
->  		blk_cleanup_queue(q);
-> 
-> Thanks,
-> 
-> Bart.
-> 
+T24gVGh1LCAyMDE4LTAyLTAxIGF0IDA5OjUzICswODAwLCBKb3NlcGggUWkgd3JvdGU6DQo+IEkn
+bSBhZnJhaWQgdGhlIHJpc2sgbWF5IGFsc28gZXhpc3QgaW4gYmxrX2NsZWFudXBfcXVldWUsIHdo
+aWNoIHdpbGwNCj4gc2V0IHF1ZXVlX2xvY2sgdG8gdG8gdGhlIGRlZmF1bHQgaW50ZXJuYWwgbG9j
+ay4NCj4gDQo+IHNwaW5fbG9ja19pcnEobG9jayk7DQo+IGlmIChxLT5xdWV1ZV9sb2NrICE9ICZx
+LT5fX3F1ZXVlX2xvY2spDQo+IAlxLT5xdWV1ZV9sb2NrID0gJnEtPl9fcXVldWVfbG9jazsNCj4g
+c3Bpbl91bmxvY2tfaXJxKGxvY2spOw0KPiANCj4gSSdtIHRoaW5raW5nIG9mIGdldHRpbmcgYmxr
+Zy0+cS0+cXVldWVfbG9jayB0byBsb2NhbCBmaXJzdCwgYnV0IHRoaXMNCj4gd2lsbCByZXN1bHQg
+aW4gc3RpbGwgdXNpbmcgZHJpdmVyIGxvY2sgZXZlbiB0aGUgcXVldWVfbG9jayBoYXMgYWxyZWFk
+eQ0KPiBiZWVuIHNldCB0byB0aGUgZGVmYXVsdCBpbnRlcm5hbCBsb2NrLg0KDQpIZWxsbyBKb3Nl
+cGgsDQoNCkkgdGhpbmsgdGhlIHJhY2UgYmV0d2VlbiB0aGUgcXVldWVfbG9jayBhc3NpZ25tZW50
+IGluIGJsa19jbGVhbnVwX3F1ZXVlKCkNCmFuZCB0aGUgdXNlIG9mIHRoYXQgcG9pbnRlciBieSBj
+Z3JvdXAgYXR0cmlidXRlcyBjb3VsZCBiZSBzb2x2ZWQgYnkNCnJlbW92aW5nIHRoZSB2aXNpYmls
+aXR5IG9mIHRoZXNlIGF0dHJpYnV0ZXMgZnJvbSBibGtfY2xlYW51cF9xdWV1ZSgpIGluc3RlYWQN
+Cm9mIF9fYmxrX3JlbGVhc2VfcXVldWUoKS4gSG93ZXZlciwgbGFzdCB0aW1lIEkgcHJvcG9zZWQg
+dG8gbW92ZSBjb2RlIGZyb20NCl9fYmxrX3JlbGVhc2VfcXVldWUoKSBpbnRvIGJsa19jbGVhbnVw
+X3F1ZXVlKCkgSSByZWNlaXZlZCB0aGUgZmVlZGJhY2sgdGhhdA0KZnJvbSBzb21lIGtlcm5lbCBk
+ZXZlbG9wZXJzIHRoYXQgdGhleSBkaWRuJ3QgbGlrZSB0aGlzLg0KDQpJcyB0aGUgYmxvY2sgZHJp
+dmVyIHRoYXQgdHJpZ2dlcmVkIHRoZSByYWNlIG9uIHRoZSBxLT5xdWV1ZV9sb2NrIGFzc2lnbm1l
+bnQNCnVzaW5nIGxlZ2FjeSAoc2luZ2xlIHF1ZXVlKSBvciBtdWx0aXF1ZXVlIChibGstbXEpIG1v
+ZGU/IElmIHRoYXQgZHJpdmVyIGlzDQp1c2luZyBsZWdhY3kgbW9kZSwgYXJlIHlvdSBhd2FyZSB0
+aGF0IHRoZXJlIGFyZSBwbGFucyB0byByZW1vdmUgbGVnYWN5IG1vZGUNCmZyb20gdGhlIHVwc3Ry
+ZWFtIGtlcm5lbD8gQW5kIGlmIHlvdXIgZHJpdmVyIGlzIHVzaW5nIG11bHRpcXVldWUgbW9kZSwg
+aG93DQphYm91dCB0aGUgZm9sbG93aW5nIGNoYW5nZSBpbnN0ZWFkIG9mIHRoZSB0d28gcGF0Y2hl
+cyBpbiB0aGlzIHBhdGNoIHNlcmllczoNCg0KLS0tIGEvYmxvY2svYmxrLWNvcmUuYw0KKysrIGIv
+YmxvY2svYmxrLWNvcmUuYw0KQEAgLTEwOTMsNyArMTA5Myw3IEBAIGJsa19pbml0X3F1ZXVlX25v
+ZGUocmVxdWVzdF9mbl9wcm9jICpyZm4sIHNwaW5sb2NrX3QgKmxvY2ssIGludCBub2RlX2lkKQ0K
+IAkJcmV0dXJuIE5VTEw7DQogDQogCXEtPnJlcXVlc3RfZm4gPSByZm47DQotCWlmIChsb2NrKQ0K
+KwlpZiAoIXEtPm1xX29wcyAmJiBsb2NrKQ0KIAkJcS0+cXVldWVfbG9jayA9IGxvY2s7DQogCWlm
+IChibGtfaW5pdF9hbGxvY2F0ZWRfcXVldWUocSkgPCAwKSB7DQogCQlibGtfY2xlYW51cF9xdWV1
+ZShxKTsNCg0KVGhhbmtzLA0KDQpCYXJ0Lg==
