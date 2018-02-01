@@ -1,124 +1,78 @@
-Return-Path: <sagi@grimberg.me>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Jason Gunthorpe <jgg@ziepe.ca>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Idan Burstein <idanb@mellanox.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH rfc 5/5] IB/cq: wire up adaptive moderation to workqueue based completion queues
-Date: Tue,  6 Feb 2018 00:03:16 +0200
-Message-Id: <20180205220316.30236-6-sagi@grimberg.me>
-In-Reply-To: <20180205220316.30236-1-sagi@grimberg.me>
-References: <20180205220316.30236-1-sagi@grimberg.me>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: WARNING: CPU: 2 PID: 207 at drivers/nvme/host/core.c:527
+ nvme_setup_cmd+0x3d3
+To: Keith Busch <keith.busch@intel.com>
+Cc: "jianchao.wang" <jianchao.w.wang@oracle.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Christoph Hellwig <hch@lst.de>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ Ming Lei <ming.lei@redhat.com>
+References: <45f93661-da0d-94c5-1740-85242df8776e@kernel.dk>
+ <0872b361-157b-a876-20af-3d7a4ee7ff31@kernel.dk>
+ <8fd916ab-42d7-c654-5a01-8f1eb4be730e@oracle.com>
+ <0b7686b3-f716-49ba-c7c4-929d84905569@kernel.dk>
+ <7459ffed-c63c-38a9-84f5-456c2a5c4fe0@oracle.com>
+ <0f6c248b-eb67-9b02-a4b9-0366d476e70d@kernel.dk>
+ <20180201045645.GF27735@localhost.localdomain>
+ <576ba7dc-78cf-b5d2-d1de-446d1f4b2732@kernel.dk>
+ <7ec361a3-8900-d259-6842-e0b0b14a253a@kernel.dk>
+ <20180201195212.GD24417@localhost.localdomain>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <5585297e-385d-8f8b-06bb-834d655293dc@kernel.dk>
+Date: Thu, 1 Feb 2018 13:55:34 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180201195212.GD24417@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/infiniband/core/cq.c | 25 ++++++++++++++++++++-----
- include/rdma/ib_verbs.h      |  9 +++++++--
- 2 files changed, 27 insertions(+), 7 deletions(-)
+On 2/1/18 12:52 PM, Keith Busch wrote:
+> On Thu, Feb 01, 2018 at 10:58:23AM -0700, Jens Axboe wrote:
+>> I was able to reproduce on a test box, pretty trivially in fact:
+>>
+>> # echo mq-deadline > /sys/block/nvme2n1/queue/scheduler
+>> # mkfs.ext4 /dev/nvme2n1
+>> # mount /dev/nvme2n1 /data -o discard
+>> # dd if=/dev/zero of=/data/10g bs=1M count=10k
+>> # sync
+>> # rm /data/10g
+>> # sync <- triggered
+>>
+>> Your patch still doesn't work, but mainly because we init the segments
+>> to 0 when setting up a discard. The below works for me, and cleans up
+>> the merge path a bit, since your patch was missing various adjustments
+>> on both the merged and freed request.
+> 
+> I'm still finding cases not accounted even your patch. I had to use the
+> following on top of that, and this pattern looks like it needs to be
+> repeated for all schedulers:
+> 
+> ---
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index 55c0a745b427..25c14c58385c 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -259,6 +259,8 @@ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+>  		if (!*merged_request)
+>  			elv_merged_request(q, rq, ELEVATOR_FRONT_MERGE);
+>  		return true;
+> +	case ELEVATOR_DISCARD_MERGE:
+> +		return bio_attempt_discard_merge(q, rq, bio);
 
-diff --git a/drivers/infiniband/core/cq.c b/drivers/infiniband/core/cq.c
-index 270801d28f9d..1d984fd77449 100644
---- a/drivers/infiniband/core/cq.c
-+++ b/drivers/infiniband/core/cq.c
-@@ -13,6 +13,7 @@
- #include <linux/module.h>
- #include <linux/err.h>
- #include <linux/slab.h>
-+#include <linux/irq-am.h>
- #include <rdma/ib_verbs.h>
- 
- /* # of WCs to poll for with a single call to ib_poll_cq */
-@@ -70,6 +71,13 @@ static int ib_cq_irqpoll_am(struct irq_poll *iop, unsigned short level)
- 	return ib_cq_am(cq, level);
- }
- 
-+static int ib_cq_workqueue_am(struct irq_am *am, unsigned short level)
-+{
-+	struct ib_cq *cq = container_of(am, struct ib_cq, wq.am);
-+
-+	return ib_cq_am(cq, level);
-+}
-+
- static int __ib_process_cq(struct ib_cq *cq, int budget)
- {
- 	int i, n, completed = 0;
-@@ -147,18 +155,21 @@ static void ib_cq_completion_softirq(struct ib_cq *cq, void *private)
- 
- static void ib_cq_poll_work(struct work_struct *work)
- {
--	struct ib_cq *cq = container_of(work, struct ib_cq, work);
-+	struct ib_cq *cq = container_of(work, struct ib_cq, wq.work);
- 	int completed;
- 
- 	completed = __ib_process_cq(cq, IB_POLL_BUDGET_WORKQUEUE);
-+	irq_am_add_comps(&cq->wq.am, completed);
- 	if (completed >= IB_POLL_BUDGET_WORKQUEUE ||
- 	    ib_req_notify_cq(cq, IB_POLL_FLAGS) > 0)
--		queue_work(ib_comp_wq, &cq->work);
-+		queue_work(ib_comp_wq, &cq->wq.work);
-+	else
-+		irq_am_add_event(&cq->wq.am);
- }
- 
- static void ib_cq_completion_workqueue(struct ib_cq *cq, void *private)
- {
--	queue_work(ib_comp_wq, &cq->work);
-+	queue_work(ib_comp_wq, &cq->wq.work);
- }
- 
- /**
-@@ -214,7 +225,10 @@ struct ib_cq *ib_alloc_cq(struct ib_device *dev, void *private,
- 		break;
- 	case IB_POLL_WORKQUEUE:
- 		cq->comp_handler = ib_cq_completion_workqueue;
--		INIT_WORK(&cq->work, ib_cq_poll_work);
-+		INIT_WORK(&cq->wq.work, ib_cq_poll_work);
-+		if (cq->device->modify_cq)
-+			irq_am_init(&cq->wq.am, IB_CQ_AM_NR_EVENTS,
-+				IB_CQ_AM_NR_LEVELS, 0, ib_cq_workqueue_am);
- 		ib_req_notify_cq(cq, IB_CQ_NEXT_COMP);
- 		break;
- 	default:
-@@ -250,7 +264,8 @@ void ib_free_cq(struct ib_cq *cq)
- 		irq_poll_disable(&cq->iop);
- 		break;
- 	case IB_POLL_WORKQUEUE:
--		cancel_work_sync(&cq->work);
-+		cancel_work_sync(&cq->wq.work);
-+		irq_am_cleanup(&cq->wq.am);
- 		break;
- 	default:
- 		WARN_ON_ONCE(1);
-diff --git a/include/rdma/ib_verbs.h b/include/rdma/ib_verbs.h
-index fd84cda5ed7c..14a93566adb6 100644
---- a/include/rdma/ib_verbs.h
-+++ b/include/rdma/ib_verbs.h
-@@ -1555,6 +1555,11 @@ enum ib_poll_context {
- 	IB_POLL_WORKQUEUE,	/* poll from workqueue */
- };
- 
-+struct ib_cq_workqueue_poll {
-+	struct irq_am		am;
-+	struct work_struct	work;
-+};
-+
- struct ib_cq {
- 	struct ib_device       *device;
- 	struct ib_uobject      *uobject;
-@@ -1566,8 +1571,8 @@ struct ib_cq {
- 	enum ib_poll_context	poll_ctx;
- 	struct ib_wc		*wc;
- 	union {
--		struct irq_poll		iop;
--		struct work_struct	work;
-+		struct irq_poll			iop;
-+		struct ib_cq_workqueue_poll	wq;
- 	};
- };
- 
+Yes, we need this to enable the bio-to-request merging.
+
+> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+> index c56f211c8440..a0f5752b6858 100644
+> --- a/block/mq-deadline.c
+> +++ b/block/mq-deadline.c
+> @@ -451,7 +451,7 @@ static int dd_request_merge(struct request_queue *q, struct request **rq,
+>  
+>  		if (elv_bio_merge_ok(__rq, bio)) {
+>  			*rq = __rq;
+> -			return ELEVATOR_FRONT_MERGE;
+> +			return blk_try_merge(__rq, bio);
+
+This isn't needed. We already know it's a front merge at this point,
+and it can only be a normal read/write request.
+
 -- 
-2.14.1
+Jens Axboe
