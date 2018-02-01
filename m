@@ -1,196 +1,153 @@
-Return-Path: <ming.lei@redhat.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:60452 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751408AbeBAPFj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 1 Feb 2018 10:05:39 -0500
+Date: Thu, 1 Feb 2018 23:04:48 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: linux-scsi@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Arun Easi <arun.easi@cavium.com>,
-	Omar Sandoval <osandov@fb.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Don Brace <don.brace@microsemi.com>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Peter Rivera <peter.rivera@broadcom.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Laurence Oberman <loberman@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 5/5] scsi: virtio_scsi: fix IO hang by irq vector automatic affinity
-Date: Sat,  3 Feb 2018 12:21:12 +0800
-Message-Id: <20180203042112.15239-6-ming.lei@redhat.com>
-In-Reply-To: <20180203042112.15239-1-ming.lei@redhat.com>
-References: <20180203042112.15239-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+To: Don Brace <don.brace@microsemi.com>
+Cc: Laurence Oberman <loberman@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@fb.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Mike Snitzer <snitzer@redhat.com>, linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 0/2] genirq/affinity: try to make sure online CPU is
+ assgined to irq vector
+Message-ID: <20180201150441.GA32269@ming.t460p>
+References: <20180115160345.2611-1-ming.lei@redhat.com>
+ <20180115174036.GA20191@infradead.org>
+ <20180116013043.GA3213@ming.t460p>
+ <alpine.DEB.2.20.1801161223500.1823@nanos>
+ <1516109317.9574.1.camel@redhat.com>
+ <a6086631efd54749a298add3d6b9a134@microsemi.com>
+ <20180201103651.GA29263@ming.t460p>
+ <35e74f9ae47b4b5db8ee4bf3a8989e82@microsemi.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <35e74f9ae47b4b5db8ee4bf3a8989e82@microsemi.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Now 84676c1f21e8ff5(genirq/affinity: assign vectors to all possible CPUs)
-has been merged to V4.16-rc, and it is easy to allocate all offline CPUs
-for some irq vectors, this can't be avoided even though the allocation
-is improved.
+On Thu, Feb 01, 2018 at 02:53:35PM +0000, Don Brace wrote:
+> > -----Original Message-----
+> > From: Ming Lei [mailto:ming.lei@redhat.com]
+> > Sent: Thursday, February 01, 2018 4:37 AM
+> > To: Don Brace <don.brace@microsemi.com>
+> > Cc: Laurence Oberman <loberman@redhat.com>; Thomas Gleixner
+> > <tglx@linutronix.de>; Christoph Hellwig <hch@infradead.org>; Jens Axboe
+> > <axboe@fb.com>; linux-block@vger.kernel.org; linux-kernel@vger.kernel.org;
+> > Mike Snitzer <snitzer@redhat.com>
+> > Subject: Re: [PATCH 0/2] genirq/affinity: try to make sure online CPU is assgined
+> > to irq vector
+> > 
+> > EXTERNAL EMAIL
+> > 
+> > 
+> > On Tue, Jan 16, 2018 at 03:22:18PM +0000, Don Brace wrote:
+> > > > -----Original Message-----
+> > > > From: Laurence Oberman [mailto:loberman@redhat.com]
+> > > > Sent: Tuesday, January 16, 2018 7:29 AM
+> > > > To: Thomas Gleixner <tglx@linutronix.de>; Ming Lei <ming.lei@redhat.com>
+> > > > Cc: Christoph Hellwig <hch@infradead.org>; Jens Axboe <axboe@fb.com>;
+> > > > linux-block@vger.kernel.org; linux-kernel@vger.kernel.org; Mike Snitzer
+> > > > <snitzer@redhat.com>; Don Brace <don.brace@microsemi.com>
+> > > > Subject: Re: [PATCH 0/2] genirq/affinity: try to make sure online CPU is
+> > assgined
+> > > > to irq vector
+> > > >
+> > > > > > It is because of irq_create_affinity_masks().
+> > > > >
+> > > > > That still does not answer the question. If the interrupt for a queue
+> > > > > is
+> > > > > assigned to an offline CPU, then the queue should not be used and
+> > > > > never
+> > > > > raise an interrupt. That's how managed interrupts have been designed.
+> > > > >
+> > > > > Thanks,
+> > > > >
+> > > > >       tglx
+> > > > >
+> > > > >
+> > > > >
+> > > > >
+> > > >
+> > > > I captured a full boot log for this issue for Microsemi, I will send it
+> > > > to Don Brace.
+> > > > I enabled all the HPSA debug and here is snippet
+> > > >
+> > > >
+> > > > ..
+> > > > ..
+> > > > ..
+> > > >   246.751135] INFO: task systemd-udevd:413 blocked for more than 120
+> > > > seconds.
+> > > > [��246.788008]�������Tainted: G          I      4.15.0-rc4.noming+ #1
+> > > > [��246.822380] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+> > > > disables this message.
+> > > > [��246.865594] systemd-udevd   D    0   413    411 0x80000004
+> > > > [��246.895519] Call Trace:
+> > > > [��246.909713]��? __schedule+0x340/0xc20
+> > > > [��246.930236]��schedule+0x32/0x80
+> > > > [��246.947905]��schedule_timeout+0x23d/0x450
+> > > > [  246.970047]��? find_held_lock+0x2d/0x90
+> > > > [��246.991774]��? wait_for_completion_io+0x108/0x170
+> > > > [��247.018172]��io_schedule_timeout+0x19/0x40
+> > > > [��247.041208]��wait_for_completion_io+0x110/0x170
+> > > > [��247.067326]��? wake_up_q+0x70/0x70
+> > > > [��247.086801]��hpsa_scsi_do_simple_cmd+0xc6/0x100 [hpsa]
+> > > > [��247.114315]��hpsa_scsi_do_simple_cmd_with_retry+0xb7/0x1c0 [hpsa]
+> > > > [��247.146629]��hpsa_scsi_do_inquiry+0x73/0xd0 [hpsa]
+> > > > [��247.174118]��hpsa_init_one+0x12cb/0x1a59 [hpsa]
+> > >
+> > > This trace comes from internally generated discovery commands. No SCSI
+> > devices have
+> > > been presented to the SML yet.
+> > >
+> > > At this point we should be running on only one CPU. These commands are
+> > meant to use
+> > > reply queue 0 which are tied to CPU 0. It's interesting that the patch helps.
+> > >
+> > > However, I was wondering if you could inspect the iLo IML logs and send the
+> > > AHS logs for inspection.
+> > 
+> > Hello Don,
+> > 
+> > Now the patch has been merged to linus tree as:
+> > 
+> > 84676c1f21e8ff54b ("genirq/affinity: assign vectors to all possible CPUs")
+> > 
+> > and it breaks Laurence's machine completely, :-(
+> > 
+> > I just take a look at HPSA's code, and found that reply queue is chosen
+> > in the following way in most of code path:
+> > 
+> >         if (likely(reply_queue == DEFAULT_REPLY_QUEUE))
+> >                 cp->ReplyQueue = smp_processor_id() % h->nreply_queues;
+> > 
+> > h->nreply_queues is the msix vector number which is returned from
+> > pci_alloc_irq_vectors(), and now some of vectors may be mapped to all
+> > offline CPUs, for example, one processor isn't plugged to socket.
+> > 
+> > If I understand correctly, 'cp->ReplyQueue' is aligned to one irq
+> > vector, and the command is expected by handled via that irq vector,
+> > is it right?
+> > 
+> > If yes, now I guess this way can't work any more if number of online
+> > CPUs is >= h->nreply_queues, and you may need to check the cpu affinity
+> > of one vector before choosing the reply queue, and block/blk-mq-pci.c
+> > may be helpful for you.
+> > 
+> > Thanks,
+> > Ming
+> 
+> Thanks Ming,
+> I start working up a patch.
 
-For example, on a 8cores VM, 4~7 are not-present/offline, 4 queues of
-virtio-scsi, the irq affinity assigned can become the following shape:
+Also the reply queue may be mapped to blk-mq's hw queue directly, then the
+conversion may be done by blk-mq's MQ framework, but legacy path still need
+the fix.
 
-	irq 36, cpu list 0-7
-	irq 37, cpu list 0-7
-	irq 38, cpu list 0-7
-	irq 39, cpu list 0-1
-	irq 40, cpu list 4,6
-	irq 41, cpu list 2-3
-	irq 42, cpu list 5,7
-
-Then IO hang is triggered in case of non-SCSI_MQ.
-
-Given storage IO is always C/S model, there isn't such issue with SCSI_MQ(blk-mq),
-because no IO can be submitted to one hw queue if the hw queue hasn't online
-CPUs.
-
-Fix this issue by forcing to use blk_mq.
-
-BTW, I have been used virtio-scsi(scsi_mq) for several years, and it has
-been quite stable, so it shouldn't cause extra risk.
-
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Arun Easi <arun.easi@cavium.com>
-Cc: Omar Sandoval <osandov@fb.com>,
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-Cc: Christoph Hellwig <hch@lst.de>,
-Cc: Don Brace <don.brace@microsemi.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Peter Rivera <peter.rivera@broadcom.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Laurence Oberman <loberman@redhat.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/virtio_scsi.c | 59 +++-------------------------------------------
- 1 file changed, 3 insertions(+), 56 deletions(-)
-
-diff --git a/drivers/scsi/virtio_scsi.c b/drivers/scsi/virtio_scsi.c
-index 7c28e8d4955a..54e3a0f6844c 100644
---- a/drivers/scsi/virtio_scsi.c
-+++ b/drivers/scsi/virtio_scsi.c
-@@ -91,9 +91,6 @@ struct virtio_scsi_vq {
- struct virtio_scsi_target_state {
- 	seqcount_t tgt_seq;
- 
--	/* Count of outstanding requests. */
--	atomic_t reqs;
--
- 	/* Currently active virtqueue for requests sent to this target. */
- 	struct virtio_scsi_vq *req_vq;
- };
-@@ -152,8 +149,6 @@ static void virtscsi_complete_cmd(struct virtio_scsi *vscsi, void *buf)
- 	struct virtio_scsi_cmd *cmd = buf;
- 	struct scsi_cmnd *sc = cmd->sc;
- 	struct virtio_scsi_cmd_resp *resp = &cmd->resp.cmd;
--	struct virtio_scsi_target_state *tgt =
--				scsi_target(sc->device)->hostdata;
- 
- 	dev_dbg(&sc->device->sdev_gendev,
- 		"cmd %p response %u status %#02x sense_len %u\n",
-@@ -210,8 +205,6 @@ static void virtscsi_complete_cmd(struct virtio_scsi *vscsi, void *buf)
- 	}
- 
- 	sc->scsi_done(sc);
--
--	atomic_dec(&tgt->reqs);
- }
- 
- static void virtscsi_vq_done(struct virtio_scsi *vscsi,
-@@ -580,10 +573,7 @@ static int virtscsi_queuecommand_single(struct Scsi_Host *sh,
- 					struct scsi_cmnd *sc)
- {
- 	struct virtio_scsi *vscsi = shost_priv(sh);
--	struct virtio_scsi_target_state *tgt =
--				scsi_target(sc->device)->hostdata;
- 
--	atomic_inc(&tgt->reqs);
- 	return virtscsi_queuecommand(vscsi, &vscsi->req_vqs[0], sc);
- }
- 
-@@ -596,55 +586,11 @@ static struct virtio_scsi_vq *virtscsi_pick_vq_mq(struct virtio_scsi *vscsi,
- 	return &vscsi->req_vqs[hwq];
- }
- 
--static struct virtio_scsi_vq *virtscsi_pick_vq(struct virtio_scsi *vscsi,
--					       struct virtio_scsi_target_state *tgt)
--{
--	struct virtio_scsi_vq *vq;
--	unsigned long flags;
--	u32 queue_num;
--
--	local_irq_save(flags);
--	if (atomic_inc_return(&tgt->reqs) > 1) {
--		unsigned long seq;
--
--		do {
--			seq = read_seqcount_begin(&tgt->tgt_seq);
--			vq = tgt->req_vq;
--		} while (read_seqcount_retry(&tgt->tgt_seq, seq));
--	} else {
--		/* no writes can be concurrent because of atomic_t */
--		write_seqcount_begin(&tgt->tgt_seq);
--
--		/* keep previous req_vq if a reader just arrived */
--		if (unlikely(atomic_read(&tgt->reqs) > 1)) {
--			vq = tgt->req_vq;
--			goto unlock;
--		}
--
--		queue_num = smp_processor_id();
--		while (unlikely(queue_num >= vscsi->num_queues))
--			queue_num -= vscsi->num_queues;
--		tgt->req_vq = vq = &vscsi->req_vqs[queue_num];
-- unlock:
--		write_seqcount_end(&tgt->tgt_seq);
--	}
--	local_irq_restore(flags);
--
--	return vq;
--}
--
- static int virtscsi_queuecommand_multi(struct Scsi_Host *sh,
- 				       struct scsi_cmnd *sc)
- {
- 	struct virtio_scsi *vscsi = shost_priv(sh);
--	struct virtio_scsi_target_state *tgt =
--				scsi_target(sc->device)->hostdata;
--	struct virtio_scsi_vq *req_vq;
--
--	if (shost_use_blk_mq(sh))
--		req_vq = virtscsi_pick_vq_mq(vscsi, sc);
--	else
--		req_vq = virtscsi_pick_vq(vscsi, tgt);
-+	struct virtio_scsi_vq *req_vq = virtscsi_pick_vq_mq(vscsi, sc);
- 
- 	return virtscsi_queuecommand(vscsi, req_vq, sc);
- }
-@@ -775,7 +721,6 @@ static int virtscsi_target_alloc(struct scsi_target *starget)
- 		return -ENOMEM;
- 
- 	seqcount_init(&tgt->tgt_seq);
--	atomic_set(&tgt->reqs, 0);
- 	tgt->req_vq = &vscsi->req_vqs[0];
- 
- 	starget->hostdata = tgt;
-@@ -823,6 +768,7 @@ static struct scsi_host_template virtscsi_host_template_single = {
- 	.target_alloc = virtscsi_target_alloc,
- 	.target_destroy = virtscsi_target_destroy,
- 	.track_queue_depth = 1,
-+	.force_blk_mq = 1,
- };
- 
- static struct scsi_host_template virtscsi_host_template_multi = {
-@@ -844,6 +790,7 @@ static struct scsi_host_template virtscsi_host_template_multi = {
- 	.target_destroy = virtscsi_target_destroy,
- 	.map_queues = virtscsi_map_queues,
- 	.track_queue_depth = 1,
-+	.force_blk_mq = 1,
- };
- 
- #define virtscsi_config_get(vdev, fld) \
--- 
-2.9.5
+thanks
+Ming
