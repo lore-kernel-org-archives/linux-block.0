@@ -1,25 +1,80 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCHv2 1/2] block: Merge discard requests as a special case
-To: Keith Busch <keith.busch@intel.com>,
- Linux Block <linux-block@vger.kernel.org>,
- Linux NVMe <linux-nvme@lists.infradead.org>, Christoph Hellwig <hch@lst.de>
+Return-Path: <keith.busch@intel.com>
+From: Keith Busch <keith.busch@intel.com>
+To: Linux Block <linux-block@vger.kernel.org>,
+	Linux NVMe <linux-nvme@lists.infradead.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <keith.busch@intel.com>
+Subject: [PATCHv2 1/2] block: Merge discard requests as a special case
+Date: Thu,  1 Feb 2018 13:31:57 -0700
+Message-Id: <20180201203158.24761-2-keith.busch@intel.com>
+In-Reply-To: <20180201203158.24761-1-keith.busch@intel.com>
 References: <20180201203158.24761-1-keith.busch@intel.com>
- <20180201203158.24761-2-keith.busch@intel.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <d55e87e6-e59c-9a22-297b-039febcb953c@kernel.dk>
-Date: Thu, 1 Feb 2018 14:00:06 -0700
-MIME-Version: 1.0
-In-Reply-To: <20180201203158.24761-2-keith.busch@intel.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 2/1/18 1:31 PM, Keith Busch wrote:
-> Discard requests operate under different constraints than other operations
-> and have different rules for merging. This patch will handle such requests
-> as a special case, using the same criteria and segment accounting used
-> for merging a discard bio into a reqseut.
+Discard requests operate under different constraints than other operations
+and have different rules for merging. This patch will handle such requests
+as a special case, using the same criteria and segment accounting used
+for merging a discard bio into a reqseut.
 
-I already fixed this one up.
+Signed-off-by: Keith Busch <keith.busch@intel.com>
+---
+ block/blk-merge.c | 29 ++++++++++++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
 
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 8452fc7164cc..e36462bc90f3 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -550,6 +550,25 @@ static bool req_no_special_merge(struct request *req)
+ 	return !q->mq_ops && req->special;
+ }
+ 
++static int req_attempt_discard_merge(struct request_queue *q, struct request *req,
++		struct request *next)
++{
++	unsigned short segments = blk_rq_nr_discard_segments(req);
++
++	if (segments >= queue_max_discard_segments(q))
++		goto no_merge;
++	if (blk_rq_sectors(req) + bio_sectors(next->bio) >
++	    blk_rq_get_max_sectors(req, blk_rq_pos(req)))
++		goto no_merge;
++
++	req->nr_phys_segments = segments + blk_rq_nr_discard_segments(next);
++	return 1;
++
++no_merge:
++	req_set_nomerge(q, req);
++	return 0;
++}
++
+ static int ll_merge_requests_fn(struct request_queue *q, struct request *req,
+ 				struct request *next)
+ {
+@@ -564,6 +583,13 @@ static int ll_merge_requests_fn(struct request_queue *q, struct request *req,
+ 	if (req_no_special_merge(req) || req_no_special_merge(next))
+ 		return 0;
+ 
++	/*
++	 * Merging discard requests use different constraints than other
++	 * operations.
++	 */
++	if (req_op(req) == REQ_OP_DISCARD)
++		return req_attempt_discard_merge(q, req, next);
++
+ 	if (req_gap_back_merge(req, next->bio))
+ 		return 0;
+ 
+@@ -715,7 +741,8 @@ static struct request *attempt_merge(struct request_queue *q,
+ 
+ 	req->__data_len += blk_rq_bytes(next);
+ 
+-	elv_merge_requests(q, req, next);
++	if (req_op(req) != REQ_OP_DISCARD)
++		elv_merge_requests(q, req, next);
+ 
+ 	/*
+ 	 * 'next' is going away, so update stats accordingly
 -- 
-Jens Axboe
+2.14.3
