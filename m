@@ -1,103 +1,177 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:37703 "EHLO mx2.suse.de"
+Received: from out1.zte.com.cn ([202.103.147.172]:37008 "EHLO mxct.zte.com.cn"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752132AbeBFEVP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Feb 2018 23:21:15 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH v5 00/10] bcache: device failure handling improvement 
-Date: Tue,  6 Feb 2018 12:20:50 +0800
-Message-Id: <20180206042100.65021-1-colyli@suse.de>
+        id S1751811AbeBAIMV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 1 Feb 2018 03:12:21 -0500
+From: tang.junhui@zte.com.cn
+To: colyli@suse.de, mlyle@lyle.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        tang.junhui@zte.com.cn
+Subject: [PATCH v2 2/2] bcache: fix high CPU occupancy during journal
+Date: Thu, 1 Feb 2018 16:14:46 +0800
+Message-Id: <1517472886-4240-2-git-send-email-tang.junhui@zte.com.cn>
+In-Reply-To: <1517472886-4240-1-git-send-email-tang.junhui@zte.com.cn>
+References: <1517472886-4240-1-git-send-email-tang.junhui@zte.com.cn>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi maintainers and folks,
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-This patch set tries to improve bcache device failure handling, includes
-cache device and backing device failures.
+After long time small writing I/O running, we found the occupancy of CPU
+is very high and I/O performance has been reduced by about half:
 
-The basic idea to handle failed cache device is,
-- Unregister cache set
-- Detach all backing devices which are attached to this cache set
-- Stop all the detached bcache devices (configurable)
-- Stop all flash only volume on the cache set
-The above process is named 'cache set retire' by me. The result of cache
-set retire is, cache set and bcache devices are all removed, following
-I/O requests will get failed immediately to notift upper layer or user
-space coce that the cache device is failed or disconnected.
-- Stop all the detached bcache devices (configurable)
-- Stop all flash only volume on the cache set
-The above process is named 'cache set retire' by me. The result of cache
-set retire is, cache set and bcache devices are all removed
-(configurable), following I/O requests will get failed immediately to
-notify upper layer or user space coce that the cache device is failed or
-disconnected.
+[root@ceph151 internal]# top
+top - 15:51:05 up 1 day,2:43,  4 users,  load average: 16.89, 15.15, 16.53
+Tasks: 2063 total,   4 running, 2059 sleeping,   0 stopped,   0 zombie
+%Cpu(s):4.3 us, 17.1 sy 0.0 ni, 66.1 id, 12.0 wa,  0.0 hi,  0.5 si,  0.0 st
+KiB Mem : 65450044 total, 24586420 free, 38909008 used,  1954616 buff/cache
+KiB Swap: 65667068 total, 65667068 free,        0 used. 25136812 avail Mem
 
-There are 2 patches from v4 patch set is merged into bcache-for-next, they
-are not in v5 patch set any more.
+  PID USER PR NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+ 2023 root 20  0       0      0      0 S 55.1  0.0   0:04.42 kworker/11:191
+14126 root 20  0       0      0      0 S 42.9  0.0   0:08.72 kworker/10:3
+ 9292 root 20  0       0      0      0 S 30.4  0.0   1:10.99 kworker/6:1
+ 8553 ceph 20  0 4242492 1.805g  18804 S 30.0  2.9 410:07.04 ceph-osd
+12287 root 20  0       0      0      0 S 26.7  0.0   0:28.13 kworker/7:85
+31019 root 20  0       0      0      0 S 26.1  0.0   1:30.79 kworker/22:1
+ 1787 root 20  0       0      0      0 R 25.7  0.0   5:18.45 kworker/8:7
+32169 root 20  0       0      0      0 S 14.5  0.0   1:01.92 kworker/23:1
+21476 root 20  0       0      0      0 S 13.9  0.0   0:05.09 kworker/1:54
+ 2204 root 20  0       0      0      0 S 12.5  0.0   1:25.17 kworker/9:10
+16994 root 20  0       0      0      0 S 12.2  0.0   0:06.27 kworker/5:106
+15714 root 20  0       0      0      0 R 10.9  0.0   0:01.85 kworker/19:2
+ 9661 ceph 20  0 4246876 1.731g  18800 S 10.6  2.8 403:00.80 ceph-osd
+11460 ceph 20  0 4164692 2.206g  18876 S 10.6  3.5 360:27.19 ceph-osd
+ 9960 root 20  0       0      0      0 S 10.2  0.0   0:02.75 kworker/2:139
+11699 ceph 20  0 4169244 1.920g  18920 S 10.2  3.1 355:23.67 ceph-osd
+ 6843 ceph 20  0 4197632 1.810g  18900 S  9.6  2.9 380:08.30 ceph-osd
 
-V5 patch set adds a new patch "bcache: add stop_when_cache_set_failed
-option to backing device", which provides "auto"/"always" options to
-configure whether or not to stop bcache device for a broken cache set. The
-patch "bcache: stop all attached bcache devices for a retired cache set"
-from v4 patch set is replaced by the above new added patch.
+The kernel work consumed a lot of CPU, and I found they are running journal
+work, The journal is reclaiming source and flush btree node with surprising
+frequency.
 
-Most of the patches are reviewed by Hannes Reinecke and Junhui Tang. There
-are still severl patches need to be reviewed,
-- [PATCH v5 03/10] bcache: quit dc->writeback_thread when
-  BCACHE_DEV_DETACHING is set
-- [PATCH v5 06/10] bcache: add stop_when_cache_set_failed option to
-   backing device 
+Through further analysis, we found that in btree_flush_write(), we try to
+get a btree node with the smallest fifo idex to flush by traverse all the
+btree nodein c->bucket_hash, after we getting it, since no locker protects
+it, this btree node may have been written to cache device by other works,
+and if this occurred, we retry to traverse in c->bucket_hash and get
+another btree node. When the problem occurrd, the retry times is very high,
+and we consume a lot of CPU in looking for a appropriate btree node.
 
-Any comment, question and review are warmly welcome. Thanks in advance.
+In this patch, we try to record 128 btree nodes with the smallest fifo idex
+in heap, and pop one by one when we need to flush btree node. It greatly
+reduces the time for the loop to find the appropriate BTREE node, and also
+reduce the occupancy of CPU.
 
-Changelog:
-v5: replace patch "bcache: stop all attached bcache devices for a retired
-    cache set" from v4 patch set by "bcache: add stop_when_cache_set_failed
-    option to backing device" from v5 patch set. 
-    fix issues from v4 patch set.
-    improve kernel message format, remove redundant prefix string.
-v4: add per-cached_dev option stop_attached_devs_on_fail to avoid stopping
-    attached bcache device from a retiring cache set.
-v3: fix detach issue find in v2 patch set.
-v2: fixes all problems found in v1 review.
-    add patches to handle backing device failure.
-    add one more patch to set writeback_rate_update_seconds range.
-    include a patch from Junhui Tang.
-v1: the initial version, only handles cache device failure.
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+---
+ drivers/md/bcache/bcache.h  |  2 ++
+ drivers/md/bcache/journal.c | 47 ++++++++++++++++++++++++++++++---------------
+ drivers/md/bcache/util.h    |  2 ++
+ 3 files changed, 36 insertions(+), 15 deletions(-)
 
-Coly Li
-
-
-Coly Li (10):
-  bcache: set writeback_rate_update_seconds in range [1, 60] seconds
-  bcache: fix cached_dev->count usage for bch_cache_set_error()
-  bcache: quit dc->writeback_thread when BCACHE_DEV_DETACHING is set
-  bcache: stop dc->writeback_rate_update properly
-  bcache: add CACHE_SET_IO_DISABLE to struct cache_set flags
-  bcache: stop all attached bcache devices for a retired cache set
-  bcache: add backing_request_endio() for bi_end_io of attached backing
-    device I/O
-  bcache: add io_disable to struct cached_dev
-  bcache: stop bcache device when backing device is offline
-  bcache: add stop_when_cache_set_failed option to backing device
-
-Tang Junhui (1):
-  bcache: fix inaccurate io state for detached bcache devices
-
- drivers/md/bcache/alloc.c     |   3 +-
- drivers/md/bcache/bcache.h    |  44 ++++++++-
- drivers/md/bcache/btree.c     |  10 +-
- drivers/md/bcache/io.c        |  16 +++-
- drivers/md/bcache/journal.c   |   4 +-
- drivers/md/bcache/request.c   | 185 +++++++++++++++++++++++++++++++------
- drivers/md/bcache/super.c     | 206 ++++++++++++++++++++++++++++++++++++++----
- drivers/md/bcache/sysfs.c     |  59 +++++++++++-
- drivers/md/bcache/util.h      |   6 --
- drivers/md/bcache/writeback.c |  94 ++++++++++++++++---
- drivers/md/bcache/writeback.h |   5 +-
- 11 files changed, 551 insertions(+), 81 deletions(-)
-
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 0432e28..b343ba4 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -669,6 +669,8 @@ struct cache_set {
+ 
+ #define BUCKET_HASH_BITS	12
+ 	struct hlist_head	bucket_hash[1 << BUCKET_HASH_BITS];
++
++	DECLARE_HEAP(struct btree *, flush_btree);
+ };
+ 
+ struct bbio {
+diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
+index 47fd0b8..f42d3ea 100644
+--- a/drivers/md/bcache/journal.c
++++ b/drivers/md/bcache/journal.c
+@@ -363,6 +363,12 @@ int bch_journal_replay(struct cache_set *s, struct list_head *list)
+ }
+ 
+ /* Journalling */
++#define journal_max_cmp(l, r) \
++	(fifo_idx(&c->journal.pin, btree_current_write(l)->journal) < \
++	 fifo_idx(&(c)->journal.pin, btree_current_write(r)->journal))
++#define journal_min_cmp(l, r) \
++	(fifo_idx(&c->journal.pin, btree_current_write(l)->journal) > \
++	 fifo_idx(&(c)->journal.pin, btree_current_write(r)->journal))
+ 
+ static void btree_flush_write(struct cache_set *c)
+ {
+@@ -370,25 +376,35 @@ static void btree_flush_write(struct cache_set *c)
+ 	 * Try to find the btree node with that references the oldest journal
+ 	 * entry, best is our current candidate and is locked if non NULL:
+ 	 */
+-	struct btree *b, *best;
+-	unsigned i;
++	struct btree *b;
++	int i;
+ 
+ 	atomic_long_inc(&c->flush_write);
++
+ retry:
+-	best = NULL;
+-
+-	for_each_cached_btree(b, c, i)
+-		if (btree_current_write(b)->journal) {
+-			if (!best)
+-				best = b;
+-			else if (journal_pin_cmp(c,
+-					btree_current_write(best)->journal,
+-					btree_current_write(b)->journal)) {
+-				best = b;
++	spin_lock(&c->journal.lock);
++	if (heap_empty(&c->flush_btree)) {
++		for_each_cached_btree(b, c, i)
++			if (btree_current_write(b)->journal) {
++				if (!heap_full(&c->flush_btree))
++					heap_add(&c->flush_btree, b,
++						 journal_max_cmp);
++				else if (journal_max_cmp(b,
++					 heap_peek(&c->flush_btree))) {
++					c->flush_btree.data[0] = b;
++					heap_sift(&c->flush_btree, 0,
++						  journal_max_cmp);
++				}
+ 			}
+-		}
+ 
+-	b = best;
++		for (i = c->flush_btree.used / 2 - 1; i >= 0; --i)
++			heap_sift(&c->flush_btree, i, journal_min_cmp);
++	}
++
++	b = NULL;
++	heap_pop(&c->flush_btree, b, journal_min_cmp);
++	spin_unlock(&c->journal.lock);
++
+ 	if (b) {
+ 		mutex_lock(&b->write_lock);
+ 		if (!btree_current_write(b)->journal) {
+@@ -819,7 +835,8 @@ int bch_journal_alloc(struct cache_set *c)
+ 	j->w[0].c = c;
+ 	j->w[1].c = c;
+ 
+-	if (!(init_fifo(&j->pin, JOURNAL_PIN, GFP_KERNEL)) ||
++	if (!(init_heap(&c->flush_btree, 128, GFP_KERNEL)) ||
++	    !(init_fifo(&j->pin, JOURNAL_PIN, GFP_KERNEL)) ||
+ 	    !(j->w[0].data = (void *) __get_free_pages(GFP_KERNEL, JSET_BITS)) ||
+ 	    !(j->w[1].data = (void *) __get_free_pages(GFP_KERNEL, JSET_BITS)))
+ 		return -ENOMEM;
+diff --git a/drivers/md/bcache/util.h b/drivers/md/bcache/util.h
+index f54b582..809bc99 100644
+--- a/drivers/md/bcache/util.h
++++ b/drivers/md/bcache/util.h
+@@ -112,6 +112,8 @@
+ 
+ #define heap_full(h)	((h)->used == (h)->size)
+ 
++#define heap_empty(h)	((h)->used == 0)
++
+ #define DECLARE_FIFO(type, name)					\
+ 	struct {							\
+ 		size_t front, back, size, mask;				\
 -- 
-2.16.1
+1.8.3.1
