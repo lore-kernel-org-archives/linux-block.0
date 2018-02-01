@@ -1,204 +1,111 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:40528 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752574AbeBEMPg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Feb 2018 07:15:36 -0500
-Received: by mail-lf0-f68.google.com with SMTP id h92so41401762lfi.7
-        for <linux-block@vger.kernel.org>; Mon, 05 Feb 2018 04:15:36 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, javier@cnexlabs.com,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [PATCH 1/4] lightnvm: make 1.2 data structures explicit
-Date: Mon,  5 Feb 2018 13:15:02 +0100
-Message-Id: <20180205121505.27563-2-mb@lightnvm.io>
-In-Reply-To: <20180205121505.27563-1-mb@lightnvm.io>
-References: <20180205121505.27563-1-mb@lightnvm.io>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mxhk.zte.com.cn ([63.217.80.70]:52698 "EHLO mxhk.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751272AbeBAIMW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 1 Feb 2018 03:12:22 -0500
+From: tang.junhui@zte.com.cn
+To: colyli@suse.de, mlyle@lyle.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        tang.junhui@zte.com.cn
+Subject: [PATCH] bcache: calculate the number of incremental GC nodes according to the total of btree nodes
+Date: Thu, 1 Feb 2018 16:14:45 +0800
+Message-Id: <1517472886-4240-1-git-send-email-tang.junhui@zte.com.cn>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Make the 1.2 data structures explicit, so it will be easy to identify
-the 2.0 data structures. Also fix the order of which the nvme_nvm_*
-are declared, such that they follow the nvme_nvm_command order.
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+This patch base on "[PATCH] bcache: finish incremental GC".
+
+Since incremental GC would stop 100ms when front side I/O comes, so when
+there are many btree nodes, if GC only processes constant (100) nodes each
+time, GC would last a long time, and the front I/Os would run out of the
+buckets (since no new bucket can be allocated during GC), and I/Os be
+blocked again.
+
+So GC should not process constant nodes, but varied nodes according to the
+number of btree nodes. In this patch, GC is divided into constant (100)
+times, so when there are many btree nodes, GC can process more nodes each
+time, otherwise GC will process less nodes each time (but not less than
+MIN_GC_NODES).
+
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
 ---
- drivers/nvme/host/lightnvm.c | 82 ++++++++++++++++++++++----------------------
- 1 file changed, 41 insertions(+), 41 deletions(-)
+ drivers/md/bcache/btree.c | 37 ++++++++++++++++++++++++++++++++++---
+ 1 file changed, 34 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index dc0b1335c7c6..60db3f1b59da 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -51,6 +51,21 @@ struct nvme_nvm_ph_rw {
- 	__le64			resv;
- };
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index 48a4d18..d8a5d31 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -90,10 +90,10 @@
  
-+struct nvme_nvm_erase_blk {
-+	__u8			opcode;
-+	__u8			flags;
-+	__u16			command_id;
-+	__le32			nsid;
-+	__u64			rsvd[2];
-+	__le64			prp1;
-+	__le64			prp2;
-+	__le64			spba;
-+	__le16			length;
-+	__le16			control;
-+	__le32			dsmgmt;
-+	__le64			resv;
-+};
-+
- struct nvme_nvm_identity {
- 	__u8			opcode;
- 	__u8			flags;
-@@ -89,33 +104,18 @@ struct nvme_nvm_setbbtbl {
- 	__u32			rsvd4[3];
- };
+ #define MAX_NEED_GC		64
+ #define MAX_SAVE_PRIO		72
++#define MAX_GC_TIMES		100
+ #define MIN_GC_NODES		100
+ #define GC_SLEEP_TIME		100
  
--struct nvme_nvm_erase_blk {
--	__u8			opcode;
--	__u8			flags;
--	__u16			command_id;
--	__le32			nsid;
--	__u64			rsvd[2];
--	__le64			prp1;
--	__le64			prp2;
--	__le64			spba;
--	__le16			length;
--	__le16			control;
--	__le32			dsmgmt;
--	__le64			resv;
--};
 -
- struct nvme_nvm_command {
- 	union {
- 		struct nvme_common_command common;
--		struct nvme_nvm_identity identity;
- 		struct nvme_nvm_ph_rw ph_rw;
-+		struct nvme_nvm_erase_blk erase;
-+		struct nvme_nvm_identity identity;
- 		struct nvme_nvm_getbbtbl get_bb;
- 		struct nvme_nvm_setbbtbl set_bb;
--		struct nvme_nvm_erase_blk erase;
- 	};
- };
+ #define PTR_DIRTY_BIT		(((uint64_t) 1 << 36))
  
--struct nvme_nvm_id_group {
-+struct nvme_nvm_id12_grp {
- 	__u8			mtype;
- 	__u8			fmtype;
- 	__le16			res16;
-@@ -141,7 +141,7 @@ struct nvme_nvm_id_group {
- 	__u8			reserved[906];
- } __packed;
- 
--struct nvme_nvm_addr_format {
-+struct nvme_nvm_id12_addrf {
- 	__u8			ch_offset;
- 	__u8			ch_len;
- 	__u8			lun_offset;
-@@ -157,16 +157,16 @@ struct nvme_nvm_addr_format {
- 	__u8			res[4];
- } __packed;
- 
--struct nvme_nvm_id {
-+struct nvme_nvm_id12 {
- 	__u8			ver_id;
- 	__u8			vmnt;
- 	__u8			cgrps;
- 	__u8			res;
- 	__le32			cap;
- 	__le32			dom;
--	struct nvme_nvm_addr_format ppaf;
-+	struct nvme_nvm_id12_addrf ppaf;
- 	__u8			resv[228];
--	struct nvme_nvm_id_group group;
-+	struct nvme_nvm_id12_grp grp;
- 	__u8			resv2[2880];
- } __packed;
- 
-@@ -191,25 +191,25 @@ static inline void _nvme_nvm_check_size(void)
- {
- 	BUILD_BUG_ON(sizeof(struct nvme_nvm_identity) != 64);
- 	BUILD_BUG_ON(sizeof(struct nvme_nvm_ph_rw) != 64);
-+	BUILD_BUG_ON(sizeof(struct nvme_nvm_erase_blk) != 64);
- 	BUILD_BUG_ON(sizeof(struct nvme_nvm_getbbtbl) != 64);
- 	BUILD_BUG_ON(sizeof(struct nvme_nvm_setbbtbl) != 64);
--	BUILD_BUG_ON(sizeof(struct nvme_nvm_erase_blk) != 64);
--	BUILD_BUG_ON(sizeof(struct nvme_nvm_id_group) != 960);
--	BUILD_BUG_ON(sizeof(struct nvme_nvm_addr_format) != 16);
--	BUILD_BUG_ON(sizeof(struct nvme_nvm_id) != NVME_IDENTIFY_DATA_SIZE);
-+	BUILD_BUG_ON(sizeof(struct nvme_nvm_id12_grp) != 960);
-+	BUILD_BUG_ON(sizeof(struct nvme_nvm_id12_addrf) != 16);
-+	BUILD_BUG_ON(sizeof(struct nvme_nvm_id12) != NVME_IDENTIFY_DATA_SIZE);
- 	BUILD_BUG_ON(sizeof(struct nvme_nvm_bb_tbl) != 64);
- }
- 
--static int init_grps(struct nvm_id *nvm_id, struct nvme_nvm_id *nvme_nvm_id)
-+static int init_grp(struct nvm_id *nvm_id, struct nvme_nvm_id12 *id12)
- {
--	struct nvme_nvm_id_group *src;
-+	struct nvme_nvm_id12_grp *src;
- 	struct nvm_id_group *grp;
- 	int sec_per_pg, sec_per_pl, pg_per_blk;
- 
--	if (nvme_nvm_id->cgrps != 1)
-+	if (id12->cgrps != 1)
- 		return -EINVAL;
- 
--	src = &nvme_nvm_id->group;
-+	src = &id12->grp;
- 	grp = &nvm_id->grp;
- 
- 	grp->mtype = src->mtype;
-@@ -261,34 +261,34 @@ static int init_grps(struct nvm_id *nvm_id, struct nvme_nvm_id *nvme_nvm_id)
- static int nvme_nvm_identity(struct nvm_dev *nvmdev, struct nvm_id *nvm_id)
- {
- 	struct nvme_ns *ns = nvmdev->q->queuedata;
--	struct nvme_nvm_id *nvme_nvm_id;
-+	struct nvme_nvm_id12 *id;
- 	struct nvme_nvm_command c = {};
- 	int ret;
- 
- 	c.identity.opcode = nvme_nvm_admin_identity;
- 	c.identity.nsid = cpu_to_le32(ns->head->ns_id);
- 
--	nvme_nvm_id = kmalloc(sizeof(struct nvme_nvm_id), GFP_KERNEL);
--	if (!nvme_nvm_id)
-+	id = kmalloc(sizeof(struct nvme_nvm_id12), GFP_KERNEL);
-+	if (!id)
- 		return -ENOMEM;
- 
- 	ret = nvme_submit_sync_cmd(ns->ctrl->admin_q, (struct nvme_command *)&c,
--				nvme_nvm_id, sizeof(struct nvme_nvm_id));
-+				id, sizeof(struct nvme_nvm_id12));
- 	if (ret) {
- 		ret = -EIO;
- 		goto out;
- 	}
- 
--	nvm_id->ver_id = nvme_nvm_id->ver_id;
--	nvm_id->vmnt = nvme_nvm_id->vmnt;
--	nvm_id->cap = le32_to_cpu(nvme_nvm_id->cap);
--	nvm_id->dom = le32_to_cpu(nvme_nvm_id->dom);
--	memcpy(&nvm_id->ppaf, &nvme_nvm_id->ppaf,
-+	nvm_id->ver_id = id->ver_id;
-+	nvm_id->vmnt = id->vmnt;
-+	nvm_id->cap = le32_to_cpu(id->cap);
-+	nvm_id->dom = le32_to_cpu(id->dom);
-+	memcpy(&nvm_id->ppaf, &id->ppaf,
- 					sizeof(struct nvm_addr_format));
- 
--	ret = init_grps(nvm_id, nvme_nvm_id);
-+	ret = init_grp(nvm_id, id);
- out:
--	kfree(nvme_nvm_id);
-+	kfree(id);
+ #define PTR_HASH(c, k)							\
+@@ -1511,6 +1511,31 @@ static unsigned btree_gc_count_keys(struct btree *b)
  	return ret;
  }
  
++static size_t btree_gc_min_nodes(struct cache_set *c)
++{
++	size_t			min_nodes;
++
++	/*
++	 * Since incremental GC would stop 100ms when front
++	 * side I/O comes, so when there are many btree nodes,
++	 * if GC only processes constant (100) nodes each time,
++	 * GC would last a long time, and the front I/Os
++	 * would run out of the buckets (since no new bucket
++	 * can be allocated during GC), and be blocked again.
++	 * So GC should not process constant nodes, but varied
++	 * nodes according to the number of btree nodes, which
++	 * realized by dividing GC into constant(100) times,
++	 * so when there are many btree nodes, GC can process
++	 * more nodes each time, otherwise, GC will process less
++	 * nodes each time (but not less than MIN_GC_NODES)
++	 */
++	min_nodes = c->gc_stats.nodes / MAX_GC_TIMES;
++	if (min_nodes < MIN_GC_NODES)
++		min_nodes = MIN_GC_NODES;
++
++	return min_nodes;
++}
++
+ static int btree_gc_recurse(struct btree *b, struct btree_op *op,
+ 			    struct closure *writes, struct gc_stat *gc)
+ {
+@@ -1577,7 +1602,7 @@ static int btree_gc_recurse(struct btree *b, struct btree_op *op,
+ 		r->b = NULL;
+ 
+ 		if (atomic_read(&b->c->io_inflight) &&
+-		    gc->nodes >= gc->nodes_pre + MIN_GC_NODES) {
++		    gc->nodes >= gc->nodes_pre + btree_gc_min_nodes(b->c)) {
+ 			gc->nodes_pre =  gc->nodes;
+ 			ret = -EAGAIN;
+ 			break;
+@@ -1835,8 +1860,14 @@ static int bch_btree_check_recurse(struct btree *b, struct btree_op *op)
+ 		do {
+ 			k = bch_btree_iter_next_filter(&iter, &b->keys,
+ 						       bch_ptr_bad);
+-			if (k)
++			if (k) {
+ 				btree_node_prefetch(b, k);
++				/*
++				 * initiallize c->gc_stats.nodes
++				 * for incremental GC
++				 */
++				b->c->gc_stats.nodes++;
++			}
+ 
+ 			if (p)
+ 				ret = btree(check_recurse, p, b, op);
 -- 
-2.11.0
+1.8.3.1
