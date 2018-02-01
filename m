@@ -1,89 +1,81 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:44013 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752664AbeBIJ1s (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Feb 2018 04:27:48 -0500
-Received: by mail-lf0-f68.google.com with SMTP id a25so1025942lfg.10
-        for <linux-block@vger.kernel.org>; Fri, 09 Feb 2018 01:27:48 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        javier@cnexlabs.com,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [PATCH V2 4/4] nvme: lightnvm: add late setup of block size and metadata
-Date: Fri,  9 Feb 2018 10:27:19 +0100
-Message-Id: <20180209092719.10679-5-mb@lightnvm.io>
-In-Reply-To: <20180209092719.10679-1-mb@lightnvm.io>
-References: <20180209092719.10679-1-mb@lightnvm.io>
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:39162 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751730AbeBAVpR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Feb 2018 16:45:17 -0500
+Received: by mail-pf0-f193.google.com with SMTP id e11so16152814pff.6
+        for <linux-block@vger.kernel.org>; Thu, 01 Feb 2018 13:45:17 -0800 (PST)
+Subject: Re: [PATCH v4 02/13] bcache: properly set task state in
+ bch_writeback_thread()
+To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Junhui Tang <tang.junhui@zte.com.cn>
+References: <20180127142406.89741-1-colyli@suse.de>
+ <20180127142406.89741-3-colyli@suse.de>
+From: Michael Lyle <mlyle@lyle.org>
+Message-ID: <ec59cf58-9337-498e-943d-9d5b69d41965@lyle.org>
+Date: Thu, 1 Feb 2018 13:45:15 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20180127142406.89741-3-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The nvme driver sets up the size of the nvme namespace in two steps.
-First it initializes the device with standard logical block and
-metadata sizes, and then sets the correct logical block and metadata
-size. Due to the OCSSD 2.0 specification relies on the namespace to
-expose these sizes for correct initialization, let it be updated
-appropriately on the LightNVM side as well.
+On 01/27/2018 06:23 AM, Coly Li wrote:
+> Kernel thread routine bch_writeback_thread() has the following code block,
+> 
+> 447         down_write(&dc->writeback_lock);
+> 448~450     if (check conditions) {
+> 451                 up_write(&dc->writeback_lock);
+> 452                 set_current_state(TASK_INTERRUPTIBLE);
+> 453
+> 454                 if (kthread_should_stop())
+> 455                         return 0;
+> 456
+> 457                 schedule();
+> 458                 continue;
+> 459         }
+> 
+> If condition check is true, its task state is set to TASK_INTERRUPTIBLE
+> and call schedule() to wait for others to wake up it.
+> 
+> There are 2 issues in current code,
+> 1, Task state is set to TASK_INTERRUPTIBLE after the condition checks, if
+>    another process changes the condition and call wake_up_process(dc->
+>    writeback_thread), then at line 452 task state is set back to
+>    TASK_INTERRUPTIBLE, the writeback kernel thread will lose a chance to be
+>    waken up.
+> 2, At line 454 if kthread_should_stop() is true, writeback kernel thread
+>    will return to kernel/kthread.c:kthread() with TASK_INTERRUPTIBLE and
+>    call do_exit(). It is not good to enter do_exit() with task state
+>    TASK_INTERRUPTIBLE, in following code path might_sleep() is called and a
+>    warning message is reported by __might_sleep(): "WARNING: do not call
+>    blocking ops when !TASK_RUNNING; state=1 set at [xxxx]".
+> 
+> For the first issue, task state should be set before condition checks.
+> Ineed because dc->writeback_lock is required when modifying all the
+> conditions, calling set_current_state() inside code block where dc->
+> writeback_lock is hold is safe. But this is quite implicit, so I still move
+> set_current_state() before all the condition checks.
+> 
+> For the second issue, frankley speaking it does not hurt when kernel thread
+> exits with TASK_INTERRUPTIBLE state, but this warning message scares users,
+> makes them feel there might be something risky with bcache and hurt their
+> data.  Setting task state to TASK_RUNNING before returning fixes this
+> problem.
+> 
+> In alloc.c:allocator_wait(), there is also a similar issue, and is also
+> fixed in this patch.
+> 
+> Changelog:
+> v3: merge two similar fixes into one patch
+> v2: fix the race issue in v1 patch.
+> v1: initial buggy fix.
+> 
+> Signed-off-by: Coly Li <colyli@suse.de>
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Cc: Michael Lyle <mlyle@lyle.org>
+> Cc: Junhui Tang <tang.junhui@zte.com.cn>
 
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
----
- drivers/nvme/host/core.c     | 2 ++
- drivers/nvme/host/lightnvm.c | 8 ++++++++
- drivers/nvme/host/nvme.h     | 2 ++
- 3 files changed, 12 insertions(+)
+This one LGTM-- applying to my staging branch
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index f837d666cbd4..740ceb28067c 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1379,6 +1379,8 @@ static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
- 	if (ns->noiob)
- 		nvme_set_chunk_size(ns);
- 	nvme_update_disk_info(disk, ns, id);
-+	if (ns->ndev)
-+		nvme_nvm_update_nvm_info(ns);
- #ifdef CONFIG_NVME_MULTIPATH
- 	if (ns->head->disk)
- 		nvme_update_disk_info(ns->head->disk, ns, id);
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index 8b243af8a949..a19e85f0cbae 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -814,6 +814,14 @@ int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned int cmd, unsigned long arg)
- 	}
- }
- 
-+void nvme_nvm_update_nvm_info(struct nvme_ns *ns)
-+{
-+	struct nvm_dev *ndev = ns->ndev;
-+
-+	ndev->identity.csecs = ndev->geo.sec_size = 1 << ns->lba_shift;
-+	ndev->identity.sos = ndev->geo.oob_size = ns->ms;
-+}
-+
- int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node)
- {
- 	struct request_queue *q = ns->queue;
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index ea1aa5283e8e..1ca08f4993ba 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -451,12 +451,14 @@ static inline void nvme_mpath_clear_current_path(struct nvme_ns *ns)
- #endif /* CONFIG_NVME_MULTIPATH */
- 
- #ifdef CONFIG_NVM
-+void nvme_nvm_update_nvm_info(struct nvme_ns *ns);
- int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node);
- void nvme_nvm_unregister(struct nvme_ns *ns);
- int nvme_nvm_register_sysfs(struct nvme_ns *ns);
- void nvme_nvm_unregister_sysfs(struct nvme_ns *ns);
- int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned int cmd, unsigned long arg);
- #else
-+static inline void nvme_nvm_update_nvm_info(struct nvme_ns *ns) {};
- static inline int nvme_nvm_register(struct nvme_ns *ns, char *disk_name,
- 				    int node)
- {
--- 
-2.11.0
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
