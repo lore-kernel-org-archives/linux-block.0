@@ -1,61 +1,337 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:55114 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S964915AbeBMOGR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Feb 2018 09:06:17 -0500
-Received: by mail-wm0-f68.google.com with SMTP id i186so16232795wmi.4
-        for <linux-block@vger.kernel.org>; Tue, 13 Feb 2018 06:06:17 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 0/8] lightnvm: pblk: implement support for 2.0
-Date: Tue, 13 Feb 2018 15:06:00 +0100
-Message-Id: <1518530768-20956-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <roman.penyaev@profitbricks.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+From: Roman Pen <roman.penyaev@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Jack Wang <jinpu.wang@profitbricks.com>
+Subject: [PATCH 11/24] ibtrs: server: sysfs interface functions
+Date: Fri,  2 Feb 2018 15:08:51 +0100
+Message-Id: <20180202140904.2017-12-roman.penyaev@profitbricks.com>
+In-Reply-To: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
+References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
+List-ID: <linux-block@vger.kernel.org>
 
-This patchset implements support for 2.0 spec in pblk.
+This is the sysfs interface to IBTRS sessions on server side:
 
-The first patch abstracts the geometry retrieved from the identify
-command and allows both specs to coexist under the same geometry
-description. From there on, we build the missing 2.0 support in lightnvm
-core: address format, address conversion and report chnk get log page.
-The last three patches implement the actual support for 2.0 in pblk.
+  /sys/kernel/ibtrs_server/<SESS-NAME>/
+    *** IBTRS session accepted from a client peer
+    |
+    |- paths/<SOURCE-IP>/
+       *** established paths from a client in a session
+       |
+       |- disconnect
+       |  *** disconnect path
+       |
+       |- hca_name
+       |  *** HCA name
+       |
+       |- hca_port
+       |  *** HCA port
+       |
+       |- stats/
+          *** current path statistics
+          |
+	  |- rdma
+	  |- reset_all
+	  |- wc_completions
 
-Note that we only port functionality for 2.0. Newer functionality
-enabled by 2.0 (e.g., wear-leveling) will be submitted in following
-patches.
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Cc: Jack Wang <jinpu.wang@profitbricks.com>
+---
+ drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c | 278 +++++++++++++++++++++++++
+ 1 file changed, 278 insertions(+)
 
-This patches apply on top of Matias' latest patches.
-
-Javier González (8):
-  lightnvm: exposed generic geometry to targets
-  lightnvm: show generic geometry in sysfs
-  lightnvm: add support for 2.0 address format
-  lightnvm: convert address based on spec. version
-  lightnvm: implement get log report chunk helpers
-  lightnvm: pblk: implement get log report chunk
-  lightnvm: pblk: refactor init/exit sequences
-  lightnvm: pblk: implement 2.0 support
-
- drivers/lightnvm/core.c          | 171 ++++-----
- drivers/lightnvm/pblk-core.c     | 134 +++++--
- drivers/lightnvm/pblk-gc.c       |   2 +-
- drivers/lightnvm/pblk-init.c     | 787 +++++++++++++++++++++++----------------
- drivers/lightnvm/pblk-read.c     |   2 +-
- drivers/lightnvm/pblk-recovery.c |  14 +-
- drivers/lightnvm/pblk-rl.c       |   2 +-
- drivers/lightnvm/pblk-sysfs.c    | 130 ++++++-
- drivers/lightnvm/pblk-write.c    |   2 +-
- drivers/lightnvm/pblk.h          | 253 +++++++++----
- drivers/nvme/host/lightnvm.c     | 553 ++++++++++++++++++---------
- include/linux/lightnvm.h         | 317 ++++++++++------
- 12 files changed, 1553 insertions(+), 814 deletions(-)
-
+diff --git a/drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c b/drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c
+new file mode 100644
+index 000000000000..ec2c86fe4181
+--- /dev/null
++++ b/drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c
+@@ -0,0 +1,278 @@
++/*
++ * InfiniBand Transport Layer
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler <mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *          Kleber Souza <kleber.souza@profitbricks.com>
++ *          Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
++ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#undef pr_fmt
++#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
++
++#include "ibtrs-pri.h"
++#include "ibtrs-srv.h"
++#include "ibtrs-log.h"
++
++static struct kobject *ibtrs_kobj;
++
++static struct kobj_type ktype = {
++	.sysfs_ops	= &kobj_sysfs_ops,
++};
++
++static ssize_t ibtrs_srv_disconnect_show(struct kobject *kobj,
++					 struct kobj_attribute *attr,
++					 char *page)
++{
++	return scnprintf(page, PAGE_SIZE, "Usage: echo 1 > %s\n",
++			 attr->attr.name);
++}
++
++static ssize_t ibtrs_srv_disconnect_store(struct kobject *kobj,
++					  struct kobj_attribute *attr,
++					  const char *buf, size_t count)
++{
++	struct ibtrs_srv_sess *sess;
++	char str[MAXHOSTNAMELEN];
++
++	sess = container_of(kobj, struct ibtrs_srv_sess, kobj);
++	if (!sysfs_streq(buf, "1")) {
++		ibtrs_err(sess, "%s: invalid value: '%s'\n",
++			  attr->attr.name, buf);
++		return -EINVAL;
++	}
++
++	sockaddr_to_str((struct sockaddr *)&sess->s.dst_addr, str, sizeof(str));
++
++	ibtrs_info(sess, "disconnect for path %s requested\n", str);
++	ibtrs_srv_queue_close(sess);
++
++	return count;
++}
++
++static struct kobj_attribute ibtrs_srv_disconnect_attr =
++	__ATTR(disconnect, 0644,
++	       ibtrs_srv_disconnect_show, ibtrs_srv_disconnect_store);
++
++static ssize_t ibtrs_srv_hca_port_show(struct kobject *kobj,
++				       struct kobj_attribute *attr,
++				       char *page)
++{
++	struct ibtrs_srv_sess *sess;
++	struct ibtrs_con *usr_con;
++
++	sess = container_of(kobj, typeof(*sess), kobj);
++	usr_con = sess->s.con[0];
++
++	return scnprintf(page, PAGE_SIZE, "%u\n",
++			 usr_con->cm_id->port_num);
++}
++
++static struct kobj_attribute ibtrs_srv_hca_port_attr =
++	__ATTR(hca_port, 0444, ibtrs_srv_hca_port_show, NULL);
++
++static ssize_t ibtrs_srv_hca_name_show(struct kobject *kobj,
++				       struct kobj_attribute *attr,
++				       char *page)
++{
++	struct ibtrs_srv_sess *sess;
++
++	sess = container_of(kobj, struct ibtrs_srv_sess, kobj);
++
++	return scnprintf(page, PAGE_SIZE, "%s\n",
++			 sess->s.ib_dev->dev->name);
++}
++
++static struct kobj_attribute ibtrs_srv_hca_name_attr =
++	__ATTR(hca_name, 0444, ibtrs_srv_hca_name_show, NULL);
++
++static struct attribute *ibtrs_srv_sess_attrs[] = {
++	&ibtrs_srv_hca_name_attr.attr,
++	&ibtrs_srv_hca_port_attr.attr,
++	&ibtrs_srv_disconnect_attr.attr,
++	NULL,
++};
++
++static struct attribute_group ibtrs_srv_sess_attr_group = {
++	.attrs = ibtrs_srv_sess_attrs,
++};
++
++STAT_ATTR(struct ibtrs_srv_sess, rdma,
++	  ibtrs_srv_stats_rdma_to_str,
++	  ibtrs_srv_reset_rdma_stats);
++
++STAT_ATTR(struct ibtrs_srv_sess, wc_completion,
++	  ibtrs_srv_stats_wc_completion_to_str,
++	  ibtrs_srv_reset_wc_completion_stats);
++
++STAT_ATTR(struct ibtrs_srv_sess, reset_all,
++	  ibtrs_srv_reset_all_help,
++	  ibtrs_srv_reset_all_stats);
++
++static struct attribute *ibtrs_srv_stats_attrs[] = {
++	&rdma_attr.attr,
++	&wc_completion_attr.attr,
++	&reset_all_attr.attr,
++	NULL,
++};
++
++static struct attribute_group ibtrs_srv_stats_attr_group = {
++	.attrs = ibtrs_srv_stats_attrs,
++};
++
++static int ibtrs_srv_create_once_sysfs_root_folders(struct ibtrs_srv_sess *sess)
++{
++	struct ibtrs_srv *srv = sess->srv;
++	int err = 0;
++
++	mutex_lock(&srv->paths_mutex);
++	if (srv->kobj.state_in_sysfs) {
++		/* Just increase references if kobjs were already inited */
++		kobject_get(&srv->kobj_paths);
++		kobject_get(&srv->kobj);
++		goto unlock;
++	}
++	err = kobject_init_and_add(&srv->kobj, &ktype, ibtrs_kobj,
++				   "%s", sess->s.sessname);
++	if (unlikely(err)) {
++		pr_err("kobject_init_and_add(): %d\n", err);
++		goto unlock;
++	}
++	err = kobject_init_and_add(&srv->kobj_paths, &ktype,
++				   &srv->kobj, "paths");
++	if (unlikely(err)) {
++		pr_err("kobject_init_and_add(): %d\n", err);
++		goto put_kobj;
++	}
++unlock:
++	mutex_unlock(&srv->paths_mutex);
++
++	return err;
++
++put_kobj:
++	kobject_del(&srv->kobj);
++	kobject_put(&srv->kobj);
++	goto unlock;
++}
++
++static void ibtrs_srv_destroy_once_sysfs_root_folders(struct ibtrs_srv_sess *sess)
++{
++	struct ibtrs_srv *srv = sess->srv;
++
++	mutex_lock(&srv->paths_mutex);
++	kobject_put(&srv->kobj_paths);
++	kobject_put(&srv->kobj);
++	mutex_unlock(&srv->paths_mutex);
++}
++
++static int ibtrs_srv_create_stats_files(struct ibtrs_srv_sess *sess)
++{
++	int err;
++
++	err = kobject_init_and_add(&sess->kobj_stats, &ktype,
++				   &sess->kobj, "stats");
++	if (unlikely(err)) {
++		ibtrs_err(sess, "kobject_init_and_add(): %d\n", err);
++		return err;
++	}
++	err = sysfs_create_group(&sess->kobj_stats,
++				 &ibtrs_srv_stats_attr_group);
++	if (unlikely(err)) {
++		ibtrs_err(sess, "sysfs_create_group(): %d\n", err);
++		goto err;
++	}
++
++	return 0;
++
++err:
++	kobject_put(&sess->kobj_stats);
++
++	return err;
++}
++
++int ibtrs_srv_create_sess_files(struct ibtrs_srv_sess *sess)
++{
++	struct ibtrs_srv *srv = sess->srv;
++	char str[MAXHOSTNAMELEN];
++	int err;
++
++	sockaddr_to_str((struct sockaddr *)&sess->s.dst_addr, str, sizeof(str));
++
++	err = ibtrs_srv_create_once_sysfs_root_folders(sess);
++	if (unlikely(err))
++		return err;
++
++	err = kobject_init_and_add(&sess->kobj, &ktype, &srv->kobj_paths,
++				   "%s", str);
++	if (unlikely(err)) {
++		ibtrs_err(sess, "kobject_init_and_add(): %d\n", err);
++		goto destroy_root;
++	}
++	err = sysfs_create_group(&sess->kobj, &ibtrs_srv_sess_attr_group);
++	if (unlikely(err)) {
++		ibtrs_err(sess, "sysfs_create_group(): %d\n", err);
++		goto put_kobj;
++	}
++	err = ibtrs_srv_create_stats_files(sess);
++	if (unlikely(err))
++		goto remove_group;
++
++	return 0;
++
++remove_group:
++	sysfs_remove_group(&sess->kobj, &ibtrs_srv_sess_attr_group);
++put_kobj:
++	kobject_del(&sess->kobj);
++	kobject_put(&sess->kobj);
++destroy_root:
++	ibtrs_srv_destroy_once_sysfs_root_folders(sess);
++
++	return err;
++}
++
++void ibtrs_srv_destroy_sess_files(struct ibtrs_srv_sess *sess)
++{
++	if (sess->kobj.state_in_sysfs) {
++		kobject_del(&sess->kobj_stats);
++		kobject_put(&sess->kobj_stats);
++		kobject_del(&sess->kobj);
++		kobject_put(&sess->kobj);
++
++		ibtrs_srv_destroy_once_sysfs_root_folders(sess);
++	}
++}
++
++int ibtrs_srv_create_sysfs_module_files(void)
++{
++	ibtrs_kobj = kobject_create_and_add(KBUILD_MODNAME, kernel_kobj);
++	if (unlikely(!ibtrs_kobj))
++		return -ENOMEM;
++
++	return 0;
++}
++
++void ibtrs_srv_destroy_sysfs_module_files(void)
++{
++	kobject_del(ibtrs_kobj);
++	kobject_put(ibtrs_kobj);
++}
 -- 
-2.7.4
+2.13.1
