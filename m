@@ -1,29 +1,309 @@
-Return-Path: <prvs=564c18bbf=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "roman.penyaev@profitbricks.com" <roman.penyaev@profitbricks.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-CC: "danil.kipnis@profitbricks.com" <danil.kipnis@profitbricks.com>,
-	"hch@infradead.org" <hch@infradead.org>, "ogerlitz@mellanox.com"
-	<ogerlitz@mellanox.com>, "jinpu.wang@profitbricks.com"
-	<jinpu.wang@profitbricks.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"sagi@grimberg.me" <sagi@grimberg.me>
-Subject: Re: [PATCH 23/24] ibnbd: a bit of documentation
-Date: Fri, 2 Feb 2018 15:55:19 +0000
-Message-ID: <1517586918.2675.3.camel@wdc.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+From: Roman Pen <roman.penyaev@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Jack Wang <jinpu.wang@profitbricks.com>
+Subject: [PATCH 23/24] ibnbd: a bit of documentation
+Date: Fri,  2 Feb 2018 15:09:03 +0100
+Message-Id: <20180202140904.2017-24-roman.penyaev@profitbricks.com>
+In-Reply-To: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
 References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
-	 <20180202140904.2017-24-roman.penyaev@profitbricks.com>
-In-Reply-To: <20180202140904.2017-24-roman.penyaev@profitbricks.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-T24gRnJpLCAyMDE4LTAyLTAyIGF0IDE1OjA5ICswMTAwLCBSb21hbiBQZW4gd3JvdGU6DQo+ICtF
-bnRyaWVzIHVuZGVyIC9zeXMva2VybmVsL2libmJkX2NsaWVudC8NCj4gKz09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PQ0KPiBbIC4uLiBdDQoNCllvdSB3aWxsIG5lZWQgR3Jl
-ZyBLSCdzIHBlcm1pc3Npb24gdG8gYWRkIG5ldyBlbnRyaWVzIGRpcmVjdGx5IHVuZGVyIC9zeXMv
-a2VybmVsLg0KU2luY2UgSSB0aGluayB0aGF0IGl0IGlzIHVubGlrZWx5IHRoYXQgaGUgd2lsbCBn
-aXZlIHRoYXQgcGVybWlzc2lvbjogaGF2ZSB5b3UNCmNvbnNpZGVyZWQgdG8gYWRkIHRoZSBuZXcg
-Y2xpZW50IGVudHJpZXMgdW5kZXIgL3N5cy9jbGFzcy9ibG9jayBmb3IgdGhlIGNsaWVudCBhbmQN
-Ci9zeXMva2VybmVsL2NvbmZpZ2ZzL2libmJkIGZvciB0aGUgdGFyZ2V0LCBzaW1pbGFyIHRvIHdo
-YXQgdGhlIE5WTWVPRiBkcml2ZXJzIGRvDQp0b2RheT8NCg0KQmFydC4=
+README with description of major sysfs entries.
+
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Cc: Jack Wang <jinpu.wang@profitbricks.com>
+---
+ drivers/block/ibnbd/README | 272 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 272 insertions(+)
+
+diff --git a/drivers/block/ibnbd/README b/drivers/block/ibnbd/README
+new file mode 100644
+index 000000000000..e0feb39fad14
+--- /dev/null
++++ b/drivers/block/ibnbd/README
+@@ -0,0 +1,272 @@
++***************************************
++Infiniband Network Block Device (IBNBD)
++***************************************
++
++Introduction
++------------
++
++IBNBD (InfiniBand Network Block Device) is a pair of kernel modules
++(client and server) that allow for remote access of a block device on
++the server over IBTRS protocol using the RDMA (InfiniBand, RoCE, iWarp)
++transport. After being mapped, the remote block devices can be accessed
++on the client side as local block devices.
++
++I/O is transfered between client and server by the IBTRS transport
++modules. The administration of IBNBD and IBTRS modules is done via
++sysfs entries.
++
++Requirements
++------------
++
++  IBTRS kernel modules
++
++Quick Start
++-----------
++
++Server side:
++  # modprobe ibnbd_server
++
++Client side:
++  # modprobe ibnbd_client
++  # echo "sessname=blya path=ip:10.50.100.66 device_path=/dev/ram0" > \
++            /sys/kernel/ibnbd_client/map_device
++
++  Where "sessname=" is a session name, a string to identify the session
++  on client and on server sides; "path=" is a destination IP address or
++  a pair of a source and a destination IPs, separated by comma.  Multiple
++  "path=" options can be specified in order to use multipath  (see IBTRS
++  description for details); "device_path=" is the block device to be
++  mapped from the server side. After the session to the server machine is
++  established, the mapped device will appear on the client side under
++  /dev/ibnbd<N>.
++
++
++======================
++Client Sysfs Interface
++======================
++
++All sysfs files that are not read-only provide the usage information on read:
++
++Example:
++  # cat /sys/kernel/ibnbd_client/map_device
++
++  > Usage: echo "sessname=<name of the ibtrs session> path=<[srcaddr,]dstaddr>
++  > [path=<[srcaddr,]dstaddr>] device_path=<full path on remote side>
++  > [access_mode=<ro|rw|migration>] [input_mode=<mq|rq>]
++  > [io_mode=<fileio|blockio>]" > map_device
++  >
++  > addr ::= [ ip:<ipv4> | ip:<ipv6> | gid:<gid> ]
++
++Entries under /sys/kernel/ibnbd_client/
++=======================================
++
++map_device (RW)
++---------------
++
++Expected format is the following:
++
++    sessname=<name of the ibtrs session>
++    path=<[srcaddr,]dstaddr> [path=<[srcaddr,]dstaddr> ...]
++    device_path=<full path on remote side>
++    [access_mode=<ro|rw|migration>]
++    [input_mode=<mq|rq>]
++    [io_mode=<fileio|blockio>]
++
++Where:
++
++sessname: accepts a string not bigger than 256 chars, which identifies
++          a given session on the client and on the server.
++	  I.e. "clt_hostname-srv_hostname" could be a natural choice.
++
++path:     describes a connection between the client and the server by
++	  specifying destination and, when required, the source address.
++	  The addresses are to be provided in the following format:
++
++            ip:<IPv6>
++            ip:<IPv4>
++            gid:<GID>
++
++          for example:
++
++          path=ip:10.0.0.66
++                         The single addr is treated as the destination.
++                         The connection will be established to this
++                         server from any client IP address.
++
++          path=ip:10.0.0.66,ip:10.0.1.66
++                         First addr is the source address and the second
++                         is the destination.
++
++          If multiple "path=" options are specified multiple connection
++          will be established and data will be sent according to
++          the selected multipath policy (see IBTRS mp_policy sysfs entry
++          description).
++
++device_path: Path to the block device on the server side. Path is specified
++	     relative to the directory on server side configured in the
++             'dev_search_path' module parameter of the ibnbd_server.
++             The ibnbd_server prepends the <device_path> received from client
++	     with <dev_search_path> and tries to open the
++	     <dev_search_path>/<device_path> block device.  On success,
++	     a /dev/ibnbd<N> device file, a /sys/block/ibnbd_client/ibnbd<N>/
++	     directory and an entry in /sys/kernel/ibnbd_client/devices will be
++             created.
++
++access_mode: the access_mode parameter specifies if the device is to be
++             mapped as "ro" read-only or "rw" read-write. The server allows
++	     a device to be exported in rw mode only once. The "migration"
++             access mode has to be specified if a second mapping in read-write
++	     mode is desired.
++
++             By default "rw" is used.
++
++input_mode: the input_mode parameter specifies the internal I/O
++            processing mode of the block device on the client.  Accepts
++            "mq" and "rq".
++
++            By default "mq" mode is used.
++
++io_mode:  the io_mode parameter specifies if the device on the server
++          will be opened as block device "blockio" or as file "fileio".
++          When the device is opened as file, the VFS page cache is used
++          for read I/O operations, write I/O operations bypass the page
++          cache and go directly to disk (except meta updates, like file
++          access time).
++
++          By default "blockio" mode is used.
++
++Exit Codes:
++
++If the device is already mapped it will fail with EEXIST. If the input
++has an invalid format it will return EINVAL. If the device path cannot
++be found on the server, it will fail with ENOENT.
++
++Finding device file after mapping
++---------------------------------
++
++After mapping, the device file can be found by:
++ o  The symlink /sys/kernel/ibnbd_client/devices/<device_id> points to
++    /sys/block/<dev-name>. The last part of the symlink destination is
++    the same as the device name.  By extracting the last part of the
++    path the path to the device /dev/<dev-name> can be build.
++
++ o /dev/block/$(cat /sys/kernel/ibnbd_client/devices/<device_id>/dev)
++
++How to find the <device_id> of the device is described on the next
++section.
++
++Entries under /sys/kernel/ibnbd_client/devices/
++===============================================
++
++For each device mapped on the client a new symbolic link is created as
++/sys/kernel/ibnbd_client/devices/<device_id>, which points to the block
++device created by ibnbd (/sys/block/ibnbd<N>/). The <device_id> of each
++device is created as follows:
++
++- If the 'device_path' provided during mapping contains slashes ("/"),
++  they are replaced by exclamation mark ("!") and used as as the
++  <device_id>. Otherwise, the <device_id> will be the same as the
++  "device_path" provided.
++
++Entries under /sys/block/ibnbd<N>/ibnbd_client/
++===============================================
++
++unmap_device (RW)
++-----------------
++
++To unmap a volume, "normal" or "force" has to be written to:
++  /sys/block/ibnbd<N>/ibnbd_client/unmap_device
++
++When "normal" is used, the operation will fail with EBUSY if any process
++is using the device.  When "force" is used, the device is also unmapped
++when device is in use.  All I/Os that are in progress will fail.
++
++Example:
++
++   # echo "normal" > /sys/block/ibnbd0/ibnbd/unmap_device
++
++state (RO)
++----------
++
++The file contains the current state of the block device. The state file
++returns "open" when the device is successfully mapped from the server
++and accepting I/O requests. When the connection to the server gets
++disconnected in case of an error (e.g. link failure), the state file
++returns "closed" and all I/O requests submitted to it will fail with -EIO.
++
++session (RO)
++------------
++
++IBNBD uses IBTRS session to transport the data between client and
++server.  The entry "session" contains the name of the session, that
++was used to establish the IBTRS session.  It's the same name that
++was passed as server parameter to the map_device entry.
++
++mapping_path (RO)
++-----------------
++
++Contains the path that was passed as "device_path" to the map_device
++operation.
++
++======================
++Server Sysfs Interface
++======================
++
++Entries under /sys/kernel/ibnbd_server/
++=======================================
++
++When a client maps a device, a directory entry with the name of the
++block device is created under /sys/kernel/ibnbd_server/devices/.
++
++Entries under /sys/kernel/ibnbd_server/devices/<device_name>/
++=============================================================
++
++block_dev (link)
++---------------
++
++Is a symlink to the sysfs entry of the exported device.
++
++Example:
++
++  block_dev -> ../../../../devices/virtual/block/ram0
++
++Entries under /sys/kernel/ibnbd_server/devices/<device_name>/sessions/
++======================================================================
++
++For each client a particular device is exported to, following directory will be
++created:
++
++/sys/kernel/ibnbd_server/devices/<device_name>/sessions/<session-name>/
++
++When the device is unmapped by that client, the directory will be removed.
++
++Entries under /sys/kernel/ibnbd_server/devices/<device_name>/sessions/<session-name>
++====================================================================================
++
++read_only (RO)
++--------------
++
++Contains '1' if device is mapped read-only, otherwise '0'.
++
++mapping_path (RO)
++-----------------
++
++Contains the relative device path provided by the user during mapping.
++
++==============================
++IBNBD-Server Module Parameters
++==============================
++
++dev_search_path
++---------------
++
++When a device is mapped from the client, the server generates the path
++to the block device on the server side by concatenating dev_search_path
++and the "device_path" that was specified in the map_device operation.
++
++The default dev_search_path is: "/".
++
++Contact
++-------
++
++Mailing list: "IBNBD/IBTRS Storage Team" <ibnbd@profitbricks.com>
+-- 
+2.13.1
