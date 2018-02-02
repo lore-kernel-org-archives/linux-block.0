@@ -11,138 +11,93 @@ Cc: Jens Axboe <axboe@kernel.dk>,
 	Roman Pen <roman.penyaev@profitbricks.com>,
 	Danil Kipnis <danil.kipnis@profitbricks.com>,
 	Jack Wang <jinpu.wang@profitbricks.com>
-Subject: [PATCH 10/24] ibtrs: server: statistics functions
-Date: Fri,  2 Feb 2018 15:08:50 +0100
-Message-Id: <20180202140904.2017-11-roman.penyaev@profitbricks.com>
+Subject: [PATCH 12/24] ibtrs: include client and server modules into kernel compilation
+Date: Fri,  2 Feb 2018 15:08:52 +0100
+Message-Id: <20180202140904.2017-13-roman.penyaev@profitbricks.com>
 In-Reply-To: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
 References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This introduces set of functions used on server side to account
-statistics of RDMA data sent/received.
+Add IBTRS Makefile, Kconfig and also corresponding lines into upper
+layer infiniband/ulp files.
 
 Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
 Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
 Cc: Jack Wang <jinpu.wang@profitbricks.com>
 ---
- drivers/infiniband/ulp/ibtrs/ibtrs-srv-stats.c | 110 +++++++++++++++++++++++++
- 1 file changed, 110 insertions(+)
+ drivers/infiniband/Kconfig            |  1 +
+ drivers/infiniband/ulp/Makefile       |  1 +
+ drivers/infiniband/ulp/ibtrs/Kconfig  | 20 ++++++++++++++++++++
+ drivers/infiniband/ulp/ibtrs/Makefile | 15 +++++++++++++++
+ 4 files changed, 37 insertions(+)
 
-diff --git a/drivers/infiniband/ulp/ibtrs/ibtrs-srv-stats.c b/drivers/infiniband/ulp/ibtrs/ibtrs-srv-stats.c
+diff --git a/drivers/infiniband/Kconfig b/drivers/infiniband/Kconfig
+index cbf186522016..7adbd0e272c4 100644
+--- a/drivers/infiniband/Kconfig
++++ b/drivers/infiniband/Kconfig
+@@ -93,6 +93,7 @@ source "drivers/infiniband/ulp/srpt/Kconfig"
+ 
+ source "drivers/infiniband/ulp/iser/Kconfig"
+ source "drivers/infiniband/ulp/isert/Kconfig"
++source "drivers/infiniband/ulp/ibtrs/Kconfig"
+ 
+ source "drivers/infiniband/ulp/opa_vnic/Kconfig"
+ source "drivers/infiniband/sw/rdmavt/Kconfig"
+diff --git a/drivers/infiniband/ulp/Makefile b/drivers/infiniband/ulp/Makefile
+index 437813c7b481..1c4f10dc8d49 100644
+--- a/drivers/infiniband/ulp/Makefile
++++ b/drivers/infiniband/ulp/Makefile
+@@ -5,3 +5,4 @@ obj-$(CONFIG_INFINIBAND_SRPT)		+= srpt/
+ obj-$(CONFIG_INFINIBAND_ISER)		+= iser/
+ obj-$(CONFIG_INFINIBAND_ISERT)		+= isert/
+ obj-$(CONFIG_INFINIBAND_OPA_VNIC)	+= opa_vnic/
++obj-$(CONFIG_INFINIBAND_IBTRS)		+= ibtrs/
+diff --git a/drivers/infiniband/ulp/ibtrs/Kconfig b/drivers/infiniband/ulp/ibtrs/Kconfig
 new file mode 100644
-index 000000000000..441b07fdf44a
+index 000000000000..eaeb8f3f6b4e
 --- /dev/null
-+++ b/drivers/infiniband/ulp/ibtrs/ibtrs-srv-stats.c
-@@ -0,0 +1,110 @@
-+/*
-+ * InfiniBand Transport Layer
-+ *
-+ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
-+ * Authors: Fabian Holler <mail@fholler.de>
-+ *          Jack Wang <jinpu.wang@profitbricks.com>
-+ *          Kleber Souza <kleber.souza@profitbricks.com>
-+ *          Danil Kipnis <danil.kipnis@profitbricks.com>
-+ *          Roman Penyaev <roman.penyaev@profitbricks.com>
-+ *          Milind Dumbare <Milind.dumbare@gmail.com>
-+ *
-+ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
-+ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
-+ *          Roman Penyaev <roman.penyaev@profitbricks.com>
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version 2
-+ * of the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
++++ b/drivers/infiniband/ulp/ibtrs/Kconfig
+@@ -0,0 +1,20 @@
++config INFINIBAND_IBTRS
++	tristate
++	depends on INFINIBAND_ADDR_TRANS
 +
-+#undef pr_fmt
-+#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
++config INFINIBAND_IBTRS_CLIENT
++	tristate "IBTRS client module"
++	depends on INFINIBAND_ADDR_TRANS
++	select INFINIBAND_IBTRS
++	help
++	  IBTRS client allows for simplified data transfer and connection
++	  establishment over RDMA (InfiniBand, RoCE, iWarp). Uses BIO-like
++	  READ/WRITE semantics and provides multipath capabilities.
 +
-+#include "ibtrs-srv.h"
++config INFINIBAND_IBTRS_SERVER
++	tristate "IBTRS server module"
++	depends on INFINIBAND_ADDR_TRANS
++	select INFINIBAND_IBTRS
++	help
++	  IBTRS server module processing connection and IO requests received
++	  from the IBTRS client module.
+diff --git a/drivers/infiniband/ulp/ibtrs/Makefile b/drivers/infiniband/ulp/ibtrs/Makefile
+new file mode 100644
+index 000000000000..e6ea858745ad
+--- /dev/null
++++ b/drivers/infiniband/ulp/ibtrs/Makefile
+@@ -0,0 +1,15 @@
++ibtrs-client-y := ibtrs-clt.o \
++		  ibtrs-clt-stats.o \
++		  ibtrs-clt-sysfs.o
 +
-+void ibtrs_srv_update_rdma_stats(struct ibtrs_srv_stats *s,
-+				 size_t size, int d)
-+{
-+	atomic64_inc(&s->rdma_stats.dir[d].cnt);
-+	atomic64_add(size, &s->rdma_stats.dir[d].size_total);
-+}
++ibtrs-server-y := ibtrs-srv.o \
++		  ibtrs-srv-stats.o \
++		  ibtrs-srv-sysfs.o
 +
-+void ibtrs_srv_update_wc_stats(struct ibtrs_srv_stats *s)
-+{
-+	atomic64_inc(&s->wc_comp.calls);
-+	atomic64_inc(&s->wc_comp.total_wc_cnt);
-+}
++ibtrs-core-y := ibtrs.o
 +
-+int ibtrs_srv_reset_rdma_stats(struct ibtrs_srv_stats *stats, bool enable)
-+{
-+	if (enable) {
-+		struct ibtrs_srv_stats_rdma_stats *r = &stats->rdma_stats;
++obj-$(CONFIG_INFINIBAND_IBTRS)        += ibtrs-core.o
++obj-$(CONFIG_INFINIBAND_IBTRS_CLIENT) += ibtrs-client.o
++obj-$(CONFIG_INFINIBAND_IBTRS_SERVER) += ibtrs-server.o
 +
-+		memset(r, 0, sizeof(*r));
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+ssize_t ibtrs_srv_stats_rdma_to_str(struct ibtrs_srv_stats *stats,
-+				    char *page, size_t len)
-+{
-+	struct ibtrs_srv_stats_rdma_stats *r = &stats->rdma_stats;
-+	struct ibtrs_srv_sess *sess;
-+
-+	sess = container_of(stats, typeof(*sess), stats);
-+
-+	return scnprintf(page, len, "%ld %ld %ld %ld %u\n",
-+			 atomic64_read(&r->dir[READ].cnt),
-+			 atomic64_read(&r->dir[READ].size_total),
-+			 atomic64_read(&r->dir[WRITE].cnt),
-+			 atomic64_read(&r->dir[WRITE].size_total),
-+			 atomic_read(&sess->ids_inflight));
-+}
-+
-+int ibtrs_srv_reset_wc_completion_stats(struct ibtrs_srv_stats *stats,
-+					bool enable)
-+{
-+	if (enable) {
-+		memset(&stats->wc_comp, 0, sizeof(stats->wc_comp));
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+int ibtrs_srv_stats_wc_completion_to_str(struct ibtrs_srv_stats *stats,
-+					 char *buf, size_t len)
-+{
-+	return snprintf(buf, len, "%ld %ld\n",
-+			atomic64_read(&stats->wc_comp.total_wc_cnt),
-+			atomic64_read(&stats->wc_comp.calls));
-+}
-+
-+ssize_t ibtrs_srv_reset_all_help(struct ibtrs_srv_stats *stats,
-+				 char *page, size_t len)
-+{
-+	return scnprintf(page, PAGE_SIZE, "echo 1 to reset all statistics\n");
-+}
-+
-+int ibtrs_srv_reset_all_stats(struct ibtrs_srv_stats *stats, bool enable)
-+{
-+	if (enable) {
-+		ibtrs_srv_reset_wc_completion_stats(stats, enable);
-+		ibtrs_srv_reset_rdma_stats(stats, enable);
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
++-include $(src)/compat/compat.mk
 -- 
 2.13.1
