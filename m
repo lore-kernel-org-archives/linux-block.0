@@ -1,84 +1,110 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from pv33p36im-asmtp002.me.com ([17.142.213.63]:34651 "EHLO
-        pv33p36im-asmtp002.me.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932477AbeBLDuS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 11 Feb 2018 22:50:18 -0500
-From: Chengguang Xu <cgxu519@icloud.com>
-Content-type: text/plain; charset=gb2312
-MIME-version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Question about  strange phenomenon of cgroup blkio stat
-Message-id: <BF15784C-1B05-4294-8994-018A0D82F6D6@icloud.com>
-Date: Mon, 12 Feb 2018 10:50:11 +0800
-To: cgroups@vger.kernel.org, linux-block@vger.kernel.org
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:51268 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752139AbeBBOLJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Feb 2018 09:11:09 -0500
+Received: by mail-wm0-f67.google.com with SMTP id r71so12976386wmd.1
+        for <linux-block@vger.kernel.org>; Fri, 02 Feb 2018 06:11:08 -0800 (PST)
+From: Roman Pen <roman.penyaev@profitbricks.com>
+To: linux-block@vger.kernel.org, linux-rdma@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Or Gerlitz <ogerlitz@mellanox.com>,
+        Roman Pen <roman.penyaev@profitbricks.com>,
+        Danil Kipnis <danil.kipnis@profitbricks.com>,
+        Jack Wang <jinpu.wang@profitbricks.com>
+Subject: [PATCH 22/24] ibnbd: include client and server modules into kernel compilation
+Date: Fri,  2 Feb 2018 15:09:02 +0100
+Message-Id: <20180202140904.2017-23-roman.penyaev@profitbricks.com>
+In-Reply-To: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
+References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi All
+Add IBNBD Makefile, Kconfig and also corresponding lines into upper
+block layer files.
 
-I=A1=AFm new to cgroup and block layer, recently I found a strange =
-phenomenon in cgroup blkio stat as blow.
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Cc: Jack Wang <jinpu.wang@profitbricks.com>
+---
+ drivers/block/Kconfig        |  2 ++
+ drivers/block/Makefile       |  1 +
+ drivers/block/ibnbd/Kconfig  | 22 ++++++++++++++++++++++
+ drivers/block/ibnbd/Makefile | 13 +++++++++++++
+ 4 files changed, 38 insertions(+)
 
-I setup a blkio cgroup and wrote 1GB data in direct mode, but the stat =
-indicated almost wrote 2.56GB,=20
-
-I tested several times in physical machine on cgroup v1 & v2 and both =
-were same results, but interesting
-
-thing is when testing on VM(virtual machine) the stat is exactly the =
-same as the data size had written.
-
-Could anyone give me a hint or explanation for this?
-
-
-testing info:
--------------------------------------------------------------
-
-$ uname -r
-4.15.2
-
-$ echo $$
-4242
-
-$ cat /cgroup2/22/cgroup.procs
-4242
-13868
-
-$ cat cgroup.controllers
-io memory
-
-$ df /mnt/sdb1
-Filesystem     1K-blocks     Used Available Use% Mounted on
-/dev/sdb1      209612800 18102292 191510508   9% /mnt/sdb1
-
-$ lsblk
-NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
-sdb      8:16   0 557.9G  0 disk
-=A9=C0=A9=A4sdb2   8:18   0 357.9G  0 part
-=A9=B8=A9=A4sdb1   8:17   0   200G  0 part /mnt/sdb1
-sdc      8:32   0 557.9G  0 disk
-=A9=C0=A9=A4sdc2   8:34   0   100G  0 part
-=A9=C0=A9=A4sdc3   8:35   0   100G  0 part
-=A9=C0=A9=A4sdc1   8:33   0   100G  0 part
-=A9=B8=A9=A4sdc4   8:36   0 257.9G  0 part
-sda      8:0    0 557.9G  0 disk
-=A9=C0=A9=A4sda2   8:2    0 542.2G  0 part /
-=A9=B8=A9=A4sda1   8:1    0  15.6G  0 part [SWAP]
-
-
-$ dd if=3D/dev/zero of=3D/mnt/sdb1/22/test bs=3D1M count=3D1024 =
-oflag=3Ddirect
-1024+0 records in
-1024+0 records out
-1073741824 bytes (1.1 GB) copied, 2.47852 s, 433 MB/s
-
-
-$ cat /cgroup2/22/io.stat
-8:0 rbytes=3D1105920 wbytes=3D36864 rios=3D59 wios=3D4
-8:16 rbytes=3D10330624 wbytes=3D2693799936 rios=3D102 wios=3D4105
-
-
-
-
-Thanks,
-Chengguang.
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index 40579d0cb3d1..483aae5d391e 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -477,4 +477,6 @@ config BLK_DEV_RSXX
+ 	  To compile this driver as a module, choose M here: the
+ 	  module will be called rsxx.
+ 
++source "drivers/block/ibnbd/Kconfig"
++
+ endif # BLK_DEV
+diff --git a/drivers/block/Makefile b/drivers/block/Makefile
+index dc061158b403..65346a1d0b1a 100644
+--- a/drivers/block/Makefile
++++ b/drivers/block/Makefile
+@@ -38,6 +38,7 @@ obj-$(CONFIG_BLK_DEV_PCIESSD_MTIP32XX)	+= mtip32xx/
+ obj-$(CONFIG_BLK_DEV_RSXX) += rsxx/
+ obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk.o
+ obj-$(CONFIG_ZRAM) += zram/
++obj-$(CONFIG_BLK_DEV_IBNBD)	+= ibnbd/
+ 
+ skd-y		:= skd_main.o
+ swim_mod-y	:= swim.o swim_asm.o
+diff --git a/drivers/block/ibnbd/Kconfig b/drivers/block/ibnbd/Kconfig
+new file mode 100644
+index 000000000000..c5cc7d111c7a
+--- /dev/null
++++ b/drivers/block/ibnbd/Kconfig
+@@ -0,0 +1,22 @@
++config BLK_DEV_IBNBD
++	boolean
++
++config BLK_DEV_IBNBD_CLIENT
++	tristate "Network block device driver on top of IBTRS transport"
++	depends on INFINIBAND_IBTRS_CLIENT
++	select BLK_DEV_IBNBD
++	help
++	  IBNBD client allows for mapping of a remote block devices over
++	  IBTRS protocol from a target system where IBNBD server is running.
++
++	  If unsure, say N.
++
++config BLK_DEV_IBNBD_SERVER
++	tristate "Network block device over RDMA Infiniband server support"
++	depends on INFINIBAND_IBTRS_SERVER
++	select BLK_DEV_IBNBD
++	help
++	  IBNBD server allows for exporting local block devices to a remote client
++	  over IBTRS protocol.
++
++	  If unsure, say N.
+diff --git a/drivers/block/ibnbd/Makefile b/drivers/block/ibnbd/Makefile
+new file mode 100644
+index 000000000000..5f20e72e0633
+--- /dev/null
++++ b/drivers/block/ibnbd/Makefile
+@@ -0,0 +1,13 @@
++ccflags-y := -Idrivers/infiniband/ulp/ibtrs
++
++ibnbd-client-y := ibnbd-clt.o \
++		  ibnbd-clt-sysfs.o
++
++ibnbd-server-y := ibnbd-srv.o \
++		  ibnbd-srv-dev.o \
++		  ibnbd-srv-sysfs.o
++
++obj-$(CONFIG_BLK_DEV_IBNBD_CLIENT) += ibnbd-client.o
++obj-$(CONFIG_BLK_DEV_IBNBD_SERVER) += ibnbd-server.o
++
++-include $(src)/compat/compat.mk
+-- 
+2.13.1
