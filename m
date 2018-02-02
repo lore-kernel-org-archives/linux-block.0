@@ -1,85 +1,41 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:41141 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:41108 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751463AbeBBJcY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 2 Feb 2018 04:32:24 -0500
-From: NeilBrown <neilb@suse.com>
-To: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com
-Date: Fri, 02 Feb 2018 17:19:33 +1100
-Subject: Re: [dm-devel] [LSF/MM TOPIC] block: extend generic biosets to allow per-device frontpad
-In-Reply-To: <20180129213300.GC5744@redhat.com>
-References: <20180129213300.GC5744@redhat.com>
-Message-ID: <87zi4r29sa.fsf@notabene.neil.brown.name>
+        id S1751376AbeBBJcX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 2 Feb 2018 04:32:23 -0500
+Subject: Re: [PATCH v4 00/13] bcache: device failure handling improvement
+To: Michael Lyle <mlyle@lyle.org>, linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+References: <20180128015625.128497-1-colyli@suse.de>
+ <2fde00b8-f605-d0d0-a51c-c126a2939326@lyle.org>
+From: Coly Li <colyli@suse.de>
+Message-ID: <aefd75a0-e7de-bbb6-386a-8e7f9a128e98@suse.de>
+Date: Fri, 2 Feb 2018 10:04:15 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-        micalg=pgp-sha256; protocol="application/pgp-signature"
+In-Reply-To: <2fde00b8-f605-d0d0-a51c-c126a2939326@lyle.org>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
---=-=-=
-Content-Type: text/plain
+On 02/02/2018 5:52 AM, Michael Lyle wrote:
+> On 01/27/2018 05:56 PM, Coly Li wrote:
+>> Hi maintainers and folks,
+> 
+> Hi Coly---
+> 
+>> This patch set tries to improve bcache device failure handling, includes
+>> cache device and backing device failures.
+> 
+> I've skimmed this whole patchset and overall it looks good.  I have
+> taken some pieces (2,6) for possible-4.16.  I understand you'll be
+> sending out a v5 soon-- I'll perform a more detailed review then.
 
-On Mon, Jan 29 2018, Mike Snitzer wrote:
+Hi Mike,
 
-> I'd like to enable bio-based DM to _not_ need to clone bios.  But to do
-> so each bio-based DM target's required per-bio-data would need to be
-> provided by upper layer biosets (as opposed to the bioset DM currently
-> creates).
->
-> So my thinking is that all system-level biosets (e.g. fs_bio_set,
-> blkdev_dio_pool) would redirect to a device specific variant bioset IFF
-> the underlying device advertises the need for a specific per-bio-data
-> payload to be provided.
->
-> I know this _could_ become a rathole but I'd like to avoid reverting DM
-> back to the days of having to worry about managing mempools for the
-> purpose of per-io allocations.  I've grown spoiled by the performance
-> and elegance that comes with having the bio and per-bio-data allocated
-> from the same bioset.
->
-> Thoughts?
+Since you will pick patch 2,6 from v4 patch set, I will not include them
+in v5 patch set, and rebase the v5 cache set against the latest
+bcache-for-next.
 
-md/raid0 remaps each bio and passes it directly down to one of several
-devices.
-I think your scheme would mean that it would need to clone each bio to
-make sure it is from the correctly sized pool.
+Thanks.
 
-I suspect it could be made to work though.
-
-1/ have a way for the driver receiving a bio to discover how much
-   frontpad was allocated.
-2/ require drivers to accept bios with any size of frontpad, but a
-   fast-path is taken if it is already big enough.
-3/ allow a block device to advertise it's preferred frontpad.
-4/ make sure your config-change-notification mechanism can communicate
-   changes to this number.
-5/ gather statistics on what percentage of bios have a too-small
-   frontpad.
-
-Then start modifying places that allocate bios to use the hint,
-and when benchmarks show the percentage is high - use it to encourage
-other people to allocate better bios.
-
-NeilBrown
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAlp0AvUACgkQOeye3VZi
-gblURBAAjE+opJaOYrWK32UPF2U6QAH3mwOd6zpqv4cCsnCkjtgywdJ2fD8pSsYa
-8YlzNNvrKTT8KWrZ1RyNNTSOUhlJgjq3aIQ98kSANgBYVhCzWhYjNSwktEQGT7YJ
-UXUqecflKftpokV/D3ISdGhiz64ZVKOmPQTizsLNVzFUilEVP3CvKu0fqzw+CcZW
-pxR9dFS/drBHNVckTBzj/9chc4+3vm88ybR73at81Gr27BwPWaqjnu5tS2WlVNzX
-xno8STBbtOOfbtjkSAwesDwWbcqQyj8YAi3iQabKMHRf9NEWZtsa56iJg23YPuSH
-8D617hU86PZWw302rzibB8AkZenp4pqgOXJCH6xresV9ZYFvSyaJi/oaVe9+a0vO
-mdna+6e9/dWjai22mRpp0/xmpWcdRxH9cK+fy0sPq9QmU5nnHfnrNo9K8G2fK/bE
-rk6tSh51rqNa+GEZHRXYtgQOhpUUQtwwYbE8xebD0WG25U16/BnowLQb0jDrhqdF
-I/OaxAiEOC95tvqGE2Br1YdmHnvvJF7eAEiXh/0OTNyW1S/nqWnHQ5PTlG35iaLG
-ltL4g5iTu6dWswb092x5+By5NeFJBcMI0n0ejc3Sqw9/xcs5QRKVvGN4/1EoSdp/
-JIOQVgNhc+iSUmLU3ucoWKYfOq+GG+kIMdNlwFMhkDuK/ZhFFEA=
-=weO7
------END PGP SIGNATURE-----
---=-=-=--
+Coly Li
