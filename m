@@ -1,56 +1,144 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f66.google.com ([209.85.215.66]:44260 "EHLO
-        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752271AbeBEMPf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Feb 2018 07:15:35 -0500
-Received: by mail-lf0-f66.google.com with SMTP id v188so41390769lfa.11
-        for <linux-block@vger.kernel.org>; Mon, 05 Feb 2018 04:15:34 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, javier@cnexlabs.com,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [PATCH 0/4] lightnvm: base 2.0 implementation
-Date: Mon,  5 Feb 2018 13:15:01 +0100
-Message-Id: <20180205121505.27563-1-mb@lightnvm.io>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:55767 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752000AbeBBOLE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Feb 2018 09:11:04 -0500
+Received: by mail-wm0-f67.google.com with SMTP id 143so12835167wma.5
+        for <linux-block@vger.kernel.org>; Fri, 02 Feb 2018 06:11:03 -0800 (PST)
+From: Roman Pen <roman.penyaev@profitbricks.com>
+To: linux-block@vger.kernel.org, linux-rdma@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bart.vanassche@sandisk.com>,
+        Or Gerlitz <ogerlitz@mellanox.com>,
+        Roman Pen <roman.penyaev@profitbricks.com>,
+        Danil Kipnis <danil.kipnis@profitbricks.com>,
+        Jack Wang <jinpu.wang@profitbricks.com>
+Subject: [PATCH 18/24] ibnbd: server: private header with server structs and functions
+Date: Fri,  2 Feb 2018 15:08:58 +0100
+Message-Id: <20180202140904.2017-19-roman.penyaev@profitbricks.com>
+In-Reply-To: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
+References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi,
+This header describes main structs and functions used by ibnbd-server
+module, namely structs for managing sessions from different clients
+and mapped (opened) devices.
 
-A couple of patches for 2.0 support for the lightnvm subsystem. They
-form the basis for integrating 2.0 support.
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Cc: Jack Wang <jinpu.wang@profitbricks.com>
+---
+ drivers/block/ibnbd/ibnbd-srv.h | 100 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 100 insertions(+)
 
-For the rest of the support, Javier has code that implements report
-chunk and sets up the LBA format data structure. He also has a bunch
-of patches that brings pblk up to speed.
-
-The first two patches is preparation for the 2.0 work. The third patch
-implements the 2.0 data structures, the geometry command, and exposes
-the sysfs attributes that comes with the 2.0 specification. Note that
-the attributes between 1.2 and 2.0 are different, and it is expected
-that user-space shall use the version sysfs attribute to know which
-attributes will be available.
-
-The last patch implements support for using the nvme namespace logical
-block and metadata fields and sync it with the internal lightnvm
-identify structures.
-
--Matias
-
-Matias Bjørling (4):
-  lightnvm: make 1.2 data structures explicit
-  lightnvm: flatten nvm_id_group into nvm_id
-  lightnvm: add 2.0 geometry identification
-  nvme: lightnvm: add late setup of block size and metadata
-
- drivers/lightnvm/core.c      |  27 ++-
- drivers/nvme/host/core.c     |   2 +
- drivers/nvme/host/lightnvm.c | 508 ++++++++++++++++++++++++++++++++-----------
- drivers/nvme/host/nvme.h     |   2 +
- include/linux/lightnvm.h     |  64 +++---
- 5 files changed, 426 insertions(+), 177 deletions(-)
-
+diff --git a/drivers/block/ibnbd/ibnbd-srv.h b/drivers/block/ibnbd/ibnbd-srv.h
+new file mode 100644
+index 000000000000..191a1650bc1d
+--- /dev/null
++++ b/drivers/block/ibnbd/ibnbd-srv.h
+@@ -0,0 +1,100 @@
++/*
++ * InfiniBand Network Block Driver
++ *
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler <mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *          Kleber Souza <kleber.souza@profitbricks.com>
++ *          Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ *
++ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
++ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef IBNBD_SRV_H
++#define IBNBD_SRV_H
++
++#include <linux/types.h>
++#include <linux/idr.h>
++#include <linux/kref.h>
++
++#include "ibtrs.h"
++#include "ibnbd-proto.h"
++#include "ibnbd-log.h"
++
++struct ibnbd_srv_session {
++	/* Entry inside global sess_list */
++	struct list_head        list;
++	struct ibtrs_srv	*ibtrs;
++	char			sessname[NAME_MAX];
++	int			queue_depth;
++	struct bio_set		*sess_bio_set;
++
++	rwlock_t                index_lock ____cacheline_aligned;
++	struct idr              index_idr;
++	/* List of struct ibnbd_srv_sess_dev */
++	struct list_head        sess_dev_list;
++	struct mutex		lock;
++	u8			ver;
++};
++
++struct ibnbd_srv_dev {
++	/* Entry inside global dev_list */
++	struct list_head                list;
++	struct kobject                  dev_kobj;
++	struct kobject                  dev_sessions_kobj;
++	struct kref                     kref;
++	char				id[NAME_MAX];
++	/* List of ibnbd_srv_sess_dev structs */
++	struct list_head		sess_dev_list;
++	struct mutex			lock;
++	int				open_write_cnt;
++	enum ibnbd_io_mode		mode;
++};
++
++/* Structure which binds N devices and N sessions */
++struct ibnbd_srv_sess_dev {
++	/* Entry inside ibnbd_srv_dev struct */
++	struct list_head		dev_list;
++	/* Entry inside ibnbd_srv_session struct */
++	struct list_head		sess_list;
++	struct ibnbd_dev		*ibnbd_dev;
++	struct ibnbd_srv_session        *sess;
++	struct ibnbd_srv_dev		*dev;
++	struct kobject                  kobj;
++	struct completion		*sysfs_release_compl;
++	u32                             device_id;
++	fmode_t                         open_flags;
++	struct kref			kref;
++	struct completion               *destroy_comp;
++	char				pathname[NAME_MAX];
++};
++
++/* ibnbd-srv-sysfs.c */
++
++int ibnbd_srv_create_dev_sysfs(struct ibnbd_srv_dev *dev,
++			       struct block_device *bdev,
++			       const char *dir_name);
++void ibnbd_srv_destroy_dev_sysfs(struct ibnbd_srv_dev *dev);
++int ibnbd_srv_create_dev_session_sysfs(struct ibnbd_srv_sess_dev *sess_dev);
++void ibnbd_srv_destroy_dev_session_sysfs(struct ibnbd_srv_sess_dev *sess_dev);
++int ibnbd_srv_create_sysfs_files(void);
++void ibnbd_srv_destroy_sysfs_files(void);
++
++#endif /* IBNBD_SRV_H */
 -- 
-2.11.0
+2.13.1
