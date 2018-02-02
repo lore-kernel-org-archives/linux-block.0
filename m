@@ -1,270 +1,232 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:37807 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752277AbeBFEWC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Feb 2018 23:22:02 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Nix <nix@esperi.org.uk>, Pavel Goran <via-bcache@pvgoran.name>,
-        Michael Lyle <mlyle@lyle.org>,
-        Junhui Tang <tang.junhui@zte.com.cn>,
-        Hannes Reinecke <hare@suse.com>
-Subject: [PATCH v5 06/10] bcache: add stop_when_cache_set_failed option to backing device
-Date: Tue,  6 Feb 2018 12:20:56 +0800
-Message-Id: <20180206042100.65021-7-colyli@suse.de>
-In-Reply-To: <20180206042100.65021-1-colyli@suse.de>
-References: <20180206042100.65021-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <roman.penyaev@profitbricks.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+From: Roman Pen <roman.penyaev@profitbricks.com>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bart Van Assche <bart.vanassche@sandisk.com>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Roman Pen <roman.penyaev@profitbricks.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>,
+	Jack Wang <jinpu.wang@profitbricks.com>
+Subject: [PATCH 15/24] ibnbd: client: private header with client structs and functions
+Date: Fri,  2 Feb 2018 15:08:55 +0100
+Message-Id: <20180202140904.2017-16-roman.penyaev@profitbricks.com>
+In-Reply-To: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
+References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
+List-ID: <linux-block@vger.kernel.org>
 
-When there are too many I/O errors on cache device, current bcache code
-will retire the whole cache set, and detach all bcache devices. But the
-detached bcache devices are not stopped, which is problematic when bcache
-is in writeback mode.
+This header describes main structs and functions used by ibnbd-client
+module, mainly for managing IBNBD sessions and mapped block devices,
+creating and destroying sysfs entries.
 
-If the retired cache set has dirty data of backing devices, continue
-writing to bcache device will write to backing device directly. If the
-LBA of write request has a dirty version cached on cache device, next time
-when the cache device is re-registered and backing device re-attached to
-it again, the stale dirty data on cache device will be written to backing
-device, and overwrite latest directly written data. This situation causes
-a quite data corruption.
-
-But we cannot simply stop all attached bcache devices when the cache set is
-broken or disconnected. For example, use bcache to accelerate performance
-of an email service. In such workload, if cache device is broken but no
-dirty data lost, keep the bcache device alive and permit email service
-continue to access user data might be a better solution for the cache
-device failure.
-
-Nix <nix@esperi.org.uk> points out the issue and provides the above example
-to explain why it might be necessary to not stop bcache device for broken
-cache device. Pavel Goran <via-bcache@pvgoran.name> provides a brilliant
-suggestion to provide "always" and "auto" options to per-cached device
-sysfs file stop_when_cache_set_failed. If cache set is retiring and the
-backing device has no dirty data on cache, it should be safe to keep the
-bcache device alive. In this case, if stop_when_cache_set_failed is set to
-"auto", the device failure handling code will not stop this bcache device
-and permit application to access the backing device with a unattached
-bcache device.
-
-Changelog:
-v2: change option values of stop_when_cache_set_failed from 1/0 to
-    "auto"/"always".
-v1: initial version, stop_when_cache_set_failed can be 0 (not stop) or 1
-    (always stop).
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Nix <nix@esperi.org.uk>
-Cc: Pavel Goran <via-bcache@pvgoran.name>
-Cc: Michael Lyle <mlyle@lyle.org>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
-Cc: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
+Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
+Cc: Jack Wang <jinpu.wang@profitbricks.com>
 ---
- drivers/md/bcache/bcache.h |  9 +++++
- drivers/md/bcache/super.c  | 82 ++++++++++++++++++++++++++++++++++++++++------
- drivers/md/bcache/sysfs.c  | 17 ++++++++++
- 3 files changed, 98 insertions(+), 10 deletions(-)
+ drivers/block/ibnbd/ibnbd-clt.h | 193 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 193 insertions(+)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 7917b3820dd5..263164490833 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -287,6 +287,12 @@ struct io {
- 	sector_t		last;
- };
- 
-+enum stop_on_faliure {
-+	BCH_CACHED_DEV_STOP_ATUO = 0,
-+	BCH_CACHED_DEV_STOP_ALWAYS,
-+	BCH_CACHED_DEV_STOP_MODE_MAX,
-+};
-+
- struct cached_dev {
- 	struct list_head	list;
- 	struct bcache_device	disk;
-@@ -379,6 +385,8 @@ struct cached_dev {
- 	unsigned		writeback_rate_i_term_inverse;
- 	unsigned		writeback_rate_p_term_inverse;
- 	unsigned		writeback_rate_minimum;
-+
-+	enum stop_on_faliure	stop_when_cache_set_failed;
- };
- 
- enum alloc_reserve {
-@@ -924,6 +932,7 @@ void bch_write_bdev_super(struct cached_dev *, struct closure *);
- 
- extern struct workqueue_struct *bcache_wq;
- extern const char * const bch_cache_modes[];
-+extern const char * const bch_stop_on_failure_modes[];
- extern struct mutex bch_register_lock;
- extern struct list_head bch_cache_sets;
- 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index f8b0d1196c12..e335433bdfb7 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -47,6 +47,14 @@ const char * const bch_cache_modes[] = {
- 	NULL
- };
- 
-+/* Default is -1; we skip past it for stop_when_cache_set_failed */
-+const char * const bch_stop_on_failure_modes[] = {
-+	"default",
-+	"auto",
-+	"always",
-+	NULL
-+};
-+
- static struct kobject *bcache_kobj;
- struct mutex bch_register_lock;
- LIST_HEAD(bch_cache_sets);
-@@ -1187,6 +1195,9 @@ static int cached_dev_init(struct cached_dev *dc, unsigned block_size)
- 		max(dc->disk.disk->queue->backing_dev_info->ra_pages,
- 		    q->backing_dev_info->ra_pages);
- 
-+	/* default to auto */
-+	dc->stop_when_cache_set_failed = BCH_CACHED_DEV_STOP_ATUO;
-+
- 	bch_cached_dev_request_init(dc);
- 	bch_cached_dev_writeback_init(dc);
- 	return 0;
-@@ -1463,25 +1474,76 @@ static void cache_set_flush(struct closure *cl)
- 	closure_return(cl);
- }
- 
+diff --git a/drivers/block/ibnbd/ibnbd-clt.h b/drivers/block/ibnbd/ibnbd-clt.h
+new file mode 100644
+index 000000000000..b3d72b2962dd
+--- /dev/null
++++ b/drivers/block/ibnbd/ibnbd-clt.h
+@@ -0,0 +1,193 @@
 +/*
-+ * This function is only called when CACHE_SET_IO_DISABLE is set, which means
-+ * cache set is unregistering due to too many I/O errors. In this condition,
-+ * the bcache device might be stopped, it depends on stop_when_cache_set_failed
-+ * value and whether the broken cache has dirty data:
++ * InfiniBand Network Block Driver
 + *
-+ * dc->stop_when_cache_set_failed    dc->has_dirty   stop bcache device
-+ *  BCH_CACHED_STOP_ATUO               0               NO
-+ *  BCH_CACHED_STOP_ATUO               1               YES
-+ *  BCH_CACHED_DEV_STOP_ALWAYS         0               YES
-+ *  BCH_CACHED_DEV_STOP_ALWAYS         1               YES
++ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
++ * Authors: Fabian Holler <mail@fholler.de>
++ *          Jack Wang <jinpu.wang@profitbricks.com>
++ *          Kleber Souza <kleber.souza@profitbricks.com>
++ *          Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *          Milind Dumbare <Milind.dumbare@gmail.com>
 + *
-+ * The expected behavior is, if stop_when_cache_set_failed is configured to
-+ * "auto" via sysfs interface, the bcache device will not be stopped if the
-+ * backing device is clean on the broken cache device.
++ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
++ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
++ *          Roman Penyaev <roman.penyaev@profitbricks.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version 2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
 + */
-+static void conditional_stop_bcache_device(struct cache_set *c,
-+					   struct bcache_device *d,
-+					   struct cached_dev *dc)
++
++#ifndef IBNBD_CLT_H
++#define IBNBD_CLT_H
++
++#include <linux/wait.h>
++#include <linux/in.h>
++#include <linux/inet.h>
++#include <linux/blk-mq.h>
++#include <linux/refcount.h>
++
++#include "ibtrs.h"
++#include "ibnbd-proto.h"
++#include "ibnbd-log.h"
++
++#define BMAX_SEGMENTS 31
++#define RECONNECT_DELAY 30
++#define MAX_RECONNECTS -1
++
++enum ibnbd_clt_dev_state {
++	DEV_STATE_INIT,
++	DEV_STATE_MAPPED,
++	DEV_STATE_MAPPED_DISCONNECTED,
++	DEV_STATE_UNMAPPED,
++};
++
++enum ibnbd_queue_mode {
++	BLK_MQ,
++	BLK_RQ
++};
++
++struct ibnbd_iu_comp {
++	wait_queue_head_t wait;
++	int errno;
++};
++
++struct ibnbd_iu {
++	union {
++		struct request *rq; /* for block io */
++		void *buf; /* for user messages */
++	};
++	struct ibtrs_tag	*tag;
++	union {
++		/* use to send msg associated with a dev */
++		struct ibnbd_clt_dev *dev;
++		/* use to send msg associated with a sess */
++		struct ibnbd_clt_session *sess;
++	};
++	blk_status_t		status;
++	struct scatterlist	sglist[BMAX_SEGMENTS];
++	struct work_struct	work;
++	int			errno;
++	struct ibnbd_iu_comp	*comp;
++};
++
++struct ibnbd_cpu_qlist {
++	struct list_head	requeue_list;
++	spinlock_t		requeue_lock;
++	unsigned int		cpu;
++};
++
++struct ibnbd_clt_session {
++	struct list_head        list;
++	struct ibtrs_clt        *ibtrs;
++	wait_queue_head_t       ibtrs_waitq;
++	bool                    ibtrs_ready;
++	struct ibnbd_cpu_qlist	__percpu
++				*cpu_queues;
++	DECLARE_BITMAP(cpu_queues_bm, NR_CPUS);
++	int	__percpu	*cpu_rr; /* per-cpu var for CPU round-robin */
++	atomic_t		busy;
++	int			queue_depth;
++	u32			max_io_size;
++	struct blk_mq_tag_set	tag_set;
++	struct mutex		lock; /* protects state and devs_list */
++	struct list_head        devs_list; /* list of struct ibnbd_clt_dev */
++	refcount_t		refcount;
++	char			sessname[NAME_MAX];
++	u8			ver; /* protocol version */
++};
++
++/**
++ * Submission queues.
++ */
++struct ibnbd_queue {
++	struct list_head	requeue_list;
++	unsigned long		in_list;
++	struct ibnbd_clt_dev	*dev;
++	struct blk_mq_hw_ctx	*hctx;
++};
++
++struct ibnbd_clt_dev {
++	struct ibnbd_clt_session	*sess;
++	struct request_queue	*queue;
++	struct ibnbd_queue	*hw_queues;
++	struct delayed_work	rq_delay_work;
++	u32			device_id;
++	/* local Idr index - used to track minor number allocations. */
++	u32			clt_device_id;
++	struct mutex		lock;
++	enum ibnbd_clt_dev_state	dev_state;
++	enum ibnbd_queue_mode	queue_mode;
++	enum ibnbd_io_mode	io_mode; /* user requested */
++	enum ibnbd_io_mode	remote_io_mode; /* server really used */
++	char			pathname[NAME_MAX];
++	enum ibnbd_access_mode	access_mode;
++	bool			read_only;
++	bool			rotational;
++	u32			max_hw_sectors;
++	u32			max_write_same_sectors;
++	u32			max_discard_sectors;
++	u32			discard_granularity;
++	u32			discard_alignment;
++	u16			secure_discard;
++	u16			physical_block_size;
++	u16			logical_block_size;
++	u16			max_segments;
++	size_t			nsectors;
++	u64			size;		/* device size in bytes */
++	struct list_head        list;
++	struct gendisk		*gd;
++	struct kobject		kobj;
++	char			blk_symlink_name[NAME_MAX];
++	refcount_t		refcount;
++	struct work_struct	unmap_on_rmmod_work;
++};
++
++static inline const char *ibnbd_queue_mode_str(enum ibnbd_queue_mode mode)
 +{
-+	if (dc->stop_when_cache_set_failed == BCH_CACHED_DEV_STOP_ALWAYS) {
-+		pr_warn("stop_when_cache_set_failed of %s is \"always\", stop"
-+			" it for failed cache set %pU.",
-+			d->disk->disk_name, c->sb.set_uuid);
-+		bcache_device_stop(d);
-+	} else if (atomic_read(&dc->has_dirty)) {
-+		/*
-+		 * dc->stop_when_cache_set_failed == BCH_CACHED_STOP_ATUO
-+		 * and dc->has_dirty == 1
-+		 */
-+		pr_warn("stop_when_cache_set_failed of %s is \"auto\" and "
-+			"cache is dirty, stop it to avoid potential data "
-+			"corruption.",
-+			d->disk->disk_name);
-+			bcache_device_stop(d);
-+	} else {
-+		/*
-+		 * dc->stop_when_cache_set_failed == BCH_CACHED_STOP_ATUO
-+		 * and dc->has_dirty == 0
-+		 */
-+		pr_warn("stop_when_cache_set_failed of %s is \"auto\" and "
-+			"cache is clean, keep it alive.",
-+			d->disk->disk_name);
++	switch (mode) {
++	case BLK_RQ:
++		return "rq";
++	case BLK_MQ:
++		return "mq";
++	default:
++		return "unknown";
 +	}
 +}
 +
- static void __cache_set_unregister(struct closure *cl)
- {
- 	struct cache_set *c = container_of(cl, struct cache_set, caching);
- 	struct cached_dev *dc;
-+	struct bcache_device *d;
- 	size_t i;
- 
- 	mutex_lock(&bch_register_lock);
- 
--	for (i = 0; i < c->devices_max_used; i++)
--		if (c->devices[i]) {
--			if (!UUID_FLASH_ONLY(&c->uuids[i]) &&
--			    test_bit(CACHE_SET_UNREGISTERING, &c->flags)) {
--				dc = container_of(c->devices[i],
--						  struct cached_dev, disk);
--				bch_cached_dev_detach(dc);
--			} else {
--				bcache_device_stop(c->devices[i]);
--			}
-+	for (i = 0; i < c->devices_max_used; i++) {
-+		d = c->devices[i];
-+		if (!d)
-+			continue;
++/* ibnbd-clt.c */
 +
-+		if (!UUID_FLASH_ONLY(&c->uuids[i]) &&
-+		    test_bit(CACHE_SET_UNREGISTERING, &c->flags)) {
-+			dc = container_of(d, struct cached_dev, disk);
-+			bch_cached_dev_detach(dc);
-+			if (test_bit(CACHE_SET_IO_DISABLE, &c->flags))
-+				conditional_stop_bcache_device(c, d, dc);
-+		} else {
-+			bcache_device_stop(d);
- 		}
-+	}
- 
- 	mutex_unlock(&bch_register_lock);
- 
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index cf973c07c856..91d859a54575 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -78,6 +78,7 @@ rw_attribute(congested_write_threshold_us);
- rw_attribute(sequential_cutoff);
- rw_attribute(data_csum);
- rw_attribute(cache_mode);
-+rw_attribute(stop_when_cache_set_failed);
- rw_attribute(writeback_metadata);
- rw_attribute(writeback_running);
- rw_attribute(writeback_percent);
-@@ -126,6 +127,12 @@ SHOW(__bch_cached_dev)
- 					       bch_cache_modes + 1,
- 					       BDEV_CACHE_MODE(&dc->sb));
- 
-+	if (attr == &sysfs_stop_when_cache_set_failed)
-+		return bch_snprint_string_list(buf, PAGE_SIZE,
-+					       bch_stop_on_failure_modes + 1,
-+					       dc->stop_when_cache_set_failed);
++struct ibnbd_clt_dev *ibnbd_clt_map_device(const char *sessname,
++					   struct ibtrs_addr *paths,
++					   size_t path_cnt,
++					   const char *pathname,
++					   enum ibnbd_access_mode access_mode,
++					   enum ibnbd_queue_mode queue_mode,
++					   enum ibnbd_io_mode io_mode);
++int ibnbd_clt_unmap_device(struct ibnbd_clt_dev *dev, bool force,
++			   const struct attribute *sysfs_self);
 +
++int ibnbd_clt_remap_device(struct ibnbd_clt_dev *dev);
++int ibnbd_clt_resize_disk(struct ibnbd_clt_dev *dev, size_t newsize);
 +
- 	sysfs_printf(data_csum,		"%i", dc->disk.data_csum);
- 	var_printf(verify,		"%i");
- 	var_printf(bypass_torture_test,	"%i");
-@@ -247,6 +254,15 @@ STORE(__cached_dev)
- 		}
- 	}
- 
-+	if (attr == &sysfs_stop_when_cache_set_failed) {
-+		v = bch_read_string_list(buf, bch_stop_on_failure_modes + 1);
++/* ibnbd-clt-sysfs.c */
 +
-+		if (v < 0)
-+			return v;
++int ibnbd_clt_create_sysfs_files(void);
 +
-+		dc->stop_when_cache_set_failed = v;
-+	}
++void ibnbd_clt_destroy_sysfs_files(void);
++void ibnbd_clt_destroy_default_group(void);
 +
- 	if (attr == &sysfs_label) {
- 		if (size > SB_LABEL_SIZE)
- 			return -EINVAL;
-@@ -323,6 +339,7 @@ static struct attribute *bch_cached_dev_files[] = {
- 	&sysfs_data_csum,
- #endif
- 	&sysfs_cache_mode,
-+	&sysfs_stop_when_cache_set_failed,
- 	&sysfs_writeback_metadata,
- 	&sysfs_writeback_running,
- 	&sysfs_writeback_delay,
++void ibnbd_clt_remove_dev_symlink(struct ibnbd_clt_dev *dev);
++void ibnbd_sysfs_remove_file_self(struct kobject *kobj,
++				  const struct attribute *attr);
++
++#endif /* IBNBD_CLT_H */
 -- 
-2.16.1
+2.13.1
