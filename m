@@ -1,71 +1,37 @@
-Return-Path: <jinpu.wang@profitbricks.com>
-MIME-Version: 1.0
-In-Reply-To: <1517589637.3936.16.camel@redhat.com>
-References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
- <1517587623.2675.8.camel@sandisk.com> <1517589637.3936.16.camel@redhat.com>
-From: Jinpu Wang <jinpu.wang@profitbricks.com>
-Date: Mon, 5 Feb 2018 09:45:15 +0100
-Message-ID: <CAMGffEnPREHrsf=Nkj-K0iRbgSoUiqZ4dLo+xzMF6KYofTSQnA@mail.gmail.com>
+Return-Path: <prvs=564c18bbf=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "roman.penyaev@profitbricks.com" <roman.penyaev@profitbricks.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+CC: "danil.kipnis@profitbricks.com" <danil.kipnis@profitbricks.com>,
+	"hch@infradead.org" <hch@infradead.org>, "ogerlitz@mellanox.com"
+	<ogerlitz@mellanox.com>, "jinpu.wang@profitbricks.com"
+	<jinpu.wang@profitbricks.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"sagi@grimberg.me" <sagi@grimberg.me>
 Subject: Re: [PATCH 00/24] InfiniBand Transport (IBTRS) and Network Block
  Device (IBNBD)
-To: Doug Ledford <dledford@redhat.com>, Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "roman.penyaev@profitbricks.com" <roman.penyaev@profitbricks.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"danil.kipnis@profitbricks.com" <danil.kipnis@profitbricks.com>, "hch@infradead.org" <hch@infradead.org>,
-	"ogerlitz@mellanox.com" <ogerlitz@mellanox.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"sagi@grimberg.me" <sagi@grimberg.me>
-Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 2 Feb 2018 17:05:07 +0000
+Message-ID: <1517591106.2675.28.camel@sandisk.com>
+References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
+In-Reply-To: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Feb 2, 2018 at 5:40 PM, Doug Ledford <dledford@redhat.com> wrote:
-> On Fri, 2018-02-02 at 16:07 +0000, Bart Van Assche wrote:
->> On Fri, 2018-02-02 at 15:08 +0100, Roman Pen wrote:
->> > Since the first version the following was changed:
->> >
->> >    - Load-balancing and IO fail-over using multipath features were added.
->> >    - Major parts of the code were rewritten, simplified and overall code
->> >      size was reduced by a quarter.
->>
->> That is interesting to know, but what happened to the feedback that Sagi and
->> I provided on v1? Has that feedback been addressed? See also
->> https://www.spinics.net/lists/linux-rdma/msg47819.html and
->> https://www.spinics.net/lists/linux-rdma/msg47879.html.
->>
->> Regarding multipath support: there are already two multipath implementations
->> upstream (dm-mpath and the multipath implementation in the NVMe initiator).
->> I'm not sure we want a third multipath implementation in the Linux kernel.
->
-> There's more than that.  There was also md-multipath, and smc-r includes
-> another version of multipath, plus I assume we support mptcp as well.
->
-> But, to be fair, the different multipaths in this list serve different
-> purposes and I'm not sure they could all be generalized out and served
-> by a single multipath code.  Although, fortunately, md-multipath is
-> deprecated, so no need to worry about it, and it is only dm-multipath
-> and nvme multipath that deal directly with block devices and assume
-> block semantics.  If I read the cover letter right (and I haven't dug
-> into the code to confirm this), the ibtrs multipath has much more in
-> common with smc-r multipath, where it doesn't really assume a block
-> layer device sits on top of it, it's more of a pure network multipath,
-> which the implementation of smc-r is and mptcp would be too.  I would
-> like to see a core RDMA multipath implementation soon that would
-> abstract out some of these multipath tasks, at least across RDMA links,
-> and that didn't have the current limitations (smc-r only supports RoCE
-> links, and it sounds like ibtrs only supports IB like links, but maybe
-> I'm wrong there, I haven't looked at the patches yet).
-Hi Doug, hi Bart,
-
-Thanks for your valuable input, here is my 2 cents:
-
-IBTRS multipath is indeed a network multipath, with sysfs interface to
-remove/add path dynamically.
-IBTRS is built on rdma-cm, so expect to support RoCE and iWARP, but we
-mainly tested in IB environment,
-slightly tested on RXE.
-
-
-Regards,
--- 
-Jack Wang
-Linux Kernel Developer
+T24gRnJpLCAyMDE4LTAyLTAyIGF0IDE1OjA4ICswMTAwLCBSb21hbiBQZW4gd3JvdGU6DQo+IG8g
+U2ltcGxlIGNvbmZpZ3VyYXRpb24gb2YgSUJOQkQ6DQo+ICAgIC0gU2VydmVyIHNpZGUgaXMgY29t
+cGxldGVseSBwYXNzaXZlOiB2b2x1bWVzIGRvIG5vdCBuZWVkIHRvIGJlDQo+ICAgICAgZXhwbGlj
+aXRseSBleHBvcnRlZC4NCg0KVGhhdCBzb3VuZHMgbGlrZSBhIHNlY3VyaXR5IGhvbGU/IEkgdGhp
+bmsgdGhlIGFiaWxpdHkgdG8gY29uZmlndXJlIHdoZXRoZXIgb3INCm5vdCBhbiBpbml0aWF0b3Ig
+aXMgYWxsb3dlZCB0byBsb2cgaW4gaXMgZXNzZW50aWFsIGFuZCBhbHNvIHdoaWNoIHZvbHVtZXMg
+YW4NCmluaXRpYXRvciBoYXMgYWNjZXNzIHRvLg0KDQo+ICAgIC0gT25seSBJQiBwb3J0IEdJRCBh
+bmQgZGV2aWNlIHBhdGggbmVlZGVkIG9uIGNsaWVudCBzaWRlIHRvIG1hcA0KPiAgICAgIGEgYmxv
+Y2sgZGV2aWNlLg0KDQpJIHRoaW5rIElQIGFkZHJlc3NpbmcgaXMgcHJlZmVycmVkIG92ZXIgR0lE
+IGFkZHJlc3NpbmcgaW4gUm9DRSBuZXR3b3Jrcy4NCkFkZGl0aW9uYWxseSwgaGF2ZSB5b3Ugbm90
+aWNlZCB0aGF0IEdVSUQgY29uZmlndXJhdGlvbiBzdXBwb3J0IGhhcyBiZWVuIGFkZGVkDQp0byB0
+aGUgdXBzdHJlYW0gaWJfc3JwdCBkcml2ZXI/IFVzaW5nIEdJRHMgaGFzIGEgdmVyeSBpbXBvcnRh
+bnQgZGlzYWR2YW50YWdlLA0KbmFtZWx5IHRoYXQgYXQgbGVhc3QgaW4gSUIgbmV0d29ya3MgdGhl
+IHByZWZpeCB3aWxsIGNoYW5nZSBpZiB0aGUgc3VibmV0DQptYW5hZ2VyIGlzIHJlY29uZmlndXJl
+ZC4gQWRkaXRpb25hbGx5LCBpbiBJQiBuZXR3b3JrcyBpdCBtYXkgaGFwcGVuIHRoYXQgdGhlDQp0
+YXJnZXQgZHJpdmVyIGlzIGxvYWRlZCBhbmQgY29uZmlndXJlZCBiZWZvcmUgdGhlIEdJRCBoYXMg
+YmVlbiBhc3NpZ25lZCB0bw0KYWxsIFJETUEgcG9ydHMuDQoNClRoYW5rcywNCg0KQmFydC4=
