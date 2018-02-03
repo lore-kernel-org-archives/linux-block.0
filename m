@@ -1,94 +1,85 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH 3/5] block: null_blk: introduce module parameter of
- 'g_global_tags'
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
- Mike Snitzer <snitzer@redhat.com>
-Cc: linux-scsi@vger.kernel.org, Arun Easi <arun.easi@cavium.com>,
- Omar Sandoval <osandov@fb.com>,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- James Bottomley <james.bottomley@hansenpartnership.com>,
- Christoph Hellwig <hch@lst.de>, Don Brace <don.brace@microsemi.com>,
- Kashyap Desai <kashyap.desai@broadcom.com>,
- Peter Rivera <peter.rivera@broadcom.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Laurence Oberman <loberman@redhat.com>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Mike Snitzer <snitzer@redhat.com>
+Cc: linux-scsi@vger.kernel.org,
+	Hannes Reinecke <hare@suse.de>,
+	Arun Easi <arun.easi@cavium.com>,
+	Omar Sandoval <osandov@fb.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	James Bottomley <james.bottomley@hansenpartnership.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Don Brace <don.brace@microsemi.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Peter Rivera <peter.rivera@broadcom.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Laurence Oberman <loberman@redhat.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 3/5] block: null_blk: introduce module parameter of 'g_global_tags'
+Date: Sat,  3 Feb 2018 12:21:10 +0800
+Message-Id: <20180203042112.15239-4-ming.lei@redhat.com>
+In-Reply-To: <20180203042112.15239-1-ming.lei@redhat.com>
 References: <20180203042112.15239-1-ming.lei@redhat.com>
- <20180203042112.15239-4-ming.lei@redhat.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <26c62f5c-05bc-53e9-c5a9-eb9395d9a854@suse.de>
-Date: Mon, 5 Feb 2018 07:54:54 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180203042112.15239-4-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 02/03/2018 05:21 AM, Ming Lei wrote:
-> This patch introduces the parameter of 'g_global_tags' so that we can
-> test this feature by null_blk easiy.
-> 
-> Not see obvious performance drop with global_tags when the whole hw
-> depth is kept as same:
-> 
-> 1) no 'global_tags', each hw queue depth is 1, and 4 hw queues
-> modprobe null_blk queue_mode=2 nr_devices=4 shared_tags=1 global_tags=0 submit_queues=4 hw_queue_depth=1
-> 
-> 2) 'global_tags', global hw queue depth is 4, and 4 hw queues
-> modprobe null_blk queue_mode=2 nr_devices=4 shared_tags=1 global_tags=0 submit_queues=4 hw_queue_depth=4
-> 
-> 3) fio test done in above two settings:
->    fio --bs=4k --size=512G  --rw=randread --norandommap --direct=1 --ioengine=libaio --iodepth=4 --runtime=$RUNTIME --group_reporting=1  --name=nullb0 --filename=/dev/nullb0 --name=nullb1 --filename=/dev/nullb1 --name=nullb2 --filename=/dev/nullb2 --name=nullb3 --filename=/dev/nullb3
-> 
-> 1M IOPS can be reached in both above tests which is done in one VM.
-> 
-> Cc: Hannes Reinecke <hare@suse.de>
-> Cc: Arun Easi <arun.easi@cavium.com>
-> Cc: Omar Sandoval <osandov@fb.com>,
-> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-> Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-> Cc: Christoph Hellwig <hch@lst.de>,
-> Cc: Don Brace <don.brace@microsemi.com>
-> Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-> Cc: Peter Rivera <peter.rivera@broadcom.com>
-> Cc: Laurence Oberman <loberman@redhat.com>
-> Cc: Mike Snitzer <snitzer@redhat.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  drivers/block/null_blk.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-> index 287a09611c0f..ad0834efad42 100644
-> --- a/drivers/block/null_blk.c
-> +++ b/drivers/block/null_blk.c
-> @@ -163,6 +163,10 @@ static int g_submit_queues = 1;
->  module_param_named(submit_queues, g_submit_queues, int, S_IRUGO);
->  MODULE_PARM_DESC(submit_queues, "Number of submission queues");
->  
-> +static int g_global_tags = 0;
-> +module_param_named(global_tags, g_global_tags, int, S_IRUGO);
-> +MODULE_PARM_DESC(global_tags, "All submission queues share one tags");
-> +
->  static int g_home_node = NUMA_NO_NODE;
->  module_param_named(home_node, g_home_node, int, S_IRUGO);
->  MODULE_PARM_DESC(home_node, "Home node for the device");
-> @@ -1622,6 +1626,8 @@ static int null_init_tag_set(struct nullb *nullb, struct blk_mq_tag_set *set)
->  	set->flags = BLK_MQ_F_SHOULD_MERGE;
->  	if (g_no_sched)
->  		set->flags |= BLK_MQ_F_NO_SCHED;
-> +	if (g_global_tags)
-> +		set->flags |= BLK_MQ_F_GLOBAL_TAGS;
->  	set->driver_data = NULL;
->  
->  	if ((nullb && nullb->dev->blocking) || g_blocking)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+This patch introduces the parameter of 'g_global_tags' so that we can
+test this feature by null_blk easiy.
 
-Cheers,
+Not see obvious performance drop with global_tags when the whole hw
+depth is kept as same:
 
-Hannes
+1) no 'global_tags', each hw queue depth is 1, and 4 hw queues
+modprobe null_blk queue_mode=2 nr_devices=4 shared_tags=1 global_tags=0 submit_queues=4 hw_queue_depth=1
+
+2) 'global_tags', global hw queue depth is 4, and 4 hw queues
+modprobe null_blk queue_mode=2 nr_devices=4 shared_tags=1 global_tags=0 submit_queues=4 hw_queue_depth=4
+
+3) fio test done in above two settings:
+   fio --bs=4k --size=512G  --rw=randread --norandommap --direct=1 --ioengine=libaio --iodepth=4 --runtime=$RUNTIME --group_reporting=1  --name=nullb0 --filename=/dev/nullb0 --name=nullb1 --filename=/dev/nullb1 --name=nullb2 --filename=/dev/nullb2 --name=nullb3 --filename=/dev/nullb3
+
+1M IOPS can be reached in both above tests which is done in one VM.
+
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Arun Easi <arun.easi@cavium.com>
+Cc: Omar Sandoval <osandov@fb.com>,
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
+Cc: Christoph Hellwig <hch@lst.de>,
+Cc: Don Brace <don.brace@microsemi.com>
+Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: Peter Rivera <peter.rivera@broadcom.com>
+Cc: Laurence Oberman <loberman@redhat.com>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/null_blk.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index 287a09611c0f..ad0834efad42 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -163,6 +163,10 @@ static int g_submit_queues = 1;
+ module_param_named(submit_queues, g_submit_queues, int, S_IRUGO);
+ MODULE_PARM_DESC(submit_queues, "Number of submission queues");
+ 
++static int g_global_tags = 0;
++module_param_named(global_tags, g_global_tags, int, S_IRUGO);
++MODULE_PARM_DESC(global_tags, "All submission queues share one tags");
++
+ static int g_home_node = NUMA_NO_NODE;
+ module_param_named(home_node, g_home_node, int, S_IRUGO);
+ MODULE_PARM_DESC(home_node, "Home node for the device");
+@@ -1622,6 +1626,8 @@ static int null_init_tag_set(struct nullb *nullb, struct blk_mq_tag_set *set)
+ 	set->flags = BLK_MQ_F_SHOULD_MERGE;
+ 	if (g_no_sched)
+ 		set->flags |= BLK_MQ_F_NO_SCHED;
++	if (g_global_tags)
++		set->flags |= BLK_MQ_F_GLOBAL_TAGS;
+ 	set->driver_data = NULL;
+ 
+ 	if ((nullb && nullb->dev->blocking) || g_blocking)
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.9.5
