@@ -1,189 +1,66 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:37728 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752309AbeBFEV3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Feb 2018 23:21:29 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Michael Lyle <mlyle@lyle.org>,
-        Junhui Tang <tang.junhui@zte.com.cn>
-Subject: [PATCH v5 02/10] bcache: fix cached_dev->count usage for bch_cache_set_error()
-Date: Tue,  6 Feb 2018 12:20:52 +0800
-Message-Id: <20180206042100.65021-3-colyli@suse.de>
-In-Reply-To: <20180206042100.65021-1-colyli@suse.de>
-References: <20180206042100.65021-1-colyli@suse.de>
+Received: from auth-4.ukservers.net ([217.10.138.158]:40672 "EHLO
+        auth-4.ukservers.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752026AbeBCRQZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 3 Feb 2018 12:16:25 -0500
+Subject: Re: [LSF/MM TOPIC] De-clustered RAID with MD
+To: NeilBrown <neilb@suse.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        lsf-pc@lists.linux-foundation.org
+References: <mqdvafkhep0.fsf@linux-x5ow.site>
+ <5A6F4CA6.5060802@youngman.org.uk> <87fu6o5o83.fsf@notabene.neil.brown.name>
+ <5A704C59.4000705@youngman.org.uk> <87372n613s.fsf@notabene.neil.brown.name>
+Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>, Neil Brown <neilb@suse.de>
+From: Wols Lists <antlists@youngman.org.uk>
+Message-ID: <5A75EE63.8040606@youngman.org.uk>
+Date: Sat, 3 Feb 2018 17:16:19 +0000
+MIME-Version: 1.0
+In-Reply-To: <87372n613s.fsf@notabene.neil.brown.name>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-When bcache metadata I/O fails, bcache will call bch_cache_set_error()
-to retire the whole cache set. The expected behavior to retire a cache
-set is to unregister the cache set, and unregister all backing device
-attached to this cache set, then remove sysfs entries of the cache set
-and all attached backing devices, finally release memory of structs
-cache_set, cache, cached_dev and bcache_device.
+On 30/01/18 11:24, NeilBrown wrote:
+> When Ax are a logical stripe and Bx are the next,  then you have a
+> slightly better distribution.  If device XX fails then the reads needed
+> for the first stripe mostly come from different drives than those for
+> the second stripe, which are mostly different again for the 3rd stripe.
 
-In my testing when journal I/O failure triggered by disconnected cache
-device, sometimes the cache set cannot be retired, and its sysfs
-entry /sys/fs/bcache/<uuid> still exits and the backing device also
-references it. This is not expected behavior.
+Having got myself thoroughly confused, I think I've got my head
+straight. There's actually an incredibly simple algorithm for this, I think.
 
-When metadata I/O failes, the call senquence to retire whole cache set is,
-        bch_cache_set_error()
-        bch_cache_set_unregister()
-        bch_cache_set_stop()
-        __cache_set_unregister()     <- called as callback by calling
-                                        clousre_queue(&c->caching)
-        cache_set_flush()            <- called as a callback when refcount
-                                        of cache_set->caching is 0
-        cache_set_free()             <- called as a callback when refcount
-                                        of catch_set->cl is 0
-        bch_cache_set_release()      <- called as a callback when refcount
-                                        of catch_set->kobj is 0
+First of all, let's state that we're defining a new complex raid here,
+people get confused between linux-raid-10 and raid-1+0, so ...
 
-I find if kernel thread bch_writeback_thread() quits while-loop when
-kthread_should_stop() is true and searched_full_index is false, clousre
-callback cache_set_flush() set by continue_at() will never be called. The
-result is, bcache fails to retire whole cache set.
+I was originally thinking about about raid-61, mirroring raid-6 across a
+random number of drives. I think here we're actually talking about
+raid-60 - doing a raid-6 across a random number of drives. Can we prefix
+whatever raid level we call it with an "L" so it's not confused with
+standard raid-6+0?
 
-cache_set_flush() will be called when refcount of closure c->caching is 0,
-and in function bcache_device_detach() refcount of closure c->caching is
-released to 0 by clousre_put(). In metadata error code path, function
-bcache_device_detach() is called by cached_dev_detach_finish(). This is a
-callback routine being called when cached_dev->count is 0. This refcount
-is decreased by cached_dev_put().
+Okay. Let's say we have a five-disk raid-6 smeared across seven drives.
+Let's call it Raid-L60. That gives us 35 blocks per disk stripe.
 
-The above dependence indicates, cache_set_flush() will be called when
-refcount of cache_set->cl is 0, and refcount of cache_set->cl to be 0
-when refcount of cache_dev->count is 0.
+A1 A2 A3 A4 A5 B1 B2
+B3 B4 B5 C1 C2 C3 C4
+C5 D1 D2 D3 D4 D5 E1
+E2 E3 E4 E5 F1 F2 F3
+F4 F5 G1 G2 G3 G4 G5
 
-The reason why sometimes cache_dev->count is not 0 (when metadata I/O fails
-and bch_cache_set_error() called) is, in bch_writeback_thread(), refcount
-of cache_dev is not decreased properly.
+That gives us a logical disk stripe 35 wide, that we just need to scramble.
 
-In bch_writeback_thread(), cached_dev_put() is called only when
-searched_full_index is true and cached_dev->writeback_keys is empty, a.k.a
-there is no dirty data on cache. In most of run time it is correct, but
-when bch_writeback_thread() quits the while-loop while cache is still
-dirty, current code forget to call cached_dev_put() before this kernel
-thread exits. This is why sometimes cache_set_flush() is not executed and
-cache set fails to be retired.
+Position * Prime mod Disks.
 
-The reason to call cached_dev_put() in bch_writeback_rate() is, when the
-cache device changes from clean to dirty, cached_dev_get() is called, to
-make sure during writeback operatiions both backing and cache devices
-won't be released.
+The problem, of course, is that this is going to scramble each logical
+stripe the same. So as we've got 5 stripes, can we use a table of 5
+different primes? The snag, of course, is that we mustn't use a prime
+that is a factor of the number of disks, as this will blow up with a
+vengeance. It makes sense also to avoid a prime that's a factor of the
+logical disks, I suspect. So here, I'd use 2,3,11,13,17
 
-Adding following code in bch_writeback_thread() does not work,
-   static int bch_writeback_thread(void *arg)
-        }
+I'd like to add the logical stripe number in rather than use multiple
+primes, but I don't think that'll work ...
 
-+       if (atomic_read(&dc->has_dirty))
-+               cached_dev_put()
-+
-        return 0;
- }
-because writeback kernel thread can be waken up and start via sysfs entry:
-        echo 1 > /sys/block/bcache<N>/bcache/writeback_running
-It is difficult to check whether backing device is dirty without race and
-extra lock. So the above modification will introduce potential refcount
-underflow in some conditions.
-
-The correct fix is, to take cached dev refcount when creating the kernel
-thread, and put it before the kernel thread exits. Then bcache does not
-need to take a cached dev refcount when cache turns from clean to dirty,
-or to put a cached dev refcount when cache turns from ditry to clean. The
-writeback kernel thread is alwasy safe to reference data structure from
-cache set, cache and cached device (because a refcount of cache device is
-taken for it already), and no matter the kernel thread is stopped by I/O
-errors or system reboot, cached_dev->count can always be used correctly.
-
-The patch is simple, but understanding how it works is quite complicated.
-
-Changelog:
-v2: set dc->writeback_thread to NULL in this patch, as suggested by Hannes.
-v1: initial version for review.
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Cc: Michael Lyle <mlyle@lyle.org>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
----
- drivers/md/bcache/super.c     |  1 -
- drivers/md/bcache/writeback.c | 11 ++++++++---
- drivers/md/bcache/writeback.h |  2 --
- 3 files changed, 8 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index a2ad37a8afc0..7d96dc6860fa 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1052,7 +1052,6 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c)
- 	if (BDEV_STATE(&dc->sb) == BDEV_STATE_DIRTY) {
- 		bch_sectors_dirty_init(&dc->disk);
- 		atomic_set(&dc->has_dirty, 1);
--		refcount_inc(&dc->count);
- 		bch_writeback_queue(dc);
- 	}
- 
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index f1d2fc15abcc..b280c134dd4d 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -572,7 +572,7 @@ static int bch_writeback_thread(void *arg)
- 
- 			if (kthread_should_stop()) {
- 				set_current_state(TASK_RUNNING);
--				return 0;
-+				break;
- 			}
- 
- 			schedule();
-@@ -585,7 +585,6 @@ static int bch_writeback_thread(void *arg)
- 		if (searched_full_index &&
- 		    RB_EMPTY_ROOT(&dc->writeback_keys.keys)) {
- 			atomic_set(&dc->has_dirty, 0);
--			cached_dev_put(dc);
- 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_CLEAN);
- 			bch_write_bdev_super(dc, NULL);
- 		}
-@@ -606,6 +605,9 @@ static int bch_writeback_thread(void *arg)
- 		}
- 	}
- 
-+	dc->writeback_thread = NULL;
-+	cached_dev_put(dc);
-+
- 	return 0;
- }
- 
-@@ -669,10 +671,13 @@ int bch_cached_dev_writeback_start(struct cached_dev *dc)
- 	if (!dc->writeback_write_wq)
- 		return -ENOMEM;
- 
-+	cached_dev_get(dc);
- 	dc->writeback_thread = kthread_create(bch_writeback_thread, dc,
- 					      "bcache_writeback");
--	if (IS_ERR(dc->writeback_thread))
-+	if (IS_ERR(dc->writeback_thread)) {
-+		cached_dev_put(dc);
- 		return PTR_ERR(dc->writeback_thread);
-+	}
- 
- 	schedule_delayed_work(&dc->writeback_rate_update,
- 			      dc->writeback_rate_update_seconds * HZ);
-diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
-index 587b25599856..0bba8f1c6cdf 100644
---- a/drivers/md/bcache/writeback.h
-+++ b/drivers/md/bcache/writeback.h
-@@ -105,8 +105,6 @@ static inline void bch_writeback_add(struct cached_dev *dc)
- {
- 	if (!atomic_read(&dc->has_dirty) &&
- 	    !atomic_xchg(&dc->has_dirty, 1)) {
--		refcount_inc(&dc->count);
--
- 		if (BDEV_STATE(&dc->sb) != BDEV_STATE_DIRTY) {
- 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_DIRTY);
- 			/* XXX: should do this synchronously */
--- 
-2.16.1
+Cheers,
+Wol
