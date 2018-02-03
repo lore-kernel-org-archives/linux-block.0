@@ -1,8 +1,8 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from auth-4.ukservers.net ([217.10.138.158]:40672 "EHLO
-        auth-4.ukservers.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752026AbeBCRQZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 3 Feb 2018 12:16:25 -0500
+Received: from auth-3.ukservers.net ([217.10.138.152]:44994 "EHLO
+        auth-3.ukservers.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752026AbeBCPxS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 3 Feb 2018 10:53:18 -0500
 Subject: Re: [LSF/MM TOPIC] De-clustered RAID with MD
 To: NeilBrown <neilb@suse.com>,
         Johannes Thumshirn <jthumshirn@suse.de>,
@@ -13,8 +13,8 @@ References: <mqdvafkhep0.fsf@linux-x5ow.site>
 Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
         Hannes Reinecke <hare@suse.de>, Neil Brown <neilb@suse.de>
 From: Wols Lists <antlists@youngman.org.uk>
-Message-ID: <5A75EE63.8040606@youngman.org.uk>
-Date: Sat, 3 Feb 2018 17:16:19 +0000
+Message-ID: <5A75DAEB.9030805@youngman.org.uk>
+Date: Sat, 3 Feb 2018 15:53:15 +0000
 MIME-Version: 1.0
 In-Reply-To: <87372n613s.fsf@notabene.neil.brown.name>
 Content-Type: text/plain; charset=windows-1252
@@ -27,40 +27,25 @@ On 30/01/18 11:24, NeilBrown wrote:
 > for the first stripe mostly come from different drives than those for
 > the second stripe, which are mostly different again for the 3rd stripe.
 
-Having got myself thoroughly confused, I think I've got my head
-straight. There's actually an incredibly simple algorithm for this, I think.
+Well, my maths has been well and truly proved wrong. But. Does streaming
+from one drive directly onto another have value in reducing stress? I've
+just done a worked example for four drives, mirrored three times across
+eighteen drives.
 
-First of all, let's state that we're defining a new complex raid here,
-people get confused between linux-raid-10 and raid-1+0, so ...
+The result is that the drives have ended up in six groups of three
+mirrored drives. So if any drive fails, I can just copy an
+almost-identical drive from the mirror.
 
-I was originally thinking about about raid-61, mirroring raid-6 across a
-random number of drives. I think here we're actually talking about
-raid-60 - doing a raid-6 across a random number of drives. Can we prefix
-whatever raid level we call it with an "L" so it's not confused with
-standard raid-6+0?
+I'll have to play with eg 17 drives and see if this alters the dynamics
+- it'll be interesting.
 
-Okay. Let's say we have a five-disk raid-6 smeared across seven drives.
-Let's call it Raid-L60. That gives us 35 blocks per disk stripe.
+ 0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17
+a1  b2  c3  a4  c1  a2  b3  c4  b1  c2  a3  b4  a1  b2  c3  a4  c1  a2
+b3  c4  b1  c2  a3  b4  a1  b2  c3  a4  c1  a2  b3  c4  b1  c2  a3  b4
 
-A1 A2 A3 A4 A5 B1 B2
-B3 B4 B5 C1 C2 C3 C4
-C5 D1 D2 D3 D4 D5 E1
-E2 E3 E4 E5 F1 F2 F3
-F4 F5 G1 G2 G3 G4 G5
-
-That gives us a logical disk stripe 35 wide, that we just need to scramble.
-
-Position * Prime mod Disks.
-
-The problem, of course, is that this is going to scramble each logical
-stripe the same. So as we've got 5 stripes, can we use a table of 5
-different primes? The snag, of course, is that we mustn't use a prime
-that is a factor of the number of disks, as this will blow up with a
-vengeance. It makes sense also to avoid a prime that's a factor of the
-logical disks, I suspect. So here, I'd use 2,3,11,13,17
-
-I'd like to add the logical stripe number in rather than use multiple
-primes, but I don't think that'll work ...
+Note I'm rotating 5 drives at a time, so a1,a2,a3,a4 goes on drives
+0,5,10,15 ... But pick any drive and you'll notice the drives six away
+are almost mirrors.
 
 Cheers,
 Wol
