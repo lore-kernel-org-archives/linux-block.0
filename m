@@ -1,58 +1,53 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0074.outbound.protection.outlook.com ([104.47.32.74]:60790
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751594AbeBDNJD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 4 Feb 2018 08:09:03 -0500
-From: Javier Gonzalez <javier@cnexlabs.com>
-To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:36572 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750852AbeBDMy7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Feb 2018 07:54:59 -0500
+Received: by mail-lf0-f65.google.com with SMTP id t79so38013908lfe.3
+        for <linux-block@vger.kernel.org>; Sun, 04 Feb 2018 04:54:58 -0800 (PST)
 Subject: Re: [PATCH 5/5] lightnvm: pblk: refactor bad block identification
-Date: Sun, 4 Feb 2018 13:09:00 +0000
-Message-ID: <CBBD681B-B852-487F-B38D-6F405DBCB2E8@cnexlabs.com>
+To: Javier Gonzalez <javier@cnexlabs.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 References: <1517364411-22386-1-git-send-email-javier@cnexlabs.com>
  <1517364411-22386-5-git-send-email-javier@cnexlabs.com>
  <bdde0655-0904-0bf1-7029-51708fcff8b3@lightnvm.io>
  <F1AA3AA6-8F23-43A8-9C4C-5F684A80782C@cnexlabs.com>
  <33896b20-c555-7c60-ed47-28156f4c93bf@lightnvm.io>
- <DEB69E27-635B-4B4F-ABA4-08BEC14B291F@cnexlabs.com>,<71151484-9bee-512b-cfe4-dd5bdc1b4711@lightnvm.io>
-In-Reply-To: <71151484-9bee-512b-cfe4-dd5bdc1b4711@lightnvm.io>
-Content-Type: text/plain; charset="utf-8"
+ <DEB69E27-635B-4B4F-ABA4-08BEC14B291F@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <71151484-9bee-512b-cfe4-dd5bdc1b4711@lightnvm.io>
+Date: Sun, 4 Feb 2018 13:54:56 +0100
 MIME-Version: 1.0
+In-Reply-To: <DEB69E27-635B-4B4F-ABA4-08BEC14B291F@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-DQo+IE9uIDQgRmViIDIwMTgsIGF0IDEzLjU1LCBNYXRpYXMgQmrDuHJsaW5nIDxtYkBsaWdodG52
-bS5pbz4gd3JvdGU6DQo+IA0KPiBPbiAwMi8wNC8yMDE4IDExOjM3IEFNLCBKYXZpZXIgR29uemFs
-ZXogd3JvdGU6DQo+Pj4gT24gMzEgSmFuIDIwMTgsIGF0IDE5LjI0LCBNYXRpYXMgQmrDuHJsaW5n
-IDxtYkBsaWdodG52bS5pbz4gd3JvdGU6DQo+Pj4gDQo+Pj4gT24gMDEvMzEvMjAxOCAxMDoxMyBB
-TSwgSmF2aWVyIEdvbnphbGV6IHdyb3RlOg0KPj4+Pj4gT24gMzEgSmFuIDIwMTgsIGF0IDE2LjUx
-LCBNYXRpYXMgQmrDuHJsaW5nIDxtYkBsaWdodG52bS5pbz4gd3JvdGU6DQo+Pj4+PiANCj4+Pj4g
-SSBoYXZlIGEgcGF0Y2hlcyBhYnN0cmFjdGluZyB0aGlzLCB3aGljaCBJIHRoaW5rIGl0IG1ha2Vz
-IGl0IGNsZWFuZXIuIEkgY2FuIHB1c2ggaXQgbmV4dCB3ZWVrIGZvciByZXZpZXcuIEnigJltIHRy
-YXZlbGluZyB0aGlzIHdlZWsuIChJZiB5b3Ugd2FudCB0byBnZXQgYSBnbGltcHNlIEkgY2FuIHBv
-aW50IHlvdSB0byB0aGUgY29kZSkuDQo+Pj4gDQo+Pj4gWWVzLCBwbGVhc2UgZG8uIFRoYW5rcw0K
-Pj4gVGhpcyBpcyB0aGUgcmVsZWFzZSBjYW5kaWRhdGUgZm9yIDIuMCBzdXBwb3J0IGJhc2VkIG9u
-IDQuMTcuIEknbGwgcmViYXNlDQo+PiBvbiB0b3Agb2YgeW91IDIuMCBzdXBwb3J0LiBXZSdsbCBz
-ZWUgaWYgYWxsIGNoYW5nZXMgbWFrZSBpdCB0byA0LjE3DQo+PiB0aGVuLg0KPj4gaHR0cHM6Ly9n
-aXRodWIuY29tL09wZW5DaGFubmVsU1NEL2xpbnV4L3RyZWUvZm9yLTQuMTcvc3BlYzIwDQo+PiBK
-YXZpZXINCj4gDQo+IEdyZWF0LiBJIGxvb2sgZm9yd2FyZCB0byBiZSBwYXRjaGVzIGJlaW5nIGNs
-ZWFuZWQgdXAgYW5kIHBvc3RlZC4gSSBkbyBzZWUgc29tZSBuaXRwaWNrcyBoZXJlIGFuZCB0aGVy
-ZSwgd2hpY2ggd2UgcHJvcGVybHkgY2FuIHRha2UgYSBjb3VwbGUgb2Ygc3RhYnMgYXQuDQoNClN1
-cmUuIFRoaXMgaXMgc3RpbGwgaW4gZGV2ZWxvcG1lbnQ7IGp1c3Qgd2FudGVkIHRvIHBvaW50IHRv
-IHRoZSBhYnN0cmFjdGlvbnMgSeKAmW0gdGhpbmtpbmcgb2Ygc28gdGhhdCB3ZSBkb27igJl0IGRv
-IHRoZSBzYW1lIHdvcmsgdHdpY2UuIA0KDQpJ4oCZbGwgd2FpdCBmb3IgcG9zdGluZyB1bnRpbCB5
-b3UgZG8gdGhlIDIuMCBpZGVudGlmeSwgc2luY2UgdGhlIG9sZCB2ZXJzaW9uIGlzIGltcGxlbWVu
-dGVkIG9uIHRoZSBmaXJzdCBwYXRjaCBvZiB0aGlzIHNlcmllcy4gDQoNCj4gT25lIHRoaW5rIHRo
-YXQgZ2VuZXJhbGx5IHN0YW5kcyBvdXQgdG8gbWUgaXMgdGhlICJpZiAxLjIgc3VwcG9ydCIsIGVs
-c2UsIC4uLiBzdGF0ZW1lbnRzLiBUaGVzZSBjb3VsZCBiZSBzdHJ1Y3R1cmVkIGJldHRlciBieSBo
-YXZpbmcgZGVkaWNhdGVkIHNldHVwIGZ1bmN0aW9ucyBmb3IgMS4yIGFuZCAyLjAuDQoNCldlIGhh
-dmUgdGhpcyBjb25zdHJ1Y3Rpb24gYm90aCBpbiBwYmxrIGFuZCBpbiBjb3JlIGZvciBhZGRyZXNz
-IHRyYW5zbGF0aW9uLiBOb3RlIHRoYXQgd2UgbmVlZCB0byBoYXZlIHRoZW0gc2VwYXJhdGVkIHRv
-IHN1cHBvcnQgbXVsdGkgaW5zdGFuY2UgYW5kIGtlZXAgY2hhbm5lbHMgZGVjb3VwbGVkIGZyb20g
-ZWFjaCBpbnN0YW5jZS4gDQoNCkkgYXNzdW1lIDIgaWYuLi50aGVuIGlzIGNoZWFwZXIgdGhhbiBk
-b2luZyAyIGRlLXJlZmVyZW5jZXMgdG8gZnVuY3Rpb24gcG9pbnRlcnMuIFRoaXMgaXMgdGhlIHdh
-eSBpdCBpcyBkb25lIG9uIGxlZ2FjeSBwYXRocyBpbiBvdGhlciBwbGFjZXMgKGUuZy4sIG5vbiBt
-cSBzY3NpKSwgYnV0IEkgY2FuIGxvb2sgaW50byBob3cgcG9pbnRlciBmdW5jdGlvbnMgd291bGQg
-bG9vayBsaWtlIGFuZCBtZWFzdXJlIHRoZSBwZXJmb3JtYW5jZSBpbXBhY3QuIA0KDQpKYXZpZXI=
+On 02/04/2018 11:37 AM, Javier Gonzalez wrote:
+> 
+>> On 31 Jan 2018, at 19.24, Matias Bjørling <mb@lightnvm.io> wrote:
+>>
+>> On 01/31/2018 10:13 AM, Javier Gonzalez wrote:
+>>>> On 31 Jan 2018, at 16.51, Matias Bjørling <mb@lightnvm.io> wrote:
+>>>>
+>>> I have a patches abstracting this, which I think it makes it cleaner. I can push it next week for review. I’m traveling this week. (If you want to get a glimpse I can point you to the code).
+>>
+>> Yes, please do. Thanks
+> 
+> This is the release candidate for 2.0 support based on 4.17. I'll rebase
+> on top of you 2.0 support. We'll see if all changes make it to 4.17
+> then.
+> 
+> https://github.com/OpenChannelSSD/linux/tree/for-4.17/spec20
+> 
+> Javier
+> 
+
+Great. I look forward to be patches being cleaned up and posted. I do 
+see some nitpicks here and there, which we properly can take a couple of 
+stabs at.
+
+One think that generally stands out to me is the "if 1.2 support", else, 
+... statements. These could be structured better by having dedicated 
+setup functions for 1.2 and 2.0.
