@@ -1,111 +1,49 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: linux-scsi@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Arun Easi <arun.easi@cavium.com>,
-	Omar Sandoval <osandov@fb.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Don Brace <don.brace@microsemi.com>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Peter Rivera <peter.rivera@broadcom.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Laurence Oberman <loberman@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 4/5] scsi: introduce force_blk_mq
-Date: Sat,  3 Feb 2018 12:21:11 +0800
-Message-Id: <20180203042112.15239-5-ming.lei@redhat.com>
-In-Reply-To: <20180203042112.15239-1-ming.lei@redhat.com>
-References: <20180203042112.15239-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail3.protonmail.ch ([185.70.40.25]:64093 "EHLO
+        mail3.protonmail.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750798AbeBDJXx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Feb 2018 04:23:53 -0500
+Date: Sun, 04 Feb 2018 04:23:48 -0500
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jordan Glover <Golden_Miller83@protonmail.ch>
+Reply-To: Jordan Glover <Golden_Miller83@protonmail.ch>
+Subject: Unsafe shutdowns on TOSHIBA THNSF5256GPUK NVME
+Message-ID: <3R4XYOaCHnSEOR172rNrH05ByS93wcnaAw2I0qnOCiqYxvNeOSSUhxvNkMGPPJNlLp1ay00lYLoCzbMfu06gYltNIn_j93dg2Os3rq1XGr8=@protonmail.ch>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
->From scsi driver view, it is a bit troublesome to support both blk-mq
-and non-blk-mq at the same time, especially when drivers need to support
-multi hw-queue.
+Hello,
 
-This patch introduces 'force_blk_mq' to scsi_host_template so that drivers
-can provide blk-mq only support, so driver code can avoid the trouble
-for supporting both.
+I have problem with "unsafe shutdowns" on Lenovo laptop with TOSHIBA
+THNSF5256GPUK NVME disk. It happens every time I power-off my machine and I=
+ can
+hear characteristic "click" sound like with rotational disks. (maybe that's
+something else but I'm basing on info from S.M.A.R.T data not this).
 
-This patch may clean up driver a lot by providing blk-mq only support, espeically
-it is easier to convert multiple reply queues into blk_mq's MQ for the following
-purposes:
+I looked around and saw that people report similar problems in different NV=
+ME
+disks[1][2], even across different OSes[3][4]. I also found some old patche=
+s
+witch tried to deal with this[5].
 
-1) use blk_mq multiple hw queue to deal with allocated irq vectors of all offline
-CPU affinity[1]:
+I know that my disk was already put on $hitlist due to power saving issues[=
+6].
 
-	[1] https://marc.info/?l=linux-kernel&m=151748144730409&w=2
+I tested this with linux kernels 4.14.x - 4.15. My BIOS and disk firmware a=
+re
+updated.
 
-Now 84676c1f21e8ff5(genirq/affinity: assign vectors to all possible CPUs)
-has been merged to V4.16-rc, and it is easy to allocate all offline CPUs
-for some irq vectors, this can't be avoided even though the allocation
-is improved.
+Is there anything I could do to resolve this issue? Thx for any help.
 
-So all these drivers have to avoid to ask HBA to complete request in
-reply queue which hasn't online CPUs assigned.
+Jordan
 
-This issue can be solved generically and easily via blk_mq(scsi_mq) multiple
-hw queue by mapping each reply queue into hctx.
-
-2) some drivers[1] require to complete request in the submission CPU for
-avoiding hard/soft lockup, which is easily done with blk_mq, so not necessary
-to reinvent wheels for solving the problem.
-
-	[2] https://marc.info/?t=151601851400001&r=1&w=2
-
-Sovling the above issues for non-MQ path may not be easy, or introduce
-unnecessary work, especially we plan to enable SCSI_MQ soon as discussed
-recently[3]:
-
-	[3] https://marc.info/?l=linux-scsi&m=151727684915589&w=2
-
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Arun Easi <arun.easi@cavium.com>
-Cc: Omar Sandoval <osandov@fb.com>,
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-Cc: Christoph Hellwig <hch@lst.de>,
-Cc: Don Brace <don.brace@microsemi.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Peter Rivera <peter.rivera@broadcom.com>
-Cc: Laurence Oberman <loberman@redhat.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/hosts.c     | 1 +
- include/scsi/scsi_host.h | 3 +++
- 2 files changed, 4 insertions(+)
-
-diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
-index fe3a0da3ec97..c75cebd7911d 100644
---- a/drivers/scsi/hosts.c
-+++ b/drivers/scsi/hosts.c
-@@ -471,6 +471,7 @@ struct Scsi_Host *scsi_host_alloc(struct scsi_host_template *sht, int privsize)
- 		shost->dma_boundary = 0xffffffff;
- 
- 	shost->use_blk_mq = scsi_use_blk_mq;
-+	shost->use_blk_mq = scsi_use_blk_mq || !!shost->hostt->force_blk_mq;
- 
- 	device_initialize(&shost->shost_gendev);
- 	dev_set_name(&shost->shost_gendev, "host%d", shost->host_no);
-diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
-index a8b7bf879ced..4118760e5c32 100644
---- a/include/scsi/scsi_host.h
-+++ b/include/scsi/scsi_host.h
-@@ -452,6 +452,9 @@ struct scsi_host_template {
- 	/* True if the controller does not support WRITE SAME */
- 	unsigned no_write_same:1;
- 
-+	/* tell scsi core we support blk-mq only */
-+	unsigned force_blk_mq:1;
-+
- 	/*
- 	 * Countdown for host blocking with no commands outstanding.
- 	 */
--- 
-2.9.5
+[1] https://bbs.archlinux.org/viewtopic.php?id=3D230723
+[2] https://bugs.alpinelinux.org/issues/5082
+[3]https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=3D211852
+[4] https://www.win-raid.com/t2041f38-SAMSUNG-PRO-NVMe-SSD-unsafe-shutdowns=
+-NVMe-driver-W-x-unexpected-shutdown.html
+[5] http://lists.infradead.org/pipermail/linux-nvme/2014-March/000744.html
+[6] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree=
+/drivers/nvme/host/core.c#n1950
