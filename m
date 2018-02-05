@@ -1,80 +1,31 @@
-Return-Path: <prvs=590d2a92c=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+MIME-Version: 1.0
+In-Reply-To: <4f5c5941-c30f-51e8-619a-c03aa9e514b7@kernel.dk>
+References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
+ <20180202140904.2017-17-roman.penyaev@profitbricks.com> <4f5c5941-c30f-51e8-619a-c03aa9e514b7@kernel.dk>
+From: Roman Penyaev <roman.penyaev@profitbricks.com>
+Date: Mon, 5 Feb 2018 13:54:58 +0100
+Message-ID: <CAJrWOzAKmE_KPZi4i5dCXuBOkuN7Ax4SpVv6tbZfTW4SLamb+A@mail.gmail.com>
+Subject: Re: [PATCH 16/24] ibnbd: client: main functionality
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 01/11] block: Reorder the queue flag manipulaton function definitions
-Date: Wed, 28 Feb 2018 11:28:13 -0800
-Message-Id: <20180228192823.5191-2-bart.vanassche@wdc.com>
-In-Reply-To: <20180228192823.5191-1-bart.vanassche@wdc.com>
-References: <20180228192823.5191-1-bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Bart Van Assche <bart.vanassche@sandisk.com>, Or Gerlitz <ogerlitz@mellanox.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>, Jack Wang <jinpu.wang@profitbricks.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-Move the definition of queue_flag_clear_unlocked() up and move the
-definition of queue_in_flight() down such that all queue flag
-manipulation function definitions become contiguous.
+On Fri, Feb 2, 2018 at 4:11 PM, Jens Axboe <axboe@kernel.dk> wrote:
+> On 2/2/18 7:08 AM, Roman Pen wrote:
+>> This is main functionality of ibnbd-client module, which provides
+>> interface to map remote device as local block device /dev/ibnbd<N>
+>> and feeds IBTRS with IO requests.
+>
+> Kill the legacy IO path for this, the driver should only support
+> blk-mq. Hence kill off your BLK_RQ part, that will eliminate
+> the dual path you have too.
 
-This patch does not change any functionality.
+ok, sounds good, frankly, we did not use rq very long time.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Ming Lei <ming.lei@redhat.com>
----
- include/linux/blkdev.h | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
-
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 9becac7432d0..e1e2a06559dc 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -724,6 +724,12 @@ static inline void queue_flag_set_unlocked(unsigned int flag,
- 	__set_bit(flag, &q->queue_flags);
- }
- 
-+static inline void queue_flag_clear_unlocked(unsigned int flag,
-+					     struct request_queue *q)
-+{
-+	__clear_bit(flag, &q->queue_flags);
-+}
-+
- static inline int queue_flag_test_and_clear(unsigned int flag,
- 					    struct request_queue *q)
- {
-@@ -756,17 +762,6 @@ static inline void queue_flag_set(unsigned int flag, struct request_queue *q)
- 	__set_bit(flag, &q->queue_flags);
- }
- 
--static inline void queue_flag_clear_unlocked(unsigned int flag,
--					     struct request_queue *q)
--{
--	__clear_bit(flag, &q->queue_flags);
--}
--
--static inline int queue_in_flight(struct request_queue *q)
--{
--	return q->in_flight[0] + q->in_flight[1];
--}
--
- static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
- {
- 	queue_lockdep_assert_held(q);
-@@ -802,6 +797,11 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
- extern int blk_set_preempt_only(struct request_queue *q);
- extern void blk_clear_preempt_only(struct request_queue *q);
- 
-+static inline int queue_in_flight(struct request_queue *q)
-+{
-+	return q->in_flight[0] + q->in_flight[1];
-+}
-+
- static inline bool blk_account_rq(struct request *rq)
- {
- 	return (rq->rq_flags & RQF_STARTED) && !blk_rq_is_passthrough(rq);
--- 
-2.16.2
+--
+Roman
