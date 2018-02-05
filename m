@@ -1,46 +1,57 @@
-Return-Path: <prvs=5677c57d0=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "tj@kernel.org" <tj@kernel.org>
-CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Mon, 5 Feb 2018 13:06:01 -0800
+From: Tejun Heo <tj@kernel.org>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>
 Subject: Re: [PATCH] blk-mq: Fix a race between resetting the timer and
  completion handling
-Date: Mon, 5 Feb 2018 21:33:03 +0000
-Message-ID: <1517866382.3764.43.camel@wdc.com>
+Message-ID: <20180205210601.GP1121507@devbig577.frc2.facebook.com>
 References: <20180201224930.17918-1-bart.vanassche@wdc.com>
-	 <20180205210601.GP1121507@devbig577.frc2.facebook.com>
-In-Reply-To: <20180205210601.GP1121507@devbig577.frc2.facebook.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180201224930.17918-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE4LTAyLTA1IGF0IDEzOjA2IC0wODAwLCBUZWp1biBIZW8gd3JvdGU6DQo+IFRo
-YW5rcyBhIGxvdCBmb3IgdGVzdGluZyBhbmQgZml4aW5nIHRoZSBpc3N1ZXMgYnV0IEknbSBhIGJp
-dCBjb25mdXNlZA0KPiBieSB0aGUgcGF0Y2guICBNYXliZSB3ZSBjYW4gc3BsaXQgcGF0Y2ggYSBi
-aXQgbW9yZT8gIFRoZXJlIHNlZW0gdG8gYmUNCj4gdGhyZWUgdGhpbmdzIGdvaW5nIG9uLA0KPiAN
-Cj4gMS4gQ2hhbmdpbmcgcHJlZW1wdGlvbiBwcm90ZWN0aW9uIHRvIGlycSBwcm90ZWN0aW9uIGlu
-IGlzc3VlIHBhdGguDQo+IA0KPiAyLiBNZXJnZSBvZiBhYm9ydGVkX2dzdGF0ZV9zeW5jIGFuZCBn
-c3RhdGVfc2VxLg0KPiANCj4gMy4gVXBkYXRlcyB0byBibGtfbXFfcnFfdGltZWRfb3V0KCkuDQo+
-IA0KPiBBcmUgYWxsIHRocmVlIGNoYW5nZXMgbmVjZXNzYXJ5IGZvciBzdGFiaWxpdHk/DQoNCkhl
-bGxvIFRlanVuLA0KDQpNeSBnb2FsIHdpdGggdGhpcyBwYXRjaCBpcyB0byBmaXggdGhlIHJhY2Ug
-YmV0d2VlbiByZXNldHRpbmcgdGhlIHRpbWVyIGFuZA0KdGhlIGNvbXBsZXRpb24gcGF0aC4gSGVu
-Y2UgY2hhbmdlICgzKS4gQ2hhbmdlcyAoMSkgYW5kICgyKSBhcmUgbmVlZGVkIHRvDQptYWtlIHRo
-ZSBjaGFuZ2VzIGluIGJsa19tcV9ycV90aW1lZF9vdXQoKSB3b3JrLg0KDQo+ID4gQEAgLTgzMSwx
-MyArODM0LDEyIEBAIHN0YXRpYyB2b2lkIGJsa19tcV9ycV90aW1lZF9vdXQoc3RydWN0IHJlcXVl
-c3QgKnJlcSwgYm9vbCByZXNlcnZlZCkNCj4gPiAgCQlfX2Jsa19tcV9jb21wbGV0ZV9yZXF1ZXN0
-KHJlcSk7DQo+ID4gIAkJYnJlYWs7DQo+ID4gIAljYXNlIEJMS19FSF9SRVNFVF9USU1FUjoNCj4g
-PiAtCQkvKg0KPiA+IC0JCSAqIEFzIG5vdGhpbmcgcHJldmVudHMgZnJvbSBjb21wbGV0aW9uIGhh
-cHBlbmluZyB3aGlsZQ0KPiA+IC0JCSAqIC0+YWJvcnRlZF9nc3RhdGUgaXMgc2V0LCB0aGlzIG1h
-eSBsZWFkIHRvIGlnbm9yZWQNCj4gPiAtCQkgKiBjb21wbGV0aW9ucyBhbmQgZnVydGhlciBzcHVy
-aW91cyB0aW1lb3V0cy4NCj4gPiAtCQkgKi8NCj4gPiAtCQlibGtfbXFfcnFfdXBkYXRlX2Fib3J0
-ZWRfZ3N0YXRlKHJlcSwgMCk7DQo+ID4gKwkJbG9jYWxfaXJxX2Rpc2FibGUoKTsNCj4gPiArCQl3
-cml0ZV9zZXFjb3VudF9iZWdpbigmcmVxLT5nc3RhdGVfc2VxKTsNCj4gPiAgCQlibGtfYWRkX3Rp
-bWVyKHJlcSk7DQo+ID4gKwkJcmVxLT5hYm9ydGVkX2dzdGF0ZSA9IDA7DQo+ID4gKwkJd3JpdGVf
-c2VxY291bnRfZW5kKCZyZXEtPmdzdGF0ZV9zZXEpOw0KPiA+ICsJCWxvY2FsX2lycV9lbmFibGUo
-KTsNCj4gPiAgCQlicmVhazsNCj4gDQo+IFNvLCB0aGlzIGlzICMzIGFuZCBJJ20gbm90IHN1cmUg
-aG93IGFkZGluZyBnc3RhdGVfc2VxIHByb3RlY3Rpb24gZ2V0cw0KPiByaWQgb2YgdGhlIHJhY2Ug
-Y29uZGl0aW9uIG1lbnRpb25lZCBpbiB0aGUgY29tbWVudC4gIEl0J3Mgc3RpbGwgdGhlDQo+IHNh
-bWUgdGhhdCBub3RoaW5nIGlzIHByb3RlY3RpbmcgYWdhaW5zdCByYWNpbmcgdy8gY29tcGxldGlv
-bi4NCg0KSSB0aGluayB5b3UgYXJlIHJpZ2h0LiBJIHdpbGwgc2VlIHdoZXRoZXIgSSBjYW4gcmV3
-b3JrIHRoaXMgcGF0Y2ggdG8gYWRkcmVzcw0KdGhhdCByYWNlLg0KDQpUaGFua3MsDQoNCkJhcnQu
-DQoNCg0K
+Hello, Bart.
+
+Thanks a lot for testing and fixing the issues but I'm a bit confused
+by the patch.  Maybe we can split patch a bit more?  There seem to be
+three things going on,
+
+1. Changing preemption protection to irq protection in issue path.
+
+2. Merge of aborted_gstate_sync and gstate_seq.
+
+3. Updates to blk_mq_rq_timed_out().
+
+Are all three changes necessary for stability?
+
+> @@ -831,13 +834,12 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
+>  		__blk_mq_complete_request(req);
+>  		break;
+>  	case BLK_EH_RESET_TIMER:
+> -		/*
+> -		 * As nothing prevents from completion happening while
+> -		 * ->aborted_gstate is set, this may lead to ignored
+> -		 * completions and further spurious timeouts.
+> -		 */
+> -		blk_mq_rq_update_aborted_gstate(req, 0);
+> +		local_irq_disable();
+> +		write_seqcount_begin(&req->gstate_seq);
+>  		blk_add_timer(req);
+> +		req->aborted_gstate = 0;
+> +		write_seqcount_end(&req->gstate_seq);
+> +		local_irq_enable();
+>  		break;
+
+So, this is #3 and I'm not sure how adding gstate_seq protection gets
+rid of the race condition mentioned in the comment.  It's still the
+same that nothing is protecting against racing w/ completion.
+
+Thanks.
+
+-- 
+tejun
