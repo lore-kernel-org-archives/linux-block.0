@@ -1,190 +1,71 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-Subject: Re: [PATCH V2 8/8] scsi: hpsa: use blk_mq to solve irq affinity issue
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        "Mike Snitzer" <snitzer@redhat.com>
+Return-Path: <don.brace@microsemi.com>
+From: Don Brace <don.brace@microsemi.com>
+To: Laurence Oberman <loberman@redhat.com>, Ming Lei <ming.lei@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, Christoph Hellwig <hch@infradead.org>, "Mike
+ Snitzer" <snitzer@redhat.com>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, Hannes Reinecke
+	<hare@suse.de>, Arun Easi <arun.easi@cavium.com>, Omar Sandoval
+	<osandov@fb.com>, "Martin K . Petersen" <martin.petersen@oracle.com>, "James
+ Bottomley" <james.bottomley@hansenpartnership.com>, Christoph Hellwig
+	<hch@lst.de>, Kashyap Desai <kashyap.desai@broadcom.com>, Peter Rivera
+	<peter.rivera@broadcom.com>, Paolo Bonzini <pbonzini@redhat.com>
+Subject: RE: [PATCH V2 8/8] scsi: hpsa: use blk_mq to solve irq affinity issue
+Date: Mon, 5 Feb 2018 18:54:35 +0000
+Message-ID: <1fdeb97688f64a90bb1d8d30d175e6e7@microsemi.com>
 References: <20180205152035.15016-1-ming.lei@redhat.com>
- <20180205152035.15016-9-ming.lei@redhat.com>
-CC: <linux-scsi@vger.kernel.org>, Hannes Reinecke <hare@suse.de>,
-        Arun Easi <arun.easi@cavium.com>,
-        Omar Sandoval <osandov@fb.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <james.bottomley@hansenpartnership.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "Don Brace" <don.brace@microsemi.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Peter Rivera <peter.rivera@broadcom.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Laurence Oberman <loberman@redhat.com>
-From: "chenxiang (M)" <chenxiang66@hisilicon.com>
-Message-ID: <bce37b1a-6faf-a661-19cd-ef583f19f280@hisilicon.com>
-Date: Tue, 6 Feb 2018 10:18:19 +0800
+	 <20180205152035.15016-9-ming.lei@redhat.com>
+ <1517846290.11655.6.camel@redhat.com>
+In-Reply-To: <1517846290.11655.6.camel@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20180205152035.15016-9-ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Sender: linux-scsi-owner@vger.kernel.org
+Return-Path: don.brace@microsemi.com
 List-ID: <linux-block@vger.kernel.org>
 
-在 2018/2/5 23:20, Ming Lei 写道:
-> This patch uses .force_blk_mq to drive HPSA via SCSI_MQ, meantime maps
-> each reply queue to blk_mq's hw queue, then .queuecommand can always
-> choose the hw queue as the reply queue. And if no any online CPU is
-> mapped to one hw queue, request can't be submitted to this hw queue
-> at all, finally the irq affinity issue is solved.
->
-> Cc: Hannes Reinecke <hare@suse.de>
-> Cc: Arun Easi <arun.easi@cavium.com>
-> Cc: Omar Sandoval <osandov@fb.com>,
-> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-> Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-> Cc: Christoph Hellwig <hch@lst.de>,
-> Cc: Don Brace <don.brace@microsemi.com>
-> Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-> Cc: Peter Rivera <peter.rivera@broadcom.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Mike Snitzer <snitzer@redhat.com>
-> Tested-by: Laurence Oberman <loberman@redhat.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->   drivers/scsi/hpsa.c | 51 ++++++++++++++++++++++++++++++++++-----------------
->   1 file changed, 34 insertions(+), 17 deletions(-)
->
-> diff --git a/drivers/scsi/hpsa.c b/drivers/scsi/hpsa.c
-> index 443eabf63a9f..e517a4c74a28 100644
-> --- a/drivers/scsi/hpsa.c
-> +++ b/drivers/scsi/hpsa.c
-> @@ -51,6 +51,7 @@
->   #include <linux/jiffies.h>
->   #include <linux/percpu-defs.h>
->   #include <linux/percpu.h>
-> +#include <linux/blk-mq-pci.h>
->   #include <asm/unaligned.h>
->   #include <asm/div64.h>
->   #include "hpsa_cmd.h"
-> @@ -956,6 +957,13 @@ static struct device_attribute *hpsa_shost_attrs[] = {
->   #define HPSA_NRESERVED_CMDS	(HPSA_CMDS_RESERVED_FOR_DRIVER +\
->   				 HPSA_MAX_CONCURRENT_PASSTHRUS)
->   
-> +static int hpsa_map_queues(struct Scsi_Host *shost)
-> +{
-> +        struct ctlr_info *h = shost_to_hba(shost);
-> +
-> +        return blk_mq_pci_map_queues(&shost->tag_set, h->pdev);
-> +}
-> +
-
-Hi Lei Ming,
-It is okay to use blk_mq_pci_map_queue to solve automatic irq affinity 
-issue when the first interrupt vector for queues is 0.
-But if the first interrupt vector for queues is not 0,  we seems 
-couldn't use blk_mq_pci_map_queue directly,
-such as blk_mq_virtio_map_queues, it realizes a interface itself. Is it 
-possible to provide a general interface for those
-situations?
-
-
->   static struct scsi_host_template hpsa_driver_template = {
->   	.module			= THIS_MODULE,
->   	.name			= HPSA,
-> @@ -974,10 +982,13 @@ static struct scsi_host_template hpsa_driver_template = {
->   #ifdef CONFIG_COMPAT
->   	.compat_ioctl		= hpsa_compat_ioctl,
->   #endif
-> +	.map_queues = hpsa_map_queues,
->   	.sdev_attrs = hpsa_sdev_attrs,
->   	.shost_attrs = hpsa_shost_attrs,
->   	.max_sectors = 1024,
->   	.no_write_same = 1,
-> +	.force_blk_mq = 1,
-> +	.host_tagset = 1,
->   };
->   
->   static inline u32 next_command(struct ctlr_info *h, u8 q)
-> @@ -1045,11 +1056,7 @@ static void set_performant_mode(struct ctlr_info *h, struct CommandList *c,
->   		c->busaddr |= 1 | (h->blockFetchTable[c->Header.SGList] << 1);
->   		if (unlikely(!h->msix_vectors))
->   			return;
-> -		if (likely(reply_queue == DEFAULT_REPLY_QUEUE))
-> -			c->Header.ReplyQueue =
-> -				raw_smp_processor_id() % h->nreply_queues;
-> -		else
-> -			c->Header.ReplyQueue = reply_queue % h->nreply_queues;
-> +		c->Header.ReplyQueue = reply_queue;
->   	}
->   }
->   
-> @@ -1063,10 +1070,7 @@ static void set_ioaccel1_performant_mode(struct ctlr_info *h,
->   	 * Tell the controller to post the reply to the queue for this
->   	 * processor.  This seems to give the best I/O throughput.
->   	 */
-> -	if (likely(reply_queue == DEFAULT_REPLY_QUEUE))
-> -		cp->ReplyQueue = smp_processor_id() % h->nreply_queues;
-> -	else
-> -		cp->ReplyQueue = reply_queue % h->nreply_queues;
-> +	cp->ReplyQueue = reply_queue;
->   	/*
->   	 * Set the bits in the address sent down to include:
->   	 *  - performant mode bit (bit 0)
-> @@ -1087,10 +1091,7 @@ static void set_ioaccel2_tmf_performant_mode(struct ctlr_info *h,
->   	/* Tell the controller to post the reply to the queue for this
->   	 * processor.  This seems to give the best I/O throughput.
->   	 */
-> -	if (likely(reply_queue == DEFAULT_REPLY_QUEUE))
-> -		cp->reply_queue = smp_processor_id() % h->nreply_queues;
-> -	else
-> -		cp->reply_queue = reply_queue % h->nreply_queues;
-> +	cp->reply_queue = reply_queue;
->   	/* Set the bits in the address sent down to include:
->   	 *  - performant mode bit not used in ioaccel mode 2
->   	 *  - pull count (bits 0-3)
-> @@ -1109,10 +1110,7 @@ static void set_ioaccel2_performant_mode(struct ctlr_info *h,
->   	 * Tell the controller to post the reply to the queue for this
->   	 * processor.  This seems to give the best I/O throughput.
->   	 */
-> -	if (likely(reply_queue == DEFAULT_REPLY_QUEUE))
-> -		cp->reply_queue = smp_processor_id() % h->nreply_queues;
-> -	else
-> -		cp->reply_queue = reply_queue % h->nreply_queues;
-> +	cp->reply_queue = reply_queue;
->   	/*
->   	 * Set the bits in the address sent down to include:
->   	 *  - performant mode bit not used in ioaccel mode 2
-> @@ -1152,11 +1150,27 @@ static void dial_up_lockup_detection_on_fw_flash_complete(struct ctlr_info *h,
->   		h->heartbeat_sample_interval = HEARTBEAT_SAMPLE_INTERVAL;
->   }
->   
-> +static unsigned get_reply_queue(struct ctlr_info *h, struct CommandList *c)
-> +{
-> +	struct scsi_cmnd *cmd = c->scsi_cmd;
-> +	int *map;
-> +
-> +	if (cmd && cmd->request) {
-> +		u32 tag = blk_mq_unique_tag(cmd->request);
-> +		return blk_mq_unique_tag_to_hwq(tag);
-> +	}
-> +
-> +	map = h->scsi_host->tag_set.mq_map;
-> +	return map[raw_smp_processor_id()];
-> +}
-> +
->   static void __enqueue_cmd_and_start_io(struct ctlr_info *h,
->   	struct CommandList *c, int reply_queue)
->   {
->   	dial_down_lockup_detection_during_fw_flash(h, c);
->   	atomic_inc(&h->commands_outstanding);
-> +
-> +	reply_queue = get_reply_queue(h, c);
->   	switch (c->cmd_type) {
->   	case CMD_IOACCEL1:
->   		set_ioaccel1_performant_mode(h, c, reply_queue);
-> @@ -5781,6 +5795,9 @@ static int hpsa_scsi_add_host(struct ctlr_info *h)
->   {
->   	int rv;
->   
-> +	/* map reply queue to blk_mq hw queue */
-> +	h->scsi_host->nr_hw_queues = h->msix_vectors;
-> +
->   	rv = scsi_add_host(h->scsi_host, &h->pdev->dev);
->   	if (rv) {
->   		dev_err(&h->pdev->dev, "scsi_add_host failed\n");
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBMYXVyZW5jZSBPYmVybWFuIFtt
+YWlsdG86bG9iZXJtYW5AcmVkaGF0LmNvbV0NCj4gU2VudDogTW9uZGF5LCBGZWJydWFyeSAwNSwg
+MjAxOCA5OjU4IEFNDQo+IFRvOiBNaW5nIExlaSA8bWluZy5sZWlAcmVkaGF0LmNvbT47IEplbnMg
+QXhib2UgPGF4Ym9lQGtlcm5lbC5kaz47IGxpbnV4LQ0KPiBibG9ja0B2Z2VyLmtlcm5lbC5vcmc7
+IENocmlzdG9waCBIZWxsd2lnIDxoY2hAaW5mcmFkZWFkLm9yZz47IE1pa2UgU25pdHplcg0KPiA8
+c25pdHplckByZWRoYXQuY29tPjsgRG9uIEJyYWNlIDxkb24uYnJhY2VAbWljcm9zZW1pLmNvbT4N
+Cj4gQ2M6IGxpbnV4LXNjc2lAdmdlci5rZXJuZWwub3JnOyBIYW5uZXMgUmVpbmVja2UgPGhhcmVA
+c3VzZS5kZT47IEFydW4gRWFzaQ0KPiA8YXJ1bi5lYXNpQGNhdml1bS5jb20+OyBPbWFyIFNhbmRv
+dmFsIDxvc2FuZG92QGZiLmNvbT47IE1hcnRpbiBLIC4NCj4gUGV0ZXJzZW4gPG1hcnRpbi5wZXRl
+cnNlbkBvcmFjbGUuY29tPjsgSmFtZXMgQm90dG9tbGV5DQo+IDxqYW1lcy5ib3R0b21sZXlAaGFu
+c2VucGFydG5lcnNoaXAuY29tPjsgQ2hyaXN0b3BoIEhlbGx3aWcgPGhjaEBsc3QuZGU+Ow0KPiBE
+b24gQnJhY2UgPGRvbi5icmFjZUBtaWNyb3NlbWkuY29tPjsgS2FzaHlhcCBEZXNhaQ0KPiA8a2Fz
+aHlhcC5kZXNhaUBicm9hZGNvbS5jb20+OyBQZXRlciBSaXZlcmEgPHBldGVyLnJpdmVyYUBicm9h
+ZGNvbS5jb20+Ow0KPiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPg0KPiBTdWJq
+ZWN0OiBSZTogW1BBVENIIFYyIDgvOF0gc2NzaTogaHBzYTogdXNlIGJsa19tcSB0byBzb2x2ZSBp
+cnEgYWZmaW5pdHkgaXNzdWUNCj4gDQo+IEVYVEVSTkFMIEVNQUlMDQo+IA0KPiANCj4gT24gTW9u
+LCAyMDE4LTAyLTA1IGF0IDIzOjIwICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gPiBUaGlzIHBh
+dGNoIHVzZXMgLmZvcmNlX2Jsa19tcSB0byBkcml2ZSBIUFNBIHZpYSBTQ1NJX01RLCBtZWFudGlt
+ZQ0KPiA+IG1hcHMNCj4gPiBlYWNoIHJlcGx5IHF1ZXVlIHRvIGJsa19tcSdzIGh3IHF1ZXVlLCB0
+aGVuIC5xdWV1ZWNvbW1hbmQgY2FuIGFsd2F5cw0KPiA+IGNob29zZSB0aGUgaHcgcXVldWUgYXMg
+dGhlIHJlcGx5IHF1ZXVlLiBBbmQgaWYgbm8gYW55IG9ubGluZSBDUFUgaXMNCj4gPiBtYXBwZWQg
+dG8gb25lIGh3IHF1ZXVlLCByZXF1ZXN0IGNhbid0IGJlIHN1Ym1pdHRlZCB0byB0aGlzIGh3IHF1
+ZXVlDQo+ID4gYXQgYWxsLCBmaW5hbGx5IHRoZSBpcnEgYWZmaW5pdHkgaXNzdWUgaXMgc29sdmVk
+Lg0KPiA+DQo+ID4gQ2M6IEhhbm5lcyBSZWluZWNrZSA8aGFyZUBzdXNlLmRlPg0KPiA+IENjOiBB
+cnVuIEVhc2kgPGFydW4uZWFzaUBjYXZpdW0uY29tPg0KPiA+IENjOiBPbWFyIFNhbmRvdmFsIDxv
+c2FuZG92QGZiLmNvbT4sDQo+ID4gQ2M6ICJNYXJ0aW4gSy4gUGV0ZXJzZW4iIDxtYXJ0aW4ucGV0
+ZXJzZW5Ab3JhY2xlLmNvbT4sDQo+ID4gQ2M6IEphbWVzIEJvdHRvbWxleSA8amFtZXMuYm90dG9t
+bGV5QGhhbnNlbnBhcnRuZXJzaGlwLmNvbT4sDQo+ID4gQ2M6IENocmlzdG9waCBIZWxsd2lnIDxo
+Y2hAbHN0LmRlPiwNCj4gPiBDYzogRG9uIEJyYWNlIDxkb24uYnJhY2VAbWljcm9zZW1pLmNvbT4N
+Cj4gPiBDYzogS2FzaHlhcCBEZXNhaSA8a2FzaHlhcC5kZXNhaUBicm9hZGNvbS5jb20+DQo+ID4g
+Q2M6IFBldGVyIFJpdmVyYSA8cGV0ZXIucml2ZXJhQGJyb2FkY29tLmNvbT4NCj4gPiBDYzogUGFv
+bG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4NCj4gPiBDYzogTWlrZSBTbml0emVyIDxz
+bml0emVyQHJlZGhhdC5jb20+DQo+ID4gVGVzdGVkLWJ5OiBMYXVyZW5jZSBPYmVybWFuIDxsb2Jl
+cm1hbkByZWRoYXQuY29tPg0KPiA+IFNpZ25lZC1vZmYtYnk6IE1pbmcgTGVpIDxtaW5nLmxlaUBy
+ZWRoYXQuY29tPg0KPiA+IC0tLQ0KPiA+ICBkcml2ZXJzL3Njc2kvaHBzYS5jIHwgNTEgKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLQ0KPiBUaGlzIGlzIGEgY3JpdGlj
+YWwgaXNzdWUgb24gdGhlIEhQU0EgYmVjYXVzZSBMaW51cyBhbHJlYWR5IGhhcyB0aGUNCj4gb3Jp
+Z2luYWwgY29tbWl0IHRoYXQgY2F1c2VzIHRoZSBzeXN0ZW0gdG8gZmFpbCB0byBib290Lg0KPiAN
+Cj4gQWxsIG15IHRlc3Rpbmcgd2FzIG9uIERMMzgwIEc3IHNlcnZlcnMgd2l0aDoNCj4gDQo+IEhl
+d2xldHQtUGFja2FyZCBDb21wYW55IFNtYXJ0IEFycmF5IEc2IGNvbnRyb2xsZXJzDQo+IFZlbmRv
+cjogSFAgICAgICAgTW9kZWw6IFA0MTBpICAgICAgICAgICAgUmV2OiA2LjY0DQo+IA0KPiBNaW5n
+J3MgcGF0Y2ggZml4ZXMgdGhpcyBzbyB3ZSBuZWVkIHRvIHRyeSBtb3ZlIHRoaXMgYWxvbmcuDQo+
+IA0KPiBJIGhhdmUgYSBETDM4MCBHOCBhcyB3ZWxsIHdoaWNoIGlzIGFsc28gbGlrZWx5IGV4cG9z
+ZWQgaGVyZSBhbmQgSSBhZGRlZA0KPiAgRG9uIEJyYWNlIGZvciBGWUkgdG8gdGhpcyBsaXN0Lg0K
+PiANCj4gVGhhbmtzIE1pbmcNCg0KVGVzdGVkLWJ5OiBEb24gQnJhY2UgPGRvbi5icmFjZUBtaWNy
+b3NlbWkuY29tPg0KUDQ0MSwgUDQzMSwgUDgzMGksIEgyNDANCg0KQWNrZWQtYnk6IERvbiBCcmFj
+ZSA8ZG9uLmJyYWNlQG1pY3Jvc2VtaS5jb20+DQoNCg0KDQo=
