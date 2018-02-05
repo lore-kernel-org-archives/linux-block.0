@@ -1,97 +1,111 @@
-Return-Path: <osandov@osandov.com>
-Return-Path: <osandov@osandov.com>
-Date: Tue, 6 Feb 2018 12:20:43 -0800
-From: Omar Sandoval <osandov@osandov.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@infradead.org>,
-	Mike Snitzer <snitzer@redhat.com>, linux-scsi@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>, Arun Easi <arun.easi@cavium.com>,
+	Mike Snitzer <snitzer@redhat.com>
+Cc: linux-scsi@vger.kernel.org,
+	Hannes Reinecke <hare@suse.de>,
+	Arun Easi <arun.easi@cavium.com>,
 	Omar Sandoval <osandov@fb.com>,
 	"Martin K . Petersen" <martin.petersen@oracle.com>,
 	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Christoph Hellwig <hch@lst.de>, Don Brace <don.brace@microsemi.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Don Brace <don.brace@microsemi.com>,
 	Kashyap Desai <kashyap.desai@broadcom.com>,
 	Peter Rivera <peter.rivera@broadcom.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
-	Laurence Oberman <loberman@redhat.com>
-Subject: Re: [PATCH V2 5/8] scsi: introduce force_blk_mq
-Message-ID: <20180206202043.GB16027@vader.DHCP.thefacebook.com>
+	Laurence Oberman <loberman@redhat.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 5/8] scsi: introduce force_blk_mq
+Date: Mon,  5 Feb 2018 23:20:32 +0800
+Message-Id: <20180205152035.15016-6-ming.lei@redhat.com>
+In-Reply-To: <20180205152035.15016-1-ming.lei@redhat.com>
 References: <20180205152035.15016-1-ming.lei@redhat.com>
- <20180205152035.15016-6-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180205152035.15016-6-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Feb 05, 2018 at 11:20:32PM +0800, Ming Lei wrote:
-> From scsi driver view, it is a bit troublesome to support both blk-mq
-> and non-blk-mq at the same time, especially when drivers need to support
-> multi hw-queue.
-> 
-> This patch introduces 'force_blk_mq' to scsi_host_template so that drivers
-> can provide blk-mq only support, so driver code can avoid the trouble
-> for supporting both.
-> 
-> This patch may clean up driver a lot by providing blk-mq only support, espeically
-> it is easier to convert multiple reply queues into blk_mq's MQ for the following
-> purposes:
-> 
-> 1) use blk_mq multiple hw queue to deal with allocated irq vectors of all offline
-> CPU affinity[1]:
-> 
-> 	[1] https://marc.info/?l=linux-kernel&m=151748144730409&w=2
-> 
-> Now 84676c1f21e8ff5(genirq/affinity: assign vectors to all possible CPUs)
-> has been merged to V4.16-rc, and it is easy to allocate all offline CPUs
-> for some irq vectors, this can't be avoided even though the allocation
-> is improved.
-> 
-> So all these drivers have to avoid to ask HBA to complete request in
-> reply queue which hasn't online CPUs assigned.
-> 
-> This issue can be solved generically and easily via blk_mq(scsi_mq) multiple
-> hw queue by mapping each reply queue into hctx.
-> 
-> 2) some drivers[1] require to complete request in the submission CPU for
-> avoiding hard/soft lockup, which is easily done with blk_mq, so not necessary
-> to reinvent wheels for solving the problem.
-> 
-> 	[2] https://marc.info/?t=151601851400001&r=1&w=2
-> 
-> Sovling the above issues for non-MQ path may not be easy, or introduce
-> unnecessary work, especially we plan to enable SCSI_MQ soon as discussed
-> recently[3]:
-> 
-> 	[3] https://marc.info/?l=linux-scsi&m=151727684915589&w=2
-> 
-> Cc: Arun Easi <arun.easi@cavium.com>
-> Cc: Omar Sandoval <osandov@fb.com>,
-> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-> Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-> Cc: Christoph Hellwig <hch@lst.de>,
-> Cc: Don Brace <don.brace@microsemi.com>
-> Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-> Cc: Peter Rivera <peter.rivera@broadcom.com>
-> Cc: Mike Snitzer <snitzer@redhat.com>
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
-> Tested-by: Laurence Oberman <loberman@redhat.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  drivers/scsi/hosts.c     | 1 +
->  include/scsi/scsi_host.h | 3 +++
->  2 files changed, 4 insertions(+)
-> 
-> diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
-> index fe3a0da3ec97..c75cebd7911d 100644
-> --- a/drivers/scsi/hosts.c
-> +++ b/drivers/scsi/hosts.c
-> @@ -471,6 +471,7 @@ struct Scsi_Host *scsi_host_alloc(struct scsi_host_template *sht, int privsize)
->  		shost->dma_boundary = 0xffffffff;
->  
->  	shost->use_blk_mq = scsi_use_blk_mq;
+>From scsi driver view, it is a bit troublesome to support both blk-mq
+and non-blk-mq at the same time, especially when drivers need to support
+multi hw-queue.
 
-Not sure if this is a patch formatting issue, but this old line wasn't
-deleted.
+This patch introduces 'force_blk_mq' to scsi_host_template so that drivers
+can provide blk-mq only support, so driver code can avoid the trouble
+for supporting both.
 
-> +	shost->use_blk_mq = scsi_use_blk_mq || !!shost->hostt->force_blk_mq;
+This patch may clean up driver a lot by providing blk-mq only support, espeically
+it is easier to convert multiple reply queues into blk_mq's MQ for the following
+purposes:
+
+1) use blk_mq multiple hw queue to deal with allocated irq vectors of all offline
+CPU affinity[1]:
+
+	[1] https://marc.info/?l=linux-kernel&m=151748144730409&w=2
+
+Now 84676c1f21e8ff5(genirq/affinity: assign vectors to all possible CPUs)
+has been merged to V4.16-rc, and it is easy to allocate all offline CPUs
+for some irq vectors, this can't be avoided even though the allocation
+is improved.
+
+So all these drivers have to avoid to ask HBA to complete request in
+reply queue which hasn't online CPUs assigned.
+
+This issue can be solved generically and easily via blk_mq(scsi_mq) multiple
+hw queue by mapping each reply queue into hctx.
+
+2) some drivers[1] require to complete request in the submission CPU for
+avoiding hard/soft lockup, which is easily done with blk_mq, so not necessary
+to reinvent wheels for solving the problem.
+
+	[2] https://marc.info/?t=151601851400001&r=1&w=2
+
+Sovling the above issues for non-MQ path may not be easy, or introduce
+unnecessary work, especially we plan to enable SCSI_MQ soon as discussed
+recently[3]:
+
+	[3] https://marc.info/?l=linux-scsi&m=151727684915589&w=2
+
+Cc: Arun Easi <arun.easi@cavium.com>
+Cc: Omar Sandoval <osandov@fb.com>,
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
+Cc: Christoph Hellwig <hch@lst.de>,
+Cc: Don Brace <don.brace@microsemi.com>
+Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: Peter Rivera <peter.rivera@broadcom.com>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Tested-by: Laurence Oberman <loberman@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/scsi/hosts.c     | 1 +
+ include/scsi/scsi_host.h | 3 +++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
+index fe3a0da3ec97..c75cebd7911d 100644
+--- a/drivers/scsi/hosts.c
++++ b/drivers/scsi/hosts.c
+@@ -471,6 +471,7 @@ struct Scsi_Host *scsi_host_alloc(struct scsi_host_template *sht, int privsize)
+ 		shost->dma_boundary = 0xffffffff;
+ 
+ 	shost->use_blk_mq = scsi_use_blk_mq;
++	shost->use_blk_mq = scsi_use_blk_mq || !!shost->hostt->force_blk_mq;
+ 
+ 	device_initialize(&shost->shost_gendev);
+ 	dev_set_name(&shost->shost_gendev, "host%d", shost->host_no);
+diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
+index f6623f887ee4..d67b2eaff8f1 100644
+--- a/include/scsi/scsi_host.h
++++ b/include/scsi/scsi_host.h
+@@ -452,6 +452,9 @@ struct scsi_host_template {
+ 	/* True if the controller does not support WRITE SAME */
+ 	unsigned no_write_same:1;
+ 
++	/* True if the low-level driver supports blk-mq only */
++	unsigned force_blk_mq:1;
++
+ 	/*
+ 	 * Countdown for host blocking with no commands outstanding.
+ 	 */
+-- 
+2.9.5
