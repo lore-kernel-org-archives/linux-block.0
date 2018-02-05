@@ -1,54 +1,54 @@
-Return-Path: <prvs=570d9c77a=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@infradead.org" <hch@infradead.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "snitzer@redhat.com" <snitzer@redhat.com>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
-CC: "hch@lst.de" <hch@lst.de>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "hare@suse.de" <hare@suse.de>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"don.brace@microsemi.com" <don.brace@microsemi.com>,
-	"james.bottomley@hansenpartnership.com"
-	<james.bottomley@hansenpartnership.com>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "arun.easi@cavium.com" <arun.easi@cavium.com>,
-	"osandov@fb.com" <osandov@fb.com>, "loberman@redhat.com"
-	<loberman@redhat.com>, "kashyap.desai@broadcom.com"
-	<kashyap.desai@broadcom.com>, "peter.rivera@broadcom.com"
-	<peter.rivera@broadcom.com>
+Return-Path: <hare@suse.de>
 Subject: Re: [PATCH 1/5] blk-mq: tags: define several fields of tags as
  pointer
-Date: Thu, 8 Feb 2018 17:34:19 +0000
-Message-ID: <1518111257.3611.33.camel@wdc.com>
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+ Mike Snitzer <snitzer@redhat.com>
+Cc: linux-scsi@vger.kernel.org, Arun Easi <arun.easi@cavium.com>,
+ Omar Sandoval <osandov@fb.com>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ James Bottomley <james.bottomley@hansenpartnership.com>,
+ Christoph Hellwig <hch@lst.de>, Don Brace <don.brace@microsemi.com>,
+ Kashyap Desai <kashyap.desai@broadcom.com>,
+ Peter Rivera <peter.rivera@broadcom.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Laurence Oberman <loberman@redhat.com>
 References: <20180203042112.15239-1-ming.lei@redhat.com>
-	 <20180203042112.15239-2-ming.lei@redhat.com>
-In-Reply-To: <20180203042112.15239-2-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+ <20180203042112.15239-2-ming.lei@redhat.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <6959d8aa-9388-74c9-c3ae-189fe7885d1a@suse.de>
+Date: Mon, 5 Feb 2018 07:57:57 +0100
 MIME-Version: 1.0
+In-Reply-To: <20180203042112.15239-2-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-T24gU2F0LCAyMDE4LTAyLTAzIGF0IDEyOjIxICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gZGlm
-ZiAtLWdpdCBhL2Jsb2NrL2Jsay1tcS10YWcuaCBiL2Jsb2NrL2Jsay1tcS10YWcuaA0KPiBpbmRl
-eCA2MWRlYWIwYjVhNWEuLmE2ODMyM2ZhMGMwMiAxMDA2NDQNCj4gLS0tIGEvYmxvY2svYmxrLW1x
-LXRhZy5oDQo+ICsrKyBiL2Jsb2NrL2Jsay1tcS10YWcuaA0KPiBAQCAtMTEsMTAgKzExLDE0IEBA
-IHN0cnVjdCBibGtfbXFfdGFncyB7DQo+ICAJdW5zaWduZWQgaW50IG5yX3RhZ3M7DQo+ICAJdW5z
-aWduZWQgaW50IG5yX3Jlc2VydmVkX3RhZ3M7DQo+ICANCj4gLQlhdG9taWNfdCBhY3RpdmVfcXVl
-dWVzOw0KPiArCWF0b21pY190ICphY3RpdmVfcXVldWVzOw0KPiArCWF0b21pY190IF9fYWN0aXZl
-X3F1ZXVlczsNCj4gIA0KPiAtCXN0cnVjdCBzYml0bWFwX3F1ZXVlIGJpdG1hcF90YWdzOw0KPiAt
-CXN0cnVjdCBzYml0bWFwX3F1ZXVlIGJyZXNlcnZlZF90YWdzOw0KPiArCXN0cnVjdCBzYml0bWFw
-X3F1ZXVlICpiaXRtYXBfdGFnczsNCj4gKwlzdHJ1Y3Qgc2JpdG1hcF9xdWV1ZSAqYnJlc2VydmVk
-X3RhZ3M7DQo+ICsNCj4gKwlzdHJ1Y3Qgc2JpdG1hcF9xdWV1ZSBfX2JpdG1hcF90YWdzOw0KPiAr
-CXN0cnVjdCBzYml0bWFwX3F1ZXVlIF9fYnJlc2VydmVkX3RhZ3M7DQo+ICANCj4gIAlzdHJ1Y3Qg
-cmVxdWVzdCAqKnJxczsNCj4gIAlzdHJ1Y3QgcmVxdWVzdCAqKnN0YXRpY19ycXM7DQoNClRoaXMg
-aXMgZ2V0dGluZyB1Z2x5OiBtdWx0aXBsZSBwb2ludGVycyB0aGF0IGVpdGhlciBhbGwgcG9pbnQg
-YXQgYW4gZWxlbWVudA0KaW5zaWRlIHN0cnVjdCBibGtfbXFfdGFncyBvciBhbGwgcG9pbnQgYXQg
-YSBtZW1iZXIgb3V0c2lkZSBibGtfbXFfdGFncy4gSGF2ZQ0KeW91IGNvbnNpZGVyZWQgdG8gaW50
-cm9kdWNlIGEgbmV3IHN0cnVjdHVyZSBmb3IgdGhlc2UgbWVtYmVycyAoYWN0aXZlX3F1ZXVlcywN
-CmJpdG1hcF90YWdzIGFuZCBicmVzZXJ2ZWRfdGFncykgc3VjaCB0aGF0IG9ubHkgYSBzaW5nbGUg
-bmV3IHBvaW50ZXIgaGFzIHRvDQpiZSBpbnRyb2R1Y2VkIGluIHN0cnVjdCBibGtfbXFfdGFncz8g
-QWRkaXRpb25hbGx5LCB3aHkgZG9lcyBldmVyeQ0KYmxrX21xX3RhZ3MgaW5zdGFuY2UgaGF2ZSBp
-dHMgb3duIHN0YXRpY19ycXMgYXJyYXkgaWYgdGFncyBhcmUgc2hhcmVkDQphY3Jvc3MgaGFyZHdh
-cmUgcXVldWVzPyBibGtfbXFfZ2V0X3RhZygpIGFsbG9jYXRlcyBhIHRhZyBlaXRoZXIgZnJvbQ0K
-Yml0bWFwX3RhZ3Mgb3IgZnJvbSBicmVzZXJ2ZWRfdGFncy4gU28gaWYgdGhlc2UgdGFnIHNldHMg
-YXJlIHNoYXJlZCBJDQpkb24ndCB0aGluayB0aGF0IGl0IGlzIG5lY2Vzc2FyeSB0byBoYXZlIG9u
-ZSBzdGF0aWNfcnFzIGFycmF5IHBlciBzdHJ1Y3QNCmJsa19tcV90YWdzIGluc3RhbmNlLg0KDQpU
-aGFua3MsDQoNCkJhcnQuDQoNCg0KDQo=
+On 02/03/2018 05:21 AM, Ming Lei wrote:
+> This patch changes tags->breserved_tags, tags->bitmap_tags and
+> tags->active_queues as pointer, and prepares for supporting global tags.
+> 
+> No functional change.
+> 
+> Cc: Laurence Oberman <loberman@redhat.com>
+> Cc: Mike Snitzer <snitzer@redhat.com>
+> Cc: Christoph Hellwig <hch@infradead.org>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/bfq-iosched.c    |  4 ++--
+>  block/blk-mq-debugfs.c | 10 +++++-----
+>  block/blk-mq-tag.c     | 48 ++++++++++++++++++++++++++----------------------
+>  block/blk-mq-tag.h     | 10 +++++++---
+>  block/blk-mq.c         |  2 +-
+>  block/kyber-iosched.c  |  2 +-
+>  6 files changed, 42 insertions(+), 34 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
