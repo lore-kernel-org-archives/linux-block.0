@@ -1,35 +1,80 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f51.google.com ([74.125.83.51]:33472 "EHLO
-        mail-pg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752077AbeBAVwM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Feb 2018 16:52:12 -0500
-Received: by mail-pg0-f51.google.com with SMTP id u1so13063455pgr.0
-        for <linux-block@vger.kernel.org>; Thu, 01 Feb 2018 13:52:11 -0800 (PST)
-Subject: Re: [PATCH v4 00/13] bcache: device failure handling improvement
-To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org
-References: <20180128015625.128497-1-colyli@suse.de>
-From: Michael Lyle <mlyle@lyle.org>
-Message-ID: <2fde00b8-f605-d0d0-a51c-c126a2939326@lyle.org>
-Date: Thu, 1 Feb 2018 13:52:09 -0800
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 5/5] scsi: virtio_scsi: fix IO hang by irq vector
+ automatic affinity
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+ Mike Snitzer <snitzer@redhat.com>
+Cc: linux-scsi@vger.kernel.org, Arun Easi <arun.easi@cavium.com>,
+ Omar Sandoval <osandov@fb.com>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ James Bottomley <james.bottomley@hansenpartnership.com>,
+ Christoph Hellwig <hch@lst.de>, Don Brace <don.brace@microsemi.com>,
+ Kashyap Desai <kashyap.desai@broadcom.com>,
+ Peter Rivera <peter.rivera@broadcom.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Laurence Oberman <loberman@redhat.com>
+References: <20180203042112.15239-1-ming.lei@redhat.com>
+ <20180203042112.15239-6-ming.lei@redhat.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <4b831a39-1024-48d3-bb7c-3395f85cd4db@suse.de>
+Date: Mon, 5 Feb 2018 07:57:29 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180128015625.128497-1-colyli@suse.de>
+In-Reply-To: <20180203042112.15239-6-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On 01/27/2018 05:56 PM, Coly Li wrote:
-> Hi maintainers and folks,
+On 02/03/2018 05:21 AM, Ming Lei wrote:
+> Now 84676c1f21e8ff5(genirq/affinity: assign vectors to all possible CPUs)
+> has been merged to V4.16-rc, and it is easy to allocate all offline CPUs
+> for some irq vectors, this can't be avoided even though the allocation
+> is improved.
+> 
+> For example, on a 8cores VM, 4~7 are not-present/offline, 4 queues of
+> virtio-scsi, the irq affinity assigned can become the following shape:
+> 
+> 	irq 36, cpu list 0-7
+> 	irq 37, cpu list 0-7
+> 	irq 38, cpu list 0-7
+> 	irq 39, cpu list 0-1
+> 	irq 40, cpu list 4,6
+> 	irq 41, cpu list 2-3
+> 	irq 42, cpu list 5,7
+> 
+> Then IO hang is triggered in case of non-SCSI_MQ.
+> 
+> Given storage IO is always C/S model, there isn't such issue with SCSI_MQ(blk-mq),
+> because no IO can be submitted to one hw queue if the hw queue hasn't online
+> CPUs.
+> 
+> Fix this issue by forcing to use blk_mq.
+> 
+> BTW, I have been used virtio-scsi(scsi_mq) for several years, and it has
+> been quite stable, so it shouldn't cause extra risk.
+> 
+> Cc: Hannes Reinecke <hare@suse.de>
+> Cc: Arun Easi <arun.easi@cavium.com>
+> Cc: Omar Sandoval <osandov@fb.com>,
+> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+> Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
+> Cc: Christoph Hellwig <hch@lst.de>,
+> Cc: Don Brace <don.brace@microsemi.com>
+> Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+> Cc: Peter Rivera <peter.rivera@broadcom.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Laurence Oberman <loberman@redhat.com>
+> Cc: Mike Snitzer <snitzer@redhat.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/scsi/virtio_scsi.c | 59 +++-------------------------------------------
+>  1 file changed, 3 insertions(+), 56 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Hi Coly---
+Cheers,
 
-> This patch set tries to improve bcache device failure handling, includes
-> cache device and backing device failures.
-
-I've skimmed this whole patchset and overall it looks good.  I have
-taken some pieces (2,6) for possible-4.16.  I understand you'll be
-sending out a v5 soon-- I'll perform a more detailed review then.
-
-Thanks,
-
-Mike
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
