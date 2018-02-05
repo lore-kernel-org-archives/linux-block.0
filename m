@@ -1,29 +1,139 @@
-Return-Path: <prvs=570d9c77a=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "sagi@grimberg.me"
-	<sagi@grimberg.me>
-CC: "hch@lst.de" <hch@lst.de>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
-	"idanb@mellanox.com" <idanb@mellanox.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
-Subject: Re: [PATCH rfc 3/5] irq_poll: wire up irq_am
-Date: Thu, 8 Feb 2018 01:28:25 +0000
-Message-ID: <1518053304.2870.95.camel@wdc.com>
+Return-Path: <sagi@grimberg.me>
+From: Sagi Grimberg <sagi@grimberg.me>
+To: linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Jason Gunthorpe <jgg@ziepe.ca>,
+	Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Idan Burstein <idanb@mellanox.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH rfc 3/5] irq_poll: wire up irq_am
+Date: Tue,  6 Feb 2018 00:03:14 +0200
+Message-Id: <20180205220316.30236-4-sagi@grimberg.me>
+In-Reply-To: <20180205220316.30236-1-sagi@grimberg.me>
 References: <20180205220316.30236-1-sagi@grimberg.me>
-	 <20180205220316.30236-4-sagi@grimberg.me>
-In-Reply-To: <20180205220316.30236-4-sagi@grimberg.me>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE4LTAyLTA2IGF0IDAwOjAzICswMjAwLCBTYWdpIEdyaW1iZXJnIHdyb3RlOg0K
-PiArdm9pZCBpcnFfcG9sbF9pbml0X2FtKHN0cnVjdCBpcnFfcG9sbCAqaW9wLCB1bnNpZ25lZCBp
-bnQgbnJfZXZlbnRzLA0KPiArICAgICAgICB1bnNpZ25lZCBzaG9ydCBucl9sZXZlbHMsIHVuc2ln
-bmVkIHNob3J0IHN0YXJ0X2xldmVsLCBpcnFfcG9sbF9hbV9mbiAqYW1mbikNCj4gK3sNCj4gKwlp
-b3AtPmFtZm4gPSBhbWZuOw0KPiArCWlycV9hbV9pbml0KCZpb3AtPmFtLCBucl9ldmVudHMsIG5y
-X2xldmVscywgc3RhcnRfbGV2ZWwsIGlycV9wb2xsX2FtKTsNCj4gK30NCg0KVGhpcyBmdW5jdGlv
-biBoYXMgYSBsYXJnZSBudW1iZXIgb2YgcGFyYW1ldGVycyBhbmQgbW9zdCBvZiB0aGVtIGFyZSBw
-YXNzZWQgdmVyYmF0aW0gdG8NCmlycV9hbV9pbml0KCkuIFBsZWFzZSBjb25zaWRlciB0byBpbnRy
-b2R1Y2UgYSBzdHJ1Y3R1cmUgZm9yIHRoZXNlIHBhcmFtZXRlcnMgc3VjaCB0aGF0DQp0aGUgbnVt
-YmVyIG9mIGZ1bmN0aW9uIGFyZ3VtZW50cyBzdGF5cyByZWFzb25hYmxlLg0KDQpUaGFua3MsDQoN
-CkJhcnQuDQoNCg0KDQo=
+Update online stats for fired event and completions on
+each poll cycle.
+
+Also expose am initialization interface. The irqpoll consumer will
+initialize the irq-am context of the irq-poll context.
+
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+---
+ include/linux/irq_poll.h |  9 +++++++++
+ lib/Kconfig              |  1 +
+ lib/irq_poll.c           | 30 +++++++++++++++++++++++++++++-
+ 3 files changed, 39 insertions(+), 1 deletion(-)
+
+diff --git a/include/linux/irq_poll.h b/include/linux/irq_poll.h
+index 16aaeccb65cb..de3055359fd8 100644
+--- a/include/linux/irq_poll.h
++++ b/include/linux/irq_poll.h
+@@ -2,14 +2,20 @@
+ #ifndef IRQ_POLL_H
+ #define IRQ_POLL_H
+ 
++#include <linux/irq-am.h>
++
+ struct irq_poll;
+ typedef int (irq_poll_fn)(struct irq_poll *, int);
++typedef int (irq_poll_am_fn)(struct irq_poll *, unsigned short);
+ 
+ struct irq_poll {
+ 	struct list_head list;
+ 	unsigned long state;
+ 	int weight;
+ 	irq_poll_fn *poll;
++
++	struct irq_am am;
++	irq_poll_am_fn *amfn;
+ };
+ 
+ enum {
+@@ -23,4 +29,7 @@ extern void irq_poll_complete(struct irq_poll *);
+ extern void irq_poll_enable(struct irq_poll *);
+ extern void irq_poll_disable(struct irq_poll *);
+ 
++extern void irq_poll_init_am(struct irq_poll *iop, unsigned int nr_events,
++        unsigned short nr_levels, unsigned short start_level,
++	irq_poll_am_fn *amfn);
+ #endif
+diff --git a/lib/Kconfig b/lib/Kconfig
+index bbb4c9eea84d..d495b21cd241 100644
+--- a/lib/Kconfig
++++ b/lib/Kconfig
+@@ -511,6 +511,7 @@ config IRQ_AM
+ 
+ config IRQ_POLL
+ 	bool "IRQ polling library"
++	select IRQ_AM
+ 	help
+ 	  Helper library to poll interrupt mitigation using polling.
+ 
+diff --git a/lib/irq_poll.c b/lib/irq_poll.c
+index 86a709954f5a..6bc86a677d8c 100644
+--- a/lib/irq_poll.c
++++ b/lib/irq_poll.c
+@@ -53,6 +53,7 @@ static void __irq_poll_complete(struct irq_poll *iop)
+ 	list_del(&iop->list);
+ 	smp_mb__before_atomic();
+ 	clear_bit_unlock(IRQ_POLL_F_SCHED, &iop->state);
++	irq_am_add_event(&iop->am);
+ }
+ 
+ /**
+@@ -106,8 +107,10 @@ static void __latent_entropy irq_poll_softirq(struct softirq_action *h)
+ 
+ 		weight = iop->weight;
+ 		work = 0;
+-		if (test_bit(IRQ_POLL_F_SCHED, &iop->state))
++		if (test_bit(IRQ_POLL_F_SCHED, &iop->state)) {
+ 			work = iop->poll(iop, weight);
++			irq_am_add_comps(&iop->am, work);
++		}
+ 
+ 		budget -= work;
+ 
+@@ -144,6 +147,7 @@ static void __latent_entropy irq_poll_softirq(struct softirq_action *h)
+  **/
+ void irq_poll_disable(struct irq_poll *iop)
+ {
++	irq_am_cleanup(&iop->am);
+ 	set_bit(IRQ_POLL_F_DISABLE, &iop->state);
+ 	while (test_and_set_bit(IRQ_POLL_F_SCHED, &iop->state))
+ 		msleep(1);
+@@ -185,6 +189,30 @@ void irq_poll_init(struct irq_poll *iop, int weight, irq_poll_fn *poll_fn)
+ }
+ EXPORT_SYMBOL(irq_poll_init);
+ 
++static int irq_poll_am(struct irq_am *am, unsigned short level)
++{
++	struct irq_poll *iop = container_of(am, struct irq_poll, am);
++
++	return iop->amfn(iop, level);
++}
++
++/**
++ * irq_poll_init_am - Initialize adaptive moderation parameters on this @iop
++ * @iop:      The parent iopoll structure
++ * @weight:   The default weight (or command completion budget)
++ * @poll_fn:  The handler to invoke
++ *
++ * Description:
++ *     Initialize adaptive moderation for this irq_poll structure.
++ **/
++void irq_poll_init_am(struct irq_poll *iop, unsigned int nr_events,
++        unsigned short nr_levels, unsigned short start_level, irq_poll_am_fn *amfn)
++{
++	iop->amfn = amfn;
++	irq_am_init(&iop->am, nr_events, nr_levels, start_level, irq_poll_am);
++}
++EXPORT_SYMBOL(irq_poll_init_am);
++
+ static int irq_poll_cpu_dead(unsigned int cpu)
+ {
+ 	/*
+-- 
+2.14.1
