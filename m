@@ -1,74 +1,50 @@
-Return-Path: <roman.penyaev@profitbricks.com>
-MIME-Version: 1.0
-In-Reply-To: <1517849882.3764.13.camel@wdc.com>
-References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
- <23dcfda7-eac1-ed13-b24e-3586c284ee55@grimberg.me> <1517849882.3764.13.camel@wdc.com>
-From: Roman Penyaev <roman.penyaev@profitbricks.com>
-Date: Mon, 5 Feb 2018 18:16:02 +0100
-Message-ID: <CAJrWOzDwDAt-w08-zmhJHsgedTyGQ-Dp=vHTvmrdSz9st7npxQ@mail.gmail.com>
+Return-Path: <prvs=5677c57d0=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "roman.penyaev@profitbricks.com" <roman.penyaev@profitbricks.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "sagi@grimberg.me"
+	<sagi@grimberg.me>
+CC: "hch@infradead.org" <hch@infradead.org>, "danil.kipnis@profitbricks.com"
+	<danil.kipnis@profitbricks.com>, "jinpu.wang@profitbricks.com"
+	<jinpu.wang@profitbricks.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"ogerlitz@mellanox.com" <ogerlitz@mellanox.com>
 Subject: Re: [PATCH 00/24] InfiniBand Transport (IBTRS) and Network Block
  Device (IBNBD)
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "sagi@grimberg.me" <sagi@grimberg.me>,
-	"hch@infradead.org" <hch@infradead.org>,
-	"danil.kipnis@profitbricks.com" <danil.kipnis@profitbricks.com>,
-	"jinpu.wang@profitbricks.com" <jinpu.wang@profitbricks.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"ogerlitz@mellanox.com" <ogerlitz@mellanox.com>
-Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 5 Feb 2018 16:58:03 +0000
+Message-ID: <1517849882.3764.13.camel@wdc.com>
+References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
+	 <23dcfda7-eac1-ed13-b24e-3586c284ee55@grimberg.me>
+In-Reply-To: <23dcfda7-eac1-ed13-b24e-3586c284ee55@grimberg.me>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Bart,
-
-On Mon, Feb 5, 2018 at 5:58 PM, Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
-> On Mon, 2018-02-05 at 14:16 +0200, Sagi Grimberg wrote:
->> - Your latency measurements are surprisingly high for a null target
->>    device (even for low end nvme device actually) regardless of the
->>    transport implementation.
->>
->> For example:
->> - QD=1 read latency is 648.95 for ibnbd (I assume usecs right?) which is
->>    fairly high. on nvme-rdma its 1058 us, which means over 1 millisecond
->>    and even 1.254 ms for srp. Last time I tested nvme-rdma read QD=1
->>    latency I got ~14 us. So something does not add up here. If this is
->>    not some configuration issue, then we have serious bugs to handle..
->>
->> - QD=16 the read latencies are > 10ms for null devices?! I'm having
->>    troubles understanding how you were able to get such high latencies
->>    (> 100 ms for QD>=100)
->>
->> Can you share more information about your setup? It would really help
->> us understand more.
->
-> I would also appreciate it if more information could be provided about the
-> measurement results. In addition to answering Sagi's questions, would it
-> be possible to share the fio job that was used for measuring latency? In
-> https://events.static.linuxfound.org/sites/events/files/slides/Copy%20of%20IBNBD-Vault-2017-5.pdf
-> I found the following:
->
-> iodepth=128
-> iodepth_batch_submit=128
->
-> If you want to keep the pipeline full I think that you need to set the
-> iodepth_batch_submit parameter to a value that is much lower than iodepth.
-> I think that setting iodepth_batch_submit equal to iodepth will yield
-> suboptimal IOPS results. Jens, please correct me if I got this wrong.
-
-Sorry, Bart, I would answer here in a few words (I would like to answer
-in details tomorrow on Sagi's mail).
-
-Everything (fio jobs, setup, etc) is given in the same link:
-
-https://www.spinics.net/lists/linux-rdma/msg48799.html
-
-at the bottom you will find links on google docs with many pages
-and archived fio jobs and scripts. (I do not remember exactly,
-one year passed, but there should be everything).
-
-Regarding smaller iodepth_batch_submit - that decreases performance.
-Once I played with that, even introduced new iodepth_batch_complete_max
-option for fio, but then I decided to stop and simply chose this
-configuration, which provides me fastest results.
-
---
-Roman
+T24gTW9uLCAyMDE4LTAyLTA1IGF0IDE0OjE2ICswMjAwLCBTYWdpIEdyaW1iZXJnIHdyb3RlOg0K
+PiAtIFlvdXIgbGF0ZW5jeSBtZWFzdXJlbWVudHMgYXJlIHN1cnByaXNpbmdseSBoaWdoIGZvciBh
+IG51bGwgdGFyZ2V0DQo+ICAgIGRldmljZSAoZXZlbiBmb3IgbG93IGVuZCBudm1lIGRldmljZSBh
+Y3R1YWxseSkgcmVnYXJkbGVzcyBvZiB0aGUNCj4gICAgdHJhbnNwb3J0IGltcGxlbWVudGF0aW9u
+Lg0KPiANCj4gRm9yIGV4YW1wbGU6DQo+IC0gUUQ9MSByZWFkIGxhdGVuY3kgaXMgNjQ4Ljk1IGZv
+ciBpYm5iZCAoSSBhc3N1bWUgdXNlY3MgcmlnaHQ/KSB3aGljaCBpcw0KPiAgICBmYWlybHkgaGln
+aC4gb24gbnZtZS1yZG1hIGl0cyAxMDU4IHVzLCB3aGljaCBtZWFucyBvdmVyIDEgbWlsbGlzZWNv
+bmQNCj4gICAgYW5kIGV2ZW4gMS4yNTQgbXMgZm9yIHNycC4gTGFzdCB0aW1lIEkgdGVzdGVkIG52
+bWUtcmRtYSByZWFkIFFEPTENCj4gICAgbGF0ZW5jeSBJIGdvdCB+MTQgdXMuIFNvIHNvbWV0aGlu
+ZyBkb2VzIG5vdCBhZGQgdXAgaGVyZS4gSWYgdGhpcyBpcw0KPiAgICBub3Qgc29tZSBjb25maWd1
+cmF0aW9uIGlzc3VlLCB0aGVuIHdlIGhhdmUgc2VyaW91cyBidWdzIHRvIGhhbmRsZS4uDQo+IA0K
+PiAtIFFEPTE2IHRoZSByZWFkIGxhdGVuY2llcyBhcmUgPiAxMG1zIGZvciBudWxsIGRldmljZXM/
+ISBJJ20gaGF2aW5nDQo+ICAgIHRyb3VibGVzIHVuZGVyc3RhbmRpbmcgaG93IHlvdSB3ZXJlIGFi
+bGUgdG8gZ2V0IHN1Y2ggaGlnaCBsYXRlbmNpZXMNCj4gICAgKD4gMTAwIG1zIGZvciBRRD49MTAw
+KQ0KPiANCj4gQ2FuIHlvdSBzaGFyZSBtb3JlIGluZm9ybWF0aW9uIGFib3V0IHlvdXIgc2V0dXA/
+IEl0IHdvdWxkIHJlYWxseSBoZWxwDQo+IHVzIHVuZGVyc3RhbmQgbW9yZS4NCg0KSSB3b3VsZCBh
+bHNvIGFwcHJlY2lhdGUgaXQgaWYgbW9yZSBpbmZvcm1hdGlvbiBjb3VsZCBiZSBwcm92aWRlZCBh
+Ym91dCB0aGUNCm1lYXN1cmVtZW50IHJlc3VsdHMuIEluIGFkZGl0aW9uIHRvIGFuc3dlcmluZyBT
+YWdpJ3MgcXVlc3Rpb25zLCB3b3VsZCBpdA0KYmUgcG9zc2libGUgdG8gc2hhcmUgdGhlIGZpbyBq
+b2IgdGhhdCB3YXMgdXNlZCBmb3IgbWVhc3VyaW5nIGxhdGVuY3k/IEluDQpodHRwczovL2V2ZW50
+cy5zdGF0aWMubGludXhmb3VuZC5vcmcvc2l0ZXMvZXZlbnRzL2ZpbGVzL3NsaWRlcy9Db3B5JTIw
+b2YlMjBJQk5CRC1WYXVsdC0yMDE3LTUucGRmDQpJIGZvdW5kIHRoZSBmb2xsb3dpbmc6DQoNCmlv
+ZGVwdGg9MTI4DQppb2RlcHRoX2JhdGNoX3N1Ym1pdD0xMjgNCg0KSWYgeW91IHdhbnQgdG8ga2Vl
+cCB0aGUgcGlwZWxpbmUgZnVsbCBJIHRoaW5rIHRoYXQgeW91IG5lZWQgdG8gc2V0IHRoZQ0KaW9k
+ZXB0aF9iYXRjaF9zdWJtaXQgcGFyYW1ldGVyIHRvIGEgdmFsdWUgdGhhdCBpcyBtdWNoIGxvd2Vy
+IHRoYW4gaW9kZXB0aC4NCkkgdGhpbmsgdGhhdCBzZXR0aW5nIGlvZGVwdGhfYmF0Y2hfc3VibWl0
+IGVxdWFsIHRvIGlvZGVwdGggd2lsbCB5aWVsZA0Kc3Vib3B0aW1hbCBJT1BTIHJlc3VsdHMuIEpl
+bnMsIHBsZWFzZSBjb3JyZWN0IG1lIGlmIEkgZ290IHRoaXMgd3JvbmcuDQoNClRoYW5rcywNCg0K
+QmFydC4NCg0KDQo=
