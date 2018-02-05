@@ -1,139 +1,101 @@
-Return-Path: <kashyap.desai@broadcom.com>
-From: Kashyap Desai <kashyap.desai@broadcom.com>
-References: <20180203042112.15239-1-ming.lei@redhat.com> <07c1f41e-de7c-5e3d-1a2d-0cd7af7b46df@suse.de>
- <528c93de0aac9010e274847ab1ae0328@mail.gmail.com> <20180205101734.GA32558@ming.t460p>
-In-Reply-To: <20180205101734.GA32558@ming.t460p>
-MIME-Version: 1.0
-Date: Tue, 6 Feb 2018 11:33:50 +0530
-Message-ID: <4c8162129f2a09dca2d1e7eefd61e272@mail.gmail.com>
-Subject: RE: [PATCH 0/5] blk-mq/scsi-mq: support global tags & introduce force_blk_mq
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>, Mike Snitzer <snitzer@redhat.com>, linux-scsi@vger.kernel.org,
-	Arun Easi <arun.easi@cavium.com>, Omar Sandoval <osandov@fb.com>,
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Mike Snitzer <snitzer@redhat.com>
+Cc: linux-scsi@vger.kernel.org,
+	Hannes Reinecke <hare@suse.de>,
+	Arun Easi <arun.easi@cavium.com>,
+	Omar Sandoval <osandov@fb.com>,
 	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>, Christoph Hellwig <hch@lst.de>,
-	Don Brace <don.brace@microsemi.com>, Peter Rivera <peter.rivera@broadcom.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Laurence Oberman <loberman@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+	James Bottomley <james.bottomley@hansenpartnership.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Don Brace <don.brace@microsemi.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Peter Rivera <peter.rivera@broadcom.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Laurence Oberman <loberman@redhat.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 0/8] blk-mq/scsi-mq: support global tags & introduce force_blk_mq
+Date: Mon,  5 Feb 2018 23:20:27 +0800
+Message-Id: <20180205152035.15016-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-> > We still have more than one reply queue ending up completion one CPU.
->
-> pci_alloc_irq_vectors(PCI_IRQ_AFFINITY) has to be used, that means
-> smp_affinity_enable has to be set as 1, but seems it is the default
-setting.
->
-> Please see kernel/irq/affinity.c, especially irq_calc_affinity_vectors()
-which
-> figures out an optimal number of vectors, and the computation is based
-on
-> cpumask_weight(cpu_possible_mask) now. If all offline CPUs are mapped to
-> some of reply queues, these queues won't be active(no request submitted
-to
-> these queues). The mechanism of PCI_IRQ_AFFINITY basically makes sure
-that
-> more than one irq vector won't be handled by one same CPU, and the irq
-> vector spread is done in irq_create_affinity_masks().
->
-> > Try to reduce MSI-x vector of megaraid_sas or mpt3sas driver via
-> > module parameter to simulate the issue. We need more number of Online
-> > CPU than reply-queue.
->
-> IMO, you don't need to simulate the issue, pci_alloc_irq_vectors(
-> PCI_IRQ_AFFINITY) will handle that for you. You can dump the returned
-irq
-> vector number, num_possible_cpus()/num_online_cpus() and each irq
-> vector's affinity assignment.
->
-> > We may see completion redirected to original CPU because of
-> > "QUEUE_FLAG_SAME_FORCE", but ISR of low level driver can keep one CPU
-> > busy in local ISR routine.
->
-> Could you dump each irq vector's affinity assignment of your megaraid in
-your
-> test?
+Hi All,
 
-To quickly reproduce, I restricted to single MSI-x vector on megaraid_sas
-driver.  System has total 16 online CPUs.
+This patchset supports global tags which was started by Hannes originally:
 
-Output of affinity hints.
-kernel version:
-Linux rhel7.3 4.15.0-rc1+ #2 SMP Mon Feb 5 12:13:34 EST 2018 x86_64 x86_64
-x86_64 GNU/Linux
-PCI name is 83:00.0, dump its irq affinity:
-irq 105, cpu list 0-3,8-11
+	https://marc.info/?l=linux-block&m=149132580511346&w=2
 
-Affinity mask is created properly, but only CPU-0 is overloaded with
-interrupt processing.
+Also inroduce 'force_blk_mq' and 'host_tagset' to 'struct scsi_host_template',
+so that driver can avoid to support two IO paths(legacy and blk-mq), especially
+recent discusion mentioned that SCSI_MQ will be enabled at default soon.
 
-# numactl --hardware
-available: 2 nodes (0-1)
-node 0 cpus: 0 1 2 3 8 9 10 11
-node 0 size: 47861 MB
-node 0 free: 46516 MB
-node 1 cpus: 4 5 6 7 12 13 14 15
-node 1 size: 64491 MB
-node 1 free: 62805 MB
-node distances:
-node   0   1
-  0:  10  21
-  1:  21  10
+	https://marc.info/?l=linux-scsi&m=151727684915589&w=2
 
-Output of  system activities (sar).  (gnice is 100% and it is consumed in
-megaraid_sas ISR routine.)
+With the above changes, it should be easier to convert SCSI drivers'
+reply queue into blk-mq's hctx, then the automatic irq affinity issue can
+be solved easily, please see detailed descrption in commit log and the
+8th patch for converting HPSA.
 
+Also drivers may require to complete request on the submission CPU
+for avoiding hard/soft deadlock, which can be done easily with blk_mq
+too.
 
-12:44:40 PM     CPU      %usr     %nice      %sys   %iowait    %steal
-%irq     %soft    %guest    %gnice     %idle
-12:44:41 PM     all         6.03      0.00        29.98      0.00
-0.00         0.00        0.00        0.00        0.00         63.99
-12:44:41 PM       0         0.00      0.00         0.00        0.00
-0.00         0.00        0.00        0.00       100.00         0
+	https://marc.info/?t=151601851400001&r=1&w=2
 
+The 6th patch uses the introduced 'force_blk_mq' to fix virtio_scsi
+so that IO hang issue can be avoided inside legacy IO path, this issue is
+a bit generic, at least HPSA/virtio-scsi are found broken with v4.15+.
 
-In my test, I used rq_affinity is set to 2. (QUEUE_FLAG_SAME_FORCE). I
-also used " host_tagset" V2 patch set for megaraid_sas.
+The 7th & 8th patch fixes HPSA's IO issue which is caused by the reply
+queue selection algorithem.
 
-Using RFC requested in -
-"https://marc.info/?l=linux-scsi&m=151601833418346&w=2 " lockup is avoided
-(you can noticed that gnice is shifted to softirq. Even though it is 100%
-consumed, There is always exit for existing completion loop due to
-irqpoll_weight  @irq_poll_init().
+Laurence has verified that this patch makes HPSA working with the linus
+tree with this patchset.
 
-Average:        CPU      %usr     %nice      %sys   %iowait    %steal
-%irq     %soft    %guest    %gnice     %idle
-Average:        all          4.25      0.00        21.61      0.00
-0.00      0.00         6.61           0.00      0.00     67.54
-Average:          0           0.00      0.00         0.00      0.00
-0.00      0.00       100.00        0.00      0.00      0.00
+The V2 can be found in the following tree/branch:
 
+	https://github.com/ming1/linux/commits/v4.15-for-next-global-tags-v2
 
-Hope this clarifies. We need different fix to avoid lockups. Can we
-consider using irq poll interface if #CPU is more than Reply queue/MSI-x.
-?
+V2:
+	- fix restart code for global tags
+	- fixes HPSA's IO hang issue
+	- add 'scsi: Add template flag 'host_tagset''
+	- reorder patch
 
->
-> And the following script can do it easily, and the pci path (the 1st
-column of
-> lspci output) need to be passed, such as: 00:1c.4,
->
-> #!/bin/sh
-> if [ $# -ge 1 ]; then
->     PCID=$1
-> else
->     PCID=`lspci | grep "Non-Volatile memory" | cut -c1-7` fi PCIP=`find
-> /sys/devices -name *$PCID | grep pci` IRQS=`ls $PCIP/msi_irqs`
->
-> echo "kernel version: "
-> uname -a
->
-> echo "PCI name is $PCID, dump its irq affinity:"
-> for IRQ in $IRQS; do
->     CPUS=`cat /proc/irq/$IRQ/smp_affinity_list`
->     echo "\tirq $IRQ, cpu list $CPUS"
-> done
->
->
-> Thanks,
-> Ming
+Thanks
+Ming
+
+Hannes Reinecke (1):
+  scsi: Add template flag 'host_tagset'
+
+Ming Lei (7):
+  blk-mq: tags: define several fields of tags as pointer
+  blk-mq: introduce BLK_MQ_F_GLOBAL_TAGS
+  block: null_blk: introduce module parameter of 'g_global_tags'
+  scsi: introduce force_blk_mq
+  scsi: virtio_scsi: fix IO hang by irq vector automatic affinity
+  scsi: hpsa: call hpsa_hba_inquiry() after adding host
+  scsi: hpsa: use blk_mq to solve irq affinity issue
+
+ block/bfq-iosched.c        |  4 +--
+ block/blk-mq-debugfs.c     | 11 ++++----
+ block/blk-mq-sched.c       | 13 ++++++++-
+ block/blk-mq-tag.c         | 67 +++++++++++++++++++++++++++++-----------------
+ block/blk-mq-tag.h         | 15 ++++++++---
+ block/blk-mq.c             | 31 ++++++++++++++++-----
+ block/blk-mq.h             |  3 ++-
+ block/kyber-iosched.c      |  2 +-
+ drivers/block/null_blk.c   |  6 +++++
+ drivers/scsi/hosts.c       |  1 +
+ drivers/scsi/hpsa.c        | 56 ++++++++++++++++++++++++--------------
+ drivers/scsi/scsi_lib.c    |  2 ++
+ drivers/scsi/virtio_scsi.c | 59 +++-------------------------------------
+ include/linux/blk-mq.h     |  2 ++
+ include/scsi/scsi_host.h   |  6 +++++
+ 15 files changed, 157 insertions(+), 121 deletions(-)
+
+-- 
+2.9.5
