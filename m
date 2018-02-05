@@ -1,103 +1,100 @@
-Return-Path: <roman.penyaev@profitbricks.com>
-Return-Path: <roman.penyaev@profitbricks.com>
-From: Roman Pen <roman.penyaev@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Or Gerlitz <ogerlitz@mellanox.com>,
-	Roman Pen <roman.penyaev@profitbricks.com>,
-	Danil Kipnis <danil.kipnis@profitbricks.com>,
-	Jack Wang <jinpu.wang@profitbricks.com>
-Subject: [PATCH 12/24] ibtrs: include client and server modules into kernel compilation
-Date: Fri,  2 Feb 2018 15:08:52 +0100
-Message-Id: <20180202140904.2017-13-roman.penyaev@profitbricks.com>
-In-Reply-To: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
-References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] wbt: fix incorrect throttling due to flush latency
+To: Mikulas Patocka <mpatocka@redhat.com>
+Cc: linux-block@vger.kernel.org, dm-devel@redhat.com
+References: <alpine.LRH.2.02.1802051406190.15867@file01.intranet.prod.int.rdu2.redhat.com>
+ <33d2d1ab-d57e-8a3f-94df-e79704b5d863@kernel.dk>
+ <6bf3dd42-eb4a-8408-eb09-3b6c4dd18354@kernel.dk>
+ <alpine.LRH.2.02.1802051456570.24305@file01.intranet.prod.int.rdu2.redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <95c737cc-07d0-c0a5-1d97-1e58df005802@kernel.dk>
+Date: Mon, 5 Feb 2018 13:16:39 -0700
+MIME-Version: 1.0
+In-Reply-To: <alpine.LRH.2.02.1802051456570.24305@file01.intranet.prod.int.rdu2.redhat.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Add IBTRS Makefile, Kconfig and also corresponding lines into upper
-layer infiniband/ulp files.
+On 2/5/18 1:00 PM, Mikulas Patocka wrote:
+> 
+> 
+> On Mon, 5 Feb 2018, Jens Axboe wrote:
+> 
+>> On 2/5/18 12:22 PM, Jens Axboe wrote:
+>>> On 2/5/18 12:11 PM, Mikulas Patocka wrote:
+>>>> I have a workload where one process sends many asynchronous write bios
+>>>> (without waiting for them) and another process sends synchronous flush
+>>>> bios. During this workload, writeback throttling throttles down to one
+>>>> outstanding bio, and this incorrect throttling causes performance
+>>>> degradation (all write bios sleep in __wbt_wait and they couldn't be sent
+>>>> in parallel).
+>>>>
+>>>> The reason for this throttling is that wbt_data_dir counts flush requests
+>>>> in the read bucket. The flush requests (that take quite a long time)
+>>>> trigger this condition repeatedly:
+>>>> 	if (stat[READ].min > rwb->min_lat_nsec)
+>>>> and that condition causes scale down to one outstanding request, despite
+>>>> the fact that there are no read bios at all.
+>>>>
+>>>> A similar problem could also show up with REQ_OP_ZONE_REPORT and
+>>>> REQ_OP_ZONE_RESET - they are also counted in the read bucket.
+>>>>
+>>>> This patch fixes the function wbt_data_dir, so that only REQ_OP_READ 
+>>>> requests are counted in the read bucket. The patch improves SATA 
+>>>> write+flush throughput from 130MB/s to 350MB/s.
+>>>
+>>> Good catch. But I do wonder if we should account them at all. It
+>>> might make sense to account flushes as writes, but we really
+>>> should not account anything that isn't regular read/write IO 
+>>> related.
+>>>
+>>> Something like the below? Potentially including REQ_OP_FLUSH in the
+>>> write latencies as well.
+>>
+>> Thinking about it, flush should just be counted as writes, and the
+>> rest disregarded. Ala below.
+>>
+>>
+>> diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+>> index ae8de9780085..f92fc84b5e2c 100644
+>> --- a/block/blk-wbt.c
+>> +++ b/block/blk-wbt.c
+>> @@ -697,7 +697,15 @@ u64 wbt_default_latency_nsec(struct request_queue *q)
+>>  
+>>  static int wbt_data_dir(const struct request *rq)
+>>  {
+>> -	return rq_data_dir(rq);
+>> +	const int op = req_op(rq);
+>> +
+>> +	if (op == REQ_OP_READ)
+>> +		return READ;
+>> +	else if (op == REQ_OP_WRITE || op == REQ_OP_FLUSH)
+>> +		return WRITE;
+>> +
+>> +	/* don't account */
+>> +	return -1;
+>>  }
+>>  
+>>  int wbt_init(struct request_queue *q)
+>>
+>> -- 
+>> Jens Axboe
+> 
+> Yes, this works.
 
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
-Cc: Jack Wang <jinpu.wang@profitbricks.com>
----
- drivers/infiniband/Kconfig            |  1 +
- drivers/infiniband/ulp/Makefile       |  1 +
- drivers/infiniband/ulp/ibtrs/Kconfig  | 20 ++++++++++++++++++++
- drivers/infiniband/ulp/ibtrs/Makefile | 15 +++++++++++++++
- 4 files changed, 37 insertions(+)
+OK good, I'll queue that up then.
 
-diff --git a/drivers/infiniband/Kconfig b/drivers/infiniband/Kconfig
-index cbf186522016..7adbd0e272c4 100644
---- a/drivers/infiniband/Kconfig
-+++ b/drivers/infiniband/Kconfig
-@@ -93,6 +93,7 @@ source "drivers/infiniband/ulp/srpt/Kconfig"
- 
- source "drivers/infiniband/ulp/iser/Kconfig"
- source "drivers/infiniband/ulp/isert/Kconfig"
-+source "drivers/infiniband/ulp/ibtrs/Kconfig"
- 
- source "drivers/infiniband/ulp/opa_vnic/Kconfig"
- source "drivers/infiniband/sw/rdmavt/Kconfig"
-diff --git a/drivers/infiniband/ulp/Makefile b/drivers/infiniband/ulp/Makefile
-index 437813c7b481..1c4f10dc8d49 100644
---- a/drivers/infiniband/ulp/Makefile
-+++ b/drivers/infiniband/ulp/Makefile
-@@ -5,3 +5,4 @@ obj-$(CONFIG_INFINIBAND_SRPT)		+= srpt/
- obj-$(CONFIG_INFINIBAND_ISER)		+= iser/
- obj-$(CONFIG_INFINIBAND_ISERT)		+= isert/
- obj-$(CONFIG_INFINIBAND_OPA_VNIC)	+= opa_vnic/
-+obj-$(CONFIG_INFINIBAND_IBTRS)		+= ibtrs/
-diff --git a/drivers/infiniband/ulp/ibtrs/Kconfig b/drivers/infiniband/ulp/ibtrs/Kconfig
-new file mode 100644
-index 000000000000..eaeb8f3f6b4e
---- /dev/null
-+++ b/drivers/infiniband/ulp/ibtrs/Kconfig
-@@ -0,0 +1,20 @@
-+config INFINIBAND_IBTRS
-+	tristate
-+	depends on INFINIBAND_ADDR_TRANS
-+
-+config INFINIBAND_IBTRS_CLIENT
-+	tristate "IBTRS client module"
-+	depends on INFINIBAND_ADDR_TRANS
-+	select INFINIBAND_IBTRS
-+	help
-+	  IBTRS client allows for simplified data transfer and connection
-+	  establishment over RDMA (InfiniBand, RoCE, iWarp). Uses BIO-like
-+	  READ/WRITE semantics and provides multipath capabilities.
-+
-+config INFINIBAND_IBTRS_SERVER
-+	tristate "IBTRS server module"
-+	depends on INFINIBAND_ADDR_TRANS
-+	select INFINIBAND_IBTRS
-+	help
-+	  IBTRS server module processing connection and IO requests received
-+	  from the IBTRS client module.
-diff --git a/drivers/infiniband/ulp/ibtrs/Makefile b/drivers/infiniband/ulp/ibtrs/Makefile
-new file mode 100644
-index 000000000000..e6ea858745ad
---- /dev/null
-+++ b/drivers/infiniband/ulp/ibtrs/Makefile
-@@ -0,0 +1,15 @@
-+ibtrs-client-y := ibtrs-clt.o \
-+		  ibtrs-clt-stats.o \
-+		  ibtrs-clt-sysfs.o
-+
-+ibtrs-server-y := ibtrs-srv.o \
-+		  ibtrs-srv-stats.o \
-+		  ibtrs-srv-sysfs.o
-+
-+ibtrs-core-y := ibtrs.o
-+
-+obj-$(CONFIG_INFINIBAND_IBTRS)        += ibtrs-core.o
-+obj-$(CONFIG_INFINIBAND_IBTRS_CLIENT) += ibtrs-client.o
-+obj-$(CONFIG_INFINIBAND_IBTRS_SERVER) += ibtrs-server.o
-+
-+-include $(src)/compat/compat.mk
+> BTW. write throttling still causes some performance degradation (350MB/s 
+> vs. 500MB/s without throttling) - should there be some logic that disables 
+> write throttling if no sync requests are received?
+> 
+> Something like - if there's sync read, enable write throttling - if there 
+> were no sync reads in the last 5 seconds, disable write throttling?
+
+blk-wbt maintains a baseline that isn't too deep into writes, or you run
+into problems exactly when a sync or read request does come in after 5
+seconds, or whatever heuristic you choose. So that's very much by
+design. It does allow steps to go negative if no reads have been seen,
+but only so much so, and it bounces back immediately when one is seen.
+
 -- 
-2.13.1
+Jens Axboe
