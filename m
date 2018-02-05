@@ -1,249 +1,111 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:37853 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752318AbeBFEWW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Feb 2018 23:22:22 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Michael Lyle <mlyle@lyle.org>,
-        Junhui Tang <tang.junhui@zte.com.cn>
-Subject: [PATCH v5 09/10] bcache: add io_disable to struct cached_dev
-Date: Tue,  6 Feb 2018 12:20:59 +0800
-Message-Id: <20180206042100.65021-10-colyli@suse.de>
-In-Reply-To: <20180206042100.65021-1-colyli@suse.de>
-References: <20180206042100.65021-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Content-Type: text/plain;
+	charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: v4.15 and I/O hang with BFQ
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <3E34D175-88F9-4114-B627-A11262A7B470@linaro.org>
+Date: Mon, 5 Feb 2018 20:07:03 +0100
+Cc: Ming Lei <ming.lei@redhat.com>,
+ Oleksandr Natalenko <oleksandr@natalenko.name>,
+ Ivan Kozik <ivan@ludios.org>,
+ linux-block <linux-block@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Jens Axboe <axboe@kernel.dk>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ SERENA ZIVIANI <169364@studenti.unimore.it>
+Message-Id: <6BCE8A16-7D00-4B55-8E2D-0DDC7C187C14@linaro.org>
+References: <9ad0d544ab2b12f87f44eb4ef88e23a2@natalenko.name>
+ <20180130081925.GA25183@ming.t460p>
+ <38bd4dbe280bd0934abde764fe0916cd@natalenko.name>
+ <20180130144002.GA14401@ming.t460p>
+ <3E34D175-88F9-4114-B627-A11262A7B470@linaro.org>
+To: bfq-iosched@googlegroups.com
+List-ID: <linux-block@vger.kernel.org>
 
-If a bcache device is configured to writeback mode, current code does not
-handle write I/O errors on backing devices properly.
 
-In writeback mode, write request is written to cache device, and
-latter being flushed to backing device. If I/O failed when writing from
-cache device to the backing device, bcache code just ignores the error and
-upper layer code is NOT noticed that the backing device is broken.
 
-This patch tries to handle backing device failure like how the cache device
-failure is handled,
-- Add a error counter 'io_errors' and error limit 'error_limit' in struct
-  cached_dev. Add another io_disable to struct cached_dev to disable I/Os
-  on the problematic backing device.
-- When I/O error happens on backing device, increase io_errors counter. And
-  if io_errors reaches error_limit, set cache_dev->io_disable to true, and
-  stop the bcache device.
+> Il giorno 30 gen 2018, alle ore 16:40, Paolo Valente =
+<paolo.valente@linaro.org> ha scritto:
+>=20
+>=20
+>=20
+>> Il giorno 30 gen 2018, alle ore 15:40, Ming Lei <ming.lei@redhat.com> =
+ha scritto:
+>>=20
+>> On Tue, Jan 30, 2018 at 03:30:28PM +0100, Oleksandr Natalenko wrote:
+>>> Hi.
+>>>=20
+>> ...
+>>>  systemd-udevd-271   [000] ....     4.311033: bfq_insert_requests: =
+insert
+>>> rq->0
+>>>  systemd-udevd-271   [000] ...1     4.311037: =
+blk_mq_do_dispatch_sched:
+>>> not get rq, 1
+>>>         cfdisk-408   [000] ....    13.484220: bfq_insert_requests: =
+insert
+>>> rq->1
+>>>   kworker/0:1H-174   [000] ....    13.484253: =
+blk_mq_do_dispatch_sched:
+>>> not get rq, 1
+>>> =3D=3D=3D
+>>>=20
+>>> Looks the same, right?
+>>=20
+>> Yeah, same with before.
+>>=20
+>=20
+> Hi guys,
+> sorry for the delay with this fix.  We are proceeding very slowly on
+> this, because I'm super busy.  Anyway, now I can at least explain in
+> more detail the cause that leads to this hang.  Commit 'a6a252e64914
+> ("blk-mq-sched: decide how to handle flush rq via RQF_FLUSH_SEQ")'
+> makes all non-flush re-prepared requests be re-inserted into the I/O
+> scheduler.  With this change, I/O schedulers may get the same request
+> inserted again, even several times, without a finish_request invoked
+> on the request before each re-insertion.
+>=20
+> For the I/O scheduler, every such re-prepared request is equivalent
+> to the insertion of a new request. For schedulers like mq-deadline
+> or kyber this fact causes no problems. In contrast, it confuses a =
+stateful
+> scheduler like BFQ, which preserves states for an I/O request until
+> finish_request is invoked on it. In particular, BFQ has no way
+> to know that the above re-insertions concerns the same, already =
+dispatched
+> request. So it may get stuck waiting for the completion of these
+> re-inserted requests forever, thus preventing any other queue of
+> requests to be served.
+>=20
+> We are trying to address this issue by adding the hook requeue_request
+> to bfq interface.
+>=20
+> Unfortunately, with our current implementation of requeue_request in
+> place, bfq eventually gets to an incoherent state.  This is apparently
+> caused by a requeue of an I/O request, immediately followed by a
+> completion of the same request.  This seems rather absurd, and drives
+> bfq crazy.  But this is something for which we don't have definite
+> results yet.
+>=20
+> We're working on it, sorry again for the delay.
+>=20
 
-The result is, if backing device is broken of disconnected, and I/O errors
-reach its error limit, backing device will be disabled and the associated
-bcache device will be removed from system.
+Ok, patch arriving ... Please test it.
 
-Changelog:
-v2: remove "bcache: " prefix in pr_error(), and use correct name string to
-    print out bcache device gendisk name.
-v1: indeed this is new added in v2 patch set.
+Thanks,
+Paolo
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Cc: Michael Lyle <mlyle@lyle.org>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
----
- drivers/md/bcache/bcache.h  |  6 ++++++
- drivers/md/bcache/io.c      | 14 ++++++++++++++
- drivers/md/bcache/request.c | 14 ++++++++++++--
- drivers/md/bcache/super.c   | 23 ++++++++++++++++++++++-
- drivers/md/bcache/sysfs.c   | 15 ++++++++++++++-
- 5 files changed, 68 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 263164490833..c59ce168bd82 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -366,6 +366,7 @@ struct cached_dev {
- 	unsigned		sequential_cutoff;
- 	unsigned		readahead;
- 
-+	unsigned		io_disable:1;
- 	unsigned		verify:1;
- 	unsigned		bypass_torture_test:1;
- 
-@@ -387,6 +388,9 @@ struct cached_dev {
- 	unsigned		writeback_rate_minimum;
- 
- 	enum stop_on_faliure	stop_when_cache_set_failed;
-+#define DEFAULT_CACHED_DEV_ERROR_LIMIT	64
-+	atomic_t		io_errors;
-+	unsigned		error_limit;
- };
- 
- enum alloc_reserve {
-@@ -896,6 +900,7 @@ static inline void closure_bio_submit(struct cache_set *c,
- 
- /* Forward declarations */
- 
-+void bch_count_backing_io_errors(struct cached_dev *dc, struct bio *bio);
- void bch_count_io_errors(struct cache *, blk_status_t, int, const char *);
- void bch_bbio_count_io_errors(struct cache_set *, struct bio *,
- 			      blk_status_t, const char *);
-@@ -923,6 +928,7 @@ int bch_bucket_alloc_set(struct cache_set *, unsigned,
- 			 struct bkey *, int, bool);
- bool bch_alloc_sectors(struct cache_set *, struct bkey *, unsigned,
- 		       unsigned, unsigned, bool);
-+bool bch_cached_dev_error(struct cached_dev *dc);
- 
- __printf(2, 3)
- bool bch_cache_set_error(struct cache_set *, const char *, ...);
-diff --git a/drivers/md/bcache/io.c b/drivers/md/bcache/io.c
-index 8013ecbcdbda..7fac97ae036e 100644
---- a/drivers/md/bcache/io.c
-+++ b/drivers/md/bcache/io.c
-@@ -50,6 +50,20 @@ void bch_submit_bbio(struct bio *bio, struct cache_set *c,
- }
- 
- /* IO errors */
-+void bch_count_backing_io_errors(struct cached_dev *dc, struct bio *bio)
-+{
-+	char buf[BDEVNAME_SIZE];
-+	unsigned errors;
-+
-+	WARN_ONCE(!dc, "NULL pointer of struct cached_dev");
-+
-+	errors = atomic_add_return(1, &dc->io_errors);
-+	if (errors < dc->error_limit)
-+		pr_err("%s: IO error on backing device, unrecoverable",
-+			bio_devname(bio, buf));
-+	else
-+		bch_cached_dev_error(dc);
-+}
- 
- void bch_count_io_errors(struct cache *ca,
- 			 blk_status_t error,
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 9c6dda3b0068..03245e6980a6 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -637,6 +637,8 @@ static void backing_request_endio(struct bio *bio)
- 
- 	if (bio->bi_status) {
- 		struct search *s = container_of(cl, struct search, cl);
-+		struct cached_dev *dc = container_of(s->d,
-+						     struct cached_dev, disk);
- 		/*
- 		 * If a bio has REQ_PREFLUSH for writeback mode, it is
- 		 * speically assembled in cached_dev_write() for a non-zero
-@@ -657,6 +659,7 @@ static void backing_request_endio(struct bio *bio)
- 		}
- 		s->recoverable = false;
- 		/* should count I/O error for backing device here */
-+		bch_count_backing_io_errors(dc, bio);
- 	}
- 
- 	bio_put(bio);
-@@ -1065,8 +1068,14 @@ static void detatched_dev_end_io(struct bio *bio)
- 			    bio_data_dir(bio),
- 			    &ddip->d->disk->part0, ddip->start_time);
- 
--	kfree(ddip);
-+	if (bio->bi_status) {
-+		struct cached_dev *dc = container_of(ddip->d,
-+						     struct cached_dev, disk);
-+		/* should count I/O error for backing device here */
-+		bch_count_backing_io_errors(dc, bio);
-+	}
- 
-+	kfree(ddip);
- 	bio->bi_end_io(bio);
- }
- 
-@@ -1105,7 +1114,8 @@ static blk_qc_t cached_dev_make_request(struct request_queue *q,
- 	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
- 	int rw = bio_data_dir(bio);
- 
--	if (unlikely(d->c && test_bit(CACHE_SET_IO_DISABLE, &d->c->flags))) {
-+	if (unlikely((d->c && test_bit(CACHE_SET_IO_DISABLE, &d->c->flags)) ||
-+		     dc->io_disable)) {
- 		bio->bi_status = BLK_STS_IOERR;
- 		bio_endio(bio);
- 		return BLK_QC_T_NONE;
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 4f1a14b99415..40b07d980a20 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1196,7 +1196,10 @@ static int cached_dev_init(struct cached_dev *dc, unsigned block_size)
- 		max(dc->disk.disk->queue->backing_dev_info->ra_pages,
- 		    q->backing_dev_info->ra_pages);
- 
--	/* default to auto */
-+	atomic_set(&dc->io_errors, 0);
-+	dc->io_disable = false;
-+	dc->error_limit = DEFAULT_CACHED_DEV_ERROR_LIMIT;
-+	/* default to "auto" */
- 	dc->stop_when_cache_set_failed = BCH_CACHED_DEV_STOP_ATUO;
- 
- 	bch_cached_dev_request_init(dc);
-@@ -1350,6 +1353,24 @@ int bch_flash_dev_create(struct cache_set *c, uint64_t size)
- 	return flash_dev_run(c, u);
- }
- 
-+bool bch_cached_dev_error(struct cached_dev *dc)
-+{
-+	char name[BDEVNAME_SIZE];
-+
-+	if (!dc || test_bit(BCACHE_DEV_CLOSING, &dc->disk.flags))
-+		return false;
-+
-+	dc->io_disable = true;
-+	/* make others know io_disable is true earlier */
-+	smp_mb();
-+
-+	pr_err("stop %s: too many IO errors on backing device %s\n",
-+		dc->disk.disk->disk_name, bdevname(dc->bdev, name));
-+
-+	bcache_device_stop(&dc->disk);
-+	return true;
-+}
-+
- /* Cache set */
- 
- __printf(2, 3)
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index 91d859a54575..e88fdcc549cd 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -141,7 +141,9 @@ SHOW(__bch_cached_dev)
- 	var_print(writeback_delay);
- 	var_print(writeback_percent);
- 	sysfs_hprint(writeback_rate,	dc->writeback_rate.rate << 9);
--
-+	sysfs_hprint(io_errors,		atomic_read(&dc->io_errors));
-+	sysfs_printf(io_error_limit,	"%i", dc->error_limit);
-+	sysfs_printf(io_disable,	"%i", dc->io_disable);
- 	var_print(writeback_rate_update_seconds);
- 	var_print(writeback_rate_i_term_inverse);
- 	var_print(writeback_rate_p_term_inverse);
-@@ -232,6 +234,14 @@ STORE(__cached_dev)
- 	d_strtoul(writeback_rate_i_term_inverse);
- 	d_strtoul_nonzero(writeback_rate_p_term_inverse);
- 
-+	sysfs_strtoul_clamp(io_error_limit, dc->error_limit, 0, INT_MAX);
-+
-+	if (attr == &sysfs_io_disable) {
-+		int v = strtoul_or_return(buf);
-+
-+		dc->io_disable = v ? 1 : 0;
-+	}
-+
- 	d_strtoi_h(sequential_cutoff);
- 	d_strtoi_h(readahead);
- 
-@@ -349,6 +359,9 @@ static struct attribute *bch_cached_dev_files[] = {
- 	&sysfs_writeback_rate_i_term_inverse,
- 	&sysfs_writeback_rate_p_term_inverse,
- 	&sysfs_writeback_rate_debug,
-+	&sysfs_errors,
-+	&sysfs_io_error_limit,
-+	&sysfs_io_disable,
- 	&sysfs_dirty_data,
- 	&sysfs_stripe_size,
- 	&sysfs_partial_stripes_expensive,
--- 
-2.16.1
+> Thanks,
+> Paolo
+>=20
+>> --=20
+>> Ming
+>=20
+> --=20
+> You received this message because you are subscribed to the Google =
+Groups "bfq-iosched" group.
+> To unsubscribe from this group and stop receiving emails from it, send =
+an email to bfq-iosched+unsubscribe@googlegroups.com.
+> For more options, visit https://groups.google.com/d/optout.
