@@ -1,34 +1,40 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
-Subject: Re: [PATCH 23/24] ibnbd: a bit of documentation
-To: Roman Penyaev <roman.penyaev@profitbricks.com>,
- Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- "danil.kipnis@profitbricks.com" <danil.kipnis@profitbricks.com>,
- "hch@infradead.org" <hch@infradead.org>,
- "ogerlitz@mellanox.com" <ogerlitz@mellanox.com>,
- "jinpu.wang@profitbricks.com" <jinpu.wang@profitbricks.com>,
- "axboe@kernel.dk" <axboe@kernel.dk>
-References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
- <20180202140904.2017-24-roman.penyaev@profitbricks.com>
- <1517586918.2675.3.camel@wdc.com>
- <CAJrWOzCVu_UNgMxNUuf0m9szYgRP88dGepKLbtMCtZUxOW75Vw@mail.gmail.com>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <ce4ea220-301a-d71b-a17f-2f050c1cdfa0@grimberg.me>
-Date: Mon, 5 Feb 2018 16:16:02 +0200
+Return-Path: <roman.penyaev@profitbricks.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJrWOzCVu_UNgMxNUuf0m9szYgRP88dGepKLbtMCtZUxOW75Vw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1517586918.2675.3.camel@wdc.com>
+References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
+ <20180202140904.2017-24-roman.penyaev@profitbricks.com> <1517586918.2675.3.camel@wdc.com>
+From: Roman Penyaev <roman.penyaev@profitbricks.com>
+Date: Mon, 5 Feb 2018 14:03:35 +0100
+Message-ID: <CAJrWOzCVu_UNgMxNUuf0m9szYgRP88dGepKLbtMCtZUxOW75Vw@mail.gmail.com>
+Subject: Re: [PATCH 23/24] ibnbd: a bit of documentation
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"danil.kipnis@profitbricks.com" <danil.kipnis@profitbricks.com>, "hch@infradead.org" <hch@infradead.org>,
+	"ogerlitz@mellanox.com" <ogerlitz@mellanox.com>,
+	"jinpu.wang@profitbricks.com" <jinpu.wang@profitbricks.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"sagi@grimberg.me" <sagi@grimberg.me>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
+On Fri, Feb 2, 2018 at 4:55 PM, Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
+> On Fri, 2018-02-02 at 15:09 +0100, Roman Pen wrote:
+>> +Entries under /sys/kernel/ibnbd_client/
+>> +=======================================
+>> [ ... ]
+>
+> You will need Greg KH's permission to add new entries directly under /sys/kernel.
+> Since I think that it is unlikely that he will give that permission: have you
+> considered to add the new client entries under /sys/class/block for the client and
+> /sys/kernel/configfs/ibnbd for the target, similar to what the NVMeOF drivers do
+> today?
 
-> /sys/kernel was chosen ages ago and I completely forgot to move it to configfs.
-> IBTRS is not a block device, so for some read-only entries (statistics
-> or states)
-> something else should be probably used, not configfs.  Or it is fine
-> to read state
-> of the connection from configfs?  For me sounds a bit weird.
+/sys/kernel was chosen ages ago and I completely forgot to move it to configfs.
+IBTRS is not a block device, so for some read-only entries (statistics
+or states)
+something else should be probably used, not configfs.  Or it is fine
+to read state
+of the connection from configfs?  For me sounds a bit weird.
 
-Configs go via configfs, states and alike go to sysfs (but you need your
-own class device).
+--
+Roman
