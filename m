@@ -1,44 +1,67 @@
-Return-Path: <prvs=5677c57d0=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "jinpu.wang@profitbricks.com" <jinpu.wang@profitbricks.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"hch@infradead.org" <hch@infradead.org>, "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>, "roman.penyaev@profitbricks.com"
-	<roman.penyaev@profitbricks.com>, "sagi@grimberg.me" <sagi@grimberg.me>,
-	"ogerlitz@mellanox.com" <ogerlitz@mellanox.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "danil.kipnis@profitbricks.com"
-	<danil.kipnis@profitbricks.com>
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
 Subject: Re: [PATCH 00/24] InfiniBand Transport (IBTRS) and Network Block
  Device (IBNBD)
-Date: Mon, 5 Feb 2018 16:16:49 +0000
-Message-ID: <1517847408.3764.5.camel@wdc.com>
+To: Danil Kipnis <danil.kipnis@profitbricks.com>
+Cc: Jinpu Wang <jinpu.wang@profitbricks.com>,
+ Bart Van Assche <Bart.VanAssche@wdc.com>,
+ "roman.penyaev@profitbricks.com" <roman.penyaev@profitbricks.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "hch@infradead.org" <hch@infradead.org>,
+ "ogerlitz@mellanox.com" <ogerlitz@mellanox.com>,
+ "axboe@kernel.dk" <axboe@kernel.dk>
 References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
-	 <1517591106.2675.28.camel@sandisk.com>
-	 <CAMGffEkhqR9Z5bkMfnVn8an2OUM8k+jYoR5EFdtv3k9en1bh=w@mail.gmail.com>
-In-Reply-To: <CAMGffEkhqR9Z5bkMfnVn8an2OUM8k+jYoR5EFdtv3k9en1bh=w@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+ <1517591106.2675.28.camel@sandisk.com>
+ <CAMGffEkhqR9Z5bkMfnVn8an2OUM8k+jYoR5EFdtv3k9en1bh=w@mail.gmail.com>
+ <40a7fc35-f86c-1d9d-f057-e5822708fc32@grimberg.me>
+ <CAHg0HuxawAjCf711gkKKiQbbLskNsvUDhP+m32oiGFsY2BRz5g@mail.gmail.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <41347a8d-8a3b-c35f-801c-b4b21c37f285@grimberg.me>
+Date: Mon, 5 Feb 2018 16:17:58 +0200
 MIME-Version: 1.0
+In-Reply-To: <CAHg0HuxawAjCf711gkKKiQbbLskNsvUDhP+m32oiGFsY2BRz5g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE4LTAyLTA1IGF0IDA5OjU2ICswMTAwLCBKaW5wdSBXYW5nIHdyb3RlOg0KPiBI
-aSBCYXJ0LA0KPiANCj4gTXkgYW5vdGhlciAyIGNlbnRzOikNCj4gT24gRnJpLCBGZWIgMiwgMjAx
-OCBhdCA2OjA1IFBNLCBCYXJ0IFZhbiBBc3NjaGUgPEJhcnQuVmFuQXNzY2hlQHdkYy5jb20+IHdy
-b3RlOg0KPiA+IE9uIEZyaSwgMjAxOC0wMi0wMiBhdCAxNTowOCArMDEwMCwgUm9tYW4gUGVuIHdy
-b3RlOg0KPiA+ID4gbyBTaW1wbGUgY29uZmlndXJhdGlvbiBvZiBJQk5CRDoNCj4gPiA+ICAgIC0g
-U2VydmVyIHNpZGUgaXMgY29tcGxldGVseSBwYXNzaXZlOiB2b2x1bWVzIGRvIG5vdCBuZWVkIHRv
-IGJlDQo+ID4gPiAgICAgIGV4cGxpY2l0bHkgZXhwb3J0ZWQuDQo+ID4gDQo+ID4gVGhhdCBzb3Vu
-ZHMgbGlrZSBhIHNlY3VyaXR5IGhvbGU/IEkgdGhpbmsgdGhlIGFiaWxpdHkgdG8gY29uZmlndXJl
-IHdoZXRoZXIgb3INCj4gPiBub3QgYW4gaW5pdGlhdG9yIGlzIGFsbG93ZWQgdG8gbG9nIGluIGlz
-IGVzc2VudGlhbCBhbmQgYWxzbyB3aGljaCB2b2x1bWVzIGFuDQo+ID4gaW5pdGlhdG9yIGhhcyBh
-Y2Nlc3MgdG8uDQo+IA0KPiBPdXIgZGVzaWduIHRhcmdldCBmb3Igd2VsbCBjb250cm9sbGVkIHBy
-b2R1Y3Rpb24gZW52aXJvbm1lbnQsIHNvIHNlY3VyaXR5IGlzDQo+IGhhbmRsZSBpbiBvdGhlciBs
-YXllci4gT24gc2VydmVyIHNpZGUsIGFkbWluIGNhbiBzZXQgdGhlIGRldl9zZWFyY2hfcGF0aCBp
-bg0KPiBtb2R1bGUgcGFyYW1ldGVyIHRvIHNldCBwYXJlbnQgZGlyZWN0b3J5LCB0aGlzIHdpbGwg
-Y29uY2F0ZW5hdGUgd2l0aCB0aGUgcGF0aA0KPiBjbGllbnQgc2VuZCBpbiBvcGVuIG1lc3NhZ2Ug
-dG8gb3BlbiBhIGJsb2NrIGRldmljZS4NCg0KSGVsbG8gSmFjaywNCg0KVGhhdCBhcHByb2FjaCBt
-YXkgd29yayB3ZWxsIGZvciB5b3VyIGVtcGxveWVyIGJ1dCBzb3JyeSBJIGRvbid0IHRoaW5rIHRo
-aXMgaXMNCnN1ZmZpY2llbnQgZm9yIGFuIHVwc3RyZWFtIGRyaXZlci4gSSB0aGluayB0aGF0IG1v
-c3QgdXNlcnMgd2hvIGNvbmZpZ3VyZSBhDQpuZXR3b3JrIHN0b3JhZ2UgdGFyZ2V0IGV4cGVjdCBm
-dWxsIGNvbnRyb2wgb3ZlciB3aGljaCBzdG9yYWdlIGRldmljZXMgYXJlIGV4cG9ydGVkDQphbmQg
-YWxzbyBvdmVyIHdoaWNoIGNsaWVudHMgZG8gaGF2ZSBhbmQgZG8gbm90IGhhdmUgYWNjZXNzLg0K
-DQpCYXJ0Lg==
+
+>>> Hi Bart,
+>>>
+>>> My another 2 cents:)
+>>> On Fri, Feb 2, 2018 at 6:05 PM, Bart Van Assche <Bart.VanAssche@wdc.com>
+>>> wrote:
+>>>>
+>>>> On Fri, 2018-02-02 at 15:08 +0100, Roman Pen wrote:
+>>>>>
+>>>>> o Simple configuration of IBNBD:
+>>>>>      - Server side is completely passive: volumes do not need to be
+>>>>>        explicitly exported.
+>>>>
+>>>>
+>>>> That sounds like a security hole? I think the ability to configure
+>>>> whether or
+>>>> not an initiator is allowed to log in is essential and also which volumes
+>>>> an
+>>>> initiator has access to.
+>>>
+>>> Our design target for well controlled production environment, so
+>>> security is handle in other layer.
+>>
+>>
+>> What will happen to a new adopter of the code you are contributing?
+> 
+> Hi Sagi, Hi Bart,
+> thanks for your feedback.
+> We considered the "storage cluster" setup, where each ibnbd client has
+> access to each ibnbd server. Each ibnbd server manages devices under
+> his "dev_search_path" and can provide access to them to any ibnbd
+> client in the network.
+
+I don't understand how that helps?
+
+> On top of that Ibnbd server has an additional
+> "artificial" restriction, that a device can be mapped in writable-mode
+> by only one client at once.
+
+I think one would still need the option to disallow readable export as
+well.
