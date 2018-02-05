@@ -1,189 +1,203 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:47608 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752171AbeBHPpZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 8 Feb 2018 10:45:25 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Michael Lyle <mlyle@lyle.org>,
-        Junhui Tang <tang.junhui@zte.com.cn>
-Subject: [PATCH v6 1/9] bcache: fix cached_dev->count usage for bch_cache_set_error()
-Date: Thu,  8 Feb 2018 23:44:55 +0800
-Message-Id: <20180208154503.92463-2-colyli@suse.de>
-In-Reply-To: <20180208154503.92463-1-colyli@suse.de>
-References: <20180208154503.92463-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+Date: Mon, 5 Feb 2018 09:56:03 +0100
+From: Jan Kara <jack@suse.cz>
+To: Eric Biggers <ebiggers3@gmail.com>
+Cc: Jan Kara <jack@suse.cz>, Hou Tao <houtao1@huawei.com>,
+	Foy <long7573@126.com>, Jens Axboe <axboe@kernel.dk>,
+	Dan Carpenter <dan.carpenter@oracle.com>,
+	Paolo Valente <paolo.valente@linaro.org>, security@kernel.org,
+	syzkaller@googlegroups.com, linux-block@vger.kernel.org
+Subject: Re: blkdev loop UAF
+Message-ID: <20180205085603.24l7c3xvryxkul7l@quack2.suse.cz>
+References: <654967ea.6cce.160e43379f6.Coremail.long7573@126.com>
+ <20180111082441.myaxc2upbjhcucqh@mwanda>
+ <69a2465f-dd67-6962-4f15-57fa9cbafe4d@huawei.com>
+ <20180111170008.24crzej4utoh5s3p@quack2.suse.cz>
+ <20180202035845.GA949@zzz.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180202035845.GA949@zzz.localdomain>
+List-ID: <linux-block@vger.kernel.org>
 
-When bcache metadata I/O fails, bcache will call bch_cache_set_error()
-to retire the whole cache set. The expected behavior to retire a cache
-set is to unregister the cache set, and unregister all backing device
-attached to this cache set, then remove sysfs entries of the cache set
-and all attached backing devices, finally release memory of structs
-cache_set, cache, cached_dev and bcache_device.
+On Thu 01-02-18 19:58:45, Eric Biggers wrote:
+> On Thu, Jan 11, 2018 at 06:00:08PM +0100, Jan Kara wrote:
+> > On Thu 11-01-18 19:22:39, Hou Tao wrote:
+> > > Hi,
+> > > 
+> > > On 2018/1/11 16:24, Dan Carpenter wrote:
+> > > > Thanks for your report and the patch.  I am sending it to the
+> > > > linux-block devs since it's already public.
+> > > > 
+> > > > regards,
+> > > > dan carpenter
+> > > 
+> > > The User-after-free problem is not specific for loop device, it can also
+> > > be reproduced on scsi device, and there are more race problems caused by
+> > > the race between bdev open and gendisk shutdown [1].
+> > > 
+> > > The cause of the UAF problem is that there are two instances of gendisk which share
+> > > the same bdev. After the process owning the new gendisk increases bdev->bd_openers,
+> > > the other process which owns the older gendisk will find bdev->bd_openers is not zero
+> > > and will put the last reference of the older gendisk and cause User-after-free.
+> > > 
+> > > I had proposed a patch for the problem, but it's still an incomplete fix for the race
+> > > between gendisk shutdown and bdev opening.
+> > > 
+> > > diff --git a/fs/block_dev.c b/fs/block_dev.c
+> > > index 4a181fc..5ecdb9f 100644
+> > > --- a/fs/block_dev.c
+> > > +++ b/fs/block_dev.c
+> > > @@ -1510,6 +1510,11 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+> > >                 if (bdev->bd_bdi == &noop_backing_dev_info)
+> > >                         bdev->bd_bdi = bdi_get(disk->queue->backing_dev_info);
+> > >         } else {
+> > > +               if (bdev->bd_disk != disk) {
+> > > +                       ret = -ENXIO;
+> > > +                       goto out_unlock_bdev;
+> > > +               }
+> > > +
+> > >                 if (bdev->bd_contains == bdev) {
+> > >                         ret = 0;
+> > >                         if (bdev->bd_disk->fops->open)
+> > > 
+> > > 
+> > > As far as I know, Jan Kara is working on these problems. So, Jan, any suggestions ?
+> > 
+> > Yeah, thanks for the ping. I was working today to get this fixed. I have
+> > about 6 patches (attached) which should fix all the outstanding issues I'm
+> > aware of.  So far they are only boot tested. I will give them more
+> > stress-testing next week and then post them officially but if you have time,
+> > feel free to try them out as well. Thanks!
+> > 
+> 
+> Jan, are you still planning to fix this?  This was also reported by syzbot here:
+> https://groups.google.com/d/msg/syzkaller-bugs/9wXx4YULITQ/0SK8vqxhAgAJ.  Note
+> that the C reproducer attached to that report doesn't work for me anymore
+> following ae6650163c6 ("loop: fix concurrent lo_open/lo_release").  However,
+> syzbot has still hit this on more recent kernels.  Here's a C reproducer that
+> still works for me on Linus' tree as of today, though it can take 5-10 seconds:
 
-In my testing when journal I/O failure triggered by disconnected cache
-device, sometimes the cache set cannot be retired, and its sysfs
-entry /sys/fs/bcache/<uuid> still exits and the backing device also
-references it. This is not expected behavior.
+Yes, I do plan to post the patches. I was just struggling with getting the
+original failure reproduced (plus I had quite some other work, vacation) so
+I couldn't really test whether my patches fix the reported problem. So
+thanks for your reproducer, I'll try it out and see whether my patches fix
+the problem.
 
-When metadata I/O failes, the call senquence to retire whole cache set is,
-        bch_cache_set_error()
-        bch_cache_set_unregister()
-        bch_cache_set_stop()
-        __cache_set_unregister()     <- called as callback by calling
-                                        clousre_queue(&c->caching)
-        cache_set_flush()            <- called as a callback when refcount
-                                        of cache_set->caching is 0
-        cache_set_free()             <- called as a callback when refcount
-                                        of catch_set->cl is 0
-        bch_cache_set_release()      <- called as a callback when refcount
-                                        of catch_set->kobj is 0
+								Honza
 
-I find if kernel thread bch_writeback_thread() quits while-loop when
-kthread_should_stop() is true and searched_full_index is false, clousre
-callback cache_set_flush() set by continue_at() will never be called. The
-result is, bcache fails to retire whole cache set.
-
-cache_set_flush() will be called when refcount of closure c->caching is 0,
-and in function bcache_device_detach() refcount of closure c->caching is
-released to 0 by clousre_put(). In metadata error code path, function
-bcache_device_detach() is called by cached_dev_detach_finish(). This is a
-callback routine being called when cached_dev->count is 0. This refcount
-is decreased by cached_dev_put().
-
-The above dependence indicates, cache_set_flush() will be called when
-refcount of cache_set->cl is 0, and refcount of cache_set->cl to be 0
-when refcount of cache_dev->count is 0.
-
-The reason why sometimes cache_dev->count is not 0 (when metadata I/O fails
-and bch_cache_set_error() called) is, in bch_writeback_thread(), refcount
-of cache_dev is not decreased properly.
-
-In bch_writeback_thread(), cached_dev_put() is called only when
-searched_full_index is true and cached_dev->writeback_keys is empty, a.k.a
-there is no dirty data on cache. In most of run time it is correct, but
-when bch_writeback_thread() quits the while-loop while cache is still
-dirty, current code forget to call cached_dev_put() before this kernel
-thread exits. This is why sometimes cache_set_flush() is not executed and
-cache set fails to be retired.
-
-The reason to call cached_dev_put() in bch_writeback_rate() is, when the
-cache device changes from clean to dirty, cached_dev_get() is called, to
-make sure during writeback operatiions both backing and cache devices
-won't be released.
-
-Adding following code in bch_writeback_thread() does not work,
-   static int bch_writeback_thread(void *arg)
-        }
-
-+       if (atomic_read(&dc->has_dirty))
-+               cached_dev_put()
-+
-        return 0;
- }
-because writeback kernel thread can be waken up and start via sysfs entry:
-        echo 1 > /sys/block/bcache<N>/bcache/writeback_running
-It is difficult to check whether backing device is dirty without race and
-extra lock. So the above modification will introduce potential refcount
-underflow in some conditions.
-
-The correct fix is, to take cached dev refcount when creating the kernel
-thread, and put it before the kernel thread exits. Then bcache does not
-need to take a cached dev refcount when cache turns from clean to dirty,
-or to put a cached dev refcount when cache turns from ditry to clean. The
-writeback kernel thread is alwasy safe to reference data structure from
-cache set, cache and cached device (because a refcount of cache device is
-taken for it already), and no matter the kernel thread is stopped by I/O
-errors or system reboot, cached_dev->count can always be used correctly.
-
-The patch is simple, but understanding how it works is quite complicated.
-
-Changelog:
-v2: set dc->writeback_thread to NULL in this patch, as suggested by Hannes.
-v1: initial version for review.
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Cc: Michael Lyle <mlyle@lyle.org>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
----
- drivers/md/bcache/super.c     |  1 -
- drivers/md/bcache/writeback.c | 11 ++++++++---
- drivers/md/bcache/writeback.h |  2 --
- 3 files changed, 8 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 312895788036..9b745c5c1980 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1054,7 +1054,6 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
- 	if (BDEV_STATE(&dc->sb) == BDEV_STATE_DIRTY) {
- 		bch_sectors_dirty_init(&dc->disk);
- 		atomic_set(&dc->has_dirty, 1);
--		refcount_inc(&dc->count);
- 		bch_writeback_queue(dc);
- 	}
- 
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index f1d2fc15abcc..b280c134dd4d 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -572,7 +572,7 @@ static int bch_writeback_thread(void *arg)
- 
- 			if (kthread_should_stop()) {
- 				set_current_state(TASK_RUNNING);
--				return 0;
-+				break;
- 			}
- 
- 			schedule();
-@@ -585,7 +585,6 @@ static int bch_writeback_thread(void *arg)
- 		if (searched_full_index &&
- 		    RB_EMPTY_ROOT(&dc->writeback_keys.keys)) {
- 			atomic_set(&dc->has_dirty, 0);
--			cached_dev_put(dc);
- 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_CLEAN);
- 			bch_write_bdev_super(dc, NULL);
- 		}
-@@ -606,6 +605,9 @@ static int bch_writeback_thread(void *arg)
- 		}
- 	}
- 
-+	dc->writeback_thread = NULL;
-+	cached_dev_put(dc);
-+
- 	return 0;
- }
- 
-@@ -669,10 +671,13 @@ int bch_cached_dev_writeback_start(struct cached_dev *dc)
- 	if (!dc->writeback_write_wq)
- 		return -ENOMEM;
- 
-+	cached_dev_get(dc);
- 	dc->writeback_thread = kthread_create(bch_writeback_thread, dc,
- 					      "bcache_writeback");
--	if (IS_ERR(dc->writeback_thread))
-+	if (IS_ERR(dc->writeback_thread)) {
-+		cached_dev_put(dc);
- 		return PTR_ERR(dc->writeback_thread);
-+	}
- 
- 	schedule_delayed_work(&dc->writeback_rate_update,
- 			      dc->writeback_rate_update_seconds * HZ);
-diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
-index 587b25599856..0bba8f1c6cdf 100644
---- a/drivers/md/bcache/writeback.h
-+++ b/drivers/md/bcache/writeback.h
-@@ -105,8 +105,6 @@ static inline void bch_writeback_add(struct cached_dev *dc)
- {
- 	if (!atomic_read(&dc->has_dirty) &&
- 	    !atomic_xchg(&dc->has_dirty, 1)) {
--		refcount_inc(&dc->count);
--
- 		if (BDEV_STATE(&dc->sb) != BDEV_STATE_DIRTY) {
- 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_DIRTY);
- 			/* XXX: should do this synchronously */
+> #include <fcntl.h>
+> #include <linux/loop.h>
+> #include <sys/ioctl.h>
+> #include <unistd.h>
+> 
+> int main()
+> {
+> 	int fd = open("/dev/loop-control", 0);
+> 
+> 	if (!fork()) {
+> 		for (;;)
+> 			ioctl(fd, LOOP_CTL_ADD, 0);
+> 	}
+> 
+> 	if (!fork()) {
+> 		for (;;)
+> 			ioctl(fd, LOOP_CTL_REMOVE, 0);
+> 	}
+> 
+> 	fork();
+> 	for (;;) {
+> 		fd = open("/dev/loop0", O_EXCL);
+> 		close(fd);
+> 	}
+> }
+> 
+> This is the KASAN splat I get from the above:
+> 
+> BUG: KASAN: use-after-free in disk_unblock_events+0x3e/0x40 block/genhd.c:1672
+> Read of size 8 at addr ffff880030743670 by task systemd-udevd/165
+> 
+> CPU: 1 PID: 165 Comm: systemd-udevd Not tainted 4.15.0-08279-gfe53d1443a146 #38
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.11.0-20171110_100015-anatol 04/01/2014
+> Call Trace:
+>  __dump_stack lib/dump_stack.c:17 [inline]
+>  dump_stack+0xb3/0x145 lib/dump_stack.c:53
+> perf: interrupt took too long (7334 > 4816), lowering kernel.perf_event_max_sample_rate to 27000
+>  print_address_description+0x73/0x290 mm/kasan/report.c:252
+>  kasan_report_error mm/kasan/report.c:351 [inline]
+>  kasan_report+0x235/0x350 mm/kasan/report.c:409
+>  disk_unblock_events+0x3e/0x40 block/genhd.c:1672
+>  __blkdev_get+0x41b/0xd30 fs/block_dev.c:1535
+>  blkdev_get+0x283/0x980 fs/block_dev.c:1591
+>  do_dentry_open.isra.1+0x6c0/0xaf0 fs/open.c:752
+>  do_last fs/namei.c:3378 [inline]
+>  path_openat+0x587/0x28b0 fs/namei.c:3518
+>  do_filp_open+0x231/0x3a0 fs/namei.c:3553
+>  do_sys_open+0x399/0x610 fs/open.c:1059
+>  do_syscall_64+0x213/0x740 arch/x86/entry/common.c:285
+>  entry_SYSCALL64_slow_path+0x25/0x25
+> RIP: 0033:0x7f51d23262ce
+> RSP: 002b:00007ffdf1844310 EFLAGS: 00000246 ORIG_RAX: 0000000000000101
+> RAX: ffffffffffffffda RBX: 0000562878961d30 RCX: 00007f51d23262ce
+> RDX: 00000000000a0800 RSI: 0000562878974860 RDI: ffffffffffffff9c
+> RBP: 0000562878965150 R08: 00007f51d1c9d914 R09: ffffffffffffffb0
+> R10: 0000000000000000 R11: 0000000000000246 R12: 000000000000000e
+> R13: 0000562878965150 R14: 0000000000000004 R15: 0000000000000003
+> 
+> Allocated by task 160:
+>  kmem_cache_alloc_node_trace include/linux/slab.h:413 [inline]
+>  kmalloc_node include/linux/slab.h:537 [inline]
+>  kzalloc_node include/linux/slab.h:699 [inline]
+>  __alloc_disk_node+0xb6/0x450 block/genhd.c:1415
+>  loop_add+0x3fd/0x9e0 drivers/block/loop.c:1814
+>  loop_probe+0x152/0x180 drivers/block/loop.c:1921
+>  kobj_lookup+0x176/0x310 drivers/base/map.c:124
+>  get_gendisk+0x28/0x290 block/genhd.c:804
+>  __blkdev_get+0x2ec/0xd30 fs/block_dev.c:1433
+>  blkdev_get+0x485/0x980 fs/block_dev.c:1591
+>  do_dentry_open.isra.1+0x6c0/0xaf0 fs/open.c:752
+>  do_last fs/namei.c:3378 [inline]
+>  path_openat+0x587/0x28b0 fs/namei.c:3518
+>  do_filp_open+0x231/0x3a0 fs/namei.c:3553
+>  do_sys_open+0x399/0x610 fs/open.c:1059
+>  entry_SYSCALL_64_fastpath+0x1e/0x8b
+> 
+> Freed by task 165:
+>  __cache_free mm/slab.c:3484 [inline]
+>  kfree+0x8a/0xd0 mm/slab.c:3799
+>  disk_release+0x2c3/0x380 block/genhd.c:1264
+>  device_release+0x6e/0x1d0 drivers/base/core.c:811
+>  kobject_cleanup lib/kobject.c:646 [inline]
+>  kobject_release lib/kobject.c:675 [inline]
+>  kref_put include/linux/kref.h:70 [inline]
+>  kobject_put+0x14c/0x400 lib/kobject.c:692
+>  __blkdev_get+0x39f/0xd30 fs/block_dev.c:1528
+>  blkdev_get+0x283/0x980 fs/block_dev.c:1591
+>  do_dentry_open.isra.1+0x6c0/0xaf0 fs/open.c:752
+>  do_last fs/namei.c:3378 [inline]
+>  path_openat+0x587/0x28b0 fs/namei.c:3518
+>  do_filp_open+0x231/0x3a0 fs/namei.c:3553
+>  do_sys_open+0x399/0x610 fs/open.c:1059
+>  do_syscall_64+0x213/0x740 arch/x86/entry/common.c:285
+>  return_from_SYSCALL_64+0x0/0x75
+> 
+> The buggy address belongs to the object at ffff880030743280
+>  which belongs to the cache kmalloc-2048 of size 2048
+> The buggy address is located 1008 bytes inside of
+>  2048-byte region [ffff880030743280, ffff880030743a80)
+> The buggy address belongs to the page:
+> page:ffffea0000a99670 count:1 mapcount:0 mapping:ffff880030742180 index:0x0 compound_mapcount: 0
+> flags: 0x100000000008100(slab|head)
+> raw: 0100000000008100 ffff880030742180 0000000000000000 0000000100000003
+> raw: ffffea0000b895a0 ffffea0000b91720 ffff880036000800
+> page dumped because: kasan: bad access detected
+> 
+> Memory state around the buggy address:
+>  ffff880030743500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>  ffff880030743580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> >ffff880030743600: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>                                                              ^
+>  ffff880030743680: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>  ffff880030743700: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
 -- 
-2.16.1
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
