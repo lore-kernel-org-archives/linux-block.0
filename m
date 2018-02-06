@@ -1,51 +1,37 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:35998 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752477AbeBFQFm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 6 Feb 2018 11:05:42 -0500
-From: Jan Kara <jack@suse.cz>
-To: <linux-block@vger.kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Hou Tao <houtao1@huawei.com>,
-        Eric Biggers <ebiggers3@gmail.com>, Jan Kara <jack@suse.cz>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 1/6] genhd: Fix leaked module reference for NVME devices
-Date: Tue,  6 Feb 2018 17:05:24 +0100
-Message-Id: <20180206160529.20713-2-jack@suse.cz>
-In-Reply-To: <20180206160529.20713-1-jack@suse.cz>
-References: <20180206160529.20713-1-jack@suse.cz>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: Add should_fail_bio() for bpf error injection
+To: Omar Sandoval <osandov@osandov.com>,
+ Howard McLauchlan <hmclauchlan@fb.com>
+Cc: linux-block@vger.kernel.org, Josef Bacik <jbacik@fb.com>
+References: <20180124232258.17164-1-hmclauchlan@fb.com>
+ <20180206192732.GA16027@vader.DHCP.thefacebook.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <6cb9b347-66b5-e688-97c1-9fb039da7423@kernel.dk>
+Date: Tue, 6 Feb 2018 12:50:08 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180206192732.GA16027@vader.DHCP.thefacebook.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Commit 8ddcd653257c "block: introduce GENHD_FL_HIDDEN" added handling of
-hidden devices to get_gendisk() but forgot to drop module reference
-which is also acquired by get_disk(). Drop the reference as necessary.
+On 2/6/18 12:27 PM, Omar Sandoval wrote:
+> On Wed, Jan 24, 2018 at 03:22:58PM -0800, Howard McLauchlan wrote:
+>> The classic error injection mechanism, should_fail_request() does not
+>> support use cases where more information is required (from the entire
+>> struct bio, for example).
+>>
+>> To that end, this patch introduces should_fail_bio(), which calls
+>> should_fail_request() under the hood but provides a convenient
+>> place for kprobes to hook into if they require the entire struct bio.
+>> This patch also replaces some existing calls to should_fail_request()
+>> with should_fail_bio() with no degradation in performance.
+> 
+> Reviewed-by: Omar Sandoval <osandov@fb.com>
+> 
+> Jens, can we pick this up for 4.16? The necessary BPF support has been
+> merged into Linus' tree.
 
-Arguably the function naming here is misleading as put_disk() is *not*
-the counterpart of get_disk() but let's fix that in the follow up
-commit since that will be more intrusive.
+I don't see why not - but the patch no longer applies. Howard, can you
+respin it?
 
-Fixes: 8ddcd653257c18a669fcb75ee42c37054908e0d6
-CC: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/genhd.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/block/genhd.c b/block/genhd.c
-index 96a66f671720..22f4fc340a3a 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -802,7 +802,10 @@ struct gendisk *get_gendisk(dev_t devt, int *partno)
- 	}
- 
- 	if (disk && unlikely(disk->flags & GENHD_FL_HIDDEN)) {
-+		struct module *owner = disk->fops->owner;
-+
- 		put_disk(disk);
-+		module_put(owner);
- 		disk = NULL;
- 	}
- 	return disk;
 -- 
-2.13.6
+Jens Axboe
