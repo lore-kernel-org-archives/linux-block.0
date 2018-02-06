@@ -1,105 +1,269 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out1.zte.com.cn ([202.103.147.172]:54744 "EHLO mxct.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751448AbeB0Bnq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Feb 2018 20:43:46 -0500
-From: tang.junhui@zte.com.cn
-To: colyli@suse.de, mlyle@lyle.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        tang.junhui@zte.com.cn
-Subject: [PATCH] bcache: fix kernel crashes when run fio in a RAID backend bcache device
-Date: Tue, 27 Feb 2018 09:46:11 +0800
-Message-Id: <1519695971-27674-1-git-send-email-tang.junhui@zte.com.cn>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <joseph.qi@linux.alibaba.com>
+From: Joseph Qi <joseph.qi@linux.alibaba.com>
+Subject: [PATCH] blk-throttle: fix race between blkcg_bio_issue_check and
+ cgroup_rmdir
+To: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>
+Cc: linux-block <linux-block@vger.kernel.org>, cgroups@vger.kernel.org,
+ xuejiufei <jiufei.xue@linux.alibaba.com>,
+ Caspar Zhang <caspar@linux.alibaba.com>
+Message-ID: <78df88f6-eef5-2e7b-65ab-3b6abb84262a@linux.alibaba.com>
+Date: Tue, 6 Feb 2018 15:36:16 +0800
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+We've triggered a WARNING in blk_throtl_bio when throttling writeback
+io, which complains blkg->refcnt is already 0 when calling blkg_get, and
+then kernel crashes with invalid page request.
+After investigating this issue, we've found there is a race between
+blkcg_bio_issue_check and cgroup_rmdir. The race is described below.
 
-Kernel crashed when run fio in a RAID5 backend bcache device, the call 
-trace is bellow:
-[  440.012034] kernel BUG at block/blk-ioc.c:146!
-[  440.012696] invalid opcode: 0000 [#1] SMP NOPTI
-[  440.026537] CPU: 2 PID: 2205 Comm: md127_raid5 Not tainted 4.15.0 #8
-[  440.027441] Hardware name: HP ProLiant MicroServer Gen8, BIOS J06 07/16
-/2015
-[  440.028615] RIP: 0010:put_io_context+0x8b/0x90
-[  440.029246] RSP: 0018:ffffa8c882b43af8 EFLAGS: 00010246
-[  440.029990] RAX: 0000000000000000 RBX: ffffa8c88294fca0 RCX: 0000000000
-0f4240
-[  440.031006] RDX: 0000000000000004 RSI: 0000000000000286 RDI: ffffa8c882
-94fca0
-[  440.032030] RBP: ffffa8c882b43b10 R08: 0000000000000003 R09: ffff949cb8
-0c1700
-[  440.033206] R10: 0000000000000104 R11: 000000000000b71c R12: 00000000000
-01000
-[  440.034222] R13: 0000000000000000 R14: ffff949cad84db70 R15: ffff949cb11
-bd1e0
-[  440.035239] FS:  0000000000000000(0000) GS:ffff949cba280000(0000) knlGS:
-0000000000000000
-[  440.060190] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  440.084967] CR2: 00007ff0493ef000 CR3: 00000002f1e0a002 CR4: 00000000001
-606e0
-[  440.110498] Call Trace:
-[  440.135443]  bio_disassociate_task+0x1b/0x60
-[  440.160355]  bio_free+0x1b/0x60
-[  440.184666]  bio_put+0x23/0x30
-[  440.208272]  search_free+0x23/0x40 [bcache]
-[  440.231448]  cached_dev_write_complete+0x31/0x70 [bcache]
-[  440.254468]  closure_put+0xb6/0xd0 [bcache]
-[  440.277087]  request_endio+0x30/0x40 [bcache]
-[  440.298703]  bio_endio+0xa1/0x120
-[  440.319644]  handle_stripe+0x418/0x2270 [raid456]
-[  440.340614]  ? load_balance+0x17b/0x9c0
-[  440.360506]  handle_active_stripes.isra.58+0x387/0x5a0 [raid456]
-[  440.380675]  ? __release_stripe+0x15/0x20 [raid456]
-[  440.400132]  raid5d+0x3ed/0x5d0 [raid456]
-[  440.419193]  ? schedule+0x36/0x80
-[  440.437932]  ? schedule_timeout+0x1d2/0x2f0
-[  440.456136]  md_thread+0x122/0x150
-[  440.473687]  ? wait_woken+0x80/0x80
-[  440.491411]  kthread+0x102/0x140
-[  440.508636]  ? find_pers+0x70/0x70
-[  440.524927]  ? kthread_associate_blkcg+0xa0/0xa0
-[  440.541791]  ret_from_fork+0x35/0x40
-[  440.558020] Code: c2 48 00 5b 41 5c 41 5d 5d c3 48 89 c6 4c 89 e7 e8 bb c2 
-48 00 48 8b 3d bc 36 4b 01 48 89 de e8 7c f7 e0 ff 5b 41 5c 41 5d 5d c3 <0f> 0b
-0f 1f 00 0f 1f 44 00 00 55 48 8d 47 b8 48 89 e5 41 57 41 
-[  440.610020] RIP: put_io_context+0x8b/0x90 RSP: ffffa8c882b43af8
-[  440.628575] ---[ end trace a1fd79d85643a73e ]--
+writeback kworker
+  blkcg_bio_issue_check
+    rcu_read_lock
+    blkg_lookup
+    <<< *race window*
+    blk_throtl_bio
+      spin_lock_irq(q->queue_lock)
+      spin_unlock_irq(q->queue_lock)
+    rcu_read_unlock
 
-All the crash issue happened when a bypass IO coming, in such scenario
-s->iop.bio is pointed to the s->orig_bio. In search_free(), it finishes the
-s->orig_bio by calling bio_complete(), and after that, s->iop.bio became
-invalid, then kernel would crash when calling bio_put(). Maybe its upper
-layer's faulty, since bio should not be freed before we calling bio_put(),
-but we'd better calling bio_put() first before calling bio_complete() to
-notify upper layer ending this bio.
+cgroup_rmdir
+  cgroup_destroy_locked
+    kill_css
+      css_killed_ref_fn
+        css_killed_work_fn
+          offline_css
+            blkcg_css_offline
+              spin_trylock(q->queue_lock)
+              blkg_destroy
+              spin_unlock(q->queue_lock)
 
-This patch moves bio_complete() under bio_put() to avoid kernel crash.
+Since rcu can only prevent blkg from releasing when it is being used,
+the blkg->refcnt can be decreased to 0 during blkg_destroy and schedule
+blkg release.
+Then trying to blkg_get in blk_throtl_bio will complains the WARNING.
+And then the corresponding blkg_put will schedule blkg release again,
+which result in double free.
+This race is introduced by commit ae1188963611 ("blkcg: consolidate blkg
+creation in blkcg_bio_issue_check()"). Before this commit, it will lookup
+first and then try to lookup/create again with queue_lock. So revive
+this logic to fix the race.
 
-Reported-by: Matthias Ferdinand <bcache@mfedv.net>
-Tested-by: Matthias Ferdinand <bcache@mfedv.net>
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+Fixes: ae1188963611 ("blkcg: consolidate blkg creation in blkcg_bio_issue_check()")
+Reported-by: Jiufei Xue <jiufei.xue@linux.alibaba.com>
+Signed-off-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+CC: stable@vger.kernel.org
 ---
- drivers/md/bcache/request.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-cgroup.c         |  2 +-
+ block/blk-throttle.c       | 29 +++++++++++++++++++++++++----
+ block/cfq-iosched.c        | 33 +++++++++++++++++++++++----------
+ include/linux/blk-cgroup.h | 27 +++++----------------------
+ 4 files changed, 54 insertions(+), 37 deletions(-)
 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 643c3021..eb4e305 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -637,11 +637,11 @@ static void do_bio_hook(struct search *s, struct bio *orig_bio)
- static void search_free(struct closure *cl)
- {
- 	struct search *s = container_of(cl, struct search, cl);
--	bio_complete(s);
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 4117524..b1d22e5 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -162,7 +162,6 @@ struct blkcg_gq *blkg_lookup_slowpath(struct blkcg *blkcg,
  
- 	if (s->iop.bio)
- 		bio_put(s->iop.bio);
- 
-+	bio_complete(s);
- 	closure_debug_destroy(cl);
- 	mempool_free(s, s->d->c->search);
+ 	return NULL;
  }
+-EXPORT_SYMBOL_GPL(blkg_lookup_slowpath);
+ 
+ /*
+  * If @new_blkg is %NULL, this function tries to allocate a new one as
+@@ -306,6 +305,7 @@ struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
+ 			return blkg;
+ 	}
+ }
++EXPORT_SYMBOL_GPL(blkg_lookup_create);
+ 
+ static void blkg_destroy(struct blkcg_gq *blkg)
+ {
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index c5a1316..ec830be 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -2143,26 +2143,41 @@ static void blk_throtl_assoc_bio(struct throtl_grp *tg, struct bio *bio)
+ #endif
+ }
+ 
+-bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
++bool blk_throtl_bio(struct request_queue *q, struct blkcg *blkcg,
+ 		    struct bio *bio)
+ {
++	struct throtl_data *td = q->td;
+ 	struct throtl_qnode *qn = NULL;
+-	struct throtl_grp *tg = blkg_to_tg(blkg ?: q->root_blkg);
++	struct throtl_grp *tg;
++	struct blkcg_gq *blkg;
+ 	struct throtl_service_queue *sq;
+ 	bool rw = bio_data_dir(bio);
+ 	bool throttled = false;
+-	struct throtl_data *td = tg->td;
+ 
+ 	WARN_ON_ONCE(!rcu_read_lock_held());
+ 
++	/*
++	 * If a group has no rules, just update the dispatch stats in lockless
++	 * manner and return.
++	 */
++	blkg = blkg_lookup(blkcg, q);
++	tg = blkg_to_tg(blkg);
++	if (tg && !tg->has_rules[rw])
++		goto out;
++
+ 	/* see throtl_charge_bio() */
+-	if (bio_flagged(bio, BIO_THROTTLED) || !tg->has_rules[rw])
++	if (bio_flagged(bio, BIO_THROTTLED))
+ 		goto out;
+ 
+ 	spin_lock_irq(q->queue_lock);
+ 
+ 	throtl_update_latency_buckets(td);
+ 
++	blkg = blkg_lookup_create(blkcg, q);
++	if (IS_ERR(blkg))
++		blkg = q->root_blkg;
++	tg = blkg_to_tg(blkg);
++
+ 	if (unlikely(blk_queue_bypass(q)))
+ 		goto out_unlock;
+ 
+@@ -2253,6 +2268,12 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
+ 	if (throttled || !td->track_bio_latency)
+ 		bio->bi_issue_stat.stat |= SKIP_LATENCY;
+ #endif
++	if (!throttled) {
++		blkg_rwstat_add(&blkg->stat_bytes, bio->bi_opf,
++				bio->bi_iter.bi_size);
++		blkg_rwstat_add(&blkg->stat_ios, bio->bi_opf, 1);
++	}
++
+ 	return throttled;
+ }
+ 
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index 9f342ef..60f53b5 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -1674,15 +1674,28 @@ static void cfq_pd_reset_stats(struct blkg_policy_data *pd)
+ 	cfqg_stats_reset(&cfqg->stats);
+ }
+ 
+-static struct cfq_group *cfq_lookup_cfqg(struct cfq_data *cfqd,
+-					 struct blkcg *blkcg)
++/*
++ * Search for the cfq group current task belongs to. request_queue lock must
++ * be held.
++ */
++static struct cfq_group *cfq_lookup_create_cfqg(struct cfq_data *cfqd,
++						struct blkcg *blkcg)
+ {
+-	struct blkcg_gq *blkg;
++	struct request_queue *q = cfqd->queue;
++	struct cfq_group *cfqg = NULL;
+ 
+-	blkg = blkg_lookup(blkcg, cfqd->queue);
+-	if (likely(blkg))
+-		return blkg_to_cfqg(blkg);
+-	return NULL;
++	/* avoid lookup for the common case where there's no blkcg */
++	if (blkcg == &blkcg_root) {
++		cfqg = cfqd->root_group;
++	} else {
++		struct blkcg_gq *blkg;
++
++		blkg = blkg_lookup_create(blkcg, q);
++		if (!IS_ERR(blkg))
++			cfqg = blkg_to_cfqg(blkg);
++	}
++
++	return cfqg;
+ }
+ 
+ static void cfq_link_cfqq_cfqg(struct cfq_queue *cfqq, struct cfq_group *cfqg)
+@@ -2178,8 +2191,8 @@ static ssize_t cfq_set_weight_on_dfl(struct kernfs_open_file *of,
+ };
+ 
+ #else /* GROUP_IOSCHED */
+-static struct cfq_group *cfq_lookup_cfqg(struct cfq_data *cfqd,
+-					 struct blkcg *blkcg)
++static struct cfq_group *cfq_lookup_create_cfqg(struct cfq_data *cfqd,
++						struct blkcg *blkcg)
+ {
+ 	return cfqd->root_group;
+ }
+@@ -3814,7 +3827,7 @@ static inline void check_blkcg_changed(struct cfq_io_cq *cic, struct bio *bio)
+ 	struct cfq_group *cfqg;
+ 
+ 	rcu_read_lock();
+-	cfqg = cfq_lookup_cfqg(cfqd, bio_blkcg(bio));
++	cfqg = cfq_lookup_create_cfqg(cfqd, bio_blkcg(bio));
+ 	if (!cfqg) {
+ 		cfqq = &cfqd->oom_cfqq;
+ 		goto out;
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index 69bea82..e667841 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -428,8 +428,8 @@ static inline struct request_list *blk_get_rl(struct request_queue *q,
+ 	 * or if either the blkcg or queue is going away.  Fall back to
+ 	 * root_rl in such cases.
+ 	 */
+-	blkg = blkg_lookup(blkcg, q);
+-	if (unlikely(!blkg))
++	blkg = blkg_lookup_create(blkcg, q);
++	if (unlikely(IS_ERR(blkg)))
+ 		goto root_rl;
+ 
+ 	blkg_get(blkg);
+@@ -672,10 +672,10 @@ static inline void blkg_rwstat_add_aux(struct blkg_rwstat *to,
+ }
+ 
+ #ifdef CONFIG_BLK_DEV_THROTTLING
+-extern bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
++extern bool blk_throtl_bio(struct request_queue *q, struct blkcg *blkcg,
+ 			   struct bio *bio);
+ #else
+-static inline bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
++static inline bool blk_throtl_bio(struct request_queue *q, struct blkcg *blkcg,
+ 				  struct bio *bio) { return false; }
+ #endif
+ 
+@@ -683,7 +683,6 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
+ 					 struct bio *bio)
+ {
+ 	struct blkcg *blkcg;
+-	struct blkcg_gq *blkg;
+ 	bool throtl = false;
+ 
+ 	rcu_read_lock();
+@@ -692,23 +691,7 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
+ 	/* associate blkcg if bio hasn't attached one */
+ 	bio_associate_blkcg(bio, &blkcg->css);
+ 
+-	blkg = blkg_lookup(blkcg, q);
+-	if (unlikely(!blkg)) {
+-		spin_lock_irq(q->queue_lock);
+-		blkg = blkg_lookup_create(blkcg, q);
+-		if (IS_ERR(blkg))
+-			blkg = NULL;
+-		spin_unlock_irq(q->queue_lock);
+-	}
+-
+-	throtl = blk_throtl_bio(q, blkg, bio);
+-
+-	if (!throtl) {
+-		blkg = blkg ?: q->root_blkg;
+-		blkg_rwstat_add(&blkg->stat_bytes, bio->bi_opf,
+-				bio->bi_iter.bi_size);
+-		blkg_rwstat_add(&blkg->stat_ios, bio->bi_opf, 1);
+-	}
++	throtl = blk_throtl_bio(q, blkcg, bio);
+ 
+ 	rcu_read_unlock();
+ 	return !throtl;
 -- 
-1.8.3.1
+1.9.4
