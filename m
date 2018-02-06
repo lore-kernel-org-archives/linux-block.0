@@ -1,49 +1,29 @@
-Return-Path: <prvs=590d2a92c=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Josef Bacik <jbacik@fb.com>,
-	Shaohua Li <shli@fb.com>,
-	Omar Sandoval <osandov@fb.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v5 1/6] block/loop: Delete gendisk before cleaning up the request queue
-Date: Wed, 28 Feb 2018 10:15:28 -0800
-Message-Id: <20180228181533.29402-2-bart.vanassche@wdc.com>
-In-Reply-To: <20180228181533.29402-1-bart.vanassche@wdc.com>
-References: <20180228181533.29402-1-bart.vanassche@wdc.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v3] block: Add should_fail_bio() for bpf error injection
+To: Howard McLauchlan <hmclauchlan@fb.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com, Omar Sandoval <osandov@osandov.com>,
+ Josef Bacik <jbacik@fb.com>
+References: <20180206220539.30413-1-hmclauchlan@fb.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <2a573a6e-e7c8-a7af-6826-04442d243d33@kernel.dk>
+Date: Tue, 6 Feb 2018 15:14:02 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180206220539.30413-1-hmclauchlan@fb.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Remove the disk, partition and bdi sysfs attributes before cleaning up
-the request queue associated with the disk.
+On 2/6/18 3:05 PM, Howard McLauchlan wrote:
+> The classic error injection mechanism, should_fail_request() does not
+> support use cases where more information is required (from the entire
+> struct bio, for example).
+> 
+> To that end, this patch introduces should_fail_bio(), which calls
+> should_fail_request() under the hood but provides a convenient
+> place for kprobes to hook into if they require the entire struct bio.
+> This patch also replaces some existing calls to should_fail_request()
+> with should_fail_bio() with no degradation in performance.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Joseph Qi <joseph.qi@linux.alibaba.com>
-Cc: Josef Bacik <jbacik@fb.com>
-Cc: Shaohua Li <shli@fb.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/loop.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This seems better, applied, thanks.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index d5fe720cf149..8b693fdd08dc 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1864,8 +1864,8 @@ static int loop_add(struct loop_device **l, int i)
- 
- static void loop_remove(struct loop_device *lo)
- {
--	blk_cleanup_queue(lo->lo_queue);
- 	del_gendisk(lo->lo_disk);
-+	blk_cleanup_queue(lo->lo_queue);
- 	blk_mq_free_tag_set(&lo->tag_set);
- 	put_disk(lo->lo_disk);
- 	kfree(lo);
 -- 
-2.16.2
+Jens Axboe
