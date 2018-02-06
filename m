@@ -1,58 +1,48 @@
 Return-Path: <prvs=5689bd51d=Bart.VanAssche@wdc.com>
 From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "roman.penyaev@profitbricks.com" <roman.penyaev@profitbricks.com>,
-	"sagi@grimberg.me" <sagi@grimberg.me>
+To: "danil.kipnis@profitbricks.com" <danil.kipnis@profitbricks.com>
 CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
 	"hch@infradead.org" <hch@infradead.org>, "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>, "jinpu.wang@profitbricks.com"
-	<jinpu.wang@profitbricks.com>, "ogerlitz@mellanox.com"
-	<ogerlitz@mellanox.com>, Bart Van Assche <Bart.VanAssche@wdc.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>, "danil.kipnis@profitbricks.com"
-	<danil.kipnis@profitbricks.com>
+	<linux-rdma@vger.kernel.org>, "roman.penyaev@profitbricks.com"
+	<roman.penyaev@profitbricks.com>, "jinpu.wang@profitbricks.com"
+	<jinpu.wang@profitbricks.com>, "sagi@grimberg.me" <sagi@grimberg.me>,
+	"ogerlitz@mellanox.com" <ogerlitz@mellanox.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
 Subject: Re: [PATCH 00/24] InfiniBand Transport (IBTRS) and Network Block
  Device (IBNBD)
-Date: Tue, 6 Feb 2018 16:01:31 +0000
-Message-ID: <1517932890.3934.30.camel@wdc.com>
+Date: Tue, 6 Feb 2018 15:35:44 +0000
+Message-ID: <1517931342.3934.16.camel@wdc.com>
 References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
-	 <23dcfda7-eac1-ed13-b24e-3586c284ee55@grimberg.me>
-	 <CAJrWOzDmU_RWxaY+eXjZ3Az162gr9Bax8=5+1FYj4vzYDoxp7g@mail.gmail.com>
-In-Reply-To: <CAJrWOzDmU_RWxaY+eXjZ3Az162gr9Bax8=5+1FYj4vzYDoxp7g@mail.gmail.com>
+	 <1517591106.2675.28.camel@sandisk.com>
+	 <CAMGffEkhqR9Z5bkMfnVn8an2OUM8k+jYoR5EFdtv3k9en1bh=w@mail.gmail.com>
+	 <40a7fc35-f86c-1d9d-f057-e5822708fc32@grimberg.me>
+	 <CAHg0HuxawAjCf711gkKKiQbbLskNsvUDhP+m32oiGFsY2BRz5g@mail.gmail.com>
+	 <41347a8d-8a3b-c35f-801c-b4b21c37f285@grimberg.me>
+	 <CAHg0HuxtvRvPcX8yZxcwSSP5XK6ZnLbxBkpx+X7QyDZtny3XZA@mail.gmail.com>
+	 <9abc87a6-cb47-d3bf-65c6-6f386401bdb9@wdc.com>
+	 <CAHg0Huxejb065yVRLquNUKDZHB=NhuCBOnkgE-Q4FW3_Y-A_rQ@mail.gmail.com>
+In-Reply-To: <CAHg0Huxejb065yVRLquNUKDZHB=NhuCBOnkgE-Q4FW3_Y-A_rQ@mail.gmail.com>
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE4LTAyLTA2IGF0IDE0OjEyICswMTAwLCBSb21hbiBQZW55YWV2IHdyb3RlOg0K
-PiBPbiBNb24sIEZlYiA1LCAyMDE4IGF0IDE6MTYgUE0sIFNhZ2kgR3JpbWJlcmcgPHNhZ2lAZ3Jp
-bWJlcmcubWU+IHdyb3RlOg0KPiA+IFsgLi4uIF0NCj4gPiAtIHNycC9zY3N0IGNvbXBhcmlzb24g
-aXMgcmVhbGx5IG5vdCBmYWlyIGhhdmluZyBpdCBpbiBsZWdhY3kgcmVxdWVzdA0KPiA+ICAgbW9k
-ZS4gQ2FuIHlvdSBwbGVhc2UgcmVwZWF0IGl0IGFuZCByZXBvcnQgYSBidWcgdG8gZWl0aGVyIGxp
-bnV4LXJkbWENCj4gPiAgIG9yIHRvIHRoZSBzY3N0IG1haWxpbmcgbGlzdD8NCj4gDQo+IFllcCwg
-SSBjYW4gcmV0ZXN0IHdpdGggbXEuDQo+IA0KPiA+IC0gWW91ciBsYXRlbmN5IG1lYXN1cmVtZW50
-cyBhcmUgc3VycHJpc2luZ2x5IGhpZ2ggZm9yIGEgbnVsbCB0YXJnZXQNCj4gPiAgIGRldmljZSAo
-ZXZlbiBmb3IgbG93IGVuZCBudm1lIGRldmljZSBhY3R1YWxseSkgcmVnYXJkbGVzcyBvZiB0aGUN
-Cj4gPiAgIHRyYW5zcG9ydCBpbXBsZW1lbnRhdGlvbi4NCj4gDQo+IEhtLCBuZXR3b3JrIGNvbmZp
-Z3VyYXRpb24/ICBUaGVzZSBhcmUgcmVzdWx0cyBvbiBtYWNoaW5lcyBkZWRpY2F0ZWQNCj4gdG8g
-b3VyIHRlYW0gZm9yIHRlc3RpbmcgaW4gb25lIG9mIG91ciBkYXRhY2VudGVycy4gTm90aGluZyBz
-cGVjaWFsDQo+IGluIGNvbmZpZ3VyYXRpb24uDQoNCkhlbGxvIFJvbWFuLA0KDQpJIGFncmVlIHRo
-YXQgdGhlIGxhdGVuY3kgbnVtYmVycyBhcmUgd2F5IHRvbyBoaWdoIGZvciBhIG51bGwgdGFyZ2V0
-IGRldmljZS4NCkxhc3QgdGltZSBJIG1lYXN1cmVkIGxhdGVuY3kgZm9yIHRoZSBTUlAgcHJvdG9j
-b2wgYWdhaW5zdCBhbiBTQ1NUIHRhcmdldA0KKyBudWxsIGJsb2NrIGRyaXZlciBhdCB0aGUgdGFy
-Z2V0IHNpZGUgYW5kIENvbm5lY3RYLTMgYWRhcHRlcnMgSSBtZWFzdXJlZCBhDQpsYXRlbmN5IG9m
-IGFib3V0IDE0IG1pY3Jvc2Vjb25kcy4gVGhhdCdzIGFsbW9zdCAxMDAgdGltZXMgbGVzcyB0aGFu
-IHRoZQ0KbWVhc3VyZW1lbnQgcmVzdWx0cyBpbiBodHRwczovL3d3dy5zcGluaWNzLm5ldC9saXN0
-cy9saW51eC1yZG1hL21zZzQ4Nzk5Lmh0bWwuDQoNClNvbWV0aGluZyBlbHNlIEkgd291bGQgbGlr
-ZSB0byB1bmRlcnN0YW5kIGJldHRlciBpcyBob3cgbXVjaCBvZiB0aGUgbGF0ZW5jeQ0KZ2FwIGJl
-dHdlZW4gTlZNZU9GL1NSUCBhbmQgSUJOQkQgY2FuIGJlIGNsb3NlZCB3aXRob3V0IGNoYW5naW5n
-IHRoZSB3aXJlDQpwcm90b2NvbC4gV2FzIGUuZy4gc3VwcG9ydCBmb3IgaW1tZWRpYXRlIGRhdGEg
-cHJlc2VudCBpbiB0aGUgTlZNZU9GIGFuZC9vcg0KU1JQIGRyaXZlcnMgdXNlZCBvbiB5b3VyIHRl
-c3Qgc2V0dXA/IEFyZSB5b3UgYXdhcmUgdGhhdCB0aGUgTlZNZU9GIHRhcmdldA0KZHJpdmVyIGNh
-bGxzIHBhZ2VfYWxsb2MoKSBmcm9tIHRoZSBob3QgcGF0aCBidXQgdGhhdCB0aGVyZSBhcmUgcGxh
-bnMgdG8NCmF2b2lkIHRoZXNlIGNhbGxzIGluIHRoZSBob3QgcGF0aCBieSB1c2luZyBhIGNhY2hp
-bmcgbWVjaGFuaXNtIHNpbWlsYXIgdG8NCnRoZSBTR1YgY2FjaGUgaW4gU0NTVD8gQXJlIHlvdSBh
-d2FyZSB0aGF0IGEgc2lnbmlmaWNhbnQgbGF0ZW5jeSByZWR1Y3Rpb24NCmNhbiBiZSBhY2hpZXZl
-ZCBieSBjaGFuZ2luZyB0aGUgU0NTVCBTR1YgY2FjaGUgZnJvbSBhIGdsb2JhbCBpbnRvIGEgcGVy
-LUNQVQ0KY2FjaGU/IFJlZ2FyZGluZyB0aGUgU1JQIG1lYXN1cmVtZW50czogaGF2ZSB5b3UgdHJp
-ZWQgdG8gc2V0IHRoZQ0KbmV2ZXJfcmVnaXN0ZXIga2VybmVsIG1vZHVsZSBwYXJhbWV0ZXIgdG8g
-dHJ1ZT8gSSdtIGFza2luZyB0aGlzIGJlY2F1c2UgSQ0KdGhpbmsgdGhhdCBtb2RlIGlzIG1vc3Qg
-c2ltaWxhciB0byBob3cgdGhlIElCTkJEIGluaXRpYXRvciBkcml2ZXIgd29ya3MuDQoNClRoYW5r
-cywNCg0KQmFydC4=
+T24gVHVlLCAyMDE4LTAyLTA2IGF0IDEwOjQ0ICswMTAwLCBEYW5pbCBLaXBuaXMgd3JvdGU6DQo+
+IHRoZSBjb25maWd1cmF0aW9uICh3aGljaCBkZXZpY2VzIGNhbiBiZSBhY2Nlc3NlZCBieSBhIHBh
+cnRpY3VsYXINCj4gY2xpZW50KSBjYW4gaGFwcGVuIGFsc28gYWZ0ZXIgdGhlIGtlcm5lbCB0YXJn
+ZXQgbW9kdWxlIGlzIGxvYWRlZC4gVGhlDQo+IGRpcmVjdG9yeSBpbiA8ZGV2X3NlYXJjaF9wYXRo
+PiBpcyBhIG1vZHVsZSBwYXJhbWV0ZXIgYW5kIGlzIGZpeGVkLiBJdA0KPiBjb250YWlucyBmb3Ig
+ZXhhbXBsZSAiL2libmJkX2RldmljZXMvIi4gQnV0IGEgcGFydGljdWxhciBjbGllbnQgWA0KPiB3
+b3VsZCBiZSBhYmxlIHRvIG9ubHkgYWNjZXNzIHRoZSBkZXZpY2VzIGxvY2F0ZWQgaW4gdGhlIHN1
+YmRpcmVjdG9yeQ0KPiAiL2libmJkX2RldmljZXMvY2xpZW50X3gvIi4gKFRoZSBzZXNzaW9ubmFt
+ZSBoZXJlIGlzIGNsaWVudF94KSBPbmUgY2FuDQo+IGFkZCBvciByZW1vdmUgdGhlIGRldmljZXMg
+ZnJvbSB0aGF0IGRpcmVjdG9yeSAodGhvc2UgYXJlIGp1c3Qgc3ltbGlua3MNCj4gdG8gL2Rldi94
+eHgpIGF0IGFueSB0aW1lIC0gYmVmb3JlIG9yIGFmdGVyIHRoZSBzZXJ2ZXIgbW9kdWxlIGlzDQo+
+IGxvYWRlZC4gQnV0IHlvdSBhcmUgcmlnaHQsIHdlIG5lZWQgc29tZXRoaW5nIGFkZGl0aW9uYWwg
+aW4gb3JkZXIgdG8gYmUNCj4gYWJsZSB0byBzcGVjaWZ5IHdoaWNoIGRldmljZXMgYSBjbGllbnQg
+Y2FuIGFjY2VzcyB3cml0YWJsZSBhbmQgd2hpY2gNCj4gcmVhZG9ubHkuIE1heSBiZSBhbm90aGVy
+IHN1YmRpcmVjdG9yaWVzICJ3ciIgYW5kICJybyIgZm9yIGVhY2ggY2xpZW50Og0KPiB0aG9zZSB1
+bmRlciAvaWJuYmRfZGV2aWNlcy9jbGllbnRfeC9yby8gY2FuIG9ubHkgYmUgcmVhZCBieSBjbGll
+bnRfeA0KPiBhbmQgdGhvc2UgaW4gL2libmJkX2RldmljZXMvY2xpZW50X3gvd3IvIGNhbiBhbHNv
+IGJlIHdyaXR0ZW4gdG8/DQoNClBsZWFzZSB1c2UgYSBzdGFuZGFyZCBrZXJuZWwgZmlsZXN5c3Rl
+bSAoc3lzZnMgb3IgY29uZmlnZnMpIGluc3RlYWQgb2YNCnJlaW52ZW50aW5nIGl0Lg0KDQpUaGFu
+a3MsDQoNCkJhcnQu
