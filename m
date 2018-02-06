@@ -1,65 +1,35 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f66.google.com ([209.85.160.66]:33939 "EHLO
-        mail-pl0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751730AbeBAVoG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Feb 2018 16:44:06 -0500
-Received: by mail-pl0-f66.google.com with SMTP id q17so2339632pll.1
-        for <linux-block@vger.kernel.org>; Thu, 01 Feb 2018 13:44:05 -0800 (PST)
-Subject: Re: [PATCH v4 01/13] bcache: set writeback_rate_update_seconds in
- range [1, 60] seconds
-To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org
-References: <20180127142406.89741-1-colyli@suse.de>
- <20180127142406.89741-2-colyli@suse.de>
-From: Michael Lyle <mlyle@lyle.org>
-Message-ID: <37cb226a-2335-89d6-26f7-af611c70586b@lyle.org>
-Date: Thu, 1 Feb 2018 13:44:00 -0800
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+To: "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>,
+        gregkh@linuxfoundation.org
+Cc: axboe@kernel.dk, jlayton@poochiereds.net, bfields@fieldses.org,
+        viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <151788389652.28069.6065922071875812126.stgit@srivatsa-ubuntu>
+From: Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <de9e2460-3633-ee4b-904d-6510f9045b8b@deltatee.com>
+Date: Tue, 6 Feb 2018 10:14:53 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180127142406.89741-2-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <151788389652.28069.6065922071875812126.stgit@srivatsa-ubuntu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Subject: Re: [PATCH 1/2] char_dev: Fix off-by-one bugs in find_dynamic_major()
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On 01/27/2018 06:23 AM, Coly Li wrote:
-> dc->writeback_rate_update_seconds can be set via sysfs and its value can
-> be set to [1, ULONG_MAX].  It does not make sense to set such a large
-> value, 60 seconds is long enough value considering the default 5 seconds
-> works well for long time.
+Thanks!
+
+On 05/02/18 07:25 PM, Srivatsa S. Bhat wrote:
+> From: Srivatsa S. Bhat <srivatsa@csail.mit.edu>
 > 
-> Because dc->writeback_rate_update is a special delayed work, it re-arms
-> itself inside the delayed work routine update_writeback_rate(). When
-> stopping it by cancel_delayed_work_sync(), there should be a timeout to
-> wait and make sure the re-armed delayed work is stopped too. A small max
-> value of dc->writeback_rate_update_seconds is also helpful to decide a
-> reasonable small timeout.
+> CHRDEV_MAJOR_DYN_END and CHRDEV_MAJOR_DYN_EXT_END are valid major
+> numbers. So fix the loop iteration to include them in the search for
+> free major numbers.
 > 
-> This patch limits sysfs interface to set dc->writeback_rate_update_seconds
-> in range of [1, 60] seconds, and replaces the hand-coded number by macros.
+> While at it, also remove a redundant if condition ("cd->major != i"),
+> as it will never be true.
 > 
-> Signed-off-by: Coly Li <colyli@suse.de>
-> Reviewed-by: Hannes Reinecke <hare@suse.com>
+> Signed-off-by: Srivatsa S. Bhat <srivatsa@csail.mit.edu>
 
-[snip]
+Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
 
-> ---
->  drivers/md/bcache/sysfs.c     | 3 +++
->  drivers/md/bcache/writeback.c | 2 +-
->  drivers/md/bcache/writeback.h | 3 +++
->  3 files changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-> index b4184092c727..a74a752c9e0f 100644
-> --- a/drivers/md/bcache/sysfs.c
-> +++ b/drivers/md/bcache/sysfs.c
-> @@ -215,6 +215,9 @@ STORE(__cached_dev)
->  	sysfs_strtoul_clamp(writeback_rate,
->  			    dc->writeback_rate.rate, 1, INT_MAX);
->  
-> +	sysfs_strtoul_clamp(writeback_rate_update_seconds,
-> +			    dc->writeback_rate_update_seconds,
-> +			    1, WRITEBACK_RATE_UPDATE_SECS_MAX);
->  	d_strtoul_nonzero(writeback_rate_update_seconds);
 
-Doesn't the above line need to be removed for this to work?
-
-Mike
+Logan
