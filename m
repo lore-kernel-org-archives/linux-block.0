@@ -1,69 +1,36 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f194.google.com ([209.85.128.194]:44620 "EHLO
-        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753307AbeBUJ1T (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Feb 2018 04:27:19 -0500
-Received: by mail-wr0-f194.google.com with SMTP id v65so2421515wrc.11
-        for <linux-block@vger.kernel.org>; Wed, 21 Feb 2018 01:27:18 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 08/20] lightnvm: complete geo structure with maxoc*
-Date: Wed, 21 Feb 2018 10:26:46 +0100
-Message-Id: <1519205218-26994-9-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1519205218-26994-1-git-send-email-javier@cnexlabs.com>
-References: <1519205218-26994-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v2] block: Add should_fail_bio() for bpf error injection
+To: Howard McLauchlan <hmclauchlan@fb.com>, linux-block@vger.kernel.org
+Cc: kernel-team@fb.com, Omar Sandoval <osandov@osandov.com>,
+ Josef Bacik <jbacik@fb.com>
+References: <20180206211108.3236-1-hmclauchlan@fb.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <2ad8a90d-d3c1-be0d-0f60-b365286b13b3@kernel.dk>
+Date: Tue, 6 Feb 2018 14:15:17 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180206211108.3236-1-hmclauchlan@fb.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Complete the generic geometry structure with the maxoc and maxocpu
-felds, present in the 2.0 spec.
+On 2/6/18 2:11 PM, Howard McLauchlan wrote:
+> The classic error injection mechanism, should_fail_request() does not
+> support use cases where more information is required (from the entire
+> struct bio, for example).
+> 
+> To that end, this patch introduces should_fail_bio(), which calls
+> should_fail_request() under the hood but provides a convenient
+> place for kprobes to hook into if they require the entire struct bio.
+> This patch also replaces some existing calls to should_fail_request()
+> with should_fail_bio() with no degradation in performance.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/nvme/host/lightnvm.c | 4 ++++
- include/linux/lightnvm.h     | 2 ++
- 2 files changed, 6 insertions(+)
+It fails:
 
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index cca32da05316..9c1f8225c4e1 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -318,6 +318,8 @@ static int nvme_nvm_setup_12(struct nvme_nvm_id12 *id,
- 	dev_geo->c.ws_min = sec_per_pg;
- 	dev_geo->c.ws_opt = sec_per_pg;
- 	dev_geo->c.mw_cunits = 8;		/* default to MLC safe values */
-+	dev_geo->c.maxoc = dev_geo->all_luns;	/* default to 1 chunk per LUN */
-+	dev_geo->c.maxocpu = 1;			/* default to 1 chunk per LUN */
- 
- 	dev_geo->c.mccap = le32_to_cpu(src->mccap);
- 
-@@ -405,6 +407,8 @@ static int nvme_nvm_setup_20(struct nvme_nvm_id20 *id,
- 	dev_geo->c.ws_min = le32_to_cpu(id->ws_min);
- 	dev_geo->c.ws_opt = le32_to_cpu(id->ws_opt);
- 	dev_geo->c.mw_cunits = le32_to_cpu(id->mw_cunits);
-+	dev_geo->c.maxoc = le32_to_cpu(id->maxoc);
-+	dev_geo->c.maxocpu = le32_to_cpu(id->maxocpu);
- 
- 	dev_geo->c.mccap = le32_to_cpu(id->mccap);
- 
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index ccc5faa63cb7..e1c4292ea33d 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -215,6 +215,8 @@ struct nvm_common_geo {
- 	u32	ws_min;		/* minimum write size */
- 	u32	ws_opt;		/* optimal write size */
- 	u32	mw_cunits;	/* distance required for successful read */
-+	u32	maxoc;		/* maximum open chunks */
-+	u32	maxocpu;	/* maximum open chunks per parallel unit */
- 
- 	/* device capabilities */
- 	u32	mccap;
+block/blk-core.c:2091:1: warning: data definition has no type or storage class
+ BPF_ALLOW_ERROR_INJECTION(should_fail_bio);
+ ^~~~~~~~~~~~~~~~~~~~~~~~~
+block/blk-core.c:2091:1: error: type defaults to ‘int’ in declaration of ‘BPF_ALLOW_ERROR_INJECTION’ [-Werror=implicit-int]
+block/blk-core.c:2091:1: warning: parameter names (without types) in function declaration
+cc1: some warnings being treated as errors
+
 -- 
-2.7.4
+Jens Axboe
