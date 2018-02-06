@@ -1,87 +1,138 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-cys01nam02on0051.outbound.protection.outlook.com ([104.47.37.51]:48000
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752629AbeBZUgE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Feb 2018 15:36:04 -0500
-From: Javier Gonzalez <javier@cnexlabs.com>
-To: Heiner Litz <hlitz@ucsc.edu>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        =?iso-8859-1?Q?Matias_Bj=F8rling?= <mb@lightnvm.io>
-Subject: Re: [PATCH][RESEND] lightnvm: Avoid validation of default op value
-Date: Mon, 26 Feb 2018 20:35:59 +0000
-Message-ID: <A2D48F7C-66B7-4515-BAFB-244010ACE486@cnexlabs.com>
-References: <20180226202219.2880-1-hlitz@ucsc.edu>
-In-Reply-To: <20180226202219.2880-1-hlitz@ucsc.edu>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_D085BDD5-0E34-4034-9081-553B6607BE77";
-        protocol="application/pgp-signature"; micalg=pgp-sha512
-MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Laurence Oberman <loberman@redhat.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 1/5] genirq/affinity: rename *node_to_possible_cpumask as *node_to_cpumask
+Date: Tue,  6 Feb 2018 20:17:38 +0800
+Message-Id: <20180206121742.29336-2-ming.lei@redhat.com>
+In-Reply-To: <20180206121742.29336-1-ming.lei@redhat.com>
+References: <20180206121742.29336-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
---Apple-Mail=_D085BDD5-0E34-4034-9081-553B6607BE77
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
+The following patches will introduce two stage irq spread for improving
+irq spread on all possible CPUs.
 
-> On 26 Feb 2018, at 21.22, Heiner Litz <hlitz@ucsc.edu> wrote:
->=20
-> Fixes: 38401d231de65 ("lightnvm: set target over-provision on create =
-ioctl")
->=20
-> Signed-off-by: Heiner Litz <hlitz@ucsc.edu>
-> ---
-> drivers/lightnvm/core.c | 6 ++----
-> 1 file changed, 2 insertions(+), 4 deletions(-)
->=20
-> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-> index dcc9e621e651..74b53fc1b813 100644
-> --- a/drivers/lightnvm/core.c
-> +++ b/drivers/lightnvm/core.c
-> @@ -304,11 +304,9 @@ static int __nvm_config_extended(struct nvm_dev =
-*dev,
-> 	}
->=20
-> 	/* op not set falls into target's default */
-> -	if (e->op =3D=3D 0xFFFF)
-> +	if (e->op =3D=3D 0xFFFF) {
-> 		e->op =3D NVM_TARGET_DEFAULT_OP;
-> -
-> -	if (e->op < NVM_TARGET_MIN_OP ||
-> -	    e->op > NVM_TARGET_MAX_OP) {
-> +	} else if (e->op < NVM_TARGET_MIN_OP || e->op > =
-NVM_TARGET_MAX_OP) {
-> 		pr_err("nvm: invalid over provisioning value\n");
-> 		return -EINVAL;
-> 	}
-> --
-> 2.14.1
+No funtional change.
 
-Thanks for applying the changes. Looks good to me now.
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ kernel/irq/affinity.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
-
---Apple-Mail=_D085BDD5-0E34-4034-9081-553B6607BE77
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment; filename="signature.asc"
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAlqUb60ACgkQIX4xUKFR
-nnSMkQ//QwejaIL2T1x6gAGRbQpp+CYqsMFJPSP21vxA6rJC2yiLfZNuWwnYQl9J
-isT9m8NM3MBdbIFvT1eTgDGyXH7hOEfrcKrqQl99Xcgxe5UP7xMCjsxP7JRvuH7p
-DHNXZ4xaF/1Tz6rks54EMC4GMP5LaA5iZupPcRyZEfsCwY3zuECoJYtth/MDqdgp
-b03Cy/a+hlWaWrS9HvFT6kfq4pqU4yTgzHbcSjU9MWoT2eIXsXDoQ7ET6HEjQQ69
-6aTV7kAyoPDfbiztnYWTPOlUYN5q1Z6XRBGKJRJIOScPEcz+9TwIrcCEGkeIwxXA
-BvIc75IL0oIVo3O3HaRPALlB6jgdVAo+gjIojW3fbO3cV1hX6WKc7HgFymKNCnjk
-dLNZJ0ItVPTxLgQgWpHkCAZ5eIKCOe6z64FuhdXUaGY9XKG3nRZHtvsYsTeBYCfb
-8s+5oVANaJCE9v7e0/hnXvlzaP0aF6O/T5vc6QjWTYvKkDqo70GF2zTvyrcm3hbY
-OaKerjYnn3IYygXdCnWVosH/h3XZjuBMDag7TDkPnzyeMIpNZVz3uNniZCozBFsL
-hQ4GW8EM2bm/ocs9fsdbDww1peKDv+3e1oo+v/Y38z+t4j7ZOpcIxuVI27Y1KZZr
-4fV+cnS6UU5T5CZoGcdWH3qyutvi2J5QVf/cczJGlemTrdTNolk=
-=IwcY
------END PGP SIGNATURE-----
-
---Apple-Mail=_D085BDD5-0E34-4034-9081-553B6607BE77--
+diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
+index a37a3b4b6342..4b1c4763212d 100644
+--- a/kernel/irq/affinity.c
++++ b/kernel/irq/affinity.c
+@@ -39,7 +39,7 @@ static void irq_spread_init_one(struct cpumask *irqmsk, struct cpumask *nmsk,
+ 	}
+ }
+ 
+-static cpumask_var_t *alloc_node_to_possible_cpumask(void)
++static cpumask_var_t *alloc_node_to_cpumask(void)
+ {
+ 	cpumask_var_t *masks;
+ 	int node;
+@@ -62,7 +62,7 @@ static cpumask_var_t *alloc_node_to_possible_cpumask(void)
+ 	return NULL;
+ }
+ 
+-static void free_node_to_possible_cpumask(cpumask_var_t *masks)
++static void free_node_to_cpumask(cpumask_var_t *masks)
+ {
+ 	int node;
+ 
+@@ -71,7 +71,7 @@ static void free_node_to_possible_cpumask(cpumask_var_t *masks)
+ 	kfree(masks);
+ }
+ 
+-static void build_node_to_possible_cpumask(cpumask_var_t *masks)
++static void build_node_to_cpumask(cpumask_var_t *masks)
+ {
+ 	int cpu;
+ 
+@@ -79,14 +79,14 @@ static void build_node_to_possible_cpumask(cpumask_var_t *masks)
+ 		cpumask_set_cpu(cpu, masks[cpu_to_node(cpu)]);
+ }
+ 
+-static int get_nodes_in_cpumask(cpumask_var_t *node_to_possible_cpumask,
++static int get_nodes_in_cpumask(cpumask_var_t *node_to_cpumask,
+ 				const struct cpumask *mask, nodemask_t *nodemsk)
+ {
+ 	int n, nodes = 0;
+ 
+ 	/* Calculate the number of nodes in the supplied affinity mask */
+ 	for_each_node(n) {
+-		if (cpumask_intersects(mask, node_to_possible_cpumask[n])) {
++		if (cpumask_intersects(mask, node_to_cpumask[n])) {
+ 			node_set(n, *nodemsk);
+ 			nodes++;
+ 		}
+@@ -109,7 +109,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 	int last_affv = affv + affd->pre_vectors;
+ 	nodemask_t nodemsk = NODE_MASK_NONE;
+ 	struct cpumask *masks;
+-	cpumask_var_t nmsk, *node_to_possible_cpumask;
++	cpumask_var_t nmsk, *node_to_cpumask;
+ 
+ 	/*
+ 	 * If there aren't any vectors left after applying the pre/post
+@@ -125,8 +125,8 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 	if (!masks)
+ 		goto out;
+ 
+-	node_to_possible_cpumask = alloc_node_to_possible_cpumask();
+-	if (!node_to_possible_cpumask)
++	node_to_cpumask = alloc_node_to_cpumask();
++	if (!node_to_cpumask)
+ 		goto out;
+ 
+ 	/* Fill out vectors at the beginning that don't need affinity */
+@@ -135,8 +135,8 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 
+ 	/* Stabilize the cpumasks */
+ 	get_online_cpus();
+-	build_node_to_possible_cpumask(node_to_possible_cpumask);
+-	nodes = get_nodes_in_cpumask(node_to_possible_cpumask, cpu_possible_mask,
++	build_node_to_cpumask(node_to_cpumask);
++	nodes = get_nodes_in_cpumask(node_to_cpumask, cpu_possible_mask,
+ 				     &nodemsk);
+ 
+ 	/*
+@@ -146,7 +146,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 	if (affv <= nodes) {
+ 		for_each_node_mask(n, nodemsk) {
+ 			cpumask_copy(masks + curvec,
+-				     node_to_possible_cpumask[n]);
++				     node_to_cpumask[n]);
+ 			if (++curvec == last_affv)
+ 				break;
+ 		}
+@@ -160,7 +160,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 		vecs_per_node = (affv - (curvec - affd->pre_vectors)) / nodes;
+ 
+ 		/* Get the cpus on this node which are in the mask */
+-		cpumask_and(nmsk, cpu_possible_mask, node_to_possible_cpumask[n]);
++		cpumask_and(nmsk, cpu_possible_mask, node_to_cpumask[n]);
+ 
+ 		/* Calculate the number of cpus per vector */
+ 		ncpus = cpumask_weight(nmsk);
+@@ -192,7 +192,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 	/* Fill out vectors at the end that don't need affinity */
+ 	for (; curvec < nvecs; curvec++)
+ 		cpumask_copy(masks + curvec, irq_default_affinity);
+-	free_node_to_possible_cpumask(node_to_possible_cpumask);
++	free_node_to_cpumask(node_to_cpumask);
+ out:
+ 	free_cpumask_var(nmsk);
+ 	return masks;
+-- 
+2.9.5
