@@ -1,314 +1,249 @@
-Return-Path: <roman.penyaev@profitbricks.com>
-Return-Path: <roman.penyaev@profitbricks.com>
-From: Roman Pen <roman.penyaev@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Or Gerlitz <ogerlitz@mellanox.com>,
-	Roman Pen <roman.penyaev@profitbricks.com>,
-	Danil Kipnis <danil.kipnis@profitbricks.com>,
-	Jack Wang <jinpu.wang@profitbricks.com>
-Subject: [PATCH 21/24] ibnbd: server: sysfs interface functions
-Date: Fri,  2 Feb 2018 15:09:01 +0100
-Message-Id: <20180202140904.2017-22-roman.penyaev@profitbricks.com>
-In-Reply-To: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
-References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:37853 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752318AbeBFEWW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 5 Feb 2018 23:22:22 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Michael Lyle <mlyle@lyle.org>,
+        Junhui Tang <tang.junhui@zte.com.cn>
+Subject: [PATCH v5 09/10] bcache: add io_disable to struct cached_dev
+Date: Tue,  6 Feb 2018 12:20:59 +0800
+Message-Id: <20180206042100.65021-10-colyli@suse.de>
+In-Reply-To: <20180206042100.65021-1-colyli@suse.de>
+References: <20180206042100.65021-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-This is the sysfs interface to IBNBD mapped devices on server side:
+If a bcache device is configured to writeback mode, current code does not
+handle write I/O errors on backing devices properly.
 
-  /sys/kernel/ibnbd_server/devices/<device_name>/
-    |- block_dev
-    |  *** link pointing to the corresponding block device sysfs entry
-    |
-    |- sessions/<session-name>/
-    |  *** sessions directory
-       |
-       |- read_only
-       |  *** is devices mapped as read only
-       |
-       |- mapping_path
-          *** relative device path provided by the client during mapping
+In writeback mode, write request is written to cache device, and
+latter being flushed to backing device. If I/O failed when writing from
+cache device to the backing device, bcache code just ignores the error and
+upper layer code is NOT noticed that the backing device is broken.
 
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
-Cc: Jack Wang <jinpu.wang@profitbricks.com>
+This patch tries to handle backing device failure like how the cache device
+failure is handled,
+- Add a error counter 'io_errors' and error limit 'error_limit' in struct
+  cached_dev. Add another io_disable to struct cached_dev to disable I/Os
+  on the problematic backing device.
+- When I/O error happens on backing device, increase io_errors counter. And
+  if io_errors reaches error_limit, set cache_dev->io_disable to true, and
+  stop the bcache device.
+
+The result is, if backing device is broken of disconnected, and I/O errors
+reach its error limit, backing device will be disabled and the associated
+bcache device will be removed from system.
+
+Changelog:
+v2: remove "bcache: " prefix in pr_error(), and use correct name string to
+    print out bcache device gendisk name.
+v1: indeed this is new added in v2 patch set.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Cc: Michael Lyle <mlyle@lyle.org>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
 ---
- drivers/block/ibnbd/ibnbd-srv-sysfs.c | 264 ++++++++++++++++++++++++++++++++++
- 1 file changed, 264 insertions(+)
+ drivers/md/bcache/bcache.h  |  6 ++++++
+ drivers/md/bcache/io.c      | 14 ++++++++++++++
+ drivers/md/bcache/request.c | 14 ++++++++++++--
+ drivers/md/bcache/super.c   | 23 ++++++++++++++++++++++-
+ drivers/md/bcache/sysfs.c   | 15 ++++++++++++++-
+ 5 files changed, 68 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/block/ibnbd/ibnbd-srv-sysfs.c b/drivers/block/ibnbd/ibnbd-srv-sysfs.c
-new file mode 100644
-index 000000000000..a0efd6a2accb
---- /dev/null
-+++ b/drivers/block/ibnbd/ibnbd-srv-sysfs.c
-@@ -0,0 +1,264 @@
-+/*
-+ * InfiniBand Network Block Driver
-+ *
-+ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
-+ * Authors: Fabian Holler <mail@fholler.de>
-+ *          Jack Wang <jinpu.wang@profitbricks.com>
-+ *          Kleber Souza <kleber.souza@profitbricks.com>
-+ *          Danil Kipnis <danil.kipnis@profitbricks.com>
-+ *          Roman Penyaev <roman.penyaev@profitbricks.com>
-+ *          Milind Dumbare <Milind.dumbare@gmail.com>
-+ *
-+ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
-+ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
-+ *          Roman Penyaev <roman.penyaev@profitbricks.com>
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version 2
-+ * of the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#undef pr_fmt
-+#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
-+
-+#include <uapi/linux/limits.h>
-+#include <linux/kobject.h>
-+#include <linux/sysfs.h>
-+#include <linux/stat.h>
-+#include <linux/genhd.h>
-+#include <linux/list.h>
-+#include <linux/moduleparam.h>
-+
-+#include "ibnbd-srv.h"
-+
-+static struct kobject *ibnbd_srv_kobj;
-+static struct kobject *ibnbd_srv_devices_kobj;
-+
-+static struct attribute *ibnbd_srv_default_dev_attrs[] = {
-+	NULL,
-+};
-+
-+static struct attribute_group ibnbd_srv_default_dev_attr_group = {
-+	.attrs = ibnbd_srv_default_dev_attrs,
-+};
-+
-+static ssize_t ibnbd_srv_attr_show(struct kobject *kobj, struct attribute *attr,
-+				   char *page)
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 263164490833..c59ce168bd82 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -366,6 +366,7 @@ struct cached_dev {
+ 	unsigned		sequential_cutoff;
+ 	unsigned		readahead;
+ 
++	unsigned		io_disable:1;
+ 	unsigned		verify:1;
+ 	unsigned		bypass_torture_test:1;
+ 
+@@ -387,6 +388,9 @@ struct cached_dev {
+ 	unsigned		writeback_rate_minimum;
+ 
+ 	enum stop_on_faliure	stop_when_cache_set_failed;
++#define DEFAULT_CACHED_DEV_ERROR_LIMIT	64
++	atomic_t		io_errors;
++	unsigned		error_limit;
+ };
+ 
+ enum alloc_reserve {
+@@ -896,6 +900,7 @@ static inline void closure_bio_submit(struct cache_set *c,
+ 
+ /* Forward declarations */
+ 
++void bch_count_backing_io_errors(struct cached_dev *dc, struct bio *bio);
+ void bch_count_io_errors(struct cache *, blk_status_t, int, const char *);
+ void bch_bbio_count_io_errors(struct cache_set *, struct bio *,
+ 			      blk_status_t, const char *);
+@@ -923,6 +928,7 @@ int bch_bucket_alloc_set(struct cache_set *, unsigned,
+ 			 struct bkey *, int, bool);
+ bool bch_alloc_sectors(struct cache_set *, struct bkey *, unsigned,
+ 		       unsigned, unsigned, bool);
++bool bch_cached_dev_error(struct cached_dev *dc);
+ 
+ __printf(2, 3)
+ bool bch_cache_set_error(struct cache_set *, const char *, ...);
+diff --git a/drivers/md/bcache/io.c b/drivers/md/bcache/io.c
+index 8013ecbcdbda..7fac97ae036e 100644
+--- a/drivers/md/bcache/io.c
++++ b/drivers/md/bcache/io.c
+@@ -50,6 +50,20 @@ void bch_submit_bbio(struct bio *bio, struct cache_set *c,
+ }
+ 
+ /* IO errors */
++void bch_count_backing_io_errors(struct cached_dev *dc, struct bio *bio)
 +{
-+	struct kobj_attribute *kattr;
-+	int ret = -EIO;
++	char buf[BDEVNAME_SIZE];
++	unsigned errors;
 +
-+	kattr = container_of(attr, struct kobj_attribute, attr);
-+	if (kattr->show)
-+		ret = kattr->show(kobj, kattr, page);
-+	return ret;
++	WARN_ONCE(!dc, "NULL pointer of struct cached_dev");
++
++	errors = atomic_add_return(1, &dc->io_errors);
++	if (errors < dc->error_limit)
++		pr_err("%s: IO error on backing device, unrecoverable",
++			bio_devname(bio, buf));
++	else
++		bch_cached_dev_error(dc);
++}
+ 
+ void bch_count_io_errors(struct cache *ca,
+ 			 blk_status_t error,
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 9c6dda3b0068..03245e6980a6 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -637,6 +637,8 @@ static void backing_request_endio(struct bio *bio)
+ 
+ 	if (bio->bi_status) {
+ 		struct search *s = container_of(cl, struct search, cl);
++		struct cached_dev *dc = container_of(s->d,
++						     struct cached_dev, disk);
+ 		/*
+ 		 * If a bio has REQ_PREFLUSH for writeback mode, it is
+ 		 * speically assembled in cached_dev_write() for a non-zero
+@@ -657,6 +659,7 @@ static void backing_request_endio(struct bio *bio)
+ 		}
+ 		s->recoverable = false;
+ 		/* should count I/O error for backing device here */
++		bch_count_backing_io_errors(dc, bio);
+ 	}
+ 
+ 	bio_put(bio);
+@@ -1065,8 +1068,14 @@ static void detatched_dev_end_io(struct bio *bio)
+ 			    bio_data_dir(bio),
+ 			    &ddip->d->disk->part0, ddip->start_time);
+ 
+-	kfree(ddip);
++	if (bio->bi_status) {
++		struct cached_dev *dc = container_of(ddip->d,
++						     struct cached_dev, disk);
++		/* should count I/O error for backing device here */
++		bch_count_backing_io_errors(dc, bio);
++	}
+ 
++	kfree(ddip);
+ 	bio->bi_end_io(bio);
+ }
+ 
+@@ -1105,7 +1114,8 @@ static blk_qc_t cached_dev_make_request(struct request_queue *q,
+ 	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
+ 	int rw = bio_data_dir(bio);
+ 
+-	if (unlikely(d->c && test_bit(CACHE_SET_IO_DISABLE, &d->c->flags))) {
++	if (unlikely((d->c && test_bit(CACHE_SET_IO_DISABLE, &d->c->flags)) ||
++		     dc->io_disable)) {
+ 		bio->bi_status = BLK_STS_IOERR;
+ 		bio_endio(bio);
+ 		return BLK_QC_T_NONE;
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 4f1a14b99415..40b07d980a20 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1196,7 +1196,10 @@ static int cached_dev_init(struct cached_dev *dc, unsigned block_size)
+ 		max(dc->disk.disk->queue->backing_dev_info->ra_pages,
+ 		    q->backing_dev_info->ra_pages);
+ 
+-	/* default to auto */
++	atomic_set(&dc->io_errors, 0);
++	dc->io_disable = false;
++	dc->error_limit = DEFAULT_CACHED_DEV_ERROR_LIMIT;
++	/* default to "auto" */
+ 	dc->stop_when_cache_set_failed = BCH_CACHED_DEV_STOP_ATUO;
+ 
+ 	bch_cached_dev_request_init(dc);
+@@ -1350,6 +1353,24 @@ int bch_flash_dev_create(struct cache_set *c, uint64_t size)
+ 	return flash_dev_run(c, u);
+ }
+ 
++bool bch_cached_dev_error(struct cached_dev *dc)
++{
++	char name[BDEVNAME_SIZE];
++
++	if (!dc || test_bit(BCACHE_DEV_CLOSING, &dc->disk.flags))
++		return false;
++
++	dc->io_disable = true;
++	/* make others know io_disable is true earlier */
++	smp_mb();
++
++	pr_err("stop %s: too many IO errors on backing device %s\n",
++		dc->disk.disk->disk_name, bdevname(dc->bdev, name));
++
++	bcache_device_stop(&dc->disk);
++	return true;
 +}
 +
-+static ssize_t ibnbd_srv_attr_store(struct kobject *kobj,
-+				    struct attribute *attr,
-+				    const char *page, size_t length)
-+{
-+	struct kobj_attribute *kattr;
-+	int ret = -EIO;
+ /* Cache set */
+ 
+ __printf(2, 3)
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index 91d859a54575..e88fdcc549cd 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -141,7 +141,9 @@ SHOW(__bch_cached_dev)
+ 	var_print(writeback_delay);
+ 	var_print(writeback_percent);
+ 	sysfs_hprint(writeback_rate,	dc->writeback_rate.rate << 9);
+-
++	sysfs_hprint(io_errors,		atomic_read(&dc->io_errors));
++	sysfs_printf(io_error_limit,	"%i", dc->error_limit);
++	sysfs_printf(io_disable,	"%i", dc->io_disable);
+ 	var_print(writeback_rate_update_seconds);
+ 	var_print(writeback_rate_i_term_inverse);
+ 	var_print(writeback_rate_p_term_inverse);
+@@ -232,6 +234,14 @@ STORE(__cached_dev)
+ 	d_strtoul(writeback_rate_i_term_inverse);
+ 	d_strtoul_nonzero(writeback_rate_p_term_inverse);
+ 
++	sysfs_strtoul_clamp(io_error_limit, dc->error_limit, 0, INT_MAX);
 +
-+	kattr = container_of(attr, struct kobj_attribute, attr);
-+	if (kattr->store)
-+		ret = kattr->store(kobj, kattr, page, length);
-+	return ret;
-+}
++	if (attr == &sysfs_io_disable) {
++		int v = strtoul_or_return(buf);
 +
-+static const struct sysfs_ops ibnbd_srv_sysfs_ops = {
-+	.show	= ibnbd_srv_attr_show,
-+	.store	= ibnbd_srv_attr_store,
-+};
-+
-+static struct kobj_type ibnbd_srv_dev_ktype = {
-+	.sysfs_ops	= &ibnbd_srv_sysfs_ops,
-+};
-+
-+static struct kobj_type ibnbd_srv_dev_sessions_ktype = {
-+	.sysfs_ops	= &ibnbd_srv_sysfs_ops,
-+};
-+
-+int ibnbd_srv_create_dev_sysfs(struct ibnbd_srv_dev *dev,
-+			       struct block_device *bdev,
-+			       const char *dir_name)
-+{
-+	struct kobject *bdev_kobj;
-+	int ret;
-+
-+	ret = kobject_init_and_add(&dev->dev_kobj, &ibnbd_srv_dev_ktype,
-+				   ibnbd_srv_devices_kobj, dir_name);
-+	if (ret)
-+		return ret;
-+
-+	ret = kobject_init_and_add(&dev->dev_sessions_kobj,
-+				   &ibnbd_srv_dev_sessions_ktype,
-+				   &dev->dev_kobj, "sessions");
-+	if (ret)
-+		goto err;
-+
-+	ret = sysfs_create_group(&dev->dev_kobj,
-+				 &ibnbd_srv_default_dev_attr_group);
-+	if (ret)
-+		goto err2;
-+
-+	bdev_kobj = &disk_to_dev(bdev->bd_disk)->kobj;
-+	ret = sysfs_create_link(&dev->dev_kobj, bdev_kobj, "block_dev");
-+	if (ret)
-+		goto err3;
-+
-+	return 0;
-+
-+err3:
-+	sysfs_remove_group(&dev->dev_kobj,
-+			   &ibnbd_srv_default_dev_attr_group);
-+err2:
-+	kobject_del(&dev->dev_sessions_kobj);
-+	kobject_put(&dev->dev_sessions_kobj);
-+err:
-+	kobject_del(&dev->dev_kobj);
-+	kobject_put(&dev->dev_kobj);
-+	return ret;
-+}
-+
-+void ibnbd_srv_destroy_dev_sysfs(struct ibnbd_srv_dev *dev)
-+{
-+	sysfs_remove_link(&dev->dev_kobj, "block_dev");
-+	sysfs_remove_group(&dev->dev_kobj, &ibnbd_srv_default_dev_attr_group);
-+	kobject_del(&dev->dev_sessions_kobj);
-+	kobject_put(&dev->dev_sessions_kobj);
-+	kobject_del(&dev->dev_kobj);
-+	kobject_put(&dev->dev_kobj);
-+}
-+
-+static ssize_t ibnbd_srv_dev_session_ro_show(struct kobject *kobj,
-+					     struct kobj_attribute *attr,
-+					     char *page)
-+{
-+	struct ibnbd_srv_sess_dev *sess_dev;
-+
-+	sess_dev = container_of(kobj, struct ibnbd_srv_sess_dev, kobj);
-+
-+	return scnprintf(page, PAGE_SIZE, "%s\n",
-+			 (sess_dev->open_flags & FMODE_WRITE) ? "0" : "1");
-+}
-+
-+static struct kobj_attribute ibnbd_srv_dev_session_ro_attr =
-+	__ATTR(read_only, 0444,
-+	       ibnbd_srv_dev_session_ro_show,
-+	       NULL);
-+
-+static ssize_t
-+ibnbd_srv_dev_session_mapping_path_show(struct kobject *kobj,
-+					struct kobj_attribute *attr, char *page)
-+{
-+	struct ibnbd_srv_sess_dev *sess_dev;
-+
-+	sess_dev = container_of(kobj, struct ibnbd_srv_sess_dev, kobj);
-+
-+	return scnprintf(page, PAGE_SIZE, "%s\n", sess_dev->pathname);
-+}
-+
-+static struct kobj_attribute ibnbd_srv_dev_session_mapping_path_attr =
-+	__ATTR(mapping_path, 0444,
-+	       ibnbd_srv_dev_session_mapping_path_show,
-+	       NULL);
-+
-+static struct attribute *ibnbd_srv_default_dev_sessions_attrs[] = {
-+	&ibnbd_srv_dev_session_ro_attr.attr,
-+	&ibnbd_srv_dev_session_mapping_path_attr.attr,
-+	NULL,
-+};
-+
-+static struct attribute_group ibnbd_srv_default_dev_session_attr_group = {
-+	.attrs = ibnbd_srv_default_dev_sessions_attrs,
-+};
-+
-+void ibnbd_srv_destroy_dev_session_sysfs(struct ibnbd_srv_sess_dev *sess_dev)
-+{
-+	DECLARE_COMPLETION_ONSTACK(sysfs_compl);
-+
-+	sysfs_remove_group(&sess_dev->kobj,
-+			   &ibnbd_srv_default_dev_session_attr_group);
-+
-+	sess_dev->sysfs_release_compl = &sysfs_compl;
-+	kobject_del(&sess_dev->kobj);
-+	kobject_put(&sess_dev->kobj);
-+	wait_for_completion(&sysfs_compl);
-+}
-+
-+static void ibnbd_srv_sess_dev_release(struct kobject *kobj)
-+{
-+	struct ibnbd_srv_sess_dev *sess_dev;
-+
-+	sess_dev = container_of(kobj, struct ibnbd_srv_sess_dev, kobj);
-+	if (sess_dev->sysfs_release_compl)
-+		complete_all(sess_dev->sysfs_release_compl);
-+}
-+
-+static struct kobj_type ibnbd_srv_sess_dev_ktype = {
-+	.sysfs_ops	= &ibnbd_srv_sysfs_ops,
-+	.release	= ibnbd_srv_sess_dev_release,
-+};
-+
-+int ibnbd_srv_create_dev_session_sysfs(struct ibnbd_srv_sess_dev *sess_dev)
-+{
-+	int ret;
-+
-+	ret = kobject_init_and_add(&sess_dev->kobj, &ibnbd_srv_sess_dev_ktype,
-+				   &sess_dev->dev->dev_sessions_kobj, "%s",
-+				   sess_dev->sess->sessname);
-+	if (ret)
-+		return ret;
-+
-+	ret = sysfs_create_group(&sess_dev->kobj,
-+				 &ibnbd_srv_default_dev_session_attr_group);
-+	if (ret)
-+		goto err;
-+
-+	return 0;
-+
-+err:
-+	kobject_del(&sess_dev->kobj);
-+	kobject_put(&sess_dev->kobj);
-+
-+	return ret;
-+}
-+
-+int ibnbd_srv_create_sysfs_files(void)
-+{
-+	int err;
-+
-+	ibnbd_srv_kobj = kobject_create_and_add(KBUILD_MODNAME, kernel_kobj);
-+	if (!ibnbd_srv_kobj)
-+		return -ENOMEM;
-+
-+	ibnbd_srv_devices_kobj = kobject_create_and_add("devices",
-+							ibnbd_srv_kobj);
-+	if (!ibnbd_srv_devices_kobj) {
-+		err = -ENOMEM;
-+		goto err;
++		dc->io_disable = v ? 1 : 0;
 +	}
 +
-+	return 0;
-+
-+err:
-+	kobject_put(ibnbd_srv_kobj);
-+	return err;
-+}
-+
-+void ibnbd_srv_destroy_sysfs_files(void)
-+{
-+	kobject_put(ibnbd_srv_devices_kobj);
-+	kobject_put(ibnbd_srv_kobj);
-+}
+ 	d_strtoi_h(sequential_cutoff);
+ 	d_strtoi_h(readahead);
+ 
+@@ -349,6 +359,9 @@ static struct attribute *bch_cached_dev_files[] = {
+ 	&sysfs_writeback_rate_i_term_inverse,
+ 	&sysfs_writeback_rate_p_term_inverse,
+ 	&sysfs_writeback_rate_debug,
++	&sysfs_errors,
++	&sysfs_io_error_limit,
++	&sysfs_io_disable,
+ 	&sysfs_dirty_data,
+ 	&sysfs_stripe_size,
+ 	&sysfs_partial_stripes_expensive,
 -- 
-2.13.1
+2.16.1
