@@ -1,174 +1,203 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f66.google.com ([209.85.160.66]:34973 "EHLO
-        mail-pl0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751410AbeBWNQi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Feb 2018 08:16:38 -0500
-Date: Fri, 23 Feb 2018 18:46:32 +0530
-From: Aishwarya Pant <aishpant@gmail.com>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        Greg KH <gregkh@linuxfoundation.org>
-Cc: Julia Lawall <julia.lawall@lip6.fr>
-Subject: [RESEND PATCH v2] Documentation/ABI: clean up sysfs-class-pktcdvd
-Message-ID: <20180223131632.GA21867@mordor.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Received: from mx2.suse.de ([195.135.220.15]:35972 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752439AbeBFQFk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 6 Feb 2018 11:05:40 -0500
+From: Jan Kara <jack@suse.cz>
+To: <linux-block@vger.kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Hou Tao <houtao1@huawei.com>,
+        Eric Biggers <ebiggers3@gmail.com>, Jan Kara <jack@suse.cz>
+Subject: [PATCH 2/6] genhd: Rename get_disk() to get_disk_and_module()
+Date: Tue,  6 Feb 2018 17:05:25 +0100
+Message-Id: <20180206160529.20713-3-jack@suse.cz>
+In-Reply-To: <20180206160529.20713-1-jack@suse.cz>
+References: <20180206160529.20713-1-jack@suse.cz>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Clean up the sysfs documentation such that it is in the same format as
-described in Documentation/ABI/README. Mainly, the patch moves the
-attribute names to the 'What:' field. This might be useful for scripting
-and tracking changes in the ABI.
+Rename get_disk() to get_disk_and_module() to make sure what the
+function does. It's not a great name but at least it is now clear that
+put_disk() is not it's counterpart.
 
-Signed-off-by: Aishwarya Pant <aishpant@gmail.com>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
-Changes in v2:
-- Convert spaces to tabs
+ block/genhd.c           | 10 ++++------
+ drivers/block/amiflop.c |  2 +-
+ drivers/block/ataflop.c |  2 +-
+ drivers/block/brd.c     |  2 +-
+ drivers/block/floppy.c  |  2 +-
+ drivers/block/loop.c    |  2 +-
+ drivers/block/swim.c    |  2 +-
+ drivers/block/z2ram.c   |  2 +-
+ drivers/ide/ide-probe.c |  2 +-
+ include/linux/genhd.h   |  2 +-
+ 10 files changed, 13 insertions(+), 15 deletions(-)
 
- Documentation/ABI/testing/sysfs-class-pktcdvd | 129 +++++++++++++++-----------
- 1 file changed, 75 insertions(+), 54 deletions(-)
-
-diff --git a/Documentation/ABI/testing/sysfs-class-pktcdvd b/Documentation/ABI/testing/sysfs-class-pktcdvd
-index b1c3f0263359..dde4f26d0780 100644
---- a/Documentation/ABI/testing/sysfs-class-pktcdvd
-+++ b/Documentation/ABI/testing/sysfs-class-pktcdvd
-@@ -1,60 +1,81 @@
--What:           /sys/class/pktcdvd/
--Date:           Oct. 2006
--KernelVersion:  2.6.20
--Contact:        Thomas Maier <balagi@justmail.de>
--Description:
--
- sysfs interface
- ---------------
-+The pktcdvd module (packet writing driver) creates the following files in the
-+sysfs: (<devid> is in the format major:minor)
-+
-+What:		/sys/class/pktcdvd/add
-+What:		/sys/class/pktcdvd/remove
-+What:		/sys/class/pktcdvd/device_map
-+Date:		Oct. 2006
-+KernelVersion:	2.6.20
-+Contact:	Thomas Maier <balagi@justmail.de>
-+Description:
-+
-+		add:		(WO) Write a block device id (major:minor) to
-+				create a new pktcdvd device and map it to the
-+				block device.
-+
-+		remove:		(WO) Write the pktcdvd device id (major:minor)
-+				to remove the pktcdvd device.
-+
-+		device_map:	(RO) Shows the device mapping in format:
-+				pktcdvd[0-7] <pktdevid> <blkdevid>
-+
-+
-+What:		/sys/class/pktcdvd/pktcdvd[0-7]/dev
-+What:		/sys/class/pktcdvd/pktcdvd[0-7]/uevent
-+Date:		Oct. 2006
-+KernelVersion:	2.6.20
-+Contact:	Thomas Maier <balagi@justmail.de>
-+Description:
-+		dev:	(RO) Device id
-+
-+		uevent:	(WO) To send a uevent
-+
-+
-+What:		/sys/class/pktcdvd/pktcdvd[0-7]/stat/packets_started
-+What:		/sys/class/pktcdvd/pktcdvd[0-7]/stat/packets_finished
-+What:		/sys/class/pktcdvd/pktcdvd[0-7]/stat/kb_written
-+What:		/sys/class/pktcdvd/pktcdvd[0-7]/stat/kb_read
-+What:		/sys/class/pktcdvd/pktcdvd[0-7]/stat/kb_read_gather
-+What:		/sys/class/pktcdvd/pktcdvd[0-7]/stat/reset
-+Date:		Oct. 2006
-+KernelVersion:	2.6.20
-+Contact:	Thomas Maier <balagi@justmail.de>
-+Description:
-+		packets_started:	(RO) Number of started packets.
-+
-+		packets_finished:	(RO) Number of finished packets.
-+
-+		kb_written:		(RO) kBytes written.
-+
-+		kb_read:		(RO) kBytes read.
-+
-+		kb_read_gather:		(RO) kBytes read to fill write packets.
-+
-+		reset:			(WO) Write any value to it to reset
-+					pktcdvd device statistic values, like
-+					bytes read/written.
-+
-+
-+What:		/sys/class/pktcdvd/pktcdvd[0-7]/write_queue/size
-+What:		/sys/class/pktcdvd/pktcdvd[0-7]/write_queue/congestion_off
-+What:		/sys/class/pktcdvd/pktcdvd[0-7]/write_queue/congestion_on
-+Date:		Oct. 2006
-+KernelVersion:	2.6.20
-+Contact:	Thomas Maier <balagi@justmail.de>
-+Description:
-+		size:		(RO) Contains the size of the bio write queue.
-+
-+		congestion_off:	(RW) If bio write queue size is below this mark,
-+				accept new bio requests from the block layer.
+diff --git a/block/genhd.c b/block/genhd.c
+index 22f4fc340a3a..058cf91f8d32 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -547,7 +547,7 @@ static int exact_lock(dev_t devt, void *data)
+ {
+ 	struct gendisk *p = data;
  
--The pktcdvd module (packet writing driver) creates
--these files in the sysfs:
--(<devid> is in format  major:minor )
--
--/sys/class/pktcdvd/
--    add            (0200)  Write a block device id (major:minor)
--                           to create a new pktcdvd device and map
--                           it to the block device.
--
--    remove         (0200)  Write the pktcdvd device id (major:minor)
--                           to it to remove the pktcdvd device.
--
--    device_map     (0444)  Shows the device mapping in format:
--                             pktcdvd[0-7] <pktdevid> <blkdevid>
--
--/sys/class/pktcdvd/pktcdvd[0-7]/
--    dev                   (0444) Device id
--    uevent                (0200) To send an uevent.
--
--/sys/class/pktcdvd/pktcdvd[0-7]/stat/
--    packets_started       (0444) Number of started packets.
--    packets_finished      (0444) Number of finished packets.
--
--    kb_written            (0444) kBytes written.
--    kb_read               (0444) kBytes read.
--    kb_read_gather        (0444) kBytes read to fill write packets.
--
--    reset                 (0200) Write any value to it to reset
--                                 pktcdvd device statistic values, like
--                                 bytes read/written.
--
--/sys/class/pktcdvd/pktcdvd[0-7]/write_queue/
--    size                  (0444) Contains the size of the bio write
--                                 queue.
--
--    congestion_off        (0644) If bio write queue size is below
--                                 this mark, accept new bio requests
--                                 from the block layer.
--
--    congestion_on         (0644) If bio write queue size is higher
--                                 as this mark, do no longer accept
--                                 bio write requests from the block
--                                 layer and wait till the pktcdvd
--                                 device has processed enough bio's
--                                 so that bio write queue size is
--                                 below congestion off mark.
--                                 A value of <= 0 disables congestion
--                                 control.
-+		congestion_on:	(RW) If bio write queue size is higher as this
-+				mark, do no longer accept bio write requests
-+				from the block layer and wait till the pktcdvd
-+				device has processed enough bio's so that bio
-+				write queue size is below congestion off mark.
-+				A value of <= 0 disables congestion control.
+-	if (!get_disk(p))
++	if (!get_disk_and_module(p))
+ 		return -1;
+ 	return 0;
+ }
+@@ -794,7 +794,7 @@ struct gendisk *get_gendisk(dev_t devt, int *partno)
  
+ 		spin_lock_bh(&ext_devt_lock);
+ 		part = idr_find(&ext_devt_idr, blk_mangle_minor(MINOR(devt)));
+-		if (part && get_disk(part_to_disk(part))) {
++		if (part && get_disk_and_module(part_to_disk(part))) {
+ 			*partno = part->partno;
+ 			disk = part_to_disk(part);
+ 		}
+@@ -1441,7 +1441,7 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
+ }
+ EXPORT_SYMBOL(__alloc_disk_node);
  
- Example:
+-struct kobject *get_disk(struct gendisk *disk)
++struct kobject *get_disk_and_module(struct gendisk *disk)
+ {
+ 	struct module *owner;
+ 	struct kobject *kobj;
+@@ -1459,15 +1459,13 @@ struct kobject *get_disk(struct gendisk *disk)
+ 	return kobj;
+ 
+ }
+-
+-EXPORT_SYMBOL(get_disk);
++EXPORT_SYMBOL(get_disk_and_module);
+ 
+ void put_disk(struct gendisk *disk)
+ {
+ 	if (disk)
+ 		kobject_put(&disk_to_dev(disk)->kobj);
+ }
+-
+ EXPORT_SYMBOL(put_disk);
+ 
+ static void set_disk_ro_uevent(struct gendisk *gd, int ro)
+diff --git a/drivers/block/amiflop.c b/drivers/block/amiflop.c
+index e5aa62fcf5a8..3aaf6af3ec23 100644
+--- a/drivers/block/amiflop.c
++++ b/drivers/block/amiflop.c
+@@ -1758,7 +1758,7 @@ static struct kobject *floppy_find(dev_t dev, int *part, void *data)
+ 	if (unit[drive].type->code == FD_NODRIVE)
+ 		return NULL;
+ 	*part = 0;
+-	return get_disk(unit[drive].gendisk);
++	return get_disk_and_module(unit[drive].gendisk);
+ }
+ 
+ static int __init amiga_floppy_probe(struct platform_device *pdev)
+diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
+index 8bc3b9fd8dd2..dfb2c2622e5a 100644
+--- a/drivers/block/ataflop.c
++++ b/drivers/block/ataflop.c
+@@ -1917,7 +1917,7 @@ static struct kobject *floppy_find(dev_t dev, int *part, void *data)
+ 	if (drive >= FD_MAX_UNITS || type > NUM_DISK_MINORS)
+ 		return NULL;
+ 	*part = 0;
+-	return get_disk(unit[drive].disk);
++	return get_disk_and_module(unit[drive].disk);
+ }
+ 
+ static int __init atari_floppy_init (void)
+diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+index 8028a3a7e7fd..deea78e485da 100644
+--- a/drivers/block/brd.c
++++ b/drivers/block/brd.c
+@@ -456,7 +456,7 @@ static struct kobject *brd_probe(dev_t dev, int *part, void *data)
+ 
+ 	mutex_lock(&brd_devices_mutex);
+ 	brd = brd_init_one(MINOR(dev) / max_part, &new);
+-	kobj = brd ? get_disk(brd->brd_disk) : NULL;
++	kobj = brd ? get_disk_and_module(brd->brd_disk) : NULL;
+ 	mutex_unlock(&brd_devices_mutex);
+ 
+ 	if (new)
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index eae484acfbbc..8ec7235fc93b 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -4505,7 +4505,7 @@ static struct kobject *floppy_find(dev_t dev, int *part, void *data)
+ 	if (((*part >> 2) & 0x1f) >= ARRAY_SIZE(floppy_type))
+ 		return NULL;
+ 	*part = 0;
+-	return get_disk(disks[drive]);
++	return get_disk_and_module(disks[drive]);
+ }
+ 
+ static int __init do_floppy_init(void)
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index d5fe720cf149..87855b5123a6 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1922,7 +1922,7 @@ static struct kobject *loop_probe(dev_t dev, int *part, void *data)
+ 	if (err < 0)
+ 		kobj = NULL;
+ 	else
+-		kobj = get_disk(lo->lo_disk);
++		kobj = get_disk_and_module(lo->lo_disk);
+ 	mutex_unlock(&loop_index_mutex);
+ 
+ 	*part = 0;
+diff --git a/drivers/block/swim.c b/drivers/block/swim.c
+index 84434d3ea19b..64e066eba72e 100644
+--- a/drivers/block/swim.c
++++ b/drivers/block/swim.c
+@@ -799,7 +799,7 @@ static struct kobject *floppy_find(dev_t dev, int *part, void *data)
+ 		return NULL;
+ 
+ 	*part = 0;
+-	return get_disk(swd->unit[drive].disk);
++	return get_disk_and_module(swd->unit[drive].disk);
+ }
+ 
+ static int swim_add_floppy(struct swim_priv *swd, enum drive_location location)
+diff --git a/drivers/block/z2ram.c b/drivers/block/z2ram.c
+index 41c95c9b2ab4..8f9130ab5887 100644
+--- a/drivers/block/z2ram.c
++++ b/drivers/block/z2ram.c
+@@ -332,7 +332,7 @@ static const struct block_device_operations z2_fops =
+ static struct kobject *z2_find(dev_t dev, int *part, void *data)
+ {
+ 	*part = 0;
+-	return get_disk(z2ram_gendisk);
++	return get_disk_and_module(z2ram_gendisk);
+ }
+ 
+ static struct request_queue *z2_queue;
+diff --git a/drivers/ide/ide-probe.c b/drivers/ide/ide-probe.c
+index 17fd55af4d92..caa20eb5f26b 100644
+--- a/drivers/ide/ide-probe.c
++++ b/drivers/ide/ide-probe.c
+@@ -928,7 +928,7 @@ static int exact_lock(dev_t dev, void *data)
+ {
+ 	struct gendisk *p = data;
+ 
+-	if (!get_disk(p))
++	if (!get_disk_and_module(p))
+ 		return -1;
+ 	return 0;
+ }
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 5144ebe046c9..12402912a86a 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -595,7 +595,7 @@ extern void delete_partition(struct gendisk *, int);
+ extern void printk_all_partitions(void);
+ 
+ extern struct gendisk *__alloc_disk_node(int minors, int node_id);
+-extern struct kobject *get_disk(struct gendisk *disk);
++extern struct kobject *get_disk_and_module(struct gendisk *disk);
+ extern void put_disk(struct gendisk *disk);
+ extern void blk_register_region(dev_t devt, unsigned long range,
+ 			struct module *module,
 -- 
-2.16.2
+2.13.6
