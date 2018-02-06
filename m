@@ -1,48 +1,182 @@
-Return-Path: <prvs=5689bd51d=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "danil.kipnis@profitbricks.com" <danil.kipnis@profitbricks.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"hch@infradead.org" <hch@infradead.org>, "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>, "roman.penyaev@profitbricks.com"
-	<roman.penyaev@profitbricks.com>, "jinpu.wang@profitbricks.com"
-	<jinpu.wang@profitbricks.com>, "sagi@grimberg.me" <sagi@grimberg.me>,
-	"ogerlitz@mellanox.com" <ogerlitz@mellanox.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
+Return-Path: <roman.penyaev@profitbricks.com>
+MIME-Version: 1.0
+In-Reply-To: <23dcfda7-eac1-ed13-b24e-3586c284ee55@grimberg.me>
+References: <20180202140904.2017-1-roman.penyaev@profitbricks.com> <23dcfda7-eac1-ed13-b24e-3586c284ee55@grimberg.me>
+From: Roman Penyaev <roman.penyaev@profitbricks.com>
+Date: Tue, 6 Feb 2018 14:12:35 +0100
+Message-ID: <CAJrWOzDmU_RWxaY+eXjZ3Az162gr9Bax8=5+1FYj4vzYDoxp7g@mail.gmail.com>
 Subject: Re: [PATCH 00/24] InfiniBand Transport (IBTRS) and Network Block
  Device (IBNBD)
-Date: Tue, 6 Feb 2018 15:35:44 +0000
-Message-ID: <1517931342.3934.16.camel@wdc.com>
-References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
-	 <1517591106.2675.28.camel@sandisk.com>
-	 <CAMGffEkhqR9Z5bkMfnVn8an2OUM8k+jYoR5EFdtv3k9en1bh=w@mail.gmail.com>
-	 <40a7fc35-f86c-1d9d-f057-e5822708fc32@grimberg.me>
-	 <CAHg0HuxawAjCf711gkKKiQbbLskNsvUDhP+m32oiGFsY2BRz5g@mail.gmail.com>
-	 <41347a8d-8a3b-c35f-801c-b4b21c37f285@grimberg.me>
-	 <CAHg0HuxtvRvPcX8yZxcwSSP5XK6ZnLbxBkpx+X7QyDZtny3XZA@mail.gmail.com>
-	 <9abc87a6-cb47-d3bf-65c6-6f386401bdb9@wdc.com>
-	 <CAHg0Huxejb065yVRLquNUKDZHB=NhuCBOnkgE-Q4FW3_Y-A_rQ@mail.gmail.com>
-In-Reply-To: <CAHg0Huxejb065yVRLquNUKDZHB=NhuCBOnkgE-Q4FW3_Y-A_rQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+	Bart Van Assche <bart.vanassche@sandisk.com>, Or Gerlitz <ogerlitz@mellanox.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>, Jack Wang <jinpu.wang@profitbricks.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE4LTAyLTA2IGF0IDEwOjQ0ICswMTAwLCBEYW5pbCBLaXBuaXMgd3JvdGU6DQo+
-IHRoZSBjb25maWd1cmF0aW9uICh3aGljaCBkZXZpY2VzIGNhbiBiZSBhY2Nlc3NlZCBieSBhIHBh
-cnRpY3VsYXINCj4gY2xpZW50KSBjYW4gaGFwcGVuIGFsc28gYWZ0ZXIgdGhlIGtlcm5lbCB0YXJn
-ZXQgbW9kdWxlIGlzIGxvYWRlZC4gVGhlDQo+IGRpcmVjdG9yeSBpbiA8ZGV2X3NlYXJjaF9wYXRo
-PiBpcyBhIG1vZHVsZSBwYXJhbWV0ZXIgYW5kIGlzIGZpeGVkLiBJdA0KPiBjb250YWlucyBmb3Ig
-ZXhhbXBsZSAiL2libmJkX2RldmljZXMvIi4gQnV0IGEgcGFydGljdWxhciBjbGllbnQgWA0KPiB3
-b3VsZCBiZSBhYmxlIHRvIG9ubHkgYWNjZXNzIHRoZSBkZXZpY2VzIGxvY2F0ZWQgaW4gdGhlIHN1
-YmRpcmVjdG9yeQ0KPiAiL2libmJkX2RldmljZXMvY2xpZW50X3gvIi4gKFRoZSBzZXNzaW9ubmFt
-ZSBoZXJlIGlzIGNsaWVudF94KSBPbmUgY2FuDQo+IGFkZCBvciByZW1vdmUgdGhlIGRldmljZXMg
-ZnJvbSB0aGF0IGRpcmVjdG9yeSAodGhvc2UgYXJlIGp1c3Qgc3ltbGlua3MNCj4gdG8gL2Rldi94
-eHgpIGF0IGFueSB0aW1lIC0gYmVmb3JlIG9yIGFmdGVyIHRoZSBzZXJ2ZXIgbW9kdWxlIGlzDQo+
-IGxvYWRlZC4gQnV0IHlvdSBhcmUgcmlnaHQsIHdlIG5lZWQgc29tZXRoaW5nIGFkZGl0aW9uYWwg
-aW4gb3JkZXIgdG8gYmUNCj4gYWJsZSB0byBzcGVjaWZ5IHdoaWNoIGRldmljZXMgYSBjbGllbnQg
-Y2FuIGFjY2VzcyB3cml0YWJsZSBhbmQgd2hpY2gNCj4gcmVhZG9ubHkuIE1heSBiZSBhbm90aGVy
-IHN1YmRpcmVjdG9yaWVzICJ3ciIgYW5kICJybyIgZm9yIGVhY2ggY2xpZW50Og0KPiB0aG9zZSB1
-bmRlciAvaWJuYmRfZGV2aWNlcy9jbGllbnRfeC9yby8gY2FuIG9ubHkgYmUgcmVhZCBieSBjbGll
-bnRfeA0KPiBhbmQgdGhvc2UgaW4gL2libmJkX2RldmljZXMvY2xpZW50X3gvd3IvIGNhbiBhbHNv
-IGJlIHdyaXR0ZW4gdG8/DQoNClBsZWFzZSB1c2UgYSBzdGFuZGFyZCBrZXJuZWwgZmlsZXN5c3Rl
-bSAoc3lzZnMgb3IgY29uZmlnZnMpIGluc3RlYWQgb2YNCnJlaW52ZW50aW5nIGl0Lg0KDQpUaGFu
-a3MsDQoNCkJhcnQu
+Hi Sagi,
+
+On Mon, Feb 5, 2018 at 1:16 PM, Sagi Grimberg <sagi@grimberg.me> wrote:
+> Hi Roman and the team,
+>
+> On 02/02/2018 04:08 PM, Roman Pen wrote:
+>>
+>> This series introduces IBNBD/IBTRS modules.
+>>
+>> IBTRS (InfiniBand Transport) is a reliable high speed transport library
+>> which allows for establishing connection between client and server
+>> machines via RDMA.
+>
+>
+> So its not strictly infiniband correct?
+
+This is RDMA.  Original IB prefix is a bit confusing, that's true.
+
+>  It is optimized to transfer (read/write) IO blocks
+>>
+>> in the sense that it follows the BIO semantics of providing the
+>> possibility to either write data from a scatter-gather list to the
+>> remote side or to request ("read") data transfer from the remote side
+>> into a given set of buffers.
+>>
+>> IBTRS is multipath capable and provides I/O fail-over and load-balancing
+>> functionality.
+>
+>
+> Couple of questions on your multipath implementation?
+> 1. What was your main objective over dm-multipath?
+
+No objections, mpath is a part of the transport ibtrs library.
+
+> 2. What was the consideration of this implementation over
+> creating a stand-alone bio based device node to reinject the
+> bio to the original block device?
+
+ibnbd and ibtrs are separate, on fail-over or load-balancing
+we work with IO requests inside a library.
+
+>> IBNBD (InfiniBand Network Block Device) is a pair of kernel modules
+>> (client and server) that allow for remote access of a block device on
+>> the server over IBTRS protocol. After being mapped, the remote block
+>> devices can be accessed on the client side as local block devices.
+>> Internally IBNBD uses IBTRS as an RDMA transport library.
+>>
+>> Why?
+>>
+>>     - IBNBD/IBTRS is developed in order to map thin provisioned volumes,
+>>       thus internal protocol is simple and consists of several request
+>>          types only without awareness of underlaying hardware devices.
+>
+>
+> Can you explain how the protocol is developed for thin-p? What are the
+> essence of how its suited for it?
+
+Here I wanted to emphasize, that we do not support any HW commands,
+like nvme does, thus internal protocol consists of several commands.
+So answering on your question "how the protocol is developed for thin-p"
+I would put it another way around: "protocol does nothing to support
+real device, because all we need is to map thin-p volumes".  It is just
+simpler.
+
+>>     - IBTRS was developed as an independent RDMA transport library, which
+>>       supports fail-over and load-balancing policies using multipath, thus
+>>          it can be used for any other IO needs rather than only for block
+>>          device.
+>
+>
+> What do you mean by "any other IO"?
+
+I mean other IO producers, not only ibnbd, since this is just a transport
+library.
+
+>
+>>     - IBNBD/IBTRS is faster than NVME over RDMA.  Old comparison results:
+>>       https://www.spinics.net/lists/linux-rdma/msg48799.html
+>>       (I retested on latest 4.14 kernel - there is no any significant
+>>           difference, thus I post the old link).
+>
+>
+> That is interesting to learn.
+>
+> Reading your reference brings a couple of questions though,
+> - Its unclear to me how ibnbd performs reads without performing memory
+>   registration. Is it using the global dma rkey?
+
+Yes, global rkey.
+
+WRITE: writes from client
+READ: writes from server
+
+> - Its unclear to me how there is a difference in noreg in writes,
+>   because for small writes nvme-rdma never register memory (it uses
+>   inline data).
+
+No support for that.
+
+> - Looks like with nvme-rdma you max out your iops at 1.6 MIOPs, that
+>   seems considerably low against other reports. Can you try and explain
+>   what was the bottleneck? This can be a potential bug and I (and the
+>   rest of the community is interesting in knowing more details).
+
+Sure, I can try.  BTW, what are other reports and numbers?
+
+> - srp/scst comparison is really not fair having it in legacy request
+>   mode. Can you please repeat it and report a bug to either linux-rdma
+>   or to the scst mailing list?
+
+Yep, I can retest with mq.
+
+> - Your latency measurements are surprisingly high for a null target
+>   device (even for low end nvme device actually) regardless of the
+>   transport implementation.
+
+Hm, network configuration?  These are results on machines dedicated
+to our team for testing in one of our datacenters. Nothing special
+in configuration.
+
+> For example:
+> - QD=1 read latency is 648.95 for ibnbd (I assume usecs right?) which is
+>   fairly high. on nvme-rdma its 1058 us, which means over 1 millisecond
+>   and even 1.254 ms for srp. Last time I tested nvme-rdma read QD=1
+>   latency I got ~14 us. So something does not add up here. If this is
+>   not some configuration issue, then we have serious bugs to handle..
+>
+> - QD=16 the read latencies are > 10ms for null devices?! I'm having
+>   troubles understanding how you were able to get such high latencies
+>   (> 100 ms for QD>=100)
+
+What QD stands for? queue depth?  This is not a queue depth, this is
+how many fio jobs are dedicated.
+
+And regarding latencies: I can suspect only network configuration.
+
+
+> Can you share more information about your setup? It would really help
+> us understand more.
+
+Everything is specified in the google doc sheet.  Also you can
+download the fio files, links are also provided, at the bottom.
+
+https://www.spinics.net/lists/linux-rdma/msg48799.html
+
+
+[1] FIO runner and results extractor script:
+    https://drive.google.com/open?id=0B8_SivzwHdgSS2RKcmc4bWg0YjA
+
+[2] Archive with FIO configurations and results:
+    https://drive.google.com/open?id=0B8_SivzwHdgSaDlhMXV6THhoRXc
+
+[3] Google sheet with performance measurements:
+    https://drive.google.com/open?id=1sCTBKLA5gbhhkgd2USZXY43VL3zLidzdqDeObZn9Edc
+
+[4] NVMEoF configuration:
+    https://drive.google.com/open?id=0B8_SivzwHdgSTzRjbGtmaVR6LWM
+
+[5] SCST configuration:
+    https://drive.google.com/open?id=0B8_SivzwHdgSM1B5eGpKWmFJMFk
+
+
+
+--
+Roman
