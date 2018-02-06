@@ -1,596 +1,269 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f194.google.com ([209.85.128.194]:36827 "EHLO
-        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752016AbeBBOKw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Feb 2018 09:10:52 -0500
-Received: by mail-wr0-f194.google.com with SMTP id y3so12850656wrh.3
-        for <linux-block@vger.kernel.org>; Fri, 02 Feb 2018 06:10:51 -0800 (PST)
-From: Roman Pen <roman.penyaev@profitbricks.com>
-To: linux-block@vger.kernel.org, linux-rdma@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bart.vanassche@sandisk.com>,
-        Or Gerlitz <ogerlitz@mellanox.com>,
-        Roman Pen <roman.penyaev@profitbricks.com>,
-        Danil Kipnis <danil.kipnis@profitbricks.com>,
-        Jack Wang <jinpu.wang@profitbricks.com>
-Subject: [PATCH 07/24] ibtrs: client: sysfs interface functions
-Date: Fri,  2 Feb 2018 15:08:47 +0100
-Message-Id: <20180202140904.2017-8-roman.penyaev@profitbricks.com>
-In-Reply-To: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
-References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
+Received: from mx2.suse.de ([195.135.220.15]:36699 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752403AbeBFLXR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 6 Feb 2018 06:23:17 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Nix <nix@esperi.org.uk>, Pavel Goran <via-bcache@pvgoran.name>,
+        Michael Lyle <mlyle@lyle.org>,
+        Junhui Tang <tang.junhui@zte.com.cn>,
+        Hannes Reinecke <hare@suse.com>
+Subject: [PATCH v5 06/10] bcache: add stop_when_cache_set_failed option to backing device
+Date: Tue,  6 Feb 2018 19:23:06 +0800
+Message-Id: <20180206112306.83290-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This is the sysfs interface to IBTRS sessions on client side:
+When there are too many I/O errors on cache device, current bcache code
+will retire the whole cache set, and detach all bcache devices. But the
+detached bcache devices are not stopped, which is problematic when bcache
+is in writeback mode.
 
-  /sys/kernel/ibtrs_client/<SESS-NAME>/
-    *** IBTRS session created by ibtrs_clt_open() API call
-    |
-    |- max_reconnect_attempts
-    |  *** number of reconnect attempts for session
-    |
-    |- add_path
-    |  *** adds another connection path into IBTRS session
-    |
-    |- paths/<DEST-IP>/
-       *** established paths to server in a session
-       |
-       |- disconnect
-       |  *** disconnect path
-       |
-       |- reconnect
-       |  *** reconnect path
-       |
-       |- remove_path
-       |  *** remove current path
-       |
-       |- state
-       |  *** retrieve current path state
-       |
-       |- stats/
-          *** current path statistics
-          |
-	  |- cpu_migration
-	  |- rdma
-	  |- rdma_lat
-	  |- reconnects
-	  |- reset_all
-	  |- sg_entries
-	  |- wc_completions
+If the retired cache set has dirty data of backing devices, continue
+writing to bcache device will write to backing device directly. If the
+LBA of write request has a dirty version cached on cache device, next time
+when the cache device is re-registered and backing device re-attached to
+it again, the stale dirty data on cache device will be written to backing
+device, and overwrite latest directly written data. This situation causes
+a quite data corruption.
 
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
-Cc: Jack Wang <jinpu.wang@profitbricks.com>
+But we cannot simply stop all attached bcache devices when the cache set is
+broken or disconnected. For example, use bcache to accelerate performance
+of an email service. In such workload, if cache device is broken but no
+dirty data lost, keep the bcache device alive and permit email service
+continue to access user data might be a better solution for the cache
+device failure.
+
+Nix <nix@esperi.org.uk> points out the issue and provides the above example
+to explain why it might be necessary to not stop bcache device for broken
+cache device. Pavel Goran <via-bcache@pvgoran.name> provides a brilliant
+suggestion to provide "always" and "auto" options to per-cached device
+sysfs file stop_when_cache_set_failed. If cache set is retiring and the
+backing device has no dirty data on cache, it should be safe to keep the
+bcache device alive. In this case, if stop_when_cache_set_failed is set to
+"auto", the device failure handling code will not stop this bcache device
+and permit application to access the backing device with a unattached
+bcache device.
+
+Changelog:
+v3: fix typos pointed out by Nix.
+v2: change option values of stop_when_cache_set_failed from 1/0 to
+    "auto"/"always".
+v1: initial version, stop_when_cache_set_failed can be 0 (not stop) or 1
+    (always stop).
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Cc: Nix <nix@esperi.org.uk>
+Cc: Pavel Goran <via-bcache@pvgoran.name>
+Cc: Michael Lyle <mlyle@lyle.org>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
+Cc: Hannes Reinecke <hare@suse.com>
 ---
- drivers/infiniband/ulp/ibtrs/ibtrs-clt-sysfs.c | 519 +++++++++++++++++++++++++
- 1 file changed, 519 insertions(+)
+ drivers/md/bcache/bcache.h |  9 +++++
+ drivers/md/bcache/super.c  | 82 ++++++++++++++++++++++++++++++++++++++++------
+ drivers/md/bcache/sysfs.c  | 17 ++++++++++
+ 3 files changed, 98 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/infiniband/ulp/ibtrs/ibtrs-clt-sysfs.c b/drivers/infiniband/ulp/ibtrs/ibtrs-clt-sysfs.c
-new file mode 100644
-index 000000000000..04949d6d796b
---- /dev/null
-+++ b/drivers/infiniband/ulp/ibtrs/ibtrs-clt-sysfs.c
-@@ -0,0 +1,519 @@
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 7917b3820dd5..263164490833 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -287,6 +287,12 @@ struct io {
+ 	sector_t		last;
+ };
+ 
++enum stop_on_failure {
++	BCH_CACHED_DEV_STOP_AUTO = 0,
++	BCH_CACHED_DEV_STOP_ALWAYS,
++	BCH_CACHED_DEV_STOP_MODE_MAX,
++};
++
+ struct cached_dev {
+ 	struct list_head	list;
+ 	struct bcache_device	disk;
+@@ -379,6 +385,8 @@ struct cached_dev {
+ 	unsigned		writeback_rate_i_term_inverse;
+ 	unsigned		writeback_rate_p_term_inverse;
+ 	unsigned		writeback_rate_minimum;
++
++	enum stop_on_failure	stop_when_cache_set_failed;
+ };
+ 
+ enum alloc_reserve {
+@@ -924,6 +932,7 @@ void bch_write_bdev_super(struct cached_dev *, struct closure *);
+ 
+ extern struct workqueue_struct *bcache_wq;
+ extern const char * const bch_cache_modes[];
++extern const char * const bch_stop_on_failure_modes[];
+ extern struct mutex bch_register_lock;
+ extern struct list_head bch_cache_sets;
+ 
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index f8b0d1196c12..e335433bdfb7 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -47,6 +47,14 @@ const char * const bch_cache_modes[] = {
+ 	NULL
+ };
+ 
++/* Default is -1; we skip past it for stop_when_cache_set_failed */
++const char * const bch_stop_on_failure_modes[] = {
++	"default",
++	"auto",
++	"always",
++	NULL
++};
++
+ static struct kobject *bcache_kobj;
+ struct mutex bch_register_lock;
+ LIST_HEAD(bch_cache_sets);
+@@ -1187,6 +1195,9 @@ static int cached_dev_init(struct cached_dev *dc, unsigned block_size)
+ 		max(dc->disk.disk->queue->backing_dev_info->ra_pages,
+ 		    q->backing_dev_info->ra_pages);
+ 
++	/* default to auto */
++	dc->stop_when_cache_set_failed = BCH_CACHED_DEV_STOP_AUTO;
++
+ 	bch_cached_dev_request_init(dc);
+ 	bch_cached_dev_writeback_init(dc);
+ 	return 0;
+@@ -1463,25 +1474,76 @@ static void cache_set_flush(struct closure *cl)
+ 	closure_return(cl);
+ }
+ 
 +/*
-+ * InfiniBand Transport Layer
++ * This function is only called when CACHE_SET_IO_DISABLE is set, which means
++ * cache set is unregistering due to too many I/O errors. In this condition,
++ * the bcache device might be stopped, it depends on stop_when_cache_set_failed
++ * value and whether the broken cache has dirty data:
 + *
-+ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
-+ * Authors: Fabian Holler <mail@fholler.de>
-+ *          Jack Wang <jinpu.wang@profitbricks.com>
-+ *          Kleber Souza <kleber.souza@profitbricks.com>
-+ *          Danil Kipnis <danil.kipnis@profitbricks.com>
-+ *          Roman Penyaev <roman.penyaev@profitbricks.com>
-+ *          Milind Dumbare <Milind.dumbare@gmail.com>
++ * dc->stop_when_cache_set_failed    dc->has_dirty   stop bcache device
++ *  BCH_CACHED_STOP_ATUO               0               NO
++ *  BCH_CACHED_STOP_ATUO               1               YES
++ *  BCH_CACHED_DEV_STOP_ALWAYS         0               YES
++ *  BCH_CACHED_DEV_STOP_ALWAYS         1               YES
 + *
-+ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
-+ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
-+ *          Roman Penyaev <roman.penyaev@profitbricks.com>
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version 2
-+ * of the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ * The expected behavior is, if stop_when_cache_set_failed is configured to
++ * "auto" via sysfs interface, the bcache device will not be stopped if the
++ * backing device is clean on the broken cache device.
 + */
-+
-+#undef pr_fmt
-+#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
-+
-+#include "ibtrs-pri.h"
-+#include "ibtrs-clt.h"
-+#include "ibtrs-log.h"
-+
-+static struct kobject *ibtrs_kobj;
-+
-+#define MIN_MAX_RECONN_ATT -1
-+#define MAX_MAX_RECONN_ATT 9999
-+
-+static struct kobj_type ktype = {
-+	.sysfs_ops = &kobj_sysfs_ops,
-+};
-+
-+static ssize_t ibtrs_clt_max_reconn_attempts_show(struct kobject *kobj,
-+						  struct kobj_attribute *attr,
-+						  char *page)
++static void conditional_stop_bcache_device(struct cache_set *c,
++					   struct bcache_device *d,
++					   struct cached_dev *dc)
 +{
-+	struct ibtrs_clt *clt;
-+
-+	clt = container_of(kobj, struct ibtrs_clt, kobj);
-+
-+	return sprintf(page, "%d\n", ibtrs_clt_get_max_reconnect_attempts(clt));
-+}
-+
-+static ssize_t ibtrs_clt_max_reconn_attempts_store(struct kobject *kobj,
-+						   struct kobj_attribute *attr,
-+						   const char *buf,
-+						   size_t count)
-+{
-+	struct ibtrs_clt *clt;
-+	int value;
-+	int ret;
-+
-+	clt = container_of(kobj, struct ibtrs_clt, kobj);
-+
-+	ret = kstrtoint(buf, 10, &value);
-+	if (unlikely(ret)) {
-+		ibtrs_err(clt, "%s: failed to convert string '%s' to int\n",
-+			  attr->attr.name, buf);
-+		return ret;
-+	}
-+	if (unlikely(value > MAX_MAX_RECONN_ATT ||
-+		     value < MIN_MAX_RECONN_ATT)) {
-+		ibtrs_err(clt, "%s: invalid range"
-+			  " (provided: '%s', accepted: min: %d, max: %d)\n",
-+			  attr->attr.name, buf, MIN_MAX_RECONN_ATT,
-+			  MAX_MAX_RECONN_ATT);
-+		return -EINVAL;
-+	}
-+	ibtrs_clt_set_max_reconnect_attempts(clt, value);
-+
-+	return count;
-+}
-+
-+static struct kobj_attribute ibtrs_clt_max_reconnect_attempts_attr =
-+	__ATTR(max_reconnect_attempts, 0644,
-+	       ibtrs_clt_max_reconn_attempts_show,
-+	       ibtrs_clt_max_reconn_attempts_store);
-+
-+static ssize_t ibtrs_clt_mp_policy_show(struct kobject *kobj,
-+					struct kobj_attribute *attr,
-+					char *page)
-+{
-+	struct ibtrs_clt *clt;
-+
-+	clt = container_of(kobj, struct ibtrs_clt, kobj);
-+
-+	switch (clt->mp_policy) {
-+	case MP_POLICY_RR:
-+		return sprintf(page, "round-robin (RR: %d)\n", clt->mp_policy);
-+	case MP_POLICY_MIN_INFLIGHT:
-+		return sprintf(page, "min-inflight (MI: %d)\n", clt->mp_policy);
-+	default:
-+		return sprintf(page, "Unknown (%d)\n", clt->mp_policy);
++	if (dc->stop_when_cache_set_failed == BCH_CACHED_DEV_STOP_ALWAYS) {
++		pr_warn("stop_when_cache_set_failed of %s is \"always\", stop"
++			" it for failed cache set %pU.",
++			d->disk->disk_name, c->sb.set_uuid);
++		bcache_device_stop(d);
++	} else if (atomic_read(&dc->has_dirty)) {
++		/*
++		 * dc->stop_when_cache_set_failed == BCH_CACHED_STOP_ATUO
++		 * and dc->has_dirty == 1
++		 */
++		pr_warn("stop_when_cache_set_failed of %s is \"auto\" and "
++			"cache is dirty, stop it to avoid potential data "
++			"corruption.",
++			d->disk->disk_name);
++			bcache_device_stop(d);
++	} else {
++		/*
++		 * dc->stop_when_cache_set_failed == BCH_CACHED_STOP_ATUO
++		 * and dc->has_dirty == 0
++		 */
++		pr_warn("stop_when_cache_set_failed of %s is \"auto\" and "
++			"cache is clean, keep it alive.",
++			d->disk->disk_name);
 +	}
 +}
 +
-+static ssize_t ibtrs_clt_mp_policy_store(struct kobject *kobj,
-+					 struct kobj_attribute *attr,
-+					 const char *buf,
-+					 size_t count)
-+{
-+	struct ibtrs_clt *clt;
-+	int value;
-+	int ret;
+ static void __cache_set_unregister(struct closure *cl)
+ {
+ 	struct cache_set *c = container_of(cl, struct cache_set, caching);
+ 	struct cached_dev *dc;
++	struct bcache_device *d;
+ 	size_t i;
+ 
+ 	mutex_lock(&bch_register_lock);
+ 
+-	for (i = 0; i < c->devices_max_used; i++)
+-		if (c->devices[i]) {
+-			if (!UUID_FLASH_ONLY(&c->uuids[i]) &&
+-			    test_bit(CACHE_SET_UNREGISTERING, &c->flags)) {
+-				dc = container_of(c->devices[i],
+-						  struct cached_dev, disk);
+-				bch_cached_dev_detach(dc);
+-			} else {
+-				bcache_device_stop(c->devices[i]);
+-			}
++	for (i = 0; i < c->devices_max_used; i++) {
++		d = c->devices[i];
++		if (!d)
++			continue;
 +
-+	clt = container_of(kobj, struct ibtrs_clt, kobj);
++		if (!UUID_FLASH_ONLY(&c->uuids[i]) &&
++		    test_bit(CACHE_SET_UNREGISTERING, &c->flags)) {
++			dc = container_of(d, struct cached_dev, disk);
++			bch_cached_dev_detach(dc);
++			if (test_bit(CACHE_SET_IO_DISABLE, &c->flags))
++				conditional_stop_bcache_device(c, d, dc);
++		} else {
++			bcache_device_stop(d);
+ 		}
++	}
+ 
+ 	mutex_unlock(&bch_register_lock);
+ 
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index cf973c07c856..91d859a54575 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -78,6 +78,7 @@ rw_attribute(congested_write_threshold_us);
+ rw_attribute(sequential_cutoff);
+ rw_attribute(data_csum);
+ rw_attribute(cache_mode);
++rw_attribute(stop_when_cache_set_failed);
+ rw_attribute(writeback_metadata);
+ rw_attribute(writeback_running);
+ rw_attribute(writeback_percent);
+@@ -126,6 +127,12 @@ SHOW(__bch_cached_dev)
+ 					       bch_cache_modes + 1,
+ 					       BDEV_CACHE_MODE(&dc->sb));
+ 
++	if (attr == &sysfs_stop_when_cache_set_failed)
++		return bch_snprint_string_list(buf, PAGE_SIZE,
++					       bch_stop_on_failure_modes + 1,
++					       dc->stop_when_cache_set_failed);
 +
-+	ret = kstrtoint(buf, 10, &value);
-+	if (!ret && (value == MP_POLICY_RR || value == MP_POLICY_MIN_INFLIGHT)) {
-+		clt->mp_policy = value;
-+		return count;
++
+ 	sysfs_printf(data_csum,		"%i", dc->disk.data_csum);
+ 	var_printf(verify,		"%i");
+ 	var_printf(bypass_torture_test,	"%i");
+@@ -247,6 +254,15 @@ STORE(__cached_dev)
+ 		}
+ 	}
+ 
++	if (attr == &sysfs_stop_when_cache_set_failed) {
++		v = bch_read_string_list(buf, bch_stop_on_failure_modes + 1);
++
++		if (v < 0)
++			return v;
++
++		dc->stop_when_cache_set_failed = v;
 +	}
 +
-+	if (!strncasecmp(buf, "round-robin", 11) ||
-+	    !strncasecmp(buf, "rr", 2))
-+		clt->mp_policy = MP_POLICY_RR;
-+	else if (!strncasecmp(buf, "min-inflight", 12) ||
-+		 !strncasecmp(buf, "mi", 2))
-+		clt->mp_policy = MP_POLICY_MIN_INFLIGHT;
-+	else
-+		return -EINVAL;
-+
-+	return count;
-+}
-+
-+static struct kobj_attribute ibtrs_clt_mp_policy_attr =
-+	__ATTR(mp_policy, 0644,
-+	       ibtrs_clt_mp_policy_show,
-+	       ibtrs_clt_mp_policy_store);
-+
-+static ssize_t ibtrs_clt_state_show(struct kobject *kobj,
-+				    struct kobj_attribute *attr, char *page)
-+{
-+	struct ibtrs_clt_sess *sess;
-+
-+	sess = container_of(kobj, struct ibtrs_clt_sess, kobj);
-+	if (ibtrs_clt_sess_is_connected(sess))
-+		return sprintf(page, "connected\n");
-+
-+	return sprintf(page, "disconnected\n");
-+}
-+
-+static struct kobj_attribute ibtrs_clt_state_attr =
-+	__ATTR(state, 0444, ibtrs_clt_state_show, NULL);
-+
-+static ssize_t ibtrs_clt_reconnect_show(struct kobject *kobj,
-+					struct kobj_attribute *attr,
-+					char *page)
-+{
-+	return scnprintf(page, PAGE_SIZE, "Usage: echo 1 > %s\n",
-+			 attr->attr.name);
-+}
-+
-+static ssize_t ibtrs_clt_reconnect_store(struct kobject *kobj,
-+					 struct kobj_attribute *attr,
-+					 const char *buf, size_t count)
-+{
-+	struct ibtrs_clt_sess *sess;
-+	int ret;
-+
-+	sess = container_of(kobj, struct ibtrs_clt_sess, kobj);
-+	if (!sysfs_streq(buf, "1")) {
-+		ibtrs_err(sess, "%s: unknown value: '%s'\n",
-+			  attr->attr.name, buf);
-+		return -EINVAL;
-+	}
-+	ret = ibtrs_clt_reconnect_from_sysfs(sess);
-+	if (unlikely(ret))
-+		return ret;
-+
-+	return count;
-+}
-+
-+static struct kobj_attribute ibtrs_clt_reconnect_attr =
-+	__ATTR(reconnect, 0644, ibtrs_clt_reconnect_show,
-+	       ibtrs_clt_reconnect_store);
-+
-+static ssize_t ibtrs_clt_disconnect_show(struct kobject *kobj,
-+					 struct kobj_attribute *attr,
-+					 char *page)
-+{
-+	return scnprintf(page, PAGE_SIZE, "Usage: echo 1 > %s\n",
-+			 attr->attr.name);
-+}
-+
-+static ssize_t ibtrs_clt_disconnect_store(struct kobject *kobj,
-+					  struct kobj_attribute *attr,
-+					  const char *buf, size_t count)
-+{
-+	struct ibtrs_clt_sess *sess;
-+	int ret;
-+
-+	sess = container_of(kobj, struct ibtrs_clt_sess, kobj);
-+	if (!sysfs_streq(buf, "1")) {
-+		ibtrs_err(sess, "%s: unknown value: '%s'\n",
-+			  attr->attr.name, buf);
-+		return -EINVAL;
-+	}
-+	ret = ibtrs_clt_disconnect_from_sysfs(sess);
-+	if (unlikely(ret))
-+		return ret;
-+
-+	return count;
-+}
-+
-+static struct kobj_attribute ibtrs_clt_disconnect_attr =
-+	__ATTR(disconnect, 0644, ibtrs_clt_disconnect_show,
-+	       ibtrs_clt_disconnect_store);
-+
-+static ssize_t ibtrs_clt_remove_path_show(struct kobject *kobj,
-+					  struct kobj_attribute *attr,
-+					  char *page)
-+{
-+	return scnprintf(page, PAGE_SIZE, "Usage: echo 1 > %s\n",
-+			 attr->attr.name);
-+}
-+
-+static ssize_t ibtrs_clt_remove_path_store(struct kobject *kobj,
-+					   struct kobj_attribute *attr,
-+					   const char *buf, size_t count)
-+{
-+	struct ibtrs_clt_sess *sess;
-+	int ret;
-+
-+	sess = container_of(kobj, struct ibtrs_clt_sess, kobj);
-+	if (!sysfs_streq(buf, "1")) {
-+		ibtrs_err(sess, "%s: unknown value: '%s'\n",
-+			  attr->attr.name, buf);
-+		return -EINVAL;
-+	}
-+	ret = ibtrs_clt_remove_path_from_sysfs(sess, &attr->attr);
-+	if (unlikely(ret))
-+		return ret;
-+
-+	return count;
-+}
-+
-+static struct kobj_attribute ibtrs_clt_remove_path_attr =
-+	__ATTR(remove_path, 0644, ibtrs_clt_remove_path_show,
-+	       ibtrs_clt_remove_path_store);
-+
-+static ssize_t ibtrs_clt_add_path_show(struct kobject *kobj,
-+				       struct kobj_attribute *attr, char *page)
-+{
-+	return scnprintf(page, PAGE_SIZE, "Usage: echo"
-+			 " [<source addr>,]<destination addr> > %s\n\n"
-+			"*addr ::= [ ip:<ipv4|ipv6> | gid:<gid> ]\n",
-+			 attr->attr.name);
-+}
-+
-+static ssize_t ibtrs_clt_add_path_store(struct kobject *kobj,
-+					struct kobj_attribute *attr,
-+					const char *buf, size_t count)
-+{
-+	struct sockaddr_storage srcaddr, dstaddr;
-+	struct ibtrs_addr addr = {
-+		.src = (struct sockaddr *)&srcaddr,
-+		.dst = (struct sockaddr *)&dstaddr
-+	};
-+	struct ibtrs_clt *clt;
-+	const char *nl;
-+	size_t len;
-+	int err;
-+
-+	clt = container_of(kobj, struct ibtrs_clt, kobj);
-+
-+	nl = strchr(buf, '\n');
-+	if (nl)
-+		len = nl - buf;
-+	else
-+		len = count;
-+	err = ibtrs_addr_to_sockaddr(buf, len, clt->port, &addr);
-+	if (unlikely(err))
-+		return -EINVAL;
-+
-+	err = ibtrs_clt_create_path_from_sysfs(clt, &addr);
-+	if (unlikely(err))
-+		return err;
-+
-+	return count;
-+}
-+
-+static struct kobj_attribute ibtrs_clt_add_path_attr =
-+	__ATTR(add_path, 0644, ibtrs_clt_add_path_show,
-+	       ibtrs_clt_add_path_store);
-+
-+STAT_ATTR(struct ibtrs_clt_sess, cpu_migration,
-+	  ibtrs_clt_stats_migration_cnt_to_str,
-+	  ibtrs_clt_reset_cpu_migr_stats);
-+
-+STAT_ATTR(struct ibtrs_clt_sess, sg_entries,
-+	  ibtrs_clt_stats_sg_list_distr_to_str,
-+	  ibtrs_clt_reset_sg_list_distr_stats);
-+
-+STAT_ATTR(struct ibtrs_clt_sess, reconnects,
-+	  ibtrs_clt_stats_reconnects_to_str,
-+	  ibtrs_clt_reset_reconnects_stat);
-+
-+STAT_ATTR(struct ibtrs_clt_sess, rdma_lat,
-+	  ibtrs_clt_stats_rdma_lat_distr_to_str,
-+	  ibtrs_clt_reset_rdma_lat_distr_stats);
-+
-+STAT_ATTR(struct ibtrs_clt_sess, wc_completion,
-+	  ibtrs_clt_stats_wc_completion_to_str,
-+	  ibtrs_clt_reset_wc_comp_stats);
-+
-+STAT_ATTR(struct ibtrs_clt_sess, rdma,
-+	  ibtrs_clt_stats_rdma_to_str,
-+	  ibtrs_clt_reset_rdma_stats);
-+
-+STAT_ATTR(struct ibtrs_clt_sess, reset_all,
-+	  ibtrs_clt_reset_all_help,
-+	  ibtrs_clt_reset_all_stats);
-+
-+static struct attribute *ibtrs_clt_stats_attrs[] = {
-+	&sg_entries_attr.attr,
-+	&cpu_migration_attr.attr,
-+	&reconnects_attr.attr,
-+	&rdma_lat_attr.attr,
-+	&wc_completion_attr.attr,
-+	&rdma_attr.attr,
-+	&reset_all_attr.attr,
-+	NULL,
-+};
-+
-+static struct attribute_group ibtrs_clt_stats_attr_group = {
-+	.attrs = ibtrs_clt_stats_attrs,
-+};
-+
-+static int ibtrs_clt_create_stats_files(struct kobject *kobj,
-+					struct kobject *kobj_stats)
-+{
-+	int ret;
-+
-+	ret = kobject_init_and_add(kobj_stats, &ktype, kobj, "stats");
-+	if (ret) {
-+		pr_err("Failed to init and add stats kobject, err: %d\n",
-+		       ret);
-+		return ret;
-+	}
-+
-+	ret = sysfs_create_group(kobj_stats, &ibtrs_clt_stats_attr_group);
-+	if (ret) {
-+		pr_err("failed to create stats sysfs group, err: %d\n",
-+		       ret);
-+		goto err;
-+	}
-+
-+	return 0;
-+
-+err:
-+	kobject_del(kobj_stats);
-+	kobject_put(kobj_stats);
-+
-+	return ret;
-+}
-+
-+static struct attribute *ibtrs_clt_sess_attrs[] = {
-+	&ibtrs_clt_state_attr.attr,
-+	&ibtrs_clt_reconnect_attr.attr,
-+	&ibtrs_clt_disconnect_attr.attr,
-+	&ibtrs_clt_remove_path_attr.attr,
-+	NULL,
-+};
-+
-+static struct attribute_group ibtrs_clt_sess_attr_group = {
-+	.attrs = ibtrs_clt_sess_attrs,
-+};
-+
-+int ibtrs_clt_create_sess_files(struct ibtrs_clt_sess *sess)
-+{
-+	struct ibtrs_clt *clt = sess->clt;
-+	char str[MAXHOSTNAMELEN];
-+	int err;
-+
-+	sockaddr_to_str((struct sockaddr *)&sess->s.dst_addr, str, sizeof(str));
-+
-+	err = kobject_init_and_add(&sess->kobj, &ktype, &clt->kobj_paths,
-+				   "%s", str);
-+	if (unlikely(err)) {
-+		pr_err("kobject_init_and_add: %d\n", err);
-+		return err;
-+	}
-+	err = sysfs_create_group(&sess->kobj, &ibtrs_clt_sess_attr_group);
-+	if (unlikely(err)) {
-+		pr_err("sysfs_create_group(): %d\n", err);
-+		goto put_kobj;
-+	}
-+	err = ibtrs_clt_create_stats_files(&sess->kobj, &sess->kobj_stats);
-+	if (unlikely(err))
-+		goto put_kobj;
-+
-+	return 0;
-+
-+put_kobj:
-+	kobject_del(&sess->kobj);
-+	kobject_put(&sess->kobj);
-+
-+	return err;
-+}
-+
-+static void ibtrs_sysfs_remove_file_self(struct kobject *kobj,
-+					 const struct attribute *attr)
-+{
-+	struct device_attribute dattr = {
-+		.attr.name = attr->name
-+	};
-+	struct device *device;
-+
-+	/*
-+	 * Unfortunately original sysfs_remove_file_self() is not exported,
-+	 * so consider this as a hack to call self removal of a sysfs entry
-+	 * just using another "door".
-+	 */
-+
-+	device = container_of(kobj, typeof(*device), kobj);
-+	device_remove_file_self(device, &dattr);
-+}
-+
-+void ibtrs_clt_destroy_sess_files(struct ibtrs_clt_sess *sess,
-+				  const struct attribute *sysfs_self)
-+{
-+	if (sess->kobj.state_in_sysfs) {
-+		kobject_del(&sess->kobj_stats);
-+		kobject_put(&sess->kobj_stats);
-+		if (sysfs_self)
-+			/* To avoid deadlock firstly commit suicide */
-+			ibtrs_sysfs_remove_file_self(&sess->kobj, sysfs_self);
-+		kobject_del(&sess->kobj);
-+		kobject_put(&sess->kobj);
-+	}
-+}
-+
-+static struct attribute *ibtrs_clt_attrs[] = {
-+	&ibtrs_clt_max_reconnect_attempts_attr.attr,
-+	&ibtrs_clt_mp_policy_attr.attr,
-+	&ibtrs_clt_add_path_attr.attr,
-+	NULL,
-+};
-+
-+static struct attribute_group ibtrs_clt_attr_group = {
-+	.attrs = ibtrs_clt_attrs,
-+};
-+
-+int ibtrs_clt_create_sysfs_root_folders(struct ibtrs_clt *clt)
-+{
-+	int err;
-+
-+	err = kobject_init_and_add(&clt->kobj, &ktype, ibtrs_kobj,
-+				   "%s", clt->sessname);
-+	if (unlikely(err)) {
-+		pr_err("kobject_init_and_add(): %d\n", err);
-+		return err;
-+	}
-+	err = kobject_init_and_add(&clt->kobj_paths, &ktype,
-+				   &clt->kobj, "paths");
-+	if (unlikely(err)) {
-+		pr_err("kobject_init_and_add(): %d\n", err);
-+		goto put_kobj;
-+	}
-+
-+	return 0;
-+
-+put_kobj:
-+	kobject_del(&clt->kobj);
-+	kobject_put(&clt->kobj);
-+
-+	return err;
-+}
-+
-+int ibtrs_clt_create_sysfs_root_files(struct ibtrs_clt *clt)
-+{
-+	return sysfs_create_group(&clt->kobj, &ibtrs_clt_attr_group);
-+}
-+
-+void ibtrs_clt_destroy_sysfs_root_folders(struct ibtrs_clt *clt)
-+{
-+	if (clt->kobj_paths.state_in_sysfs) {
-+		kobject_del(&clt->kobj_paths);
-+		kobject_put(&clt->kobj_paths);
-+	}
-+	if (clt->kobj.state_in_sysfs) {
-+		kobject_del(&clt->kobj);
-+		kobject_put(&clt->kobj);
-+	}
-+}
-+
-+void ibtrs_clt_destroy_sysfs_root_files(struct ibtrs_clt *clt)
-+{
-+	sysfs_remove_group(&clt->kobj, &ibtrs_clt_attr_group);
-+}
-+
-+int ibtrs_clt_create_sysfs_module_files(void)
-+{
-+	ibtrs_kobj = kobject_create_and_add(KBUILD_MODNAME, kernel_kobj);
-+	if (unlikely(!ibtrs_kobj))
-+		return -ENOMEM;
-+
-+	return 0;
-+}
-+
-+void ibtrs_clt_destroy_sysfs_module_files(void)
-+{
-+	kobject_del(ibtrs_kobj);
-+	kobject_put(ibtrs_kobj);
-+}
+ 	if (attr == &sysfs_label) {
+ 		if (size > SB_LABEL_SIZE)
+ 			return -EINVAL;
+@@ -323,6 +339,7 @@ static struct attribute *bch_cached_dev_files[] = {
+ 	&sysfs_data_csum,
+ #endif
+ 	&sysfs_cache_mode,
++	&sysfs_stop_when_cache_set_failed,
+ 	&sysfs_writeback_metadata,
+ 	&sysfs_writeback_running,
+ 	&sysfs_writeback_delay,
 -- 
-2.13.1
+2.16.1
