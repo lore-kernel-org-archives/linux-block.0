@@ -1,296 +1,189 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: linux-scsi@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Arun Easi <arun.easi@cavium.com>,
-	Omar Sandoval <osandov@fb.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Don Brace <don.brace@microsemi.com>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Peter Rivera <peter.rivera@broadcom.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Laurence Oberman <loberman@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 2/5] blk-mq: introduce BLK_MQ_F_GLOBAL_TAGS
-Date: Sat,  3 Feb 2018 12:21:09 +0800
-Message-Id: <20180203042112.15239-3-ming.lei@redhat.com>
-In-Reply-To: <20180203042112.15239-1-ming.lei@redhat.com>
-References: <20180203042112.15239-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:37728 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752309AbeBFEV3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 5 Feb 2018 23:21:29 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Michael Lyle <mlyle@lyle.org>,
+        Junhui Tang <tang.junhui@zte.com.cn>
+Subject: [PATCH v5 02/10] bcache: fix cached_dev->count usage for bch_cache_set_error()
+Date: Tue,  6 Feb 2018 12:20:52 +0800
+Message-Id: <20180206042100.65021-3-colyli@suse.de>
+In-Reply-To: <20180206042100.65021-1-colyli@suse.de>
+References: <20180206042100.65021-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Quite a few HBAs(such as HPSA, megaraid, mpt3sas, ..) support multiple
-reply queues, but tags is often HBA wide.
+When bcache metadata I/O fails, bcache will call bch_cache_set_error()
+to retire the whole cache set. The expected behavior to retire a cache
+set is to unregister the cache set, and unregister all backing device
+attached to this cache set, then remove sysfs entries of the cache set
+and all attached backing devices, finally release memory of structs
+cache_set, cache, cached_dev and bcache_device.
 
-These HBAs have switched to use pci_alloc_irq_vectors(PCI_IRQ_AFFINITY)
-for automatic affinity assignment.
+In my testing when journal I/O failure triggered by disconnected cache
+device, sometimes the cache set cannot be retired, and its sysfs
+entry /sys/fs/bcache/<uuid> still exits and the backing device also
+references it. This is not expected behavior.
 
-Now 84676c1f21e8ff5(genirq/affinity: assign vectors to all possible CPUs)
-has been merged to V4.16-rc, and it is easy to allocate all offline CPUs
-for some irq vectors, this can't be avoided even though the allocation
-is improved.
+When metadata I/O failes, the call senquence to retire whole cache set is,
+        bch_cache_set_error()
+        bch_cache_set_unregister()
+        bch_cache_set_stop()
+        __cache_set_unregister()     <- called as callback by calling
+                                        clousre_queue(&c->caching)
+        cache_set_flush()            <- called as a callback when refcount
+                                        of cache_set->caching is 0
+        cache_set_free()             <- called as a callback when refcount
+                                        of catch_set->cl is 0
+        bch_cache_set_release()      <- called as a callback when refcount
+                                        of catch_set->kobj is 0
 
-So all these drivers have to avoid to ask HBA to complete request in
-reply queue which hasn't online CPUs assigned, and HPSA has been broken
-with v4.15+:
+I find if kernel thread bch_writeback_thread() quits while-loop when
+kthread_should_stop() is true and searched_full_index is false, clousre
+callback cache_set_flush() set by continue_at() will never be called. The
+result is, bcache fails to retire whole cache set.
 
-	https://marc.info/?l=linux-kernel&m=151748144730409&w=2
+cache_set_flush() will be called when refcount of closure c->caching is 0,
+and in function bcache_device_detach() refcount of closure c->caching is
+released to 0 by clousre_put(). In metadata error code path, function
+bcache_device_detach() is called by cached_dev_detach_finish(). This is a
+callback routine being called when cached_dev->count is 0. This refcount
+is decreased by cached_dev_put().
 
-This issue can be solved generically and easily via blk_mq(scsi_mq) multiple
-hw queue by mapping each reply queue into hctx, but one tricky thing is
-the HBA wide(instead of hw queue wide) tags.
+The above dependence indicates, cache_set_flush() will be called when
+refcount of cache_set->cl is 0, and refcount of cache_set->cl to be 0
+when refcount of cache_dev->count is 0.
 
-This patch is based on the following Hannes's patch:
+The reason why sometimes cache_dev->count is not 0 (when metadata I/O fails
+and bch_cache_set_error() called) is, in bch_writeback_thread(), refcount
+of cache_dev is not decreased properly.
 
-	https://marc.info/?l=linux-block&m=149132580511346&w=2
+In bch_writeback_thread(), cached_dev_put() is called only when
+searched_full_index is true and cached_dev->writeback_keys is empty, a.k.a
+there is no dirty data on cache. In most of run time it is correct, but
+when bch_writeback_thread() quits the while-loop while cache is still
+dirty, current code forget to call cached_dev_put() before this kernel
+thread exits. This is why sometimes cache_set_flush() is not executed and
+cache set fails to be retired.
 
-One big difference with Hannes's is that this patch only makes the tags sbitmap
-and active_queues data structure HBA wide, and others are kept as NUMA locality,
-such as request, hctx, tags, ...
+The reason to call cached_dev_put() in bch_writeback_rate() is, when the
+cache device changes from clean to dirty, cached_dev_get() is called, to
+make sure during writeback operatiions both backing and cache devices
+won't be released.
 
-The following patch will support global tags on null_blk, also the performance
-data is provided, no obvious performance loss is observed when the whole
-hw queue depth is same.
+Adding following code in bch_writeback_thread() does not work,
+   static int bch_writeback_thread(void *arg)
+        }
 
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Arun Easi <arun.easi@cavium.com>
-Cc: Omar Sandoval <osandov@fb.com>,
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-Cc: Christoph Hellwig <hch@lst.de>,
-Cc: Don Brace <don.brace@microsemi.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Peter Rivera <peter.rivera@broadcom.com>
-Cc: Laurence Oberman <loberman@redhat.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
++       if (atomic_read(&dc->has_dirty))
++               cached_dev_put()
++
+        return 0;
+ }
+because writeback kernel thread can be waken up and start via sysfs entry:
+        echo 1 > /sys/block/bcache<N>/bcache/writeback_running
+It is difficult to check whether backing device is dirty without race and
+extra lock. So the above modification will introduce potential refcount
+underflow in some conditions.
+
+The correct fix is, to take cached dev refcount when creating the kernel
+thread, and put it before the kernel thread exits. Then bcache does not
+need to take a cached dev refcount when cache turns from clean to dirty,
+or to put a cached dev refcount when cache turns from ditry to clean. The
+writeback kernel thread is alwasy safe to reference data structure from
+cache set, cache and cached device (because a refcount of cache device is
+taken for it already), and no matter the kernel thread is stopped by I/O
+errors or system reboot, cached_dev->count can always be used correctly.
+
+The patch is simple, but understanding how it works is quite complicated.
+
+Changelog:
+v2: set dc->writeback_thread to NULL in this patch, as suggested by Hannes.
+v1: initial version for review.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Cc: Michael Lyle <mlyle@lyle.org>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
 ---
- block/blk-mq-debugfs.c |  1 +
- block/blk-mq-sched.c   |  2 +-
- block/blk-mq-tag.c     | 23 ++++++++++++++++++-----
- block/blk-mq-tag.h     |  5 ++++-
- block/blk-mq.c         | 29 ++++++++++++++++++++++++-----
- block/blk-mq.h         |  3 ++-
- include/linux/blk-mq.h |  2 ++
- 7 files changed, 52 insertions(+), 13 deletions(-)
+ drivers/md/bcache/super.c     |  1 -
+ drivers/md/bcache/writeback.c | 11 ++++++++---
+ drivers/md/bcache/writeback.h |  2 --
+ 3 files changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 0dfafa4b655a..0f0fafe03f5d 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -206,6 +206,7 @@ static const char *const hctx_flag_name[] = {
- 	HCTX_FLAG_NAME(SHOULD_MERGE),
- 	HCTX_FLAG_NAME(TAG_SHARED),
- 	HCTX_FLAG_NAME(SG_MERGE),
-+	HCTX_FLAG_NAME(GLOBAL_TAGS),
- 	HCTX_FLAG_NAME(BLOCKING),
- 	HCTX_FLAG_NAME(NO_SCHED),
- };
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 55c0a745b427..191d4bc95f0e 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -495,7 +495,7 @@ static int blk_mq_sched_alloc_tags(struct request_queue *q,
- 	int ret;
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index a2ad37a8afc0..7d96dc6860fa 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1052,7 +1052,6 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c)
+ 	if (BDEV_STATE(&dc->sb) == BDEV_STATE_DIRTY) {
+ 		bch_sectors_dirty_init(&dc->disk);
+ 		atomic_set(&dc->has_dirty, 1);
+-		refcount_inc(&dc->count);
+ 		bch_writeback_queue(dc);
+ 	}
  
- 	hctx->sched_tags = blk_mq_alloc_rq_map(set, hctx_idx, q->nr_requests,
--					       set->reserved_tags);
-+					       set->reserved_tags, false);
- 	if (!hctx->sched_tags)
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index f1d2fc15abcc..b280c134dd4d 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -572,7 +572,7 @@ static int bch_writeback_thread(void *arg)
+ 
+ 			if (kthread_should_stop()) {
+ 				set_current_state(TASK_RUNNING);
+-				return 0;
++				break;
+ 			}
+ 
+ 			schedule();
+@@ -585,7 +585,6 @@ static int bch_writeback_thread(void *arg)
+ 		if (searched_full_index &&
+ 		    RB_EMPTY_ROOT(&dc->writeback_keys.keys)) {
+ 			atomic_set(&dc->has_dirty, 0);
+-			cached_dev_put(dc);
+ 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_CLEAN);
+ 			bch_write_bdev_super(dc, NULL);
+ 		}
+@@ -606,6 +605,9 @@ static int bch_writeback_thread(void *arg)
+ 		}
+ 	}
+ 
++	dc->writeback_thread = NULL;
++	cached_dev_put(dc);
++
+ 	return 0;
+ }
+ 
+@@ -669,10 +671,13 @@ int bch_cached_dev_writeback_start(struct cached_dev *dc)
+ 	if (!dc->writeback_write_wq)
  		return -ENOMEM;
  
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 571797dc36cb..66377d09eaeb 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -379,9 +379,11 @@ static struct blk_mq_tags *blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
- 	return NULL;
- }
- 
--struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
-+struct blk_mq_tags *blk_mq_init_tags(struct blk_mq_tag_set *set,
-+				     unsigned int total_tags,
- 				     unsigned int reserved_tags,
--				     int node, int alloc_policy)
-+				     int node, int alloc_policy,
-+				     bool global_tag)
- {
- 	struct blk_mq_tags *tags;
- 
-@@ -397,6 +399,14 @@ struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
- 	tags->nr_tags = total_tags;
- 	tags->nr_reserved_tags = reserved_tags;
- 
-+	WARN_ON(global_tag && !set->global_tags);
-+	if (global_tag && set->global_tags) {
-+		tags->bitmap_tags = set->global_tags->bitmap_tags;
-+		tags->breserved_tags = set->global_tags->breserved_tags;
-+		tags->active_queues = set->global_tags->active_queues;
-+		tags->global_tags = true;
-+		return tags;
++	cached_dev_get(dc);
+ 	dc->writeback_thread = kthread_create(bch_writeback_thread, dc,
+ 					      "bcache_writeback");
+-	if (IS_ERR(dc->writeback_thread))
++	if (IS_ERR(dc->writeback_thread)) {
++		cached_dev_put(dc);
+ 		return PTR_ERR(dc->writeback_thread);
 +	}
- 	tags->bitmap_tags = &tags->__bitmap_tags;
- 	tags->breserved_tags = &tags->__breserved_tags;
- 	tags->active_queues = &tags->__active_queues;
-@@ -406,8 +416,10 @@ struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
  
- void blk_mq_free_tags(struct blk_mq_tags *tags)
+ 	schedule_delayed_work(&dc->writeback_rate_update,
+ 			      dc->writeback_rate_update_seconds * HZ);
+diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
+index 587b25599856..0bba8f1c6cdf 100644
+--- a/drivers/md/bcache/writeback.h
++++ b/drivers/md/bcache/writeback.h
+@@ -105,8 +105,6 @@ static inline void bch_writeback_add(struct cached_dev *dc)
  {
--	sbitmap_queue_free(tags->bitmap_tags);
--	sbitmap_queue_free(tags->breserved_tags);
-+	if (!tags->global_tags) {
-+		sbitmap_queue_free(tags->bitmap_tags);
-+		sbitmap_queue_free(tags->breserved_tags);
-+	}
- 	kfree(tags);
- }
- 
-@@ -441,7 +453,8 @@ int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
- 		if (tdepth > 16 * BLKDEV_MAX_RQ)
- 			return -EINVAL;
- 
--		new = blk_mq_alloc_rq_map(set, hctx->queue_num, tdepth, 0);
-+		new = blk_mq_alloc_rq_map(set, hctx->queue_num, tdepth, 0,
-+				(*tagsptr)->global_tags);
- 		if (!new)
- 			return -ENOMEM;
- 		ret = blk_mq_alloc_rqs(set, new, hctx->queue_num, tdepth);
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index a68323fa0c02..a87b5cfa5726 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -20,13 +20,16 @@ struct blk_mq_tags {
- 	struct sbitmap_queue __bitmap_tags;
- 	struct sbitmap_queue __breserved_tags;
- 
-+	bool	global_tags;
- 	struct request **rqs;
- 	struct request **static_rqs;
- 	struct list_head page_list;
- };
- 
- 
--extern struct blk_mq_tags *blk_mq_init_tags(unsigned int nr_tags, unsigned int reserved_tags, int node, int alloc_policy);
-+extern struct blk_mq_tags *blk_mq_init_tags(struct blk_mq_tag_set *set,
-+		unsigned int nr_tags, unsigned int reserved_tags, int node,
-+		int alloc_policy, bool global_tag);
- extern void blk_mq_free_tags(struct blk_mq_tags *tags);
- 
- extern unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 69d4534870af..a98466dc71b5 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2023,7 +2023,8 @@ void blk_mq_free_rq_map(struct blk_mq_tags *tags)
- struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
- 					unsigned int hctx_idx,
- 					unsigned int nr_tags,
--					unsigned int reserved_tags)
-+					unsigned int reserved_tags,
-+					bool global_tags)
- {
- 	struct blk_mq_tags *tags;
- 	int node;
-@@ -2032,8 +2033,9 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
- 	if (node == NUMA_NO_NODE)
- 		node = set->numa_node;
- 
--	tags = blk_mq_init_tags(nr_tags, reserved_tags, node,
--				BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags));
-+	tags = blk_mq_init_tags(set, nr_tags, reserved_tags, node,
-+				BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags),
-+				global_tags);
- 	if (!tags)
- 		return NULL;
- 
-@@ -2336,7 +2338,8 @@ static bool __blk_mq_alloc_rq_map(struct blk_mq_tag_set *set, int hctx_idx)
- 	int ret = 0;
- 
- 	set->tags[hctx_idx] = blk_mq_alloc_rq_map(set, hctx_idx,
--					set->queue_depth, set->reserved_tags);
-+					set->queue_depth, set->reserved_tags,
-+					!!(set->flags & BLK_MQ_F_GLOBAL_TAGS));
- 	if (!set->tags[hctx_idx])
- 		return false;
- 
-@@ -2891,15 +2894,28 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
- 	if (ret)
- 		goto out_free_mq_map;
- 
-+	if (set->flags & BLK_MQ_F_GLOBAL_TAGS) {
-+		ret = -ENOMEM;
-+		set->global_tags = blk_mq_init_tags(set, set->queue_depth,
-+				set->reserved_tags, set->numa_node,
-+				BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags),
-+				false);
-+		if (!set->global_tags)
-+			goto out_free_mq_map;
-+	}
-+
- 	ret = blk_mq_alloc_rq_maps(set);
- 	if (ret)
--		goto out_free_mq_map;
-+		goto out_free_global_tags;
- 
- 	mutex_init(&set->tag_list_lock);
- 	INIT_LIST_HEAD(&set->tag_list);
- 
- 	return 0;
- 
-+out_free_global_tags:
-+	if (set->global_tags)
-+		blk_mq_free_tags(set->global_tags);
- out_free_mq_map:
- 	kfree(set->mq_map);
- 	set->mq_map = NULL;
-@@ -2914,6 +2930,9 @@ void blk_mq_free_tag_set(struct blk_mq_tag_set *set)
- {
- 	int i;
- 
-+	if (set->global_tags)
-+		blk_mq_free_tags(set->global_tags);
-+
- 	for (i = 0; i < nr_cpu_ids; i++)
- 		blk_mq_free_map_and_requests(set, i);
- 
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 88c558f71819..d1d9a0a8e1fa 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -61,7 +61,8 @@ void blk_mq_free_rq_map(struct blk_mq_tags *tags);
- struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
- 					unsigned int hctx_idx,
- 					unsigned int nr_tags,
--					unsigned int reserved_tags);
-+					unsigned int reserved_tags,
-+					bool global_tags);
- int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 		     unsigned int hctx_idx, unsigned int depth);
- 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 8efcf49796a3..8548c72d6b4a 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -82,6 +82,7 @@ struct blk_mq_tag_set {
- 	void			*driver_data;
- 
- 	struct blk_mq_tags	**tags;
-+	struct blk_mq_tags	*global_tags;	/* for BLK_MQ_F_GLOBAL_TAGS */
- 
- 	struct mutex		tag_list_lock;
- 	struct list_head	tag_list;
-@@ -175,6 +176,7 @@ enum {
- 	BLK_MQ_F_SHOULD_MERGE	= 1 << 0,
- 	BLK_MQ_F_TAG_SHARED	= 1 << 1,
- 	BLK_MQ_F_SG_MERGE	= 1 << 2,
-+	BLK_MQ_F_GLOBAL_TAGS	= 1 << 3,
- 	BLK_MQ_F_BLOCKING	= 1 << 5,
- 	BLK_MQ_F_NO_SCHED	= 1 << 6,
- 	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
+ 	if (!atomic_read(&dc->has_dirty) &&
+ 	    !atomic_xchg(&dc->has_dirty, 1)) {
+-		refcount_inc(&dc->count);
+-
+ 		if (BDEV_STATE(&dc->sb) != BDEV_STATE_DIRTY) {
+ 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_DIRTY);
+ 			/* XXX: should do this synchronously */
 -- 
-2.9.5
+2.16.1
