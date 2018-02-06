@@ -1,279 +1,193 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:37756 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752369AbeBFEVo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Feb 2018 23:21:44 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Michael Lyle <mlyle@lyle.org>, Hannes Reinecke <hare@suse.com>
-Subject: [PATCH v5 04/10] bcache: stop dc->writeback_rate_update properly
-Date: Tue,  6 Feb 2018 12:20:54 +0800
-Message-Id: <20180206042100.65021-5-colyli@suse.de>
-In-Reply-To: <20180206042100.65021-1-colyli@suse.de>
-References: <20180206042100.65021-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+Date: Tue, 6 Feb 2018 17:51:41 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Mike Snitzer <snitzer@redhat.com>, linux-scsi@vger.kernel.org,
+	Arun Easi <arun.easi@cavium.com>, Omar Sandoval <osandov@fb.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	James Bottomley <james.bottomley@hansenpartnership.com>,
+	Christoph Hellwig <hch@lst.de>, Don Brace <don.brace@microsemi.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Peter Rivera <peter.rivera@broadcom.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Laurence Oberman <loberman@redhat.com>
+Subject: Re: [PATCH V2 8/8] scsi: hpsa: use blk_mq to solve irq affinity issue
+Message-ID: <20180206095135.GA15518@ming.t460p>
+References: <20180205152035.15016-1-ming.lei@redhat.com>
+ <20180205152035.15016-9-ming.lei@redhat.com>
+ <38210970-dfa3-9bac-124c-92065b10f4b3@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <38210970-dfa3-9bac-124c-92065b10f4b3@suse.de>
+List-ID: <linux-block@vger.kernel.org>
 
-struct delayed_work writeback_rate_update in struct cache_dev is a delayed
-worker to call function update_writeback_rate() in period (the interval is
-defined by dc->writeback_rate_update_seconds).
+On Tue, Feb 06, 2018 at 09:39:26AM +0100, Hannes Reinecke wrote:
+> On 02/05/2018 04:20 PM, Ming Lei wrote:
+> > This patch uses .force_blk_mq to drive HPSA via SCSI_MQ, meantime maps
+> > each reply queue to blk_mq's hw queue, then .queuecommand can always
+> > choose the hw queue as the reply queue. And if no any online CPU is
+> > mapped to one hw queue, request can't be submitted to this hw queue
+> > at all, finally the irq affinity issue is solved.
+> > 
+> > Cc: Hannes Reinecke <hare@suse.de>
+> > Cc: Arun Easi <arun.easi@cavium.com>
+> > Cc: Omar Sandoval <osandov@fb.com>,
+> > Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+> > Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
+> > Cc: Christoph Hellwig <hch@lst.de>,
+> > Cc: Don Brace <don.brace@microsemi.com>
+> > Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+> > Cc: Peter Rivera <peter.rivera@broadcom.com>
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Cc: Mike Snitzer <snitzer@redhat.com>
+> > Tested-by: Laurence Oberman <loberman@redhat.com>
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  drivers/scsi/hpsa.c | 51 ++++++++++++++++++++++++++++++++++-----------------
+> >  1 file changed, 34 insertions(+), 17 deletions(-)
+> > 
+> > diff --git a/drivers/scsi/hpsa.c b/drivers/scsi/hpsa.c
+> > index 443eabf63a9f..e517a4c74a28 100644
+> > --- a/drivers/scsi/hpsa.c
+> > +++ b/drivers/scsi/hpsa.c
+> > @@ -51,6 +51,7 @@
+> >  #include <linux/jiffies.h>
+> >  #include <linux/percpu-defs.h>
+> >  #include <linux/percpu.h>
+> > +#include <linux/blk-mq-pci.h>
+> >  #include <asm/unaligned.h>
+> >  #include <asm/div64.h>
+> >  #include "hpsa_cmd.h"
+> > @@ -956,6 +957,13 @@ static struct device_attribute *hpsa_shost_attrs[] = {
+> >  #define HPSA_NRESERVED_CMDS	(HPSA_CMDS_RESERVED_FOR_DRIVER +\
+> >  				 HPSA_MAX_CONCURRENT_PASSTHRUS)
+> >  
+> > +static int hpsa_map_queues(struct Scsi_Host *shost)
+> > +{
+> > +        struct ctlr_info *h = shost_to_hba(shost);
+> > +
+> > +        return blk_mq_pci_map_queues(&shost->tag_set, h->pdev);
+> > +}
+> > +
+> >  static struct scsi_host_template hpsa_driver_template = {
+> >  	.module			= THIS_MODULE,
+> >  	.name			= HPSA,
+> > @@ -974,10 +982,13 @@ static struct scsi_host_template hpsa_driver_template = {
+> >  #ifdef CONFIG_COMPAT
+> >  	.compat_ioctl		= hpsa_compat_ioctl,
+> >  #endif
+> > +	.map_queues = hpsa_map_queues,
+> >  	.sdev_attrs = hpsa_sdev_attrs,
+> >  	.shost_attrs = hpsa_shost_attrs,
+> >  	.max_sectors = 1024,
+> >  	.no_write_same = 1,
+> > +	.force_blk_mq = 1,
+> > +	.host_tagset = 1,
+> >  };
+> >  
+> >  static inline u32 next_command(struct ctlr_info *h, u8 q)
+> > @@ -1045,11 +1056,7 @@ static void set_performant_mode(struct ctlr_info *h, struct CommandList *c,
+> >  		c->busaddr |= 1 | (h->blockFetchTable[c->Header.SGList] << 1);
+> >  		if (unlikely(!h->msix_vectors))
+> >  			return;
+> > -		if (likely(reply_queue == DEFAULT_REPLY_QUEUE))
+> > -			c->Header.ReplyQueue =
+> > -				raw_smp_processor_id() % h->nreply_queues;
+> > -		else
+> > -			c->Header.ReplyQueue = reply_queue % h->nreply_queues;
+> > +		c->Header.ReplyQueue = reply_queue;
+> >  	}
+> >  }
+> >  
+> > @@ -1063,10 +1070,7 @@ static void set_ioaccel1_performant_mode(struct ctlr_info *h,
+> >  	 * Tell the controller to post the reply to the queue for this
+> >  	 * processor.  This seems to give the best I/O throughput.
+> >  	 */
+> > -	if (likely(reply_queue == DEFAULT_REPLY_QUEUE))
+> > -		cp->ReplyQueue = smp_processor_id() % h->nreply_queues;
+> > -	else
+> > -		cp->ReplyQueue = reply_queue % h->nreply_queues;
+> > +	cp->ReplyQueue = reply_queue;
+> >  	/*
+> >  	 * Set the bits in the address sent down to include:
+> >  	 *  - performant mode bit (bit 0)
+> > @@ -1087,10 +1091,7 @@ static void set_ioaccel2_tmf_performant_mode(struct ctlr_info *h,
+> >  	/* Tell the controller to post the reply to the queue for this
+> >  	 * processor.  This seems to give the best I/O throughput.
+> >  	 */
+> > -	if (likely(reply_queue == DEFAULT_REPLY_QUEUE))
+> > -		cp->reply_queue = smp_processor_id() % h->nreply_queues;
+> > -	else
+> > -		cp->reply_queue = reply_queue % h->nreply_queues;
+> > +	cp->reply_queue = reply_queue;
+> >  	/* Set the bits in the address sent down to include:
+> >  	 *  - performant mode bit not used in ioaccel mode 2
+> >  	 *  - pull count (bits 0-3)
+> > @@ -1109,10 +1110,7 @@ static void set_ioaccel2_performant_mode(struct ctlr_info *h,
+> >  	 * Tell the controller to post the reply to the queue for this
+> >  	 * processor.  This seems to give the best I/O throughput.
+> >  	 */
+> > -	if (likely(reply_queue == DEFAULT_REPLY_QUEUE))
+> > -		cp->reply_queue = smp_processor_id() % h->nreply_queues;
+> > -	else
+> > -		cp->reply_queue = reply_queue % h->nreply_queues;
+> > +	cp->reply_queue = reply_queue;
+> >  	/*
+> >  	 * Set the bits in the address sent down to include:
+> >  	 *  - performant mode bit not used in ioaccel mode 2
+> > @@ -1152,11 +1150,27 @@ static void dial_up_lockup_detection_on_fw_flash_complete(struct ctlr_info *h,
+> >  		h->heartbeat_sample_interval = HEARTBEAT_SAMPLE_INTERVAL;
+> >  }
+> >  
+> > +static unsigned get_reply_queue(struct ctlr_info *h, struct CommandList *c)
+> > +{
+> > +	struct scsi_cmnd *cmd = c->scsi_cmd;
+> > +	int *map;
+> > +
+> > +	if (cmd && cmd->request) {
+> > +		u32 tag = blk_mq_unique_tag(cmd->request);
+> > +		return blk_mq_unique_tag_to_hwq(tag);
+> > +	}
+> > +
+> > +	map = h->scsi_host->tag_set.mq_map;
+> > +	return map[raw_smp_processor_id()];
+> > +}
+> > +
+> >  static void __enqueue_cmd_and_start_io(struct ctlr_info *h,
+> >  	struct CommandList *c, int reply_queue)
+> >  {
+> >  	dial_down_lockup_detection_during_fw_flash(h, c);
+> >  	atomic_inc(&h->commands_outstanding);
+> > +
+> > +	reply_queue = get_reply_queue(h, c);
+> >  	switch (c->cmd_type) {
+> >  	case CMD_IOACCEL1:
+> >  		set_ioaccel1_performant_mode(h, c, reply_queue);
+> > @@ -5781,6 +5795,9 @@ static int hpsa_scsi_add_host(struct ctlr_info *h)
+> >  {
+> >  	int rv;
+> >  
+> > +	/* map reply queue to blk_mq hw queue */
+> > +	h->scsi_host->nr_hw_queues = h->msix_vectors;
+> > +
+> >  	rv = scsi_add_host(h->scsi_host, &h->pdev->dev);
+> >  	if (rv) {
+> >  		dev_err(&h->pdev->dev, "scsi_add_host failed\n");
+> > 
+> I really wonder why we need to call 'raw_smp_processor' here; typically
+> the queue should be encoded in the tag, so it would be better to call
+> blk_mq_unique_tag()/blk_mq_unique_tag_to_hwq() here to get the hardware
+> queue.
 
-When a metadate I/O error happens on cache device, bcache error handling
-routine bch_cache_set_error() will call bch_cache_set_unregister() to
-retire whole cache set. On the unregister code path, this delayed work is
-stopped by calling cancel_delayed_work_sync(&dc->writeback_rate_update).
+HPSA may send internal command(no any request attached) to HBA directly,
+that is why raw_smp_processor() is used here. As you saw in patch 7, command
+can be submitted to HBA even before adding scsi host...
 
-dc->writeback_rate_update is a special delayed work from others in bcache.
-In its routine update_writeback_rate(), this delayed work is re-armed
-itself. That means when cancel_delayed_work_sync() returns, this delayed
-work can still be executed after several seconds defined by
-dc->writeback_rate_update_seconds.
+I admit it is ugly, but that should be something we can survive, at least blk-mq
+provides one simply approach to get the correct(or default) hw/reply queue for
+submission req. 
 
-The problem is, after cancel_delayed_work_sync() returns, the cache set
-unregister code path will continue and release memory of struct cache set.
-Then the delayed work is scheduled to run, __update_writeback_rate()
-will reference the already released cache_set memory, and trigger a NULL
-pointer deference fault.
-
-This patch introduces two more bcache device flags,
-- BCACHE_DEV_WB_RUNNING
-  bit set:  bcache device is in writeback mode and running, it is OK for
-            dc->writeback_rate_update to re-arm itself.
-  bit clear:bcache device is trying to stop dc->writeback_rate_update,
-            this delayed work should not re-arm itself and quit.
-- BCACHE_DEV_RATE_DW_RUNNING
-  bit set:  routine update_writeback_rate() is executing.
-  bit clear: routine update_writeback_rate() quits.
-
-This patch also adds a function cancel_writeback_rate_update_dwork() to
-wait for dc->writeback_rate_update quits before cancel it by calling
-cancel_delayed_work_sync(). In order to avoid a deadlock by unexpected
-quit dc->writeback_rate_update, after time_out seconds this function will
-give up and continue to call cancel_delayed_work_sync().
-
-And here I explain how this patch stops self re-armed delayed work properly
-with the above stuffs.
-
-update_writeback_rate() sets BCACHE_DEV_RATE_DW_RUNNING at its beginning
-and clears BCACHE_DEV_RATE_DW_RUNNING at its end. Before calling
-cancel_writeback_rate_update_dwork() clear flag BCACHE_DEV_WB_RUNNING.
-
-Before calling cancel_delayed_work_sync() wait utill flag
-BCACHE_DEV_RATE_DW_RUNNING is clear. So when calling
-cancel_delayed_work_sync(), dc->writeback_rate_update must be already re-
-armed, or quite by seeing BCACHE_DEV_WB_RUNNING cleared. In both cases
-delayed work routine update_writeback_rate() won't be executed after
-cancel_delayed_work_sync() returns.
-
-Inside update_writeback_rate() before calling schedule_delayed_work(), flag
-BCACHE_DEV_WB_RUNNING is checked before. If this flag is cleared, it means
-someone is about to stop the delayed work. Because flag
-BCACHE_DEV_RATE_DW_RUNNING is set already and cancel_delayed_work_sync()
-has to wait for this flag to be cleared, we don't need to worry about race
-condition here.
-
-If update_writeback_rate() is scheduled to run after checking
-BCACHE_DEV_RATE_DW_RUNNING and before calling cancel_delayed_work_sync()
-in cancel_writeback_rate_update_dwork(), it is also safe. Because at this
-moment BCACHE_DEV_WB_RUNNING is cleared with memory barrier. As I mentioned
-previously, update_writeback_rate() will see BCACHE_DEV_WB_RUNNING is clear
-and quit immediately.
-
-Because there are more dependences inside update_writeback_rate() to struct
-cache_set memory, dc->writeback_rate_update is not a simple self re-arm
-delayed work. After trying many different methods (e.g. hold dc->count, or
-use locks), this is the only way I can find which works to properly stop
-dc->writeback_rate_update delayed work.
-
-Changelog:
-v3: change values of BCACHE_DEV_WB_RUNNING and BCACHE_DEV_RATE_DW_RUNNING
-    to bit index, for test_bit().
-v2: Try to fix the race issue which is pointed out by Junhui.
-v1: The initial version for review
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Junhui Tang <tang.junhui@zte.com.cn>
-Cc: Michael Lyle <mlyle@lyle.org>
-Cc: Hannes Reinecke <hare@suse.com>
----
- drivers/md/bcache/bcache.h    |  9 +++++----
- drivers/md/bcache/super.c     | 39 +++++++++++++++++++++++++++++++++++----
- drivers/md/bcache/sysfs.c     |  3 ++-
- drivers/md/bcache/writeback.c | 29 ++++++++++++++++++++++++++++-
- 4 files changed, 70 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index b8c2e1bef1f1..0380626bf525 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -258,10 +258,11 @@ struct bcache_device {
- 	struct gendisk		*disk;
- 
- 	unsigned long		flags;
--#define BCACHE_DEV_CLOSING	0
--#define BCACHE_DEV_DETACHING	1
--#define BCACHE_DEV_UNLINK_DONE	2
--
-+#define BCACHE_DEV_CLOSING		0
-+#define BCACHE_DEV_DETACHING		1
-+#define BCACHE_DEV_UNLINK_DONE		2
-+#define BCACHE_DEV_WB_RUNNING		3
-+#define BCACHE_DEV_RATE_DW_RUNNING	4
- 	unsigned		nr_stripes;
- 	unsigned		stripe_size;
- 	atomic_t		*stripe_sectors_dirty;
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 7d96dc6860fa..e15cacecf078 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -899,6 +899,32 @@ void bch_cached_dev_run(struct cached_dev *dc)
- 		pr_debug("error creating sysfs link");
- }
- 
-+/*
-+ * If BCACHE_DEV_RATE_DW_RUNNING is set, it means routine of the delayed
-+ * work dc->writeback_rate_update is running. Wait until the routine
-+ * quits (BCACHE_DEV_RATE_DW_RUNNING is clear), then continue to
-+ * cancel it. If BCACHE_DEV_RATE_DW_RUNNING is not clear after time_out
-+ * seconds, give up waiting here and continue to cancel it too.
-+ */
-+static void cancel_writeback_rate_update_dwork(struct cached_dev *dc)
-+{
-+	int time_out = WRITEBACK_RATE_UPDATE_SECS_MAX * HZ;
-+
-+	do {
-+		if (!test_bit(BCACHE_DEV_RATE_DW_RUNNING,
-+			      &dc->disk.flags))
-+			break;
-+		time_out--;
-+		schedule_timeout_interruptible(1);
-+	} while (time_out > 0);
-+
-+	if (time_out == 0)
-+		pr_warn("give up waiting for dc->writeback_write_update"
-+			" to quit");
-+
-+	cancel_delayed_work_sync(&dc->writeback_rate_update);
-+}
-+
- static void cached_dev_detach_finish(struct work_struct *w)
- {
- 	struct cached_dev *dc = container_of(w, struct cached_dev, detach);
-@@ -911,7 +937,9 @@ static void cached_dev_detach_finish(struct work_struct *w)
- 
- 	mutex_lock(&bch_register_lock);
- 
--	cancel_delayed_work_sync(&dc->writeback_rate_update);
-+	if (test_and_clear_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags))
-+		cancel_writeback_rate_update_dwork(dc);
-+
- 	if (!IS_ERR_OR_NULL(dc->writeback_thread)) {
- 		kthread_stop(dc->writeback_thread);
- 		dc->writeback_thread = NULL;
-@@ -954,6 +982,7 @@ void bch_cached_dev_detach(struct cached_dev *dc)
- 	closure_get(&dc->disk.cl);
- 
- 	bch_writeback_queue(dc);
-+
- 	cached_dev_put(dc);
- }
- 
-@@ -1079,14 +1108,16 @@ static void cached_dev_free(struct closure *cl)
- {
- 	struct cached_dev *dc = container_of(cl, struct cached_dev, disk.cl);
- 
--	cancel_delayed_work_sync(&dc->writeback_rate_update);
-+	mutex_lock(&bch_register_lock);
-+
-+	if (test_and_clear_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags))
-+		cancel_writeback_rate_update_dwork(dc);
-+
- 	if (!IS_ERR_OR_NULL(dc->writeback_thread))
- 		kthread_stop(dc->writeback_thread);
- 	if (dc->writeback_write_wq)
- 		destroy_workqueue(dc->writeback_write_wq);
- 
--	mutex_lock(&bch_register_lock);
--
- 	if (atomic_read(&dc->running))
- 		bd_unlink_disk_holder(dc->bdev, dc->disk.disk);
- 	bcache_device_free(&dc->disk);
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index 4a6a697e1680..399e91cbf714 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -306,7 +306,8 @@ STORE(bch_cached_dev)
- 		bch_writeback_queue(dc);
- 
- 	if (attr == &sysfs_writeback_percent)
--		schedule_delayed_work(&dc->writeback_rate_update,
-+		if (!test_and_set_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags))
-+			schedule_delayed_work(&dc->writeback_rate_update,
- 				      dc->writeback_rate_update_seconds * HZ);
- 
- 	mutex_unlock(&bch_register_lock);
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 4dbeaaa575bf..8f98ef1038d3 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -115,6 +115,21 @@ static void update_writeback_rate(struct work_struct *work)
- 					     struct cached_dev,
- 					     writeback_rate_update);
- 
-+	/*
-+	 * should check BCACHE_DEV_RATE_DW_RUNNING before calling
-+	 * cancel_delayed_work_sync().
-+	 */
-+	set_bit(BCACHE_DEV_RATE_DW_RUNNING, &dc->disk.flags);
-+	/* paired with where BCACHE_DEV_RATE_DW_RUNNING is tested */
-+	smp_mb();
-+
-+	if (!test_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags)) {
-+		clear_bit(BCACHE_DEV_RATE_DW_RUNNING, &dc->disk.flags);
-+		/* paired with where BCACHE_DEV_RATE_DW_RUNNING is tested */
-+		smp_mb();
-+		return;
-+	}
-+
- 	down_read(&dc->writeback_lock);
- 
- 	if (atomic_read(&dc->has_dirty) &&
-@@ -123,8 +138,18 @@ static void update_writeback_rate(struct work_struct *work)
- 
- 	up_read(&dc->writeback_lock);
- 
--	schedule_delayed_work(&dc->writeback_rate_update,
-+	if (test_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags)) {
-+		schedule_delayed_work(&dc->writeback_rate_update,
- 			      dc->writeback_rate_update_seconds * HZ);
-+	}
-+
-+	/*
-+	 * should check BCACHE_DEV_RATE_DW_RUNNING before calling
-+	 * cancel_delayed_work_sync().
-+	 */
-+	clear_bit(BCACHE_DEV_RATE_DW_RUNNING, &dc->disk.flags);
-+	/* paired with where BCACHE_DEV_RATE_DW_RUNNING is tested */
-+	smp_mb();
- }
- 
- static unsigned writeback_delay(struct cached_dev *dc, unsigned sectors)
-@@ -675,6 +700,7 @@ void bch_cached_dev_writeback_init(struct cached_dev *dc)
- 	dc->writeback_rate_p_term_inverse = 40;
- 	dc->writeback_rate_i_term_inverse = 10000;
- 
-+	WARN_ON(test_and_clear_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags));
- 	INIT_DELAYED_WORK(&dc->writeback_rate_update, update_writeback_rate);
- }
- 
-@@ -693,6 +719,7 @@ int bch_cached_dev_writeback_start(struct cached_dev *dc)
- 		return PTR_ERR(dc->writeback_thread);
- 	}
- 
-+	WARN_ON(test_and_set_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags));
- 	schedule_delayed_work(&dc->writeback_rate_update,
- 			      dc->writeback_rate_update_seconds * HZ);
- 
--- 
-2.16.1
+Thanks,
+Ming
