@@ -1,46 +1,96 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f177.google.com ([209.85.192.177]:42694 "EHLO
-        mail-pf0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754048AbeBGTlx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Feb 2018 14:41:53 -0500
-Received: by mail-pf0-f177.google.com with SMTP id b25so765612pfd.9
-        for <linux-block@vger.kernel.org>; Wed, 07 Feb 2018 11:41:53 -0800 (PST)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com
-Subject: Bcache patches for inclusion in 4.16
-Date: Wed,  7 Feb 2018 11:41:38 -0800
-Message-Id: <20180207194146.5095-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Tue, 6 Feb 2018 13:43:10 -0800
+From: Omar Sandoval <osandov@osandov.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Mike Snitzer <snitzer@redhat.com>, linux-scsi@vger.kernel.org,
+	Hannes Reinecke <hare@suse.de>, Arun Easi <arun.easi@cavium.com>,
+	Omar Sandoval <osandov@fb.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	James Bottomley <james.bottomley@hansenpartnership.com>,
+	Christoph Hellwig <hch@lst.de>, Don Brace <don.brace@microsemi.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Peter Rivera <peter.rivera@broadcom.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Laurence Oberman <loberman@redhat.com>
+Subject: Re: [PATCH V2 4/8] block: null_blk: introduce module parameter of
+ 'g_global_tags'
+Message-ID: <20180206214310.GE16027@vader.DHCP.thefacebook.com>
+References: <20180205152035.15016-1-ming.lei@redhat.com>
+ <20180205152035.15016-5-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180205152035.15016-5-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Jens---
+On Mon, Feb 05, 2018 at 11:20:31PM +0800, Ming Lei wrote:
+> This patch introduces the parameter of 'g_global_tags' so that we can
+> test this feature by null_blk easiy.
+> 
+> Not see obvious performance drop with global_tags when the whole hw
+> depth is kept as same:
+> 
+> 1) no 'global_tags', each hw queue depth is 1, and 4 hw queues
+> modprobe null_blk queue_mode=2 nr_devices=4 shared_tags=1 global_tags=0 submit_queues=4 hw_queue_depth=1
+> 
+> 2) 'global_tags', global hw queue depth is 4, and 4 hw queues
+> modprobe null_blk queue_mode=2 nr_devices=4 shared_tags=1 global_tags=1 submit_queues=4 hw_queue_depth=4
+> 
+> 3) fio test done in above two settings:
+>    fio --bs=4k --size=512G  --rw=randread --norandommap --direct=1 --ioengine=libaio --iodepth=4 --runtime=$RUNTIME --group_reporting=1  --name=nullb0 --filename=/dev/nullb0 --name=nullb1 --filename=/dev/nullb1 --name=nullb2 --filename=/dev/nullb2 --name=nullb3 --filename=/dev/nullb3
+> 
+> 1M IOPS can be reached in both above tests which is done in one VM.
+> 
+> Cc: Arun Easi <arun.easi@cavium.com>
+> Cc: Omar Sandoval <osandov@fb.com>,
+> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+> Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
+> Cc: Christoph Hellwig <hch@lst.de>,
+> Cc: Don Brace <don.brace@microsemi.com>
+> Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+> Cc: Peter Rivera <peter.rivera@broadcom.com>
+> Cc: Mike Snitzer <snitzer@redhat.com>
+> Tested-by: Laurence Oberman <loberman@redhat.com>
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Here are a few more changes for 4.16 from Coly Li and Tang Junhui.
+The module parameter is just called "global_tags", not "g_global_tags",
+right? The subject should say the former.
 
-Probably the most "functional" is 2/8, which makes a change to improve a
-performance bug under sustained small writes.  Still, it's a small, safe
-change that seems good to take.  The rest are small bugfixes.
+Otherwise,
 
-All have seen some degree of test (which is, of course, always ongoing).
+Reviewed-by: Omar Sandoval <osandov@fb.com>
 
-Note that there's one checkpatch error in this, but it was already present
-and is just triggered by altering an adjacent line.
-
- 9 files changed, 111 insertions(+), 36 deletions(-)
-
-Coly Li (3):
-      bcache: properly set task state in bch_writeback_thread()
-      bcache: set error_limit correctly
-      bcache: set writeback_rate_update_seconds in range [1, 60] seconds
-
-Tang Junhui (5):
-      bcache: add journal statistic
-      bcache: fix high CPU occupancy during journal
-      bcache: fix for allocator and register thread race
-      bcache: return attach error when no cache set exist
-      bcache: fix for data collapse after re-attaching an attached device
-
-Thanks, as always,
-
-Mike
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/block/null_blk.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+> index 287a09611c0f..ad0834efad42 100644
+> --- a/drivers/block/null_blk.c
+> +++ b/drivers/block/null_blk.c
+> @@ -163,6 +163,10 @@ static int g_submit_queues = 1;
+>  module_param_named(submit_queues, g_submit_queues, int, S_IRUGO);
+>  MODULE_PARM_DESC(submit_queues, "Number of submission queues");
+>  
+> +static int g_global_tags = 0;
+> +module_param_named(global_tags, g_global_tags, int, S_IRUGO);
+> +MODULE_PARM_DESC(global_tags, "All submission queues share one tags");
+> +
+>  static int g_home_node = NUMA_NO_NODE;
+>  module_param_named(home_node, g_home_node, int, S_IRUGO);
+>  MODULE_PARM_DESC(home_node, "Home node for the device");
+> @@ -1622,6 +1626,8 @@ static int null_init_tag_set(struct nullb *nullb, struct blk_mq_tag_set *set)
+>  	set->flags = BLK_MQ_F_SHOULD_MERGE;
+>  	if (g_no_sched)
+>  		set->flags |= BLK_MQ_F_NO_SCHED;
+> +	if (g_global_tags)
+> +		set->flags |= BLK_MQ_F_GLOBAL_TAGS;
+>  	set->driver_data = NULL;
+>  
+>  	if ((nullb && nullb->dev->blocking) || g_blocking)
+> -- 
+> 2.9.5
+> 
