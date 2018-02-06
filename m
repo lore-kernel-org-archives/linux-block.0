@@ -1,141 +1,154 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from othala.iewc.co.za ([154.73.34.12]:41178 "EHLO othala.uls.co.za"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753503AbeBVL3Z (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Feb 2018 06:29:25 -0500
-Received: from uls-154-73-35-201.wall.uls.co.za ([154.73.35.201] helo=tauri.local.uls.co.za)
-        by othala.uls.co.za with esmtpsa (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
-        (Exim 4.89)
-        (envelope-from <jaco@uls.co.za>)
-        id 1eooaa-00070p-Kd
-        for linux-block@vger.kernel.org; Thu, 22 Feb 2018 12:59:00 +0200
-To: linux-block@vger.kernel.org
-Cc: Pieter Kruger <pieterk@uls.co.za>
-From: Jaco Kroon <jaco@uls.co.za>
-Subject: disk-io lockup in 4.14.13 kernel
-Message-ID: <16bae006-371f-1eea-56b6-8668249d870b@uls.co.za>
-Date: Thu, 22 Feb 2018 12:58:59 +0200
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Laurence Oberman <loberman@redhat.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 4/5] genirq/affinity: irq vector spread among online CPUs as far as possible
+Date: Tue,  6 Feb 2018 20:17:41 +0800
+Message-Id: <20180206121742.29336-5-ming.lei@redhat.com>
+In-Reply-To: <20180206121742.29336-1-ming.lei@redhat.com>
+References: <20180206121742.29336-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+84676c1f21 ("genirq/affinity: assign vectors to all possible CPUs")
+may cause irq vector assigned to all offline CPUs, and this kind of
+assignment may cause much less irq vectors mapped to online CPUs, and
+performance may get hurt.
 
-We've been seeing sporadic IO lockups on recent kernels.
+For example, in a 8 cores system, 0~3 online, 4~8 offline/not present,
+see 'lscpu':
 
-Currently installed on the server is 4.14.13.
+	[ming@box]$lscpu
+	Architecture:          x86_64
+	CPU op-mode(s):        32-bit, 64-bit
+	Byte Order:            Little Endian
+	CPU(s):                4
+	On-line CPU(s) list:   0-3
+	Thread(s) per core:    1
+	Core(s) per socket:    2
+	Socket(s):             2
+	NUMA node(s):          2
+	...
+	NUMA node0 CPU(s):     0-3
+	NUMA node1 CPU(s):
+	...
 
-Previously we ran 4.0.9, due to various problems from 4.1 onward with
-respect to RAID problems, and netfilter etc ... with 4.13 being the
-first usable kernel again that doesn't require additional patching.  I'm
-not sure if the situation currently is RAID related, or actual disk, I
-doubt it's filesystem (ext4 in this case).
+For example, one device has 4 queues:
 
-As far as I can tell the issue has been coming along since the
-introduction of 4.1.
+1) before 84676c1f21 ("genirq/affinity: assign vectors to all possible CPUs")
+	irq 39, cpu list 0
+	irq 40, cpu list 1
+	irq 41, cpu list 2
+	irq 42, cpu list 3
 
-We've got LVM in use, with dm-5 representing vg=lvm, lv=home, mounted on
-/home (quite a big one).  Two PVs backing that, each a mdadm based RAID6.
+2) after 84676c1f21 ("genirq/affinity: assign vectors to all possible CPUs")
+	irq 39, cpu list 0-2
+	irq 40, cpu list 3-4,6
+	irq 41, cpu list 5
+	irq 42, cpu list 7
 
-The clear symptom that we see every time is this snippet from iostat -dmx 1:
+3) after applying this patch against V4.15+:
+	irq 39, cpu list 0,4
+	irq 40, cpu list 1,6
+	irq 41, cpu list 2,5
+	irq 42, cpu list 3,7
 
-Device:         rrqm/s   wrqm/s     r/s     w/s    rMB/s    wMB/s
-avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
-sds               0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-sdq               0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-sdo               0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-sdr               0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-sdl               0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-sdp               0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-sdn               0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-sdj               0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-sdb               0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-sda               0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-sdf               0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-sdk               0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-sdc               0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-sdh               0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-sde               0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-sdm               0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-sdi               0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-sdg               0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-sdd               0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-md127             0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-md125             0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-md126             0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-md124             0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-dm-0              0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-dm-1              0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-dm-2              0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-dm-3              0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-dm-4              0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-dm-5              0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     1.00    0.00    0.00    0.00   0.00 100.00
-dm-6              0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
-dm-7              0.00     0.00    0.00    0.00     0.00     0.00    
-0.00     0.00    0.00    0.00    0.00   0.00   0.00
+This patch tries to do irq vector spread among online CPUs as far as
+possible by 2 stages spread.
 
-Normally I see that the sd* devices carries approximately the same load
-as the md* devices as the dm-* devices (in terms of number of requests,
-not by utilization %).  So if we have outstanding requests on dm-* we
-will see oustanding requests on md* on sd*.  This is not the case above,
-which leads me to believe that dm-5 in this case received a request, but
-for some or another reason never responded (ie, kernel believes there is
-an outstanding request).
+The above assignment 3) isn't the optimal result from NUMA view, but it
+returns more irq vectors with online CPU mapped, given in reality one CPU
+should be enough to handle one irq vector, so it is better to do this way.
 
-The file-system on /home is non-responsive at this point for any
-non-cached data (meaning that some folders an ls on will work, whereas
-others the ls process will go into uninterruptible wait and stay there -
-far majority of them).
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Christoph Hellwig <hch@lst.de>
+Reported-by: Laurence Oberman <loberman@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ kernel/irq/affinity.c | 35 +++++++++++++++++++++++++++++------
+ 1 file changed, 29 insertions(+), 6 deletions(-)
 
-/proc/mdstat is looking very happy based on my experience.  No failed
-drives or the like.
-
-Capture of everything I thought to capture available at
-http://downloads.uls.co.za/lockup/, specifically:
-
-dmesg output
-dmsetup -v info
-dmsetup -v table
-/proc/mstat
-px axf
-uptime
-iostat -dmx 1 60
-
-System is currently in "broken" state, and I can leave it there for
-approximately the next four hours to gather additional information, at
-which point I'll have to trigger a hard reset (system fails to shut down
-cleanly).
-
-Kind Regards,
-Jaco
+diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
+index 9801aecf8763..6755ed77d017 100644
+--- a/kernel/irq/affinity.c
++++ b/kernel/irq/affinity.c
+@@ -106,6 +106,9 @@ int irq_build_affinity_masks(const struct irq_affinity *affd,
+ 	nodemask_t nodemsk = NODE_MASK_NONE;
+ 	int n, nodes, cpus_per_vec, extra_vecs, done = 0;
+ 
++	if (!cpumask_weight(cpu_mask))
++		return 0;
++
+ 	nodes = get_nodes_in_cpumask(node_to_cpumask, cpu_mask, &nodemsk);
+ 
+ 	/*
+@@ -175,9 +178,9 @@ struct cpumask *
+ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ {
+ 	int affv = nvecs - affd->pre_vectors - affd->post_vectors;
+-	int curvec;
++	int curvec, vecs_offline, vecs_online;
+ 	struct cpumask *masks;
+-	cpumask_var_t nmsk, *node_to_cpumask;
++	cpumask_var_t nmsk, cpu_mask, *node_to_cpumask;
+ 
+ 	/*
+ 	 * If there aren't any vectors left after applying the pre/post
+@@ -193,9 +196,12 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 	if (!masks)
+ 		goto out;
+ 
++	if (!alloc_cpumask_var(&cpu_mask, GFP_KERNEL))
++		goto out;
++
+ 	node_to_cpumask = alloc_node_to_cpumask();
+ 	if (!node_to_cpumask)
+-		goto out;
++		goto out_free_cpu_mask;
+ 
+ 	/* Fill out vectors at the beginning that don't need affinity */
+ 	for (curvec = 0; curvec < affd->pre_vectors; curvec++)
+@@ -204,15 +210,32 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 	/* Stabilize the cpumasks */
+ 	get_online_cpus();
+ 	build_node_to_cpumask(node_to_cpumask);
+-	curvec += irq_build_affinity_masks(affd, curvec, affv,
+-					   node_to_cpumask,
+-					   cpu_possible_mask, nmsk, masks);
++	/* spread on online CPUs starting from the vector of affd->pre_vectors */
++	vecs_online = irq_build_affinity_masks(affd, curvec, affv,
++					       node_to_cpumask,
++					       cpu_online_mask, nmsk, masks);
++
++	/* spread on offline CPUs starting from the next vector to be handled */
++	if (vecs_online >= affv)
++		curvec = affd->pre_vectors;
++	else
++		curvec = affd->pre_vectors + vecs_online;
++	cpumask_andnot(cpu_mask, cpu_possible_mask, cpu_online_mask);
++	vecs_offline = irq_build_affinity_masks(affd, curvec, affv,
++						node_to_cpumask,
++					        cpu_mask, nmsk, masks);
+ 	put_online_cpus();
+ 
+ 	/* Fill out vectors at the end that don't need affinity */
++	if (vecs_online + vecs_offline >= affv)
++		curvec = affv + affd->pre_vectors;
++	else
++		curvec = affd->pre_vectors + vecs_online + vecs_offline;
+ 	for (; curvec < nvecs; curvec++)
+ 		cpumask_copy(masks + curvec, irq_default_affinity);
+ 	free_node_to_cpumask(node_to_cpumask);
++out_free_cpu_mask:
++	free_cpumask_var(cpu_mask);
+ out:
+ 	free_cpumask_var(nmsk);
+ 	return masks;
+-- 
+2.9.5
