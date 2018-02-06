@@ -1,96 +1,58 @@
-Return-Path: <roman.penyaev@profitbricks.com>
-MIME-Version: 1.0
-In-Reply-To: <1517932890.3934.30.camel@wdc.com>
-References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
- <23dcfda7-eac1-ed13-b24e-3586c284ee55@grimberg.me> <CAJrWOzDmU_RWxaY+eXjZ3Az162gr9Bax8=5+1FYj4vzYDoxp7g@mail.gmail.com>
- <1517932890.3934.30.camel@wdc.com>
-From: Roman Penyaev <roman.penyaev@profitbricks.com>
-Date: Wed, 7 Feb 2018 13:57:03 +0100
-Message-ID: <CAJrWOzD3+tcA1cvSNOsN8t7uCOidJ2x6wsqqvFiEHdxW2th=sA@mail.gmail.com>
+Return-Path: <prvs=5689bd51d=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "roman.penyaev@profitbricks.com" <roman.penyaev@profitbricks.com>,
+	"sagi@grimberg.me" <sagi@grimberg.me>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"hch@infradead.org" <hch@infradead.org>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "jinpu.wang@profitbricks.com"
+	<jinpu.wang@profitbricks.com>, "ogerlitz@mellanox.com"
+	<ogerlitz@mellanox.com>, Bart Van Assche <Bart.VanAssche@wdc.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "danil.kipnis@profitbricks.com"
+	<danil.kipnis@profitbricks.com>
 Subject: Re: [PATCH 00/24] InfiniBand Transport (IBTRS) and Network Block
  Device (IBNBD)
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "sagi@grimberg.me" <sagi@grimberg.me>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "hch@infradead.org" <hch@infradead.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"jinpu.wang@profitbricks.com" <jinpu.wang@profitbricks.com>,
-	"ogerlitz@mellanox.com" <ogerlitz@mellanox.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"danil.kipnis@profitbricks.com" <danil.kipnis@profitbricks.com>
-Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 6 Feb 2018 16:01:31 +0000
+Message-ID: <1517932890.3934.30.camel@wdc.com>
+References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
+	 <23dcfda7-eac1-ed13-b24e-3586c284ee55@grimberg.me>
+	 <CAJrWOzDmU_RWxaY+eXjZ3Az162gr9Bax8=5+1FYj4vzYDoxp7g@mail.gmail.com>
+In-Reply-To: <CAJrWOzDmU_RWxaY+eXjZ3Az162gr9Bax8=5+1FYj4vzYDoxp7g@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Feb 6, 2018 at 5:01 PM, Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
-> On Tue, 2018-02-06 at 14:12 +0100, Roman Penyaev wrote:
->> On Mon, Feb 5, 2018 at 1:16 PM, Sagi Grimberg <sagi@grimberg.me> wrote:
->> > [ ... ]
->> > - srp/scst comparison is really not fair having it in legacy request
->> >   mode. Can you please repeat it and report a bug to either linux-rdma
->> >   or to the scst mailing list?
->>
->> Yep, I can retest with mq.
->>
->> > - Your latency measurements are surprisingly high for a null target
->> >   device (even for low end nvme device actually) regardless of the
->> >   transport implementation.
->>
->> Hm, network configuration?  These are results on machines dedicated
->> to our team for testing in one of our datacenters. Nothing special
->> in configuration.
->
-
-Hello Bart,
-
-> I agree that the latency numbers are way too high for a null target device.
-> Last time I measured latency for the SRP protocol against an SCST target
-> + null block driver at the target side and ConnectX-3 adapters I measured a
-> latency of about 14 microseconds. That's almost 100 times less than the
-> measurement results in https://www.spinics.net/lists/linux-rdma/msg48799.html.
-
-Here is the following configuration of the setup:
-
-Initiator and target HW configuration:
-    AMD Opteron 6386 SE, 64CPU, 128Gb
-    InfiniBand: Mellanox Technologies MT26428
-                [ConnectX VPI PCIe 2.0 5GT/s - IB QDR / 10GigE]
-
-Also, I remember that between initiator and target there were two IB switches.
-Unfortunately, I can't repeat the same configuration, but will retest as
-soon as we get new HW.
-
-> Something else I would like to understand better is how much of the latency
-> gap between NVMeOF/SRP and IBNBD can be closed without changing the wire
-> protocol. Was e.g. support for immediate data present in the NVMeOF and/or
-> SRP drivers used on your test setup?
-
-I did not get the question. IBTRS uses empty messages with only imm_data
-field set to respond on IO. This is a part of the IBTRS protocol.  I do
-not understand how can immediate data be present in other drivers, if
-those do not use it in their protocols.  I am lost here.
-
-> Are you aware that the NVMeOF target driver calls page_alloc() from the hot path but that there are plans to
-> avoid these calls in the hot path by using a caching mechanism similar to
-> the SGV cache in SCST? Are you aware that a significant latency reduction
-> can be achieved by changing the SCST SGV cache from a global into a per-CPU
-> cache?
-
-No, I am not aware. That is nice, that there is a lot of room for performance
-tweaks. I will definitely retest on fresh kernel once everything is done on
-nvme, scst or ibtrs (especially when we get rid of fmrs and UNSAFE rkeys).
-Maybe there are some other parameters which can be also tweaked?
-
-> Regarding the SRP measurements: have you tried to set the
-> never_register kernel module parameter to true? I'm asking this because I
-> think that mode is most similar to how the IBNBD initiator driver works.
-
-yes, according to my notes from that link (frankly, I do not remember,
-but that is what I wrote 1 year ago):
-
-    * Where suffixes mean:
-
-     _noreg - modules on initiator side (ib_srp, nvme_rdma) were loaded
-              with 'register_always=N' param
-
-That what you are asking, right?
-
---
-Roman
+T24gVHVlLCAyMDE4LTAyLTA2IGF0IDE0OjEyICswMTAwLCBSb21hbiBQZW55YWV2IHdyb3RlOg0K
+PiBPbiBNb24sIEZlYiA1LCAyMDE4IGF0IDE6MTYgUE0sIFNhZ2kgR3JpbWJlcmcgPHNhZ2lAZ3Jp
+bWJlcmcubWU+IHdyb3RlOg0KPiA+IFsgLi4uIF0NCj4gPiAtIHNycC9zY3N0IGNvbXBhcmlzb24g
+aXMgcmVhbGx5IG5vdCBmYWlyIGhhdmluZyBpdCBpbiBsZWdhY3kgcmVxdWVzdA0KPiA+ICAgbW9k
+ZS4gQ2FuIHlvdSBwbGVhc2UgcmVwZWF0IGl0IGFuZCByZXBvcnQgYSBidWcgdG8gZWl0aGVyIGxp
+bnV4LXJkbWENCj4gPiAgIG9yIHRvIHRoZSBzY3N0IG1haWxpbmcgbGlzdD8NCj4gDQo+IFllcCwg
+SSBjYW4gcmV0ZXN0IHdpdGggbXEuDQo+IA0KPiA+IC0gWW91ciBsYXRlbmN5IG1lYXN1cmVtZW50
+cyBhcmUgc3VycHJpc2luZ2x5IGhpZ2ggZm9yIGEgbnVsbCB0YXJnZXQNCj4gPiAgIGRldmljZSAo
+ZXZlbiBmb3IgbG93IGVuZCBudm1lIGRldmljZSBhY3R1YWxseSkgcmVnYXJkbGVzcyBvZiB0aGUN
+Cj4gPiAgIHRyYW5zcG9ydCBpbXBsZW1lbnRhdGlvbi4NCj4gDQo+IEhtLCBuZXR3b3JrIGNvbmZp
+Z3VyYXRpb24/ICBUaGVzZSBhcmUgcmVzdWx0cyBvbiBtYWNoaW5lcyBkZWRpY2F0ZWQNCj4gdG8g
+b3VyIHRlYW0gZm9yIHRlc3RpbmcgaW4gb25lIG9mIG91ciBkYXRhY2VudGVycy4gTm90aGluZyBz
+cGVjaWFsDQo+IGluIGNvbmZpZ3VyYXRpb24uDQoNCkhlbGxvIFJvbWFuLA0KDQpJIGFncmVlIHRo
+YXQgdGhlIGxhdGVuY3kgbnVtYmVycyBhcmUgd2F5IHRvbyBoaWdoIGZvciBhIG51bGwgdGFyZ2V0
+IGRldmljZS4NCkxhc3QgdGltZSBJIG1lYXN1cmVkIGxhdGVuY3kgZm9yIHRoZSBTUlAgcHJvdG9j
+b2wgYWdhaW5zdCBhbiBTQ1NUIHRhcmdldA0KKyBudWxsIGJsb2NrIGRyaXZlciBhdCB0aGUgdGFy
+Z2V0IHNpZGUgYW5kIENvbm5lY3RYLTMgYWRhcHRlcnMgSSBtZWFzdXJlZCBhDQpsYXRlbmN5IG9m
+IGFib3V0IDE0IG1pY3Jvc2Vjb25kcy4gVGhhdCdzIGFsbW9zdCAxMDAgdGltZXMgbGVzcyB0aGFu
+IHRoZQ0KbWVhc3VyZW1lbnQgcmVzdWx0cyBpbiBodHRwczovL3d3dy5zcGluaWNzLm5ldC9saXN0
+cy9saW51eC1yZG1hL21zZzQ4Nzk5Lmh0bWwuDQoNClNvbWV0aGluZyBlbHNlIEkgd291bGQgbGlr
+ZSB0byB1bmRlcnN0YW5kIGJldHRlciBpcyBob3cgbXVjaCBvZiB0aGUgbGF0ZW5jeQ0KZ2FwIGJl
+dHdlZW4gTlZNZU9GL1NSUCBhbmQgSUJOQkQgY2FuIGJlIGNsb3NlZCB3aXRob3V0IGNoYW5naW5n
+IHRoZSB3aXJlDQpwcm90b2NvbC4gV2FzIGUuZy4gc3VwcG9ydCBmb3IgaW1tZWRpYXRlIGRhdGEg
+cHJlc2VudCBpbiB0aGUgTlZNZU9GIGFuZC9vcg0KU1JQIGRyaXZlcnMgdXNlZCBvbiB5b3VyIHRl
+c3Qgc2V0dXA/IEFyZSB5b3UgYXdhcmUgdGhhdCB0aGUgTlZNZU9GIHRhcmdldA0KZHJpdmVyIGNh
+bGxzIHBhZ2VfYWxsb2MoKSBmcm9tIHRoZSBob3QgcGF0aCBidXQgdGhhdCB0aGVyZSBhcmUgcGxh
+bnMgdG8NCmF2b2lkIHRoZXNlIGNhbGxzIGluIHRoZSBob3QgcGF0aCBieSB1c2luZyBhIGNhY2hp
+bmcgbWVjaGFuaXNtIHNpbWlsYXIgdG8NCnRoZSBTR1YgY2FjaGUgaW4gU0NTVD8gQXJlIHlvdSBh
+d2FyZSB0aGF0IGEgc2lnbmlmaWNhbnQgbGF0ZW5jeSByZWR1Y3Rpb24NCmNhbiBiZSBhY2hpZXZl
+ZCBieSBjaGFuZ2luZyB0aGUgU0NTVCBTR1YgY2FjaGUgZnJvbSBhIGdsb2JhbCBpbnRvIGEgcGVy
+LUNQVQ0KY2FjaGU/IFJlZ2FyZGluZyB0aGUgU1JQIG1lYXN1cmVtZW50czogaGF2ZSB5b3UgdHJp
+ZWQgdG8gc2V0IHRoZQ0KbmV2ZXJfcmVnaXN0ZXIga2VybmVsIG1vZHVsZSBwYXJhbWV0ZXIgdG8g
+dHJ1ZT8gSSdtIGFza2luZyB0aGlzIGJlY2F1c2UgSQ0KdGhpbmsgdGhhdCBtb2RlIGlzIG1vc3Qg
+c2ltaWxhciB0byBob3cgdGhlIElCTkJEIGluaXRpYXRvciBkcml2ZXIgd29ya3MuDQoNClRoYW5r
+cywNCg0KQmFydC4=
