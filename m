@@ -1,80 +1,47 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: linux-scsi@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Arun Easi <arun.easi@cavium.com>,
-	Omar Sandoval <osandov@fb.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Don Brace <don.brace@microsemi.com>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Peter Rivera <peter.rivera@broadcom.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Laurence Oberman <loberman@redhat.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 3/8] scsi: Add template flag 'host_tagset'
-Date: Mon,  5 Feb 2018 23:20:30 +0800
-Message-Id: <20180205152035.15016-4-ming.lei@redhat.com>
-In-Reply-To: <20180205152035.15016-1-ming.lei@redhat.com>
-References: <20180205152035.15016-1-ming.lei@redhat.com>
+Return-Path: <gerlitz.or@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20180205220316.30236-2-sagi@grimberg.me>
+References: <20180205220316.30236-1-sagi@grimberg.me> <20180205220316.30236-2-sagi@grimberg.me>
+From: Or Gerlitz <gerlitz.or@gmail.com>
+Date: Tue, 6 Feb 2018 09:43:43 +0200
+Message-ID: <CAJ3xEMhcQLL+QiqtLNtPrRcZEGSspipAoX5C_ERVwv1p=vAMHw@mail.gmail.com>
+Subject: Re: [PATCH rfc 1/5] irq-am: Introduce library implementing generic
+ adaptive moderation
+To: Sagi Grimberg <sagi@grimberg.me>, Tal Gilboa <talgi@mellanox.com>
+Cc: linux-block@vger.kernel.org,
+	RDMA mailing list <linux-rdma@vger.kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Idan Burstein <idanb@mellanox.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-From: Hannes Reinecke <hare@suse.com>
+On Tue, Feb 6, 2018 at 12:03 AM, Sagi Grimberg <sagi@grimberg.me> wrote:
+> irq-am library helps I/O devices implement interrupt moderation in
+> an adaptive fashion, based on online stats.
+>
+> The consumer can initialize an irq-am context with a callback that
+> performs the device specific moderation programming and also the number
+> of am (adaptive moderation) levels which are also, abstracted and allows
+> for device specific tuning.
+>
+> The irq-am code will sample once every nr_events and will check for significant
+> change in workload characteristics (completions per second, events per second)
+> and if it detects one, will perform an am level update(called a step).
+>
+> The irq-am code  assumes that the am levels are sorted in an increasing order when
+> the lowest level corresponds to the optimum latency tuning (short time and low
+> completion-count) and gradually increasing towards the throughput optimum tuning
+> (longer time and higher completion-count). So there is a trend and tuning direction
+> tracked by the moderator. When the moderator collects sufficient statistics (also
+> controlled by the consumer defining nr_events), it compares the current stats with the
+> previous stats and if a significant changed was observed in the load, the moderator
+> attempts to increment/decrement its current level (step) and schedules a program
+> dispatch work.
+>
+> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+> ---
+>  include/linux/irq-am.h | 116 +++++++++++++++++++++++++++++++
 
-Add a host template flag 'host_tagset' to enable the use of a global
-tagset for block-mq.
-
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Arun Easi <arun.easi@cavium.com>
-Cc: Omar Sandoval <osandov@fb.com>,
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-Cc: Christoph Hellwig <hch@lst.de>,
-Cc: Don Brace <don.brace@microsemi.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Peter Rivera <peter.rivera@broadcom.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Tested-by: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/scsi_lib.c  | 2 ++
- include/scsi/scsi_host.h | 3 +++
- 2 files changed, 5 insertions(+)
-
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 55be2550c555..9ab74ac634ea 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2274,6 +2274,8 @@ int scsi_mq_setup_tags(struct Scsi_Host *shost)
- 	shost->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_SG_MERGE;
- 	shost->tag_set.flags |=
- 		BLK_ALLOC_POLICY_TO_MQ_FLAG(shost->hostt->tag_alloc_policy);
-+	if (shost->hostt->host_tagset)
-+		shost->tag_set.flags |= BLK_MQ_F_GLOBAL_TAGS;
- 	shost->tag_set.driver_data = shost;
- 
- 	return blk_mq_alloc_tag_set(&shost->tag_set);
-diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
-index a8b7bf879ced..f6623f887ee4 100644
---- a/include/scsi/scsi_host.h
-+++ b/include/scsi/scsi_host.h
-@@ -457,6 +457,9 @@ struct scsi_host_template {
- 	 */
- 	unsigned int max_host_blocked;
- 
-+	/* True if the host supports a host-wide tagspace */
-+	unsigned host_tagset:1;
-+
- 	/*
- 	 * Default value for the blocking.  If the queue is empty,
- 	 * host_blocked counts down in the request_fn until it restarts
--- 
-2.9.5
+Talking to Tal, it seems that this is what landed in upstream as
+include/linux/net_dim.h
+and can have few adjustments for you, I suggest you take a look
