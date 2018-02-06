@@ -1,85 +1,61 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH 0/5] blk-mq/scsi-mq: support global tags & introduce
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH V2 0/8] blk-mq/scsi-mq: support global tags & introduce
  force_blk_mq
-To: Kashyap Desai <kashyap.desai@broadcom.com>, Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Christoph Hellwig <hch@infradead.org>, Mike Snitzer <snitzer@redhat.com>,
- linux-scsi@vger.kernel.org, Arun Easi <arun.easi@cavium.com>,
- Omar Sandoval <osandov@fb.com>,
+To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+ Christoph Hellwig <hch@infradead.org>, Mike Snitzer <snitzer@redhat.com>
+Cc: linux-scsi@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
+ Arun Easi <arun.easi@cavium.com>, Omar Sandoval <osandov@fb.com>,
  "Martin K . Petersen" <martin.petersen@oracle.com>,
  James Bottomley <james.bottomley@hansenpartnership.com>,
  Christoph Hellwig <hch@lst.de>, Don Brace <don.brace@microsemi.com>,
+ Kashyap Desai <kashyap.desai@broadcom.com>,
  Peter Rivera <peter.rivera@broadcom.com>, Paolo Bonzini
  <pbonzini@redhat.com>, Laurence Oberman <loberman@redhat.com>
-References: <20180203042112.15239-1-ming.lei@redhat.com>
- <07c1f41e-de7c-5e3d-1a2d-0cd7af7b46df@suse.de>
- <528c93de0aac9010e274847ab1ae0328@mail.gmail.com>
- <20180205101734.GA32558@ming.t460p>
- <4c8162129f2a09dca2d1e7eefd61e272@mail.gmail.com>
- <20180206080452.GA14651@ming.t460p>
- <b0b6dae90e4525f91459d450c01c4204@mail.gmail.com>
- <20180206123148.GA29378@ming.t460p>
- <8cf1036167ec5fb58c1d2f70bbb0b678@mail.gmail.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <4c934478-a9c1-2f66-83f2-982b85c4e6cc@suse.de>
-Date: Wed, 7 Feb 2018 07:50:21 +0100
+References: <20180205152035.15016-1-ming.lei@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <27ff9093-82f0-c113-96b4-bbd2ceb36b75@kernel.dk>
+Date: Tue, 6 Feb 2018 16:15:50 -0700
 MIME-Version: 1.0
-In-Reply-To: <8cf1036167ec5fb58c1d2f70bbb0b678@mail.gmail.com>
+In-Reply-To: <20180205152035.15016-1-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi all,
+On 2/5/18 8:20 AM, Ming Lei wrote:
+> Hi All,
+> 
+> This patchset supports global tags which was started by Hannes originally:
+> 
+> 	https://marc.info/?l=linux-block&m=149132580511346&w=2
+> 
+> Also inroduce 'force_blk_mq' and 'host_tagset' to 'struct scsi_host_template',
+> so that driver can avoid to support two IO paths(legacy and blk-mq), especially
+> recent discusion mentioned that SCSI_MQ will be enabled at default soon.
+> 
+> 	https://marc.info/?l=linux-scsi&m=151727684915589&w=2
+> 
+> With the above changes, it should be easier to convert SCSI drivers'
+> reply queue into blk-mq's hctx, then the automatic irq affinity issue can
+> be solved easily, please see detailed descrption in commit log and the
+> 8th patch for converting HPSA.
+> 
+> Also drivers may require to complete request on the submission CPU
+> for avoiding hard/soft deadlock, which can be done easily with blk_mq
+> too.
+> 
+> 	https://marc.info/?t=151601851400001&r=1&w=2
+> 
+> The 6th patch uses the introduced 'force_blk_mq' to fix virtio_scsi
+> so that IO hang issue can be avoided inside legacy IO path, this issue is
+> a bit generic, at least HPSA/virtio-scsi are found broken with v4.15+.
+> 
+> The 7th & 8th patch fixes HPSA's IO issue which is caused by the reply
+> queue selection algorithem.
+> 
+> Laurence has verified that this patch makes HPSA working with the linus
+> tree with this patchset.
 
-[ .. ]
->>
->> Could you share us your patch for enabling global_tags/MQ on
-> megaraid_sas
->> so that I can reproduce your test?
->>
->>> See below perf top data. "bt_iter" is consuming 4 times more CPU.
->>
->> Could you share us what the IOPS/CPU utilization effect is after
-> applying the
->> patch V2? And your test script?
-> Regarding CPU utilization, I need to test one more time. Currently system
-> is in used.
-> 
-> I run below fio test on total 24 SSDs expander attached.
-> 
-> numactl -N 1 fio jbod.fio --rw=randread --iodepth=64 --bs=4k
-> --ioengine=libaio --rw=randread
-> 
-> Performance dropped from 1.6 M IOPs to 770K IOPs.
-> 
-This is basically what we've seen with earlier iterations.
+Do you have any performance numbers for this patchset? I'd be curious
+to know how big the hit is.
 
->>
->> In theory, it shouldn't, because the HBA only supports HBA wide tags,
->> that means the allocation has to share a HBA wide sbitmap no matte>> if global tags is used or not.
->>
->> Anyway, I will take a look at the performance test and data.
->>
->>
->> Thanks,
->> Ming
-> 
-> 
-> Megaraid_sas version of shared tag set.
-> 
-Whee; thanks for that.
-
-I've just finished a patchset moving megarai_sas_fusion to embedded
-commands (and cutting down the size of 'struct megasas_cmd_fusion' by
-half :-), so that will come in just handy.
-
-Will give it a spin.
-
-Cheers,
-
-Hannes
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+Jens Axboe
