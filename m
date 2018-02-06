@@ -1,26 +1,30 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Tue, 6 Feb 2018 12:33:36 -0800
+From: Omar Sandoval <osandov@osandov.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Mike Snitzer <snitzer@redhat.com>, linux-scsi@vger.kernel.org,
+	Hannes Reinecke <hare@suse.de>, Arun Easi <arun.easi@cavium.com>,
+	Omar Sandoval <osandov@fb.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	James Bottomley <james.bottomley@hansenpartnership.com>,
+	Christoph Hellwig <hch@lst.de>, Don Brace <don.brace@microsemi.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Peter Rivera <peter.rivera@broadcom.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Laurence Oberman <loberman@redhat.com>
 Subject: Re: [PATCH V2 2/8] blk-mq: introduce BLK_MQ_F_GLOBAL_TAGS
-To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
- Christoph Hellwig <hch@infradead.org>, Mike Snitzer <snitzer@redhat.com>
-Cc: linux-scsi@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
- Arun Easi <arun.easi@cavium.com>, Omar Sandoval <osandov@fb.com>,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- James Bottomley <james.bottomley@hansenpartnership.com>,
- Christoph Hellwig <hch@lst.de>, Don Brace <don.brace@microsemi.com>,
- Kashyap Desai <kashyap.desai@broadcom.com>,
- Peter Rivera <peter.rivera@broadcom.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Laurence Oberman <loberman@redhat.com>
+Message-ID: <20180206203336.GC16027@vader.DHCP.thefacebook.com>
 References: <20180205152035.15016-1-ming.lei@redhat.com>
  <20180205152035.15016-3-ming.lei@redhat.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <398c755a-ada6-1e60-9562-51b69476e55d@kernel.dk>
-Date: Tue, 6 Feb 2018 16:18:20 -0700
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180205152035.15016-3-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 2/5/18 8:20 AM, Ming Lei wrote:
+On Mon, Feb 05, 2018 at 11:20:29PM +0800, Ming Lei wrote:
 > Quite a few HBAs(such as HPSA, megaraid, mpt3sas, ..) support multiple
 > reply queues, but tags is often HBA wide.
 > 
@@ -53,12 +57,62 @@ On 2/5/18 8:20 AM, Ming Lei wrote:
 > The following patch will support global tags on null_blk, also the performance
 > data is provided, no obvious performance loss is observed when the whole
 > hw queue depth is same.
+> 
+> Cc: Hannes Reinecke <hare@suse.de>
+> Cc: Arun Easi <arun.easi@cavium.com>
+> Cc: Omar Sandoval <osandov@fb.com>,
+> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+> Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
+> Cc: Christoph Hellwig <hch@lst.de>,
+> Cc: Don Brace <don.brace@microsemi.com>
+> Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+> Cc: Peter Rivera <peter.rivera@broadcom.com>
+> Cc: Mike Snitzer <snitzer@redhat.com>
+> Tested-by: Laurence Oberman <loberman@redhat.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-mq-debugfs.c |  1 +
+>  block/blk-mq-sched.c   | 13 ++++++++++++-
+>  block/blk-mq-tag.c     | 23 ++++++++++++++++++-----
+>  block/blk-mq-tag.h     |  5 ++++-
+>  block/blk-mq.c         | 29 ++++++++++++++++++++++++-----
+>  block/blk-mq.h         |  3 ++-
+>  include/linux/blk-mq.h |  2 ++
+>  7 files changed, 63 insertions(+), 13 deletions(-)
+> 
+> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+> index 0dfafa4b655a..0f0fafe03f5d 100644
+> --- a/block/blk-mq-debugfs.c
+> +++ b/block/blk-mq-debugfs.c
+> @@ -206,6 +206,7 @@ static const char *const hctx_flag_name[] = {
+>  	HCTX_FLAG_NAME(SHOULD_MERGE),
+>  	HCTX_FLAG_NAME(TAG_SHARED),
+>  	HCTX_FLAG_NAME(SG_MERGE),
+> +	HCTX_FLAG_NAME(GLOBAL_TAGS),
+>  	HCTX_FLAG_NAME(BLOCKING),
+>  	HCTX_FLAG_NAME(NO_SCHED),
+>  };
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index 55c0a745b427..385bbec73804 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -81,6 +81,17 @@ static bool blk_mq_sched_restart_hctx(struct blk_mq_hw_ctx *hctx)
+>  	} else
+>  		clear_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
+>  
+> +	/* need to restart all hw queues for global tags */
+> +	if (hctx->flags & BLK_MQ_F_GLOBAL_TAGS) {
+> +		struct blk_mq_hw_ctx *hctx2;
+> +		int i;
+> +
+> +		queue_for_each_hw_ctx(hctx->queue, hctx2, i)
+> +			if (blk_mq_run_hw_queue(hctx2, true))
+> +				return true;
 
-GLOBAL implies that it's, strangely enough, global. That isn't really the
-case. Why not call this BLK_MQ_F_HOST_TAGS or something like that? I'd
-welcome better names, but global doesn't seem to be a great choice.
+Is it intentional that we stop after the first hw queue does work? That
+seems fine but it's a little confusing because the comment claims we
+restart everything.
 
-BLK_MQ_F_SET_TAGS?
-
--- 
-Jens Axboe
+> +		return false;
+> +	}
+> +
