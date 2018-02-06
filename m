@@ -1,206 +1,173 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f67.google.com ([209.85.215.67]:46390 "EHLO
-        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1031479AbeBONMU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Feb 2018 08:12:20 -0500
-Received: by mail-lf0-f67.google.com with SMTP id q194so33967758lfe.13
-        for <linux-block@vger.kernel.org>; Thu, 15 Feb 2018 05:12:19 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        javier@cnexlabs.com,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [PATCH v2 1/6] lightnvm: make 1.2 data structures explicit
-Date: Thu, 15 Feb 2018 14:11:55 +0100
-Message-Id: <20180215131200.3354-2-mb@lightnvm.io>
-In-Reply-To: <20180215131200.3354-1-mb@lightnvm.io>
-References: <20180215131200.3354-1-mb@lightnvm.io>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Laurence Oberman <loberman@redhat.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 2/5] genirq/affinity: move actual irq vector spread into one helper
+Date: Tue,  6 Feb 2018 20:17:39 +0800
+Message-Id: <20180206121742.29336-3-ming.lei@redhat.com>
+In-Reply-To: <20180206121742.29336-1-ming.lei@redhat.com>
+References: <20180206121742.29336-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Make the 1.2 data structures explicit, so it will be easy to identify
-the 2.0 data structures. Also fix the order of which the nvme_nvm_*
-are declared, such that they follow the nvme_nvm_command order.
+No functional change, just prepare for converting to 2-stage
+irq vector spread.
 
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/nvme/host/lightnvm.c | 82 ++++++++++++++++++++++----------------------
- 1 file changed, 41 insertions(+), 41 deletions(-)
+ kernel/irq/affinity.c | 99 +++++++++++++++++++++++++++++----------------------
+ 1 file changed, 56 insertions(+), 43 deletions(-)
 
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index dc0b1335c7c6..60db3f1b59da 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -51,6 +51,21 @@ struct nvme_nvm_ph_rw {
- 	__le64			resv;
- };
- 
-+struct nvme_nvm_erase_blk {
-+	__u8			opcode;
-+	__u8			flags;
-+	__u16			command_id;
-+	__le32			nsid;
-+	__u64			rsvd[2];
-+	__le64			prp1;
-+	__le64			prp2;
-+	__le64			spba;
-+	__le16			length;
-+	__le16			control;
-+	__le32			dsmgmt;
-+	__le64			resv;
-+};
-+
- struct nvme_nvm_identity {
- 	__u8			opcode;
- 	__u8			flags;
-@@ -89,33 +104,18 @@ struct nvme_nvm_setbbtbl {
- 	__u32			rsvd4[3];
- };
- 
--struct nvme_nvm_erase_blk {
--	__u8			opcode;
--	__u8			flags;
--	__u16			command_id;
--	__le32			nsid;
--	__u64			rsvd[2];
--	__le64			prp1;
--	__le64			prp2;
--	__le64			spba;
--	__le16			length;
--	__le16			control;
--	__le32			dsmgmt;
--	__le64			resv;
--};
--
- struct nvme_nvm_command {
- 	union {
- 		struct nvme_common_command common;
--		struct nvme_nvm_identity identity;
- 		struct nvme_nvm_ph_rw ph_rw;
-+		struct nvme_nvm_erase_blk erase;
-+		struct nvme_nvm_identity identity;
- 		struct nvme_nvm_getbbtbl get_bb;
- 		struct nvme_nvm_setbbtbl set_bb;
--		struct nvme_nvm_erase_blk erase;
- 	};
- };
- 
--struct nvme_nvm_id_group {
-+struct nvme_nvm_id12_grp {
- 	__u8			mtype;
- 	__u8			fmtype;
- 	__le16			res16;
-@@ -141,7 +141,7 @@ struct nvme_nvm_id_group {
- 	__u8			reserved[906];
- } __packed;
- 
--struct nvme_nvm_addr_format {
-+struct nvme_nvm_id12_addrf {
- 	__u8			ch_offset;
- 	__u8			ch_len;
- 	__u8			lun_offset;
-@@ -157,16 +157,16 @@ struct nvme_nvm_addr_format {
- 	__u8			res[4];
- } __packed;
- 
--struct nvme_nvm_id {
-+struct nvme_nvm_id12 {
- 	__u8			ver_id;
- 	__u8			vmnt;
- 	__u8			cgrps;
- 	__u8			res;
- 	__le32			cap;
- 	__le32			dom;
--	struct nvme_nvm_addr_format ppaf;
-+	struct nvme_nvm_id12_addrf ppaf;
- 	__u8			resv[228];
--	struct nvme_nvm_id_group group;
-+	struct nvme_nvm_id12_grp grp;
- 	__u8			resv2[2880];
- } __packed;
- 
-@@ -191,25 +191,25 @@ static inline void _nvme_nvm_check_size(void)
- {
- 	BUILD_BUG_ON(sizeof(struct nvme_nvm_identity) != 64);
- 	BUILD_BUG_ON(sizeof(struct nvme_nvm_ph_rw) != 64);
-+	BUILD_BUG_ON(sizeof(struct nvme_nvm_erase_blk) != 64);
- 	BUILD_BUG_ON(sizeof(struct nvme_nvm_getbbtbl) != 64);
- 	BUILD_BUG_ON(sizeof(struct nvme_nvm_setbbtbl) != 64);
--	BUILD_BUG_ON(sizeof(struct nvme_nvm_erase_blk) != 64);
--	BUILD_BUG_ON(sizeof(struct nvme_nvm_id_group) != 960);
--	BUILD_BUG_ON(sizeof(struct nvme_nvm_addr_format) != 16);
--	BUILD_BUG_ON(sizeof(struct nvme_nvm_id) != NVME_IDENTIFY_DATA_SIZE);
-+	BUILD_BUG_ON(sizeof(struct nvme_nvm_id12_grp) != 960);
-+	BUILD_BUG_ON(sizeof(struct nvme_nvm_id12_addrf) != 16);
-+	BUILD_BUG_ON(sizeof(struct nvme_nvm_id12) != NVME_IDENTIFY_DATA_SIZE);
- 	BUILD_BUG_ON(sizeof(struct nvme_nvm_bb_tbl) != 64);
+diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
+index 4b1c4763212d..6af3f6727f63 100644
+--- a/kernel/irq/affinity.c
++++ b/kernel/irq/affinity.c
+@@ -79,7 +79,7 @@ static void build_node_to_cpumask(cpumask_var_t *masks)
+ 		cpumask_set_cpu(cpu, masks[cpu_to_node(cpu)]);
  }
  
--static int init_grps(struct nvm_id *nvm_id, struct nvme_nvm_id *nvme_nvm_id)
-+static int init_grp(struct nvm_id *nvm_id, struct nvme_nvm_id12 *id12)
+-static int get_nodes_in_cpumask(cpumask_var_t *node_to_cpumask,
++static int get_nodes_in_cpumask(const cpumask_var_t *node_to_cpumask,
+ 				const struct cpumask *mask, nodemask_t *nodemsk)
  {
--	struct nvme_nvm_id_group *src;
-+	struct nvme_nvm_id12_grp *src;
- 	struct nvm_id_group *grp;
- 	int sec_per_pg, sec_per_pl, pg_per_blk;
+ 	int n, nodes = 0;
+@@ -94,50 +94,19 @@ static int get_nodes_in_cpumask(cpumask_var_t *node_to_cpumask,
+ 	return nodes;
+ }
  
--	if (nvme_nvm_id->cgrps != 1)
-+	if (id12->cgrps != 1)
- 		return -EINVAL;
- 
--	src = &nvme_nvm_id->group;
-+	src = &id12->grp;
- 	grp = &nvm_id->grp;
- 
- 	grp->mtype = src->mtype;
-@@ -261,34 +261,34 @@ static int init_grps(struct nvm_id *nvm_id, struct nvme_nvm_id *nvme_nvm_id)
- static int nvme_nvm_identity(struct nvm_dev *nvmdev, struct nvm_id *nvm_id)
+-/**
+- * irq_create_affinity_masks - Create affinity masks for multiqueue spreading
+- * @nvecs:	The total number of vectors
+- * @affd:	Description of the affinity requirements
+- *
+- * Returns the masks pointer or NULL if allocation failed.
+- */
+-struct cpumask *
+-irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
++int irq_build_affinity_masks(int nvecs, const struct irq_affinity *affd,
++			     const cpumask_var_t *node_to_cpumask,
++			     const struct cpumask *cpu_mask,
++			     struct cpumask *nmsk,
++			     struct cpumask *masks)
  {
- 	struct nvme_ns *ns = nvmdev->q->queuedata;
--	struct nvme_nvm_id *nvme_nvm_id;
-+	struct nvme_nvm_id12 *id;
- 	struct nvme_nvm_command c = {};
- 	int ret;
+-	int n, nodes, cpus_per_vec, extra_vecs, curvec;
+ 	int affv = nvecs - affd->pre_vectors - affd->post_vectors;
+ 	int last_affv = affv + affd->pre_vectors;
++	int curvec = affd->pre_vectors;
+ 	nodemask_t nodemsk = NODE_MASK_NONE;
+-	struct cpumask *masks;
+-	cpumask_var_t nmsk, *node_to_cpumask;
+-
+-	/*
+-	 * If there aren't any vectors left after applying the pre/post
+-	 * vectors don't bother with assigning affinity.
+-	 */
+-	if (!affv)
+-		return NULL;
+-
+-	if (!zalloc_cpumask_var(&nmsk, GFP_KERNEL))
+-		return NULL;
+-
+-	masks = kcalloc(nvecs, sizeof(*masks), GFP_KERNEL);
+-	if (!masks)
+-		goto out;
++	int n, nodes, cpus_per_vec, extra_vecs;
  
- 	c.identity.opcode = nvme_nvm_admin_identity;
- 	c.identity.nsid = cpu_to_le32(ns->head->ns_id);
+-	node_to_cpumask = alloc_node_to_cpumask();
+-	if (!node_to_cpumask)
+-		goto out;
+-
+-	/* Fill out vectors at the beginning that don't need affinity */
+-	for (curvec = 0; curvec < affd->pre_vectors; curvec++)
+-		cpumask_copy(masks + curvec, irq_default_affinity);
+-
+-	/* Stabilize the cpumasks */
+-	get_online_cpus();
+-	build_node_to_cpumask(node_to_cpumask);
+-	nodes = get_nodes_in_cpumask(node_to_cpumask, cpu_possible_mask,
+-				     &nodemsk);
++	nodes = get_nodes_in_cpumask(node_to_cpumask, cpu_mask, &nodemsk);
  
--	nvme_nvm_id = kmalloc(sizeof(struct nvme_nvm_id), GFP_KERNEL);
--	if (!nvme_nvm_id)
-+	id = kmalloc(sizeof(struct nvme_nvm_id12), GFP_KERNEL);
-+	if (!id)
- 		return -ENOMEM;
- 
- 	ret = nvme_submit_sync_cmd(ns->ctrl->admin_q, (struct nvme_command *)&c,
--				nvme_nvm_id, sizeof(struct nvme_nvm_id));
-+				id, sizeof(struct nvme_nvm_id12));
- 	if (ret) {
- 		ret = -EIO;
- 		goto out;
+ 	/*
+ 	 * If the number of nodes in the mask is greater than or equal the
+@@ -150,7 +119,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 			if (++curvec == last_affv)
+ 				break;
+ 		}
+-		goto done;
++		goto out;
  	}
  
--	nvm_id->ver_id = nvme_nvm_id->ver_id;
--	nvm_id->vmnt = nvme_nvm_id->vmnt;
--	nvm_id->cap = le32_to_cpu(nvme_nvm_id->cap);
--	nvm_id->dom = le32_to_cpu(nvme_nvm_id->dom);
--	memcpy(&nvm_id->ppaf, &nvme_nvm_id->ppaf,
-+	nvm_id->ver_id = id->ver_id;
-+	nvm_id->vmnt = id->vmnt;
-+	nvm_id->cap = le32_to_cpu(id->cap);
-+	nvm_id->dom = le32_to_cpu(id->dom);
-+	memcpy(&nvm_id->ppaf, &id->ppaf,
- 					sizeof(struct nvm_addr_format));
+ 	for_each_node_mask(n, nodemsk) {
+@@ -160,7 +129,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 		vecs_per_node = (affv - (curvec - affd->pre_vectors)) / nodes;
  
--	ret = init_grps(nvm_id, nvme_nvm_id);
-+	ret = init_grp(nvm_id, id);
- out:
--	kfree(nvme_nvm_id);
-+	kfree(id);
- 	return ret;
- }
+ 		/* Get the cpus on this node which are in the mask */
+-		cpumask_and(nmsk, cpu_possible_mask, node_to_cpumask[n]);
++		cpumask_and(nmsk, cpu_mask, node_to_cpumask[n]);
  
+ 		/* Calculate the number of cpus per vector */
+ 		ncpus = cpumask_weight(nmsk);
+@@ -186,7 +155,51 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 		--nodes;
+ 	}
+ 
+-done:
++out:
++	return curvec - affd->pre_vectors;
++}
++
++/**
++ * irq_create_affinity_masks - Create affinity masks for multiqueue spreading
++ * @nvecs:	The total number of vectors
++ * @affd:	Description of the affinity requirements
++ *
++ * Returns the masks pointer or NULL if allocation failed.
++ */
++struct cpumask *
++irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
++{
++	int curvec;
++	struct cpumask *masks;
++	cpumask_var_t nmsk, *node_to_cpumask;
++
++	/*
++	 * If there aren't any vectors left after applying the pre/post
++	 * vectors don't bother with assigning affinity.
++	 */
++	if (nvecs == affd->pre_vectors + affd->post_vectors)
++		return NULL;
++
++	if (!zalloc_cpumask_var(&nmsk, GFP_KERNEL))
++		return NULL;
++
++	masks = kcalloc(nvecs, sizeof(*masks), GFP_KERNEL);
++	if (!masks)
++		goto out;
++
++	node_to_cpumask = alloc_node_to_cpumask();
++	if (!node_to_cpumask)
++		goto out;
++
++	/* Fill out vectors at the beginning that don't need affinity */
++	for (curvec = 0; curvec < affd->pre_vectors; curvec++)
++		cpumask_copy(masks + curvec, irq_default_affinity);
++
++	/* Stabilize the cpumasks */
++	get_online_cpus();
++	build_node_to_cpumask(node_to_cpumask);
++	curvec += irq_build_affinity_masks(nvecs, affd, node_to_cpumask,
++					   cpu_possible_mask, nmsk, masks);
+ 	put_online_cpus();
+ 
+ 	/* Fill out vectors at the end that don't need affinity */
 -- 
-2.11.0
+2.9.5
