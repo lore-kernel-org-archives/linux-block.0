@@ -1,183 +1,83 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:44915 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754349AbeBGTmD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Feb 2018 14:42:03 -0500
-Received: by mail-pf0-f195.google.com with SMTP id 17so765277pfw.11
-        for <linux-block@vger.kernel.org>; Wed, 07 Feb 2018 11:42:03 -0800 (PST)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Tang Junhui <tang.junhui@zte.com.cn>,
-        Hua Rui <huarui.dev@gmail.com>
-Subject: [PATCH 5/8] bcache: fix for allocator and register thread race
-Date: Wed,  7 Feb 2018 11:41:43 -0800
-Message-Id: <20180207194146.5095-6-mlyle@lyle.org>
-In-Reply-To: <20180207194146.5095-1-mlyle@lyle.org>
-References: <20180207194146.5095-1-mlyle@lyle.org>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH V2 7/8] scsi: hpsa: call hpsa_hba_inquiry() after adding
+ host
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+ Mike Snitzer <snitzer@redhat.com>
+Cc: linux-scsi@vger.kernel.org, Arun Easi <arun.easi@cavium.com>,
+ Omar Sandoval <osandov@fb.com>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ James Bottomley <james.bottomley@hansenpartnership.com>,
+ Christoph Hellwig <hch@lst.de>, Don Brace <don.brace@microsemi.com>,
+ Kashyap Desai <kashyap.desai@broadcom.com>,
+ Peter Rivera <peter.rivera@broadcom.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Laurence Oberman <loberman@redhat.com>
+References: <20180205152035.15016-1-ming.lei@redhat.com>
+ <20180205152035.15016-8-ming.lei@redhat.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <a36adf6c-9b44-9bc1-c049-38949773b049@suse.de>
+Date: Tue, 6 Feb 2018 09:32:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180205152035.15016-8-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+On 02/05/2018 04:20 PM, Ming Lei wrote:
+> So that we can decide the default reply queue by the map created
+> during adding host.
+> 
+> Cc: Hannes Reinecke <hare@suse.de>
+> Cc: Arun Easi <arun.easi@cavium.com>
+> Cc: Omar Sandoval <osandov@fb.com>,
+> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+> Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
+> Cc: Christoph Hellwig <hch@lst.de>,
+> Cc: Don Brace <don.brace@microsemi.com>
+> Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+> Cc: Peter Rivera <peter.rivera@broadcom.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Mike Snitzer <snitzer@redhat.com>
+> Tested-by: Laurence Oberman <loberman@redhat.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/scsi/hpsa.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/scsi/hpsa.c b/drivers/scsi/hpsa.c
+> index 287e5eb0723f..443eabf63a9f 100644
+> --- a/drivers/scsi/hpsa.c
+> +++ b/drivers/scsi/hpsa.c
+> @@ -8691,12 +8691,9 @@ static int hpsa_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  	/* Disable discovery polling.*/
+>  	h->discovery_polling = 0;
+>  
+> -
+>  	/* Turn the interrupts on so we can service requests */
+>  	h->access.set_intr_mask(h, HPSA_INTR_ON);
+>  
+> -	hpsa_hba_inquiry(h);
+> -
+>  	h->lastlogicals = kzalloc(sizeof(*(h->lastlogicals)), GFP_KERNEL);
+>  	if (!h->lastlogicals)
+>  		dev_info(&h->pdev->dev,
+> @@ -8707,6 +8704,8 @@ static int hpsa_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  	if (rc)
+>  		goto clean7; /* perf, sg, cmd, irq, shost, pci, lu, aer/h */
+>  
+> +	hpsa_hba_inquiry(h);
+> +
+>  	/* Monitor the controller for firmware lockups */
+>  	h->heartbeat_sample_interval = HEARTBEAT_SAMPLE_INTERVAL;
+>  	INIT_DELAYED_WORK(&h->monitor_ctlr_work, hpsa_monitor_ctlr_worker);
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-After long time running of random small IO writing,
-I reboot the machine, and after the machine power on,
-I found bcache got stuck, the stack is:
-[root@ceph153 ~]# cat /proc/2510/task/*/stack
-[<ffffffffa06b2455>] closure_sync+0x25/0x90 [bcache]
-[<ffffffffa06b6be8>] bch_journal+0x118/0x2b0 [bcache]
-[<ffffffffa06b6dc7>] bch_journal_meta+0x47/0x70 [bcache]
-[<ffffffffa06be8f7>] bch_prio_write+0x237/0x340 [bcache]
-[<ffffffffa06a8018>] bch_allocator_thread+0x3c8/0x3d0 [bcache]
-[<ffffffff810a631f>] kthread+0xcf/0xe0
-[<ffffffff8164c318>] ret_from_fork+0x58/0x90
-[<ffffffffffffffff>] 0xffffffffffffffff
-[root@ceph153 ~]# cat /proc/2038/task/*/stack
-[<ffffffffa06b1abd>] __bch_btree_map_nodes+0x12d/0x150 [bcache]
-[<ffffffffa06b1bd1>] bch_btree_insert+0xf1/0x170 [bcache]
-[<ffffffffa06b637f>] bch_journal_replay+0x13f/0x230 [bcache]
-[<ffffffffa06c75fe>] run_cache_set+0x79a/0x7c2 [bcache]
-[<ffffffffa06c0cf8>] register_bcache+0xd48/0x1310 [bcache]
-[<ffffffff812f702f>] kobj_attr_store+0xf/0x20
-[<ffffffff8125b216>] sysfs_write_file+0xc6/0x140
-[<ffffffff811dfbfd>] vfs_write+0xbd/0x1e0
-[<ffffffff811e069f>] SyS_write+0x7f/0xe0
-[<ffffffff8164c3c9>] system_call_fastpath+0x16/0x1
-The stack shows the register thread and allocator thread
-were getting stuck when registering cache device.
+Cheers,
 
-I reboot the machine several times, the issue always
-exsit in this machine.
-
-I debug the code, and found the call trace as bellow:
-register_bcache()
-   ==>run_cache_set()
-      ==>bch_journal_replay()
-         ==>bch_btree_insert()
-            ==>__bch_btree_map_nodes()
-               ==>btree_insert_fn()
-                  ==>btree_split() //node need split
-                     ==>btree_check_reserve()
-In btree_check_reserve(), It will check if there is enough buckets
-of RESERVE_BTREE type, since allocator thread did not work yet, so
-no buckets of RESERVE_BTREE type allocated, so the register thread
-waits on c->btree_cache_wait, and goes to sleep.
-
-Then the allocator thread initialized, the call trace is bellow:
-bch_allocator_thread()
-==>bch_prio_write()
-   ==>bch_journal_meta()
-      ==>bch_journal()
-         ==>journal_wait_for_write()
-In journal_wait_for_write(), It will check if journal is full by
-journal_full(), but the long time random small IO writing
-causes the exhaustion of journal buckets(journal.blocks_free=0),
-In order to release the journal buckets,
-the allocator calls btree_flush_write() to flush keys to
-btree nodes, and waits on c->journal.wait until btree nodes writing
-over or there has already some journal buckets space, then the
-allocator thread goes to sleep. but in btree_flush_write(), since
-bch_journal_replay() is not finished, so no btree nodes have journal
-(condition "if (btree_current_write(b)->journal)" never satisfied),
-so we got no btree node to flush, no journal bucket released,
-and allocator sleep all the times.
-
-Through the above analysis, we can see that:
-1) Register thread wait for allocator thread to allocate buckets of
-   RESERVE_BTREE type;
-2) Alloctor thread wait for register thread to replay journal, so it
-   can flush btree nodes and get journal bucket.
-   then they are all got stuck by waiting for each other.
-
-Hua Rui provided a patch for me, by allocating some buckets of
-RESERVE_BTREE type in advance, so the register thread can get bucket
-when btree node splitting and no need to waiting for the allocator
-thread. I tested it, it has effect, and register thread run a step
-forward, but finally are still got stuck, the reason is only 8 bucket
-of RESERVE_BTREE type were allocated, and in bch_journal_replay(),
-after 2 btree nodes splitting, only 4 bucket of RESERVE_BTREE type left,
-then btree_check_reserve() is not satisfied anymore, so it goes to sleep
-again, and in the same time, alloctor thread did not flush enough btree
-nodes to release a journal bucket, so they all got stuck again.
-
-So we need to allocate more buckets of RESERVE_BTREE type in advance,
-but how much is enough?  By experience and test, I think it should be
-as much as journal buckets. Then I modify the code as this patch,
-and test in the machine, and it works.
-
-This patch modified base on Hua Rui’s patch, and allocate more buckets
-of RESERVE_BTREE type in advance to avoid register thread and allocate
-thread going to wait for each other.
-
-[patch v2] ca->sb.njournal_buckets would be 0 in the first time after
-cache creation, and no journal exists, so just 8 btree buckets is OK.
-
-Signed-off-by: Hua Rui <huarui.dev@gmail.com>
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/btree.c |  9 ++++++---
- drivers/md/bcache/super.c | 13 ++++++++++++-
- 2 files changed, 18 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index bf3a48aa9a9a..fad9fe8817eb 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -1869,14 +1869,17 @@ void bch_initial_gc_finish(struct cache_set *c)
- 	 */
- 	for_each_cache(ca, c, i) {
- 		for_each_bucket(b, ca) {
--			if (fifo_full(&ca->free[RESERVE_PRIO]))
-+			if (fifo_full(&ca->free[RESERVE_PRIO]) &&
-+			    fifo_full(&ca->free[RESERVE_BTREE]))
- 				break;
- 
- 			if (bch_can_invalidate_bucket(ca, b) &&
- 			    !GC_MARK(b)) {
- 				__bch_invalidate_one_bucket(ca, b);
--				fifo_push(&ca->free[RESERVE_PRIO],
--					  b - ca->buckets);
-+				if (!fifo_push(&ca->free[RESERVE_PRIO],
-+				   b - ca->buckets))
-+					fifo_push(&ca->free[RESERVE_BTREE],
-+						  b - ca->buckets);
- 			}
- 		}
- 	}
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index e29150ec17e7..a2ad37a8afc0 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1833,6 +1833,7 @@ void bch_cache_release(struct kobject *kobj)
- static int cache_alloc(struct cache *ca)
- {
- 	size_t free;
-+	size_t btree_buckets;
- 	struct bucket *b;
- 
- 	__module_get(THIS_MODULE);
-@@ -1840,9 +1841,19 @@ static int cache_alloc(struct cache *ca)
- 
- 	bio_init(&ca->journal.bio, ca->journal.bio.bi_inline_vecs, 8);
- 
-+	/*
-+	 * when ca->sb.njournal_buckets is not zero, journal exists,
-+	 * and in bch_journal_replay(), tree node may split,
-+	 * so bucket of RESERVE_BTREE type is needed,
-+	 * the worst situation is all journal buckets are valid journal,
-+	 * and all the keys need to replay,
-+	 * so the number of  RESERVE_BTREE type buckets should be as much
-+	 * as journal buckets
-+	 */
-+	btree_buckets = ca->sb.njournal_buckets ?: 8;
- 	free = roundup_pow_of_two(ca->sb.nbuckets) >> 10;
- 
--	if (!init_fifo(&ca->free[RESERVE_BTREE], 8, GFP_KERNEL) ||
-+	if (!init_fifo(&ca->free[RESERVE_BTREE], btree_buckets, GFP_KERNEL) ||
- 	    !init_fifo_exact(&ca->free[RESERVE_PRIO], prio_buckets(ca), GFP_KERNEL) ||
- 	    !init_fifo(&ca->free[RESERVE_MOVINGGC], free, GFP_KERNEL) ||
- 	    !init_fifo(&ca->free[RESERVE_NONE], free, GFP_KERNEL) ||
+Hannes
 -- 
-2.14.1
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
