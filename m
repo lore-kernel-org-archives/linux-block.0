@@ -1,90 +1,128 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Subject: [PATCH 03/19] lightnvm: add minor version to generic geometry
-Date: Mon, 26 Feb 2018 14:17:02 +0100
-Message-Id: <1519651038-16845-4-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
-References: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org,
- =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="utf-8"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:42647 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754266AbeBGTmB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Feb 2018 14:42:01 -0500
+Received: by mail-pf0-f195.google.com with SMTP id b25so765766pfd.9
+        for <linux-block@vger.kernel.org>; Wed, 07 Feb 2018 11:42:00 -0800 (PST)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Coly Li <colyli@suse.de>,
+        Michael Lyle <mlyle@lyle.org>,
+        Junhui Tang <tang.junhui@zte.com.cn>
+Subject: [PATCH 3/8] bcache: properly set task state in bch_writeback_thread()
+Date: Wed,  7 Feb 2018 11:41:41 -0800
+Message-Id: <20180207194146.5095-4-mlyle@lyle.org>
+In-Reply-To: <20180207194146.5095-1-mlyle@lyle.org>
+References: <20180207194146.5095-1-mlyle@lyle.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-U2VwYXJhdGUgdGhlIHZlcnNpb24gYmV0d2VlbiBtYWpvciBhbmQgbWlub3Igb24gdGhlIGdlbmVy
-aWMgZ2VvbWV0cnkgYW5kCnJlcHJlc2VudCBpdCB0aHJvdWdoIHN5c2ZzIGluIHRoZSAyLjAgcGF0
-aC4gVGhlIDEuMiBwYXRoIG9ubHkgc2hvd3MgdGhlIG1ham9yCnZlcnNpb24gdG8gcHJlc2VydmUg
-dGhlIGV4aXN0aW5nIHVzZXIgc3BhY2UgaW50ZXJmYWNlLgoKU2lnbmVkLW9mZi1ieTogSmF2aWVy
-IEdvbnrDoWxleiA8amF2aWVyQGNuZXhsYWJzLmNvbT4KLS0tCiBkcml2ZXJzL2xpZ2h0bnZtL2Nv
-cmUuYyAgICAgIHwgIDQgKystLQogZHJpdmVycy9udm1lL2hvc3QvbGlnaHRudm0uYyB8IDI1ICsr
-KysrKysrKysrKysrKysrKysrLS0tLS0KIGluY2x1ZGUvbGludXgvbGlnaHRudm0uaCAgICAgfCAg
-MyArKy0KIDMgZmlsZXMgY2hhbmdlZCwgMjQgaW5zZXJ0aW9ucygrKSwgOCBkZWxldGlvbnMoLSkK
-CmRpZmYgLS1naXQgYS9kcml2ZXJzL2xpZ2h0bnZtL2NvcmUuYyBiL2RyaXZlcnMvbGlnaHRudm0v
-Y29yZS5jCmluZGV4IDQzZTNkNmJiNWJlNi4uOTZmNGU2MmQzODNiIDEwMDY0NAotLS0gYS9kcml2
-ZXJzL2xpZ2h0bnZtL2NvcmUuYworKysgYi9kcml2ZXJzL2xpZ2h0bnZtL2NvcmUuYwpAQCAtODk3
-LDggKzg5Nyw4IEBAIHN0YXRpYyBpbnQgbnZtX2luaXQoc3RydWN0IG52bV9kZXYgKmRldikKIAkJ
-Z290byBlcnI7CiAJfQogCi0JcHJfZGVidWcoIm52bTogdmVyOiV1IG52bV92ZW5kb3I6JXhcbiIs
-Ci0JCQkJZGV2X2dlby0+dmVyX2lkLAorCXByX2RlYnVnKCJudm06IHZlcjoldS4ldSBudm1fdmVu
-ZG9yOiV4XG4iLAorCQkJCWRldl9nZW8tPm1ham9yX3Zlcl9pZCwgZGV2X2dlby0+bWlub3JfdmVy
-X2lkLAogCQkJCWRldl9nZW8tPmMudm1udCk7CiAKIAlyZXQgPSBudm1fY29yZV9pbml0KGRldik7
-CmRpZmYgLS1naXQgYS9kcml2ZXJzL252bWUvaG9zdC9saWdodG52bS5jIGIvZHJpdmVycy9udm1l
-L2hvc3QvbGlnaHRudm0uYwppbmRleCAxMDM5MmE2NjRiNTAuLjhiZWZiNjBlZWFjYiAxMDA2NDQK
-LS0tIGEvZHJpdmVycy9udm1lL2hvc3QvbGlnaHRudm0uYworKysgYi9kcml2ZXJzL252bWUvaG9z
-dC9saWdodG52bS5jCkBAIC0yOTUsNyArMjk1LDkgQEAgc3RhdGljIGludCBudm1lX252bV9zZXR1
-cF8xMihzdHJ1Y3QgbnZtZV9udm1faWQxMiAqaWQsCiAJCXJldHVybiAtRUlOVkFMOwogCX0KIAot
-CWRldl9nZW8tPnZlcl9pZCA9IGlkLT52ZXJfaWQ7CisJLyogMS4yIHNwZWMuIG9ubHkgcmVwb3J0
-cyBhIHNpbmdsZSB2ZXJzaW9uIGlkIC0gdW5mb2xkICovCisJZGV2X2dlby0+bWFqb3JfdmVyX2lk
-ID0gaWQtPnZlcl9pZDsKKwlkZXZfZ2VvLT5taW5vcl92ZXJfaWQgPSAyOwogCiAJZGV2X2dlby0+
-bnJfY2hubHMgPSBzcmMtPm51bV9jaDsKIAlkZXZfZ2VvLT5ucl9sdW5zID0gc3JjLT5udW1fbHVu
-OwpAQCAtMzgwLDcgKzM4MiwxNCBAQCBzdGF0aWMgdm9pZCBudm1lX252bV9zZXRfYWRkcl8yMChz
-dHJ1Y3QgbnZtX2FkZHJfZm9ybWF0ICpkc3QsCiBzdGF0aWMgaW50IG52bWVfbnZtX3NldHVwXzIw
-KHN0cnVjdCBudm1lX252bV9pZDIwICppZCwKIAkJCSAgICAgc3RydWN0IG52bV9nZW8gKmRldl9n
-ZW8pCiB7Ci0JZGV2X2dlby0+dmVyX2lkID0gaWQtPm1qcjsKKwlkZXZfZ2VvLT5tYWpvcl92ZXJf
-aWQgPSBpZC0+bWpyOworCWRldl9nZW8tPm1pbm9yX3Zlcl9pZCA9IGlkLT5tbnI7CisKKwlpZiAo
-IShkZXZfZ2VvLT5tYWpvcl92ZXJfaWQgPT0gMiAmJiBkZXZfZ2VvLT5taW5vcl92ZXJfaWQgPT0g
-MCkpIHsKKwkJcHJfZXJyKCJudm06IE9DU1NEIHZlcnNpb24gbm90IHN1cHBvcnRlZCAodiVkLiVk
-KVxuIiwKKwkJCQlkZXZfZ2VvLT5tYWpvcl92ZXJfaWQsIGRldl9nZW8tPm1pbm9yX3Zlcl9pZCk7
-CisJCXJldHVybiAtRUlOVkFMOworCX0KIAogCWRldl9nZW8tPm5yX2NobmxzID0gbGUxNl90b19j
-cHUoaWQtPm51bV9ncnApOwogCWRldl9nZW8tPm5yX2x1bnMgPSBsZTE2X3RvX2NwdShpZC0+bnVt
-X3B1KTsKQEAgLTkyMCw3ICs5MjksMTMgQEAgc3RhdGljIHNzaXplX3QgbnZtX2Rldl9hdHRyX3No
-b3coc3RydWN0IGRldmljZSAqZGV2LAogCWF0dHIgPSAmZGF0dHItPmF0dHI7CiAKIAlpZiAoc3Ry
-Y21wKGF0dHItPm5hbWUsICJ2ZXJzaW9uIikgPT0gMCkgewotCQlyZXR1cm4gc2NucHJpbnRmKHBh
-Z2UsIFBBR0VfU0laRSwgIiV1XG4iLCBkZXZfZ2VvLT52ZXJfaWQpOworCQlpZiAoZGV2X2dlby0+
-bWFqb3JfdmVyX2lkID09IDEpCisJCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwg
-IiV1XG4iLAorCQkJCQkJZGV2X2dlby0+bWFqb3JfdmVyX2lkKTsKKwkJZWxzZQorCQkJcmV0dXJu
-IHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIldS4ldVxuIiwKKwkJCQkJCWRldl9nZW8tPm1h
-am9yX3Zlcl9pZCwKKwkJCQkJCWRldl9nZW8tPm1pbm9yX3Zlcl9pZCk7CiAJfSBlbHNlIGlmIChz
-dHJjbXAoYXR0ci0+bmFtZSwgImNhcGFiaWxpdGllcyIpID09IDApIHsKIAkJcmV0dXJuIHNjbnBy
-aW50ZihwYWdlLCBQQUdFX1NJWkUsICIldVxuIiwgZGV2X2dlby0+Yy5jYXApOwogCX0gZWxzZSBp
-ZiAoc3RyY21wKGF0dHItPm5hbWUsICJyZWFkX3R5cCIpID09IDApIHsKQEAgLTExNzQsNyArMTE4
-OSw3IEBAIGludCBudm1lX252bV9yZWdpc3Rlcl9zeXNmcyhzdHJ1Y3QgbnZtZV9ucyAqbnMpCiAJ
-aWYgKCFuZGV2KQogCQlyZXR1cm4gLUVJTlZBTDsKIAotCXN3aXRjaCAoZGV2X2dlby0+dmVyX2lk
-KSB7CisJc3dpdGNoIChkZXZfZ2VvLT5tYWpvcl92ZXJfaWQpIHsKIAljYXNlIDE6CiAJCXJldHVy
-biBzeXNmc19jcmVhdGVfZ3JvdXAoJmRpc2tfdG9fZGV2KG5zLT5kaXNrKS0+a29iaiwKIAkJCQkJ
-Jm52bV9kZXZfYXR0cl9ncm91cF8xMik7CkBAIC0xMTkxLDcgKzEyMDYsNyBAQCB2b2lkIG52bWVf
-bnZtX3VucmVnaXN0ZXJfc3lzZnMoc3RydWN0IG52bWVfbnMgKm5zKQogCXN0cnVjdCBudm1fZGV2
-ICpuZGV2ID0gbnMtPm5kZXY7CiAJc3RydWN0IG52bV9nZW8gKmRldl9nZW8gPSAmbmRldi0+Z2Vv
-OwogCi0Jc3dpdGNoIChkZXZfZ2VvLT52ZXJfaWQpIHsKKwlzd2l0Y2ggKGRldl9nZW8tPm1ham9y
-X3Zlcl9pZCkgewogCWNhc2UgMToKIAkJc3lzZnNfcmVtb3ZlX2dyb3VwKCZkaXNrX3RvX2Rldihu
-cy0+ZGlzayktPmtvYmosCiAJCQkJCSZudm1fZGV2X2F0dHJfZ3JvdXBfMTIpOwpkaWZmIC0tZ2l0
-IGEvaW5jbHVkZS9saW51eC9saWdodG52bS5oIGIvaW5jbHVkZS9saW51eC9saWdodG52bS5oCmlu
-ZGV4IDQyNzA0YzRjYTlhZi4uY2NhZjhhMzAyMDJkIDEwMDY0NAotLS0gYS9pbmNsdWRlL2xpbnV4
-L2xpZ2h0bnZtLmgKKysrIGIvaW5jbHVkZS9saW51eC9saWdodG52bS5oCkBAIC0zMDksNyArMzA5
-LDggQEAgc3RydWN0IG52bV9jb21tb25fZ2VvIHsKIC8qIEluc3RhbmNlIGdlb21ldHJ5ICovCiBz
-dHJ1Y3QgbnZtX2dlbyB7CiAJLyogZGV2aWNlIHJlcG9ydGVkIHZlcnNpb24gKi8KLQl1OAl2ZXJf
-aWQ7CisJdTgJbWFqb3JfdmVyX2lkOworCXU4CW1pbm9yX3Zlcl9pZDsKIAogCS8qIGluc3RhbmNl
-IHNwZWNpZmljIGdlb21ldHJ5ICovCiAJaW50IG5yX2NobmxzOwotLSAKMi43LjQKCgpfX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpMaW51eC1udm1lIG1haWxp
-bmcgbGlzdApMaW51eC1udm1lQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xpc3RzLmluZnJh
-ZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1udm1lCg==
+From: Coly Li <colyli@suse.de>
+
+Kernel thread routine bch_writeback_thread() has the following code block,
+
+447         down_write(&dc->writeback_lock);
+448~450     if (check conditions) {
+451                 up_write(&dc->writeback_lock);
+452                 set_current_state(TASK_INTERRUPTIBLE);
+453
+454                 if (kthread_should_stop())
+455                         return 0;
+456
+457                 schedule();
+458                 continue;
+459         }
+
+If condition check is true, its task state is set to TASK_INTERRUPTIBLE
+and call schedule() to wait for others to wake up it.
+
+There are 2 issues in current code,
+1, Task state is set to TASK_INTERRUPTIBLE after the condition checks, if
+   another process changes the condition and call wake_up_process(dc->
+   writeback_thread), then at line 452 task state is set back to
+   TASK_INTERRUPTIBLE, the writeback kernel thread will lose a chance to be
+   waken up.
+2, At line 454 if kthread_should_stop() is true, writeback kernel thread
+   will return to kernel/kthread.c:kthread() with TASK_INTERRUPTIBLE and
+   call do_exit(). It is not good to enter do_exit() with task state
+   TASK_INTERRUPTIBLE, in following code path might_sleep() is called and a
+   warning message is reported by __might_sleep(): "WARNING: do not call
+   blocking ops when !TASK_RUNNING; state=1 set at [xxxx]".
+
+For the first issue, task state should be set before condition checks.
+Ineed because dc->writeback_lock is required when modifying all the
+conditions, calling set_current_state() inside code block where dc->
+writeback_lock is hold is safe. But this is quite implicit, so I still move
+set_current_state() before all the condition checks.
+
+For the second issue, frankley speaking it does not hurt when kernel thread
+exits with TASK_INTERRUPTIBLE state, but this warning message scares users,
+makes them feel there might be something risky with bcache and hurt their
+data.  Setting task state to TASK_RUNNING before returning fixes this
+problem.
+
+In alloc.c:allocator_wait(), there is also a similar issue, and is also
+fixed in this patch.
+
+Changelog:
+v3: merge two similar fixes into one patch
+v2: fix the race issue in v1 patch.
+v1: initial buggy fix.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
+Cc: Michael Lyle <mlyle@lyle.org>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
+---
+ drivers/md/bcache/alloc.c     | 4 +++-
+ drivers/md/bcache/writeback.c | 7 +++++--
+ 2 files changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
+index 6cc6c0f9c3a9..458e1d38577d 100644
+--- a/drivers/md/bcache/alloc.c
++++ b/drivers/md/bcache/alloc.c
+@@ -287,8 +287,10 @@ do {									\
+ 			break;						\
+ 									\
+ 		mutex_unlock(&(ca)->set->bucket_lock);			\
+-		if (kthread_should_stop())				\
++		if (kthread_should_stop()) {				\
++			set_current_state(TASK_RUNNING);		\
+ 			return 0;					\
++		}							\
+ 									\
+ 		schedule();						\
+ 		mutex_lock(&(ca)->set->bucket_lock);			\
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index 51306a19ab03..58218f7e77c3 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -564,18 +564,21 @@ static int bch_writeback_thread(void *arg)
+ 
+ 	while (!kthread_should_stop()) {
+ 		down_write(&dc->writeback_lock);
++		set_current_state(TASK_INTERRUPTIBLE);
+ 		if (!atomic_read(&dc->has_dirty) ||
+ 		    (!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags) &&
+ 		     !dc->writeback_running)) {
+ 			up_write(&dc->writeback_lock);
+-			set_current_state(TASK_INTERRUPTIBLE);
+ 
+-			if (kthread_should_stop())
++			if (kthread_should_stop()) {
++				set_current_state(TASK_RUNNING);
+ 				return 0;
++			}
+ 
+ 			schedule();
+ 			continue;
+ 		}
++		set_current_state(TASK_RUNNING);
+ 
+ 		searched_full_index = refill_dirty(dc);
+ 
+-- 
+2.14.1
