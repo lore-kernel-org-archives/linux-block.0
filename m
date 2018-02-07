@@ -1,50 +1,40 @@
-Return-Path: <prvs=56915ec98=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "tj@kernel.org" <tj@kernel.org>
-CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 7 Feb 2018 12:09:51 -0800
+From: "tj@kernel.org" <tj@kernel.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH v2] blk-mq: Fix race between resetting the timer and
  completion handling
-Date: Wed, 7 Feb 2018 21:02:21 +0000
-Message-ID: <1518037339.2870.61.camel@wdc.com>
+Message-ID: <20180207200951.GE695913@devbig577.frc2.facebook.com>
 References: <20180207011133.25957-1-bart.vanassche@wdc.com>
-	 <20180207170612.GB695913@devbig577.frc2.facebook.com>
-	 <1518030233.2870.57.camel@wdc.com>
-	 <20180207200951.GE695913@devbig577.frc2.facebook.com>
-In-Reply-To: <20180207200951.GE695913@devbig577.frc2.facebook.com>
-Content-Type: text/plain; charset="utf-8"
+ <20180207170612.GB695913@devbig577.frc2.facebook.com>
+ <1518030233.2870.57.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1518030233.2870.57.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gV2VkLCAyMDE4LTAyLTA3IGF0IDEyOjA5IC0wODAwLCB0akBrZXJuZWwub3JnIHdyb3RlOg0K
-PiBIZWxsbywNCj4gDQo+IE9uIFdlZCwgRmViIDA3LCAyMDE4IGF0IDA3OjAzOjU2UE0gKzAwMDAs
-IEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gPiBJIHRyaWVkIHRoZSBhYm92ZSBwYXRjaCBidXQg
-YWxyZWFkeSBkdXJpbmcgdGhlIGZpcnN0IGl0ZXJhdGlvbiBvZiB0aGUgdGVzdCBJDQo+ID4gbm90
-aWNlZCB0aGF0IHRoZSB0ZXN0IGh1bmcsIHByb2JhYmx5IGR1ZSB0byB0aGUgZm9sbG93aW5nIHJl
-cXVlc3QgdGhhdCBnb3Qgc3R1Y2s6DQo+ID4gDQo+ID4gJCAoY2QgL3N5cy9rZXJuZWwvZGVidWcv
-YmxvY2sgJiYgZ3JlcCAtYUggLiAqLyovKi9ycV9saXN0KQ0KPiA+IDAwMDAwMDAwYTk4Y2ZmNjAg
-ey5vcD1TQ1NJX0lOLCAuY21kX2ZsYWdzPSwgLnJxX2ZsYWdzPU1RX0lORkxJR0hUfFBSRUVNUFR8
-UVVJRVR8SU9fU1RBVHxQTSwNCj4gPiAgLnN0YXRlPWlkbGUsIC50YWc9MjIsIC5pbnRlcm5hbF90
-YWc9LTEsIC5jbWQ9U3luY2hyb25pemUgQ2FjaGUoMTApIDM1IDAwIDAwIDAwIDAwIDAwLCAucmV0
-cmllcz0wLA0KPiA+ICAucmVzdWx0ID0gMHgwLCAuZmxhZ3M9VEFHR0VELCAudGltZW91dD02MC4w
-MDAsIGFsbG9jYXRlZCA4NzIuNjkwIHMgYWdvfQ0KPiANCj4gSSdtIHdvbmRlciBob3cgdGhpcyBo
-YXBwZW5lZCwgc28gd2UgY2FuIGxvc2UgYSBjb21wbGV0aW9uIHdoZW4gaXQNCj4gcmFjZXMgYWdh
-aW5zdCBCTEtfRUhfUkVTRVRfVElNRVI7IGhvd2V2ZXIsIHRoZSBjb21tYW5kIHNob3VsZCB0aW1l
-b3V0DQo+IGxhdGVyIGN1eiB0aGUgdGltZXIgaXMgcnVubmluZyBhZ2FpbiBub3cuICBNYXliZSB3
-ZSBhY3R1YWxseSBoYWQgdGhlDQo+IG1lbW9yeSBiYXJyaWVyIHJhY2UgdGhhdCB5b3UgcG9pbnRl
-ZCBvdXQgaW4gdGhlIG90aGVyIG1lc3NhZ2U/DQoNCkhlbGxvIFRlanVuLA0KDQpUaGUgcGF0Y2gg
-dGhhdCBJIHVzZWQgaW4gbXkgdGVzdCBoYWQgYW4gc21wX3dtYigpIGNhbGwgKHNlZSBhbHNvIGJl
-bG93KS4gQW55d2F5LA0KSSB3aWxsIHNlZSB3aGV0aGVyIEkgY2FuIGV4dHJhY3QgbW9yZSBzdGF0
-ZSBpbmZvcm1hdGlvbiB0aHJvdWdoIGRlYnVnZnMuDQoNCmRpZmYgLS1naXQgYS9ibG9jay9ibGst
-bXEuYyBiL2Jsb2NrL2Jsay1tcS5jDQppbmRleCBlZjRmNmRmMGYxZGYuLjhlYjIxMDVkODJiNyAx
-MDA2NDQNCi0tLSBhL2Jsb2NrL2Jsay1tcS5jDQorKysgYi9ibG9jay9ibGstbXEuYw0KQEAgLTgy
-NywxMyArODI3LDkgQEAgc3RhdGljIHZvaWQgYmxrX21xX3JxX3RpbWVkX291dChzdHJ1Y3QgcmVx
-dWVzdCAqcmVxLCBib29sIHJlc2VydmVkKQ0KIAkJX19ibGtfbXFfY29tcGxldGVfcmVxdWVzdChy
-ZXEpOw0KIAkJYnJlYWs7DQogCWNhc2UgQkxLX0VIX1JFU0VUX1RJTUVSOg0KLQkJLyoNCi0JCSAq
-IEFzIG5vdGhpbmcgcHJldmVudHMgZnJvbSBjb21wbGV0aW9uIGhhcHBlbmluZyB3aGlsZQ0KLQkJ
-ICogLT5hYm9ydGVkX2dzdGF0ZSBpcyBzZXQsIHRoaXMgbWF5IGxlYWQgdG8gaWdub3JlZA0KLQkJ
-ICogY29tcGxldGlvbnMgYW5kIGZ1cnRoZXIgc3B1cmlvdXMgdGltZW91dHMuDQotCQkgKi8NCi0J
-CWJsa19tcV9ycV91cGRhdGVfYWJvcnRlZF9nc3RhdGUocmVxLCAwKTsNCiAJCWJsa19hZGRfdGlt
-ZXIocmVxKTsNCisJCXNtcF93bWIoKTsNCisJCWJsa19tcV9ycV91cGRhdGVfYWJvcnRlZF9nc3Rh
-dGUocmVxLCAwKTsNCiAJCWJyZWFrOw0KIAljYXNlIEJMS19FSF9OT1RfSEFORExFRDoNCiAJCWJy
-ZWFrOw0KDQoNCg0K
+Hello,
+
+On Wed, Feb 07, 2018 at 07:03:56PM +0000, Bart Van Assche wrote:
+> I tried the above patch but already during the first iteration of the test I
+> noticed that the test hung, probably due to the following request that got stuck:
+> 
+> $ (cd /sys/kernel/debug/block && grep -aH . */*/*/rq_list)
+> 00000000a98cff60 {.op=SCSI_IN, .cmd_flags=, .rq_flags=MQ_INFLIGHT|PREEMPT|QUIET|IO_STAT|PM,
+>  .state=idle, .tag=22, .internal_tag=-1, .cmd=Synchronize Cache(10) 35 00 00 00 00 00, .retries=0,
+>  .result = 0x0, .flags=TAGGED, .timeout=60.000, allocated 872.690 s ago}
+
+I'm wonder how this happened, so we can lose a completion when it
+races against BLK_EH_RESET_TIMER; however, the command should timeout
+later cuz the timer is running again now.  Maybe we actually had the
+memory barrier race that you pointed out in the other message?
+
+Thanks.
+
+-- 
+tejun
