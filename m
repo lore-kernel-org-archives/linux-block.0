@@ -1,38 +1,56 @@
-Return-Path: <prvs=56915ec98=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "tj@kernel.org" <tj@kernel.org>
-CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 7 Feb 2018 09:35:31 -0800
+From: "tj@kernel.org" <tj@kernel.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH v2] blk-mq: Fix race between resetting the timer and
  completion handling
-Date: Wed, 7 Feb 2018 18:14:13 +0000
-Message-ID: <1518027251.2870.53.camel@wdc.com>
+Message-ID: <20180207173531.GC695913@devbig577.frc2.facebook.com>
 References: <20180207011133.25957-1-bart.vanassche@wdc.com>
-	 <20180207170612.GB695913@devbig577.frc2.facebook.com>
-	 <1518024428.2870.35.camel@wdc.com>
-	 <20180207173531.GC695913@devbig577.frc2.facebook.com>
-In-Reply-To: <20180207173531.GC695913@devbig577.frc2.facebook.com>
-Content-Type: text/plain; charset="utf-8"
+ <20180207170612.GB695913@devbig577.frc2.facebook.com>
+ <1518024428.2870.35.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1518024428.2870.35.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gV2VkLCAyMDE4LTAyLTA3IGF0IDA5OjM1IC0wODAwLCB0akBrZXJuZWwub3JnIHdyb3RlOg0K
-PiBPbiBXZWQsIEZlYiAwNywgMjAxOCBhdCAwNToyNzoxMFBNICswMDAwLCBCYXJ0IFZhbiBBc3Nj
-aGUgd3JvdGU6DQo+ID4gRXZlbiB3aXRoIHRoZSBhYm92ZSBjaGFuZ2UgSSB0aGluayB0aGF0IHRo
-ZXJlIGlzIHN0aWxsIGEgcmFjZSBiZXR3ZWVuIHRoZQ0KPiA+IGNvZGUgdGhhdCBoYW5kbGVzIHRp
-bWVyIHJlc2V0cyBhbmQgdGhlIGNvbXBsZXRpb24gaGFuZGxlci4NCj4gDQo+IENhbiB5b3UgZWxh
-Ym9yYXRlIHRoZSBzY2VuYXJpbyBhIGJpdCBmdXJ0aGVyPyAgSWYgeW91J3JlIHJlZmVycmluZyB0
-bw0KPiBsb3N0IGNvbXBsZXRpb25zLCB3ZSd2ZSBhbHdheXMgaGFkIHRoYXQgYW5kIHdoaWxlIHdl
-IGNhbiB0cnkgdG8gY2xvc2UNCj4gdGhhdCBob2xlIHRvbywgSSBkb24ndCB0aGluayBpdCdzIGEg
-Y3JpdGljYWwgaXNzdWUuDQoNCkhlbGxvIFRlanVuLA0KDQpXaGVuIEkgd3JvdGUgbXkgY29tbWVu
-dCBJIHdhcyBub3Qgc3VyZSB3aGV0aGVyIG9yIG5vdCBub24tcmVlbnRyYW5jeSBpcw0KZ3VhcmFu
-dGVlZCBmb3Igd29yayBxdWV1ZSBpdGVtcy4gSG93ZXZlciwgYWNjb3JkaW5nIHRvIHdoYXQgSSBm
-b3VuZCBpbiB0aGUNCndvcmtxdWV1ZSBpbXBsZW1lbnRhdGlvbiBJIHRoaW5rIHRoYXQgaXMgZ3Vh
-cmFudGVlZC4gU28gaXQgc2hvdWxkbid0IGJlDQpwb3NzaWJsZSB0aGF0IHRoZSB0aW1lciBhY3Rp
-dmF0ZWQgYnkgYmxrX2FkZF90aW1lcigpIGdldHMgaGFuZGxlZCBiZWZvcmUNCmFib3J0ZWRfZ3N0
-YXRlIGlzIHJlc2V0LiBCdXQgc2luY2UgdGhlIHRpbWVvdXQgaGFuZGxlciBhbmQgY29tcGxldGlv
-bg0KaGFuZGxlcnMgY2FuIGJlIGV4ZWN1dGVkIGJ5IGRpZmZlcmVudCBDUFVzLCBzaG91bGRuJ3Qg
-YSBtZW1vcnkgYmFycmllciBiZQ0KaW5zZXJ0ZWQgYmV0d2VlbiB0aGUgYmxrX2FkZF90aW1lcigp
-IGNhbGwgYW5kIHJlc2V0dGluZyBhYm9ydGVkX2dzeW5jIHRvDQpndWFyYW50ZWUgdGhhdCBhIGNv
-bXBsZXRpb24gY2Fubm90IG9jY3VyIGJlZm9yZSBibGtfYWRkX3RpbWVyKCkgaGFzIHJlc2V0DQpS
-UUZfTVFfVElNRU9VVF9FWFBJUkVEPw0KDQpUaGFua3MsDQoNCkJhcnQuDQoNCg0K
+Hello, Bart.
+
+On Wed, Feb 07, 2018 at 05:27:10PM +0000, Bart Van Assche wrote:
+> Even with the above change I think that there is still a race between the
+> code that handles timer resets and the completion handler. Anyway, the test
+
+Can you elaborate the scenario a bit further?  If you're referring to
+lost completions, we've always had that and while we can try to close
+that hole too, I don't think it's a critical issue.
+
+> with which I triggered these races is as follows:
+> - Start from what will become kernel v4.16-rc1 and apply the patch that adds
+>   SRP over RoCE support to the ib_srpt driver. See also the "[PATCH v2 00/14]
+>   IB/srpt: Add RDMA/CM support" patch series
+>   (https://www.spinics.net/lists/linux-rdma/msg59589.html).
+> - Apply my patch series that fixes a race between the SCSI error handler and
+>   SCSI transport recovery.
+> - Apply my patch series that improves the stability of the SCSI target core
+>   (LIO).
+> - Build and install that kernel.
+> - Clone the following repository: https://github.com/bvanassche/srp-test.
+> - Run the following test:
+>   while true; do srp-test/run_tests -c -t 02-mq; done
+> - While the test is running, check whether or not something weird happens.
+>   Sometimes I see that scsi_times_out() crashes. Sometimes I see while running
+>   this test that a soft lockup is reported inside blk_mq_do_dispatch_ctx().
+> 
+> If you want I can share the tree on github that I use myself for my tests.
+
+Heh, that's quite a bit.  I'll take up on that git tree later but for
+now I'd really appreciate if you can test the patch.
+
+Thank you very much.
+
+-- 
+tejun
