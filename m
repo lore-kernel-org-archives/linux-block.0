@@ -1,38 +1,42 @@
-Return-Path: <cl@linux.com>
-Date: Wed, 7 Feb 2018 10:35:14 -0600 (CST)
-From: Christopher Lameter <cl@linux.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-cc: "jinpu.wang@profitbricks.com" <jinpu.wang@profitbricks.com>,
-    "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-    "hch@infradead.org" <hch@infradead.org>,
-    "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-    "roman.penyaev@profitbricks.com" <roman.penyaev@profitbricks.com>,
-    "sagi@grimberg.me" <sagi@grimberg.me>,
-    "ogerlitz@mellanox.com" <ogerlitz@mellanox.com>,
-    "axboe@kernel.dk" <axboe@kernel.dk>,
-    "danil.kipnis@profitbricks.com" <danil.kipnis@profitbricks.com>
+Return-Path: <roman.penyaev@profitbricks.com>
+MIME-Version: 1.0
+In-Reply-To: <1270775c-950b-76f7-be4f-d5a3198395c2@grimberg.me>
+References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
+ <23dcfda7-eac1-ed13-b24e-3586c284ee55@grimberg.me> <1270775c-950b-76f7-be4f-d5a3198395c2@grimberg.me>
+From: Roman Penyaev <roman.penyaev@profitbricks.com>
+Date: Wed, 7 Feb 2018 14:06:54 +0100
+Message-ID: <CAJrWOzBkdh6pQYzcGFw4GADF_nN_Xiv9O2yGtcNhg0AgLVr+-A@mail.gmail.com>
 Subject: Re: [PATCH 00/24] InfiniBand Transport (IBTRS) and Network Block
  Device (IBNBD)
-In-Reply-To: <1517847408.3764.5.camel@wdc.com>
-Message-ID: <alpine.DEB.2.20.1802071031590.21957@nuc-kabylake>
-References: <20180202140904.2017-1-roman.penyaev@profitbricks.com> <1517591106.2675.28.camel@sandisk.com> <CAMGffEkhqR9Z5bkMfnVn8an2OUM8k+jYoR5EFdtv3k9en1bh=w@mail.gmail.com> <1517847408.3764.5.camel@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+	Bart Van Assche <bart.vanassche@sandisk.com>, Or Gerlitz <ogerlitz@mellanox.com>,
+	Danil Kipnis <danil.kipnis@profitbricks.com>, Jack Wang <jinpu.wang@profitbricks.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, 5 Feb 2018, Bart Van Assche wrote:
+Hi Sagi and all,
 
-> That approach may work well for your employer but sorry I don't think this is
-> sufficient for an upstream driver. I think that most users who configure a
-> network storage target expect full control over which storage devices are exported
-> and also over which clients do have and do not have access.
+On Mon, Feb 5, 2018 at 1:30 PM, Sagi Grimberg <sagi@grimberg.me> wrote:
+> Hi Roman and the team (again), replying to my own email :)
+>
+> I forgot to mention that first of all thank you for upstreaming
+> your work! I fully support your goal to have your production driver
+> upstream to minimize your maintenance efforts. I hope that my
+> feedback didn't came across with a different impression, that was
+> certainly not my intent.
 
-Well is that actually true for IPoIB? It seems that I can arbitrarily
-attach to any partition I want without access control. In many ways some
-of the RDMA layers and modules are loose with security since performance
-is what matters mostly and deployments occur in separate production
-environments.
+Well, I've just recovered from two heart attacks, which I got
+while reading your replies, but now I am fine, thanks :)
 
-We have had security issues (that not fully resolved yet) with the RDMA
-RPC API for years.. So maybe lets relax on the security requirements a
-bit?
+> It would be great if you can address and/or reply to my feedback
+> (as well as others) and re-spin it again.
+
+Jokes aside, we would like to thank you all, guys, for valuable
+feedback. I got a lot of useful remarks from you Sagi and you Bart.
+We will try to cover them in next version and will provide up-to-date
+comparison results.
+
+--
+Roman
