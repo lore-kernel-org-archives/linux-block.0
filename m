@@ -1,4 +1,4 @@
-Return-Path: <prvs=570d9c77a=Bart.VanAssche@wdc.com>
+Return-Path: <prvs=56915ec98=Bart.VanAssche@wdc.com>
 From: Bart Van Assche <Bart.VanAssche@wdc.com>
 To: "hch@infradead.org" <hch@infradead.org>, "linux-block@vger.kernel.org"
 	<linux-block@vger.kernel.org>, "snitzer@redhat.com" <snitzer@redhat.com>,
@@ -16,8 +16,8 @@ CC: "hch@lst.de" <hch@lst.de>, "martin.petersen@oracle.com"
 	<kashyap.desai@broadcom.com>, "peter.rivera@broadcom.com"
 	<peter.rivera@broadcom.com>
 Subject: Re: [PATCH V2 2/8] blk-mq: introduce BLK_MQ_F_GLOBAL_TAGS
-Date: Thu, 8 Feb 2018 15:25:51 +0000
-Message-ID: <1518103548.6826.2.camel@wdc.com>
+Date: Wed, 7 Feb 2018 16:59:24 +0000
+Message-ID: <1518022762.2870.20.camel@wdc.com>
 References: <20180205152035.15016-1-ming.lei@redhat.com>
 	 <20180205152035.15016-3-ming.lei@redhat.com>
 In-Reply-To: <20180205152035.15016-3-ming.lei@redhat.com>
@@ -37,9 +37,11 @@ S19NUV9GX0dMT0JBTF9UQUdTKSB7DQo+ICsJCXN0cnVjdCBibGtfbXFfaHdfY3R4ICpoY3R4MjsN
 Cj4gKwkJaW50IGk7DQo+ICsNCj4gKwkJcXVldWVfZm9yX2VhY2hfaHdfY3R4KGhjdHgtPnF1ZXVl
 LCBoY3R4MiwgaSkNCj4gKwkJCWlmIChibGtfbXFfcnVuX2h3X3F1ZXVlKGhjdHgyLCB0cnVlKSkN
 Cj4gKwkJCQlyZXR1cm4gdHJ1ZTsNCj4gKwkJcmV0dXJuIGZhbHNlOw0KPiArCX0NCj4gKw0KPiAg
-CXJldHVybiBibGtfbXFfcnVuX2h3X3F1ZXVlKGhjdHgsIHRydWUpOw0KPiAgfQ0KDQpJdCBzZWVt
-cyB3ZWlyZCB0byBtZSB0aGF0IG5vIG1hdHRlciBmb3Igd2hpY2ggaGFyZHdhcmUgcXVldWUgYSBy
-ZXN0YXJ0IGlzDQpyZXF1ZXN0ZWQgKHRoZSBoY3R4IGFyZ3VtZW50KSB0aGF0IHRoZSBhYm92ZSBs
-b29wIHN0YXJ0cyB3aXRoIGV4YW1pbmluZw0KdGhlIGhhcmR3YXJlIHF1ZXVlIHdpdGggaW5kZXgg
-MC4gV2lsbCB0aGlzIGNhdXNlIGZhaXJuZXNzIGFuZC9vciBjYWNoZQ0KbGluZSBib3VuY2luZyBw
-cm9ibGVtcz8NCg0KVGhhbmtzLA0KDQpCYXJ0Lg0KDQoNCg0KDQo=
+CXJldHVybiBibGtfbXFfcnVuX2h3X3F1ZXVlKGhjdHgsIHRydWUpOw0KPiAgfQ0KDQpUaGlzIG5l
+dyBsb29wIGxvb2tzIG1pc3BsYWNlZCB0byBtZS4gSWYgYm90aCB0aGUgQkxLX01RX0ZfR0xPQkFM
+X1RBR1MgYW5kIHRoZQ0KQkxLX01RX0ZfVEFHX1NIQVJFRCBmbGFncyBhcmUgc2V0IHRoZW4gdGhl
+IG91dGVyIGxvb3AgaW4gYmxrX21xX3NjaGVkX3Jlc3RhcnQoKQ0KYW5kIHRoZSBpbm5lciBsb29w
+IGluIGJsa19tcV9zY2hlZF9yZXN0YXJ0X2hjdHgoKSB3aWxsIGNhdXNlIG1vcmUgY2FsbHMgb2YN
+CmJsa19tcV9ydW5faHdfcXVldWUoKSB0aGFuIG5lY2Vzc2FyeS4gSGF2ZSB5b3UgY29uc2lkZXJl
+ZCB0byBtZXJnZSB0aGUgYWJvdmUNCmxvb3AgaW50byBibGtfbXFfc2NoZWRfcmVzdGFydCgpPw0K
+DQpUaGFua3MsDQoNCkJhcnQuDQoNCg0K
