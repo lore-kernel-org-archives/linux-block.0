@@ -1,96 +1,74 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: <linux-block@vger.kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>,
-	Hou Tao <houtao1@huawei.com>,
-	Eric Biggers <ebiggers3@gmail.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 6/6] blockdev: Avoid two active bdev inodes for one device
-Date: Tue,  6 Feb 2018 17:05:29 +0100
-Message-Id: <20180206160529.20713-7-jack@suse.cz>
-In-Reply-To: <20180206160529.20713-1-jack@suse.cz>
-References: <20180206160529.20713-1-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:33304 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752540AbeBGE6y (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Feb 2018 23:58:54 -0500
+Received: by mail-pg0-f65.google.com with SMTP id u1so2074427pgr.0
+        for <linux-block@vger.kernel.org>; Tue, 06 Feb 2018 20:58:54 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20171212212248.GD185376@gmail.com>
+References: <f403043d11ccfea019055f705d18@google.com> <20171203201608.GC844@zzz.localdomain>
+ <20171204081408.oyp46roxbkjbxxkw@mwanda> <CACT4Y+aE-Q-PeUaY99d2UbK4BHnf18OoV0MBXyOXzXttf1=nYw@mail.gmail.com>
+ <20171204092632.mh772rjaqahgslvp@mwanda> <20171212212248.GD185376@gmail.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Wed, 7 Feb 2018 05:58:33 +0100
+Message-ID: <CACT4Y+b-v9zeEBydJqdTAnd82QL3M_45Eferaq9MdcR-4P8Rrw@mail.gmail.com>
+Subject: Re: WARNING in kmalloc_slab (3)
+To: Eric Biggers <ebiggers3@gmail.com>
+Cc: Dan Carpenter <dan.carpenter@oracle.com>,
+        syzbot
+        <bot+2797c18fc195e3e240c3c3e7837a14130e157fb0@syzkaller.appspotmail.com>,
+        Alexey Dobriyan <adobriyan@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Dave Jiang <dave.jiang@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs@googlegroups.com, Al Viro <viro@zeniv.linux.org.uk>,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When blkdev_open() races with device removal and creation it can happen
-that unhashed bdev inode gets associated with newly created gendisk
-like:
+On Tue, Dec 12, 2017 at 10:22 PM, Eric Biggers <ebiggers3@gmail.com> wrote:
+> On Mon, Dec 04, 2017 at 12:26:32PM +0300, Dan Carpenter wrote:
+>> On Mon, Dec 04, 2017 at 09:18:05AM +0100, Dmitry Vyukov wrote:
+>> > On Mon, Dec 4, 2017 at 9:14 AM, Dan Carpenter <dan.carpenter@oracle.com> wrote:
+>> > > On Sun, Dec 03, 2017 at 12:16:08PM -0800, Eric Biggers wrote:
+>> > >> Looks like BLKTRACESETUP doesn't limit the '.buf_nr' parameter, allowing anyone
+>> > >> who can open a block device to cause an extremely large kmalloc.  Here's a
+>> > >> simplified reproducer:
+>> > >>
+>> > >
+>> > > There are lots of places which allow people to allocate as much as they
+>> > > want.  With Syzcaller, you might want to just hard code a __GFP_NOWARN
+>> > > in to disable it.
+>> >
+>> > Hi,
+>> >
+>> > Hard code it where?
+>>
+>> My idea was to just make warn_alloc() a no-op.
+>>
+>> >
+>> > User-controllable allocation are supposed to use __GFP_NOWARN.
+>>
+>> No that's not right.  What we don't want is unprivileged users to use
+>> all the memory and we don't want unprivileged users to spam
+>> /var/log/messages.  But you have to have slightly elevated permissions
+>> to open block devices right?  The warning is helpful.  Admins should
+>> "don't do that" if they don't want the warning.
+>
+> WARN_ON() should only be used for kernel bugs.  printk can be a different story.
+> If it's a "userspace shouldn't do this" kind of thing, then if there is any
+> message at all it should be a rate-limited printk that actually explains what
+> the problem is, not a random WARN_ON() that can only be interpreted by kernel
+> developers.
+>
+> And yes, the fact that anyone with read access to any block device, even e.g. a
+> loop device, can cause the kernel to do an unbounded kmalloc *is* a bug.  It
+> needs to have a reasonable limit.  It is not a problem on all systems, but on
+> some systems "the admin" might give users read access to some block devices.
 
-CPU0					CPU1
-blkdev_open()
-  bdev = bd_acquire()
-					del_gendisk()
-					  bdev_unhash_inode(bdev);
-					remove device
-					create new device with the same number
-  __blkdev_get()
-    disk = get_gendisk()
-      - gets reference to gendisk of the new device
 
-Now another blkdev_open() will not find original 'bdev' as it got
-unhashed, create a new one and associate it with the same 'disk' at
-which point problems start as we have two independent page caches for
-one device.
 
-Fix the problem by verifying that the bdev inode didn't get unhashed
-before we acquired gendisk reference. That way we make sure gendisk can
-get associated only with visible bdev inodes.
-
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- fs/block_dev.c | 25 +++++++++++++++++++++++--
- 1 file changed, 23 insertions(+), 2 deletions(-)
-
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index fe41a76769fa..fe09ef9c21f3 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1058,6 +1058,27 @@ static int bd_prepare_to_claim(struct block_device *bdev,
- 	return 0;
- }
- 
-+static struct gendisk *bdev_get_gendisk(struct block_device *bdev, int *partno)
-+{
-+	struct gendisk *disk = get_gendisk(bdev->bd_dev, partno);
-+
-+	if (!disk)
-+		return NULL;
-+	/*
-+	 * Now that we hold gendisk reference we make sure bdev we looked up is
-+	 * not stale. If it is, it means device got removed and created before
-+	 * we looked up gendisk and we fail open in such case. Associating
-+	 * unhashed bdev with newly created gendisk could lead to two bdevs
-+	 * (and thus two independent caches) being associated with one device
-+	 * which is bad.
-+	 */
-+	if (inode_unhashed(bdev->bd_inode)) {
-+		put_disk_and_module(disk);
-+		return NULL;
-+	}
-+	return disk;
-+}
-+
- /**
-  * bd_start_claiming - start claiming a block device
-  * @bdev: block device of interest
-@@ -1094,7 +1115,7 @@ static struct block_device *bd_start_claiming(struct block_device *bdev,
- 	 * @bdev might not have been initialized properly yet, look up
- 	 * and grab the outer block device the hard way.
- 	 */
--	disk = get_gendisk(bdev->bd_dev, &partno);
-+	disk = bdev_get_gendisk(bdev, &partno);
- 	if (!disk)
- 		return ERR_PTR(-ENXIO);
- 
-@@ -1429,7 +1450,7 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
-  restart:
- 
- 	ret = -ENXIO;
--	disk = get_gendisk(bdev->bd_dev, &partno);
-+	disk = bdev_get_gendisk(bdev, &partno);
- 	if (!disk)
- 		goto out;
- 
--- 
-2.13.6
+#syz fix: kernel/relay.c: limit kmalloc size to KMALLOC_MAX_SIZE
