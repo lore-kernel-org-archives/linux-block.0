@@ -1,50 +1,112 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: linux-block@vger.kernel.org
-Subject: [PATCH V2 0/4] lightnvm: base 2.0 implementation
-Date: Fri,  9 Feb 2018 10:27:15 +0100
-Message-Id: <20180209092719.10679-1-mb@lightnvm.io>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from szxga06-in.huawei.com ([45.249.212.32]:34391 "EHLO huawei.com"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753478AbeBGKz1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 7 Feb 2018 05:55:27 -0500
+Subject: Re: [LSF/MM TOPIC] Two blk-mq related topics
+To: Ming Lei <ming.lei@redhat.com>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>
+References: <20180129154455.GB17176@ming.t460p>
+ <1517259390.3969.41.camel@HansenPartnership.com>
+ <20180130012408.GD17176@ming.t460p>
+ <f2cf73ae-d645-6a04-5190-3d0cc91c4581@huawei.com>
+CC: <linux-block@vger.kernel.org>, <lsf-pc@lists.linux-foundation.org>,
+        <linux-nvme@lists.infradead.org>, <Linux-scsi@vger.kernel.org>,
+        Linuxarm <linuxarm@huawei.com>
+From: John Garry <john.garry@huawei.com>
+Message-ID: <712f97fe-633a-3e4c-8ae0-c8c1bbbb16c6@huawei.com>
+Date: Wed, 7 Feb 2018 10:55:03 +0000
 MIME-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: javier@cnexlabs.com, =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="utf-8"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <f2cf73ae-d645-6a04-5190-3d0cc91c4581@huawei.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-QSBjb3VwbGUgb2YgcGF0Y2hlcyBmb3IgMi4wIHN1cHBvcnQgZm9yIHRoZSBsaWdodG52bSBzdWJz
-eXN0ZW0uIFRoZXkKZm9ybSB0aGUgYmFzaXMgZm9yIGludGVncmF0aW5nIDIuMCBzdXBwb3J0LgoK
-Rm9yIHRoZSByZXN0IG9mIHRoZSBzdXBwb3J0LCBKYXZpZXIgaGFzIGNvZGUgdGhhdCBpbXBsZW1l
-bnRzIHJlcG9ydApjaHVuayBhbmQgc2V0cyB1cCB0aGUgTEJBIGZvcm1hdCBkYXRhIHN0cnVjdHVy
-ZS4gSGUgYWxzbyBoYXMgYSBidW5jaApvZiBwYXRjaGVzIHRoYXQgYnJpbmdzIHBibGsgdXAgdG8g
-c3BlZWQuCgpUaGUgZmlyc3QgdHdvIHBhdGNoZXMgaXMgcHJlcGFyYXRpb24gZm9yIHRoZSAyLjAg
-d29yay4gVGhlIHRoaXJkIHBhdGNoCmltcGxlbWVudHMgdGhlIDIuMCBkYXRhIHN0cnVjdHVyZXMs
-IHRoZSBnZW9tZXRyeSBjb21tYW5kLCBhbmQgZXhwb3Nlcwp0aGUgc3lzZnMgYXR0cmlidXRlcyB0
-aGF0IGNvbWVzIHdpdGggdGhlIDIuMCBzcGVjaWZpY2F0aW9uLiBOb3RlIHRoYXQKdGhlIGF0dHJp
-YnV0ZXMgYmV0d2VlbiAxLjIgYW5kIDIuMCBhcmUgZGlmZmVyZW50LCBhbmQgaXQgaXMgZXhwZWN0
-ZWQKdGhhdCB1c2VyLXNwYWNlIHNoYWxsIHVzZSB0aGUgdmVyc2lvbiBzeXNmcyBhdHRyaWJ1dGUg
-dG8ga25vdyB3aGljaAphdHRyaWJ1dGVzIHdpbGwgYmUgYXZhaWxhYmxlLgoKVGhlIGxhc3QgcGF0
-Y2ggaW1wbGVtZW50cyBzdXBwb3J0IGZvciB1c2luZyB0aGUgbnZtZSBuYW1lc3BhY2UgbG9naWNh
-bApibG9jayBhbmQgbWV0YWRhdGEgZmllbGRzIGFuZCBzeW5jIGl0IHdpdGggdGhlIGludGVybmFs
-IGxpZ2h0bnZtCmlkZW50aWZ5IHN0cnVjdHVyZXMuCgpDaGFuZ2VzIHNpbmNlIHYxOgoKIC0gcHJf
-ZXJyIGZpeCBmcm9tIFJhbmR5LgogLSBBZGRyZXNzIHR5cGUgZml4IGZyb20gSmF2aWVyLgogLSBB
-bHNvIENDIHRoZSBudm1lIG1haWxpbmcgbGlzdC4KCk1hdGlhcyBCasO4cmxpbmcgKDQpOgogIGxp
-Z2h0bnZtOiBtYWtlIDEuMiBkYXRhIHN0cnVjdHVyZXMgZXhwbGljaXQKICBsaWdodG52bTogZmxh
-dHRlbiBudm1faWRfZ3JvdXAgaW50byBudm1faWQKICBsaWdodG52bTogYWRkIDIuMCBnZW9tZXRy
-eSBpZGVudGlmaWNhdGlvbgogIG52bWU6IGxpZ2h0bnZtOiBhZGQgbGF0ZSBzZXR1cCBvZiBibG9j
-ayBzaXplIGFuZCBtZXRhZGF0YQoKIGRyaXZlcnMvbGlnaHRudm0vY29yZS5jICAgICAgfCAgMzMg
-KystCiBkcml2ZXJzL252bWUvaG9zdC9jb3JlLmMgICAgIHwgICAyICsKIGRyaXZlcnMvbnZtZS9o
-b3N0L2xpZ2h0bnZtLmMgfCA1MDggKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0t
-LS0tLS0tLQogZHJpdmVycy9udm1lL2hvc3QvbnZtZS5oICAgICB8ICAgMiArCiBpbmNsdWRlL2xp
-bnV4L2xpZ2h0bnZtLmggICAgIHwgIDY0ICsrKy0tLQogNSBmaWxlcyBjaGFuZ2VkLCA0MjggaW5z
-ZXJ0aW9ucygrKSwgMTgxIGRlbGV0aW9ucygtKQoKLS0gCjIuMTEuMAoKCl9fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkxpbnV4LW52bWUgbWFpbGluZyBsaXN0
-CkxpbnV4LW52bWVAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8vbGlzdHMuaW5mcmFkZWFkLm9y
-Zy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4LW52bWUK
+On 30/01/2018 10:33, John Garry wrote:
+> On 30/01/2018 01:24, Ming Lei wrote:
+>> On Mon, Jan 29, 2018 at 12:56:30PM -0800, James Bottomley wrote:
+>>> On Mon, 2018-01-29 at 23:46 +0800, Ming Lei wrote:
+>>> [...]
+>>>> 2. When to enable SCSI_MQ at default again?
+>>>
+>>> I'm not sure there's much to discuss ... I think the basic answer is as
+>>> soon as Christoph wants to try it again.
+>>
+>> I guess Christoph still need to evaluate if there are existed issues or
+>> blockers before trying it again. And more input may be got from F2F
+>> discussion, IMHO.
+>>
+>>>
+>>>> SCSI_MQ is enabled on V3.17 firstly, but disabled at default. In
+>>>> V4.13-rc1, it is enabled at default, but later the patch is reverted
+>>>> in V4.13-rc7, and becomes disabled at default too.
+>>>>
+>>>> Now both the original reported PM issue(actually SCSI quiesce) and
+>>>> the sequential IO performance issue have been addressed.
+>>>
+>>> Is the blocker bug just not closed because no-one thought to do it:
+>>>
+>>> https://bugzilla.kernel.org/show_bug.cgi?id=178381
+>>>
+>>> (we have confirmed that this issue is now fixed with the original
+>>> reporter?)
+>>
+>>> From a developer view, this issue is fixed by the following commit:
+>> 3a0a52997(block, scsi: Make SCSI quiesce and resume work reliably),
+>> and it is verified by kernel list reporter.
+>>
+>>>
+>>> And did the Huawei guy (Jonathan Cameron) confirm his performance issue
+>>> was fixed (I don't think I saw email that he did)?
+>>
+>> Last time I talked with John Garry about the issue, and the merged
+>> .get_budget
+>> based patch improves much on the IO performance, but there is still a
+>> bit gap
+>> compared with legacy path. Seems a driver specific issue, remembered
+>> that removing
+>> a driver's lock can improve performance much.
+>>
+>> Garry, could you provide further update on this issue?
+>
+> Hi Ming,
+>
+> From our testing with experimental changes to our driver to support SCSI
+> mq we were almost getting on par performance with legacy path. But
+> without these MQ was hitting performance (and I would not necessarily
+> say it was a driver issue).
+>
+> We can retest from today's mainline and see where we are.
+>
+> BTW, Have you got performance figures for many other single queue HBAs
+> with and without CONFIG_SCSI_MQ_DEFAULT=Y?
+
+We finally got around to retesting this (on hisi_sas controller). So the 
+results are generally ok, in that we are now not seeing such big 
+performance drops in our hardware for enabling SCSI MQ - in some 
+scenarios the performance is better. Generally fio rw mode is better.
+
+Anyway, for what it's worth, it's a green light from us to set SCSI MQ 
+on by default.
+
+John
+
+>
+> Thanks,
+> John
+>
+>>
+>> Thanks,
+>> Ming
+>>
+>> .
+>>
+>
+>
+> _______________________________________________
+> Linuxarm mailing list
+> Linuxarm@huawei.com
+> http://hulk.huawei.com/mailman/listinfo/linuxarm
+>
+> .
+>
