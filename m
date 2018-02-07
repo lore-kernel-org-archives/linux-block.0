@@ -1,112 +1,182 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from szxga06-in.huawei.com ([45.249.212.32]:34391 "EHLO huawei.com"
-        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753478AbeBGKz1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 7 Feb 2018 05:55:27 -0500
-Subject: Re: [LSF/MM TOPIC] Two blk-mq related topics
-To: Ming Lei <ming.lei@redhat.com>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>
-References: <20180129154455.GB17176@ming.t460p>
- <1517259390.3969.41.camel@HansenPartnership.com>
- <20180130012408.GD17176@ming.t460p>
- <f2cf73ae-d645-6a04-5190-3d0cc91c4581@huawei.com>
-CC: <linux-block@vger.kernel.org>, <lsf-pc@lists.linux-foundation.org>,
-        <linux-nvme@lists.infradead.org>, <Linux-scsi@vger.kernel.org>,
-        Linuxarm <linuxarm@huawei.com>
-From: John Garry <john.garry@huawei.com>
-Message-ID: <712f97fe-633a-3e4c-8ae0-c8c1bbbb16c6@huawei.com>
-Date: Wed, 7 Feb 2018 10:55:03 +0000
-MIME-Version: 1.0
-In-Reply-To: <f2cf73ae-d645-6a04-5190-3d0cc91c4581@huawei.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:45991 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754157AbeBGTl7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Feb 2018 14:41:59 -0500
+Received: by mail-pg0-f66.google.com with SMTP id m136so691898pga.12
+        for <linux-block@vger.kernel.org>; Wed, 07 Feb 2018 11:41:59 -0800 (PST)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Tang Junhui <tang.junhui@zte.com.cn>
+Subject: [PATCH 2/8] bcache: fix high CPU occupancy during journal
+Date: Wed,  7 Feb 2018 11:41:40 -0800
+Message-Id: <20180207194146.5095-3-mlyle@lyle.org>
+In-Reply-To: <20180207194146.5095-1-mlyle@lyle.org>
+References: <20180207194146.5095-1-mlyle@lyle.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 30/01/2018 10:33, John Garry wrote:
-> On 30/01/2018 01:24, Ming Lei wrote:
->> On Mon, Jan 29, 2018 at 12:56:30PM -0800, James Bottomley wrote:
->>> On Mon, 2018-01-29 at 23:46 +0800, Ming Lei wrote:
->>> [...]
->>>> 2. When to enable SCSI_MQ at default again?
->>>
->>> I'm not sure there's much to discuss ... I think the basic answer is as
->>> soon as Christoph wants to try it again.
->>
->> I guess Christoph still need to evaluate if there are existed issues or
->> blockers before trying it again. And more input may be got from F2F
->> discussion, IMHO.
->>
->>>
->>>> SCSI_MQ is enabled on V3.17 firstly, but disabled at default. In
->>>> V4.13-rc1, it is enabled at default, but later the patch is reverted
->>>> in V4.13-rc7, and becomes disabled at default too.
->>>>
->>>> Now both the original reported PM issue(actually SCSI quiesce) and
->>>> the sequential IO performance issue have been addressed.
->>>
->>> Is the blocker bug just not closed because no-one thought to do it:
->>>
->>> https://bugzilla.kernel.org/show_bug.cgi?id=178381
->>>
->>> (we have confirmed that this issue is now fixed with the original
->>> reporter?)
->>
->>> From a developer view, this issue is fixed by the following commit:
->> 3a0a52997(block, scsi: Make SCSI quiesce and resume work reliably),
->> and it is verified by kernel list reporter.
->>
->>>
->>> And did the Huawei guy (Jonathan Cameron) confirm his performance issue
->>> was fixed (I don't think I saw email that he did)?
->>
->> Last time I talked with John Garry about the issue, and the merged
->> .get_budget
->> based patch improves much on the IO performance, but there is still a
->> bit gap
->> compared with legacy path. Seems a driver specific issue, remembered
->> that removing
->> a driver's lock can improve performance much.
->>
->> Garry, could you provide further update on this issue?
->
-> Hi Ming,
->
-> From our testing with experimental changes to our driver to support SCSI
-> mq we were almost getting on par performance with legacy path. But
-> without these MQ was hitting performance (and I would not necessarily
-> say it was a driver issue).
->
-> We can retest from today's mainline and see where we are.
->
-> BTW, Have you got performance figures for many other single queue HBAs
-> with and without CONFIG_SCSI_MQ_DEFAULT=Y?
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-We finally got around to retesting this (on hisi_sas controller). So the 
-results are generally ok, in that we are now not seeing such big 
-performance drops in our hardware for enabling SCSI MQ - in some 
-scenarios the performance is better. Generally fio rw mode is better.
+After long time small writing I/O running, we found the occupancy of CPU
+is very high and I/O performance has been reduced by about half:
 
-Anyway, for what it's worth, it's a green light from us to set SCSI MQ 
-on by default.
+[root@ceph151 internal]# top
+top - 15:51:05 up 1 day,2:43,  4 users,  load average: 16.89, 15.15, 16.53
+Tasks: 2063 total,   4 running, 2059 sleeping,   0 stopped,   0 zombie
+%Cpu(s):4.3 us, 17.1 sy 0.0 ni, 66.1 id, 12.0 wa,  0.0 hi,  0.5 si,  0.0 st
+KiB Mem : 65450044 total, 24586420 free, 38909008 used,  1954616 buff/cache
+KiB Swap: 65667068 total, 65667068 free,        0 used. 25136812 avail Mem
 
-John
+  PID USER PR NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+ 2023 root 20  0       0      0      0 S 55.1  0.0   0:04.42 kworker/11:191
+14126 root 20  0       0      0      0 S 42.9  0.0   0:08.72 kworker/10:3
+ 9292 root 20  0       0      0      0 S 30.4  0.0   1:10.99 kworker/6:1
+ 8553 ceph 20  0 4242492 1.805g  18804 S 30.0  2.9 410:07.04 ceph-osd
+12287 root 20  0       0      0      0 S 26.7  0.0   0:28.13 kworker/7:85
+31019 root 20  0       0      0      0 S 26.1  0.0   1:30.79 kworker/22:1
+ 1787 root 20  0       0      0      0 R 25.7  0.0   5:18.45 kworker/8:7
+32169 root 20  0       0      0      0 S 14.5  0.0   1:01.92 kworker/23:1
+21476 root 20  0       0      0      0 S 13.9  0.0   0:05.09 kworker/1:54
+ 2204 root 20  0       0      0      0 S 12.5  0.0   1:25.17 kworker/9:10
+16994 root 20  0       0      0      0 S 12.2  0.0   0:06.27 kworker/5:106
+15714 root 20  0       0      0      0 R 10.9  0.0   0:01.85 kworker/19:2
+ 9661 ceph 20  0 4246876 1.731g  18800 S 10.6  2.8 403:00.80 ceph-osd
+11460 ceph 20  0 4164692 2.206g  18876 S 10.6  3.5 360:27.19 ceph-osd
+ 9960 root 20  0       0      0      0 S 10.2  0.0   0:02.75 kworker/2:139
+11699 ceph 20  0 4169244 1.920g  18920 S 10.2  3.1 355:23.67 ceph-osd
+ 6843 ceph 20  0 4197632 1.810g  18900 S  9.6  2.9 380:08.30 ceph-osd
 
->
-> Thanks,
-> John
->
->>
->> Thanks,
->> Ming
->>
->> .
->>
->
->
-> _______________________________________________
-> Linuxarm mailing list
-> Linuxarm@huawei.com
-> http://hulk.huawei.com/mailman/listinfo/linuxarm
->
-> .
->
+The kernel work consumed a lot of CPU, and I found they are running journal
+work, The journal is reclaiming source and flush btree node with surprising
+frequency.
+
+Through further analysis, we found that in btree_flush_write(), we try to
+get a btree node with the smallest fifo idex to flush by traverse all the
+btree nodein c->bucket_hash, after we getting it, since no locker protects
+it, this btree node may have been written to cache device by other works,
+and if this occurred, we retry to traverse in c->bucket_hash and get
+another btree node. When the problem occurrd, the retry times is very high,
+and we consume a lot of CPU in looking for a appropriate btree node.
+
+In this patch, we try to record 128 btree nodes with the smallest fifo idex
+in heap, and pop one by one when we need to flush btree node. It greatly
+reduces the time for the loop to find the appropriate BTREE node, and also
+reduce the occupancy of CPU.
+
+[note by mpl: this triggers a checkpatch error because of adjacent,
+pre-existing style violations]
+
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
+---
+ drivers/md/bcache/bcache.h  |  2 ++
+ drivers/md/bcache/journal.c | 47 ++++++++++++++++++++++++++++++---------------
+ drivers/md/bcache/util.h    |  2 ++
+ 3 files changed, 36 insertions(+), 15 deletions(-)
+
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index b98d7705acb6..a857eb3c10de 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -679,6 +679,8 @@ struct cache_set {
+ 
+ #define BUCKET_HASH_BITS	12
+ 	struct hlist_head	bucket_hash[1 << BUCKET_HASH_BITS];
++
++	DECLARE_HEAP(struct btree *, flush_btree);
+ };
+ 
+ struct bbio {
+diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
+index f5296007a9d5..1b736b860739 100644
+--- a/drivers/md/bcache/journal.c
++++ b/drivers/md/bcache/journal.c
+@@ -368,6 +368,12 @@ int bch_journal_replay(struct cache_set *s, struct list_head *list)
+ }
+ 
+ /* Journalling */
++#define journal_max_cmp(l, r) \
++	(fifo_idx(&c->journal.pin, btree_current_write(l)->journal) < \
++	 fifo_idx(&(c)->journal.pin, btree_current_write(r)->journal))
++#define journal_min_cmp(l, r) \
++	(fifo_idx(&c->journal.pin, btree_current_write(l)->journal) > \
++	 fifo_idx(&(c)->journal.pin, btree_current_write(r)->journal))
+ 
+ static void btree_flush_write(struct cache_set *c)
+ {
+@@ -375,25 +381,35 @@ static void btree_flush_write(struct cache_set *c)
+ 	 * Try to find the btree node with that references the oldest journal
+ 	 * entry, best is our current candidate and is locked if non NULL:
+ 	 */
+-	struct btree *b, *best;
+-	unsigned i;
++	struct btree *b;
++	int i;
+ 
+ 	atomic_long_inc(&c->flush_write);
++
+ retry:
+-	best = NULL;
+-
+-	for_each_cached_btree(b, c, i)
+-		if (btree_current_write(b)->journal) {
+-			if (!best)
+-				best = b;
+-			else if (journal_pin_cmp(c,
+-					btree_current_write(best)->journal,
+-					btree_current_write(b)->journal)) {
+-				best = b;
++	spin_lock(&c->journal.lock);
++	if (heap_empty(&c->flush_btree)) {
++		for_each_cached_btree(b, c, i)
++			if (btree_current_write(b)->journal) {
++				if (!heap_full(&c->flush_btree))
++					heap_add(&c->flush_btree, b,
++						 journal_max_cmp);
++				else if (journal_max_cmp(b,
++					 heap_peek(&c->flush_btree))) {
++					c->flush_btree.data[0] = b;
++					heap_sift(&c->flush_btree, 0,
++						  journal_max_cmp);
++				}
+ 			}
+-		}
+ 
+-	b = best;
++		for (i = c->flush_btree.used / 2 - 1; i >= 0; --i)
++			heap_sift(&c->flush_btree, i, journal_min_cmp);
++	}
++
++	b = NULL;
++	heap_pop(&c->flush_btree, b, journal_min_cmp);
++	spin_unlock(&c->journal.lock);
++
+ 	if (b) {
+ 		mutex_lock(&b->write_lock);
+ 		if (!btree_current_write(b)->journal) {
+@@ -824,7 +840,8 @@ int bch_journal_alloc(struct cache_set *c)
+ 	j->w[0].c = c;
+ 	j->w[1].c = c;
+ 
+-	if (!(init_fifo(&j->pin, JOURNAL_PIN, GFP_KERNEL)) ||
++	if (!(init_heap(&c->flush_btree, 128, GFP_KERNEL)) ||
++	    !(init_fifo(&j->pin, JOURNAL_PIN, GFP_KERNEL)) ||
+ 	    !(j->w[0].data = (void *) __get_free_pages(GFP_KERNEL, JSET_BITS)) ||
+ 	    !(j->w[1].data = (void *) __get_free_pages(GFP_KERNEL, JSET_BITS)))
+ 		return -ENOMEM;
+diff --git a/drivers/md/bcache/util.h b/drivers/md/bcache/util.h
+index 4df4c5c1cab2..a6763db7f061 100644
+--- a/drivers/md/bcache/util.h
++++ b/drivers/md/bcache/util.h
+@@ -112,6 +112,8 @@ do {									\
+ 
+ #define heap_full(h)	((h)->used == (h)->size)
+ 
++#define heap_empty(h)	((h)->used == 0)
++
+ #define DECLARE_FIFO(type, name)					\
+ 	struct {							\
+ 		size_t front, back, size, mask;				\
+-- 
+2.14.1
