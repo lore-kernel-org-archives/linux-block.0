@@ -1,111 +1,45 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: v4.15 and I/O hang with BFQ
-From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <3E34D175-88F9-4114-B627-A11262A7B470@linaro.org>
-Date: Mon, 5 Feb 2018 20:07:03 +0100
-Cc: Ming Lei <ming.lei@redhat.com>,
- Oleksandr Natalenko <oleksandr@natalenko.name>,
- Ivan Kozik <ivan@ludios.org>,
- linux-block <linux-block@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Jens Axboe <axboe@kernel.dk>,
- Linus Walleij <linus.walleij@linaro.org>,
- SERENA ZIVIANI <169364@studenti.unimore.it>
-Message-Id: <6BCE8A16-7D00-4B55-8E2D-0DDC7C187C14@linaro.org>
-References: <9ad0d544ab2b12f87f44eb4ef88e23a2@natalenko.name>
- <20180130081925.GA25183@ming.t460p>
- <38bd4dbe280bd0934abde764fe0916cd@natalenko.name>
- <20180130144002.GA14401@ming.t460p>
- <3E34D175-88F9-4114-B627-A11262A7B470@linaro.org>
-To: bfq-iosched@googlegroups.com
+Return-Path: <axboe@kernel.dk>
+Subject: Re: Bcache patches for inclusion in 4.16
+To: Michael Lyle <mlyle@lyle.org>, linux-bcache@vger.kernel.org,
+ linux-block@vger.kernel.org
+References: <20180207194146.5095-1-mlyle@lyle.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <35326bbb-0a35-3f0b-c83b-0b81864d1728@kernel.dk>
+Date: Wed, 7 Feb 2018 13:33:36 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180207194146.5095-1-mlyle@lyle.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
+On 2/7/18 12:41 PM, Michael Lyle wrote:
+> Hi Jens---
+> 
+> Here are a few more changes for 4.16 from Coly Li and Tang Junhui.
+> 
+> Probably the most "functional" is 2/8, which makes a change to improve a
+> performance bug under sustained small writes.  Still, it's a small, safe
+> change that seems good to take.  The rest are small bugfixes.
+> 
+> All have seen some degree of test (which is, of course, always ongoing).
+> 
+> Note that there's one checkpatch error in this, but it was already present
+> and is just triggered by altering an adjacent line.
+> 
+>  9 files changed, 111 insertions(+), 36 deletions(-)
+> 
+> Coly Li (3):
+>       bcache: properly set task state in bch_writeback_thread()
+>       bcache: set error_limit correctly
+>       bcache: set writeback_rate_update_seconds in range [1, 60] seconds
+> 
+> Tang Junhui (5):
+>       bcache: add journal statistic
+>       bcache: fix high CPU occupancy during journal
+>       bcache: fix for allocator and register thread race
+>       bcache: return attach error when no cache set exist
+>       bcache: fix for data collapse after re-attaching an attached device
 
+Applied, thanks.
 
-> Il giorno 30 gen 2018, alle ore 16:40, Paolo Valente =
-<paolo.valente@linaro.org> ha scritto:
->=20
->=20
->=20
->> Il giorno 30 gen 2018, alle ore 15:40, Ming Lei <ming.lei@redhat.com> =
-ha scritto:
->>=20
->> On Tue, Jan 30, 2018 at 03:30:28PM +0100, Oleksandr Natalenko wrote:
->>> Hi.
->>>=20
->> ...
->>>  systemd-udevd-271   [000] ....     4.311033: bfq_insert_requests: =
-insert
->>> rq->0
->>>  systemd-udevd-271   [000] ...1     4.311037: =
-blk_mq_do_dispatch_sched:
->>> not get rq, 1
->>>         cfdisk-408   [000] ....    13.484220: bfq_insert_requests: =
-insert
->>> rq->1
->>>   kworker/0:1H-174   [000] ....    13.484253: =
-blk_mq_do_dispatch_sched:
->>> not get rq, 1
->>> =3D=3D=3D
->>>=20
->>> Looks the same, right?
->>=20
->> Yeah, same with before.
->>=20
->=20
-> Hi guys,
-> sorry for the delay with this fix.  We are proceeding very slowly on
-> this, because I'm super busy.  Anyway, now I can at least explain in
-> more detail the cause that leads to this hang.  Commit 'a6a252e64914
-> ("blk-mq-sched: decide how to handle flush rq via RQF_FLUSH_SEQ")'
-> makes all non-flush re-prepared requests be re-inserted into the I/O
-> scheduler.  With this change, I/O schedulers may get the same request
-> inserted again, even several times, without a finish_request invoked
-> on the request before each re-insertion.
->=20
-> For the I/O scheduler, every such re-prepared request is equivalent
-> to the insertion of a new request. For schedulers like mq-deadline
-> or kyber this fact causes no problems. In contrast, it confuses a =
-stateful
-> scheduler like BFQ, which preserves states for an I/O request until
-> finish_request is invoked on it. In particular, BFQ has no way
-> to know that the above re-insertions concerns the same, already =
-dispatched
-> request. So it may get stuck waiting for the completion of these
-> re-inserted requests forever, thus preventing any other queue of
-> requests to be served.
->=20
-> We are trying to address this issue by adding the hook requeue_request
-> to bfq interface.
->=20
-> Unfortunately, with our current implementation of requeue_request in
-> place, bfq eventually gets to an incoherent state.  This is apparently
-> caused by a requeue of an I/O request, immediately followed by a
-> completion of the same request.  This seems rather absurd, and drives
-> bfq crazy.  But this is something for which we don't have definite
-> results yet.
->=20
-> We're working on it, sorry again for the delay.
->=20
-
-Ok, patch arriving ... Please test it.
-
-Thanks,
-Paolo
-
-> Thanks,
-> Paolo
->=20
->> --=20
->> Ming
->=20
-> --=20
-> You received this message because you are subscribed to the Google =
-Groups "bfq-iosched" group.
-> To unsubscribe from this group and stop receiving emails from it, send =
-an email to bfq-iosched+unsubscribe@googlegroups.com.
-> For more options, visit https://groups.google.com/d/optout.
+-- 
+Jens Axboe
