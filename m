@@ -1,82 +1,54 @@
-Return-Path: <prvs=56915ec98=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "tj@kernel.org" <tj@kernel.org>
-CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 7 Feb 2018 13:40:09 -0800
+From: "tj@kernel.org" <tj@kernel.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH v2] blk-mq: Fix race between resetting the timer and
  completion handling
-Date: Wed, 7 Feb 2018 23:48:18 +0000
-Message-ID: <1518047297.2870.80.camel@wdc.com>
+Message-ID: <20180207214009.GG695913@devbig577.frc2.facebook.com>
 References: <20180207011133.25957-1-bart.vanassche@wdc.com>
-	 <20180207170612.GB695913@devbig577.frc2.facebook.com>
-	 <1518024428.2870.35.camel@wdc.com>
-	 <20180207173531.GC695913@devbig577.frc2.facebook.com>
-	 <1518027251.2870.53.camel@wdc.com>
-	 <20180207200724.GD695913@devbig577.frc2.facebook.com>
-In-Reply-To: <20180207200724.GD695913@devbig577.frc2.facebook.com>
-Content-Type: text/plain; charset="utf-8"
+ <20180207170612.GB695913@devbig577.frc2.facebook.com>
+ <1518030233.2870.57.camel@wdc.com>
+ <20180207200951.GE695913@devbig577.frc2.facebook.com>
+ <1518037339.2870.61.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1518037339.2870.61.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gV2VkLCAyMDE4LTAyLTA3IGF0IDEyOjA3IC0wODAwLCB0akBrZXJuZWwub3JnIHdyb3RlOg0K
-PiBBaCwgeW91J3JlIHJpZ2h0LiAgdTY0X3N0YXRfc3luYyBkb2Vzbid0IGltcGx5IGJhcnJpZXJz
-LCBzbyB3ZSB3YW50DQo+IHNvbWV0aGluZyBsaWtlIHRoZSBmb2xsb3dpbmcuDQo+IA0KPiBkaWZm
-IC0tZ2l0IGEvYmxvY2svYmxrLW1xLmMgYi9ibG9jay9ibGstbXEuYw0KPiBpbmRleCBkZjkzMTAy
-Li5kNmVkZjNiIDEwMDY0NA0KPiAtLS0gYS9ibG9jay9ibGstbXEuYw0KPiArKysgYi9ibG9jay9i
-bGstbXEuYw0KPiBAQCAtNTkzLDcgKzU5Myw3IEBAIHN0YXRpYyB2b2lkIGJsa19tcV9ycV91cGRh
-dGVfYWJvcnRlZF9nc3RhdGUoc3RydWN0IHJlcXVlc3QgKnJxLCB1NjQgZ3N0YXRlKQ0KPiAgCSAq
-Lw0KPiAgCWxvY2FsX2lycV9zYXZlKGZsYWdzKTsNCj4gIAl1NjRfc3RhdHNfdXBkYXRlX2JlZ2lu
-KCZycS0+YWJvcnRlZF9nc3RhdGVfc3luYyk7DQo+IC0JcnEtPmFib3J0ZWRfZ3N0YXRlID0gZ3N0
-YXRlOw0KPiArCXNtcF9zdG9yZV9yZWxlYXNlKCZycS0+YWJvcnRlZF9nc3RhdGUsIGdzdGF0ZSk7
-DQo+ICAJdTY0X3N0YXRzX3VwZGF0ZV9lbmQoJnJxLT5hYm9ydGVkX2dzdGF0ZV9zeW5jKTsNCj4g
-IAlsb2NhbF9pcnFfcmVzdG9yZShmbGFncyk7DQo+ICB9DQo+IEBAIC02MDUsNyArNjA1LDcgQEAg
-c3RhdGljIHU2NCBibGtfbXFfcnFfYWJvcnRlZF9nc3RhdGUoc3RydWN0IHJlcXVlc3QgKnJxKQ0K
-PiAgDQo+ICAJZG8gew0KPiAgCQlzdGFydCA9IHU2NF9zdGF0c19mZXRjaF9iZWdpbigmcnEtPmFi
-b3J0ZWRfZ3N0YXRlX3N5bmMpOw0KPiAtCQlhYm9ydGVkX2dzdGF0ZSA9IHJxLT5hYm9ydGVkX2dz
-dGF0ZTsNCj4gKwkJYWJvcnRlZF9nc3RhdGUgPSBzbXBfbG9hZF9hY3F1aXJlKCZycS0+YWJvcnRl
-ZF9nc3RhdGUpOw0KPiAgCX0gd2hpbGUgKHU2NF9zdGF0c19mZXRjaF9yZXRyeSgmcnEtPmFib3J0
-ZWRfZ3N0YXRlX3N5bmMsIHN0YXJ0KSk7DQo+ICANCj4gIAlyZXR1cm4gYWJvcnRlZF9nc3RhdGU7
-DQo+IEBAIC04MzYsOCArODM2LDggQEAgc3RhdGljIHZvaWQgYmxrX21xX3JxX3RpbWVkX291dChz
-dHJ1Y3QgcmVxdWVzdCAqcmVxLCBib29sIHJlc2VydmVkKQ0KPiAgCQkgKiAtPmFib3J0ZWRfZ3N0
-YXRlIGlzIHNldCwgdGhpcyBtYXkgbGVhZCB0byBpZ25vcmVkDQo+ICAJCSAqIGNvbXBsZXRpb25z
-IGFuZCBmdXJ0aGVyIHNwdXJpb3VzIHRpbWVvdXRzLg0KPiAgCQkgKi8NCj4gLQkJYmxrX21xX3Jx
-X3VwZGF0ZV9hYm9ydGVkX2dzdGF0ZShyZXEsIDApOw0KPiAgCQlibGtfYWRkX3RpbWVyKHJlcSk7
-DQo+ICsJCWJsa19tcV9ycV91cGRhdGVfYWJvcnRlZF9nc3RhdGUocmVxLCAwKTsNCj4gIAkJYnJl
-YWs7DQo+ICAJY2FzZSBCTEtfRUhfTk9UX0hBTkRMRUQ6DQo+ICAJCWJyZWFrOw0KDQpIZWxsbyBU
-ZWp1biwNCg0KV2l0aCB0aGlzIHBhdGNoIGFwcGxpZWQgSSBzZWUgcmVxdWVzdHMgZm9yIHdoaWNo
-IGl0IHNlZW1zIGxpa2UgdGhlIHRpbWVvdXQgaGFuZGxlcg0KZGlkIG5vdCBnZXQgaW52b2tlZDoN
-Cg0Kc2RjL2hjdHgwL2J1c3k6MDAwMDAwMDA5NWUwNGI3YyB7Lm9wPVdSSVRFLCAuY21kX2ZsYWdz
-PUZBSUxGQVNUX1RSQU5TUE9SVHxTWU5DfE4NCk9NRVJHRXxJRExFLCAucnFfZmxhZ3M9TVFfSU5G
-TElHSFR8RE9OVFBSRVB8SU9fU1RBVHxNUV9USU1FT1VUX0VYUElSRUQsIC5zdGF0ZT1pDQpuX2Zs
-aWdodCwgLmdzdGF0ZT0weGVkLzB4ZWQsIC50YWc9MjYsIC5pbnRlcm5hbF90YWc9LTEsIC5jbWQ9
-V3JpdGUoMTApIDJhIDAwIDAwICANCjAwIDYwIGJhIDAwIDAwIDA4IDAwLCAucmV0cmllcz0wLCAu
-cmVzdWx0ID0gMHg1MDAwMCwgLmZsYWdzPVRBR0dFRHxJTklUSUFMSVpFRCwgIA0KLnRpbWVvdXQ9
-MS4wMDAsIGFsbG9jYXRlZCAxMDkzLjE4MCBzIGFnb30NCg0Kc2RjL2hjdHgwL2J1c3k6MDAwMDAw
-MDA2NWE2NGU5YiB7Lm9wPVdSSVRFLCAuY21kX2ZsYWdzPUZBSUxGQVNUX1RSQU5TUE9SVHxTWU5D
-fE4NCk9NRVJHRXxJRExFLCAucnFfZmxhZ3M9TVFfSU5GTElHSFR8RE9OVFBSRVB8SU9fU1RBVHxN
-UV9USU1FT1VUX0VYUElSRUQsIC5zdGF0ZT1pDQpuX2ZsaWdodCwgLmdzdGF0ZT0weDUvMHg1LCAu
-dGFnPTI3LCAuaW50ZXJuYWxfdGFnPS0xLCAuY21kPVdyaXRlKDEwKSAyYSAwMCAwMCAwMA0KIDYy
-IGQyIDAwIDAwIDA4IDAwLCAucmV0cmllcz0wLCAucmVzdWx0ID0gMHg1MDAwMCwgLmZsYWdzPVRB
-R0dFRHxJTklUSUFMSVpFRCwgLnQNCmltZW91dD0xLjAwMCwgYWxsb2NhdGVkIDEwOTMuMTgwIHMg
-YWdvfQ0KDQpbIC4uLiBdDQoNCnNkYy9oY3R4My9idXN5OjAwMDAwMDAwNDc5Y2MyYTkgey5vcD1X
-UklURSwgLmNtZF9mbGFncz1GQUlMRkFTVF9UUkFOU1BPUlR8U1lOQ3xODQpPTUVSR0V8SURMRSwg
-LnJxX2ZsYWdzPU1RX0lORkxJR0hUfERPTlRQUkVQfElPX1NUQVQsIC5zdGF0ZT1pbl9mbGlnaHQs
-IC5nc3RhdGU9MA0KeDExLzB4MTEsIC50YWc9NTcsIC5pbnRlcm5hbF90YWc9LTEsIC5jbWQ9V3Jp
-dGUoMTApIDJhIDAwIDAwIDAwIDYxIGQyIDAwIDAwIDA4IDANCjAsIC5yZXRyaWVzPTAsIC5yZXN1
-bHQgPSAweDAsIC5mbGFncz1UQUdHRUR8SU5JVElBTElaRUQsIC50aW1lb3V0PTEuMDAwLCBhbGxv
-Y2F0DQplZCAxMDkzLjE1MCBzIGFnb30NCg0Kc2RjL2hjdHgzL2J1c3k6MDAwMDAwMDA4ZmQxMzBk
-NSB7Lm9wPVdSSVRFLCAuY21kX2ZsYWdzPUZBSUxGQVNUX1RSQU5TUE9SVHxTWU5DfE4NCk9NRVJH
-RXxJRExFLCAucnFfZmxhZ3M9TVFfSU5GTElHSFR8RE9OVFBSRVB8SU9fU1RBVCwgLnN0YXRlPWlu
-X2ZsaWdodCwgLmdzdGF0ZT0wDQp4ZC8weGQsIC50YWc9NjEsIC5pbnRlcm5hbF90YWc9LTEsIC5j
-bWQ9V3JpdGUoMTApIDJhIDAwIDAwIDAwIGMzIDk0IDAwIDAwIDA4IDAwLA0KIC5yZXRyaWVzPTAs
-IC5yZXN1bHQgPSAweDAsIC5mbGFncz1UQUdHRUR8SU5JVElBTElaRUQsIC50aW1lb3V0PTEuMDAw
-LCBhbGxvY2F0ZWQNCiAxMDkzLjE0MCBzIGFnb30NCg0KQXMgb25lIGNhbiBzZWUgZm9yIHNvbWUg
-cmVxdWVzdHMgTVFfVElNRU9VVF9FWFBJUkVEIGlzIHNldCBhbmQgLnJlc3VsdCA9IDB4NTAwMDAu
-DQpUaGUgdmFsdWUgb2YgLnJlc3VsdCBtZWFucyB0aGF0IHRoZSBTQ1NJIGVycm9yIGhhbmRsZXIg
-aGFzIHN1Ym1pdHRlZCBhbiBhYm9ydCAoc2VlDQphbHNvIHNjbW5kLT5yZXN1bHQgPSBESURfQUJP
-UlQgPDwgMTYgaW4gZHJpdmVycy9pbmZpbmliYW5kL3VscC9zcnAvaWJfc3JwLmMpLiBGb3INCnRo
-ZSBsYXN0IHR3byByZXF1ZXN0cyBzaG93biBhYm92ZSBob3dldmVyIE1RX1RJTUVPVVRfRVhQSVJF
-RCBpcyBub3Qgc2V0IGFuZCB0aGUNClNDU0kgcmVzdWx0IGhhcyB2YWx1ZSAwLiBJIHRoaW5rIHRo
-YXQgbWVhbnMgdGhhdCBpdCBjYW4gaGFwcGVuIHRoYXQgYSByZXF1ZXN0DQp0aW1lcyBvdXQgYnV0
-IHRoYXQgdGhlIHRpbWVvdXQgaGFuZGxlciBkb2VzIG5vdCBnZXQgaW52b2tlZCAuLi4NCg0KVGhh
-bmtzLA0KDQpCYXJ0Lg0KDQoNCg0K
+Hello,
+
+On Wed, Feb 07, 2018 at 09:02:21PM +0000, Bart Van Assche wrote:
+> The patch that I used in my test had an smp_wmb() call (see also below). Anyway,
+> I will see whether I can extract more state information through debugfs.
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index ef4f6df0f1df..8eb2105d82b7 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -827,13 +827,9 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
+>  		__blk_mq_complete_request(req);
+>  		break;
+>  	case BLK_EH_RESET_TIMER:
+> -		/*
+> -		 * As nothing prevents from completion happening while
+> -		 * ->aborted_gstate is set, this may lead to ignored
+> -		 * completions and further spurious timeouts.
+> -		 */
+> -		blk_mq_rq_update_aborted_gstate(req, 0);
+>  		blk_add_timer(req);
+> +		smp_wmb();
+> +		blk_mq_rq_update_aborted_gstate(req, 0);
+
+Without the matching rmb, just adding rmb won't do much but given the
+default strong ordering on x86 and other operations around, what you
+were seeing is probably not caused by lack of barriers.
+
+Thanks.
+
+-- 
+tejun
