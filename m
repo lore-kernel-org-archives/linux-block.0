@@ -1,270 +1,129 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:47708 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752297AbeBHPqC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 8 Feb 2018 10:46:02 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Nix <nix@esperi.org.uk>, Pavel Goran <via-bcache@pvgoran.name>,
-        Junhui Tang <tang.junhui@zte.com.cn>,
-        Hannes Reinecke <hare@suse.com>
-Subject: [PATCH v6 5/9] bcache: add stop_when_cache_set_failed option to backing device
-Date: Thu,  8 Feb 2018 23:44:59 +0800
-Message-Id: <20180208154503.92463-6-colyli@suse.de>
-In-Reply-To: <20180208154503.92463-1-colyli@suse.de>
-References: <20180208154503.92463-1-colyli@suse.de>
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:45990 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754048AbeBGTl6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Feb 2018 14:41:58 -0500
+Received: by mail-pg0-f67.google.com with SMTP id m136so691870pga.12
+        for <linux-block@vger.kernel.org>; Wed, 07 Feb 2018 11:41:58 -0800 (PST)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Tang Junhui <tang.junhui@zte.com.cn>
+Subject: [PATCH 1/8] bcache: add journal statistic
+Date: Wed,  7 Feb 2018 11:41:39 -0800
+Message-Id: <20180207194146.5095-2-mlyle@lyle.org>
+In-Reply-To: <20180207194146.5095-1-mlyle@lyle.org>
+References: <20180207194146.5095-1-mlyle@lyle.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-When there are too many I/O errors on cache device, current bcache code
-will retire the whole cache set, and detach all bcache devices. But the
-detached bcache devices are not stopped, which is problematic when bcache
-is in writeback mode.
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-If the retired cache set has dirty data of backing devices, continue
-writing to bcache device will write to backing device directly. If the
-LBA of write request has a dirty version cached on cache device, next time
-when the cache device is re-registered and backing device re-attached to
-it again, the stale dirty data on cache device will be written to backing
-device, and overwrite latest directly written data. This situation causes
-a quite data corruption.
+Sometimes, Journal takes up a lot of CPU, we need statistics
+to know what's the journal is doing. So this patch provide
+some journal statistics:
+1) reclaim: how many times the journal try to reclaim resource,
+   usually the journal bucket or/and the pin are exhausted.
+2) flush_write: how many times the journal try to flush btree node
+   to cache device, usually the journal bucket are exhausted.
+3) retry_flush_write: how many times the journal retry to flush
+   the next btree node, usually the previous tree node have been
+   flushed by other thread.
+we show these statistic by sysfs interface. Through these statistics
+We can totally see the status of journal module when the CPU is too
+high.
 
-But we cannot simply stop all attached bcache devices when the cache set is
-broken or disconnected. For example, use bcache to accelerate performance
-of an email service. In such workload, if cache device is broken but no
-dirty data lost, keep the bcache device alive and permit email service
-continue to access user data might be a better solution for the cache
-device failure.
-
-Nix <nix@esperi.org.uk> points out the issue and provides the above example
-to explain why it might be necessary to not stop bcache device for broken
-cache device. Pavel Goran <via-bcache@pvgoran.name> provides a brilliant
-suggestion to provide "always" and "auto" options to per-cached device
-sysfs file stop_when_cache_set_failed. If cache set is retiring and the
-backing device has no dirty data on cache, it should be safe to keep the
-bcache device alive. In this case, if stop_when_cache_set_failed is set to
-"auto", the device failure handling code will not stop this bcache device
-and permit application to access the backing device with a unattached
-bcache device.
-
-Changelog:
-v3: fix typos pointed out by Nix.
-v2: change option values of stop_when_cache_set_failed from 1/0 to
-    "auto"/"always".
-v1: initial version, stop_when_cache_set_failed can be 0 (not stop) or 1
-    (always stop).
-
-Signed-off-by: Coly Li <colyli@suse.de>
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
 Reviewed-by: Michael Lyle <mlyle@lyle.org>
-Cc: Nix <nix@esperi.org.uk>
-Cc: Pavel Goran <via-bcache@pvgoran.name>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
-Cc: Hannes Reinecke <hare@suse.com>
 ---
- drivers/md/bcache/bcache.h |  9 +++++
- drivers/md/bcache/super.c  | 82 ++++++++++++++++++++++++++++++++++++++++------
- drivers/md/bcache/sysfs.c  | 17 ++++++++++
- 3 files changed, 98 insertions(+), 10 deletions(-)
+ drivers/md/bcache/bcache.h  |  4 ++++
+ drivers/md/bcache/journal.c |  5 +++++
+ drivers/md/bcache/sysfs.c   | 15 +++++++++++++++
+ 3 files changed, 24 insertions(+)
 
 diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 56179fff1e59..7c2b836732e9 100644
+index 5e2d4e80198e..b98d7705acb6 100644
 --- a/drivers/md/bcache/bcache.h
 +++ b/drivers/md/bcache/bcache.h
-@@ -287,6 +287,12 @@ struct io {
- 	sector_t		last;
- };
+@@ -658,6 +658,10 @@ struct cache_set {
+ 	atomic_long_t		writeback_keys_done;
+ 	atomic_long_t		writeback_keys_failed;
  
-+enum stop_on_failure {
-+	BCH_CACHED_DEV_STOP_AUTO = 0,
-+	BCH_CACHED_DEV_STOP_ALWAYS,
-+	BCH_CACHED_DEV_STOP_MODE_MAX,
-+};
++	atomic_long_t		reclaim;
++	atomic_long_t		flush_write;
++	atomic_long_t		retry_flush_write;
 +
- struct cached_dev {
- 	struct list_head	list;
- 	struct bcache_device	disk;
-@@ -379,6 +385,8 @@ struct cached_dev {
- 	unsigned		writeback_rate_i_term_inverse;
- 	unsigned		writeback_rate_p_term_inverse;
- 	unsigned		writeback_rate_minimum;
+ 	enum			{
+ 		ON_ERROR_UNREGISTER,
+ 		ON_ERROR_PANIC,
+diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
+index a87165c1d8e5..f5296007a9d5 100644
+--- a/drivers/md/bcache/journal.c
++++ b/drivers/md/bcache/journal.c
+@@ -377,6 +377,8 @@ static void btree_flush_write(struct cache_set *c)
+ 	 */
+ 	struct btree *b, *best;
+ 	unsigned i;
 +
-+	enum stop_on_failure	stop_when_cache_set_failed;
- };
++	atomic_long_inc(&c->flush_write);
+ retry:
+ 	best = NULL;
  
- enum alloc_reserve {
-@@ -924,6 +932,7 @@ void bch_write_bdev_super(struct cached_dev *, struct closure *);
- 
- extern struct workqueue_struct *bcache_wq;
- extern const char * const bch_cache_modes[];
-+extern const char * const bch_stop_on_failure_modes[];
- extern struct mutex bch_register_lock;
- extern struct list_head bch_cache_sets;
- 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index a1abeebc7643..52d5012948c9 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -47,6 +47,14 @@ const char * const bch_cache_modes[] = {
- 	NULL
- };
- 
-+/* Default is -1; we skip past it for stop_when_cache_set_failed */
-+const char * const bch_stop_on_failure_modes[] = {
-+	"default",
-+	"auto",
-+	"always",
-+	NULL
-+};
-+
- static struct kobject *bcache_kobj;
- struct mutex bch_register_lock;
- LIST_HEAD(bch_cache_sets);
-@@ -1189,6 +1197,9 @@ static int cached_dev_init(struct cached_dev *dc, unsigned block_size)
- 		max(dc->disk.disk->queue->backing_dev_info->ra_pages,
- 		    q->backing_dev_info->ra_pages);
- 
-+	/* default to auto */
-+	dc->stop_when_cache_set_failed = BCH_CACHED_DEV_STOP_AUTO;
-+
- 	bch_cached_dev_request_init(dc);
- 	bch_cached_dev_writeback_init(dc);
- 	return 0;
-@@ -1465,25 +1476,76 @@ static void cache_set_flush(struct closure *cl)
- 	closure_return(cl);
- }
- 
-+/*
-+ * This function is only called when CACHE_SET_IO_DISABLE is set, which means
-+ * cache set is unregistering due to too many I/O errors. In this condition,
-+ * the bcache device might be stopped, it depends on stop_when_cache_set_failed
-+ * value and whether the broken cache has dirty data:
-+ *
-+ * dc->stop_when_cache_set_failed    dc->has_dirty   stop bcache device
-+ *  BCH_CACHED_STOP_AUTO               0               NO
-+ *  BCH_CACHED_STOP_AUTO               1               YES
-+ *  BCH_CACHED_DEV_STOP_ALWAYS         0               YES
-+ *  BCH_CACHED_DEV_STOP_ALWAYS         1               YES
-+ *
-+ * The expected behavior is, if stop_when_cache_set_failed is configured to
-+ * "auto" via sysfs interface, the bcache device will not be stopped if the
-+ * backing device is clean on the broken cache device.
-+ */
-+static void conditional_stop_bcache_device(struct cache_set *c,
-+					   struct bcache_device *d,
-+					   struct cached_dev *dc)
-+{
-+	if (dc->stop_when_cache_set_failed == BCH_CACHED_DEV_STOP_ALWAYS) {
-+		pr_warn("stop_when_cache_set_failed of %s is \"always\", stop"
-+			" it for failed cache set %pU.",
-+			d->disk->disk_name, c->sb.set_uuid);
-+		bcache_device_stop(d);
-+	} else if (atomic_read(&dc->has_dirty)) {
-+		/*
-+		 * dc->stop_when_cache_set_failed == BCH_CACHED_STOP_AUTO
-+		 * and dc->has_dirty == 1
-+		 */
-+		pr_warn("stop_when_cache_set_failed of %s is \"auto\" and "
-+			"cache is dirty, stop it to avoid potential data "
-+			"corruption.",
-+			d->disk->disk_name);
-+			bcache_device_stop(d);
-+	} else {
-+		/*
-+		 * dc->stop_when_cache_set_failed == BCH_CACHED_STOP_AUTO
-+		 * and dc->has_dirty == 0
-+		 */
-+		pr_warn("stop_when_cache_set_failed of %s is \"auto\" and "
-+			"cache is clean, keep it alive.",
-+			d->disk->disk_name);
-+	}
-+}
-+
- static void __cache_set_unregister(struct closure *cl)
- {
- 	struct cache_set *c = container_of(cl, struct cache_set, caching);
- 	struct cached_dev *dc;
-+	struct bcache_device *d;
- 	size_t i;
- 
- 	mutex_lock(&bch_register_lock);
- 
--	for (i = 0; i < c->devices_max_used; i++)
--		if (c->devices[i]) {
--			if (!UUID_FLASH_ONLY(&c->uuids[i]) &&
--			    test_bit(CACHE_SET_UNREGISTERING, &c->flags)) {
--				dc = container_of(c->devices[i],
--						  struct cached_dev, disk);
--				bch_cached_dev_detach(dc);
--			} else {
--				bcache_device_stop(c->devices[i]);
--			}
-+	for (i = 0; i < c->devices_max_used; i++) {
-+		d = c->devices[i];
-+		if (!d)
-+			continue;
-+
-+		if (!UUID_FLASH_ONLY(&c->uuids[i]) &&
-+		    test_bit(CACHE_SET_UNREGISTERING, &c->flags)) {
-+			dc = container_of(d, struct cached_dev, disk);
-+			bch_cached_dev_detach(dc);
-+			if (test_bit(CACHE_SET_IO_DISABLE, &c->flags))
-+				conditional_stop_bcache_device(c, d, dc);
-+		} else {
-+			bcache_device_stop(d);
+@@ -397,6 +399,7 @@ static void btree_flush_write(struct cache_set *c)
+ 		if (!btree_current_write(b)->journal) {
+ 			mutex_unlock(&b->write_lock);
+ 			/* We raced */
++			atomic_long_inc(&c->retry_flush_write);
+ 			goto retry;
  		}
-+	}
  
- 	mutex_unlock(&bch_register_lock);
+@@ -476,6 +479,8 @@ static void journal_reclaim(struct cache_set *c)
+ 	unsigned iter, n = 0;
+ 	atomic_t p;
+ 
++	atomic_long_inc(&c->reclaim);
++
+ 	while (!atomic_read(&fifo_front(&c->journal.pin)))
+ 		fifo_pop(&c->journal.pin, p);
  
 diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index e75279b7d180..f2b3b2686627 100644
+index b4184092c727..46e7a6b3e7c7 100644
 --- a/drivers/md/bcache/sysfs.c
 +++ b/drivers/md/bcache/sysfs.c
-@@ -78,6 +78,7 @@ rw_attribute(congested_write_threshold_us);
- rw_attribute(sequential_cutoff);
- rw_attribute(data_csum);
- rw_attribute(cache_mode);
-+rw_attribute(stop_when_cache_set_failed);
- rw_attribute(writeback_metadata);
- rw_attribute(writeback_running);
- rw_attribute(writeback_percent);
-@@ -126,6 +127,12 @@ SHOW(__bch_cached_dev)
- 					       bch_cache_modes + 1,
- 					       BDEV_CACHE_MODE(&dc->sb));
+@@ -65,6 +65,9 @@ read_attribute(bset_tree_stats);
  
-+	if (attr == &sysfs_stop_when_cache_set_failed)
-+		return bch_snprint_string_list(buf, PAGE_SIZE,
-+					       bch_stop_on_failure_modes + 1,
-+					       dc->stop_when_cache_set_failed);
-+
-+
- 	sysfs_printf(data_csum,		"%i", dc->disk.data_csum);
- 	var_printf(verify,		"%i");
- 	var_printf(bypass_torture_test,	"%i");
-@@ -247,6 +254,15 @@ STORE(__cached_dev)
- 		}
- 	}
+ read_attribute(state);
+ read_attribute(cache_read_races);
++read_attribute(reclaim);
++read_attribute(flush_write);
++read_attribute(retry_flush_write);
+ read_attribute(writeback_keys_done);
+ read_attribute(writeback_keys_failed);
+ read_attribute(io_errors);
+@@ -545,6 +548,15 @@ SHOW(__bch_cache_set)
+ 	sysfs_print(cache_read_races,
+ 		    atomic_long_read(&c->cache_read_races));
  
-+	if (attr == &sysfs_stop_when_cache_set_failed) {
-+		v = bch_read_string_list(buf, bch_stop_on_failure_modes + 1);
++	sysfs_print(reclaim,
++		    atomic_long_read(&c->reclaim));
 +
-+		if (v < 0)
-+			return v;
++	sysfs_print(flush_write,
++		    atomic_long_read(&c->flush_write));
 +
-+		dc->stop_when_cache_set_failed = v;
-+	}
++	sysfs_print(retry_flush_write,
++		    atomic_long_read(&c->retry_flush_write));
 +
- 	if (attr == &sysfs_label) {
- 		if (size > SB_LABEL_SIZE)
- 			return -EINVAL;
-@@ -326,6 +342,7 @@ static struct attribute *bch_cached_dev_files[] = {
- 	&sysfs_data_csum,
- #endif
- 	&sysfs_cache_mode,
-+	&sysfs_stop_when_cache_set_failed,
- 	&sysfs_writeback_metadata,
- 	&sysfs_writeback_running,
- 	&sysfs_writeback_delay,
+ 	sysfs_print(writeback_keys_done,
+ 		    atomic_long_read(&c->writeback_keys_done));
+ 	sysfs_print(writeback_keys_failed,
+@@ -731,6 +743,9 @@ static struct attribute *bch_cache_set_internal_files[] = {
+ 
+ 	&sysfs_bset_tree_stats,
+ 	&sysfs_cache_read_races,
++	&sysfs_reclaim,
++	&sysfs_flush_write,
++	&sysfs_retry_flush_write,
+ 	&sysfs_writeback_keys_done,
+ 	&sysfs_writeback_keys_failed,
+ 
 -- 
-2.16.1
+2.14.1
