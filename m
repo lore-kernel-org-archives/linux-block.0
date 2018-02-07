@@ -1,56 +1,61 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Wed, 7 Feb 2018 09:35:31 -0800
-From: "tj@kernel.org" <tj@kernel.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@lst.de" <hch@lst.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <prvs=56915ec98=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "tj@kernel.org" <tj@kernel.org>
+CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH v2] blk-mq: Fix race between resetting the timer and
  completion handling
-Message-ID: <20180207173531.GC695913@devbig577.frc2.facebook.com>
+Date: Wed, 7 Feb 2018 17:27:10 +0000
+Message-ID: <1518024428.2870.35.camel@wdc.com>
 References: <20180207011133.25957-1-bart.vanassche@wdc.com>
- <20180207170612.GB695913@devbig577.frc2.facebook.com>
- <1518024428.2870.35.camel@wdc.com>
+	 <20180207170612.GB695913@devbig577.frc2.facebook.com>
+In-Reply-To: <20180207170612.GB695913@devbig577.frc2.facebook.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1518024428.2870.35.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello, Bart.
-
-On Wed, Feb 07, 2018 at 05:27:10PM +0000, Bart Van Assche wrote:
-> Even with the above change I think that there is still a race between the
-> code that handles timer resets and the completion handler. Anyway, the test
-
-Can you elaborate the scenario a bit further?  If you're referring to
-lost completions, we've always had that and while we can try to close
-that hole too, I don't think it's a critical issue.
-
-> with which I triggered these races is as follows:
-> - Start from what will become kernel v4.16-rc1 and apply the patch that adds
->   SRP over RoCE support to the ib_srpt driver. See also the "[PATCH v2 00/14]
->   IB/srpt: Add RDMA/CM support" patch series
->   (https://www.spinics.net/lists/linux-rdma/msg59589.html).
-> - Apply my patch series that fixes a race between the SCSI error handler and
->   SCSI transport recovery.
-> - Apply my patch series that improves the stability of the SCSI target core
->   (LIO).
-> - Build and install that kernel.
-> - Clone the following repository: https://github.com/bvanassche/srp-test.
-> - Run the following test:
->   while true; do srp-test/run_tests -c -t 02-mq; done
-> - While the test is running, check whether or not something weird happens.
->   Sometimes I see that scsi_times_out() crashes. Sometimes I see while running
->   this test that a soft lockup is reported inside blk_mq_do_dispatch_ctx().
-> 
-> If you want I can share the tree on github that I use myself for my tests.
-
-Heh, that's quite a bit.  I'll take up on that git tree later but for
-now I'd really appreciate if you can test the patch.
-
-Thank you very much.
-
--- 
-tejun
+T24gV2VkLCAyMDE4LTAyLTA3IGF0IDA5OjA2IC0wODAwLCBUZWp1biBIZW8gd3JvdGU6DQo+IE9u
+IFR1ZSwgRmViIDA2LCAyMDE4IGF0IDA1OjExOjMzUE0gLTA4MDAsIEJhcnQgVmFuIEFzc2NoZSB3
+cm90ZToNCj4gPiBUaGUgZm9sbG93aW5nIHJhY2UgY2FuIG9jY3VyIGJldHdlZW4gdGhlIGNvZGUg
+dGhhdCByZXNldHMgdGhlIHRpbWVyDQo+ID4gYW5kIGNvbXBsZXRpb24gaGFuZGxpbmc6DQo+ID4g
+LSBUaGUgY29kZSB0aGF0IGhhbmRsZXMgQkxLX0VIX1JFU0VUX1RJTUVSIHJlc2V0cyBhYm9ydGVk
+X2dzdGF0ZS4NCj4gPiAtIEEgY29tcGxldGlvbiBvY2N1cnMgYW5kIGJsa19tcV9jb21wbGV0ZV9y
+ZXF1ZXN0KCkgY2FsbHMNCj4gPiAgIF9fYmxrX21xX2NvbXBsZXRlX3JlcXVlc3QoKS4NCj4gPiAt
+IFRoZSB0aW1lb3V0IGNvZGUgY2FsbHMgYmxrX2FkZF90aW1lcigpIGFuZCB0aGF0IGZ1bmN0aW9u
+IHNldHMgdGhlDQo+ID4gICByZXF1ZXN0IGRlYWRsaW5lIGFuZCBhZGp1c3RzIHRoZSB0aW1lci4N
+Cj4gPiAtIF9fYmxrX21xX2NvbXBsZXRlX3JlcXVlc3QoKSBmcmVlcyB0aGUgcmVxdWVzdCB0YWcu
+DQo+ID4gLSBUaGUgdGltZXIgZmlyZXMgYW5kIHRoZSB0aW1lb3V0IGhhbmRsZXIgZ2V0cyBjYWxs
+ZWQgZm9yIGEgZnJlZWQNCj4gPiAgIHJlcXVlc3QuDQo+IA0KPiBDYW4geW91IHNlZSB3aGV0aGVy
+IGJ5IGFueSBjaGFuY2UgdGhlIGZvbGxvd2luZyBwYXRjaCBmaXhlcyB0aGUgaXNzdWU/DQo+IElm
+IG5vdCwgY2FuIHlvdSBzaGFyZSB0aGUgcmVwcm8gY2FzZT8NCj4gDQo+IFRoYW5rcy4NCj4gDQo+
+IGRpZmYgLS1naXQgYS9ibG9jay9ibGstbXEuYyBiL2Jsb2NrL2Jsay1tcS5jDQo+IGluZGV4IGRm
+OTMxMDIuLjY1MWQxOGMgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2Jsay1tcS5jDQo+ICsrKyBiL2Js
+b2NrL2Jsay1tcS5jDQo+IEBAIC04MzYsOCArODM2LDggQEAgc3RhdGljIHZvaWQgYmxrX21xX3Jx
+X3RpbWVkX291dChzdHJ1Y3QgcmVxdWVzdCAqcmVxLCBib29sIHJlc2VydmVkKQ0KPiAgCQkgKiAt
+PmFib3J0ZWRfZ3N0YXRlIGlzIHNldCwgdGhpcyBtYXkgbGVhZCB0byBpZ25vcmVkDQo+ICAJCSAq
+IGNvbXBsZXRpb25zIGFuZCBmdXJ0aGVyIHNwdXJpb3VzIHRpbWVvdXRzLg0KPiAgCQkgKi8NCj4g
+LQkJYmxrX21xX3JxX3VwZGF0ZV9hYm9ydGVkX2dzdGF0ZShyZXEsIDApOw0KPiAgCQlibGtfYWRk
+X3RpbWVyKHJlcSk7DQo+ICsJCWJsa19tcV9ycV91cGRhdGVfYWJvcnRlZF9nc3RhdGUocmVxLCAw
+KTsNCj4gIAkJYnJlYWs7DQo+ICAJY2FzZSBCTEtfRUhfTk9UX0hBTkRMRUQ6DQo+ICAJCWJyZWFr
+Ow0KDQpIZWxsbyBUZWp1biwNCg0KRXZlbiB3aXRoIHRoZSBhYm92ZSBjaGFuZ2UgSSB0aGluayB0
+aGF0IHRoZXJlIGlzIHN0aWxsIGEgcmFjZSBiZXR3ZWVuIHRoZQ0KY29kZSB0aGF0IGhhbmRsZXMg
+dGltZXIgcmVzZXRzIGFuZCB0aGUgY29tcGxldGlvbiBoYW5kbGVyLiBBbnl3YXksIHRoZSB0ZXN0
+DQp3aXRoIHdoaWNoIEkgdHJpZ2dlcmVkIHRoZXNlIHJhY2VzIGlzIGFzIGZvbGxvd3M6DQotIFN0
+YXJ0IGZyb20gd2hhdCB3aWxsIGJlY29tZSBrZXJuZWwgdjQuMTYtcmMxIGFuZCBhcHBseSB0aGUg
+cGF0Y2ggdGhhdCBhZGRzDQogIFNSUCBvdmVyIFJvQ0Ugc3VwcG9ydCB0byB0aGUgaWJfc3JwdCBk
+cml2ZXIuIFNlZSBhbHNvIHRoZSAiW1BBVENIIHYyIDAwLzE0XQ0KICBJQi9zcnB0OiBBZGQgUkRN
+QS9DTSBzdXBwb3J0IiBwYXRjaCBzZXJpZXMNCiAgKGh0dHBzOi8vd3d3LnNwaW5pY3MubmV0L2xp
+c3RzL2xpbnV4LXJkbWEvbXNnNTk1ODkuaHRtbCkuDQotIEFwcGx5IG15IHBhdGNoIHNlcmllcyB0
+aGF0IGZpeGVzIGEgcmFjZSBiZXR3ZWVuIHRoZSBTQ1NJIGVycm9yIGhhbmRsZXIgYW5kDQogIFND
+U0kgdHJhbnNwb3J0IHJlY292ZXJ5Lg0KLSBBcHBseSBteSBwYXRjaCBzZXJpZXMgdGhhdCBpbXBy
+b3ZlcyB0aGUgc3RhYmlsaXR5IG9mIHRoZSBTQ1NJIHRhcmdldCBjb3JlDQogIChMSU8pLg0KLSBC
+dWlsZCBhbmQgaW5zdGFsbCB0aGF0IGtlcm5lbC4NCi0gQ2xvbmUgdGhlIGZvbGxvd2luZyByZXBv
+c2l0b3J5OiBodHRwczovL2dpdGh1Yi5jb20vYnZhbmFzc2NoZS9zcnAtdGVzdC4NCi0gUnVuIHRo
+ZSBmb2xsb3dpbmcgdGVzdDoNCiAgd2hpbGUgdHJ1ZTsgZG8gc3JwLXRlc3QvcnVuX3Rlc3RzIC1j
+IC10IDAyLW1xOyBkb25lDQotIFdoaWxlIHRoZSB0ZXN0IGlzIHJ1bm5pbmcsIGNoZWNrIHdoZXRo
+ZXIgb3Igbm90IHNvbWV0aGluZyB3ZWlyZCBoYXBwZW5zLg0KICBTb21ldGltZXMgSSBzZWUgdGhh
+dCBzY3NpX3RpbWVzX291dCgpIGNyYXNoZXMuIFNvbWV0aW1lcyBJIHNlZSB3aGlsZSBydW5uaW5n
+DQogIHRoaXMgdGVzdCB0aGF0IGEgc29mdCBsb2NrdXAgaXMgcmVwb3J0ZWQgaW5zaWRlIGJsa19t
+cV9kb19kaXNwYXRjaF9jdHgoKS4NCg0KSWYgeW91IHdhbnQgSSBjYW4gc2hhcmUgdGhlIHRyZWUg
+b24gZ2l0aHViIHRoYXQgSSB1c2UgbXlzZWxmIGZvciBteSB0ZXN0cy4NCg0KVGhhbmtzLA0KDQpC
+YXJ0Lg==
