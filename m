@@ -1,245 +1,73 @@
 Return-Path: <paolo.valente@linaro.org>
 Return-Path: <paolo.valente@linaro.org>
+Content-Type: text/plain;
+	charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH BUGFIX 1/1] block, bfq: add requeue-request hook
 From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	alban.browaeys@gmail.com,
-	ming.lei@redhat.com,
-	ivan@ludios.org,
-	169364@studenti.unimore.it,
-	holger@applied-asynchrony.com,
-	efault@gmx.de,
-	Paolo Valente <paolo.valente@linaro.org>,
-	Serena Ziviani <ziviani.serena@gmail.com>
-Subject: [PATCH BUGFIX V2 1/1] block, bfq: add requeue-request hook
-Date: Wed,  7 Feb 2018 19:00:50 +0100
-Message-Id: <20180207180050.5639-2-paolo.valente@linaro.org>
-In-Reply-To: <20180207180050.5639-1-paolo.valente@linaro.org>
-References: <20180207180050.5639-1-paolo.valente@linaro.org>
+In-Reply-To: <9a99ff3cb52e475f48327c91e3d236d0@natalenko.name>
+Date: Wed, 7 Feb 2018 18:33:53 +0100
+Cc: Mike Galbraith <efault@gmx.de>,
+ Jens Axboe <axboe@kernel.dk>,
+ linux-block <linux-block@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Ulf Hansson <ulf.hansson@linaro.org>,
+ Mark Brown <broonie@kernel.org>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ 'Paolo Valente' via bfq-iosched <bfq-iosched@googlegroups.com>,
+ Alban Browaeys <alban.browaeys@gmail.com>,
+ Ming Lei <ming.lei@redhat.com>,
+ Ivan Kozik <ivan@ludios.org>,
+ SERENA ZIVIANI <169364@studenti.unimore.it>,
+ Serena Ziviani <ziviani.serena@gmail.com>,
+ =?utf-8?Q?Holger_Hoffst=C3=A4tte?= <holger@applied-asynchrony.com>
+Message-Id: <FA000DEE-04FF-4BB4-80C7-A7B31ED10BDD@linaro.org>
+References: <20180205190510.5499-1-paolo.valente@linaro.org>
+ <20180205190510.5499-2-paolo.valente@linaro.org>
+ <ee76e49c0d1ceab07c20e9d27e2fdc46@natalenko.name>
+ <1517903761.9843.12.camel@gmx.de>
+ <899B68CC-5955-4418-8BFF-DC55A743A61B@linaro.org>
+ <1517918234.25841.31.camel@gmx.de>
+ <77124223e6116350a5184a5199850304@natalenko.name>
+ <1517924768.25841.32.camel@gmx.de>
+ <8842084cc8a26b7f46ae600bda8a7bd0@natalenko.name>
+ <CC8CDDA5-A232-41A6-BE1E-CDB0B361C3DB@linaro.org>
+ <82ffc96aacc3945861cbb708df346338@natalenko.name>
+ <E52CCDEA-279A-40D8-AD9B-F4D1AF351BF1@linaro.org>
+ <1517995431.25619.5.camel@gmx.de>
+ <FBF6DCBB-B0F5-446B-8FD1-106E2538A9C1@linaro.org>
+ <1517998516.6606.1.camel@gmx.de>
+ <5584030F-8F4E-4C98-84A5-79873A1BF775@linaro.org>
+ <8D356375-4C35-41EC-9F4D-0E321B08F9BF@linaro.org>
+ <9a99ff3cb52e475f48327c91e3d236d0@natalenko.name>
+To: Oleksandr Natalenko <oleksandr@natalenko.name>
 List-ID: <linux-block@vger.kernel.org>
 
-Commit 'a6a252e64914 ("blk-mq-sched: decide how to handle flush rq via
-RQF_FLUSH_SEQ")' makes all non-flush re-prepared requests for a device
-be re-inserted into the active I/O scheduler for that device. As a
-consequence, I/O schedulers may get the same request inserted again,
-even several times, without a finish_request invoked on that request
-before each re-insertion.
 
-This fact is the cause of the failure reported in [1]. For an I/O
-scheduler, every re-insertion of the same re-prepared request is
-equivalent to the insertion of a new request. For schedulers like
-mq-deadline or kyber, this fact causes no harm. In contrast, it
-confuses a stateful scheduler like BFQ, which keeps state for an I/O
-request, until the finish_request hook is invoked on the request. In
-particular, BFQ may get stuck, waiting forever for the number of
-request dispatches, of the same request, to be balanced by an equal
-number of request completions (while there will be one completion for
-that request). In this state, BFQ may refuse to serve I/O requests
-from other bfq_queues. The hang reported in [1] then follows.
 
-However, the above re-prepared requests undergo a requeue, thus the
-requeue_request hook of the active elevator is invoked for these
-requests, if set. This commit then addresses the above issue by
-properly implementing the hook requeue_request in BFQ.
+> Il giorno 07 feb 2018, alle ore 16:50, Oleksandr Natalenko =
+<oleksandr@natalenko.name> ha scritto:
+>=20
+> Hi.
+>=20
+> 07.02.2018 12:27, Paolo Valente wrote:
+>> Hi Oleksandr, Holger,
+>> before I prepare a V2 candidate patch, could you please test my
+>> instrumentation patch too, with the above change made.  For your
+>> convenience, I have attached a compressed archive with both the
+>> instrumentation patch and a patch making the above change.
+>> Crossing my fingers,
+>> Paolo
+>=20
+> With all three patches applied I cannot reproduce neither cfdisk hang =
+nor some kind of boom.
+>=20
+> Thank you.
+>=20
 
-[1] https://marc.info/?l=linux-block&m=151211117608676
+Thank you, Oleksandr. I'm now ready to prepare a new version of this =
+patch.
 
-Reported-by: Ivan Kozik <ivan@ludios.org>
-Reported-by: Alban Browaeys <alban.browaeys@gmail.com>
-Tested-by: Mike Galbraith <efault@gmx.de>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Serena Ziviani <ziviani.serena@gmail.com>
----
- block/bfq-iosched.c | 109 ++++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 84 insertions(+), 25 deletions(-)
+Paolo
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 47e6ec7427c4..21e6b9e45638 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -3823,24 +3823,26 @@ static struct request *__bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 		}
- 
- 		/*
--		 * We exploit the bfq_finish_request hook to decrement
--		 * rq_in_driver, but bfq_finish_request will not be
--		 * invoked on this request. So, to avoid unbalance,
--		 * just start this request, without incrementing
--		 * rq_in_driver. As a negative consequence,
--		 * rq_in_driver is deceptively lower than it should be
--		 * while this request is in service. This may cause
--		 * bfq_schedule_dispatch to be invoked uselessly.
-+		 * We exploit the bfq_finish_requeue_request hook to
-+		 * decrement rq_in_driver, but
-+		 * bfq_finish_requeue_request will not be invoked on
-+		 * this request. So, to avoid unbalance, just start
-+		 * this request, without incrementing rq_in_driver. As
-+		 * a negative consequence, rq_in_driver is deceptively
-+		 * lower than it should be while this request is in
-+		 * service. This may cause bfq_schedule_dispatch to be
-+		 * invoked uselessly.
- 		 *
- 		 * As for implementing an exact solution, the
--		 * bfq_finish_request hook, if defined, is probably
--		 * invoked also on this request. So, by exploiting
--		 * this hook, we could 1) increment rq_in_driver here,
--		 * and 2) decrement it in bfq_finish_request. Such a
--		 * solution would let the value of the counter be
--		 * always accurate, but it would entail using an extra
--		 * interface function. This cost seems higher than the
--		 * benefit, being the frequency of non-elevator-private
-+		 * bfq_finish_requeue_request hook, if defined, is
-+		 * probably invoked also on this request. So, by
-+		 * exploiting this hook, we could 1) increment
-+		 * rq_in_driver here, and 2) decrement it in
-+		 * bfq_finish_requeue_request. Such a solution would
-+		 * let the value of the counter be always accurate,
-+		 * but it would entail using an extra interface
-+		 * function. This cost seems higher than the benefit,
-+		 * being the frequency of non-elevator-private
- 		 * requests very low.
- 		 */
- 		goto start_rq;
-@@ -4515,6 +4517,8 @@ static inline void bfq_update_insert_stats(struct request_queue *q,
- 					   unsigned int cmd_flags) {}
- #endif
- 
-+static void bfq_prepare_request(struct request *rq, struct bio *bio);
-+
- static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 			       bool at_head)
- {
-@@ -4541,6 +4545,20 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 		else
- 			list_add_tail(&rq->queuelist, &bfqd->dispatch);
- 	} else {
-+		if (!bfqq) {
-+			/*
-+			 * This should never happen. Most likely rq is
-+			 * a requeued regular request, being
-+			 * re-inserted without being first
-+			 * re-prepared. Do a prepare, to avoid
-+			 * failure.
-+			 */
-+			pr_warn("Regular request associated with no queue");
-+			WARN_ON(1);
-+			bfq_prepare_request(rq, rq->bio);
-+			bfqq = RQ_BFQQ(rq);
-+		}
-+
- 		idle_timer_disabled = __bfq_insert_request(bfqd, rq);
- 		/*
- 		 * Update bfqq, because, if a queue merge has occurred
-@@ -4697,22 +4715,44 @@ static void bfq_completed_request(struct bfq_queue *bfqq, struct bfq_data *bfqd)
- 		bfq_schedule_dispatch(bfqd);
- }
- 
--static void bfq_finish_request_body(struct bfq_queue *bfqq)
-+static void bfq_finish_requeue_request_body(struct bfq_queue *bfqq)
- {
- 	bfqq->allocated--;
- 
- 	bfq_put_queue(bfqq);
- }
- 
--static void bfq_finish_request(struct request *rq)
-+/*
-+ * Handle either a requeue or a finish for rq. The things to do are
-+ * the same in both cases: all references to rq are to be dropped. In
-+ * particular, rq is considered completed from the point of view of
-+ * the scheduler.
-+ */
-+static void bfq_finish_requeue_request(struct request *rq)
- {
--	struct bfq_queue *bfqq;
-+	struct bfq_queue *bfqq = RQ_BFQQ(rq);
- 	struct bfq_data *bfqd;
- 
--	if (!rq->elv.icq)
-+	/*
-+	 * Requeue and finish hooks are invoked in blk-mq without
-+	 * checking whether the involved request is actually still
-+	 * referenced in the scheduler. To handle this fact, the
-+	 * following two checks make this function exit in case of
-+	 * spurious invocations, for which there is nothing to do.
-+	 *
-+	 * First, check whether rq has nothing to do with an elevator.
-+	 */
-+	if (unlikely(!(rq->rq_flags & RQF_ELVPRIV)))
-+		return;
-+
-+	/*
-+	 * rq either is not associated with any icq, or is an already
-+	 * requeued request that has not (yet) been re-inserted into
-+	 * a bfq_queue.
-+	 */
-+	if (!rq->elv.icq || !bfqq)
- 		return;
- 
--	bfqq = RQ_BFQQ(rq);
- 	bfqd = bfqq->bfqd;
- 
- 	if (rq->rq_flags & RQF_STARTED)
-@@ -4727,13 +4767,14 @@ static void bfq_finish_request(struct request *rq)
- 		spin_lock_irqsave(&bfqd->lock, flags);
- 
- 		bfq_completed_request(bfqq, bfqd);
--		bfq_finish_request_body(bfqq);
-+		bfq_finish_requeue_request_body(bfqq);
- 
- 		spin_unlock_irqrestore(&bfqd->lock, flags);
- 	} else {
- 		/*
- 		 * Request rq may be still/already in the scheduler,
--		 * in which case we need to remove it. And we cannot
-+		 * in which case we need to remove it (this should
-+		 * never happen in case of requeue). And we cannot
- 		 * defer such a check and removal, to avoid
- 		 * inconsistencies in the time interval from the end
- 		 * of this function to the start of the deferred work.
-@@ -4748,9 +4789,26 @@ static void bfq_finish_request(struct request *rq)
- 			bfqg_stats_update_io_remove(bfqq_group(bfqq),
- 						    rq->cmd_flags);
- 		}
--		bfq_finish_request_body(bfqq);
-+		bfq_finish_requeue_request_body(bfqq);
- 	}
- 
-+	/*
-+	 * Reset private fields. In case of a requeue, this allows
-+	 * this function to correctly do nothing if it is spuriously
-+	 * invoked again on this same request (see the check at the
-+	 * beginning of the function). Probably, a better general
-+	 * design would be to prevent blk-mq from invoking the requeue
-+	 * or finish hooks of an elevator, for a request that is not
-+	 * referred by that elevator.
-+	 *
-+	 * Resetting the following fields would break the
-+	 * request-insertion logic if rq is re-inserted into a bfq
-+	 * internal queue, without a re-preparation. Here we assume
-+	 * that re-insertions of requeued requests, without
-+	 * re-preparation, can happen only for pass_through or at_head
-+	 * requests (which are not re-inserted into bfq internal
-+	 * queues).
-+	 */
- 	rq->elv.priv[0] = NULL;
- 	rq->elv.priv[1] = NULL;
- }
-@@ -5426,7 +5484,8 @@ static struct elevator_type iosched_bfq_mq = {
- 	.ops.mq = {
- 		.limit_depth		= bfq_limit_depth,
- 		.prepare_request	= bfq_prepare_request,
--		.finish_request		= bfq_finish_request,
-+		.requeue_request        = bfq_finish_requeue_request,
-+		.finish_request		= bfq_finish_requeue_request,
- 		.exit_icq		= bfq_exit_icq,
- 		.insert_requests	= bfq_insert_requests,
- 		.dispatch_request	= bfq_dispatch_request,
--- 
-2.15.1
+> Oleksandr
