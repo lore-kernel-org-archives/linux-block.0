@@ -1,42 +1,96 @@
 Return-Path: <roman.penyaev@profitbricks.com>
 MIME-Version: 1.0
-In-Reply-To: <1270775c-950b-76f7-be4f-d5a3198395c2@grimberg.me>
+In-Reply-To: <1517932890.3934.30.camel@wdc.com>
 References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
- <23dcfda7-eac1-ed13-b24e-3586c284ee55@grimberg.me> <1270775c-950b-76f7-be4f-d5a3198395c2@grimberg.me>
+ <23dcfda7-eac1-ed13-b24e-3586c284ee55@grimberg.me> <CAJrWOzDmU_RWxaY+eXjZ3Az162gr9Bax8=5+1FYj4vzYDoxp7g@mail.gmail.com>
+ <1517932890.3934.30.camel@wdc.com>
 From: Roman Penyaev <roman.penyaev@profitbricks.com>
-Date: Wed, 7 Feb 2018 14:06:54 +0100
-Message-ID: <CAJrWOzBkdh6pQYzcGFw4GADF_nN_Xiv9O2yGtcNhg0AgLVr+-A@mail.gmail.com>
+Date: Wed, 7 Feb 2018 13:57:03 +0100
+Message-ID: <CAJrWOzD3+tcA1cvSNOsN8t7uCOidJ2x6wsqqvFiEHdxW2th=sA@mail.gmail.com>
 Subject: Re: [PATCH 00/24] InfiniBand Transport (IBTRS) and Network Block
  Device (IBNBD)
-To: Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
-	Bart Van Assche <bart.vanassche@sandisk.com>, Or Gerlitz <ogerlitz@mellanox.com>,
-	Danil Kipnis <danil.kipnis@profitbricks.com>, Jack Wang <jinpu.wang@profitbricks.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "sagi@grimberg.me" <sagi@grimberg.me>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "hch@infradead.org" <hch@infradead.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"jinpu.wang@profitbricks.com" <jinpu.wang@profitbricks.com>,
+	"ogerlitz@mellanox.com" <ogerlitz@mellanox.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"danil.kipnis@profitbricks.com" <danil.kipnis@profitbricks.com>
 Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Sagi and all,
-
-On Mon, Feb 5, 2018 at 1:30 PM, Sagi Grimberg <sagi@grimberg.me> wrote:
-> Hi Roman and the team (again), replying to my own email :)
+On Tue, Feb 6, 2018 at 5:01 PM, Bart Van Assche <Bart.VanAssche@wdc.com> wrote:
+> On Tue, 2018-02-06 at 14:12 +0100, Roman Penyaev wrote:
+>> On Mon, Feb 5, 2018 at 1:16 PM, Sagi Grimberg <sagi@grimberg.me> wrote:
+>> > [ ... ]
+>> > - srp/scst comparison is really not fair having it in legacy request
+>> >   mode. Can you please repeat it and report a bug to either linux-rdma
+>> >   or to the scst mailing list?
+>>
+>> Yep, I can retest with mq.
+>>
+>> > - Your latency measurements are surprisingly high for a null target
+>> >   device (even for low end nvme device actually) regardless of the
+>> >   transport implementation.
+>>
+>> Hm, network configuration?  These are results on machines dedicated
+>> to our team for testing in one of our datacenters. Nothing special
+>> in configuration.
 >
-> I forgot to mention that first of all thank you for upstreaming
-> your work! I fully support your goal to have your production driver
-> upstream to minimize your maintenance efforts. I hope that my
-> feedback didn't came across with a different impression, that was
-> certainly not my intent.
 
-Well, I've just recovered from two heart attacks, which I got
-while reading your replies, but now I am fine, thanks :)
+Hello Bart,
 
-> It would be great if you can address and/or reply to my feedback
-> (as well as others) and re-spin it again.
+> I agree that the latency numbers are way too high for a null target device.
+> Last time I measured latency for the SRP protocol against an SCST target
+> + null block driver at the target side and ConnectX-3 adapters I measured a
+> latency of about 14 microseconds. That's almost 100 times less than the
+> measurement results in https://www.spinics.net/lists/linux-rdma/msg48799.html.
 
-Jokes aside, we would like to thank you all, guys, for valuable
-feedback. I got a lot of useful remarks from you Sagi and you Bart.
-We will try to cover them in next version and will provide up-to-date
-comparison results.
+Here is the following configuration of the setup:
+
+Initiator and target HW configuration:
+    AMD Opteron 6386 SE, 64CPU, 128Gb
+    InfiniBand: Mellanox Technologies MT26428
+                [ConnectX VPI PCIe 2.0 5GT/s - IB QDR / 10GigE]
+
+Also, I remember that between initiator and target there were two IB switches.
+Unfortunately, I can't repeat the same configuration, but will retest as
+soon as we get new HW.
+
+> Something else I would like to understand better is how much of the latency
+> gap between NVMeOF/SRP and IBNBD can be closed without changing the wire
+> protocol. Was e.g. support for immediate data present in the NVMeOF and/or
+> SRP drivers used on your test setup?
+
+I did not get the question. IBTRS uses empty messages with only imm_data
+field set to respond on IO. This is a part of the IBTRS protocol.  I do
+not understand how can immediate data be present in other drivers, if
+those do not use it in their protocols.  I am lost here.
+
+> Are you aware that the NVMeOF target driver calls page_alloc() from the hot path but that there are plans to
+> avoid these calls in the hot path by using a caching mechanism similar to
+> the SGV cache in SCST? Are you aware that a significant latency reduction
+> can be achieved by changing the SCST SGV cache from a global into a per-CPU
+> cache?
+
+No, I am not aware. That is nice, that there is a lot of room for performance
+tweaks. I will definitely retest on fresh kernel once everything is done on
+nvme, scst or ibtrs (especially when we get rid of fmrs and UNSAFE rkeys).
+Maybe there are some other parameters which can be also tweaked?
+
+> Regarding the SRP measurements: have you tried to set the
+> never_register kernel module parameter to true? I'm asking this because I
+> think that mode is most similar to how the IBNBD initiator driver works.
+
+yes, according to my notes from that link (frankly, I do not remember,
+but that is what I wrote 1 year ago):
+
+    * Where suffixes mean:
+
+     _noreg - modules on initiator side (ib_srp, nvme_rdma) were loaded
+              with 'register_always=N' param
+
+That what you are asking, right?
 
 --
 Roman
