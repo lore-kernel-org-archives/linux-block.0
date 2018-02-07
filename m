@@ -1,74 +1,72 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: linux-scsi@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Arun Easi <arun.easi@cavium.com>,
-	Omar Sandoval <osandov@fb.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Don Brace <don.brace@microsemi.com>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Peter Rivera <peter.rivera@broadcom.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Laurence Oberman <loberman@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 7/8] scsi: hpsa: call hpsa_hba_inquiry() after adding host
-Date: Mon,  5 Feb 2018 23:20:34 +0800
-Message-Id: <20180205152035.15016-8-ming.lei@redhat.com>
-In-Reply-To: <20180205152035.15016-1-ming.lei@redhat.com>
-References: <20180205152035.15016-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:39714 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754453AbeBGTmG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Feb 2018 14:42:06 -0500
+Received: by mail-pg0-f65.google.com with SMTP id w17so696409pgv.6
+        for <linux-block@vger.kernel.org>; Wed, 07 Feb 2018 11:42:06 -0800 (PST)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Tang Junhui <tang.junhui@zte.com.cn>
+Subject: [PATCH 7/8] bcache: return attach error when no cache set exist
+Date: Wed,  7 Feb 2018 11:41:45 -0800
+Message-Id: <20180207194146.5095-8-mlyle@lyle.org>
+In-Reply-To: <20180207194146.5095-1-mlyle@lyle.org>
+References: <20180207194146.5095-1-mlyle@lyle.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-So that we can decide the default reply queue by the map created
-during adding host.
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Arun Easi <arun.easi@cavium.com>
-Cc: Omar Sandoval <osandov@fb.com>,
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-Cc: Christoph Hellwig <hch@lst.de>,
-Cc: Don Brace <don.brace@microsemi.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Peter Rivera <peter.rivera@broadcom.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Tested-by: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+I attach a back-end device to a cache set, and the cache set is not
+registered yet, this back-end device did not attach successfully, and no
+error returned:
+[root]# echo 87859280-fec6-4bcc-20df7ca8f86b > /sys/block/sde/bcache/attach
+[root]#
+
+In sysfs_attach(), the return value "v" is initialized to "size" in
+the beginning, and if no cache set exist in bch_cache_sets, the "v" value
+would not change any more, and return to sysfs, sysfs regard it as success
+since the "size" is a positive number.
+
+This patch fixes this issue by assigning "v" with "-ENOENT" in the
+initialization.
+
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
 ---
- drivers/scsi/hpsa.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/md/bcache/sysfs.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/scsi/hpsa.c b/drivers/scsi/hpsa.c
-index 287e5eb0723f..443eabf63a9f 100644
---- a/drivers/scsi/hpsa.c
-+++ b/drivers/scsi/hpsa.c
-@@ -8691,12 +8691,9 @@ static int hpsa_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	/* Disable discovery polling.*/
- 	h->discovery_polling = 0;
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index 4a6a697e1680..a7552f509f50 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -198,7 +198,7 @@ STORE(__cached_dev)
+ {
+ 	struct cached_dev *dc = container_of(kobj, struct cached_dev,
+ 					     disk.kobj);
+-	ssize_t v = size;
++	ssize_t v;
+ 	struct cache_set *c;
+ 	struct kobj_uevent_env *env;
  
--
- 	/* Turn the interrupts on so we can service requests */
- 	h->access.set_intr_mask(h, HPSA_INTR_ON);
+@@ -275,6 +275,7 @@ STORE(__cached_dev)
+ 		if (bch_parse_uuid(buf, dc->sb.set_uuid) < 16)
+ 			return -EINVAL;
  
--	hpsa_hba_inquiry(h);
--
- 	h->lastlogicals = kzalloc(sizeof(*(h->lastlogicals)), GFP_KERNEL);
- 	if (!h->lastlogicals)
- 		dev_info(&h->pdev->dev,
-@@ -8707,6 +8704,8 @@ static int hpsa_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	if (rc)
- 		goto clean7; /* perf, sg, cmd, irq, shost, pci, lu, aer/h */
++		v = -ENOENT;
+ 		list_for_each_entry(c, &bch_cache_sets, list) {
+ 			v = bch_cached_dev_attach(dc, c);
+ 			if (!v)
+@@ -282,7 +283,7 @@ STORE(__cached_dev)
+ 		}
  
-+	hpsa_hba_inquiry(h);
-+
- 	/* Monitor the controller for firmware lockups */
- 	h->heartbeat_sample_interval = HEARTBEAT_SAMPLE_INTERVAL;
- 	INIT_DELAYED_WORK(&h->monitor_ctlr_work, hpsa_monitor_ctlr_worker);
+ 		pr_err("Can't attach %s: cache set not found", buf);
+-		size = v;
++		return v;
+ 	}
+ 
+ 	if (attr == &sysfs_detach && dc->disk.c)
 -- 
-2.9.5
+2.14.1
