@@ -1,47 +1,37 @@
-Return-Path: <prvs=56915ec98=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "hch@infradead.org" <hch@infradead.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "snitzer@redhat.com" <snitzer@redhat.com>,
-	"ming.lei@redhat.com" <ming.lei@redhat.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
-CC: "hch@lst.de" <hch@lst.de>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "hare@suse.de" <hare@suse.de>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"don.brace@microsemi.com" <don.brace@microsemi.com>,
-	"james.bottomley@hansenpartnership.com"
-	<james.bottomley@hansenpartnership.com>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "arun.easi@cavium.com" <arun.easi@cavium.com>,
-	"osandov@fb.com" <osandov@fb.com>, "loberman@redhat.com"
-	<loberman@redhat.com>, "kashyap.desai@broadcom.com"
-	<kashyap.desai@broadcom.com>, "peter.rivera@broadcom.com"
-	<peter.rivera@broadcom.com>
+Return-Path: <prvs=56915ec98=bart.vanassche@wdc.com>
 Subject: Re: [PATCH V2 2/8] blk-mq: introduce BLK_MQ_F_GLOBAL_TAGS
-Date: Wed, 7 Feb 2018 16:59:24 +0000
-Message-ID: <1518022762.2870.20.camel@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+ linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+ Mike Snitzer <snitzer@redhat.com>
+Cc: linux-scsi@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
+ Arun Easi <arun.easi@cavium.com>, Omar Sandoval <osandov@fb.com>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ James Bottomley <james.bottomley@hansenpartnership.com>,
+ Christoph Hellwig <hch@lst.de>, Don Brace <don.brace@microsemi.com>,
+ Kashyap Desai <kashyap.desai@broadcom.com>,
+ Peter Rivera <peter.rivera@broadcom.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Laurence Oberman <loberman@redhat.com>
 References: <20180205152035.15016-1-ming.lei@redhat.com>
-	 <20180205152035.15016-3-ming.lei@redhat.com>
-In-Reply-To: <20180205152035.15016-3-ming.lei@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+ <20180205152035.15016-3-ming.lei@redhat.com>
+ <398c755a-ada6-1e60-9562-51b69476e55d@kernel.dk>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+Message-ID: <7c7062b9-5333-6530-8561-35936a51240e@wdc.com>
+Date: Wed, 7 Feb 2018 08:09:21 -0800
 MIME-Version: 1.0
+In-Reply-To: <398c755a-ada6-1e60-9562-51b69476e55d@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE4LTAyLTA1IGF0IDIzOjIwICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gZGlm
-ZiAtLWdpdCBhL2Jsb2NrL2Jsay1tcS1zY2hlZC5jIGIvYmxvY2svYmxrLW1xLXNjaGVkLmMNCj4g
-aW5kZXggNTVjMGE3NDViNDI3Li4zODViYmVjNzM4MDQgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2Js
-ay1tcS1zY2hlZC5jDQo+ICsrKyBiL2Jsb2NrL2Jsay1tcS1zY2hlZC5jDQo+IEBAIC04MSw2ICs4
-MSwxNyBAQCBzdGF0aWMgYm9vbCBibGtfbXFfc2NoZWRfcmVzdGFydF9oY3R4KHN0cnVjdCBibGtf
-bXFfaHdfY3R4ICpoY3R4KQ0KPiAgCX0gZWxzZQ0KPiAgCQljbGVhcl9iaXQoQkxLX01RX1NfU0NI
-RURfUkVTVEFSVCwgJmhjdHgtPnN0YXRlKTsNCj4gIA0KPiArCS8qIG5lZWQgdG8gcmVzdGFydCBh
-bGwgaHcgcXVldWVzIGZvciBnbG9iYWwgdGFncyAqLw0KPiArCWlmIChoY3R4LT5mbGFncyAmIEJM
-S19NUV9GX0dMT0JBTF9UQUdTKSB7DQo+ICsJCXN0cnVjdCBibGtfbXFfaHdfY3R4ICpoY3R4MjsN
-Cj4gKwkJaW50IGk7DQo+ICsNCj4gKwkJcXVldWVfZm9yX2VhY2hfaHdfY3R4KGhjdHgtPnF1ZXVl
-LCBoY3R4MiwgaSkNCj4gKwkJCWlmIChibGtfbXFfcnVuX2h3X3F1ZXVlKGhjdHgyLCB0cnVlKSkN
-Cj4gKwkJCQlyZXR1cm4gdHJ1ZTsNCj4gKwkJcmV0dXJuIGZhbHNlOw0KPiArCX0NCj4gKw0KPiAg
-CXJldHVybiBibGtfbXFfcnVuX2h3X3F1ZXVlKGhjdHgsIHRydWUpOw0KPiAgfQ0KDQpUaGlzIG5l
-dyBsb29wIGxvb2tzIG1pc3BsYWNlZCB0byBtZS4gSWYgYm90aCB0aGUgQkxLX01RX0ZfR0xPQkFM
-X1RBR1MgYW5kIHRoZQ0KQkxLX01RX0ZfVEFHX1NIQVJFRCBmbGFncyBhcmUgc2V0IHRoZW4gdGhl
-IG91dGVyIGxvb3AgaW4gYmxrX21xX3NjaGVkX3Jlc3RhcnQoKQ0KYW5kIHRoZSBpbm5lciBsb29w
-IGluIGJsa19tcV9zY2hlZF9yZXN0YXJ0X2hjdHgoKSB3aWxsIGNhdXNlIG1vcmUgY2FsbHMgb2YN
-CmJsa19tcV9ydW5faHdfcXVldWUoKSB0aGFuIG5lY2Vzc2FyeS4gSGF2ZSB5b3UgY29uc2lkZXJl
-ZCB0byBtZXJnZSB0aGUgYWJvdmUNCmxvb3AgaW50byBibGtfbXFfc2NoZWRfcmVzdGFydCgpPw0K
-DQpUaGFua3MsDQoNCkJhcnQuDQoNCg0K
+On 02/06/18 15:18, Jens Axboe wrote:
+> GLOBAL implies that it's, strangely enough, global. That isn't really the
+> case. Why not call this BLK_MQ_F_HOST_TAGS or something like that? I'd
+> welcome better names, but global doesn't seem to be a great choice.
+> 
+> BLK_MQ_F_SET_TAGS?
+
+I like the name BLK_MQ_F_HOST_TAGS because it refers how these tags will 
+be used by SCSI LLDs, namely as a host-wide tag set.
+
+Thanks,
+
+Bart.
