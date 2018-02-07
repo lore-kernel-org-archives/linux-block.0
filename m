@@ -1,9 +1,8 @@
 Return-Path: <ming.lei@redhat.com>
-Date: Wed, 7 Feb 2018 08:44:55 +0800
+Date: Wed, 7 Feb 2018 08:43:13 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Omar Sandoval <osandov@osandov.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
 	Mike Snitzer <snitzer@redhat.com>, linux-scsi@vger.kernel.org,
 	Hannes Reinecke <hare@suse.de>, Arun Easi <arun.easi@cavium.com>,
 	Omar Sandoval <osandov@fb.com>,
@@ -15,33 +14,27 @@ Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Laurence Oberman <loberman@redhat.com>
 Subject: Re: [PATCH V2 2/8] blk-mq: introduce BLK_MQ_F_GLOBAL_TAGS
-Message-ID: <20180207004454.GB13470@ming.t460p>
+Message-ID: <20180207004311.GA13470@ming.t460p>
 References: <20180205152035.15016-1-ming.lei@redhat.com>
  <20180205152035.15016-3-ming.lei@redhat.com>
- <20180206203336.GC16027@vader.DHCP.thefacebook.com>
+ <398c755a-ada6-1e60-9562-51b69476e55d@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180206203336.GC16027@vader.DHCP.thefacebook.com>
+In-Reply-To: <398c755a-ada6-1e60-9562-51b69476e55d@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Feb 06, 2018 at 12:33:36PM -0800, Omar Sandoval wrote:
-> On Mon, Feb 05, 2018 at 11:20:29PM +0800, Ming Lei wrote:
-......
-> >  
-> > +	/* need to restart all hw queues for global tags */
-> > +	if (hctx->flags & BLK_MQ_F_GLOBAL_TAGS) {
-> > +		struct blk_mq_hw_ctx *hctx2;
-> > +		int i;
-> > +
-> > +		queue_for_each_hw_ctx(hctx->queue, hctx2, i)
-> > +			if (blk_mq_run_hw_queue(hctx2, true))
-> > +				return true;
+On Tue, Feb 06, 2018 at 04:18:20PM -0700, Jens Axboe wrote:
+> On 2/5/18 8:20 AM, Ming Lei wrote:
+...
 > 
-> Is it intentional that we stop after the first hw queue does work? That
-> seems fine but it's a little confusing because the comment claims we
-> restart everything.
+> GLOBAL implies that it's, strangely enough, global. That isn't really the
+> case. Why not call this BLK_MQ_F_HOST_TAGS or something like that? I'd
+> welcome better names, but global doesn't seem to be a great choice.
+> 
+> BLK_MQ_F_SET_TAGS?
 
-Good catch, will update comment in V3.
+Good point, I am fine with either BLK_MQ_F_HOST_TAGS or BLK_MQ_F_SET_TAGS,
+will update in V3.
 
 Thanks,
 Ming
