@@ -1,107 +1,140 @@
-Return-Path: <lsf-pc-bounces@lists.linux-foundation.org>
-Date: Fri, 2 Feb 2018 15:04:11 -0700
-From: Liu Bo <bo.li.liu@oracle.com>
-To: Jan Kara <jack@suse.cz>
-Message-ID: <20180202220411.GB23065@dhcp-10-211-47-181.usdhcp.oraclecorp.com>
-References: <20180125115727.slf6zj4zzevcskkn@quack2.suse.cz>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:44776 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753733AbeBGRjI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Feb 2018 12:39:08 -0500
+Received: by mail-pf0-f194.google.com with SMTP id 17so614706pfw.11
+        for <linux-block@vger.kernel.org>; Wed, 07 Feb 2018 09:39:08 -0800 (PST)
+Subject: Re: [PATCH v5 07/10] bcache: fix inaccurate io state for detached
+ bcache devices
+To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Tang Junhui <tang.junhui@zte.com.cn>
+References: <20180206042100.65021-1-colyli@suse.de>
+ <20180206042100.65021-8-colyli@suse.de>
+From: Michael Lyle <mlyle@lyle.org>
+Message-ID: <e55f7656-0f19-a997-1777-f6cd5abda3b5@lyle.org>
+Date: Wed, 7 Feb 2018 09:39:05 -0800
 MIME-Version: 1.0
-In-Reply-To: <20180125115727.slf6zj4zzevcskkn@quack2.suse.cz>
-Cc: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org
-Subject: Re: [Lsf-pc] [LSF/MM TOPIC] get_user_pages() and filesystems
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/lsf-pc>,
-	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=unsubscribe>
-List-Archive: <https://lists.linuxfoundation.org/mailman/private/lsf-pc/>
-List-Post: <mailto:lsf-pc@lists.linux-foundation.org>
-List-Help: <mailto:lsf-pc-request@lists.linux-foundation.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/lsf-pc>,
-	<mailto:lsf-pc-request@lists.linux-foundation.org?subject=subscribe>
-Reply-To: bo.li.liu@oracle.com
-Content-Type: text/plain; charset="us-ascii"
-Sender: lsf-pc-bounces@lists.linux-foundation.org
-Errors-To: lsf-pc-bounces@lists.linux-foundation.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20180206042100.65021-8-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Jan,
+detatched should be detached, otherwise lgtm.
 
-On Thu, Jan 25, 2018 at 12:57:27PM +0100, Jan Kara wrote:
-> Hello,
-> 
-> this is about a problem I have identified last month and for which I still
-> don't have good solution. Some discussion of the problem happened here [1]
-> where also technical details are posted but culprit of the problem is
-> relatively simple: Lots of places in kernel (fs code, writeback logic,
-> stable-pages framework for DIF/DIX) assume that file pages in page cache
-> can be modified either via write(2), truncate(2), fallocate(2) or similar
-> code paths explicitely manipulating with file space or via a writeable
-> mapping into page tables. In particular we assume that if we block all the
-> above paths by taking proper locks, block page faults, and unmap (/ map
-> read-only) the page, it cannot be modified. But this assumption is violated
-> by get_user_pages() users (such as direct IO or RDMA drivers - and we've
-> got reports from such users of weird things happening).
-> 
-> The problem with GUP users is that they acquire page reference (at that
-> point page is writeably mapped into page tables) and some time in future
-> (which can be quite far in case of RDMA) page contents gets modified and
-> page marked dirty.
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
 
-I got a question here, when you say 'page contents gets modified', do
-you mean that GUP users modify the page content?
-
-I have another story about GUP users who use direct-IO, qemu sometimes
-doesn't work well with btrfs when checksum enabled and reports
-checksum failures when guest OS doesn't use stable pages, where it is
-not GUP users but the original file/mapping that may be changing the
-page content in flight.
-
-So looks like either way we kinda have problems.
-
-Thanks,
-
--liubo
-
+On 02/05/2018 08:20 PM, Coly Li wrote:
+> From: Tang Junhui <tang.junhui@zte.com.cn>
 > 
-> The question is how to properly solve this problem. One obvious way is to
-> indicate page has a GUP reference and block its unmapping / remapping RO
-> until that is dropped. But this has a technical problem (how to find space
-> in struct page for such tracking) and a design problem (blocking e.g.
-> writeback for hours because some RDMA app used a file mapping as a buffer
-> simply is not acceptable). There are also various modifications to this
-> solution like refuse to use file pages for RDMA
-> (get_user_pages_longterm()) and block waiting for users like direct IO, or
-> require that RDMA users provide a way to revoke access from GUPed pages.
+> When we run IO in a detached device,  and run iostat to shows IO status,
+> normally it will show like bellow (Omitted some fields):
+> Device: ... avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
+> sdd        ... 15.89     0.53    1.82    0.20    2.23   1.81  52.30
+> bcache0    ... 15.89   115.42    0.00    0.00    0.00   2.40  69.60
+> but after IO stopped, there are still very big avgqu-sz and %util
+> values as bellow:
+> Device: ... avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
+> bcache0   ...      0   5326.32    0.00    0.00    0.00   0.00 100.10
 > 
-> Another obvious solution is to try to remove the assumption from all those
-> places - i.e., use bounce buffers for DIF/DIX, make sure filesystems are
-> prepared for dirty pages suddenly appearing in files and handle that as
-> good as they can. They really need to sensibly handle only a case when
-> underlying storage is already allocated / reserved, in all other cases I
-> believe they are fine in just discarding the data. This would be very
-> tedious but I believe it could be done. But overall long-term maintenance
-> burden of this solution just doesn't seem worth it to me.
+> The reason for this issue is that, only generic_start_io_acct() called
+> and no generic_end_io_acct() called for detached device in
+> cached_dev_make_request(). See the code:
+> //start generic_start_io_acct()
+> generic_start_io_acct(q, rw, bio_sectors(bio), &d->disk->part0);
+> if (cached_dev_get(dc)) {
+> 	//will callback generic_end_io_acct()
+> }
+> else {
+> 	//will not call generic_end_io_acct()
+> }
 > 
-> Another possible solution might be that GUP users (at least the long term
-> ones) won't get references directly to page cache pages but only to some
-> bounce pages (something like cow on private file mappings) and data would
-> be just copied to the page cache pages at set_page_dirty_lock() time (we
-> would probably have to move these users to a completely new API to keep our
-> sanity). This would have userspace visible impacts (data won't be visible
-> in the file until GUP user is done with it) but maybe it would be
-> acceptable. Also how to keep association to the original pagecache page
-> (and how it should be handled when underlying file just goes away) is
-> unclear.
+> This patch calls generic_end_io_acct() in the end of IO for detached
+> devices, so we can show IO state correctly.
 > 
-> So clever ideas are needed and possibly some input from FS / MM / RDMA
-> folks about what might be acceptable.
+> (Modified to use GFP_NOIO in kzalloc() by Coly Li)
 > 
-> 								Honza
+> Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+> Reviewed-by: Coly Li <colyli@suse.de>
+> Reviewed-by: Hannes Reinecke <hare@suse.com>
+> ---
+>  drivers/md/bcache/request.c | 58 +++++++++++++++++++++++++++++++++++++++------
+>  1 file changed, 51 insertions(+), 7 deletions(-)
 > 
-> [1] https://www.spinics.net/lists/linux-xfs/msg14468.html
+> diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+> index 02296bda6384..e09c5ae745be 100644
+> --- a/drivers/md/bcache/request.c
+> +++ b/drivers/md/bcache/request.c
+> @@ -986,6 +986,55 @@ static void cached_dev_nodata(struct closure *cl)
+>  	continue_at(cl, cached_dev_bio_complete, NULL);
+>  }
+>  
+> +struct detached_dev_io_private {
+> +	struct bcache_device	*d;
+> +	unsigned long		start_time;
+> +	bio_end_io_t		*bi_end_io;
+> +	void			*bi_private;
+> +};
+> +
+> +static void detatched_dev_end_io(struct bio *bio)
+> +{
+> +	struct detached_dev_io_private *ddip;
+> +
+> +	ddip = bio->bi_private;
+> +	bio->bi_end_io = ddip->bi_end_io;
+> +	bio->bi_private = ddip->bi_private;
+> +
+> +	generic_end_io_acct(ddip->d->disk->queue,
+> +			    bio_data_dir(bio),
+> +			    &ddip->d->disk->part0, ddip->start_time);
+> +
+> +	kfree(ddip);
+> +
+> +	bio->bi_end_io(bio);
+> +}
+> +
+> +static void detached_dev_do_request(struct bcache_device *d, struct bio *bio)
+> +{
+> +	struct detached_dev_io_private *ddip;
+> +	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
+> +
+> +	/*
+> +	 * no need to call closure_get(&dc->disk.cl),
+> +	 * because upper layer had already opened bcache device,
+> +	 * which would call closure_get(&dc->disk.cl)
+> +	 */
+> +	ddip = kzalloc(sizeof(struct detached_dev_io_private), GFP_NOIO);
+> +	ddip->d = d;
+> +	ddip->start_time = jiffies;
+> +	ddip->bi_end_io = bio->bi_end_io;
+> +	ddip->bi_private = bio->bi_private;
+> +	bio->bi_end_io = detatched_dev_end_io;
+> +	bio->bi_private = ddip;
+> +
+> +	if ((bio_op(bio) == REQ_OP_DISCARD) &&
+> +	    !blk_queue_discard(bdev_get_queue(dc->bdev)))
+> +		bio->bi_end_io(bio);
+> +	else
+> +		generic_make_request(bio);
+> +}
+> +
+>  /* Cached devices - read & write stuff */
+>  
+>  static blk_qc_t cached_dev_make_request(struct request_queue *q,
+> @@ -1028,13 +1077,8 @@ static blk_qc_t cached_dev_make_request(struct request_queue *q,
+>  			else
+>  				cached_dev_read(dc, s);
+>  		}
+> -	} else {
+> -		if ((bio_op(bio) == REQ_OP_DISCARD) &&
+> -		    !blk_queue_discard(bdev_get_queue(dc->bdev)))
+> -			bio_endio(bio);
+> -		else
+> -			generic_make_request(bio);
+> -	}
+> +	} else
+> +		detached_dev_do_request(d, bio);
+>  
+>  	return BLK_QC_T_NONE;
+>  }
 > 
-> -- 
-> Jan Kara <jack@suse.com>
-> SUSE Labs, CR
-_______________________________________________
-Lsf-pc mailing list
-Lsf-pc@lists.linux-foundation.org
-https://lists.linuxfoundation.org/mailman/listinfo/lsf-pc
