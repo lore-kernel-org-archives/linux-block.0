@@ -1,19 +1,21 @@
-Return-Path: <hare@suse.de>
+Return-Path: <ming.lei@redhat.com>
+Date: Thu, 8 Feb 2018 09:23:03 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+	Mike Snitzer <snitzer@redhat.com>, linux-scsi@vger.kernel.org,
+	Arun Easi <arun.easi@cavium.com>, Omar Sandoval <osandov@fb.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	James Bottomley <james.bottomley@hansenpartnership.com>,
+	Christoph Hellwig <hch@lst.de>, Don Brace <don.brace@microsemi.com>,
+	Peter Rivera <peter.rivera@broadcom.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Laurence Oberman <loberman@redhat.com>
 Subject: Re: [PATCH 0/5] blk-mq/scsi-mq: support global tags & introduce
  force_blk_mq
-To: Kashyap Desai <kashyap.desai@broadcom.com>, Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Christoph Hellwig <hch@infradead.org>, Mike Snitzer <snitzer@redhat.com>,
- linux-scsi@vger.kernel.org, Arun Easi <arun.easi@cavium.com>,
- Omar Sandoval <osandov@fb.com>,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- James Bottomley <james.bottomley@hansenpartnership.com>,
- Christoph Hellwig <hch@lst.de>, Don Brace <don.brace@microsemi.com>,
- Peter Rivera <peter.rivera@broadcom.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Laurence Oberman <loberman@redhat.com>
-References: <20180203042112.15239-1-ming.lei@redhat.com>
- <07c1f41e-de7c-5e3d-1a2d-0cd7af7b46df@suse.de>
- <528c93de0aac9010e274847ab1ae0328@mail.gmail.com>
+Message-ID: <20180208012254.GA22516@ming.t460p>
+References: <528c93de0aac9010e274847ab1ae0328@mail.gmail.com>
  <20180205101734.GA32558@ming.t460p>
  <4c8162129f2a09dca2d1e7eefd61e272@mail.gmail.com>
  <20180206080452.GA14651@ming.t460p>
@@ -23,63 +25,62 @@ References: <20180203042112.15239-1-ming.lei@redhat.com>
  <4c934478-a9c1-2f66-83f2-982b85c4e6cc@suse.de>
  <20180207122257.GA16633@ming.t460p>
  <95b8ea33c79b84188e4a54b4e5fcd7b6@mail.gmail.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <35778fd9-ede6-ed3d-4b13-27fb35ede9bd@suse.de>
-Date: Thu, 8 Feb 2018 08:00:29 +0100
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <95b8ea33c79b84188e4a54b4e5fcd7b6@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 02/07/2018 03:14 PM, Kashyap Desai wrote:
->> -----Original Message-----
->> From: Ming Lei [mailto:ming.lei@redhat.com]
->> Sent: Wednesday, February 7, 2018 5:53 PM
->> To: Hannes Reinecke
->> Cc: Kashyap Desai; Jens Axboe; linux-block@vger.kernel.org; Christoph
->> Hellwig; Mike Snitzer; linux-scsi@vger.kernel.org; Arun Easi; Omar
+Hi Kashyap,
+
+On Wed, Feb 07, 2018 at 07:44:04PM +0530, Kashyap Desai wrote:
+> > -----Original Message-----
+> > From: Ming Lei [mailto:ming.lei@redhat.com]
+> > Sent: Wednesday, February 7, 2018 5:53 PM
+> > To: Hannes Reinecke
+> > Cc: Kashyap Desai; Jens Axboe; linux-block@vger.kernel.org; Christoph
+> > Hellwig; Mike Snitzer; linux-scsi@vger.kernel.org; Arun Easi; Omar
 > Sandoval;
->> Martin K . Petersen; James Bottomley; Christoph Hellwig; Don Brace;
+> > Martin K . Petersen; James Bottomley; Christoph Hellwig; Don Brace;
 > Peter
->> Rivera; Paolo Bonzini; Laurence Oberman
->> Subject: Re: [PATCH 0/5] blk-mq/scsi-mq: support global tags & introduce
->> force_blk_mq
->>
->> On Wed, Feb 07, 2018 at 07:50:21AM +0100, Hannes Reinecke wrote:
->>> Hi all,
->>>
->>> [ .. ]
->>>>>
->>>>> Could you share us your patch for enabling global_tags/MQ on
->>>> megaraid_sas
->>>>> so that I can reproduce your test?
->>>>>
->>>>>> See below perf top data. "bt_iter" is consuming 4 times more CPU.
->>>>>
->>>>> Could you share us what the IOPS/CPU utilization effect is after
->>>> applying the
->>>>> patch V2? And your test script?
->>>> Regarding CPU utilization, I need to test one more time. Currently
->>>> system is in used.
->>>>
->>>> I run below fio test on total 24 SSDs expander attached.
->>>>
->>>> numactl -N 1 fio jbod.fio --rw=randread --iodepth=64 --bs=4k
->>>> --ioengine=libaio --rw=randread
->>>>
->>>> Performance dropped from 1.6 M IOPs to 770K IOPs.
->>>>
->>> This is basically what we've seen with earlier iterations.
->>
->> Hi Hannes,
->>
->> As I mentioned in another mail[1], Kashyap's patch has a big issue,
+> > Rivera; Paolo Bonzini; Laurence Oberman
+> > Subject: Re: [PATCH 0/5] blk-mq/scsi-mq: support global tags & introduce
+> > force_blk_mq
+> >
+> > On Wed, Feb 07, 2018 at 07:50:21AM +0100, Hannes Reinecke wrote:
+> > > Hi all,
+> > >
+> > > [ .. ]
+> > > >>
+> > > >> Could you share us your patch for enabling global_tags/MQ on
+> > > > megaraid_sas
+> > > >> so that I can reproduce your test?
+> > > >>
+> > > >>> See below perf top data. "bt_iter" is consuming 4 times more CPU.
+> > > >>
+> > > >> Could you share us what the IOPS/CPU utilization effect is after
+> > > > applying the
+> > > >> patch V2? And your test script?
+> > > > Regarding CPU utilization, I need to test one more time. Currently
+> > > > system is in used.
+> > > >
+> > > > I run below fio test on total 24 SSDs expander attached.
+> > > >
+> > > > numactl -N 1 fio jbod.fio --rw=randread --iodepth=64 --bs=4k
+> > > > --ioengine=libaio --rw=randread
+> > > >
+> > > > Performance dropped from 1.6 M IOPs to 770K IOPs.
+> > > >
+> > > This is basically what we've seen with earlier iterations.
+> >
+> > Hi Hannes,
+> >
+> > As I mentioned in another mail[1], Kashyap's patch has a big issue,
 > which
->> causes only reply queue 0 used.
->>
->> [1] https://marc.info/?l=linux-scsi&m=151793204014631&w=2
->>
->> So could you guys run your performance test again after fixing the
+> > causes only reply queue 0 used.
+> >
+> > [1] https://marc.info/?l=linux-scsi&m=151793204014631&w=2
+> >
+> > So could you guys run your performance test again after fixing the
 > patch?
 > 
 > Ming -
@@ -205,26 +206,26 @@ On 02/07/2018 03:14 PM, Kashyap Desai wrote:
 >    0.71%  [kernel]            [k] sbitmap_queue_clear
 >    0.63%  [kernel]            [k] find_next_bit
 >    0.54%  [kernel]            [k] _raw_spin_lock_irqsave
-> 
-Ah. So we're spending quite some time in trying to find a free tag.
-I guess this is due to every queue starting at the same position trying
-to find a free tag, which inevitably leads to a contention.
 
-Can't we lay out the pointers so that each queue starts looking for free
-bits at a _different_ location?
+The above trace says nothing about the performance drop, and it just means some
+disk stat utilities are crazy reading /proc/diskstats or /sys/block/sda/stat, see
+below, and the performance drop might be related with this crazy reading too.
 
-IE if we evenly spread the initial position for each queue and use a
-round-robin algorithm we should be getting better results, methinks.
+bt_iter
+    <-bt_for_each
+        <-blk_mq_queue_tag_busy_iter
+            <-blk_mq_in_flight
+                <-part_in_flight
+                    <-part_stat_show
+                    <-diskstats_show
+                    <-part_round_stats
+            <-blk_mq_timeout_work
 
-I'll give it a go once the hickups with converting megaraid_sas to
-embedded commands are done with :-(
+If you are using fio to run the test, could you show us the fio log(with and
+without the patchset) and don't start any disk stat utilities meantime?
 
-Cheers,
+Also seems none is the default scheduler after this patchset is applied,
+could you run same test with mq-deadline?
 
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+Thanks,
+Ming
