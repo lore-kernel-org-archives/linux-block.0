@@ -1,196 +1,189 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: linux-scsi@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Arun Easi <arun.easi@cavium.com>,
-	Omar Sandoval <osandov@fb.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Don Brace <don.brace@microsemi.com>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Peter Rivera <peter.rivera@broadcom.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Laurence Oberman <loberman@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 6/8] scsi: virtio_scsi: fix IO hang by irq vector automatic affinity
-Date: Mon,  5 Feb 2018 23:20:33 +0800
-Message-Id: <20180205152035.15016-7-ming.lei@redhat.com>
-In-Reply-To: <20180205152035.15016-1-ming.lei@redhat.com>
-References: <20180205152035.15016-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:47608 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752171AbeBHPpZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 8 Feb 2018 10:45:25 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Michael Lyle <mlyle@lyle.org>,
+        Junhui Tang <tang.junhui@zte.com.cn>
+Subject: [PATCH v6 1/9] bcache: fix cached_dev->count usage for bch_cache_set_error()
+Date: Thu,  8 Feb 2018 23:44:55 +0800
+Message-Id: <20180208154503.92463-2-colyli@suse.de>
+In-Reply-To: <20180208154503.92463-1-colyli@suse.de>
+References: <20180208154503.92463-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Now 84676c1f21e8ff5(genirq/affinity: assign vectors to all possible CPUs)
-has been merged to V4.16-rc, and it is easy to allocate all offline CPUs
-for some irq vectors, this can't be avoided even though the allocation
-is improved.
+When bcache metadata I/O fails, bcache will call bch_cache_set_error()
+to retire the whole cache set. The expected behavior to retire a cache
+set is to unregister the cache set, and unregister all backing device
+attached to this cache set, then remove sysfs entries of the cache set
+and all attached backing devices, finally release memory of structs
+cache_set, cache, cached_dev and bcache_device.
 
-For example, on a 8cores VM, 4~7 are not-present/offline, 4 queues of
-virtio-scsi, the irq affinity assigned can become the following shape:
+In my testing when journal I/O failure triggered by disconnected cache
+device, sometimes the cache set cannot be retired, and its sysfs
+entry /sys/fs/bcache/<uuid> still exits and the backing device also
+references it. This is not expected behavior.
 
-	irq 36, cpu list 0-7
-	irq 37, cpu list 0-7
-	irq 38, cpu list 0-7
-	irq 39, cpu list 0-1
-	irq 40, cpu list 4,6
-	irq 41, cpu list 2-3
-	irq 42, cpu list 5,7
+When metadata I/O failes, the call senquence to retire whole cache set is,
+        bch_cache_set_error()
+        bch_cache_set_unregister()
+        bch_cache_set_stop()
+        __cache_set_unregister()     <- called as callback by calling
+                                        clousre_queue(&c->caching)
+        cache_set_flush()            <- called as a callback when refcount
+                                        of cache_set->caching is 0
+        cache_set_free()             <- called as a callback when refcount
+                                        of catch_set->cl is 0
+        bch_cache_set_release()      <- called as a callback when refcount
+                                        of catch_set->kobj is 0
 
-Then IO hang is triggered in case of non-SCSI_MQ.
+I find if kernel thread bch_writeback_thread() quits while-loop when
+kthread_should_stop() is true and searched_full_index is false, clousre
+callback cache_set_flush() set by continue_at() will never be called. The
+result is, bcache fails to retire whole cache set.
 
-Given storage IO is always C/S model, there isn't such issue with SCSI_MQ(blk-mq),
-because no IO can be submitted to one hw queue if the hw queue hasn't online
-CPUs.
+cache_set_flush() will be called when refcount of closure c->caching is 0,
+and in function bcache_device_detach() refcount of closure c->caching is
+released to 0 by clousre_put(). In metadata error code path, function
+bcache_device_detach() is called by cached_dev_detach_finish(). This is a
+callback routine being called when cached_dev->count is 0. This refcount
+is decreased by cached_dev_put().
 
-Fix this issue by forcing to use blk_mq.
+The above dependence indicates, cache_set_flush() will be called when
+refcount of cache_set->cl is 0, and refcount of cache_set->cl to be 0
+when refcount of cache_dev->count is 0.
 
-BTW, I have been used virtio-scsi(scsi_mq) for several years, and it has
-been quite stable, so it shouldn't cause extra risk.
+The reason why sometimes cache_dev->count is not 0 (when metadata I/O fails
+and bch_cache_set_error() called) is, in bch_writeback_thread(), refcount
+of cache_dev is not decreased properly.
 
-Cc: Arun Easi <arun.easi@cavium.com>
-Cc: Omar Sandoval <osandov@fb.com>,
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-Cc: Christoph Hellwig <hch@lst.de>,
-Cc: Don Brace <don.brace@microsemi.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Peter Rivera <peter.rivera@broadcom.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Tested-by: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+In bch_writeback_thread(), cached_dev_put() is called only when
+searched_full_index is true and cached_dev->writeback_keys is empty, a.k.a
+there is no dirty data on cache. In most of run time it is correct, but
+when bch_writeback_thread() quits the while-loop while cache is still
+dirty, current code forget to call cached_dev_put() before this kernel
+thread exits. This is why sometimes cache_set_flush() is not executed and
+cache set fails to be retired.
+
+The reason to call cached_dev_put() in bch_writeback_rate() is, when the
+cache device changes from clean to dirty, cached_dev_get() is called, to
+make sure during writeback operatiions both backing and cache devices
+won't be released.
+
+Adding following code in bch_writeback_thread() does not work,
+   static int bch_writeback_thread(void *arg)
+        }
+
++       if (atomic_read(&dc->has_dirty))
++               cached_dev_put()
++
+        return 0;
+ }
+because writeback kernel thread can be waken up and start via sysfs entry:
+        echo 1 > /sys/block/bcache<N>/bcache/writeback_running
+It is difficult to check whether backing device is dirty without race and
+extra lock. So the above modification will introduce potential refcount
+underflow in some conditions.
+
+The correct fix is, to take cached dev refcount when creating the kernel
+thread, and put it before the kernel thread exits. Then bcache does not
+need to take a cached dev refcount when cache turns from clean to dirty,
+or to put a cached dev refcount when cache turns from ditry to clean. The
+writeback kernel thread is alwasy safe to reference data structure from
+cache set, cache and cached device (because a refcount of cache device is
+taken for it already), and no matter the kernel thread is stopped by I/O
+errors or system reboot, cached_dev->count can always be used correctly.
+
+The patch is simple, but understanding how it works is quite complicated.
+
+Changelog:
+v2: set dc->writeback_thread to NULL in this patch, as suggested by Hannes.
+v1: initial version for review.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Cc: Michael Lyle <mlyle@lyle.org>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
 ---
- drivers/scsi/virtio_scsi.c | 59 +++-------------------------------------------
- 1 file changed, 3 insertions(+), 56 deletions(-)
+ drivers/md/bcache/super.c     |  1 -
+ drivers/md/bcache/writeback.c | 11 ++++++++---
+ drivers/md/bcache/writeback.h |  2 --
+ 3 files changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/scsi/virtio_scsi.c b/drivers/scsi/virtio_scsi.c
-index 7c28e8d4955a..54e3a0f6844c 100644
---- a/drivers/scsi/virtio_scsi.c
-+++ b/drivers/scsi/virtio_scsi.c
-@@ -91,9 +91,6 @@ struct virtio_scsi_vq {
- struct virtio_scsi_target_state {
- 	seqcount_t tgt_seq;
- 
--	/* Count of outstanding requests. */
--	atomic_t reqs;
--
- 	/* Currently active virtqueue for requests sent to this target. */
- 	struct virtio_scsi_vq *req_vq;
- };
-@@ -152,8 +149,6 @@ static void virtscsi_complete_cmd(struct virtio_scsi *vscsi, void *buf)
- 	struct virtio_scsi_cmd *cmd = buf;
- 	struct scsi_cmnd *sc = cmd->sc;
- 	struct virtio_scsi_cmd_resp *resp = &cmd->resp.cmd;
--	struct virtio_scsi_target_state *tgt =
--				scsi_target(sc->device)->hostdata;
- 
- 	dev_dbg(&sc->device->sdev_gendev,
- 		"cmd %p response %u status %#02x sense_len %u\n",
-@@ -210,8 +205,6 @@ static void virtscsi_complete_cmd(struct virtio_scsi *vscsi, void *buf)
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 312895788036..9b745c5c1980 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1054,7 +1054,6 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
+ 	if (BDEV_STATE(&dc->sb) == BDEV_STATE_DIRTY) {
+ 		bch_sectors_dirty_init(&dc->disk);
+ 		atomic_set(&dc->has_dirty, 1);
+-		refcount_inc(&dc->count);
+ 		bch_writeback_queue(dc);
  	}
  
- 	sc->scsi_done(sc);
--
--	atomic_dec(&tgt->reqs);
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index f1d2fc15abcc..b280c134dd4d 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -572,7 +572,7 @@ static int bch_writeback_thread(void *arg)
+ 
+ 			if (kthread_should_stop()) {
+ 				set_current_state(TASK_RUNNING);
+-				return 0;
++				break;
+ 			}
+ 
+ 			schedule();
+@@ -585,7 +585,6 @@ static int bch_writeback_thread(void *arg)
+ 		if (searched_full_index &&
+ 		    RB_EMPTY_ROOT(&dc->writeback_keys.keys)) {
+ 			atomic_set(&dc->has_dirty, 0);
+-			cached_dev_put(dc);
+ 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_CLEAN);
+ 			bch_write_bdev_super(dc, NULL);
+ 		}
+@@ -606,6 +605,9 @@ static int bch_writeback_thread(void *arg)
+ 		}
+ 	}
+ 
++	dc->writeback_thread = NULL;
++	cached_dev_put(dc);
++
+ 	return 0;
  }
  
- static void virtscsi_vq_done(struct virtio_scsi *vscsi,
-@@ -580,10 +573,7 @@ static int virtscsi_queuecommand_single(struct Scsi_Host *sh,
- 					struct scsi_cmnd *sc)
- {
- 	struct virtio_scsi *vscsi = shost_priv(sh);
--	struct virtio_scsi_target_state *tgt =
--				scsi_target(sc->device)->hostdata;
- 
--	atomic_inc(&tgt->reqs);
- 	return virtscsi_queuecommand(vscsi, &vscsi->req_vqs[0], sc);
- }
- 
-@@ -596,55 +586,11 @@ static struct virtio_scsi_vq *virtscsi_pick_vq_mq(struct virtio_scsi *vscsi,
- 	return &vscsi->req_vqs[hwq];
- }
- 
--static struct virtio_scsi_vq *virtscsi_pick_vq(struct virtio_scsi *vscsi,
--					       struct virtio_scsi_target_state *tgt)
--{
--	struct virtio_scsi_vq *vq;
--	unsigned long flags;
--	u32 queue_num;
--
--	local_irq_save(flags);
--	if (atomic_inc_return(&tgt->reqs) > 1) {
--		unsigned long seq;
--
--		do {
--			seq = read_seqcount_begin(&tgt->tgt_seq);
--			vq = tgt->req_vq;
--		} while (read_seqcount_retry(&tgt->tgt_seq, seq));
--	} else {
--		/* no writes can be concurrent because of atomic_t */
--		write_seqcount_begin(&tgt->tgt_seq);
--
--		/* keep previous req_vq if a reader just arrived */
--		if (unlikely(atomic_read(&tgt->reqs) > 1)) {
--			vq = tgt->req_vq;
--			goto unlock;
--		}
--
--		queue_num = smp_processor_id();
--		while (unlikely(queue_num >= vscsi->num_queues))
--			queue_num -= vscsi->num_queues;
--		tgt->req_vq = vq = &vscsi->req_vqs[queue_num];
-- unlock:
--		write_seqcount_end(&tgt->tgt_seq);
--	}
--	local_irq_restore(flags);
--
--	return vq;
--}
--
- static int virtscsi_queuecommand_multi(struct Scsi_Host *sh,
- 				       struct scsi_cmnd *sc)
- {
- 	struct virtio_scsi *vscsi = shost_priv(sh);
--	struct virtio_scsi_target_state *tgt =
--				scsi_target(sc->device)->hostdata;
--	struct virtio_scsi_vq *req_vq;
--
--	if (shost_use_blk_mq(sh))
--		req_vq = virtscsi_pick_vq_mq(vscsi, sc);
--	else
--		req_vq = virtscsi_pick_vq(vscsi, tgt);
-+	struct virtio_scsi_vq *req_vq = virtscsi_pick_vq_mq(vscsi, sc);
- 
- 	return virtscsi_queuecommand(vscsi, req_vq, sc);
- }
-@@ -775,7 +721,6 @@ static int virtscsi_target_alloc(struct scsi_target *starget)
+@@ -669,10 +671,13 @@ int bch_cached_dev_writeback_start(struct cached_dev *dc)
+ 	if (!dc->writeback_write_wq)
  		return -ENOMEM;
  
- 	seqcount_init(&tgt->tgt_seq);
--	atomic_set(&tgt->reqs, 0);
- 	tgt->req_vq = &vscsi->req_vqs[0];
++	cached_dev_get(dc);
+ 	dc->writeback_thread = kthread_create(bch_writeback_thread, dc,
+ 					      "bcache_writeback");
+-	if (IS_ERR(dc->writeback_thread))
++	if (IS_ERR(dc->writeback_thread)) {
++		cached_dev_put(dc);
+ 		return PTR_ERR(dc->writeback_thread);
++	}
  
- 	starget->hostdata = tgt;
-@@ -823,6 +768,7 @@ static struct scsi_host_template virtscsi_host_template_single = {
- 	.target_alloc = virtscsi_target_alloc,
- 	.target_destroy = virtscsi_target_destroy,
- 	.track_queue_depth = 1,
-+	.force_blk_mq = 1,
- };
- 
- static struct scsi_host_template virtscsi_host_template_multi = {
-@@ -844,6 +790,7 @@ static struct scsi_host_template virtscsi_host_template_multi = {
- 	.target_destroy = virtscsi_target_destroy,
- 	.map_queues = virtscsi_map_queues,
- 	.track_queue_depth = 1,
-+	.force_blk_mq = 1,
- };
- 
- #define virtscsi_config_get(vdev, fld) \
+ 	schedule_delayed_work(&dc->writeback_rate_update,
+ 			      dc->writeback_rate_update_seconds * HZ);
+diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
+index 587b25599856..0bba8f1c6cdf 100644
+--- a/drivers/md/bcache/writeback.h
++++ b/drivers/md/bcache/writeback.h
+@@ -105,8 +105,6 @@ static inline void bch_writeback_add(struct cached_dev *dc)
+ {
+ 	if (!atomic_read(&dc->has_dirty) &&
+ 	    !atomic_xchg(&dc->has_dirty, 1)) {
+-		refcount_inc(&dc->count);
+-
+ 		if (BDEV_STATE(&dc->sb) != BDEV_STATE_DIRTY) {
+ 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_DIRTY);
+ 			/* XXX: should do this synchronously */
 -- 
-2.9.5
+2.16.1
