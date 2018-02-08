@@ -1,148 +1,84 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Subject: [PATCH 09/19] lightnvm: rename sect_* to sec_*
-Date: Mon, 26 Feb 2018 14:17:08 +0100
-Message-Id: <1519651038-16845-10-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
-References: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:38826 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751574AbeBHJms (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Feb 2018 04:42:48 -0500
+Received: by mail-lf0-f65.google.com with SMTP id g72so5506193lfg.5
+        for <linux-block@vger.kernel.org>; Thu, 08 Feb 2018 01:42:47 -0800 (PST)
+Subject: Re: [PATCH 0/4] lightnvm: base 2.0 implementation
+To: Javier Gonzalez <javier@cnexlabs.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20180205121505.27563-1-mb@lightnvm.io>
+ <DA4E2087-F1E8-4903-9B53-95CFECD6B868@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <8b50ed33-226a-760a-e888-51ff573b9557@lightnvm.io>
+Date: Thu, 8 Feb 2018 10:42:44 +0100
 MIME-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org,
- =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="utf-8"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <DA4E2087-F1E8-4903-9B53-95CFECD6B868@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-UmVuYW1lIGFiYnJldmlhdGlvbnMgZm9yIHNlY3RvciBmcm9tIHNlY3RfKiB0byBzZWNfKiBhcyBt
-b3N0IG9mIHRoZSBjb2RlCnVzZXMgdGhpcyBmb3JtYXQgYW5kIGl0IGlzIGNvbmZ1c2luZyB3aGVu
-IHVzaW5nIHRoZSBkaWZmZXJlbnQKc3RydWN0dXJlcy4KClNpZ25lZC1vZmYtYnk6IEphdmllciBH
-b256w6FsZXogPGphdmllckBjbmV4bGFicy5jb20+Ci0tLQogZHJpdmVycy9saWdodG52bS9wYmxr
-LWluaXQuYyAgfCA4ICsrKystLS0tCiBkcml2ZXJzL2xpZ2h0bnZtL3BibGstc3lzZnMuYyB8IDQg
-KystLQogZHJpdmVycy9saWdodG52bS9wYmxrLmggICAgICAgfCA4ICsrKystLS0tCiBkcml2ZXJz
-L252bWUvaG9zdC9saWdodG52bS5jICB8IDggKysrKy0tLS0KIGluY2x1ZGUvbGludXgvbGlnaHRu
-dm0uaCAgICAgIHwgOCArKysrLS0tLQogNSBmaWxlcyBjaGFuZ2VkLCAxOCBpbnNlcnRpb25zKCsp
-LCAxOCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9kcml2ZXJzL2xpZ2h0bnZtL3BibGstaW5p
-dC5jIGIvZHJpdmVycy9saWdodG52bS9wYmxrLWluaXQuYwppbmRleCA3ZTMyOTdiZTUxN2QuLjMw
-YWVjODYzZjEzNiAxMDA2NDQKLS0tIGEvZHJpdmVycy9saWdodG52bS9wYmxrLWluaXQuYworKysg
-Yi9kcml2ZXJzL2xpZ2h0bnZtL3BibGstaW5pdC5jCkBAIC0xNzksMTYgKzE3OSwxNiBAQCBzdGF0
-aWMgaW50IHBibGtfc2V0X2FkZHJmXzEyKHN0cnVjdCBudm1fZ2VvICpnZW8sCiAJZHN0LT5ibGtf
-bGVuID0gc3JjLT5ibGtfbGVuOwogCWRzdC0+cGdfbGVuID0gc3JjLT5wZ19sZW47CiAJZHN0LT5w
-bG5fbGVuID0gc3JjLT5wbG5fbGVuOwotCWRzdC0+c2VjdF9sZW4gPSBzcmMtPnNlY3RfbGVuOwor
-CWRzdC0+c2VjX2xlbiA9IHNyYy0+c2VjX2xlbjsKIAotCWRzdC0+c2VjdF9vZmZzZXQgPSAwOwot
-CWRzdC0+cGxuX29mZnNldCA9IGRzdC0+c2VjdF9sZW47CisJZHN0LT5zZWNfb2Zmc2V0ID0gMDsK
-Kwlkc3QtPnBsbl9vZmZzZXQgPSBkc3QtPnNlY19sZW47CiAJZHN0LT5jaF9vZmZzZXQgPSBkc3Qt
-PnBsbl9vZmZzZXQgKyBkc3QtPnBsbl9sZW47CiAJZHN0LT5sdW5fb2Zmc2V0ID0gZHN0LT5jaF9v
-ZmZzZXQgKyBkc3QtPmNoX2xlbjsKIAlkc3QtPnBnX29mZnNldCA9IGRzdC0+bHVuX29mZnNldCAr
-IGRzdC0+bHVuX2xlbjsKIAlkc3QtPmJsa19vZmZzZXQgPSBkc3QtPnBnX29mZnNldCArIGRzdC0+
-cGdfbGVuOwogCi0JZHN0LT5zZWNfbWFzayA9ICgoMVVMTCA8PCBkc3QtPnNlY3RfbGVuKSAtIDEp
-IDw8IGRzdC0+c2VjdF9vZmZzZXQ7CisJZHN0LT5zZWNfbWFzayA9ICgoMVVMTCA8PCBkc3QtPnNl
-Y19sZW4pIC0gMSkgPDwgZHN0LT5zZWNfb2Zmc2V0OwogCWRzdC0+cGxuX21hc2sgPSAoKDFVTEwg
-PDwgZHN0LT5wbG5fbGVuKSAtIDEpIDw8IGRzdC0+cGxuX29mZnNldDsKIAlkc3QtPmNoX21hc2sg
-PSAoKDFVTEwgPDwgZHN0LT5jaF9sZW4pIC0gMSkgPDwgZHN0LT5jaF9vZmZzZXQ7CiAJZHN0LT5s
-dW5fbWFzayA9ICgoMVVMTCA8PCBkc3QtPmx1bl9sZW4pIC0gMSkgPDwgZHN0LT5sdW5fb2Zmc2V0
-OwpkaWZmIC0tZ2l0IGEvZHJpdmVycy9saWdodG52bS9wYmxrLXN5c2ZzLmMgYi9kcml2ZXJzL2xp
-Z2h0bnZtL3BibGstc3lzZnMuYwppbmRleCA1ZWIyMWEyNzkzNjEuLjgxMjg4YWE5MTYyYSAxMDA2
-NDQKLS0tIGEvZHJpdmVycy9saWdodG52bS9wYmxrLXN5c2ZzLmMKKysrIGIvZHJpdmVycy9saWdo
-dG52bS9wYmxrLXN5c2ZzLmMKQEAgLTEyOCw3ICsxMjgsNyBAQCBzdGF0aWMgc3NpemVfdCBwYmxr
-X3N5c2ZzX3BwYWYoc3RydWN0IHBibGsgKnBibGssIGNoYXIgKnBhZ2UpCiAJCQlwcGFmLT5ibGtf
-b2Zmc2V0LCBwcGFmLT5ibGtfbGVuLAogCQkJcHBhZi0+cGdfb2Zmc2V0LCBwcGFmLT5wZ19sZW4s
-CiAJCQlwcGFmLT5wbG5fb2Zmc2V0LCBwcGFmLT5wbG5fbGVuLAotCQkJcHBhZi0+c2VjdF9vZmZz
-ZXQsIHBwYWYtPnNlY3RfbGVuKTsKKwkJCXBwYWYtPnNlY19vZmZzZXQsIHBwYWYtPnNlY19sZW4p
-OwogCiAJc3ogKz0gc25wcmludGYocGFnZSArIHN6LCBQQUdFX1NJWkUgLSBzeiwKIAkJImRldmlj
-ZTpjaDolZC8lZCxsdW46JWQvJWQsYmxrOiVkLyVkLHBnOiVkLyVkLHBsOiVkLyVkLHNlYzolZC8l
-ZFxuIiwKQEAgLTEzNyw3ICsxMzcsNyBAQCBzdGF0aWMgc3NpemVfdCBwYmxrX3N5c2ZzX3BwYWYo
-c3RydWN0IHBibGsgKnBibGssIGNoYXIgKnBhZ2UpCiAJCQlnZW9fcHBhZi0+YmxrX29mZnNldCwg
-Z2VvX3BwYWYtPmJsa19sZW4sCiAJCQlnZW9fcHBhZi0+cGdfb2Zmc2V0LCBnZW9fcHBhZi0+cGdf
-bGVuLAogCQkJZ2VvX3BwYWYtPnBsbl9vZmZzZXQsIGdlb19wcGFmLT5wbG5fbGVuLAotCQkJZ2Vv
-X3BwYWYtPnNlY3Rfb2Zmc2V0LCBnZW9fcHBhZi0+c2VjdF9sZW4pOworCQkJZ2VvX3BwYWYtPnNl
-Y19vZmZzZXQsIGdlb19wcGFmLT5zZWNfbGVuKTsKIAogCXJldHVybiBzejsKIH0KZGlmZiAtLWdp
-dCBhL2RyaXZlcnMvbGlnaHRudm0vcGJsay5oIGIvZHJpdmVycy9saWdodG52bS9wYmxrLmgKaW5k
-ZXggMWYzMjI4NGIwYWVjLi40ZjdhMzY1NDM2ZjEgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvbGlnaHRu
-dm0vcGJsay5oCisrKyBiL2RyaXZlcnMvbGlnaHRudm0vcGJsay5oCkBAIC05NTcsNyArOTU3LDcg
-QEAgc3RhdGljIGlubGluZSBzdHJ1Y3QgcHBhX2FkZHIgYWRkcl90b19nZW5fcHBhKHN0cnVjdCBw
-YmxrICpwYmxrLCB1NjQgcGFkZHIsCiAJcHBhLmcubHVuID0gKHBhZGRyICYgcHBhZi0+bHVuX21h
-c2spID4+IHBwYWYtPmx1bl9vZmZzZXQ7CiAJcHBhLmcuY2ggPSAocGFkZHIgJiBwcGFmLT5jaF9t
-YXNrKSA+PiBwcGFmLT5jaF9vZmZzZXQ7CiAJcHBhLmcucGwgPSAocGFkZHIgJiBwcGFmLT5wbG5f
-bWFzaykgPj4gcHBhZi0+cGxuX29mZnNldDsKLQlwcGEuZy5zZWMgPSAocGFkZHIgJiBwcGFmLT5z
-ZWNfbWFzaykgPj4gcHBhZi0+c2VjdF9vZmZzZXQ7CisJcHBhLmcuc2VjID0gKHBhZGRyICYgcHBh
-Zi0+c2VjX21hc2spID4+IHBwYWYtPnNlY19vZmZzZXQ7CiAKIAlyZXR1cm4gcHBhOwogfQpAQCAt
-OTczLDcgKzk3Myw3IEBAIHN0YXRpYyBpbmxpbmUgdTY0IHBibGtfZGV2X3BwYV90b19saW5lX2Fk
-ZHIoc3RydWN0IHBibGsgKnBibGssCiAJcGFkZHIgfD0gKHU2NClwLmcubHVuIDw8IHBwYWYtPmx1
-bl9vZmZzZXQ7CiAJcGFkZHIgfD0gKHU2NClwLmcucGcgPDwgcHBhZi0+cGdfb2Zmc2V0OwogCXBh
-ZGRyIHw9ICh1NjQpcC5nLnBsIDw8IHBwYWYtPnBsbl9vZmZzZXQ7Ci0JcGFkZHIgfD0gKHU2NClw
-Lmcuc2VjIDw8IHBwYWYtPnNlY3Rfb2Zmc2V0OworCXBhZGRyIHw9ICh1NjQpcC5nLnNlYyA8PCBw
-cGFmLT5zZWNfb2Zmc2V0OwogCiAJcmV0dXJuIHBhZGRyOwogfQpAQCAtOTk4LDcgKzk5OCw3IEBA
-IHN0YXRpYyBpbmxpbmUgc3RydWN0IHBwYV9hZGRyIHBibGtfcHBhMzJfdG9fcHBhNjQoc3RydWN0
-IHBibGsgKnBibGssIHUzMiBwcGEzMikKIAkJcHBhNjQuZy5ibGsgPSAocHBhMzIgJiBwcGFmLT5i
-bGtfbWFzaykgPj4gcHBhZi0+YmxrX29mZnNldDsKIAkJcHBhNjQuZy5wZyA9IChwcGEzMiAmIHBw
-YWYtPnBnX21hc2spID4+IHBwYWYtPnBnX29mZnNldDsKIAkJcHBhNjQuZy5wbCA9IChwcGEzMiAm
-IHBwYWYtPnBsbl9tYXNrKSA+PiBwcGFmLT5wbG5fb2Zmc2V0OwotCQlwcGE2NC5nLnNlYyA9IChw
-cGEzMiAmIHBwYWYtPnNlY19tYXNrKSA+PiBwcGFmLT5zZWN0X29mZnNldDsKKwkJcHBhNjQuZy5z
-ZWMgPSAocHBhMzIgJiBwcGFmLT5zZWNfbWFzaykgPj4gcHBhZi0+c2VjX29mZnNldDsKIAl9CiAK
-IAlyZXR1cm4gcHBhNjQ7CkBAIC0xMDIyLDcgKzEwMjIsNyBAQCBzdGF0aWMgaW5saW5lIHUzMiBw
-YmxrX3BwYTY0X3RvX3BwYTMyKHN0cnVjdCBwYmxrICpwYmxrLCBzdHJ1Y3QgcHBhX2FkZHIgcHBh
-NjQpCiAJCXBwYTMyIHw9IHBwYTY0LmcuYmxrIDw8IHBwYWYtPmJsa19vZmZzZXQ7CiAJCXBwYTMy
-IHw9IHBwYTY0LmcucGcgPDwgcHBhZi0+cGdfb2Zmc2V0OwogCQlwcGEzMiB8PSBwcGE2NC5nLnBs
-IDw8IHBwYWYtPnBsbl9vZmZzZXQ7Ci0JCXBwYTMyIHw9IHBwYTY0Lmcuc2VjIDw8IHBwYWYtPnNl
-Y3Rfb2Zmc2V0OworCQlwcGEzMiB8PSBwcGE2NC5nLnNlYyA8PCBwcGFmLT5zZWNfb2Zmc2V0Owog
-CX0KIAogCXJldHVybiBwcGEzMjsKZGlmZiAtLWdpdCBhL2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0
-bnZtLmMgYi9kcml2ZXJzL252bWUvaG9zdC9saWdodG52bS5jCmluZGV4IGYzZjUyNGRjMTM4OS4u
-Mzc3ZTY1MjVlNTNmIDEwMDY0NAotLS0gYS9kcml2ZXJzL252bWUvaG9zdC9saWdodG52bS5jCisr
-KyBiL2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMKQEAgLTI2MiwyMSArMjYyLDIxIEBAIHN0
-YXRpYyB2b2lkIG52bWVfbnZtX3NldF9hZGRyXzEyKHN0cnVjdCBudm1fYWRkcl9mb3JtYXRfMTIg
-KmRzdCwKIAlkc3QtPmJsa19sZW4gPSBzcmMtPmJsa19sZW47CiAJZHN0LT5wZ19sZW4gPSBzcmMt
-PnBnX2xlbjsKIAlkc3QtPnBsbl9sZW4gPSBzcmMtPnBsbl9sZW47Ci0JZHN0LT5zZWN0X2xlbiA9
-IHNyYy0+c2VjX2xlbjsKKwlkc3QtPnNlY19sZW4gPSBzcmMtPnNlY19sZW47CiAKIAlkc3QtPmNo
-X29mZnNldCA9IHNyYy0+Y2hfb2Zmc2V0OwogCWRzdC0+bHVuX29mZnNldCA9IHNyYy0+bHVuX29m
-ZnNldDsKIAlkc3QtPmJsa19vZmZzZXQgPSBzcmMtPmJsa19vZmZzZXQ7CiAJZHN0LT5wZ19vZmZz
-ZXQgPSBzcmMtPnBnX29mZnNldDsKIAlkc3QtPnBsbl9vZmZzZXQgPSBzcmMtPnBsbl9vZmZzZXQ7
-Ci0JZHN0LT5zZWN0X29mZnNldCA9IHNyYy0+c2VjX29mZnNldDsKKwlkc3QtPnNlY19vZmZzZXQg
-PSBzcmMtPnNlY19vZmZzZXQ7CiAKIAlkc3QtPmNoX21hc2sgPSAoKDFVTEwgPDwgZHN0LT5jaF9s
-ZW4pIC0gMSkgPDwgZHN0LT5jaF9vZmZzZXQ7CiAJZHN0LT5sdW5fbWFzayA9ICgoMVVMTCA8PCBk
-c3QtPmx1bl9sZW4pIC0gMSkgPDwgZHN0LT5sdW5fb2Zmc2V0OwogCWRzdC0+YmxrX21hc2sgPSAo
-KDFVTEwgPDwgZHN0LT5ibGtfbGVuKSAtIDEpIDw8IGRzdC0+YmxrX29mZnNldDsKIAlkc3QtPnBn
-X21hc2sgPSAoKDFVTEwgPDwgZHN0LT5wZ19sZW4pIC0gMSkgPDwgZHN0LT5wZ19vZmZzZXQ7CiAJ
-ZHN0LT5wbG5fbWFzayA9ICgoMVVMTCA8PCBkc3QtPnBsbl9sZW4pIC0gMSkgPDwgZHN0LT5wbG5f
-b2Zmc2V0OwotCWRzdC0+c2VjX21hc2sgPSAoKDFVTEwgPDwgZHN0LT5zZWN0X2xlbikgLSAxKSA8
-PCBkc3QtPnNlY3Rfb2Zmc2V0OworCWRzdC0+c2VjX21hc2sgPSAoKDFVTEwgPDwgZHN0LT5zZWNf
-bGVuKSAtIDEpIDw8IGRzdC0+c2VjX29mZnNldDsKIH0KIAogc3RhdGljIGludCBudm1lX252bV9z
-ZXR1cF8xMihzdHJ1Y3QgbnZtZV9udm1faWQxMiAqaWQsCkBAIC05NzUsNyArOTc1LDcgQEAgc3Rh
-dGljIHNzaXplX3QgbnZtX2Rldl9hdHRyX3Nob3dfcHBhZihzdHJ1Y3QgbnZtX2FkZHJfZm9ybWF0
-XzEyICpwcGFmLAogCQkJCXBwYWYtPnBsbl9vZmZzZXQsIHBwYWYtPnBsbl9sZW4sCiAJCQkJcHBh
-Zi0+YmxrX29mZnNldCwgcHBhZi0+YmxrX2xlbiwKIAkJCQlwcGFmLT5wZ19vZmZzZXQsIHBwYWYt
-PnBnX2xlbiwKLQkJCQlwcGFmLT5zZWN0X29mZnNldCwgcHBhZi0+c2VjdF9sZW4pOworCQkJCXBw
-YWYtPnNlY19vZmZzZXQsIHBwYWYtPnNlY19sZW4pOwogfQogCiBzdGF0aWMgc3NpemVfdCBudm1f
-ZGV2X2F0dHJfc2hvd18xMihzdHJ1Y3QgZGV2aWNlICpkZXYsCmRpZmYgLS1naXQgYS9pbmNsdWRl
-L2xpbnV4L2xpZ2h0bnZtLmggYi9pbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmgKaW5kZXggNzk3NTk0
-ZDY1MTlmLi4xOGJiOWU5Nzc0ZDYgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvbGludXgvbGlnaHRudm0u
-aAorKysgYi9pbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmgKQEAgLTE2MywxNCArMTYzLDE0IEBAIHN0
-cnVjdCBudm1fYWRkcl9mb3JtYXRfMTIgewogCXU4CWJsa19sZW47CiAJdTgJcGdfbGVuOwogCXU4
-CXBsbl9sZW47Ci0JdTgJc2VjdF9sZW47CisJdTgJc2VjX2xlbjsKIAogCXU4CWNoX29mZnNldDsK
-IAl1OAlsdW5fb2Zmc2V0OwogCXU4CWJsa19vZmZzZXQ7CiAJdTgJcGdfb2Zmc2V0OwogCXU4CXBs
-bl9vZmZzZXQ7Ci0JdTgJc2VjdF9vZmZzZXQ7CisJdTgJc2VjX29mZnNldDsKIAogCXU2NAljaF9t
-YXNrOwogCXU2NAlsdW5fbWFzazsKQEAgLTM5MSw3ICszOTEsNyBAQCBzdGF0aWMgaW5saW5lIHN0
-cnVjdCBwcGFfYWRkciBnZW5lcmljX3RvX2Rldl9hZGRyKHN0cnVjdCBudm1fdGd0X2RldiAqdGd0
-X2RldiwKIAlsLnBwYSB8PSAoKHU2NClyLmcuYmxrKSA8PCBwcGFmLT5ibGtfb2Zmc2V0OwogCWwu
-cHBhIHw9ICgodTY0KXIuZy5wZykgPDwgcHBhZi0+cGdfb2Zmc2V0OwogCWwucHBhIHw9ICgodTY0
-KXIuZy5wbCkgPDwgcHBhZi0+cGxuX29mZnNldDsKLQlsLnBwYSB8PSAoKHU2NClyLmcuc2VjKSA8
-PCBwcGFmLT5zZWN0X29mZnNldDsKKwlsLnBwYSB8PSAoKHU2NClyLmcuc2VjKSA8PCBwcGFmLT5z
-ZWNfb2Zmc2V0OwogCiAJcmV0dXJuIGw7CiB9CkBAIC00MTEsNyArNDExLDcgQEAgc3RhdGljIGlu
-bGluZSBzdHJ1Y3QgcHBhX2FkZHIgZGV2X3RvX2dlbmVyaWNfYWRkcihzdHJ1Y3QgbnZtX3RndF9k
-ZXYgKnRndF9kZXYsCiAJbC5nLmJsayA9IChyLnBwYSAmIHBwYWYtPmJsa19tYXNrKSA+PiBwcGFm
-LT5ibGtfb2Zmc2V0OwogCWwuZy5wZyA9IChyLnBwYSAmIHBwYWYtPnBnX21hc2spID4+IHBwYWYt
-PnBnX29mZnNldDsKIAlsLmcucGwgPSAoci5wcGEgJiBwcGFmLT5wbG5fbWFzaykgPj4gcHBhZi0+
-cGxuX29mZnNldDsKLQlsLmcuc2VjID0gKHIucHBhICYgcHBhZi0+c2VjX21hc2spID4+IHBwYWYt
-PnNlY3Rfb2Zmc2V0OworCWwuZy5zZWMgPSAoci5wcGEgJiBwcGFmLT5zZWNfbWFzaykgPj4gcHBh
-Zi0+c2VjX29mZnNldDsKIAogCXJldHVybiBsOwogfQotLSAKMi43LjQKCgpfX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpMaW51eC1udm1lIG1haWxpbmcgbGlz
-dApMaW51eC1udm1lQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xpc3RzLmluZnJhZGVhZC5v
-cmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1udm1lCg==
+On 02/08/2018 10:35 AM, Javier Gonzalez wrote:
+>> On 5 Feb 2018, at 13.15, Matias Bjørling <mb@lightnvm.io> wrote:
+>>
+>> Hi,
+>>
+>> A couple of patches for 2.0 support for the lightnvm subsystem. They
+>> form the basis for integrating 2.0 support.
+>>
+>> For the rest of the support, Javier has code that implements report
+>> chunk and sets up the LBA format data structure. He also has a bunch
+>> of patches that brings pblk up to speed.
+>>
+>> The first two patches is preparation for the 2.0 work. The third patch
+>> implements the 2.0 data structures, the geometry command, and exposes
+>> the sysfs attributes that comes with the 2.0 specification. Note that
+>> the attributes between 1.2 and 2.0 are different, and it is expected
+>> that user-space shall use the version sysfs attribute to know which
+>> attributes will be available.
+>>
+>> The last patch implements support for using the nvme namespace logical
+>> block and metadata fields and sync it with the internal lightnvm
+>> identify structures.
+>>
+>> -Matias
+>>
+>> Matias Bjørling (4):
+>>   lightnvm: make 1.2 data structures explicit
+>>   lightnvm: flatten nvm_id_group into nvm_id
+>>   lightnvm: add 2.0 geometry identification
+>>   nvme: lightnvm: add late setup of block size and metadata
+>>
+>> drivers/lightnvm/core.c      |  27 ++-
+>> drivers/nvme/host/core.c     |   2 +
+>> drivers/nvme/host/lightnvm.c | 508 ++++++++++++++++++++++++++++++++-----------
+>> drivers/nvme/host/nvme.h     |   2 +
+>> include/linux/lightnvm.h     |  64 +++---
+>> 5 files changed, 426 insertions(+), 177 deletions(-)
+>>
+>> --
+>> 2.11.0
+> 
+> Thanks for posting these. I have started rebasing my patches on top of
+> the new geometry - it is a bit different of how I implemented it, but
+> I'll take care of it.
+> 
+> I'll review as I go - some of the changes I have might make sense to
+> squash in your patches to keep a clean history...
+> 
+
+Thanks.
+
+> I'll add a couple of patches abstracting the geometry so that at core.c
+> level we only work with a single geometry structure. This is they way it
+> is done in the early patches I pointe you to before. Then it is patches
+> building bottom-up support for the new features in 2.0.
+> 
+
+Yep, I was expecting that. I skipped that part since it went into pblk 
+and you already had some patches for it.
+
+> Javier
+> 
