@@ -1,41 +1,51 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 8 Feb 2018 09:19:34 -0800
-From: "tj@kernel.org" <tj@kernel.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "hch@lst.de" <hch@lst.de>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <prvs=570d9c77a=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "tj@kernel.org" <tj@kernel.org>
+CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH v2] blk-mq: Fix race between resetting the timer and
  completion handling
-Message-ID: <20180208171934.GQ695913@devbig577.frc2.facebook.com>
-References: <1518024428.2870.35.camel@wdc.com>
- <20180207173531.GC695913@devbig577.frc2.facebook.com>
- <1518027251.2870.53.camel@wdc.com>
- <20180207200724.GD695913@devbig577.frc2.facebook.com>
- <1518047297.2870.80.camel@wdc.com>
- <1518052193.2870.90.camel@wdc.com>
- <20180208153940.GM695913@devbig577.frc2.facebook.com>
- <1518107501.3611.19.camel@wdc.com>
- <20180208170010.GP695913@devbig577.frc2.facebook.com>
- <1518109843.3611.25.camel@wdc.com>
+Date: Thu, 8 Feb 2018 17:10:45 +0000
+Message-ID: <1518109843.3611.25.camel@wdc.com>
+References: <20180207011133.25957-1-bart.vanassche@wdc.com>
+	 <20180207170612.GB695913@devbig577.frc2.facebook.com>
+	 <1518024428.2870.35.camel@wdc.com>
+	 <20180207173531.GC695913@devbig577.frc2.facebook.com>
+	 <1518027251.2870.53.camel@wdc.com>
+	 <20180207200724.GD695913@devbig577.frc2.facebook.com>
+	 <1518047297.2870.80.camel@wdc.com> <1518052193.2870.90.camel@wdc.com>
+	 <20180208153940.GM695913@devbig577.frc2.facebook.com>
+	 <1518107501.3611.19.camel@wdc.com>
+	 <20180208170010.GP695913@devbig577.frc2.facebook.com>
+In-Reply-To: <20180208170010.GP695913@devbig577.frc2.facebook.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1518109843.3611.25.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hello, Bart.
-
-On Thu, Feb 08, 2018 at 05:10:45PM +0000, Bart Van Assche wrote:
-> I think "dereferencing a pointer" means reading the memory location that pointer points
-> at? Anyway, I think we both interpret the crash report in the same way, namely that it
-> means that scmd->device == NULL.
-
-No, what I'm trying to say is that it's is the device->host reference
-not the scmd->device reference.
-
-Thanks.
-
--- 
-tejun
+T24gVGh1LCAyMDE4LTAyLTA4IGF0IDA5OjAwIC0wODAwLCB0akBrZXJuZWwub3JnIHdyb3RlOg0K
+PiBPbiBUaHUsIEZlYiAwOCwgMjAxOCBhdCAwNDozMTo0M1BNICswMDAwLCBCYXJ0IFZhbiBBc3Nj
+aGUgd3JvdGU6DQo+ID4gVGhlIGNyYXNoIGlzIHJlcG9ydGVkIGF0IGFkZHJlc3Mgc2NzaV90aW1l
+c19vdXQrMHgxNyA9PSBzY3NpX3RpbWVzX291dCsyMy4gVGhlDQo+ID4gaW5zdHJ1Y3Rpb24gYXQg
+dGhhdCBhZGRyZXNzIHRyaWVzIHRvIGRlcmVmZXJlbmNlIHNjc2lfY21uZC5kZXZpY2UgKCVyYXgp
+LiBUaGUNCj4gPiByZWdpc3RlciBkdW1wIHNob3dzIHRoYXQgdGhhdCBwb2ludGVyIGhhcyB0aGUg
+dmFsdWUgTlVMTC4gVGhlIG9ubHkgZnVuY3Rpb24gSQ0KPiA+IGtub3cgb2YgdGhhdCBjbGVhcnMg
+dGhlIHNjc2lfY21uZC5kZXZpY2UgcG9pbnRlciBpcyBzY3NpX3JlcV9pbml0KCkuIFRoZSBvbmx5
+DQo+ID4gY2FsbGVyIG9mIHRoYXQgZnVuY3Rpb24gaW4gdGhlIFNDU0kgY29yZSBpcyBzY3NpX2lu
+aXRpYWxpemVfcnEoKS4gVGhhdCBmdW5jdGlvbg0KPiA+IGhhcyB0d28gY2FsbGVycywgbmFtZWx5
+IHNjc2lfaW5pdF9jb21tYW5kKCkgYW5kIGJsa19nZXRfcmVxdWVzdCgpLiBIb3dldmVyLA0KPiA+
+IHRoZSBzY3NpX2NtbmQuZGV2aWNlIHBvaW50ZXIgaXMgbm90IGNsZWFyZWQgd2hlbiBhIHJlcXVl
+c3QgZmluaXNoZXMuIFRoaXMgaXMNCj4gPiB3aHkgSSB0aGluayB0aGF0IHRoZSBhYm92ZSBjcmFz
+aCByZXBvcnQgaW5kaWNhdGVzIHRoYXQgc2NzaV90aW1lc19vdXQoKSB3YXMNCj4gPiBjYWxsZWQg
+Zm9yIGEgcmVxdWVzdCB0aGF0IHdhcyBiZWluZyByZWluaXRpYWxpemVkIGFuZCBub3QgYnkgZGV2
+aWNlIGhvdHBsdWdnaW5nLg0KPiANCj4gSSBjb3VsZCBiZSBtaXNyZWFkaW5nIGl0IGJ1dCBzY3Np
+X2NtbmQtPmRldmljZSBkZXJlZmVyZW5jZSBzaG91bGQgYmUNCj4gdGhlIGZvbGxvd2luZy4NCj4g
+DQo+ICAgICAweDAwMDAwMDAwMDAwMDViZGQgPCsxMz46ICAgIG1vdiAgICAweDFiMCglcmRpKSwl
+cmF4DQo+IA0KPiAlcmRpIGlzIEByZXEsIDB4MWIwKCVyZGkpIHNlZW1zIHRvIGJlIHRoZSBjb21i
+aW5lZCBhcml0aG1ldGljIG9mDQo+IGJsa19tcV9ycV90b19wZHUoKSBhbmQgLT5kZXZpY2UgZGVy
+ZWZlcmVuY2UgLSAweDE3OCArIDB4MzguICBUaGUNCj4gZmF1bHRpbmcgYWNjZXNzIGlzICglcmF4
+KSwgd2hpY2ggaXMgZGVyZWYnaW5nIGhvc3QgZnJvbSBkZXZpY2UuDQoNCkhlbGxvIFRlanVuLA0K
+DQpJIHRoaW5rICJkZXJlZmVyZW5jaW5nIGEgcG9pbnRlciIgbWVhbnMgcmVhZGluZyB0aGUgbWVt
+b3J5IGxvY2F0aW9uIHRoYXQgcG9pbnRlciBwb2ludHMNCmF0PyBBbnl3YXksIEkgdGhpbmsgd2Ug
+Ym90aCBpbnRlcnByZXQgdGhlIGNyYXNoIHJlcG9ydCBpbiB0aGUgc2FtZSB3YXksIG5hbWVseSB0
+aGF0IGl0DQptZWFucyB0aGF0IHNjbWQtPmRldmljZSA9PSBOVUxMLg0KDQpUaGFua3MsDQoNCkJh
+cnQuDQoNCg0KDQo=
