@@ -1,762 +1,90 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:39341 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965040AbeBMOG0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Feb 2018 09:06:26 -0500
-Received: by mail-wm0-f65.google.com with SMTP id b21so16234715wme.4
-        for <linux-block@vger.kernel.org>; Tue, 13 Feb 2018 06:06:25 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 7/8] lightnvm: pblk: refactor init/exit sequences
-Date: Tue, 13 Feb 2018 15:06:07 +0100
-Message-Id: <1518530768-20956-8-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1518530768-20956-1-git-send-email-javier@cnexlabs.com>
-References: <1518530768-20956-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mx2.suse.de ([195.135.220.15]:47599 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752266AbeBHPpQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 8 Feb 2018 10:45:16 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH v6 0/9] bcache: device failure handling improvement
+Date: Thu,  8 Feb 2018 23:44:54 +0800
+Message-Id: <20180208154503.92463-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Refactor init and exit sequences to improve readability. In the way, fix
-bad free ordering on the init error path.
+Hi maintainers and folks,
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
+This patch set tries to improve bcache device failure handling, includes
+cache device and backing device failures.
+
+The basic idea to handle failed cache device is,
+- Unregister cache set
+- Detach all backing devices which are attached to this cache set
+- Stop all the detached bcache devices (configurable)
+- Stop all flash only volume on the cache set
+The above process is named 'cache set retire' by me. The result of cache
+set retire is, cache set and bcache devices are all removed, following
+I/O requests will get failed immediately to notift upper layer or user
+space coce that the cache device is failed or disconnected.
+- Stop all the detached bcache devices (configurable)
+- Stop all flash only volume on the cache set
+The above process is named 'cache set retire' by me. The result of cache
+set retire is, cache set and bcache devices are all removed
+(configurable), following I/O requests will get failed immediately to
+notify upper layer or user space coce that the cache device is failed or
+disconnected.
+
+one patch from v5 patch set is merged into bcache-for-next, which is not
+in v6 patch set any longer. The changes of v6 patch set are only for typo
+fix, which were pointed out by Nix, Michael and other developers.
+
+So far all patches have peer review, thank you all, bcache developers! 
+
+Changelog:
+v6: fix typo and mistaken spelling.
+v5: replace patch "bcache: stop all attached bcache devices for a retired
+    cache set" from v4 patch set by "bcache: add stop_when_cache_set_failed
+    option to backing device" from v5 patch set.
+    fix issues from v4 patch set.
+    improve kernel message format, remove redundant prefix string.
+v4: add per-cached_dev option stop_attached_devs_on_fail to avoid stopping
+    attached bcache device from a retiring cache set.
+v3: fix detach issue find in v2 patch set.
+v2: fixes all problems found in v1 review.
+    add patches to handle backing device failure.
+    add one more patch to set writeback_rate_update_seconds range.
+    include a patch from Junhui Tang.
+v1: the initial version, only handles cache device failure.
+
+Coly Li
 ---
- drivers/lightnvm/pblk-init.c | 503 ++++++++++++++++++++++---------------------
- 1 file changed, 254 insertions(+), 249 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index dfc68718e27e..04685f2d39d3 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -103,7 +103,40 @@ static void pblk_l2p_free(struct pblk *pblk)
- 	vfree(pblk->trans_map);
- }
- 
--static int pblk_l2p_init(struct pblk *pblk)
-+static int pblk_l2p_recover(struct pblk *pblk, bool factory_init)
-+{
-+	struct pblk_line *line = NULL;
-+
-+	if (factory_init) {
-+		pblk_setup_uuid(pblk);
-+	} else {
-+		line = pblk_recov_l2p(pblk);
-+		if (IS_ERR(line)) {
-+			pr_err("pblk: could not recover l2p table\n");
-+			return -EFAULT;
-+		}
-+	}
-+
-+#ifdef CONFIG_NVM_DEBUG
-+	pr_info("pblk init: L2P CRC: %x\n", pblk_l2p_crc(pblk));
-+#endif
-+
-+	/* Free full lines directly as GC has not been started yet */
-+	pblk_gc_free_full_lines(pblk);
-+
-+	if (!line) {
-+		/* Configure next line for user data */
-+		line = pblk_line_get_first_data(pblk);
-+		if (!line) {
-+			pr_err("pblk: line list corrupted\n");
-+			return -EFAULT;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static int pblk_l2p_init(struct pblk *pblk, bool factory_init)
- {
- 	sector_t i;
- 	struct ppa_addr ppa;
-@@ -119,7 +152,7 @@ static int pblk_l2p_init(struct pblk *pblk)
- 	for (i = 0; i < pblk->rl.nr_secs; i++)
- 		pblk_trans_map_set(pblk, i, ppa);
- 
--	return 0;
-+	return pblk_l2p_recover(pblk, factory_init);
- }
- 
- static void pblk_rwb_free(struct pblk *pblk)
-@@ -268,87 +301,114 @@ static int pblk_core_init(struct pblk *pblk)
- {
- 	struct nvm_tgt_dev *dev = pblk->dev;
- 	struct nvm_geo *geo = &dev->geo;
-+	int max_write_ppas;
-+
-+	atomic64_set(&pblk->user_wa, 0);
-+	atomic64_set(&pblk->pad_wa, 0);
-+	atomic64_set(&pblk->gc_wa, 0);
-+	pblk->user_rst_wa = 0;
-+	pblk->pad_rst_wa = 0;
-+	pblk->gc_rst_wa = 0;
-+
-+	atomic_long_set(&pblk->nr_flush, 0);
-+	pblk->nr_flush_rst = 0;
- 
- 	pblk->pgs_in_buffer = geo->c.mw_cunits * geo->c.ws_opt * geo->all_luns;
- 
-+	pblk->min_write_pgs = geo->c.ws_opt * (geo->c.csecs / PAGE_SIZE);
-+	max_write_ppas = pblk->min_write_pgs * geo->all_luns;
-+	pblk->max_write_pgs = (max_write_ppas < nvm_max_phys_sects(dev)) ?
-+				max_write_ppas : nvm_max_phys_sects(dev);
-+	pblk_set_sec_per_write(pblk, pblk->min_write_pgs);
-+
-+	if (pblk->max_write_pgs > PBLK_MAX_REQ_ADDRS) {
-+		pr_err("pblk: cannot support device max_phys_sect\n");
-+		return -EINVAL;
-+	}
-+
-+	pblk->pad_dist = kzalloc((pblk->min_write_pgs - 1) * sizeof(atomic64_t),
-+								GFP_KERNEL);
-+	if (!pblk->pad_dist)
-+		return -ENOMEM;
-+
- 	if (pblk_init_global_caches(pblk))
--		return -ENOMEM;
-+		goto fail_free_pad_dist;
- 
- 	/* Internal bios can be at most the sectors signaled by the device. */
- 	pblk->page_bio_pool = mempool_create_page_pool(nvm_max_phys_sects(dev),
- 									0);
- 	if (!pblk->page_bio_pool)
--		goto free_global_caches;
-+		goto fail_free_global_caches;
- 
- 	pblk->gen_ws_pool = mempool_create_slab_pool(PBLK_GEN_WS_POOL_SIZE,
- 							pblk_ws_cache);
- 	if (!pblk->gen_ws_pool)
--		goto free_page_bio_pool;
-+		goto fail_free_page_bio_pool;
- 
- 	pblk->rec_pool = mempool_create_slab_pool(geo->all_luns,
- 							pblk_rec_cache);
- 	if (!pblk->rec_pool)
--		goto free_gen_ws_pool;
-+		goto fail_free_gen_ws_pool;
- 
- 	pblk->r_rq_pool = mempool_create_slab_pool(geo->all_luns,
- 							pblk_g_rq_cache);
- 	if (!pblk->r_rq_pool)
--		goto free_rec_pool;
-+		goto fail_free_rec_pool;
- 
- 	pblk->e_rq_pool = mempool_create_slab_pool(geo->all_luns,
- 							pblk_g_rq_cache);
- 	if (!pblk->e_rq_pool)
--		goto free_r_rq_pool;
-+		goto fail_free_r_rq_pool;
- 
- 	pblk->w_rq_pool = mempool_create_slab_pool(geo->all_luns,
- 							pblk_w_rq_cache);
- 	if (!pblk->w_rq_pool)
--		goto free_e_rq_pool;
-+		goto fail_free_e_rq_pool;
- 
- 	pblk->close_wq = alloc_workqueue("pblk-close-wq",
- 			WQ_MEM_RECLAIM | WQ_UNBOUND, PBLK_NR_CLOSE_JOBS);
- 	if (!pblk->close_wq)
--		goto free_w_rq_pool;
-+		goto fail_free_w_rq_pool;
- 
- 	pblk->bb_wq = alloc_workqueue("pblk-bb-wq",
- 			WQ_MEM_RECLAIM | WQ_UNBOUND, 0);
- 	if (!pblk->bb_wq)
--		goto free_close_wq;
-+		goto fail_free_close_wq;
- 
- 	pblk->r_end_wq = alloc_workqueue("pblk-read-end-wq",
- 			WQ_MEM_RECLAIM | WQ_UNBOUND, 0);
- 	if (!pblk->r_end_wq)
--		goto free_bb_wq;
-+		goto fail_free_bb_wq;
- 
- 	if (pblk_set_addrf(pblk))
--		goto free_r_end_wq;
--
--	if (pblk_rwb_init(pblk))
--		goto free_r_end_wq;
-+		goto fail_free_r_end_wq;
- 
- 	INIT_LIST_HEAD(&pblk->compl_list);
-+
- 	return 0;
- 
--free_r_end_wq:
-+fail_free_r_end_wq:
- 	destroy_workqueue(pblk->r_end_wq);
--free_bb_wq:
-+fail_free_bb_wq:
- 	destroy_workqueue(pblk->bb_wq);
--free_close_wq:
-+fail_free_close_wq:
- 	destroy_workqueue(pblk->close_wq);
--free_w_rq_pool:
-+fail_free_w_rq_pool:
- 	mempool_destroy(pblk->w_rq_pool);
--free_e_rq_pool:
-+fail_free_e_rq_pool:
- 	mempool_destroy(pblk->e_rq_pool);
--free_r_rq_pool:
-+fail_free_r_rq_pool:
- 	mempool_destroy(pblk->r_rq_pool);
--free_rec_pool:
-+fail_free_rec_pool:
- 	mempool_destroy(pblk->rec_pool);
--free_gen_ws_pool:
-+fail_free_gen_ws_pool:
- 	mempool_destroy(pblk->gen_ws_pool);
--free_page_bio_pool:
-+fail_free_page_bio_pool:
- 	mempool_destroy(pblk->page_bio_pool);
--free_global_caches:
-+fail_free_global_caches:
- 	pblk_free_global_caches(pblk);
-+fail_free_pad_dist:
-+	kfree(pblk->pad_dist);
- 	return -ENOMEM;
- }
- 
-@@ -370,9 +430,8 @@ static void pblk_core_free(struct pblk *pblk)
- 	mempool_destroy(pblk->e_rq_pool);
- 	mempool_destroy(pblk->w_rq_pool);
- 
--	pblk_rwb_free(pblk);
--
- 	pblk_free_global_caches(pblk);
-+	kfree(pblk->pad_dist);
- }
- 
- static void pblk_luns_free(struct pblk *pblk)
-@@ -394,8 +453,6 @@ static void pblk_line_mg_free(struct pblk *pblk)
- 		pblk_mfree(l_mg->eline_meta[i]->buf, l_mg->emeta_alloc_type);
- 		kfree(l_mg->eline_meta[i]);
- 	}
--
--	kfree(pblk->lines);
- }
- 
- static void pblk_line_meta_free(struct pblk_line *line)
-@@ -419,6 +476,10 @@ static void pblk_lines_free(struct pblk *pblk)
- 		pblk_line_meta_free(line);
- 	}
- 	spin_unlock(&l_mg->free_lock);
-+
-+	pblk_line_mg_free(pblk);
-+
-+	kfree(pblk->lines);
- }
- 
- static int pblk_bb_get_tbl(struct nvm_tgt_dev *dev, struct pblk_lun *rlun,
-@@ -516,38 +577,6 @@ static int pblk_luns_init(struct pblk *pblk, struct ppa_addr *luns)
- 	return 0;
- }
- 
--static int pblk_lines_configure(struct pblk *pblk, int flags)
--{
--	struct pblk_line *line = NULL;
--	int ret = 0;
--
--	if (!(flags & NVM_TARGET_FACTORY)) {
--		line = pblk_recov_l2p(pblk);
--		if (IS_ERR(line)) {
--			pr_err("pblk: could not recover l2p table\n");
--			ret = -EFAULT;
--		}
--	}
--
--#ifdef CONFIG_NVM_DEBUG
--	pr_info("pblk init: L2P CRC: %x\n", pblk_l2p_crc(pblk));
--#endif
--
--	/* Free full lines directly as GC has not been started yet */
--	pblk_gc_free_full_lines(pblk);
--
--	if (!line) {
--		/* Configure next line for user data */
--		line = pblk_line_get_first_data(pblk);
--		if (!line) {
--			pr_err("pblk: line list corrupted\n");
--			ret = -EFAULT;
--		}
--	}
--
--	return ret;
--}
--
- /* See comment over struct line_emeta definition */
- static unsigned int calc_emeta_len(struct pblk *pblk)
- {
-@@ -613,81 +642,6 @@ static void pblk_set_provision(struct pblk *pblk, long nr_free_blks)
- 	atomic_set(&pblk->rl.free_user_blocks, nr_free_blks);
- }
- 
--static int pblk_lines_alloc_metadata(struct pblk *pblk)
--{
--	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
--	struct pblk_line_meta *lm = &pblk->lm;
--	int i;
--
--	/* smeta is always small enough to fit on a kmalloc memory allocation,
--	 * emeta depends on the number of LUNs allocated to the pblk instance
--	 */
--	for (i = 0; i < PBLK_DATA_LINES; i++) {
--		l_mg->sline_meta[i] = kmalloc(lm->smeta_len, GFP_KERNEL);
--		if (!l_mg->sline_meta[i])
--			goto fail_free_smeta;
--	}
--
--	/* emeta allocates three different buffers for managing metadata with
--	 * in-memory and in-media layouts
--	 */
--	for (i = 0; i < PBLK_DATA_LINES; i++) {
--		struct pblk_emeta *emeta;
--
--		emeta = kmalloc(sizeof(struct pblk_emeta), GFP_KERNEL);
--		if (!emeta)
--			goto fail_free_emeta;
--
--		if (lm->emeta_len[0] > KMALLOC_MAX_CACHE_SIZE) {
--			l_mg->emeta_alloc_type = PBLK_VMALLOC_META;
--
--			emeta->buf = vmalloc(lm->emeta_len[0]);
--			if (!emeta->buf) {
--				kfree(emeta);
--				goto fail_free_emeta;
--			}
--
--			emeta->nr_entries = lm->emeta_sec[0];
--			l_mg->eline_meta[i] = emeta;
--		} else {
--			l_mg->emeta_alloc_type = PBLK_KMALLOC_META;
--
--			emeta->buf = kmalloc(lm->emeta_len[0], GFP_KERNEL);
--			if (!emeta->buf) {
--				kfree(emeta);
--				goto fail_free_emeta;
--			}
--
--			emeta->nr_entries = lm->emeta_sec[0];
--			l_mg->eline_meta[i] = emeta;
--		}
--	}
--
--	l_mg->vsc_list = kcalloc(l_mg->nr_lines, sizeof(__le32), GFP_KERNEL);
--	if (!l_mg->vsc_list)
--		goto fail_free_emeta;
--
--	for (i = 0; i < l_mg->nr_lines; i++)
--		l_mg->vsc_list[i] = cpu_to_le32(EMPTY_ENTRY);
--
--	return 0;
--
--fail_free_emeta:
--	while (--i >= 0) {
--		if (l_mg->emeta_alloc_type == PBLK_VMALLOC_META)
--			vfree(l_mg->eline_meta[i]->buf);
--		else
--			kfree(l_mg->eline_meta[i]->buf);
--		kfree(l_mg->eline_meta[i]);
--	}
--
--fail_free_smeta:
--	for (i = 0; i < PBLK_DATA_LINES; i++)
--		kfree(l_mg->sline_meta[i]);
--
--	return -ENOMEM;
--}
--
- static int pblk_setup_line_meta_12(struct pblk *pblk, struct pblk_line *line,
- 				   void *chunk_log)
- {
-@@ -831,29 +785,13 @@ static int pblk_alloc_line_meta(struct pblk *pblk, struct pblk_line *line)
- 	return 0;
- }
- 
--static int pblk_lines_init(struct pblk *pblk)
-+static int pblk_line_mg_init(struct pblk *pblk)
- {
- 	struct nvm_tgt_dev *dev = pblk->dev;
- 	struct nvm_geo *geo = &dev->geo;
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
- 	struct pblk_line_meta *lm = &pblk->lm;
--	struct pblk_line *line;
--	void *chunk_log;
--	unsigned int smeta_len, emeta_len;
--	long nr_free_chks = 0;
--	int bb_distance, max_write_ppas;
--	int i, ret;
--
--	pblk->min_write_pgs = geo->c.ws_opt * (geo->c.csecs / PAGE_SIZE);
--	max_write_ppas = pblk->min_write_pgs * geo->all_luns;
--	pblk->max_write_pgs = (max_write_ppas < nvm_max_phys_sects(dev)) ?
--				max_write_ppas : nvm_max_phys_sects(dev);
--	pblk_set_sec_per_write(pblk, pblk->min_write_pgs);
--
--	if (pblk->max_write_pgs > PBLK_MAX_REQ_ADDRS) {
--		pr_err("pblk: cannot support device max_phys_sect\n");
--		return -EINVAL;
--	}
-+	int i, bb_distance;
- 
- 	l_mg->nr_lines = geo->c.num_chk;
- 	l_mg->log_line = l_mg->data_line = NULL;
-@@ -862,6 +800,119 @@ static int pblk_lines_init(struct pblk *pblk)
- 	atomic_set(&l_mg->sysfs_line_state, -1);
- 	bitmap_zero(&l_mg->meta_bitmap, PBLK_DATA_LINES);
- 
-+	INIT_LIST_HEAD(&l_mg->free_list);
-+	INIT_LIST_HEAD(&l_mg->corrupt_list);
-+	INIT_LIST_HEAD(&l_mg->bad_list);
-+	INIT_LIST_HEAD(&l_mg->gc_full_list);
-+	INIT_LIST_HEAD(&l_mg->gc_high_list);
-+	INIT_LIST_HEAD(&l_mg->gc_mid_list);
-+	INIT_LIST_HEAD(&l_mg->gc_low_list);
-+	INIT_LIST_HEAD(&l_mg->gc_empty_list);
-+
-+	INIT_LIST_HEAD(&l_mg->emeta_list);
-+
-+	l_mg->gc_lists[0] = &l_mg->gc_high_list;
-+	l_mg->gc_lists[1] = &l_mg->gc_mid_list;
-+	l_mg->gc_lists[2] = &l_mg->gc_low_list;
-+
-+	spin_lock_init(&l_mg->free_lock);
-+	spin_lock_init(&l_mg->close_lock);
-+	spin_lock_init(&l_mg->gc_lock);
-+
-+	l_mg->vsc_list = kcalloc(l_mg->nr_lines, sizeof(__le32), GFP_KERNEL);
-+	if (!l_mg->vsc_list)
-+		goto fail;
-+
-+	l_mg->bb_template = kzalloc(lm->sec_bitmap_len, GFP_KERNEL);
-+	if (!l_mg->bb_template)
-+		goto fail_free_vsc_list;
-+
-+	l_mg->bb_aux = kzalloc(lm->sec_bitmap_len, GFP_KERNEL);
-+	if (!l_mg->bb_aux)
-+		goto fail_free_bb_template;
-+
-+	/* smeta is always small enough to fit on a kmalloc memory allocation,
-+	 * emeta depends on the number of LUNs allocated to the pblk instance
-+	 */
-+	for (i = 0; i < PBLK_DATA_LINES; i++) {
-+		l_mg->sline_meta[i] = kmalloc(lm->smeta_len, GFP_KERNEL);
-+		if (!l_mg->sline_meta[i])
-+			goto fail_free_smeta;
-+	}
-+
-+	/* emeta allocates three different buffers for managing metadata with
-+	 * in-memory and in-media layouts
-+	 */
-+	for (i = 0; i < PBLK_DATA_LINES; i++) {
-+		struct pblk_emeta *emeta;
-+
-+		emeta = kmalloc(sizeof(struct pblk_emeta), GFP_KERNEL);
-+		if (!emeta)
-+			goto fail_free_emeta;
-+
-+		if (lm->emeta_len[0] > KMALLOC_MAX_CACHE_SIZE) {
-+			l_mg->emeta_alloc_type = PBLK_VMALLOC_META;
-+
-+			emeta->buf = vmalloc(lm->emeta_len[0]);
-+			if (!emeta->buf) {
-+				kfree(emeta);
-+				goto fail_free_emeta;
-+			}
-+
-+			emeta->nr_entries = lm->emeta_sec[0];
-+			l_mg->eline_meta[i] = emeta;
-+		} else {
-+			l_mg->emeta_alloc_type = PBLK_KMALLOC_META;
-+
-+			emeta->buf = kmalloc(lm->emeta_len[0], GFP_KERNEL);
-+			if (!emeta->buf) {
-+				kfree(emeta);
-+				goto fail_free_emeta;
-+			}
-+
-+			emeta->nr_entries = lm->emeta_sec[0];
-+			l_mg->eline_meta[i] = emeta;
-+		}
-+	}
-+
-+	for (i = 0; i < l_mg->nr_lines; i++)
-+		l_mg->vsc_list[i] = cpu_to_le32(EMPTY_ENTRY);
-+
-+	bb_distance = (geo->all_luns) * geo->c.ws_opt;
-+	for (i = 0; i < lm->sec_per_line; i += bb_distance)
-+		bitmap_set(l_mg->bb_template, i, geo->c.ws_opt);
-+
-+	return 0;
-+
-+fail_free_emeta:
-+	while (--i >= 0) {
-+		if (l_mg->emeta_alloc_type == PBLK_VMALLOC_META)
-+			vfree(l_mg->eline_meta[i]->buf);
-+		else
-+			kfree(l_mg->eline_meta[i]->buf);
-+		kfree(l_mg->eline_meta[i]);
-+	}
-+fail_free_smeta:
-+	kfree(l_mg->bb_aux);
-+
-+	for (i = 0; i < PBLK_DATA_LINES; i++)
-+		kfree(l_mg->sline_meta[i]);
-+fail_free_bb_template:
-+	kfree(l_mg->bb_template);
-+fail_free_vsc_list:
-+	kfree(l_mg->vsc_list);
-+fail:
-+	return -ENOMEM;
-+}
-+
-+static int pblk_line_meta_init(struct pblk *pblk)
-+{
-+	struct nvm_tgt_dev *dev = pblk->dev;
-+	struct nvm_geo *geo = &dev->geo;
-+	struct pblk_line_meta *lm = &pblk->lm;
-+	unsigned int smeta_len, emeta_len;
-+	int i;
-+
- 	lm->sec_per_line = geo->c.clba * geo->all_luns;
- 	lm->blk_per_line = geo->all_luns;
- 	lm->blk_bitmap_len = BITS_TO_LONGS(geo->all_luns) * sizeof(long);
-@@ -912,58 +963,38 @@ static int pblk_lines_init(struct pblk *pblk)
- 		return -EINVAL;
- 	}
- 
--	ret = pblk_lines_alloc_metadata(pblk);
-+	return 0;
-+}
-+
-+static int pblk_lines_init(struct pblk *pblk)
-+{
-+	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
-+	struct pblk_line *line;
-+	void *chunk_log;
-+	long nr_free_chks = 0;
-+	int i, ret;
-+
-+	ret = pblk_line_meta_init(pblk);
- 	if (ret)
- 		return ret;
- 
--	l_mg->bb_template = kzalloc(lm->sec_bitmap_len, GFP_KERNEL);
--	if (!l_mg->bb_template) {
--		ret = -ENOMEM;
--		goto fail_free_meta;
--	}
--
--	l_mg->bb_aux = kzalloc(lm->sec_bitmap_len, GFP_KERNEL);
--	if (!l_mg->bb_aux) {
--		ret = -ENOMEM;
--		goto fail_free_bb_template;
--	}
--
--	bb_distance = (geo->all_luns) * geo->c.ws_opt;
--	for (i = 0; i < lm->sec_per_line; i += bb_distance)
--		bitmap_set(l_mg->bb_template, i, geo->c.ws_opt);
--
--	INIT_LIST_HEAD(&l_mg->free_list);
--	INIT_LIST_HEAD(&l_mg->corrupt_list);
--	INIT_LIST_HEAD(&l_mg->bad_list);
--	INIT_LIST_HEAD(&l_mg->gc_full_list);
--	INIT_LIST_HEAD(&l_mg->gc_high_list);
--	INIT_LIST_HEAD(&l_mg->gc_mid_list);
--	INIT_LIST_HEAD(&l_mg->gc_low_list);
--	INIT_LIST_HEAD(&l_mg->gc_empty_list);
--
--	INIT_LIST_HEAD(&l_mg->emeta_list);
--
--	l_mg->gc_lists[0] = &l_mg->gc_high_list;
--	l_mg->gc_lists[1] = &l_mg->gc_mid_list;
--	l_mg->gc_lists[2] = &l_mg->gc_low_list;
--
--	spin_lock_init(&l_mg->free_lock);
--	spin_lock_init(&l_mg->close_lock);
--	spin_lock_init(&l_mg->gc_lock);
--
--	pblk->lines = kcalloc(l_mg->nr_lines, sizeof(struct pblk_line),
--								GFP_KERNEL);
--	if (!pblk->lines) {
--		ret = -ENOMEM;
--		goto fail_free_bb_aux;
--	}
-+	ret = pblk_line_mg_init(pblk);
-+	if (ret)
-+		return ret;
- 
- 	chunk_log = pblk_chunk_get_log(pblk);
- 	if (IS_ERR(chunk_log)) {
- 		pr_err("pblk: could not get chunk log (%lu)\n",
- 							PTR_ERR(chunk_log));
- 		ret = PTR_ERR(chunk_log);
--		goto fail_free_lines;
-+		goto fail_free_meta;
-+	}
-+
-+	pblk->lines = kcalloc(l_mg->nr_lines, sizeof(struct pblk_line),
-+								GFP_KERNEL);
-+	if (!pblk->lines) {
-+		ret = -ENOMEM;
-+		goto fail_free_chunk_log;
- 	}
- 
- 	for (i = 0; i < l_mg->nr_lines; i++) {
-@@ -971,7 +1002,7 @@ static int pblk_lines_init(struct pblk *pblk)
- 
- 		ret = pblk_alloc_line_meta(pblk, line);
- 		if (ret)
--			goto fail_free_chunk_log;
-+			goto fail_free_lines;
- 
- 		nr_free_chks += pblk_setup_line_meta(pblk, line, chunk_log, i);
- 	}
-@@ -981,16 +1012,12 @@ static int pblk_lines_init(struct pblk *pblk)
- 	kfree(chunk_log);
- 	return 0;
- 
--fail_free_chunk_log:
--	kfree(chunk_log);
-+fail_free_lines:
- 	while (--i >= 0)
- 		pblk_line_meta_free(&pblk->lines[i]);
--fail_free_lines:
- 	kfree(pblk->lines);
--fail_free_bb_aux:
--	kfree(l_mg->bb_aux);
--fail_free_bb_template:
--	kfree(l_mg->bb_template);
-+fail_free_chunk_log:
-+	kfree(chunk_log);
- fail_free_meta:
- 	pblk_line_mg_free(pblk);
- 
-@@ -1033,12 +1060,11 @@ static void pblk_writer_stop(struct pblk *pblk)
- 
- static void pblk_free(struct pblk *pblk)
- {
--	pblk_luns_free(pblk);
- 	pblk_lines_free(pblk);
--	kfree(pblk->pad_dist);
--	pblk_line_mg_free(pblk);
--	pblk_core_free(pblk);
- 	pblk_l2p_free(pblk);
-+	pblk_rwb_free(pblk);
-+	pblk_core_free(pblk);
-+	pblk_luns_free(pblk);
- 
- 	kfree(pblk);
- }
-@@ -1109,19 +1135,6 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
- 	spin_lock_init(&pblk->trans_lock);
- 	spin_lock_init(&pblk->lock);
- 
--	if (flags & NVM_TARGET_FACTORY)
--		pblk_setup_uuid(pblk);
--
--	atomic64_set(&pblk->user_wa, 0);
--	atomic64_set(&pblk->pad_wa, 0);
--	atomic64_set(&pblk->gc_wa, 0);
--	pblk->user_rst_wa = 0;
--	pblk->pad_rst_wa = 0;
--	pblk->gc_rst_wa = 0;
--
--	atomic_long_set(&pblk->nr_flush, 0);
--	pblk->nr_flush_rst = 0;
--
- #ifdef CONFIG_NVM_DEBUG
- 	atomic_long_set(&pblk->inflight_writes, 0);
- 	atomic_long_set(&pblk->padded_writes, 0);
-@@ -1145,48 +1158,42 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
- 	atomic_long_set(&pblk->write_failed, 0);
- 	atomic_long_set(&pblk->erase_failed, 0);
- 
-+
- 	ret = pblk_luns_init(pblk, dev->luns);
- 	if (ret) {
- 		pr_err("pblk: could not initialize luns\n");
- 		goto fail;
- 	}
- 
--	ret = pblk_lines_init(pblk);
--	if (ret) {
--		pr_err("pblk: could not initialize lines\n");
--		goto fail_free_luns;
--	}
--
--	pblk->pad_dist = kzalloc((pblk->min_write_pgs - 1) * sizeof(atomic64_t),
--				 GFP_KERNEL);
--	if (!pblk->pad_dist) {
--		ret = -ENOMEM;
--		goto fail_free_line_meta;
--	}
--
- 	ret = pblk_core_init(pblk);
- 	if (ret) {
- 		pr_err("pblk: could not initialize core\n");
--		goto fail_free_pad_dist;
-+		goto fail_free_luns;
- 	}
- 
--	ret = pblk_l2p_init(pblk);
-+	ret = pblk_lines_init(pblk);
- 	if (ret) {
--		pr_err("pblk: could not initialize maps\n");
-+		pr_err("pblk: could not initialize lines\n");
- 		goto fail_free_core;
- 	}
- 
--	ret = pblk_lines_configure(pblk, flags);
-+	ret = pblk_rwb_init(pblk);
- 	if (ret) {
--		pr_err("pblk: could not configure lines\n");
--		goto fail_free_l2p;
-+		pr_err("pblk: could not initialize write buffer\n");
-+		goto fail_free_lines;
-+	}
-+
-+	ret = pblk_l2p_init(pblk, flags & NVM_TARGET_FACTORY);
-+	if (ret) {
-+		pr_err("pblk: could not initialize maps\n");
-+		goto fail_free_rwb;
- 	}
- 
- 	ret = pblk_writer_init(pblk);
- 	if (ret) {
- 		if (ret != -EINTR)
- 			pr_err("pblk: could not initialize write thread\n");
--		goto fail_free_lines;
-+		goto fail_free_l2p;
- 	}
- 
- 	ret = pblk_gc_init(pblk);
-@@ -1221,16 +1228,14 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
- 
- fail_stop_writer:
- 	pblk_writer_stop(pblk);
--fail_free_lines:
--	pblk_lines_free(pblk);
- fail_free_l2p:
- 	pblk_l2p_free(pblk);
-+fail_free_rwb:
-+	pblk_rwb_free(pblk);
-+fail_free_lines:
-+	pblk_lines_free(pblk);
- fail_free_core:
- 	pblk_core_free(pblk);
--fail_free_pad_dist:
--	kfree(pblk->pad_dist);
--fail_free_line_meta:
--	pblk_line_mg_free(pblk);
- fail_free_luns:
- 	pblk_luns_free(pblk);
- fail:
+Coly Li (8):
+  bcache: fix cached_dev->count usage for bch_cache_set_error()
+  bcache: quit dc->writeback_thread when BCACHE_DEV_DETACHING is set
+  bcache: stop dc->writeback_rate_update properly
+  bcache: add CACHE_SET_IO_DISABLE to struct cache_set flags
+  bcache: add stop_when_cache_set_failed option to backing device
+  bcache: add backing_request_endio() for bi_end_io of attached backing
+    device I/O
+  bcache: add io_disable to struct cached_dev
+  bcache: stop bcache device when backing device is offline
+
+Tang Junhui (1):
+  bcache: fix inaccurate io state for detached bcache devices
+
+ drivers/md/bcache/alloc.c     |   3 +-
+ drivers/md/bcache/bcache.h    |  44 ++++++++-
+ drivers/md/bcache/btree.c     |  10 ++-
+ drivers/md/bcache/io.c        |  16 +++-
+ drivers/md/bcache/journal.c   |   4 +-
+ drivers/md/bcache/request.c   | 185 ++++++++++++++++++++++++++++++++------
+ drivers/md/bcache/super.c     | 205 ++++++++++++++++++++++++++++++++++++++----
+ drivers/md/bcache/sysfs.c     |  55 +++++++++++-
+ drivers/md/bcache/util.h      |   6 --
+ drivers/md/bcache/writeback.c |  92 ++++++++++++++++---
+ drivers/md/bcache/writeback.h |   2 -
+ 11 files changed, 543 insertions(+), 79 deletions(-)
+
 -- 
-2.7.4
+2.16.1
