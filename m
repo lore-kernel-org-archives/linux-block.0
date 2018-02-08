@@ -1,46 +1,88 @@
-Return-Path: <htejun@gmail.com>
-Return-Path: <htejun@gmail.com>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 8 Feb 2018 07:23:07 -0800
-From: Tejun Heo <tj@kernel.org>
-To: Joseph Qi <joseph.qi@linux.alibaba.com>
-Cc: Jens Axboe <axboe@kernel.dk>, xuejiufei <jiufei.xue@linux.alibaba.com>,
-	Caspar Zhang <caspar@linux.alibaba.com>,
-	linux-block <linux-block@vger.kernel.org>, cgroups@vger.kernel.org
+Return-Path: <joseph.qi@linux.alibaba.com>
 Subject: Re: [PATCH v2] blk-throttle: fix race between blkcg_bio_issue_check
  and cgroup_rmdir
-Message-ID: <20180208152307.GL695913@devbig577.frc2.facebook.com>
+To: Tejun Heo <tj@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, xuejiufei <jiufei.xue@linux.alibaba.com>,
+ Caspar Zhang <caspar@linux.alibaba.com>,
+ linux-block <linux-block@vger.kernel.org>, cgroups@vger.kernel.org
 References: <6f136c90-faa9-4bc0-b02f-3a112b4d8360@linux.alibaba.com>
  <20180207213811.GF695913@devbig577.frc2.facebook.com>
- <b590caed-1423-4776-966d-cd9e346a8ea1@linux.alibaba.com>
+From: Joseph Qi <joseph.qi@linux.alibaba.com>
+Message-ID: <b590caed-1423-4776-966d-cd9e346a8ea1@linux.alibaba.com>
+Date: Thu, 8 Feb 2018 10:29:43 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <b590caed-1423-4776-966d-cd9e346a8ea1@linux.alibaba.com>
+In-Reply-To: <20180207213811.GF695913@devbig577.frc2.facebook.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hello, Joseph.
+Hi Tejun,
+Thanks very much for reviewing this patch.
 
-On Thu, Feb 08, 2018 at 10:29:43AM +0800, Joseph Qi wrote:
-> So you mean checking css->refcnt to prevent the further use of
-> blkg_get? I think it makes sense.
+On 18/2/8 05:38, Tejun Heo wrote:
+> Hello, Joseph.
+> 
+> On Wed, Feb 07, 2018 at 04:40:02PM +0800, Joseph Qi wrote:
+>> writeback kworker
+>>   blkcg_bio_issue_check
+>>     rcu_read_lock
+>>     blkg_lookup
+>>     <<< *race window*
+>>     blk_throtl_bio
+>>       spin_lock_irq(q->queue_lock)
+>>       spin_unlock_irq(q->queue_lock)
+>>     rcu_read_unlock
+>>
+>> cgroup_rmdir
+>>   cgroup_destroy_locked
+>>     kill_css
+>>       css_killed_ref_fn
+>>         css_killed_work_fn
+>>           offline_css
+>>             blkcg_css_offline
+>>               spin_trylock(q->queue_lock)
+>>               blkg_destroy
+>>               spin_unlock(q->queue_lock)
+> 
+> Ah, right.  Thanks for spotting the bug.
+> 
+>> Since rcu can only prevent blkg from releasing when it is being used,
+>> the blkg->refcnt can be decreased to 0 during blkg_destroy and schedule
+>> blkg release.
+>> Then trying to blkg_get in blk_throtl_bio will complains the WARNING.
+>> And then the corresponding blkg_put will schedule blkg release again,
+>> which result in double free.
+>> This race is introduced by commit ae1188963611 ("blkcg: consolidate blkg
+>> creation in blkcg_bio_issue_check()"). Before this commit, it will lookup
+>> first and then try to lookup/create again with queue_lock. So revive
+>> this logic to fix the race.
+> 
+> The change seems a bit drastic to me.  Can't we do something like the
+> following instead?
+> 
+> blk_throtl_bio()
+> {
+> 	... non throttled cases ...
+> 
+> 	/* out-of-limit, queue to @tg */
+> 
+> 	/*
+> 	 * We can look up and retry but the race window is tiny here.
+> 	 * Just letting it through should be good enough.
+> 	 */
+> 	if (!css_tryget(blkcg->css))
+> 		goto out;
+> 
+> 	... actual queueing ...
+> 	css_put(blkcg->css);
+> 	...
+> }
+So you mean checking css->refcnt to prevent the further use of
+blkg_get? I think it makes sense.
+IMO, we should use css_tryget_online instead, and rightly after taking
+queue_lock. Because there may be more use of blkg_get in blk_throtl_bio
+in the futher. Actually it already has two now. One is in
+blk_throtl_assoc_bio, and the other is in throtl_qnode_add_bio.
+What do you think of this?
 
-Yes.
-
-> IMO, we should use css_tryget_online instead, and rightly after taking
-
-Not really.  An offline css still can have a vast amount of IO to
-drain and write out.
-
-> queue_lock. Because there may be more use of blkg_get in blk_throtl_bio
-> in the futher. Actually it already has two now. One is in
-> blk_throtl_assoc_bio, and the other is in throtl_qnode_add_bio.
-> What do you think of this?
-
-As long as we avoid making the bypass paths expensive, whatever makes
-the code easier to read and maintain would be better.  css ref ops are
-extremely cheap anyway.
-
-Thanks.
-
--- 
-tejun
+Thanks,
+Joseph
