@@ -1,65 +1,54 @@
-Return-Path: <jiufei.xue@linux.alibaba.com>
-From: Jiufei Xue <jiufei.xue@linux.alibaba.com>
-Subject: [PATCH 3/4] block: display the correct diskname for bio
-To: hch@lst.de, Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, caspar@linux.alibaba.com,
- Joseph Qi <joseph.qi@linux.alibaba.com>
-References: <fc363a8d-957c-be3a-e60a-a8b40727d727@linux.alibaba.com>
-Message-ID: <675554d9-afdb-c7c5-1c5e-643002048d02@linux.alibaba.com>
-Date: Mon, 26 Feb 2018 20:04:41 +0800
+Return-Path: <prvs=570d9c77a=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@infradead.org" <hch@infradead.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "snitzer@redhat.com" <snitzer@redhat.com>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "hare@suse.de" <hare@suse.de>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"don.brace@microsemi.com" <don.brace@microsemi.com>,
+	"james.bottomley@hansenpartnership.com"
+	<james.bottomley@hansenpartnership.com>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "arun.easi@cavium.com" <arun.easi@cavium.com>,
+	"osandov@fb.com" <osandov@fb.com>, "loberman@redhat.com"
+	<loberman@redhat.com>, "kashyap.desai@broadcom.com"
+	<kashyap.desai@broadcom.com>, "peter.rivera@broadcom.com"
+	<peter.rivera@broadcom.com>
+Subject: Re: [PATCH 1/5] blk-mq: tags: define several fields of tags as
+ pointer
+Date: Thu, 8 Feb 2018 17:34:19 +0000
+Message-ID: <1518111257.3611.33.camel@wdc.com>
+References: <20180203042112.15239-1-ming.lei@redhat.com>
+	 <20180203042112.15239-2-ming.lei@redhat.com>
+In-Reply-To: <20180203042112.15239-2-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <fc363a8d-957c-be3a-e60a-a8b40727d727@linux.alibaba.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-bio_devname use __bdevname to display the device name, and can
-only show the major and minor of the part0.
-Fix this by using disk_name to display the correct name.
-
-Signed-off-by: Jiufei Xue <jiufei.xue@linux.alibaba.com>
----
- block/partition-generic.c | 6 ++++++
- include/linux/bio.h       | 4 +---
- 2 files changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index 91622db..08dabcd 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -51,6 +51,12 @@ const char *bdevname(struct block_device *bdev, char *buf)
- 
- EXPORT_SYMBOL(bdevname);
- 
-+const char *bio_devname(struct bio *bio, char *buf)
-+{
-+	return disk_name(bio->bi_disk, bio->bi_partno, buf);
-+}
-+EXPORT_SYMBOL(bio_devname);
-+
- /*
-  * There's very little reason to use this, you should really
-  * have a struct block_device just about everywhere and use
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index d0eb659..ce547a2 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -511,6 +511,7 @@ extern struct bio *bio_copy_user_iov(struct request_queue *,
- extern struct bio_vec *bvec_alloc(gfp_t, int, unsigned long *, mempool_t *);
- extern void bvec_free(mempool_t *, struct bio_vec *, unsigned int);
- extern unsigned int bvec_nr_vecs(unsigned short idx);
-+extern const char *bio_devname(struct bio *bio, char *buffer);
- 
- #define bio_set_dev(bio, bdev) 			\
- do {						\
-@@ -529,9 +530,6 @@ extern struct bio *bio_copy_user_iov(struct request_queue *,
- #define bio_dev(bio) \
- 	disk_devt((bio)->bi_disk)
- 
--#define bio_devname(bio, buf) \
--	__bdevname(bio_dev(bio), (buf))
--
- #ifdef CONFIG_BLK_CGROUP
- int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css);
- void bio_disassociate_task(struct bio *bio);
--- 
-1.9.4
+T24gU2F0LCAyMDE4LTAyLTAzIGF0IDEyOjIxICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gZGlm
+ZiAtLWdpdCBhL2Jsb2NrL2Jsay1tcS10YWcuaCBiL2Jsb2NrL2Jsay1tcS10YWcuaA0KPiBpbmRl
+eCA2MWRlYWIwYjVhNWEuLmE2ODMyM2ZhMGMwMiAxMDA2NDQNCj4gLS0tIGEvYmxvY2svYmxrLW1x
+LXRhZy5oDQo+ICsrKyBiL2Jsb2NrL2Jsay1tcS10YWcuaA0KPiBAQCAtMTEsMTAgKzExLDE0IEBA
+IHN0cnVjdCBibGtfbXFfdGFncyB7DQo+ICAJdW5zaWduZWQgaW50IG5yX3RhZ3M7DQo+ICAJdW5z
+aWduZWQgaW50IG5yX3Jlc2VydmVkX3RhZ3M7DQo+ICANCj4gLQlhdG9taWNfdCBhY3RpdmVfcXVl
+dWVzOw0KPiArCWF0b21pY190ICphY3RpdmVfcXVldWVzOw0KPiArCWF0b21pY190IF9fYWN0aXZl
+X3F1ZXVlczsNCj4gIA0KPiAtCXN0cnVjdCBzYml0bWFwX3F1ZXVlIGJpdG1hcF90YWdzOw0KPiAt
+CXN0cnVjdCBzYml0bWFwX3F1ZXVlIGJyZXNlcnZlZF90YWdzOw0KPiArCXN0cnVjdCBzYml0bWFw
+X3F1ZXVlICpiaXRtYXBfdGFnczsNCj4gKwlzdHJ1Y3Qgc2JpdG1hcF9xdWV1ZSAqYnJlc2VydmVk
+X3RhZ3M7DQo+ICsNCj4gKwlzdHJ1Y3Qgc2JpdG1hcF9xdWV1ZSBfX2JpdG1hcF90YWdzOw0KPiAr
+CXN0cnVjdCBzYml0bWFwX3F1ZXVlIF9fYnJlc2VydmVkX3RhZ3M7DQo+ICANCj4gIAlzdHJ1Y3Qg
+cmVxdWVzdCAqKnJxczsNCj4gIAlzdHJ1Y3QgcmVxdWVzdCAqKnN0YXRpY19ycXM7DQoNClRoaXMg
+aXMgZ2V0dGluZyB1Z2x5OiBtdWx0aXBsZSBwb2ludGVycyB0aGF0IGVpdGhlciBhbGwgcG9pbnQg
+YXQgYW4gZWxlbWVudA0KaW5zaWRlIHN0cnVjdCBibGtfbXFfdGFncyBvciBhbGwgcG9pbnQgYXQg
+YSBtZW1iZXIgb3V0c2lkZSBibGtfbXFfdGFncy4gSGF2ZQ0KeW91IGNvbnNpZGVyZWQgdG8gaW50
+cm9kdWNlIGEgbmV3IHN0cnVjdHVyZSBmb3IgdGhlc2UgbWVtYmVycyAoYWN0aXZlX3F1ZXVlcywN
+CmJpdG1hcF90YWdzIGFuZCBicmVzZXJ2ZWRfdGFncykgc3VjaCB0aGF0IG9ubHkgYSBzaW5nbGUg
+bmV3IHBvaW50ZXIgaGFzIHRvDQpiZSBpbnRyb2R1Y2VkIGluIHN0cnVjdCBibGtfbXFfdGFncz8g
+QWRkaXRpb25hbGx5LCB3aHkgZG9lcyBldmVyeQ0KYmxrX21xX3RhZ3MgaW5zdGFuY2UgaGF2ZSBp
+dHMgb3duIHN0YXRpY19ycXMgYXJyYXkgaWYgdGFncyBhcmUgc2hhcmVkDQphY3Jvc3MgaGFyZHdh
+cmUgcXVldWVzPyBibGtfbXFfZ2V0X3RhZygpIGFsbG9jYXRlcyBhIHRhZyBlaXRoZXIgZnJvbQ0K
+Yml0bWFwX3RhZ3Mgb3IgZnJvbSBicmVzZXJ2ZWRfdGFncy4gU28gaWYgdGhlc2UgdGFnIHNldHMg
+YXJlIHNoYXJlZCBJDQpkb24ndCB0aGluayB0aGF0IGl0IGlzIG5lY2Vzc2FyeSB0byBoYXZlIG9u
+ZSBzdGF0aWNfcnFzIGFycmF5IHBlciBzdHJ1Y3QNCmJsa19tcV90YWdzIGluc3RhbmNlLg0KDQpU
+aGFua3MsDQoNCkJhcnQuDQoNCg0KDQo=
