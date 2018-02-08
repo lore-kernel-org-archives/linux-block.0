@@ -1,177 +1,141 @@
-Return-Path: <sagi@grimberg.me>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Jason Gunthorpe <jgg@ziepe.ca>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Idan Burstein <idanb@mellanox.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH rfc 2/5] irq-am: add some debugfs exposure on tuning state
-Date: Tue,  6 Feb 2018 00:03:13 +0200
-Message-Id: <20180205220316.30236-3-sagi@grimberg.me>
-In-Reply-To: <20180205220316.30236-1-sagi@grimberg.me>
-References: <20180205220316.30236-1-sagi@grimberg.me>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:47622 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751130AbeBHPpc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 8 Feb 2018 10:45:32 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Hannes Reinecke <hare@suse.com>,
+        Huijun Tang <tang.junhui@zte.com.cn>
+Subject: [PATCH v6 2/9] bcache: quit dc->writeback_thread when BCACHE_DEV_DETACHING is set
+Date: Thu,  8 Feb 2018 23:44:56 +0800
+Message-Id: <20180208154503.92463-3-colyli@suse.de>
+In-Reply-To: <20180208154503.92463-1-colyli@suse.de>
+References: <20180208154503.92463-1-colyli@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Useful for local debugging
+In patch "bcache: fix cached_dev->count usage for bch_cache_set_error()",
+cached_dev_get() is called when creating dc->writeback_thread, and
+cached_dev_put() is called when exiting dc->writeback_thread. This
+modification works well unless people detach the bcache device manually by
+    'echo 1 > /sys/block/bcache<N>/bcache/detach'
+Because this sysfs interface only calls bch_cached_dev_detach() which wakes
+up dc->writeback_thread but does not stop it. The reason is, before patch
+"bcache: fix cached_dev->count usage for bch_cache_set_error()", inside
+bch_writeback_thread(), if cache is not dirty after writeback,
+cached_dev_put() will be called here. And in cached_dev_make_request() when
+a new write request makes cache from clean to dirty, cached_dev_get() will
+be called there. Since we don't operate dc->count in these locations,
+refcount d->count cannot be dropped after cache becomes clean, and
+cached_dev_detach_finish() won't be called to detach bcache device.
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+This patch fixes the issue by checking whether BCACHE_DEV_DETACHING is
+set inside bch_writeback_thread(). If this bit is set and cache is clean
+(no existing writeback_keys), break the while-loop, call cached_dev_put()
+and quit the writeback thread.
+
+Please note if cache is still dirty, even BCACHE_DEV_DETACHING is set the
+writeback thread should continue to perform writeback, this is the original
+design of manually detach.
+
+It is safe to do the following check without locking, let me explain why,
++	if (!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags) &&
++	    (!atomic_read(&dc->has_dirty) || !dc->writeback_running)) {
+
+If the kenrel thread does not sleep and continue to run due to conditions
+are not updated in time on the running CPU core, it just consumes more CPU
+cycles and has no hurt. This should-sleep-but-run is safe here. We just
+focus on the should-run-but-sleep condition, which means the writeback
+thread goes to sleep in mistake while it should continue to run.
+1, First of all, no matter the writeback thread is hung or not, kthread_stop() from
+   cached_dev_detach_finish() will wake up it and terminate by making
+   kthread_should_stop() return true. And in normal run time, bit on index
+   BCACHE_DEV_DETACHING is always cleared, the condition
+	!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags)
+   is always true and can be ignored as constant value.
+2, If one of the following conditions is true, the writeback thread should
+   go to sleep,
+   "!atomic_read(&dc->has_dirty)" or "!dc->writeback_running)"
+   each of them independently controls the writeback thread should sleep or
+   not, let's analyse them one by one.
+2.1 condition "!atomic_read(&dc->has_dirty)"
+   If dc->has_dirty is set from 0 to 1 on another CPU core, bcache will
+   call bch_writeback_queue() immediately or call bch_writeback_add() which
+   indirectly calls bch_writeback_queue() too. In bch_writeback_queue(),
+   wake_up_process(dc->writeback_thread) is called. It sets writeback
+   thread's task state to TASK_RUNNING and following an implicit memory
+   barrier, then tries to wake up the writeback thread.
+   In writeback thread, its task state is set to TASK_INTERRUPTIBLE before
+   doing the condition check. If other CPU core sets the TASK_RUNNING state
+   after writeback thread setting TASK_INTERRUPTIBLE, the writeback thread
+   will be scheduled to run very soon because its state is not
+   TASK_INTERRUPTIBLE. If other CPU core sets the TASK_RUNNING state before
+   writeback thread setting TASK_INTERRUPTIBLE, the implict memory barrier
+   of wake_up_process() will make sure modification of dc->has_dirty on
+   other CPU core is updated and observed on the CPU core of writeback
+   thread. Therefore the condition check will correctly be false, and
+   continue writeback code without sleeping.
+2.2 condition "!dc->writeback_running)"
+   dc->writeback_running can be changed via sysfs file, every time it is
+   modified, a following bch_writeback_queue() is alwasy called. So the
+   change is always observed on the CPU core of writeback thread. If
+   dc->writeback_running is changed from 0 to 1 on other CPU core, this
+   condition check will observe the modification and allow writeback
+   thread to continue to run without sleeping.
+Now we can see, even without a locking protection, multiple conditions
+check is safe here, no deadlock or process hang up will happen.
+
+I compose a separte patch because that patch "bcache: fix cached_dev->count
+usage for bch_cache_set_error()" already gets a "Reviewed-by:" from Hannes
+Reinecke. Also this fix is not trivial and good for a separate patch.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Huijun Tang <tang.junhui@zte.com.cn>
 ---
- include/linux/irq-am.h |   2 +
- lib/irq-am.c           | 109 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 111 insertions(+)
+ drivers/md/bcache/writeback.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/irq-am.h b/include/linux/irq-am.h
-index 5ddd5ca268aa..18df315633a4 100644
---- a/include/linux/irq-am.h
-+++ b/include/linux/irq-am.h
-@@ -101,6 +101,8 @@ struct irq_am {
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index b280c134dd4d..4dbeaaa575bf 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -565,9 +565,15 @@ static int bch_writeback_thread(void *arg)
+ 	while (!kthread_should_stop()) {
+ 		down_write(&dc->writeback_lock);
+ 		set_current_state(TASK_INTERRUPTIBLE);
+-		if (!atomic_read(&dc->has_dirty) ||
+-		    (!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags) &&
+-		     !dc->writeback_running)) {
++		/*
++		 * If the bache device is detaching, skip here and continue
++		 * to perform writeback. Otherwise, if no dirty data on cache,
++		 * or there is dirty data on cache but writeback is disabled,
++		 * the writeback thread should sleep here and wait for others
++		 * to wake up it.
++		 */
++		if (!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags) &&
++		    (!atomic_read(&dc->has_dirty) || !dc->writeback_running)) {
+ 			up_write(&dc->writeback_lock);
  
- 	struct work_struct		work;
- 	irq_am_fn			*program;
-+	struct dentry			*debugfs_dir;
-+	int				id;
- };
+ 			if (kthread_should_stop()) {
+@@ -587,6 +593,14 @@ static int bch_writeback_thread(void *arg)
+ 			atomic_set(&dc->has_dirty, 0);
+ 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_CLEAN);
+ 			bch_write_bdev_super(dc, NULL);
++			/*
++			 * If bcache device is detaching via sysfs interface,
++			 * writeback thread should stop after there is no dirty
++			 * data on cache. BCACHE_DEV_DETACHING flag is set in
++			 * bch_cached_dev_detach().
++			 */
++			if (test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags))
++				break;
+ 		}
  
- void irq_am_add_event(struct irq_am *am);
-diff --git a/lib/irq-am.c b/lib/irq-am.c
-index ed7befd7a560..6cd2f131f5e8 100644
---- a/lib/irq-am.c
-+++ b/lib/irq-am.c
-@@ -12,6 +12,61 @@
-  * more details.
-  */
- #include <linux/irq-am.h>
-+#include <linux/debugfs.h>
-+
-+static DEFINE_IDA(am_ida);
-+
-+#ifdef CONFIG_DEBUG_FS
-+struct dentry *irq_am_debugfs_root;
-+
-+struct irq_am_debugfs_attr {
-+	const char *name;
-+	umode_t mode;
-+	int (*show)(void *, struct seq_file *);
-+	ssize_t (*write)(void *, const char __user *, size_t, loff_t *);
-+};
-+
-+static int irq_am_tune_state_show(void *data, struct seq_file *m)
-+{
-+	struct irq_am *am = data;
-+
-+	seq_printf(m, "%d\n", am->tune_state);
-+	return 0;
-+}
-+
-+static int irq_am_curr_level_show(void *data, struct seq_file *m)
-+{
-+	struct irq_am *am = data;
-+
-+	seq_printf(m, "%d\n", am->curr_level);
-+	return 0;
-+}
-+
-+static int irq_am_debugfs_show(struct seq_file *m, void *v)
-+{
-+	const struct irq_am_debugfs_attr *attr = m->private;
-+	void *data = d_inode(m->file->f_path.dentry->d_parent)->i_private;
-+
-+	return attr->show(data, m);
-+}
-+
-+static int irq_am_debugfs_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, irq_am_debugfs_show, inode->i_private);
-+}
-+
-+static const struct file_operations irq_am_debugfs_fops = {
-+	.open		= irq_am_debugfs_open,
-+	.read		= seq_read,
-+	.release	= seq_release,
-+};
-+
-+static const struct irq_am_debugfs_attr irq_am_attrs[] = {
-+	{"tune_state", 0400, irq_am_tune_state_show},
-+	{"curr_level", 0400, irq_am_curr_level_show},
-+	{},
-+};
-+#endif
- 
- static void irq_am_try_step(struct irq_am *am)
- {
-@@ -160,10 +215,51 @@ static void irq_am_program_moderation_work(struct work_struct *w)
- 	am->state = IRQ_AM_START_MEASURING;
- }
- 
-+#ifdef CONFIG_DEBUG_FS
-+static bool debugfs_create_files(struct dentry *parent, void *data,
-+				 const struct irq_am_debugfs_attr *attr)
-+{
-+	d_inode(parent)->i_private = data;
-+
-+	for (; attr->name; attr++) {
-+		if (!debugfs_create_file(attr->name, attr->mode, parent,
-+					 (void *)attr, &irq_am_debugfs_fops))
-+			return false;
-+	}
-+	return true;
-+}
-+
-+static int irq_am_register_debugfs(struct irq_am *am)
-+{
-+	char name[20];
-+
-+	snprintf(name, sizeof(name), "am%u", am->id);
-+	am->debugfs_dir = debugfs_create_dir(name,
-+				irq_am_debugfs_root);
-+	if (!am->debugfs_dir)
-+		return -ENOMEM;
-+
-+	if (!debugfs_create_files(am->debugfs_dir, am,
-+				irq_am_attrs))
-+		return -ENOMEM;
-+	return 0;
-+}
-+
-+static void irq_am_deregister_debugfs(struct irq_am *am)
-+{
-+	debugfs_remove_recursive(am->debugfs_dir);
-+}
-+
-+#else
-+static int irq_am_register_debugfs(struct irq_am *am) {}
-+static void irq_am_deregister_debugfs(struct irq_am *am) {}
-+#endif
- 
- void irq_am_cleanup(struct irq_am *am)
- {
- 	flush_work(&am->work);
-+	irq_am_deregister_debugfs(am);
-+	ida_simple_remove(&am_ida, am->id);
- }
- EXPORT_SYMBOL_GPL(irq_am_cleanup);
- 
-@@ -177,6 +273,19 @@ void irq_am_init(struct irq_am *am, unsigned int nr_events,
- 	am->nr_events = nr_events;
- 	am->curr_level = start_level;
- 	am->program = fn;
-+	am->id = ida_simple_get(&am_ida, 0, 0, GFP_KERNEL);
-+	WARN_ON(am->id < 0);
- 	INIT_WORK(&am->work, irq_am_program_moderation_work);
-+	if (irq_am_register_debugfs(am))
-+		pr_warn("irq-am %d failed to register debugfs\n", am->id);
- }
- EXPORT_SYMBOL_GPL(irq_am_init);
-+
-+static __init int irq_am_setup(void)
-+{
-+#ifdef CONFIG_DEBUG_FS
-+	irq_am_debugfs_root = debugfs_create_dir("irq_am", NULL);
-+#endif
-+	return 0;
-+}
-+subsys_initcall(irq_am_setup);
+ 		up_write(&dc->writeback_lock);
 -- 
-2.14.1
+2.16.1
