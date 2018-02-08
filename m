@@ -1,86 +1,45 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:41140 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751461AbeBBJcY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 2 Feb 2018 04:32:24 -0500
-From: NeilBrown <neilb@suse.com>
-To: Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com
-Date: Fri, 02 Feb 2018 16:59:55 +1100
-Subject: Re: [dm-devel] [LSF/MM TOPIC] block, dm: restack queue_limits
-In-Reply-To: <20180129210836.GA5744@redhat.com>
-References: <20180129210836.GA5744@redhat.com>
-Message-ID: <87607g2ap0.fsf@notabene.neil.brown.name>
+Return-Path: <prvs=570d9c77a=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@infradead.org" <hch@infradead.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "snitzer@redhat.com" <snitzer@redhat.com>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
+CC: "hch@lst.de" <hch@lst.de>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "hare@suse.de" <hare@suse.de>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"don.brace@microsemi.com" <don.brace@microsemi.com>,
+	"james.bottomley@hansenpartnership.com"
+	<james.bottomley@hansenpartnership.com>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "arun.easi@cavium.com" <arun.easi@cavium.com>,
+	"osandov@fb.com" <osandov@fb.com>, "loberman@redhat.com"
+	<loberman@redhat.com>, "kashyap.desai@broadcom.com"
+	<kashyap.desai@broadcom.com>, "peter.rivera@broadcom.com"
+	<peter.rivera@broadcom.com>
+Subject: Re: [PATCH V2 2/8] blk-mq: introduce BLK_MQ_F_GLOBAL_TAGS
+Date: Thu, 8 Feb 2018 15:25:51 +0000
+Message-ID: <1518103548.6826.2.camel@wdc.com>
+References: <20180205152035.15016-1-ming.lei@redhat.com>
+	 <20180205152035.15016-3-ming.lei@redhat.com>
+In-Reply-To: <20180205152035.15016-3-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-        micalg=pgp-sha256; protocol="application/pgp-signature"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
---=-=-=
-Content-Type: text/plain
-
-On Mon, Jan 29 2018, Mike Snitzer wrote:
-
-> We currently don't restack the queue_limits if the lowest, or
-> intermediate, layer of an IO stack changes.
->
-> This is particularly unfortunate in the case of FLUSH/FUA which may
-> change if/when a HW controller's BBU fails; whereby requiring the device
-> advertise that it has a volatile write cache (WCE=1).
->
-> But in the context of DM, really it'd be best if the entire stack of
-> devices had their limits restacked if any underlying layer's limits
-> change.
->
-> In the past, Martin and I discussed that we should "just do it" but
-> never did.  Not sure we need a lengthy discussion but figured I'd put it
-> out there.
-
-So much "yes"!!
-Just a notifier chain would probably do.
-
-I would like the notification to support changing the size of the device
-too.
-I see this as being two-stage.
-1/ I'm going to change the device size to X - are you all OK with that?
-2/ Device size is now X.
-
-That allows md and dm to check that filesystems aren't going to get mad
-when devices are made smaller, and can adjust (if they want to) when
-devices get bigger.
-
-Thanks,
-NeilBrown
-
->
-> Maybe I'll find time, between now and April, to try implementing it.
->
-> Thanks,
-> Mike
->
-> --
-> dm-devel mailing list
-> dm-devel@redhat.com
-> https://www.redhat.com/mailman/listinfo/dm-devel
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEG8Yp69OQ2HB7X0l6Oeye3VZigbkFAlpz/lsACgkQOeye3VZi
-gbn4QhAAwrK92tzJOSGQBiXNSHoZWcWZRwTl0AxKj1ZYzCjeifxig8XVdYUky8YK
-zGZzNttyc7S2tQ/+jbhyyWhAQ5vnNw0OI7UtU3nhcK6eSdAoiwKn1Hpy0fS/ybEJ
-5HaP/25TshhvgM0o1M2xCfGJ/GIRKbmGtUfqRGWkB55o0O6DCqSxMTiTwLEobBlq
-qONisCYfiStrFyfJKEOc1nCOVpqXhYW1zbWX8lWbHin/5RLMlCLbluF8kGH3TNCV
-Rce2rWbd/vcVpITyCo7Mmq3nlvGQREf/GFMlMG0amKzrNi6KUXWNRQDYNw3vyAf8
-t22HburtmneedDQQEVM/XxzASC/s/bv14y8WH5Xh/q+9Ny+45FqSgEK8lY8xjK8n
-2ul3h2QbC3m6GIXTLyzT/PkpH3qBI6F5hVqDKgYkTJrLwd6mED2CNsPLOkM68f0G
-HuQc17JbEKqoyj5hUDlNqenUi2ffyzlf+nicdg12GhiPw2bW5gYo2x8+5Rnb8sTf
-PutNEFKyJJS7YxFE8wZ3v4EmMgA4xIoc0gKq5mbafzyS0HcGz7J4+t2Lyjfn2KRF
-6aBKw1klui4dhFb+pcbpkDujYS1EJ/UJG/MnmLedda3FlzgP1I050W8nhCQ0ZSXK
-NcmZEo2BPNxzSnkyPr7mWwlV3hT0yz0cpnHlf1pVao8sGefWca8=
-=aSpN
------END PGP SIGNATURE-----
---=-=-=--
+T24gTW9uLCAyMDE4LTAyLTA1IGF0IDIzOjIwICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gZGlm
+ZiAtLWdpdCBhL2Jsb2NrL2Jsay1tcS1zY2hlZC5jIGIvYmxvY2svYmxrLW1xLXNjaGVkLmMNCj4g
+aW5kZXggNTVjMGE3NDViNDI3Li4zODViYmVjNzM4MDQgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL2Js
+ay1tcS1zY2hlZC5jDQo+ICsrKyBiL2Jsb2NrL2Jsay1tcS1zY2hlZC5jDQo+IEBAIC04MSw2ICs4
+MSwxNyBAQCBzdGF0aWMgYm9vbCBibGtfbXFfc2NoZWRfcmVzdGFydF9oY3R4KHN0cnVjdCBibGtf
+bXFfaHdfY3R4ICpoY3R4KQ0KPiAgCX0gZWxzZQ0KPiAgCQljbGVhcl9iaXQoQkxLX01RX1NfU0NI
+RURfUkVTVEFSVCwgJmhjdHgtPnN0YXRlKTsNCj4gIA0KPiArCS8qIG5lZWQgdG8gcmVzdGFydCBh
+bGwgaHcgcXVldWVzIGZvciBnbG9iYWwgdGFncyAqLw0KPiArCWlmIChoY3R4LT5mbGFncyAmIEJM
+S19NUV9GX0dMT0JBTF9UQUdTKSB7DQo+ICsJCXN0cnVjdCBibGtfbXFfaHdfY3R4ICpoY3R4MjsN
+Cj4gKwkJaW50IGk7DQo+ICsNCj4gKwkJcXVldWVfZm9yX2VhY2hfaHdfY3R4KGhjdHgtPnF1ZXVl
+LCBoY3R4MiwgaSkNCj4gKwkJCWlmIChibGtfbXFfcnVuX2h3X3F1ZXVlKGhjdHgyLCB0cnVlKSkN
+Cj4gKwkJCQlyZXR1cm4gdHJ1ZTsNCj4gKwkJcmV0dXJuIGZhbHNlOw0KPiArCX0NCj4gKw0KPiAg
+CXJldHVybiBibGtfbXFfcnVuX2h3X3F1ZXVlKGhjdHgsIHRydWUpOw0KPiAgfQ0KDQpJdCBzZWVt
+cyB3ZWlyZCB0byBtZSB0aGF0IG5vIG1hdHRlciBmb3Igd2hpY2ggaGFyZHdhcmUgcXVldWUgYSBy
+ZXN0YXJ0IGlzDQpyZXF1ZXN0ZWQgKHRoZSBoY3R4IGFyZ3VtZW50KSB0aGF0IHRoZSBhYm92ZSBs
+b29wIHN0YXJ0cyB3aXRoIGV4YW1pbmluZw0KdGhlIGhhcmR3YXJlIHF1ZXVlIHdpdGggaW5kZXgg
+MC4gV2lsbCB0aGlzIGNhdXNlIGZhaXJuZXNzIGFuZC9vciBjYWNoZQ0KbGluZSBib3VuY2luZyBw
+cm9ibGVtcz8NCg0KVGhhbmtzLA0KDQpCYXJ0Lg0KDQoNCg0KDQo=
