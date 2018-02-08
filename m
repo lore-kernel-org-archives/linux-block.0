@@ -1,33 +1,29 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
+Return-Path: <prvs=570d9c77a=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "sagi@grimberg.me"
+	<sagi@grimberg.me>
+CC: "hch@lst.de" <hch@lst.de>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
+	"idanb@mellanox.com" <idanb@mellanox.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
 Subject: Re: [PATCH rfc 3/5] irq_poll: wire up irq_am
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-Cc: "hch@lst.de" <hch@lst.de>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
- "idanb@mellanox.com" <idanb@mellanox.com>, "axboe@kernel.dk"
- <axboe@kernel.dk>
+Date: Thu, 8 Feb 2018 01:28:25 +0000
+Message-ID: <1518053304.2870.95.camel@wdc.com>
 References: <20180205220316.30236-1-sagi@grimberg.me>
- <20180205220316.30236-4-sagi@grimberg.me> <1518053304.2870.95.camel@wdc.com>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <5d0abc5a-5b5d-33d2-954c-3ec92272b99f@grimberg.me>
-Date: Mon, 12 Feb 2018 21:40:52 +0200
+	 <20180205220316.30236-4-sagi@grimberg.me>
+In-Reply-To: <20180205220316.30236-4-sagi@grimberg.me>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1518053304.2870.95.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Hey Bart,
-
->> +void irq_poll_init_am(struct irq_poll *iop, unsigned int nr_events,
->> +        unsigned short nr_levels, unsigned short start_level, irq_poll_am_fn *amfn)
->> +{
->> +	iop->amfn = amfn;
->> +	irq_am_init(&iop->am, nr_events, nr_levels, start_level, irq_poll_am);
->> +}
-> 
-> This function has a large number of parameters and most of them are passed verbatim to
-> irq_am_init(). Please consider to introduce a structure for these parameters such that
-> the number of function arguments stays reasonable.
-
-I can definitely change that.
+T24gVHVlLCAyMDE4LTAyLTA2IGF0IDAwOjAzICswMjAwLCBTYWdpIEdyaW1iZXJnIHdyb3RlOg0K
+PiArdm9pZCBpcnFfcG9sbF9pbml0X2FtKHN0cnVjdCBpcnFfcG9sbCAqaW9wLCB1bnNpZ25lZCBp
+bnQgbnJfZXZlbnRzLA0KPiArICAgICAgICB1bnNpZ25lZCBzaG9ydCBucl9sZXZlbHMsIHVuc2ln
+bmVkIHNob3J0IHN0YXJ0X2xldmVsLCBpcnFfcG9sbF9hbV9mbiAqYW1mbikNCj4gK3sNCj4gKwlp
+b3AtPmFtZm4gPSBhbWZuOw0KPiArCWlycV9hbV9pbml0KCZpb3AtPmFtLCBucl9ldmVudHMsIG5y
+X2xldmVscywgc3RhcnRfbGV2ZWwsIGlycV9wb2xsX2FtKTsNCj4gK30NCg0KVGhpcyBmdW5jdGlv
+biBoYXMgYSBsYXJnZSBudW1iZXIgb2YgcGFyYW1ldGVycyBhbmQgbW9zdCBvZiB0aGVtIGFyZSBw
+YXNzZWQgdmVyYmF0aW0gdG8NCmlycV9hbV9pbml0KCkuIFBsZWFzZSBjb25zaWRlciB0byBpbnRy
+b2R1Y2UgYSBzdHJ1Y3R1cmUgZm9yIHRoZXNlIHBhcmFtZXRlcnMgc3VjaCB0aGF0DQp0aGUgbnVt
+YmVyIG9mIGZ1bmN0aW9uIGFyZ3VtZW50cyBzdGF5cyByZWFzb25hYmxlLg0KDQpUaGFua3MsDQoN
+CkJhcnQuDQoNCg0KDQo=
