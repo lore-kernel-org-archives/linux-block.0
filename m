@@ -1,275 +1,66 @@
-Return-Path: <roman.penyaev@profitbricks.com>
-Return-Path: <roman.penyaev@profitbricks.com>
-From: Roman Pen <roman.penyaev@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Or Gerlitz <ogerlitz@mellanox.com>,
-	Roman Pen <roman.penyaev@profitbricks.com>,
-	Danil Kipnis <danil.kipnis@profitbricks.com>,
-	Jack Wang <jinpu.wang@profitbricks.com>
-Subject: [PATCH 13/24] ibtrs: a bit of documentation
-Date: Fri,  2 Feb 2018 15:08:53 +0100
-Message-Id: <20180202140904.2017-14-roman.penyaev@profitbricks.com>
-In-Reply-To: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
+Return-Path: <prvs=570d9c77a=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "danil.kipnis@profitbricks.com" <danil.kipnis@profitbricks.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"hch@infradead.org" <hch@infradead.org>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "roman.penyaev@profitbricks.com"
+	<roman.penyaev@profitbricks.com>, "jinpu.wang@profitbricks.com"
+	<jinpu.wang@profitbricks.com>, "ogerlitz@mellanox.com"
+	<ogerlitz@mellanox.com>, "sagi@grimberg.me" <sagi@grimberg.me>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "cl@linux.com" <cl@linux.com>
+Subject: Re: [PATCH 00/24] InfiniBand Transport (IBTRS) and Network Block
+ Device (IBNBD)
+Date: Thu, 8 Feb 2018 18:09:56 +0000
+Message-ID: <1518113395.3611.54.camel@wdc.com>
 References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
+	 <1517591106.2675.28.camel@sandisk.com>
+	 <CAMGffEkhqR9Z5bkMfnVn8an2OUM8k+jYoR5EFdtv3k9en1bh=w@mail.gmail.com>
+	 <1517847408.3764.5.camel@wdc.com>
+	 <alpine.DEB.2.20.1802071031590.21957@nuc-kabylake>
+	 <CAJrWOzBrbV0yJvCvKxAK2Arujf7wiCx_Xoo9jdiwDRj93Lq7Yg@mail.gmail.com>
+	 <1518024719.2870.39.camel@wdc.com>
+	 <CAHg0HuxRz4=fhX1P3yk9sQ+q_MUXoj=062aQ9fcwP8awjm09jA@mail.gmail.com>
+In-Reply-To: <CAHg0HuxRz4=fhX1P3yk9sQ+q_MUXoj=062aQ9fcwP8awjm09jA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-README with description of major sysfs entries.
-
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
-Cc: Jack Wang <jinpu.wang@profitbricks.com>
----
- drivers/infiniband/ulp/ibtrs/README | 238 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 238 insertions(+)
-
-diff --git a/drivers/infiniband/ulp/ibtrs/README b/drivers/infiniband/ulp/ibtrs/README
-new file mode 100644
-index 000000000000..ed506c7e202d
---- /dev/null
-+++ b/drivers/infiniband/ulp/ibtrs/README
-@@ -0,0 +1,238 @@
-+****************************
-+InfiniBand Transport (IBTRS)
-+****************************
-+
-+IBTRS (InfiniBand Transport) is a reliable high speed transport library
-+which provides support to establish optimal number of connections
-+between client and server machines using RDMA (InfiniBand, RoCE, iWarp)
-+transport. It is optimized to transfer (read/write) IO blocks.
-+
-+In its core interface it follows the BIO semantics of providing the
-+possibility to either write data from an sg list to the remote side
-+or to request ("read") data transfer from the remote side into a given
-+sg list.
-+
-+IBTRS provides I/O fail-over and load-balancing capabilities by using
-+multipath I/O (see "add_path" and "mp_policy" configuration entries).
-+
-+IBTRS is used by the IBNBD (Infiniband Network Block Device) modules.
-+
-+======================
-+Client Sysfs Interface
-+======================
-+
-+This chapter describes only the most important files of sysfs interface
-+on client side.
-+
-+Entries under /sys/kernel/ibtrs_client/
-+=======================================
-+
-+When a user of IBTRS API creates a new session, a directory entry with
-+the name of that session is created.
-+
-+Entries under /sys/kernel/ibtrs_client/<session-name>/
-+======================================================
-+
-+add_path (RW)
-+-------------
-+
-+Adds a new path (connection) to an existing session. Expected format is the
-+following:
-+
-+  <[source addr,]destination addr>
-+
-+  *addr ::= [ ip:<ipv4|ipv6> | gid:<gid> ]
-+
-+max_reconnect_attempts (RW)
-+---------------------------
-+
-+Maximum number reconnect attempts the client should make before giving up
-+after connection breaks unexpectedly.
-+
-+mp_policy (RW)
-+--------------
-+
-+Multipath policy specifies which path should be selected on each IO:
-+
-+   round-robin (0):
-+       select path in per CPU round-robin manner.
-+
-+   min-inflight (1):
-+       select path with minimum inflights.
-+
-+Entries under /sys/kernel/ibtrs_client/<session-name>/paths/
-+============================================================
-+
-+
-+Each path belonging to a given session is listed here by its destination
-+address. When a new path is added to a session by writing to the "add_path"
-+entry, a directory with the corresponding destination address is created.
-+
-+Entries under /sys/kernel/ibtrs_client/<session-name>/paths/<dest-addr>/
-+========================================================================
-+
-+state (R)
-+---------
-+
-+Contains "connected" if the session is connected to the peer and fully
-+functional.  Otherwise the file contains "disconnected"
-+
-+reconnect (RW)
-+--------------
-+
-+Write "1" to the file in order to reconnect the path.
-+Operation is blocking and returns 0 if reconnect was successfull.
-+
-+disconnect (RW)
-+---------------
-+
-+Write "1" to the file in order to disconnect the path.
-+Operation blocks until IBTRS path is disconnected.
-+
-+remove_path (RW)
-+----------------
-+
-+Write "1" to the file in order to disconnected and remove the path
-+from the session.  Operation blocks until the path is disconnected
-+and removed from the session.
-+
-+Entries under /sys/kernel/ibtrs_client/<session-name>/paths/<dest-addr>/stats/
-+==============================================================================
-+
-+Write "0" to any file in that directory to reset corresponding statistics.
-+
-+reset_all (RW)
-+--------------
-+
-+Read will return usage help, write 0 will clear all the statistics.
-+
-+sg_entries (RW)
-+---------------
-+
-+Data to be transfered via RDMA is passed to IBTRS as scather-gather
-+list. A scather-gather list can contain multiple entries.
-+Scather-gather list with less entries require less processing power
-+and can therefore transfered faster. The file sg_entries outputs a
-+per-CPU distribution table for the number of entries in the
-+scather-gather lists, that were passed to the IBTRS API function
-+ibtrs_clt_request (READ or WRITE).
-+
-+cpu_migration (RW)
-+------------------
-+
-+IBTRS expects that each HCA IRQ is pinned to a separate CPU. If it's
-+not the case, the processing of an I/O response could be processed on a
-+different CPU than where it was originally submitted.  This file shows
-+how many interrupts where generated on a non expected CPU.
-+"from:" is the CPU on which the IRQ was expected, but not generated.
-+"to:" is the CPU on which the IRQ was generated, but not expected.
-+
-+reconnects (RW)
-+---------------
-+
-+Contains 2 unsigned int values, the first one records number of successful
-+reconnects in the path lifetime, the second one records number of failed
-+reconnects in the path lifetime.
-+
-+rdma_lat (RW)
-+-------------
-+
-+Latency distribution of IBTRS requests.
-+The format is:
-+   1 ms: <CNT-LAT-READ> <CNT-LAT-WRITE>
-+   2 ms: <CNT-LAT-READ> <CNT-LAT-WRITE>
-+   4 ms: <CNT-LAT-READ> <CNT-LAT-WRITE>
-+   8 ms: <CNT-LAT-READ> <CNT-LAT-WRITE>
-+  16 ms: <CNT-LAT-READ> <CNT-LAT-WRITE>
-+  ...
-+  65536 ms: <CNT-LAT-READ> <CNT-LAT-WRITE>
-+  >= 65536 ms: <CNT-LAT-READ> <CNT-LAT-WRITE>
-+  maximum ms: <CNT-LAT-READ> <CNT-LAT-WRITE>
-+
-+wc_completion (RW)
-+------------------
-+
-+Contains 2 unsigned int values, the first one records max number of work
-+requests processed in work_completion in session lifetime, the second
-+one records average number of work requests processed in work_completion
-+in session lifetime.
-+
-+rdma (RW)
-+---------
-+
-+Contains statistics regarding rdma operations and inflight operations.
-+The output consists of 6 values:
-+
-+<read-count> <read-total-size> <write-count> <write-total-size> \
-+<inflights> <failovered>
-+
-+======================
-+Server Sysfs Interface
-+======================
-+
-+Entries under /sys/kernel/ibtrs_server/
-+=======================================
-+
-+When a user of IBTRS API creates a new session on a client side, a
-+directory entry with the name of that session is created in here.
-+
-+Entries under /sys/kernel/ibtrs_server/<session-name>/paths/
-+============================================================
-+
-+When new path is created by writing to "add_path" entry on client side,
-+a directory entry with source address is created on server.
-+
-+Entries under /sys/kernel/ibtrs_server/<session-name>/paths/<source-addr>/
-+==========================================================================
-+
-+disconnect (RW)
-+---------------
-+
-+When "1" is written to the file, the IBTRS session is being disconnected.
-+Oprations is non-blocking and returns control immediately to the caller.
-+
-+hca_name (R)
-+------------
-+
-+Contains the the name of HCA the connection established on.
-+
-+hca_port (R)
-+------------
-+
-+Contains the port number of active port traffic is going through.
-+
-+Entries under /sys/kernel/ibtrs_server/<session-name>/paths/<source-addr>/stats/
-+================================================================================
-+
-+When "0" is written to a file in this directory, the corresponding counters
-+will be reset.
-+
-+reset_all (RW)
-+--------------
-+
-+Read will return usage help, write 0 will clear all the counters about
-+stats.
-+
-+rdma (RW)
-+---------
-+
-+Contains statistics regarding rdma operations and inflight operations.
-+The output consists of 5 values:
-+
-+<read-count> <read-total-size> <write-count> <write-total-size> <inflights>
-+
-+wc_completion (RW)
-+------------------
-+
-+Contains 3 values, the first one is int, records max number of work
-+requests processed in work_completion in session lifetime, the second
-+one long int records total number of work requests processed in
-+work_completion in session lifetime and the 3rd one long int records
-+total number of calls to the cq completion handler. Devision of 2nd
-+number through 3rd gives the average number of completions processed
-+in completion handler.
-+
-+Contact
-+-------
-+
-+Mailing list: "IBNBD/IBTRS Storage Team" <ibnbd@profitbricks.com>
--- 
-2.13.1
+T24gVGh1LCAyMDE4LTAyLTA4IGF0IDE4OjM4ICswMTAwLCBEYW5pbCBLaXBuaXMgd3JvdGU6DQo+
+IHRoYW5rcyBmb3IgdGhlIGxpbmsgdG8gdGhlIGFydGljbGUuIFRvIHRoZSBiZXN0IG9mIG15IHVu
+ZGVyc3RhbmRpbmcsDQo+IHRoZSBndXlzIHN1Z2dlc3QgdG8gYXV0aGVudGljYXRlIHRoZSBkZXZp
+Y2VzIGZpcnN0IGFuZCBvbmx5IHRoZW4NCj4gYXV0aGVudGljYXRlIHRoZSB1c2VycyB3aG8gdXNl
+IHRoZSBkZXZpY2VzIGluIG9yZGVyIHRvIGdldCBhY2Nlc3MgdG8gYQ0KPiBjb3Jwb3JhdGUgc2Vy
+dmljZS4gVGhleSBhbHNvIG1lbnRpb24gaW4gdGhlIHByZXNlbnRhdGlvbiB0aGUgY3VycmVudA0K
+PiB0cmVuZCBvZiBtb3ZpbmcgY29ycG9yYXRlIHNlcnZpY2VzIGludG8gdGhlIGNsb3VkLiBCdXQg
+SSB0aGluayB0aGlzIGlzDQo+IG5vdCBhYm91dCB0aGUgZGV2aWNlcyBmcm9tIHdoaWNoIHRoYXQg
+Y2xvdWQgaXMgYnVpbGQgb2YuIElzbid0IGEgY2xvdWQNCj4gZmlyc3QgYnVpbGQgb3V0IG9mIGRl
+dmljZXMgY29ubmVjdGVkIHZpYSBJQiBhbmQgdGhlbiB1c2VycyAoYW5kIHRoZWlyDQo+IGRldmlj
+ZXMpIGFyZSBwcm92aWRlZCBhY2Nlc3MgdG8gdGhlIHNlcnZpY2VzIG9mIHRoYXQgY2xvdWQgYXMg
+YSB3aG9sZT8NCj4gSWYgYSBtYWxpY2lvdXMgdXNlciBhbHJlYWR5IHBsdWdnZWQgaGlzIGRldmlj
+ZSBpbnRvIGFuIElCIHN3aXRjaCBvZiBhDQo+IGNsb3VkIGludGVybmFsIGluZnJhc3RydWN0dXJl
+LCBpc24ndCBpdCBnYW1lIG92ZXIgYW55d2F5PyBDYW4ndCBoZQ0KPiBqdXN0IHRha2UgdGhlIGhh
+cmQgZHJpdmVzIGluc3RlYWQgb2YgbWFwcGluZyB0aGVtPw0KDQpIZWxsbyBEYW5pbCwNCg0KSXQg
+c2VlbXMgbGlrZSB3ZSBlYWNoIGhhdmUgYmVlbiBmb2N1c3Npbmcgb24gZGlmZmVyZW50IGFzcGVj
+dHMgb2YgdGhlIGFydGljbGUuDQpUaGUgcmVhc29uIEkgcmVmZXJyZWQgdG8gdGhhdCBhcnRpY2xl
+IGlzIGJlY2F1c2UgSSByZWFkIHRoZSBmb2xsb3dpbmcgaW4NCnRoYXQgYXJ0aWNsZTogIlVubGlr
+ZSB0aGUgY29udmVudGlvbmFsIHBlcmltZXRlciBzZWN1cml0eSBtb2RlbCwgQmV5b25kQ29ycA0K
+ZG9lc27igJl0IGdhdGUgYWNjZXNzIHRvIHNlcnZpY2VzIGFuZCB0b29scyBiYXNlZCBvbiBhIHVz
+ZXLigJlzIHBoeXNpY2FsIGxvY2F0aW9uDQpvciB0aGUgb3JpZ2luYXRpbmcgbmV0d29yayBbIC4u
+LiBdIFRoZSB6ZXJvIHRydXN0IGFyY2hpdGVjdHVyZSBzcGVsbHMgdHJvdWJsZQ0KZm9yIHRyYWRp
+dGlvbmFsIGF0dGFja3MgdGhhdCByZWx5IG9uIHBlbmV0cmF0aW5nIGEgdG91Z2ggcGVyaW1ldGVy
+IHRvIHdhbHR6DQpmcmVlbHkgd2l0aGluIGFuIG9wZW4gaW50ZXJuYWwgbmV0d29yay4iIFN1cHBv
+c2UgZS5nLiB0aGF0IGFuIG9yZ2FuaXphdGlvbg0KZGVjaWRlcyB0byB1c2UgUm9DRSBvciBpV0FS
+UCBmb3IgY29ubmVjdGl2aXR5IGJldHdlZW4gYmxvY2sgc3RvcmFnZSBpbml0aWF0b3INCnN5c3Rl
+bXMgYW5kIGJsb2NrIHN0b3JhZ2UgdGFyZ2V0IHN5c3RlbXMgYW5kIHRoYXQgaXQgaGFzIGEgc2lu
+Z2xlIGNvbXBhbnktDQp3aWRlIEV0aGVybmV0IG5ldHdvcmsuIElmIHRoZSB0YXJnZXQgc3lzdGVt
+IGRvZXMgbm90IHJlc3RyaWN0IGFjY2VzcyBiYXNlZA0Kb24gaW5pdGlhdG9yIElQIGFkZHJlc3Mg
+dGhlbiBhbnkgcGVuZXRyYXRvciB3b3VsZCBiZSBhYmxlIHRvIGFjY2VzcyBhbGwgdGhlDQpibG9j
+ayBkZXZpY2VzIGV4cG9ydGVkIGJ5IHRoZSB0YXJnZXQgYWZ0ZXIgYSBTb2Z0Um9DRSBvciBTb2Z0
+aVdBUlAgaW5pdGlhdG9yDQpkcml2ZXIgaGFzIGJlZW4gbG9hZGVkLiBJZiB0aGUgdGFyZ2V0IHN5
+c3RlbSBob3dldmVyIHJlc3RyaWN0cyBhY2Nlc3MgYmFzZWQNCm9uIHRoZSBpbml0aWF0b3IgSVAg
+YWRkcmVzcyB0aGVuIHRoYXQgd291bGQgbWFrZSBpdCBoYXJkZXIgZm9yIGEgcGVuZXRyYXRvcg0K
+dG8gYWNjZXNzIHRoZSBleHBvcnRlZCBibG9jayBzdG9yYWdlIGRldmljZXMuIEluc3RlYWQgb2Yg
+anVzdCBwZW5ldHJhdGluZyB0aGUNCm5ldHdvcmsgYWNjZXNzLCBJUCBhZGRyZXNzIHNwb29maW5n
+IHdvdWxkIGhhdmUgdG8gYmUgdXNlZCBvciBhY2Nlc3Mgd291bGQNCmhhdmUgdG8gYmUgb2J0YWlu
+ZWQgdG8gYSBzeXN0ZW0gdGhhdCBoYXMgYmVlbiBncmFudGVkIGFjY2VzcyB0byB0aGUgdGFyZ2V0
+DQpzeXN0ZW0uDQoNClRoYW5rcywNCg0KQmFydC4NCg0KDQo=
