@@ -1,89 +1,50 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:37707 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752141AbeBFEVW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Feb 2018 23:21:22 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Michael Lyle <mlyle@lyle.org>
-Subject: [PATCH v5 01/10] bcache: set writeback_rate_update_seconds in range [1, 60] seconds
-Date: Tue,  6 Feb 2018 12:20:51 +0800
-Message-Id: <20180206042100.65021-2-colyli@suse.de>
-In-Reply-To: <20180206042100.65021-1-colyli@suse.de>
-References: <20180206042100.65021-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: linux-block@vger.kernel.org
+Subject: [PATCH V2 0/4] lightnvm: base 2.0 implementation
+Date: Fri,  9 Feb 2018 10:27:15 +0100
+Message-Id: <20180209092719.10679-1-mb@lightnvm.io>
+MIME-Version: 1.0
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: javier@cnexlabs.com, =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-dc->writeback_rate_update_seconds can be set via sysfs and its value can
-be set to [1, ULONG_MAX].  It does not make sense to set such a large
-value, 60 seconds is long enough value considering the default 5 seconds
-works well for long time.
-
-Because dc->writeback_rate_update is a special delayed work, it re-arms
-itself inside the delayed work routine update_writeback_rate(). When
-stopping it by cancel_delayed_work_sync(), there should be a timeout to
-wait and make sure the re-armed delayed work is stopped too. A small max
-value of dc->writeback_rate_update_seconds is also helpful to decide a
-reasonable small timeout.
-
-This patch limits sysfs interface to set dc->writeback_rate_update_seconds
-in range of [1, 60] seconds, and replaces the hand-coded number by macros.
-
-Changelog:
-v2: fix a rebase typo in v4, which is pointed out by Michael Lyle.
-v1: initial version.
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Cc: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/sysfs.c     | 4 +++-
- drivers/md/bcache/writeback.c | 2 +-
- drivers/md/bcache/writeback.h | 3 +++
- 3 files changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index c524305cc9a7..4a6a697e1680 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -218,7 +218,9 @@ STORE(__cached_dev)
- 	sysfs_strtoul_clamp(writeback_rate,
- 			    dc->writeback_rate.rate, 1, INT_MAX);
- 
--	d_strtoul_nonzero(writeback_rate_update_seconds);
-+	sysfs_strtoul_clamp(writeback_rate_update_seconds,
-+			    dc->writeback_rate_update_seconds,
-+			    1, WRITEBACK_RATE_UPDATE_SECS_MAX);
- 	d_strtoul(writeback_rate_i_term_inverse);
- 	d_strtoul_nonzero(writeback_rate_p_term_inverse);
- 
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 58218f7e77c3..f1d2fc15abcc 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -655,7 +655,7 @@ void bch_cached_dev_writeback_init(struct cached_dev *dc)
- 	dc->writeback_rate.rate		= 1024;
- 	dc->writeback_rate_minimum	= 8;
- 
--	dc->writeback_rate_update_seconds = 5;
-+	dc->writeback_rate_update_seconds = WRITEBACK_RATE_UPDATE_SECS_DEFAULT;
- 	dc->writeback_rate_p_term_inverse = 40;
- 	dc->writeback_rate_i_term_inverse = 10000;
- 
-diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
-index 66f1c527fa24..587b25599856 100644
---- a/drivers/md/bcache/writeback.h
-+++ b/drivers/md/bcache/writeback.h
-@@ -8,6 +8,9 @@
- #define MAX_WRITEBACKS_IN_PASS  5
- #define MAX_WRITESIZE_IN_PASS   5000	/* *512b */
- 
-+#define WRITEBACK_RATE_UPDATE_SECS_MAX		60
-+#define WRITEBACK_RATE_UPDATE_SECS_DEFAULT	5
-+
- /*
-  * 14 (16384ths) is chosen here as something that each backing device
-  * should be a reasonable fraction of the share, and not to blow up
--- 
-2.16.1
+QSBjb3VwbGUgb2YgcGF0Y2hlcyBmb3IgMi4wIHN1cHBvcnQgZm9yIHRoZSBsaWdodG52bSBzdWJz
+eXN0ZW0uIFRoZXkKZm9ybSB0aGUgYmFzaXMgZm9yIGludGVncmF0aW5nIDIuMCBzdXBwb3J0LgoK
+Rm9yIHRoZSByZXN0IG9mIHRoZSBzdXBwb3J0LCBKYXZpZXIgaGFzIGNvZGUgdGhhdCBpbXBsZW1l
+bnRzIHJlcG9ydApjaHVuayBhbmQgc2V0cyB1cCB0aGUgTEJBIGZvcm1hdCBkYXRhIHN0cnVjdHVy
+ZS4gSGUgYWxzbyBoYXMgYSBidW5jaApvZiBwYXRjaGVzIHRoYXQgYnJpbmdzIHBibGsgdXAgdG8g
+c3BlZWQuCgpUaGUgZmlyc3QgdHdvIHBhdGNoZXMgaXMgcHJlcGFyYXRpb24gZm9yIHRoZSAyLjAg
+d29yay4gVGhlIHRoaXJkIHBhdGNoCmltcGxlbWVudHMgdGhlIDIuMCBkYXRhIHN0cnVjdHVyZXMs
+IHRoZSBnZW9tZXRyeSBjb21tYW5kLCBhbmQgZXhwb3Nlcwp0aGUgc3lzZnMgYXR0cmlidXRlcyB0
+aGF0IGNvbWVzIHdpdGggdGhlIDIuMCBzcGVjaWZpY2F0aW9uLiBOb3RlIHRoYXQKdGhlIGF0dHJp
+YnV0ZXMgYmV0d2VlbiAxLjIgYW5kIDIuMCBhcmUgZGlmZmVyZW50LCBhbmQgaXQgaXMgZXhwZWN0
+ZWQKdGhhdCB1c2VyLXNwYWNlIHNoYWxsIHVzZSB0aGUgdmVyc2lvbiBzeXNmcyBhdHRyaWJ1dGUg
+dG8ga25vdyB3aGljaAphdHRyaWJ1dGVzIHdpbGwgYmUgYXZhaWxhYmxlLgoKVGhlIGxhc3QgcGF0
+Y2ggaW1wbGVtZW50cyBzdXBwb3J0IGZvciB1c2luZyB0aGUgbnZtZSBuYW1lc3BhY2UgbG9naWNh
+bApibG9jayBhbmQgbWV0YWRhdGEgZmllbGRzIGFuZCBzeW5jIGl0IHdpdGggdGhlIGludGVybmFs
+IGxpZ2h0bnZtCmlkZW50aWZ5IHN0cnVjdHVyZXMuCgpDaGFuZ2VzIHNpbmNlIHYxOgoKIC0gcHJf
+ZXJyIGZpeCBmcm9tIFJhbmR5LgogLSBBZGRyZXNzIHR5cGUgZml4IGZyb20gSmF2aWVyLgogLSBB
+bHNvIENDIHRoZSBudm1lIG1haWxpbmcgbGlzdC4KCk1hdGlhcyBCasO4cmxpbmcgKDQpOgogIGxp
+Z2h0bnZtOiBtYWtlIDEuMiBkYXRhIHN0cnVjdHVyZXMgZXhwbGljaXQKICBsaWdodG52bTogZmxh
+dHRlbiBudm1faWRfZ3JvdXAgaW50byBudm1faWQKICBsaWdodG52bTogYWRkIDIuMCBnZW9tZXRy
+eSBpZGVudGlmaWNhdGlvbgogIG52bWU6IGxpZ2h0bnZtOiBhZGQgbGF0ZSBzZXR1cCBvZiBibG9j
+ayBzaXplIGFuZCBtZXRhZGF0YQoKIGRyaXZlcnMvbGlnaHRudm0vY29yZS5jICAgICAgfCAgMzMg
+KystCiBkcml2ZXJzL252bWUvaG9zdC9jb3JlLmMgICAgIHwgICAyICsKIGRyaXZlcnMvbnZtZS9o
+b3N0L2xpZ2h0bnZtLmMgfCA1MDggKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0t
+LS0tLS0tLQogZHJpdmVycy9udm1lL2hvc3QvbnZtZS5oICAgICB8ICAgMiArCiBpbmNsdWRlL2xp
+bnV4L2xpZ2h0bnZtLmggICAgIHwgIDY0ICsrKy0tLQogNSBmaWxlcyBjaGFuZ2VkLCA0MjggaW5z
+ZXJ0aW9ucygrKSwgMTgxIGRlbGV0aW9ucygtKQoKLS0gCjIuMTEuMAoKCl9fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkxpbnV4LW52bWUgbWFpbGluZyBsaXN0
+CkxpbnV4LW52bWVAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8vbGlzdHMuaW5mcmFkZWFkLm9y
+Zy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4LW52bWUK
