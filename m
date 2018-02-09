@@ -1,173 +1,325 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 2/5] genirq/affinity: move actual irq vector spread into one helper
-Date: Tue,  6 Feb 2018 20:17:39 +0800
-Message-Id: <20180206121742.29336-3-ming.lei@redhat.com>
-In-Reply-To: <20180206121742.29336-1-ming.lei@redhat.com>
-References: <20180206121742.29336-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:44007 "EHLO
+        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752647AbeBIJ1q (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Feb 2018 04:27:46 -0500
+Received: by mail-lf0-f67.google.com with SMTP id a25so1025779lfg.10
+        for <linux-block@vger.kernel.org>; Fri, 09 Feb 2018 01:27:45 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        javier@cnexlabs.com,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [PATCH V2 2/4] lightnvm: flatten nvm_id_group into nvm_id
+Date: Fri,  9 Feb 2018 10:27:17 +0100
+Message-Id: <20180209092719.10679-3-mb@lightnvm.io>
+In-Reply-To: <20180209092719.10679-1-mb@lightnvm.io>
+References: <20180209092719.10679-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-No functional change, just prepare for converting to 2-stage
-irq vector spread.
+There are no groups in the 2.0 specification, make sure that the
+nvm_id structure is flattened before 2.0 data structures are added.
 
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- kernel/irq/affinity.c | 99 +++++++++++++++++++++++++++++----------------------
- 1 file changed, 56 insertions(+), 43 deletions(-)
+ drivers/lightnvm/core.c      |  25 ++++++-----
+ drivers/nvme/host/lightnvm.c | 100 +++++++++++++++++++++----------------------
+ include/linux/lightnvm.h     |  53 +++++++++++------------
+ 3 files changed, 86 insertions(+), 92 deletions(-)
 
-diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
-index 4b1c4763212d..6af3f6727f63 100644
---- a/kernel/irq/affinity.c
-+++ b/kernel/irq/affinity.c
-@@ -79,7 +79,7 @@ static void build_node_to_cpumask(cpumask_var_t *masks)
- 		cpumask_set_cpu(cpu, masks[cpu_to_node(cpu)]);
- }
- 
--static int get_nodes_in_cpumask(cpumask_var_t *node_to_cpumask,
-+static int get_nodes_in_cpumask(const cpumask_var_t *node_to_cpumask,
- 				const struct cpumask *mask, nodemask_t *nodemsk)
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index dcc9e621e651..c72863b36439 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -851,33 +851,32 @@ EXPORT_SYMBOL(nvm_get_tgt_bb_tbl);
+ static int nvm_core_init(struct nvm_dev *dev)
  {
- 	int n, nodes = 0;
-@@ -94,50 +94,19 @@ static int get_nodes_in_cpumask(cpumask_var_t *node_to_cpumask,
- 	return nodes;
- }
+ 	struct nvm_id *id = &dev->identity;
+-	struct nvm_id_group *grp = &id->grp;
+ 	struct nvm_geo *geo = &dev->geo;
+ 	int ret;
  
--/**
-- * irq_create_affinity_masks - Create affinity masks for multiqueue spreading
-- * @nvecs:	The total number of vectors
-- * @affd:	Description of the affinity requirements
-- *
-- * Returns the masks pointer or NULL if allocation failed.
-- */
--struct cpumask *
--irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
-+int irq_build_affinity_masks(int nvecs, const struct irq_affinity *affd,
-+			     const cpumask_var_t *node_to_cpumask,
-+			     const struct cpumask *cpu_mask,
-+			     struct cpumask *nmsk,
-+			     struct cpumask *masks)
- {
--	int n, nodes, cpus_per_vec, extra_vecs, curvec;
- 	int affv = nvecs - affd->pre_vectors - affd->post_vectors;
- 	int last_affv = affv + affd->pre_vectors;
-+	int curvec = affd->pre_vectors;
- 	nodemask_t nodemsk = NODE_MASK_NONE;
--	struct cpumask *masks;
--	cpumask_var_t nmsk, *node_to_cpumask;
--
--	/*
--	 * If there aren't any vectors left after applying the pre/post
--	 * vectors don't bother with assigning affinity.
--	 */
--	if (!affv)
--		return NULL;
--
--	if (!zalloc_cpumask_var(&nmsk, GFP_KERNEL))
--		return NULL;
--
--	masks = kcalloc(nvecs, sizeof(*masks), GFP_KERNEL);
--	if (!masks)
--		goto out;
-+	int n, nodes, cpus_per_vec, extra_vecs;
+ 	memcpy(&geo->ppaf, &id->ppaf, sizeof(struct nvm_addr_format));
  
--	node_to_cpumask = alloc_node_to_cpumask();
--	if (!node_to_cpumask)
--		goto out;
--
--	/* Fill out vectors at the beginning that don't need affinity */
--	for (curvec = 0; curvec < affd->pre_vectors; curvec++)
--		cpumask_copy(masks + curvec, irq_default_affinity);
--
--	/* Stabilize the cpumasks */
--	get_online_cpus();
--	build_node_to_cpumask(node_to_cpumask);
--	nodes = get_nodes_in_cpumask(node_to_cpumask, cpu_possible_mask,
--				     &nodemsk);
-+	nodes = get_nodes_in_cpumask(node_to_cpumask, cpu_mask, &nodemsk);
- 
- 	/*
- 	 * If the number of nodes in the mask is greater than or equal the
-@@ -150,7 +119,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 			if (++curvec == last_affv)
- 				break;
- 		}
--		goto done;
-+		goto out;
+-	if (grp->mtype != 0) {
++	if (id->mtype != 0) {
+ 		pr_err("nvm: memory type not supported\n");
+ 		return -EINVAL;
  	}
  
- 	for_each_node_mask(n, nodemsk) {
-@@ -160,7 +129,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 		vecs_per_node = (affv - (curvec - affd->pre_vectors)) / nodes;
+ 	/* Whole device values */
+-	geo->nr_chnls = grp->num_ch;
+-	geo->nr_luns = grp->num_lun;
++	geo->nr_chnls = id->num_ch;
++	geo->nr_luns = id->num_lun;
  
- 		/* Get the cpus on this node which are in the mask */
--		cpumask_and(nmsk, cpu_possible_mask, node_to_cpumask[n]);
-+		cpumask_and(nmsk, cpu_mask, node_to_cpumask[n]);
+ 	/* Generic device geometry values */
+-	geo->ws_min = grp->ws_min;
+-	geo->ws_opt = grp->ws_opt;
+-	geo->ws_seq = grp->ws_seq;
+-	geo->ws_per_chk = grp->ws_per_chk;
+-	geo->nr_chks = grp->num_chk;
+-	geo->sec_size = grp->csecs;
+-	geo->oob_size = grp->sos;
+-	geo->mccap = grp->mccap;
++	geo->ws_min = id->ws_min;
++	geo->ws_opt = id->ws_opt;
++	geo->ws_seq = id->ws_seq;
++	geo->ws_per_chk = id->ws_per_chk;
++	geo->nr_chks = id->num_chk;
++	geo->sec_size = id->csecs;
++	geo->oob_size = id->sos;
++	geo->mccap = id->mccap;
+ 	geo->max_rq_size = dev->ops->max_phys_sect * geo->sec_size;
  
- 		/* Calculate the number of cpus per vector */
- 		ncpus = cpumask_weight(nmsk);
-@@ -186,7 +155,51 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 		--nodes;
+-	geo->sec_per_chk = grp->clba;
++	geo->sec_per_chk = id->clba;
+ 	geo->sec_per_lun = geo->sec_per_chk * geo->nr_chks;
+ 	geo->all_luns = geo->nr_luns * geo->nr_chnls;
+ 
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index 60db3f1b59da..6412551ecc65 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -203,57 +203,55 @@ static inline void _nvme_nvm_check_size(void)
+ static int init_grp(struct nvm_id *nvm_id, struct nvme_nvm_id12 *id12)
+ {
+ 	struct nvme_nvm_id12_grp *src;
+-	struct nvm_id_group *grp;
+ 	int sec_per_pg, sec_per_pl, pg_per_blk;
+ 
+ 	if (id12->cgrps != 1)
+ 		return -EINVAL;
+ 
+ 	src = &id12->grp;
+-	grp = &nvm_id->grp;
+ 
+-	grp->mtype = src->mtype;
+-	grp->fmtype = src->fmtype;
++	nvm_id->mtype = src->mtype;
++	nvm_id->fmtype = src->fmtype;
+ 
+-	grp->num_ch = src->num_ch;
+-	grp->num_lun = src->num_lun;
++	nvm_id->num_ch = src->num_ch;
++	nvm_id->num_lun = src->num_lun;
+ 
+-	grp->num_chk = le16_to_cpu(src->num_chk);
+-	grp->csecs = le16_to_cpu(src->csecs);
+-	grp->sos = le16_to_cpu(src->sos);
++	nvm_id->num_chk = le16_to_cpu(src->num_chk);
++	nvm_id->csecs = le16_to_cpu(src->csecs);
++	nvm_id->sos = le16_to_cpu(src->sos);
+ 
+ 	pg_per_blk = le16_to_cpu(src->num_pg);
+-	sec_per_pg = le16_to_cpu(src->fpg_sz) / grp->csecs;
++	sec_per_pg = le16_to_cpu(src->fpg_sz) / nvm_id->csecs;
+ 	sec_per_pl = sec_per_pg * src->num_pln;
+-	grp->clba = sec_per_pl * pg_per_blk;
+-	grp->ws_per_chk = pg_per_blk;
++	nvm_id->clba = sec_per_pl * pg_per_blk;
++	nvm_id->ws_per_chk = pg_per_blk;
+ 
+-	grp->mpos = le32_to_cpu(src->mpos);
+-	grp->cpar = le16_to_cpu(src->cpar);
+-	grp->mccap = le32_to_cpu(src->mccap);
++	nvm_id->mpos = le32_to_cpu(src->mpos);
++	nvm_id->cpar = le16_to_cpu(src->cpar);
++	nvm_id->mccap = le32_to_cpu(src->mccap);
+ 
+-	grp->ws_opt = grp->ws_min = sec_per_pg;
+-	grp->ws_seq = NVM_IO_SNGL_ACCESS;
++	nvm_id->ws_opt = nvm_id->ws_min = sec_per_pg;
++	nvm_id->ws_seq = NVM_IO_SNGL_ACCESS;
+ 
+-	if (grp->mpos & 0x020202) {
+-		grp->ws_seq = NVM_IO_DUAL_ACCESS;
+-		grp->ws_opt <<= 1;
+-	} else if (grp->mpos & 0x040404) {
+-		grp->ws_seq = NVM_IO_QUAD_ACCESS;
+-		grp->ws_opt <<= 2;
++	if (nvm_id->mpos & 0x020202) {
++		nvm_id->ws_seq = NVM_IO_DUAL_ACCESS;
++		nvm_id->ws_opt <<= 1;
++	} else if (nvm_id->mpos & 0x040404) {
++		nvm_id->ws_seq = NVM_IO_QUAD_ACCESS;
++		nvm_id->ws_opt <<= 2;
  	}
  
--done:
-+out:
-+	return curvec - affd->pre_vectors;
-+}
-+
-+/**
-+ * irq_create_affinity_masks - Create affinity masks for multiqueue spreading
-+ * @nvecs:	The total number of vectors
-+ * @affd:	Description of the affinity requirements
-+ *
-+ * Returns the masks pointer or NULL if allocation failed.
-+ */
-+struct cpumask *
-+irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
-+{
-+	int curvec;
-+	struct cpumask *masks;
-+	cpumask_var_t nmsk, *node_to_cpumask;
-+
-+	/*
-+	 * If there aren't any vectors left after applying the pre/post
-+	 * vectors don't bother with assigning affinity.
-+	 */
-+	if (nvecs == affd->pre_vectors + affd->post_vectors)
-+		return NULL;
-+
-+	if (!zalloc_cpumask_var(&nmsk, GFP_KERNEL))
-+		return NULL;
-+
-+	masks = kcalloc(nvecs, sizeof(*masks), GFP_KERNEL);
-+	if (!masks)
-+		goto out;
-+
-+	node_to_cpumask = alloc_node_to_cpumask();
-+	if (!node_to_cpumask)
-+		goto out;
-+
-+	/* Fill out vectors at the beginning that don't need affinity */
-+	for (curvec = 0; curvec < affd->pre_vectors; curvec++)
-+		cpumask_copy(masks + curvec, irq_default_affinity);
-+
-+	/* Stabilize the cpumasks */
-+	get_online_cpus();
-+	build_node_to_cpumask(node_to_cpumask);
-+	curvec += irq_build_affinity_masks(nvecs, affd, node_to_cpumask,
-+					   cpu_possible_mask, nmsk, masks);
- 	put_online_cpus();
+-	grp->trdt = le32_to_cpu(src->trdt);
+-	grp->trdm = le32_to_cpu(src->trdm);
+-	grp->tprt = le32_to_cpu(src->tprt);
+-	grp->tprm = le32_to_cpu(src->tprm);
+-	grp->tbet = le32_to_cpu(src->tbet);
+-	grp->tbem = le32_to_cpu(src->tbem);
++	nvm_id->trdt = le32_to_cpu(src->trdt);
++	nvm_id->trdm = le32_to_cpu(src->trdm);
++	nvm_id->tprt = le32_to_cpu(src->tprt);
++	nvm_id->tprm = le32_to_cpu(src->tprm);
++	nvm_id->tbet = le32_to_cpu(src->tbet);
++	nvm_id->tbem = le32_to_cpu(src->tbem);
  
- 	/* Fill out vectors at the end that don't need affinity */
+ 	/* 1.2 compatibility */
+-	grp->num_pln = src->num_pln;
+-	grp->num_pg = le16_to_cpu(src->num_pg);
+-	grp->fpg_sz = le16_to_cpu(src->fpg_sz);
++	nvm_id->num_pln = src->num_pln;
++	nvm_id->num_pg = le16_to_cpu(src->num_pg);
++	nvm_id->fpg_sz = le16_to_cpu(src->fpg_sz);
+ 
+ 	return 0;
+ }
+@@ -740,14 +738,12 @@ static ssize_t nvm_dev_attr_show(struct device *dev,
+ 	struct nvme_ns *ns = nvme_get_ns_from_dev(dev);
+ 	struct nvm_dev *ndev = ns->ndev;
+ 	struct nvm_id *id;
+-	struct nvm_id_group *grp;
+ 	struct attribute *attr;
+ 
+ 	if (!ndev)
+ 		return 0;
+ 
+ 	id = &ndev->identity;
+-	grp = &id->grp;
+ 	attr = &dattr->attr;
+ 
+ 	if (strcmp(attr->name, "version") == 0) {
+@@ -771,41 +767,41 @@ static ssize_t nvm_dev_attr_show(struct device *dev,
+ 			id->ppaf.pg_offset, id->ppaf.pg_len,
+ 			id->ppaf.sect_offset, id->ppaf.sect_len);
+ 	} else if (strcmp(attr->name, "media_type") == 0) {	/* u8 */
+-		return scnprintf(page, PAGE_SIZE, "%u\n", grp->mtype);
++		return scnprintf(page, PAGE_SIZE, "%u\n", id->mtype);
+ 	} else if (strcmp(attr->name, "flash_media_type") == 0) {
+-		return scnprintf(page, PAGE_SIZE, "%u\n", grp->fmtype);
++		return scnprintf(page, PAGE_SIZE, "%u\n", id->fmtype);
+ 	} else if (strcmp(attr->name, "num_channels") == 0) {
+-		return scnprintf(page, PAGE_SIZE, "%u\n", grp->num_ch);
++		return scnprintf(page, PAGE_SIZE, "%u\n", id->num_ch);
+ 	} else if (strcmp(attr->name, "num_luns") == 0) {
+-		return scnprintf(page, PAGE_SIZE, "%u\n", grp->num_lun);
++		return scnprintf(page, PAGE_SIZE, "%u\n", id->num_lun);
+ 	} else if (strcmp(attr->name, "num_planes") == 0) {
+-		return scnprintf(page, PAGE_SIZE, "%u\n", grp->num_pln);
++		return scnprintf(page, PAGE_SIZE, "%u\n", id->num_pln);
+ 	} else if (strcmp(attr->name, "num_blocks") == 0) {	/* u16 */
+-		return scnprintf(page, PAGE_SIZE, "%u\n", grp->num_chk);
++		return scnprintf(page, PAGE_SIZE, "%u\n", id->num_chk);
+ 	} else if (strcmp(attr->name, "num_pages") == 0) {
+-		return scnprintf(page, PAGE_SIZE, "%u\n", grp->num_pg);
++		return scnprintf(page, PAGE_SIZE, "%u\n", id->num_pg);
+ 	} else if (strcmp(attr->name, "page_size") == 0) {
+-		return scnprintf(page, PAGE_SIZE, "%u\n", grp->fpg_sz);
++		return scnprintf(page, PAGE_SIZE, "%u\n", id->fpg_sz);
+ 	} else if (strcmp(attr->name, "hw_sector_size") == 0) {
+-		return scnprintf(page, PAGE_SIZE, "%u\n", grp->csecs);
++		return scnprintf(page, PAGE_SIZE, "%u\n", id->csecs);
+ 	} else if (strcmp(attr->name, "oob_sector_size") == 0) {/* u32 */
+-		return scnprintf(page, PAGE_SIZE, "%u\n", grp->sos);
++		return scnprintf(page, PAGE_SIZE, "%u\n", id->sos);
+ 	} else if (strcmp(attr->name, "read_typ") == 0) {
+-		return scnprintf(page, PAGE_SIZE, "%u\n", grp->trdt);
++		return scnprintf(page, PAGE_SIZE, "%u\n", id->trdt);
+ 	} else if (strcmp(attr->name, "read_max") == 0) {
+-		return scnprintf(page, PAGE_SIZE, "%u\n", grp->trdm);
++		return scnprintf(page, PAGE_SIZE, "%u\n", id->trdm);
+ 	} else if (strcmp(attr->name, "prog_typ") == 0) {
+-		return scnprintf(page, PAGE_SIZE, "%u\n", grp->tprt);
++		return scnprintf(page, PAGE_SIZE, "%u\n", id->tprt);
+ 	} else if (strcmp(attr->name, "prog_max") == 0) {
+-		return scnprintf(page, PAGE_SIZE, "%u\n", grp->tprm);
++		return scnprintf(page, PAGE_SIZE, "%u\n", id->tprm);
+ 	} else if (strcmp(attr->name, "erase_typ") == 0) {
+-		return scnprintf(page, PAGE_SIZE, "%u\n", grp->tbet);
++		return scnprintf(page, PAGE_SIZE, "%u\n", id->tbet);
+ 	} else if (strcmp(attr->name, "erase_max") == 0) {
+-		return scnprintf(page, PAGE_SIZE, "%u\n", grp->tbem);
++		return scnprintf(page, PAGE_SIZE, "%u\n", id->tbem);
+ 	} else if (strcmp(attr->name, "multiplane_modes") == 0) {
+-		return scnprintf(page, PAGE_SIZE, "0x%08x\n", grp->mpos);
++		return scnprintf(page, PAGE_SIZE, "0x%08x\n", id->mpos);
+ 	} else if (strcmp(attr->name, "media_capabilities") == 0) {
+-		return scnprintf(page, PAGE_SIZE, "0x%08x\n", grp->mccap);
++		return scnprintf(page, PAGE_SIZE, "0x%08x\n", id->mccap);
+ 	} else if (strcmp(attr->name, "max_phys_secs") == 0) {
+ 		return scnprintf(page, PAGE_SIZE, "%u\n",
+ 				ndev->ops->max_phys_sect);
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 7f4b60abdf27..94b704a8d83d 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -154,9 +154,29 @@ struct nvm_id_lp_tbl {
+ 	struct nvm_id_lp_mlc mlc;
+ };
+ 
+-struct nvm_id_group {
+-	u8	mtype;
+-	u8	fmtype;
++struct nvm_addr_format {
++	u8	ch_offset;
++	u8	ch_len;
++	u8	lun_offset;
++	u8	lun_len;
++	u8	pln_offset;
++	u8	pln_len;
++	u8	blk_offset;
++	u8	blk_len;
++	u8	pg_offset;
++	u8	pg_len;
++	u8	sect_offset;
++	u8	sect_len;
++};
++
++struct nvm_id {
++	u8	ver_id;
++	u8	vmnt;
++	u32	cap;
++	u32	dom;
++
++	struct	nvm_addr_format ppaf;
++
+ 	u8	num_ch;
+ 	u8	num_lun;
+ 	u16	num_chk;
+@@ -180,33 +200,12 @@ struct nvm_id_group {
+ 	u16	cpar;
+ 
+ 	/* 1.2 compatibility */
++	u8	mtype;
++	u8	fmtype;
++
+ 	u8	num_pln;
+ 	u16	num_pg;
+ 	u16	fpg_sz;
+-};
+-
+-struct nvm_addr_format {
+-	u8	ch_offset;
+-	u8	ch_len;
+-	u8	lun_offset;
+-	u8	lun_len;
+-	u8	pln_offset;
+-	u8	pln_len;
+-	u8	blk_offset;
+-	u8	blk_len;
+-	u8	pg_offset;
+-	u8	pg_len;
+-	u8	sect_offset;
+-	u8	sect_len;
+-};
+-
+-struct nvm_id {
+-	u8	ver_id;
+-	u8	vmnt;
+-	u32	cap;
+-	u32	dom;
+-	struct nvm_addr_format ppaf;
+-	struct nvm_id_group grp;
+ } __packed;
+ 
+ struct nvm_target {
 -- 
-2.9.5
+2.11.0
