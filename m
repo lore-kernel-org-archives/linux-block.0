@@ -1,74 +1,115 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:33304 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752540AbeBGE6y (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Feb 2018 23:58:54 -0500
-Received: by mail-pg0-f65.google.com with SMTP id u1so2074427pgr.0
-        for <linux-block@vger.kernel.org>; Tue, 06 Feb 2018 20:58:54 -0800 (PST)
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: linux-block@vger.kernel.org
+Subject: [PATCH V2 1/4] lightnvm: make 1.2 data structures explicit
+Date: Fri,  9 Feb 2018 10:27:16 +0100
+Message-Id: <20180209092719.10679-2-mb@lightnvm.io>
+In-Reply-To: <20180209092719.10679-1-mb@lightnvm.io>
+References: <20180209092719.10679-1-mb@lightnvm.io>
 MIME-Version: 1.0
-In-Reply-To: <20171212212248.GD185376@gmail.com>
-References: <f403043d11ccfea019055f705d18@google.com> <20171203201608.GC844@zzz.localdomain>
- <20171204081408.oyp46roxbkjbxxkw@mwanda> <CACT4Y+aE-Q-PeUaY99d2UbK4BHnf18OoV0MBXyOXzXttf1=nYw@mail.gmail.com>
- <20171204092632.mh772rjaqahgslvp@mwanda> <20171212212248.GD185376@gmail.com>
-From: Dmitry Vyukov <dvyukov@google.com>
-Date: Wed, 7 Feb 2018 05:58:33 +0100
-Message-ID: <CACT4Y+b-v9zeEBydJqdTAnd82QL3M_45Eferaq9MdcR-4P8Rrw@mail.gmail.com>
-Subject: Re: WARNING in kmalloc_slab (3)
-To: Eric Biggers <ebiggers3@gmail.com>
-Cc: Dan Carpenter <dan.carpenter@oracle.com>,
-        syzbot
-        <bot+2797c18fc195e3e240c3c3e7837a14130e157fb0@syzkaller.appspotmail.com>,
-        Alexey Dobriyan <adobriyan@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Dave Jiang <dave.jiang@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs@googlegroups.com, Al Viro <viro@zeniv.linux.org.uk>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: javier@cnexlabs.com, =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-On Tue, Dec 12, 2017 at 10:22 PM, Eric Biggers <ebiggers3@gmail.com> wrote:
-> On Mon, Dec 04, 2017 at 12:26:32PM +0300, Dan Carpenter wrote:
->> On Mon, Dec 04, 2017 at 09:18:05AM +0100, Dmitry Vyukov wrote:
->> > On Mon, Dec 4, 2017 at 9:14 AM, Dan Carpenter <dan.carpenter@oracle.com> wrote:
->> > > On Sun, Dec 03, 2017 at 12:16:08PM -0800, Eric Biggers wrote:
->> > >> Looks like BLKTRACESETUP doesn't limit the '.buf_nr' parameter, allowing anyone
->> > >> who can open a block device to cause an extremely large kmalloc.  Here's a
->> > >> simplified reproducer:
->> > >>
->> > >
->> > > There are lots of places which allow people to allocate as much as they
->> > > want.  With Syzcaller, you might want to just hard code a __GFP_NOWARN
->> > > in to disable it.
->> >
->> > Hi,
->> >
->> > Hard code it where?
->>
->> My idea was to just make warn_alloc() a no-op.
->>
->> >
->> > User-controllable allocation are supposed to use __GFP_NOWARN.
->>
->> No that's not right.  What we don't want is unprivileged users to use
->> all the memory and we don't want unprivileged users to spam
->> /var/log/messages.  But you have to have slightly elevated permissions
->> to open block devices right?  The warning is helpful.  Admins should
->> "don't do that" if they don't want the warning.
->
-> WARN_ON() should only be used for kernel bugs.  printk can be a different story.
-> If it's a "userspace shouldn't do this" kind of thing, then if there is any
-> message at all it should be a rate-limited printk that actually explains what
-> the problem is, not a random WARN_ON() that can only be interpreted by kernel
-> developers.
->
-> And yes, the fact that anyone with read access to any block device, even e.g. a
-> loop device, can cause the kernel to do an unbounded kmalloc *is* a bug.  It
-> needs to have a reasonable limit.  It is not a problem on all systems, but on
-> some systems "the admin" might give users read access to some block devices.
-
-
-
-#syz fix: kernel/relay.c: limit kmalloc size to KMALLOC_MAX_SIZE
+TWFrZSB0aGUgMS4yIGRhdGEgc3RydWN0dXJlcyBleHBsaWNpdCwgc28gaXQgd2lsbCBiZSBlYXN5
+IHRvIGlkZW50aWZ5CnRoZSAyLjAgZGF0YSBzdHJ1Y3R1cmVzLiBBbHNvIGZpeCB0aGUgb3JkZXIg
+b2Ygd2hpY2ggdGhlIG52bWVfbnZtXyoKYXJlIGRlY2xhcmVkLCBzdWNoIHRoYXQgdGhleSBmb2xs
+b3cgdGhlIG52bWVfbnZtX2NvbW1hbmQgb3JkZXIuCgpTaWduZWQtb2ZmLWJ5OiBNYXRpYXMgQmrD
+uHJsaW5nIDxtYkBsaWdodG52bS5pbz4KLS0tCiBkcml2ZXJzL252bWUvaG9zdC9saWdodG52bS5j
+IHwgODIgKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KIDEgZmls
+ZSBjaGFuZ2VkLCA0MSBpbnNlcnRpb25zKCspLCA0MSBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQg
+YS9kcml2ZXJzL252bWUvaG9zdC9saWdodG52bS5jIGIvZHJpdmVycy9udm1lL2hvc3QvbGlnaHRu
+dm0uYwppbmRleCBkYzBiMTMzNWM3YzYuLjYwZGIzZjFiNTlkYSAxMDA2NDQKLS0tIGEvZHJpdmVy
+cy9udm1lL2hvc3QvbGlnaHRudm0uYworKysgYi9kcml2ZXJzL252bWUvaG9zdC9saWdodG52bS5j
+CkBAIC01MSw2ICs1MSwyMSBAQCBzdHJ1Y3QgbnZtZV9udm1fcGhfcncgewogCV9fbGU2NAkJCXJl
+c3Y7CiB9OwogCitzdHJ1Y3QgbnZtZV9udm1fZXJhc2VfYmxrIHsKKwlfX3U4CQkJb3Bjb2RlOwor
+CV9fdTgJCQlmbGFnczsKKwlfX3UxNgkJCWNvbW1hbmRfaWQ7CisJX19sZTMyCQkJbnNpZDsKKwlf
+X3U2NAkJCXJzdmRbMl07CisJX19sZTY0CQkJcHJwMTsKKwlfX2xlNjQJCQlwcnAyOworCV9fbGU2
+NAkJCXNwYmE7CisJX19sZTE2CQkJbGVuZ3RoOworCV9fbGUxNgkJCWNvbnRyb2w7CisJX19sZTMy
+CQkJZHNtZ210OworCV9fbGU2NAkJCXJlc3Y7Cit9OworCiBzdHJ1Y3QgbnZtZV9udm1faWRlbnRp
+dHkgewogCV9fdTgJCQlvcGNvZGU7CiAJX191OAkJCWZsYWdzOwpAQCAtODksMzMgKzEwNCwxOCBA
+QCBzdHJ1Y3QgbnZtZV9udm1fc2V0YmJ0YmwgewogCV9fdTMyCQkJcnN2ZDRbM107CiB9OwogCi1z
+dHJ1Y3QgbnZtZV9udm1fZXJhc2VfYmxrIHsKLQlfX3U4CQkJb3Bjb2RlOwotCV9fdTgJCQlmbGFn
+czsKLQlfX3UxNgkJCWNvbW1hbmRfaWQ7Ci0JX19sZTMyCQkJbnNpZDsKLQlfX3U2NAkJCXJzdmRb
+Ml07Ci0JX19sZTY0CQkJcHJwMTsKLQlfX2xlNjQJCQlwcnAyOwotCV9fbGU2NAkJCXNwYmE7Ci0J
+X19sZTE2CQkJbGVuZ3RoOwotCV9fbGUxNgkJCWNvbnRyb2w7Ci0JX19sZTMyCQkJZHNtZ210Owot
+CV9fbGU2NAkJCXJlc3Y7Ci19OwotCiBzdHJ1Y3QgbnZtZV9udm1fY29tbWFuZCB7CiAJdW5pb24g
+ewogCQlzdHJ1Y3QgbnZtZV9jb21tb25fY29tbWFuZCBjb21tb247Ci0JCXN0cnVjdCBudm1lX252
+bV9pZGVudGl0eSBpZGVudGl0eTsKIAkJc3RydWN0IG52bWVfbnZtX3BoX3J3IHBoX3J3OworCQlz
+dHJ1Y3QgbnZtZV9udm1fZXJhc2VfYmxrIGVyYXNlOworCQlzdHJ1Y3QgbnZtZV9udm1faWRlbnRp
+dHkgaWRlbnRpdHk7CiAJCXN0cnVjdCBudm1lX252bV9nZXRiYnRibCBnZXRfYmI7CiAJCXN0cnVj
+dCBudm1lX252bV9zZXRiYnRibCBzZXRfYmI7Ci0JCXN0cnVjdCBudm1lX252bV9lcmFzZV9ibGsg
+ZXJhc2U7CiAJfTsKIH07CiAKLXN0cnVjdCBudm1lX252bV9pZF9ncm91cCB7CitzdHJ1Y3QgbnZt
+ZV9udm1faWQxMl9ncnAgewogCV9fdTgJCQltdHlwZTsKIAlfX3U4CQkJZm10eXBlOwogCV9fbGUx
+NgkJCXJlczE2OwpAQCAtMTQxLDcgKzE0MSw3IEBAIHN0cnVjdCBudm1lX252bV9pZF9ncm91cCB7
+CiAJX191OAkJCXJlc2VydmVkWzkwNl07CiB9IF9fcGFja2VkOwogCi1zdHJ1Y3QgbnZtZV9udm1f
+YWRkcl9mb3JtYXQgeworc3RydWN0IG52bWVfbnZtX2lkMTJfYWRkcmYgewogCV9fdTgJCQljaF9v
+ZmZzZXQ7CiAJX191OAkJCWNoX2xlbjsKIAlfX3U4CQkJbHVuX29mZnNldDsKQEAgLTE1NywxNiAr
+MTU3LDE2IEBAIHN0cnVjdCBudm1lX252bV9hZGRyX2Zvcm1hdCB7CiAJX191OAkJCXJlc1s0XTsK
+IH0gX19wYWNrZWQ7CiAKLXN0cnVjdCBudm1lX252bV9pZCB7CitzdHJ1Y3QgbnZtZV9udm1faWQx
+MiB7CiAJX191OAkJCXZlcl9pZDsKIAlfX3U4CQkJdm1udDsKIAlfX3U4CQkJY2dycHM7CiAJX191
+OAkJCXJlczsKIAlfX2xlMzIJCQljYXA7CiAJX19sZTMyCQkJZG9tOwotCXN0cnVjdCBudm1lX252
+bV9hZGRyX2Zvcm1hdCBwcGFmOworCXN0cnVjdCBudm1lX252bV9pZDEyX2FkZHJmIHBwYWY7CiAJ
+X191OAkJCXJlc3ZbMjI4XTsKLQlzdHJ1Y3QgbnZtZV9udm1faWRfZ3JvdXAgZ3JvdXA7CisJc3Ry
+dWN0IG52bWVfbnZtX2lkMTJfZ3JwIGdycDsKIAlfX3U4CQkJcmVzdjJbMjg4MF07CiB9IF9fcGFj
+a2VkOwogCkBAIC0xOTEsMjUgKzE5MSwyNSBAQCBzdGF0aWMgaW5saW5lIHZvaWQgX252bWVfbnZt
+X2NoZWNrX3NpemUodm9pZCkKIHsKIAlCVUlMRF9CVUdfT04oc2l6ZW9mKHN0cnVjdCBudm1lX252
+bV9pZGVudGl0eSkgIT0gNjQpOwogCUJVSUxEX0JVR19PTihzaXplb2Yoc3RydWN0IG52bWVfbnZt
+X3BoX3J3KSAhPSA2NCk7CisJQlVJTERfQlVHX09OKHNpemVvZihzdHJ1Y3QgbnZtZV9udm1fZXJh
+c2VfYmxrKSAhPSA2NCk7CiAJQlVJTERfQlVHX09OKHNpemVvZihzdHJ1Y3QgbnZtZV9udm1fZ2V0
+YmJ0YmwpICE9IDY0KTsKIAlCVUlMRF9CVUdfT04oc2l6ZW9mKHN0cnVjdCBudm1lX252bV9zZXRi
+YnRibCkgIT0gNjQpOwotCUJVSUxEX0JVR19PTihzaXplb2Yoc3RydWN0IG52bWVfbnZtX2VyYXNl
+X2JsaykgIT0gNjQpOwotCUJVSUxEX0JVR19PTihzaXplb2Yoc3RydWN0IG52bWVfbnZtX2lkX2dy
+b3VwKSAhPSA5NjApOwotCUJVSUxEX0JVR19PTihzaXplb2Yoc3RydWN0IG52bWVfbnZtX2FkZHJf
+Zm9ybWF0KSAhPSAxNik7Ci0JQlVJTERfQlVHX09OKHNpemVvZihzdHJ1Y3QgbnZtZV9udm1faWQp
+ICE9IE5WTUVfSURFTlRJRllfREFUQV9TSVpFKTsKKwlCVUlMRF9CVUdfT04oc2l6ZW9mKHN0cnVj
+dCBudm1lX252bV9pZDEyX2dycCkgIT0gOTYwKTsKKwlCVUlMRF9CVUdfT04oc2l6ZW9mKHN0cnVj
+dCBudm1lX252bV9pZDEyX2FkZHJmKSAhPSAxNik7CisJQlVJTERfQlVHX09OKHNpemVvZihzdHJ1
+Y3QgbnZtZV9udm1faWQxMikgIT0gTlZNRV9JREVOVElGWV9EQVRBX1NJWkUpOwogCUJVSUxEX0JV
+R19PTihzaXplb2Yoc3RydWN0IG52bWVfbnZtX2JiX3RibCkgIT0gNjQpOwogfQogCi1zdGF0aWMg
+aW50IGluaXRfZ3JwcyhzdHJ1Y3QgbnZtX2lkICpudm1faWQsIHN0cnVjdCBudm1lX252bV9pZCAq
+bnZtZV9udm1faWQpCitzdGF0aWMgaW50IGluaXRfZ3JwKHN0cnVjdCBudm1faWQgKm52bV9pZCwg
+c3RydWN0IG52bWVfbnZtX2lkMTIgKmlkMTIpCiB7Ci0Jc3RydWN0IG52bWVfbnZtX2lkX2dyb3Vw
+ICpzcmM7CisJc3RydWN0IG52bWVfbnZtX2lkMTJfZ3JwICpzcmM7CiAJc3RydWN0IG52bV9pZF9n
+cm91cCAqZ3JwOwogCWludCBzZWNfcGVyX3BnLCBzZWNfcGVyX3BsLCBwZ19wZXJfYmxrOwogCi0J
+aWYgKG52bWVfbnZtX2lkLT5jZ3JwcyAhPSAxKQorCWlmIChpZDEyLT5jZ3JwcyAhPSAxKQogCQly
+ZXR1cm4gLUVJTlZBTDsKIAotCXNyYyA9ICZudm1lX252bV9pZC0+Z3JvdXA7CisJc3JjID0gJmlk
+MTItPmdycDsKIAlncnAgPSAmbnZtX2lkLT5ncnA7CiAKIAlncnAtPm10eXBlID0gc3JjLT5tdHlw
+ZTsKQEAgLTI2MSwzNCArMjYxLDM0IEBAIHN0YXRpYyBpbnQgaW5pdF9ncnBzKHN0cnVjdCBudm1f
+aWQgKm52bV9pZCwgc3RydWN0IG52bWVfbnZtX2lkICpudm1lX252bV9pZCkKIHN0YXRpYyBpbnQg
+bnZtZV9udm1faWRlbnRpdHkoc3RydWN0IG52bV9kZXYgKm52bWRldiwgc3RydWN0IG52bV9pZCAq
+bnZtX2lkKQogewogCXN0cnVjdCBudm1lX25zICpucyA9IG52bWRldi0+cS0+cXVldWVkYXRhOwot
+CXN0cnVjdCBudm1lX252bV9pZCAqbnZtZV9udm1faWQ7CisJc3RydWN0IG52bWVfbnZtX2lkMTIg
+KmlkOwogCXN0cnVjdCBudm1lX252bV9jb21tYW5kIGMgPSB7fTsKIAlpbnQgcmV0OwogCiAJYy5p
+ZGVudGl0eS5vcGNvZGUgPSBudm1lX252bV9hZG1pbl9pZGVudGl0eTsKIAljLmlkZW50aXR5Lm5z
+aWQgPSBjcHVfdG9fbGUzMihucy0+aGVhZC0+bnNfaWQpOwogCi0JbnZtZV9udm1faWQgPSBrbWFs
+bG9jKHNpemVvZihzdHJ1Y3QgbnZtZV9udm1faWQpLCBHRlBfS0VSTkVMKTsKLQlpZiAoIW52bWVf
+bnZtX2lkKQorCWlkID0ga21hbGxvYyhzaXplb2Yoc3RydWN0IG52bWVfbnZtX2lkMTIpLCBHRlBf
+S0VSTkVMKTsKKwlpZiAoIWlkKQogCQlyZXR1cm4gLUVOT01FTTsKIAogCXJldCA9IG52bWVfc3Vi
+bWl0X3N5bmNfY21kKG5zLT5jdHJsLT5hZG1pbl9xLCAoc3RydWN0IG52bWVfY29tbWFuZCAqKSZj
+LAotCQkJCW52bWVfbnZtX2lkLCBzaXplb2Yoc3RydWN0IG52bWVfbnZtX2lkKSk7CisJCQkJaWQs
+IHNpemVvZihzdHJ1Y3QgbnZtZV9udm1faWQxMikpOwogCWlmIChyZXQpIHsKIAkJcmV0ID0gLUVJ
+TzsKIAkJZ290byBvdXQ7CiAJfQogCi0JbnZtX2lkLT52ZXJfaWQgPSBudm1lX252bV9pZC0+dmVy
+X2lkOwotCW52bV9pZC0+dm1udCA9IG52bWVfbnZtX2lkLT52bW50OwotCW52bV9pZC0+Y2FwID0g
+bGUzMl90b19jcHUobnZtZV9udm1faWQtPmNhcCk7Ci0JbnZtX2lkLT5kb20gPSBsZTMyX3RvX2Nw
+dShudm1lX252bV9pZC0+ZG9tKTsKLQltZW1jcHkoJm52bV9pZC0+cHBhZiwgJm52bWVfbnZtX2lk
+LT5wcGFmLAorCW52bV9pZC0+dmVyX2lkID0gaWQtPnZlcl9pZDsKKwludm1faWQtPnZtbnQgPSBp
+ZC0+dm1udDsKKwludm1faWQtPmNhcCA9IGxlMzJfdG9fY3B1KGlkLT5jYXApOworCW52bV9pZC0+
+ZG9tID0gbGUzMl90b19jcHUoaWQtPmRvbSk7CisJbWVtY3B5KCZudm1faWQtPnBwYWYsICZpZC0+
+cHBhZiwKIAkJCQkJc2l6ZW9mKHN0cnVjdCBudm1fYWRkcl9mb3JtYXQpKTsKIAotCXJldCA9IGlu
+aXRfZ3Jwcyhudm1faWQsIG52bWVfbnZtX2lkKTsKKwlyZXQgPSBpbml0X2dycChudm1faWQsIGlk
+KTsKIG91dDoKLQlrZnJlZShudm1lX252bV9pZCk7CisJa2ZyZWUoaWQpOwogCXJldHVybiByZXQ7
+CiB9CiAKLS0gCjIuMTEuMAoKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fCkxpbnV4LW52bWUgbWFpbGluZyBsaXN0CkxpbnV4LW52bWVAbGlzdHMuaW5mcmFk
+ZWFkLm9yZwpodHRwOi8vbGlzdHMuaW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4
+LW52bWUK
