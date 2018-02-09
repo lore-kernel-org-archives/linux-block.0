@@ -1,56 +1,31 @@
-Return-Path: <prvs=57171364e=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Jan Kara <jack@suse.com>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v3 0/3] Fix races between blkcg code and request queue initialization and cleanup
-Date: Fri,  9 Feb 2018 10:44:02 -0800
-Message-Id: <20180209184405.25835-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from aserp2120.oracle.com ([141.146.126.78]:37456 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752192AbeBIEwI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Feb 2018 23:52:08 -0500
+Date: Thu, 8 Feb 2018 20:52:00 -0800
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Goldwyn Rodrigues <rgoldwyn@suse.com>
+Subject: Re: [PATCH v7 1/2] xfs: remove assert to check bytes returned
+Message-ID: <20180209045200.GA5426@magnolia>
+References: <20180208185948.26827-1-rgoldwyn@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180208185948.26827-1-rgoldwyn@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hello Jens,
+On Thu, Feb 08, 2018 at 12:59:47PM -0600, Goldwyn Rodrigues wrote:
+> From: Goldwyn Rodrigues <rgoldwyn@suse.com>
+> 
+> Since we can return less than count in case of partial direct
+> writes, remove the ASSERT.
+> 
+> Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
 
-Recently Joseph Qi identified races between the block cgroup code and request
-queue initialization and cleanup. This patch series address these races. Please
-consider these patches for kernel v4.17.
+Looks ok,
+Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
 
-Thanks,
-
-Bart.
-
-Changes between v2 and v3:
-- Added a third patch that fixes a race between the blkcg code and queue
-  cleanup.
-
-Changes between v1 and v2:
-- Split a single patch into two patches.
-- Dropped blk_alloc_queue_node2() and modified all block drivers that call
-  blk_alloc_queue_node().
-
-Bart Van Assche (3):
-  block: Add a third argument to blk_alloc_queue_node()
-  block: Fix a race between the cgroup code and request queue
-    initialization
-  block: Fix a race between request queue removal and the block cgroup
-    controller
-
- block/blk-core.c               | 60 +++++++++++++++++++++++++++++++++++-------
- block/blk-mq.c                 |  2 +-
- block/blk-sysfs.c              |  7 -----
- drivers/block/drbd/drbd_main.c |  3 +--
- drivers/block/null_blk.c       |  3 ++-
- drivers/block/umem.c           |  7 +++--
- drivers/ide/ide-probe.c        |  2 +-
- drivers/lightnvm/core.c        |  2 +-
- drivers/md/dm.c                |  2 +-
- drivers/nvdimm/pmem.c          |  2 +-
- drivers/nvme/host/multipath.c  |  2 +-
- drivers/scsi/scsi_lib.c        |  2 +-
- include/linux/blkdev.h         |  3 ++-
- 13 files changed, 65 insertions(+), 32 deletions(-)
-
--- 
-2.16.1
+--D
