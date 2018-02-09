@@ -1,79 +1,89 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-bl2nam02on0071.outbound.protection.outlook.com ([104.47.38.71]:58687
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751021AbeBLUVx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Feb 2018 15:21:53 -0500
-From: Javier Gonzalez <javier@cnexlabs.com>
-To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [PATCH V2 4/4] nvme: lightnvm: add late setup of block size and
- metadata
-Date: Mon, 12 Feb 2018 20:21:49 +0000
-Message-ID: <098A1343-A9FB-47BD-A4B5-6E77A1861A4B@cnexlabs.com>
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:44013 "EHLO
+        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752664AbeBIJ1s (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Feb 2018 04:27:48 -0500
+Received: by mail-lf0-f68.google.com with SMTP id a25so1025942lfg.10
+        for <linux-block@vger.kernel.org>; Fri, 09 Feb 2018 01:27:48 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        javier@cnexlabs.com,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [PATCH V2 4/4] nvme: lightnvm: add late setup of block size and metadata
+Date: Fri,  9 Feb 2018 10:27:19 +0100
+Message-Id: <20180209092719.10679-5-mb@lightnvm.io>
+In-Reply-To: <20180209092719.10679-1-mb@lightnvm.io>
 References: <20180209092719.10679-1-mb@lightnvm.io>
- <20180209092719.10679-5-mb@lightnvm.io>
-In-Reply-To: <20180209092719.10679-5-mb@lightnvm.io>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_E4450FA5-2150-4D0B-87C9-AC311466B328";
-        protocol="application/pgp-signature"; micalg=pgp-sha512
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
---Apple-Mail=_E4450FA5-2150-4D0B-87C9-AC311466B328
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
+The nvme driver sets up the size of the nvme namespace in two steps.
+First it initializes the device with standard logical block and
+metadata sizes, and then sets the correct logical block and metadata
+size. Due to the OCSSD 2.0 specification relies on the namespace to
+expose these sizes for correct initialization, let it be updated
+appropriately on the LightNVM side as well.
 
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+---
+ drivers/nvme/host/core.c     | 2 ++
+ drivers/nvme/host/lightnvm.c | 8 ++++++++
+ drivers/nvme/host/nvme.h     | 2 ++
+ 3 files changed, 12 insertions(+)
 
-> On 9 Feb 2018, at 01.27, Matias Bj=C3=B8rling <mb@lightnvm.io> wrote:
->=20
-> The nvme driver sets up the size of the nvme namespace in two steps.
-> First it initializes the device with standard logical block and
-> metadata sizes, and then sets the correct logical block and metadata
-> size. Due to the OCSSD 2.0 specification relies on the namespace to
-> expose these sizes for correct initialization, let it be updated
-> appropriately on the LightNVM side as well.
->=20
-> Signed-off-by: Matias Bj=C3=B8rling <mb@lightnvm.io>
-> ---
->=20
-
-This late initialization breaks ligthnvm's core init since the sector
-size (csecs) is used on the first init part to set the logical block =
-size.
-
-nvm_core_init -> blk_queue_logical_block_size(dev->q, dev_geo->c.csecs);
-
-We can do do a nvme_nvm_revalidate and set this on the revalidation path
-instead of simply updating the info as in nvme_nvm_update_nvm_info().
-
-Javier
-
---Apple-Mail=_E4450FA5-2150-4D0B-87C9-AC311466B328
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment; filename="signature.asc"
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAlqB91gACgkQIX4xUKFR
-nnQxbxAAydq8diQ9d+x+W8742it3pffX7sqxY967LC2tcFvrmj8El2smPAD1P5wk
-g2QWRAZ7gTkWX/dfVO9HxSCyV2+IAl1/TJVOK1PvL8IELGnuwgrhBFDyu3ox/83A
-yzNEAFSklDVlboEcm6vpCmNkniJCbABXHfrZX6gHMgQNmGnL3fIgL3Os1IcABBHd
-J0Hk9YRjuSnipuONTeZhLh/OLe1oxdXDuVvHMuW0HQXneLGjjfmylKXgzdHXQc08
-ZVRRgrZSEYWWeIzb+dGZkEng7BaRm7W2/v8e+85G26TPZQcNz2Jbtys3iWAhAE6/
-8nsub/hDr6KZWrhvpwz0aO7mhnDKXHYrlGhgiW9bGa/8lyJO+cXgp+k9Kpe+Xvv6
-rUZinkiS8EEfSAPuGQHYMUOkc0yQdW3gUM8yDFOA+j/WpE+bIEH8LHdJQSptUwja
-YF3bNv900ifSsXuUrHqS3cMlWUSdhaytAo5VS6kR2Xt1ULjCT6ftoK/0U39MCqP2
-fBPI+gR0oaP6dG4pdR+AuEH3zfz4Bin6eMEIu82boPYbPlWgeVEO6vaTiZaLgMea
-ln6Cthk/D8vu2vMVgVnRHYrk9GRc6Om2vomAY1i67RXZqx6gy8dvUWqPm/V9zttj
-NS5rAOmcaWp7a3g2WIVZ0NoYaSdZ05k4j0D1uhBOd0XJRDz13iQ=
-=0okX
------END PGP SIGNATURE-----
-
---Apple-Mail=_E4450FA5-2150-4D0B-87C9-AC311466B328--
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index f837d666cbd4..740ceb28067c 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -1379,6 +1379,8 @@ static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
+ 	if (ns->noiob)
+ 		nvme_set_chunk_size(ns);
+ 	nvme_update_disk_info(disk, ns, id);
++	if (ns->ndev)
++		nvme_nvm_update_nvm_info(ns);
+ #ifdef CONFIG_NVME_MULTIPATH
+ 	if (ns->head->disk)
+ 		nvme_update_disk_info(ns->head->disk, ns, id);
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index 8b243af8a949..a19e85f0cbae 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -814,6 +814,14 @@ int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned int cmd, unsigned long arg)
+ 	}
+ }
+ 
++void nvme_nvm_update_nvm_info(struct nvme_ns *ns)
++{
++	struct nvm_dev *ndev = ns->ndev;
++
++	ndev->identity.csecs = ndev->geo.sec_size = 1 << ns->lba_shift;
++	ndev->identity.sos = ndev->geo.oob_size = ns->ms;
++}
++
+ int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node)
+ {
+ 	struct request_queue *q = ns->queue;
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index ea1aa5283e8e..1ca08f4993ba 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -451,12 +451,14 @@ static inline void nvme_mpath_clear_current_path(struct nvme_ns *ns)
+ #endif /* CONFIG_NVME_MULTIPATH */
+ 
+ #ifdef CONFIG_NVM
++void nvme_nvm_update_nvm_info(struct nvme_ns *ns);
+ int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node);
+ void nvme_nvm_unregister(struct nvme_ns *ns);
+ int nvme_nvm_register_sysfs(struct nvme_ns *ns);
+ void nvme_nvm_unregister_sysfs(struct nvme_ns *ns);
+ int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned int cmd, unsigned long arg);
+ #else
++static inline void nvme_nvm_update_nvm_info(struct nvme_ns *ns) {};
+ static inline int nvme_nvm_register(struct nvme_ns *ns, char *disk_name,
+ 				    int node)
+ {
+-- 
+2.11.0
