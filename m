@@ -1,83 +1,72 @@
-Return-Path: <arnd@arndb.de>
-From: Arnd Bergmann <arnd@arndb.de>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Nicolas Pitre <nico@linaro.org>,
-	Andi Kleen <ak@linux.intel.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] block: skd: fix incorrect linux/slab_def.h inclusion
-Date: Fri,  2 Feb 2018 16:03:04 +0100
-Message-Id: <20180202150326.344024-1-arnd@arndb.de>
+Return-Path: <axboe@kernel.dk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 4.16-rc1
+Message-ID: <02e0617e-39cd-1ded-6da0-6ba1826010a0@kernel.dk>
+Date: Sat, 10 Feb 2018 10:31:55 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-skd includes slab_def.h to get access to the slab cache object size.
-However, including this header breaks when we use SLUB or SLOB instead of
-the SLAB allocator, since the structure layout is completely different,
-as shown by this warning when we build this driver in one of the invalid
-configurations with link-time optimizations enabled:
+Hi Linus,
 
-include/linux/slab.h:715:0: error: type of 'kmem_cache_size' does not match original declaration [-Werror=lto-type-mismatch]
- unsigned int kmem_cache_size(struct kmem_cache *s);
+A few fixes to round off the merge window on the block side. This pull
+request contains:
 
-mm/slab_common.c:77:14: note: 'kmem_cache_size' was previously declared here
- unsigned int kmem_cache_size(struct kmem_cache *s)
-              ^
-mm/slab_common.c:77:14: note: code may be misoptimized unless -fno-strict-aliasing is used
-include/linux/slab.h:147:0: error: type of 'kmem_cache_destroy' does not match original declaration [-Werror=lto-type-mismatch]
- void kmem_cache_destroy(struct kmem_cache *);
+- Set of bcache fixes by way of Michael Lyle, from the usual bcache
+  suspects.
 
-mm/slab_common.c:858:6: note: 'kmem_cache_destroy' was previously declared here
- void kmem_cache_destroy(struct kmem_cache *s)
-      ^
-mm/slab_common.c:858:6: note: code may be misoptimized unless -fno-strict-aliasing is used
-include/linux/slab.h:140:0: error: type of 'kmem_cache_create' does not match original declaration [-Werror=lto-type-mismatch]
- struct kmem_cache *kmem_cache_create(const char *name, size_t size,
+- Addition of a simple-to-hook-into function for bpf EIO error
+  injection.
 
-mm/slab_common.c:534:1: note: 'kmem_cache_create' was previously declared here
- kmem_cache_create(const char *name, size_t size, size_t align,
- ^
+- Fix for blk-wbt that mischarectized flushes as reads. Improve the
+  logic so that flushes and writes are accounted as writes, and only
+  reads as reads. From me.
 
-This removes the header inclusion and instead uses the kmem_cache_size()
-interface to get the size in a reliable way.
+- Fix for requeue crash in BFQ, from Paolo.
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/block/skd_main.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Please pull!
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index de0d08133c7e..e41935ab41ef 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -32,7 +32,6 @@
- #include <linux/aer.h>
- #include <linux/wait.h>
- #include <linux/stringify.h>
--#include <linux/slab_def.h>
- #include <scsi/scsi.h>
- #include <scsi/sg.h>
- #include <linux/io.h>
-@@ -2603,7 +2602,8 @@ static void *skd_alloc_dma(struct skd_device *skdev, struct kmem_cache *s,
- 	buf = kmem_cache_alloc(s, gfp);
- 	if (!buf)
- 		return NULL;
--	*dma_handle = dma_map_single(dev, buf, s->size, dir);
-+	*dma_handle = dma_map_single(dev, buf,
-+				     kmem_cache_size(s), dir);
- 	if (dma_mapping_error(dev, *dma_handle)) {
- 		kmem_cache_free(s, buf);
- 		buf = NULL;
-@@ -2618,7 +2618,8 @@ static void skd_free_dma(struct skd_device *skdev, struct kmem_cache *s,
- 	if (!vaddr)
- 		return;
- 
--	dma_unmap_single(&skdev->pdev->dev, dma_handle, s->size, dir);
-+	dma_unmap_single(&skdev->pdev->dev, dma_handle,
-+			 kmem_cache_size(s), dir);
- 	kmem_cache_free(s, vaddr);
- }
- 
+
+  git://git.kernel.dk/linux-block.git tags/for-linus-20180210
+
+
+----------------------------------------------------------------
+Coly Li (3):
+      bcache: properly set task state in bch_writeback_thread()
+      bcache: set error_limit correctly
+      bcache: set writeback_rate_update_seconds in range [1, 60] seconds
+
+Howard McLauchlan (1):
+      block: Add should_fail_bio() for bpf error injection
+
+Jens Axboe (1):
+      blk-wbt: account flush requests correctly
+
+Paolo Valente (1):
+      block, bfq: add requeue-request hook
+
+Tang Junhui (5):
+      bcache: add journal statistic
+      bcache: fix high CPU occupancy during journal
+      bcache: fix for allocator and register thread race
+      bcache: return attach error when no cache set exist
+      bcache: fix for data collapse after re-attaching an attached device
+
+ block/bfq-iosched.c           | 107 ++++++++++++++++++++++++++++++++----------
+ block/blk-core.c              |  11 ++++-
+ block/blk-wbt.c               |  10 +++-
+ drivers/md/bcache/alloc.c     |   4 +-
+ drivers/md/bcache/bcache.h    |   9 +++-
+ drivers/md/bcache/btree.c     |   9 ++--
+ drivers/md/bcache/journal.c   |  52 ++++++++++++++------
+ drivers/md/bcache/super.c     |  25 +++++++---
+ drivers/md/bcache/sysfs.c     |  34 +++++++++++---
+ drivers/md/bcache/util.h      |   2 +
+ drivers/md/bcache/writeback.c |   9 ++--
+ drivers/md/bcache/writeback.h |   3 ++
+ 12 files changed, 212 insertions(+), 63 deletions(-)
+
 -- 
-2.9.0
+Jens Axboe
