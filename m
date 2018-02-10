@@ -1,51 +1,38 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from auth-3.ukservers.net ([217.10.138.152]:44994 "EHLO
-        auth-3.ukservers.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752026AbeBCPxS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 3 Feb 2018 10:53:18 -0500
-Subject: Re: [LSF/MM TOPIC] De-clustered RAID with MD
-To: NeilBrown <neilb@suse.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        lsf-pc@lists.linux-foundation.org
-References: <mqdvafkhep0.fsf@linux-x5ow.site>
- <5A6F4CA6.5060802@youngman.org.uk> <87fu6o5o83.fsf@notabene.neil.brown.name>
- <5A704C59.4000705@youngman.org.uk> <87372n613s.fsf@notabene.neil.brown.name>
-Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>, Neil Brown <neilb@suse.de>
-From: Wols Lists <antlists@youngman.org.uk>
-Message-ID: <5A75DAEB.9030805@youngman.org.uk>
-Date: Sat, 3 Feb 2018 15:53:15 +0000
+Received: from mail-wr0-f181.google.com ([209.85.128.181]:38286 "EHLO
+        mail-wr0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753300AbeBJAmI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Feb 2018 19:42:08 -0500
+Received: by mail-wr0-f181.google.com with SMTP id t94so9873738wrc.5
+        for <linux-block@vger.kernel.org>; Fri, 09 Feb 2018 16:42:07 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <87372n613s.fsf@notabene.neil.brown.name>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20180208214757.GA8211@vader.DHCP.thefacebook.com>
+References: <20180208214757.GA8211@vader.DHCP.thefacebook.com>
+From: Ming Lei <tom.leiming@gmail.com>
+Date: Sat, 10 Feb 2018 08:42:06 +0800
+Message-ID: <CACVXFVNxNNQTwsRXOMSm36kXhX=xbRmSwizxNPwhYxQAaX79ew@mail.gmail.com>
+Subject: Re: [LSF/MM ATTEND] State of blk-mq I/O scheduling and next steps
+To: Omar Sandoval <osandov@osandov.com>
+Cc: lsf-pc@lists.linux-foundation.org,
+        linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 30/01/18 11:24, NeilBrown wrote:
-> When Ax are a logical stripe and Bx are the next,  then you have a
-> slightly better distribution.  If device XX fails then the reads needed
-> for the first stripe mostly come from different drives than those for
-> the second stripe, which are mostly different again for the 3rd stripe.
+On Fri, Feb 9, 2018 at 5:47 AM, Omar Sandoval <osandov@osandov.com> wrote:
+> Hi,
+>
+> I'd like to attend LSF/MM to talk about the state of I/O scheduling in
+> blk-mq. I can present some results about mq-deadline and Kyber on our
+> production workloads. I'd also like to talk about what's next, in
+> particular, improvements and features for Kyber.
+Hi Omar,
 
-Well, my maths has been well and truly proved wrong. But. Does streaming
-from one drive directly onto another have value in reducing stress? I've
-just done a worked example for four drives, mirrored three times across
-eighteen drives.
+I am very interested in these topics, especially looking forward to
+your update on what's next. I am also thinking about improving
+SSD/NVMe via kyber, and interested in any topics about SSD/NVMe
+performance, how to deal with SSD/NVMe friendly,...
 
-The result is that the drives have ended up in six groups of three
-mirrored drives. So if any drive fails, I can just copy an
-almost-identical drive from the mirror.
 
-I'll have to play with eg 17 drives and see if this alters the dynamics
-- it'll be interesting.
-
- 0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17
-a1  b2  c3  a4  c1  a2  b3  c4  b1  c2  a3  b4  a1  b2  c3  a4  c1  a2
-b3  c4  b1  c2  a3  b4  a1  b2  c3  a4  c1  a2  b3  c4  b1  c2  a3  b4
-
-Note I'm rotating 5 drives at a time, so a1,a2,a3,a4 goes on drives
-0,5,10,15 ... But pick any drive and you'll notice the drives six away
-are almost mirrors.
-
-Cheers,
-Wol
+Thanks,
+Ming Lei
