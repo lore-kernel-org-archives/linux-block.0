@@ -1,147 +1,47 @@
-Return-Path: <gunthorp@deltatee.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvdimm@lists.01.org,
-	linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Logan Gunthorpe <logang@deltatee.com>
-Date: Wed, 28 Feb 2018 16:39:58 -0700
-Message-Id: <20180228234006.21093-3-logang@deltatee.com>
-In-Reply-To: <20180228234006.21093-1-logang@deltatee.com>
-References: <20180228234006.21093-1-logang@deltatee.com>
-Subject: [PATCH v2 02/10] PCI/P2PDMA: Add sysfs group to display p2pmem stats
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mxhk.zte.com.cn ([63.217.80.70]:47378 "EHLO mxhk.zte.com.cn"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751050AbeBKC1W (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 10 Feb 2018 21:27:22 -0500
+From: tang.junhui@zte.com.cn
+To: colyli@suse.de, mlyle@lyle.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        tang.junhui@zte.com.cn
+Subject: [PATCH] bcache: fix incorrect sysfs output value of strip size
+Date: Sun, 11 Feb 2018 10:30:00 +0800
+Message-Id: <1518316200-31550-1-git-send-email-tang.junhui@zte.com.cn>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Attributes display the total amount of P2P memory, the amount available
-and whether it is published or not.
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Stripe size is shown as zero when no strip in back end device:
+[root@ceph132 ~]# cat /sys/block/sdd/bcache/stripe_size
+0.0k
+
+Actually it should be 1T Bytes (1 << 31 sectors), but in sysfs
+interface, stripe_size was changed from sectors to bytes, and move
+9 bits left, so the 32 bits variable overflows.
+
+This patch change the variable to a 64 bits type before moving bits.
+
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
 ---
- Documentation/ABI/testing/sysfs-bus-pci | 25 +++++++++++++++++
- drivers/pci/p2pdma.c                    | 50 +++++++++++++++++++++++++++++++++
- 2 files changed, 75 insertions(+)
+ drivers/md/bcache/sysfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/ABI/testing/sysfs-bus-pci b/Documentation/ABI/testing/sysfs-bus-pci
-index 44d4b2be92fd..f5656dae21be 100644
---- a/Documentation/ABI/testing/sysfs-bus-pci
-+++ b/Documentation/ABI/testing/sysfs-bus-pci
-@@ -323,3 +323,28 @@ Description:
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index b418409..240cbec 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -170,7 +170,7 @@
+ 	sysfs_hprint(dirty_data,
+ 		     bcache_dev_sectors_dirty(&dc->disk) << 9);
  
- 		This is similar to /sys/bus/pci/drivers_autoprobe, but
- 		affects only the VFs associated with a specific PF.
-+
-+What:		/sys/bus/pci/devices/.../p2pmem/available
-+Date:		November 2017
-+Contact:	Logan Gunthorpe <logang@deltatee.com>
-+Description:
-+		If the device has any Peer-to-Peer memory registered, this
-+	        file contains the amount of memory that has not been
-+		allocated (in decimal).
-+
-+What:		/sys/bus/pci/devices/.../p2pmem/size
-+Date:		November 2017
-+Contact:	Logan Gunthorpe <logang@deltatee.com>
-+Description:
-+		If the device has any Peer-to-Peer memory registered, this
-+	        file contains the total ammount of memory that the device
-+		provides (in decimal).
-+
-+What:		/sys/bus/pci/devices/.../p2pmem/published
-+Date:		November 2017
-+Contact:	Logan Gunthorpe <logang@deltatee.com>
-+Description:
-+		If the device has any Peer-to-Peer memory registered, this
-+	        file contains a '1' if the memory has been published for
-+		use inside the kernel or a '0' if it is only intended
-+		for use within the driver that published it.
-diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
-index ec0a6cb9e500..a57df78f6a32 100644
---- a/drivers/pci/p2pdma.c
-+++ b/drivers/pci/p2pdma.c
-@@ -29,6 +29,53 @@ struct pci_p2pdma {
- 	bool published;
- };
+-	sysfs_hprint(stripe_size,	dc->disk.stripe_size << 9);
++	sysfs_hprint(stripe_size,	 ((uint64_t)dc->disk.stripe_size) << 9);
+ 	var_printf(partial_stripes_expensive,	"%u");
  
-+static ssize_t size_show(struct device *dev, struct device_attribute *attr,
-+			 char *buf)
-+{
-+	struct pci_dev *pdev = to_pci_dev(dev);
-+	size_t size = 0;
-+
-+	if (pdev->p2pdma->pool)
-+		size = gen_pool_size(pdev->p2pdma->pool);
-+
-+	return snprintf(buf, PAGE_SIZE, "%zd\n", size);
-+}
-+static DEVICE_ATTR_RO(size);
-+
-+static ssize_t available_show(struct device *dev, struct device_attribute *attr,
-+			      char *buf)
-+{
-+	struct pci_dev *pdev = to_pci_dev(dev);
-+	size_t avail = 0;
-+
-+	if (pdev->p2pdma->pool)
-+		avail = gen_pool_avail(pdev->p2pdma->pool);
-+
-+	return snprintf(buf, PAGE_SIZE, "%zd\n", avail);
-+}
-+static DEVICE_ATTR_RO(available);
-+
-+static ssize_t published_show(struct device *dev, struct device_attribute *attr,
-+			      char *buf)
-+{
-+	struct pci_dev *pdev = to_pci_dev(dev);
-+
-+	return snprintf(buf, PAGE_SIZE, "%d\n", pdev->p2pdma->published);
-+}
-+static DEVICE_ATTR_RO(published);
-+
-+static struct attribute *p2pmem_attrs[] = {
-+	&dev_attr_size.attr,
-+	&dev_attr_available.attr,
-+	&dev_attr_published.attr,
-+	NULL,
-+};
-+
-+static const struct attribute_group p2pmem_group = {
-+	.attrs = p2pmem_attrs,
-+	.name = "p2pmem",
-+};
-+
- static void pci_p2pdma_percpu_release(struct percpu_ref *ref)
- {
- 	struct pci_p2pdma *p2p =
-@@ -55,6 +102,7 @@ static void pci_p2pdma_release(void *data)
- 	percpu_ref_exit(&pdev->p2pdma->devmap_ref);
- 
- 	gen_pool_destroy(pdev->p2pdma->pool);
-+	sysfs_remove_group(&pdev->dev.kobj, &p2pmem_group);
- 	pdev->p2pdma = NULL;
- }
- 
-@@ -83,6 +131,8 @@ static int pci_p2pdma_setup(struct pci_dev *pdev)
- 	if (error)
- 		goto out_pool_destroy;
- 
-+	error = sysfs_create_group(&pdev->dev.kobj, &p2pmem_group);
-+
- 	pdev->p2pdma = p2p;
- 
- 	return 0;
+ 	var_hprint(sequential_cutoff);
 -- 
-2.11.0
+1.8.3.1
