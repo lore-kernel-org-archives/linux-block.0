@@ -1,203 +1,61 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:35972 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752439AbeBFQFk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 6 Feb 2018 11:05:40 -0500
-From: Jan Kara <jack@suse.cz>
-To: <linux-block@vger.kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Hou Tao <houtao1@huawei.com>,
-        Eric Biggers <ebiggers3@gmail.com>, Jan Kara <jack@suse.cz>
-Subject: [PATCH 2/6] genhd: Rename get_disk() to get_disk_and_module()
-Date: Tue,  6 Feb 2018 17:05:25 +0100
-Message-Id: <20180206160529.20713-3-jack@suse.cz>
-In-Reply-To: <20180206160529.20713-1-jack@suse.cz>
-References: <20180206160529.20713-1-jack@suse.cz>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=5743cbe84=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Hannes Reinecke <hare@suse.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: [PATCH] blk-mq-debugfs: Also show requests that have not yet been started
+Date: Mon, 12 Feb 2018 09:02:00 -0800
+Message-Id: <20180212170200.13131-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Rename get_disk() to get_disk_and_module() to make sure what the
-function does. It's not a great name but at least it is now clear that
-put_disk() is not it's counterpart.
+When debugging e.g. the SCSI timeout handler it is important that
+requests that have not yet been started or that already have
+completed are also reported through debugfs.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
+This patch depends on a patch that went upstream in kernel v4.15,
+namely commit 14e3062fb185 ("scsi: core: Fix a scsi_show_rq() NULL
+pointer dereference").
+
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
 ---
- block/genhd.c           | 10 ++++------
- drivers/block/amiflop.c |  2 +-
- drivers/block/ataflop.c |  2 +-
- drivers/block/brd.c     |  2 +-
- drivers/block/floppy.c  |  2 +-
- drivers/block/loop.c    |  2 +-
- drivers/block/swim.c    |  2 +-
- drivers/block/z2ram.c   |  2 +-
- drivers/ide/ide-probe.c |  2 +-
- include/linux/genhd.h   |  2 +-
- 10 files changed, 13 insertions(+), 15 deletions(-)
+ block/blk-mq-debugfs.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 22f4fc340a3a..058cf91f8d32 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -547,7 +547,7 @@ static int exact_lock(dev_t devt, void *data)
- {
- 	struct gendisk *p = data;
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index c62a3704515b..bcb64b2f8090 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -401,6 +401,12 @@ struct show_busy_params {
+ };
  
--	if (!get_disk(p))
-+	if (!get_disk_and_module(p))
- 		return -1;
- 	return 0;
+ /*
++ * Show "busy" requests - these are the requests owned by the block driver.
++ * The test list_empty(&rq->queuelist) is used to figure out whether or not
++ * a request is owned by the block driver. That test works because the block
++ * layer core uses list_del_init() consistently to remove a request from one
++ * of the request lists.
++ *
+  * Note: the state of a request may change while this function is in progress,
+  * e.g. due to a concurrent blk_mq_finish_request() call.
+  */
+@@ -409,7 +415,7 @@ static void hctx_show_busy_rq(struct request *rq, void *data, bool reserved)
+ 	const struct show_busy_params *params = data;
+ 
+ 	if (blk_mq_map_queue(rq->q, rq->mq_ctx->cpu) == params->hctx &&
+-	    blk_mq_rq_state(rq) != MQ_RQ_IDLE)
++	    list_empty(&rq->queuelist))
+ 		__blk_mq_debugfs_rq_show(params->m,
+ 					 list_entry_rq(&rq->queuelist));
  }
-@@ -794,7 +794,7 @@ struct gendisk *get_gendisk(dev_t devt, int *partno)
- 
- 		spin_lock_bh(&ext_devt_lock);
- 		part = idr_find(&ext_devt_idr, blk_mangle_minor(MINOR(devt)));
--		if (part && get_disk(part_to_disk(part))) {
-+		if (part && get_disk_and_module(part_to_disk(part))) {
- 			*partno = part->partno;
- 			disk = part_to_disk(part);
- 		}
-@@ -1441,7 +1441,7 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
- }
- EXPORT_SYMBOL(__alloc_disk_node);
- 
--struct kobject *get_disk(struct gendisk *disk)
-+struct kobject *get_disk_and_module(struct gendisk *disk)
- {
- 	struct module *owner;
- 	struct kobject *kobj;
-@@ -1459,15 +1459,13 @@ struct kobject *get_disk(struct gendisk *disk)
- 	return kobj;
- 
- }
--
--EXPORT_SYMBOL(get_disk);
-+EXPORT_SYMBOL(get_disk_and_module);
- 
- void put_disk(struct gendisk *disk)
- {
- 	if (disk)
- 		kobject_put(&disk_to_dev(disk)->kobj);
- }
--
- EXPORT_SYMBOL(put_disk);
- 
- static void set_disk_ro_uevent(struct gendisk *gd, int ro)
-diff --git a/drivers/block/amiflop.c b/drivers/block/amiflop.c
-index e5aa62fcf5a8..3aaf6af3ec23 100644
---- a/drivers/block/amiflop.c
-+++ b/drivers/block/amiflop.c
-@@ -1758,7 +1758,7 @@ static struct kobject *floppy_find(dev_t dev, int *part, void *data)
- 	if (unit[drive].type->code == FD_NODRIVE)
- 		return NULL;
- 	*part = 0;
--	return get_disk(unit[drive].gendisk);
-+	return get_disk_and_module(unit[drive].gendisk);
- }
- 
- static int __init amiga_floppy_probe(struct platform_device *pdev)
-diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
-index 8bc3b9fd8dd2..dfb2c2622e5a 100644
---- a/drivers/block/ataflop.c
-+++ b/drivers/block/ataflop.c
-@@ -1917,7 +1917,7 @@ static struct kobject *floppy_find(dev_t dev, int *part, void *data)
- 	if (drive >= FD_MAX_UNITS || type > NUM_DISK_MINORS)
- 		return NULL;
- 	*part = 0;
--	return get_disk(unit[drive].disk);
-+	return get_disk_and_module(unit[drive].disk);
- }
- 
- static int __init atari_floppy_init (void)
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 8028a3a7e7fd..deea78e485da 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -456,7 +456,7 @@ static struct kobject *brd_probe(dev_t dev, int *part, void *data)
- 
- 	mutex_lock(&brd_devices_mutex);
- 	brd = brd_init_one(MINOR(dev) / max_part, &new);
--	kobj = brd ? get_disk(brd->brd_disk) : NULL;
-+	kobj = brd ? get_disk_and_module(brd->brd_disk) : NULL;
- 	mutex_unlock(&brd_devices_mutex);
- 
- 	if (new)
-diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index eae484acfbbc..8ec7235fc93b 100644
---- a/drivers/block/floppy.c
-+++ b/drivers/block/floppy.c
-@@ -4505,7 +4505,7 @@ static struct kobject *floppy_find(dev_t dev, int *part, void *data)
- 	if (((*part >> 2) & 0x1f) >= ARRAY_SIZE(floppy_type))
- 		return NULL;
- 	*part = 0;
--	return get_disk(disks[drive]);
-+	return get_disk_and_module(disks[drive]);
- }
- 
- static int __init do_floppy_init(void)
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index d5fe720cf149..87855b5123a6 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1922,7 +1922,7 @@ static struct kobject *loop_probe(dev_t dev, int *part, void *data)
- 	if (err < 0)
- 		kobj = NULL;
- 	else
--		kobj = get_disk(lo->lo_disk);
-+		kobj = get_disk_and_module(lo->lo_disk);
- 	mutex_unlock(&loop_index_mutex);
- 
- 	*part = 0;
-diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-index 84434d3ea19b..64e066eba72e 100644
---- a/drivers/block/swim.c
-+++ b/drivers/block/swim.c
-@@ -799,7 +799,7 @@ static struct kobject *floppy_find(dev_t dev, int *part, void *data)
- 		return NULL;
- 
- 	*part = 0;
--	return get_disk(swd->unit[drive].disk);
-+	return get_disk_and_module(swd->unit[drive].disk);
- }
- 
- static int swim_add_floppy(struct swim_priv *swd, enum drive_location location)
-diff --git a/drivers/block/z2ram.c b/drivers/block/z2ram.c
-index 41c95c9b2ab4..8f9130ab5887 100644
---- a/drivers/block/z2ram.c
-+++ b/drivers/block/z2ram.c
-@@ -332,7 +332,7 @@ static const struct block_device_operations z2_fops =
- static struct kobject *z2_find(dev_t dev, int *part, void *data)
- {
- 	*part = 0;
--	return get_disk(z2ram_gendisk);
-+	return get_disk_and_module(z2ram_gendisk);
- }
- 
- static struct request_queue *z2_queue;
-diff --git a/drivers/ide/ide-probe.c b/drivers/ide/ide-probe.c
-index 17fd55af4d92..caa20eb5f26b 100644
---- a/drivers/ide/ide-probe.c
-+++ b/drivers/ide/ide-probe.c
-@@ -928,7 +928,7 @@ static int exact_lock(dev_t dev, void *data)
- {
- 	struct gendisk *p = data;
- 
--	if (!get_disk(p))
-+	if (!get_disk_and_module(p))
- 		return -1;
- 	return 0;
- }
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 5144ebe046c9..12402912a86a 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -595,7 +595,7 @@ extern void delete_partition(struct gendisk *, int);
- extern void printk_all_partitions(void);
- 
- extern struct gendisk *__alloc_disk_node(int minors, int node_id);
--extern struct kobject *get_disk(struct gendisk *disk);
-+extern struct kobject *get_disk_and_module(struct gendisk *disk);
- extern void put_disk(struct gendisk *disk);
- extern void blk_register_region(dev_t devt, unsigned long range,
- 			struct module *module,
 -- 
-2.13.6
+2.16.1
