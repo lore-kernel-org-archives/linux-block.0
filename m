@@ -1,135 +1,37 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:36066 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752545AbeBZMBu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Feb 2018 07:01:50 -0500
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>, Hou Tao <houtao1@huawei.com>,
-        Jan Kara <jack@suse.cz>
-Subject: [PATCH 5/6] genhd: Fix BUG in blkdev_open()
-Date: Mon, 26 Feb 2018 13:01:41 +0100
-Message-Id: <20180226120142.25786-6-jack@suse.cz>
-In-Reply-To: <20180226120142.25786-1-jack@suse.cz>
-References: <20180226120142.25786-1-jack@suse.cz>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=5750b75e3=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "sergey.senozhatsky.work@gmail.com" <sergey.senozhatsky.work@gmail.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"ngupta@vflare.org" <ngupta@vflare.org>, "snitzer@redhat.com"
+	<snitzer@redhat.com>, "hch@lst.de" <hch@lst.de>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"dan.j.williams@intel.com" <dan.j.williams@intel.com>, "minchan@kernel.org"
+	<minchan@kernel.org>, "davem@davemloft.net" <davem@davemloft.net>
+Subject: Re: [PATCH] block: Move SECTOR_SIZE and SECTOR_SHIFT definitions into
+ <linux/blkdev.h>
+Date: Tue, 13 Feb 2018 16:17:44 +0000
+Message-ID: <1518538663.2796.3.camel@wdc.com>
+References: <20180212190535.30057-1-bart.vanassche@wdc.com>
+	 <20180213085415.GB1953@jagdpanzerIV>
+In-Reply-To: <20180213085415.GB1953@jagdpanzerIV>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-When two blkdev_open() calls for a partition race with device removal
-and recreation, we can hit BUG_ON(!bd_may_claim(bdev, whole, holder)) in
-blkdev_open(). The race can happen as follows:
-
-CPU0				CPU1			CPU2
-							del_gendisk()
-							  bdev_unhash_inode(part1);
-
-blkdev_open(part1, O_EXCL)	blkdev_open(part1, O_EXCL)
-  bdev = bd_acquire()		  bdev = bd_acquire()
-  blkdev_get(bdev)
-    bd_start_claiming(bdev)
-      - finds old inode 'whole'
-      bd_prepare_to_claim() -> 0
-							  bdev_unhash_inode(whole);
-							<device removed>
-							<new device under same
-							 number created>
-				  blkdev_get(bdev);
-				    bd_start_claiming(bdev)
-				      - finds new inode 'whole'
-				      bd_prepare_to_claim()
-					- this also succeeds as we have
-					  different 'whole' here...
-					- bad things happen now as we
-					  have two exclusive openers of
-					  the same bdev
-
-The problem here is that block device opens can see various intermediate
-states while gendisk is shutting down and then being recreated.
-
-We fix the problem by introducing new lookup_sem in gendisk that
-synchronizes gendisk deletion with get_gendisk() and furthermore by
-making sure that get_gendisk() does not return gendisk that is being (or
-has been) deleted. This makes sure that once we ever manage to look up
-newly created bdev inode, we are also guaranteed that following
-get_gendisk() will either return failure (and we fail open) or it
-returns gendisk for the new device and following bdget_disk() will
-return new bdev inode (i.e., blkdev_open() follows the path as if it is
-completely run after new device is created).
-
-Reported-and-analyzed-by: Hou Tao <houtao1@huawei.com>
-Tested-by: Hou Tao <houtao1@huawei.com>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/genhd.c         | 21 ++++++++++++++++++++-
- include/linux/genhd.h |  1 +
- 2 files changed, 21 insertions(+), 1 deletion(-)
-
-diff --git a/block/genhd.c b/block/genhd.c
-index 4c0590434591..9656f9e9f99e 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -717,6 +717,11 @@ void del_gendisk(struct gendisk *disk)
- 	blk_integrity_del(disk);
- 	disk_del_events(disk);
- 
-+	/*
-+	 * Block lookups of the disk until all bdevs are unhashed and the
-+	 * disk is marked as dead (GENHD_FL_UP cleared).
-+	 */
-+	down_write(&disk->lookup_sem);
- 	/* invalidate stuff */
- 	disk_part_iter_init(&piter, disk,
- 			     DISK_PITER_INCL_EMPTY | DISK_PITER_REVERSE);
-@@ -731,6 +736,7 @@ void del_gendisk(struct gendisk *disk)
- 	bdev_unhash_inode(disk_devt(disk));
- 	set_capacity(disk, 0);
- 	disk->flags &= ~GENHD_FL_UP;
-+	up_write(&disk->lookup_sem);
- 
- 	if (!(disk->flags & GENHD_FL_HIDDEN))
- 		sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
-@@ -816,9 +822,21 @@ struct gendisk *get_gendisk(dev_t devt, int *partno)
- 		spin_unlock_bh(&ext_devt_lock);
- 	}
- 
--	if (disk && unlikely(disk->flags & GENHD_FL_HIDDEN)) {
-+	if (!disk)
-+		return NULL;
-+
-+	/*
-+	 * Synchronize with del_gendisk() to not return disk that is being
-+	 * destroyed.
-+	 */
-+	down_read(&disk->lookup_sem);
-+	if (unlikely((disk->flags & GENHD_FL_HIDDEN) ||
-+		     !(disk->flags & GENHD_FL_UP))) {
-+		up_read(&disk->lookup_sem);
- 		put_disk_and_module(disk);
- 		disk = NULL;
-+	} else {
-+		up_read(&disk->lookup_sem);
- 	}
- 	return disk;
- }
-@@ -1418,6 +1436,7 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
- 			kfree(disk);
- 			return NULL;
- 		}
-+		init_rwsem(&disk->lookup_sem);
- 		disk->node_id = node_id;
- 		if (disk_expand_part_tbl(disk, 0)) {
- 			free_part_stats(&disk->part0);
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 7f5906fe1b70..c826b0b5232a 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -198,6 +198,7 @@ struct gendisk {
- 	void *private_data;
- 
- 	int flags;
-+	struct rw_semaphore lookup_sem;
- 	struct kobject *slave_dir;
- 
- 	struct timer_rand_state *random;
--- 
-2.13.6
+T24gVHVlLCAyMDE4LTAyLTEzIGF0IDE3OjU0ICswOTAwLCBTZXJnZXkgU2Vub3poYXRza3kgd3Jv
+dGU6DQo+IE9uICgwMi8xMi8xOCAxMTowNSksIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gWy4u
+XQ0KPiA+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L2Jsa2Rldi5oIGIvaW5jbHVkZS9saW51
+eC9ibGtkZXYuaA0KPiA+IGluZGV4IGFjNDc0MGNmNzRiZS4uY2YxNzYyNjYwNGMyIDEwMDY0NA0K
+PiA+IC0tLSBhL2luY2x1ZGUvbGludXgvYmxrZGV2LmgNCj4gPiArKysgYi9pbmNsdWRlL2xpbnV4
+L2Jsa2Rldi5oDQo+ID4gQEAgLTEwMjYsMTQgKzEwMjYsMjUgQEAgc3RhdGljIGlubGluZSBpbnQg
+YmxrX3JxX2N1cl9ieXRlcyhjb25zdCBzdHJ1Y3QgcmVxdWVzdCAqcnEpDQo+ID4gIA0KPiA+ICBl
+eHRlcm4gdW5zaWduZWQgaW50IGJsa19ycV9lcnJfYnl0ZXMoY29uc3Qgc3RydWN0IHJlcXVlc3Qg
+KnJxKTsNCj4gPiAgDQo+ID4gKy8qDQo+ID4gKyAqIFZhcmlhYmxlcyBvZiB0eXBlIHNlY3Rvcl90
+IHJlcHJlc2VudCBhbiBvZmZzZXQgb3Igc2l6ZSB0aGF0IGlzIGEgbXVsdGlwbGUgb2YNCj4gPiAr
+ICogMioqOSBieXRlcy4gSGVuY2UgdGhlc2UgdHdvIGNvbnN0YW50cy4NCj4gPiArICovDQo+ID4g
+KyNpZm5kZWYgU0VDVE9SX1NISUZUDQo+ID4gK2VudW0geyBTRUNUT1JfU0hJRlQgPSA5IH07DQo+
+ID4gKyNlbmRpZg0KPiA+ICsjaWZuZGVmIFNFQ1RPUl9TSVpFDQo+ID4gK2VudW0geyBTRUNUT1Jf
+U0laRSA9IDUxMiB9Ow0KPiA+ICsjZW5kaWYNCj4gDQo+IFNob3VsZG4ndCBTRUNUT1JfU0laRSBk
+ZXBlbmQgb24gU0VDVE9SX1NISUZUPw0KPiANCj4gMSA8PCBTRUNUT1JfU0hJRlQNCg0KTm90IHN1
+cmUgaWYgdGhhdCBjaGFuZ2Ugd2lsbCByZWFsbHkgbWFrZSBhIGRpZmZlcmVuY2UuIEFueXdheSwg
+SSB3aWxsIG1ha2UgdGhhdCBjaGFuZ2UuDQoNCkJhcnQuDQoNCg0KDQo=
