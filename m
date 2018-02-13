@@ -1,156 +1,152 @@
-Return-Path: <jack@suse.cz>
-Date: Wed, 14 Feb 2018 12:53:37 +0100
-From: Jan Kara <jack@suse.cz>
-To: Hou Tao <houtao1@huawei.com>
-Cc: Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-	Eric Biggers <ebiggers3@gmail.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from szxga06-in.huawei.com ([45.249.212.32]:42765 "EHLO huawei.com"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S933132AbeBMCM1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 12 Feb 2018 21:12:27 -0500
 Subject: Re: [PATCH 5/6] genhd: Fix BUG in blkdev_open()
-Message-ID: <20180214115337.pllqo4m2m7bunbxv@quack2.suse.cz>
+To: Jan Kara <jack@suse.cz>, <linux-block@vger.kernel.org>
 References: <20180206160529.20713-1-jack@suse.cz>
  <20180206160529.20713-6-jack@suse.cz>
- <9d88e37a-6fb9-aca9-6572-c4bfabadabb8@huawei.com>
+CC: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Eric Biggers <ebiggers3@gmail.com>
+From: Hou Tao <houtao1@huawei.com>
+Message-ID: <9d88e37a-6fb9-aca9-6572-c4bfabadabb8@huawei.com>
+Date: Tue, 13 Feb 2018 10:11:37 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <9d88e37a-6fb9-aca9-6572-c4bfabadabb8@huawei.com>
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20180206160529.20713-6-jack@suse.cz>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Tue 13-02-18 10:11:37, Hou Tao wrote:
-> Hi Jan,
-> 
-> On 2018/2/7 0:05, Jan Kara wrote:
-> > When two blkdev_open() calls for a partition race with device removal
-> > and recreation, we can hit BUG_ON(!bd_may_claim(bdev, whole, holder)) in
-> > blkdev_open(). The race can happen as follows:
-> > 
-> > CPU0				CPU1			CPU2
-> > 							del_gendisk()
-> > 							  bdev_unhash_inode(part1);
-> > 
-> > blkdev_open(part1, O_EXCL)	blkdev_open(part1, O_EXCL)
-> >   bdev = bd_acquire()		  bdev = bd_acquire()
-> >   blkdev_get(bdev)
-> >     bd_start_claiming(bdev)
-> >       - finds old inode 'whole'
-> >       bd_prepare_to_claim() -> 0
-> > 							  bdev_unhash_inode(whole);
-> > 							<device removed>
-> > 							<new device under same
-> > 							 number created>
-> > 				  blkdev_get(bdev);
-> > 				    bd_start_claiming(bdev)
-> > 				      - finds new inode 'whole'
-> > 				      bd_prepare_to_claim()
-> > 					- this also succeeds as we have
-> > 					  different 'whole' here...
-> > 					- bad things happen now as we
-> > 					  have two exclusive openers of
-> > 					  the same bdev
-> > 
-> > The problem here is that block device opens can see various intermediate
-> > states while gendisk is shutting down and then being recreated.
-> > 
-> > We fix the problem by introducing new lookup_sem in gendisk that
-> > synchronizes gendisk deletion with get_gendisk() and furthermore by
-> > making sure that get_gendisk() does not return gendisk that is being (or
-> > has been) deleted. This makes sure that once we ever manage to look up
-> > newly created bdev inode, we are also guaranteed that following
-> > get_gendisk() will either return failure (and we fail open) or it
-> > returns gendisk for the new device and following bdget_disk() will
-> > return new bdev inode (i.e., blkdev_open() follows the path as if it is
-> > completely run after new device is created).
-> > 
-> > Reported-and-analyzed-by: Hou Tao <houtao1@huawei.com>
-> > Signed-off-by: Jan Kara <jack@suse.cz>
-> > ---
-> >  block/genhd.c         | 21 ++++++++++++++++++++-
-> >  include/linux/genhd.h |  1 +
-> >  2 files changed, 21 insertions(+), 1 deletion(-)
-> > 
-> 
-> Before applying the patch set, the BUG_ON in blkdev_open() will reproduce in about
-> 10 minutes or less. Now after applying the patch set and running about 8 hours or more,
-> the bug is no longer reproducible, so
-> 
-> Tested-by: Hou Tao <houtao1@huawei.com>
-> 
-> Based on the test result, it seems that this patch alone can not fix the BUG_ON in
-> blkdev_open(). Patch 6 is also needed to fix the BUG_ON problem.
+Hi Jan,
 
-Thanks a lot for the testing! Jens, can you please pick up these fixes?
-Thanks!
-
-								Honza
-
-> > diff --git a/block/genhd.c b/block/genhd.c
-> > index 64c323549a22..c6f68c332bfe 100644
-> > --- a/block/genhd.c
-> > +++ b/block/genhd.c
-> > @@ -703,6 +703,11 @@ void del_gendisk(struct gendisk *disk)
-> >  	blk_integrity_del(disk);
-> >  	disk_del_events(disk);
-> >  
-> > +	/*
-> > +	 * Block lookups of the disk until all bdevs are unhashed and the
-> > +	 * disk is marked as dead (GENHD_FL_UP cleared).
-> > +	 */
-> > +	down_write(&disk->lookup_sem);
-> >  	/* invalidate stuff */
-> >  	disk_part_iter_init(&piter, disk,
-> >  			     DISK_PITER_INCL_EMPTY | DISK_PITER_REVERSE);
-> > @@ -717,6 +722,7 @@ void del_gendisk(struct gendisk *disk)
-> >  	bdev_unhash_inode(disk_devt(disk));
-> >  	set_capacity(disk, 0);
-> >  	disk->flags &= ~GENHD_FL_UP;
-> > +	up_write(&disk->lookup_sem);
-> >  
-> >  	if (!(disk->flags & GENHD_FL_HIDDEN))
-> >  		sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
-> > @@ -801,9 +807,21 @@ struct gendisk *get_gendisk(dev_t devt, int *partno)
-> >  		spin_unlock_bh(&ext_devt_lock);
-> >  	}
-> >  
-> > -	if (disk && unlikely(disk->flags & GENHD_FL_HIDDEN)) {
-> > +	if (!disk)
-> > +		return NULL;
-> > +
-> > +	/*
-> > +	 * Synchronize with del_gendisk() to not return disk that is being
-> > +	 * destroyed.
-> > +	 */
-> > +	down_read(&disk->lookup_sem);
-> > +	if (unlikely((disk->flags & GENHD_FL_HIDDEN) ||
-> > +		     !(disk->flags & GENHD_FL_UP))) {
-> > +		up_read(&disk->lookup_sem);
-> >  		put_disk_and_module(disk);
-> >  		disk = NULL;
-> > +	} else {
-> > +		up_read(&disk->lookup_sem);
-> >  	}
-> >  	return disk;
-> >  }
-> > @@ -1403,6 +1421,7 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
-> >  			kfree(disk);
-> >  			return NULL;
-> >  		}
-> > +		init_rwsem(&disk->lookup_sem);
-> >  		disk->node_id = node_id;
-> >  		if (disk_expand_part_tbl(disk, 0)) {
-> >  			free_part_stats(&disk->part0);
-> > diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-> > index 07b715cdeb93..7b548253eaef 100644
-> > --- a/include/linux/genhd.h
-> > +++ b/include/linux/genhd.h
-> > @@ -198,6 +198,7 @@ struct gendisk {
-> >  	void *private_data;
-> >  
-> >  	int flags;
-> > +	struct rw_semaphore lookup_sem;
-> >  	struct kobject *slave_dir;
-> >  
-> >  	struct timer_rand_state *random;
-> > 
+On 2018/2/7 0:05, Jan Kara wrote:
+> When two blkdev_open() calls for a partition race with device removal
+> and recreation, we can hit BUG_ON(!bd_may_claim(bdev, whole, holder)) in
+> blkdev_open(). The race can happen as follows:
 > 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> CPU0				CPU1			CPU2
+> 							del_gendisk()
+> 							  bdev_unhash_inode(part1);
+> 
+> blkdev_open(part1, O_EXCL)	blkdev_open(part1, O_EXCL)
+>   bdev = bd_acquire()		  bdev = bd_acquire()
+>   blkdev_get(bdev)
+>     bd_start_claiming(bdev)
+>       - finds old inode 'whole'
+>       bd_prepare_to_claim() -> 0
+> 							  bdev_unhash_inode(whole);
+> 							<device removed>
+> 							<new device under same
+> 							 number created>
+> 				  blkdev_get(bdev);
+> 				    bd_start_claiming(bdev)
+> 				      - finds new inode 'whole'
+> 				      bd_prepare_to_claim()
+> 					- this also succeeds as we have
+> 					  different 'whole' here...
+> 					- bad things happen now as we
+> 					  have two exclusive openers of
+> 					  the same bdev
+> 
+> The problem here is that block device opens can see various intermediate
+> states while gendisk is shutting down and then being recreated.
+> 
+> We fix the problem by introducing new lookup_sem in gendisk that
+> synchronizes gendisk deletion with get_gendisk() and furthermore by
+> making sure that get_gendisk() does not return gendisk that is being (or
+> has been) deleted. This makes sure that once we ever manage to look up
+> newly created bdev inode, we are also guaranteed that following
+> get_gendisk() will either return failure (and we fail open) or it
+> returns gendisk for the new device and following bdget_disk() will
+> return new bdev inode (i.e., blkdev_open() follows the path as if it is
+> completely run after new device is created).
+> 
+> Reported-and-analyzed-by: Hou Tao <houtao1@huawei.com>
+> Signed-off-by: Jan Kara <jack@suse.cz>
+> ---
+>  block/genhd.c         | 21 ++++++++++++++++++++-
+>  include/linux/genhd.h |  1 +
+>  2 files changed, 21 insertions(+), 1 deletion(-)
+> 
+
+Before applying the patch set, the BUG_ON in blkdev_open() will reproduce in about
+10 minutes or less. Now after applying the patch set and running about 8 hours or more,
+the bug is no longer reproducible, so
+
+Tested-by: Hou Tao <houtao1@huawei.com>
+
+Based on the test result, it seems that this patch alone can not fix the BUG_ON in
+blkdev_open(). Patch 6 is also needed to fix the BUG_ON problem.
+
+Regards,
+Tao
+
+> diff --git a/block/genhd.c b/block/genhd.c
+> index 64c323549a22..c6f68c332bfe 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -703,6 +703,11 @@ void del_gendisk(struct gendisk *disk)
+>  	blk_integrity_del(disk);
+>  	disk_del_events(disk);
+>  
+> +	/*
+> +	 * Block lookups of the disk until all bdevs are unhashed and the
+> +	 * disk is marked as dead (GENHD_FL_UP cleared).
+> +	 */
+> +	down_write(&disk->lookup_sem);
+>  	/* invalidate stuff */
+>  	disk_part_iter_init(&piter, disk,
+>  			     DISK_PITER_INCL_EMPTY | DISK_PITER_REVERSE);
+> @@ -717,6 +722,7 @@ void del_gendisk(struct gendisk *disk)
+>  	bdev_unhash_inode(disk_devt(disk));
+>  	set_capacity(disk, 0);
+>  	disk->flags &= ~GENHD_FL_UP;
+> +	up_write(&disk->lookup_sem);
+>  
+>  	if (!(disk->flags & GENHD_FL_HIDDEN))
+>  		sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
+> @@ -801,9 +807,21 @@ struct gendisk *get_gendisk(dev_t devt, int *partno)
+>  		spin_unlock_bh(&ext_devt_lock);
+>  	}
+>  
+> -	if (disk && unlikely(disk->flags & GENHD_FL_HIDDEN)) {
+> +	if (!disk)
+> +		return NULL;
+> +
+> +	/*
+> +	 * Synchronize with del_gendisk() to not return disk that is being
+> +	 * destroyed.
+> +	 */
+> +	down_read(&disk->lookup_sem);
+> +	if (unlikely((disk->flags & GENHD_FL_HIDDEN) ||
+> +		     !(disk->flags & GENHD_FL_UP))) {
+> +		up_read(&disk->lookup_sem);
+>  		put_disk_and_module(disk);
+>  		disk = NULL;
+> +	} else {
+> +		up_read(&disk->lookup_sem);
+>  	}
+>  	return disk;
+>  }
+> @@ -1403,6 +1421,7 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
+>  			kfree(disk);
+>  			return NULL;
+>  		}
+> +		init_rwsem(&disk->lookup_sem);
+>  		disk->node_id = node_id;
+>  		if (disk_expand_part_tbl(disk, 0)) {
+>  			free_part_stats(&disk->part0);
+> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+> index 07b715cdeb93..7b548253eaef 100644
+> --- a/include/linux/genhd.h
+> +++ b/include/linux/genhd.h
+> @@ -198,6 +198,7 @@ struct gendisk {
+>  	void *private_data;
+>  
+>  	int flags;
+> +	struct rw_semaphore lookup_sem;
+>  	struct kobject *slave_dir;
+>  
+>  	struct timer_rand_state *random;
+> 
