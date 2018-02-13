@@ -1,46 +1,83 @@
-Return-Path: <prvs=5750b75e3=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "paolo.valente@linaro.org" <paolo.valente@linaro.org>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
 Subject: Re: v4.16-rc1 + dm-mpath + BFQ
-Date: Tue, 13 Feb 2018 18:47:20 +0000
-Message-ID: <1518547636.2796.15.camel@wdc.com>
+From: Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <06795609-6ec6-4ae2-f219-3bf7219c11a3@wdc.com>
+Date: Tue, 13 Feb 2018 19:38:34 +0100
+Cc: Jens Axboe <axboe@kernel.dk>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Message-Id: <D89FF8A1-871E-4661-AE9F-6515E6C5EF22@linaro.org>
 References: <1518202449.2871.32.camel@wdc.com>
-	 <6a1695f4-de6f-a959-5242-9611e148bc11@kernel.dk>
-	 <13a55c03-b138-ca8c-0a0a-95c976b4909e@wdc.com>
-	 <bee15d7a-de1f-daee-717d-b9e314ab06a1@kernel.dk>
-	 <1FC84680-6482-4FE5-97D0-0F7079C45AA7@linaro.org>
-	 <06795609-6ec6-4ae2-f219-3bf7219c11a3@wdc.com>
-	 <D89FF8A1-871E-4661-AE9F-6515E6C5EF22@linaro.org>
-In-Reply-To: <D89FF8A1-871E-4661-AE9F-6515E6C5EF22@linaro.org>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+ <6a1695f4-de6f-a959-5242-9611e148bc11@kernel.dk>
+ <13a55c03-b138-ca8c-0a0a-95c976b4909e@wdc.com>
+ <bee15d7a-de1f-daee-717d-b9e314ab06a1@kernel.dk>
+ <1FC84680-6482-4FE5-97D0-0F7079C45AA7@linaro.org>
+ <06795609-6ec6-4ae2-f219-3bf7219c11a3@wdc.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE4LTAyLTEzIGF0IDE5OjM4ICswMTAwLCBQYW9sbyBWYWxlbnRlIHdyb3RlOg0K
-PiBhcyBhIGZpcnN0IGF0dGVtcHQsIEkndmUgZm9sbG93ZWQgeW91ciBzdGVwcywgYnV0IGdvdDoN
-Cj4gRXJyb3I6IGNvdWxkIG5vdCBmaW5kIHNnX3Jlc2V0DQoNClBsZWFzZSBpbnN0YWxsIHRoZSBz
-ZzNfdXRpbHMgcGFja2FnZS4gRXZlcnkgTGludXggZGlzdHJvIEkga25vdyBvZiBzdXBwb3J0cyB0
-aGF0DQpwYWNrYWdlLiBBbmQgaW4gY2FzZSB5b3Ugd291bGQgbGlrZSB0byBpbnN0YWxsIGl0IGZy
-b20gc291cmNlLCB0aGUgc291cmNlIGNvZGUgb2YNCnRoYXQgcGFja2FnZSBpcyBhdmFpbGFibGUg
-ZnJvbSBodHRwOi8vc2cuZGFubnkuY3ovc2cvc2czX3V0aWxzLmh0bWwuDQoNCj4gRm9yIGliX3Ny
-cC1iYWNrcG9ydCwgSSBnZXQgYSBsb3Qgb2Ygd2FybmluZ3MgbGlrZSB0aGUgZm9sbG93aW5nIG9u
-ZSwNCj4gYXQgIm1ha2UgaW5zdGFsbCIgKHByZWNlZGVkIGJ5IGNvcnJlc3BvbmRpbmcgd2Fybmlu
-Z3MgYXQgdGhlIGVuZCBvZg0KPiB0aGUgY29tcGlsYXRpb24pOg0KPiBkZXBtb2Q6IFdBUk5JTkc6
-IC9saWIvbW9kdWxlcy80LjE2LjAtcmMxKy9leHRyYS9pYl9zcnAua28gbmVlZHMgdW5rbm93biBz
-eW1ib2wgcmRtYV9yZXNvbHZlX2FkZHINCj4gDQo+IFVuZm9ydHVuYXRlbHksIGl0IGdldHMgd29y
-c2Ugd2hpbGUgZXhlY3V0aW5nICJtYWtlIHNjc3Qgc3JwdCI6DQoNClBsZWFzZSBuZWl0aGVyIGlu
-c3RhbGwgdGhlIGliX3NycC1iYWNrcG9ydCBkcml2ZXIgbm9yIFNDU1QuIFRoZXNlIGRyaXZlcnMg
-aGF2ZQ0Kbm90IHlldCBiZWVuIHRlc3RlZCBhZ2FpbnN0IGtlcm5lbCB2NC4xNi1yYzEuIEkgcHJv
-dmlkZWQgeW91IGEga2VybmVsIHRyZWUgaW4NCndoaWNoIGJvdGggdGhlIFNSUCBpbml0aWF0b3Ig
-YW5kIHRhcmdldCBkcml2ZXJzIHN1cHBvcnQgUm9DRSBzdWNoIHRoYXQgeW91IGRvbid0DQpuZWVk
-IHRvIGluc3RhbGwgdGhlc2Ugb3V0LW9mLXRyZWUgZHJpdmVycy4gSSB0aGluayBhbGwgdGhhdCB5
-b3UgbmVlZCBmcm9tIHRoZQ0Kc3JwLXRlc3QgUkVBRE1FIGRvY3VtZW50IGFyZSB0aGUgaW5zdHJ1
-Y3Rpb25zIHRvIGNvbmZpZ3VyZSAvZXRjL211bHRpcGF0aC5jb25mDQphbmQgdGhlIGluc3RydWN0
-aW9ucyBmb3IgaW5zdGFsbGluZyB0aGUgcmVxdWlyZWQgcGFja2FnZXMuIEZyb20gdGhhdCBSRUFE
-TUUNCmRvY3VtZW50Og0KDQpJbnN0YWxsIHRoZSBmb2xsb3dpbmcgc29mdHdhcmUgcGFja2FnZXMg
-aWYgdGhlc2UgaGF2ZSBub3QgeWV0IGJlZW4gaW5zdGFsbGVkOg0KZmlvLCBnY2MtYysrLCBtYWtl
-LCBtdWx0aXBhdGgtdG9vbHMgb3IgZGV2aWNlLW1hcHBlci1tdWx0aXBhdGgsIHNnM191dGlscywN
-CnNycHRvb2xzLCBlMmZzcHJvZ3MgYW5kIHhmc3Byb2dzLg0KDQpUaGFua3MsDQoNCkJhcnQuDQoN
-Cg0K
+
+
+> Il giorno 12 feb 2018, alle ore 17:31, Bart Van Assche =
+<bart.vanassche@wdc.com> ha scritto:
+>=20
+> On 02/11/18 23:35, Paolo Valente wrote:
+>> Also this smells a little bit like some spurious elevator call.
+>> Unfortunately I have no clue on the cause.  To go on, I need at least
+>> to reproduce it.  In this respect: Bart, could you please tell me how
+>> to setup the offending configuration, and to cause the failure?
+>> Possibly with just one, or at most two PCs.  I don't have fancier hw
+>> at the moment.
+>=20
+> Hello Paolo,
+>=20
+> Although I expect that it is possible to reproduce this with an =
+unmodified v4.16-rc1 kernel, this is how I ran into this issue:
+> * Clone the for-next branch of https://github.com/bvanassche/linux.
+> * Build and install that kernel in a virtual machine.
+> * Clone https://github.com/bvanassche/srp-test.
+> * Run the following command:
+>  srp-test/run_tests -c -d -r 10 -t 02-mq -e bfq
+>=20
+
+Hi Bart,
+as a first attempt, I've followed your steps, but got:
+Error: could not find sg_reset
+expectedly because of dependencies that you are implying in your steps.
+
+So, I have followed the instructions in the srp-test README for the
+case "Running the Tests on an Ethernet Setup", directly on a 4.16-rc1.
+
+For ib_srp-backport, I get a lot of warnings like the following one,
+at "make install" (preceded by corresponding warnings at the end of
+the compilation):
+depmod: WARNING: /lib/modules/4.16.0-rc1+/extra/ib_srp.ko needs unknown =
+symbol rdma_resolve_addr
+
+Unfortunately, it gets worse while executing "make scst srpt":
+
+  CC [M]  /home/paolo/scst/srpt/src/ib_srpt.o
+In file included from /home/paolo/scst/srpt/src/ib_srpt.c:62:0:
+/home/paolo/scst/srpt/src/ib_srpt.h:481:8: error: redefinition of =
+=E2=80=98struct srp_login_req_rdma=E2=80=99
+ struct srp_login_req_rdma {
+        ^~~~~~~~~~~~~~~~~~
+In file included from /home/paolo/scst/srpt/src/ib_srpt.h:44:0,
+                 from /home/paolo/scst/srpt/src/ib_srpt.c:62:
+/mnt/linux-dev/linux/include/scsi/srp.h:139:8: note: originally defined =
+here
+ struct srp_login_req_rdma {
+        ^~~~~~~~~~~~~~~~~~
+
+Could you please give me some help, so as to not get lost among these =
+issues?
+
+Thanks,
+Paolo
+
+> Thanks,
+>=20
+> Bart.
