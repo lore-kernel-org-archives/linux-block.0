@@ -1,76 +1,92 @@
-Return-Path: <prvs=576cf723c=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "tj@kernel.org" <tj@kernel.org>
-CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Tue, 13 Feb 2018 13:20:44 -0800
+From: "tj@kernel.org" <tj@kernel.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH v2] blk-mq: Fix race between resetting the timer and
  completion handling
-Date: Wed, 14 Feb 2018 16:58:56 +0000
-Message-ID: <1518627534.3147.6.camel@wdc.com>
+Message-ID: <20180213212044.GS695913@devbig577.frc2.facebook.com>
 References: <20180207011133.25957-1-bart.vanassche@wdc.com>
-	 <20180207170612.GB695913@devbig577.frc2.facebook.com>
-	 <1518024428.2870.35.camel@wdc.com>
-	 <20180207173531.GC695913@devbig577.frc2.facebook.com>
-	 <1518027251.2870.53.camel@wdc.com>
-	 <20180207200724.GD695913@devbig577.frc2.facebook.com>
-	 <1518047297.2870.80.camel@wdc.com> <1518052193.2870.90.camel@wdc.com>
-	 <20180208153940.GM695913@devbig577.frc2.facebook.com>
-	 <1518107501.3611.19.camel@wdc.com>
-	 <20180213212044.GS695913@devbig577.frc2.facebook.com>
-In-Reply-To: <20180213212044.GS695913@devbig577.frc2.facebook.com>
-Content-Type: text/plain; charset="utf-8"
+ <20180207170612.GB695913@devbig577.frc2.facebook.com>
+ <1518024428.2870.35.camel@wdc.com>
+ <20180207173531.GC695913@devbig577.frc2.facebook.com>
+ <1518027251.2870.53.camel@wdc.com>
+ <20180207200724.GD695913@devbig577.frc2.facebook.com>
+ <1518047297.2870.80.camel@wdc.com>
+ <1518052193.2870.90.camel@wdc.com>
+ <20180208153940.GM695913@devbig577.frc2.facebook.com>
+ <1518107501.3611.19.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1518107501.3611.19.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVHVlLCAyMDE4LTAyLTEzIGF0IDEzOjIwIC0wODAwLCB0akBrZXJuZWwub3JnIHdyb3RlOg0K
-PiBPbiBUaHUsIEZlYiAwOCwgMjAxOCBhdCAwNDozMTo0M1BNICswMDAwLCBCYXJ0IFZhbiBBc3Nj
-aGUgd3JvdGU6DQo+ID4gVGhlIGNyYXNoIGlzIHJlcG9ydGVkIGF0IGFkZHJlc3Mgc2NzaV90aW1l
-c19vdXQrMHgxNyA9PSBzY3NpX3RpbWVzX291dCsyMy4gVGhlDQo+ID4gaW5zdHJ1Y3Rpb24gYXQg
-dGhhdCBhZGRyZXNzIHRyaWVzIHRvIGRlcmVmZXJlbmNlIHNjc2lfY21uZC5kZXZpY2UgKCVyYXgp
-LiBUaGUNCj4gPiByZWdpc3RlciBkdW1wIHNob3dzIHRoYXQgdGhhdCBwb2ludGVyIGhhcyB0aGUg
-dmFsdWUgTlVMTC4gVGhlIG9ubHkgZnVuY3Rpb24gSQ0KPiA+IGtub3cgb2YgdGhhdCBjbGVhcnMg
-dGhlIHNjc2lfY21uZC5kZXZpY2UgcG9pbnRlciBpcyBzY3NpX3JlcV9pbml0KCkuIFRoZSBvbmx5
-DQo+ID4gY2FsbGVyIG9mIHRoYXQgZnVuY3Rpb24gaW4gdGhlIFNDU0kgY29yZSBpcyBzY3NpX2lu
-aXRpYWxpemVfcnEoKS4gVGhhdCBmdW5jdGlvbg0KPiA+IGhhcyB0d28gY2FsbGVycywgbmFtZWx5
-IHNjc2lfaW5pdF9jb21tYW5kKCkgYW5kIGJsa19nZXRfcmVxdWVzdCgpLiBIb3dldmVyLA0KPiA+
-IHRoZSBzY3NpX2NtbmQuZGV2aWNlIHBvaW50ZXIgaXMgbm90IGNsZWFyZWQgd2hlbiBhIHJlcXVl
-c3QgZmluaXNoZXMuIFRoaXMgaXMNCj4gPiB3aHkgSSB0aGluayB0aGF0IHRoZSBhYm92ZSBjcmFz
-aCByZXBvcnQgaW5kaWNhdGVzIHRoYXQgc2NzaV90aW1lc19vdXQoKSB3YXMNCj4gPiBjYWxsZWQg
-Zm9yIGEgcmVxdWVzdCB0aGF0IHdhcyBiZWluZyByZWluaXRpYWxpemVkIGFuZCBub3QgYnkgZGV2
-aWNlIGhvdHBsdWdnaW5nLg0KPiANCj4gQ2FuIHlvdSBwbGVhc2UgZ2l2ZSB0aGUgZm9sbG93aW5n
-IHBhdGNoIGEgc2hvdD8gIFdoaWxlIHRpbWVvdXQgcGF0aCBpcw0KPiBzeW5jaG9ybml6aW5nIGFn
-YWluc3QgdGhlIGNvbXBsZXRpb24gcGF0aCAoYW5kIHRoZSBmb2xsb3dpbmcgcmUtaW5pdCkNCj4g
-d2hpbGUgdGFraW5nIGJhY2sgY29udHJvbCBvZiBhIHRpbWVkLW91dCByZXF1ZXN0LCBpdCB3YXNu
-J3QgZG9pbmcgdGhhdA0KPiB3aGlsZSBnaXZpbmcgaXQgYmFjaywgc28gdGhlIHRpbWVyIHJlZ2lz
-dHJhdGlvbiBjb3VsZCByYWNlIGFnYWluc3QNCj4gY29tcGxldGlvbiBhbmQgcmUtaXNzdWUuICBJ
-J20gc3RpbGwgbm90IHF1aXRlIHN1cmUgaG93IHRoYXQgY2FuIGxlYWQNCj4gdG8gdGhlIG9vcHMg
-dGhvLiAgQW55d2F5cywgd2UgbmVlZCBzb21ldGhpbmcgbGlrZSB0aGlzIG9uZSB3YXkgb3IgdGhl
-DQo+IG90aGVyLg0KPiANCj4gVGhpcyBpc24ndCB0aGUgZmluYWwgcGF0Y2guICBXZSBzaG91bGQg
-YWRkIGJhdGNoaW5nLXVwIG9mIHJjdQ0KPiBzeW5jaHJvbml6ZSBjYWxscyBzaW1pbGFyIHRvIHRo
-ZSBhYm9ydCBwYXRoLg0KPiANCj4gVGhhbmtzLg0KPiANCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Js
-ay1tcS5jIGIvYmxvY2svYmxrLW1xLmMNCj4gaW5kZXggZGY5MzEwMi4uYjY2YWVjMyAxMDA2NDQN
-Cj4gLS0tIGEvYmxvY2svYmxrLW1xLmMNCj4gKysrIGIvYmxvY2svYmxrLW1xLmMNCj4gQEAgLTgx
-Niw3ICs4MTYsOCBAQCBzdHJ1Y3QgYmxrX21xX3RpbWVvdXRfZGF0YSB7DQo+ICAJdW5zaWduZWQg
-aW50IG5yX2V4cGlyZWQ7DQo+ICB9Ow0KPiAgDQo+IC1zdGF0aWMgdm9pZCBibGtfbXFfcnFfdGlt
-ZWRfb3V0KHN0cnVjdCByZXF1ZXN0ICpyZXEsIGJvb2wgcmVzZXJ2ZWQpDQo+ICtzdGF0aWMgdm9p
-ZCBibGtfbXFfcnFfdGltZWRfb3V0KHN0cnVjdCBibGtfbXFfaHdfY3R4ICpoY3R4LCBzdHJ1Y3Qg
-cmVxdWVzdCAqcmVxLA0KPiArCQkJCWJvb2wgcmVzZXJ2ZWQpDQo+ICB7DQo+ICAJY29uc3Qgc3Ry
-dWN0IGJsa19tcV9vcHMgKm9wcyA9IHJlcS0+cS0+bXFfb3BzOw0KPiAgCWVudW0gYmxrX2VoX3Rp
-bWVyX3JldHVybiByZXQgPSBCTEtfRUhfUkVTRVRfVElNRVI7DQo+IEBAIC04MzYsOCArODM3LDEy
-IEBAIHN0YXRpYyB2b2lkIGJsa19tcV9ycV90aW1lZF9vdXQoc3RydWN0IHJlcXVlc3QgKnJlcSwg
-Ym9vbCByZXNlcnZlZCkNCj4gIAkJICogLT5hYm9ydGVkX2dzdGF0ZSBpcyBzZXQsIHRoaXMgbWF5
-IGxlYWQgdG8gaWdub3JlZA0KPiAgCQkgKiBjb21wbGV0aW9ucyBhbmQgZnVydGhlciBzcHVyaW91
-cyB0aW1lb3V0cy4NCj4gIAkJICovDQo+IC0JCWJsa19tcV9ycV91cGRhdGVfYWJvcnRlZF9nc3Rh
-dGUocmVxLCAwKTsNCj4gIAkJYmxrX2FkZF90aW1lcihyZXEpOw0KPiArCQlpZiAoIShoY3R4LT5m
-bGFncyAmIEJMS19NUV9GX0JMT0NLSU5HKSkNCj4gKwkJCXN5bmNocm9uaXplX3JjdSgpOw0KPiAr
-CQllbHNlDQo+ICsJCQlzeW5jaHJvbml6ZV9zcmN1KGhjdHgtPnNyY3UpOw0KPiArCQlibGtfbXFf
-cnFfdXBkYXRlX2Fib3J0ZWRfZ3N0YXRlKHJlcSwgMCk7DQo+ICAJCWJyZWFrOw0KPiAgCWNhc2Ug
-QkxLX0VIX05PVF9IQU5ETEVEOg0KPiAgCQlicmVhazsNCj4gQEAgLTg5Myw3ICs4OTgsNyBAQCBz
-dGF0aWMgdm9pZCBibGtfbXFfdGVybWluYXRlX2V4cGlyZWQoc3RydWN0IGJsa19tcV9od19jdHgg
-KmhjdHgsDQo+ICAJICovDQo+ICAJaWYgKCEocnEtPnJxX2ZsYWdzICYgUlFGX01RX1RJTUVPVVRf
-RVhQSVJFRCkgJiYNCj4gIAkgICAgUkVBRF9PTkNFKHJxLT5nc3RhdGUpID09IHJxLT5hYm9ydGVk
-X2dzdGF0ZSkNCj4gLQkJYmxrX21xX3JxX3RpbWVkX291dChycSwgcmVzZXJ2ZWQpOw0KPiArCQli
-bGtfbXFfcnFfdGltZWRfb3V0KGhjdHgsIHJxLCByZXNlcnZlZCk7DQo+ICB9DQo+ICANCj4gIHN0
-YXRpYyB2b2lkIGJsa19tcV90aW1lb3V0X3dvcmsoc3RydWN0IHdvcmtfc3RydWN0ICp3b3JrKQ0K
-DQpIZWxsbyBUZWp1biwNCg0KV2l0aCB0aGlzIHBhdGNoIGFwcGxpZWQgdGhlIHRlc3RzIEkgcmFu
-IHNvIGZhciBwYXNzLg0KDQpUaGFua3MsDQoNCkJhcnQuDQoNCg0KDQo=
+Hello, Bart.
+
+Sorry about the delay.
+
+On Thu, Feb 08, 2018 at 04:31:43PM +0000, Bart Van Assche wrote:
+> The crash is reported at address scsi_times_out+0x17 == scsi_times_out+23. The
+> instruction at that address tries to dereference scsi_cmnd.device (%rax). The
+> register dump shows that that pointer has the value NULL. The only function I
+> know of that clears the scsi_cmnd.device pointer is scsi_req_init(). The only
+> caller of that function in the SCSI core is scsi_initialize_rq(). That function
+> has two callers, namely scsi_init_command() and blk_get_request(). However,
+> the scsi_cmnd.device pointer is not cleared when a request finishes. This is
+> why I think that the above crash report indicates that scsi_times_out() was
+> called for a request that was being reinitialized and not by device hotplugging.
+
+Can you please give the following patch a shot?  While timeout path is
+synchornizing against the completion path (and the following re-init)
+while taking back control of a timed-out request, it wasn't doing that
+while giving it back, so the timer registration could race against
+completion and re-issue.  I'm still not quite sure how that can lead
+to the oops tho.  Anyways, we need something like this one way or the
+other.
+
+This isn't the final patch.  We should add batching-up of rcu
+synchronize calls similar to the abort path.
+
+Thanks.
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index df93102..b66aec3 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -816,7 +816,8 @@ struct blk_mq_timeout_data {
+ 	unsigned int nr_expired;
+ };
+ 
+-static void blk_mq_rq_timed_out(struct request *req, bool reserved)
++static void blk_mq_rq_timed_out(struct blk_mq_hw_ctx *hctx, struct request *req,
++				bool reserved)
+ {
+ 	const struct blk_mq_ops *ops = req->q->mq_ops;
+ 	enum blk_eh_timer_return ret = BLK_EH_RESET_TIMER;
+@@ -836,8 +837,12 @@ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
+ 		 * ->aborted_gstate is set, this may lead to ignored
+ 		 * completions and further spurious timeouts.
+ 		 */
+-		blk_mq_rq_update_aborted_gstate(req, 0);
+ 		blk_add_timer(req);
++		if (!(hctx->flags & BLK_MQ_F_BLOCKING))
++			synchronize_rcu();
++		else
++			synchronize_srcu(hctx->srcu);
++		blk_mq_rq_update_aborted_gstate(req, 0);
+ 		break;
+ 	case BLK_EH_NOT_HANDLED:
+ 		break;
+@@ -893,7 +898,7 @@ static void blk_mq_terminate_expired(struct blk_mq_hw_ctx *hctx,
+ 	 */
+ 	if (!(rq->rq_flags & RQF_MQ_TIMEOUT_EXPIRED) &&
+ 	    READ_ONCE(rq->gstate) == rq->aborted_gstate)
+-		blk_mq_rq_timed_out(rq, reserved);
++		blk_mq_rq_timed_out(hctx, rq, reserved);
+ }
+ 
+ static void blk_mq_timeout_work(struct work_struct *work)
