@@ -1,141 +1,81 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:37745 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752309AbeBFEVh (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Feb 2018 23:21:37 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Michael Lyle <mlyle@lyle.org>, Hannes Reinecke <hare@suse.com>,
-        Huijun Tang <tang.junhui@zte.com.cn>
-Subject: [PATCH v5 03/10] bcache: quit dc->writeback_thread when BCACHE_DEV_DETACHING is set
-Date: Tue,  6 Feb 2018 12:20:53 +0800
-Message-Id: <20180206042100.65021-4-colyli@suse.de>
-In-Reply-To: <20180206042100.65021-1-colyli@suse.de>
-References: <20180206042100.65021-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Subject: [PATCH 4/8] lightnvm: convert address based on spec. version
+Date: Tue, 13 Feb 2018 15:06:04 +0100
+Message-Id: <1518530768-20956-5-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1518530768-20956-1-git-send-email-javier@cnexlabs.com>
+References: <1518530768-20956-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: linux-block@vger.kernel.org,
+ =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-In patch "bcache: fix cached_dev->count usage for bch_cache_set_error()",
-cached_dev_get() is called when creating dc->writeback_thread, and
-cached_dev_put() is called when exiting dc->writeback_thread. This
-modification works well unless people detach the bcache device manually by
-    'echo 1 > /sys/block/bcache<N>/bcache/detach'
-Because this sysfs interface only calls bch_cached_dev_detach() which wakes
-up dc->writeback_thread but does not stop it. The reason is, before patch
-"bcache: fix cached_dev->count usage for bch_cache_set_error()", inside
-bch_writeback_thread(), if cache is not dirty after writeback,
-cached_dev_put() will be called here. And in cached_dev_make_request() when
-a new write request makes cache from clean to dirty, cached_dev_get() will
-be called there. Since we don't operate dc->count in these locations,
-refcount d->count cannot be dropped after cache becomes clean, and
-cached_dev_detach_finish() won't be called to detach bcache device.
-
-This patch fixes the issue by checking whether BCACHE_DEV_DETACHING is
-set inside bch_writeback_thread(). If this bit is set and cache is clean
-(no existing writeback_keys), break the while-loop, call cached_dev_put()
-and quit the writeback thread.
-
-Please note if cache is still dirty, even BCACHE_DEV_DETACHING is set the
-writeback thread should continue to perform writeback, this is the original
-design of manually detach.
-
-It is safe to do the following check without locking, let me explain why,
-+	if (!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags) &&
-+	    (!atomic_read(&dc->has_dirty) || !dc->writeback_running)) {
-
-If the kenrel thread does not sleep and continue to run due to conditions
-are not updated in time on the running CPU core, it just consumes more CPU
-cycles and has no hurt. This should-sleep-but-run is safe here. We just
-focus on the should-run-but-sleep condition, which means the writeback
-thread goes to sleep in mistake while it should continue to run.
-1, First of all, no matter the writeback thread is hung or not, kthread_stop() from
-   cached_dev_detach_finish() will wake up it and terminate by making
-   kthread_should_stop() return true. And in normal run time, bit on index
-   BCACHE_DEV_DETACHING is always cleared, the condition
-	!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags)
-   is always true and can be ignored as constant value.
-2, If one of the following conditions is true, the writeback thread should
-   go to sleep,
-   "!atomic_read(&dc->has_dirty)" or "!dc->writeback_running)"
-   each of them independently controls the writeback thread should sleep or
-   not, let's analyse them one by one.
-2.1 condition "!atomic_read(&dc->has_dirty)"
-   If dc->has_dirty is set from 0 to 1 on another CPU core, bcache will
-   call bch_writeback_queue() immediately or call bch_writeback_add() which
-   indirectly calls bch_writeback_queue() too. In bch_writeback_queue(),
-   wake_up_process(dc->writeback_thread) is called. It sets writeback
-   thread's task state to TASK_RUNNING and following an implicit memory
-   barrier, then tries to wake up the writeback thread.
-   In writeback thread, its task state is set to TASK_INTERRUPTIBLE before
-   doing the condition check. If other CPU core sets the TASK_RUNNING state
-   after writeback thread setting TASK_INTERRUPTIBLE, the writeback thread
-   will be scheduled to run very soon because its state is not
-   TASK_INTERRUPTIBLE. If other CPU core sets the TASK_RUNNING state before
-   writeback thread setting TASK_INTERRUPTIBLE, the implict memory barrier
-   of wake_up_process() will make sure modification of dc->has_dirty on
-   other CPU core is updated and observed on the CPU core of writeback
-   thread. Therefore the condition check will correctly be false, and
-   continue writeback code without sleeping.
-2.2 condition "!dc->writeback_running)"
-   dc->writeback_running can be changed via sysfs file, every time it is
-   modified, a following bch_writeback_queue() is alwasy called. So the
-   change is always observed on the CPU core of writeback thread. If
-   dc->writeback_running is changed from 0 to 1 on other CPU core, this
-   condition check will observe the modification and allow writeback
-   thread to continue to run without sleeping.
-Now we can see, even without a locking protection, multiple conditions
-check is safe here, no deadlock or process hang up will happen.
-
-I compose a separte patch because that patch "bcache: fix cached_dev->count
-usage for bch_cache_set_error()" already gets a "Reviewed-by:" from Hannes
-Reinecke. Also this fix is not trivial and good for a separate patch.
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Michael Lyle <mlyle@lyle.org>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Huijun Tang <tang.junhui@zte.com.cn>
----
- drivers/md/bcache/writeback.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index b280c134dd4d..4dbeaaa575bf 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -565,9 +565,15 @@ static int bch_writeback_thread(void *arg)
- 	while (!kthread_should_stop()) {
- 		down_write(&dc->writeback_lock);
- 		set_current_state(TASK_INTERRUPTIBLE);
--		if (!atomic_read(&dc->has_dirty) ||
--		    (!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags) &&
--		     !dc->writeback_running)) {
-+		/*
-+		 * If the bache device is detaching, skip here and continue
-+		 * to perform writeback. Otherwise, if no dirty data on cache,
-+		 * or there is dirty data on cache but writeback is disabled,
-+		 * the writeback thread should sleep here and wait for others
-+		 * to wake up it.
-+		 */
-+		if (!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags) &&
-+		    (!atomic_read(&dc->has_dirty) || !dc->writeback_running)) {
- 			up_write(&dc->writeback_lock);
- 
- 			if (kthread_should_stop()) {
-@@ -587,6 +593,14 @@ static int bch_writeback_thread(void *arg)
- 			atomic_set(&dc->has_dirty, 0);
- 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_CLEAN);
- 			bch_write_bdev_super(dc, NULL);
-+			/*
-+			 * If bcache device is detaching via sysfs interface,
-+			 * writeback thread should stop after there is no dirty
-+			 * data on cache. BCACHE_DEV_DETACHING flag is set in
-+			 * bch_cached_dev_detach().
-+			 */
-+			if (test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags))
-+				break;
- 		}
- 
- 		up_write(&dc->writeback_lock);
--- 
-2.16.1
+Q3JlYXRlIHRoZSBkZXZpY2UgcHBhIGZvciBib3RoIDEuMiBhbmQgMi4wLgoKU2lnbmVkLW9mZi1i
+eTogSmF2aWVyIEdvbnrDoWxleiA8amF2aWVyQGNuZXhsYWJzLmNvbT4KLS0tCiBpbmNsdWRlL2xp
+bnV4L2xpZ2h0bnZtLmggfCA1MiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0t
+LS0tLS0tLS0tLS0KIDEgZmlsZSBjaGFuZ2VkLCAzNiBpbnNlcnRpb25zKCspLCAxNiBkZWxldGlv
+bnMoLSkKCmRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmggYi9pbmNsdWRlL2xp
+bnV4L2xpZ2h0bnZtLmgKaW5kZXggZTAzNWFlNGM5YWNjLi4xMTQ4YjNmMjJiMjcgMTAwNjQ0Ci0t
+LSBhL2luY2x1ZGUvbGludXgvbGlnaHRudm0uaAorKysgYi9pbmNsdWRlL2xpbnV4L2xpZ2h0bnZt
+LmgKQEAgLTQxMiwxNiArNDEyLDI2IEBAIHN0YXRpYyBpbmxpbmUgc3RydWN0IHBwYV9hZGRyIGdl
+bmVyaWNfdG9fZGV2X2FkZHIoc3RydWN0IG52bV90Z3RfZGV2ICp0Z3RfZGV2LAogCQkJCQkJICBz
+dHJ1Y3QgcHBhX2FkZHIgcikKIHsKIAlzdHJ1Y3QgbnZtX2dlbyAqZ2VvID0gJnRndF9kZXYtPmdl
+bzsKLQlzdHJ1Y3QgbnZtX2FkZHJfZm9ybWF0XzEyICpwcGFmID0KLQkJCQkoc3RydWN0IG52bV9h
+ZGRyX2Zvcm1hdF8xMiAqKSZnZW8tPmMuYWRkcmY7CiAJc3RydWN0IHBwYV9hZGRyIGw7CiAKLQls
+LnBwYSA9ICgodTY0KXIuZy5jaCkgPDwgcHBhZi0+Y2hfb2Zmc2V0OwotCWwucHBhIHw9ICgodTY0
+KXIuZy5sdW4pIDw8IHBwYWYtPmx1bl9vZmZzZXQ7Ci0JbC5wcGEgfD0gKCh1NjQpci5nLmJsaykg
+PDwgcHBhZi0+YmxrX29mZnNldDsKLQlsLnBwYSB8PSAoKHU2NClyLmcucGcpIDw8IHBwYWYtPnBn
+X29mZnNldDsKLQlsLnBwYSB8PSAoKHU2NClyLmcucGwpIDw8IHBwYWYtPnBsbl9vZmZzZXQ7Ci0J
+bC5wcGEgfD0gKCh1NjQpci5nLnNlYykgPDwgcHBhZi0+c2VjX29mZnNldDsKKwlpZiAoZ2VvLT5j
+LnZlcnNpb24gPT0gTlZNX09DU1NEX1NQRUNfMTIpIHsKKwkJc3RydWN0IG52bV9hZGRyX2Zvcm1h
+dF8xMiAqcHBhZiA9CisJCQkJKHN0cnVjdCBudm1fYWRkcl9mb3JtYXRfMTIgKikmZ2VvLT5jLmFk
+ZHJmOworCisJCWwucHBhID0gKCh1NjQpci5nLmNoKSA8PCBwcGFmLT5jaF9vZmZzZXQ7CisJCWwu
+cHBhIHw9ICgodTY0KXIuZy5sdW4pIDw8IHBwYWYtPmx1bl9vZmZzZXQ7CisJCWwucHBhIHw9ICgo
+dTY0KXIuZy5ibGspIDw8IHBwYWYtPmJsa19vZmZzZXQ7CisJCWwucHBhIHw9ICgodTY0KXIuZy5w
+ZykgPDwgcHBhZi0+cGdfb2Zmc2V0OworCQlsLnBwYSB8PSAoKHU2NClyLmcucGwpIDw8IHBwYWYt
+PnBsbl9vZmZzZXQ7CisJCWwucHBhIHw9ICgodTY0KXIuZy5zZWMpIDw8IHBwYWYtPnNlY19vZmZz
+ZXQ7CisJfSBlbHNlIHsKKwkJc3RydWN0IG52bV9hZGRyX2Zvcm1hdCAqbGJhZiA9ICZnZW8tPmMu
+YWRkcmY7CisKKwkJbC5wcGEgPSAoKHU2NClyLm0uY2gpIDw8IGxiYWYtPmNoX29mZnNldDsKKwkJ
+bC5wcGEgfD0gKCh1NjQpci5tLmx1bikgPDwgbGJhZi0+bHVuX29mZnNldDsKKwkJbC5wcGEgfD0g
+KCh1NjQpci5tLmNoaykgPDwgbGJhZi0+Y2hrX29mZnNldDsKKwkJbC5wcGEgfD0gKCh1NjQpci5t
+LnNlYykgPDwgbGJhZi0+c2VjX29mZnNldDsKKwl9CiAKIAlyZXR1cm4gbDsKIH0KQEAgLTQzMCwx
+OCArNDQwLDI4IEBAIHN0YXRpYyBpbmxpbmUgc3RydWN0IHBwYV9hZGRyIGRldl90b19nZW5lcmlj
+X2FkZHIoc3RydWN0IG52bV90Z3RfZGV2ICp0Z3RfZGV2LAogCQkJCQkJICBzdHJ1Y3QgcHBhX2Fk
+ZHIgcikKIHsKIAlzdHJ1Y3QgbnZtX2dlbyAqZ2VvID0gJnRndF9kZXYtPmdlbzsKLQlzdHJ1Y3Qg
+bnZtX2FkZHJfZm9ybWF0XzEyICpwcGFmID0KLQkJCQkoc3RydWN0IG52bV9hZGRyX2Zvcm1hdF8x
+MiAqKSZnZW8tPmMuYWRkcmY7CiAJc3RydWN0IHBwYV9hZGRyIGw7CiAKIAlsLnBwYSA9IDA7CiAK
+LQlsLmcuY2ggPSAoci5wcGEgJiBwcGFmLT5jaF9tYXNrKSA+PiBwcGFmLT5jaF9vZmZzZXQ7Ci0J
+bC5nLmx1biA9IChyLnBwYSAmIHBwYWYtPmx1bl9tYXNrKSA+PiBwcGFmLT5sdW5fb2Zmc2V0Owot
+CWwuZy5ibGsgPSAoci5wcGEgJiBwcGFmLT5ibGtfbWFzaykgPj4gcHBhZi0+YmxrX29mZnNldDsK
+LQlsLmcucGcgPSAoci5wcGEgJiBwcGFmLT5wZ19tYXNrKSA+PiBwcGFmLT5wZ19vZmZzZXQ7Ci0J
+bC5nLnBsID0gKHIucHBhICYgcHBhZi0+cGxuX21hc2spID4+IHBwYWYtPnBsbl9vZmZzZXQ7Ci0J
+bC5nLnNlYyA9IChyLnBwYSAmIHBwYWYtPnNlY19tYXNrKSA+PiBwcGFmLT5zZWNfb2Zmc2V0Owor
+CWlmIChnZW8tPmMudmVyc2lvbiA9PSBOVk1fT0NTU0RfU1BFQ18xMikgeworCQlzdHJ1Y3QgbnZt
+X2FkZHJfZm9ybWF0XzEyICpwcGFmID0KKwkJCQkoc3RydWN0IG52bV9hZGRyX2Zvcm1hdF8xMiAq
+KSZnZW8tPmMuYWRkcmY7CisKKwkJbC5nLmNoID0gKHIucHBhICYgcHBhZi0+Y2hfbWFzaykgPj4g
+cHBhZi0+Y2hfb2Zmc2V0OworCQlsLmcubHVuID0gKHIucHBhICYgcHBhZi0+bHVuX21hc2spID4+
+IHBwYWYtPmx1bl9vZmZzZXQ7CisJCWwuZy5ibGsgPSAoci5wcGEgJiBwcGFmLT5ibGtfbWFzaykg
+Pj4gcHBhZi0+YmxrX29mZnNldDsKKwkJbC5nLnBnID0gKHIucHBhICYgcHBhZi0+cGdfbWFzaykg
+Pj4gcHBhZi0+cGdfb2Zmc2V0OworCQlsLmcucGwgPSAoci5wcGEgJiBwcGFmLT5wbG5fbWFzaykg
+Pj4gcHBhZi0+cGxuX29mZnNldDsKKwkJbC5nLnNlYyA9IChyLnBwYSAmIHBwYWYtPnNlY19tYXNr
+KSA+PiBwcGFmLT5zZWNfb2Zmc2V0OworCX0gZWxzZSB7CisJCXN0cnVjdCBudm1fYWRkcl9mb3Jt
+YXQgKmxiYWYgPSAmZ2VvLT5jLmFkZHJmOworCisJCWwubS5jaCA9IChyLnBwYSAmIGxiYWYtPmNo
+X21hc2spID4+IGxiYWYtPmNoX29mZnNldDsKKwkJbC5tLmx1biA9IChyLnBwYSAmIGxiYWYtPmx1
+bl9tYXNrKSA+PiBsYmFmLT5sdW5fb2Zmc2V0OworCQlsLm0uY2hrID0gKHIucHBhICYgbGJhZi0+
+Y2hrX21hc2spID4+IGxiYWYtPmNoa19vZmZzZXQ7CisJCWwubS5zZWMgPSAoci5wcGEgJiBsYmFm
+LT5zZWNfbWFzaykgPj4gbGJhZi0+c2VjX29mZnNldDsKKwl9CiAKIAlyZXR1cm4gbDsKIH0KLS0g
+CjIuNy40CgoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18K
+TGludXgtbnZtZSBtYWlsaW5nIGxpc3QKTGludXgtbnZtZUBsaXN0cy5pbmZyYWRlYWQub3JnCmh0
+dHA6Ly9saXN0cy5pbmZyYWRlYWQub3JnL21haWxtYW4vbGlzdGluZm8vbGludXgtbnZtZQo=
