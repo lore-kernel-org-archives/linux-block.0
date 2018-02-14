@@ -1,388 +1,709 @@
-Return-Path: <sagi@grimberg.me>
-From: Sagi Grimberg <sagi@grimberg.me>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Jason Gunthorpe <jgg@ziepe.ca>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Idan Burstein <idanb@mellanox.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH rfc 1/5] irq-am: Introduce library implementing generic adaptive moderation
-Date: Tue,  6 Feb 2018 00:03:12 +0200
-Message-Id: <20180205220316.30236-2-sagi@grimberg.me>
-In-Reply-To: <20180205220316.30236-1-sagi@grimberg.me>
-References: <20180205220316.30236-1-sagi@grimberg.me>
+Return-Path: <kashyap.desai@broadcom.com>
+From: Kashyap Desai <kashyap.desai@broadcom.com>
+References: <20180207122257.GA16633@ming.t460p> <95b8ea33c79b84188e4a54b4e5fcd7b6@mail.gmail.com>
+ <35778fd9-ede6-ed3d-4b13-27fb35ede9bd@suse.de> <20180208165313.GA31725@ming.t460p>
+ <14c596572dcf99c4343c7eba65a7c427@mail.gmail.com> <20180209053107.GA30909@ming.t460p>
+ <50c2ea693cd9923b53e2eb0ffd2b143e@mail.gmail.com> <20180210010057.GA2543@ming.t460p>
+ <20180211053102.GA15507@ming.t460p> <4d9ec8ce1766819fa537c81a4a1db276@mail.gmail.com>
+ <20180213004031.GA8109@ming.t460p>
+In-Reply-To: <20180213004031.GA8109@ming.t460p>
+MIME-Version: 1.0
+Date: Wed, 14 Feb 2018 11:58:33 +0530
+Message-ID: <8f52c08f51f9e2ff54aee5311670e6b4@mail.gmail.com>
+Subject: RE: [PATCH 0/5] blk-mq/scsi-mq: support global tags & introduce force_blk_mq
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>, Mike Snitzer <snitzer@redhat.com>, linux-scsi@vger.kernel.org,
+	Arun Easi <arun.easi@cavium.com>, Omar Sandoval <osandov@fb.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	James Bottomley <james.bottomley@hansenpartnership.com>, Christoph Hellwig <hch@lst.de>,
+	Don Brace <don.brace@microsemi.com>, Peter Rivera <peter.rivera@broadcom.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Laurence Oberman <loberman@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-irq-am library helps I/O devices implement interrupt moderation in
-an adaptive fashion, based on online stats.
+> -----Original Message-----
+> From: Ming Lei [mailto:ming.lei@redhat.com]
+> Sent: Tuesday, February 13, 2018 6:11 AM
+> To: Kashyap Desai
+> Cc: Hannes Reinecke; Jens Axboe; linux-block@vger.kernel.org; Christoph
+> Hellwig; Mike Snitzer; linux-scsi@vger.kernel.org; Arun Easi; Omar
+Sandoval;
+> Martin K . Petersen; James Bottomley; Christoph Hellwig; Don Brace;
+Peter
+> Rivera; Paolo Bonzini; Laurence Oberman
+> Subject: Re: [PATCH 0/5] blk-mq/scsi-mq: support global tags & introduce
+> force_blk_mq
+>
+> Hi Kashyap,
+>
+> On Tue, Feb 13, 2018 at 12:05:14AM +0530, Kashyap Desai wrote:
+> > > -----Original Message-----
+> > > From: Ming Lei [mailto:ming.lei@redhat.com]
+> > > Sent: Sunday, February 11, 2018 11:01 AM
+> > > To: Kashyap Desai
+> > > Cc: Hannes Reinecke; Jens Axboe; linux-block@vger.kernel.org;
+> > > Christoph Hellwig; Mike Snitzer; linux-scsi@vger.kernel.org; Arun
+> > > Easi; Omar
+> > Sandoval;
+> > > Martin K . Petersen; James Bottomley; Christoph Hellwig; Don Brace;
+> > Peter
+> > > Rivera; Paolo Bonzini; Laurence Oberman
+> > > Subject: Re: [PATCH 0/5] blk-mq/scsi-mq: support global tags &
+> > > introduce force_blk_mq
+> > >
+> > > On Sat, Feb 10, 2018 at 09:00:57AM +0800, Ming Lei wrote:
+> > > > Hi Kashyap,
+> > > >
+> > > > On Fri, Feb 09, 2018 at 02:12:16PM +0530, Kashyap Desai wrote:
+> > > > > > -----Original Message-----
+> > > > > > From: Ming Lei [mailto:ming.lei@redhat.com]
+> > > > > > Sent: Friday, February 9, 2018 11:01 AM
+> > > > > > To: Kashyap Desai
+> > > > > > Cc: Hannes Reinecke; Jens Axboe; linux-block@vger.kernel.org;
+> > > > > > Christoph Hellwig; Mike Snitzer; linux-scsi@vger.kernel.org;
+> > > > > > Arun Easi; Omar
+> > > > > Sandoval;
+> > > > > > Martin K . Petersen; James Bottomley; Christoph Hellwig; Don
+> > > > > > Brace;
+> > > > > Peter
+> > > > > > Rivera; Paolo Bonzini; Laurence Oberman
+> > > > > > Subject: Re: [PATCH 0/5] blk-mq/scsi-mq: support global tags &
+> > > > > > introduce force_blk_mq
+> > > > > >
+> > > > > > On Fri, Feb 09, 2018 at 10:28:23AM +0530, Kashyap Desai wrote:
+> > > > > > > > -----Original Message-----
+> > > > > > > > From: Ming Lei [mailto:ming.lei@redhat.com]
+> > > > > > > > Sent: Thursday, February 8, 2018 10:23 PM
+> > > > > > > > To: Hannes Reinecke
+> > > > > > > > Cc: Kashyap Desai; Jens Axboe;
+> > > > > > > > linux-block@vger.kernel.org; Christoph Hellwig; Mike
+> > > > > > > > Snitzer; linux-scsi@vger.kernel.org; Arun Easi; Omar
+> > > > > > > Sandoval;
+> > > > > > > > Martin K . Petersen; James Bottomley; Christoph Hellwig;
+> > > > > > > > Don Brace;
+> > > > > > > Peter
+> > > > > > > > Rivera; Paolo Bonzini; Laurence Oberman
+> > > > > > > > Subject: Re: [PATCH 0/5] blk-mq/scsi-mq: support global
+> > > > > > > > tags & introduce force_blk_mq
+> > > > > > > >
+> > > > > > > > On Thu, Feb 08, 2018 at 08:00:29AM +0100, Hannes Reinecke
+> > wrote:
+> > > > > > > > > On 02/07/2018 03:14 PM, Kashyap Desai wrote:
+> > > > > > > > > >> -----Original Message-----
+> > > > > > > > > >> From: Ming Lei [mailto:ming.lei@redhat.com]
+> > > > > > > > > >> Sent: Wednesday, February 7, 2018 5:53 PM
+> > > > > > > > > >> To: Hannes Reinecke
+> > > > > > > > > >> Cc: Kashyap Desai; Jens Axboe;
+> > > > > > > > > >> linux-block@vger.kernel.org; Christoph Hellwig; Mike
+> > > > > > > > > >> Snitzer; linux-scsi@vger.kernel.org; Arun Easi; Omar
+> > > > > > > > > > Sandoval;
+> > > > > > > > > >> Martin K . Petersen; James Bottomley; Christoph
+> > > > > > > > > >> Hellwig; Don Brace;
+> > > > > > > > > > Peter
+> > > > > > > > > >> Rivera; Paolo Bonzini; Laurence Oberman
+> > > > > > > > > >> Subject: Re: [PATCH 0/5] blk-mq/scsi-mq: support
+> > > > > > > > > >> global tags & introduce force_blk_mq
+> > > > > > > > > >>
+> > > > > > > > > >> On Wed, Feb 07, 2018 at 07:50:21AM +0100, Hannes
+> > > > > > > > > >> Reinecke
+> > > > > wrote:
+> > > > > > > > > >>> Hi all,
+> > > > > > > > > >>>
+> > > > > > > > > >>> [ .. ]
+> > > > > > > > > >>>>>
+> > > > > > > > > >>>>> Could you share us your patch for enabling
+> > > > > > > > > >>>>> global_tags/MQ on
+> > > > > > > > > >>>> megaraid_sas
+> > > > > > > > > >>>>> so that I can reproduce your test?
+> > > > > > > > > >>>>>
+> > > > > > > > > >>>>>> See below perf top data. "bt_iter" is consuming 4
+> > > > > > > > > >>>>>> times more
+> > > > > > > CPU.
+> > > > > > > > > >>>>>
+> > > > > > > > > >>>>> Could you share us what the IOPS/CPU utilization
+> > > > > > > > > >>>>> effect is after
+> > > > > > > > > >>>> applying the
+> > > > > > > > > >>>>> patch V2? And your test script?
+> > > > > > > > > >>>> Regarding CPU utilization, I need to test one more
+> > time.
+> > > > > > > > > >>>> Currently system is in used.
+> > > > > > > > > >>>>
+> > > > > > > > > >>>> I run below fio test on total 24 SSDs expander
+> > attached.
+> > > > > > > > > >>>>
+> > > > > > > > > >>>> numactl -N 1 fio jbod.fio --rw=randread
+> > > > > > > > > >>>> --iodepth=64 --bs=4k --ioengine=libaio
+> > > > > > > > > >>>> --rw=randread
+> > > > > > > > > >>>>
+> > > > > > > > > >>>> Performance dropped from 1.6 M IOPs to 770K IOPs.
+> > > > > > > > > >>>>
+> > > > > > > > > >>> This is basically what we've seen with earlier
+> > iterations.
+> > > > > > > > > >>
+> > > > > > > > > >> Hi Hannes,
+> > > > > > > > > >>
+> > > > > > > > > >> As I mentioned in another mail[1], Kashyap's patch
+> > > > > > > > > >> has a big issue,
+> > > > > > > > > > which
+> > > > > > > > > >> causes only reply queue 0 used.
+> > > > > > > > > >>
+> > > > > > > > > >> [1]
+> > > > > > > > > >> https://marc.info/?l=linux-scsi&m=151793204014631&w=2
+> > > > > > > > > >>
+> > > > > > > > > >> So could you guys run your performance test again
+> > > > > > > > > >> after fixing the
+> > > > > > > > > > patch?
+> > > > > > > > > >
+> > > > > > > > > > Ming -
+> > > > > > > > > >
+> > > > > > > > > > I tried after change you requested.  Performance drop
+> > > > > > > > > > is still
+> > > > > > > unresolved.
+> > > > > > > > > > From 1.6 M IOPS to 770K IOPS.
+> > > > > > > > > >
+> > > > > > > > > > See below data. All 24 reply queue is in used
+correctly.
+> > > > > > > > > >
+> > > > > > > > > > IRQs / 1 second(s)
+> > > > > > > > > > IRQ#  TOTAL  NODE0   NODE1  NAME
+> > > > > > > > > >  360  16422      0   16422  IR-PCI-MSI 70254653-edge
+> > megasas
+> > > > > > > > > >  364  15980      0   15980  IR-PCI-MSI 70254657-edge
+> > megasas
+> > > > > > > > > >  362  15979      0   15979  IR-PCI-MSI 70254655-edge
+> > megasas
+> > > > > > > > > >  345  15696      0   15696  IR-PCI-MSI 70254638-edge
+> > megasas
+> > > > > > > > > >  341  15659      0   15659  IR-PCI-MSI 70254634-edge
+> > megasas
+> > > > > > > > > >  369  15656      0   15656  IR-PCI-MSI 70254662-edge
+> > megasas
+> > > > > > > > > >  359  15650      0   15650  IR-PCI-MSI 70254652-edge
+> > megasas
+> > > > > > > > > >  358  15596      0   15596  IR-PCI-MSI 70254651-edge
+> > megasas
+> > > > > > > > > >  350  15574      0   15574  IR-PCI-MSI 70254643-edge
+> > megasas
+> > > > > > > > > >  342  15532      0   15532  IR-PCI-MSI 70254635-edge
+> > megasas
+> > > > > > > > > >  344  15527      0   15527  IR-PCI-MSI 70254637-edge
+> > megasas
+> > > > > > > > > >  346  15485      0   15485  IR-PCI-MSI 70254639-edge
+> > megasas
+> > > > > > > > > >  361  15482      0   15482  IR-PCI-MSI 70254654-edge
+> > megasas
+> > > > > > > > > >  348  15467      0   15467  IR-PCI-MSI 70254641-edge
+> > megasas
+> > > > > > > > > >  368  15463      0   15463  IR-PCI-MSI 70254661-edge
+> > megasas
+> > > > > > > > > >  354  15420      0   15420  IR-PCI-MSI 70254647-edge
+> > megasas
+> > > > > > > > > >  351  15378      0   15378  IR-PCI-MSI 70254644-edge
+> > megasas
+> > > > > > > > > >  352  15377      0   15377  IR-PCI-MSI 70254645-edge
+> > megasas
+> > > > > > > > > >  356  15348      0   15348  IR-PCI-MSI 70254649-edge
+> > megasas
+> > > > > > > > > >  337  15344      0   15344  IR-PCI-MSI 70254630-edge
+> > megasas
+> > > > > > > > > >  343  15320      0   15320  IR-PCI-MSI 70254636-edge
+> > megasas
+> > > > > > > > > >  355  15266      0   15266  IR-PCI-MSI 70254648-edge
+> > megasas
+> > > > > > > > > >  335  15247      0   15247  IR-PCI-MSI 70254628-edge
+> > megasas
+> > > > > > > > > >  363  15233      0   15233  IR-PCI-MSI 70254656-edge
+> > megasas
+> > > > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > Average:        CPU      %usr     %nice      %sys
+> > %iowait
+> > > > > > > %steal
+> > > > > > > > > > %irq     %soft    %guest    %gnice     %idle
+> > > > > > > > > > Average:         18      3.80      0.00     14.78
+> > 10.08
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      4.01      0.00      0.00     67.33
+> > > > > > > > > > Average:         19      3.26      0.00     15.35
+> > 10.62
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      4.03      0.00      0.00     66.74
+> > > > > > > > > > Average:         20      3.42      0.00     14.57
+> > 10.67
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.84      0.00      0.00     67.50
+> > > > > > > > > > Average:         21      3.19      0.00     15.60
+> > 10.75
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      4.16      0.00      0.00     66.30
+> > > > > > > > > > Average:         22      3.58      0.00     15.15
+> > 10.66
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.51      0.00      0.00     67.11
+> > > > > > > > > > Average:         23      3.34      0.00     15.36
+> > 10.63
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      4.17      0.00      0.00     66.50
+> > > > > > > > > > Average:         24      3.50      0.00     14.58
+> > 10.93
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.85      0.00      0.00     67.13
+> > > > > > > > > > Average:         25      3.20      0.00     14.68
+> > 10.86
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      4.31      0.00      0.00     66.95
+> > > > > > > > > > Average:         26      3.27      0.00     14.80
+> > 10.70
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.68      0.00      0.00     67.55
+> > > > > > > > > > Average:         27      3.58      0.00     15.36
+> > 10.80
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.79      0.00      0.00     66.48
+> > > > > > > > > > Average:         28      3.46      0.00     15.17
+> > 10.46
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.32      0.00      0.00     67.59
+> > > > > > > > > > Average:         29      3.34      0.00     14.42
+> > 10.72
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.34      0.00      0.00     68.18
+> > > > > > > > > > Average:         30      3.34      0.00     15.08
+> > 10.70
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.89      0.00      0.00     66.99
+> > > > > > > > > > Average:         31      3.26      0.00     15.33
+> > 10.47
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.33      0.00      0.00     67.61
+> > > > > > > > > > Average:         32      3.21      0.00     14.80
+> > 10.61
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.70      0.00      0.00     67.67
+> > > > > > > > > > Average:         33      3.40      0.00     13.88
+> > 10.55
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      4.02      0.00      0.00     68.15
+> > > > > > > > > > Average:         34      3.74      0.00     17.41
+> > 10.61
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      4.51      0.00      0.00     63.73
+> > > > > > > > > > Average:         35      3.35      0.00     14.37
+> > 10.74
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.84      0.00      0.00     67.71
+> > > > > > > > > > Average:         36      0.54      0.00      1.77
+> > 0.00
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      0.00      0.00      0.00     97.69
+> > > > > > > > > > ..
+> > > > > > > > > > Average:         54      3.60      0.00     15.17
+> > 10.39
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      4.22      0.00      0.00     66.62
+> > > > > > > > > > Average:         55      3.33      0.00     14.85
+> > 10.55
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.96      0.00      0.00     67.31
+> > > > > > > > > > Average:         56      3.40      0.00     15.19
+> > 10.54
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.74      0.00      0.00     67.13
+> > > > > > > > > > Average:         57      3.41      0.00     13.98
+> > 10.78
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      4.10      0.00      0.00     67.73
+> > > > > > > > > > Average:         58      3.32      0.00     15.16
+> > 10.52
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      4.01      0.00      0.00     66.99
+> > > > > > > > > > Average:         59      3.17      0.00     15.80
+> > 10.35
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.86      0.00      0.00     66.80
+> > > > > > > > > > Average:         60      3.00      0.00     14.63
+> > 10.59
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.97      0.00      0.00     67.80
+> > > > > > > > > > Average:         61      3.34      0.00     14.70
+> > 10.66
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      4.32      0.00      0.00     66.97
+> > > > > > > > > > Average:         62      3.34      0.00     15.29
+> > 10.56
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.89      0.00      0.00     66.92
+> > > > > > > > > > Average:         63      3.29      0.00     14.51
+> > 10.72
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.85      0.00      0.00     67.62
+> > > > > > > > > > Average:         64      3.48      0.00     15.31
+> > 10.65
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.97      0.00      0.00     66.60
+> > > > > > > > > > Average:         65      3.34      0.00     14.36
+> > 10.80
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      4.11      0.00      0.00     67.39
+> > > > > > > > > > Average:         66      3.13      0.00     14.94
+> > 10.70
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      4.10      0.00      0.00     67.13
+> > > > > > > > > > Average:         67      3.06      0.00     15.56
+> > 10.69
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.82      0.00      0.00     66.88
+> > > > > > > > > > Average:         68      3.33      0.00     14.98
+> > 10.61
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.81      0.00      0.00     67.27
+> > > > > > > > > > Average:         69      3.20      0.00     15.43
+> > 10.70
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.82      0.00      0.00     66.85
+> > > > > > > > > > Average:         70      3.34      0.00     17.14
+> > 10.59
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.00      0.00      0.00     65.92
+> > > > > > > > > > Average:         71      3.41      0.00     14.94
+> > 10.56
+> > > > > > > 0.00
+> > > > > > > > > > 0.00      3.41      0.00      0.00     67.69
+> > > > > > > > > >
+> > > > > > > > > > Perf top -
+> > > > > > > > > >
+> > > > > > > > > >   64.33%  [kernel]            [k] bt_iter
+> > > > > > > > > >    4.86%  [kernel]            [k]
+> > blk_mq_queue_tag_busy_iter
+> > > > > > > > > >    4.23%  [kernel]            [k] _find_next_bit
+> > > > > > > > > >    2.40%  [kernel]            [k]
+> > > > > native_queued_spin_lock_slowpath
+> > > > > > > > > >    1.09%  [kernel]            [k] sbitmap_any_bit_set
+> > > > > > > > > >    0.71%  [kernel]            [k] sbitmap_queue_clear
+> > > > > > > > > >    0.63%  [kernel]            [k] find_next_bit
+> > > > > > > > > >    0.54%  [kernel]            [k]
+_raw_spin_lock_irqsave
+> > > > > > > > > >
+> > > > > > > > > Ah. So we're spending quite some time in trying to find
+> > > > > > > > > a free
+> > > > > tag.
+> > > > > > > > > I guess this is due to every queue starting at the same
+> > > > > > > > > position trying to find a free tag, which inevitably
+> > > > > > > > > leads
+> > to a
+> > > contention.
+> > > > > > > >
+> > > > > > > > IMO, the above trace means that blk_mq_in_flight() may be
+> > > > > > > > the
+> > > > > > > bottleneck,
+> > > > > > > > and looks not related with tag allocation.
+> > > > > > > >
+> > > > > > > > Kashyap, could you run your performance test again after
+> > > > > > > > disabling
+> > > > > > > iostat by
+> > > > > > > > the following command on all test devices and killing all
+> > > > > > > > utilities
+> > > > > > > which may
+> > > > > > > > read iostat(/proc/diskstats, ...)?
+> > > > > > > >
+> > > > > > > > 	echo 0 > /sys/block/sdN/queue/iostat
+> > > > > > >
+> > > > > > > Ming - After changing iostat = 0 , I see performance issue
+> > > > > > > is
+> > > > > resolved.
+> > > > > > >
+> > > > > > > Below is perf top output after iostats = 0
+> > > > > > >
+> > > > > > >
+> > > > > > >   23.45%  [kernel]             [k] bt_iter
+> > > > > > >    2.27%  [kernel]             [k]
+blk_mq_queue_tag_busy_iter
+> > > > > > >    2.18%  [kernel]             [k] _find_next_bit
+> > > > > > >    2.06%  [megaraid_sas]       [k] complete_cmd_fusion
+> > > > > > >    1.87%  [kernel]             [k] clflush_cache_range
+> > > > > > >    1.70%  [kernel]             [k] dma_pte_clear_level
+> > > > > > >    1.56%  [kernel]             [k] __domain_mapping
+> > > > > > >    1.55%  [kernel]             [k] sbitmap_queue_clear
+> > > > > > >    1.30%  [kernel]             [k] gup_pgd_range
+> > > > > >
+> > > > > > Hi Kashyap,
+> > > > > >
+> > > > > > Thanks for your test and update.
+> > > > > >
+> > > > > > Looks blk_mq_queue_tag_busy_iter() is still sampled by perf
+> > > > > > even though iostats is disabled, and I guess there may be
+> > > > > > utilities which are
+> > > > > reading iostats
+> > > > > > a bit frequently.
+> > > > >
+> > > > > I  will be doing some more testing and post you my findings.
+> > > >
+> > > > I will find sometime this weekend to see if I can cook a patch to
+> > > > address this issue of io accounting.
+> > >
+> > > Hi Kashyap,
+> > >
+> > > Please test the top 5 patches in the following tree to see if
+> > megaraid_sas's
+> > > performance is OK:
+> > >
+> > > 	https://github.com/ming1/linux/commits/v4.15-for-next-global-tags-
+> > > v2
+> > >
+> > > This tree is made by adding these 5 patches against patchset V2.
+> > >
+> >
+> > Ming -
+> > I applied 5 patches on top of V2 and behavior is still unchanged.
+> > Below is perf top data. (1000K IOPS)
+> >
+> >   34.58%  [kernel]                 [k] bt_iter
+> >    2.96%  [kernel]                 [k] sbitmap_any_bit_set
+> >    2.77%  [kernel]                 [k] bt_iter_global_tags
+> >    1.75%  [megaraid_sas]           [k] complete_cmd_fusion
+> >    1.62%  [kernel]                 [k] sbitmap_queue_clear
+> >    1.62%  [kernel]                 [k] _raw_spin_lock
+> >    1.51%  [kernel]                 [k] blk_mq_run_hw_queue
+> >    1.45%  [kernel]                 [k] gup_pgd_range
+> >    1.31%  [kernel]                 [k] irq_entries_start
+> >    1.29%  fio                      [.] __fio_gettime
+> >    1.13%  [kernel]                 [k] _raw_spin_lock_irqsave
+> >    0.95%  [kernel]                 [k]
+native_queued_spin_lock_slowpath
+> >    0.92%  [kernel]                 [k] scsi_queue_rq
+> >    0.91%  [kernel]                 [k] blk_mq_run_hw_queues
+> >    0.85%  [kernel]                 [k] blk_mq_get_request
+> >    0.81%  [kernel]                 [k] switch_mm_irqs_off
+> >    0.78%  [megaraid_sas]           [k] megasas_build_io_fusion
+> >    0.77%  [kernel]                 [k] __schedule
+> >    0.73%  [kernel]                 [k] update_load_avg
+> >    0.69%  [kernel]                 [k] fput
+> >    0.65%  [kernel]                 [k] scsi_dispatch_cmd
+> >    0.64%  fio                      [.] fio_libaio_event
+> >    0.53%  [kernel]                 [k] do_io_submit
+> >    0.52%  [kernel]                 [k] read_tsc
+> >    0.51%  [megaraid_sas]           [k]
+megasas_build_and_issue_cmd_fusion
+> >    0.51%  [kernel]                 [k] scsi_softirq_done
+> >    0.50%  [kernel]                 [k] kobject_put
+> >    0.50%  [kernel]                 [k] cpuidle_enter_state
+> >    0.49%  [kernel]                 [k] native_write_msr
+> >    0.48%  fio                      [.] io_completed
+> >
+> > Below is perf top data with iostat=0  (1400K IOPS)
+> >
+> >    4.87%  [kernel]                      [k] sbitmap_any_bit_set
+> >    2.93%  [kernel]                      [k] _raw_spin_lock
+> >    2.84%  [megaraid_sas]                [k] complete_cmd_fusion
+> >    2.38%  [kernel]                      [k] irq_entries_start
+> >    2.36%  [kernel]                      [k] gup_pgd_range
+> >    2.35%  [kernel]                      [k] blk_mq_run_hw_queue
+> >    2.30%  [kernel]                      [k] sbitmap_queue_clear
+> >    2.01%  fio                           [.] __fio_gettime
+> >    1.78%  [kernel]                      [k] _raw_spin_lock_irqsave
+> >    1.51%  [kernel]                      [k] scsi_queue_rq
+> >    1.43%  [kernel]                      [k] blk_mq_run_hw_queues
+> >    1.36%  [kernel]                      [k] fput
+> >    1.32%  [kernel]                      [k] __schedule
+> >    1.31%  [kernel]                      [k] switch_mm_irqs_off
+> >    1.29%  [kernel]                      [k] update_load_avg
+> >    1.25%  [megaraid_sas]                [k] megasas_build_io_fusion
+> >    1.22%  [kernel]                      [k]
+> > native_queued_spin_lock_slowpath
+> >    1.03%  [kernel]                      [k] scsi_dispatch_cmd
+> >    1.03%  [kernel]                      [k] blk_mq_get_request
+> >    0.91%  fio                           [.] fio_libaio_event
+> >    0.89%  [kernel]                      [k] scsi_softirq_done
+> >    0.87%  [kernel]                      [k] kobject_put
+> >    0.86%  [kernel]                      [k] cpuidle_enter_state
+> >    0.84%  fio                           [.] io_completed
+> >    0.83%  [kernel]                      [k] do_io_submit
+> >    0.83%  [megaraid_sas]                [k]
+> > megasas_build_and_issue_cmd_fusion
+> >    0.83%  [kernel]                      [k] __switch_to
+> >    0.82%  [kernel]                      [k] read_tsc
+> >    0.80%  [kernel]                      [k] native_write_msr
+> >    0.76%  [kernel]                      [k] aio_comp
+> >
+> >
+> > Perf data without V2 patch applied.  (1600K IOPS)
+> >
+> >    5.97%  [megaraid_sas]           [k] complete_cmd_fusion
+> >    5.24%  [kernel]                 [k] bt_iter
+> >    3.28%  [kernel]                 [k] _raw_spin_lock
+> >    2.98%  [kernel]                 [k] irq_entries_start
+> >    2.29%  fio                      [.] __fio_gettime
+> >    2.04%  [kernel]                 [k] scsi_queue_rq
+> >    1.92%  [megaraid_sas]           [k] megasas_build_io_fusion
+> >    1.61%  [kernel]                 [k] switch_mm_irqs_off
+> >    1.59%  [megaraid_sas]           [k]
+megasas_build_and_issue_cmd_fusion
+> >    1.41%  [kernel]                 [k] scsi_dispatch_cmd
+> >    1.33%  [kernel]                 [k] scsi_softirq_done
+> >    1.18%  [kernel]                 [k] gup_pgd_range
+> >    1.18%  [kernel]                 [k] blk_mq_complete_request
+> >    1.13%  [kernel]                 [k] blk_mq_free_request
+> >    1.05%  [kernel]                 [k] do_io_submit
+> >    1.04%  [kernel]                 [k] _find_next_bit
+> >    1.02%  [kernel]                 [k] blk_mq_get_request
+> >    0.95%  [megaraid_sas]           [k] megasas_build_ldio_fusion
+> >    0.95%  [kernel]                 [k] scsi_dec_host_busy
+> >    0.89%  fio                      [.] get_io_u
+> >    0.88%  [kernel]                 [k] entry_SYSCALL_64
+> >    0.84%  [megaraid_sas]           [k] megasas_queue_command
+> >    0.79%  [kernel]                 [k] native_write_msr
+> >    0.77%  [kernel]                 [k] read_tsc
+> >    0.73%  [kernel]                 [k] _raw_spin_lock_irqsave
+> >    0.73%  fio                      [.] fio_libaio_commit
+> >    0.72%  [kernel]                 [k] kmem_cache_alloc
+> >    0.72%  [kernel]                 [k] blkdev_direct_IO
+> >    0.69%  [megaraid_sas]           [k] MR_GetPhyParams
+> >    0.68%  [kernel]                 [k] blk_mq_dequeue_f
+>
+> The above data is very helpful to understand the issue, great thanks!
+>
+> With this patchset V2 and the 5 patches, if iostats is set as 0, IOPS is
+1400K, but
+> 1600K IOPS can be reached without all these patches with iostats as 1.
+>
+> BTW, could you share us what the machine is? ARM64? I saw ARM64's cache
+> coherence performance is bad before. In the dual socket system(each
+socket
+> has 8 X86 CPU cores) I tested, only ~0.5% IOPS drop can be observed
+after the
+> 5 patches are applied on V2 in null_blk test, which is described in
+commit log.
 
-The consumer can initialize an irq-am context with a callback that
-performs the device specific moderation programming and also the number
-of am (adaptive moderation) levels which are also, abstracted and allows
-for device specific tuning.
+I am using Intel Skylake/Lewisburg/Purley.
 
-The irq-am code will sample once every nr_events and will check for significant
-change in workload characteristics (completions per second, events per second)
-and if it detects one, will perform an am level update(called a step).
+>
+> Looks it means single sbitmap can't perform well under MQ's case in
+which
+> there will be much more concurrent submissions and completions. In case
+of
+> single hw queue(current linus tree), one hctx->run_work only allows one
+> __blk_mq_run_hw_queue() running at 'async' mode, and reply queues are
+> used in round-robin way, which may cause contention on the single
+sbitmap
+> too, especially io accounting may consume a bit much more CPU, I guess
+that
+> may contribute some on the CPU lockup.
+>
+> Could you run your test without V2 patches by setting 'iostats' as 0?
 
-The irq-am code  assumes that the am levels are sorted in an increasing order when
-the lowest level corresponds to the optimum latency tuning (short time and low
-completion-count) and gradually increasing towards the throughput optimum tuning
-(longer time and higher completion-count). So there is a trend and tuning direction
-tracked by the moderator. When the moderator collects sufficient statistics (also
-controlled by the consumer defining nr_events), it compares the current stats with the
-previous stats and if a significant changed was observed in the load, the moderator
-attempts to increment/decrement its current level (step) and schedules a program
-dispatch work.
+Tested without V2 patch set. Iostat=1.  IOPS = 1600K
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- include/linux/irq-am.h | 116 +++++++++++++++++++++++++++++++
- lib/Kconfig            |   5 ++
- lib/Makefile           |   1 +
- lib/irq-am.c           | 182 +++++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 304 insertions(+)
- create mode 100644 include/linux/irq-am.h
- create mode 100644 lib/irq-am.c
+   5.93%  [megaraid_sas]              [k] complete_cmd_fusion
+   5.34%  [kernel]                    [k] bt_iter
+   3.23%  [kernel]                    [k] _raw_spin_lock
+   2.92%  [kernel]                    [k] irq_entries_start
+   2.57%  fio                         [.] __fio_gettime
+   2.10%  [kernel]                    [k] scsi_queue_rq
+   1.98%  [megaraid_sas]              [k] megasas_build_io_fusion
+   1.93%  [kernel]                    [k] switch_mm_irqs_off
+   1.79%  [megaraid_sas]              [k]
+megasas_build_and_issue_cmd_fusion
+   1.45%  [kernel]                    [k] scsi_softirq_done
+   1.42%  [kernel]                    [k] scsi_dispatch_cmd
+   1.23%  [kernel]                    [k] blk_mq_complete_request
+   1.11%  [megaraid_sas]              [k] megasas_build_ldio_fusion
+   1.11%  [kernel]                    [k] gup_pgd_range
+   1.08%  [kernel]                    [k] blk_mq_free_request
+   1.03%  [kernel]                    [k] do_io_submit
+   1.02%  [kernel]                    [k] _find_next_bit
+   1.00%  [kernel]                    [k] scsi_dec_host_busy
+   0.94%  [kernel]                    [k] blk_mq_get_request
+   0.93%  [megaraid_sas]              [k] megasas_queue_command
+   0.92%  [kernel]                    [k] native_write_msr
+   0.85%  fio                         [.] get_io_u
+   0.83%  [kernel]                    [k] entry_SYSCALL_64
+   0.83%  [kernel]                    [k] _raw_spin_lock_irqsave
+   0.82%  [kernel]                    [k] read_tsc
+   0.81%  [sd_mod]                    [k] sd_init_command
+   0.67%  [kernel]                    [k] kmem_cache_alloc
+   0.63%  [kernel]                    [k] memset_erms
+   0.63%  [kernel]                    [k] aio_read_events
+   0.62%  [kernel]                    [k] blkdev_dir
 
-diff --git a/include/linux/irq-am.h b/include/linux/irq-am.h
-new file mode 100644
-index 000000000000..5ddd5ca268aa
---- /dev/null
-+++ b/include/linux/irq-am.h
-@@ -0,0 +1,116 @@
-+/*
-+ * Adaptive moderation support for I/O devices.
-+ * Copyright (c) 2018 Lightbits Labs.
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ */
-+#ifndef _IRQ_AM_H
-+#define _IRQ_AM_H
-+
-+#include <linux/ktime.h>
-+#include <linux/workqueue.h>
-+
-+struct irq_am;
-+typedef int (irq_am_fn)(struct irq_am *, unsigned short level);
-+
-+/*
-+ * struct irq_am_sample_stats - sample stats for adpative moderation
-+ * @cps:        completions per-second
-+ * @eps:        events per-second
-+ * @cpe:	completions per event
-+ */
-+struct irq_am_sample_stats {
-+	u32 cps;
-+	u32 eps;
-+	u32 cpe;
-+};
-+
-+/*
-+ * struct irq_am_sample - per-irq interrupt batch sample unit
-+ * @time:         current time
-+ * @comps:     completions count since last sample
-+ * @events:    events count since the last sample
-+ */
-+struct irq_am_sample {
-+	ktime_t	time;
-+	u64	comps;
-+	u64	events;
-+};
-+
-+/*
-+ * enum irq_am_state - adaptive moderation monitor states
-+ * @IRQ_AM_START_MEASURING:        collect first sample (start_sample)
-+ * @IRQ_AM_MEASURING:              measurement in progress
-+ * @IRQ_AM_PROGRAM_MODERATION:     moderatio program scheduled
-+ *                                 so we should not react to any stats
-+ *                                 from the old moderation profile.
-+ */
-+enum irq_am_state {
-+	IRQ_AM_START_MEASURING,
-+	IRQ_AM_MEASURING,
-+	IRQ_AM_PROGRAM_MODERATION,
-+};
-+
-+enum irq_am_tune_state {
-+	IRQ_AM_GOING_UP,
-+	IRQ_AM_GOING_DOWN,
-+};
-+
-+enum irq_am_relative_diff {
-+	IRQ_AM_STATS_WORSE,
-+	IRQ_AM_STATS_SAME,
-+	IRQ_AM_STATS_BETTER,
-+};
-+
-+struct irq_am_stats {
-+	u64	events;
-+	u64	comps;
-+};
-+
-+/*
-+ * struct irq_am - irq adaptive moderation monitor
-+ * @state:             adaptive moderation monitor state
-+ * @tune_state:        tuning state of the moderation monitor
-+ * @am_stats:          overall completions and events counters
-+ * @start_sample:      first sample in moderation batch
-+ * @prev_stats:        previous stats for trend detection
-+ * @nr_events:         number of events between samples
-+ * @nr_levels:         number of moderation levels
-+ * @curr_level:        current moderation level
-+ * @work:              schedule moderation program
-+ * @program:           moderation program handler
-+ */
-+struct irq_am {
-+	enum irq_am_state		state;
-+	enum irq_am_tune_state		tune_state;
-+
-+	struct irq_am_stats		am_stats;
-+	struct irq_am_sample		start_sample;
-+	struct irq_am_sample_stats	prev_stats;
-+
-+	u16				nr_events;
-+	unsigned short			nr_levels;
-+	unsigned short			curr_level;
-+
-+	struct work_struct		work;
-+	irq_am_fn			*program;
-+};
-+
-+void irq_am_add_event(struct irq_am *am);
-+static inline void irq_am_add_comps(struct irq_am *am, u64 n)
-+{
-+	am->am_stats.comps += n;
-+}
-+
-+void irq_am_cleanup(struct irq_am *am);
-+void irq_am_init(struct irq_am *am, unsigned int nr_events,
-+	unsigned short nr_levels, unsigned short start_level, irq_am_fn *fn);
-+
-+#endif
-diff --git a/lib/Kconfig b/lib/Kconfig
-index 4dd5c11366f9..bbb4c9eea84d 100644
---- a/lib/Kconfig
-+++ b/lib/Kconfig
-@@ -504,6 +504,11 @@ config DDR
- 	  information. This data is useful for drivers handling
- 	  DDR SDRAM controllers.
- 
-+config IRQ_AM
-+	bool "IRQ adaptive moderation library"
-+	help
-+	  Helper library to implement adaptive moderation for I/O devices.
-+
- config IRQ_POLL
- 	bool "IRQ polling library"
- 	help
-diff --git a/lib/Makefile b/lib/Makefile
-index d11c48ec8ffd..795583a685b9 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -193,6 +193,7 @@ obj-$(CONFIG_SG_SPLIT) += sg_split.o
- obj-$(CONFIG_SG_POOL) += sg_pool.o
- obj-$(CONFIG_STMP_DEVICE) += stmp_device.o
- obj-$(CONFIG_IRQ_POLL) += irq_poll.o
-+obj-$(CONFIG_IRQ_AM) += irq-am.o
- 
- obj-$(CONFIG_STACKDEPOT) += stackdepot.o
- KASAN_SANITIZE_stackdepot.o := n
-diff --git a/lib/irq-am.c b/lib/irq-am.c
-new file mode 100644
-index 000000000000..ed7befd7a560
---- /dev/null
-+++ b/lib/irq-am.c
-@@ -0,0 +1,182 @@
-+/*
-+ * Adaptive moderation support for I/O devices.
-+ * Copyright (c) 2018 Lightbits Labs.
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ */
-+#include <linux/irq-am.h>
-+
-+static void irq_am_try_step(struct irq_am *am)
-+{
-+	if (am->tune_state == IRQ_AM_GOING_UP &&
-+	    am->curr_level != am->nr_levels - 1) {
-+		am->curr_level++;
-+	} else if (am->tune_state == IRQ_AM_GOING_DOWN &&
-+		   am->curr_level != 0) {
-+		am->curr_level--;
-+	}
-+}
-+
-+static inline bool irq_am_on_edge(struct irq_am *am)
-+{
-+	return am->curr_level == 0 || am->curr_level == am->nr_levels - 1;
-+}
-+
-+static void irq_am_turn(struct irq_am *am)
-+{
-+	am->tune_state = am->tune_state == IRQ_AM_GOING_UP ?
-+		IRQ_AM_GOING_DOWN : IRQ_AM_GOING_UP;
-+	irq_am_try_step(am);
-+}
-+
-+#define IRQ_AM_SIGNIFICANT_DIFF(val, ref) \
-+	(((100 * abs((val) - (ref))) / (ref)) > 20) /* more than 20% difference */
-+
-+static int irq_am_stats_compare(struct irq_am *am, struct irq_am_sample_stats *curr)
-+{
-+	struct irq_am_sample_stats *prev = &am->prev_stats;
-+
-+	/* first stat */
-+	if (!prev->cps)
-+		return IRQ_AM_STATS_SAME;
-+
-+	/* more completions per second is better */
-+	if (IRQ_AM_SIGNIFICANT_DIFF(curr->cps, prev->cps))
-+		return (curr->cps > prev->cps) ? IRQ_AM_STATS_BETTER :
-+						 IRQ_AM_STATS_WORSE;
-+
-+	/* less events per second is better */
-+	if (IRQ_AM_SIGNIFICANT_DIFF(curr->eps, prev->eps))
-+		return (curr->eps < prev->eps) ? IRQ_AM_STATS_BETTER :
-+						 IRQ_AM_STATS_WORSE;
-+
-+	/*
-+	 * we get 1 completion per event, no point in trying to aggregate
-+	 * any further, start declining moderation
-+	 */
-+	if (curr->cpe == 1 && am->curr_level)
-+		return am->tune_state == IRQ_AM_GOING_UP ?
-+			IRQ_AM_STATS_WORSE : IRQ_AM_STATS_BETTER;
-+
-+	return IRQ_AM_STATS_SAME;
-+}
-+
-+static bool irq_am_decision(struct irq_am *am,
-+		struct irq_am_sample_stats *curr_stats)
-+{
-+	unsigned short prev_level = am->curr_level;
-+	enum irq_am_relative_diff diff;
-+	bool changed;
-+
-+	diff = irq_am_stats_compare(am, curr_stats);
-+	switch (diff) {
-+	default:
-+	case IRQ_AM_STATS_SAME:
-+		/* fall through */
-+		break;
-+	case IRQ_AM_STATS_WORSE:
-+		irq_am_turn(am);
-+		break;
-+	case IRQ_AM_STATS_BETTER:
-+		irq_am_try_step(am);
-+		break;
-+	}
-+
-+	changed = am->curr_level != prev_level || irq_am_on_edge(am);
-+	if (changed || !am->prev_stats.cps)
-+		am->prev_stats = *curr_stats;
-+
-+	return changed;
-+}
-+
-+static void irq_am_sample(struct irq_am *am, struct irq_am_sample *s)
-+{
-+	s->time = ktime_get();
-+	s->events = am->am_stats.events;
-+	s->comps = am->am_stats.comps;
-+}
-+
-+static void irq_am_calc_stats(struct irq_am *am, struct irq_am_sample *start,
-+		struct irq_am_sample *end,
-+		struct irq_am_sample_stats *curr_stats)
-+{
-+	/* u32 holds up to 71 minutes, should be enough */
-+	u32 delta_us = ktime_us_delta(end->time, start->time);
-+	u32 ncomps = end->comps - start->comps;
-+
-+	if (!delta_us)
-+		return;
-+
-+	curr_stats->cps = DIV_ROUND_UP(ncomps * USEC_PER_SEC, delta_us);
-+	curr_stats->eps = DIV_ROUND_UP(am->nr_events * USEC_PER_SEC, delta_us);
-+	curr_stats->cpe = DIV_ROUND_UP(ncomps, am->nr_events);
-+}
-+
-+void irq_am_add_event(struct irq_am *am)
-+{
-+	struct irq_am_sample end_sample;
-+	struct irq_am_sample_stats curr_stats;
-+	u16 nr_events;
-+
-+	am->am_stats.events++;
-+
-+	switch (am->state) {
-+	case IRQ_AM_MEASURING:
-+		nr_events = am->am_stats.events - am->start_sample.events;
-+		if (nr_events < am->nr_events)
-+			break;
-+
-+		irq_am_sample(am, &end_sample);
-+		irq_am_calc_stats(am, &am->start_sample, &end_sample,
-+				    &curr_stats);
-+		if (irq_am_decision(am, &curr_stats)) {
-+			am->state = IRQ_AM_PROGRAM_MODERATION;
-+			schedule_work(&am->work);
-+			break;
-+		}
-+		/* fall through */
-+	case IRQ_AM_START_MEASURING:
-+		irq_am_sample(am, &am->start_sample);
-+		am->state = IRQ_AM_MEASURING;
-+		break;
-+	case IRQ_AM_PROGRAM_MODERATION:
-+		break;
-+	}
-+}
-+EXPORT_SYMBOL_GPL(irq_am_add_event);
-+
-+static void irq_am_program_moderation_work(struct work_struct *w)
-+{
-+	struct irq_am *am = container_of(w, struct irq_am, work);
-+
-+	WARN_ON_ONCE(am->program(am, am->curr_level));
-+	am->state = IRQ_AM_START_MEASURING;
-+}
-+
-+
-+void irq_am_cleanup(struct irq_am *am)
-+{
-+	flush_work(&am->work);
-+}
-+EXPORT_SYMBOL_GPL(irq_am_cleanup);
-+
-+void irq_am_init(struct irq_am *am, unsigned int nr_events,
-+	unsigned short nr_levels, unsigned short start_level, irq_am_fn *fn)
-+{
-+	memset(am, 0, sizeof(*am));
-+	am->state = IRQ_AM_START_MEASURING;
-+	am->tune_state = IRQ_AM_GOING_UP;
-+	am->nr_levels = nr_levels;
-+	am->nr_events = nr_events;
-+	am->curr_level = start_level;
-+	am->program = fn;
-+	INIT_WORK(&am->work, irq_am_program_moderation_work);
-+}
-+EXPORT_SYMBOL_GPL(irq_am_init);
--- 
-2.14.1
+
+Tested without V2 patch set. Iostat=0. IOPS = 1600K
+
+   5.79%  [megaraid_sas]           [k] complete_cmd_fusion
+   3.28%  [kernel]                 [k] _raw_spin_lock
+   3.28%  [kernel]                 [k] irq_entries_start
+   2.10%  [kernel]                 [k] scsi_queue_rq
+   1.96%  fio                      [.] __fio_gettime
+   1.85%  [megaraid_sas]           [k] megasas_build_io_fusion
+   1.68%  [megaraid_sas]           [k] megasas_build_and_issue_cmd_fusion
+   1.36%  [kernel]                 [k] gup_pgd_range
+   1.36%  [kernel]                 [k] scsi_dispatch_cmd
+   1.28%  [kernel]                 [k] do_io_submit
+   1.25%  [kernel]                 [k] switch_mm_irqs_off
+   1.20%  [kernel]                 [k] blk_mq_free_request
+   1.18%  [megaraid_sas]           [k] megasas_build_ldio_fusion
+   1.11%  [kernel]                 [k] dput
+   1.07%  [kernel]                 [k] scsi_softirq_done
+   1.07%  fio                      [.] get_io_u
+   1.07%  [kernel]                 [k] scsi_dec_host_busy
+   1.02%  [kernel]                 [k] blk_mq_get_request
+   0.96%  [sd_mod]                 [k] sd_init_command
+   0.92%  [kernel]                 [k] entry_SYSCALL_64
+   0.89%  [kernel]                 [k] blk_mq_make_request
+   0.87%  [kernel]                 [k] blkdev_direct_IO
+   0.84%  [kernel]                 [k] blk_mq_complete_request
+   0.78%  [kernel]                 [k] _raw_spin_lock_irqsave
+   0.77%  [kernel]                 [k] lookup_ioctx
+   0.76%  [megaraid_sas]           [k] MR_GetPhyParams
+   0.75%  [kernel]                 [k] blk_mq_dequeue_from_ctx
+   0.75%  [kernel]                 [k] memset_erms
+   0.74%  [kernel]                 [k] kmem_cache_alloc
+   0.72%  [megaraid_sas]           [k] megasas_queue_comman
+> and could you share us what the .can_queue is in this HBA?
+
+can_queue = 8072. In my test I used --iodepth=128 for 12 SCSI device (R0
+Volume.) FIO will only push 1536 outstanding commands.
+
+
+>
+> >
+> >
+> > > If possible, please provide us the performance data without these
+> > patches and
+> > > with these patches, together with perf trace.
+> > >
+> > > The top 5 patches are for addressing the io accounting issue, and
+> > > which should be the main reason for your performance drop, even
+> > > lockup in megaraid_sas's ISR, IMO.
+> >
+> > I think performance drop is different issue. May be a side effect of
+> > the patch set. Even though we fix this perf issue, cpu lock up is
+> > completely different issue.
+>
+> The performance drop is caused by the global data structure of sbitmap
+which
+> is accessed from all CPUs concurrently.
+>
+> > Regarding cpu lock up, there was similar discussion and folks are
+> > finding irq poll is good method to resolve lockup.  Not sure why NVME
+> > driver did not opted irq_poll, but there was extensive discussion and
+> > I am also
+>
+> NVMe's hw queues won't use host wide tags, so no such issue.
+>
+> > seeing cpu lock up mainly due to multiple completion queue/reply queue
+> > is tied to single CPU. We have weighing method in irq poll to quit ISR
+> > and that is the way we can avoid lock-up.
+> > http://lists.infradead.org/pipermail/linux-nvme/2017-January/007724.ht
+> > ml
+>
+> This patch can make sure that one request is always completed in the
+> submission CPU, but contention on the global sbitmap is too big and
+causes
+> performance drop.
+>
+> Now looks this is really an interesting topic for discussion.
+>
+>
+> Thanks,
+> Ming
