@@ -1,99 +1,206 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:50923 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S964917AbeBMOGV (ORCPT
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:46390 "EHLO
+        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1031479AbeBONMU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Feb 2018 09:06:21 -0500
-Received: by mail-wm0-f66.google.com with SMTP id f71so16254910wmf.0
-        for <linux-block@vger.kernel.org>; Tue, 13 Feb 2018 06:06:20 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 3/8] lightnvm: add support for 2.0 address format
-Date: Tue, 13 Feb 2018 15:06:03 +0100
-Message-Id: <1518530768-20956-4-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1518530768-20956-1-git-send-email-javier@cnexlabs.com>
-References: <1518530768-20956-1-git-send-email-javier@cnexlabs.com>
+        Thu, 15 Feb 2018 08:12:20 -0500
+Received: by mail-lf0-f67.google.com with SMTP id q194so33967758lfe.13
+        for <linux-block@vger.kernel.org>; Thu, 15 Feb 2018 05:12:19 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        javier@cnexlabs.com,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [PATCH v2 1/6] lightnvm: make 1.2 data structures explicit
+Date: Thu, 15 Feb 2018 14:11:55 +0100
+Message-Id: <20180215131200.3354-2-mb@lightnvm.io>
+In-Reply-To: <20180215131200.3354-1-mb@lightnvm.io>
+References: <20180215131200.3354-1-mb@lightnvm.io>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Add support for 2.0 address format. Also, align address bits for 1.2 and 2.0 to
-align.
+Make the 1.2 data structures explicit, so it will be easy to identify
+the 2.0 data structures. Also fix the order of which the nvme_nvm_*
+are declared, such that they follow the nvme_nvm_command order.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- include/linux/lightnvm.h | 45 ++++++++++++++++++++++++++++++++-------------
- 1 file changed, 32 insertions(+), 13 deletions(-)
+ drivers/nvme/host/lightnvm.c | 82 ++++++++++++++++++++++----------------------
+ 1 file changed, 41 insertions(+), 41 deletions(-)
 
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 6a567bd19b73..e035ae4c9acc 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -16,12 +16,21 @@ enum {
- 	NVM_IOTYPE_GC = 1,
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index dc0b1335c7c6..60db3f1b59da 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -51,6 +51,21 @@ struct nvme_nvm_ph_rw {
+ 	__le64			resv;
  };
  
--#define NVM_BLK_BITS (16)
--#define NVM_PG_BITS  (16)
--#define NVM_SEC_BITS (8)
--#define NVM_PL_BITS  (8)
--#define NVM_LUN_BITS (8)
--#define NVM_CH_BITS  (7)
-+/* 1.2 format */
-+#define NVM_12_CH_BITS  (8)
-+#define NVM_12_LUN_BITS (8)
-+#define NVM_12_BLK_BITS (16)
-+#define NVM_12_PG_BITS  (16)
-+#define NVM_12_PL_BITS  (4)
-+#define NVM_12_SEC_BITS (4)
-+#define NVM_12_RESERVED (8)
++struct nvme_nvm_erase_blk {
++	__u8			opcode;
++	__u8			flags;
++	__u16			command_id;
++	__le32			nsid;
++	__u64			rsvd[2];
++	__le64			prp1;
++	__le64			prp2;
++	__le64			spba;
++	__le16			length;
++	__le16			control;
++	__le32			dsmgmt;
++	__le64			resv;
++};
 +
-+/* 2.0 format */
-+#define NVM_20_CH_BITS  (8)
-+#define NVM_20_LUN_BITS (8)
-+#define NVM_20_CHK_BITS (16)
-+#define NVM_20_SEC_BITS (24)
-+#define NVM_20_RESERVED (8)
+ struct nvme_nvm_identity {
+ 	__u8			opcode;
+ 	__u8			flags;
+@@ -89,33 +104,18 @@ struct nvme_nvm_setbbtbl {
+ 	__u32			rsvd4[3];
+ };
  
- enum {
- 	NVM_OCSSD_SPEC_12 = 12,
-@@ -31,16 +40,26 @@ enum {
- struct ppa_addr {
- 	/* Generic structure for all addresses */
+-struct nvme_nvm_erase_blk {
+-	__u8			opcode;
+-	__u8			flags;
+-	__u16			command_id;
+-	__le32			nsid;
+-	__u64			rsvd[2];
+-	__le64			prp1;
+-	__le64			prp2;
+-	__le64			spba;
+-	__le16			length;
+-	__le16			control;
+-	__le32			dsmgmt;
+-	__le64			resv;
+-};
+-
+ struct nvme_nvm_command {
  	union {
-+		/* 1.2 device format */
- 		struct {
--			u64 blk		: NVM_BLK_BITS;
--			u64 pg		: NVM_PG_BITS;
--			u64 sec		: NVM_SEC_BITS;
--			u64 pl		: NVM_PL_BITS;
--			u64 lun		: NVM_LUN_BITS;
--			u64 ch		: NVM_CH_BITS;
--			u64 reserved	: 1;
-+			u64 ch		: NVM_12_CH_BITS;
-+			u64 lun		: NVM_12_LUN_BITS;
-+			u64 blk		: NVM_12_BLK_BITS;
-+			u64 pg		: NVM_12_PG_BITS;
-+			u64 pl		: NVM_12_PL_BITS;
-+			u64 sec		: NVM_12_SEC_BITS;
-+			u64 reserved	: NVM_12_RESERVED;
- 		} g;
+ 		struct nvme_common_command common;
+-		struct nvme_nvm_identity identity;
+ 		struct nvme_nvm_ph_rw ph_rw;
++		struct nvme_nvm_erase_blk erase;
++		struct nvme_nvm_identity identity;
+ 		struct nvme_nvm_getbbtbl get_bb;
+ 		struct nvme_nvm_setbbtbl set_bb;
+-		struct nvme_nvm_erase_blk erase;
+ 	};
+ };
  
-+		/* 2.0 device format */
-+		struct {
-+			u64 ch		: NVM_20_CH_BITS;
-+			u64 lun		: NVM_20_LUN_BITS;
-+			u64 chk		: NVM_20_CHK_BITS;
-+			u64 sec		: NVM_20_SEC_BITS;
-+			u64 reserved	: NVM_20_RESERVED;
-+		} m;
-+
- 		struct {
- 			u64 line	: 63;
- 			u64 is_cached	: 1;
+-struct nvme_nvm_id_group {
++struct nvme_nvm_id12_grp {
+ 	__u8			mtype;
+ 	__u8			fmtype;
+ 	__le16			res16;
+@@ -141,7 +141,7 @@ struct nvme_nvm_id_group {
+ 	__u8			reserved[906];
+ } __packed;
+ 
+-struct nvme_nvm_addr_format {
++struct nvme_nvm_id12_addrf {
+ 	__u8			ch_offset;
+ 	__u8			ch_len;
+ 	__u8			lun_offset;
+@@ -157,16 +157,16 @@ struct nvme_nvm_addr_format {
+ 	__u8			res[4];
+ } __packed;
+ 
+-struct nvme_nvm_id {
++struct nvme_nvm_id12 {
+ 	__u8			ver_id;
+ 	__u8			vmnt;
+ 	__u8			cgrps;
+ 	__u8			res;
+ 	__le32			cap;
+ 	__le32			dom;
+-	struct nvme_nvm_addr_format ppaf;
++	struct nvme_nvm_id12_addrf ppaf;
+ 	__u8			resv[228];
+-	struct nvme_nvm_id_group group;
++	struct nvme_nvm_id12_grp grp;
+ 	__u8			resv2[2880];
+ } __packed;
+ 
+@@ -191,25 +191,25 @@ static inline void _nvme_nvm_check_size(void)
+ {
+ 	BUILD_BUG_ON(sizeof(struct nvme_nvm_identity) != 64);
+ 	BUILD_BUG_ON(sizeof(struct nvme_nvm_ph_rw) != 64);
++	BUILD_BUG_ON(sizeof(struct nvme_nvm_erase_blk) != 64);
+ 	BUILD_BUG_ON(sizeof(struct nvme_nvm_getbbtbl) != 64);
+ 	BUILD_BUG_ON(sizeof(struct nvme_nvm_setbbtbl) != 64);
+-	BUILD_BUG_ON(sizeof(struct nvme_nvm_erase_blk) != 64);
+-	BUILD_BUG_ON(sizeof(struct nvme_nvm_id_group) != 960);
+-	BUILD_BUG_ON(sizeof(struct nvme_nvm_addr_format) != 16);
+-	BUILD_BUG_ON(sizeof(struct nvme_nvm_id) != NVME_IDENTIFY_DATA_SIZE);
++	BUILD_BUG_ON(sizeof(struct nvme_nvm_id12_grp) != 960);
++	BUILD_BUG_ON(sizeof(struct nvme_nvm_id12_addrf) != 16);
++	BUILD_BUG_ON(sizeof(struct nvme_nvm_id12) != NVME_IDENTIFY_DATA_SIZE);
+ 	BUILD_BUG_ON(sizeof(struct nvme_nvm_bb_tbl) != 64);
+ }
+ 
+-static int init_grps(struct nvm_id *nvm_id, struct nvme_nvm_id *nvme_nvm_id)
++static int init_grp(struct nvm_id *nvm_id, struct nvme_nvm_id12 *id12)
+ {
+-	struct nvme_nvm_id_group *src;
++	struct nvme_nvm_id12_grp *src;
+ 	struct nvm_id_group *grp;
+ 	int sec_per_pg, sec_per_pl, pg_per_blk;
+ 
+-	if (nvme_nvm_id->cgrps != 1)
++	if (id12->cgrps != 1)
+ 		return -EINVAL;
+ 
+-	src = &nvme_nvm_id->group;
++	src = &id12->grp;
+ 	grp = &nvm_id->grp;
+ 
+ 	grp->mtype = src->mtype;
+@@ -261,34 +261,34 @@ static int init_grps(struct nvm_id *nvm_id, struct nvme_nvm_id *nvme_nvm_id)
+ static int nvme_nvm_identity(struct nvm_dev *nvmdev, struct nvm_id *nvm_id)
+ {
+ 	struct nvme_ns *ns = nvmdev->q->queuedata;
+-	struct nvme_nvm_id *nvme_nvm_id;
++	struct nvme_nvm_id12 *id;
+ 	struct nvme_nvm_command c = {};
+ 	int ret;
+ 
+ 	c.identity.opcode = nvme_nvm_admin_identity;
+ 	c.identity.nsid = cpu_to_le32(ns->head->ns_id);
+ 
+-	nvme_nvm_id = kmalloc(sizeof(struct nvme_nvm_id), GFP_KERNEL);
+-	if (!nvme_nvm_id)
++	id = kmalloc(sizeof(struct nvme_nvm_id12), GFP_KERNEL);
++	if (!id)
+ 		return -ENOMEM;
+ 
+ 	ret = nvme_submit_sync_cmd(ns->ctrl->admin_q, (struct nvme_command *)&c,
+-				nvme_nvm_id, sizeof(struct nvme_nvm_id));
++				id, sizeof(struct nvme_nvm_id12));
+ 	if (ret) {
+ 		ret = -EIO;
+ 		goto out;
+ 	}
+ 
+-	nvm_id->ver_id = nvme_nvm_id->ver_id;
+-	nvm_id->vmnt = nvme_nvm_id->vmnt;
+-	nvm_id->cap = le32_to_cpu(nvme_nvm_id->cap);
+-	nvm_id->dom = le32_to_cpu(nvme_nvm_id->dom);
+-	memcpy(&nvm_id->ppaf, &nvme_nvm_id->ppaf,
++	nvm_id->ver_id = id->ver_id;
++	nvm_id->vmnt = id->vmnt;
++	nvm_id->cap = le32_to_cpu(id->cap);
++	nvm_id->dom = le32_to_cpu(id->dom);
++	memcpy(&nvm_id->ppaf, &id->ppaf,
+ 					sizeof(struct nvm_addr_format));
+ 
+-	ret = init_grps(nvm_id, nvme_nvm_id);
++	ret = init_grp(nvm_id, id);
+ out:
+-	kfree(nvme_nvm_id);
++	kfree(id);
+ 	return ret;
+ }
+ 
 -- 
-2.7.4
+2.11.0
