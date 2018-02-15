@@ -1,111 +1,112 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mxhk.zte.com.cn ([63.217.80.70]:52698 "EHLO mxhk.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751272AbeBAIMW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 1 Feb 2018 03:12:22 -0500
-From: tang.junhui@zte.com.cn
-To: colyli@suse.de, mlyle@lyle.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        tang.junhui@zte.com.cn
-Subject: [PATCH] bcache: calculate the number of incremental GC nodes according to the total of btree nodes
-Date: Thu, 1 Feb 2018 16:14:45 +0800
-Message-Id: <1517472886-4240-1-git-send-email-tang.junhui@zte.com.cn>
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:38910 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1032208AbeBONM1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Feb 2018 08:12:27 -0500
+Received: by mail-lf0-f65.google.com with SMTP id g72so33969535lfg.5
+        for <linux-block@vger.kernel.org>; Thu, 15 Feb 2018 05:12:26 -0800 (PST)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        javier@cnexlabs.com,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [PATCH v2 6/6] nvme: lightnvm: add late setup of block size and metadata
+Date: Thu, 15 Feb 2018 14:12:00 +0100
+Message-Id: <20180215131200.3354-7-mb@lightnvm.io>
+In-Reply-To: <20180215131200.3354-1-mb@lightnvm.io>
+References: <20180215131200.3354-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+The nvme driver sets up the size of the nvme namespace in two steps.
+First it initializes the device with standard logical block and
+metadata sizes, and then sets the correct logical block and metadata
+size. Due to the OCSSD 2.0 specification relies on the namespace to
+expose these sizes for correct initialization, let it be updated
+appropriately on the LightNVM side as well.
 
-This patch base on "[PATCH] bcache: finish incremental GC".
-
-Since incremental GC would stop 100ms when front side I/O comes, so when
-there are many btree nodes, if GC only processes constant (100) nodes each
-time, GC would last a long time, and the front I/Os would run out of the
-buckets (since no new bucket can be allocated during GC), and I/Os be
-blocked again.
-
-So GC should not process constant nodes, but varied nodes according to the
-number of btree nodes. In this patch, GC is divided into constant (100)
-times, so when there are many btree nodes, GC can process more nodes each
-time, otherwise GC will process less nodes each time (but not less than
-MIN_GC_NODES).
-
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- drivers/md/bcache/btree.c | 37 ++++++++++++++++++++++++++++++++++---
- 1 file changed, 34 insertions(+), 3 deletions(-)
+ drivers/lightnvm/core.c      | 3 ---
+ drivers/nvme/host/core.c     | 2 ++
+ drivers/nvme/host/lightnvm.c | 8 ++++++++
+ drivers/nvme/host/nvme.h     | 2 ++
+ 4 files changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index 48a4d18..d8a5d31 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -90,10 +90,10 @@
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 782f381e4d61..689c97b97775 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -864,8 +864,6 @@ static int nvm_core_init(struct nvm_dev *dev)
+ 	geo->ws_seq = id->ws_seq;
+ 	geo->ws_per_chk = id->ws_per_chk;
+ 	geo->nr_chks = id->num_chk;
+-	geo->sec_size = id->csecs;
+-	geo->oob_size = id->sos;
+ 	geo->mccap = id->mccap;
  
- #define MAX_NEED_GC		64
- #define MAX_SAVE_PRIO		72
-+#define MAX_GC_TIMES		100
- #define MIN_GC_NODES		100
- #define GC_SLEEP_TIME		100
+ 	geo->sec_per_chk = id->clba;
+@@ -893,7 +891,6 @@ static int nvm_core_init(struct nvm_dev *dev)
+ 	if (ret)
+ 		goto err_fmtype;
  
--
- #define PTR_DIRTY_BIT		(((uint64_t) 1 << 36))
- 
- #define PTR_HASH(c, k)							\
-@@ -1511,6 +1511,31 @@ static unsigned btree_gc_count_keys(struct btree *b)
- 	return ret;
+-	blk_queue_logical_block_size(dev->q, geo->sec_size);
+ 	return 0;
+ err_fmtype:
+ 	kfree(dev->lun_map);
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index f837d666cbd4..740ceb28067c 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -1379,6 +1379,8 @@ static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
+ 	if (ns->noiob)
+ 		nvme_set_chunk_size(ns);
+ 	nvme_update_disk_info(disk, ns, id);
++	if (ns->ndev)
++		nvme_nvm_update_nvm_info(ns);
+ #ifdef CONFIG_NVME_MULTIPATH
+ 	if (ns->head->disk)
+ 		nvme_update_disk_info(ns->head->disk, ns, id);
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index e38d835b15b5..839c0b96466a 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -812,6 +812,14 @@ int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned int cmd, unsigned long arg)
+ 	}
  }
  
-+static size_t btree_gc_min_nodes(struct cache_set *c)
++void nvme_nvm_update_nvm_info(struct nvme_ns *ns)
 +{
-+	size_t			min_nodes;
++	struct nvm_dev *ndev = ns->ndev;
 +
-+	/*
-+	 * Since incremental GC would stop 100ms when front
-+	 * side I/O comes, so when there are many btree nodes,
-+	 * if GC only processes constant (100) nodes each time,
-+	 * GC would last a long time, and the front I/Os
-+	 * would run out of the buckets (since no new bucket
-+	 * can be allocated during GC), and be blocked again.
-+	 * So GC should not process constant nodes, but varied
-+	 * nodes according to the number of btree nodes, which
-+	 * realized by dividing GC into constant(100) times,
-+	 * so when there are many btree nodes, GC can process
-+	 * more nodes each time, otherwise, GC will process less
-+	 * nodes each time (but not less than MIN_GC_NODES)
-+	 */
-+	min_nodes = c->gc_stats.nodes / MAX_GC_TIMES;
-+	if (min_nodes < MIN_GC_NODES)
-+		min_nodes = MIN_GC_NODES;
-+
-+	return min_nodes;
++	ndev->identity.csecs = ndev->geo.sec_size = 1 << ns->lba_shift;
++	ndev->identity.sos = ndev->geo.oob_size = ns->ms;
 +}
 +
- static int btree_gc_recurse(struct btree *b, struct btree_op *op,
- 			    struct closure *writes, struct gc_stat *gc)
+ int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node)
  {
-@@ -1577,7 +1602,7 @@ static int btree_gc_recurse(struct btree *b, struct btree_op *op,
- 		r->b = NULL;
+ 	struct request_queue *q = ns->queue;
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index ea1aa5283e8e..1ca08f4993ba 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -451,12 +451,14 @@ static inline void nvme_mpath_clear_current_path(struct nvme_ns *ns)
+ #endif /* CONFIG_NVME_MULTIPATH */
  
- 		if (atomic_read(&b->c->io_inflight) &&
--		    gc->nodes >= gc->nodes_pre + MIN_GC_NODES) {
-+		    gc->nodes >= gc->nodes_pre + btree_gc_min_nodes(b->c)) {
- 			gc->nodes_pre =  gc->nodes;
- 			ret = -EAGAIN;
- 			break;
-@@ -1835,8 +1860,14 @@ static int bch_btree_check_recurse(struct btree *b, struct btree_op *op)
- 		do {
- 			k = bch_btree_iter_next_filter(&iter, &b->keys,
- 						       bch_ptr_bad);
--			if (k)
-+			if (k) {
- 				btree_node_prefetch(b, k);
-+				/*
-+				 * initiallize c->gc_stats.nodes
-+				 * for incremental GC
-+				 */
-+				b->c->gc_stats.nodes++;
-+			}
- 
- 			if (p)
- 				ret = btree(check_recurse, p, b, op);
+ #ifdef CONFIG_NVM
++void nvme_nvm_update_nvm_info(struct nvme_ns *ns);
+ int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node);
+ void nvme_nvm_unregister(struct nvme_ns *ns);
+ int nvme_nvm_register_sysfs(struct nvme_ns *ns);
+ void nvme_nvm_unregister_sysfs(struct nvme_ns *ns);
+ int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned int cmd, unsigned long arg);
+ #else
++static inline void nvme_nvm_update_nvm_info(struct nvme_ns *ns) {};
+ static inline int nvme_nvm_register(struct nvme_ns *ns, char *disk_name,
+ 				    int node)
+ {
 -- 
-1.8.3.1
+2.11.0
