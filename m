@@ -1,75 +1,37 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: linux-scsi@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Arun Easi <arun.easi@cavium.com>,
-	Omar Sandoval <osandov@fb.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Don Brace <don.brace@microsemi.com>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Peter Rivera <peter.rivera@broadcom.com>,
-	Laurence Oberman <loberman@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 0/8] blk-mq & scsi: fix reply queue selection and improve host wide tagset
-Date: Tue, 27 Feb 2018 18:07:42 +0800
-Message-Id: <20180227100750.32299-1-ming.lei@redhat.com>
+Return-Path: <joe@perches.com>
+Message-ID: <1518661577.3678.44.camel@perches.com>
+Subject: Re: [PATCH] block: Change 'unsigned' to 'unsigned int' throughout
+ block layer
+From: Joe Perches <joe@perches.com>
+To: Al Viro <viro@ZenIV.linux.org.uk>, John Pittman <jpittman@redhat.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Date: Wed, 14 Feb 2018 18:26:17 -0800
+In-Reply-To: <20180215021321.GB30522@ZenIV.linux.org.uk>
+References: <1518658622-5931-1-git-send-email-jpittman@redhat.com>
+	 <20180215021321.GB30522@ZenIV.linux.org.uk>
+Content-Type: text/plain; charset="ISO-8859-1"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Hi All,
+On Thu, 2018-02-15 at 02:13 +0000, Al Viro wrote:
+> On Wed, Feb 14, 2018 at 08:37:02PM -0500, John Pittman wrote:
+> > In quite a few files throughout the block layer, the bare 'unsigned' is
+> > used rather than the preferred 'unsigned int'.
+> 
+> Preferred by whom?
 
-The 1st two patches fixes reply queue selection, and this issue has been
-reported and can cause IO hang during booting, please consider the two
-for V4.16.
+The kernel as a whole, ~12:1
 
-The following 6 patches try to improve hostwide tagset on hpsa and
-megaraid_sas by making hw queue per NUMA node.
+> >  The issue was
+> 
+> What is that "issue" and why is it a problem in the first place?
 
-I don't have high-performance hpsa and megaraid_sas device at hand.
+it's not.
 
-Don Brace, could you test this patchset on concurrent IOs over you hpsa
-SSD and see if this approach is well?
+> Oh, good - so presumably it does have some explanations beyond "The Most Holy
+> checkpatch.pl Spake Unto Us"; could the esteemed sir share those with us?
 
-Kashyap, could you test this patchset on your megaraid_sas SSDs?
+infidel...
 
-	gitweb: https://github.com/ming1/linux/tree/v4.16-rc-host-tags-v3.2
-
-thanks,
-Ming
-
-Hannes Reinecke (1):
-  scsi: Add template flag 'host_tagset'
-
-Ming Lei (7):
-  scsi: hpsa: fix selection of reply queue
-  scsi: megaraid_sas: fix selection of reply queue
-  blk-mq: introduce 'start_tag' field to 'struct blk_mq_tags'
-  blk-mq: introduce BLK_MQ_F_HOST_TAGS
-  block: null_blk: introduce module parameter of 'g_host_tags'
-  scsi: hpsa: improve scsi_mq performance via .host_tagset
-  scsi: megaraid: improve scsi_mq performance via .host_tagset
-
- block/blk-mq-debugfs.c                      |  2 +
- block/blk-mq-sched.c                        |  2 +-
- block/blk-mq-tag.c                          | 13 +++--
- block/blk-mq-tag.h                          | 11 ++--
- block/blk-mq.c                              | 50 +++++++++++++++---
- block/blk-mq.h                              |  3 +-
- drivers/block/null_blk.c                    |  6 +++
- drivers/scsi/hpsa.c                         | 79 ++++++++++++++++++++++-------
- drivers/scsi/hpsa.h                         |  1 +
- drivers/scsi/megaraid/megaraid_sas.h        |  2 +-
- drivers/scsi/megaraid/megaraid_sas_base.c   | 40 ++++++++++++++-
- drivers/scsi/megaraid/megaraid_sas_fusion.c | 12 ++---
- drivers/scsi/scsi_lib.c                     |  2 +
- include/linux/blk-mq.h                      |  2 +
- include/scsi/scsi_host.h                    |  3 ++
- 15 files changed, 182 insertions(+), 46 deletions(-)
-
--- 
-2.9.5
+;)
