@@ -1,37 +1,30 @@
-Return-Path: <joe@perches.com>
-Message-ID: <1518661577.3678.44.camel@perches.com>
+Return-Path: <viro@ftp.linux.org.uk>
+Date: Thu, 15 Feb 2018 02:13:21 +0000
+From: Al Viro <viro@ZenIV.linux.org.uk>
+To: John Pittman <jpittman@redhat.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH] block: Change 'unsigned' to 'unsigned int' throughout
  block layer
-From: Joe Perches <joe@perches.com>
-To: Al Viro <viro@ZenIV.linux.org.uk>, John Pittman <jpittman@redhat.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Date: Wed, 14 Feb 2018 18:26:17 -0800
-In-Reply-To: <20180215021321.GB30522@ZenIV.linux.org.uk>
+Message-ID: <20180215021321.GB30522@ZenIV.linux.org.uk>
 References: <1518658622-5931-1-git-send-email-jpittman@redhat.com>
-	 <20180215021321.GB30522@ZenIV.linux.org.uk>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1518658622-5931-1-git-send-email-jpittman@redhat.com>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, 2018-02-15 at 02:13 +0000, Al Viro wrote:
-> On Wed, Feb 14, 2018 at 08:37:02PM -0500, John Pittman wrote:
-> > In quite a few files throughout the block layer, the bare 'unsigned' is
-> > used rather than the preferred 'unsigned int'.
-> 
-> Preferred by whom?
+On Wed, Feb 14, 2018 at 08:37:02PM -0500, John Pittman wrote:
+> In quite a few files throughout the block layer, the bare 'unsigned' is
+> used rather than the preferred 'unsigned int'.
 
-The kernel as a whole, ~12:1
+Preferred by whom?
 
-> >  The issue was
-> 
-> What is that "issue" and why is it a problem in the first place?
+>  The issue was
 
-it's not.
+What is that "issue" and why is it a problem in the first place?
 
-> Oh, good - so presumably it does have some explanations beyond "The Most Holy
-> checkpatch.pl Spake Unto Us"; could the esteemed sir share those with us?
+> exposed by checkpatch.pl.  Warnings encountered were:
 
-infidel...
-
-;)
+Oh, good - so presumably it does have some explanations beyond "The Most Holy
+checkpatch.pl Spake Unto Us"; could the esteemed sir share those with us?
