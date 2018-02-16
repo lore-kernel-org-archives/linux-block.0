@@ -1,56 +1,190 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Subject: [PATCH 07/19] lightnvm: complete 2.0 values in sysfs
-Date: Mon, 26 Feb 2018 14:17:06 +0100
-Message-Id: <1519651038-16845-8-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
-References: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org,
- =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="utf-8"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:58047 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1034179AbeBPOVQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Feb 2018 09:21:16 -0500
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Omar Sandoval <osandov@osandov.com>
+Cc: Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
+        Linux NVMe Mailinglist <linux-nvme@lists.infradead.org>,
+        Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH blktests] tests/nvme: add NVMe test group and tracepoint test
+Date: Fri, 16 Feb 2018 15:21:04 +0100
+Message-Id: <20180216142104.25756-1-jthumshirn@suse.de>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-QWRkIG1pc3NpbmcgZ2VvbWV0cnkgdmFsdWVzIHRvIHN5c2ZzLiBOYW1lbHksIG1heG9jIGFuZCBt
-YXhvY3B1LgoKU2lnbmVkLW9mZi1ieTogSmF2aWVyIEdvbnrDoWxleiA8amF2aWVyQGNuZXhsYWJz
-LmNvbT4KLS0tCiBkcml2ZXJzL252bWUvaG9zdC9saWdodG52bS5jIHwgOCArKysrKysrKwogMSBm
-aWxlIGNoYW5nZWQsIDggaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL2RyaXZlcnMvbnZtZS9o
-b3N0L2xpZ2h0bnZtLmMgYi9kcml2ZXJzL252bWUvaG9zdC9saWdodG52bS5jCmluZGV4IGE4ZjM1
-ZThiNzk1My4uNGVhNTUzYzkxNzU2IDEwMDY0NAotLS0gYS9kcml2ZXJzL252bWUvaG9zdC9saWdo
-dG52bS5jCisrKyBiL2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMKQEAgLTEwNjYsNiArMTA2
-NiwxMCBAQCBzdGF0aWMgc3NpemVfdCBudm1fZGV2X2F0dHJfc2hvd18yMChzdHJ1Y3QgZGV2aWNl
-ICpkZXYsCiAJCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9TSVpFLCAiJXVcbiIsIGRldl9n
-ZW8tPmMud3NfbWluKTsKIAl9IGVsc2UgaWYgKHN0cmNtcChhdHRyLT5uYW1lLCAid3Nfb3B0Iikg
-PT0gMCkgewogCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwgIiV1XG4iLCBkZXZf
-Z2VvLT5jLndzX29wdCk7CisJfSBlbHNlIGlmIChzdHJjbXAoYXR0ci0+bmFtZSwgIm1heG9jIikg
-PT0gMCkgeworCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwgIiV1XG4iLCBkZXZf
-Z2VvLT5jLm1heG9jKTsKKwl9IGVsc2UgaWYgKHN0cmNtcChhdHRyLT5uYW1lLCAibWF4b2NwdSIp
-ID09IDApIHsKKwkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIldVxuIiwgZGV2
-X2dlby0+Yy5tYXhvY3B1KTsKIAl9IGVsc2UgaWYgKHN0cmNtcChhdHRyLT5uYW1lLCAibXdfY3Vu
-aXRzIikgPT0gMCkgewogCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwgIiV1XG4i
-LCBkZXZfZ2VvLT5jLm13X2N1bml0cyk7CiAJfSBlbHNlIGlmIChzdHJjbXAoYXR0ci0+bmFtZSwg
-IndyaXRlX3R5cCIpID09IDApIHsKQEAgLTExNjMsNiArMTE2Nyw4IEBAIHN0YXRpYyBOVk1fREVW
-X0FUVFJfMjBfUk8oY2h1bmtzKTsKIHN0YXRpYyBOVk1fREVWX0FUVFJfMjBfUk8oY2xiYSk7CiBz
-dGF0aWMgTlZNX0RFVl9BVFRSXzIwX1JPKHdzX21pbik7CiBzdGF0aWMgTlZNX0RFVl9BVFRSXzIw
-X1JPKHdzX29wdCk7CitzdGF0aWMgTlZNX0RFVl9BVFRSXzIwX1JPKG1heG9jKTsKK3N0YXRpYyBO
-Vk1fREVWX0FUVFJfMjBfUk8obWF4b2NwdSk7CiBzdGF0aWMgTlZNX0RFVl9BVFRSXzIwX1JPKG13
-X2N1bml0cyk7CiBzdGF0aWMgTlZNX0RFVl9BVFRSXzIwX1JPKHdyaXRlX3R5cCk7CiBzdGF0aWMg
-TlZNX0RFVl9BVFRSXzIwX1JPKHdyaXRlX21heCk7CkBAIC0xMTc5LDYgKzExODUsOCBAQCBzdGF0
-aWMgc3RydWN0IGF0dHJpYnV0ZSAqbnZtX2Rldl9hdHRyc18yMFtdID0gewogCSZkZXZfYXR0cl9j
-bGJhLmF0dHIsCiAJJmRldl9hdHRyX3dzX21pbi5hdHRyLAogCSZkZXZfYXR0cl93c19vcHQuYXR0
-ciwKKwkmZGV2X2F0dHJfbWF4b2MuYXR0ciwKKwkmZGV2X2F0dHJfbWF4b2NwdS5hdHRyLAogCSZk
-ZXZfYXR0cl9td19jdW5pdHMuYXR0ciwKIAogCSZkZXZfYXR0cl9yZWFkX3R5cC5hdHRyLAotLSAK
-Mi43LjQKCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpM
-aW51eC1udm1lIG1haWxpbmcgbGlzdApMaW51eC1udm1lQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0
-cDovL2xpc3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1udm1lCg==
+Add a NVMe test group and a tracepoint test as the first test case.
+
+Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ common/nvme        | 28 +++++++++++++++++++++++
+ tests/nvme/001     | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/001.out | 12 ++++++++++
+ tests/nvme/group   | 28 +++++++++++++++++++++++
+ 4 files changed, 134 insertions(+)
+ create mode 100644 common/nvme
+ create mode 100755 tests/nvme/001
+ create mode 100644 tests/nvme/001.out
+ create mode 100644 tests/nvme/group
+
+diff --git a/common/nvme b/common/nvme
+new file mode 100644
+index 000000000000..ec3986f43e21
+--- /dev/null
++++ b/common/nvme
+@@ -0,0 +1,28 @@
++#!/bin/bash
++#
++# Default helper functions for NVMe devices.
++#
++# Copyright (C) 2018 Johannes Thumshirn
++#
++# This program is free software: you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation, either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++shopt -s extglob
++
++_test_dev_is_nvme() {
++	if ! readlink -f "$TEST_DEV_SYSFS/device" | grep -q nvme; then
++		SKIP_REASON="$TEST_DEV is not a NVMe device"
++		return 1
++	fi
++	return 0
++}
+diff --git a/tests/nvme/001 b/tests/nvme/001
+new file mode 100755
+index 000000000000..ff4a9047c884
+--- /dev/null
++++ b/tests/nvme/001
+@@ -0,0 +1,66 @@
++#!/bin/bash
++#
++# Regression test for commit 3d030e41d96f ("nvme: add tracepoint for
++# nvme_setup_cmd")
++#
++# Copyright (C) 2018 Johannes Thumshirn
++#
++# This program is free software: you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation, either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++DESCRIPTION="enable nvme_setup_nvm_cmd trace point and submit I/O to the
++device"
++
++QUICK=1
++
++# This function normalizes the variable parts of the trace on the individual
++# test system so the known good result in test/nvme/001.out matches if all is
++# OK.
++# If anyone finds a readable way of definig this filter I'm all ears.
++filter_trace() {
++	sed -r "s/dd-[0-9]+\s+\[[0-9]+\]\s+\.{4}\s+[0-9]+\.[0-9]+: nvme_setup_nvm_cmd:\s+qid=[0-9]+, nsid=[0-9]+, cmdid=[0-9]+, flags=0x0, meta=0x0, cmd=\(nvme_cmd_read slba=0, len=31, ctrl=0x0, dsmgmt=0, reftag=0\)/dd-XXX   [XXX] ....     X.XXXXXX: nvme_setup_nvm_cmd: qid=X, nsid=X, cmdid=X, flags=0x0, meta=0x0, cmd=(nvme_cmd_read slba=0, len=31, ctrl=0x0, dsmgmt=0, reftag=0)/"
++}
++
++test_device() {
++	echo "Running ${TEST_NAME}"
++	cleanup_debugfs=0
++	cleanup_tracefs=0
++
++	if ! grep -q debugfs /proc/mounts; then
++		mount -t debugfs none /sys/kernel/debug
++		cleanup_debugfs=1
++	fi
++
++	if ! grep -q tracefs /proc/mounts; then
++		mount -t tracefs none /sys/kernel/debug/tracing
++		cleanup_tracefs=1
++	fi
++
++	echo 1 > /sys/kernel/debug/tracing/events/nvme/nvme_setup_nvm_cmd/enable
++
++	dd if=${TEST_DEV} of=/dev/null bs=512 count=1 >>$FULL 2> /dev/null
++
++	cat /sys/kernel/debug/tracing/trace | filter_trace
++
++	echo 0 > /sys/kernel/debug/tracing/events/nvme/nvme_setup_nvm_cmd/enable
++
++	if [[ $cleanup_tracefs == 1 ]]; then
++		umount /sys/kernel/debug/tracing
++	fi
++
++	if [[ $cleanup_debugfs == 1 ]]; then
++		umount /sys/kernel/debug
++	fi
++
++	echo "Test complete"
++}
+diff --git a/tests/nvme/001.out b/tests/nvme/001.out
+new file mode 100644
+index 000000000000..bca1d0fc27b1
+--- /dev/null
++++ b/tests/nvme/001.out
+@@ -0,0 +1,12 @@
++Running nvme/001
++# tracer: nop
++#
++#                              _-----=> irqs-off
++#                             / _----=> need-resched
++#                            | / _---=> hardirq/softirq
++#                            || / _--=> preempt-depth
++#                            ||| /     delay
++#           TASK-PID   CPU#  ||||    TIMESTAMP  FUNCTION
++#              | |       |   ||||       |         |
++              dd-XXX   [XXX] ....     X.XXXXXX: nvme_setup_nvm_cmd: qid=X, nsid=X, cmdid=X, flags=0x0, meta=0x0, cmd=(nvme_cmd_read slba=0, len=31, ctrl=0x0, dsmgmt=0, reftag=0)
++Test complete
+diff --git a/tests/nvme/group b/tests/nvme/group
+new file mode 100644
+index 000000000000..5e4e65c922c7
+--- /dev/null
++++ b/tests/nvme/group
+@@ -0,0 +1,28 @@
++#!/bin/bash
++#
++# Test specific to NVMe devices
++#
++# Copyright (C) 2018 Johannes Thumshirn
++#
++# This program is free software: you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation, either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++. common/nvme
++
++group_requires() {
++	_have_root
++}
++
++group_device_requires() {
++	_test_dev_is_nvme
++}
+-- 
+2.13.6
