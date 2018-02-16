@@ -1,541 +1,424 @@
-Return-Path: <hare@suse.de>
-From: Hannes Reinecke <hare@suse.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Mike Christie <mchristi@redhat.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Hannes Reinecke <hare@suse.com>
-Subject: [PATCH] block: copy ioprio in __bio_clone_fast()
-Date: Mon, 26 Feb 2018 11:55:52 +0100
-Message-Id: <20180226105552.22120-1-hare@suse.de>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:34952 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753323AbeBPGkY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Feb 2018 01:40:24 -0500
+Received: by mail-pg0-f67.google.com with SMTP id l131so1734231pga.2
+        for <linux-block@vger.kernel.org>; Thu, 15 Feb 2018 22:40:23 -0800 (PST)
+From: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
+Message-Id: <ADD0E58F-DBA5-4A53-9666-0B046F5DAE8E@lightnvm.io>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_7085E976-BDA0-4187-A9A6-E5013718E758";
+        protocol="application/pgp-signature";
+        micalg=pgp-sha512
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH 6/8] lightnvm: pblk: implement get log report chunk
+Date: Thu, 15 Feb 2018 22:38:56 -0800
+In-Reply-To: <0287b2a1-34b3-d069-04ef-79170def571f@lightnvm.io>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+To: =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>
+References: <1518530768-20956-1-git-send-email-javier@cnexlabs.com>
+ <1518530768-20956-7-git-send-email-javier@cnexlabs.com>
+ <0287b2a1-34b3-d069-04ef-79170def571f@lightnvm.io>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We need to copy the io priority, too; otherwise the clone will run
-with a different priority than the original one.
 
-Fixes: 43b62ce3ff0a ("block: move bio io prio to a new field")
-Signed-off-by: Hannes Reinecke <hare@suse.com>
----
- block/bio.c          |   1 +
- drivers/vhost/npiv.c | 379 +++++----------------------------------------------
- 2 files changed, 37 insertions(+), 343 deletions(-)
+--Apple-Mail=_7085E976-BDA0-4187-A9A6-E5013718E758
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-diff --git a/block/bio.c b/block/bio.c
-index e1708db48258..e079911c640f 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -605,6 +605,7 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
- 	bio->bi_write_hint = bio_src->bi_write_hint;
- 	bio->bi_iter = bio_src->bi_iter;
- 	bio->bi_io_vec = bio_src->bi_io_vec;
-+	bio->bi_ioprio = bio_src->bi_ioprio;
- 
- 	bio_clone_blkcg_association(bio, bio_src);
- }
-diff --git a/drivers/vhost/npiv.c b/drivers/vhost/npiv.c
-index 20e2a66e332d..3527996aab3f 100644
---- a/drivers/vhost/npiv.c
-+++ b/drivers/vhost/npiv.c
-@@ -13,7 +13,7 @@
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  * GNU General Public License for more details.
-  *
-- ****************************************************************************/
-+ */
- 
- #include <linux/module.h>
- #include <linux/moduleparam.h>
-@@ -31,6 +31,7 @@
- #include <linux/fs.h>
- #include <linux/vmalloc.h>
- #include <linux/miscdevice.h>
-+#include <linux/mempool.h>
- #include <asm/unaligned.h>
- #include <scsi/scsi_common.h>
- #include <scsi/scsi_proto.h>
-@@ -87,8 +88,6 @@ struct vhost_npiv_cmd {
- 	struct vhost_virtqueue *tvc_vq;
- 	/* Pointer to vhost nexus memory */
- 	struct vhost_npiv_nexus *tvc_nexus;
--	/* The TCM I/O descriptor that is accessed via container_of() */
--	struct se_cmd tvc_se_cmd;
- 	/* work item used for cmwq dispatch to vhost_npiv_submission_work() */
- 	struct work_struct work;
- 	/* Copy of the incoming SCSI command descriptor block (CDB) */
-@@ -101,11 +100,6 @@ struct vhost_npiv_cmd {
- 	struct vhost_npiv_inflight *inflight;
- };
- 
--struct vhost_npiv_nexus {
--	/* Pointer to TCM session for I_T Nexus */
--	struct se_session *tvn_se_sess;
--};
--
- struct vhost_npiv_tpg {
- 	/* Vhost port target portal group tag for TCM */
- 	u16 tport_tpgt;
-@@ -121,25 +115,10 @@ struct vhost_npiv_tpg {
- 	struct mutex tv_tpg_mutex;
- 	/* Pointer to the TCM VHost I_T Nexus for this TPG endpoint */
- 	struct vhost_npiv_nexus *tpg_nexus;
--	/* Pointer back to vhost_npiv_tport */
--	struct vhost_npiv_tport *tport;
--	/* Returned by vhost_npiv_make_tpg() */
--	struct se_portal_group se_tpg;
- 	/* Pointer back to vhost_npiv, protected by tv_tpg_mutex */
- 	struct vhost_npiv *vhost_npiv;
- };
- 
--struct vhost_npiv_tport {
--	/* SCSI protocol the tport is providing */
--	u8 tport_proto_id;
--	/* Binary World Wide unique Port Name for Vhost Target port */
--	u64 tport_wwpn;
--	/* ASCII formatted WWPN for Vhost Target port */
--	char tport_name[VHOST_NPIV_NAMELEN];
--	/* Returned by vhost_npiv_make_tport() */
--	struct se_wwn tport_wwn;
--};
--
- struct vhost_npiv_evt {
- 	/* event to be sent to guest */
- 	struct virtio_scsi_event event;
-@@ -195,6 +174,7 @@ struct vhost_npiv {
- };
- 
- static struct workqueue_struct *vhost_npiv_workqueue;
-+static struct mempool *vhost_npiv_cmd_pool;
- 
- /* Global spinlock to protect vhost_npiv TPG list for vhost IOCTL access */
- static DEFINE_MUTEX(vhost_npiv_mutex);
-@@ -253,132 +233,6 @@ static void vhost_npiv_put_inflight(struct vhost_npiv_inflight *inflight)
- 	kref_put(&inflight->kref, vhost_npiv_done_inflight);
- }
- 
--static int vhost_npiv_check_true(struct se_portal_group *se_tpg)
--{
--	return 1;
--}
--
--static int vhost_npiv_check_false(struct se_portal_group *se_tpg)
--{
--	return 0;
--}
--
--static char *vhost_npiv_get_fabric_name(void)
--{
--	return "vhost";
--}
--
--static char *vhost_npiv_get_fabric_wwn(struct se_portal_group *se_tpg)
--{
--	struct vhost_npiv_tpg *tpg = container_of(se_tpg,
--				struct vhost_npiv_tpg, se_tpg);
--	struct vhost_npiv_tport *tport = tpg->tport;
--
--	return &tport->tport_name[0];
--}
--
--static u16 vhost_npiv_get_tpgt(struct se_portal_group *se_tpg)
--{
--	struct vhost_npiv_tpg *tpg = container_of(se_tpg,
--				struct vhost_npiv_tpg, se_tpg);
--	return tpg->tport_tpgt;
--}
--
--static int vhost_npiv_check_prot_fabric_only(struct se_portal_group *se_tpg)
--{
--	struct vhost_npiv_tpg *tpg = container_of(se_tpg,
--				struct vhost_npiv_tpg, se_tpg);
--
--	return tpg->tv_fabric_prot_type;
--}
--
--static u32 vhost_npiv_tpg_get_inst_index(struct se_portal_group *se_tpg)
--{
--	return 1;
--}
--
--static void vhost_npiv_release_cmd(struct se_cmd *se_cmd)
--{
--	struct vhost_npiv_cmd *tv_cmd = container_of(se_cmd,
--				struct vhost_npiv_cmd, tvc_se_cmd);
--	struct se_session *se_sess = tv_cmd->tvc_nexus->tvn_se_sess;
--	int i;
--
--	if (tv_cmd->tvc_sgl_count) {
--		for (i = 0; i < tv_cmd->tvc_sgl_count; i++)
--			put_page(sg_page(&tv_cmd->tvc_sgl[i]));
--	}
--	if (tv_cmd->tvc_prot_sgl_count) {
--		for (i = 0; i < tv_cmd->tvc_prot_sgl_count; i++)
--			put_page(sg_page(&tv_cmd->tvc_prot_sgl[i]));
--	}
--
--	vhost_npiv_put_inflight(tv_cmd->inflight);
--	percpu_ida_free(&se_sess->sess_tag_pool, se_cmd->map_tag);
--}
--
--static u32 vhost_npiv_sess_get_index(struct se_session *se_sess)
--{
--	return 0;
--}
--
--static int vhost_npiv_write_pending(struct se_cmd *se_cmd)
--{
--	/* Go ahead and process the write immediately */
--	target_execute_cmd(se_cmd);
--	return 0;
--}
--
--static int vhost_npiv_write_pending_status(struct se_cmd *se_cmd)
--{
--	return 0;
--}
--
--static void vhost_npiv_set_default_node_attrs(struct se_node_acl *nacl)
--{
--	return;
--}
--
--static int vhost_npiv_get_cmd_state(struct se_cmd *se_cmd)
--{
--	return 0;
--}
--
--static void vhost_npiv_complete_cmd(struct vhost_npiv_cmd *cmd)
--{
--	struct vhost_npiv *vs = cmd->tvc_vhost;
--
--	llist_add(&cmd->tvc_completion_list, &vs->vs_completion_list);
--
--	vhost_work_queue(&vs->dev, &vs->vs_completion_work);
--}
--
--static int vhost_npiv_queue_data_in(struct se_cmd *se_cmd)
--{
--	struct vhost_npiv_cmd *cmd = container_of(se_cmd,
--				struct vhost_npiv_cmd, tvc_se_cmd);
--	vhost_npiv_complete_cmd(cmd);
--	return 0;
--}
--
--static int vhost_npiv_queue_status(struct se_cmd *se_cmd)
--{
--	struct vhost_npiv_cmd *cmd = container_of(se_cmd,
--				struct vhost_npiv_cmd, tvc_se_cmd);
--	vhost_npiv_complete_cmd(cmd);
--	return 0;
--}
--
--static void vhost_npiv_queue_tm_rsp(struct se_cmd *se_cmd)
--{
--	return;
--}
--
--static void vhost_npiv_aborted_task(struct se_cmd *se_cmd)
--{
--	return;
--}
--
- static void vhost_npiv_free_evt(struct vhost_npiv *vs, struct vhost_npiv_evt *evt)
- {
- 	vs->vs_events_nr--;
-@@ -411,20 +265,6 @@ vhost_npiv_allocate_evt(struct vhost_npiv *vs,
- 	return evt;
- }
- 
--static void vhost_npiv_free_cmd(struct vhost_npiv_cmd *cmd)
--{
--	struct se_cmd *se_cmd = &cmd->tvc_se_cmd;
--
--	/* TODO locking against target/backend threads? */
--	transport_generic_free_cmd(se_cmd, 0);
--
--}
--
--static int vhost_npiv_check_stop_free(struct se_cmd *se_cmd)
--{
--	return target_put_sess_cmd(se_cmd);
--}
--
- static void
- vhost_npiv_do_evt_work(struct vhost_npiv *vs, struct vhost_npiv_evt *evt)
- {
-@@ -650,26 +490,19 @@ vhost_npiv_calc_sgls(struct iov_iter *iter, size_t bytes, int max_sgls)
- }
- 
- static int
--vhost_npiv_iov_to_sgl(struct vhost_npiv_cmd *cmd, bool write,
-+vhost_npiv_iov_to_req(struct vhost_npiv_cmd *cmd, bool write,
- 		      struct iov_iter *iter,
--		      struct scatterlist *sg, int sg_count)
-+		      struct request *req, int nr_pages)
- {
- 	struct scatterlist *p = sg;
- 	int ret;
-+	struct bio_vec *vecs;
- 
--	while (iov_iter_count(iter)) {
--		ret = vhost_npiv_map_to_sgl(cmd, iter, sg, write);
--		if (ret < 0) {
--			while (p < sg) {
--				struct page *page = sg_page(p++);
--				if (page)
--					put_page(page);
--			}
--			return ret;
--		}
--		sg += ret;
--	}
--	return 0;
-+	vec = kmalloc(nr_pages * sizeof(struct bio_vec), GFP_KERNEL);
-+	bio_init(req->bio, vecs, nr_pages);
-+	req->bio->bi_end_io = vhost_npiv_end_io;
-+
-+	return bio_iov_iter_get_pages(req->bio, iter);
- }
- 
- static int
-@@ -678,61 +511,17 @@ vhost_npiv_mapal(struct vhost_npiv_cmd *cmd,
- 		 size_t data_bytes, struct iov_iter *data_iter)
- {
- 	int sgl_count, ret;
--	bool write = (cmd->tvc_data_direction == DMA_FROM_DEVICE);
--
--	if (prot_bytes) {
--		sgl_count = vhost_npiv_calc_sgls(prot_iter, prot_bytes,
--						 VHOST_NPIV_PREALLOC_PROT_SGLS);
--		if (sgl_count < 0)
--			return sgl_count;
--
--		sg_init_table(cmd->tvc_prot_sgl, sgl_count);
--		cmd->tvc_prot_sgl_count = sgl_count;
--		pr_debug("%s prot_sg %p prot_sgl_count %u\n", __func__,
--			 cmd->tvc_prot_sgl, cmd->tvc_prot_sgl_count);
--
--		ret = vhost_npiv_iov_to_sgl(cmd, write, prot_iter,
--					    cmd->tvc_prot_sgl,
--					    cmd->tvc_prot_sgl_count);
--		if (ret < 0) {
--			cmd->tvc_prot_sgl_count = 0;
--			return ret;
--		}
--	}
--	sgl_count = vhost_npiv_calc_sgls(data_iter, data_bytes,
--					 VHOST_NPIV_PREALLOC_SGLS);
--	if (sgl_count < 0)
--		return sgl_count;
--
--	sg_init_table(cmd->tvc_sgl, sgl_count);
--	cmd->tvc_sgl_count = sgl_count;
--	pr_debug("%s data_sg %p data_sgl_count %u\n", __func__,
--		  cmd->tvc_sgl, cmd->tvc_sgl_count);
--
--	ret = vhost_npiv_iov_to_sgl(cmd, write, data_iter,
--				    cmd->tvc_sgl, cmd->tvc_sgl_count);
--	if (ret < 0) {
--		cmd->tvc_sgl_count = 0;
--		return ret;
--	}
--	return 0;
--}
- 
--static int vhost_npiv_to_tcm_attr(int attr)
--{
--	switch (attr) {
--	case VIRTIO_SCSI_S_SIMPLE:
--		return TCM_SIMPLE_TAG;
--	case VIRTIO_SCSI_S_ORDERED:
--		return TCM_ORDERED_TAG;
--	case VIRTIO_SCSI_S_HEAD:
--		return TCM_HEAD_TAG;
--	case VIRTIO_SCSI_S_ACA:
--		return TCM_ACA_TAG;
--	default:
--		break;
--	}
--	return TCM_SIMPLE_TAG;
-+	if (WARN_ON(prot_bytes))
-+		return -EOPNOTSUPP;
-+
-+	nr_pages = iov_iter_npages(data_iter, BIO_MAX_PAGES + 1);
-+	req->bio = bio_alloc_bioset(GFP_KERNEL, nr_pages, NULL);
-+	bio_get(req->bio);
-+	req->bio->bi_private = cmd;
-+	req->bio->bi_end_io = vhost_npiv_end_io;
-+
-+	return bio_iov_iter_get_pages(req->bio, data_iter);
- }
- 
- static void vhost_npiv_submission_work(struct work_struct *work)
-@@ -890,7 +679,7 @@ vhost_npiv_handle_vq(struct vhost_npiv *vs, struct vhost_virtqueue *vq)
- 			vhost_npiv_send_bad_target(vs, vq, head, out);
- 			continue;
- 		}
--			
-+
- 		/*
- 		 * Determine data_direction by calculating the total outgoing
- 		 * iovec sizes + incoming iovec sizes vs. virtio-scsi request +
-@@ -1024,7 +813,6 @@ vhost_npiv_handle_vq(struct vhost_npiv *vs, struct vhost_virtqueue *vq)
- 		req->timeout = timeout;
- 		req->cmd_flags |= flags;
- 		req->rq_flags |= rq_flags | RQF_QUIET;
--		req->end_io_data = vs
- 
- 		blk_execute_rq(req->q, NULL, req, 1);
- 	}
-@@ -1399,113 +1187,6 @@ static void vhost_npiv_deregister(void)
- 	misc_deregister(&vhost_npiv_misc);
- }
- 
--static char *vhost_npiv_dump_proto_id(struct vhost_npiv_tport *tport)
--{
--	switch (tport->tport_proto_id) {
--	case SCSI_PROTOCOL_SAS:
--		return "SAS";
--	case SCSI_PROTOCOL_FCP:
--		return "FCP";
--	case SCSI_PROTOCOL_ISCSI:
--		return "iSCSI";
--	default:
--		break;
--	}
--
--	return "Unknown";
--}
--
--static void
--vhost_npiv_do_plug(struct vhost_npiv_tpg *tpg,
--		  struct se_lun *lun, bool plug)
--{
--
--	struct vhost_npiv *vs = tpg->vhost_npiv;
--	struct vhost_virtqueue *vq;
--	u32 reason;
--
--	if (!vs)
--		return;
--
--	mutex_lock(&vs->dev.mutex);
--
--	if (plug)
--		reason = VIRTIO_SCSI_EVT_RESET_RESCAN;
--	else
--		reason = VIRTIO_SCSI_EVT_RESET_REMOVED;
--
--	vq = &vs->vqs[VHOST_NPIV_VQ_EVT].vq;
--	mutex_lock(&vq->mutex);
--	if (vhost_has_feature(vq, VIRTIO_SCSI_F_HOTPLUG))
--		vhost_npiv_send_evt(vs, tpg, lun,
--				   VIRTIO_SCSI_T_TRANSPORT_RESET, reason);
--	mutex_unlock(&vq->mutex);
--	mutex_unlock(&vs->dev.mutex);
--}
--
--static void vhost_npiv_hotplug(struct vhost_npiv_tpg *tpg, struct se_lun *lun)
--{
--	vhost_npiv_do_plug(tpg, lun, true);
--}
--
--static void vhost_npiv_hotunplug(struct vhost_npiv_tpg *tpg, struct se_lun *lun)
--{
--	vhost_npiv_do_plug(tpg, lun, false);
--}
--
--static int vhost_npiv_port_link(struct se_portal_group *se_tpg,
--			       struct se_lun *lun)
--{
--	struct vhost_npiv_tpg *tpg = container_of(se_tpg,
--				struct vhost_npiv_tpg, se_tpg);
--
--	mutex_lock(&vhost_npiv_mutex);
--
--	mutex_lock(&tpg->tv_tpg_mutex);
--	tpg->tv_tpg_port_count++;
--	mutex_unlock(&tpg->tv_tpg_mutex);
--
--	vhost_npiv_hotplug(tpg, lun);
--
--	mutex_unlock(&vhost_npiv_mutex);
--
--	return 0;
--}
--
--static void vhost_npiv_port_unlink(struct se_portal_group *se_tpg,
--				  struct se_lun *lun)
--{
--	struct vhost_npiv_tpg *tpg = container_of(se_tpg,
--				struct vhost_npiv_tpg, se_tpg);
--
--	mutex_lock(&vhost_npiv_mutex);
--
--	mutex_lock(&tpg->tv_tpg_mutex);
--	tpg->tv_tpg_port_count--;
--	mutex_unlock(&tpg->tv_tpg_mutex);
--
--	vhost_npiv_hotunplug(tpg, lun);
--
--	mutex_unlock(&vhost_npiv_mutex);
--}
--
--static void vhost_npiv_free_cmd_map_res(struct se_session *se_sess)
--{
--	struct vhost_npiv_cmd *tv_cmd;
--	unsigned int i;
--
--	if (!se_sess->sess_cmd_map)
--		return;
--
--	for (i = 0; i < VHOST_NPIV_DEFAULT_TAGS; i++) {
--		tv_cmd = &((struct vhost_npiv_cmd *)se_sess->sess_cmd_map)[i];
--
--		kfree(tv_cmd->tvc_sgl);
--		kfree(tv_cmd->tvc_prot_sgl);
--		kfree(tv_cmd->tvc_upages);
--	}
--}
--
- static int __init vhost_npiv_init(void)
- {
- 	int ret = -ENOMEM;
-@@ -1514,22 +1195,34 @@ static int __init vhost_npiv_init(void)
- 		" on "UTS_RELEASE"\n", VHOST_NPIV_VERSION, utsname()->sysname,
- 		utsname()->machine);
- 
-+	vhost_npiv_cmd_pool = mempool_create_kmalloc_pool(VHOST_NPIV_MIN_CMDS,
-+				sizeof (struct vhost_npiv_cmd));
-+	if (!vhost_npiv_cmd_pool)
-+		return -ENOMEM;
-+
- 	/*
- 	 * Use our own dedicated workqueue for submitting I/O into
- 	 * target core to avoid contention within system_wq.
- 	 */
- 	vhost_npiv_workqueue = alloc_workqueue("vhost_npiv", 0, 0);
--	if (!vhost_npiv_workqueue)
-+	if (!vhost_npiv_workqueue) {
-+		mempool_destroy(vhost_cmd_pool);
- 		return -ENOMEM;
- 		goto out;
- 
--	return vhost_npiv_register();
-+	ret = vhost_npiv_register();
-+	if (ret < 0) {
-+		destroy_workqueue(vhost_npiv_workqueue);
-+		mempool_destroy(vhost_npiv_cmd_pool);
-+	}
-+	return ret;
- };
- 
- static void vhost_npiv_exit(void)
- {
- 	vhost_npiv_deregister();
- 	destroy_workqueue(vhost_npiv_workqueue);
-+	mempool_destroy(vhost_npiv_cmd_pool);
- };
- 
- MODULE_DESCRIPTION("VHOST_NPIV passthrough");
--- 
-2.12.3
+
+> On 15 Feb 2018, at 02.59, Matias Bj=C3=B8rling <mb@lightnvm.io> wrote:
+>=20
+> On 02/13/2018 03:06 PM, Javier Gonz=C3=A1lez wrote:
+>> From: Javier Gonz=C3=A1lez <javier@javigon.com>
+>> In preparation of pblk supporting 2.0, implement the get log report
+>> chunk in pblk.
+>> This patch only replicates de bad block functionality as the rest of =
+the
+>> metadata requires new pblk functionality (e.g., wear-index to =
+implement
+>> wear-leveling). This functionality will come in future patches.
+>> Signed-off-by: Javier Gonz=C3=A1lez <javier@cnexlabs.com>
+>> ---
+>>  drivers/lightnvm/pblk-core.c  | 118 +++++++++++++++++++++++----
+>>  drivers/lightnvm/pblk-init.c  | 186 =
++++++++++++++++++++++++++++++++-----------
+>>  drivers/lightnvm/pblk-sysfs.c |  67 +++++++++++++++
+>>  drivers/lightnvm/pblk.h       |  20 +++++
+>>  4 files changed, 327 insertions(+), 64 deletions(-)
+>> diff --git a/drivers/lightnvm/pblk-core.c =
+b/drivers/lightnvm/pblk-core.c
+>> index 519af8b9eab7..01b78ee5c0e0 100644
+>> --- a/drivers/lightnvm/pblk-core.c
+>> +++ b/drivers/lightnvm/pblk-core.c
+>> @@ -44,11 +44,12 @@ static void pblk_line_mark_bb(struct work_struct =
+*work)
+>>  }
+>>    static void pblk_mark_bb(struct pblk *pblk, struct pblk_line =
+*line,
+>> -			 struct ppa_addr *ppa)
+>> +			 struct ppa_addr ppa_addr)
+>>  {
+>>  	struct nvm_tgt_dev *dev =3D pblk->dev;
+>>  	struct nvm_geo *geo =3D &dev->geo;
+>> -	int pos =3D pblk_ppa_to_pos(geo, *ppa);
+>> +	struct ppa_addr *ppa;
+>> +	int pos =3D pblk_ppa_to_pos(geo, ppa_addr);
+>>    	pr_debug("pblk: erase failed: line:%d, pos:%d\n", line->id, =
+pos);
+>>  	atomic_long_inc(&pblk->erase_failed);
+>> @@ -58,6 +59,15 @@ static void pblk_mark_bb(struct pblk *pblk, struct =
+pblk_line *line,
+>>  		pr_err("pblk: attempted to erase bb: line:%d, pos:%d\n",
+>>  							line->id, pos);
+>>  +	/* Not necessary to mark bad blocks on 2.0 spec. */
+>> +	if (geo->c.version =3D=3D NVM_OCSSD_SPEC_20)
+>> +		return;
+>> +
+>> +	ppa =3D kmalloc(sizeof(struct ppa_addr), GFP_ATOMIC);
+>> +	if (!ppa)
+>> +		return;
+>> +
+>> +	*ppa =3D ppa_addr;
+>>  	pblk_gen_run_ws(pblk, NULL, ppa, pblk_line_mark_bb,
+>>  						GFP_ATOMIC, =
+pblk->bb_wq);
+>>  }
+>> @@ -69,16 +79,8 @@ static void __pblk_end_io_erase(struct pblk *pblk, =
+struct nvm_rq *rqd)
+>>  	line =3D &pblk->lines[pblk_ppa_to_line(rqd->ppa_addr)];
+>>  	atomic_dec(&line->left_seblks);
+>>  -	if (rqd->error) {
+>> -		struct ppa_addr *ppa;
+>> -
+>> -		ppa =3D kmalloc(sizeof(struct ppa_addr), GFP_ATOMIC);
+>> -		if (!ppa)
+>> -			return;
+>> -
+>> -		*ppa =3D rqd->ppa_addr;
+>> -		pblk_mark_bb(pblk, line, ppa);
+>> -	}
+>> +	if (rqd->error)
+>> +		pblk_mark_bb(pblk, line, rqd->ppa_addr);
+>>    	atomic_dec(&pblk->inflight_io);
+>>  }
+>> @@ -92,6 +94,47 @@ static void pblk_end_io_erase(struct nvm_rq *rqd)
+>>  	mempool_free(rqd, pblk->e_rq_pool);
+>>  }
+>>  +/*
+>> + * Get information for all chunks from the device.
+>> + *
+>> + * The caller is responsible for freeing the returned structure
+>> + */
+>> +struct nvm_chunk_log_page *pblk_chunk_get_info(struct pblk *pblk)
+>> +{
+>> +	struct nvm_tgt_dev *dev =3D pblk->dev;
+>> +	struct nvm_geo *geo =3D &dev->geo;
+>> +	struct nvm_chunk_log_page *log;
+>> +	unsigned long len;
+>> +	int ret;
+>> +
+>> +	len =3D geo->all_chunks * sizeof(*log);
+>> +	log =3D kzalloc(len, GFP_KERNEL);
+>> +	if (!log)
+>> +		return ERR_PTR(-ENOMEM);
+>> +
+>> +	ret =3D nvm_get_chunk_log_page(dev, log, 0, len);
+>> +	if (ret) {
+>> +		pr_err("pblk: could not get chunk log page (%d)\n", =
+ret);
+>> +		kfree(log);
+>> +		return ERR_PTR(-EIO);
+>> +	}
+>> +
+>> +	return log;
+>> +}
+>> +
+>> +struct nvm_chunk_log_page *pblk_chunk_get_off(struct pblk *pblk,
+>> +					      struct nvm_chunk_log_page =
+*lp,
+>> +					      struct ppa_addr ppa)
+>> +{
+>> +	struct nvm_tgt_dev *dev =3D pblk->dev;
+>> +	struct nvm_geo *geo =3D &dev->geo;
+>> +	int ch_off =3D ppa.m.ch * geo->c.num_chk * geo->num_lun;
+>> +	int lun_off =3D ppa.m.lun * geo->c.num_chk;
+>> +	int chk_off =3D ppa.m.chk;
+>> +
+>> +	return lp + ch_off + lun_off + chk_off;
+>> +}
+>> +
+>>  void __pblk_map_invalidate(struct pblk *pblk, struct pblk_line =
+*line,
+>>  			   u64 paddr)
+>>  {
+>> @@ -1094,10 +1137,38 @@ static int pblk_line_init_bb(struct pblk =
+*pblk, struct pblk_line *line,
+>>  	return 1;
+>>  }
+>>  +static int pblk_prepare_new_line(struct pblk *pblk, struct =
+pblk_line *line)
+>> +{
+>> +	struct pblk_line_meta *lm =3D &pblk->lm;
+>> +	struct nvm_tgt_dev *dev =3D pblk->dev;
+>> +	struct nvm_geo *geo =3D &dev->geo;
+>> +	int blk_to_erase =3D atomic_read(&line->blk_in_line);
+>> +	int i;
+>> +
+>> +	for (i =3D 0; i < lm->blk_per_line; i++) {
+>> +		int state =3D line->chks[i].state;
+>> +		struct pblk_lun *rlun =3D &pblk->luns[i];
+>> +
+>> +		/* Free chunks should not be erased */
+>> +		if (state & NVM_CHK_ST_FREE) {
+>> +			set_bit(pblk_ppa_to_pos(geo, rlun->chunk_bppa),
+>> +					line->erase_bitmap);
+>> +			blk_to_erase--;
+>> +			line->chks[i].state =3D NVM_CHK_ST_HOST_USE;
+>> +		}
+>> +
+>> +		WARN_ONCE(state & NVM_CHK_ST_OPEN,
+>> +				"pblk: open chunk in new line: %d\n",
+>> +				line->id);
+>> +	}
+>> +
+>> +	return blk_to_erase;
+>> +}
+>> +
+>>  static int pblk_line_prepare(struct pblk *pblk, struct pblk_line =
+*line)
+>>  {
+>>  	struct pblk_line_meta *lm =3D &pblk->lm;
+>> -	int blk_in_line =3D atomic_read(&line->blk_in_line);
+>> +	int blk_to_erase;
+>>    	line->map_bitmap =3D kzalloc(lm->sec_bitmap_len, GFP_ATOMIC);
+>>  	if (!line->map_bitmap)
+>> @@ -1110,7 +1181,21 @@ static int pblk_line_prepare(struct pblk =
+*pblk, struct pblk_line *line)
+>>  		return -ENOMEM;
+>>  	}
+>>  +	/* Bad blocks do not need to be erased */
+>> +	bitmap_copy(line->erase_bitmap, line->blk_bitmap, =
+lm->blk_per_line);
+>> +
+>>  	spin_lock(&line->lock);
+>> +
+>> +	/* If we have not written to this line, we need to mark up free =
+chunks
+>> +	 * as already erased
+>> +	 */
+>> +	if (line->state =3D=3D PBLK_LINESTATE_NEW) {
+>> +		blk_to_erase =3D pblk_prepare_new_line(pblk, line);
+>> +		line->state =3D PBLK_LINESTATE_FREE;
+>> +	} else {
+>> +		blk_to_erase =3D atomic_read(&line->blk_in_line);
+>> +	}
+>> +
+>>  	if (line->state !=3D PBLK_LINESTATE_FREE) {
+>>  		kfree(line->map_bitmap);
+>>  		kfree(line->invalid_bitmap);
+>> @@ -1122,15 +1207,12 @@ static int pblk_line_prepare(struct pblk =
+*pblk, struct pblk_line *line)
+>>    	line->state =3D PBLK_LINESTATE_OPEN;
+>>  -	atomic_set(&line->left_eblks, blk_in_line);
+>> -	atomic_set(&line->left_seblks, blk_in_line);
+>> +	atomic_set(&line->left_eblks, blk_to_erase);
+>> +	atomic_set(&line->left_seblks, blk_to_erase);
+>>    	line->meta_distance =3D lm->meta_distance;
+>>  	spin_unlock(&line->lock);
+>>  -	/* Bad blocks do not need to be erased */
+>> -	bitmap_copy(line->erase_bitmap, line->blk_bitmap, =
+lm->blk_per_line);
+>> -
+>>  	kref_init(&line->ref);
+>>    	return 0;
+>> diff --git a/drivers/lightnvm/pblk-init.c =
+b/drivers/lightnvm/pblk-init.c
+>> index 72b7902e5d1c..dfc68718e27e 100644
+>> --- a/drivers/lightnvm/pblk-init.c
+>> +++ b/drivers/lightnvm/pblk-init.c
+>> @@ -402,6 +402,7 @@ static void pblk_line_meta_free(struct pblk_line =
+*line)
+>>  {
+>>  	kfree(line->blk_bitmap);
+>>  	kfree(line->erase_bitmap);
+>> +	kfree(line->chks);
+>>  }
+>>    static void pblk_lines_free(struct pblk *pblk)
+>> @@ -470,25 +471,15 @@ static void *pblk_bb_get_log(struct pblk *pblk)
+>>  	return log;
+>>  }
+>>  -static int pblk_bb_line(struct pblk *pblk, struct pblk_line *line,
+>> -			u8 *bb_log, int blk_per_line)
+>> +static void *pblk_chunk_get_log(struct pblk *pblk)
+>>  {
+>>  	struct nvm_tgt_dev *dev =3D pblk->dev;
+>>  	struct nvm_geo *geo =3D &dev->geo;
+>> -	int i, bb_cnt =3D 0;
+>>  -	for (i =3D 0; i < blk_per_line; i++) {
+>> -		struct pblk_lun *rlun =3D &pblk->luns[i];
+>> -		u8 *lun_bb_log =3D bb_log + i * blk_per_line;
+>> -
+>> -		if (lun_bb_log[line->id] =3D=3D NVM_BLK_T_FREE)
+>> -			continue;
+>> -
+>> -		set_bit(pblk_ppa_to_pos(geo, rlun->bppa), =
+line->blk_bitmap);
+>> -		bb_cnt++;
+>> -	}
+>> -
+>> -	return bb_cnt;
+>> +	if (geo->c.version =3D=3D NVM_OCSSD_SPEC_12)
+>> +		return pblk_bb_get_log(pblk);
+>> +	else
+>> +		return pblk_chunk_get_info(pblk);
+>>  }
+>>    static int pblk_luns_init(struct pblk *pblk, struct ppa_addr =
+*luns)
+>> @@ -517,6 +508,7 @@ static int pblk_luns_init(struct pblk *pblk, =
+struct ppa_addr *luns)
+>>    		rlun =3D &pblk->luns[i];
+>>  		rlun->bppa =3D luns[lunid];
+>> +		rlun->chunk_bppa =3D luns[i];
+>>    		sema_init(&rlun->wr_sem, 1);
+>>  	}
+>> @@ -696,8 +688,125 @@ static int pblk_lines_alloc_metadata(struct =
+pblk *pblk)
+>>  	return -ENOMEM;
+>>  }
+>>  -static int pblk_setup_line_meta(struct pblk *pblk, struct pblk_line =
+*line,
+>> -				void *chunk_log, long *nr_bad_blks)
+>> +static int pblk_setup_line_meta_12(struct pblk *pblk, struct =
+pblk_line *line,
+>> +				   void *chunk_log)
+>> +{
+>> +	struct nvm_tgt_dev *dev =3D pblk->dev;
+>> +	struct nvm_geo *geo =3D &dev->geo;
+>> +	struct pblk_line_meta *lm =3D &pblk->lm;
+>> +	int i, chk_per_lun, nr_bad_chks =3D 0;
+>> +
+>> +	chk_per_lun =3D geo->c.num_chk * geo->c.pln_mode;
+>> +
+>> +	for (i =3D 0; i < lm->blk_per_line; i++) {
+>> +		struct pblk_chunk *chunk =3D &line->chks[i];
+>> +		struct pblk_lun *rlun =3D &pblk->luns[i];
+>> +		u8 *lun_bb_log =3D chunk_log + i * chk_per_lun;
+>> +
+>> +		/*
+>> +		 * In 1.2 spec. chunk state is not persisted by the =
+device. Thus
+>> +		 * some of the values are reset each time pblk is =
+instantiated.
+>> +		 */
+>> +		if (lun_bb_log[line->id] =3D=3D NVM_BLK_T_FREE)
+>> +			chunk->state =3D  NVM_CHK_ST_HOST_USE;
+>> +		else
+>> +			chunk->state =3D NVM_CHK_ST_OFFLINE;
+>> +
+>> +		chunk->type =3D NVM_CHK_TP_W_SEQ;
+>> +		chunk->wi =3D 0;
+>> +		chunk->slba =3D -1;
+>> +		chunk->cnlb =3D geo->c.clba;
+>> +		chunk->wp =3D 0;
+>> +
+>> +		if (!(chunk->state & NVM_CHK_ST_OFFLINE))
+>> +			continue;
+>> +
+>> +		set_bit(pblk_ppa_to_pos(geo, rlun->bppa), =
+line->blk_bitmap);
+>> +		nr_bad_chks++;
+>> +	}
+>> +
+>> +	return nr_bad_chks;
+>> +}
+>> +
+>> +static int pblk_setup_line_meta_20(struct pblk *pblk, struct =
+pblk_line *line,
+>> +				   struct nvm_chunk_log_page *log_page)
+>> +{
+>> +	struct nvm_tgt_dev *dev =3D pblk->dev;
+>> +	struct nvm_geo *geo =3D &dev->geo;
+>> +	struct pblk_line_meta *lm =3D &pblk->lm;
+>> +	int i, nr_bad_chks =3D 0;
+>> +
+>> +	for (i =3D 0; i < lm->blk_per_line; i++) {
+>> +		struct pblk_chunk *chunk =3D &line->chks[i];
+>> +		struct pblk_lun *rlun =3D &pblk->luns[i];
+>> +		struct nvm_chunk_log_page *chunk_log_page;
+>> +		struct ppa_addr ppa;
+>> +
+>> +		ppa =3D rlun->chunk_bppa;
+>> +		ppa.m.chk =3D line->id;
+>> +		chunk_log_page =3D pblk_chunk_get_off(pblk, log_page, =
+ppa);
+>> +
+>> +		chunk->state =3D chunk_log_page->state;
+>> +		chunk->type =3D chunk_log_page->type;
+>> +		chunk->wi =3D chunk_log_page->wear_index;
+>> +		chunk->slba =3D le64_to_cpu(chunk_log_page->slba);
+>> +		chunk->cnlb =3D le64_to_cpu(chunk_log_page->cnlb);
+>> +		chunk->wp =3D le64_to_cpu(chunk_log_page->wp);
+>> +
+>> +		if (!(chunk->state & NVM_CHK_ST_OFFLINE))
+>> +			continue;
+>> +
+>> +		if (chunk->type & NVM_CHK_TP_SZ_SPEC) {
+>> +			WARN_ONCE(1, "pblk: custom-sized chunks =
+unsupported\n");
+>> +			continue;
+>> +		}
+>> +
+>> +		set_bit(pblk_ppa_to_pos(geo, rlun->chunk_bppa),
+>> +							=
+line->blk_bitmap);
+>> +		nr_bad_chks++;
+>> +	}
+>> +
+>> +	return nr_bad_chks;
+>> +}
+>> +
+>=20
+> The device chunk to nvm_chunk logic belongs in the lightnvm core. A
+> target should preferably not handle the case between 1.2 and 2.0
+> interface.
+>=20
+
+I thought about this and it is cleaner, the problem is that the return
+values from these two interfaces are completely different. My other
+approach was asking only for report chunk and then create the log page
+format for 1.2 I can see this working good. I'll give it another spin.
+
+Javier
+
+--Apple-Mail=_7085E976-BDA0-4187-A9A6-E5013718E758
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEm1mT7zen+vs9+T8kYx8FO3WZGMoFAlqGfIAACgkQYx8FO3WZ
+GMreuBAAkj+g60wRH3o1kYMF4o2ecYy+ZjetbFxOILG915eF8qL2Ti2YzCSAX4Km
+c+BFhkzTw7pAI/R9IvHLV53QDRXQT6yKPa43mVNHhdYYHuZyhYes3D4pWhYEmvTd
+p030xlb28jmTwN6vGumBn92Qo+4FxJjk6LA93IUgbnVzRg5C6uVO4lOF6aZSwfsr
+JBnA5xoNGENX5AMTzMiPGqp46ntTaWxrfQ2g2KZwI1NqRdGM0hea2eUgQB2Jga+P
+NfFLPXAouWj8xcy+1rodi1oG0MUFqhzIYgS6K7HyMuI5IAJILWQoDP0+1Bo9Uz89
+cdaRiAI9+u8MprMy+t676d6mD0jpZC0W+hskURVac3zUxjEDbVNPXcOZfCISLT9o
+uXmhFXVLU9KKA1c/Al8uptitpCkreLsvf/Q2KgWXhakfsYGUUvha7sudtcxrqHkY
+UcDRDukNr4e1Hrs7fkiXYxbn1c9B6tnnF+jgCyn+9ESsM3G6XUIL+5eiRTBCm/cg
+aHRYTRzlaGJvCAfaWF15rrqlCl5FsuB7VEgBCCAaH9H1eZiagIlg3RvRMO6wpWF8
+1aQth6yy+9uI/kLG4lyN+4whLM7ggzZLI9SZpmCqMvKVDGydvsQF2w8AxWfHQAeH
+lg9uTFCsPLbWa09bdATOd6zh0obNuAks+etIokB5ywQ7xdvUzCY=
+=NmRG
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_7085E976-BDA0-4187-A9A6-E5013718E758--
