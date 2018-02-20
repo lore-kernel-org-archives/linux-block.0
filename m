@@ -1,73 +1,37 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.16-rc
-Message-ID: <aaea812d-08f0-39a2-04d8-e1356c6b5f3e@kernel.dk>
-Date: Sun, 4 Feb 2018 09:38:29 -0700
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <jonas.rabenstein@studium.uni-erlangen.de>
+From: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+To: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
+	Scott Bauer <scott.bauer@intel.com>,
+	Jonathan Derrick <jonathan.derrick@intel.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] block: sed-opal: fix u64 short atom length
+Date: Tue, 20 Feb 2018 20:20:39 +0100
+Message-Id: <20180220192039.3912-2-jonas.rabenstein@studium.uni-erlangen.de>
+In-Reply-To: <20180220192039.3912-1-jonas.rabenstein@studium.uni-erlangen.de>
+References: <20180220192039.3912-1-jonas.rabenstein@studium.uni-erlangen.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Linus,
+The length must be given as bytes and not as 4 bit tuples.
 
-A followup pull request for this merge window, though most of this is
-fixes and not new code/features. This pull request contains:
+Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+---
+ block/sed-opal.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-- skd fix from Arnd, fixing a build error dependent on sla allocator
-  type.
-
-- blk-mq scheduler discard merging fixes, one from me and one from
-  Keith. This fixes a segment miscalculation for blk-mq-sched, where we
-  mistakenly think two segments are physically contigious even though
-  the request isn't carrying real data. Also fixes a bio-to-rq merge
-  case.
-
-- Don't re-set a bit on the buffer_head flags, if it's already set. This
-  can cause scalability concerns on bigger machines and workloads. From
-  Kemi Wang.
-
-- Add BLK_STS_DEV_RESOURCE return value to blk-mq, allowing us to
-  distuingish between a local (device related) resource starvation and a
-  global one. The latter might happen without IO being in flight, so it
-  has to be handled a bit differently. From Ming.
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git tags/for-linus-20180204
-
-
-----------------------------------------------------------------
-Arnd Bergmann (1):
-      block: skd: fix incorrect linux/slab_def.h inclusion
-
-Jens Axboe (1):
-      blk-mq: fix discard merge with scheduler attached
-
-Keith Busch (1):
-      blk-mq-sched: Enable merging discard bio into request
-
-Kemi Wang (1):
-      buffer: Avoid setting buffer bits that are already set
-
-Ming Lei (1):
-      blk-mq: introduce BLK_STS_DEV_RESOURCE
-
- block/blk-core.c             |  3 +++
- block/blk-merge.c            | 29 ++++++++++++++++++++++++++---
- block/blk-mq-sched.c         |  2 ++
- block/blk-mq.c               | 20 ++++++++++++++++----
- drivers/block/null_blk.c     |  2 +-
- drivers/block/skd_main.c     |  7 ++++---
- drivers/block/virtio_blk.c   |  2 +-
- drivers/block/xen-blkfront.c |  2 +-
- drivers/md/dm-rq.c           |  5 ++---
- drivers/nvme/host/fc.c       | 12 ++----------
- drivers/scsi/scsi_lib.c      |  6 +++---
- include/linux/blk_types.h    | 18 ++++++++++++++++++
- include/linux/buffer_head.h  |  5 ++++-
- 13 files changed, 83 insertions(+), 30 deletions(-)
-
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index 36842bfa572e..d5f565e1557a 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -562,7 +562,7 @@ static void add_token_u64(int *err, struct opal_dev *cmd, u64 number)
+ 	}
+ 
+ 	msb = fls(number);
+-	len = DIV_ROUND_UP(msb, 4);
++	len = DIV_ROUND_UP(msb, 8);
+ 
+ 	if (cmd->pos >= IO_BUFFER_LENGTH - len - 1) {
+ 		pr_debug("Error adding u64: end of buffer.\n");
 -- 
-Jens Axboe
+2.13.6
