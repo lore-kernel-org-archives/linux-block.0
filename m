@@ -1,41 +1,49 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:56134 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750884AbeBTKNM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Feb 2018 05:13:12 -0500
-Date: Tue, 20 Feb 2018 11:13:11 +0100
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Max Gurtovoy <maxg@mellanox.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+Received: from mail-eopbgr00071.outbound.protection.outlook.com ([40.107.0.71]:60556
+        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750979AbeBTJ4t (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 20 Feb 2018 04:56:49 -0500
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Jens Axboe <axboe@fb.com>, Ming Lei <ming.lei@redhat.com>,
-        linux-nvme@lists.infradead.org
-Subject: Re: how can one drain MQ request queue ?
-Message-ID: <20180220101311.aoe7m57kwm5ejb2a@linux-x5ow.site>
-References: <a8d50fdf-1ed9-1f10-1ac9-4cbbf223cb8b@mellanox.com>
+        <linux-nvme@lists.infradead.org>
+From: Max Gurtovoy <maxg@mellanox.com>
+Subject: how can one drain MQ request queue ?
+Message-ID: <a8d50fdf-1ed9-1f10-1ac9-4cbbf223cb8b@mellanox.com>
+Date: Tue, 20 Feb 2018 11:56:07 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <a8d50fdf-1ed9-1f10-1ac9-4cbbf223cb8b@mellanox.com>
+Content-Type: text/plain; charset="windows-1255"; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Tue, Feb 20, 2018 at 11:56:07AM +0200, Max Gurtovoy wrote:
-> hi all,
-> is there a way to drain a blk-mq based request queue (similar to
-> blk_drain_queue for non MQ) ?
+hi all,
+is there a way to drain a blk-mq based request queue (similar to 
+blk_drain_queue for non MQ) ?
 
-I _think_ you can do a echo run >
-/sys/kernel/debug/block/nvmeXnX/hctxX/state and that should trigger
-it.
+I try to fix the following situation:
+Running DM-multipath over NVMEoF/RDMA block devices, toggling the switch 
+ports during traffic using fio and making sure the traffic never fails.
 
-Hope that helps.
+when the switch port goes down the initiator driver start an error 
+recovery process
+- blk_mq_quiesce_queue for each namespace request queue
+- cancel all requests of the tagset using blk_mq_tagset_busy_iter
+- destroy the QPs/RDMA connections and MR pools
+- blk_mq_unquiesce_queue for each namespace request queue
+- reconnect to the target (after creating RDMA resources again)
 
-Byte,
-     Johannes
+During the QP destruction, I see a warning that not all the memory 
+regions were back to the mr_pool. For every request we get from the 
+block layer (well, almost every request) we get a MR from the MR pool.
+So what I see is that, depends on the timing, some requests are 
+dispatched/completed after we blk_mq_unquiesce_queue and after we 
+destroy the QP and the MR pool. Probably these request were inserted 
+during quiescing, and I want to flush/drain them before I destroy the QP.
 
--- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Is there a way in the block layer that I can do it (we don't want to 
+destroy the tagset and the request_queue on each reconnection)?
+
+I'm open for suggestion :)
+
+Cheers,
+Max.
