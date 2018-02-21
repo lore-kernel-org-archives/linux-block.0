@@ -1,4 +1,4 @@
-Return-Path: <prvs=591f9e40c=Bart.VanAssche@wdc.com>
+Return-Path: <prvs=583440fc3=Bart.VanAssche@wdc.com>
 From: Bart Van Assche <Bart.VanAssche@wdc.com>
 To: "paolo.valente@linaro.org" <paolo.valente@linaro.org>
 CC: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
@@ -6,8 +6,8 @@ CC: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
 	"linus.walleij@linaro.org" <linus.walleij@linaro.org>, "axboe@kernel.dk"
 	<axboe@kernel.dk>
 Subject: Re: v4.16-rc1 + dm-mpath + BFQ
-Date: Thu, 1 Mar 2018 01:35:24 +0000
-Message-ID: <1519868123.2777.28.camel@wdc.com>
+Date: Wed, 21 Feb 2018 18:09:23 +0000
+Message-ID: <1519236562.4060.1.camel@wdc.com>
 References: <1518202449.2871.32.camel@wdc.com>
 	 <6a1695f4-de6f-a959-5242-9611e148bc11@kernel.dk>
 	 <13a55c03-b138-ca8c-0a0a-95c976b4909e@wdc.com>
@@ -35,15 +35,8 @@ bGl6aW5nIC9kZXYvcmFtMSAuLi4gZG9uZQ0KPiBta2RpcjogaW1wb3NzaWJpbGUgY3JlYXJlIGxh
 IGRpcmVjdG9yeSAiMDIxYzo0MmZmOmZlNGM6ZmFjOSI6IEludmFsaWQgYXJndW1lbnQNCj4gUmV0
 cnlpbmcgd2l0aCBvbGQgcG9ydCBuYW1lIGZvcm1hdA0KPiBta2RpcjogaW1wb3NzaWJpbGUgY3Jl
 YXJlIGxhIGRpcmVjdG9yeSAiMHhmZTgwMDAwMDAwMDAwMDAwMDIxYzQyZmZmZTRjZmFjOSI6IElu
-dmFsaWQgYXJndW1lbnQNCg0KSGVsbG8gUGFvbG8sDQoNClRoYW5rIHlvdSBmb3IgaGF2aW5nIHNo
-YXJlZCB5b3VyIGtlcm5lbCBjb25maWcgb2ZmLWxpc3QuIEFmdGVyIGhhdmluZw0KbWFkZSB0aGUg
-Zm9sbG93aW5nIGNoYW5nZXMgdG8geW91ciBrZXJuZWwgY29uZmlnIEkgd2FzIGFibGUgdG8gcnVu
-IHRoZQ0Kc3JwLXRlc3Qgc29mdHdhcmU6DQoqIEVuYWJsZSBDT05GSUdfRE1fTVVMVElQQVRIX1FM
-LCBDT05GSUdfRE1fTVVMVElQQVRIX1NULA0KICBDT05GSUdfU0NTSV9ESF9SREFDLCBDT05GSUdf
-U0NTSV9ESF9FTUMgYW5kIENPTkZJR19TQ1NJX0RIX0FMVUEuDQoqIERpc2FibGUgQ09ORklHX0tB
-U0FOLiBBcHBhcmVudGx5IHRoZXJlIGlzIGFuIGluY29tcGF0aWJpbGl0eSBiZXR3ZWVuIHRoZQ0K
-ICByZG1hX3J4ZSBkcml2ZXIgYW5kIEtBU0FOLiBJJ20gc3RpbGwgYW5hbHl6aW5nIHRoaXMuDQoN
-ClBsZWFzZSBsZXQgbWUga25vdyB3aGV0aGVyIHRoZXNlIGNoYW5nZXMgYWxzbyBhbGxvdyB5b3Ug
-dG8gcnVuIHRoZSBzcnAtdGVzdA0Kc29mdHdhcmUgYW5kIHdoZXRoZXIgeW91IGNhbiByZXByb2R1
-Y2Ugd2hhdCBJIHJlcG9ydGVkIGF0IHRoZSBzdGFydCBvZiB0aGlzDQplLW1haWwgdGhyZWFkLg0K
-DQpUaGFua3MsDQoNCkJhcnQuDQoNCg0K
+dmFsaWQgYXJndW1lbnQNCg0KSGVsbG8gUGFvbG8sDQoNClRoYXQgcHJvYmFibHkgbWVhbnMgdGhh
+dCB0aGVyZSBpcyBzdGlsbCBzb21ldGhpbmcgbWlzc2luZyBmcm9tIHRoZSBrZXJuZWwNCmNvbmZp
+ZyB0aGF0IHlvdSBhcmUgdXNpbmcuIFBsZWFzZSBzZW5kIHRoYXQga2VybmVsLWNvbmZpZyB0byBt
+ZSAob2ZmLWxpc3QpDQpzdWNoIHRoYXQgSSBjYW4gaGF2ZSBhIGxvb2sgYXQgaXQuDQoNClRoYW5r
+cywNCg0KQmFydC4NCg0KDQoNCg==
