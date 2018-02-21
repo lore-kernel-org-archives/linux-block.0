@@ -1,182 +1,602 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:45991 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754157AbeBGTl7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Feb 2018 14:41:59 -0500
-Received: by mail-pg0-f66.google.com with SMTP id m136so691898pga.12
-        for <linux-block@vger.kernel.org>; Wed, 07 Feb 2018 11:41:59 -0800 (PST)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Tang Junhui <tang.junhui@zte.com.cn>
-Subject: [PATCH 2/8] bcache: fix high CPU occupancy during journal
-Date: Wed,  7 Feb 2018 11:41:40 -0800
-Message-Id: <20180207194146.5095-3-mlyle@lyle.org>
-In-Reply-To: <20180207194146.5095-1-mlyle@lyle.org>
-References: <20180207194146.5095-1-mlyle@lyle.org>
+Received: from mail-wr0-f196.google.com ([209.85.128.196]:41347 "EHLO
+        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S937616AbeBUOa5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Feb 2018 09:30:57 -0500
+Received: by mail-wr0-f196.google.com with SMTP id f14so5038926wre.8
+        for <linux-block@vger.kernel.org>; Wed, 21 Feb 2018 06:30:56 -0800 (PST)
+From: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
+Message-Id: <8011E2FC-D5AC-4F18-B9B3-73B1DF03B435@lightnvm.io>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_3798F2B6-A897-4E5F-A8C1-9C2946ADE409";
+        protocol="application/pgp-signature";
+        micalg=pgp-sha512
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH 20/20] lightnvm: pblk: implement 2.0 support
+Date: Wed, 21 Feb 2018 15:30:50 +0100
+In-Reply-To: <1519205218-26994-21-git-send-email-javier@cnexlabs.com>
+Cc: =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        linux-nvme@lists.infradead.org
+To: =?utf-8?Q?Javier_Gonz=C3=A1lez?= <jg@lightnvm.io>
+References: <1519205218-26994-1-git-send-email-javier@cnexlabs.com>
+ <1519205218-26994-21-git-send-email-javier@cnexlabs.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
 
-After long time small writing I/O running, we found the occupancy of CPU
-is very high and I/O performance has been reduced by about half:
+--Apple-Mail=_3798F2B6-A897-4E5F-A8C1-9C2946ADE409
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-[root@ceph151 internal]# top
-top - 15:51:05 up 1 day,2:43,  4 users,  load average: 16.89, 15.15, 16.53
-Tasks: 2063 total,   4 running, 2059 sleeping,   0 stopped,   0 zombie
-%Cpu(s):4.3 us, 17.1 sy 0.0 ni, 66.1 id, 12.0 wa,  0.0 hi,  0.5 si,  0.0 st
-KiB Mem : 65450044 total, 24586420 free, 38909008 used,  1954616 buff/cache
-KiB Swap: 65667068 total, 65667068 free,        0 used. 25136812 avail Mem
+BTW, there is a V3 for this patch at least, adding holes in the mapping
+bitmap to avoid the multiplications and divisions on the fast path, when
+the media format is not a power of two. I'll send it this week; just
+wanted to get this out for revision.
 
-  PID USER PR NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
- 2023 root 20  0       0      0      0 S 55.1  0.0   0:04.42 kworker/11:191
-14126 root 20  0       0      0      0 S 42.9  0.0   0:08.72 kworker/10:3
- 9292 root 20  0       0      0      0 S 30.4  0.0   1:10.99 kworker/6:1
- 8553 ceph 20  0 4242492 1.805g  18804 S 30.0  2.9 410:07.04 ceph-osd
-12287 root 20  0       0      0      0 S 26.7  0.0   0:28.13 kworker/7:85
-31019 root 20  0       0      0      0 S 26.1  0.0   1:30.79 kworker/22:1
- 1787 root 20  0       0      0      0 R 25.7  0.0   5:18.45 kworker/8:7
-32169 root 20  0       0      0      0 S 14.5  0.0   1:01.92 kworker/23:1
-21476 root 20  0       0      0      0 S 13.9  0.0   0:05.09 kworker/1:54
- 2204 root 20  0       0      0      0 S 12.5  0.0   1:25.17 kworker/9:10
-16994 root 20  0       0      0      0 S 12.2  0.0   0:06.27 kworker/5:106
-15714 root 20  0       0      0      0 R 10.9  0.0   0:01.85 kworker/19:2
- 9661 ceph 20  0 4246876 1.731g  18800 S 10.6  2.8 403:00.80 ceph-osd
-11460 ceph 20  0 4164692 2.206g  18876 S 10.6  3.5 360:27.19 ceph-osd
- 9960 root 20  0       0      0      0 S 10.2  0.0   0:02.75 kworker/2:139
-11699 ceph 20  0 4169244 1.920g  18920 S 10.2  3.1 355:23.67 ceph-osd
- 6843 ceph 20  0 4197632 1.810g  18900 S  9.6  2.9 380:08.30 ceph-osd
+Javier
 
-The kernel work consumed a lot of CPU, and I found they are running journal
-work, The journal is reclaiming source and flush btree node with surprising
-frequency.
+> On 21 Feb 2018, at 10.26, Javier Gonz=C3=A1lez <jg@lightnvm.io> wrote:
+>=20
+> Implement 2.0 support in pblk. This includes the address formatting =
+and
+> mapping paths, as well as the sysfs entries for them.
+>=20
+> Signed-off-by: Javier Gonz=C3=A1lez <javier@cnexlabs.com>
+> ---
+> drivers/lightnvm/pblk-init.c  |  57 ++++++++++--
+> drivers/lightnvm/pblk-sysfs.c |  36 ++++++--
+> drivers/lightnvm/pblk.h       | 198 =
+++++++++++++++++++++++++++++++++----------
+> 3 files changed, 233 insertions(+), 58 deletions(-)
+>=20
+> diff --git a/drivers/lightnvm/pblk-init.c =
+b/drivers/lightnvm/pblk-init.c
+> index c5c304a37554..ce9aa4b3b09a 100644
+> --- a/drivers/lightnvm/pblk-init.c
+> +++ b/drivers/lightnvm/pblk-init.c
+> @@ -231,20 +231,63 @@ static int pblk_set_addrf_12(struct nvm_geo =
+*geo,
+> 	return dst->blk_offset + src->blk_len;
+> }
+>=20
+> +static int pblk_set_addrf_20(struct nvm_geo *geo,
+> +			     struct nvm_addr_format *adst,
+> +			     struct pblk_addr_format *udst)
+> +{
+> +	struct nvm_addr_format *src =3D &geo->c.addrf;
+> +
+> +	adst->ch_len =3D get_count_order(geo->num_ch);
+> +	adst->lun_len =3D get_count_order(geo->num_lun);
+> +	adst->chk_len =3D src->chk_len;
+> +	adst->sec_len =3D src->sec_len;
+> +
+> +	adst->sec_offset =3D 0;
+> +	adst->ch_offset =3D adst->sec_len;
+> +	adst->lun_offset =3D adst->ch_offset + adst->ch_len;
+> +	adst->chk_offset =3D adst->lun_offset + adst->lun_len;
+> +
+> +	adst->sec_mask =3D ((1ULL << adst->sec_len) - 1) << =
+adst->sec_offset;
+> +	adst->chk_mask =3D ((1ULL << adst->chk_len) - 1) << =
+adst->chk_offset;
+> +	adst->lun_mask =3D ((1ULL << adst->lun_len) - 1) << =
+adst->lun_offset;
+> +	adst->ch_mask =3D ((1ULL << adst->ch_len) - 1) << =
+adst->ch_offset;
+> +
+> +	udst->sec_stripe =3D geo->c.ws_opt;
+> +	udst->ch_stripe =3D geo->num_ch;
+> +	udst->lun_stripe =3D geo->num_lun;
+> +
+> +	udst->sec_lun_stripe =3D udst->sec_stripe * udst->ch_stripe;
+> +	udst->sec_ws_stripe =3D udst->sec_lun_stripe * udst->lun_stripe;
+> +
+> +	return adst->chk_offset + adst->chk_len;
+> +}
+> +
+> static int pblk_set_addrf(struct pblk *pblk)
+> {
+> 	struct nvm_tgt_dev *dev =3D pblk->dev;
+> 	struct nvm_geo *geo =3D &dev->geo;
+> 	int mod;
+>=20
+> -	div_u64_rem(geo->c.clba, pblk->min_write_pgs, &mod);
+> -	if (mod) {
+> -		pr_err("pblk: bad configuration of sectors/pages\n");
+> +	switch (geo->c.version) {
+> +	case NVM_OCSSD_SPEC_12:
+> +		div_u64_rem(geo->c.clba, pblk->min_write_pgs, &mod);
+> +		if (mod) {
+> +			pr_err("pblk: bad configuration of =
+sectors/pages\n");
+> +			return -EINVAL;
+> +		}
+> +
+> +		pblk->addrf_len =3D pblk_set_addrf_12(geo, (void =
+*)&pblk->addrf);
+> +		break;
+> +	case NVM_OCSSD_SPEC_20:
+> +		pblk->addrf_len =3D pblk_set_addrf_20(geo, (void =
+*)&pblk->addrf,
+> +								=
+&pblk->uaddrf);
+> +		break;
+> +	default:
+> +		pr_err("pblk: OCSSD revision not supported (%d)\n",
+> +								=
+geo->c.version);
+> 		return -EINVAL;
+> 	}
+>=20
+> -	pblk->addrf_len =3D pblk_set_addrf_12(geo, (void =
+*)&pblk->addrf);
+> -
+> 	return 0;
+> }
+>=20
+> @@ -1110,7 +1153,9 @@ static void *pblk_init(struct nvm_tgt_dev *dev, =
+struct gendisk *tdisk,
+> 	struct pblk *pblk;
+> 	int ret;
+>=20
+> -	if (geo->c.version !=3D NVM_OCSSD_SPEC_12) {
+> +	/* pblk supports 1.2 and 2.0 versions */
+> +	if (!(geo->c.version =3D=3D NVM_OCSSD_SPEC_12 ||
+> +					geo->c.version =3D=3D =
+NVM_OCSSD_SPEC_20)) {
+> 		pr_err("pblk: OCSSD version not supported (%u)\n",
+> 							geo->c.version);
+> 		return ERR_PTR(-EINVAL);
+> diff --git a/drivers/lightnvm/pblk-sysfs.c =
+b/drivers/lightnvm/pblk-sysfs.c
+> index 191af0c6591e..60b8d931e4ba 100644
+> --- a/drivers/lightnvm/pblk-sysfs.c
+> +++ b/drivers/lightnvm/pblk-sysfs.c
+> @@ -113,15 +113,16 @@ static ssize_t pblk_sysfs_ppaf(struct pblk =
+*pblk, char *page)
+> {
+> 	struct nvm_tgt_dev *dev =3D pblk->dev;
+> 	struct nvm_geo *geo =3D &dev->geo;
+> -	struct nvm_addr_format_12 *ppaf;
+> -	struct nvm_addr_format_12 *geo_ppaf;
+> 	ssize_t sz =3D 0;
+>=20
+> -	ppaf =3D (struct nvm_addr_format_12 *)&pblk->addrf;
+> -	geo_ppaf =3D (struct nvm_addr_format_12 *)&geo->c.addrf;
+> +	if (geo->c.version =3D=3D NVM_OCSSD_SPEC_12) {
+> +		struct nvm_addr_format_12 *ppaf =3D
+> +				(struct nvm_addr_format_12 =
+*)&pblk->addrf;
+> +		struct nvm_addr_format_12 *geo_ppaf =3D
+> +				(struct nvm_addr_format_12 =
+*)&geo->c.addrf;
+>=20
+> -	sz =3D snprintf(page, PAGE_SIZE,
+> -		=
+"pblk:(s:%d)ch:%d/%d,lun:%d/%d,blk:%d/%d,pg:%d/%d,pl:%d/%d,sec:%d/%d\n",
+> +		sz =3D snprintf(page, PAGE_SIZE,
+> +			=
+"pblk:(s:%d)ch:%d/%d,lun:%d/%d,blk:%d/%d,pg:%d/%d,pl:%d/%d,sec:%d/%d\n",
+> 			pblk->addrf_len,
+> 			ppaf->ch_offset, ppaf->ch_len,
+> 			ppaf->lun_offset, ppaf->lun_len,
+> @@ -130,14 +131,33 @@ static ssize_t pblk_sysfs_ppaf(struct pblk =
+*pblk, char *page)
+> 			ppaf->pln_offset, ppaf->pln_len,
+> 			ppaf->sec_offset, ppaf->sec_len);
+>=20
+> -	sz +=3D snprintf(page + sz, PAGE_SIZE - sz,
+> -		=
+"device:ch:%d/%d,lun:%d/%d,blk:%d/%d,pg:%d/%d,pl:%d/%d,sec:%d/%d\n",
+> +		sz +=3D snprintf(page + sz, PAGE_SIZE - sz,
+> +			=
+"device:ch:%d/%d,lun:%d/%d,blk:%d/%d,pg:%d/%d,pl:%d/%d,sec:%d/%d\n",
+> 			geo_ppaf->ch_offset, geo_ppaf->ch_len,
+> 			geo_ppaf->lun_offset, geo_ppaf->lun_len,
+> 			geo_ppaf->blk_offset, geo_ppaf->blk_len,
+> 			geo_ppaf->pg_offset, geo_ppaf->pg_len,
+> 			geo_ppaf->pln_offset, geo_ppaf->pln_len,
+> 			geo_ppaf->sec_offset, geo_ppaf->sec_len);
+> +	} else {
+> +		struct nvm_addr_format *ppaf =3D &pblk->addrf;
+> +		struct nvm_addr_format *geo_ppaf =3D &geo->c.addrf;
+> +
+> +		sz =3D snprintf(page, PAGE_SIZE,
+> +			=
+"pblk:(s:%d)ch:%d/%d,lun:%d/%d,chk:%d/%d/sec:%d/%d\n",
+> +			pblk->addrf_len,
+> +			ppaf->ch_offset, ppaf->ch_len,
+> +			ppaf->lun_offset, ppaf->lun_len,
+> +			ppaf->chk_offset, ppaf->chk_len,
+> +			ppaf->sec_offset, ppaf->sec_len);
+> +
+> +		sz +=3D snprintf(page + sz, PAGE_SIZE - sz,
+> +			=
+"device:ch:%d/%d,lun:%d/%d,chk:%d/%d,sec:%d/%d\n",
+> +			geo_ppaf->ch_offset, geo_ppaf->ch_len,
+> +			geo_ppaf->lun_offset, geo_ppaf->lun_len,
+> +			geo_ppaf->chk_offset, geo_ppaf->chk_len,
+> +			geo_ppaf->sec_offset, geo_ppaf->sec_len);
+> +	}
+>=20
+> 	return sz;
+> }
+> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+> index c66fa0c28adf..b92a1145ad97 100644
+> --- a/drivers/lightnvm/pblk.h
+> +++ b/drivers/lightnvm/pblk.h
+> @@ -574,6 +574,18 @@ enum {
+> 	PBLK_STATE_STOPPED =3D 3,
+> };
+>=20
+> +/* Internal format to support not power-of-2 device formats (for now) =
+*/
+> +struct pblk_addr_format {
+> +	/* gen to dev */
+> +	int sec_stripe;
+> +	int ch_stripe;
+> +	int lun_stripe;
+> +
+> +	/* dev to gen */
+> +	int sec_lun_stripe;
+> +	int sec_ws_stripe;
+> +};
+> +
+> struct pblk {
+> 	struct nvm_tgt_dev *dev;
+> 	struct gendisk *disk;
+> @@ -586,7 +598,8 @@ struct pblk {
+> 	struct pblk_line_mgmt l_mg;		/* Line management */
+> 	struct pblk_line_meta lm;		/* Line metadata */
+>=20
+> -	struct nvm_addr_format addrf;
+> +	struct nvm_addr_format addrf;	/* Aligned address format */
+> +	struct pblk_addr_format uaddrf;	/* Unaligned address format */
+> 	int addrf_len;
+>=20
+> 	struct pblk_rb rwb;
+> @@ -967,17 +980,43 @@ static inline int pblk_ppa_to_pos(struct nvm_geo =
+*geo, struct ppa_addr p)
+> static inline struct ppa_addr addr_to_gen_ppa(struct pblk *pblk, u64 =
+paddr,
+> 					      u64 line_id)
+> {
+> -	struct nvm_addr_format_12 *ppaf =3D
+> -				(struct nvm_addr_format_12 =
+*)&pblk->addrf;
+> +	struct nvm_tgt_dev *dev =3D pblk->dev;
+> +	struct nvm_geo *geo =3D &dev->geo;
+> 	struct ppa_addr ppa;
+>=20
+> -	ppa.ppa =3D 0;
+> -	ppa.g.blk =3D line_id;
+> -	ppa.g.pg =3D (paddr & ppaf->pg_mask) >> ppaf->pg_offset;
+> -	ppa.g.lun =3D (paddr & ppaf->lun_mask) >> ppaf->lun_offset;
+> -	ppa.g.ch =3D (paddr & ppaf->ch_mask) >> ppaf->ch_offset;
+> -	ppa.g.pl =3D (paddr & ppaf->pln_mask) >> ppaf->pln_offset;
+> -	ppa.g.sec =3D (paddr & ppaf->sec_mask) >> ppaf->sec_offset;
+> +	if (geo->c.version =3D=3D NVM_OCSSD_SPEC_12) {
+> +		struct nvm_addr_format_12 *ppaf =3D
+> +				(struct nvm_addr_format_12 =
+*)&pblk->addrf;
+> +
+> +		ppa.ppa =3D 0;
+> +		ppa.g.blk =3D line_id;
+> +		ppa.g.pg =3D (paddr & ppaf->pg_mask) >> ppaf->pg_offset;
+> +		ppa.g.lun =3D (paddr & ppaf->lun_mask) >> =
+ppaf->lun_offset;
+> +		ppa.g.ch =3D (paddr & ppaf->ch_mask) >> ppaf->ch_offset;
+> +		ppa.g.pl =3D (paddr & ppaf->pln_mask) >> =
+ppaf->pln_offset;
+> +		ppa.g.sec =3D (paddr & ppaf->sec_mask) >> =
+ppaf->sec_offset;
+> +	} else {
+> +		struct pblk_addr_format *uaddrf =3D &pblk->uaddrf;
+> +		int secs, chnls, luns;
+> +
+> +		ppa.ppa =3D 0;
+> +
+> +		ppa.m.chk =3D line_id;
+> +
+> +		div_u64_rem(paddr, uaddrf->sec_stripe, &secs);
+> +		ppa.m.sec =3D secs;
+> +
+> +		sector_div(paddr, uaddrf->sec_stripe);
+> +		div_u64_rem(paddr, uaddrf->ch_stripe, &chnls);
+> +		ppa.m.ch =3D chnls;
+> +
+> +		sector_div(paddr, uaddrf->ch_stripe);
+> +		div_u64_rem(paddr, uaddrf->lun_stripe, &luns);
+> +		ppa.m.lun =3D luns;
+> +
+> +		sector_div(paddr, uaddrf->lun_stripe);
+> +		ppa.m.sec +=3D uaddrf->sec_stripe * paddr;
+> +	}
+>=20
+> 	return ppa;
+> }
+> @@ -985,15 +1024,32 @@ static inline struct ppa_addr =
+addr_to_gen_ppa(struct pblk *pblk, u64 paddr,
+> static inline u64 pblk_dev_ppa_to_line_addr(struct pblk *pblk,
+> 							struct ppa_addr =
+p)
+> {
+> -	struct nvm_addr_format_12 *ppaf =3D
+> -				(struct nvm_addr_format_12 =
+*)&pblk->addrf;
+> +	struct nvm_tgt_dev *dev =3D pblk->dev;
+> +	struct nvm_geo *geo =3D &dev->geo;
+> 	u64 paddr;
+>=20
+> -	paddr =3D (u64)p.g.ch << ppaf->ch_offset;
+> -	paddr |=3D (u64)p.g.lun << ppaf->lun_offset;
+> -	paddr |=3D (u64)p.g.pg << ppaf->pg_offset;
+> -	paddr |=3D (u64)p.g.pl << ppaf->pln_offset;
+> -	paddr |=3D (u64)p.g.sec << ppaf->sec_offset;
+> +	if (geo->c.version =3D=3D NVM_OCSSD_SPEC_12) {
+> +		struct nvm_addr_format_12 *ppaf =3D
+> +				(struct nvm_addr_format_12 =
+*)&pblk->addrf;
+> +
+> +		paddr =3D (u64)p.g.ch << ppaf->ch_offset;
+> +		paddr |=3D (u64)p.g.lun << ppaf->lun_offset;
+> +		paddr |=3D (u64)p.g.pg << ppaf->pg_offset;
+> +		paddr |=3D (u64)p.g.pl << ppaf->pln_offset;
+> +		paddr |=3D (u64)p.g.sec << ppaf->sec_offset;
+> +	} else {
+> +		struct pblk_addr_format *uaddrf =3D &pblk->uaddrf;
+> +		u64 secs =3D (u64)p.m.sec;
+> +		int sec_stripe;
+> +
+> +		paddr =3D (u64)p.m.ch * uaddrf->sec_stripe;
+> +		paddr +=3D (u64)p.m.lun * uaddrf->sec_lun_stripe;
+> +
+> +		div_u64_rem(secs, uaddrf->sec_stripe, &sec_stripe);
+> +		sector_div(secs, uaddrf->sec_stripe);
+> +		paddr +=3D secs * uaddrf->sec_ws_stripe;
+> +		paddr +=3D sec_stripe;
+> +	}
+>=20
+> 	return paddr;
+> }
+> @@ -1010,15 +1066,37 @@ static inline struct ppa_addr =
+pblk_ppa32_to_ppa64(struct pblk *pblk, u32 ppa32)
+> 		ppa64.c.line =3D ppa32 & ((~0U) >> 1);
+> 		ppa64.c.is_cached =3D 1;
+> 	} else {
+> -		struct nvm_addr_format_12 *ppaf =3D
+> +		struct nvm_tgt_dev *dev =3D pblk->dev;
+> +		struct nvm_geo *geo =3D &dev->geo;
+> +
+> +		if (geo->c.version =3D=3D NVM_OCSSD_SPEC_12) {
+> +			struct nvm_addr_format_12 *ppaf =3D
+> 				(struct nvm_addr_format_12 =
+*)&pblk->addrf;
+>=20
+> -		ppa64.g.ch =3D (ppa32 & ppaf->ch_mask) >> =
+ppaf->ch_offset;
+> -		ppa64.g.lun =3D (ppa32 & ppaf->lun_mask) >> =
+ppaf->lun_offset;
+> -		ppa64.g.blk =3D (ppa32 & ppaf->blk_mask) >> =
+ppaf->blk_offset;
+> -		ppa64.g.pg =3D (ppa32 & ppaf->pg_mask) >> =
+ppaf->pg_offset;
+> -		ppa64.g.pl =3D (ppa32 & ppaf->pln_mask) >> =
+ppaf->pln_offset;
+> -		ppa64.g.sec =3D (ppa32 & ppaf->sec_mask) >> =
+ppaf->sec_offset;
+> +			ppa64.g.ch =3D (ppa32 & ppaf->ch_mask) >>
+> +							ppaf->ch_offset;
+> +			ppa64.g.lun =3D (ppa32 & ppaf->lun_mask) >>
+> +							=
+ppaf->lun_offset;
+> +			ppa64.g.blk =3D (ppa32 & ppaf->blk_mask) >>
+> +							=
+ppaf->blk_offset;
+> +			ppa64.g.pg =3D (ppa32 & ppaf->pg_mask) >>
+> +							ppaf->pg_offset;
+> +			ppa64.g.pl =3D (ppa32 & ppaf->pln_mask) >>
+> +							=
+ppaf->pln_offset;
+> +			ppa64.g.sec =3D (ppa32 & ppaf->sec_mask) >>
+> +							=
+ppaf->sec_offset;
+> +		} else {
+> +			struct nvm_addr_format *lbaf =3D &pblk->addrf;
+> +
+> +			ppa64.m.ch =3D (ppa32 & lbaf->ch_mask) >>
+> +							lbaf->ch_offset;
+> +			ppa64.m.lun =3D (ppa32 & lbaf->lun_mask) >>
+> +							=
+lbaf->lun_offset;
+> +			ppa64.m.chk =3D (ppa32 & lbaf->chk_mask) >>
+> +							=
+lbaf->chk_offset;
+> +			ppa64.m.sec =3D (ppa32 & lbaf->sec_mask) >>
+> +							=
+lbaf->sec_offset;
+> +		}
+> 	}
+>=20
+> 	return ppa64;
+> @@ -1034,15 +1112,27 @@ static inline u32 pblk_ppa64_to_ppa32(struct =
+pblk *pblk, struct ppa_addr ppa64)
+> 		ppa32 |=3D ppa64.c.line;
+> 		ppa32 |=3D 1U << 31;
+> 	} else {
+> -		struct nvm_addr_format_12 *ppaf =3D
+> +		struct nvm_tgt_dev *dev =3D pblk->dev;
+> +		struct nvm_geo *geo =3D &dev->geo;
+> +
+> +		if (geo->c.version =3D=3D NVM_OCSSD_SPEC_12) {
+> +			struct nvm_addr_format_12 *ppaf =3D
+> 				(struct nvm_addr_format_12 =
+*)&pblk->addrf;
+>=20
+> -		ppa32 |=3D ppa64.g.ch << ppaf->ch_offset;
+> -		ppa32 |=3D ppa64.g.lun << ppaf->lun_offset;
+> -		ppa32 |=3D ppa64.g.blk << ppaf->blk_offset;
+> -		ppa32 |=3D ppa64.g.pg << ppaf->pg_offset;
+> -		ppa32 |=3D ppa64.g.pl << ppaf->pln_offset;
+> -		ppa32 |=3D ppa64.g.sec << ppaf->sec_offset;
+> +			ppa32 |=3D ppa64.g.ch << ppaf->ch_offset;
+> +			ppa32 |=3D ppa64.g.lun << ppaf->lun_offset;
+> +			ppa32 |=3D ppa64.g.blk << ppaf->blk_offset;
+> +			ppa32 |=3D ppa64.g.pg << ppaf->pg_offset;
+> +			ppa32 |=3D ppa64.g.pl << ppaf->pln_offset;
+> +			ppa32 |=3D ppa64.g.sec << ppaf->sec_offset;
+> +		} else {
+> +			struct nvm_addr_format *lbaf =3D &pblk->addrf;
+> +
+> +			ppa32 |=3D ppa64.m.ch << lbaf->ch_offset;
+> +			ppa32 |=3D ppa64.m.lun << lbaf->lun_offset;
+> +			ppa32 |=3D ppa64.m.chk << lbaf->chk_offset;
+> +			ppa32 |=3D ppa64.m.sec << lbaf->sec_offset;
+> +		}
+> 	}
+>=20
+> 	return ppa32;
+> @@ -1160,6 +1250,9 @@ static inline int pblk_set_progr_mode(struct =
+pblk *pblk, int type)
+> 	struct nvm_geo *geo =3D &dev->geo;
+> 	int flags;
+>=20
+> +	if (geo->c.version =3D=3D NVM_OCSSD_SPEC_20)
+> +		return 0;
+> +
+> 	flags =3D geo->c.pln_mode >> 1;
+>=20
+> 	if (type =3D=3D PBLK_WRITE)
+> @@ -1179,6 +1272,9 @@ static inline int pblk_set_read_mode(struct pblk =
+*pblk, int type)
+> 	struct nvm_geo *geo =3D &dev->geo;
+> 	int flags;
+>=20
+> +	if (geo->c.version =3D=3D NVM_OCSSD_SPEC_20)
+> +		return 0;
+> +
+> 	flags =3D NVM_IO_SUSPEND | NVM_IO_SCRAMBLE_ENABLE;
+> 	if (type =3D=3D PBLK_READ_SEQUENTIAL)
+> 		flags |=3D geo->c.pln_mode >> 1;
+> @@ -1192,16 +1288,21 @@ static inline int pblk_io_aligned(struct pblk =
+*pblk, int nr_secs)
+> }
+>=20
+> #ifdef CONFIG_NVM_DEBUG
+> -static inline void print_ppa(struct ppa_addr *p, char *msg, int =
+error)
+> +static inline void print_ppa(struct nvm_geo *geo, struct ppa_addr *p,
+> +			     char *msg, int error)
+> {
+> 	if (p->c.is_cached) {
+> 		pr_err("ppa: (%s: %x) cache line: %llu\n",
+> 				msg, error, (u64)p->c.line);
+> -	} else {
+> +	} else if (geo->c.version =3D=3D NVM_OCSSD_SPEC_12) {
+> 		pr_err("ppa: (%s: =
+%x):ch:%d,lun:%d,blk:%d,pg:%d,pl:%d,sec:%d\n",
+> 			msg, error,
+> 			p->g.ch, p->g.lun, p->g.blk,
+> 			p->g.pg, p->g.pl, p->g.sec);
+> +	} else {
+> +		pr_err("ppa: (%s: %x):ch:%d,lun:%d,chk:%d,sec:%d\n",
+> +			msg, error,
+> +			p->m.ch, p->m.lun, p->m.chk, p->m.sec);
+> 	}
+> }
+>=20
+> @@ -1211,13 +1312,13 @@ static inline void =
+pblk_print_failed_rqd(struct pblk *pblk, struct nvm_rq *rqd,
+> 	int bit =3D -1;
+>=20
+> 	if (rqd->nr_ppas =3D=3D  1) {
+> -		print_ppa(&rqd->ppa_addr, "rqd", error);
+> +		print_ppa(&pblk->dev->geo, &rqd->ppa_addr, "rqd", =
+error);
+> 		return;
+> 	}
+>=20
+> 	while ((bit =3D find_next_bit((void *)&rqd->ppa_status, =
+rqd->nr_ppas,
+> 						bit + 1)) < =
+rqd->nr_ppas) {
+> -		print_ppa(&rqd->ppa_list[bit], "rqd", error);
+> +		print_ppa(&pblk->dev->geo, &rqd->ppa_list[bit], "rqd", =
+error);
+> 	}
+>=20
+> 	pr_err("error:%d, ppa_status:%llx\n", error, rqd->ppa_status);
+> @@ -1233,16 +1334,25 @@ static inline int =
+pblk_boundary_ppa_checks(struct nvm_tgt_dev *tgt_dev,
+> 	for (i =3D 0; i < nr_ppas; i++) {
+> 		ppa =3D &ppas[i];
+>=20
+> -		if (!ppa->c.is_cached &&
+> -				ppa->g.ch < geo->num_ch &&
+> -				ppa->g.lun < geo->num_lun &&
+> -				ppa->g.pl < geo->c.num_pln &&
+> -				ppa->g.blk < geo->c.num_chk &&
+> -				ppa->g.pg < geo->c.num_pg &&
+> -				ppa->g.sec < geo->c.ws_min)
+> -			continue;
+> +		if (geo->c.version =3D=3D NVM_OCSSD_SPEC_12) {
+> +			if (!ppa->c.is_cached &&
+> +					ppa->g.ch < geo->num_ch &&
+> +					ppa->g.lun < geo->num_lun &&
+> +					ppa->g.pl < geo->c.num_pln &&
+> +					ppa->g.blk < geo->c.num_chk &&
+> +					ppa->g.pg < geo->c.num_pg &&
+> +					ppa->g.sec < geo->c.ws_min)
+> +				continue;
+> +		} else {
+> +			if (!ppa->c.is_cached &&
+> +					ppa->m.ch < geo->num_ch &&
+> +					ppa->m.lun < geo->num_lun &&
+> +					ppa->m.chk < geo->c.num_chk &&
+> +					ppa->m.sec < geo->c.clba)
+> +				continue;
+> +		}
+>=20
+> -		print_ppa(ppa, "boundary", i);
+> +		print_ppa(geo, ppa, "boundary", i);
+>=20
+> 		return 1;
+> 	}
+> --
+> 2.7.4
+>=20
+>=20
+> _______________________________________________
+> Linux-nvme mailing list
+> Linux-nvme@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-nvme
 
-Through further analysis, we found that in btree_flush_write(), we try to
-get a btree node with the smallest fifo idex to flush by traverse all the
-btree nodein c->bucket_hash, after we getting it, since no locker protects
-it, this btree node may have been written to cache device by other works,
-and if this occurred, we retry to traverse in c->bucket_hash and get
-another btree node. When the problem occurrd, the retry times is very high,
-and we consume a lot of CPU in looking for a appropriate btree node.
+--Apple-Mail=_3798F2B6-A897-4E5F-A8C1-9C2946ADE409
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
 
-In this patch, we try to record 128 btree nodes with the smallest fifo idex
-in heap, and pop one by one when we need to flush btree node. It greatly
-reduces the time for the loop to find the appropriate BTREE node, and also
-reduce the occupancy of CPU.
+-----BEGIN PGP SIGNATURE-----
 
-[note by mpl: this triggers a checkpatch error because of adjacent,
-pre-existing style violations]
+iQIzBAEBCgAdFiEEm1mT7zen+vs9+T8kYx8FO3WZGMoFAlqNgpoACgkQYx8FO3WZ
+GMq8gRAAn4zb4ASOfXkzQK45yrcSLZwGQRWrMpx1sj1XQjqF5UsNef8sZJ8YEURa
+Jrw4jkAnZ8UdjdFOd3nWCfgUojDCzvQphKCzeC6gIHTriR/0SgmpHnX99Co4HwcP
+SobpZN/C8s0GIhrDU8P/FSs4TgYnAuYoP+SMKCwlwtFhfKT8f4PUjJirHgn/H/Hk
+UpWRxTInkED4+Ykbrhfn/m7Jhh3FBj+0JfEvGpsM6v+S6bn1/ga6Z5t7WLh4CKEZ
+WsykK3sdMVU58dLl3r4echGwrPb9Tf0V3T/JRXNCPExyxGuWRS+NMdizBKdjMp0A
+bUnkumg6VPNjRPqIXRSahEeU7YU78Ix+TH+CIvdUGZXoBWrmFOz6EdDZuefZ1d3b
+dp+BDmv8Rmi/jP7f7iFSqC9HD+pk11udLiwYY4Pq514XYupLOxxRj83cy4JjfvDj
+JLB6wTctvxVwHdBdFH1rEGTJHmcN6acdj8ShLHdR1nkgX0AIoY67m7+lIHDlcxTE
+eqNMfJARhNuoO0hCSQp2fssVFL5a7FVlnPxeg9UyHhM1GK0qHWMnRMR8Fvl5r9cm
+bOOdQRz2lXkA7cOPf6zw1/gQKSUllKPotl1bgLF/1yLnQL7MLtgqC2r+lgVTIFvS
++b3f29595t8HDm28vb9tVE2XOju6hmo2QyvFv8gsgX8npgF1Qcs=
+=oGzg
+-----END PGP SIGNATURE-----
 
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/bcache.h  |  2 ++
- drivers/md/bcache/journal.c | 47 ++++++++++++++++++++++++++++++---------------
- drivers/md/bcache/util.h    |  2 ++
- 3 files changed, 36 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index b98d7705acb6..a857eb3c10de 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -679,6 +679,8 @@ struct cache_set {
- 
- #define BUCKET_HASH_BITS	12
- 	struct hlist_head	bucket_hash[1 << BUCKET_HASH_BITS];
-+
-+	DECLARE_HEAP(struct btree *, flush_btree);
- };
- 
- struct bbio {
-diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
-index f5296007a9d5..1b736b860739 100644
---- a/drivers/md/bcache/journal.c
-+++ b/drivers/md/bcache/journal.c
-@@ -368,6 +368,12 @@ int bch_journal_replay(struct cache_set *s, struct list_head *list)
- }
- 
- /* Journalling */
-+#define journal_max_cmp(l, r) \
-+	(fifo_idx(&c->journal.pin, btree_current_write(l)->journal) < \
-+	 fifo_idx(&(c)->journal.pin, btree_current_write(r)->journal))
-+#define journal_min_cmp(l, r) \
-+	(fifo_idx(&c->journal.pin, btree_current_write(l)->journal) > \
-+	 fifo_idx(&(c)->journal.pin, btree_current_write(r)->journal))
- 
- static void btree_flush_write(struct cache_set *c)
- {
-@@ -375,25 +381,35 @@ static void btree_flush_write(struct cache_set *c)
- 	 * Try to find the btree node with that references the oldest journal
- 	 * entry, best is our current candidate and is locked if non NULL:
- 	 */
--	struct btree *b, *best;
--	unsigned i;
-+	struct btree *b;
-+	int i;
- 
- 	atomic_long_inc(&c->flush_write);
-+
- retry:
--	best = NULL;
--
--	for_each_cached_btree(b, c, i)
--		if (btree_current_write(b)->journal) {
--			if (!best)
--				best = b;
--			else if (journal_pin_cmp(c,
--					btree_current_write(best)->journal,
--					btree_current_write(b)->journal)) {
--				best = b;
-+	spin_lock(&c->journal.lock);
-+	if (heap_empty(&c->flush_btree)) {
-+		for_each_cached_btree(b, c, i)
-+			if (btree_current_write(b)->journal) {
-+				if (!heap_full(&c->flush_btree))
-+					heap_add(&c->flush_btree, b,
-+						 journal_max_cmp);
-+				else if (journal_max_cmp(b,
-+					 heap_peek(&c->flush_btree))) {
-+					c->flush_btree.data[0] = b;
-+					heap_sift(&c->flush_btree, 0,
-+						  journal_max_cmp);
-+				}
- 			}
--		}
- 
--	b = best;
-+		for (i = c->flush_btree.used / 2 - 1; i >= 0; --i)
-+			heap_sift(&c->flush_btree, i, journal_min_cmp);
-+	}
-+
-+	b = NULL;
-+	heap_pop(&c->flush_btree, b, journal_min_cmp);
-+	spin_unlock(&c->journal.lock);
-+
- 	if (b) {
- 		mutex_lock(&b->write_lock);
- 		if (!btree_current_write(b)->journal) {
-@@ -824,7 +840,8 @@ int bch_journal_alloc(struct cache_set *c)
- 	j->w[0].c = c;
- 	j->w[1].c = c;
- 
--	if (!(init_fifo(&j->pin, JOURNAL_PIN, GFP_KERNEL)) ||
-+	if (!(init_heap(&c->flush_btree, 128, GFP_KERNEL)) ||
-+	    !(init_fifo(&j->pin, JOURNAL_PIN, GFP_KERNEL)) ||
- 	    !(j->w[0].data = (void *) __get_free_pages(GFP_KERNEL, JSET_BITS)) ||
- 	    !(j->w[1].data = (void *) __get_free_pages(GFP_KERNEL, JSET_BITS)))
- 		return -ENOMEM;
-diff --git a/drivers/md/bcache/util.h b/drivers/md/bcache/util.h
-index 4df4c5c1cab2..a6763db7f061 100644
---- a/drivers/md/bcache/util.h
-+++ b/drivers/md/bcache/util.h
-@@ -112,6 +112,8 @@ do {									\
- 
- #define heap_full(h)	((h)->used == (h)->size)
- 
-+#define heap_empty(h)	((h)->used == 0)
-+
- #define DECLARE_FIFO(type, name)					\
- 	struct {							\
- 		size_t front, back, size, mask;				\
--- 
-2.14.1
+--Apple-Mail=_3798F2B6-A897-4E5F-A8C1-9C2946ADE409--
