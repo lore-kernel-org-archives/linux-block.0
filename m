@@ -1,74 +1,64 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out30-132.freemail.mail.aliyun.com ([115.124.30.132]:44399 "EHLO
-        out30-132.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752309AbeB0MKY (ORCPT
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:33663 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751810AbeBUID4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Feb 2018 07:10:24 -0500
-From: Jiufei Xue <jiufei.xue@linux.alibaba.com>
-Subject: [PATCH 3/4] block: display the correct diskname for bio
-To: Christoph Hellwig <hch@lst.de>, Shaohua Li <shli@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>
-Cc: linux-block <linux-block@vger.kernel.org>,
-        caspar@linux.alibaba.com, Joseph Qi <joseph.qi@linux.alibaba.com>
-References: <014d8f0c-31db-c18b-855e-5e425b9499be@linux.alibaba.com>
-Message-ID: <d908e3af-5fda-1715-9af0-5e67e4e3d3e3@linux.alibaba.com>
-Date: Tue, 27 Feb 2018 20:10:18 +0800
-MIME-Version: 1.0
-In-Reply-To: <014d8f0c-31db-c18b-855e-5e425b9499be@linux.alibaba.com>
-Content-Type: text/plain; charset=utf-8
+        Wed, 21 Feb 2018 03:03:56 -0500
+Received: by mail-lf0-f65.google.com with SMTP id f19so1085821lfg.0
+        for <linux-block@vger.kernel.org>; Wed, 21 Feb 2018 00:03:55 -0800 (PST)
+From: hans.ml.holmberg@owltronix.com
+To: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Cc: =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>
+Subject: [PATCH 3/3] lightnvm: pblk: prevent race in pblk_rb_flush_point_set
+Date: Wed, 21 Feb 2018 09:03:01 +0100
+Message-Id: <1519200181-10886-4-git-send-email-hans.ml.holmberg@owltronix.com>
+In-Reply-To: <1519200181-10886-1-git-send-email-hans.ml.holmberg@owltronix.com>
+References: <1519200181-10886-1-git-send-email-hans.ml.holmberg@owltronix.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-bio_devname use __bdevname to display the device name, and can
-only show the major and minor of the part0,
-Fix this by using disk_name to display the correct name.
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-Fixes: 74d46992e0d9 ("block: replace bi_bdev with a gendisk pointer and partitions index")
-Signed-off-by: Jiufei Xue <jiufei.xue@linux.alibaba.com>
-Reviewed-by: Omar Sandoval <osandov@fb.com>
+Make sure that we are not advancing the sync pointer while
+we're adding bios to the write buffer entry completion list.
+
+This race condition results in bios not completing and was identified
+by a hang when running xfstest generic/113.
+
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
 ---
- block/partition-generic.c | 6 ++++++
- include/linux/bio.h       | 4 +---
- 2 files changed, 7 insertions(+), 3 deletions(-)
+ drivers/lightnvm/pblk-rb.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index 91622db..08dabcd 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -51,6 +51,12 @@ const char *bdevname(struct block_device *bdev, char *buf)
+diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
+index 8b14340..52fdd85 100644
+--- a/drivers/lightnvm/pblk-rb.c
++++ b/drivers/lightnvm/pblk-rb.c
+@@ -355,10 +355,13 @@ static int pblk_rb_flush_point_set(struct pblk_rb *rb, struct bio *bio,
+ 	struct pblk_rb_entry *entry;
+ 	unsigned int sync, flush_point;
  
- EXPORT_SYMBOL(bdevname);
++	pblk_rb_sync_init(rb, NULL);
+ 	sync = READ_ONCE(rb->sync);
  
-+const char *bio_devname(struct bio *bio, char *buf)
-+{
-+	return disk_name(bio->bi_disk, bio->bi_partno, buf);
-+}
-+EXPORT_SYMBOL(bio_devname);
-+
- /*
-  * There's very little reason to use this, you should really
-  * have a struct block_device just about everywhere and use
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index d0eb659..ce547a2 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -511,6 +511,7 @@ extern struct bio *bio_copy_user_iov(struct request_queue *,
- extern struct bio_vec *bvec_alloc(gfp_t, int, unsigned long *, mempool_t *);
- extern void bvec_free(mempool_t *, struct bio_vec *, unsigned int);
- extern unsigned int bvec_nr_vecs(unsigned short idx);
-+extern const char *bio_devname(struct bio *bio, char *buffer);
+-	if (pos == sync)
++	if (pos == sync) {
++		pblk_rb_sync_end(rb, NULL);
+ 		return 0;
++	}
  
- #define bio_set_dev(bio, bdev) 			\
- do {						\
-@@ -529,9 +530,6 @@ extern struct bio *bio_copy_user_iov(struct request_queue *,
- #define bio_dev(bio) \
- 	disk_devt((bio)->bi_disk)
+ #ifdef CONFIG_NVM_DEBUG
+ 	atomic_inc(&rb->inflight_flush_point);
+@@ -367,8 +370,6 @@ static int pblk_rb_flush_point_set(struct pblk_rb *rb, struct bio *bio,
+ 	flush_point = (pos == 0) ? (rb->nr_entries - 1) : (pos - 1);
+ 	entry = &rb->entries[flush_point];
  
--#define bio_devname(bio, buf) \
--	__bdevname(bio_dev(bio), (buf))
+-	pblk_rb_sync_init(rb, NULL);
 -
- #ifdef CONFIG_BLK_CGROUP
- int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css);
- void bio_disassociate_task(struct bio *bio);
+ 	/* Protect flush points */
+ 	smp_store_release(&rb->flush_point, flush_point);
+ 
 -- 
-1.9.4
+2.7.4
