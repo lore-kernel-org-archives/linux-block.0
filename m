@@ -1,92 +1,48 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-io0-f193.google.com ([209.85.223.193]:41382 "EHLO
-        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750803AbeBQGNL (ORCPT
+Received: from mail-wr0-f193.google.com ([209.85.128.193]:36468 "EHLO
+        mail-wr0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932230AbeBUJ1i (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 17 Feb 2018 01:13:11 -0500
-Date: Sat, 17 Feb 2018 11:43:04 +0530
-From: Aishwarya Pant <aishpant@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: Julia Lawall <julia.lawall@lip6.fr>, linux-kernel@vger.kernel.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        Greg KH <gregkh@linuxfoundation.org>, linux-doc@vger.kernel.org
-Subject: [PATCH v2] block/loop: add documentation for sysfs interface
-Message-ID: <20180217061304.GA14083@mordor.localdomain>
+        Wed, 21 Feb 2018 04:27:38 -0500
+Received: by mail-wr0-f193.google.com with SMTP id u15so2455848wrg.3
+        for <linux-block@vger.kernel.org>; Wed, 21 Feb 2018 01:27:37 -0800 (PST)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 15/20] nvme: make nvme_get_log_ext available
+Date: Wed, 21 Feb 2018 10:26:53 +0100
+Message-Id: <1519205218-26994-16-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1519205218-26994-1-git-send-email-javier@cnexlabs.com>
+References: <1519205218-26994-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Documentation has been compiled from git logs and by reading through
-code.
+Make nvme_get_log_ext available outside of core.c.
 
-Signed-off-by: Aishwarya Pant <aishpant@gmail.com>
+This is in preparation for using it in lightnvm.c
+
+Signed-off-by: Javier González <javier@cnexlabs.>
 ---
-For drivers/block/loop.c, I don't see any maintainers or mailing lists except
-for LKML. I am guessing linux-block mailing list should be okay.
+ drivers/nvme/host/nvme.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Changes in v2:
-- Add linux-block@vger.kernel.org to the recipient list.
-
- Documentation/ABI/testing/sysfs-block-loop | 50 ++++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
- create mode 100644 Documentation/ABI/testing/sysfs-block-loop
-
-diff --git a/Documentation/ABI/testing/sysfs-block-loop b/Documentation/ABI/testing/sysfs-block-loop
-new file mode 100644
-index 000000000000..627f4eb87286
---- /dev/null
-+++ b/Documentation/ABI/testing/sysfs-block-loop
-@@ -0,0 +1,50 @@
-+What:		/sys/block/loopX/loop/autoclear
-+Date:		Aug, 2010
-+KernelVersion:	v2.6.37
-+Contact:	linux-block@vger.kernel.org
-+Description:
-+		(RO) Shows if the device is in autoclear mode or not ( "1" or
-+		"0"). Autoclear (if set) indicates that the loopback device will
-+		self-distruct after last close.
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 1ca08f4993ba..505f797f8c6c 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -396,6 +396,9 @@ int nvme_reset_ctrl(struct nvme_ctrl *ctrl);
+ int nvme_delete_ctrl(struct nvme_ctrl *ctrl);
+ int nvme_delete_ctrl_sync(struct nvme_ctrl *ctrl);
+ 
++int nvme_get_log_ext(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
++		     u8 log_page, void *log, size_t size, size_t offset);
 +
-+What:		/sys/block/loopX/loop/backing_file
-+Date:		Aug, 2010
-+KernelVersion:	v2.6.37
-+Contact:	linux-block@vger.kernel.org
-+Description:
-+		(RO) The path of the backing file that the loop device maps its
-+		data blocks to.
-+
-+What:		/sys/block/loopX/loop/offset
-+Date:		Aug, 2010
-+KernelVersion:	v2.6.37
-+Contact:	linux-block@vger.kernel.org
-+Description:
-+		(RO) Start offset (in bytes).
-+
-+What:		/sys/block/loopX/loop/sizelimit
-+Date:		Aug, 2010
-+KernelVersion:	v2.6.37
-+Contact:	linux-block@vger.kernel.org
-+Description:
-+		(RO) The size (in bytes) that the block device maps, starting
-+		from the offset.
-+
-+What:		/sys/block/loopX/loop/partscan
-+Date:		Aug, 2011
-+KernelVersion:	v3.10
-+Contact:	linux-block@vger.kernel.org
-+Description:
-+		(RO) Shows if automatic partition scanning is enabled for the
-+		device or not ("1" or "0"). This can be requested individually
-+		per loop device during its setup by setting LO_FLAGS_PARTSCAN in
-+		in the ioctl request. By default, no partition tables are
-+		scanned.
-+
-+What:		/sys/block/loopX/loop/dio
-+Date:		Aug, 2015
-+KernelVersion:	v4.10
-+Contact:	linux-block@vger.kernel.org
-+Description:
-+		(RO) Shows if direct IO is being used to access backing file or
-+		not ("1 or "0").
+ extern const struct attribute_group nvme_ns_id_attr_group;
+ extern const struct block_device_operations nvme_ns_head_ops;
+ 
 -- 
-2.16.1
+2.7.4
