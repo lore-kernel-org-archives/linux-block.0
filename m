@@ -1,19 +1,19 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:37047 "EHLO
-        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932105AbeBUJ1X (ORCPT
+Received: from mail-wr0-f195.google.com ([209.85.128.195]:40593 "EHLO
+        mail-wr0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753309AbeBUJ1j (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Feb 2018 04:27:23 -0500
-Received: by mail-wr0-f196.google.com with SMTP id z12so2447814wrg.4
-        for <linux-block@vger.kernel.org>; Wed, 21 Feb 2018 01:27:22 -0800 (PST)
+        Wed, 21 Feb 2018 04:27:39 -0500
+Received: by mail-wr0-f195.google.com with SMTP id o76so2436013wrb.7
+        for <linux-block@vger.kernel.org>; Wed, 21 Feb 2018 01:27:39 -0800 (PST)
 From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
 To: mb@lightnvm.io
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-nvme@lists.infradead.org,
         =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 12/20] lightnvm: complete 2.0 values in sysfs
-Date: Wed, 21 Feb 2018 10:26:50 +0100
-Message-Id: <1519205218-26994-13-git-send-email-javier@cnexlabs.com>
+Subject: [PATCH 17/20] lightnvm: define chunk states
+Date: Wed, 21 Feb 2018 10:26:55 +0100
+Message-Id: <1519205218-26994-18-git-send-email-javier@cnexlabs.com>
 In-Reply-To: <1519205218-26994-1-git-send-email-javier@cnexlabs.com>
 References: <1519205218-26994-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
@@ -21,45 +21,41 @@ Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Add missing geometry values to sysfs. Namely, maxoc and maxocpu.
+Define chunk states as given in the 2.0 spec. Also, add an extra chunk
+state that signals that the chunk is in use by the host. This allows for
+the chunk metadata to be "owned" by a target when active, thus
+completing the chunk state machine from the host perspective and
+facilitating sanity checks. This state is transparent for the device.
 
 Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- drivers/nvme/host/lightnvm.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ include/linux/lightnvm.h | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index 70dc4740f0d3..88c71d0d0d8c 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -1059,6 +1059,10 @@ static ssize_t nvm_dev_attr_show_20(struct device *dev,
- 		return scnprintf(page, PAGE_SIZE, "%u\n", dev_geo->c.ws_min);
- 	} else if (strcmp(attr->name, "ws_opt") == 0) {
- 		return scnprintf(page, PAGE_SIZE, "%u\n", dev_geo->c.ws_opt);
-+	} else if (strcmp(attr->name, "maxoc") == 0) {
-+		return scnprintf(page, PAGE_SIZE, "%u\n", dev_geo->c.maxoc);
-+	} else if (strcmp(attr->name, "maxocpu") == 0) {
-+		return scnprintf(page, PAGE_SIZE, "%u\n", dev_geo->c.maxocpu);
- 	} else if (strcmp(attr->name, "mw_cunits") == 0) {
- 		return scnprintf(page, PAGE_SIZE, "%u\n", dev_geo->c.mw_cunits);
- 	} else if (strcmp(attr->name, "write_typ") == 0) {
-@@ -1158,6 +1162,8 @@ static NVM_DEV_ATTR_20_RO(chunks);
- static NVM_DEV_ATTR_20_RO(clba);
- static NVM_DEV_ATTR_20_RO(ws_min);
- static NVM_DEV_ATTR_20_RO(ws_opt);
-+static NVM_DEV_ATTR_20_RO(maxoc);
-+static NVM_DEV_ATTR_20_RO(maxocpu);
- static NVM_DEV_ATTR_20_RO(mw_cunits);
- static NVM_DEV_ATTR_20_RO(write_typ);
- static NVM_DEV_ATTR_20_RO(write_max);
-@@ -1175,6 +1181,8 @@ static struct attribute *nvm_dev_attrs_20[] = {
- 	&dev_attr_clba.attr,
- 	&dev_attr_ws_min.attr,
- 	&dev_attr_ws_opt.attr,
-+	&dev_attr_maxoc.attr,
-+	&dev_attr_maxocpu.attr,
- 	&dev_attr_mw_cunits.attr,
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index bc43700c37ec..4dfb85d08ab5 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -297,6 +297,20 @@ struct nvm_dev_geo {
+ 	struct nvm_common_geo c;
+ };
  
- 	&dev_attr_read_typ.attr,
++enum {
++	/* Chunk states */
++	NVM_CHK_ST_FREE =	1 << 0,
++	NVM_CHK_ST_CLOSED =	1 << 1,
++	NVM_CHK_ST_OPEN =	1 << 2,
++	NVM_CHK_ST_OFFLINE =	1 << 3,
++	NVM_CHK_ST_HOST_USE =	1 << 7,
++
++	/* Chunk types */
++	NVM_CHK_TP_W_SEQ =	1 << 0,
++	NVM_CHK_TP_W_RAN =	1 << 1,
++	NVM_CHK_TP_SZ_SPEC =	1 << 4,
++};
++
+ /*
+  * Note: The structure size is linked to nvme_nvm_chk_meta such that the same
+  * buffer can be used when converting from little endian to cpu addressing.
 -- 
 2.7.4
