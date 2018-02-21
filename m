@@ -1,53 +1,57 @@
-Return-Path: <prvs=583440fc3=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "tj@kernel.org" <tj@kernel.org>
-CC: "hch@lst.de" <hch@lst.de>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 21 Feb 2018 11:21:11 -0800
+From: "tj@kernel.org" <tj@kernel.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH v2] blk-mq: Fix race between resetting the timer and
  completion handling
-Date: Wed, 21 Feb 2018 22:55:25 +0000
-Message-ID: <1519253724.4060.18.camel@wdc.com>
+Message-ID: <20180221192111.GE170644@devbig577.frc2.facebook.com>
 References: <1518027251.2870.53.camel@wdc.com>
-	 <20180207200724.GD695913@devbig577.frc2.facebook.com>
-	 <1518047297.2870.80.camel@wdc.com> <1518052193.2870.90.camel@wdc.com>
-	 <20180208153940.GM695913@devbig577.frc2.facebook.com>
-	 <1518107501.3611.19.camel@wdc.com>
-	 <20180213212044.GS695913@devbig577.frc2.facebook.com>
-	 <1518627534.3147.6.camel@wdc.com>
-	 <20180218131144.GX695913@devbig577.frc2.facebook.com>
-	 <1519239184.4060.7.camel@wdc.com>
-	 <20180221192111.GE170644@devbig577.frc2.facebook.com>
-In-Reply-To: <20180221192111.GE170644@devbig577.frc2.facebook.com>
-Content-Type: text/plain; charset="utf-8"
+ <20180207200724.GD695913@devbig577.frc2.facebook.com>
+ <1518047297.2870.80.camel@wdc.com>
+ <1518052193.2870.90.camel@wdc.com>
+ <20180208153940.GM695913@devbig577.frc2.facebook.com>
+ <1518107501.3611.19.camel@wdc.com>
+ <20180213212044.GS695913@devbig577.frc2.facebook.com>
+ <1518627534.3147.6.camel@wdc.com>
+ <20180218131144.GX695913@devbig577.frc2.facebook.com>
+ <1519239184.4060.7.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1519239184.4060.7.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gV2VkLCAyMDE4LTAyLTIxIGF0IDExOjIxIC0wODAwLCB0akBrZXJuZWwub3JnIHdyb3RlOg0K
-PiBIZWxsbywgQmFydC4NCj4gDQo+IE9uIFdlZCwgRmViIDIxLCAyMDE4IGF0IDA2OjUzOjA1UE0g
-KzAwMDAsIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gPiBPbiBTdW4sIDIwMTgtMDItMTggYXQg
-MDU6MTEgLTA4MDAsIHRqQGtlcm5lbC5vcmcgd3JvdGU6DQo+ID4gPiBPbiBXZWQsIEZlYiAxNCwg
-MjAxOCBhdCAwNDo1ODo1NlBNICswMDAwLCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6DQo+ID4gPiA+
-IFdpdGggdGhpcyBwYXRjaCBhcHBsaWVkIHRoZSB0ZXN0cyBJIHJhbiBzbyBmYXIgcGFzcy4NCj4g
-PiA+IA0KPiA+ID4gQWgsIGdyZWF0IHRvIGhlYXIuICBUaGFua3MgYSBsb3QgZm9yIHRlc3Rpbmcu
-ICBDYW4geW91IHBsZWFzZSB2ZXJpZnkNCj4gPiA+IHRoZSBmb2xsb3dpbmc/ICBJdCdzIHRoZSBz
-YW1lIGFwcHJvYWNoIGJ1dCB3aXRoIFJDVSBzeW5jIGJhdGNoaW5nLg0KPiA+IA0KPiA+IEhlbGxv
-IFRlanVuLA0KPiA+IA0KPiA+IEFmdGVyIGhhdmluZyBtZXJnZWQga2VybmVsIHY0LjE2LXJjMiBp
-bnRvIG15IGtlcm5lbCB0cmVlIGFuZCBhZnRlciBoYXZpbmcNCj4gPiBhcHBsaWVkIHBhdGNoICJB
-dm9pZCB0aGF0IEFUQSBlcnJvciBoYW5kbGluZyBoYW5ncyINCj4gPiAoaHR0cHM6Ly93d3cubWFp
-bC1hcmNoaXZlLmNvbS9saW51eC1zY3NpQHZnZXIua2VybmVsLm9yZy9tc2c3MTE0NS5odG1sKSBJ
-DQo+ID4gaGF2ZSBub3QgYmVlbiBhYmxlIHRvIHJlcHJvZHVjZSB0aGUgcmVwb3J0ZWQgY3Jhc2gg
-LSBuZWl0aGVyIHdpdGggdGhlIHBhdGNoDQo+ID4gYXBwbGllZCB0aGF0IHdhcyBwb3N0ZWQgb24g
-RmVicnVhcnkgMTN0aCBub3Igd2l0aG91dCB0aGF0IHBhdGNoLiBUaGlzIG1ha2VzDQo+ID4gbWUg
-d29uZGVyIHdoZXRoZXIgd2Ugc2hvdWxkIGRyb3AgdGhlIGRpc2N1c3NlZCBwYXRjaGVzIHVubGVz
-cyBzb21lb25lIGNvbWVzDQo+ID4gdXAgd2l0aCBhIHJlcHJvZHVjaWJsZSB0ZXN0IGNhc2U/DQo+
-IA0KPiBJdCBpcyBhbiBhY3R1YWwgYnVnIGluIHRoYXQgd2UgYWN0dWFsbHkgY2FuIG92ZXJyaWRl
-IHRoZSB0aW1lciBzZXR0aW5nDQo+IG9mIHRoZSBuZXh0IHJlcXVlc3QgaW5zdGFuY2UuICBHaXZl
-biB0aGF0IHRoZSByYWNlIHdpbmRvdyBpc24ndCB0aGF0DQo+IGxhcmdlLCBpdCBtYWtlcyBzZW5z
-ZSB0aGF0IHRoZSByZXByb2R1Y2liaWxpdHkgaXMgYWZmZWN0ZWQgYnkNCj4gYnV0dGVyZmxpZXMu
-ICBJIHRoaW5rIGl0IG1ha2VzIHNlbnNlIHRvIGZpeCB0aGUgYnVnLiAgQW55IGNoYW5jZSB5b3UN
-Cj4gY2FuIHRlc3QgdGhlIG5ldyBwYXRjaCBvbiB0b3Agb2YgdGhlIHJlcHJvZHVjaWJsZSBzZXR1
-cD8NCg0KSGVsbG8gVGVqdW4sDQoNClNpbmNlIEkgaGFkIG5vdCBzYXZlZCBhbnkgb2YgdGhlIHRy
-ZWVzIHRoYXQgSSBoYWQgdXNlZCBkdXJpbmcgbXkgdGVzdHMgSSBwaWNrZWQNCnNldmVyYWwgdHJl
-ZXMgZnJvbSB0aGUgImdpdCByZWZsb2ciIG91dHB1dCBhbmQgdHJpZWQgdG8gcmVwcm9kdWNlIHRo
-ZSBjcmFzaCB0aGF0DQpJIGhhZCByZXBvcnRlZCB3aXRoIHRoZXNlIHRyZWVzLiBVbmZvcnR1bmF0
-ZWx5IHNvIGZhciB3aXRob3V0IHN1Y2Nlc3MuDQoNCkJhcnQuDQoNCg0K
+Hello, Bart.
+
+On Wed, Feb 21, 2018 at 06:53:05PM +0000, Bart Van Assche wrote:
+> On Sun, 2018-02-18 at 05:11 -0800, tj@kernel.org wrote:
+> > On Wed, Feb 14, 2018 at 04:58:56PM +0000, Bart Van Assche wrote:
+> > > With this patch applied the tests I ran so far pass.
+> > 
+> > Ah, great to hear.  Thanks a lot for testing.  Can you please verify
+> > the following?  It's the same approach but with RCU sync batching.
+> 
+> Hello Tejun,
+> 
+> After having merged kernel v4.16-rc2 into my kernel tree and after having
+> applied patch "Avoid that ATA error handling hangs"
+> (https://www.mail-archive.com/linux-scsi@vger.kernel.org/msg71145.html) I
+> have not been able to reproduce the reported crash - neither with the patch
+> applied that was posted on February 13th nor without that patch. This makes
+> me wonder whether we should drop the discussed patches unless someone comes
+> up with a reproducible test case?
+
+It is an actual bug in that we actually can override the timer setting
+of the next request instance.  Given that the race window isn't that
+large, it makes sense that the reproducibility is affected by
+butterflies.  I think it makes sense to fix the bug.  Any chance you
+can test the new patch on top of the reproducible setup?
+
+Thanks.
+
+-- 
+tejun
