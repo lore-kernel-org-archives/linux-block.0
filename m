@@ -1,73 +1,52 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:42064 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1753194AbeBFWGE (ORCPT
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:43263 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751775AbeBUIDz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 6 Feb 2018 17:06:04 -0500
-From: Howard McLauchlan <hmclauchlan@fb.com>
-To: <linux-block@vger.kernel.org>
-CC: Jens Axboe <axboe@fb.com>, <kernel-team@fb.com>,
-        Omar Sandoval <osandov@osandov.com>,
-        Josef Bacik <jbacik@fb.com>,
-        Howard McLauchlan <hmclauchlan@fb.com>
-Subject: [PATCH v3] block: Add should_fail_bio() for bpf error injection
-Date: Tue, 6 Feb 2018 14:05:39 -0800
-Message-ID: <20180206220539.30413-1-hmclauchlan@fb.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Wed, 21 Feb 2018 03:03:55 -0500
+Received: by mail-lf0-f65.google.com with SMTP id q69so1063218lfi.10
+        for <linux-block@vger.kernel.org>; Wed, 21 Feb 2018 00:03:54 -0800 (PST)
+From: hans.ml.holmberg@owltronix.com
+To: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Cc: =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>
+Subject: [PATCH 2/3] lightnvm: pblk: allow allocation of new lines during shutdown
+Date: Wed, 21 Feb 2018 09:03:00 +0100
+Message-Id: <1519200181-10886-3-git-send-email-hans.ml.holmberg@owltronix.com>
+In-Reply-To: <1519200181-10886-1-git-send-email-hans.ml.holmberg@owltronix.com>
+References: <1519200181-10886-1-git-send-email-hans.ml.holmberg@owltronix.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The classic error injection mechanism, should_fail_request() does not
-support use cases where more information is required (from the entire
-struct bio, for example).
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-To that end, this patch introduces should_fail_bio(), which calls
-should_fail_request() under the hood but provides a convenient
-place for kprobes to hook into if they require the entire struct bio.
-This patch also replaces some existing calls to should_fail_request()
-with should_fail_bio() with no degradation in performance.
+When shutting down pblk the write buffer is flushed and if the
+current line can't fit the data in the write buffer we need
+to allocate a new line, so remove the check that prevents this.
 
-Signed-off-by: Howard McLauchlan <hmclauchlan@fb.com>
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
 ---
- block/blk-core.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ drivers/lightnvm/pblk-core.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index d0d104268f1a..2d1a7bbe0634 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -34,6 +34,7 @@
- #include <linux/pm_runtime.h>
- #include <linux/blk-cgroup.h>
- #include <linux/debugfs.h>
-+#include <linux/bpf.h>
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 22e61cd..8848443 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -1407,13 +1407,6 @@ struct pblk_line *pblk_line_replace_data(struct pblk *pblk)
+ 	l_mg->data_line = new;
  
- #define CREATE_TRACE_POINTS
- #include <trace/events/block.h>
-@@ -2083,6 +2084,14 @@ static inline bool bio_check_ro(struct bio *bio, struct hd_struct *part)
- 	return false;
- }
+ 	spin_lock(&l_mg->free_lock);
+-	if (pblk->state != PBLK_STATE_RUNNING) {
+-		l_mg->data_line = NULL;
+-		l_mg->data_next = NULL;
+-		spin_unlock(&l_mg->free_lock);
+-		goto out;
+-	}
+-
+ 	pblk_line_setup_metadata(new, l_mg, &pblk->lm);
+ 	spin_unlock(&l_mg->free_lock);
  
-+static noinline int should_fail_bio(struct bio *bio)
-+{
-+	if (should_fail_request(&bio->bi_disk->part0, bio->bi_iter.bi_size))
-+		return -EIO;
-+	return 0;
-+}
-+ALLOW_ERROR_INJECTION(should_fail_bio, ERRNO);
-+
- /*
-  * Remap block n of partition p to block n+start(p) of the disk.
-  */
-@@ -2174,7 +2183,7 @@ generic_make_request_checks(struct bio *bio)
- 	if ((bio->bi_opf & REQ_NOWAIT) && !queue_is_rq_based(q))
- 		goto not_supported;
- 
--	if (should_fail_request(&bio->bi_disk->part0, bio->bi_iter.bi_size))
-+	if (should_fail_bio(bio))
- 		goto end_io;
- 
- 	if (!bio->bi_partno) {
 -- 
-2.14.1
+2.7.4
