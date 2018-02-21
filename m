@@ -1,77 +1,156 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: linux-scsi@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Arun Easi <arun.easi@cavium.com>,
-	Omar Sandoval <osandov@fb.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Don Brace <don.brace@microsemi.com>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Peter Rivera <peter.rivera@broadcom.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Laurence Oberman <loberman@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 0/5] blk-mq/scsi-mq: support global tags & introduce force_blk_mq
-Date: Sat,  3 Feb 2018 12:21:07 +0800
-Message-Id: <20180203042112.15239-1-ming.lei@redhat.com>
+Return-Path: <bo.li.liu@oracle.com>
+Date: Wed, 21 Feb 2018 15:54:12 -0700
+From: Liu Bo <bo.li.liu@oracle.com>
+To: xuejiufei <jiufei.xue@linux.alibaba.com>
+Cc: Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, caspar@linux.alibaba.com
+Subject: Re: [PATCH RESEND] blk-throttle: avoid double counted
+Message-ID: <20180221225412.GA15815@dhcp-10-211-47-181.usdhcp.oraclecorp.com>
+Reply-To: bo.li.liu@oracle.com
+References: <b802b5e4-b5ed-b09f-8da9-9a4823434015@linux.alibaba.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <b802b5e4-b5ed-b09f-8da9-9a4823434015@linux.alibaba.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi All,
+On Wed, Feb 14, 2018 at 11:22:10AM +0800, xuejiufei wrote:
+> If a bio is split after counted to the stat_bytes and stat_ios in
+> blkcg_bio_issue_check(), the bio could be resubmitted and enters the
+> block throttle layer again. This will cause the part of the bio is
+> counted twice.
+> 
+> The flag BIO_THROTTLED can not be used to fix this problem considering the
+> following two cases.
+> 1. The bio is throttled and resubmitted to the block throttle layer. It
+> has the flag BIO_THROTTLED and should be counted.
+> 2. The bio can be dispatched and has been counted, then it is split
+> and resubmitted to the block throttle layer. It also has the flag
+> BIO_THROTTLED but should not be counted again.
+> 
+> So we add another flag BIO_THROTL_COUNTED to avoid double counted.
+>
 
-This patchset supports global tags which was started by Hannes originally:
+The patch looks good and safe to me.
 
-	https://marc.info/?l=linux-block&m=149132580511346&w=2
+Reviewed-by: Liu Bo <bo.li.liu@oracle.com>
+Tested-by: Liu Bo <bo.li.liu@oracle.com>
 
-Also inroduce 'force_blk_mq' to 'struct scsi_host_template', so that
-driver can avoid to support two IO paths(legacy and blk-mq), especially
-recent discusion mentioned that SCSI_MQ will be enabled at default soon.
+Verified with the following steps:
 
-	https://marc.info/?l=linux-scsi&m=151727684915589&w=2
+# mount -t cgroup -o blkio xxx /mnt/liubo
+# mkdir /mnt/liubo/test
+# echo 0 > /mnt/liubo/test/tasks
+# echo 1 > /mnt/liubo/test/blkio.reset_stats
+# xfs_io -f -d -c "pwrite -b 2M 0 2M" /mnt/btrfs/foobar
 
-With the above two changes, it should be easier to convert SCSI drivers'
-reply queue into blk-mq's hctx, then the automatic irq affinity issue can
-be solved easily, please see detailed descrption in commit log.
+- w/o the patch (only device of interest 8:128 is shown),
+# cat /mnt/liubo/test/blkio.throttle.io_serviced
+8:128 Read 0
+8:128 Write 3
+8:128 Sync 3
+8:128 Async 0
+8:128 Total 3
+Total 3
+# cat /mnt/liubo/test/blkio.throttle.io_service_bytes                                                                
+8:128 Read 0
+8:128 Write 3948544
+8:128 Sync 3948544
+8:128 Async 0
+8:128 Total 3948544
+Total 3948544
 
-Also drivers may require to complete request on the submission CPU
-for avoiding hard/soft deadlock, which can be done easily with blk_mq
-too.
+(also verified by blktrace about the split, 2M was split into 504K +
+1280K + 264K.)
 
-	https://marc.info/?t=151601851400001&r=1&w=2
+- w/ the patch,
+# cat /mnt/liubo/test/blkio.throttle.io_serviced
+8:128 Read 0
+8:128 Write 1
+8:128 Sync 1
+8:128 Async 0
+8:128 Total 1
+Total 5
+# cat /mnt/liubo/test/blkio.throttle.io_service_bytes
+8:128 Read 0
+8:128 Write 2097152
+8:128 Sync 2097152
+8:128 Async 0
+8:128 Total 2097152
 
-The final patch uses the introduced 'force_blk_mq' to fix virtio_scsi
-so that IO hang issue can be avoided inside legacy IO path, this issue is
-a bit generic, at least HPSA/virtio-scsi are found broken with v4.15+.
 
-Thanks
-Ming
+Thanks,
 
-Ming Lei (5):
-  blk-mq: tags: define several fields of tags as pointer
-  blk-mq: introduce BLK_MQ_F_GLOBAL_TAGS
-  block: null_blk: introduce module parameter of 'g_global_tags'
-  scsi: introduce force_blk_mq
-  scsi: virtio_scsi: fix IO hang by irq vector automatic affinity
+-liubo
 
- block/bfq-iosched.c        |  4 +--
- block/blk-mq-debugfs.c     | 11 ++++----
- block/blk-mq-sched.c       |  2 +-
- block/blk-mq-tag.c         | 67 +++++++++++++++++++++++++++++-----------------
- block/blk-mq-tag.h         | 15 ++++++++---
- block/blk-mq.c             | 31 ++++++++++++++++-----
- block/blk-mq.h             |  3 ++-
- block/kyber-iosched.c      |  2 +-
- drivers/block/null_blk.c   |  6 +++++
- drivers/scsi/hosts.c       |  1 +
- drivers/scsi/virtio_scsi.c | 59 +++-------------------------------------
- include/linux/blk-mq.h     |  2 ++
- include/scsi/scsi_host.h   |  3 +++
- 13 files changed, 105 insertions(+), 101 deletions(-)
 
--- 
-2.9.5
+> Signed-off-by: Jiufei Xue <jiufei.xue@linux.alibaba.com>
+> ---
+>  block/bio.c                | 2 ++
+>  include/linux/bio.h        | 6 ++++--
+>  include/linux/blk-cgroup.h | 3 ++-
+>  include/linux/blk_types.h  | 1 +
+>  4 files changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index 9ef6cf3..4594c2e 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -601,6 +601,8 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
+>  	bio_set_flag(bio, BIO_CLONED);
+>  	if (bio_flagged(bio_src, BIO_THROTTLED))
+>  		bio_set_flag(bio, BIO_THROTTLED);
+> +	if (bio_flagged(bio_src, BIO_THROTL_COUNTED))
+> +		bio_set_flag(bio, BIO_THROTL_COUNTED);
+>  	bio->bi_opf = bio_src->bi_opf;
+>  	bio->bi_write_hint = bio_src->bi_write_hint;
+>  	bio->bi_iter = bio_src->bi_iter;
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index 23d29b3..aefc24c 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -492,8 +492,10 @@ extern struct bio *bio_copy_user_iov(struct request_queue *,
+>  
+>  #define bio_set_dev(bio, bdev) 			\
+>  do {						\
+> -	if ((bio)->bi_disk != (bdev)->bd_disk)	\
+> -		bio_clear_flag(bio, BIO_THROTTLED);\
+> +	if ((bio)->bi_disk != (bdev)->bd_disk)	{	\
+> +		bio_clear_flag(bio, BIO_THROTTLED);	\
+> +		bio_clear_flag(bio, BIO_THROTL_COUNTED);\
+> +	}					\
+>  	(bio)->bi_disk = (bdev)->bd_disk;	\
+>  	(bio)->bi_partno = (bdev)->bd_partno;	\
+>  } while (0)
+> diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+> index e9825ff..c151bc9 100644
+> --- a/include/linux/blk-cgroup.h
+> +++ b/include/linux/blk-cgroup.h
+> @@ -701,11 +701,12 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
+>  
+>  	throtl = blk_throtl_bio(q, blkg, bio);
+>  
+> -	if (!throtl) {
+> +	if (!throtl && !bio_flagged(bio, BIO_THROTL_COUNTED)) {
+>  		blkg = blkg ?: q->root_blkg;
+>  		blkg_rwstat_add(&blkg->stat_bytes, bio->bi_opf,
+>  				bio->bi_iter.bi_size);
+>  		blkg_rwstat_add(&blkg->stat_ios, bio->bi_opf, 1);
+> +		bio_set_flag(bio, BIO_THROTL_COUNTED);
+>  	}
+>  
+>  	rcu_read_unlock();
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index 9e7d8bd..7a3890a 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -135,6 +135,7 @@ struct bio {
+>  				 * throttling rules. Don't do it again. */
+>  #define BIO_TRACE_COMPLETION 10	/* bio_endio() should trace the final completion
+>  				 * of this bio. */
+> +#define BIO_THROTL_COUNTED 11	/* This bio has already counted to rwstat. */
+>  /* See BVEC_POOL_OFFSET below before adding new flags */
+>  
+>  /*
+> -- 
+> 1.8.3.1
+> 
