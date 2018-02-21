@@ -1,101 +1,49 @@
-Return-Path: <srivatsa@csail.mit.edu>
-Subject: [PATCH 2/2] block,
- char_dev: Use correct format specifier for unsigned ints
-From: "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
-To: gregkh@linuxfoundation.org, logang@deltatee.com
-Cc: axboe@kernel.dk, jlayton@poochiereds.net, bfields@fieldses.org,
- viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- srivatsa@csail.mit.edu
-Date: Mon, 05 Feb 2018 18:25:27 -0800
-Message-ID: <151788391701.28069.13145257664735983272.stgit@srivatsa-ubuntu>
-In-Reply-To: <151788389652.28069.6065922071875812126.stgit@srivatsa-ubuntu>
-References: <151788389652.28069.6065922071875812126.stgit@srivatsa-ubuntu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:34595 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751763AbeBUIDy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Feb 2018 03:03:54 -0500
+Received: by mail-lf0-f65.google.com with SMTP id l191so1085917lfe.1
+        for <linux-block@vger.kernel.org>; Wed, 21 Feb 2018 00:03:54 -0800 (PST)
+From: hans.ml.holmberg@owltronix.com
+To: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Cc: =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>
+Subject: [PATCH 1/3] lightnvm: pblk: delete writer kick timer before stopping thread
+Date: Wed, 21 Feb 2018 09:02:59 +0100
+Message-Id: <1519200181-10886-2-git-send-email-hans.ml.holmberg@owltronix.com>
+In-Reply-To: <1519200181-10886-1-git-send-email-hans.ml.holmberg@owltronix.com>
+References: <1519200181-10886-1-git-send-email-hans.ml.holmberg@owltronix.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Srivatsa S. Bhat <srivatsa@csail.mit.edu>
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-register_blkdev() and __register_chrdev_region() treat the major
-number as an unsigned int. So print it the same way to avoid
-absurd error statements such as:
-"... major requested (-1) is greater than the maximum (511) ..."
-(and also fix off-by-one bugs in the error prints).
+Unless we delete the timer that wakes up the write thread
+before we stop the thread we risk re-starting the thread, so
+delete the timer first.
 
-While at it, also update the comment describing register_blkdev().
-
-Signed-off-by: Srivatsa S. Bhat <srivatsa@csail.mit.edu>
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
 ---
+ drivers/lightnvm/pblk-init.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- block/genhd.c |   19 +++++++++++--------
- fs/char_dev.c |    4 ++--
- 2 files changed, 13 insertions(+), 10 deletions(-)
-
-diff --git a/block/genhd.c b/block/genhd.c
-index 88a53c1..21a18e5 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -308,19 +308,22 @@ void blkdev_show(struct seq_file *seqf, off_t offset)
- /**
-  * register_blkdev - register a new block device
-  *
-- * @major: the requested major device number [1..255]. If @major = 0, try to
-- *         allocate any unused major number.
-+ * @major: the requested major device number [1..BLKDEV_MAJOR_MAX-1]. If
-+ *         @major = 0, try to allocate any unused major number.
-  * @name: the name of the new block device as a zero terminated string
-  *
-  * The @name must be unique within the system.
-  *
-  * The return value depends on the @major input parameter:
-  *
-- *  - if a major device number was requested in range [1..255] then the
-- *    function returns zero on success, or a negative error code
-+ *  - if a major device number was requested in range [1..BLKDEV_MAJOR_MAX-1]
-+ *    then the function returns zero on success, or a negative error code
-  *  - if any unused major number was requested with @major = 0 parameter
-  *    then the return value is the allocated major number in range
-- *    [1..255] or a negative error code otherwise
-+ *    [1..BLKDEV_MAJOR_MAX-1] or a negative error code otherwise
-+ *
-+ * See Documentation/admin-guide/devices.txt for the list of allocated
-+ * major numbers.
-  */
- int register_blkdev(unsigned int major, const char *name)
- {
-@@ -347,8 +350,8 @@ int register_blkdev(unsigned int major, const char *name)
- 	}
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index a2b54a8..862ac4e 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -923,9 +923,9 @@ static void pblk_writer_stop(struct pblk *pblk)
+ 	WARN(pblk_rb_sync_count(&pblk->rwb),
+ 			"Stopping not fully synced write buffer\n");
  
- 	if (major >= BLKDEV_MAJOR_MAX) {
--		pr_err("register_blkdev: major requested (%d) is greater than the maximum (%d) for %s\n",
--		       major, BLKDEV_MAJOR_MAX, name);
-+		pr_err("register_blkdev: major requested (%u) is greater than the maximum (%u) for %s\n",
-+		       major, BLKDEV_MAJOR_MAX-1, name);
++	del_timer_sync(&pblk->wtimer);
+ 	if (pblk->writer_ts)
+ 		kthread_stop(pblk->writer_ts);
+-	del_timer(&pblk->wtimer);
+ }
  
- 		ret = -EINVAL;
- 		goto out;
-@@ -375,7 +378,7 @@ int register_blkdev(unsigned int major, const char *name)
- 		ret = -EBUSY;
- 
- 	if (ret < 0) {
--		printk("register_blkdev: cannot get major %d for %s\n",
-+		printk("register_blkdev: cannot get major %u for %s\n",
- 		       major, name);
- 		kfree(p);
- 	}
-diff --git a/fs/char_dev.c b/fs/char_dev.c
-index 33c9385..a279c58 100644
---- a/fs/char_dev.c
-+++ b/fs/char_dev.c
-@@ -121,8 +121,8 @@ __register_chrdev_region(unsigned int major, unsigned int baseminor,
- 	}
- 
- 	if (major >= CHRDEV_MAJOR_MAX) {
--		pr_err("CHRDEV \"%s\" major requested (%d) is greater than the maximum (%d)\n",
--		       name, major, CHRDEV_MAJOR_MAX);
-+		pr_err("CHRDEV \"%s\" major requested (%u) is greater than the maximum (%u)\n",
-+		       name, major, CHRDEV_MAJOR_MAX-1);
- 		ret = -EINVAL;
- 		goto out;
- 	}
+ static void pblk_free(struct pblk *pblk)
+-- 
+2.7.4
