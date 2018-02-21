@@ -1,170 +1,83 @@
-Return-Path: <prvs=57171364e=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Jan Kara <jack@suse.com>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Kees Cook <keescook@chromium.org>
-Subject: [PATCH v3 2/3] block: Fix a race between the cgroup code and request queue initialization
-Date: Fri,  9 Feb 2018 10:44:04 -0800
-Message-Id: <20180209184405.25835-3-bart.vanassche@wdc.com>
-In-Reply-To: <20180209184405.25835-1-bart.vanassche@wdc.com>
-References: <20180209184405.25835-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wr0-f196.google.com ([209.85.128.196]:35417 "EHLO
+        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753299AbeBUJ1R (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Feb 2018 04:27:17 -0500
+Received: by mail-wr0-f196.google.com with SMTP id l43so2452161wrc.2
+        for <linux-block@vger.kernel.org>; Wed, 21 Feb 2018 01:27:16 -0800 (PST)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 06/20] lightnvm: add shorten OCSSD version in geo
+Date: Wed, 21 Feb 2018 10:26:44 +0100
+Message-Id: <1519205218-26994-7-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1519205218-26994-1-git-send-email-javier@cnexlabs.com>
+References: <1519205218-26994-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Initialize the request queue lock earlier such that the following
-race can no longer occur:
+Create a shorten version to use in the generic geometry.
 
-blk_init_queue_node()             blkcg_print_blkgs()
-  blk_alloc_queue_node (1)
-    q->queue_lock = &q->__queue_lock (2)
-    blkcg_init_queue(q) (3)
-                                    spin_lock_irq(blkg->q->queue_lock) (4)
-  q->queue_lock = lock (5)
-                                    spin_unlock_irq(blkg->q->queue_lock) (6)
-
-(1) allocate an uninitialized queue;
-(2) initialize queue_lock to its default internal lock;
-(3) initialize blkcg part of request queue, which will create blkg and
-    then insert it to blkg_list;
-(4) traverse blkg_list and find the created blkg, and then take its
-    queue lock, here it is the default *internal lock*;
-(5) *race window*, now queue_lock is overridden with *driver specified
-    lock*;
-(6) now unlock *driver specified lock*, not the locked *internal lock*,
-    unlock balance breaks.
-
-The changes in this patch are as follows:
-- Move the .queue_lock initialization from blk_init_queue_node() into
-  blk_alloc_queue_node().
-- Only override the .queue_lock pointer for legacy queues because it
-  is not useful for blk-mq queues to override this pointer.
-- For all all block drivers that initialize .queue_lock explicitly,
-  change the blk_alloc_queue() call in the driver into a
-  blk_alloc_queue_node() call and remove the explicit .queue_lock
-  initialization. Additionally, initialize the spin lock that will
-  be used as queue lock earlier if necessary.
-
-Reported-by: Joseph Qi <joseph.qi@linux.alibaba.com>
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
-Cc: Philipp Reisner <philipp.reisner@linbit.com>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: Kees Cook <keescook@chromium.org>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- block/blk-core.c               | 24 ++++++++++++++++--------
- drivers/block/drbd/drbd_main.c |  3 +--
- drivers/block/umem.c           |  7 +++----
- 3 files changed, 20 insertions(+), 14 deletions(-)
+ drivers/nvme/host/lightnvm.c | 6 ++++++
+ include/linux/lightnvm.h     | 8 ++++++++
+ 2 files changed, 14 insertions(+)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index e873a24bf82d..41c74b37be85 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -888,6 +888,19 @@ static void blk_rq_timed_out_timer(struct timer_list *t)
- 	kblockd_schedule_work(&q->timeout_work);
- }
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index f22331e61cef..bd97672e0b4f 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -299,6 +299,9 @@ static int nvme_nvm_setup_12(struct nvme_nvm_id12 *id,
+ 	dev_geo->major_ver_id = id->ver_id;
+ 	dev_geo->minor_ver_id = 2;
  
-+/**
-+ * blk_alloc_queue_node - allocate a request queue
-+ * @gfp_mask: memory allocation flags
-+ * @node_id: NUMA node to allocate memory from
-+ * @lock: For legacy queues, pointer to a spinlock that will be used to e.g.
-+ *        serialize calls to the legacy .request_fn() callback. Ignored for
-+ *	  blk-mq request queues.
-+ *
-+ * Note: pass the queue lock as the third argument to this function instead of
-+ * setting the queue lock pointer explicitly to avoid triggering a sporadic
-+ * crash in the blkcg code. This function namely calls blkcg_init_queue() and
-+ * the queue lock pointer must be set before blkcg_init_queue() is called.
-+ */
- struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id,
- 					   spinlock_t *lock)
- {
-@@ -940,11 +953,8 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id,
- 	mutex_init(&q->sysfs_lock);
- 	spin_lock_init(&q->__queue_lock);
++	/* Set compacted version for upper layers */
++	dev_geo->c.version = NVM_OCSSD_SPEC_12;
++
+ 	dev_geo->num_ch = src->num_ch;
+ 	dev_geo->num_lun = src->num_lun;
+ 	dev_geo->all_luns = dev_geo->num_ch * dev_geo->num_lun;
+@@ -381,6 +384,9 @@ static int nvme_nvm_setup_20(struct nvme_nvm_id20 *id,
+ 	dev_geo->major_ver_id = id->mjr;
+ 	dev_geo->minor_ver_id = id->mnr;
  
--	/*
--	 * By default initialize queue_lock to internal lock and driver can
--	 * override it later if need be.
--	 */
--	q->queue_lock = &q->__queue_lock;
-+	if (!q->mq_ops)
-+		q->queue_lock = lock ? : &q->__queue_lock;
++	/* Set compacted version for upper layers */
++	dev_geo->c.version = NVM_OCSSD_SPEC_20;
++
+ 	if (!(dev_geo->major_ver_id == 2 && dev_geo->minor_ver_id == 0)) {
+ 		pr_err("nvm: OCSSD version not supported (v%d.%d)\n",
+ 				dev_geo->major_ver_id, dev_geo->minor_ver_id);
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 28d429e0a1c9..02f1fd617781 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -23,6 +23,11 @@ enum {
+ #define NVM_LUN_BITS (8)
+ #define NVM_CH_BITS  (7)
  
- 	/*
- 	 * A queue starts its life with bypass turned on to avoid
-@@ -1031,13 +1041,11 @@ blk_init_queue_node(request_fn_proc *rfn, spinlock_t *lock, int node_id)
- {
- 	struct request_queue *q;
++enum {
++	NVM_OCSSD_SPEC_12 = 12,
++	NVM_OCSSD_SPEC_20 = 20,
++};
++
+ struct ppa_addr {
+ 	/* Generic structure for all addresses */
+ 	union {
+@@ -197,6 +202,9 @@ struct nvm_addr_format {
  
--	q = blk_alloc_queue_node(GFP_KERNEL, node_id, NULL);
-+	q = blk_alloc_queue_node(GFP_KERNEL, node_id, lock);
- 	if (!q)
- 		return NULL;
- 
- 	q->request_fn = rfn;
--	if (lock)
--		q->queue_lock = lock;
- 	if (blk_init_allocated_queue(q) < 0) {
- 		blk_cleanup_queue(q);
- 		return NULL;
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index 0a0394aa1b9c..185f1ef00a7c 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -2816,7 +2816,7 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
- 
- 	drbd_init_set_defaults(device);
- 
--	q = blk_alloc_queue(GFP_KERNEL);
-+	q = blk_alloc_queue_node(GFP_KERNEL, NUMA_NO_NODE, &resource->req_lock);
- 	if (!q)
- 		goto out_no_q;
- 	device->rq_queue = q;
-@@ -2848,7 +2848,6 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
- 	/* Setting the max_hw_sectors to an odd value of 8kibyte here
- 	   This triggers a max_bio_size message upon first attach or connect */
- 	blk_queue_max_hw_sectors(q, DRBD_MAX_BIO_SIZE_SAFE >> 8);
--	q->queue_lock = &resource->req_lock;
- 
- 	device->md_io.page = alloc_page(GFP_KERNEL);
- 	if (!device->md_io.page)
-diff --git a/drivers/block/umem.c b/drivers/block/umem.c
-index 8077123678ad..5c7fb8cc4149 100644
---- a/drivers/block/umem.c
-+++ b/drivers/block/umem.c
-@@ -888,13 +888,14 @@ static int mm_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
- 	card->Active = -1;	/* no page is active */
- 	card->bio = NULL;
- 	card->biotail = &card->bio;
-+	spin_lock_init(&card->lock);
- 
--	card->queue = blk_alloc_queue(GFP_KERNEL);
-+	card->queue = blk_alloc_queue_node(GFP_KERNEL, NUMA_NO_NODE,
-+					   &card->lock);
- 	if (!card->queue)
- 		goto failed_alloc;
- 
- 	blk_queue_make_request(card->queue, mm_make_request);
--	card->queue->queue_lock = &card->lock;
- 	card->queue->queuedata = card;
- 
- 	tasklet_init(&card->tasklet, process_page, (unsigned long)card);
-@@ -968,8 +969,6 @@ static int mm_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
- 	dev_printk(KERN_INFO, &card->dev->dev,
- 		"Window size %d bytes, IRQ %d\n", data, dev->irq);
- 
--	spin_lock_init(&card->lock);
--
- 	pci_set_drvdata(dev, card);
- 
- 	if (pci_write_cmd != 0x0F) 	/* If not Memory Write & Invalidate */
+ /* Device common geometry */
+ struct nvm_common_geo {
++	/* kernel short version */
++	u8	version;
++
+ 	/* chunk geometry */
+ 	u32	num_chk;	/* chunks per lun */
+ 	u32	clba;		/* sectors per chunk */
 -- 
-2.16.1
+2.7.4
