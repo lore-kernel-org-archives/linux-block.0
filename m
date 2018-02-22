@@ -1,107 +1,113 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0052.outbound.protection.outlook.com ([104.47.33.52]:54240
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753189AbeBVKZu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Feb 2018 05:25:50 -0500
-From: Javier Gonzalez <javier@cnexlabs.com>
-To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:46365 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753000AbeBVJjM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Feb 2018 04:39:12 -0500
+Received: by mail-lf0-f66.google.com with SMTP id r80so6457966lfe.13
+        for <linux-block@vger.kernel.org>; Thu, 22 Feb 2018 01:39:11 -0800 (PST)
+Subject: Re: [PATCH 03/20] lightnvm: fix capabilities for 2.0 sysfs
+To: Javier Gonzalez <javier@cnexlabs.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [PATCH 03/20] lightnvm: fix capabilities for 2.0 sysfs
-Date: Thu, 22 Feb 2018 10:25:47 +0000
-Message-ID: <A949EA48-27DF-4370-B213-3A4CE4E4F7D1@cnexlabs.com>
 References: <1519205218-26994-1-git-send-email-javier@cnexlabs.com>
  <1519205218-26994-4-git-send-email-javier@cnexlabs.com>
  <23b494fb-264d-a8ef-6172-5330d5a63bea@lightnvm.io>
- <19BA9139-DB6D-4A9B-A0B4-72F38BE648E9@cnexlabs.com>,<616ad3c9-b10c-0439-2d63-5e9e25abce84@lightnvm.io>
-In-Reply-To: <616ad3c9-b10c-0439-2d63-5e9e25abce84@lightnvm.io>
-Content-Type: text/plain; charset="utf-8"
+ <19BA9139-DB6D-4A9B-A0B4-72F38BE648E9@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <616ad3c9-b10c-0439-2d63-5e9e25abce84@lightnvm.io>
+Date: Thu, 22 Feb 2018 10:39:08 +0100
 MIME-Version: 1.0
+In-Reply-To: <19BA9139-DB6D-4A9B-A0B4-72F38BE648E9@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-DQoNCj4gT24gMjIgRmViIDIwMTgsIGF0IDEwLjM5LCBNYXRpYXMgQmrDuHJsaW5nIDxtYkBsaWdo
-dG52bS5pbz4gd3JvdGU6DQo+IA0KPiBPbiAwMi8yMi8yMDE4IDA4OjQ3IEFNLCBKYXZpZXIgR29u
-emFsZXogd3JvdGU6DQo+Pj4gT24gMjIgRmViIDIwMTgsIGF0IDA4LjI4LCBNYXRpYXMgQmrDuHJs
-aW5nIDxtYkBsaWdodG52bS5pbz4gd3JvdGU6DQo+Pj4gDQo+Pj4+IE9uIDAyLzIxLzIwMTggMTA6
-MjYgQU0sIEphdmllciBHb256w6FsZXogd3JvdGU6DQo+Pj4+IEJvdGggMS4yIGFuZCAyLjAgc3Bl
-Y3MgZGVmaW5lIGEgZmllbGQgZm9yIG1lZGlhIGFuZCBjb250cm9sbGVyDQo+Pj4+IGNhcGFiaWxp
-dGllcy4gQWxzbywgMS4yIGRlZmluZXMgYSBzZXBhcmF0ZSBmaWVsZCBkZWRpY2F0ZWQgdG8gZGV2
-aWNlDQo+Pj4+IGNhcGFiaWxpdGllcy4NCj4+Pj4gSW4gMi4wIHN5c2ZzLCB0aGlzIHZhbHVlcyBo
-YXZlIGJlZW4gbWl4ZWQuIFJldmVydCB0aGVtIHRvIHRoZSByaWdodA0KPj4+PiB2YWx1ZS4NCj4+
-Pj4gU2lnbmVkLW9mZi1ieTogSmF2aWVyIEdvbnrDoWxleiA8amF2aWVyQGNuZXhsYWJzLmNvbT4N
-Cj4+Pj4gLS0tDQo+Pj4+ICBkcml2ZXJzL252bWUvaG9zdC9saWdodG52bS5jIHwgMTggKysrKysr
-KysrLS0tLS0tLS0tDQo+Pj4+ICAxIGZpbGUgY2hhbmdlZCwgOSBpbnNlcnRpb25zKCspLCA5IGRl
-bGV0aW9ucygtKQ0KPj4+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9udm1lL2hvc3QvbGlnaHRudm0u
-YyBiL2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMNCj4+Pj4gaW5kZXggOTY5YmI4NzQ4NTBj
-Li41OThhYmJhNjZmNTIgMTAwNjQ0DQo+Pj4+IC0tLSBhL2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0
-bnZtLmMNCj4+Pj4gKysrIGIvZHJpdmVycy9udm1lL2hvc3QvbGlnaHRudm0uYw0KPj4+PiBAQCAt
-OTE0LDggKzkxNCw4IEBAIHN0YXRpYyBzc2l6ZV90IG52bV9kZXZfYXR0cl9zaG93KHN0cnVjdCBk
-ZXZpY2UgKmRldiwNCj4+Pj4gICAgICAgIGlmIChzdHJjbXAoYXR0ci0+bmFtZSwgInZlcnNpb24i
-KSA9PSAwKSB7DQo+Pj4+ICAgICAgICAgIHJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9TSVpF
-LCAiJXVcbiIsIGRldl9nZW8tPnZlcl9pZCk7DQo+Pj4+IC0gICAgfSBlbHNlIGlmIChzdHJjbXAo
-YXR0ci0+bmFtZSwgImNhcGFiaWxpdGllcyIpID09IDApIHsNCj4+Pj4gLSAgICAgICAgcmV0dXJu
-IHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIldVxuIiwgZGV2X2dlby0+Yy5jYXApOw0KPj4+
-PiArICAgIH0gZWxzZSBpZiAoc3RyY21wKGF0dHItPm5hbWUsICJtZWRpYV9jYXBhYmlsaXRpZXMi
-KSA9PSAwKSB7DQo+Pj4+ICsgICAgICAgIHJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9TSVpF
-LCAiJXVcbiIsIGRldl9nZW8tPmMubWNjYXApOw0KPj4+PiAgICAgIH0gZWxzZSBpZiAoc3RyY21w
-KGF0dHItPm5hbWUsICJyZWFkX3R5cCIpID09IDApIHsNCj4+Pj4gICAgICAgICAgcmV0dXJuIHNj
-bnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIldVxuIiwgZGV2X2dlby0+Yy50cmR0KTsNCj4+Pj4g
-ICAgICB9IGVsc2UgaWYgKHN0cmNtcChhdHRyLT5uYW1lLCAicmVhZF9tYXgiKSA9PSAwKSB7DQo+
-Pj4+IEBAIC05OTMsOCArOTkzLDggQEAgc3RhdGljIHNzaXplX3QgbnZtX2Rldl9hdHRyX3Nob3df
-MTIoc3RydWN0IGRldmljZSAqZGV2LA0KPj4+PiAgICAgICAgICByZXR1cm4gc2NucHJpbnRmKHBh
-Z2UsIFBBR0VfU0laRSwgIiV1XG4iLCBkZXZfZ2VvLT5jLnRiZW0pOw0KPj4+PiAgICAgIH0gZWxz
-ZSBpZiAoc3RyY21wKGF0dHItPm5hbWUsICJtdWx0aXBsYW5lX21vZGVzIikgPT0gMCkgew0KPj4+
-PiAgICAgICAgICByZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwgIjB4JTA4eFxuIiwg
-ZGV2X2dlby0+Yy5tcG9zKTsNCj4+Pj4gLSAgICB9IGVsc2UgaWYgKHN0cmNtcChhdHRyLT5uYW1l
-LCAibWVkaWFfY2FwYWJpbGl0aWVzIikgPT0gMCkgew0KPj4+PiAtICAgICAgICByZXR1cm4gc2Nu
-cHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwgIjB4JTA4eFxuIiwgZGV2X2dlby0+Yy5tY2NhcCk7DQo+
-Pj4+ICsgICAgfSBlbHNlIGlmIChzdHJjbXAoYXR0ci0+bmFtZSwgImNhcGFiaWxpdGllcyIpID09
-IDApIHsNCj4+Pj4gKyAgICAgICAgcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIw
-eCUwOHhcbiIsIGRldl9nZW8tPmMuY2FwKTsNCj4+Pj4gICAgICB9IGVsc2UgaWYgKHN0cmNtcChh
-dHRyLT5uYW1lLCAibWF4X3BoeXNfc2VjcyIpID09IDApIHsNCj4+Pj4gICAgICAgICAgcmV0dXJu
-IHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIldVxuIiwgTlZNX01BWF9WTEJBKTsNCj4+Pj4g
-ICAgICB9IGVsc2Ugew0KPj4+PiBAQCAtMTA1NSw3ICsxMDU1LDcgQEAgc3RhdGljIHNzaXplX3Qg
-bnZtX2Rldl9hdHRyX3Nob3dfMjAoc3RydWN0IGRldmljZSAqZGV2LA0KPj4+PiAgICAvKiBnZW5l
-cmFsIGF0dHJpYnV0ZXMgKi8NCj4+Pj4gIHN0YXRpYyBOVk1fREVWX0FUVFJfUk8odmVyc2lvbik7
-DQo+Pj4+IC1zdGF0aWMgTlZNX0RFVl9BVFRSX1JPKGNhcGFiaWxpdGllcyk7DQo+Pj4+ICtzdGF0
-aWMgTlZNX0RFVl9BVFRSX1JPKG1lZGlhX2NhcGFiaWxpdGllcyk7DQo+Pj4+ICAgIHN0YXRpYyBO
-Vk1fREVWX0FUVFJfUk8ocmVhZF90eXApOw0KPj4+PiAgc3RhdGljIE5WTV9ERVZfQVRUUl9STyhy
-ZWFkX21heCk7DQo+Pj4+IEBAIC0xMDgwLDEyICsxMDgwLDEyIEBAIHN0YXRpYyBOVk1fREVWX0FU
-VFJfMTJfUk8ocHJvZ19tYXgpOw0KPj4+PiAgc3RhdGljIE5WTV9ERVZfQVRUUl8xMl9STyhlcmFz
-ZV90eXApOw0KPj4+PiAgc3RhdGljIE5WTV9ERVZfQVRUUl8xMl9STyhlcmFzZV9tYXgpOw0KPj4+
-PiAgc3RhdGljIE5WTV9ERVZfQVRUUl8xMl9STyhtdWx0aXBsYW5lX21vZGVzKTsNCj4+Pj4gLXN0
-YXRpYyBOVk1fREVWX0FUVFJfMTJfUk8obWVkaWFfY2FwYWJpbGl0aWVzKTsNCj4+Pj4gK3N0YXRp
-YyBOVk1fREVWX0FUVFJfMTJfUk8oY2FwYWJpbGl0aWVzKTsNCj4+Pj4gIHN0YXRpYyBOVk1fREVW
-X0FUVFJfMTJfUk8obWF4X3BoeXNfc2Vjcyk7DQo+Pj4+ICAgIHN0YXRpYyBzdHJ1Y3QgYXR0cmli
-dXRlICpudm1fZGV2X2F0dHJzXzEyW10gPSB7DQo+Pj4+ICAgICAgJmRldl9hdHRyX3ZlcnNpb24u
-YXR0ciwNCj4+Pj4gLSAgICAmZGV2X2F0dHJfY2FwYWJpbGl0aWVzLmF0dHIsDQo+Pj4+ICsgICAg
-JmRldl9hdHRyX21lZGlhX2NhcGFiaWxpdGllcy5hdHRyLA0KPj4+PiAgICAgICAgJmRldl9hdHRy
-X3ZlbmRvcl9vcGNvZGUuYXR0ciwNCj4+Pj4gICAgICAmZGV2X2F0dHJfZGV2aWNlX21vZGUuYXR0
-ciwNCj4+Pj4gQEAgLTExMDgsNyArMTEwOCw3IEBAIHN0YXRpYyBzdHJ1Y3QgYXR0cmlidXRlICpu
-dm1fZGV2X2F0dHJzXzEyW10gPSB7DQo+Pj4+ICAgICAgJmRldl9hdHRyX2VyYXNlX3R5cC5hdHRy
-LA0KPj4+PiAgICAgICZkZXZfYXR0cl9lcmFzZV9tYXguYXR0ciwNCj4+Pj4gICAgICAmZGV2X2F0
-dHJfbXVsdGlwbGFuZV9tb2Rlcy5hdHRyLA0KPj4+PiAtICAgICZkZXZfYXR0cl9tZWRpYV9jYXBh
-YmlsaXRpZXMuYXR0ciwNCj4+Pj4gKyAgICAmZGV2X2F0dHJfY2FwYWJpbGl0aWVzLmF0dHIsDQo+
-Pj4+ICAgICAgJmRldl9hdHRyX21heF9waHlzX3NlY3MuYXR0ciwNCj4+Pj4gICAgICAgIE5VTEws
-DQo+Pj4+IEBAIC0xMTM0LDcgKzExMzQsNyBAQCBzdGF0aWMgTlZNX0RFVl9BVFRSXzIwX1JPKHJl
-c2V0X21heCk7DQo+Pj4+ICAgIHN0YXRpYyBzdHJ1Y3QgYXR0cmlidXRlICpudm1fZGV2X2F0dHJz
-XzIwW10gPSB7DQo+Pj4+ICAgICAgJmRldl9hdHRyX3ZlcnNpb24uYXR0ciwNCj4+Pj4gLSAgICAm
-ZGV2X2F0dHJfY2FwYWJpbGl0aWVzLmF0dHIsDQo+Pj4+ICsgICAgJmRldl9hdHRyX21lZGlhX2Nh
-cGFiaWxpdGllcy5hdHRyLA0KPj4+PiAgICAgICAgJmRldl9hdHRyX2dyb3Vwcy5hdHRyLA0KPj4+
-PiAgICAgICZkZXZfYXR0cl9wdW5pdHMuYXR0ciwNCj4+PiANCj4+PiBXaXRoIHRoZSBtY2NhcCBj
-aGFuZ2VzLCBpdCBzaG91bGQgbWFrZSBzZW5zZSB0byBrZWVwIHRoZSBjYXBhYmlsaXRpZXMNCj4+
-PiBhcyBpcy4NCj4+IFRoZSBjaGFuZ2UgYWRkcyBtY2NhcCwgYnV0IHN5c2ZzIHBvaW50cyB0byBj
-YXAsIHdoaWNoIGlzIHdyb25nLiBUaGlzDQo+PiBwYXRjaCBpcyBuZWVkZWQuIE90aGVyd2lzZSwg
-d2UgY2hhbmdlIHRoZSBuYW1lIG9mIG1jY2FwIHRvIGNhcCwgd2hpY2gNCj4+IGlzIF92ZXJ5XyBj
-b25mdXNpbmcgdG8gcGVvcGxlIGZhbWlsaWFyIHRvIGJvdGggc3BlY3MuIFdlIGNhbiBjaGFuZ2UN
-Cj4+IHRoZSBuYW1lIG9mIG1jY2FwIHRvIGNhcCBpbiBhIGZ1dHVyZSBzcGVjIHJldmlzaW9uLg0K
-Pj4gSmF2aWVyDQo+IA0KPiBUaGluayBvZiB0aGUgc3lzZnMgY2FwYWJpbGl0aWVzIGFzIGFuIGFi
-c3RyYWN0IHZhbHVlIHRoYXQgZGVmaW5lcyBnZW5lcmljIGNhcGFiaWxpdGllcy4gSXQgaXMgbm90
-IGRpcmVjdGx5IHRpZWQgdG8gZWl0aGVyIDEuMiBvciAyLjAuDQoNCknigJltIHRoaW5raW5nIGFi
-b3V0IHRoZSB1c2VyIGxvb2tpbmcgYXQgc3lzZnMgYW5kIGF0IHRoZSBzcGVjIGF0IHRoZSBzYW1l
-IHRpbWUgLSBJIG15c2VsZiBnZXQgY29uZnVzZWQgd2hlbiBuYW1lcyBkb27igJl0IG1hdGNoLiAN
-Cg0KQW55d2F5LCBJ4oCZbGwga2VlcCBpdCB0aGUgd2F5IGl0IHdhcyBhbmQgYWRkIGEgY29tbWVu
-dCBmb3IgY2xhcmlmaWNhdGlvbi4gV291bGQgdGhhdCB3b3JrIGZvciB5b3U/DQoNCkphdmllciA=
+On 02/22/2018 08:47 AM, Javier Gonzalez wrote:
+>> On 22 Feb 2018, at 08.28, Matias Bjørling <mb@lightnvm.io> wrote:
+>>
+>> On 02/21/2018 10:26 AM, Javier González wrote:
+>>> Both 1.2 and 2.0 specs define a field for media and controller
+>>> capabilities. Also, 1.2 defines a separate field dedicated to device
+>>> capabilities.
+>>> In 2.0 sysfs, this values have been mixed. Revert them to the right
+>>> value.
+>>> Signed-off-by: Javier González <javier@cnexlabs.com>
+>>> ---
+>>>   drivers/nvme/host/lightnvm.c | 18 +++++++++---------
+>>>   1 file changed, 9 insertions(+), 9 deletions(-)
+>>> diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+>>> index 969bb874850c..598abba66f52 100644
+>>> --- a/drivers/nvme/host/lightnvm.c
+>>> +++ b/drivers/nvme/host/lightnvm.c
+>>> @@ -914,8 +914,8 @@ static ssize_t nvm_dev_attr_show(struct device *dev,
+>>>     	if (strcmp(attr->name, "version") == 0) {
+>>>   		return scnprintf(page, PAGE_SIZE, "%u\n", dev_geo->ver_id);
+>>> -	} else if (strcmp(attr->name, "capabilities") == 0) {
+>>> -		return scnprintf(page, PAGE_SIZE, "%u\n", dev_geo->c.cap);
+>>> +	} else if (strcmp(attr->name, "media_capabilities") == 0) {
+>>> +		return scnprintf(page, PAGE_SIZE, "%u\n", dev_geo->c.mccap);
+>>>   	} else if (strcmp(attr->name, "read_typ") == 0) {
+>>>   		return scnprintf(page, PAGE_SIZE, "%u\n", dev_geo->c.trdt);
+>>>   	} else if (strcmp(attr->name, "read_max") == 0) {
+>>> @@ -993,8 +993,8 @@ static ssize_t nvm_dev_attr_show_12(struct device *dev,
+>>>   		return scnprintf(page, PAGE_SIZE, "%u\n", dev_geo->c.tbem);
+>>>   	} else if (strcmp(attr->name, "multiplane_modes") == 0) {
+>>>   		return scnprintf(page, PAGE_SIZE, "0x%08x\n", dev_geo->c.mpos);
+>>> -	} else if (strcmp(attr->name, "media_capabilities") == 0) {
+>>> -		return scnprintf(page, PAGE_SIZE, "0x%08x\n", dev_geo->c.mccap);
+>>> +	} else if (strcmp(attr->name, "capabilities") == 0) {
+>>> +		return scnprintf(page, PAGE_SIZE, "0x%08x\n", dev_geo->c.cap);
+>>>   	} else if (strcmp(attr->name, "max_phys_secs") == 0) {
+>>>   		return scnprintf(page, PAGE_SIZE, "%u\n", NVM_MAX_VLBA);
+>>>   	} else {
+>>> @@ -1055,7 +1055,7 @@ static ssize_t nvm_dev_attr_show_20(struct device *dev,
+>>>     /* general attributes */
+>>>   static NVM_DEV_ATTR_RO(version);
+>>> -static NVM_DEV_ATTR_RO(capabilities);
+>>> +static NVM_DEV_ATTR_RO(media_capabilities);
+>>>     static NVM_DEV_ATTR_RO(read_typ);
+>>>   static NVM_DEV_ATTR_RO(read_max);
+>>> @@ -1080,12 +1080,12 @@ static NVM_DEV_ATTR_12_RO(prog_max);
+>>>   static NVM_DEV_ATTR_12_RO(erase_typ);
+>>>   static NVM_DEV_ATTR_12_RO(erase_max);
+>>>   static NVM_DEV_ATTR_12_RO(multiplane_modes);
+>>> -static NVM_DEV_ATTR_12_RO(media_capabilities);
+>>> +static NVM_DEV_ATTR_12_RO(capabilities);
+>>>   static NVM_DEV_ATTR_12_RO(max_phys_secs);
+>>>     static struct attribute *nvm_dev_attrs_12[] = {
+>>>   	&dev_attr_version.attr,
+>>> -	&dev_attr_capabilities.attr,
+>>> +	&dev_attr_media_capabilities.attr,
+>>>     	&dev_attr_vendor_opcode.attr,
+>>>   	&dev_attr_device_mode.attr,
+>>> @@ -1108,7 +1108,7 @@ static struct attribute *nvm_dev_attrs_12[] = {
+>>>   	&dev_attr_erase_typ.attr,
+>>>   	&dev_attr_erase_max.attr,
+>>>   	&dev_attr_multiplane_modes.attr,
+>>> -	&dev_attr_media_capabilities.attr,
+>>> +	&dev_attr_capabilities.attr,
+>>>   	&dev_attr_max_phys_secs.attr,
+>>>     	NULL,
+>>> @@ -1134,7 +1134,7 @@ static NVM_DEV_ATTR_20_RO(reset_max);
+>>>     static struct attribute *nvm_dev_attrs_20[] = {
+>>>   	&dev_attr_version.attr,
+>>> -	&dev_attr_capabilities.attr,
+>>> +	&dev_attr_media_capabilities.attr,
+>>>     	&dev_attr_groups.attr,
+>>>   	&dev_attr_punits.attr,
+>>
+>> With the mccap changes, it should make sense to keep the capabilities
+>> as is.
+> 
+> The change adds mccap, but sysfs points to cap, which is wrong. This
+> patch is needed. Otherwise, we change the name of mccap to cap, which
+> is _very_ confusing to people familiar to both specs. We can change
+> the name of mccap to cap in a future spec revision.
+> 
+> Javier
+> 
+
+Think of the sysfs capabilities as an abstract value that defines 
+generic capabilities. It is not directly tied to either 1.2 or 2.0.
