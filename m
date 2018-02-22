@@ -1,138 +1,49 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f65.google.com ([209.85.160.65]:37832 "EHLO
-        mail-pl0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754320AbeBGTmH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Feb 2018 14:42:07 -0500
-Received: by mail-pl0-f65.google.com with SMTP id ay8-v6so669783plb.4
-        for <linux-block@vger.kernel.org>; Wed, 07 Feb 2018 11:42:07 -0800 (PST)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Tang Junhui <tang.junhui@zte.com.cn>
-Subject: [PATCH 8/8] bcache: fix for data collapse after re-attaching an attached device
-Date: Wed,  7 Feb 2018 11:41:46 -0800
-Message-Id: <20180207194146.5095-9-mlyle@lyle.org>
-In-Reply-To: <20180207194146.5095-1-mlyle@lyle.org>
-References: <20180207194146.5095-1-mlyle@lyle.org>
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:38292 "EHLO
+        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751657AbeBVH0v (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Feb 2018 02:26:51 -0500
+Received: by mail-lf0-f67.google.com with SMTP id g72so5975625lfg.5
+        for <linux-block@vger.kernel.org>; Wed, 21 Feb 2018 23:26:51 -0800 (PST)
+Subject: Re: [PATCH 02/20] lightnvm: add controller capabilities to 2.0
+To: =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <jg@lightnvm.io>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@cnexlabs.com>
+References: <1519205218-26994-1-git-send-email-javier@cnexlabs.com>
+ <1519205218-26994-3-git-send-email-javier@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <bd9509cd-dc47-e0af-2ee1-027eb22af189@lightnvm.io>
+Date: Thu, 22 Feb 2018 08:26:49 +0100
+MIME-Version: 1.0
+In-Reply-To: <1519205218-26994-3-git-send-email-javier@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+On 02/21/2018 10:26 AM, Javier González wrote:
+> Assign missing mccap value on 2.0 path
+> 
+> Signed-off-by: Javier González <javier@cnexlabs.com>
+> ---
+>   drivers/nvme/host/lightnvm.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+> index c81e64cc20d7..969bb874850c 100644
+> --- a/drivers/nvme/host/lightnvm.c
+> +++ b/drivers/nvme/host/lightnvm.c
+> @@ -392,6 +392,8 @@ static int nvme_nvm_setup_20(struct nvme_nvm_id20 *id,
+>   	dev_geo->c.ws_opt = le32_to_cpu(id->ws_opt);
+>   	dev_geo->c.mw_cunits = le32_to_cpu(id->mw_cunits);
+>   
+> +	dev_geo->c.mccap = le32_to_cpu(id->mccap);
+> +
+>   	dev_geo->c.trdt = le32_to_cpu(id->trdt);
+>   	dev_geo->c.trdm = le32_to_cpu(id->trdm);
+>   	dev_geo->c.tprt = le32_to_cpu(id->twrt);
+> 
 
-back-end device sdm has already attached a cache_set with ID
-f67ebe1f-f8bc-4d73-bfe5-9dc88607f119, then try to attach with
-another cache set, and it returns with an error:
-[root]# cd /sys/block/sdm/bcache
-[root]# echo 5ccd0a63-148e-48b8-afa2-aca9cbd6279f > attach
--bash: echo: write error: Invalid argument
-
-After that, execute a command to modify the label of bcache
-device:
-[root]# echo data_disk1 > label
-
-Then we reboot the system, when the system power on, the back-end
-device can not attach to cache_set, a messages show in the log:
-Feb  5 12:05:52 ceph152 kernel: [922385.508498] bcache:
-bch_cached_dev_attach() couldn't find uuid for sdm in set
-
-In sysfs_attach(), dc->sb.set_uuid was assigned to the value
-which input through sysfs, no matter whether it is success
-or not in bch_cached_dev_attach(). For example, If the back-end
-device has already attached to an cache set, bch_cached_dev_attach()
-would fail, but dc->sb.set_uuid was changed. Then modify the
-label of bcache device, it will call bch_write_bdev_super(),
-which would write the dc->sb.set_uuid to the super block, so we
-record a wrong cache set ID in the super block, after the system
-reboot, the cache set couldn't find the uuid of the back-end
-device, so the bcache device couldn't exist and use any more.
-
-In this patch, we don't assigned cache set ID to dc->sb.set_uuid
-in sysfs_attach() directly, but input it into bch_cached_dev_attach(),
-and assigned dc->sb.set_uuid to the cache set ID after the back-end
-device attached to the cache set successful.
-
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/bcache.h |  2 +-
- drivers/md/bcache/super.c  | 10 ++++++----
- drivers/md/bcache/sysfs.c  |  6 ++++--
- 3 files changed, 11 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index b8c2e1bef1f1..12e5197f186c 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -924,7 +924,7 @@ void bcache_write_super(struct cache_set *);
- 
- int bch_flash_dev_create(struct cache_set *c, uint64_t size);
- 
--int bch_cached_dev_attach(struct cached_dev *, struct cache_set *);
-+int bch_cached_dev_attach(struct cached_dev *, struct cache_set *, uint8_t *);
- void bch_cached_dev_detach(struct cached_dev *);
- void bch_cached_dev_run(struct cached_dev *);
- void bcache_device_stop(struct bcache_device *);
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index a2ad37a8afc0..312895788036 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -957,7 +957,8 @@ void bch_cached_dev_detach(struct cached_dev *dc)
- 	cached_dev_put(dc);
- }
- 
--int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c)
-+int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
-+			  uint8_t *set_uuid)
- {
- 	uint32_t rtime = cpu_to_le32(get_seconds());
- 	struct uuid_entry *u;
-@@ -965,7 +966,8 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c)
- 
- 	bdevname(dc->bdev, buf);
- 
--	if (memcmp(dc->sb.set_uuid, c->sb.set_uuid, 16))
-+	if ((set_uuid && memcmp(set_uuid, c->sb.set_uuid, 16)) ||
-+	    (!set_uuid && memcmp(dc->sb.set_uuid, c->sb.set_uuid, 16)))
- 		return -ENOENT;
- 
- 	if (dc->disk.c) {
-@@ -1194,7 +1196,7 @@ static void register_bdev(struct cache_sb *sb, struct page *sb_page,
- 
- 	list_add(&dc->list, &uncached_devices);
- 	list_for_each_entry(c, &bch_cache_sets, list)
--		bch_cached_dev_attach(dc, c);
-+		bch_cached_dev_attach(dc, c, NULL);
- 
- 	if (BDEV_STATE(&dc->sb) == BDEV_STATE_NONE ||
- 	    BDEV_STATE(&dc->sb) == BDEV_STATE_STALE)
-@@ -1716,7 +1718,7 @@ static void run_cache_set(struct cache_set *c)
- 	bcache_write_super(c);
- 
- 	list_for_each_entry_safe(dc, t, &uncached_devices, list)
--		bch_cached_dev_attach(dc, c);
-+		bch_cached_dev_attach(dc, c, NULL);
- 
- 	flash_devs_run(c);
- 
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index a7552f509f50..78cd7bd50fdd 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -272,12 +272,14 @@ STORE(__cached_dev)
- 	}
- 
- 	if (attr == &sysfs_attach) {
--		if (bch_parse_uuid(buf, dc->sb.set_uuid) < 16)
-+		uint8_t		set_uuid[16];
-+
-+		if (bch_parse_uuid(buf, set_uuid) < 16)
- 			return -EINVAL;
- 
- 		v = -ENOENT;
- 		list_for_each_entry(c, &bch_cache_sets, list) {
--			v = bch_cached_dev_attach(dc, c);
-+			v = bch_cached_dev_attach(dc, c, set_uuid);
- 			if (!v)
- 				return size;
- 		}
--- 
-2.14.1
+The mccap field between 1.2 and 2.0 is orthogonal. They represent two 
+different capabilities fields. The mccap has to be interpreted if used.
