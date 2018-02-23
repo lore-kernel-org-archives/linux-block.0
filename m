@@ -1,33 +1,33 @@
-Return-Path: <axboe@kernel.dk>
-Date: Sat, 24 Feb 2018 15:56:20 -0700
-From: Jens Axboe <axboe@kernel.dk>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>
+Cc: linux-block@vger.kernel.org,
 	Paolo Valente <paolo.valente@linaro.org>,
-	Omar Sandoval <osandov@fb.com>, oleksandr@natalenko.name,
-	holger@applied-asynchrony.com
-Subject: Re: [PATCH 0/2] blk-mq: kyber: fix domain token leak during requeue
-Message-ID: <20180224225617.GA6452@kernel.dk>
-References: <20180223153657.17376-1-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180223153657.17376-1-ming.lei@redhat.com>
+	Omar Sandoval <osandov@fb.com>,
+	oleksandr@natalenko.name,
+	holger@applied-asynchrony.com,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 0/2] blk-mq: kyber: fix domain token leak during requeue
+Date: Fri, 23 Feb 2018 23:36:55 +0800
+Message-Id: <20180223153657.17376-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Feb 23 2018, Ming Lei wrote:
-> Hi,
-> 
-> This two patch fixes domain token leak on kyber scheduler, and actually
-> fixes one IO hang issue.
-> 
-> Thanks,
-> 
-> Ming Lei (2):
->   blk-mq: don't call io sched's .requeue_request when requeueing rq to
->     ->dispatch
->   block: kyber: fix domain token leak during requeue
+Hi,
 
-Applied, thanks.
+This two patch fixes domain token leak on kyber scheduler, and actually
+fixes one IO hang issue.
+
+Thanks,
+
+Ming Lei (2):
+  blk-mq: don't call io sched's .requeue_request when requeueing rq to
+    ->dispatch
+  block: kyber: fix domain token leak during requeue
+
+ block/blk-mq.c        | 4 +++-
+ block/kyber-iosched.c | 1 +
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
 -- 
-Jens Axboe
+2.9.5
