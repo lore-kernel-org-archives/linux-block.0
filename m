@@ -1,28 +1,24 @@
-Return-Path: <jiangqi903@gmail.com>
-Return-Path: <jiangqi903@gmail.com>
-Subject: Re: [PATCH v4 2/6] md: Delete gendisk before cleaning up the request
- queue
-To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Shaohua Li <shli@kernel.org>
+Return-Path: <jthumshirn@suse.de>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>,  linux-block@vger.kernel.org,  Christoph Hellwig <hch@lst.de>,  Shaohua Li <shli@kernel.org>
+Subject: Re: [PATCH v4 2/6] md: Delete gendisk before cleaning up the request queue
 References: <20180223010808.25765-1-bart.vanassche@wdc.com>
- <20180223010808.25765-3-bart.vanassche@wdc.com>
-From: Joseph Qi <jiangqi903@gmail.com>
-Message-ID: <4b0e5408-de2f-54fd-d41e-5c2186d88bd3@gmail.com>
-Date: Fri, 23 Feb 2018 17:50:46 +0800
+	<20180223010808.25765-3-bart.vanassche@wdc.com>
+Date: Fri, 23 Feb 2018 09:22:57 +0100
+In-Reply-To: <20180223010808.25765-3-bart.vanassche@wdc.com> (Bart Van
+	Assche's message of "Thu, 22 Feb 2018 17:08:04 -0800")
+Message-ID: <mqdmv00dsim.fsf@linux-x5ow.site>
 MIME-Version: 1.0
-In-Reply-To: <20180223010808.25765-3-bart.vanassche@wdc.com>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-
-
-On 18/2/23 09:08, Bart Van Assche wrote:
-> Remove the disk, partition and bdi sysfs attributes before cleaning up
-> the request queue associated with the disk.
-> 
-> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-> Cc: Shaohua Li <shli@kernel.org>
-
-Looks good.
-Reviewed-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+--=20
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
+GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N=C3=BCrnberg)
+Key fingerprint =3D EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
