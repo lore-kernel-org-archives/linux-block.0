@@ -1,43 +1,76 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:59230 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751338AbeBWQDc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Feb 2018 11:03:32 -0500
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "jaco@uls.co.za" <jaco@uls.co.za>
-CC: "pieterk@uls.co.za" <pieterk@uls.co.za>
+Received: from othala.iewc.co.za ([154.73.34.12]:54072 "EHLO othala.uls.co.za"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751015AbeBWJ7B (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Feb 2018 04:59:01 -0500
 Subject: Re: disk-io lockup in 4.14.13 kernel
-Date: Fri, 23 Feb 2018 16:03:30 +0000
-Message-ID: <1519401809.2904.4.camel@wdc.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>,
+        linux-block@vger.kernel.org
+Cc: Pieter Kruger <pieterk@uls.co.za>
 References: <16bae006-371f-1eea-56b6-8668249d870b@uls.co.za>
-         <828103f7-7550-16a3-d482-8953adc5a234@wdc.com>
-         <1071d2e4-f56f-ad5b-289c-c7fada6a166e@uls.co.za>
-In-Reply-To: <1071d2e4-f56f-ad5b-289c-c7fada6a166e@uls.co.za>
-Content-Type: text/plain; charset="utf-8"
+ <828103f7-7550-16a3-d482-8953adc5a234@wdc.com>
+From: Jaco Kroon <jaco@uls.co.za>
+Message-ID: <1071d2e4-f56f-ad5b-289c-c7fada6a166e@uls.co.za>
+Date: Fri, 23 Feb 2018 11:58:52 +0200
 MIME-Version: 1.0
+In-Reply-To: <828103f7-7550-16a3-d482-8953adc5a234@wdc.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gRnJpLCAyMDE4LTAyLTIzIGF0IDExOjU4ICswMjAwLCBKYWNvIEtyb29uIHdyb3RlOg0KPiBP
-biAyMi8wMi8yMDE4IDE4OjQ2LCBCYXJ0IFZhbiBBc3NjaGUgd3JvdGU6DQo+ID4gKGNkIC9zeXMv
-a2VybmVsL2RlYnVnL2Jsb2NrICYmIGZpbmQgLiAtdHlwZSBmIC1leGVjIGdyZXAgLWFIIC4ge30g
-XDspDQo+IA0KPiBJIGRvbid0IGhhdmUgYSAvc3lzL2tlcm5lbC9kZWJ1ZyBmb2xkZXIgLSBJJ3Zl
-IGVuYWJsZWQgQ09ORklHX0RFQlVHX0ZTDQo+IGFuZCBCTEtfREVCVUdfRlMsIHdpbGwgcmVib290
-IGF0IHRoZSBmaXJzdCBvcHBvcnR1bml0eS4gIEFzIGEgZ2VuZXJhbA0KPiBydWxlIC0gaXMgdGhl
-cmUgYWRkaXRpb25hbCBvdmVyaGVhZCB0byBoYXZpbmcgZGVidWdmcyBlbmFibGVkPyAgQW55DQo+
-IG90aGVyIHJpc2tzIHRoYXQgSSBzaG91bGQgYmUgYXdhcmUgb2Y/ICBJbiBlc3NlbmNlLCBhcmUg
-dGhlcmUgYW55DQo+IGRpc2FkdmFudGFnZXMgdG8ganVzdCBlbmFibGluZyBERUJVR19GUyBhcyBh
-IGdlbmVyYWwgcnVsZT8gIEkgZGlkIG5vdGUNCj4gdGhhdCBhIGZldyBleHRyYSBERUJVRyBvcHRp
-b25zIHBvcCB1cCBmb3Igb3RoZXIgbW9kdWxlcyAuLi4gc28gbXkgZ3V0IGlzDQo+IHRvd2FyZHMg
-bGVhdmluZyB0aGlzIGRpc2FibGVkIGFzIGEgZ2VuZXJhbCBydWxlIGFuZCBlbmFibGluZyB3aGVu
-IG5lZWRlZC4NCg0KSGVsbG8gSmFjbywNCg0KVGhlIG9ubHkgZGlzYWR2YW50YWdlcyBvZiBlbmFi
-bGluZyBkZWJ1Z2ZzIHRoYXQgSSBrbm93IG9mIGFyZToNCi0gVGhlIGFkZGl0aW9uYWwgbWVtb3J5
-IHJlcXVpcmVkIGJ5IGRlYnVnZnMgKHByb2JhYmx5IG5vdCB0aGF0IG11Y2gpLg0KLSBBIHNlY3Vy
-aXR5IHJpc2sgaWYgbm90IGFsbCB1c2VycyB3aG8gaGF2ZSBhbiBhY2NvdW50IG9uIHRoZSBzeXN0
-ZW0gYXJlIGZ1bGx5DQogIHRydXN0ZWQuIFNlZSBlLmcuIGh0dHBzOi8vYnVncy5kZWJpYW4ub3Jn
-L2NnaS1iaW4vYnVncmVwb3J0LmNnaT9idWc9NjgxNDE4Lg0KDQpFbmFibGluZyBkZWJ1Z2ZzIGRv
-ZXNuJ3QgY2F1c2UgYW55IHJ1bnRpbWUgb3ZlcmhlYWQgaW4gdGhlIGhvdCBwYXRoIG9mIHRoZQ0K
-YmxvY2sgbGF5ZXIgaWYgbm8gc29mdHdhcmUgYWNjZXNzZXMgdGhlIGRlYnVnZnMgYXR0cmlidXRl
-cy4NCg0KQmFydC4=
+Hi Bart,
+
+Thank you for your response.
+
+On 22/02/2018 18:46, Bart Van Assche wrote:
+> On 02/22/18 02:58, Jaco Kroon wrote:
+>> We've been seeing sporadic IO lockups on recent kernels.
+>
+> Are you using the legacy I/O stack or blk-mq? If you are not yet using
+> blk-mq, can you switch to blk-mq + scsi-mq + dm-mq? If the lockup is
+> reproducible with blk-mq, can you share the output of the following
+> command:
+crowsnest ~ # zgrep MQ /proc/config.gz
+
+CONFIG_SCSI_MQ_DEFAULT=y
+# CONFIG_DM_MQ_DEFAULT is not set
+
+... oi, so that's a very valid question.
+
+blk-mq is thus off by default, I've now enabled it on the "live" system
+with "echo 1 > /sys/module/dm_mod/parameters/use_blk_mq".
+
+I've also modified the kernel config to set CONFIG_DM_MQ_DEFAULT (I know
+I can just set this on cmdline too).
+
+The only immediately visible effect is that I seem to be more
+consistently get >300MB/s (and more frequently >400MB) off the array in
+terms of read speed, where normally I'd expect 200MB consistent with
+spikes just over 300MB and very infrequently over 400MB.  This is a very
+simple spot check with iotop over approximately a minute.
+
+I am seeing I/O errors in dmesg from time to time, this to me hints that
+potentially it may be something related to some error path that's
+causing problems.
+
+Just so we're clear, we're seeing this happen approximately once a
+month, so if switching on dm_mod.use_blk_mq solves it then I won't
+really know beyond a shadow of a doubt, and the only way of "knowing" is
+if we can get to an uptime of three months or so ...
+
+>
+> (cd /sys/kernel/debug/block && find . -type f -exec grep -aH . {} \;)
+I don't have a /sys/kernel/debug folder - I've enabled CONFIG_DEBUG_FS
+and BLK_DEBUG_FS, will reboot at the first opportunity.  As a general
+rule - is there additional overhead to having debugfs enabled?  Any
+other risks that I should be aware of?  In essence, are there any
+disadvantages to just enabling DEBUG_FS as a general rule?  I did note
+that a few extra DEBUG options pop up for other modules ... so my gut is
+towards leaving this disabled as a general rule and enabling when needed.
+
+>
+> Thanks,
+Thank you!
+
+Kind Regards,
+Jaco
