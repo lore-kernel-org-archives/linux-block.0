@@ -1,44 +1,27 @@
-Return-Path: <prvs=590d2a92c=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	"Nicholas A . Bellinger" <nab@linux-iscsi.org>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 08/11] target/tcm_loop: Use blk_queue_flag_set()
-Date: Wed, 28 Feb 2018 11:28:20 -0800
-Message-Id: <20180228192823.5191-9-bart.vanassche@wdc.com>
-In-Reply-To: <20180228192823.5191-1-bart.vanassche@wdc.com>
-References: <20180228192823.5191-1-bart.vanassche@wdc.com>
+Return-Path: <prvs=585cc836a=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "jthumshirn@suse.de" <jthumshirn@suse.de>
+CC: "hch@lst.de" <hch@lst.de>, "ulf.hansson@linaro.org"
+	<ulf.hansson@linaro.org>, "keescook@chromium.org" <keescook@chromium.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"philipp.reisner@linbit.com" <philipp.reisner@linbit.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "joseph.qi@linux.alibaba.com"
+	<joseph.qi@linux.alibaba.com>
+Subject: Re: [PATCH v4 4/6] block: Add a third argument to
+ blk_alloc_queue_node()
+Date: Fri, 23 Feb 2018 16:07:26 +0000
+Message-ID: <1519402043.2904.5.camel@wdc.com>
+References: <20180223010808.25765-1-bart.vanassche@wdc.com>
+	 <20180223010808.25765-5-bart.vanassche@wdc.com>
+	 <mqdbmggdscz.fsf@linux-x5ow.site>
+In-Reply-To: <mqdbmggdscz.fsf@linux-x5ow.site>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Use blk_queue_flag_set() instead of open-coding this function.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Nicholas A. Bellinger <nab@linux-iscsi.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Ming Lei <ming.lei@redhat.com>
----
- drivers/target/loopback/tcm_loop.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/target/loopback/tcm_loop.c b/drivers/target/loopback/tcm_loop.c
-index 9cd4ffe76c07..60d5b918c4ac 100644
---- a/drivers/target/loopback/tcm_loop.c
-+++ b/drivers/target/loopback/tcm_loop.c
-@@ -309,7 +309,7 @@ static int tcm_loop_target_reset(struct scsi_cmnd *sc)
- 
- static int tcm_loop_slave_alloc(struct scsi_device *sd)
- {
--	set_bit(QUEUE_FLAG_BIDI, &sd->request_queue->queue_flags);
-+	blk_queue_flag_set(QUEUE_FLAG_BIDI, sd->request_queue);
- 	return 0;
- }
- 
--- 
-2.16.2
+T24gRnJpLCAyMDE4LTAyLTIzIGF0IDA5OjI2ICswMTAwLCBKb2hhbm5lcyBUaHVtc2hpcm4gd3Jv
+dGU6DQo+IGhvdyBhYm91dCAiYmxvY2s6IEFkZCAnbG9jaycgYXMgdGhpcmQgYXJndW1lbnQgdG8N
+Cj4gYmxrX2FsbG9jX3F1ZXVlX25vZGUoKSI/DQo+IA0KPiBTbyBvbmUgYWN0dWFsbHkgc2VlcyBl
+YXJseSBlbm91Z2ggd2hhdCB0aGUgdGhyaXJkIGFyZ3VtZW50IHdpbGwgYmU/DQoNCkhlbGxvIEpv
+aGFubmVzLA0KDQpJZiBJIGhhdmUgdG8gcmVwb3N0IHRoaXMgcGF0Y2ggc2VyaWVzIEkgd2lsbCBt
+YWtlIHRoYXQgY2hhbmdlLg0KDQpUaGFua3MgZm9yIHRoZSByZXZpZXcuDQoNCkJhcnQuDQoNCg0K
