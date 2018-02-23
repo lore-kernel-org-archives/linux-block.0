@@ -1,83 +1,47 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:35417 "EHLO
-        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753299AbeBUJ1R (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Feb 2018 04:27:17 -0500
-Received: by mail-wr0-f196.google.com with SMTP id l43so2452161wrc.2
-        for <linux-block@vger.kernel.org>; Wed, 21 Feb 2018 01:27:16 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 06/20] lightnvm: add shorten OCSSD version in geo
-Date: Wed, 21 Feb 2018 10:26:44 +0100
-Message-Id: <1519205218-26994-7-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1519205218-26994-1-git-send-email-javier@cnexlabs.com>
-References: <1519205218-26994-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <jiangqi903@gmail.com>
+Return-Path: <jiangqi903@gmail.com>
+Subject: Re: [PATCH v4 6/6] block: Fix a race between request queue removal
+ and the block cgroup controller
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Jan Kara <jack@suse.com>,
+ "joseph.qi@linux.alibaba.com" <joseph.qi@linux.alibaba.com>
+References: <20180223010808.25765-1-bart.vanassche@wdc.com>
+ <20180223010808.25765-7-bart.vanassche@wdc.com>
+From: Joseph Qi <jiangqi903@gmail.com>
+Message-ID: <4fb04428-7de9-3454-3002-83a2c805083e@gmail.com>
+Date: Fri, 23 Feb 2018 17:54:42 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180223010808.25765-7-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Create a shorten version to use in the generic geometry.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/nvme/host/lightnvm.c | 6 ++++++
- include/linux/lightnvm.h     | 8 ++++++++
- 2 files changed, 14 insertions(+)
 
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index f22331e61cef..bd97672e0b4f 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -299,6 +299,9 @@ static int nvme_nvm_setup_12(struct nvme_nvm_id12 *id,
- 	dev_geo->major_ver_id = id->ver_id;
- 	dev_geo->minor_ver_id = 2;
- 
-+	/* Set compacted version for upper layers */
-+	dev_geo->c.version = NVM_OCSSD_SPEC_12;
-+
- 	dev_geo->num_ch = src->num_ch;
- 	dev_geo->num_lun = src->num_lun;
- 	dev_geo->all_luns = dev_geo->num_ch * dev_geo->num_lun;
-@@ -381,6 +384,9 @@ static int nvme_nvm_setup_20(struct nvme_nvm_id20 *id,
- 	dev_geo->major_ver_id = id->mjr;
- 	dev_geo->minor_ver_id = id->mnr;
- 
-+	/* Set compacted version for upper layers */
-+	dev_geo->c.version = NVM_OCSSD_SPEC_20;
-+
- 	if (!(dev_geo->major_ver_id == 2 && dev_geo->minor_ver_id == 0)) {
- 		pr_err("nvm: OCSSD version not supported (v%d.%d)\n",
- 				dev_geo->major_ver_id, dev_geo->minor_ver_id);
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 28d429e0a1c9..02f1fd617781 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -23,6 +23,11 @@ enum {
- #define NVM_LUN_BITS (8)
- #define NVM_CH_BITS  (7)
- 
-+enum {
-+	NVM_OCSSD_SPEC_12 = 12,
-+	NVM_OCSSD_SPEC_20 = 20,
-+};
-+
- struct ppa_addr {
- 	/* Generic structure for all addresses */
- 	union {
-@@ -197,6 +202,9 @@ struct nvm_addr_format {
- 
- /* Device common geometry */
- struct nvm_common_geo {
-+	/* kernel short version */
-+	u8	version;
-+
- 	/* chunk geometry */
- 	u32	num_chk;	/* chunks per lun */
- 	u32	clba;		/* sectors per chunk */
--- 
-2.7.4
+On 18/2/23 09:08, Bart Van Assche wrote:
+> Avoid that the following race can occur:
+> 
+> blk_cleanup_queue()               blkcg_print_blkgs()
+>   spin_lock_irq(lock) (1)           spin_lock_irq(blkg->q->queue_lock) (2,5)
+>     q->queue_lock = &q->__queue_lock (3)
+>   spin_unlock_irq(lock) (4)
+>                                     spin_unlock_irq(blkg->q->queue_lock) (6)
+> 
+> (1) take driver lock;
+> (2) busy loop for driver lock;
+> (3) override driver lock with internal lock;
+> (4) unlock driver lock;
+> (5) can take driver lock now;
+> (6) but unlock internal lock.
+> 
+> This change is safe because only the SCSI core and the NVME core keep
+> a reference on a request queue after having called blk_cleanup_queue().
+> Neither driver accesses any of the removed data structures between its
+> blk_cleanup_queue() and blk_put_queue() calls.
+> 
+> Reported-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Jan Kara <jack@suse.com>
+
+Looks good.
+Reviewed-by: Joseph Qi <joseph.qi@linux.alibaba.com>
