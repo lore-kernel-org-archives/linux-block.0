@@ -1,33 +1,31 @@
-Return-Path: <jiangqi903@gmail.com>
-Return-Path: <jiangqi903@gmail.com>
-Subject: Re: [PATCH v4 4/6] block: Add a third argument to
- blk_alloc_queue_node()
-To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Joseph Qi <joseph.qi@linux.alibaba.com>,
- Philipp Reisner <philipp.reisner@linbit.com>,
- Ulf Hansson <ulf.hansson@linaro.org>, Kees Cook <keescook@chromium.org>
+Return-Path: <jthumshirn@suse.de>
+From: Johannes Thumshirn <jthumshirn@suse.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>,  linux-block@vger.kernel.org,  Christoph Hellwig <hch@lst.de>,  Joseph Qi <joseph.qi@linux.alibaba.com>,  Philipp Reisner <philipp.reisner@linbit.com>,  Ulf Hansson <ulf.hansson@linaro.org>,  Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH v4 4/6] block: Add a third argument to blk_alloc_queue_node()
 References: <20180223010808.25765-1-bart.vanassche@wdc.com>
- <20180223010808.25765-5-bart.vanassche@wdc.com>
-From: Joseph Qi <jiangqi903@gmail.com>
-Message-ID: <49516dbe-3002-ef15-e532-22a8ce617b12@gmail.com>
-Date: Fri, 23 Feb 2018 17:48:26 +0800
+	<20180223010808.25765-5-bart.vanassche@wdc.com>
+Date: Fri, 23 Feb 2018 09:26:20 +0100
+In-Reply-To: <20180223010808.25765-5-bart.vanassche@wdc.com> (Bart Van
+	Assche's message of "Thu, 22 Feb 2018 17:08:06 -0800")
+Message-ID: <mqdbmggdscz.fsf@linux-x5ow.site>
 MIME-Version: 1.0
-In-Reply-To: <20180223010808.25765-5-bart.vanassche@wdc.com>
 Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
+Hi Bart,
 
+how about "block: Add 'lock' as third argument to
+blk_alloc_queue_node()"?
 
-On 18/2/23 09:08, Bart Van Assche wrote:
-> This patch does not change any functionality.
-> 
-> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
-> Cc: Philipp Reisner <philipp.reisner@linbit.com>
-> Cc: Ulf Hansson <ulf.hansson@linaro.org>
-> Cc: Kees Cook <keescook@chromium.org>
+So one actually sees early enough what the thrird argument will be?
 
-Looks good.
-Reviewed-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+Thanks,
+        Johannes
+--=20
+Johannes Thumshirn                                          Storage
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
+GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N=C3=BCrnberg)
+Key fingerprint =3D EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
