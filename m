@@ -1,65 +1,174 @@
-Return-Path: <jiangqi903@gmail.com>
-Return-Path: <jiangqi903@gmail.com>
-Subject: Re: [PATCH v4 5/6] block: Fix a race between the cgroup code and
- request queue initialization
-To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:61504 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751317AbeBWBIK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Feb 2018 20:08:10 -0500
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Joseph Qi <joseph.qi@linux.alibaba.com>,
- Philipp Reisner <philipp.reisner@linbit.com>,
- Ulf Hansson <ulf.hansson@linaro.org>, Kees Cook <keescook@chromium.org>
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Kees Cook <keescook@chromium.org>
+Subject: [PATCH v4 5/6] block: Fix a race between the cgroup code and request queue initialization
+Date: Thu, 22 Feb 2018 17:08:07 -0800
+Message-Id: <20180223010808.25765-6-bart.vanassche@wdc.com>
+In-Reply-To: <20180223010808.25765-1-bart.vanassche@wdc.com>
 References: <20180223010808.25765-1-bart.vanassche@wdc.com>
- <20180223010808.25765-6-bart.vanassche@wdc.com>
-From: Joseph Qi <jiangqi903@gmail.com>
-Message-ID: <33eefa94-b0fc-9ac4-6b16-39c3ad8fc293@gmail.com>
-Date: Fri, 23 Feb 2018 17:52:23 +0800
-MIME-Version: 1.0
-In-Reply-To: <20180223010808.25765-6-bart.vanassche@wdc.com>
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
+Initialize the request queue lock earlier such that the following
+race can no longer occur:
 
+blk_init_queue_node()             blkcg_print_blkgs()
+  blk_alloc_queue_node (1)
+    q->queue_lock = &q->__queue_lock (2)
+    blkcg_init_queue(q) (3)
+                                    spin_lock_irq(blkg->q->queue_lock) (4)
+  q->queue_lock = lock (5)
+                                    spin_unlock_irq(blkg->q->queue_lock) (6)
 
-On 18/2/23 09:08, Bart Van Assche wrote:
-> Initialize the request queue lock earlier such that the following
-> race can no longer occur:
-> 
-> blk_init_queue_node()             blkcg_print_blkgs()
->   blk_alloc_queue_node (1)
->     q->queue_lock = &q->__queue_lock (2)
->     blkcg_init_queue(q) (3)
->                                     spin_lock_irq(blkg->q->queue_lock) (4)
->   q->queue_lock = lock (5)
->                                     spin_unlock_irq(blkg->q->queue_lock) (6)
-> 
-> (1) allocate an uninitialized queue;
-> (2) initialize queue_lock to its default internal lock;
-> (3) initialize blkcg part of request queue, which will create blkg and
->     then insert it to blkg_list;
-> (4) traverse blkg_list and find the created blkg, and then take its
->     queue lock, here it is the default *internal lock*;
-> (5) *race window*, now queue_lock is overridden with *driver specified
->     lock*;
-> (6) now unlock *driver specified lock*, not the locked *internal lock*,
->     unlock balance breaks.
-> 
-> The changes in this patch are as follows:
-> - Move the .queue_lock initialization from blk_init_queue_node() into
->   blk_alloc_queue_node().
-> - Only override the .queue_lock pointer for legacy queues because it
->   is not useful for blk-mq queues to override this pointer.
-> - For all all block drivers that initialize .queue_lock explicitly,
->   change the blk_alloc_queue() call in the driver into a
->   blk_alloc_queue_node() call and remove the explicit .queue_lock
->   initialization. Additionally, initialize the spin lock that will
->   be used as queue lock earlier if necessary.
-> 
-> Reported-by: Joseph Qi <joseph.qi@linux.alibaba.com>
-> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
-> Cc: Philipp Reisner <philipp.reisner@linbit.com>
-> Cc: Ulf Hansson <ulf.hansson@linaro.org>
-> Cc: Kees Cook <keescook@chromium.org>
+(1) allocate an uninitialized queue;
+(2) initialize queue_lock to its default internal lock;
+(3) initialize blkcg part of request queue, which will create blkg and
+    then insert it to blkg_list;
+(4) traverse blkg_list and find the created blkg, and then take its
+    queue lock, here it is the default *internal lock*;
+(5) *race window*, now queue_lock is overridden with *driver specified
+    lock*;
+(6) now unlock *driver specified lock*, not the locked *internal lock*,
+    unlock balance breaks.
 
-Looks good.
-Reviewed-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+The changes in this patch are as follows:
+- Move the .queue_lock initialization from blk_init_queue_node() into
+  blk_alloc_queue_node().
+- Only override the .queue_lock pointer for legacy queues because it
+  is not useful for blk-mq queues to override this pointer.
+- For all all block drivers that initialize .queue_lock explicitly,
+  change the blk_alloc_queue() call in the driver into a
+  blk_alloc_queue_node() call and remove the explicit .queue_lock
+  initialization. Additionally, initialize the spin lock that will
+  be used as queue lock earlier if necessary.
+
+Reported-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
+Cc: Philipp Reisner <philipp.reisner@linbit.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: Kees Cook <keescook@chromium.org>
+---
+ block/blk-core.c               | 24 ++++++++++++++++--------
+ drivers/block/drbd/drbd_main.c |  3 +--
+ drivers/block/umem.c           |  7 +++----
+ 3 files changed, 20 insertions(+), 14 deletions(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index e873a24bf82d..41c74b37be85 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -888,6 +888,19 @@ static void blk_rq_timed_out_timer(struct timer_list *t)
+ 	kblockd_schedule_work(&q->timeout_work);
+ }
+ 
++/**
++ * blk_alloc_queue_node - allocate a request queue
++ * @gfp_mask: memory allocation flags
++ * @node_id: NUMA node to allocate memory from
++ * @lock: For legacy queues, pointer to a spinlock that will be used to e.g.
++ *        serialize calls to the legacy .request_fn() callback. Ignored for
++ *	  blk-mq request queues.
++ *
++ * Note: pass the queue lock as the third argument to this function instead of
++ * setting the queue lock pointer explicitly to avoid triggering a sporadic
++ * crash in the blkcg code. This function namely calls blkcg_init_queue() and
++ * the queue lock pointer must be set before blkcg_init_queue() is called.
++ */
+ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id,
+ 					   spinlock_t *lock)
+ {
+@@ -940,11 +953,8 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id,
+ 	mutex_init(&q->sysfs_lock);
+ 	spin_lock_init(&q->__queue_lock);
+ 
+-	/*
+-	 * By default initialize queue_lock to internal lock and driver can
+-	 * override it later if need be.
+-	 */
+-	q->queue_lock = &q->__queue_lock;
++	if (!q->mq_ops)
++		q->queue_lock = lock ? : &q->__queue_lock;
+ 
+ 	/*
+ 	 * A queue starts its life with bypass turned on to avoid
+@@ -1031,13 +1041,11 @@ blk_init_queue_node(request_fn_proc *rfn, spinlock_t *lock, int node_id)
+ {
+ 	struct request_queue *q;
+ 
+-	q = blk_alloc_queue_node(GFP_KERNEL, node_id, NULL);
++	q = blk_alloc_queue_node(GFP_KERNEL, node_id, lock);
+ 	if (!q)
+ 		return NULL;
+ 
+ 	q->request_fn = rfn;
+-	if (lock)
+-		q->queue_lock = lock;
+ 	if (blk_init_allocated_queue(q) < 0) {
+ 		blk_cleanup_queue(q);
+ 		return NULL;
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index 0a0394aa1b9c..185f1ef00a7c 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -2816,7 +2816,7 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
+ 
+ 	drbd_init_set_defaults(device);
+ 
+-	q = blk_alloc_queue(GFP_KERNEL);
++	q = blk_alloc_queue_node(GFP_KERNEL, NUMA_NO_NODE, &resource->req_lock);
+ 	if (!q)
+ 		goto out_no_q;
+ 	device->rq_queue = q;
+@@ -2848,7 +2848,6 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
+ 	/* Setting the max_hw_sectors to an odd value of 8kibyte here
+ 	   This triggers a max_bio_size message upon first attach or connect */
+ 	blk_queue_max_hw_sectors(q, DRBD_MAX_BIO_SIZE_SAFE >> 8);
+-	q->queue_lock = &resource->req_lock;
+ 
+ 	device->md_io.page = alloc_page(GFP_KERNEL);
+ 	if (!device->md_io.page)
+diff --git a/drivers/block/umem.c b/drivers/block/umem.c
+index 8077123678ad..5c7fb8cc4149 100644
+--- a/drivers/block/umem.c
++++ b/drivers/block/umem.c
+@@ -888,13 +888,14 @@ static int mm_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
+ 	card->Active = -1;	/* no page is active */
+ 	card->bio = NULL;
+ 	card->biotail = &card->bio;
++	spin_lock_init(&card->lock);
+ 
+-	card->queue = blk_alloc_queue(GFP_KERNEL);
++	card->queue = blk_alloc_queue_node(GFP_KERNEL, NUMA_NO_NODE,
++					   &card->lock);
+ 	if (!card->queue)
+ 		goto failed_alloc;
+ 
+ 	blk_queue_make_request(card->queue, mm_make_request);
+-	card->queue->queue_lock = &card->lock;
+ 	card->queue->queuedata = card;
+ 
+ 	tasklet_init(&card->tasklet, process_page, (unsigned long)card);
+@@ -968,8 +969,6 @@ static int mm_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
+ 	dev_printk(KERN_INFO, &card->dev->dev,
+ 		"Window size %d bytes, IRQ %d\n", data, dev->irq);
+ 
+-	spin_lock_init(&card->lock);
+-
+ 	pci_set_drvdata(dev, card);
+ 
+ 	if (pci_write_cmd != 0x0F) 	/* If not Memory Write & Invalidate */
+-- 
+2.16.2
