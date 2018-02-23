@@ -1,39 +1,64 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Sat, 24 Feb 2018 20:44:28 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v4 0/6] Fix races between blkcg code and request queue
- initialization and cleanup
-Message-ID: <20180224124427.GA26192@ming.t460p>
-References: <20180223010808.25765-1-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180223010808.25765-1-bart.vanassche@wdc.com>
+Return-Path: <prvs=585cc836a=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH v4 0/6] Fix races between blkcg code and request queue initialization and cleanup
+Date: Thu, 22 Feb 2018 17:08:02 -0800
+Message-Id: <20180223010808.25765-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Feb 22, 2018 at 05:08:02PM -0800, Bart Van Assche wrote:
-> Hello Jens,
-> 
-> Recently Joseph Qi identified races between the block cgroup code and request
-> queue initialization and cleanup. This patch series address these races. Please
-> consider these patches for kernel v4.17.
-> 
-> Thanks,
-> 
-> Bart.
-> 
-> Changes between v3 and v4:
-> - Added three patches that fix the calling order of del_gendisk() and
->   blk_cleanup_queue() in multiple block drivers.
+Hello Jens,
 
-Suggest to add description about the reason why we have to delete
-gendisk before blk_cleanup_queue() in commit log.
+Recently Joseph Qi identified races between the block cgroup code and request
+queue initialization and cleanup. This patch series address these races. Please
+consider these patches for kernel v4.17.
 
-For patches 1 ~ 3:
+Thanks,
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Bart.
+
+Changes between v3 and v4:
+- Added three patches that fix the calling order of del_gendisk() and
+  blk_cleanup_queue() in multiple block drivers.
+
+Changes between v2 and v3:
+- Added a third patch that fixes a race between the blkcg code and queue
+  cleanup.
+
+Changes between v1 and v2:
+- Split a single patch into two patches.
+- Dropped blk_alloc_queue_node2() and modified all block drivers that call
+  blk_alloc_queue_node().
+
+Bart Van Assche (6):
+  block/loop: Delete gendisk before cleaning up the request queue
+  md: Delete gendisk before cleaning up the request queue
+  zram: Delete gendisk before cleaning up the request queue
+  block: Add a third argument to blk_alloc_queue_node()
+  block: Fix a race between the cgroup code and request queue
+    initialization
+  block: Fix a race between request queue removal and the block cgroup
+    controller
+
+ block/blk-core.c               | 60 +++++++++++++++++++++++++++++++++++-------
+ block/blk-mq.c                 |  2 +-
+ block/blk-sysfs.c              |  7 -----
+ drivers/block/drbd/drbd_main.c |  3 +--
+ drivers/block/loop.c           |  2 +-
+ drivers/block/null_blk.c       |  3 ++-
+ drivers/block/umem.c           |  7 +++--
+ drivers/block/zram/zram_drv.c  |  2 +-
+ drivers/ide/ide-probe.c        |  2 +-
+ drivers/lightnvm/core.c        |  2 +-
+ drivers/md/dm.c                |  2 +-
+ drivers/md/md.c                |  6 ++---
+ drivers/nvdimm/pmem.c          |  2 +-
+ drivers/nvme/host/multipath.c  |  2 +-
+ drivers/scsi/scsi_lib.c        |  2 +-
+ include/linux/blkdev.h         |  3 ++-
+ 16 files changed, 70 insertions(+), 37 deletions(-)
 
 -- 
-Ming
+2.16.2
