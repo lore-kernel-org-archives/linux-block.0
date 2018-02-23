@@ -1,27 +1,45 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:41491 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751351AbeBWRNp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Feb 2018 12:13:45 -0500
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "ming.lei@redhat.com" <ming.lei@redhat.com>
-CC: "osandov@osandov.com" <osandov@osandov.com>,
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37504 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751492AbeBWQ0n (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Feb 2018 11:26:43 -0500
+Date: Sat, 24 Feb 2018 00:26:27 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "osandov@osandov.com" <osandov@osandov.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: v4.16-rc2: I/O hang with dm-rq + Kyber
-Date: Fri, 23 Feb 2018 17:13:42 +0000
-Message-ID: <1519406021.2904.24.camel@wdc.com>
+Message-ID: <20180223162626.GB17466@ming.t460p>
 References: <1519333819.2861.17.camel@wdc.com>
-         <20180223162626.GB17466@ming.t460p>
-In-Reply-To: <20180223162626.GB17466@ming.t460p>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1519333819.2861.17.camel@wdc.com>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gU2F0LCAyMDE4LTAyLTI0IGF0IDAwOjI2ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gVGhl
-IGZvbGxvd2luZyAyIHBhdGNoIGZpeGVzIG9uZSBJTyBoYW5nIG9uIGt5YmVyIGluIG15IHRlc3Qg
-b24gVVNCLCBjb3VsZA0KPiB5b3UgdGVzdCBpdCBhbmQgc2VlIGlmIHlvdXIgY2FzZSBjYW4gYmUg
-Zml4ZWQ/DQo+IA0KPiAJaHR0cHM6Ly9tYXJjLmluZm8vP2w9bGludXgtYmxvY2smbT0xNTE5NDAw
-MjI4MzE5OTQmdz0yDQoNClRoZXNlIHR3byBwYXRjaGVzIGFyZSBzdWZmaWNpZW50IHRvIG1ha2Ug
-bXkgdGVzdCBwYXNzLg0KDQpUaGFua3MhDQoNCkJhcnQuDQoNCg0K
+On Thu, Feb 22, 2018 at 09:10:23PM +0000, Bart Van Assche wrote:
+> Hello Omar,
+> 
+> I/O hangs if I run the following command on top of kernel v4.16-rc2 + the
+> ib_srpt patch that adds RDMA/CM support:
+> 
+> srp-test/run_tests -c -d -r 10 -t 02-mq -e kyber
+> 
+> This does not happen with the deadline scheduler nor without a scheduler.
+> This test passed a few months ago. I have attached the output of the following
+> command to this e-mail:
+> 
+> (cd /sys/kernel/debug/block && grep -r .) | grep -v /poll_stat
+> 
+> Can you have a look?
+
+The following 2 patch fixes one IO hang on kyber in my test on USB, could
+you test it and see if your case can be fixed?
+
+	https://marc.info/?l=linux-block&m=151940022831994&w=2
+
+BTW, from your attached log, looks it belongs to domain token leak
+issue too, so it should have been addressed by above patches.
+
+Thanks,
+Ming
