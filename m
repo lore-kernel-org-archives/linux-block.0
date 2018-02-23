@@ -1,59 +1,65 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f67.google.com ([209.85.160.67]:42653 "EHLO
-        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751877AbeB0Rti (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Feb 2018 12:49:38 -0500
-Received: by mail-pl0-f67.google.com with SMTP id 93-v6so1236669plc.9
-        for <linux-block@vger.kernel.org>; Tue, 27 Feb 2018 09:49:38 -0800 (PST)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Coly Li <colyli@suse.de>
-Subject: [PATCH 1/2] bcache: correct flash only vols (check all uuids)
-Date: Tue, 27 Feb 2018 09:49:29 -0800
-Message-Id: <20180227174930.15911-2-mlyle@lyle.org>
-In-Reply-To: <20180227174930.15911-1-mlyle@lyle.org>
-References: <20180227174930.15911-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jiangqi903@gmail.com>
+Return-Path: <jiangqi903@gmail.com>
+Subject: Re: [PATCH v4 5/6] block: Fix a race between the cgroup code and
+ request queue initialization
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Joseph Qi <joseph.qi@linux.alibaba.com>,
+ Philipp Reisner <philipp.reisner@linbit.com>,
+ Ulf Hansson <ulf.hansson@linaro.org>, Kees Cook <keescook@chromium.org>
+References: <20180223010808.25765-1-bart.vanassche@wdc.com>
+ <20180223010808.25765-6-bart.vanassche@wdc.com>
+From: Joseph Qi <jiangqi903@gmail.com>
+Message-ID: <33eefa94-b0fc-9ac4-6b16-39c3ad8fc293@gmail.com>
+Date: Fri, 23 Feb 2018 17:52:23 +0800
+MIME-Version: 1.0
+In-Reply-To: <20180223010808.25765-6-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Coly Li <colyli@suse.de>
 
-Commit 2831231d4c3f ("bcache: reduce cache_set devices iteration by
-devices_max_used") adds c->devices_max_used to reduce iteration of
-c->uuids elements, this value is updated in bcache_device_attach().
 
-But for flash only volume, when calling flash_devs_run(), the function
-bcache_device_attach() is not called yet and c->devices_max_used is not
-updated. The unexpected result is, the flash only volume won't be run
-by flash_devs_run().
+On 18/2/23 09:08, Bart Van Assche wrote:
+> Initialize the request queue lock earlier such that the following
+> race can no longer occur:
+> 
+> blk_init_queue_node()             blkcg_print_blkgs()
+>   blk_alloc_queue_node (1)
+>     q->queue_lock = &q->__queue_lock (2)
+>     blkcg_init_queue(q) (3)
+>                                     spin_lock_irq(blkg->q->queue_lock) (4)
+>   q->queue_lock = lock (5)
+>                                     spin_unlock_irq(blkg->q->queue_lock) (6)
+> 
+> (1) allocate an uninitialized queue;
+> (2) initialize queue_lock to its default internal lock;
+> (3) initialize blkcg part of request queue, which will create blkg and
+>     then insert it to blkg_list;
+> (4) traverse blkg_list and find the created blkg, and then take its
+>     queue lock, here it is the default *internal lock*;
+> (5) *race window*, now queue_lock is overridden with *driver specified
+>     lock*;
+> (6) now unlock *driver specified lock*, not the locked *internal lock*,
+>     unlock balance breaks.
+> 
+> The changes in this patch are as follows:
+> - Move the .queue_lock initialization from blk_init_queue_node() into
+>   blk_alloc_queue_node().
+> - Only override the .queue_lock pointer for legacy queues because it
+>   is not useful for blk-mq queues to override this pointer.
+> - For all all block drivers that initialize .queue_lock explicitly,
+>   change the blk_alloc_queue() call in the driver into a
+>   blk_alloc_queue_node() call and remove the explicit .queue_lock
+>   initialization. Additionally, initialize the spin lock that will
+>   be used as queue lock earlier if necessary.
+> 
+> Reported-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
+> Cc: Philipp Reisner <philipp.reisner@linbit.com>
+> Cc: Ulf Hansson <ulf.hansson@linaro.org>
+> Cc: Kees Cook <keescook@chromium.org>
 
-This patch fixes the issue by iterate all c->uuids elements in
-flash_devs_run(). c->devices_max_used will be updated properly when
-bcache_device_attach() gets called.
-
-[mlyle: commit subject edited for character limit]
-
-Fixes: 2831231d4c3f ("bcache: reduce cache_set devices iteration by devices_max_used")
-Reported-by: Tang Junhui <tang.junhui@zte.com.cn>
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/super.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 312895788036..4d1d8dfb2d2a 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1274,7 +1274,7 @@ static int flash_devs_run(struct cache_set *c)
- 	struct uuid_entry *u;
- 
- 	for (u = c->uuids;
--	     u < c->uuids + c->devices_max_used && !ret;
-+	     u < c->uuids + c->nr_uuids && !ret;
- 	     u++)
- 		if (UUID_FLASH_ONLY(u))
- 			ret = flash_dev_run(c, u);
--- 
-2.14.1
+Looks good.
+Reviewed-by: Joseph Qi <joseph.qi@linux.alibaba.com>
