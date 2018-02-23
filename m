@@ -1,24 +1,45 @@
-Return-Path: <jthumshirn@suse.de>
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>,  linux-block@vger.kernel.org,  Christoph Hellwig <hch@lst.de>,  Shaohua Li <shli@kernel.org>
-Subject: Re: [PATCH v4 2/6] md: Delete gendisk before cleaning up the request queue
+Return-Path: <prvs=585cc836a=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Shaohua Li <shli@kernel.org>
+Subject: [PATCH v4 2/6] md: Delete gendisk before cleaning up the request queue
+Date: Thu, 22 Feb 2018 17:08:04 -0800
+Message-Id: <20180223010808.25765-3-bart.vanassche@wdc.com>
+In-Reply-To: <20180223010808.25765-1-bart.vanassche@wdc.com>
 References: <20180223010808.25765-1-bart.vanassche@wdc.com>
-	<20180223010808.25765-3-bart.vanassche@wdc.com>
-Date: Fri, 23 Feb 2018 09:22:57 +0100
-In-Reply-To: <20180223010808.25765-3-bart.vanassche@wdc.com> (Bart Van
-	Assche's message of "Thu, 22 Feb 2018 17:08:04 -0800")
-Message-ID: <mqdmv00dsim.fsf@linux-x5ow.site>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
---=20
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
-GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N=C3=BCrnberg)
-Key fingerprint =3D EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Remove the disk, partition and bdi sysfs attributes before cleaning up
+the request queue associated with the disk.
+
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Shaohua Li <shli@kernel.org>
+---
+ drivers/md/md.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index bc67ab6844f0..eba7fa2f0abb 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -5203,12 +5203,12 @@ static void md_free(struct kobject *ko)
+ 	if (mddev->sysfs_state)
+ 		sysfs_put(mddev->sysfs_state);
+ 
++	if (mddev->gendisk)
++		del_gendisk(mddev->gendisk);
+ 	if (mddev->queue)
+ 		blk_cleanup_queue(mddev->queue);
+-	if (mddev->gendisk) {
+-		del_gendisk(mddev->gendisk);
++	if (mddev->gendisk)
+ 		put_disk(mddev->gendisk);
+-	}
+ 	percpu_ref_exit(&mddev->writes_pending);
+ 
+ 	kfree(mddev);
+-- 
+2.16.2
