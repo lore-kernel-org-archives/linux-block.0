@@ -1,62 +1,34 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Subject: [PATCH 05/19] lightnvm: complete geo structure with maxoc*
-Date: Mon, 26 Feb 2018 14:17:04 +0100
-Message-Id: <1519651038-16845-6-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
-References: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <jiangqi903@gmail.com>
+Return-Path: <jiangqi903@gmail.com>
+Subject: Re: [PATCH v4 1/6] block/loop: Delete gendisk before cleaning up the
+ request queue
+To: Bart Van Assche <bart.vanassche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Josef Bacik <jbacik@fb.com>, Shaohua Li <shli@fb.com>,
+ Omar Sandoval <osandov@fb.com>, Hannes Reinecke <hare@suse.com>,
+ Ming Lei <ming.lei@redhat.com>
+References: <20180223010808.25765-1-bart.vanassche@wdc.com>
+ <20180223010808.25765-2-bart.vanassche@wdc.com>
+From: Joseph Qi <jiangqi903@gmail.com>
+Message-ID: <1a29c99d-64cb-9884-3acd-1cd7b1f0e100@gmail.com>
+Date: Fri, 23 Feb 2018 17:49:48 +0800
 MIME-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org,
- =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="utf-8"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+In-Reply-To: <20180223010808.25765-2-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Q29tcGxldGUgdGhlIGdlbmVyaWMgZ2VvbWV0cnkgc3RydWN0dXJlIHdpdGggdGhlIG1heG9jIGFu
-ZCBtYXhvY3B1CmZlbGRzLCBwcmVzZW50IGluIHRoZSAyLjAgc3BlYy4KClNpZ25lZC1vZmYtYnk6
-IEphdmllciBHb256w6FsZXogPGphdmllckBjbmV4bGFicy5jb20+Ci0tLQogZHJpdmVycy9udm1l
-L2hvc3QvbGlnaHRudm0uYyB8IDkgKysrKysrKysrCiBpbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmgg
-ICAgIHwgMiArKwogMiBmaWxlcyBjaGFuZ2VkLCAxMSBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0
-IGEvZHJpdmVycy9udm1lL2hvc3QvbGlnaHRudm0uYyBiL2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0
-bnZtLmMKaW5kZXggYTQ4OTUwYTM3YjhkLi5hOGYzNWU4Yjc5NTMgMTAwNjQ0Ci0tLSBhL2RyaXZl
-cnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMKKysrIGIvZHJpdmVycy9udm1lL2hvc3QvbGlnaHRudm0u
-YwpAQCAtMzIzLDYgKzMyMywxMyBAQCBzdGF0aWMgaW50IG52bWVfbnZtX3NldHVwXzEyKHN0cnVj
-dCBudm1lX252bV9pZDEyICppZCwKIAlkZXZfZ2VvLT5jLndzX29wdCA9IHNlY19wZXJfcGc7CiAJ
-ZGV2X2dlby0+Yy5td19jdW5pdHMgPSA4OwkJLyogZGVmYXVsdCB0byBNTEMgc2FmZSB2YWx1ZXMg
-Ki8KIAorCS8qIERvIG5vdCBpbXBvc2UgdmFsdWVzIGZvciBtYXhpbXVtIG51bWJlciBvZiBvcGVu
-IGJsb2NrcyBhcyBpdCBpcworCSAqIHVuc3BlY2lmaWVkIGluIDEuMi4gVXNlcnMgb2YgMS4yIG11
-c3QgYmUgYXdhcmUgb2YgdGhpcyBhbmQgZXZlbnR1YWxseQorCSAqIHNwZWNpZnkgdGhlc2UgdmFs
-dWVzIHRocm91Z2ggYSBxdWlyayBpZiByZXN0cmljdGlvbnMgYXBwbHkuCisJICovCisJZGV2X2dl
-by0+Yy5tYXhvYyA9IGRldl9nZW8tPmFsbF9sdW5zICogZGV2X2dlby0+Yy5udW1fY2hrOworCWRl
-dl9nZW8tPmMubWF4b2NwdSA9IGRldl9nZW8tPmMubnVtX2NoazsKKwogCWRldl9nZW8tPmMuY2Fw
-ID0gbGUzMl90b19jcHUoc3JjLT5tY2NhcCk7CiAKIAlkZXZfZ2VvLT5jLnRyZHQgPSBsZTMyX3Rv
-X2NwdShzcmMtPnRyZHQpOwpAQCAtNDEzLDYgKzQyMCw4IEBAIHN0YXRpYyBpbnQgbnZtZV9udm1f
-c2V0dXBfMjAoc3RydWN0IG52bWVfbnZtX2lkMjAgKmlkLAogCWRldl9nZW8tPmMud3NfbWluID0g
-bGUzMl90b19jcHUoaWQtPndzX21pbik7CiAJZGV2X2dlby0+Yy53c19vcHQgPSBsZTMyX3RvX2Nw
-dShpZC0+d3Nfb3B0KTsKIAlkZXZfZ2VvLT5jLm13X2N1bml0cyA9IGxlMzJfdG9fY3B1KGlkLT5t
-d19jdW5pdHMpOworCWRldl9nZW8tPmMubWF4b2MgPSBsZTMyX3RvX2NwdShpZC0+bWF4b2MpOwor
-CWRldl9nZW8tPmMubWF4b2NwdSA9IGxlMzJfdG9fY3B1KGlkLT5tYXhvY3B1KTsKIAogCWRldl9n
-ZW8tPmMuY2FwID0gbGUzMl90b19jcHUoaWQtPm1jY2FwKTsKIApkaWZmIC0tZ2l0IGEvaW5jbHVk
-ZS9saW51eC9saWdodG52bS5oIGIvaW5jbHVkZS9saW51eC9saWdodG52bS5oCmluZGV4IDU3ZDAw
-NjQ0YTFjNi4uZThlNmJmZDRkMGQ0IDEwMDY0NAotLS0gYS9pbmNsdWRlL2xpbnV4L2xpZ2h0bnZt
-LmgKKysrIGIvaW5jbHVkZS9saW51eC9saWdodG52bS5oCkBAIC0yODAsNiArMjgwLDggQEAgc3Ry
-dWN0IG52bV9jb21tb25fZ2VvIHsKIAl1MzIJd3NfbWluOwkJLyogbWluaW11bSB3cml0ZSBzaXpl
-ICovCiAJdTMyCXdzX29wdDsJCS8qIG9wdGltYWwgd3JpdGUgc2l6ZSAqLwogCXUzMgltd19jdW5p
-dHM7CS8qIGRpc3RhbmNlIHJlcXVpcmVkIGZvciBzdWNjZXNzZnVsIHJlYWQgKi8KKwl1MzIJbWF4
-b2M7CQkvKiBtYXhpbXVtIG9wZW4gY2h1bmtzICovCisJdTMyCW1heG9jcHU7CS8qIG1heGltdW0g
-b3BlbiBjaHVua3MgcGVyIHBhcmFsbGVsIHVuaXQgKi8KIAogCS8qIGRldmljZSBjYXBhYmlsaXRp
-ZXMuIE5vdGUgdGhhdCB0aGlzIHJlcHJlc2VudHMgY2FwYWJpbGl0aWVzIGluIDEuMgogCSAqIGFu
-ZCBtZWRpYSBhbmQgY29udHJvbGxlciBjYXBhYmlsaXRpZXMgaW4gMi4wCi0tIAoyLjcuNAoKCl9f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkxpbnV4LW52bWUg
-bWFpbGluZyBsaXN0CkxpbnV4LW52bWVAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8vbGlzdHMu
-aW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4LW52bWUK
+
+
+On 18/2/23 09:08, Bart Van Assche wrote:
+> Remove the disk, partition and bdi sysfs attributes before cleaning up
+> the request queue associated with the disk.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Josef Bacik <jbacik@fb.com>
+> Cc: Shaohua Li <shli@fb.com>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+
+Looks good.
+Reviewed-by: Joseph Qi <joseph.qi@linux.alibaba.com>
