@@ -1,49 +1,27 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f41.google.com ([74.125.82.41]:52901 "EHLO
-        mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932327AbeB0P5p (ORCPT
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:41491 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751351AbeBWRNp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Feb 2018 10:57:45 -0500
-Received: by mail-wm0-f41.google.com with SMTP id t3so25032717wmc.2
-        for <linux-block@vger.kernel.org>; Tue, 27 Feb 2018 07:57:44 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH V4] lightnvm: simplify geometry structure
-Date: Tue, 27 Feb 2018 16:57:11 +0100
-Message-Id: <1519747032-25704-1-git-send-email-javier@cnexlabs.com>
+        Fri, 23 Feb 2018 12:13:45 -0500
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "osandov@osandov.com" <osandov@osandov.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: v4.16-rc2: I/O hang with dm-rq + Kyber
+Date: Fri, 23 Feb 2018 17:13:42 +0000
+Message-ID: <1519406021.2904.24.camel@wdc.com>
+References: <1519333819.2861.17.camel@wdc.com>
+         <20180223162626.GB17466@ming.t460p>
+In-Reply-To: <20180223162626.GB17466@ming.t460p>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Sending this separately as it seems to be the controversial one.
-
-# Changes since V3
->From Matias:
-  - Remove nvm_common_geo
-  - Do appropriate renames when having a single geometry for device and
-    targets
-
-Javier
-
-Javier González (1):
-  lightnvm: simplify geometry structure.
-
- drivers/lightnvm/core.c          | 114 +++++--------
- drivers/lightnvm/pblk-core.c     |  16 +-
- drivers/lightnvm/pblk-gc.c       |   2 +-
- drivers/lightnvm/pblk-init.c     | 123 +++++++-------
- drivers/lightnvm/pblk-read.c     |   2 +-
- drivers/lightnvm/pblk-recovery.c |  14 +-
- drivers/lightnvm/pblk-rl.c       |   2 +-
- drivers/lightnvm/pblk-sysfs.c    |  39 +++--
- drivers/lightnvm/pblk-write.c    |   2 +-
- drivers/lightnvm/pblk.h          |  93 +++++------
- drivers/nvme/host/lightnvm.c     | 344 +++++++++++++++++++++++----------------
- include/linux/lightnvm.h         | 202 ++++++++++++-----------
- 12 files changed, 501 insertions(+), 452 deletions(-)
-
--- 
-2.7.4
+T24gU2F0LCAyMDE4LTAyLTI0IGF0IDAwOjI2ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gVGhl
+IGZvbGxvd2luZyAyIHBhdGNoIGZpeGVzIG9uZSBJTyBoYW5nIG9uIGt5YmVyIGluIG15IHRlc3Qg
+b24gVVNCLCBjb3VsZA0KPiB5b3UgdGVzdCBpdCBhbmQgc2VlIGlmIHlvdXIgY2FzZSBjYW4gYmUg
+Zml4ZWQ/DQo+IA0KPiAJaHR0cHM6Ly9tYXJjLmluZm8vP2w9bGludXgtYmxvY2smbT0xNTE5NDAw
+MjI4MzE5OTQmdz0yDQoNClRoZXNlIHR3byBwYXRjaGVzIGFyZSBzdWZmaWNpZW50IHRvIG1ha2Ug
+bXkgdGVzdCBwYXNzLg0KDQpUaGFua3MhDQoNCkJhcnQuDQoNCg0K
