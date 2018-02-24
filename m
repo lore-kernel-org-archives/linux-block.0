@@ -1,76 +1,35 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Return-Path: <prvs=586c790fd=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@infradead.org" <hch@infradead.org>, "ming.lei@redhat.com"
+	<ming.lei@redhat.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"paolo.valente@linaro.org" <paolo.valente@linaro.org>,
+	"oleksandr@natalenko.name" <oleksandr@natalenko.name>, "osandov@fb.com"
+	<osandov@fb.com>, "holger@applied-asynchrony.com"
+	<holger@applied-asynchrony.com>
 Subject: Re: [PATCH 1/2] blk-mq: don't call io sched's .requeue_request when
  requeueing rq to ->dispatch
-From: Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20180223153657.17376-2-ming.lei@redhat.com>
-Date: Sat, 24 Feb 2018 17:17:05 +0100
-Cc: Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwig <hch@infradead.org>,
- linux-block@vger.kernel.org,
- Omar Sandoval <osandov@fb.com>,
- oleksandr@natalenko.name,
- holger@applied-asynchrony.com
-Message-Id: <0EE812FD-DA1D-49AB-97FE-EF48BDAE8452@linaro.org>
+Date: Sat, 24 Feb 2018 01:08:56 +0000
+Message-ID: <1519404794.2904.15.camel@wdc.com>
 References: <20180223153657.17376-1-ming.lei@redhat.com>
- <20180223153657.17376-2-ming.lei@redhat.com>
-To: Ming Lei <ming.lei@redhat.com>
+	 <20180223153657.17376-2-ming.lei@redhat.com>
+In-Reply-To: <20180223153657.17376-2-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-
-
-> Il giorno 23 feb 2018, alle ore 16:36, Ming Lei <ming.lei@redhat.com> =
-ha scritto:
->=20
-> __blk_mq_requeue_request() covers two cases:
->=20
-> - one is that the requeued request is added to hctx->dispatch, such as
-> blk_mq_dispatch_rq_list()
->=20
-> - another case is that the request is requeued to io scheduler, such =
-as
-> blk_mq_requeue_request().
->=20
-> We should call io sched's .requeue_request callback only for the 2nd
-> case.
->=20
-
-Acked-by: Paolo Valente <paolo.valente@linaro.org>
-
-> Cc: Paolo Valente <paolo.valente@linaro.org>
-> Cc: Omar Sandoval <osandov@fb.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
-> block/blk-mq.c | 4 +++-
-> 1 file changed, 3 insertions(+), 1 deletion(-)
->=20
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 357492712b0e..16e83e6df404 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -712,7 +712,6 @@ static void __blk_mq_requeue_request(struct =
-request *rq)
->=20
-> 	trace_block_rq_requeue(q, rq);
-> 	wbt_requeue(q->rq_wb, &rq->issue_stat);
-> -	blk_mq_sched_requeue_request(rq);
->=20
-> 	if (blk_mq_rq_state(rq) !=3D MQ_RQ_IDLE) {
-> 		blk_mq_rq_update_state(rq, MQ_RQ_IDLE);
-> @@ -725,6 +724,9 @@ void blk_mq_requeue_request(struct request *rq, =
-bool kick_requeue_list)
-> {
-> 	__blk_mq_requeue_request(rq);
->=20
-> +	/* this request will be re-inserted to io scheduler queue */
-> +	blk_mq_sched_requeue_request(rq);
-> +
-> 	BUG_ON(blk_queued_rq(rq));
-> 	blk_mq_add_to_requeue_list(rq, true, kick_requeue_list);
-> }
-> --=20
-> 2.9.5
->=20
+T24gRnJpLCAyMDE4LTAyLTIzIGF0IDIzOjM2ICswODAwLCBNaW5nIExlaSB3cm90ZToNCj4gX19i
+bGtfbXFfcmVxdWV1ZV9yZXF1ZXN0KCkgY292ZXJzIHR3byBjYXNlczoNCj4gDQo+IC0gb25lIGlz
+IHRoYXQgdGhlIHJlcXVldWVkIHJlcXVlc3QgaXMgYWRkZWQgdG8gaGN0eC0+ZGlzcGF0Y2gsIHN1
+Y2ggYXMNCj4gYmxrX21xX2Rpc3BhdGNoX3JxX2xpc3QoKQ0KPiANCj4gLSBhbm90aGVyIGNhc2Ug
+aXMgdGhhdCB0aGUgcmVxdWVzdCBpcyByZXF1ZXVlZCB0byBpbyBzY2hlZHVsZXIsIHN1Y2ggYXMN
+Cj4gYmxrX21xX3JlcXVldWVfcmVxdWVzdCgpLg0KPiANCj4gV2Ugc2hvdWxkIGNhbGwgaW8gc2No
+ZWQncyAucmVxdWV1ZV9yZXF1ZXN0IGNhbGxiYWNrIG9ubHkgZm9yIHRoZSAybmQNCj4gY2FzZS4N
+Cg0KSSB0aGluayBpdCB3b3VsZCBoYXZlIGJlZW4gbW9yZSBjbGVhciBpZiBpdCB3b3VsZCBoYXZl
+IGJlZW4gbWVudGlvbmVkIHRoYXQNCmJsa19tcV9zY2hlZF9yZXF1ZXVlX3JlcXVlc3QoKSBtdXN0
+IG9ubHkgYmUgY2FsbGVkIGZvciByZXF1ZXN0cyB0aGF0IGhhdmUNCmJlZW4gc3RhcnRlZC4gQW55
+d2F5LCBpZiB5b3UgYWRkIHRoZSBmb2xsb3dpbmcgdG8gdGhpcyBwYXRjaDoNCg0KRml4ZXM6IGJk
+MTY2ZWYxODNjMiAoImJsay1tcS1zY2hlZDogYWRkIGZyYW1ld29yayBmb3IgTVEgY2FwYWJsZSBJ
+TyBzY2hlZHVsZXJzIikNCkNjOiBzdGFibGVAdmdlci5rZXJuZWwub3JnDQoNCnRoZW4geW91IGNh
+biBhbHNvIGFkZDoNCg0KUmV2aWV3ZWQtYnk6IEJhcnQgVmFuIEFzc2NoZSA8YmFydC52YW5hc3Nj
+aGVAd2RjLmNvbT4NCg0KDQoNCg==
