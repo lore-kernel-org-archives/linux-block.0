@@ -1,27 +1,28 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0078.outbound.protection.outlook.com ([104.47.41.78]:17054
+Received: from mail-dm3nam03on0067.outbound.protection.outlook.com ([104.47.41.67]:40602
         "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750852AbeBXJPP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 24 Feb 2018 04:15:15 -0500
+        id S1750852AbeBXJLy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 24 Feb 2018 04:11:54 -0500
 From: Javier Gonzalez <javier@cnexlabs.com>
 To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
 CC: Heiner Litz <hlitz@ucsc.edu>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "matias@lightnvm.io" <matias@lightnvm.io>
 Subject: Re: [PATCH] lightnvm: fix bad block initialization
-Date: Sat, 24 Feb 2018 09:15:13 +0000
-Message-ID: <667A51B2-2026-471D-BFDB-3847B121817C@cnexlabs.com>
+Date: Sat, 24 Feb 2018 09:11:51 +0000
+Message-ID: <90B573AB-6969-4159-9DCF-62EC47022AD1@cnexlabs.com>
 References: <20180223174016.6104-1-hlitz@ucsc.edu>
  <02770a13-9699-aa8d-bcf2-c7aaefe28623@lightnvm.io>
 In-Reply-To: <02770a13-9699-aa8d-bcf2-c7aaefe28623@lightnvm.io>
 Content-Type: multipart/signed;
-        boundary="Apple-Mail=_960CF976-AD03-4B38-A30B-11D4678CC573";
+        boundary="Apple-Mail=_3BAB4D37-AC7D-4D7B-B9C2-D9B6BF07A90E";
         protocol="application/pgp-signature"; micalg=pgp-sha512
 MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
---Apple-Mail=_960CF976-AD03-4B38-A30B-11D4678CC573
+--Apple-Mail=_3BAB4D37-AC7D-4D7B-B9C2-D9B6BF07A90E
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain;
 	charset=utf-8
@@ -62,7 +63,7 @@ struct pblk_line *line,
 
 The patch looks good, but it is missing:
 
-   Fixes: 36b3b712e81dc ("lightnvm: pblk: refactor bad block =
+    Fixes: 36b3b712e81dc ("lightnvm: pblk: refactor bad block =
 identification")
 
 Matias, please add this when picking up.
@@ -70,10 +71,9 @@ Matias, please add this when picking up.
 Reviewed-by: Javier Gonz=C3=A1lez <javier@cnexlabs.com>
 
 
-PS:
-Heiner: Matias' lightnvm.io address is mb@lightnvm.io
 
---Apple-Mail=_960CF976-AD03-4B38-A30B-11D4678CC573
+
+--Apple-Mail=_3BAB4D37-AC7D-4D7B-B9C2-D9B6BF07A90E
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="signature.asc"
 Content-Type: application/pgp-signature; name="signature.asc"
@@ -81,19 +81,19 @@ Content-Description: Message signed with OpenPGP
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAlqRLR8ACgkQIX4xUKFR
-nnS4DRAAi4Rvr3TQcKWHEW3og8zB+t+b87+FM7/yUsus5ECI2clFbIGVjSSDJ3UK
-SMmwBNCtUQAViRpXnqPcGt2AZO+sPuTUzWIGLtW3y1wMznvzAfnwmyDgZ+OrxQuk
-HfZ/QOmNLkFx/3WDajVC2wMEhPj8TuumVsaqfBgeQv7U0vPT9miuLSFTYXXJUZfY
-JXVI2B17m0PcC2K2xjx9Bi0XatJmkuhUgLCQAjgi/kqXnWCgMkqx8+XTnRkTD0Ct
-bAjpkLgnYRRKYznBLzDSjwri/b1BSsPvY8pCVu3LF1WxjdgBiu+sETvtJPKwubGG
-MSL9/C27M6WUikcRafochar/NDrKTQvkZzNj8zkzF9GwX6/iU1xfp9YAHbHmlWZ0
-DddbPlHUijyHPkKz0adiHM5LrnkPHKfa05ErFV9pH1/TIuP9kl/++NFaGxhuMsl4
-oUAj4QZdmd+4I8DgwguixpdwM9YJY9US5GMZkWlj55ZtHTk8yheMEUCZSr9NEk5z
-/ZtO1KFwHq/UZKR5CqA1P+LdMO/5lQMYTDS6JdjfD/OSE5AE7og1XByCEi3ZvwrS
-9XfwEKsSNRGSRQcXjLj+Nlra/9BjBHwJzhvwMtiA6fbAQ/Nt41HdRcXwqw7PLHt5
-E5SsO0s+cJFJdQ7fjn7LcTjQHj3IxXfio/XswUeas4nyAB0Znv0=
-=8DdO
+iQIzBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAlqRLFQACgkQIX4xUKFR
+nnTLtA/8CD6vKRRLua5VWq+ZvSPfwRsnOmqdddaQLJ31ZKLEgJF5kSZAy9tjMq5I
+qLVMtL02wtB2hyTlWjjwzg9Rm0cZ9/Z9x4uEjO/Ll5DNQmggVrrksLgKDEif22AS
+hrimHY9OtuALz65ZL0GUTEVnMawlOtSuc1F7xbNGkrYAv6TjKN6V39PVLqCcfbZ8
+6CVS4ID77HAT5viWD0wNOFUKLDY639XsjL8k+QOiBTcGbYJN0e2wzRplVTfG68t+
+iP7Low2WKoSRiQum5Q73nDKFbP+gjIaA9MokLQBZ19KTw5LDHes0/Vszn/yapdNN
+eyEkbE3t2ITvus6gn+0kPtSBMlt21KUmZdFDfLRCWljToCbgIaCRQmAIhfmdaoOW
+H+gqgc2A8ZF+22CltGuAImqcMRXCQg8IlwrN9fa1sIAnN5J7A4aMic+JxiAkoP3j
+stGFRxxVpV4/ZHbuAXiS53tZ4r0yDrmVvGhKMsvuTTy06Is5d3BcsQ0qYPmHX0TN
+MKdk1HBfmxxU+sTvzpsNs5rkgwE8HM4JrLIiyYjAtjliarTsAhzf3cmpXHkYPiKJ
++fC9sypje5Zwya3/SB0mGn7cUctHRZTZNepgWZbSGBi1LiOcwXQnzJV27PGaKI7B
+RBHSbm6wOKopuoFP0k3OPj8MsMj4L6ZTlhjZAWp1YewYEJ/3caU=
+=CY9g
 -----END PGP SIGNATURE-----
 
---Apple-Mail=_960CF976-AD03-4B38-A30B-11D4678CC573--
+--Apple-Mail=_3BAB4D37-AC7D-4D7B-B9C2-D9B6BF07A90E--
