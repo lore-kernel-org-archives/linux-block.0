@@ -1,7 +1,7 @@
-Return-Path: <shawnguo@kernel.org>
-Date: Sat, 24 Feb 2018 16:56:27 +0800
-From: Shawn Guo <shawnguo@kernel.org>
-To: Pavel Machek <pavel@ucw.cz>
+Return-Path: <pavel@ucw.cz>
+Date: Sat, 24 Feb 2018 09:52:27 +0100
+From: Pavel Machek <pavel@ucw.cz>
+To: Shawn Guo <shawnguo@kernel.org>
 Cc: elfring@users.sourceforge.net,
 	kernel list <linux-kernel@vger.kernel.org>, vgupta@synopsys.com,
 	linux@armlinux.org.uk, oleg@redhat.com, catalin.marinas@arm.com,
@@ -36,43 +36,69 @@ Cc: elfring@users.sourceforge.net,
 	freedreno@lists.freedesktop.org, iommu@lists.linux-foundation.org,
 	linux-raid@vger.kernel.org
 Subject: Re: [PATCH] fix double ;;s in code
-Message-ID: <20180224085626.GN3217@dragon>
+Message-ID: <20180224085227.GA12996@amd>
 References: <20180217211955.GE9640@amd>
  <20180222090932.GJ3217@dragon>
- <20180224085227.GA12996@amd>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180224085227.GA12996@amd>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="qDbXVdCdHGoSgWSk"
+In-Reply-To: <20180222090932.GJ3217@dragon>
 List-ID: <linux-block@vger.kernel.org>
 
-On Sat, Feb 24, 2018 at 09:52:27AM +0100, Pavel Machek wrote:
-> Hi!
-> 
-> > > diff --git a/drivers/soc/imx/gpc.c b/drivers/soc/imx/gpc.c
-> > > index 53f7275..cfb42f5 100644
-> > > --- a/drivers/soc/imx/gpc.c
-> > > +++ b/drivers/soc/imx/gpc.c
-> > > @@ -348,7 +348,7 @@ static int imx_gpc_old_dt_init(struct device *dev, struct regmap *regmap,
-> > >  		if (i == 1) {
-> > >  			domain->supply = devm_regulator_get(dev, "pu");
-> > >  			if (IS_ERR(domain->supply))
-> > > -				return PTR_ERR(domain->supply);;
-> > > +				return PTR_ERR(domain->supply);
-> > >  
-> > >  			ret = imx_pgc_get_clocks(dev, domain);
-> > >  			if (ret)
-> > > 
-> > 
-> > Considering the controversy how the changes should be merged, I'm going
-> > to send a separate patch just for IMX GPC driver with a reported-by-you
-> > tag.  Thanks for catching this.
-> 
-> That works for me.
-> 
-> Alternatively... Andrew Morton merged the patch to his -mm tree
-> (thanks!), so you don't need to take any action, and it will be
-> eventually fixed.
 
-Okay, I'm dropping my patch from IMX tree.
+--qDbXVdCdHGoSgWSk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Shawn
+Hi!
+
+> > diff --git a/drivers/soc/imx/gpc.c b/drivers/soc/imx/gpc.c
+> > index 53f7275..cfb42f5 100644
+> > --- a/drivers/soc/imx/gpc.c
+> > +++ b/drivers/soc/imx/gpc.c
+> > @@ -348,7 +348,7 @@ static int imx_gpc_old_dt_init(struct device *dev, =
+struct regmap *regmap,
+> >  		if (i =3D=3D 1) {
+> >  			domain->supply =3D devm_regulator_get(dev, "pu");
+> >  			if (IS_ERR(domain->supply))
+> > -				return PTR_ERR(domain->supply);;
+> > +				return PTR_ERR(domain->supply);
+> > =20
+> >  			ret =3D imx_pgc_get_clocks(dev, domain);
+> >  			if (ret)
+> >=20
+>=20
+> Considering the controversy how the changes should be merged, I'm going
+> to send a separate patch just for IMX GPC driver with a reported-by-you
+> tag.  Thanks for catching this.
+
+That works for me.
+
+Alternatively... Andrew Morton merged the patch to his -mm tree
+(thanks!), so you don't need to take any action, and it will be
+eventually fixed.
+
+If you merge your own version of the patch, that's ok, too, since
+Andrew will just drop his version.
+
+Best regards,
+									Pavel
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html
+
+--qDbXVdCdHGoSgWSk
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlqRJ8sACgkQMOfwapXb+vJnFQCfWSkka/liG8y+QlhIsWXlYlju
+LMwAoKeeuJ1utbSPd+SNFlihXcdggiAP
+=Ejo3
+-----END PGP SIGNATURE-----
+
+--qDbXVdCdHGoSgWSk--
