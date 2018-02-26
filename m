@@ -1,341 +1,202 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ot0-f170.google.com ([74.125.82.170]:42371 "EHLO
-        mail-ot0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754902AbeBWTvp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Feb 2018 14:51:45 -0500
-Received: by mail-ot0-f170.google.com with SMTP id l5so1061412otf.9
-        for <linux-block@vger.kernel.org>; Fri, 23 Feb 2018 11:51:45 -0800 (PST)
-From: Laura Abbott <labbott@redhat.com>
-Subject: Hangs in balance_dirty_pages with arm-32 LPAE + highmem
-To: Linux-MM <linux-mm@kvack.org>, linux-block@vger.kernel.org
-Message-ID: <b77a6596-3b35-84fe-b65b-43d2e43950b3@redhat.com>
-Date: Fri, 23 Feb 2018 11:51:41 -0800
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Received: from mx2.suse.de ([195.135.220.15]:36028 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752353AbeBZMBs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Feb 2018 07:01:48 -0500
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>, Hou Tao <houtao1@huawei.com>,
+        Jan Kara <jack@suse.cz>
+Subject: [PATCH 2/6] genhd: Rename get_disk() to get_disk_and_module()
+Date: Mon, 26 Feb 2018 13:01:38 +0100
+Message-Id: <20180226120142.25786-3-jack@suse.cz>
+In-Reply-To: <20180226120142.25786-1-jack@suse.cz>
+References: <20180226120142.25786-1-jack@suse.cz>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi,
+Rename get_disk() to get_disk_and_module() to make sure what the
+function does. It's not a great name but at least it is now clear that
+put_disk() is not it's counterpart.
 
-The Fedora arm-32 build VMs have a somewhat long standing problem
-of hanging when running mkfs.ext4 with a bunch of processes stuck
-in D state. This has been seen as far back as 4.13 but is still
-present on 4.14:
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ block/genhd.c           | 10 ++++------
+ drivers/block/amiflop.c |  2 +-
+ drivers/block/ataflop.c |  2 +-
+ drivers/block/brd.c     |  2 +-
+ drivers/block/floppy.c  |  2 +-
+ drivers/block/loop.c    |  2 +-
+ drivers/block/swim.c    |  2 +-
+ drivers/block/z2ram.c   |  2 +-
+ drivers/ide/ide-probe.c |  2 +-
+ include/linux/genhd.h   |  2 +-
+ 10 files changed, 13 insertions(+), 15 deletions(-)
 
-sysrq: SysRq : Show Blocked State                                                [255/1885]
-   task                PC stack   pid father
-auditd          D    0   377      1 0x00000020
-[<c0955e68>] (__schedule) from [<c0956070>] (schedule+0x98/0xbc)
-[<c0956070>] (schedule) from [<c09598e4>] (schedule_timeout+0x328/0x3ac)
-[<c09598e4>] (schedule_timeout) from [<c09564f8>] (io_schedule_timeout+0x24/0x38)
-[<c09564f8>] (io_schedule_timeout) from [<c03720bc>] (balance_dirty_pages.constprop.6+0xac8
-/0xc5c)
-[<c03720bc>] (balance_dirty_pages.constprop.6) from [<c0372508>] (balance_dirty_pages_ratel
-imited+0x2b8/0x43c)
-[<c0372508>] (balance_dirty_pages_ratelimited) from [<c03637f8>] (generic_perform_write+0x1
-74/0x1a4)
-[<c03637f8>] (generic_perform_write) from [<c0365e98>] (__generic_file_write_iter+0x16c/0x1
-98)
-[<c0365e98>] (__generic_file_write_iter) from [<c046b398>] (ext4_file_write_iter+0x314/0x41
-4)
-[<c046b398>] (ext4_file_write_iter) from [<c03ddd68>] (__vfs_write+0x100/0x128)
-[<c03ddd68>] (__vfs_write) from [<c03ddf5c>] (vfs_write+0xc0/0x194)
-[<c03ddf5c>] (vfs_write) from [<c03de12c>] (SyS_write+0x44/0x7c)
-[<c03de12c>] (SyS_write) from [<c0224ef0>] (__sys_trace_return+0x0/0x10)
-rs:main Q:Reg   D    0   441      1 0x00000000
-[<c0955e68>] (__schedule) from [<c0956070>] (schedule+0x98/0xbc)
-[<c0956070>] (schedule) from [<c09598e4>] (schedule_timeout+0x328/0x3ac)
-[<c09598e4>] (schedule_timeout) from [<c09564f8>] (io_schedule_timeout+0x24/0x38)
-[<c09564f8>] (io_schedule_timeout) from [<c03720bc>] (balance_dirty_pages.constprop.6+0xac8
-/0xc5c)
-[<c03720bc>] (balance_dirty_pages.constprop.6) from [<c0372508>] (balance_dirty_pages_ratel
-imited+0x2b8/0x43c)
-[<c0372508>] (balance_dirty_pages_ratelimited) from [<c03637f8>] (generic_perform_write+0x1
-74/0x1a4)
-[<c03637f8>] (generic_perform_write) from [<c0365e98>] (__generic_file_write_iter+0x16c/0x1
-98)
-[<c0365e98>] (__generic_file_write_iter) from [<c046b398>] (ext4_file_write_iter+0x314/0x41
-4)
-[<c046b398>] (ext4_file_write_iter) from [<c03ddd68>] (__vfs_write+0x100/0x128)
-[<c03ddd68>] (__vfs_write) from [<c03ddf5c>] (vfs_write+0xc0/0x194)
-[<c03ddf5c>] (vfs_write) from [<c03de12c>] (SyS_write+0x44/0x7c)
-[<c03de12c>] (SyS_write) from [<c0224d40>] (ret_fast_syscall+0x0/0x4c)
-ntpd            D    0  1453      1 0x00000001
-[<c0955e68>] (__schedule) from [<c0956070>] (schedule+0x98/0xbc)
-[<c0956070>] (schedule) from [<c09598e4>] (schedule_timeout+0x328/0x3ac)
-[<c09598e4>] (schedule_timeout) from [<c09564f8>] (io_schedule_timeout+0x24/0x38)
-[<c09564f8>] (io_schedule_timeout) from [<c03720bc>] (balance_dirty_pages.constprop.6+0xac8
-/0xc5c)
-[<c03720bc>] (balance_dirty_pages.constprop.6) from [<c0372508>] (balance_dirty_pages_ratel
-imited+0x2b8/0x43c)
-[<c0372508>] (balance_dirty_pages_ratelimited) from [<c03637f8>] (generic_perform_write+0x1
-74/0x1a4)
-[<c03637f8>] (generic_perform_write) from [<c0365e98>] (__generic_file_write_iter+0x16c/0x1
-98)
-[<c0365e98>] (__generic_file_write_iter) from [<c046b398>] (ext4_file_write_iter+0x314/0x41
-4)
-[<c046b398>] (ext4_file_write_iter) from [<c03ddd68>] (__vfs_write+0x100/0x128)
-[<c03ddd68>] (__vfs_write) from [<c03ddf5c>] (vfs_write+0xc0/0x194)
-[<c046b398>] (ext4_file_write_iter) from [<c03ddd68>] (__vfs_write+0x100/0x128)  [203/1885]
-[<c03ddd68>] (__vfs_write) from [<c03ddf5c>] (vfs_write+0xc0/0x194)
-[<c03ddf5c>] (vfs_write) from [<c03de12c>] (SyS_write+0x44/0x7c)
-[<c03de12c>] (SyS_write) from [<c0224d40>] (ret_fast_syscall+0x0/0x4c)
-kojid           D    0  4616      1 0x00000000
-[<c0955e68>] (__schedule) from [<c0956070>] (schedule+0x98/0xbc)
-[<c0956070>] (schedule) from [<c09598e4>] (schedule_timeout+0x328/0x3ac)
-[<c09598e4>] (schedule_timeout) from [<c09564f8>] (io_schedule_timeout+0x24/0x38)
-[<c09564f8>] (io_schedule_timeout) from [<c03720bc>] (balance_dirty_pages.constprop.6+0xac8
-/0xc5c)
-[<c03720bc>] (balance_dirty_pages.constprop.6) from [<c0372508>] (balance_dirty_pages_ratel
-imited+0x2b8/0x43c)
-[<c0372508>] (balance_dirty_pages_ratelimited) from [<c03637f8>] (generic_perform_write+0x1
-74/0x1a4)
-[<c03637f8>] (generic_perform_write) from [<c0365e98>] (__generic_file_write_iter+0x16c/0x1
-98)
-[<c0365e98>] (__generic_file_write_iter) from [<c046b398>] (ext4_file_write_iter+0x314/0x41
-4)
-[<c046b398>] (ext4_file_write_iter) from [<c03ddd68>] (__vfs_write+0x100/0x128)
-[<c03ddd68>] (__vfs_write) from [<c03ddf5c>] (vfs_write+0xc0/0x194)
-[<c03ddf5c>] (vfs_write) from [<c03de12c>] (SyS_write+0x44/0x7c)
-[<c03de12c>] (SyS_write) from [<c0224d40>] (ret_fast_syscall+0x0/0x4c)
-kworker/u8:0    D    0 28525      2 0x00000000
-Workqueue: writeback wb_workfn (flush-7:0)
-[<c0955e68>] (__schedule) from [<c0956070>] (schedule+0x98/0xbc)
-[<c0956070>] (schedule) from [<c0281c34>] (io_schedule+0x1c/0x2c)
-[<c0281c34>] (io_schedule) from [<c055ff2c>] (wbt_wait+0x21c/0x300)
-[<c055ff2c>] (wbt_wait) from [<c053ba14>] (blk_mq_make_request+0xac/0x560)
-[<c053ba14>] (blk_mq_make_request) from [<c0530034>] (generic_make_request+0xd0/0x214)
-[<c0530034>] (generic_make_request) from [<c053028c>] (submit_bio+0x114/0x16c)
-[<c053028c>] (submit_bio) from [<c0412b98>] (submit_bh_wbc+0x190/0x1a0)
-[<c0412b98>] (submit_bh_wbc) from [<c0412e90>] (__block_write_full_page+0x2e8/0x43c)
-[<c0412e90>] (__block_write_full_page) from [<c0413150>] (block_write_full_page+0x80/0xec)
-[<c0413150>] (block_write_full_page) from [<c0370380>] (__writepage+0x1c/0x4c)
-[<c0370380>] (__writepage) from [<c0370d30>] (write_cache_pages+0x350/0x3f0)
-[<c0370d30>] (write_cache_pages) from [<c03715d8>] (generic_writepages+0x44/0x60)
-[<c03715d8>] (generic_writepages) from [<c0372eb4>] (do_writepages+0x3c/0x74)
-[<c0372eb4>] (do_writepages) from [<c04098a8>] (__writeback_single_inode+0xb4/0x404)
-[<c04098a8>] (__writeback_single_inode) from [<c040a118>] (writeback_sb_inodes+0x258/0x438)
-[<c040a118>] (writeback_sb_inodes) from [<c040a364>] (__writeback_inodes_wb+0x6c/0xa8)
-[<c040a364>] (__writeback_inodes_wb) from [<c040a564>] (wb_writeback+0x1c4/0x30c)
-[<c040a564>] (wb_writeback) from [<c040ae98>] (wb_workfn+0x130/0x450)
-[<c040ae98>] (wb_workfn) from [<c026f488>] (process_one_work+0x254/0x42c)
-[<c026f488>] (process_one_work) from [<c02705c4>] (worker_thread+0x2d0/0x450)
-[<c02705c4>] (worker_thread) from [<c02750cc>] (kthread+0x13c/0x154)
-[<c02750cc>] (kthread) from [<c0224e18>] (ret_from_fork+0x14/0x3c)
-kworker/u8:1    D    0 16594      2 0x00000000
-Workqueue: writeback wb_workfn (flush-252:0)
-[<c0955e68>] (__schedule) from [<c0956070>] (schedule+0x98/0xbc)
-[<c0956070>] (schedule) from [<c0281c34>] (io_schedule+0x1c/0x2c)
-[<c0281c34>] (io_schedule) from [<c055ff2c>] (wbt_wait+0x21c/0x300)
-[<c055ff2c>] (wbt_wait) from [<c053ba14>] (blk_mq_make_request+0xac/0x560)
-[<c053ba14>] (blk_mq_make_request) from [<c0530034>] (generic_make_request+0xd0/0x214)
-[<c0530034>] (generic_make_request) from [<c053028c>] (submit_bio+0x114/0x16c)
-[<c053ba14>] (blk_mq_make_request) from [<c0530034>] (generic_make_request+0xd0/0[151/1885]
-[<c0530034>] (generic_make_request) from [<c053028c>] (submit_bio+0x114/0x16c)
-[<c053028c>] (submit_bio) from [<c0412b98>] (submit_bh_wbc+0x190/0x1a0)
-[<c0412b98>] (submit_bh_wbc) from [<c0412e90>] (__block_write_full_page+0x2e8/0x43c)
-[<c0412e90>] (__block_write_full_page) from [<c0413150>] (block_write_full_page+0x80/0xec)
-[<c0413150>] (block_write_full_page) from [<c0370380>] (__writepage+0x1c/0x4c)
-[<c0370380>] (__writepage) from [<c0370d30>] (write_cache_pages+0x350/0x3f0)
-[<c0370d30>] (write_cache_pages) from [<c03715d8>] (generic_writepages+0x44/0x60)
-[<c03715d8>] (generic_writepages) from [<c0372eb4>] (do_writepages+0x3c/0x74)
-[<c0372eb4>] (do_writepages) from [<c04098a8>] (__writeback_single_inode+0xb4/0x404)
-[<c04098a8>] (__writeback_single_inode) from [<c040a118>] (writeback_sb_inodes+0x258/0x438)
-[<c040a118>] (writeback_sb_inodes) from [<c040a364>] (__writeback_inodes_wb+0x6c/0xa8)
-[<c040a364>] (__writeback_inodes_wb) from [<c040a564>] (wb_writeback+0x1c4/0x30c)
-[<c040a564>] (wb_writeback) from [<c040ae98>] (wb_workfn+0x130/0x450)
-[<c040ae98>] (wb_workfn) from [<c026f488>] (process_one_work+0x254/0x42c)
-[<c026f488>] (process_one_work) from [<c02705c4>] (worker_thread+0x2d0/0x450)
-[<c02705c4>] (worker_thread) from [<c02750cc>] (kthread+0x13c/0x154)
-[<c02750cc>] (kthread) from [<c0224e18>] (ret_from_fork+0x14/0x3c)
-loop0           D    0  9138      2 0x00000000
-[<c0955e68>] (__schedule) from [<c0956070>] (schedule+0x98/0xbc)
-[<c0956070>] (schedule) from [<c09598e4>] (schedule_timeout+0x328/0x3ac)
-[<c09598e4>] (schedule_timeout) from [<c09564f8>] (io_schedule_timeout+0x24/0x38)
-[<c09564f8>] (io_schedule_timeout) from [<c03720bc>] (balance_dirty_pages.constprop.6+0xac8
-/0xc5c)
-[<c03720bc>] (balance_dirty_pages.constprop.6) from [<c0372508>] (balance_dirty_pages_ratel
-imited+0x2b8/0x43c)
-[<c0372508>] (balance_dirty_pages_ratelimited) from [<c03637f8>] (generic_perform_write+0x1
-74/0x1a4)
-[<c03637f8>] (generic_perform_write) from [<c0365e98>] (__generic_file_write_iter+0x16c/0x1
-98)
-[<c0365e98>] (__generic_file_write_iter) from [<c046b398>] (ext4_file_write_iter+0x314/0x41
-4)
-[<c046b398>] (ext4_file_write_iter) from [<c03dbccc>] (do_iter_readv_writev+0x118/0x140)
-[<c03dbccc>] (do_iter_readv_writev) from [<c03dd024>] (do_iter_write+0x84/0xf8)
-[<c03dd024>] (do_iter_write) from [<bf38b19c>] (lo_write_bvec+0x70/0xec [loop])
-[<bf38b19c>] (lo_write_bvec [loop]) from [<bf38c04c>] (loop_queue_work+0x3b4/0x92c [loop])
-[<bf38c04c>] (loop_queue_work [loop]) from [<c0275234>] (kthread_worker_fn+0x114/0x1c8)
-[<c0275234>] (kthread_worker_fn) from [<c02750cc>] (kthread+0x13c/0x154)
-[<c02750cc>] (kthread) from [<c0224e18>] (ret_from_fork+0x14/0x3c)
-mkfs.ext4       D    0  9142   1535 0x00000000
-[<c0955e68>] (__schedule) from [<c0956070>] (schedule+0x98/0xbc)
-[<c0956070>] (schedule) from [<c0281c34>] (io_schedule+0x1c/0x2c)
-[<c0281c34>] (io_schedule) from [<c0362080>] (__lock_page+0x10c/0x144)
-[<c0362080>] (__lock_page) from [<c0370bb8>] (write_cache_pages+0x1d8/0x3f0)
-[<c0370bb8>] (write_cache_pages) from [<c03715d8>] (generic_writepages+0x44/0x60)
-[<c03715d8>] (generic_writepages) from [<c0372eb4>] (do_writepages+0x3c/0x74)
-[<c0372eb4>] (do_writepages) from [<c0364264>] (__filemap_fdatawrite_range+0xc0/0xe0)
-[<c0364264>] (__filemap_fdatawrite_range) from [<c0364454>] (file_write_and_wait_range+0x40
-/0x78)
-[<c0364454>] (file_write_and_wait_range) from [<c0415868>] (blkdev_fsync+0x20/0x50)
-[<c0415868>] (blkdev_fsync) from [<c040e26c>] (vfs_fsync+0x28/0x30)
-[<c040e26c>] (vfs_fsync) from [<c040e2a4>] (do_fsync+0x30/0x4c)
-[<c040e2a4>] (do_fsync) from [<c0224d40>] (ret_fast_syscall+0x0/0x4c)
-python          D    0  9167   9165 0x00000000
-Sun Feb 18 18:17:58 2018] [<c0955e68>] (__schedule) from [<c0956070>] (schedule+0x98/0xbc)
-[<c0956070>] (schedule) from [<c09598e4>] (schedule_timeout+0x328/0x3ac)
-[<c09598e4>] (schedule_timeout) from [<c09564f8>] (io_schedule_timeout+0x24/0x38)
-[<c09564f8>] (io_schedule_timeout) from [<c03720bc>] (balance_dirty_pages.constprop.6+0xac8
-/0xc5c)
-[<c03720bc>] (balance_dirty_pages.constprop.6) from [<c0372508>] (balance_dirty_pages_ratel
-imited+0x2b8/0x43c)
-[<c0372508>] (balance_dirty_pages_ratelimited) from [<c0397724>] (fault_dirty_shared_page+0
-x9c/0xb4)
-[<c0397724>] (fault_dirty_shared_page) from [<c0399c48>] (do_wp_page+0x628/0x688)
-[<c0399c48>] (do_wp_page) from [<c039cd0c>] (handle_mm_fault+0xd5c/0xe08)
-[<c039cd0c>] (handle_mm_fault) from [<c095c7d8>] (do_page_fault+0x1f0/0x360)
-[<c095c7d8>] (do_page_fault) from [<c0201384>] (do_DataAbort+0x34/0xb4)
-[<c0201384>] (do_DataAbort) from [<c095c19c>] (__dabt_usr+0x3c/0x40)
-Exception stack(0xc69dbfb0 to 0xc69dbff8)
-bfa0:                                     019fec50 00000002 cc684d00 cc684d00
-bfc0: 00000001 b4214cf4 019fec50 00000002 000587b8 00000000 00000001 b4214cf0
-bfe0: b4f39584 bec32990 b4eee238 b4e799a0 600f0010 ffffffff
-python          D    0  9313   9304 0x00000000
-[<c0955e68>] (__schedule) from [<c0956070>] (schedule+0x98/0xbc)
-[<c0956070>] (schedule) from [<c09598e4>] (schedule_timeout+0x328/0x3ac)
-[<c09598e4>] (schedule_timeout) from [<c09564f8>] (io_schedule_timeout+0x24/0x38)
-[<c09564f8>] (io_schedule_timeout) from [<c03720bc>] (balance_dirty_pages.constprop.6+0xac8
-/0xc5c)
-[<c03720bc>] (balance_dirty_pages.constprop.6) from [<c0372508>] (balance_dirty_pages_ratel
-imited+0x2b8/0x43c)
-[<c0372508>] (balance_dirty_pages_ratelimited) from [<c03637f8>] (generic_perform_write+0x1
-74/0x1a4)
-[<c03637f8>] (generic_perform_write) from [<c0365e98>] (__generic_file_write_iter+0x16c/0x1
-98)
-[<c0365e98>] (__generic_file_write_iter) from [<c046b398>] (ext4_file_write_iter+0x314/0x41
-4)
-[<c046b398>] (ext4_file_write_iter) from [<c03ddd68>] (__vfs_write+0x100/0x128)
-[<c03ddd68>] (__vfs_write) from [<c03ddf5c>] (vfs_write+0xc0/0x194)
-[<c03ddf5c>] (vfs_write) from [<c03de12c>] (SyS_write+0x44/0x7c)
-[<c03de12c>] (SyS_write) from [<c0224d40>] (ret_fast_syscall+0x0/0x4c)
-python          D    0  9326   9317 0x00000000
-[<c0955e68>] (__schedule) from [<c0956070>] (schedule+0x98/0xbc)
-[<c0956070>] (schedule) from [<c09598e4>] (schedule_timeout+0x328/0x3ac)
-[<c09598e4>] (schedule_timeout) from [<c09564f8>] (io_schedule_timeout+0x24/0x38)
-[<c09564f8>] (io_schedule_timeout) from [<c03720bc>] (balance_dirty_pages.constprop.6+0xac8
-/0xc5c)
-[<c03720bc>] (balance_dirty_pages.constprop.6) from [<c0372508>] (balance_dirty_pages_ratel
-imited+0x2b8/0x43c)
-[<c0372508>] (balance_dirty_pages_ratelimited) from [<c03637f8>] (generic_perform_write+0x1
-74/0x1a4)
-[<c03637f8>] (generic_perform_write) from [<c0365e98>] (__generic_file_write_iter+0x16c/0x1
-98)
-[<c0365e98>] (__generic_file_write_iter) from [<c046b398>] (ext4_file_write_iter+0x314/0x41
-4)
-[<c046b398>] (ext4_file_write_iter) from [<c03ddd68>] (__vfs_write+0x100/0x128)
-[<c03ddd68>] (__vfs_write) from [<c03ddf5c>] (vfs_write+0xc0/0x194)
-[<c03ddf5c>] (vfs_write) from [<c03de12c>] (SyS_write+0x44/0x7c)
-[<c03de12c>] (SyS_write) from [<c0224d40>] (ret_fast_syscall+0x0/0x4c)
-python          D    0  9351   9342 0x00000000
-[<c0955e68>] (__schedule) from [<c0956070>] (schedule+0x98/0xbc)
-[<c0956070>] (schedule) from [<c09598e4>] (schedule_timeout+0x328/0x3ac)
-[<c09598e4>] (schedule_timeout) from [<c09564f8>] (io_schedule_timeout+0x24/0x38)
-[<c09564f8>] (io_schedule_timeout) from [<c03720bc>] (balance_dirty_pages.constprop.6+0xac8
-/0xc5c)
-[<c03720bc>] (balance_dirty_pages.constprop.6) from [<c0372508>] (balance_dirty_pages_ratel
-imited+0x2b8/0x43c)
-[<c0372508>] (balance_dirty_pages_ratelimited) from [<c03637f8>] (generic_perform_write+0x1
-74/0x1a4)
-[<c03637f8>] (generic_perform_write) from [<c0365e98>] (__generic_file_write_iter+0x16c/0x1
-98)
-[<c0365e98>] (__generic_file_write_iter) from [<c046b398>] (ext4_file_write_iter+0x314/0x41
-4)
-[<c046b398>] (ext4_file_write_iter) from [<c03ddd68>] (__vfs_write+0x100/0x128)
-[<c03ddd68>] (__vfs_write) from [<c03ddf5c>] (vfs_write+0xc0/0x194)
-[<c03ddf5c>] (vfs_write) from [<c03de12c>] (SyS_write+0x44/0x7c)
-[<c03de12c>] (SyS_write) from [<c0224d40>] (ret_fast_syscall+0x0/0x4c)
-python          D    0  9361   9352 0x00000000
-[<c0955e68>] (__schedule) from [<c0956070>] (schedule+0x98/0xbc)
-[<c0956070>] (schedule) from [<c09598e4>] (schedule_timeout+0x328/0x3ac)
-[<c09598e4>] (schedule_timeout) from [<c09564f8>] (io_schedule_timeout+0x24/0x38)
-[<c09564f8>] (io_schedule_timeout) from [<c03720bc>] (balance_dirty_pages.constprop.6+0xac8
-/0xc5c)
-[<c03720bc>] (balance_dirty_pages.constprop.6) from [<c0372508>] (balance_dirty_pages_ratel
-imited+0x2b8/0x43c)
-[<c0372508>] (balance_dirty_pages_ratelimited) from [<c03637f8>] (generic_perform_write+0x1
-74/0x1a4)
-[<c03637f8>] (generic_perform_write) from [<c0365e98>] (__generic_file_write_iter+0x16c/0x1
-98)
-[<c0365e98>] (__generic_file_write_iter) from [<c046b398>] (ext4_file_write_iter+0x314/0x41
-4)
-[<c046b398>] (ext4_file_write_iter) from [<c03ddd68>] (__vfs_write+0x100/0x128)
-[<c03ddd68>] (__vfs_write) from [<c03ddf5c>] (vfs_write+0xc0/0x194)
-[<c03ddf5c>] (vfs_write) from [<c03de12c>] (SyS_write+0x44/0x7c)
-[<c03de12c>] (SyS_write) from [<c0224d40>] (ret_fast_syscall+0x0/0x4c)
-python          D    0  9374   9365 0x00000000
-[<c0955e68>] (__schedule) from [<c0956070>] (schedule+0x98/0xbc)
-[<c0956070>] (schedule) from [<c09598e4>] (schedule_timeout+0x328/0x3ac)
-[<c09598e4>] (schedule_timeout) from [<c09564f8>] (io_schedule_timeout+0x24/0x38)
-[<c09564f8>] (io_schedule_timeout) from [<c03720bc>] (balance_dirty_pages.constprop.6+0xac8
-/0xc5c)
-[<c03720bc>] (balance_dirty_pages.constprop.6) from [<c0372508>] (balance_dirty_pages_ratel
-imited+0x2b8/0x43c)
-[<c0372508>] (balance_dirty_pages_ratelimited) from [<c03637f8>] (generic_perform_write+0x1
-74/0x1a4)
-[<c03637f8>] (generic_perform_write) from [<c0365e98>] (__generic_file_write_iter+0x16c/0x1
-98)
-[<c0365e98>] (__generic_file_write_iter) from [<c046b398>] (ext4_file_write_iter+0x314/0x41
-4)
-[<c046b398>] (ext4_file_write_iter) from [<c03ddd68>] (__vfs_write+0x100/0x128)
-[<c03ddd68>] (__vfs_write) from [<c03ddf5c>] (vfs_write+0xc0/0x194)
-[<c03ddf5c>] (vfs_write) from [<c03de12c>] (SyS_write+0x44/0x7c)
-[<c03de12c>] (SyS_write) from [<c0224d40>] (ret_fast_syscall+0x0/0x4c)
-python          D    0  9385   9376 0x00000000
-[<c0955e68>] (__schedule) from [<c0956070>] (schedule+0x98/0xbc)
-[<c0956070>] (schedule) from [<c09598e4>] (schedule_timeout+0x328/0x3ac)
-[<c09598e4>] (schedule_timeout) from [<c09564f8>] (io_schedule_timeout+0x24/0x38)
-[<c09564f8>] (io_schedule_timeout) from [<c03720bc>] (balance_dirty_pages.constprop.6+0xac8
-/0xc5c)
-[<c03720bc>] (balance_dirty_pages.constprop.6) from [<c0372508>] (balance_dirty_pages_ratel
-imited+0x2b8/0x43c)
-[<c0372508>] (balance_dirty_pages_ratelimited) from [<c03637f8>] (generic_perform_write+0x1
-74/0x1a4)
-[<c03637f8>] (generic_perform_write) from [<c0365e98>] (__generic_file_write_iter+0x16c/0x1
-98)
-[<c0365e98>] (__generic_file_write_iter) from [<c046b398>] (ext4_file_write_iter+0x314/0x41
-4)
-[<c046b398>] (ext4_file_write_iter) from [<c03ddd68>] (__vfs_write+0x100/0x128)
-[<c03ddd68>] (__vfs_write) from [<c03ddf5c>] (vfs_write+0xc0/0x194)
-[<c03ddf5c>] (vfs_write) from [<c03de12c>] (SyS_write+0x44/0x7c)
-[<c03de12c>] (SyS_write) from [<c0224d40>] (ret_fast_syscall+0x0/0x4c)
-systemd-journal D    0  9678      1 0x00000080
-[<c0955e68>] (__schedule) from [<c0956070>] (schedule+0x98/0xbc)
-[<c0956070>] (schedule) from [<c09598e4>] (schedule_timeout+0x328/0x3ac)
-[<c09598e4>] (schedule_timeout) from [<c09564f8>] (io_schedule_timeout+0x24/0x38)
-[<c09564f8>] (io_schedule_timeout) from [<c03720bc>] (balance_dirty_pages.constprop.6+0xac8
-/0xc5c)
-[<c03720bc>] (balance_dirty_pages.constprop.6) from [<c0372508>] (balance_dirty_pages_ratel
-imited+0x2b8/0x43c)
-[<c0372508>] (balance_dirty_pages_ratelimited) from [<c0397724>] (fault_dirty_shared_page+0
-x9c/0xb4)
-[<c0397724>] (fault_dirty_shared_page) from [<c039cc34>] (handle_mm_fault+0xc84/0xe08)
-[<c039cc34>] (handle_mm_fault) from [<c095c7d8>] (do_page_fault+0x1f0/0x360)
-[<c095c7d8>] (do_page_fault) from [<c0201384>] (do_DataAbort+0x34/0xb4)
-[<c0201384>] (do_DataAbort) from [<c095c19c>] (__dabt_usr+0x3c/0x40)
-Exception stack(0xc40d9fb0 to 0xc40d9ff8)
-9fa0:                                     b5e605e0 00000000 001c2b28 b5e64000
-9fc0: 01b60ff0 00000000 be94e444 be94e448 001c6550 00000000 be94e660 be94e450
-9fe0: 00000000 be94e400 b6cfffcc b6e94a50 20000010 ffffffff
-
-This looks like everything is blocked on the writeback completing but
-the writeback has been throttled. According to the infra team, this problem
-is _not_ seen without LPAE (i.e. only 4G of RAM). I did see
-https://patchwork.kernel.org/patch/10201593/ but that doesn't seem to
-quite match since this seems to be completely stuck. Any suggestions to
-narrow the problem down?
-
-Thanks,
-Laura
+diff --git a/block/genhd.c b/block/genhd.c
+index 5098bffe6ba6..21b2843b27d0 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -547,7 +547,7 @@ static int exact_lock(dev_t devt, void *data)
+ {
+ 	struct gendisk *p = data;
+ 
+-	if (!get_disk(p))
++	if (!get_disk_and_module(p))
+ 		return -1;
+ 	return 0;
+ }
+@@ -809,7 +809,7 @@ struct gendisk *get_gendisk(dev_t devt, int *partno)
+ 
+ 		spin_lock_bh(&ext_devt_lock);
+ 		part = idr_find(&ext_devt_idr, blk_mangle_minor(MINOR(devt)));
+-		if (part && get_disk(part_to_disk(part))) {
++		if (part && get_disk_and_module(part_to_disk(part))) {
+ 			*partno = part->partno;
+ 			disk = part_to_disk(part);
+ 		}
+@@ -1456,7 +1456,7 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
+ }
+ EXPORT_SYMBOL(__alloc_disk_node);
+ 
+-struct kobject *get_disk(struct gendisk *disk)
++struct kobject *get_disk_and_module(struct gendisk *disk)
+ {
+ 	struct module *owner;
+ 	struct kobject *kobj;
+@@ -1474,15 +1474,13 @@ struct kobject *get_disk(struct gendisk *disk)
+ 	return kobj;
+ 
+ }
+-
+-EXPORT_SYMBOL(get_disk);
++EXPORT_SYMBOL(get_disk_and_module);
+ 
+ void put_disk(struct gendisk *disk)
+ {
+ 	if (disk)
+ 		kobject_put(&disk_to_dev(disk)->kobj);
+ }
+-
+ EXPORT_SYMBOL(put_disk);
+ 
+ static void set_disk_ro_uevent(struct gendisk *gd, int ro)
+diff --git a/drivers/block/amiflop.c b/drivers/block/amiflop.c
+index e5aa62fcf5a8..3aaf6af3ec23 100644
+--- a/drivers/block/amiflop.c
++++ b/drivers/block/amiflop.c
+@@ -1758,7 +1758,7 @@ static struct kobject *floppy_find(dev_t dev, int *part, void *data)
+ 	if (unit[drive].type->code == FD_NODRIVE)
+ 		return NULL;
+ 	*part = 0;
+-	return get_disk(unit[drive].gendisk);
++	return get_disk_and_module(unit[drive].gendisk);
+ }
+ 
+ static int __init amiga_floppy_probe(struct platform_device *pdev)
+diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
+index 8bc3b9fd8dd2..dfb2c2622e5a 100644
+--- a/drivers/block/ataflop.c
++++ b/drivers/block/ataflop.c
+@@ -1917,7 +1917,7 @@ static struct kobject *floppy_find(dev_t dev, int *part, void *data)
+ 	if (drive >= FD_MAX_UNITS || type > NUM_DISK_MINORS)
+ 		return NULL;
+ 	*part = 0;
+-	return get_disk(unit[drive].disk);
++	return get_disk_and_module(unit[drive].disk);
+ }
+ 
+ static int __init atari_floppy_init (void)
+diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+index 8028a3a7e7fd..deea78e485da 100644
+--- a/drivers/block/brd.c
++++ b/drivers/block/brd.c
+@@ -456,7 +456,7 @@ static struct kobject *brd_probe(dev_t dev, int *part, void *data)
+ 
+ 	mutex_lock(&brd_devices_mutex);
+ 	brd = brd_init_one(MINOR(dev) / max_part, &new);
+-	kobj = brd ? get_disk(brd->brd_disk) : NULL;
++	kobj = brd ? get_disk_and_module(brd->brd_disk) : NULL;
+ 	mutex_unlock(&brd_devices_mutex);
+ 
+ 	if (new)
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index eae484acfbbc..8ec7235fc93b 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -4505,7 +4505,7 @@ static struct kobject *floppy_find(dev_t dev, int *part, void *data)
+ 	if (((*part >> 2) & 0x1f) >= ARRAY_SIZE(floppy_type))
+ 		return NULL;
+ 	*part = 0;
+-	return get_disk(disks[drive]);
++	return get_disk_and_module(disks[drive]);
+ }
+ 
+ static int __init do_floppy_init(void)
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index d5fe720cf149..87855b5123a6 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1922,7 +1922,7 @@ static struct kobject *loop_probe(dev_t dev, int *part, void *data)
+ 	if (err < 0)
+ 		kobj = NULL;
+ 	else
+-		kobj = get_disk(lo->lo_disk);
++		kobj = get_disk_and_module(lo->lo_disk);
+ 	mutex_unlock(&loop_index_mutex);
+ 
+ 	*part = 0;
+diff --git a/drivers/block/swim.c b/drivers/block/swim.c
+index 84434d3ea19b..64e066eba72e 100644
+--- a/drivers/block/swim.c
++++ b/drivers/block/swim.c
+@@ -799,7 +799,7 @@ static struct kobject *floppy_find(dev_t dev, int *part, void *data)
+ 		return NULL;
+ 
+ 	*part = 0;
+-	return get_disk(swd->unit[drive].disk);
++	return get_disk_and_module(swd->unit[drive].disk);
+ }
+ 
+ static int swim_add_floppy(struct swim_priv *swd, enum drive_location location)
+diff --git a/drivers/block/z2ram.c b/drivers/block/z2ram.c
+index 41c95c9b2ab4..8f9130ab5887 100644
+--- a/drivers/block/z2ram.c
++++ b/drivers/block/z2ram.c
+@@ -332,7 +332,7 @@ static const struct block_device_operations z2_fops =
+ static struct kobject *z2_find(dev_t dev, int *part, void *data)
+ {
+ 	*part = 0;
+-	return get_disk(z2ram_gendisk);
++	return get_disk_and_module(z2ram_gendisk);
+ }
+ 
+ static struct request_queue *z2_queue;
+diff --git a/drivers/ide/ide-probe.c b/drivers/ide/ide-probe.c
+index 17fd55af4d92..caa20eb5f26b 100644
+--- a/drivers/ide/ide-probe.c
++++ b/drivers/ide/ide-probe.c
+@@ -928,7 +928,7 @@ static int exact_lock(dev_t dev, void *data)
+ {
+ 	struct gendisk *p = data;
+ 
+-	if (!get_disk(p))
++	if (!get_disk_and_module(p))
+ 		return -1;
+ 	return 0;
+ }
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 5e3531027b51..8e11b9321e55 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -600,7 +600,7 @@ extern void delete_partition(struct gendisk *, int);
+ extern void printk_all_partitions(void);
+ 
+ extern struct gendisk *__alloc_disk_node(int minors, int node_id);
+-extern struct kobject *get_disk(struct gendisk *disk);
++extern struct kobject *get_disk_and_module(struct gendisk *disk);
+ extern void put_disk(struct gendisk *disk);
+ extern void blk_register_region(dev_t devt, unsigned long range,
+ 			struct module *module,
+-- 
+2.13.6
