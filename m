@@ -1,96 +1,34 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0a-00272701.pphosted.com ([67.231.145.144]:54972 "EHLO
-        mx0a-00272701.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751733AbeBWS0x (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Feb 2018 13:26:53 -0500
-From: Steve Kenton <skenton@ou.edu>
-To: linux-block@vger.kernel.org
-Cc: Steve Kenton <skenton@ou.edu>, Thomas Schmitt <scdbackup@gmx.net>
-Subject: [PATCH 1/1] extend BLKRRPART to update the readable size of media
-Date: Fri, 23 Feb 2018 12:00:37 -0600
-Message-Id: <20180223180037.23157-1-skenton@ou.edu>
+Return-Path: <jiufei.xue@linux.alibaba.com>
+From: Jiufei Xue <jiufei.xue@linux.alibaba.com>
+Subject: [PATCH 4/4] block: fix a typo
+To: hch@lst.de, Shaohua Li <shli@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, caspar@linux.alibaba.com,
+ Joseph Qi <joseph.qi@linux.alibaba.com>
+References: <fc363a8d-957c-be3a-e60a-a8b40727d727@linux.alibaba.com>
+Message-ID: <e2b40779-497a-5b32-0ffe-c6d1800b7200@linux.alibaba.com>
+Date: Mon, 26 Feb 2018 20:04:44 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <fc363a8d-957c-be3a-e60a-a8b40727d727@linux.alibaba.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-The readable size of new, factory blank, optical media can change via user
-space ioctl(SG_IO) commands to format overwritable media such as DVD+RW for
-a UDF filesystem or write to sequential media such as DVD-R for an ISO-9660
-filesystem. However there appears to be no easy way to update the size used
-by the block layer from the initial value of zero. Traditionally, ejecting and
-reinserting the media is the workaround to this long standing issue which 
-programs such as growisofs use by automatically opening and closing the tray
-at the end of a session so the newly created filesystem becomes mountable
-and readable. This can be problematic when using a slot load drive.
-
-An even more heavy handed approach is to delete and then rescan the drive
-using sysfs. echo offline > state  echo 1 > delete  echo - - - > scan
-without ever ejecting the media. It works but is slow and rather ugly.
-
-Reading a factory blank DVD+RW needing to be "de-iced" gives this result
-both before *AND* after formatting with $ xorriso -dev /dev/sr0 -format full
-
-$ dd if=/dev/sr0 of=/dev/null bs=2k
-dd: error reading ‘/dev/sr0’: Input/output error
-0+0 records in
-0+0 records out
-0 bytes (0 B) copied, 0.0275589 s, 0.0 kB/s
-
-The crux of the problem being the readable size after formatting is still zero
-which does not change to the correct value without ejecting and reinserting
-the newly formatted media to force a call to fops->revalidate_disk().
-
-hdi@hdi-H110N:/sys/block/sr0$ cat size
-0
-hdi@hdi-H110N:/sys/block/sr0$ cat size
-9180416
-
-Making the BLKRRPART ioctl call fops->revalidate_disk() => sr_revalidate_disk()
-in sr.c resolves the issue for optical media and should be a benign and
-potentially useful operation if ever called for non-optical media =>
-sd_revalidate_disk() in sd.c for any other devices which change size.
-Programs would have to "opt in" to use ioctl(BLKRRPART) on optial media.
-
-The down side is that BLKRRPART requires CAP_SYSADMIN for userspace programs.
-
-Signed-off-by: Steve Kenton <skenton@ou.edu>
-Signed-off-by: Thomas Schmitt <scdbackup@gmx.net>
+Signed-off-by: Jiufei Xue <jiufei.xue@linux.alibaba.com>
 ---
-I discussed this with Thomas Schmitt the maintainer of the xorriso burner
-program to define the problem and suggest a fix.
+ drivers/block/pktcdvd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-V2: Add NULL pointer check
-Checkpatch wrapping and update commit message
-Send to linux-block@vger.kernel.org instead of linux-fsdevel@vger.kernel.org
- block/ioctl.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 1668506d8ed8..1d48dcad668a 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -163,14 +163,18 @@ int __blkdev_reread_part(struct block_device *bdev)
- {
- 	struct gendisk *disk = bdev->bd_disk;
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index 531a091..c61d20c 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -1122,7 +1122,7 @@ static int pkt_start_recovery(struct packet_data *pkt)
+ 	pkt->sector = new_sector;
  
--	if (!disk_part_scan_enabled(disk) || bdev != bdev->bd_contains)
-+	if (bdev != bdev->bd_contains) /* must be whole disk */
- 		return -EINVAL;
-+
- 	if (!capable(CAP_SYS_ADMIN))
- 		return -EACCES;
- 
- 	lockdep_assert_held(&bdev->bd_mutex);
- 
--	return rescan_partitions(disk, bdev);
-+	if (disk_part_scan_enabled(disk))
-+		return rescan_partitions(disk, bdev); /* update partitions */
-+	else if (disk->fops->revalidate_disk) /* could be sr or sd */
-+		return disk->fops->revalidate_disk(disk); /* update size */
- }
- EXPORT_SYMBOL(__blkdev_reread_part);
- 
+ 	bio_reset(pkt->bio);
+-	bio_set_set(pkt->bio, pd->bdev);
++	bio_set_dev(pkt->bio, pd->bdev);
+ 	bio_set_op_attrs(pkt->bio, REQ_OP_WRITE, 0);
+ 	pkt->bio->bi_iter.bi_sector = new_sector;
+ 	pkt->bio->bi_iter.bi_size = pkt->frames * CD_FRAMESIZE;
 -- 
-2.16.1.72.g5be1f00
+1.9.4
