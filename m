@@ -1,96 +1,90 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: WARNING: CPU: 2 PID: 207 at drivers/nvme/host/core.c:527
- nvme_setup_cmd+0x3d3
-To: Keith Busch <keith.busch@intel.com>
-Cc: "jianchao.wang" <jianchao.w.wang@oracle.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Christoph Hellwig <hch@lst.de>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- Ming Lei <ming.lei@redhat.com>
-References: <45f93661-da0d-94c5-1740-85242df8776e@kernel.dk>
- <0872b361-157b-a876-20af-3d7a4ee7ff31@kernel.dk>
- <8fd916ab-42d7-c654-5a01-8f1eb4be730e@oracle.com>
- <0b7686b3-f716-49ba-c7c4-929d84905569@kernel.dk>
- <7459ffed-c63c-38a9-84f5-456c2a5c4fe0@oracle.com>
- <0f6c248b-eb67-9b02-a4b9-0366d476e70d@kernel.dk>
- <20180201045645.GF27735@localhost.localdomain>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <576ba7dc-78cf-b5d2-d1de-446d1f4b2732@kernel.dk>
-Date: Thu, 1 Feb 2018 08:26:11 -0700
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Subject: [PATCH 03/19] lightnvm: add minor version to generic geometry
+Date: Mon, 26 Feb 2018 14:17:02 +0100
+Message-Id: <1519651038-16845-4-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
+References: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
-In-Reply-To: <20180201045645.GF27735@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: linux-block@vger.kernel.org,
+ =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-On 1/31/18 9:56 PM, Keith Busch wrote:
-> On Wed, Jan 31, 2018 at 08:07:41PM -0700, Jens Axboe wrote:
->>  	if (total_phys_segments > queue_max_segments(q))
->> -		return 0;
->> +			return 0;
-> 
-> This perhaps unintended change happens to point out another problem:
-> queue_max_segments is the wrong limit for discards, which require
-> queue_max_discard_segments.
-> 
-> It might be easier to merge discard requests special, like how merging
-> a discard bio is handled (untested).
-
-Yeah agreed, we should just split it up completely instead instead of
-special casing it in the read/write path.
-
-
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index 8452fc7164cc..01671e1373ff 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -550,6 +550,28 @@ static bool req_no_special_merge(struct request *req)
->  	return !q->mq_ops && req->special;
->  }
->  
-> +static bool req_attempt_discard_merge(struct request_queue *q, struct request *req,
-> +		struct request *next)
-> +{
-> +	unsigned short segments = blk_rq_nr_discard_segments(req);
-> +
-> +	if (segments >= queue_max_discard_segments(q))
-> +		goto no_merge;
-> +	if (blk_rq_sectors(req) + bio_sectors(next->bio) >
-> +	    blk_rq_get_max_sectors(req, blk_rq_pos(req)))
-> +		goto no_merge;
-> +
-> +	req->biotail->bi_next = next->bio;
-> +	req->biotail = next->biotail;
-> +	req->nr_phys_segments = segments + blk_rq_nr_discard_segments(next);
-> +	next->bio = NULL;
-> +	return true;
-> +
-> +no_merge:
-> +	req_set_nomerge(q, req);
-> +	return false;
-> +}
-> +
->  static int ll_merge_requests_fn(struct request_queue *q, struct request *req,
->  				struct request *next)
->  {
-> @@ -679,6 +701,15 @@ static struct request *attempt_merge(struct request_queue *q,
->  	if (req->write_hint != next->write_hint)
->  		return NULL;
->  
-> +	/*
-> +	 * Discards are ... special.
-> +	 */
-> +	if (req_op(req) == REQ_OP_DISCARD) {
-> +		if (req_attempt_discard_merge(q, req, next))
-> +			return next;
-> +		return NULL;
-> +	}
-> +
->  	/*
->  	 * If we are allowed to merge, then append bio list
->  	 * from next to rq and release next. merge_requests_fn
-
-This looks fine to me, the bio-to-request merge path already looks correct.
-Care to send a properly formatted patch?
-
--- 
-Jens Axboe
+U2VwYXJhdGUgdGhlIHZlcnNpb24gYmV0d2VlbiBtYWpvciBhbmQgbWlub3Igb24gdGhlIGdlbmVy
+aWMgZ2VvbWV0cnkgYW5kCnJlcHJlc2VudCBpdCB0aHJvdWdoIHN5c2ZzIGluIHRoZSAyLjAgcGF0
+aC4gVGhlIDEuMiBwYXRoIG9ubHkgc2hvd3MgdGhlIG1ham9yCnZlcnNpb24gdG8gcHJlc2VydmUg
+dGhlIGV4aXN0aW5nIHVzZXIgc3BhY2UgaW50ZXJmYWNlLgoKU2lnbmVkLW9mZi1ieTogSmF2aWVy
+IEdvbnrDoWxleiA8amF2aWVyQGNuZXhsYWJzLmNvbT4KLS0tCiBkcml2ZXJzL2xpZ2h0bnZtL2Nv
+cmUuYyAgICAgIHwgIDQgKystLQogZHJpdmVycy9udm1lL2hvc3QvbGlnaHRudm0uYyB8IDI1ICsr
+KysrKysrKysrKysrKysrKysrLS0tLS0KIGluY2x1ZGUvbGludXgvbGlnaHRudm0uaCAgICAgfCAg
+MyArKy0KIDMgZmlsZXMgY2hhbmdlZCwgMjQgaW5zZXJ0aW9ucygrKSwgOCBkZWxldGlvbnMoLSkK
+CmRpZmYgLS1naXQgYS9kcml2ZXJzL2xpZ2h0bnZtL2NvcmUuYyBiL2RyaXZlcnMvbGlnaHRudm0v
+Y29yZS5jCmluZGV4IDQzZTNkNmJiNWJlNi4uOTZmNGU2MmQzODNiIDEwMDY0NAotLS0gYS9kcml2
+ZXJzL2xpZ2h0bnZtL2NvcmUuYworKysgYi9kcml2ZXJzL2xpZ2h0bnZtL2NvcmUuYwpAQCAtODk3
+LDggKzg5Nyw4IEBAIHN0YXRpYyBpbnQgbnZtX2luaXQoc3RydWN0IG52bV9kZXYgKmRldikKIAkJ
+Z290byBlcnI7CiAJfQogCi0JcHJfZGVidWcoIm52bTogdmVyOiV1IG52bV92ZW5kb3I6JXhcbiIs
+Ci0JCQkJZGV2X2dlby0+dmVyX2lkLAorCXByX2RlYnVnKCJudm06IHZlcjoldS4ldSBudm1fdmVu
+ZG9yOiV4XG4iLAorCQkJCWRldl9nZW8tPm1ham9yX3Zlcl9pZCwgZGV2X2dlby0+bWlub3JfdmVy
+X2lkLAogCQkJCWRldl9nZW8tPmMudm1udCk7CiAKIAlyZXQgPSBudm1fY29yZV9pbml0KGRldik7
+CmRpZmYgLS1naXQgYS9kcml2ZXJzL252bWUvaG9zdC9saWdodG52bS5jIGIvZHJpdmVycy9udm1l
+L2hvc3QvbGlnaHRudm0uYwppbmRleCAxMDM5MmE2NjRiNTAuLjhiZWZiNjBlZWFjYiAxMDA2NDQK
+LS0tIGEvZHJpdmVycy9udm1lL2hvc3QvbGlnaHRudm0uYworKysgYi9kcml2ZXJzL252bWUvaG9z
+dC9saWdodG52bS5jCkBAIC0yOTUsNyArMjk1LDkgQEAgc3RhdGljIGludCBudm1lX252bV9zZXR1
+cF8xMihzdHJ1Y3QgbnZtZV9udm1faWQxMiAqaWQsCiAJCXJldHVybiAtRUlOVkFMOwogCX0KIAot
+CWRldl9nZW8tPnZlcl9pZCA9IGlkLT52ZXJfaWQ7CisJLyogMS4yIHNwZWMuIG9ubHkgcmVwb3J0
+cyBhIHNpbmdsZSB2ZXJzaW9uIGlkIC0gdW5mb2xkICovCisJZGV2X2dlby0+bWFqb3JfdmVyX2lk
+ID0gaWQtPnZlcl9pZDsKKwlkZXZfZ2VvLT5taW5vcl92ZXJfaWQgPSAyOwogCiAJZGV2X2dlby0+
+bnJfY2hubHMgPSBzcmMtPm51bV9jaDsKIAlkZXZfZ2VvLT5ucl9sdW5zID0gc3JjLT5udW1fbHVu
+OwpAQCAtMzgwLDcgKzM4MiwxNCBAQCBzdGF0aWMgdm9pZCBudm1lX252bV9zZXRfYWRkcl8yMChz
+dHJ1Y3QgbnZtX2FkZHJfZm9ybWF0ICpkc3QsCiBzdGF0aWMgaW50IG52bWVfbnZtX3NldHVwXzIw
+KHN0cnVjdCBudm1lX252bV9pZDIwICppZCwKIAkJCSAgICAgc3RydWN0IG52bV9nZW8gKmRldl9n
+ZW8pCiB7Ci0JZGV2X2dlby0+dmVyX2lkID0gaWQtPm1qcjsKKwlkZXZfZ2VvLT5tYWpvcl92ZXJf
+aWQgPSBpZC0+bWpyOworCWRldl9nZW8tPm1pbm9yX3Zlcl9pZCA9IGlkLT5tbnI7CisKKwlpZiAo
+IShkZXZfZ2VvLT5tYWpvcl92ZXJfaWQgPT0gMiAmJiBkZXZfZ2VvLT5taW5vcl92ZXJfaWQgPT0g
+MCkpIHsKKwkJcHJfZXJyKCJudm06IE9DU1NEIHZlcnNpb24gbm90IHN1cHBvcnRlZCAodiVkLiVk
+KVxuIiwKKwkJCQlkZXZfZ2VvLT5tYWpvcl92ZXJfaWQsIGRldl9nZW8tPm1pbm9yX3Zlcl9pZCk7
+CisJCXJldHVybiAtRUlOVkFMOworCX0KIAogCWRldl9nZW8tPm5yX2NobmxzID0gbGUxNl90b19j
+cHUoaWQtPm51bV9ncnApOwogCWRldl9nZW8tPm5yX2x1bnMgPSBsZTE2X3RvX2NwdShpZC0+bnVt
+X3B1KTsKQEAgLTkyMCw3ICs5MjksMTMgQEAgc3RhdGljIHNzaXplX3QgbnZtX2Rldl9hdHRyX3No
+b3coc3RydWN0IGRldmljZSAqZGV2LAogCWF0dHIgPSAmZGF0dHItPmF0dHI7CiAKIAlpZiAoc3Ry
+Y21wKGF0dHItPm5hbWUsICJ2ZXJzaW9uIikgPT0gMCkgewotCQlyZXR1cm4gc2NucHJpbnRmKHBh
+Z2UsIFBBR0VfU0laRSwgIiV1XG4iLCBkZXZfZ2VvLT52ZXJfaWQpOworCQlpZiAoZGV2X2dlby0+
+bWFqb3JfdmVyX2lkID09IDEpCisJCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwg
+IiV1XG4iLAorCQkJCQkJZGV2X2dlby0+bWFqb3JfdmVyX2lkKTsKKwkJZWxzZQorCQkJcmV0dXJu
+IHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIldS4ldVxuIiwKKwkJCQkJCWRldl9nZW8tPm1h
+am9yX3Zlcl9pZCwKKwkJCQkJCWRldl9nZW8tPm1pbm9yX3Zlcl9pZCk7CiAJfSBlbHNlIGlmIChz
+dHJjbXAoYXR0ci0+bmFtZSwgImNhcGFiaWxpdGllcyIpID09IDApIHsKIAkJcmV0dXJuIHNjbnBy
+aW50ZihwYWdlLCBQQUdFX1NJWkUsICIldVxuIiwgZGV2X2dlby0+Yy5jYXApOwogCX0gZWxzZSBp
+ZiAoc3RyY21wKGF0dHItPm5hbWUsICJyZWFkX3R5cCIpID09IDApIHsKQEAgLTExNzQsNyArMTE4
+OSw3IEBAIGludCBudm1lX252bV9yZWdpc3Rlcl9zeXNmcyhzdHJ1Y3QgbnZtZV9ucyAqbnMpCiAJ
+aWYgKCFuZGV2KQogCQlyZXR1cm4gLUVJTlZBTDsKIAotCXN3aXRjaCAoZGV2X2dlby0+dmVyX2lk
+KSB7CisJc3dpdGNoIChkZXZfZ2VvLT5tYWpvcl92ZXJfaWQpIHsKIAljYXNlIDE6CiAJCXJldHVy
+biBzeXNmc19jcmVhdGVfZ3JvdXAoJmRpc2tfdG9fZGV2KG5zLT5kaXNrKS0+a29iaiwKIAkJCQkJ
+Jm52bV9kZXZfYXR0cl9ncm91cF8xMik7CkBAIC0xMTkxLDcgKzEyMDYsNyBAQCB2b2lkIG52bWVf
+bnZtX3VucmVnaXN0ZXJfc3lzZnMoc3RydWN0IG52bWVfbnMgKm5zKQogCXN0cnVjdCBudm1fZGV2
+ICpuZGV2ID0gbnMtPm5kZXY7CiAJc3RydWN0IG52bV9nZW8gKmRldl9nZW8gPSAmbmRldi0+Z2Vv
+OwogCi0Jc3dpdGNoIChkZXZfZ2VvLT52ZXJfaWQpIHsKKwlzd2l0Y2ggKGRldl9nZW8tPm1ham9y
+X3Zlcl9pZCkgewogCWNhc2UgMToKIAkJc3lzZnNfcmVtb3ZlX2dyb3VwKCZkaXNrX3RvX2Rldihu
+cy0+ZGlzayktPmtvYmosCiAJCQkJCSZudm1fZGV2X2F0dHJfZ3JvdXBfMTIpOwpkaWZmIC0tZ2l0
+IGEvaW5jbHVkZS9saW51eC9saWdodG52bS5oIGIvaW5jbHVkZS9saW51eC9saWdodG52bS5oCmlu
+ZGV4IDQyNzA0YzRjYTlhZi4uY2NhZjhhMzAyMDJkIDEwMDY0NAotLS0gYS9pbmNsdWRlL2xpbnV4
+L2xpZ2h0bnZtLmgKKysrIGIvaW5jbHVkZS9saW51eC9saWdodG52bS5oCkBAIC0zMDksNyArMzA5
+LDggQEAgc3RydWN0IG52bV9jb21tb25fZ2VvIHsKIC8qIEluc3RhbmNlIGdlb21ldHJ5ICovCiBz
+dHJ1Y3QgbnZtX2dlbyB7CiAJLyogZGV2aWNlIHJlcG9ydGVkIHZlcnNpb24gKi8KLQl1OAl2ZXJf
+aWQ7CisJdTgJbWFqb3JfdmVyX2lkOworCXU4CW1pbm9yX3Zlcl9pZDsKIAogCS8qIGluc3RhbmNl
+IHNwZWNpZmljIGdlb21ldHJ5ICovCiAJaW50IG5yX2NobmxzOwotLSAKMi43LjQKCgpfX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpMaW51eC1udm1lIG1haWxp
+bmcgbGlzdApMaW51eC1udm1lQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xpc3RzLmluZnJh
+ZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1udm1lCg==
