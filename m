@@ -1,267 +1,42 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: linux-scsi@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Arun Easi <arun.easi@cavium.com>,
-	Omar Sandoval <osandov@fb.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Don Brace <don.brace@microsemi.com>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Peter Rivera <peter.rivera@broadcom.com>,
-	Laurence Oberman <loberman@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 4/8] blk-mq: introduce BLK_MQ_F_HOST_TAGS
-Date: Tue, 27 Feb 2018 18:07:46 +0800
-Message-Id: <20180227100750.32299-5-ming.lei@redhat.com>
-In-Reply-To: <20180227100750.32299-1-ming.lei@redhat.com>
-References: <20180227100750.32299-1-ming.lei@redhat.com>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Subject: [PATCH 14/19] nvme: make nvme_get_log_ext available
+Date: Mon, 26 Feb 2018 14:17:13 +0100
+Message-Id: <1519651038-16845-15-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
+References: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: linux-block@vger.kernel.org,
+ =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-This patch can support to partition host-wide tags to multiple hw queues,
-so each hw queue related data structures(tags, hctx) can be accessed in
-NUMA locality way, for example, the hw queue can be per NUMA node.
-
-It is observed IOPS can be improved much in this way on null_blk test.
-
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Arun Easi <arun.easi@cavium.com>
-Cc: Omar Sandoval <osandov@fb.com>,
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-Cc: Christoph Hellwig <hch@lst.de>,
-Cc: Don Brace <don.brace@microsemi.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Peter Rivera <peter.rivera@broadcom.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Laurence Oberman <loberman@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-debugfs.c |  2 ++
- block/blk-mq-sched.c   |  2 +-
- block/blk-mq-tag.c     | 10 +++++++---
- block/blk-mq-tag.h     |  5 ++++-
- block/blk-mq.c         | 43 ++++++++++++++++++++++++++++++++++++++-----
- block/blk-mq.h         |  3 ++-
- include/linux/blk-mq.h |  2 ++
- 7 files changed, 56 insertions(+), 11 deletions(-)
-
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 21cbc1f071c6..56b4a572f233 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -206,6 +206,7 @@ static const char *const hctx_flag_name[] = {
- 	HCTX_FLAG_NAME(SHOULD_MERGE),
- 	HCTX_FLAG_NAME(TAG_SHARED),
- 	HCTX_FLAG_NAME(SG_MERGE),
-+	HCTX_FLAG_NAME(HOST_TAGS),
- 	HCTX_FLAG_NAME(BLOCKING),
- 	HCTX_FLAG_NAME(NO_SCHED),
- };
-@@ -434,6 +435,7 @@ static void blk_mq_debugfs_tags_show(struct seq_file *m,
- 	seq_printf(m, "nr_reserved_tags=%u\n", tags->nr_reserved_tags);
- 	seq_printf(m, "active_queues=%d\n",
- 		   atomic_read(&tags->active_queues));
-+	seq_printf(m, "start_tag=%u\n", tags->start_tag);
- 
- 	seq_puts(m, "\nbitmap_tags:\n");
- 	sbitmap_queue_show(&tags->bitmap_tags, m);
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 25c14c58385c..d895a57f945a 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -497,7 +497,7 @@ static int blk_mq_sched_alloc_tags(struct request_queue *q,
- 	int ret;
- 
- 	hctx->sched_tags = blk_mq_alloc_rq_map(set, hctx_idx, q->nr_requests,
--					       set->reserved_tags);
-+					       set->reserved_tags, 0);
- 	if (!hctx->sched_tags)
- 		return -ENOMEM;
- 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 5014d7343ea9..cc8886f82c71 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -380,9 +380,11 @@ static struct blk_mq_tags *blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
- 	return NULL;
- }
- 
--struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
-+struct blk_mq_tags *blk_mq_init_tags(struct blk_mq_tag_set *set,
-+				     unsigned int total_tags,
- 				     unsigned int reserved_tags,
--				     int node, int alloc_policy)
-+				     int node, int alloc_policy,
-+				     unsigned int start_tag)
- {
- 	struct blk_mq_tags *tags;
- 
-@@ -397,6 +399,7 @@ struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
- 
- 	tags->nr_tags = total_tags;
- 	tags->nr_reserved_tags = reserved_tags;
-+	tags->start_tag = start_tag;
- 
- 	return blk_mq_init_bitmap_tags(tags, node, alloc_policy);
- }
-@@ -438,7 +441,8 @@ int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
- 		if (tdepth > 16 * BLKDEV_MAX_RQ)
- 			return -EINVAL;
- 
--		new = blk_mq_alloc_rq_map(set, hctx->queue_num, tdepth, 0);
-+		new = blk_mq_alloc_rq_map(set, hctx->queue_num, tdepth, 0,
-+				tags->start_tag);
- 		if (!new)
- 			return -ENOMEM;
- 		ret = blk_mq_alloc_rqs(set, new, hctx->queue_num, tdepth);
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index 1d629920db69..9cd195cb15d0 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -14,6 +14,7 @@ struct blk_mq_tags {
- 	atomic_t active_queues;
- 
- 	unsigned int start_tag;
-+	bool	host_wide;
- 
- 	struct sbitmap_queue bitmap_tags;
- 	struct sbitmap_queue breserved_tags;
-@@ -24,7 +25,9 @@ struct blk_mq_tags {
- };
- 
- 
--extern struct blk_mq_tags *blk_mq_init_tags(unsigned int nr_tags, unsigned int reserved_tags, int node, int alloc_policy);
-+extern struct blk_mq_tags *blk_mq_init_tags(struct blk_mq_tag_set *set,
-+		unsigned int nr_tags, unsigned int reserved_tags, int node,
-+		int alloc_policy, unsigned int start_tag);
- extern void blk_mq_free_tags(struct blk_mq_tags *tags);
- 
- extern unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 5ea11d087f7b..6ebe053b2280 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2024,7 +2024,8 @@ void blk_mq_free_rq_map(struct blk_mq_tags *tags)
- struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
- 					unsigned int hctx_idx,
- 					unsigned int nr_tags,
--					unsigned int reserved_tags)
-+					unsigned int reserved_tags,
-+					unsigned int start_tag)
- {
- 	struct blk_mq_tags *tags;
- 	int node;
-@@ -2033,8 +2034,9 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
- 	if (node == NUMA_NO_NODE)
- 		node = set->numa_node;
- 
--	tags = blk_mq_init_tags(nr_tags, reserved_tags, node,
--				BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags));
-+	tags = blk_mq_init_tags(set, nr_tags, reserved_tags, node,
-+				BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags),
-+				start_tag);
- 	if (!tags)
- 		return NULL;
- 
-@@ -2086,6 +2088,9 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 	size_t rq_size, left;
- 	int node;
- 
-+	if (tags->host_wide && !hctx_idx)
-+		depth += set->__host_queue_depth - set->nr_hw_queues * set->queue_depth;
-+
- 	node = blk_mq_hw_queue_to_node(set->mq_map, hctx_idx);
- 	if (node == NUMA_NO_NODE)
- 		node = set->numa_node;
-@@ -2335,12 +2340,25 @@ static void blk_mq_init_cpu_queues(struct request_queue *q,
- static bool __blk_mq_alloc_rq_map(struct blk_mq_tag_set *set, int hctx_idx)
- {
- 	int ret = 0;
-+	unsigned int queue_depth = set->queue_depth;
-+	unsigned int extra, start_tag = 0;
-+
-+	if (set->flags & BLK_MQ_F_HOST_TAGS) {
-+		extra = set->__host_queue_depth - set->nr_hw_queues * queue_depth;
-+		/* Assign extra tags to hw queue 0 */
-+		if (hctx_idx == 0)
-+			queue_depth += extra;
-+		else
-+			start_tag = hctx_idx * queue_depth + extra;
-+	}
- 
--	set->tags[hctx_idx] = blk_mq_alloc_rq_map(set, hctx_idx,
--					set->queue_depth, set->reserved_tags);
-+	set->tags[hctx_idx] = blk_mq_alloc_rq_map(set, hctx_idx, queue_depth,
-+						  set->reserved_tags,
-+						  start_tag);
- 	if (!set->tags[hctx_idx])
- 		return false;
- 
-+	set->tags[hctx_idx]->host_wide = !!(set->flags & BLK_MQ_F_HOST_TAGS);
- 	ret = blk_mq_alloc_rqs(set, set->tags[hctx_idx], hctx_idx,
- 				set->queue_depth);
- 	if (!ret)
-@@ -2892,6 +2910,21 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
- 	if (ret)
- 		goto out_free_mq_map;
- 
-+	/*
-+	 * Divide host tags to each hw queues equally, and assign extra
-+	 * tags to hw queue 0, see __blk_mq_alloc_rq_map().
-+	 *
-+	 * It is driver's responsility to choose a suitable 'nr_hw_queues'
-+	 * for getting a good 'hw queue depth', so that enough parallelism
-+	 * can be exploited from device internal view to get good performance,
-+	 * for example, 32 is often fine for HDD., and 256 or a bit less is
-+	 * enough for SSD.
-+	 */
-+	if (set->flags & BLK_MQ_F_HOST_TAGS) {
-+		set->__host_queue_depth = set->queue_depth;
-+		set->queue_depth = set->__host_queue_depth / set->nr_hw_queues;
-+	}
-+
- 	ret = blk_mq_alloc_rq_maps(set);
- 	if (ret)
- 		goto out_free_mq_map;
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 88c558f71819..ea9a46517c8a 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -61,7 +61,8 @@ void blk_mq_free_rq_map(struct blk_mq_tags *tags);
- struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
- 					unsigned int hctx_idx,
- 					unsigned int nr_tags,
--					unsigned int reserved_tags);
-+					unsigned int reserved_tags,
-+					unsigned int start_tag);
- int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 		     unsigned int hctx_idx, unsigned int depth);
- 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 8efcf49796a3..cff01125bba7 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -74,6 +74,7 @@ struct blk_mq_tag_set {
- 	const struct blk_mq_ops	*ops;
- 	unsigned int		nr_hw_queues;
- 	unsigned int		queue_depth;	/* max hw supported */
-+	unsigned int		__host_queue_depth;	/* BLK_MQ_F_HOST_TAGS */
- 	unsigned int		reserved_tags;
- 	unsigned int		cmd_size;	/* per-request extra data */
- 	int			numa_node;
-@@ -175,6 +176,7 @@ enum {
- 	BLK_MQ_F_SHOULD_MERGE	= 1 << 0,
- 	BLK_MQ_F_TAG_SHARED	= 1 << 1,
- 	BLK_MQ_F_SG_MERGE	= 1 << 2,
-+	BLK_MQ_F_HOST_TAGS	= 1 << 3,
- 	BLK_MQ_F_BLOCKING	= 1 << 5,
- 	BLK_MQ_F_NO_SCHED	= 1 << 6,
- 	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
--- 
-2.9.5
+TWFrZSBudm1lX2dldF9sb2dfZXh0IGF2YWlsYWJsZSBvdXRzaWRlIG9mIGNvcmUuYy4KClRoaXMg
+aXMgaW4gcHJlcGFyYXRpb24gZm9yIHVzaW5nIGl0IGluIGxpZ2h0bnZtLmMKClNpZ25lZC1vZmYt
+Ynk6IEphdmllciBHb256w6FsZXogPGphdmllckBjbmV4bGFicy4+Ci0tLQogZHJpdmVycy9udm1l
+L2hvc3QvbnZtZS5oIHwgMyArKysKIDEgZmlsZSBjaGFuZ2VkLCAzIGluc2VydGlvbnMoKykKCmRp
+ZmYgLS1naXQgYS9kcml2ZXJzL252bWUvaG9zdC9udm1lLmggYi9kcml2ZXJzL252bWUvaG9zdC9u
+dm1lLmgKaW5kZXggMWNhMDhmNDk5M2JhLi41MDVmNzk3ZjhjNmMgMTAwNjQ0Ci0tLSBhL2RyaXZl
+cnMvbnZtZS9ob3N0L252bWUuaAorKysgYi9kcml2ZXJzL252bWUvaG9zdC9udm1lLmgKQEAgLTM5
+Niw2ICszOTYsOSBAQCBpbnQgbnZtZV9yZXNldF9jdHJsKHN0cnVjdCBudm1lX2N0cmwgKmN0cmwp
+OwogaW50IG52bWVfZGVsZXRlX2N0cmwoc3RydWN0IG52bWVfY3RybCAqY3RybCk7CiBpbnQgbnZt
+ZV9kZWxldGVfY3RybF9zeW5jKHN0cnVjdCBudm1lX2N0cmwgKmN0cmwpOwogCitpbnQgbnZtZV9n
+ZXRfbG9nX2V4dChzdHJ1Y3QgbnZtZV9jdHJsICpjdHJsLCBzdHJ1Y3QgbnZtZV9ucyAqbnMsCisJ
+CSAgICAgdTggbG9nX3BhZ2UsIHZvaWQgKmxvZywgc2l6ZV90IHNpemUsIHNpemVfdCBvZmZzZXQp
+OworCiBleHRlcm4gY29uc3Qgc3RydWN0IGF0dHJpYnV0ZV9ncm91cCBudm1lX25zX2lkX2F0dHJf
+Z3JvdXA7CiBleHRlcm4gY29uc3Qgc3RydWN0IGJsb2NrX2RldmljZV9vcGVyYXRpb25zIG52bWVf
+bnNfaGVhZF9vcHM7CiAKLS0gCjIuNy40CgoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX18KTGludXgtbnZtZSBtYWlsaW5nIGxpc3QKTGludXgtbnZtZUBsaXN0
+cy5pbmZyYWRlYWQub3JnCmh0dHA6Ly9saXN0cy5pbmZyYWRlYWQub3JnL21haWxtYW4vbGlzdGlu
+Zm8vbGludXgtbnZtZQo=
