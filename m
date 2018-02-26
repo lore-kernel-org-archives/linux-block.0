@@ -1,135 +1,91 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:46986 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751968AbeB0Q44 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Feb 2018 11:56:56 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Tang Junhui <tang.junhui@zte.com.cn>
-Subject: [PATCH v7 6/9] bcache: fix inaccurate io state for detached bcache devices
-Date: Wed, 28 Feb 2018 00:55:54 +0800
-Message-Id: <20180227165557.20442-7-colyli@suse.de>
-In-Reply-To: <20180227165557.20442-1-colyli@suse.de>
-References: <20180227165557.20442-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Subject: [PATCH 13/19] lightnvm: make address conversions depend on generic
+ device
+Date: Mon, 26 Feb 2018 14:17:12 +0100
+Message-Id: <1519651038-16845-14-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
+References: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: linux-block@vger.kernel.org,
+ =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
-
-When we run IO in a detached device,  and run iostat to shows IO status,
-normally it will show like bellow (Omitted some fields):
-Device: ... avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
-sdd        ... 15.89     0.53    1.82    0.20    2.23   1.81  52.30
-bcache0    ... 15.89   115.42    0.00    0.00    0.00   2.40  69.60
-but after IO stopped, there are still very big avgqu-sz and %util
-values as bellow:
-Device: ... avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
-bcache0   ...      0   5326.32    0.00    0.00    0.00   0.00 100.10
-
-The reason for this issue is that, only generic_start_io_acct() called
-and no generic_end_io_acct() called for detached device in
-cached_dev_make_request(). See the code:
-//start generic_start_io_acct()
-generic_start_io_acct(q, rw, bio_sectors(bio), &d->disk->part0);
-if (cached_dev_get(dc)) {
-	//will callback generic_end_io_acct()
-}
-else {
-	//will not call generic_end_io_acct()
-}
-
-This patch calls generic_end_io_acct() in the end of IO for detached
-devices, so we can show IO state correctly.
-
-(Modified to use GFP_NOIO in kzalloc() by Coly Li)
-
-Changelog:
-v2: fix typo.
-v1: the initial version.
-
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-Reviewed-by: Coly Li <colyli@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/request.c | 58 +++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 51 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 02296bda6384..279c9266bf50 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -986,6 +986,55 @@ static void cached_dev_nodata(struct closure *cl)
- 	continue_at(cl, cached_dev_bio_complete, NULL);
- }
- 
-+struct detached_dev_io_private {
-+	struct bcache_device	*d;
-+	unsigned long		start_time;
-+	bio_end_io_t		*bi_end_io;
-+	void			*bi_private;
-+};
-+
-+static void detached_dev_end_io(struct bio *bio)
-+{
-+	struct detached_dev_io_private *ddip;
-+
-+	ddip = bio->bi_private;
-+	bio->bi_end_io = ddip->bi_end_io;
-+	bio->bi_private = ddip->bi_private;
-+
-+	generic_end_io_acct(ddip->d->disk->queue,
-+			    bio_data_dir(bio),
-+			    &ddip->d->disk->part0, ddip->start_time);
-+
-+	kfree(ddip);
-+
-+	bio->bi_end_io(bio);
-+}
-+
-+static void detached_dev_do_request(struct bcache_device *d, struct bio *bio)
-+{
-+	struct detached_dev_io_private *ddip;
-+	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
-+
-+	/*
-+	 * no need to call closure_get(&dc->disk.cl),
-+	 * because upper layer had already opened bcache device,
-+	 * which would call closure_get(&dc->disk.cl)
-+	 */
-+	ddip = kzalloc(sizeof(struct detached_dev_io_private), GFP_NOIO);
-+	ddip->d = d;
-+	ddip->start_time = jiffies;
-+	ddip->bi_end_io = bio->bi_end_io;
-+	ddip->bi_private = bio->bi_private;
-+	bio->bi_end_io = detached_dev_end_io;
-+	bio->bi_private = ddip;
-+
-+	if ((bio_op(bio) == REQ_OP_DISCARD) &&
-+	    !blk_queue_discard(bdev_get_queue(dc->bdev)))
-+		bio->bi_end_io(bio);
-+	else
-+		generic_make_request(bio);
-+}
-+
- /* Cached devices - read & write stuff */
- 
- static blk_qc_t cached_dev_make_request(struct request_queue *q,
-@@ -1028,13 +1077,8 @@ static blk_qc_t cached_dev_make_request(struct request_queue *q,
- 			else
- 				cached_dev_read(dc, s);
- 		}
--	} else {
--		if ((bio_op(bio) == REQ_OP_DISCARD) &&
--		    !blk_queue_discard(bdev_get_queue(dc->bdev)))
--			bio_endio(bio);
--		else
--			generic_make_request(bio);
--	}
-+	} else
-+		detached_dev_do_request(d, bio);
- 
- 	return BLK_QC_T_NONE;
- }
--- 
-2.16.1
+T24gYWRkcmVzcyBjb252ZXJzaW9ucywgdXNlIHRoZSBnZW5lcmljIGRldmljZSwgaW5zdGVhZCBv
+ZiB0aGUgdGFyZ2V0CmRldmljZS4gVGhpcyBhbGxvd3MgdG8gdXNlIGNvbnZlcnNpb25zIG91dHNp
+ZGUgb2YgdGhlIHRhcmdldCdzIHJlYWxtLgoKU2lnbmVkLW9mZi1ieTogSmF2aWVyIEdvbnrDoWxl
+eiA8amF2aWVyQGNuZXhsYWJzLmNvbT4KLS0tCiBkcml2ZXJzL2xpZ2h0bnZtL2NvcmUuYyAgfCAg
+NCArKy0tCiBpbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmggfCAyMCArKysrKysrKysrLS0tLS0tLS0t
+LQogMiBmaWxlcyBjaGFuZ2VkLCAxMiBpbnNlcnRpb25zKCspLCAxMiBkZWxldGlvbnMoLSkKCmRp
+ZmYgLS1naXQgYS9kcml2ZXJzL2xpZ2h0bnZtL2NvcmUuYyBiL2RyaXZlcnMvbGlnaHRudm0vY29y
+ZS5jCmluZGV4IDkyZWE2ZTM5ZGQ2NC4uZmFlNWU4YzZmY2QwIDEwMDY0NAotLS0gYS9kcml2ZXJz
+L2xpZ2h0bnZtL2NvcmUuYworKysgYi9kcml2ZXJzL2xpZ2h0bnZtL2NvcmUuYwpAQCAtNTg4LDcg
+KzU4OCw3IEBAIHN0YXRpYyB2b2lkIG52bV9wcGFfdGd0X3RvX2RldihzdHJ1Y3QgbnZtX3RndF9k
+ZXYgKnRndF9kZXYsCiAKIAlmb3IgKGkgPSAwOyBpIDwgbnJfcHBhczsgaSsrKSB7CiAJCW52bV9t
+YXBfdG9fZGV2KHRndF9kZXYsICZwcGFfbGlzdFtpXSk7Ci0JCXBwYV9saXN0W2ldID0gZ2VuZXJp
+Y190b19kZXZfYWRkcih0Z3RfZGV2LCBwcGFfbGlzdFtpXSk7CisJCXBwYV9saXN0W2ldID0gZ2Vu
+ZXJpY190b19kZXZfYWRkcih0Z3RfZGV2LT5wYXJlbnQsIHBwYV9saXN0W2ldKTsKIAl9CiB9CiAK
+QEAgLTU5OCw3ICs1OTgsNyBAQCBzdGF0aWMgdm9pZCBudm1fcHBhX2Rldl90b190Z3Qoc3RydWN0
+IG52bV90Z3RfZGV2ICp0Z3RfZGV2LAogCWludCBpOwogCiAJZm9yIChpID0gMDsgaSA8IG5yX3Bw
+YXM7IGkrKykgewotCQlwcGFfbGlzdFtpXSA9IGRldl90b19nZW5lcmljX2FkZHIodGd0X2Rldiwg
+cHBhX2xpc3RbaV0pOworCQlwcGFfbGlzdFtpXSA9IGRldl90b19nZW5lcmljX2FkZHIodGd0X2Rl
+di0+cGFyZW50LCBwcGFfbGlzdFtpXSk7CiAJCW52bV9tYXBfdG9fdGd0KHRndF9kZXYsICZwcGFf
+bGlzdFtpXSk7CiAJfQogfQpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9saWdodG52bS5oIGIv
+aW5jbHVkZS9saW51eC9saWdodG52bS5oCmluZGV4IDhjZGExMTI1YzM0YS4uMmI5MDk1OTI1Njhh
+IDEwMDY0NAotLS0gYS9pbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmgKKysrIGIvaW5jbHVkZS9saW51
+eC9saWdodG52bS5oCkBAIC00MDUsMTUgKzQwNSwxNSBAQCBzdHJ1Y3QgbnZtX2RldiB7CiAJc3Ry
+dWN0IGxpc3RfaGVhZCB0YXJnZXRzOwogfTsKIAotc3RhdGljIGlubGluZSBzdHJ1Y3QgcHBhX2Fk
+ZHIgZ2VuZXJpY190b19kZXZfYWRkcihzdHJ1Y3QgbnZtX3RndF9kZXYgKnRndF9kZXYsCitzdGF0
+aWMgaW5saW5lIHN0cnVjdCBwcGFfYWRkciBnZW5lcmljX3RvX2Rldl9hZGRyKHN0cnVjdCBudm1f
+ZGV2ICpkZXYsCiAJCQkJCQkgIHN0cnVjdCBwcGFfYWRkciByKQogewotCXN0cnVjdCBudm1fZ2Vv
+ICpnZW8gPSAmdGd0X2Rldi0+Z2VvOworCXN0cnVjdCBudm1fZ2VvICpkZXZfZ2VvID0gJmRldi0+
+Z2VvOwogCXN0cnVjdCBwcGFfYWRkciBsOwogCi0JaWYgKGdlby0+Yy52ZXJzaW9uID09IE5WTV9P
+Q1NTRF9TUEVDXzEyKSB7CisJaWYgKGRldl9nZW8tPmMudmVyc2lvbiA9PSBOVk1fT0NTU0RfU1BF
+Q18xMikgewogCQlzdHJ1Y3QgbnZtX2FkZHJfZm9ybWF0XzEyICpwcGFmID0KLQkJCQkoc3RydWN0
+IG52bV9hZGRyX2Zvcm1hdF8xMiAqKSZnZW8tPmMuYWRkcmY7CisJCQkJKHN0cnVjdCBudm1fYWRk
+cl9mb3JtYXRfMTIgKikmZGV2X2dlby0+Yy5hZGRyZjsKIAogCQlsLnBwYSA9ICgodTY0KXIuZy5j
+aCkgPDwgcHBhZi0+Y2hfb2Zmc2V0OwogCQlsLnBwYSB8PSAoKHU2NClyLmcubHVuKSA8PCBwcGFm
+LT5sdW5fb2Zmc2V0OwpAQCAtNDIyLDcgKzQyMiw3IEBAIHN0YXRpYyBpbmxpbmUgc3RydWN0IHBw
+YV9hZGRyIGdlbmVyaWNfdG9fZGV2X2FkZHIoc3RydWN0IG52bV90Z3RfZGV2ICp0Z3RfZGV2LAog
+CQlsLnBwYSB8PSAoKHU2NClyLmcucGwpIDw8IHBwYWYtPnBsbl9vZmZzZXQ7CiAJCWwucHBhIHw9
+ICgodTY0KXIuZy5zZWMpIDw8IHBwYWYtPnNlY19vZmZzZXQ7CiAJfSBlbHNlIHsKLQkJc3RydWN0
+IG52bV9hZGRyX2Zvcm1hdCAqbGJhZiA9ICZnZW8tPmMuYWRkcmY7CisJCXN0cnVjdCBudm1fYWRk
+cl9mb3JtYXQgKmxiYWYgPSAmZGV2X2dlby0+Yy5hZGRyZjsKIAogCQlsLnBwYSA9ICgodTY0KXIu
+bS5ncnApIDw8IGxiYWYtPmNoX29mZnNldDsKIAkJbC5wcGEgfD0gKCh1NjQpci5tLnB1KSA8PCBs
+YmFmLT5sdW5fb2Zmc2V0OwpAQCAtNDMzLDE3ICs0MzMsMTcgQEAgc3RhdGljIGlubGluZSBzdHJ1
+Y3QgcHBhX2FkZHIgZ2VuZXJpY190b19kZXZfYWRkcihzdHJ1Y3QgbnZtX3RndF9kZXYgKnRndF9k
+ZXYsCiAJcmV0dXJuIGw7CiB9CiAKLXN0YXRpYyBpbmxpbmUgc3RydWN0IHBwYV9hZGRyIGRldl90
+b19nZW5lcmljX2FkZHIoc3RydWN0IG52bV90Z3RfZGV2ICp0Z3RfZGV2LAorc3RhdGljIGlubGlu
+ZSBzdHJ1Y3QgcHBhX2FkZHIgZGV2X3RvX2dlbmVyaWNfYWRkcihzdHJ1Y3QgbnZtX2RldiAqZGV2
+LAogCQkJCQkJICBzdHJ1Y3QgcHBhX2FkZHIgcikKIHsKLQlzdHJ1Y3QgbnZtX2dlbyAqZ2VvID0g
+JnRndF9kZXYtPmdlbzsKKwlzdHJ1Y3QgbnZtX2dlbyAqZGV2X2dlbyA9ICZkZXYtPmdlbzsKIAlz
+dHJ1Y3QgcHBhX2FkZHIgbDsKIAogCWwucHBhID0gMDsKIAotCWlmIChnZW8tPmMudmVyc2lvbiA9
+PSBOVk1fT0NTU0RfU1BFQ18xMikgeworCWlmIChkZXZfZ2VvLT5jLnZlcnNpb24gPT0gTlZNX09D
+U1NEX1NQRUNfMTIpIHsKIAkJc3RydWN0IG52bV9hZGRyX2Zvcm1hdF8xMiAqcHBhZiA9Ci0JCQkJ
+KHN0cnVjdCBudm1fYWRkcl9mb3JtYXRfMTIgKikmZ2VvLT5jLmFkZHJmOworCQkJCShzdHJ1Y3Qg
+bnZtX2FkZHJfZm9ybWF0XzEyICopJmRldl9nZW8tPmMuYWRkcmY7CiAKIAkJbC5nLmNoID0gKHIu
+cHBhICYgcHBhZi0+Y2hfbWFzaykgPj4gcHBhZi0+Y2hfb2Zmc2V0OwogCQlsLmcubHVuID0gKHIu
+cHBhICYgcHBhZi0+bHVuX21hc2spID4+IHBwYWYtPmx1bl9vZmZzZXQ7CkBAIC00NTIsNyArNDUy
+LDcgQEAgc3RhdGljIGlubGluZSBzdHJ1Y3QgcHBhX2FkZHIgZGV2X3RvX2dlbmVyaWNfYWRkcihz
+dHJ1Y3QgbnZtX3RndF9kZXYgKnRndF9kZXYsCiAJCWwuZy5wbCA9IChyLnBwYSAmIHBwYWYtPnBs
+bl9tYXNrKSA+PiBwcGFmLT5wbG5fb2Zmc2V0OwogCQlsLmcuc2VjID0gKHIucHBhICYgcHBhZi0+
+c2VjX21hc2spID4+IHBwYWYtPnNlY19vZmZzZXQ7CiAJfSBlbHNlIHsKLQkJc3RydWN0IG52bV9h
+ZGRyX2Zvcm1hdCAqbGJhZiA9ICZnZW8tPmMuYWRkcmY7CisJCXN0cnVjdCBudm1fYWRkcl9mb3Jt
+YXQgKmxiYWYgPSAmZGV2X2dlby0+Yy5hZGRyZjsKIAogCQlsLm0uZ3JwID0gKHIucHBhICYgbGJh
+Zi0+Y2hfbWFzaykgPj4gbGJhZi0+Y2hfb2Zmc2V0OwogCQlsLm0ucHUgPSAoci5wcGEgJiBsYmFm
+LT5sdW5fbWFzaykgPj4gbGJhZi0+bHVuX29mZnNldDsKLS0gCjIuNy40CgoKX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KTGludXgtbnZtZSBtYWlsaW5nIGxp
+c3QKTGludXgtbnZtZUBsaXN0cy5pbmZyYWRlYWQub3JnCmh0dHA6Ly9saXN0cy5pbmZyYWRlYWQu
+b3JnL21haWxtYW4vbGlzdGluZm8vbGludXgtbnZtZQo=
