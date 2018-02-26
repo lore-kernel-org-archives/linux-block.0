@@ -1,65 +1,59 @@
-Return-Path: <prvs=590d2a92c=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Subject: [PATCH 04/19] lightnvm: add shorten OCSSD version in geo
+Date: Mon, 26 Feb 2018 14:17:03 +0100
+Message-Id: <1519651038-16845-5-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
+References: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
 Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Damien Le Moal <damien.lemoal@wdc.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] blk-mq: Make sure that the affected zone is unlocked if a request times out
-Date: Tue, 27 Feb 2018 16:28:30 -0800
-Message-Id: <20180228002830.3052-1-bart.vanassche@wdc.com>
+ =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-If a request times out the .completed_request() method is not called
-and the .finish_request() method is only called if RQF_ELVPRIV has
-been set. Hence this patch that sets RQF_ELVPRIV and that adds a
-.finish_request() method. Without this patch, if a request times out
-the zone that request applies to remains locked forever and no further
-writes are accepted for that zone.
-
-Fixes: 5700f69178e9 ("mq-deadline: Introduce zone locking support")
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Ming Lei <ming.lei@redhat.com>
----
- block/mq-deadline.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index c56f211c8440..55d5b7a02d62 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -367,7 +367,8 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd)
- 	 * If the request needs its target zone locked, do it.
- 	 */
- 	blk_req_zone_write_lock(rq);
--	rq->rq_flags |= RQF_STARTED;
-+	/* Set RQF_ELVPRIV to ensure that .finish_request() gets called */
-+	rq->rq_flags |= RQF_STARTED | RQF_ELVPRIV;
- 	return rq;
- }
- 
-@@ -539,7 +540,9 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
-  * For zoned block devices, write unlock the target zone of
-  * completed write requests. Do this while holding the zone lock
-  * spinlock so that the zone is never unlocked while deadline_fifo_request()
-- * while deadline_next_request() are executing.
-+ * while deadline_next_request() are executing. This function is called twice
-+ * for requests that complete in a normal way and once for requests that time
-+ * out.
-  */
- static void dd_completed_request(struct request *rq)
- {
-@@ -757,6 +760,7 @@ static struct elevator_type mq_deadline = {
- 		.insert_requests	= dd_insert_requests,
- 		.dispatch_request	= dd_dispatch_request,
- 		.completed_request	= dd_completed_request,
-+		.finish_request		= dd_completed_request,
- 		.next_request		= elv_rb_latter_request,
- 		.former_request		= elv_rb_former_request,
- 		.bio_merge		= dd_bio_merge,
--- 
-2.16.2
+Q3JlYXRlIGEgc2hvcnRlbiB2ZXJzaW9uIHRvIHVzZSBpbiB0aGUgZ2VuZXJpYyBnZW9tZXRyeS4K
+ClNpZ25lZC1vZmYtYnk6IEphdmllciBHb256w6FsZXogPGphdmllckBjbmV4bGFicy5jb20+Ci0t
+LQogZHJpdmVycy9udm1lL2hvc3QvbGlnaHRudm0uYyB8IDYgKysrKysrCiBpbmNsdWRlL2xpbnV4
+L2xpZ2h0bnZtLmggICAgIHwgOCArKysrKysrKwogMiBmaWxlcyBjaGFuZ2VkLCAxNCBpbnNlcnRp
+b25zKCspCgpkaWZmIC0tZ2l0IGEvZHJpdmVycy9udm1lL2hvc3QvbGlnaHRudm0uYyBiL2RyaXZl
+cnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMKaW5kZXggOGJlZmI2MGVlYWNiLi5hNDg5NTBhMzdiOGQg
+MTAwNjQ0Ci0tLSBhL2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMKKysrIGIvZHJpdmVycy9u
+dm1lL2hvc3QvbGlnaHRudm0uYwpAQCAtMjk5LDYgKzI5OSw5IEBAIHN0YXRpYyBpbnQgbnZtZV9u
+dm1fc2V0dXBfMTIoc3RydWN0IG52bWVfbnZtX2lkMTIgKmlkLAogCWRldl9nZW8tPm1ham9yX3Zl
+cl9pZCA9IGlkLT52ZXJfaWQ7CiAJZGV2X2dlby0+bWlub3JfdmVyX2lkID0gMjsKIAorCS8qIFNl
+dCBjb21wYWN0ZWQgdmVyc2lvbiBmb3IgdXBwZXIgbGF5ZXJzICovCisJZGV2X2dlby0+Yy52ZXJz
+aW9uID0gTlZNX09DU1NEX1NQRUNfMTI7CisKIAlkZXZfZ2VvLT5ucl9jaG5scyA9IHNyYy0+bnVt
+X2NoOwogCWRldl9nZW8tPm5yX2x1bnMgPSBzcmMtPm51bV9sdW47CiAJZGV2X2dlby0+YWxsX2x1
+bnMgPSBkZXZfZ2VvLT5ucl9jaG5scyAqIGRldl9nZW8tPm5yX2x1bnM7CkBAIC0zODUsNiArMzg4
+LDkgQEAgc3RhdGljIGludCBudm1lX252bV9zZXR1cF8yMChzdHJ1Y3QgbnZtZV9udm1faWQyMCAq
+aWQsCiAJZGV2X2dlby0+bWFqb3JfdmVyX2lkID0gaWQtPm1qcjsKIAlkZXZfZ2VvLT5taW5vcl92
+ZXJfaWQgPSBpZC0+bW5yOwogCisJLyogU2V0IGNvbXBhY3RlZCB2ZXJzaW9uIGZvciB1cHBlciBs
+YXllcnMgKi8KKwlkZXZfZ2VvLT5jLnZlcnNpb24gPSBOVk1fT0NTU0RfU1BFQ18yMDsKKwogCWlm
+ICghKGRldl9nZW8tPm1ham9yX3Zlcl9pZCA9PSAyICYmIGRldl9nZW8tPm1pbm9yX3Zlcl9pZCA9
+PSAwKSkgewogCQlwcl9lcnIoIm52bTogT0NTU0QgdmVyc2lvbiBub3Qgc3VwcG9ydGVkICh2JWQu
+JWQpXG4iLAogCQkJCWRldl9nZW8tPm1ham9yX3Zlcl9pZCwgZGV2X2dlby0+bWlub3JfdmVyX2lk
+KTsKZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGludXgvbGlnaHRudm0uaCBiL2luY2x1ZGUvbGludXgv
+bGlnaHRudm0uaAppbmRleCBjY2FmOGEzMDIwMmQuLjU3ZDAwNjQ0YTFjNiAxMDA2NDQKLS0tIGEv
+aW5jbHVkZS9saW51eC9saWdodG52bS5oCisrKyBiL2luY2x1ZGUvbGludXgvbGlnaHRudm0uaApA
+QCAtMjMsNiArMjMsMTEgQEAgZW51bSB7CiAjZGVmaW5lIE5WTV9MVU5fQklUUyAoOCkKICNkZWZp
+bmUgTlZNX0NIX0JJVFMgICg3KQogCitlbnVtIHsKKwlOVk1fT0NTU0RfU1BFQ18xMiA9IDEyLAor
+CU5WTV9PQ1NTRF9TUEVDXzIwID0gMjAsCit9OworCiBzdHJ1Y3QgcHBhX2FkZHIgewogCS8qIEdl
+bmVyaWMgc3RydWN0dXJlIGZvciBhbGwgYWRkcmVzc2VzICovCiAJdW5pb24gewpAQCAtMjYyLDYg
+KzI2Nyw5IEBAIGVudW0gewogCiAvKiBEZXZpY2UgY29tbW9uIGdlb21ldHJ5ICovCiBzdHJ1Y3Qg
+bnZtX2NvbW1vbl9nZW8geworCS8qIGtlcm5lbCBzaG9ydCB2ZXJzaW9uICovCisJdTgJdmVyc2lv
+bjsKKwogCS8qIGNodW5rIGdlb21ldHJ5ICovCiAJdTMyCW51bV9jaGs7CS8qIGNodW5rcyBwZXIg
+bHVuICovCiAJdTMyCWNsYmE7CQkvKiBzZWN0b3JzIHBlciBjaHVuayAqLwotLSAKMi43LjQKCgpf
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpMaW51eC1udm1l
+IG1haWxpbmcgbGlzdApMaW51eC1udm1lQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xpc3Rz
+LmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1udm1lCg==
