@@ -1,22 +1,35 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: [PATCH][RESEND] block: copy ioprio in __bio_clone_fast()
-To: Hannes Reinecke <hare@suse.de>
-Cc: linux-block@vger.kernel.org, Mike Christie <mchristi@redhat.com>,
- Hannes Reinecke <hare@suse.com>
-References: <20180226132906.108227-1-hare@suse.de>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <cb0a2196-2ec5-e66e-1fc9-e48d51b2ffb6@kernel.dk>
-Date: Mon, 26 Feb 2018 09:06:59 -0700
-MIME-Version: 1.0
-In-Reply-To: <20180226132906.108227-1-hare@suse.de>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <hare@suse.de>
+From: Hannes Reinecke <hare@suse.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Mike Christie <mchristi@redhat.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Hannes Reinecke <hare@suse.com>
+Subject: [PATCH][RESEND] block: copy ioprio in __bio_clone_fast()
+Date: Mon, 26 Feb 2018 14:29:06 +0100
+Message-Id: <20180226132906.108227-1-hare@suse.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On 2/26/18 6:29 AM, Hannes Reinecke wrote:
-> We need to copy the io priority, too; otherwise the clone will run
-> with a different priority than the original one.
+We need to copy the io priority, too; otherwise the clone will run
+with a different priority than the original one.
 
-What about bio_clone_bioset()?
+Fixes: 43b62ce3ff0a ("block: move bio io prio to a new field")
+Signed-off-by: Hannes Reinecke <hare@suse.com>
+---
+ block/bio.c | 1 +
+ 1 file changed, 1 insertion(+)
 
+diff --git a/block/bio.c b/block/bio.c
+index e1708db48258..e079911c640f 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -605,6 +605,7 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
+ 	bio->bi_write_hint = bio_src->bi_write_hint;
+ 	bio->bi_iter = bio_src->bi_iter;
+ 	bio->bi_io_vec = bio_src->bi_io_vec;
++	bio->bi_ioprio = bio_src->bi_ioprio;
+ 
+ 	bio_clone_blkcg_association(bio, bio_src);
+ }
 -- 
-Jens Axboe
+2.12.3
