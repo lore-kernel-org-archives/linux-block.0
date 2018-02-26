@@ -1,222 +1,53 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f67.google.com ([209.85.215.67]:32770 "EHLO
-        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1032166AbeBONM0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Feb 2018 08:12:26 -0500
-Received: by mail-lf0-f67.google.com with SMTP id j193so18000166lfe.0
-        for <linux-block@vger.kernel.org>; Thu, 15 Feb 2018 05:12:25 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        javier@cnexlabs.com,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [PATCH v2 5/6] lightnvm: remove nvm_dev_ops->max_phys_sect
-Date: Thu, 15 Feb 2018 14:11:59 +0100
-Message-Id: <20180215131200.3354-6-mb@lightnvm.io>
-In-Reply-To: <20180215131200.3354-1-mb@lightnvm.io>
-References: <20180215131200.3354-1-mb@lightnvm.io>
+Return-Path: <hare@suse.com>
+Subject: Re: [PATCH] block: copy ioprio in __bio_clone_fast()
+To: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Mike Christie <mchristi@redhat.com>
+References: <20180226105552.22120-1-hare@suse.de>
+From: Hannes Reinecke <hare@suse.com>
+Message-ID: <6ad5eabb-30ff-4094-0873-3cb03bba9b1c@suse.com>
+Date: Mon, 26 Feb 2018 12:40:51 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180226105552.22120-1-hare@suse.de>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-The value of max_phys_sect is always static. Instead of
-defining it in the nvm_dev_ops structure, declare it as a global
-value.
+On 02/26/2018 11:55 AM, Hannes Reinecke wrote:
+> We need to copy the io priority, too; otherwise the clone will run
+> with a different priority than the original one.
+> 
+> Fixes: 43b62ce3ff0a ("block: move bio io prio to a new field")
+> Signed-off-by: Hannes Reinecke <hare@suse.com>
+> ---
+>  block/bio.c          |   1 +
+>  drivers/vhost/npiv.c | 379 +++++----------------------------------------------
+>  2 files changed, 37 insertions(+), 343 deletions(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index e1708db48258..e079911c640f 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -605,6 +605,7 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
+>  	bio->bi_write_hint = bio_src->bi_write_hint;
+>  	bio->bi_iter = bio_src->bi_iter;
+>  	bio->bi_io_vec = bio_src->bi_io_vec;
+> +	bio->bi_ioprio = bio_src->bi_ioprio;
+>  
+>  	bio_clone_blkcg_association(bio, bio_src);
+>  }
+> diff --git a/drivers/vhost/npiv.c b/drivers/vhost/npiv.c
+> index 20e2a66e332d..3527996aab3f 100644
+> --- a/drivers/vhost/npiv.c
+> +++ b/drivers/vhost/npiv.c
+> @@ -13,7 +13,7 @@
 
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
----
- drivers/lightnvm/core.c          | 28 +++++++---------------------
- drivers/lightnvm/pblk-init.c     |  9 ++++-----
- drivers/lightnvm/pblk-recovery.c |  8 ++------
- drivers/nvme/host/lightnvm.c     |  5 +----
- include/linux/lightnvm.h         |  5 ++---
- 5 files changed, 16 insertions(+), 39 deletions(-)
+Gnaa.
+Please ignore.
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 511c81c319ee..782f381e4d61 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -407,7 +407,8 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 	tdisk->private_data = targetdata;
- 	tqueue->queuedata = targetdata;
- 
--	blk_queue_max_hw_sectors(tqueue, 8 * dev->ops->max_phys_sect);
-+	blk_queue_max_hw_sectors(tqueue,
-+			(dev->geo.sec_size >> 9) * NVM_MAX_VLBA);
- 
- 	set_capacity(tdisk, tt->capacity(targetdata));
- 	add_disk(tdisk);
-@@ -719,7 +720,7 @@ int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas,
- 	struct nvm_rq rqd;
- 	int ret;
- 
--	if (nr_ppas > dev->ops->max_phys_sect) {
-+	if (nr_ppas > NVM_MAX_VLBA) {
- 		pr_err("nvm: unable to update all blocks atomically\n");
- 		return -EINVAL;
- 	}
-@@ -740,14 +741,6 @@ int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas,
- }
- EXPORT_SYMBOL(nvm_set_tgt_bb_tbl);
- 
--int nvm_max_phys_sects(struct nvm_tgt_dev *tgt_dev)
--{
--	struct nvm_dev *dev = tgt_dev->parent;
--
--	return dev->ops->max_phys_sect;
--}
--EXPORT_SYMBOL(nvm_max_phys_sects);
--
- int nvm_submit_io(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
- {
- 	struct nvm_dev *dev = tgt_dev->parent;
-@@ -965,17 +958,10 @@ int nvm_register(struct nvm_dev *dev)
- 	if (!dev->q || !dev->ops)
- 		return -EINVAL;
- 
--	if (dev->ops->max_phys_sect > 256) {
--		pr_info("nvm: max sectors supported is 256.\n");
--		return -EINVAL;
--	}
--
--	if (dev->ops->max_phys_sect > 1) {
--		dev->dma_pool = dev->ops->create_dma_pool(dev, "ppalist");
--		if (!dev->dma_pool) {
--			pr_err("nvm: could not create dma pool\n");
--			return -ENOMEM;
--		}
-+	dev->dma_pool = dev->ops->create_dma_pool(dev, "ppalist");
-+	if (!dev->dma_pool) {
-+		pr_err("nvm: could not create dma pool\n");
-+		return -ENOMEM;
- 	}
- 
- 	ret = nvm_init(dev);
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 86a94a7faa96..5261702e9ff7 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -260,8 +260,7 @@ static int pblk_core_init(struct pblk *pblk)
- 		return -ENOMEM;
- 
- 	/* Internal bios can be at most the sectors signaled by the device. */
--	pblk->page_bio_pool = mempool_create_page_pool(nvm_max_phys_sects(dev),
--									0);
-+	pblk->page_bio_pool = mempool_create_page_pool(NVM_MAX_VLBA, 0);
- 	if (!pblk->page_bio_pool)
- 		goto free_global_caches;
- 
-@@ -716,12 +715,12 @@ static int pblk_lines_init(struct pblk *pblk)
- 
- 	pblk->min_write_pgs = geo->sec_per_pl * (geo->sec_size / PAGE_SIZE);
- 	max_write_ppas = pblk->min_write_pgs * geo->all_luns;
--	pblk->max_write_pgs = (max_write_ppas < nvm_max_phys_sects(dev)) ?
--				max_write_ppas : nvm_max_phys_sects(dev);
-+	pblk->max_write_pgs = min_t(int, max_write_ppas, NVM_MAX_VLBA);
- 	pblk_set_sec_per_write(pblk, pblk->min_write_pgs);
- 
- 	if (pblk->max_write_pgs > PBLK_MAX_REQ_ADDRS) {
--		pr_err("pblk: cannot support device max_phys_sect\n");
-+		pr_err("pblk: vector list too big(%u > %u)\n",
-+				pblk->max_write_pgs, PBLK_MAX_REQ_ADDRS);
- 		return -EINVAL;
- 	}
- 
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index e75a1af2eebe..aaab9a5c17cc 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -21,17 +21,15 @@ void pblk_submit_rec(struct work_struct *work)
- 	struct pblk_rec_ctx *recovery =
- 			container_of(work, struct pblk_rec_ctx, ws_rec);
- 	struct pblk *pblk = recovery->pblk;
--	struct nvm_tgt_dev *dev = pblk->dev;
- 	struct nvm_rq *rqd = recovery->rqd;
- 	struct pblk_c_ctx *c_ctx = nvm_rq_to_pdu(rqd);
--	int max_secs = nvm_max_phys_sects(dev);
- 	struct bio *bio;
- 	unsigned int nr_rec_secs;
- 	unsigned int pgs_read;
- 	int ret;
- 
- 	nr_rec_secs = bitmap_weight((unsigned long int *)&rqd->ppa_status,
--								max_secs);
-+								NVM_MAX_VLBA);
- 
- 	bio = bio_alloc(GFP_KERNEL, nr_rec_secs);
- 
-@@ -74,8 +72,6 @@ int pblk_recov_setup_rq(struct pblk *pblk, struct pblk_c_ctx *c_ctx,
- 			struct pblk_rec_ctx *recovery, u64 *comp_bits,
- 			unsigned int comp)
- {
--	struct nvm_tgt_dev *dev = pblk->dev;
--	int max_secs = nvm_max_phys_sects(dev);
- 	struct nvm_rq *rec_rqd;
- 	struct pblk_c_ctx *rec_ctx;
- 	int nr_entries = c_ctx->nr_valid + c_ctx->nr_padded;
-@@ -86,7 +82,7 @@ int pblk_recov_setup_rq(struct pblk *pblk, struct pblk_c_ctx *c_ctx,
- 	/* Copy completion bitmap, but exclude the first X completed entries */
- 	bitmap_shift_right((unsigned long int *)&rec_rqd->ppa_status,
- 				(unsigned long int *)comp_bits,
--				comp, max_secs);
-+				comp, NVM_MAX_VLBA);
- 
- 	/* Save the context for the entries that need to be re-written and
- 	 * update current context with the completed entries.
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index 8b243af8a949..e38d835b15b5 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -612,8 +612,6 @@ static struct nvm_dev_ops nvme_nvm_dev_ops = {
- 	.destroy_dma_pool	= nvme_nvm_destroy_dma_pool,
- 	.dev_dma_alloc		= nvme_nvm_dev_dma_alloc,
- 	.dev_dma_free		= nvme_nvm_dev_dma_free,
--
--	.max_phys_sect		= 64,
- };
- 
- static int nvme_nvm_submit_user_cmd(struct request_queue *q,
-@@ -932,8 +930,7 @@ static ssize_t nvm_dev_attr_show_12(struct device *dev,
- 	} else if (strcmp(attr->name, "media_capabilities") == 0) {
- 		return scnprintf(page, PAGE_SIZE, "0x%08x\n", id->mccap);
- 	} else if (strcmp(attr->name, "max_phys_secs") == 0) {
--		return scnprintf(page, PAGE_SIZE, "%u\n",
--				ndev->ops->max_phys_sect);
-+		return scnprintf(page, PAGE_SIZE, "%u\n", NVM_MAX_VLBA);
- 	} else {
- 		return scnprintf(page,
- 				 PAGE_SIZE,
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 67b4fa8e4906..e55b10573c99 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -73,8 +73,6 @@ struct nvm_dev_ops {
- 	nvm_destroy_dma_pool_fn	*destroy_dma_pool;
- 	nvm_dev_dma_alloc_fn	*dev_dma_alloc;
- 	nvm_dev_dma_free_fn	*dev_dma_free;
--
--	unsigned int		max_phys_sect;
- };
- 
- #ifdef CONFIG_NVM
-@@ -228,6 +226,8 @@ struct nvm_target {
- #define NVM_VERSION_MINOR 0
- #define NVM_VERSION_PATCH 0
- 
-+#define NVM_MAX_VLBA (64) /* max logical blocks in a vector command */
-+
- struct nvm_rq;
- typedef void (nvm_end_io_fn)(struct nvm_rq *);
- 
-@@ -436,7 +436,6 @@ extern void nvm_unregister(struct nvm_dev *);
- 
- extern int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr *,
- 			      int, int);
--extern int nvm_max_phys_sects(struct nvm_tgt_dev *);
- extern int nvm_submit_io(struct nvm_tgt_dev *, struct nvm_rq *);
- extern int nvm_submit_io_sync(struct nvm_tgt_dev *, struct nvm_rq *);
- extern void nvm_end_io(struct nvm_rq *);
+Will be sending the correct patch.
+
 -- 
-2.11.0
+Dr. Hannes Reinecke		               zSeries & Storage
+hare@suse.com			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
