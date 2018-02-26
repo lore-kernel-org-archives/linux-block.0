@@ -1,47 +1,61 @@
-Return-Path: <prvs=585cc836a=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Josef Bacik <jbacik@fb.com>,
-	Shaohua Li <shli@fb.com>,
-	Omar Sandoval <osandov@fb.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v4 1/6] block/loop: Delete gendisk before cleaning up the request queue
-Date: Thu, 22 Feb 2018 17:08:03 -0800
-Message-Id: <20180223010808.25765-2-bart.vanassche@wdc.com>
-In-Reply-To: <20180223010808.25765-1-bart.vanassche@wdc.com>
-References: <20180223010808.25765-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f53.google.com ([209.85.215.53]:37682 "EHLO
+        mail-lf0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751079AbeBZSdp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Feb 2018 13:33:45 -0500
+Received: by mail-lf0-f53.google.com with SMTP id y19so23692963lfd.4
+        for <linux-block@vger.kernel.org>; Mon, 26 Feb 2018 10:33:44 -0800 (PST)
+Subject: Re: [PATCH V3 00/19] lightnvm: pblk: implement 2.0 support
+To: Javier Gonzalez <javier@cnexlabs.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+References: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
+ <93f1a727-55bf-ff7c-bc05-70cc9f5f9f27@lightnvm.io>
+ <87859168-A64E-4FF6-9F7E-174A903704D0@cnexlabs.com>
+ <398381af-7c17-4e57-1d07-f50051c05430@lightnvm.io>
+ <49DA8C17-0960-4EBF-9FA7-364DE5EAF405@cnexlabs.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <8ef84882-b847-2b2a-7e63-a7203e8531ce@lightnvm.io>
+Date: Mon, 26 Feb 2018 19:33:42 +0100
+MIME-Version: 1.0
+In-Reply-To: <49DA8C17-0960-4EBF-9FA7-364DE5EAF405@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Remove the disk, partition and bdi sysfs attributes before cleaning up
-the request queue associated with the disk.
+On 02/26/2018 07:27 PM, Javier Gonzalez wrote:
+>> On 26 Feb 2018, at 19.24, Matias Bjørling <mb@lightnvm.io> wrote:
+>>
+>> On 02/26/2018 07:21 PM, Javier Gonzalez wrote:
+>>>> On 26 Feb 2018, at 19.19, Matias Bjørling <mb@lightnvm.io> wrote:
+>>>>
+>>>> On 02/26/2018 02:16 PM, Javier González wrote:
+>>>>> # Changes since V2:
+>>>>> Apply Matias' feedback:
+>>>>>   - Remove generic nvm_id identify structure.
+>>>>>   - Do not remap capabilities (cap) to media and controlled capabilities
+>>>>>     (mccap). Instead, add a comment to prevent confusion when
+>>>>>     crosschecking with 2.0 spec.
+>>>>>   - Change maxoc and maxocpu defaults from 1 block to the max number of
+>>>>>     blocks.
+>>>>>   - Re-implement the generic geometry to use nvm_geo on both device and
+>>>>>     targets. Maintain nvm_common_geo to make it easier to copy the common
+>>>>>     part of the geometry (without having to overwrite target-specific
+>>>>>     fields, which is ugly and error prone). Matias, if you still want to
+>>>>>     get rid of this, we can do it.
+>>>>
+>>>> I do, the variables should go directly in nvm_geo. Thanks.
+>>> Ok. Is the rest ok with you?
+>> I'll go through it when the rebase is posted. Most of the patches is
+>> dependent on the first patch.
+> 
+> As it is now, it will be basically %s/geo->c.X/geo->X/g. If you can look
+> at the first patch now, I can put all comments in a single version more,
+> instead of going through one extra cycle...
+> 
+> 
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Josef Bacik <jbacik@fb.com>
-Cc: Shaohua Li <shli@fb.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/loop.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index d5fe720cf149..8b693fdd08dc 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1864,8 +1864,8 @@ static int loop_add(struct loop_device **l, int i)
- 
- static void loop_remove(struct loop_device *lo)
- {
--	blk_cleanup_queue(lo->lo_queue);
- 	del_gendisk(lo->lo_disk);
-+	blk_cleanup_queue(lo->lo_queue);
- 	blk_mq_free_tag_set(&lo->tag_set);
- 	put_disk(lo->lo_disk);
- 	kfree(lo);
--- 
-2.16.2
+Also the variable dev_geo -> geo. I'm good with just getting the updated 
+version before posting the full patch set again.
