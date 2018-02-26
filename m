@@ -1,128 +1,95 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:42647 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754266AbeBGTmB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Feb 2018 14:42:01 -0500
-Received: by mail-pf0-f195.google.com with SMTP id b25so765766pfd.9
-        for <linux-block@vger.kernel.org>; Wed, 07 Feb 2018 11:42:00 -0800 (PST)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Coly Li <colyli@suse.de>,
-        Michael Lyle <mlyle@lyle.org>,
-        Junhui Tang <tang.junhui@zte.com.cn>
-Subject: [PATCH 3/8] bcache: properly set task state in bch_writeback_thread()
-Date: Wed,  7 Feb 2018 11:41:41 -0800
-Message-Id: <20180207194146.5095-4-mlyle@lyle.org>
-In-Reply-To: <20180207194146.5095-1-mlyle@lyle.org>
-References: <20180207194146.5095-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jack@suse.cz>
+From: Jan Kara <jack@suse.cz>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: <linux-block@vger.kernel.org>,
+	Hou Tao <houtao1@huawei.com>,
+	Jan Kara <jack@suse.cz>
+Subject: [PATCH 4/6] genhd: Fix use after free in __blkdev_get()
+Date: Mon, 26 Feb 2018 13:01:40 +0100
+Message-Id: <20180226120142.25786-5-jack@suse.cz>
+In-Reply-To: <20180226120142.25786-1-jack@suse.cz>
+References: <20180226120142.25786-1-jack@suse.cz>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Coly Li <colyli@suse.de>
+When two blkdev_open() calls race with device removal and recreation,
+__blkdev_get() can use looked up gendisk after it is freed:
 
-Kernel thread routine bch_writeback_thread() has the following code block,
+CPU0				CPU1			CPU2
+							del_gendisk(disk);
+							  bdev_unhash_inode(inode);
+blkdev_open()			blkdev_open()
+  bdev = bd_acquire(inode);
+    - creates and returns new inode
+				  bdev = bd_acquire(inode);
+				    - returns the same inode
+  __blkdev_get(devt)		  __blkdev_get(devt)
+    disk = get_gendisk(devt);
+      - got structure of device going away
+							<finish device removal>
+							<new device gets
+							 created under the same
+							 device number>
+				  disk = get_gendisk(devt);
+				    - got new device structure
+				  if (!bdev->bd_openers) {
+				    does the first open
+				  }
+    if (!bdev->bd_openers)
+      - false
+    } else {
+      put_disk_and_module(disk)
+        - remember this was old device - this was last ref and disk is
+          now freed
+    }
+    disk_unblock_events(disk); -> oops
 
-447         down_write(&dc->writeback_lock);
-448~450     if (check conditions) {
-451                 up_write(&dc->writeback_lock);
-452                 set_current_state(TASK_INTERRUPTIBLE);
-453
-454                 if (kthread_should_stop())
-455                         return 0;
-456
-457                 schedule();
-458                 continue;
-459         }
+Fix the problem by making sure we drop reference to disk in
+__blkdev_get() only after we are really done with it.
 
-If condition check is true, its task state is set to TASK_INTERRUPTIBLE
-and call schedule() to wait for others to wake up it.
-
-There are 2 issues in current code,
-1, Task state is set to TASK_INTERRUPTIBLE after the condition checks, if
-   another process changes the condition and call wake_up_process(dc->
-   writeback_thread), then at line 452 task state is set back to
-   TASK_INTERRUPTIBLE, the writeback kernel thread will lose a chance to be
-   waken up.
-2, At line 454 if kthread_should_stop() is true, writeback kernel thread
-   will return to kernel/kthread.c:kthread() with TASK_INTERRUPTIBLE and
-   call do_exit(). It is not good to enter do_exit() with task state
-   TASK_INTERRUPTIBLE, in following code path might_sleep() is called and a
-   warning message is reported by __might_sleep(): "WARNING: do not call
-   blocking ops when !TASK_RUNNING; state=1 set at [xxxx]".
-
-For the first issue, task state should be set before condition checks.
-Ineed because dc->writeback_lock is required when modifying all the
-conditions, calling set_current_state() inside code block where dc->
-writeback_lock is hold is safe. But this is quite implicit, so I still move
-set_current_state() before all the condition checks.
-
-For the second issue, frankley speaking it does not hurt when kernel thread
-exits with TASK_INTERRUPTIBLE state, but this warning message scares users,
-makes them feel there might be something risky with bcache and hurt their
-data.  Setting task state to TASK_RUNNING before returning fixes this
-problem.
-
-In alloc.c:allocator_wait(), there is also a similar issue, and is also
-fixed in this patch.
-
-Changelog:
-v3: merge two similar fixes into one patch
-v2: fix the race issue in v1 patch.
-v1: initial buggy fix.
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
-Cc: Michael Lyle <mlyle@lyle.org>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
+Reported-by: Hou Tao <houtao1@huawei.com>
+Tested-by: Hou Tao <houtao1@huawei.com>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- drivers/md/bcache/alloc.c     | 4 +++-
- drivers/md/bcache/writeback.c | 7 +++++--
- 2 files changed, 8 insertions(+), 3 deletions(-)
+ fs/block_dev.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
-index 6cc6c0f9c3a9..458e1d38577d 100644
---- a/drivers/md/bcache/alloc.c
-+++ b/drivers/md/bcache/alloc.c
-@@ -287,8 +287,10 @@ do {									\
- 			break;						\
- 									\
- 		mutex_unlock(&(ca)->set->bucket_lock);			\
--		if (kthread_should_stop())				\
-+		if (kthread_should_stop()) {				\
-+			set_current_state(TASK_RUNNING);		\
- 			return 0;					\
-+		}							\
- 									\
- 		schedule();						\
- 		mutex_lock(&(ca)->set->bucket_lock);			\
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 51306a19ab03..58218f7e77c3 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -564,18 +564,21 @@ static int bch_writeback_thread(void *arg)
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 1dbbf847911a..fe41a76769fa 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -1409,6 +1409,7 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 	int ret;
+ 	int partno;
+ 	int perm = 0;
++	bool first_open = false;
  
- 	while (!kthread_should_stop()) {
- 		down_write(&dc->writeback_lock);
-+		set_current_state(TASK_INTERRUPTIBLE);
- 		if (!atomic_read(&dc->has_dirty) ||
- 		    (!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags) &&
- 		     !dc->writeback_running)) {
- 			up_write(&dc->writeback_lock);
--			set_current_state(TASK_INTERRUPTIBLE);
- 
--			if (kthread_should_stop())
-+			if (kthread_should_stop()) {
-+				set_current_state(TASK_RUNNING);
- 				return 0;
-+			}
- 
- 			schedule();
- 			continue;
+ 	if (mode & FMODE_READ)
+ 		perm |= MAY_READ;
+@@ -1435,6 +1436,7 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 	disk_block_events(disk);
+ 	mutex_lock_nested(&bdev->bd_mutex, for_part);
+ 	if (!bdev->bd_openers) {
++		first_open = true;
+ 		bdev->bd_disk = disk;
+ 		bdev->bd_queue = disk->queue;
+ 		bdev->bd_contains = bdev;
+@@ -1520,14 +1522,15 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
+ 			if (ret)
+ 				goto out_unlock_bdev;
  		}
-+		set_current_state(TASK_RUNNING);
+-		/* only one opener holds refs to the module and disk */
+-		put_disk_and_module(disk);
+ 	}
+ 	bdev->bd_openers++;
+ 	if (for_part)
+ 		bdev->bd_part_count++;
+ 	mutex_unlock(&bdev->bd_mutex);
+ 	disk_unblock_events(disk);
++	/* only one opener holds refs to the module and disk */
++	if (!first_open)
++		put_disk_and_module(disk);
+ 	return 0;
  
- 		searched_full_index = refill_dirty(dc);
- 
+  out_clear:
 -- 
-2.14.1
+2.13.6
