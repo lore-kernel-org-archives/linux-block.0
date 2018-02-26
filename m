@@ -1,202 +1,135 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:36028 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:36066 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752353AbeBZMBs (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Feb 2018 07:01:48 -0500
+        id S1752545AbeBZMBu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Feb 2018 07:01:50 -0500
 From: Jan Kara <jack@suse.cz>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: <linux-block@vger.kernel.org>, Hou Tao <houtao1@huawei.com>,
         Jan Kara <jack@suse.cz>
-Subject: [PATCH 2/6] genhd: Rename get_disk() to get_disk_and_module()
-Date: Mon, 26 Feb 2018 13:01:38 +0100
-Message-Id: <20180226120142.25786-3-jack@suse.cz>
+Subject: [PATCH 5/6] genhd: Fix BUG in blkdev_open()
+Date: Mon, 26 Feb 2018 13:01:41 +0100
+Message-Id: <20180226120142.25786-6-jack@suse.cz>
 In-Reply-To: <20180226120142.25786-1-jack@suse.cz>
 References: <20180226120142.25786-1-jack@suse.cz>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Rename get_disk() to get_disk_and_module() to make sure what the
-function does. It's not a great name but at least it is now clear that
-put_disk() is not it's counterpart.
+When two blkdev_open() calls for a partition race with device removal
+and recreation, we can hit BUG_ON(!bd_may_claim(bdev, whole, holder)) in
+blkdev_open(). The race can happen as follows:
 
+CPU0				CPU1			CPU2
+							del_gendisk()
+							  bdev_unhash_inode(part1);
+
+blkdev_open(part1, O_EXCL)	blkdev_open(part1, O_EXCL)
+  bdev = bd_acquire()		  bdev = bd_acquire()
+  blkdev_get(bdev)
+    bd_start_claiming(bdev)
+      - finds old inode 'whole'
+      bd_prepare_to_claim() -> 0
+							  bdev_unhash_inode(whole);
+							<device removed>
+							<new device under same
+							 number created>
+				  blkdev_get(bdev);
+				    bd_start_claiming(bdev)
+				      - finds new inode 'whole'
+				      bd_prepare_to_claim()
+					- this also succeeds as we have
+					  different 'whole' here...
+					- bad things happen now as we
+					  have two exclusive openers of
+					  the same bdev
+
+The problem here is that block device opens can see various intermediate
+states while gendisk is shutting down and then being recreated.
+
+We fix the problem by introducing new lookup_sem in gendisk that
+synchronizes gendisk deletion with get_gendisk() and furthermore by
+making sure that get_gendisk() does not return gendisk that is being (or
+has been) deleted. This makes sure that once we ever manage to look up
+newly created bdev inode, we are also guaranteed that following
+get_gendisk() will either return failure (and we fail open) or it
+returns gendisk for the new device and following bdget_disk() will
+return new bdev inode (i.e., blkdev_open() follows the path as if it is
+completely run after new device is created).
+
+Reported-and-analyzed-by: Hou Tao <houtao1@huawei.com>
+Tested-by: Hou Tao <houtao1@huawei.com>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- block/genhd.c           | 10 ++++------
- drivers/block/amiflop.c |  2 +-
- drivers/block/ataflop.c |  2 +-
- drivers/block/brd.c     |  2 +-
- drivers/block/floppy.c  |  2 +-
- drivers/block/loop.c    |  2 +-
- drivers/block/swim.c    |  2 +-
- drivers/block/z2ram.c   |  2 +-
- drivers/ide/ide-probe.c |  2 +-
- include/linux/genhd.h   |  2 +-
- 10 files changed, 13 insertions(+), 15 deletions(-)
+ block/genhd.c         | 21 ++++++++++++++++++++-
+ include/linux/genhd.h |  1 +
+ 2 files changed, 21 insertions(+), 1 deletion(-)
 
 diff --git a/block/genhd.c b/block/genhd.c
-index 5098bffe6ba6..21b2843b27d0 100644
+index 4c0590434591..9656f9e9f99e 100644
 --- a/block/genhd.c
 +++ b/block/genhd.c
-@@ -547,7 +547,7 @@ static int exact_lock(dev_t devt, void *data)
- {
- 	struct gendisk *p = data;
+@@ -717,6 +717,11 @@ void del_gendisk(struct gendisk *disk)
+ 	blk_integrity_del(disk);
+ 	disk_del_events(disk);
  
--	if (!get_disk(p))
-+	if (!get_disk_and_module(p))
- 		return -1;
- 	return 0;
++	/*
++	 * Block lookups of the disk until all bdevs are unhashed and the
++	 * disk is marked as dead (GENHD_FL_UP cleared).
++	 */
++	down_write(&disk->lookup_sem);
+ 	/* invalidate stuff */
+ 	disk_part_iter_init(&piter, disk,
+ 			     DISK_PITER_INCL_EMPTY | DISK_PITER_REVERSE);
+@@ -731,6 +736,7 @@ void del_gendisk(struct gendisk *disk)
+ 	bdev_unhash_inode(disk_devt(disk));
+ 	set_capacity(disk, 0);
+ 	disk->flags &= ~GENHD_FL_UP;
++	up_write(&disk->lookup_sem);
+ 
+ 	if (!(disk->flags & GENHD_FL_HIDDEN))
+ 		sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
+@@ -816,9 +822,21 @@ struct gendisk *get_gendisk(dev_t devt, int *partno)
+ 		spin_unlock_bh(&ext_devt_lock);
+ 	}
+ 
+-	if (disk && unlikely(disk->flags & GENHD_FL_HIDDEN)) {
++	if (!disk)
++		return NULL;
++
++	/*
++	 * Synchronize with del_gendisk() to not return disk that is being
++	 * destroyed.
++	 */
++	down_read(&disk->lookup_sem);
++	if (unlikely((disk->flags & GENHD_FL_HIDDEN) ||
++		     !(disk->flags & GENHD_FL_UP))) {
++		up_read(&disk->lookup_sem);
+ 		put_disk_and_module(disk);
+ 		disk = NULL;
++	} else {
++		up_read(&disk->lookup_sem);
+ 	}
+ 	return disk;
  }
-@@ -809,7 +809,7 @@ struct gendisk *get_gendisk(dev_t devt, int *partno)
- 
- 		spin_lock_bh(&ext_devt_lock);
- 		part = idr_find(&ext_devt_idr, blk_mangle_minor(MINOR(devt)));
--		if (part && get_disk(part_to_disk(part))) {
-+		if (part && get_disk_and_module(part_to_disk(part))) {
- 			*partno = part->partno;
- 			disk = part_to_disk(part);
+@@ -1418,6 +1436,7 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
+ 			kfree(disk);
+ 			return NULL;
  		}
-@@ -1456,7 +1456,7 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
- }
- EXPORT_SYMBOL(__alloc_disk_node);
- 
--struct kobject *get_disk(struct gendisk *disk)
-+struct kobject *get_disk_and_module(struct gendisk *disk)
- {
- 	struct module *owner;
- 	struct kobject *kobj;
-@@ -1474,15 +1474,13 @@ struct kobject *get_disk(struct gendisk *disk)
- 	return kobj;
- 
- }
--
--EXPORT_SYMBOL(get_disk);
-+EXPORT_SYMBOL(get_disk_and_module);
- 
- void put_disk(struct gendisk *disk)
- {
- 	if (disk)
- 		kobject_put(&disk_to_dev(disk)->kobj);
- }
--
- EXPORT_SYMBOL(put_disk);
- 
- static void set_disk_ro_uevent(struct gendisk *gd, int ro)
-diff --git a/drivers/block/amiflop.c b/drivers/block/amiflop.c
-index e5aa62fcf5a8..3aaf6af3ec23 100644
---- a/drivers/block/amiflop.c
-+++ b/drivers/block/amiflop.c
-@@ -1758,7 +1758,7 @@ static struct kobject *floppy_find(dev_t dev, int *part, void *data)
- 	if (unit[drive].type->code == FD_NODRIVE)
- 		return NULL;
- 	*part = 0;
--	return get_disk(unit[drive].gendisk);
-+	return get_disk_and_module(unit[drive].gendisk);
- }
- 
- static int __init amiga_floppy_probe(struct platform_device *pdev)
-diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
-index 8bc3b9fd8dd2..dfb2c2622e5a 100644
---- a/drivers/block/ataflop.c
-+++ b/drivers/block/ataflop.c
-@@ -1917,7 +1917,7 @@ static struct kobject *floppy_find(dev_t dev, int *part, void *data)
- 	if (drive >= FD_MAX_UNITS || type > NUM_DISK_MINORS)
- 		return NULL;
- 	*part = 0;
--	return get_disk(unit[drive].disk);
-+	return get_disk_and_module(unit[drive].disk);
- }
- 
- static int __init atari_floppy_init (void)
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 8028a3a7e7fd..deea78e485da 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -456,7 +456,7 @@ static struct kobject *brd_probe(dev_t dev, int *part, void *data)
- 
- 	mutex_lock(&brd_devices_mutex);
- 	brd = brd_init_one(MINOR(dev) / max_part, &new);
--	kobj = brd ? get_disk(brd->brd_disk) : NULL;
-+	kobj = brd ? get_disk_and_module(brd->brd_disk) : NULL;
- 	mutex_unlock(&brd_devices_mutex);
- 
- 	if (new)
-diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index eae484acfbbc..8ec7235fc93b 100644
---- a/drivers/block/floppy.c
-+++ b/drivers/block/floppy.c
-@@ -4505,7 +4505,7 @@ static struct kobject *floppy_find(dev_t dev, int *part, void *data)
- 	if (((*part >> 2) & 0x1f) >= ARRAY_SIZE(floppy_type))
- 		return NULL;
- 	*part = 0;
--	return get_disk(disks[drive]);
-+	return get_disk_and_module(disks[drive]);
- }
- 
- static int __init do_floppy_init(void)
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index d5fe720cf149..87855b5123a6 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1922,7 +1922,7 @@ static struct kobject *loop_probe(dev_t dev, int *part, void *data)
- 	if (err < 0)
- 		kobj = NULL;
- 	else
--		kobj = get_disk(lo->lo_disk);
-+		kobj = get_disk_and_module(lo->lo_disk);
- 	mutex_unlock(&loop_index_mutex);
- 
- 	*part = 0;
-diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-index 84434d3ea19b..64e066eba72e 100644
---- a/drivers/block/swim.c
-+++ b/drivers/block/swim.c
-@@ -799,7 +799,7 @@ static struct kobject *floppy_find(dev_t dev, int *part, void *data)
- 		return NULL;
- 
- 	*part = 0;
--	return get_disk(swd->unit[drive].disk);
-+	return get_disk_and_module(swd->unit[drive].disk);
- }
- 
- static int swim_add_floppy(struct swim_priv *swd, enum drive_location location)
-diff --git a/drivers/block/z2ram.c b/drivers/block/z2ram.c
-index 41c95c9b2ab4..8f9130ab5887 100644
---- a/drivers/block/z2ram.c
-+++ b/drivers/block/z2ram.c
-@@ -332,7 +332,7 @@ static const struct block_device_operations z2_fops =
- static struct kobject *z2_find(dev_t dev, int *part, void *data)
- {
- 	*part = 0;
--	return get_disk(z2ram_gendisk);
-+	return get_disk_and_module(z2ram_gendisk);
- }
- 
- static struct request_queue *z2_queue;
-diff --git a/drivers/ide/ide-probe.c b/drivers/ide/ide-probe.c
-index 17fd55af4d92..caa20eb5f26b 100644
---- a/drivers/ide/ide-probe.c
-+++ b/drivers/ide/ide-probe.c
-@@ -928,7 +928,7 @@ static int exact_lock(dev_t dev, void *data)
- {
- 	struct gendisk *p = data;
- 
--	if (!get_disk(p))
-+	if (!get_disk_and_module(p))
- 		return -1;
- 	return 0;
- }
++		init_rwsem(&disk->lookup_sem);
+ 		disk->node_id = node_id;
+ 		if (disk_expand_part_tbl(disk, 0)) {
+ 			free_part_stats(&disk->part0);
 diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 5e3531027b51..8e11b9321e55 100644
+index 7f5906fe1b70..c826b0b5232a 100644
 --- a/include/linux/genhd.h
 +++ b/include/linux/genhd.h
-@@ -600,7 +600,7 @@ extern void delete_partition(struct gendisk *, int);
- extern void printk_all_partitions(void);
+@@ -198,6 +198,7 @@ struct gendisk {
+ 	void *private_data;
  
- extern struct gendisk *__alloc_disk_node(int minors, int node_id);
--extern struct kobject *get_disk(struct gendisk *disk);
-+extern struct kobject *get_disk_and_module(struct gendisk *disk);
- extern void put_disk(struct gendisk *disk);
- extern void blk_register_region(dev_t devt, unsigned long range,
- 			struct module *module,
+ 	int flags;
++	struct rw_semaphore lookup_sem;
+ 	struct kobject *slave_dir;
+ 
+ 	struct timer_rand_state *random;
 -- 
 2.13.6
