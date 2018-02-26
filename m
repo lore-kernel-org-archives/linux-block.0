@@ -1,269 +1,227 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:36699 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752403AbeBFLXR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 6 Feb 2018 06:23:17 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Nix <nix@esperi.org.uk>, Pavel Goran <via-bcache@pvgoran.name>,
-        Michael Lyle <mlyle@lyle.org>,
-        Junhui Tang <tang.junhui@zte.com.cn>,
-        Hannes Reinecke <hare@suse.com>
-Subject: [PATCH v5 06/10] bcache: add stop_when_cache_set_failed option to backing device
-Date: Tue,  6 Feb 2018 19:23:06 +0800
-Message-Id: <20180206112306.83290-1-colyli@suse.de>
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:40433 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753170AbeBZNRi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Feb 2018 08:17:38 -0500
+Received: by mail-wm0-f67.google.com with SMTP id t6so8842594wmt.5
+        for <linux-block@vger.kernel.org>; Mon, 26 Feb 2018 05:17:38 -0800 (PST)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 10/19] lightnvm: add support for 2.0 address format
+Date: Mon, 26 Feb 2018 14:17:09 +0100
+Message-Id: <1519651038-16845-11-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
+References: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-When there are too many I/O errors on cache device, current bcache code
-will retire the whole cache set, and detach all bcache devices. But the
-detached bcache devices are not stopped, which is problematic when bcache
-is in writeback mode.
+Add support for 2.0 address format. Also, align address bits for 1.2 and
+2.0 to be able to operate on channel and luns without requiring a format
+conversion. Use a generic address format for this purpose.
 
-If the retired cache set has dirty data of backing devices, continue
-writing to bcache device will write to backing device directly. If the
-LBA of write request has a dirty version cached on cache device, next time
-when the cache device is re-registered and backing device re-attached to
-it again, the stale dirty data on cache device will be written to backing
-device, and overwrite latest directly written data. This situation causes
-a quite data corruption.
-
-But we cannot simply stop all attached bcache devices when the cache set is
-broken or disconnected. For example, use bcache to accelerate performance
-of an email service. In such workload, if cache device is broken but no
-dirty data lost, keep the bcache device alive and permit email service
-continue to access user data might be a better solution for the cache
-device failure.
-
-Nix <nix@esperi.org.uk> points out the issue and provides the above example
-to explain why it might be necessary to not stop bcache device for broken
-cache device. Pavel Goran <via-bcache@pvgoran.name> provides a brilliant
-suggestion to provide "always" and "auto" options to per-cached device
-sysfs file stop_when_cache_set_failed. If cache set is retiring and the
-backing device has no dirty data on cache, it should be safe to keep the
-bcache device alive. In this case, if stop_when_cache_set_failed is set to
-"auto", the device failure handling code will not stop this bcache device
-and permit application to access the backing device with a unattached
-bcache device.
-
-Changelog:
-v3: fix typos pointed out by Nix.
-v2: change option values of stop_when_cache_set_failed from 1/0 to
-    "auto"/"always".
-v1: initial version, stop_when_cache_set_failed can be 0 (not stop) or 1
-    (always stop).
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Nix <nix@esperi.org.uk>
-Cc: Pavel Goran <via-bcache@pvgoran.name>
-Cc: Michael Lyle <mlyle@lyle.org>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
-Cc: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- drivers/md/bcache/bcache.h |  9 +++++
- drivers/md/bcache/super.c  | 82 ++++++++++++++++++++++++++++++++++++++++------
- drivers/md/bcache/sysfs.c  | 17 ++++++++++
- 3 files changed, 98 insertions(+), 10 deletions(-)
+ drivers/lightnvm/core.c  |  20 ++++-----
+ include/linux/lightnvm.h | 105 ++++++++++++++++++++++++++++++++++-------------
+ 2 files changed, 86 insertions(+), 39 deletions(-)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 7917b3820dd5..263164490833 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -287,6 +287,12 @@ struct io {
- 	sector_t		last;
- };
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 45bed54488f9..92ea6e39dd64 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -196,8 +196,8 @@ static struct nvm_tgt_dev *nvm_create_tgt_dev(struct nvm_dev *dev,
  
-+enum stop_on_failure {
-+	BCH_CACHED_DEV_STOP_AUTO = 0,
-+	BCH_CACHED_DEV_STOP_ALWAYS,
-+	BCH_CACHED_DEV_STOP_MODE_MAX,
-+};
-+
- struct cached_dev {
- 	struct list_head	list;
- 	struct bcache_device	disk;
-@@ -379,6 +385,8 @@ struct cached_dev {
- 	unsigned		writeback_rate_i_term_inverse;
- 	unsigned		writeback_rate_p_term_inverse;
- 	unsigned		writeback_rate_minimum;
-+
-+	enum stop_on_failure	stop_when_cache_set_failed;
- };
+ 		for (j = 0; j < luns_in_chnl; j++) {
+ 			luns[lunid].ppa = 0;
+-			luns[lunid].g.ch = i;
+-			luns[lunid++].g.lun = j;
++			luns[lunid].a.ch = i;
++			luns[lunid++].a.lun = j;
  
- enum alloc_reserve {
-@@ -924,6 +932,7 @@ void bch_write_bdev_super(struct cached_dev *, struct closure *);
+ 			lun_offs[j] = blun;
+ 			lun_roffs[j + blun] = blun;
+@@ -563,22 +563,22 @@ static void nvm_unregister_map(struct nvm_dev *dev)
+ static void nvm_map_to_dev(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *p)
+ {
+ 	struct nvm_dev_map *dev_map = tgt_dev->map;
+-	struct nvm_ch_map *ch_map = &dev_map->chnls[p->g.ch];
+-	int lun_off = ch_map->lun_offs[p->g.lun];
++	struct nvm_ch_map *ch_map = &dev_map->chnls[p->a.ch];
++	int lun_off = ch_map->lun_offs[p->a.lun];
  
- extern struct workqueue_struct *bcache_wq;
- extern const char * const bch_cache_modes[];
-+extern const char * const bch_stop_on_failure_modes[];
- extern struct mutex bch_register_lock;
- extern struct list_head bch_cache_sets;
- 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index f8b0d1196c12..e335433bdfb7 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -47,6 +47,14 @@ const char * const bch_cache_modes[] = {
- 	NULL
- };
- 
-+/* Default is -1; we skip past it for stop_when_cache_set_failed */
-+const char * const bch_stop_on_failure_modes[] = {
-+	"default",
-+	"auto",
-+	"always",
-+	NULL
-+};
-+
- static struct kobject *bcache_kobj;
- struct mutex bch_register_lock;
- LIST_HEAD(bch_cache_sets);
-@@ -1187,6 +1195,9 @@ static int cached_dev_init(struct cached_dev *dc, unsigned block_size)
- 		max(dc->disk.disk->queue->backing_dev_info->ra_pages,
- 		    q->backing_dev_info->ra_pages);
- 
-+	/* default to auto */
-+	dc->stop_when_cache_set_failed = BCH_CACHED_DEV_STOP_AUTO;
-+
- 	bch_cached_dev_request_init(dc);
- 	bch_cached_dev_writeback_init(dc);
- 	return 0;
-@@ -1463,25 +1474,76 @@ static void cache_set_flush(struct closure *cl)
- 	closure_return(cl);
+-	p->g.ch += ch_map->ch_off;
+-	p->g.lun += lun_off;
++	p->a.ch += ch_map->ch_off;
++	p->a.lun += lun_off;
  }
  
-+/*
-+ * This function is only called when CACHE_SET_IO_DISABLE is set, which means
-+ * cache set is unregistering due to too many I/O errors. In this condition,
-+ * the bcache device might be stopped, it depends on stop_when_cache_set_failed
-+ * value and whether the broken cache has dirty data:
-+ *
-+ * dc->stop_when_cache_set_failed    dc->has_dirty   stop bcache device
-+ *  BCH_CACHED_STOP_ATUO               0               NO
-+ *  BCH_CACHED_STOP_ATUO               1               YES
-+ *  BCH_CACHED_DEV_STOP_ALWAYS         0               YES
-+ *  BCH_CACHED_DEV_STOP_ALWAYS         1               YES
-+ *
-+ * The expected behavior is, if stop_when_cache_set_failed is configured to
-+ * "auto" via sysfs interface, the bcache device will not be stopped if the
-+ * backing device is clean on the broken cache device.
-+ */
-+static void conditional_stop_bcache_device(struct cache_set *c,
-+					   struct bcache_device *d,
-+					   struct cached_dev *dc)
-+{
-+	if (dc->stop_when_cache_set_failed == BCH_CACHED_DEV_STOP_ALWAYS) {
-+		pr_warn("stop_when_cache_set_failed of %s is \"always\", stop"
-+			" it for failed cache set %pU.",
-+			d->disk->disk_name, c->sb.set_uuid);
-+		bcache_device_stop(d);
-+	} else if (atomic_read(&dc->has_dirty)) {
-+		/*
-+		 * dc->stop_when_cache_set_failed == BCH_CACHED_STOP_ATUO
-+		 * and dc->has_dirty == 1
-+		 */
-+		pr_warn("stop_when_cache_set_failed of %s is \"auto\" and "
-+			"cache is dirty, stop it to avoid potential data "
-+			"corruption.",
-+			d->disk->disk_name);
-+			bcache_device_stop(d);
-+	} else {
-+		/*
-+		 * dc->stop_when_cache_set_failed == BCH_CACHED_STOP_ATUO
-+		 * and dc->has_dirty == 0
-+		 */
-+		pr_warn("stop_when_cache_set_failed of %s is \"auto\" and "
-+			"cache is clean, keep it alive.",
-+			d->disk->disk_name);
-+	}
-+}
-+
- static void __cache_set_unregister(struct closure *cl)
+ static void nvm_map_to_tgt(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *p)
  {
- 	struct cache_set *c = container_of(cl, struct cache_set, caching);
- 	struct cached_dev *dc;
-+	struct bcache_device *d;
- 	size_t i;
+ 	struct nvm_dev *dev = tgt_dev->parent;
+ 	struct nvm_dev_map *dev_rmap = dev->rmap;
+-	struct nvm_ch_map *ch_rmap = &dev_rmap->chnls[p->g.ch];
+-	int lun_roff = ch_rmap->lun_offs[p->g.lun];
++	struct nvm_ch_map *ch_rmap = &dev_rmap->chnls[p->a.ch];
++	int lun_roff = ch_rmap->lun_offs[p->a.lun];
  
- 	mutex_lock(&bch_register_lock);
+-	p->g.ch -= ch_rmap->ch_off;
+-	p->g.lun -= lun_roff;
++	p->a.ch -= ch_rmap->ch_off;
++	p->a.lun -= lun_roff;
+ }
  
--	for (i = 0; i < c->devices_max_used; i++)
--		if (c->devices[i]) {
--			if (!UUID_FLASH_ONLY(&c->uuids[i]) &&
--			    test_bit(CACHE_SET_UNREGISTERING, &c->flags)) {
--				dc = container_of(c->devices[i],
--						  struct cached_dev, disk);
--				bch_cached_dev_detach(dc);
--			} else {
--				bcache_device_stop(c->devices[i]);
--			}
-+	for (i = 0; i < c->devices_max_used; i++) {
-+		d = c->devices[i];
-+		if (!d)
-+			continue;
+ static void nvm_ppa_tgt_to_dev(struct nvm_tgt_dev *tgt_dev,
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 18bb9e9774d6..8cda1125c34a 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -16,12 +16,21 @@ enum {
+ 	NVM_IOTYPE_GC = 1,
+ };
+ 
+-#define NVM_BLK_BITS (16)
+-#define NVM_PG_BITS  (16)
+-#define NVM_SEC_BITS (8)
+-#define NVM_PL_BITS  (8)
+-#define NVM_LUN_BITS (8)
+-#define NVM_CH_BITS  (7)
++/* common format */
++#define NVM_GEN_CH_BITS  (8)
++#define NVM_GEN_LUN_BITS (8)
++#define NVM_GEN_BLK_BITS (16)
++#define NVM_GEN_RESERVED (32)
 +
-+		if (!UUID_FLASH_ONLY(&c->uuids[i]) &&
-+		    test_bit(CACHE_SET_UNREGISTERING, &c->flags)) {
-+			dc = container_of(d, struct cached_dev, disk);
-+			bch_cached_dev_detach(dc);
-+			if (test_bit(CACHE_SET_IO_DISABLE, &c->flags))
-+				conditional_stop_bcache_device(c, d, dc);
-+		} else {
-+			bcache_device_stop(d);
- 		}
++/* 1.2 format */
++#define NVM_12_PG_BITS  (16)
++#define NVM_12_PL_BITS  (4)
++#define NVM_12_SEC_BITS (4)
++#define NVM_12_RESERVED (8)
++
++/* 2.0 format */
++#define NVM_20_SEC_BITS (24)
++#define NVM_20_RESERVED (8)
+ 
+ enum {
+ 	NVM_OCSSD_SPEC_12 = 12,
+@@ -31,16 +40,34 @@ enum {
+ struct ppa_addr {
+ 	/* Generic structure for all addresses */
+ 	union {
++		/* generic device format */
+ 		struct {
+-			u64 blk		: NVM_BLK_BITS;
+-			u64 pg		: NVM_PG_BITS;
+-			u64 sec		: NVM_SEC_BITS;
+-			u64 pl		: NVM_PL_BITS;
+-			u64 lun		: NVM_LUN_BITS;
+-			u64 ch		: NVM_CH_BITS;
+-			u64 reserved	: 1;
++			u64 ch		: NVM_GEN_CH_BITS;
++			u64 lun		: NVM_GEN_LUN_BITS;
++			u64 blk		: NVM_GEN_BLK_BITS;
++			u64 reserved	: NVM_GEN_RESERVED;
++		} a;
++
++		/* 1.2 device format */
++		struct {
++			u64 ch		: NVM_GEN_CH_BITS;
++			u64 lun		: NVM_GEN_LUN_BITS;
++			u64 blk		: NVM_GEN_BLK_BITS;
++			u64 pg		: NVM_12_PG_BITS;
++			u64 pl		: NVM_12_PL_BITS;
++			u64 sec		: NVM_12_SEC_BITS;
++			u64 reserved	: NVM_12_RESERVED;
+ 		} g;
+ 
++		/* 2.0 device format */
++		struct {
++			u64 grp		: NVM_GEN_CH_BITS;
++			u64 pu		: NVM_GEN_LUN_BITS;
++			u64 chk		: NVM_GEN_BLK_BITS;
++			u64 sec		: NVM_20_SEC_BITS;
++			u64 reserved	: NVM_20_RESERVED;
++		} m;
++
+ 		struct {
+ 			u64 line	: 63;
+ 			u64 is_cached	: 1;
+@@ -382,16 +409,26 @@ static inline struct ppa_addr generic_to_dev_addr(struct nvm_tgt_dev *tgt_dev,
+ 						  struct ppa_addr r)
+ {
+ 	struct nvm_geo *geo = &tgt_dev->geo;
+-	struct nvm_addr_format_12 *ppaf =
+-				(struct nvm_addr_format_12 *)&geo->c.addrf;
+ 	struct ppa_addr l;
+ 
+-	l.ppa = ((u64)r.g.ch) << ppaf->ch_offset;
+-	l.ppa |= ((u64)r.g.lun) << ppaf->lun_offset;
+-	l.ppa |= ((u64)r.g.blk) << ppaf->blk_offset;
+-	l.ppa |= ((u64)r.g.pg) << ppaf->pg_offset;
+-	l.ppa |= ((u64)r.g.pl) << ppaf->pln_offset;
+-	l.ppa |= ((u64)r.g.sec) << ppaf->sec_offset;
++	if (geo->c.version == NVM_OCSSD_SPEC_12) {
++		struct nvm_addr_format_12 *ppaf =
++				(struct nvm_addr_format_12 *)&geo->c.addrf;
++
++		l.ppa = ((u64)r.g.ch) << ppaf->ch_offset;
++		l.ppa |= ((u64)r.g.lun) << ppaf->lun_offset;
++		l.ppa |= ((u64)r.g.blk) << ppaf->blk_offset;
++		l.ppa |= ((u64)r.g.pg) << ppaf->pg_offset;
++		l.ppa |= ((u64)r.g.pl) << ppaf->pln_offset;
++		l.ppa |= ((u64)r.g.sec) << ppaf->sec_offset;
++	} else {
++		struct nvm_addr_format *lbaf = &geo->c.addrf;
++
++		l.ppa = ((u64)r.m.grp) << lbaf->ch_offset;
++		l.ppa |= ((u64)r.m.pu) << lbaf->lun_offset;
++		l.ppa |= ((u64)r.m.chk) << lbaf->chk_offset;
++		l.ppa |= ((u64)r.m.sec) << lbaf->sec_offset;
 +	}
  
- 	mutex_unlock(&bch_register_lock);
+ 	return l;
+ }
+@@ -400,18 +437,28 @@ static inline struct ppa_addr dev_to_generic_addr(struct nvm_tgt_dev *tgt_dev,
+ 						  struct ppa_addr r)
+ {
+ 	struct nvm_geo *geo = &tgt_dev->geo;
+-	struct nvm_addr_format_12 *ppaf =
+-				(struct nvm_addr_format_12 *)&geo->c.addrf;
+ 	struct ppa_addr l;
  
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index cf973c07c856..91d859a54575 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -78,6 +78,7 @@ rw_attribute(congested_write_threshold_us);
- rw_attribute(sequential_cutoff);
- rw_attribute(data_csum);
- rw_attribute(cache_mode);
-+rw_attribute(stop_when_cache_set_failed);
- rw_attribute(writeback_metadata);
- rw_attribute(writeback_running);
- rw_attribute(writeback_percent);
-@@ -126,6 +127,12 @@ SHOW(__bch_cached_dev)
- 					       bch_cache_modes + 1,
- 					       BDEV_CACHE_MODE(&dc->sb));
+ 	l.ppa = 0;
  
-+	if (attr == &sysfs_stop_when_cache_set_failed)
-+		return bch_snprint_string_list(buf, PAGE_SIZE,
-+					       bch_stop_on_failure_modes + 1,
-+					       dc->stop_when_cache_set_failed);
+-	l.g.ch = (r.ppa & ppaf->ch_mask) >> ppaf->ch_offset;
+-	l.g.lun = (r.ppa & ppaf->lun_mask) >> ppaf->lun_offset;
+-	l.g.blk = (r.ppa & ppaf->blk_mask) >> ppaf->blk_offset;
+-	l.g.pg = (r.ppa & ppaf->pg_mask) >> ppaf->pg_offset;
+-	l.g.pl = (r.ppa & ppaf->pln_mask) >> ppaf->pln_offset;
+-	l.g.sec = (r.ppa & ppaf->sec_mask) >> ppaf->sec_offset;
++	if (geo->c.version == NVM_OCSSD_SPEC_12) {
++		struct nvm_addr_format_12 *ppaf =
++				(struct nvm_addr_format_12 *)&geo->c.addrf;
 +
++		l.g.ch = (r.ppa & ppaf->ch_mask) >> ppaf->ch_offset;
++		l.g.lun = (r.ppa & ppaf->lun_mask) >> ppaf->lun_offset;
++		l.g.blk = (r.ppa & ppaf->blk_mask) >> ppaf->blk_offset;
++		l.g.pg = (r.ppa & ppaf->pg_mask) >> ppaf->pg_offset;
++		l.g.pl = (r.ppa & ppaf->pln_mask) >> ppaf->pln_offset;
++		l.g.sec = (r.ppa & ppaf->sec_mask) >> ppaf->sec_offset;
++	} else {
++		struct nvm_addr_format *lbaf = &geo->c.addrf;
 +
- 	sysfs_printf(data_csum,		"%i", dc->disk.data_csum);
- 	var_printf(verify,		"%i");
- 	var_printf(bypass_torture_test,	"%i");
-@@ -247,6 +254,15 @@ STORE(__cached_dev)
- 		}
- 	}
- 
-+	if (attr == &sysfs_stop_when_cache_set_failed) {
-+		v = bch_read_string_list(buf, bch_stop_on_failure_modes + 1);
-+
-+		if (v < 0)
-+			return v;
-+
-+		dc->stop_when_cache_set_failed = v;
++		l.m.grp = (r.ppa & lbaf->ch_mask) >> lbaf->ch_offset;
++		l.m.pu = (r.ppa & lbaf->lun_mask) >> lbaf->lun_offset;
++		l.m.chk = (r.ppa & lbaf->chk_mask) >> lbaf->chk_offset;
++		l.m.sec = (r.ppa & lbaf->sec_mask) >> lbaf->sec_offset;
 +	}
-+
- 	if (attr == &sysfs_label) {
- 		if (size > SB_LABEL_SIZE)
- 			return -EINVAL;
-@@ -323,6 +339,7 @@ static struct attribute *bch_cached_dev_files[] = {
- 	&sysfs_data_csum,
- #endif
- 	&sysfs_cache_mode,
-+	&sysfs_stop_when_cache_set_failed,
- 	&sysfs_writeback_metadata,
- 	&sysfs_writeback_running,
- 	&sysfs_writeback_delay,
+ 
+ 	return l;
+ }
 -- 
-2.16.1
+2.7.4
