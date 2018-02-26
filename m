@@ -1,193 +1,46 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	Hou Tao <houtao1@huawei.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 3/6] genhd: Add helper put_disk_and_module()
-Date: Mon, 26 Feb 2018 13:01:39 +0100
-Message-Id: <20180226120142.25786-4-jack@suse.cz>
-In-Reply-To: <20180226120142.25786-1-jack@suse.cz>
-References: <20180226120142.25786-1-jack@suse.cz>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Subject: [PATCH 06/19] lightnvm: pblk: check for supported version
+Date: Mon, 26 Feb 2018 14:17:05 +0100
+Message-Id: <1519651038-16845-7-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
+References: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: linux-block@vger.kernel.org,
+ =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-Add a proper counterpart to get_disk_and_module() -
-put_disk_and_module(). Currently it is opencoded in several places.
-
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/blk-cgroup.c    | 11 ++---------
- block/genhd.c         | 20 ++++++++++++++++----
- fs/block_dev.c        | 19 +++++--------------
- include/linux/genhd.h |  1 +
- 4 files changed, 24 insertions(+), 27 deletions(-)
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 4117524ca45b..c2033a232a44 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -812,7 +812,6 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
- 	struct gendisk *disk;
- 	struct request_queue *q;
- 	struct blkcg_gq *blkg;
--	struct module *owner;
- 	unsigned int major, minor;
- 	int key_len, part, ret;
- 	char *body;
-@@ -904,9 +903,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
- 	spin_unlock_irq(q->queue_lock);
- 	rcu_read_unlock();
- fail:
--	owner = disk->fops->owner;
--	put_disk(disk);
--	module_put(owner);
-+	put_disk_and_module(disk);
- 	/*
- 	 * If queue was bypassing, we should retry.  Do so after a
- 	 * short msleep().  It isn't strictly necessary but queue
-@@ -931,13 +928,9 @@ EXPORT_SYMBOL_GPL(blkg_conf_prep);
- void blkg_conf_finish(struct blkg_conf_ctx *ctx)
- 	__releases(ctx->disk->queue->queue_lock) __releases(rcu)
- {
--	struct module *owner;
--
- 	spin_unlock_irq(ctx->disk->queue->queue_lock);
- 	rcu_read_unlock();
--	owner = ctx->disk->fops->owner;
--	put_disk(ctx->disk);
--	module_put(owner);
-+	put_disk_and_module(ctx->disk);
- }
- EXPORT_SYMBOL_GPL(blkg_conf_finish);
- 
-diff --git a/block/genhd.c b/block/genhd.c
-index 21b2843b27d0..4c0590434591 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -817,10 +817,7 @@ struct gendisk *get_gendisk(dev_t devt, int *partno)
- 	}
- 
- 	if (disk && unlikely(disk->flags & GENHD_FL_HIDDEN)) {
--		struct module *owner = disk->fops->owner;
--
--		put_disk(disk);
--		module_put(owner);
-+		put_disk_and_module(disk);
- 		disk = NULL;
- 	}
- 	return disk;
-@@ -1483,6 +1480,21 @@ void put_disk(struct gendisk *disk)
- }
- EXPORT_SYMBOL(put_disk);
- 
-+/*
-+ * This is a counterpart of get_disk_and_module() and thus also of
-+ * get_gendisk().
-+ */
-+void put_disk_and_module(struct gendisk *disk)
-+{
-+	if (disk) {
-+		struct module *owner = disk->fops->owner;
-+
-+		put_disk(disk);
-+		module_put(owner);
-+	}
-+}
-+EXPORT_SYMBOL(put_disk_and_module);
-+
- static void set_disk_ro_uevent(struct gendisk *gd, int ro)
- {
- 	char event[] = "DISK_RO=1";
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 4a181fcb5175..1dbbf847911a 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1111,8 +1111,7 @@ static struct block_device *bd_start_claiming(struct block_device *bdev,
- 	else
- 		whole = bdgrab(bdev);
- 
--	module_put(disk->fops->owner);
--	put_disk(disk);
-+	put_disk_and_module(disk);
- 	if (!whole)
- 		return ERR_PTR(-ENOMEM);
- 
-@@ -1407,7 +1406,6 @@ static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part);
- static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- {
- 	struct gendisk *disk;
--	struct module *owner;
- 	int ret;
- 	int partno;
- 	int perm = 0;
-@@ -1433,7 +1431,6 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 	disk = get_gendisk(bdev->bd_dev, &partno);
- 	if (!disk)
- 		goto out;
--	owner = disk->fops->owner;
- 
- 	disk_block_events(disk);
- 	mutex_lock_nested(&bdev->bd_mutex, for_part);
-@@ -1463,8 +1460,7 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 					bdev->bd_queue = NULL;
- 					mutex_unlock(&bdev->bd_mutex);
- 					disk_unblock_events(disk);
--					put_disk(disk);
--					module_put(owner);
-+					put_disk_and_module(disk);
- 					goto restart;
- 				}
- 			}
-@@ -1525,8 +1521,7 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 				goto out_unlock_bdev;
- 		}
- 		/* only one opener holds refs to the module and disk */
--		put_disk(disk);
--		module_put(owner);
-+		put_disk_and_module(disk);
- 	}
- 	bdev->bd_openers++;
- 	if (for_part)
-@@ -1546,8 +1541,7 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
-  out_unlock_bdev:
- 	mutex_unlock(&bdev->bd_mutex);
- 	disk_unblock_events(disk);
--	put_disk(disk);
--	module_put(owner);
-+	put_disk_and_module(disk);
-  out:
- 	bdput(bdev);
- 
-@@ -1770,8 +1764,6 @@ static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part)
- 			disk->fops->release(disk, mode);
- 	}
- 	if (!bdev->bd_openers) {
--		struct module *owner = disk->fops->owner;
--
- 		disk_put_part(bdev->bd_part);
- 		bdev->bd_part = NULL;
- 		bdev->bd_disk = NULL;
-@@ -1779,8 +1771,7 @@ static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part)
- 			victim = bdev->bd_contains;
- 		bdev->bd_contains = NULL;
- 
--		put_disk(disk);
--		module_put(owner);
-+		put_disk_and_module(disk);
- 	}
- 	mutex_unlock(&bdev->bd_mutex);
- 	bdput(bdev);
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 8e11b9321e55..7f5906fe1b70 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -602,6 +602,7 @@ extern void printk_all_partitions(void);
- extern struct gendisk *__alloc_disk_node(int minors, int node_id);
- extern struct kobject *get_disk_and_module(struct gendisk *disk);
- extern void put_disk(struct gendisk *disk);
-+extern void put_disk_and_module(struct gendisk *disk);
- extern void blk_register_region(dev_t devt, unsigned long range,
- 			struct module *module,
- 			struct kobject *(*probe)(dev_t, int *, void *),
--- 
-2.13.6
+QXQgdGhpcyBwb2ludCwgb25seSAxLjIgc3BlYyBpcyBzdXBwb3J0ZWQsIHRodXMgY2hlY2sgZm9y
+IGl0LiBBbHNvLApzaW5jZSBkZXZpY2Utc2lkZSBMMlAgaXMgb25seSBzdXBwb3J0ZWQgaW4gdGhl
+IDEuMiBzcGVjLCBtYWtlIHN1cmUgdG8Kb25seSBjaGVjayBpdHMgdmFsdWUgdW5kZXIgMS4yLgoK
+U2lnbmVkLW9mZi1ieTogSmF2aWVyIEdvbnrDoWxleiA8amF2aWVyQGNuZXhsYWJzLmNvbT4KLS0t
+CiBkcml2ZXJzL2xpZ2h0bnZtL3BibGstaW5pdC5jIHwgMTAgKysrKysrKystLQogMSBmaWxlIGNo
+YW5nZWQsIDggaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9kcml2
+ZXJzL2xpZ2h0bnZtL3BibGstaW5pdC5jIGIvZHJpdmVycy9saWdodG52bS9wYmxrLWluaXQuYwpp
+bmRleCA5NWVjYjBlYzczNmIuLjZlMDU2Nzk3MWNmNiAxMDA2NDQKLS0tIGEvZHJpdmVycy9saWdo
+dG52bS9wYmxrLWluaXQuYworKysgYi9kcml2ZXJzL2xpZ2h0bnZtL3BibGstaW5pdC5jCkBAIC05
+OTAsOSArOTkwLDE1IEBAIHN0YXRpYyB2b2lkICpwYmxrX2luaXQoc3RydWN0IG52bV90Z3RfZGV2
+ICpkZXYsIHN0cnVjdCBnZW5kaXNrICp0ZGlzaywKIAlzdHJ1Y3QgcGJsayAqcGJsazsKIAlpbnQg
+cmV0OwogCi0JaWYgKGRldi0+Z2VvLmMuZG9tICYgTlZNX1JTUF9MMlApIHsKKwlpZiAoZ2VvLT5j
+LnZlcnNpb24gIT0gTlZNX09DU1NEX1NQRUNfMTIpIHsKKwkJcHJfZXJyKCJwYmxrOiBPQ1NTRCB2
+ZXJzaW9uIG5vdCBzdXBwb3J0ZWQgKCV1KVxuIiwKKwkJCQkJCQlnZW8tPmMudmVyc2lvbik7CisJ
+CXJldHVybiBFUlJfUFRSKC1FSU5WQUwpOworCX0KKworCWlmIChnZW8tPmMudmVyc2lvbiA9PSBO
+Vk1fT0NTU0RfU1BFQ18xMiAmJiBnZW8tPmMuZG9tICYgTlZNX1JTUF9MMlApIHsKIAkJcHJfZXJy
+KCJwYmxrOiBob3N0LXNpZGUgTDJQIHRhYmxlIG5vdCBzdXBwb3J0ZWQuICgleClcbiIsCi0JCQkJ
+CQkJZGV2LT5nZW8uYy5kb20pOworCQkJCQkJCWdlby0+Yy5kb20pOwogCQlyZXR1cm4gRVJSX1BU
+UigtRUlOVkFMKTsKIAl9CiAKLS0gCjIuNy40CgoKX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX18KTGludXgtbnZtZSBtYWlsaW5nIGxpc3QKTGludXgtbnZtZUBs
+aXN0cy5pbmZyYWRlYWQub3JnCmh0dHA6Ly9saXN0cy5pbmZyYWRlYWQub3JnL21haWxtYW4vbGlz
+dGluZm8vbGludXgtbnZtZQo=
