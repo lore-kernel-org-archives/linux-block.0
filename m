@@ -1,87 +1,41 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Subject: [PATCH 12/15] lightnvn: pblk: use generic address format
-Date: Wed, 28 Feb 2018 16:49:32 +0100
-Message-Id: <1519832975-25432-13-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1519832975-25432-1-git-send-email-javier@cnexlabs.com>
-References: <1519832975-25432-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Mon, 26 Feb 2018 15:41:01 -0800
+From: Omar Sandoval <osandov@osandov.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+	linux-block@vger.kernel.org,
+	Paolo Valente <paolo.valente@linaro.org>,
+	Omar Sandoval <osandov@fb.com>, oleksandr@natalenko.name,
+	holger@applied-asynchrony.com
+Subject: Re: [PATCH 0/2] blk-mq: kyber: fix domain token leak during requeue
+Message-ID: <20180226234101.GB15264@vader.DHCP.thefacebook.com>
+References: <20180223153657.17376-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org,
- =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="utf-8"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180223153657.17376-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-VXNlIHRoZSBnZW5lcmljIGFkZHJlc3MgZm9ybWF0IG9uIGNvbW1vbiBhZGRyZXNzIG1hbmlwdWxh
-dGlvbnMuCgpTaWduZWQtb2ZmLWJ5OiBKYXZpZXIgR29uesOhbGV6IDxqYXZpZXJAY25leGxhYnMu
-Y29tPgotLS0KIGRyaXZlcnMvbGlnaHRudm0vcGJsay1jb3JlLmMgIHwgMTAgKysrKystLS0tLQog
-ZHJpdmVycy9saWdodG52bS9wYmxrLW1hcC5jICAgfCAgNCArKy0tCiBkcml2ZXJzL2xpZ2h0bnZt
-L3BibGstc3lzZnMuYyB8ICA0ICsrLS0KIGRyaXZlcnMvbGlnaHRudm0vcGJsay5oICAgICAgIHwg
-IDQgKystLQogNCBmaWxlcyBjaGFuZ2VkLCAxMSBpbnNlcnRpb25zKCspLCAxMSBkZWxldGlvbnMo
-LSkKCmRpZmYgLS1naXQgYS9kcml2ZXJzL2xpZ2h0bnZtL3BibGstY29yZS5jIGIvZHJpdmVycy9s
-aWdodG52bS9wYmxrLWNvcmUuYwppbmRleCA3ZDBiZDMzZjExZDkuLjJlMTBiMThiNjFlMyAxMDA2
-NDQKLS0tIGEvZHJpdmVycy9saWdodG52bS9wYmxrLWNvcmUuYworKysgYi9kcml2ZXJzL2xpZ2h0
-bnZtL3BibGstY29yZS5jCkBAIC04ODUsNyArODg1LDcgQEAgaW50IHBibGtfbGluZV9lcmFzZShz
-dHJ1Y3QgcGJsayAqcGJsaywgc3RydWN0IHBibGtfbGluZSAqbGluZSkKIAkJfQogCiAJCXBwYSA9
-IHBibGstPmx1bnNbYml0XS5icHBhOyAvKiBzZXQgY2ggYW5kIGx1biAqLwotCQlwcGEuZy5ibGsg
-PSBsaW5lLT5pZDsKKwkJcHBhLmEuYmxrID0gbGluZS0+aWQ7CiAKIAkJYXRvbWljX2RlYygmbGlu
-ZS0+bGVmdF9lYmxrcyk7CiAJCVdBUk5fT04odGVzdF9hbmRfc2V0X2JpdChiaXQsIGxpbmUtPmVy
-YXNlX2JpdG1hcCkpOwpAQCAtMTY4Niw4ICsxNjg2LDggQEAgc3RhdGljIHZvaWQgX19wYmxrX2Rv
-d25fcGFnZShzdHJ1Y3QgcGJsayAqcGJsaywgc3RydWN0IHBwYV9hZGRyICpwcGFfbGlzdCwKIAlp
-bnQgaTsKIAogCWZvciAoaSA9IDE7IGkgPCBucl9wcGFzOyBpKyspCi0JCVdBUk5fT04ocHBhX2xp
-c3RbMF0uZy5sdW4gIT0gcHBhX2xpc3RbaV0uZy5sdW4gfHwKLQkJCQlwcGFfbGlzdFswXS5nLmNo
-ICE9IHBwYV9saXN0W2ldLmcuY2gpOworCQlXQVJOX09OKHBwYV9saXN0WzBdLmEubHVuICE9IHBw
-YV9saXN0W2ldLmEubHVuIHx8CisJCQkJcHBhX2xpc3RbMF0uYS5jaCAhPSBwcGFfbGlzdFtpXS5h
-LmNoKTsKICNlbmRpZgogCiAJcmV0ID0gZG93bl90aW1lb3V0KCZybHVuLT53cl9zZW0sIG1zZWNz
-X3RvX2ppZmZpZXMoMzAwMDApKTsKQEAgLTE3MzEsOCArMTczMSw4IEBAIHZvaWQgcGJsa191cF9w
-YWdlKHN0cnVjdCBwYmxrICpwYmxrLCBzdHJ1Y3QgcHBhX2FkZHIgKnBwYV9saXN0LCBpbnQgbnJf
-cHBhcykKIAlpbnQgaTsKIAogCWZvciAoaSA9IDE7IGkgPCBucl9wcGFzOyBpKyspCi0JCVdBUk5f
-T04ocHBhX2xpc3RbMF0uZy5sdW4gIT0gcHBhX2xpc3RbaV0uZy5sdW4gfHwKLQkJCQlwcGFfbGlz
-dFswXS5nLmNoICE9IHBwYV9saXN0W2ldLmcuY2gpOworCQlXQVJOX09OKHBwYV9saXN0WzBdLmEu
-bHVuICE9IHBwYV9saXN0W2ldLmEubHVuIHx8CisJCQkJcHBhX2xpc3RbMF0uYS5jaCAhPSBwcGFf
-bGlzdFtpXS5hLmNoKTsKICNlbmRpZgogCiAJcmx1biA9ICZwYmxrLT5sdW5zW3Bvc107CmRpZmYg
-LS1naXQgYS9kcml2ZXJzL2xpZ2h0bnZtL3BibGstbWFwLmMgYi9kcml2ZXJzL2xpZ2h0bnZtL3Bi
-bGstbWFwLmMKaW5kZXggMDRlMDhkNzZlYTVmLi4yMGRiYWE4OWM5ZGYgMTAwNjQ0Ci0tLSBhL2Ry
-aXZlcnMvbGlnaHRudm0vcGJsay1tYXAuYworKysgYi9kcml2ZXJzL2xpZ2h0bnZtL3BibGstbWFw
-LmMKQEAgLTEyNyw3ICsxMjcsNyBAQCB2b2lkIHBibGtfbWFwX2VyYXNlX3JxKHN0cnVjdCBwYmxr
-ICpwYmxrLCBzdHJ1Y3QgbnZtX3JxICpycWQsCiAJCQlhdG9taWNfZGVjKCZlX2xpbmUtPmxlZnRf
-ZWJsa3MpOwogCiAJCQkqZXJhc2VfcHBhID0gcnFkLT5wcGFfbGlzdFtpXTsKLQkJCWVyYXNlX3Bw
-YS0+Zy5ibGsgPSBlX2xpbmUtPmlkOworCQkJZXJhc2VfcHBhLT5hLmJsayA9IGVfbGluZS0+aWQ7
-CiAKIAkJCXNwaW5fdW5sb2NrKCZlX2xpbmUtPmxvY2spOwogCkBAIC0xNjgsNiArMTY4LDYgQEAg
-dm9pZCBwYmxrX21hcF9lcmFzZV9ycShzdHJ1Y3QgcGJsayAqcGJsaywgc3RydWN0IG52bV9ycSAq
-cnFkLAogCQlzZXRfYml0KGJpdCwgZV9saW5lLT5lcmFzZV9iaXRtYXApOwogCQlhdG9taWNfZGVj
-KCZlX2xpbmUtPmxlZnRfZWJsa3MpOwogCQkqZXJhc2VfcHBhID0gcGJsay0+bHVuc1tiaXRdLmJw
-cGE7IC8qIHNldCBjaCBhbmQgbHVuICovCi0JCWVyYXNlX3BwYS0+Zy5ibGsgPSBlX2xpbmUtPmlk
-OworCQllcmFzZV9wcGEtPmEuYmxrID0gZV9saW5lLT5pZDsKIAl9CiB9CmRpZmYgLS1naXQgYS9k
-cml2ZXJzL2xpZ2h0bnZtL3BibGstc3lzZnMuYyBiL2RyaXZlcnMvbGlnaHRudm0vcGJsay1zeXNm
-cy5jCmluZGV4IGNiYjViNmVkYjdiZi4uYTY0M2RjNjIzNzMxIDEwMDY0NAotLS0gYS9kcml2ZXJz
-L2xpZ2h0bnZtL3BibGstc3lzZnMuYworKysgYi9kcml2ZXJzL2xpZ2h0bnZtL3BibGstc3lzZnMu
-YwpAQCAtMzksOCArMzksOCBAQCBzdGF0aWMgc3NpemVfdCBwYmxrX3N5c2ZzX2x1bnNfc2hvdyhz
-dHJ1Y3QgcGJsayAqcGJsaywgY2hhciAqcGFnZSkKIAkJc3ogKz0gc25wcmludGYocGFnZSArIHN6
-LCBQQUdFX1NJWkUgLSBzeiwKIAkJCQkicGJsazogcG9zOiVkLCBjaDolZCwgbHVuOiVkIC0gJWRc
-biIsCiAJCQkJCWksCi0JCQkJCXJsdW4tPmJwcGEuZy5jaCwKLQkJCQkJcmx1bi0+YnBwYS5nLmx1
-biwKKwkJCQkJcmx1bi0+YnBwYS5hLmNoLAorCQkJCQlybHVuLT5icHBhLmEubHVuLAogCQkJCQlh
-Y3RpdmUpOwogCX0KIApkaWZmIC0tZ2l0IGEvZHJpdmVycy9saWdodG52bS9wYmxrLmggYi9kcml2
-ZXJzL2xpZ2h0bnZtL3BibGsuaAppbmRleCBkZDAwODlmZTYyYjkuLjZhYzY0ZDllYjU3ZSAxMDA2
-NDQKLS0tIGEvZHJpdmVycy9saWdodG52bS9wYmxrLmgKKysrIGIvZHJpdmVycy9saWdodG52bS9w
-YmxrLmgKQEAgLTkzNiwxMiArOTM2LDEyIEBAIHN0YXRpYyBpbmxpbmUgaW50IHBibGtfcGFkX2Rp
-c3RhbmNlKHN0cnVjdCBwYmxrICpwYmxrKQogCiBzdGF0aWMgaW5saW5lIGludCBwYmxrX3BwYV90
-b19saW5lKHN0cnVjdCBwcGFfYWRkciBwKQogewotCXJldHVybiBwLmcuYmxrOworCXJldHVybiBw
-LmEuYmxrOwogfQogCiBzdGF0aWMgaW5saW5lIGludCBwYmxrX3BwYV90b19wb3Moc3RydWN0IG52
-bV9nZW8gKmdlbywgc3RydWN0IHBwYV9hZGRyIHApCiB7Ci0JcmV0dXJuIHAuZy5sdW4gKiBnZW8t
-Pm51bV9jaCArIHAuZy5jaDsKKwlyZXR1cm4gcC5hLmx1biAqIGdlby0+bnVtX2NoICsgcC5hLmNo
-OwogfQogCiBzdGF0aWMgaW5saW5lIHN0cnVjdCBwcGFfYWRkciBhZGRyX3RvX2dlbl9wcGEoc3Ry
-dWN0IHBibGsgKnBibGssIHU2NCBwYWRkciwKLS0gCjIuNy40CgoKX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX18KTGludXgtbnZtZSBtYWlsaW5nIGxpc3QKTGlu
-dXgtbnZtZUBsaXN0cy5pbmZyYWRlYWQub3JnCmh0dHA6Ly9saXN0cy5pbmZyYWRlYWQub3JnL21h
-aWxtYW4vbGlzdGluZm8vbGludXgtbnZtZQo=
+On Fri, Feb 23, 2018 at 11:36:55PM +0800, Ming Lei wrote:
+> Hi,
+> 
+> This two patch fixes domain token leak on kyber scheduler, and actually
+> fixes one IO hang issue.
+> 
+> Thanks,
+> 
+> Ming Lei (2):
+>   blk-mq: don't call io sched's .requeue_request when requeueing rq to
+>     ->dispatch
+>   block: kyber: fix domain token leak during requeue
+> 
+>  block/blk-mq.c        | 4 +++-
+>  block/kyber-iosched.c | 1 +
+>  2 files changed, 4 insertions(+), 1 deletion(-)
+> 
+> -- 
+> 2.9.5
+> 
+
+I didn't get to add my reviewed-by before Jens queued this up, but
+thanks for fixing this, Ming.
