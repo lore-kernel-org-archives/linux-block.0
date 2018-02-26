@@ -1,65 +1,113 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Subject: [PATCH 08/15] lightnvm: make address conversions depend on generic
- device
-Date: Wed, 28 Feb 2018 16:49:28 +0100
-Message-Id: <1519832975-25432-9-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1519832975-25432-1-git-send-email-javier@cnexlabs.com>
-References: <1519832975-25432-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:35331 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751903AbeBZM7L (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Feb 2018 07:59:11 -0500
+Received: by mail-lf0-f65.google.com with SMTP id 70so22073644lfw.2
+        for <linux-block@vger.kernel.org>; Mon, 26 Feb 2018 04:59:10 -0800 (PST)
+Subject: Re: [PATCH] lightnvm: centralize permission check for lightnvm ioctl
+To: Johannes Thumshirn <jthumshirn@suse.de>,
+        =?UTF-8?Q?Matias_Bj=c3=b8rling?= <m@bjorling.me>
+Cc: =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@cnexlabs.com>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>
+References: <20180226121133.16727-1-jthumshirn@suse.de>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <bf10df6f-619f-a60b-46c9-0fbc98a26ff6@lightnvm.io>
+Date: Mon, 26 Feb 2018 13:59:08 +0100
 MIME-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org,
- =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="utf-8"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20180226121133.16727-1-jthumshirn@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-T24gYWRkcmVzcyBjb252ZXJzaW9ucywgdXNlIHRoZSBnZW5lcmljIGRldmljZSwgaW5zdGVhZCBv
-ZiB0aGUgdGFyZ2V0CmRldmljZS4gVGhpcyBhbGxvd3MgdG8gdXNlIGNvbnZlcnNpb25zIG91dHNp
-ZGUgb2YgdGhlIHRhcmdldCdzIHJlYWxtLgoKU2lnbmVkLW9mZi1ieTogSmF2aWVyIEdvbnrDoWxl
-eiA8amF2aWVyQGNuZXhsYWJzLmNvbT4KLS0tCiBkcml2ZXJzL2xpZ2h0bnZtL2NvcmUuYyAgfCA0
-ICsrLS0KIGluY2x1ZGUvbGludXgvbGlnaHRudm0uaCB8IDggKysrKy0tLS0KIDIgZmlsZXMgY2hh
-bmdlZCwgNiBpbnNlcnRpb25zKCspLCA2IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2RyaXZl
-cnMvbGlnaHRudm0vY29yZS5jIGIvZHJpdmVycy9saWdodG52bS9jb3JlLmMKaW5kZXggMzZkNzZk
-ZTIyZGZjLi5lZDMzZTBiMTE3ODggMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvbGlnaHRudm0vY29yZS5j
-CisrKyBiL2RyaXZlcnMvbGlnaHRudm0vY29yZS5jCkBAIC01ODEsNyArNTgxLDcgQEAgc3RhdGlj
-IHZvaWQgbnZtX3BwYV90Z3RfdG9fZGV2KHN0cnVjdCBudm1fdGd0X2RldiAqdGd0X2RldiwKIAog
-CWZvciAoaSA9IDA7IGkgPCBucl9wcGFzOyBpKyspIHsKIAkJbnZtX21hcF90b19kZXYodGd0X2Rl
-diwgJnBwYV9saXN0W2ldKTsKLQkJcHBhX2xpc3RbaV0gPSBnZW5lcmljX3RvX2Rldl9hZGRyKHRn
-dF9kZXYsIHBwYV9saXN0W2ldKTsKKwkJcHBhX2xpc3RbaV0gPSBnZW5lcmljX3RvX2Rldl9hZGRy
-KHRndF9kZXYtPnBhcmVudCwgcHBhX2xpc3RbaV0pOwogCX0KIH0KIApAQCAtNTkxLDcgKzU5MSw3
-IEBAIHN0YXRpYyB2b2lkIG52bV9wcGFfZGV2X3RvX3RndChzdHJ1Y3QgbnZtX3RndF9kZXYgKnRn
-dF9kZXYsCiAJaW50IGk7CiAKIAlmb3IgKGkgPSAwOyBpIDwgbnJfcHBhczsgaSsrKSB7Ci0JCXBw
-YV9saXN0W2ldID0gZGV2X3RvX2dlbmVyaWNfYWRkcih0Z3RfZGV2LCBwcGFfbGlzdFtpXSk7CisJ
-CXBwYV9saXN0W2ldID0gZGV2X3RvX2dlbmVyaWNfYWRkcih0Z3RfZGV2LT5wYXJlbnQsIHBwYV9s
-aXN0W2ldKTsKIAkJbnZtX21hcF90b190Z3QodGd0X2RldiwgJnBwYV9saXN0W2ldKTsKIAl9CiB9
-CmRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmggYi9pbmNsdWRlL2xpbnV4L2xp
-Z2h0bnZtLmgKaW5kZXggNzMxMTBhZGYyN2FkLi5lODc4Yjk1YWVlYzQgMTAwNjQ0Ci0tLSBhL2lu
-Y2x1ZGUvbGludXgvbGlnaHRudm0uaAorKysgYi9pbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmgKQEAg
-LTM5OSwxMCArMzk5LDEwIEBAIHN0cnVjdCBudm1fZGV2IHsKIAlzdHJ1Y3QgbGlzdF9oZWFkIHRh
-cmdldHM7CiB9OwogCi1zdGF0aWMgaW5saW5lIHN0cnVjdCBwcGFfYWRkciBnZW5lcmljX3RvX2Rl
-dl9hZGRyKHN0cnVjdCBudm1fdGd0X2RldiAqdGd0X2RldiwKK3N0YXRpYyBpbmxpbmUgc3RydWN0
-IHBwYV9hZGRyIGdlbmVyaWNfdG9fZGV2X2FkZHIoc3RydWN0IG52bV9kZXYgKmRldiwKIAkJCQkJ
-CSAgc3RydWN0IHBwYV9hZGRyIHIpCiB7Ci0Jc3RydWN0IG52bV9nZW8gKmdlbyA9ICZ0Z3RfZGV2
-LT5nZW87CisJc3RydWN0IG52bV9nZW8gKmdlbyA9ICZkZXYtPmdlbzsKIAlzdHJ1Y3QgcHBhX2Fk
-ZHIgbDsKIAogCWlmIChnZW8tPnZlcnNpb24gPT0gTlZNX09DU1NEX1NQRUNfMTIpIHsKQEAgLTQy
-NywxMCArNDI3LDEwIEBAIHN0YXRpYyBpbmxpbmUgc3RydWN0IHBwYV9hZGRyIGdlbmVyaWNfdG9f
-ZGV2X2FkZHIoc3RydWN0IG52bV90Z3RfZGV2ICp0Z3RfZGV2LAogCXJldHVybiBsOwogfQogCi1z
-dGF0aWMgaW5saW5lIHN0cnVjdCBwcGFfYWRkciBkZXZfdG9fZ2VuZXJpY19hZGRyKHN0cnVjdCBu
-dm1fdGd0X2RldiAqdGd0X2RldiwKK3N0YXRpYyBpbmxpbmUgc3RydWN0IHBwYV9hZGRyIGRldl90
-b19nZW5lcmljX2FkZHIoc3RydWN0IG52bV9kZXYgKmRldiwKIAkJCQkJCSAgc3RydWN0IHBwYV9h
-ZGRyIHIpCiB7Ci0Jc3RydWN0IG52bV9nZW8gKmdlbyA9ICZ0Z3RfZGV2LT5nZW87CisJc3RydWN0
-IG52bV9nZW8gKmdlbyA9ICZkZXYtPmdlbzsKIAlzdHJ1Y3QgcHBhX2FkZHIgbDsKIAogCWwucHBh
-ID0gMDsKLS0gCjIuNy40CgoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX18KTGludXgtbnZtZSBtYWlsaW5nIGxpc3QKTGludXgtbnZtZUBsaXN0cy5pbmZyYWRl
-YWQub3JnCmh0dHA6Ly9saXN0cy5pbmZyYWRlYWQub3JnL21haWxtYW4vbGlzdGluZm8vbGludXgt
-bnZtZQo=
+On 02/26/2018 01:11 PM, Johannes Thumshirn wrote:
+> Currently all functions for handling the lightnvm core ioctl commands
+> do a check for CAP_SYS_ADMIN.
+> 
+> Change this to fail early in nvm_ctl_ioctl(), so we don't have to
+> duplicate the permission checks all over.
+> 
+> Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
+>   drivers/lightnvm/core.c | 21 +++------------------
+>   1 file changed, 3 insertions(+), 18 deletions(-)
+> 
+> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+> index dcc9e621e651..74d0bda94c11 100644
+> --- a/drivers/lightnvm/core.c
+> +++ b/drivers/lightnvm/core.c
+> @@ -1040,9 +1040,6 @@ static long nvm_ioctl_info(struct file *file, void __user *arg)
+>   	struct nvm_tgt_type *tt;
+>   	int tgt_iter = 0;
+>   
+> -	if (!capable(CAP_SYS_ADMIN))
+> -		return -EPERM;
+> -
+>   	info = memdup_user(arg, sizeof(struct nvm_ioctl_info));
+>   	if (IS_ERR(info))
+>   		return -EFAULT;
+> @@ -1081,9 +1078,6 @@ static long nvm_ioctl_get_devices(struct file *file, void __user *arg)
+>   	struct nvm_dev *dev;
+>   	int i = 0;
+>   
+> -	if (!capable(CAP_SYS_ADMIN))
+> -		return -EPERM;
+> -
+>   	devices = kzalloc(sizeof(struct nvm_ioctl_get_devices), GFP_KERNEL);
+>   	if (!devices)
+>   		return -ENOMEM;
+> @@ -1124,9 +1118,6 @@ static long nvm_ioctl_dev_create(struct file *file, void __user *arg)
+>   {
+>   	struct nvm_ioctl_create create;
+>   
+> -	if (!capable(CAP_SYS_ADMIN))
+> -		return -EPERM;
+> -
+>   	if (copy_from_user(&create, arg, sizeof(struct nvm_ioctl_create)))
+>   		return -EFAULT;
+>   
+> @@ -1162,9 +1153,6 @@ static long nvm_ioctl_dev_remove(struct file *file, void __user *arg)
+>   	struct nvm_dev *dev;
+>   	int ret = 0;
+>   
+> -	if (!capable(CAP_SYS_ADMIN))
+> -		return -EPERM;
+> -
+>   	if (copy_from_user(&remove, arg, sizeof(struct nvm_ioctl_remove)))
+>   		return -EFAULT;
+>   
+> @@ -1189,9 +1177,6 @@ static long nvm_ioctl_dev_init(struct file *file, void __user *arg)
+>   {
+>   	struct nvm_ioctl_dev_init init;
+>   
+> -	if (!capable(CAP_SYS_ADMIN))
+> -		return -EPERM;
+> -
+>   	if (copy_from_user(&init, arg, sizeof(struct nvm_ioctl_dev_init)))
+>   		return -EFAULT;
+>   
+> @@ -1208,9 +1193,6 @@ static long nvm_ioctl_dev_factory(struct file *file, void __user *arg)
+>   {
+>   	struct nvm_ioctl_dev_factory fact;
+>   
+> -	if (!capable(CAP_SYS_ADMIN))
+> -		return -EPERM;
+> -
+>   	if (copy_from_user(&fact, arg, sizeof(struct nvm_ioctl_dev_factory)))
+>   		return -EFAULT;
+>   
+> @@ -1226,6 +1208,9 @@ static long nvm_ctl_ioctl(struct file *file, uint cmd, unsigned long arg)
+>   {
+>   	void __user *argp = (void __user *)arg;
+>   
+> +	if (!capable(CAP_SYS_ADMIN))
+> +		return -EPERM;
+> +
+>   	switch (cmd) {
+>   	case NVM_INFO:
+>   		return nvm_ioctl_info(file, argp);
+> 
+
+Thanks Johannes. Applied.
