@@ -1,88 +1,247 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:38521 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752877AbeBEMPl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Feb 2018 07:15:41 -0500
-Received: by mail-lf0-f68.google.com with SMTP id g72so41381762lfg.5
-        for <linux-block@vger.kernel.org>; Mon, 05 Feb 2018 04:15:41 -0800 (PST)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, javier@cnexlabs.com,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [PATCH 4/4] nvme: lightnvm: add late setup of block size and metadata
-Date: Mon,  5 Feb 2018 13:15:05 +0100
-Message-Id: <20180205121505.27563-5-mb@lightnvm.io>
-In-Reply-To: <20180205121505.27563-1-mb@lightnvm.io>
-References: <20180205121505.27563-1-mb@lightnvm.io>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mx2.suse.de ([195.135.220.15]:47010 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751968AbeB0Q5K (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Feb 2018 11:57:10 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Michael Lyle <mlyle@lyle.org>,
+        Junhui Tang <tang.junhui@zte.com.cn>
+Subject: [PATCH v7 8/9] bcache: add io_disable to struct cached_dev
+Date: Wed, 28 Feb 2018 00:55:56 +0800
+Message-Id: <20180227165557.20442-9-colyli@suse.de>
+In-Reply-To: <20180227165557.20442-1-colyli@suse.de>
+References: <20180227165557.20442-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The nvme driver sets up the size of the nvme namespace in two steps.
-First it initializes the device with standard logical block and
-metadata sizes, and then sets the correct logical block and metadata
-size. Due to the OCSSD 2.0 specification relies on the namespace to
-expose these sizes for correct initialization, let it be updated
-appropriately on the LightNVM side as well.
+If a bcache device is configured to writeback mode, current code does not
+handle write I/O errors on backing devices properly.
 
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+In writeback mode, write request is written to cache device, and
+latter being flushed to backing device. If I/O failed when writing from
+cache device to the backing device, bcache code just ignores the error and
+upper layer code is NOT noticed that the backing device is broken.
+
+This patch tries to handle backing device failure like how the cache device
+failure is handled,
+- Add a error counter 'io_errors' and error limit 'error_limit' in struct
+  cached_dev. Add another io_disable to struct cached_dev to disable I/Os
+  on the problematic backing device.
+- When I/O error happens on backing device, increase io_errors counter. And
+  if io_errors reaches error_limit, set cache_dev->io_disable to true, and
+  stop the bcache device.
+
+The result is, if backing device is broken of disconnected, and I/O errors
+reach its error limit, backing device will be disabled and the associated
+bcache device will be removed from system.
+
+Changelog:
+v2: remove "bcache: " prefix in pr_error(), and use correct name string to
+    print out bcache device gendisk name.
+v1: indeed this is new added in v2 patch set.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Cc: Michael Lyle <mlyle@lyle.org>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
 ---
- drivers/nvme/host/core.c     | 2 ++
- drivers/nvme/host/lightnvm.c | 8 ++++++++
- drivers/nvme/host/nvme.h     | 2 ++
- 3 files changed, 12 insertions(+)
+ drivers/md/bcache/bcache.h  |  6 ++++++
+ drivers/md/bcache/io.c      | 14 ++++++++++++++
+ drivers/md/bcache/request.c | 14 ++++++++++++--
+ drivers/md/bcache/super.c   | 21 +++++++++++++++++++++
+ drivers/md/bcache/sysfs.c   | 15 ++++++++++++++-
+ 5 files changed, 67 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index f837d666cbd4..740ceb28067c 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1379,6 +1379,8 @@ static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
- 	if (ns->noiob)
- 		nvme_set_chunk_size(ns);
- 	nvme_update_disk_info(disk, ns, id);
-+	if (ns->ndev)
-+		nvme_nvm_update_nvm_info(ns);
- #ifdef CONFIG_NVME_MULTIPATH
- 	if (ns->head->disk)
- 		nvme_update_disk_info(ns->head->disk, ns, id);
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index a9c010655ccc..8d4301854811 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -814,6 +814,14 @@ int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned int cmd, unsigned long arg)
- 	}
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 5e9f3610c6fd..d338b7086013 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -367,6 +367,7 @@ struct cached_dev {
+ 	unsigned		sequential_cutoff;
+ 	unsigned		readahead;
+ 
++	unsigned		io_disable:1;
+ 	unsigned		verify:1;
+ 	unsigned		bypass_torture_test:1;
+ 
+@@ -388,6 +389,9 @@ struct cached_dev {
+ 	unsigned		writeback_rate_minimum;
+ 
+ 	enum stop_on_failure	stop_when_cache_set_failed;
++#define DEFAULT_CACHED_DEV_ERROR_LIMIT	64
++	atomic_t		io_errors;
++	unsigned		error_limit;
+ };
+ 
+ enum alloc_reserve {
+@@ -911,6 +915,7 @@ static inline void wait_for_kthread_stop(void)
+ 
+ /* Forward declarations */
+ 
++void bch_count_backing_io_errors(struct cached_dev *dc, struct bio *bio);
+ void bch_count_io_errors(struct cache *, blk_status_t, int, const char *);
+ void bch_bbio_count_io_errors(struct cache_set *, struct bio *,
+ 			      blk_status_t, const char *);
+@@ -938,6 +943,7 @@ int bch_bucket_alloc_set(struct cache_set *, unsigned,
+ 			 struct bkey *, int, bool);
+ bool bch_alloc_sectors(struct cache_set *, struct bkey *, unsigned,
+ 		       unsigned, unsigned, bool);
++bool bch_cached_dev_error(struct cached_dev *dc);
+ 
+ __printf(2, 3)
+ bool bch_cache_set_error(struct cache_set *, const char *, ...);
+diff --git a/drivers/md/bcache/io.c b/drivers/md/bcache/io.c
+index 8013ecbcdbda..7fac97ae036e 100644
+--- a/drivers/md/bcache/io.c
++++ b/drivers/md/bcache/io.c
+@@ -50,6 +50,20 @@ void bch_submit_bbio(struct bio *bio, struct cache_set *c,
  }
  
-+void nvme_nvm_update_nvm_info(struct nvme_ns *ns)
+ /* IO errors */
++void bch_count_backing_io_errors(struct cached_dev *dc, struct bio *bio)
 +{
-+	struct nvm_dev *ndev = ns->ndev;
++	char buf[BDEVNAME_SIZE];
++	unsigned errors;
 +
-+	ndev->identity.csecs = ndev->geo.sec_size = 1 << ns->lba_shift;
-+	ndev->identity.sos = ndev->geo.oob_size = ns->ms;
++	WARN_ONCE(!dc, "NULL pointer of struct cached_dev");
++
++	errors = atomic_add_return(1, &dc->io_errors);
++	if (errors < dc->error_limit)
++		pr_err("%s: IO error on backing device, unrecoverable",
++			bio_devname(bio, buf));
++	else
++		bch_cached_dev_error(dc);
++}
+ 
+ void bch_count_io_errors(struct cache *ca,
+ 			 blk_status_t error,
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 0c517dd806a5..d7a463e0250e 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -637,6 +637,8 @@ static void backing_request_endio(struct bio *bio)
+ 
+ 	if (bio->bi_status) {
+ 		struct search *s = container_of(cl, struct search, cl);
++		struct cached_dev *dc = container_of(s->d,
++						     struct cached_dev, disk);
+ 		/*
+ 		 * If a bio has REQ_PREFLUSH for writeback mode, it is
+ 		 * speically assembled in cached_dev_write() for a non-zero
+@@ -657,6 +659,7 @@ static void backing_request_endio(struct bio *bio)
+ 		}
+ 		s->recoverable = false;
+ 		/* should count I/O error for backing device here */
++		bch_count_backing_io_errors(dc, bio);
+ 	}
+ 
+ 	bio_put(bio);
+@@ -1065,8 +1068,14 @@ static void detached_dev_end_io(struct bio *bio)
+ 			    bio_data_dir(bio),
+ 			    &ddip->d->disk->part0, ddip->start_time);
+ 
+-	kfree(ddip);
++	if (bio->bi_status) {
++		struct cached_dev *dc = container_of(ddip->d,
++						     struct cached_dev, disk);
++		/* should count I/O error for backing device here */
++		bch_count_backing_io_errors(dc, bio);
++	}
+ 
++	kfree(ddip);
+ 	bio->bi_end_io(bio);
+ }
+ 
+@@ -1105,7 +1114,8 @@ static blk_qc_t cached_dev_make_request(struct request_queue *q,
+ 	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
+ 	int rw = bio_data_dir(bio);
+ 
+-	if (unlikely(d->c && test_bit(CACHE_SET_IO_DISABLE, &d->c->flags))) {
++	if (unlikely((d->c && test_bit(CACHE_SET_IO_DISABLE, &d->c->flags)) ||
++		     dc->io_disable)) {
+ 		bio->bi_status = BLK_STS_IOERR;
+ 		bio_endio(bio);
+ 		return BLK_QC_T_NONE;
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 7f029535edff..cae4caac17da 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1198,6 +1198,9 @@ static int cached_dev_init(struct cached_dev *dc, unsigned block_size)
+ 		max(dc->disk.disk->queue->backing_dev_info->ra_pages,
+ 		    q->backing_dev_info->ra_pages);
+ 
++	atomic_set(&dc->io_errors, 0);
++	dc->io_disable = false;
++	dc->error_limit = DEFAULT_CACHED_DEV_ERROR_LIMIT;
+ 	/* default to auto */
+ 	dc->stop_when_cache_set_failed = BCH_CACHED_DEV_STOP_AUTO;
+ 
+@@ -1352,6 +1355,24 @@ int bch_flash_dev_create(struct cache_set *c, uint64_t size)
+ 	return flash_dev_run(c, u);
+ }
+ 
++bool bch_cached_dev_error(struct cached_dev *dc)
++{
++	char name[BDEVNAME_SIZE];
++
++	if (!dc || test_bit(BCACHE_DEV_CLOSING, &dc->disk.flags))
++		return false;
++
++	dc->io_disable = true;
++	/* make others know io_disable is true earlier */
++	smp_mb();
++
++	pr_err("stop %s: too many IO errors on backing device %s\n",
++		dc->disk.disk->disk_name, bdevname(dc->bdev, name));
++
++	bcache_device_stop(&dc->disk);
++	return true;
 +}
 +
- int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node)
- {
- 	struct request_queue *q = ns->queue;
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index ea1aa5283e8e..1ca08f4993ba 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -451,12 +451,14 @@ static inline void nvme_mpath_clear_current_path(struct nvme_ns *ns)
- #endif /* CONFIG_NVME_MULTIPATH */
+ /* Cache set */
  
- #ifdef CONFIG_NVM
-+void nvme_nvm_update_nvm_info(struct nvme_ns *ns);
- int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node);
- void nvme_nvm_unregister(struct nvme_ns *ns);
- int nvme_nvm_register_sysfs(struct nvme_ns *ns);
- void nvme_nvm_unregister_sysfs(struct nvme_ns *ns);
- int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned int cmd, unsigned long arg);
- #else
-+static inline void nvme_nvm_update_nvm_info(struct nvme_ns *ns) {};
- static inline int nvme_nvm_register(struct nvme_ns *ns, char *disk_name,
- 				    int node)
- {
+ __printf(2, 3)
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index f2b3b2686627..bd40d9d0a969 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -141,7 +141,9 @@ SHOW(__bch_cached_dev)
+ 	var_print(writeback_delay);
+ 	var_print(writeback_percent);
+ 	sysfs_hprint(writeback_rate,	dc->writeback_rate.rate << 9);
+-
++	sysfs_hprint(io_errors,		atomic_read(&dc->io_errors));
++	sysfs_printf(io_error_limit,	"%i", dc->error_limit);
++	sysfs_printf(io_disable,	"%i", dc->io_disable);
+ 	var_print(writeback_rate_update_seconds);
+ 	var_print(writeback_rate_i_term_inverse);
+ 	var_print(writeback_rate_p_term_inverse);
+@@ -232,6 +234,14 @@ STORE(__cached_dev)
+ 	d_strtoul(writeback_rate_i_term_inverse);
+ 	d_strtoul_nonzero(writeback_rate_p_term_inverse);
+ 
++	sysfs_strtoul_clamp(io_error_limit, dc->error_limit, 0, INT_MAX);
++
++	if (attr == &sysfs_io_disable) {
++		int v = strtoul_or_return(buf);
++
++		dc->io_disable = v ? 1 : 0;
++	}
++
+ 	d_strtoi_h(sequential_cutoff);
+ 	d_strtoi_h(readahead);
+ 
+@@ -352,6 +362,9 @@ static struct attribute *bch_cached_dev_files[] = {
+ 	&sysfs_writeback_rate_i_term_inverse,
+ 	&sysfs_writeback_rate_p_term_inverse,
+ 	&sysfs_writeback_rate_debug,
++	&sysfs_errors,
++	&sysfs_io_error_limit,
++	&sysfs_io_disable,
+ 	&sysfs_dirty_data,
+ 	&sysfs_stripe_size,
+ 	&sysfs_partial_stripes_expensive,
 -- 
-2.11.0
+2.16.1
