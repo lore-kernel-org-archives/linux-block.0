@@ -1,87 +1,80 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: linux-scsi@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Arun Easi <arun.easi@cavium.com>,
-	Omar Sandoval <osandov@fb.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Don Brace <don.brace@microsemi.com>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Peter Rivera <peter.rivera@broadcom.com>,
-	Laurence Oberman <loberman@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 6/8] block: null_blk: introduce module parameter of 'g_host_tags'
-Date: Tue, 27 Feb 2018 18:07:48 +0800
-Message-Id: <20180227100750.32299-7-ming.lei@redhat.com>
-In-Reply-To: <20180227100750.32299-1-ming.lei@redhat.com>
-References: <20180227100750.32299-1-ming.lei@redhat.com>
+Return-Path: <mlyle@lyle.org>
+Return-Path: <mlyle@lyle.org>
+Subject: Re: [PATCH] bcache: check all uuid elements when start flash only
+ volumes
+To: Coly Li <colyli@suse.de>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <20180226161047.14577-1-colyli@suse.de>
+ <d041972d-8ba4-c4c7-2b91-b342174463ec@suse.de>
+From: Michael Lyle <mlyle@lyle.org>
+Message-ID: <16efbb53-4ecd-8a90-dbad-90027e155244@lyle.org>
+Date: Mon, 26 Feb 2018 19:54:11 -0800
+MIME-Version: 1.0
+In-Reply-To: <d041972d-8ba4-c4c7-2b91-b342174463ec@suse.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This patch introduces the parameter of 'g_host_tags' so that we can
-test this feature by null_blk easiy.
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
 
-With host_tags when the whole hw depth is kept as same, it is observed
-that IOPS can be improved by ~50% on a dual socket(total 16 CPU cores)
-system:
+I have this and the other fix in the queue for testing tomorrow and will
+pass along a changeset to Jens if all looks good.  Thanks!
 
-1) no 'host_tags', each hw queue depth is 16, and 1 hw queue
-modprobe null_blk queue_mode=2 nr_devices=4 shared_tags=1 host_tags=0 submit_queues=1 hw_queue_depth=16
+Mike
 
-IOPS: 1382K
-
-2) 'host_tags', each hw queue depth is 8, and 2 hw queues
-modprobe null_blk queue_mode=2 nr_devices=4 shared_tags=1 host_tags=1 submit_queues=2 hw_queue_depth=16
-
-IOPS: 2124K
-
-3) fio test done in above two settings:
-fio --bs=4k --size=512G  --rw=randread --norandommap --direct=1 --ioengine=libaio --iodepth=4 --runtime=$RUNTIME --group_reporting=1  --name=nullb0 --filename=/dev/nullb0 --name=nullb1 --filename=/dev/nullb1 --name=nullb2 --filename=/dev/nullb2 --name=nullb3 --filename=/dev/nullb3
-
-Cc: Arun Easi <arun.easi@cavium.com>
-Cc: Omar Sandoval <osandov@fb.com>,
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-Cc: Christoph Hellwig <hch@lst.de>,
-Cc: Don Brace <don.brace@microsemi.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Peter Rivera <peter.rivera@broadcom.com>
-Cc: Laurence Oberman <loberman@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/null_blk.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index 287a09611c0f..51b16249028a 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -163,6 +163,10 @@ static int g_submit_queues = 1;
- module_param_named(submit_queues, g_submit_queues, int, S_IRUGO);
- MODULE_PARM_DESC(submit_queues, "Number of submission queues");
- 
-+static int g_host_tags = 0;
-+module_param_named(host_tags, g_host_tags, int, S_IRUGO);
-+MODULE_PARM_DESC(host_tags, "All submission queues share one tags");
-+
- static int g_home_node = NUMA_NO_NODE;
- module_param_named(home_node, g_home_node, int, S_IRUGO);
- MODULE_PARM_DESC(home_node, "Home node for the device");
-@@ -1622,6 +1626,8 @@ static int null_init_tag_set(struct nullb *nullb, struct blk_mq_tag_set *set)
- 	set->flags = BLK_MQ_F_SHOULD_MERGE;
- 	if (g_no_sched)
- 		set->flags |= BLK_MQ_F_NO_SCHED;
-+	if (g_host_tags)
-+		set->flags |= BLK_MQ_F_HOST_TAGS;
- 	set->driver_data = NULL;
- 
- 	if ((nullb && nullb->dev->blocking) || g_blocking)
--- 
-2.9.5
+On 02/26/2018 08:15 AM, Coly Li wrote:
+> On 27/02/2018 12:10 AM, Coly Li wrote:
+>> Commit 2831231d4c3f ("bcache: reduce cache_set devices iteration by
+>> devices_max_used") adds c->devices_max_used to reduce iteration of
+>> c->uuids elements, this value is updated in bcache_device_attach().
+>>
+>> But for flash only volume, when calling flash_devs_run(), the function
+>> bcache_device_attach() is not called yet and c->devices_max_used is not
+>> updated. The unexpected result is, the flash only volume won't be run
+>> by flash_devs_run().
+>>
+>> This patch fixes the issue by iterate all c->uuids elements in
+>> flash_devs_run(). c->devices_max_used will be updated properly when
+>> bcache_device_attach() gets called.
+>>
+>> Fixes: 2831231d4c3f ("bcache: reduce cache_set devices iteration by devices_max_used")
+>> Reported-by: Tang Junhui <tang.junhui@zte.com.cn>
+>> Signed-off-by: Coly Li <colyli@suse.de>
+>> Cc: Michael Lyle <mlyle@lyle.org>
+>> ---
+>>  drivers/md/bcache/super.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+>> index 312895788036..4d1d8dfb2d2a 100644
+>> --- a/drivers/md/bcache/super.c
+>> +++ b/drivers/md/bcache/super.c
+>> @@ -1274,7 +1274,7 @@ static int flash_devs_run(struct cache_set *c)
+>>  	struct uuid_entry *u;
+>>  
+>>  	for (u = c->uuids;
+>> -	     u < c->uuids + c->devices_max_used && !ret;
+>> +	     u < c->uuids + c->nr_uuids && !ret;
+>>  	     u++)
+>>  		if (UUID_FLASH_ONLY(u))
+>>  			ret = flash_dev_run(c, u);
+>>
+> 
+> Hi Jens and Michael,
+> 
+> Could you please have a look and pick this fix into 4.16 ? Commit
+> 2831231d4c3f ("bcache: reduce cache_set devices iteration by
+> devices_max_used") is just merged in 4.16-rc1, so I don't CC stable for
+> this fix.
+> 
+> And I still need a peer code reviewer on this patch, any Reviewed-by is
+> welcome.
+> 
+> Thanks to Junhui Tang for reporting this issue today.
+> 
+> Coly Li
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bcache" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
