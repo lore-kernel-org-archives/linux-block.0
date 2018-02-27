@@ -1,59 +1,164 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:44450 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750952AbeB0SUu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Feb 2018 13:20:50 -0500
-Received: by mail-pg0-f65.google.com with SMTP id l4so7826778pgp.11
-        for <linux-block@vger.kernel.org>; Tue, 27 Feb 2018 10:20:50 -0800 (PST)
-Subject: Re: [PATCH v7 9/9] bcache: stop bcache device when backing device is
- offline
-To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Junhui Tang <tang.junhui@zte.com.cn>
+Received: from mx2.suse.de ([195.135.220.15]:47018 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751838AbeB0Q5Q (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Feb 2018 11:57:16 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Michael Lyle <mlyle@lyle.org>,
+        Junhui Tang <tang.junhui@zte.com.cn>
+Subject: [PATCH v7 9/9] bcache: stop bcache device when backing device is offline
+Date: Wed, 28 Feb 2018 00:55:57 +0800
+Message-Id: <20180227165557.20442-10-colyli@suse.de>
+In-Reply-To: <20180227165557.20442-1-colyli@suse.de>
 References: <20180227165557.20442-1-colyli@suse.de>
- <20180227165557.20442-10-colyli@suse.de>
-From: Michael Lyle <mlyle@lyle.org>
-Message-ID: <f4eb2061-67d7-28a3-6187-6390ff974836@lyle.org>
-Date: Tue, 27 Feb 2018 10:20:47 -0800
-MIME-Version: 1.0
-In-Reply-To: <20180227165557.20442-10-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Coly Li--
+Currently bcache does not handle backing device failure, if backing
+device is offline and disconnected from system, its bcache device can still
+be accessible. If the bcache device is in writeback mode, I/O requests even
+can success if the requests hit on cache device. That is to say, when and
+how bcache handles offline backing device is undefined.
 
-Just a couple of questions.
+This patch tries to handle backing device offline in a rather simple way,
+- Add cached_dev->status_update_thread kernel thread to update backing
+  device status in every 1 second.
+- Add cached_dev->offline_seconds to record how many seconds the backing
+  device is observed to be offline. If the backing device is offline for
+  BACKING_DEV_OFFLINE_TIMEOUT (30) seconds, set dc->io_disable to 1 and
+  call bcache_device_stop() to stop the bache device which linked to the
+  offline backing device.
 
-On 02/27/2018 08:55 AM, Coly Li wrote:
-> +#define BACKING_DEV_OFFLINE_TIMEOUT 5
+Now if a backing device is offline for BACKING_DEV_OFFLINE_TIMEOUT seconds,
+its bcache device will be removed, then user space application writing on
+it will get error immediately, and handler the device failure in time.
 
-I think you wanted this to be 30 (per commit message)-- was this turned
-down for testing or deliberate?
+This patch is quite simple, does not handle more complicated situations.
+Once the bcache device is stopped, users need to recovery the backing
+device, register and attach it manually.
 
-> +static int cached_dev_status_update(void *arg)
-> +{
-> +	struct cached_dev *dc = arg;
-> +	struct request_queue *q;
-> +	char buf[BDEVNAME_SIZE];
-> +
-> +	/*
-> +	 * If this delayed worker is stopping outside, directly quit here.
-> +	 * dc->io_disable might be set via sysfs interface, so check it
-> +	 * here too.
-> +	 */
-> +	while (!kthread_should_stop() && !dc->io_disable) {
-> +		q = bdev_get_queue(dc->bdev);
-> +		if (blk_queue_dying(q))
+Changelog:
+v3: call wait_for_kthread_stop() before exits kernel thread.
+v2: remove "bcache: " prefix when calling pr_warn().
+v1: initial version.
 
-I am not sure-- is this the correct test to know if the bdev is offline?
- It's very sparsely used outside of the core block system.  (Is there
-any scenario where the queue comes back?  Can the device be "offline"
-and still have a live queue?  Another approach might be to set
-io_disable when there's an extended period without a successful IO, and
-it might be possible to do this with atomics without a thread).
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Cc: Michael Lyle <mlyle@lyle.org>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
+---
+ drivers/md/bcache/bcache.h |  2 ++
+ drivers/md/bcache/super.c  | 55 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 57 insertions(+)
 
-This approach can work if you're certain that blk_queue_dying is an
-appropriate test for all failure scenarios (I just don't know).
-
-Mike
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index d338b7086013..1cfe37dba0f1 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -345,6 +345,7 @@ struct cached_dev {
+ 
+ 	struct keybuf		writeback_keys;
+ 
++	struct task_struct	*status_update_thread;
+ 	/*
+ 	 * Order the write-half of writeback operations strongly in dispatch
+ 	 * order.  (Maintain LBA order; don't allow reads completing out of
+@@ -392,6 +393,7 @@ struct cached_dev {
+ #define DEFAULT_CACHED_DEV_ERROR_LIMIT	64
+ 	atomic_t		io_errors;
+ 	unsigned		error_limit;
++	unsigned		offline_seconds;
+ };
+ 
+ enum alloc_reserve {
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index cae4caac17da..abeb52bd9ebe 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -654,6 +654,11 @@ static int ioctl_dev(struct block_device *b, fmode_t mode,
+ 		     unsigned int cmd, unsigned long arg)
+ {
+ 	struct bcache_device *d = b->bd_disk->private_data;
++	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
++
++	if (dc->io_disable)
++		return -EIO;
++
+ 	return d->ioctl(d, mode, cmd, arg);
+ }
+ 
+@@ -864,6 +869,45 @@ static void calc_cached_dev_sectors(struct cache_set *c)
+ 	c->cached_dev_sectors = sectors;
+ }
+ 
++#define BACKING_DEV_OFFLINE_TIMEOUT 5
++static int cached_dev_status_update(void *arg)
++{
++	struct cached_dev *dc = arg;
++	struct request_queue *q;
++	char buf[BDEVNAME_SIZE];
++
++	/*
++	 * If this delayed worker is stopping outside, directly quit here.
++	 * dc->io_disable might be set via sysfs interface, so check it
++	 * here too.
++	 */
++	while (!kthread_should_stop() && !dc->io_disable) {
++		q = bdev_get_queue(dc->bdev);
++		if (blk_queue_dying(q))
++			dc->offline_seconds++;
++		else
++			dc->offline_seconds = 0;
++
++		if (dc->offline_seconds >= BACKING_DEV_OFFLINE_TIMEOUT) {
++			pr_err("%s: device offline for %d seconds",
++				bdevname(dc->bdev, buf),
++				BACKING_DEV_OFFLINE_TIMEOUT);
++			pr_err("%s: disable I/O request due to backing "
++				"device offline", dc->disk.name);
++			dc->io_disable = true;
++			/* let others know earlier that io_disable is true */
++			smp_mb();
++			bcache_device_stop(&dc->disk);
++			break;
++		}
++
++		schedule_timeout_interruptible(HZ);
++	}
++
++	wait_for_kthread_stop();
++	return 0;
++}
++
+ void bch_cached_dev_run(struct cached_dev *dc)
+ {
+ 	struct bcache_device *d = &dc->disk;
+@@ -906,6 +950,15 @@ void bch_cached_dev_run(struct cached_dev *dc)
+ 	if (sysfs_create_link(&d->kobj, &disk_to_dev(d->disk)->kobj, "dev") ||
+ 	    sysfs_create_link(&disk_to_dev(d->disk)->kobj, &d->kobj, "bcache"))
+ 		pr_debug("error creating sysfs link");
++
++	dc->status_update_thread = kthread_run(cached_dev_status_update,
++					       dc,
++					      "bcache_status_update");
++	if (IS_ERR(dc->status_update_thread)) {
++		pr_warn("failed to create bcache_status_update kthread, "
++			"continue to run without monitoring backing "
++			"device status");
++	}
+ }
+ 
+ /*
+@@ -1128,6 +1181,8 @@ static void cached_dev_free(struct closure *cl)
+ 		kthread_stop(dc->writeback_thread);
+ 	if (dc->writeback_write_wq)
+ 		destroy_workqueue(dc->writeback_write_wq);
++	if (!IS_ERR_OR_NULL(dc->status_update_thread))
++		kthread_stop(dc->status_update_thread);
+ 
+ 	if (atomic_read(&dc->running))
+ 		bd_unlink_disk_holder(dc->bdev, dc->disk.disk);
+-- 
+2.16.1
