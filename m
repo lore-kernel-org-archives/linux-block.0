@@ -1,163 +1,141 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:52075 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753179AbeBZNRj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Feb 2018 08:17:39 -0500
-Received: by mail-wm0-f68.google.com with SMTP id h21so17383277wmd.1
-        for <linux-block@vger.kernel.org>; Mon, 26 Feb 2018 05:17:39 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 11/19] lightnvm: pblk: rename ppaf* to addrf*
-Date: Mon, 26 Feb 2018 14:17:10 +0100
-Message-Id: <1519651038-16845-12-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
-References: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mx2.suse.de ([195.135.220.15]:46935 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751907AbeB0Q40 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Feb 2018 11:56:26 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Hannes Reinecke <hare@suse.com>,
+        Huijun Tang <tang.junhui@zte.com.cn>
+Subject: [PATCH v7 2/9] bcache: quit dc->writeback_thread when BCACHE_DEV_DETACHING is set
+Date: Wed, 28 Feb 2018 00:55:50 +0800
+Message-Id: <20180227165557.20442-3-colyli@suse.de>
+In-Reply-To: <20180227165557.20442-1-colyli@suse.de>
+References: <20180227165557.20442-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-In preparation for 2.0 support in pblk, rename variables referring to
-the address format to addrf and reserve ppaf for the 1.2 path.
+In patch "bcache: fix cached_dev->count usage for bch_cache_set_error()",
+cached_dev_get() is called when creating dc->writeback_thread, and
+cached_dev_put() is called when exiting dc->writeback_thread. This
+modification works well unless people detach the bcache device manually by
+    'echo 1 > /sys/block/bcache<N>/bcache/detach'
+Because this sysfs interface only calls bch_cached_dev_detach() which wakes
+up dc->writeback_thread but does not stop it. The reason is, before patch
+"bcache: fix cached_dev->count usage for bch_cache_set_error()", inside
+bch_writeback_thread(), if cache is not dirty after writeback,
+cached_dev_put() will be called here. And in cached_dev_make_request() when
+a new write request makes cache from clean to dirty, cached_dev_get() will
+be called there. Since we don't operate dc->count in these locations,
+refcount d->count cannot be dropped after cache becomes clean, and
+cached_dev_detach_finish() won't be called to detach bcache device.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
+This patch fixes the issue by checking whether BCACHE_DEV_DETACHING is
+set inside bch_writeback_thread(). If this bit is set and cache is clean
+(no existing writeback_keys), break the while-loop, call cached_dev_put()
+and quit the writeback thread.
+
+Please note if cache is still dirty, even BCACHE_DEV_DETACHING is set the
+writeback thread should continue to perform writeback, this is the original
+design of manually detach.
+
+It is safe to do the following check without locking, let me explain why,
++	if (!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags) &&
++	    (!atomic_read(&dc->has_dirty) || !dc->writeback_running)) {
+
+If the kenrel thread does not sleep and continue to run due to conditions
+are not updated in time on the running CPU core, it just consumes more CPU
+cycles and has no hurt. This should-sleep-but-run is safe here. We just
+focus on the should-run-but-sleep condition, which means the writeback
+thread goes to sleep in mistake while it should continue to run.
+1, First of all, no matter the writeback thread is hung or not, kthread_stop() from
+   cached_dev_detach_finish() will wake up it and terminate by making
+   kthread_should_stop() return true. And in normal run time, bit on index
+   BCACHE_DEV_DETACHING is always cleared, the condition
+	!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags)
+   is always true and can be ignored as constant value.
+2, If one of the following conditions is true, the writeback thread should
+   go to sleep,
+   "!atomic_read(&dc->has_dirty)" or "!dc->writeback_running)"
+   each of them independently controls the writeback thread should sleep or
+   not, let's analyse them one by one.
+2.1 condition "!atomic_read(&dc->has_dirty)"
+   If dc->has_dirty is set from 0 to 1 on another CPU core, bcache will
+   call bch_writeback_queue() immediately or call bch_writeback_add() which
+   indirectly calls bch_writeback_queue() too. In bch_writeback_queue(),
+   wake_up_process(dc->writeback_thread) is called. It sets writeback
+   thread's task state to TASK_RUNNING and following an implicit memory
+   barrier, then tries to wake up the writeback thread.
+   In writeback thread, its task state is set to TASK_INTERRUPTIBLE before
+   doing the condition check. If other CPU core sets the TASK_RUNNING state
+   after writeback thread setting TASK_INTERRUPTIBLE, the writeback thread
+   will be scheduled to run very soon because its state is not
+   TASK_INTERRUPTIBLE. If other CPU core sets the TASK_RUNNING state before
+   writeback thread setting TASK_INTERRUPTIBLE, the implict memory barrier
+   of wake_up_process() will make sure modification of dc->has_dirty on
+   other CPU core is updated and observed on the CPU core of writeback
+   thread. Therefore the condition check will correctly be false, and
+   continue writeback code without sleeping.
+2.2 condition "!dc->writeback_running)"
+   dc->writeback_running can be changed via sysfs file, every time it is
+   modified, a following bch_writeback_queue() is alwasy called. So the
+   change is always observed on the CPU core of writeback thread. If
+   dc->writeback_running is changed from 0 to 1 on other CPU core, this
+   condition check will observe the modification and allow writeback
+   thread to continue to run without sleeping.
+Now we can see, even without a locking protection, multiple conditions
+check is safe here, no deadlock or process hang up will happen.
+
+I compose a separte patch because that patch "bcache: fix cached_dev->count
+usage for bch_cache_set_error()" already gets a "Reviewed-by:" from Hannes
+Reinecke. Also this fix is not trivial and good for a separate patch.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Huijun Tang <tang.junhui@zte.com.cn>
 ---
- drivers/lightnvm/pblk-init.c  |  8 ++++----
- drivers/lightnvm/pblk-sysfs.c |  4 ++--
- drivers/lightnvm/pblk.h       | 16 ++++++++--------
- 3 files changed, 14 insertions(+), 14 deletions(-)
+ drivers/md/bcache/writeback.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 30aec863f136..ec39800eea42 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -80,7 +80,7 @@ static size_t pblk_trans_map_size(struct pblk *pblk)
- {
- 	int entry_size = 8;
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index b280c134dd4d..4dbeaaa575bf 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -565,9 +565,15 @@ static int bch_writeback_thread(void *arg)
+ 	while (!kthread_should_stop()) {
+ 		down_write(&dc->writeback_lock);
+ 		set_current_state(TASK_INTERRUPTIBLE);
+-		if (!atomic_read(&dc->has_dirty) ||
+-		    (!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags) &&
+-		     !dc->writeback_running)) {
++		/*
++		 * If the bache device is detaching, skip here and continue
++		 * to perform writeback. Otherwise, if no dirty data on cache,
++		 * or there is dirty data on cache but writeback is disabled,
++		 * the writeback thread should sleep here and wait for others
++		 * to wake up it.
++		 */
++		if (!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags) &&
++		    (!atomic_read(&dc->has_dirty) || !dc->writeback_running)) {
+ 			up_write(&dc->writeback_lock);
  
--	if (pblk->ppaf_bitsize < 32)
-+	if (pblk->addrf_len < 32)
- 		entry_size = 4;
+ 			if (kthread_should_stop()) {
+@@ -587,6 +593,14 @@ static int bch_writeback_thread(void *arg)
+ 			atomic_set(&dc->has_dirty, 0);
+ 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_CLEAN);
+ 			bch_write_bdev_super(dc, NULL);
++			/*
++			 * If bcache device is detaching via sysfs interface,
++			 * writeback thread should stop after there is no dirty
++			 * data on cache. BCACHE_DEV_DETACHING flag is set in
++			 * bch_cached_dev_detach().
++			 */
++			if (test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags))
++				break;
+ 		}
  
- 	return entry_size * pblk->rl.nr_secs;
-@@ -198,7 +198,7 @@ static int pblk_set_addrf_12(struct nvm_geo *geo,
- 	return dst->blk_offset + src->blk_len;
- }
- 
--static int pblk_set_ppaf(struct pblk *pblk)
-+static int pblk_set_addrf(struct pblk *pblk)
- {
- 	struct nvm_tgt_dev *dev = pblk->dev;
- 	struct nvm_geo *geo = &dev->geo;
-@@ -210,7 +210,7 @@ static int pblk_set_ppaf(struct pblk *pblk)
- 		return -EINVAL;
- 	}
- 
--	pblk->ppaf_bitsize = pblk_set_addrf_12(geo, (void *)&pblk->ppaf);
-+	pblk->addrf_len = pblk_set_addrf_12(geo, (void *)&pblk->addrf);
- 
- 	return 0;
- }
-@@ -319,7 +319,7 @@ static int pblk_core_init(struct pblk *pblk)
- 	if (!pblk->r_end_wq)
- 		goto free_bb_wq;
- 
--	if (pblk_set_ppaf(pblk))
-+	if (pblk_set_addrf(pblk))
- 		goto free_r_end_wq;
- 
- 	if (pblk_rwb_init(pblk))
-diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
-index 81288aa9162a..d3b50741b691 100644
---- a/drivers/lightnvm/pblk-sysfs.c
-+++ b/drivers/lightnvm/pblk-sysfs.c
-@@ -117,12 +117,12 @@ static ssize_t pblk_sysfs_ppaf(struct pblk *pblk, char *page)
- 	struct nvm_addr_format_12 *geo_ppaf;
- 	ssize_t sz = 0;
- 
--	ppaf = (struct nvm_addr_format_12 *)&pblk->ppaf;
-+	ppaf = (struct nvm_addr_format_12 *)&pblk->addrf;
- 	geo_ppaf = (struct nvm_addr_format_12 *)&geo->c.addrf;
- 
- 	sz = snprintf(page, PAGE_SIZE,
- 		"pblk:(s:%d)ch:%d/%d,lun:%d/%d,blk:%d/%d,pg:%d/%d,pl:%d/%d,sec:%d/%d\n",
--			pblk->ppaf_bitsize,
-+			pblk->addrf_len,
- 			ppaf->ch_offset, ppaf->ch_len,
- 			ppaf->lun_offset, ppaf->lun_len,
- 			ppaf->blk_offset, ppaf->blk_len,
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 4f7a365436f1..46b29a492f74 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -570,8 +570,8 @@ struct pblk {
- 	struct pblk_line_mgmt l_mg;		/* Line management */
- 	struct pblk_line_meta lm;		/* Line metadata */
- 
--	struct nvm_addr_format ppaf;
--	int ppaf_bitsize;
-+	struct nvm_addr_format addrf;
-+	int addrf_len;
- 
- 	struct pblk_rb rwb;
- 
-@@ -948,7 +948,7 @@ static inline struct ppa_addr addr_to_gen_ppa(struct pblk *pblk, u64 paddr,
- 					      u64 line_id)
- {
- 	struct nvm_addr_format_12 *ppaf =
--				(struct nvm_addr_format_12 *)&pblk->ppaf;
-+				(struct nvm_addr_format_12 *)&pblk->addrf;
- 	struct ppa_addr ppa;
- 
- 	ppa.ppa = 0;
-@@ -966,7 +966,7 @@ static inline u64 pblk_dev_ppa_to_line_addr(struct pblk *pblk,
- 							struct ppa_addr p)
- {
- 	struct nvm_addr_format_12 *ppaf =
--				(struct nvm_addr_format_12 *)&pblk->ppaf;
-+				(struct nvm_addr_format_12 *)&pblk->addrf;
- 	u64 paddr;
- 
- 	paddr = (u64)p.g.ch << ppaf->ch_offset;
-@@ -991,7 +991,7 @@ static inline struct ppa_addr pblk_ppa32_to_ppa64(struct pblk *pblk, u32 ppa32)
- 		ppa64.c.is_cached = 1;
- 	} else {
- 		struct nvm_addr_format_12 *ppaf =
--				(struct nvm_addr_format_12 *)&pblk->ppaf;
-+				(struct nvm_addr_format_12 *)&pblk->addrf;
- 
- 		ppa64.g.ch = (ppa32 & ppaf->ch_mask) >> ppaf->ch_offset;
- 		ppa64.g.lun = (ppa32 & ppaf->lun_mask) >> ppaf->lun_offset;
-@@ -1015,7 +1015,7 @@ static inline u32 pblk_ppa64_to_ppa32(struct pblk *pblk, struct ppa_addr ppa64)
- 		ppa32 |= 1U << 31;
- 	} else {
- 		struct nvm_addr_format_12 *ppaf =
--				(struct nvm_addr_format_12 *)&pblk->ppaf;
-+				(struct nvm_addr_format_12 *)&pblk->addrf;
- 
- 		ppa32 |= ppa64.g.ch << ppaf->ch_offset;
- 		ppa32 |= ppa64.g.lun << ppaf->lun_offset;
-@@ -1033,7 +1033,7 @@ static inline struct ppa_addr pblk_trans_map_get(struct pblk *pblk,
- {
- 	struct ppa_addr ppa;
- 
--	if (pblk->ppaf_bitsize < 32) {
-+	if (pblk->addrf_len < 32) {
- 		u32 *map = (u32 *)pblk->trans_map;
- 
- 		ppa = pblk_ppa32_to_ppa64(pblk, map[lba]);
-@@ -1049,7 +1049,7 @@ static inline struct ppa_addr pblk_trans_map_get(struct pblk *pblk,
- static inline void pblk_trans_map_set(struct pblk *pblk, sector_t lba,
- 						struct ppa_addr ppa)
- {
--	if (pblk->ppaf_bitsize < 32) {
-+	if (pblk->addrf_len < 32) {
- 		u32 *map = (u32 *)pblk->trans_map;
- 
- 		map[lba] = pblk_ppa64_to_ppa32(pblk, ppa);
+ 		up_write(&dc->writeback_lock);
 -- 
-2.7.4
+2.16.1
