@@ -1,75 +1,27 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: linux-scsi@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Arun Easi <arun.easi@cavium.com>,
-	Omar Sandoval <osandov@fb.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Don Brace <don.brace@microsemi.com>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Peter Rivera <peter.rivera@broadcom.com>,
-	Laurence Oberman <loberman@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 7/8] scsi: hpsa: improve scsi_mq performance via .host_tagset
-Date: Tue, 27 Feb 2018 18:07:49 +0800
-Message-Id: <20180227100750.32299-8-ming.lei@redhat.com>
-In-Reply-To: <20180227100750.32299-1-ming.lei@redhat.com>
-References: <20180227100750.32299-1-ming.lei@redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 0/2] Bcache fixes for 4.16
+To: Michael Lyle <mlyle@lyle.org>, linux-bcache@vger.kernel.org,
+ linux-block@vger.kernel.org
+References: <20180227174930.15911-1-mlyle@lyle.org>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <97b035f5-22dd-9c37-717d-7d723cdd8a2d@kernel.dk>
+Date: Tue, 27 Feb 2018 10:54:44 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180227174930.15911-1-mlyle@lyle.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-It is observed that IOPS can be improved much by simply making
-hw queue per NUMA node on null_blk, so this patch applies the
-introduced .host_tagset for improving performance.
+On 2/27/18 10:49 AM, Michael Lyle wrote:
+> Hi Jens,
+> 
+> Please pick up these two critical fixes to bcache by Tang Junhui.
+> They're both one-liners and have been reviewed and tested.
+> 
+> The first corrects a regression when flash-only volumes are present
+> that was introduced in 4.16-RC1.  The second adjusts bio refcount
+> and completion behavior to work with md RAID5 backing.
 
-In reality, .can_queue is quite big, and NUMA node number is
-often small, so each hw queue's depth should be high enough to
-saturate device.
+Looks fine, applied for 4.16, thanks Mike.
 
-Cc: Arun Easi <arun.easi@cavium.com>
-Cc: Omar Sandoval <osandov@fb.com>,
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-Cc: Christoph Hellwig <hch@lst.de>,
-Cc: Don Brace <don.brace@microsemi.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Peter Rivera <peter.rivera@broadcom.com>
-Cc: Laurence Oberman <loberman@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/hpsa.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/drivers/scsi/hpsa.c b/drivers/scsi/hpsa.c
-index 3a9eca163db8..0747751b7e1c 100644
---- a/drivers/scsi/hpsa.c
-+++ b/drivers/scsi/hpsa.c
-@@ -978,6 +978,7 @@ static struct scsi_host_template hpsa_driver_template = {
- 	.shost_attrs = hpsa_shost_attrs,
- 	.max_sectors = 1024,
- 	.no_write_same = 1,
-+	.host_tagset = 1,
- };
- 
- static inline u32 next_command(struct ctlr_info *h, u8 q)
-@@ -5761,6 +5762,11 @@ static int hpsa_scsi_host_alloc(struct ctlr_info *h)
- static int hpsa_scsi_add_host(struct ctlr_info *h)
- {
- 	int rv;
-+	/* 256 tags should be high enough to saturate device */
-+	int max_queues = DIV_ROUND_UP(h->scsi_host->can_queue, 256);
-+
-+	/* per NUMA node hw queue */
-+	h->scsi_host->nr_hw_queues = min_t(int, nr_node_ids, max_queues);
- 
- 	rv = scsi_add_host(h->scsi_host, &h->pdev->dev);
- 	if (rv) {
 -- 
-2.9.5
+Jens Axboe
