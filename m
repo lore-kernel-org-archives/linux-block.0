@@ -1,43 +1,87 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:40432 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750877AbeBZTqH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Feb 2018 14:46:07 -0500
-Received: by mail-pf0-f193.google.com with SMTP id m5so6941002pff.7
-        for <linux-block@vger.kernel.org>; Mon, 26 Feb 2018 11:46:06 -0800 (PST)
-From: Heiner Litz <hlitz@ucsc.edu>
-To: linux-block@vger.kernel.org
-Cc: javier@cnexlabs.com, mb@lightnvm.io, Heiner Litz <hlitz@ucsc.edu>
-Subject: [PATCH] lightnvm: Avoid validation of default op value Avoid validation of default op value, if default value is given. In preparation of using the rsvd field of the extended config for additional paramters while using default op.
-Date: Mon, 26 Feb 2018 11:45:57 -0800
-Message-Id: <20180226194557.12226-1-hlitz@ucsc.edu>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Mike Snitzer <snitzer@redhat.com>
+Cc: linux-scsi@vger.kernel.org,
+	Hannes Reinecke <hare@suse.de>,
+	Arun Easi <arun.easi@cavium.com>,
+	Omar Sandoval <osandov@fb.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	James Bottomley <james.bottomley@hansenpartnership.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Don Brace <don.brace@microsemi.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Peter Rivera <peter.rivera@broadcom.com>,
+	Laurence Oberman <loberman@redhat.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 6/8] block: null_blk: introduce module parameter of 'g_host_tags'
+Date: Tue, 27 Feb 2018 18:07:48 +0800
+Message-Id: <20180227100750.32299-7-ming.lei@redhat.com>
+In-Reply-To: <20180227100750.32299-1-ming.lei@redhat.com>
+References: <20180227100750.32299-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
- Fixes: 38401d231de65 ("lightnvm: set target over-provision on create ioctl")
+This patch introduces the parameter of 'g_host_tags' so that we can
+test this feature by null_blk easiy.
 
-Signed-off-by: Heiner Litz <hlitz@ucsc.edu>
+With host_tags when the whole hw depth is kept as same, it is observed
+that IOPS can be improved by ~50% on a dual socket(total 16 CPU cores)
+system:
+
+1) no 'host_tags', each hw queue depth is 16, and 1 hw queue
+modprobe null_blk queue_mode=2 nr_devices=4 shared_tags=1 host_tags=0 submit_queues=1 hw_queue_depth=16
+
+IOPS: 1382K
+
+2) 'host_tags', each hw queue depth is 8, and 2 hw queues
+modprobe null_blk queue_mode=2 nr_devices=4 shared_tags=1 host_tags=1 submit_queues=2 hw_queue_depth=16
+
+IOPS: 2124K
+
+3) fio test done in above two settings:
+fio --bs=4k --size=512G  --rw=randread --norandommap --direct=1 --ioengine=libaio --iodepth=4 --runtime=$RUNTIME --group_reporting=1  --name=nullb0 --filename=/dev/nullb0 --name=nullb1 --filename=/dev/nullb1 --name=nullb2 --filename=/dev/nullb2 --name=nullb3 --filename=/dev/nullb3
+
+Cc: Arun Easi <arun.easi@cavium.com>
+Cc: Omar Sandoval <osandov@fb.com>,
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
+Cc: Christoph Hellwig <hch@lst.de>,
+Cc: Don Brace <don.brace@microsemi.com>
+Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: Peter Rivera <peter.rivera@broadcom.com>
+Cc: Laurence Oberman <loberman@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/lightnvm/core.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/block/null_blk.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index dcc9e621e651..4e6095e2af06 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -304,10 +304,9 @@ static int __nvm_config_extended(struct nvm_dev *dev,
- 	}
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index 287a09611c0f..51b16249028a 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -163,6 +163,10 @@ static int g_submit_queues = 1;
+ module_param_named(submit_queues, g_submit_queues, int, S_IRUGO);
+ MODULE_PARM_DESC(submit_queues, "Number of submission queues");
  
- 	/* op not set falls into target's default */
--	if (e->op == 0xFFFF)
-+	if (e->op == 0xFFFF) {
- 		e->op = NVM_TARGET_DEFAULT_OP;
--
--	if (e->op < NVM_TARGET_MIN_OP ||
-+	} else if (e->op < NVM_TARGET_MIN_OP ||
- 	    e->op > NVM_TARGET_MAX_OP) {
- 		pr_err("nvm: invalid over provisioning value\n");
- 		return -EINVAL;
++static int g_host_tags = 0;
++module_param_named(host_tags, g_host_tags, int, S_IRUGO);
++MODULE_PARM_DESC(host_tags, "All submission queues share one tags");
++
+ static int g_home_node = NUMA_NO_NODE;
+ module_param_named(home_node, g_home_node, int, S_IRUGO);
+ MODULE_PARM_DESC(home_node, "Home node for the device");
+@@ -1622,6 +1626,8 @@ static int null_init_tag_set(struct nullb *nullb, struct blk_mq_tag_set *set)
+ 	set->flags = BLK_MQ_F_SHOULD_MERGE;
+ 	if (g_no_sched)
+ 		set->flags |= BLK_MQ_F_NO_SCHED;
++	if (g_host_tags)
++		set->flags |= BLK_MQ_F_HOST_TAGS;
+ 	set->driver_data = NULL;
+ 
+ 	if ((nullb && nullb->dev->blocking) || g_blocking)
 -- 
-2.14.1
+2.9.5
