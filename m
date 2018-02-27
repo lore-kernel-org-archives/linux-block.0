@@ -1,70 +1,59 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5717 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751646AbeB1GSF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Feb 2018 01:18:05 -0500
-Subject: Re: [bug report] Don't enter SCSI error handler on kernel 4.16-rc1
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-References: <e8bba22c-a02b-f449-c67a-d4a7ae8482df@hisilicon.com>
- <1519658706.3975.2.camel@wdc.com>
- <75f77913-41a7-98fd-f4a1-0301ff4d6e2b@hisilicon.com>
- <1519743443.21815.2.camel@wdc.com>
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:22993 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753477AbeB0O52 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Feb 2018 09:57:28 -0500
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "chenxiang66@hisilicon.com" <chenxiang66@hisilicon.com>
 CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "tj@kernel.org" <tj@kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "john.garry@huawei.com" <john.garry@huawei.com>,
         "linuxarm@huawei.com" <linuxarm@huawei.com>
-From: "chenxiang (M)" <chenxiang66@hisilicon.com>
-Message-ID: <0e03cf3a-9b96-d41e-5896-1e4c6bdf81d9@hisilicon.com>
-Date: Wed, 28 Feb 2018 14:17:03 +0800
+Subject: Re: [bug report] Don't enter SCSI error handler on kernel 4.16-rc1
+Date: Tue, 27 Feb 2018 14:57:24 +0000
+Message-ID: <1519743443.21815.2.camel@wdc.com>
+References: <e8bba22c-a02b-f449-c67a-d4a7ae8482df@hisilicon.com>
+         <1519658706.3975.2.camel@wdc.com>
+         <75f77913-41a7-98fd-f4a1-0301ff4d6e2b@hisilicon.com>
+In-Reply-To: <75f77913-41a7-98fd-f4a1-0301ff4d6e2b@hisilicon.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1519743443.21815.2.camel@wdc.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-在 2018/2/27 22:57, Bart Van Assche 写道:
-> On Tue, 2018-02-27 at 15:09 +0800, chenxiang (M) wrote:
->> 在 2018/2/26 23:25, Bart Van Assche 写道:
->>> On Mon, 2018-02-26 at 17:37 +0800, chenxiang (M) wrote:
->>>> When i have a test on kernel 4.16-rc1, find a issue: running IO on SATA disk, then disable the disk through
->>>> sysfs interface(echo 0 > /sys/class/sas_phy/phy-1:0:0/enable), IO will hang and never enter SCSI EH. The issue
->>>> appears every time.
->>>>
->>>> I add some prints on code and find that  those IOs will be timeout after 30s, and they all enter
->>>> function scsi_eh_scmd_add, but only some of them can enter function scsi_eh_inc_host_failed. So it will never
->>>> enter SCSI EH.  I suspect it is related to the patch ("commit 3bd6f43f5cb371" scsi: core: Ensure that the
->>>> SCSI error handler gets woken up ). Please have a check.
->>> Hello chenxiang,
->>>
->>> Had you already noticed patch "[PATCH v2] Avoid that ATA error handling can
->>> trigger a kernel hang or oops"? If not, can you apply that patch to your
->>> kernel and verify whether it fixes this behavior? See also
->>> https://www.mail-archive.com/linux-scsi@vger.kernel.org/msg71189.html or
->>> https://patchwork.kernel.org/patch/10236213/.
->> After applied your patch, the issue i reported seems be solved.
-> Thanks for having testing that patch!
->
->> But when i have long time test(disable/enable disk when running IO) on
->> the testcase, Null pointer occurs.
->> It seems not related to current issue but i am not sure.
->> I ran the testcase for long time before in kernel 4.15-rc5, and it was okay.
->>
->> Part of log is as follows, and i add attachment of log in the email :
->>
->> [  485.716578] pc : blk_abort_request+0x14/0x68
-> (+Tejun)
->
-> Hello chenxiang,
->
-> Please check whether the following patch fixes the kernel crash you ran into:
->
-> https://marc.info/?l=linux-block&m=151895951207014
-
-It seems the patch is for block mq, but the issue i encount is under 
-block legacy as CONFIG_SCSI_MQ_DEFAULT is not enabled.
-
->
-> Thanks,
->
-> Bart.
+T24gVHVlLCAyMDE4LTAyLTI3IGF0IDE1OjA5ICswODAwLCBjaGVueGlhbmcgKE0pIHdyb3RlOg0K
+PiDlnKggMjAxOC8yLzI2IDIzOjI1LCBCYXJ0IFZhbiBBc3NjaGUg5YaZ6YGTOg0KPiA+IE9uIE1v
+biwgMjAxOC0wMi0yNiBhdCAxNzozNyArMDgwMCwgY2hlbnhpYW5nIChNKSB3cm90ZToNCj4gPiA+
+IFdoZW4gaSBoYXZlIGEgdGVzdCBvbiBrZXJuZWwgNC4xNi1yYzEsIGZpbmQgYSBpc3N1ZTogcnVu
+bmluZyBJTyBvbiBTQVRBIGRpc2ssIHRoZW4gZGlzYWJsZSB0aGUgZGlzayB0aHJvdWdoDQo+ID4g
+PiBzeXNmcyBpbnRlcmZhY2UoZWNobyAwID4gL3N5cy9jbGFzcy9zYXNfcGh5L3BoeS0xOjA6MC9l
+bmFibGUpLCBJTyB3aWxsIGhhbmcgYW5kIG5ldmVyIGVudGVyIFNDU0kgRUguIFRoZSBpc3N1ZQ0K
+PiA+ID4gYXBwZWFycyBldmVyeSB0aW1lLg0KPiA+ID4gDQo+ID4gPiBJIGFkZCBzb21lIHByaW50
+cyBvbiBjb2RlIGFuZCBmaW5kIHRoYXQgIHRob3NlIElPcyB3aWxsIGJlIHRpbWVvdXQgYWZ0ZXIg
+MzBzLCBhbmQgdGhleSBhbGwgZW50ZXINCj4gPiA+IGZ1bmN0aW9uIHNjc2lfZWhfc2NtZF9hZGQs
+IGJ1dCBvbmx5IHNvbWUgb2YgdGhlbSBjYW4gZW50ZXIgZnVuY3Rpb24gc2NzaV9laF9pbmNfaG9z
+dF9mYWlsZWQuIFNvIGl0IHdpbGwgbmV2ZXINCj4gPiA+IGVudGVyIFNDU0kgRUguICBJIHN1c3Bl
+Y3QgaXQgaXMgcmVsYXRlZCB0byB0aGUgcGF0Y2ggKCJjb21taXQgM2JkNmY0M2Y1Y2IzNzEiIHNj
+c2k6IGNvcmU6IEVuc3VyZSB0aGF0IHRoZQ0KPiA+ID4gU0NTSSBlcnJvciBoYW5kbGVyIGdldHMg
+d29rZW4gdXAgKS4gUGxlYXNlIGhhdmUgYSBjaGVjay4NCj4gPiANCj4gPiBIZWxsbyBjaGVueGlh
+bmcsDQo+ID4gDQo+ID4gSGFkIHlvdSBhbHJlYWR5IG5vdGljZWQgcGF0Y2ggIltQQVRDSCB2Ml0g
+QXZvaWQgdGhhdCBBVEEgZXJyb3IgaGFuZGxpbmcgY2FuDQo+ID4gdHJpZ2dlciBhIGtlcm5lbCBo
+YW5nIG9yIG9vcHMiPyBJZiBub3QsIGNhbiB5b3UgYXBwbHkgdGhhdCBwYXRjaCB0byB5b3VyDQo+
+ID4ga2VybmVsIGFuZCB2ZXJpZnkgd2hldGhlciBpdCBmaXhlcyB0aGlzIGJlaGF2aW9yPyBTZWUg
+YWxzbw0KPiA+IGh0dHBzOi8vd3d3Lm1haWwtYXJjaGl2ZS5jb20vbGludXgtc2NzaUB2Z2VyLmtl
+cm5lbC5vcmcvbXNnNzExODkuaHRtbCBvcg0KPiA+IGh0dHBzOi8vcGF0Y2h3b3JrLmtlcm5lbC5v
+cmcvcGF0Y2gvMTAyMzYyMTMvLg0KPiANCj4gQWZ0ZXIgYXBwbGllZCB5b3VyIHBhdGNoLCB0aGUg
+aXNzdWUgaSByZXBvcnRlZCBzZWVtcyBiZSBzb2x2ZWQuDQoNClRoYW5rcyBmb3IgaGF2aW5nIHRl
+c3RpbmcgdGhhdCBwYXRjaCENCg0KPiBCdXQgd2hlbiBpIGhhdmUgbG9uZyB0aW1lIHRlc3QoZGlz
+YWJsZS9lbmFibGUgZGlzayB3aGVuIHJ1bm5pbmcgSU8pIG9uIA0KPiB0aGUgdGVzdGNhc2UsIE51
+bGwgcG9pbnRlciBvY2N1cnMuDQo+IEl0IHNlZW1zIG5vdCByZWxhdGVkIHRvIGN1cnJlbnQgaXNz
+dWUgYnV0IGkgYW0gbm90IHN1cmUuDQo+IEkgcmFuIHRoZSB0ZXN0Y2FzZSBmb3IgbG9uZyB0aW1l
+IGJlZm9yZSBpbiBrZXJuZWwgNC4xNS1yYzUsIGFuZCBpdCB3YXMgb2theS4NCj4gDQo+IFBhcnQg
+b2YgbG9nIGlzIGFzIGZvbGxvd3MsIGFuZCBpIGFkZCBhdHRhY2htZW50IG9mIGxvZyBpbiB0aGUg
+ZW1haWwgOg0KPiANCj4gWyAgNDg1LjcxNjU3OF0gcGMgOiBibGtfYWJvcnRfcmVxdWVzdCsweDE0
+LzB4NjgNCg0KKCtUZWp1bikNCg0KSGVsbG8gY2hlbnhpYW5nLA0KDQpQbGVhc2UgY2hlY2sgd2hl
+dGhlciB0aGUgZm9sbG93aW5nIHBhdGNoIGZpeGVzIHRoZSBrZXJuZWwgY3Jhc2ggeW91IHJhbiBp
+bnRvOg0KDQpodHRwczovL21hcmMuaW5mby8/bD1saW51eC1ibG9jayZtPTE1MTg5NTk1MTIwNzAx
+NA0KDQpUaGFua3MsDQoNCkJhcnQu
