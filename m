@@ -1,82 +1,59 @@
-Return-Path: <prvs=590d2a92c=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <damien.lemoal@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] mq-deadline: Make sure to always unlock zones
-Date: Wed, 28 Feb 2018 09:35:29 -0800
-Message-Id: <20180228173529.24941-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pl0-f67.google.com ([209.85.160.67]:42653 "EHLO
+        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751877AbeB0Rti (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Feb 2018 12:49:38 -0500
+Received: by mail-pl0-f67.google.com with SMTP id 93-v6so1236669plc.9
+        for <linux-block@vger.kernel.org>; Tue, 27 Feb 2018 09:49:38 -0800 (PST)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Coly Li <colyli@suse.de>
+Subject: [PATCH 1/2] bcache: correct flash only vols (check all uuids)
+Date: Tue, 27 Feb 2018 09:49:29 -0800
+Message-Id: <20180227174930.15911-2-mlyle@lyle.org>
+In-Reply-To: <20180227174930.15911-1-mlyle@lyle.org>
+References: <20180227174930.15911-1-mlyle@lyle.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Damien Le Moal <damien.lemoal@wdc.com>
+From: Coly Li <colyli@suse.de>
 
-In case of a failed write request (all retries failed) and when using
-libata, the SCSI error handler calls scsi_finish_command(). In the
-case of blk-mq this means that scsi_mq_done() does not get called,
-that blk_mq_complete_request() does not get called and also that the
-mq-deadline .completed_request() method is not called. This results in
-the target zone of the failed write request being left in a locked
-state, preventing that any new write requests are issued to the same
-zone.
+Commit 2831231d4c3f ("bcache: reduce cache_set devices iteration by
+devices_max_used") adds c->devices_max_used to reduce iteration of
+c->uuids elements, this value is updated in bcache_device_attach().
 
-Fix this by replacing the .completed_request() method with the
-.finish_request() method as this method is always called whether or
-not a request completes successfully. Since the .finish_request()
-method is only called by the blk-mq core if a .prepare_request()
-method exists, add a dummy .prepare_request() method.
+But for flash only volume, when calling flash_devs_run(), the function
+bcache_device_attach() is not called yet and c->devices_max_used is not
+updated. The unexpected result is, the flash only volume won't be run
+by flash_devs_run().
 
-Fixes: 5700f69178e9 ("mq-deadline: Introduce zone locking support")
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-[ bvanassche: edited patch description ]
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Ming Lei <ming.lei@redhat.com>
+This patch fixes the issue by iterate all c->uuids elements in
+flash_devs_run(). c->devices_max_used will be updated properly when
+bcache_device_attach() gets called.
+
+[mlyle: commit subject edited for character limit]
+
+Fixes: 2831231d4c3f ("bcache: reduce cache_set devices iteration by devices_max_used")
+Reported-by: Tang Junhui <tang.junhui@zte.com.cn>
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
 ---
- block/mq-deadline.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+ drivers/md/bcache/super.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index c56f211c8440..8ec0ba9f5386 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -535,13 +535,22 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
- 	spin_unlock(&dd->lock);
- }
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 312895788036..4d1d8dfb2d2a 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1274,7 +1274,7 @@ static int flash_devs_run(struct cache_set *c)
+ 	struct uuid_entry *u;
  
-+/*
-+ * Nothing to do here. This is defined only to ensure that .finish_request
-+ * method is called upon request completion.
-+ */
-+static void dd_prepare_request(struct request *rq, struct bio *bio)
-+{
-+}
-+
- /*
-  * For zoned block devices, write unlock the target zone of
-  * completed write requests. Do this while holding the zone lock
-  * spinlock so that the zone is never unlocked while deadline_fifo_request()
-- * while deadline_next_request() are executing.
-+ * or deadline_next_request() are executing. This function is called for
-+ * all requests, whether or not these requests complete successfully.
-  */
--static void dd_completed_request(struct request *rq)
-+static void dd_finish_request(struct request *rq)
- {
- 	struct request_queue *q = rq->q;
- 
-@@ -756,7 +765,8 @@ static struct elevator_type mq_deadline = {
- 	.ops.mq = {
- 		.insert_requests	= dd_insert_requests,
- 		.dispatch_request	= dd_dispatch_request,
--		.completed_request	= dd_completed_request,
-+		.prepare_request	= dd_prepare_request,
-+		.finish_request		= dd_finish_request,
- 		.next_request		= elv_rb_latter_request,
- 		.former_request		= elv_rb_former_request,
- 		.bio_merge		= dd_bio_merge,
+ 	for (u = c->uuids;
+-	     u < c->uuids + c->devices_max_used && !ret;
++	     u < c->uuids + c->nr_uuids && !ret;
+ 	     u++)
+ 		if (UUID_FLASH_ONLY(u))
+ 			ret = flash_dev_run(c, u);
 -- 
-2.16.2
+2.14.1
