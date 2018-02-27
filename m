@@ -1,96 +1,70 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: <linux-block@vger.kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>,
-	Hou Tao <houtao1@huawei.com>,
-	Eric Biggers <ebiggers3@gmail.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 4/6] genhd: Fix use after free in __blkdev_get()
-Date: Tue,  6 Feb 2018 17:05:27 +0100
-Message-Id: <20180206160529.20713-5-jack@suse.cz>
-In-Reply-To: <20180206160529.20713-1-jack@suse.cz>
-References: <20180206160529.20713-1-jack@suse.cz>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f45.google.com ([209.85.215.45]:41171 "EHLO
+        mail-lf0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752056AbeB0ME5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Feb 2018 07:04:57 -0500
+Subject: Re: [PATCH V15 06/22] mmc: block: Add blk-mq support
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Adrian Hunter <adrian.hunter@intel.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Bough Chen <haibo.chen@nxp.com>,
+        Alex Lemberg <alex.lemberg@sandisk.com>,
+        Mateusz Nowak <mateusz.nowak@intel.com>,
+        Yuliy Izrailov <Yuliy.Izrailov@sandisk.com>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Dong Aisheng <dongas86@gmail.com>,
+        Das Asutosh <asutoshd@codeaurora.org>,
+        Zhangfei Gao <zhangfei.gao@gmail.com>,
+        Sahitya Tummala <stummala@codeaurora.org>,
+        Harjani Ritesh <riteshh@codeaurora.org>,
+        Venu Byravarasu <vbyravarasu@nvidia.com>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Thierry Reding <treding@nvidia.com>,
+        Krishna Reddy <vdumpa@nvidia.com>
+References: <1511962879-24262-1-git-send-email-adrian.hunter@intel.com>
+ <1511962879-24262-7-git-send-email-adrian.hunter@intel.com>
+ <bc65b542-9703-aa04-f1c7-b10584e44391@gmail.com>
+ <829308a3-3bf6-c173-65fa-e2a0f45f7f61@intel.com>
+ <68886f99-97f5-897a-f754-6f414741bd5a@gmail.com>
+ <22580b82-0257-b156-9f0c-79afa34067e5@gmail.com>
+ <CACRpkdaWyV2VPFBsFAjt-a8t6f3F6XwonHxfR3HfUJ=C13uuWw@mail.gmail.com>
+From: Dmitry Osipenko <digetx@gmail.com>
+Message-ID: <a15e8905-6ca8-d078-d891-58dc2f30f463@gmail.com>
+Date: Tue, 27 Feb 2018 15:04:35 +0300
+MIME-Version: 1.0
+In-Reply-To: <CACRpkdaWyV2VPFBsFAjt-a8t6f3F6XwonHxfR3HfUJ=C13uuWw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-When two blkdev_open() calls race with device removal and recreation,
-__blkdev_get() can use looked up gendisk after it is freed:
+On 27.02.2018 11:57, Linus Walleij wrote:
+> On Mon, Feb 26, 2018 at 10:48 PM, Dmitry Osipenko <digetx@gmail.com> wrote:
+>> On 22.02.2018 20:54, Dmitry Osipenko wrote:
+>>> On 22.02.2018 10:42, Adrian Hunter wrote:
+> 
+>>>> SDIO (unless it is a combo card) should be unaffected by changes to the
+>>>> block driver.
+>>
+>> I don't know whether it's a combo card or not. Where I can find info about that?
+>> Is it mentioned in sysfs somewhere?
+> 
+> Combo cards were used with very old (2000s) PDAs which had only
+> one SD card slot which they wanted to use for WiFi and storage
+> at the same time.
+> 
+> They are very uncommon and I haven't been able to locate any
+> even for testing.
+> 
+> It is very unlikely that you have one.
+> 
+> However you would notice it from seeing a partition attachment
+> message (like with an ordinary SD card) when you plug in your
+> card.
 
-CPU0				CPU1			CPU2
-							del_gendisk(disk);
-							  bdev_unhash_inode(inode);
-blkdev_open()			blkdev_open()
-  bdev = bd_acquire(inode);
-    - creates and returns new inode
-				  bdev = bd_acquire(inode);
-				    - returns the same inode
-  __blkdev_get(devt)		  __blkdev_get(devt)
-    disk = get_gendisk(devt);
-      - got structure of device going away
-							<finish device removal>
-							<new device gets
-							 created under the same
-							 device number>
-				  disk = get_gendisk(devt);
-				    - got new device structure
-				  if (!bdev->bd_openers) {
-				    does the first open
-				  }
-    if (!bdev->bd_openers)
-      - false
-    } else {
-      put_disk_and_module(disk)
-        - remember this was old device - this was last ref and disk is
-          now freed
-    }
-    disk_unblock_events(disk); -> oops
-
-Fix the problem by making sure we drop reference to disk in
-__blkdev_get() only after we are really done with it.
-
-Reported-by: Hou Tao <houtao1@huawei.com>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- fs/block_dev.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 1dbbf847911a..fe41a76769fa 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1409,6 +1409,7 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 	int ret;
- 	int partno;
- 	int perm = 0;
-+	bool first_open = false;
- 
- 	if (mode & FMODE_READ)
- 		perm |= MAY_READ;
-@@ -1435,6 +1436,7 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 	disk_block_events(disk);
- 	mutex_lock_nested(&bdev->bd_mutex, for_part);
- 	if (!bdev->bd_openers) {
-+		first_open = true;
- 		bdev->bd_disk = disk;
- 		bdev->bd_queue = disk->queue;
- 		bdev->bd_contains = bdev;
-@@ -1520,14 +1522,15 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 			if (ret)
- 				goto out_unlock_bdev;
- 		}
--		/* only one opener holds refs to the module and disk */
--		put_disk_and_module(disk);
- 	}
- 	bdev->bd_openers++;
- 	if (for_part)
- 		bdev->bd_part_count++;
- 	mutex_unlock(&bdev->bd_mutex);
- 	disk_unblock_events(disk);
-+	/* only one opener holds refs to the module and disk */
-+	if (!first_open)
-+		put_disk_and_module(disk);
- 	return 0;
- 
-  out_clear:
--- 
-2.13.6
+Thank you very much for the explanation. It's not a combo card.
