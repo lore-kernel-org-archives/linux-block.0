@@ -1,115 +1,161 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Subject: [PATCH V4 00/15] lightnvm: pblk: implement 2.0 support
-Date: Wed, 28 Feb 2018 16:49:20 +0100
-Message-Id: <1519832975-25432-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:46977 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751668AbeB0E7E (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Feb 2018 23:59:04 -0500
+Subject: Re: [PATCH] bcache: fix kernel crashes when run fio in a RAID backend
+ bcache device
+From: Coly Li <colyli@suse.de>
+Cc: tang.junhui@zte.com.cn, mlyle@lyle.org,
+        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <1519695971-27674-1-git-send-email-tang.junhui@zte.com.cn>
+ <6d3f4ac6-31b1-6369-1616-d8f461d7ff94@suse.de>
+To: "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
+        <linux-raid@vger.kernel.org>, Shaohua Li <shli@kernel.org>
+Message-ID: <0de0c603-381f-e3a1-f050-a1d76b3138be@suse.de>
+Date: Tue, 27 Feb 2018 12:58:53 +0800
 MIME-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org,
- =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="utf-8"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <6d3f4ac6-31b1-6369-1616-d8f461d7ff94@suse.de>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-IyBDaGFuZ2VzIHNpbmNlIFY0CiAtIFJlYmFzZSBvbiB0b3Agb2YgTWF0aWFzJyBmb3ItNC4xNy9j
-b3JlCiAtIEZpeCBwYmxrJ3Mgd3JpdGUgYnVmZmVyIHNpemUgd2hlbiB1c2luZyBtd19jdWludHMK
-IC0gUmVtb3ZlIGNodW5rIGluZm9ybWF0aW9uIGZyb20gcGJsaydzIHN5c2ZzLiBXZSBpbnRlbmQg
-dG8gY2xlYW4gdXAKICAgc3lzZnMsIGFzIGl0IGlzIG1lc3N5IGFzIGl0IGlzIG5vdywgYW5kIHVz
-ZSB0cmFjZSBwb2ludHMgaW5zdGVhZC4gU28sCiAgIGF2b2lkIGFuIGV4dHJhIHJlZmFjdG9yaW5n
-IGluIHRoZSBuZWFyIGZ1dHVyZS4KCkZyb20gTWF0aWFzOgogLSBTcXVhc2ggZ2VvbWV0cnkgcGF0
-Y2hlcwogLSBTcXVhc2ggY2h1bmsgc3VwcG9ydCBpbiBsaWdodG52bSBjb3JlCiAtIFVzZSBjb3Jl
-IHN0cnVjdHVyZSBmb3IgY2h1bmsgbWV0YWRhdGEKIC0gUmVtb3ZlIGludGVybWVkaWF0ZSB2YWx1
-ZXMgZm9yIGNzZWNzIGFuZCBzb3MgYmVmb3JlIGRpc2sKICAgcmV2YWxpZGF0aW9uLgogLSBWYXJp
-b3VzIHJlbmFtaW5ncwoKIyBDaGFuZ2VzIHNpbmNlIFYzCkZyb20gTWF0aWFzOgogLSBSZW1vdmUg
-bnZtX2NvbW1vbl9nZW8KIC0gRG8gYXBwcm9wcmlhdGUgcmVuYW1lcyB3aGVuIGhhdmluZyBhIHNp
-bmdsZSBnZW9tZXRyeSBmb3IgZGV2aWNlIGFuZAogICAgIHRhcmdldHMKCiMgQ2hhbmdlcyBzaW5j
-ZSBWMjoKCkFwcGx5IE1hdGlhcycgZmVlZGJhY2s6CiAtIFJlbW92ZSBnZW5lcmljIG52bV9pZCBp
-ZGVudGlmeSBzdHJ1Y3R1cmUuCiAtIERvIG5vdCByZW1hcCBjYXBhYmlsaXRpZXMgKGNhcCkgdG8g
-bWVkaWEgYW5kIGNvbnRyb2xsZWQgY2FwYWJpbGl0aWVzCiAgIChtY2NhcCkuIEluc3RlYWQsIGFk
-ZCBhIGNvbW1lbnQgdG8gcHJldmVudCBjb25mdXNpb24gd2hlbgogICBjcm9zc2NoZWNraW5nIHdp
-dGggMi4wIHNwZWMuCiAtIENoYW5nZSBtYXhvYyBhbmQgbWF4b2NwdSBkZWZhdWx0cyBmcm9tIDEg
-YmxvY2sgdG8gdGhlIG1heCBudW1iZXIgb2YKICAgYmxvY2tzLgogLSBSZS1pbXBsZW1lbnQgdGhl
-IGdlbmVyaWMgZ2VvbWV0cnkgdG8gdXNlIG52bV9nZW8gb24gYm90aCBkZXZpY2UgYW5kCiAgIHRh
-cmdldHMuIE1haW50YWluIG52bV9jb21tb25fZ2VvIHRvIG1ha2UgaXQgZWFzaWVyIHRvIGNvcHkg
-dGhlIGNvbW1vbgogICBwYXJ0IG9mIHRoZSBnZW9tZXRyeSAod2l0aG91dCBoYXZpbmcgdG8gb3Zl
-cndyaXRlIHRhcmdldC1zcGVjaWZpYwogICBmaWVsZHMsIHdoaWNoIGlzIHVnbHkgYW5kIGVycm9y
-IHByb25lKS4gTWF0aWFzLCBpZiB5b3Ugc3RpbGwgd2FudCB0bwogICBnZXQgcmlkIG9mIHRoaXMs
-IHdlIGNhbiBkbyBpdC4KIC0gUmUtb3JkZXIgcGF0Y2hlcyB3aXRoIHJlbmFtaW5nIHRvIG1ha2Ug
-dGhlbSBtb3JlIG1lYW5pbmdmdWwuIFRoZXNlCiAgIGJlbG9uZyB0byB0aGUgc2VyaWVzLCBzaW5j
-ZSB0aGUgbmFtZSBjaGFuZ2VzIGFyZSBtb3RpdmF0ZWQgYnkgMi4wCiAgIGluY2x1c2lvbnMuIFRo
-ZSBvbmx5IGV4Y2VwdGlvbiB3b3VsZCBiZSAzNmQxMGJmZDMyMzQsIGJ1dCBJIGhvcGUgaXQKICAg
-aXMgT0sgSSBpbmNsdWRlIGl0IGhlcmUuCgpBbHNvLAogLSBFbGltaW5hdGUgYSBkZXBlbmRlbmN5
-IGJldHdlZW4gbHVucyBhbmQgbGluZXMgaW4gdGhlIGluaXQvZXhpdAogICByZWZhY3RvcmluZy4K
-IC0gVXNlIHRoZSBnbG9iYWwgYWRkcmVzcyBmb3JtYXQgd2hlbiBwb3NzaWJsZSB0byBhdm9pZCBk
-ZWZhdWx0aW5nIG9uCiAgIHRoZSAxLjIgcGF0aC4gVGhpcyB3aWxsIHNhZmUgaGVhZGFjaGVzIGlm
-IHRoZSBhZGRyZXNzIGZvcm1hdCBjaGFuZ2VzCiAgIGF0IHNvbWUgcG9pbnQuCgpJIHRvb2sgb3V0
-IHRoZSBwYXRjaCBhbGxvd2luZyB0byBkbyBiaXQgc2hpZnRzIG9uIG5vbiBwb3dlci1vZi0yIG1l
-ZGlhCmZvcm1hdHMgb24gcGJsaydzIG1hcHBpbmcgc2luY2UgaXQgcmVxdWlyZXMgdG91Y2hpbmcg
-bWFueSBwbGFjZXMgdGhhdAphcmUgbm90IDIuMCByZWxhdGVkLiBJJ2xsIHN1Ym1pdCB0aGlzIHNl
-cGFyYXRlbHkuCgojIENoYW5nZXMgc2luY2UgVjE6CgpBcHBseSBNYXRpYXMnIGZlZWRiYWNrOgog
-LSBSZWJhc2Ugb24gdG9wIG9mIE1hdGlhcycgbGF0ZXN0IHBhdGNoZXMuCiAtIFVzZSBudm1lX2dl
-dF9sb2dfZXh0IHRvIHN1Ym1pdCByZXBvcnQgY2h1bmsgYW5kIGV4cG9ydCBpdC4KIC0gUmUtd3Jp
-dGUgcmVwb3J0IGNodW5rIGJhc2VkIG9uIE1hdGlhcycgc3VnZ2VzdGlvbnMuIEhlcmUsIEkKICAg
-bWFpbnRhaW5lZCB0aGUgbGJhIGludGVyZmFjZSwgYnV0IGl0IHdhcyBuZWNlc3NhcnkgdG8gcmVk
-byB0aGUKICAgYWRkcmVzcyBmb3JtYXR0aW5nIHRvIG1hdGNoIHRoZSBjaHVuayBsb2cgcGFnZSBm
-b3JtYXQuIEZvciBwYmxrLAogICB0aGlzIG1lYW5zIGEgZG91YmxlIGFkZHJlc3MgdHJhbnNmb3Jt
-YXRpb24sIGJ1dCBpdCBlbmFibGVzIHRoZQogICBzdGFuZGFyZCBwYXRoIHRvIHVzZSBsYmFzLCBw
-bHVzLCB0aGlzIGlzIG5vdCBpbiB0aGUgZmFzdCBwYXRoLgogLSBGb2xkIGFkZHJlc3MgZm9ybWF0
-IHRvZ2V0aGVyIHdpdGggYWRkcmVzcyB0cmFuc2Zvcm1hdGlvbnMuCiAtIFNwbGl0IHRoZSBnZW5l
-cmljIGdlb21ldHJ5IHBhdGNoIGluIGRpZmZlcmVudCBwYXRjaGVzLgogLSBSZW1vdmUgcmVmYWN0
-b3Jpbmcgb2YgbGlndGhudm0ncyBjb3JlIHN5c2ZzLgoKRmVlZGJhY2sgbm90IGFwcGxpZWQ6CiAt
-IE5vdCBsZXR0aW5nIHBibGsga25vdyBhYm91dCAxLjIgYW5kIDIuMCBiYWQgYmxvY2sgcGF0aHMu
-CiAgIFNpbmNlIHRoZSBpbnRlcmZhY2VzIGZvciBnZXQvc2V0IGJhZCBibG9jayBhbmQgcmVwb3J0
-IGNodW5rIGFyZSBzbwogICBkaWZmZXJlbnQsIG1vdmluZyB0aGlzIGxvZ2ljIHRvIGNvcmUgYWRk
-cyBhc3N1bXB0aW9ucyBvbiBob3cgdGhlCiAgIHRhcmdldHMgd291bGQgd2FudCB0byBnZXQgdGhl
-IGRhdGEgYmFjay4gQSB3YXkgb2YgZG9pbmcgdGhpcyBpcwogICBjcmVhdGluZyBhIGxvZ2ljYWwg
-cmVwb3J0IGNodW5rIG9uIHRoZSAxLjIgcGF0aCwgYnV0IHRoaXMgd291bGQKICAgbWVhbiB0aGF0
-IHZhbHVlcyBsaWtlIHRoZSB3ZWFyLWluZGV4IGFyZSBpbnZhbGlkLCB3aGljaCByZXF1aXJlcwog
-ICB0aGUgdGFyZ2V0IGtub3dsZWRnZS4gSSdtIG9wZW4gdG8gc3VnZ2VzdGlvbnMgaGVyZS4KCkFs
-c286CiAtIERvIHNvbWUgZnVydGhlciByZW5hbWluZ3MKIC0gQ3JlYXRlIGEgZ2VuZXJpYyBhZGRy
-ZXNzIGZvcm1hdCB0byBtYWtlIGl0IGV4cGxpY2l0IHdoZXJlIHdlIHNoYXJlCiAgIDEuMiBhbmQg
-Mi4wIGZpZWxkcyB0byBhdm9pZCBhZGRyZXNzIGZvcm1hdHRpbmcgaW4gdGhlIGZhc3QgcGF0aC4K
-IC0gQWRkIG5ldyBmaWVsZHMgdG8gc3lzZnMgdG8gY29tcGxldGUgc3BlYyBhbmQgc2hvdyBtYWpv
-ci9taW5vcgogICB2ZXJzaW9ucyAodmVyc2lvbiBhbmQgc3VidmVyc2lvbiB0byByZXNwZWN0IGN1
-cnJlbnQgaW50ZXJmYWNlKS4KCkltcGxlbWVudCAyLjAgc3VwcG9ydCBpbiBwYmxrLiBUaGlzIGlu
-Y2x1ZGVzIHRoZSBhZGRyZXNzIGZvcm1hdHRpbmcgYW5kCm1hcHBpbmcgcGF0aHMsIGFzIHdlbGwg
-YXMgdGhlIHN5c2ZzIGVudHJpZXMgZm9yIHRoZW0uCgpKYXZpZXIKCgpKYXZpZXIgR29uesOhbGV6
-ICgxNSk6CiAgbGlnaHRudm06IHNpbXBsaWZ5IGdlb21ldHJ5IHN0cnVjdHVyZS4KICBsaWdodG52
-bTogYWRkIGNvbnRyb2xsZXIgY2FwYWJpbGl0aWVzIHRvIDIuMAogIGxpZ2h0bnZtOiBhZGQgbWlu
-b3IgdmVyc2lvbiB0byBnZW5lcmljIGdlb21ldHJ5CiAgbGlnaHRudm06IGFkZCBzaG9ydGVuIE9D
-U1NEIHZlcnNpb24gaW4gZ2VvCiAgbGlnaHRudm06IGNvbXBsZXRlIGdlbyBzdHJ1Y3R1cmUgd2l0
-aCBtYXhvYyoKICBsaWdodG52bTogbm9ybWFsaXplIGdlb21ldHJ5IG5vbWVuY2xhdHVyZQogIGxp
-Z2h0bnZtOiBhZGQgc3VwcG9ydCBmb3IgMi4wIGFkZHJlc3MgZm9ybWF0CiAgbGlnaHRudm06IG1h
-a2UgYWRkcmVzcyBjb252ZXJzaW9ucyBkZXBlbmQgb24gZ2VuZXJpYyBkZXZpY2UKICBsaWdodG52
-bTogaW1wbGVtZW50IGdldCBsb2cgcmVwb3J0IGNodW5rIGhlbHBlcnMKICBsaWdodG52bTogcGJs
-azogY2hlY2sgZm9yIHN1cHBvcnRlZCB2ZXJzaW9uCiAgbGlnaHRudm06IHBibGs6IHJlbmFtZSBw
-cGFmKiB0byBhZGRyZioKICBsaWdodG52bjogcGJsazogdXNlIGdlbmVyaWMgYWRkcmVzcyBmb3Jt
-YXQKICBsaWdodG52bTogcGJsazogaW1wbGVtZW50IGdldCBsb2cgcmVwb3J0IGNodW5rCiAgbGln
-aHRudm06IHBibGs6IHJlZmFjdG9yIGluaXQvZXhpdCBzZXF1ZW5jZXMKICBsaWdodG52bTogcGJs
-azogaW1wbGVtZW50IDIuMCBzdXBwb3J0CgogZHJpdmVycy9saWdodG52bS9jb3JlLmMgICAgICAg
-ICAgfCAxNzggKysrKy0tLS0tCiBkcml2ZXJzL2xpZ2h0bnZtL3BibGstY29yZS5jICAgICB8IDE2
-OSArKysrKystLQogZHJpdmVycy9saWdodG52bS9wYmxrLWdjLmMgICAgICAgfCAgIDIgKy0KIGRy
-aXZlcnMvbGlnaHRudm0vcGJsay1pbml0LmMgICAgIHwgODM4ICsrKysrKysrKysrKysrKysrKysr
-KysrLS0tLS0tLS0tLS0tLS0tLQogZHJpdmVycy9saWdodG52bS9wYmxrLW1hcC5jICAgICAgfCAg
-IDQgKy0KIGRyaXZlcnMvbGlnaHRudm0vcGJsay1yZWFkLmMgICAgIHwgICAyICstCiBkcml2ZXJz
-L2xpZ2h0bnZtL3BibGstcmVjb3ZlcnkuYyB8ICAxNCArLQogZHJpdmVycy9saWdodG52bS9wYmxr
-LXJsLmMgICAgICAgfCAgIDIgKy0KIGRyaXZlcnMvbGlnaHRudm0vcGJsay1zeXNmcy5jICAgIHwg
-IDY1ICsrLQogZHJpdmVycy9saWdodG52bS9wYmxrLXdyaXRlLmMgICAgfCAgIDIgKy0KIGRyaXZl
-cnMvbGlnaHRudm0vcGJsay5oICAgICAgICAgIHwgMjQyICsrKysrKystLS0tCiBkcml2ZXJzL252
-bWUvaG9zdC9jb3JlLmMgICAgICAgICB8ICAgNiArLQogZHJpdmVycy9udm1lL2hvc3QvbGlnaHRu
-dm0uYyAgICAgfCA0NTMgKysrKysrKysrKysrKystLS0tLS0tCiBkcml2ZXJzL252bWUvaG9zdC9u
-dm1lLmggICAgICAgICB8ICAgMyArCiBpbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmggICAgICAgICB8
-IDMzMSArKysrKysrKysrLS0tLS0tCiAxNSBmaWxlcyBjaGFuZ2VkLCAxNDc5IGluc2VydGlvbnMo
-KyksIDgzMiBkZWxldGlvbnMoLSkKCi0tIAoyLjcuNAoKCl9fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fCkxpbnV4LW52bWUgbWFpbGluZyBsaXN0CkxpbnV4LW52
-bWVAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8vbGlzdHMuaW5mcmFkZWFkLm9yZy9tYWlsbWFu
-L2xpc3RpbmZvL2xpbnV4LW52bWUK
+Hi linux-raid folks,
+
+I also forward this email to linux-raid mailing list, hope you may find
+something suspicious in raid5 code.
+
+Junhui hits a BUG() when bcache runs on top of md raid5, where bio
+reference count <= 0. There is no other layer on top of bcache, so the
+most suspicious part is md raid5.
+
+Junhui's fix solves the problem, but I'd like to see whether there is
+potential bug from raid5 code, which reset memory of bio then free it in
+search_free() of bcache.
+
+If raid5 is built on top of bcache, it is easy to say the issue is from
+drivers/md/raid5.c:raid5_end_write_request(), there is a bio_reset(bi)
+at tail of the function. This function assumes the reference count of
+bio is 1, and reset object memory.
+
+But after discussed with Junhui, he tells me bcache is on top of md
+raid5, then it is not clear to me how the raid5 taints bio from upper
+layer (bcache).
+
+Can anybody have a look and give me any hint ?
+
+P.S. Junhui's fix from bcache side is good, I just want to figure out
+what exactly the root cause is.
+
+Thanks in advance.
+
+Coly Li
+
+On 27/02/2018 11:47 AM, Coly Li wrote:
+> On 27/02/2018 9:46 AM, tang.junhui@zte.com.cn wrote:
+>> From: Tang Junhui <tang.junhui@zte.com.cn>
+>>
+>> Kernel crashed when run fio in a RAID5 backend bcache device, the call 
+>> trace is bellow:
+>> [  440.012034] kernel BUG at block/blk-ioc.c:146!
+>> [  440.012696] invalid opcode: 0000 [#1] SMP NOPTI
+>> [  440.026537] CPU: 2 PID: 2205 Comm: md127_raid5 Not tainted 4.15.0 #8
+>> [  440.027441] Hardware name: HP ProLiant MicroServer Gen8, BIOS J06 07/16
+>> /2015
+>> [  440.028615] RIP: 0010:put_io_context+0x8b/0x90
+>> [  440.029246] RSP: 0018:ffffa8c882b43af8 EFLAGS: 00010246
+>> [  440.029990] RAX: 0000000000000000 RBX: ffffa8c88294fca0 RCX: 0000000000
+>> 0f4240
+>> [  440.031006] RDX: 0000000000000004 RSI: 0000000000000286 RDI: ffffa8c882
+>> 94fca0
+>> [  440.032030] RBP: ffffa8c882b43b10 R08: 0000000000000003 R09: ffff949cb8
+>> 0c1700
+>> [  440.033206] R10: 0000000000000104 R11: 000000000000b71c R12: 00000000000
+>> 01000
+>> [  440.034222] R13: 0000000000000000 R14: ffff949cad84db70 R15: ffff949cb11
+>> bd1e0
+>> [  440.035239] FS:  0000000000000000(0000) GS:ffff949cba280000(0000) knlGS:
+>> 0000000000000000
+>> [  440.060190] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>> [  440.084967] CR2: 00007ff0493ef000 CR3: 00000002f1e0a002 CR4: 00000000001
+>> 606e0
+>> [  440.110498] Call Trace:
+>> [  440.135443]  bio_disassociate_task+0x1b/0x60
+>> [  440.160355]  bio_free+0x1b/0x60
+>> [  440.184666]  bio_put+0x23/0x30
+>> [  440.208272]  search_free+0x23/0x40 [bcache]
+>> [  440.231448]  cached_dev_write_complete+0x31/0x70 [bcache]
+>> [  440.254468]  closure_put+0xb6/0xd0 [bcache]
+>> [  440.277087]  request_endio+0x30/0x40 [bcache]
+>> [  440.298703]  bio_endio+0xa1/0x120
+>> [  440.319644]  handle_stripe+0x418/0x2270 [raid456]
+>> [  440.340614]  ? load_balance+0x17b/0x9c0
+>> [  440.360506]  handle_active_stripes.isra.58+0x387/0x5a0 [raid456]
+>> [  440.380675]  ? __release_stripe+0x15/0x20 [raid456]
+>> [  440.400132]  raid5d+0x3ed/0x5d0 [raid456]
+>> [  440.419193]  ? schedule+0x36/0x80
+>> [  440.437932]  ? schedule_timeout+0x1d2/0x2f0
+>> [  440.456136]  md_thread+0x122/0x150
+>> [  440.473687]  ? wait_woken+0x80/0x80
+>> [  440.491411]  kthread+0x102/0x140
+>> [  440.508636]  ? find_pers+0x70/0x70
+>> [  440.524927]  ? kthread_associate_blkcg+0xa0/0xa0
+>> [  440.541791]  ret_from_fork+0x35/0x40
+>> [  440.558020] Code: c2 48 00 5b 41 5c 41 5d 5d c3 48 89 c6 4c 89 e7 e8 bb c2 
+>> 48 00 48 8b 3d bc 36 4b 01 48 89 de e8 7c f7 e0 ff 5b 41 5c 41 5d 5d c3 <0f> 0b
+>> 0f 1f 00 0f 1f 44 00 00 55 48 8d 47 b8 48 89 e5 41 57 41 
+>> [  440.610020] RIP: put_io_context+0x8b/0x90 RSP: ffffa8c882b43af8
+>> [  440.628575] ---[ end trace a1fd79d85643a73e ]--
+>>
+>> All the crash issue happened when a bypass IO coming, in such scenario
+>> s->iop.bio is pointed to the s->orig_bio. In search_free(), it finishes the
+>> s->orig_bio by calling bio_complete(), and after that, s->iop.bio became
+>> invalid, then kernel would crash when calling bio_put(). Maybe its upper
+>> layer's faulty, since bio should not be freed before we calling bio_put(),
+>> but we'd better calling bio_put() first before calling bio_complete() to
+>> notify upper layer ending this bio.
+>>
+>> This patch moves bio_complete() under bio_put() to avoid kernel crash.
+>>
+>> Reported-by: Matthias Ferdinand <bcache@mfedv.net>
+>> Tested-by: Matthias Ferdinand <bcache@mfedv.net>
+>> Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+> 
+> Hi Junhui,
+> 
+> The problem is from drivers/md/raid5.c:raid5_end_write_request(), there
+> is a bio_reset(bi) at tail of the function. This function assumes the
+> reference count of bio is 1, and reset object memory.
+> 
+> IMHO your fix is the simplest, and maybe it is the correct way as your
+> change: we should try best to decrease bio reference count before
+> calling bio_endio().
+> 
+> Reviewed-by: Coly Li <colyli@suse.de>
+> 
+> Thanks.
+> 
+> Coly Li
+> 
+>> ---
+>>  drivers/md/bcache/request.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+>> index 643c3021..eb4e305 100644
+>> --- a/drivers/md/bcache/request.c
+>> +++ b/drivers/md/bcache/request.c
+>> @@ -637,11 +637,11 @@ static void do_bio_hook(struct search *s, struct bio *orig_bio)
+>>  static void search_free(struct closure *cl)
+>>  {
+>>  	struct search *s = container_of(cl, struct search, cl);
+>> -	bio_complete(s);
+>>  
+>>  	if (s->iop.bio)
+>>  		bio_put(s->iop.bio);
+>>  
+>> +	bio_complete(s);
+>>  	closure_debug_destroy(cl);
+>>  	mempool_free(s, s->d->c->search);
+>>  }
+>>
