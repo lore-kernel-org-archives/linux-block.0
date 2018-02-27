@@ -1,140 +1,75 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Subject: [PATCH 15/19] lightnvm: implement get log report chunk helpers
-Date: Mon, 26 Feb 2018 14:17:14 +0100
-Message-Id: <1519651038-16845-16-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
-References: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org,
- =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
- =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="utf-8"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Mike Snitzer <snitzer@redhat.com>
+Cc: linux-scsi@vger.kernel.org,
+	Hannes Reinecke <hare@suse.de>,
+	Arun Easi <arun.easi@cavium.com>,
+	Omar Sandoval <osandov@fb.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	James Bottomley <james.bottomley@hansenpartnership.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Don Brace <don.brace@microsemi.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Peter Rivera <peter.rivera@broadcom.com>,
+	Laurence Oberman <loberman@redhat.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 7/8] scsi: hpsa: improve scsi_mq performance via .host_tagset
+Date: Tue, 27 Feb 2018 18:07:49 +0800
+Message-Id: <20180227100750.32299-8-ming.lei@redhat.com>
+In-Reply-To: <20180227100750.32299-1-ming.lei@redhat.com>
+References: <20180227100750.32299-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-RnJvbTogSmF2aWVyIEdvbnrDoWxleiA8amF2aWVyQGphdmlnb24uY29tPgoKVGhlIDIuMCBzcGVj
-IHByb3ZpZGVzIGEgcmVwb3J0IGNodW5rIGxvZyBwYWdlIHRoYXQgY2FuIGJlIHJldHJpZXZlZAp1
-c2luZyB0aGUgc3RhbmdhcmQgbnZtZSBnZXQgbG9nIHBhZ2UuIFRoaXMgcmVwbGFjZXMgdGhlIGRl
-ZGljYXRlZApnZXQvcHV0IGJhZCBibG9jayB0YWJsZSBpbiAxLjIuCgpUaGlzIHBhdGNoIGltcGxl
-bWVudHMgdGhlIGhlbHBlciBmdW5jdGlvbnMgdG8gYWxsb3cgdGFyZ2V0cyByZXRyaWV2ZSB0aGUK
-Y2h1bmsgbWV0YWRhdGEgdXNpbmcgZ2V0IGxvZyBwYWdlCgpTaWduZWQtb2ZmLWJ5OiBKYXZpZXIg
-R29uesOhbGV6IDxqYXZpZXJAY25leGxhYnMuY29tPgotLS0KIGRyaXZlcnMvbGlnaHRudm0vY29y
-ZS5jICAgICAgfCAxMSArKysrKysrCiBkcml2ZXJzL252bWUvaG9zdC9saWdodG52bS5jIHwgNzQg
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysKIGluY2x1ZGUvbGlu
-dXgvbGlnaHRudm0uaCAgICAgfCAyNCArKysrKysrKysrKysrKwogMyBmaWxlcyBjaGFuZ2VkLCAx
-MDkgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL2RyaXZlcnMvbGlnaHRudm0vY29yZS5jIGIv
-ZHJpdmVycy9saWdodG52bS9jb3JlLmMKaW5kZXggZmFlNWU4YzZmY2QwLi4wZjQxMTRjYjQ4ZWUg
-MTAwNjQ0Ci0tLSBhL2RyaXZlcnMvbGlnaHRudm0vY29yZS5jCisrKyBiL2RyaXZlcnMvbGlnaHRu
-dm0vY29yZS5jCkBAIC03MTksNiArNzE5LDE3IEBAIHN0YXRpYyB2b2lkIG52bV9mcmVlX3JxZF9w
-cGFsaXN0KHN0cnVjdCBudm1fdGd0X2RldiAqdGd0X2RldiwKIAludm1fZGV2X2RtYV9mcmVlKHRn
-dF9kZXYtPnBhcmVudCwgcnFkLT5wcGFfbGlzdCwgcnFkLT5kbWFfcHBhX2xpc3QpOwogfQogCitp
-bnQgbnZtX2dldF9jaHVua19tZXRhKHN0cnVjdCBudm1fdGd0X2RldiAqdGd0X2Rldiwgc3RydWN0
-IG52bV9jaGtfbWV0YSAqbWV0YSwKKwkJc3RydWN0IHBwYV9hZGRyIHBwYSwgaW50IG5jaGtzKQor
-eworCXN0cnVjdCBudm1fZGV2ICpkZXYgPSB0Z3RfZGV2LT5wYXJlbnQ7CisKKwludm1fcHBhX3Rn
-dF90b19kZXYodGd0X2RldiwgJnBwYSwgMSk7CisKKwlyZXR1cm4gZGV2LT5vcHMtPmdldF9jaGtf
-bWV0YSh0Z3RfZGV2LT5wYXJlbnQsIG1ldGEsCisJCQkJCQkoc2VjdG9yX3QpcHBhLnBwYSwgbmNo
-a3MpOworfQorRVhQT1JUX1NZTUJPTChudm1fZ2V0X2NodW5rX21ldGEpOwogCiBpbnQgbnZtX3Nl
-dF90Z3RfYmJfdGJsKHN0cnVjdCBudm1fdGd0X2RldiAqdGd0X2Rldiwgc3RydWN0IHBwYV9hZGRy
-ICpwcGFzLAogCQkgICAgICAgaW50IG5yX3BwYXMsIGludCB0eXBlKQpkaWZmIC0tZ2l0IGEvZHJp
-dmVycy9udm1lL2hvc3QvbGlnaHRudm0uYyBiL2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMK
-aW5kZXggMzc3ZTY1MjVlNTNmLi43YzRhZjEzMmQwNzIgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvbnZt
-ZS9ob3N0L2xpZ2h0bnZtLmMKKysrIGIvZHJpdmVycy9udm1lL2hvc3QvbGlnaHRudm0uYwpAQCAt
-MzUsNiArMzUsMTAgQEAgZW51bSBudm1lX252bV9hZG1pbl9vcGNvZGUgewogCW52bWVfbnZtX2Fk
-bWluX3NldF9iYl90YmwJPSAweGYxLAogfTsKIAorZW51bSBudm1lX252bV9sb2dfcGFnZSB7CisJ
-TlZNRV9OVk1fTE9HX1JFUE9SVF9DSFVOSwk9IDB4Y2EsCit9OworCiBzdHJ1Y3QgbnZtZV9udm1f
-cGhfcncgewogCV9fdTgJCQlvcGNvZGU7CiAJX191OAkJCWZsYWdzOwpAQCAtMjM2LDYgKzI0MCwx
-NiBAQCBzdHJ1Y3QgbnZtZV9udm1faWQyMCB7CiAJX191OAkJCXZzWzEwMjRdOwogfTsKIAorc3Ry
-dWN0IG52bWVfbnZtX2Noa19tZXRhIHsKKwlfX3U4CXN0YXRlOworCV9fdTgJdHlwZTsKKwlfX3U4
-CXdpOworCV9fdTgJcnN2ZFs1XTsKKwlfX2xlNjQJc2xiYTsKKwlfX2xlNjQJY25sYjsKKwlfX2xl
-NjQJd3A7Cit9OworCiAvKgogICogQ2hlY2sgd2UgZGlkbid0IGluYWR2ZXJ0ZW50bHkgZ3JvdyB0
-aGUgY29tbWFuZCBzdHJ1Y3QKICAqLwpAQCAtMjUyLDYgKzI2Niw5IEBAIHN0YXRpYyBpbmxpbmUg
-dm9pZCBfbnZtZV9udm1fY2hlY2tfc2l6ZSh2b2lkKQogCUJVSUxEX0JVR19PTihzaXplb2Yoc3Ry
-dWN0IG52bWVfbnZtX2JiX3RibCkgIT0gNjQpOwogCUJVSUxEX0JVR19PTihzaXplb2Yoc3RydWN0
-IG52bWVfbnZtX2lkMjBfYWRkcmYpICE9IDgpOwogCUJVSUxEX0JVR19PTihzaXplb2Yoc3RydWN0
-IG52bWVfbnZtX2lkMjApICE9IE5WTUVfSURFTlRJRllfREFUQV9TSVpFKTsKKwlCVUlMRF9CVUdf
-T04oc2l6ZW9mKHN0cnVjdCBudm1lX252bV9jaGtfbWV0YSkgIT0gMzIpOworCUJVSUxEX0JVR19P
-TihzaXplb2Yoc3RydWN0IG52bWVfbnZtX2Noa19tZXRhKSAhPQorCQkJCQkJc2l6ZW9mKHN0cnVj
-dCBudm1fY2hrX21ldGEpKTsKIH0KIAogc3RhdGljIHZvaWQgbnZtZV9udm1fc2V0X2FkZHJfMTIo
-c3RydWN0IG52bV9hZGRyX2Zvcm1hdF8xMiAqZHN0LApAQCAtNTU4LDYgKzU3NSw2MSBAQCBzdGF0
-aWMgaW50IG52bWVfbnZtX3NldF9iYl90Ymwoc3RydWN0IG52bV9kZXYgKm52bWRldiwgc3RydWN0
-IHBwYV9hZGRyICpwcGFzLAogCXJldHVybiByZXQ7CiB9CiAKKy8qCisgKiBFeHBlY3QgdGhlIGxi
-YSBpbiBkZXZpY2UgZm9ybWF0CisgKi8KK3N0YXRpYyBpbnQgbnZtZV9udm1fZ2V0X2Noa19tZXRh
-KHN0cnVjdCBudm1fZGV2ICpuZGV2LAorCQkJCSBzdHJ1Y3QgbnZtX2Noa19tZXRhICptZXRhLAor
-CQkJCSBzZWN0b3JfdCBzbGJhLCBpbnQgbmNoa3MpCit7CisJc3RydWN0IG52bV9nZW8gKmRldl9n
-ZW8gPSAmbmRldi0+Z2VvOworCXN0cnVjdCBudm1lX25zICpucyA9IG5kZXYtPnEtPnF1ZXVlZGF0
-YTsKKwlzdHJ1Y3QgbnZtZV9jdHJsICpjdHJsID0gbnMtPmN0cmw7CisJc3RydWN0IG52bWVfbnZt
-X2Noa19tZXRhICpkZXZfbWV0YSA9IChzdHJ1Y3QgbnZtZV9udm1fY2hrX21ldGEgKiltZXRhOwor
-CXN0cnVjdCBwcGFfYWRkciBwcGE7CisJc2l6ZV90IGxlZnQgPSBuY2hrcyAqIHNpemVvZihzdHJ1
-Y3QgbnZtZV9udm1fY2hrX21ldGEpOworCXNpemVfdCBsb2dfcG9zLCBvZmZzZXQsIGxlbjsKKwlp
-bnQgcmV0LCBpOworCisJLyogTm9ybWFsaXplIGxiYSBhZGRyZXNzIHNwYWNlIHRvIG9idGFpbiBs
-b2cgb2Zmc2V0ICovCisJcHBhLnBwYSA9IHNsYmE7CisJcHBhID0gZGV2X3RvX2dlbmVyaWNfYWRk
-cihuZGV2LCBwcGEpOworCisJbG9nX3BvcyA9IHBwYS5tLmNoazsKKwlsb2dfcG9zICs9IHBwYS5t
-LnB1ICogZGV2X2dlby0+Yy5udW1fY2hrOworCWxvZ19wb3MgKz0gcHBhLm0uZ3JwICogZGV2X2dl
-by0+bnVtX2x1biAqIGRldl9nZW8tPmMubnVtX2NoazsKKworCW9mZnNldCA9IGxvZ19wb3MgKiBz
-aXplb2Yoc3RydWN0IG52bWVfbnZtX2Noa19tZXRhKTsKKworCXdoaWxlIChsZWZ0KSB7CisJCWxl
-biA9IG1pbl90KHVuc2lnbmVkIGludCwgbGVmdCwgY3RybC0+bWF4X2h3X3NlY3RvcnMgPDwgOSk7
-CisKKwkJcmV0ID0gbnZtZV9nZXRfbG9nX2V4dChjdHJsLCBucywgTlZNRV9OVk1fTE9HX1JFUE9S
-VF9DSFVOSywKKwkJCQlkZXZfbWV0YSwgbGVuLCBvZmZzZXQpOworCQlpZiAocmV0KSB7CisJCQlk
-ZXZfZXJyKGN0cmwtPmRldmljZSwgIkdldCBSRVBPUlQgQ0hVTksgbG9nIGVycm9yXG4iKTsKKwkJ
-CWJyZWFrOworCQl9CisKKwkJZm9yIChpID0gMDsgaSA8IGxlbjsgaSArPSBzaXplb2Yoc3RydWN0
-IG52bWVfbnZtX2Noa19tZXRhKSkgeworCQkJbWV0YS0+c3RhdGUgPSBkZXZfbWV0YS0+c3RhdGU7
-CisJCQltZXRhLT50eXBlID0gZGV2X21ldGEtPnR5cGU7CisJCQltZXRhLT53aSA9IGRldl9tZXRh
-LT53aTsKKwkJCW1ldGEtPnNsYmEgPSBsZTY0X3RvX2NwdShkZXZfbWV0YS0+c2xiYSk7CisJCQlt
-ZXRhLT5jbmxiID0gbGU2NF90b19jcHUoZGV2X21ldGEtPmNubGIpOworCQkJbWV0YS0+d3AgPSBs
-ZTY0X3RvX2NwdShkZXZfbWV0YS0+d3ApOworCisJCQltZXRhKys7CisJCQlkZXZfbWV0YSsrOwor
-CQl9CisKKwkJb2Zmc2V0ICs9IGxlbjsKKwkJbGVmdCAtPSBsZW47CisJfQorCisJcmV0dXJuIHJl
-dDsKK30KKwogc3RhdGljIGlubGluZSB2b2lkIG52bWVfbnZtX3JxdG9jbWQoc3RydWN0IG52bV9y
-cSAqcnFkLCBzdHJ1Y3QgbnZtZV9ucyAqbnMsCiAJCQkJICAgIHN0cnVjdCBudm1lX252bV9jb21t
-YW5kICpjKQogewpAQCAtNjg5LDYgKzc2MSw4IEBAIHN0YXRpYyBzdHJ1Y3QgbnZtX2Rldl9vcHMg
-bnZtZV9udm1fZGV2X29wcyA9IHsKIAkuZ2V0X2JiX3RibAkJPSBudm1lX252bV9nZXRfYmJfdGJs
-LAogCS5zZXRfYmJfdGJsCQk9IG52bWVfbnZtX3NldF9iYl90YmwsCiAKKwkuZ2V0X2Noa19tZXRh
-CQk9IG52bWVfbnZtX2dldF9jaGtfbWV0YSwKKwogCS5zdWJtaXRfaW8JCT0gbnZtZV9udm1fc3Vi
-bWl0X2lvLAogCS5zdWJtaXRfaW9fc3luYwkJPSBudm1lX252bV9zdWJtaXRfaW9fc3luYywKIApk
-aWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9saWdodG52bS5oIGIvaW5jbHVkZS9saW51eC9saWdo
-dG52bS5oCmluZGV4IDJiOTA5NTkyNTY4YS4uNzc2ZmZkYzJlMTM3IDEwMDY0NAotLS0gYS9pbmNs
-dWRlL2xpbnV4L2xpZ2h0bnZtLmgKKysrIGIvaW5jbHVkZS9saW51eC9saWdodG52bS5oCkBAIC04
-MSwxMCArODEsMTMgQEAgc3RydWN0IG52bV9ycTsKIHN0cnVjdCBudm1faWQ7CiBzdHJ1Y3QgbnZt
-X2RldjsKIHN0cnVjdCBudm1fdGd0X2RldjsKK3N0cnVjdCBudm1fY2hrX21ldGE7CiAKIHR5cGVk
-ZWYgaW50IChudm1faWRfZm4pKHN0cnVjdCBudm1fZGV2ICopOwogdHlwZWRlZiBpbnQgKG52bV9v
-cF9iYl90YmxfZm4pKHN0cnVjdCBudm1fZGV2ICosIHN0cnVjdCBwcGFfYWRkciwgdTggKik7CiB0
-eXBlZGVmIGludCAobnZtX29wX3NldF9iYl9mbikoc3RydWN0IG52bV9kZXYgKiwgc3RydWN0IHBw
-YV9hZGRyICosIGludCwgaW50KTsKK3R5cGVkZWYgaW50IChudm1fZ2V0X2Noa19tZXRhX2ZuKShz
-dHJ1Y3QgbnZtX2RldiAqLCBzdHJ1Y3QgbnZtX2Noa19tZXRhICosCisJCQkJCQkJCXNlY3Rvcl90
-LCBpbnQpOwogdHlwZWRlZiBpbnQgKG52bV9zdWJtaXRfaW9fZm4pKHN0cnVjdCBudm1fZGV2ICos
-IHN0cnVjdCBudm1fcnEgKik7CiB0eXBlZGVmIGludCAobnZtX3N1Ym1pdF9pb19zeW5jX2ZuKShz
-dHJ1Y3QgbnZtX2RldiAqLCBzdHJ1Y3QgbnZtX3JxICopOwogdHlwZWRlZiB2b2lkICoobnZtX2Ny
-ZWF0ZV9kbWFfcG9vbF9mbikoc3RydWN0IG52bV9kZXYgKiwgY2hhciAqKTsKQEAgLTk4LDYgKzEw
-MSw4IEBAIHN0cnVjdCBudm1fZGV2X29wcyB7CiAJbnZtX29wX2JiX3RibF9mbgkqZ2V0X2JiX3Ri
-bDsKIAludm1fb3Bfc2V0X2JiX2ZuCSpzZXRfYmJfdGJsOwogCisJbnZtX2dldF9jaGtfbWV0YV9m
-bgkqZ2V0X2Noa19tZXRhOworCiAJbnZtX3N1Ym1pdF9pb19mbgkqc3VibWl0X2lvOwogCW52bV9z
-dWJtaXRfaW9fc3luY19mbgkqc3VibWl0X2lvX3N5bmM7CiAKQEAgLTIyNyw2ICsyMzIsMjAgQEAg
-c3RydWN0IG52bV9hZGRyX2Zvcm1hdCB7CiAJdTY0CXJzdl9tYXNrWzJdOwogfTsKIAorLyoKKyAq
-IE5vdGU6IFRoZSBzdHJ1Y3R1cmUgc2l6ZSBpcyBsaW5rZWQgdG8gbnZtZV9udm1fY2hrX21ldGEg
-c3VjaCB0aGF0IHRoZSBzYW1lCisgKiBidWZmZXIgY2FuIGJlIHVzZWQgd2hlbiBjb252ZXJ0aW5n
-IGZyb20gbGl0dGxlIGVuZGlhbiB0byBjcHUgYWRkcmVzc2luZy4KKyAqLworc3RydWN0IG52bV9j
-aGtfbWV0YSB7CisJdTgJc3RhdGU7CisJdTgJdHlwZTsKKwl1OAl3aTsKKwl1OAlyc3ZkWzVdOwor
-CXU2NAlzbGJhOworCXU2NAljbmxiOworCXU2NAl3cDsKK307CisKIHN0cnVjdCBudm1fdGFyZ2V0
-IHsKIAlzdHJ1Y3QgbGlzdF9oZWFkIGxpc3Q7CiAJc3RydWN0IG52bV90Z3RfZGV2ICpkZXY7CkBA
-IC01MDIsNiArNTIxLDExIEBAIGV4dGVybiBzdHJ1Y3QgbnZtX2RldiAqbnZtX2FsbG9jX2Rldihp
-bnQpOwogZXh0ZXJuIGludCBudm1fcmVnaXN0ZXIoc3RydWN0IG52bV9kZXYgKik7CiBleHRlcm4g
-dm9pZCBudm1fdW5yZWdpc3RlcihzdHJ1Y3QgbnZtX2RldiAqKTsKIAorCitleHRlcm4gaW50IG52
-bV9nZXRfY2h1bmtfbWV0YShzdHJ1Y3QgbnZtX3RndF9kZXYgKnRndF9kZXYsCisJCQkgICAgICBz
-dHJ1Y3QgbnZtX2Noa19tZXRhICptZXRhLCBzdHJ1Y3QgcHBhX2FkZHIgcHBhLAorCQkJICAgICAg
-aW50IG5jaGtzKTsKKwogZXh0ZXJuIGludCBudm1fc2V0X3RndF9iYl90Ymwoc3RydWN0IG52bV90
-Z3RfZGV2ICosIHN0cnVjdCBwcGFfYWRkciAqLAogCQkJICAgICAgaW50LCBpbnQpOwogZXh0ZXJu
-IGludCBudm1fc3VibWl0X2lvKHN0cnVjdCBudm1fdGd0X2RldiAqLCBzdHJ1Y3QgbnZtX3JxICop
-OwotLSAKMi43LjQKCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fXwpMaW51eC1udm1lIG1haWxpbmcgbGlzdApMaW51eC1udm1lQGxpc3RzLmluZnJhZGVhZC5v
-cmcKaHR0cDovL2xpc3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1udm1l
-Cg==
+It is observed that IOPS can be improved much by simply making
+hw queue per NUMA node on null_blk, so this patch applies the
+introduced .host_tagset for improving performance.
+
+In reality, .can_queue is quite big, and NUMA node number is
+often small, so each hw queue's depth should be high enough to
+saturate device.
+
+Cc: Arun Easi <arun.easi@cavium.com>
+Cc: Omar Sandoval <osandov@fb.com>,
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
+Cc: Christoph Hellwig <hch@lst.de>,
+Cc: Don Brace <don.brace@microsemi.com>
+Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: Peter Rivera <peter.rivera@broadcom.com>
+Cc: Laurence Oberman <loberman@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/scsi/hpsa.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/scsi/hpsa.c b/drivers/scsi/hpsa.c
+index 3a9eca163db8..0747751b7e1c 100644
+--- a/drivers/scsi/hpsa.c
++++ b/drivers/scsi/hpsa.c
+@@ -978,6 +978,7 @@ static struct scsi_host_template hpsa_driver_template = {
+ 	.shost_attrs = hpsa_shost_attrs,
+ 	.max_sectors = 1024,
+ 	.no_write_same = 1,
++	.host_tagset = 1,
+ };
+ 
+ static inline u32 next_command(struct ctlr_info *h, u8 q)
+@@ -5761,6 +5762,11 @@ static int hpsa_scsi_host_alloc(struct ctlr_info *h)
+ static int hpsa_scsi_add_host(struct ctlr_info *h)
+ {
+ 	int rv;
++	/* 256 tags should be high enough to saturate device */
++	int max_queues = DIV_ROUND_UP(h->scsi_host->can_queue, 256);
++
++	/* per NUMA node hw queue */
++	h->scsi_host->nr_hw_queues = min_t(int, nr_node_ids, max_queues);
+ 
+ 	rv = scsi_add_host(h->scsi_host, &h->pdev->dev);
+ 	if (rv) {
+-- 
+2.9.5
