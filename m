@@ -15,201 +15,123 @@ Cc: linux-scsi@vger.kernel.org,
 	Kashyap Desai <kashyap.desai@broadcom.com>,
 	Peter Rivera <peter.rivera@broadcom.com>,
 	Laurence Oberman <loberman@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Meelis Roos <mroos@linux.ee>
-Subject: [PATCH V3 1/8] scsi: hpsa: fix selection of reply queue
-Date: Tue, 27 Feb 2018 18:07:43 +0800
-Message-Id: <20180227100750.32299-2-ming.lei@redhat.com>
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 3/8] blk-mq: introduce 'start_tag' field to 'struct blk_mq_tags'
+Date: Tue, 27 Feb 2018 18:07:45 +0800
+Message-Id: <20180227100750.32299-4-ming.lei@redhat.com>
 In-Reply-To: <20180227100750.32299-1-ming.lei@redhat.com>
 References: <20180227100750.32299-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
->From 84676c1f21 (genirq/affinity: assign vectors to all possible CPUs),
-one msix vector can be created without any online CPU mapped, then one
-command's completion may not be notified.
+This patch introduces 'start_tag' field to 'struct blk_mq_tags' so that
+host wide tagset can be supported easily in the following patches by
+partitioning host wide tags into multiple hw queues.
 
-This patch setups mapping between cpu and reply queue according to irq
-affinity info retrived by pci_irq_get_affinity(), and uses this mapping
-table to choose reply queue for queuing one command.
-
-Then the chosen reply queue has to be active, and fixes IO hang caused
-by using inactive reply queue which doesn't have any online CPU mapped.
+No function change.
 
 Cc: Hannes Reinecke <hare@suse.de>
 Cc: Arun Easi <arun.easi@cavium.com>
+Cc: Omar Sandoval <osandov@fb.com>,
 Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
 Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
 Cc: Christoph Hellwig <hch@lst.de>,
 Cc: Don Brace <don.brace@microsemi.com>
 Cc: Kashyap Desai <kashyap.desai@broadcom.com>
 Cc: Peter Rivera <peter.rivera@broadcom.com>
-Cc: Laurence Oberman <loberman@redhat.com>
-Cc: Meelis Roos <mroos@linux.ee>
-Fixes: 84676c1f21e8 ("genirq/affinity: assign vectors to all possible CPUs")
+Cc: Mike Snitzer <snitzer@redhat.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/scsi/hpsa.c | 73 +++++++++++++++++++++++++++++++++++++++--------------
- drivers/scsi/hpsa.h |  1 +
- 2 files changed, 55 insertions(+), 19 deletions(-)
+ block/blk-mq-tag.c | 3 ++-
+ block/blk-mq-tag.h | 6 ++++--
+ block/blk-mq.c     | 7 ++++---
+ 3 files changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/scsi/hpsa.c b/drivers/scsi/hpsa.c
-index 5293e6827ce5..3a9eca163db8 100644
---- a/drivers/scsi/hpsa.c
-+++ b/drivers/scsi/hpsa.c
-@@ -1045,11 +1045,7 @@ static void set_performant_mode(struct ctlr_info *h, struct CommandList *c,
- 		c->busaddr |= 1 | (h->blockFetchTable[c->Header.SGList] << 1);
- 		if (unlikely(!h->msix_vectors))
- 			return;
--		if (likely(reply_queue == DEFAULT_REPLY_QUEUE))
--			c->Header.ReplyQueue =
--				raw_smp_processor_id() % h->nreply_queues;
--		else
--			c->Header.ReplyQueue = reply_queue % h->nreply_queues;
-+		c->Header.ReplyQueue = reply_queue;
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 336dde07b230..5014d7343ea9 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -179,12 +179,13 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 	finish_wait(&ws->wait, &wait);
+ 
+ found_tag:
+-	return tag + tag_offset;
++	return tag + tag_offset + tags->start_tag;
+ }
+ 
+ void blk_mq_put_tag(struct blk_mq_hw_ctx *hctx, struct blk_mq_tags *tags,
+ 		    struct blk_mq_ctx *ctx, unsigned int tag)
+ {
++	tag -= tags->start_tag;
+ 	if (!blk_mq_tag_is_reserved(tags, tag)) {
+ 		const int real_tag = tag - tags->nr_reserved_tags;
+ 
+diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
+index 61deab0b5a5a..1d629920db69 100644
+--- a/block/blk-mq-tag.h
++++ b/block/blk-mq-tag.h
+@@ -13,6 +13,8 @@ struct blk_mq_tags {
+ 
+ 	atomic_t active_queues;
+ 
++	unsigned int start_tag;
++
+ 	struct sbitmap_queue bitmap_tags;
+ 	struct sbitmap_queue breserved_tags;
+ 
+@@ -78,13 +80,13 @@ static inline void blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+ static inline void blk_mq_tag_set_rq(struct blk_mq_hw_ctx *hctx,
+ 		unsigned int tag, struct request *rq)
+ {
+-	hctx->tags->rqs[tag] = rq;
++	hctx->tags->rqs[tag - hctx->tags->start_tag] = rq;
+ }
+ 
+ static inline bool blk_mq_tag_is_reserved(struct blk_mq_tags *tags,
+ 					  unsigned int tag)
+ {
+-	return tag < tags->nr_reserved_tags;
++	return (tag - tags->start_tag) < tags->nr_reserved_tags;
+ }
+ 
+ #endif
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 357492712b0e..5ea11d087f7b 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -270,7 +270,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 		unsigned int tag, unsigned int op)
+ {
+ 	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
+-	struct request *rq = tags->static_rqs[tag];
++	struct request *rq = tags->static_rqs[tag - tags->start_tag];
+ 	req_flags_t rq_flags = 0;
+ 
+ 	if (data->flags & BLK_MQ_REQ_INTERNAL) {
+@@ -283,7 +283,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 		}
+ 		rq->tag = tag;
+ 		rq->internal_tag = -1;
+-		data->hctx->tags->rqs[rq->tag] = rq;
++		data->hctx->tags->rqs[rq->tag - tags->start_tag] = rq;
  	}
- }
  
-@@ -1063,10 +1059,7 @@ static void set_ioaccel1_performant_mode(struct ctlr_info *h,
- 	 * Tell the controller to post the reply to the queue for this
- 	 * processor.  This seems to give the best I/O throughput.
- 	 */
--	if (likely(reply_queue == DEFAULT_REPLY_QUEUE))
--		cp->ReplyQueue = smp_processor_id() % h->nreply_queues;
--	else
--		cp->ReplyQueue = reply_queue % h->nreply_queues;
-+	cp->ReplyQueue = reply_queue;
- 	/*
- 	 * Set the bits in the address sent down to include:
- 	 *  - performant mode bit (bit 0)
-@@ -1087,10 +1080,7 @@ static void set_ioaccel2_tmf_performant_mode(struct ctlr_info *h,
- 	/* Tell the controller to post the reply to the queue for this
- 	 * processor.  This seems to give the best I/O throughput.
- 	 */
--	if (likely(reply_queue == DEFAULT_REPLY_QUEUE))
--		cp->reply_queue = smp_processor_id() % h->nreply_queues;
--	else
--		cp->reply_queue = reply_queue % h->nreply_queues;
-+	cp->reply_queue = reply_queue;
- 	/* Set the bits in the address sent down to include:
- 	 *  - performant mode bit not used in ioaccel mode 2
- 	 *  - pull count (bits 0-3)
-@@ -1109,10 +1099,7 @@ static void set_ioaccel2_performant_mode(struct ctlr_info *h,
- 	 * Tell the controller to post the reply to the queue for this
- 	 * processor.  This seems to give the best I/O throughput.
- 	 */
--	if (likely(reply_queue == DEFAULT_REPLY_QUEUE))
--		cp->reply_queue = smp_processor_id() % h->nreply_queues;
--	else
--		cp->reply_queue = reply_queue % h->nreply_queues;
-+	cp->reply_queue = reply_queue;
- 	/*
- 	 * Set the bits in the address sent down to include:
- 	 *  - performant mode bit not used in ioaccel mode 2
-@@ -1157,6 +1144,8 @@ static void __enqueue_cmd_and_start_io(struct ctlr_info *h,
+ 	/* csd/requeue_work/fifo_time is initialized before use */
+@@ -801,6 +801,7 @@ EXPORT_SYMBOL(blk_mq_delay_kick_requeue_list);
+ 
+ struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags, unsigned int tag)
  {
- 	dial_down_lockup_detection_during_fw_flash(h, c);
- 	atomic_inc(&h->commands_outstanding);
-+
-+	reply_queue = h->reply_map[raw_smp_processor_id()];
- 	switch (c->cmd_type) {
- 	case CMD_IOACCEL1:
- 		set_ioaccel1_performant_mode(h, c, reply_queue);
-@@ -7376,6 +7365,26 @@ static void hpsa_disable_interrupt_mode(struct ctlr_info *h)
- 	h->msix_vectors = 0;
- }
++	tag -= tags->start_tag;
+ 	if (tag < tags->nr_tags) {
+ 		prefetch(tags->rqs[tag]);
+ 		return tags->rqs[tag];
+@@ -1076,7 +1077,7 @@ bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
+ 			rq->rq_flags |= RQF_MQ_INFLIGHT;
+ 			atomic_inc(&data.hctx->nr_active);
+ 		}
+-		data.hctx->tags->rqs[rq->tag] = rq;
++		data.hctx->tags->rqs[rq->tag - data.hctx->tags->start_tag] = rq;
+ 	}
  
-+static void hpsa_setup_reply_map(struct ctlr_info *h)
-+{
-+	const struct cpumask *mask;
-+	unsigned int queue, cpu;
-+
-+	for (queue = 0; queue < h->msix_vectors; queue++) {
-+		mask = pci_irq_get_affinity(h->pdev, queue);
-+		if (!mask)
-+			goto fallback;
-+
-+		for_each_cpu(cpu, mask)
-+			h->reply_map[cpu] = queue;
-+	}
-+	return;
-+
-+fallback:
-+	for_each_possible_cpu(cpu)
-+		h->reply_map[cpu] = 0;
-+}
-+
- /* If MSI/MSI-X is supported by the kernel we will try to enable it on
-  * controllers that are capable. If not, we use legacy INTx mode.
-  */
-@@ -7771,6 +7780,10 @@ static int hpsa_pci_init(struct ctlr_info *h)
- 	err = hpsa_interrupt_mode(h);
- 	if (err)
- 		goto clean1;
-+
-+	/* setup mapping between CPU and reply queue */
-+	hpsa_setup_reply_map(h);
-+
- 	err = hpsa_pci_find_memory_BAR(h->pdev, &h->paddr);
- 	if (err)
- 		goto clean2;	/* intmode+region, pci */
-@@ -8480,6 +8493,28 @@ static struct workqueue_struct *hpsa_create_controller_wq(struct ctlr_info *h,
- 	return wq;
- }
- 
-+static void hpda_free_ctlr_info(struct ctlr_info *h)
-+{
-+	kfree(h->reply_map);
-+	kfree(h);
-+}
-+
-+static struct ctlr_info *hpda_alloc_ctlr_info(void)
-+{
-+	struct ctlr_info *h;
-+
-+	h = kzalloc(sizeof(*h), GFP_KERNEL);
-+	if (!h)
-+		return NULL;
-+
-+	h->reply_map = kzalloc(sizeof(*h->reply_map) * nr_cpu_ids, GFP_KERNEL);
-+	if (!h->reply_map) {
-+		kfree(h);
-+		return NULL;
-+	}
-+	return h;
-+}
-+
- static int hpsa_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- {
- 	int dac, rc;
-@@ -8517,7 +8552,7 @@ static int hpsa_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	 * the driver.  See comments in hpsa.h for more info.
- 	 */
- 	BUILD_BUG_ON(sizeof(struct CommandList) % COMMANDLIST_ALIGNMENT);
--	h = kzalloc(sizeof(*h), GFP_KERNEL);
-+	h = hpda_alloc_ctlr_info();
- 	if (!h) {
- 		dev_err(&pdev->dev, "Failed to allocate controller head\n");
- 		return -ENOMEM;
-@@ -8916,7 +8951,7 @@ static void hpsa_remove_one(struct pci_dev *pdev)
- 	h->lockup_detected = NULL;			/* init_one 2 */
- 	/* (void) pci_disable_pcie_error_reporting(pdev); */	/* init_one 1 */
- 
--	kfree(h);					/* init_one 1 */
-+	hpda_free_ctlr_info(h);				/* init_one 1 */
- }
- 
- static int hpsa_suspend(__attribute__((unused)) struct pci_dev *pdev,
-diff --git a/drivers/scsi/hpsa.h b/drivers/scsi/hpsa.h
-index 018f980a701c..fb9f5e7f8209 100644
---- a/drivers/scsi/hpsa.h
-+++ b/drivers/scsi/hpsa.h
-@@ -158,6 +158,7 @@ struct bmic_controller_parameters {
- #pragma pack()
- 
- struct ctlr_info {
-+	unsigned int *reply_map;
- 	int	ctlr;
- 	char	devname[8];
- 	char    *product_name;
+ done:
 -- 
 2.9.5
