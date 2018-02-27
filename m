@@ -1,91 +1,207 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Subject: [PATCH 13/19] lightnvm: make address conversions depend on generic
- device
-Date: Mon, 26 Feb 2018 14:17:12 +0100
-Message-Id: <1519651038-16845-14-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
-References: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pl0-f67.google.com ([209.85.160.67]:33718 "EHLO
+        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751721AbeB0SBT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Feb 2018 13:01:19 -0500
+Received: by mail-pl0-f67.google.com with SMTP id c11-v6so8416492plo.0
+        for <linux-block@vger.kernel.org>; Tue, 27 Feb 2018 10:01:19 -0800 (PST)
+Subject: Re: [PATCH v7 1/9] bcache: fix cached_dev->count usage for
+ bch_cache_set_error()
+To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Junhui Tang <tang.junhui@zte.com.cn>
+References: <20180227165557.20442-1-colyli@suse.de>
+ <20180227165557.20442-2-colyli@suse.de>
+From: Michael Lyle <mlyle@lyle.org>
+Message-ID: <9d3d5b05-1b8e-bcef-b4f0-a8e417df840b@lyle.org>
+Date: Tue, 27 Feb 2018 10:01:16 -0800
 MIME-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org,
- =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="utf-8"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20180227165557.20442-2-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-T24gYWRkcmVzcyBjb252ZXJzaW9ucywgdXNlIHRoZSBnZW5lcmljIGRldmljZSwgaW5zdGVhZCBv
-ZiB0aGUgdGFyZ2V0CmRldmljZS4gVGhpcyBhbGxvd3MgdG8gdXNlIGNvbnZlcnNpb25zIG91dHNp
-ZGUgb2YgdGhlIHRhcmdldCdzIHJlYWxtLgoKU2lnbmVkLW9mZi1ieTogSmF2aWVyIEdvbnrDoWxl
-eiA8amF2aWVyQGNuZXhsYWJzLmNvbT4KLS0tCiBkcml2ZXJzL2xpZ2h0bnZtL2NvcmUuYyAgfCAg
-NCArKy0tCiBpbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmggfCAyMCArKysrKysrKysrLS0tLS0tLS0t
-LQogMiBmaWxlcyBjaGFuZ2VkLCAxMiBpbnNlcnRpb25zKCspLCAxMiBkZWxldGlvbnMoLSkKCmRp
-ZmYgLS1naXQgYS9kcml2ZXJzL2xpZ2h0bnZtL2NvcmUuYyBiL2RyaXZlcnMvbGlnaHRudm0vY29y
-ZS5jCmluZGV4IDkyZWE2ZTM5ZGQ2NC4uZmFlNWU4YzZmY2QwIDEwMDY0NAotLS0gYS9kcml2ZXJz
-L2xpZ2h0bnZtL2NvcmUuYworKysgYi9kcml2ZXJzL2xpZ2h0bnZtL2NvcmUuYwpAQCAtNTg4LDcg
-KzU4OCw3IEBAIHN0YXRpYyB2b2lkIG52bV9wcGFfdGd0X3RvX2RldihzdHJ1Y3QgbnZtX3RndF9k
-ZXYgKnRndF9kZXYsCiAKIAlmb3IgKGkgPSAwOyBpIDwgbnJfcHBhczsgaSsrKSB7CiAJCW52bV9t
-YXBfdG9fZGV2KHRndF9kZXYsICZwcGFfbGlzdFtpXSk7Ci0JCXBwYV9saXN0W2ldID0gZ2VuZXJp
-Y190b19kZXZfYWRkcih0Z3RfZGV2LCBwcGFfbGlzdFtpXSk7CisJCXBwYV9saXN0W2ldID0gZ2Vu
-ZXJpY190b19kZXZfYWRkcih0Z3RfZGV2LT5wYXJlbnQsIHBwYV9saXN0W2ldKTsKIAl9CiB9CiAK
-QEAgLTU5OCw3ICs1OTgsNyBAQCBzdGF0aWMgdm9pZCBudm1fcHBhX2Rldl90b190Z3Qoc3RydWN0
-IG52bV90Z3RfZGV2ICp0Z3RfZGV2LAogCWludCBpOwogCiAJZm9yIChpID0gMDsgaSA8IG5yX3Bw
-YXM7IGkrKykgewotCQlwcGFfbGlzdFtpXSA9IGRldl90b19nZW5lcmljX2FkZHIodGd0X2Rldiwg
-cHBhX2xpc3RbaV0pOworCQlwcGFfbGlzdFtpXSA9IGRldl90b19nZW5lcmljX2FkZHIodGd0X2Rl
-di0+cGFyZW50LCBwcGFfbGlzdFtpXSk7CiAJCW52bV9tYXBfdG9fdGd0KHRndF9kZXYsICZwcGFf
-bGlzdFtpXSk7CiAJfQogfQpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9saWdodG52bS5oIGIv
-aW5jbHVkZS9saW51eC9saWdodG52bS5oCmluZGV4IDhjZGExMTI1YzM0YS4uMmI5MDk1OTI1Njhh
-IDEwMDY0NAotLS0gYS9pbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmgKKysrIGIvaW5jbHVkZS9saW51
-eC9saWdodG52bS5oCkBAIC00MDUsMTUgKzQwNSwxNSBAQCBzdHJ1Y3QgbnZtX2RldiB7CiAJc3Ry
-dWN0IGxpc3RfaGVhZCB0YXJnZXRzOwogfTsKIAotc3RhdGljIGlubGluZSBzdHJ1Y3QgcHBhX2Fk
-ZHIgZ2VuZXJpY190b19kZXZfYWRkcihzdHJ1Y3QgbnZtX3RndF9kZXYgKnRndF9kZXYsCitzdGF0
-aWMgaW5saW5lIHN0cnVjdCBwcGFfYWRkciBnZW5lcmljX3RvX2Rldl9hZGRyKHN0cnVjdCBudm1f
-ZGV2ICpkZXYsCiAJCQkJCQkgIHN0cnVjdCBwcGFfYWRkciByKQogewotCXN0cnVjdCBudm1fZ2Vv
-ICpnZW8gPSAmdGd0X2Rldi0+Z2VvOworCXN0cnVjdCBudm1fZ2VvICpkZXZfZ2VvID0gJmRldi0+
-Z2VvOwogCXN0cnVjdCBwcGFfYWRkciBsOwogCi0JaWYgKGdlby0+Yy52ZXJzaW9uID09IE5WTV9P
-Q1NTRF9TUEVDXzEyKSB7CisJaWYgKGRldl9nZW8tPmMudmVyc2lvbiA9PSBOVk1fT0NTU0RfU1BF
-Q18xMikgewogCQlzdHJ1Y3QgbnZtX2FkZHJfZm9ybWF0XzEyICpwcGFmID0KLQkJCQkoc3RydWN0
-IG52bV9hZGRyX2Zvcm1hdF8xMiAqKSZnZW8tPmMuYWRkcmY7CisJCQkJKHN0cnVjdCBudm1fYWRk
-cl9mb3JtYXRfMTIgKikmZGV2X2dlby0+Yy5hZGRyZjsKIAogCQlsLnBwYSA9ICgodTY0KXIuZy5j
-aCkgPDwgcHBhZi0+Y2hfb2Zmc2V0OwogCQlsLnBwYSB8PSAoKHU2NClyLmcubHVuKSA8PCBwcGFm
-LT5sdW5fb2Zmc2V0OwpAQCAtNDIyLDcgKzQyMiw3IEBAIHN0YXRpYyBpbmxpbmUgc3RydWN0IHBw
-YV9hZGRyIGdlbmVyaWNfdG9fZGV2X2FkZHIoc3RydWN0IG52bV90Z3RfZGV2ICp0Z3RfZGV2LAog
-CQlsLnBwYSB8PSAoKHU2NClyLmcucGwpIDw8IHBwYWYtPnBsbl9vZmZzZXQ7CiAJCWwucHBhIHw9
-ICgodTY0KXIuZy5zZWMpIDw8IHBwYWYtPnNlY19vZmZzZXQ7CiAJfSBlbHNlIHsKLQkJc3RydWN0
-IG52bV9hZGRyX2Zvcm1hdCAqbGJhZiA9ICZnZW8tPmMuYWRkcmY7CisJCXN0cnVjdCBudm1fYWRk
-cl9mb3JtYXQgKmxiYWYgPSAmZGV2X2dlby0+Yy5hZGRyZjsKIAogCQlsLnBwYSA9ICgodTY0KXIu
-bS5ncnApIDw8IGxiYWYtPmNoX29mZnNldDsKIAkJbC5wcGEgfD0gKCh1NjQpci5tLnB1KSA8PCBs
-YmFmLT5sdW5fb2Zmc2V0OwpAQCAtNDMzLDE3ICs0MzMsMTcgQEAgc3RhdGljIGlubGluZSBzdHJ1
-Y3QgcHBhX2FkZHIgZ2VuZXJpY190b19kZXZfYWRkcihzdHJ1Y3QgbnZtX3RndF9kZXYgKnRndF9k
-ZXYsCiAJcmV0dXJuIGw7CiB9CiAKLXN0YXRpYyBpbmxpbmUgc3RydWN0IHBwYV9hZGRyIGRldl90
-b19nZW5lcmljX2FkZHIoc3RydWN0IG52bV90Z3RfZGV2ICp0Z3RfZGV2LAorc3RhdGljIGlubGlu
-ZSBzdHJ1Y3QgcHBhX2FkZHIgZGV2X3RvX2dlbmVyaWNfYWRkcihzdHJ1Y3QgbnZtX2RldiAqZGV2
-LAogCQkJCQkJICBzdHJ1Y3QgcHBhX2FkZHIgcikKIHsKLQlzdHJ1Y3QgbnZtX2dlbyAqZ2VvID0g
-JnRndF9kZXYtPmdlbzsKKwlzdHJ1Y3QgbnZtX2dlbyAqZGV2X2dlbyA9ICZkZXYtPmdlbzsKIAlz
-dHJ1Y3QgcHBhX2FkZHIgbDsKIAogCWwucHBhID0gMDsKIAotCWlmIChnZW8tPmMudmVyc2lvbiA9
-PSBOVk1fT0NTU0RfU1BFQ18xMikgeworCWlmIChkZXZfZ2VvLT5jLnZlcnNpb24gPT0gTlZNX09D
-U1NEX1NQRUNfMTIpIHsKIAkJc3RydWN0IG52bV9hZGRyX2Zvcm1hdF8xMiAqcHBhZiA9Ci0JCQkJ
-KHN0cnVjdCBudm1fYWRkcl9mb3JtYXRfMTIgKikmZ2VvLT5jLmFkZHJmOworCQkJCShzdHJ1Y3Qg
-bnZtX2FkZHJfZm9ybWF0XzEyICopJmRldl9nZW8tPmMuYWRkcmY7CiAKIAkJbC5nLmNoID0gKHIu
-cHBhICYgcHBhZi0+Y2hfbWFzaykgPj4gcHBhZi0+Y2hfb2Zmc2V0OwogCQlsLmcubHVuID0gKHIu
-cHBhICYgcHBhZi0+bHVuX21hc2spID4+IHBwYWYtPmx1bl9vZmZzZXQ7CkBAIC00NTIsNyArNDUy
-LDcgQEAgc3RhdGljIGlubGluZSBzdHJ1Y3QgcHBhX2FkZHIgZGV2X3RvX2dlbmVyaWNfYWRkcihz
-dHJ1Y3QgbnZtX3RndF9kZXYgKnRndF9kZXYsCiAJCWwuZy5wbCA9IChyLnBwYSAmIHBwYWYtPnBs
-bl9tYXNrKSA+PiBwcGFmLT5wbG5fb2Zmc2V0OwogCQlsLmcuc2VjID0gKHIucHBhICYgcHBhZi0+
-c2VjX21hc2spID4+IHBwYWYtPnNlY19vZmZzZXQ7CiAJfSBlbHNlIHsKLQkJc3RydWN0IG52bV9h
-ZGRyX2Zvcm1hdCAqbGJhZiA9ICZnZW8tPmMuYWRkcmY7CisJCXN0cnVjdCBudm1fYWRkcl9mb3Jt
-YXQgKmxiYWYgPSAmZGV2X2dlby0+Yy5hZGRyZjsKIAogCQlsLm0uZ3JwID0gKHIucHBhICYgbGJh
-Zi0+Y2hfbWFzaykgPj4gbGJhZi0+Y2hfb2Zmc2V0OwogCQlsLm0ucHUgPSAoci5wcGEgJiBsYmFm
-LT5sdW5fbWFzaykgPj4gbGJhZi0+bHVuX29mZnNldDsKLS0gCjIuNy40CgoKX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KTGludXgtbnZtZSBtYWlsaW5nIGxp
-c3QKTGludXgtbnZtZUBsaXN0cy5pbmZyYWRlYWQub3JnCmh0dHA6Ly9saXN0cy5pbmZyYWRlYWQu
-b3JnL21haWxtYW4vbGlzdGluZm8vbGludXgtbnZtZQo=
+Hi Coly Li---
+
+Thanks for this.  I've been uncomfortable with the interaction between
+the dirty status and the refcount (even aside from this issue), and I
+believe you've resolved it.  I'm sorry for the slow review-- it's taken
+me some time to convince myself that this is safe.
+
+I'm getting closer to be able to apply these for 4.17.
+
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
+
+Mike
+
+On 02/27/2018 08:55 AM, Coly Li wrote:
+> When bcache metadata I/O fails, bcache will call bch_cache_set_error()
+> to retire the whole cache set. The expected behavior to retire a cache
+> set is to unregister the cache set, and unregister all backing device
+> attached to this cache set, then remove sysfs entries of the cache set
+> and all attached backing devices, finally release memory of structs
+> cache_set, cache, cached_dev and bcache_device.
+> 
+> In my testing when journal I/O failure triggered by disconnected cache
+> device, sometimes the cache set cannot be retired, and its sysfs
+> entry /sys/fs/bcache/<uuid> still exits and the backing device also
+> references it. This is not expected behavior.
+> 
+> When metadata I/O failes, the call senquence to retire whole cache set is,
+>         bch_cache_set_error()
+>         bch_cache_set_unregister()
+>         bch_cache_set_stop()
+>         __cache_set_unregister()     <- called as callback by calling
+>                                         clousre_queue(&c->caching)
+>         cache_set_flush()            <- called as a callback when refcount
+>                                         of cache_set->caching is 0
+>         cache_set_free()             <- called as a callback when refcount
+>                                         of catch_set->cl is 0
+>         bch_cache_set_release()      <- called as a callback when refcount
+>                                         of catch_set->kobj is 0
+> 
+> I find if kernel thread bch_writeback_thread() quits while-loop when
+> kthread_should_stop() is true and searched_full_index is false, clousre
+> callback cache_set_flush() set by continue_at() will never be called. The
+> result is, bcache fails to retire whole cache set.
+> 
+> cache_set_flush() will be called when refcount of closure c->caching is 0,
+> and in function bcache_device_detach() refcount of closure c->caching is
+> released to 0 by clousre_put(). In metadata error code path, function
+> bcache_device_detach() is called by cached_dev_detach_finish(). This is a
+> callback routine being called when cached_dev->count is 0. This refcount
+> is decreased by cached_dev_put().
+> 
+> The above dependence indicates, cache_set_flush() will be called when
+> refcount of cache_set->cl is 0, and refcount of cache_set->cl to be 0
+> when refcount of cache_dev->count is 0.
+> 
+> The reason why sometimes cache_dev->count is not 0 (when metadata I/O fails
+> and bch_cache_set_error() called) is, in bch_writeback_thread(), refcount
+> of cache_dev is not decreased properly.
+> 
+> In bch_writeback_thread(), cached_dev_put() is called only when
+> searched_full_index is true and cached_dev->writeback_keys is empty, a.k.a
+> there is no dirty data on cache. In most of run time it is correct, but
+> when bch_writeback_thread() quits the while-loop while cache is still
+> dirty, current code forget to call cached_dev_put() before this kernel
+> thread exits. This is why sometimes cache_set_flush() is not executed and
+> cache set fails to be retired.
+> 
+> The reason to call cached_dev_put() in bch_writeback_rate() is, when the
+> cache device changes from clean to dirty, cached_dev_get() is called, to
+> make sure during writeback operatiions both backing and cache devices
+> won't be released.
+> 
+> Adding following code in bch_writeback_thread() does not work,
+>    static int bch_writeback_thread(void *arg)
+>         }
+> 
+> +       if (atomic_read(&dc->has_dirty))
+> +               cached_dev_put()
+> +
+>         return 0;
+>  }
+> because writeback kernel thread can be waken up and start via sysfs entry:
+>         echo 1 > /sys/block/bcache<N>/bcache/writeback_running
+> It is difficult to check whether backing device is dirty without race and
+> extra lock. So the above modification will introduce potential refcount
+> underflow in some conditions.
+> 
+> The correct fix is, to take cached dev refcount when creating the kernel
+> thread, and put it before the kernel thread exits. Then bcache does not
+> need to take a cached dev refcount when cache turns from clean to dirty,
+> or to put a cached dev refcount when cache turns from ditry to clean. The
+> writeback kernel thread is alwasy safe to reference data structure from
+> cache set, cache and cached device (because a refcount of cache device is
+> taken for it already), and no matter the kernel thread is stopped by I/O
+> errors or system reboot, cached_dev->count can always be used correctly.
+> 
+> The patch is simple, but understanding how it works is quite complicated.
+> 
+> Changelog:
+> v2: set dc->writeback_thread to NULL in this patch, as suggested by Hannes.
+> v1: initial version for review.
+> 
+> Signed-off-by: Coly Li <colyli@suse.de>
+> Reviewed-by: Hannes Reinecke <hare@suse.com>
+> Cc: Michael Lyle <mlyle@lyle.org>
+> Cc: Junhui Tang <tang.junhui@zte.com.cn>
+> ---
+>  drivers/md/bcache/super.c     |  1 -
+>  drivers/md/bcache/writeback.c | 11 ++++++++---
+>  drivers/md/bcache/writeback.h |  2 --
+>  3 files changed, 8 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index 312895788036..9b745c5c1980 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -1054,7 +1054,6 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
+>  	if (BDEV_STATE(&dc->sb) == BDEV_STATE_DIRTY) {
+>  		bch_sectors_dirty_init(&dc->disk);
+>  		atomic_set(&dc->has_dirty, 1);
+> -		refcount_inc(&dc->count);
+>  		bch_writeback_queue(dc);
+>  	}
+>  
+> diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+> index f1d2fc15abcc..b280c134dd4d 100644
+> --- a/drivers/md/bcache/writeback.c
+> +++ b/drivers/md/bcache/writeback.c
+> @@ -572,7 +572,7 @@ static int bch_writeback_thread(void *arg)
+>  
+>  			if (kthread_should_stop()) {
+>  				set_current_state(TASK_RUNNING);
+> -				return 0;
+> +				break;
+>  			}
+>  
+>  			schedule();
+> @@ -585,7 +585,6 @@ static int bch_writeback_thread(void *arg)
+>  		if (searched_full_index &&
+>  		    RB_EMPTY_ROOT(&dc->writeback_keys.keys)) {
+>  			atomic_set(&dc->has_dirty, 0);
+> -			cached_dev_put(dc);
+>  			SET_BDEV_STATE(&dc->sb, BDEV_STATE_CLEAN);
+>  			bch_write_bdev_super(dc, NULL);
+>  		}
+> @@ -606,6 +605,9 @@ static int bch_writeback_thread(void *arg)
+>  		}
+>  	}
+>  
+> +	dc->writeback_thread = NULL;
+> +	cached_dev_put(dc);
+> +
+>  	return 0;
+>  }
+>  
+> @@ -669,10 +671,13 @@ int bch_cached_dev_writeback_start(struct cached_dev *dc)
+>  	if (!dc->writeback_write_wq)
+>  		return -ENOMEM;
+>  
+> +	cached_dev_get(dc);
+>  	dc->writeback_thread = kthread_create(bch_writeback_thread, dc,
+>  					      "bcache_writeback");
+> -	if (IS_ERR(dc->writeback_thread))
+> +	if (IS_ERR(dc->writeback_thread)) {
+> +		cached_dev_put(dc);
+>  		return PTR_ERR(dc->writeback_thread);
+> +	}
+>  
+>  	schedule_delayed_work(&dc->writeback_rate_update,
+>  			      dc->writeback_rate_update_seconds * HZ);
+> diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
+> index 587b25599856..0bba8f1c6cdf 100644
+> --- a/drivers/md/bcache/writeback.h
+> +++ b/drivers/md/bcache/writeback.h
+> @@ -105,8 +105,6 @@ static inline void bch_writeback_add(struct cached_dev *dc)
+>  {
+>  	if (!atomic_read(&dc->has_dirty) &&
+>  	    !atomic_xchg(&dc->has_dirty, 1)) {
+> -		refcount_inc(&dc->count);
+> -
+>  		if (BDEV_STATE(&dc->sb) != BDEV_STATE_DIRTY) {
+>  			SET_BDEV_STATE(&dc->sb, BDEV_STATE_DIRTY);
+>  			/* XXX: should do this synchronously */
+> 
