@@ -1,308 +1,270 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:65085 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933476AbeB1T2Z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Feb 2018 14:28:25 -0500
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 03/11] block: Introduce blk_queue_flag_{set,clear,test_and_{set,clear}}()
-Date: Wed, 28 Feb 2018 11:28:15 -0800
-Message-Id: <20180228192823.5191-4-bart.vanassche@wdc.com>
-In-Reply-To: <20180228192823.5191-1-bart.vanassche@wdc.com>
-References: <20180228192823.5191-1-bart.vanassche@wdc.com>
+Received: from mx2.suse.de ([195.135.220.15]:46976 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751965AbeB0Q4v (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Feb 2018 11:56:51 -0500
+From: Coly Li <colyli@suse.de>
+To: linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        Nix <nix@esperi.org.uk>, Pavel Goran <via-bcache@pvgoran.name>,
+        Junhui Tang <tang.junhui@zte.com.cn>,
+        Hannes Reinecke <hare@suse.com>
+Subject: [PATCH v7 5/9] bcache: add stop_when_cache_set_failed option to backing device
+Date: Wed, 28 Feb 2018 00:55:53 +0800
+Message-Id: <20180227165557.20442-6-colyli@suse.de>
+In-Reply-To: <20180227165557.20442-1-colyli@suse.de>
+References: <20180227165557.20442-1-colyli@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Introduce functions that modify the queue flags and that protect
-these modifications with the request queue lock. Except for moving
-one wake_up_all() call from inside to outside a critical section,
-this patch does not change any functionality.
+When there are too many I/O errors on cache device, current bcache code
+will retire the whole cache set, and detach all bcache devices. But the
+detached bcache devices are not stopped, which is problematic when bcache
+is in writeback mode.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Ming Lei <ming.lei@redhat.com>
+If the retired cache set has dirty data of backing devices, continue
+writing to bcache device will write to backing device directly. If the
+LBA of write request has a dirty version cached on cache device, next time
+when the cache device is re-registered and backing device re-attached to
+it again, the stale dirty data on cache device will be written to backing
+device, and overwrite latest directly written data. This situation causes
+a quite data corruption.
+
+But we cannot simply stop all attached bcache devices when the cache set is
+broken or disconnected. For example, use bcache to accelerate performance
+of an email service. In such workload, if cache device is broken but no
+dirty data lost, keep the bcache device alive and permit email service
+continue to access user data might be a better solution for the cache
+device failure.
+
+Nix <nix@esperi.org.uk> points out the issue and provides the above example
+to explain why it might be necessary to not stop bcache device for broken
+cache device. Pavel Goran <via-bcache@pvgoran.name> provides a brilliant
+suggestion to provide "always" and "auto" options to per-cached device
+sysfs file stop_when_cache_set_failed. If cache set is retiring and the
+backing device has no dirty data on cache, it should be safe to keep the
+bcache device alive. In this case, if stop_when_cache_set_failed is set to
+"auto", the device failure handling code will not stop this bcache device
+and permit application to access the backing device with a unattached
+bcache device.
+
+Changelog:
+v3: fix typos pointed out by Nix.
+v2: change option values of stop_when_cache_set_failed from 1/0 to
+    "auto"/"always".
+v1: initial version, stop_when_cache_set_failed can be 0 (not stop) or 1
+    (always stop).
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
+Cc: Nix <nix@esperi.org.uk>
+Cc: Pavel Goran <via-bcache@pvgoran.name>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
+Cc: Hannes Reinecke <hare@suse.com>
 ---
- block/blk-core.c       | 91 +++++++++++++++++++++++++++++++++++++++++---------
- block/blk-mq.c         | 12 ++-----
- block/blk-settings.c   |  6 ++--
- block/blk-sysfs.c      | 22 ++++--------
- block/blk-timeout.c    |  6 ++--
- include/linux/blkdev.h |  5 +++
- 6 files changed, 93 insertions(+), 49 deletions(-)
+ drivers/md/bcache/bcache.h |  9 +++++
+ drivers/md/bcache/super.c  | 82 ++++++++++++++++++++++++++++++++++++++++------
+ drivers/md/bcache/sysfs.c  | 17 ++++++++++
+ 3 files changed, 98 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 1d6b4b0545aa..475b8926a616 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -72,6 +72,78 @@ struct kmem_cache *blk_requestq_cachep;
-  */
- static struct workqueue_struct *kblockd_workqueue;
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 8a0327581d62..5e9f3610c6fd 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -288,6 +288,12 @@ struct io {
+ 	sector_t		last;
+ };
  
-+/**
-+ * blk_queue_flag_set - atomically set a queue flag
-+ * @flag: flag to be set
-+ * @q: request queue
-+ */
-+void blk_queue_flag_set(unsigned int flag, struct request_queue *q)
-+{
-+	unsigned long flags;
++enum stop_on_failure {
++	BCH_CACHED_DEV_STOP_AUTO = 0,
++	BCH_CACHED_DEV_STOP_ALWAYS,
++	BCH_CACHED_DEV_STOP_MODE_MAX,
++};
 +
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	queue_flag_set(flag, q);
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+}
-+EXPORT_SYMBOL(blk_queue_flag_set);
+ struct cached_dev {
+ 	struct list_head	list;
+ 	struct bcache_device	disk;
+@@ -380,6 +386,8 @@ struct cached_dev {
+ 	unsigned		writeback_rate_i_term_inverse;
+ 	unsigned		writeback_rate_p_term_inverse;
+ 	unsigned		writeback_rate_minimum;
 +
-+/**
-+ * blk_queue_flag_clear - atomically clear a queue flag
-+ * @flag: flag to be cleared
-+ * @q: request queue
-+ */
-+void blk_queue_flag_clear(unsigned int flag, struct request_queue *q)
-+{
-+	unsigned long flags;
++	enum stop_on_failure	stop_when_cache_set_failed;
+ };
+ 
+ enum alloc_reserve {
+@@ -939,6 +947,7 @@ void bch_write_bdev_super(struct cached_dev *, struct closure *);
+ 
+ extern struct workqueue_struct *bcache_wq;
+ extern const char * const bch_cache_modes[];
++extern const char * const bch_stop_on_failure_modes[];
+ extern struct mutex bch_register_lock;
+ extern struct list_head bch_cache_sets;
+ 
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index a1abeebc7643..5c49109a7046 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -47,6 +47,14 @@ const char * const bch_cache_modes[] = {
+ 	NULL
+ };
+ 
++/* Default is -1; we skip past it for stop_when_cache_set_failed */
++const char * const bch_stop_on_failure_modes[] = {
++	"default",
++	"auto",
++	"always",
++	NULL
++};
 +
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	queue_flag_clear(flag, q);
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+}
-+EXPORT_SYMBOL(blk_queue_flag_clear);
+ static struct kobject *bcache_kobj;
+ struct mutex bch_register_lock;
+ LIST_HEAD(bch_cache_sets);
+@@ -1189,6 +1197,9 @@ static int cached_dev_init(struct cached_dev *dc, unsigned block_size)
+ 		max(dc->disk.disk->queue->backing_dev_info->ra_pages,
+ 		    q->backing_dev_info->ra_pages);
+ 
++	/* default to auto */
++	dc->stop_when_cache_set_failed = BCH_CACHED_DEV_STOP_AUTO;
 +
-+/**
-+ * blk_queue_flag_test_and_set - atomically test and set a queue flag
-+ * @flag: flag to be set
-+ * @q: request queue
+ 	bch_cached_dev_request_init(dc);
+ 	bch_cached_dev_writeback_init(dc);
+ 	return 0;
+@@ -1465,25 +1476,76 @@ static void cache_set_flush(struct closure *cl)
+ 	closure_return(cl);
+ }
+ 
++/*
++ * This function is only called when CACHE_SET_IO_DISABLE is set, which means
++ * cache set is unregistering due to too many I/O errors. In this condition,
++ * the bcache device might be stopped, it depends on stop_when_cache_set_failed
++ * value and whether the broken cache has dirty data:
 + *
-+ * Returns the previous value of @flag - 0 if the flag was not set and 1 if
-+ * the flag was already set.
-+ */
-+bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q)
-+{
-+	unsigned long flags;
-+	bool res;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	res = queue_flag_test_and_set(flag, q);
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+
-+	return res;
-+}
-+EXPORT_SYMBOL_GPL(blk_queue_flag_test_and_set);
-+
-+/**
-+ * blk_queue_flag_test_and_clear - atomically test and clear a queue flag
-+ * @flag: flag to be cleared
-+ * @q: request queue
++ * dc->stop_when_cache_set_failed    dc->has_dirty   stop bcache device
++ *  BCH_CACHED_STOP_AUTO               0               NO
++ *  BCH_CACHED_STOP_AUTO               1               YES
++ *  BCH_CACHED_DEV_STOP_ALWAYS         0               YES
++ *  BCH_CACHED_DEV_STOP_ALWAYS         1               YES
 + *
-+ * Returns the previous value of @flag - 0 if the flag was not set and 1 if
-+ * the flag was set.
++ * The expected behavior is, if stop_when_cache_set_failed is configured to
++ * "auto" via sysfs interface, the bcache device will not be stopped if the
++ * backing device is clean on the broken cache device.
 + */
-+bool blk_queue_flag_test_and_clear(unsigned int flag, struct request_queue *q)
++static void conditional_stop_bcache_device(struct cache_set *c,
++					   struct bcache_device *d,
++					   struct cached_dev *dc)
 +{
-+	unsigned long flags;
-+	bool res;
-+
-+	spin_lock_irqsave(q->queue_lock, flags);
-+	res = queue_flag_test_and_clear(flag, q);
-+	spin_unlock_irqrestore(q->queue_lock, flags);
-+
-+	return res;
++	if (dc->stop_when_cache_set_failed == BCH_CACHED_DEV_STOP_ALWAYS) {
++		pr_warn("stop_when_cache_set_failed of %s is \"always\", stop"
++			" it for failed cache set %pU.",
++			d->disk->disk_name, c->sb.set_uuid);
++		bcache_device_stop(d);
++	} else if (atomic_read(&dc->has_dirty)) {
++		/*
++		 * dc->stop_when_cache_set_failed == BCH_CACHED_STOP_AUTO
++		 * and dc->has_dirty == 1
++		 */
++		pr_warn("stop_when_cache_set_failed of %s is \"auto\" and "
++			"cache is dirty, stop it to avoid potential data "
++			"corruption.",
++			d->disk->disk_name);
++			bcache_device_stop(d);
++	} else {
++		/*
++		 * dc->stop_when_cache_set_failed == BCH_CACHED_STOP_AUTO
++		 * and dc->has_dirty == 0
++		 */
++		pr_warn("stop_when_cache_set_failed of %s is \"auto\" and "
++			"cache is clean, keep it alive.",
++			d->disk->disk_name);
++	}
 +}
-+EXPORT_SYMBOL_GPL(blk_queue_flag_test_and_clear);
 +
- static void blk_clear_congested(struct request_list *rl, int sync)
+ static void __cache_set_unregister(struct closure *cl)
  {
- #ifdef CONFIG_CGROUP_WRITEBACK
-@@ -362,25 +434,14 @@ EXPORT_SYMBOL(blk_sync_queue);
-  */
- int blk_set_preempt_only(struct request_queue *q)
- {
--	unsigned long flags;
--	int res;
--
--	spin_lock_irqsave(q->queue_lock, flags);
--	res = queue_flag_test_and_set(QUEUE_FLAG_PREEMPT_ONLY, q);
--	spin_unlock_irqrestore(q->queue_lock, flags);
--
--	return res;
-+	return blk_queue_flag_test_and_set(QUEUE_FLAG_PREEMPT_ONLY, q);
- }
- EXPORT_SYMBOL_GPL(blk_set_preempt_only);
+ 	struct cache_set *c = container_of(cl, struct cache_set, caching);
+ 	struct cached_dev *dc;
++	struct bcache_device *d;
+ 	size_t i;
  
- void blk_clear_preempt_only(struct request_queue *q)
- {
--	unsigned long flags;
--
--	spin_lock_irqsave(q->queue_lock, flags);
--	queue_flag_clear(QUEUE_FLAG_PREEMPT_ONLY, q);
-+	blk_queue_flag_clear(QUEUE_FLAG_PREEMPT_ONLY, q);
- 	wake_up_all(&q->mq_freeze_wq);
--	spin_unlock_irqrestore(q->queue_lock, flags);
- }
- EXPORT_SYMBOL_GPL(blk_clear_preempt_only);
+ 	mutex_lock(&bch_register_lock);
  
-@@ -630,9 +691,7 @@ EXPORT_SYMBOL_GPL(blk_queue_bypass_end);
+-	for (i = 0; i < c->devices_max_used; i++)
+-		if (c->devices[i]) {
+-			if (!UUID_FLASH_ONLY(&c->uuids[i]) &&
+-			    test_bit(CACHE_SET_UNREGISTERING, &c->flags)) {
+-				dc = container_of(c->devices[i],
+-						  struct cached_dev, disk);
+-				bch_cached_dev_detach(dc);
+-			} else {
+-				bcache_device_stop(c->devices[i]);
+-			}
++	for (i = 0; i < c->devices_max_used; i++) {
++		d = c->devices[i];
++		if (!d)
++			continue;
++
++		if (!UUID_FLASH_ONLY(&c->uuids[i]) &&
++		    test_bit(CACHE_SET_UNREGISTERING, &c->flags)) {
++			dc = container_of(d, struct cached_dev, disk);
++			bch_cached_dev_detach(dc);
++			if (test_bit(CACHE_SET_IO_DISABLE, &c->flags))
++				conditional_stop_bcache_device(c, d, dc);
++		} else {
++			bcache_device_stop(d);
+ 		}
++	}
  
- void blk_set_queue_dying(struct request_queue *q)
- {
--	spin_lock_irq(q->queue_lock);
--	queue_flag_set(QUEUE_FLAG_DYING, q);
--	spin_unlock_irq(q->queue_lock);
-+	blk_queue_flag_set(QUEUE_FLAG_DYING, q);
+ 	mutex_unlock(&bch_register_lock);
  
- 	/*
- 	 * When queue DYING flag is set, we need to block new req
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 96baa6511c1e..67026494119b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -198,11 +198,7 @@ EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
-  */
- void blk_mq_quiesce_queue_nowait(struct request_queue *q)
- {
--	unsigned long flags;
--
--	spin_lock_irqsave(q->queue_lock, flags);
--	queue_flag_set(QUEUE_FLAG_QUIESCED, q);
--	spin_unlock_irqrestore(q->queue_lock, flags);
-+	blk_queue_flag_set(QUEUE_FLAG_QUIESCED, q);
- }
- EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_nowait);
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index e75279b7d180..f2b3b2686627 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -78,6 +78,7 @@ rw_attribute(congested_write_threshold_us);
+ rw_attribute(sequential_cutoff);
+ rw_attribute(data_csum);
+ rw_attribute(cache_mode);
++rw_attribute(stop_when_cache_set_failed);
+ rw_attribute(writeback_metadata);
+ rw_attribute(writeback_running);
+ rw_attribute(writeback_percent);
+@@ -126,6 +127,12 @@ SHOW(__bch_cached_dev)
+ 					       bch_cache_modes + 1,
+ 					       BDEV_CACHE_MODE(&dc->sb));
  
-@@ -243,11 +239,7 @@ EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
-  */
- void blk_mq_unquiesce_queue(struct request_queue *q)
- {
--	unsigned long flags;
--
--	spin_lock_irqsave(q->queue_lock, flags);
--	queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
--	spin_unlock_irqrestore(q->queue_lock, flags);
-+	blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
- 
- 	/* dispatch requests which are inserted during quiescing */
- 	blk_mq_run_hw_queues(q, true);
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 7f719da0eadd..d1de71124656 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -859,12 +859,10 @@ EXPORT_SYMBOL(blk_queue_update_dma_alignment);
- 
- void blk_queue_flush_queueable(struct request_queue *q, bool queueable)
- {
--	spin_lock_irq(q->queue_lock);
- 	if (queueable)
--		queue_flag_clear(QUEUE_FLAG_FLUSH_NQ, q);
-+		blk_queue_flag_clear(QUEUE_FLAG_FLUSH_NQ, q);
- 	else
--		queue_flag_set(QUEUE_FLAG_FLUSH_NQ, q);
--	spin_unlock_irq(q->queue_lock);
-+		blk_queue_flag_set(QUEUE_FLAG_FLUSH_NQ, q);
- }
- EXPORT_SYMBOL_GPL(blk_queue_flush_queueable);
- 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 49bc4aa8d1fc..f8457d6f0190 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -276,12 +276,10 @@ queue_store_##name(struct request_queue *q, const char *page, size_t count) \
- 	if (neg)							\
- 		val = !val;						\
- 									\
--	spin_lock_irq(q->queue_lock);					\
- 	if (val)							\
--		queue_flag_set(QUEUE_FLAG_##flag, q);			\
-+		blk_queue_flag_set(QUEUE_FLAG_##flag, q);		\
- 	else								\
--		queue_flag_clear(QUEUE_FLAG_##flag, q);			\
--	spin_unlock_irq(q->queue_lock);					\
-+		blk_queue_flag_clear(QUEUE_FLAG_##flag, q);		\
- 	return ret;							\
- }
- 
-@@ -414,12 +412,10 @@ static ssize_t queue_poll_store(struct request_queue *q, const char *page,
- 	if (ret < 0)
- 		return ret;
- 
--	spin_lock_irq(q->queue_lock);
- 	if (poll_on)
--		queue_flag_set(QUEUE_FLAG_POLL, q);
-+		blk_queue_flag_set(QUEUE_FLAG_POLL, q);
- 	else
--		queue_flag_clear(QUEUE_FLAG_POLL, q);
--	spin_unlock_irq(q->queue_lock);
-+		blk_queue_flag_clear(QUEUE_FLAG_POLL, q);
- 
- 	return ret;
- }
-@@ -487,12 +483,10 @@ static ssize_t queue_wc_store(struct request_queue *q, const char *page,
- 	if (set == -1)
- 		return -EINVAL;
- 
--	spin_lock_irq(q->queue_lock);
- 	if (set)
--		queue_flag_set(QUEUE_FLAG_WC, q);
-+		blk_queue_flag_set(QUEUE_FLAG_WC, q);
- 	else
--		queue_flag_clear(QUEUE_FLAG_WC, q);
--	spin_unlock_irq(q->queue_lock);
-+		blk_queue_flag_clear(QUEUE_FLAG_WC, q);
- 
- 	return count;
- }
-@@ -948,9 +942,7 @@ void blk_unregister_queue(struct gendisk *disk)
- 	 */
- 	mutex_lock(&q->sysfs_lock);
- 
--	spin_lock_irq(q->queue_lock);
--	queue_flag_clear(QUEUE_FLAG_REGISTERED, q);
--	spin_unlock_irq(q->queue_lock);
-+	blk_queue_flag_clear(QUEUE_FLAG_REGISTERED, q);
- 
- 	/*
- 	 * Remove the sysfs attributes before unregistering the queue data
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index d35ad737e8b0..a5b06eeb3874 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -57,12 +57,10 @@ ssize_t part_timeout_store(struct device *dev, struct device_attribute *attr,
- 		char *p = (char *) buf;
- 
- 		val = simple_strtoul(p, &p, 10);
--		spin_lock_irq(q->queue_lock);
- 		if (val)
--			queue_flag_set(QUEUE_FLAG_FAIL_IO, q);
-+			blk_queue_flag_set(QUEUE_FLAG_FAIL_IO, q);
- 		else
--			queue_flag_clear(QUEUE_FLAG_FAIL_IO, q);
--		spin_unlock_irq(q->queue_lock);
-+			blk_queue_flag_clear(QUEUE_FLAG_FAIL_IO, q);
++	if (attr == &sysfs_stop_when_cache_set_failed)
++		return bch_snprint_string_list(buf, PAGE_SIZE,
++					       bch_stop_on_failure_modes + 1,
++					       dc->stop_when_cache_set_failed);
++
++
+ 	sysfs_printf(data_csum,		"%i", dc->disk.data_csum);
+ 	var_printf(verify,		"%i");
+ 	var_printf(bypass_torture_test,	"%i");
+@@ -247,6 +254,15 @@ STORE(__cached_dev)
+ 		}
  	}
  
- 	return count;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index e1e2a06559dc..eca31d0ef2df 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -705,6 +705,11 @@ struct request_queue {
- 				 (1 << QUEUE_FLAG_SAME_COMP)	|	\
- 				 (1 << QUEUE_FLAG_POLL))
- 
-+void blk_queue_flag_set(unsigned int flag, struct request_queue *q);
-+void blk_queue_flag_clear(unsigned int flag, struct request_queue *q);
-+bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
-+bool blk_queue_flag_test_and_clear(unsigned int flag, struct request_queue *q);
++	if (attr == &sysfs_stop_when_cache_set_failed) {
++		v = bch_read_string_list(buf, bch_stop_on_failure_modes + 1);
 +
- /*
-  * @q->queue_lock is set while a queue is being initialized. Since we know
-  * that no other threads access the queue object before @q->queue_lock has
++		if (v < 0)
++			return v;
++
++		dc->stop_when_cache_set_failed = v;
++	}
++
+ 	if (attr == &sysfs_label) {
+ 		if (size > SB_LABEL_SIZE)
+ 			return -EINVAL;
+@@ -326,6 +342,7 @@ static struct attribute *bch_cached_dev_files[] = {
+ 	&sysfs_data_csum,
+ #endif
+ 	&sysfs_cache_mode,
++	&sysfs_stop_when_cache_set_failed,
+ 	&sysfs_writeback_metadata,
+ 	&sysfs_writeback_running,
+ 	&sysfs_writeback_delay,
 -- 
-2.16.2
+2.16.1
