@@ -1,161 +1,126 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:46977 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:44009 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751668AbeB0E7E (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Feb 2018 23:59:04 -0500
+        id S1751740AbeB0DrR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Feb 2018 22:47:17 -0500
 Subject: Re: [PATCH] bcache: fix kernel crashes when run fio in a RAID backend
  bcache device
-From: Coly Li <colyli@suse.de>
-Cc: tang.junhui@zte.com.cn, mlyle@lyle.org,
-        linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+To: tang.junhui@zte.com.cn, mlyle@lyle.org
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
 References: <1519695971-27674-1-git-send-email-tang.junhui@zte.com.cn>
- <6d3f4ac6-31b1-6369-1616-d8f461d7ff94@suse.de>
-To: "open list:SOFTWARE RAID (Multiple Disks) SUPPORT"
-        <linux-raid@vger.kernel.org>, Shaohua Li <shli@kernel.org>
-Message-ID: <0de0c603-381f-e3a1-f050-a1d76b3138be@suse.de>
-Date: Tue, 27 Feb 2018 12:58:53 +0800
+From: Coly Li <colyli@suse.de>
+Message-ID: <6d3f4ac6-31b1-6369-1616-d8f461d7ff94@suse.de>
+Date: Tue, 27 Feb 2018 11:47:06 +0800
 MIME-Version: 1.0
-In-Reply-To: <6d3f4ac6-31b1-6369-1616-d8f461d7ff94@suse.de>
+In-Reply-To: <1519695971-27674-1-git-send-email-tang.junhui@zte.com.cn>
 Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi linux-raid folks,
+On 27/02/2018 9:46 AM, tang.junhui@zte.com.cn wrote:
+> From: Tang Junhui <tang.junhui@zte.com.cn>
+> 
+> Kernel crashed when run fio in a RAID5 backend bcache device, the call 
+> trace is bellow:
+> [  440.012034] kernel BUG at block/blk-ioc.c:146!
+> [  440.012696] invalid opcode: 0000 [#1] SMP NOPTI
+> [  440.026537] CPU: 2 PID: 2205 Comm: md127_raid5 Not tainted 4.15.0 #8
+> [  440.027441] Hardware name: HP ProLiant MicroServer Gen8, BIOS J06 07/16
+> /2015
+> [  440.028615] RIP: 0010:put_io_context+0x8b/0x90
+> [  440.029246] RSP: 0018:ffffa8c882b43af8 EFLAGS: 00010246
+> [  440.029990] RAX: 0000000000000000 RBX: ffffa8c88294fca0 RCX: 0000000000
+> 0f4240
+> [  440.031006] RDX: 0000000000000004 RSI: 0000000000000286 RDI: ffffa8c882
+> 94fca0
+> [  440.032030] RBP: ffffa8c882b43b10 R08: 0000000000000003 R09: ffff949cb8
+> 0c1700
+> [  440.033206] R10: 0000000000000104 R11: 000000000000b71c R12: 00000000000
+> 01000
+> [  440.034222] R13: 0000000000000000 R14: ffff949cad84db70 R15: ffff949cb11
+> bd1e0
+> [  440.035239] FS:  0000000000000000(0000) GS:ffff949cba280000(0000) knlGS:
+> 0000000000000000
+> [  440.060190] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  440.084967] CR2: 00007ff0493ef000 CR3: 00000002f1e0a002 CR4: 00000000001
+> 606e0
+> [  440.110498] Call Trace:
+> [  440.135443]  bio_disassociate_task+0x1b/0x60
+> [  440.160355]  bio_free+0x1b/0x60
+> [  440.184666]  bio_put+0x23/0x30
+> [  440.208272]  search_free+0x23/0x40 [bcache]
+> [  440.231448]  cached_dev_write_complete+0x31/0x70 [bcache]
+> [  440.254468]  closure_put+0xb6/0xd0 [bcache]
+> [  440.277087]  request_endio+0x30/0x40 [bcache]
+> [  440.298703]  bio_endio+0xa1/0x120
+> [  440.319644]  handle_stripe+0x418/0x2270 [raid456]
+> [  440.340614]  ? load_balance+0x17b/0x9c0
+> [  440.360506]  handle_active_stripes.isra.58+0x387/0x5a0 [raid456]
+> [  440.380675]  ? __release_stripe+0x15/0x20 [raid456]
+> [  440.400132]  raid5d+0x3ed/0x5d0 [raid456]
+> [  440.419193]  ? schedule+0x36/0x80
+> [  440.437932]  ? schedule_timeout+0x1d2/0x2f0
+> [  440.456136]  md_thread+0x122/0x150
+> [  440.473687]  ? wait_woken+0x80/0x80
+> [  440.491411]  kthread+0x102/0x140
+> [  440.508636]  ? find_pers+0x70/0x70
+> [  440.524927]  ? kthread_associate_blkcg+0xa0/0xa0
+> [  440.541791]  ret_from_fork+0x35/0x40
+> [  440.558020] Code: c2 48 00 5b 41 5c 41 5d 5d c3 48 89 c6 4c 89 e7 e8 bb c2 
+> 48 00 48 8b 3d bc 36 4b 01 48 89 de e8 7c f7 e0 ff 5b 41 5c 41 5d 5d c3 <0f> 0b
+> 0f 1f 00 0f 1f 44 00 00 55 48 8d 47 b8 48 89 e5 41 57 41 
+> [  440.610020] RIP: put_io_context+0x8b/0x90 RSP: ffffa8c882b43af8
+> [  440.628575] ---[ end trace a1fd79d85643a73e ]--
+> 
+> All the crash issue happened when a bypass IO coming, in such scenario
+> s->iop.bio is pointed to the s->orig_bio. In search_free(), it finishes the
+> s->orig_bio by calling bio_complete(), and after that, s->iop.bio became
+> invalid, then kernel would crash when calling bio_put(). Maybe its upper
+> layer's faulty, since bio should not be freed before we calling bio_put(),
+> but we'd better calling bio_put() first before calling bio_complete() to
+> notify upper layer ending this bio.
+> 
+> This patch moves bio_complete() under bio_put() to avoid kernel crash.
+> 
+> Reported-by: Matthias Ferdinand <bcache@mfedv.net>
+> Tested-by: Matthias Ferdinand <bcache@mfedv.net>
+> Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
 
-I also forward this email to linux-raid mailing list, hope you may find
-something suspicious in raid5 code.
+Hi Junhui,
 
-Junhui hits a BUG() when bcache runs on top of md raid5, where bio
-reference count <= 0. There is no other layer on top of bcache, so the
-most suspicious part is md raid5.
+The problem is from drivers/md/raid5.c:raid5_end_write_request(), there
+is a bio_reset(bi) at tail of the function. This function assumes the
+reference count of bio is 1, and reset object memory.
 
-Junhui's fix solves the problem, but I'd like to see whether there is
-potential bug from raid5 code, which reset memory of bio then free it in
-search_free() of bcache.
+IMHO your fix is the simplest, and maybe it is the correct way as your
+change: we should try best to decrease bio reference count before
+calling bio_endio().
 
-If raid5 is built on top of bcache, it is easy to say the issue is from
-drivers/md/raid5.c:raid5_end_write_request(), there is a bio_reset(bi)
-at tail of the function. This function assumes the reference count of
-bio is 1, and reset object memory.
+Reviewed-by: Coly Li <colyli@suse.de>
 
-But after discussed with Junhui, he tells me bcache is on top of md
-raid5, then it is not clear to me how the raid5 taints bio from upper
-layer (bcache).
-
-Can anybody have a look and give me any hint ?
-
-P.S. Junhui's fix from bcache side is good, I just want to figure out
-what exactly the root cause is.
-
-Thanks in advance.
+Thanks.
 
 Coly Li
 
-On 27/02/2018 11:47 AM, Coly Li wrote:
-> On 27/02/2018 9:46 AM, tang.junhui@zte.com.cn wrote:
->> From: Tang Junhui <tang.junhui@zte.com.cn>
->>
->> Kernel crashed when run fio in a RAID5 backend bcache device, the call 
->> trace is bellow:
->> [  440.012034] kernel BUG at block/blk-ioc.c:146!
->> [  440.012696] invalid opcode: 0000 [#1] SMP NOPTI
->> [  440.026537] CPU: 2 PID: 2205 Comm: md127_raid5 Not tainted 4.15.0 #8
->> [  440.027441] Hardware name: HP ProLiant MicroServer Gen8, BIOS J06 07/16
->> /2015
->> [  440.028615] RIP: 0010:put_io_context+0x8b/0x90
->> [  440.029246] RSP: 0018:ffffa8c882b43af8 EFLAGS: 00010246
->> [  440.029990] RAX: 0000000000000000 RBX: ffffa8c88294fca0 RCX: 0000000000
->> 0f4240
->> [  440.031006] RDX: 0000000000000004 RSI: 0000000000000286 RDI: ffffa8c882
->> 94fca0
->> [  440.032030] RBP: ffffa8c882b43b10 R08: 0000000000000003 R09: ffff949cb8
->> 0c1700
->> [  440.033206] R10: 0000000000000104 R11: 000000000000b71c R12: 00000000000
->> 01000
->> [  440.034222] R13: 0000000000000000 R14: ffff949cad84db70 R15: ffff949cb11
->> bd1e0
->> [  440.035239] FS:  0000000000000000(0000) GS:ffff949cba280000(0000) knlGS:
->> 0000000000000000
->> [  440.060190] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> [  440.084967] CR2: 00007ff0493ef000 CR3: 00000002f1e0a002 CR4: 00000000001
->> 606e0
->> [  440.110498] Call Trace:
->> [  440.135443]  bio_disassociate_task+0x1b/0x60
->> [  440.160355]  bio_free+0x1b/0x60
->> [  440.184666]  bio_put+0x23/0x30
->> [  440.208272]  search_free+0x23/0x40 [bcache]
->> [  440.231448]  cached_dev_write_complete+0x31/0x70 [bcache]
->> [  440.254468]  closure_put+0xb6/0xd0 [bcache]
->> [  440.277087]  request_endio+0x30/0x40 [bcache]
->> [  440.298703]  bio_endio+0xa1/0x120
->> [  440.319644]  handle_stripe+0x418/0x2270 [raid456]
->> [  440.340614]  ? load_balance+0x17b/0x9c0
->> [  440.360506]  handle_active_stripes.isra.58+0x387/0x5a0 [raid456]
->> [  440.380675]  ? __release_stripe+0x15/0x20 [raid456]
->> [  440.400132]  raid5d+0x3ed/0x5d0 [raid456]
->> [  440.419193]  ? schedule+0x36/0x80
->> [  440.437932]  ? schedule_timeout+0x1d2/0x2f0
->> [  440.456136]  md_thread+0x122/0x150
->> [  440.473687]  ? wait_woken+0x80/0x80
->> [  440.491411]  kthread+0x102/0x140
->> [  440.508636]  ? find_pers+0x70/0x70
->> [  440.524927]  ? kthread_associate_blkcg+0xa0/0xa0
->> [  440.541791]  ret_from_fork+0x35/0x40
->> [  440.558020] Code: c2 48 00 5b 41 5c 41 5d 5d c3 48 89 c6 4c 89 e7 e8 bb c2 
->> 48 00 48 8b 3d bc 36 4b 01 48 89 de e8 7c f7 e0 ff 5b 41 5c 41 5d 5d c3 <0f> 0b
->> 0f 1f 00 0f 1f 44 00 00 55 48 8d 47 b8 48 89 e5 41 57 41 
->> [  440.610020] RIP: put_io_context+0x8b/0x90 RSP: ffffa8c882b43af8
->> [  440.628575] ---[ end trace a1fd79d85643a73e ]--
->>
->> All the crash issue happened when a bypass IO coming, in such scenario
->> s->iop.bio is pointed to the s->orig_bio. In search_free(), it finishes the
->> s->orig_bio by calling bio_complete(), and after that, s->iop.bio became
->> invalid, then kernel would crash when calling bio_put(). Maybe its upper
->> layer's faulty, since bio should not be freed before we calling bio_put(),
->> but we'd better calling bio_put() first before calling bio_complete() to
->> notify upper layer ending this bio.
->>
->> This patch moves bio_complete() under bio_put() to avoid kernel crash.
->>
->> Reported-by: Matthias Ferdinand <bcache@mfedv.net>
->> Tested-by: Matthias Ferdinand <bcache@mfedv.net>
->> Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+> ---
+>  drivers/md/bcache/request.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Hi Junhui,
+> diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+> index 643c3021..eb4e305 100644
+> --- a/drivers/md/bcache/request.c
+> +++ b/drivers/md/bcache/request.c
+> @@ -637,11 +637,11 @@ static void do_bio_hook(struct search *s, struct bio *orig_bio)
+>  static void search_free(struct closure *cl)
+>  {
+>  	struct search *s = container_of(cl, struct search, cl);
+> -	bio_complete(s);
+>  
+>  	if (s->iop.bio)
+>  		bio_put(s->iop.bio);
+>  
+> +	bio_complete(s);
+>  	closure_debug_destroy(cl);
+>  	mempool_free(s, s->d->c->search);
+>  }
 > 
-> The problem is from drivers/md/raid5.c:raid5_end_write_request(), there
-> is a bio_reset(bi) at tail of the function. This function assumes the
-> reference count of bio is 1, and reset object memory.
-> 
-> IMHO your fix is the simplest, and maybe it is the correct way as your
-> change: we should try best to decrease bio reference count before
-> calling bio_endio().
-> 
-> Reviewed-by: Coly Li <colyli@suse.de>
-> 
-> Thanks.
-> 
-> Coly Li
-> 
->> ---
->>  drivers/md/bcache/request.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
->> index 643c3021..eb4e305 100644
->> --- a/drivers/md/bcache/request.c
->> +++ b/drivers/md/bcache/request.c
->> @@ -637,11 +637,11 @@ static void do_bio_hook(struct search *s, struct bio *orig_bio)
->>  static void search_free(struct closure *cl)
->>  {
->>  	struct search *s = container_of(cl, struct search, cl);
->> -	bio_complete(s);
->>  
->>  	if (s->iop.bio)
->>  		bio_put(s->iop.bio);
->>  
->> +	bio_complete(s);
->>  	closure_debug_destroy(cl);
->>  	mempool_free(s, s->d->c->search);
->>  }
->>
