@@ -1,54 +1,44 @@
-Return-Path: <roman.penyaev@profitbricks.com>
-Return-Path: <roman.penyaev@profitbricks.com>
-From: Roman Pen <roman.penyaev@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Or Gerlitz <ogerlitz@mellanox.com>,
-	Roman Pen <roman.penyaev@profitbricks.com>,
-	Danil Kipnis <danil.kipnis@profitbricks.com>,
-	Jack Wang <jinpu.wang@profitbricks.com>
-Subject: [PATCH 24/24] MAINTAINERS: Add maintainer for IBNBD/IBTRS modules
-Date: Fri,  2 Feb 2018 15:09:04 +0100
-Message-Id: <20180202140904.2017-25-roman.penyaev@profitbricks.com>
-In-Reply-To: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
-References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f171.google.com ([209.85.192.171]:39917 "EHLO
+        mail-pf0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751689AbeB0SHI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Feb 2018 13:07:08 -0500
+Received: by mail-pf0-f171.google.com with SMTP id u5so1522709pfh.6
+        for <linux-block@vger.kernel.org>; Tue, 27 Feb 2018 10:07:08 -0800 (PST)
+Subject: Re: [PATCH v7 4/9] bcache: add CACHE_SET_IO_DISABLE to struct
+ cache_set flags
+To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Junhui Tang <tang.junhui@zte.com.cn>,
+        Pavel Vazharov <freakpv@gmail.com>
+References: <20180227165557.20442-1-colyli@suse.de>
+ <20180227165557.20442-5-colyli@suse.de>
+From: Michael Lyle <mlyle@lyle.org>
+Message-ID: <aefa3d5a-f168-9105-385a-4bb6bf6fa136@lyle.org>
+Date: Tue, 27 Feb 2018 10:07:05 -0800
+MIME-Version: 1.0
+In-Reply-To: <20180227165557.20442-5-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Cc: Danil Kipnis <danil.kipnis@profitbricks.com>
-Cc: Jack Wang <jinpu.wang@profitbricks.com>
----
- MAINTAINERS | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+Hi Coly Li--
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 18994806e441..fad9c2529f8a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -6714,6 +6714,20 @@ IBM ServeRAID RAID DRIVER
- S:	Orphan
- F:	drivers/scsi/ips.*
- 
-+IBNBD BLOCK DRIVERS
-+M:	IBNBD/IBTRS Storage Team <ibnbd@profitbricks.com>
-+L:	linux-block@vger.kernel.org
-+S:	Maintained
-+T:	git git://github.com/profitbricks/ibnbd.git
-+F:	drivers/block/ibnbd/
-+
-+IBTRS TRANSPORT DRIVERS
-+M:	IBNBD/IBTRS Storage Team <ibnbd@profitbricks.com>
-+L:	linux-rdma@vger.kernel.org
-+S:	Maintained
-+T:	git git://github.com/profitbricks/ibnbd.git
-+F:	drivers/infiniband/ulp/ibtrs/
-+
- ICH LPC AND GPIO DRIVER
- M:	Peter Tyser <ptyser@xes-inc.com>
- S:	Maintained
--- 
-2.13.1
+On 02/27/2018 08:55 AM, Coly Li wrote:
+> When too many I/Os failed on cache device, bch_cache_set_error() is called
+> in the error handling code path to retire whole problematic cache set. If
+> new I/O requests continue to come and take refcount dc->count, the cache
+> set won't be retired immediately, this is a problem.
+> 
+> Further more, there are several kernel thread and self-armed kernel work
+> may still running after bch_cache_set_error() is called. It needs to wait
+> quite a while for them to stop, or they won't stop at all. They also
+> prevent the cache set from being retired.
+
+It's too bad this is necessary-- I wish the IO layer could latch error
+for us in some kind of meaningful way instead of us having to do it
+ourselves (and for filesystems, etc, having to each do similar things to
+prevent just continuously hitting IO timeouts).  That said, the code
+looks good.
+
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
