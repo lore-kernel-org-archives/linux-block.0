@@ -1,44 +1,49 @@
-Return-Path: <ebiggers3@gmail.com>
-Return-Path: <ebiggers3@gmail.com>
-Date: Mon, 26 Feb 2018 11:09:49 -0800
-From: Eric Biggers <ebiggers3@gmail.com>
-To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc: Eric Biggers <ebiggers@google.com>
-Subject: Re: [PATCH] blktrace_api.h: fix comment for struct
- blk_user_trace_setup
-Message-ID: <20180226190949.GB177108@gmail.com>
-References: <20180127005806.105338-1-ebiggers3@gmail.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f41.google.com ([74.125.82.41]:52901 "EHLO
+        mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932327AbeB0P5p (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Feb 2018 10:57:45 -0500
+Received: by mail-wm0-f41.google.com with SMTP id t3so25032717wmc.2
+        for <linux-block@vger.kernel.org>; Tue, 27 Feb 2018 07:57:44 -0800 (PST)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH V4] lightnvm: simplify geometry structure
+Date: Tue, 27 Feb 2018 16:57:11 +0100
+Message-Id: <1519747032-25704-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180127005806.105338-1-ebiggers3@gmail.com>
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On Fri, Jan 26, 2018 at 04:58:06PM -0800, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> 'struct blk_user_trace_setup' is passed to BLKTRACESETUP, not
-> BLKTRACESTART.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  include/uapi/linux/blktrace_api.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/include/uapi/linux/blktrace_api.h b/include/uapi/linux/blktrace_api.h
-> index 20d1490d6377..3c50e07ee833 100644
-> --- a/include/uapi/linux/blktrace_api.h
-> +++ b/include/uapi/linux/blktrace_api.h
-> @@ -131,7 +131,7 @@ enum {
->  #define BLKTRACE_BDEV_SIZE	32
->  
->  /*
-> - * User setup structure passed with BLKTRACESTART
-> + * User setup structure passed with BLKTRACESETUP
->   */
->  struct blk_user_trace_setup {
->  	char name[BLKTRACE_BDEV_SIZE];	/* output */
-> -- 
-> 2.16.0.rc1.238.g530d649a79-goog
-> 
+Sending this separately as it seems to be the controversial one.
 
-Ping.
+# Changes since V3
+>From Matias:
+  - Remove nvm_common_geo
+  - Do appropriate renames when having a single geometry for device and
+    targets
+
+Javier
+
+Javier González (1):
+  lightnvm: simplify geometry structure.
+
+ drivers/lightnvm/core.c          | 114 +++++--------
+ drivers/lightnvm/pblk-core.c     |  16 +-
+ drivers/lightnvm/pblk-gc.c       |   2 +-
+ drivers/lightnvm/pblk-init.c     | 123 +++++++-------
+ drivers/lightnvm/pblk-read.c     |   2 +-
+ drivers/lightnvm/pblk-recovery.c |  14 +-
+ drivers/lightnvm/pblk-rl.c       |   2 +-
+ drivers/lightnvm/pblk-sysfs.c    |  39 +++--
+ drivers/lightnvm/pblk-write.c    |   2 +-
+ drivers/lightnvm/pblk.h          |  93 +++++------
+ drivers/nvme/host/lightnvm.c     | 344 +++++++++++++++++++++++----------------
+ include/linux/lightnvm.h         | 202 ++++++++++++-----------
+ 12 files changed, 501 insertions(+), 452 deletions(-)
+
+-- 
+2.7.4
