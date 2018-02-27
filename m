@@ -1,83 +1,288 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Subject: [PATCH 05/15] lightnvm: complete geo structure with maxoc*
-Date: Wed, 28 Feb 2018 16:49:25 +0100
-Message-Id: <1519832975-25432-6-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1519832975-25432-1-git-send-email-javier@cnexlabs.com>
-References: <1519832975-25432-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:33902 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751552AbeB0Sxz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Feb 2018 13:53:55 -0500
+Received: by mail-pg0-f66.google.com with SMTP id m19so7872525pgn.1
+        for <linux-block@vger.kernel.org>; Tue, 27 Feb 2018 10:53:55 -0800 (PST)
+Subject: Re: [PATCH v7 3/9] bcache: stop dc->writeback_rate_update properly
+To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>
+References: <20180227165557.20442-1-colyli@suse.de>
+ <20180227165557.20442-4-colyli@suse.de>
+From: Michael Lyle <mlyle@lyle.org>
+Message-ID: <a8268739-89db-fd4c-0213-2990b4650f31@lyle.org>
+Date: Tue, 27 Feb 2018 10:53:52 -0800
 MIME-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org,
- =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="utf-8"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20180227165557.20442-4-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Q29tcGxldGUgdGhlIGdlbmVyaWMgZ2VvbWV0cnkgc3RydWN0dXJlIHdpdGggdGhlIG1heG9jIGFu
-ZCBtYXhvY3B1CmZlbGRzLCBwcmVzZW50IGluIHRoZSAyLjAgc3BlYy4gQWxzbywgZXhwb3NlIHRo
-ZW0gdGhyb3VnaCBzeXNmcy4KClNpZ25lZC1vZmYtYnk6IEphdmllciBHb256w6FsZXogPGphdmll
-ckBjbmV4bGFicy5jb20+Ci0tLQogZHJpdmVycy9udm1lL2hvc3QvbGlnaHRudm0uYyB8IDE3ICsr
-KysrKysrKysrKysrKysrCiBpbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmggICAgIHwgIDIgKysKIDIg
-ZmlsZXMgY2hhbmdlZCwgMTkgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL2RyaXZlcnMvbnZt
-ZS9ob3N0L2xpZ2h0bnZtLmMgYi9kcml2ZXJzL252bWUvaG9zdC9saWdodG52bS5jCmluZGV4IDg1
-ZjMzNmE3OWNkYS4uYWZiNWY4ODNmOGM4IDEwMDY0NAotLS0gYS9kcml2ZXJzL252bWUvaG9zdC9s
-aWdodG52bS5jCisrKyBiL2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMKQEAgLTMyMyw2ICsz
-MjMsMTMgQEAgc3RhdGljIGludCBudm1lX252bV9zZXR1cF8xMihzdHJ1Y3QgbnZtZV9udm1faWQx
-MiAqaWQsCiAJZ2VvLT53c19vcHQgPSBzZWNfcGVyX3BnOwogCWdlby0+bXdfY3VuaXRzID0gZ2Vv
-LT53c19vcHQgPDwgMzsJLyogZGVmYXVsdCB0byBNTEMgc2FmZSB2YWx1ZXMgKi8KIAorCS8qIERv
-IG5vdCBpbXBvc2UgdmFsdWVzIGZvciBtYXhpbXVtIG51bWJlciBvZiBvcGVuIGJsb2NrcyBhcyBp
-dCBpcworCSAqIHVuc3BlY2lmaWVkIGluIDEuMi4gVXNlcnMgb2YgMS4yIG11c3QgYmUgYXdhcmUg
-b2YgdGhpcyBhbmQgZXZlbnR1YWxseQorCSAqIHNwZWNpZnkgdGhlc2UgdmFsdWVzIHRocm91Z2gg
-YSBxdWlyayBpZiByZXN0cmljdGlvbnMgYXBwbHkuCisJICovCisJZ2VvLT5tYXhvYyA9IGdlby0+
-YWxsX2x1bnMgKiBnZW8tPm5yX2Noa3M7CisJZ2VvLT5tYXhvY3B1ID0gZ2VvLT5ucl9jaGtzOwor
-CiAJZ2VvLT5jYXAgPSBsZTMyX3RvX2NwdShzcmMtPm1jY2FwKTsKIAogCWdlby0+dHJkdCA9IGxl
-MzJfdG9fY3B1KHNyYy0+dHJkdCk7CkBAIC00MTAsNiArNDE3LDggQEAgc3RhdGljIGludCBudm1l
-X252bV9zZXR1cF8yMChzdHJ1Y3QgbnZtZV9udm1faWQyMCAqaWQsCiAJZ2VvLT53c19taW4gPSBs
-ZTMyX3RvX2NwdShpZC0+d3NfbWluKTsKIAlnZW8tPndzX29wdCA9IGxlMzJfdG9fY3B1KGlkLT53
-c19vcHQpOwogCWdlby0+bXdfY3VuaXRzID0gbGUzMl90b19jcHUoaWQtPm13X2N1bml0cyk7CisJ
-Z2VvLT5tYXhvYyA9IGxlMzJfdG9fY3B1KGlkLT5tYXhvYyk7CisJZ2VvLT5tYXhvY3B1ID0gbGUz
-Ml90b19jcHUoaWQtPm1heG9jcHUpOwogCiAJZ2VvLT5jYXAgPSBsZTMyX3RvX2NwdShpZC0+bWNj
-YXApOwogCkBAIC0xMDU0LDYgKzEwNjMsMTAgQEAgc3RhdGljIHNzaXplX3QgbnZtX2Rldl9hdHRy
-X3Nob3dfMjAoc3RydWN0IGRldmljZSAqZGV2LAogCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBB
-R0VfU0laRSwgIiV1XG4iLCBnZW8tPndzX21pbik7CiAJfSBlbHNlIGlmIChzdHJjbXAoYXR0ci0+
-bmFtZSwgIndzX29wdCIpID09IDApIHsKIAkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdFX1NJ
-WkUsICIldVxuIiwgZ2VvLT53c19vcHQpOworCX0gZWxzZSBpZiAoc3RyY21wKGF0dHItPm5hbWUs
-ICJtYXhvYyIpID09IDApIHsKKwkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIl
-dVxuIiwgZ2VvLT5tYXhvYyk7CisJfSBlbHNlIGlmIChzdHJjbXAoYXR0ci0+bmFtZSwgIm1heG9j
-cHUiKSA9PSAwKSB7CisJCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9TSVpFLCAiJXVcbiIs
-IGdlby0+bWF4b2NwdSk7CiAJfSBlbHNlIGlmIChzdHJjbXAoYXR0ci0+bmFtZSwgIm13X2N1bml0
-cyIpID09IDApIHsKIAkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIldVxuIiwg
-Z2VvLT5td19jdW5pdHMpOwogCX0gZWxzZSBpZiAoc3RyY21wKGF0dHItPm5hbWUsICJ3cml0ZV90
-eXAiKSA9PSAwKSB7CkBAIC0xMTUxLDYgKzExNjQsOCBAQCBzdGF0aWMgTlZNX0RFVl9BVFRSXzIw
-X1JPKGNodW5rcyk7CiBzdGF0aWMgTlZNX0RFVl9BVFRSXzIwX1JPKGNsYmEpOwogc3RhdGljIE5W
-TV9ERVZfQVRUUl8yMF9STyh3c19taW4pOwogc3RhdGljIE5WTV9ERVZfQVRUUl8yMF9STyh3c19v
-cHQpOworc3RhdGljIE5WTV9ERVZfQVRUUl8yMF9STyhtYXhvYyk7CitzdGF0aWMgTlZNX0RFVl9B
-VFRSXzIwX1JPKG1heG9jcHUpOwogc3RhdGljIE5WTV9ERVZfQVRUUl8yMF9STyhtd19jdW5pdHMp
-Owogc3RhdGljIE5WTV9ERVZfQVRUUl8yMF9STyh3cml0ZV90eXApOwogc3RhdGljIE5WTV9ERVZf
-QVRUUl8yMF9STyh3cml0ZV9tYXgpOwpAQCAtMTE2Nyw2ICsxMTgyLDggQEAgc3RhdGljIHN0cnVj
-dCBhdHRyaWJ1dGUgKm52bV9kZXZfYXR0cnNfMjBbXSA9IHsKIAkmZGV2X2F0dHJfY2xiYS5hdHRy
-LAogCSZkZXZfYXR0cl93c19taW4uYXR0ciwKIAkmZGV2X2F0dHJfd3Nfb3B0LmF0dHIsCisJJmRl
-dl9hdHRyX21heG9jLmF0dHIsCisJJmRldl9hdHRyX21heG9jcHUuYXR0ciwKIAkmZGV2X2F0dHJf
-bXdfY3VuaXRzLmF0dHIsCiAKIAkmZGV2X2F0dHJfcmVhZF90eXAuYXR0ciwKZGlmZiAtLWdpdCBh
-L2luY2x1ZGUvbGludXgvbGlnaHRudm0uaCBiL2luY2x1ZGUvbGludXgvbGlnaHRudm0uaAppbmRl
-eCBiOGJjMTU4YTI0NzIuLjIxMDJiMDkyYzdlYiAxMDA2NDQKLS0tIGEvaW5jbHVkZS9saW51eC9s
-aWdodG52bS5oCisrKyBiL2luY2x1ZGUvbGludXgvbGlnaHRudm0uaApAQCAtMjk2LDYgKzI5Niw4
-IEBAIHN0cnVjdCBudm1fZ2VvIHsKIAl1MzIJd3NfbWluOwkJLyogbWluaW11bSB3cml0ZSBzaXpl
-ICovCiAJdTMyCXdzX29wdDsJCS8qIG9wdGltYWwgd3JpdGUgc2l6ZSAqLwogCXUzMgltd19jdW5p
-dHM7CS8qIGRpc3RhbmNlIHJlcXVpcmVkIGZvciBzdWNjZXNzZnVsIHJlYWQgKi8KKwl1MzIJbWF4
-b2M7CQkvKiBtYXhpbXVtIG9wZW4gY2h1bmtzICovCisJdTMyCW1heG9jcHU7CS8qIG1heGltdW0g
-b3BlbiBjaHVua3MgcGVyIHBhcmFsbGVsIHVuaXQgKi8KIAogCS8qIGRldmljZSBjYXBhYmlsaXRp
-ZXMuIE5vdGUgdGhhdCB0aGlzIHJlcHJlc2VudHMgY2FwYWJpbGl0aWVzIGluIDEuMgogCSAqIGFu
-ZCBtZWRpYSBhbmQgY29udHJvbGxlciBjYXBhYmlsaXRpZXMgaW4gMi4wCi0tIAoyLjcuNAoKCl9f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkxpbnV4LW52bWUg
-bWFpbGluZyBsaXN0CkxpbnV4LW52bWVAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8vbGlzdHMu
-aW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4LW52bWUK
+OK, I have convinced myself this is safe.
+
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
+
+On 02/27/2018 08:55 AM, Coly Li wrote:
+> struct delayed_work writeback_rate_update in struct cache_dev is a delayed
+> worker to call function update_writeback_rate() in period (the interval is
+> defined by dc->writeback_rate_update_seconds).
+> 
+> When a metadate I/O error happens on cache device, bcache error handling
+> routine bch_cache_set_error() will call bch_cache_set_unregister() to
+> retire whole cache set. On the unregister code path, this delayed work is
+> stopped by calling cancel_delayed_work_sync(&dc->writeback_rate_update).
+> 
+> dc->writeback_rate_update is a special delayed work from others in bcache.
+> In its routine update_writeback_rate(), this delayed work is re-armed
+> itself. That means when cancel_delayed_work_sync() returns, this delayed
+> work can still be executed after several seconds defined by
+> dc->writeback_rate_update_seconds.
+> 
+> The problem is, after cancel_delayed_work_sync() returns, the cache set
+> unregister code path will continue and release memory of struct cache set.
+> Then the delayed work is scheduled to run, __update_writeback_rate()
+> will reference the already released cache_set memory, and trigger a NULL
+> pointer deference fault.
+> 
+> This patch introduces two more bcache device flags,
+> - BCACHE_DEV_WB_RUNNING
+>   bit set:  bcache device is in writeback mode and running, it is OK for
+>             dc->writeback_rate_update to re-arm itself.
+>   bit clear:bcache device is trying to stop dc->writeback_rate_update,
+>             this delayed work should not re-arm itself and quit.
+> - BCACHE_DEV_RATE_DW_RUNNING
+>   bit set:  routine update_writeback_rate() is executing.
+>   bit clear: routine update_writeback_rate() quits.
+> 
+> This patch also adds a function cancel_writeback_rate_update_dwork() to
+> wait for dc->writeback_rate_update quits before cancel it by calling
+> cancel_delayed_work_sync(). In order to avoid a deadlock by unexpected
+> quit dc->writeback_rate_update, after time_out seconds this function will
+> give up and continue to call cancel_delayed_work_sync().
+> 
+> And here I explain how this patch stops self re-armed delayed work properly
+> with the above stuffs.
+> 
+> update_writeback_rate() sets BCACHE_DEV_RATE_DW_RUNNING at its beginning
+> and clears BCACHE_DEV_RATE_DW_RUNNING at its end. Before calling
+> cancel_writeback_rate_update_dwork() clear flag BCACHE_DEV_WB_RUNNING.
+> 
+> Before calling cancel_delayed_work_sync() wait utill flag
+> BCACHE_DEV_RATE_DW_RUNNING is clear. So when calling
+> cancel_delayed_work_sync(), dc->writeback_rate_update must be already re-
+> armed, or quite by seeing BCACHE_DEV_WB_RUNNING cleared. In both cases
+> delayed work routine update_writeback_rate() won't be executed after
+> cancel_delayed_work_sync() returns.
+> 
+> Inside update_writeback_rate() before calling schedule_delayed_work(), flag
+> BCACHE_DEV_WB_RUNNING is checked before. If this flag is cleared, it means
+> someone is about to stop the delayed work. Because flag
+> BCACHE_DEV_RATE_DW_RUNNING is set already and cancel_delayed_work_sync()
+> has to wait for this flag to be cleared, we don't need to worry about race
+> condition here.
+> 
+> If update_writeback_rate() is scheduled to run after checking
+> BCACHE_DEV_RATE_DW_RUNNING and before calling cancel_delayed_work_sync()
+> in cancel_writeback_rate_update_dwork(), it is also safe. Because at this
+> moment BCACHE_DEV_WB_RUNNING is cleared with memory barrier. As I mentioned
+> previously, update_writeback_rate() will see BCACHE_DEV_WB_RUNNING is clear
+> and quit immediately.
+> 
+> Because there are more dependences inside update_writeback_rate() to struct
+> cache_set memory, dc->writeback_rate_update is not a simple self re-arm
+> delayed work. After trying many different methods (e.g. hold dc->count, or
+> use locks), this is the only way I can find which works to properly stop
+> dc->writeback_rate_update delayed work.
+> 
+> Changelog:
+> v3: change values of BCACHE_DEV_WB_RUNNING and BCACHE_DEV_RATE_DW_RUNNING
+>     to bit index, for test_bit().
+> v2: Try to fix the race issue which is pointed out by Junhui.
+> v1: The initial version for review
+> 
+> Signed-off-by: Coly Li <colyli@suse.de>
+> Reviewed-by: Junhui Tang <tang.junhui@zte.com.cn>
+> Cc: Michael Lyle <mlyle@lyle.org>
+> Cc: Hannes Reinecke <hare@suse.com>
+> ---
+>  drivers/md/bcache/bcache.h    |  9 +++++----
+>  drivers/md/bcache/super.c     | 39 +++++++++++++++++++++++++++++++++++----
+>  drivers/md/bcache/sysfs.c     |  3 ++-
+>  drivers/md/bcache/writeback.c | 29 ++++++++++++++++++++++++++++-
+>  4 files changed, 70 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+> index 12e5197f186c..b5ddb848cd31 100644
+> --- a/drivers/md/bcache/bcache.h
+> +++ b/drivers/md/bcache/bcache.h
+> @@ -258,10 +258,11 @@ struct bcache_device {
+>  	struct gendisk		*disk;
+>  
+>  	unsigned long		flags;
+> -#define BCACHE_DEV_CLOSING	0
+> -#define BCACHE_DEV_DETACHING	1
+> -#define BCACHE_DEV_UNLINK_DONE	2
+> -
+> +#define BCACHE_DEV_CLOSING		0
+> +#define BCACHE_DEV_DETACHING		1
+> +#define BCACHE_DEV_UNLINK_DONE		2
+> +#define BCACHE_DEV_WB_RUNNING		3
+> +#define BCACHE_DEV_RATE_DW_RUNNING	4
+>  	unsigned		nr_stripes;
+>  	unsigned		stripe_size;
+>  	atomic_t		*stripe_sectors_dirty;
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index 9b745c5c1980..531cd967c05f 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -899,6 +899,32 @@ void bch_cached_dev_run(struct cached_dev *dc)
+>  		pr_debug("error creating sysfs link");
+>  }
+>  
+> +/*
+> + * If BCACHE_DEV_RATE_DW_RUNNING is set, it means routine of the delayed
+> + * work dc->writeback_rate_update is running. Wait until the routine
+> + * quits (BCACHE_DEV_RATE_DW_RUNNING is clear), then continue to
+> + * cancel it. If BCACHE_DEV_RATE_DW_RUNNING is not clear after time_out
+> + * seconds, give up waiting here and continue to cancel it too.
+> + */
+> +static void cancel_writeback_rate_update_dwork(struct cached_dev *dc)
+> +{
+> +	int time_out = WRITEBACK_RATE_UPDATE_SECS_MAX * HZ;
+> +
+> +	do {
+> +		if (!test_bit(BCACHE_DEV_RATE_DW_RUNNING,
+> +			      &dc->disk.flags))
+> +			break;
+> +		time_out--;
+> +		schedule_timeout_interruptible(1);
+> +	} while (time_out > 0);
+> +
+> +	if (time_out == 0)
+> +		pr_warn("give up waiting for dc->writeback_write_update"
+> +			" to quit");
+> +
+> +	cancel_delayed_work_sync(&dc->writeback_rate_update);
+> +}
+> +
+>  static void cached_dev_detach_finish(struct work_struct *w)
+>  {
+>  	struct cached_dev *dc = container_of(w, struct cached_dev, detach);
+> @@ -911,7 +937,9 @@ static void cached_dev_detach_finish(struct work_struct *w)
+>  
+>  	mutex_lock(&bch_register_lock);
+>  
+> -	cancel_delayed_work_sync(&dc->writeback_rate_update);
+> +	if (test_and_clear_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags))
+> +		cancel_writeback_rate_update_dwork(dc);
+> +
+>  	if (!IS_ERR_OR_NULL(dc->writeback_thread)) {
+>  		kthread_stop(dc->writeback_thread);
+>  		dc->writeback_thread = NULL;
+> @@ -954,6 +982,7 @@ void bch_cached_dev_detach(struct cached_dev *dc)
+>  	closure_get(&dc->disk.cl);
+>  
+>  	bch_writeback_queue(dc);
+> +
+>  	cached_dev_put(dc);
+>  }
+>  
+> @@ -1081,14 +1110,16 @@ static void cached_dev_free(struct closure *cl)
+>  {
+>  	struct cached_dev *dc = container_of(cl, struct cached_dev, disk.cl);
+>  
+> -	cancel_delayed_work_sync(&dc->writeback_rate_update);
+> +	mutex_lock(&bch_register_lock);
+> +
+> +	if (test_and_clear_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags))
+> +		cancel_writeback_rate_update_dwork(dc);
+> +
+>  	if (!IS_ERR_OR_NULL(dc->writeback_thread))
+>  		kthread_stop(dc->writeback_thread);
+>  	if (dc->writeback_write_wq)
+>  		destroy_workqueue(dc->writeback_write_wq);
+>  
+> -	mutex_lock(&bch_register_lock);
+> -
+>  	if (atomic_read(&dc->running))
+>  		bd_unlink_disk_holder(dc->bdev, dc->disk.disk);
+>  	bcache_device_free(&dc->disk);
+> diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+> index 78cd7bd50fdd..55673508628f 100644
+> --- a/drivers/md/bcache/sysfs.c
+> +++ b/drivers/md/bcache/sysfs.c
+> @@ -309,7 +309,8 @@ STORE(bch_cached_dev)
+>  		bch_writeback_queue(dc);
+>  
+>  	if (attr == &sysfs_writeback_percent)
+> -		schedule_delayed_work(&dc->writeback_rate_update,
+> +		if (!test_and_set_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags))
+> +			schedule_delayed_work(&dc->writeback_rate_update,
+>  				      dc->writeback_rate_update_seconds * HZ);
+>  
+>  	mutex_unlock(&bch_register_lock);
+> diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+> index 4dbeaaa575bf..8f98ef1038d3 100644
+> --- a/drivers/md/bcache/writeback.c
+> +++ b/drivers/md/bcache/writeback.c
+> @@ -115,6 +115,21 @@ static void update_writeback_rate(struct work_struct *work)
+>  					     struct cached_dev,
+>  					     writeback_rate_update);
+>  
+> +	/*
+> +	 * should check BCACHE_DEV_RATE_DW_RUNNING before calling
+> +	 * cancel_delayed_work_sync().
+> +	 */
+> +	set_bit(BCACHE_DEV_RATE_DW_RUNNING, &dc->disk.flags);
+> +	/* paired with where BCACHE_DEV_RATE_DW_RUNNING is tested */
+> +	smp_mb();
+> +
+> +	if (!test_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags)) {
+> +		clear_bit(BCACHE_DEV_RATE_DW_RUNNING, &dc->disk.flags);
+> +		/* paired with where BCACHE_DEV_RATE_DW_RUNNING is tested */
+> +		smp_mb();
+> +		return;
+> +	}
+> +
+>  	down_read(&dc->writeback_lock);
+>  
+>  	if (atomic_read(&dc->has_dirty) &&
+> @@ -123,8 +138,18 @@ static void update_writeback_rate(struct work_struct *work)
+>  
+>  	up_read(&dc->writeback_lock);
+>  
+> -	schedule_delayed_work(&dc->writeback_rate_update,
+> +	if (test_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags)) {
+> +		schedule_delayed_work(&dc->writeback_rate_update,
+>  			      dc->writeback_rate_update_seconds * HZ);
+> +	}
+> +
+> +	/*
+> +	 * should check BCACHE_DEV_RATE_DW_RUNNING before calling
+> +	 * cancel_delayed_work_sync().
+> +	 */
+> +	clear_bit(BCACHE_DEV_RATE_DW_RUNNING, &dc->disk.flags);
+> +	/* paired with where BCACHE_DEV_RATE_DW_RUNNING is tested */
+> +	smp_mb();
+>  }
+>  
+>  static unsigned writeback_delay(struct cached_dev *dc, unsigned sectors)
+> @@ -675,6 +700,7 @@ void bch_cached_dev_writeback_init(struct cached_dev *dc)
+>  	dc->writeback_rate_p_term_inverse = 40;
+>  	dc->writeback_rate_i_term_inverse = 10000;
+>  
+> +	WARN_ON(test_and_clear_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags));
+>  	INIT_DELAYED_WORK(&dc->writeback_rate_update, update_writeback_rate);
+>  }
+>  
+> @@ -693,6 +719,7 @@ int bch_cached_dev_writeback_start(struct cached_dev *dc)
+>  		return PTR_ERR(dc->writeback_thread);
+>  	}
+>  
+> +	WARN_ON(test_and_set_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags));
+>  	schedule_delayed_work(&dc->writeback_rate_update,
+>  			      dc->writeback_rate_update_seconds * HZ);
+>  
+> 
