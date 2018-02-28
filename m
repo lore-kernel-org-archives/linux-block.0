@@ -1,82 +1,88 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	linux-kernel@vger.kernel.org
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Subject: [PATCH 03/15] lightnvm: add minor version to generic geometry
+Date: Wed, 28 Feb 2018 16:49:23 +0100
+Message-Id: <1519832975-25432-4-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1519832975-25432-1-git-send-email-javier@cnexlabs.com>
+References: <1519832975-25432-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
 Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 5/5] nvme: pci: pass max vectors as num_possible_cpus() to pci_alloc_irq_vectors
-Date: Tue,  6 Feb 2018 20:17:42 +0800
-Message-Id: <20180206121742.29336-6-ming.lei@redhat.com>
-In-Reply-To: <20180206121742.29336-1-ming.lei@redhat.com>
-References: <20180206121742.29336-1-ming.lei@redhat.com>
+ =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-84676c1f21 ("genirq/affinity: assign vectors to all possible CPUs")
-has switched to do irq vectors spread among all possible CPUs, so
-pass num_possible_cpus() as max vecotrs to be assigned.
-
-For example, in a 8 cores system, 0~3 online, 4~8 offline/not present,
-see 'lscpu':
-
-        [ming@box]$lscpu
-        Architecture:          x86_64
-        CPU op-mode(s):        32-bit, 64-bit
-        Byte Order:            Little Endian
-        CPU(s):                4
-        On-line CPU(s) list:   0-3
-        Thread(s) per core:    1
-        Core(s) per socket:    2
-        Socket(s):             2
-        NUMA node(s):          2
-        ...
-        NUMA node0 CPU(s):     0-3
-        NUMA node1 CPU(s):
-        ...
-
-1) before this patch, follows the allocated vectors and their affinity:
-	irq 47, cpu list 0,4
-	irq 48, cpu list 1,6
-	irq 49, cpu list 2,5
-	irq 50, cpu list 3,7
-
-2) after this patch, follows the allocated vectors and their affinity:
-	irq 43, cpu list 0
-	irq 44, cpu list 1
-	irq 45, cpu list 2
-	irq 46, cpu list 3
-	irq 47, cpu list 4
-	irq 48, cpu list 6
-	irq 49, cpu list 5
-	irq 50, cpu list 7
-
-Cc: Keith Busch <keith.busch@intel.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/nvme/host/pci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 6fe7af00a1f4..f778426c93d5 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1903,7 +1903,7 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
- 	int result, nr_io_queues;
- 	unsigned long size;
- 
--	nr_io_queues = num_present_cpus();
-+	nr_io_queues = num_possible_cpus();
- 	result = nvme_set_queue_count(&dev->ctrl, &nr_io_queues);
- 	if (result < 0)
- 		return result;
--- 
-2.9.5
+U2VwYXJhdGUgdGhlIHZlcnNpb24gYmV0d2VlbiBtYWpvciBhbmQgbWlub3Igb24gdGhlIGdlbmVy
+aWMgZ2VvbWV0cnkgYW5kCnJlcHJlc2VudCBpdCB0aHJvdWdoIHN5c2ZzIGluIHRoZSAyLjAgcGF0
+aC4gVGhlIDEuMiBwYXRoIG9ubHkgc2hvd3MgdGhlCm1ham9yIHZlcnNpb24gdG8gcHJlc2VydmUg
+dGhlIGV4aXN0aW5nIHVzZXIgc3BhY2UgaW50ZXJmYWNlLgoKU2lnbmVkLW9mZi1ieTogSmF2aWVy
+IEdvbnrDoWxleiA8amF2aWVyQGNuZXhsYWJzLmNvbT4KLS0tCiBkcml2ZXJzL2xpZ2h0bnZtL2Nv
+cmUuYyAgICAgIHwgIDQgKystLQogZHJpdmVycy9udm1lL2hvc3QvbGlnaHRudm0uYyB8IDI1ICsr
+KysrKysrKysrKysrKysrKysrLS0tLS0KIGluY2x1ZGUvbGludXgvbGlnaHRudm0uaCAgICAgfCAg
+MyArKy0KIDMgZmlsZXMgY2hhbmdlZCwgMjQgaW5zZXJ0aW9ucygrKSwgOCBkZWxldGlvbnMoLSkK
+CmRpZmYgLS1naXQgYS9kcml2ZXJzL2xpZ2h0bnZtL2NvcmUuYyBiL2RyaXZlcnMvbGlnaHRudm0v
+Y29yZS5jCmluZGV4IDlhNDE3ZDljZGYwYy4uYzRmNzJmYmFkMmJmIDEwMDY0NAotLS0gYS9kcml2
+ZXJzL2xpZ2h0bnZtL2NvcmUuYworKysgYi9kcml2ZXJzL2xpZ2h0bnZtL2NvcmUuYwpAQCAtODkw
+LDggKzg5MCw4IEBAIHN0YXRpYyBpbnQgbnZtX2luaXQoc3RydWN0IG52bV9kZXYgKmRldikKIAkJ
+Z290byBlcnI7CiAJfQogCi0JcHJfZGVidWcoIm52bTogdmVyOiV1IG52bV92ZW5kb3I6JXhcbiIs
+Ci0JCQkJZ2VvLT52ZXJfaWQsCisJcHJfZGVidWcoIm52bTogdmVyOiV1LiV1IG52bV92ZW5kb3I6
+JXhcbiIsCisJCQkJZ2VvLT5tYWpvcl92ZXJfaWQsIGdlby0+bWlub3JfdmVyX2lkLAogCQkJCWdl
+by0+dm1udCk7CiAKIAlyZXQgPSBudm1fY29yZV9pbml0KGRldik7CmRpZmYgLS1naXQgYS9kcml2
+ZXJzL252bWUvaG9zdC9saWdodG52bS5jIGIvZHJpdmVycy9udm1lL2hvc3QvbGlnaHRudm0uYwpp
+bmRleCA1YjIwMjRlYmFjNzYuLmE2MDBlNzBiNmU2YiAxMDA2NDQKLS0tIGEvZHJpdmVycy9udm1l
+L2hvc3QvbGlnaHRudm0uYworKysgYi9kcml2ZXJzL252bWUvaG9zdC9saWdodG52bS5jCkBAIC0y
+OTUsNyArMjk1LDkgQEAgc3RhdGljIGludCBudm1lX252bV9zZXR1cF8xMihzdHJ1Y3QgbnZtZV9u
+dm1faWQxMiAqaWQsCiAJCXJldHVybiAtRUlOVkFMOwogCX0KIAotCWdlby0+dmVyX2lkID0gaWQt
+PnZlcl9pZDsKKwkvKiAxLjIgc3BlYy4gb25seSByZXBvcnRzIGEgc2luZ2xlIHZlcnNpb24gaWQg
+LSB1bmZvbGQgKi8KKwlnZW8tPm1ham9yX3Zlcl9pZCA9IGlkLT52ZXJfaWQ7CisJZ2VvLT5taW5v
+cl92ZXJfaWQgPSAyOwogCiAJZ2VvLT5ucl9jaG5scyA9IHNyYy0+bnVtX2NoOwogCWdlby0+bnJf
+bHVucyA9IHNyYy0+bnVtX2x1bjsKQEAgLTM4MCw3ICszODIsMTQgQEAgc3RhdGljIHZvaWQgbnZt
+ZV9udm1fc2V0X2FkZHJfMjAoc3RydWN0IG52bV9hZGRyX2Zvcm1hdCAqZHN0LAogc3RhdGljIGlu
+dCBudm1lX252bV9zZXR1cF8yMChzdHJ1Y3QgbnZtZV9udm1faWQyMCAqaWQsCiAJCQkgICAgIHN0
+cnVjdCBudm1fZ2VvICpnZW8pCiB7Ci0JZ2VvLT52ZXJfaWQgPSBpZC0+bWpyOworCWdlby0+bWFq
+b3JfdmVyX2lkID0gaWQtPm1qcjsKKwlnZW8tPm1pbm9yX3Zlcl9pZCA9IGlkLT5tbnI7CisKKwlp
+ZiAoIShnZW8tPm1ham9yX3Zlcl9pZCA9PSAyICYmIGdlby0+bWlub3JfdmVyX2lkID09IDApKSB7
+CisJCXByX2VycigibnZtOiBPQ1NTRCB2ZXJzaW9uIG5vdCBzdXBwb3J0ZWQgKHYlZC4lZClcbiIs
+CisJCQkJZ2VvLT5tYWpvcl92ZXJfaWQsIGdlby0+bWlub3JfdmVyX2lkKTsKKwkJcmV0dXJuIC1F
+SU5WQUw7CisJfQogCiAJZ2VvLT5ucl9jaG5scyA9IGxlMTZfdG9fY3B1KGlkLT5udW1fZ3JwKTsK
+IAlnZW8tPm5yX2x1bnMgPSBsZTE2X3RvX2NwdShpZC0+bnVtX3B1KTsKQEAgLTkxNyw3ICs5MjYs
+MTMgQEAgc3RhdGljIHNzaXplX3QgbnZtX2Rldl9hdHRyX3Nob3coc3RydWN0IGRldmljZSAqZGV2
+LAogCWF0dHIgPSAmZGF0dHItPmF0dHI7CiAKIAlpZiAoc3RyY21wKGF0dHItPm5hbWUsICJ2ZXJz
+aW9uIikgPT0gMCkgewotCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwgIiV1XG4i
+LCBnZW8tPnZlcl9pZCk7CisJCWlmIChnZW8tPm1ham9yX3Zlcl9pZCA9PSAxKQorCQkJcmV0dXJu
+IHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIldVxuIiwKKwkJCQkJCWdlby0+bWFqb3JfdmVy
+X2lkKTsKKwkJZWxzZQorCQkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIldS4l
+dVxuIiwKKwkJCQkJCWdlby0+bWFqb3JfdmVyX2lkLAorCQkJCQkJZ2VvLT5taW5vcl92ZXJfaWQp
+OwogCX0gZWxzZSBpZiAoc3RyY21wKGF0dHItPm5hbWUsICJjYXBhYmlsaXRpZXMiKSA9PSAwKSB7
+CiAJCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9TSVpFLCAiJXVcbiIsIGdlby0+Y2FwKTsK
+IAl9IGVsc2UgaWYgKHN0cmNtcChhdHRyLT5uYW1lLCAicmVhZF90eXAiKSA9PSAwKSB7CkBAIC0x
+MTcxLDcgKzExODYsNyBAQCBpbnQgbnZtZV9udm1fcmVnaXN0ZXJfc3lzZnMoc3RydWN0IG52bWVf
+bnMgKm5zKQogCWlmICghbmRldikKIAkJcmV0dXJuIC1FSU5WQUw7CiAKLQlzd2l0Y2ggKGdlby0+
+dmVyX2lkKSB7CisJc3dpdGNoIChnZW8tPm1ham9yX3Zlcl9pZCkgewogCWNhc2UgMToKIAkJcmV0
+dXJuIHN5c2ZzX2NyZWF0ZV9ncm91cCgmZGlza190b19kZXYobnMtPmRpc2spLT5rb2JqLAogCQkJ
+CQkmbnZtX2Rldl9hdHRyX2dyb3VwXzEyKTsKQEAgLTExODgsNyArMTIwMyw3IEBAIHZvaWQgbnZt
+ZV9udm1fdW5yZWdpc3Rlcl9zeXNmcyhzdHJ1Y3QgbnZtZV9ucyAqbnMpCiAJc3RydWN0IG52bV9k
+ZXYgKm5kZXYgPSBucy0+bmRldjsKIAlzdHJ1Y3QgbnZtX2dlbyAqZ2VvID0gJm5kZXYtPmdlbzsK
+IAotCXN3aXRjaCAoZ2VvLT52ZXJfaWQpIHsKKwlzd2l0Y2ggKGdlby0+bWFqb3JfdmVyX2lkKSB7
+CiAJY2FzZSAxOgogCQlzeXNmc19yZW1vdmVfZ3JvdXAoJmRpc2tfdG9fZGV2KG5zLT5kaXNrKS0+
+a29iaiwKIAkJCQkJJm52bV9kZXZfYXR0cl9ncm91cF8xMik7CmRpZmYgLS1naXQgYS9pbmNsdWRl
+L2xpbnV4L2xpZ2h0bnZtLmggYi9pbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmgKaW5kZXggYjlmMGQy
+MDcwZGU5Li40YjJlY2JmNDVmZDkgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvbGludXgvbGlnaHRudm0u
+aAorKysgYi9pbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmgKQEAgLTI2Myw3ICsyNjMsOCBAQCBlbnVt
+IHsKIC8qIEluc3RhbmNlIGdlb21ldHJ5ICovCiBzdHJ1Y3QgbnZtX2dlbyB7CiAJLyogZGV2aWNl
+IHJlcG9ydGVkIHZlcnNpb24gKi8KLQl1OAl2ZXJfaWQ7CisJdTgJbWFqb3JfdmVyX2lkOworCXU4
+CW1pbm9yX3Zlcl9pZDsKIAogCS8qIGluc3RhbmNlIHNwZWNpZmljIGdlb21ldHJ5ICovCiAJaW50
+IG5yX2NobmxzOwotLSAKMi43LjQKCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fXwpMaW51eC1udm1lIG1haWxpbmcgbGlzdApMaW51eC1udm1lQGxpc3RzLmlu
+ZnJhZGVhZC5vcmcKaHR0cDovL2xpc3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9s
+aW51eC1udm1lCg==
