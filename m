@@ -1,137 +1,44 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Mike Snitzer <snitzer@redhat.com>
-Cc: linux-scsi@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>,
-	Arun Easi <arun.easi@cavium.com>,
-	Omar Sandoval <osandov@fb.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
+Return-Path: <prvs=590d2a92c=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
-	Don Brace <don.brace@microsemi.com>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Peter Rivera <peter.rivera@broadcom.com>,
-	Laurence Oberman <loberman@redhat.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 3/8] blk-mq: introduce 'start_tag' field to 'struct blk_mq_tags'
-Date: Tue, 27 Feb 2018 18:07:45 +0800
-Message-Id: <20180227100750.32299-4-ming.lei@redhat.com>
-In-Reply-To: <20180227100750.32299-1-ming.lei@redhat.com>
-References: <20180227100750.32299-1-ming.lei@redhat.com>
+Subject: [PATCH 07/11] iscsi: Use blk_queue_flag_set()
+Date: Wed, 28 Feb 2018 11:28:19 -0800
+Message-Id: <20180228192823.5191-8-bart.vanassche@wdc.com>
+In-Reply-To: <20180228192823.5191-1-bart.vanassche@wdc.com>
+References: <20180228192823.5191-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This patch introduces 'start_tag' field to 'struct blk_mq_tags' so that
-host wide tagset can be supported easily in the following patches by
-partitioning host wide tags into multiple hw queues.
+Use blk_queue_flag_set() instead of open-coding this function.
 
-No function change.
-
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
 Cc: Hannes Reinecke <hare@suse.de>
-Cc: Arun Easi <arun.easi@cavium.com>
-Cc: Omar Sandoval <osandov@fb.com>,
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-Cc: Christoph Hellwig <hch@lst.de>,
-Cc: Don Brace <don.brace@microsemi.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Peter Rivera <peter.rivera@broadcom.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq-tag.c | 3 ++-
- block/blk-mq-tag.h | 6 ++++--
- block/blk-mq.c     | 7 ++++---
- 3 files changed, 10 insertions(+), 6 deletions(-)
+ drivers/scsi/iscsi_tcp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 336dde07b230..5014d7343ea9 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -179,12 +179,13 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
- 	finish_wait(&ws->wait, &wait);
+diff --git a/drivers/scsi/iscsi_tcp.c b/drivers/scsi/iscsi_tcp.c
+index 6198559abbd8..07b54dfebccf 100644
+--- a/drivers/scsi/iscsi_tcp.c
++++ b/drivers/scsi/iscsi_tcp.c
+@@ -948,7 +948,7 @@ static umode_t iscsi_sw_tcp_attr_is_visible(int param_type, int param)
  
- found_tag:
--	return tag + tag_offset;
-+	return tag + tag_offset + tags->start_tag;
+ static int iscsi_sw_tcp_slave_alloc(struct scsi_device *sdev)
+ {
+-	set_bit(QUEUE_FLAG_BIDI, &sdev->request_queue->queue_flags);
++	blk_queue_flag_set(QUEUE_FLAG_BIDI, sdev->request_queue);
+ 	return 0;
  }
  
- void blk_mq_put_tag(struct blk_mq_hw_ctx *hctx, struct blk_mq_tags *tags,
- 		    struct blk_mq_ctx *ctx, unsigned int tag)
- {
-+	tag -= tags->start_tag;
- 	if (!blk_mq_tag_is_reserved(tags, tag)) {
- 		const int real_tag = tag - tags->nr_reserved_tags;
- 
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index 61deab0b5a5a..1d629920db69 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -13,6 +13,8 @@ struct blk_mq_tags {
- 
- 	atomic_t active_queues;
- 
-+	unsigned int start_tag;
-+
- 	struct sbitmap_queue bitmap_tags;
- 	struct sbitmap_queue breserved_tags;
- 
-@@ -78,13 +80,13 @@ static inline void blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
- static inline void blk_mq_tag_set_rq(struct blk_mq_hw_ctx *hctx,
- 		unsigned int tag, struct request *rq)
- {
--	hctx->tags->rqs[tag] = rq;
-+	hctx->tags->rqs[tag - hctx->tags->start_tag] = rq;
- }
- 
- static inline bool blk_mq_tag_is_reserved(struct blk_mq_tags *tags,
- 					  unsigned int tag)
- {
--	return tag < tags->nr_reserved_tags;
-+	return (tag - tags->start_tag) < tags->nr_reserved_tags;
- }
- 
- #endif
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 357492712b0e..5ea11d087f7b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -270,7 +270,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 		unsigned int tag, unsigned int op)
- {
- 	struct blk_mq_tags *tags = blk_mq_tags_from_data(data);
--	struct request *rq = tags->static_rqs[tag];
-+	struct request *rq = tags->static_rqs[tag - tags->start_tag];
- 	req_flags_t rq_flags = 0;
- 
- 	if (data->flags & BLK_MQ_REQ_INTERNAL) {
-@@ -283,7 +283,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 		}
- 		rq->tag = tag;
- 		rq->internal_tag = -1;
--		data->hctx->tags->rqs[rq->tag] = rq;
-+		data->hctx->tags->rqs[rq->tag - tags->start_tag] = rq;
- 	}
- 
- 	/* csd/requeue_work/fifo_time is initialized before use */
-@@ -801,6 +801,7 @@ EXPORT_SYMBOL(blk_mq_delay_kick_requeue_list);
- 
- struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags, unsigned int tag)
- {
-+	tag -= tags->start_tag;
- 	if (tag < tags->nr_tags) {
- 		prefetch(tags->rqs[tag]);
- 		return tags->rqs[tag];
-@@ -1076,7 +1077,7 @@ bool blk_mq_get_driver_tag(struct request *rq, struct blk_mq_hw_ctx **hctx,
- 			rq->rq_flags |= RQF_MQ_INFLIGHT;
- 			atomic_inc(&data.hctx->nr_active);
- 		}
--		data.hctx->tags->rqs[rq->tag] = rq;
-+		data.hctx->tags->rqs[rq->tag - data.hctx->tags->start_tag] = rq;
- 	}
- 
- done:
 -- 
-2.9.5
+2.16.2
