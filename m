@@ -1,18 +1,18 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:37107 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751789AbeB1A4v (ORCPT
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:40391 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751789AbeB1A4u (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Feb 2018 19:56:51 -0500
-Received: by mail-pf0-f194.google.com with SMTP id s24so321553pfm.4
-        for <linux-block@vger.kernel.org>; Tue, 27 Feb 2018 16:56:51 -0800 (PST)
+        Tue, 27 Feb 2018 19:56:50 -0500
+Received: by mail-pf0-f196.google.com with SMTP id m5so318606pff.7
+        for <linux-block@vger.kernel.org>; Tue, 27 Feb 2018 16:56:50 -0800 (PST)
 From: Omar Sandoval <osandov@osandov.com>
 To: linux-block@vger.kernel.org
 Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com,
         Tejun Heo <tj@kernel.org>
-Subject: [PATCH 2/2] sbitmap: use test_and_set_bit_lock()/clear_bit_unlock()
-Date: Tue, 27 Feb 2018 16:56:43 -0800
-Message-Id: <8e20f73a574b84a72838ad3f4dd67be9e2db70ed.1519779182.git.osandov@fb.com>
+Subject: [PATCH 1/2] block: clear ctx pending bit under ctx lock
+Date: Tue, 27 Feb 2018 16:56:42 -0800
+Message-Id: <d035a59a30e8a39176b4e4a9a92ece3c76d21399.1519779182.git.osandov@fb.com>
 In-Reply-To: <cover.1519779182.git.osandov@fb.com>
 References: <cover.1519779182.git.osandov@fb.com>
 In-Reply-To: <cover.1519779182.git.osandov@fb.com>
@@ -22,85 +22,34 @@ List-Id: linux-block@vger.kernel.org
 
 From: Omar Sandoval <osandov@fb.com>
 
-sbitmap_queue_get()/sbitmap_queue_clear() are used for
-allocating/freeing a resource, so they should provide acquire/release
-barrier semantics, respectively. sbitmap_get() currently contains a full
-barrier, which is unnecessary, so use test_and_set_bit_lock() instead of
-test_and_set_bit() (these are equivalent on x86_64). sbitmap_clear_bit()
-does not imply any barriers, which is incorrect, as accesses of the
-resource (e.g., request) could potentially get reordered to after the
-clear_bit(). Introduce sbitmap_clear_bit_unlock() and use it for
-sbitmap_queue_clear() (this only adds a compiler barrier on x86_64). The
-other existing user of sbitmap_clear_bit() (the blk-mq software queue
-pending map) is serialized through a spinlock and does not need this.
+When we insert a request, we set the software queue pending bit while
+holding the software queue lock. However, we clear it outside of the
+lock, so it's possible that a concurrent insert could reset the bit
+after we clear it but before we empty the request list. Afterwards, the
+bit would still be set but the software queue wouldn't have any requests
+in it, leading us to do a spurious run in the future. This is mostly a
+benign/theoretical issue, but it makes the following change easier to
+justify.
 
-Reported-by: Tejun Heo <tj@kernel.org>
 Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- include/linux/sbitmap.h |  8 ++++++++
- lib/sbitmap.c           | 10 +++++-----
- 2 files changed, 13 insertions(+), 5 deletions(-)
+ block/blk-mq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index 0dcc60e820de..841585f6e5f2 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -171,6 +171,8 @@ void sbitmap_resize(struct sbitmap *sb, unsigned int depth);
-  *               starting from the last allocated bit. This is less efficient
-  *               than the default behavior (false).
-  *
-+ * This operation provides acquire barrier semantics if it succeeds.
-+ *
-  * Return: Non-negative allocated bit number if successful, -1 otherwise.
-  */
- int sbitmap_get(struct sbitmap *sb, unsigned int alloc_hint, bool round_robin);
-@@ -300,6 +302,12 @@ static inline void sbitmap_clear_bit(struct sbitmap *sb, unsigned int bitnr)
- 	clear_bit(SB_NR_TO_BIT(sb, bitnr), __sbitmap_word(sb, bitnr));
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 357492712b0e..09a57d97ca7f 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -984,9 +984,9 @@ static bool flush_busy_ctx(struct sbitmap *sb, unsigned int bitnr, void *data)
+ 	struct blk_mq_hw_ctx *hctx = flush_data->hctx;
+ 	struct blk_mq_ctx *ctx = hctx->ctxs[bitnr];
+ 
+-	sbitmap_clear_bit(sb, bitnr);
+ 	spin_lock(&ctx->lock);
+ 	list_splice_tail_init(&ctx->rq_list, flush_data->list);
++	sbitmap_clear_bit(sb, bitnr);
+ 	spin_unlock(&ctx->lock);
+ 	return true;
  }
- 
-+static inline void sbitmap_clear_bit_unlock(struct sbitmap *sb,
-+					    unsigned int bitnr)
-+{
-+	clear_bit_unlock(SB_NR_TO_BIT(sb, bitnr), __sbitmap_word(sb, bitnr));
-+}
-+
- static inline int sbitmap_test_bit(struct sbitmap *sb, unsigned int bitnr)
- {
- 	return test_bit(SB_NR_TO_BIT(sb, bitnr), __sbitmap_word(sb, bitnr));
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 42b5ca0acf93..e6a9c06ec70c 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -100,7 +100,7 @@ static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
- 			return -1;
- 		}
- 
--		if (!test_and_set_bit(nr, word))
-+		if (!test_and_set_bit_lock(nr, word))
- 			break;
- 
- 		hint = nr + 1;
-@@ -434,9 +434,9 @@ static void sbq_wake_up(struct sbitmap_queue *sbq)
- 	/*
- 	 * Pairs with the memory barrier in set_current_state() to ensure the
- 	 * proper ordering of clear_bit()/waitqueue_active() in the waker and
--	 * test_and_set_bit()/prepare_to_wait()/finish_wait() in the waiter. See
--	 * the comment on waitqueue_active(). This is __after_atomic because we
--	 * just did clear_bit() in the caller.
-+	 * test_and_set_bit_lock()/prepare_to_wait()/finish_wait() in the
-+	 * waiter. See the comment on waitqueue_active(). This is __after_atomic
-+	 * because we just did clear_bit_unlock() in the caller.
- 	 */
- 	smp_mb__after_atomic();
- 
-@@ -469,7 +469,7 @@ static void sbq_wake_up(struct sbitmap_queue *sbq)
- void sbitmap_queue_clear(struct sbitmap_queue *sbq, unsigned int nr,
- 			 unsigned int cpu)
- {
--	sbitmap_clear_bit(&sbq->sb, nr);
-+	sbitmap_clear_bit_unlock(&sbq->sb, nr);
- 	sbq_wake_up(sbq);
- 	if (likely(!sbq->round_robin && nr < sbq->sb.depth))
- 		*per_cpu_ptr(sbq->alloc_hint, cpu) = nr;
 -- 
 2.16.2
