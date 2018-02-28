@@ -1,337 +1,53 @@
-Return-Path: <roman.penyaev@profitbricks.com>
-Return-Path: <roman.penyaev@profitbricks.com>
-From: Roman Pen <roman.penyaev@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Or Gerlitz <ogerlitz@mellanox.com>,
-	Roman Pen <roman.penyaev@profitbricks.com>,
-	Danil Kipnis <danil.kipnis@profitbricks.com>,
-	Jack Wang <jinpu.wang@profitbricks.com>
-Subject: [PATCH 11/24] ibtrs: server: sysfs interface functions
-Date: Fri,  2 Feb 2018 15:08:51 +0100
-Message-Id: <20180202140904.2017-12-roman.penyaev@profitbricks.com>
-In-Reply-To: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
-References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
+Return-Path: <mlyle@lyle.org>
+MIME-Version: 1.0
+In-Reply-To: <20180228192823.5191-7-bart.vanassche@wdc.com>
+References: <20180228192823.5191-1-bart.vanassche@wdc.com> <20180228192823.5191-7-bart.vanassche@wdc.com>
+From: Michael Lyle <mlyle@lyle.org>
+Date: Wed, 28 Feb 2018 12:18:51 -0800
+Message-ID: <CAJ+L6qfGhf9mYHktsG14ok6Ax=M3uL2aNjfNdW0JHctDHRLUDQ@mail.gmail.com>
+Subject: Re: [PATCH 06/11] bcache: Use the blk_queue_flag_{set,clear}() functions
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Kent Overstreet <kent.overstreet@gmail.com>, Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>, Ming Lei <ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-block@vger.kernel.org>
 
-This is the sysfs interface to IBTRS sessions on server side:
+LGTM
 
-  /sys/kernel/ibtrs_server/<SESS-NAME>/
-    *** IBTRS session accepted from a client peer
-    |
-    |- paths/<SOURCE-IP>/
-       *** established paths from a client in a session
-       |
-       |- disconnect
-       |  *** disconnect path
-       |
-       |- hca_name
-       |  *** HCA name
-       |
-       |- hca_port
-       |  *** HCA port
-       |
-       |- stats/
-          *** current path statistics
-          |
-	  |- rdma
-	  |- reset_all
-	  |- wc_completions
-
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
-Cc: Jack Wang <jinpu.wang@profitbricks.com>
----
- drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c | 278 +++++++++++++++++++++++++
- 1 file changed, 278 insertions(+)
-
-diff --git a/drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c b/drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c
-new file mode 100644
-index 000000000000..ec2c86fe4181
---- /dev/null
-+++ b/drivers/infiniband/ulp/ibtrs/ibtrs-srv-sysfs.c
-@@ -0,0 +1,278 @@
-+/*
-+ * InfiniBand Transport Layer
-+ *
-+ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
-+ * Authors: Fabian Holler <mail@fholler.de>
-+ *          Jack Wang <jinpu.wang@profitbricks.com>
-+ *          Kleber Souza <kleber.souza@profitbricks.com>
-+ *          Danil Kipnis <danil.kipnis@profitbricks.com>
-+ *          Roman Penyaev <roman.penyaev@profitbricks.com>
-+ *          Milind Dumbare <Milind.dumbare@gmail.com>
-+ *
-+ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
-+ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
-+ *          Roman Penyaev <roman.penyaev@profitbricks.com>
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version 2
-+ * of the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#undef pr_fmt
-+#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
-+
-+#include "ibtrs-pri.h"
-+#include "ibtrs-srv.h"
-+#include "ibtrs-log.h"
-+
-+static struct kobject *ibtrs_kobj;
-+
-+static struct kobj_type ktype = {
-+	.sysfs_ops	= &kobj_sysfs_ops,
-+};
-+
-+static ssize_t ibtrs_srv_disconnect_show(struct kobject *kobj,
-+					 struct kobj_attribute *attr,
-+					 char *page)
-+{
-+	return scnprintf(page, PAGE_SIZE, "Usage: echo 1 > %s\n",
-+			 attr->attr.name);
-+}
-+
-+static ssize_t ibtrs_srv_disconnect_store(struct kobject *kobj,
-+					  struct kobj_attribute *attr,
-+					  const char *buf, size_t count)
-+{
-+	struct ibtrs_srv_sess *sess;
-+	char str[MAXHOSTNAMELEN];
-+
-+	sess = container_of(kobj, struct ibtrs_srv_sess, kobj);
-+	if (!sysfs_streq(buf, "1")) {
-+		ibtrs_err(sess, "%s: invalid value: '%s'\n",
-+			  attr->attr.name, buf);
-+		return -EINVAL;
-+	}
-+
-+	sockaddr_to_str((struct sockaddr *)&sess->s.dst_addr, str, sizeof(str));
-+
-+	ibtrs_info(sess, "disconnect for path %s requested\n", str);
-+	ibtrs_srv_queue_close(sess);
-+
-+	return count;
-+}
-+
-+static struct kobj_attribute ibtrs_srv_disconnect_attr =
-+	__ATTR(disconnect, 0644,
-+	       ibtrs_srv_disconnect_show, ibtrs_srv_disconnect_store);
-+
-+static ssize_t ibtrs_srv_hca_port_show(struct kobject *kobj,
-+				       struct kobj_attribute *attr,
-+				       char *page)
-+{
-+	struct ibtrs_srv_sess *sess;
-+	struct ibtrs_con *usr_con;
-+
-+	sess = container_of(kobj, typeof(*sess), kobj);
-+	usr_con = sess->s.con[0];
-+
-+	return scnprintf(page, PAGE_SIZE, "%u\n",
-+			 usr_con->cm_id->port_num);
-+}
-+
-+static struct kobj_attribute ibtrs_srv_hca_port_attr =
-+	__ATTR(hca_port, 0444, ibtrs_srv_hca_port_show, NULL);
-+
-+static ssize_t ibtrs_srv_hca_name_show(struct kobject *kobj,
-+				       struct kobj_attribute *attr,
-+				       char *page)
-+{
-+	struct ibtrs_srv_sess *sess;
-+
-+	sess = container_of(kobj, struct ibtrs_srv_sess, kobj);
-+
-+	return scnprintf(page, PAGE_SIZE, "%s\n",
-+			 sess->s.ib_dev->dev->name);
-+}
-+
-+static struct kobj_attribute ibtrs_srv_hca_name_attr =
-+	__ATTR(hca_name, 0444, ibtrs_srv_hca_name_show, NULL);
-+
-+static struct attribute *ibtrs_srv_sess_attrs[] = {
-+	&ibtrs_srv_hca_name_attr.attr,
-+	&ibtrs_srv_hca_port_attr.attr,
-+	&ibtrs_srv_disconnect_attr.attr,
-+	NULL,
-+};
-+
-+static struct attribute_group ibtrs_srv_sess_attr_group = {
-+	.attrs = ibtrs_srv_sess_attrs,
-+};
-+
-+STAT_ATTR(struct ibtrs_srv_sess, rdma,
-+	  ibtrs_srv_stats_rdma_to_str,
-+	  ibtrs_srv_reset_rdma_stats);
-+
-+STAT_ATTR(struct ibtrs_srv_sess, wc_completion,
-+	  ibtrs_srv_stats_wc_completion_to_str,
-+	  ibtrs_srv_reset_wc_completion_stats);
-+
-+STAT_ATTR(struct ibtrs_srv_sess, reset_all,
-+	  ibtrs_srv_reset_all_help,
-+	  ibtrs_srv_reset_all_stats);
-+
-+static struct attribute *ibtrs_srv_stats_attrs[] = {
-+	&rdma_attr.attr,
-+	&wc_completion_attr.attr,
-+	&reset_all_attr.attr,
-+	NULL,
-+};
-+
-+static struct attribute_group ibtrs_srv_stats_attr_group = {
-+	.attrs = ibtrs_srv_stats_attrs,
-+};
-+
-+static int ibtrs_srv_create_once_sysfs_root_folders(struct ibtrs_srv_sess *sess)
-+{
-+	struct ibtrs_srv *srv = sess->srv;
-+	int err = 0;
-+
-+	mutex_lock(&srv->paths_mutex);
-+	if (srv->kobj.state_in_sysfs) {
-+		/* Just increase references if kobjs were already inited */
-+		kobject_get(&srv->kobj_paths);
-+		kobject_get(&srv->kobj);
-+		goto unlock;
-+	}
-+	err = kobject_init_and_add(&srv->kobj, &ktype, ibtrs_kobj,
-+				   "%s", sess->s.sessname);
-+	if (unlikely(err)) {
-+		pr_err("kobject_init_and_add(): %d\n", err);
-+		goto unlock;
-+	}
-+	err = kobject_init_and_add(&srv->kobj_paths, &ktype,
-+				   &srv->kobj, "paths");
-+	if (unlikely(err)) {
-+		pr_err("kobject_init_and_add(): %d\n", err);
-+		goto put_kobj;
-+	}
-+unlock:
-+	mutex_unlock(&srv->paths_mutex);
-+
-+	return err;
-+
-+put_kobj:
-+	kobject_del(&srv->kobj);
-+	kobject_put(&srv->kobj);
-+	goto unlock;
-+}
-+
-+static void ibtrs_srv_destroy_once_sysfs_root_folders(struct ibtrs_srv_sess *sess)
-+{
-+	struct ibtrs_srv *srv = sess->srv;
-+
-+	mutex_lock(&srv->paths_mutex);
-+	kobject_put(&srv->kobj_paths);
-+	kobject_put(&srv->kobj);
-+	mutex_unlock(&srv->paths_mutex);
-+}
-+
-+static int ibtrs_srv_create_stats_files(struct ibtrs_srv_sess *sess)
-+{
-+	int err;
-+
-+	err = kobject_init_and_add(&sess->kobj_stats, &ktype,
-+				   &sess->kobj, "stats");
-+	if (unlikely(err)) {
-+		ibtrs_err(sess, "kobject_init_and_add(): %d\n", err);
-+		return err;
-+	}
-+	err = sysfs_create_group(&sess->kobj_stats,
-+				 &ibtrs_srv_stats_attr_group);
-+	if (unlikely(err)) {
-+		ibtrs_err(sess, "sysfs_create_group(): %d\n", err);
-+		goto err;
-+	}
-+
-+	return 0;
-+
-+err:
-+	kobject_put(&sess->kobj_stats);
-+
-+	return err;
-+}
-+
-+int ibtrs_srv_create_sess_files(struct ibtrs_srv_sess *sess)
-+{
-+	struct ibtrs_srv *srv = sess->srv;
-+	char str[MAXHOSTNAMELEN];
-+	int err;
-+
-+	sockaddr_to_str((struct sockaddr *)&sess->s.dst_addr, str, sizeof(str));
-+
-+	err = ibtrs_srv_create_once_sysfs_root_folders(sess);
-+	if (unlikely(err))
-+		return err;
-+
-+	err = kobject_init_and_add(&sess->kobj, &ktype, &srv->kobj_paths,
-+				   "%s", str);
-+	if (unlikely(err)) {
-+		ibtrs_err(sess, "kobject_init_and_add(): %d\n", err);
-+		goto destroy_root;
-+	}
-+	err = sysfs_create_group(&sess->kobj, &ibtrs_srv_sess_attr_group);
-+	if (unlikely(err)) {
-+		ibtrs_err(sess, "sysfs_create_group(): %d\n", err);
-+		goto put_kobj;
-+	}
-+	err = ibtrs_srv_create_stats_files(sess);
-+	if (unlikely(err))
-+		goto remove_group;
-+
-+	return 0;
-+
-+remove_group:
-+	sysfs_remove_group(&sess->kobj, &ibtrs_srv_sess_attr_group);
-+put_kobj:
-+	kobject_del(&sess->kobj);
-+	kobject_put(&sess->kobj);
-+destroy_root:
-+	ibtrs_srv_destroy_once_sysfs_root_folders(sess);
-+
-+	return err;
-+}
-+
-+void ibtrs_srv_destroy_sess_files(struct ibtrs_srv_sess *sess)
-+{
-+	if (sess->kobj.state_in_sysfs) {
-+		kobject_del(&sess->kobj_stats);
-+		kobject_put(&sess->kobj_stats);
-+		kobject_del(&sess->kobj);
-+		kobject_put(&sess->kobj);
-+
-+		ibtrs_srv_destroy_once_sysfs_root_folders(sess);
-+	}
-+}
-+
-+int ibtrs_srv_create_sysfs_module_files(void)
-+{
-+	ibtrs_kobj = kobject_create_and_add(KBUILD_MODNAME, kernel_kobj);
-+	if (unlikely(!ibtrs_kobj))
-+		return -ENOMEM;
-+
-+	return 0;
-+}
-+
-+void ibtrs_srv_destroy_sysfs_module_files(void)
-+{
-+	kobject_del(ibtrs_kobj);
-+	kobject_put(ibtrs_kobj);
-+}
--- 
-2.13.1
+On Wed, Feb 28, 2018 at 11:28 AM, Bart Van Assche
+<bart.vanassche@wdc.com> wrote:
+> Use the blk_queue_flag_{set,clear}() functions instead of open-coding
+> these.
+>
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Michael Lyle <mlyle@lyle.org>
+> Cc: Kent Overstreet <kent.overstreet@gmail.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Hannes Reinecke <hare@suse.de>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/md/bcache/super.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index 312895788036..047e30cb93dc 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -833,9 +833,9 @@ static int bcache_device_init(struct bcache_device *d, unsigned block_size,
+>         q->limits.io_min                = block_size;
+>         q->limits.logical_block_size    = block_size;
+>         q->limits.physical_block_size   = block_size;
+> -       set_bit(QUEUE_FLAG_NONROT,      &d->disk->queue->queue_flags);
+> -       clear_bit(QUEUE_FLAG_ADD_RANDOM, &d->disk->queue->queue_flags);
+> -       set_bit(QUEUE_FLAG_DISCARD,     &d->disk->queue->queue_flags);
+> +       blk_queue_flag_set(QUEUE_FLAG_NONROT, d->disk->queue);
+> +       blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, d->disk->queue);
+> +       blk_queue_flag_set(QUEUE_FLAG_DISCARD, d->disk->queue);
+>
+>         blk_queue_write_cache(q, true, true);
+>
+> --
+> 2.16.2
+>
