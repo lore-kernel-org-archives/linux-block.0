@@ -1,137 +1,418 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f67.google.com ([209.85.160.67]:38992 "EHLO
-        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754320AbeBGTmC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Feb 2018 14:42:02 -0500
-Received: by mail-pl0-f67.google.com with SMTP id o13-v6so670267pli.6
-        for <linux-block@vger.kernel.org>; Wed, 07 Feb 2018 11:42:02 -0800 (PST)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Coly Li <colyli@suse.de>,
-        Junhui Tang <tang.junhui@zte.com.cn>
-Subject: [PATCH 4/8] bcache: set error_limit correctly
-Date: Wed,  7 Feb 2018 11:41:42 -0800
-Message-Id: <20180207194146.5095-5-mlyle@lyle.org>
-In-Reply-To: <20180207194146.5095-1-mlyle@lyle.org>
-References: <20180207194146.5095-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <gunthorp@deltatee.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org,
+	linux-nvdimm@lists.01.org,
+	linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Steve Wise <swise@opengridcomputing.com>
+Date: Wed, 28 Feb 2018 16:40:06 -0700
+Message-Id: <20180228234006.21093-11-logang@deltatee.com>
+In-Reply-To: <20180228234006.21093-1-logang@deltatee.com>
+References: <20180228234006.21093-1-logang@deltatee.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH v2 10/10] nvmet: Optionally use PCI P2P memory
+List-ID: <linux-block@vger.kernel.org>
 
-From: Coly Li <colyli@suse.de>
+We create a configfs attribute in each nvme-fabrics target port to
+enable p2p memory use. When enabled, the port will only then use the
+p2p memory if a p2p memory device can be found which is behind the
+same switch as the RDMA port and all the block devices in use. If
+the user enabled it an no devices are found, then the system will
+silently fall back on using regular memory.
 
-Struct cache uses io_errors for two purposes,
-- Error decay: when cache set error_decay is set, io_errors is used to
-  generate a small piece of delay when I/O error happens.
-- I/O errors counter: in order to generate big enough value for error
-  decay, I/O errors counter value is stored by left shifting 20 bits (a.k.a
-  IO_ERROR_SHIFT).
+If appropriate, that port will allocate memory for the RDMA buffers
+for queues from the p2pmem device falling back to system memory should
+anything fail.
 
-In function bch_count_io_errors(), if I/O errors counter reaches cache set
-error limit, bch_cache_set_error() will be called to retire the whold cache
-set. But current code is problematic when checking the error limit, see the
-following code piece from bch_count_io_errors(),
+Ideally, we'd want to use an NVME CMB buffer as p2p memory. This would
+save an extra PCI transfer as the NVME card could just take the data
+out of it's own memory. However, at this time, cards with CMB buffers
+don't seem to be available.
 
- 90     if (error) {
- 91             char buf[BDEVNAME_SIZE];
- 92             unsigned errors = atomic_add_return(1 << IO_ERROR_SHIFT,
- 93                                                 &ca->io_errors);
- 94             errors >>= IO_ERROR_SHIFT;
- 95
- 96             if (errors < ca->set->error_limit)
- 97                     pr_err("%s: IO error on %s, recovering",
- 98                            bdevname(ca->bdev, buf), m);
- 99             else
-100                     bch_cache_set_error(ca->set,
-101                                         "%s: too many IO errors %s",
-102                                         bdevname(ca->bdev, buf), m);
-103     }
-
-At line 94, errors is right shifting IO_ERROR_SHIFT bits, now it is real
-errors counter to compare at line 96. But ca->set->error_limit is initia-
-lized with an amplified value in bch_cache_set_alloc(),
-1545         c->error_limit  = 8 << IO_ERROR_SHIFT;
-
-It means by default, in bch_count_io_errors(), before 8<<20 errors happened
-bch_cache_set_error() won't be called to retire the problematic cache
-device. If the average request size is 64KB, it means bcache won't handle
-failed device until 512GB data is requested. This is too large to be an I/O
-threashold. So I believe the correct error limit should be much less.
-
-This patch sets default cache set error limit to 8, then in
-bch_count_io_errors() when errors counter reaches 8 (if it is default
-value), function bch_cache_set_error() will be called to retire the whole
-cache set. This patch also removes bits shifting when store or show
-io_error_limit value via sysfs interface.
-
-Nowadays most of SSDs handle internal flash failure automatically by LBA
-address re-indirect mapping. If an I/O error can be observed by upper layer
-code, it will be a notable error because that SSD can not re-indirect
-map the problematic LBA address to an available flash block. This situation
-indicates the whole SSD will be failed very soon. Therefore setting 8 as
-the default io error limit value makes sense, it is enough for most of
-cache devices.
-
-Changelog:
-v2: add reviewed-by from Hannes.
-v1: initial version for review.
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Tang Junhui <tang.junhui@zte.com.cn>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
+Signed-off-by: Stephen Bates <sbates@raithlin.com>
+Signed-off-by: Steve Wise <swise@opengridcomputing.com>
+[hch: partial rewrite of the initial code]
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- drivers/md/bcache/bcache.h | 1 +
- drivers/md/bcache/super.c  | 2 +-
- drivers/md/bcache/sysfs.c  | 4 ++--
- 3 files changed, 4 insertions(+), 3 deletions(-)
+ drivers/nvme/target/configfs.c | 29 +++++++++++++
+ drivers/nvme/target/core.c     | 95 +++++++++++++++++++++++++++++++++++++++++-
+ drivers/nvme/target/io-cmd.c   |  3 ++
+ drivers/nvme/target/nvmet.h    | 10 +++++
+ drivers/nvme/target/rdma.c     | 41 ++++++++++++++----
+ 5 files changed, 169 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index a857eb3c10de..b8c2e1bef1f1 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -666,6 +666,7 @@ struct cache_set {
- 		ON_ERROR_UNREGISTER,
- 		ON_ERROR_PANIC,
- 	}			on_error;
-+#define DEFAULT_IO_ERROR_LIMIT 8
- 	unsigned		error_limit;
- 	unsigned		error_decay;
+diff --git a/drivers/nvme/target/configfs.c b/drivers/nvme/target/configfs.c
+index e6b2d2af81b6..f1ad9d32344d 100644
+--- a/drivers/nvme/target/configfs.c
++++ b/drivers/nvme/target/configfs.c
+@@ -867,12 +867,41 @@ static void nvmet_port_release(struct config_item *item)
+ 	kfree(port);
+ }
  
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 133b81225ea9..e29150ec17e7 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1553,7 +1553,7 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
++#ifdef CONFIG_PCI_P2PDMA
++static ssize_t nvmet_allow_p2pmem_show(struct config_item *item, char *page)
++{
++	return sprintf(page, "%d\n", to_nvmet_port(item)->allow_p2pmem);
++}
++
++static ssize_t nvmet_allow_p2pmem_store(struct config_item *item,
++					const char *page, size_t count)
++{
++	struct nvmet_port *port = to_nvmet_port(item);
++	bool allow;
++	int ret;
++
++	ret = strtobool(page, &allow);
++	if (ret)
++		return ret;
++
++	down_write(&nvmet_config_sem);
++	port->allow_p2pmem = allow;
++	up_write(&nvmet_config_sem);
++
++	return count;
++}
++CONFIGFS_ATTR(nvmet_, allow_p2pmem);
++#endif /* CONFIG_PCI_P2PDMA */
++
+ static struct configfs_attribute *nvmet_port_attrs[] = {
+ 	&nvmet_attr_addr_adrfam,
+ 	&nvmet_attr_addr_treq,
+ 	&nvmet_attr_addr_traddr,
+ 	&nvmet_attr_addr_trsvcid,
+ 	&nvmet_attr_addr_trtype,
++#ifdef CONFIG_PCI_P2PDMA
++	&nvmet_attr_allow_p2pmem,
++#endif
+ 	NULL,
+ };
  
- 	c->congested_read_threshold_us	= 2000;
- 	c->congested_write_threshold_us	= 20000;
--	c->error_limit	= 8 << IO_ERROR_SHIFT;
-+	c->error_limit	= DEFAULT_IO_ERROR_LIMIT;
+diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
+index 0bd737117a80..59847aec27db 100644
+--- a/drivers/nvme/target/core.c
++++ b/drivers/nvme/target/core.c
+@@ -15,6 +15,7 @@
+ #include <linux/module.h>
+ #include <linux/random.h>
+ #include <linux/rculist.h>
++#include <linux/pci-p2pdma.h>
  
- 	return c;
- err:
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index 46e7a6b3e7c7..c524305cc9a7 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -568,7 +568,7 @@ SHOW(__bch_cache_set)
+ #include "nvmet.h"
  
- 	/* See count_io_errors for why 88 */
- 	sysfs_print(io_error_halflife,	c->error_decay * 88);
--	sysfs_print(io_error_limit,	c->error_limit >> IO_ERROR_SHIFT);
-+	sysfs_print(io_error_limit,	c->error_limit);
+@@ -271,6 +272,25 @@ void nvmet_put_namespace(struct nvmet_ns *ns)
+ 	percpu_ref_put(&ns->ref);
+ }
  
- 	sysfs_hprint(congested,
- 		     ((uint64_t) bch_get_congested(c)) << 9);
-@@ -668,7 +668,7 @@ STORE(__bch_cache_set)
++static int nvmet_p2pdma_add_client(struct nvmet_ctrl *ctrl,
++				   struct nvmet_ns *ns)
++{
++	int ret;
++
++	if (!blk_queue_pci_p2pdma(ns->bdev->bd_queue)) {
++		pr_err("peer-to-peer DMA is not supported by %s\n",
++		       ns->device_path);
++		return -EINVAL;
++	}
++
++	ret = pci_p2pdma_add_client(&ctrl->p2p_clients, nvmet_ns_dev(ns));
++	if (ret)
++		pr_err("failed to add peer-to-peer DMA client %s: %d\n",
++		       ns->device_path, ret);
++
++	return ret;
++}
++
+ int nvmet_ns_enable(struct nvmet_ns *ns)
+ {
+ 	struct nvmet_subsys *subsys = ns->subsys;
+@@ -299,6 +319,14 @@ int nvmet_ns_enable(struct nvmet_ns *ns)
+ 	if (ret)
+ 		goto out_blkdev_put;
+ 
++	list_for_each_entry(ctrl, &subsys->ctrls, subsys_entry) {
++		if (ctrl->p2p_dev) {
++			ret = nvmet_p2pdma_add_client(ctrl, ns);
++			if (ret)
++				goto out_remove_clients;
++		}
++	}
++
+ 	if (ns->nsid > subsys->max_nsid)
+ 		subsys->max_nsid = ns->nsid;
+ 
+@@ -328,6 +356,9 @@ int nvmet_ns_enable(struct nvmet_ns *ns)
+ out_unlock:
+ 	mutex_unlock(&subsys->lock);
+ 	return ret;
++out_remove_clients:
++	list_for_each_entry(ctrl, &subsys->ctrls, subsys_entry)
++		pci_p2pdma_remove_client(&ctrl->p2p_clients, nvmet_ns_dev(ns));
+ out_blkdev_put:
+ 	blkdev_put(ns->bdev, FMODE_WRITE|FMODE_READ);
+ 	ns->bdev = NULL;
+@@ -363,8 +394,10 @@ void nvmet_ns_disable(struct nvmet_ns *ns)
+ 	percpu_ref_exit(&ns->ref);
+ 
+ 	mutex_lock(&subsys->lock);
+-	list_for_each_entry(ctrl, &subsys->ctrls, subsys_entry)
++	list_for_each_entry(ctrl, &subsys->ctrls, subsys_entry) {
++		pci_p2pdma_remove_client(&ctrl->p2p_clients, nvmet_ns_dev(ns));
+ 		nvmet_add_async_event(ctrl, NVME_AER_TYPE_NOTICE, 0, 0);
++	}
+ 
+ 	if (ns->bdev)
+ 		blkdev_put(ns->bdev, FMODE_WRITE|FMODE_READ);
+@@ -761,6 +794,63 @@ bool nvmet_host_allowed(struct nvmet_req *req, struct nvmet_subsys *subsys,
+ 		return __nvmet_host_allowed(subsys, hostnqn);
+ }
+ 
++/*
++ * If allow_p2pmem is set, we will try to use P2P memory for the SGL lists for
++ * Ι/O commands. This requires the PCI p2p device to be compatible with the
++ * backing device for every namespace on this controller.
++ */
++static void nvmet_setup_p2pmem(struct nvmet_ctrl *ctrl, struct nvmet_req *req)
++{
++	struct nvmet_ns *ns;
++	int ret;
++
++	if (!req->port->allow_p2pmem || !req->p2p_client)
++		return;
++
++	mutex_lock(&ctrl->subsys->lock);
++
++	ret = pci_p2pdma_add_client(&ctrl->p2p_clients, req->p2p_client);
++	if (ret) {
++		pr_err("failed adding peer-to-peer DMA client %s: %d\n",
++		       dev_name(req->p2p_client), ret);
++		goto free_devices;
++	}
++
++	list_for_each_entry_rcu(ns, &ctrl->subsys->namespaces, dev_link) {
++		ret = nvmet_p2pdma_add_client(ctrl, ns);
++		if (ret)
++			goto free_devices;
++	}
++
++	ctrl->p2p_dev = pci_p2pmem_find(&ctrl->p2p_clients);
++	if (!ctrl->p2p_dev) {
++		pr_info("no supported peer-to-peer memory devices found\n");
++		goto free_devices;
++	}
++	mutex_unlock(&ctrl->subsys->lock);
++
++	pr_info("using peer-to-peer memory on %s\n", pci_name(ctrl->p2p_dev));
++	return;
++
++free_devices:
++	pci_p2pdma_client_list_free(&ctrl->p2p_clients);
++	mutex_unlock(&ctrl->subsys->lock);
++}
++
++static void nvmet_release_p2pmem(struct nvmet_ctrl *ctrl)
++{
++	if (!ctrl->p2p_dev)
++		return;
++
++	mutex_lock(&ctrl->subsys->lock);
++
++	pci_p2pdma_client_list_free(&ctrl->p2p_clients);
++	pci_dev_put(ctrl->p2p_dev);
++	ctrl->p2p_dev = NULL;
++
++	mutex_unlock(&ctrl->subsys->lock);
++}
++
+ u16 nvmet_alloc_ctrl(const char *subsysnqn, const char *hostnqn,
+ 		struct nvmet_req *req, u32 kato, struct nvmet_ctrl **ctrlp)
+ {
+@@ -800,6 +890,7 @@ u16 nvmet_alloc_ctrl(const char *subsysnqn, const char *hostnqn,
+ 
+ 	INIT_WORK(&ctrl->async_event_work, nvmet_async_event_work);
+ 	INIT_LIST_HEAD(&ctrl->async_events);
++	INIT_LIST_HEAD(&ctrl->p2p_clients);
+ 
+ 	memcpy(ctrl->subsysnqn, subsysnqn, NVMF_NQN_SIZE);
+ 	memcpy(ctrl->hostnqn, hostnqn, NVMF_NQN_SIZE);
+@@ -855,6 +946,7 @@ u16 nvmet_alloc_ctrl(const char *subsysnqn, const char *hostnqn,
+ 		ctrl->kato = DIV_ROUND_UP(kato, 1000);
+ 	}
+ 	nvmet_start_keep_alive_timer(ctrl);
++	nvmet_setup_p2pmem(ctrl, req);
+ 
+ 	mutex_lock(&subsys->lock);
+ 	list_add_tail(&ctrl->subsys_entry, &subsys->ctrls);
+@@ -891,6 +983,7 @@ static void nvmet_ctrl_free(struct kref *ref)
+ 	flush_work(&ctrl->async_event_work);
+ 	cancel_work_sync(&ctrl->fatal_err_work);
+ 
++	nvmet_release_p2pmem(ctrl);
+ 	ida_simple_remove(&cntlid_ida, ctrl->cntlid);
+ 
+ 	kfree(ctrl->sqs);
+diff --git a/drivers/nvme/target/io-cmd.c b/drivers/nvme/target/io-cmd.c
+index 28bbdff4a88b..a213f8fc3bf3 100644
+--- a/drivers/nvme/target/io-cmd.c
++++ b/drivers/nvme/target/io-cmd.c
+@@ -56,6 +56,9 @@ static void nvmet_execute_rw(struct nvmet_req *req)
+ 		op = REQ_OP_READ;
  	}
  
- 	if (attr == &sysfs_io_error_limit)
--		c->error_limit = strtoul_or_return(buf) << IO_ERROR_SHIFT;
-+		c->error_limit = strtoul_or_return(buf);
++	if (is_pci_p2pdma_page(sg_page(req->sg)))
++		op_flags |= REQ_PCI_P2PDMA;
++
+ 	sector = le64_to_cpu(req->cmd->rw.slba);
+ 	sector <<= (req->ns->blksize_shift - 9);
  
- 	/* See count_io_errors() for why 88 */
- 	if (attr == &sysfs_io_error_halflife)
+diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
+index 417f6c0331cc..85a170914588 100644
+--- a/drivers/nvme/target/nvmet.h
++++ b/drivers/nvme/target/nvmet.h
+@@ -64,6 +64,11 @@ static inline struct nvmet_ns *to_nvmet_ns(struct config_item *item)
+ 	return container_of(to_config_group(item), struct nvmet_ns, group);
+ }
+ 
++static inline struct device *nvmet_ns_dev(struct nvmet_ns *ns)
++{
++	return disk_to_dev(ns->bdev->bd_disk);
++}
++
+ struct nvmet_cq {
+ 	u16			qid;
+ 	u16			size;
+@@ -98,6 +103,7 @@ struct nvmet_port {
+ 	struct list_head		referrals;
+ 	void				*priv;
+ 	bool				enabled;
++	bool				allow_p2pmem;
+ };
+ 
+ static inline struct nvmet_port *to_nvmet_port(struct config_item *item)
+@@ -131,6 +137,8 @@ struct nvmet_ctrl {
+ 	struct work_struct	fatal_err_work;
+ 
+ 	struct nvmet_fabrics_ops *ops;
++	struct pci_dev		*p2p_dev;
++	struct list_head	p2p_clients;
+ 
+ 	char			subsysnqn[NVMF_NQN_FIELD_LEN];
+ 	char			hostnqn[NVMF_NQN_FIELD_LEN];
+@@ -232,6 +240,8 @@ struct nvmet_req {
+ 
+ 	void (*execute)(struct nvmet_req *req);
+ 	struct nvmet_fabrics_ops *ops;
++
++	struct device *p2p_client;
+ };
+ 
+ static inline void nvmet_set_status(struct nvmet_req *req, u16 status)
+diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
+index 020354e11351..7a1f09995ed5 100644
+--- a/drivers/nvme/target/rdma.c
++++ b/drivers/nvme/target/rdma.c
+@@ -23,6 +23,7 @@
+ #include <linux/string.h>
+ #include <linux/wait.h>
+ #include <linux/inet.h>
++#include <linux/pci-p2pdma.h>
+ #include <asm/unaligned.h>
+ 
+ #include <rdma/ib_verbs.h>
+@@ -68,6 +69,7 @@ struct nvmet_rdma_rsp {
+ 	u8			n_rdma;
+ 	u32			flags;
+ 	u32			invalidate_rkey;
++	struct pci_dev		*p2p_dev;
+ 
+ 	struct list_head	wait_list;
+ 	struct list_head	free_list;
+@@ -426,12 +428,18 @@ static void nvmet_rdma_release_rsp(struct nvmet_rdma_rsp *rsp)
+ 
+ 	if (rsp->n_rdma) {
+ 		rdma_rw_ctx_destroy(&rsp->rw, queue->cm_id->qp,
+-				queue->cm_id->port_num, rsp->req.sg,
+-				rsp->req.sg_cnt, nvmet_data_dir(&rsp->req), 0);
++			queue->cm_id->port_num, rsp->req.sg,
++			rsp->req.sg_cnt, nvmet_data_dir(&rsp->req),
++			rsp->p2p_dev ? RDMA_RW_CTX_FLAG_PCI_P2PDMA : 0);
+ 	}
+ 
+-	if (rsp->req.sg != &rsp->cmd->inline_sg)
+-		sgl_free(rsp->req.sg);
++	if (rsp->req.sg != &rsp->cmd->inline_sg) {
++		if (rsp->p2p_dev)
++			pci_p2pmem_free_sgl(rsp->p2p_dev, rsp->req.sg,
++					    rsp->req.sg_cnt);
++		else
++			sgl_free(rsp->req.sg);
++	}
+ 
+ 	if (unlikely(!list_empty_careful(&queue->rsp_wr_wait_list)))
+ 		nvmet_rdma_process_wr_wait_list(queue);
+@@ -567,19 +575,34 @@ static u16 nvmet_rdma_map_sgl_keyed(struct nvmet_rdma_rsp *rsp,
+ 	u64 addr = le64_to_cpu(sgl->addr);
+ 	u32 len = get_unaligned_le24(sgl->length);
+ 	u32 key = get_unaligned_le32(sgl->key);
++	struct pci_dev *p2p_dev = NULL;
+ 	int ret;
+ 
+ 	/* no data command? */
+ 	if (!len)
+ 		return 0;
+ 
+-	rsp->req.sg = sgl_alloc(len, GFP_KERNEL, &rsp->req.sg_cnt);
+-	if (!rsp->req.sg)
+-		return NVME_SC_INTERNAL;
++	if (rsp->queue->nvme_sq.ctrl)
++		p2p_dev = rsp->queue->nvme_sq.ctrl->p2p_dev;
++
++	rsp->p2p_dev = NULL;
++	if (rsp->queue->nvme_sq.qid && p2p_dev) {
++		ret = pci_p2pmem_alloc_sgl(p2p_dev, &rsp->req.sg,
++					   &rsp->req.sg_cnt, len);
++		if (!ret)
++			rsp->p2p_dev = p2p_dev;
++	}
++
++	if (!rsp->p2p_dev) {
++		rsp->req.sg = sgl_alloc(len, GFP_KERNEL, &rsp->req.sg_cnt);
++		if (!rsp->req.sg)
++			return NVME_SC_INTERNAL;
++	}
+ 
+ 	ret = rdma_rw_ctx_init(&rsp->rw, cm_id->qp, cm_id->port_num,
+ 			rsp->req.sg, rsp->req.sg_cnt, 0, addr, key,
+-			nvmet_data_dir(&rsp->req), 0);
++			nvmet_data_dir(&rsp->req),
++			rsp->p2p_dev ? RDMA_RW_CTX_FLAG_PCI_P2PDMA : 0);
+ 	if (ret < 0)
+ 		return NVME_SC_INTERNAL;
+ 	rsp->req.transfer_len += len;
+@@ -658,6 +681,8 @@ static void nvmet_rdma_handle_command(struct nvmet_rdma_queue *queue,
+ 		cmd->send_sge.addr, cmd->send_sge.length,
+ 		DMA_TO_DEVICE);
+ 
++	cmd->req.p2p_client = &queue->dev->device->dev;
++
+ 	if (!nvmet_req_init(&cmd->req, &queue->nvme_cq,
+ 			&queue->nvme_sq, &nvmet_rdma_ops))
+ 		return;
 -- 
-2.14.1
+2.11.0
