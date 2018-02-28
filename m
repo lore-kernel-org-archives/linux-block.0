@@ -1,3535 +1,987 @@
-Return-Path: <roman.penyaev@profitbricks.com>
-Return-Path: <roman.penyaev@profitbricks.com>
-From: Roman Pen <roman.penyaev@profitbricks.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Or Gerlitz <ogerlitz@mellanox.com>,
-	Roman Pen <roman.penyaev@profitbricks.com>,
-	Danil Kipnis <danil.kipnis@profitbricks.com>,
-	Jack Wang <jinpu.wang@profitbricks.com>
-Subject: [PATCH 05/24] ibtrs: client: main functionality
-Date: Fri,  2 Feb 2018 15:08:45 +0100
-Message-Id: <20180202140904.2017-6-roman.penyaev@profitbricks.com>
-In-Reply-To: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
-References: <20180202140904.2017-1-roman.penyaev@profitbricks.com>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Subject: [PATCH 01/15] lightnvm: simplify geometry structure.
+Date: Wed, 28 Feb 2018 16:49:21 +0100
+Message-Id: <1519832975-25432-2-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1519832975-25432-1-git-send-email-javier@cnexlabs.com>
+References: <1519832975-25432-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: linux-block@vger.kernel.org,
+ =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-This is main functionality of ibtrs-client module, which manages
-set of RDMA connections for each IBTRS session, does multipathing,
-load balancing and failover of RDMA requests.
-
-Signed-off-by: Roman Pen <roman.penyaev@profitbricks.com>
-Signed-off-by: Danil Kipnis <danil.kipnis@profitbricks.com>
-Cc: Jack Wang <jinpu.wang@profitbricks.com>
----
- drivers/infiniband/ulp/ibtrs/ibtrs-clt.c | 3496 ++++++++++++++++++++++++++++++
- 1 file changed, 3496 insertions(+)
-
-diff --git a/drivers/infiniband/ulp/ibtrs/ibtrs-clt.c b/drivers/infiniband/ulp/ibtrs/ibtrs-clt.c
-new file mode 100644
-index 000000000000..aa0a17f2a78c
---- /dev/null
-+++ b/drivers/infiniband/ulp/ibtrs/ibtrs-clt.c
-@@ -0,0 +1,3496 @@
-+/*
-+ * InfiniBand Transport Layer
-+ *
-+ * Copyright (c) 2014 - 2017 ProfitBricks GmbH. All rights reserved.
-+ * Authors: Fabian Holler <mail@fholler.de>
-+ *          Jack Wang <jinpu.wang@profitbricks.com>
-+ *          Kleber Souza <kleber.souza@profitbricks.com>
-+ *          Danil Kipnis <danil.kipnis@profitbricks.com>
-+ *          Roman Penyaev <roman.penyaev@profitbricks.com>
-+ *          Milind Dumbare <Milind.dumbare@gmail.com>
-+ *
-+ * Copyright (c) 2017 - 2018 ProfitBricks GmbH. All rights reserved.
-+ * Authors: Danil Kipnis <danil.kipnis@profitbricks.com>
-+ *          Roman Penyaev <roman.penyaev@profitbricks.com>
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version 2
-+ * of the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#undef pr_fmt
-+#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
-+
-+#include <linux/module.h>
-+#include <rdma/ib_fmr_pool.h>
-+
-+#include "ibtrs-clt.h"
-+#include "ibtrs-log.h"
-+
-+#define RECONNECT_SEED 8
-+#define MAX_SEGMENTS 31
-+
-+#define IBTRS_CONNECT_TIMEOUT_MS 5000
-+
-+MODULE_AUTHOR("ibnbd@profitbricks.com");
-+MODULE_DESCRIPTION("IBTRS Client");
-+MODULE_VERSION(IBTRS_VER_STRING);
-+MODULE_LICENSE("GPL");
-+
-+static bool use_fr;
-+module_param(use_fr, bool, 0444);
-+MODULE_PARM_DESC(use_fr, "use FRWR mode for memory registration if possible."
-+		 " (default: 0)");
-+
-+static ushort nr_cons_per_session;
-+module_param(nr_cons_per_session, ushort, 0444);
-+MODULE_PARM_DESC(nr_cons_per_session, "Number of connections per session."
-+		 " (default: nr_cpu_ids)");
-+
-+static int retry_count = 7;
-+
-+static int retry_count_set(const char *val, const struct kernel_param *kp)
-+{
-+	int err, ival;
-+
-+	err = kstrtoint(val, 0, &ival);
-+	if (err)
-+		return err;
-+
-+	if (ival < MIN_RTR_CNT || ival > MAX_RTR_CNT)
-+		return -EINVAL;
-+
-+	retry_count = ival;
-+
-+	return 0;
-+}
-+
-+static const struct kernel_param_ops retry_count_ops = {
-+	.set		= retry_count_set,
-+	.get		= param_get_int,
-+};
-+module_param_cb(retry_count, &retry_count_ops, &retry_count, 0644);
-+
-+MODULE_PARM_DESC(retry_count, "Number of times to send the message if the"
-+		 " remote side didn't respond with Ack or Nack (default: 3,"
-+		 " min: " __stringify(MIN_RTR_CNT) ", max: "
-+		 __stringify(MAX_RTR_CNT) ")");
-+
-+static int fmr_sg_cnt = 4;
-+module_param_named(fmr_sg_cnt, fmr_sg_cnt, int, 0644);
-+MODULE_PARM_DESC(fmr_sg_cnt, "when sg_cnt is bigger than fmr_sg_cnt, enable"
-+		 " FMR (default: 4)");
-+
-+static struct workqueue_struct *ibtrs_wq;
-+
-+static void ibtrs_rdma_error_recovery(struct ibtrs_clt_con *con);
-+static void ibtrs_clt_rdma_done(struct ib_cq *cq, struct ib_wc *wc);
-+
-+static inline void ibtrs_clt_state_lock(void)
-+{
-+	rcu_read_lock();
-+}
-+
-+static inline void ibtrs_clt_state_unlock(void)
-+{
-+	rcu_read_unlock();
-+}
-+
-+#define cmpxchg_min(var, new) ({					\
-+	typeof(var) old;						\
-+									\
-+	do {								\
-+		old = var;						\
-+		new = (!old ? new : min_t(typeof(var), old, new));	\
-+	} while (cmpxchg(&var, old, new) != old);			\
-+})
-+
-+static void ibtrs_clt_set_min_queue_depth(struct ibtrs_clt *clt, size_t new)
-+{
-+	/* Can be updated from different sessions (paths), so cmpxchg */
-+
-+	cmpxchg_min(clt->queue_depth, new);
-+}
-+
-+static void ibtrs_clt_set_min_io_size(struct ibtrs_clt *clt, size_t new)
-+{
-+	/* Can be updated from different sessions (paths), so cmpxchg */
-+
-+	cmpxchg_min(clt->max_io_size, new);
-+}
-+
-+bool ibtrs_clt_sess_is_connected(const struct ibtrs_clt_sess *sess)
-+{
-+	return sess->state == IBTRS_CLT_CONNECTED;
-+}
-+
-+static inline bool ibtrs_clt_is_connected(const struct ibtrs_clt *clt)
-+{
-+	struct ibtrs_clt_sess *sess;
-+	bool connected = false;
-+
-+	ibtrs_clt_state_lock();
-+	list_for_each_entry_rcu(sess, &clt->paths_list, s.entry)
-+		connected |= ibtrs_clt_sess_is_connected(sess);
-+	ibtrs_clt_state_unlock();
-+
-+	return connected;
-+}
-+
-+/**
-+ * struct ibtrs_fr_desc - fast registration work request arguments
-+ * @entry: Entry in ibtrs_fr_pool.free_list.
-+ * @mr:    Memory region.
-+ */
-+struct ibtrs_fr_desc {
-+	struct list_head		entry;
-+	struct ib_mr			*mr;
-+};
-+
-+/**
-+ * struct ibtrs_fr_pool - pool of fast registration descriptors
-+ *
-+ * An entry is available for allocation if and only if it occurs in @free_list.
-+ *
-+ * @size:      Number of descriptors in this pool.
-+ * @max_page_list_len: Maximum fast registration work request page list length.
-+ * @lock:      Protects free_list.
-+ * @free_list: List of free descriptors.
-+ * @desc:      Fast registration descriptor pool.
-+ */
-+struct ibtrs_fr_pool {
-+	int			size;
-+	int			max_page_list_len;
-+	spinlock_t		lock; /* protects free_list */
-+	struct list_head	free_list;
-+	struct ibtrs_fr_desc	desc[0];
-+};
-+
-+/**
-+ * struct ibtrs_map_state - per-request DMA memory mapping state
-+ * @desc:	    Pointer to the element of the buffer descriptor array
-+ *		    that is being filled in.
-+ * @pages:	    Array with DMA addresses of pages being considered for
-+ *		    memory registration.
-+ * @base_dma_addr:  DMA address of the first page that has not yet been mapped.
-+ * @dma_len:	    Number of bytes that will be registered with the next
-+ *		    FMR or FR memory registration call.
-+ * @total_len:	    Total number of bytes in the sg-list being mapped.
-+ * @npages:	    Number of page addresses in the pages[] array.
-+ * @nmdesc:	    Number of FMR or FR memory descriptors used for mapping.
-+ * @ndesc:	    Number of buffer descriptors that have been filled in.
-+ */
-+struct ibtrs_map_state {
-+	union {
-+		struct ib_pool_fmr	**next_fmr;
-+		struct ibtrs_fr_desc	**next_fr;
-+	};
-+	struct ibtrs_sg_desc	*desc;
-+	union {
-+		u64			*pages;
-+		struct scatterlist      *sg;
-+	};
-+	dma_addr_t		base_dma_addr;
-+	u32			dma_len;
-+	u32			total_len;
-+	u32			npages;
-+	u32			nmdesc;
-+	u32			ndesc;
-+	enum dma_data_direction dir;
-+};
-+
-+static inline struct ibtrs_tag *
-+__ibtrs_get_tag(struct ibtrs_clt *clt, enum ibtrs_clt_con_type con_type)
-+{
-+	size_t max_depth = clt->queue_depth;
-+	struct ibtrs_tag *tag;
-+	int cpu, bit;
-+
-+	cpu = get_cpu();
-+	do {
-+		bit = find_first_zero_bit(clt->tags_map, max_depth);
-+		if (unlikely(bit >= max_depth)) {
-+			put_cpu();
-+			return NULL;
-+		}
-+
-+	} while (unlikely(test_and_set_bit_lock(bit, clt->tags_map)));
-+	put_cpu();
-+
-+	tag = GET_TAG(clt, bit);
-+	WARN_ON(tag->mem_id != bit);
-+	tag->cpu_id = cpu;
-+	tag->con_type = con_type;
-+
-+	return tag;
-+}
-+
-+static inline void __ibtrs_put_tag(struct ibtrs_clt *clt,
-+				   struct ibtrs_tag *tag)
-+{
-+	clear_bit_unlock(tag->mem_id, clt->tags_map);
-+}
-+
-+struct ibtrs_tag *ibtrs_clt_get_tag(struct ibtrs_clt *clt,
-+				    enum ibtrs_clt_con_type con_type,
-+				    int can_wait)
-+{
-+	struct ibtrs_tag *tag;
-+	DEFINE_WAIT(wait);
-+
-+	tag = __ibtrs_get_tag(clt, con_type);
-+	if (likely(tag) || !can_wait)
-+		return tag;
-+
-+	do {
-+		prepare_to_wait(&clt->tags_wait, &wait, TASK_UNINTERRUPTIBLE);
-+		tag = __ibtrs_get_tag(clt, con_type);
-+		if (likely(tag))
-+			break;
-+
-+		io_schedule();
-+	} while (1);
-+
-+	finish_wait(&clt->tags_wait, &wait);
-+
-+	return tag;
-+}
-+EXPORT_SYMBOL(ibtrs_clt_get_tag);
-+
-+void ibtrs_clt_put_tag(struct ibtrs_clt *clt, struct ibtrs_tag *tag)
-+{
-+	if (WARN_ON(!test_bit(tag->mem_id, clt->tags_map)))
-+		return;
-+
-+	__ibtrs_put_tag(clt, tag);
-+
-+	/*
-+	 * Putting a tag is a barrier, so we will observe
-+	 * new entry in the wait list, no worries.
-+	 */
-+	if (waitqueue_active(&clt->tags_wait))
-+		wake_up(&clt->tags_wait);
-+}
-+EXPORT_SYMBOL(ibtrs_clt_put_tag);
-+
-+/**
-+ * ibtrs_tag_to_clt_con() - returns RDMA connection id by the tag
-+ *
-+ * Note:
-+ *     IO connection starts from 1.
-+ *     0 connection is for user messages.
-+ */
-+static struct ibtrs_clt_con *ibtrs_tag_to_clt_con(struct ibtrs_clt_sess *sess,
-+						  struct ibtrs_tag *tag)
-+{
-+	int id = 0;
-+
-+	if (likely(tag->con_type == IBTRS_IO_CON))
-+		id = (tag->cpu_id % (sess->s.con_num - 1)) + 1;
-+
-+	return to_clt_con(sess->s.con[id]);
-+}
-+
-+/**
-+ * ibtrs_destroy_fr_pool() - free the resources owned by a pool
-+ * @pool: Fast registration pool to be destroyed.
-+ */
-+static void ibtrs_destroy_fr_pool(struct ibtrs_fr_pool *pool)
-+{
-+	struct ibtrs_fr_desc *d;
-+	int i, err;
-+
-+	if (!pool)
-+		return;
-+
-+	for (i = 0, d = &pool->desc[0]; i < pool->size; i++, d++) {
-+		if (d->mr) {
-+			err = ib_dereg_mr(d->mr);
-+			if (err)
-+				pr_err("Failed to deregister memory region,"
-+				       " err: %d\n", err);
-+		}
-+	}
-+	kfree(pool);
-+}
-+
-+/**
-+ * ibtrs_create_fr_pool() - allocate and initialize a pool for fast registration
-+ * @device:            IB device to allocate fast registration descriptors for.
-+ * @pd:                Protection domain associated with the FR descriptors.
-+ * @pool_size:         Number of descriptors to allocate.
-+ * @max_page_list_len: Maximum fast registration work request page list length.
-+ */
-+static struct ibtrs_fr_pool *ibtrs_create_fr_pool(struct ib_device *device,
-+						  struct ib_pd *pd,
-+						  int pool_size,
-+						  int max_page_list_len)
-+{
-+	struct ibtrs_fr_pool *pool;
-+	struct ibtrs_fr_desc *d;
-+	struct ib_mr *mr;
-+	int i, ret;
-+
-+	if (pool_size <= 0) {
-+		pr_warn("Creating fr pool failed, invalid pool size %d\n",
-+			pool_size);
-+		ret = -EINVAL;
-+		goto err;
-+	}
-+
-+	pool = kzalloc(sizeof(*pool) + pool_size * sizeof(*d), GFP_KERNEL);
-+	if (!pool) {
-+		ret = -ENOMEM;
-+		goto err;
-+	}
-+
-+	pool->size = pool_size;
-+	pool->max_page_list_len = max_page_list_len;
-+	spin_lock_init(&pool->lock);
-+	INIT_LIST_HEAD(&pool->free_list);
-+
-+	for (i = 0, d = &pool->desc[0]; i < pool->size; i++, d++) {
-+		mr = ib_alloc_mr(pd, IB_MR_TYPE_MEM_REG, max_page_list_len);
-+		if (IS_ERR(mr)) {
-+			pr_warn("Failed to allocate fast region memory\n");
-+			ret = PTR_ERR(mr);
-+			goto destroy_pool;
-+		}
-+		d->mr = mr;
-+		list_add_tail(&d->entry, &pool->free_list);
-+	}
-+
-+	return pool;
-+
-+destroy_pool:
-+	ibtrs_destroy_fr_pool(pool);
-+err:
-+	return ERR_PTR(ret);
-+}
-+
-+/**
-+ * ibtrs_fr_pool_get() - obtain a descriptor suitable for fast registration
-+ * @pool: Pool to obtain descriptor from.
-+ */
-+static struct ibtrs_fr_desc *ibtrs_fr_pool_get(struct ibtrs_fr_pool *pool)
-+{
-+	struct ibtrs_fr_desc *d = NULL;
-+
-+	spin_lock_bh(&pool->lock);
-+	if (!list_empty(&pool->free_list)) {
-+		d = list_first_entry(&pool->free_list, typeof(*d), entry);
-+		list_del(&d->entry);
-+	}
-+	spin_unlock_bh(&pool->lock);
-+
-+	return d;
-+}
-+
-+/**
-+ * ibtrs_fr_pool_put() - put an FR descriptor back in the free list
-+ * @pool: Pool the descriptor was allocated from.
-+ * @desc: Pointer to an array of fast registration descriptor pointers.
-+ * @n:    Number of descriptors to put back.
-+ *
-+ * Note: The caller must already have queued an invalidation request for
-+ * desc->mr->rkey before calling this function.
-+ */
-+static void ibtrs_fr_pool_put(struct ibtrs_fr_pool *pool,
-+			      struct ibtrs_fr_desc **desc, int n)
-+{
-+	int i;
-+
-+	spin_lock_bh(&pool->lock);
-+	for (i = 0; i < n; i++)
-+		list_add(&desc[i]->entry, &pool->free_list);
-+	spin_unlock_bh(&pool->lock);
-+}
-+
-+static void ibtrs_map_desc(struct ibtrs_map_state *state, dma_addr_t dma_addr,
-+			   u32 dma_len, u32 rkey, u32 max_desc)
-+{
-+	struct ibtrs_sg_desc *desc = state->desc;
-+
-+	pr_debug("dma_addr %llu, key %u, dma_len %u\n",
-+		 dma_addr, rkey, dma_len);
-+	desc->addr = cpu_to_le64(dma_addr);
-+	desc->key  = cpu_to_le32(rkey);
-+	desc->len  = cpu_to_le32(dma_len);
-+
-+	state->total_len += dma_len;
-+	if (state->ndesc < max_desc) {
-+		state->desc++;
-+		state->ndesc++;
-+	} else {
-+		state->ndesc = INT_MIN;
-+		pr_err("Could not fit S/G list into buffer descriptor %d.\n",
-+		       max_desc);
-+	}
-+}
-+
-+static int ibtrs_map_finish_fmr(struct ibtrs_map_state *state,
-+				struct ibtrs_clt_con *con)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	struct ib_pool_fmr *fmr;
-+	dma_addr_t dma_addr;
-+	u64 io_addr = 0;
-+
-+	fmr = ib_fmr_pool_map_phys(sess->fmr_pool, state->pages,
-+				   state->npages, io_addr);
-+	if (IS_ERR(fmr)) {
-+		ibtrs_wrn_rl(sess, "Failed to map FMR from FMR pool, "
-+			     "err: %ld\n", PTR_ERR(fmr));
-+		return PTR_ERR(fmr);
-+	}
-+
-+	*state->next_fmr++ = fmr;
-+	state->nmdesc++;
-+	dma_addr = state->base_dma_addr & ~sess->mr_page_mask;
-+	pr_debug("ndesc = %d, nmdesc = %d, npages = %d\n",
-+		 state->ndesc, state->nmdesc, state->npages);
-+	if (state->dir == DMA_TO_DEVICE)
-+		ibtrs_map_desc(state, dma_addr, state->dma_len, fmr->fmr->lkey,
-+			       sess->max_desc);
-+	else
-+		ibtrs_map_desc(state, dma_addr, state->dma_len, fmr->fmr->rkey,
-+			       sess->max_desc);
-+
-+	return 0;
-+}
-+
-+static void ibtrs_clt_fast_reg_done(struct ib_cq *cq, struct ib_wc *wc)
-+{
-+	struct ibtrs_clt_con *con = cq->cq_context;
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+
-+	if (unlikely(wc->status != IB_WC_SUCCESS)) {
-+		ibtrs_err(sess, "Failed IB_WR_REG_MR: %s\n",
-+			  ib_wc_status_msg(wc->status));
-+		ibtrs_rdma_error_recovery(con);
-+	}
-+}
-+
-+static struct ib_cqe fast_reg_cqe = {
-+	.done = ibtrs_clt_fast_reg_done
-+};
-+
-+/* TODO */
-+static int ibtrs_map_finish_fr(struct ibtrs_map_state *state,
-+			       struct ibtrs_clt_con *con, int sg_cnt,
-+			       unsigned int *sg_offset_p)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	struct ibtrs_fr_desc *desc;
-+	struct ib_send_wr *bad_wr;
-+	struct ib_reg_wr wr;
-+	struct ib_pd *pd;
-+	u32 rkey;
-+	int n;
-+
-+	pd = sess->s.ib_dev->pd;
-+	if (sg_cnt == 1 && (pd->flags & IB_PD_UNSAFE_GLOBAL_RKEY)) {
-+		unsigned int sg_offset = sg_offset_p ? *sg_offset_p : 0;
-+
-+		ibtrs_map_desc(state, sg_dma_address(state->sg) + sg_offset,
-+			       sg_dma_len(state->sg) - sg_offset,
-+			       pd->unsafe_global_rkey, sess->max_desc);
-+		if (sg_offset_p)
-+			*sg_offset_p = 0;
-+		return 1;
-+	}
-+
-+	desc = ibtrs_fr_pool_get(con->fr_pool);
-+	if (!desc) {
-+		ibtrs_wrn_rl(sess, "Failed to get descriptor from FR pool\n");
-+		return -ENOMEM;
-+	}
-+
-+	rkey = ib_inc_rkey(desc->mr->rkey);
-+	ib_update_fast_reg_key(desc->mr, rkey);
-+
-+	memset(&wr, 0, sizeof(wr));
-+	n = ib_map_mr_sg(desc->mr, state->sg, sg_cnt, sg_offset_p,
-+			 sess->mr_page_size);
-+	if (unlikely(n < 0)) {
-+		ibtrs_fr_pool_put(con->fr_pool, &desc, 1);
-+		return n;
-+	}
-+
-+	wr.wr.next = NULL;
-+	wr.wr.opcode = IB_WR_REG_MR;
-+	wr.wr.wr_cqe = &fast_reg_cqe;
-+	wr.wr.num_sge = 0;
-+	wr.wr.send_flags = 0;
-+	wr.mr = desc->mr;
-+	wr.key = desc->mr->rkey;
-+	wr.access = (IB_ACCESS_LOCAL_WRITE | IB_ACCESS_REMOTE_WRITE);
-+
-+	*state->next_fr++ = desc;
-+	state->nmdesc++;
-+
-+	ibtrs_map_desc(state, state->base_dma_addr, state->dma_len,
-+		       desc->mr->rkey, sess->max_desc);
-+
-+	return ib_post_send(con->c.qp, &wr.wr, &bad_wr);
-+}
-+
-+static int ibtrs_finish_fmr_mapping(struct ibtrs_map_state *state,
-+				    struct ibtrs_clt_con *con)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	struct ib_pd *pd = sess->s.ib_dev->pd;
-+	int ret = 0;
-+
-+	if (state->npages == 0)
-+		return 0;
-+
-+	if (state->npages == 1 && (pd->flags & IB_PD_UNSAFE_GLOBAL_RKEY))
-+		ibtrs_map_desc(state, state->base_dma_addr, state->dma_len,
-+			       pd->unsafe_global_rkey,
-+			       sess->max_desc);
-+	else
-+		ret = ibtrs_map_finish_fmr(state, con);
-+
-+	if (ret == 0) {
-+		state->npages = 0;
-+		state->dma_len = 0;
-+	}
-+
-+	return ret;
-+}
-+
-+static int ibtrs_map_sg_entry(struct ibtrs_map_state *state,
-+			      struct ibtrs_clt_con *con, struct scatterlist *sg,
-+			      int sg_count)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	unsigned int dma_len, len;
-+	struct ib_device *ibdev;
-+	dma_addr_t dma_addr;
-+	int ret;
-+
-+	ibdev = sess->s.ib_dev->dev;
-+	dma_addr = ib_sg_dma_address(ibdev, sg);
-+	dma_len = ib_sg_dma_len(ibdev, sg);
-+	if (!dma_len)
-+		return 0;
-+
-+	while (dma_len) {
-+		unsigned int offset = dma_addr & ~sess->mr_page_mask;
-+
-+		if (state->npages == sess->max_pages_per_mr ||
-+		    offset != 0) {
-+			ret = ibtrs_finish_fmr_mapping(state, con);
-+			if (ret)
-+				return ret;
-+		}
-+
-+		len = min_t(unsigned int, dma_len,
-+			    sess->mr_page_size - offset);
-+
-+		if (!state->npages)
-+			state->base_dma_addr = dma_addr;
-+		state->pages[state->npages++] =
-+			dma_addr & sess->mr_page_mask;
-+		state->dma_len += len;
-+		dma_addr += len;
-+		dma_len -= len;
-+	}
-+
-+	/*
-+	 * If the last entry of the MR wasn't a full page, then we need to
-+	 * close it out and start a new one -- we can only merge at page
-+	 * boundaries.
-+	 */
-+	ret = 0;
-+	if (len != sess->mr_page_size)
-+		ret = ibtrs_finish_fmr_mapping(state, con);
-+	return ret;
-+}
-+
-+static int ibtrs_map_fr(struct ibtrs_map_state *state,
-+			struct ibtrs_clt_con *con,
-+			struct scatterlist *sg, int sg_count)
-+{
-+	unsigned int sg_offset = 0;
-+
-+	state->sg = sg;
-+
-+	while (sg_count) {
-+		int i, n;
-+
-+		n = ibtrs_map_finish_fr(state, con, sg_count, &sg_offset);
-+		if (unlikely(n < 0))
-+			return n;
-+
-+		sg_count -= n;
-+		for (i = 0; i < n; i++)
-+			state->sg = sg_next(state->sg);
-+	}
-+
-+	return 0;
-+}
-+
-+static int ibtrs_map_fmr(struct ibtrs_map_state *state,
-+			 struct ibtrs_clt_con *con,
-+			 struct scatterlist *sg_first_entry,
-+			 int sg_first_entry_index, int sg_count)
-+{
-+	int i, ret;
-+	struct scatterlist *sg;
-+
-+	for (i = sg_first_entry_index, sg = sg_first_entry; i < sg_count;
-+	     i++, sg = sg_next(sg)) {
-+		ret = ibtrs_map_sg_entry(state, con, sg, sg_count);
-+		if (ret)
-+			return ret;
-+	}
-+	return 0;
-+}
-+
-+static int ibtrs_map_sg(struct ibtrs_map_state *state,
-+			struct ibtrs_clt_con *con,
-+			struct ibtrs_clt_io_req *req)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	int ret = 0;
-+
-+	state->pages = req->map_page;
-+	if (sess->fast_reg_mode == IBTRS_FAST_MEM_FR) {
-+		state->next_fr = req->fr_list;
-+		ret = ibtrs_map_fr(state, con, req->sglist, req->sg_cnt);
-+		if (ret)
-+			goto out;
-+	} else if (sess->fast_reg_mode == IBTRS_FAST_MEM_FMR) {
-+		state->next_fmr = req->fmr_list;
-+		ret = ibtrs_map_fmr(state, con, req->sglist, 0,
-+				    req->sg_cnt);
-+		if (ret)
-+			goto out;
-+		ret = ibtrs_finish_fmr_mapping(state, con);
-+		if (ret)
-+			goto out;
-+	}
-+
-+out:
-+	req->nmdesc = state->nmdesc;
-+	return ret;
-+}
-+
-+static void ibtrs_clt_inv_rkey_done(struct ib_cq *cq, struct ib_wc *wc)
-+{
-+	struct ibtrs_clt_con *con = cq->cq_context;
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+
-+	if (unlikely(wc->status != IB_WC_SUCCESS)) {
-+		ibtrs_err(sess, "Failed IB_WR_LOCAL_INV: %s\n",
-+			  ib_wc_status_msg(wc->status));
-+		ibtrs_rdma_error_recovery(con);
-+	}
-+}
-+
-+static struct ib_cqe local_inv_cqe = {
-+	.done = ibtrs_clt_inv_rkey_done
-+};
-+
-+static int ibtrs_inv_rkey(struct ibtrs_clt_con *con, u32 rkey)
-+{
-+	struct ib_send_wr *bad_wr;
-+	struct ib_send_wr wr = {
-+		.opcode		    = IB_WR_LOCAL_INV,
-+		.wr_cqe		    = &local_inv_cqe,
-+		.next		    = NULL,
-+		.num_sge	    = 0,
-+		.send_flags	    = 0,
-+		.ex.invalidate_rkey = rkey,
-+	};
-+
-+	return ib_post_send(con->c.qp, &wr, &bad_wr);
-+}
-+
-+static void ibtrs_unmap_fast_reg_data(struct ibtrs_clt_con *con,
-+				      struct ibtrs_clt_io_req *req)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	int i, ret;
-+
-+	if (sess->fast_reg_mode == IBTRS_FAST_MEM_FR) {
-+		struct ibtrs_fr_desc **pfr;
-+
-+		for (i = req->nmdesc, pfr = req->fr_list; i > 0; i--, pfr++) {
-+			ret = ibtrs_inv_rkey(con, (*pfr)->mr->rkey);
-+			if (ret < 0) {
-+				ibtrs_err(sess,
-+					  "Invalidating registered RDMA memory for"
-+					  " rkey %#x failed, err: %d\n",
-+					  (*pfr)->mr->rkey, ret);
-+			}
-+		}
-+		if (req->nmdesc)
-+			ibtrs_fr_pool_put(con->fr_pool, req->fr_list,
-+					  req->nmdesc);
-+	} else {
-+		struct ib_pool_fmr **pfmr;
-+
-+		for (i = req->nmdesc, pfmr = req->fmr_list; i > 0; i--, pfmr++)
-+			ib_fmr_pool_unmap(*pfmr);
-+	}
-+	req->nmdesc = 0;
-+}
-+
-+/*
-+ * We have more scatter/gather entries, so use fast_reg_map
-+ * trying to merge as many entries as we can.
-+ */
-+static int ibtrs_fast_reg_map_data(struct ibtrs_clt_con *con,
-+				   struct ibtrs_sg_desc *desc,
-+				   struct ibtrs_clt_io_req *req)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	struct ibtrs_map_state state;
-+	int ret;
-+
-+	memset(&state, 0, sizeof(state));
-+	state.desc	= desc;
-+	state.dir	= req->dir;
-+	ret = ibtrs_map_sg(&state, con, req);
-+
-+	if (unlikely(ret))
-+		goto unmap;
-+
-+	if (unlikely(state.ndesc <= 0)) {
-+		ibtrs_err(sess,
-+			  "Could not fit S/G list into buffer descriptor %d\n",
-+			  state.ndesc);
-+		ret = -EIO;
-+		goto unmap;
-+	}
-+
-+	return state.ndesc;
-+unmap:
-+	ibtrs_unmap_fast_reg_data(con, req);
-+	return ret;
-+}
-+
-+static int ibtrs_post_send_rdma(struct ibtrs_clt_con *con,
-+				struct ibtrs_clt_io_req *req,
-+				u64 addr, u32 off, u32 imm)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	enum ib_send_flags flags;
-+	struct ib_sge list[1];
-+
-+	if (unlikely(!req->sg_size)) {
-+		ibtrs_wrn(sess, "Doing RDMA Write failed, no data supplied\n");
-+		return -EINVAL;
-+	}
-+
-+	/* user data and user message in the first list element */
-+	list[0].addr   = req->iu->dma_addr;
-+	list[0].length = req->sg_size;
-+	list[0].lkey   = sess->s.ib_dev->lkey;
-+
-+	/*
-+	 * From time to time we have to post signalled sends,
-+	 * or send queue will fill up and only QP reset can help.
-+	 */
-+	flags = atomic_inc_return(&con->io_cnt) % sess->queue_depth ?
-+			0 : IB_SEND_SIGNALED;
-+	return ibtrs_iu_post_rdma_write_imm(&con->c, req->iu, list, 1,
-+					    sess->srv_rdma_buf_rkey,
-+					    addr + off, imm, flags);
-+}
-+
-+static void ibtrs_set_sge_with_desc(struct ib_sge *list,
-+				    struct ibtrs_sg_desc *desc)
-+{
-+	list->addr   = le64_to_cpu(desc->addr);
-+	list->length = le32_to_cpu(desc->len);
-+	list->lkey   = le32_to_cpu(desc->key);
-+	pr_debug("dma_addr %llu, key %u, dma_len %u\n",
-+		 list->addr, list->lkey, list->length);
-+}
-+
-+static void ibtrs_set_rdma_desc_last(struct ibtrs_clt_con *con,
-+				     struct ib_sge *list,
-+				     struct ibtrs_clt_io_req *req,
-+				     struct ib_rdma_wr *wr, int offset,
-+				     struct ibtrs_sg_desc *desc, int m,
-+				     int n, u64 addr, u32 size, u32 imm)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	enum ib_send_flags flags;
-+	int i;
-+
-+	for (i = m; i < n; i++, desc++)
-+		ibtrs_set_sge_with_desc(&list[i], desc);
-+
-+	list[i].addr   = req->iu->dma_addr;
-+	list[i].length = size;
-+	list[i].lkey   = sess->s.ib_dev->lkey;
-+
-+	wr->wr.wr_cqe = &req->iu->cqe;
-+	wr->wr.sg_list = &list[m];
-+	wr->wr.num_sge = n - m + 1;
-+	wr->remote_addr	= addr + offset;
-+	wr->rkey = sess->srv_rdma_buf_rkey;
-+
-+	/*
-+	 * From time to time we have to post signalled sends,
-+	 * or send queue will fill up and only QP reset can help.
-+	 */
-+	flags = atomic_inc_return(&con->io_cnt) % sess->queue_depth ?
-+			0 : IB_SEND_SIGNALED;
-+
-+	wr->wr.opcode = IB_WR_RDMA_WRITE_WITH_IMM;
-+	wr->wr.send_flags  = flags;
-+	wr->wr.ex.imm_data = cpu_to_be32(imm);
-+}
-+
-+static int ibtrs_post_send_rdma_desc_more(struct ibtrs_clt_con *con,
-+					  struct ib_sge *list,
-+					  struct ibtrs_clt_io_req *req,
-+					  struct ibtrs_sg_desc *desc, int n,
-+					  u64 addr, u32 size, u32 imm)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	size_t max_sge, num_sge, num_wr;
-+	struct ib_send_wr *bad_wr;
-+	struct ib_rdma_wr *wrs, *wr;
-+	int j = 0, k, offset = 0, len = 0;
-+	int m = 0;
-+	int ret;
-+
-+	max_sge = sess->max_sge;
-+	num_sge = 1 + n;
-+	num_wr = DIV_ROUND_UP(num_sge, max_sge);
-+
-+	wrs = kcalloc(num_wr, sizeof(*wrs), GFP_ATOMIC);
-+	if (!wrs)
-+		return -ENOMEM;
-+
-+	if (num_wr == 1)
-+		goto last_one;
-+
-+	for (; j < num_wr; j++) {
-+		wr = &wrs[j];
-+		for (k = 0; k < max_sge; k++, desc++) {
-+			m = k + j * max_sge;
-+			ibtrs_set_sge_with_desc(&list[m], desc);
-+			len += le32_to_cpu(desc->len);
-+		}
-+		wr->wr.wr_cqe = &req->iu->cqe;
-+		wr->wr.sg_list = &list[m];
-+		wr->wr.num_sge = max_sge;
-+		wr->remote_addr	= addr + offset;
-+		wr->rkey = sess->srv_rdma_buf_rkey;
-+
-+		offset += len;
-+		wr->wr.next = &wrs[j + 1].wr;
-+		wr->wr.opcode = IB_WR_RDMA_WRITE;
-+	}
-+
-+last_one:
-+	wr = &wrs[j];
-+
-+	ibtrs_set_rdma_desc_last(con, list, req, wr, offset,
-+				 desc, m, n, addr, size, imm);
-+
-+	ret = ib_post_send(con->c.qp, &wrs[0].wr, &bad_wr);
-+	if (unlikely(ret))
-+		ibtrs_err(sess, "Posting write request to QP failed,"
-+			  " err: %d\n", ret);
-+	kfree(wrs);
-+	return ret;
-+}
-+
-+static int ibtrs_post_send_rdma_desc(struct ibtrs_clt_con *con,
-+				     struct ibtrs_clt_io_req *req,
-+				     struct ibtrs_sg_desc *desc, int n,
-+				     u64 addr, u32 size, u32 imm)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	enum ib_send_flags flags;
-+	struct ib_sge *list;
-+	size_t num_sge;
-+	int ret, i;
-+
-+	num_sge = 1 + n;
-+	list = kmalloc_array(num_sge, sizeof(*list), GFP_ATOMIC);
-+	if (!list)
-+		return -ENOMEM;
-+
-+	if (num_sge < sess->max_sge) {
-+		for (i = 0; i < n; i++, desc++)
-+			ibtrs_set_sge_with_desc(&list[i], desc);
-+		list[i].addr   = req->iu->dma_addr;
-+		list[i].length = size;
-+		list[i].lkey   = sess->s.ib_dev->lkey;
-+
-+		/*
-+		 * From time to time we have to post signalled sends,
-+		 * or send queue will fill up and only QP reset can help.
-+		 */
-+		flags = atomic_inc_return(&con->io_cnt) % sess->queue_depth ?
-+				0 : IB_SEND_SIGNALED;
-+		ret = ibtrs_iu_post_rdma_write_imm(&con->c, req->iu, list,
-+						   num_sge,
-+						   sess->srv_rdma_buf_rkey,
-+						   addr, imm, flags);
-+	} else {
-+		ret = ibtrs_post_send_rdma_desc_more(con, list, req, desc, n,
-+						     addr, size, imm);
-+	}
-+
-+	kfree(list);
-+	return ret;
-+}
-+
-+static int ibtrs_post_send_rdma_more(struct ibtrs_clt_con *con,
-+				     struct ibtrs_clt_io_req *req,
-+				     u64 addr, u32 size, u32 imm)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	struct ib_device *ibdev = sess->s.ib_dev->dev;
-+	enum ib_send_flags flags;
-+	struct scatterlist *sg;
-+	struct ib_sge *list;
-+	size_t num_sge;
-+	int i, ret;
-+
-+	num_sge = 1 + req->sg_cnt;
-+	list = kmalloc_array(num_sge, sizeof(*list), GFP_ATOMIC);
-+	if (!list)
-+		return -ENOMEM;
-+
-+	for_each_sg(req->sglist, sg, req->sg_cnt, i) {
-+		list[i].addr   = ib_sg_dma_address(ibdev, sg);
-+		list[i].length = ib_sg_dma_len(ibdev, sg);
-+		list[i].lkey   = sess->s.ib_dev->lkey;
-+	}
-+	list[i].addr   = req->iu->dma_addr;
-+	list[i].length = size;
-+	list[i].lkey   = sess->s.ib_dev->lkey;
-+
-+	/*
-+	 * From time to time we have to post signalled sends,
-+	 * or send queue will fill up and only QP reset can help.
-+	 */
-+	flags = atomic_inc_return(&con->io_cnt) % sess->queue_depth ?
-+			0 : IB_SEND_SIGNALED;
-+	ret = ibtrs_iu_post_rdma_write_imm(&con->c, req->iu, list, num_sge,
-+					   sess->srv_rdma_buf_rkey,
-+					   addr, imm, flags);
-+	kfree(list);
-+
-+	return ret;
-+}
-+
-+static inline unsigned long ibtrs_clt_get_raw_ms(void)
-+{
-+	struct timespec ts;
-+
-+	getrawmonotonic(&ts);
-+
-+	return timespec_to_ns(&ts) / NSEC_PER_MSEC;
-+}
-+
-+static void complete_rdma_req(struct ibtrs_clt_io_req *req,
-+			      int errno, bool notify)
-+{
-+	struct ibtrs_clt_con *con = req->con;
-+	struct ibtrs_clt_sess *sess;
-+	enum dma_data_direction dir;
-+	struct ibtrs_clt *clt;
-+	void *priv;
-+
-+	if (WARN_ON(!req->in_use))
-+		return;
-+	if (WARN_ON(!req->con))
-+		return;
-+	sess = to_clt_sess(con->c.sess);
-+	clt = sess->clt;
-+
-+	if (req->sg_cnt > fmr_sg_cnt)
-+		ibtrs_unmap_fast_reg_data(req->con, req);
-+	if (req->sg_cnt)
-+		ib_dma_unmap_sg(sess->s.ib_dev->dev, req->sglist,
-+				req->sg_cnt, req->dir);
-+	if (sess->stats.enable_rdma_lat)
-+		ibtrs_clt_update_rdma_lat(&sess->stats,
-+					  req->dir == DMA_FROM_DEVICE,
-+					  ibtrs_clt_get_raw_ms() -
-+					  req->start_time);
-+	ibtrs_clt_decrease_inflight(&sess->stats);
-+
-+	req->in_use = false;
-+	req->con = NULL;
-+	priv = req->priv;
-+	dir = req->dir;
-+
-+	if (notify)
-+		req->conf(priv, errno);
-+}
-+
-+static void process_io_rsp(struct ibtrs_clt_sess *sess, u32 msg_id, s16 errno)
-+{
-+	if (WARN_ON(msg_id >= sess->queue_depth))
-+		return;
-+
-+	complete_rdma_req(&sess->reqs[msg_id], errno, true);
-+}
-+
-+static struct ib_cqe io_comp_cqe = {
-+	.done = ibtrs_clt_rdma_done
-+};
-+
-+static void ibtrs_clt_rdma_done(struct ib_cq *cq, struct ib_wc *wc)
-+{
-+	struct ibtrs_clt_con *con = cq->cq_context;
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	u32 imm_type, imm_payload;
-+	int err;
-+
-+	if (unlikely(wc->status != IB_WC_SUCCESS)) {
-+		if (wc->status != IB_WC_WR_FLUSH_ERR) {
-+			ibtrs_err(sess, "RDMA failed: %s\n",
-+				  ib_wc_status_msg(wc->status));
-+			ibtrs_rdma_error_recovery(con);
-+		}
-+		return;
-+	}
-+	ibtrs_clt_update_wc_stats(con);
-+
-+	switch (wc->opcode) {
-+	case IB_WC_RDMA_WRITE:
-+		/*
-+		 * post_send() RDMA write completions of IO reqs (read/write)
-+		 * and hb
-+		 */
-+		break;
-+	case IB_WC_RECV_RDMA_WITH_IMM:
-+		/*
-+		 * post_recv() RDMA write completions of IO reqs (read/write)
-+		 * and hb
-+		 */
-+		if (WARN_ON(wc->wr_cqe != &io_comp_cqe))
-+			return;
-+		err = ibtrs_post_recv_empty(&con->c, &io_comp_cqe);
-+		if (unlikely(err)) {
-+			ibtrs_err(sess, "ibtrs_post_recv_empty(): %d\n", err);
-+			ibtrs_rdma_error_recovery(con);
-+			break;
-+		}
-+		ibtrs_from_imm(be32_to_cpu(wc->ex.imm_data),
-+			       &imm_type, &imm_payload);
-+		if (likely(imm_type == IBTRS_IO_RSP_IMM)) {
-+			u32 msg_id;
-+
-+			ibtrs_from_io_rsp_imm(imm_payload, &msg_id, &err);
-+			process_io_rsp(sess, msg_id, err);
-+		} else if (imm_type == IBTRS_HB_MSG_IMM) {
-+			WARN_ON(con->c.cid);
-+			ibtrs_send_hb_ack(&sess->s);
-+		} else if (imm_type == IBTRS_HB_ACK_IMM) {
-+			WARN_ON(con->c.cid);
-+			sess->s.hb_missed_cnt = 0;
-+		} else {
-+			ibtrs_wrn(sess, "Unknown IMM type %u\n", imm_type);
-+		}
-+		break;
-+	default:
-+		ibtrs_wrn(sess, "Unexpected WC type: %s\n",
-+			  ib_wc_opcode_str(wc->opcode));
-+		return;
-+	}
-+}
-+
-+static int post_recv_io(struct ibtrs_clt_con *con)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	int err, i;
-+
-+	for (i = 0; i < sess->queue_depth; i++) {
-+		err = ibtrs_post_recv_empty(&con->c, &io_comp_cqe);
-+		if (unlikely(err))
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static int post_recv_sess(struct ibtrs_clt_sess *sess)
-+{
-+	int err, cid;
-+
-+	for (cid = 0; cid < sess->s.con_num; cid++) {
-+		err = post_recv_io(to_clt_con(sess->s.con[cid]));
-+		if (unlikely(err)) {
-+			ibtrs_err(sess, "post_recv_io(), err: %d\n", err);
-+			return err;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+struct path_it {
-+	int i;
-+	struct list_head skip_list;
-+	struct ibtrs_clt *clt;
-+	struct ibtrs_clt_sess *(*next_path)(struct path_it *);
-+};
-+
-+#define do_each_path(path, clt, it) {					\
-+	path_it_init(it, clt);						\
-+	ibtrs_clt_state_lock();						\
-+	for ((it)->i = 0; ((path) = ((it)->next_path)(it)) &&		\
-+			  (it)->i < (it)->clt->paths_num;		\
-+	     (it)->i++)
-+
-+#define while_each_path(it)						\
-+	path_it_deinit(it);						\
-+	ibtrs_clt_state_unlock();					\
-+	}
-+
-+/**
-+ * get_next_path_rr() - Returns path in round-robin fashion.
-+ *
-+ * Related to @MP_POLICY_RR
-+ *
-+ * Locks:
-+ *    ibtrs_clt_state_lock() must be hold.
-+ */
-+static struct ibtrs_clt_sess *get_next_path_rr(struct path_it *it)
-+{
-+	struct ibtrs_clt_sess __percpu * __rcu *ppcpu_path, *path;
-+	struct ibtrs_clt *clt = it->clt;
-+
-+	ppcpu_path = this_cpu_ptr(clt->pcpu_path);
-+	path = rcu_dereference(*ppcpu_path);
-+	if (unlikely(!path))
-+		path = list_first_or_null_rcu(&clt->paths_list,
-+					      typeof(*path), s.entry);
-+	else
-+		path = list_next_or_null_rcu_rr(path, &clt->paths_list,
-+						s.entry);
-+	rcu_assign_pointer(*ppcpu_path, path);
-+
-+	return path;
-+}
-+
-+/**
-+ * get_next_path_min_inflight() - Returns path with minimal inflight count.
-+ *
-+ * Related to @MP_POLICY_MIN_INFLIGHT
-+ *
-+ * Locks:
-+ *    ibtrs_clt_state_lock() must be hold.
-+ */
-+static struct ibtrs_clt_sess *get_next_path_min_inflight(struct path_it *it)
-+{
-+	struct ibtrs_clt_sess *min_path = NULL;
-+	struct ibtrs_clt *clt = it->clt;
-+	struct ibtrs_clt_sess *sess;
-+	int min_inflight = INT_MAX;
-+	int inflight;
-+
-+	list_for_each_entry_rcu(sess, &clt->paths_list, s.entry) {
-+		if (unlikely(!list_empty(raw_cpu_ptr(sess->mp_skip_entry))))
-+			continue;
-+
-+		inflight = atomic_read(&sess->stats.inflight);
-+
-+		if (inflight < min_inflight) {
-+			min_inflight = inflight;
-+			min_path = sess;
-+		}
-+	}
-+
-+	/*
-+	 * add the path to the skip list, so that next time we can get
-+	 * a different one
-+	 */
-+	if (min_path)
-+		list_add(raw_cpu_ptr(min_path->mp_skip_entry), &it->skip_list);
-+
-+	return min_path;
-+}
-+
-+static inline void path_it_init(struct path_it *it, struct ibtrs_clt *clt)
-+{
-+	INIT_LIST_HEAD(&it->skip_list);
-+	it->clt = clt;
-+	it->i = 0;
-+
-+	if (clt->mp_policy == MP_POLICY_RR)
-+		it->next_path = get_next_path_rr;
-+	else
-+		it->next_path = get_next_path_min_inflight;
-+}
-+
-+static inline void path_it_deinit(struct path_it *it)
-+{
-+	struct list_head *skip, *tmp;
-+	/*
-+	 * The skip_list is used only for the MIN_INFLIGHT policy.
-+	 * We need to remove paths from it, so that next IO can insert
-+	 * paths (->mp_skip_entry) into a skip_list again.
-+	 */
-+	list_for_each_safe(skip, tmp, &it->skip_list)
-+		list_del_init(skip);
-+}
-+
-+static inline void ibtrs_clt_init_req(struct ibtrs_clt_io_req *req,
-+				      struct ibtrs_clt_sess *sess,
-+				      ibtrs_conf_fn *conf,
-+				      struct ibtrs_tag *tag, void *priv,
-+				      const struct kvec *vec, size_t usr_len,
-+				      struct scatterlist *sg, size_t sg_cnt,
-+				      size_t data_len, int dir)
-+{
-+	req->tag = tag;
-+	req->in_use = true;
-+	req->usr_len = usr_len;
-+	req->data_len = data_len;
-+	req->sglist = sg;
-+	req->sg_cnt = sg_cnt;
-+	req->priv = priv;
-+	req->dir = dir;
-+	req->con = ibtrs_tag_to_clt_con(sess, tag);
-+	req->conf = conf;
-+	copy_from_kvec(req->iu->buf, vec, usr_len);
-+	if (sess->stats.enable_rdma_lat)
-+		req->start_time = ibtrs_clt_get_raw_ms();
-+}
-+
-+static inline struct ibtrs_clt_io_req *
-+ibtrs_clt_get_req(struct ibtrs_clt_sess *sess, ibtrs_conf_fn *conf,
-+		  struct ibtrs_tag *tag, void *priv,
-+		  const struct kvec *vec, size_t usr_len,
-+		  struct scatterlist *sg, size_t sg_cnt,
-+		  size_t data_len, int dir)
-+{
-+	struct ibtrs_clt_io_req *req;
-+
-+	req = &sess->reqs[tag->mem_id];
-+	ibtrs_clt_init_req(req, sess, conf, tag, priv, vec, usr_len,
-+			   sg, sg_cnt, data_len, dir);
-+	return req;
-+}
-+
-+static inline struct ibtrs_clt_io_req *
-+ibtrs_clt_get_copy_req(struct ibtrs_clt_sess *alive_sess,
-+		       struct ibtrs_clt_io_req *fail_req)
-+{
-+	struct ibtrs_clt_io_req *req;
-+	struct kvec vec = {
-+		.iov_base = fail_req->iu->buf,
-+		.iov_len  = fail_req->usr_len
-+	};
-+
-+	req = &alive_sess->reqs[fail_req->tag->mem_id];
-+	ibtrs_clt_init_req(req, alive_sess, fail_req->conf, fail_req->tag,
-+			   fail_req->priv, &vec, fail_req->usr_len,
-+			   fail_req->sglist, fail_req->sg_cnt,
-+			   fail_req->data_len, fail_req->dir);
-+	return req;
-+}
-+
-+static int ibtrs_clt_write_req(struct ibtrs_clt_io_req *req);
-+static int ibtrs_clt_read_req(struct ibtrs_clt_io_req *req);
-+
-+static int ibtrs_clt_failover_req(struct ibtrs_clt *clt,
-+				  struct ibtrs_clt_io_req *fail_req)
-+{
-+	struct ibtrs_clt_sess *alive_sess;
-+	struct ibtrs_clt_io_req *req;
-+	int err = -ECONNABORTED;
-+	struct path_it it;
-+
-+	do_each_path(alive_sess, clt, &it) {
-+		if (unlikely(alive_sess->state != IBTRS_CLT_CONNECTED))
-+			continue;
-+		req = ibtrs_clt_get_copy_req(alive_sess, fail_req);
-+		if (req->dir == DMA_TO_DEVICE)
-+			err = ibtrs_clt_write_req(req);
-+		else
-+			err = ibtrs_clt_read_req(req);
-+		if (unlikely(err)) {
-+			req->in_use = false;
-+			continue;
-+		}
-+		/* Success path */
-+		ibtrs_clt_inc_failover_cnt(&alive_sess->stats);
-+		break;
-+	} while_each_path(&it);
-+
-+	return err;
-+}
-+
-+static void fail_all_outstanding_reqs(struct ibtrs_clt_sess *sess,
-+				      bool failover)
-+{
-+	struct ibtrs_clt *clt = sess->clt;
-+	struct ibtrs_clt_io_req *req;
-+	int i;
-+
-+	if (!sess->reqs)
-+		return;
-+	for (i = 0; i < sess->queue_depth; ++i) {
-+		bool notify;
-+		int err = 0;
-+
-+		req = &sess->reqs[i];
-+		if (!req->in_use)
-+			continue;
-+
-+		if (failover)
-+			err = ibtrs_clt_failover_req(clt, req);
-+
-+		notify = (!failover || err);
-+		complete_rdma_req(req, -ECONNABORTED, notify);
-+	}
-+}
-+
-+static void free_sess_reqs(struct ibtrs_clt_sess *sess)
-+{
-+	struct ibtrs_clt_io_req *req;
-+	int i;
-+
-+	if (!sess->reqs)
-+		return;
-+	for (i = 0; i < sess->queue_depth; ++i) {
-+		req = &sess->reqs[i];
-+		if (sess->fast_reg_mode == IBTRS_FAST_MEM_FR)
-+			kfree(req->fr_list);
-+		else if (sess->fast_reg_mode == IBTRS_FAST_MEM_FMR)
-+			kfree(req->fmr_list);
-+		kfree(req->map_page);
-+		ibtrs_iu_free(req->iu, DMA_TO_DEVICE,
-+			      sess->s.ib_dev->dev);
-+	}
-+	kfree(sess->reqs);
-+	sess->reqs = NULL;
-+}
-+
-+static int alloc_sess_reqs(struct ibtrs_clt_sess *sess)
-+{
-+	struct ibtrs_clt_io_req *req;
-+	void *mr_list;
-+	int i;
-+
-+	sess->reqs = kcalloc(sess->queue_depth, sizeof(*sess->reqs),
-+			     GFP_KERNEL);
-+	if (unlikely(!sess->reqs))
-+		return -ENOMEM;
-+
-+	for (i = 0; i < sess->queue_depth; ++i) {
-+		req = &sess->reqs[i];
-+		req->iu = ibtrs_iu_alloc(i, sess->max_req_size, GFP_KERNEL,
-+					 sess->s.ib_dev->dev, DMA_TO_DEVICE,
-+					 ibtrs_clt_rdma_done);
-+		if (unlikely(!req->iu))
-+			goto out;
-+		mr_list = kmalloc_array(sess->max_pages_per_mr,
-+					sizeof(void *), GFP_KERNEL);
-+		if (unlikely(!mr_list))
-+			goto out;
-+		if (sess->fast_reg_mode == IBTRS_FAST_MEM_FR)
-+			req->fr_list = mr_list;
-+		else if (sess->fast_reg_mode == IBTRS_FAST_MEM_FMR)
-+			req->fmr_list = mr_list;
-+
-+		req->map_page = kmalloc_array(sess->max_pages_per_mr,
-+					      sizeof(void *), GFP_KERNEL);
-+		if (unlikely(!req->map_page))
-+			goto out;
-+	}
-+
-+	return 0;
-+
-+out:
-+	free_sess_reqs(sess);
-+
-+	return -ENOMEM;
-+}
-+
-+static int alloc_tags(struct ibtrs_clt *clt)
-+{
-+	unsigned int chunk_bits;
-+	int err, i;
-+
-+	clt->tags_map = kcalloc(BITS_TO_LONGS(clt->queue_depth), sizeof(long),
-+				GFP_KERNEL);
-+	if (unlikely(!clt->tags_map)) {
-+		err = -ENOMEM;
-+		goto out_err;
-+	}
-+	clt->tags = kcalloc(clt->queue_depth, TAG_SIZE(clt), GFP_KERNEL);
-+	if (unlikely(!clt->tags)) {
-+		err = -ENOMEM;
-+		goto err_map;
-+	}
-+	chunk_bits = ilog2(clt->queue_depth - 1) + 1;
-+	for (i = 0; i < clt->queue_depth; i++) {
-+		struct ibtrs_tag *tag;
-+
-+		tag = GET_TAG(clt, i);
-+		tag->mem_id = i;
-+		tag->mem_off = i << (MAX_IMM_PAYL_BITS - chunk_bits);
-+	}
-+
-+	return 0;
-+
-+err_map:
-+	kfree(clt->tags_map);
-+	clt->tags_map = NULL;
-+out_err:
-+	return err;
-+}
-+
-+static void free_tags(struct ibtrs_clt *clt)
-+{
-+	kfree(clt->tags_map);
-+	clt->tags_map = NULL;
-+	kfree(clt->tags);
-+	clt->tags = NULL;
-+}
-+
-+static void query_fast_reg_mode(struct ibtrs_clt_sess *sess)
-+{
-+	struct ibtrs_ib_dev *ib_dev;
-+	u64 max_pages_per_mr;
-+	int mr_page_shift;
-+
-+	ib_dev = sess->s.ib_dev;
-+	if (ib_dev->dev->alloc_fmr && ib_dev->dev->dealloc_fmr &&
-+	    ib_dev->dev->map_phys_fmr && ib_dev->dev->unmap_fmr) {
-+		sess->fast_reg_mode = IBTRS_FAST_MEM_FMR;
-+		ibtrs_info(sess, "Device %s supports FMR\n", ib_dev->dev->name);
-+	}
-+	if (ib_dev->attrs.device_cap_flags & IB_DEVICE_MEM_MGT_EXTENSIONS &&
-+	    use_fr) {
-+		sess->fast_reg_mode = IBTRS_FAST_MEM_FR;
-+		ibtrs_info(sess, "Device %s supports FR\n", ib_dev->dev->name);
-+	}
-+
-+	/*
-+	 * Use the smallest page size supported by the HCA, down to a
-+	 * minimum of 4096 bytes. We're unlikely to build large sglists
-+	 * out of smaller entries.
-+	 */
-+	mr_page_shift      = max(12, ffs(ib_dev->attrs.page_size_cap) - 1);
-+	sess->mr_page_size = 1 << mr_page_shift;
-+	sess->max_sge      = ib_dev->attrs.max_sge;
-+	sess->mr_page_mask = ~((u64)sess->mr_page_size - 1);
-+	max_pages_per_mr   = ib_dev->attrs.max_mr_size;
-+	do_div(max_pages_per_mr, sess->mr_page_size);
-+	sess->max_pages_per_mr = min_t(u64, sess->max_pages_per_mr,
-+				       max_pages_per_mr);
-+	if (sess->fast_reg_mode == IBTRS_FAST_MEM_FR) {
-+		sess->max_pages_per_mr =
-+			min_t(u32, sess->max_pages_per_mr,
-+			      ib_dev->attrs.max_fast_reg_page_list_len);
-+	}
-+	sess->mr_max_size = sess->mr_page_size * sess->max_pages_per_mr;
-+}
-+
-+static int alloc_con_fast_pool(struct ibtrs_clt_con *con)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	struct ibtrs_fr_pool *fr_pool;
-+	int err = 0;
-+
-+	if (sess->fast_reg_mode == IBTRS_FAST_MEM_FR) {
-+		fr_pool = ibtrs_create_fr_pool(sess->s.ib_dev->dev,
-+					       sess->s.ib_dev->pd,
-+					       sess->queue_depth,
-+					       sess->max_pages_per_mr);
-+		if (unlikely(IS_ERR(fr_pool))) {
-+			err = PTR_ERR(fr_pool);
-+			ibtrs_err(sess, "FR pool allocation failed, err: %d\n",
-+				  err);
-+			return err;
-+		}
-+		con->fr_pool = fr_pool;
-+	}
-+
-+	return err;
-+}
-+
-+static void free_con_fast_pool(struct ibtrs_clt_con *con)
-+{
-+	if (con->fr_pool) {
-+		ibtrs_destroy_fr_pool(con->fr_pool);
-+		con->fr_pool = NULL;
-+	}
-+}
-+
-+static int alloc_sess_fast_pool(struct ibtrs_clt_sess *sess)
-+{
-+	struct ib_fmr_pool_param fmr_param;
-+	struct ib_fmr_pool *fmr_pool;
-+	int err = 0;
-+
-+	if (sess->fast_reg_mode == IBTRS_FAST_MEM_FMR) {
-+		memset(&fmr_param, 0, sizeof(fmr_param));
-+		fmr_param.pool_size	    = sess->queue_depth *
-+					      sess->max_pages_per_mr;
-+		fmr_param.dirty_watermark   = fmr_param.pool_size / 4;
-+		fmr_param.cache		    = 0;
-+		fmr_param.max_pages_per_fmr = sess->max_pages_per_mr;
-+		fmr_param.page_shift	    = ilog2(sess->mr_page_size);
-+		fmr_param.access	    = (IB_ACCESS_LOCAL_WRITE |
-+					       IB_ACCESS_REMOTE_WRITE);
-+
-+		fmr_pool = ib_create_fmr_pool(sess->s.ib_dev->pd, &fmr_param);
-+		if (unlikely(IS_ERR(fmr_pool))) {
-+			err = PTR_ERR(fmr_pool);
-+			ibtrs_err(sess, "FMR pool allocation failed, err: %d\n",
-+				  err);
-+			return err;
-+		}
-+		sess->fmr_pool = fmr_pool;
-+	}
-+
-+	return err;
-+}
-+
-+static void free_sess_fast_pool(struct ibtrs_clt_sess *sess)
-+{
-+	if (sess->fmr_pool) {
-+		ib_destroy_fmr_pool(sess->fmr_pool);
-+		sess->fmr_pool = NULL;
-+	}
-+}
-+
-+static int alloc_sess_io_bufs(struct ibtrs_clt_sess *sess)
-+{
-+	int ret;
-+
-+	ret = alloc_sess_reqs(sess);
-+	if (unlikely(ret)) {
-+		ibtrs_err(sess, "alloc_sess_reqs(), err: %d\n", ret);
-+		return ret;
-+	}
-+	ret = alloc_sess_fast_pool(sess);
-+	if (unlikely(ret)) {
-+		ibtrs_err(sess, "alloc_sess_fast_pool(), err: %d\n", ret);
-+		goto free_reqs;
-+	}
-+
-+	return 0;
-+
-+free_reqs:
-+	free_sess_reqs(sess);
-+
-+	return ret;
-+}
-+
-+static void free_sess_io_bufs(struct ibtrs_clt_sess *sess)
-+{
-+	free_sess_reqs(sess);
-+	free_sess_fast_pool(sess);
-+}
-+
-+static bool __ibtrs_clt_change_state(struct ibtrs_clt_sess *sess,
-+				     enum ibtrs_clt_state new_state)
-+{
-+	enum ibtrs_clt_state old_state;
-+	bool changed = false;
-+
-+	old_state = sess->state;
-+	switch (new_state) {
-+	case IBTRS_CLT_CONNECTING:
-+		switch (old_state) {
-+		case IBTRS_CLT_RECONNECTING:
-+			changed = true;
-+			/* FALLTHRU */
-+		default:
-+			break;
-+		}
-+		break;
-+	case IBTRS_CLT_RECONNECTING:
-+		switch (old_state) {
-+		case IBTRS_CLT_CONNECTED:
-+		case IBTRS_CLT_CONNECTING_ERR:
-+		case IBTRS_CLT_CLOSED:
-+			changed = true;
-+			/* FALLTHRU */
-+		default:
-+			break;
-+		}
-+		break;
-+	case IBTRS_CLT_CONNECTED:
-+		switch (old_state) {
-+		case IBTRS_CLT_CONNECTING:
-+			changed = true;
-+			/* FALLTHRU */
-+		default:
-+			break;
-+		}
-+		break;
-+	case IBTRS_CLT_CONNECTING_ERR:
-+		switch (old_state) {
-+		case IBTRS_CLT_CONNECTING:
-+			changed = true;
-+			/* FALLTHRU */
-+		default:
-+			break;
-+		}
-+		break;
-+	case IBTRS_CLT_CLOSING:
-+		switch (old_state) {
-+		case IBTRS_CLT_CONNECTING:
-+		case IBTRS_CLT_CONNECTING_ERR:
-+		case IBTRS_CLT_RECONNECTING:
-+		case IBTRS_CLT_CONNECTED:
-+			changed = true;
-+			/* FALLTHRU */
-+		default:
-+			break;
-+		}
-+		break;
-+	case IBTRS_CLT_CLOSED:
-+		switch (old_state) {
-+		case IBTRS_CLT_CLOSING:
-+			changed = true;
-+			/* FALLTHRU */
-+		default:
-+			break;
-+		}
-+		break;
-+	case IBTRS_CLT_DEAD:
-+		switch (old_state) {
-+		case IBTRS_CLT_CLOSED:
-+			changed = true;
-+			/* FALLTHRU */
-+		default:
-+			break;
-+		}
-+		break;
-+	default:
-+		break;
-+	}
-+	if (changed) {
-+		sess->state = new_state;
-+		wake_up_locked(&sess->state_wq);
-+	}
-+
-+	return changed;
-+}
-+
-+static bool ibtrs_clt_change_state_from_to(struct ibtrs_clt_sess *sess,
-+					   enum ibtrs_clt_state old_state,
-+					   enum ibtrs_clt_state new_state)
-+{
-+	bool changed = false;
-+
-+	spin_lock_irq(&sess->state_wq.lock);
-+	if (sess->state == old_state)
-+		changed = __ibtrs_clt_change_state(sess, new_state);
-+	spin_unlock_irq(&sess->state_wq.lock);
-+
-+	return changed;
-+}
-+
-+static bool ibtrs_clt_change_state_get_old(struct ibtrs_clt_sess *sess,
-+					   enum ibtrs_clt_state new_state,
-+					   enum ibtrs_clt_state *old_state)
-+{
-+	bool changed;
-+
-+	spin_lock_irq(&sess->state_wq.lock);
-+	*old_state = sess->state;
-+	changed = __ibtrs_clt_change_state(sess, new_state);
-+	spin_unlock_irq(&sess->state_wq.lock);
-+
-+	return changed;
-+}
-+
-+static bool ibtrs_clt_change_state(struct ibtrs_clt_sess *sess,
-+				   enum ibtrs_clt_state new_state)
-+{
-+	enum ibtrs_clt_state old_state;
-+
-+	return ibtrs_clt_change_state_get_old(sess, new_state, &old_state);
-+}
-+
-+static enum ibtrs_clt_state ibtrs_clt_state(struct ibtrs_clt_sess *sess)
-+{
-+	enum ibtrs_clt_state state;
-+
-+	spin_lock_irq(&sess->state_wq.lock);
-+	state = sess->state;
-+	spin_unlock_irq(&sess->state_wq.lock);
-+
-+	return state;
-+}
-+
-+static void ibtrs_clt_hb_err_handler(struct ibtrs_con *c, int err)
-+{
-+	struct ibtrs_clt_con *con;
-+
-+	(void)err;
-+	con = container_of(c, typeof(*con), c);
-+	ibtrs_rdma_error_recovery(con);
-+}
-+
-+static void ibtrs_clt_init_hb(struct ibtrs_clt_sess *sess)
-+{
-+	ibtrs_init_hb(&sess->s, &io_comp_cqe,
-+		      IBTRS_HB_INTERVAL_MS,
-+		      IBTRS_HB_MISSED_MAX,
-+		      ibtrs_clt_hb_err_handler,
-+		      ibtrs_wq);
-+}
-+
-+static void ibtrs_clt_start_hb(struct ibtrs_clt_sess *sess)
-+{
-+	ibtrs_start_hb(&sess->s);
-+}
-+
-+static void ibtrs_clt_stop_hb(struct ibtrs_clt_sess *sess)
-+{
-+	ibtrs_stop_hb(&sess->s);
-+}
-+
-+static void ibtrs_clt_reconnect_work(struct work_struct *work);
-+static void ibtrs_clt_close_work(struct work_struct *work);
-+
-+static struct ibtrs_clt_sess *alloc_sess(struct ibtrs_clt *clt,
-+					 const struct ibtrs_addr *path,
-+					 size_t con_num, u16 max_segments)
-+{
-+	struct ibtrs_clt_sess *sess;
-+	int err = -ENOMEM;
-+	int cpu;
-+
-+	sess = kzalloc(sizeof(*sess), GFP_KERNEL);
-+	if (unlikely(!sess))
-+		goto err;
-+
-+	/* Extra connection for user messages */
-+	con_num += 1;
-+
-+	sess->s.con = kcalloc(con_num, sizeof(*sess->s.con), GFP_KERNEL);
-+	if (unlikely(!sess->s.con))
-+		goto err_free_sess;
-+
-+	mutex_init(&sess->init_mutex);
-+	uuid_gen(&sess->s.uuid);
-+	memcpy(&sess->s.dst_addr, path->dst,
-+	       rdma_addr_size((struct sockaddr *)path->dst));
-+
-+	/*
-+	 * rdma_resolve_addr() passes src_addr to cma_bind_addr, which
-+	 * checks the sa_family to be non-zero. If user passed src_addr=NULL
-+	 * the sess->src_addr will contain only zeros, which is then fine.
-+	 */
-+	if (path->src)
-+		memcpy(&sess->s.src_addr, path->src,
-+		       rdma_addr_size((struct sockaddr *)path->src));
-+	strlcpy(sess->s.sessname, clt->sessname, sizeof(sess->s.sessname));
-+	sess->s.con_num = con_num;
-+	sess->clt = clt;
-+	sess->max_pages_per_mr = max_segments;
-+	init_waitqueue_head(&sess->state_wq);
-+	sess->state = IBTRS_CLT_CONNECTING;
-+	atomic_set(&sess->connected_cnt, 0);
-+	INIT_WORK(&sess->close_work, ibtrs_clt_close_work);
-+	INIT_DELAYED_WORK(&sess->reconnect_dwork, ibtrs_clt_reconnect_work);
-+	ibtrs_clt_init_hb(sess);
-+
-+	sess->mp_skip_entry = alloc_percpu(typeof(*sess->mp_skip_entry));
-+	if (unlikely(!sess->mp_skip_entry))
-+		goto err_free_con;
-+
-+	for_each_possible_cpu(cpu)
-+		INIT_LIST_HEAD(per_cpu_ptr(sess->mp_skip_entry, cpu));
-+
-+	err = ibtrs_clt_init_stats(&sess->stats);
-+	if (unlikely(err))
-+		goto err_free_percpu;
-+
-+	return sess;
-+
-+err_free_percpu:
-+	free_percpu(sess->mp_skip_entry);
-+err_free_con:
-+	kfree(sess->s.con);
-+err_free_sess:
-+	kfree(sess);
-+err:
-+	return ERR_PTR(err);
-+}
-+
-+static void free_sess(struct ibtrs_clt_sess *sess)
-+{
-+	ibtrs_clt_free_stats(&sess->stats);
-+	free_percpu(sess->mp_skip_entry);
-+	kfree(sess->s.con);
-+	kfree(sess->srv_rdma_addr);
-+	kfree(sess);
-+}
-+
-+static int create_con(struct ibtrs_clt_sess *sess, unsigned int cid)
-+{
-+	struct ibtrs_clt_con *con;
-+
-+	con = kzalloc(sizeof(*con), GFP_KERNEL);
-+	if (unlikely(!con))
-+		return -ENOMEM;
-+
-+	/* Map first two connections to the first CPU */
-+	con->cpu  = (cid ? cid - 1 : 0) % nr_cpu_ids;
-+	con->c.cid = cid;
-+	con->c.sess = &sess->s;
-+	atomic_set(&con->io_cnt, 0);
-+
-+	sess->s.con[cid] = &con->c;
-+
-+	return 0;
-+}
-+
-+static void destroy_con(struct ibtrs_clt_con *con)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+
-+	sess->s.con[con->c.cid] = NULL;
-+	kfree(con);
-+}
-+
-+static int create_con_cq_qp(struct ibtrs_clt_con *con)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	u16 cq_size, wr_queue_size;
-+	int err, cq_vector;
-+
-+	/*
-+	 * This function can fail, but still destroy_con_cq_qp() should
-+	 * be called, this is because create_con_cq_qp() is called on cm
-+	 * event path, thus caller/waiter never knows: have we failed before
-+	 * create_con_cq_qp() or after.  To solve this dilemma without
-+	 * creating any additional flags just allow destroy_con_cq_qp() be
-+	 * called many times.
-+	 */
-+
-+	if (con->c.cid == 0) {
-+		cq_size = SERVICE_CON_QUEUE_DEPTH;
-+		/* + 2 for drain and heartbeat */
-+		wr_queue_size = SERVICE_CON_QUEUE_DEPTH + 2;
-+		/* We must be the first here */
-+		if (WARN_ON(sess->s.ib_dev))
-+			return -EINVAL;
-+
-+		/*
-+		 * The whole session uses device from user connection.
-+		 * Be careful not to close user connection before ib dev
-+		 * is gracefully put.
-+		 */
-+		sess->s.ib_dev = ibtrs_ib_dev_find_get(con->c.cm_id);
-+		if (unlikely(!sess->s.ib_dev)) {
-+			ibtrs_wrn(sess, "ibtrs_ib_dev_find_get(): no memory\n");
-+			return -ENOMEM;
-+		}
-+		sess->s.ib_dev_ref = 1;
-+		query_fast_reg_mode(sess);
-+	} else {
-+		int num_wr;
-+
-+		/*
-+		 * Here we assume that session members are correctly set.
-+		 * This is always true if user connection (cid == 0) is
-+		 * established first.
-+		 */
-+		if (WARN_ON(!sess->s.ib_dev))
-+			return -EINVAL;
-+		if (WARN_ON(!sess->queue_depth))
-+			return -EINVAL;
-+
-+		/* Shared between connections */
-+		sess->s.ib_dev_ref++;
-+		cq_size = sess->queue_depth;
-+		num_wr = DIV_ROUND_UP(sess->max_pages_per_mr, sess->max_sge);
-+		wr_queue_size = sess->s.ib_dev->attrs.max_qp_wr;
-+		wr_queue_size = min_t(int, wr_queue_size,
-+				      sess->queue_depth * num_wr *
-+				      (use_fr ? 3 : 2) + 1);
-+	}
-+	cq_vector = con->cpu % sess->s.ib_dev->dev->num_comp_vectors;
-+	err = ibtrs_cq_qp_create(&sess->s, &con->c, sess->max_sge,
-+				 cq_vector, cq_size, wr_queue_size,
-+				 IB_POLL_SOFTIRQ);
-+	/*
-+	 * In case of error we do not bother to clean previous allocations,
-+	 * since destroy_con_cq_qp() must be called.
-+	 */
-+
-+	if (unlikely(err))
-+		return err;
-+
-+	if (con->c.cid) {
-+		err = alloc_con_fast_pool(con);
-+		if (unlikely(err))
-+			ibtrs_cq_qp_destroy(&con->c);
-+	}
-+
-+	return err;
-+}
-+
-+static void destroy_con_cq_qp(struct ibtrs_clt_con *con)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+
-+	/*
-+	 * Be careful here: destroy_con_cq_qp() can be called even
-+	 * create_con_cq_qp() failed, see comments there.
-+	 */
-+
-+	ibtrs_cq_qp_destroy(&con->c);
-+	if (con->c.cid != 0)
-+		free_con_fast_pool(con);
-+	if (sess->s.ib_dev_ref && !--sess->s.ib_dev_ref) {
-+		ibtrs_ib_dev_put(sess->s.ib_dev);
-+		sess->s.ib_dev = NULL;
-+	}
-+}
-+
-+static void stop_cm(struct ibtrs_clt_con *con)
-+{
-+	rdma_disconnect(con->c.cm_id);
-+	if (con->c.qp)
-+		ib_drain_qp(con->c.qp);
-+}
-+
-+static void destroy_cm(struct ibtrs_clt_con *con)
-+{
-+	rdma_destroy_id(con->c.cm_id);
-+	con->c.cm_id = NULL;
-+}
-+
-+static int ibtrs_clt_rdma_cm_handler(struct rdma_cm_id *cm_id,
-+				     struct rdma_cm_event *ev);
-+
-+static int create_cm(struct ibtrs_clt_con *con)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	struct rdma_cm_id *cm_id;
-+	int err;
-+
-+	cm_id = rdma_create_id(&init_net, ibtrs_clt_rdma_cm_handler, con,
-+			       sess->s.dst_addr.ss_family == AF_IB ?
-+			       RDMA_PS_IB : RDMA_PS_TCP, IB_QPT_RC);
-+	if (unlikely(IS_ERR(cm_id))) {
-+		err = PTR_ERR(cm_id);
-+		ibtrs_err(sess, "Failed to create CM ID, err: %d\n", err);
-+
-+		return err;
-+	}
-+	con->c.cm_id = cm_id;
-+	con->cm_err = 0;
-+	/* allow the port to be reused */
-+	err = rdma_set_reuseaddr(cm_id, 1);
-+	if (err != 0) {
-+		ibtrs_err(sess, "Set address reuse failed, err: %d\n", err);
-+		goto destroy_cm;
-+	}
-+	err = rdma_resolve_addr(cm_id, (struct sockaddr *)&sess->s.src_addr,
-+				(struct sockaddr *)&sess->s.dst_addr,
-+				IBTRS_CONNECT_TIMEOUT_MS);
-+	if (unlikely(err)) {
-+		ibtrs_err(sess, "Failed to resolve address, err: %d\n", err);
-+		goto destroy_cm;
-+	}
-+	/*
-+	 * Combine connection status and session events. This is needed
-+	 * for waiting two possible cases: cm_err has something meaningful
-+	 * or session state was really changed to error by device removal.
-+	 */
-+	err = wait_event_interruptible_timeout(sess->state_wq,
-+			con->cm_err || sess->state != IBTRS_CLT_CONNECTING,
-+			msecs_to_jiffies(IBTRS_CONNECT_TIMEOUT_MS));
-+	if (unlikely(err == 0 || err == -ERESTARTSYS)) {
-+		if (err == 0)
-+			err = -ETIMEDOUT;
-+		/* Timedout or interrupted */
-+		goto errr;
-+	}
-+	if (unlikely(con->cm_err < 0)) {
-+		err = con->cm_err;
-+		goto errr;
-+	}
-+	if (unlikely(sess->state != IBTRS_CLT_CONNECTING)) {
-+		/* Device removal */
-+		err = -ECONNABORTED;
-+		goto errr;
-+	}
-+
-+	return 0;
-+
-+errr:
-+	stop_cm(con);
-+	/* Is safe to call destroy if cq_qp is not inited */
-+	destroy_con_cq_qp(con);
-+destroy_cm:
-+	destroy_cm(con);
-+
-+	return err;
-+}
-+
-+static void ibtrs_clt_sess_up(struct ibtrs_clt_sess *sess)
-+{
-+	struct ibtrs_clt *clt = sess->clt;
-+	int up;
-+
-+	/*
-+	 * We can fire RECONNECTED event only when all paths were
-+	 * connected on ibtrs_clt_open(), then each was disconnected
-+	 * and the first one connected again.  That's why this nasty
-+	 * game with counter value.
-+	 */
-+
-+	mutex_lock(&clt->paths_ev_mutex);
-+	up = ++clt->paths_up;
-+	/*
-+	 * Here it is safe to access paths num directly since up counter
-+	 * is greater than MAX_PATHS_NUM only while ibtrs_clt_open() is
-+	 * in progress, thus paths removals are impossible.
-+	 */
-+	if (up > MAX_PATHS_NUM && up == MAX_PATHS_NUM + clt->paths_num)
-+		clt->paths_up = clt->paths_num;
-+	else if (up == 1)
-+		clt->link_ev(clt->priv, IBTRS_CLT_LINK_EV_RECONNECTED);
-+	mutex_unlock(&clt->paths_ev_mutex);
-+
-+	/* Mark session as established */
-+	sess->established = true;
-+	sess->reconnect_attempts = 0;
-+	sess->stats.reconnects.successful_cnt++;
-+}
-+
-+static void ibtrs_clt_sess_down(struct ibtrs_clt_sess *sess)
-+{
-+	struct ibtrs_clt *clt = sess->clt;
-+
-+	if (!sess->established)
-+		return;
-+
-+	sess->established = false;
-+	mutex_lock(&clt->paths_ev_mutex);
-+	WARN_ON(!clt->paths_up);
-+	if (--clt->paths_up == 0)
-+		clt->link_ev(clt->priv, IBTRS_CLT_LINK_EV_DISCONNECTED);
-+	mutex_unlock(&clt->paths_ev_mutex);
-+}
-+
-+static void ibtrs_clt_stop_and_destroy_conns(struct ibtrs_clt_sess *sess,
-+					     bool failover)
-+{
-+	struct ibtrs_clt_con *con;
-+	unsigned int cid;
-+
-+	WARN_ON(sess->state == IBTRS_CLT_CONNECTED);
-+
-+	/*
-+	 * Possible race with ibtrs_clt_open(), when DEVICE_REMOVAL comes
-+	 * exactly in between.  Start destroying after it finishes.
-+	 */
-+	mutex_lock(&sess->init_mutex);
-+	mutex_unlock(&sess->init_mutex);
-+
-+	/*
-+	 * All IO paths must observe !CONNECTED state before we
-+	 * free everything.
-+	 */
-+	synchronize_rcu();
-+
-+	ibtrs_clt_stop_hb(sess);
-+
-+	/*
-+	 * The order it utterly crucial: firstly disconnect and complete all
-+	 * rdma requests with error (thus set in_use=false for requests),
-+	 * then fail outstanding requests checking in_use for each, and
-+	 * eventually notify upper layer about session disconnection.
-+	 */
-+
-+	for (cid = 0; cid < sess->s.con_num; cid++) {
-+		con = to_clt_con(sess->s.con[cid]);
-+		if (!con)
-+			break;
-+
-+		stop_cm(con);
-+	}
-+	fail_all_outstanding_reqs(sess, failover);
-+	free_sess_io_bufs(sess);
-+	ibtrs_clt_sess_down(sess);
-+
-+	/*
-+	 * Wait for graceful shutdown, namely when peer side invokes
-+	 * rdma_disconnect(). 'connected_cnt' is decremented only on
-+	 * CM events, thus if other side had crashed and hb has detected
-+	 * something is wrong, here we will stuck for exactly timeout ms,
-+	 * since CM does not fire anything.  That is fine, we are not in
-+	 * hurry.
-+	 */
-+	wait_event_timeout(sess->state_wq, !atomic_read(&sess->connected_cnt),
-+			   msecs_to_jiffies(IBTRS_CONNECT_TIMEOUT_MS));
-+
-+	for (cid = 0; cid < sess->s.con_num; cid++) {
-+		con = to_clt_con(sess->s.con[cid]);
-+		if (!con)
-+			break;
-+
-+		destroy_con_cq_qp(con);
-+		destroy_cm(con);
-+		destroy_con(con);
-+	}
-+}
-+
-+static void ibtrs_clt_remove_path_from_arr(struct ibtrs_clt_sess *sess)
-+{
-+	struct ibtrs_clt *clt = sess->clt;
-+	struct ibtrs_clt_sess *next;
-+	int cpu;
-+
-+	mutex_lock(&clt->paths_mutex);
-+	list_del_rcu(&sess->s.entry);
-+
-+	/* Make sure everybody observes path removal. */
-+	synchronize_rcu();
-+
-+	/*
-+	 * Decrement paths number only after grace period, because
-+	 * caller of do_each_path() must firstly observe list without
-+	 * path and only then decremented paths number.
-+	 *
-+	 * Otherwise there can be the following situation:
-+	 *    o Two paths exist and IO is coming.
-+	 *    o One path is removed:
-+	 *      CPU#0                          CPU#1
-+	 *      do_each_path():                ibtrs_clt_remove_path_from_arr():
-+	 *          path = get_next_path()
-+	 *          ^^^                            list_del_rcu(path)
-+	 *          [!CONNECTED path]              clt->paths_num--
-+	 *                                              ^^^^^^^^^
-+	 *          load clt->paths_num                 from 2 to 1
-+	 *                    ^^^^^^^^^
-+	 *                    sees 1
-+	 *
-+	 *      path is observed as !CONNECTED, but do_each_path() loop
-+	 *      ends, because expression i < clt->paths_num is false.
-+	 */
-+	clt->paths_num--;
-+
-+	next = list_next_or_null_rcu_rr(sess, &clt->paths_list, s.entry);
-+
-+	/*
-+	 * Pcpu paths can still point to the path which is going to be
-+	 * removed, so change the pointer manually.
-+	 */
-+	for_each_possible_cpu(cpu) {
-+		struct ibtrs_clt_sess **ppcpu_path;
-+
-+		ppcpu_path = per_cpu_ptr(clt->pcpu_path, cpu);
-+		if (*ppcpu_path != sess)
-+			/*
-+			 * synchronize_rcu() was called just after deleting
-+			 * entry from the list, thus IO code path cannot
-+			 * change pointer back to the pointer which is going
-+			 * to be removed, we are safe here.
-+			 */
-+			continue;
-+
-+		/*
-+		 * We race with IO code path, which also changes pointer,
-+		 * thus we have to be careful not to override it.
-+		 */
-+		cmpxchg(ppcpu_path, sess, next);
-+	}
-+	mutex_unlock(&clt->paths_mutex);
-+}
-+
-+static inline bool __ibtrs_clt_path_exists(struct ibtrs_clt *clt,
-+					   struct ibtrs_addr *addr)
-+{
-+	struct ibtrs_clt_sess *sess;
-+
-+	list_for_each_entry(sess, &clt->paths_list, s.entry)
-+		if (!sockaddr_cmp((struct sockaddr *)&sess->s.dst_addr,
-+				  addr->dst))
-+			return true;
-+
-+	return false;
-+}
-+
-+static bool ibtrs_clt_path_exists(struct ibtrs_clt *clt,
-+				  struct ibtrs_addr *addr)
-+{
-+	bool res;
-+
-+	mutex_lock(&clt->paths_mutex);
-+	res = __ibtrs_clt_path_exists(clt, addr);
-+	mutex_unlock(&clt->paths_mutex);
-+
-+	return res;
-+}
-+
-+static int ibtrs_clt_add_path_to_arr(struct ibtrs_clt_sess *sess,
-+				     struct ibtrs_addr *addr)
-+{
-+	struct ibtrs_clt *clt = sess->clt;
-+	int err = 0;
-+
-+	mutex_lock(&clt->paths_mutex);
-+	if (!__ibtrs_clt_path_exists(clt, addr)) {
-+		list_add_tail_rcu(&sess->s.entry, &clt->paths_list);
-+		clt->paths_num++;
-+	} else
-+		err = -EEXIST;
-+	mutex_unlock(&clt->paths_mutex);
-+
-+	return err;
-+}
-+
-+static void ibtrs_clt_close_work(struct work_struct *work)
-+{
-+	struct ibtrs_clt_sess *sess;
-+	/*
-+	 * Always try to do a failover, if only single path remains,
-+	 * all requests will be completed with error.
-+	 */
-+	bool failover = true;
-+
-+	sess = container_of(work, struct ibtrs_clt_sess, close_work);
-+
-+	cancel_delayed_work_sync(&sess->reconnect_dwork);
-+	ibtrs_clt_stop_and_destroy_conns(sess, failover);
-+	/*
-+	 * Sounds stupid, huh?  No, it is not.  Consider this sequence:
-+	 *
-+	 *   #CPU0                              #CPU1
-+	 *   1.  CONNECTED->RECONNECTING
-+	 *   2.                                 RECONNECTING->CLOSING
-+	 *   3.  queue_work(&reconnect_dwork)
-+	 *   4.                                 queue_work(&close_work);
-+	 *   5.  reconnect_work();              close_work();
-+	 *
-+	 * To avoid that case do cancel twice: before and after.
-+	 */
-+	cancel_delayed_work_sync(&sess->reconnect_dwork);
-+	ibtrs_clt_change_state(sess, IBTRS_CLT_CLOSED);
-+}
-+
-+static void ibtrs_clt_close_conns(struct ibtrs_clt_sess *sess, bool wait)
-+{
-+	if (ibtrs_clt_change_state(sess, IBTRS_CLT_CLOSING))
-+		queue_work(ibtrs_wq, &sess->close_work);
-+	if (wait)
-+		flush_work(&sess->close_work);
-+}
-+
-+static int init_conns(struct ibtrs_clt_sess *sess)
-+{
-+	unsigned int cid;
-+	int err;
-+
-+	/*
-+	 * On every new session connections increase reconnect counter
-+	 * to avoid clashes with previous sessions not yet closed
-+	 * sessions on a server side.
-+	 */
-+	sess->s.recon_cnt++;
-+
-+	/* Establish all RDMA connections  */
-+	for (cid = 0; cid < sess->s.con_num; cid++) {
-+		err = create_con(sess, cid);
-+		if (unlikely(err))
-+			goto destroy;
-+
-+		err = create_cm(to_clt_con(sess->s.con[cid]));
-+		if (unlikely(err)) {
-+			destroy_con(to_clt_con(sess->s.con[cid]));
-+			goto destroy;
-+		}
-+	}
-+	/* Allocate all session related buffers */
-+	err = alloc_sess_io_bufs(sess);
-+	if (unlikely(err))
-+		goto destroy;
-+
-+	ibtrs_clt_start_hb(sess);
-+
-+	return 0;
-+
-+destroy:
-+	while (cid--) {
-+		struct ibtrs_clt_con *con = to_clt_con(sess->s.con[cid]);
-+
-+		stop_cm(con);
-+		destroy_con_cq_qp(con);
-+		destroy_cm(con);
-+		destroy_con(con);
-+	}
-+	/*
-+	 * If we've never taken async path and got an error, say,
-+	 * doing rdma_resolve_addr(), switch to CONNECTION_ERR state
-+	 * manually to keep reconnecting.
-+	 */
-+	ibtrs_clt_change_state(sess, IBTRS_CLT_CONNECTING_ERR);
-+
-+	return err;
-+}
-+
-+static int ibtrs_rdma_addr_resolved(struct ibtrs_clt_con *con)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	int err;
-+
-+	err = create_con_cq_qp(con);
-+	if (unlikely(err)) {
-+		ibtrs_err(sess, "create_con_cq_qp(), err: %d\n", err);
-+		return err;
-+	}
-+	err = rdma_resolve_route(con->c.cm_id, IBTRS_CONNECT_TIMEOUT_MS);
-+	if (unlikely(err)) {
-+		ibtrs_err(sess, "Resolving route failed, err: %d\n", err);
-+		destroy_con_cq_qp(con);
-+	}
-+
-+	return err;
-+}
-+
-+static int ibtrs_rdma_route_resolved(struct ibtrs_clt_con *con)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	struct ibtrs_clt *clt = sess->clt;
-+	struct ibtrs_msg_conn_req msg;
-+	struct rdma_conn_param param;
-+
-+	int err;
-+
-+	memset(&param, 0, sizeof(param));
-+	param.retry_count = retry_count;
-+	param.rnr_retry_count = 7;
-+	param.private_data = &msg;
-+	param.private_data_len = sizeof(msg);
-+
-+	/*
-+	 * Those two are the part of struct cma_hdr which is shared
-+	 * with private_data in case of AF_IB, so put zeroes to avoid
-+	 * wrong validation inside cma.c on receiver side.
-+	 */
-+	msg.__cma_version = 0;
-+	msg.__ip_version = 0;
-+	msg.magic = cpu_to_le16(IBTRS_MAGIC);
-+	msg.version = cpu_to_le16(IBTRS_VERSION);
-+	msg.cid = cpu_to_le16(con->c.cid);
-+	msg.cid_num = cpu_to_le16(sess->s.con_num);
-+	msg.recon_cnt = cpu_to_le16(sess->s.recon_cnt);
-+	uuid_copy(&msg.sess_uuid, &sess->s.uuid);
-+	uuid_copy(&msg.paths_uuid, &clt->paths_uuid);
-+
-+	err = rdma_connect(con->c.cm_id, &param);
-+	if (err)
-+		ibtrs_err(sess, "rdma_connect(): %d\n", err);
-+
-+	return err;
-+}
-+
-+static int ibtrs_rdma_conn_established(struct ibtrs_clt_con *con,
-+				       struct rdma_cm_event *ev)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	const struct ibtrs_msg_conn_rsp *msg;
-+	u16 version, queue_depth;
-+	int errno;
-+	u8 len;
-+
-+	msg = ev->param.conn.private_data;
-+	len = ev->param.conn.private_data_len;
-+	if (unlikely(len < sizeof(*msg))) {
-+		ibtrs_err(sess, "Invalid IBTRS connection response");
-+		return -ECONNRESET;
-+	}
-+	if (unlikely(le16_to_cpu(msg->magic) != IBTRS_MAGIC)) {
-+		ibtrs_err(sess, "Invalid IBTRS magic");
-+		return -ECONNRESET;
-+	}
-+	version = le16_to_cpu(msg->version);
-+	if (unlikely(version >> 8 != IBTRS_VER_MAJOR)) {
-+		ibtrs_err(sess, "Unsupported major IBTRS version: %d",
-+			  version);
-+		return -ECONNRESET;
-+	}
-+	errno = le16_to_cpu(msg->errno);
-+	if (unlikely(errno)) {
-+		ibtrs_err(sess, "Invalid IBTRS message: errno %d",
-+			  errno);
-+		return -ECONNRESET;
-+	}
-+	if (con->c.cid == 0) {
-+		queue_depth = le16_to_cpu(msg->queue_depth);
-+
-+		if (queue_depth > MAX_SESS_QUEUE_DEPTH) {
-+			ibtrs_err(sess, "Invalid IBTRS message: queue=%d\n",
-+				  queue_depth);
-+			return -ECONNRESET;
-+		}
-+		if (!sess->srv_rdma_addr || sess->queue_depth < queue_depth) {
-+			kfree(sess->srv_rdma_addr);
-+			sess->srv_rdma_addr =
-+				kcalloc(queue_depth,
-+					sizeof(*sess->srv_rdma_addr),
-+					GFP_KERNEL);
-+			if (unlikely(!sess->srv_rdma_addr)) {
-+				ibtrs_err(sess, "Failed to allocate "
-+					  "queue_depth=%d\n", queue_depth);
-+				return -ENOMEM;
-+			}
-+		}
-+		sess->queue_depth = queue_depth;
-+		sess->srv_rdma_buf_rkey = le32_to_cpu(msg->rkey);
-+		sess->max_req_size = le32_to_cpu(msg->max_req_size);
-+		sess->max_io_size = le32_to_cpu(msg->max_io_size);
-+		sess->chunk_size = sess->max_io_size + sess->max_req_size;
-+		sess->max_desc  = sess->max_req_size;
-+		sess->max_desc -= sizeof(u32) + sizeof(u32) + IO_MSG_SIZE;
-+		sess->max_desc /= sizeof(struct ibtrs_sg_desc);
-+
-+		/*
-+		 * Global queue depth and is always a minimum.  If while a
-+		 * reconnection server sends us a value a bit higher -
-+		 * client does not care and uses cached minimum.
-+		 */
-+		ibtrs_clt_set_min_queue_depth(sess->clt, sess->queue_depth);
-+		ibtrs_clt_set_min_io_size(sess->clt, sess->max_io_size);
-+	}
-+
-+	return 0;
-+}
-+
-+static int ibtrs_rdma_conn_rejected(struct ibtrs_clt_con *con,
-+				    struct rdma_cm_event *ev)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	const struct ibtrs_msg_conn_rsp *msg;
-+	const char *rej_msg;
-+	int status, errno;
-+	u8 data_len;
-+
-+	status = ev->status;
-+	rej_msg = rdma_reject_msg(con->c.cm_id, status);
-+	msg = rdma_consumer_reject_data(con->c.cm_id, ev, &data_len);
-+
-+	if (msg && data_len >= sizeof(*msg)) {
-+		errno = (int16_t)le16_to_cpu(msg->errno);
-+		if (errno == -EBUSY)
-+			ibtrs_err(sess,
-+				  "Previous session is still exists on the "
-+				  "server, please reconnect later\n");
-+		else
-+			ibtrs_err(sess,
-+				  "Connect rejected: status %d (%s), ibtrs "
-+				  "errno %d\n", status, rej_msg, errno);
-+	} else {
-+		ibtrs_err(sess,
-+			  "Connect rejected but with malformed message: "
-+			  "status %d (%s)\n", status, rej_msg);
-+	}
-+
-+	return -ECONNRESET;
-+}
-+
-+static void ibtrs_rdma_error_recovery(struct ibtrs_clt_con *con)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+
-+	if (ibtrs_clt_change_state_from_to(sess,
-+					   IBTRS_CLT_CONNECTED,
-+					   IBTRS_CLT_RECONNECTING)) {
-+		/*
-+		 * Normal scenario, reconnect if we were successfully connected
-+		 */
-+		queue_delayed_work(ibtrs_wq, &sess->reconnect_dwork, 0);
-+	} else {
-+		/*
-+		 * Error can happen just on establishing new connection,
-+		 * so notify waiter with error state, waiter is responsible
-+		 * for cleaning the rest and reconnect if needed.
-+		 */
-+		ibtrs_clt_change_state_from_to(sess,
-+					       IBTRS_CLT_CONNECTING,
-+					       IBTRS_CLT_CONNECTING_ERR);
-+	}
-+}
-+
-+static inline void flag_success_on_conn(struct ibtrs_clt_con *con)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+
-+	atomic_inc(&sess->connected_cnt);
-+	con->cm_err = 1;
-+}
-+
-+static inline void flag_error_on_conn(struct ibtrs_clt_con *con, int cm_err)
-+{
-+	if (con->cm_err == 1) {
-+		struct ibtrs_clt_sess *sess;
-+
-+		sess = to_clt_sess(con->c.sess);
-+		if (atomic_dec_and_test(&sess->connected_cnt))
-+			wake_up(&sess->state_wq);
-+	}
-+	con->cm_err = cm_err;
-+}
-+
-+static int ibtrs_clt_rdma_cm_handler(struct rdma_cm_id *cm_id,
-+				     struct rdma_cm_event *ev)
-+{
-+	struct ibtrs_clt_con *con = cm_id->context;
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	int cm_err = 0;
-+
-+	switch (ev->event) {
-+	case RDMA_CM_EVENT_ADDR_RESOLVED:
-+		cm_err = ibtrs_rdma_addr_resolved(con);
-+		break;
-+	case RDMA_CM_EVENT_ROUTE_RESOLVED:
-+		cm_err = ibtrs_rdma_route_resolved(con);
-+		break;
-+	case RDMA_CM_EVENT_ESTABLISHED:
-+		con->cm_err = ibtrs_rdma_conn_established(con, ev);
-+		if (likely(!con->cm_err)) {
-+			/*
-+			 * Report success and wake up. Here we abuse state_wq,
-+			 * i.e. wake up without state change, but we set cm_err.
-+			 */
-+			flag_success_on_conn(con);
-+			wake_up(&sess->state_wq);
-+			return 0;
-+		}
-+		break;
-+	case RDMA_CM_EVENT_REJECTED:
-+		cm_err = ibtrs_rdma_conn_rejected(con, ev);
-+		break;
-+	case RDMA_CM_EVENT_CONNECT_ERROR:
-+	case RDMA_CM_EVENT_UNREACHABLE:
-+		ibtrs_wrn(sess, "CM error event %d\n", ev->event);
-+		cm_err = -ECONNRESET;
-+		break;
-+	case RDMA_CM_EVENT_ADDR_ERROR:
-+	case RDMA_CM_EVENT_ROUTE_ERROR:
-+		cm_err = -EHOSTUNREACH;
-+		break;
-+	case RDMA_CM_EVENT_DISCONNECTED:
-+	case RDMA_CM_EVENT_ADDR_CHANGE:
-+	case RDMA_CM_EVENT_TIMEWAIT_EXIT:
-+		cm_err = -ECONNRESET;
-+		break;
-+	case RDMA_CM_EVENT_DEVICE_REMOVAL:
-+		/*
-+		 * Device removal is a special case.  Queue close and return 0.
-+		 */
-+		ibtrs_clt_close_conns(sess, false);
-+		return 0;
-+	default:
-+		ibtrs_err(sess, "Unexpected RDMA CM event (%d)\n", ev->event);
-+		cm_err = -ECONNRESET;
-+		break;
-+	}
-+
-+	if (cm_err) {
-+		/*
-+		 * cm error makes sense only on connection establishing,
-+		 * in other cases we rely on normal procedure of reconnecting.
-+		 */
-+		flag_error_on_conn(con, cm_err);
-+		ibtrs_rdma_error_recovery(con);
-+	}
-+
-+	return 0;
-+}
-+
-+static void ibtrs_clt_info_req_done(struct ib_cq *cq, struct ib_wc *wc)
-+{
-+	struct ibtrs_clt_con *con = cq->cq_context;
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	struct ibtrs_iu *iu;
-+
-+	iu = container_of(wc->wr_cqe, struct ibtrs_iu, cqe);
-+	ibtrs_iu_free(iu, DMA_TO_DEVICE, sess->s.ib_dev->dev);
-+
-+	if (unlikely(wc->status != IB_WC_SUCCESS)) {
-+		ibtrs_err(sess, "Sess info request send failed: %s\n",
-+			  ib_wc_status_msg(wc->status));
-+		ibtrs_clt_change_state(sess, IBTRS_CLT_CONNECTING_ERR);
-+		return;
-+	}
-+
-+	ibtrs_clt_update_wc_stats(con);
-+}
-+
-+static int process_info_rsp(struct ibtrs_clt_sess *sess,
-+			    const struct ibtrs_msg_info_rsp *msg)
-+{
-+	unsigned int addr_num;
-+	int i;
-+
-+	addr_num = le16_to_cpu(msg->addr_num);
-+	/*
-+	 * Check if IB immediate data size is enough to hold the mem_id and
-+	 * the offset inside the memory chunk.
-+	 */
-+	if (unlikely(ilog2(addr_num - 1) + ilog2(sess->chunk_size - 1) >
-+		     MAX_IMM_PAYL_BITS)) {
-+		ibtrs_err(sess, "RDMA immediate size (%db) not enough to "
-+			  "encode %d buffers of size %dB\n",  MAX_IMM_PAYL_BITS,
-+			  addr_num, sess->chunk_size);
-+		return -EINVAL;
-+	}
-+	if (unlikely(addr_num > sess->queue_depth)) {
-+		ibtrs_err(sess, "Incorrect addr_num=%d\n", addr_num);
-+		return -EINVAL;
-+	}
-+	for (i = 0; i < msg->addr_num; i++)
-+		sess->srv_rdma_addr[i] = le64_to_cpu(msg->addr[i]);
-+
-+	return 0;
-+}
-+
-+static void ibtrs_clt_info_rsp_done(struct ib_cq *cq, struct ib_wc *wc)
-+{
-+	struct ibtrs_clt_con *con = cq->cq_context;
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	struct ibtrs_msg_info_rsp *msg;
-+	enum ibtrs_clt_state state;
-+	struct ibtrs_iu *iu;
-+	size_t rx_sz;
-+	int err;
-+
-+	state = IBTRS_CLT_CONNECTING_ERR;
-+
-+	WARN_ON(con->c.cid);
-+	iu = container_of(wc->wr_cqe, struct ibtrs_iu, cqe);
-+	if (unlikely(wc->status != IB_WC_SUCCESS)) {
-+		ibtrs_err(sess, "Sess info response recv failed: %s\n",
-+			  ib_wc_status_msg(wc->status));
-+		goto out;
-+	}
-+	WARN_ON(wc->opcode != IB_WC_RECV);
-+
-+	if (unlikely(wc->byte_len < sizeof(*msg))) {
-+		ibtrs_err(sess, "Sess info response is malformed: size %d\n",
-+			  wc->byte_len);
-+		goto out;
-+	}
-+	msg = iu->buf;
-+	if (unlikely(le16_to_cpu(msg->type) != IBTRS_MSG_INFO_RSP)) {
-+		ibtrs_err(sess, "Sess info response is malformed: type %d\n",
-+			  le32_to_cpu(msg->type));
-+		goto out;
-+	}
-+	rx_sz  = sizeof(*msg);
-+	rx_sz += sizeof(msg->addr[0]) * le16_to_cpu(msg->addr_num);
-+	if (unlikely(wc->byte_len < rx_sz)) {
-+		ibtrs_err(sess, "Sess info response is malformed: size %d\n",
-+			  wc->byte_len);
-+		goto out;
-+	}
-+	err = process_info_rsp(sess, msg);
-+	if (unlikely(err))
-+		goto out;
-+
-+	err = post_recv_sess(sess);
-+	if (unlikely(err))
-+		goto out;
-+
-+	state = IBTRS_CLT_CONNECTED;
-+
-+out:
-+	ibtrs_clt_update_wc_stats(con);
-+	ibtrs_iu_free(iu, DMA_FROM_DEVICE, sess->s.ib_dev->dev);
-+	ibtrs_clt_change_state(sess, state);
-+}
-+
-+static int ibtrs_send_sess_info(struct ibtrs_clt_sess *sess)
-+{
-+	struct ibtrs_clt_con *usr_con = to_clt_con(sess->s.con[0]);
-+	struct ibtrs_msg_info_req *msg;
-+	struct ibtrs_iu *tx_iu, *rx_iu;
-+	size_t rx_sz;
-+	int err;
-+
-+	rx_sz  = sizeof(struct ibtrs_msg_info_rsp);
-+	rx_sz += sizeof(u64) * MAX_SESS_QUEUE_DEPTH;
-+
-+	tx_iu = ibtrs_iu_alloc(0, sizeof(struct ibtrs_msg_info_req), GFP_KERNEL,
-+			       sess->s.ib_dev->dev, DMA_TO_DEVICE,
-+			       ibtrs_clt_info_req_done);
-+	rx_iu = ibtrs_iu_alloc(0, rx_sz, GFP_KERNEL, sess->s.ib_dev->dev,
-+			       DMA_FROM_DEVICE, ibtrs_clt_info_rsp_done);
-+	if (unlikely(!tx_iu || !rx_iu)) {
-+		ibtrs_err(sess, "ibtrs_iu_alloc(): no memory\n");
-+		err = -ENOMEM;
-+		goto out;
-+	}
-+	/* Prepare for getting info response */
-+	err = ibtrs_iu_post_recv(&usr_con->c, rx_iu);
-+	if (unlikely(err)) {
-+		ibtrs_err(sess, "ibtrs_iu_post_recv(), err: %d\n", err);
-+		goto out;
-+	}
-+	rx_iu = NULL;
-+
-+	msg = tx_iu->buf;
-+	msg->type = cpu_to_le16(IBTRS_MSG_INFO_REQ);
-+	memcpy(msg->sessname, sess->s.sessname, sizeof(msg->sessname));
-+
-+	/* Send info request */
-+	err = ibtrs_iu_post_send(&usr_con->c, tx_iu, sizeof(*msg));
-+	if (unlikely(err)) {
-+		ibtrs_err(sess, "ibtrs_iu_post_send(), err: %d\n", err);
-+		goto out;
-+	}
-+	tx_iu = NULL;
-+
-+	/* Wait for state change */
-+	wait_event_interruptible_timeout(sess->state_wq,
-+				sess->state != IBTRS_CLT_CONNECTING,
-+				msecs_to_jiffies(IBTRS_CONNECT_TIMEOUT_MS));
-+	if (unlikely(sess->state != IBTRS_CLT_CONNECTED)) {
-+		if (sess->state == IBTRS_CLT_CONNECTING_ERR)
-+			err = -ECONNRESET;
-+		else
-+			err = -ETIMEDOUT;
-+		goto out;
-+	}
-+
-+out:
-+	if (tx_iu)
-+		ibtrs_iu_free(tx_iu, DMA_TO_DEVICE, sess->s.ib_dev->dev);
-+	if (rx_iu)
-+		ibtrs_iu_free(rx_iu, DMA_FROM_DEVICE, sess->s.ib_dev->dev);
-+	if (unlikely(err))
-+		/* If we've never taken async path because of malloc problems */
-+		ibtrs_clt_change_state(sess, IBTRS_CLT_CONNECTING_ERR);
-+
-+	return err;
-+}
-+
-+/**
-+ * init_sess() - establishes all session connections and does handshake
-+ *
-+ * In case of error full close or reconnect procedure should be taken,
-+ * because reconnect or close async works can be started.
-+ */
-+static int init_sess(struct ibtrs_clt_sess *sess)
-+{
-+	int err;
-+
-+	mutex_lock(&sess->init_mutex);
-+	err = init_conns(sess);
-+	if (unlikely(err)) {
-+		ibtrs_err(sess, "init_conns(), err: %d\n", err);
-+		goto out;
-+	}
-+	err = ibtrs_send_sess_info(sess);
-+	if (unlikely(err)) {
-+		ibtrs_err(sess, "ibtrs_send_sess_info(), err: %d\n", err);
-+		goto out;
-+	}
-+	ibtrs_clt_sess_up(sess);
-+out:
-+	mutex_unlock(&sess->init_mutex);
-+
-+	return err;
-+}
-+
-+static void ibtrs_clt_reconnect_work(struct work_struct *work)
-+{
-+	struct ibtrs_clt_sess *sess;
-+	struct ibtrs_clt *clt;
-+	unsigned int delay_ms;
-+	int err;
-+
-+	sess = container_of(to_delayed_work(work), struct ibtrs_clt_sess,
-+			    reconnect_dwork);
-+	clt = sess->clt;
-+
-+	if (ibtrs_clt_state(sess) == IBTRS_CLT_CLOSING)
-+		/* User requested closing */
-+		return;
-+
-+	if (sess->reconnect_attempts >= clt->max_reconnect_attempts) {
-+		/* Close a session completely if max attempts is reached */
-+		ibtrs_clt_close_conns(sess, false);
-+		return;
-+	}
-+	sess->reconnect_attempts++;
-+
-+	/* Stop everything */
-+	ibtrs_clt_stop_and_destroy_conns(sess, true);
-+	ibtrs_clt_change_state(sess, IBTRS_CLT_CONNECTING);
-+
-+	err = init_sess(sess);
-+	if (unlikely(err))
-+		goto reconnect_again;
-+
-+	return;
-+
-+reconnect_again:
-+	if (ibtrs_clt_change_state(sess, IBTRS_CLT_RECONNECTING)) {
-+		sess->stats.reconnects.fail_cnt++;
-+		delay_ms = clt->reconnect_delay_sec * 1000;
-+		queue_delayed_work(ibtrs_wq, &sess->reconnect_dwork,
-+				   msecs_to_jiffies(delay_ms));
-+	}
-+}
-+
-+static struct ibtrs_clt *alloc_clt(const char *sessname, size_t paths_num,
-+				   short port, size_t pdu_sz,
-+				   void *priv, link_clt_ev_fn *link_ev,
-+				   unsigned int max_segments,
-+				   unsigned int reconnect_delay_sec,
-+				   unsigned int max_reconnect_attempts)
-+{
-+	struct ibtrs_clt *clt;
-+	int err;
-+
-+	if (unlikely(!paths_num || paths_num > MAX_PATHS_NUM))
-+		return ERR_PTR(-EINVAL);
-+
-+	if (unlikely(strlen(sessname) >= sizeof(clt->sessname)))
-+		return ERR_PTR(-EINVAL);
-+
-+	clt = kzalloc(sizeof(*clt), GFP_KERNEL);
-+	if (unlikely(!clt))
-+		return ERR_PTR(-ENOMEM);
-+
-+	clt->pcpu_path = alloc_percpu(typeof(*clt->pcpu_path));
-+	if (unlikely(!clt->pcpu_path)) {
-+		kfree(clt);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	uuid_gen(&clt->paths_uuid);
-+	INIT_LIST_HEAD_RCU(&clt->paths_list);
-+	clt->paths_num = paths_num;
-+	clt->paths_up = MAX_PATHS_NUM;
-+	clt->port = port;
-+	clt->pdu_sz = pdu_sz;
-+	clt->max_segments = max_segments;
-+	clt->reconnect_delay_sec = reconnect_delay_sec;
-+	clt->max_reconnect_attempts = max_reconnect_attempts;
-+	clt->priv = priv;
-+	clt->link_ev = link_ev;
-+	clt->mp_policy = MP_POLICY_MIN_INFLIGHT;
-+	strlcpy(clt->sessname, sessname, sizeof(clt->sessname));
-+	init_waitqueue_head(&clt->tags_wait);
-+	mutex_init(&clt->paths_ev_mutex);
-+	mutex_init(&clt->paths_mutex);
-+
-+	err = ibtrs_clt_create_sysfs_root_folders(clt);
-+	if (unlikely(err)) {
-+		free_percpu(clt->pcpu_path);
-+		kfree(clt);
-+		return ERR_PTR(err);
-+	}
-+
-+	return clt;
-+}
-+
-+static void wait_for_inflight_tags(struct ibtrs_clt *clt)
-+{
-+	if (clt->tags_map) {
-+		size_t sz = clt->queue_depth;
-+
-+		wait_event(clt->tags_wait,
-+			   find_first_bit(clt->tags_map, sz) >= sz);
-+	}
-+}
-+
-+static void free_clt(struct ibtrs_clt *clt)
-+{
-+	ibtrs_clt_destroy_sysfs_root_folders(clt);
-+	wait_for_inflight_tags(clt);
-+	free_tags(clt);
-+	free_percpu(clt->pcpu_path);
-+	kfree(clt);
-+}
-+
-+struct ibtrs_clt *ibtrs_clt_open(void *priv, link_clt_ev_fn *link_ev,
-+				 const char *sessname,
-+				 const struct ibtrs_addr *paths,
-+				 size_t paths_num,
-+				 short port,
-+				 size_t pdu_sz, u8 reconnect_delay_sec,
-+				 u16 max_segments,
-+				 s16 max_reconnect_attempts)
-+{
-+	struct ibtrs_clt_sess *sess, *tmp;
-+	struct ibtrs_clt *clt;
-+	int err, i;
-+
-+	clt = alloc_clt(sessname, paths_num, port, pdu_sz, priv, link_ev,
-+			max_segments, reconnect_delay_sec,
-+			max_reconnect_attempts);
-+	if (unlikely(IS_ERR(clt))) {
-+		err = PTR_ERR(clt);
-+		goto out;
-+	}
-+	for (i = 0; i < paths_num; i++) {
-+		struct ibtrs_clt_sess *sess;
-+
-+		sess = alloc_sess(clt, &paths[i], nr_cons_per_session,
-+				  max_segments);
-+		if (unlikely(IS_ERR(sess))) {
-+			err = PTR_ERR(sess);
-+			ibtrs_err(clt, "alloc_sess(), err: %d\n", err);
-+			goto close_all_sess;
-+		}
-+		list_add_tail_rcu(&sess->s.entry, &clt->paths_list);
-+
-+		err = init_sess(sess);
-+		if (unlikely(err))
-+			goto close_all_sess;
-+
-+		err = ibtrs_clt_create_sess_files(sess);
-+		if (unlikely(err))
-+			goto close_all_sess;
-+	}
-+	err = alloc_tags(clt);
-+	if (unlikely(err)) {
-+		ibtrs_err(clt, "alloc_tags(), err: %d\n", err);
-+		goto close_all_sess;
-+	}
-+	err = ibtrs_clt_create_sysfs_root_files(clt);
-+	if (unlikely(err))
-+		goto close_all_sess;
-+
-+	/*
-+	 * There is a race if someone decides to completely remove just
-+	 * newly created path using sysfs entry.  To avoid the race we
-+	 * use simple 'opened' flag, see ibtrs_clt_remove_path_from_sysfs().
-+	 */
-+	clt->opened = true;
-+
-+	/* Do not let module be unloaded if client is alive */
-+	__module_get(THIS_MODULE);
-+
-+	return clt;
-+
-+close_all_sess:
-+	list_for_each_entry_safe(sess, tmp, &clt->paths_list, s.entry) {
-+		ibtrs_clt_destroy_sess_files(sess, NULL);
-+		ibtrs_clt_close_conns(sess, true);
-+		free_sess(sess);
-+	}
-+	free_clt(clt);
-+
-+out:
-+	return ERR_PTR(err);
-+}
-+EXPORT_SYMBOL(ibtrs_clt_open);
-+
-+void ibtrs_clt_close(struct ibtrs_clt *clt)
-+{
-+	struct ibtrs_clt_sess *sess, *tmp;
-+
-+	/* Firstly forbid sysfs access */
-+	ibtrs_clt_destroy_sysfs_root_files(clt);
-+	ibtrs_clt_destroy_sysfs_root_folders(clt);
-+
-+	/* Now it is safe to iterate over all paths without locks */
-+	list_for_each_entry_safe(sess, tmp, &clt->paths_list, s.entry) {
-+		ibtrs_clt_destroy_sess_files(sess, NULL);
-+		ibtrs_clt_close_conns(sess, true);
-+		free_sess(sess);
-+	}
-+	free_clt(clt);
-+	module_put(THIS_MODULE);
-+}
-+EXPORT_SYMBOL(ibtrs_clt_close);
-+
-+int ibtrs_clt_reconnect_from_sysfs(struct ibtrs_clt_sess *sess)
-+{
-+	enum ibtrs_clt_state old_state;
-+	int err = -EBUSY;
-+	bool changed;
-+
-+	changed = ibtrs_clt_change_state_get_old(sess, IBTRS_CLT_RECONNECTING,
-+						 &old_state);
-+	if (changed) {
-+		sess->reconnect_attempts = 0;
-+		queue_delayed_work(ibtrs_wq, &sess->reconnect_dwork, 0);
-+	}
-+	if (changed || old_state == IBTRS_CLT_RECONNECTING) {
-+		/*
-+		 * flush_delayed_work() queues pending work for immediate
-+		 * execution, so do the flush if we have queued something
-+		 * right now or work is pending.
-+		 */
-+		flush_delayed_work(&sess->reconnect_dwork);
-+		err = ibtrs_clt_sess_is_connected(sess) ? 0 : -ENOTCONN;
-+	}
-+
-+	return err;
-+}
-+
-+int ibtrs_clt_disconnect_from_sysfs(struct ibtrs_clt_sess *sess)
-+{
-+	ibtrs_clt_close_conns(sess, true);
-+
-+	return 0;
-+}
-+
-+int ibtrs_clt_remove_path_from_sysfs(struct ibtrs_clt_sess *sess,
-+				     const struct attribute *sysfs_self)
-+{
-+	struct ibtrs_clt *clt = sess->clt;
-+	enum ibtrs_clt_state old_state;
-+	bool changed;
-+
-+	/*
-+	 * That can happen only when userspace tries to remove path
-+	 * very early, when ibtrs_clt_open() is not yet finished.
-+	 */
-+	if (unlikely(!clt->opened))
-+		return -EBUSY;
-+
-+	/*
-+	 * Continue stopping path till state was changed to DEAD or
-+	 * state was observed as DEAD:
-+	 * 1. State was changed to DEAD - we were fast and nobody
-+	 *    invoked ibtrs_clt_reconnect(), which can again start
-+	 *    reconnecting.
-+	 * 2. State was observed as DEAD - we have someone in parallel
-+	 *    removing the path.
-+	 */
-+	do {
-+		ibtrs_clt_close_conns(sess, true);
-+	} while (!(changed = ibtrs_clt_change_state_get_old(sess,
-+							    IBTRS_CLT_DEAD,
-+							    &old_state)) &&
-+		   old_state != IBTRS_CLT_DEAD);
-+
-+	/*
-+	 * If state was successfully changed to DEAD, commit suicide.
-+	 */
-+	if (likely(changed)) {
-+		ibtrs_clt_destroy_sess_files(sess, sysfs_self);
-+		ibtrs_clt_remove_path_from_arr(sess);
-+		free_sess(sess);
-+	}
-+
-+	return 0;
-+}
-+
-+void ibtrs_clt_set_max_reconnect_attempts(struct ibtrs_clt *clt, int value)
-+{
-+	clt->max_reconnect_attempts = (unsigned int)value;
-+}
-+
-+int ibtrs_clt_get_max_reconnect_attempts(const struct ibtrs_clt *clt)
-+{
-+	return (int)clt->max_reconnect_attempts;
-+}
-+
-+static int ibtrs_clt_rdma_write_desc(struct ibtrs_clt_con *con,
-+				     struct ibtrs_clt_io_req *req, u64 buf,
-+				     size_t u_msg_len, u32 imm,
-+				     struct ibtrs_msg_rdma_write *msg)
-+{
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	struct ibtrs_sg_desc *desc;
-+	int ret;
-+
-+	desc = kmalloc_array(sess->max_pages_per_mr, sizeof(*desc), GFP_ATOMIC);
-+	if (unlikely(!desc))
-+		return -ENOMEM;
-+
-+	ret = ibtrs_fast_reg_map_data(con, desc, req);
-+	if (unlikely(ret < 0)) {
-+		ibtrs_err_rl(sess,
-+			     "Write request failed, fast reg. data mapping"
-+			     " failed, err: %d\n", ret);
-+		kfree(desc);
-+		return ret;
-+	}
-+	ret = ibtrs_post_send_rdma_desc(con, req, desc, ret, buf,
-+					u_msg_len + sizeof(*msg), imm);
-+	if (unlikely(ret)) {
-+		ibtrs_err(sess, "Write request failed, posting work"
-+			  " request failed, err: %d\n", ret);
-+		ibtrs_unmap_fast_reg_data(con, req);
-+	}
-+	kfree(desc);
-+	return ret;
-+}
-+
-+static int ibtrs_clt_write_req(struct ibtrs_clt_io_req *req)
-+{
-+	struct ibtrs_clt_con *con = req->con;
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	struct ibtrs_msg_rdma_write *msg;
-+
-+	int ret, count = 0;
-+	u32 imm, buf_id;
-+	u64 buf;
-+
-+	const size_t tsize = sizeof(*msg) + req->data_len + req->usr_len;
-+
-+	if (unlikely(tsize > sess->chunk_size)) {
-+		ibtrs_wrn(sess, "Write request failed, size too big %zu > %d\n",
-+			  tsize, sess->chunk_size);
-+		return -EMSGSIZE;
-+	}
-+	if (req->sg_cnt) {
-+		count = ib_dma_map_sg(sess->s.ib_dev->dev, req->sglist,
-+				      req->sg_cnt, req->dir);
-+		if (unlikely(!count)) {
-+			ibtrs_wrn(sess, "Write request failed, map failed\n");
-+			return -EINVAL;
-+		}
-+	}
-+	/* put ibtrs msg after sg and user message */
-+	msg = req->iu->buf + req->usr_len;
-+	msg->type = cpu_to_le16(IBTRS_MSG_WRITE);
-+	msg->usr_len = cpu_to_le16(req->usr_len);
-+
-+	/* ibtrs message on server side will be after user data and message */
-+	imm = req->tag->mem_off + req->data_len + req->usr_len;
-+	imm = ibtrs_to_io_req_imm(imm);
-+	buf_id = req->tag->mem_id;
-+	req->sg_size = tsize;
-+	buf = sess->srv_rdma_addr[buf_id];
-+
-+	/*
-+	 * Update stats now, after request is successfully sent it is not
-+	 * safe anymore to touch it.
-+	 */
-+	ibtrs_clt_update_all_stats(req, WRITE);
-+
-+	if (count > fmr_sg_cnt)
-+		ret = ibtrs_clt_rdma_write_desc(req->con, req, buf,
-+						req->usr_len, imm, msg);
-+	else
-+		ret = ibtrs_post_send_rdma_more(req->con, req, buf,
-+						req->usr_len + sizeof(*msg),
-+						imm);
-+	if (unlikely(ret)) {
-+		ibtrs_err(sess, "Write request failed: %d\n", ret);
-+		ibtrs_clt_decrease_inflight(&sess->stats);
-+		if (req->sg_cnt)
-+			ib_dma_unmap_sg(sess->s.ib_dev->dev, req->sglist,
-+					req->sg_cnt, req->dir);
-+	}
-+
-+	return ret;
-+}
-+
-+int ibtrs_clt_write(struct ibtrs_clt *clt, ibtrs_conf_fn *conf,
-+		    struct ibtrs_tag *tag, void *priv, const struct kvec *vec,
-+		    size_t nr, size_t data_len, struct scatterlist *sg,
-+		    unsigned int sg_cnt)
-+{
-+	struct ibtrs_clt_io_req *req;
-+	struct ibtrs_clt_sess *sess;
-+
-+	int err = -ECONNABORTED;
-+	struct path_it it;
-+	size_t usr_len;
-+
-+	usr_len = kvec_length(vec, nr);
-+	do_each_path(sess, clt, &it) {
-+		if (unlikely(sess->state != IBTRS_CLT_CONNECTED))
-+			continue;
-+
-+		if (unlikely(usr_len > IO_MSG_SIZE)) {
-+			ibtrs_wrn_rl(sess, "Write request failed, user message"
-+				     " size is %zu B big, max size is %d B\n",
-+				     usr_len, IO_MSG_SIZE);
-+			err = -EMSGSIZE;
-+			break;
-+		}
-+		req = ibtrs_clt_get_req(sess, conf, tag, priv, vec, usr_len,
-+					sg, sg_cnt, data_len, DMA_TO_DEVICE);
-+		err = ibtrs_clt_write_req(req);
-+		if (unlikely(err)) {
-+			req->in_use = false;
-+			continue;
-+		}
-+		/* Success path */
-+		break;
-+	} while_each_path(&it);
-+
-+	return err;
-+}
-+
-+static int ibtrs_clt_read_req(struct ibtrs_clt_io_req *req)
-+{
-+	struct ibtrs_clt_con *con = req->con;
-+	struct ibtrs_clt_sess *sess = to_clt_sess(con->c.sess);
-+	struct ibtrs_msg_rdma_read *msg;
-+	struct ibtrs_ib_dev *ibdev;
-+	struct scatterlist *sg;
-+
-+	int i, ret, count = 0;
-+	u32 imm, buf_id;
-+
-+	const size_t tsize = sizeof(*msg) + req->data_len + req->usr_len;
-+
-+	ibdev = sess->s.ib_dev;
-+
-+	if (unlikely(tsize > sess->chunk_size)) {
-+		ibtrs_wrn(sess, "Read request failed, message size is"
-+			  " %zu, bigger than CHUNK_SIZE %d\n", tsize,
-+			  sess->chunk_size);
-+		return -EMSGSIZE;
-+	}
-+
-+	if (req->sg_cnt) {
-+		count = ib_dma_map_sg(ibdev->dev, req->sglist, req->sg_cnt,
-+				      req->dir);
-+		if (unlikely(!count)) {
-+			ibtrs_wrn(sess, "Read request failed, "
-+				  "dma map failed\n");
-+			return -EINVAL;
-+		}
-+	}
-+	/* put our message into req->buf after user message*/
-+	msg = req->iu->buf + req->usr_len;
-+	msg->type = cpu_to_le16(IBTRS_MSG_READ);
-+	msg->sg_cnt = cpu_to_le32(count);
-+	msg->usr_len = cpu_to_le16(req->usr_len);
-+
-+	if (count > fmr_sg_cnt) {
-+		ret = ibtrs_fast_reg_map_data(req->con, msg->desc, req);
-+		if (ret < 0) {
-+			ibtrs_err_rl(sess,
-+				     "Read request failed, failed to map "
-+				     " fast reg. data, err: %d\n", ret);
-+			ib_dma_unmap_sg(ibdev->dev, req->sglist, req->sg_cnt,
-+					req->dir);
-+			return ret;
-+		}
-+		msg->sg_cnt = cpu_to_le32(ret);
-+	} else {
-+		for_each_sg(req->sglist, sg, req->sg_cnt, i) {
-+			msg->desc[i].addr =
-+				cpu_to_le64(ib_sg_dma_address(ibdev->dev, sg));
-+			msg->desc[i].key =
-+				cpu_to_le32(ibdev->rkey);
-+			msg->desc[i].len =
-+				cpu_to_le32(ib_sg_dma_len(ibdev->dev, sg));
-+		}
-+		req->nmdesc = 0;
-+	}
-+	/*
-+	 * ibtrs message will be after the space reserved for disk data and
-+	 * user message
-+	 */
-+	imm = req->tag->mem_off + req->data_len + req->usr_len;
-+	imm = ibtrs_to_io_req_imm(imm);
-+	buf_id = req->tag->mem_id;
-+
-+	req->sg_size  = sizeof(*msg);
-+	req->sg_size += le32_to_cpu(msg->sg_cnt) * sizeof(struct ibtrs_sg_desc);
-+	req->sg_size += req->usr_len;
-+
-+	/*
-+	 * Update stats now, after request is successfully sent it is not
-+	 * safe anymore to touch it.
-+	 */
-+	ibtrs_clt_update_all_stats(req, READ);
-+
-+	ret = ibtrs_post_send_rdma(req->con, req, sess->srv_rdma_addr[buf_id],
-+				   req->data_len, imm);
-+	if (unlikely(ret)) {
-+		ibtrs_err(sess, "Read request failed: %d\n", ret);
-+		ibtrs_clt_decrease_inflight(&sess->stats);
-+		if (unlikely(count > fmr_sg_cnt))
-+			ibtrs_unmap_fast_reg_data(req->con, req);
-+		if (req->sg_cnt)
-+			ib_dma_unmap_sg(ibdev->dev, req->sglist,
-+					req->sg_cnt, req->dir);
-+	}
-+
-+	return ret;
-+}
-+
-+int ibtrs_clt_read(struct ibtrs_clt *clt, ibtrs_conf_fn *conf,
-+		   struct ibtrs_tag *tag, void *priv, const struct kvec *vec,
-+		   size_t nr, size_t data_len, struct scatterlist *sg,
-+		   unsigned int sg_cnt)
-+{
-+	struct ibtrs_clt_io_req *req;
-+	struct ibtrs_clt_sess *sess;
-+
-+	int err = -ECONNABORTED;
-+	struct path_it it;
-+	size_t usr_len;
-+
-+	usr_len = kvec_length(vec, nr);
-+	do_each_path(sess, clt, &it) {
-+		if (unlikely(sess->state != IBTRS_CLT_CONNECTED))
-+			continue;
-+
-+		if (unlikely(usr_len > IO_MSG_SIZE ||
-+			     sizeof(struct ibtrs_msg_rdma_read) +
-+			     sg_cnt * sizeof(struct ibtrs_sg_desc) >
-+			     sess->max_req_size)) {
-+			ibtrs_wrn_rl(sess, "Read request failed, user message"
-+				     " size is %zu B big, max size is %d B\n",
-+				     usr_len, IO_MSG_SIZE);
-+			err = -EMSGSIZE;
-+			break;
-+		}
-+		req = ibtrs_clt_get_req(sess, conf, tag, priv, vec, usr_len,
-+					sg, sg_cnt, data_len, DMA_FROM_DEVICE);
-+		err = ibtrs_clt_read_req(req);
-+		if (unlikely(err)) {
-+			req->in_use = false;
-+			continue;
-+		}
-+		/* Success path */
-+		break;
-+	} while_each_path(&it);
-+
-+	return err;
-+}
-+
-+int ibtrs_clt_request(int dir, ibtrs_conf_fn *conf, struct ibtrs_clt *clt,
-+		      struct ibtrs_tag *tag, void *priv, const struct kvec *vec,
-+		      size_t nr, size_t len, struct scatterlist *sg,
-+		      unsigned int sg_len)
-+{
-+	if (dir == READ)
-+		return ibtrs_clt_read(clt, conf, tag, priv, vec, nr, len, sg,
-+				      sg_len);
-+	else
-+		return ibtrs_clt_write(clt, conf, tag, priv, vec, nr, len, sg,
-+				       sg_len);
-+}
-+EXPORT_SYMBOL(ibtrs_clt_request);
-+
-+int ibtrs_clt_query(struct ibtrs_clt *clt, struct ibtrs_attrs *attr)
-+{
-+	if (unlikely(!ibtrs_clt_is_connected(clt)))
-+		return -ECOMM;
-+
-+	attr->queue_depth      = clt->queue_depth;
-+	attr->max_io_size      = clt->max_io_size;
-+	strlcpy(attr->sessname, clt->sessname, sizeof(attr->sessname));
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(ibtrs_clt_query);
-+
-+int ibtrs_clt_create_path_from_sysfs(struct ibtrs_clt *clt,
-+				     struct ibtrs_addr *addr)
-+{
-+	struct ibtrs_clt_sess *sess;
-+	int err;
-+
-+	if (ibtrs_clt_path_exists(clt, addr))
-+		return -EEXIST;
-+
-+	sess = alloc_sess(clt, addr, nr_cons_per_session, clt->max_segments);
-+	if (unlikely(IS_ERR(sess)))
-+		return PTR_ERR(sess);
-+
-+	/*
-+	 * It is totally safe to add path in CONNECTING state: coming
-+	 * IO will never grab it.  Also it is very important to add
-+	 * path before init, since init fires LINK_CONNECTED event.
-+	 */
-+	err = ibtrs_clt_add_path_to_arr(sess, addr);
-+	if (unlikely(err))
-+		goto free_sess;
-+
-+	err = init_sess(sess);
-+	if (unlikely(err))
-+		goto close_sess;
-+
-+	err = ibtrs_clt_create_sess_files(sess);
-+	if (unlikely(err))
-+		goto close_sess;
-+
-+	return 0;
-+
-+close_sess:
-+	ibtrs_clt_remove_path_from_arr(sess);
-+	ibtrs_clt_close_conns(sess, true);
-+free_sess:
-+	free_sess(sess);
-+
-+	return err;
-+}
-+
-+static int check_module_params(void)
-+{
-+	if (fmr_sg_cnt > MAX_SEGMENTS || fmr_sg_cnt < 0) {
-+		pr_err("invalid fmr_sg_cnt values\n");
-+		return -EINVAL;
-+	}
-+	if (nr_cons_per_session == 0)
-+		nr_cons_per_session = min_t(unsigned int, nr_cpu_ids, U16_MAX);
-+
-+	return 0;
-+}
-+
-+static int __init ibtrs_client_init(void)
-+{
-+	int err;
-+
-+	pr_info("Loading module %s, version: %s "
-+		"(use_fr: %d, retry_count: %d, "
-+		"fmr_sg_cnt: %d)\n",
-+		KBUILD_MODNAME, IBTRS_VER_STRING,
-+		use_fr,	retry_count, fmr_sg_cnt);
-+	err = check_module_params();
-+	if (err) {
-+		pr_err("Failed to load module, invalid module parameters,"
-+		       " err: %d\n", err);
-+		return err;
-+	}
-+	ibtrs_wq = alloc_workqueue("ibtrs_client_wq", WQ_MEM_RECLAIM, 0);
-+	if (!ibtrs_wq) {
-+		pr_err("Failed to load module, alloc ibtrs_client_wq failed\n");
-+		return -ENOMEM;
-+	}
-+	err = ibtrs_clt_create_sysfs_module_files();
-+	if (err) {
-+		pr_err("Failed to load module, can't create sysfs files,"
-+		       " err: %d\n", err);
-+		goto out_ibtrs_wq;
-+	}
-+
-+	return 0;
-+
-+out_ibtrs_wq:
-+	destroy_workqueue(ibtrs_wq);
-+
-+	return err;
-+}
-+
-+static void __exit ibtrs_client_exit(void)
-+{
-+	ibtrs_clt_destroy_sysfs_module_files();
-+	destroy_workqueue(ibtrs_wq);
-+}
-+
-+module_init(ibtrs_client_init);
-+module_exit(ibtrs_client_exit);
--- 
-2.13.1
+Q3VycmVudGx5LCB0aGUgZGV2aWNlIGdlb21ldHJ5IGlzIHN0b3JlZCByZWR1bmRhbnRseSBpbiB0
+aGUgbnZtX2lkIGFuZApudm1fZ2VvIHN0cnVjdHVyZXMgYXQgYSBkZXZpY2UgbGV2ZWwuIE1vcmVv
+dmVyLCB3aGVuIGluc3RhbnRpYXRpbmcKdGFyZ2V0cyBvbiBhIHNwZWNpZmljIG51bWJlciBvZiBM
+VU5zLCB0aGVzZSBzdHJ1Y3R1cmVzIGFyZSByZXBsaWNhdGVkCmFuZCBtYW51YWxseSBtb2RpZmll
+ZCB0byBmaXQgdGhlIGluc3RhbmNlIGNoYW5uZWwgYW5kIExVTiBwYXJ0aXRpb25pbmcuCgpJbnN0
+ZWFkLCBjcmVhdGUgYSBnZW5lcmljIGdlb21ldHJ5IGFyb3VuZCBudm1fZ2VvLCB3aGljaCBjYW4g
+YmUgdXNlZCBieQooaSkgdGhlIHVuZGVybHlpbmcgZGV2aWNlIHRvIGRlc2NyaWJlIHRoZSBnZW9t
+ZXRyeSBvZiB0aGUgd2hvbGUgZGV2aWNlLAphbmQgKGlpKSBpbnN0YW5jZXMgdG8gZGVzY3JpYmUg
+dGhlaXIgZ2VvbWV0cnkgaW5kZXBlbmRlbnRseS4KClNpZ25lZC1vZmYtYnk6IEphdmllciBHb256
+w6FsZXogPGphdmllckBjbmV4bGFicy5jb20+Ci0tLQogZHJpdmVycy9saWdodG52bS9jb3JlLmMg
+ICAgICAgICAgfCAgNzAgKysrLS0tLS0KIGRyaXZlcnMvbGlnaHRudm0vcGJsay1jb3JlLmMgICAg
+IHwgIDE2ICstCiBkcml2ZXJzL2xpZ2h0bnZtL3BibGstZ2MuYyAgICAgICB8ICAgMiArLQogZHJp
+dmVycy9saWdodG52bS9wYmxrLWluaXQuYyAgICAgfCAxMTkgKysrKysrKy0tLS0tLS0KIGRyaXZl
+cnMvbGlnaHRudm0vcGJsay1yZWFkLmMgICAgIHwgICAyICstCiBkcml2ZXJzL2xpZ2h0bnZtL3Bi
+bGstcmVjb3ZlcnkuYyB8ICAxNCArLQogZHJpdmVycy9saWdodG52bS9wYmxrLXJsLmMgICAgICAg
+fCAgIDIgKy0KIGRyaXZlcnMvbGlnaHRudm0vcGJsay1zeXNmcy5jICAgIHwgIDM5ICsrKy0tCiBk
+cml2ZXJzL2xpZ2h0bnZtL3BibGstd3JpdGUuYyAgICB8ICAgMiArLQogZHJpdmVycy9saWdodG52
+bS9wYmxrLmggICAgICAgICAgfCAgODcgKysrKystLS0tLQogZHJpdmVycy9udm1lL2hvc3QvbGln
+aHRudm0uYyAgICAgfCAzNDEgKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0t
+CiBpbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmggICAgICAgICB8IDIwMCArKysrKysrKysrKy0tLS0t
+LS0tLS0tLQogMTIgZmlsZXMgY2hhbmdlZCwgNDY1IGluc2VydGlvbnMoKyksIDQyOSBkZWxldGlv
+bnMoLSkKCmRpZmYgLS1naXQgYS9kcml2ZXJzL2xpZ2h0bnZtL2NvcmUuYyBiL2RyaXZlcnMvbGln
+aHRudm0vY29yZS5jCmluZGV4IDE5YzQ2ZWJiMWI5MS4uOWE0MTdkOWNkZjBjIDEwMDY0NAotLS0g
+YS9kcml2ZXJzL2xpZ2h0bnZtL2NvcmUuYworKysgYi9kcml2ZXJzL2xpZ2h0bnZtL2NvcmUuYwpA
+QCAtMTU1LDcgKzE1NSw3IEBAIHN0YXRpYyBzdHJ1Y3QgbnZtX3RndF9kZXYgKm52bV9jcmVhdGVf
+dGd0X2RldihzdHJ1Y3QgbnZtX2RldiAqZGV2LAogCWludCBibHVuID0gbHVuX2JlZ2luICUgZGV2
+LT5nZW8ubnJfbHVuczsKIAlpbnQgbHVuaWQgPSAwOwogCWludCBsdW5fYmFsYW5jZWQgPSAxOwot
+CWludCBwcmV2X25yX2x1bnM7CisJaW50IHNlY19wZXJfbHVuLCBwcmV2X25yX2x1bnM7CiAJaW50
+IGksIGo7CiAKIAlucl9jaG5scyA9IChucl9jaG5sc19tb2QgPT0gMCkgPyBucl9jaG5scyA6IG5y
+X2NobmxzICsgMTsKQEAgLTIxNSwxOCArMjE1LDIzIEBAIHN0YXRpYyBzdHJ1Y3QgbnZtX3RndF9k
+ZXYgKm52bV9jcmVhdGVfdGd0X2RldihzdHJ1Y3QgbnZtX2RldiAqZGV2LAogCWlmICghdGd0X2Rl
+dikKIAkJZ290byBlcnJfY2g7CiAKKwkvKiBJbmhlcml0IGRldmljZSBnZW9tZXRyeSBmcm9tIHBh
+cmVudCAqLwogCW1lbWNweSgmdGd0X2Rldi0+Z2VvLCAmZGV2LT5nZW8sIHNpemVvZihzdHJ1Y3Qg
+bnZtX2dlbykpOworCiAJLyogVGFyZ2V0IGRldmljZSBvbmx5IG93bnMgYSBwb3J0aW9uIG9mIHRo
+ZSBwaHlzaWNhbCBkZXZpY2UgKi8KIAl0Z3RfZGV2LT5nZW8ubnJfY2hubHMgPSBucl9jaG5sczsK
+LQl0Z3RfZGV2LT5nZW8uYWxsX2x1bnMgPSBucl9sdW5zOwogCXRndF9kZXYtPmdlby5ucl9sdW5z
+ID0gKGx1bl9iYWxhbmNlZCkgPyBwcmV2X25yX2x1bnMgOiAtMTsKKwl0Z3RfZGV2LT5nZW8uYWxs
+X2x1bnMgPSBucl9sdW5zOworCXRndF9kZXYtPmdlby5hbGxfY2h1bmtzID0gbnJfbHVucyAqIGRl
+di0+Z2VvLm5yX2Noa3M7CisKIAl0Z3RfZGV2LT5nZW8ub3AgPSBvcDsKLQl0Z3RfZGV2LT50b3Rh
+bF9zZWNzID0gbnJfbHVucyAqIHRndF9kZXYtPmdlby5zZWNfcGVyX2x1bjsKKworCXNlY19wZXJf
+bHVuID0gZGV2LT5nZW8uY2xiYSAqIGRldi0+Z2VvLm5yX2Noa3M7CisJdGd0X2Rldi0+Z2VvLnRv
+dGFsX3NlY3MgPSBucl9sdW5zICogc2VjX3Blcl9sdW47CisKIAl0Z3RfZGV2LT5xID0gZGV2LT5x
+OwogCXRndF9kZXYtPm1hcCA9IGRldl9tYXA7CiAJdGd0X2Rldi0+bHVucyA9IGx1bnM7Ci0JbWVt
+Y3B5KCZ0Z3RfZGV2LT5pZGVudGl0eSwgJmRldi0+aWRlbnRpdHksIHNpemVvZihzdHJ1Y3QgbnZt
+X2lkKSk7Ci0KIAl0Z3RfZGV2LT5wYXJlbnQgPSBkZXY7CiAKIAlyZXR1cm4gdGd0X2RldjsKQEAg
+LTI5Niw4ICszMDEsNiBAQCBzdGF0aWMgaW50IF9fbnZtX2NvbmZpZ19zaW1wbGUoc3RydWN0IG52
+bV9kZXYgKmRldiwKIHN0YXRpYyBpbnQgX19udm1fY29uZmlnX2V4dGVuZGVkKHN0cnVjdCBudm1f
+ZGV2ICpkZXYsCiAJCQkJIHN0cnVjdCBudm1faW9jdGxfY3JlYXRlX2V4dGVuZGVkICplKQogewot
+CXN0cnVjdCBudm1fZ2VvICpnZW8gPSAmZGV2LT5nZW87Ci0KIAlpZiAoZS0+bHVuX2JlZ2luID09
+IDB4RkZGRiAmJiBlLT5sdW5fZW5kID09IDB4RkZGRikgewogCQllLT5sdW5fYmVnaW4gPSAwOwog
+CQllLT5sdW5fZW5kID0gZGV2LT5nZW8uYWxsX2x1bnMgLSAxOwpAQCAtMzExLDcgKzMxNCw3IEBA
+IHN0YXRpYyBpbnQgX19udm1fY29uZmlnX2V4dGVuZGVkKHN0cnVjdCBudm1fZGV2ICpkZXYsCiAJ
+CXJldHVybiAtRUlOVkFMOwogCX0KIAotCXJldHVybiBudm1fY29uZmlnX2NoZWNrX2x1bnMoZ2Vv
+LCBlLT5sdW5fYmVnaW4sIGUtPmx1bl9lbmQpOworCXJldHVybiBudm1fY29uZmlnX2NoZWNrX2x1
+bnMoJmRldi0+Z2VvLCBlLT5sdW5fYmVnaW4sIGUtPmx1bl9lbmQpOwogfQogCiBzdGF0aWMgaW50
+IG52bV9jcmVhdGVfdGd0KHN0cnVjdCBudm1fZGV2ICpkZXYsIHN0cnVjdCBudm1faW9jdGxfY3Jl
+YXRlICpjcmVhdGUpCkBAIC00MDYsNyArNDA5LDcgQEAgc3RhdGljIGludCBudm1fY3JlYXRlX3Rn
+dChzdHJ1Y3QgbnZtX2RldiAqZGV2LCBzdHJ1Y3QgbnZtX2lvY3RsX2NyZWF0ZSAqY3JlYXRlKQog
+CXRxdWV1ZS0+cXVldWVkYXRhID0gdGFyZ2V0ZGF0YTsKIAogCWJsa19xdWV1ZV9tYXhfaHdfc2Vj
+dG9ycyh0cXVldWUsCi0JCQkoZGV2LT5nZW8uc2VjX3NpemUgPj4gOSkgKiBOVk1fTUFYX1ZMQkEp
+OworCQkJKGRldi0+Z2VvLmNzZWNzID4+IDkpICogTlZNX01BWF9WTEJBKTsKIAogCXNldF9jYXBh
+Y2l0eSh0ZGlzaywgdHQtPmNhcGFjaXR5KHRhcmdldGRhdGEpKTsKIAlhZGRfZGlzayh0ZGlzayk7
+CkBAIC04NDEsNDAgKzg0NCw5IEBAIEVYUE9SVF9TWU1CT0wobnZtX2dldF90Z3RfYmJfdGJsKTsK
+IAogc3RhdGljIGludCBudm1fY29yZV9pbml0KHN0cnVjdCBudm1fZGV2ICpkZXYpCiB7Ci0Jc3Ry
+dWN0IG52bV9pZCAqaWQgPSAmZGV2LT5pZGVudGl0eTsKIAlzdHJ1Y3QgbnZtX2dlbyAqZ2VvID0g
+JmRldi0+Z2VvOwogCWludCByZXQ7CiAKLQltZW1jcHkoJmdlby0+cHBhZiwgJmlkLT5wcGFmLCBz
+aXplb2Yoc3RydWN0IG52bV9hZGRyX2Zvcm1hdCkpOwotCi0JaWYgKGlkLT5tdHlwZSAhPSAwKSB7
+Ci0JCXByX2VycigibnZtOiBtZW1vcnkgdHlwZSBub3Qgc3VwcG9ydGVkXG4iKTsKLQkJcmV0dXJu
+IC1FSU5WQUw7Ci0JfQotCi0JLyogV2hvbGUgZGV2aWNlIHZhbHVlcyAqLwotCWdlby0+bnJfY2hu
+bHMgPSBpZC0+bnVtX2NoOwotCWdlby0+bnJfbHVucyA9IGlkLT5udW1fbHVuOwotCi0JLyogR2Vu
+ZXJpYyBkZXZpY2UgZ2VvbWV0cnkgdmFsdWVzICovCi0JZ2VvLT53c19taW4gPSBpZC0+d3NfbWlu
+OwotCWdlby0+d3Nfb3B0ID0gaWQtPndzX29wdDsKLQlnZW8tPndzX3NlcSA9IGlkLT53c19zZXE7
+Ci0JZ2VvLT53c19wZXJfY2hrID0gaWQtPndzX3Blcl9jaGs7Ci0JZ2VvLT5ucl9jaGtzID0gaWQt
+Pm51bV9jaGs7Ci0JZ2VvLT5tY2NhcCA9IGlkLT5tY2NhcDsKLQotCWdlby0+c2VjX3Blcl9jaGsg
+PSBpZC0+Y2xiYTsKLQlnZW8tPnNlY19wZXJfbHVuID0gZ2VvLT5zZWNfcGVyX2NoayAqIGdlby0+
+bnJfY2hrczsKLQlnZW8tPmFsbF9sdW5zID0gZ2VvLT5ucl9sdW5zICogZ2VvLT5ucl9jaG5sczsK
+LQotCS8qIDEuMiBzcGVjIGRldmljZSBnZW9tZXRyeSB2YWx1ZXMgKi8KLQlnZW8tPnBsYW5lX21v
+ZGUgPSAxIDw8IGdlby0+d3Nfc2VxOwotCWdlby0+bnJfcGxhbmVzID0gZ2VvLT53c19vcHQgLyBn
+ZW8tPndzX21pbjsKLQlnZW8tPnNlY19wZXJfcGcgPSBnZW8tPndzX21pbjsKLQlnZW8tPnNlY19w
+ZXJfcGwgPSBnZW8tPnNlY19wZXJfcGcgKiBnZW8tPm5yX3BsYW5lczsKLQotCWRldi0+dG90YWxf
+c2VjcyA9IGdlby0+YWxsX2x1bnMgKiBnZW8tPnNlY19wZXJfbHVuOwogCWRldi0+bHVuX21hcCA9
+IGtjYWxsb2MoQklUU19UT19MT05HUyhnZW8tPmFsbF9sdW5zKSwKIAkJCQkJc2l6ZW9mKHVuc2ln
+bmVkIGxvbmcpLCBHRlBfS0VSTkVMKTsKIAlpZiAoIWRldi0+bHVuX21hcCkKQEAgLTkxMywxNiAr
+ODg1LDE0IEBAIHN0YXRpYyBpbnQgbnZtX2luaXQoc3RydWN0IG52bV9kZXYgKmRldikKIAlzdHJ1
+Y3QgbnZtX2dlbyAqZ2VvID0gJmRldi0+Z2VvOwogCWludCByZXQgPSAtRUlOVkFMOwogCi0JaWYg
+KGRldi0+b3BzLT5pZGVudGl0eShkZXYsICZkZXYtPmlkZW50aXR5KSkgeworCWlmIChkZXYtPm9w
+cy0+aWRlbnRpdHkoZGV2KSkgewogCQlwcl9lcnIoIm52bTogZGV2aWNlIGNvdWxkIG5vdCBiZSBp
+ZGVudGlmaWVkXG4iKTsKIAkJZ290byBlcnI7CiAJfQogCi0JaWYgKGRldi0+aWRlbnRpdHkudmVy
+X2lkICE9IDEgJiYgZGV2LT5pZGVudGl0eS52ZXJfaWQgIT0gMikgewotCQlwcl9lcnIoIm52bTog
+ZGV2aWNlIHZlcl9pZCAlZCBub3Qgc3VwcG9ydGVkIGJ5IGtlcm5lbC5cbiIsCi0JCQkJZGV2LT5p
+ZGVudGl0eS52ZXJfaWQpOwotCQlnb3RvIGVycjsKLQl9CisJcHJfZGVidWcoIm52bTogdmVyOiV1
+IG52bV92ZW5kb3I6JXhcbiIsCisJCQkJZ2VvLT52ZXJfaWQsCisJCQkJZ2VvLT52bW50KTsKIAog
+CXJldCA9IG52bV9jb3JlX2luaXQoZGV2KTsKIAlpZiAocmV0KSB7CkBAIC05MzAsMTAgKzkwMCwx
+MCBAQCBzdGF0aWMgaW50IG52bV9pbml0KHN0cnVjdCBudm1fZGV2ICpkZXYpCiAJCWdvdG8gZXJy
+OwogCX0KIAotCXByX2luZm8oIm52bTogcmVnaXN0ZXJlZCAlcyBbJXUvJXUvJXUvJXUvJXUvJXVd
+XG4iLAotCQkJZGV2LT5uYW1lLCBnZW8tPnNlY19wZXJfcGcsIGdlby0+bnJfcGxhbmVzLAotCQkJ
+Z2VvLT53c19wZXJfY2hrLCBnZW8tPm5yX2Noa3MsCi0JCQlnZW8tPmFsbF9sdW5zLCBnZW8tPm5y
+X2NobmxzKTsKKwlwcl9pbmZvKCJudm06IHJlZ2lzdGVyZWQgJXMgWyV1LyV1LyV1LyV1LyV1XVxu
+IiwKKwkJCWRldi0+bmFtZSwgZ2VvLT53c19taW4sIGdlby0+d3Nfb3B0LAorCQkJZ2VvLT5ucl9j
+aGtzLCBnZW8tPmFsbF9sdW5zLAorCQkJZ2VvLT5ucl9jaG5scyk7CiAJcmV0dXJuIDA7CiBlcnI6
+CiAJcHJfZXJyKCJudm06IGZhaWxlZCB0byBpbml0aWFsaXplIG52bVxuIik7CmRpZmYgLS1naXQg
+YS9kcml2ZXJzL2xpZ2h0bnZtL3BibGstY29yZS5jIGIvZHJpdmVycy9saWdodG52bS9wYmxrLWNv
+cmUuYwppbmRleCA4ODQ4NDQzYTA3MjEuLjE2OTU4OWRkZDQ1NyAxMDA2NDQKLS0tIGEvZHJpdmVy
+cy9saWdodG52bS9wYmxrLWNvcmUuYworKysgYi9kcml2ZXJzL2xpZ2h0bnZtL3BibGstY29yZS5j
+CkBAIC02MTMsNyArNjEzLDcgQEAgc3RhdGljIGludCBwYmxrX2xpbmVfc3VibWl0X2VtZXRhX2lv
+KHN0cnVjdCBwYmxrICpwYmxrLCBzdHJ1Y3QgcGJsa19saW5lICpsaW5lLAogCW1lbXNldCgmcnFk
+LCAwLCBzaXplb2Yoc3RydWN0IG52bV9ycSkpOwogCiAJcnFfcHBhcyA9IHBibGtfY2FsY19zZWNz
+KHBibGssIGxlZnRfcHBhcywgMCk7Ci0JcnFfbGVuID0gcnFfcHBhcyAqIGdlby0+c2VjX3NpemU7
+CisJcnFfbGVuID0gcnFfcHBhcyAqIGdlby0+Y3NlY3M7CiAKIAliaW8gPSBwYmxrX2Jpb19tYXBf
+YWRkcihwYmxrLCBlbWV0YV9idWYsIHJxX3BwYXMsIHJxX2xlbiwKIAkJCQkJbF9tZy0+ZW1ldGFf
+YWxsb2NfdHlwZSwgR0ZQX0tFUk5FTCk7CkBAIC03MjIsNyArNzIyLDcgQEAgdTY0IHBibGtfbGlu
+ZV9zbWV0YV9zdGFydChzdHJ1Y3QgcGJsayAqcGJsaywgc3RydWN0IHBibGtfbGluZSAqbGluZSkK
+IAlpZiAoYml0ID49IGxtLT5ibGtfcGVyX2xpbmUpCiAJCXJldHVybiAtMTsKIAotCXJldHVybiBi
+aXQgKiBnZW8tPnNlY19wZXJfcGw7CisJcmV0dXJuIGJpdCAqIGdlby0+d3Nfb3B0OwogfQogCiBz
+dGF0aWMgaW50IHBibGtfbGluZV9zdWJtaXRfc21ldGFfaW8oc3RydWN0IHBibGsgKnBibGssIHN0
+cnVjdCBwYmxrX2xpbmUgKmxpbmUsCkBAIC0xMDM1LDE5ICsxMDM1LDE5IEBAIHN0YXRpYyBpbnQg
+cGJsa19saW5lX2luaXRfYmIoc3RydWN0IHBibGsgKnBibGssIHN0cnVjdCBwYmxrX2xpbmUgKmxp
+bmUsCiAJLyogQ2FwdHVyZSBiYWQgYmxvY2sgaW5mb3JtYXRpb24gb24gbGluZSBtYXBwaW5nIGJp
+dG1hcHMgKi8KIAl3aGlsZSAoKGJpdCA9IGZpbmRfbmV4dF9iaXQobGluZS0+YmxrX2JpdG1hcCwg
+bG0tPmJsa19wZXJfbGluZSwKIAkJCQkJYml0ICsgMSkpIDwgbG0tPmJsa19wZXJfbGluZSkgewot
+CQlvZmYgPSBiaXQgKiBnZW8tPnNlY19wZXJfcGw7CisJCW9mZiA9IGJpdCAqIGdlby0+d3Nfb3B0
+OwogCQliaXRtYXBfc2hpZnRfbGVmdChsX21nLT5iYl9hdXgsIGxfbWctPmJiX3RlbXBsYXRlLCBv
+ZmYsCiAJCQkJCQkJbG0tPnNlY19wZXJfbGluZSk7CiAJCWJpdG1hcF9vcihsaW5lLT5tYXBfYml0
+bWFwLCBsaW5lLT5tYXBfYml0bWFwLCBsX21nLT5iYl9hdXgsCiAJCQkJCQkJbG0tPnNlY19wZXJf
+bGluZSk7Ci0JCWxpbmUtPnNlY19pbl9saW5lIC09IGdlby0+c2VjX3Blcl9jaGs7CisJCWxpbmUt
+PnNlY19pbl9saW5lIC09IGdlby0+Y2xiYTsKIAkJaWYgKGJpdCA+PSBsbS0+ZW1ldGFfYmIpCiAJ
+CQlucl9iYisrOwogCX0KIAogCS8qIE1hcmsgc21ldGEgbWV0YWRhdGEgc2VjdG9ycyBhcyBiYWQg
+c2VjdG9ycyAqLwogCWJpdCA9IGZpbmRfZmlyc3RfemVyb19iaXQobGluZS0+YmxrX2JpdG1hcCwg
+bG0tPmJsa19wZXJfbGluZSk7Ci0Jb2ZmID0gYml0ICogZ2VvLT5zZWNfcGVyX3BsOworCW9mZiA9
+IGJpdCAqIGdlby0+d3Nfb3B0OwogCWJpdG1hcF9zZXQobGluZS0+bWFwX2JpdG1hcCwgb2ZmLCBs
+bS0+c21ldGFfc2VjKTsKIAlsaW5lLT5zZWNfaW5fbGluZSAtPSBsbS0+c21ldGFfc2VjOwogCWxp
+bmUtPnNtZXRhX3NzZWMgPSBvZmY7CkBAIC0xMDY2LDEwICsxMDY2LDEwIEBAIHN0YXRpYyBpbnQg
+cGJsa19saW5lX2luaXRfYmIoc3RydWN0IHBibGsgKnBibGssIHN0cnVjdCBwYmxrX2xpbmUgKmxp
+bmUsCiAJZW1ldGFfc2VjcyA9IGxtLT5lbWV0YV9zZWNbMF07CiAJb2ZmID0gbG0tPnNlY19wZXJf
+bGluZTsKIAl3aGlsZSAoZW1ldGFfc2VjcykgewotCQlvZmYgLT0gZ2VvLT5zZWNfcGVyX3BsOwor
+CQlvZmYgLT0gZ2VvLT53c19vcHQ7CiAJCWlmICghdGVzdF9iaXQob2ZmLCBsaW5lLT5pbnZhbGlk
+X2JpdG1hcCkpIHsKLQkJCWJpdG1hcF9zZXQobGluZS0+aW52YWxpZF9iaXRtYXAsIG9mZiwgZ2Vv
+LT5zZWNfcGVyX3BsKTsKLQkJCWVtZXRhX3NlY3MgLT0gZ2VvLT5zZWNfcGVyX3BsOworCQkJYml0
+bWFwX3NldChsaW5lLT5pbnZhbGlkX2JpdG1hcCwgb2ZmLCBnZW8tPndzX29wdCk7CisJCQllbWV0
+YV9zZWNzIC09IGdlby0+d3Nfb3B0OwogCQl9CiAJfQogCmRpZmYgLS1naXQgYS9kcml2ZXJzL2xp
+Z2h0bnZtL3BibGstZ2MuYyBiL2RyaXZlcnMvbGlnaHRudm0vcGJsay1nYy5jCmluZGV4IDMyMGY5
+OWFmOTllOS4uNjg1MWE1YzY3MTg5IDEwMDY0NAotLS0gYS9kcml2ZXJzL2xpZ2h0bnZtL3BibGst
+Z2MuYworKysgYi9kcml2ZXJzL2xpZ2h0bnZtL3BibGstZ2MuYwpAQCAtODgsNyArODgsNyBAQCBz
+dGF0aWMgdm9pZCBwYmxrX2djX2xpbmVfd3Moc3RydWN0IHdvcmtfc3RydWN0ICp3b3JrKQogCiAJ
+dXAoJmdjLT5nY19zZW0pOwogCi0JZ2NfcnEtPmRhdGEgPSB2bWFsbG9jKGdjX3JxLT5ucl9zZWNz
+ICogZ2VvLT5zZWNfc2l6ZSk7CisJZ2NfcnEtPmRhdGEgPSB2bWFsbG9jKGdjX3JxLT5ucl9zZWNz
+ICogZ2VvLT5jc2Vjcyk7CiAJaWYgKCFnY19ycS0+ZGF0YSkgewogCQlwcl9lcnIoInBibGs6IGNv
+dWxkIG5vdCBHQyBsaW5lOiVkICglZC8lZClcbiIsCiAJCQkJCWxpbmUtPmlkLCAqbGluZS0+dnNj
+LCBnY19ycS0+bnJfc2Vjcyk7CmRpZmYgLS1naXQgYS9kcml2ZXJzL2xpZ2h0bnZtL3BibGstaW5p
+dC5jIGIvZHJpdmVycy9saWdodG52bS9wYmxrLWluaXQuYwppbmRleCAyNWZjNzBjYTA3ZjcuLjli
+NWVlMDVjMzAyOCAxMDA2NDQKLS0tIGEvZHJpdmVycy9saWdodG52bS9wYmxrLWluaXQuYworKysg
+Yi9kcml2ZXJzL2xpZ2h0bnZtL3BibGstaW5pdC5jCkBAIC0xNDYsNyArMTQ2LDcgQEAgc3RhdGlj
+IGludCBwYmxrX3J3Yl9pbml0KHN0cnVjdCBwYmxrICpwYmxrKQogCQlyZXR1cm4gLUVOT01FTTsK
+IAogCXBvd2VyX3NpemUgPSBnZXRfY291bnRfb3JkZXIobnJfZW50cmllcyk7Ci0JcG93ZXJfc2Vn
+X3N6ID0gZ2V0X2NvdW50X29yZGVyKGdlby0+c2VjX3NpemUpOworCXBvd2VyX3NlZ19zeiA9IGdl
+dF9jb3VudF9vcmRlcihnZW8tPmNzZWNzKTsKIAogCXJldHVybiBwYmxrX3JiX2luaXQoJnBibGst
+PnJ3YiwgZW50cmllcywgcG93ZXJfc2l6ZSwgcG93ZXJfc2VnX3N6KTsKIH0KQEAgLTE1NCwxMSAr
+MTU0LDExIEBAIHN0YXRpYyBpbnQgcGJsa19yd2JfaW5pdChzdHJ1Y3QgcGJsayAqcGJsaykKIC8q
+IE1pbmltdW0gcGFnZXMgbmVlZGVkIHdpdGhpbiBhIGx1biAqLwogI2RlZmluZSBBRERSX1BPT0xf
+U0laRSA2NAogCi1zdGF0aWMgaW50IHBibGtfc2V0X3BwYWYoc3RydWN0IHBibGsgKnBibGspCitz
+dGF0aWMgaW50IHBibGtfc2V0X2FkZHJmXzEyKHN0cnVjdCBudm1fZ2VvICpnZW8sCisJCQkgICAg
+IHN0cnVjdCBudm1fYWRkcl9mb3JtYXRfMTIgKmRzdCkKIHsKLQlzdHJ1Y3QgbnZtX3RndF9kZXYg
+KmRldiA9IHBibGstPmRldjsKLQlzdHJ1Y3QgbnZtX2dlbyAqZ2VvID0gJmRldi0+Z2VvOwotCXN0
+cnVjdCBudm1fYWRkcl9mb3JtYXQgcHBhZiA9IGdlby0+cHBhZjsKKwlzdHJ1Y3QgbnZtX2FkZHJf
+Zm9ybWF0XzEyICpzcmMgPQorCQkJCShzdHJ1Y3QgbnZtX2FkZHJfZm9ybWF0XzEyICopJmdlby0+
+YWRkcmY7CiAJaW50IHBvd2VyX2xlbjsKIAogCS8qIFJlLWNhbGN1bGF0ZSBjaGFubmVsIGFuZCBs
+dW4gZm9ybWF0IHRvIGFkYXB0IHRvIGNvbmZpZ3VyYXRpb24gKi8KQEAgLTE2NywzNCArMTY3LDUw
+IEBAIHN0YXRpYyBpbnQgcGJsa19zZXRfcHBhZihzdHJ1Y3QgcGJsayAqcGJsaykKIAkJcHJfZXJy
+KCJwYmxrOiBzdXBwb3J0cyBvbmx5IHBvd2VyLW9mLXR3byBjaGFubmVsIGNvbmZpZy5cbiIpOwog
+CQlyZXR1cm4gLUVJTlZBTDsKIAl9Ci0JcHBhZi5jaF9sZW4gPSBwb3dlcl9sZW47CisJZHN0LT5j
+aF9sZW4gPSBwb3dlcl9sZW47CiAKIAlwb3dlcl9sZW4gPSBnZXRfY291bnRfb3JkZXIoZ2VvLT5u
+cl9sdW5zKTsKIAlpZiAoMSA8PCBwb3dlcl9sZW4gIT0gZ2VvLT5ucl9sdW5zKSB7CiAJCXByX2Vy
+cigicGJsazogc3VwcG9ydHMgb25seSBwb3dlci1vZi10d28gTFVOIGNvbmZpZy5cbiIpOwogCQly
+ZXR1cm4gLUVJTlZBTDsKIAl9Ci0JcHBhZi5sdW5fbGVuID0gcG93ZXJfbGVuOworCWRzdC0+bHVu
+X2xlbiA9IHBvd2VyX2xlbjsKIAotCXBibGstPnBwYWYuc2VjX29mZnNldCA9IDA7Ci0JcGJsay0+
+cHBhZi5wbG5fb2Zmc2V0ID0gcHBhZi5zZWN0X2xlbjsKLQlwYmxrLT5wcGFmLmNoX29mZnNldCA9
+IHBibGstPnBwYWYucGxuX29mZnNldCArIHBwYWYucGxuX2xlbjsKLQlwYmxrLT5wcGFmLmx1bl9v
+ZmZzZXQgPSBwYmxrLT5wcGFmLmNoX29mZnNldCArIHBwYWYuY2hfbGVuOwotCXBibGstPnBwYWYu
+cGdfb2Zmc2V0ID0gcGJsay0+cHBhZi5sdW5fb2Zmc2V0ICsgcHBhZi5sdW5fbGVuOwotCXBibGst
+PnBwYWYuYmxrX29mZnNldCA9IHBibGstPnBwYWYucGdfb2Zmc2V0ICsgcHBhZi5wZ19sZW47Ci0J
+cGJsay0+cHBhZi5zZWNfbWFzayA9ICgxVUxMIDw8IHBwYWYuc2VjdF9sZW4pIC0gMTsKLQlwYmxr
+LT5wcGFmLnBsbl9tYXNrID0gKCgxVUxMIDw8IHBwYWYucGxuX2xlbikgLSAxKSA8PAotCQkJCQkJ
+CXBibGstPnBwYWYucGxuX29mZnNldDsKLQlwYmxrLT5wcGFmLmNoX21hc2sgPSAoKDFVTEwgPDwg
+cHBhZi5jaF9sZW4pIC0gMSkgPDwKLQkJCQkJCQlwYmxrLT5wcGFmLmNoX29mZnNldDsKLQlwYmxr
+LT5wcGFmLmx1bl9tYXNrID0gKCgxVUxMIDw8IHBwYWYubHVuX2xlbikgLSAxKSA8PAotCQkJCQkJ
+CXBibGstPnBwYWYubHVuX29mZnNldDsKLQlwYmxrLT5wcGFmLnBnX21hc2sgPSAoKDFVTEwgPDwg
+cHBhZi5wZ19sZW4pIC0gMSkgPDwKLQkJCQkJCQlwYmxrLT5wcGFmLnBnX29mZnNldDsKLQlwYmxr
+LT5wcGFmLmJsa19tYXNrID0gKCgxVUxMIDw8IHBwYWYuYmxrX2xlbikgLSAxKSA8PAotCQkJCQkJ
+CXBibGstPnBwYWYuYmxrX29mZnNldDsKKwlkc3QtPmJsa19sZW4gPSBzcmMtPmJsa19sZW47CisJ
+ZHN0LT5wZ19sZW4gPSBzcmMtPnBnX2xlbjsKKwlkc3QtPnBsbl9sZW4gPSBzcmMtPnBsbl9sZW47
+CisJZHN0LT5zZWN0X2xlbiA9IHNyYy0+c2VjdF9sZW47CiAKLQlwYmxrLT5wcGFmX2JpdHNpemUg
+PSBwYmxrLT5wcGFmLmJsa19vZmZzZXQgKyBwcGFmLmJsa19sZW47CisJZHN0LT5zZWN0X29mZnNl
+dCA9IDA7CisJZHN0LT5wbG5fb2Zmc2V0ID0gZHN0LT5zZWN0X2xlbjsKKwlkc3QtPmNoX29mZnNl
+dCA9IGRzdC0+cGxuX29mZnNldCArIGRzdC0+cGxuX2xlbjsKKwlkc3QtPmx1bl9vZmZzZXQgPSBk
+c3QtPmNoX29mZnNldCArIGRzdC0+Y2hfbGVuOworCWRzdC0+cGdfb2Zmc2V0ID0gZHN0LT5sdW5f
+b2Zmc2V0ICsgZHN0LT5sdW5fbGVuOworCWRzdC0+YmxrX29mZnNldCA9IGRzdC0+cGdfb2Zmc2V0
+ICsgZHN0LT5wZ19sZW47CisKKwlkc3QtPnNlY19tYXNrID0gKCgxVUxMIDw8IGRzdC0+c2VjdF9s
+ZW4pIC0gMSkgPDwgZHN0LT5zZWN0X29mZnNldDsKKwlkc3QtPnBsbl9tYXNrID0gKCgxVUxMIDw8
+IGRzdC0+cGxuX2xlbikgLSAxKSA8PCBkc3QtPnBsbl9vZmZzZXQ7CisJZHN0LT5jaF9tYXNrID0g
+KCgxVUxMIDw8IGRzdC0+Y2hfbGVuKSAtIDEpIDw8IGRzdC0+Y2hfb2Zmc2V0OworCWRzdC0+bHVu
+X21hc2sgPSAoKDFVTEwgPDwgZHN0LT5sdW5fbGVuKSAtIDEpIDw8IGRzdC0+bHVuX29mZnNldDsK
+Kwlkc3QtPnBnX21hc2sgPSAoKDFVTEwgPDwgZHN0LT5wZ19sZW4pIC0gMSkgPDwgZHN0LT5wZ19v
+ZmZzZXQ7CisJZHN0LT5ibGtfbWFzayA9ICgoMVVMTCA8PCBkc3QtPmJsa19sZW4pIC0gMSkgPDwg
+ZHN0LT5ibGtfb2Zmc2V0OworCisJcmV0dXJuIGRzdC0+YmxrX29mZnNldCArIHNyYy0+YmxrX2xl
+bjsKK30KKworc3RhdGljIGludCBwYmxrX3NldF9wcGFmKHN0cnVjdCBwYmxrICpwYmxrKQorewor
+CXN0cnVjdCBudm1fdGd0X2RldiAqZGV2ID0gcGJsay0+ZGV2OworCXN0cnVjdCBudm1fZ2VvICpn
+ZW8gPSAmZGV2LT5nZW87CisJaW50IG1vZDsKKworCWRpdl91NjRfcmVtKGdlby0+Y2xiYSwgcGJs
+ay0+bWluX3dyaXRlX3BncywgJm1vZCk7CisJaWYgKG1vZCkgeworCQlwcl9lcnIoInBibGs6IGJh
+ZCBjb25maWd1cmF0aW9uIG9mIHNlY3RvcnMvcGFnZXNcbiIpOworCQlyZXR1cm4gLUVJTlZBTDsK
+Kwl9CisKKwlwYmxrLT5wcGFmX2JpdHNpemUgPSBwYmxrX3NldF9hZGRyZl8xMihnZW8sICh2b2lk
+ICopJnBibGstPnBwYWYpOwogCiAJcmV0dXJuIDA7CiB9CkBAIC0yNTMsOCArMjY5LDcgQEAgc3Rh
+dGljIGludCBwYmxrX2NvcmVfaW5pdChzdHJ1Y3QgcGJsayAqcGJsaykKIAlzdHJ1Y3QgbnZtX3Rn
+dF9kZXYgKmRldiA9IHBibGstPmRldjsKIAlzdHJ1Y3QgbnZtX2dlbyAqZ2VvID0gJmRldi0+Z2Vv
+OwogCi0JcGJsay0+cGdzX2luX2J1ZmZlciA9IE5WTV9NRU1fUEFHRV9XUklURSAqIGdlby0+c2Vj
+X3Blcl9wZyAqCi0JCQkJCQlnZW8tPm5yX3BsYW5lcyAqIGdlby0+YWxsX2x1bnM7CisJcGJsay0+
+cGdzX2luX2J1ZmZlciA9IGdlby0+bXdfY3VuaXRzICogZ2VvLT5hbGxfbHVuczsKIAogCWlmIChw
+YmxrX2luaXRfZ2xvYmFsX2NhY2hlcyhwYmxrKSkKIAkJcmV0dXJuIC1FTk9NRU07CkBAIC01NTIs
+MTggKzU2NywxOCBAQCBzdGF0aWMgdW5zaWduZWQgaW50IGNhbGNfZW1ldGFfbGVuKHN0cnVjdCBw
+YmxrICpwYmxrKQogCS8qIFJvdW5kIHRvIHNlY3RvciBzaXplIHNvIHRoYXQgbGJhX2xpc3Qgc3Rh
+cnRzIG9uIGl0cyBvd24gc2VjdG9yICovCiAJbG0tPmVtZXRhX3NlY1sxXSA9IERJVl9ST1VORF9V
+UCgKIAkJCXNpemVvZihzdHJ1Y3QgbGluZV9lbWV0YSkgKyBsbS0+YmxrX2JpdG1hcF9sZW4gKwot
+CQkJc2l6ZW9mKHN0cnVjdCB3YV9jb3VudGVycyksIGdlby0+c2VjX3NpemUpOwotCWxtLT5lbWV0
+YV9sZW5bMV0gPSBsbS0+ZW1ldGFfc2VjWzFdICogZ2VvLT5zZWNfc2l6ZTsKKwkJCXNpemVvZihz
+dHJ1Y3Qgd2FfY291bnRlcnMpLCBnZW8tPmNzZWNzKTsKKwlsbS0+ZW1ldGFfbGVuWzFdID0gbG0t
+PmVtZXRhX3NlY1sxXSAqIGdlby0+Y3NlY3M7CiAKIAkvKiBSb3VuZCB0byBzZWN0b3Igc2l6ZSBz
+byB0aGF0IHZzY19saXN0IHN0YXJ0cyBvbiBpdHMgb3duIHNlY3RvciAqLwogCWxtLT5kc2VjX3Bl
+cl9saW5lID0gbG0tPnNlY19wZXJfbGluZSAtIGxtLT5lbWV0YV9zZWNbMF07CiAJbG0tPmVtZXRh
+X3NlY1syXSA9IERJVl9ST1VORF9VUChsbS0+ZHNlY19wZXJfbGluZSAqIHNpemVvZih1NjQpLAot
+CQkJZ2VvLT5zZWNfc2l6ZSk7Ci0JbG0tPmVtZXRhX2xlblsyXSA9IGxtLT5lbWV0YV9zZWNbMl0g
+KiBnZW8tPnNlY19zaXplOworCQkJZ2VvLT5jc2Vjcyk7CisJbG0tPmVtZXRhX2xlblsyXSA9IGxt
+LT5lbWV0YV9zZWNbMl0gKiBnZW8tPmNzZWNzOwogCiAJbG0tPmVtZXRhX3NlY1szXSA9IERJVl9S
+T1VORF9VUChsX21nLT5ucl9saW5lcyAqIHNpemVvZih1MzIpLAotCQkJZ2VvLT5zZWNfc2l6ZSk7
+Ci0JbG0tPmVtZXRhX2xlblszXSA9IGxtLT5lbWV0YV9zZWNbM10gKiBnZW8tPnNlY19zaXplOwor
+CQkJZ2VvLT5jc2Vjcyk7CisJbG0tPmVtZXRhX2xlblszXSA9IGxtLT5lbWV0YV9zZWNbM10gKiBn
+ZW8tPmNzZWNzOwogCiAJbG0tPnZzY19saXN0X2xlbiA9IGxfbWctPm5yX2xpbmVzICogc2l6ZW9m
+KHUzMik7CiAKQEAgLTU5NCwxMyArNjA5LDEzIEBAIHN0YXRpYyB2b2lkIHBibGtfc2V0X3Byb3Zp
+c2lvbihzdHJ1Y3QgcGJsayAqcGJsaywgbG9uZyBucl9mcmVlX2Jsa3MpCiAJICogb24gdXNlciBj
+YXBhY2l0eSBjb25zaWRlciBvbmx5IHByb3Zpc2lvbmVkIGJsb2NrcwogCSAqLwogCXBibGstPnJs
+LnRvdGFsX2Jsb2NrcyA9IG5yX2ZyZWVfYmxrczsKLQlwYmxrLT5ybC5ucl9zZWNzID0gbnJfZnJl
+ZV9ibGtzICogZ2VvLT5zZWNfcGVyX2NoazsKKwlwYmxrLT5ybC5ucl9zZWNzID0gbnJfZnJlZV9i
+bGtzICogZ2VvLT5jbGJhOwogCiAJLyogQ29uc2lkZXIgc2VjdG9ycyB1c2VkIGZvciBtZXRhZGF0
+YSAqLwogCXNlY19tZXRhID0gKGxtLT5zbWV0YV9zZWMgKyBsbS0+ZW1ldGFfc2VjWzBdKSAqIGxf
+bWctPm5yX2ZyZWVfbGluZXM7Ci0JYmxrX21ldGEgPSBESVZfUk9VTkRfVVAoc2VjX21ldGEsIGdl
+by0+c2VjX3Blcl9jaGspOworCWJsa19tZXRhID0gRElWX1JPVU5EX1VQKHNlY19tZXRhLCBnZW8t
+PmNsYmEpOwogCi0JcGJsay0+Y2FwYWNpdHkgPSAocHJvdmlzaW9uZWQgLSBibGtfbWV0YSkgKiBn
+ZW8tPnNlY19wZXJfY2hrOworCXBibGstPmNhcGFjaXR5ID0gKHByb3Zpc2lvbmVkIC0gYmxrX21l
+dGEpICogZ2VvLT5jbGJhOwogCiAJYXRvbWljX3NldCgmcGJsay0+cmwuZnJlZV9ibG9ja3MsIG5y
+X2ZyZWVfYmxrcyk7CiAJYXRvbWljX3NldCgmcGJsay0+cmwuZnJlZV91c2VyX2Jsb2NrcywgbnJf
+ZnJlZV9ibGtzKTsKQEAgLTcxMSwxMCArNzI2LDEwIEBAIHN0YXRpYyBpbnQgcGJsa19saW5lc19p
+bml0KHN0cnVjdCBwYmxrICpwYmxrKQogCXZvaWQgKmNodW5rX2xvZzsKIAl1bnNpZ25lZCBpbnQg
+c21ldGFfbGVuLCBlbWV0YV9sZW47CiAJbG9uZyBucl9iYWRfYmxrcyA9IDAsIG5yX2ZyZWVfYmxr
+cyA9IDA7Ci0JaW50IGJiX2Rpc3RhbmNlLCBtYXhfd3JpdGVfcHBhcywgbW9kOworCWludCBiYl9k
+aXN0YW5jZSwgbWF4X3dyaXRlX3BwYXM7CiAJaW50IGksIHJldDsKIAotCXBibGstPm1pbl93cml0
+ZV9wZ3MgPSBnZW8tPnNlY19wZXJfcGwgKiAoZ2VvLT5zZWNfc2l6ZSAvIFBBR0VfU0laRSk7CisJ
+cGJsay0+bWluX3dyaXRlX3BncyA9IGdlby0+d3Nfb3B0ICogKGdlby0+Y3NlY3MgLyBQQUdFX1NJ
+WkUpOwogCW1heF93cml0ZV9wcGFzID0gcGJsay0+bWluX3dyaXRlX3BncyAqIGdlby0+YWxsX2x1
+bnM7CiAJcGJsay0+bWF4X3dyaXRlX3BncyA9IG1pbl90KGludCwgbWF4X3dyaXRlX3BwYXMsIE5W
+TV9NQVhfVkxCQSk7CiAJcGJsa19zZXRfc2VjX3Blcl93cml0ZShwYmxrLCBwYmxrLT5taW5fd3Jp
+dGVfcGdzKTsKQEAgLTcyNSwxOSArNzQwLDEzIEBAIHN0YXRpYyBpbnQgcGJsa19saW5lc19pbml0
+KHN0cnVjdCBwYmxrICpwYmxrKQogCQlyZXR1cm4gLUVJTlZBTDsKIAl9CiAKLQlkaXZfdTY0X3Jl
+bShnZW8tPnNlY19wZXJfY2hrLCBwYmxrLT5taW5fd3JpdGVfcGdzLCAmbW9kKTsKLQlpZiAobW9k
+KSB7Ci0JCXByX2VycigicGJsazogYmFkIGNvbmZpZ3VyYXRpb24gb2Ygc2VjdG9ycy9wYWdlc1xu
+Iik7Ci0JCXJldHVybiAtRUlOVkFMOwotCX0KLQogCWxfbWctPm5yX2xpbmVzID0gZ2VvLT5ucl9j
+aGtzOwogCWxfbWctPmxvZ19saW5lID0gbF9tZy0+ZGF0YV9saW5lID0gTlVMTDsKIAlsX21nLT5s
+X3NlcV9uciA9IGxfbWctPmRfc2VxX25yID0gMDsKIAlsX21nLT5ucl9mcmVlX2xpbmVzID0gMDsK
+IAliaXRtYXBfemVybygmbF9tZy0+bWV0YV9iaXRtYXAsIFBCTEtfREFUQV9MSU5FUyk7CiAKLQls
+bS0+c2VjX3Blcl9saW5lID0gZ2VvLT5zZWNfcGVyX2NoayAqIGdlby0+YWxsX2x1bnM7CisJbG0t
+PnNlY19wZXJfbGluZSA9IGdlby0+Y2xiYSAqIGdlby0+YWxsX2x1bnM7CiAJbG0tPmJsa19wZXJf
+bGluZSA9IGdlby0+YWxsX2x1bnM7CiAJbG0tPmJsa19iaXRtYXBfbGVuID0gQklUU19UT19MT05H
+UyhnZW8tPmFsbF9sdW5zKSAqIHNpemVvZihsb25nKTsKIAlsbS0+c2VjX2JpdG1hcF9sZW4gPSBC
+SVRTX1RPX0xPTkdTKGxtLT5zZWNfcGVyX2xpbmUpICogc2l6ZW9mKGxvbmcpOwpAQCAtNzUxLDgg
+Kzc2MCw4IEBAIHN0YXRpYyBpbnQgcGJsa19saW5lc19pbml0KHN0cnVjdCBwYmxrICpwYmxrKQog
+CSAqLwogCWkgPSAxOwogYWRkX3NtZXRhX3BhZ2U6Ci0JbG0tPnNtZXRhX3NlYyA9IGkgKiBnZW8t
+PnNlY19wZXJfcGw7Ci0JbG0tPnNtZXRhX2xlbiA9IGxtLT5zbWV0YV9zZWMgKiBnZW8tPnNlY19z
+aXplOworCWxtLT5zbWV0YV9zZWMgPSBpICogZ2VvLT53c19vcHQ7CisJbG0tPnNtZXRhX2xlbiA9
+IGxtLT5zbWV0YV9zZWMgKiBnZW8tPmNzZWNzOwogCiAJc21ldGFfbGVuID0gc2l6ZW9mKHN0cnVj
+dCBsaW5lX3NtZXRhKSArIGxtLT5sdW5fYml0bWFwX2xlbjsKIAlpZiAoc21ldGFfbGVuID4gbG0t
+PnNtZXRhX2xlbikgewpAQCAtNzY1LDggKzc3NCw4IEBAIHN0YXRpYyBpbnQgcGJsa19saW5lc19p
+bml0KHN0cnVjdCBwYmxrICpwYmxrKQogCSAqLwogCWkgPSAxOwogYWRkX2VtZXRhX3BhZ2U6Ci0J
+bG0tPmVtZXRhX3NlY1swXSA9IGkgKiBnZW8tPnNlY19wZXJfcGw7Ci0JbG0tPmVtZXRhX2xlblsw
+XSA9IGxtLT5lbWV0YV9zZWNbMF0gKiBnZW8tPnNlY19zaXplOworCWxtLT5lbWV0YV9zZWNbMF0g
+PSBpICogZ2VvLT53c19vcHQ7CisJbG0tPmVtZXRhX2xlblswXSA9IGxtLT5lbWV0YV9zZWNbMF0g
+KiBnZW8tPmNzZWNzOwogCiAJZW1ldGFfbGVuID0gY2FsY19lbWV0YV9sZW4ocGJsayk7CiAJaWYg
+KGVtZXRhX2xlbiA+IGxtLT5lbWV0YV9sZW5bMF0pIHsKQEAgLTc3OSw3ICs3ODgsNyBAQCBzdGF0
+aWMgaW50IHBibGtfbGluZXNfaW5pdChzdHJ1Y3QgcGJsayAqcGJsaykKIAlsbS0+bWluX2Jsa19s
+aW5lID0gMTsKIAlpZiAoZ2VvLT5hbGxfbHVucyA+IDEpCiAJCWxtLT5taW5fYmxrX2xpbmUgKz0g
+RElWX1JPVU5EX1VQKGxtLT5zbWV0YV9zZWMgKwotCQkJCQlsbS0+ZW1ldGFfc2VjWzBdLCBnZW8t
+PnNlY19wZXJfY2hrKTsKKwkJCQkJbG0tPmVtZXRhX3NlY1swXSwgZ2VvLT5jbGJhKTsKIAogCWlm
+IChsbS0+bWluX2Jsa19saW5lID4gbG0tPmJsa19wZXJfbGluZSkgewogCQlwcl9lcnIoInBibGs6
+IGNvbmZpZy4gbm90IHN1cHBvcnRlZC4gTWluLiBMVU4gaW4gbGluZTolZFxuIiwKQEAgLTgwMyw5
+ICs4MTIsOSBAQCBzdGF0aWMgaW50IHBibGtfbGluZXNfaW5pdChzdHJ1Y3QgcGJsayAqcGJsaykK
+IAkJZ290byBmYWlsX2ZyZWVfYmJfdGVtcGxhdGU7CiAJfQogCi0JYmJfZGlzdGFuY2UgPSAoZ2Vv
+LT5hbGxfbHVucykgKiBnZW8tPnNlY19wZXJfcGw7CisJYmJfZGlzdGFuY2UgPSAoZ2VvLT5hbGxf
+bHVucykgKiBnZW8tPndzX29wdDsKIAlmb3IgKGkgPSAwOyBpIDwgbG0tPnNlY19wZXJfbGluZTsg
+aSArPSBiYl9kaXN0YW5jZSkKLQkJYml0bWFwX3NldChsX21nLT5iYl90ZW1wbGF0ZSwgaSwgZ2Vv
+LT5zZWNfcGVyX3BsKTsKKwkJYml0bWFwX3NldChsX21nLT5iYl90ZW1wbGF0ZSwgaSwgZ2VvLT53
+c19vcHQpOwogCiAJSU5JVF9MSVNUX0hFQUQoJmxfbWctPmZyZWVfbGlzdCk7CiAJSU5JVF9MSVNU
+X0hFQUQoJmxfbWctPmNvcnJ1cHRfbGlzdCk7CkBAIC05ODIsOSArOTkxLDkgQEAgc3RhdGljIHZv
+aWQgKnBibGtfaW5pdChzdHJ1Y3QgbnZtX3RndF9kZXYgKmRldiwgc3RydWN0IGdlbmRpc2sgKnRk
+aXNrLAogCXN0cnVjdCBwYmxrICpwYmxrOwogCWludCByZXQ7CiAKLQlpZiAoZGV2LT5pZGVudGl0
+eS5kb20gJiBOVk1fUlNQX0wyUCkgeworCWlmIChkZXYtPmdlby5kb20gJiBOVk1fUlNQX0wyUCkg
+ewogCQlwcl9lcnIoInBibGs6IGhvc3Qtc2lkZSBMMlAgdGFibGUgbm90IHN1cHBvcnRlZC4gKCV4
+KVxuIiwKLQkJCQkJCQlkZXYtPmlkZW50aXR5LmRvbSk7CisJCQkJCQkJZGV2LT5nZW8uZG9tKTsK
+IAkJcmV0dXJuIEVSUl9QVFIoLUVJTlZBTCk7CiAJfQogCkBAIC0xMDkyLDcgKzExMDEsNyBAQCBz
+dGF0aWMgdm9pZCAqcGJsa19pbml0KHN0cnVjdCBudm1fdGd0X2RldiAqZGV2LCBzdHJ1Y3QgZ2Vu
+ZGlzayAqdGRpc2ssCiAKIAlibGtfcXVldWVfd3JpdGVfY2FjaGUodHF1ZXVlLCB0cnVlLCBmYWxz
+ZSk7CiAKLQl0cXVldWUtPmxpbWl0cy5kaXNjYXJkX2dyYW51bGFyaXR5ID0gZ2VvLT5zZWNfcGVy
+X2NoayAqIGdlby0+c2VjX3NpemU7CisJdHF1ZXVlLT5saW1pdHMuZGlzY2FyZF9ncmFudWxhcml0
+eSA9IGdlby0+Y2xiYSAqIGdlby0+Y3NlY3M7CiAJdHF1ZXVlLT5saW1pdHMuZGlzY2FyZF9hbGln
+bm1lbnQgPSAwOwogCWJsa19xdWV1ZV9tYXhfZGlzY2FyZF9zZWN0b3JzKHRxdWV1ZSwgVUlOVF9N
+QVggPj4gOSk7CiAJcXVldWVfZmxhZ19zZXRfdW5sb2NrZWQoUVVFVUVfRkxBR19ESVNDQVJELCB0
+cXVldWUpOwpkaWZmIC0tZ2l0IGEvZHJpdmVycy9saWdodG52bS9wYmxrLXJlYWQuYyBiL2RyaXZl
+cnMvbGlnaHRudm0vcGJsay1yZWFkLmMKaW5kZXggMmY3NjEyODNmNDNlLi45ZWVlMTBmNjlkZjAg
+MTAwNjQ0Ci0tLSBhL2RyaXZlcnMvbGlnaHRudm0vcGJsay1yZWFkLmMKKysrIGIvZHJpdmVycy9s
+aWdodG52bS9wYmxrLXJlYWQuYwpAQCAtNTYzLDcgKzU2Myw3IEBAIGludCBwYmxrX3N1Ym1pdF9y
+ZWFkX2djKHN0cnVjdCBwYmxrICpwYmxrLCBzdHJ1Y3QgcGJsa19nY19ycSAqZ2NfcnEpCiAJaWYg
+KCEoZ2NfcnEtPnNlY3NfdG9fZ2MpKQogCQlnb3RvIG91dDsKIAotCWRhdGFfbGVuID0gKGdjX3Jx
+LT5zZWNzX3RvX2djKSAqIGdlby0+c2VjX3NpemU7CisJZGF0YV9sZW4gPSAoZ2NfcnEtPnNlY3Nf
+dG9fZ2MpICogZ2VvLT5jc2VjczsKIAliaW8gPSBwYmxrX2Jpb19tYXBfYWRkcihwYmxrLCBnY19y
+cS0+ZGF0YSwgZ2NfcnEtPnNlY3NfdG9fZ2MsIGRhdGFfbGVuLAogCQkJCQkJUEJMS19WTUFMTE9D
+X01FVEEsIEdGUF9LRVJORUwpOwogCWlmIChJU19FUlIoYmlvKSkgewpkaWZmIC0tZ2l0IGEvZHJp
+dmVycy9saWdodG52bS9wYmxrLXJlY292ZXJ5LmMgYi9kcml2ZXJzL2xpZ2h0bnZtL3BibGstcmVj
+b3ZlcnkuYwppbmRleCBhYWFiOWE1YzE3Y2MuLjI2MzU2NDI5ZGM3MiAxMDA2NDQKLS0tIGEvZHJp
+dmVycy9saWdodG52bS9wYmxrLXJlY292ZXJ5LmMKKysrIGIvZHJpdmVycy9saWdodG52bS9wYmxr
+LXJlY292ZXJ5LmMKQEAgLTE4NCw3ICsxODQsNyBAQCBzdGF0aWMgaW50IHBibGtfY2FsY19zZWNf
+aW5fbGluZShzdHJ1Y3QgcGJsayAqcGJsaywgc3RydWN0IHBibGtfbGluZSAqbGluZSkKIAlpbnQg
+bnJfYmIgPSBiaXRtYXBfd2VpZ2h0KGxpbmUtPmJsa19iaXRtYXAsIGxtLT5ibGtfcGVyX2xpbmUp
+OwogCiAJcmV0dXJuIGxtLT5zZWNfcGVyX2xpbmUgLSBsbS0+c21ldGFfc2VjIC0gbG0tPmVtZXRh
+X3NlY1swXSAtCi0JCQkJbnJfYmIgKiBnZW8tPnNlY19wZXJfY2hrOworCQkJCW5yX2JiICogZ2Vv
+LT5jbGJhOwogfQogCiBzdHJ1Y3QgcGJsa19yZWNvdl9hbGxvYyB7CkBAIC0yMzIsNyArMjMyLDcg
+QEAgc3RhdGljIGludCBwYmxrX3JlY292X3JlYWRfb29iKHN0cnVjdCBwYmxrICpwYmxrLCBzdHJ1
+Y3QgcGJsa19saW5lICpsaW5lLAogCXJxX3BwYXMgPSBwYmxrX2NhbGNfc2VjcyhwYmxrLCBsZWZ0
+X3BwYXMsIDApOwogCWlmICghcnFfcHBhcykKIAkJcnFfcHBhcyA9IHBibGstPm1pbl93cml0ZV9w
+Z3M7Ci0JcnFfbGVuID0gcnFfcHBhcyAqIGdlby0+c2VjX3NpemU7CisJcnFfbGVuID0gcnFfcHBh
+cyAqIGdlby0+Y3NlY3M7CiAKIAliaW8gPSBiaW9fbWFwX2tlcm4oZGV2LT5xLCBkYXRhLCBycV9s
+ZW4sIEdGUF9LRVJORUwpOwogCWlmIChJU19FUlIoYmlvKSkKQEAgLTM1MSw3ICszNTEsNyBAQCBz
+dGF0aWMgaW50IHBibGtfcmVjb3ZfcGFkX29vYihzdHJ1Y3QgcGJsayAqcGJsaywgc3RydWN0IHBi
+bGtfbGluZSAqbGluZSwKIAlpZiAoIXBhZF9ycSkKIAkJcmV0dXJuIC1FTk9NRU07CiAKLQlkYXRh
+ID0gdnphbGxvYyhwYmxrLT5tYXhfd3JpdGVfcGdzICogZ2VvLT5zZWNfc2l6ZSk7CisJZGF0YSA9
+IHZ6YWxsb2MocGJsay0+bWF4X3dyaXRlX3BncyAqIGdlby0+Y3NlY3MpOwogCWlmICghZGF0YSkg
+ewogCQlyZXQgPSAtRU5PTUVNOwogCQlnb3RvIGZyZWVfcnE7CkBAIC0zNjgsNyArMzY4LDcgQEAg
+c3RhdGljIGludCBwYmxrX3JlY292X3BhZF9vb2Ioc3RydWN0IHBibGsgKnBibGssIHN0cnVjdCBw
+YmxrX2xpbmUgKmxpbmUsCiAJCWdvdG8gZmFpbF9mcmVlX3BhZDsKIAl9CiAKLQlycV9sZW4gPSBy
+cV9wcGFzICogZ2VvLT5zZWNfc2l6ZTsKKwlycV9sZW4gPSBycV9wcGFzICogZ2VvLT5jc2VjczsK
+IAogCW1ldGFfbGlzdCA9IG52bV9kZXZfZG1hX2FsbG9jKGRldi0+cGFyZW50LCBHRlBfS0VSTkVM
+LCAmZG1hX21ldGFfbGlzdCk7CiAJaWYgKCFtZXRhX2xpc3QpIHsKQEAgLTUwOSw3ICs1MDksNyBA
+QCBzdGF0aWMgaW50IHBibGtfcmVjb3Zfc2Nhbl9hbGxfb29iKHN0cnVjdCBwYmxrICpwYmxrLCBz
+dHJ1Y3QgcGJsa19saW5lICpsaW5lLAogCXJxX3BwYXMgPSBwYmxrX2NhbGNfc2VjcyhwYmxrLCBs
+ZWZ0X3BwYXMsIDApOwogCWlmICghcnFfcHBhcykKIAkJcnFfcHBhcyA9IHBibGstPm1pbl93cml0
+ZV9wZ3M7Ci0JcnFfbGVuID0gcnFfcHBhcyAqIGdlby0+c2VjX3NpemU7CisJcnFfbGVuID0gcnFf
+cHBhcyAqIGdlby0+Y3NlY3M7CiAKIAliaW8gPSBiaW9fbWFwX2tlcm4oZGV2LT5xLCBkYXRhLCBy
+cV9sZW4sIEdGUF9LRVJORUwpOwogCWlmIChJU19FUlIoYmlvKSkKQEAgLTY0MCw3ICs2NDAsNyBA
+QCBzdGF0aWMgaW50IHBibGtfcmVjb3Zfc2Nhbl9vb2Ioc3RydWN0IHBibGsgKnBibGssIHN0cnVj
+dCBwYmxrX2xpbmUgKmxpbmUsCiAJcnFfcHBhcyA9IHBibGtfY2FsY19zZWNzKHBibGssIGxlZnRf
+cHBhcywgMCk7CiAJaWYgKCFycV9wcGFzKQogCQlycV9wcGFzID0gcGJsay0+bWluX3dyaXRlX3Bn
+czsKLQlycV9sZW4gPSBycV9wcGFzICogZ2VvLT5zZWNfc2l6ZTsKKwlycV9sZW4gPSBycV9wcGFz
+ICogZ2VvLT5jc2VjczsKIAogCWJpbyA9IGJpb19tYXBfa2VybihkZXYtPnEsIGRhdGEsIHJxX2xl
+biwgR0ZQX0tFUk5FTCk7CiAJaWYgKElTX0VSUihiaW8pKQpAQCAtNzQ1LDcgKzc0NSw3IEBAIHN0
+YXRpYyBpbnQgcGJsa19yZWNvdl9sMnBfZnJvbV9vb2Ioc3RydWN0IHBibGsgKnBibGssIHN0cnVj
+dCBwYmxrX2xpbmUgKmxpbmUpCiAJcHBhX2xpc3QgPSAodm9pZCAqKShtZXRhX2xpc3QpICsgcGJs
+a19kbWFfbWV0YV9zaXplOwogCWRtYV9wcGFfbGlzdCA9IGRtYV9tZXRhX2xpc3QgKyBwYmxrX2Rt
+YV9tZXRhX3NpemU7CiAKLQlkYXRhID0ga2NhbGxvYyhwYmxrLT5tYXhfd3JpdGVfcGdzLCBnZW8t
+PnNlY19zaXplLCBHRlBfS0VSTkVMKTsKKwlkYXRhID0ga2NhbGxvYyhwYmxrLT5tYXhfd3JpdGVf
+cGdzLCBnZW8tPmNzZWNzLCBHRlBfS0VSTkVMKTsKIAlpZiAoIWRhdGEpIHsKIAkJcmV0ID0gLUVO
+T01FTTsKIAkJZ290byBmcmVlX21ldGFfbGlzdDsKZGlmZiAtLWdpdCBhL2RyaXZlcnMvbGlnaHRu
+dm0vcGJsay1ybC5jIGIvZHJpdmVycy9saWdodG52bS9wYmxrLXJsLmMKaW5kZXggMGQ0NTdiMTYy
+ZjIzLi44ODNhNzExM2IxOWQgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvbGlnaHRudm0vcGJsay1ybC5j
+CisrKyBiL2RyaXZlcnMvbGlnaHRudm0vcGJsay1ybC5jCkBAIC0yMDAsNyArMjAwLDcgQEAgdm9p
+ZCBwYmxrX3JsX2luaXQoc3RydWN0IHBibGtfcmwgKnJsLCBpbnQgYnVkZ2V0KQogCiAJLyogQ29u
+c2lkZXIgc2VjdG9ycyB1c2VkIGZvciBtZXRhZGF0YSAqLwogCXNlY19tZXRhID0gKGxtLT5zbWV0
+YV9zZWMgKyBsbS0+ZW1ldGFfc2VjWzBdKSAqIGxfbWctPm5yX2ZyZWVfbGluZXM7Ci0JYmxrX21l
+dGEgPSBESVZfUk9VTkRfVVAoc2VjX21ldGEsIGdlby0+c2VjX3Blcl9jaGspOworCWJsa19tZXRh
+ID0gRElWX1JPVU5EX1VQKHNlY19tZXRhLCBnZW8tPmNsYmEpOwogCiAJcmwtPmhpZ2ggPSBwYmxr
+LT5vcF9ibGtzIC0gYmxrX21ldGEgLSBsbS0+YmxrX3Blcl9saW5lOwogCXJsLT5oaWdoX3B3ID0g
+Z2V0X2NvdW50X29yZGVyKHJsLT5oaWdoKTsKZGlmZiAtLWdpdCBhL2RyaXZlcnMvbGlnaHRudm0v
+cGJsay1zeXNmcy5jIGIvZHJpdmVycy9saWdodG52bS9wYmxrLXN5c2ZzLmMKaW5kZXggMTY4MGNl
+MGE4MjhkLi4zMzE5OWM2YWYyNjcgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvbGlnaHRudm0vcGJsay1z
+eXNmcy5jCisrKyBiL2RyaXZlcnMvbGlnaHRudm0vcGJsay1zeXNmcy5jCkBAIC0xMTMsMjYgKzEx
+MywzMSBAQCBzdGF0aWMgc3NpemVfdCBwYmxrX3N5c2ZzX3BwYWYoc3RydWN0IHBibGsgKnBibGss
+IGNoYXIgKnBhZ2UpCiB7CiAJc3RydWN0IG52bV90Z3RfZGV2ICpkZXYgPSBwYmxrLT5kZXY7CiAJ
+c3RydWN0IG52bV9nZW8gKmdlbyA9ICZkZXYtPmdlbzsKKwlzdHJ1Y3QgbnZtX2FkZHJfZm9ybWF0
+XzEyICpwcGFmOworCXN0cnVjdCBudm1fYWRkcl9mb3JtYXRfMTIgKmdlb19wcGFmOwogCXNzaXpl
+X3Qgc3ogPSAwOwogCi0Jc3ogPSBzbnByaW50ZihwYWdlLCBQQUdFX1NJWkUgLSBzeiwKLQkJImc6
+KGI6JWQpYmxrOiVkLyVkLHBnOiVkLyVkLGx1bjolZC8lZCxjaDolZC8lZCxwbDolZC8lZCxzZWM6
+JWQvJWRcbiIsCi0JCXBibGstPnBwYWZfYml0c2l6ZSwKLQkJcGJsay0+cHBhZi5ibGtfb2Zmc2V0
+LCBnZW8tPnBwYWYuYmxrX2xlbiwKLQkJcGJsay0+cHBhZi5wZ19vZmZzZXQsIGdlby0+cHBhZi5w
+Z19sZW4sCi0JCXBibGstPnBwYWYubHVuX29mZnNldCwgZ2VvLT5wcGFmLmx1bl9sZW4sCi0JCXBi
+bGstPnBwYWYuY2hfb2Zmc2V0LCBnZW8tPnBwYWYuY2hfbGVuLAotCQlwYmxrLT5wcGFmLnBsbl9v
+ZmZzZXQsIGdlby0+cHBhZi5wbG5fbGVuLAotCQlwYmxrLT5wcGFmLnNlY19vZmZzZXQsIGdlby0+
+cHBhZi5zZWN0X2xlbik7CisJcHBhZiA9IChzdHJ1Y3QgbnZtX2FkZHJfZm9ybWF0XzEyICopJnBi
+bGstPnBwYWY7CisJZ2VvX3BwYWYgPSAoc3RydWN0IG52bV9hZGRyX2Zvcm1hdF8xMiAqKSZnZW8t
+PmFkZHJmOworCisJc3ogPSBzbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsCisJCSJwYmxrOihzOiVk
+KWNoOiVkLyVkLGx1bjolZC8lZCxibGs6JWQvJWQscGc6JWQvJWQscGw6JWQvJWQsc2VjOiVkLyVk
+XG4iLAorCQkJcGJsay0+cHBhZl9iaXRzaXplLAorCQkJcHBhZi0+Y2hfb2Zmc2V0LCBwcGFmLT5j
+aF9sZW4sCisJCQlwcGFmLT5sdW5fb2Zmc2V0LCBwcGFmLT5sdW5fbGVuLAorCQkJcHBhZi0+Ymxr
+X29mZnNldCwgcHBhZi0+YmxrX2xlbiwKKwkJCXBwYWYtPnBnX29mZnNldCwgcHBhZi0+cGdfbGVu
+LAorCQkJcHBhZi0+cGxuX29mZnNldCwgcHBhZi0+cGxuX2xlbiwKKwkJCXBwYWYtPnNlY3Rfb2Zm
+c2V0LCBwcGFmLT5zZWN0X2xlbik7CiAKIAlzeiArPSBzbnByaW50ZihwYWdlICsgc3osIFBBR0Vf
+U0laRSAtIHN6LAotCQkiZDpibGs6JWQvJWQscGc6JWQvJWQsbHVuOiVkLyVkLGNoOiVkLyVkLHBs
+OiVkLyVkLHNlYzolZC8lZFxuIiwKLQkJZ2VvLT5wcGFmLmJsa19vZmZzZXQsIGdlby0+cHBhZi5i
+bGtfbGVuLAotCQlnZW8tPnBwYWYucGdfb2Zmc2V0LCBnZW8tPnBwYWYucGdfbGVuLAotCQlnZW8t
+PnBwYWYubHVuX29mZnNldCwgZ2VvLT5wcGFmLmx1bl9sZW4sCi0JCWdlby0+cHBhZi5jaF9vZmZz
+ZXQsIGdlby0+cHBhZi5jaF9sZW4sCi0JCWdlby0+cHBhZi5wbG5fb2Zmc2V0LCBnZW8tPnBwYWYu
+cGxuX2xlbiwKLQkJZ2VvLT5wcGFmLnNlY3Rfb2Zmc2V0LCBnZW8tPnBwYWYuc2VjdF9sZW4pOwor
+CQkiZGV2aWNlOmNoOiVkLyVkLGx1bjolZC8lZCxibGs6JWQvJWQscGc6JWQvJWQscGw6JWQvJWQs
+c2VjOiVkLyVkXG4iLAorCQkJZ2VvX3BwYWYtPmNoX29mZnNldCwgZ2VvX3BwYWYtPmNoX2xlbiwK
+KwkJCWdlb19wcGFmLT5sdW5fb2Zmc2V0LCBnZW9fcHBhZi0+bHVuX2xlbiwKKwkJCWdlb19wcGFm
+LT5ibGtfb2Zmc2V0LCBnZW9fcHBhZi0+YmxrX2xlbiwKKwkJCWdlb19wcGFmLT5wZ19vZmZzZXQs
+IGdlb19wcGFmLT5wZ19sZW4sCisJCQlnZW9fcHBhZi0+cGxuX29mZnNldCwgZ2VvX3BwYWYtPnBs
+bl9sZW4sCisJCQlnZW9fcHBhZi0+c2VjdF9vZmZzZXQsIGdlb19wcGFmLT5zZWN0X2xlbik7CiAK
+IAlyZXR1cm4gc3o7CiB9CkBAIC0yODgsNyArMjkzLDcgQEAgc3RhdGljIHNzaXplX3QgcGJsa19z
+eXNmc19saW5lc19pbmZvKHN0cnVjdCBwYmxrICpwYmxrLCBjaGFyICpwYWdlKQogCQkJCSJibGtf
+bGluZTolZCwgc2VjX2xpbmU6JWQsIHNlY19ibGs6JWRcbiIsCiAJCQkJCWxtLT5ibGtfcGVyX2xp
+bmUsCiAJCQkJCWxtLT5zZWNfcGVyX2xpbmUsCi0JCQkJCWdlby0+c2VjX3Blcl9jaGspOworCQkJ
+CQlnZW8tPmNsYmEpOwogCiAJcmV0dXJuIHN6OwogfQpkaWZmIC0tZ2l0IGEvZHJpdmVycy9saWdo
+dG52bS9wYmxrLXdyaXRlLmMgYi9kcml2ZXJzL2xpZ2h0bnZtL3BibGstd3JpdGUuYwppbmRleCBh
+YWU4NmVkNjBiOTguLjNlNmYxZWJkNzQzYSAxMDA2NDQKLS0tIGEvZHJpdmVycy9saWdodG52bS9w
+YmxrLXdyaXRlLmMKKysrIGIvZHJpdmVycy9saWdodG52bS9wYmxrLXdyaXRlLmMKQEAgLTMzMyw3
+ICszMzMsNyBAQCBpbnQgcGJsa19zdWJtaXRfbWV0YV9pbyhzdHJ1Y3QgcGJsayAqcGJsaywgc3Ry
+dWN0IHBibGtfbGluZSAqbWV0YV9saW5lKQogCW1fY3R4ID0gbnZtX3JxX3RvX3BkdShycWQpOwog
+CW1fY3R4LT5wcml2YXRlID0gbWV0YV9saW5lOwogCi0JcnFfbGVuID0gcnFfcHBhcyAqIGdlby0+
+c2VjX3NpemU7CisJcnFfbGVuID0gcnFfcHBhcyAqIGdlby0+Y3NlY3M7CiAJZGF0YSA9ICgodm9p
+ZCAqKWVtZXRhLT5idWYpICsgZW1ldGEtPm1lbTsKIAogCWJpbyA9IHBibGtfYmlvX21hcF9hZGRy
+KHBibGssIGRhdGEsIHJxX3BwYXMsIHJxX2xlbiwKZGlmZiAtLWdpdCBhL2RyaXZlcnMvbGlnaHRu
+dm0vcGJsay5oIGIvZHJpdmVycy9saWdodG52bS9wYmxrLmgKaW5kZXggZjAzMDlkODE3MmMwLi5i
+MjljMWU2Njk4YWEgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvbGlnaHRudm0vcGJsay5oCisrKyBiL2Ry
+aXZlcnMvbGlnaHRudm0vcGJsay5oCkBAIC01NTEsMjEgKzU1MSw2IEBAIHN0cnVjdCBwYmxrX2xp
+bmVfbWV0YSB7CiAJdW5zaWduZWQgaW50IG1ldGFfZGlzdGFuY2U7CS8qIERpc3RhbmNlIGJldHdl
+ZW4gZGF0YSBhbmQgbWV0YWRhdGEgKi8KIH07CiAKLXN0cnVjdCBwYmxrX2FkZHJfZm9ybWF0IHsK
+LQl1NjQJY2hfbWFzazsKLQl1NjQJbHVuX21hc2s7Ci0JdTY0CXBsbl9tYXNrOwotCXU2NAlibGtf
+bWFzazsKLQl1NjQJcGdfbWFzazsKLQl1NjQJc2VjX21hc2s7Ci0JdTgJY2hfb2Zmc2V0OwotCXU4
+CWx1bl9vZmZzZXQ7Ci0JdTgJcGxuX29mZnNldDsKLQl1OAlibGtfb2Zmc2V0OwotCXU4CXBnX29m
+ZnNldDsKLQl1OAlzZWNfb2Zmc2V0OwotfTsKLQogZW51bSB7CiAJUEJMS19TVEFURV9SVU5OSU5H
+ID0gMCwKIAlQQkxLX1NUQVRFX1NUT1BQSU5HID0gMSwKQEAgLTU4NSw4ICs1NzAsOCBAQCBzdHJ1
+Y3QgcGJsayB7CiAJc3RydWN0IHBibGtfbGluZV9tZ210IGxfbWc7CQkvKiBMaW5lIG1hbmFnZW1l
+bnQgKi8KIAlzdHJ1Y3QgcGJsa19saW5lX21ldGEgbG07CQkvKiBMaW5lIG1ldGFkYXRhICovCiAK
+KwlzdHJ1Y3QgbnZtX2FkZHJfZm9ybWF0IHBwYWY7CiAJaW50IHBwYWZfYml0c2l6ZTsKLQlzdHJ1
+Y3QgcGJsa19hZGRyX2Zvcm1hdCBwcGFmOwogCiAJc3RydWN0IHBibGtfcmIgcndiOwogCkBAIC05
+NDEsMTQgKzkyNiwxMiBAQCBzdGF0aWMgaW5saW5lIGludCBwYmxrX2xpbmVfdnNjKHN0cnVjdCBw
+YmxrX2xpbmUgKmxpbmUpCiAJcmV0dXJuIGxlMzJfdG9fY3B1KCpsaW5lLT52c2MpOwogfQogCi0j
+ZGVmaW5lIE5WTV9NRU1fUEFHRV9XUklURSAoOCkKLQogc3RhdGljIGlubGluZSBpbnQgcGJsa19w
+YWRfZGlzdGFuY2Uoc3RydWN0IHBibGsgKnBibGspCiB7CiAJc3RydWN0IG52bV90Z3RfZGV2ICpk
+ZXYgPSBwYmxrLT5kZXY7CiAJc3RydWN0IG52bV9nZW8gKmdlbyA9ICZkZXYtPmdlbzsKIAotCXJl
+dHVybiBOVk1fTUVNX1BBR0VfV1JJVEUgKiBnZW8tPmFsbF9sdW5zICogZ2VvLT5zZWNfcGVyX3Bs
+OworCXJldHVybiBnZW8tPm13X2N1bml0cyAqIGdlby0+YWxsX2x1bnMgKiBnZW8tPndzX29wdDsK
+IH0KIAogc3RhdGljIGlubGluZSBpbnQgcGJsa19wcGFfdG9fbGluZShzdHJ1Y3QgcHBhX2FkZHIg
+cCkKQEAgLTk2NCwxNSArOTQ3LDE3IEBAIHN0YXRpYyBpbmxpbmUgaW50IHBibGtfcHBhX3RvX3Bv
+cyhzdHJ1Y3QgbnZtX2dlbyAqZ2VvLCBzdHJ1Y3QgcHBhX2FkZHIgcCkKIHN0YXRpYyBpbmxpbmUg
+c3RydWN0IHBwYV9hZGRyIGFkZHJfdG9fZ2VuX3BwYShzdHJ1Y3QgcGJsayAqcGJsaywgdTY0IHBh
+ZGRyLAogCQkJCQkgICAgICB1NjQgbGluZV9pZCkKIHsKKwlzdHJ1Y3QgbnZtX2FkZHJfZm9ybWF0
+XzEyICpwcGFmID0KKwkJCQkoc3RydWN0IG52bV9hZGRyX2Zvcm1hdF8xMiAqKSZwYmxrLT5wcGFm
+OwogCXN0cnVjdCBwcGFfYWRkciBwcGE7CiAKIAlwcGEucHBhID0gMDsKIAlwcGEuZy5ibGsgPSBs
+aW5lX2lkOwotCXBwYS5nLnBnID0gKHBhZGRyICYgcGJsay0+cHBhZi5wZ19tYXNrKSA+PiBwYmxr
+LT5wcGFmLnBnX29mZnNldDsKLQlwcGEuZy5sdW4gPSAocGFkZHIgJiBwYmxrLT5wcGFmLmx1bl9t
+YXNrKSA+PiBwYmxrLT5wcGFmLmx1bl9vZmZzZXQ7Ci0JcHBhLmcuY2ggPSAocGFkZHIgJiBwYmxr
+LT5wcGFmLmNoX21hc2spID4+IHBibGstPnBwYWYuY2hfb2Zmc2V0OwotCXBwYS5nLnBsID0gKHBh
+ZGRyICYgcGJsay0+cHBhZi5wbG5fbWFzaykgPj4gcGJsay0+cHBhZi5wbG5fb2Zmc2V0OwotCXBw
+YS5nLnNlYyA9IChwYWRkciAmIHBibGstPnBwYWYuc2VjX21hc2spID4+IHBibGstPnBwYWYuc2Vj
+X29mZnNldDsKKwlwcGEuZy5wZyA9IChwYWRkciAmIHBwYWYtPnBnX21hc2spID4+IHBwYWYtPnBn
+X29mZnNldDsKKwlwcGEuZy5sdW4gPSAocGFkZHIgJiBwcGFmLT5sdW5fbWFzaykgPj4gcHBhZi0+
+bHVuX29mZnNldDsKKwlwcGEuZy5jaCA9IChwYWRkciAmIHBwYWYtPmNoX21hc2spID4+IHBwYWYt
+PmNoX29mZnNldDsKKwlwcGEuZy5wbCA9IChwYWRkciAmIHBwYWYtPnBsbl9tYXNrKSA+PiBwcGFm
+LT5wbG5fb2Zmc2V0OworCXBwYS5nLnNlYyA9IChwYWRkciAmIHBwYWYtPnNlY19tYXNrKSA+PiBw
+cGFmLT5zZWN0X29mZnNldDsKIAogCXJldHVybiBwcGE7CiB9CkBAIC05ODAsMTMgKzk2NSwxNSBA
+QCBzdGF0aWMgaW5saW5lIHN0cnVjdCBwcGFfYWRkciBhZGRyX3RvX2dlbl9wcGEoc3RydWN0IHBi
+bGsgKnBibGssIHU2NCBwYWRkciwKIHN0YXRpYyBpbmxpbmUgdTY0IHBibGtfZGV2X3BwYV90b19s
+aW5lX2FkZHIoc3RydWN0IHBibGsgKnBibGssCiAJCQkJCQkJc3RydWN0IHBwYV9hZGRyIHApCiB7
+CisJc3RydWN0IG52bV9hZGRyX2Zvcm1hdF8xMiAqcHBhZiA9CisJCQkJKHN0cnVjdCBudm1fYWRk
+cl9mb3JtYXRfMTIgKikmcGJsay0+cHBhZjsKIAl1NjQgcGFkZHI7CiAKLQlwYWRkciA9ICh1NjQp
+cC5nLnBnIDw8IHBibGstPnBwYWYucGdfb2Zmc2V0OwotCXBhZGRyIHw9ICh1NjQpcC5nLmx1biA8
+PCBwYmxrLT5wcGFmLmx1bl9vZmZzZXQ7Ci0JcGFkZHIgfD0gKHU2NClwLmcuY2ggPDwgcGJsay0+
+cHBhZi5jaF9vZmZzZXQ7Ci0JcGFkZHIgfD0gKHU2NClwLmcucGwgPDwgcGJsay0+cHBhZi5wbG5f
+b2Zmc2V0OwotCXBhZGRyIHw9ICh1NjQpcC5nLnNlYyA8PCBwYmxrLT5wcGFmLnNlY19vZmZzZXQ7
+CisJcGFkZHIgPSAodTY0KXAuZy5jaCA8PCBwcGFmLT5jaF9vZmZzZXQ7CisJcGFkZHIgfD0gKHU2
+NClwLmcubHVuIDw8IHBwYWYtPmx1bl9vZmZzZXQ7CisJcGFkZHIgfD0gKHU2NClwLmcucGcgPDwg
+cHBhZi0+cGdfb2Zmc2V0OworCXBhZGRyIHw9ICh1NjQpcC5nLnBsIDw8IHBwYWYtPnBsbl9vZmZz
+ZXQ7CisJcGFkZHIgfD0gKHU2NClwLmcuc2VjIDw8IHBwYWYtPnNlY3Rfb2Zmc2V0OwogCiAJcmV0
+dXJuIHBhZGRyOwogfQpAQCAtMTAwMywxOCArOTkwLDE1IEBAIHN0YXRpYyBpbmxpbmUgc3RydWN0
+IHBwYV9hZGRyIHBibGtfcHBhMzJfdG9fcHBhNjQoc3RydWN0IHBibGsgKnBibGssIHUzMiBwcGEz
+MikKIAkJcHBhNjQuYy5saW5lID0gcHBhMzIgJiAoKH4wVSkgPj4gMSk7CiAJCXBwYTY0LmMuaXNf
+Y2FjaGVkID0gMTsKIAl9IGVsc2UgewotCQlwcGE2NC5nLmJsayA9IChwcGEzMiAmIHBibGstPnBw
+YWYuYmxrX21hc2spID4+Ci0JCQkJCQkJcGJsay0+cHBhZi5ibGtfb2Zmc2V0OwotCQlwcGE2NC5n
+LnBnID0gKHBwYTMyICYgcGJsay0+cHBhZi5wZ19tYXNrKSA+PgotCQkJCQkJCXBibGstPnBwYWYu
+cGdfb2Zmc2V0OwotCQlwcGE2NC5nLmx1biA9IChwcGEzMiAmIHBibGstPnBwYWYubHVuX21hc2sp
+ID4+Ci0JCQkJCQkJcGJsay0+cHBhZi5sdW5fb2Zmc2V0OwotCQlwcGE2NC5nLmNoID0gKHBwYTMy
+ICYgcGJsay0+cHBhZi5jaF9tYXNrKSA+PgotCQkJCQkJCXBibGstPnBwYWYuY2hfb2Zmc2V0Owot
+CQlwcGE2NC5nLnBsID0gKHBwYTMyICYgcGJsay0+cHBhZi5wbG5fbWFzaykgPj4KLQkJCQkJCQlw
+YmxrLT5wcGFmLnBsbl9vZmZzZXQ7Ci0JCXBwYTY0Lmcuc2VjID0gKHBwYTMyICYgcGJsay0+cHBh
+Zi5zZWNfbWFzaykgPj4KLQkJCQkJCQlwYmxrLT5wcGFmLnNlY19vZmZzZXQ7CisJCXN0cnVjdCBu
+dm1fYWRkcl9mb3JtYXRfMTIgKnBwYWYgPQorCQkJCShzdHJ1Y3QgbnZtX2FkZHJfZm9ybWF0XzEy
+ICopJnBibGstPnBwYWY7CisKKwkJcHBhNjQuZy5jaCA9IChwcGEzMiAmIHBwYWYtPmNoX21hc2sp
+ID4+IHBwYWYtPmNoX29mZnNldDsKKwkJcHBhNjQuZy5sdW4gPSAocHBhMzIgJiBwcGFmLT5sdW5f
+bWFzaykgPj4gcHBhZi0+bHVuX29mZnNldDsKKwkJcHBhNjQuZy5ibGsgPSAocHBhMzIgJiBwcGFm
+LT5ibGtfbWFzaykgPj4gcHBhZi0+YmxrX29mZnNldDsKKwkJcHBhNjQuZy5wZyA9IChwcGEzMiAm
+IHBwYWYtPnBnX21hc2spID4+IHBwYWYtPnBnX29mZnNldDsKKwkJcHBhNjQuZy5wbCA9IChwcGEz
+MiAmIHBwYWYtPnBsbl9tYXNrKSA+PiBwcGFmLT5wbG5fb2Zmc2V0OworCQlwcGE2NC5nLnNlYyA9
+IChwcGEzMiAmIHBwYWYtPnNlY19tYXNrKSA+PiBwcGFmLT5zZWN0X29mZnNldDsKIAl9CiAKIAly
+ZXR1cm4gcHBhNjQ7CkBAIC0xMDMwLDEyICsxMDE0LDE1IEBAIHN0YXRpYyBpbmxpbmUgdTMyIHBi
+bGtfcHBhNjRfdG9fcHBhMzIoc3RydWN0IHBibGsgKnBibGssIHN0cnVjdCBwcGFfYWRkciBwcGE2
+NCkKIAkJcHBhMzIgfD0gcHBhNjQuYy5saW5lOwogCQlwcGEzMiB8PSAxVSA8PCAzMTsKIAl9IGVs
+c2UgewotCQlwcGEzMiB8PSBwcGE2NC5nLmJsayA8PCBwYmxrLT5wcGFmLmJsa19vZmZzZXQ7Ci0J
+CXBwYTMyIHw9IHBwYTY0LmcucGcgPDwgcGJsay0+cHBhZi5wZ19vZmZzZXQ7Ci0JCXBwYTMyIHw9
+IHBwYTY0LmcubHVuIDw8IHBibGstPnBwYWYubHVuX29mZnNldDsKLQkJcHBhMzIgfD0gcHBhNjQu
+Zy5jaCA8PCBwYmxrLT5wcGFmLmNoX29mZnNldDsKLQkJcHBhMzIgfD0gcHBhNjQuZy5wbCA8PCBw
+YmxrLT5wcGFmLnBsbl9vZmZzZXQ7Ci0JCXBwYTMyIHw9IHBwYTY0Lmcuc2VjIDw8IHBibGstPnBw
+YWYuc2VjX29mZnNldDsKKwkJc3RydWN0IG52bV9hZGRyX2Zvcm1hdF8xMiAqcHBhZiA9CisJCQkJ
+KHN0cnVjdCBudm1fYWRkcl9mb3JtYXRfMTIgKikmcGJsay0+cHBhZjsKKworCQlwcGEzMiB8PSBw
+cGE2NC5nLmNoIDw8IHBwYWYtPmNoX29mZnNldDsKKwkJcHBhMzIgfD0gcHBhNjQuZy5sdW4gPDwg
+cHBhZi0+bHVuX29mZnNldDsKKwkJcHBhMzIgfD0gcHBhNjQuZy5ibGsgPDwgcHBhZi0+YmxrX29m
+ZnNldDsKKwkJcHBhMzIgfD0gcHBhNjQuZy5wZyA8PCBwcGFmLT5wZ19vZmZzZXQ7CisJCXBwYTMy
+IHw9IHBwYTY0LmcucGwgPDwgcHBhZi0+cGxuX29mZnNldDsKKwkJcHBhMzIgfD0gcHBhNjQuZy5z
+ZWMgPDwgcHBhZi0+c2VjdF9vZmZzZXQ7CiAJfQogCiAJcmV0dXJuIHBwYTMyOwpAQCAtMTIyOSwx
+MCArMTIxNiwxMCBAQCBzdGF0aWMgaW5saW5lIGludCBwYmxrX2JvdW5kYXJ5X3BwYV9jaGVja3Mo
+c3RydWN0IG52bV90Z3RfZGV2ICp0Z3RfZGV2LAogCQlpZiAoIXBwYS0+Yy5pc19jYWNoZWQgJiYK
+IAkJCQlwcGEtPmcuY2ggPCBnZW8tPm5yX2NobmxzICYmCiAJCQkJcHBhLT5nLmx1biA8IGdlby0+
+bnJfbHVucyAmJgotCQkJCXBwYS0+Zy5wbCA8IGdlby0+bnJfcGxhbmVzICYmCisJCQkJcHBhLT5n
+LnBsIDwgZ2VvLT5udW1fcGxuICYmCiAJCQkJcHBhLT5nLmJsayA8IGdlby0+bnJfY2hrcyAmJgot
+CQkJCXBwYS0+Zy5wZyA8IGdlby0+d3NfcGVyX2NoayAmJgotCQkJCXBwYS0+Zy5zZWMgPCBnZW8t
+PnNlY19wZXJfcGcpCisJCQkJcHBhLT5nLnBnIDwgZ2VvLT5udW1fcGcgJiYKKwkJCQlwcGEtPmcu
+c2VjIDwgZ2VvLT53c19taW4pCiAJCQljb250aW51ZTsKIAogCQlwcmludF9wcGEocHBhLCAiYm91
+bmRhcnkiLCBpKTsKZGlmZiAtLWdpdCBhL2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMgYi9k
+cml2ZXJzL252bWUvaG9zdC9saWdodG52bS5jCmluZGV4IDgzOWMwYjk2NDY2YS4uZTI3NmFjZTI4
+YzY0IDEwMDY0NAotLS0gYS9kcml2ZXJzL252bWUvaG9zdC9saWdodG52bS5jCisrKyBiL2RyaXZl
+cnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMKQEAgLTE1Miw4ICsxNTIsOCBAQCBzdHJ1Y3QgbnZtZV9u
+dm1faWQxMl9hZGRyZiB7CiAJX191OAkJCWJsa19sZW47CiAJX191OAkJCXBnX29mZnNldDsKIAlf
+X3U4CQkJcGdfbGVuOwotCV9fdTgJCQlzZWN0X29mZnNldDsKLQlfX3U4CQkJc2VjdF9sZW47CisJ
+X191OAkJCXNlY19vZmZzZXQ7CisJX191OAkJCXNlY19sZW47CiAJX191OAkJCXJlc1s0XTsKIH0g
+X19wYWNrZWQ7CiAKQEAgLTI1NCwxMDYgKzI1NCwxNjEgQEAgc3RhdGljIGlubGluZSB2b2lkIF9u
+dm1lX252bV9jaGVja19zaXplKHZvaWQpCiAJQlVJTERfQlVHX09OKHNpemVvZihzdHJ1Y3QgbnZt
+ZV9udm1faWQyMCkgIT0gTlZNRV9JREVOVElGWV9EQVRBX1NJWkUpOwogfQogCi1zdGF0aWMgaW50
+IGluaXRfZ3JwKHN0cnVjdCBudm1faWQgKm52bV9pZCwgc3RydWN0IG52bWVfbnZtX2lkMTIgKmlk
+MTIpCitzdGF0aWMgdm9pZCBudm1lX252bV9zZXRfYWRkcl8xMihzdHJ1Y3QgbnZtX2FkZHJfZm9y
+bWF0XzEyICpkc3QsCisJCQkJIHN0cnVjdCBudm1lX252bV9pZDEyX2FkZHJmICpzcmMpCit7CisJ
+ZHN0LT5jaF9sZW4gPSBzcmMtPmNoX2xlbjsKKwlkc3QtPmx1bl9sZW4gPSBzcmMtPmx1bl9sZW47
+CisJZHN0LT5ibGtfbGVuID0gc3JjLT5ibGtfbGVuOworCWRzdC0+cGdfbGVuID0gc3JjLT5wZ19s
+ZW47CisJZHN0LT5wbG5fbGVuID0gc3JjLT5wbG5fbGVuOworCWRzdC0+c2VjdF9sZW4gPSBzcmMt
+PnNlY19sZW47CisKKwlkc3QtPmNoX29mZnNldCA9IHNyYy0+Y2hfb2Zmc2V0OworCWRzdC0+bHVu
+X29mZnNldCA9IHNyYy0+bHVuX29mZnNldDsKKwlkc3QtPmJsa19vZmZzZXQgPSBzcmMtPmJsa19v
+ZmZzZXQ7CisJZHN0LT5wZ19vZmZzZXQgPSBzcmMtPnBnX29mZnNldDsKKwlkc3QtPnBsbl9vZmZz
+ZXQgPSBzcmMtPnBsbl9vZmZzZXQ7CisJZHN0LT5zZWN0X29mZnNldCA9IHNyYy0+c2VjX29mZnNl
+dDsKKworCWRzdC0+Y2hfbWFzayA9ICgoMVVMTCA8PCBkc3QtPmNoX2xlbikgLSAxKSA8PCBkc3Qt
+PmNoX29mZnNldDsKKwlkc3QtPmx1bl9tYXNrID0gKCgxVUxMIDw8IGRzdC0+bHVuX2xlbikgLSAx
+KSA8PCBkc3QtPmx1bl9vZmZzZXQ7CisJZHN0LT5ibGtfbWFzayA9ICgoMVVMTCA8PCBkc3QtPmJs
+a19sZW4pIC0gMSkgPDwgZHN0LT5ibGtfb2Zmc2V0OworCWRzdC0+cGdfbWFzayA9ICgoMVVMTCA8
+PCBkc3QtPnBnX2xlbikgLSAxKSA8PCBkc3QtPnBnX29mZnNldDsKKwlkc3QtPnBsbl9tYXNrID0g
+KCgxVUxMIDw8IGRzdC0+cGxuX2xlbikgLSAxKSA8PCBkc3QtPnBsbl9vZmZzZXQ7CisJZHN0LT5z
+ZWNfbWFzayA9ICgoMVVMTCA8PCBkc3QtPnNlY3RfbGVuKSAtIDEpIDw8IGRzdC0+c2VjdF9vZmZz
+ZXQ7Cit9CisKK3N0YXRpYyBpbnQgbnZtZV9udm1fc2V0dXBfMTIoc3RydWN0IG52bWVfbnZtX2lk
+MTIgKmlkLAorCQkJICAgICBzdHJ1Y3QgbnZtX2dlbyAqZ2VvKQogewogCXN0cnVjdCBudm1lX252
+bV9pZDEyX2dycCAqc3JjOwogCWludCBzZWNfcGVyX3BnLCBzZWNfcGVyX3BsLCBwZ19wZXJfYmxr
+OwogCi0JaWYgKGlkMTItPmNncnBzICE9IDEpCisJaWYgKGlkLT5jZ3JwcyAhPSAxKQogCQlyZXR1
+cm4gLUVJTlZBTDsKIAotCXNyYyA9ICZpZDEyLT5ncnA7CisJc3JjID0gJmlkLT5ncnA7CiAKLQlu
+dm1faWQtPm10eXBlID0gc3JjLT5tdHlwZTsKLQludm1faWQtPmZtdHlwZSA9IHNyYy0+Zm10eXBl
+OworCWlmIChzcmMtPm10eXBlICE9IDApIHsKKwkJcHJfZXJyKCJudm06IG1lbW9yeSB0eXBlIG5v
+dCBzdXBwb3J0ZWRcbiIpOworCQlyZXR1cm4gLUVJTlZBTDsKKwl9CisKKwlnZW8tPnZlcl9pZCA9
+IGlkLT52ZXJfaWQ7CisKKwlnZW8tPm5yX2NobmxzID0gc3JjLT5udW1fY2g7CisJZ2VvLT5ucl9s
+dW5zID0gc3JjLT5udW1fbHVuOworCWdlby0+YWxsX2x1bnMgPSBnZW8tPm5yX2NobmxzICogZ2Vv
+LT5ucl9sdW5zOwogCi0JbnZtX2lkLT5udW1fY2ggPSBzcmMtPm51bV9jaDsKLQludm1faWQtPm51
+bV9sdW4gPSBzcmMtPm51bV9sdW47CisJZ2VvLT5ucl9jaGtzID0gbGUxNl90b19jcHUoc3JjLT5u
+dW1fY2hrKTsKIAotCW52bV9pZC0+bnVtX2NoayA9IGxlMTZfdG9fY3B1KHNyYy0+bnVtX2Noayk7
+Ci0JbnZtX2lkLT5jc2VjcyA9IGxlMTZfdG9fY3B1KHNyYy0+Y3NlY3MpOwotCW52bV9pZC0+c29z
+ID0gbGUxNl90b19jcHUoc3JjLT5zb3MpOworCWdlby0+Y3NlY3MgPSBsZTE2X3RvX2NwdShzcmMt
+PmNzZWNzKTsKKwlnZW8tPnNvcyA9IGxlMTZfdG9fY3B1KHNyYy0+c29zKTsKIAogCXBnX3Blcl9i
+bGsgPSBsZTE2X3RvX2NwdShzcmMtPm51bV9wZyk7Ci0Jc2VjX3Blcl9wZyA9IGxlMTZfdG9fY3B1
+KHNyYy0+ZnBnX3N6KSAvIG52bV9pZC0+Y3NlY3M7CisJc2VjX3Blcl9wZyA9IGxlMTZfdG9fY3B1
+KHNyYy0+ZnBnX3N6KSAvIGdlby0+Y3NlY3M7CiAJc2VjX3Blcl9wbCA9IHNlY19wZXJfcGcgKiBz
+cmMtPm51bV9wbG47Ci0JbnZtX2lkLT5jbGJhID0gc2VjX3Blcl9wbCAqIHBnX3Blcl9ibGs7Ci0J
+bnZtX2lkLT53c19wZXJfY2hrID0gcGdfcGVyX2JsazsKLQotCW52bV9pZC0+bXBvcyA9IGxlMzJf
+dG9fY3B1KHNyYy0+bXBvcyk7Ci0JbnZtX2lkLT5jcGFyID0gbGUxNl90b19jcHUoc3JjLT5jcGFy
+KTsKLQludm1faWQtPm1jY2FwID0gbGUzMl90b19jcHUoc3JjLT5tY2NhcCk7Ci0KLQludm1faWQt
+PndzX29wdCA9IG52bV9pZC0+d3NfbWluID0gc2VjX3Blcl9wZzsKLQludm1faWQtPndzX3NlcSA9
+IE5WTV9JT19TTkdMX0FDQ0VTUzsKLQotCWlmIChudm1faWQtPm1wb3MgJiAweDAyMDIwMikgewot
+CQludm1faWQtPndzX3NlcSA9IE5WTV9JT19EVUFMX0FDQ0VTUzsKLQkJbnZtX2lkLT53c19vcHQg
+PDw9IDE7Ci0JfSBlbHNlIGlmIChudm1faWQtPm1wb3MgJiAweDA0MDQwNCkgewotCQludm1faWQt
+PndzX3NlcSA9IE5WTV9JT19RVUFEX0FDQ0VTUzsKLQkJbnZtX2lkLT53c19vcHQgPDw9IDI7CisJ
+Z2VvLT5jbGJhID0gc2VjX3Blcl9wbCAqIHBnX3Blcl9ibGs7CisKKwlnZW8tPmFsbF9jaHVua3Mg
+PSBnZW8tPmFsbF9sdW5zICogZ2VvLT5ucl9jaGtzOworCWdlby0+dG90YWxfc2VjcyA9IGdlby0+
+Y2xiYSAqIGdlby0+YWxsX2NodW5rczsKKworCWdlby0+d3NfbWluID0gc2VjX3Blcl9wZzsKKwln
+ZW8tPndzX29wdCA9IHNlY19wZXJfcGc7CisJZ2VvLT5td19jdW5pdHMgPSBnZW8tPndzX29wdCA8
+PCAzOwkvKiBkZWZhdWx0IHRvIE1MQyBzYWZlIHZhbHVlcyAqLworCisJZ2VvLT5tY2NhcCA9IGxl
+MzJfdG9fY3B1KHNyYy0+bWNjYXApOworCisJZ2VvLT50cmR0ID0gbGUzMl90b19jcHUoc3JjLT50
+cmR0KTsKKwlnZW8tPnRyZG0gPSBsZTMyX3RvX2NwdShzcmMtPnRyZG0pOworCWdlby0+dHBydCA9
+IGxlMzJfdG9fY3B1KHNyYy0+dHBydCk7CisJZ2VvLT50cHJtID0gbGUzMl90b19jcHUoc3JjLT50
+cHJtKTsKKwlnZW8tPnRiZXQgPSBsZTMyX3RvX2NwdShzcmMtPnRiZXQpOworCWdlby0+dGJlbSA9
+IGxlMzJfdG9fY3B1KHNyYy0+dGJlbSk7CisKKwkvKiAxLjIgY29tcGF0aWJpbGl0eSAqLworCWdl
+by0+dm1udCA9IGlkLT52bW50OworCWdlby0+Y2FwID0gbGUzMl90b19jcHUoaWQtPmNhcCk7CisJ
+Z2VvLT5kb20gPSBsZTMyX3RvX2NwdShpZC0+ZG9tKTsKKworCWdlby0+bXR5cGUgPSBzcmMtPm10
+eXBlOworCWdlby0+Zm10eXBlID0gc3JjLT5mbXR5cGU7CisKKwlnZW8tPmNwYXIgPSBsZTE2X3Rv
+X2NwdShzcmMtPmNwYXIpOworCWdlby0+bXBvcyA9IGxlMzJfdG9fY3B1KHNyYy0+bXBvcyk7CisK
+KwlnZW8tPnBsYW5lX21vZGUgPSBOVk1fUExBTkVfU0lOR0xFOworCisJaWYgKGdlby0+bXBvcyAm
+IDB4MDIwMjAyKSB7CisJCWdlby0+cGxhbmVfbW9kZSA9IE5WTV9QTEFORV9ET1VCTEU7CisJCWdl
+by0+d3Nfb3B0IDw8PSAxOworCX0gZWxzZSBpZiAoZ2VvLT5tcG9zICYgMHgwNDA0MDQpIHsKKwkJ
+Z2VvLT5wbGFuZV9tb2RlID0gTlZNX1BMQU5FX1FVQUQ7CisJCWdlby0+d3Nfb3B0IDw8PSAyOwog
+CX0KIAotCW52bV9pZC0+dHJkdCA9IGxlMzJfdG9fY3B1KHNyYy0+dHJkdCk7Ci0JbnZtX2lkLT50
+cmRtID0gbGUzMl90b19jcHUoc3JjLT50cmRtKTsKLQludm1faWQtPnRwcnQgPSBsZTMyX3RvX2Nw
+dShzcmMtPnRwcnQpOwotCW52bV9pZC0+dHBybSA9IGxlMzJfdG9fY3B1KHNyYy0+dHBybSk7Ci0J
+bnZtX2lkLT50YmV0ID0gbGUzMl90b19jcHUoc3JjLT50YmV0KTsKLQludm1faWQtPnRiZW0gPSBs
+ZTMyX3RvX2NwdShzcmMtPnRiZW0pOwotCi0JLyogMS4yIGNvbXBhdGliaWxpdHkgKi8KLQludm1f
+aWQtPm51bV9wbG4gPSBzcmMtPm51bV9wbG47Ci0JbnZtX2lkLT5udW1fcGcgPSBsZTE2X3RvX2Nw
+dShzcmMtPm51bV9wZyk7Ci0JbnZtX2lkLT5mcGdfc3ogPSBsZTE2X3RvX2NwdShzcmMtPmZwZ19z
+eik7CisJZ2VvLT5udW1fcGxuID0gc3JjLT5udW1fcGxuOworCWdlby0+bnVtX3BnID0gbGUxNl90
+b19jcHUoc3JjLT5udW1fcGcpOworCWdlby0+ZnBnX3N6ID0gbGUxNl90b19jcHUoc3JjLT5mcGdf
+c3opOworCisJbnZtZV9udm1fc2V0X2FkZHJfMTIoKHN0cnVjdCBudm1fYWRkcl9mb3JtYXRfMTIg
+KikmZ2VvLT5hZGRyZiwKKwkJCQkJCQkJJmlkLT5wcGFmKTsKIAogCXJldHVybiAwOwogfQogCi1z
+dGF0aWMgaW50IG52bWVfbnZtX3NldHVwXzEyKHN0cnVjdCBudm1fZGV2ICpudm1kZXYsIHN0cnVj
+dCBudm1faWQgKm52bV9pZCwKLQkJc3RydWN0IG52bWVfbnZtX2lkMTIgKmlkKQorc3RhdGljIHZv
+aWQgbnZtZV9udm1fc2V0X2FkZHJfMjAoc3RydWN0IG52bV9hZGRyX2Zvcm1hdCAqZHN0LAorCQkJ
+CSBzdHJ1Y3QgbnZtZV9udm1faWQyMF9hZGRyZiAqc3JjKQogewotCW52bV9pZC0+dmVyX2lkID0g
+aWQtPnZlcl9pZDsKLQludm1faWQtPnZtbnQgPSBpZC0+dm1udDsKLQludm1faWQtPmNhcCA9IGxl
+MzJfdG9fY3B1KGlkLT5jYXApOwotCW52bV9pZC0+ZG9tID0gbGUzMl90b19jcHUoaWQtPmRvbSk7
+Ci0JbWVtY3B5KCZudm1faWQtPnBwYWYsICZpZC0+cHBhZiwKLQkJCQkJc2l6ZW9mKHN0cnVjdCBu
+dm1fYWRkcl9mb3JtYXQpKTsKLQotCXJldHVybiBpbml0X2dycChudm1faWQsIGlkKTsKKwlkc3Qt
+PmNoX2xlbiA9IHNyYy0+Z3JwX2xlbjsKKwlkc3QtPmx1bl9sZW4gPSBzcmMtPnB1X2xlbjsKKwlk
+c3QtPmNoa19sZW4gPSBzcmMtPmNoa19sZW47CisJZHN0LT5zZWNfbGVuID0gc3JjLT5sYmFfbGVu
+OworCisJZHN0LT5zZWNfb2Zmc2V0ID0gMDsKKwlkc3QtPmNoa19vZmZzZXQgPSBkc3QtPnNlY19s
+ZW47CisJZHN0LT5sdW5fb2Zmc2V0ID0gZHN0LT5jaGtfb2Zmc2V0ICsgZHN0LT5jaGtfbGVuOwor
+CWRzdC0+Y2hfb2Zmc2V0ID0gZHN0LT5sdW5fb2Zmc2V0ICsgZHN0LT5sdW5fbGVuOworCisJZHN0
+LT5jaF9tYXNrID0gKCgxVUxMIDw8IGRzdC0+Y2hfbGVuKSAtIDEpIDw8IGRzdC0+Y2hfb2Zmc2V0
+OworCWRzdC0+bHVuX21hc2sgPSAoKDFVTEwgPDwgZHN0LT5sdW5fbGVuKSAtIDEpIDw8IGRzdC0+
+bHVuX29mZnNldDsKKwlkc3QtPmNoa19tYXNrID0gKCgxVUxMIDw8IGRzdC0+Y2hrX2xlbikgLSAx
+KSA8PCBkc3QtPmNoa19vZmZzZXQ7CisJZHN0LT5zZWNfbWFzayA9ICgoMVVMTCA8PCBkc3QtPnNl
+Y19sZW4pIC0gMSkgPDwgZHN0LT5zZWNfb2Zmc2V0OwogfQogCi1zdGF0aWMgaW50IG52bWVfbnZt
+X3NldHVwXzIwKHN0cnVjdCBudm1fZGV2ICpudm1kZXYsIHN0cnVjdCBudm1faWQgKm52bV9pZCwK
+LQkJc3RydWN0IG52bWVfbnZtX2lkMjAgKmlkKQorc3RhdGljIGludCBudm1lX252bV9zZXR1cF8y
+MChzdHJ1Y3QgbnZtZV9udm1faWQyMCAqaWQsCisJCQkgICAgIHN0cnVjdCBudm1fZ2VvICpnZW8p
+CiB7Ci0JbnZtX2lkLT52ZXJfaWQgPSBpZC0+bWpyOworCWdlby0+dmVyX2lkID0gaWQtPm1qcjsK
+KworCWdlby0+bnJfY2hubHMgPSBsZTE2X3RvX2NwdShpZC0+bnVtX2dycCk7CisJZ2VvLT5ucl9s
+dW5zID0gbGUxNl90b19jcHUoaWQtPm51bV9wdSk7CisJZ2VvLT5hbGxfbHVucyA9IGdlby0+bnJf
+Y2hubHMgKiBnZW8tPm5yX2x1bnM7CiAKLQludm1faWQtPm51bV9jaCA9IGxlMTZfdG9fY3B1KGlk
+LT5udW1fZ3JwKTsKLQludm1faWQtPm51bV9sdW4gPSBsZTE2X3RvX2NwdShpZC0+bnVtX3B1KTsK
+LQludm1faWQtPm51bV9jaGsgPSBsZTMyX3RvX2NwdShpZC0+bnVtX2Noayk7Ci0JbnZtX2lkLT5j
+bGJhID0gbGUzMl90b19jcHUoaWQtPmNsYmEpOworCWdlby0+bnJfY2hrcyA9IGxlMzJfdG9fY3B1
+KGlkLT5udW1fY2hrKTsKKwlnZW8tPmNsYmEgPSBsZTMyX3RvX2NwdShpZC0+Y2xiYSk7CiAKLQlu
+dm1faWQtPndzX21pbiA9IGxlMzJfdG9fY3B1KGlkLT53c19taW4pOwotCW52bV9pZC0+d3Nfb3B0
+ID0gbGUzMl90b19jcHUoaWQtPndzX29wdCk7Ci0JbnZtX2lkLT5td19jdW5pdHMgPSBsZTMyX3Rv
+X2NwdShpZC0+bXdfY3VuaXRzKTsKKwlnZW8tPmFsbF9jaHVua3MgPSBnZW8tPmFsbF9sdW5zICog
+Z2VvLT5ucl9jaGtzOworCWdlby0+dG90YWxfc2VjcyA9IGdlby0+Y2xiYSAqIGdlby0+YWxsX2No
+dW5rczsKIAotCW52bV9pZC0+dHJkdCA9IGxlMzJfdG9fY3B1KGlkLT50cmR0KTsKLQludm1faWQt
+PnRyZG0gPSBsZTMyX3RvX2NwdShpZC0+dHJkbSk7Ci0JbnZtX2lkLT50cHJ0ID0gbGUzMl90b19j
+cHUoaWQtPnR3cnQpOwotCW52bV9pZC0+dHBybSA9IGxlMzJfdG9fY3B1KGlkLT50d3JtKTsKLQlu
+dm1faWQtPnRiZXQgPSBsZTMyX3RvX2NwdShpZC0+dGNyc3QpOwotCW52bV9pZC0+dGJlbSA9IGxl
+MzJfdG9fY3B1KGlkLT50Y3JzbSk7CisJZ2VvLT53c19taW4gPSBsZTMyX3RvX2NwdShpZC0+d3Nf
+bWluKTsKKwlnZW8tPndzX29wdCA9IGxlMzJfdG9fY3B1KGlkLT53c19vcHQpOworCWdlby0+bXdf
+Y3VuaXRzID0gbGUzMl90b19jcHUoaWQtPm13X2N1bml0cyk7CiAKLQkvKiBjYWxjdWxhdGVkIHZh
+bHVlcyAqLwotCW52bV9pZC0+d3NfcGVyX2NoayA9IG52bV9pZC0+Y2xiYSAvIG52bV9pZC0+d3Nf
+bWluOworCWdlby0+dHJkdCA9IGxlMzJfdG9fY3B1KGlkLT50cmR0KTsKKwlnZW8tPnRyZG0gPSBs
+ZTMyX3RvX2NwdShpZC0+dHJkbSk7CisJZ2VvLT50cHJ0ID0gbGUzMl90b19jcHUoaWQtPnR3cnQp
+OworCWdlby0+dHBybSA9IGxlMzJfdG9fY3B1KGlkLT50d3JtKTsKKwlnZW8tPnRiZXQgPSBsZTMy
+X3RvX2NwdShpZC0+dGNyc3QpOworCWdlby0+dGJlbSA9IGxlMzJfdG9fY3B1KGlkLT50Y3JzbSk7
+CiAKLQkvKiAxLjIgY29tcGF0aWJpbGl0eSAqLwotCW52bV9pZC0+d3Nfc2VxID0gTlZNX0lPX1NO
+R0xfQUNDRVNTOworCW52bWVfbnZtX3NldF9hZGRyXzIwKCZnZW8tPmFkZHJmLCAmaWQtPmxiYWYp
+OwogCiAJcmV0dXJuIDA7CiB9CiAKLXN0YXRpYyBpbnQgbnZtZV9udm1faWRlbnRpdHkoc3RydWN0
+IG52bV9kZXYgKm52bWRldiwgc3RydWN0IG52bV9pZCAqbnZtX2lkKQorc3RhdGljIGludCBudm1l
+X252bV9pZGVudGl0eShzdHJ1Y3QgbnZtX2RldiAqbnZtZGV2KQogewogCXN0cnVjdCBudm1lX25z
+ICpucyA9IG52bWRldi0+cS0+cXVldWVkYXRhOwogCXN0cnVjdCBudm1lX252bV9pZDEyICppZDsK
+QEAgLTM4MCwxOCArNDM1LDE4IEBAIHN0YXRpYyBpbnQgbnZtZV9udm1faWRlbnRpdHkoc3RydWN0
+IG52bV9kZXYgKm52bWRldiwgc3RydWN0IG52bV9pZCAqbnZtX2lkKQogCSAqLwogCXN3aXRjaCAo
+aWQtPnZlcl9pZCkgewogCWNhc2UgMToKLQkJcmV0ID0gbnZtZV9udm1fc2V0dXBfMTIobnZtZGV2
+LCBudm1faWQsIGlkKTsKKwkJcmV0ID0gbnZtZV9udm1fc2V0dXBfMTIoaWQsICZudm1kZXYtPmdl
+byk7CiAJCWJyZWFrOwogCWNhc2UgMjoKLQkJcmV0ID0gbnZtZV9udm1fc2V0dXBfMjAobnZtZGV2
+LCBudm1faWQsCi0JCQkJKHN0cnVjdCBudm1lX252bV9pZDIwICopaWQpOworCQlyZXQgPSBudm1l
+X252bV9zZXR1cF8yMCgoc3RydWN0IG52bWVfbnZtX2lkMjAgKilpZCwKKwkJCQkJCQkmbnZtZGV2
+LT5nZW8pOwogCQlicmVhazsKIAlkZWZhdWx0OgotCQlkZXZfZXJyKG5zLT5jdHJsLT5kZXZpY2Us
+Ci0JCQkiT0NTU0QgcmV2aXNpb24gbm90IHN1cHBvcnRlZCAoJWQpXG4iLAotCQkJbnZtX2lkLT52
+ZXJfaWQpOworCQlkZXZfZXJyKG5zLT5jdHJsLT5kZXZpY2UsICJPQ1NTRCByZXZpc2lvbiBub3Qg
+c3VwcG9ydGVkICglZClcbiIsCisJCQkJCQkJaWQtPnZlcl9pZCk7CiAJCXJldCA9IC1FSU5WQUw7
+CiAJfQorCiBvdXQ6CiAJa2ZyZWUoaWQpOwogCXJldHVybiByZXQ7CkBAIC00MDYsNyArNDYxLDcg
+QEAgc3RhdGljIGludCBudm1lX252bV9nZXRfYmJfdGJsKHN0cnVjdCBudm1fZGV2ICpudm1kZXYs
+IHN0cnVjdCBwcGFfYWRkciBwcGEsCiAJc3RydWN0IG52bWVfY3RybCAqY3RybCA9IG5zLT5jdHJs
+OwogCXN0cnVjdCBudm1lX252bV9jb21tYW5kIGMgPSB7fTsKIAlzdHJ1Y3QgbnZtZV9udm1fYmJf
+dGJsICpiYl90Ymw7Ci0JaW50IG5yX2Jsa3MgPSBnZW8tPm5yX2Noa3MgKiBnZW8tPnBsYW5lX21v
+ZGU7CisJaW50IG5yX2Jsa3MgPSBnZW8tPm5yX2Noa3MgKiBnZW8tPm51bV9wbG47CiAJaW50IHRi
+bHN6ID0gc2l6ZW9mKHN0cnVjdCBudm1lX252bV9iYl90YmwpICsgbnJfYmxrczsKIAlpbnQgcmV0
+ID0gMDsKIApAQCAtNDQ3LDcgKzUwMiw3IEBAIHN0YXRpYyBpbnQgbnZtZV9udm1fZ2V0X2JiX3Ri
+bChzdHJ1Y3QgbnZtX2RldiAqbnZtZGV2LCBzdHJ1Y3QgcHBhX2FkZHIgcHBhLAogCQlnb3RvIG91
+dDsKIAl9CiAKLQltZW1jcHkoYmxrcywgYmJfdGJsLT5ibGssIGdlby0+bnJfY2hrcyAqIGdlby0+
+cGxhbmVfbW9kZSk7CisJbWVtY3B5KGJsa3MsIGJiX3RibC0+YmxrLCBnZW8tPm5yX2Noa3MgKiBn
+ZW8tPm51bV9wbG4pOwogb3V0OgogCWtmcmVlKGJiX3RibCk7CiAJcmV0dXJuIHJldDsKQEAgLTgx
+NSw5ICs4NzAsMTAgQEAgaW50IG52bWVfbnZtX2lvY3RsKHN0cnVjdCBudm1lX25zICpucywgdW5z
+aWduZWQgaW50IGNtZCwgdW5zaWduZWQgbG9uZyBhcmcpCiB2b2lkIG52bWVfbnZtX3VwZGF0ZV9u
+dm1faW5mbyhzdHJ1Y3QgbnZtZV9ucyAqbnMpCiB7CiAJc3RydWN0IG52bV9kZXYgKm5kZXYgPSBu
+cy0+bmRldjsKKwlzdHJ1Y3QgbnZtX2dlbyAqZ2VvID0gJm5kZXYtPmdlbzsKIAotCW5kZXYtPmlk
+ZW50aXR5LmNzZWNzID0gbmRldi0+Z2VvLnNlY19zaXplID0gMSA8PCBucy0+bGJhX3NoaWZ0Owot
+CW5kZXYtPmlkZW50aXR5LnNvcyA9IG5kZXYtPmdlby5vb2Jfc2l6ZSA9IG5zLT5tczsKKwlnZW8t
+PmNzZWNzID0gMSA8PCBucy0+bGJhX3NoaWZ0OworCWdlby0+c29zID0gbnMtPm1zOwogfQogCiBp
+bnQgbnZtZV9udm1fcmVnaXN0ZXIoc3RydWN0IG52bWVfbnMgKm5zLCBjaGFyICpkaXNrX25hbWUs
+IGludCBub2RlKQpAQCAtODUwLDIzICs5MDYsMjIgQEAgc3RhdGljIHNzaXplX3QgbnZtX2Rldl9h
+dHRyX3Nob3coc3RydWN0IGRldmljZSAqZGV2LAogewogCXN0cnVjdCBudm1lX25zICpucyA9IG52
+bWVfZ2V0X25zX2Zyb21fZGV2KGRldik7CiAJc3RydWN0IG52bV9kZXYgKm5kZXYgPSBucy0+bmRl
+djsKLQlzdHJ1Y3QgbnZtX2lkICppZDsKKwlzdHJ1Y3QgbnZtX2dlbyAqZ2VvID0gJm5kZXYtPmdl
+bzsKIAlzdHJ1Y3QgYXR0cmlidXRlICphdHRyOwogCiAJaWYgKCFuZGV2KQogCQlyZXR1cm4gMDsK
+IAotCWlkID0gJm5kZXYtPmlkZW50aXR5OwogCWF0dHIgPSAmZGF0dHItPmF0dHI7CiAKIAlpZiAo
+c3RyY21wKGF0dHItPm5hbWUsICJ2ZXJzaW9uIikgPT0gMCkgewotCQlyZXR1cm4gc2NucHJpbnRm
+KHBhZ2UsIFBBR0VfU0laRSwgIiV1XG4iLCBpZC0+dmVyX2lkKTsKKwkJcmV0dXJuIHNjbnByaW50
+ZihwYWdlLCBQQUdFX1NJWkUsICIldVxuIiwgZ2VvLT52ZXJfaWQpOwogCX0gZWxzZSBpZiAoc3Ry
+Y21wKGF0dHItPm5hbWUsICJjYXBhYmlsaXRpZXMiKSA9PSAwKSB7Ci0JCXJldHVybiBzY25wcmlu
+dGYocGFnZSwgUEFHRV9TSVpFLCAiJXVcbiIsIGlkLT5jYXApOworCQlyZXR1cm4gc2NucHJpbnRm
+KHBhZ2UsIFBBR0VfU0laRSwgIiV1XG4iLCBnZW8tPmNhcCk7CiAJfSBlbHNlIGlmIChzdHJjbXAo
+YXR0ci0+bmFtZSwgInJlYWRfdHlwIikgPT0gMCkgewotCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2Us
+IFBBR0VfU0laRSwgIiV1XG4iLCBpZC0+dHJkdCk7CisJCXJldHVybiBzY25wcmludGYocGFnZSwg
+UEFHRV9TSVpFLCAiJXVcbiIsIGdlby0+dHJkdCk7CiAJfSBlbHNlIGlmIChzdHJjbXAoYXR0ci0+
+bmFtZSwgInJlYWRfbWF4IikgPT0gMCkgewotCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0Vf
+U0laRSwgIiV1XG4iLCBpZC0+dHJkbSk7CisJCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9T
+SVpFLCAiJXVcbiIsIGdlby0+dHJkbSk7CiAJfSBlbHNlIHsKIAkJcmV0dXJuIHNjbnByaW50Zihw
+YWdlLAogCQkJCSBQQUdFX1NJWkUsCkBAIC04NzUsNzUgKzkzMCw3OSBAQCBzdGF0aWMgc3NpemVf
+dCBudm1fZGV2X2F0dHJfc2hvdyhzdHJ1Y3QgZGV2aWNlICpkZXYsCiAJfQogfQogCitzdGF0aWMg
+c3NpemVfdCBudm1fZGV2X2F0dHJfc2hvd19wcGFmKHN0cnVjdCBudm1fYWRkcl9mb3JtYXRfMTIg
+KnBwYWYsCisJCQkJCSBjaGFyICpwYWdlKQoreworCXJldHVybiBzY25wcmludGYocGFnZSwgUEFH
+RV9TSVpFLAorCQkiMHglMDJ4JTAyeCUwMnglMDJ4JTAyeCUwMnglMDJ4JTAyeCUwMnglMDJ4JTAy
+eCUwMnhcbiIsCisJCQkJcHBhZi0+Y2hfb2Zmc2V0LCBwcGFmLT5jaF9sZW4sCisJCQkJcHBhZi0+
+bHVuX29mZnNldCwgcHBhZi0+bHVuX2xlbiwKKwkJCQlwcGFmLT5wbG5fb2Zmc2V0LCBwcGFmLT5w
+bG5fbGVuLAorCQkJCXBwYWYtPmJsa19vZmZzZXQsIHBwYWYtPmJsa19sZW4sCisJCQkJcHBhZi0+
+cGdfb2Zmc2V0LCBwcGFmLT5wZ19sZW4sCisJCQkJcHBhZi0+c2VjdF9vZmZzZXQsIHBwYWYtPnNl
+Y3RfbGVuKTsKK30KKwogc3RhdGljIHNzaXplX3QgbnZtX2Rldl9hdHRyX3Nob3dfMTIoc3RydWN0
+IGRldmljZSAqZGV2LAogCQlzdHJ1Y3QgZGV2aWNlX2F0dHJpYnV0ZSAqZGF0dHIsIGNoYXIgKnBh
+Z2UpCiB7CiAJc3RydWN0IG52bWVfbnMgKm5zID0gbnZtZV9nZXRfbnNfZnJvbV9kZXYoZGV2KTsK
+IAlzdHJ1Y3QgbnZtX2RldiAqbmRldiA9IG5zLT5uZGV2OwotCXN0cnVjdCBudm1faWQgKmlkOwor
+CXN0cnVjdCBudm1fZ2VvICpnZW8gPSAmbmRldi0+Z2VvOwogCXN0cnVjdCBhdHRyaWJ1dGUgKmF0
+dHI7CiAKIAlpZiAoIW5kZXYpCiAJCXJldHVybiAwOwogCi0JaWQgPSAmbmRldi0+aWRlbnRpdHk7
+CiAJYXR0ciA9ICZkYXR0ci0+YXR0cjsKIAogCWlmIChzdHJjbXAoYXR0ci0+bmFtZSwgInZlbmRv
+cl9vcGNvZGUiKSA9PSAwKSB7Ci0JCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9TSVpFLCAi
+JXVcbiIsIGlkLT52bW50KTsKKwkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIl
+dVxuIiwgZ2VvLT52bW50KTsKIAl9IGVsc2UgaWYgKHN0cmNtcChhdHRyLT5uYW1lLCAiZGV2aWNl
+X21vZGUiKSA9PSAwKSB7Ci0JCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9TSVpFLCAiJXVc
+biIsIGlkLT5kb20pOworCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwgIiV1XG4i
+LCBnZW8tPmRvbSk7CiAJLyoga2VwdCBmb3IgY29tcGF0aWJpbGl0eSAqLwogCX0gZWxzZSBpZiAo
+c3RyY21wKGF0dHItPm5hbWUsICJtZWRpYV9tYW5hZ2VyIikgPT0gMCkgewogCQlyZXR1cm4gc2Nu
+cHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwgIiVzXG4iLCAiZ2VubnZtIik7CiAJfSBlbHNlIGlmIChz
+dHJjbXAoYXR0ci0+bmFtZSwgInBwYV9mb3JtYXQiKSA9PSAwKSB7Ci0JCXJldHVybiBzY25wcmlu
+dGYocGFnZSwgUEFHRV9TSVpFLAotCQkJIjB4JTAyeCUwMnglMDJ4JTAyeCUwMnglMDJ4JTAyeCUw
+MnglMDJ4JTAyeCUwMnglMDJ4XG4iLAotCQkJaWQtPnBwYWYuY2hfb2Zmc2V0LCBpZC0+cHBhZi5j
+aF9sZW4sCi0JCQlpZC0+cHBhZi5sdW5fb2Zmc2V0LCBpZC0+cHBhZi5sdW5fbGVuLAotCQkJaWQt
+PnBwYWYucGxuX29mZnNldCwgaWQtPnBwYWYucGxuX2xlbiwKLQkJCWlkLT5wcGFmLmJsa19vZmZz
+ZXQsIGlkLT5wcGFmLmJsa19sZW4sCi0JCQlpZC0+cHBhZi5wZ19vZmZzZXQsIGlkLT5wcGFmLnBn
+X2xlbiwKLQkJCWlkLT5wcGFmLnNlY3Rfb2Zmc2V0LCBpZC0+cHBhZi5zZWN0X2xlbik7CisJCXJl
+dHVybiBudm1fZGV2X2F0dHJfc2hvd19wcGFmKCh2b2lkICopJmdlby0+YWRkcmYsIHBhZ2UpOwog
+CX0gZWxzZSBpZiAoc3RyY21wKGF0dHItPm5hbWUsICJtZWRpYV90eXBlIikgPT0gMCkgewkvKiB1
+OCAqLwotCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwgIiV1XG4iLCBpZC0+bXR5
+cGUpOworCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwgIiV1XG4iLCBnZW8tPm10
+eXBlKTsKIAl9IGVsc2UgaWYgKHN0cmNtcChhdHRyLT5uYW1lLCAiZmxhc2hfbWVkaWFfdHlwZSIp
+ID09IDApIHsKLQkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIldVxuIiwgaWQt
+PmZtdHlwZSk7CisJCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9TSVpFLCAiJXVcbiIsIGdl
+by0+Zm10eXBlKTsKIAl9IGVsc2UgaWYgKHN0cmNtcChhdHRyLT5uYW1lLCAibnVtX2NoYW5uZWxz
+IikgPT0gMCkgewotCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwgIiV1XG4iLCBp
+ZC0+bnVtX2NoKTsKKwkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIldVxuIiwg
+Z2VvLT5ucl9jaG5scyk7CiAJfSBlbHNlIGlmIChzdHJjbXAoYXR0ci0+bmFtZSwgIm51bV9sdW5z
+IikgPT0gMCkgewotCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwgIiV1XG4iLCBp
+ZC0+bnVtX2x1bik7CisJCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9TSVpFLCAiJXVcbiIs
+IGdlby0+bnJfbHVucyk7CiAJfSBlbHNlIGlmIChzdHJjbXAoYXR0ci0+bmFtZSwgIm51bV9wbGFu
+ZXMiKSA9PSAwKSB7Ci0JCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9TSVpFLCAiJXVcbiIs
+IGlkLT5udW1fcGxuKTsKKwkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIldVxu
+IiwgZ2VvLT5udW1fcGxuKTsKIAl9IGVsc2UgaWYgKHN0cmNtcChhdHRyLT5uYW1lLCAibnVtX2Js
+b2NrcyIpID09IDApIHsJLyogdTE2ICovCi0JCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9T
+SVpFLCAiJXVcbiIsIGlkLT5udW1fY2hrKTsKKwkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdF
+X1NJWkUsICIldVxuIiwgZ2VvLT5ucl9jaGtzKTsKIAl9IGVsc2UgaWYgKHN0cmNtcChhdHRyLT5u
+YW1lLCAibnVtX3BhZ2VzIikgPT0gMCkgewotCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0Vf
+U0laRSwgIiV1XG4iLCBpZC0+bnVtX3BnKTsKKwkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdF
+X1NJWkUsICIldVxuIiwgZ2VvLT5udW1fcGcpOwogCX0gZWxzZSBpZiAoc3RyY21wKGF0dHItPm5h
+bWUsICJwYWdlX3NpemUiKSA9PSAwKSB7Ci0JCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9T
+SVpFLCAiJXVcbiIsIGlkLT5mcGdfc3opOworCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0Vf
+U0laRSwgIiV1XG4iLCBnZW8tPmZwZ19zeik7CiAJfSBlbHNlIGlmIChzdHJjbXAoYXR0ci0+bmFt
+ZSwgImh3X3NlY3Rvcl9zaXplIikgPT0gMCkgewotCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBB
+R0VfU0laRSwgIiV1XG4iLCBpZC0+Y3NlY3MpOworCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBB
+R0VfU0laRSwgIiV1XG4iLCBnZW8tPmNzZWNzKTsKIAl9IGVsc2UgaWYgKHN0cmNtcChhdHRyLT5u
+YW1lLCAib29iX3NlY3Rvcl9zaXplIikgPT0gMCkgey8qIHUzMiAqLwotCQlyZXR1cm4gc2NucHJp
+bnRmKHBhZ2UsIFBBR0VfU0laRSwgIiV1XG4iLCBpZC0+c29zKTsKKwkJcmV0dXJuIHNjbnByaW50
+ZihwYWdlLCBQQUdFX1NJWkUsICIldVxuIiwgZ2VvLT5zb3MpOwogCX0gZWxzZSBpZiAoc3RyY21w
+KGF0dHItPm5hbWUsICJwcm9nX3R5cCIpID09IDApIHsKLQkJcmV0dXJuIHNjbnByaW50ZihwYWdl
+LCBQQUdFX1NJWkUsICIldVxuIiwgaWQtPnRwcnQpOworCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2Us
+IFBBR0VfU0laRSwgIiV1XG4iLCBnZW8tPnRwcnQpOwogCX0gZWxzZSBpZiAoc3RyY21wKGF0dHIt
+Pm5hbWUsICJwcm9nX21heCIpID09IDApIHsKLQkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdF
+X1NJWkUsICIldVxuIiwgaWQtPnRwcm0pOworCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0Vf
+U0laRSwgIiV1XG4iLCBnZW8tPnRwcm0pOwogCX0gZWxzZSBpZiAoc3RyY21wKGF0dHItPm5hbWUs
+ICJlcmFzZV90eXAiKSA9PSAwKSB7Ci0JCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9TSVpF
+LCAiJXVcbiIsIGlkLT50YmV0KTsKKwkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUs
+ICIldVxuIiwgZ2VvLT50YmV0KTsKIAl9IGVsc2UgaWYgKHN0cmNtcChhdHRyLT5uYW1lLCAiZXJh
+c2VfbWF4IikgPT0gMCkgewotCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwgIiV1
+XG4iLCBpZC0+dGJlbSk7CisJCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9TSVpFLCAiJXVc
+biIsIGdlby0+dGJlbSk7CiAJfSBlbHNlIGlmIChzdHJjbXAoYXR0ci0+bmFtZSwgIm11bHRpcGxh
+bmVfbW9kZXMiKSA9PSAwKSB7Ci0JCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9TSVpFLCAi
+MHglMDh4XG4iLCBpZC0+bXBvcyk7CisJCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9TSVpF
+LCAiMHglMDh4XG4iLCBnZW8tPm1wb3MpOwogCX0gZWxzZSBpZiAoc3RyY21wKGF0dHItPm5hbWUs
+ICJtZWRpYV9jYXBhYmlsaXRpZXMiKSA9PSAwKSB7Ci0JCXJldHVybiBzY25wcmludGYocGFnZSwg
+UEFHRV9TSVpFLCAiMHglMDh4XG4iLCBpZC0+bWNjYXApOworCQlyZXR1cm4gc2NucHJpbnRmKHBh
+Z2UsIFBBR0VfU0laRSwgIjB4JTA4eFxuIiwgZ2VvLT5tY2NhcCk7CiAJfSBlbHNlIGlmIChzdHJj
+bXAoYXR0ci0+bmFtZSwgIm1heF9waHlzX3NlY3MiKSA9PSAwKSB7CiAJCXJldHVybiBzY25wcmlu
+dGYocGFnZSwgUEFHRV9TSVpFLCAiJXVcbiIsIE5WTV9NQVhfVkxCQSk7CiAJfSBlbHNlIHsKLQkJ
+cmV0dXJuIHNjbnByaW50ZihwYWdlLAotCQkJCSBQQUdFX1NJWkUsCi0JCQkJICJVbmhhbmRsZWQg
+YXR0ciglcykgaW4gYG52bV9kZXZfYXR0cl9zaG93XzEyYFxuIiwKLQkJCQkgYXR0ci0+bmFtZSk7
+CisJCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9TSVpFLAorCQkJIlVuaGFuZGxlZCBhdHRy
+KCVzKSBpbiBgbnZtX2Rldl9hdHRyX3Nob3dfMTJgXG4iLAorCQkJYXR0ci0+bmFtZSk7CiAJfQog
+fQogCkBAIC05NTIsNDIgKzEwMTEsNDAgQEAgc3RhdGljIHNzaXplX3QgbnZtX2Rldl9hdHRyX3No
+b3dfMjAoc3RydWN0IGRldmljZSAqZGV2LAogewogCXN0cnVjdCBudm1lX25zICpucyA9IG52bWVf
+Z2V0X25zX2Zyb21fZGV2KGRldik7CiAJc3RydWN0IG52bV9kZXYgKm5kZXYgPSBucy0+bmRldjsK
+LQlzdHJ1Y3QgbnZtX2lkICppZDsKKwlzdHJ1Y3QgbnZtX2dlbyAqZ2VvID0gJm5kZXYtPmdlbzsK
+IAlzdHJ1Y3QgYXR0cmlidXRlICphdHRyOwogCiAJaWYgKCFuZGV2KQogCQlyZXR1cm4gMDsKIAot
+CWlkID0gJm5kZXYtPmlkZW50aXR5OwogCWF0dHIgPSAmZGF0dHItPmF0dHI7CiAKIAlpZiAoc3Ry
+Y21wKGF0dHItPm5hbWUsICJncm91cHMiKSA9PSAwKSB7Ci0JCXJldHVybiBzY25wcmludGYocGFn
+ZSwgUEFHRV9TSVpFLCAiJXVcbiIsIGlkLT5udW1fY2gpOworCQlyZXR1cm4gc2NucHJpbnRmKHBh
+Z2UsIFBBR0VfU0laRSwgIiV1XG4iLCBnZW8tPm5yX2NobmxzKTsKIAl9IGVsc2UgaWYgKHN0cmNt
+cChhdHRyLT5uYW1lLCAicHVuaXRzIikgPT0gMCkgewotCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2Us
+IFBBR0VfU0laRSwgIiV1XG4iLCBpZC0+bnVtX2x1bik7CisJCXJldHVybiBzY25wcmludGYocGFn
+ZSwgUEFHRV9TSVpFLCAiJXVcbiIsIGdlby0+bnJfbHVucyk7CiAJfSBlbHNlIGlmIChzdHJjbXAo
+YXR0ci0+bmFtZSwgImNodW5rcyIpID09IDApIHsKLQkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQ
+QUdFX1NJWkUsICIldVxuIiwgaWQtPm51bV9jaGspOworCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2Us
+IFBBR0VfU0laRSwgIiV1XG4iLCBnZW8tPm5yX2Noa3MpOwogCX0gZWxzZSBpZiAoc3RyY21wKGF0
+dHItPm5hbWUsICJjbGJhIikgPT0gMCkgewotCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0Vf
+U0laRSwgIiV1XG4iLCBpZC0+Y2xiYSk7CisJCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9T
+SVpFLCAiJXVcbiIsIGdlby0+Y2xiYSk7CiAJfSBlbHNlIGlmIChzdHJjbXAoYXR0ci0+bmFtZSwg
+IndzX21pbiIpID09IDApIHsKLQkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIl
+dVxuIiwgaWQtPndzX21pbik7CisJCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9TSVpFLCAi
+JXVcbiIsIGdlby0+d3NfbWluKTsKIAl9IGVsc2UgaWYgKHN0cmNtcChhdHRyLT5uYW1lLCAid3Nf
+b3B0IikgPT0gMCkgewotCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwgIiV1XG4i
+LCBpZC0+d3Nfb3B0KTsKKwkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIldVxu
+IiwgZ2VvLT53c19vcHQpOwogCX0gZWxzZSBpZiAoc3RyY21wKGF0dHItPm5hbWUsICJtd19jdW5p
+dHMiKSA9PSAwKSB7Ci0JCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9TSVpFLCAiJXVcbiIs
+IGlkLT5td19jdW5pdHMpOworCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwgIiV1
+XG4iLCBnZW8tPm13X2N1bml0cyk7CiAJfSBlbHNlIGlmIChzdHJjbXAoYXR0ci0+bmFtZSwgIndy
+aXRlX3R5cCIpID09IDApIHsKLQkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIl
+dVxuIiwgaWQtPnRwcnQpOworCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwgIiV1
+XG4iLCBnZW8tPnRwcnQpOwogCX0gZWxzZSBpZiAoc3RyY21wKGF0dHItPm5hbWUsICJ3cml0ZV9t
+YXgiKSA9PSAwKSB7Ci0JCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9TSVpFLCAiJXVcbiIs
+IGlkLT50cHJtKTsKKwkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIldVxuIiwg
+Z2VvLT50cHJtKTsKIAl9IGVsc2UgaWYgKHN0cmNtcChhdHRyLT5uYW1lLCAicmVzZXRfdHlwIikg
+PT0gMCkgewotCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwgIiV1XG4iLCBpZC0+
+dGJldCk7CisJCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9TSVpFLCAiJXVcbiIsIGdlby0+
+dGJldCk7CiAJfSBlbHNlIGlmIChzdHJjbXAoYXR0ci0+bmFtZSwgInJlc2V0X21heCIpID09IDAp
+IHsKLQkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIldVxuIiwgaWQtPnRiZW0p
+OworCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwgIiV1XG4iLCBnZW8tPnRiZW0p
+OwogCX0gZWxzZSB7Ci0JCXJldHVybiBzY25wcmludGYocGFnZSwKLQkJCQkgUEFHRV9TSVpFLAot
+CQkJCSAiVW5oYW5kbGVkIGF0dHIoJXMpIGluIGBudm1fZGV2X2F0dHJfc2hvd18yMGBcbiIsCi0J
+CQkJIGF0dHItPm5hbWUpOworCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwKKwkJ
+CSJVbmhhbmRsZWQgYXR0ciglcykgaW4gYG52bV9kZXZfYXR0cl9zaG93XzIwYFxuIiwKKwkJCWF0
+dHItPm5hbWUpOwogCX0KIH0KIApAQCAtMTEwNiwxMCArMTE2MywxMyBAQCBzdGF0aWMgY29uc3Qg
+c3RydWN0IGF0dHJpYnV0ZV9ncm91cCBudm1fZGV2X2F0dHJfZ3JvdXBfMjAgPSB7CiAKIGludCBu
+dm1lX252bV9yZWdpc3Rlcl9zeXNmcyhzdHJ1Y3QgbnZtZV9ucyAqbnMpCiB7Ci0JaWYgKCFucy0+
+bmRldikKKwlzdHJ1Y3QgbnZtX2RldiAqbmRldiA9IG5zLT5uZGV2OworCXN0cnVjdCBudm1fZ2Vv
+ICpnZW8gPSAmbmRldi0+Z2VvOworCisJaWYgKCFuZGV2KQogCQlyZXR1cm4gLUVJTlZBTDsKIAot
+CXN3aXRjaCAobnMtPm5kZXYtPmlkZW50aXR5LnZlcl9pZCkgeworCXN3aXRjaCAoZ2VvLT52ZXJf
+aWQpIHsKIAljYXNlIDE6CiAJCXJldHVybiBzeXNmc19jcmVhdGVfZ3JvdXAoJmRpc2tfdG9fZGV2
+KG5zLT5kaXNrKS0+a29iaiwKIAkJCQkJJm52bV9kZXZfYXR0cl9ncm91cF8xMik7CkBAIC0xMTIz
+LDcgKzExODMsMTAgQEAgaW50IG52bWVfbnZtX3JlZ2lzdGVyX3N5c2ZzKHN0cnVjdCBudm1lX25z
+ICpucykKIAogdm9pZCBudm1lX252bV91bnJlZ2lzdGVyX3N5c2ZzKHN0cnVjdCBudm1lX25zICpu
+cykKIHsKLQlzd2l0Y2ggKG5zLT5uZGV2LT5pZGVudGl0eS52ZXJfaWQpIHsKKwlzdHJ1Y3QgbnZt
+X2RldiAqbmRldiA9IG5zLT5uZGV2OworCXN0cnVjdCBudm1fZ2VvICpnZW8gPSAmbmRldi0+Z2Vv
+OworCisJc3dpdGNoIChnZW8tPnZlcl9pZCkgewogCWNhc2UgMToKIAkJc3lzZnNfcmVtb3ZlX2dy
+b3VwKCZkaXNrX3RvX2Rldihucy0+ZGlzayktPmtvYmosCiAJCQkJCSZudm1fZGV2X2F0dHJfZ3Jv
+dXBfMTIpOwpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9saWdodG52bS5oIGIvaW5jbHVkZS9s
+aW51eC9saWdodG52bS5oCmluZGV4IGU1NWIxMDU3M2M5OS4uMTYyNTVmY2Q1MjUwIDEwMDY0NAot
+LS0gYS9pbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmgKKysrIGIvaW5jbHVkZS9saW51eC9saWdodG52
+bS5oCkBAIC01MCw3ICs1MCw3IEBAIHN0cnVjdCBudm1faWQ7CiBzdHJ1Y3QgbnZtX2RldjsKIHN0
+cnVjdCBudm1fdGd0X2RldjsKIAotdHlwZWRlZiBpbnQgKG52bV9pZF9mbikoc3RydWN0IG52bV9k
+ZXYgKiwgc3RydWN0IG52bV9pZCAqKTsKK3R5cGVkZWYgaW50IChudm1faWRfZm4pKHN0cnVjdCBu
+dm1fZGV2ICopOwogdHlwZWRlZiBpbnQgKG52bV9vcF9iYl90YmxfZm4pKHN0cnVjdCBudm1fZGV2
+ICosIHN0cnVjdCBwcGFfYWRkciwgdTggKik7CiB0eXBlZGVmIGludCAobnZtX29wX3NldF9iYl9m
+bikoc3RydWN0IG52bV9kZXYgKiwgc3RydWN0IHBwYV9hZGRyICosIGludCwgaW50KTsKIHR5cGVk
+ZWYgaW50IChudm1fc3VibWl0X2lvX2ZuKShzdHJ1Y3QgbnZtX2RldiAqLCBzdHJ1Y3QgbnZtX3Jx
+ICopOwpAQCAtMTUyLDYyICsxNTIsNDggQEAgc3RydWN0IG52bV9pZF9scF90YmwgewogCXN0cnVj
+dCBudm1faWRfbHBfbWxjIG1sYzsKIH07CiAKLXN0cnVjdCBudm1fYWRkcl9mb3JtYXQgewotCXU4
+CWNoX29mZnNldDsKK3N0cnVjdCBudm1fYWRkcl9mb3JtYXRfMTIgewogCXU4CWNoX2xlbjsKLQl1
+OAlsdW5fb2Zmc2V0OwogCXU4CWx1bl9sZW47Ci0JdTgJcGxuX29mZnNldDsKKwl1OAlibGtfbGVu
+OworCXU4CXBnX2xlbjsKIAl1OAlwbG5fbGVuOworCXU4CXNlY3RfbGVuOworCisJdTgJY2hfb2Zm
+c2V0OworCXU4CWx1bl9vZmZzZXQ7CiAJdTgJYmxrX29mZnNldDsKLQl1OAlibGtfbGVuOwogCXU4
+CXBnX29mZnNldDsKLQl1OAlwZ19sZW47CisJdTgJcGxuX29mZnNldDsKIAl1OAlzZWN0X29mZnNl
+dDsKLQl1OAlzZWN0X2xlbjsKLX07Ci0KLXN0cnVjdCBudm1faWQgewotCXU4CXZlcl9pZDsKLQl1
+OAl2bW50OwotCXUzMgljYXA7Ci0JdTMyCWRvbTsKLQotCXN0cnVjdAludm1fYWRkcl9mb3JtYXQg
+cHBhZjsKLQotCXU4CW51bV9jaDsKLQl1OAludW1fbHVuOwotCXUxNgludW1fY2hrOwotCXUxNglj
+bGJhOwotCXUxNgljc2VjczsKLQl1MTYJc29zOwotCi0JdTMyCXdzX21pbjsKLQl1MzIJd3Nfb3B0
+OwotCXUzMgltd19jdW5pdHM7CiAKLQl1MzIJdHJkdDsKLQl1MzIJdHJkbTsKLQl1MzIJdHBydDsK
+LQl1MzIJdHBybTsKLQl1MzIJdGJldDsKLQl1MzIJdGJlbTsKLQl1MzIJbXBvczsKLQl1MzIJbWNj
+YXA7Ci0JdTE2CWNwYXI7Ci0KLQkvKiBjYWxjdWxhdGVkIHZhbHVlcyAqLwotCXUxNgl3c19zZXE7
+Ci0JdTE2CXdzX3Blcl9jaGs7Ci0KLQkvKiAxLjIgY29tcGF0aWJpbGl0eSAqLwotCXU4CW10eXBl
+OwotCXU4CWZtdHlwZTsKKwl1NjQJY2hfbWFzazsKKwl1NjQJbHVuX21hc2s7CisJdTY0CWJsa19t
+YXNrOworCXU2NAlwZ19tYXNrOworCXU2NAlwbG5fbWFzazsKKwl1NjQJc2VjX21hc2s7Cit9Owog
+Ci0JdTgJbnVtX3BsbjsKLQl1MTYJbnVtX3BnOwotCXUxNglmcGdfc3o7Ci19IF9fcGFja2VkOwor
+c3RydWN0IG52bV9hZGRyX2Zvcm1hdCB7CisJdTgJY2hfbGVuOworCXU4CWx1bl9sZW47CisJdTgJ
+Y2hrX2xlbjsKKwl1OAlzZWNfbGVuOworCXU4CXJzdl9sZW5bMl07CisKKwl1OAljaF9vZmZzZXQ7
+CisJdTgJbHVuX29mZnNldDsKKwl1OAljaGtfb2Zmc2V0OworCXU4CXNlY19vZmZzZXQ7CisJdTgJ
+cnN2X29mZlsyXTsKKworCXU2NAljaF9tYXNrOworCXU2NAlsdW5fbWFzazsKKwl1NjQJY2hrX21h
+c2s7CisJdTY0CXNlY19tYXNrOworCXU2NAlyc3ZfbWFza1syXTsKK307CiAKIHN0cnVjdCBudm1f
+dGFyZ2V0IHsKIAlzdHJ1Y3QgbGlzdF9oZWFkIGxpc3Q7CkBAIC0yNzQsMzYgKzI2MCw2MyBAQCBl
+bnVtIHsKIAlOVk1fQkxLX1NUX0JBRCA9CTB4OCwJLyogQmFkIGJsb2NrICovCiB9OwogCi0KLS8q
+IERldmljZSBnZW5lcmljIGluZm9ybWF0aW9uICovCisvKiBJbnN0YW5jZSBnZW9tZXRyeSAqLwog
+c3RydWN0IG52bV9nZW8gewotCS8qIGdlbmVyaWMgZ2VvbWV0cnkgKi8KKwkvKiBkZXZpY2UgcmVw
+b3J0ZWQgdmVyc2lvbiAqLworCXU4CXZlcl9pZDsKKworCS8qIGluc3RhbmNlIHNwZWNpZmljIGdl
+b21ldHJ5ICovCiAJaW50IG5yX2NobmxzOwotCWludCBhbGxfbHVuczsgLyogYWNyb3NzIGNoYW5u
+ZWxzICovCi0JaW50IG5yX2x1bnM7IC8qIHBlciBjaGFubmVsICovCi0JaW50IG5yX2Noa3M7IC8q
+IHBlciBsdW4gKi8KKwlpbnQgbnJfbHVuczsJCS8qIHBlciBjaGFubmVsICovCiAKLQlpbnQgc2Vj
+X3NpemU7Ci0JaW50IG9vYl9zaXplOwotCWludCBtY2NhcDsKKwkvKiBjYWxjdWxhdGVkIHZhbHVl
+cyAqLworCWludCBhbGxfbHVuczsJCS8qIGFjcm9zcyBjaGFubmVscyAqLworCWludCBhbGxfY2h1
+bmtzOwkJLyogYWNyb3NzIGNoYW5uZWxzICovCiAKLQlpbnQgc2VjX3Blcl9jaGs7Ci0JaW50IHNl
+Y19wZXJfbHVuOworCWludCBvcDsJCQkvKiBvdmVyLXByb3Zpc2lvbiBpbiBpbnN0YW5jZSAqLwog
+Ci0JaW50IHdzX21pbjsKLQlpbnQgd3Nfb3B0OwotCWludCB3c19zZXE7Ci0JaW50IHdzX3Blcl9j
+aGs7CisJc2VjdG9yX3QgdG90YWxfc2VjczsJLyogYWNyb3NzIGNoYW5uZWxzICovCiAKLQlpbnQg
+b3A7CisJLyogY2h1bmsgZ2VvbWV0cnkgKi8KKwl1MzIJbnJfY2hrczsJLyogY2h1bmtzIHBlciBs
+dW4gKi8KKwl1MzIJY2xiYTsJCS8qIHNlY3RvcnMgcGVyIGNodW5rICovCisJdTE2CWNzZWNzOwkJ
+Lyogc2VjdG9yIHNpemUgKi8KKwl1MTYJc29zOwkJLyogb3V0LW9mLWJhbmQgYXJlYSBzaXplICov
+CiAKLQlzdHJ1Y3QgbnZtX2FkZHJfZm9ybWF0IHBwYWY7CisJLyogZGV2aWNlIHdyaXRlIGNvbnN0
+cmFpbnMgKi8KKwl1MzIJd3NfbWluOwkJLyogbWluaW11bSB3cml0ZSBzaXplICovCisJdTMyCXdz
+X29wdDsJCS8qIG9wdGltYWwgd3JpdGUgc2l6ZSAqLworCXUzMgltd19jdW5pdHM7CS8qIGRpc3Rh
+bmNlIHJlcXVpcmVkIGZvciBzdWNjZXNzZnVsIHJlYWQgKi8KIAotCS8qIExlZ2FjeSAxLjIgc3Bl
+Y2lmaWMgZ2VvbWV0cnkgKi8KLQlpbnQgcGxhbmVfbW9kZTsgLyogZHJpdmUgZGV2aWNlIGluIHNp
+bmdsZSwgZG91YmxlIG9yIHF1YWQgbW9kZSAqLwotCWludCBucl9wbGFuZXM7Ci0JaW50IHNlY19w
+ZXJfcGc7IC8qIG9ubHkgc2VjdG9ycyBmb3IgYSBzaW5nbGUgcGFnZSAqLwotCWludCBzZWNfcGVy
+X3BsOyAvKiBhbGwgc2VjdG9ycyBhY3Jvc3MgcGxhbmVzICovCisJLyogZGV2aWNlIGNhcGFiaWxp
+dGllcyAqLworCXUzMgltY2NhcDsKKworCS8qIGRldmljZSB0aW1pbmdzICovCisJdTMyCXRyZHQ7
+CQkvKiBBdmcuIFRyZWFkIChucykgKi8KKwl1MzIJdHJkbTsJCS8qIE1heCBUcmVhZCAobnMpICov
+CisJdTMyCXRwcnQ7CQkvKiBBdmcuIFRwcm9nIChucykgKi8KKwl1MzIJdHBybTsJCS8qIE1heCBU
+cHJvZyAobnMpICovCisJdTMyCXRiZXQ7CQkvKiBBdmcuIFRlcmFzZSAobnMpICovCisJdTMyCXRi
+ZW07CQkvKiBNYXggVGVyYXNlIChucykgKi8KKworCS8qIGdlbmVyaWMgYWRkcmVzcyBmb3JtYXQg
+Ki8KKwlzdHJ1Y3QgbnZtX2FkZHJfZm9ybWF0IGFkZHJmOworCisJLyogMS4yIGNvbXBhdGliaWxp
+dHkgKi8KKwl1OAl2bW50OworCXUzMgljYXA7CisJdTMyCWRvbTsKKworCXU4CW10eXBlOworCXU4
+CWZtdHlwZTsKKworCXUxNgljcGFyOworCXUzMgltcG9zOworCisJdTgJbnVtX3BsbjsKKwl1OAlw
+bGFuZV9tb2RlOworCXUxNgludW1fcGc7CisJdTE2CWZwZ19zejsKIH07CiAKIC8qIHN1Yi1kZXZp
+Y2Ugc3RydWN0dXJlICovCkBAIC0zMTQsOSArMzI3LDYgQEAgc3RydWN0IG52bV90Z3RfZGV2IHsK
+IAkvKiBCYXNlIHBwYXMgZm9yIHRhcmdldCBMVU5zICovCiAJc3RydWN0IHBwYV9hZGRyICpsdW5z
+OwogCi0Jc2VjdG9yX3QgdG90YWxfc2VjczsKLQotCXN0cnVjdCBudm1faWQgaWRlbnRpdHk7CiAJ
+c3RydWN0IHJlcXVlc3RfcXVldWUgKnE7CiAKIAlzdHJ1Y3QgbnZtX2RldiAqcGFyZW50OwpAQCAt
+MzMxLDEzICszNDEsOSBAQCBzdHJ1Y3QgbnZtX2RldiB7CiAJLyogRGV2aWNlIGluZm9ybWF0aW9u
+ICovCiAJc3RydWN0IG52bV9nZW8gZ2VvOwogCi0JdW5zaWduZWQgbG9uZyB0b3RhbF9zZWNzOwot
+CiAJdW5zaWduZWQgbG9uZyAqbHVuX21hcDsKIAl2b2lkICpkbWFfcG9vbDsKIAotCXN0cnVjdCBu
+dm1faWQgaWRlbnRpdHk7Ci0KIAkvKiBCYWNrZW5kIGRldmljZSAqLwogCXN0cnVjdCByZXF1ZXN0
+X3F1ZXVlICpxOwogCWNoYXIgbmFtZVtESVNLX05BTUVfTEVOXTsKQEAgLTM1NywxNCArMzYzLDE2
+IEBAIHN0YXRpYyBpbmxpbmUgc3RydWN0IHBwYV9hZGRyIGdlbmVyaWNfdG9fZGV2X2FkZHIoc3Ry
+dWN0IG52bV90Z3RfZGV2ICp0Z3RfZGV2LAogCQkJCQkJICBzdHJ1Y3QgcHBhX2FkZHIgcikKIHsK
+IAlzdHJ1Y3QgbnZtX2dlbyAqZ2VvID0gJnRndF9kZXYtPmdlbzsKKwlzdHJ1Y3QgbnZtX2FkZHJf
+Zm9ybWF0XzEyICpwcGFmID0KKwkJCQkoc3RydWN0IG52bV9hZGRyX2Zvcm1hdF8xMiAqKSZnZW8t
+PmFkZHJmOwogCXN0cnVjdCBwcGFfYWRkciBsOwogCi0JbC5wcGEgPSAoKHU2NClyLmcuYmxrKSA8
+PCBnZW8tPnBwYWYuYmxrX29mZnNldDsKLQlsLnBwYSB8PSAoKHU2NClyLmcucGcpIDw8IGdlby0+
+cHBhZi5wZ19vZmZzZXQ7Ci0JbC5wcGEgfD0gKCh1NjQpci5nLnNlYykgPDwgZ2VvLT5wcGFmLnNl
+Y3Rfb2Zmc2V0OwotCWwucHBhIHw9ICgodTY0KXIuZy5wbCkgPDwgZ2VvLT5wcGFmLnBsbl9vZmZz
+ZXQ7Ci0JbC5wcGEgfD0gKCh1NjQpci5nLmx1bikgPDwgZ2VvLT5wcGFmLmx1bl9vZmZzZXQ7Ci0J
+bC5wcGEgfD0gKCh1NjQpci5nLmNoKSA8PCBnZW8tPnBwYWYuY2hfb2Zmc2V0OworCWwucHBhID0g
+KCh1NjQpci5nLmNoKSA8PCBwcGFmLT5jaF9vZmZzZXQ7CisJbC5wcGEgfD0gKCh1NjQpci5nLmx1
+bikgPDwgcHBhZi0+bHVuX29mZnNldDsKKwlsLnBwYSB8PSAoKHU2NClyLmcuYmxrKSA8PCBwcGFm
+LT5ibGtfb2Zmc2V0OworCWwucHBhIHw9ICgodTY0KXIuZy5wZykgPDwgcHBhZi0+cGdfb2Zmc2V0
+OworCWwucHBhIHw9ICgodTY0KXIuZy5wbCkgPDwgcHBhZi0+cGxuX29mZnNldDsKKwlsLnBwYSB8
+PSAoKHU2NClyLmcuc2VjKSA8PCBwcGFmLT5zZWN0X29mZnNldDsKIAogCXJldHVybiBsOwogfQpA
+QCAtMzczLDI0ICszODEsMTggQEAgc3RhdGljIGlubGluZSBzdHJ1Y3QgcHBhX2FkZHIgZGV2X3Rv
+X2dlbmVyaWNfYWRkcihzdHJ1Y3QgbnZtX3RndF9kZXYgKnRndF9kZXYsCiAJCQkJCQkgIHN0cnVj
+dCBwcGFfYWRkciByKQogewogCXN0cnVjdCBudm1fZ2VvICpnZW8gPSAmdGd0X2Rldi0+Z2VvOwor
+CXN0cnVjdCBudm1fYWRkcl9mb3JtYXRfMTIgKnBwYWYgPQorCQkJCShzdHJ1Y3QgbnZtX2FkZHJf
+Zm9ybWF0XzEyICopJmdlby0+YWRkcmY7CiAJc3RydWN0IHBwYV9hZGRyIGw7CiAKIAlsLnBwYSA9
+IDA7Ci0JLyoKLQkgKiAoci5wcGEgPDwgWCBvZmZzZXQpICYgWCBsZW4gYml0bWFzay4gWCBlcS4g
+YmxrLCBwZywgZXRjLgotCSAqLwotCWwuZy5ibGsgPSAoci5wcGEgPj4gZ2VvLT5wcGFmLmJsa19v
+ZmZzZXQpICYKLQkJCQkJKCgoMSA8PCBnZW8tPnBwYWYuYmxrX2xlbikgLSAxKSk7Ci0JbC5nLnBn
+IHw9IChyLnBwYSA+PiBnZW8tPnBwYWYucGdfb2Zmc2V0KSAmCi0JCQkJCSgoKDEgPDwgZ2VvLT5w
+cGFmLnBnX2xlbikgLSAxKSk7Ci0JbC5nLnNlYyB8PSAoci5wcGEgPj4gZ2VvLT5wcGFmLnNlY3Rf
+b2Zmc2V0KSAmCi0JCQkJCSgoKDEgPDwgZ2VvLT5wcGFmLnNlY3RfbGVuKSAtIDEpKTsKLQlsLmcu
+cGwgfD0gKHIucHBhID4+IGdlby0+cHBhZi5wbG5fb2Zmc2V0KSAmCi0JCQkJCSgoKDEgPDwgZ2Vv
+LT5wcGFmLnBsbl9sZW4pIC0gMSkpOwotCWwuZy5sdW4gfD0gKHIucHBhID4+IGdlby0+cHBhZi5s
+dW5fb2Zmc2V0KSAmCi0JCQkJCSgoKDEgPDwgZ2VvLT5wcGFmLmx1bl9sZW4pIC0gMSkpOwotCWwu
+Zy5jaCB8PSAoci5wcGEgPj4gZ2VvLT5wcGFmLmNoX29mZnNldCkgJgotCQkJCQkoKCgxIDw8IGdl
+by0+cHBhZi5jaF9sZW4pIC0gMSkpOworCisJbC5nLmNoID0gKHIucHBhICYgcHBhZi0+Y2hfbWFz
+aykgPj4gcHBhZi0+Y2hfb2Zmc2V0OworCWwuZy5sdW4gPSAoci5wcGEgJiBwcGFmLT5sdW5fbWFz
+aykgPj4gcHBhZi0+bHVuX29mZnNldDsKKwlsLmcuYmxrID0gKHIucHBhICYgcHBhZi0+YmxrX21h
+c2spID4+IHBwYWYtPmJsa19vZmZzZXQ7CisJbC5nLnBnID0gKHIucHBhICYgcHBhZi0+cGdfbWFz
+aykgPj4gcHBhZi0+cGdfb2Zmc2V0OworCWwuZy5wbCA9IChyLnBwYSAmIHBwYWYtPnBsbl9tYXNr
+KSA+PiBwcGFmLT5wbG5fb2Zmc2V0OworCWwuZy5zZWMgPSAoci5wcGEgJiBwcGFmLT5zZWNfbWFz
+aykgPj4gcHBhZi0+c2VjdF9vZmZzZXQ7CiAKIAlyZXR1cm4gbDsKIH0KLS0gCjIuNy40CgoKX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KTGludXgtbnZtZSBt
+YWlsaW5nIGxpc3QKTGludXgtbnZtZUBsaXN0cy5pbmZyYWRlYWQub3JnCmh0dHA6Ly9saXN0cy5p
+bmZyYWRlYWQub3JnL21haWxtYW4vbGlzdGluZm8vbGludXgtbnZtZQo=
