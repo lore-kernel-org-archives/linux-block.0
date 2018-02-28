@@ -1,109 +1,106 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Laurence Oberman <loberman@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 3/5] genirq/affinity: support to do irq vectors spread starting from any vector
-Date: Tue,  6 Feb 2018 20:17:40 +0800
-Message-Id: <20180206121742.29336-4-ming.lei@redhat.com>
-In-Reply-To: <20180206121742.29336-1-ming.lei@redhat.com>
-References: <20180206121742.29336-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:37107 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751789AbeB1A4v (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Feb 2018 19:56:51 -0500
+Received: by mail-pf0-f194.google.com with SMTP id s24so321553pfm.4
+        for <linux-block@vger.kernel.org>; Tue, 27 Feb 2018 16:56:51 -0800 (PST)
+From: Omar Sandoval <osandov@osandov.com>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com,
+        Tejun Heo <tj@kernel.org>
+Subject: [PATCH 2/2] sbitmap: use test_and_set_bit_lock()/clear_bit_unlock()
+Date: Tue, 27 Feb 2018 16:56:43 -0800
+Message-Id: <8e20f73a574b84a72838ad3f4dd67be9e2db70ed.1519779182.git.osandov@fb.com>
+In-Reply-To: <cover.1519779182.git.osandov@fb.com>
+References: <cover.1519779182.git.osandov@fb.com>
+In-Reply-To: <cover.1519779182.git.osandov@fb.com>
+References: <cover.1519779182.git.osandov@fb.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Now two parameters(start_vec, affv) are introduced to irq_build_affinity_masks(),
-then this helper can build the affinity of each irq vector starting from
-the irq vector of 'start_vec', and handle at most 'affv' vectors.
+From: Omar Sandoval <osandov@fb.com>
 
-This way is required to do 2-stages irq vectors spread among all
-possible CPUs.
+sbitmap_queue_get()/sbitmap_queue_clear() are used for
+allocating/freeing a resource, so they should provide acquire/release
+barrier semantics, respectively. sbitmap_get() currently contains a full
+barrier, which is unnecessary, so use test_and_set_bit_lock() instead of
+test_and_set_bit() (these are equivalent on x86_64). sbitmap_clear_bit()
+does not imply any barriers, which is incorrect, as accesses of the
+resource (e.g., request) could potentially get reordered to after the
+clear_bit(). Introduce sbitmap_clear_bit_unlock() and use it for
+sbitmap_queue_clear() (this only adds a compiler barrier on x86_64). The
+other existing user of sbitmap_clear_bit() (the blk-mq software queue
+pending map) is serialized through a spinlock and does not need this.
 
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Reported-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
 ---
- kernel/irq/affinity.c | 23 +++++++++++++++--------
- 1 file changed, 15 insertions(+), 8 deletions(-)
+ include/linux/sbitmap.h |  8 ++++++++
+ lib/sbitmap.c           | 10 +++++-----
+ 2 files changed, 13 insertions(+), 5 deletions(-)
 
-diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
-index 6af3f6727f63..9801aecf8763 100644
---- a/kernel/irq/affinity.c
-+++ b/kernel/irq/affinity.c
-@@ -94,17 +94,17 @@ static int get_nodes_in_cpumask(const cpumask_var_t *node_to_cpumask,
- 	return nodes;
+diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
+index 0dcc60e820de..841585f6e5f2 100644
+--- a/include/linux/sbitmap.h
++++ b/include/linux/sbitmap.h
+@@ -171,6 +171,8 @@ void sbitmap_resize(struct sbitmap *sb, unsigned int depth);
+  *               starting from the last allocated bit. This is less efficient
+  *               than the default behavior (false).
+  *
++ * This operation provides acquire barrier semantics if it succeeds.
++ *
+  * Return: Non-negative allocated bit number if successful, -1 otherwise.
+  */
+ int sbitmap_get(struct sbitmap *sb, unsigned int alloc_hint, bool round_robin);
+@@ -300,6 +302,12 @@ static inline void sbitmap_clear_bit(struct sbitmap *sb, unsigned int bitnr)
+ 	clear_bit(SB_NR_TO_BIT(sb, bitnr), __sbitmap_word(sb, bitnr));
  }
  
--int irq_build_affinity_masks(int nvecs, const struct irq_affinity *affd,
-+int irq_build_affinity_masks(const struct irq_affinity *affd,
-+			     const int start_vec, const int affv,
- 			     const cpumask_var_t *node_to_cpumask,
- 			     const struct cpumask *cpu_mask,
- 			     struct cpumask *nmsk,
- 			     struct cpumask *masks)
++static inline void sbitmap_clear_bit_unlock(struct sbitmap *sb,
++					    unsigned int bitnr)
++{
++	clear_bit_unlock(SB_NR_TO_BIT(sb, bitnr), __sbitmap_word(sb, bitnr));
++}
++
+ static inline int sbitmap_test_bit(struct sbitmap *sb, unsigned int bitnr)
  {
--	int affv = nvecs - affd->pre_vectors - affd->post_vectors;
- 	int last_affv = affv + affd->pre_vectors;
--	int curvec = affd->pre_vectors;
-+	int curvec = start_vec;
- 	nodemask_t nodemsk = NODE_MASK_NONE;
--	int n, nodes, cpus_per_vec, extra_vecs;
-+	int n, nodes, cpus_per_vec, extra_vecs, done = 0;
- 
- 	nodes = get_nodes_in_cpumask(node_to_cpumask, cpu_mask, &nodemsk);
- 
-@@ -116,8 +116,10 @@ int irq_build_affinity_masks(int nvecs, const struct irq_affinity *affd,
- 		for_each_node_mask(n, nodemsk) {
- 			cpumask_copy(masks + curvec,
- 				     node_to_cpumask[n]);
--			if (++curvec == last_affv)
-+			if (++done == affv)
- 				break;
-+			if (++curvec == last_affv)
-+				curvec = affd->pre_vectors;
- 		}
- 		goto out;
- 	}
-@@ -150,13 +152,16 @@ int irq_build_affinity_masks(int nvecs, const struct irq_affinity *affd,
- 			irq_spread_init_one(masks + curvec, nmsk, cpus_per_vec);
+ 	return test_bit(SB_NR_TO_BIT(sb, bitnr), __sbitmap_word(sb, bitnr));
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index 42b5ca0acf93..e6a9c06ec70c 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -100,7 +100,7 @@ static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
+ 			return -1;
  		}
  
--		if (curvec >= last_affv)
-+		done += v;
-+		if (done >= affv)
+-		if (!test_and_set_bit(nr, word))
++		if (!test_and_set_bit_lock(nr, word))
  			break;
-+		if (curvec >= last_affv)
-+			curvec = affd->pre_vectors;
- 		--nodes;
- 	}
  
- out:
--	return curvec - affd->pre_vectors;
-+	return done;
- }
+ 		hint = nr + 1;
+@@ -434,9 +434,9 @@ static void sbq_wake_up(struct sbitmap_queue *sbq)
+ 	/*
+ 	 * Pairs with the memory barrier in set_current_state() to ensure the
+ 	 * proper ordering of clear_bit()/waitqueue_active() in the waker and
+-	 * test_and_set_bit()/prepare_to_wait()/finish_wait() in the waiter. See
+-	 * the comment on waitqueue_active(). This is __after_atomic because we
+-	 * just did clear_bit() in the caller.
++	 * test_and_set_bit_lock()/prepare_to_wait()/finish_wait() in the
++	 * waiter. See the comment on waitqueue_active(). This is __after_atomic
++	 * because we just did clear_bit_unlock() in the caller.
+ 	 */
+ 	smp_mb__after_atomic();
  
- /**
-@@ -169,6 +174,7 @@ int irq_build_affinity_masks(int nvecs, const struct irq_affinity *affd,
- struct cpumask *
- irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+@@ -469,7 +469,7 @@ static void sbq_wake_up(struct sbitmap_queue *sbq)
+ void sbitmap_queue_clear(struct sbitmap_queue *sbq, unsigned int nr,
+ 			 unsigned int cpu)
  {
-+	int affv = nvecs - affd->pre_vectors - affd->post_vectors;
- 	int curvec;
- 	struct cpumask *masks;
- 	cpumask_var_t nmsk, *node_to_cpumask;
-@@ -198,7 +204,8 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 	/* Stabilize the cpumasks */
- 	get_online_cpus();
- 	build_node_to_cpumask(node_to_cpumask);
--	curvec += irq_build_affinity_masks(nvecs, affd, node_to_cpumask,
-+	curvec += irq_build_affinity_masks(affd, curvec, affv,
-+					   node_to_cpumask,
- 					   cpu_possible_mask, nmsk, masks);
- 	put_online_cpus();
- 
+-	sbitmap_clear_bit(&sbq->sb, nr);
++	sbitmap_clear_bit_unlock(&sbq->sb, nr);
+ 	sbq_wake_up(sbq);
+ 	if (likely(!sbq->round_robin && nr < sbq->sb.depth))
+ 		*per_cpu_ptr(sbq->alloc_hint, cpu) = nr;
 -- 
-2.9.5
+2.16.2
