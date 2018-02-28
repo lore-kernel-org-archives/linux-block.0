@@ -1,190 +1,249 @@
-Return-Path: <prvs=590d2a92c=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
+Return-Path: <gunthorp@deltatee.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org,
+	linux-nvdimm@lists.01.org,
+	linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
 	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Kees Cook <keescook@chromium.org>
-Subject: [PATCH v5 4/6] block: Add 'lock' as third argument to blk_alloc_queue_node()
-Date: Wed, 28 Feb 2018 10:15:31 -0800
-Message-Id: <20180228181533.29402-5-bart.vanassche@wdc.com>
-In-Reply-To: <20180228181533.29402-1-bart.vanassche@wdc.com>
-References: <20180228181533.29402-1-bart.vanassche@wdc.com>
+	Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 28 Feb 2018 16:40:02 -0700
+Message-Id: <20180228234006.21093-7-logang@deltatee.com>
+In-Reply-To: <20180228234006.21093-1-logang@deltatee.com>
+References: <20180228234006.21093-1-logang@deltatee.com>
+Subject: [PATCH v2 06/10] IB/core: Add optional PCI P2P flag to rdma_rw_ctx_[init|destroy]()
 List-ID: <linux-block@vger.kernel.org>
 
-This patch does not change any functionality.
+In order to use PCI P2P memory pci_p2pmem_[un]map_sg() functions must be
+called to map the correct DMA address. To do this, we add a flags
+variable and the RDMA_RW_CTX_FLAG_PCI_P2P flag. When the flag is
+specified use the appropriate map function.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Joseph Qi <joseph.qi@linux.alibaba.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Philipp Reisner <philipp.reisner@linbit.com>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: Kees Cook <keescook@chromium.org>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- block/blk-core.c              | 7 ++++---
- block/blk-mq.c                | 2 +-
- drivers/block/null_blk.c      | 3 ++-
- drivers/ide/ide-probe.c       | 2 +-
- drivers/lightnvm/core.c       | 2 +-
- drivers/md/dm.c               | 2 +-
- drivers/nvdimm/pmem.c         | 2 +-
- drivers/nvme/host/multipath.c | 2 +-
- drivers/scsi/scsi_lib.c       | 2 +-
- include/linux/blkdev.h        | 3 ++-
- 10 files changed, 15 insertions(+), 12 deletions(-)
+ drivers/infiniband/core/rw.c            | 21 +++++++++++++++++----
+ drivers/infiniband/ulp/isert/ib_isert.c |  5 +++--
+ drivers/infiniband/ulp/srpt/ib_srpt.c   |  7 ++++---
+ drivers/nvme/target/rdma.c              |  6 +++---
+ include/rdma/rw.h                       |  7 +++++--
+ net/sunrpc/xprtrdma/svc_rdma_rw.c       |  6 +++---
+ 6 files changed, 35 insertions(+), 17 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 2d1a7bbe0634..e873a24bf82d 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -810,7 +810,7 @@ void blk_exit_rl(struct request_queue *q, struct request_list *rl)
+diff --git a/drivers/infiniband/core/rw.c b/drivers/infiniband/core/rw.c
+index c8963e91f92a..775a9f8b15a6 100644
+--- a/drivers/infiniband/core/rw.c
++++ b/drivers/infiniband/core/rw.c
+@@ -12,6 +12,7 @@
+  */
+ #include <linux/moduleparam.h>
+ #include <linux/slab.h>
++#include <linux/pci-p2pdma.h>
+ #include <rdma/mr_pool.h>
+ #include <rdma/rw.h>
  
- struct request_queue *blk_alloc_queue(gfp_t gfp_mask)
+@@ -269,18 +270,24 @@ static int rdma_rw_init_single_wr(struct rdma_rw_ctx *ctx, struct ib_qp *qp,
+  * @remote_addr:remote address to read/write (relative to @rkey)
+  * @rkey:	remote key to operate on
+  * @dir:	%DMA_TO_DEVICE for RDMA WRITE, %DMA_FROM_DEVICE for RDMA READ
++ * @flags:      any of the RDMA_RW_CTX_FLAG_* flags
+  *
+  * Returns the number of WQEs that will be needed on the workqueue if
+  * successful, or a negative error code.
+  */
+ int rdma_rw_ctx_init(struct rdma_rw_ctx *ctx, struct ib_qp *qp, u8 port_num,
+ 		struct scatterlist *sg, u32 sg_cnt, u32 sg_offset,
+-		u64 remote_addr, u32 rkey, enum dma_data_direction dir)
++		u64 remote_addr, u32 rkey, enum dma_data_direction dir,
++		unsigned int flags)
  {
--	return blk_alloc_queue_node(gfp_mask, NUMA_NO_NODE);
-+	return blk_alloc_queue_node(gfp_mask, NUMA_NO_NODE, NULL);
- }
- EXPORT_SYMBOL(blk_alloc_queue);
+ 	struct ib_device *dev = qp->pd->device;
+ 	int ret;
  
-@@ -888,7 +888,8 @@ static void blk_rq_timed_out_timer(struct timer_list *t)
- 	kblockd_schedule_work(&q->timeout_work);
- }
- 
--struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
-+struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id,
-+					   spinlock_t *lock)
- {
- 	struct request_queue *q;
- 
-@@ -1030,7 +1031,7 @@ blk_init_queue_node(request_fn_proc *rfn, spinlock_t *lock, int node_id)
- {
- 	struct request_queue *q;
- 
--	q = blk_alloc_queue_node(GFP_KERNEL, node_id);
-+	q = blk_alloc_queue_node(GFP_KERNEL, node_id, NULL);
- 	if (!q)
- 		return NULL;
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 357492712b0e..7f3772162523 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2554,7 +2554,7 @@ struct request_queue *blk_mq_init_queue(struct blk_mq_tag_set *set)
- {
- 	struct request_queue *uninit_q, *q;
- 
--	uninit_q = blk_alloc_queue_node(GFP_KERNEL, set->numa_node);
-+	uninit_q = blk_alloc_queue_node(GFP_KERNEL, set->numa_node, NULL);
- 	if (!uninit_q)
- 		return ERR_PTR(-ENOMEM);
- 
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index 287a09611c0f..f3d17ea88965 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -1717,7 +1717,8 @@ static int null_add_dev(struct nullb_device *dev)
- 		}
- 		null_init_queues(nullb);
- 	} else if (dev->queue_mode == NULL_Q_BIO) {
--		nullb->q = blk_alloc_queue_node(GFP_KERNEL, dev->home_node);
-+		nullb->q = blk_alloc_queue_node(GFP_KERNEL, dev->home_node,
-+						NULL);
- 		if (!nullb->q) {
- 			rv = -ENOMEM;
- 			goto out_cleanup_queues;
-diff --git a/drivers/ide/ide-probe.c b/drivers/ide/ide-probe.c
-index 17fd55af4d92..2e80a866073c 100644
---- a/drivers/ide/ide-probe.c
-+++ b/drivers/ide/ide-probe.c
-@@ -766,7 +766,7 @@ static int ide_init_queue(ide_drive_t *drive)
- 	 *	limits and LBA48 we could raise it but as yet
- 	 *	do not.
- 	 */
--	q = blk_alloc_queue_node(GFP_KERNEL, hwif_to_node(hwif));
-+	q = blk_alloc_queue_node(GFP_KERNEL, hwif_to_node(hwif), NULL);
- 	if (!q)
- 		return 1;
- 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index dcc9e621e651..5f1988df1593 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -384,7 +384,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 		goto err_dev;
- 	}
- 
--	tqueue = blk_alloc_queue_node(GFP_KERNEL, dev->q->node);
-+	tqueue = blk_alloc_queue_node(GFP_KERNEL, dev->q->node, NULL);
- 	if (!tqueue) {
- 		ret = -ENOMEM;
- 		goto err_disk;
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 68136806d365..7586d249266c 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1841,7 +1841,7 @@ static struct mapped_device *alloc_dev(int minor)
- 	INIT_LIST_HEAD(&md->table_devices);
- 	spin_lock_init(&md->uevent_lock);
- 
--	md->queue = blk_alloc_queue_node(GFP_KERNEL, numa_node_id);
-+	md->queue = blk_alloc_queue_node(GFP_KERNEL, numa_node_id, NULL);
- 	if (!md->queue)
- 		goto bad;
- 	md->queue->queuedata = md;
-diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
-index 10041ac4032c..cfb15ac50925 100644
---- a/drivers/nvdimm/pmem.c
-+++ b/drivers/nvdimm/pmem.c
-@@ -344,7 +344,7 @@ static int pmem_attach_disk(struct device *dev,
- 		return -EBUSY;
- 	}
- 
--	q = blk_alloc_queue_node(GFP_KERNEL, dev_to_node(dev));
-+	q = blk_alloc_queue_node(GFP_KERNEL, dev_to_node(dev), NULL);
- 	if (!q)
+-	ret = ib_dma_map_sg(dev, sg, sg_cnt, dir);
++	if (flags & RDMA_RW_CTX_FLAG_PCI_P2PDMA)
++		ret = pci_p2pdma_map_sg(dev->dma_device, sg, sg_cnt, dir);
++	else
++		ret = ib_dma_map_sg(dev, sg, sg_cnt, dir);
++
+ 	if (!ret)
  		return -ENOMEM;
+ 	sg_cnt = ret;
+@@ -579,9 +586,11 @@ EXPORT_SYMBOL(rdma_rw_ctx_post);
+  * @sg:		scatterlist that was used for the READ/WRITE
+  * @sg_cnt:	number of entries in @sg
+  * @dir:	%DMA_TO_DEVICE for RDMA WRITE, %DMA_FROM_DEVICE for RDMA READ
++ * @flags:      the same flags used to init the context
+  */
+ void rdma_rw_ctx_destroy(struct rdma_rw_ctx *ctx, struct ib_qp *qp, u8 port_num,
+-		struct scatterlist *sg, u32 sg_cnt, enum dma_data_direction dir)
++		struct scatterlist *sg, u32 sg_cnt, enum dma_data_direction dir,
++		unsigned int flags)
+ {
+ 	int i;
  
-diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-index 3b211d9e58b8..cf013784fa85 100644
---- a/drivers/nvme/host/multipath.c
-+++ b/drivers/nvme/host/multipath.c
-@@ -162,7 +162,7 @@ int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl, struct nvme_ns_head *head)
- 	if (!(ctrl->subsys->cmic & (1 << 1)) || !multipath)
- 		return 0;
+@@ -602,7 +611,11 @@ void rdma_rw_ctx_destroy(struct rdma_rw_ctx *ctx, struct ib_qp *qp, u8 port_num,
+ 		break;
+ 	}
  
--	q = blk_alloc_queue_node(GFP_KERNEL, NUMA_NO_NODE);
-+	q = blk_alloc_queue_node(GFP_KERNEL, NUMA_NO_NODE, NULL);
- 	if (!q)
- 		goto out;
- 	q->queuedata = head;
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index a86df9ca7d1c..71d1135f94d0 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2223,7 +2223,7 @@ struct request_queue *scsi_old_alloc_queue(struct scsi_device *sdev)
- 	struct Scsi_Host *shost = sdev->host;
- 	struct request_queue *q;
+-	ib_dma_unmap_sg(qp->pd->device, sg, sg_cnt, dir);
++	if (flags & RDMA_RW_CTX_FLAG_PCI_P2PDMA)
++		pci_p2pdma_unmap_sg(qp->pd->device->dma_device, sg,
++				    sg_cnt, dir);
++	else
++		ib_dma_unmap_sg(qp->pd->device, sg, sg_cnt, dir);
+ }
+ EXPORT_SYMBOL(rdma_rw_ctx_destroy);
  
--	q = blk_alloc_queue_node(GFP_KERNEL, NUMA_NO_NODE);
-+	q = blk_alloc_queue_node(GFP_KERNEL, NUMA_NO_NODE, NULL);
- 	if (!q)
- 		return NULL;
- 	q->cmd_size = sizeof(struct scsi_cmnd) + shost->hostt->cmd_size;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index ed63f3b69c12..667a9b0053d9 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1321,7 +1321,8 @@ extern long nr_blockdev_pages(void);
+diff --git a/drivers/infiniband/ulp/isert/ib_isert.c b/drivers/infiniband/ulp/isert/ib_isert.c
+index fff40b097947..933200645262 100644
+--- a/drivers/infiniband/ulp/isert/ib_isert.c
++++ b/drivers/infiniband/ulp/isert/ib_isert.c
+@@ -1497,7 +1497,8 @@ isert_rdma_rw_ctx_destroy(struct isert_cmd *cmd, struct isert_conn *conn)
+ 				se_cmd->t_prot_nents, dir);
+ 	} else {
+ 		rdma_rw_ctx_destroy(&cmd->rw, conn->qp, conn->cm_id->port_num,
+-				se_cmd->t_data_sg, se_cmd->t_data_nents, dir);
++				se_cmd->t_data_sg, se_cmd->t_data_nents,
++				dir, 0);
+ 	}
  
- bool __must_check blk_get_queue(struct request_queue *);
- struct request_queue *blk_alloc_queue(gfp_t);
--struct request_queue *blk_alloc_queue_node(gfp_t, int);
-+struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id,
-+					   spinlock_t *lock);
- extern void blk_put_queue(struct request_queue *);
- extern void blk_set_queue_dying(struct request_queue *);
+ 	cmd->rw.nr_ops = 0;
+@@ -2152,7 +2153,7 @@ isert_rdma_rw_ctx_post(struct isert_cmd *cmd, struct isert_conn *conn,
+ 	} else {
+ 		ret = rdma_rw_ctx_init(&cmd->rw, conn->qp, port_num,
+ 				se_cmd->t_data_sg, se_cmd->t_data_nents,
+-				offset, addr, rkey, dir);
++				offset, addr, rkey, dir, 0);
+ 	}
+ 
+ 	if (ret < 0) {
+diff --git a/drivers/infiniband/ulp/srpt/ib_srpt.c b/drivers/infiniband/ulp/srpt/ib_srpt.c
+index 0373b7c40902..5dcbe0a18db8 100644
+--- a/drivers/infiniband/ulp/srpt/ib_srpt.c
++++ b/drivers/infiniband/ulp/srpt/ib_srpt.c
+@@ -899,7 +899,8 @@ static int srpt_alloc_rw_ctxs(struct srpt_send_ioctx *ioctx,
+ 			goto unwind;
+ 
+ 		ret = rdma_rw_ctx_init(&ctx->rw, ch->qp, ch->sport->port,
+-				ctx->sg, ctx->nents, 0, remote_addr, rkey, dir);
++				ctx->sg, ctx->nents, 0, remote_addr, rkey,
++				dir, 0);
+ 		if (ret < 0) {
+ 			target_free_sgl(ctx->sg, ctx->nents);
+ 			goto unwind;
+@@ -928,7 +929,7 @@ static int srpt_alloc_rw_ctxs(struct srpt_send_ioctx *ioctx,
+ 		struct srpt_rw_ctx *ctx = &ioctx->rw_ctxs[i];
+ 
+ 		rdma_rw_ctx_destroy(&ctx->rw, ch->qp, ch->sport->port,
+-				ctx->sg, ctx->nents, dir);
++				ctx->sg, ctx->nents, dir, 0);
+ 		target_free_sgl(ctx->sg, ctx->nents);
+ 	}
+ 	if (ioctx->rw_ctxs != &ioctx->s_rw_ctx)
+@@ -946,7 +947,7 @@ static void srpt_free_rw_ctxs(struct srpt_rdma_ch *ch,
+ 		struct srpt_rw_ctx *ctx = &ioctx->rw_ctxs[i];
+ 
+ 		rdma_rw_ctx_destroy(&ctx->rw, ch->qp, ch->sport->port,
+-				ctx->sg, ctx->nents, dir);
++				ctx->sg, ctx->nents, dir, 0);
+ 		target_free_sgl(ctx->sg, ctx->nents);
+ 	}
+ 
+diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
+index 978e169c11bf..020354e11351 100644
+--- a/drivers/nvme/target/rdma.c
++++ b/drivers/nvme/target/rdma.c
+@@ -427,7 +427,7 @@ static void nvmet_rdma_release_rsp(struct nvmet_rdma_rsp *rsp)
+ 	if (rsp->n_rdma) {
+ 		rdma_rw_ctx_destroy(&rsp->rw, queue->cm_id->qp,
+ 				queue->cm_id->port_num, rsp->req.sg,
+-				rsp->req.sg_cnt, nvmet_data_dir(&rsp->req));
++				rsp->req.sg_cnt, nvmet_data_dir(&rsp->req), 0);
+ 	}
+ 
+ 	if (rsp->req.sg != &rsp->cmd->inline_sg)
+@@ -510,7 +510,7 @@ static void nvmet_rdma_read_data_done(struct ib_cq *cq, struct ib_wc *wc)
+ 	atomic_add(rsp->n_rdma, &queue->sq_wr_avail);
+ 	rdma_rw_ctx_destroy(&rsp->rw, queue->cm_id->qp,
+ 			queue->cm_id->port_num, rsp->req.sg,
+-			rsp->req.sg_cnt, nvmet_data_dir(&rsp->req));
++			rsp->req.sg_cnt, nvmet_data_dir(&rsp->req), 0);
+ 	rsp->n_rdma = 0;
+ 
+ 	if (unlikely(wc->status != IB_WC_SUCCESS)) {
+@@ -579,7 +579,7 @@ static u16 nvmet_rdma_map_sgl_keyed(struct nvmet_rdma_rsp *rsp,
+ 
+ 	ret = rdma_rw_ctx_init(&rsp->rw, cm_id->qp, cm_id->port_num,
+ 			rsp->req.sg, rsp->req.sg_cnt, 0, addr, key,
+-			nvmet_data_dir(&rsp->req));
++			nvmet_data_dir(&rsp->req), 0);
+ 	if (ret < 0)
+ 		return NVME_SC_INTERNAL;
+ 	rsp->req.transfer_len += len;
+diff --git a/include/rdma/rw.h b/include/rdma/rw.h
+index a3cbbc7b6417..dbc342b53901 100644
+--- a/include/rdma/rw.h
++++ b/include/rdma/rw.h
+@@ -59,12 +59,15 @@ struct rdma_rw_ctx {
+ 	};
+ };
+ 
++#define RDMA_RW_CTX_FLAG_PCI_P2PDMA  (1 << 0)
++
+ int rdma_rw_ctx_init(struct rdma_rw_ctx *ctx, struct ib_qp *qp, u8 port_num,
+ 		struct scatterlist *sg, u32 sg_cnt, u32 sg_offset,
+-		u64 remote_addr, u32 rkey, enum dma_data_direction dir);
++		u64 remote_addr, u32 rkey, enum dma_data_direction dir,
++		unsigned int flags);
+ void rdma_rw_ctx_destroy(struct rdma_rw_ctx *ctx, struct ib_qp *qp, u8 port_num,
+ 		struct scatterlist *sg, u32 sg_cnt,
+-		enum dma_data_direction dir);
++		enum dma_data_direction dir, unsigned int flags);
+ 
+ int rdma_rw_ctx_signature_init(struct rdma_rw_ctx *ctx, struct ib_qp *qp,
+ 		u8 port_num, struct scatterlist *sg, u32 sg_cnt,
+diff --git a/net/sunrpc/xprtrdma/svc_rdma_rw.c b/net/sunrpc/xprtrdma/svc_rdma_rw.c
+index 12b9a7e0b6d2..4364a8e98470 100644
+--- a/net/sunrpc/xprtrdma/svc_rdma_rw.c
++++ b/net/sunrpc/xprtrdma/svc_rdma_rw.c
+@@ -140,7 +140,7 @@ static void svc_rdma_cc_release(struct svc_rdma_chunk_ctxt *cc,
+ 
+ 		rdma_rw_ctx_destroy(&ctxt->rw_ctx, rdma->sc_qp,
+ 				    rdma->sc_port_num, ctxt->rw_sg_table.sgl,
+-				    ctxt->rw_nents, dir);
++				    ctxt->rw_nents, dir, 0);
+ 		svc_rdma_put_rw_ctxt(rdma, ctxt);
+ 	}
+ 	svc_xprt_put(&rdma->sc_xprt);
+@@ -433,7 +433,7 @@ svc_rdma_build_writes(struct svc_rdma_write_info *info,
+ 		ret = rdma_rw_ctx_init(&ctxt->rw_ctx, rdma->sc_qp,
+ 				       rdma->sc_port_num, ctxt->rw_sg_table.sgl,
+ 				       ctxt->rw_nents, 0, seg_offset,
+-				       seg_handle, DMA_TO_DEVICE);
++				       seg_handle, DMA_TO_DEVICE, 0);
+ 		if (ret < 0)
+ 			goto out_initerr;
+ 
+@@ -639,7 +639,7 @@ static int svc_rdma_build_read_segment(struct svc_rdma_read_info *info,
+ 	ret = rdma_rw_ctx_init(&ctxt->rw_ctx, cc->cc_rdma->sc_qp,
+ 			       cc->cc_rdma->sc_port_num,
+ 			       ctxt->rw_sg_table.sgl, ctxt->rw_nents,
+-			       0, offset, rkey, DMA_FROM_DEVICE);
++			       0, offset, rkey, DMA_FROM_DEVICE, 0);
+ 	if (ret < 0)
+ 		goto out_initerr;
  
 -- 
-2.16.2
+2.11.0
