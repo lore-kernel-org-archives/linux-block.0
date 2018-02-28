@@ -1,247 +1,116 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:47010 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751968AbeB0Q5K (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Feb 2018 11:57:10 -0500
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        Michael Lyle <mlyle@lyle.org>,
-        Junhui Tang <tang.junhui@zte.com.cn>
-Subject: [PATCH v7 8/9] bcache: add io_disable to struct cached_dev
-Date: Wed, 28 Feb 2018 00:55:56 +0800
-Message-Id: <20180227165557.20442-9-colyli@suse.de>
-In-Reply-To: <20180227165557.20442-1-colyli@suse.de>
-References: <20180227165557.20442-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <gunthorp@deltatee.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org,
+	linux-nvdimm@lists.01.org,
+	linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 28 Feb 2018 16:40:04 -0700
+Message-Id: <20180228234006.21093-9-logang@deltatee.com>
+In-Reply-To: <20180228234006.21093-1-logang@deltatee.com>
+References: <20180228234006.21093-1-logang@deltatee.com>
+Subject: [PATCH v2 08/10] nvme-pci: Add support for P2P memory in requests
+List-ID: <linux-block@vger.kernel.org>
 
-If a bcache device is configured to writeback mode, current code does not
-handle write I/O errors on backing devices properly.
+For P2P requests we must use the pci_p2pmem_[un]map_sg() functions
+instead of the dma_map_sg functions.
 
-In writeback mode, write request is written to cache device, and
-latter being flushed to backing device. If I/O failed when writing from
-cache device to the backing device, bcache code just ignores the error and
-upper layer code is NOT noticed that the backing device is broken.
+With that, we can then indicate PCI_P2P support in the request queue.
+For this, we create an NVME_F_PCI_P2P flag which tells the core to
+set QUEUE_FLAG_PCI_P2P in the request queue.
 
-This patch tries to handle backing device failure like how the cache device
-failure is handled,
-- Add a error counter 'io_errors' and error limit 'error_limit' in struct
-  cached_dev. Add another io_disable to struct cached_dev to disable I/Os
-  on the problematic backing device.
-- When I/O error happens on backing device, increase io_errors counter. And
-  if io_errors reaches error_limit, set cache_dev->io_disable to true, and
-  stop the bcache device.
-
-The result is, if backing device is broken of disconnected, and I/O errors
-reach its error limit, backing device will be disabled and the associated
-bcache device will be removed from system.
-
-Changelog:
-v2: remove "bcache: " prefix in pr_error(), and use correct name string to
-    print out bcache device gendisk name.
-v1: indeed this is new added in v2 patch set.
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Cc: Michael Lyle <mlyle@lyle.org>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- drivers/md/bcache/bcache.h  |  6 ++++++
- drivers/md/bcache/io.c      | 14 ++++++++++++++
- drivers/md/bcache/request.c | 14 ++++++++++++--
- drivers/md/bcache/super.c   | 21 +++++++++++++++++++++
- drivers/md/bcache/sysfs.c   | 15 ++++++++++++++-
- 5 files changed, 67 insertions(+), 3 deletions(-)
+ drivers/nvme/host/core.c |  4 ++++
+ drivers/nvme/host/nvme.h |  1 +
+ drivers/nvme/host/pci.c  | 19 +++++++++++++++----
+ 3 files changed, 20 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 5e9f3610c6fd..d338b7086013 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -367,6 +367,7 @@ struct cached_dev {
- 	unsigned		sequential_cutoff;
- 	unsigned		readahead;
- 
-+	unsigned		io_disable:1;
- 	unsigned		verify:1;
- 	unsigned		bypass_torture_test:1;
- 
-@@ -388,6 +389,9 @@ struct cached_dev {
- 	unsigned		writeback_rate_minimum;
- 
- 	enum stop_on_failure	stop_when_cache_set_failed;
-+#define DEFAULT_CACHED_DEV_ERROR_LIMIT	64
-+	atomic_t		io_errors;
-+	unsigned		error_limit;
- };
- 
- enum alloc_reserve {
-@@ -911,6 +915,7 @@ static inline void wait_for_kthread_stop(void)
- 
- /* Forward declarations */
- 
-+void bch_count_backing_io_errors(struct cached_dev *dc, struct bio *bio);
- void bch_count_io_errors(struct cache *, blk_status_t, int, const char *);
- void bch_bbio_count_io_errors(struct cache_set *, struct bio *,
- 			      blk_status_t, const char *);
-@@ -938,6 +943,7 @@ int bch_bucket_alloc_set(struct cache_set *, unsigned,
- 			 struct bkey *, int, bool);
- bool bch_alloc_sectors(struct cache_set *, struct bkey *, unsigned,
- 		       unsigned, unsigned, bool);
-+bool bch_cached_dev_error(struct cached_dev *dc);
- 
- __printf(2, 3)
- bool bch_cache_set_error(struct cache_set *, const char *, ...);
-diff --git a/drivers/md/bcache/io.c b/drivers/md/bcache/io.c
-index 8013ecbcdbda..7fac97ae036e 100644
---- a/drivers/md/bcache/io.c
-+++ b/drivers/md/bcache/io.c
-@@ -50,6 +50,20 @@ void bch_submit_bbio(struct bio *bio, struct cache_set *c,
- }
- 
- /* IO errors */
-+void bch_count_backing_io_errors(struct cached_dev *dc, struct bio *bio)
-+{
-+	char buf[BDEVNAME_SIZE];
-+	unsigned errors;
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 0fe7ea35c221..4dd564f175fa 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2954,7 +2954,11 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
+ 	ns->queue = blk_mq_init_queue(ctrl->tagset);
+ 	if (IS_ERR(ns->queue))
+ 		goto out_free_ns;
 +
-+	WARN_ONCE(!dc, "NULL pointer of struct cached_dev");
+ 	queue_flag_set_unlocked(QUEUE_FLAG_NONROT, ns->queue);
++	if (ctrl->ops->flags & NVME_F_PCI_P2PDMA)
++		queue_flag_set_unlocked(QUEUE_FLAG_PCI_P2PDMA, ns->queue);
 +
-+	errors = atomic_add_return(1, &dc->io_errors);
-+	if (errors < dc->error_limit)
-+		pr_err("%s: IO error on backing device, unrecoverable",
-+			bio_devname(bio, buf));
+ 	ns->queue->queuedata = ns;
+ 	ns->ctrl = ctrl;
+ 
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 0521e4707d1c..e38beb1917e2 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -290,6 +290,7 @@ struct nvme_ctrl_ops {
+ 	unsigned int flags;
+ #define NVME_F_FABRICS			(1 << 0)
+ #define NVME_F_METADATA_SUPPORTED	(1 << 1)
++#define NVME_F_PCI_P2PDMA		(1 << 2)
+ 	int (*reg_read32)(struct nvme_ctrl *ctrl, u32 off, u32 *val);
+ 	int (*reg_write32)(struct nvme_ctrl *ctrl, u32 off, u32 val);
+ 	int (*reg_read64)(struct nvme_ctrl *ctrl, u32 off, u64 *val);
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 56ca79be8476..b896a78225cb 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -796,8 +796,13 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
+ 		goto out;
+ 
+ 	ret = BLK_STS_RESOURCE;
+-	nr_mapped = dma_map_sg_attrs(dev->dev, iod->sg, iod->nents, dma_dir,
+-			DMA_ATTR_NO_WARN);
++
++	if (REQ_IS_PCI_P2PDMA(req))
++		nr_mapped = pci_p2pdma_map_sg(dev->dev, iod->sg, iod->nents,
++					  dma_dir);
 +	else
-+		bch_cached_dev_error(dc);
-+}
++		nr_mapped = dma_map_sg_attrs(dev->dev, iod->sg, iod->nents,
++					     dma_dir,  DMA_ATTR_NO_WARN);
+ 	if (!nr_mapped)
+ 		goto out;
  
- void bch_count_io_errors(struct cache *ca,
- 			 blk_status_t error,
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 0c517dd806a5..d7a463e0250e 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -637,6 +637,8 @@ static void backing_request_endio(struct bio *bio)
+@@ -842,7 +847,12 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
+ 			DMA_TO_DEVICE : DMA_FROM_DEVICE;
  
- 	if (bio->bi_status) {
- 		struct search *s = container_of(cl, struct search, cl);
-+		struct cached_dev *dc = container_of(s->d,
-+						     struct cached_dev, disk);
- 		/*
- 		 * If a bio has REQ_PREFLUSH for writeback mode, it is
- 		 * speically assembled in cached_dev_write() for a non-zero
-@@ -657,6 +659,7 @@ static void backing_request_endio(struct bio *bio)
- 		}
- 		s->recoverable = false;
- 		/* should count I/O error for backing device here */
-+		bch_count_backing_io_errors(dc, bio);
- 	}
- 
- 	bio_put(bio);
-@@ -1065,8 +1068,14 @@ static void detached_dev_end_io(struct bio *bio)
- 			    bio_data_dir(bio),
- 			    &ddip->d->disk->part0, ddip->start_time);
- 
--	kfree(ddip);
-+	if (bio->bi_status) {
-+		struct cached_dev *dc = container_of(ddip->d,
-+						     struct cached_dev, disk);
-+		/* should count I/O error for backing device here */
-+		bch_count_backing_io_errors(dc, bio);
-+	}
- 
-+	kfree(ddip);
- 	bio->bi_end_io(bio);
- }
- 
-@@ -1105,7 +1114,8 @@ static blk_qc_t cached_dev_make_request(struct request_queue *q,
- 	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
- 	int rw = bio_data_dir(bio);
- 
--	if (unlikely(d->c && test_bit(CACHE_SET_IO_DISABLE, &d->c->flags))) {
-+	if (unlikely((d->c && test_bit(CACHE_SET_IO_DISABLE, &d->c->flags)) ||
-+		     dc->io_disable)) {
- 		bio->bi_status = BLK_STS_IOERR;
- 		bio_endio(bio);
- 		return BLK_QC_T_NONE;
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 7f029535edff..cae4caac17da 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1198,6 +1198,9 @@ static int cached_dev_init(struct cached_dev *dc, unsigned block_size)
- 		max(dc->disk.disk->queue->backing_dev_info->ra_pages,
- 		    q->backing_dev_info->ra_pages);
- 
-+	atomic_set(&dc->io_errors, 0);
-+	dc->io_disable = false;
-+	dc->error_limit = DEFAULT_CACHED_DEV_ERROR_LIMIT;
- 	/* default to auto */
- 	dc->stop_when_cache_set_failed = BCH_CACHED_DEV_STOP_AUTO;
- 
-@@ -1352,6 +1355,24 @@ int bch_flash_dev_create(struct cache_set *c, uint64_t size)
- 	return flash_dev_run(c, u);
- }
- 
-+bool bch_cached_dev_error(struct cached_dev *dc)
-+{
-+	char name[BDEVNAME_SIZE];
+ 	if (iod->nents) {
+-		dma_unmap_sg(dev->dev, iod->sg, iod->nents, dma_dir);
++		if (REQ_IS_PCI_P2PDMA(req))
++			pci_p2pdma_unmap_sg(dev->dev, iod->sg, iod->nents,
++					    dma_dir);
++		else
++			dma_unmap_sg(dev->dev, iod->sg, iod->nents, dma_dir);
 +
-+	if (!dc || test_bit(BCACHE_DEV_CLOSING, &dc->disk.flags))
-+		return false;
-+
-+	dc->io_disable = true;
-+	/* make others know io_disable is true earlier */
-+	smp_mb();
-+
-+	pr_err("stop %s: too many IO errors on backing device %s\n",
-+		dc->disk.disk->disk_name, bdevname(dc->bdev, name));
-+
-+	bcache_device_stop(&dc->disk);
-+	return true;
-+}
-+
- /* Cache set */
- 
- __printf(2, 3)
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index f2b3b2686627..bd40d9d0a969 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -141,7 +141,9 @@ SHOW(__bch_cached_dev)
- 	var_print(writeback_delay);
- 	var_print(writeback_percent);
- 	sysfs_hprint(writeback_rate,	dc->writeback_rate.rate << 9);
--
-+	sysfs_hprint(io_errors,		atomic_read(&dc->io_errors));
-+	sysfs_printf(io_error_limit,	"%i", dc->error_limit);
-+	sysfs_printf(io_disable,	"%i", dc->io_disable);
- 	var_print(writeback_rate_update_seconds);
- 	var_print(writeback_rate_i_term_inverse);
- 	var_print(writeback_rate_p_term_inverse);
-@@ -232,6 +234,14 @@ STORE(__cached_dev)
- 	d_strtoul(writeback_rate_i_term_inverse);
- 	d_strtoul_nonzero(writeback_rate_p_term_inverse);
- 
-+	sysfs_strtoul_clamp(io_error_limit, dc->error_limit, 0, INT_MAX);
-+
-+	if (attr == &sysfs_io_disable) {
-+		int v = strtoul_or_return(buf);
-+
-+		dc->io_disable = v ? 1 : 0;
-+	}
-+
- 	d_strtoi_h(sequential_cutoff);
- 	d_strtoi_h(readahead);
- 
-@@ -352,6 +362,9 @@ static struct attribute *bch_cached_dev_files[] = {
- 	&sysfs_writeback_rate_i_term_inverse,
- 	&sysfs_writeback_rate_p_term_inverse,
- 	&sysfs_writeback_rate_debug,
-+	&sysfs_errors,
-+	&sysfs_io_error_limit,
-+	&sysfs_io_disable,
- 	&sysfs_dirty_data,
- 	&sysfs_stripe_size,
- 	&sysfs_partial_stripes_expensive,
+ 		if (blk_integrity_rq(req)) {
+ 			if (req_op(req) == REQ_OP_READ)
+ 				nvme_dif_remap(req, nvme_dif_complete);
+@@ -2422,7 +2432,8 @@ static int nvme_pci_reg_read64(struct nvme_ctrl *ctrl, u32 off, u64 *val)
+ static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
+ 	.name			= "pcie",
+ 	.module			= THIS_MODULE,
+-	.flags			= NVME_F_METADATA_SUPPORTED,
++	.flags			= NVME_F_METADATA_SUPPORTED |
++				  NVME_F_PCI_P2PDMA,
+ 	.reg_read32		= nvme_pci_reg_read32,
+ 	.reg_write32		= nvme_pci_reg_write32,
+ 	.reg_read64		= nvme_pci_reg_read64,
 -- 
-2.16.1
+2.11.0
