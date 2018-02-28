@@ -1,95 +1,123 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	Hou Tao <houtao1@huawei.com>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 4/6] genhd: Fix use after free in __blkdev_get()
-Date: Mon, 26 Feb 2018 13:01:40 +0100
-Message-Id: <20180226120142.25786-5-jack@suse.cz>
-In-Reply-To: <20180226120142.25786-1-jack@suse.cz>
-References: <20180226120142.25786-1-jack@suse.cz>
+Return-Path: <gunthorp@deltatee.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org,
+	linux-nvdimm@lists.01.org,
+	linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 28 Feb 2018 16:40:01 -0700
+Message-Id: <20180228234006.21093-6-logang@deltatee.com>
+In-Reply-To: <20180228234006.21093-1-logang@deltatee.com>
+References: <20180228234006.21093-1-logang@deltatee.com>
+Subject: [PATCH v2 05/10] block: Introduce PCI P2P flags for request and request queue
 List-ID: <linux-block@vger.kernel.org>
 
-When two blkdev_open() calls race with device removal and recreation,
-__blkdev_get() can use looked up gendisk after it is freed:
+QUEUE_FLAG_PCI_P2P is introduced meaning a driver's request queue
+supports targeting P2P memory.
 
-CPU0				CPU1			CPU2
-							del_gendisk(disk);
-							  bdev_unhash_inode(inode);
-blkdev_open()			blkdev_open()
-  bdev = bd_acquire(inode);
-    - creates and returns new inode
-				  bdev = bd_acquire(inode);
-				    - returns the same inode
-  __blkdev_get(devt)		  __blkdev_get(devt)
-    disk = get_gendisk(devt);
-      - got structure of device going away
-							<finish device removal>
-							<new device gets
-							 created under the same
-							 device number>
-				  disk = get_gendisk(devt);
-				    - got new device structure
-				  if (!bdev->bd_openers) {
-				    does the first open
-				  }
-    if (!bdev->bd_openers)
-      - false
-    } else {
-      put_disk_and_module(disk)
-        - remember this was old device - this was last ref and disk is
-          now freed
-    }
-    disk_unblock_events(disk); -> oops
+REQ_PCI_P2P is introduced to indicate a particular bio request is
+directed to/from PCI P2P memory. A request with this flag is not
+accepted unless the corresponding queues have the QUEUE_FLAG_PCI_P2P
+flag set.
 
-Fix the problem by making sure we drop reference to disk in
-__blkdev_get() only after we are really done with it.
-
-Reported-by: Hou Tao <houtao1@huawei.com>
-Tested-by: Hou Tao <houtao1@huawei.com>
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- fs/block_dev.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ block/blk-core.c          |  3 +++
+ include/linux/blk_types.h | 18 +++++++++++++++++-
+ include/linux/blkdev.h    |  3 +++
+ 3 files changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 1dbbf847911a..fe41a76769fa 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1409,6 +1409,7 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 	int ret;
- 	int partno;
- 	int perm = 0;
-+	bool first_open = false;
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 2d1a7bbe0634..36a6a304a559 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -2183,6 +2183,9 @@ generic_make_request_checks(struct bio *bio)
+ 	if ((bio->bi_opf & REQ_NOWAIT) && !queue_is_rq_based(q))
+ 		goto not_supported;
  
- 	if (mode & FMODE_READ)
- 		perm |= MAY_READ;
-@@ -1435,6 +1436,7 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 	disk_block_events(disk);
- 	mutex_lock_nested(&bdev->bd_mutex, for_part);
- 	if (!bdev->bd_openers) {
-+		first_open = true;
- 		bdev->bd_disk = disk;
- 		bdev->bd_queue = disk->queue;
- 		bdev->bd_contains = bdev;
-@@ -1520,14 +1522,15 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode, int for_part)
- 			if (ret)
- 				goto out_unlock_bdev;
- 		}
--		/* only one opener holds refs to the module and disk */
--		put_disk_and_module(disk);
- 	}
- 	bdev->bd_openers++;
- 	if (for_part)
- 		bdev->bd_part_count++;
- 	mutex_unlock(&bdev->bd_mutex);
- 	disk_unblock_events(disk);
-+	/* only one opener holds refs to the module and disk */
-+	if (!first_open)
-+		put_disk_and_module(disk);
- 	return 0;
++	if ((bio->bi_opf & REQ_PCI_P2PDMA) && !blk_queue_pci_p2pdma(q))
++		goto not_supported;
++
+ 	if (should_fail_bio(bio))
+ 		goto end_io;
  
-  out_clear:
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index bf18b95ed92d..490122c85b3f 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -274,6 +274,10 @@ enum req_flag_bits {
+ 	__REQ_BACKGROUND,	/* background IO */
+ 	__REQ_NOWAIT,           /* Don't wait if request will block */
+ 
++#ifdef CONFIG_PCI_P2PDMA
++	__REQ_PCI_P2PDMA,	/* request is to/from P2P memory */
++#endif
++
+ 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
+ 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
+ 
+@@ -298,6 +302,18 @@ enum req_flag_bits {
+ #define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
+ #define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
+ 
++#ifdef CONFIG_PCI_P2PDMA
++/*
++ * Currently SGLs do not support mixed P2P and regular memory so
++ * requests with P2P memory must not be merged.
++ */
++#define REQ_PCI_P2PDMA		(1ULL << __REQ_PCI_P2PDMA)
++#define REQ_IS_PCI_P2PDMA(req)	((req)->cmd_flags & REQ_PCI_P2PDMA)
++#else
++#define REQ_PCI_P2PDMA		0
++#define REQ_IS_PCI_P2PDMA(req)	0
++#endif /* CONFIG_PCI_P2PDMA */
++
+ #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
+ 
+ #define REQ_DRV			(1ULL << __REQ_DRV)
+@@ -306,7 +322,7 @@ enum req_flag_bits {
+ 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
+ 
+ #define REQ_NOMERGE_FLAGS \
+-	(REQ_NOMERGE | REQ_PREFLUSH | REQ_FUA)
++	(REQ_NOMERGE | REQ_PREFLUSH | REQ_FUA | REQ_PCI_P2PDMA)
+ 
+ #define bio_op(bio) \
+ 	((bio)->bi_opf & REQ_OP_MASK)
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index ed63f3b69c12..0b4a386c73ea 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -698,6 +698,7 @@ struct request_queue {
+ #define QUEUE_FLAG_SCSI_PASSTHROUGH 27	/* queue supports SCSI commands */
+ #define QUEUE_FLAG_QUIESCED    28	/* queue has been quiesced */
+ #define QUEUE_FLAG_PREEMPT_ONLY	29	/* only process REQ_PREEMPT requests */
++#define QUEUE_FLAG_PCI_P2PDMA  30	/* device supports pci p2p requests */
+ 
+ #define QUEUE_FLAG_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
+ 				 (1 << QUEUE_FLAG_SAME_COMP)	|	\
+@@ -793,6 +794,8 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
+ #define blk_queue_dax(q)	test_bit(QUEUE_FLAG_DAX, &(q)->queue_flags)
+ #define blk_queue_scsi_passthrough(q)	\
+ 	test_bit(QUEUE_FLAG_SCSI_PASSTHROUGH, &(q)->queue_flags)
++#define blk_queue_pci_p2pdma(q)	\
++	test_bit(QUEUE_FLAG_PCI_P2PDMA, &(q)->queue_flags)
+ 
+ #define blk_noretry_request(rq) \
+ 	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
 -- 
-2.13.6
+2.11.0
