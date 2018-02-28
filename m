@@ -1,112 +1,32 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f65.google.com ([209.85.160.65]:45839 "EHLO
-        mail-pl0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751872AbeB0Rtm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Feb 2018 12:49:42 -0500
-Received: by mail-pl0-f65.google.com with SMTP id v9-v6so9808105plp.12
-        for <linux-block@vger.kernel.org>; Tue, 27 Feb 2018 09:49:42 -0800 (PST)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Tang Junhui <tang.junhui@zte.com.cn>
-Subject: [PATCH 2/2] bcache: fix kcrashes with fio in RAID5 backend dev
-Date: Tue, 27 Feb 2018 09:49:30 -0800
-Message-Id: <20180227174930.15911-3-mlyle@lyle.org>
-In-Reply-To: <20180227174930.15911-1-mlyle@lyle.org>
-References: <20180227174930.15911-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=59071c28a=Damien.LeMoal@wdc.com>
+From: Damien Le Moal <Damien.LeMoal@wdc.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>, Jens Axboe <axboe@kernel.dk>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Christoph
+ Hellwig <hch@lst.de>, Omar Sandoval <osandov@fb.com>, Ming Lei
+	<ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>, Johannes Thumshirn
+	<jthumshirn@suse.de>
+Subject: Re: [PATCH 2/2] blk-mq-debugfs: Show zone locking information
+Date: Wed, 28 Feb 2018 01:52:38 +0000
+Message-ID: <6e2b1ef0-98ff-284a-e77b-61b05b3caf4b@wdc.com>
+References: <20180228003214.3194-1-bart.vanassche@wdc.com>
+ <20180228003214.3194-3-bart.vanassche@wdc.com>
+In-Reply-To: <20180228003214.3194-3-bart.vanassche@wdc.com>
+Reply-To: Damien Le Moal <Damien.LeMoal@wdc.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
-
-Kernel crashed when run fio in a RAID5 backend bcache device, the call
-trace is bellow:
-[  440.012034] kernel BUG at block/blk-ioc.c:146!
-[  440.012696] invalid opcode: 0000 [#1] SMP NOPTI
-[  440.026537] CPU: 2 PID: 2205 Comm: md127_raid5 Not tainted 4.15.0 #8
-[  440.027441] Hardware name: HP ProLiant MicroServer Gen8, BIOS J06 07/16
-/2015
-[  440.028615] RIP: 0010:put_io_context+0x8b/0x90
-[  440.029246] RSP: 0018:ffffa8c882b43af8 EFLAGS: 00010246
-[  440.029990] RAX: 0000000000000000 RBX: ffffa8c88294fca0 RCX: 0000000000
-0f4240
-[  440.031006] RDX: 0000000000000004 RSI: 0000000000000286 RDI: ffffa8c882
-94fca0
-[  440.032030] RBP: ffffa8c882b43b10 R08: 0000000000000003 R09: ffff949cb8
-0c1700
-[  440.033206] R10: 0000000000000104 R11: 000000000000b71c R12: 00000000000
-01000
-[  440.034222] R13: 0000000000000000 R14: ffff949cad84db70 R15: ffff949cb11
-bd1e0
-[  440.035239] FS:  0000000000000000(0000) GS:ffff949cba280000(0000) knlGS:
-0000000000000000
-[  440.060190] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  440.084967] CR2: 00007ff0493ef000 CR3: 00000002f1e0a002 CR4: 00000000001
-606e0
-[  440.110498] Call Trace:
-[  440.135443]  bio_disassociate_task+0x1b/0x60
-[  440.160355]  bio_free+0x1b/0x60
-[  440.184666]  bio_put+0x23/0x30
-[  440.208272]  search_free+0x23/0x40 [bcache]
-[  440.231448]  cached_dev_write_complete+0x31/0x70 [bcache]
-[  440.254468]  closure_put+0xb6/0xd0 [bcache]
-[  440.277087]  request_endio+0x30/0x40 [bcache]
-[  440.298703]  bio_endio+0xa1/0x120
-[  440.319644]  handle_stripe+0x418/0x2270 [raid456]
-[  440.340614]  ? load_balance+0x17b/0x9c0
-[  440.360506]  handle_active_stripes.isra.58+0x387/0x5a0 [raid456]
-[  440.380675]  ? __release_stripe+0x15/0x20 [raid456]
-[  440.400132]  raid5d+0x3ed/0x5d0 [raid456]
-[  440.419193]  ? schedule+0x36/0x80
-[  440.437932]  ? schedule_timeout+0x1d2/0x2f0
-[  440.456136]  md_thread+0x122/0x150
-[  440.473687]  ? wait_woken+0x80/0x80
-[  440.491411]  kthread+0x102/0x140
-[  440.508636]  ? find_pers+0x70/0x70
-[  440.524927]  ? kthread_associate_blkcg+0xa0/0xa0
-[  440.541791]  ret_from_fork+0x35/0x40
-[  440.558020] Code: c2 48 00 5b 41 5c 41 5d 5d c3 48 89 c6 4c 89 e7 e8 bb c2
-48 00 48 8b 3d bc 36 4b 01 48 89 de e8 7c f7 e0 ff 5b 41 5c 41 5d 5d c3 <0f> 0b
-0f 1f 00 0f 1f 44 00 00 55 48 8d 47 b8 48 89 e5 41 57 41
-[  440.610020] RIP: put_io_context+0x8b/0x90 RSP: ffffa8c882b43af8
-[  440.628575] ---[ end trace a1fd79d85643a73e ]--
-
-All the crash issue happened when a bypass IO coming, in such scenario
-s->iop.bio is pointed to the s->orig_bio. In search_free(), it finishes the
-s->orig_bio by calling bio_complete(), and after that, s->iop.bio became
-invalid, then kernel would crash when calling bio_put(). Maybe its upper
-layer's faulty, since bio should not be freed before we calling bio_put(),
-but we'd better calling bio_put() first before calling bio_complete() to
-notify upper layer ending this bio.
-
-This patch moves bio_complete() under bio_put() to avoid kernel crash.
-
-[mlyle: fixed commit subject for character limits]
-
-Reported-by: Matthias Ferdinand <bcache@mfedv.net>
-Tested-by: Matthias Ferdinand <bcache@mfedv.net>
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/request.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 1a46b41dac70..6422846b546e 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -659,11 +659,11 @@ static void do_bio_hook(struct search *s, struct bio *orig_bio)
- static void search_free(struct closure *cl)
- {
- 	struct search *s = container_of(cl, struct search, cl);
--	bio_complete(s);
- 
- 	if (s->iop.bio)
- 		bio_put(s->iop.bio);
- 
-+	bio_complete(s);
- 	closure_debug_destroy(cl);
- 	mempool_free(s, s->d->c->search);
- }
--- 
-2.14.1
+QmFydCwNCg0KT24gMjAxOC8wMi8yNyAxNjozMiwgQmFydCBWYW4gQXNzY2hlIHdyb3RlOg0KPiBX
+aGVuIGRlYnVnZ2luZyB0aGUgWkJDIGNvZGUgaW4gdGhlIG1xLWRlYWRsaW5lIHNjaGVkdWxlciBp
+dCBpcyB2ZXJ5DQo+IGltcG9ydGFudCB0byBrbm93IHdoaWNoIHpvbmVzIGFyZSBsb2NrZWQgYW5k
+IHdoaWNoIHpvbmVzIGFyZSBub3QNCj4gbG9ja2VkLiBIZW5jZSB0aGlzIHBhdGNoIHRoYXQgZXhw
+b3J0cyB0aGUgem9uZSBsb2NraW5nIGluZm9ybWF0aW9uDQo+IHRocm91Z2ggZGVidWdmcy4NCj4g
+DQo+IFNpZ25lZC1vZmYtYnk6IEJhcnQgVmFuIEFzc2NoZSA8YmFydC52YW5hc3NjaGVAd2RjLmNv
+bT4NCj4gQ2M6IE9tYXIgU2FuZG92YWwgPG9zYW5kb3ZAZmIuY29tPg0KPiBDYzogRGFtaWVuIExl
+IE1vYWwgPGRhbWllbi5sZW1vYWxAd2RjLmNvbT4NCj4gQ2M6IE1pbmcgTGVpIDxtaW5nLmxlaUBy
+ZWRoYXQuY29tPg0KPiBDYzogSGFubmVzIFJlaW5lY2tlIDxoYXJlQHN1c2UuZGU+DQo+IENjOiBK
+b2hhbm5lcyBUaHVtc2hpcm4gPGp0aHVtc2hpcm5Ac3VzZS5kZT4NCg0KSXQgd291bGQgYmUgbmlj
+ZSB0byBhZGQgdGhlIHNhbWUgdG8gbGVnYWN5IGRlYWRsaW5lIHRvby4NCg0KRm9yIHRoaXMgcGF0
+Y2g6DQoNClJldmlld2VkLWJ5OiBEYW1pZW4gTGUgTW9hbCA8ZGFtaWVuLmxlbW9hbEB3ZGMuY29t
+Pg0KVGVzdGVkLWJ5OiBEYW1pZW4gTGUgTW9hbCA8ZGFtaWVuLmxlbW9hbEB3ZGMuY29tPg0KDQoN
+Ci0tIA0KRGFtaWVuIExlIE1vYWwNCldlc3Rlcm4gRGlnaXRhbCBSZXNlYXJjaA==
