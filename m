@@ -1,37 +1,44 @@
-Return-Path: <jonas.rabenstein@studium.uni-erlangen.de>
-From: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-To: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
-	Scott Bauer <scott.bauer@intel.com>,
-	Jonathan Derrick <jonathan.derrick@intel.com>,
-	Jens Axboe <axboe@kernel.dk>
+Return-Path: <prvs=590d2a92c=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] block: sed-opal: fix u64 short atom length
-Date: Tue, 20 Feb 2018 20:20:39 +0100
-Message-Id: <20180220192039.3912-2-jonas.rabenstein@studium.uni-erlangen.de>
-In-Reply-To: <20180220192039.3912-1-jonas.rabenstein@studium.uni-erlangen.de>
-References: <20180220192039.3912-1-jonas.rabenstein@studium.uni-erlangen.de>
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	"Nicholas A . Bellinger" <nab@linux-iscsi.org>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 08/11] target/tcm_loop: Use blk_queue_flag_set()
+Date: Wed, 28 Feb 2018 11:28:20 -0800
+Message-Id: <20180228192823.5191-9-bart.vanassche@wdc.com>
+In-Reply-To: <20180228192823.5191-1-bart.vanassche@wdc.com>
+References: <20180228192823.5191-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-The length must be given as bytes and not as 4 bit tuples.
+Use blk_queue_flag_set() instead of open-coding this function.
 
-Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Nicholas A. Bellinger <nab@linux-iscsi.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Ming Lei <ming.lei@redhat.com>
 ---
- block/sed-opal.c | 2 +-
+ drivers/target/loopback/tcm_loop.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 36842bfa572e..d5f565e1557a 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -562,7 +562,7 @@ static void add_token_u64(int *err, struct opal_dev *cmd, u64 number)
- 	}
+diff --git a/drivers/target/loopback/tcm_loop.c b/drivers/target/loopback/tcm_loop.c
+index 9cd4ffe76c07..60d5b918c4ac 100644
+--- a/drivers/target/loopback/tcm_loop.c
++++ b/drivers/target/loopback/tcm_loop.c
+@@ -309,7 +309,7 @@ static int tcm_loop_target_reset(struct scsi_cmnd *sc)
  
- 	msb = fls(number);
--	len = DIV_ROUND_UP(msb, 4);
-+	len = DIV_ROUND_UP(msb, 8);
+ static int tcm_loop_slave_alloc(struct scsi_device *sd)
+ {
+-	set_bit(QUEUE_FLAG_BIDI, &sd->request_queue->queue_flags);
++	blk_queue_flag_set(QUEUE_FLAG_BIDI, sd->request_queue);
+ 	return 0;
+ }
  
- 	if (cmd->pos >= IO_BUFFER_LENGTH - len - 1) {
- 		pr_debug("Error adding u64: end of buffer.\n");
 -- 
-2.13.6
+2.16.2
