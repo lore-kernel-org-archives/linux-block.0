@@ -1,67 +1,162 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:65085 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933430AbeB1T20 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Feb 2018 14:28:26 -0500
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 05/11] mtip32xx: Use the blk_queue_flag_*() functions
-Date: Wed, 28 Feb 2018 11:28:17 -0800
-Message-Id: <20180228192823.5191-6-bart.vanassche@wdc.com>
-In-Reply-To: <20180228192823.5191-1-bart.vanassche@wdc.com>
-References: <20180228192823.5191-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <gunthorp@deltatee.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org,
+	linux-nvdimm@lists.01.org,
+	linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 28 Feb 2018 16:40:00 -0700
+Message-Id: <20180228234006.21093-5-logang@deltatee.com>
+In-Reply-To: <20180228234006.21093-1-logang@deltatee.com>
+References: <20180228234006.21093-1-logang@deltatee.com>
+Subject: [PATCH v2 04/10] PCI/P2PDMA: Clear ACS P2P flags for all devices behind switches
+List-ID: <linux-block@vger.kernel.org>
 
-Use the blk_queue_flag_*() functions instead of open-coding these.
+For peer-to-peer transactions to work the downstream ports in each
+switch must not have the ACS flags set. At this time there is no way
+to dynamically change the flags and update the corresponding IOMMU
+groups so this is done at enumeration time before the the groups are
+assigned.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Ming Lei <ming.lei@redhat.com>
+This effectively means that if CONFIG_PCI_P2PDMA is selected then
+all devices behind any switch will be in the same IOMMU group.
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- drivers/block/mtip32xx/mtip32xx.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/pci/Kconfig        |  4 ++++
+ drivers/pci/p2pdma.c       | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ drivers/pci/pci.c          |  4 ++++
+ include/linux/pci-p2pdma.h |  5 +++++
+ 4 files changed, 57 insertions(+)
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index b8af7352a18f..769c551e3d71 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -159,7 +159,7 @@ static bool mtip_check_surprise_removal(struct pci_dev *pdev)
- 	if (vendor_id == 0xFFFF) {
- 		dd->sr = true;
- 		if (dd->queue)
--			set_bit(QUEUE_FLAG_DEAD, &dd->queue->queue_flags);
-+			blk_queue_flag_set(QUEUE_FLAG_DEAD, dd->queue);
- 		else
- 			dev_warn(&dd->pdev->dev,
- 				"%s: dd->queue is NULL\n", __func__);
-@@ -3855,8 +3855,8 @@ static int mtip_block_initialize(struct driver_data *dd)
- 		goto start_service_thread;
+diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
+index 840831418cbd..a430672f0ad4 100644
+--- a/drivers/pci/Kconfig
++++ b/drivers/pci/Kconfig
+@@ -138,6 +138,10 @@ config PCI_P2PDMA
+ 	  it's hard to tell which support it with good performance, so
+ 	  at this time you will need a PCIe switch.
  
- 	/* Set device limits. */
--	set_bit(QUEUE_FLAG_NONROT, &dd->queue->queue_flags);
--	clear_bit(QUEUE_FLAG_ADD_RANDOM, &dd->queue->queue_flags);
-+	blk_queue_flag_set(QUEUE_FLAG_NONROT, dd->queue);
-+	blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, dd->queue);
- 	blk_queue_max_segments(dd->queue, MTIP_MAX_SG);
- 	blk_queue_physical_block_size(dd->queue, 4096);
- 	blk_queue_max_hw_sectors(dd->queue, 0xffff);
-@@ -3866,7 +3866,7 @@ static int mtip_block_initialize(struct driver_data *dd)
++	  Enabling this option will also disable ACS on all ports behind
++	  any PCIe switch. This effictively puts all devices behind any
++	  switch into the same IOMMU group.
++
+ 	  If unsure, say N.
  
- 	/* Signal trim support */
- 	if (dd->trim_supp == true) {
--		set_bit(QUEUE_FLAG_DISCARD, &dd->queue->queue_flags);
-+		blk_queue_flag_set(QUEUE_FLAG_DISCARD, dd->queue);
- 		dd->queue->limits.discard_granularity = 4096;
- 		blk_queue_max_discard_sectors(dd->queue,
- 			MTIP_MAX_TRIM_ENTRY_LEN * MTIP_MAX_TRIM_ENTRIES);
+ config PCI_LABEL
+diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+index 4e1c81f64b29..61af07acd21a 100644
+--- a/drivers/pci/p2pdma.c
++++ b/drivers/pci/p2pdma.c
+@@ -255,6 +255,50 @@ static struct pci_dev *get_upstream_bridge_port(struct pci_dev *pdev)
+ 	return up2;
+ }
+ 
++/*
++ * pci_p2pdma_disable_acs - disable ACS flags for ports in PCI
++ *	bridges/switches
++ * @pdev: device to disable ACS flags for
++ *
++ * The ACS flags for P2P Request Redirect and P2P Completion Redirect need
++ * to be disabled on any downstream port in any switch in order for
++ * the TLPs to not be forwarded up to the RC which is not what we want
++ * for P2P.
++ *
++ * This function is called when the devices are first enumerated and
++ * will result in all devices behind any switch to be in the same IOMMU
++ * group. At this time there is no way to "hotplug" IOMMU groups so we rely
++ * on this largish hammer. If you need the devices to be in separate groups
++ * don't enable CONFIG_PCI_P2PDMA.
++ *
++ * Returns 1 if the ACS bits for this device were cleared, otherwise 0.
++ */
++int pci_p2pdma_disable_acs(struct pci_dev *pdev)
++{
++	struct pci_dev *up;
++	int pos;
++	u16 ctrl;
++
++	up = get_upstream_bridge_port(pdev);
++	if (!up)
++		return 0;
++	pci_dev_put(up);
++
++	pos = pci_find_ext_capability(pdev, PCI_EXT_CAP_ID_ACS);
++	if (!pos)
++		return 0;
++
++	dev_info(&pdev->dev, "disabling ACS flags for peer-to-peer DMA\n");
++
++	pci_read_config_word(pdev, pos + PCI_ACS_CTRL, &ctrl);
++
++	ctrl &= ~(PCI_ACS_RR | PCI_ACS_CR);
++
++	pci_write_config_word(pdev, pos + PCI_ACS_CTRL, ctrl);
++
++	return 1;
++}
++
+ static bool __upstream_bridges_match(struct pci_dev *upstream,
+ 				     struct pci_dev *client)
+ {
+diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+index f6a4dd10d9b0..95ad3cf288c8 100644
+--- a/drivers/pci/pci.c
++++ b/drivers/pci/pci.c
+@@ -16,6 +16,7 @@
+ #include <linux/of.h>
+ #include <linux/of_pci.h>
+ #include <linux/pci.h>
++#include <linux/pci-p2pdma.h>
+ #include <linux/pm.h>
+ #include <linux/slab.h>
+ #include <linux/module.h>
+@@ -2826,6 +2827,9 @@ static void pci_std_enable_acs(struct pci_dev *dev)
+  */
+ void pci_enable_acs(struct pci_dev *dev)
+ {
++	if (pci_p2pdma_disable_acs(dev))
++		return;
++
+ 	if (!pci_acs_enable)
+ 		return;
+ 
+diff --git a/include/linux/pci-p2pdma.h b/include/linux/pci-p2pdma.h
+index 126eca697ab3..f537f521f60c 100644
+--- a/include/linux/pci-p2pdma.h
++++ b/include/linux/pci-p2pdma.h
+@@ -22,6 +22,7 @@ struct block_device;
+ struct scatterlist;
+ 
+ #ifdef CONFIG_PCI_P2PDMA
++int pci_p2pdma_disable_acs(struct pci_dev *pdev);
+ int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar, size_t size,
+ 		u64 offset);
+ int pci_p2pdma_add_client(struct list_head *head, struct device *dev);
+@@ -41,6 +42,10 @@ int pci_p2pdma_map_sg(struct device *dev, struct scatterlist *sg, int nents,
+ void pci_p2pdma_unmap_sg(struct device *dev, struct scatterlist *sg, int nents,
+ 			 enum dma_data_direction dir);
+ #else /* CONFIG_PCI_P2PDMA */
++static inline int pci_p2pdma_disable_acs(struct pci_dev *pdev)
++{
++	return 0;
++}
+ static inline int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar,
+ 		size_t size, u64 offset)
+ {
 -- 
-2.16.2
+2.11.0
