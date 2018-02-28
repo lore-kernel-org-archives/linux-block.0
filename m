@@ -1,87 +1,84 @@
-Return-Path: <prvs=59071c28a=Damien.LeMoal@wdc.com>
-From: Damien Le Moal <Damien.LeMoal@wdc.com>
-To: Ming Lei <ming.lei@redhat.com>, Bart Van Assche <Bart.VanAssche@wdc.com>
-CC: Jens Axboe <axboe@kernel.dk>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, Hannes
- Reinecke <hare@suse.com>
-Subject: Re: [PATCH] blk-mq: Make sure that the affected zone is unlocked if a
- request times out
-Date: Wed, 28 Feb 2018 02:21:49 +0000
-Message-ID: <7354e215-9f6a-acde-112a-e9f81a34b7d4@wdc.com>
+Return-Path: <ming.lei@redhat.com>
+Date: Wed, 28 Feb 2018 09:35:38 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <damien.lemoal@wdc.com>,
+	Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH] blk-mq: Make sure that the affected zone is unlocked if
+ a request times out
+Message-ID: <20180228013537.GD11230@ming.t460p>
 References: <20180228002830.3052-1-bart.vanassche@wdc.com>
- <20180228013537.GD11230@ming.t460p>
-In-Reply-To: <20180228013537.GD11230@ming.t460p>
-Reply-To: Damien Le Moal <Damien.LeMoal@wdc.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180228002830.3052-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-TWluZywNCg0KT24gMjAxOC8wMi8yNyAxNzozNSwgTWluZyBMZWkgd3JvdGU6DQo+IE9uIFR1ZSwg
-RmViIDI3LCAyMDE4IGF0IDA0OjI4OjMwUE0gLTA4MDAsIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToN
-Cj4+IElmIGEgcmVxdWVzdCB0aW1lcyBvdXQgdGhlIC5jb21wbGV0ZWRfcmVxdWVzdCgpIG1ldGhv
-ZCBpcyBub3QgY2FsbGVkDQo+IA0KPiBJZiBCTEtfRUhfSEFORExFRCBpcyByZXR1cm5lZCBmcm9t
-IC50aW1lb3V0KCksIF9fYmxrX21xX2NvbXBsZXRlX3JlcXVlc3QoKQ0KPiBzaG91bGQgaGF2ZSBj
-YWxsZWQgLmNvbXBsZXRlZF9yZXF1ZXN0KCkuIE90aGVyd2lzZSwgc29tZXdoZXJlIG1heSBiZQ0K
-PiB3cm9uZyBhYm91dCB0aW1lb3V0IGhhbmRsaW5nLiBDb3VsZCB5b3UgaW52ZXN0aWdhdGUgd2h5
-IC5jb21wbGV0ZWRfcmVxdWVzdA0KPiBpc24ndCBjYWxsZWQgdW5kZXIgdGhpcyBzaXR1YXRpb24/
-DQoNCkFjdHVhbGx5LCB0aGUgY29tbWl0IG1lc3NhZ2UgaXMgYSBsaXR0bGUgbWlzbGVhZGluZy4g
-VGhlIHByb2JsZW0gaXMgbm90IG9ubHkgZm9yDQp0aW1lb3V0IGJ1dCBhbHNvIGZvciBjb21tYW5k
-cyBjb21wbGV0aW5nIHdpdGggYSBmYWlsdXJlLiBUaGlzIGlzIHZlcnkgZWFzeSB0bw0KcmVwcm9k
-dWNlIGJ5IHNpbXBseSBkb2luZyBhbiB1bmFsaWduZWQgd3JpdGUgdG8gYSBzZXF1ZW50aWFsIHpv
-bmUgb24gYW4gQVRBDQp6b25lZCBibG9jayBkZXZpY2UuIEluIHRoaXMgY2FzZSwgdGhlIHNjaGVk
-dWxlciAuY29tcGxldGVkX3JlcXVlc3QgbWV0aG9kIGlzIG5vdA0KY2FsbGVkLCB3aGljaCByZXN1
-bHQgaW4gdGhlIHRhcmdldCB6b25lIG9mIHRoZSBmYWlsZWQgd3JpdGUgdG8gcmVtYWluIGxvY2tl
-ZC4NCg0KSGVuY2UgdGhlIGFkZGl0aW9uIG9mIGEgLmZpbmlzaF9yZXF1ZXN0IG1ldGhvZCBpbiBt
-cS1kZWFkbGluZSBwb2ludGluZyB0byB0aGUNCnNhbWUgZnVuY3Rpb24gYXMgLmNvbXBsZXRlZF9y
-ZXF1ZXN0IHRvIGVuc3VyZSB0aGF0IHRoZSBjb21tYW5kIHRhcmdldCB6b25lIGlzDQp1bmxvY2tl
-ZC4gVG8gZW5zdXJlIHRoYXQgdGhlIC5maW5pc2hfcmVxdWVzdCBtZXRob2QgaXMgY2FsbGVkLCB0
-aGUgUlFGX0VMVlBSSVYNCmZsYWcgaXMgc2V0IHdoZW4gdGhlIHJlcXVlc3QgaXMgZGlzcGF0Y2hl
-ZCBhZnRlciB0aGUgdGFyZ2V0IHpvbmUgd2FzIGxvY2tlZC4NCg0KPj4gYW5kIHRoZSAuZmluaXNo
-X3JlcXVlc3QoKSBtZXRob2QgaXMgb25seSBjYWxsZWQgaWYgUlFGX0VMVlBSSVYgaGFzDQo+IA0K
-PiAuZmluaXNoX3JlcXVlc3QoKSBpcyBjb3VudGVyLXBhaXIgb2YgLnByZXBhcmVfcmVxdWVzdCgp
-LCBhbmQgYm90aA0KPiBhcmVuJ3QgaW1wbGVtZW50ZWQgYnkgbXEtZGVhZGxpbmUsIHNvIFJRRl9F
-TFZQUklWIG5lZWRuJ3QgdG8gYmUgc2V0LA0KPiBhbmQgdGhlIGN1cnJlbnQgcnVsZSBpcyB0aGF0
-IHRoaXMgZmxhZyBpcyBtYW5hZ2VkIGJ5IGJsb2NrIGNvcmUuDQoNCkluZGVlZC4gU28gZG8geW91
-IHRoaW5rIGl0IHdvdWxkIGJlIGJldHRlciB0byByYXRoZXIgZm9yY2UgYSBjYWxsIHRvDQouY29t
-cGxldGVkX3JlcXVlc3QgZm9yIGZhaWxlZCBjb21tYW5kIGluIEFUQSBjYXNlID8gQ3VycmVudGx5
-LCBpdCBpcyBub3QgY2FsbGVkDQphZnRlciBhbGwgcmV0cmllcyBmb3IgdGhlIGNvbW1hbmQgZmFp
-bGVkLg0KDQo+IA0KPj4gYmVlbiBzZXQuIEhlbmNlIHRoaXMgcGF0Y2ggdGhhdCBzZXRzIFJRRl9F
-TFZQUklWIGFuZCB0aGF0IGFkZHMgYQ0KPj4gLmZpbmlzaF9yZXF1ZXN0KCkgbWV0aG9kLiBXaXRo
-b3V0IHRoaXMgcGF0Y2gsIGlmIGEgcmVxdWVzdCB0aW1lcyBvdXQNCj4+IHRoZSB6b25lIHRoYXQg
-cmVxdWVzdCBhcHBsaWVzIHRvIHJlbWFpbnMgbG9ja2VkIGZvcmV2ZXIgYW5kIG5vIGZ1cnRoZXIN
-Cj4+IHdyaXRlcyBhcmUgYWNjZXB0ZWQgZm9yIHRoYXQgem9uZS4NCj4+DQo+PiBGaXhlczogNTcw
-MGY2OTE3OGU5ICgibXEtZGVhZGxpbmU6IEludHJvZHVjZSB6b25lIGxvY2tpbmcgc3VwcG9ydCIp
-DQo+PiBTaWduZWQtb2ZmLWJ5OiBEYW1pZW4gTGUgTW9hbCA8ZGFtaWVuLmxlbW9hbEB3ZGMuY29t
-Pg0KPj4gU2lnbmVkLW9mZi1ieTogQmFydCBWYW4gQXNzY2hlIDxiYXJ0LnZhbmFzc2NoZUB3ZGMu
-Y29tPg0KPj4gQ2M6IEhhbm5lcyBSZWluZWNrZSA8aGFyZUBzdXNlLmNvbT4NCj4+IENjOiBNaW5n
-IExlaSA8bWluZy5sZWlAcmVkaGF0LmNvbT4NCj4+IC0tLQ0KPj4gIGJsb2NrL21xLWRlYWRsaW5l
-LmMgfCA4ICsrKysrKy0tDQo+PiAgMSBmaWxlIGNoYW5nZWQsIDYgaW5zZXJ0aW9ucygrKSwgMiBk
-ZWxldGlvbnMoLSkNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvYmxvY2svbXEtZGVhZGxpbmUuYyBiL2Js
-b2NrL21xLWRlYWRsaW5lLmMNCj4+IGluZGV4IGM1NmYyMTFjODQ0MC4uNTVkNWI3YTAyZDYyIDEw
-MDY0NA0KPj4gLS0tIGEvYmxvY2svbXEtZGVhZGxpbmUuYw0KPj4gKysrIGIvYmxvY2svbXEtZGVh
-ZGxpbmUuYw0KPj4gQEAgLTM2Nyw3ICszNjcsOCBAQCBzdGF0aWMgc3RydWN0IHJlcXVlc3QgKl9f
-ZGRfZGlzcGF0Y2hfcmVxdWVzdChzdHJ1Y3QgZGVhZGxpbmVfZGF0YSAqZGQpDQo+PiAgCSAqIElm
-IHRoZSByZXF1ZXN0IG5lZWRzIGl0cyB0YXJnZXQgem9uZSBsb2NrZWQsIGRvIGl0Lg0KPj4gIAkg
-Ki8NCj4+ICAJYmxrX3JlcV96b25lX3dyaXRlX2xvY2socnEpOw0KPj4gLQlycS0+cnFfZmxhZ3Mg
-fD0gUlFGX1NUQVJURUQ7DQo+PiArCS8qIFNldCBSUUZfRUxWUFJJViB0byBlbnN1cmUgdGhhdCAu
-ZmluaXNoX3JlcXVlc3QoKSBnZXRzIGNhbGxlZCAqLw0KPj4gKwlycS0+cnFfZmxhZ3MgfD0gUlFG
-X1NUQVJURUQgfCBSUUZfRUxWUFJJVjsNCj4+ICAJcmV0dXJuIHJxOw0KPj4gIH0NCj4+ICANCj4+
-IEBAIC01MzksNyArNTQwLDkgQEAgc3RhdGljIHZvaWQgZGRfaW5zZXJ0X3JlcXVlc3RzKHN0cnVj
-dCBibGtfbXFfaHdfY3R4ICpoY3R4LA0KPj4gICAqIEZvciB6b25lZCBibG9jayBkZXZpY2VzLCB3
-cml0ZSB1bmxvY2sgdGhlIHRhcmdldCB6b25lIG9mDQo+PiAgICogY29tcGxldGVkIHdyaXRlIHJl
-cXVlc3RzLiBEbyB0aGlzIHdoaWxlIGhvbGRpbmcgdGhlIHpvbmUgbG9jaw0KPj4gICAqIHNwaW5s
-b2NrIHNvIHRoYXQgdGhlIHpvbmUgaXMgbmV2ZXIgdW5sb2NrZWQgd2hpbGUgZGVhZGxpbmVfZmlm
-b19yZXF1ZXN0KCkNCj4+IC0gKiB3aGlsZSBkZWFkbGluZV9uZXh0X3JlcXVlc3QoKSBhcmUgZXhl
-Y3V0aW5nLg0KPj4gKyAqIHdoaWxlIGRlYWRsaW5lX25leHRfcmVxdWVzdCgpIGFyZSBleGVjdXRp
-bmcuIFRoaXMgZnVuY3Rpb24gaXMgY2FsbGVkIHR3aWNlDQo+PiArICogZm9yIHJlcXVlc3RzIHRo
-YXQgY29tcGxldGUgaW4gYSBub3JtYWwgd2F5IGFuZCBvbmNlIGZvciByZXF1ZXN0cyB0aGF0IHRp
-bWUNCj4+ICsgKiBvdXQuDQo+PiAgICovDQo+PiAgc3RhdGljIHZvaWQgZGRfY29tcGxldGVkX3Jl
-cXVlc3Qoc3RydWN0IHJlcXVlc3QgKnJxKQ0KPj4gIHsNCj4+IEBAIC03NTcsNiArNzYwLDcgQEAg
-c3RhdGljIHN0cnVjdCBlbGV2YXRvcl90eXBlIG1xX2RlYWRsaW5lID0gew0KPj4gIAkJLmluc2Vy
-dF9yZXF1ZXN0cwk9IGRkX2luc2VydF9yZXF1ZXN0cywNCj4+ICAJCS5kaXNwYXRjaF9yZXF1ZXN0
-CT0gZGRfZGlzcGF0Y2hfcmVxdWVzdCwNCj4+ICAJCS5jb21wbGV0ZWRfcmVxdWVzdAk9IGRkX2Nv
-bXBsZXRlZF9yZXF1ZXN0LA0KPj4gKwkJLmZpbmlzaF9yZXF1ZXN0CQk9IGRkX2NvbXBsZXRlZF9y
-ZXF1ZXN0LA0KPj4gIAkJLm5leHRfcmVxdWVzdAkJPSBlbHZfcmJfbGF0dGVyX3JlcXVlc3QsDQo+
-PiAgCQkuZm9ybWVyX3JlcXVlc3QJCT0gZWx2X3JiX2Zvcm1lcl9yZXF1ZXN0LA0KPj4gIAkJLmJp
-b19tZXJnZQkJPSBkZF9iaW9fbWVyZ2UsDQo+PiAtLSANCj4+IDIuMTYuMg0KPj4NCj4gDQoNCg0K
-LS0gDQpEYW1pZW4gTGUgTW9hbA0KV2VzdGVybiBEaWdpdGFsIFJlc2VhcmNo
+On Tue, Feb 27, 2018 at 04:28:30PM -0800, Bart Van Assche wrote:
+> If a request times out the .completed_request() method is not called
+
+If BLK_EH_HANDLED is returned from .timeout(), __blk_mq_complete_request()
+should have called .completed_request(). Otherwise, somewhere may be
+wrong about timeout handling. Could you investigate why .completed_request
+isn't called under this situation?
+
+> and the .finish_request() method is only called if RQF_ELVPRIV has
+
+.finish_request() is counter-pair of .prepare_request(), and both
+aren't implemented by mq-deadline, so RQF_ELVPRIV needn't to be set,
+and the current rule is that this flag is managed by block core.
+
+> been set. Hence this patch that sets RQF_ELVPRIV and that adds a
+> .finish_request() method. Without this patch, if a request times out
+> the zone that request applies to remains locked forever and no further
+> writes are accepted for that zone.
+> 
+> Fixes: 5700f69178e9 ("mq-deadline: Introduce zone locking support")
+> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/mq-deadline.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+> index c56f211c8440..55d5b7a02d62 100644
+> --- a/block/mq-deadline.c
+> +++ b/block/mq-deadline.c
+> @@ -367,7 +367,8 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd)
+>  	 * If the request needs its target zone locked, do it.
+>  	 */
+>  	blk_req_zone_write_lock(rq);
+> -	rq->rq_flags |= RQF_STARTED;
+> +	/* Set RQF_ELVPRIV to ensure that .finish_request() gets called */
+> +	rq->rq_flags |= RQF_STARTED | RQF_ELVPRIV;
+>  	return rq;
+>  }
+>  
+> @@ -539,7 +540,9 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
+>   * For zoned block devices, write unlock the target zone of
+>   * completed write requests. Do this while holding the zone lock
+>   * spinlock so that the zone is never unlocked while deadline_fifo_request()
+> - * while deadline_next_request() are executing.
+> + * while deadline_next_request() are executing. This function is called twice
+> + * for requests that complete in a normal way and once for requests that time
+> + * out.
+>   */
+>  static void dd_completed_request(struct request *rq)
+>  {
+> @@ -757,6 +760,7 @@ static struct elevator_type mq_deadline = {
+>  		.insert_requests	= dd_insert_requests,
+>  		.dispatch_request	= dd_dispatch_request,
+>  		.completed_request	= dd_completed_request,
+> +		.finish_request		= dd_completed_request,
+>  		.next_request		= elv_rb_latter_request,
+>  		.former_request		= elv_rb_former_request,
+>  		.bio_merge		= dd_bio_merge,
+> -- 
+> 2.16.2
+> 
+
+-- 
+Ming
