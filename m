@@ -1,59 +1,83 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:38594 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752885AbeB1Ptw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Feb 2018 10:49:52 -0500
+Received: by mail-wm0-f65.google.com with SMTP id z9so5923406wmb.3
+        for <linux-block@vger.kernel.org>; Wed, 28 Feb 2018 07:49:52 -0800 (PST)
 From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
 To: mb@lightnvm.io
-Subject: [PATCH 02/19] lightnvm: add controller capabilities to 2.0
-Date: Mon, 26 Feb 2018 14:17:01 +0100
-Message-Id: <1519651038-16845-3-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
-References: <1519651038-16845-1-git-send-email-javier@cnexlabs.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 04/15] lightnvm: add shorten OCSSD version in geo
+Date: Wed, 28 Feb 2018 16:49:24 +0100
+Message-Id: <1519832975-25432-5-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1519832975-25432-1-git-send-email-javier@cnexlabs.com>
+References: <1519832975-25432-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org,
- =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="utf-8"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-QXNzaWduIG1pc3NpbmcgbWNjYXAgdmFsdWUgb24gMi4wIHBhdGgKClNpZ25lZC1vZmYtYnk6IEph
-dmllciBHb256w6FsZXogPGphdmllckBjbmV4bGFicy5jb20+Ci0tLQogZHJpdmVycy9udm1lL2hv
-c3QvbGlnaHRudm0uYyB8IDQgKysrLQogaW5jbHVkZS9saW51eC9saWdodG52bS5oICAgICB8IDgg
-KysrKystLS0KIDIgZmlsZXMgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygt
-KQoKZGlmZiAtLWdpdCBhL2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMgYi9kcml2ZXJzL252
-bWUvaG9zdC9saWdodG52bS5jCmluZGV4IDhmNTQxMzMxYjFhOS4uMTAzOTJhNjY0YjUwIDEwMDY0
-NAotLS0gYS9kcml2ZXJzL252bWUvaG9zdC9saWdodG52bS5jCisrKyBiL2RyaXZlcnMvbnZtZS9o
-b3N0L2xpZ2h0bnZtLmMKQEAgLTMxOCw3ICszMTgsNyBAQCBzdGF0aWMgaW50IG52bWVfbnZtX3Nl
-dHVwXzEyKHN0cnVjdCBudm1lX252bV9pZDEyICppZCwKIAlkZXZfZ2VvLT5jLndzX29wdCA9IHNl
-Y19wZXJfcGc7CiAJZGV2X2dlby0+Yy5td19jdW5pdHMgPSA4OwkJLyogZGVmYXVsdCB0byBNTEMg
-c2FmZSB2YWx1ZXMgKi8KIAotCWRldl9nZW8tPmMubWNjYXAgPSBsZTMyX3RvX2NwdShzcmMtPm1j
-Y2FwKTsKKwlkZXZfZ2VvLT5jLmNhcCA9IGxlMzJfdG9fY3B1KHNyYy0+bWNjYXApOwogCiAJZGV2
-X2dlby0+Yy50cmR0ID0gbGUzMl90b19jcHUoc3JjLT50cmR0KTsKIAlkZXZfZ2VvLT5jLnRyZG0g
-PSBsZTMyX3RvX2NwdShzcmMtPnRyZG0pOwpAQCAtMzk5LDYgKzM5OSw4IEBAIHN0YXRpYyBpbnQg
-bnZtZV9udm1fc2V0dXBfMjAoc3RydWN0IG52bWVfbnZtX2lkMjAgKmlkLAogCWRldl9nZW8tPmMu
-d3Nfb3B0ID0gbGUzMl90b19jcHUoaWQtPndzX29wdCk7CiAJZGV2X2dlby0+Yy5td19jdW5pdHMg
-PSBsZTMyX3RvX2NwdShpZC0+bXdfY3VuaXRzKTsKIAorCWRldl9nZW8tPmMuY2FwID0gbGUzMl90
-b19jcHUoaWQtPm1jY2FwKTsKKwogCWRldl9nZW8tPmMudHJkdCA9IGxlMzJfdG9fY3B1KGlkLT50
-cmR0KTsKIAlkZXZfZ2VvLT5jLnRyZG0gPSBsZTMyX3RvX2NwdShpZC0+dHJkbSk7CiAJZGV2X2dl
-by0+Yy50cHJ0ID0gbGUzMl90b19jcHUoaWQtPnR3cnQpOwpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9s
-aW51eC9saWdodG52bS5oIGIvaW5jbHVkZS9saW51eC9saWdodG52bS5oCmluZGV4IDQ1MzdjMDE0
-MDM4Ni4uNDI3MDRjNGNhOWFmIDEwMDY0NAotLS0gYS9pbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmgK
-KysrIGIvaW5jbHVkZS9saW51eC9saWdodG52bS5oCkBAIC0yNzMsOCArMjczLDEwIEBAIHN0cnVj
-dCBudm1fY29tbW9uX2dlbyB7CiAJdTMyCXdzX29wdDsJCS8qIG9wdGltYWwgd3JpdGUgc2l6ZSAq
-LwogCXUzMgltd19jdW5pdHM7CS8qIGRpc3RhbmNlIHJlcXVpcmVkIGZvciBzdWNjZXNzZnVsIHJl
-YWQgKi8KIAotCS8qIGRldmljZSBjYXBhYmlsaXRpZXMgKi8KLQl1MzIJbWNjYXA7CisJLyogZGV2
-aWNlIGNhcGFiaWxpdGllcy4gTm90ZSB0aGF0IHRoaXMgcmVwcmVzZW50cyBjYXBhYmlsaXRpZXMg
-aW4gMS4yCisJICogYW5kIG1lZGlhIGFuZCBjb250cm9sbGVyIGNhcGFiaWxpdGllcyBpbiAyLjAK
-KwkgKi8KKwl1MzIJY2FwOwogCiAJLyogZGV2aWNlIHRpbWluZ3MgKi8KIAl1MzIJdHJkdDsJCS8q
-IEF2Zy4gVHJlYWQgKG5zKSAqLwpAQCAtMjg5LDcgKzI5MSw3IEBAIHN0cnVjdCBudm1fY29tbW9u
-X2dlbyB7CiAKIAkvKiAxLjIgY29tcGF0aWJpbGl0eSAqLwogCXU4CXZtbnQ7Ci0JdTMyCWNhcDsK
-Kwl1MzIJbWNjYXA7CiAJdTMyCWRvbTsKIAogCXU4CW10eXBlOwotLSAKMi43LjQKCgpfX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpMaW51eC1udm1lIG1haWxp
-bmcgbGlzdApMaW51eC1udm1lQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xpc3RzLmluZnJh
-ZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1udm1lCg==
+Create a shorten version to use in the generic geometry.
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
+---
+ drivers/nvme/host/lightnvm.c | 6 ++++++
+ include/linux/lightnvm.h     | 8 ++++++++
+ 2 files changed, 14 insertions(+)
+
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index a600e70b6e6b..85f336a79cda 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -299,6 +299,9 @@ static int nvme_nvm_setup_12(struct nvme_nvm_id12 *id,
+ 	geo->major_ver_id = id->ver_id;
+ 	geo->minor_ver_id = 2;
+ 
++	/* Set compacted version for upper layers */
++	geo->version = NVM_OCSSD_SPEC_12;
++
+ 	geo->nr_chnls = src->num_ch;
+ 	geo->nr_luns = src->num_lun;
+ 	geo->all_luns = geo->nr_chnls * geo->nr_luns;
+@@ -385,6 +388,9 @@ static int nvme_nvm_setup_20(struct nvme_nvm_id20 *id,
+ 	geo->major_ver_id = id->mjr;
+ 	geo->minor_ver_id = id->mnr;
+ 
++	/* Set compacted version for upper layers */
++	geo->version = NVM_OCSSD_SPEC_20;
++
+ 	if (!(geo->major_ver_id == 2 && geo->minor_ver_id == 0)) {
+ 		pr_err("nvm: OCSSD version not supported (v%d.%d)\n",
+ 				geo->major_ver_id, geo->minor_ver_id);
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 4b2ecbf45fd9..b8bc158a2472 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -23,6 +23,11 @@ enum {
+ #define NVM_LUN_BITS (8)
+ #define NVM_CH_BITS  (7)
+ 
++enum {
++	NVM_OCSSD_SPEC_12 = 12,
++	NVM_OCSSD_SPEC_20 = 20,
++};
++
+ struct ppa_addr {
+ 	/* Generic structure for all addresses */
+ 	union {
+@@ -266,6 +271,9 @@ struct nvm_geo {
+ 	u8	major_ver_id;
+ 	u8	minor_ver_id;
+ 
++	/* kernel short version */
++	u8	version;
++
+ 	/* instance specific geometry */
+ 	int nr_chnls;
+ 	int nr_luns;		/* per channel */
+-- 
+2.7.4
