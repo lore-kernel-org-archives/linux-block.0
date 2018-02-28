@@ -1,32 +1,67 @@
-Return-Path: <prvs=59071c28a=Damien.LeMoal@wdc.com>
-From: Damien Le Moal <Damien.LeMoal@wdc.com>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>, Jens Axboe <axboe@kernel.dk>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Christoph
- Hellwig <hch@lst.de>, Omar Sandoval <osandov@fb.com>, Ming Lei
-	<ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>, Johannes Thumshirn
-	<jthumshirn@suse.de>
-Subject: Re: [PATCH 2/2] blk-mq-debugfs: Show zone locking information
-Date: Wed, 28 Feb 2018 01:52:38 +0000
-Message-ID: <6e2b1ef0-98ff-284a-e77b-61b05b3caf4b@wdc.com>
+Return-Path: <prvs=590d2a92c=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <damien.lemoal@wdc.com>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Omar Sandoval <osandov@fb.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>
+Subject: [PATCH 2/2] blk-mq-debugfs: Show zone locking information
+Date: Tue, 27 Feb 2018 16:32:14 -0800
+Message-Id: <20180228003214.3194-3-bart.vanassche@wdc.com>
+In-Reply-To: <20180228003214.3194-1-bart.vanassche@wdc.com>
 References: <20180228003214.3194-1-bart.vanassche@wdc.com>
- <20180228003214.3194-3-bart.vanassche@wdc.com>
-In-Reply-To: <20180228003214.3194-3-bart.vanassche@wdc.com>
-Reply-To: Damien Le Moal <Damien.LeMoal@wdc.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-QmFydCwNCg0KT24gMjAxOC8wMi8yNyAxNjozMiwgQmFydCBWYW4gQXNzY2hlIHdyb3RlOg0KPiBX
-aGVuIGRlYnVnZ2luZyB0aGUgWkJDIGNvZGUgaW4gdGhlIG1xLWRlYWRsaW5lIHNjaGVkdWxlciBp
-dCBpcyB2ZXJ5DQo+IGltcG9ydGFudCB0byBrbm93IHdoaWNoIHpvbmVzIGFyZSBsb2NrZWQgYW5k
-IHdoaWNoIHpvbmVzIGFyZSBub3QNCj4gbG9ja2VkLiBIZW5jZSB0aGlzIHBhdGNoIHRoYXQgZXhw
-b3J0cyB0aGUgem9uZSBsb2NraW5nIGluZm9ybWF0aW9uDQo+IHRocm91Z2ggZGVidWdmcy4NCj4g
-DQo+IFNpZ25lZC1vZmYtYnk6IEJhcnQgVmFuIEFzc2NoZSA8YmFydC52YW5hc3NjaGVAd2RjLmNv
-bT4NCj4gQ2M6IE9tYXIgU2FuZG92YWwgPG9zYW5kb3ZAZmIuY29tPg0KPiBDYzogRGFtaWVuIExl
-IE1vYWwgPGRhbWllbi5sZW1vYWxAd2RjLmNvbT4NCj4gQ2M6IE1pbmcgTGVpIDxtaW5nLmxlaUBy
-ZWRoYXQuY29tPg0KPiBDYzogSGFubmVzIFJlaW5lY2tlIDxoYXJlQHN1c2UuZGU+DQo+IENjOiBK
-b2hhbm5lcyBUaHVtc2hpcm4gPGp0aHVtc2hpcm5Ac3VzZS5kZT4NCg0KSXQgd291bGQgYmUgbmlj
-ZSB0byBhZGQgdGhlIHNhbWUgdG8gbGVnYWN5IGRlYWRsaW5lIHRvby4NCg0KRm9yIHRoaXMgcGF0
-Y2g6DQoNClJldmlld2VkLWJ5OiBEYW1pZW4gTGUgTW9hbCA8ZGFtaWVuLmxlbW9hbEB3ZGMuY29t
-Pg0KVGVzdGVkLWJ5OiBEYW1pZW4gTGUgTW9hbCA8ZGFtaWVuLmxlbW9hbEB3ZGMuY29tPg0KDQoN
-Ci0tIA0KRGFtaWVuIExlIE1vYWwNCldlc3Rlcm4gRGlnaXRhbCBSZXNlYXJjaA==
+When debugging the ZBC code in the mq-deadline scheduler it is very
+important to know which zones are locked and which zones are not
+locked. Hence this patch that exports the zone locking information
+through debugfs.
+
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ block/blk-mq-debugfs.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index eaf282e239b0..1be2116e09b5 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -206,11 +206,27 @@ static ssize_t queue_write_hint_store(void *data, const char __user *buf,
+ 	return count;
+ }
+ 
++static int queue_zone_wlock_show(void *data, struct seq_file *m)
++{
++	struct request_queue *q = data;
++	unsigned int i;
++
++	if (!q->seq_zones_wlock)
++		return 0;
++
++	for (i = 0; i < blk_queue_nr_zones(q); i++)
++		if (test_bit(i, q->seq_zones_wlock))
++			seq_printf(m, "%u\n", i);
++
++	return 0;
++}
++
+ static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
+ 	{ "poll_stat", 0400, queue_poll_stat_show },
+ 	{ "requeue_list", 0400, .seq_ops = &queue_requeue_list_seq_ops },
+ 	{ "state", 0600, queue_state_show, queue_state_write },
+ 	{ "write_hints", 0600, queue_write_hint_show, queue_write_hint_store },
++	{ "zone_wlock", 0400, queue_zone_wlock_show, NULL },
+ 	{ },
+ };
+ 
+-- 
+2.16.2
