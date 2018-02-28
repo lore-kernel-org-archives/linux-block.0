@@ -1,35 +1,190 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f65.google.com ([209.85.160.65]:34659 "EHLO
-        mail-pl0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751788AbeB1A4u (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Feb 2018 19:56:50 -0500
-Received: by mail-pl0-f65.google.com with SMTP id u13-v6so490898plq.1
-        for <linux-block@vger.kernel.org>; Tue, 27 Feb 2018 16:56:49 -0800 (PST)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com,
-        Tejun Heo <tj@kernel.org>
-Subject: [PATCH 0/2] block: sbitmap tweaks
-Date: Tue, 27 Feb 2018 16:56:41 -0800
-Message-Id: <cover.1519779182.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=590d2a92c=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Kees Cook <keescook@chromium.org>
+Subject: [PATCH v5 4/6] block: Add 'lock' as third argument to blk_alloc_queue_node()
+Date: Wed, 28 Feb 2018 10:15:31 -0800
+Message-Id: <20180228181533.29402-5-bart.vanassche@wdc.com>
+In-Reply-To: <20180228181533.29402-1-bart.vanassche@wdc.com>
+References: <20180228181533.29402-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+This patch does not change any functionality.
 
-Two fixlets inspired by Tejun's patch
-(https://patchwork.kernel.org/patch/10226749/). Patch 2 is what we
-discussed on that patch, patch 1 is a small preparation.
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Philipp Reisner <philipp.reisner@linbit.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: Kees Cook <keescook@chromium.org>
+---
+ block/blk-core.c              | 7 ++++---
+ block/blk-mq.c                | 2 +-
+ drivers/block/null_blk.c      | 3 ++-
+ drivers/ide/ide-probe.c       | 2 +-
+ drivers/lightnvm/core.c       | 2 +-
+ drivers/md/dm.c               | 2 +-
+ drivers/nvdimm/pmem.c         | 2 +-
+ drivers/nvme/host/multipath.c | 2 +-
+ drivers/scsi/scsi_lib.c       | 2 +-
+ include/linux/blkdev.h        | 3 ++-
+ 10 files changed, 15 insertions(+), 12 deletions(-)
 
-Omar Sandoval (2):
-  block: clear ctx pending bit under ctx lock
-  sbitmap: use test_and_set_bit_lock()/clear_bit_unlock()
-
- block/blk-mq.c          |  2 +-
- include/linux/sbitmap.h |  8 ++++++++
- lib/sbitmap.c           | 10 +++++-----
- 3 files changed, 14 insertions(+), 6 deletions(-)
-
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 2d1a7bbe0634..e873a24bf82d 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -810,7 +810,7 @@ void blk_exit_rl(struct request_queue *q, struct request_list *rl)
+ 
+ struct request_queue *blk_alloc_queue(gfp_t gfp_mask)
+ {
+-	return blk_alloc_queue_node(gfp_mask, NUMA_NO_NODE);
++	return blk_alloc_queue_node(gfp_mask, NUMA_NO_NODE, NULL);
+ }
+ EXPORT_SYMBOL(blk_alloc_queue);
+ 
+@@ -888,7 +888,8 @@ static void blk_rq_timed_out_timer(struct timer_list *t)
+ 	kblockd_schedule_work(&q->timeout_work);
+ }
+ 
+-struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
++struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id,
++					   spinlock_t *lock)
+ {
+ 	struct request_queue *q;
+ 
+@@ -1030,7 +1031,7 @@ blk_init_queue_node(request_fn_proc *rfn, spinlock_t *lock, int node_id)
+ {
+ 	struct request_queue *q;
+ 
+-	q = blk_alloc_queue_node(GFP_KERNEL, node_id);
++	q = blk_alloc_queue_node(GFP_KERNEL, node_id, NULL);
+ 	if (!q)
+ 		return NULL;
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 357492712b0e..7f3772162523 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2554,7 +2554,7 @@ struct request_queue *blk_mq_init_queue(struct blk_mq_tag_set *set)
+ {
+ 	struct request_queue *uninit_q, *q;
+ 
+-	uninit_q = blk_alloc_queue_node(GFP_KERNEL, set->numa_node);
++	uninit_q = blk_alloc_queue_node(GFP_KERNEL, set->numa_node, NULL);
+ 	if (!uninit_q)
+ 		return ERR_PTR(-ENOMEM);
+ 
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index 287a09611c0f..f3d17ea88965 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -1717,7 +1717,8 @@ static int null_add_dev(struct nullb_device *dev)
+ 		}
+ 		null_init_queues(nullb);
+ 	} else if (dev->queue_mode == NULL_Q_BIO) {
+-		nullb->q = blk_alloc_queue_node(GFP_KERNEL, dev->home_node);
++		nullb->q = blk_alloc_queue_node(GFP_KERNEL, dev->home_node,
++						NULL);
+ 		if (!nullb->q) {
+ 			rv = -ENOMEM;
+ 			goto out_cleanup_queues;
+diff --git a/drivers/ide/ide-probe.c b/drivers/ide/ide-probe.c
+index 17fd55af4d92..2e80a866073c 100644
+--- a/drivers/ide/ide-probe.c
++++ b/drivers/ide/ide-probe.c
+@@ -766,7 +766,7 @@ static int ide_init_queue(ide_drive_t *drive)
+ 	 *	limits and LBA48 we could raise it but as yet
+ 	 *	do not.
+ 	 */
+-	q = blk_alloc_queue_node(GFP_KERNEL, hwif_to_node(hwif));
++	q = blk_alloc_queue_node(GFP_KERNEL, hwif_to_node(hwif), NULL);
+ 	if (!q)
+ 		return 1;
+ 
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index dcc9e621e651..5f1988df1593 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -384,7 +384,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ 		goto err_dev;
+ 	}
+ 
+-	tqueue = blk_alloc_queue_node(GFP_KERNEL, dev->q->node);
++	tqueue = blk_alloc_queue_node(GFP_KERNEL, dev->q->node, NULL);
+ 	if (!tqueue) {
+ 		ret = -ENOMEM;
+ 		goto err_disk;
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 68136806d365..7586d249266c 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1841,7 +1841,7 @@ static struct mapped_device *alloc_dev(int minor)
+ 	INIT_LIST_HEAD(&md->table_devices);
+ 	spin_lock_init(&md->uevent_lock);
+ 
+-	md->queue = blk_alloc_queue_node(GFP_KERNEL, numa_node_id);
++	md->queue = blk_alloc_queue_node(GFP_KERNEL, numa_node_id, NULL);
+ 	if (!md->queue)
+ 		goto bad;
+ 	md->queue->queuedata = md;
+diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
+index 10041ac4032c..cfb15ac50925 100644
+--- a/drivers/nvdimm/pmem.c
++++ b/drivers/nvdimm/pmem.c
+@@ -344,7 +344,7 @@ static int pmem_attach_disk(struct device *dev,
+ 		return -EBUSY;
+ 	}
+ 
+-	q = blk_alloc_queue_node(GFP_KERNEL, dev_to_node(dev));
++	q = blk_alloc_queue_node(GFP_KERNEL, dev_to_node(dev), NULL);
+ 	if (!q)
+ 		return -ENOMEM;
+ 
+diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
+index 3b211d9e58b8..cf013784fa85 100644
+--- a/drivers/nvme/host/multipath.c
++++ b/drivers/nvme/host/multipath.c
+@@ -162,7 +162,7 @@ int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl, struct nvme_ns_head *head)
+ 	if (!(ctrl->subsys->cmic & (1 << 1)) || !multipath)
+ 		return 0;
+ 
+-	q = blk_alloc_queue_node(GFP_KERNEL, NUMA_NO_NODE);
++	q = blk_alloc_queue_node(GFP_KERNEL, NUMA_NO_NODE, NULL);
+ 	if (!q)
+ 		goto out;
+ 	q->queuedata = head;
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index a86df9ca7d1c..71d1135f94d0 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -2223,7 +2223,7 @@ struct request_queue *scsi_old_alloc_queue(struct scsi_device *sdev)
+ 	struct Scsi_Host *shost = sdev->host;
+ 	struct request_queue *q;
+ 
+-	q = blk_alloc_queue_node(GFP_KERNEL, NUMA_NO_NODE);
++	q = blk_alloc_queue_node(GFP_KERNEL, NUMA_NO_NODE, NULL);
+ 	if (!q)
+ 		return NULL;
+ 	q->cmd_size = sizeof(struct scsi_cmnd) + shost->hostt->cmd_size;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index ed63f3b69c12..667a9b0053d9 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1321,7 +1321,8 @@ extern long nr_blockdev_pages(void);
+ 
+ bool __must_check blk_get_queue(struct request_queue *);
+ struct request_queue *blk_alloc_queue(gfp_t);
+-struct request_queue *blk_alloc_queue_node(gfp_t, int);
++struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id,
++					   spinlock_t *lock);
+ extern void blk_put_queue(struct request_queue *);
+ extern void blk_set_queue_dying(struct request_queue *);
+ 
 -- 
 2.16.2
