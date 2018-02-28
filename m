@@ -1,51 +1,59 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:54860 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753237AbeBZNTR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Feb 2018 08:19:17 -0500
-Received: by mail-wm0-f68.google.com with SMTP id z81so17371730wmb.4
-        for <linux-block@vger.kernel.org>; Mon, 26 Feb 2018 05:19:16 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH] lightnvm: pblk: remove unused variable
-Date: Mon, 26 Feb 2018 14:18:49 +0100
-Message-Id: <1519651129-17897-1-git-send-email-javier@cnexlabs.com>
+Received: from mx2.suse.de ([195.135.220.15]:58844 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751423AbeB1EzV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Feb 2018 23:55:21 -0500
+Subject: Re: [PATCH v7 0/9] bcache: device failure handling improvement
+To: Michael Lyle <mlyle@lyle.org>, linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+References: <20180227165557.20442-1-colyli@suse.de>
+ <d49160a9-cfee-1547-f08a-dcf83daba6f6@lyle.org>
+ <881d16b5-e356-bb2a-459d-15c9ad11ca16@lyle.org>
+ <942b59f3-6222-7131-c99c-515c822dd099@lyle.org>
+From: Coly Li <colyli@suse.de>
+Message-ID: <4a3a1f25-1957-79fa-50ea-6514083728b9@suse.de>
+Date: Wed, 28 Feb 2018 12:55:13 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <942b59f3-6222-7131-c99c-515c822dd099@lyle.org>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Remove unused variable after a previous cleanup (a8112b631adb)
+On 28/02/2018 3:27 AM, Michael Lyle wrote:
+> On 02/27/2018 10:33 AM, Michael Lyle wrote:
+>> On 02/27/2018 10:29 AM, Michael Lyle wrote:
+>>> Hi Coly Li--
+>>>
+>>> On 02/27/2018 08:55 AM, Coly Li wrote:
+>>>> Hi maintainers and folks,
+>>>>
+>>>> This patch set tries to improve bcache device failure handling, includes
+>>>> cache device and backing device failures.
+>>>
+>>> I have applied 1, 2, 4 & 6 from this series to my 4.17 bcache-for-next
+>>> for testing.
+>>
+>> Correction: I meant 1, 2, 5 & 6.
+> 
+> Sorry everyone for churn.  Present applied state is 1-6:
+> 
+> #6 6a2fb6357eae bcache: fix inaccurate io state for detached bcache devices
+> #5 6aee8a57d141 bcache: add stop_when_cache_set_failed option to backing
+> device
+> #4 3a9c638b1950 bcache: add CACHE_SET_IO_DISABLE to struct cache_set flags
+> #3 1b355007b5ae bcache: stop dc->writeback_rate_update properly
+> #2 70120583e4b5 bcache: quit dc->writeback_thread when
+> BCACHE_DEV_DETACHING is set
+> #1 b8f557d64115 bcache: fix cached_dev->count usage for
+> bch_cache_set_error()
+> 
+> There's some checkpatch warnings relating to non-preferred style
+> (splitting strings to hit 80 character limit) but I will fix them up
+> myself later).  This subset is through review and passes initial testing
+> (will be testing more / and writing test suite).
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/pblk-core.c | 3 ---
- 1 file changed, 3 deletions(-)
+Hi Mike,
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index ce6a7cfdba66..e6cb4317bb50 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -1071,7 +1071,6 @@ static int pblk_line_init_bb(struct pblk *pblk, struct pblk_line *line,
- 	struct nvm_geo *geo = &dev->geo;
- 	struct pblk_line_meta *lm = &pblk->lm;
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
--	int nr_bb = 0;
- 	u64 off;
- 	int bit = -1;
- 	int emeta_secs;
-@@ -1087,8 +1086,6 @@ static int pblk_line_init_bb(struct pblk *pblk, struct pblk_line *line,
- 		bitmap_or(line->map_bitmap, line->map_bitmap, l_mg->bb_aux,
- 							lm->sec_per_line);
- 		line->sec_in_line -= geo->c.clba;
--		if (bit >= lm->emeta_bb)
--			nr_bb++;
- 	}
- 
- 	/* Mark smeta metadata sectors as bad sectors */
--- 
-2.7.4
+Thanks for your effort.
+
+Coly Li
