@@ -1,82 +1,58 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:62045 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933488AbeB1T2Z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Feb 2018 14:28:25 -0500
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 04/11] block: Protect queue flag changes with the queue lock
-Date: Wed, 28 Feb 2018 11:28:16 -0800
-Message-Id: <20180228192823.5191-5-bart.vanassche@wdc.com>
-In-Reply-To: <20180228192823.5191-1-bart.vanassche@wdc.com>
-References: <20180228192823.5191-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Subject: [PATCH 02/15] lightnvm: add controller capabilities to 2.0
+Date: Wed, 28 Feb 2018 16:49:22 +0100
+Message-Id: <1519832975-25432-3-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1519832975-25432-1-git-send-email-javier@cnexlabs.com>
+References: <1519832975-25432-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
+Cc: linux-block@vger.kernel.org,
+ =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+List-ID: <linux-block@vger.kernel.org>
 
-Since the queue flags may be changed concurrently from multiple
-contexts after a queue becomes visible in sysfs, make these changes
-safe by protecting these with the queue lock.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c   | 3 +--
- block/blk-stat.c | 6 +++---
- 2 files changed, 4 insertions(+), 5 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 67026494119b..899f357962e8 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3022,8 +3022,7 @@ EXPORT_SYMBOL_GPL(blk_mq_update_nr_hw_queues);
- /* Enable polling stats and return whether they were already enabled. */
- static bool blk_poll_stats_enable(struct request_queue *q)
- {
--	if (test_bit(QUEUE_FLAG_POLL_STATS, &q->queue_flags) ||
--	    test_and_set_bit(QUEUE_FLAG_POLL_STATS, &q->queue_flags))
-+	if (blk_queue_flag_test_and_set(QUEUE_FLAG_POLL_STATS, q))
- 		return true;
- 	blk_stat_add_callback(q, q->poll_cb);
- 	return false;
-diff --git a/block/blk-stat.c b/block/blk-stat.c
-index b664aa6df725..bd365a95fcf8 100644
---- a/block/blk-stat.c
-+++ b/block/blk-stat.c
-@@ -152,7 +152,7 @@ void blk_stat_add_callback(struct request_queue *q,
- 
- 	spin_lock(&q->stats->lock);
- 	list_add_tail_rcu(&cb->list, &q->stats->callbacks);
--	queue_flag_set(QUEUE_FLAG_STATS, q);
-+	blk_queue_flag_set(QUEUE_FLAG_STATS, q);
- 	spin_unlock(&q->stats->lock);
- }
- EXPORT_SYMBOL_GPL(blk_stat_add_callback);
-@@ -163,7 +163,7 @@ void blk_stat_remove_callback(struct request_queue *q,
- 	spin_lock(&q->stats->lock);
- 	list_del_rcu(&cb->list);
- 	if (list_empty(&q->stats->callbacks) && !q->stats->enable_accounting)
--		queue_flag_clear(QUEUE_FLAG_STATS, q);
-+		blk_queue_flag_clear(QUEUE_FLAG_STATS, q);
- 	spin_unlock(&q->stats->lock);
- 
- 	del_timer_sync(&cb->timer);
-@@ -191,7 +191,7 @@ void blk_stat_enable_accounting(struct request_queue *q)
- {
- 	spin_lock(&q->stats->lock);
- 	q->stats->enable_accounting = true;
--	queue_flag_set(QUEUE_FLAG_STATS, q);
-+	blk_queue_flag_set(QUEUE_FLAG_STATS, q);
- 	spin_unlock(&q->stats->lock);
- }
- 
--- 
-2.16.2
+QXNzaWduIG1pc3NpbmcgbWNjYXAgdmFsdWUgb24gMi4wIHBhdGgKClNpZ25lZC1vZmYtYnk6IEph
+dmllciBHb256w6FsZXogPGphdmllckBjbmV4bGFicy5jb20+Ci0tLQogZHJpdmVycy9udm1lL2hv
+c3QvbGlnaHRudm0uYyB8IDQgKysrLQogaW5jbHVkZS9saW51eC9saWdodG52bS5oICAgICB8IDgg
+KysrKystLS0KIDIgZmlsZXMgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygt
+KQoKZGlmZiAtLWdpdCBhL2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMgYi9kcml2ZXJzL252
+bWUvaG9zdC9saWdodG52bS5jCmluZGV4IGUyNzZhY2UyOGM2NC4uNWIyMDI0ZWJhYzc2IDEwMDY0
+NAotLS0gYS9kcml2ZXJzL252bWUvaG9zdC9saWdodG52bS5jCisrKyBiL2RyaXZlcnMvbnZtZS9o
+b3N0L2xpZ2h0bnZtLmMKQEAgLTMxOCw3ICszMTgsNyBAQCBzdGF0aWMgaW50IG52bWVfbnZtX3Nl
+dHVwXzEyKHN0cnVjdCBudm1lX252bV9pZDEyICppZCwKIAlnZW8tPndzX29wdCA9IHNlY19wZXJf
+cGc7CiAJZ2VvLT5td19jdW5pdHMgPSBnZW8tPndzX29wdCA8PCAzOwkvKiBkZWZhdWx0IHRvIE1M
+QyBzYWZlIHZhbHVlcyAqLwogCi0JZ2VvLT5tY2NhcCA9IGxlMzJfdG9fY3B1KHNyYy0+bWNjYXAp
+OworCWdlby0+Y2FwID0gbGUzMl90b19jcHUoc3JjLT5tY2NhcCk7CiAKIAlnZW8tPnRyZHQgPSBs
+ZTMyX3RvX2NwdShzcmMtPnRyZHQpOwogCWdlby0+dHJkbSA9IGxlMzJfdG9fY3B1KHNyYy0+dHJk
+bSk7CkBAIC0zOTYsNiArMzk2LDggQEAgc3RhdGljIGludCBudm1lX252bV9zZXR1cF8yMChzdHJ1
+Y3QgbnZtZV9udm1faWQyMCAqaWQsCiAJZ2VvLT53c19vcHQgPSBsZTMyX3RvX2NwdShpZC0+d3Nf
+b3B0KTsKIAlnZW8tPm13X2N1bml0cyA9IGxlMzJfdG9fY3B1KGlkLT5td19jdW5pdHMpOwogCisJ
+Z2VvLT5jYXAgPSBsZTMyX3RvX2NwdShpZC0+bWNjYXApOworCiAJZ2VvLT50cmR0ID0gbGUzMl90
+b19jcHUoaWQtPnRyZHQpOwogCWdlby0+dHJkbSA9IGxlMzJfdG9fY3B1KGlkLT50cmRtKTsKIAln
+ZW8tPnRwcnQgPSBsZTMyX3RvX2NwdShpZC0+dHdydCk7CmRpZmYgLS1naXQgYS9pbmNsdWRlL2xp
+bnV4L2xpZ2h0bnZtLmggYi9pbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmgKaW5kZXggMTYyNTVmY2Q1
+MjUwLi5iOWYwZDIwNzBkZTkgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvbGludXgvbGlnaHRudm0uaAor
+KysgYi9pbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmgKQEAgLTI4OCw4ICsyODgsMTAgQEAgc3RydWN0
+IG52bV9nZW8gewogCXUzMgl3c19vcHQ7CQkvKiBvcHRpbWFsIHdyaXRlIHNpemUgKi8KIAl1MzIJ
+bXdfY3VuaXRzOwkvKiBkaXN0YW5jZSByZXF1aXJlZCBmb3Igc3VjY2Vzc2Z1bCByZWFkICovCiAK
+LQkvKiBkZXZpY2UgY2FwYWJpbGl0aWVzICovCi0JdTMyCW1jY2FwOworCS8qIGRldmljZSBjYXBh
+YmlsaXRpZXMuIE5vdGUgdGhhdCB0aGlzIHJlcHJlc2VudHMgY2FwYWJpbGl0aWVzIGluIDEuMgor
+CSAqIGFuZCBtZWRpYSBhbmQgY29udHJvbGxlciBjYXBhYmlsaXRpZXMgaW4gMi4wCisJICovCisJ
+dTMyCWNhcDsKIAogCS8qIGRldmljZSB0aW1pbmdzICovCiAJdTMyCXRyZHQ7CQkvKiBBdmcuIFRy
+ZWFkIChucykgKi8KQEAgLTMwNCw3ICszMDYsNyBAQCBzdHJ1Y3QgbnZtX2dlbyB7CiAKIAkvKiAx
+LjIgY29tcGF0aWJpbGl0eSAqLwogCXU4CXZtbnQ7Ci0JdTMyCWNhcDsKKwl1MzIJbWNjYXA7CiAJ
+dTMyCWRvbTsKIAogCXU4CW10eXBlOwotLSAKMi43LjQKCgpfX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fXwpMaW51eC1udm1lIG1haWxpbmcgbGlzdApMaW51eC1u
+dm1lQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xpc3RzLmluZnJhZGVhZC5vcmcvbWFpbG1h
+bi9saXN0aW5mby9saW51eC1udm1lCg==
