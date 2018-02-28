@@ -1,140 +1,80 @@
-Return-Path: <axboe@kernel.dk>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: Omar Sandoval <osandov@osandov.com>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] null_blk: add 'requeue' fault attribute
-Message-ID: <e3116aee-ae06-a415-c56f-30c3780f6a67@kernel.dk>
-Date: Tue, 27 Feb 2018 15:34:53 -0700
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <prvs=590d2a92c=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 01/11] block: Reorder the queue flag manipulaton function definitions
+Date: Wed, 28 Feb 2018 11:28:13 -0800
+Message-Id: <20180228192823.5191-2-bart.vanassche@wdc.com>
+In-Reply-To: <20180228192823.5191-1-bart.vanassche@wdc.com>
+References: <20180228192823.5191-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Similarly to the support we have for testing/faking timeouts for
-null_blk, this adds support for triggering a requeue condition.
-Considering the issues around restart we've been seeing, this should be
-a useful addition to the testing arsenal to ensure that we are handling
-requeue conditions correctly.
+Move the definition of queue_flag_clear_unlocked() up and move the
+definition of queue_in_flight() down such that all queue flag
+manipulation function definitions become contiguous.
 
-This works for queue mode 1 (legacy request_fn based path) and 2 (blk-mq
-path), as there's no good way to do requeue with a bio based driver.
-This is similar to the timeout path.
+This patch does not change any functionality.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Ming Lei <ming.lei@redhat.com>
 ---
+ include/linux/blkdev.h | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
- null_blk.c |   55 +++++++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 43 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index 287a09611c0f..363536572e19 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -29,6 +29,7 @@
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 9becac7432d0..e1e2a06559dc 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -724,6 +724,12 @@ static inline void queue_flag_set_unlocked(unsigned int flag,
+ 	__set_bit(flag, &q->queue_flags);
+ }
  
- #ifdef CONFIG_BLK_DEV_NULL_BLK_FAULT_INJECTION
- static DECLARE_FAULT_ATTR(null_timeout_attr);
-+static DECLARE_FAULT_ATTR(null_requeue_attr);
- #endif
- 
- static inline u64 mb_per_tick(int mbps)
-@@ -170,6 +171,9 @@ MODULE_PARM_DESC(home_node, "Home node for the device");
- #ifdef CONFIG_BLK_DEV_NULL_BLK_FAULT_INJECTION
- static char g_timeout_str[80];
- module_param_string(timeout, g_timeout_str, sizeof(g_timeout_str), S_IRUGO);
-+
-+static char g_requeue_str[80];
-+module_param_string(requeue, g_requeue_str, sizeof(g_requeue_str), S_IRUGO);
- #endif
- 
- static int g_queue_mode = NULL_Q_MQ;
-@@ -1380,7 +1384,15 @@ static bool should_timeout_request(struct request *rq)
- 	if (g_timeout_str[0])
- 		return should_fail(&null_timeout_attr, 1);
- #endif
-+	return false;
-+}
- 
-+static bool should_requeue_request(struct request *rq)
++static inline void queue_flag_clear_unlocked(unsigned int flag,
++					     struct request_queue *q)
 +{
-+#ifdef CONFIG_BLK_DEV_NULL_BLK_FAULT_INJECTION
-+	if (g_requeue_str[0])
-+		return should_fail(&null_requeue_attr, 1);
-+#endif
- 	return false;
- }
- 
-@@ -1391,11 +1403,17 @@ static void null_request_fn(struct request_queue *q)
- 	while ((rq = blk_fetch_request(q)) != NULL) {
- 		struct nullb_cmd *cmd = rq->special;
- 
--		if (!should_timeout_request(rq)) {
--			spin_unlock_irq(q->queue_lock);
--			null_handle_cmd(cmd);
--			spin_lock_irq(q->queue_lock);
-+		/* just ignore the request */
-+		if (should_timeout_request(rq))
-+			continue;
-+		if (should_requeue_request(rq)) {
-+			blk_requeue_request(q, rq);
-+			continue;
- 		}
++	__clear_bit(flag, &q->queue_flags);
++}
 +
-+		spin_unlock_irq(q->queue_lock);
-+		null_handle_cmd(cmd);
-+		spin_lock_irq(q->queue_lock);
- 	}
+ static inline int queue_flag_test_and_clear(unsigned int flag,
+ 					    struct request_queue *q)
+ {
+@@ -756,17 +762,6 @@ static inline void queue_flag_set(unsigned int flag, struct request_queue *q)
+ 	__set_bit(flag, &q->queue_flags);
  }
  
-@@ -1422,10 +1440,12 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
- 
- 	blk_mq_start_request(bd->rq);
- 
--	if (!should_timeout_request(bd->rq))
--		return null_handle_cmd(cmd);
-+	if (should_requeue_request(bd->rq))
-+		return BLK_STS_RESOURCE;
-+	if (should_timeout_request(bd->rq))
-+		return BLK_STS_OK;
- 
--	return BLK_STS_OK;
-+	return null_handle_cmd(cmd);
- }
- 
- static const struct blk_mq_ops null_mq_ops = {
-@@ -1659,16 +1679,27 @@ static void null_validate_conf(struct nullb_device *dev)
- 		dev->mbps = 0;
- }
- 
--static bool null_setup_fault(void)
+-static inline void queue_flag_clear_unlocked(unsigned int flag,
+-					     struct request_queue *q)
 -{
- #ifdef CONFIG_BLK_DEV_NULL_BLK_FAULT_INJECTION
--	if (!g_timeout_str[0])
-+static bool __null_setup_fault(struct fault_attr *attr, char *str)
+-	__clear_bit(flag, &q->queue_flags);
+-}
+-
+-static inline int queue_in_flight(struct request_queue *q)
+-{
+-	return q->in_flight[0] + q->in_flight[1];
+-}
+-
+ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
+ {
+ 	queue_lockdep_assert_held(q);
+@@ -802,6 +797,11 @@ static inline void queue_flag_clear(unsigned int flag, struct request_queue *q)
+ extern int blk_set_preempt_only(struct request_queue *q);
+ extern void blk_clear_preempt_only(struct request_queue *q);
+ 
++static inline int queue_in_flight(struct request_queue *q)
 +{
-+	if (!str[0])
- 		return true;
- 
--	if (!setup_fault_attr(&null_timeout_attr, g_timeout_str))
-+	if (!setup_fault_attr(attr, str))
- 		return false;
- 
--	null_timeout_attr.verbose = 0;
-+	attr->verbose = 0;
-+	return true;
++	return q->in_flight[0] + q->in_flight[1];
 +}
-+#endif
 +
-+static bool null_setup_fault(void)
-+{
-+#ifdef CONFIG_BLK_DEV_NULL_BLK_FAULT_INJECTION
-+	if (!__null_setup_fault(&null_timeout_attr, g_timeout_str))
-+		return false;
-+	if (!__null_setup_fault(&null_requeue_attr, g_requeue_str))
-+		return false;
- #endif
- 	return true;
- }
-
+ static inline bool blk_account_rq(struct request *rq)
+ {
+ 	return (rq->rq_flags & RQF_STARTED) && !blk_rq_is_passthrough(rq);
 -- 
-Jens Axboe
+2.16.2
