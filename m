@@ -1,47 +1,83 @@
-Return-Path: <prvs=590d2a92c=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
+Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
+To: mb@lightnvm.io
+Subject: [PATCH 05/15] lightnvm: complete geo structure with maxoc*
+Date: Wed, 28 Feb 2018 16:49:25 +0100
+Message-Id: <1519832975-25432-6-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1519832975-25432-1-git-send-email-javier@cnexlabs.com>
+References: <1519832975-25432-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
+List-Post: <mailto:linux-nvme@lists.infradead.org>
+List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
+ <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
 Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Shaohua Li <shli@kernel.org>
-Subject: [PATCH v5 2/6] md: Delete gendisk before cleaning up the request queue
-Date: Wed, 28 Feb 2018 10:15:29 -0800
-Message-Id: <20180228181533.29402-3-bart.vanassche@wdc.com>
-In-Reply-To: <20180228181533.29402-1-bart.vanassche@wdc.com>
-References: <20180228181533.29402-1-bart.vanassche@wdc.com>
+ =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
+Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
 List-ID: <linux-block@vger.kernel.org>
 
-Remove the disk, partition and bdi sysfs attributes before cleaning up
-the request queue associated with the disk.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Joseph Qi <joseph.qi@linux.alibaba.com>
-Cc: Shaohua Li <shli@kernel.org>
----
- drivers/md/md.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index bc67ab6844f0..eba7fa2f0abb 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -5203,12 +5203,12 @@ static void md_free(struct kobject *ko)
- 	if (mddev->sysfs_state)
- 		sysfs_put(mddev->sysfs_state);
- 
-+	if (mddev->gendisk)
-+		del_gendisk(mddev->gendisk);
- 	if (mddev->queue)
- 		blk_cleanup_queue(mddev->queue);
--	if (mddev->gendisk) {
--		del_gendisk(mddev->gendisk);
-+	if (mddev->gendisk)
- 		put_disk(mddev->gendisk);
--	}
- 	percpu_ref_exit(&mddev->writes_pending);
- 
- 	kfree(mddev);
--- 
-2.16.2
+Q29tcGxldGUgdGhlIGdlbmVyaWMgZ2VvbWV0cnkgc3RydWN0dXJlIHdpdGggdGhlIG1heG9jIGFu
+ZCBtYXhvY3B1CmZlbGRzLCBwcmVzZW50IGluIHRoZSAyLjAgc3BlYy4gQWxzbywgZXhwb3NlIHRo
+ZW0gdGhyb3VnaCBzeXNmcy4KClNpZ25lZC1vZmYtYnk6IEphdmllciBHb256w6FsZXogPGphdmll
+ckBjbmV4bGFicy5jb20+Ci0tLQogZHJpdmVycy9udm1lL2hvc3QvbGlnaHRudm0uYyB8IDE3ICsr
+KysrKysrKysrKysrKysrCiBpbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmggICAgIHwgIDIgKysKIDIg
+ZmlsZXMgY2hhbmdlZCwgMTkgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL2RyaXZlcnMvbnZt
+ZS9ob3N0L2xpZ2h0bnZtLmMgYi9kcml2ZXJzL252bWUvaG9zdC9saWdodG52bS5jCmluZGV4IDg1
+ZjMzNmE3OWNkYS4uYWZiNWY4ODNmOGM4IDEwMDY0NAotLS0gYS9kcml2ZXJzL252bWUvaG9zdC9s
+aWdodG52bS5jCisrKyBiL2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMKQEAgLTMyMyw2ICsz
+MjMsMTMgQEAgc3RhdGljIGludCBudm1lX252bV9zZXR1cF8xMihzdHJ1Y3QgbnZtZV9udm1faWQx
+MiAqaWQsCiAJZ2VvLT53c19vcHQgPSBzZWNfcGVyX3BnOwogCWdlby0+bXdfY3VuaXRzID0gZ2Vv
+LT53c19vcHQgPDwgMzsJLyogZGVmYXVsdCB0byBNTEMgc2FmZSB2YWx1ZXMgKi8KIAorCS8qIERv
+IG5vdCBpbXBvc2UgdmFsdWVzIGZvciBtYXhpbXVtIG51bWJlciBvZiBvcGVuIGJsb2NrcyBhcyBp
+dCBpcworCSAqIHVuc3BlY2lmaWVkIGluIDEuMi4gVXNlcnMgb2YgMS4yIG11c3QgYmUgYXdhcmUg
+b2YgdGhpcyBhbmQgZXZlbnR1YWxseQorCSAqIHNwZWNpZnkgdGhlc2UgdmFsdWVzIHRocm91Z2gg
+YSBxdWlyayBpZiByZXN0cmljdGlvbnMgYXBwbHkuCisJICovCisJZ2VvLT5tYXhvYyA9IGdlby0+
+YWxsX2x1bnMgKiBnZW8tPm5yX2Noa3M7CisJZ2VvLT5tYXhvY3B1ID0gZ2VvLT5ucl9jaGtzOwor
+CiAJZ2VvLT5jYXAgPSBsZTMyX3RvX2NwdShzcmMtPm1jY2FwKTsKIAogCWdlby0+dHJkdCA9IGxl
+MzJfdG9fY3B1KHNyYy0+dHJkdCk7CkBAIC00MTAsNiArNDE3LDggQEAgc3RhdGljIGludCBudm1l
+X252bV9zZXR1cF8yMChzdHJ1Y3QgbnZtZV9udm1faWQyMCAqaWQsCiAJZ2VvLT53c19taW4gPSBs
+ZTMyX3RvX2NwdShpZC0+d3NfbWluKTsKIAlnZW8tPndzX29wdCA9IGxlMzJfdG9fY3B1KGlkLT53
+c19vcHQpOwogCWdlby0+bXdfY3VuaXRzID0gbGUzMl90b19jcHUoaWQtPm13X2N1bml0cyk7CisJ
+Z2VvLT5tYXhvYyA9IGxlMzJfdG9fY3B1KGlkLT5tYXhvYyk7CisJZ2VvLT5tYXhvY3B1ID0gbGUz
+Ml90b19jcHUoaWQtPm1heG9jcHUpOwogCiAJZ2VvLT5jYXAgPSBsZTMyX3RvX2NwdShpZC0+bWNj
+YXApOwogCkBAIC0xMDU0LDYgKzEwNjMsMTAgQEAgc3RhdGljIHNzaXplX3QgbnZtX2Rldl9hdHRy
+X3Nob3dfMjAoc3RydWN0IGRldmljZSAqZGV2LAogCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBB
+R0VfU0laRSwgIiV1XG4iLCBnZW8tPndzX21pbik7CiAJfSBlbHNlIGlmIChzdHJjbXAoYXR0ci0+
+bmFtZSwgIndzX29wdCIpID09IDApIHsKIAkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdFX1NJ
+WkUsICIldVxuIiwgZ2VvLT53c19vcHQpOworCX0gZWxzZSBpZiAoc3RyY21wKGF0dHItPm5hbWUs
+ICJtYXhvYyIpID09IDApIHsKKwkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIl
+dVxuIiwgZ2VvLT5tYXhvYyk7CisJfSBlbHNlIGlmIChzdHJjbXAoYXR0ci0+bmFtZSwgIm1heG9j
+cHUiKSA9PSAwKSB7CisJCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9TSVpFLCAiJXVcbiIs
+IGdlby0+bWF4b2NwdSk7CiAJfSBlbHNlIGlmIChzdHJjbXAoYXR0ci0+bmFtZSwgIm13X2N1bml0
+cyIpID09IDApIHsKIAkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIldVxuIiwg
+Z2VvLT5td19jdW5pdHMpOwogCX0gZWxzZSBpZiAoc3RyY21wKGF0dHItPm5hbWUsICJ3cml0ZV90
+eXAiKSA9PSAwKSB7CkBAIC0xMTUxLDYgKzExNjQsOCBAQCBzdGF0aWMgTlZNX0RFVl9BVFRSXzIw
+X1JPKGNodW5rcyk7CiBzdGF0aWMgTlZNX0RFVl9BVFRSXzIwX1JPKGNsYmEpOwogc3RhdGljIE5W
+TV9ERVZfQVRUUl8yMF9STyh3c19taW4pOwogc3RhdGljIE5WTV9ERVZfQVRUUl8yMF9STyh3c19v
+cHQpOworc3RhdGljIE5WTV9ERVZfQVRUUl8yMF9STyhtYXhvYyk7CitzdGF0aWMgTlZNX0RFVl9B
+VFRSXzIwX1JPKG1heG9jcHUpOwogc3RhdGljIE5WTV9ERVZfQVRUUl8yMF9STyhtd19jdW5pdHMp
+Owogc3RhdGljIE5WTV9ERVZfQVRUUl8yMF9STyh3cml0ZV90eXApOwogc3RhdGljIE5WTV9ERVZf
+QVRUUl8yMF9STyh3cml0ZV9tYXgpOwpAQCAtMTE2Nyw2ICsxMTgyLDggQEAgc3RhdGljIHN0cnVj
+dCBhdHRyaWJ1dGUgKm52bV9kZXZfYXR0cnNfMjBbXSA9IHsKIAkmZGV2X2F0dHJfY2xiYS5hdHRy
+LAogCSZkZXZfYXR0cl93c19taW4uYXR0ciwKIAkmZGV2X2F0dHJfd3Nfb3B0LmF0dHIsCisJJmRl
+dl9hdHRyX21heG9jLmF0dHIsCisJJmRldl9hdHRyX21heG9jcHUuYXR0ciwKIAkmZGV2X2F0dHJf
+bXdfY3VuaXRzLmF0dHIsCiAKIAkmZGV2X2F0dHJfcmVhZF90eXAuYXR0ciwKZGlmZiAtLWdpdCBh
+L2luY2x1ZGUvbGludXgvbGlnaHRudm0uaCBiL2luY2x1ZGUvbGludXgvbGlnaHRudm0uaAppbmRl
+eCBiOGJjMTU4YTI0NzIuLjIxMDJiMDkyYzdlYiAxMDA2NDQKLS0tIGEvaW5jbHVkZS9saW51eC9s
+aWdodG52bS5oCisrKyBiL2luY2x1ZGUvbGludXgvbGlnaHRudm0uaApAQCAtMjk2LDYgKzI5Niw4
+IEBAIHN0cnVjdCBudm1fZ2VvIHsKIAl1MzIJd3NfbWluOwkJLyogbWluaW11bSB3cml0ZSBzaXpl
+ICovCiAJdTMyCXdzX29wdDsJCS8qIG9wdGltYWwgd3JpdGUgc2l6ZSAqLwogCXUzMgltd19jdW5p
+dHM7CS8qIGRpc3RhbmNlIHJlcXVpcmVkIGZvciBzdWNjZXNzZnVsIHJlYWQgKi8KKwl1MzIJbWF4
+b2M7CQkvKiBtYXhpbXVtIG9wZW4gY2h1bmtzICovCisJdTMyCW1heG9jcHU7CS8qIG1heGltdW0g
+b3BlbiBjaHVua3MgcGVyIHBhcmFsbGVsIHVuaXQgKi8KIAogCS8qIGRldmljZSBjYXBhYmlsaXRp
+ZXMuIE5vdGUgdGhhdCB0aGlzIHJlcHJlc2VudHMgY2FwYWJpbGl0aWVzIGluIDEuMgogCSAqIGFu
+ZCBtZWRpYSBhbmQgY29udHJvbGxlciBjYXBhYmlsaXRpZXMgaW4gMi4wCi0tIAoyLjcuNAoKCl9f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkxpbnV4LW52bWUg
+bWFpbGluZyBsaXN0CkxpbnV4LW52bWVAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8vbGlzdHMu
+aW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4LW52bWUK
