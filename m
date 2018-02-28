@@ -1,88 +1,35 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <jg@lightnvm.io>
-To: mb@lightnvm.io
-Subject: [PATCH 03/15] lightnvm: add minor version to generic geometry
-Date: Wed, 28 Feb 2018 16:49:23 +0100
-Message-Id: <1519832975-25432-4-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1519832975-25432-1-git-send-email-javier@cnexlabs.com>
-References: <1519832975-25432-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <axboe@kernel.dk>
+Date: Wed, 28 Feb 2018 12:08:29 -0700
+From: Jens Axboe <axboe@kernel.dk>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH v5 0/6] Fix races between blkcg code and request queue
+ initialization and cleanup
+Message-ID: <20180228190824.GA10814@kernel.dk>
+References: <20180228181533.29402-1-bart.vanassche@wdc.com>
+ <5fe43ee3-2982-6d6d-2461-519fa02d00cd@kernel.dk>
+ <1519844492.2777.11.camel@wdc.com>
 MIME-Version: 1.0
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org,
- =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="utf-8"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1519844492.2777.11.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-U2VwYXJhdGUgdGhlIHZlcnNpb24gYmV0d2VlbiBtYWpvciBhbmQgbWlub3Igb24gdGhlIGdlbmVy
-aWMgZ2VvbWV0cnkgYW5kCnJlcHJlc2VudCBpdCB0aHJvdWdoIHN5c2ZzIGluIHRoZSAyLjAgcGF0
-aC4gVGhlIDEuMiBwYXRoIG9ubHkgc2hvd3MgdGhlCm1ham9yIHZlcnNpb24gdG8gcHJlc2VydmUg
-dGhlIGV4aXN0aW5nIHVzZXIgc3BhY2UgaW50ZXJmYWNlLgoKU2lnbmVkLW9mZi1ieTogSmF2aWVy
-IEdvbnrDoWxleiA8amF2aWVyQGNuZXhsYWJzLmNvbT4KLS0tCiBkcml2ZXJzL2xpZ2h0bnZtL2Nv
-cmUuYyAgICAgIHwgIDQgKystLQogZHJpdmVycy9udm1lL2hvc3QvbGlnaHRudm0uYyB8IDI1ICsr
-KysrKysrKysrKysrKysrKysrLS0tLS0KIGluY2x1ZGUvbGludXgvbGlnaHRudm0uaCAgICAgfCAg
-MyArKy0KIDMgZmlsZXMgY2hhbmdlZCwgMjQgaW5zZXJ0aW9ucygrKSwgOCBkZWxldGlvbnMoLSkK
-CmRpZmYgLS1naXQgYS9kcml2ZXJzL2xpZ2h0bnZtL2NvcmUuYyBiL2RyaXZlcnMvbGlnaHRudm0v
-Y29yZS5jCmluZGV4IDlhNDE3ZDljZGYwYy4uYzRmNzJmYmFkMmJmIDEwMDY0NAotLS0gYS9kcml2
-ZXJzL2xpZ2h0bnZtL2NvcmUuYworKysgYi9kcml2ZXJzL2xpZ2h0bnZtL2NvcmUuYwpAQCAtODkw
-LDggKzg5MCw4IEBAIHN0YXRpYyBpbnQgbnZtX2luaXQoc3RydWN0IG52bV9kZXYgKmRldikKIAkJ
-Z290byBlcnI7CiAJfQogCi0JcHJfZGVidWcoIm52bTogdmVyOiV1IG52bV92ZW5kb3I6JXhcbiIs
-Ci0JCQkJZ2VvLT52ZXJfaWQsCisJcHJfZGVidWcoIm52bTogdmVyOiV1LiV1IG52bV92ZW5kb3I6
-JXhcbiIsCisJCQkJZ2VvLT5tYWpvcl92ZXJfaWQsIGdlby0+bWlub3JfdmVyX2lkLAogCQkJCWdl
-by0+dm1udCk7CiAKIAlyZXQgPSBudm1fY29yZV9pbml0KGRldik7CmRpZmYgLS1naXQgYS9kcml2
-ZXJzL252bWUvaG9zdC9saWdodG52bS5jIGIvZHJpdmVycy9udm1lL2hvc3QvbGlnaHRudm0uYwpp
-bmRleCA1YjIwMjRlYmFjNzYuLmE2MDBlNzBiNmU2YiAxMDA2NDQKLS0tIGEvZHJpdmVycy9udm1l
-L2hvc3QvbGlnaHRudm0uYworKysgYi9kcml2ZXJzL252bWUvaG9zdC9saWdodG52bS5jCkBAIC0y
-OTUsNyArMjk1LDkgQEAgc3RhdGljIGludCBudm1lX252bV9zZXR1cF8xMihzdHJ1Y3QgbnZtZV9u
-dm1faWQxMiAqaWQsCiAJCXJldHVybiAtRUlOVkFMOwogCX0KIAotCWdlby0+dmVyX2lkID0gaWQt
-PnZlcl9pZDsKKwkvKiAxLjIgc3BlYy4gb25seSByZXBvcnRzIGEgc2luZ2xlIHZlcnNpb24gaWQg
-LSB1bmZvbGQgKi8KKwlnZW8tPm1ham9yX3Zlcl9pZCA9IGlkLT52ZXJfaWQ7CisJZ2VvLT5taW5v
-cl92ZXJfaWQgPSAyOwogCiAJZ2VvLT5ucl9jaG5scyA9IHNyYy0+bnVtX2NoOwogCWdlby0+bnJf
-bHVucyA9IHNyYy0+bnVtX2x1bjsKQEAgLTM4MCw3ICszODIsMTQgQEAgc3RhdGljIHZvaWQgbnZt
-ZV9udm1fc2V0X2FkZHJfMjAoc3RydWN0IG52bV9hZGRyX2Zvcm1hdCAqZHN0LAogc3RhdGljIGlu
-dCBudm1lX252bV9zZXR1cF8yMChzdHJ1Y3QgbnZtZV9udm1faWQyMCAqaWQsCiAJCQkgICAgIHN0
-cnVjdCBudm1fZ2VvICpnZW8pCiB7Ci0JZ2VvLT52ZXJfaWQgPSBpZC0+bWpyOworCWdlby0+bWFq
-b3JfdmVyX2lkID0gaWQtPm1qcjsKKwlnZW8tPm1pbm9yX3Zlcl9pZCA9IGlkLT5tbnI7CisKKwlp
-ZiAoIShnZW8tPm1ham9yX3Zlcl9pZCA9PSAyICYmIGdlby0+bWlub3JfdmVyX2lkID09IDApKSB7
-CisJCXByX2VycigibnZtOiBPQ1NTRCB2ZXJzaW9uIG5vdCBzdXBwb3J0ZWQgKHYlZC4lZClcbiIs
-CisJCQkJZ2VvLT5tYWpvcl92ZXJfaWQsIGdlby0+bWlub3JfdmVyX2lkKTsKKwkJcmV0dXJuIC1F
-SU5WQUw7CisJfQogCiAJZ2VvLT5ucl9jaG5scyA9IGxlMTZfdG9fY3B1KGlkLT5udW1fZ3JwKTsK
-IAlnZW8tPm5yX2x1bnMgPSBsZTE2X3RvX2NwdShpZC0+bnVtX3B1KTsKQEAgLTkxNyw3ICs5MjYs
-MTMgQEAgc3RhdGljIHNzaXplX3QgbnZtX2Rldl9hdHRyX3Nob3coc3RydWN0IGRldmljZSAqZGV2
-LAogCWF0dHIgPSAmZGF0dHItPmF0dHI7CiAKIAlpZiAoc3RyY21wKGF0dHItPm5hbWUsICJ2ZXJz
-aW9uIikgPT0gMCkgewotCQlyZXR1cm4gc2NucHJpbnRmKHBhZ2UsIFBBR0VfU0laRSwgIiV1XG4i
-LCBnZW8tPnZlcl9pZCk7CisJCWlmIChnZW8tPm1ham9yX3Zlcl9pZCA9PSAxKQorCQkJcmV0dXJu
-IHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIldVxuIiwKKwkJCQkJCWdlby0+bWFqb3JfdmVy
-X2lkKTsKKwkJZWxzZQorCQkJcmV0dXJuIHNjbnByaW50ZihwYWdlLCBQQUdFX1NJWkUsICIldS4l
-dVxuIiwKKwkJCQkJCWdlby0+bWFqb3JfdmVyX2lkLAorCQkJCQkJZ2VvLT5taW5vcl92ZXJfaWQp
-OwogCX0gZWxzZSBpZiAoc3RyY21wKGF0dHItPm5hbWUsICJjYXBhYmlsaXRpZXMiKSA9PSAwKSB7
-CiAJCXJldHVybiBzY25wcmludGYocGFnZSwgUEFHRV9TSVpFLCAiJXVcbiIsIGdlby0+Y2FwKTsK
-IAl9IGVsc2UgaWYgKHN0cmNtcChhdHRyLT5uYW1lLCAicmVhZF90eXAiKSA9PSAwKSB7CkBAIC0x
-MTcxLDcgKzExODYsNyBAQCBpbnQgbnZtZV9udm1fcmVnaXN0ZXJfc3lzZnMoc3RydWN0IG52bWVf
-bnMgKm5zKQogCWlmICghbmRldikKIAkJcmV0dXJuIC1FSU5WQUw7CiAKLQlzd2l0Y2ggKGdlby0+
-dmVyX2lkKSB7CisJc3dpdGNoIChnZW8tPm1ham9yX3Zlcl9pZCkgewogCWNhc2UgMToKIAkJcmV0
-dXJuIHN5c2ZzX2NyZWF0ZV9ncm91cCgmZGlza190b19kZXYobnMtPmRpc2spLT5rb2JqLAogCQkJ
-CQkmbnZtX2Rldl9hdHRyX2dyb3VwXzEyKTsKQEAgLTExODgsNyArMTIwMyw3IEBAIHZvaWQgbnZt
-ZV9udm1fdW5yZWdpc3Rlcl9zeXNmcyhzdHJ1Y3QgbnZtZV9ucyAqbnMpCiAJc3RydWN0IG52bV9k
-ZXYgKm5kZXYgPSBucy0+bmRldjsKIAlzdHJ1Y3QgbnZtX2dlbyAqZ2VvID0gJm5kZXYtPmdlbzsK
-IAotCXN3aXRjaCAoZ2VvLT52ZXJfaWQpIHsKKwlzd2l0Y2ggKGdlby0+bWFqb3JfdmVyX2lkKSB7
-CiAJY2FzZSAxOgogCQlzeXNmc19yZW1vdmVfZ3JvdXAoJmRpc2tfdG9fZGV2KG5zLT5kaXNrKS0+
-a29iaiwKIAkJCQkJJm52bV9kZXZfYXR0cl9ncm91cF8xMik7CmRpZmYgLS1naXQgYS9pbmNsdWRl
-L2xpbnV4L2xpZ2h0bnZtLmggYi9pbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmgKaW5kZXggYjlmMGQy
-MDcwZGU5Li40YjJlY2JmNDVmZDkgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvbGludXgvbGlnaHRudm0u
-aAorKysgYi9pbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmgKQEAgLTI2Myw3ICsyNjMsOCBAQCBlbnVt
-IHsKIC8qIEluc3RhbmNlIGdlb21ldHJ5ICovCiBzdHJ1Y3QgbnZtX2dlbyB7CiAJLyogZGV2aWNl
-IHJlcG9ydGVkIHZlcnNpb24gKi8KLQl1OAl2ZXJfaWQ7CisJdTgJbWFqb3JfdmVyX2lkOworCXU4
-CW1pbm9yX3Zlcl9pZDsKIAogCS8qIGluc3RhbmNlIHNwZWNpZmljIGdlb21ldHJ5ICovCiAJaW50
-IG5yX2NobmxzOwotLSAKMi43LjQKCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fXwpMaW51eC1udm1lIG1haWxpbmcgbGlzdApMaW51eC1udm1lQGxpc3RzLmlu
-ZnJhZGVhZC5vcmcKaHR0cDovL2xpc3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9s
-aW51eC1udm1lCg==
+On Wed, Feb 28 2018, Bart Van Assche wrote:
+> On Wed, 2018-02-28 at 11:19 -0700, Jens Axboe wrote:
+> > Didn't Ming ack the first three?
+> 
+> Hello Jens,
+> 
+> This morning I did what I usually do before I repost a patch series, namely to
+> look at the replies to individual patches for reviewed-by tags. That's how I
+> overlooked the following (see also https://marc.info/?l=linux-block&m=151947628418213):
+> 
+> "For patches 1 ~ 3: Reviewed-by: Ming Lei <ming.lei@redhat.com>"
+> 
+> Do you want me to repost this series?
+
+No that's OK, I can add them. Just wanted to double check.
+
+-- 
+Jens Axboe
