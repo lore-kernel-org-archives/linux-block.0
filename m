@@ -1,202 +1,152 @@
-Return-Path: <prvs=590d2a92c=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
+Return-Path: <gunthorp@deltatee.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org,
+	linux-nvdimm@lists.01.org,
+	linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
 	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <damien.lemoal@wdc.com>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Omar Sandoval <osandov@fb.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH 1/2] blk-mq-debugfs: Reorder queue show and store methods
-Date: Tue, 27 Feb 2018 16:32:13 -0800
-Message-Id: <20180228003214.3194-2-bart.vanassche@wdc.com>
-In-Reply-To: <20180228003214.3194-1-bart.vanassche@wdc.com>
-References: <20180228003214.3194-1-bart.vanassche@wdc.com>
+	Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 28 Feb 2018 16:39:59 -0700
+Message-Id: <20180228234006.21093-4-logang@deltatee.com>
+In-Reply-To: <20180228234006.21093-1-logang@deltatee.com>
+References: <20180228234006.21093-1-logang@deltatee.com>
+Subject: [PATCH v2 03/10] PCI/P2PDMA: Add PCI p2pmem dma mappings to adjust the bus offset
 List-ID: <linux-block@vger.kernel.org>
 
-Make sure that the queue show and store methods are contiguous and
-also that these appear in alphabetical order.
+The DMA address used when mapping PCI P2P memory must be the PCI bus
+address. Thus, introduce pci_p2pmem_[un]map_sg() to map the correct
+addresses when using P2P memory.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Damien Le Moal <damien.lemoal@wdc.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
+For this, we assume that an SGL passed to these functions contain all
+p2p memory or no p2p memory.
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- block/blk-mq-debugfs.c | 130 ++++++++++++++++++++++++-------------------------
- 1 file changed, 65 insertions(+), 65 deletions(-)
+ drivers/pci/p2pdma.c       | 51 ++++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/memremap.h   |  1 +
+ include/linux/pci-p2pdma.h | 13 ++++++++++++
+ 3 files changed, 65 insertions(+)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index a5a6fc5304e2..eaf282e239b0 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -24,6 +24,64 @@
- #include "blk-mq-debugfs.h"
- #include "blk-mq-tag.h"
+diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+index a57df78f6a32..4e1c81f64b29 100644
+--- a/drivers/pci/p2pdma.c
++++ b/drivers/pci/p2pdma.c
+@@ -188,6 +188,8 @@ int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar, size_t size,
+ 	pgmap->res.flags = pci_resource_flags(pdev, bar);
+ 	pgmap->ref = &pdev->p2pdma->devmap_ref;
+ 	pgmap->type = MEMORY_DEVICE_PCI_P2PDMA;
++	pgmap->pci_p2pdma_bus_offset = pci_bus_address(pdev, bar) -
++		pci_resource_start(pdev, bar);
  
-+static void print_stat(struct seq_file *m, struct blk_rq_stat *stat)
+ 	addr = devm_memremap_pages(&pdev->dev, pgmap);
+ 	if (IS_ERR(addr))
+@@ -616,3 +618,52 @@ void pci_p2pmem_publish(struct pci_dev *pdev, bool publish)
+ 	pdev->p2pdma->published = publish;
+ }
+ EXPORT_SYMBOL_GPL(pci_p2pmem_publish);
++
++/*
++ * pci_p2pdma_map_sg - map a PCI peer-to-peer sg for DMA
++ * @dev:        device doing the DMA request
++ * @sg:		scatter list to map
++ * @nents:	elements in the scatterlist
++ * @dir:        DMA direction
++ *
++ * Returns the number of SG entries mapped
++ */
++int pci_p2pdma_map_sg(struct device *dev, struct scatterlist *sg, int nents,
++		      enum dma_data_direction dir)
 +{
-+	if (stat->nr_samples) {
-+		seq_printf(m, "samples=%d, mean=%lld, min=%llu, max=%llu",
-+			   stat->nr_samples, stat->mean, stat->min, stat->max);
-+	} else {
-+		seq_puts(m, "samples=0");
++	struct dev_pagemap *pgmap;
++	struct scatterlist *s;
++	phys_addr_t paddr;
++	int i;
++
++	/*
++	 * p2pdma mappings are not compatible with devices that use
++	 * dma_virt_ops.
++	 */
++	if (IS_ENABLED(CONFIG_DMA_VIRT_OPS) && dev->dma_ops == &dma_virt_ops)
++		return 0;
++
++	for_each_sg(sg, s, nents, i) {
++		pgmap = sg_page(s)->pgmap;
++		paddr = sg_phys(s);
++
++		s->dma_address = paddr - pgmap->pci_p2pdma_bus_offset;
++		sg_dma_len(s) = s->length;
 +	}
-+}
 +
-+static int queue_poll_stat_show(void *data, struct seq_file *m)
++	return nents;
++}
++EXPORT_SYMBOL_GPL(pci_p2pdma_map_sg);
++
++/**
++ * pci_p2pdma_unmap_sg - unmap a PCI peer-to-peer sg for DMA
++ * @dev:        device doing the DMA request
++ * @sg:		scatter list to map
++ * @nents:	elements in the scatterlist
++ * @dir:        DMA direction
++ */
++void pci_p2pdma_unmap_sg(struct device *dev, struct scatterlist *sg, int nents,
++			 enum dma_data_direction dir)
 +{
-+	struct request_queue *q = data;
-+	int bucket;
-+
-+	for (bucket = 0; bucket < BLK_MQ_POLL_STATS_BKTS/2; bucket++) {
-+		seq_printf(m, "read  (%d Bytes): ", 1 << (9+bucket));
-+		print_stat(m, &q->poll_stat[2*bucket]);
-+		seq_puts(m, "\n");
-+
-+		seq_printf(m, "write (%d Bytes): ",  1 << (9+bucket));
-+		print_stat(m, &q->poll_stat[2*bucket+1]);
-+		seq_puts(m, "\n");
-+	}
-+	return 0;
 +}
-+
-+static void *queue_requeue_list_start(struct seq_file *m, loff_t *pos)
-+	__acquires(&q->requeue_lock)
-+{
-+	struct request_queue *q = m->private;
-+
-+	spin_lock_irq(&q->requeue_lock);
-+	return seq_list_start(&q->requeue_list, *pos);
-+}
-+
-+static void *queue_requeue_list_next(struct seq_file *m, void *v, loff_t *pos)
-+{
-+	struct request_queue *q = m->private;
-+
-+	return seq_list_next(v, &q->requeue_list, pos);
-+}
-+
-+static void queue_requeue_list_stop(struct seq_file *m, void *v)
-+	__releases(&q->requeue_lock)
-+{
-+	struct request_queue *q = m->private;
-+
-+	spin_unlock_irq(&q->requeue_lock);
-+}
-+
-+static const struct seq_operations queue_requeue_list_seq_ops = {
-+	.start	= queue_requeue_list_start,
-+	.next	= queue_requeue_list_next,
-+	.stop	= queue_requeue_list_stop,
-+	.show	= blk_mq_debugfs_rq_show,
-+};
-+
- static int blk_flags_show(struct seq_file *m, const unsigned long flags,
- 			  const char *const *flag_name, int flag_name_count)
- {
-@@ -125,16 +183,6 @@ static ssize_t queue_state_write(void *data, const char __user *buf,
- 	return count;
- }
- 
--static void print_stat(struct seq_file *m, struct blk_rq_stat *stat)
--{
--	if (stat->nr_samples) {
--		seq_printf(m, "samples=%d, mean=%lld, min=%llu, max=%llu",
--			   stat->nr_samples, stat->mean, stat->min, stat->max);
--	} else {
--		seq_puts(m, "samples=0");
--	}
--}
--
- static int queue_write_hint_show(void *data, struct seq_file *m)
- {
- 	struct request_queue *q = data;
-@@ -158,22 +206,13 @@ static ssize_t queue_write_hint_store(void *data, const char __user *buf,
- 	return count;
- }
- 
--static int queue_poll_stat_show(void *data, struct seq_file *m)
--{
--	struct request_queue *q = data;
--	int bucket;
--
--	for (bucket = 0; bucket < BLK_MQ_POLL_STATS_BKTS/2; bucket++) {
--		seq_printf(m, "read  (%d Bytes): ", 1 << (9+bucket));
--		print_stat(m, &q->poll_stat[2*bucket]);
--		seq_puts(m, "\n");
--
--		seq_printf(m, "write (%d Bytes): ",  1 << (9+bucket));
--		print_stat(m, &q->poll_stat[2*bucket+1]);
--		seq_puts(m, "\n");
--	}
--	return 0;
--}
-+static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
-+	{ "poll_stat", 0400, queue_poll_stat_show },
-+	{ "requeue_list", 0400, .seq_ops = &queue_requeue_list_seq_ops },
-+	{ "state", 0600, queue_state_show, queue_state_write },
-+	{ "write_hints", 0600, queue_write_hint_show, queue_write_hint_store },
-+	{ },
-+};
- 
- #define HCTX_STATE_NAME(name) [BLK_MQ_S_##name] = #name
- static const char *const hctx_state_name[] = {
-@@ -335,37 +374,6 @@ int blk_mq_debugfs_rq_show(struct seq_file *m, void *v)
- }
- EXPORT_SYMBOL_GPL(blk_mq_debugfs_rq_show);
- 
--static void *queue_requeue_list_start(struct seq_file *m, loff_t *pos)
--	__acquires(&q->requeue_lock)
--{
--	struct request_queue *q = m->private;
--
--	spin_lock_irq(&q->requeue_lock);
--	return seq_list_start(&q->requeue_list, *pos);
--}
--
--static void *queue_requeue_list_next(struct seq_file *m, void *v, loff_t *pos)
--{
--	struct request_queue *q = m->private;
--
--	return seq_list_next(v, &q->requeue_list, pos);
--}
--
--static void queue_requeue_list_stop(struct seq_file *m, void *v)
--	__releases(&q->requeue_lock)
--{
--	struct request_queue *q = m->private;
--
--	spin_unlock_irq(&q->requeue_lock);
--}
--
--static const struct seq_operations queue_requeue_list_seq_ops = {
--	.start	= queue_requeue_list_start,
--	.next	= queue_requeue_list_next,
--	.stop	= queue_requeue_list_stop,
--	.show	= blk_mq_debugfs_rq_show,
--};
--
- static void *hctx_dispatch_start(struct seq_file *m, loff_t *pos)
- 	__acquires(&hctx->lock)
- {
-@@ -761,14 +769,6 @@ static const struct file_operations blk_mq_debugfs_fops = {
- 	.release	= blk_mq_debugfs_release,
++EXPORT_SYMBOL_GPL(pci_p2pdma_unmap_sg);
+diff --git a/include/linux/memremap.h b/include/linux/memremap.h
+index 9e907c338a44..1660f64ce96f 100644
+--- a/include/linux/memremap.h
++++ b/include/linux/memremap.h
+@@ -125,6 +125,7 @@ struct dev_pagemap {
+ 	struct device *dev;
+ 	void *data;
+ 	enum memory_type type;
++	u64 pci_p2pdma_bus_offset;
  };
  
--static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
--	{"poll_stat", 0400, queue_poll_stat_show},
--	{"requeue_list", 0400, .seq_ops = &queue_requeue_list_seq_ops},
--	{"state", 0600, queue_state_show, queue_state_write},
--	{"write_hints", 0600, queue_write_hint_show, queue_write_hint_store},
--	{},
--};
--
- static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_attrs[] = {
- 	{"state", 0400, hctx_state_show},
- 	{"flags", 0400, hctx_flags_show},
+ #ifdef CONFIG_ZONE_DEVICE
+diff --git a/include/linux/pci-p2pdma.h b/include/linux/pci-p2pdma.h
+index c0dde3d3aac4..126eca697ab3 100644
+--- a/include/linux/pci-p2pdma.h
++++ b/include/linux/pci-p2pdma.h
+@@ -36,6 +36,10 @@ int pci_p2pmem_alloc_sgl(struct pci_dev *pdev, struct scatterlist **sgl,
+ void pci_p2pmem_free_sgl(struct pci_dev *pdev, struct scatterlist *sgl,
+ 		unsigned int nents);
+ void pci_p2pmem_publish(struct pci_dev *pdev, bool publish);
++int pci_p2pdma_map_sg(struct device *dev, struct scatterlist *sg, int nents,
++		      enum dma_data_direction dir);
++void pci_p2pdma_unmap_sg(struct device *dev, struct scatterlist *sg, int nents,
++			 enum dma_data_direction dir);
+ #else /* CONFIG_PCI_P2PDMA */
+ static inline int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar,
+ 		size_t size, u64 offset)
+@@ -83,5 +87,14 @@ static inline void pci_p2pmem_free_sgl(struct pci_dev *pdev,
+ static inline void pci_p2pmem_publish(struct pci_dev *pdev, bool publish)
+ {
+ }
++static inline int pci_p2pdma_map_sg(struct device *dev,
++	struct scatterlist *sg, int nents, enum dma_data_direction dir)
++{
++	return 0;
++}
++static inline void pci_p2pdma_unmap_sg(struct device *dev,
++	struct scatterlist *sg, int nents, enum dma_data_direction dir)
++{
++}
+ #endif /* CONFIG_PCI_P2PDMA */
+ #endif /* _LINUX_PCI_P2P_H */
 -- 
-2.16.2
+2.11.0
