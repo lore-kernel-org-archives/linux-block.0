@@ -1,155 +1,110 @@
-Return-Path: <gunthorp@deltatee.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvdimm@lists.01.org,
-	linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Logan Gunthorpe <logang@deltatee.com>
-Date: Wed, 28 Feb 2018 16:39:56 -0700
-Message-Id: <20180228234006.21093-1-logang@deltatee.com>
-Subject: [PATCH v2 00/10] Copy Offload in NVMe Fabrics with P2P PCI Memory
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:12915 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753100AbeB1SPf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Feb 2018 13:15:35 -0500
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Jan Kara <jack@suse.com>
+Subject: [PATCH v5 6/6] block: Fix a race between request queue removal and the block cgroup controller
+Date: Wed, 28 Feb 2018 10:15:33 -0800
+Message-Id: <20180228181533.29402-7-bart.vanassche@wdc.com>
+In-Reply-To: <20180228181533.29402-1-bart.vanassche@wdc.com>
+References: <20180228181533.29402-1-bart.vanassche@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Everyone,
+Avoid that the following race can occur:
 
-Here's v2 of our series to introduce P2P based copy offload to NVMe
-fabrics. This version has been rebased onto v4.16-rc3 which already
-includes Christoph's devpagemap work the previous version was based
-off as well as a couple of the cleanup patches that were in v1.
+blk_cleanup_queue()               blkcg_print_blkgs()
+  spin_lock_irq(lock) (1)           spin_lock_irq(blkg->q->queue_lock) (2,5)
+    q->queue_lock = &q->__queue_lock (3)
+  spin_unlock_irq(lock) (4)
+                                    spin_unlock_irq(blkg->q->queue_lock) (6)
 
-Additionally, we've made the following changes based on feedback:
+(1) take driver lock;
+(2) busy loop for driver lock;
+(3) override driver lock with internal lock;
+(4) unlock driver lock;
+(5) can take driver lock now;
+(6) but unlock internal lock.
 
-* Renamed everything to 'p2pdma' per the suggestion from Bjorn as well
-  as a bunch of cleanup and spelling fixes he pointed out in the last
-  series.
+This change is safe because only the SCSI core and the NVME core keep
+a reference on a request queue after having called blk_cleanup_queue().
+Neither driver accesses any of the removed data structures between its
+blk_cleanup_queue() and blk_put_queue() calls.
 
-* To address Alex's ACS concerns, we change to a simpler method of
-  just disabling ACS behind switches for any kernel that has
-  CONFIG_PCI_P2PDMA.
+Reported-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+Cc: Jan Kara <jack@suse.com>
+---
+ block/blk-core.c  | 31 +++++++++++++++++++++++++++++++
+ block/blk-sysfs.c |  7 -------
+ 2 files changed, 31 insertions(+), 7 deletions(-)
 
-* We also reject using devices that employ 'dma_virt_ops' which should
-  fairly simply handle Jason's concerns that this work might break with
-  the HFI, QIB and rxe drivers that use the virtual ops to implement
-  their own special DMA operations.
-
-Thanks,
-
-Logan
-
---
-
-This is a continuation of our work to enable using Peer-to-Peer PCI
-memory in NVMe fabrics targets. Many thanks go to Christoph Hellwig who
-provided valuable feedback to get these patches to where they are today.
-
-The concept here is to use memory that's exposed on a PCI BAR as
-data buffers in the NVME target code such that data can be transferred
-from an RDMA NIC to the special memory and then directly to an NVMe
-device avoiding system memory entirely. The upside of this is better
-QoS for applications running on the CPU utilizing memory and lower
-PCI bandwidth required to the CPU (such that systems could be designed
-with fewer lanes connected to the CPU). However, presently, the
-trade-off is currently a reduction in overall throughput. (Largely due
-to hardware issues that would certainly improve in the future).
-
-Due to these trade-offs we've designed the system to only enable using
-the PCI memory in cases where the NIC, NVMe devices and memory are all
-behind the same PCI switch. This will mean many setups that could likely
-work well will not be supported so that we can be more confident it
-will work and not place any responsibility on the user to understand
-their topology. (We chose to go this route based on feedback we
-received at the last LSF). Future work may enable these transfers behind
-a fabric of PCI switches or perhaps using a white list of known good
-root complexes.
-
-In order to enable this functionality, we introduce a few new PCI
-functions such that a driver can register P2P memory with the system.
-Struct pages are created for this memory using devm_memremap_pages()
-and the PCI bus offset is stored in the corresponding pagemap structure.
-
-Another set of functions allow a client driver to create a list of
-client devices that will be used in a given P2P transactions and then
-use that list to find any P2P memory that is supported by all the
-client devices. This list is then also used to selectively disable the
-ACS bits for the downstream ports behind these devices.
-
-In the block layer, we also introduce a P2P request flag to indicate a
-given request targets P2P memory as well as a flag for a request queue
-to indicate a given queue supports targeting P2P memory. P2P requests
-will only be accepted by queues that support it. Also, P2P requests
-are marked to not be merged seeing a non-homogenous request would
-complicate the DMA mapping requirements.
-
-In the PCI NVMe driver, we modify the existing CMB support to utilize
-the new PCI P2P memory infrastructure and also add support for P2P
-memory in its request queue. When a P2P request is received it uses the
-pci_p2pmem_map_sg() function which applies the necessary transformation
-to get the corrent pci_bus_addr_t for the DMA transactions.
-
-In the RDMA core, we also adjust rdma_rw_ctx_init() and
-rdma_rw_ctx_destroy() to take a flags argument which indicates whether
-to use the PCI P2P mapping functions or not.
-
-Finally, in the NVMe fabrics target port we introduce a new
-configuration boolean: 'allow_p2pmem'. When set, the port will attempt
-to find P2P memory supported by the RDMA NIC and all namespaces. If
-supported memory is found, it will be used in all IO transfers. And if
-a port is using P2P memory, adding new namespaces that are not supported
-by that memory will fail.
-
-Logan Gunthorpe (10):
-  PCI/P2PDMA: Support peer to peer memory
-  PCI/P2PDMA: Add sysfs group to display p2pmem stats
-  PCI/P2PDMA: Add PCI p2pmem dma mappings to adjust the bus offset
-  PCI/P2PDMA: Clear ACS P2P flags for all devices behind switches
-  block: Introduce PCI P2P flags for request and request queue
-  IB/core: Add optional PCI P2P flag to rdma_rw_ctx_[init|destroy]()
-  nvme-pci: Use PCI p2pmem subsystem to manage the CMB
-  nvme-pci: Add support for P2P memory in requests
-  nvme-pci: Add a quirk for a pseudo CMB
-  nvmet: Optionally use PCI P2P memory
-
- Documentation/ABI/testing/sysfs-bus-pci |  25 ++
- block/blk-core.c                        |   3 +
- drivers/infiniband/core/rw.c            |  21 +-
- drivers/infiniband/ulp/isert/ib_isert.c |   5 +-
- drivers/infiniband/ulp/srpt/ib_srpt.c   |   7 +-
- drivers/nvme/host/core.c                |   4 +
- drivers/nvme/host/nvme.h                |   8 +
- drivers/nvme/host/pci.c                 | 118 ++++--
- drivers/nvme/target/configfs.c          |  29 ++
- drivers/nvme/target/core.c              |  95 ++++-
- drivers/nvme/target/io-cmd.c            |   3 +
- drivers/nvme/target/nvmet.h             |  10 +
- drivers/nvme/target/rdma.c              |  43 +-
- drivers/pci/Kconfig                     |  20 +
- drivers/pci/Makefile                    |   1 +
- drivers/pci/p2pdma.c                    | 713 ++++++++++++++++++++++++++++++++
- drivers/pci/pci.c                       |   4 +
- include/linux/blk_types.h               |  18 +-
- include/linux/blkdev.h                  |   3 +
- include/linux/memremap.h                |  19 +
- include/linux/pci-p2pdma.h              | 105 +++++
- include/linux/pci.h                     |   4 +
- include/rdma/rw.h                       |   7 +-
- net/sunrpc/xprtrdma/svc_rdma_rw.c       |   6 +-
- 24 files changed, 1204 insertions(+), 67 deletions(-)
- create mode 100644 drivers/pci/p2pdma.c
- create mode 100644 include/linux/pci-p2pdma.h
-
---
-2.11.0
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 41c74b37be85..6febc69a58aa 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -719,6 +719,37 @@ void blk_cleanup_queue(struct request_queue *q)
+ 	del_timer_sync(&q->backing_dev_info->laptop_mode_wb_timer);
+ 	blk_sync_queue(q);
+ 
++	/*
++	 * I/O scheduler exit is only safe after the sysfs scheduler attribute
++	 * has been removed.
++	 */
++	WARN_ON_ONCE(q->kobj.state_in_sysfs);
++
++	/*
++	 * Since the I/O scheduler exit code may access cgroup information,
++	 * perform I/O scheduler exit before disassociating from the block
++	 * cgroup controller.
++	 */
++	if (q->elevator) {
++		ioc_clear_queue(q);
++		elevator_exit(q, q->elevator);
++		q->elevator = NULL;
++	}
++
++	/*
++	 * Remove all references to @q from the block cgroup controller before
++	 * restoring @q->queue_lock to avoid that restoring this pointer causes
++	 * e.g. blkcg_print_blkgs() to crash.
++	 */
++	blkcg_exit_queue(q);
++
++	/*
++	 * Since the cgroup code may dereference the @q->backing_dev_info
++	 * pointer, only decrease its reference count after having removed the
++	 * association with the block cgroup controller.
++	 */
++	bdi_put(q->backing_dev_info);
++
+ 	if (q->mq_ops)
+ 		blk_mq_free_queue(q);
+ 	percpu_ref_exit(&q->q_usage_counter);
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index cbea895a5547..fd71a00c9462 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -798,13 +798,6 @@ static void __blk_release_queue(struct work_struct *work)
+ 	if (test_bit(QUEUE_FLAG_POLL_STATS, &q->queue_flags))
+ 		blk_stat_remove_callback(q, q->poll_cb);
+ 	blk_stat_free_callback(q->poll_cb);
+-	bdi_put(q->backing_dev_info);
+-	blkcg_exit_queue(q);
+-
+-	if (q->elevator) {
+-		ioc_clear_queue(q);
+-		elevator_exit(q, q->elevator);
+-	}
+ 
+ 	blk_free_queue_stats(q->stats);
+ 
+-- 
+2.16.2
