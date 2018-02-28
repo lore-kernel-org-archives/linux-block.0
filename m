@@ -1,72 +1,70 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:39714 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754453AbeBGTmG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Feb 2018 14:42:06 -0500
-Received: by mail-pg0-f65.google.com with SMTP id w17so696409pgv.6
-        for <linux-block@vger.kernel.org>; Wed, 07 Feb 2018 11:42:06 -0800 (PST)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Tang Junhui <tang.junhui@zte.com.cn>
-Subject: [PATCH 7/8] bcache: return attach error when no cache set exist
-Date: Wed,  7 Feb 2018 11:41:45 -0800
-Message-Id: <20180207194146.5095-8-mlyle@lyle.org>
-In-Reply-To: <20180207194146.5095-1-mlyle@lyle.org>
-References: <20180207194146.5095-1-mlyle@lyle.org>
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5717 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751646AbeB1GSF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Feb 2018 01:18:05 -0500
+Subject: Re: [bug report] Don't enter SCSI error handler on kernel 4.16-rc1
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+References: <e8bba22c-a02b-f449-c67a-d4a7ae8482df@hisilicon.com>
+ <1519658706.3975.2.camel@wdc.com>
+ <75f77913-41a7-98fd-f4a1-0301ff4d6e2b@hisilicon.com>
+ <1519743443.21815.2.camel@wdc.com>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "tj@kernel.org" <tj@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "john.garry@huawei.com" <john.garry@huawei.com>,
+        "linuxarm@huawei.com" <linuxarm@huawei.com>
+From: "chenxiang (M)" <chenxiang66@hisilicon.com>
+Message-ID: <0e03cf3a-9b96-d41e-5896-1e4c6bdf81d9@hisilicon.com>
+Date: Wed, 28 Feb 2018 14:17:03 +0800
+MIME-Version: 1.0
+In-Reply-To: <1519743443.21815.2.camel@wdc.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+在 2018/2/27 22:57, Bart Van Assche 写道:
+> On Tue, 2018-02-27 at 15:09 +0800, chenxiang (M) wrote:
+>> 在 2018/2/26 23:25, Bart Van Assche 写道:
+>>> On Mon, 2018-02-26 at 17:37 +0800, chenxiang (M) wrote:
+>>>> When i have a test on kernel 4.16-rc1, find a issue: running IO on SATA disk, then disable the disk through
+>>>> sysfs interface(echo 0 > /sys/class/sas_phy/phy-1:0:0/enable), IO will hang and never enter SCSI EH. The issue
+>>>> appears every time.
+>>>>
+>>>> I add some prints on code and find that  those IOs will be timeout after 30s, and they all enter
+>>>> function scsi_eh_scmd_add, but only some of them can enter function scsi_eh_inc_host_failed. So it will never
+>>>> enter SCSI EH.  I suspect it is related to the patch ("commit 3bd6f43f5cb371" scsi: core: Ensure that the
+>>>> SCSI error handler gets woken up ). Please have a check.
+>>> Hello chenxiang,
+>>>
+>>> Had you already noticed patch "[PATCH v2] Avoid that ATA error handling can
+>>> trigger a kernel hang or oops"? If not, can you apply that patch to your
+>>> kernel and verify whether it fixes this behavior? See also
+>>> https://www.mail-archive.com/linux-scsi@vger.kernel.org/msg71189.html or
+>>> https://patchwork.kernel.org/patch/10236213/.
+>> After applied your patch, the issue i reported seems be solved.
+> Thanks for having testing that patch!
+>
+>> But when i have long time test(disable/enable disk when running IO) on
+>> the testcase, Null pointer occurs.
+>> It seems not related to current issue but i am not sure.
+>> I ran the testcase for long time before in kernel 4.15-rc5, and it was okay.
+>>
+>> Part of log is as follows, and i add attachment of log in the email :
+>>
+>> [  485.716578] pc : blk_abort_request+0x14/0x68
+> (+Tejun)
+>
+> Hello chenxiang,
+>
+> Please check whether the following patch fixes the kernel crash you ran into:
+>
+> https://marc.info/?l=linux-block&m=151895951207014
 
-I attach a back-end device to a cache set, and the cache set is not
-registered yet, this back-end device did not attach successfully, and no
-error returned:
-[root]# echo 87859280-fec6-4bcc-20df7ca8f86b > /sys/block/sde/bcache/attach
-[root]#
+It seems the patch is for block mq, but the issue i encount is under 
+block legacy as CONFIG_SCSI_MQ_DEFAULT is not enabled.
 
-In sysfs_attach(), the return value "v" is initialized to "size" in
-the beginning, and if no cache set exist in bch_cache_sets, the "v" value
-would not change any more, and return to sysfs, sysfs regard it as success
-since the "size" is a positive number.
-
-This patch fixes this issue by assigning "v" with "-ENOENT" in the
-initialization.
-
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/sysfs.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index 4a6a697e1680..a7552f509f50 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -198,7 +198,7 @@ STORE(__cached_dev)
- {
- 	struct cached_dev *dc = container_of(kobj, struct cached_dev,
- 					     disk.kobj);
--	ssize_t v = size;
-+	ssize_t v;
- 	struct cache_set *c;
- 	struct kobj_uevent_env *env;
- 
-@@ -275,6 +275,7 @@ STORE(__cached_dev)
- 		if (bch_parse_uuid(buf, dc->sb.set_uuid) < 16)
- 			return -EINVAL;
- 
-+		v = -ENOENT;
- 		list_for_each_entry(c, &bch_cache_sets, list) {
- 			v = bch_cached_dev_attach(dc, c);
- 			if (!v)
-@@ -282,7 +283,7 @@ STORE(__cached_dev)
- 		}
- 
- 		pr_err("Can't attach %s: cache set not found", buf);
--		size = v;
-+		return v;
- 	}
- 
- 	if (attr == &sysfs_detach && dc->disk.c)
--- 
-2.14.1
+>
+> Thanks,
+>
+> Bart.
