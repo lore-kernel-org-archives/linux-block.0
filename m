@@ -1,227 +1,49 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:41286 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751786AbeBHS76 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 8 Feb 2018 13:59:58 -0500
-From: Goldwyn Rodrigues <rgoldwyn@suse.de>
-To: linux-fsdevel@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Goldwyn Rodrigues <rgoldwyn@suse.com>
-Subject: [PATCH v7 2/2] Return bytes transferred for partial direct I/O
-Date: Thu,  8 Feb 2018 12:59:48 -0600
-Message-Id: <20180208185948.26827-2-rgoldwyn@suse.de>
-In-Reply-To: <20180208185948.26827-1-rgoldwyn@suse.de>
-References: <20180208185948.26827-1-rgoldwyn@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=591f9e40c=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "paolo.valente@linaro.org" <paolo.valente@linaro.org>
+CC: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linus.walleij@linaro.org" <linus.walleij@linaro.org>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
+Subject: Re: v4.16-rc1 + dm-mpath + BFQ
+Date: Thu, 1 Mar 2018 01:35:24 +0000
+Message-ID: <1519868123.2777.28.camel@wdc.com>
+References: <1518202449.2871.32.camel@wdc.com>
+	 <6a1695f4-de6f-a959-5242-9611e148bc11@kernel.dk>
+	 <13a55c03-b138-ca8c-0a0a-95c976b4909e@wdc.com>
+	 <bee15d7a-de1f-daee-717d-b9e314ab06a1@kernel.dk>
+	 <1FC84680-6482-4FE5-97D0-0F7079C45AA7@linaro.org>
+	 <06795609-6ec6-4ae2-f219-3bf7219c11a3@wdc.com>
+	 <D89FF8A1-871E-4661-AE9F-6515E6C5EF22@linaro.org>
+	 <1518547636.2796.15.camel@wdc.com>
+	 <0BF6AC73-69CE-41B5-BDAC-C5249037C83C@linaro.org>
+	 <60f48ff1-7c8b-2c10-4560-744d70bccea1@wdc.com>
+	 <6C49304C-D506-4719-9365-E7D35BEC9851@linaro.org>
+In-Reply-To: <6C49304C-D506-4719-9365-E7D35BEC9851@linaro.org>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-From: Goldwyn Rodrigues <rgoldwyn@suse.com>
-
-In case direct I/O encounters an error midway, it returns the error.
-Instead it should be returning the number of bytes transferred so far.
-
-Test case for filesystems (with ENOSPC):
-1. Create an almost full filesystem
-2. Create a file, say /mnt/lastfile, until the filesystem is full.
-3. Direct write() with count > sizeof /mnt/lastfile.
-
-Result: write() returns -ENOSPC. However, file content has data written
-in step 3.
-
-Added a sysctl entry: dio_short_writes which is on by default. This is
-to support applications which expect either and error or the bytes submitted
-as a return value for the write calls.
-
-This fixes fstest generic/472.
-
-Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
----
- Documentation/sysctl/fs.txt | 14 ++++++++++++++
- fs/block_dev.c              |  2 +-
- fs/direct-io.c              |  7 +++++--
- fs/iomap.c                  | 23 ++++++++++++-----------
- include/linux/fs.h          |  1 +
- kernel/sysctl.c             |  9 +++++++++
- 6 files changed, 42 insertions(+), 14 deletions(-)
-
-Changes since v1:
- - incorporated iomap and block devices
-
-Changes since v2:
- - realized that file size was not increasing when performing a (partial)
-   direct I/O because end_io function was receiving the error instead of
-   size. Fixed.
-
-Changes since v3:
- - [hch] initialize transferred with dio->size and use transferred instead
-   of dio->size.
-
-Changes since v4:
- - Refreshed to v4.14
-
-Changes since v5:
- - Added /proc/sys/fs/dio_short_writes (default 1) to guard older applications
-   which expect write(fd, buf, count) returns either count or error.
-
-Changes since v6:
- - Corrected documentation
- - Re-ordered patch
-
-diff --git a/Documentation/sysctl/fs.txt b/Documentation/sysctl/fs.txt
-index 6c00c1e2743f..21582f675985 100644
---- a/Documentation/sysctl/fs.txt
-+++ b/Documentation/sysctl/fs.txt
-@@ -22,6 +22,7 @@ Currently, these files are in /proc/sys/fs:
- - aio-max-nr
- - aio-nr
- - dentry-state
-+- dio_short_writes
- - dquot-max
- - dquot-nr
- - file-max
-@@ -76,6 +77,19 @@ dcache isn't pruned yet.
- 
- ==============================================================
- 
-+dio_short_writes:
-+
-+In case Direct I/O encounters a transient error, it returns
-+the error code, even if it has performed part of the write.
-+This flag, if on (default), will return the number of bytes written
-+so far, as the write(2) semantics are. However, some older applications
-+still consider a direct write as an error if all of the I/O
-+submitted is not complete. I.e. write(file, count, buf) != count.
-+This option can be disabled on systems in order to support
-+existing applications which do not expect short writes.
-+
-+==============================================================
-+
- dquot-max & dquot-nr:
- 
- The file dquot-max shows the maximum number of cached disk
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 4a181fcb5175..49d94360bb51 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -409,7 +409,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
- 
- 	if (!ret)
- 		ret = blk_status_to_errno(dio->bio.bi_status);
--	if (likely(!ret))
-+	if (likely(dio->size))
- 		ret = dio->size;
- 
- 	bio_put(&dio->bio);
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index 3aafb3343a65..9bd15be64c25 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -151,6 +151,7 @@ struct dio {
- } ____cacheline_aligned_in_smp;
- 
- static struct kmem_cache *dio_cache __read_mostly;
-+unsigned int sysctl_dio_short_writes = 1;
- 
- /*
-  * How many pages are in the queue?
-@@ -262,7 +263,7 @@ static ssize_t dio_complete(struct dio *dio, ssize_t ret, unsigned int flags)
- 		ret = dio->page_errors;
- 	if (ret == 0)
- 		ret = dio->io_error;
--	if (ret == 0)
-+	if (!sysctl_dio_short_writes && (ret == 0))
- 		ret = transferred;
- 
- 	if (dio->end_io) {
-@@ -310,7 +311,9 @@ static ssize_t dio_complete(struct dio *dio, ssize_t ret, unsigned int flags)
- 	}
- 
- 	kmem_cache_free(dio_cache, dio);
--	return ret;
-+	if (!sysctl_dio_short_writes)
-+		return ret;
-+	return transferred ? transferred : ret;
- }
- 
- static void dio_aio_complete_work(struct work_struct *work)
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 47d29ccffaef..a8d6908dc0de 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -716,23 +716,24 @@ static ssize_t iomap_dio_complete(struct iomap_dio *dio)
- 	struct kiocb *iocb = dio->iocb;
- 	struct inode *inode = file_inode(iocb->ki_filp);
- 	loff_t offset = iocb->ki_pos;
--	ssize_t ret;
-+	ssize_t err;
-+	ssize_t transferred = dio->size;
- 
- 	if (dio->end_io) {
--		ret = dio->end_io(iocb,
--				dio->error ? dio->error : dio->size,
--				dio->flags);
-+		err = dio->end_io(iocb,
-+				  (transferred && sysctl_dio_short_writes) ?
-+						transferred : dio->error,
-+				  dio->flags);
- 	} else {
--		ret = dio->error;
-+		err = dio->error;
- 	}
- 
--	if (likely(!ret)) {
--		ret = dio->size;
-+	if (likely(transferred)) {
- 		/* check for short read */
--		if (offset + ret > dio->i_size &&
-+		if (offset + transferred > dio->i_size &&
- 		    !(dio->flags & IOMAP_DIO_WRITE))
--			ret = dio->i_size - offset;
--		iocb->ki_pos += ret;
-+			transferred = dio->i_size - offset;
-+		iocb->ki_pos += transferred;
- 	}
- 
- 	/*
-@@ -759,7 +760,7 @@ static ssize_t iomap_dio_complete(struct iomap_dio *dio)
- 	inode_dio_end(file_inode(iocb->ki_filp));
- 	kfree(dio);
- 
--	return ret;
-+	return (transferred && sysctl_dio_short_writes) ? transferred : err;
- }
- 
- static void iomap_dio_complete_work(struct work_struct *work)
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 511fbaabf624..a25652e5ae1b 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1469,6 +1469,7 @@ static inline void i_gid_write(struct inode *inode, gid_t gid)
- }
- 
- extern struct timespec current_time(struct inode *inode);
-+extern unsigned int sysctl_dio_short_writes;
- 
- /*
-  * Snapshotting support.
-diff --git a/kernel/sysctl.c b/kernel/sysctl.c
-index 557d46728577..362a9c3156f1 100644
---- a/kernel/sysctl.c
-+++ b/kernel/sysctl.c
-@@ -1844,6 +1844,15 @@ static struct ctl_table fs_table[] = {
- 		.proc_handler	= proc_dointvec_minmax,
- 		.extra1		= &one,
- 	},
-+	{
-+		.procname	= "dio_short_writes",
-+		.data		= &sysctl_dio_short_writes,
-+		.maxlen		= sizeof(int),
-+		.mode		= 0600,
-+		.proc_handler	= proc_dointvec_minmax,
-+		.extra1		= &zero,
-+		.extra2		= &one,
-+	},
- 	{ }
- };
- 
--- 
-2.16.1
+T24gRnJpLCAyMDE4LTAyLTE2IGF0IDA4OjM5ICswMTAwLCBQYW9sbyBWYWxlbnRlIHdyb3RlOg0K
+PiBhZnRlciBlbmFibGluZyB0aGUgbGlzdGluZyBvcHRpb25zIGluIHlvdXIgbGlzdCwgYW5kIGEg
+ZmV3IG90aGVyDQo+IHJlbGF0ZWQgb3B0aW9ucywgc3VjaCBpYmxvY2sgc3VwcG9ydCwgSSBnZXQg
+dGhpczoNCj4gDQo+ICQgc3VkbyAuL3J1bl90ZXN0cyAtYyAtZCAtciAxMCAtdCAwMi1tcSAtZSBi
+ZnENCj4gVW5sb2FkZWQgdGhlIGliX3NycHQga2VybmVsIG1vZHVsZQ0KPiBVbmxvYWRlZCB0aGUg
+cmRtYV9yeGUga2VybmVsIG1vZHVsZQ0KPiBTb2Z0Um9DRSBuZXR3b3JrIGludGVyZmFjZXM6IHJ4
+ZTANCj4gWmVyby1pbml0aWFsaXppbmcgL2Rldi9yYW0wIC4uLiBkb25lDQo+IFplcm8taW5pdGlh
+bGl6aW5nIC9kZXYvcmFtMSAuLi4gZG9uZQ0KPiBta2RpcjogaW1wb3NzaWJpbGUgY3JlYXJlIGxh
+IGRpcmVjdG9yeSAiMDIxYzo0MmZmOmZlNGM6ZmFjOSI6IEludmFsaWQgYXJndW1lbnQNCj4gUmV0
+cnlpbmcgd2l0aCBvbGQgcG9ydCBuYW1lIGZvcm1hdA0KPiBta2RpcjogaW1wb3NzaWJpbGUgY3Jl
+YXJlIGxhIGRpcmVjdG9yeSAiMHhmZTgwMDAwMDAwMDAwMDAwMDIxYzQyZmZmZTRjZmFjOSI6IElu
+dmFsaWQgYXJndW1lbnQNCg0KSGVsbG8gUGFvbG8sDQoNClRoYW5rIHlvdSBmb3IgaGF2aW5nIHNo
+YXJlZCB5b3VyIGtlcm5lbCBjb25maWcgb2ZmLWxpc3QuIEFmdGVyIGhhdmluZw0KbWFkZSB0aGUg
+Zm9sbG93aW5nIGNoYW5nZXMgdG8geW91ciBrZXJuZWwgY29uZmlnIEkgd2FzIGFibGUgdG8gcnVu
+IHRoZQ0Kc3JwLXRlc3Qgc29mdHdhcmU6DQoqIEVuYWJsZSBDT05GSUdfRE1fTVVMVElQQVRIX1FM
+LCBDT05GSUdfRE1fTVVMVElQQVRIX1NULA0KICBDT05GSUdfU0NTSV9ESF9SREFDLCBDT05GSUdf
+U0NTSV9ESF9FTUMgYW5kIENPTkZJR19TQ1NJX0RIX0FMVUEuDQoqIERpc2FibGUgQ09ORklHX0tB
+U0FOLiBBcHBhcmVudGx5IHRoZXJlIGlzIGFuIGluY29tcGF0aWJpbGl0eSBiZXR3ZWVuIHRoZQ0K
+ICByZG1hX3J4ZSBkcml2ZXIgYW5kIEtBU0FOLiBJJ20gc3RpbGwgYW5hbHl6aW5nIHRoaXMuDQoN
+ClBsZWFzZSBsZXQgbWUga25vdyB3aGV0aGVyIHRoZXNlIGNoYW5nZXMgYWxzbyBhbGxvdyB5b3Ug
+dG8gcnVuIHRoZSBzcnAtdGVzdA0Kc29mdHdhcmUgYW5kIHdoZXRoZXIgeW91IGNhbiByZXByb2R1
+Y2Ugd2hhdCBJIHJlcG9ydGVkIGF0IHRoZSBzdGFydCBvZiB0aGlzDQplLW1haWwgdGhyZWFkLg0K
+DQpUaGFua3MsDQoNCkJhcnQuDQoNCg0K
