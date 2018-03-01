@@ -1,124 +1,49 @@
-Return-Path: <jglisse@redhat.com>
-Date: Thu, 1 Mar 2018 15:55:49 -0500
-From: Jerome Glisse <jglisse@redhat.com>
+Return-Path: <jgg@ziepe.ca>
+Return-Path: <jgg@ziepe.ca>
+Date: Thu, 1 Mar 2018 13:53:15 -0700
+From: Jason Gunthorpe <jgg@ziepe.ca>
 To: Benjamin Herrenschmidt <benh@au1.ibm.com>
-Cc: Logan Gunthorpe <logang@deltatee.com>, linux-kernel@vger.kernel.org,
+Cc: Dan Williams <dan.j.williams@intel.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org, linux-nvdimm@lists.01.org,
+	linux-rdma <linux-rdma@vger.kernel.org>,
+	linux-nvdimm <linux-nvdimm@lists.01.org>,
 	linux-block@vger.kernel.org, Stephen Bates <sbates@raithlin.com>,
 	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
 	Keith Busch <keith.busch@intel.com>,
 	Sagi Grimberg <sagi@grimberg.me>,
 	Bjorn Helgaas <bhelgaas@google.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
 	Max Gurtovoy <maxg@mellanox.com>,
-	Dan Williams <dan.j.williams@intel.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
 	Alex Williamson <alex.williamson@redhat.com>,
 	Oliver OHalloran <oliveroh@au1.ibm.com>
 Subject: Re: [PATCH v2 00/10] Copy Offload in NVMe Fabrics with P2P PCI Memory
-Message-ID: <20180301205548.GA6742@redhat.com>
+Message-ID: <20180301205315.GJ19007@ziepe.ca>
 References: <20180228234006.21093-1-logang@deltatee.com>
  <1519876489.4592.3.camel@kernel.crashing.org>
  <1519876569.4592.4.camel@au1.ibm.com>
- <8e808448-fc01-5da0-51e7-1a6657d5a23a@deltatee.com>
- <1519936195.4592.18.camel@au1.ibm.com>
+ <CAPcyv4h7mcFphv3j_vW-CGxXa2pjQgLqpBOLzHuTzAFzygai-Q@mail.gmail.com>
+ <1519936477.4592.23.camel@au1.ibm.com>
+ <1519936815.4592.25.camel@au1.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1519936195.4592.18.camel@au1.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1519936815.4592.25.camel@au1.ibm.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Mar 02, 2018 at 07:29:55AM +1100, Benjamin Herrenschmidt wrote:
-> On Thu, 2018-03-01 at 11:04 -0700, Logan Gunthorpe wrote:
-> > 
-> > On 28/02/18 08:56 PM, Benjamin Herrenschmidt wrote:
-> > > On Thu, 2018-03-01 at 14:54 +1100, Benjamin Herrenschmidt wrote:
-> > > > The problem is that acccording to him (I didn't double check the latest
-> > > > patches) you effectively hotplug the PCIe memory into the system when
-> > > > creating struct pages.
-> > > > 
-> > > > This cannot possibly work for us. First we cannot map PCIe memory as
-> > > > cachable. (Note that doing so is a bad idea if you are behind a PLX
-> > > > switch anyway since you'd ahve to manage cache coherency in SW).
-> > > 
-> > > Note: I think the above means it won't work behind a switch on x86
-> > > either, will it ?
-> > 
-> > This works perfectly fine on x86 behind a switch and we've tested it on 
-> > multiple machines. We've never had an issue of running out of virtual 
-> > space despite our PCI bars typically being located with an offset of 
-> > 56TB or more. The arch code on x86 also somehow figures out not to map 
-> > the memory as cachable so that's not an issue (though, at this point, 
-> > the CPU never accesses the memory so even if it were, it wouldn't affect 
-> > anything).
-> 
-> Oliver can you look into this ? You sais the memory was effectively
-> hotplug'ed into the system when creating the struct pages. That would
-> mean to me that it's a) mapped (which for us is cachable, maybe x86 has
-> tricks to avoid that) and b) potentially used to populate userspace
-> pages (that will definitely be cachable). Unless there's something in
-> there you didn't see that prevents it.
-> 
-> > We also had this working on ARM64 a while back but it required some out 
-> > of tree ZONE_DEVICE patches and some truly horrid hacks to it's arch 
-> > code to ioremap the memory into the page map.
-> > 
-> > You didn't mention what architecture you were trying this on.
-> 
-> ppc64.
-> 
-> > It may make sense at this point to make this feature dependent on x86 
-> > until more work is done to make it properly portable. Something like 
-> > arch functions that allow adding IO memory pages to with a specific 
-> > cache setting. Though, if an arch has such restrictive limits on the map 
-> > size it would probably need to address that too somehow.
-> 
-> Not fan of that approach.
-> 
-> So there are two issues to consider here:
-> 
->  - Our MMIO space is very far away from memory (high bits set in the
-> address) which causes problem with things like vmmemmap, page_address,
-> virt_to_page etc... Do you have similar issues on arm64 ?
+On Fri, Mar 02, 2018 at 07:40:15AM +1100, Benjamin Herrenschmidt wrote:
+> Also we need to be able to hard block MEMREMAP_WB mappings of non-RAM
+> on ppc64 (maybe via an arch hook as it might depend on the processor
+> family). Server powerpc cannot do cachable accesses on IO memory
+> (unless it's special OpenCAPI or nVlink, but not on PCIe).
 
-HMM private (HMM public is different) works around that by looking for
-"hole" in address space and using those for hotplug (ie page_to_pfn()
-!= physical pfn of the memory). This is ok for HMM because the memory
-is never map by the CPU and we can find the physical pfn with a little
-bit of math (page_to_pfn() - page->pgmap->res->start + page->pgmap->dev->
-physical_base_address).
+I think you are right on this - even on x86 we must not create
+cachable mappings of PCI BARs - there is no way that works the way
+anyone would expect.
 
-To avoid anything going bad i actually do not populate the kernel linear
-mapping for the range hence definitly no CPU access at all through those
-struct page. CPU can still access PCIE bar through usual mmio map.
+I think this series doesn't have a problem here only because it never
+touches the BAR pages with the CPU.
 
-> 
->  - We need to ensure that the mechanism (which I'm not familiar with)
-> that you use to create the struct page's for the device don't end up
-> turning those device pages into normal "general use" pages for the
-> system. Oliver thinks it does, you say it doesn't, ... 
-> 
-> Jerome (Glisse), what's your take on this ? Smells like something that
-> could be covered by HMM...
+BAR memory should be mapped into the CPU as WC at best on all arches..
 
-Well this again a new user of struct page for device memory just for
-one usecase. I wanted HMM to be more versatile so that it could be use
-for this kind of thing too. I guess the message didn't go through. I
-will take some cycles tomorrow to look into this patchset to ascertain
-how struct page is use in this context.
-
-Note that i also want peer to peer for HMM users but with ACS and using
-IOMMU ie having to populate IOMMU page table of one device to point to
-bar of another device. I need to test on how many platform this work,
-hardware engineer are unable/unwilling to commit on wether this work or
-not.
-
-
-> Logan, the only reason you need struct page's to begin with is for the
-> DMA API right ? Or am I missing something here ?
-
-If it is only needed for that this sounds like a waste of memory for
-struct page. Thought i understand this allow new API to match previous
-one.
-
-Cheers,
-J�r�me
+Jason
