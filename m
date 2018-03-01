@@ -15,8 +15,8 @@ CC: Jason Gunthorpe <jgg@ziepe.ca>, Logan Gunthorpe <logang@deltatee.com>,
 	<benh@kernel.crashing.org>, Alex Williamson <alex.williamson@redhat.com>,
 	Steve Wise <swise@opengridcomputing.com>
 Subject: Re: [PATCH v2 10/10] nvmet: Optionally use PCI P2P memory
-Date: Thu, 1 Mar 2018 23:57:43 +0000
-Message-ID: <CE2A5D93-E735-4414-8DC1-B308B74A1C5B@raithlin.com>
+Date: Thu, 1 Mar 2018 23:53:16 +0000
+Message-ID: <6B6A0FD9-14F5-4AF2-A74A-DAA562C34AB9@raithlin.com>
 References: <20180228234006.21093-1-logang@deltatee.com>
  <20180228234006.21093-11-logang@deltatee.com>
  <749e3752-4349-0bdf-5243-3d510c2b26db@grimberg.me>
@@ -32,14 +32,7 @@ Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-PiBXZSBkb24ndCB3YW50IHRvIGx1bXAgdGhlc2UgYWxsIHRvZ2V0aGVyIHdpdGhvdXQga25vd2lu
-ZyB3aGljaCByZWdpb24geW91J3JlIGFsbG9jYXRpbmcgZnJvbSwgcmlnaHQ/DQoNCkluIGFsbCBz
-ZXJpb3VzbmVzcyBJIGRvIGFncmVlIHdpdGggeW91IG9uIHRoZXNlIEtlaXRoIGluIHRoZSBsb25n
-IHRlcm0uIFdlIHdvdWxkIGNvbnNpZGVyIGFkZGluZyBwcm9wZXJ0eSBmbGFncyBmb3IgdGhlIG1l
-bW9yeSBhcyBpdCBpcyBhZGRlZCB0byB0aGUgcDJwIGNvcmUgYW5kIHRoZW4gdGhlIGFsbG9jYXRv
-ciBjb3VsZCBldm9sdmUgdG8gaW50ZWxsaWdlbnRseSBkaXNoIGl0IG91dC4gQXR0cmlidXRlcyBs
-aWtlIGVuZHVyYW5jZSwgbGF0ZW5jeSBhbmQgc3BlY2lhbCB3cml0ZSBjb21taXQgcmVxdWlyZW1l
-bnRzIGNvdWxkIGFsbCBiZWNvbWUgYXR0cmlidXRlcyBpbiB0aW1lLiBQZXJoYXBzIG9uZSBtb3Jl
-IHJlYXNvbiBmb3IgYSBjZW50cmFsIGVudGl0eSBmb3IgcDJwIG1lbW9yeSBhbGxvY2F0aW9uIHNv
-IHRoaXMgY29kZSBkb2VzIG5vdCBlbmQgdXAgaGF2aW5nIHRvIGdvIGludG8gbWFueSBkaWZmZXJl
-bnQgZHJpdmVycz8NCg0KU3RlcGhlbg0KICAgIA0KDQo=
+PiBUaGVyZSdzIGEgbWVhbmluZ2Z1bCBkaWZmZXJlbmNlIGJldHdlZW4gd3JpdGluZyB0byBhbiBO
+Vk1lIENNQiB2cyBQTVINCg0KV2hlbiB0aGUgUE1SIHNwZWMgYmVjb21lcyBwdWJsaWMgd2UgY2Fu
+IGRpc2N1c3MgaG93IGJlc3QgdG8gaW50ZWdyYXRlIGl0IGludG8gdGhlIFAyUCBmcmFtZXdvcmsg
+KGlmIGF0IGFsbCkgOy0pLg0KDQpTdGVwaGVuDQoNCiAgICANCg0K
