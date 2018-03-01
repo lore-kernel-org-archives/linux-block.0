@@ -1,58 +1,42 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from ale.deltatee.com ([207.54.116.67]:39006 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1162136AbeCAV50 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 1 Mar 2018 16:57:26 -0500
-From: Logan Gunthorpe <logang@deltatee.com>
+Return-Path: <logang@deltatee.com>
 To: Dan Williams <dan.j.williams@intel.com>, benh@au1.ibm.com
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
-        Oliver OHalloran <oliveroh@au1.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        linux-nvdimm <linux-nvdimm@lists.01.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linux-pci@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Christoph Hellwig <hch@lst.de>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-rdma <linux-rdma@vger.kernel.org>,
+ linux-nvdimm <linux-nvdimm@lists.01.org>, linux-block@vger.kernel.org,
+ Stephen Bates <sbates@raithlin.com>, Christoph Hellwig <hch@lst.de>,
+ Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+ Sagi Grimberg <sagi@grimberg.me>, Bjorn Helgaas <bhelgaas@google.com>,
+ Jason Gunthorpe <jgg@mellanox.com>, Max Gurtovoy <maxg@mellanox.com>,
+ =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Oliver OHalloran <oliveroh@au1.ibm.com>
 References: <20180228234006.21093-1-logang@deltatee.com>
  <1519876489.4592.3.camel@kernel.crashing.org>
  <1519876569.4592.4.camel@au1.ibm.com>
  <CAPcyv4h7mcFphv3j_vW-CGxXa2pjQgLqpBOLzHuTzAFzygai-Q@mail.gmail.com>
  <1519936477.4592.23.camel@au1.ibm.com>
  <CAPcyv4goHsYytq60ehJUori8Xq+Z0p8dV-8_oRALj244H4YtwQ@mail.gmail.com>
- <2079ba48-5ae5-5b44-cce1-8175712dd395@deltatee.com>
-Message-ID: <43ba615f-a6e1-9444-65e1-494169cb415d@deltatee.com>
-Date: Thu, 1 Mar 2018 14:57:06 -0700
+From: Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <2079ba48-5ae5-5b44-cce1-8175712dd395@deltatee.com>
+Date: Thu, 1 Mar 2018 14:45:09 -0700
 MIME-Version: 1.0
-In-Reply-To: <2079ba48-5ae5-5b44-cce1-8175712dd395@deltatee.com>
+In-Reply-To: <CAPcyv4goHsYytq60ehJUori8Xq+Z0p8dV-8_oRALj244H4YtwQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Subject: Re: [PATCH v2 00/10] Copy Offload in NVMe Fabrics with P2P PCI Memory
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
 
 
-On 01/03/18 02:45 PM, Logan Gunthorpe wrote:
-> It handles it fine for many situations. But when you try to map 
-> something that is at the end of the physical address space then the 
-> spares-vmemmap needs virtual address space that's the size of the 
-> physical address space divided by PAGE_SIZE which may be a little bit 
-> too large...
+On 01/03/18 02:37 PM, Dan Williams wrote:
+> Ah ok, I'd need to look at the details. I had been assuming that
+> sparse-vmemmap could handle such a situation, but that could indeed be
+> a broken assumption.
 
-Though, considering this more, maybe this shouldn't be a problem...
-
-Lets say you have 56bits of address space. That's 64PB. If you use need 
-a sparse vmemmap for the entire space it will take 16TB which leaves you 
-with 63.98PB of address space left. (Similar calculations for other 
-numbers of address bits.)
-
-So I'm not sure what the problem with this is.
-
-We still have to ensure all the arches map the memory with the right 
-cache bits but that should be relatively easy to solve.
+It handles it fine for many situations. But when you try to map 
+something that is at the end of the physical address space then the 
+spares-vmemmap needs virtual address space that's the size of the 
+physical address space divided by PAGE_SIZE which may be a little bit 
+too large...
 
 Logan
