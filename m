@@ -1,26 +1,22 @@
-Return-Path: <jgg@ziepe.ca>
-Return-Path: <jgg@ziepe.ca>
-Date: Thu, 1 Mar 2018 16:20:38 -0700
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Stephen Bates <sbates@raithlin.com>
-Cc: Logan Gunthorpe <logang@deltatee.com>, Sagi Grimberg <sagi@grimberg.me>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Steve Wise <swise@opengridcomputing.com>
+Return-Path: <sbates@raithlin.com>
+From: "Stephen  Bates" <sbates@raithlin.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>, Logan Gunthorpe <logang@deltatee.com>
+CC: Sagi Grimberg <sagi@grimberg.me>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-pci@vger.kernel.org"
+	<linux-pci@vger.kernel.org>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "linux-nvdimm@lists.01.org"
+	<linux-nvdimm@lists.01.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, Jens Axboe
+	<axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>, Bjorn Helgaas
+	<bhelgaas@google.com>, Max Gurtovoy <maxg@mellanox.com>, Dan Williams
+	<dan.j.williams@intel.com>, =?utf-8?B?SsOpcsO0bWUgR2xpc3Nl?=
+	<jglisse@redhat.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	"Alex Williamson" <alex.williamson@redhat.com>, Steve Wise
+	<swise@opengridcomputing.com>
 Subject: Re: [PATCH v2 10/10] nvmet: Optionally use PCI P2P memory
-Message-ID: <20180301232038.GO19007@ziepe.ca>
+Date: Thu, 1 Mar 2018 23:00:51 +0000
+Message-ID: <77591162-4CCD-446E-A27C-1CDB4996ACB7@raithlin.com>
 References: <20180228234006.21093-1-logang@deltatee.com>
  <20180228234006.21093-11-logang@deltatee.com>
  <749e3752-4349-0bdf-5243-3d510c2b26db@grimberg.me>
@@ -29,33 +25,22 @@ References: <20180228234006.21093-1-logang@deltatee.com>
  <20180301184249.GI19007@ziepe.ca>
  <edaf476a-cfe9-0598-1aa5-14802a9a1477@deltatee.com>
  <20180301224540.GL19007@ziepe.ca>
- <77591162-4CCD-446E-A27C-1CDB4996ACB7@raithlin.com>
+In-Reply-To: <20180301224540.GL19007@ziepe.ca>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <77591162-4CCD-446E-A27C-1CDB4996ACB7@raithlin.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Mar 01, 2018 at 11:00:51PM +0000, Stephen  Bates wrote:
-
-> > Seems like a very subtle and hard to debug performance trap to leave
-> > for the users, and pretty much the only reason to use P2P is
-> > performance... So why have such a dangerous interface?
-> 
-> P2P is about offloading the memory and PCI subsystem of the host CPU
-> and this is achieved no matter which p2p_dev is used.
-
-No, locality matters. If you have a bunch of NICs and bunch of drives
-and the allocator chooses to put all P2P memory on a single drive your
-performance will suck horribly even if all the traffic is offloaded.
-
-Performance will suck if you have speed differences between the PCI-E
-devices. Eg a bunch of Gen 3 x8 NVMe cards paired with a Gen 4 x16 NIC
-will not reach full performance unless the p2p buffers are properly
-balanced between all cards.
-
-This is why I think putting things in one big pool and pretending like
-any P2P mem is interchangable with any other makes zero sense to me,
-it is not how the system actually works. Proper locality matters a
-lot.
-
-Jason
+Pj4gV2UnZCBwcmVmZXIgdG8gaGF2ZSBhIGdlbmVyaWMgd2F5IHRvIGdldCBwMnBtZW0gaW5zdGVh
+ZCBvZiByZXN0cmljdGluZw0KPj4gb3Vyc2VsdmVzIHRvIG9ubHkgdXNpbmcgQ01Ccy4gV2UgZGlk
+IHdvcmsgaW4gdGhlIHBhc3Qgd2hlcmUgdGhlIFAyUCBtZW1vcnkNCiA+PiB3YXMgcGFydCBvZiBh
+biBJQiBhZGFwdGVyIGFuZCBub3QgdGhlIE5WTWUgY2FyZC4gU28gdGhpcyB3b24ndCB3b3JrIGlm
+IGl0J3MNCiAgPj4gYW4gTlZNZSBvbmx5IGludGVyZmFjZS4NCiAgICANCiA+IEl0IGp1c3Qgc2Vl
+bXMgbGlrZSBpdCBpdCBtYWtpbmcgaXQgdG9vIGNvbXBsaWNhdGVkLg0KDQpJIGRpc2FncmVlLiBI
+YXZpbmcgYSBjb21tb24gYWxsb2NhdG9yIChpbnN0ZWFkIG9mIHNvbWUgc2VwYXJhdGUgYWxsb2Nh
+dG9yIHBlciBkcml2ZXIpIG1ha2VzIHRoaW5ncyBzaW1wbGVyLg0KDQo+IFNlZW1zIGxpa2UgYSB2
+ZXJ5IHN1YnRsZSBhbmQgaGFyZCB0byBkZWJ1ZyBwZXJmb3JtYW5jZSB0cmFwIHRvIGxlYXZlDQo+
+IGZvciB0aGUgdXNlcnMsIGFuZCBwcmV0dHkgbXVjaCB0aGUgb25seSByZWFzb24gdG8gdXNlIFAy
+UCBpcw0KPiBwZXJmb3JtYW5jZS4uLiBTbyB3aHkgaGF2ZSBzdWNoIGEgZGFuZ2Vyb3VzIGludGVy
+ZmFjZT8NCg0KUDJQIGlzIGFib3V0IG9mZmxvYWRpbmcgdGhlIG1lbW9yeSBhbmQgUENJIHN1YnN5
+c3RlbSBvZiB0aGUgaG9zdCBDUFUgYW5kIHRoaXMgaXMgYWNoaWV2ZWQgbm8gbWF0dGVyIHdoaWNo
+IHAycF9kZXYgaXMgdXNlZC4NCg0KU3RlcGhlbg0KICAgIA0KDQo=
