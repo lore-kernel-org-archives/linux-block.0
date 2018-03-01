@@ -1,75 +1,27 @@
-Return-Path: <prvs=609d84ff1=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Tejun Heo <tj@kernel.org>,
-	Hannes Reinecke <hare@suse.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Johannes Thumshirn <jthumshirn@suse.de>,
-	Oleksandr Natalenko <oleksandr@natalenko.name>,
-	Martin Steigerwald <martin@lichtvoll.de>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] block: Change a rcu_read_{lock,unlock}_sched() pair into rcu_read_{lock,unlock}()
-Date: Mon, 19 Mar 2018 11:46:13 -0700
-Message-Id: <20180319184613.14161-1-bart.vanassche@wdc.com>
+Return-Path: <sagigrim@gmail.com>
+Return-Path: <sagigrim@gmail.com>
+Subject: Re: [PATCH v2 09/10] nvme-pci: Add a quirk for a pseudo CMB
+To: Logan Gunthorpe <logang@deltatee.com>, linux-kernel@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-rdma@vger.kernel.org, linux-nvdimm@lists.01.org,
+ linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>, Christoph Hellwig <hch@lst.de>,
+ Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+ Bjorn Helgaas <bhelgaas@google.com>, Jason Gunthorpe <jgg@mellanox.com>,
+ Max Gurtovoy <maxg@mellanox.com>, Dan Williams <dan.j.williams@intel.com>,
+ =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+ Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ Alex Williamson <alex.williamson@redhat.com>
+References: <20180228234006.21093-1-logang@deltatee.com>
+ <20180228234006.21093-10-logang@deltatee.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <85896210-f963-7d0b-e60e-0cd903677c09@grimberg.me>
+Date: Thu, 1 Mar 2018 13:03:59 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180228234006.21093-10-logang@deltatee.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-scsi_device_quiesce() uses synchronize_rcu() to guarantee that the
-effect of blk_set_preempt_only() will be visible for percpu_ref_tryget()
-calls that occur after the queue unfreeze by using the approach
-explained in https://lwn.net/Articles/573497/. The rcu read lock and
-unlock calls in blk_queue_enter() form a pair with the synchronize_rcu()
-call in scsi_device_quiesce(). Both scsi_device_quiesce() and
-blk_queue_enter() must either use regular RCU or RCU-sched.
-Since neither the RCU-protected code in blk_queue_enter() nor
-blk_queue_usage_counter_release() sleeps, regular RCU protection
-is sufficient. Note: scsi_device_quiesce() does not have to be
-modified since it already uses synchronize_rcu().
+Looks fine,
 
-Reported-by: Tejun Heo <tj@kernel.org>
-Fixes: 3a0a529971ec ("block, scsi: Make SCSI quiesce and resume work reliably")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Acked-by: Tejun Heo <tj@kernel.org>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Oleksandr Natalenko <oleksandr@natalenko.name>
-Cc: Martin Steigerwald <martin@lichtvoll.de>
-Cc: stable@vger.kernel.org # v4.15
----
-
-Changes between v1 and v2:
-- Explained in the interaction between scsi_device_quiesce() and
-  blk_queue_enter() in the patch description.
-
- block/blk-core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 5e88c579e896..a0f675f84f86 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -917,7 +917,7 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- 		bool success = false;
- 		int ret;
- 
--		rcu_read_lock_sched();
-+		rcu_read_lock();
- 		if (percpu_ref_tryget_live(&q->q_usage_counter)) {
- 			/*
- 			 * The code that sets the PREEMPT_ONLY flag is
-@@ -930,7 +930,7 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- 				percpu_ref_put(&q->q_usage_counter);
- 			}
- 		}
--		rcu_read_unlock_sched();
-+		rcu_read_unlock();
- 
- 		if (success)
- 			return 0;
--- 
-2.16.2
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
