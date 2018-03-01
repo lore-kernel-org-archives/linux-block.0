@@ -1,22 +1,18 @@
-Return-Path: <sbates@raithlin.com>
-From: "Stephen  Bates" <sbates@raithlin.com>
-To: Keith Busch <keith.busch@intel.com>
-CC: Jason Gunthorpe <jgg@ziepe.ca>, Logan Gunthorpe <logang@deltatee.com>,
-	Sagi Grimberg <sagi@grimberg.me>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-pci@vger.kernel.org"
-	<linux-pci@vger.kernel.org>, "linux-nvme@lists.infradead.org"
-	<linux-nvme@lists.infradead.org>, "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>, "linux-nvdimm@lists.01.org"
-	<linux-nvdimm@lists.01.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, Jens Axboe
-	<axboe@kernel.dk>, Bjorn Helgaas <bhelgaas@google.com>, Max Gurtovoy
-	<maxg@mellanox.com>, Dan Williams <dan.j.williams@intel.com>,
-	=?utf-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>, Benjamin Herrenschmidt
-	<benh@kernel.crashing.org>, Alex Williamson <alex.williamson@redhat.com>,
-	Steve Wise <swise@opengridcomputing.com>
-Subject: Re: [PATCH v2 10/10] nvmet: Optionally use PCI P2P memory
-Date: Thu, 1 Mar 2018 23:53:16 +0000
-Message-ID: <6B6A0FD9-14F5-4AF2-A74A-DAA562C34AB9@raithlin.com>
+Return-Path: <logang@deltatee.com>
+To: Keith Busch <keith.busch@intel.com>, Stephen Bates <sbates@raithlin.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Sagi Grimberg <sagi@grimberg.me>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+ Bjorn Helgaas <bhelgaas@google.com>, Max Gurtovoy <maxg@mellanox.com>,
+ Dan Williams <dan.j.williams@intel.com>, =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?=
+ <jglisse@redhat.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Steve Wise <swise@opengridcomputing.com>
 References: <20180228234006.21093-1-logang@deltatee.com>
  <20180228234006.21093-11-logang@deltatee.com>
  <749e3752-4349-0bdf-5243-3d510c2b26db@grimberg.me>
@@ -27,12 +23,30 @@ References: <20180228234006.21093-1-logang@deltatee.com>
  <20180301224540.GL19007@ziepe.ca>
  <77591162-4CCD-446E-A27C-1CDB4996ACB7@raithlin.com>
  <20180301234930.GG14799@localhost.localdomain>
-In-Reply-To: <20180301234930.GG14799@localhost.localdomain>
-Content-Type: text/plain; charset="utf-8"
+From: Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <34dc518d-b566-3e2a-8ad9-65d4f5d08a44@deltatee.com>
+Date: Thu, 1 Mar 2018 16:52:23 -0700
 MIME-Version: 1.0
+In-Reply-To: <20180301234930.GG14799@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Subject: Re: [PATCH v2 10/10] nvmet: Optionally use PCI P2P memory
 List-ID: <linux-block@vger.kernel.org>
 
-PiBUaGVyZSdzIGEgbWVhbmluZ2Z1bCBkaWZmZXJlbmNlIGJldHdlZW4gd3JpdGluZyB0byBhbiBO
-Vk1lIENNQiB2cyBQTVINCg0KV2hlbiB0aGUgUE1SIHNwZWMgYmVjb21lcyBwdWJsaWMgd2UgY2Fu
-IGRpc2N1c3MgaG93IGJlc3QgdG8gaW50ZWdyYXRlIGl0IGludG8gdGhlIFAyUCBmcmFtZXdvcmsg
-KGlmIGF0IGFsbCkgOy0pLg0KDQpTdGVwaGVuDQoNCiAgICANCg0K
+
+
+On 01/03/18 04:49 PM, Keith Busch wrote:
+> On Thu, Mar 01, 2018 at 11:00:51PM +0000, Stephen  Bates wrote:
+>>
+>> P2P is about offloading the memory and PCI subsystem of the host CPU
+>> and this is achieved no matter which p2p_dev is used.
+> 
+> Even within a device, memory attributes for its various regions may not be
+> the same. There's a meaningful difference between writing to an NVMe CMB
+> vs PMR, and a single device could have both. We don't want to lump these
+> all together without knowing which region you're allocating from, right?
+
+Yes, PMRs are a whole other beast. I have no idea what anyone is going 
+to actually do with those yet. But no one is proposing to publish them 
+as p2pmem with this code.
+
+Logan
