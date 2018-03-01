@@ -1,43 +1,91 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Laurence Oberman <loberman@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V2 2/5] genirq/affinity: mark 'node_to_cpumask' as const for get_nodes_in_cpumask()
-Date: Mon,  5 Mar 2018 11:13:54 +0800
-Message-Id: <20180305031357.23950-3-ming.lei@redhat.com>
-In-Reply-To: <20180305031357.23950-1-ming.lei@redhat.com>
-References: <20180305031357.23950-1-ming.lei@redhat.com>
+Return-Path: <loberman@redhat.com>
+Return-Path: <loberman@redhat.com>
+Message-ID: <1519940812.15243.3.camel@redhat.com>
+Subject: Re: [PATCH V3 0/8] blk-mq & scsi: fix reply queue selection and
+ improve host wide tagset
+From: Laurence Oberman <loberman@redhat.com>
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>, Mike
+ Snitzer <snitzer@redhat.com>
+Cc: linux-scsi@vger.kernel.org, Hannes Reinecke <hare@suse.de>, Arun Easi
+ <arun.easi@cavium.com>, Omar Sandoval <osandov@fb.com>, "Martin K .
+ Petersen" <martin.petersen@oracle.com>, James Bottomley
+ <james.bottomley@hansenpartnership.com>, Christoph Hellwig <hch@lst.de>,
+ Don Brace <don.brace@microsemi.com>, Kashyap Desai
+ <kashyap.desai@broadcom.com>, Peter Rivera <peter.rivera@broadcom.com>
+Date: Thu, 01 Mar 2018 16:46:52 -0500
+In-Reply-To: <20180227100750.32299-1-ming.lei@redhat.com>
+References: <20180227100750.32299-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Inside irq_create_affinity_masks(), once 'node_to_cpumask' is created,
-it is accessed read-only, so mark it as const for
-get_nodes_in_cpumask().
+On Tue, 2018-02-27 at 18:07 +0800, Ming Lei wrote:
+> Hi All,
+> 
+> The 1st two patches fixes reply queue selection, and this issue has
+> been
+> reported and can cause IO hang during booting, please consider the
+> two
+> for V4.16.
+> 
+> The following 6 patches try to improve hostwide tagset on hpsa and
+> megaraid_sas by making hw queue per NUMA node.
+> 
+> I don't have high-performance hpsa and megaraid_sas device at hand.
+> 
+> Don Brace, could you test this patchset on concurrent IOs over you
+> hpsa
+> SSD and see if this approach is well?
+> 
+> Kashyap, could you test this patchset on your megaraid_sas SSDs?
+> 
+> 	gitweb: https://github.com/ming1/linux/tree/v4.16-rc-host-tags-
+> v3.2
+> 
+> thanks,
+> Ming
+> 
+> Hannes Reinecke (1):
+>   scsi: Add template flag 'host_tagset'
+> 
+> Ming Lei (7):
+>   scsi: hpsa: fix selection of reply queue
+>   scsi: megaraid_sas: fix selection of reply queue
+>   blk-mq: introduce 'start_tag' field to 'struct blk_mq_tags'
+>   blk-mq: introduce BLK_MQ_F_HOST_TAGS
+>   block: null_blk: introduce module parameter of 'g_host_tags'
+>   scsi: hpsa: improve scsi_mq performance via .host_tagset
+>   scsi: megaraid: improve scsi_mq performance via .host_tagset
+> 
+>  block/blk-mq-debugfs.c                      |  2 +
+>  block/blk-mq-sched.c                        |  2 +-
+>  block/blk-mq-tag.c                          | 13 +++--
+>  block/blk-mq-tag.h                          | 11 ++--
+>  block/blk-mq.c                              | 50 +++++++++++++++---
+>  block/blk-mq.h                              |  3 +-
+>  drivers/block/null_blk.c                    |  6 +++
+>  drivers/scsi/hpsa.c                         | 79
+> ++++++++++++++++++++++-------
+>  drivers/scsi/hpsa.h                         |  1 +
+>  drivers/scsi/megaraid/megaraid_sas.h        |  2 +-
+>  drivers/scsi/megaraid/megaraid_sas_base.c   | 40 ++++++++++++++-
+>  drivers/scsi/megaraid/megaraid_sas_fusion.c | 12 ++---
+>  drivers/scsi/scsi_lib.c                     |  2 +
+>  include/linux/blk-mq.h                      |  2 +
+>  include/scsi/scsi_host.h                    |  3 ++
+>  15 files changed, 182 insertions(+), 46 deletions(-)
+> 
 
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- kernel/irq/affinity.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+For the patchset above
+All functional I/O tests and boot tests passed with multiple concurrent
+fio runs.
 
-diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
-index 4b1c4763212d..9f49d6ef0dc8 100644
---- a/kernel/irq/affinity.c
-+++ b/kernel/irq/affinity.c
-@@ -79,7 +79,7 @@ static void build_node_to_cpumask(cpumask_var_t *masks)
- 		cpumask_set_cpu(cpu, masks[cpu_to_node(cpu)]);
- }
- 
--static int get_nodes_in_cpumask(cpumask_var_t *node_to_cpumask,
-+static int get_nodes_in_cpumask(const cpumask_var_t *node_to_cpumask,
- 				const struct cpumask *mask, nodemask_t *nodemsk)
- {
- 	int n, nodes = 0;
--- 
-2.9.5
+Original HPSA booting issue is also resolved and its important or we
+will have to revert original genirq commit
+commit 84676c1f21e8ff54befe985f4f14dc1edc10046b
+
+Tested-by: Laurence Oberman <loberman@redhat.com>
+
+Thanks
+Laurence
