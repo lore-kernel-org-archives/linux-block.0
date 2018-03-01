@@ -1,77 +1,41 @@
-Return-Path: <toshi.kani@hpe.com>
-From: "Kani, Toshi" <toshi.kani@hpe.com>
-To: "torvalds@linux-foundation.org" <torvalds@linux-foundation.org>,
-	"benh@kernel.crashing.org" <benh@kernel.crashing.org>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "hch@lst.de"
-	<hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>,
-	"linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>, "jglisse@redhat.com"
-	<jglisse@redhat.com>, "linux-nvme@lists.infradead.org"
-	<linux-nvme@lists.infradead.org>, "maxg@mellanox.com" <maxg@mellanox.com>,
-	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-	"keith.busch@intel.com" <keith.busch@intel.com>, "oliveroh@au1.ibm.com"
-	<oliveroh@au1.ibm.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "bhelgaas@google.com"
-	<bhelgaas@google.com>
-Subject: Re: [PATCH v2 00/10] Copy Offload in NVMe Fabrics with P2P PCI Memory
-Date: Fri, 2 Mar 2018 16:22:24 +0000
-Message-ID: <1520010446.2693.19.camel@hpe.com>
+Return-Path: <logang@deltatee.com>
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ Dan Williams <dan.j.williams@intel.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+ Oliver OHalloran <oliveroh@au1.ibm.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ linux-nvdimm <linux-nvdimm@lists.01.org>,
+ linux-rdma <linux-rdma@vger.kernel.org>, linux-pci@vger.kernel.org,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+ =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+ Jason Gunthorpe <jgg@mellanox.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ Max Gurtovoy <maxg@mellanox.com>, Christoph Hellwig <hch@lst.de>
 References: <20180228234006.21093-1-logang@deltatee.com>
-	 <1519876489.4592.3.camel@kernel.crashing.org>
-	 <1519876569.4592.4.camel@au1.ibm.com>
-	 <CAPcyv4h7mcFphv3j_vW-CGxXa2pjQgLqpBOLzHuTzAFzygai-Q@mail.gmail.com>
-	 <1519936477.4592.23.camel@au1.ibm.com>
-	 <1519936815.4592.25.camel@au1.ibm.com> <20180301205315.GJ19007@ziepe.ca>
-	 <1519942012.4592.31.camel@au1.ibm.com>
-	 <CA+55aFy-oAiFJ3WDx4giR1enj65y-YJnZZhY6geFw0ygFyKXfQ@mail.gmail.com>
-	 <1519943658.4592.34.camel@kernel.crashing.org>
-In-Reply-To: <1519943658.4592.34.camel@kernel.crashing.org>
-Content-Type: text/plain; charset="utf-8"
+ <1519876489.4592.3.camel@kernel.crashing.org>
+ <1519876569.4592.4.camel@au1.ibm.com>
+ <CAPcyv4h7mcFphv3j_vW-CGxXa2pjQgLqpBOLzHuTzAFzygai-Q@mail.gmail.com>
+ <1519936477.4592.23.camel@au1.ibm.com>
+ <CAPcyv4goHsYytq60ehJUori8Xq+Z0p8dV-8_oRALj244H4YtwQ@mail.gmail.com>
+ <2079ba48-5ae5-5b44-cce1-8175712dd395@deltatee.com>
+ <43ba615f-a6e1-9444-65e1-494169cb415d@deltatee.com>
+ <1519945204.4592.45.camel@au1.ibm.com>
+ <595acefb-18fc-e650-e172-bae271263c4c@deltatee.com>
+ <1519946767.4592.49.camel@kernel.crashing.org>
+From: Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <0181dbb9-0b63-5a99-0425-ec77fe5b1e3f@deltatee.com>
+Date: Thu, 1 Mar 2018 16:54:51 -0700
 MIME-Version: 1.0
+In-Reply-To: <1519946767.4592.49.camel@kernel.crashing.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Subject: Re: [PATCH v2 00/10] Copy Offload in NVMe Fabrics with P2P PCI Memory
 List-ID: <linux-block@vger.kernel.org>
 
-T24gRnJpLCAyMDE4LTAzLTAyIGF0IDA5OjM0ICsxMTAwLCBCZW5qYW1pbiBIZXJyZW5zY2htaWR0
-IHdyb3RlOg0KPiBPbiBUaHUsIDIwMTgtMDMtMDEgYXQgMTQ6MzEgLTA4MDAsIExpbnVzIFRvcnZh
-bGRzIHdyb3RlOg0KPiA+IE9uIFRodSwgTWFyIDEsIDIwMTggYXQgMjowNiBQTSwgQmVuamFtaW4g
-SGVycmVuc2NobWlkdCA8YmVuaEBhdTEuaWJtLmNvbT4gd3JvdGU6DQo+ID4gPiANCj4gPiA+IENv
-dWxkIGJlIHRoYXQgeDg2IGhhcyB0aGUgc21hcnRzIHRvIGRvIHRoZSByaWdodCB0aGluZywgc3Rp
-bGwgdHJ5aW5nIHRvDQo+ID4gPiB1bnRhbmdsZSB0aGUgY29kZSA6LSkNCj4gPiANCj4gPiBBZmFp
-aywgeDg2IHdpbGwgbm90IGNhY2hlIFBDSSB1bmxlc3MgdGhlIHN5c3RlbSBpcyBtaXNjb25maWd1
-cmVkLCBhbmQNCj4gPiBldmVuIHRoZW4gaXQncyBtb3JlIGxpa2VseSB0byBqdXN0IHJhaXNlIGEg
-bWFjaGluZSBjaGVjayBleGNlcHRpb24NCj4gPiB0aGFuIGNhY2hlIHRoaW5ncy4NCj4gPiANCj4g
-PiBUaGUgbGFzdC1sZXZlbCBjYWNoZSBpcyBnb2luZyB0byBkbyBmaWxscyBhbmQgc3BpbGxzIGRp
-cmVjdGx5IHRvIHRoZQ0KPiA+IG1lbW9yeSBjb250cm9sbGVyLCBub3QgdG8gdGhlIFBDSWUgc2lk
-ZSBvZiB0aGluZ3MuDQo+ID4gDQo+ID4gKEkgZ3Vlc3MgeW91ICpjYW4qIGRvIHRoaW5ncyBkaWZm
-ZXJlbnRseSwgYW5kIEkgd291bGRuJ3QgYmUgc3VycHJpc2VkDQo+ID4gaWYgc29tZSBwZW9wbGUg
-aW5zaWRlIEludGVsIGRpZCB0cnkgdG8gZG8gdGhpbmdzIGRpZmZlcmVudGx5IHdpdGgNCj4gPiB0
-cnlpbmcgbnZyYW0gb3ZlciBQQ0llLCBidXQgaW4gZ2VuZXJhbCBJIHRoaW5rIHRoZSBhYm92ZSBp
-cyB0cnVlKQ0KPiA+IA0KPiA+IFlvdSB3b24ndCBmaW5kIGl0IGluIHRoZSBrZXJuZWwgY29kZSBl
-aXRoZXIuIEl0J3MgaW4gaGFyZHdhcmUgd2l0aA0KPiA+IGZpcm13YXJlIGNvbmZpZ3VyYXRpb24g
-b2Ygd2hhdCBhZGRyZXNzZXMgYXJlIG1hcHBlZCB0byB0aGUgbWVtb3J5DQo+ID4gY29udHJvbGxl
-cnMgKGFuZCBfaG93XyB0aGV5IGFyZSBtYXBwZWQpIGFuZCB3aGljaCBhcmUgbm90Lg0KPiANCj4g
-QWggdGhhbmtzICEgVGhhbmtzIGV4cGxhaW5zLiBXZSBjYW4gZml4IHRoYXQgb24gcHBjNjQgaW4g
-b3VyIGxpbmVhcg0KPiBtYXBwaW5nIGNvZGUgYnkgY2hlY2tpbmcgdGhlIGFkZHJlc3MgdnMuIG1l
-bWJsb2NrcyB0byBjaG9zZSB0aGUgcmlnaHQNCj4gcGFnZSB0YWJsZSBhdHRyaWJ1dGVzLg0KDQpG
-V0lXLCB0aGlzIHRoaW5nIGlzIGNhbGxlZCBNVFJScyBvbiB4ODYsIHdoaWNoIGFyZSBpbml0aWFs
-aXplZCBieSBCSU9TLg0KVGhlc2UgcmVnaXN0ZXJzIGVmZmVjdGl2ZWx5IG92ZXJ3cml0ZSBwYWdl
-IHRhYmxlIHNldHVwcy4gIEludGVsIFNETQ0KZGVmaW5lcyB0aGUgZWZmZWN0IGFzIGZvbGxvd3Mu
-ICAnUEFUIEVudHJ5IFZhbHVlJyBpcyB0aGUgcGFnZSB0YWJsZQ0Kc2V0dXAuDQoNCk1UUlIgTWVt
-b3J5IFR5cGUgIFBBVCBFbnRyeSBWYWx1ZSAgRWZmZWN0aXZlIE1lbW9yeSBUeXBlDQotLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KVUMgICAg
-ICAgICAgICAgICAgVUMgICAgICAgICAgICAgICBVQw0KVUMgICAgICAgICAgICAgICAgV0MgICAg
-ICAgICAgICAgICBXQw0KVUMgICAgICAgICAgICAgICAgV1QgICAgICAgICAgICAgICBVQw0KVUMg
-ICAgICAgICAgICAgICAgV0IgICAgICAgICAgICAgICBVQw0KVUMgICAgICAgICAgICAgICAgV1Ag
-ICAgICAgICAgICAgICBVQyANCg0KT24gbXkgc3lzdGVtLCBCSU9TIHNldHMgTVRSUnMgdG8gY292
-ZXIgdGhlIGVudGlyZSBNTUlPIHJhbmdlcyB3aXRoIFVDLg0KT3RoZXIgQklPU2VzIG1heSBzaW1w
-bHkgc2V0IHRoZSBNVFJSIGRlZmF1bHQgdHlwZSB0byBVQywgaS5lLiB1bmNvdmVyZWQNCnJhbmdl
-cyBiZWNvbWUgVUMuDQoNCiMgY2F0IC9wcm9jL210cnINCiA6DQpyZWcwMTogYmFzZT0weGMwMDAw
-MDAwMDAwICgxMjU4MjkxMk1CKSwgc2l6ZT0yMDk3MTUyTUIsIGNvdW50PTE6DQp1bmNhY2hhYmxl
-DQogOg0KDQojIGNhdCAvcHJvYy9pb21lbSB8IGdyZXAgJ1BDSSBCdXMnDQogOg0KYzAwMDAwMDAw
-MDAtYzNmZmZmZmZmZmYgOiBQQ0kgQnVzIDAwMDA6MDANCmM0MDAwMDAwMDAwLWM3ZmZmZmZmZmZm
-IDogUENJIEJ1cyAwMDAwOjExDQpjODAwMDAwMDAwMC1jYmZmZmZmZmZmZiA6IFBDSSBCdXMgMDAw
-MDozNg0KY2MwMDAwMDAwMDAtY2ZmZmZmZmZmZmYgOiBQQ0kgQnVzIDAwMDA6NWINCmQwMDAwMDAw
-MDAwLWQzZmZmZmZmZmZmIDogUENJIEJ1cyAwMDAwOjgwDQpkNDAwMDAwMDAwMC1kN2ZmZmZmZmZm
-ZiA6IFBDSSBCdXMgMDAwMDo4NQ0KZDgwMDAwMDAwMDAtZGJmZmZmZmZmZmYgOiBQQ0kgQnVzIDAw
-MDA6YWUNCmRjMDAwMDAwMDAwLWRmZmZmZmZmZmZmIDogUENJIEJ1cyAwMDAwOmQ3DQoNCi1Ub3No
-aQ0KDQoNCg==
+
+
+On 01/03/18 04:26 PM, Benjamin Herrenschmidt wrote:
+> The big problem is not the vmemmap, it's the linear mapping.
+
+Ah, yes, ok.
+
+Logan
