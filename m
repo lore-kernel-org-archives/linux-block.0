@@ -1,63 +1,39 @@
-Return-Path: <dan.j.williams@intel.com>
-MIME-Version: 1.0
-In-Reply-To: <1519936477.4592.23.camel@au1.ibm.com>
-References: <20180228234006.21093-1-logang@deltatee.com> <1519876489.4592.3.camel@kernel.crashing.org>
- <1519876569.4592.4.camel@au1.ibm.com> <CAPcyv4h7mcFphv3j_vW-CGxXa2pjQgLqpBOLzHuTzAFzygai-Q@mail.gmail.com>
- <1519936477.4592.23.camel@au1.ibm.com>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Thu, 1 Mar 2018 13:37:03 -0800
-Message-ID: <CAPcyv4goHsYytq60ehJUori8Xq+Z0p8dV-8_oRALj244H4YtwQ@mail.gmail.com>
+Return-Path: <sbates@raithlin.com>
+From: "Stephen  Bates" <sbates@raithlin.com>
+To: Jerome Glisse <jglisse@redhat.com>, Logan Gunthorpe <logang@deltatee.com>
+CC: Benjamin Herrenschmidt <benh@au1.ibm.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-pci@vger.kernel.org"
+	<linux-pci@vger.kernel.org>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "linux-nvdimm@lists.01.org"
+	<linux-nvdimm@lists.01.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, Jens Axboe
+	<axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>, Sagi Grimberg
+	<sagi@grimberg.me>, Bjorn Helgaas <bhelgaas@google.com>, Jason Gunthorpe
+	<jgg@mellanox.com>, Max Gurtovoy <maxg@mellanox.com>, Dan Williams
+	<dan.j.williams@intel.com>, Alex Williamson <alex.williamson@redhat.com>,
+	Oliver OHalloran <oliveroh@au1.ibm.com>
 Subject: Re: [PATCH v2 00/10] Copy Offload in NVMe Fabrics with P2P PCI Memory
-To: benh@au1.ibm.com
-Cc: Logan Gunthorpe <logang@deltatee.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-rdma <linux-rdma@vger.kernel.org>,
-	linux-nvdimm <linux-nvdimm@lists.01.org>, linux-block@vger.kernel.org,
-	Stephen Bates <sbates@raithlin.com>, Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>, Jason Gunthorpe <jgg@mellanox.com>, Max Gurtovoy <maxg@mellanox.com>,
-	=?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-	Alex Williamson <alex.williamson@redhat.com>, Oliver OHalloran <oliveroh@au1.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 1 Mar 2018 21:37:00 +0000
+Message-ID: <EA9224B2-3B12-4F31-9602-DEAF9869A242@raithlin.com>
+References: <20180228234006.21093-1-logang@deltatee.com>
+ <1519876489.4592.3.camel@kernel.crashing.org>
+ <1519876569.4592.4.camel@au1.ibm.com>
+ <8e808448-fc01-5da0-51e7-1a6657d5a23a@deltatee.com>
+ <1519936195.4592.18.camel@au1.ibm.com> <20180301205548.GA6742@redhat.com>
+ <a512edf9-2d96-9229-fe60-e0ea60b3922b@deltatee.com>
+ <20180301211036.GB6742@redhat.com>
+In-Reply-To: <20180301211036.GB6742@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Mar 1, 2018 at 12:34 PM, Benjamin Herrenschmidt
-<benh@au1.ibm.com> wrote:
-> On Thu, 2018-03-01 at 11:21 -0800, Dan Williams wrote:
->> On Wed, Feb 28, 2018 at 7:56 PM, Benjamin Herrenschmidt
->> <benh@au1.ibm.com> wrote:
->> > On Thu, 2018-03-01 at 14:54 +1100, Benjamin Herrenschmidt wrote:
->> > > On Wed, 2018-02-28 at 16:39 -0700, Logan Gunthorpe wrote:
->> > > > Hi Everyone,
->> > >
->> > >
->> > > So Oliver (CC) was having issues getting any of that to work for us.
->> > >
->> > > The problem is that acccording to him (I didn't double check the latest
->> > > patches) you effectively hotplug the PCIe memory into the system when
->> > > creating struct pages.
->> > >
->> > > This cannot possibly work for us. First we cannot map PCIe memory as
->> > > cachable. (Note that doing so is a bad idea if you are behind a PLX
->> > > switch anyway since you'd ahve to manage cache coherency in SW).
->> >
->> > Note: I think the above means it won't work behind a switch on x86
->> > either, will it ?
->>
->> The devm_memremap_pages() infrastructure allows placing the memmap in
->> "System-RAM" even if the hotplugged range is in PCI space. So, even if
->> it is an issue on some configurations, it's just a simple adjustment
->> to where the memmap is placed.
->
-> But what happens with that PCI memory ? Is it effectively turned into
-> nromal memory (ie, usable for normal allocations, potentially used to
-> populate user pages etc...) or is it kept aside ?
->
-> Also on ppc64, the physical addresses of PCIe make it so far appart
-> that there's no way we can map them into the linear mapping at the
-> normal offset of PAGE_OFFSET + (pfn << PAGE_SHIFT), so things like
-> page_address or virt_to_page cannot work as-is on PCIe addresses.
-
-Ah ok, I'd need to look at the details. I had been assuming that
-sparse-vmemmap could handle such a situation, but that could indeed be
-a broken assumption.
+PiBUaGUgaW50ZW50aW9uIG9mIEhNTSBpcyB0byBiZSB1c2VmdWwgZm9yIGFsbCBkZXZpY2UgbWVt
+b3J5IHRoYXQgd2lzaA0KPiB0byBoYXZlIHN0cnVjdCBwYWdlIGZvciB2YXJpb3VzIHJlYXNvbnMu
+DQoNCkhpIEplcm1vbmUgYW5kIHRoYW5rcyBmb3IgeW91ciBpbnB1dCEgVW5kZXJzdG9vZC4gV2Ug
+aGF2ZSBsb29rZWQgYXQgSE1NIGluIHRoZSBwYXN0IGFuZCBsb25nIHRlcm0gSSBkZWZpbml0ZWx5
+IHdvdWxkIGxpa2UgdG8gY29uc2lkZXIgaG93IHdlIGNhbiBhZGQgUDJQIGZ1bmN0aW9uYWxpdHkg
+dG8gSE1NIGZvciBib3RoIERFVklDRV9QUklWQVRFIGFuZCBERVZJQ0VfUFVCTElDIHNvIHdlIGNh
+biBwYXNzIGFkZHJlc3NhYmxlIGFuZCBub24tYWRkcmVzc2FibGUgYmxvY2tzIG9mIGRhdGEgYmV0
+d2VlbiBkZXZpY2VzLiBIb3dldmVyIHRoYXQgaXMgd2VsbCBiZXlvbmQgdGhlIGludGVudGlvbnMg
+b2YgdGhpcyBzZXJpZXMgOy0pLg0KDQpTdGVwaGVuDQogICAgDQoNCg==
