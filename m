@@ -1,21 +1,18 @@
-Return-Path: <sbates@raithlin.com>
-From: "Stephen  Bates" <sbates@raithlin.com>
-To: Christoph Hellwig <hch@infradead.org>
-CC: Keith Busch <keith.busch@intel.com>, Jens Axboe <axboe@kernel.dk>, "Alex
- Williamson" <alex.williamson@redhat.com>, "linux-nvdimm@lists.01.org"
-	<linux-nvdimm@lists.01.org>, "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>, "linux-pci@vger.kernel.org"
-	<linux-pci@vger.kernel.org>, Steve Wise <swise@opengridcomputing.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Jason Gunthorpe
-	<jgg@ziepe.ca>, =?utf-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>, Bjorn Helgaas
-	<bhelgaas@google.com>, Max Gurtovoy <maxg@mellanox.com>, Christoph Hellwig
-	<hch@lst.de>
-Subject: Re: [PATCH v2 10/10] nvmet: Optionally use PCI P2P memory
-Date: Fri, 2 Mar 2018 20:51:42 +0000
-Message-ID: <F7179402-E931-45DB-903E-5D92608A464E@raithlin.com>
+Return-Path: <logang@deltatee.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>, Stephen Bates <sbates@raithlin.com>
+Cc: Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+ Bjorn Helgaas <bhelgaas@google.com>, Max Gurtovoy <maxg@mellanox.com>,
+ Dan Williams <dan.j.williams@intel.com>, =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?=
+ <jglisse@redhat.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Steve Wise <swise@opengridcomputing.com>
 References: <20180228234006.21093-11-logang@deltatee.com>
  <749e3752-4349-0bdf-5243-3d510c2b26db@grimberg.me>
  <40d69074-31a8-d06a-ade9-90de7712c553@deltatee.com>
@@ -25,21 +22,51 @@ References: <20180228234006.21093-11-logang@deltatee.com>
  <20180301224540.GL19007@ziepe.ca>
  <77591162-4CCD-446E-A27C-1CDB4996ACB7@raithlin.com>
  <20180301234930.GG14799@localhost.localdomain>
- <6B6A0FD9-14F5-4AF2-A74A-DAA562C34AB9@raithlin.com>
- <20180302155322.GA5934@infradead.org>
-In-Reply-To: <20180302155322.GA5934@infradead.org>
-Content-Type: text/plain; charset="utf-8"
+ <CE2A5D93-E735-4414-8DC1-B308B74A1C5B@raithlin.com>
+ <20180302161842.GB14861@ziepe.ca>
+From: Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <a9e2eb46-50ff-e8c6-3b00-a297876c190b@deltatee.com>
+Date: Fri, 2 Mar 2018 10:10:31 -0700
 MIME-Version: 1.0
+In-Reply-To: <20180302161842.GB14861@ziepe.ca>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Subject: Re: [PATCH v2 10/10] nvmet: Optionally use PCI P2P memory
 List-ID: <linux-block@vger.kernel.org>
 
-PiAgICBodHRwOi8vbnZtZXhwcmVzcy5vcmcvd3AtY29udGVudC91cGxvYWRzL05WTS1FeHByZXNz
-LTEuMy1SYXRpZmllZC1UUHMuemlwDQoNCkBLZWl0aCAtIG15IGFwb2xvZ2llcy4NCg0KQENocmlz
-dG9waCAtIHRoYW5rcyBmb3IgdGhlIGxpbmsNCg0KU28gbXkgdW5kZXJzdGFuZGluZyBvZiB3aGVu
-IHRoZSB0ZWNobmljYWwgY29udGVudCBzdXJyb3VuZGluZyBuZXcgTlZNZSBUZWNobmljYWwgUHJv
-cG9zYWxzIChUUHMpIHdhcyB3cm9uZy4gSSB0aG91Z2ggdGhlIFRQIGNvbnRlbnQgY291bGQgb25s
-eSBiZSBkaXNjdXNzZWQgb25jZSBkaXNjbG9zZWQgaW4gdGhlIHB1YmxpYyBzdGFuZGFyZC4gSSBo
-YXZlIG5vdyBsZWFybnQgdGhhdCBvbmNlIHRoZSBUUHMgYXJlIHJhdGlmaWVkIHRoZXkgYXJlIHB1
-YmxpY2FsbHkgYXZhaWxhYmxlIQ0KDQpIb3dldmVyLCBhcyBMb2dhbiBwb2ludGVkIG91dCwgUE1S
-cyBhcmUgbm90IHJlbGV2YW50IHRvIHRoaXMgc2VyaWVzIHNvIGxldCdzIGRlZmVyIGRpc2N1c3Np
-b24gb24gaG93IHRvIHN1cHBvcnQgdGhlbSB0byBhIGxhdGVyIGRhdGUhDQoNClN0ZXBoZW4NCiAg
-ICANCg0K
+
+
+On 02/03/18 09:18 AM, Jason Gunthorpe wrote:
+
+> This allocator is already seems not useful for the P2P target memory
+> on a Mellanox NIC due to the way it has a special allocation flow
+> (windowing) and special usage requirements..
+> 
+> Nor can it be usefull for the doorbell memory in the NIC.
+
+No one says every P2P use has to use P2P memory. Doorbells are obviously 
+not P2P memory. But it's the p2mem interface that's important and the 
+interface absolutely does not belong in the NVMe driver. Once you have 
+the P2P memory interface you need an allocator behind it and the obvious 
+place is in the P2P code to handle the common case where you're just 
+mapping a BAR. We don't need to implement a genalloc in every driver 
+that has P2P memory attached with it. If some hardware wants to expose 
+memory that requires complicated allocation it's up to them to solve 
+that problem but that isn't enough justification, to me, to push common 
+code into every driver.
+
+> Both of these are existing use cases for P2P with out of tree patches..
+
+And we have out of tree code that uses the generic allocator part of 
+p2pmem.
+
+> The allocator seems to only be able to solve the CMB problem, and I
+> think due to that it is better to put this allocator in the NVMe
+> driver and not the core code.. At least until we find a 2nd user that
+> needs the same allocation scheme...
+
+See the first P2PMEM RFC. We used Chelsio's NIC instead of the CMB with 
+a very similar allocation scheme. We'd still be enabling that NIC in the 
+same way if we didn't run into hardware issues with it. A simple BAR 
+with memory behind it is always going to be the most common case.
+
+Logan
