@@ -1,137 +1,57 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out1.zte.com.cn ([202.103.147.172]:36924 "EHLO mxct.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932600AbeCEIba (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Mar 2018 03:31:30 -0500
-From: tang.junhui@zte.com.cn
-To: cgxu519@gmx.com
-Cc: mlyle@lyle.org, kent.overstreet@gmail.com,
-        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
-        tang.junhui@zte.com.cn
-Subject: [PATCH v2] bcache: move closure debug file into debug direcotry
-Date: Mon, 5 Mar 2018 16:34:40 +0800
-Message-Id: <1520238880-8595-1-git-send-email-tang.junhui@zte.com.cn>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <logang@deltatee.com>
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Bjorn Helgaas <helgaas@kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-rdma <linux-rdma@vger.kernel.org>,
+ linux-nvdimm <linux-nvdimm@lists.01.org>, linux-block@vger.kernel.org,
+ Stephen Bates <sbates@raithlin.com>, Christoph Hellwig <hch@lst.de>,
+ Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+ Sagi Grimberg <sagi@grimberg.me>, Bjorn Helgaas <bhelgaas@google.com>,
+ Jason Gunthorpe <jgg@mellanox.com>, Max Gurtovoy <maxg@mellanox.com>,
+ =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+ Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ Alex Williamson <alex.williamson@redhat.com>
+References: <20180228234006.21093-1-logang@deltatee.com>
+ <20180228234006.21093-3-logang@deltatee.com>
+ <20180301174450.GF13722@bhelgaas-glaptop.roam.corp.google.com>
+ <d69d59c0-6182-cce7-7ba4-8552ba95bef5@deltatee.com>
+ <CAPcyv4hj5XJrsKHxZEWTSdrDAv0k7tf1ptb7_2FpTGpxqY5jUQ@mail.gmail.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <c97fb967-966d-4a8e-91ab-e3f216ebdd97@deltatee.com>
+Date: Thu, 1 Mar 2018 17:37:58 -0700
+MIME-Version: 1.0
+In-Reply-To: <CAPcyv4hj5XJrsKHxZEWTSdrDAv0k7tf1ptb7_2FpTGpxqY5jUQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Subject: Re: [PATCH v2 02/10] PCI/P2PDMA: Add sysfs group to display p2pmem
+ stats
+List-ID: <linux-block@vger.kernel.org>
 
-LGTM.
 
-Reviewed-by: Tang Junhui <tang.junhui@zte.com.cn>
 
-> In current code closure debug file is outside of debug directory
-> and when unloading module there is lack of removing operation
-> for closure debug file, so it will cause creating error when trying
-> to reload  module.
+On 01/03/18 05:36 PM, Dan Williams wrote:
+> On Thu, Mar 1, 2018 at 4:15 PM, Logan Gunthorpe <logang@deltatee.com> wrote:
+>>
+>>
+>> On 01/03/18 10:44 AM, Bjorn Helgaas wrote:
+>>>
+>>> I think these two statements are out of order, since the attributes
+>>> dereference pdev->p2pdma.  And it looks like you set "error"
+>>> unnecessarily, since you return immediately looking at it.
+>>
+>>
+>> Per the previous series, sysfs_create_group is must_check for some reason. I
+>> had a printk there but you didn't think it was necessary. So assigning it to
+>> error is the only way to squash the warning.
 > 
-> This patch move closure debug file into "bcache" debug direcory
-> so that the file can get deleted properly.
-> 
-> Signed-off-by: Chengguang Xu <cgxu519@gmx.com>
-> ---
-> Changes since v1:
-> - Move closure debug file into "bcache" debug direcory instead of
-> deleting it individually.
-> - Change Signed-off-by mail address.
-> 
->  drivers/md/bcache/closure.c | 9 +++++----
->  drivers/md/bcache/closure.h | 5 +++--
->  drivers/md/bcache/debug.c   | 2 +-
->  drivers/md/bcache/super.c   | 3 +--
->  4 files changed, 10 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/md/bcache/closure.c b/drivers/md/bcache/closure.c
-> index 7f12920..64b123c 100644
-> --- a/drivers/md/bcache/closure.c
-> +++ b/drivers/md/bcache/closure.c
-> @@ -157,7 +157,7 @@ void closure_debug_destroy(struct closure *cl)
->  }
->  EXPORT_SYMBOL(closure_debug_destroy);
->  
-> -static struct dentry *debug;
-> +static struct dentry *closure_debug;
->  
->  static int debug_seq_show(struct seq_file *f, void *data)
->  {
-> @@ -199,11 +199,12 @@ static int debug_seq_open(struct inode *inode, struct file *file)
->      .release    = single_release
->  };
->  
-> -void __init closure_debug_init(void)
-> +int __init closure_debug_init(void)
->  {
-> -    debug = debugfs_create_file("closures", 0400, NULL, NULL, &debug_ops);
-> +    closure_debug = debugfs_create_file("closures",
-> +                0400, debug, NULL, &debug_ops);
-> +    return IS_ERR_OR_NULL(closure_debug);
->  }
-> -
->  #endif
->  
->  MODULE_AUTHOR("Kent Overstreet <koverstreet@google.com>");
-> diff --git a/drivers/md/bcache/closure.h b/drivers/md/bcache/closure.h
-> index 3b9dfc9..0fb704d 100644
-> --- a/drivers/md/bcache/closure.h
-> +++ b/drivers/md/bcache/closure.h
-> @@ -105,6 +105,7 @@
->  struct closure;
->  struct closure_syncer;
->  typedef void (closure_fn) (struct closure *);
-> +extern struct dentry *debug;
->  
->  struct closure_waitlist {
->      struct llist_head    list;
-> @@ -185,13 +186,13 @@ static inline void closure_sync(struct closure *cl)
->  
->  #ifdef CONFIG_BCACHE_CLOSURES_DEBUG
->  
-> -void closure_debug_init(void);
-> +int closure_debug_init(void);
->  void closure_debug_create(struct closure *cl);
->  void closure_debug_destroy(struct closure *cl);
->  
->  #else
->  
-> -static inline void closure_debug_init(void) {}
-> +static inline int closure_debug_init(void) { return 0; }
->  static inline void closure_debug_create(struct closure *cl) {}
->  static inline void closure_debug_destroy(struct closure *cl) {}
->  
-> diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
-> index af89408..5db02de 100644
-> --- a/drivers/md/bcache/debug.c
-> +++ b/drivers/md/bcache/debug.c
-> @@ -17,7 +17,7 @@
->  #include <linux/random.h>
->  #include <linux/seq_file.h>
->  
-> -static struct dentry *debug;
-> +struct dentry *debug;
->  
->  #ifdef CONFIG_BCACHE_DEBUG
->  
-> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-> index 1a9fdab..b784292 100644
-> --- a/drivers/md/bcache/super.c
-> +++ b/drivers/md/bcache/super.c
-> @@ -2133,7 +2133,6 @@ static int __init bcache_init(void)
->      mutex_init(&bch_register_lock);
->      init_waitqueue_head(&unregister_wait);
->      register_reboot_notifier(&reboot);
-> -    closure_debug_init();
->  
->      bcache_major = register_blkdev(0, "bcache");
->      if (bcache_major < 0) {
-> @@ -2145,7 +2144,7 @@ static int __init bcache_init(void)
->      if (!(bcache_wq = alloc_workqueue("bcache", WQ_MEM_RECLAIM, 0)) ||
->          !(bcache_kobj = kobject_create_and_add("bcache", fs_kobj)) ||
->          bch_request_init() ||
-> -        bch_debug_init(bcache_kobj) ||
-> +        bch_debug_init(bcache_kobj) || closure_debug_init() ||
->          sysfs_create_files(bcache_kobj, files))
->          goto err;
->  
-> -- 
-> 1.8.3.1
+> Why not fail the setup if the sysfs_create_group() fails? Sure, it may
+> not be strictly required for userspace to have access to these
+> attributes, but it seems hostile that userspace can't make assumptions
+> about the presence of the "p2pmem" directory relative to the
+> capability being setup.
 
-Thanks
-Tang Junhui
+Works for me. I'll do that.
+
+Thanks,
+
+Logan
