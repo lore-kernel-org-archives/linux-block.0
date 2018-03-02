@@ -1,28 +1,30 @@
-Return-Path: <sagigrim@gmail.com>
-Return-Path: <sagigrim@gmail.com>
-Subject: Re: [PATCH v2 05/10] block: Introduce PCI P2P flags for request and
- request queue
-To: Logan Gunthorpe <logang@deltatee.com>, linux-kernel@vger.kernel.org,
- linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-rdma@vger.kernel.org, linux-nvdimm@lists.01.org,
- linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>, Christoph Hellwig <hch@lst.de>,
- Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
- Bjorn Helgaas <bhelgaas@google.com>, Jason Gunthorpe <jgg@mellanox.com>,
- Max Gurtovoy <maxg@mellanox.com>, Dan Williams <dan.j.williams@intel.com>,
- =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
- Benjamin Herrenschmidt <benh@kernel.crashing.org>,
- Alex Williamson <alex.williamson@redhat.com>
-References: <20180228234006.21093-1-logang@deltatee.com>
- <20180228234006.21093-6-logang@deltatee.com>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <2882003d-7689-7825-7651-e68ffadb9d41@grimberg.me>
-Date: Thu, 1 Mar 2018 13:08:24 +0200
+Return-Path: <martin.petersen@oracle.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, Mike Snitzer <snitzer@redhat.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH 10/11] block: Complain if queue_flag_(set|clear)_unlocked() is abused
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20180228192823.5191-1-bart.vanassche@wdc.com>
+	<20180228192823.5191-11-bart.vanassche@wdc.com>
+Date: Fri, 02 Mar 2018 18:18:16 -0500
+In-Reply-To: <20180228192823.5191-11-bart.vanassche@wdc.com> (Bart Van
+	Assche's message of "Wed, 28 Feb 2018 11:28:22 -0800")
+Message-ID: <yq1sh9it6br.fsf@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20180228234006.21093-6-logang@deltatee.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-Looks fine,
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Bart,
+
+> Since it is not safe to use queue_flag_(set|clear)_unlocked() without
+> holding the queue lock after the sysfs entries for a queue have been
+> created, complain if this happens.
+
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
