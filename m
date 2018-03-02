@@ -1,85 +1,52 @@
-Return-Path: <benh@kernel.crashing.org>
-Message-ID: <1520027052.4592.60.camel@kernel.crashing.org>
-Subject: Re: [PATCH v2 00/10] Copy Offload in NVMe Fabrics with P2P PCI
- Memory
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-To: Logan Gunthorpe <logang@deltatee.com>,
-        Dan Williams
-	 <dan.j.williams@intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
-        Oliver OHalloran <oliveroh@au1.ibm.com>,
-        Alex Williamson
- <alex.williamson@redhat.com>,
-        linux-nvdimm <linux-nvdimm@lists.01.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>, linux-pci@vger.kernel.org,
-        Linux
- Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        =?ISO-8859-1?Q?J=E9r=F4me?= Glisse <jglisse@redhat.com>,
-        Jason Gunthorpe
- <jgg@mellanox.com>,
-        Bjorn Helgaas <bhelgaas@google.com>, Max Gurtovoy
- <maxg@mellanox.com>,
-        Christoph Hellwig <hch@lst.de>
-Date: Sat, 03 Mar 2018 08:44:12 +1100
-In-Reply-To: <1519946734.4592.48.camel@au1.ibm.com>
+Return-Path: <sbates@raithlin.com>
+From: "Stephen  Bates" <sbates@raithlin.com>
+To: Jerome Glisse <jglisse@redhat.com>, Logan Gunthorpe <logang@deltatee.com>
+CC: Benjamin Herrenschmidt <benh@au1.ibm.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-pci@vger.kernel.org"
+	<linux-pci@vger.kernel.org>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "linux-nvdimm@lists.01.org"
+	<linux-nvdimm@lists.01.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, Jens Axboe
+	<axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>, Sagi Grimberg
+	<sagi@grimberg.me>, Bjorn Helgaas <bhelgaas@google.com>, Jason Gunthorpe
+	<jgg@mellanox.com>, Max Gurtovoy <maxg@mellanox.com>, Dan Williams
+	<dan.j.williams@intel.com>, Alex Williamson <alex.williamson@redhat.com>,
+	Oliver OHalloran <oliveroh@au1.ibm.com>
+Subject: Re: [PATCH v2 00/10] Copy Offload in NVMe Fabrics with P2P PCI Memory
+Date: Fri, 2 Mar 2018 21:38:43 +0000
+Message-ID: <8D3B5C26-39E0-478D-B51F-A22B3F36C4D7@raithlin.com>
 References: <20180228234006.21093-1-logang@deltatee.com>
-	 <1519876489.4592.3.camel@kernel.crashing.org>
-	 <1519876569.4592.4.camel@au1.ibm.com>
-	 <CAPcyv4h7mcFphv3j_vW-CGxXa2pjQgLqpBOLzHuTzAFzygai-Q@mail.gmail.com>
-	 <1519936477.4592.23.camel@au1.ibm.com>
-	 <CAPcyv4goHsYytq60ehJUori8Xq+Z0p8dV-8_oRALj244H4YtwQ@mail.gmail.com>
-	 <2079ba48-5ae5-5b44-cce1-8175712dd395@deltatee.com>
-	 <43ba615f-a6e1-9444-65e1-494169cb415d@deltatee.com>
-	 <1519945204.4592.45.camel@au1.ibm.com>
-	 <595acefb-18fc-e650-e172-bae271263c4c@deltatee.com>
-	 <1519946734.4592.48.camel@au1.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+ <1519876489.4592.3.camel@kernel.crashing.org>
+ <1519876569.4592.4.camel@au1.ibm.com>
+ <8e808448-fc01-5da0-51e7-1a6657d5a23a@deltatee.com>
+ <1519936195.4592.18.camel@au1.ibm.com> <20180301205548.GA6742@redhat.com>
+ <a512edf9-2d96-9229-fe60-e0ea60b3922b@deltatee.com>
+ <20180301211036.GB6742@redhat.com>
+In-Reply-To: <20180301211036.GB6742@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, 2018-03-02 at 10:25 +1100, Benjamin Herrenschmidt wrote:
-> On Thu, 2018-03-01 at 16:19 -0700, Logan Gunthorpe wrote:
-> > 
-> > On 01/03/18 04:00 PM, Benjamin Herrenschmidt wrote:
-> > > We use only 52 in practice but yes.
-> > > 
-> > > >   That's 64PB. If you use need
-> > > > a sparse vmemmap for the entire space it will take 16TB which leaves you
-> > > > with 63.98PB of address space left. (Similar calculations for other
-> > > > numbers of address bits.)
-> > > 
-> > > We only have 52 bits of virtual space for the kernel with the radix
-> > > MMU.
-> > 
-> > Ok, assuming you only have 52 bits of physical address space: the sparse 
-> > vmemmap takes 1TB and you're left with 3.9PB of address space for other 
-> > things. So, again, why doesn't that work? Is my math wrong
-> 
-> The big problem is not the vmemmap, it's the linear mapping
-
-Allright, so, I think I have a plan to fix this, but it will take a
-little bit of time.
-
-Basically the idea is to have firmware pass to Linux a region that's
-known to not have anything in it that it can use for the vmalloc space
-rather than have linux arbitrarily cut the address space in half.
-
-I'm pretty sure I can always find large enough "holes" in the physical
-address space that are outside of both RAM/OpenCAPI/Nvlink and
-PCIe/MMIO space. If anything, unused chip IDs. But I don't want Linux
-to have to know about the intimate HW details so I'll pass it from FW.
-
-It will take some time to adjust Linux and get updated FW around
-though.
-
-Once that's done, I'll be able to have the linear mapping go through
-the entire 52-bit space (minus that hole). Of course the hole need to
-be large enough to hold a vmemmap for a 52-bit space, so that's about
-4TB. So I probably need a hole that's at least 8TB.
-
-As for the mapping attributes, it should be easy for my linear mapping
-code to ensure anything that isn't actual RAM is mapped NC.
-
-Cheers,
-Ben.
+PiBJdCBzZWVtcyBwZW9wbGUgbWlzcy11bmRlcnN0YW5kIEhNTSA6KCANCg0KSGkgSmVyb21lDQoN
+CllvdXIgdW5oYXBweSBmYWNlIGVtb3RpY29uIG1hZGUgbWUgc2FkIHNvIEkgd2VudCBvZmYgdG8g
+KHJlKXJlYWQgdXAgb24gSE1NLiBBbG9uZyB0aGUgd2F5IEkgY2FtZSB1cCB3aXRoIGEgY291cGxl
+IG9mIHRoaW5ncy4NCg0KV2hpbGUgaG1tLnR4dCBpcyByZWFsbHkgbmljZSB0byByZWFkIGl0IG1h
+a2VzIG5vIG1lbnRpb24gb2YgREVWSUNFX1BSSVZBVEUgYW5kIERFVklDRV9QVUJMSUMuIEl0IGFs
+c28gZ2l2ZXMgbm8gaW5kaWNhdGlvbiB3aGVuIG9uZSBtaWdodCBjaG9vc2UgdG8gdXNlIG9uZSBv
+dmVyIHRoZSBvdGhlci4gV291bGQgaXQgYmUgcG9zc2libGUgdG8gdXBkYXRlIGhtbS50eHQgdG8g
+aW5jbHVkZSBzb21lIGRpc2N1c3Npb24gb24gdGhpcz8gSSB1bmRlcnN0YW5kIHRoYXQgREVWSUNF
+X1BVQkxJQyBjcmVhdGVzIGEgbWFwcGluZyBpbiB0aGUga2VybmVsJ3MgbGluZWFyIGFkZHJlc3Mg
+c3BhY2UgZm9yIHRoZSBkZXZpY2UgbWVtb3J5IGFuZCBERVZJQ0VfUFJJVkFURSBkb2VzIG5vdC4g
+SG93ZXZlciwgbGlrZSBJIHNhaWQsIEkgYW0gbm90IHN1cmUgd2hlbiB5b3Ugd291bGQgdXNlIGVp
+dGhlciBvbmUgYW5kIHRoZSBwcm9zIGFuZCBjb25zIG9mIGRvaW5nIHNvLiBJIGFjdHVhbGx5IGVu
+ZGVkIHVwIGZpbmRpbmcgc29tZSB1c2VmdWwgaW5mb3JtYXRpb24gaW4gbWVtcmVtYXAuaCBidXQg
+SSBkb24ndCB0aGluayBpdCBpcyBmYWlyIHRvIGV4cGVjdCBwZW9wbGUgdG8gZGlnICp0aGF0KiBk
+ZWVwIHRvIGZpbmQgdGhpcyBpbmZvcm1hdGlvbiA7LSkuDQoNCkEgcXVpY2sgZ3JlcCBzaG93cyBu
+byBkcml2ZXJzIHVzaW5nIHRoZSBITU0gQVBJIGluIHRoZSB1cHN0cmVhbSBjb2RlIHRvZGF5LiBJ
+cyB0aGlzIGNvcnJlY3Q/IEFyZSB0aGVyZSBhbnkgZXhhbXBsZXMgb2Ygb3V0IG9mIHRyZWUgZHJp
+dmVycyB0aGF0IHVzZSBITU0geW91IGNhbiBwb2ludCBtZSB0b28/IEFzIGEgZHJpdmVyIGRldmVs
+b3BlciB3aGF0IHJlc291cmNlcyBleGlzdCB0byBoZWxwIG1lIHdyaXRlIGEgSE1NIGF3YXJlIGRy
+aXZlcj8NCg0KVGhlICh2ZXJ5IG5pY2UpIGhtbS50eHQgZG9jdW1lbnQgaXMgbm90IHJlZmVyZW5j
+ZXMgaW4gdGhlIE1BSU5UQUlORVJTIGZpbGU/IFlvdSBtaWdodCB3YW50IHRvIGZpeCB0aGF0IHdo
+ZW4geW91IGhhdmUgYSBtb21lbnQuDQoNClN0ZXBoZW4NCg0KDQo=
