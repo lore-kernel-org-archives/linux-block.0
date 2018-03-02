@@ -1,42 +1,32 @@
-Return-Path: <jonas.rabenstein@studium.uni-erlangen.de>
-From: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-To: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
-	Scott Bauer <scott.bauer@intel.com>,
-	Jonathan Derrick <jonathan.derrick@intel.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 5/8] block: sed-opal: print failed function address
-Date: Tue, 13 Mar 2018 14:08:58 +0100
-Message-Id: <55b2d57015c4088fcc3685045415cba02f9aa931.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
-In-Reply-To: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
-References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
-In-Reply-To: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
-References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
+Return-Path: <martin.petersen@oracle.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH 03/11] block: Introduce blk_queue_flag_{set,clear,test_and_{set,clear}}()
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20180228192823.5191-1-bart.vanassche@wdc.com>
+	<20180228192823.5191-4-bart.vanassche@wdc.com>
+Date: Fri, 02 Mar 2018 18:11:25 -0500
+In-Reply-To: <20180228192823.5191-4-bart.vanassche@wdc.com> (Bart Van Assche's
+	message of "Wed, 28 Feb 2018 11:28:15 -0800")
+Message-ID: <yq1muzqul7m.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
-add function address (and if available its symbol) to the message if a
-step function fails.
 
-Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
----
- block/sed-opal.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Bart,
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 5a448a3ba1df..f7925e6f607c 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -394,8 +394,8 @@ static int next(struct opal_dev *dev)
- 
- 		error = step->fn(dev, step->data);
- 		if (error) {
--			pr_debug("Error on step function: %d with error %d: %s\n",
--				 state, error,
-+			pr_info("Error on step function %pS: %d with error %d: %s\n",
-+				 step->fn, state, error,
- 				 opal_error_to_human(error));
- 
- 			/* For each OPAL command we do a discovery0 then we
+> Introduce functions that modify the queue flags and that protect
+> these modifications with the request queue lock. Except for moving
+> one wake_up_all() call from inside to outside a critical section,
+> this patch does not change any functionality.
+
+Looks OK.
+
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+
 -- 
-2.16.1
+Martin K. Petersen	Oracle Linux Engineering
