@@ -1,168 +1,317 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Shaohua Li <shli@kernel.org>,
-	Kyungchan Koh <kkc6196@fb.com>,
-	weiping zhang <zhangweiping@didichuxing.com>,
-	Bart Van Assche <bart.vanassche@sandisk.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] block: null_blk: fix 'Invalid parameters' failure when loading module
-Date: Sat,  3 Mar 2018 10:24:36 +0800
-Message-Id: <20180303022436.11444-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:53234 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1427165AbeCBPWC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Mar 2018 10:22:02 -0500
+Received: by mail-wm0-f66.google.com with SMTP id t3so3817307wmc.2
+        for <linux-block@vger.kernel.org>; Fri, 02 Mar 2018 07:22:01 -0800 (PST)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 06/12] lightnvm: add support for 2.0 address format
+Date: Fri,  2 Mar 2018 16:21:14 +0100
+Message-Id: <1520004080-27760-7-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1520004080-27760-1-git-send-email-javier@cnexlabs.com>
+References: <1520004080-27760-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-On ARM64, the default page size has been 64K on some distributions, and
-we should allow ARM64 people to play null_blk.
+Add support for 2.0 address format. Also, align address bits for 1.2 and
+2.0 to be able to operate on channel and luns without requiring a format
+conversion. Use a generic address format for this purpose.
 
-This patch fixes the issue by extend page bitmap size for supporting
-other non-4KB PAGE_SIZE.
+Also, convert the generic operations to the generic format in pblk.
 
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- drivers/block/null_blk.c | 46 +++++++++++++++++++++++++---------------------
- 1 file changed, 25 insertions(+), 21 deletions(-)
+ drivers/lightnvm/core.c       |  20 ++++-----
+ drivers/lightnvm/pblk-core.c  |  10 ++---
+ drivers/lightnvm/pblk-map.c   |   4 +-
+ drivers/lightnvm/pblk-sysfs.c |   4 +-
+ drivers/lightnvm/pblk.h       |   4 +-
+ include/linux/lightnvm.h      | 101 +++++++++++++++++++++++++++++++-----------
+ 6 files changed, 95 insertions(+), 48 deletions(-)
 
-diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
-index 51b16249028a..388c5212a181 100644
---- a/drivers/block/null_blk.c
-+++ b/drivers/block/null_blk.c
-@@ -72,6 +72,7 @@ enum nullb_device_flags {
- 	NULLB_DEV_FL_CACHE	= 3,
- };
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index b869e3051265..36d76de22dfc 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -194,8 +194,8 @@ static struct nvm_tgt_dev *nvm_create_tgt_dev(struct nvm_dev *dev,
  
-+#define MAP_SZ		((PAGE_SIZE >> SECTOR_SHIFT) + 2)
- /*
-  * nullb_page is a page in memory for nullb devices.
-  *
-@@ -86,10 +87,10 @@ enum nullb_device_flags {
-  */
- struct nullb_page {
- 	struct page *page;
--	unsigned long bitmap;
-+	unsigned long bitmap[DIV_ROUND_UP(MAP_SZ, sizeof(unsigned long) * 8)];
- };
--#define NULLB_PAGE_LOCK (sizeof(unsigned long) * 8 - 1)
--#define NULLB_PAGE_FREE (sizeof(unsigned long) * 8 - 2)
-+#define NULLB_PAGE_LOCK (MAP_SZ - 1)
-+#define NULLB_PAGE_FREE (MAP_SZ - 2)
+ 		for (j = 0; j < luns_in_chnl; j++) {
+ 			luns[lunid].ppa = 0;
+-			luns[lunid].g.ch = i;
+-			luns[lunid++].g.lun = j;
++			luns[lunid].a.ch = i;
++			luns[lunid++].a.lun = j;
  
- struct nullb_device {
- 	struct nullb *nullb;
-@@ -732,7 +733,7 @@ static struct nullb_page *null_alloc_page(gfp_t gfp_flags)
- 	if (!t_page->page)
- 		goto out_freepage;
- 
--	t_page->bitmap = 0;
-+	memset(t_page->bitmap, 0, sizeof(t_page->bitmap));
- 	return t_page;
- out_freepage:
- 	kfree(t_page);
-@@ -742,13 +743,20 @@ static struct nullb_page *null_alloc_page(gfp_t gfp_flags)
- 
- static void null_free_page(struct nullb_page *t_page)
+ 			lun_offs[j] = blun;
+ 			lun_roffs[j + blun] = blun;
+@@ -556,22 +556,22 @@ static void nvm_unregister_map(struct nvm_dev *dev)
+ static void nvm_map_to_dev(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *p)
  {
--	__set_bit(NULLB_PAGE_FREE, &t_page->bitmap);
--	if (test_bit(NULLB_PAGE_LOCK, &t_page->bitmap))
-+	__set_bit(NULLB_PAGE_FREE, t_page->bitmap);
-+	if (test_bit(NULLB_PAGE_LOCK, t_page->bitmap))
- 		return;
- 	__free_page(t_page->page);
- 	kfree(t_page);
+ 	struct nvm_dev_map *dev_map = tgt_dev->map;
+-	struct nvm_ch_map *ch_map = &dev_map->chnls[p->g.ch];
+-	int lun_off = ch_map->lun_offs[p->g.lun];
++	struct nvm_ch_map *ch_map = &dev_map->chnls[p->a.ch];
++	int lun_off = ch_map->lun_offs[p->a.lun];
+ 
+-	p->g.ch += ch_map->ch_off;
+-	p->g.lun += lun_off;
++	p->a.ch += ch_map->ch_off;
++	p->a.lun += lun_off;
  }
  
-+static bool null_page_empty(struct nullb_page *page)
-+{
-+	int size = MAP_SZ - 2;
-+
-+	return find_first_bit(page->bitmap, size) == size;
-+}
-+
- static void null_free_sector(struct nullb *nullb, sector_t sector,
- 	bool is_cache)
+ static void nvm_map_to_tgt(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *p)
  {
-@@ -763,9 +771,9 @@ static void null_free_sector(struct nullb *nullb, sector_t sector,
+ 	struct nvm_dev *dev = tgt_dev->parent;
+ 	struct nvm_dev_map *dev_rmap = dev->rmap;
+-	struct nvm_ch_map *ch_rmap = &dev_rmap->chnls[p->g.ch];
+-	int lun_roff = ch_rmap->lun_offs[p->g.lun];
++	struct nvm_ch_map *ch_rmap = &dev_rmap->chnls[p->a.ch];
++	int lun_roff = ch_rmap->lun_offs[p->a.lun];
  
- 	t_page = radix_tree_lookup(root, idx);
- 	if (t_page) {
--		__clear_bit(sector_bit, &t_page->bitmap);
-+		__clear_bit(sector_bit, t_page->bitmap);
+-	p->g.ch -= ch_rmap->ch_off;
+-	p->g.lun -= lun_roff;
++	p->a.ch -= ch_rmap->ch_off;
++	p->a.lun -= lun_roff;
+ }
  
--		if (!t_page->bitmap) {
-+		if (null_page_empty(t_page)) {
- 			ret = radix_tree_delete_item(root, idx, t_page);
- 			WARN_ON(ret != t_page);
- 			null_free_page(ret);
-@@ -836,7 +844,7 @@ static struct nullb_page *__null_lookup_page(struct nullb *nullb,
- 	t_page = radix_tree_lookup(root, idx);
- 	WARN_ON(t_page && t_page->page->index != idx);
- 
--	if (t_page && (for_write || test_bit(sector_bit, &t_page->bitmap)))
-+	if (t_page && (for_write || test_bit(sector_bit, t_page->bitmap)))
- 		return t_page;
- 
- 	return NULL;
-@@ -899,10 +907,10 @@ static int null_flush_cache_page(struct nullb *nullb, struct nullb_page *c_page)
- 
- 	t_page = null_insert_page(nullb, idx << PAGE_SECTORS_SHIFT, true);
- 
--	__clear_bit(NULLB_PAGE_LOCK, &c_page->bitmap);
--	if (test_bit(NULLB_PAGE_FREE, &c_page->bitmap)) {
-+	__clear_bit(NULLB_PAGE_LOCK, c_page->bitmap);
-+	if (test_bit(NULLB_PAGE_FREE, c_page->bitmap)) {
- 		null_free_page(c_page);
--		if (t_page && t_page->bitmap == 0) {
-+		if (t_page && null_page_empty(t_page)) {
- 			ret = radix_tree_delete_item(&nullb->dev->data,
- 				idx, t_page);
- 			null_free_page(t_page);
-@@ -918,11 +926,11 @@ static int null_flush_cache_page(struct nullb *nullb, struct nullb_page *c_page)
- 
- 	for (i = 0; i < PAGE_SECTORS;
- 			i += (nullb->dev->blocksize >> SECTOR_SHIFT)) {
--		if (test_bit(i, &c_page->bitmap)) {
-+		if (test_bit(i, c_page->bitmap)) {
- 			offset = (i << SECTOR_SHIFT);
- 			memcpy(dst + offset, src + offset,
- 				nullb->dev->blocksize);
--			__set_bit(i, &t_page->bitmap);
-+			__set_bit(i, t_page->bitmap);
+ static void nvm_ppa_tgt_to_dev(struct nvm_tgt_dev *tgt_dev,
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 7d0bd33f11d9..2e10b18b61e3 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -885,7 +885,7 @@ int pblk_line_erase(struct pblk *pblk, struct pblk_line *line)
  		}
+ 
+ 		ppa = pblk->luns[bit].bppa; /* set ch and lun */
+-		ppa.g.blk = line->id;
++		ppa.a.blk = line->id;
+ 
+ 		atomic_dec(&line->left_eblks);
+ 		WARN_ON(test_and_set_bit(bit, line->erase_bitmap));
+@@ -1686,8 +1686,8 @@ static void __pblk_down_page(struct pblk *pblk, struct ppa_addr *ppa_list,
+ 	int i;
+ 
+ 	for (i = 1; i < nr_ppas; i++)
+-		WARN_ON(ppa_list[0].g.lun != ppa_list[i].g.lun ||
+-				ppa_list[0].g.ch != ppa_list[i].g.ch);
++		WARN_ON(ppa_list[0].a.lun != ppa_list[i].a.lun ||
++				ppa_list[0].a.ch != ppa_list[i].a.ch);
+ #endif
+ 
+ 	ret = down_timeout(&rlun->wr_sem, msecs_to_jiffies(30000));
+@@ -1731,8 +1731,8 @@ void pblk_up_page(struct pblk *pblk, struct ppa_addr *ppa_list, int nr_ppas)
+ 	int i;
+ 
+ 	for (i = 1; i < nr_ppas; i++)
+-		WARN_ON(ppa_list[0].g.lun != ppa_list[i].g.lun ||
+-				ppa_list[0].g.ch != ppa_list[i].g.ch);
++		WARN_ON(ppa_list[0].a.lun != ppa_list[i].a.lun ||
++				ppa_list[0].a.ch != ppa_list[i].a.ch);
+ #endif
+ 
+ 	rlun = &pblk->luns[pos];
+diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
+index 04e08d76ea5f..20dbaa89c9df 100644
+--- a/drivers/lightnvm/pblk-map.c
++++ b/drivers/lightnvm/pblk-map.c
+@@ -127,7 +127,7 @@ void pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 			atomic_dec(&e_line->left_eblks);
+ 
+ 			*erase_ppa = rqd->ppa_list[i];
+-			erase_ppa->g.blk = e_line->id;
++			erase_ppa->a.blk = e_line->id;
+ 
+ 			spin_unlock(&e_line->lock);
+ 
+@@ -168,6 +168,6 @@ void pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
+ 		set_bit(bit, e_line->erase_bitmap);
+ 		atomic_dec(&e_line->left_eblks);
+ 		*erase_ppa = pblk->luns[bit].bppa; /* set ch and lun */
+-		erase_ppa->g.blk = e_line->id;
++		erase_ppa->a.blk = e_line->id;
+ 	}
+ }
+diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
+index 59bbbead4fa2..a4b3c6ca45a3 100644
+--- a/drivers/lightnvm/pblk-sysfs.c
++++ b/drivers/lightnvm/pblk-sysfs.c
+@@ -39,8 +39,8 @@ static ssize_t pblk_sysfs_luns_show(struct pblk *pblk, char *page)
+ 		sz += snprintf(page + sz, PAGE_SIZE - sz,
+ 				"pblk: pos:%d, ch:%d, lun:%d - %d\n",
+ 					i,
+-					rlun->bppa.g.ch,
+-					rlun->bppa.g.lun,
++					rlun->bppa.a.ch,
++					rlun->bppa.a.lun,
+ 					active);
  	}
  
-@@ -959,10 +967,10 @@ static int null_make_cache_space(struct nullb *nullb, unsigned long n)
- 		 * We found the page which is being flushed to disk by other
- 		 * threads
- 		 */
--		if (test_bit(NULLB_PAGE_LOCK, &c_pages[i]->bitmap))
-+		if (test_bit(NULLB_PAGE_LOCK, c_pages[i]->bitmap))
- 			c_pages[i] = NULL;
- 		else
--			__set_bit(NULLB_PAGE_LOCK, &c_pages[i]->bitmap);
-+			__set_bit(NULLB_PAGE_LOCK, c_pages[i]->bitmap);
- 	}
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index dcdad255ccb5..6607c41b23c0 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -936,12 +936,12 @@ static inline int pblk_pad_distance(struct pblk *pblk)
  
- 	one_round = 0;
-@@ -1015,7 +1023,7 @@ static int copy_to_nullb(struct nullb *nullb, struct page *source,
- 		kunmap_atomic(dst);
- 		kunmap_atomic(src);
+ static inline int pblk_ppa_to_line(struct ppa_addr p)
+ {
+-	return p.g.blk;
++	return p.a.blk;
+ }
  
--		__set_bit(sector & SECTOR_MASK, &t_page->bitmap);
-+		__set_bit(sector & SECTOR_MASK, t_page->bitmap);
+ static inline int pblk_ppa_to_pos(struct nvm_geo *geo, struct ppa_addr p)
+ {
+-	return p.g.lun * geo->num_ch + p.g.ch;
++	return p.a.lun * geo->num_ch + p.a.ch;
+ }
  
- 		if (is_fua)
- 			null_free_sector(nullb, sector, true);
-@@ -1808,10 +1816,6 @@ static int __init null_init(void)
- 	struct nullb *nullb;
- 	struct nullb_device *dev;
+ static inline struct ppa_addr addr_to_gen_ppa(struct pblk *pblk, u64 paddr,
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 00295d9f9522..f2549b4b8626 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -16,12 +16,21 @@ enum {
+ 	NVM_IOTYPE_GC = 1,
+ };
  
--	/* check for nullb_page.bitmap */
--	if (sizeof(unsigned long) * 8 - 2 < (PAGE_SIZE >> SECTOR_SHIFT))
--		return -EINVAL;
--
- 	if (g_bs > PAGE_SIZE) {
- 		pr_warn("null_blk: invalid block size\n");
- 		pr_warn("null_blk: defaults block size to %lu\n", PAGE_SIZE);
+-#define NVM_BLK_BITS (16)
+-#define NVM_PG_BITS  (16)
+-#define NVM_SEC_BITS (8)
+-#define NVM_PL_BITS  (8)
+-#define NVM_LUN_BITS (8)
+-#define NVM_CH_BITS  (7)
++/* common format */
++#define NVM_GEN_CH_BITS  (8)
++#define NVM_GEN_LUN_BITS (8)
++#define NVM_GEN_BLK_BITS (16)
++#define NVM_GEN_RESERVED (32)
++
++/* 1.2 format */
++#define NVM_12_PG_BITS  (16)
++#define NVM_12_PL_BITS  (4)
++#define NVM_12_SEC_BITS (4)
++#define NVM_12_RESERVED (8)
++
++/* 2.0 format */
++#define NVM_20_SEC_BITS (24)
++#define NVM_20_RESERVED (8)
+ 
+ enum {
+ 	NVM_OCSSD_SPEC_12 = 12,
+@@ -31,16 +40,34 @@ enum {
+ struct ppa_addr {
+ 	/* Generic structure for all addresses */
+ 	union {
++		/* generic device format */
+ 		struct {
+-			u64 blk		: NVM_BLK_BITS;
+-			u64 pg		: NVM_PG_BITS;
+-			u64 sec		: NVM_SEC_BITS;
+-			u64 pl		: NVM_PL_BITS;
+-			u64 lun		: NVM_LUN_BITS;
+-			u64 ch		: NVM_CH_BITS;
+-			u64 reserved	: 1;
++			u64 ch		: NVM_GEN_CH_BITS;
++			u64 lun		: NVM_GEN_LUN_BITS;
++			u64 blk		: NVM_GEN_BLK_BITS;
++			u64 reserved	: NVM_GEN_RESERVED;
++		} a;
++
++		/* 1.2 device format */
++		struct {
++			u64 ch		: NVM_GEN_CH_BITS;
++			u64 lun		: NVM_GEN_LUN_BITS;
++			u64 blk		: NVM_GEN_BLK_BITS;
++			u64 pg		: NVM_12_PG_BITS;
++			u64 pl		: NVM_12_PL_BITS;
++			u64 sec		: NVM_12_SEC_BITS;
++			u64 reserved	: NVM_12_RESERVED;
+ 		} g;
+ 
++		/* 2.0 device format */
++		struct {
++			u64 grp		: NVM_GEN_CH_BITS;
++			u64 pu		: NVM_GEN_LUN_BITS;
++			u64 chk		: NVM_GEN_BLK_BITS;
++			u64 sec		: NVM_20_SEC_BITS;
++			u64 reserved	: NVM_20_RESERVED;
++		} m;
++
+ 		struct {
+ 			u64 line	: 63;
+ 			u64 is_cached	: 1;
+@@ -374,15 +401,25 @@ static inline struct ppa_addr generic_to_dev_addr(struct nvm_tgt_dev *tgt_dev,
+ 						  struct ppa_addr r)
+ {
+ 	struct nvm_geo *geo = &tgt_dev->geo;
+-	struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&geo->addrf;
+ 	struct ppa_addr l;
+ 
+-	l.ppa = ((u64)r.g.ch) << ppaf->ch_offset;
+-	l.ppa |= ((u64)r.g.lun) << ppaf->lun_offset;
+-	l.ppa |= ((u64)r.g.blk) << ppaf->blk_offset;
+-	l.ppa |= ((u64)r.g.pg) << ppaf->pg_offset;
+-	l.ppa |= ((u64)r.g.pl) << ppaf->pln_offset;
+-	l.ppa |= ((u64)r.g.sec) << ppaf->sec_offset;
++	if (geo->version == NVM_OCSSD_SPEC_12) {
++		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&geo->addrf;
++
++		l.ppa = ((u64)r.g.ch) << ppaf->ch_offset;
++		l.ppa |= ((u64)r.g.lun) << ppaf->lun_offset;
++		l.ppa |= ((u64)r.g.blk) << ppaf->blk_offset;
++		l.ppa |= ((u64)r.g.pg) << ppaf->pg_offset;
++		l.ppa |= ((u64)r.g.pl) << ppaf->pln_offset;
++		l.ppa |= ((u64)r.g.sec) << ppaf->sec_offset;
++	} else {
++		struct nvm_addrf *lbaf = &geo->addrf;
++
++		l.ppa = ((u64)r.m.grp) << lbaf->ch_offset;
++		l.ppa |= ((u64)r.m.pu) << lbaf->lun_offset;
++		l.ppa |= ((u64)r.m.chk) << lbaf->chk_offset;
++		l.ppa |= ((u64)r.m.sec) << lbaf->sec_offset;
++	}
+ 
+ 	return l;
+ }
+@@ -391,17 +428,27 @@ static inline struct ppa_addr dev_to_generic_addr(struct nvm_tgt_dev *tgt_dev,
+ 						  struct ppa_addr r)
+ {
+ 	struct nvm_geo *geo = &tgt_dev->geo;
+-	struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&geo->addrf;
+ 	struct ppa_addr l;
+ 
+ 	l.ppa = 0;
+ 
+-	l.g.ch = (r.ppa & ppaf->ch_mask) >> ppaf->ch_offset;
+-	l.g.lun = (r.ppa & ppaf->lun_mask) >> ppaf->lun_offset;
+-	l.g.blk = (r.ppa & ppaf->blk_mask) >> ppaf->blk_offset;
+-	l.g.pg = (r.ppa & ppaf->pg_mask) >> ppaf->pg_offset;
+-	l.g.pl = (r.ppa & ppaf->pln_mask) >> ppaf->pln_offset;
+-	l.g.sec = (r.ppa & ppaf->sec_mask) >> ppaf->sec_offset;
++	if (geo->version == NVM_OCSSD_SPEC_12) {
++		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&geo->addrf;
++
++		l.g.ch = (r.ppa & ppaf->ch_mask) >> ppaf->ch_offset;
++		l.g.lun = (r.ppa & ppaf->lun_mask) >> ppaf->lun_offset;
++		l.g.blk = (r.ppa & ppaf->blk_mask) >> ppaf->blk_offset;
++		l.g.pg = (r.ppa & ppaf->pg_mask) >> ppaf->pg_offset;
++		l.g.pl = (r.ppa & ppaf->pln_mask) >> ppaf->pln_offset;
++		l.g.sec = (r.ppa & ppaf->sec_mask) >> ppaf->sec_offset;
++	} else {
++		struct nvm_addrf *lbaf = &geo->addrf;
++
++		l.m.grp = (r.ppa & lbaf->ch_mask) >> lbaf->ch_offset;
++		l.m.pu = (r.ppa & lbaf->lun_mask) >> lbaf->lun_offset;
++		l.m.chk = (r.ppa & lbaf->chk_mask) >> lbaf->chk_offset;
++		l.m.sec = (r.ppa & lbaf->sec_mask) >> lbaf->sec_offset;
++	}
+ 
+ 	return l;
+ }
 -- 
-2.9.5
+2.7.4
