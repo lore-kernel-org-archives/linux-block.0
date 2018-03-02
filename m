@@ -1,164 +1,161 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f65.google.com ([209.85.160.65]:34164 "EHLO
-        mail-pl0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754801AbeCSAgw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Mar 2018 20:36:52 -0400
-Received: by mail-pl0-f65.google.com with SMTP id u11-v6so5561117plq.1
-        for <linux-block@vger.kernel.org>; Sun, 18 Mar 2018 17:36:52 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Chengguang Xu <cgxu519@gmx.com>
-Subject: [for-4.17 10/20] bcache: move closure debug file into debug directory
-Date: Sun, 18 Mar 2018 17:36:23 -0700
-Message-Id: <20180319003633.27225-11-mlyle@lyle.org>
-In-Reply-To: <20180319003633.27225-1-mlyle@lyle.org>
-References: <20180319003633.27225-1-mlyle@lyle.org>
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:37294 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1427200AbeCBPWF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Mar 2018 10:22:05 -0500
+Received: by mail-wm0-f68.google.com with SMTP id 139so3728162wmn.2
+        for <linux-block@vger.kernel.org>; Fri, 02 Mar 2018 07:22:05 -0800 (PST)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 10/12] lightnvm: pblk: rename ppaf* to addrf*
+Date: Fri,  2 Mar 2018 16:21:18 +0100
+Message-Id: <1520004080-27760-11-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1520004080-27760-1-git-send-email-javier@cnexlabs.com>
+References: <1520004080-27760-1-git-send-email-javier@cnexlabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Chengguang Xu <cgxu519@gmx.com>
+In preparation for 2.0 support in pblk, rename variables referring to
+the address format to addrf and reserve ppaf for the 1.2 path.
 
-In current code closure debug file is outside of debug directory
-and when unloading module there is lack of removing operation
-for closure debug file, so it will cause creating error when trying
-to reload  module.
-
-This patch move closure debug file into "bcache" debug direcory
-so that the file can get deleted properly.
-
-Signed-off-by: Chengguang Xu <cgxu519@gmx.com>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
-Reviewed-by: Tang Junhui <tang.junhui@zte.com.cn>
+Signed-off-by: Javier González <javier@cnexlabs.com>
 ---
- drivers/md/bcache/closure.c |  9 +++++----
- drivers/md/bcache/closure.h |  5 +++--
- drivers/md/bcache/debug.c   | 14 +++++++-------
- drivers/md/bcache/super.c   |  3 +--
- 4 files changed, 16 insertions(+), 15 deletions(-)
+ drivers/lightnvm/pblk-init.c  |  8 ++++----
+ drivers/lightnvm/pblk-sysfs.c |  4 ++--
+ drivers/lightnvm/pblk.h       | 16 ++++++++--------
+ 3 files changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/md/bcache/closure.c b/drivers/md/bcache/closure.c
-index 7f12920c14f7..c0949c9f843b 100644
---- a/drivers/md/bcache/closure.c
-+++ b/drivers/md/bcache/closure.c
-@@ -157,7 +157,7 @@ void closure_debug_destroy(struct closure *cl)
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 0ad06fa8c7c7..4df68a802551 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -80,7 +80,7 @@ static size_t pblk_trans_map_size(struct pblk *pblk)
+ {
+ 	int entry_size = 8;
+ 
+-	if (pblk->ppaf_bitsize < 32)
++	if (pblk->addrf_len < 32)
+ 		entry_size = 4;
+ 
+ 	return entry_size * pblk->rl.nr_secs;
+@@ -229,7 +229,7 @@ static int pblk_set_addrf_12(struct nvm_geo *geo, struct nvm_addrf_12 *dst)
+ 	return dst->blk_offset + src->blk_len;
  }
- EXPORT_SYMBOL(closure_debug_destroy);
  
--static struct dentry *debug;
-+static struct dentry *closure_debug;
- 
- static int debug_seq_show(struct seq_file *f, void *data)
+-static int pblk_set_ppaf(struct pblk *pblk)
++static int pblk_set_addrf(struct pblk *pblk)
  {
-@@ -199,11 +199,12 @@ static const struct file_operations debug_ops = {
- 	.release	= single_release
- };
- 
--void __init closure_debug_init(void)
-+int __init closure_debug_init(void)
- {
--	debug = debugfs_create_file("closures", 0400, NULL, NULL, &debug_ops);
-+	closure_debug = debugfs_create_file("closures",
-+				0400, bcache_debug, NULL, &debug_ops);
-+	return IS_ERR_OR_NULL(closure_debug);
- }
--
- #endif
- 
- MODULE_AUTHOR("Kent Overstreet <koverstreet@google.com>");
-diff --git a/drivers/md/bcache/closure.h b/drivers/md/bcache/closure.h
-index 3b9dfc9962ad..71427eb5fdae 100644
---- a/drivers/md/bcache/closure.h
-+++ b/drivers/md/bcache/closure.h
-@@ -105,6 +105,7 @@
- struct closure;
- struct closure_syncer;
- typedef void (closure_fn) (struct closure *);
-+extern struct dentry *bcache_debug;
- 
- struct closure_waitlist {
- 	struct llist_head	list;
-@@ -185,13 +186,13 @@ static inline void closure_sync(struct closure *cl)
- 
- #ifdef CONFIG_BCACHE_CLOSURES_DEBUG
- 
--void closure_debug_init(void);
-+int closure_debug_init(void);
- void closure_debug_create(struct closure *cl);
- void closure_debug_destroy(struct closure *cl);
- 
- #else
- 
--static inline void closure_debug_init(void) {}
-+static inline int closure_debug_init(void) { return 0; }
- static inline void closure_debug_create(struct closure *cl) {}
- static inline void closure_debug_destroy(struct closure *cl) {}
- 
-diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
-index af89408befe8..028f7b386e01 100644
---- a/drivers/md/bcache/debug.c
-+++ b/drivers/md/bcache/debug.c
-@@ -17,7 +17,7 @@
- #include <linux/random.h>
- #include <linux/seq_file.h>
- 
--static struct dentry *debug;
-+struct dentry *bcache_debug;
- 
- #ifdef CONFIG_BCACHE_DEBUG
- 
-@@ -232,11 +232,11 @@ static const struct file_operations cache_set_debug_ops = {
- 
- void bch_debug_init_cache_set(struct cache_set *c)
- {
--	if (!IS_ERR_OR_NULL(debug)) {
-+	if (!IS_ERR_OR_NULL(bcache_debug)) {
- 		char name[50];
- 		snprintf(name, 50, "bcache-%pU", c->sb.set_uuid);
- 
--		c->debug = debugfs_create_file(name, 0400, debug, c,
-+		c->debug = debugfs_create_file(name, 0400, bcache_debug, c,
- 					       &cache_set_debug_ops);
+ 	struct nvm_tgt_dev *dev = pblk->dev;
+ 	struct nvm_geo *geo = &dev->geo;
+@@ -241,7 +241,7 @@ static int pblk_set_ppaf(struct pblk *pblk)
+ 		return -EINVAL;
  	}
- }
-@@ -245,13 +245,13 @@ void bch_debug_init_cache_set(struct cache_set *c)
  
- void bch_debug_exit(void)
+-	pblk->ppaf_bitsize = pblk_set_addrf_12(geo, (void *)&pblk->ppaf);
++	pblk->addrf_len = pblk_set_addrf_12(geo, (void *)&pblk->addrf);
+ 
+ 	return 0;
+ }
+@@ -377,7 +377,7 @@ static int pblk_core_init(struct pblk *pblk)
+ 	if (!pblk->r_end_wq)
+ 		goto free_bb_wq;
+ 
+-	if (pblk_set_ppaf(pblk))
++	if (pblk_set_addrf(pblk))
+ 		goto free_r_end_wq;
+ 
+ 	INIT_LIST_HEAD(&pblk->compl_list);
+diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
+index a4b3c6ca45a3..87bf51d13f48 100644
+--- a/drivers/lightnvm/pblk-sysfs.c
++++ b/drivers/lightnvm/pblk-sysfs.c
+@@ -117,12 +117,12 @@ static ssize_t pblk_sysfs_ppaf(struct pblk *pblk, char *page)
+ 	struct nvm_addrf_12 *geo_ppaf;
+ 	ssize_t sz = 0;
+ 
+-	ppaf = (struct nvm_addrf_12 *)&pblk->ppaf;
++	ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
+ 	geo_ppaf = (struct nvm_addrf_12 *)&geo->addrf;
+ 
+ 	sz = snprintf(page, PAGE_SIZE,
+ 		"g:(b:%d)blk:%d/%d,pg:%d/%d,lun:%d/%d,ch:%d/%d,pl:%d/%d,sec:%d/%d\n",
+-			pblk->ppaf_bitsize,
++			pblk->addrf_len,
+ 			ppaf->blk_offset, ppaf->blk_len,
+ 			ppaf->pg_offset, ppaf->pg_len,
+ 			ppaf->lun_offset, ppaf->lun_len,
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 6607c41b23c0..40aee9e48af4 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -570,8 +570,8 @@ struct pblk {
+ 	struct pblk_line_mgmt l_mg;		/* Line management */
+ 	struct pblk_line_meta lm;		/* Line metadata */
+ 
+-	struct nvm_addrf ppaf;
+-	int ppaf_bitsize;
++	struct nvm_addrf addrf;
++	int addrf_len;
+ 
+ 	struct pblk_rb rwb;
+ 
+@@ -947,7 +947,7 @@ static inline int pblk_ppa_to_pos(struct nvm_geo *geo, struct ppa_addr p)
+ static inline struct ppa_addr addr_to_gen_ppa(struct pblk *pblk, u64 paddr,
+ 					      u64 line_id)
  {
--	if (!IS_ERR_OR_NULL(debug))
--		debugfs_remove_recursive(debug);
-+	if (!IS_ERR_OR_NULL(bcache_debug))
-+		debugfs_remove_recursive(bcache_debug);
- }
+-	struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->ppaf;
++	struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
+ 	struct ppa_addr ppa;
  
- int __init bch_debug_init(struct kobject *kobj)
+ 	ppa.ppa = 0;
+@@ -964,7 +964,7 @@ static inline struct ppa_addr addr_to_gen_ppa(struct pblk *pblk, u64 paddr,
+ static inline u64 pblk_dev_ppa_to_line_addr(struct pblk *pblk,
+ 							struct ppa_addr p)
  {
--	debug = debugfs_create_dir("bcache", NULL);
-+	bcache_debug = debugfs_create_dir("bcache", NULL);
+-	struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->ppaf;
++	struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
+ 	u64 paddr;
  
--	return IS_ERR_OR_NULL(debug);
-+	return IS_ERR_OR_NULL(bcache_debug);
- }
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index dab9f59a1a2f..26b7a7d4df15 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -2239,7 +2239,6 @@ static int __init bcache_init(void)
- 	mutex_init(&bch_register_lock);
- 	init_waitqueue_head(&unregister_wait);
- 	register_reboot_notifier(&reboot);
--	closure_debug_init();
+ 	paddr = (u64)p.g.ch << ppaf->ch_offset;
+@@ -988,7 +988,7 @@ static inline struct ppa_addr pblk_ppa32_to_ppa64(struct pblk *pblk, u32 ppa32)
+ 		ppa64.c.line = ppa32 & ((~0U) >> 1);
+ 		ppa64.c.is_cached = 1;
+ 	} else {
+-		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->ppaf;
++		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
  
- 	bcache_major = register_blkdev(0, "bcache");
- 	if (bcache_major < 0) {
-@@ -2251,7 +2250,7 @@ static int __init bcache_init(void)
- 	if (!(bcache_wq = alloc_workqueue("bcache", WQ_MEM_RECLAIM, 0)) ||
- 	    !(bcache_kobj = kobject_create_and_add("bcache", fs_kobj)) ||
- 	    bch_request_init() ||
--	    bch_debug_init(bcache_kobj) ||
-+	    bch_debug_init(bcache_kobj) || closure_debug_init() ||
- 	    sysfs_create_files(bcache_kobj, files))
- 		goto err;
+ 		ppa64.g.ch = (ppa32 & ppaf->ch_mask) >> ppaf->ch_offset;
+ 		ppa64.g.lun = (ppa32 & ppaf->lun_mask) >> ppaf->lun_offset;
+@@ -1011,7 +1011,7 @@ static inline u32 pblk_ppa64_to_ppa32(struct pblk *pblk, struct ppa_addr ppa64)
+ 		ppa32 |= ppa64.c.line;
+ 		ppa32 |= 1U << 31;
+ 	} else {
+-		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->ppaf;
++		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
  
+ 		ppa32 |= ppa64.g.ch << ppaf->ch_offset;
+ 		ppa32 |= ppa64.g.lun << ppaf->lun_offset;
+@@ -1029,7 +1029,7 @@ static inline struct ppa_addr pblk_trans_map_get(struct pblk *pblk,
+ {
+ 	struct ppa_addr ppa;
+ 
+-	if (pblk->ppaf_bitsize < 32) {
++	if (pblk->addrf_len < 32) {
+ 		u32 *map = (u32 *)pblk->trans_map;
+ 
+ 		ppa = pblk_ppa32_to_ppa64(pblk, map[lba]);
+@@ -1045,7 +1045,7 @@ static inline struct ppa_addr pblk_trans_map_get(struct pblk *pblk,
+ static inline void pblk_trans_map_set(struct pblk *pblk, sector_t lba,
+ 						struct ppa_addr ppa)
+ {
+-	if (pblk->ppaf_bitsize < 32) {
++	if (pblk->addrf_len < 32) {
+ 		u32 *map = (u32 *)pblk->trans_map;
+ 
+ 		map[lba] = pblk_ppa64_to_ppa32(pblk, ppa);
 -- 
-2.14.1
+2.7.4
