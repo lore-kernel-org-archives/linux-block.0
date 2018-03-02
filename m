@@ -1,44 +1,54 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:46680 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752759AbeCOPIa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Mar 2018 11:08:30 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Michael Lyle <mlyle@lyle.org>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Coly Li <colyli@suse.de>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH 11/16] bcache: Check the d->disk pointer before using it
-Date: Thu, 15 Mar 2018 08:08:09 -0700
-Message-Id: <20180315150814.9412-12-bart.vanassche@wdc.com>
-In-Reply-To: <20180315150814.9412-1-bart.vanassche@wdc.com>
-References: <20180315150814.9412-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hch@lst.de>
+Date: Sat, 3 Mar 2018 00:07:38 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+	Laurence Oberman <loberman@redhat.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 2/5] genirq/affinity: move actual irq vector spread
+	into one helper
+Message-ID: <20180302230738.GB31468@lst.de>
+References: <20180206121742.29336-1-ming.lei@redhat.com> <20180206121742.29336-3-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180206121742.29336-3-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Since bcache_device_free() checks the d->disk pointer I think that
-means that that pointer can be NULL. Hence test that pointer before
-using it. This was detected by smatch.
+On Tue, Feb 06, 2018 at 08:17:39PM +0800, Ming Lei wrote:
+> No functional change, just prepare for converting to 2-stage
+> irq vector spread.
+> 
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  kernel/irq/affinity.c | 99 +++++++++++++++++++++++++++++----------------------
+>  1 file changed, 56 insertions(+), 43 deletions(-)
+> 
+> diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
+> index 4b1c4763212d..6af3f6727f63 100644
+> --- a/kernel/irq/affinity.c
+> +++ b/kernel/irq/affinity.c
+> @@ -79,7 +79,7 @@ static void build_node_to_cpumask(cpumask_var_t *masks)
+>  		cpumask_set_cpu(cpu, masks[cpu_to_node(cpu)]);
+>  }
+>  
+> -static int get_nodes_in_cpumask(cpumask_var_t *node_to_cpumask,
+> +static int get_nodes_in_cpumask(const cpumask_var_t *node_to_cpumask,
+>  				const struct cpumask *mask, nodemask_t *nodemsk)
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
----
- drivers/md/bcache/super.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Maybe you can split all your constifications into a separate prep patch?
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index d19a44cd1fd7..39bec137f636 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -742,7 +742,7 @@ static void bcache_device_free(struct bcache_device *d)
- {
- 	lockdep_assert_held(&bch_register_lock);
- 
--	pr_info("%s stopped", d->disk->disk_name);
-+	pr_info("%s stopped", d->disk ? d->disk->disk_name : "(?)");
- 
- 	if (d->c)
- 		bcache_device_detach(d);
--- 
-2.16.2
+> +int irq_build_affinity_masks(int nvecs, const struct irq_affinity *affd,
+> +			     const cpumask_var_t *node_to_cpumask,
+> +			     const struct cpumask *cpu_mask,
+> +			     struct cpumask *nmsk,
+> +			     struct cpumask *masks)
+
+static?
+
+Otherwise looks fine:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
