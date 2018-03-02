@@ -1,48 +1,39 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f52.google.com ([74.125.82.52]:51996 "EHLO
-        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1031702AbeCAPJH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Mar 2018 10:09:07 -0500
-Received: by mail-wm0-f52.google.com with SMTP id h21so12576347wmd.1
-        for <linux-block@vger.kernel.org>; Thu, 01 Mar 2018 07:09:07 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dan.carpenter@oracle.com,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH] lightnvm: pblk: refactor init/exit sequences
-Date: Thu,  1 Mar 2018 16:08:55 +0100
-Message-Id: <1519916936-30079-1-git-send-email-javier@cnexlabs.com>
+Return-Path: <martin.petersen@oracle.com>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Mike Snitzer <snitzer@redhat.com>, Shaohua Li <shli@fb.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH 09/11] block: Use blk_queue_flag_*() in drivers instead of queue_flag_*()
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20180228192823.5191-1-bart.vanassche@wdc.com>
+	<20180228192823.5191-10-bart.vanassche@wdc.com>
+Date: Fri, 02 Mar 2018 18:17:09 -0500
+In-Reply-To: <20180228192823.5191-10-bart.vanassche@wdc.com> (Bart Van
+	Assche's message of "Wed, 28 Feb 2018 11:28:21 -0800")
+Message-ID: <yq11sh2uky2.fsf@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain
+List-ID: <linux-block@vger.kernel.org>
 
-The init/exit sequences have grown in a very bad way. Refactor them to
-eliminate dependencies across initialization modules.
 
-One of these dependencies caused a bad double free when introducing a
-preparation patch for 2.0 bad block identification. This was reported by
-Dan Carpenter and 0-DAY.
+Bart,
 
-Matias,
+> This patch has been generated as follows:
+>
+> for verb in set_unlocked clear_unlocked set clear; do
+>   replace-in-files queue_flag_${verb} blk_queue_flag_${verb%_unlocked} \
+>     $(git grep -lw queue_flag_${verb} drivers block/bsg*)
+> done
+>
+> Except for protecting all queue flag changes with the queue lock
+> this patch does not change any functionality.
 
-Since you have not send the PR to Jens, please squash this patch with:
-    lightnvm: pblk: refactor bad block identification
-
-You will notice that I had queued this patch on the 2.0 series. I did
-the rebase now, which is probably what I should have done from the
-beginning. Since I'll be sending a V5 for it, this should not be a
-problem.
-
-Thanks,
-Javier
-
-Javier González (1):
-  lightnvm: pblk: refactor init/exit sequences
-
- drivers/lightnvm/pblk-init.c | 412 +++++++++++++++++++++----------------------
- 1 file changed, 206 insertions(+), 206 deletions(-)
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
 
 -- 
-2.7.4
+Martin K. Petersen	Oracle Linux Engineering
