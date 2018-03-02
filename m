@@ -1,72 +1,22 @@
-Return-Path: <linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org>
-Subject: Re: [PATCH 02/15] lightnvm: add controller capabilities to 2.0
-To: =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <jg@lightnvm.io>
-References: <1519832975-25432-1-git-send-email-javier@cnexlabs.com>
- <1519832975-25432-3-git-send-email-javier@cnexlabs.com>
-From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <e435dd71-a83d-1888-0e1b-cd1b62181e4c@lightnvm.io>
-Date: Thu, 1 Mar 2018 11:33:06 +0100
+Return-Path: <hch@lst.de>
+Date: Fri, 2 Mar 2018 23:27:19 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <damien.lemoal@wdc.com>
+Subject: Re: [PATCH] block: Suppress kernel-doc warnings triggered by
+	blk-zoned.c
+Message-ID: <20180302222719.GB30953@lst.de>
+References: <20180301162026.13970-1-bart.vanassche@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <1519832975-25432-3-git-send-email-javier@cnexlabs.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-nvme/>
-List-Post: <mailto:linux-nvme@lists.infradead.org>
-List-Help: <mailto:linux-nvme-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-nvme>,
- <mailto:linux-nvme-request@lists.infradead.org?subject=subscribe>
-Cc: linux-block@vger.kernel.org,
- =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@cnexlabs.com>,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
-Sender: "Linux-nvme" <linux-nvme-bounces@lists.infradead.org>
-Errors-To: linux-nvme-bounces+axboe=kernel.dk@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180301162026.13970-1-bart.vanassche@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gMDIvMjgvMjAxOCAwNDo0OSBQTSwgSmF2aWVyIEdvbnrDoWxleiB3cm90ZToKPiBBc3NpZ24g
-bWlzc2luZyBtY2NhcCB2YWx1ZSBvbiAyLjAgcGF0aAo+IAo+IFNpZ25lZC1vZmYtYnk6IEphdmll
-ciBHb256w6FsZXogPGphdmllckBjbmV4bGFicy5jb20+Cj4gLS0tCj4gICBkcml2ZXJzL252bWUv
-aG9zdC9saWdodG52bS5jIHwgNCArKystCj4gICBpbmNsdWRlL2xpbnV4L2xpZ2h0bnZtLmggICAg
-IHwgOCArKysrKy0tLQo+ICAgMiBmaWxlcyBjaGFuZ2VkLCA4IGluc2VydGlvbnMoKyksIDQgZGVs
-ZXRpb25zKC0pCj4gCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMg
-Yi9kcml2ZXJzL252bWUvaG9zdC9saWdodG52bS5jCj4gaW5kZXggZTI3NmFjZTI4YzY0Li41YjIw
-MjRlYmFjNzYgMTAwNjQ0Cj4gLS0tIGEvZHJpdmVycy9udm1lL2hvc3QvbGlnaHRudm0uYwo+ICsr
-KyBiL2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMKPiBAQCAtMzE4LDcgKzMxOCw3IEBAIHN0
-YXRpYyBpbnQgbnZtZV9udm1fc2V0dXBfMTIoc3RydWN0IG52bWVfbnZtX2lkMTIgKmlkLAo+ICAg
-CWdlby0+d3Nfb3B0ID0gc2VjX3Blcl9wZzsKPiAgIAlnZW8tPm13X2N1bml0cyA9IGdlby0+d3Nf
-b3B0IDw8IDM7CS8qIGRlZmF1bHQgdG8gTUxDIHNhZmUgdmFsdWVzICovCj4gICAKPiAtCWdlby0+
-bWNjYXAgPSBsZTMyX3RvX2NwdShzcmMtPm1jY2FwKTsKPiArCWdlby0+Y2FwID0gbGUzMl90b19j
-cHUoc3JjLT5tY2NhcCk7Cj4gICAKPiAgIAlnZW8tPnRyZHQgPSBsZTMyX3RvX2NwdShzcmMtPnRy
-ZHQpOwo+ICAgCWdlby0+dHJkbSA9IGxlMzJfdG9fY3B1KHNyYy0+dHJkbSk7Cj4gQEAgLTM5Niw2
-ICszOTYsOCBAQCBzdGF0aWMgaW50IG52bWVfbnZtX3NldHVwXzIwKHN0cnVjdCBudm1lX252bV9p
-ZDIwICppZCwKPiAgIAlnZW8tPndzX29wdCA9IGxlMzJfdG9fY3B1KGlkLT53c19vcHQpOwo+ICAg
-CWdlby0+bXdfY3VuaXRzID0gbGUzMl90b19jcHUoaWQtPm13X2N1bml0cyk7Cj4gICAKPiArCWdl
-by0+Y2FwID0gbGUzMl90b19jcHUoaWQtPm1jY2FwKTsKPiArCj4gICAJZ2VvLT50cmR0ID0gbGUz
-Ml90b19jcHUoaWQtPnRyZHQpOwo+ICAgCWdlby0+dHJkbSA9IGxlMzJfdG9fY3B1KGlkLT50cmRt
-KTsKPiAgIAlnZW8tPnRwcnQgPSBsZTMyX3RvX2NwdShpZC0+dHdydCk7Cj4gZGlmZiAtLWdpdCBh
-L2luY2x1ZGUvbGludXgvbGlnaHRudm0uaCBiL2luY2x1ZGUvbGludXgvbGlnaHRudm0uaAo+IGlu
-ZGV4IDE2MjU1ZmNkNTI1MC4uYjlmMGQyMDcwZGU5IDEwMDY0NAo+IC0tLSBhL2luY2x1ZGUvbGlu
-dXgvbGlnaHRudm0uaAo+ICsrKyBiL2luY2x1ZGUvbGludXgvbGlnaHRudm0uaAo+IEBAIC0yODgs
-OCArMjg4LDEwIEBAIHN0cnVjdCBudm1fZ2VvIHsKPiAgIAl1MzIJd3Nfb3B0OwkJLyogb3B0aW1h
-bCB3cml0ZSBzaXplICovCj4gICAJdTMyCW13X2N1bml0czsJLyogZGlzdGFuY2UgcmVxdWlyZWQg
-Zm9yIHN1Y2Nlc3NmdWwgcmVhZCAqLwo+ICAgCj4gLQkvKiBkZXZpY2UgY2FwYWJpbGl0aWVzICov
-Cj4gLQl1MzIJbWNjYXA7Cj4gKwkvKiBkZXZpY2UgY2FwYWJpbGl0aWVzLiBOb3RlIHRoYXQgdGhp
-cyByZXByZXNlbnRzIGNhcGFiaWxpdGllcyBpbiAxLjIKPiArCSAqIGFuZCBtZWRpYSBhbmQgY29u
-dHJvbGxlciBjYXBhYmlsaXRpZXMgaW4gMi4wCj4gKwkgKi8KPiArCXUzMgljYXA7CgpIZXJlIGlz
-IGEgbGlzdCBvZiBjYXBhYmlsaXRpZXM6CgoxLjIKQmFkIGJsb2NrIG1nbXQKSHlicmlkIGNvbW1h
-bmQgc3VwcG9ydAoKMi4wCgpWZWN0b3IgY29weQpEb3VibGUgcmVzZXQKClRoZSB3YXkgSSB3YXMg
-dGhpbmtpbmcgaXQgd291bGQgYmUgaW1wbGVtZW50ZWQgaXMgdG8gc3BsaXQgdGhlIHVwcGVyIGNh
-cCAKYml0cyB0byAyLjAsIGFuZCBsZXQgdGhlIGxvd2VyIGJpdHMgYmUgcmVzZXJ2ZWQgZm9yIDEu
-Mi4KClN1Y2ggdGhhdCBvbmUgd291bGQgZGVmaW5lIHRoZSBmb2xsb3dpbmc6CgplbnVtIHsKCU5W
-TV9DQVBfQkJNIAkxIDw8IDA7CglOVk1fQ0FQX0hDUyAJMSA8PCAxOwoKCU5WTV9DQVBfVkNQWSAJ
-MSA8PCAxNjsKCU5WTV9DQVBfRFJTVAkxIDw8IDE3Owp9OwoKVGhhdCB3YXksIHRoZSBhc3NpZ25t
-ZW50IGZyb20gMi4wIGNhbiBlYXNpbHkgYmUgZG9uZSB3aXRoIGNhcCA9IApsZTMyX3RvX2NwdShp
-ZC0+bWNjYXApIDw8IDE2OwoKYW5kIHRhcmdldHMgYW5kIG90aGVyIGRvbid0IG5lZWQgdG8gdW5k
-ZXJzdGFuZCB0aGUgZGlmZmVyZW5jZSBiZXR3ZWVuIAoxLjIgYW5kIDIuMCBmb3JtYXQuCj4gICAK
-PiAgIAkvKiBkZXZpY2UgdGltaW5ncyAqLwo+ICAgCXUzMgl0cmR0OwkJLyogQXZnLiBUcmVhZCAo
-bnMpICovCj4gQEAgLTMwNCw3ICszMDYsNyBAQCBzdHJ1Y3QgbnZtX2dlbyB7Cj4gICAKPiAgIAkv
-KiAxLjIgY29tcGF0aWJpbGl0eSAqLwo+ICAgCXU4CXZtbnQ7Cj4gLQl1MzIJY2FwOwo+ICsJdTMy
-CW1jY2FwOwo+ICAgCXUzMglkb207Cj4gICAKPiAgIAl1OAltdHlwZTsKPiAKCgpfX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpMaW51eC1udm1lIG1haWxpbmcg
-bGlzdApMaW51eC1udm1lQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xpc3RzLmluZnJhZGVh
-ZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1udm1lCg==
+Looks good,
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+
+Although I think this should say 'fixes kernel-doc warnings' instead
+of supressing them, as the old comments use invalid syntax.
