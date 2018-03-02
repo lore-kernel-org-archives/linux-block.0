@@ -1,480 +1,155 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:37300 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1427216AbeCBPWH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Mar 2018 10:22:07 -0500
-Received: by mail-wm0-f67.google.com with SMTP id 139so3728359wmn.2
-        for <linux-block@vger.kernel.org>; Fri, 02 Mar 2018 07:22:07 -0800 (PST)
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:53216 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1422860AbeCBPV4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Mar 2018 10:21:56 -0500
+Received: by mail-wm0-f65.google.com with SMTP id t3so3816804wmc.2
+        for <linux-block@vger.kernel.org>; Fri, 02 Mar 2018 07:21:55 -0800 (PST)
 From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
 To: mb@lightnvm.io
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 12/12] lightnvm: pblk: implement 2.0 support
-Date: Fri,  2 Mar 2018 16:21:20 +0100
-Message-Id: <1520004080-27760-13-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1520004080-27760-1-git-send-email-javier@cnexlabs.com>
-References: <1520004080-27760-1-git-send-email-javier@cnexlabs.com>
+Subject: [PATCH V5 00/12] lightnvm: pblk: implement 2.0 support
+Date: Fri,  2 Mar 2018 16:21:08 +0100
+Message-Id: <1520004080-27760-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
+This patchet applies on top of Matias' for-17/core, with the following
+patches applied:
+  lightnvm: pblk: refactor init/exit sequences (V2)
+  nvme: implement log page low/high offset and dwords (V2)
+
+# Changes since V4
+- Remove init/exit sequences as it has been sent separately
+-Rebase on top of latest for-4.17/core
+
+>From Matias:
+- Fix pblk sysfs
+- squash related patches
+- remove capabilities patch - Matias will take this later on
+- Various renamings
+
+# Changes since V3.1
+
+- Rebase on top of Matias' for-4.17/core
+- Fix pblk's write buffer size when using mw_cuints
+- Remove chunk information from pblk's sysfs. We intend to clean up
+  sysfs, as it is messy as it is now, and use trace points instead. So,
+    avoid an extra refactoring in the near future.
+
+>From Matias:
+- Squash geometry patches
+- Squash chunk support in lightnvm core
+- Use core structure for chunk metadata
+- Remove intermediate values for csecs and sos before disk
+  revalidation.
+- Various renamings
+
+# Changes since V3
+>From Matias:
+- Remove nvm_common_geo
+- Do appropriate renames when having a single geometry for device and
+    targets
+
+# Changes since V2:
+
+Apply Matias' feedback:
+ - Remove generic nvm_id identify structure.
+ - Do not remap capabilities (cap) to media and controlled capabilities
+   (mccap). Instead, add a comment to prevent confusion when
+   crosschecking with 2.0 spec.
+ - Change maxoc and maxocpu defaults from 1 block to the max number of
+   blocks.
+ - Re-implement the generic geometry to use nvm_geo on both device and
+   targets. Maintain nvm_common_geo to make it easier to copy the common
+   part of the geometry (without having to overwrite target-specific
+   fields, which is ugly and error prone). Matias, if you still want to
+   get rid of this, we can do it.
+ - Re-order patches with renaming to make them more meaningful. These
+   belong to the series, since the name changes are motivated by 2.0
+   inclusions. The only exception would be 36d10bfd3234, but I hope it
+   is OK I include it here.
+
+Also,
+ - Eliminate a dependency between luns and lines in the init/exit
+   refactoring.
+ - Use the global address format when possible to avoid defaulting on
+   the 1.2 path. This will safe headaches if the address format changes
+   at some point.
+
+I took out the patch allowing to do bit shifts on non power-of-2 media
+formats on pblk's mapping since it requires touching many places that
+are not 2.0 related. I'll submit this separately.
+
+# Changes since V1:
+
+Apply Matias' feedback:
+ - Rebase on top of Matias' latest patches.
+ - Use nvme_get_log_ext to submit report chunk and export it.
+ - Re-write report chunk based on Matias' suggestions. Here, I
+   maintained the lba interface, but it was necessary to redo the
+   address formatting to match the chunk log page format. For pblk,
+   this means a double address transformation, but it enables the
+   standard path to use lbas, plus, this is not in the fast path.
+ - Fold address format together with address transformations.
+ - Split the generic geometry patch in different patches.
+ - Remove refactoring of ligthnvm's core sysfs.
+
+Feedback not applied:
+ - Not letting pblk know about 1.2 and 2.0 bad block paths.
+   Since the interfaces for get/set bad block and report chunk are so
+   different, moving this logic to core adds assumptions on how the
+   targets would want to get the data back. A way of doing this is
+   creating a logical report chunk on the 1.2 path, but this would
+   mean that values like the wear-index are invalid, which requires
+   the target knowledge. I'm open to suggestions here.
+
+Also:
+ - Do some further renamings
+ - Create a generic address format to make it explicit where we share
+   1.2 and 2.0 fields to avoid address formatting in the fast path.
+ - Add new fields to sysfs to complete spec and show major/minor
+   versions (version and subversion to respect current interface).
+
 Implement 2.0 support in pblk. This includes the address formatting and
 mapping paths, as well as the sysfs entries for them.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/pblk-init.c  |  56 ++++++++++--
- drivers/lightnvm/pblk-sysfs.c |  46 +++++++---
- drivers/lightnvm/pblk.h       | 196 +++++++++++++++++++++++++++++++++---------
- 3 files changed, 236 insertions(+), 62 deletions(-)
+Javier
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index fa142c61b2fe..e34ed38ba2bb 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -229,20 +229,62 @@ static int pblk_set_addrf_12(struct nvm_geo *geo, struct nvm_addrf_12 *dst)
- 	return dst->blk_offset + src->blk_len;
- }
- 
-+static int pblk_set_addrf_20(struct nvm_geo *geo, struct nvm_addrf *adst,
-+			     struct pblk_addrf *udst)
-+{
-+	struct nvm_addrf *src = &geo->addrf;
-+
-+	adst->ch_len = get_count_order(geo->num_ch);
-+	adst->lun_len = get_count_order(geo->num_lun);
-+	adst->chk_len = src->chk_len;
-+	adst->sec_len = src->sec_len;
-+
-+	adst->sec_offset = 0;
-+	adst->ch_offset = adst->sec_len;
-+	adst->lun_offset = adst->ch_offset + adst->ch_len;
-+	adst->chk_offset = adst->lun_offset + adst->lun_len;
-+
-+	adst->sec_mask = ((1ULL << adst->sec_len) - 1) << adst->sec_offset;
-+	adst->chk_mask = ((1ULL << adst->chk_len) - 1) << adst->chk_offset;
-+	adst->lun_mask = ((1ULL << adst->lun_len) - 1) << adst->lun_offset;
-+	adst->ch_mask = ((1ULL << adst->ch_len) - 1) << adst->ch_offset;
-+
-+	udst->sec_stripe = geo->ws_opt;
-+	udst->ch_stripe = geo->num_ch;
-+	udst->lun_stripe = geo->num_lun;
-+
-+	udst->sec_lun_stripe = udst->sec_stripe * udst->ch_stripe;
-+	udst->sec_ws_stripe = udst->sec_lun_stripe * udst->lun_stripe;
-+
-+	return adst->chk_offset + adst->chk_len;
-+}
-+
- static int pblk_set_addrf(struct pblk *pblk)
- {
- 	struct nvm_tgt_dev *dev = pblk->dev;
- 	struct nvm_geo *geo = &dev->geo;
- 	int mod;
- 
--	div_u64_rem(geo->clba, pblk->min_write_pgs, &mod);
--	if (mod) {
--		pr_err("pblk: bad configuration of sectors/pages\n");
-+	switch (geo->version) {
-+	case NVM_OCSSD_SPEC_12:
-+		div_u64_rem(geo->clba, pblk->min_write_pgs, &mod);
-+		if (mod) {
-+			pr_err("pblk: bad configuration of sectors/pages\n");
-+			return -EINVAL;
-+		}
-+
-+		pblk->addrf_len = pblk_set_addrf_12(geo, (void *)&pblk->addrf);
-+		break;
-+	case NVM_OCSSD_SPEC_20:
-+		pblk->addrf_len = pblk_set_addrf_20(geo, (void *)&pblk->addrf,
-+								&pblk->uaddrf);
-+		break;
-+	default:
-+		pr_err("pblk: OCSSD revision not supported (%d)\n",
-+								geo->version);
- 		return -EINVAL;
- 	}
- 
--	pblk->addrf_len = pblk_set_addrf_12(geo, (void *)&pblk->addrf);
--
- 	return 0;
- }
- 
-@@ -1110,7 +1152,9 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
- 	struct pblk *pblk;
- 	int ret;
- 
--	if (geo->version != NVM_OCSSD_SPEC_12) {
-+	/* pblk supports 1.2 and 2.0 versions */
-+	if (!(geo->version == NVM_OCSSD_SPEC_12 ||
-+					geo->version == NVM_OCSSD_SPEC_20)) {
- 		pr_err("pblk: OCSSD version not supported (%u)\n",
- 							geo->version);
- 		return ERR_PTR(-EINVAL);
-diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
-index 87bf51d13f48..d57cb15489c3 100644
---- a/drivers/lightnvm/pblk-sysfs.c
-+++ b/drivers/lightnvm/pblk-sysfs.c
-@@ -113,15 +113,14 @@ static ssize_t pblk_sysfs_ppaf(struct pblk *pblk, char *page)
- {
- 	struct nvm_tgt_dev *dev = pblk->dev;
- 	struct nvm_geo *geo = &dev->geo;
--	struct nvm_addrf_12 *ppaf;
--	struct nvm_addrf_12 *geo_ppaf;
- 	ssize_t sz = 0;
- 
--	ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
--	geo_ppaf = (struct nvm_addrf_12 *)&geo->addrf;
-+	if (geo->version == NVM_OCSSD_SPEC_12) {
-+		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
-+		struct nvm_addrf_12 *gppaf = (struct nvm_addrf_12 *)&geo->addrf;
- 
--	sz = snprintf(page, PAGE_SIZE,
--		"g:(b:%d)blk:%d/%d,pg:%d/%d,lun:%d/%d,ch:%d/%d,pl:%d/%d,sec:%d/%d\n",
-+		sz = snprintf(page, PAGE_SIZE,
-+			"g:(b:%d)blk:%d/%d,pg:%d/%d,lun:%d/%d,ch:%d/%d,pl:%d/%d,sec:%d/%d\n",
- 			pblk->addrf_len,
- 			ppaf->blk_offset, ppaf->blk_len,
- 			ppaf->pg_offset, ppaf->pg_len,
-@@ -130,14 +129,33 @@ static ssize_t pblk_sysfs_ppaf(struct pblk *pblk, char *page)
- 			ppaf->pln_offset, ppaf->pln_len,
- 			ppaf->sec_offset, ppaf->sec_len);
- 
--	sz += snprintf(page + sz, PAGE_SIZE - sz,
--		"d:blk:%d/%d,pg:%d/%d,lun:%d/%d,ch:%d/%d,pl:%d/%d,sec:%d/%d\n",
--			geo_ppaf->blk_offset, geo_ppaf->blk_len,
--			geo_ppaf->pg_offset, geo_ppaf->pg_len,
--			geo_ppaf->lun_offset, geo_ppaf->lun_len,
--			geo_ppaf->ch_offset, geo_ppaf->ch_len,
--			geo_ppaf->pln_offset, geo_ppaf->pln_len,
--			geo_ppaf->sec_offset, geo_ppaf->sec_len);
-+		sz += snprintf(page + sz, PAGE_SIZE - sz,
-+			"d:blk:%d/%d,pg:%d/%d,lun:%d/%d,ch:%d/%d,pl:%d/%d,sec:%d/%d\n",
-+			gppaf->blk_offset, gppaf->blk_len,
-+			gppaf->pg_offset, gppaf->pg_len,
-+			gppaf->lun_offset, gppaf->lun_len,
-+			gppaf->ch_offset, gppaf->ch_len,
-+			gppaf->pln_offset, gppaf->pln_len,
-+			gppaf->sec_offset, gppaf->sec_len);
-+	} else {
-+		struct nvm_addrf *ppaf = &pblk->addrf;
-+		struct nvm_addrf *gppaf = &geo->addrf;
-+
-+		sz = snprintf(page, PAGE_SIZE,
-+			"pblk:(s:%d)ch:%d/%d,lun:%d/%d,chk:%d/%d/sec:%d/%d\n",
-+			pblk->addrf_len,
-+			ppaf->ch_offset, ppaf->ch_len,
-+			ppaf->lun_offset, ppaf->lun_len,
-+			ppaf->chk_offset, ppaf->chk_len,
-+			ppaf->sec_offset, ppaf->sec_len);
-+
-+		sz += snprintf(page + sz, PAGE_SIZE - sz,
-+			"device:ch:%d/%d,lun:%d/%d,chk:%d/%d,sec:%d/%d\n",
-+			gppaf->ch_offset, gppaf->ch_len,
-+			gppaf->lun_offset, gppaf->lun_len,
-+			gppaf->chk_offset, gppaf->chk_len,
-+			gppaf->sec_offset, gppaf->sec_len);
-+	}
- 
- 	return sz;
- }
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 39e47e3d6f23..e2d363d5efc1 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -561,6 +561,18 @@ enum {
- 	PBLK_STATE_STOPPED = 3,
- };
- 
-+/* Internal format to support not power-of-2 device formats */
-+struct pblk_addrf {
-+	/* gen to dev */
-+	int sec_stripe;
-+	int ch_stripe;
-+	int lun_stripe;
-+
-+	/* dev to gen */
-+	int sec_lun_stripe;
-+	int sec_ws_stripe;
-+};
-+
- struct pblk {
- 	struct nvm_tgt_dev *dev;
- 	struct gendisk *disk;
-@@ -573,7 +585,8 @@ struct pblk {
- 	struct pblk_line_mgmt l_mg;		/* Line management */
- 	struct pblk_line_meta lm;		/* Line metadata */
- 
--	struct nvm_addrf addrf;
-+	struct nvm_addrf addrf;		/* Aligned address format */
-+	struct pblk_addrf uaddrf;	/* Unaligned address format */
- 	int addrf_len;
- 
- 	struct pblk_rb rwb;
-@@ -954,16 +967,42 @@ static inline int pblk_ppa_to_pos(struct nvm_geo *geo, struct ppa_addr p)
- static inline struct ppa_addr addr_to_gen_ppa(struct pblk *pblk, u64 paddr,
- 					      u64 line_id)
- {
--	struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
-+	struct nvm_tgt_dev *dev = pblk->dev;
-+	struct nvm_geo *geo = &dev->geo;
- 	struct ppa_addr ppa;
- 
--	ppa.ppa = 0;
--	ppa.g.blk = line_id;
--	ppa.g.pg = (paddr & ppaf->pg_mask) >> ppaf->pg_offset;
--	ppa.g.lun = (paddr & ppaf->lun_mask) >> ppaf->lun_offset;
--	ppa.g.ch = (paddr & ppaf->ch_mask) >> ppaf->ch_offset;
--	ppa.g.pl = (paddr & ppaf->pln_mask) >> ppaf->pln_offset;
--	ppa.g.sec = (paddr & ppaf->sec_mask) >> ppaf->sec_offset;
-+	if (geo->version == NVM_OCSSD_SPEC_12) {
-+		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
-+
-+		ppa.ppa = 0;
-+		ppa.g.blk = line_id;
-+		ppa.g.pg = (paddr & ppaf->pg_mask) >> ppaf->pg_offset;
-+		ppa.g.lun = (paddr & ppaf->lun_mask) >> ppaf->lun_offset;
-+		ppa.g.ch = (paddr & ppaf->ch_mask) >> ppaf->ch_offset;
-+		ppa.g.pl = (paddr & ppaf->pln_mask) >> ppaf->pln_offset;
-+		ppa.g.sec = (paddr & ppaf->sec_mask) >> ppaf->sec_offset;
-+	} else {
-+		struct pblk_addrf *uaddrf = &pblk->uaddrf;
-+		int secs, chnls, luns;
-+
-+		ppa.ppa = 0;
-+
-+		ppa.m.chk = line_id;
-+
-+		div_u64_rem(paddr, uaddrf->sec_stripe, &secs);
-+		ppa.m.sec = secs;
-+
-+		sector_div(paddr, uaddrf->sec_stripe);
-+		div_u64_rem(paddr, uaddrf->ch_stripe, &chnls);
-+		ppa.m.grp = chnls;
-+
-+		sector_div(paddr, uaddrf->ch_stripe);
-+		div_u64_rem(paddr, uaddrf->lun_stripe, &luns);
-+		ppa.m.pu = luns;
-+
-+		sector_div(paddr, uaddrf->lun_stripe);
-+		ppa.m.sec += uaddrf->sec_stripe * paddr;
-+	}
- 
- 	return ppa;
- }
-@@ -971,14 +1010,31 @@ static inline struct ppa_addr addr_to_gen_ppa(struct pblk *pblk, u64 paddr,
- static inline u64 pblk_dev_ppa_to_line_addr(struct pblk *pblk,
- 							struct ppa_addr p)
- {
--	struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
-+	struct nvm_tgt_dev *dev = pblk->dev;
-+	struct nvm_geo *geo = &dev->geo;
- 	u64 paddr;
- 
--	paddr = (u64)p.g.ch << ppaf->ch_offset;
--	paddr |= (u64)p.g.lun << ppaf->lun_offset;
--	paddr |= (u64)p.g.pg << ppaf->pg_offset;
--	paddr |= (u64)p.g.pl << ppaf->pln_offset;
--	paddr |= (u64)p.g.sec << ppaf->sec_offset;
-+	if (geo->version == NVM_OCSSD_SPEC_12) {
-+		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
-+
-+		paddr = (u64)p.g.ch << ppaf->ch_offset;
-+		paddr |= (u64)p.g.lun << ppaf->lun_offset;
-+		paddr |= (u64)p.g.pg << ppaf->pg_offset;
-+		paddr |= (u64)p.g.pl << ppaf->pln_offset;
-+		paddr |= (u64)p.g.sec << ppaf->sec_offset;
-+	} else {
-+		struct pblk_addrf *uaddrf = &pblk->uaddrf;
-+		u64 secs = (u64)p.m.sec;
-+		int sec_stripe;
-+
-+		paddr = (u64)p.m.grp * uaddrf->sec_stripe;
-+		paddr += (u64)p.m.pu * uaddrf->sec_lun_stripe;
-+
-+		div_u64_rem(secs, uaddrf->sec_stripe, &sec_stripe);
-+		sector_div(secs, uaddrf->sec_stripe);
-+		paddr += secs * uaddrf->sec_ws_stripe;
-+		paddr += sec_stripe;
-+	}
- 
- 	return paddr;
- }
-@@ -995,14 +1051,37 @@ static inline struct ppa_addr pblk_ppa32_to_ppa64(struct pblk *pblk, u32 ppa32)
- 		ppa64.c.line = ppa32 & ((~0U) >> 1);
- 		ppa64.c.is_cached = 1;
- 	} else {
--		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
-+		struct nvm_tgt_dev *dev = pblk->dev;
-+		struct nvm_geo *geo = &dev->geo;
- 
--		ppa64.g.ch = (ppa32 & ppaf->ch_mask) >> ppaf->ch_offset;
--		ppa64.g.lun = (ppa32 & ppaf->lun_mask) >> ppaf->lun_offset;
--		ppa64.g.blk = (ppa32 & ppaf->blk_mask) >> ppaf->blk_offset;
--		ppa64.g.pg = (ppa32 & ppaf->pg_mask) >> ppaf->pg_offset;
--		ppa64.g.pl = (ppa32 & ppaf->pln_mask) >> ppaf->pln_offset;
--		ppa64.g.sec = (ppa32 & ppaf->sec_mask) >> ppaf->sec_offset;
-+		if (geo->version == NVM_OCSSD_SPEC_12) {
-+			struct nvm_addrf_12 *ppaf =
-+					(struct nvm_addrf_12 *)&pblk->addrf;
-+
-+			ppa64.g.ch = (ppa32 & ppaf->ch_mask) >>
-+							ppaf->ch_offset;
-+			ppa64.g.lun = (ppa32 & ppaf->lun_mask) >>
-+							ppaf->lun_offset;
-+			ppa64.g.blk = (ppa32 & ppaf->blk_mask) >>
-+							ppaf->blk_offset;
-+			ppa64.g.pg = (ppa32 & ppaf->pg_mask) >>
-+							ppaf->pg_offset;
-+			ppa64.g.pl = (ppa32 & ppaf->pln_mask) >>
-+							ppaf->pln_offset;
-+			ppa64.g.sec = (ppa32 & ppaf->sec_mask) >>
-+							ppaf->sec_offset;
-+		} else {
-+			struct nvm_addrf *lbaf = &pblk->addrf;
-+
-+			ppa64.m.grp = (ppa32 & lbaf->ch_mask) >>
-+							lbaf->ch_offset;
-+			ppa64.m.pu = (ppa32 & lbaf->lun_mask) >>
-+							lbaf->lun_offset;
-+			ppa64.m.chk = (ppa32 & lbaf->chk_mask) >>
-+							lbaf->chk_offset;
-+			ppa64.m.sec = (ppa32 & lbaf->sec_mask) >>
-+							lbaf->sec_offset;
-+		}
- 	}
- 
- 	return ppa64;
-@@ -1018,14 +1097,27 @@ static inline u32 pblk_ppa64_to_ppa32(struct pblk *pblk, struct ppa_addr ppa64)
- 		ppa32 |= ppa64.c.line;
- 		ppa32 |= 1U << 31;
- 	} else {
--		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
-+		struct nvm_tgt_dev *dev = pblk->dev;
-+		struct nvm_geo *geo = &dev->geo;
- 
--		ppa32 |= ppa64.g.ch << ppaf->ch_offset;
--		ppa32 |= ppa64.g.lun << ppaf->lun_offset;
--		ppa32 |= ppa64.g.blk << ppaf->blk_offset;
--		ppa32 |= ppa64.g.pg << ppaf->pg_offset;
--		ppa32 |= ppa64.g.pl << ppaf->pln_offset;
--		ppa32 |= ppa64.g.sec << ppaf->sec_offset;
-+		if (geo->version == NVM_OCSSD_SPEC_12) {
-+			struct nvm_addrf_12 *ppaf =
-+					(struct nvm_addrf_12 *)&pblk->addrf;
-+
-+			ppa32 |= ppa64.g.ch << ppaf->ch_offset;
-+			ppa32 |= ppa64.g.lun << ppaf->lun_offset;
-+			ppa32 |= ppa64.g.blk << ppaf->blk_offset;
-+			ppa32 |= ppa64.g.pg << ppaf->pg_offset;
-+			ppa32 |= ppa64.g.pl << ppaf->pln_offset;
-+			ppa32 |= ppa64.g.sec << ppaf->sec_offset;
-+		} else {
-+			struct nvm_addrf *lbaf = &pblk->addrf;
-+
-+			ppa32 |= ppa64.m.grp << lbaf->ch_offset;
-+			ppa32 |= ppa64.m.pu << lbaf->lun_offset;
-+			ppa32 |= ppa64.m.chk << lbaf->chk_offset;
-+			ppa32 |= ppa64.m.sec << lbaf->sec_offset;
-+		}
- 	}
- 
- 	return ppa32;
-@@ -1143,6 +1235,9 @@ static inline int pblk_set_progr_mode(struct pblk *pblk, int type)
- 	struct nvm_geo *geo = &dev->geo;
- 	int flags;
- 
-+	if (geo->version == NVM_OCSSD_SPEC_20)
-+		return 0;
-+
- 	flags = geo->pln_mode >> 1;
- 
- 	if (type == PBLK_WRITE)
-@@ -1162,6 +1257,9 @@ static inline int pblk_set_read_mode(struct pblk *pblk, int type)
- 	struct nvm_geo *geo = &dev->geo;
- 	int flags;
- 
-+	if (geo->version == NVM_OCSSD_SPEC_20)
-+		return 0;
-+
- 	flags = NVM_IO_SUSPEND | NVM_IO_SCRAMBLE_ENABLE;
- 	if (type == PBLK_READ_SEQUENTIAL)
- 		flags |= geo->pln_mode >> 1;
-@@ -1175,16 +1273,21 @@ static inline int pblk_io_aligned(struct pblk *pblk, int nr_secs)
- }
- 
- #ifdef CONFIG_NVM_DEBUG
--static inline void print_ppa(struct ppa_addr *p, char *msg, int error)
-+static inline void print_ppa(struct nvm_geo *geo, struct ppa_addr *p,
-+			     char *msg, int error)
- {
- 	if (p->c.is_cached) {
- 		pr_err("ppa: (%s: %x) cache line: %llu\n",
- 				msg, error, (u64)p->c.line);
--	} else {
-+	} else if (geo->version == NVM_OCSSD_SPEC_12) {
- 		pr_err("ppa: (%s: %x):ch:%d,lun:%d,blk:%d,pg:%d,pl:%d,sec:%d\n",
- 			msg, error,
- 			p->g.ch, p->g.lun, p->g.blk,
- 			p->g.pg, p->g.pl, p->g.sec);
-+	} else {
-+		pr_err("ppa: (%s: %x):ch:%d,lun:%d,chk:%d,sec:%d\n",
-+			msg, error,
-+			p->m.grp, p->m.pu, p->m.chk, p->m.sec);
- 	}
- }
- 
-@@ -1194,13 +1297,13 @@ static inline void pblk_print_failed_rqd(struct pblk *pblk, struct nvm_rq *rqd,
- 	int bit = -1;
- 
- 	if (rqd->nr_ppas ==  1) {
--		print_ppa(&rqd->ppa_addr, "rqd", error);
-+		print_ppa(&pblk->dev->geo, &rqd->ppa_addr, "rqd", error);
- 		return;
- 	}
- 
- 	while ((bit = find_next_bit((void *)&rqd->ppa_status, rqd->nr_ppas,
- 						bit + 1)) < rqd->nr_ppas) {
--		print_ppa(&rqd->ppa_list[bit], "rqd", error);
-+		print_ppa(&pblk->dev->geo, &rqd->ppa_list[bit], "rqd", error);
- 	}
- 
- 	pr_err("error:%d, ppa_status:%llx\n", error, rqd->ppa_status);
-@@ -1216,16 +1319,25 @@ static inline int pblk_boundary_ppa_checks(struct nvm_tgt_dev *tgt_dev,
- 	for (i = 0; i < nr_ppas; i++) {
- 		ppa = &ppas[i];
- 
--		if (!ppa->c.is_cached &&
--				ppa->g.ch < geo->num_ch &&
--				ppa->g.lun < geo->num_lun &&
--				ppa->g.pl < geo->num_pln &&
--				ppa->g.blk < geo->num_chk &&
--				ppa->g.pg < geo->num_pg &&
--				ppa->g.sec < geo->ws_min)
--			continue;
-+		if (geo->version == NVM_OCSSD_SPEC_12) {
-+			if (!ppa->c.is_cached &&
-+					ppa->g.ch < geo->num_ch &&
-+					ppa->g.lun < geo->num_lun &&
-+					ppa->g.pl < geo->num_pln &&
-+					ppa->g.blk < geo->num_chk &&
-+					ppa->g.pg < geo->num_pg &&
-+					ppa->g.sec < geo->ws_min)
-+				continue;
-+		} else {
-+			if (!ppa->c.is_cached &&
-+					ppa->m.grp < geo->num_ch &&
-+					ppa->m.pu < geo->num_lun &&
-+					ppa->m.chk < geo->num_chk &&
-+					ppa->m.sec < geo->clba)
-+				continue;
-+		}
- 
--		print_ppa(ppa, "boundary", i);
-+		print_ppa(geo, ppa, "boundary", i);
- 
- 		return 1;
- 	}
+
+Javier González (12):
+  lightnvm: simplify geometry structure.
+  lightnvm: add minor version to generic geometry
+  lightnvm: add shorten OCSSD version in geo
+  lightnvm: complete geo structure with maxoc*
+  lightnvm: normalize geometry nomenclature
+  lightnvm: add support for 2.0 address format
+  lightnvm: make address conversions depend on generic device
+  lightnvm: implement get log report chunk helpers
+  lightnvm: pblk: check for supported version
+  lightnvm: pblk: rename ppaf* to addrf*
+  lightnvm: pblk: implement get log report chunk
+  lightnvm: pblk: implement 2.0 support
+
+ drivers/lightnvm/core.c          | 178 +++++++---------
+ drivers/lightnvm/pblk-core.c     | 168 ++++++++++++---
+ drivers/lightnvm/pblk-gc.c       |   2 +-
+ drivers/lightnvm/pblk-init.c     | 413 +++++++++++++++++++++++------------
+ drivers/lightnvm/pblk-map.c      |   4 +-
+ drivers/lightnvm/pblk-read.c     |   2 +-
+ drivers/lightnvm/pblk-recovery.c |  14 +-
+ drivers/lightnvm/pblk-rl.c       |   2 +-
+ drivers/lightnvm/pblk-sysfs.c    |  63 ++++--
+ drivers/lightnvm/pblk-write.c    |   2 +-
+ drivers/lightnvm/pblk.h          | 240 +++++++++++++++------
+ drivers/nvme/host/core.c         |   6 +-
+ drivers/nvme/host/lightnvm.c     | 449 +++++++++++++++++++++++++++------------
+ drivers/nvme/host/nvme.h         |   3 +
+ include/linux/lightnvm.h         | 327 ++++++++++++++++++----------
+ 15 files changed, 1251 insertions(+), 622 deletions(-)
+
 -- 
 2.7.4
