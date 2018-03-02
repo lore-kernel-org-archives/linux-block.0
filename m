@@ -1,150 +1,88 @@
-Return-Path: <loberman@redhat.com>
-Return-Path: <loberman@redhat.com>
-Message-ID: <1520027601.16293.5.camel@redhat.com>
-Subject: Re: [PATCH V3 1/8] scsi: hpsa: fix selection of reply queue
-From: Laurence Oberman <loberman@redhat.com>
-To: Don Brace <don.brace@microsemi.com>, Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, "linux-block@vger.kernel.org"
- <linux-block@vger.kernel.org>, Christoph Hellwig <hch@infradead.org>, Mike
- Snitzer <snitzer@redhat.com>, "linux-scsi@vger.kernel.org"
- <linux-scsi@vger.kernel.org>,  Hannes Reinecke <hare@suse.de>, Arun Easi
- <arun.easi@cavium.com>, Omar Sandoval <osandov@fb.com>,  "Martin K .
- Petersen" <martin.petersen@oracle.com>, James Bottomley
- <james.bottomley@hansenpartnership.com>, Christoph Hellwig <hch@lst.de>,
- Kashyap Desai <kashyap.desai@broadcom.com>, Peter Rivera
- <peter.rivera@broadcom.com>, Meelis Roos <mroos@linux.ee>
-Date: Fri, 02 Mar 2018 16:53:21 -0500
-In-Reply-To: <d728ee1c12b14627beedcd72ce9bb4a7@microsemi.com>
+Return-Path: <don.brace@microsemi.com>
+From: Don Brace <don.brace@microsemi.com>
+To: Laurence Oberman <loberman@redhat.com>, Ming Lei <ming.lei@redhat.com>
+CC: Jens Axboe <axboe@kernel.dk>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, Christoph Hellwig <hch@infradead.org>, "Mike
+ Snitzer" <snitzer@redhat.com>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>, Hannes Reinecke <hare@suse.de>, Arun Easi
+	<arun.easi@cavium.com>, Omar Sandoval <osandov@fb.com>, "Martin K . Petersen"
+	<martin.petersen@oracle.com>, James Bottomley
+	<james.bottomley@hansenpartnership.com>, Christoph Hellwig <hch@lst.de>,
+	Kashyap Desai <kashyap.desai@broadcom.com>, Peter Rivera
+	<peter.rivera@broadcom.com>, Meelis Roos <mroos@linux.ee>
+Subject: RE: [PATCH V3 1/8] scsi: hpsa: fix selection of reply queue
+Date: Fri, 2 Mar 2018 15:03:12 +0000
+Message-ID: <d728ee1c12b14627beedcd72ce9bb4a7@microsemi.com>
 References: <20180227100750.32299-1-ming.lei@redhat.com>
 	 <20180227100750.32299-2-ming.lei@redhat.com>
 	 <633459ac33bf49c9a3ff6e515aa790de@microsemi.com>
 	 <1519930884.9730.8.camel@redhat.com> <1519939174.15243.0.camel@redhat.com>
 	 <20180302021557.GC10471@ming.t460p> <1519999769.16293.1.camel@redhat.com>
-	 <d728ee1c12b14627beedcd72ce9bb4a7@microsemi.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+In-Reply-To: <1519999769.16293.1.camel@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Return-Path: don.brace@microsemi.com
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, 2018-03-02 at 15:03 +0000, Don Brace wrote:
-> > -----Original Message-----
-> > From: Laurence Oberman [mailto:loberman@redhat.com]
-> > Sent: Friday, March 02, 2018 8:09 AM
-> > To: Ming Lei <ming.lei@redhat.com>
-> > Cc: Don Brace <don.brace@microsemi.com>; Jens Axboe <axboe@kernel.d
-> > k>;
-> > linux-block@vger.kernel.org; Christoph Hellwig <hch@infradead.org>;
-> > Mike
-> > Snitzer <snitzer@redhat.com>; linux-scsi@vger.kernel.org; Hannes
-> > Reinecke
-> > <hare@suse.de>; Arun Easi <arun.easi@cavium.com>; Omar Sandoval
-> > <osandov@fb.com>; Martin K . Petersen <martin.petersen@oracle.com>;
-> > James
-> > Bottomley <james.bottomley@hansenpartnership.com>; Christoph
-> > Hellwig
-> > <hch@lst.de>; Kashyap Desai <kashyap.desai@broadcom.com>; Peter
-> > Rivera
-> > <peter.rivera@broadcom.com>; Meelis Roos <mroos@linux.ee>
-> > Subject: Re: [PATCH V3 1/8] scsi: hpsa: fix selection of reply
-> > queue
-> > 
-> > EXTERNAL EMAIL
-> > 
-> > 
-> > On Fri, 2018-03-02 at 10:16 +0800, Ming Lei wrote:
-> > > On Thu, Mar 01, 2018 at 04:19:34PM -0500, Laurence Oberman wrote:
-> > > > On Thu, 2018-03-01 at 14:01 -0500, Laurence Oberman wrote:
-> > > > > On Thu, 2018-03-01 at 16:18 +0000, Don Brace wrote:
-> > > > > > > -----Original Message-----
-> > > > > > > From: Ming Lei [mailto:ming.lei@redhat.com]
-> > > > > > > Sent: Tuesday, February 27, 2018 4:08 AM
-> > > > > > > To: Jens Axboe <axboe@kernel.dk>; linux-block@vger.kernel
-> > > > > > > .org
-> > > > > > > ;
-> > > > > > > Christoph
-> > > > > > > Hellwig <hch@infradead.org>; Mike Snitzer <snitzer@redhat
-> > > > > > > .com
-> > > > > > > > 
-> > > > > > > 
-> > > > > > > Cc: linux-scsi@vger.kernel.org; Hannes Reinecke <hare@sus
-> > > > > > > e.de
-> > > > > > > > ;
-> > > > > > > 
-> > > > > > > Arun Easi
-> > > > > > > <arun.easi@cavium.com>; Omar Sandoval <osandov@fb.com>;
-> > > > > > > Martin K
-> > > > > > > .
-> > > > > > > Petersen <martin.petersen@oracle.com>; James Bottomley
-> > > > > > > <james.bottomley@hansenpartnership.com>; Christoph
-> > > > > > > Hellwig <h
-> > > > > > > ch@l
-> > > > > > > st
-> > > > > > > .de>;
-> > > > > > > Don Brace <don.brace@microsemi.com>; Kashyap Desai
-> > > > > > > <kashyap.desai@broadcom.com>; Peter Rivera <peter.rivera@
-> > > > > > > broa
-> > > > > > > dcom
-> > > > > > > .c
-> > > > > > > om>;
-> > > > > > > Laurence Oberman <loberman@redhat.com>; Ming Lei
-> > > > > > > <ming.lei@redhat.com>; Meelis Roos <mroos@linux.ee>
-> > > > > > > Subject: [PATCH V3 1/8] scsi: hpsa: fix selection of
-> > > > > > > reply
-> > > > > > > queue
-> > > > > > > 
-> > > 
-> > > Seems Don run into IO failure without blk-mq, could you run your
-> > > tests again
-> > > in legacy mode?
-> > > 
-> > > Thanks,
-> > > Ming
-> > 
-> > Hello Ming
-> > I ran multiple passes on Legacy and still see no issues in my test
-> > bed
-> > 
-> > BOOT_IMAGE=/vmlinuz-4.16.0-rc2.ming+ root=UUID=43f86d71-b1bf-4789-
-> > a28e-
-> > 21c6ddc90195 ro crashkernel=256M@64M log_buf_len=64M
-> > console=ttyS1,115200n8
-> > 
-> > HEAD of the git kernel I am using
-> > 
-> > 694e16f scsi: megaraid: improve scsi_mq performance via
-> > .host_tagset
-> > 793686c scsi: hpsa: improve scsi_mq performance via .host_tagset
-> > 60d5b36 block: null_blk: introduce module parameter of
-> > 'g_host_tags'
-> > 8847067 scsi: Add template flag 'host_tagset'
-> > a8fbdd6 blk-mq: introduce BLK_MQ_F_HOST_TAGS
-> > 4710fab blk-mq: introduce 'start_tag' field to 'struct blk_mq_tags'
-> > 09bb153 scsi: megaraid_sas: fix selection of reply queue
-> > 52700d8 scsi: hpsa: fix selection of reply queue
-> 
-> I checkout out Linus's tree (4.16.0-rc3+) and re-applied the above
-> patches.
-> I  and have been running 24 hours with no issues.
-> Evidently my forked copy was corrupted. 
-> 
-> So, my I/O testing has gone well. 
-> 
-> I'll run some performance numbers next.
-> 
-> Thanks,
-> Don
-
-Unless Kashyap is not happy we need to consider getting this in to
-Linus now because we are seeing HPE servers that keep hanging now with
-the original commit now upstream.
-
-Kashyap, are you good with the v3 patchset or still concerned with
-performance. I was getting pretty good IOPS/sec to individual SSD
-drives set up as jbod devices on the megaraid_sas.
-
-With larger I/O sizes like 1MB I was getting good MB/sec and not seeing
-a measurable performance impact.
-
-I dont have the hardware you have to mimic your configuration.
-
-Thanks
-Laurence
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBMYXVyZW5jZSBPYmVybWFuIFtt
+YWlsdG86bG9iZXJtYW5AcmVkaGF0LmNvbV0NCj4gU2VudDogRnJpZGF5LCBNYXJjaCAwMiwgMjAx
+OCA4OjA5IEFNDQo+IFRvOiBNaW5nIExlaSA8bWluZy5sZWlAcmVkaGF0LmNvbT4NCj4gQ2M6IERv
+biBCcmFjZSA8ZG9uLmJyYWNlQG1pY3Jvc2VtaS5jb20+OyBKZW5zIEF4Ym9lIDxheGJvZUBrZXJu
+ZWwuZGs+Ow0KPiBsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5vcmc7IENocmlzdG9waCBIZWxsd2ln
+IDxoY2hAaW5mcmFkZWFkLm9yZz47IE1pa2UNCj4gU25pdHplciA8c25pdHplckByZWRoYXQuY29t
+PjsgbGludXgtc2NzaUB2Z2VyLmtlcm5lbC5vcmc7IEhhbm5lcyBSZWluZWNrZQ0KPiA8aGFyZUBz
+dXNlLmRlPjsgQXJ1biBFYXNpIDxhcnVuLmVhc2lAY2F2aXVtLmNvbT47IE9tYXIgU2FuZG92YWwN
+Cj4gPG9zYW5kb3ZAZmIuY29tPjsgTWFydGluIEsgLiBQZXRlcnNlbiA8bWFydGluLnBldGVyc2Vu
+QG9yYWNsZS5jb20+OyBKYW1lcw0KPiBCb3R0b21sZXkgPGphbWVzLmJvdHRvbWxleUBoYW5zZW5w
+YXJ0bmVyc2hpcC5jb20+OyBDaHJpc3RvcGggSGVsbHdpZw0KPiA8aGNoQGxzdC5kZT47IEthc2h5
+YXAgRGVzYWkgPGthc2h5YXAuZGVzYWlAYnJvYWRjb20uY29tPjsgUGV0ZXIgUml2ZXJhDQo+IDxw
+ZXRlci5yaXZlcmFAYnJvYWRjb20uY29tPjsgTWVlbGlzIFJvb3MgPG1yb29zQGxpbnV4LmVlPg0K
+PiBTdWJqZWN0OiBSZTogW1BBVENIIFYzIDEvOF0gc2NzaTogaHBzYTogZml4IHNlbGVjdGlvbiBv
+ZiByZXBseSBxdWV1ZQ0KPiANCj4gRVhURVJOQUwgRU1BSUwNCj4gDQo+IA0KPiBPbiBGcmksIDIw
+MTgtMDMtMDIgYXQgMTA6MTYgKzA4MDAsIE1pbmcgTGVpIHdyb3RlOg0KPiA+IE9uIFRodSwgTWFy
+IDAxLCAyMDE4IGF0IDA0OjE5OjM0UE0gLTA1MDAsIExhdXJlbmNlIE9iZXJtYW4gd3JvdGU6DQo+
+ID4gPiBPbiBUaHUsIDIwMTgtMDMtMDEgYXQgMTQ6MDEgLTA1MDAsIExhdXJlbmNlIE9iZXJtYW4g
+d3JvdGU6DQo+ID4gPiA+IE9uIFRodSwgMjAxOC0wMy0wMSBhdCAxNjoxOCArMDAwMCwgRG9uIEJy
+YWNlIHdyb3RlOg0KPiA+ID4gPiA+ID4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPiA+
+ID4gPiA+IEZyb206IE1pbmcgTGVpIFttYWlsdG86bWluZy5sZWlAcmVkaGF0LmNvbV0NCj4gPiA+
+ID4gPiA+IFNlbnQ6IFR1ZXNkYXksIEZlYnJ1YXJ5IDI3LCAyMDE4IDQ6MDggQU0NCj4gPiA+ID4g
+PiA+IFRvOiBKZW5zIEF4Ym9lIDxheGJvZUBrZXJuZWwuZGs+OyBsaW51eC1ibG9ja0B2Z2VyLmtl
+cm5lbC5vcmcNCj4gPiA+ID4gPiA+IDsNCj4gPiA+ID4gPiA+IENocmlzdG9waA0KPiA+ID4gPiA+
+ID4gSGVsbHdpZyA8aGNoQGluZnJhZGVhZC5vcmc+OyBNaWtlIFNuaXR6ZXIgPHNuaXR6ZXJAcmVk
+aGF0LmNvbQ0KPiA+ID4gPiA+ID4gPg0KPiA+ID4gPiA+ID4gQ2M6IGxpbnV4LXNjc2lAdmdlci5r
+ZXJuZWwub3JnOyBIYW5uZXMgUmVpbmVja2UgPGhhcmVAc3VzZS5kZQ0KPiA+ID4gPiA+ID4gPjsN
+Cj4gPiA+ID4gPiA+IEFydW4gRWFzaQ0KPiA+ID4gPiA+ID4gPGFydW4uZWFzaUBjYXZpdW0uY29t
+PjsgT21hciBTYW5kb3ZhbCA8b3NhbmRvdkBmYi5jb20+Ow0KPiA+ID4gPiA+ID4gTWFydGluIEsN
+Cj4gPiA+ID4gPiA+IC4NCj4gPiA+ID4gPiA+IFBldGVyc2VuIDxtYXJ0aW4ucGV0ZXJzZW5Ab3Jh
+Y2xlLmNvbT47IEphbWVzIEJvdHRvbWxleQ0KPiA+ID4gPiA+ID4gPGphbWVzLmJvdHRvbWxleUBo
+YW5zZW5wYXJ0bmVyc2hpcC5jb20+OyBDaHJpc3RvcGggSGVsbHdpZyA8aA0KPiA+ID4gPiA+ID4g
+Y2hAbA0KPiA+ID4gPiA+ID4gc3QNCj4gPiA+ID4gPiA+IC5kZT47DQo+ID4gPiA+ID4gPiBEb24g
+QnJhY2UgPGRvbi5icmFjZUBtaWNyb3NlbWkuY29tPjsgS2FzaHlhcCBEZXNhaQ0KPiA+ID4gPiA+
+ID4gPGthc2h5YXAuZGVzYWlAYnJvYWRjb20uY29tPjsgUGV0ZXIgUml2ZXJhIDxwZXRlci5yaXZl
+cmFAYnJvYQ0KPiA+ID4gPiA+ID4gZGNvbQ0KPiA+ID4gPiA+ID4gLmMNCj4gPiA+ID4gPiA+IG9t
+PjsNCj4gPiA+ID4gPiA+IExhdXJlbmNlIE9iZXJtYW4gPGxvYmVybWFuQHJlZGhhdC5jb20+OyBN
+aW5nIExlaQ0KPiA+ID4gPiA+ID4gPG1pbmcubGVpQHJlZGhhdC5jb20+OyBNZWVsaXMgUm9vcyA8
+bXJvb3NAbGludXguZWU+DQo+ID4gPiA+ID4gPiBTdWJqZWN0OiBbUEFUQ0ggVjMgMS84XSBzY3Np
+OiBocHNhOiBmaXggc2VsZWN0aW9uIG9mIHJlcGx5DQo+ID4gPiA+ID4gPiBxdWV1ZQ0KPiA+ID4g
+PiA+ID4NCj4gPiBTZWVtcyBEb24gcnVuIGludG8gSU8gZmFpbHVyZSB3aXRob3V0IGJsay1tcSwg
+Y291bGQgeW91IHJ1biB5b3VyDQo+ID4gdGVzdHMgYWdhaW4NCj4gPiBpbiBsZWdhY3kgbW9kZT8N
+Cj4gPg0KPiA+IFRoYW5rcywNCj4gPiBNaW5nDQo+IA0KPiBIZWxsbyBNaW5nDQo+IEkgcmFuIG11
+bHRpcGxlIHBhc3NlcyBvbiBMZWdhY3kgYW5kIHN0aWxsIHNlZSBubyBpc3N1ZXMgaW4gbXkgdGVz
+dCBiZWQNCj4gDQo+IEJPT1RfSU1BR0U9L3ZtbGludXotNC4xNi4wLXJjMi5taW5nKyByb290PVVV
+SUQ9NDNmODZkNzEtYjFiZi00Nzg5LQ0KPiBhMjhlLQ0KPiAyMWM2ZGRjOTAxOTUgcm8gY3Jhc2hr
+ZXJuZWw9MjU2TUA2NE0gbG9nX2J1Zl9sZW49NjRNDQo+IGNvbnNvbGU9dHR5UzEsMTE1MjAwbjgN
+Cj4gDQo+IEhFQUQgb2YgdGhlIGdpdCBrZXJuZWwgSSBhbSB1c2luZw0KPiANCj4gNjk0ZTE2ZiBz
+Y3NpOiBtZWdhcmFpZDogaW1wcm92ZSBzY3NpX21xIHBlcmZvcm1hbmNlIHZpYSAuaG9zdF90YWdz
+ZXQNCj4gNzkzNjg2YyBzY3NpOiBocHNhOiBpbXByb3ZlIHNjc2lfbXEgcGVyZm9ybWFuY2Ugdmlh
+IC5ob3N0X3RhZ3NldA0KPiA2MGQ1YjM2IGJsb2NrOiBudWxsX2JsazogaW50cm9kdWNlIG1vZHVs
+ZSBwYXJhbWV0ZXIgb2YgJ2dfaG9zdF90YWdzJw0KPiA4ODQ3MDY3IHNjc2k6IEFkZCB0ZW1wbGF0
+ZSBmbGFnICdob3N0X3RhZ3NldCcNCj4gYThmYmRkNiBibGstbXE6IGludHJvZHVjZSBCTEtfTVFf
+Rl9IT1NUX1RBR1MNCj4gNDcxMGZhYiBibGstbXE6IGludHJvZHVjZSAnc3RhcnRfdGFnJyBmaWVs
+ZCB0byAnc3RydWN0IGJsa19tcV90YWdzJw0KPiAwOWJiMTUzIHNjc2k6IG1lZ2FyYWlkX3Nhczog
+Zml4IHNlbGVjdGlvbiBvZiByZXBseSBxdWV1ZQ0KPiA1MjcwMGQ4IHNjc2k6IGhwc2E6IGZpeCBz
+ZWxlY3Rpb24gb2YgcmVwbHkgcXVldWUNCg0KSSBjaGVja291dCBvdXQgTGludXMncyB0cmVlICg0
+LjE2LjAtcmMzKykgYW5kIHJlLWFwcGxpZWQgdGhlIGFib3ZlIHBhdGNoZXMuDQpJICBhbmQgaGF2
+ZSBiZWVuIHJ1bm5pbmcgMjQgaG91cnMgd2l0aCBubyBpc3N1ZXMuDQpFdmlkZW50bHkgbXkgZm9y
+a2VkIGNvcHkgd2FzIGNvcnJ1cHRlZC4gDQoNClNvLCBteSBJL08gdGVzdGluZyBoYXMgZ29uZSB3
+ZWxsLiANCg0KSSdsbCBydW4gc29tZSBwZXJmb3JtYW5jZSBudW1iZXJzIG5leHQuDQoNClRoYW5r
+cywNCkRvbg0K
