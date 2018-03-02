@@ -1,159 +1,137 @@
-Return-Path: <helgaas@kernel.org>
-Date: Thu, 1 Mar 2018 11:44:50 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Logan Gunthorpe <logang@deltatee.com>
-Cc: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
-	linux-nvdimm@lists.01.org, linux-block@vger.kernel.org,
-	Stephen Bates <sbates@raithlin.com>, Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v2 02/10] PCI/P2PDMA: Add sysfs group to display p2pmem
- stats
-Message-ID: <20180301174450.GF13722@bhelgaas-glaptop.roam.corp.google.com>
-References: <20180228234006.21093-1-logang@deltatee.com>
- <20180228234006.21093-3-logang@deltatee.com>
+Return-Path: <axboe@kernel.dk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block changes for 4.16-rc4
+Message-ID: <54bfe85d-f857-bbb8-3f72-751d85e66b27@kernel.dk>
+Date: Fri, 2 Mar 2018 08:55:14 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180228234006.21093-3-logang@deltatee.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Feb 28, 2018 at 04:39:58PM -0700, Logan Gunthorpe wrote:
-> Attributes display the total amount of P2P memory, the amount available
-> and whether it is published or not.
+Hi Linus,
 
-Can you add enough text here to make the body of the changelog
-complete in itself?  That might mean just repeating the subject, which
-is fine.
+A collection of fixes for this series. This is a little larger than
+usual at this time, but that's mainly because I was out on vacation last
+week. Nothing in here is major in any way, it's just two weeks of fixes.
+This pull request contains:
 
-> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-> ---
->  Documentation/ABI/testing/sysfs-bus-pci | 25 +++++++++++++++++
->  drivers/pci/p2pdma.c                    | 50 +++++++++++++++++++++++++++++++++
->  2 files changed, 75 insertions(+)
-> 
-> diff --git a/Documentation/ABI/testing/sysfs-bus-pci b/Documentation/ABI/testing/sysfs-bus-pci
-> index 44d4b2be92fd..f5656dae21be 100644
-> --- a/Documentation/ABI/testing/sysfs-bus-pci
-> +++ b/Documentation/ABI/testing/sysfs-bus-pci
-> @@ -323,3 +323,28 @@ Description:
->  
->  		This is similar to /sys/bus/pci/drivers_autoprobe, but
->  		affects only the VFs associated with a specific PF.
-> +
-> +What:		/sys/bus/pci/devices/.../p2pmem/available
-> +Date:		November 2017
-> +Contact:	Logan Gunthorpe <logang@deltatee.com>
-> +Description:
-> +		If the device has any Peer-to-Peer memory registered, this
-> +	        file contains the amount of memory that has not been
-> +		allocated (in decimal).
-> +
-> +What:		/sys/bus/pci/devices/.../p2pmem/size
-> +Date:		November 2017
-> +Contact:	Logan Gunthorpe <logang@deltatee.com>
-> +Description:
-> +		If the device has any Peer-to-Peer memory registered, this
-> +	        file contains the total ammount of memory that the device
+- NVMe pull from Keith, with a set of fixes from the usual suspects.
 
-s/ammount/amount/
+- mq-deadline zone unlock fix from Damien, fixing an issue with the SMR
+  zone locking added for 4.16.
 
-> +		provides (in decimal).
-> +
-> +What:		/sys/bus/pci/devices/.../p2pmem/published
-> +Date:		November 2017
-> +Contact:	Logan Gunthorpe <logang@deltatee.com>
-> +Description:
-> +		If the device has any Peer-to-Peer memory registered, this
-> +	        file contains a '1' if the memory has been published for
-> +		use inside the kernel or a '0' if it is only intended
-> +		for use within the driver that published it.
-> diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
-> index ec0a6cb9e500..a57df78f6a32 100644
-> --- a/drivers/pci/p2pdma.c
-> +++ b/drivers/pci/p2pdma.c
-> @@ -29,6 +29,53 @@ struct pci_p2pdma {
->  	bool published;
->  };
->  
-> +static ssize_t size_show(struct device *dev, struct device_attribute *attr,
-> +			 char *buf)
-> +{
-> +	struct pci_dev *pdev = to_pci_dev(dev);
-> +	size_t size = 0;
-> +
-> +	if (pdev->p2pdma->pool)
-> +		size = gen_pool_size(pdev->p2pdma->pool);
-> +
-> +	return snprintf(buf, PAGE_SIZE, "%zd\n", size);
-> +}
-> +static DEVICE_ATTR_RO(size);
-> +
-> +static ssize_t available_show(struct device *dev, struct device_attribute *attr,
-> +			      char *buf)
-> +{
-> +	struct pci_dev *pdev = to_pci_dev(dev);
-> +	size_t avail = 0;
-> +
-> +	if (pdev->p2pdma->pool)
-> +		avail = gen_pool_avail(pdev->p2pdma->pool);
-> +
-> +	return snprintf(buf, PAGE_SIZE, "%zd\n", avail);
-> +}
-> +static DEVICE_ATTR_RO(available);
-> +
-> +static ssize_t published_show(struct device *dev, struct device_attribute *attr,
-> +			      char *buf)
-> +{
-> +	struct pci_dev *pdev = to_pci_dev(dev);
-> +
-> +	return snprintf(buf, PAGE_SIZE, "%d\n", pdev->p2pdma->published);
-> +}
-> +static DEVICE_ATTR_RO(published);
-> +
-> +static struct attribute *p2pmem_attrs[] = {
-> +	&dev_attr_size.attr,
-> +	&dev_attr_available.attr,
-> +	&dev_attr_published.attr,
-> +	NULL,
-> +};
-> +
-> +static const struct attribute_group p2pmem_group = {
-> +	.attrs = p2pmem_attrs,
-> +	.name = "p2pmem",
-> +};
-> +
->  static void pci_p2pdma_percpu_release(struct percpu_ref *ref)
->  {
->  	struct pci_p2pdma *p2p =
-> @@ -55,6 +102,7 @@ static void pci_p2pdma_release(void *data)
->  	percpu_ref_exit(&pdev->p2pdma->devmap_ref);
->  
->  	gen_pool_destroy(pdev->p2pdma->pool);
-> +	sysfs_remove_group(&pdev->dev.kobj, &p2pmem_group);
->  	pdev->p2pdma = NULL;
->  }
->  
-> @@ -83,6 +131,8 @@ static int pci_p2pdma_setup(struct pci_dev *pdev)
->  	if (error)
->  		goto out_pool_destroy;
->  
-> +	error = sysfs_create_group(&pdev->dev.kobj, &p2pmem_group);
-> +
->  	pdev->p2pdma = p2p;
+- Two bcache fixes sent in by Michael, with changes from Coly and Tang.
 
-I think these two statements are out of order, since the attributes
-dereference pdev->p2pdma.  And it looks like you set "error"
-unnecessarily, since you return immediately looking at it.
+- Comment typo fix from Eric for blktrace.
 
->  	return 0;
-> -- 
-> 2.11.0
-> 
+- Return value error handling fix for nbd, from Gustavo.
+
+- Fix a direct-io case where we don't defer to a completion handler,
+  making us sleep from IRQ device completion. From Jan.
+
+- A small series from Jan fixing up holes around handling of bdev
+  references.
+
+- Small set of regression fixes from Jiufei, mostly fixing problems
+  around the gendisk pointer -> partition index change.
+
+- Regression fix from Ming, fixing a boundary issue with the discard
+  page cache invalidation.
+
+- Two patch series from Ming, fixing both a core blk-mq-sched and kyber
+  issue around token freeing on a requeue condition.
+
+Please pull!
+
+
+  git://git.kernel.dk/linux-block.git tags/for-linus-20180302
+
+
+Baegjae Sung (1):
+      nvme-multipath: fix sysfs dangerously created links
+
+Christoph Hellwig (3):
+      nvme-fabrics: don't check for non-NULL module in nvmf_register_transport
+      nvme-rdma: use blk_rq_payload_bytes instead of blk_rq_bytes
+      nvmet-loop: use blk_rq_payload_bytes for sgl selection
+
+Coly Li (1):
+      bcache: correct flash only vols (check all uuids)
+
+Damien Le Moal (1):
+      mq-deadline: Make sure to always unlock zones
+
+Eric Biggers (1):
+      blktrace_api.h: fix comment for struct blk_user_trace_setup
+
+Gustavo A. R. Silva (1):
+      nbd: fix return value in error handling path
+
+Jan Kara (7):
+      direct-io: Fix sleep in atomic due to sync AIO
+      genhd: Fix leaked module reference for NVME devices
+      genhd: Rename get_disk() to get_disk_and_module()
+      genhd: Add helper put_disk_and_module()
+      genhd: Fix use after free in __blkdev_get()
+      genhd: Fix BUG in blkdev_open()
+      blockdev: Avoid two active bdev inodes for one device
+
+Jens Axboe (1):
+      Merge branch 'for-jens' of git://git.infradead.org/nvme into for-linus
+
+Jianchao Wang (1):
+      nvme-pci: Fix nvme queue cleanup if IRQ setup fails
+
+Jiufei Xue (3):
+      block: fix the count of PGPGOUT for WRITE_SAME
+      block: display the correct diskname for bio
+      block: fix a typo
+
+Max Gurtovoy (1):
+      nvmet: fix PSDT field check in command format
+
+Ming Lei (3):
+      block: pass inclusive 'lend' parameter to truncate_inode_pages_range
+      blk-mq: don't call io sched's .requeue_request when requeueing rq to ->dispatch
+      block: kyber: fix domain token leak during requeue
+
+Tang Junhui (1):
+      bcache: fix kcrashes with fio in RAID5 backend dev
+
+ block/blk-cgroup.c                | 11 ++-------
+ block/blk-core.c                  |  2 +-
+ block/blk-mq.c                    |  4 +++-
+ block/genhd.c                     | 48 +++++++++++++++++++++++++++++++-------
+ block/ioctl.c                     |  2 +-
+ block/kyber-iosched.c             |  1 +
+ block/mq-deadline.c               | 16 ++++++++++---
+ block/partition-generic.c         |  6 +++++
+ drivers/block/amiflop.c           |  2 +-
+ drivers/block/ataflop.c           |  2 +-
+ drivers/block/brd.c               |  2 +-
+ drivers/block/floppy.c            |  2 +-
+ drivers/block/loop.c              |  2 +-
+ drivers/block/nbd.c               |  2 +-
+ drivers/block/pktcdvd.c           |  2 +-
+ drivers/block/swim.c              |  2 +-
+ drivers/block/z2ram.c             |  2 +-
+ drivers/ide/ide-probe.c           |  2 +-
+ drivers/md/bcache/request.c       |  2 +-
+ drivers/md/bcache/super.c         |  2 +-
+ drivers/nvme/host/core.c          | 12 +++-------
+ drivers/nvme/host/fabrics.c       |  2 +-
+ drivers/nvme/host/multipath.c     | 15 ++++++++----
+ drivers/nvme/host/pci.c           |  5 +++-
+ drivers/nvme/host/rdma.c          |  4 ++--
+ drivers/nvme/target/core.c        |  9 ++++---
+ drivers/nvme/target/loop.c        |  4 ++--
+ fs/block_dev.c                    | 49 +++++++++++++++++++++++++--------------
+ fs/direct-io.c                    |  3 +--
+ include/linux/bio.h               |  4 +---
+ include/linux/genhd.h             |  4 +++-
+ include/uapi/linux/blktrace_api.h |  2 +-
+ 32 files changed, 145 insertions(+), 82 deletions(-)
+
+-- 
+Jens Axboe
