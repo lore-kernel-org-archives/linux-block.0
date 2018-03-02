@@ -1,26 +1,127 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Thu, 1 Mar 2018 09:53:08 +0100
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH 07/11] iscsi: Use blk_queue_flag_set()
-Message-ID: <20180301085308.lgauf3thne72drnq@linux-x5ow.site>
-References: <20180228192823.5191-1-bart.vanassche@wdc.com>
- <20180228192823.5191-8-bart.vanassche@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:55792 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1423355AbeCBPV6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Mar 2018 10:21:58 -0500
+Received: by mail-wm0-f66.google.com with SMTP id q83so3829053wme.5
+        for <linux-block@vger.kernel.org>; Fri, 02 Mar 2018 07:21:57 -0800 (PST)
+From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
+To: mb@lightnvm.io
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
+Subject: [PATCH 02/12] lightnvm: add minor version to generic geometry
+Date: Fri,  2 Mar 2018 16:21:10 +0100
+Message-Id: <1520004080-27760-3-git-send-email-javier@cnexlabs.com>
+In-Reply-To: <1520004080-27760-1-git-send-email-javier@cnexlabs.com>
+References: <1520004080-27760-1-git-send-email-javier@cnexlabs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20180228192823.5191-8-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Separate the version between major and minor on the generic geometry and
+represent it through sysfs in the 2.0 path. The 1.2 path only shows the
+major version to preserve the existing user space interface.
+
+Signed-off-by: Javier González <javier@cnexlabs.com>
+---
+ drivers/lightnvm/core.c      |  4 ++--
+ drivers/nvme/host/lightnvm.c | 25 ++++++++++++++++++++-----
+ include/linux/lightnvm.h     |  3 ++-
+ 3 files changed, 24 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 9a417d9cdf0c..c4f72fbad2bf 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -890,8 +890,8 @@ static int nvm_init(struct nvm_dev *dev)
+ 		goto err;
+ 	}
+ 
+-	pr_debug("nvm: ver:%u nvm_vendor:%x\n",
+-				geo->ver_id,
++	pr_debug("nvm: ver:%u.%u nvm_vendor:%x\n",
++				geo->major_ver_id, geo->minor_ver_id,
+ 				geo->vmnt);
+ 
+ 	ret = nvm_core_init(dev);
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index 29c8f44eb25b..de4105544956 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -295,7 +295,9 @@ static int nvme_nvm_setup_12(struct nvme_nvm_id12 *id,
+ 		return -EINVAL;
+ 	}
+ 
+-	geo->ver_id = id->ver_id;
++	/* 1.2 spec. only reports a single version id - unfold */
++	geo->major_ver_id = id->ver_id;
++	geo->minor_ver_id = 2;
+ 
+ 	geo->nr_chnls = src->num_ch;
+ 	geo->nr_luns = src->num_lun;
+@@ -379,7 +381,14 @@ static void nvme_nvm_set_addr_20(struct nvm_addrf *dst,
+ static int nvme_nvm_setup_20(struct nvme_nvm_id20 *id,
+ 			     struct nvm_geo *geo)
+ {
+-	geo->ver_id = id->mjr;
++	geo->major_ver_id = id->mjr;
++	geo->minor_ver_id = id->mnr;
++
++	if (!(geo->major_ver_id == 2 && geo->minor_ver_id == 0)) {
++		pr_err("nvm: OCSSD version not supported (v%d.%d)\n",
++				geo->major_ver_id, geo->minor_ver_id);
++		return -EINVAL;
++	}
+ 
+ 	geo->nr_chnls = le16_to_cpu(id->num_grp);
+ 	geo->nr_luns = le16_to_cpu(id->num_pu);
+@@ -914,7 +923,13 @@ static ssize_t nvm_dev_attr_show(struct device *dev,
+ 	attr = &dattr->attr;
+ 
+ 	if (strcmp(attr->name, "version") == 0) {
+-		return scnprintf(page, PAGE_SIZE, "%u\n", geo->ver_id);
++		if (geo->major_ver_id == 1)
++			return scnprintf(page, PAGE_SIZE, "%u\n",
++						geo->major_ver_id);
++		else
++			return scnprintf(page, PAGE_SIZE, "%u.%u\n",
++						geo->major_ver_id,
++						geo->minor_ver_id);
+ 	} else if (strcmp(attr->name, "capabilities") == 0) {
+ 		return scnprintf(page, PAGE_SIZE, "%u\n", geo->cap);
+ 	} else if (strcmp(attr->name, "read_typ") == 0) {
+@@ -1167,7 +1182,7 @@ int nvme_nvm_register_sysfs(struct nvme_ns *ns)
+ 	if (!ndev)
+ 		return -EINVAL;
+ 
+-	switch (geo->ver_id) {
++	switch (geo->major_ver_id) {
+ 	case 1:
+ 		return sysfs_create_group(&disk_to_dev(ns->disk)->kobj,
+ 					&nvm_dev_attr_group_12);
+@@ -1184,7 +1199,7 @@ void nvme_nvm_unregister_sysfs(struct nvme_ns *ns)
+ 	struct nvm_dev *ndev = ns->ndev;
+ 	struct nvm_geo *geo = &ndev->geo;
+ 
+-	switch (geo->ver_id) {
++	switch (geo->major_ver_id) {
+ 	case 1:
+ 		sysfs_remove_group(&disk_to_dev(ns->disk)->kobj,
+ 					&nvm_dev_attr_group_12);
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 6e650563b379..7ed8b92d6744 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -263,7 +263,8 @@ enum {
+ /* Instance geometry */
+ struct nvm_geo {
+ 	/* device reported version */
+-	u8	ver_id;
++	u8	major_ver_id;
++	u8	minor_ver_id;
+ 
+ 	/* instance specific geometry */
+ 	int nr_chnls;
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.7.4
