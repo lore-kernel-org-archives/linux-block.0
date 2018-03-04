@@ -1,100 +1,62 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from apollo.dupie.be ([62.210.113.39]:60692 "EHLO apollo.dupie.be"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933075AbeCEJoP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Mar 2018 04:44:15 -0500
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Date: Mon, 05 Mar 2018 10:44:13 +0100
-From: Jean-Louis Dupond <jean-louis@dupond.be>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: linux-block@vger.kernel.org
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:33281 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751848AbeCDT0g (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Mar 2018 14:26:36 -0500
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "jean-louis@dupond.be" <jean-louis@dupond.be>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: vgdisplay hang on iSCSI session
-In-Reply-To: <1520191591.3413.1.camel@wdc.com>
+Date: Sun, 4 Mar 2018 19:26:33 +0000
+Message-ID: <1520191591.3413.1.camel@wdc.com>
 References: <b175d4715df19110064f986599ff87c4@dupond.be>
- <696a6c0c-2629-6af0-b5c2-fb5ce56d5f2a@wdc.com>
- <860b5a2a9d02a6a44c24b69c43e81296@dupond.be>
- <1520191591.3413.1.camel@wdc.com>
-Message-ID: <29c9d7bc9c3317045fe426b95acde577@dupond.be>
+         <696a6c0c-2629-6af0-b5c2-fb5ce56d5f2a@wdc.com>
+         <860b5a2a9d02a6a44c24b69c43e81296@dupond.be>
+In-Reply-To: <860b5a2a9d02a6a44c24b69c43e81296@dupond.be>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi,
-
-Maby a long shot, but could it be fixed by 
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git/commit/drivers/block/loop.c?h=v4.9.86&id=56bc086358cac1a2949783646eabd57447b9d672 
-?
-Or shouldn't that fix such kind of issues?
-
-It seems like some kind of race condition, cause it happens so random 
-and not on a specific action.
-
-Thanks
-Jean-Louis
-
-Op 2018-03-04 20:26, schreef Bart Van Assche:
-> On Sun, 2018-03-04 at 20:01 +0100, Jean-Louis Dupond wrote:
->> I'm running indeed CentOS 6 with the Virt SIG kernels. Already updated
->> to 4.9.75, but recently hit the problem again.
->> 
->> The first PID that was in D-state (root     27157  0.0  0.0 127664  
->> 5196
->> ?        D    06:19   0:00  \_ vgdisplay -c --ignorelockingfailure), 
->> had
->> the following stack:
->> # cat /proc/27157/stack
->> [<ffffffff813fc62f>] blk_mq_freeze_queue_wait+0x6f/0xd0
->> [<ffffffff813fe5be>] blk_freeze_queue+0x1e/0x30
->> [<ffffffff813fe5de>] blk_mq_freeze_queue+0xe/0x10
->> [<ffffffff815fa46e>] loop_switch+0x1e/0xd0
->> [<ffffffff815fb2ba>] lo_release+0x7a/0x80
->> [<ffffffff812a75f7>] __blkdev_put+0x1a7/0x200
->> [<ffffffff812a76a6>] blkdev_put+0x56/0x140
->> [<ffffffff812a77b4>] blkdev_close+0x24/0x30
->> [<ffffffff8126b7b8>] __fput+0xc8/0x240
->> [<ffffffff8126b9de>] ____fput+0xe/0x10
->> [<ffffffff810c4ab8>] task_work_run+0x68/0xa0
->> [<ffffffff81003546>] exit_to_usermode_loop+0xc6/0xd0
->> [<ffffffff81003f85>] do_syscall_64+0x185/0x240
->> [<ffffffff818df3aa>] entry_SYSCALL64_slow_path+0x25/0x25
->> [<ffffffffffffffff>] 0xffffffffffffffff
->> 
->> Other procs show the following:
->> # cat /proc/7803/stack
->> [<ffffffff812a782c>] __blkdev_get+0x6c/0x3f0
->> [<ffffffff812a7dfc>] blkdev_get+0x5c/0x1c0
->> [<ffffffff812a8342>] blkdev_open+0x62/0x80
->> [<ffffffff812669aa>] do_dentry_open+0x22a/0x340
->> [<ffffffff81266b11>] vfs_open+0x51/0x80
->> [<ffffffff81279fe5>] do_last+0x435/0x7a0
->> [<ffffffff8127a3d7>] path_openat+0x87/0x1c0
->> [<ffffffff8127a595>] do_filp_open+0x85/0xe0
->> [<ffffffff812681ec>] do_sys_open+0x11c/0x210
->> [<ffffffff8126831e>] SyS_open+0x1e/0x20
->> [<ffffffff81003e7a>] do_syscall_64+0x7a/0x240
->> [<ffffffff818df3aa>] entry_SYSCALL64_slow_path+0x25/0x25
->> [<ffffffffffffffff>] 0xffffffffffffffff
->> 
->> An strace hangs again on loop0 open:
->> stat("/dev/loop0", {st_mode=S_IFBLK|0660, st_rdev=makedev(7, 0), ...}) 
->> =
->> 0
->> open("/dev/loop0", O_RDONLY|O_DIRECT|O_NOATIME
->> 
->> And it seems like indeed alot is hanging on loop0:
->> # cat /sys/block/loop0/mq/0/queued
->> 5957
-> 
-> Hello Jean-Louis,
-> 
-> Is the system still in this state? If so, can you provide the output of 
-> the
-> following command (as an attachment):
-> 
-> find /sys/kernel/debug/block/ -type f \! \( -name poll_stat -o -name
-> dispatched -o -name merged -o -name completed \)
-> 
-> Thanks,
-> 
-> Bart.
+T24gU3VuLCAyMDE4LTAzLTA0IGF0IDIwOjAxICswMTAwLCBKZWFuLUxvdWlzIER1cG9uZCB3cm90
+ZToNCj4gSSdtIHJ1bm5pbmcgaW5kZWVkIENlbnRPUyA2IHdpdGggdGhlIFZpcnQgU0lHIGtlcm5l
+bHMuIEFscmVhZHkgdXBkYXRlZCANCj4gdG8gNC45Ljc1LCBidXQgcmVjZW50bHkgaGl0IHRoZSBw
+cm9ibGVtIGFnYWluLg0KPiANCj4gVGhlIGZpcnN0IFBJRCB0aGF0IHdhcyBpbiBELXN0YXRlIChy
+b290ICAgICAyNzE1NyAgMC4wICAwLjAgMTI3NjY0ICA1MTk2IA0KPiA/ICAgICAgICBEICAgIDA2
+OjE5ICAgMDowMCAgXF8gdmdkaXNwbGF5IC1jIC0taWdub3JlbG9ja2luZ2ZhaWx1cmUpLCBoYWQg
+DQo+IHRoZSBmb2xsb3dpbmcgc3RhY2s6DQo+ICMgY2F0IC9wcm9jLzI3MTU3L3N0YWNrDQo+IFs8
+ZmZmZmZmZmY4MTNmYzYyZj5dIGJsa19tcV9mcmVlemVfcXVldWVfd2FpdCsweDZmLzB4ZDANCj4g
+WzxmZmZmZmZmZjgxM2ZlNWJlPl0gYmxrX2ZyZWV6ZV9xdWV1ZSsweDFlLzB4MzANCj4gWzxmZmZm
+ZmZmZjgxM2ZlNWRlPl0gYmxrX21xX2ZyZWV6ZV9xdWV1ZSsweGUvMHgxMA0KPiBbPGZmZmZmZmZm
+ODE1ZmE0NmU+XSBsb29wX3N3aXRjaCsweDFlLzB4ZDANCj4gWzxmZmZmZmZmZjgxNWZiMmJhPl0g
+bG9fcmVsZWFzZSsweDdhLzB4ODANCj4gWzxmZmZmZmZmZjgxMmE3NWY3Pl0gX19ibGtkZXZfcHV0
+KzB4MWE3LzB4MjAwDQo+IFs8ZmZmZmZmZmY4MTJhNzZhNj5dIGJsa2Rldl9wdXQrMHg1Ni8weDE0
+MA0KPiBbPGZmZmZmZmZmODEyYTc3YjQ+XSBibGtkZXZfY2xvc2UrMHgyNC8weDMwDQo+IFs8ZmZm
+ZmZmZmY4MTI2YjdiOD5dIF9fZnB1dCsweGM4LzB4MjQwDQo+IFs8ZmZmZmZmZmY4MTI2YjlkZT5d
+IF9fX19mcHV0KzB4ZS8weDEwDQo+IFs8ZmZmZmZmZmY4MTBjNGFiOD5dIHRhc2tfd29ya19ydW4r
+MHg2OC8weGEwDQo+IFs8ZmZmZmZmZmY4MTAwMzU0Nj5dIGV4aXRfdG9fdXNlcm1vZGVfbG9vcCsw
+eGM2LzB4ZDANCj4gWzxmZmZmZmZmZjgxMDAzZjg1Pl0gZG9fc3lzY2FsbF82NCsweDE4NS8weDI0
+MA0KPiBbPGZmZmZmZmZmODE4ZGYzYWE+XSBlbnRyeV9TWVNDQUxMNjRfc2xvd19wYXRoKzB4MjUv
+MHgyNQ0KPiBbPGZmZmZmZmZmZmZmZmZmZmY+XSAweGZmZmZmZmZmZmZmZmZmZmYNCj4gDQo+IE90
+aGVyIHByb2NzIHNob3cgdGhlIGZvbGxvd2luZzoNCj4gIyBjYXQgL3Byb2MvNzgwMy9zdGFjaw0K
+PiBbPGZmZmZmZmZmODEyYTc4MmM+XSBfX2Jsa2Rldl9nZXQrMHg2Yy8weDNmMA0KPiBbPGZmZmZm
+ZmZmODEyYTdkZmM+XSBibGtkZXZfZ2V0KzB4NWMvMHgxYzANCj4gWzxmZmZmZmZmZjgxMmE4MzQy
+Pl0gYmxrZGV2X29wZW4rMHg2Mi8weDgwDQo+IFs8ZmZmZmZmZmY4MTI2NjlhYT5dIGRvX2RlbnRy
+eV9vcGVuKzB4MjJhLzB4MzQwDQo+IFs8ZmZmZmZmZmY4MTI2NmIxMT5dIHZmc19vcGVuKzB4NTEv
+MHg4MA0KPiBbPGZmZmZmZmZmODEyNzlmZTU+XSBkb19sYXN0KzB4NDM1LzB4N2EwDQo+IFs8ZmZm
+ZmZmZmY4MTI3YTNkNz5dIHBhdGhfb3BlbmF0KzB4ODcvMHgxYzANCj4gWzxmZmZmZmZmZjgxMjdh
+NTk1Pl0gZG9fZmlscF9vcGVuKzB4ODUvMHhlMA0KPiBbPGZmZmZmZmZmODEyNjgxZWM+XSBkb19z
+eXNfb3BlbisweDExYy8weDIxMA0KPiBbPGZmZmZmZmZmODEyNjgzMWU+XSBTeVNfb3BlbisweDFl
+LzB4MjANCj4gWzxmZmZmZmZmZjgxMDAzZTdhPl0gZG9fc3lzY2FsbF82NCsweDdhLzB4MjQwDQo+
+IFs8ZmZmZmZmZmY4MThkZjNhYT5dIGVudHJ5X1NZU0NBTEw2NF9zbG93X3BhdGgrMHgyNS8weDI1
+DQo+IFs8ZmZmZmZmZmZmZmZmZmZmZj5dIDB4ZmZmZmZmZmZmZmZmZmZmZg0KPiANCj4gQW4gc3Ry
+YWNlIGhhbmdzIGFnYWluIG9uIGxvb3AwIG9wZW46DQo+IHN0YXQoIi9kZXYvbG9vcDAiLCB7c3Rf
+bW9kZT1TX0lGQkxLfDA2NjAsIHN0X3JkZXY9bWFrZWRldig3LCAwKSwgLi4ufSkgPSANCj4gMA0K
+PiBvcGVuKCIvZGV2L2xvb3AwIiwgT19SRE9OTFl8T19ESVJFQ1R8T19OT0FUSU1FDQo+IA0KPiBB
+bmQgaXQgc2VlbXMgbGlrZSBpbmRlZWQgYWxvdCBpcyBoYW5naW5nIG9uIGxvb3AwOg0KPiAjIGNh
+dCAvc3lzL2Jsb2NrL2xvb3AwL21xLzAvcXVldWVkDQo+IDU5NTcNCg0KSGVsbG8gSmVhbi1Mb3Vp
+cywNCg0KSXMgdGhlIHN5c3RlbSBzdGlsbCBpbiB0aGlzIHN0YXRlPyBJZiBzbywgY2FuIHlvdSBw
+cm92aWRlIHRoZSBvdXRwdXQgb2YgdGhlDQpmb2xsb3dpbmcgY29tbWFuZCAoYXMgYW4gYXR0YWNo
+bWVudCk6DQoNCmZpbmQgL3N5cy9rZXJuZWwvZGVidWcvYmxvY2svIC10eXBlIGYgXCEgXCggLW5h
+bWUgcG9sbF9zdGF0IC1vIC1uYW1lIGRpc3BhdGNoZWQgLW8gLW5hbWUgbWVyZ2VkIC1vIC1uYW1l
+IGNvbXBsZXRlZCBcKQ0KDQpUaGFua3MsDQoNCkJhcnQuDQoNCg0K
