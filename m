@@ -1,222 +1,54 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f66.google.com ([209.85.215.66]:33187 "EHLO
-        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752604AbeC2WHW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Mar 2018 18:07:22 -0400
-Received: by mail-lf0-f66.google.com with SMTP id x70-v6so3501969lfa.0
-        for <linux-block@vger.kernel.org>; Thu, 29 Mar 2018 15:07:21 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        keith.busch@intel.com, javier@cnexlabs.com,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 17/37] lightnvm: remove nvm_dev_ops->max_phys_sect
-Date: Fri, 30 Mar 2018 00:05:04 +0200
-Message-Id: <20180329220524.30363-18-mb@lightnvm.io>
-In-Reply-To: <20180329220524.30363-1-mb@lightnvm.io>
-References: <20180329220524.30363-1-mb@lightnvm.io>
+Received: from mail-pl0-f66.google.com ([209.85.160.66]:40327 "EHLO
+        mail-pl0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753130AbeCEVty (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Mar 2018 16:49:54 -0500
+Received: by mail-pl0-f66.google.com with SMTP id i6-v6so10528660plt.7
+        for <linux-block@vger.kernel.org>; Mon, 05 Mar 2018 13:49:54 -0800 (PST)
+Subject: Re: [PATCH] bcache: fix incorrect sysfs output value of strip size
+To: tang.junhui@zte.com.cn, colyli@suse.de
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <1518316200-31550-1-git-send-email-tang.junhui@zte.com.cn>
+From: Michael Lyle <mlyle@lyle.org>
+Message-ID: <ee611450-b50d-d2c1-d17e-9ff3e4622505@lyle.org>
+Date: Mon, 5 Mar 2018 13:49:51 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1518316200-31550-1-git-send-email-tang.junhui@zte.com.cn>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-The value of max_phys_sect is always static. Instead of
-defining it in the nvm_dev_ops structure, declare it as a global
-value.
+LGTM, applied.
 
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
----
- drivers/lightnvm/core.c          | 28 +++++++---------------------
- drivers/lightnvm/pblk-init.c     |  9 ++++-----
- drivers/lightnvm/pblk-recovery.c |  8 ++------
- drivers/nvme/host/lightnvm.c     |  5 +----
- include/linux/lightnvm.h         |  5 ++---
- 5 files changed, 16 insertions(+), 39 deletions(-)
-
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index a59ad29600c3..9704db219866 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -407,7 +407,8 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 	tdisk->private_data = targetdata;
- 	tqueue->queuedata = targetdata;
- 
--	blk_queue_max_hw_sectors(tqueue, 8 * dev->ops->max_phys_sect);
-+	blk_queue_max_hw_sectors(tqueue,
-+			(dev->geo.sec_size >> 9) * NVM_MAX_VLBA);
- 
- 	set_capacity(tdisk, tt->capacity(targetdata));
- 	add_disk(tdisk);
-@@ -719,7 +720,7 @@ int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas,
- 	struct nvm_rq rqd;
- 	int ret;
- 
--	if (nr_ppas > dev->ops->max_phys_sect) {
-+	if (nr_ppas > NVM_MAX_VLBA) {
- 		pr_err("nvm: unable to update all blocks atomically\n");
- 		return -EINVAL;
- 	}
-@@ -740,14 +741,6 @@ int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas,
- }
- EXPORT_SYMBOL(nvm_set_tgt_bb_tbl);
- 
--int nvm_max_phys_sects(struct nvm_tgt_dev *tgt_dev)
--{
--	struct nvm_dev *dev = tgt_dev->parent;
--
--	return dev->ops->max_phys_sect;
--}
--EXPORT_SYMBOL(nvm_max_phys_sects);
--
- int nvm_submit_io(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
- {
- 	struct nvm_dev *dev = tgt_dev->parent;
-@@ -965,17 +958,10 @@ int nvm_register(struct nvm_dev *dev)
- 	if (!dev->q || !dev->ops)
- 		return -EINVAL;
- 
--	if (dev->ops->max_phys_sect > 256) {
--		pr_info("nvm: max sectors supported is 256.\n");
--		return -EINVAL;
--	}
--
--	if (dev->ops->max_phys_sect > 1) {
--		dev->dma_pool = dev->ops->create_dma_pool(dev, "ppalist");
--		if (!dev->dma_pool) {
--			pr_err("nvm: could not create dma pool\n");
--			return -ENOMEM;
--		}
-+	dev->dma_pool = dev->ops->create_dma_pool(dev, "ppalist");
-+	if (!dev->dma_pool) {
-+		pr_err("nvm: could not create dma pool\n");
-+		return -ENOMEM;
- 	}
- 
- 	ret = nvm_init(dev);
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 141036bd6afa..43b835678f48 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -260,8 +260,7 @@ static int pblk_core_init(struct pblk *pblk)
- 		return -ENOMEM;
- 
- 	/* Internal bios can be at most the sectors signaled by the device. */
--	pblk->page_bio_pool = mempool_create_page_pool(nvm_max_phys_sects(dev),
--									0);
-+	pblk->page_bio_pool = mempool_create_page_pool(NVM_MAX_VLBA, 0);
- 	if (!pblk->page_bio_pool)
- 		goto free_global_caches;
- 
-@@ -716,12 +715,12 @@ static int pblk_lines_init(struct pblk *pblk)
- 
- 	pblk->min_write_pgs = geo->sec_per_pl * (geo->sec_size / PAGE_SIZE);
- 	max_write_ppas = pblk->min_write_pgs * geo->all_luns;
--	pblk->max_write_pgs = (max_write_ppas < nvm_max_phys_sects(dev)) ?
--				max_write_ppas : nvm_max_phys_sects(dev);
-+	pblk->max_write_pgs = min_t(int, max_write_ppas, NVM_MAX_VLBA);
- 	pblk_set_sec_per_write(pblk, pblk->min_write_pgs);
- 
- 	if (pblk->max_write_pgs > PBLK_MAX_REQ_ADDRS) {
--		pr_err("pblk: cannot support device max_phys_sect\n");
-+		pr_err("pblk: vector list too big(%u > %u)\n",
-+				pblk->max_write_pgs, PBLK_MAX_REQ_ADDRS);
- 		return -EINVAL;
- 	}
- 
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index e75a1af2eebe..aaab9a5c17cc 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -21,17 +21,15 @@ void pblk_submit_rec(struct work_struct *work)
- 	struct pblk_rec_ctx *recovery =
- 			container_of(work, struct pblk_rec_ctx, ws_rec);
- 	struct pblk *pblk = recovery->pblk;
--	struct nvm_tgt_dev *dev = pblk->dev;
- 	struct nvm_rq *rqd = recovery->rqd;
- 	struct pblk_c_ctx *c_ctx = nvm_rq_to_pdu(rqd);
--	int max_secs = nvm_max_phys_sects(dev);
- 	struct bio *bio;
- 	unsigned int nr_rec_secs;
- 	unsigned int pgs_read;
- 	int ret;
- 
- 	nr_rec_secs = bitmap_weight((unsigned long int *)&rqd->ppa_status,
--								max_secs);
-+								NVM_MAX_VLBA);
- 
- 	bio = bio_alloc(GFP_KERNEL, nr_rec_secs);
- 
-@@ -74,8 +72,6 @@ int pblk_recov_setup_rq(struct pblk *pblk, struct pblk_c_ctx *c_ctx,
- 			struct pblk_rec_ctx *recovery, u64 *comp_bits,
- 			unsigned int comp)
- {
--	struct nvm_tgt_dev *dev = pblk->dev;
--	int max_secs = nvm_max_phys_sects(dev);
- 	struct nvm_rq *rec_rqd;
- 	struct pblk_c_ctx *rec_ctx;
- 	int nr_entries = c_ctx->nr_valid + c_ctx->nr_padded;
-@@ -86,7 +82,7 @@ int pblk_recov_setup_rq(struct pblk *pblk, struct pblk_c_ctx *c_ctx,
- 	/* Copy completion bitmap, but exclude the first X completed entries */
- 	bitmap_shift_right((unsigned long int *)&rec_rqd->ppa_status,
- 				(unsigned long int *)comp_bits,
--				comp, max_secs);
-+				comp, NVM_MAX_VLBA);
- 
- 	/* Save the context for the entries that need to be re-written and
- 	 * update current context with the completed entries.
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index 8b243af8a949..e38d835b15b5 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -612,8 +612,6 @@ static struct nvm_dev_ops nvme_nvm_dev_ops = {
- 	.destroy_dma_pool	= nvme_nvm_destroy_dma_pool,
- 	.dev_dma_alloc		= nvme_nvm_dev_dma_alloc,
- 	.dev_dma_free		= nvme_nvm_dev_dma_free,
--
--	.max_phys_sect		= 64,
- };
- 
- static int nvme_nvm_submit_user_cmd(struct request_queue *q,
-@@ -932,8 +930,7 @@ static ssize_t nvm_dev_attr_show_12(struct device *dev,
- 	} else if (strcmp(attr->name, "media_capabilities") == 0) {
- 		return scnprintf(page, PAGE_SIZE, "0x%08x\n", id->mccap);
- 	} else if (strcmp(attr->name, "max_phys_secs") == 0) {
--		return scnprintf(page, PAGE_SIZE, "%u\n",
--				ndev->ops->max_phys_sect);
-+		return scnprintf(page, PAGE_SIZE, "%u\n", NVM_MAX_VLBA);
- 	} else {
- 		return scnprintf(page,
- 				 PAGE_SIZE,
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 67b4fa8e4906..e55b10573c99 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -73,8 +73,6 @@ struct nvm_dev_ops {
- 	nvm_destroy_dma_pool_fn	*destroy_dma_pool;
- 	nvm_dev_dma_alloc_fn	*dev_dma_alloc;
- 	nvm_dev_dma_free_fn	*dev_dma_free;
--
--	unsigned int		max_phys_sect;
- };
- 
- #ifdef CONFIG_NVM
-@@ -228,6 +226,8 @@ struct nvm_target {
- #define NVM_VERSION_MINOR 0
- #define NVM_VERSION_PATCH 0
- 
-+#define NVM_MAX_VLBA (64) /* max logical blocks in a vector command */
-+
- struct nvm_rq;
- typedef void (nvm_end_io_fn)(struct nvm_rq *);
- 
-@@ -436,7 +436,6 @@ extern void nvm_unregister(struct nvm_dev *);
- 
- extern int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr *,
- 			      int, int);
--extern int nvm_max_phys_sects(struct nvm_tgt_dev *);
- extern int nvm_submit_io(struct nvm_tgt_dev *, struct nvm_rq *);
- extern int nvm_submit_io_sync(struct nvm_tgt_dev *, struct nvm_rq *);
- extern void nvm_end_io(struct nvm_rq *);
--- 
-2.11.0
+On 02/10/2018 06:30 PM, tang.junhui@zte.com.cn wrote:
+> From: Tang Junhui <tang.junhui@zte.com.cn>
+> 
+> Stripe size is shown as zero when no strip in back end device:
+> [root@ceph132 ~]# cat /sys/block/sdd/bcache/stripe_size
+> 0.0k
+> 
+> Actually it should be 1T Bytes (1 << 31 sectors), but in sysfs
+> interface, stripe_size was changed from sectors to bytes, and move
+> 9 bits left, so the 32 bits variable overflows.
+> 
+> This patch change the variable to a 64 bits type before moving bits.
+> 
+> Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+> ---
+>  drivers/md/bcache/sysfs.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+> index b418409..240cbec 100644
+> --- a/drivers/md/bcache/sysfs.c
+> +++ b/drivers/md/bcache/sysfs.c
+> @@ -170,7 +170,7 @@
+>  	sysfs_hprint(dirty_data,
+>  		     bcache_dev_sectors_dirty(&dc->disk) << 9);
+>  
+> -	sysfs_hprint(stripe_size,	dc->disk.stripe_size << 9);
+> +	sysfs_hprint(stripe_size,	 ((uint64_t)dc->disk.stripe_size) << 9);
+>  	var_printf(partial_stripes_expensive,	"%u");
+>  
+>  	var_hprint(sequential_cutoff);
+> 
