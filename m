@@ -1,55 +1,72 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:46351 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752206AbeC2WHB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Mar 2018 18:07:01 -0400
-Received: by mail-lf0-f68.google.com with SMTP id j68-v6so10301888lfg.13
-        for <linux-block@vger.kernel.org>; Thu, 29 Mar 2018 15:07:01 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        keith.busch@intel.com, javier@cnexlabs.com,
-        Markus Elfring <elfring@users.sourceforge.net>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 01/37] lightnvm/pblk-gc: Delete an error message for a failed memory allocation in pblk_gc_line_prepare_ws()
-Date: Fri, 30 Mar 2018 00:04:48 +0200
-Message-Id: <20180329220524.30363-2-mb@lightnvm.io>
-In-Reply-To: <20180329220524.30363-1-mb@lightnvm.io>
-References: <20180329220524.30363-1-mb@lightnvm.io>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <mlyle@lyle.org>
+Return-Path: <mlyle@lyle.org>
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-block@vger.kernel.org,
+	linux-bcache@vger.kernel.org
+Cc: axboe@kernel.dk,
+	Michael Lyle <mlyle@lyle.org>,
+	stable@vger.kernel.org
+Subject: [PATCH 2/2] bcache: don't attach backing with duplicate UUID
+Date: Mon,  5 Mar 2018 13:41:55 -0800
+Message-Id: <20180305214155.23395-3-mlyle@lyle.org>
+In-Reply-To: <20180305214155.23395-1-mlyle@lyle.org>
+References: <20180305214155.23395-1-mlyle@lyle.org>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Markus Elfring <elfring@users.sourceforge.net>
+This can happen e.g. during disk cloning.
 
-Omit an extra message for a memory allocation failure in this function.
+This is an incomplete fix: it does not catch duplicate UUIDs earlier
+when things are still unattached.  It does not unregister the device.
+Further changes to cope better with this are planned but conflict with
+Coly's ongoing improvements to handling device errors.  In the meantime,
+one can manually stop the device after this has happened.
 
-This issue was detected by using the Coccinelle software.
+Attempts to attach a duplicate device result in:
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-Reviewed-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+[  136.372404] loop: module loaded
+[  136.424461] bcache: register_bdev() registered backing device loop0
+[  136.424464] bcache: bch_cached_dev_attach() Tried to attach loop0 but duplicate UUID already attached
+
+My test procedure is:
+
+  dd if=/dev/sdb1 of=imgfile bs=1024 count=262144
+  losetup -f imgfile
+
+Signed-off-by: Michael Lyle <mlyle@lyle.org>
+Reviewed-by: Tang Junhui <tang.junhui@zte.com.cn>
+Cc: <stable@vger.kernel.org>
 ---
- drivers/lightnvm/pblk-gc.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ drivers/md/bcache/super.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-index 3d899383666e..31f17d6f14ee 100644
---- a/drivers/lightnvm/pblk-gc.c
-+++ b/drivers/lightnvm/pblk-gc.c
-@@ -147,10 +147,8 @@ static void pblk_gc_line_prepare_ws(struct work_struct *work)
- 	int ret;
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 9c141a8aaacc..5cace6892958 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -963,6 +963,7 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
+ 	uint32_t rtime = cpu_to_le32(get_seconds());
+ 	struct uuid_entry *u;
+ 	char buf[BDEVNAME_SIZE];
++	struct cached_dev *exist_dc, *t;
  
- 	invalid_bitmap = kmalloc(lm->sec_bitmap_len, GFP_KERNEL);
--	if (!invalid_bitmap) {
--		pr_err("pblk: could not allocate GC invalid bitmap\n");
-+	if (!invalid_bitmap)
- 		goto fail_free_ws;
--	}
+ 	bdevname(dc->bdev, buf);
  
- 	emeta_buf = pblk_malloc(lm->emeta_len[0], l_mg->emeta_alloc_type,
- 								GFP_KERNEL);
+@@ -987,6 +988,16 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
+ 		return -EINVAL;
+ 	}
+ 
++	/* Check whether already attached */
++	list_for_each_entry_safe(exist_dc, t, &c->cached_devs, list) {
++		if (!memcmp(dc->sb.uuid, exist_dc->sb.uuid, 16)) {
++			pr_err("Tried to attach %s but duplicate UUID already attached",
++				buf);
++
++			return -EINVAL;
++		}
++	}
++
+ 	u = uuid_find(c, dc->sb.uuid);
+ 
+ 	if (u &&
 -- 
-2.11.0
+2.14.1
