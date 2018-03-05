@@ -1,274 +1,683 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:34138 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754721AbeCSAgq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Mar 2018 20:36:46 -0400
-Received: by mail-pf0-f193.google.com with SMTP id j20so6376607pfi.1
-        for <linux-block@vger.kernel.org>; Sun, 18 Mar 2018 17:36:46 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Coly Li <colyli@suse.de>,
-        Michael Lyle <mlyle@lyle.org>, Nix <nix@esperi.org.uk>,
-        Pavel Goran <via-bcache@pvgoran.name>,
-        Junhui Tang <tang.junhui@zte.com.cn>,
-        Hannes Reinecke <hare@suse.com>
-Subject: [for-4.17 05/20] bcache: add stop_when_cache_set_failed option to backing device
-Date: Sun, 18 Mar 2018 17:36:18 -0700
-Message-Id: <20180319003633.27225-6-mlyle@lyle.org>
-In-Reply-To: <20180319003633.27225-1-mlyle@lyle.org>
-References: <20180319003633.27225-1-mlyle@lyle.org>
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:36011 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751490AbeCES1d (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Mar 2018 13:27:33 -0500
+Received: by mail-lf0-f65.google.com with SMTP id g72so24615366lfg.3
+        for <linux-block@vger.kernel.org>; Mon, 05 Mar 2018 10:27:32 -0800 (PST)
+Subject: Re: [PATCH] lightnvm: pblk: refactor init/exit sequences
+To: =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>
+Cc: linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>
+References: <1519919998-20829-1-git-send-email-javier@cnexlabs.com>
+ <1519919998-20829-2-git-send-email-javier@cnexlabs.com>
+ <8586a9e4-c76f-e38a-edcf-201cc7e2ddfb@lightnvm.io>
+ <ED151D27-0D29-451F-9E9D-155E6C8C6224@javigon.com>
+ <64fdacf9-fc89-48fb-4a8d-a8dada708329@lightnvm.io>
+ <12DCD7A9-01CB-4CCE-8F6A-6B892056F5F0@javigon.com>
+ <d6f0117f-0de5-86d6-b568-5454df627f50@lightnvm.io>
+ <5D681B87-FFE9-4E34-9D11-96CEFB6FA40B@javigon.com>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <6b9fe4ed-6f09-ab3b-ff5e-6ba66be10c6d@lightnvm.io>
+Date: Mon, 5 Mar 2018 19:27:29 +0100
+MIME-Version: 1.0
+In-Reply-To: <5D681B87-FFE9-4E34-9D11-96CEFB6FA40B@javigon.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Coly Li <colyli@suse.de>
+On 03/05/2018 03:18 PM, Javier González wrote:
+>> On 5 Mar 2018, at 15.16, Matias Bjørling <mb@lightnvm.io> wrote:
+>>
+>> On 03/05/2018 02:45 PM, Javier González wrote:
+>>>> On 5 Mar 2018, at 14.38, Matias Bjørling <mb@lightnvm.io> wrote:
+>>>>
+>>>> On 03/01/2018 08:29 PM, Javier González wrote:
+>>>>>> On 1 Mar 2018, at 19.49, Matias Bjørling <mb@lightnvm.io> wrote:
+>>>>>>
+>>>>>> On 03/01/2018 04:59 PM, Javier González wrote:
+>>>>>>> Refactor init and exit sequences to eliminate dependencies among init
+>>>>>>> modules and improve readability.
+>>>>>>> Signed-off-by: Javier González <javier@cnexlabs.com>
+>>>>>>> ---
+>>>>>>>   drivers/lightnvm/pblk-init.c | 415 +++++++++++++++++++++----------------------
+>>>>>>>   1 file changed, 206 insertions(+), 209 deletions(-)
+>>>>>>> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+>>>>>>> index 25fc70ca07f7..87c390667dd6 100644
+>>>>>>> --- a/drivers/lightnvm/pblk-init.c
+>>>>>>> +++ b/drivers/lightnvm/pblk-init.c
+>>>>>>> @@ -103,7 +103,40 @@ static void pblk_l2p_free(struct pblk *pblk)
+>>>>>>>   	vfree(pblk->trans_map);
+>>>>>>>   }
+>>>>>>>   -static int pblk_l2p_init(struct pblk *pblk)
+>>>>>>> +static int pblk_l2p_recover(struct pblk *pblk, bool factory_init)
+>>>>>>> +{
+>>>>>>> +	struct pblk_line *line = NULL;
+>>>>>>> +
+>>>>>>> +	if (factory_init) {
+>>>>>>> +		pblk_setup_uuid(pblk);
+>>>>>>> +	} else {
+>>>>>>> +		line = pblk_recov_l2p(pblk);
+>>>>>>> +		if (IS_ERR(line)) {
+>>>>>>> +			pr_err("pblk: could not recover l2p table\n");
+>>>>>>> +			return -EFAULT;
+>>>>>>> +		}
+>>>>>>> +	}
+>>>>>>> +
+>>>>>>> +#ifdef CONFIG_NVM_DEBUG
+>>>>>>> +	pr_info("pblk init: L2P CRC: %x\n", pblk_l2p_crc(pblk));
+>>>>>>> +#endif
+>>>>>>> +
+>>>>>>> +	/* Free full lines directly as GC has not been started yet */
+>>>>>>> +	pblk_gc_free_full_lines(pblk);
+>>>>>>> +
+>>>>>>> +	if (!line) {
+>>>>>>> +		/* Configure next line for user data */
+>>>>>>> +		line = pblk_line_get_first_data(pblk);
+>>>>>>> +		if (!line) {
+>>>>>>> +			pr_err("pblk: line list corrupted\n");
+>>>>>>> +			return -EFAULT;
+>>>>>>> +		}
+>>>>>>> +	}
+>>>>>>> +
+>>>>>>> +	return 0;
+>>>>>>> +}
+>>>>>>> +
+>>>>>>> +static int pblk_l2p_init(struct pblk *pblk, bool factory_init)
+>>>>>>>   {
+>>>>>>>   	sector_t i;
+>>>>>>>   	struct ppa_addr ppa;
+>>>>>>> @@ -119,7 +152,7 @@ static int pblk_l2p_init(struct pblk *pblk)
+>>>>>>>   	for (i = 0; i < pblk->rl.nr_secs; i++)
+>>>>>>>   		pblk_trans_map_set(pblk, i, ppa);
+>>>>>>>   -	return 0;
+>>>>>>> +	return pblk_l2p_recover(pblk, factory_init);
+>>>>>>>   }
+>>>>>>>     static void pblk_rwb_free(struct pblk *pblk)
+>>>>>>> @@ -159,7 +192,13 @@ static int pblk_set_ppaf(struct pblk *pblk)
+>>>>>>>   	struct nvm_tgt_dev *dev = pblk->dev;
+>>>>>>>   	struct nvm_geo *geo = &dev->geo;
+>>>>>>>   	struct nvm_addr_format ppaf = geo->ppaf;
+>>>>>>> -	int power_len;
+>>>>>>> +	int mod, power_len;
+>>>>>>> +
+>>>>>>> +	div_u64_rem(geo->sec_per_chk, pblk->min_write_pgs, &mod);
+>>>>>>> +	if (mod) {
+>>>>>>> +		pr_err("pblk: bad configuration of sectors/pages\n");
+>>>>>>> +		return -EINVAL;
+>>>>>>> +	}
+>>>>>>>     	/* Re-calculate channel and lun format to adapt to configuration */
+>>>>>>>   	power_len = get_count_order(geo->nr_chnls);
+>>>>>>> @@ -252,12 +291,39 @@ static int pblk_core_init(struct pblk *pblk)
+>>>>>>>   {
+>>>>>>>   	struct nvm_tgt_dev *dev = pblk->dev;
+>>>>>>>   	struct nvm_geo *geo = &dev->geo;
+>>>>>>> +	int max_write_ppas;
+>>>>>>> +
+>>>>>>> +	atomic64_set(&pblk->user_wa, 0);
+>>>>>>> +	atomic64_set(&pblk->pad_wa, 0);
+>>>>>>> +	atomic64_set(&pblk->gc_wa, 0);
+>>>>>>> +	pblk->user_rst_wa = 0;
+>>>>>>> +	pblk->pad_rst_wa = 0;
+>>>>>>> +	pblk->gc_rst_wa = 0;
+>>>>>>> +
+>>>>>>> +	atomic64_set(&pblk->nr_flush, 0);
+>>>>>>> +	pblk->nr_flush_rst = 0;
+>>>>>>>     	pblk->pgs_in_buffer = NVM_MEM_PAGE_WRITE * geo->sec_per_pg *
+>>>>>>>   						geo->nr_planes * geo->all_luns;
+>>>>>>>   +	pblk->min_write_pgs = geo->sec_per_pl * (geo->sec_size / PAGE_SIZE);
+>>>>>>> +	max_write_ppas = pblk->min_write_pgs * geo->all_luns;
+>>>>>>> +	pblk->max_write_pgs = min_t(int, max_write_ppas, NVM_MAX_VLBA);
+>>>>>>> +	pblk_set_sec_per_write(pblk, pblk->min_write_pgs);
+>>>>>>> +
+>>>>>>> +	if (pblk->max_write_pgs > PBLK_MAX_REQ_ADDRS) {
+>>>>>>> +		pr_err("pblk: vector list too big(%u > %u)\n",
+>>>>>>> +				pblk->max_write_pgs, PBLK_MAX_REQ_ADDRS);
+>>>>>>> +		return -EINVAL;
+>>>>>>> +	}
+>>>>>>> +
+>>>>>>> +	pblk->pad_dist = kzalloc((pblk->min_write_pgs - 1) * sizeof(atomic64_t),
+>>>>>>> +								GFP_KERNEL);
+>>>>>>> +	if (!pblk->pad_dist)
+>>>>>>> +		return -ENOMEM;
+>>>>>>> +
+>>>>>>>   	if (pblk_init_global_caches(pblk))
+>>>>>>> -		return -ENOMEM;
+>>>>>>> +		goto fail_free_pad_dist;
+>>>>>>>     	/* Internal bios can be at most the sectors signaled by the device. */
+>>>>>>>   	pblk->page_bio_pool = mempool_create_page_pool(NVM_MAX_VLBA, 0);
+>>>>>>> @@ -307,10 +373,8 @@ static int pblk_core_init(struct pblk *pblk)
+>>>>>>>   	if (pblk_set_ppaf(pblk))
+>>>>>>>   		goto free_r_end_wq;
+>>>>>>>   -	if (pblk_rwb_init(pblk))
+>>>>>>> -		goto free_r_end_wq;
+>>>>>>> -
+>>>>>>>   	INIT_LIST_HEAD(&pblk->compl_list);
+>>>>>>> +
+>>>>>>>   	return 0;
+>>>>>>>     free_r_end_wq:
+>>>>>>> @@ -333,6 +397,8 @@ static int pblk_core_init(struct pblk *pblk)
+>>>>>>>   	mempool_destroy(pblk->page_bio_pool);
+>>>>>>>   free_global_caches:
+>>>>>>>   	pblk_free_global_caches(pblk);
+>>>>>>> +fail_free_pad_dist:
+>>>>>>> +	kfree(pblk->pad_dist);
+>>>>>>>   	return -ENOMEM;
+>>>>>>>   }
+>>>>>>>   @@ -354,14 +420,8 @@ static void pblk_core_free(struct pblk *pblk)
+>>>>>>>   	mempool_destroy(pblk->e_rq_pool);
+>>>>>>>   	mempool_destroy(pblk->w_rq_pool);
+>>>>>>>   -	pblk_rwb_free(pblk);
+>>>>>>> -
+>>>>>>>   	pblk_free_global_caches(pblk);
+>>>>>>> -}
+>>>>>>> -
+>>>>>>> -static void pblk_luns_free(struct pblk *pblk)
+>>>>>>> -{
+>>>>>>> -	kfree(pblk->luns);
+>>>>>>> +	kfree(pblk->pad_dist);
+>>>>>>>   }
+>>>>>>>     static void pblk_line_mg_free(struct pblk *pblk)
+>>>>>>> @@ -378,8 +438,6 @@ static void pblk_line_mg_free(struct pblk *pblk)
+>>>>>>>   		pblk_mfree(l_mg->eline_meta[i]->buf, l_mg->emeta_alloc_type);
+>>>>>>>   		kfree(l_mg->eline_meta[i]);
+>>>>>>>   	}
+>>>>>>> -
+>>>>>>> -	kfree(pblk->lines);
+>>>>>>>   }
+>>>>>>>     static void pblk_line_meta_free(struct pblk_line *line)
+>>>>>>> @@ -402,6 +460,11 @@ static void pblk_lines_free(struct pblk *pblk)
+>>>>>>>   		pblk_line_meta_free(line);
+>>>>>>>   	}
+>>>>>>>   	spin_unlock(&l_mg->free_lock);
+>>>>>>> +
+>>>>>>> +	pblk_line_mg_free(pblk);
+>>>>>>> +
+>>>>>>> +	kfree(pblk->luns);
+>>>>>>> +	kfree(pblk->lines);
+>>>>>>>   }
+>>>>>>>     static int pblk_bb_get_tbl(struct nvm_tgt_dev *dev, struct pblk_lun *rlun,
+>>>>>>> @@ -476,7 +539,7 @@ static int pblk_bb_line(struct pblk *pblk, struct pblk_line *line,
+>>>>>>>   	return bb_cnt;
+>>>>>>>   }
+>>>>>>>   -static int pblk_luns_init(struct pblk *pblk, struct ppa_addr *luns)
+>>>>>>> +static int pblk_luns_init(struct pblk *pblk)
+>>>>>>>   {
+>>>>>>>   	struct nvm_tgt_dev *dev = pblk->dev;
+>>>>>>>   	struct nvm_geo *geo = &dev->geo;
+>>>>>>> @@ -501,7 +564,7 @@ static int pblk_luns_init(struct pblk *pblk, struct ppa_addr *luns)
+>>>>>>>   		int lunid = lun_raw + ch * geo->nr_luns;
+>>>>>>>     		rlun = &pblk->luns[i];
+>>>>>>> -		rlun->bppa = luns[lunid];
+>>>>>>> +		rlun->bppa = dev->luns[lunid];
+>>>>>>>     		sema_init(&rlun->wr_sem, 1);
+>>>>>>>   	}
+>>>>>>> @@ -509,38 +572,6 @@ static int pblk_luns_init(struct pblk *pblk, struct ppa_addr *luns)
+>>>>>>>   	return 0;
+>>>>>>>   }
+>>>>>>>   -static int pblk_lines_configure(struct pblk *pblk, int flags)
+>>>>>>> -{
+>>>>>>> -	struct pblk_line *line = NULL;
+>>>>>>> -	int ret = 0;
+>>>>>>> -
+>>>>>>> -	if (!(flags & NVM_TARGET_FACTORY)) {
+>>>>>>> -		line = pblk_recov_l2p(pblk);
+>>>>>>> -		if (IS_ERR(line)) {
+>>>>>>> -			pr_err("pblk: could not recover l2p table\n");
+>>>>>>> -			ret = -EFAULT;
+>>>>>>> -		}
+>>>>>>> -	}
+>>>>>>> -
+>>>>>>> -#ifdef CONFIG_NVM_DEBUG
+>>>>>>> -	pr_info("pblk init: L2P CRC: %x\n", pblk_l2p_crc(pblk));
+>>>>>>> -#endif
+>>>>>>> -
+>>>>>>> -	/* Free full lines directly as GC has not been started yet */
+>>>>>>> -	pblk_gc_free_full_lines(pblk);
+>>>>>>> -
+>>>>>>> -	if (!line) {
+>>>>>>> -		/* Configure next line for user data */
+>>>>>>> -		line = pblk_line_get_first_data(pblk);
+>>>>>>> -		if (!line) {
+>>>>>>> -			pr_err("pblk: line list corrupted\n");
+>>>>>>> -			ret = -EFAULT;
+>>>>>>> -		}
+>>>>>>> -	}
+>>>>>>> -
+>>>>>>> -	return ret;
+>>>>>>> -}
+>>>>>>> -
+>>>>>>>   /* See comment over struct line_emeta definition */
+>>>>>>>   static unsigned int calc_emeta_len(struct pblk *pblk)
+>>>>>>>   {
+>>>>>>> @@ -606,11 +637,70 @@ static void pblk_set_provision(struct pblk *pblk, long nr_free_blks)
+>>>>>>>   	atomic_set(&pblk->rl.free_user_blocks, nr_free_blks);
+>>>>>>>   }
+>>>>>>>   -static int pblk_lines_alloc_metadata(struct pblk *pblk)
+>>>>>>> +static int pblk_setup_line_meta(struct pblk *pblk, struct pblk_line *line,
+>>>>>>> +				void *chunk_log, long *nr_bad_blks)
+>>>>>>>   {
+>>>>>>> +	struct pblk_line_meta *lm = &pblk->lm;
+>>>>>>> +
+>>>>>>> +	line->blk_bitmap = kzalloc(lm->blk_bitmap_len, GFP_KERNEL);
+>>>>>>> +	if (!line->blk_bitmap)
+>>>>>>> +		return -ENOMEM;
+>>>>>>> +
+>>>>>>> +	line->erase_bitmap = kzalloc(lm->blk_bitmap_len, GFP_KERNEL);
+>>>>>>> +	if (!line->erase_bitmap) {
+>>>>>>> +		kfree(line->blk_bitmap);
+>>>>>>> +		return -ENOMEM;
+>>>>>>> +	}
+>>>>>>> +
+>>>>>>> +	*nr_bad_blks = pblk_bb_line(pblk, line, chunk_log, lm->blk_per_line);
+>>>>>>> +
+>>>>>>> +	return 0;
+>>>>>>> +}
+>>>>>>> +
+>>>>>>> +static int pblk_line_mg_init(struct pblk *pblk)
+>>>>>>> +{
+>>>>>>> +	struct nvm_tgt_dev *dev = pblk->dev;
+>>>>>>> +	struct nvm_geo *geo = &dev->geo;
+>>>>>>>   	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+>>>>>>>   	struct pblk_line_meta *lm = &pblk->lm;
+>>>>>>> -	int i;
+>>>>>>> +	int i, bb_distance;
+>>>>>>> +
+>>>>>>> +	l_mg->nr_lines = geo->nr_chks;
+>>>>>>> +	l_mg->log_line = l_mg->data_line = NULL;
+>>>>>>> +	l_mg->l_seq_nr = l_mg->d_seq_nr = 0;
+>>>>>>> +	l_mg->nr_free_lines = 0;
+>>>>>>> +	bitmap_zero(&l_mg->meta_bitmap, PBLK_DATA_LINES);
+>>>>>>> +
+>>>>>>> +	INIT_LIST_HEAD(&l_mg->free_list);
+>>>>>>> +	INIT_LIST_HEAD(&l_mg->corrupt_list);
+>>>>>>> +	INIT_LIST_HEAD(&l_mg->bad_list);
+>>>>>>> +	INIT_LIST_HEAD(&l_mg->gc_full_list);
+>>>>>>> +	INIT_LIST_HEAD(&l_mg->gc_high_list);
+>>>>>>> +	INIT_LIST_HEAD(&l_mg->gc_mid_list);
+>>>>>>> +	INIT_LIST_HEAD(&l_mg->gc_low_list);
+>>>>>>> +	INIT_LIST_HEAD(&l_mg->gc_empty_list);
+>>>>>>> +
+>>>>>>> +	INIT_LIST_HEAD(&l_mg->emeta_list);
+>>>>>>> +
+>>>>>>> +	l_mg->gc_lists[0] = &l_mg->gc_high_list;
+>>>>>>> +	l_mg->gc_lists[1] = &l_mg->gc_mid_list;
+>>>>>>> +	l_mg->gc_lists[2] = &l_mg->gc_low_list;
+>>>>>>> +
+>>>>>>> +	spin_lock_init(&l_mg->free_lock);
+>>>>>>> +	spin_lock_init(&l_mg->close_lock);
+>>>>>>> +	spin_lock_init(&l_mg->gc_lock);
+>>>>>>> +
+>>>>>>> +	l_mg->vsc_list = kcalloc(l_mg->nr_lines, sizeof(__le32), GFP_KERNEL);
+>>>>>>> +	if (!l_mg->vsc_list)
+>>>>>>> +		goto fail;
+>>>>>>> +
+>>>>>>> +	l_mg->bb_template = kzalloc(lm->sec_bitmap_len, GFP_KERNEL);
+>>>>>>> +	if (!l_mg->bb_template)
+>>>>>>> +		goto fail_free_vsc_list;
+>>>>>>> +
+>>>>>>> +	l_mg->bb_aux = kzalloc(lm->sec_bitmap_len, GFP_KERNEL);
+>>>>>>> +	if (!l_mg->bb_aux)
+>>>>>>> +		goto fail_free_bb_template;
+>>>>>>>     	/* smeta is always small enough to fit on a kmalloc memory allocation,
+>>>>>>>   	 * emeta depends on the number of LUNs allocated to the pblk instance
+>>>>>>> @@ -656,13 +746,13 @@ static int pblk_lines_alloc_metadata(struct pblk *pblk)
+>>>>>>>   		}
+>>>>>>>   	}
+>>>>>>>   -	l_mg->vsc_list = kcalloc(l_mg->nr_lines, sizeof(__le32), GFP_KERNEL);
+>>>>>>> -	if (!l_mg->vsc_list)
+>>>>>>> -		goto fail_free_emeta;
+>>>>>>> -
+>>>>>>>   	for (i = 0; i < l_mg->nr_lines; i++)
+>>>>>>>   		l_mg->vsc_list[i] = cpu_to_le32(EMPTY_ENTRY);
+>>>>>>>   +	bb_distance = (geo->all_luns) * geo->ws_opt;
+>>>>>>> +	for (i = 0; i < lm->sec_per_line; i += bb_distance)
+>>>>>>> +		bitmap_set(l_mg->bb_template, i, geo->ws_opt);
+>>>>>>> +
+>>>>>>>   	return 0;
+>>>>>>>     fail_free_emeta:
+>>>>>>> @@ -673,69 +763,25 @@ static int pblk_lines_alloc_metadata(struct pblk *pblk)
+>>>>>>>   			kfree(l_mg->eline_meta[i]->buf);
+>>>>>>>   		kfree(l_mg->eline_meta[i]);
+>>>>>>>   	}
+>>>>>>> -
+>>>>>>>   fail_free_smeta:
+>>>>>>>   	for (i = 0; i < PBLK_DATA_LINES; i++)
+>>>>>>>   		kfree(l_mg->sline_meta[i]);
+>>>>>>> -
+>>>>>>> +	kfree(l_mg->bb_aux);
+>>>>>>> +fail_free_bb_template:
+>>>>>>> +	kfree(l_mg->bb_template);
+>>>>>>> +fail_free_vsc_list:
+>>>>>>> +	kfree(l_mg->vsc_list);
+>>>>>>> +fail:
+>>>>>>>   	return -ENOMEM;
+>>>>>>>   }
+>>>>>>>   -static int pblk_setup_line_meta(struct pblk *pblk, struct pblk_line *line,
+>>>>>>> -				void *chunk_log, long *nr_bad_blks)
+>>>>>>> -{
+>>>>>>> -	struct pblk_line_meta *lm = &pblk->lm;
+>>>>>>> -
+>>>>>>> -	line->blk_bitmap = kzalloc(lm->blk_bitmap_len, GFP_KERNEL);
+>>>>>>> -	if (!line->blk_bitmap)
+>>>>>>> -		return -ENOMEM;
+>>>>>>> -
+>>>>>>> -	line->erase_bitmap = kzalloc(lm->blk_bitmap_len, GFP_KERNEL);
+>>>>>>> -	if (!line->erase_bitmap) {
+>>>>>>> -		kfree(line->blk_bitmap);
+>>>>>>> -		return -ENOMEM;
+>>>>>>> -	}
+>>>>>>> -
+>>>>>>> -	*nr_bad_blks = pblk_bb_line(pblk, line, chunk_log, lm->blk_per_line);
+>>>>>>> -
+>>>>>>> -	return 0;
+>>>>>>> -}
+>>>>>>> -
+>>>>>>> -static int pblk_lines_init(struct pblk *pblk)
+>>>>>>> +static int pblk_line_meta_init(struct pblk *pblk)
+>>>>>>>   {
+>>>>>>>   	struct nvm_tgt_dev *dev = pblk->dev;
+>>>>>>>   	struct nvm_geo *geo = &dev->geo;
+>>>>>>> -	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+>>>>>>>   	struct pblk_line_meta *lm = &pblk->lm;
+>>>>>>> -	struct pblk_line *line;
+>>>>>>> -	void *chunk_log;
+>>>>>>>   	unsigned int smeta_len, emeta_len;
+>>>>>>> -	long nr_bad_blks = 0, nr_free_blks = 0;
+>>>>>>> -	int bb_distance, max_write_ppas, mod;
+>>>>>>> -	int i, ret;
+>>>>>>> -
+>>>>>>> -	pblk->min_write_pgs = geo->sec_per_pl * (geo->sec_size / PAGE_SIZE);
+>>>>>>> -	max_write_ppas = pblk->min_write_pgs * geo->all_luns;
+>>>>>>> -	pblk->max_write_pgs = min_t(int, max_write_ppas, NVM_MAX_VLBA);
+>>>>>>> -	pblk_set_sec_per_write(pblk, pblk->min_write_pgs);
+>>>>>>> -
+>>>>>>> -	if (pblk->max_write_pgs > PBLK_MAX_REQ_ADDRS) {
+>>>>>>> -		pr_err("pblk: vector list too big(%u > %u)\n",
+>>>>>>> -				pblk->max_write_pgs, PBLK_MAX_REQ_ADDRS);
+>>>>>>> -		return -EINVAL;
+>>>>>>> -	}
+>>>>>>> -
+>>>>>>> -	div_u64_rem(geo->sec_per_chk, pblk->min_write_pgs, &mod);
+>>>>>>> -	if (mod) {
+>>>>>>> -		pr_err("pblk: bad configuration of sectors/pages\n");
+>>>>>>> -		return -EINVAL;
+>>>>>>> -	}
+>>>>>>> -
+>>>>>>> -	l_mg->nr_lines = geo->nr_chks;
+>>>>>>> -	l_mg->log_line = l_mg->data_line = NULL;
+>>>>>>> -	l_mg->l_seq_nr = l_mg->d_seq_nr = 0;
+>>>>>>> -	l_mg->nr_free_lines = 0;
+>>>>>>> -	bitmap_zero(&l_mg->meta_bitmap, PBLK_DATA_LINES);
+>>>>>>> +	int i;
+>>>>>>>     	lm->sec_per_line = geo->sec_per_chk * geo->all_luns;
+>>>>>>>   	lm->blk_per_line = geo->all_luns;
+>>>>>>> @@ -787,58 +833,43 @@ static int pblk_lines_init(struct pblk *pblk)
+>>>>>>>   		return -EINVAL;
+>>>>>>>   	}
+>>>>>>>   -	ret = pblk_lines_alloc_metadata(pblk);
+>>>>>>> +	return 0;
+>>>>>>> +}
+>>>>>>> +
+>>>>>>> +static int pblk_lines_init(struct pblk *pblk)
+>>>>>>> +{
+>>>>>>> +	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+>>>>>>> +	struct pblk_line_meta *lm = &pblk->lm;
+>>>>>>> +	struct pblk_line *line;
+>>>>>>> +	void *chunk_log;
+>>>>>>> +	long nr_bad_blks = 0, nr_free_blks = 0;
+>>>>>>> +	int i, ret;
+>>>>>>> +
+>>>>>>> +	ret = pblk_line_meta_init(pblk);
+>>>>>>> +	if (ret)
+>>>>>>> +		return ret;
+>>>>>>> +
+>>>>>>> +	ret = pblk_line_mg_init(pblk);
+>>>>>>>   	if (ret)
+>>>>>>>   		return ret;
+>>>>>>>   -	l_mg->bb_template = kzalloc(lm->sec_bitmap_len, GFP_KERNEL);
+>>>>>>> -	if (!l_mg->bb_template) {
+>>>>>>> -		ret = -ENOMEM;
+>>>>>>> +	ret = pblk_luns_init(pblk);
+>>>>>>> +	if (ret)
+>>>>>>>   		goto fail_free_meta;
+>>>>>>> -	}
+>>>>>>> -
+>>>>>>> -	l_mg->bb_aux = kzalloc(lm->sec_bitmap_len, GFP_KERNEL);
+>>>>>>> -	if (!l_mg->bb_aux) {
+>>>>>>> -		ret = -ENOMEM;
+>>>>>>> -		goto fail_free_bb_template;
+>>>>>>> -	}
+>>>>>>> -
+>>>>>>> -	bb_distance = (geo->all_luns) * geo->sec_per_pl;
+>>>>>>> -	for (i = 0; i < lm->sec_per_line; i += bb_distance)
+>>>>>>> -		bitmap_set(l_mg->bb_template, i, geo->sec_per_pl);
+>>>>>>> -
+>>>>>>> -	INIT_LIST_HEAD(&l_mg->free_list);
+>>>>>>> -	INIT_LIST_HEAD(&l_mg->corrupt_list);
+>>>>>>> -	INIT_LIST_HEAD(&l_mg->bad_list);
+>>>>>>> -	INIT_LIST_HEAD(&l_mg->gc_full_list);
+>>>>>>> -	INIT_LIST_HEAD(&l_mg->gc_high_list);
+>>>>>>> -	INIT_LIST_HEAD(&l_mg->gc_mid_list);
+>>>>>>> -	INIT_LIST_HEAD(&l_mg->gc_low_list);
+>>>>>>> -	INIT_LIST_HEAD(&l_mg->gc_empty_list);
+>>>>>>> -
+>>>>>>> -	INIT_LIST_HEAD(&l_mg->emeta_list);
+>>>>>>> -
+>>>>>>> -	l_mg->gc_lists[0] = &l_mg->gc_high_list;
+>>>>>>> -	l_mg->gc_lists[1] = &l_mg->gc_mid_list;
+>>>>>>> -	l_mg->gc_lists[2] = &l_mg->gc_low_list;
+>>>>>>> -
+>>>>>>> -	spin_lock_init(&l_mg->free_lock);
+>>>>>>> -	spin_lock_init(&l_mg->close_lock);
+>>>>>>> -	spin_lock_init(&l_mg->gc_lock);
+>>>>>>> -
+>>>>>>> -	pblk->lines = kcalloc(l_mg->nr_lines, sizeof(struct pblk_line),
+>>>>>>> -								GFP_KERNEL);
+>>>>>>> -	if (!pblk->lines) {
+>>>>>>> -		ret = -ENOMEM;
+>>>>>>> -		goto fail_free_bb_aux;
+>>>>>>> -	}
+>>>>>>>     	chunk_log = pblk_bb_get_log(pblk);
+>>>>>>>   	if (IS_ERR(chunk_log)) {
+>>>>>>>   		pr_err("pblk: could not get bad block log (%lu)\n",
+>>>>>>>   							PTR_ERR(chunk_log));
+>>>>>>>   		ret = PTR_ERR(chunk_log);
+>>>>>>> -		goto fail_free_lines;
+>>>>>>> +		goto fail_free_luns;
+>>>>>>> +	}
+>>>>>>> +
+>>>>>>> +	pblk->lines = kcalloc(l_mg->nr_lines, sizeof(struct pblk_line),
+>>>>>>> +								GFP_KERNEL);
+>>>>>>> +	if (!pblk->lines) {
+>>>>>>> +		ret = -ENOMEM;
+>>>>>>> +		goto fail_free_chunk_log;
+>>>>>>>   	}
+>>>>>>>     	for (i = 0; i < l_mg->nr_lines; i++) {
+>>>>>>> @@ -856,7 +887,7 @@ static int pblk_lines_init(struct pblk *pblk)
+>>>>>>>     		ret = pblk_setup_line_meta(pblk, line, chunk_log, &nr_bad_blks);
+>>>>>>>   		if (ret)
+>>>>>>> -			goto fail_free_chunk_log;
+>>>>>>> +			goto fail_free_lines;
+>>>>>>>     		chk_in_line = lm->blk_per_line - nr_bad_blks;
+>>>>>>>   		if (nr_bad_blks < 0 || nr_bad_blks > lm->blk_per_line ||
+>>>>>>> @@ -878,16 +909,14 @@ static int pblk_lines_init(struct pblk *pblk)
+>>>>>>>   	kfree(chunk_log);
+>>>>>>>   	return 0;
+>>>>>>>   -fail_free_chunk_log:
+>>>>>>> -	kfree(chunk_log);
+>>>>>>> +fail_free_lines:
+>>>>>>>   	while (--i >= 0)
+>>>>>>>   		pblk_line_meta_free(&pblk->lines[i]);
+>>>>>>> -fail_free_lines:
+>>>>>>>   	kfree(pblk->lines);
+>>>>>>> -fail_free_bb_aux:
+>>>>>>> -	kfree(l_mg->bb_aux);
+>>>>>>> -fail_free_bb_template:
+>>>>>>> -	kfree(l_mg->bb_template);
+>>>>>>> +fail_free_chunk_log:
+>>>>>>> +	kfree(chunk_log);
+>>>>>>> +fail_free_luns:
+>>>>>>> +	kfree(pblk->luns);
+>>>>>>>   fail_free_meta:
+>>>>>>>   	pblk_line_mg_free(pblk);
+>>>>>>>   @@ -930,12 +959,10 @@ static void pblk_writer_stop(struct pblk *pblk)
+>>>>>>>     static void pblk_free(struct pblk *pblk)
+>>>>>>>   {
+>>>>>>> -	pblk_luns_free(pblk);
+>>>>>>>   	pblk_lines_free(pblk);
+>>>>>>> -	kfree(pblk->pad_dist);
+>>>>>>> -	pblk_line_mg_free(pblk);
+>>>>>>> -	pblk_core_free(pblk);
+>>>>>>>   	pblk_l2p_free(pblk);
+>>>>>>> +	pblk_rwb_free(pblk);
+>>>>>>> +	pblk_core_free(pblk);
+>>>>>>>     	kfree(pblk);
+>>>>>>>   }
+>>>>>>> @@ -1000,19 +1027,6 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
+>>>>>>>   	spin_lock_init(&pblk->trans_lock);
+>>>>>>>   	spin_lock_init(&pblk->lock);
+>>>>>>>   -	if (flags & NVM_TARGET_FACTORY)
+>>>>>>> -		pblk_setup_uuid(pblk);
+>>>>>>> -
+>>>>>>> -	atomic64_set(&pblk->user_wa, 0);
+>>>>>>> -	atomic64_set(&pblk->pad_wa, 0);
+>>>>>>> -	atomic64_set(&pblk->gc_wa, 0);
+>>>>>>> -	pblk->user_rst_wa = 0;
+>>>>>>> -	pblk->pad_rst_wa = 0;
+>>>>>>> -	pblk->gc_rst_wa = 0;
+>>>>>>> -
+>>>>>>> -	atomic64_set(&pblk->nr_flush, 0);
+>>>>>>> -	pblk->nr_flush_rst = 0;
+>>>>>>> -
+>>>>>>>   #ifdef CONFIG_NVM_DEBUG
+>>>>>>>   	atomic_long_set(&pblk->inflight_writes, 0);
+>>>>>>>   	atomic_long_set(&pblk->padded_writes, 0);
+>>>>>>> @@ -1036,48 +1050,35 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
+>>>>>>>   	atomic_long_set(&pblk->write_failed, 0);
+>>>>>>>   	atomic_long_set(&pblk->erase_failed, 0);
+>>>>>>>   -	ret = pblk_luns_init(pblk, dev->luns);
+>>>>>>> -	if (ret) {
+>>>>>>> -		pr_err("pblk: could not initialize luns\n");
+>>>>>>> -		goto fail;
+>>>>>>> -	}
+>>>>>>> -
+>>>>>>> -	ret = pblk_lines_init(pblk);
+>>>>>>> -	if (ret) {
+>>>>>>> -		pr_err("pblk: could not initialize lines\n");
+>>>>>>> -		goto fail_free_luns;
+>>>>>>> -	}
+>>>>>>> -
+>>>>>>> -	pblk->pad_dist = kzalloc((pblk->min_write_pgs - 1) * sizeof(atomic64_t),
+>>>>>>> -				 GFP_KERNEL);
+>>>>>>> -	if (!pblk->pad_dist) {
+>>>>>>> -		ret = -ENOMEM;
+>>>>>>> -		goto fail_free_line_meta;
+>>>>>>> -	}
+>>>>>>> -
+>>>>>>>   	ret = pblk_core_init(pblk);
+>>>>>>>   	if (ret) {
+>>>>>>>   		pr_err("pblk: could not initialize core\n");
+>>>>>>> -		goto fail_free_pad_dist;
+>>>>>>> +		goto fail;
+>>>>>>>   	}
+>>>>>>>   -	ret = pblk_l2p_init(pblk);
+>>>>>>> +	ret = pblk_lines_init(pblk);
+>>>>>>>   	if (ret) {
+>>>>>>> -		pr_err("pblk: could not initialize maps\n");
+>>>>>>> +		pr_err("pblk: could not initialize lines\n");
+>>>>>>>   		goto fail_free_core;
+>>>>>>>   	}
+>>>>>>>   -	ret = pblk_lines_configure(pblk, flags);
+>>>>>>> +	ret = pblk_rwb_init(pblk);
+>>>>>>>   	if (ret) {
+>>>>>>> -		pr_err("pblk: could not configure lines\n");
+>>>>>>> -		goto fail_free_l2p;
+>>>>>>> +		pr_err("pblk: could not initialize write buffer\n");
+>>>>>>> +		goto fail_free_lines;
+>>>>>>> +	}
+>>>>>>> +
+>>>>>>> +	ret = pblk_l2p_init(pblk, flags & NVM_TARGET_FACTORY);
+>>>>>>> +	if (ret) {
+>>>>>>> +		pr_err("pblk: could not initialize maps\n");
+>>>>>>> +		goto fail_free_rwb;
+>>>>>>>   	}
+>>>>>>>     	ret = pblk_writer_init(pblk);
+>>>>>>>   	if (ret) {
+>>>>>>>   		if (ret != -EINTR)
+>>>>>>>   			pr_err("pblk: could not initialize write thread\n");
+>>>>>>> -		goto fail_free_lines;
+>>>>>>> +		goto fail_free_l2p;
+>>>>>>>   	}
+>>>>>>>     	ret = pblk_gc_init(pblk);
+>>>>>>> @@ -1112,18 +1113,14 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
+>>>>>>>     fail_stop_writer:
+>>>>>>>   	pblk_writer_stop(pblk);
+>>>>>>> -fail_free_lines:
+>>>>>>> -	pblk_lines_free(pblk);
+>>>>>>>   fail_free_l2p:
+>>>>>>>   	pblk_l2p_free(pblk);
+>>>>>>> +fail_free_rwb:
+>>>>>>> +	pblk_rwb_free(pblk);
+>>>>>>> +fail_free_lines:
+>>>>>>> +	pblk_lines_free(pblk);
+>>>>>>>   fail_free_core:
+>>>>>>>   	pblk_core_free(pblk);
+>>>>>>> -fail_free_pad_dist:
+>>>>>>> -	kfree(pblk->pad_dist);
+>>>>>>> -fail_free_line_meta:
+>>>>>>> -	pblk_line_mg_free(pblk);
+>>>>>>> -fail_free_luns:
+>>>>>>> -	pblk_luns_free(pblk);
+>>>>>>>   fail:
+>>>>>>>   	kfree(pblk);
+>>>>>>>   	return ERR_PTR(ret);
+>>>>>>
+>>>>>> Thanks. I'm not able to squash it without conflict. Is it based on for-4.17/core?
+>>>>> Yes, it's based on for-4.17/core, but I can see a small conflict due to
+>>>>> the patches applied in the middle of these two. How do you want to do
+>>>>> it? We can keep them separately, or do a rebase on the current patches.
+>>>>
+>>>> This is all a bit of a mess- Can you send a fix I can apply that fixes
+>>>> up the 0-day, and then this larger patch can be applied afterwards?
+>>>> (e.g., before at after your other patches)
+>>> Not really. The problem is that the original refactoring for the bad
+>>> block table was a bandage on the init/exit sequence problem. The
+>>> init/ext patch is the one that does it properly.
+>>> What we can do, since this is only in your tree, is rebase and pull the
+>>> bad block patch up and then merge with init/exit. This way we fix the
+>>> original problem and the introduced double free is non-existing.
+>>> I can do the rebasing this evening and put it in a different branch you
+>>> can review.
+>>
+>> No thanks. I fixed it up with this:
+>>
+>> diff --git i/drivers/lightnvm/pblk-init.c w/drivers/lightnvm/pblk-init.c
+>> index a2b54a88968b..c31e24aabc18 100644
+>> --- i/drivers/lightnvm/pblk-init.c
+>> +++ w/drivers/lightnvm/pblk-init.c
+>> @@ -838,7 +838,7 @@ static int pblk_lines_init(struct pblk *pblk)
+>>                 pr_err("pblk: could not get bad block log (%lu)\n",
+>> PTR_ERR(chunk_log));
+>>                 ret = PTR_ERR(chunk_log);
+>> -               goto fail_free_lines;
+>> +               goto fail_free_bb_aux;
+>>         }
+>>
+>>         for (i = 0; i < l_mg->nr_lines; i++) {
+>> @@ -882,8 +882,6 @@ static int pblk_lines_init(struct pblk *pblk)
+>>         kfree(chunk_log);
+>>         while (--i >= 0)
+>>                 pblk_line_meta_free(&pblk->lines[i]);
+>> -fail_free_lines:
+>> -       kfree(pblk->lines);
+>> fail_free_bb_aux:
+>>         kfree(l_mg->bb_aux);
+>> fail_free_bb_template:
+> 
+> It's not that simple... There are other double frees due to the way l_mg
+> is allocated, which is fixed on the other patch.
+> 
 
-When there are too many I/O errors on cache device, current bcache code
-will retire the whole cache set, and detach all bcache devices. But the
-detached bcache devices are not stopped, which is problematic when bcache
-is in writeback mode.
-
-If the retired cache set has dirty data of backing devices, continue
-writing to bcache device will write to backing device directly. If the
-LBA of write request has a dirty version cached on cache device, next time
-when the cache device is re-registered and backing device re-attached to
-it again, the stale dirty data on cache device will be written to backing
-device, and overwrite latest directly written data. This situation causes
-a quite data corruption.
-
-But we cannot simply stop all attached bcache devices when the cache set is
-broken or disconnected. For example, use bcache to accelerate performance
-of an email service. In such workload, if cache device is broken but no
-dirty data lost, keep the bcache device alive and permit email service
-continue to access user data might be a better solution for the cache
-device failure.
-
-Nix <nix@esperi.org.uk> points out the issue and provides the above example
-to explain why it might be necessary to not stop bcache device for broken
-cache device. Pavel Goran <via-bcache@pvgoran.name> provides a brilliant
-suggestion to provide "always" and "auto" options to per-cached device
-sysfs file stop_when_cache_set_failed. If cache set is retiring and the
-backing device has no dirty data on cache, it should be safe to keep the
-bcache device alive. In this case, if stop_when_cache_set_failed is set to
-"auto", the device failure handling code will not stop this bcache device
-and permit application to access the backing device with a unattached
-bcache device.
-
-Changelog:
-[mlyle: edited to not break string constants across lines]
-v3: fix typos pointed out by Nix.
-v2: change option values of stop_when_cache_set_failed from 1/0 to
-    "auto"/"always".
-v1: initial version, stop_when_cache_set_failed can be 0 (not stop) or 1
-    (always stop).
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
-Signed-off-by: Michael Lyle <mlyle@lyle.org>
-Cc: Nix <nix@esperi.org.uk>
-Cc: Pavel Goran <via-bcache@pvgoran.name>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
-Cc: Hannes Reinecke <hare@suse.com>
----
- drivers/md/bcache/bcache.h |  9 ++++++
- drivers/md/bcache/super.c  | 78 ++++++++++++++++++++++++++++++++++++++++------
- drivers/md/bcache/sysfs.c  | 17 ++++++++++
- 3 files changed, 94 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 8a0327581d62..5e9f3610c6fd 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -288,6 +288,12 @@ struct io {
- 	sector_t		last;
- };
- 
-+enum stop_on_failure {
-+	BCH_CACHED_DEV_STOP_AUTO = 0,
-+	BCH_CACHED_DEV_STOP_ALWAYS,
-+	BCH_CACHED_DEV_STOP_MODE_MAX,
-+};
-+
- struct cached_dev {
- 	struct list_head	list;
- 	struct bcache_device	disk;
-@@ -380,6 +386,8 @@ struct cached_dev {
- 	unsigned		writeback_rate_i_term_inverse;
- 	unsigned		writeback_rate_p_term_inverse;
- 	unsigned		writeback_rate_minimum;
-+
-+	enum stop_on_failure	stop_when_cache_set_failed;
- };
- 
- enum alloc_reserve {
-@@ -939,6 +947,7 @@ void bch_write_bdev_super(struct cached_dev *, struct closure *);
- 
- extern struct workqueue_struct *bcache_wq;
- extern const char * const bch_cache_modes[];
-+extern const char * const bch_stop_on_failure_modes[];
- extern struct mutex bch_register_lock;
- extern struct list_head bch_cache_sets;
- 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index fea283e6389e..dab9f59a1a2f 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -47,6 +47,14 @@ const char * const bch_cache_modes[] = {
- 	NULL
- };
- 
-+/* Default is -1; we skip past it for stop_when_cache_set_failed */
-+const char * const bch_stop_on_failure_modes[] = {
-+	"default",
-+	"auto",
-+	"always",
-+	NULL
-+};
-+
- static struct kobject *bcache_kobj;
- struct mutex bch_register_lock;
- LIST_HEAD(bch_cache_sets);
-@@ -1199,6 +1207,9 @@ static int cached_dev_init(struct cached_dev *dc, unsigned block_size)
- 		max(dc->disk.disk->queue->backing_dev_info->ra_pages,
- 		    q->backing_dev_info->ra_pages);
- 
-+	/* default to auto */
-+	dc->stop_when_cache_set_failed = BCH_CACHED_DEV_STOP_AUTO;
-+
- 	bch_cached_dev_request_init(dc);
- 	bch_cached_dev_writeback_init(dc);
- 	return 0;
-@@ -1475,25 +1486,72 @@ static void cache_set_flush(struct closure *cl)
- 	closure_return(cl);
- }
- 
-+/*
-+ * This function is only called when CACHE_SET_IO_DISABLE is set, which means
-+ * cache set is unregistering due to too many I/O errors. In this condition,
-+ * the bcache device might be stopped, it depends on stop_when_cache_set_failed
-+ * value and whether the broken cache has dirty data:
-+ *
-+ * dc->stop_when_cache_set_failed    dc->has_dirty   stop bcache device
-+ *  BCH_CACHED_STOP_AUTO               0               NO
-+ *  BCH_CACHED_STOP_AUTO               1               YES
-+ *  BCH_CACHED_DEV_STOP_ALWAYS         0               YES
-+ *  BCH_CACHED_DEV_STOP_ALWAYS         1               YES
-+ *
-+ * The expected behavior is, if stop_when_cache_set_failed is configured to
-+ * "auto" via sysfs interface, the bcache device will not be stopped if the
-+ * backing device is clean on the broken cache device.
-+ */
-+static void conditional_stop_bcache_device(struct cache_set *c,
-+					   struct bcache_device *d,
-+					   struct cached_dev *dc)
-+{
-+	if (dc->stop_when_cache_set_failed == BCH_CACHED_DEV_STOP_ALWAYS) {
-+		pr_warn("stop_when_cache_set_failed of %s is \"always\", stop it for failed cache set %pU.",
-+			d->disk->disk_name, c->sb.set_uuid);
-+		bcache_device_stop(d);
-+	} else if (atomic_read(&dc->has_dirty)) {
-+		/*
-+		 * dc->stop_when_cache_set_failed == BCH_CACHED_STOP_AUTO
-+		 * and dc->has_dirty == 1
-+		 */
-+		pr_warn("stop_when_cache_set_failed of %s is \"auto\" and cache is dirty, stop it to avoid potential data corruption.",
-+			d->disk->disk_name);
-+			bcache_device_stop(d);
-+	} else {
-+		/*
-+		 * dc->stop_when_cache_set_failed == BCH_CACHED_STOP_AUTO
-+		 * and dc->has_dirty == 0
-+		 */
-+		pr_warn("stop_when_cache_set_failed of %s is \"auto\" and cache is clean, keep it alive.",
-+			d->disk->disk_name);
-+	}
-+}
-+
- static void __cache_set_unregister(struct closure *cl)
- {
- 	struct cache_set *c = container_of(cl, struct cache_set, caching);
- 	struct cached_dev *dc;
-+	struct bcache_device *d;
- 	size_t i;
- 
- 	mutex_lock(&bch_register_lock);
- 
--	for (i = 0; i < c->devices_max_used; i++)
--		if (c->devices[i]) {
--			if (!UUID_FLASH_ONLY(&c->uuids[i]) &&
--			    test_bit(CACHE_SET_UNREGISTERING, &c->flags)) {
--				dc = container_of(c->devices[i],
--						  struct cached_dev, disk);
--				bch_cached_dev_detach(dc);
--			} else {
--				bcache_device_stop(c->devices[i]);
--			}
-+	for (i = 0; i < c->devices_max_used; i++) {
-+		d = c->devices[i];
-+		if (!d)
-+			continue;
-+
-+		if (!UUID_FLASH_ONLY(&c->uuids[i]) &&
-+		    test_bit(CACHE_SET_UNREGISTERING, &c->flags)) {
-+			dc = container_of(d, struct cached_dev, disk);
-+			bch_cached_dev_detach(dc);
-+			if (test_bit(CACHE_SET_IO_DISABLE, &c->flags))
-+				conditional_stop_bcache_device(c, d, dc);
-+		} else {
-+			bcache_device_stop(d);
- 		}
-+	}
- 
- 	mutex_unlock(&bch_register_lock);
- 
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index a3a45de5626d..414129f7c49f 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -78,6 +78,7 @@ rw_attribute(congested_write_threshold_us);
- rw_attribute(sequential_cutoff);
- rw_attribute(data_csum);
- rw_attribute(cache_mode);
-+rw_attribute(stop_when_cache_set_failed);
- rw_attribute(writeback_metadata);
- rw_attribute(writeback_running);
- rw_attribute(writeback_percent);
-@@ -126,6 +127,12 @@ SHOW(__bch_cached_dev)
- 					       bch_cache_modes + 1,
- 					       BDEV_CACHE_MODE(&dc->sb));
- 
-+	if (attr == &sysfs_stop_when_cache_set_failed)
-+		return bch_snprint_string_list(buf, PAGE_SIZE,
-+					       bch_stop_on_failure_modes + 1,
-+					       dc->stop_when_cache_set_failed);
-+
-+
- 	sysfs_printf(data_csum,		"%i", dc->disk.data_csum);
- 	var_printf(verify,		"%i");
- 	var_printf(bypass_torture_test,	"%i");
-@@ -247,6 +254,15 @@ STORE(__cached_dev)
- 		}
- 	}
- 
-+	if (attr == &sysfs_stop_when_cache_set_failed) {
-+		v = bch_read_string_list(buf, bch_stop_on_failure_modes + 1);
-+
-+		if (v < 0)
-+			return v;
-+
-+		dc->stop_when_cache_set_failed = v;
-+	}
-+
- 	if (attr == &sysfs_label) {
- 		if (size > SB_LABEL_SIZE)
- 			return -EINVAL;
-@@ -326,6 +342,7 @@ static struct attribute *bch_cached_dev_files[] = {
- 	&sysfs_data_csum,
- #endif
- 	&sysfs_cache_mode,
-+	&sysfs_stop_when_cache_set_failed,
- 	&sysfs_writeback_metadata,
- 	&sysfs_writeback_running,
- 	&sysfs_writeback_delay,
--- 
-2.14.1
+I know that. This was to fix up the original patch. I do not want to 
+rebase ack'ed patches.
