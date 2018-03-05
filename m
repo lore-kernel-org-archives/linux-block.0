@@ -1,73 +1,141 @@
-Return-Path: <msnitzer@redhat.com>
-Date: Mon, 5 Mar 2018 10:19:38 -0500
-From: Mike Snitzer <snitzer@redhat.com>
-To: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Laurence Oberman <loberman@redhat.com>,
-	Don Brace <don.brace@microsemi.com>, Ming Lei <ming.lei@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>, linux-scsi@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>, Arun Easi <arun.easi@cavium.com>,
-	Omar Sandoval <osandov@fb.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Peter Rivera <peter.rivera@broadcom.com>,
-	Meelis Roos <mroos@linux.ee>
-Subject: Re: [PATCH V3 1/8] scsi: hpsa: fix selection of reply queue
-Message-ID: <20180305151938.GA16185@redhat.com>
+Return-Path: <don.brace@microsemi.com>
+From: Don Brace <don.brace@microsemi.com>
+To: Kashyap Desai <kashyap.desai@broadcom.com>, Laurence Oberman
+	<loberman@redhat.com>, Ming Lei <ming.lei@redhat.com>
+CC: Jens Axboe <axboe@kernel.dk>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, Christoph Hellwig <hch@infradead.org>, "Mike
+ Snitzer" <snitzer@redhat.com>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>, Hannes Reinecke <hare@suse.de>, Arun Easi
+	<arun.easi@cavium.com>, Omar Sandoval <osandov@fb.com>, "Martin K . Petersen"
+	<martin.petersen@oracle.com>, James Bottomley
+	<james.bottomley@hansenpartnership.com>, Christoph Hellwig <hch@lst.de>,
+	Peter Rivera <peter.rivera@broadcom.com>, Meelis Roos <mroos@linux.ee>
+Subject: RE: [PATCH V3 1/8] scsi: hpsa: fix selection of reply queue
+Date: Mon, 5 Mar 2018 14:35:59 +0000
+Message-ID: <2117ea1d98c14456933b5ed2ee86f5cf@microsemi.com>
 References: <20180227100750.32299-1-ming.lei@redhat.com>
- <20180227100750.32299-2-ming.lei@redhat.com>
- <633459ac33bf49c9a3ff6e515aa790de@microsemi.com>
- <1519930884.9730.8.camel@redhat.com>
- <1519939174.15243.0.camel@redhat.com>
- <20180302021557.GC10471@ming.t460p>
- <1519999769.16293.1.camel@redhat.com>
- <d728ee1c12b14627beedcd72ce9bb4a7@microsemi.com>
+	 <20180227100750.32299-2-ming.lei@redhat.com>
+	 <633459ac33bf49c9a3ff6e515aa790de@microsemi.com>
+	 <1519930884.9730.8.camel@redhat.com> <1519939174.15243.0.camel@redhat.com>
+	 <20180302021557.GC10471@ming.t460p> <1519999769.16293.1.camel@redhat.com>
+	 <d728ee1c12b14627beedcd72ce9bb4a7@microsemi.com>
  <1520027601.16293.5.camel@redhat.com>
  <415904b102f8c65bf8e6915fd7cd4d7f@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <415904b102f8c65bf8e6915fd7cd4d7f@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Return-Path: don.brace@microsemi.com
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Mar 05 2018 at  2:23am -0500,
-Kashyap Desai <kashyap.desai@broadcom.com> wrote:
-
-> > -----Original Message-----
-> > From: Laurence Oberman [mailto:loberman@redhat.com]
-> > Sent: Saturday, March 3, 2018 3:23 AM
-> > To: Don Brace; Ming Lei
-> > Cc: Jens Axboe; linux-block@vger.kernel.org; Christoph Hellwig; Mike
-> > Snitzer;
-> > linux-scsi@vger.kernel.org; Hannes Reinecke; Arun Easi; Omar Sandoval;
-> > Martin K . Petersen; James Bottomley; Christoph Hellwig; Kashyap Desai;
-> > Peter
-> > Rivera; Meelis Roos
-> > Subject: Re: [PATCH V3 1/8] scsi: hpsa: fix selection of reply queue
-> >
-...
-> > Unless Kashyap is not happy we need to consider getting this in to Linus
-> > now
-> > because we are seeing HPE servers that keep hanging now with the original
-> > commit now upstream.
-> >
-> > Kashyap, are you good with the v3 patchset or still concerned with
-> > performance. I was getting pretty good IOPS/sec to individual SSD drives
-> > set
-> > up as jbod devices on the megaraid_sas.
-> 
-> Laurence -
-> Did you find difference with/without the patch ? What was IOPs number with
-> and without patch.
-> It is not urgent feature, so I would like to take some time to get BRCM's
-> performance team involved and do full analysis of performance run and find
-> pros/cons.
-
-Performance doesn't matter if the system cannot even boot (e.g. HPE
-servers with hpsa using the latest linus tree).
-
-Have you tried your testbed with just applying the first 2 patches?  Or
-do those cause the performance hit and the follow-on patches in the
-series attempt to recover from it?
-
-Mike
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBLYXNoeWFwIERlc2FpIFttYWls
+dG86a2FzaHlhcC5kZXNhaUBicm9hZGNvbS5jb21dDQo+IFNlbnQ6IE1vbmRheSwgTWFyY2ggMDUs
+IDIwMTggMToyNCBBTQ0KPiBUbzogTGF1cmVuY2UgT2Jlcm1hbiA8bG9iZXJtYW5AcmVkaGF0LmNv
+bT47IERvbiBCcmFjZQ0KPiA8ZG9uLmJyYWNlQG1pY3Jvc2VtaS5jb20+OyBNaW5nIExlaSA8bWlu
+Zy5sZWlAcmVkaGF0LmNvbT4NCj4gQ2M6IEplbnMgQXhib2UgPGF4Ym9lQGtlcm5lbC5kaz47IGxp
+bnV4LWJsb2NrQHZnZXIua2VybmVsLm9yZzsgQ2hyaXN0b3BoDQo+IEhlbGx3aWcgPGhjaEBpbmZy
+YWRlYWQub3JnPjsgTWlrZSBTbml0emVyIDxzbml0emVyQHJlZGhhdC5jb20+OyBsaW51eC0NCj4g
+c2NzaUB2Z2VyLmtlcm5lbC5vcmc7IEhhbm5lcyBSZWluZWNrZSA8aGFyZUBzdXNlLmRlPjsgQXJ1
+biBFYXNpDQo+IDxhcnVuLmVhc2lAY2F2aXVtLmNvbT47IE9tYXIgU2FuZG92YWwgPG9zYW5kb3ZA
+ZmIuY29tPjsgTWFydGluIEsgLg0KPiBQZXRlcnNlbiA8bWFydGluLnBldGVyc2VuQG9yYWNsZS5j
+b20+OyBKYW1lcyBCb3R0b21sZXkNCj4gPGphbWVzLmJvdHRvbWxleUBoYW5zZW5wYXJ0bmVyc2hp
+cC5jb20+OyBDaHJpc3RvcGggSGVsbHdpZyA8aGNoQGxzdC5kZT47DQo+IFBldGVyIFJpdmVyYSA8
+cGV0ZXIucml2ZXJhQGJyb2FkY29tLmNvbT47IE1lZWxpcyBSb29zIDxtcm9vc0BsaW51eC5lZT4N
+Cj4gU3ViamVjdDogUkU6IFtQQVRDSCBWMyAxLzhdIHNjc2k6IGhwc2E6IGZpeCBzZWxlY3Rpb24g
+b2YgcmVwbHkgcXVldWUNCj4gDQo+IEVYVEVSTkFMIEVNQUlMDQo+IA0KPiANCj4gPiAtLS0tLU9y
+aWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+IEZyb206IExhdXJlbmNlIE9iZXJtYW4gW21haWx0bzps
+b2Jlcm1hbkByZWRoYXQuY29tXQ0KPiA+IFNlbnQ6IFNhdHVyZGF5LCBNYXJjaCAzLCAyMDE4IDM6
+MjMgQU0NCj4gPiBUbzogRG9uIEJyYWNlOyBNaW5nIExlaQ0KPiA+IENjOiBKZW5zIEF4Ym9lOyBs
+aW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5vcmc7IENocmlzdG9waCBIZWxsd2lnOyBNaWtlDQo+ID4g
+U25pdHplcjsNCj4gPiBsaW51eC1zY3NpQHZnZXIua2VybmVsLm9yZzsgSGFubmVzIFJlaW5lY2tl
+OyBBcnVuIEVhc2k7IE9tYXIgU2FuZG92YWw7DQo+ID4gTWFydGluIEsgLiBQZXRlcnNlbjsgSmFt
+ZXMgQm90dG9tbGV5OyBDaHJpc3RvcGggSGVsbHdpZzsgS2FzaHlhcCBEZXNhaTsNCj4gPiBQZXRl
+cg0KPiA+IFJpdmVyYTsgTWVlbGlzIFJvb3MNCj4gPiBTdWJqZWN0OiBSZTogW1BBVENIIFYzIDEv
+OF0gc2NzaTogaHBzYTogZml4IHNlbGVjdGlvbiBvZiByZXBseSBxdWV1ZQ0KPiA+DQo+ID4gT24g
+RnJpLCAyMDE4LTAzLTAyIGF0IDE1OjAzICswMDAwLCBEb24gQnJhY2Ugd3JvdGU6DQo+ID4gPiA+
+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4gPiA+IEZyb206IExhdXJlbmNlIE9iZXJt
+YW4gW21haWx0bzpsb2Jlcm1hbkByZWRoYXQuY29tXQ0KPiA+ID4gPiBTZW50OiBGcmlkYXksIE1h
+cmNoIDAyLCAyMDE4IDg6MDkgQU0NCj4gPiA+ID4gVG86IE1pbmcgTGVpIDxtaW5nLmxlaUByZWRo
+YXQuY29tPg0KPiA+ID4gPiBDYzogRG9uIEJyYWNlIDxkb24uYnJhY2VAbWljcm9zZW1pLmNvbT47
+IEplbnMgQXhib2UgPGF4Ym9lQGtlcm5lbC5kDQo+ID4gPiA+IGs+Ow0KPiA+ID4gPiBsaW51eC1i
+bG9ja0B2Z2VyLmtlcm5lbC5vcmc7IENocmlzdG9waCBIZWxsd2lnIDxoY2hAaW5mcmFkZWFkLm9y
+Zz47DQo+ID4gPiA+IE1pa2UgU25pdHplciA8c25pdHplckByZWRoYXQuY29tPjsgbGludXgtc2Nz
+aUB2Z2VyLmtlcm5lbC5vcmc7DQo+ID4gPiA+IEhhbm5lcyBSZWluZWNrZSA8aGFyZUBzdXNlLmRl
+PjsgQXJ1biBFYXNpIDxhcnVuLmVhc2lAY2F2aXVtLmNvbT47DQo+ID4gPiA+IE9tYXIgU2FuZG92
+YWwgPG9zYW5kb3ZAZmIuY29tPjsgTWFydGluIEsgLiBQZXRlcnNlbg0KPiA+ID4gPiA8bWFydGlu
+LnBldGVyc2VuQG9yYWNsZS5jb20+OyBKYW1lcyBCb3R0b21sZXkNCj4gPiA+ID4gPGphbWVzLmJv
+dHRvbWxleUBoYW5zZW5wYXJ0bmVyc2hpcC5jb20+OyBDaHJpc3RvcGggSGVsbHdpZw0KPiA+ID4g
+PiA8aGNoQGxzdC5kZT47IEthc2h5YXAgRGVzYWkgPGthc2h5YXAuZGVzYWlAYnJvYWRjb20uY29t
+PjsgUGV0ZXINCj4gPiA+ID4gUml2ZXJhIDxwZXRlci5yaXZlcmFAYnJvYWRjb20uY29tPjsgTWVl
+bGlzIFJvb3MgPG1yb29zQGxpbnV4LmVlPg0KPiA+ID4gPiBTdWJqZWN0OiBSZTogW1BBVENIIFYz
+IDEvOF0gc2NzaTogaHBzYTogZml4IHNlbGVjdGlvbiBvZiByZXBseSBxdWV1ZQ0KPiA+ID4gPg0K
+PiA+ID4gPiBFWFRFUk5BTCBFTUFJTA0KPiA+ID4gPg0KPiA+ID4gPg0KPiA+ID4gPiBPbiBGcmks
+IDIwMTgtMDMtMDIgYXQgMTA6MTYgKzA4MDAsIE1pbmcgTGVpIHdyb3RlOg0KPiA+ID4gPiA+IE9u
+IFRodSwgTWFyIDAxLCAyMDE4IGF0IDA0OjE5OjM0UE0gLTA1MDAsIExhdXJlbmNlIE9iZXJtYW4g
+d3JvdGU6DQo+ID4gPiA+ID4gPiBPbiBUaHUsIDIwMTgtMDMtMDEgYXQgMTQ6MDEgLTA1MDAsIExh
+dXJlbmNlIE9iZXJtYW4gd3JvdGU6DQo+ID4gPiA+ID4gPiA+IE9uIFRodSwgMjAxOC0wMy0wMSBh
+dCAxNjoxOCArMDAwMCwgRG9uIEJyYWNlIHdyb3RlOg0KPiA+ID4gPiA+ID4gPiA+ID4gLS0tLS1P
+cmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPiA+ID4gPiA+ID4gPiA+IEZyb206IE1pbmcgTGVpIFtt
+YWlsdG86bWluZy5sZWlAcmVkaGF0LmNvbV0NCj4gPiA+ID4gPiA+ID4gPiA+IFNlbnQ6IFR1ZXNk
+YXksIEZlYnJ1YXJ5IDI3LCAyMDE4IDQ6MDggQU0NCj4gPiA+ID4gPiA+ID4gPiA+IFRvOiBKZW5z
+IEF4Ym9lIDxheGJvZUBrZXJuZWwuZGs+OyBsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbA0KPiA+ID4g
+PiA+ID4gPiA+ID4gLm9yZyA7IENocmlzdG9waCBIZWxsd2lnIDxoY2hAaW5mcmFkZWFkLm9yZz47
+IE1pa2UgU25pdHplcg0KPiA+ID4gPiA+ID4gPiA+ID4gPHNuaXR6ZXJAcmVkaGF0IC5jb20NCj4g
+PiA+ID4gPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+ID4gPiBD
+YzogbGludXgtc2NzaUB2Z2VyLmtlcm5lbC5vcmc7IEhhbm5lcyBSZWluZWNrZSA8aGFyZUBzdXMN
+Cj4gPiA+ID4gPiA+ID4gPiA+IGUuZGUNCj4gPiA+ID4gPiA+ID4gPiA+ID4gOw0KPiA+ID4gPiA+
+ID4gPiA+ID4NCj4gPiA+ID4gPiA+ID4gPiA+IEFydW4gRWFzaQ0KPiA+ID4gPiA+ID4gPiA+ID4g
+PGFydW4uZWFzaUBjYXZpdW0uY29tPjsgT21hciBTYW5kb3ZhbCA8b3NhbmRvdkBmYi5jb20+Ow0K
+PiA+ID4gPiA+ID4gPiA+ID4gTWFydGluIEsgLg0KPiA+ID4gPiA+ID4gPiA+ID4gUGV0ZXJzZW4g
+PG1hcnRpbi5wZXRlcnNlbkBvcmFjbGUuY29tPjsgSmFtZXMgQm90dG9tbGV5DQo+ID4gPiA+ID4g
+PiA+ID4gPiA8amFtZXMuYm90dG9tbGV5QGhhbnNlbnBhcnRuZXJzaGlwLmNvbT47IENocmlzdG9w
+aCBIZWxsd2lnDQo+ID4gPiA+ID4gPiA+ID4gPiA8aCBjaEBsIHN0IC5kZT47IERvbiBCcmFjZSA8
+ZG9uLmJyYWNlQG1pY3Jvc2VtaS5jb20+Ow0KPiA+ID4gPiA+ID4gPiA+ID4gS2FzaHlhcCBEZXNh
+aSA8a2FzaHlhcC5kZXNhaUBicm9hZGNvbS5jb20+OyBQZXRlciBSaXZlcmENCj4gPiA+ID4gPiA+
+ID4gPiA+IDxwZXRlci5yaXZlcmFAIGJyb2EgZGNvbSAuYw0KPiA+ID4gPiA+ID4gPiA+ID4gb20+
+Ow0KPiA+ID4gPiA+ID4gPiA+ID4gTGF1cmVuY2UgT2Jlcm1hbiA8bG9iZXJtYW5AcmVkaGF0LmNv
+bT47IE1pbmcgTGVpDQo+ID4gPiA+ID4gPiA+ID4gPiA8bWluZy5sZWlAcmVkaGF0LmNvbT47IE1l
+ZWxpcyBSb29zIDxtcm9vc0BsaW51eC5lZT4NCj4gPiA+ID4gPiA+ID4gPiA+IFN1YmplY3Q6IFtQ
+QVRDSCBWMyAxLzhdIHNjc2k6IGhwc2E6IGZpeCBzZWxlY3Rpb24gb2YgcmVwbHkNCj4gPiA+ID4g
+PiA+ID4gPiA+IHF1ZXVlDQo+ID4gPiA+ID4gPiA+ID4gPg0KPiA+ID4gPiA+DQo+ID4gPiA+ID4g
+U2VlbXMgRG9uIHJ1biBpbnRvIElPIGZhaWx1cmUgd2l0aG91dCBibGstbXEsIGNvdWxkIHlvdSBy
+dW4geW91cg0KPiA+ID4gPiA+IHRlc3RzIGFnYWluIGluIGxlZ2FjeSBtb2RlPw0KPiA+ID4gPiA+
+DQo+ID4gPiA+ID4gVGhhbmtzLA0KPiA+ID4gPiA+IE1pbmcNCj4gPiA+ID4NCj4gPiA+ID4gSGVs
+bG8gTWluZw0KPiA+ID4gPiBJIHJhbiBtdWx0aXBsZSBwYXNzZXMgb24gTGVnYWN5IGFuZCBzdGls
+bCBzZWUgbm8gaXNzdWVzIGluIG15IHRlc3QNCj4gPiA+ID4gYmVkDQo+ID4gPiA+DQoNClRlc3Rz
+IHJhbiBhbGwgd2Vla2VuZCB3aXRob3V0IGlzc3Vlcy4NCg0KDQo+ID4gPiA+IEJPT1RfSU1BR0U9
+L3ZtbGludXotNC4xNi4wLXJjMi5taW5nKyByb290PVVVSUQ9NDNmODZkNzEtYjFiZi0NCj4gNDc4
+OS0NCj4gPiA+ID4gYTI4ZS0NCj4gPiA+ID4gMjFjNmRkYzkwMTk1IHJvIGNyYXNoa2VybmVsPTI1
+Nk1ANjRNIGxvZ19idWZfbGVuPTY0TQ0KPiA+ID4gPiBjb25zb2xlPXR0eVMxLDExNTIwMG44DQo+
+ID4gPiA+DQo+ID4gPiA+IEhFQUQgb2YgdGhlIGdpdCBrZXJuZWwgSSBhbSB1c2luZw0KPiA+ID4g
+Pg0KPiA+ID4gPiA2OTRlMTZmIHNjc2k6IG1lZ2FyYWlkOiBpbXByb3ZlIHNjc2lfbXEgcGVyZm9y
+bWFuY2UgdmlhIC5ob3N0X3RhZ3NldA0KPiA+ID4gPiA3OTM2ODZjIHNjc2k6IGhwc2E6IGltcHJv
+dmUgc2NzaV9tcSBwZXJmb3JtYW5jZSB2aWEgLmhvc3RfdGFnc2V0DQo+ID4gPiA+IDYwZDViMzYg
+YmxvY2s6IG51bGxfYmxrOiBpbnRyb2R1Y2UgbW9kdWxlIHBhcmFtZXRlciBvZiAnZ19ob3N0X3Rh
+Z3MnDQo+ID4gPiA+IDg4NDcwNjcgc2NzaTogQWRkIHRlbXBsYXRlIGZsYWcgJ2hvc3RfdGFnc2V0
+Jw0KPiA+ID4gPiBhOGZiZGQ2IGJsay1tcTogaW50cm9kdWNlIEJMS19NUV9GX0hPU1RfVEFHUyA0
+NzEwZmFiIGJsay1tcToNCj4gPiA+ID4gaW50cm9kdWNlICdzdGFydF90YWcnIGZpZWxkIHRvICdz
+dHJ1Y3QgYmxrX21xX3RhZ3MnDQo+ID4gPiA+IDA5YmIxNTMgc2NzaTogbWVnYXJhaWRfc2FzOiBm
+aXggc2VsZWN0aW9uIG9mIHJlcGx5IHF1ZXVlDQo+ID4gPiA+IDUyNzAwZDggc2NzaTogaHBzYTog
+Zml4IHNlbGVjdGlvbiBvZiByZXBseSBxdWV1ZQ0KPiA+ID4NCj4gPiA+IEkgY2hlY2tvdXQgb3V0
+IExpbnVzJ3MgdHJlZSAoNC4xNi4wLXJjMyspIGFuZCByZS1hcHBsaWVkIHRoZSBhYm92ZQ0KPiA+
+ID4gcGF0Y2hlcy4NCj4gPiA+IEkgIGFuZCBoYXZlIGJlZW4gcnVubmluZyAyNCBob3VycyB3aXRo
+IG5vIGlzc3Vlcy4NCj4gPiA+IEV2aWRlbnRseSBteSBmb3JrZWQgY29weSB3YXMgY29ycnVwdGVk
+Lg0KPiA+ID4NCj4gPiA+IFNvLCBteSBJL08gdGVzdGluZyBoYXMgZ29uZSB3ZWxsLg0KPiA+ID4N
+Cj4gPiA+IEknbGwgcnVuIHNvbWUgcGVyZm9ybWFuY2UgbnVtYmVycyBuZXh0Lg0KPiA+ID4NCj4g
+PiA+IFRoYW5rcywNCj4gPiA+IERvbg0KPiA+DQo+ID4gVW5sZXNzIEthc2h5YXAgaXMgbm90IGhh
+cHB5IHdlIG5lZWQgdG8gY29uc2lkZXIgZ2V0dGluZyB0aGlzIGluIHRvIExpbnVzDQo+ID4gbm93
+DQo+ID4gYmVjYXVzZSB3ZSBhcmUgc2VlaW5nIEhQRSBzZXJ2ZXJzIHRoYXQga2VlcCBoYW5naW5n
+IG5vdyB3aXRoIHRoZSBvcmlnaW5hbA0KPiA+IGNvbW1pdCBub3cgdXBzdHJlYW0uDQo+ID4NCj4g
+PiBLYXNoeWFwLCBhcmUgeW91IGdvb2Qgd2l0aCB0aGUgdjMgcGF0Y2hzZXQgb3Igc3RpbGwgY29u
+Y2VybmVkIHdpdGgNCj4gPiBwZXJmb3JtYW5jZS4gSSB3YXMgZ2V0dGluZyBwcmV0dHkgZ29vZCBJ
+T1BTL3NlYyB0byBpbmRpdmlkdWFsIFNTRCBkcml2ZXMNCj4gPiBzZXQNCj4gPiB1cCBhcyBqYm9k
+IGRldmljZXMgb24gdGhlIG1lZ2FyYWlkX3Nhcy4NCj4gDQo+IExhdXJlbmNlIC0NCj4gRGlkIHlv
+dSBmaW5kIGRpZmZlcmVuY2Ugd2l0aC93aXRob3V0IHRoZSBwYXRjaCA/IFdoYXQgd2FzIElPUHMg
+bnVtYmVyIHdpdGgNCj4gYW5kIHdpdGhvdXQgcGF0Y2guDQo+IEl0IGlzIG5vdCB1cmdlbnQgZmVh
+dHVyZSwgc28gSSB3b3VsZCBsaWtlIHRvIHRha2Ugc29tZSB0aW1lIHRvIGdldCBCUkNNJ3MNCj4g
+cGVyZm9ybWFuY2UgdGVhbSBpbnZvbHZlZCBhbmQgZG8gZnVsbCBhbmFseXNpcyBvZiBwZXJmb3Jt
+YW5jZSBydW4gYW5kIGZpbmQNCj4gcHJvcy9jb25zLg0KPiANCj4gS2FzaHlhcA0KPiA+DQo+ID4g
+V2l0aCBsYXJnZXIgSS9PIHNpemVzIGxpa2UgMU1CIEkgd2FzIGdldHRpbmcgZ29vZCBNQi9zZWMg
+YW5kIG5vdCBzZWVpbmcgYQ0KPiA+IG1lYXN1cmFibGUgcGVyZm9ybWFuY2UgaW1wYWN0Lg0KPiA+
+DQo+ID4gSSBkb250IGhhdmUgdGhlIGhhcmR3YXJlIHlvdSBoYXZlIHRvIG1pbWljIHlvdXIgY29u
+ZmlndXJhdGlvbi4NCj4gPg0KPiA+IFRoYW5rcw0KPiA+IExhdXJlbmNlDQo=
