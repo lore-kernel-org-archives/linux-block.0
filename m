@@ -1,72 +1,43 @@
-Return-Path: <mlyle@lyle.org>
-Return-Path: <mlyle@lyle.org>
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-block@vger.kernel.org,
-	linux-bcache@vger.kernel.org
-Cc: axboe@kernel.dk,
-	Michael Lyle <mlyle@lyle.org>,
-	stable@vger.kernel.org
-Subject: [PATCH 2/2] bcache: don't attach backing with duplicate UUID
-Date: Mon,  5 Mar 2018 13:41:55 -0800
-Message-Id: <20180305214155.23395-3-mlyle@lyle.org>
-In-Reply-To: <20180305214155.23395-1-mlyle@lyle.org>
-References: <20180305214155.23395-1-mlyle@lyle.org>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	Laurence Oberman <loberman@redhat.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V2 2/5] genirq/affinity: mark 'node_to_cpumask' as const for get_nodes_in_cpumask()
+Date: Mon,  5 Mar 2018 11:13:54 +0800
+Message-Id: <20180305031357.23950-3-ming.lei@redhat.com>
+In-Reply-To: <20180305031357.23950-1-ming.lei@redhat.com>
+References: <20180305031357.23950-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-This can happen e.g. during disk cloning.
+Inside irq_create_affinity_masks(), once 'node_to_cpumask' is created,
+it is accessed read-only, so mark it as const for
+get_nodes_in_cpumask().
 
-This is an incomplete fix: it does not catch duplicate UUIDs earlier
-when things are still unattached.  It does not unregister the device.
-Further changes to cope better with this are planned but conflict with
-Coly's ongoing improvements to handling device errors.  In the meantime,
-one can manually stop the device after this has happened.
-
-Attempts to attach a duplicate device result in:
-
-[  136.372404] loop: module loaded
-[  136.424461] bcache: register_bdev() registered backing device loop0
-[  136.424464] bcache: bch_cached_dev_attach() Tried to attach loop0 but duplicate UUID already attached
-
-My test procedure is:
-
-  dd if=/dev/sdb1 of=imgfile bs=1024 count=262144
-  losetup -f imgfile
-
-Signed-off-by: Michael Lyle <mlyle@lyle.org>
-Reviewed-by: Tang Junhui <tang.junhui@zte.com.cn>
-Cc: <stable@vger.kernel.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/md/bcache/super.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ kernel/irq/affinity.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 9c141a8aaacc..5cace6892958 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -963,6 +963,7 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
- 	uint32_t rtime = cpu_to_le32(get_seconds());
- 	struct uuid_entry *u;
- 	char buf[BDEVNAME_SIZE];
-+	struct cached_dev *exist_dc, *t;
+diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
+index 4b1c4763212d..9f49d6ef0dc8 100644
+--- a/kernel/irq/affinity.c
++++ b/kernel/irq/affinity.c
+@@ -79,7 +79,7 @@ static void build_node_to_cpumask(cpumask_var_t *masks)
+ 		cpumask_set_cpu(cpu, masks[cpu_to_node(cpu)]);
+ }
  
- 	bdevname(dc->bdev, buf);
- 
-@@ -987,6 +988,16 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
- 		return -EINVAL;
- 	}
- 
-+	/* Check whether already attached */
-+	list_for_each_entry_safe(exist_dc, t, &c->cached_devs, list) {
-+		if (!memcmp(dc->sb.uuid, exist_dc->sb.uuid, 16)) {
-+			pr_err("Tried to attach %s but duplicate UUID already attached",
-+				buf);
-+
-+			return -EINVAL;
-+		}
-+	}
-+
- 	u = uuid_find(c, dc->sb.uuid);
- 
- 	if (u &&
+-static int get_nodes_in_cpumask(cpumask_var_t *node_to_cpumask,
++static int get_nodes_in_cpumask(const cpumask_var_t *node_to_cpumask,
+ 				const struct cpumask *mask, nodemask_t *nodemsk)
+ {
+ 	int n, nodes = 0;
 -- 
-2.14.1
+2.9.5
