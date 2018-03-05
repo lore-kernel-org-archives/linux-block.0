@@ -1,98 +1,41 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	broonie@kernel.org,
-	linus.walleij@linaro.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	khlebnikov@yandex-team.ru,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX] block, bfq: lower-bound the estimated peak rate to 1
-Date: Mon, 26 Mar 2018 16:06:24 +0200
-Message-Id: <20180326140624.2295-1-paolo.valente@linaro.org>
+Return-Path: <sbates@raithlin.com>
+From: "Stephen  Bates" <sbates@raithlin.com>
+To: Jerome Glisse <jglisse@redhat.com>
+CC: Logan Gunthorpe <logang@deltatee.com>, Benjamin Herrenschmidt
+	<benh@au1.ibm.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-pci@vger.kernel.org"
+	<linux-pci@vger.kernel.org>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "linux-nvdimm@lists.01.org"
+	<linux-nvdimm@lists.01.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, Jens Axboe
+	<axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>, Sagi Grimberg
+	<sagi@grimberg.me>, Bjorn Helgaas <bhelgaas@google.com>, Jason Gunthorpe
+	<jgg@mellanox.com>, Max Gurtovoy <maxg@mellanox.com>, Dan Williams
+	<dan.j.williams@intel.com>, Alex Williamson <alex.williamson@redhat.com>,
+	Oliver OHalloran <oliveroh@au1.ibm.com>
+Subject: Re: [PATCH v2 00/10] Copy Offload in NVMe Fabrics with P2P PCI Memory
+Date: Mon, 5 Mar 2018 20:36:03 +0000
+Message-ID: <F78D688D-BB93-4BFB-9F2B-9809278CC25C@raithlin.com>
+References: <20180228234006.21093-1-logang@deltatee.com>
+ <1519876489.4592.3.camel@kernel.crashing.org>
+ <1519876569.4592.4.camel@au1.ibm.com>
+ <8e808448-fc01-5da0-51e7-1a6657d5a23a@deltatee.com>
+ <1519936195.4592.18.camel@au1.ibm.com> <20180301205548.GA6742@redhat.com>
+ <a512edf9-2d96-9229-fe60-e0ea60b3922b@deltatee.com>
+ <20180301211036.GB6742@redhat.com>
+ <8D3B5C26-39E0-478D-B51F-A22B3F36C4D7@raithlin.com>
+ <20180302220950.GA6148@redhat.com>
+In-Reply-To: <20180302220950.GA6148@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-If a storage device handled by BFQ happens to be slower than 7.5 KB/s
-for a certain amount of time (in the order of a second), then the
-estimated peak rate of the device, maintained in BFQ, becomes equal to
-0. The reason is the limited precision with which the rate is
-represented (details on the range of representable values in the
-comments introduced by this commit). This leads to a division-by-zero
-error where the estimated peak rate is used as divisor. Such a type of
-failure has been reported in [1].
-
-This commit addresses this issue by:
-1. Lower-bounding the estimated peak rate to 1
-2. Adding and improving comments on the range of rates representable
-
-[1] https://www.spinics.net/lists/kernel/msg2739205.html
-
-Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 25 ++++++++++++++++++++++++-
- block/bfq-iosched.h |  2 +-
- 2 files changed, 25 insertions(+), 2 deletions(-)
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index aeca22d91101..f0ecd98509d8 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -201,7 +201,20 @@ static struct kmem_cache *bfq_pool;
- /* Target observation time interval for a peak-rate update (ns) */
- #define BFQ_RATE_REF_INTERVAL	NSEC_PER_SEC
- 
--/* Shift used for peak rate fixed precision calculations. */
-+/*
-+ * Shift used for peak-rate fixed precision calculations.
-+ * With
-+ * - the current shift: 16 positions
-+ * - the current type used to store rate: u32
-+ * - the current unit of measure for rate: [sectors/usec], or, more precisely,
-+ *   [(sectors/usec) / 2^BFQ_RATE_SHIFT] to take into account the shift,
-+ * the range of rates that can be stored is
-+ * [1 / 2^BFQ_RATE_SHIFT, 2^(32 - BFQ_RATE_SHIFT)] sectors/usec =
-+ * [1 / 2^16, 2^16] sectors/usec = [15e-6, 65536] sectors/usec =
-+ * [15, 65G] sectors/sec
-+ * Which, assuming a sector size of 512B, corresponds to a range of
-+ * [7.5K, 33T] B/sec
-+ */
- #define BFQ_RATE_SHIFT		16
- 
- /*
-@@ -2637,6 +2650,16 @@ static void bfq_update_rate_reset(struct bfq_data *bfqd, struct request *rq)
- 	rate /= divisor; /* smoothing constant alpha = 1/divisor */
- 
- 	bfqd->peak_rate += rate;
-+
-+	/*
-+	 * For a very slow device, bfqd->peak_rate can reach 0 (see
-+	 * the minimum representable values reported in the comments
-+	 * on BFQ_RATE_SHIFT). Push to 1 if this happens, to avoid
-+	 * divisions by zero where bfqd->peak_rate is used as a
-+	 * divisor.
-+	 */
-+	bfqd->peak_rate = max_t(u32, 1, bfqd->peak_rate);
-+
- 	update_thr_responsiveness_params(bfqd);
- 
- reset_computation:
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 350c39ae2896..ae2f3dadec44 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -499,7 +499,7 @@ struct bfq_data {
- 	u64 delta_from_first;
- 	/*
- 	 * Current estimate of the device peak rate, measured in
--	 * [BFQ_RATE_SHIFT * sectors/usec]. The left-shift by
-+	 * [(sectors/usec) / 2^BFQ_RATE_SHIFT]. The left-shift by
- 	 * BFQ_RATE_SHIFT is performed to increase precision in
- 	 * fixed-point calculations.
- 	 */
--- 
-2.16.1
+PiAgICBZZXMgaSBuZWVkIHRvIGRvY3VtZW50IHRoYXQgc29tZSBtb3JlIGluIGhtbS50eHQuLi4N
+Cg0KSGkgSmVybW9uZSwgdGhhbmtzIGZvciB0aGUgZXhwbGFuYXRpb24uIENhbiBJIHN1Z2dlc3Qg
+eW91IHVwZGF0ZSBobW0udHh0IHdpdGggd2hhdCB5b3Ugc2VudCBvdXQ/DQoNCj4gIEkgYW0gYWJv
+dXQgdG8gc2VuZCBSRkMgZm9yIG5vdXZlYXUsIGkgYW0gc3RpbGwgd29ya2luZyBvdXQgc29tZSBi
+dWdzLg0KDQpHcmVhdC4gSSB3aWxsIGtlZXAgYW4gZXllIG91dCBmb3IgaXQuIEFuIGV4YW1wbGUg
+dXNlciBvZiBobW0gd2lsbCBiZSB2ZXJ5IGhlbHBmdWwuDQoNCj4gaSB3aWxsIGZpeCB0aGUgTUFJ
+TlRBSU5FUlMgYXMgcGFydCBvZiB0aG9zZS4NCiAgICANCkF3ZXNvbWUsIHRoYW5rcy4NCg0KU3Rl
+cGhlbg0KICAgIA0KDQo=
