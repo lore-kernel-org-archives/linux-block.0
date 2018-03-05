@@ -1,167 +1,77 @@
-Return-Path: <jonas.rabenstein@studium.uni-erlangen.de>
-From: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-To: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
-	Scott Bauer <scott.bauer@intel.com>,
-	Jonathan Derrick <jonathan.derrick@intel.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 8/8] block: sed-opal: ioctl for writing to shadow mbr
-Date: Tue, 13 Mar 2018 14:09:01 +0100
-Message-Id: <b0b34fc0132312c09629c868d33b74fe5a19854e.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
-In-Reply-To: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
-References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
-In-Reply-To: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
-References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
+Return-Path: <holger@applied-asynchrony.com>
+To: linux-block <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>
+From: =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
+Subject: loop: properly declare rotational flag of underlying device
+Message-ID: <627661e4-476f-ade0-97c0-8b4812445d93@applied-asynchrony.com>
+Date: Mon, 5 Mar 2018 13:34:53 +0100
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Allow modification of the shadow mbr. If the shadow mbr is not marked as
-done, this data will be presented read only as the device content. Only
-after marking the shadow mbr as done and unlocking a locking range the
-actual content is accessible.
 
-Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
----
- block/sed-opal.c              | 74 +++++++++++++++++++++++++++++++++++++++++++
- include/linux/sed-opal.h      |  1 +
- include/uapi/linux/sed-opal.h |  8 +++++
- 3 files changed, 83 insertions(+)
+The loop driver has always declared the rotational flag of its device as
+rotational, even when the device of the mapped file is nonrotational,
+as is the case with SSDs or on tmpfs. This can confuse filesystem tools
+which are SSD-aware; in my case I frequently forget to tell mkfs.btrfs
+that my loop device on tmpfs is nonrotational, and that I really don't
+need any automatic metadata redundancy.
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index b201c96d23a3..1ec3734af656 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -1491,6 +1491,52 @@ static int set_mbr_enable_disable(struct opal_dev *dev, void *data)
- 	return finalize_and_send(dev, parse_and_check_status);
+The attached patch fixes this by introspecting the rotational flag of the
+mapped file's underlying block device, if it exists. If the mapped file's
+filesystem has no associated block device - as is the case on e.g. tmpfs -
+we assume nonrotational storage. If there is a better way to identify such
+non-devices I'd love to hear them.
+
+On previous submission (~2 years ago I think) Jens commented that this
+"changes the default". Tat's precisely the point: the default of declaring
+rotational behaviour unconditionally is more likely to be wrong than
+the other way around. To the best of my knowledge there are no byte-
+addressable but physically rotating media without associated block device.
+<insert STT-RAM joke here>
+
+This is fresh against 4.16-rc4 and has been in production since 4.9,
+with some minor changes to accommodate initialization order in 4.14.
+
+Please consider for 4.17.
+
+Signed-off-by: Holger Hoffstätte <holger@applied-asynchrony.com>
+
+cheers,
+Holger
+
+diff -rup linux-4.16-rc4/drivers/block/loop.c linux-4.16-rc4-loop/drivers/block/loop.c
+--- linux-4.16-rc4/drivers/block/loop.c	2018-03-04 23:54:11.000000000 +0100
++++ linux-4.16-rc4-loop/drivers/block/loop.c	2018-03-05 00:41:48.013602156 +0100
+@@ -829,6 +829,24 @@ static void loop_config_discard(struct l
+ 	queue_flag_set_unlocked(QUEUE_FLAG_DISCARD, q);
  }
  
-+static int write_shadow_mbr(struct opal_dev *dev, void *data)
++static void loop_update_rotational(struct loop_device *lo)
 +{
-+	struct opal_shadow_mbr *shadow = data;
-+	size_t off;
-+	u64 len;
-+	int err = 0;
-+	u8 *payload;
++	struct file *file = lo->lo_backing_file;
++	struct inode *file_inode = file->f_mapping->host;
++	struct block_device *file_bdev = file_inode->i_sb->s_bdev;
++	struct request_queue *q = lo->lo_queue;
++	bool nonrot = true;
 +
-+	/* FIXME: this is the maximum we can use for IO_BUFFER_LENGTH=2048.
-+	 *        Instead of having constant, it would be nice to compute the
-+	 *        actual value depending on IO_BUFFER_LENGTH
-+	 */
-+	len = 1950;
++	/* not all filesystems (e.g. tmpfs) have a sb->s_bdev */
++	if (file_bdev)
++		nonrot = blk_queue_nonrot(bdev_get_queue(file_bdev));
 +
-+	/* do the actual transmission(s) */
-+	for (off = 0 ; off < shadow->size; off += len) {
-+		len = min(len, shadow->size - off);
-+
-+		pr_debug("MBR: write bytes %zu+%llu/%llu\n",
-+			 off, len, shadow->size);
-+		err = start_opal_cmd(dev, opaluid[OPAL_MBR],
-+				     opalmethod[OPAL_SET]);
-+		add_token_u8(&err, dev, OPAL_STARTNAME);
-+		add_token_u8(&err, dev, OPAL_WHERE);
-+		add_token_u64(&err, dev, shadow->offset + off);
-+		add_token_u8(&err, dev, OPAL_ENDNAME);
-+
-+		add_token_u8(&err, dev, OPAL_STARTNAME);
-+		add_token_u8(&err, dev, OPAL_VALUES);
-+		payload = add_bytestring_header(&err, dev, len);
-+		if (!payload)
-+			break;
-+		if (copy_from_user(payload, shadow->data + off, len))
-+			err = -EFAULT;
-+
-+		add_token_u8(&err, dev, OPAL_ENDNAME);
-+		if (err)
-+			break;
-+
-+		err = finalize_and_send(dev, parse_and_check_status);
-+		if (err)
-+			break;
-+	}
-+	return err;
++	if (nonrot)
++		queue_flag_set_unlocked(QUEUE_FLAG_NONROT, q);
++	else
++		queue_flag_clear_unlocked(QUEUE_FLAG_NONROT, q);
 +}
 +
- static int generic_pw_cmd(u8 *key, size_t key_len, u8 *cpin_uid,
- 			  struct opal_dev *dev)
+ static void loop_unprepare_queue(struct loop_device *lo)
  {
-@@ -2036,6 +2082,31 @@ static int opal_mbr_status(struct opal_dev *dev, struct opal_mbr_data *opal_mbr)
- 	return ret;
- }
- 
-+static int opal_write_shadow_mbr(struct opal_dev *dev,
-+				 struct opal_shadow_mbr *info)
-+{
-+	const struct opal_step mbr_steps[] = {
-+		{ opal_discovery0, },
-+		{ start_admin1LSP_opal_session, &info->key },
-+		{ write_shadow_mbr, info },
-+		{ end_opal_session, },
-+		{ NULL, }
-+	};
-+	int ret;
-+
-+	if (info->size == 0)
-+		return 0;
-+
-+	if (!access_ok(VERIFY_READ, info->data, info->size))
-+		return -EINVAL;
-+
-+	mutex_lock(&dev->dev_lock);
-+	setup_opal_dev(dev, mbr_steps);
-+	ret = next(dev);
-+	mutex_unlock(&dev->dev_lock);
-+	return ret;
-+}
-+
- static int opal_save(struct opal_dev *dev, struct opal_lock_unlock *lk_unlk)
- {
- 	struct opal_suspend_data *suspend;
-@@ -2368,6 +2439,9 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
- 	case IOC_OPAL_MBR_STATUS:
- 		ret = opal_mbr_status(dev, p);
- 		break;
-+	case IOC_OPAL_WRITE_SHADOW_MBR:
-+		ret = opal_write_shadow_mbr(dev, p);
-+		break;
- 	case IOC_OPAL_ERASE_LR:
- 		ret = opal_erase_locking_range(dev, p);
- 		break;
-diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
-index b38dc602cae3..cf08cdc13cbd 100644
---- a/include/linux/sed-opal.h
-+++ b/include/linux/sed-opal.h
-@@ -47,6 +47,7 @@ static inline bool is_sed_ioctl(unsigned int cmd)
- 	case IOC_OPAL_ENABLE_DISABLE_MBR:
- 	case IOC_OPAL_ERASE_LR:
- 	case IOC_OPAL_SECURE_ERASE_LR:
-+	case IOC_OPAL_WRITE_SHADOW_MBR:
- 	case IOC_OPAL_MBR_STATUS:
- 		return true;
- 	}
-diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
-index 0cb9890cdc04..c2669ebff681 100644
---- a/include/uapi/linux/sed-opal.h
-+++ b/include/uapi/linux/sed-opal.h
-@@ -104,6 +104,13 @@ struct opal_mbr_data {
- 	__u8 __align[7];
- };
- 
-+struct opal_shadow_mbr {
-+	struct opal_key key;
-+	const __u8 *data;
-+	__u64 offset;
-+	__u64 size;
-+};
-+
- #define IOC_OPAL_SAVE		    _IOW('p', 220, struct opal_lock_unlock)
- #define IOC_OPAL_LOCK_UNLOCK	    _IOW('p', 221, struct opal_lock_unlock)
- #define IOC_OPAL_TAKE_OWNERSHIP	    _IOW('p', 222, struct opal_key)
-@@ -117,5 +124,6 @@ struct opal_mbr_data {
- #define IOC_OPAL_ERASE_LR           _IOW('p', 230, struct opal_session_info)
- #define IOC_OPAL_SECURE_ERASE_LR    _IOW('p', 231, struct opal_session_info)
- #define IOC_OPAL_MBR_STATUS         _IOW('p', 232, struct opal_mbr_data)
-+#define IOC_OPAL_WRITE_SHADOW_MBR   _IOW('p', 233, struct opal_shadow_mbr)
- 
- #endif /* _UAPI_SED_OPAL_H */
--- 
-2.16.1
+ 	kthread_flush_worker(&lo->worker);
+@@ -929,6 +947,7 @@ static int loop_set_fd(struct loop_devic
+ 	loop_update_dio(lo);
+ 	set_capacity(lo->lo_disk, size);
+ 	bd_set_size(bdev, size << 9);
++	loop_update_rotational(lo);
+ 	loop_sysfs_init(lo);
+ 	/* let user-space know about the new size */
+ 	kobject_uevent(&disk_to_dev(bdev->bd_disk)->kobj, KOBJ_CHANGE);
