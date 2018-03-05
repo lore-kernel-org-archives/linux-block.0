@@ -1,44 +1,53 @@
-Return-Path: <prvs=5980fa318=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	"Nicholas A . Bellinger" <nab@linux-iscsi.org>,
-	Hannes Reinecke <hare@suse.de>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 08/11] target/tcm_loop: Use blk_queue_flag_set()
-Date: Wed,  7 Mar 2018 17:10:09 -0800
-Message-Id: <20180308011012.31522-9-bart.vanassche@wdc.com>
-In-Reply-To: <20180308011012.31522-1-bart.vanassche@wdc.com>
-References: <20180308011012.31522-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pl0-f46.google.com ([209.85.160.46]:33930 "EHLO
+        mail-pl0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752480AbeCEWE1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Mar 2018 17:04:27 -0500
+Received: by mail-pl0-f46.google.com with SMTP id u13-v6so10558672plq.1
+        for <linux-block@vger.kernel.org>; Mon, 05 Mar 2018 14:04:27 -0800 (PST)
+Subject: Re: Some bcache patches need reveiw
+To: tang.junhui@zte.com.cn
+Cc: colyli@suse.de, linux-block@vger.kernel.org,
+        linux-bcache@vger.kernel.org
+References: <1520246366-8273-1-git-send-email-tang.junhui@zte.com.cn>
+From: Michael Lyle <mlyle@lyle.org>
+Message-ID: <904db67c-0090-8ddb-f2fc-07cbccc00969@lyle.org>
+Date: Mon, 5 Mar 2018 14:04:25 -0800
+MIME-Version: 1.0
+In-Reply-To: <1520246366-8273-1-git-send-email-tang.junhui@zte.com.cn>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Use blk_queue_flag_set() instead of open-coding this function.
+Hey Tang Junhui--
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Nicholas A. Bellinger <nab@linux-iscsi.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Ming Lei <ming.lei@redhat.com>
----
- drivers/target/loopback/tcm_loop.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+You're right.  I'm sorry, these had slipped through the cracks / I had
+lost track of them.  I also have the rest of Coly's patchset to work
+through.  I was able to apply the first two, and will continue to work
+on my for-next branch.
 
-diff --git a/drivers/target/loopback/tcm_loop.c b/drivers/target/loopback/tcm_loop.c
-index 9cd4ffe76c07..60d5b918c4ac 100644
---- a/drivers/target/loopback/tcm_loop.c
-+++ b/drivers/target/loopback/tcm_loop.c
-@@ -309,7 +309,7 @@ static int tcm_loop_target_reset(struct scsi_cmnd *sc)
- 
- static int tcm_loop_slave_alloc(struct scsi_device *sd)
- {
--	set_bit(QUEUE_FLAG_BIDI, &sd->request_queue->queue_flags);
-+	blk_queue_flag_set(QUEUE_FLAG_BIDI, sd->request_queue);
- 	return 0;
- }
- 
--- 
-2.16.2
+Mike
+
+
+On 03/05/2018 02:39 AM, tang.junhui@zte.com.cn wrote:
+> Hello Mike
+> 
+> I send some patches some times before, with no response,
+> 
+> Bellow patches are very simple, can you or anybody else have a review?
+> [PATCH] bcache: fix incorrect sysfs output value of strip size
+> [PATCH] bcache: fix error return value in memory shrink
+> [PATCH] bcache: fix error count in memory shrink
+> 
+> Bellow patches are simple too, and important for me and also important for bcache,
+> can you or anybody else have a review?
+> [PATCH] bcache: finish incremental GC
+> [PATCH] bcache: calculate the number of incremental GC nodes according to the total of btree nodes
+> 
+> Thanks,
+> Tang Junhui
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bcache" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
