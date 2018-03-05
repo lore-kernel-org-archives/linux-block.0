@@ -1,26 +1,47 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Thu, 1 Mar 2018 09:57:37 +0100
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH 11/11] block: Move the queue_flag_*() functions from a
- public into a private header file
-Message-ID: <20180301085737.rz5w3eylueuo6myg@linux-x5ow.site>
-References: <20180228192823.5191-1-bart.vanassche@wdc.com>
- <20180228192823.5191-12-bart.vanassche@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pl0-f65.google.com ([209.85.160.65]:36589 "EHLO
+        mail-pl0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752719AbeCEVzq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Mar 2018 16:55:46 -0500
+Received: by mail-pl0-f65.google.com with SMTP id 61-v6so10551994plf.3
+        for <linux-block@vger.kernel.org>; Mon, 05 Mar 2018 13:55:46 -0800 (PST)
+Subject: Re: [PATCH] bcache: fix error return value in memory shrink
+To: tang.junhui@zte.com.cn, colyli@suse.de
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <1517369453-28193-1-git-send-email-tang.junhui@zte.com.cn>
+From: Michael Lyle <mlyle@lyle.org>
+Message-ID: <af38bfef-eafb-c124-92cf-eede945815cd@lyle.org>
+Date: Mon, 5 Mar 2018 13:55:44 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20180228192823.5191-12-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <1517369453-28193-1-git-send-email-tang.junhui@zte.com.cn>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
--- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+LGTM, applied
+
+On 01/30/2018 07:30 PM, tang.junhui@zte.com.cn wrote:
+> From: Tang Junhui <tang.junhui@zte.com.cn>
+> 
+> In bch_mca_scan(), the return value should not be the number of freed btree
+> nodes, but the number of pages of freed btree nodes.
+> 
+> Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+> ---
+>  drivers/md/bcache/btree.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+> index 81e8dc3..a5fbccc 100644
+> --- a/drivers/md/bcache/btree.c
+> +++ b/drivers/md/bcache/btree.c
+> @@ -718,7 +718,7 @@ static unsigned long bch_mca_scan(struct shrinker *shrink,
+>  	}
+>  out:
+>  	mutex_unlock(&c->bucket_lock);
+> -	return freed;
+> +	return freed * c->btree_pages;
+>  }
+>  
+>  static unsigned long bch_mca_count(struct shrinker *shrink,
+> 
