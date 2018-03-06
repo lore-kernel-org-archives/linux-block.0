@@ -24,28 +24,21 @@ References: <20180227100750.32299-1-ming.lei@redhat.com>
 	<d728ee1c12b14627beedcd72ce9bb4a7@microsemi.com>
 	<1520027601.16293.5.camel@redhat.com>
 	<20180305020706.GC27111@ming.t460p>
-Date: Tue, 06 Mar 2018 14:24:25 -0500
+Date: Tue, 06 Mar 2018 12:55:14 -0500
 In-Reply-To: <20180305020706.GC27111@ming.t460p> (Ming Lei's message of "Mon,
 	5 Mar 2018 10:07:07 +0800")
-Message-ID: <yq1efkxqa6u.fsf@oracle.com>
+Message-ID: <yq1d10hrsvx.fsf@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-block@vger.kernel.org>
 
 
-Ming,
+Hi Ming,
 
 > Given both Don and Laurence have verified that patch 1 and patch 2
 > does fix IO hang, could you consider to merge the two first?
 
-Oh, and I would still need a formal Acked-by: from Don and Tested-by:
-from Laurence.
-
-Also, for 4.16/scsi-fixes I would prefer verification to be done with
-just patch 1/8 and none of the subsequent changes in place. Just to make
-sure we're testing the right thing.
-
-Thanks!
+I'm not going to merge the MR patch until Kashyap acks it.
 
 -- 
 Martin K. Petersen	Oracle Linux Engineering
