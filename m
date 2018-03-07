@@ -1,53 +1,86 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36304 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750811AbeCLJJa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Mar 2018 05:09:30 -0400
-Date: Mon, 12 Mar 2018 17:09:13 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Christoph Hellwig <hch@lst.de>, sagi@grimberg.me,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        axboe@fb.com, Jianchao Wang <jianchao.w.wang@oracle.com>,
-        linux-block@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH V2] nvme-pci: assign separate irq vectors for adminq and
- ioq0
-Message-ID: <20180312090827.GB23903@ming.t460p>
-References: <1519832921-13915-1-git-send-email-jianchao.w.wang@oracle.com>
- <20180228164726.GB16536@lst.de>
- <20180301150329.GB6795@ming.t460p>
- <20180301161042.GA14799@localhost.localdomain>
- <20180308074220.GC15748@lst.de>
- <20180309172445.GC14765@localhost.localdomain>
+Received: from mail-pl0-f67.google.com ([209.85.160.67]:37252 "EHLO
+        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933015AbeCGB77 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Mar 2018 20:59:59 -0500
+Received: by mail-pl0-f67.google.com with SMTP id w12-v6so449449plp.4
+        for <linux-block@vger.kernel.org>; Tue, 06 Mar 2018 17:59:59 -0800 (PST)
+Subject: Re: [PATCH] [v2] bcache: fix using of loop variable in memory shrink
+To: tang.junhui@zte.com.cn, colyli@suse.de
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <1520322808-13187-1-git-send-email-tang.junhui@zte.com.cn>
+From: Michael Lyle <mlyle@lyle.org>
+Message-ID: <286b81a9-ec66-28f7-47af-744597b095bd@lyle.org>
+Date: Tue, 6 Mar 2018 17:59:56 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180309172445.GC14765@localhost.localdomain>
+In-Reply-To: <1520322808-13187-1-git-send-email-tang.junhui@zte.com.cn>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On Fri, Mar 09, 2018 at 10:24:45AM -0700, Keith Busch wrote:
-> On Thu, Mar 08, 2018 at 08:42:20AM +0100, Christoph Hellwig wrote:
-> > 
-> > So I suspect we'll need to go with a patch like this, just with a way
-> > better changelog.
+Hi Tang Junhui--
+
+On 03/05/2018 11:53 PM, tang.junhui@zte.com.cn wrote:
+> From: Tang Junhui <tang.junhui@zte.com.cn>
 > 
-> I have to agree this is required for that use case. I'll run some
-> quick tests and propose an alternate changelog.
+> In bch_mca_scan(), There are some confusion and logical error in the use of
+> loop variables. In this patch, we clarify them as:
+> 1) nr: the number of btree nodes needs to scan, which will decrease after
+> we scan a btree node, and should not be less than 0;
+> 2) i: the number of btree nodes have scanned, includes both
+> btree_cache_freeable and btree_cache, which should not be bigger than
+> btree_cache_used;
+> 3) freed: the number of btree nodes have freed.
+
+Thanks-- this looks better.  Applied to my tree.
+
+Incidentally, I still get DOS line endings with the patches you send
+out, and I'm not sure why.  I can fix it with checkpatch, so it's not a
+big deal.  Maybe it relates to the git version you're using?
+
+Mike
+
 > 
-> Longer term, the current way we're including offline present cpus either
-> (a) has the driver allocate resources it can't use or (b) spreads the
-> ones it can use thinner than they need to be. Why don't we rerun the
-> irq spread under a hot cpu notifier for only online CPUs?
-
-4b855ad371 ("blk-mq: Create hctx for each present CPU") removes handling
-mapping change via hot cpu notifier. Not only code is cleaned up, but
-also fixes very complicated queue dependency issue:
-
-- loop/dm-rq queue depends on underlying queue
-- for NVMe, IO queue depends on admin queue
-
-If freezing queue can be avoided in CPU notifier, it should be fine to
-do that, otherwise it need to be avoided.
-
-Thanks,
-Ming
+> Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+> ---
+>  drivers/md/bcache/btree.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+> index 81e8dc3..7487f8e 100644
+> --- a/drivers/md/bcache/btree.c
+> +++ b/drivers/md/bcache/btree.c
+> @@ -664,6 +664,7 @@ static unsigned long bch_mca_scan(struct shrinker *shrink,
+>  	struct btree *b, *t;
+>  	unsigned long i, nr = sc->nr_to_scan;
+>  	unsigned long freed = 0;
+> +	unsigned int btree_cache_used;
+>  
+>  	if (c->shrinker_disabled)
+>  		return SHRINK_STOP;
+> @@ -688,9 +689,10 @@ static unsigned long bch_mca_scan(struct shrinker *shrink,
+>  	nr = min_t(unsigned long, nr, mca_can_free(c));
+>  
+>  	i = 0;
+> +	btree_cache_used = c->btree_cache_used;
+>  	list_for_each_entry_safe(b, t, &c->btree_cache_freeable, list) {
+> -		if (freed >= nr)
+> -			break;
+> +		if (nr <= 0)
+> +			goto out;
+>  
+>  		if (++i > 3 &&
+>  		    !mca_reap(b, 0, false)) {
+> @@ -698,9 +700,10 @@ static unsigned long bch_mca_scan(struct shrinker *shrink,
+>  			rw_unlock(true, b);
+>  			freed++;
+>  		}
+> +		nr--;
+>  	}
+>  
+> -	for (i = 0; (nr--) && i < c->btree_cache_used; i++) {
+> +	for (;  (nr--) && i < btree_cache_used; i++) {
+>  		if (list_empty(&c->btree_cache))
+>  			goto out;
+>  
+> 
