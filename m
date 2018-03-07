@@ -1,54 +1,35 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:52224 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1423502AbeCBPWE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Mar 2018 10:22:04 -0500
-Received: by mail-wm0-f67.google.com with SMTP id t3so3817548wmc.2
-        for <linux-block@vger.kernel.org>; Fri, 02 Mar 2018 07:22:04 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 09/12] lightnvm: pblk: check for supported version
-Date: Fri,  2 Mar 2018 16:21:17 +0100
-Message-Id: <1520004080-27760-10-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1520004080-27760-1-git-send-email-javier@cnexlabs.com>
-References: <1520004080-27760-1-git-send-email-javier@cnexlabs.com>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:41931 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933746AbeCGROr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Mar 2018 12:14:47 -0500
+Received: by mail-pg0-f66.google.com with SMTP id q27so1113241pgn.8
+        for <linux-block@vger.kernel.org>; Wed, 07 Mar 2018 09:14:47 -0800 (PST)
+Subject: Re: [PATCH v2] bcache: move closure debug file into debug direcotry
+To: Chengguang Xu <cgxu519@gmx.com>, tang.junhui@zte.com.cn,
+        kent.overstreet@gmail.com
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <1520393001-157614-1-git-send-email-cgxu519@gmx.com>
+From: Michael Lyle <mlyle@lyle.org>
+Message-ID: <3062881a-7548-1986-d8f7-dc1b9599c61b@lyle.org>
+Date: Wed, 7 Mar 2018 09:14:44 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1520393001-157614-1-git-send-email-cgxu519@gmx.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-At this point, only 1.2 spec is supported, thus check for it. Also,
-since device-side L2P is only supported in the 1.2 spec, make sure to
-only check its value under 1.2.
+On 03/06/2018 07:23 PM, Chengguang Xu wrote:
+> In current code closure debug file is outside of debug directory
+> and when unloading module there is lack of removing operation
+> for closure debug file, so it will cause creating error when trying
+> to reload  module.
+> 
+> This patch move closure debug file into "bcache" debug direcory
+> so that the file can get deleted properly.
+> 
+> Signed-off-by: Chengguang Xu <cgxu519@gmx.com>
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/pblk-init.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+Thanks!  This looks much better and is applied.
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 72806bd96d8f..0ad06fa8c7c7 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -1016,9 +1016,15 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
- 	struct pblk *pblk;
- 	int ret;
- 
--	if (dev->geo.dom & NVM_RSP_L2P) {
-+	if (geo->version != NVM_OCSSD_SPEC_12) {
-+		pr_err("pblk: OCSSD version not supported (%u)\n",
-+							geo->version);
-+		return ERR_PTR(-EINVAL);
-+	}
-+
-+	if (geo->version == NVM_OCSSD_SPEC_12 && geo->dom & NVM_RSP_L2P) {
- 		pr_err("pblk: host-side L2P table not supported. (%x)\n",
--							dev->geo.dom);
-+							geo->dom);
- 		return ERR_PTR(-EINVAL);
- 	}
- 
--- 
-2.7.4
+Mike
