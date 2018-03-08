@@ -1,441 +1,162 @@
-Return-Path: <don.brace@microsemi.com>
-From: Don Brace <don.brace@microsemi.com>
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "Christoph
- Hellwig" <hch@infradead.org>, Mike Snitzer <snitzer@redhat.com>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, Hannes Reinecke
-	<hare@suse.de>, Arun Easi <arun.easi@cavium.com>, Omar Sandoval
-	<osandov@fb.com>, "Martin K . Petersen" <martin.petersen@oracle.com>, "James
- Bottomley" <james.bottomley@hansenpartnership.com>, Christoph Hellwig
-	<hch@lst.de>, Kashyap Desai <kashyap.desai@broadcom.com>, Peter Rivera
-	<peter.rivera@broadcom.com>, Laurence Oberman <loberman@redhat.com>, "Meelis
- Roos" <mroos@linux.ee>
-Subject: RE: [PATCH V3 1/8] scsi: hpsa: fix selection of reply queue
-Date: Thu, 1 Mar 2018 16:18:17 +0000
-Message-ID: <633459ac33bf49c9a3ff6e515aa790de@microsemi.com>
-References: <20180227100750.32299-1-ming.lei@redhat.com>
- <20180227100750.32299-2-ming.lei@redhat.com>
-In-Reply-To: <20180227100750.32299-2-ming.lei@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Return-Path: don.brace@microsemi.com
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	linux-kernel@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	Laurence Oberman <loberman@redhat.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 2/4] genirq/affinity: move actual irq vector spread into one helper
+Date: Thu,  8 Mar 2018 18:53:56 +0800
+Message-Id: <20180308105358.1506-3-ming.lei@redhat.com>
+In-Reply-To: <20180308105358.1506-1-ming.lei@redhat.com>
+References: <20180308105358.1506-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-> -----Original Message-----
-> From: Ming Lei [mailto:ming.lei@redhat.com]
-> Sent: Tuesday, February 27, 2018 4:08 AM
-> To: Jens Axboe <axboe@kernel.dk>; linux-block@vger.kernel.org; Christoph
-> Hellwig <hch@infradead.org>; Mike Snitzer <snitzer@redhat.com>
-> Cc: linux-scsi@vger.kernel.org; Hannes Reinecke <hare@suse.de>; Arun Easi
-> <arun.easi@cavium.com>; Omar Sandoval <osandov@fb.com>; Martin K .
-> Petersen <martin.petersen@oracle.com>; James Bottomley
-> <james.bottomley@hansenpartnership.com>; Christoph Hellwig <hch@lst.de>;
-> Don Brace <don.brace@microsemi.com>; Kashyap Desai
-> <kashyap.desai@broadcom.com>; Peter Rivera <peter.rivera@broadcom.com>;
-> Laurence Oberman <loberman@redhat.com>; Ming Lei
-> <ming.lei@redhat.com>; Meelis Roos <mroos@linux.ee>
-> Subject: [PATCH V3 1/8] scsi: hpsa: fix selection of reply queue
->=20
-> EXTERNAL EMAIL
->=20
->=20
-> From 84676c1f21 (genirq/affinity: assign vectors to all possible CPUs),
-> one msix vector can be created without any online CPU mapped, then one
-> command's completion may not be notified.
->=20
-> This patch setups mapping between cpu and reply queue according to irq
-> affinity info retrived by pci_irq_get_affinity(), and uses this mapping
-> table to choose reply queue for queuing one command.
->=20
-> Then the chosen reply queue has to be active, and fixes IO hang caused
-> by using inactive reply queue which doesn't have any online CPU mapped.
->=20
-> Cc: Hannes Reinecke <hare@suse.de>
-> Cc: Arun Easi <arun.easi@cavium.com>
-> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-> Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-> Cc: Christoph Hellwig <hch@lst.de>,
-> Cc: Don Brace <don.brace@microsemi.com>
-> Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-> Cc: Peter Rivera <peter.rivera@broadcom.com>
-> Cc: Laurence Oberman <loberman@redhat.com>
-> Cc: Meelis Roos <mroos@linux.ee>
-> Fixes: 84676c1f21e8 ("genirq/affinity: assign vectors to all possible CPU=
-s")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+No functional change, just prepare for converting to 2-stage
+irq vector spread.
 
-I am getting some issues that need to be tracked down:
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ kernel/irq/affinity.c | 97 +++++++++++++++++++++++++++++----------------------
+ 1 file changed, 55 insertions(+), 42 deletions(-)
 
-[ 1636.032984] hpsa 0000:87:00.0: Acknowledging event: 0xc0000032 (HP SSD S=
-mart Path configuration change)
-[ 1638.510656] hpsa 0000:87:00.0: scsi 3:0:8:0: updated Direct-Access     H=
-P       MO0400JDVEU      PHYS DRV SSDSmartPathCap- En- Exp=3D0
-[ 1653.967695] hpsa 0000:87:00.0: Acknowledging event: 0x80000020 (HP SSD S=
-mart Path configuration change)
-[ 1656.770377] hpsa 0000:87:00.0: scsi 3:0:8:0: updated Direct-Access     H=
-P       MO0400JDVEU      PHYS DRV SSDSmartPathCap- En- Exp=3D0
-[ 2839.762267] hpsa 0000:87:00.0: Acknowledging event: 0x80000020 (HP SSD S=
-mart Path configuration change)
-[ 2840.841290] hpsa 0000:87:00.0: scsi 3:0:8:0: updated Direct-Access     H=
-P       MO0400JDVEU      PHYS DRV SSDSmartPathCap- En- Exp=3D0
-[ 2917.582653] hpsa 0000:87:00.0: Acknowledging event: 0xc0000020 (HP SSD S=
-mart Path configuration change)
-[ 2919.087191] hpsa 0000:87:00.0: scsi 3:1:0:1: updated Direct-Access     H=
-P       LOGICAL VOLUME   RAID-5 SSDSmartPathCap+ En+ Exp=3D1
-[ 2919.142527] hpsa 0000:87:00.0: hpsa_figure_phys_disk_ptrs: [3:1:0:2] A p=
-hys disk component of LV is missing, turning off offload_enabled for LV.
-[ 2919.203915] hpsa 0000:87:00.0: hpsa_figure_phys_disk_ptrs: [3:1:0:2] A p=
-hys disk component of LV is missing, turning off offload_enabled for LV.
-[ 2919.266921] hpsa 0000:87:00.0: hpsa_figure_phys_disk_ptrs: [3:1:0:2] A p=
-hys disk component of LV is missing, turning off offload_enabled for LV.
-[ 2934.999629] hpsa 0000:87:00.0: Acknowledging event: 0x40000000 (HP SSD S=
-mart Path state change)
-[ 2936.937333] hpsa 0000:87:00.0: hpsa_figure_phys_disk_ptrs: [3:1:0:2] A p=
-hys disk component of LV is missing, turning off offload_enabled for LV.
-[ 2936.998707] hpsa 0000:87:00.0: hpsa_figure_phys_disk_ptrs: [3:1:0:2] A p=
-hys disk component of LV is missing, turning off offload_enabled for LV.
-[ 2937.060101] hpsa 0000:87:00.0: hpsa_figure_phys_disk_ptrs: [3:1:0:2] A p=
-hys disk component of LV is missing, turning off offload_enabled for LV.
-[ 3619.711122] sd 3:1:0:3: [sde] tag#436 FAILED Result: hostbyte=3DDID_OK d=
-riverbyte=3DDRIVER_SENSE
-[ 3619.751150] sd 3:1:0:3: [sde] tag#436 Sense Key : Aborted Command [curre=
-nt]=20
-[ 3619.784375] sd 3:1:0:3: [sde] tag#436 Add. Sense: Internal target failur=
-e
-[ 3619.816530] sd 3:1:0:3: [sde] tag#436 CDB: Read(10) 28 00 01 1b ad af 00=
- 00 01 00
-[ 3619.852295] print_req_error: I/O error, dev sde, sector 18591151
-[ 3619.880850] sd 3:1:0:3: [sde] tag#461 FAILED Result: hostbyte=3DDID_OK d=
-riverbyte=3DDRIVER_SENSE
-[ 3619.920981] sd 3:1:0:3: [sde] tag#461 Sense Key : Aborted Command [curre=
-nt]=20
-[ 3619.955081] sd 3:1:0:3: [sde] tag#461 Add. Sense: Internal target failur=
-e
-[ 3619.987054] sd 3:1:0:3: [sde] tag#461 CDB: Read(10) 28 00 02 15 31 40 00=
- 00 01 00
-[ 3620.022569] print_req_error: I/O error, dev sde, sector 34943296
-[ 3620.050873] sd 3:1:0:3: [sde] tag#157 FAILED Result: hostbyte=3DDID_OK d=
-riverbyte=3DDRIVER_SENSE
-[ 3620.091124] sd 3:1:0:3: [sde] tag#157 Sense Key : Aborted Command [curre=
-nt]=20
-[ 3620.124179] sd 3:1:0:3: [sde] tag#157 Add. Sense: Internal target failur=
-e
-[ 3620.156203] sd 3:1:0:3: [sde] tag#157 CDB: Read(10) 28 00 03 65 9d 7e 00=
- 00 01 00
-[ 3620.191520] print_req_error: I/O error, dev sde, sector 56991102
-[ 3620.220308] sd 3:1:0:3: [sde] tag#266 FAILED Result: hostbyte=3DDID_OK d=
-riverbyte=3DDRIVER_SENSE
-[ 3620.260273] sd 3:1:0:3: [sde] tag#266 Sense Key : Aborted Command [curre=
-nt]=20
-[ 3620.294605] sd 3:1:0:3: [sde] tag#266 Add. Sense: Internal target failur=
-e
-[ 3620.328353] sd 3:1:0:3: [sde] tag#266 CDB: Read(10) 28 00 09 92 94 70 00=
- 00 01 00
-[ 3620.364807] print_req_error: I/O error, dev sde, sector 160601200
-[ 3620.394342] sd 3:1:0:3: [sde] tag#278 FAILED Result: hostbyte=3DDID_OK d=
-riverbyte=3DDRIVER_SENSE
-[ 3620.434462] sd 3:1:0:3: [sde] tag#278 Sense Key : Aborted Command [curre=
-nt]=20
-[ 3620.469059] sd 3:1:0:3: [sde] tag#278 Add. Sense: Internal target failur=
-e
-[ 3620.471761] sd 3:1:0:3: [sde] tag#467 FAILED Result: hostbyte=3DDID_OK d=
-riverbyte=3DDRIVER_SENSE
-[ 3620.502240] sd 3:1:0:3: [sde] tag#278 CDB: Read(10) 28 00 08 00 12 ea 00=
- 00 01 00
-[ 3620.543157] sd 3:1:0:3: [sde] tag#467 Sense Key : Aborted Command [curre=
-nt]=20
-[ 3620.580375] print_req_error: I/O error, dev sde, sector 134222570
-[ 3620.615355] sd 3:1:0:3: [sde] tag#467 Add. Sense: Internal target failur=
-e
-[ 3620.645069] sd 3:1:0:3: [sde] tag#244 FAILED Result: hostbyte=3DDID_OK d=
-riverbyte=3DDRIVER_SENSE
-[ 3620.678696] sd 3:1:0:3: [sde] tag#467 CDB: Read(10) 28 00 10 3f 2b fc 00=
- 00 01 00
-[ 3620.720247] sd 3:1:0:3: [sde] tag#244 Sense Key : Aborted Command [curre=
-nt]=20
-[ 3620.756776] print_req_error: I/O error, dev sde, sector 272575484
-[ 3620.791857] sd 3:1:0:3: [sde] tag#244 Add. Sense: Internal target failur=
-e
-[ 3620.822272] sd 3:1:0:3: [sde] tag#431 FAILED Result: hostbyte=3DDID_OK d=
-riverbyte=3DDRIVER_SENSE
-[ 3620.855200] sd 3:1:0:3: [sde] tag#244 CDB: Read(10) 28 00 08 31 86 d9 00=
- 00 01 00
-[ 3620.895823] sd 3:1:0:3: [sde] tag#431 Sense Key : Aborted Command [curre=
-nt]=20
-[ 3620.931923] print_req_error: I/O error, dev sde, sector 137463513
-[ 3620.966262] sd 3:1:0:3: [sde] tag#431 Add. Sense: Internal target failur=
-e
-[ 3620.995715] sd 3:1:0:3: [sde] tag#226 FAILED Result: hostbyte=3DDID_OK d=
-riverbyte=3DDRIVER_SENSE
-[ 3621.028703] sd 3:1:0:3: [sde] tag#431 CDB: Read(10) 28 00 10 7c b2 b0 00=
- 00 01 00
-[ 3621.069686] sd 3:1:0:3: [sde] tag#226 Sense Key : Aborted Command [curre=
-nt]=20
-[ 3621.106253] print_req_error: I/O error, dev sde, sector 276607664
-[ 3621.140782] sd 3:1:0:3: [sde] tag#226 Add. Sense: Internal target failur=
-e
-[ 3621.170241] sd 3:1:0:3: [sde] tag#408 FAILED Result: hostbyte=3DDID_OK d=
-riverbyte=3DDRIVER_SENSE
-[ 3621.202997] sd 3:1:0:3: [sde] tag#226 CDB: Read(10) 28 00 08 ba cf f2 00=
- 00 01 00
-[ 3621.243870] sd 3:1:0:3: [sde] tag#408 Sense Key : Aborted Command [curre=
-nt]=20
-[ 3621.280015] print_req_error: I/O error, dev sde, sector 146460658
-[ 3621.313941] sd 3:1:0:3: [sde] tag#408 Add. Sense: Internal target failur=
-e
-[ 3621.343790] print_req_error: I/O error, dev sde, sector 98830586
-[ 3621.376164] sd 3:1:0:3: [sde] tag#408 CDB: Read(10) 28 00 14 da 6a 53 00=
- 00 01 00
-[ 3641.714842] WARNING: CPU: 3 PID: 0 at kernel/rcu/tree.c:2713 rcu_process=
-_callbacks+0x4d5/0x510
-[ 3641.756175] Modules linked in: sg ip6t_rpfilter ip6t_REJECT nf_reject_ip=
-v6 nf_conntrack_ipv6 nf_defrag_ipv6 ipt_REJECT nf_reject_ipv4 nf_conntrack_=
-ipv4 nf_defrag_ipv4 xt_conntrack nf_conntrack cfg80211 rfkill ebtable_nat e=
-btable_broute bridge stp llc ebtable_filter ebtables ip6table_mangle ip6tab=
-le_security ip6table_raw ip6table_filter ip6_tables iptable_mangle iptable_=
-security iptable_raw iptable_filter ip_tables sb_edac x86_pkg_temp_thermal =
-coretemp kvm_intel kvm irqbypass crct10dif_pclmul crc32_pclmul ghash_clmuln=
-i_intel pcbc iTCO_wdt iTCO_vendor_support aesni_intel crypto_simd glue_help=
-er cryptd pcspkr hpilo hpwdt ioatdma shpchp ipmi_si lpc_ich dca mfd_core wm=
-i ipmi_msghandler acpi_power_meter pcc_cpufreq uinput xfs libcrc32c mgag200=
- i2c_algo_bit drm_kms_helper sd_mod syscopyarea sysfillrect
-[ 3642.094993]  sysimgblt fb_sys_fops ttm drm crc32c_intel i2c_core tg3 hps=
-a scsi_transport_sas usb_storage dm_mirror dm_region_hash dm_log dm_mod dax
-[ 3642.158883] CPU: 3 PID: 0 Comm: swapper/3 Not tainted 4.16.0-rc3+ #18
-[ 3642.190015] Hardware name: HP ProLiant DL580 Gen8, BIOS P79 08/18/2016
-[ 3642.221949] RIP: 0010:rcu_process_callbacks+0x4d5/0x510
-[ 3642.247606] RSP: 0018:ffff8e179f6c3f08 EFLAGS: 00010002
-[ 3642.273087] RAX: 0000000000000000 RBX: ffff8e179f6e3180 RCX: ffff8e279d1=
-e8918
-[ 3642.307426] RDX: ffffffffffffd801 RSI: ffff8e179f6c3f18 RDI: ffff8e179f6=
-e31b8
-[ 3642.342219] RBP: ffffffffb70a31c0 R08: ffff8e279d1e8918 R09: 00000000000=
-00100
-[ 3642.376929] R10: 0000000000000004 R11: 0000000000000005 R12: ffff8e179f6=
-e31b8
-[ 3642.411598] R13: ffff8e179d20ad00 R14: 0000000000000001 R15: 7ffffffffff=
-fffff
-[ 3642.445957] FS:  0000000000000000(0000) GS:ffff8e179f6c0000(0000) knlGS:=
-0000000000000000
-[ 3642.485599] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[ 3642.513678] CR2: 00007f30917b9008 CR3: 000000054900a006 CR4: 00000000001=
-606e0
-[ 3642.548189] Call Trace:
-[ 3642.560411]  <IRQ>
-[ 3642.570588]  __do_softirq+0xd1/0x275
-[ 3642.588643]  irq_exit+0xd5/0xe0
-[ 3642.604134]  smp_apic_timer_interrupt+0x60/0x120
-[ 3642.626752]  apic_timer_interrupt+0xf/0x20
-[ 3642.646712]  </IRQ>
-[ 3642.657330] RIP: 0010:cpuidle_enter_state+0xd4/0x260
-[ 3642.681389] RSP: 0018:ffffaed7c00e7ea0 EFLAGS: 00000246 ORIG_RAX: ffffff=
-ffffffff12
-[ 3642.717937] RAX: ffff8e179f6e2280 RBX: ffffcebfbfec1bb8 RCX: 00000000000=
-0001f
-[ 3642.752525] RDX: 0000000000000000 RSI: ff6c3b1b90a53a78 RDI: 00000000000=
-00000
-[ 3642.787181] RBP: 0000000000000003 R08: 0000000000000005 R09: 00000000000=
-00396
-[ 3642.821442] R10: 00000000000003a7 R11: 0000000000000008 R12: 00000000000=
-00003
-[ 3642.856381] R13: 0000034fe70ea52c R14: 0000000000000003 R15: 0000034fe71=
-d99d4
-[ 3642.890830]  do_idle+0x172/0x1e0
-[ 3642.906714]  cpu_startup_entry+0x6f/0x80
-[ 3642.925835]  start_secondary+0x187/0x1e0
-[ 3642.944975]  secondary_startup_64+0xa5/0xb0
-[ 3642.965719] Code: e9 db fd ff ff 4c 89 f6 4c 89 e7 e8 96 b8 63 00 e9 56 =
-fc ff ff 0f 0b e9 34 fc ff ff 0f 0b 0f 1f 84 00 00 00 00 00 e9 e0 fb ff ff =
-<0f> 0b 66 0f 1f 84 00 00 00 00 00 e9 e5 fd ff ff 0f 0b 66 0f 1f=20
-[ 3643.056198] ---[ end trace 7bdac969b3138de7 ]---
-[ 3735.745955] hpsa 0000:87:00.0: SCSI status: LUN:000000c000002601 CDB:120=
-10000040000000000000000000000
-[ 3735.790497] hpsa 0000:87:00.0: SCSI Status =3D 02, Sense key =3D 0x05, A=
-SC =3D 0x25, ASCQ =3D 0x00
-> ---
->  drivers/scsi/hpsa.c | 73 +++++++++++++++++++++++++++++++++++++++--------=
-------
->  drivers/scsi/hpsa.h |  1 +
->  2 files changed, 55 insertions(+), 19 deletions(-)
->=20
-> diff --git a/drivers/scsi/hpsa.c b/drivers/scsi/hpsa.c
-> index 5293e6827ce5..3a9eca163db8 100644
-> --- a/drivers/scsi/hpsa.c
-> +++ b/drivers/scsi/hpsa.c
-> @@ -1045,11 +1045,7 @@ static void set_performant_mode(struct ctlr_info
-> *h, struct CommandList *c,
->                 c->busaddr |=3D 1 | (h->blockFetchTable[c->Header.SGList]=
- << 1);
->                 if (unlikely(!h->msix_vectors))
->                         return;
-> -               if (likely(reply_queue =3D=3D DEFAULT_REPLY_QUEUE))
-> -                       c->Header.ReplyQueue =3D
-> -                               raw_smp_processor_id() % h->nreply_queues=
-;
-> -               else
-> -                       c->Header.ReplyQueue =3D reply_queue % h->nreply_=
-queues;
-> +               c->Header.ReplyQueue =3D reply_queue;
->         }
->  }
->=20
-> @@ -1063,10 +1059,7 @@ static void set_ioaccel1_performant_mode(struct
-> ctlr_info *h,
->          * Tell the controller to post the reply to the queue for this
->          * processor.  This seems to give the best I/O throughput.
->          */
-> -       if (likely(reply_queue =3D=3D DEFAULT_REPLY_QUEUE))
-> -               cp->ReplyQueue =3D smp_processor_id() % h->nreply_queues;
-> -       else
-> -               cp->ReplyQueue =3D reply_queue % h->nreply_queues;
-> +       cp->ReplyQueue =3D reply_queue;
->         /*
->          * Set the bits in the address sent down to include:
->          *  - performant mode bit (bit 0)
-> @@ -1087,10 +1080,7 @@ static void
-> set_ioaccel2_tmf_performant_mode(struct ctlr_info *h,
->         /* Tell the controller to post the reply to the queue for this
->          * processor.  This seems to give the best I/O throughput.
->          */
-> -       if (likely(reply_queue =3D=3D DEFAULT_REPLY_QUEUE))
-> -               cp->reply_queue =3D smp_processor_id() % h->nreply_queues=
-;
-> -       else
-> -               cp->reply_queue =3D reply_queue % h->nreply_queues;
-> +       cp->reply_queue =3D reply_queue;
->         /* Set the bits in the address sent down to include:
->          *  - performant mode bit not used in ioaccel mode 2
->          *  - pull count (bits 0-3)
-> @@ -1109,10 +1099,7 @@ static void set_ioaccel2_performant_mode(struct
-> ctlr_info *h,
->          * Tell the controller to post the reply to the queue for this
->          * processor.  This seems to give the best I/O throughput.
->          */
-> -       if (likely(reply_queue =3D=3D DEFAULT_REPLY_QUEUE))
-> -               cp->reply_queue =3D smp_processor_id() % h->nreply_queues=
-;
-> -       else
-> -               cp->reply_queue =3D reply_queue % h->nreply_queues;
-> +       cp->reply_queue =3D reply_queue;
->         /*
->          * Set the bits in the address sent down to include:
->          *  - performant mode bit not used in ioaccel mode 2
-> @@ -1157,6 +1144,8 @@ static void __enqueue_cmd_and_start_io(struct
-> ctlr_info *h,
->  {
->         dial_down_lockup_detection_during_fw_flash(h, c);
->         atomic_inc(&h->commands_outstanding);
-> +
-> +       reply_queue =3D h->reply_map[raw_smp_processor_id()];
->         switch (c->cmd_type) {
->         case CMD_IOACCEL1:
->                 set_ioaccel1_performant_mode(h, c, reply_queue);
-> @@ -7376,6 +7365,26 @@ static void hpsa_disable_interrupt_mode(struct
-> ctlr_info *h)
->         h->msix_vectors =3D 0;
->  }
->=20
-> +static void hpsa_setup_reply_map(struct ctlr_info *h)
-> +{
-> +       const struct cpumask *mask;
-> +       unsigned int queue, cpu;
-> +
-> +       for (queue =3D 0; queue < h->msix_vectors; queue++) {
-> +               mask =3D pci_irq_get_affinity(h->pdev, queue);
-> +               if (!mask)
-> +                       goto fallback;
-> +
-> +               for_each_cpu(cpu, mask)
-> +                       h->reply_map[cpu] =3D queue;
-> +       }
-> +       return;
-> +
-> +fallback:
-> +       for_each_possible_cpu(cpu)
-> +               h->reply_map[cpu] =3D 0;
-> +}
-> +
->  /* If MSI/MSI-X is supported by the kernel we will try to enable it on
->   * controllers that are capable. If not, we use legacy INTx mode.
->   */
-> @@ -7771,6 +7780,10 @@ static int hpsa_pci_init(struct ctlr_info *h)
->         err =3D hpsa_interrupt_mode(h);
->         if (err)
->                 goto clean1;
-> +
-> +       /* setup mapping between CPU and reply queue */
-> +       hpsa_setup_reply_map(h);
-> +
->         err =3D hpsa_pci_find_memory_BAR(h->pdev, &h->paddr);
->         if (err)
->                 goto clean2;    /* intmode+region, pci */
-> @@ -8480,6 +8493,28 @@ static struct workqueue_struct
-> *hpsa_create_controller_wq(struct ctlr_info *h,
->         return wq;
->  }
->=20
-> +static void hpda_free_ctlr_info(struct ctlr_info *h)
-> +{
-> +       kfree(h->reply_map);
-> +       kfree(h);
-> +}
-> +
-> +static struct ctlr_info *hpda_alloc_ctlr_info(void)
-> +{
-> +       struct ctlr_info *h;
-> +
-> +       h =3D kzalloc(sizeof(*h), GFP_KERNEL);
-> +       if (!h)
-> +               return NULL;
-> +
-> +       h->reply_map =3D kzalloc(sizeof(*h->reply_map) * nr_cpu_ids, GFP_=
-KERNEL);
-> +       if (!h->reply_map) {
-> +               kfree(h);
-> +               return NULL;
-> +       }
-> +       return h;
-> +}
-> +
->  static int hpsa_init_one(struct pci_dev *pdev, const struct pci_device_i=
-d *ent)
->  {
->         int dac, rc;
-> @@ -8517,7 +8552,7 @@ static int hpsa_init_one(struct pci_dev *pdev, cons=
-t
-> struct pci_device_id *ent)
->          * the driver.  See comments in hpsa.h for more info.
->          */
->         BUILD_BUG_ON(sizeof(struct CommandList) %
-> COMMANDLIST_ALIGNMENT);
-> -       h =3D kzalloc(sizeof(*h), GFP_KERNEL);
-> +       h =3D hpda_alloc_ctlr_info();
->         if (!h) {
->                 dev_err(&pdev->dev, "Failed to allocate controller head\n=
-");
->                 return -ENOMEM;
-> @@ -8916,7 +8951,7 @@ static void hpsa_remove_one(struct pci_dev *pdev)
->         h->lockup_detected =3D NULL;                      /* init_one 2 *=
-/
->         /* (void) pci_disable_pcie_error_reporting(pdev); */    /* init_o=
-ne 1 */
->=20
-> -       kfree(h);                                       /* init_one 1 */
-> +       hpda_free_ctlr_info(h);                         /* init_one 1 */
->  }
->=20
->  static int hpsa_suspend(__attribute__((unused)) struct pci_dev *pdev,
-> diff --git a/drivers/scsi/hpsa.h b/drivers/scsi/hpsa.h
-> index 018f980a701c..fb9f5e7f8209 100644
-> --- a/drivers/scsi/hpsa.h
-> +++ b/drivers/scsi/hpsa.h
-> @@ -158,6 +158,7 @@ struct bmic_controller_parameters {
->  #pragma pack()
->=20
->  struct ctlr_info {
-> +       unsigned int *reply_map;
->         int     ctlr;
->         char    devname[8];
->         char    *product_name;
-> --
-> 2.9.5
+diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
+index 4b1c4763212d..e119e86bed48 100644
+--- a/kernel/irq/affinity.c
++++ b/kernel/irq/affinity.c
+@@ -94,50 +94,19 @@ static int get_nodes_in_cpumask(cpumask_var_t *node_to_cpumask,
+ 	return nodes;
+ }
+ 
+-/**
+- * irq_create_affinity_masks - Create affinity masks for multiqueue spreading
+- * @nvecs:	The total number of vectors
+- * @affd:	Description of the affinity requirements
+- *
+- * Returns the masks pointer or NULL if allocation failed.
+- */
+-struct cpumask *
+-irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
++static int irq_build_affinity_masks(int nvecs, const struct irq_affinity *affd,
++				    cpumask_var_t *node_to_cpumask,
++				    const struct cpumask *cpu_mask,
++				    struct cpumask *nmsk,
++				    struct cpumask *masks)
+ {
+-	int n, nodes, cpus_per_vec, extra_vecs, curvec;
+ 	int affv = nvecs - affd->pre_vectors - affd->post_vectors;
+ 	int last_affv = affv + affd->pre_vectors;
++	int curvec = affd->pre_vectors;
+ 	nodemask_t nodemsk = NODE_MASK_NONE;
+-	struct cpumask *masks;
+-	cpumask_var_t nmsk, *node_to_cpumask;
+-
+-	/*
+-	 * If there aren't any vectors left after applying the pre/post
+-	 * vectors don't bother with assigning affinity.
+-	 */
+-	if (!affv)
+-		return NULL;
+-
+-	if (!zalloc_cpumask_var(&nmsk, GFP_KERNEL))
+-		return NULL;
+-
+-	masks = kcalloc(nvecs, sizeof(*masks), GFP_KERNEL);
+-	if (!masks)
+-		goto out;
++	int n, nodes, cpus_per_vec, extra_vecs;
+ 
+-	node_to_cpumask = alloc_node_to_cpumask();
+-	if (!node_to_cpumask)
+-		goto out;
+-
+-	/* Fill out vectors at the beginning that don't need affinity */
+-	for (curvec = 0; curvec < affd->pre_vectors; curvec++)
+-		cpumask_copy(masks + curvec, irq_default_affinity);
+-
+-	/* Stabilize the cpumasks */
+-	get_online_cpus();
+-	build_node_to_cpumask(node_to_cpumask);
+-	nodes = get_nodes_in_cpumask(node_to_cpumask, cpu_possible_mask,
+-				     &nodemsk);
++	nodes = get_nodes_in_cpumask(node_to_cpumask, cpu_mask, &nodemsk);
+ 
+ 	/*
+ 	 * If the number of nodes in the mask is greater than or equal the
+@@ -150,7 +119,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 			if (++curvec == last_affv)
+ 				break;
+ 		}
+-		goto done;
++		goto out;
+ 	}
+ 
+ 	for_each_node_mask(n, nodemsk) {
+@@ -160,7 +129,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 		vecs_per_node = (affv - (curvec - affd->pre_vectors)) / nodes;
+ 
+ 		/* Get the cpus on this node which are in the mask */
+-		cpumask_and(nmsk, cpu_possible_mask, node_to_cpumask[n]);
++		cpumask_and(nmsk, cpu_mask, node_to_cpumask[n]);
+ 
+ 		/* Calculate the number of cpus per vector */
+ 		ncpus = cpumask_weight(nmsk);
+@@ -186,7 +155,51 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+ 		--nodes;
+ 	}
+ 
+-done:
++out:
++	return curvec - affd->pre_vectors;
++}
++
++/**
++ * irq_create_affinity_masks - Create affinity masks for multiqueue spreading
++ * @nvecs:	The total number of vectors
++ * @affd:	Description of the affinity requirements
++ *
++ * Returns the masks pointer or NULL if allocation failed.
++ */
++struct cpumask *
++irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
++{
++	int curvec;
++	struct cpumask *masks;
++	cpumask_var_t nmsk, *node_to_cpumask;
++
++	/*
++	 * If there aren't any vectors left after applying the pre/post
++	 * vectors don't bother with assigning affinity.
++	 */
++	if (nvecs == affd->pre_vectors + affd->post_vectors)
++		return NULL;
++
++	if (!zalloc_cpumask_var(&nmsk, GFP_KERNEL))
++		return NULL;
++
++	masks = kcalloc(nvecs, sizeof(*masks), GFP_KERNEL);
++	if (!masks)
++		goto out;
++
++	node_to_cpumask = alloc_node_to_cpumask();
++	if (!node_to_cpumask)
++		goto out;
++
++	/* Fill out vectors at the beginning that don't need affinity */
++	for (curvec = 0; curvec < affd->pre_vectors; curvec++)
++		cpumask_copy(masks + curvec, irq_default_affinity);
++
++	/* Stabilize the cpumasks */
++	get_online_cpus();
++	build_node_to_cpumask(node_to_cpumask);
++	curvec += irq_build_affinity_masks(nvecs, affd, node_to_cpumask,
++					   cpu_possible_mask, nmsk, masks);
+ 	put_online_cpus();
+ 
+ 	/* Fill out vectors at the end that don't need affinity */
+-- 
+2.9.5
