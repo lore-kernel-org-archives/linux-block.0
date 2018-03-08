@@ -1,82 +1,43 @@
-Return-Path: <loberman@redhat.com>
-Return-Path: <loberman@redhat.com>
-Message-ID: <1520542569.14785.1.camel@redhat.com>
+Return-Path: <prvs=5980fa318=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "hch@lst.de" <hch@lst.de>, "hare@suse.de" <hare@suse.de>,
+	"ming.lei@redhat.com" <ming.lei@redhat.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"hch@infradead.org" <hch@infradead.org>, "snitzer@redhat.com"
+	<snitzer@redhat.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"mroos@linux.ee" <mroos@linux.ee>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>, "don.brace@microsemi.com"
+	<don.brace@microsemi.com>, "james.bottomley@hansenpartnership.com"
+	<james.bottomley@hansenpartnership.com>, "arun.easi@cavium.com"
+	<arun.easi@cavium.com>, "osandov@fb.com" <osandov@fb.com>,
+	"loberman@redhat.com" <loberman@redhat.com>, "kashyap.desai@broadcom.com"
+	<kashyap.desai@broadcom.com>, "peter.rivera@broadcom.com"
+	<peter.rivera@broadcom.com>
 Subject: Re: [PATCH V3 1/8] scsi: hpsa: fix selection of reply queue
-From: Laurence Oberman <loberman@redhat.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>, James Bottomley
- <james.bottomley@hansenpartnership.com>, Don Brace
- <don.brace@microsemi.com>,  Jens Axboe <axboe@kernel.dk>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Christoph
- Hellwig <hch@infradead.org>, Mike Snitzer <snitzer@redhat.com>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, Hannes Reinecke
- <hare@suse.de>, Arun Easi <arun.easi@cavium.com>, Omar Sandoval
- <osandov@fb.com>, Christoph Hellwig <hch@lst.de>, Kashyap Desai
- <kashyap.desai@broadcom.com>, Peter Rivera <peter.rivera@broadcom.com>,
- Meelis Roos <mroos@linux.ee>
-Date: Thu, 08 Mar 2018 15:56:09 -0500
-In-Reply-To: <20180308134201.GB2713@ming.t460p>
-References: <633459ac33bf49c9a3ff6e515aa790de@microsemi.com>
-	 <1519930884.9730.8.camel@redhat.com> <1519939174.15243.0.camel@redhat.com>
-	 <20180302021557.GC10471@ming.t460p> <1519999769.16293.1.camel@redhat.com>
-	 <d728ee1c12b14627beedcd72ce9bb4a7@microsemi.com>
-	 <1520027601.16293.5.camel@redhat.com> <20180305020706.GC27111@ming.t460p>
-	 <yq1efkxqa6u.fsf@oracle.com> <1520431897.31724.2.camel@redhat.com>
-	 <20180308134201.GB2713@ming.t460p>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Thu, 8 Mar 2018 15:31:48 +0000
+Message-ID: <1520523107.3383.1.camel@wdc.com>
+References: <20180227100750.32299-1-ming.lei@redhat.com>
+	 <20180227100750.32299-2-ming.lei@redhat.com>
+	 <20180308075035.GE15748@lst.de> <20180308081527.GA24816@ming.t460p>
+	 <ad59f1bc-5db6-1f27-9924-b043b76d5257@suse.de>
+In-Reply-To: <ad59f1bc-5db6-1f27-9924-b043b76d5257@suse.de>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, 2018-03-08 at 21:42 +0800, Ming Lei wrote:
-> On Wed, Mar 07, 2018 at 09:11:37AM -0500, Laurence Oberman wrote:
-> > On Tue, 2018-03-06 at 14:24 -0500, Martin K. Petersen wrote:
-> > > Ming,
-> > > 
-> > > > Given both Don and Laurence have verified that patch 1 and
-> > > > patch 2
-> > > > does fix IO hang, could you consider to merge the two first?
-> > > 
-> > > Oh, and I would still need a formal Acked-by: from Don and
-> > > Tested-by:
-> > > from Laurence.
-> > > 
-> > > Also, for 4.16/scsi-fixes I would prefer verification to be done
-> > > with
-> > > just patch 1/8 and none of the subsequent changes in place. Just
-> > > to
-> > > make
-> > > sure we're testing the right thing.
-> > > 
-> > > Thanks!
-> > > 
-> > 
-> > Hello Martin
-> > 
-> > I tested just Patch 1/8 from the V3 series.
-> > No issues running workload and no issues booting on the DL380G7.
-> > Don can you ack this so we can at least get this one in.
-> > 
-> > Against: 4.16.0-rc4.v31of8+ on an x86_64
-> > 
-> > Tested-by: Laurence Oberman <loberman@redhat.com>
-> 
-> Hi Laurence,
-> 
-> Thanks for your test!
-> 
-> Could you test patch 2 too since you have megaraid_sas controller?
-> 
-> Looks it is better to split the fix patches from the current
-> patchset,
-> since these fixes should be for V4.16.
-> 
-> Thanks
-> Ming
-
-Ho Ming I see a V4 now so I am going to wait until you split these and
-then I will test both HPSA and megaraid_sas once Kashyap agrees.
-
-When I see a V4 show up with the split will pull and act on it.
-
-Thanks
-Laurence
+T24gVGh1LCAyMDE4LTAzLTA4IGF0IDA5OjQxICswMTAwLCBIYW5uZXMgUmVpbmVja2Ugd3JvdGU6
+DQo+IElFIHRoZSBfZW50aXJlXyByZXF1ZXN0IHNldCBpcyBhbGxvY2F0ZWQgYXMgX29uZV8gYXJy
+YXksIG1ha2luZyBpdCBxdWl0ZQ0KPiBoYXJkIHRvIGhhbmRsZSBmcm9tIHRoZSBsb3dlci1sZXZl
+bCBDUFUgY2FjaGVzLg0KPiBBbHNvIHRoZSAnbm9kZScgaW5kaWNhdG9yIGRvZXNuJ3QgcmVhbGx5
+IGhlbHAgdXMgaGVyZSwgYXMgdGhlIHJlcXVlc3RzDQo+IGhhdmUgdG8gYmUgYWNjZXNzIGJ5IGFs
+bCBDUFVzIGluIHRoZSBzaGFyZWQgdGFnIGNhc2UuDQo+IA0KPiBXb3VsZCBpdCBiZSBwb3NzaWJs
+ZSBtb3ZlIHRhZ3MtPnJxcyB0byBiZWNvbWUgYSBfZG91YmxlXyBwb2ludGVyPw0KPiBUaGVuIHdl
+IHdvdWxkIGhhdmUgb25seSBhIHNoYXJlZCBsb29rdXAgdGFibGUsIGJ1dCB0aGUgcmVxdWVzdHMN
+Cj4gdGhlbXNlbHZlcyBjYW4gYmUgYWxsb2NhdGVkIHBlciBub2RlLCBkZXBlbmRpbmcgb24gdGhl
+IENQVSBtYXAuDQo+IF9BbmRfIGl0IHNob3VsZCBiZSBlYXNpZXIgb24gdGhlIENQVSBjYWNoZSAu
+Li4NCg0KVGhhdCBpcyBvbmUgcG9zc2libGUgc29sdXRpb24uIEFub3RoZXIgc29sdXRpb24gaXMg
+dG8gZm9sbG93IHRoZSBhcHByb2FjaA0KZnJvbSBzYml0bWFwOiBhbGxvY2F0ZSBhIHNpbmdsZSBh
+cnJheSB0aGF0IGlzIHNsaWdodGx5IGxhcmdlciB0aGFuIG5lZWRlZA0KYW5kIHVzZSB0aGUgZWxl
+bWVudHMgaW4gc3VjaCBhIHdheSB0aGF0IG5vIHR3byBDUFVzIHVzZSB0aGUgc2FtZSBjYWNoZQ0K
+bGluZS4NCg0KQmFydC4NCg0KDQoNCg0K
