@@ -1,160 +1,107 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mout.gmx.net ([212.227.15.18]:40299 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753996AbeCGDYC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 6 Mar 2018 22:24:02 -0500
-From: Chengguang Xu <cgxu519@gmx.com>
-To: mlyle@lyle.org, tang.junhui@zte.com.cn, kent.overstreet@gmail.com
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Chengguang Xu <cgxu519@gmx.com>
-Subject: [PATCH v2] bcache: move closure debug file into debug direcotry
-Date: Wed,  7 Mar 2018 11:23:21 +0800
-Message-Id: <1520393001-157614-1-git-send-email-cgxu519@gmx.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <prvs=5980fa318=bart.vanassche@wdc.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v2 02/11] block: Use the queue_flag_*() functions instead of open-coding these
+Date: Wed,  7 Mar 2018 17:10:03 -0800
+Message-Id: <20180308011012.31522-3-bart.vanassche@wdc.com>
+In-Reply-To: <20180308011012.31522-1-bart.vanassche@wdc.com>
+References: <20180308011012.31522-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-In current code closure debug file is outside of debug directory
-and when unloading module there is lack of removing operation
-for closure debug file, so it will cause creating error when trying
-to reload  module.
+Except for changing the atomic queue flag manipulations that are
+protected by the queue lock into non-atomic manipulations, this
+patch does not change any functionality.
 
-This patch move closure debug file into "bcache" debug direcory
-so that the file can get deleted properly.
-
-Signed-off-by: Chengguang Xu <cgxu519@gmx.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Ming Lei <ming.lei@redhat.com>
 ---
-Changes since v1:
-- Rename dentry name of debug directory to "bcache_debug" from "debug" to
-avoid compile error.
+ block/blk-core.c     | 2 +-
+ block/blk-mq.c       | 2 +-
+ block/blk-settings.c | 4 ++--
+ block/blk-stat.c     | 6 +++---
+ 4 files changed, 7 insertions(+), 7 deletions(-)
 
- drivers/md/bcache/closure.c |  9 +++++----
- drivers/md/bcache/closure.h |  5 +++--
- drivers/md/bcache/debug.c   | 14 +++++++-------
- drivers/md/bcache/super.c   |  3 +--
- 4 files changed, 16 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/md/bcache/closure.c b/drivers/md/bcache/closure.c
-index 7f12920..c0949c9 100644
---- a/drivers/md/bcache/closure.c
-+++ b/drivers/md/bcache/closure.c
-@@ -157,7 +157,7 @@ void closure_debug_destroy(struct closure *cl)
- }
- EXPORT_SYMBOL(closure_debug_destroy);
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 9d95b2e7c289..1d6b4b0545aa 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -995,7 +995,7 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id,
+ 	 * registered by blk_register_queue().
+ 	 */
+ 	q->bypass_depth = 1;
+-	__set_bit(QUEUE_FLAG_BYPASS, &q->queue_flags);
++	queue_flag_set_unlocked(QUEUE_FLAG_BYPASS, q);
  
--static struct dentry *debug;
-+static struct dentry *closure_debug;
+ 	init_waitqueue_head(&q->mq_freeze_wq);
  
- static int debug_seq_show(struct seq_file *f, void *data)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 53e83d92bf0a..8e0a2286524b 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2698,7 +2698,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	q->queue_flags |= QUEUE_FLAG_MQ_DEFAULT;
+ 
+ 	if (!(set->flags & BLK_MQ_F_SG_MERGE))
+-		q->queue_flags |= 1 << QUEUE_FLAG_NO_SG_MERGE;
++		queue_flag_set_unlocked(QUEUE_FLAG_NO_SG_MERGE, q);
+ 
+ 	q->sg_reserved_size = INT_MAX;
+ 
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 48ebe6be07b7..7f719da0eadd 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -861,9 +861,9 @@ void blk_queue_flush_queueable(struct request_queue *q, bool queueable)
  {
-@@ -199,11 +199,12 @@ static int debug_seq_open(struct inode *inode, struct file *file)
- 	.release	= single_release
- };
- 
--void __init closure_debug_init(void)
-+int __init closure_debug_init(void)
- {
--	debug = debugfs_create_file("closures", 0400, NULL, NULL, &debug_ops);
-+	closure_debug = debugfs_create_file("closures",
-+				0400, bcache_debug, NULL, &debug_ops);
-+	return IS_ERR_OR_NULL(closure_debug);
+ 	spin_lock_irq(q->queue_lock);
+ 	if (queueable)
+-		clear_bit(QUEUE_FLAG_FLUSH_NQ, &q->queue_flags);
++		queue_flag_clear(QUEUE_FLAG_FLUSH_NQ, q);
+ 	else
+-		set_bit(QUEUE_FLAG_FLUSH_NQ, &q->queue_flags);
++		queue_flag_set(QUEUE_FLAG_FLUSH_NQ, q);
+ 	spin_unlock_irq(q->queue_lock);
  }
--
- #endif
+ EXPORT_SYMBOL_GPL(blk_queue_flush_queueable);
+diff --git a/block/blk-stat.c b/block/blk-stat.c
+index 28003bf9941c..b664aa6df725 100644
+--- a/block/blk-stat.c
++++ b/block/blk-stat.c
+@@ -152,7 +152,7 @@ void blk_stat_add_callback(struct request_queue *q,
  
- MODULE_AUTHOR("Kent Overstreet <koverstreet@google.com>");
-diff --git a/drivers/md/bcache/closure.h b/drivers/md/bcache/closure.h
-index 3b9dfc9..71427eb 100644
---- a/drivers/md/bcache/closure.h
-+++ b/drivers/md/bcache/closure.h
-@@ -105,6 +105,7 @@
- struct closure;
- struct closure_syncer;
- typedef void (closure_fn) (struct closure *);
-+extern struct dentry *bcache_debug;
- 
- struct closure_waitlist {
- 	struct llist_head	list;
-@@ -185,13 +186,13 @@ static inline void closure_sync(struct closure *cl)
- 
- #ifdef CONFIG_BCACHE_CLOSURES_DEBUG
- 
--void closure_debug_init(void);
-+int closure_debug_init(void);
- void closure_debug_create(struct closure *cl);
- void closure_debug_destroy(struct closure *cl);
- 
- #else
- 
--static inline void closure_debug_init(void) {}
-+static inline int closure_debug_init(void) { return 0; }
- static inline void closure_debug_create(struct closure *cl) {}
- static inline void closure_debug_destroy(struct closure *cl) {}
- 
-diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
-index af89408..028f7b3 100644
---- a/drivers/md/bcache/debug.c
-+++ b/drivers/md/bcache/debug.c
-@@ -17,7 +17,7 @@
- #include <linux/random.h>
- #include <linux/seq_file.h>
- 
--static struct dentry *debug;
-+struct dentry *bcache_debug;
- 
- #ifdef CONFIG_BCACHE_DEBUG
- 
-@@ -232,11 +232,11 @@ static int bch_dump_release(struct inode *inode, struct file *file)
- 
- void bch_debug_init_cache_set(struct cache_set *c)
- {
--	if (!IS_ERR_OR_NULL(debug)) {
-+	if (!IS_ERR_OR_NULL(bcache_debug)) {
- 		char name[50];
- 		snprintf(name, 50, "bcache-%pU", c->sb.set_uuid);
- 
--		c->debug = debugfs_create_file(name, 0400, debug, c,
-+		c->debug = debugfs_create_file(name, 0400, bcache_debug, c,
- 					       &cache_set_debug_ops);
- 	}
+ 	spin_lock(&q->stats->lock);
+ 	list_add_tail_rcu(&cb->list, &q->stats->callbacks);
+-	set_bit(QUEUE_FLAG_STATS, &q->queue_flags);
++	queue_flag_set(QUEUE_FLAG_STATS, q);
+ 	spin_unlock(&q->stats->lock);
  }
-@@ -245,13 +245,13 @@ void bch_debug_init_cache_set(struct cache_set *c)
+ EXPORT_SYMBOL_GPL(blk_stat_add_callback);
+@@ -163,7 +163,7 @@ void blk_stat_remove_callback(struct request_queue *q,
+ 	spin_lock(&q->stats->lock);
+ 	list_del_rcu(&cb->list);
+ 	if (list_empty(&q->stats->callbacks) && !q->stats->enable_accounting)
+-		clear_bit(QUEUE_FLAG_STATS, &q->queue_flags);
++		queue_flag_clear(QUEUE_FLAG_STATS, q);
+ 	spin_unlock(&q->stats->lock);
  
- void bch_debug_exit(void)
+ 	del_timer_sync(&cb->timer);
+@@ -191,7 +191,7 @@ void blk_stat_enable_accounting(struct request_queue *q)
  {
--	if (!IS_ERR_OR_NULL(debug))
--		debugfs_remove_recursive(debug);
-+	if (!IS_ERR_OR_NULL(bcache_debug))
-+		debugfs_remove_recursive(bcache_debug);
+ 	spin_lock(&q->stats->lock);
+ 	q->stats->enable_accounting = true;
+-	set_bit(QUEUE_FLAG_STATS, &q->queue_flags);
++	queue_flag_set(QUEUE_FLAG_STATS, q);
+ 	spin_unlock(&q->stats->lock);
  }
- 
- int __init bch_debug_init(struct kobject *kobj)
- {
--	debug = debugfs_create_dir("bcache", NULL);
-+	bcache_debug = debugfs_create_dir("bcache", NULL);
- 
--	return IS_ERR_OR_NULL(debug);
-+	return IS_ERR_OR_NULL(bcache_debug);
- }
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 1a9fdab..b784292 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -2133,7 +2133,6 @@ static int __init bcache_init(void)
- 	mutex_init(&bch_register_lock);
- 	init_waitqueue_head(&unregister_wait);
- 	register_reboot_notifier(&reboot);
--	closure_debug_init();
- 
- 	bcache_major = register_blkdev(0, "bcache");
- 	if (bcache_major < 0) {
-@@ -2145,7 +2144,7 @@ static int __init bcache_init(void)
- 	if (!(bcache_wq = alloc_workqueue("bcache", WQ_MEM_RECLAIM, 0)) ||
- 	    !(bcache_kobj = kobject_create_and_add("bcache", fs_kobj)) ||
- 	    bch_request_init() ||
--	    bch_debug_init(bcache_kobj) ||
-+	    bch_debug_init(bcache_kobj) || closure_debug_init() ||
- 	    sysfs_create_files(bcache_kobj, files))
- 		goto err;
  
 -- 
-1.8.3.1
+2.16.2
