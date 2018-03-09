@@ -1,75 +1,36 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:41363 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752785AbeC2WHn (ORCPT
+Received: from mx0a-00272701.pphosted.com ([67.231.145.144]:55634 "EHLO
+        mx0a-00272701.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S932157AbeCIVN6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Mar 2018 18:07:43 -0400
-Received: by mail-lf0-f68.google.com with SMTP id o102-v6so10325236lfg.8
-        for <linux-block@vger.kernel.org>; Thu, 29 Mar 2018 15:07:43 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        keith.busch@intel.com, javier@cnexlabs.com,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 35/37] lightnvm: pblk: don't recover unwritten lines
-Date: Fri, 30 Mar 2018 00:05:22 +0200
-Message-Id: <20180329220524.30363-36-mb@lightnvm.io>
-In-Reply-To: <20180329220524.30363-1-mb@lightnvm.io>
-References: <20180329220524.30363-1-mb@lightnvm.io>
+        Fri, 9 Mar 2018 16:13:58 -0500
+To: linux-block@vger.kernel.org
+Cc: Thomas Schmitt <scdbackup@gmx.net>
+From: Steve Kenton <skenton@ou.edu>
+Subject: Newly initialized DVD+RW treated as zero length by the block layer
+Message-ID: <da76727f-22a3-e597-4fe5-7d5c1e6422da@ou.edu>
+Date: Fri, 9 Mar 2018 15:13:49 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+A couple of weeks ago I submitted a proposed patch to extend BLKRRPART
 
-If the line has not been written to, we should not
-try to recover any data from it, so check the state of the
-chunks in the line before attempting to read smeta.
+It got zero response which I assume means no dice to that approach.
 
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
----
- drivers/lightnvm/pblk-recovery.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+So, does anyone have another suggestion about how to deal with this issue?
 
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index 26356429dc72..3e079c2afa6e 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -864,6 +864,21 @@ static void pblk_recov_wa_counters(struct pblk *pblk,
- 	}
- }
- 
-+static int pblk_line_was_written(struct pblk_line *line,
-+			    struct pblk_line_meta *lm)
-+{
-+
-+	int i;
-+	int state_mask = NVM_CHK_ST_OFFLINE | NVM_CHK_ST_FREE;
-+
-+	for (i = 0; i < lm->blk_per_line; i++) {
-+		if (!(line->chks[i].state & state_mask))
-+			return 1;
-+	}
-+
-+	return 0;
-+}
-+
- struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
- {
- 	struct pblk_line_meta *lm = &pblk->lm;
-@@ -900,6 +915,9 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
- 		line->lun_bitmap = ((void *)(smeta_buf)) +
- 						sizeof(struct line_smeta);
- 
-+		if (!pblk_line_was_written(line, lm))
-+			continue;
-+
- 		/* Lines that cannot be read are assumed as not written here */
- 		if (pblk_line_read_smeta(pblk, line))
- 			continue;
--- 
-2.11.0
+The readable size of new, factory blank, optical media can change via user
+space ioctl(SG_IO) commands to format overwritable media such as DVD+RW for
+a UDF filesystem or write to sequential media such as DVD-R for an ISO-9660
+filesystem. However there appears to be no easy way to update the size used
+by the block layer from the initial value of zero. Traditionally, 
+ejecting and
+reinserting the media is the workaround to this long standing issue which
+programs such as growisofs use by automatically opening and closing the tray
+at the end of a session so the newly created filesystem becomes mountable
+and readable.
+
+
+Steve Kenton
