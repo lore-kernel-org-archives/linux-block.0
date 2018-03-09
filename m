@@ -1,30 +1,101 @@
-Return-Path: <prvs=599e16e30=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>, "steve@sk2.org"
-	<steve@sk2.org>, "hare@suse.com" <hare@suse.com>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
-CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>
-Subject: Re: [PATCH] device_handler: remove VLAs
-Date: Fri, 9 Mar 2018 22:48:10 +0000
-Message-ID: <1520635688.2907.17.camel@wdc.com>
+Return-Path: <steve@sk2.org>
+From: Stephen Kitt <steve@sk2.org>
+To: hare@suse.com,
+	axboe@kernel.dk,
+	jejb@linux.vnet.ibm.com,
+	martin.petersen@oracle.com
+Cc: linux-scsi@vger.kernel.org,
+	kernel-hardening@lists.openwall.com,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Stephen Kitt <steve@sk2.org>
+Subject: [PATCH] device_handler: remove VLAs
+Date: Fri,  9 Mar 2018 23:32:11 +0100
+Message-Id: <20180309223211.20473-1-steve@sk2.org>
+In-Reply-To: <20180309232933.14e39858@heffalump.sk2.org>
 References: <20180309232933.14e39858@heffalump.sk2.org>
-	 <20180309223211.20473-1-steve@sk2.org>
-In-Reply-To: <20180309223211.20473-1-steve@sk2.org>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-T24gRnJpLCAyMDE4LTAzLTA5IGF0IDIzOjMyICswMTAwLCBTdGVwaGVuIEtpdHQgd3JvdGU6DQo+
-IEluIHByZXBhcmF0aW9uIHRvIGVuYWJsaW5nIC1XdmxhLCByZW1vdmUgVkxBcyBhbmQgcmVwbGFj
-ZSB0aGVtIHdpdGgNCj4gZml4ZWQtbGVuZ3RoIGFycmF5cyBpbnN0ZWFkLg0KPiANCj4gc2NzaV9k
-aF97YWx1YSxlbWMscmRhY30gdXNlIHZhcmlhYmxlLWxlbmd0aCBhcnJheSBkZWNsYXJhdGlvbnMg
-dG8NCj4gc3RvcmUgY29tbWFuZCBibG9ja3MsIHdpdGggdGhlIGFwcHJvcHJpYXRlIHNpemUgYXMg
-ZGV0ZXJtaW5lZCBieQ0KPiBDT01NQU5EX1NJWkUuIFRoaXMgcGF0Y2ggcmVwbGFjZXMgdGhlc2Ug
-d2l0aCBmaXhlZC1zaXplZCBhcnJheXMgdXNpbmcNCj4gTUFYX0NPTU1BTkRfU0laRSwgc28gdGhh
-dCB0aGUgYXJyYXkgc2l6ZSBjYW4gYmUgZGV0ZXJtaW5lZCBhdCBjb21waWxlDQo+IHRpbWUuDQoN
-CklmIENPTU1BTkRfU0laRSgpIGlzIGV2YWx1YXRlZCBhdCBjb21waWxlIHRpbWUsIGRvIHdlIHN0
-aWxsIG5lZWQgdGhpcyBwYXRjaD8NCg0KVGhhbmtzLA0KDQpCYXJ0Lg0KDQoNCg==
+In preparation to enabling -Wvla, remove VLAs and replace them with
+fixed-length arrays instead.
+
+scsi_dh_{alua,emc,rdac} use variable-length array declarations to
+store command blocks, with the appropriate size as determined by
+COMMAND_SIZE. This patch replaces these with fixed-sized arrays using
+MAX_COMMAND_SIZE, so that the array size can be determined at compile
+time.
+
+This was prompted by https://lkml.org/lkml/2018/3/7/621
+
+Signed-off-by: Stephen Kitt <steve@sk2.org>
+---
+ drivers/scsi/device_handler/scsi_dh_alua.c | 8 ++++----
+ drivers/scsi/device_handler/scsi_dh_emc.c  | 2 +-
+ drivers/scsi/device_handler/scsi_dh_rdac.c | 2 +-
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/scsi/device_handler/scsi_dh_alua.c b/drivers/scsi/device_handler/scsi_dh_alua.c
+index 4b44325d1a82..982a52528a1c 100644
+--- a/drivers/scsi/device_handler/scsi_dh_alua.c
++++ b/drivers/scsi/device_handler/scsi_dh_alua.c
+@@ -138,12 +138,12 @@ static void release_port_group(struct kref *kref)
+ static int submit_rtpg(struct scsi_device *sdev, unsigned char *buff,
+ 		       int bufflen, struct scsi_sense_hdr *sshdr, int flags)
+ {
+-	u8 cdb[COMMAND_SIZE(MAINTENANCE_IN)];
++	u8 cdb[MAX_COMMAND_SIZE];
+ 	int req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
+ 		REQ_FAILFAST_DRIVER;
+ 
+ 	/* Prepare the command. */
+-	memset(cdb, 0x0, COMMAND_SIZE(MAINTENANCE_IN));
++	memset(cdb, 0x0, MAX_COMMAND_SIZE);
+ 	cdb[0] = MAINTENANCE_IN;
+ 	if (!(flags & ALUA_RTPG_EXT_HDR_UNSUPP))
+ 		cdb[1] = MI_REPORT_TARGET_PGS | MI_EXT_HDR_PARAM_FMT;
+@@ -166,7 +166,7 @@ static int submit_rtpg(struct scsi_device *sdev, unsigned char *buff,
+ static int submit_stpg(struct scsi_device *sdev, int group_id,
+ 		       struct scsi_sense_hdr *sshdr)
+ {
+-	u8 cdb[COMMAND_SIZE(MAINTENANCE_OUT)];
++	u8 cdb[MAX_COMMAND_SIZE];
+ 	unsigned char stpg_data[8];
+ 	int stpg_len = 8;
+ 	int req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
+@@ -178,7 +178,7 @@ static int submit_stpg(struct scsi_device *sdev, int group_id,
+ 	put_unaligned_be16(group_id, &stpg_data[6]);
+ 
+ 	/* Prepare the command. */
+-	memset(cdb, 0x0, COMMAND_SIZE(MAINTENANCE_OUT));
++	memset(cdb, 0x0, MAX_COMMAND_SIZE);
+ 	cdb[0] = MAINTENANCE_OUT;
+ 	cdb[1] = MO_SET_TARGET_PGS;
+ 	put_unaligned_be32(stpg_len, &cdb[6]);
+diff --git a/drivers/scsi/device_handler/scsi_dh_emc.c b/drivers/scsi/device_handler/scsi_dh_emc.c
+index 6a2792f3a37e..95c47909a58f 100644
+--- a/drivers/scsi/device_handler/scsi_dh_emc.c
++++ b/drivers/scsi/device_handler/scsi_dh_emc.c
+@@ -249,7 +249,7 @@ static int send_trespass_cmd(struct scsi_device *sdev,
+ 			    struct clariion_dh_data *csdev)
+ {
+ 	unsigned char *page22;
+-	unsigned char cdb[COMMAND_SIZE(MODE_SELECT)];
++	unsigned char cdb[MAX_COMMAND_SIZE];
+ 	int err, res = SCSI_DH_OK, len;
+ 	struct scsi_sense_hdr sshdr;
+ 	u64 req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
+diff --git a/drivers/scsi/device_handler/scsi_dh_rdac.c b/drivers/scsi/device_handler/scsi_dh_rdac.c
+index 7af31a1247ee..d27fabae8ddd 100644
+--- a/drivers/scsi/device_handler/scsi_dh_rdac.c
++++ b/drivers/scsi/device_handler/scsi_dh_rdac.c
+@@ -533,7 +533,7 @@ static void send_mode_select(struct work_struct *work)
+ 	int err = SCSI_DH_OK, retry_cnt = RDAC_RETRY_COUNT;
+ 	struct rdac_queue_data *tmp, *qdata;
+ 	LIST_HEAD(list);
+-	unsigned char cdb[COMMAND_SIZE(MODE_SELECT_10)];
++	unsigned char cdb[MAX_COMMAND_SIZE];
+ 	struct scsi_sense_hdr sshdr;
+ 	unsigned int data_size;
+ 	u64 req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
+-- 
+2.11.0
