@@ -1,63 +1,50 @@
-Return-Path: <keith.busch@intel.com>
-From: Keith Busch <keith.busch@intel.com>
-To: Linux NVMe <linux-nvme@lists.infradead.org>,
-	Linux Block <linux-block@vger.kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>
-Subject: [PATCH 2/3] nvme-pci: Remove unused queue parameter
-Date: Fri, 23 Mar 2018 16:19:22 -0600
-Message-Id: <20180323221923.24545-2-keith.busch@intel.com>
-In-Reply-To: <20180323221923.24545-1-keith.busch@intel.com>
-References: <20180323221923.24545-1-keith.busch@intel.com>
+Return-Path: <prvs=599e16e30=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "sagi@grimberg.me"
+	<sagi@grimberg.me>, "sbates@raithlin.com" <sbates@raithlin.com>,
+	"logang@deltatee.com" <logang@deltatee.com>, "linux-nvdimm@lists.01.org"
+	<linux-nvdimm@lists.01.org>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "linux-pci@vger.kernel.org"
+	<linux-pci@vger.kernel.org>
+CC: "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"jgg@mellanox.com" <jgg@mellanox.com>, "hch@lst.de" <hch@lst.de>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>, "dan.j.williams@intel.com" <dan.j.williams@intel.com>,
+	"jglisse@redhat.com" <jglisse@redhat.com>, "maxg@mellanox.com"
+	<maxg@mellanox.com>, "bhelgaas@google.com" <bhelgaas@google.com>,
+	"keith.busch@intel.com" <keith.busch@intel.com>, "benh@kernel.crashing.org"
+	<benh@kernel.crashing.org>
+Subject: Re: [PATCH v2 08/10] nvme-pci: Add support for P2P memory in requests
+Date: Fri, 9 Mar 2018 05:08:36 +0000
+Message-ID: <1520572115.11647.3.camel@wdc.com>
+References: <20180228234006.21093-1-logang@deltatee.com>
+	 <20180228234006.21093-9-logang@deltatee.com>
+	 <c6639530-48ba-4655-c772-7d88a030e37e@grimberg.me>
+	 <1CE68E79-E5FD-4EE2-BD88-B3EE57E43ACE@raithlin.com>
+In-Reply-To: <1CE68E79-E5FD-4EE2-BD88-B3EE57E43ACE@raithlin.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-All nvme queue memory is allocated up front. We don't take the node
-into consideration when creating queues anymore, so removing the unused
-parameter.
-
-Signed-off-by: Keith Busch <keith.busch@intel.com>
----
- drivers/nvme/host/pci.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index cef5ce851a92..632166f7d8f2 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1379,8 +1379,7 @@ static int nvme_alloc_sq_cmds(struct nvme_dev *dev, struct nvme_queue *nvmeq,
- 	return 0;
- }
- 
--static int nvme_alloc_queue(struct nvme_dev *dev, int qid,
--		int depth, int node)
-+static int nvme_alloc_queue(struct nvme_dev *dev, int qid, int depth)
- {
- 	struct nvme_queue *nvmeq = &dev->queues[qid];
- 
-@@ -1595,8 +1594,7 @@ static int nvme_pci_configure_admin_queue(struct nvme_dev *dev)
- 	if (result < 0)
- 		return result;
- 
--	result = nvme_alloc_queue(dev, 0, NVME_AQ_DEPTH,
--			dev_to_node(dev->dev));
-+	result = nvme_alloc_queue(dev, 0, NVME_AQ_DEPTH);
- 	if (result)
- 		return result;
- 
-@@ -1629,9 +1627,7 @@ static int nvme_create_io_queues(struct nvme_dev *dev)
- 	int ret = 0;
- 
- 	for (i = dev->ctrl.queue_count; i <= dev->max_qid; i++) {
--		/* vector == qid - 1, match nvme_create_queue */
--		if (nvme_alloc_queue(dev, i, dev->q_depth,
--		     pci_irq_get_node(to_pci_dev(dev->dev), i - 1))) {
-+		if (nvme_alloc_queue(dev, i, dev->q_depth)) {
- 			ret = -ENOMEM;
- 			break;
- 		}
--- 
-2.14.3
+T24gVGh1LCAyMDE4LTAzLTAxIGF0IDE1OjU4ICswMDAwLCBTdGVwaGVuICBCYXRlcyB3cm90ZToN
+Cj4gPiBBbnkgcGxhbnMgYWRkaW5nIHRoZSBjYXBhYmlsaXR5IHRvIG52bWUtcmRtYT8gU2hvdWxk
+IGJlDQo+ID4gc3RyYWlnaHQtZm9yd2FyZC4uLiBJbiB0aGVvcnksIHRoZSB1c2UtY2FzZSB3b3Vs
+ZCBiZSByZG1hIGJhY2tlbmQNCj4gPiBmYWJyaWMgYmVoaW5kLiBTaG91bGRuJ3QgYmUgaGFyZCB0
+byB0ZXN0IGVpdGhlci4uLg0KPiANCj4gTmljZSBpZGVhIFNhZ2kuIFllcyB3ZSBoYXZlIGJlZW4g
+c3RhcnRpbmcgdG8gbG9vayBhdCB0aGF0LiBUaG91Z2ggYWdhaW4gd2UNCj4gd291bGQgcHJvYmFi
+bHkgd2FudCB0byBpbXBvc2UgdGhlICJhdHRhY2hlZCB0byB0aGUgc2FtZSBQQ0llIHN3aXRjaCIg
+cnVsZQ0KPiB3aGljaCBtaWdodCBiZSBsZXNzIGNvbW1vbiB0byBzYXRpc2Z5IGluIGluaXRpYXRv
+ciBzeXN0ZW1zLiANCj4gDQo+IERvd24gdGhlIHJvYWQgSSB3b3VsZCBhbHNvIGxpa2UgdG8gZGlz
+Y3VzcyB0aGUgYmVzdCB3YXkgdG8gdXNlIHRoaXMgUDJQDQo+IGZyYW1ld29yayB0byBmYWNpbGl0
+YXRlIGNvcGllcyBiZXR3ZWVuIE5WTWUgbmFtZXNwYWNlcyAob24gYm90aCBQQ0llIGFuZA0KPiBm
+YWJyaWMgYXR0YWNoZWQgbmFtZXNwYWNlcykgd2l0aG91dCBoYXZpbmcgdG8gZXhwb3NlIHRoZSBD
+TUIgdXAgdG8gdXNlcg0KPiBzcGFjZS4gV2Fzbid0IHNvbWV0aGluZyBsaWtlIHRoYXQgZG9uZSBp
+biB0aGUgU0NTSSB3b3JsZCBhdCBzb21lIHBvaW50DQo+IE1hcnRpbj8NCg0KQXJlIHlvdSBwZXJo
+YXBzIHJlZmVycmluZyB0byB0aGUgZm9sbG93aW5nIHBhdGNoIHNlcmllczogIkNvcHkgT2ZmbG9h
+ZCINCihodHRwczovL3d3dy5zcGluaWNzLm5ldC9saXN0cy9saW51eC1zY3NpL21zZzc0NjgwLmh0
+bWwgLw0KaHR0cHM6Ly9sd24ubmV0L0FydGljbGVzLzU5MjA5NC8pPyBJIHdpbGwgY29udGFjdCBN
+YXJ0aW4gb2ZmLWxpc3QgYW5kIGluDQpjYXNlIGhlIHdvdWxkbid0IGhhdmUgdGhlIHRpbWUgbXlz
+ZWxmIHRvIHJldml2ZSB0aGF0IHBhdGNoIHNlcmllcyB0aGVuIEkNCndpbGwgZnJlZSB1cCBzb21l
+IHRpbWUgdG8gd29yayBvbiB0aGlzLg0KDQpCYXJ0Lg0KDQoNCg0KDQo=
