@@ -1,147 +1,79 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f52.google.com ([74.125.83.52]:37526 "EHLO
-        mail-pg0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754651AbeCSAgm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Mar 2018 20:36:42 -0400
-Received: by mail-pg0-f52.google.com with SMTP id n11so1538427pgp.4
-        for <linux-block@vger.kernel.org>; Sun, 18 Mar 2018 17:36:42 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Coly Li <colyli@suse.de>,
-        Hannes Reinecke <hare@suse.com>,
-        Huijun Tang <tang.junhui@zte.com.cn>
-Subject: [for-4.17 02/20] bcache: quit dc->writeback_thread when BCACHE_DEV_DETACHING is set
-Date: Sun, 18 Mar 2018 17:36:15 -0700
-Message-Id: <20180319003633.27225-3-mlyle@lyle.org>
-In-Reply-To: <20180319003633.27225-1-mlyle@lyle.org>
-References: <20180319003633.27225-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block IO bits for 4.16-rc5
+Message-ID: <e839cc6b-72d3-6606-a062-1261ac502669@kernel.dk>
+Date: Fri, 9 Mar 2018 22:21:47 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Coly Li <colyli@suse.de>
+Hi Linus,
 
-In patch "bcache: fix cached_dev->count usage for bch_cache_set_error()",
-cached_dev_get() is called when creating dc->writeback_thread, and
-cached_dev_put() is called when exiting dc->writeback_thread. This
-modification works well unless people detach the bcache device manually by
-    'echo 1 > /sys/block/bcache<N>/bcache/detach'
-Because this sysfs interface only calls bch_cached_dev_detach() which wakes
-up dc->writeback_thread but does not stop it. The reason is, before patch
-"bcache: fix cached_dev->count usage for bch_cache_set_error()", inside
-bch_writeback_thread(), if cache is not dirty after writeback,
-cached_dev_put() will be called here. And in cached_dev_make_request() when
-a new write request makes cache from clean to dirty, cached_dev_get() will
-be called there. Since we don't operate dc->count in these locations,
-refcount d->count cannot be dropped after cache becomes clean, and
-cached_dev_detach_finish() won't be called to detach bcache device.
+Here are a set of fixes for the current release. This pull request
+contains:
 
-This patch fixes the issue by checking whether BCACHE_DEV_DETACHING is
-set inside bch_writeback_thread(). If this bit is set and cache is clean
-(no existing writeback_keys), break the while-loop, call cached_dev_put()
-and quit the writeback thread.
+- Pull request from Konrad, with a single xen-blkfront fix from Bhavesh
+  with a multiqueue fix when detaching/re-attaching.
 
-Please note if cache is still dirty, even BCACHE_DEV_DETACHING is set the
-writeback thread should continue to perform writeback, this is the original
-design of manually detach.
+- Pull request from Keith for NVMe, with a few important fixes,
+  including a revert for a sysfs fix that caused some user space
+  confusion.
 
-It is safe to do the following check without locking, let me explain why,
-+	if (!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags) &&
-+	    (!atomic_read(&dc->has_dirty) || !dc->writeback_running)) {
+- Two bcache fixes by way of Michael Lyle.
 
-If the kenrel thread does not sleep and continue to run due to conditions
-are not updated in time on the running CPU core, it just consumes more CPU
-cycles and has no hurt. This should-sleep-but-run is safe here. We just
-focus on the should-run-but-sleep condition, which means the writeback
-thread goes to sleep in mistake while it should continue to run.
-1, First of all, no matter the writeback thread is hung or not,
-   kthread_stop() from cached_dev_detach_finish() will wake up it and
-   terminate by making kthread_should_stop() return true. And in normal
-   run time, bit on index BCACHE_DEV_DETACHING is always cleared, the
-   condition
-	!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags)
-   is always true and can be ignored as constant value.
-2, If one of the following conditions is true, the writeback thread should
-   go to sleep,
-   "!atomic_read(&dc->has_dirty)" or "!dc->writeback_running)"
-   each of them independently controls the writeback thread should sleep or
-   not, let's analyse them one by one.
-2.1 condition "!atomic_read(&dc->has_dirty)"
-   If dc->has_dirty is set from 0 to 1 on another CPU core, bcache will
-   call bch_writeback_queue() immediately or call bch_writeback_add() which
-   indirectly calls bch_writeback_queue() too. In bch_writeback_queue(),
-   wake_up_process(dc->writeback_thread) is called. It sets writeback
-   thread's task state to TASK_RUNNING and following an implicit memory
-   barrier, then tries to wake up the writeback thread.
-   In writeback thread, its task state is set to TASK_INTERRUPTIBLE before
-   doing the condition check. If other CPU core sets the TASK_RUNNING state
-   after writeback thread setting TASK_INTERRUPTIBLE, the writeback thread
-   will be scheduled to run very soon because its state is not
-   TASK_INTERRUPTIBLE. If other CPU core sets the TASK_RUNNING state before
-   writeback thread setting TASK_INTERRUPTIBLE, the implict memory barrier
-   of wake_up_process() will make sure modification of dc->has_dirty on
-   other CPU core is updated and observed on the CPU core of writeback
-   thread. Therefore the condition check will correctly be false, and
-   continue writeback code without sleeping.
-2.2 condition "!dc->writeback_running)"
-   dc->writeback_running can be changed via sysfs file, every time it is
-   modified, a following bch_writeback_queue() is alwasy called. So the
-   change is always observed on the CPU core of writeback thread. If
-   dc->writeback_running is changed from 0 to 1 on other CPU core, this
-   condition check will observe the modification and allow writeback
-   thread to continue to run without sleeping.
-Now we can see, even without a locking protection, multiple conditions
-check is safe here, no deadlock or process hang up will happen.
+- A loop regression fix, fixing an issue with lost writes on DAX.
 
-I compose a separte patch because that patch "bcache: fix cached_dev->count
-usage for bch_cache_set_error()" already gets a "Reviewed-by:" from Hannes
-Reinecke. Also this fix is not trivial and good for a separate patch.
 
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
-Cc: Hannes Reinecke <hare@suse.com>
-Cc: Huijun Tang <tang.junhui@zte.com.cn>
----
- drivers/md/bcache/writeback.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+Please pull!
 
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index b280c134dd4d..4dbeaaa575bf 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -565,9 +565,15 @@ static int bch_writeback_thread(void *arg)
- 	while (!kthread_should_stop()) {
- 		down_write(&dc->writeback_lock);
- 		set_current_state(TASK_INTERRUPTIBLE);
--		if (!atomic_read(&dc->has_dirty) ||
--		    (!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags) &&
--		     !dc->writeback_running)) {
-+		/*
-+		 * If the bache device is detaching, skip here and continue
-+		 * to perform writeback. Otherwise, if no dirty data on cache,
-+		 * or there is dirty data on cache but writeback is disabled,
-+		 * the writeback thread should sleep here and wait for others
-+		 * to wake up it.
-+		 */
-+		if (!test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags) &&
-+		    (!atomic_read(&dc->has_dirty) || !dc->writeback_running)) {
- 			up_write(&dc->writeback_lock);
- 
- 			if (kthread_should_stop()) {
-@@ -587,6 +593,14 @@ static int bch_writeback_thread(void *arg)
- 			atomic_set(&dc->has_dirty, 0);
- 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_CLEAN);
- 			bch_write_bdev_super(dc, NULL);
-+			/*
-+			 * If bcache device is detaching via sysfs interface,
-+			 * writeback thread should stop after there is no dirty
-+			 * data on cache. BCACHE_DEV_DETACHING flag is set in
-+			 * bch_cached_dev_detach().
-+			 */
-+			if (test_bit(BCACHE_DEV_DETACHING, &dc->disk.flags))
-+				break;
- 		}
- 
- 		up_write(&dc->writeback_lock);
+
+  git://git.kernel.dk/linux-block.git tags/for-linus-20180309
+
+
+----------------------------------------------------------------
+Bhavesh Davda (1):
+      xen-blkfront: move negotiate_mq to cover all cases of new VBDs
+
+Christoph Hellwig (1):
+      Revert "nvme: create 'slaves' and 'holders' entries for hidden controllers"
+
+James Smart (1):
+      nvme_fc: rework sqsize handling
+
+Jens Axboe (2):
+      Merge branch 'stable/for-jens-4.15' of git://git.kernel.org/.../konrad/xen into for-linus
+      Merge branch 'nvme-4.16-rc5' of git://git.infradead.org/nvme into for-linus
+
+Michael Lyle (1):
+      bcache: don't attach backing with duplicate UUID
+
+Ming Lei (1):
+      nvme: pci: pass max vectors as num_possible_cpus() to pci_alloc_irq_vectors
+
+Roland Dreier (1):
+      nvme-fabrics: Ignore nr_io_queues option for discovery controllers
+
+Ross Zwisler (1):
+      loop: Fix lost writes caused by missing flag
+
+Tang Junhui (1):
+      bcache: fix crashes in duplicate cache device register
+
+Wen Xiong (1):
+      nvme-pci: Fix EEH failure on ppc
+
+ drivers/block/loop.c          |  2 +-
+ drivers/block/xen-blkfront.c  | 17 ++++++++---------
+ drivers/md/bcache/super.c     | 27 +++++++++++++++++++++------
+ drivers/nvme/host/core.c      |  2 --
+ drivers/nvme/host/fabrics.c   |  5 +++++
+ drivers/nvme/host/fc.c        | 27 +++++++++++++++++----------
+ drivers/nvme/host/multipath.c | 30 ------------------------------
+ drivers/nvme/host/nvme.h      |  8 --------
+ drivers/nvme/host/pci.c       | 15 ++++++++-------
+ 9 files changed, 60 insertions(+), 73 deletions(-)
+
 -- 
-2.14.1
+Jens Axboe
