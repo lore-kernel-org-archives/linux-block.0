@@ -1,46 +1,79 @@
-Return-Path: <hare@suse.de>
+Return-Path: <steve@sk2.org>
+Date: Sat, 10 Mar 2018 14:14:22 +0100
+From: Stephen Kitt <steve@sk2.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>, "hare@suse.com"
+ <hare@suse.com>, "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+ "axboe@kernel.dk" <axboe@kernel.dk>, "linux-scsi@vger.kernel.org"
+ <linux-scsi@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "linux-block@vger.kernel.org"
+ <linux-block@vger.kernel.org>, "kernel-hardening@lists.openwall.com"
+ <kernel-hardening@lists.openwall.com>
 Subject: Re: [PATCH] device_handler: remove VLAs
-To: Stephen Kitt <steve@sk2.org>, hare@suse.com, axboe@kernel.dk,
- jejb@linux.vnet.ibm.com, martin.petersen@oracle.com
-Cc: linux-scsi@vger.kernel.org, kernel-hardening@lists.openwall.com,
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Message-ID: <20180310141422.3a8c451f@heffalump.sk2.org>
+In-Reply-To: <1520635688.2907.17.camel@wdc.com>
 References: <20180309232933.14e39858@heffalump.sk2.org>
- <20180309223211.20473-1-steve@sk2.org>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <7cd80595-ca17-0474-5870-6d7c0429db7a@suse.de>
-Date: Mon, 12 Mar 2018 07:25:08 +0100
+	<20180309223211.20473-1-steve@sk2.org>
+	<1520635688.2907.17.camel@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <20180309223211.20473-1-steve@sk2.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+ boundary="Sig_/RLkA53ioUhv_A3ygWmrpsFY"; protocol="application/pgp-signature"
 List-ID: <linux-block@vger.kernel.org>
 
-On 03/09/2018 11:32 PM, Stephen Kitt wrote:
-> In preparation to enabling -Wvla, remove VLAs and replace them with
-> fixed-length arrays instead.
-> 
-> scsi_dh_{alua,emc,rdac} use variable-length array declarations to
-> store command blocks, with the appropriate size as determined by
-> COMMAND_SIZE. This patch replaces these with fixed-sized arrays using
-> MAX_COMMAND_SIZE, so that the array size can be determined at compile
-> time.
-> 
-> This was prompted by https://lkml.org/lkml/2018/3/7/621
-> 
-> Signed-off-by: Stephen Kitt <steve@sk2.org>
-> ---
->  drivers/scsi/device_handler/scsi_dh_alua.c | 8 ++++----
->  drivers/scsi/device_handler/scsi_dh_emc.c  | 2 +-
->  drivers/scsi/device_handler/scsi_dh_rdac.c | 2 +-
->  3 files changed, 6 insertions(+), 6 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+--Sig_/RLkA53ioUhv_A3ygWmrpsFY
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Cheers,
+Hi Bart,
 
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+On Fri, 9 Mar 2018 22:48:10 +0000, Bart Van Assche <Bart.VanAssche@wdc.com>
+wrote:
+> On Fri, 2018-03-09 at 23:32 +0100, Stephen Kitt wrote:
+> > In preparation to enabling -Wvla, remove VLAs and replace them with
+> > fixed-length arrays instead.
+> >=20
+> > scsi_dh_{alua,emc,rdac} use variable-length array declarations to
+> > store command blocks, with the appropriate size as determined by
+> > COMMAND_SIZE. This patch replaces these with fixed-sized arrays using
+> > MAX_COMMAND_SIZE, so that the array size can be determined at compile
+> > time. =20
+>=20
+> If COMMAND_SIZE() is evaluated at compile time, do we still need this pat=
+ch?
+
+The two patches I sent were supposed to be alternative solutions; see
+https://marc.info/?l=3Dlinux-scsi&m=3D152063671005295&w=3D2 for the introdu=
+ction (I
+seem to have messed up the headers, so the mails didn=E2=80=99t end up thre=
+aded
+properly).
+
+The MAX_COMMAND_SIZE approach is nice and simple, but I thought it worth
+eliminating scsi_command_size_tbl while I was at it...
+
+Regards,
+
+Stephen
+
+--Sig_/RLkA53ioUhv_A3ygWmrpsFY
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEnPVX/hPLkMoq7x0ggNMC9Yhtg5wFAlqj2i8ACgkQgNMC9Yht
+g5zViA/+MF5I+78bIeowASW4WOSYxUhajnvUxXnTaR9TT5cs2jZDKQjie0lVu8wm
+L2H5dLE+4UWqIEKzSQRyRVhj6Bt3sWYye2hm6/kiDheIq+FXR9pfOOyOgzsvfmt/
+bHXiFYKb7TQ6BcapWLNKpCJewaMyAPWhghTdJL3UycPwZIWAo21AhNwWsQ5HWKW0
+UV/XOV0Mqvv9LlcWrdFiXPvee9NB4ZT3KVhNlyHpx9M2jO3hEMi2HqXQvhHl8H3L
+UI6jWKFLzmWGQzXkJ+2GRq/bdvWyqzyKX89mq3Xb+zRcyjd1J/AjUtcUqwkSrBt1
+r7RQIQ8XE8zD5TK39BC0OX7hWZd+oBvc+RlLl++hvYSBLJv87Eo9Mu+Fciys7PBJ
+p7YOldKbIA53DO18gsKVgruhvYNnR1VvbS5DI1rXFFDhM+21tpVXlKwBZEBAo3Kz
+4LeOKxTjuzy4OsNkSgjArWX3kBkWurNP7ueKVx6Aw1o6uOkVqqgAbXRuL67yGEL8
+CRpiF4ceZ54ZVHzz0oKXBLbZ1qpKgo4RhZ8NQFbqhI473gDbN5EJ7hugFbDde8A4
+lLGVoSqzEO/zPe88RUZD2AYsrY7X/yToXF5HTOeIHAebQwvMMh1uKcrEUVhzEfuS
+RCfd2DupwXnUUACQ4/bhJYtYizlXFeBp6iyMv4xUbmmRu0K4hwg=
+=TYGA
+-----END PGP SIGNATURE-----
+
+--Sig_/RLkA53ioUhv_A3ygWmrpsFY--
