@@ -1,83 +1,43 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from othala.iewc.co.za ([154.73.34.12]:56822 "EHLO othala.uls.co.za"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751975AbeCMJbD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Mar 2018 05:31:03 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:59476 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750707AbeCKFBO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 11 Mar 2018 00:01:14 -0500
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "jaco@uls.co.za" <jaco@uls.co.za>
+CC: "pieterk@uls.co.za" <pieterk@uls.co.za>
 Subject: Re: disk-io lockup in 4.14.13 kernel
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: "pieterk@uls.co.za" <pieterk@uls.co.za>
+Date: Sun, 11 Mar 2018 05:00:56 +0000
+Message-ID: <1520744455.8740.9.camel@wdc.com>
 References: <16bae006-371f-1eea-56b6-8668249d870b@uls.co.za>
- <828103f7-7550-16a3-d482-8953adc5a234@wdc.com>
- <257ceeb7-f466-d13d-8818-829759eda587@uls.co.za>
- <1520737695.8740.4.camel@wdc.com>
- <6e2ef6eb-a610-8c52-52d8-a35e4d3f36c9@uls.co.za>
- <1520744455.8740.9.camel@wdc.com>
-From: Jaco Kroon <jaco@uls.co.za>
-Message-ID: <0d5c21c2-4fea-5870-e971-f90556fb4141@uls.co.za>
-Date: Tue, 13 Mar 2018 11:30:48 +0200
+         <828103f7-7550-16a3-d482-8953adc5a234@wdc.com>
+         <257ceeb7-f466-d13d-8818-829759eda587@uls.co.za>
+         <1520737695.8740.4.camel@wdc.com>
+         <6e2ef6eb-a610-8c52-52d8-a35e4d3f36c9@uls.co.za>
+In-Reply-To: <6e2ef6eb-a610-8c52-52d8-a35e4d3f36c9@uls.co.za>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1520744455.8740.9.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Bart,
-
-On 11/03/2018 07:00, Bart Van Assche wrote:
-> On Sun, 2018-03-11 at 06:33 +0200, Jaco Kroon wrote:
->> crowsnest ~ # find /sys -name sdm
->> /sys/kernel/debug/block/sdm
->> /sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/host0/port-0:0/expander-0:0/port-0:0:0/expander-0:1/port-0:1:0/end_device-0:1:0/target0:0:13/0:0:13:0/block/sdm
->> /sys/class/block/sdm
->> /sys/block/sdm
->>
->>> lspci
->> crowsnest ~ # lspci
->> [ ... ]
->> 01:00.0 Serial Attached SCSI controller: LSI Logic / Symbios Logic
->> SAS3008 PCI-Express Fusion-MPT SAS-3 (rev 02)
->> [ ... ]
-> Hi Jaco,
->
-> Recently a bug fix for the mq-deadline scheduler was posted but I don't
-> think that that patch will change the behavior on your setup since you are
-> not using ZBC disks. See also "mq-deadline: Make sure to always unlock
-> zones" (https://marc.info/?l=linux-block&m=151983933714492).
->From that link:
-
-In case of a failed write request (all retries failed) and when using
-libata, the SCSI error handler calls scsi_finish_command(). In the
-case of blk-mq this means that scsi_mq_done() does not get called,
-that blk_mq_complete_request() does not get called and also that the
-mq-deadline .completed_request() method is not called. This results in
-the target zone of the failed write request being left in a locked
-state, preventing that any new write requests are issued to the same
-zone.
-
-Why do you say that this won't make a difference? To me it sounds like
-it could very well relate? You're talking about "ZBC" disks. I'm going
-to assume that the ZBC is Zoned Block ??? and reading up on it I get
-really confused.
-
-Either way, the source version onto hich the patch applies is not
-4.14.13 code (the patch references lines 756 and the source in 4.14.13
-only has 679 lines of code.  I also can't find any kind of locking that
-I can imagine that can cause a problem unless there is problems inside
-__dd_dispatch_request, blk_mq_sched_try_merge or dd_insert_request (none
-of which contains any loops that I can see at a quick glance, at least
-down to elv_merge, from there it gets more complicated).
-
->
-> Did I see correctly that /dev/sdm is behind a MPT SAS controller? You may
-> want to contact the authors of this driver and Cc the linux-scsi mailing
-> list. Sorry but I'm not familiar with the mpt3sas driver myself.
-You did see correctly, all drives are behind the MPT SAS.  If there is
-in fact a problem with the driver (or the controller itself for that
-matter) it would explain things.  It would also explain why we don't see
-this problem on other hosts.
-
-I'll contact them as well.
-
-Kind Regards,
-Jaco
+T24gU3VuLCAyMDE4LTAzLTExIGF0IDA2OjMzICswMjAwLCBKYWNvIEtyb29uIHdyb3RlOg0KPiBj
+cm93c25lc3QgfiAjIGZpbmQgL3N5cyAtbmFtZSBzZG0NCj4gL3N5cy9rZXJuZWwvZGVidWcvYmxv
+Y2svc2RtDQo+IC9zeXMvZGV2aWNlcy9wY2kwMDAwOjAwLzAwMDA6MDA6MDEuMC8wMDAwOjAxOjAw
+LjAvaG9zdDAvcG9ydC0wOjAvZXhwYW5kZXItMDowL3BvcnQtMDowOjAvZXhwYW5kZXItMDoxL3Bv
+cnQtMDoxOjAvZW5kX2RldmljZS0wOjE6MC90YXJnZXQwOjA6MTMvMDowOjEzOjAvYmxvY2svc2Rt
+DQo+IC9zeXMvY2xhc3MvYmxvY2svc2RtDQo+IC9zeXMvYmxvY2svc2RtDQo+IA0KPiA+IGxzcGNp
+DQo+IA0KPiBjcm93c25lc3QgfiAjIGxzcGNpDQo+IFsgLi4uIF0NCj4gMDE6MDAuMCBTZXJpYWwg
+QXR0YWNoZWQgU0NTSSBjb250cm9sbGVyOiBMU0kgTG9naWMgLyBTeW1iaW9zIExvZ2ljDQo+IFNB
+UzMwMDggUENJLUV4cHJlc3MgRnVzaW9uLU1QVCBTQVMtMyAocmV2IDAyKQ0KPiBbIC4uLiBdDQoN
+CkhpIEphY28sDQoNClJlY2VudGx5IGEgYnVnIGZpeCBmb3IgdGhlIG1xLWRlYWRsaW5lIHNjaGVk
+dWxlciB3YXMgcG9zdGVkIGJ1dCBJIGRvbid0DQp0aGluayB0aGF0IHRoYXQgcGF0Y2ggd2lsbCBj
+aGFuZ2UgdGhlIGJlaGF2aW9yIG9uIHlvdXIgc2V0dXAgc2luY2UgeW91IGFyZQ0Kbm90IHVzaW5n
+IFpCQyBkaXNrcy4gU2VlIGFsc28gIm1xLWRlYWRsaW5lOiBNYWtlIHN1cmUgdG8gYWx3YXlzIHVu
+bG9jaw0Kem9uZXMiIChodHRwczovL21hcmMuaW5mby8/bD1saW51eC1ibG9jayZtPTE1MTk4Mzkz
+MzcxNDQ5MikuDQoNCkRpZCBJIHNlZSBjb3JyZWN0bHkgdGhhdCAvZGV2L3NkbSBpcyBiZWhpbmQg
+YSBNUFQgU0FTIGNvbnRyb2xsZXI/IFlvdSBtYXkNCndhbnQgdG8gY29udGFjdCB0aGUgYXV0aG9y
+cyBvZiB0aGlzIGRyaXZlciBhbmQgQ2MgdGhlIGxpbnV4LXNjc2kgbWFpbGluZw0KbGlzdC4gU29y
+cnkgYnV0IEknbSBub3QgZmFtaWxpYXIgd2l0aCB0aGUgbXB0M3NhcyBkcml2ZXIgbXlzZWxmLg0K
+DQpCYXJ0Lg==
