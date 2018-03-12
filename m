@@ -1,192 +1,157 @@
-Return-Path: <joseph.qi@linux.alibaba.com>
-To: Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: xuejiufei <jiufei.xue@linux.alibaba.com>,
- Caspar Zhang <caspar@linux.alibaba.com>,
- linux-block <linux-block@vger.kernel.org>, cgroups@vger.kernel.org
-From: Joseph Qi <joseph.qi@linux.alibaba.com>
-Subject: [PATCH v4] blk-throttle: fix race between blkcg_bio_issue_check() and
- cgroup_rmdir()
-Message-ID: <634e5db5-1479-b317-1435-c4cb169298b9@linux.alibaba.com>
-Date: Tue, 6 Mar 2018 11:53:32 +0800
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <gunthorp@deltatee.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org,
+	linux-nvdimm@lists.01.org,
+	linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Logan Gunthorpe <logang@deltatee.com>
+Date: Mon, 12 Mar 2018 13:35:16 -0600
+Message-Id: <20180312193525.2855-3-logang@deltatee.com>
+In-Reply-To: <20180312193525.2855-1-logang@deltatee.com>
+References: <20180312193525.2855-1-logang@deltatee.com>
+Subject: [PATCH v3 02/11] PCI/P2PDMA: Add sysfs group to display p2pmem stats
 List-ID: <linux-block@vger.kernel.org>
 
-We've triggered a WARNING in blk_throtl_bio() when throttling writeback
-io, which complains blkg->refcnt is already 0 when calling blkg_get(),
-and then kernel crashes with invalid page request.
-After investigating this issue, we've found it is caused by a race
-between blkcg_bio_issue_check() and cgroup_rmdir(), which is described
-below:
+Add a sysfs group to display statistics about P2P memory that is
+registered in each PCI device.
 
-writeback kworker                   cgroup_rmdir
-                                      cgroup_destroy_locked
-                                        kill_css
-                                          css_killed_ref_fn
-                                            css_killed_work_fn
-                                              offline_css
-                                                blkcg_css_offline
-  blkcg_bio_issue_check
-    rcu_read_lock
-    blkg_lookup
-                                                  spin_trylock(q->queue_lock)
-                                                  blkg_destroy
-                                                  spin_unlock(q->queue_lock)
-    blk_throtl_bio
-    spin_lock_irq(q->queue_lock)
-    ...
-    spin_unlock_irq(q->queue_lock)
-  rcu_read_unlock
+Attributes in the group display the total amount of P2P memory, the
+amount available and whether it is published or not.
 
-Since rcu can only prevent blkg from releasing when it is being used,
-the blkg->refcnt can be decreased to 0 during blkg_destroy() and schedule
-blkg release.
-Then trying to blkg_get() in blk_throtl_bio() will complains the WARNING.
-And then the corresponding blkg_put() will schedule blkg release again,
-which result in double free.
-This race is introduced by commit ae1188963611 ("blkcg: consolidate blkg
-creation in blkcg_bio_issue_check()"). Before this commit, it will
-lookup first and then try to lookup/create again with queue_lock. Since
-revive this logic is a bit drastic, so fix it by only offlining pd during
-blkcg_css_offline(), and move the rest destruction (especially
-blkg_put()) into blkcg_css_free(), which should be the right way as
-discussed.
-
-Fixes: ae1188963611 ("blkcg: consolidate blkg creation in blkcg_bio_issue_check()")
-Reported-by: Jiufei Xue <jiufei.xue@linux.alibaba.com>
-Cc: stable@vger.kernel.org #4.3+
-Signed-off-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- block/blk-cgroup.c         | 57 +++++++++++++++++++++++++++++++++++-----------
- include/linux/blk-cgroup.h |  2 ++
- 2 files changed, 46 insertions(+), 13 deletions(-)
+ Documentation/ABI/testing/sysfs-bus-pci | 25 +++++++++++++++
+ drivers/pci/p2pdma.c                    | 54 +++++++++++++++++++++++++++++++++
+ 2 files changed, 79 insertions(+)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index c2033a2..450cefd 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -307,11 +307,27 @@ struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
- 	}
+diff --git a/Documentation/ABI/testing/sysfs-bus-pci b/Documentation/ABI/testing/sysfs-bus-pci
+index 44d4b2be92fd..044812c816d0 100644
+--- a/Documentation/ABI/testing/sysfs-bus-pci
++++ b/Documentation/ABI/testing/sysfs-bus-pci
+@@ -323,3 +323,28 @@ Description:
+ 
+ 		This is similar to /sys/bus/pci/drivers_autoprobe, but
+ 		affects only the VFs associated with a specific PF.
++
++What:		/sys/bus/pci/devices/.../p2pmem/available
++Date:		November 2017
++Contact:	Logan Gunthorpe <logang@deltatee.com>
++Description:
++		If the device has any Peer-to-Peer memory registered, this
++	        file contains the amount of memory that has not been
++		allocated (in decimal).
++
++What:		/sys/bus/pci/devices/.../p2pmem/size
++Date:		November 2017
++Contact:	Logan Gunthorpe <logang@deltatee.com>
++Description:
++		If the device has any Peer-to-Peer memory registered, this
++	        file contains the total amount of memory that the device
++		provides (in decimal).
++
++What:		/sys/bus/pci/devices/.../p2pmem/published
++Date:		November 2017
++Contact:	Logan Gunthorpe <logang@deltatee.com>
++Description:
++		If the device has any Peer-to-Peer memory registered, this
++	        file contains a '1' if the memory has been published for
++		use inside the kernel or a '0' if it is only intended
++		for use within the driver that published it.
+diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+index 0ee917381dce..fd4789566a56 100644
+--- a/drivers/pci/p2pdma.c
++++ b/drivers/pci/p2pdma.c
+@@ -24,6 +24,54 @@ struct pci_p2pdma {
+ 	bool p2pmem_published;
+ };
+ 
++static ssize_t size_show(struct device *dev, struct device_attribute *attr,
++			 char *buf)
++{
++	struct pci_dev *pdev = to_pci_dev(dev);
++	size_t size = 0;
++
++	if (pdev->p2pdma->pool)
++		size = gen_pool_size(pdev->p2pdma->pool);
++
++	return snprintf(buf, PAGE_SIZE, "%zd\n", size);
++}
++static DEVICE_ATTR_RO(size);
++
++static ssize_t available_show(struct device *dev, struct device_attribute *attr,
++			      char *buf)
++{
++	struct pci_dev *pdev = to_pci_dev(dev);
++	size_t avail = 0;
++
++	if (pdev->p2pdma->pool)
++		avail = gen_pool_avail(pdev->p2pdma->pool);
++
++	return snprintf(buf, PAGE_SIZE, "%zd\n", avail);
++}
++static DEVICE_ATTR_RO(available);
++
++static ssize_t published_show(struct device *dev, struct device_attribute *attr,
++			      char *buf)
++{
++	struct pci_dev *pdev = to_pci_dev(dev);
++
++	return snprintf(buf, PAGE_SIZE, "%d\n",
++			pdev->p2pdma->p2pmem_published);
++}
++static DEVICE_ATTR_RO(published);
++
++static struct attribute *p2pmem_attrs[] = {
++	&dev_attr_size.attr,
++	&dev_attr_available.attr,
++	&dev_attr_published.attr,
++	NULL,
++};
++
++static const struct attribute_group p2pmem_group = {
++	.attrs = p2pmem_attrs,
++	.name = "p2pmem",
++};
++
+ static void pci_p2pdma_percpu_release(struct percpu_ref *ref)
+ {
+ 	struct pci_p2pdma *p2p =
+@@ -53,6 +101,7 @@ static void pci_p2pdma_release(void *data)
+ 	percpu_ref_exit(&pdev->p2pdma->devmap_ref);
+ 
+ 	gen_pool_destroy(pdev->p2pdma->pool);
++	sysfs_remove_group(&pdev->dev.kobj, &p2pmem_group);
+ 	pdev->p2pdma = NULL;
  }
  
-+static void blkg_pd_offline(struct blkcg_gq *blkg)
-+{
-+	int i;
+@@ -83,9 +132,14 @@ static int pci_p2pdma_setup(struct pci_dev *pdev)
+ 
+ 	pdev->p2pdma = p2p;
+ 
++	error = sysfs_create_group(&pdev->dev.kobj, &p2pmem_group);
++	if (error)
++		goto out_pool_destroy;
 +
-+	lockdep_assert_held(blkg->q->queue_lock);
-+	lockdep_assert_held(&blkg->blkcg->lock);
-+
-+	for (i = 0; i < BLKCG_MAX_POLS; i++) {
-+		struct blkcg_policy *pol = blkcg_policy[i];
-+
-+		if (blkg->pd[i] && !blkg->pd_offline[i] && pol->pd_offline_fn) {
-+			pol->pd_offline_fn(blkg->pd[i]);
-+			blkg->pd_offline[i] = true;
-+		}
-+	}
-+}
-+
- static void blkg_destroy(struct blkcg_gq *blkg)
- {
- 	struct blkcg *blkcg = blkg->blkcg;
- 	struct blkcg_gq *parent = blkg->parent;
--	int i;
+ 	return 0;
  
- 	lockdep_assert_held(blkg->q->queue_lock);
- 	lockdep_assert_held(&blkcg->lock);
-@@ -320,13 +336,6 @@ static void blkg_destroy(struct blkcg_gq *blkg)
- 	WARN_ON_ONCE(list_empty(&blkg->q_node));
- 	WARN_ON_ONCE(hlist_unhashed(&blkg->blkcg_node));
- 
--	for (i = 0; i < BLKCG_MAX_POLS; i++) {
--		struct blkcg_policy *pol = blkcg_policy[i];
--
--		if (blkg->pd[i] && pol->pd_offline_fn)
--			pol->pd_offline_fn(blkg->pd[i]);
--	}
--
- 	if (parent) {
- 		blkg_rwstat_add_aux(&parent->stat_bytes, &blkg->stat_bytes);
- 		blkg_rwstat_add_aux(&parent->stat_ios, &blkg->stat_ios);
-@@ -369,6 +378,7 @@ static void blkg_destroy_all(struct request_queue *q)
- 		struct blkcg *blkcg = blkg->blkcg;
- 
- 		spin_lock(&blkcg->lock);
-+		blkg_pd_offline(blkg);
- 		blkg_destroy(blkg);
- 		spin_unlock(&blkcg->lock);
- 	}
-@@ -1004,16 +1014,15 @@ static int blkcg_print_stat(struct seq_file *sf, void *v)
- static void blkcg_css_offline(struct cgroup_subsys_state *css)
- {
- 	struct blkcg *blkcg = css_to_blkcg(css);
-+	struct blkcg_gq *blkg;
- 
- 	spin_lock_irq(&blkcg->lock);
- 
--	while (!hlist_empty(&blkcg->blkg_list)) {
--		struct blkcg_gq *blkg = hlist_entry(blkcg->blkg_list.first,
--						struct blkcg_gq, blkcg_node);
-+	hlist_for_each_entry(blkg, &blkcg->blkg_list, blkcg_node) {
- 		struct request_queue *q = blkg->q;
- 
- 		if (spin_trylock(q->queue_lock)) {
--			blkg_destroy(blkg);
-+			blkg_pd_offline(blkg);
- 			spin_unlock(q->queue_lock);
- 		} else {
- 			spin_unlock_irq(&blkcg->lock);
-@@ -1032,6 +1041,26 @@ static void blkcg_css_free(struct cgroup_subsys_state *css)
- 	struct blkcg *blkcg = css_to_blkcg(css);
- 	int i;
- 
-+	spin_lock_irq(&blkcg->lock);
-+
-+	while (!hlist_empty(&blkcg->blkg_list)) {
-+		struct blkcg_gq *blkg = hlist_entry(blkcg->blkg_list.first,
-+						    struct blkcg_gq,
-+						    blkcg_node);
-+		struct request_queue *q = blkg->q;
-+
-+		if (spin_trylock(q->queue_lock)) {
-+			blkg_destroy(blkg);
-+			spin_unlock(q->queue_lock);
-+		} else {
-+			spin_unlock_irq(&blkcg->lock);
-+			cpu_relax();
-+			spin_lock_irq(&blkcg->lock);
-+		}
-+	}
-+
-+	spin_unlock_irq(&blkcg->lock);
-+
- 	mutex_lock(&blkcg_pol_mutex);
- 
- 	list_del(&blkcg->all_blkcgs_node);
-@@ -1371,8 +1400,10 @@ void blkcg_deactivate_policy(struct request_queue *q,
- 		spin_lock(&blkg->blkcg->lock);
- 
- 		if (blkg->pd[pol->plid]) {
--			if (pol->pd_offline_fn)
-+			if (!blkg->pd_offline[pol->plid] && pol->pd_offline_fn) {
- 				pol->pd_offline_fn(blkg->pd[pol->plid]);
-+				blkg->pd_offline[pol->plid] = true;
-+			}
- 			pol->pd_free_fn(blkg->pd[pol->plid]);
- 			blkg->pd[pol->plid] = NULL;
- 		}
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 69bea82..ad5e2cb 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -133,6 +133,8 @@ struct blkcg_gq {
- 	struct blkg_rwstat		stat_ios;
- 
- 	struct blkg_policy_data		*pd[BLKCG_MAX_POLS];
-+	/* is the corresponding policy data offline? */
-+	bool				pd_offline[BLKCG_MAX_POLS];
- 
- 	struct rcu_head			rcu_head;
- };
+ out_pool_destroy:
++	pdev->p2pdma = NULL;
+ 	gen_pool_destroy(p2p->pool);
+ out:
+ 	devm_kfree(&pdev->dev, p2p);
 -- 
-1.8.3.1
+2.11.0
