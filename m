@@ -1,33 +1,46 @@
-Return-Path: <prvs=602e4d42b=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "steve@sk2.org" <steve@sk2.org>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"hare@suse.com" <hare@suse.com>, "kernel-hardening@lists.openwall.com"
-	<kernel-hardening@lists.openwall.com>, "jejb@linux.vnet.ibm.com"
-	<jejb@linux.vnet.ibm.com>
+Return-Path: <hare@suse.de>
 Subject: Re: [PATCH] device_handler: remove VLAs
-Date: Mon, 12 Mar 2018 15:41:26 +0000
-Message-ID: <1520869285.3469.13.camel@wdc.com>
+To: Stephen Kitt <steve@sk2.org>, hare@suse.com, axboe@kernel.dk,
+ jejb@linux.vnet.ibm.com, martin.petersen@oracle.com
+Cc: linux-scsi@vger.kernel.org, kernel-hardening@lists.openwall.com,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
 References: <20180309232933.14e39858@heffalump.sk2.org>
-	 <20180309223211.20473-1-steve@sk2.org> <1520635688.2907.17.camel@wdc.com>
-	 <20180310141422.3a8c451f@heffalump.sk2.org>
-In-Reply-To: <20180310141422.3a8c451f@heffalump.sk2.org>
-Content-Type: text/plain; charset="utf-8"
+ <20180309223211.20473-1-steve@sk2.org>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <7cd80595-ca17-0474-5870-6d7c0429db7a@suse.de>
+Date: Mon, 12 Mar 2018 07:25:08 +0100
 MIME-Version: 1.0
+In-Reply-To: <20180309223211.20473-1-steve@sk2.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-T24gU2F0LCAyMDE4LTAzLTEwIGF0IDE0OjE0ICswMTAwLCBTdGVwaGVuIEtpdHQgd3JvdGU6DQo+
-IFRoZSB0d28gcGF0Y2hlcyBJIHNlbnQgd2VyZSBzdXBwb3NlZCB0byBiZSBhbHRlcm5hdGl2ZSBz
-b2x1dGlvbnM7IHNlZQ0KPiBodHRwczovL21hcmMuaW5mby8/bD1saW51eC1zY3NpJm09MTUyMDYz
-NjcxMDA1Mjk1Jnc9MiBmb3IgdGhlIGludHJvZHVjdGlvbiAoSQ0KPiBzZWVtIHRvIGhhdmUgbWVz
-c2VkIHVwIHRoZSBoZWFkZXJzLCBzbyB0aGUgbWFpbHMgZGlkbuKAmXQgZW5kIHVwIHRocmVhZGVk
-DQo+IHByb3Blcmx5KS4NCg0KVGhlIHR3byBwYXRjaGVzIGFycml2ZWQgaW4gbXkgaW5ib3ggc2V2
-ZXJhbCBtaW51dGVzIGJlZm9yZSB0aGUgY292ZXIgbGV0dGVyLiBJbg0KdGhlIGUtbWFpbCBoZWFk
-ZXIgb2YgdGhlIGNvdmVyIGxldHRlciBJIGZvdW5kIHRoZSBmb2xsb3dpbmc6DQoNClgtR3JleWxp
-c3Q6IGRlbGF5ZWQgMTgxMCBzZWNvbmRzIGJ5IHBvc3RncmV5LTEuMjcgYXQgdmdlci5rZXJuZWwu
-b3JnOyBGcmksIDA5IE1hciAyMDE4IDE4OjA1OjA4IEVTVA0KDQpEb2VzIHRoaXMgbWVhbiB0aGF0
-IHRoZSBkZWxheSBoYXBwZW5lZCBkdWUgdG8gdmdlciBzZXJ2ZXIncyBhbnRpLXNwYW0gYWxnb3Jp
-dGhtPw0KDQpCYXJ0Lg0KDQoNCg0K
+On 03/09/2018 11:32 PM, Stephen Kitt wrote:
+> In preparation to enabling -Wvla, remove VLAs and replace them with
+> fixed-length arrays instead.
+> 
+> scsi_dh_{alua,emc,rdac} use variable-length array declarations to
+> store command blocks, with the appropriate size as determined by
+> COMMAND_SIZE. This patch replaces these with fixed-sized arrays using
+> MAX_COMMAND_SIZE, so that the array size can be determined at compile
+> time.
+> 
+> This was prompted by https://lkml.org/lkml/2018/3/7/621
+> 
+> Signed-off-by: Stephen Kitt <steve@sk2.org>
+> ---
+>  drivers/scsi/device_handler/scsi_dh_alua.c | 8 ++++----
+>  drivers/scsi/device_handler/scsi_dh_emc.c  | 2 +-
+>  drivers/scsi/device_handler/scsi_dh_rdac.c | 2 +-
+>  3 files changed, 6 insertions(+), 6 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
