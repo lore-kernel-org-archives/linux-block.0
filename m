@@ -1,107 +1,90 @@
-Return-Path: <ming.lei@redhat.com>
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+Date: Mon, 12 Mar 2018 17:00:58 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Laurence Oberman <loberman@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 3/4] genirq/affinity: support to do irq vectors spread starting from any vector
-Date: Thu,  8 Mar 2018 18:53:57 +0800
-Message-Id: <20180308105358.1506-4-ming.lei@redhat.com>
-In-Reply-To: <20180308105358.1506-1-ming.lei@redhat.com>
-References: <20180308105358.1506-1-ming.lei@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: James Bottomley <James.Bottomley@HansenPartnership.com>,
+        Jens Axboe <axboe@fb.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Meelis Roos <mroos@linux.ee>,
+        Don Brace <don.brace@microsemi.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Omar Sandoval <osandov@fb.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH V4 4/4] scsi: virtio_scsi: fix IO hang caused by irq
+ vector automatic affinity
+Message-ID: <20180312090052.GA23903@ming.t460p>
+References: <20180309033218.23042-1-ming.lei@redhat.com>
+ <20180309033218.23042-5-ming.lei@redhat.com>
+ <20180310101520.GC32022@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180310101520.GC32022@lst.de>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Now two parameters(start_vec, affv) are introduced to irq_build_affinity_masks(),
-then this helper can build the affinity of each irq vector starting from
-the irq vector of 'start_vec', and handle at most 'affv' vectors.
+On Sat, Mar 10, 2018 at 11:15:20AM +0100, Christoph Hellwig wrote:
+> This looks generally fine to me:
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> 
+> As a follow on we should probably kill virtscsi_queuecommand_single and
+> thus virtscsi_host_template_single as well.
+> > Given storage IO is always C/S model, there isn't such issue with SCSI_MQ(blk-mq),
+> 
+> What does C/S mean here?
 
-This way is required to do 2-stages irq vectors spread among all
-possible CPUs.
+Client–Server.
 
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- kernel/irq/affinity.c | 23 +++++++++++++++--------
- 1 file changed, 15 insertions(+), 8 deletions(-)
+> 
+> > @@ -580,10 +573,7 @@ static int virtscsi_queuecommand_single(struct Scsi_Host *sh,
+> >  					struct scsi_cmnd *sc)
+> >  {
+> >  	struct virtio_scsi *vscsi = shost_priv(sh);
+> > -	struct virtio_scsi_target_state *tgt =
+> > -				scsi_target(sc->device)->hostdata;
+> >  
+> > -	atomic_inc(&tgt->reqs);
+> >  	return virtscsi_queuecommand(vscsi, &vscsi->req_vqs[0], sc);
+> >  }
+> 
+> >  static int virtscsi_queuecommand_multi(struct Scsi_Host *sh,
+> >  				       struct scsi_cmnd *sc)
+> >  {
+> >  	struct virtio_scsi *vscsi = shost_priv(sh);
+> > -	struct virtio_scsi_target_state *tgt =
+> > -				scsi_target(sc->device)->hostdata;
+> > -	struct virtio_scsi_vq *req_vq;
+> > -
+> > -	if (shost_use_blk_mq(sh))
+> > -		req_vq = virtscsi_pick_vq_mq(vscsi, sc);
+> > -	else
+> > -		req_vq = virtscsi_pick_vq(vscsi, tgt);
+> > +	struct virtio_scsi_vq *req_vq = virtscsi_pick_vq_mq(vscsi, sc);
+> >  
+> >  	return virtscsi_queuecommand(vscsi, req_vq, sc);
+> 
+> Given how virtscsi_pick_vq_mq works virtscsi_queuecommand_single and
+> virtscsi_queuecommand_multi now have identical behavior.  That means
+> virtscsi_queuecommand_single should be removed, and
+> virtscsi_queuecommand_multi should be merged into virtscsi_queuecommand,
 
-diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
-index e119e86bed48..616f040c5d02 100644
---- a/kernel/irq/affinity.c
-+++ b/kernel/irq/affinity.c
-@@ -94,17 +94,17 @@ static int get_nodes_in_cpumask(cpumask_var_t *node_to_cpumask,
- 	return nodes;
- }
- 
--static int irq_build_affinity_masks(int nvecs, const struct irq_affinity *affd,
-+static int irq_build_affinity_masks(const struct irq_affinity *affd,
-+				    int start_vec, int affv,
- 				    cpumask_var_t *node_to_cpumask,
- 				    const struct cpumask *cpu_mask,
- 				    struct cpumask *nmsk,
- 				    struct cpumask *masks)
- {
--	int affv = nvecs - affd->pre_vectors - affd->post_vectors;
- 	int last_affv = affv + affd->pre_vectors;
--	int curvec = affd->pre_vectors;
-+	int curvec = start_vec;
- 	nodemask_t nodemsk = NODE_MASK_NONE;
--	int n, nodes, cpus_per_vec, extra_vecs;
-+	int n, nodes, cpus_per_vec, extra_vecs, done = 0;
- 
- 	nodes = get_nodes_in_cpumask(node_to_cpumask, cpu_mask, &nodemsk);
- 
-@@ -116,8 +116,10 @@ static int irq_build_affinity_masks(int nvecs, const struct irq_affinity *affd,
- 		for_each_node_mask(n, nodemsk) {
- 			cpumask_copy(masks + curvec,
- 				     node_to_cpumask[n]);
--			if (++curvec == last_affv)
-+			if (++done == affv)
- 				break;
-+			if (++curvec == last_affv)
-+				curvec = affd->pre_vectors;
- 		}
- 		goto out;
- 	}
-@@ -150,13 +152,16 @@ static int irq_build_affinity_masks(int nvecs, const struct irq_affinity *affd,
- 			irq_spread_init_one(masks + curvec, nmsk, cpus_per_vec);
- 		}
- 
--		if (curvec >= last_affv)
-+		done += v;
-+		if (done >= affv)
- 			break;
-+		if (curvec >= last_affv)
-+			curvec = affd->pre_vectors;
- 		--nodes;
- 	}
- 
- out:
--	return curvec - affd->pre_vectors;
-+	return done;
- }
- 
- /**
-@@ -169,6 +174,7 @@ static int irq_build_affinity_masks(int nvecs, const struct irq_affinity *affd,
- struct cpumask *
- irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- {
-+	int affv = nvecs - affd->pre_vectors - affd->post_vectors;
- 	int curvec;
- 	struct cpumask *masks;
- 	cpumask_var_t nmsk, *node_to_cpumask;
-@@ -198,7 +204,8 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 	/* Stabilize the cpumasks */
- 	get_online_cpus();
- 	build_node_to_cpumask(node_to_cpumask);
--	curvec += irq_build_affinity_masks(nvecs, affd, node_to_cpumask,
-+	curvec += irq_build_affinity_masks(affd, curvec, affv,
-+					   node_to_cpumask,
- 					   cpu_possible_mask, nmsk, masks);
- 	put_online_cpus();
- 
--- 
-2.9.5
+OK.
+
+> 
+> > @@ -823,6 +768,7 @@ static struct scsi_host_template virtscsi_host_template_single = {
+> >  	.target_alloc = virtscsi_target_alloc,
+> >  	.target_destroy = virtscsi_target_destroy,
+> >  	.track_queue_depth = 1,
+> > +	.force_blk_mq = 1,
+> 
+> This probably isn't strictly needed.  That being said with your
+> change we could probably just drop virtscsi_host_template_single entirely.
+> 
+
+OK.
+
+Thanks,
+Ming
