@@ -1,97 +1,110 @@
-Return-Path: <mb@lightnvm.io>
-Return-Path: <mb@lightnvm.io>
-Subject: Re: [PATCH 4/4] nvme: lightnvm: add late setup of block size and
- metadata
-To: Keith Busch <keith.busch@intel.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- javier@cnexlabs.com,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- Jens Axboe <axboe@kernel.dk>
-References: <20180205121505.27563-1-mb@lightnvm.io>
- <20180205121505.27563-5-mb@lightnvm.io>
-From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <343f19d9-0428-f255-6ed0-519035eef46d@lightnvm.io>
-Date: Fri, 23 Mar 2018 12:00:08 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180205121505.27563-5-mb@lightnvm.io>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Return-Path: <gunthorp@deltatee.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org,
+	linux-nvdimm@lists.01.org,
+	linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Logan Gunthorpe <logang@deltatee.com>
+Date: Mon, 12 Mar 2018 13:35:24 -0600
+Message-Id: <20180312193525.2855-11-logang@deltatee.com>
+In-Reply-To: <20180312193525.2855-1-logang@deltatee.com>
+References: <20180312193525.2855-1-logang@deltatee.com>
+Subject: [PATCH v3 10/11] nvme-pci: Add a quirk for a pseudo CMB
 List-ID: <linux-block@vger.kernel.org>
 
-On 02/05/2018 01:15 PM, Matias Bjørling wrote:
-> The nvme driver sets up the size of the nvme namespace in two steps.
-> First it initializes the device with standard logical block and
-> metadata sizes, and then sets the correct logical block and metadata
-> size. Due to the OCSSD 2.0 specification relies on the namespace to
-> expose these sizes for correct initialization, let it be updated
-> appropriately on the LightNVM side as well.
-> 
-> Signed-off-by: Matias Bjørling <mb@lightnvm.io>
-> ---
->   drivers/nvme/host/core.c     | 2 ++
->   drivers/nvme/host/lightnvm.c | 8 ++++++++
->   drivers/nvme/host/nvme.h     | 2 ++
->   3 files changed, 12 insertions(+)
-> 
-> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> index f837d666cbd4..740ceb28067c 100644
-> --- a/drivers/nvme/host/core.c
-> +++ b/drivers/nvme/host/core.c
-> @@ -1379,6 +1379,8 @@ static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
->   	if (ns->noiob)
->   		nvme_set_chunk_size(ns);
->   	nvme_update_disk_info(disk, ns, id);
-> +	if (ns->ndev)
-> +		nvme_nvm_update_nvm_info(ns);
->   #ifdef CONFIG_NVME_MULTIPATH
->   	if (ns->head->disk)
->   		nvme_update_disk_info(ns->head->disk, ns, id);
-> diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-> index a9c010655ccc..8d4301854811 100644
-> --- a/drivers/nvme/host/lightnvm.c
-> +++ b/drivers/nvme/host/lightnvm.c
-> @@ -814,6 +814,14 @@ int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned int cmd, unsigned long arg)
->   	}
->   }
->   
-> +void nvme_nvm_update_nvm_info(struct nvme_ns *ns)
-> +{
-> +	struct nvm_dev *ndev = ns->ndev;
-> +
-> +	ndev->identity.csecs = ndev->geo.sec_size = 1 << ns->lba_shift;
-> +	ndev->identity.sos = ndev->geo.oob_size = ns->ms;
-> +}
-> +
->   int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node)
->   {
->   	struct request_queue *q = ns->queue;
-> diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-> index ea1aa5283e8e..1ca08f4993ba 100644
-> --- a/drivers/nvme/host/nvme.h
-> +++ b/drivers/nvme/host/nvme.h
-> @@ -451,12 +451,14 @@ static inline void nvme_mpath_clear_current_path(struct nvme_ns *ns)
->   #endif /* CONFIG_NVME_MULTIPATH */
->   
->   #ifdef CONFIG_NVM
-> +void nvme_nvm_update_nvm_info(struct nvme_ns *ns);
->   int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node);
->   void nvme_nvm_unregister(struct nvme_ns *ns);
->   int nvme_nvm_register_sysfs(struct nvme_ns *ns);
->   void nvme_nvm_unregister_sysfs(struct nvme_ns *ns);
->   int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned int cmd, unsigned long arg);
->   #else
-> +static inline void nvme_nvm_update_nvm_info(struct nvme_ns *ns) {};
->   static inline int nvme_nvm_register(struct nvme_ns *ns, char *disk_name,
->   				    int node)
->   {
-> 
+Introduce a quirk to use CMB-like memory on older devices that have
+an exposed BAR but do not advertise support for using CMBLOC and
+CMBSIZE.
 
-Hi Keith,
+We'd like to use some of these older cards to test P2P memory.
 
-When going through the patches for 4.17, I forgot to run this patch by 
-you. It is part of adding OCSSD2.0 support to the kernel, and slides in 
-between a large refactoring, and the 2.0 part. May I add your reviewed 
-by and let Jens pick it up after the nvme patches for 4.17 has gone up?
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+---
+ drivers/nvme/host/nvme.h |  7 +++++++
+ drivers/nvme/host/pci.c  | 24 ++++++++++++++++++++----
+ 2 files changed, 27 insertions(+), 4 deletions(-)
 
-Thanks!
-
--Matias
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 1fb2b6603d49..d1381bfc40f1 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -83,6 +83,13 @@ enum nvme_quirks {
+ 	 * Supports the LighNVM command set if indicated in vs[1].
+ 	 */
+ 	NVME_QUIRK_LIGHTNVM			= (1 << 6),
++
++	/*
++	 * Pseudo CMB Support on BAR 4. For adapters like the Microsemi
++	 * NVRAM that have CMB-like memory on a BAR but does not set
++	 * CMBLOC or CMBSZ.
++	 */
++	NVME_QUIRK_PSEUDO_CMB_BAR4		= (1 << 7),
+ };
+ 
+ /*
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 0ebab7ab4d7e..a798e08a07bc 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -1683,6 +1683,13 @@ static ssize_t nvme_cmb_show(struct device *dev,
+ }
+ static DEVICE_ATTR(cmb, S_IRUGO, nvme_cmb_show, NULL);
+ 
++static u32 nvme_pseudo_cmbsz(struct pci_dev *pdev, int bar)
++{
++	return NVME_CMBSZ_WDS | NVME_CMBSZ_RDS |
++		(((ilog2(SZ_16M) - 12) / 4) << NVME_CMBSZ_SZU_SHIFT) |
++		((pci_resource_len(pdev, bar) / SZ_16M) << NVME_CMBSZ_SZ_SHIFT);
++}
++
+ static u64 nvme_cmb_size_unit(struct nvme_dev *dev)
+ {
+ 	u8 szu = (dev->cmbsz >> NVME_CMBSZ_SZU_SHIFT) & NVME_CMBSZ_SZU_MASK;
+@@ -1702,10 +1709,15 @@ static void nvme_map_cmb(struct nvme_dev *dev)
+ 	struct pci_dev *pdev = to_pci_dev(dev->dev);
+ 	int bar;
+ 
+-	dev->cmbsz = readl(dev->bar + NVME_REG_CMBSZ);
+-	if (!dev->cmbsz)
+-		return;
+-	dev->cmbloc = readl(dev->bar + NVME_REG_CMBLOC);
++	if (dev->ctrl.quirks & NVME_QUIRK_PSEUDO_CMB_BAR4) {
++		dev->cmbsz = nvme_pseudo_cmbsz(pdev, 4);
++		dev->cmbloc = 4;
++	} else {
++		dev->cmbsz = readl(dev->bar + NVME_REG_CMBSZ);
++		if (!dev->cmbsz)
++			return;
++		dev->cmbloc = readl(dev->bar + NVME_REG_CMBLOC);
++	}
+ 
+ 	size = nvme_cmb_size_unit(dev) * nvme_cmb_size(dev);
+ 	offset = nvme_cmb_size_unit(dev) * NVME_CMB_OFST(dev->cmbloc);
+@@ -2719,6 +2731,10 @@ static const struct pci_device_id nvme_id_table[] = {
+ 		.driver_data = NVME_QUIRK_LIGHTNVM, },
+ 	{ PCI_DEVICE(0x1d1d, 0x2807),	/* CNEX WL */
+ 		.driver_data = NVME_QUIRK_LIGHTNVM, },
++	{ PCI_DEVICE(0x11f8, 0xf117),	/* Microsemi NVRAM adaptor */
++		.driver_data = NVME_QUIRK_PSEUDO_CMB_BAR4, },
++	{ PCI_DEVICE(0x1db1, 0x0002),	/* Everspin nvNitro adaptor */
++		.driver_data = NVME_QUIRK_PSEUDO_CMB_BAR4,  },
+ 	{ PCI_DEVICE_CLASS(PCI_CLASS_STORAGE_EXPRESS, 0xffffff) },
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_APPLE, 0x2001) },
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_APPLE, 0x2003) },
+-- 
+2.11.0
