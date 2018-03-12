@@ -1,196 +1,180 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43936 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750932AbeCIDde (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 8 Mar 2018 22:33:34 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Jens Axboe <axboe@fb.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, Meelis Roos <mroos@linux.ee>,
-        Don Brace <don.brace@microsemi.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
-        James Bottomley <james.bottomley@hansenpartnership.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH V4 4/4] scsi: virtio_scsi: fix IO hang caused by irq vector automatic affinity
-Date: Fri,  9 Mar 2018 11:32:18 +0800
-Message-Id: <20180309033218.23042-5-ming.lei@redhat.com>
-In-Reply-To: <20180309033218.23042-1-ming.lei@redhat.com>
-References: <20180309033218.23042-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <gunthorp@deltatee.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-rdma@vger.kernel.org,
+	linux-nvdimm@lists.01.org,
+	linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <keith.busch@intel.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Jason Gunthorpe <jgg@mellanox.com>,
+	Max Gurtovoy <maxg@mellanox.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Logan Gunthorpe <logang@deltatee.com>
+Date: Mon, 12 Mar 2018 13:35:14 -0600
+Message-Id: <20180312193525.2855-1-logang@deltatee.com>
+Subject: [PATCH v3 00/11] Copy Offload in NVMe Fabrics with P2P PCI Memory
+List-ID: <linux-block@vger.kernel.org>
 
-Now 84676c1f21e8ff5(genirq/affinity: assign vectors to all possible CPUs)
-has been merged to V4.16-rc, and it is easy to allocate all offline CPUs
-for some irq vectors, this can't be avoided even though the allocation
-is improved.
+Hi Everyone,
 
-For example, on a 8cores VM, 4~7 are not-present/offline, 4 queues of
-virtio-scsi, the irq affinity assigned can become the following shape:
+Here's v3 of our series to introduce P2P based copy offload to NVMe
+fabrics. This version has been rebased onto v4.16-rc5.
 
-	irq 36, cpu list 0-7
-	irq 37, cpu list 0-7
-	irq 38, cpu list 0-7
-	irq 39, cpu list 0-1
-	irq 40, cpu list 4,6
-	irq 41, cpu list 2-3
-	irq 42, cpu list 5,7
+Thanks,
 
-Then IO hang is triggered in case of non-SCSI_MQ.
+Logan
 
-Given storage IO is always C/S model, there isn't such issue with SCSI_MQ(blk-mq),
-because no IO can be submitted to one hw queue if the hw queue isn't
-mapped to online CPUs.
 
-Fix this issue by forcing to use blk_mq.
+Changes in v3:
 
-BTW, I have been used virtio-scsi(scsi_mq) for several years, and it has
-been quite stable, so it shouldn't cause extra risk.
+* Many more fixes and minor cleanups that were spotted by Bjorn
 
-Cc: Omar Sandoval <osandov@fb.com>,
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-Cc: Christoph Hellwig <hch@lst.de>,
-Cc: Don Brace <don.brace@microsemi.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Laurence Oberman <loberman@redhat.com>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Fixes: 84676c1f21e8 ("genirq/affinity: assign vectors to all possible CPUs")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/virtio_scsi.c | 59 +++-------------------------------------------
- 1 file changed, 3 insertions(+), 56 deletions(-)
+* Additional explanation of the ACS change in both the commit message
+  and Kconfig doc. Also, the code that disables the ACS bits is surrounded
+  explicitly by an #ifdef
 
-diff --git a/drivers/scsi/virtio_scsi.c b/drivers/scsi/virtio_scsi.c
-index 7c28e8d4955a..54e3a0f6844c 100644
---- a/drivers/scsi/virtio_scsi.c
-+++ b/drivers/scsi/virtio_scsi.c
-@@ -91,9 +91,6 @@ struct virtio_scsi_vq {
- struct virtio_scsi_target_state {
- 	seqcount_t tgt_seq;
- 
--	/* Count of outstanding requests. */
--	atomic_t reqs;
--
- 	/* Currently active virtqueue for requests sent to this target. */
- 	struct virtio_scsi_vq *req_vq;
- };
-@@ -152,8 +149,6 @@ static void virtscsi_complete_cmd(struct virtio_scsi *vscsi, void *buf)
- 	struct virtio_scsi_cmd *cmd = buf;
- 	struct scsi_cmnd *sc = cmd->sc;
- 	struct virtio_scsi_cmd_resp *resp = &cmd->resp.cmd;
--	struct virtio_scsi_target_state *tgt =
--				scsi_target(sc->device)->hostdata;
- 
- 	dev_dbg(&sc->device->sdev_gendev,
- 		"cmd %p response %u status %#02x sense_len %u\n",
-@@ -210,8 +205,6 @@ static void virtscsi_complete_cmd(struct virtio_scsi *vscsi, void *buf)
- 	}
- 
- 	sc->scsi_done(sc);
--
--	atomic_dec(&tgt->reqs);
- }
- 
- static void virtscsi_vq_done(struct virtio_scsi *vscsi,
-@@ -580,10 +573,7 @@ static int virtscsi_queuecommand_single(struct Scsi_Host *sh,
- 					struct scsi_cmnd *sc)
- {
- 	struct virtio_scsi *vscsi = shost_priv(sh);
--	struct virtio_scsi_target_state *tgt =
--				scsi_target(sc->device)->hostdata;
- 
--	atomic_inc(&tgt->reqs);
- 	return virtscsi_queuecommand(vscsi, &vscsi->req_vqs[0], sc);
- }
- 
-@@ -596,55 +586,11 @@ static struct virtio_scsi_vq *virtscsi_pick_vq_mq(struct virtio_scsi *vscsi,
- 	return &vscsi->req_vqs[hwq];
- }
- 
--static struct virtio_scsi_vq *virtscsi_pick_vq(struct virtio_scsi *vscsi,
--					       struct virtio_scsi_target_state *tgt)
--{
--	struct virtio_scsi_vq *vq;
--	unsigned long flags;
--	u32 queue_num;
--
--	local_irq_save(flags);
--	if (atomic_inc_return(&tgt->reqs) > 1) {
--		unsigned long seq;
--
--		do {
--			seq = read_seqcount_begin(&tgt->tgt_seq);
--			vq = tgt->req_vq;
--		} while (read_seqcount_retry(&tgt->tgt_seq, seq));
--	} else {
--		/* no writes can be concurrent because of atomic_t */
--		write_seqcount_begin(&tgt->tgt_seq);
--
--		/* keep previous req_vq if a reader just arrived */
--		if (unlikely(atomic_read(&tgt->reqs) > 1)) {
--			vq = tgt->req_vq;
--			goto unlock;
--		}
--
--		queue_num = smp_processor_id();
--		while (unlikely(queue_num >= vscsi->num_queues))
--			queue_num -= vscsi->num_queues;
--		tgt->req_vq = vq = &vscsi->req_vqs[queue_num];
-- unlock:
--		write_seqcount_end(&tgt->tgt_seq);
--	}
--	local_irq_restore(flags);
--
--	return vq;
--}
--
- static int virtscsi_queuecommand_multi(struct Scsi_Host *sh,
- 				       struct scsi_cmnd *sc)
- {
- 	struct virtio_scsi *vscsi = shost_priv(sh);
--	struct virtio_scsi_target_state *tgt =
--				scsi_target(sc->device)->hostdata;
--	struct virtio_scsi_vq *req_vq;
--
--	if (shost_use_blk_mq(sh))
--		req_vq = virtscsi_pick_vq_mq(vscsi, sc);
--	else
--		req_vq = virtscsi_pick_vq(vscsi, tgt);
-+	struct virtio_scsi_vq *req_vq = virtscsi_pick_vq_mq(vscsi, sc);
- 
- 	return virtscsi_queuecommand(vscsi, req_vq, sc);
- }
-@@ -775,7 +721,6 @@ static int virtscsi_target_alloc(struct scsi_target *starget)
- 		return -ENOMEM;
- 
- 	seqcount_init(&tgt->tgt_seq);
--	atomic_set(&tgt->reqs, 0);
- 	tgt->req_vq = &vscsi->req_vqs[0];
- 
- 	starget->hostdata = tgt;
-@@ -823,6 +768,7 @@ static struct scsi_host_template virtscsi_host_template_single = {
- 	.target_alloc = virtscsi_target_alloc,
- 	.target_destroy = virtscsi_target_destroy,
- 	.track_queue_depth = 1,
-+	.force_blk_mq = 1,
- };
- 
- static struct scsi_host_template virtscsi_host_template_multi = {
-@@ -844,6 +790,7 @@ static struct scsi_host_template virtscsi_host_template_multi = {
- 	.target_destroy = virtscsi_target_destroy,
- 	.map_queues = virtscsi_map_queues,
- 	.track_queue_depth = 1,
-+	.force_blk_mq = 1,
- };
- 
- #define virtscsi_config_get(vdev, fld) \
--- 
-2.9.5
+* Removed the flag we added to rdma_rw_ctx() in favour of using
+  is_pci_p2pdma_page(), as suggested by Sagi.
+
+* Adjust pci_p2pmem_find() so that it prefers P2P providers that
+  are closest to (or the same as) the clients using them. In cases
+  of ties, the provider is randomly chosen.
+
+* Modify the NVMe Target code so that the PCI device name of the provider
+  may be explicitly specified, bypassing the logic in pci_p2pmem_find().
+  (Note: it's still enforced that the provider must be behind the
+   same switch as the clients).
+
+* As requested by Bjorn, added documentation for driver writers.
+
+
+Changes in v2:
+
+* Renamed everything to 'p2pdma' per the suggestion from Bjorn as well
+  as a bunch of cleanup and spelling fixes he pointed out in the last
+  series.
+
+* To address Alex's ACS concerns, we change to a simpler method of
+  just disabling ACS behind switches for any kernel that has
+  CONFIG_PCI_P2PDMA.
+
+* We also reject using devices that employ 'dma_virt_ops' which should
+  fairly simply handle Jason's concerns that this work might break with
+  the HFI, QIB and rxe drivers that use the virtual ops to implement
+  their own special DMA operations.
+
+--
+
+This is a continuation of our work to enable using Peer-to-Peer PCI
+memory in NVMe fabrics targets. Many thanks go to Christoph Hellwig who
+provided valuable feedback to get these patches to where they are today.
+
+The concept here is to use memory that's exposed on a PCI BAR as
+data buffers in the NVME target code such that data can be transferred
+from an RDMA NIC to the special memory and then directly to an NVMe
+device avoiding system memory entirely. The upside of this is better
+QoS for applications running on the CPU utilizing memory and lower
+PCI bandwidth required to the CPU (such that systems could be designed
+with fewer lanes connected to the CPU). However, presently, the
+trade-off is currently a reduction in overall throughput. (Largely due
+to hardware issues that would certainly improve in the future).
+
+Due to these trade-offs we've designed the system to only enable using
+the PCI memory in cases where the NIC, NVMe devices and memory are all
+behind the same PCI switch. This will mean many setups that could likely
+work well will not be supported so that we can be more confident it
+will work and not place any responsibility on the user to understand
+their topology. (We chose to go this route based on feedback we
+received at the last LSF). Future work may enable these transfers behind
+a fabric of PCI switches or perhaps using a white list of known good
+root complexes.
+
+In order to enable this functionality, we introduce a few new PCI
+functions such that a driver can register P2P memory with the system.
+Struct pages are created for this memory using devm_memremap_pages()
+and the PCI bus offset is stored in the corresponding pagemap structure.
+
+Another set of functions allow a client driver to create a list of
+client devices that will be used in a given P2P transactions and then
+use that list to find any P2P memory that is supported by all the
+client devices. This list is then also used to selectively disable the
+ACS bits for the downstream ports behind these devices.
+
+In the block layer, we also introduce a P2P request flag to indicate a
+given request targets P2P memory as well as a flag for a request queue
+to indicate a given queue supports targeting P2P memory. P2P requests
+will only be accepted by queues that support it. Also, P2P requests
+are marked to not be merged seeing a non-homogenous request would
+complicate the DMA mapping requirements.
+
+In the PCI NVMe driver, we modify the existing CMB support to utilize
+the new PCI P2P memory infrastructure and also add support for P2P
+memory in its request queue. When a P2P request is received it uses the
+pci_p2pmem_map_sg() function which applies the necessary transformation
+to get the corrent pci_bus_addr_t for the DMA transactions.
+
+In the RDMA core, we also adjust rdma_rw_ctx_init() and
+rdma_rw_ctx_destroy() to take a flags argument which indicates whether
+to use the PCI P2P mapping functions or not.
+
+Finally, in the NVMe fabrics target port we introduce a new
+configuration boolean: 'allow_p2pmem'. When set, the port will attempt
+to find P2P memory supported by the RDMA NIC and all namespaces. If
+supported memory is found, it will be used in all IO transfers. And if
+a port is using P2P memory, adding new namespaces that are not supported
+by that memory will fail.
+
+Logan Gunthorpe (11):
+  PCI/P2PDMA: Support peer-to-peer memory
+  PCI/P2PDMA: Add sysfs group to display p2pmem stats
+  PCI/P2PDMA: Add PCI p2pmem dma mappings to adjust the bus offset
+  PCI/P2PDMA: Clear ACS P2P flags for all devices behind switches
+  PCI/P2PDMA: Add P2P DMA driver writer's documentation
+  block: Introduce PCI P2P flags for request and request queue
+  IB/core: Ensure we map P2P memory correctly in
+    rdma_rw_ctx_[init|destroy]()
+  nvme-pci: Use PCI p2pmem subsystem to manage the CMB
+  nvme-pci: Add support for P2P memory in requests
+  nvme-pci: Add a quirk for a pseudo CMB
+  nvmet: Optionally use PCI P2P memory
+
+ Documentation/ABI/testing/sysfs-bus-pci |  25 +
+ Documentation/PCI/index.rst             |  14 +
+ Documentation/PCI/p2pdma.rst            | 164 +++++++
+ Documentation/index.rst                 |   3 +-
+ block/blk-core.c                        |   3 +
+ drivers/infiniband/core/rw.c            |  13 +-
+ drivers/nvme/host/core.c                |   4 +
+ drivers/nvme/host/nvme.h                |   8 +
+ drivers/nvme/host/pci.c                 | 118 +++--
+ drivers/nvme/target/configfs.c          |  67 +++
+ drivers/nvme/target/core.c              | 106 +++-
+ drivers/nvme/target/io-cmd.c            |   3 +
+ drivers/nvme/target/nvmet.h             |  12 +
+ drivers/nvme/target/rdma.c              |  32 +-
+ drivers/pci/Kconfig                     |  25 +
+ drivers/pci/Makefile                    |   1 +
+ drivers/pci/p2pdma.c                    | 828 ++++++++++++++++++++++++++++++++
+ drivers/pci/pci.c                       |   6 +
+ include/linux/blk_types.h               |  18 +-
+ include/linux/blkdev.h                  |   3 +
+ include/linux/memremap.h                |  19 +
+ include/linux/pci-p2pdma.h              | 119 +++++
+ include/linux/pci.h                     |   4 +
+ 23 files changed, 1543 insertions(+), 52 deletions(-)
+ create mode 100644 Documentation/PCI/index.rst
+ create mode 100644 Documentation/PCI/p2pdma.rst
+ create mode 100644 drivers/pci/p2pdma.c
+ create mode 100644 include/linux/pci-p2pdma.h
+
+--
+2.11.0
