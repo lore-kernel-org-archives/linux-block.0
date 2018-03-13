@@ -1,107 +1,108 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Laurence Oberman <loberman@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 4/5] genirq/affinity: support to do irq vectors spread starting from any vector
-Date: Mon,  5 Mar 2018 11:13:56 +0800
-Message-Id: <20180305031357.23950-5-ming.lei@redhat.com>
-In-Reply-To: <20180305031357.23950-1-ming.lei@redhat.com>
-References: <20180305031357.23950-1-ming.lei@redhat.com>
+Return-Path: <David.Laight@aculab.com>
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Stephen Kitt' <steve@sk2.org>, "hare@suse.com" <hare@suse.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "jejb@linux.vnet.ibm.com"
+	<jejb@linux.vnet.ibm.com>, "martin.petersen@oracle.com"
+	<martin.petersen@oracle.com>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: RE: [PATCH] scsi: resolve COMMAND_SIZE at compile time
+Date: Tue, 13 Mar 2018 11:34:31 +0000
+Message-ID: <a66f8abb84444cf79b818011667bc825@AcuMS.aculab.com>
+References: <20180309232933.14e39858@heffalump.sk2.org>
+ <20180309223355.21222-1-steve@sk2.org>
+In-Reply-To: <20180309223355.21222-1-steve@sk2.org>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-Now two parameters(start_vec, affv) are introduced to irq_build_affinity_masks(),
-then this helper can build the affinity of each irq vector starting from
-the irq vector of 'start_vec', and handle at most 'affv' vectors.
+From: Stephen Kitt
+> Sent: 09 March 2018 22:34
+>=20
+> COMMAND_SIZE currently uses an array of values in block/scsi_ioctl.c.
+> A number of device_handler functions use this to initialise arrays,
+> and this is flagged by -Wvla.
+>=20
+> This patch replaces COMMAND_SIZE with a variant using a formula which
+> can be resolved at compile time in cases where the opcode is fixed,
+> resolving the array size and avoiding the VLA. The downside is that
+> the code is less maintainable and that some call sites end up having
+> more complex generated code.
+>=20
+> Since scsi_command_size_tbl is dropped, we can remove the dependency
+> on BLK_SCSI_REQUEST from drivers/target/Kconfig.
+>=20
+> This was prompted by https://lkml.org/lkml/2018/3/7/621
+>=20
+> Signed-off-by: Stephen Kitt <steve@sk2.org>
+> ---
+>  block/scsi_ioctl.c         |  8 --------
+>  drivers/target/Kconfig     |  1 -
+>  include/scsi/scsi_common.h | 13 +++++++++++--
+>  3 files changed, 11 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
+> index 60b471f8621b..b9e176e537be 100644
+> --- a/block/scsi_ioctl.c
+> +++ b/block/scsi_ioctl.c
+> @@ -41,14 +41,6 @@ struct blk_cmd_filter {
+>=20
+>  static struct blk_cmd_filter blk_default_cmd_filter;
+>=20
+> -/* Command group 3 is reserved and should never be used.  */
+> -const unsigned char scsi_command_size_tbl[8] =3D
+> -{
+> -	6, 10, 10, 12,
+> -	16, 12, 10, 10
+> -};
+> -EXPORT_SYMBOL(scsi_command_size_tbl);
+> -
+>  #include <scsi/sg.h>
+>=20
+>  static int sg_get_version(int __user *p)
+> diff --git a/drivers/target/Kconfig b/drivers/target/Kconfig
+> index 4c44d7bed01a..b5f05b60cf06 100644
+> --- a/drivers/target/Kconfig
+> +++ b/drivers/target/Kconfig
+> @@ -4,7 +4,6 @@ menuconfig TARGET_CORE
+>  	depends on SCSI && BLOCK
+>  	select CONFIGFS_FS
+>  	select CRC_T10DIF
+> -	select BLK_SCSI_REQUEST # only for scsi_command_size_tbl..
+>  	select SGL_ALLOC
+>  	default n
+>  	help
+> diff --git a/include/scsi/scsi_common.h b/include/scsi/scsi_common.h
+> index 731ac09ed231..48d950666376 100644
+> --- a/include/scsi/scsi_common.h
+> +++ b/include/scsi/scsi_common.h
+> @@ -15,8 +15,17 @@ scsi_varlen_cdb_length(const void *hdr)
+>  	return ((struct scsi_varlen_cdb_hdr *)hdr)->additional_cdb_length + 8;
+>  }
+>=20
+> -extern const unsigned char scsi_command_size_tbl[8];
+> -#define COMMAND_SIZE(opcode) scsi_command_size_tbl[((opcode) >> 5) & 7]
+> +/*
+> + * SCSI command sizes are as follows, in bytes, for fixed size commands,=
+ per
+> + * group: 6, 10, 10, 12, 16, 12, 10, 10. The top three bits of an opcode
+> + * determine its group.
+> + * The size table is encoded into a 32-bit value by subtracting each val=
+ue
+> + * from 16, resulting in a value of 1715488362
+> + * (6 << 28 + 6 << 24 + 4 << 20 + 0 << 16 + 4 << 12 + 6 << 8 + 6 << 4 + =
+10).
+> + * Command group 3 is reserved and should never be used.
+> + */
+> +#define COMMAND_SIZE(opcode) \
+> +	(16 - (15 & (1715488362 >> (4 * (((opcode) >> 5) & 7)))))
 
-This way is required to do 2-stages irq vectors spread among all
-possible CPUs.
+Why not:
+	(6 + (15 & (0x446a6440u ....
 
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- kernel/irq/affinity.c | 23 +++++++++++++++--------
- 1 file changed, 15 insertions(+), 8 deletions(-)
+Specifying the constant in hex makes it more obvious.
+It is a shame about the 16, but an offset is easier than the negate.
 
-diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
-index 256adf92ec62..a8c5d07890a6 100644
---- a/kernel/irq/affinity.c
-+++ b/kernel/irq/affinity.c
-@@ -94,17 +94,17 @@ static int get_nodes_in_cpumask(const cpumask_var_t *node_to_cpumask,
- 	return nodes;
- }
- 
--static int irq_build_affinity_masks(int nvecs, const struct irq_affinity *affd,
-+static int irq_build_affinity_masks(const struct irq_affinity *affd,
-+				    const int start_vec, const int affv,
- 				    const cpumask_var_t *node_to_cpumask,
- 				    const struct cpumask *cpu_mask,
- 				    struct cpumask *nmsk,
- 				    struct cpumask *masks)
- {
--	int affv = nvecs - affd->pre_vectors - affd->post_vectors;
- 	int last_affv = affv + affd->pre_vectors;
--	int curvec = affd->pre_vectors;
-+	int curvec = start_vec;
- 	nodemask_t nodemsk = NODE_MASK_NONE;
--	int n, nodes, cpus_per_vec, extra_vecs;
-+	int n, nodes, cpus_per_vec, extra_vecs, done = 0;
- 
- 	nodes = get_nodes_in_cpumask(node_to_cpumask, cpu_mask, &nodemsk);
- 
-@@ -116,8 +116,10 @@ static int irq_build_affinity_masks(int nvecs, const struct irq_affinity *affd,
- 		for_each_node_mask(n, nodemsk) {
- 			cpumask_copy(masks + curvec,
- 				     node_to_cpumask[n]);
--			if (++curvec == last_affv)
-+			if (++done == affv)
- 				break;
-+			if (++curvec == last_affv)
-+				curvec = affd->pre_vectors;
- 		}
- 		goto out;
- 	}
-@@ -150,13 +152,16 @@ static int irq_build_affinity_masks(int nvecs, const struct irq_affinity *affd,
- 			irq_spread_init_one(masks + curvec, nmsk, cpus_per_vec);
- 		}
- 
--		if (curvec >= last_affv)
-+		done += v;
-+		if (done >= affv)
- 			break;
-+		if (curvec >= last_affv)
-+			curvec = affd->pre_vectors;
- 		--nodes;
- 	}
- 
- out:
--	return curvec - affd->pre_vectors;
-+	return done;
- }
- 
- /**
-@@ -169,6 +174,7 @@ static int irq_build_affinity_masks(int nvecs, const struct irq_affinity *affd,
- struct cpumask *
- irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- {
-+	int affv = nvecs - affd->pre_vectors - affd->post_vectors;
- 	int curvec;
- 	struct cpumask *masks;
- 	cpumask_var_t nmsk, *node_to_cpumask;
-@@ -198,7 +204,8 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 	/* Stabilize the cpumasks */
- 	get_online_cpus();
- 	build_node_to_cpumask(node_to_cpumask);
--	curvec += irq_build_affinity_masks(nvecs, affd, node_to_cpumask,
-+	curvec += irq_build_affinity_masks(affd, curvec, affv,
-+					   node_to_cpumask,
- 					   cpu_possible_mask, nmsk, masks);
- 	put_online_cpus();
- 
--- 
-2.9.5
+	David
