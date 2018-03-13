@@ -5,24 +5,26 @@ To: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
 	Jonathan Derrick <jonathan.derrick@intel.com>,
 	Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v2 01/11] block: sed-opal: use correct macro for method length
-Date: Mon, 19 Mar 2018 19:36:43 +0100
-Message-Id: <0c681a486d73d71dde21b573dbe802d1267a8514.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-In-Reply-To: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-References: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-In-Reply-To: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de> <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/8] block: sed-opal: use correct macro for method length
+Date: Tue, 13 Mar 2018 14:08:54 +0100
+Message-Id: <62436efdb8d46fed1e41b95e4984625a42c5b7ee.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
+In-Reply-To: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
+References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
+In-Reply-To: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
+References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Also the values of OPAL_UID_LENGTH and OPAL_METHOD_LENGTH are the same,
+also the values of OPAL_UID_LENGTH and OPAL_METHOD_LENGTH are the same,
 it is weird to use OPAL_UID_LENGTH for the definition of the methods.
 
 Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+---
+ block/sed-opal.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 945f4b8610e0..5aa41744b8f1 100644
+index 2158624013b3..f9d94ce64b08 100644
 --- a/block/sed-opal.c
 +++ b/block/sed-opal.c
 @@ -181,7 +181,7 @@ static const u8 opaluid[][OPAL_UID_LENGTH] = {
