@@ -1,6 +1,6 @@
 Return-Path: <sbates@raithlin.com>
 From: "Stephen  Bates" <sbates@raithlin.com>
-To: Sinan Kaya <okaya@codeaurora.org>, Logan Gunthorpe <logang@deltatee.com>,
+To: Logan Gunthorpe <logang@deltatee.com>, Sinan Kaya <okaya@codeaurora.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
 	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
@@ -14,8 +14,8 @@ CC: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Keith Busch
 	=?utf-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>, Benjamin Herrenschmidt
 	<benh@kernel.crashing.org>, Alex Williamson <alex.williamson@redhat.com>
 Subject: Re: [PATCH v3 01/11] PCI/P2PDMA: Support peer-to-peer memory
-Date: Tue, 13 Mar 2018 22:45:41 +0000
-Message-ID: <47F026DE-AFD0-4F63-8D39-375D3684C7B1@raithlin.com>
+Date: Tue, 13 Mar 2018 22:31:55 +0000
+Message-ID: <BB94077B-7EB3-49C4-862D-BF77D0A692CC@raithlin.com>
 References: <20180312193525.2855-1-logang@deltatee.com>
  <20180312193525.2855-2-logang@deltatee.com>
  <59fd2f5d-177f-334a-a9c4-0f8a6ec7c303@codeaurora.org>
@@ -28,42 +28,20 @@ References: <20180312193525.2855-1-logang@deltatee.com>
  <4eb6850c-df1b-fd44-3ee0-d43a50270b53@deltatee.com>
  <757fca36-dee4-e070-669e-f2788bd78e41@codeaurora.org>
  <4f761f55-4e9a-dccb-d12f-c59d2cd689db@deltatee.com>
- <016dc910-f96a-8a60-4bda-fa24eea98ea5@codeaurora.org>
-In-Reply-To: <016dc910-f96a-8a60-4bda-fa24eea98ea5@codeaurora.org>
+In-Reply-To: <4f761f55-4e9a-dccb-d12f-c59d2cd689db@deltatee.com>
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-SGkgU2luYW4NCg0KPiAgICBJZiBoYXJkd2FyZSBkb2Vzbid0IHN1cHBvcnQgaXQsIGJsYWNrbGlz
-dGluZyBzaG91bGQgaGF2ZSBiZWVuIHRoZSByaWdodA0KPiAgICBwYXRoIGFuZCBJIHN0aWxsIHRo
-aW5rIHRoYXQgeW91IHNob3VsZCByZW1vdmUgYWxsIHN3aXRjaCBidXNpbmVzcyBmcm9tIHRoZSBj
-b2RlLg0KPiAgICBJIGRpZCBub3QgaGVhciBlbm91Z2gganVzdGlmaWNhdGlvbiBmb3IgaGF2aW5n
-IGEgc3dpdGNoIHJlcXVpcmVtZW50DQo+ICAgIGZvciBQMlAuDQogIA0KV2UgZGlzYWdyZWUuIEFz
-IGRvZXMgdGhlIGNvbW11bml0eSBiYXNlZCBvbiBmZWVkYmFjayBvbiBwcmV2aW91cyB2ZXJzaW9u
-IG9mIHRoaXMgcGF0Y2ggc2V0Lg0KICANCj4gWW91IGFyZSBhbHNvIHNheWluZyB0aGF0IHJvb3Qg
-cG9ydHMgaGF2ZSBpc3N1ZXMgbm90IGJlY2F1c2Ugb2YgZnVuY3Rpb25hbGl0eSBidXQNCj4gYmVj
-YXVzZSBvZiBwZXJmb3JtYW5jZS4gDQoNCkkgaGF2ZSBzZWVuIGJvdGguICBTb21lIHN5c3RlbXMg
-ZmFpbCBpbiBlbnRpcmV0eSB0byByb3V0ZSBUTFBzIGFjcm9zcyByb3V0ZSBwb3J0cy4gT3RoZXJz
-IGRvIHJvdXRlIGJ1dCB3aXRoIHBvb3IgcGVyZm9ybWFuY2UuIEhhdmluZyBhIHJlcXVpcmVtZW50
-IGZvciBhIHN3aXRjaCBpcyB0aGVyZWZvcmUgYSByZWFzb25hYmxlIGFuZCBzZW5zaWJsZSBtaW5p
-bXVtIGNyaXRlcmlhIGZvciBlbmFibGluZyBwMnAuDQogICAgDQo+IElmIHlvdSBrbm93IHdoYXQg
-aXMgYmFkLCBjcmVhdGUgYSBsaXN0IGFuZCBrZWVwIGFkZGluZyBpdC4gWW91IGNhbid0IGFzc3Vt
-ZQ0KPiB1bml2ZXJzYWxseSB0aGF0IGFsbCByb290IHBvcnRzIGFyZSBicm9rZW4vIGhhdmUgYmFk
-IHBlcmZvcm1hbmNlLg0KDQpJIGFjdHVhbGx5IHdhbnRlZCB0byBkbyBhIGJsYWNrbGlzdCBvcmln
-aW5hbGx5IGJ1dCB0aGF0IGlkZWEgd2FzIG5vdCBhY2NlcHRlZCBieSB0aGUgY29tbXVuaXR5LiAN
-CiAgICANCj4gICAgV2hhdCBpZiBJIGNvbWUgdXAgd2l0aCBhIHZlcnkgY2hlYXAvY3JhcHB5IHN3
-aXRjaCAoc29tZXRoaW5nIGxpa2UgdXNlZCBpbiBkYXRhDQo+ICAgIG1pbmluZyk/DQo+IFdoYXQg
-Z3VhcmFudGVlcyB0aGF0IFAyUCB3aWxsIHdvcmsgd2l0aCB0aGlzIGRldmljZT8gWW91IGFyZSBt
-YWtpbmcgYW4NCj4gYXNzdW1wdGlvbiBoZXJlIHRoYXQgYWxsIHN3aXRjaGVzIGhhdmUgZ29vZCBw
-ZXJmb3JtYW5jZS4NCg0KQSBzd2l0Y2ggbXVzdCBzdXBwb3J0IFAyUCBvciBpdCBpcyBpbiB2aW9s
-YXRpb24gb2YgdGhlIFBDSWUgc3BlY2lmaWNhdGlvbi4NCiAgICANCj4gICAgSSBoYXZlIGJlZW4g
-ZG9pbmcgbXkgYmVzdCB0byBwcm92aWRlIGZlZWRiYWNrLiBJdCBmZWVscyBsaWtlIHlvdSBhcmUg
-dGhyb3dpbmcNCj4gICAgdGhlbSBvdmVyIHRoZSB3YWxsIHRvIGJlIGhvbmVzdC4NCg0KSSB0aGlu
-ayBvbmUgaXNzdWUgU2luYW4gaXMgdGhhdCBhIGxvdCBvZiB5b3VyIGlkZWFzIGhhdmUgYmVlbiBk
-aXNjdXNzZWQgaW4gcHJldmlvdXMgdmVyc2lvbnMgb2YgdGhlIHNlcmllcy4gU28geW91IGFyZSBh
-c2tpbmcgdXMgdG8gbWFrZSBjaGFuZ2VzIHdoaWNoLCBpbiBzb21lIGNhc2VzLCB3ZSBrbm93IGFy
-ZSBub3QgYWNjZXB0YWJsZSB0byBvdGhlcnMgaW4gdGhlIGNvbW11bml0eS4gVGhlIGlucHV0IGlz
-IHdlbGNvbWUgYnV0IGl0IGZsaWVzIGluIHRoZSBmYWNlIG9mIG90aGVyIGlucHV0IHdlIGhhdmUg
-cmVjZWl2ZWQuIA0KDQpIb3dldmVyIGlmIG90aGVyIGRldmVsb3BlcnMgZmVlbCBzdHJvbmdseSBh
-Ym91dCB0aGUgYmxhY2tsaXN0L3doaXRlbGlzdCBhbmQgc3dpdGNoIGNyaXRlcmlhIHBsZWFzZSBz
-cGVhayB1cCEgOy0pDQoNClN0ZXBoZW4NCg0KICAgIA0KDQo=
+Pj4gSXQgc291bmRzIGxpa2UgeW91IGhhdmUgdmVyeSB0aWdodCBoYXJkd2FyZSBleHBlY3RhdGlv
+bnMgZm9yIHRoaXMgdG8gd29yaw0KPj4gYXQgdGhpcyBtb21lbnQuIFlvdSBhbHNvIGRvbid0IHdh
+bnQgdG8gZ2VuZXJhbGl6ZSB0aGlzIGNvZGUgZm9yIG90aGVycyBhbmQNCj4+IGFkZHJlc3MgdGhl
+IHNob3J0Y29taW5ncy4NCj4gIE5vLCB0aGF0J3MgdGhlIHdheSB0aGUgY29tbXVuaXR5IGhhcyBw
+dXNoZWQgdGhpcyB3b3JrDQoNCkhpIFNpbmFuDQoNClRoYW5rcyBmb3IgYWxsIHRoZSBpbnB1dC4g
+QXMgTG9nYW4gaGFzIHBvaW50ZWQgb3V0IHRoZSBzd2l0Y2ggcmVxdWlyZW1lbnQgaXMgc29tZXRo
+aW5nIHRoYXQgaGFzIGV2b2x2ZWQgb3ZlciB0aW1lIGJhc2VkIG9uIGlucHV0IGZyb20gdGhlIGNv
+bW11bml0eS4gWW91IGFyZSBtb3JlIHRoYW4gd2VsY29tZSB0byBoYXZlIGFuIG9waW5pb24gb24g
+dGhpcyAoYW5kIHlvdSBoYXZlIG1hZGUgdGhhdCBvcGluaW9uIGNsZWFyIDstKSkuIE92ZXIgdGlt
+ZSB0aGUgcGF0Y2hzZXQgbWF5IGV2b2x2ZSBmcm9tIGl0cyBjdXJyZW50IHJlcXVpcmVtZW50cyBi
+dXQgcmlnaHQgbm93IHdlIGFyZSBhbGlnbmVkIHdpdGggdGhlIGZlZWRiYWNrIGZyb20gdGhlIGNv
+bW11bml0eS4NCg0KQ2hlZXJzDQoNClN0ZXBoZW4NCiANCg0K
