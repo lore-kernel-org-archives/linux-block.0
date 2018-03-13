@@ -1,5 +1,6 @@
-Return-Path: <logang@deltatee.com>
-To: Sinan Kaya <okaya@codeaurora.org>, linux-kernel@vger.kernel.org,
+Return-Path: <okaya@codeaurora.org>
+Subject: Re: [PATCH v3 01/11] PCI/P2PDMA: Support peer-to-peer memory
+To: Logan Gunthorpe <logang@deltatee.com>, linux-kernel@vger.kernel.org,
  linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
  linux-rdma@vger.kernel.org, linux-nvdimm@lists.01.org,
  linux-block@vger.kernel.org
@@ -12,44 +13,37 @@ Cc: Stephen Bates <sbates@raithlin.com>, Christoph Hellwig <hch@lst.de>,
  Alex Williamson <alex.williamson@redhat.com>
 References: <20180312193525.2855-1-logang@deltatee.com>
  <20180312193525.2855-2-logang@deltatee.com>
- <59fd2f5d-177f-334a-a9c4-0f8a6ec7c303@codeaurora.org>
-From: Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <24d8e5c2-065d-8bde-3f5d-7f158be9c578@deltatee.com>
-Date: Tue, 13 Mar 2018 10:43:55 -0600
+From: Sinan Kaya <okaya@codeaurora.org>
+Message-ID: <59fd2f5d-177f-334a-a9c4-0f8a6ec7c303@codeaurora.org>
+Date: Mon, 12 Mar 2018 23:28:17 -0400
 MIME-Version: 1.0
-In-Reply-To: <59fd2f5d-177f-334a-a9c4-0f8a6ec7c303@codeaurora.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Subject: Re: [PATCH v3 01/11] PCI/P2PDMA: Support peer-to-peer memory
+In-Reply-To: <20180312193525.2855-2-logang@deltatee.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
+On 3/12/2018 3:35 PM, Logan Gunthorpe wrote:
+> +int pci_p2pdma_add_client(struct list_head *head, struct device *dev)
 
+It feels like code tried to be a generic p2pdma provider first. Then got
+converted to PCI, yet all dev parameters are still struct device.
 
-On 12/03/18 09:28 PM, Sinan Kaya wrote:
-> On 3/12/2018 3:35 PM, Logan Gunthorpe wrote:
-> Regarding the switch business, It is amazing how much trouble you went into
-> limit this functionality into very specific hardware.
-> 
-> I thought that we reached to an agreement that code would not impose
-> any limits on what user wants.
-> 
-> What happened to all the emails we exchanged?
+Maybe, dev parameter should also be struct pci_dev so that you can get rid of
+all to_pci_dev() calls in this code including find_parent_pci_dev() function.
 
-It turns out that root ports that support P2P are far less common than 
-anyone thought. So it will likely have to be a white list. Nobody else 
-seems keen on allowing the user to enable this on hardware that doesn't 
-work. The easiest solution is still limiting it to using a switch. From 
-there, if someone wants to start creating a white-list then that's 
-probably the way forward to support root ports.
+Regarding the switch business, It is amazing how much trouble you went into
+limit this functionality into very specific hardware.
 
-And there's also the ACS problem which means if you want to use P2P on 
-the root ports you'll have to disable ACS on the entire system. (Or 
-preferably, the IOMMU groups need to get more sophisticated to allow for 
-dynamic changes).
+I thought that we reached to an agreement that code would not impose
+any limits on what user wants.
 
-Additionally, once you allow for root ports you may find the IOMMU 
-getting in the way.
+What happened to all the emails we exchanged?
 
-So there are great deal more issues to sort out if you don't restrict to 
-devices behind switches.
+I understand you are coming from what you tested. Considering that you
+are singing up for providing a generic PCI functionality into the kernel,
+why don't you just blacklist the products that you had problems with and
+yet still allow other architectures to use your code with their root ports?
 
-Logan
+-- 
+Sinan Kaya
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
