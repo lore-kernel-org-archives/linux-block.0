@@ -1,55 +1,77 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:54794 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751971AbeCOKmv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Mar 2018 06:42:51 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 0/4] bcache-tools: enable big endian support for s390x 
-Date: Thu, 15 Mar 2018 18:42:36 +0800
-Message-Id: <20180315104240.24647-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+1231baeb55c0b05cfb44+5315+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Benjamin Block <bblock@linux.vnet.ibm.com>
+Subject: [PATCH 1/3] bsg-lib: introduce a timeout field in struct bsg_job
+Date: Tue, 13 Mar 2018 17:28:39 +0100
+Message-Id: <20180313162841.9030-2-hch@lst.de>
+In-Reply-To: <20180313162841.9030-1-hch@lst.de>
+References: <20180313162841.9030-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Recently I recieve a bug report that bcache does not work on IBM s390x,
-I find the problem is from endianness support and checksum calculation.
+The zfcp driver wants to know the timeout for a bsg job, so add a field
+to struct bsg_job for it in preparation of not exposing the request
+to the bsg-lib users.
 
-Both user space tools and Linux kernel code should be fixed, this patch
-set is the modification to user space tools.
-
-Ideas of this patch set are,
-1, super block members should be swapped to little endian before writting
-   down to media.
-2, super block members should be explicitly swapped to little endian
-   before calculate checksum.
-3, checksum also should be swapped to little endian before writiting down
-   to media.
-4, checksum is checked before super block members being swapped into CPU
-   byteorder.
-
-The first 3 patches are preparation and the last patch does big endian
-support.
-
-NOTE: Linux kernel code also needs to be patched, this patch set just
-makes new created bcache devices in a correct byte order.
-
-Coly Li
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Benjamin Block <bblock@linux.vnet.ibm.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 ---
+ block/bsg-lib.c             | 1 +
+ drivers/s390/scsi/zfcp_fc.c | 4 ++--
+ include/linux/bsg-lib.h     | 2 ++
+ 3 files changed, 5 insertions(+), 2 deletions(-)
 
-Coly Li (4):
-  bcache-tools: change bcache.c:crc64() to non-inline function
-  bcache-tools: only set/display sb.bucket_size for cache devices
-  bcache-tools: print more super block information in bcache-super-show
-  bcache-tools: add CPU endianness support
-
- bcache-super-show.c | 52 +++++++++++++++++++++-----------
- bcache.c            | 75 ++++++++++++++++++++++++++++++++++++++++++++-
- bcache.h            | 19 +++++++++---
- byteorder.h         | 87 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- make-bcache.c       |  5 +--
- 5 files changed, 212 insertions(+), 26 deletions(-)
- create mode 100644 byteorder.h
-
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index b4fe1a48f111..fb509779a090 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -132,6 +132,7 @@ static int bsg_prepare_job(struct device *dev, struct request *req)
+ 	struct bsg_job *job = blk_mq_rq_to_pdu(req);
+ 	int ret;
+ 
++	job->timeout = req->timeout;
+ 	job->request = rq->cmd;
+ 	job->request_len = rq->cmd_len;
+ 
+diff --git a/drivers/s390/scsi/zfcp_fc.c b/drivers/s390/scsi/zfcp_fc.c
+index ca218c82321f..6162cf57a20a 100644
+--- a/drivers/s390/scsi/zfcp_fc.c
++++ b/drivers/s390/scsi/zfcp_fc.c
+@@ -961,7 +961,7 @@ static int zfcp_fc_exec_els_job(struct bsg_job *job,
+ 		d_id = ntoh24(bsg_request->rqst_data.h_els.port_id);
+ 
+ 	els->handler = zfcp_fc_ct_els_job_handler;
+-	return zfcp_fsf_send_els(adapter, d_id, els, job->req->timeout / HZ);
++	return zfcp_fsf_send_els(adapter, d_id, els, job->timeout / HZ);
+ }
+ 
+ static int zfcp_fc_exec_ct_job(struct bsg_job *job,
+@@ -980,7 +980,7 @@ static int zfcp_fc_exec_ct_job(struct bsg_job *job,
+ 		return ret;
+ 
+ 	ct->handler = zfcp_fc_ct_job_handler;
+-	ret = zfcp_fsf_send_ct(wka_port, ct, NULL, job->req->timeout / HZ);
++	ret = zfcp_fsf_send_ct(wka_port, ct, NULL, job->timeout / HZ);
+ 	if (ret)
+ 		zfcp_fc_wka_port_put(wka_port);
+ 
+diff --git a/include/linux/bsg-lib.h b/include/linux/bsg-lib.h
+index b1be0233ce35..402223c95ce1 100644
+--- a/include/linux/bsg-lib.h
++++ b/include/linux/bsg-lib.h
+@@ -44,6 +44,8 @@ struct bsg_job {
+ 
+ 	struct kref kref;
+ 
++	unsigned int timeout;
++
+ 	/* Transport/driver specific request/reply structs */
+ 	void *request;
+ 	void *reply;
 -- 
-2.16.2
+2.14.2
