@@ -1,167 +1,86 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40424 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752455AbeCMJoY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Mar 2018 05:44:24 -0400
-From: Ming Lei <ming.lei@redhat.com>
-To: James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Jens Axboe <axboe@fb.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, Meelis Roos <mroos@linux.ee>,
-        Don Brace <don.brace@microsemi.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
-        James Bottomley <james.bottomley@hansenpartnership.com>,
-        Hannes Reinecke <hare@suse.de>
-Subject: [PATCH V5 5/5] scsi: virtio_scsi: unify scsi_host_template
-Date: Tue, 13 Mar 2018 17:42:43 +0800
-Message-Id: <20180313094243.8710-6-ming.lei@redhat.com>
-In-Reply-To: <20180313094243.8710-1-ming.lei@redhat.com>
-References: <20180313094243.8710-1-ming.lei@redhat.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+1231baeb55c0b05cfb44+5315+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Benjamin Block <bblock@linux.vnet.ibm.com>
+Subject: [PATCH 2/3] bsg-lib: remove bsg_job.req
+Date: Tue, 13 Mar 2018 17:28:40 +0100
+Message-Id: <20180313162841.9030-3-hch@lst.de>
+In-Reply-To: <20180313162841.9030-1-hch@lst.de>
+References: <20180313162841.9030-1-hch@lst.de>
+List-ID: <linux-block@vger.kernel.org>
 
-Now we switch to use_blk_mq always, and both single queue and multi
-queue cases can be handled in one .queuecommand callback, not necessary
-to use two scsi_host_template.
+Users of the bsg-lib interface should only use the bsg_job data structure
+and not know about implementation details of it.
 
-Suggested-by: Christoph Hellwig <hch@lst.de>,
-Cc: Omar Sandoval <osandov@fb.com>,
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-Cc: Christoph Hellwig <hch@lst.de>,
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Laurence Oberman <loberman@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Benjamin Block <bblock@linux.vnet.ibm.com>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 ---
- drivers/scsi/virtio_scsi.c | 74 ++++++++++------------------------------------
- 1 file changed, 15 insertions(+), 59 deletions(-)
+ block/bsg-lib.c         | 14 ++++++--------
+ include/linux/bsg-lib.h |  1 -
+ 2 files changed, 6 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/scsi/virtio_scsi.c b/drivers/scsi/virtio_scsi.c
-index 54e3a0f6844c..45d04631888a 100644
---- a/drivers/scsi/virtio_scsi.c
-+++ b/drivers/scsi/virtio_scsi.c
-@@ -522,11 +522,20 @@ static void virtio_scsi_init_hdr_pi(struct virtio_device *vdev,
- }
- #endif
- 
--static int virtscsi_queuecommand(struct virtio_scsi *vscsi,
--				 struct virtio_scsi_vq *req_vq,
-+static struct virtio_scsi_vq *virtscsi_pick_vq_mq(struct virtio_scsi *vscsi,
-+						  struct scsi_cmnd *sc)
-+{
-+	u32 tag = blk_mq_unique_tag(sc->request);
-+	u16 hwq = blk_mq_unique_tag_to_hwq(tag);
-+
-+	return &vscsi->req_vqs[hwq];
-+}
-+
-+static int virtscsi_queuecommand(struct Scsi_Host *shost,
- 				 struct scsi_cmnd *sc)
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index fb509779a090..f2c2d54a61b4 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -35,7 +35,7 @@
+ static void bsg_teardown_job(struct kref *kref)
  {
--	struct Scsi_Host *shost = virtio_scsi_host(vscsi->vdev);
-+	struct virtio_scsi *vscsi = shost_priv(shost);
-+	struct virtio_scsi_vq *req_vq = virtscsi_pick_vq_mq(vscsi, sc);
- 	struct virtio_scsi_cmd *cmd = scsi_cmd_priv(sc);
- 	unsigned long flags;
- 	int req_size;
-@@ -569,32 +578,6 @@ static int virtscsi_queuecommand(struct virtio_scsi *vscsi,
- 	return 0;
- }
+ 	struct bsg_job *job = container_of(kref, struct bsg_job, kref);
+-	struct request *rq = job->req;
++	struct request *rq = blk_mq_rq_from_pdu(job);
  
--static int virtscsi_queuecommand_single(struct Scsi_Host *sh,
--					struct scsi_cmnd *sc)
--{
--	struct virtio_scsi *vscsi = shost_priv(sh);
--
--	return virtscsi_queuecommand(vscsi, &vscsi->req_vqs[0], sc);
--}
--
--static struct virtio_scsi_vq *virtscsi_pick_vq_mq(struct virtio_scsi *vscsi,
--						  struct scsi_cmnd *sc)
--{
--	u32 tag = blk_mq_unique_tag(sc->request);
--	u16 hwq = blk_mq_unique_tag_to_hwq(tag);
--
--	return &vscsi->req_vqs[hwq];
--}
--
--static int virtscsi_queuecommand_multi(struct Scsi_Host *sh,
--				       struct scsi_cmnd *sc)
--{
--	struct virtio_scsi *vscsi = shost_priv(sh);
--	struct virtio_scsi_vq *req_vq = virtscsi_pick_vq_mq(vscsi, sc);
--
--	return virtscsi_queuecommand(vscsi, req_vq, sc);
--}
--
- static int virtscsi_tmf(struct virtio_scsi *vscsi, struct virtio_scsi_cmd *cmd)
+ 	put_device(job->dev);	/* release reference for the request */
+ 
+@@ -68,19 +68,18 @@ EXPORT_SYMBOL_GPL(bsg_job_get);
+ void bsg_job_done(struct bsg_job *job, int result,
+ 		  unsigned int reply_payload_rcv_len)
  {
- 	DECLARE_COMPLETION_ONSTACK(comp);
-@@ -750,34 +733,13 @@ static enum blk_eh_timer_return virtscsi_eh_timed_out(struct scsi_cmnd *scmnd)
- 	return BLK_EH_RESET_TIMER;
- }
+-	struct request *req = job->req;
++	struct request *req = blk_mq_rq_from_pdu(job);
+ 	struct request *rsp = req->next_rq;
+-	struct scsi_request *rq = scsi_req(req);
+ 	int err;
  
--static struct scsi_host_template virtscsi_host_template_single = {
--	.module = THIS_MODULE,
--	.name = "Virtio SCSI HBA",
--	.proc_name = "virtio_scsi",
--	.this_id = -1,
--	.cmd_size = sizeof(struct virtio_scsi_cmd),
--	.queuecommand = virtscsi_queuecommand_single,
--	.change_queue_depth = virtscsi_change_queue_depth,
--	.eh_abort_handler = virtscsi_abort,
--	.eh_device_reset_handler = virtscsi_device_reset,
--	.eh_timed_out = virtscsi_eh_timed_out,
--	.slave_alloc = virtscsi_device_alloc,
--
--	.dma_boundary = UINT_MAX,
--	.use_clustering = ENABLE_CLUSTERING,
--	.target_alloc = virtscsi_target_alloc,
--	.target_destroy = virtscsi_target_destroy,
--	.track_queue_depth = 1,
--	.force_blk_mq = 1,
--};
--
--static struct scsi_host_template virtscsi_host_template_multi = {
-+static struct scsi_host_template virtscsi_host_template = {
- 	.module = THIS_MODULE,
- 	.name = "Virtio SCSI HBA",
- 	.proc_name = "virtio_scsi",
- 	.this_id = -1,
- 	.cmd_size = sizeof(struct virtio_scsi_cmd),
--	.queuecommand = virtscsi_queuecommand_multi,
-+	.queuecommand = virtscsi_queuecommand,
- 	.change_queue_depth = virtscsi_change_queue_depth,
- 	.eh_abort_handler = virtscsi_abort,
- 	.eh_device_reset_handler = virtscsi_device_reset,
-@@ -883,7 +845,6 @@ static int virtscsi_probe(struct virtio_device *vdev)
- 	u32 sg_elems, num_targets;
- 	u32 cmd_per_lun;
- 	u32 num_queues;
--	struct scsi_host_template *hostt;
+-	err = scsi_req(job->req)->result = result;
++	err = job->sreq.result = result;
+ 	if (err < 0)
+ 		/* we're only returning the result field in the reply */
+-		rq->sense_len = sizeof(u32);
++		job->sreq.sense_len = sizeof(u32);
+ 	else
+-		rq->sense_len = job->reply_len;
++		job->sreq.sense_len = job->reply_len;
+ 	/* we assume all request payload was transferred, residual == 0 */
+-	rq->resid_len = 0;
++	job->sreq.resid_len = 0;
  
- 	if (!vdev->config->get) {
- 		dev_err(&vdev->dev, "%s failure: config access disabled\n",
-@@ -896,12 +857,7 @@ static int virtscsi_probe(struct virtio_device *vdev)
+ 	if (rsp) {
+ 		WARN_ON(reply_payload_rcv_len > scsi_req(rsp)->resid_len);
+@@ -232,7 +231,6 @@ static void bsg_initialize_rq(struct request *req)
+ 	sreq->sense = sense;
+ 	sreq->sense_len = SCSI_SENSE_BUFFERSIZE;
  
- 	num_targets = virtscsi_config_get(vdev, max_target) + 1;
+-	job->req = req;
+ 	job->reply = sense;
+ 	job->reply_len = sreq->sense_len;
+ 	job->dd_data = job + 1;
+diff --git a/include/linux/bsg-lib.h b/include/linux/bsg-lib.h
+index 402223c95ce1..08762d297cbd 100644
+--- a/include/linux/bsg-lib.h
++++ b/include/linux/bsg-lib.h
+@@ -40,7 +40,6 @@ struct bsg_buffer {
+ struct bsg_job {
+ 	struct scsi_request sreq;
+ 	struct device *dev;
+-	struct request *req;
  
--	if (num_queues == 1)
--		hostt = &virtscsi_host_template_single;
--	else
--		hostt = &virtscsi_host_template_multi;
--
--	shost = scsi_host_alloc(hostt,
-+	shost = scsi_host_alloc(&virtscsi_host_template,
- 		sizeof(*vscsi) + sizeof(vscsi->req_vqs[0]) * num_queues);
- 	if (!shost)
- 		return -ENOMEM;
+ 	struct kref kref;
+ 
 -- 
-2.9.5
+2.14.2
