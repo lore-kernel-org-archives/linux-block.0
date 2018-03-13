@@ -5,15 +5,14 @@ To: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
 	Jonathan Derrick <jonathan.derrick@intel.com>,
 	Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v2 06/11] block: sed-opal: split generation of bytestring header and content
-Date: Mon, 19 Mar 2018 19:36:48 +0100
-Message-Id: <0f5fe62576e70de12515e323ca5c0a45ef92832d.1521482296.git.jonas.rabenstein@studium.uni-erlangen.de>
-In-Reply-To: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-References: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-In-Reply-To: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de> <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 6/8] block: sed-opal: split generation of bytestring header and content
+Date: Tue, 13 Mar 2018 14:08:59 +0100
+Message-Id: <cbd0b525838e696deb75ae2e538eb856a7fe6ecd.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
+In-Reply-To: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
+References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
+In-Reply-To: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
+References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
 List-ID: <linux-block@vger.kernel.org>
 
 Split the header generation from the (normal) memcpy part if a
@@ -22,13 +21,16 @@ generation of the bytestring content. For example, copy_from_user may be
 used without an intermediate buffer.
 
 Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+---
+ block/sed-opal.c | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
 
 diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 9b6f14e7aeb1..fc10f81d4892 100644
+index f7925e6f607c..f169e621279a 100644
 --- a/block/sed-opal.c
 +++ b/block/sed-opal.c
-@@ -581,14 +581,11 @@ static void add_token_u64(int *err, struct opal_dev *cmd, u64 number)
- 		add_token_u8(err, cmd, number >> (len * 8));
+@@ -584,14 +584,11 @@ static void add_token_u64(int *err, struct opal_dev *cmd, u64 number)
+ 	}
  }
  
 -static void add_token_bytestring(int *err, struct opal_dev *cmd,
@@ -44,7 +46,7 @@ index 9b6f14e7aeb1..fc10f81d4892 100644
  
  	if (len & ~SHORT_ATOM_LEN_MASK) {
  		header_len = 2;
-@@ -597,17 +594,27 @@ static void add_token_bytestring(int *err, struct opal_dev *cmd,
+@@ -600,17 +597,27 @@ static void add_token_bytestring(int *err, struct opal_dev *cmd,
  
  	if (!can_add(err, cmd, header_len + len)) {
  		pr_debug("Error adding bytestring: end of buffer.\n");
