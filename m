@@ -1,66 +1,52 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:46680 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752602AbeCOPI1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Mar 2018 11:08:27 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Michael Lyle <mlyle@lyle.org>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Coly Li <colyli@suse.de>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH 00/16] bcache: Compiler, sparse and smatch fixes
-Date: Thu, 15 Mar 2018 08:07:58 -0700
-Message-Id: <20180315150814.9412-1-bart.vanassche@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <okaya@codeaurora.org>
+Subject: Re: [PATCH v3 08/11] nvme-pci: Use PCI p2pmem subsystem to manage the
+ CMB
+To: Logan Gunthorpe <logang@deltatee.com>, linux-kernel@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-rdma@vger.kernel.org, linux-nvdimm@lists.01.org,
+ linux-block@vger.kernel.org
+Cc: Stephen Bates <sbates@raithlin.com>, Christoph Hellwig <hch@lst.de>,
+ Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+ Sagi Grimberg <sagi@grimberg.me>, Bjorn Helgaas <bhelgaas@google.com>,
+ Jason Gunthorpe <jgg@mellanox.com>, Max Gurtovoy <maxg@mellanox.com>,
+ Dan Williams <dan.j.williams@intel.com>, =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?=
+ <jglisse@redhat.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ Alex Williamson <alex.williamson@redhat.com>
+References: <20180312193525.2855-1-logang@deltatee.com>
+ <20180312193525.2855-9-logang@deltatee.com>
+ <4b08ec0b-76f4-4b67-a38b-5a1940c4c40d@codeaurora.org>
+From: Sinan Kaya <okaya@codeaurora.org>
+Message-ID: <08950833-d199-fd2b-06f6-9e585c183b86@codeaurora.org>
+Date: Mon, 12 Mar 2018 21:58:21 -0400
+MIME-Version: 1.0
+In-Reply-To: <4b08ec0b-76f4-4b67-a38b-5a1940c4c40d@codeaurora.org>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Hello Michael, Coly and Christoph,
+On 3/12/2018 9:55 PM, Sinan Kaya wrote:
+> On 3/12/2018 3:35 PM, Logan Gunthorpe wrote:
+>> -	if (nvmeq->sq_cmds_io)
+> 
+> I think you should keep the code as it is for the case where
+> (!nvmeq->sq_cmds_is_io && nvmeq->sq_cmds_io)
 
-A few weeks ago I analyzed the compiler (W=1), sparse and smatch warnings
-triggered by the bcache driver. This patch series is what I came up with.
-Although none of these patches have been tested I think these patches are
-worth a closer look. Feedback is welcome.
+Never mind. I misunderstood the code.
 
-Thanks,
 
-Bart.
+> 
+> You are changing the behavior for NVMe drives with CMB buffers.
+> You can change the if statement here with the statement above.
+> 
+>> -		memcpy_toio(&nvmeq->sq_cmds_io[tail], cmd, sizeof(*cmd));
+>> -	else
+>> -		memcpy(&nvmeq->sq_cmds[tail], cmd, sizeof(*cmd));
+>> +	memcpy(&nvmeq->sq_cmds[tail], cmd, sizeof(*cmd));
+>>  
+> 
+> 
 
-Bart Van Assche (16):
-  bcache: Fix indentation
-  bcache: Add __printf annotation to __bch_check_keys()
-  bcache: Annotate switch fall-through
-  bcache: Fix kernel-doc warnings
-  bcache: Remove an unused variable
-  bcache: Suppress more warnings about set-but-not-used variables
-  bcache: Reduce the number of sparse complaints about lock imbalances
-  bcache: Fix a compiler warning in bcache_device_init()
-  bcache: Remove a redundant assignment
-  bcache: Suppress a compiler warning in bch_##name##_h()
-  bcache: Check the d->disk pointer before using it
-  bcache: Make it easier for static analyzers to analyze
-    bch_allocator_thread()
-  bcache: Make bch_dump_read() fail if copying to user space fails
-  bcache: Make csum_set() implementation easier to read
-  bcache: Fix an endianness bug
-  bcache: Fix endianness annotations
-
- drivers/md/bcache/alloc.c     |   7 +--
- drivers/md/bcache/bcache.h    |  22 ++++++--
- drivers/md/bcache/bset.c      |   4 +-
- drivers/md/bcache/bset.h      |   5 +-
- drivers/md/bcache/btree.c     |   4 +-
- drivers/md/bcache/closure.c   |   8 +--
- drivers/md/bcache/debug.c     |   5 +-
- drivers/md/bcache/extents.c   |   2 -
- drivers/md/bcache/journal.c   |   4 +-
- drivers/md/bcache/request.c   |   1 +
- drivers/md/bcache/super.c     |  23 ++++----
- drivers/md/bcache/util.c      |  33 +++++++-----
- drivers/md/bcache/writeback.h |   2 +-
- include/uapi/linux/bcache.h   | 118 ++++++++++++++++++++++--------------------
- 14 files changed, 131 insertions(+), 107 deletions(-)
 
 -- 
-2.16.2
+Sinan Kaya
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project.
