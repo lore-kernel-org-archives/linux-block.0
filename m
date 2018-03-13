@@ -1,53 +1,56 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:58378 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751276AbeCMPGw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Mar 2018 11:06:52 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "jaco@uls.co.za" <jaco@uls.co.za>
-CC: "pieterk@uls.co.za" <pieterk@uls.co.za>
+Received: from othala.iewc.co.za ([154.73.34.12]:36786 "EHLO othala.uls.co.za"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751572AbeCMPAG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Mar 2018 11:00:06 -0400
 Subject: Re: disk-io lockup in 4.14.13 kernel
-Date: Tue, 13 Mar 2018 15:06:47 +0000
-Message-ID: <1520953606.2638.5.camel@wdc.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc: "pieterk@uls.co.za" <pieterk@uls.co.za>
 References: <16bae006-371f-1eea-56b6-8668249d870b@uls.co.za>
-         <828103f7-7550-16a3-d482-8953adc5a234@wdc.com>
-         <257ceeb7-f466-d13d-8818-829759eda587@uls.co.za>
-         <1520737695.8740.4.camel@wdc.com>
-         <6e2ef6eb-a610-8c52-52d8-a35e4d3f36c9@uls.co.za>
-         <1520744455.8740.9.camel@wdc.com>
-         <0d5c21c2-4fea-5870-e971-f90556fb4141@uls.co.za>
-         <1520950225.2921.0.camel@wdc.com>
-         <cca75546-a02e-bed3-fda0-0003ccc5d158@uls.co.za>
-In-Reply-To: <cca75546-a02e-bed3-fda0-0003ccc5d158@uls.co.za>
-Content-Type: text/plain; charset="utf-8"
+ <828103f7-7550-16a3-d482-8953adc5a234@wdc.com>
+ <257ceeb7-f466-d13d-8818-829759eda587@uls.co.za>
+ <1520737695.8740.4.camel@wdc.com>
+ <6e2ef6eb-a610-8c52-52d8-a35e4d3f36c9@uls.co.za>
+ <1520744455.8740.9.camel@wdc.com>
+ <0d5c21c2-4fea-5870-e971-f90556fb4141@uls.co.za>
+ <1520950225.2921.0.camel@wdc.com>
+From: Jaco Kroon <jaco@uls.co.za>
+Message-ID: <cca75546-a02e-bed3-fda0-0003ccc5d158@uls.co.za>
+Date: Tue, 13 Mar 2018 16:59:56 +0200
 MIME-Version: 1.0
+In-Reply-To: <1520950225.2921.0.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gVHVlLCAyMDE4LTAzLTEzIGF0IDE2OjU5ICswMjAwLCBKYWNvIEtyb29uIHdyb3RlOg0KPiBJ
-IHF1aWNrbHkgY2hlY2tlZCBteSBkbWVzZyBsb2dzIGFuZCBJJ20gbm90IHNlZWluZyB0aGF0IHBh
-cnRpY3VsYXINCj4gbWVzc2FnZSwgY291bGQgYmUgdGhhdCBuZXdlciBrZXJuZWxzIG9ubHkgc3Rh
-cnRlZCB3YXJuaW5nIGFib3V0IGl0Pw0KDQpIZWxsbyBKYWNvLA0KDQpUaGF0IG1lc3NhZ2Ugb25s
-eSBhcHBlYXJzIGlmICBDT05GSUdfREVCVUdfQVRPTUlDX1NMRUVQIChzbGVlcCBpbnNpZGUgYXRv
-bWljKQ0KaXMgZW5hYmxlZCBpbiB0aGUga2VybmVsIGNvbmZpZy4gVGhlIGtlcm5lbCBjb25maWd1
-cmF0aW9uIG9wdGlvbnMgSSBlbmFibGUgdG8NCnRlc3Qga2VybmVsIGNvZGUgY2FuIGJlIGZvdW5k
-IGJlbG93LiBQbGVhc2Ugbm90ZSB0aGF0IHNvbWUgb2YgdGhlc2Ugb3B0aW9ucw0Kc2xvdyBkb3du
-IHRoZSBrZXJuZWwgc2lnbmlmaWNhbnRseSwgc28gdGhlc2Ugb3B0aW9ucyBzaG91bGQgcHJvYmFi
-bHkgbm90IGJlDQplbmFibGVkIG9uIGEgcHJvZHVjdGlvbiBzeXN0ZW0uDQoNCkNPTkZJR19CTEtf
-REVCVUdfRlMNCkNPTkZJR19ERUJVR19BVE9NSUNfU0xFRVANCkNPTkZJR19ERUJVR19CT09UX1BB
-UkFNUw0KQ09ORklHX0RFQlVHX0JVR1ZFUkJPU0UNCkNPTkZJR19ERUJVR19GUw0KQ09ORklHX0RF
-QlVHX0lORk8NCkNPTkZJR19ERUJVR19JTkZPX0RXQVJGNA0KQ09ORklHX0RFQlVHX0lORk9fUkVE
-VUNFRA0KQ09ORklHX0RFQlVHX0tFUk5FTA0KQ09ORklHX0RFQlVHX0tNRU1MRUFLDQpDT05GSUdf
-REVCVUdfTElTVA0KQ09ORklHX0RFQlVHX0xPQ0tfQUxMT0MNCkNPTkZJR19ERUJVR19NVVRFWEVT
-DQpDT05GSUdfREVCVUdfT0JKRUNUUw0KQ09ORklHX0RFQlVHX09CSkVDVFNfUkNVX0hFQUQNCkNP
-TkZJR19ERUJVR19QQUdFQUxMT0MNCkNPTkZJR19ERUJVR19QRVJfQ1BVX01BUFMNCkNPTkZJR19E
-RUJVR19QSV9MSVNUDQpDT05GSUdfREVCVUdfUFJFRU1QVA0KQ09ORklHX0RFQlVHX1BSRUVNUFRf
-Vk9MVU5UQVJZDQpDT05GSUdfREVCVUdfU0cNCkNPTkZJR19ERUJVR19TUElOTE9DSw0KQ09ORklH
-X0RFQlVHX1NUQUNLT1ZFUkZMT1cNCkNPTkZJR19ERUJVR19TVEFDS19VU0FHRQ0KQ09ORklHX0RF
-VEVDVF9IVU5HX1RBU0sNCkNPTkZJR19EWU5BTUlDX0RFQlVHDQpDT05GSUdfSEFSRExPQ0tVUF9E
-RVRFQ1RPUg0KQ09ORklHX0tBU0FODQpDT05GSUdfTUFHSUNfU1lTUlENCkNPTkZJR19QUkVFTVBU
-DQpDT05GSUdfUFJPVkVfTE9DS0lORw0KQ09ORklHX1BST1ZFX1JDVQ0KQ09ORklHX1NDSEVEX0RF
-QlVHDQpDT05GSUdfU0xVQg0KQ09ORklHX1NMVUJfREVCVUdfT04NCkNPTkZJR19XUV9XQVRDSERP
-Rw0KDQpCYXJ0Lg0KDQoNCg0K
+Hi Bart,
+
+
+On 13/03/2018 16:10, Bart Van Assche wrote:
+> On Tue, 2018-03-13 at 11:30 +0200, Jaco Kroon wrote:
+>> On 11/03/2018 07:00, Bart Van Assche wrote:
+>>> Did I see correctly that /dev/sdm is behind a MPT SAS controller? You may
+>>> want to contact the authors of this driver and Cc the linux-scsi mailing
+>>> list. Sorry but I'm not familiar with the mpt3sas driver myself.
+>> You did see correctly, all drives are behind the MPT SAS.  If there is
+>> in fact a problem with the driver (or the controller itself for that
+>> matter) it would explain things.  It would also explain why we don't see
+>> this problem on other hosts.
+> You may want to have a look at the following report, something I ran into
+> myself yesterday: https://marc.info/?l=linux-scsi&m=152087904024146.
+I quickly checked my dmesg logs and I'm not seeing that particular
+message, could be that newer kernels only started warning about it?
+
+I'm not seeing any references to the
+scsih_get_enclosure_logicalid_chassis_slot() function in the code here,
+so there is obviously a newer driver in newer kernels.  The scsih_get_*
+calls I do see is in mpt3sas_scsih.c and I'm not seeing (direct) calls
+to _config_request at all.  At least it seems there is activity on the
+driver, which is always a good sign that someone is attending to problems.
+
+I'll queue an upgrade to 4.16 so long for when it's released in a couple
+of days/weeks.
+
+Kind Regards,
+Jaco
