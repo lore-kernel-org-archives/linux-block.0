@@ -5,15 +5,14 @@ To: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
 	Jonathan Derrick <jonathan.derrick@intel.com>,
 	Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v2 04/11] block: sed-opal: unify error handling of responses
-Date: Mon, 19 Mar 2018 19:36:46 +0100
-Message-Id: <4a20f9848927d0f654491136e4821f2adab131cc.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-In-Reply-To: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-References: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-In-Reply-To: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de> <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 4/8] block: sed-opal: unify error handling of responses
+Date: Tue, 13 Mar 2018 14:08:57 +0100
+Message-Id: <04455788aa86e6d2e8cd09e24f64c23af5070c08.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
+In-Reply-To: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
+References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
+In-Reply-To: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
+References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
 List-ID: <linux-block@vger.kernel.org>
 
 Also response_get_token had already been in place, its functionality had
@@ -22,12 +21,15 @@ handling. Unify the handling by reusing response_get_token within the
 other functions.
 
 Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+---
+ block/sed-opal.c | 28 ++++++++++------------------
+ 1 file changed, 10 insertions(+), 18 deletions(-)
 
 diff --git a/block/sed-opal.c b/block/sed-opal.c
-index efe5d2a7f3dc..30f6e46518a6 100644
+index 22dbea7cf4d1..5a448a3ba1df 100644
 --- a/block/sed-opal.c
 +++ b/block/sed-opal.c
-@@ -697,6 +697,11 @@ static const struct opal_resp_tok *response_get_token(
+@@ -698,6 +698,11 @@ static const struct opal_resp_tok *response_get_token(
  {
  	const struct opal_resp_tok *tok;
  
@@ -39,48 +41,28 @@ index efe5d2a7f3dc..30f6e46518a6 100644
  	if (n >= resp->num) {
  		pr_debug("Token number doesn't exist: %d, resp: %d\n",
  			 n, resp->num);
-@@ -879,27 +884,19 @@ static size_t response_get_string(const struct parsed_resp *resp, int n,
- 				  const char **store)
- {
- 	u8 skip;
--	const struct opal_resp_tok *token;
-+	const struct opal_resp_tok *tok;
+@@ -883,18 +888,10 @@ static size_t response_get_string(const struct parsed_resp *resp, int n,
+ 	const struct opal_resp_tok *token;
  
  	*store = NULL;
 -	if (!resp) {
 -		pr_debug("Response is NULL\n");
--		return 0;
++	token = response_get_token(resp, n);
++	if (IS_ERR(token))
+ 		return 0;
 -	}
--
+ 
 -	if (n > resp->num) {
 -		pr_debug("Response has %d tokens. Can't access %d\n",
 -			 resp->num, n);
-+	tok = response_get_token(resp, n);
-+	if (IS_ERR(tok))
- 		return 0;
+-		return 0;
 -	}
- 
+-
 -	token = &resp->toks[n];
--	if (token->type != OPAL_DTA_TOKENID_BYTESTRING) {
-+	if (tok->type != OPAL_DTA_TOKENID_BYTESTRING) {
+ 	if (token->type != OPAL_DTA_TOKENID_BYTESTRING) {
  		pr_debug("Token is not a byte string!\n");
  		return 0;
- 	}
- 
--	switch (token->width) {
-+	switch (tok->width) {
- 	case OPAL_WIDTH_TINY:
- 	case OPAL_WIDTH_SHORT:
- 		skip = 1;
-@@ -915,37 +912,29 @@ static size_t response_get_string(const struct parsed_resp *resp, int n,
- 		return 0;
- 	}
- 
--	*store = token->pos + skip;
--	return token->len - skip;
-+	*store = tok->pos + skip;
-+	return tok->len - skip;
- }
+@@ -922,16 +919,11 @@ static size_t response_get_string(const struct parsed_resp *resp, int n,
  
  static u64 response_get_u64(const struct parsed_resp *resp, int n)
  {
@@ -88,37 +70,17 @@ index efe5d2a7f3dc..30f6e46518a6 100644
 -		pr_debug("Response is NULL\n");
 -		return 0;
 -	}
-+	const struct opal_resp_tok *tok;
++	const struct opal_resp_tok *token;
  
 -	if (n > resp->num) {
 -		pr_debug("Response has %d tokens. Can't access %d\n",
 -			 resp->num, n);
-+	tok = response_get_token(resp, n);
-+	if (IS_ERR(tok))
++	token = response_get_token(resp, n);
++	if (IS_ERR(token))
  		return 0;
 -	}
  
--	if (resp->toks[n].type != OPAL_DTA_TOKENID_UINT) {
--		pr_debug("Token is not unsigned it: %d\n",
--			 resp->toks[n].type);
-+	if (tok->type != OPAL_DTA_TOKENID_UINT) {
-+		pr_debug("Token is not unsigned it: %d\n", tok->type);
- 		return 0;
- 	}
- 
--	if (!(resp->toks[n].width == OPAL_WIDTH_TINY ||
--	      resp->toks[n].width == OPAL_WIDTH_SHORT)) {
--		pr_debug("Atom is not short or tiny: %d\n",
--			 resp->toks[n].width);
-+	if (tok->width != OPAL_WIDTH_TINY && tok->width != OPAL_WIDTH_SHORT) {
-+		pr_debug("Atom is not short or tiny: %d\n", tok->width);
- 		return 0;
- 	}
- 
--	return resp->toks[n].stored.u;
-+	return tok->stored.u;
- }
- 
- static bool response_token_matches(const struct opal_resp_tok *token, u8 match)
+ 	if (resp->toks[n].type != OPAL_DTA_TOKENID_UINT) {
+ 		pr_debug("Token is not unsigned it: %d\n",
 -- 
 2.16.1
