@@ -5,15 +5,14 @@ To: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
 	Jonathan Derrick <jonathan.derrick@intel.com>,
 	Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v2 07/11] block: sed-opal: add ioctl for done-mark of shadow mbr
-Date: Mon, 19 Mar 2018 19:36:49 +0100
-Message-Id: <c63c7dc587e3e99f513451c969f1e6756eff2531.1521482296.git.jonas.rabenstein@studium.uni-erlangen.de>
-In-Reply-To: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-References: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-In-Reply-To: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de> <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 7/8] block: sed-opal: add ioctl for done-mark of shadow mbr
+Date: Tue, 13 Mar 2018 14:09:00 +0100
+Message-Id: <f130c3075e74406bb9d0a53d65468970e960a018.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
+In-Reply-To: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
+References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
+In-Reply-To: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
+References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
 List-ID: <linux-block@vger.kernel.org>
 
 Enable users to mark the shadow mbr as done without completely
@@ -24,12 +23,17 @@ mbr stores the required boot files. Of course, this saves also the
 and one only wants to mark the shadow mbr as done.
 
 Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+---
+ block/sed-opal.c              | 33 +++++++++++++++++++++++++++++++--
+ include/linux/sed-opal.h      |  1 +
+ include/uapi/linux/sed-opal.h |  1 +
+ 3 files changed, 33 insertions(+), 2 deletions(-)
 
 diff --git a/block/sed-opal.c b/block/sed-opal.c
-index fc10f81d4892..2c8baff8bf67 100644
+index f169e621279a..b201c96d23a3 100644
 --- a/block/sed-opal.c
 +++ b/block/sed-opal.c
-@@ -1988,13 +1988,39 @@ static int opal_erase_locking_range(struct opal_dev *dev,
+@@ -1987,13 +1987,39 @@ static int opal_erase_locking_range(struct opal_dev *dev,
  static int opal_enable_disable_shadow_mbr(struct opal_dev *dev,
  					  struct opal_mbr_data *opal_mbr)
  {
@@ -71,7 +75,7 @@ index fc10f81d4892..2c8baff8bf67 100644
  		{ end_opal_session, },
  		{ NULL, }
  	};
-@@ -2340,6 +2366,9 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
+@@ -2339,6 +2365,9 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
  	case IOC_OPAL_ENABLE_DISABLE_MBR:
  		ret = opal_enable_disable_shadow_mbr(dev, p);
  		break;
