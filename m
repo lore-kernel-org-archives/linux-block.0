@@ -5,22 +5,26 @@ To: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
 	Jonathan Derrick <jonathan.derrick@intel.com>,
 	Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v2 09/11] block: sed-opal: unify retrieval of table columns
-Date: Mon, 19 Mar 2018 19:36:51 +0100
-Message-Id: <0cb968f26381001513c188a13cbc92b76a305712.1521482296.git.jonas.rabenstein@studium.uni-erlangen.de>
-In-Reply-To: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-References: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-In-Reply-To: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de> <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 8.2/8.4] block: sed-opal: unify retrieval of table columns
+Date: Wed, 14 Mar 2018 07:15:43 +0100
+Message-Id: <93a5d31c09c867546621b9a3f849cb2b9dd628d8.1521006596.git.jonas.rabenstein@studium.uni-erlangen.de>
+In-Reply-To: <cover.1521006595.git.jonas.rabenstein@studium.uni-erlangen.de>
+References: <cover.1521006595.git.jonas.rabenstein@studium.uni-erlangen.de>
+In-Reply-To: <cover.1521006595.git.jonas.rabenstein@studium.uni-erlangen.de>
+References: <20180313154416.sgptuw7jcn7l76vn@sbauer-Z170X-UD5> <cover.1521006595.git.jonas.rabenstein@studium.uni-erlangen.de>
+References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de> <b0b34fc0132312c09629c868d33b74fe5a19854e.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de> <20180313154416.sgptuw7jcn7l76vn@sbauer-Z170X-UD5>
 List-ID: <linux-block@vger.kernel.org>
 
-Instead of having multiple places defining the same argument list to get
+instead of having multiple places defining the same argument list to get
 a specific column of a sed-opal table, provide a generic version and
 call it from those functions.
 
 Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+---
+ block/opal_proto.h |   2 +
+ block/sed-opal.c   | 130 +++++++++++++++++++----------------------------------
+ 2 files changed, 49 insertions(+), 83 deletions(-)
 
 diff --git a/block/opal_proto.h b/block/opal_proto.h
 index e20be8258854..b6e352cfe982 100644
@@ -36,10 +40,10 @@ index e20be8258854..b6e352cfe982 100644
  	OPAL_MAXRANGES = 0x04,
  	 /* mbr control */
 diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 4549fa164e98..5b7b23cb95a4 100644
+index aa49fcc30462..ebee06aaadd6 100644
 --- a/block/sed-opal.c
 +++ b/block/sed-opal.c
-@@ -1076,6 +1076,37 @@ static int finalize_and_send(struct opal_dev *dev, cont_fn cont)
+@@ -1075,6 +1075,37 @@ static int finalize_and_send(struct opal_dev *dev, cont_fn cont)
  	return opal_send_recv(dev, cont);
  }
  
@@ -77,7 +81,7 @@ index 4549fa164e98..5b7b23cb95a4 100644
  static int gen_key(struct opal_dev *dev, void *data)
  {
  	u8 uid[OPAL_UID_LENGTH];
-@@ -1130,23 +1161,11 @@ static int get_active_key(struct opal_dev *dev, void *data)
+@@ -1129,23 +1160,11 @@ static int get_active_key(struct opal_dev *dev, void *data)
  	if (err)
  		return err;
  
@@ -104,7 +108,7 @@ index 4549fa164e98..5b7b23cb95a4 100644
  }
  
  static int generic_lr_enable_disable(struct opal_dev *dev,
-@@ -1801,14 +1820,16 @@ static int activate_lsp(struct opal_dev *dev, void *data)
+@@ -1800,14 +1819,16 @@ static int activate_lsp(struct opal_dev *dev, void *data)
  	return finalize_and_send(dev, parse_and_check_status);
  }
  
@@ -126,7 +130,7 @@ index 4549fa164e98..5b7b23cb95a4 100644
  
  	lc_status = response_get_u64(&dev->parsed, 4);
  	/* 0x08 is Manufacured Inactive */
-@@ -1821,49 +1842,19 @@ static int get_lsp_lifecycle_cont(struct opal_dev *dev)
+@@ -1820,49 +1841,19 @@ static int get_lsp_lifecycle_cont(struct opal_dev *dev)
  	return 0;
  }
  
@@ -182,7 +186,7 @@ index 4549fa164e98..5b7b23cb95a4 100644
  		return OPAL_INVAL_PARAM;
  	}
  
-@@ -1876,33 +1867,6 @@ static int get_msid_cpin_pin_cont(struct opal_dev *dev)
+@@ -1875,33 +1866,6 @@ static int get_msid_cpin_pin_cont(struct opal_dev *dev)
  	return 0;
  }
  
