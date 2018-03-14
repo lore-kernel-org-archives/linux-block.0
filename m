@@ -1,19 +1,22 @@
-Return-Path: <logang@deltatee.com>
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: Stephen Bates <sbates@raithlin.com>, Sinan Kaya <okaya@codeaurora.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
- Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
- Bjorn Helgaas <bhelgaas@google.com>, Jason Gunthorpe <jgg@mellanox.com>,
- Max Gurtovoy <maxg@mellanox.com>, Dan Williams <dan.j.williams@intel.com>,
- =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
- Benjamin Herrenschmidt <benh@kernel.crashing.org>,
- Alex Williamson <alex.williamson@redhat.com>
+Return-Path: <sbates@raithlin.com>
+From: "Stephen  Bates" <sbates@raithlin.com>
+To: Bjorn Helgaas <helgaas@kernel.org>, Logan Gunthorpe <logang@deltatee.com>
+CC: Sinan Kaya <okaya@codeaurora.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-pci@vger.kernel.org"
+	<linux-pci@vger.kernel.org>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "linux-nvdimm@lists.01.org"
+	<linux-nvdimm@lists.01.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>, Jens Axboe
+	<axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>, Sagi Grimberg
+	<sagi@grimberg.me>, Bjorn Helgaas <bhelgaas@google.com>, Jason Gunthorpe
+	<jgg@mellanox.com>, Max Gurtovoy <maxg@mellanox.com>, Dan Williams
+	<dan.j.williams@intel.com>, =?utf-8?B?SsOpcsO0bWUgR2xpc3Nl?=
+	<jglisse@redhat.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	"Alex Williamson" <alex.williamson@redhat.com>
+Subject: Re: [PATCH v3 01/11] PCI/P2PDMA: Support peer-to-peer memory
+Date: Wed, 14 Mar 2018 14:05:06 +0000
+Message-ID: <45A47A71-B435-4DFA-8925-8EB91CEAB230@raithlin.com>
 References: <3e738f95-d73c-4182-2fa1-8664aafb1ab7@deltatee.com>
  <703aa92c-0c1c-4852-5887-6f6e6ccde0fb@codeaurora.org>
  <a0af83f8-2cbc-862b-6f8b-231991527cfc@deltatee.com>
@@ -25,63 +28,21 @@ References: <3e738f95-d73c-4182-2fa1-8664aafb1ab7@deltatee.com>
  <20180313230850.GA45763@bhelgaas-glaptop.roam.corp.google.com>
  <8de5d3dd-a78f-02d5-0eea-4365364143b6@deltatee.com>
  <20180314025639.GA50067@bhelgaas-glaptop.roam.corp.google.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <112493af-ccd0-455b-6600-b50764f7ab7e@deltatee.com>
-Date: Wed, 14 Mar 2018 10:17:34 -0600
-MIME-Version: 1.0
 In-Reply-To: <20180314025639.GA50067@bhelgaas-glaptop.roam.corp.google.com>
-Content-Type: text/plain; charset=utf-8
-Subject: Re: [PATCH v3 01/11] PCI/P2PDMA: Support peer-to-peer memory
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-
-
-On 13/03/18 08:56 PM, Bjorn Helgaas wrote:
-> I assume you want to exclude Root Ports because of multi-function
-> devices and the "route to self" error.  I was hoping for a reference
-> to that so I could learn more about it.
-
-I haven't been able to find where in the spec it forbids route to self.
-But I was told this by developers who work know switches. Hopefully
-Stephen can find the reference.
-
-But it's a bit of a moot point. Devices can DMA to themselves if they
-are designed to do so. For example, some NVMe cards can read and write
-their own CMB for certain types of DMA request. There is a register in
-the spec (CMBSZ) which specifies which types of requests are supported.
-(See 3.1.12 in NVMe 1.3a).
-
-> I agree that peers need to have a common upstream bridge.  I think
-> you're saying peers need to have *two* common upstream bridges.  If I
-> understand correctly, requiring two common bridges is a way to ensure
-> that peers directly below Root Ports don't try to DMA to each other.
-
-No, I don't get where you think we need to have two common upstream
-bridges. I'm not sure when such a case would ever happen. But you seem
-to understand based on what you wrote below.
-
-> So I guess the first order of business is to nail down whether peers
-> below a Root Port are prohibited from DMAing to each other.  My
-> assumption, based on 6.12.1.2 and the fact that I haven't yet found
-> a prohibition, is that they can.
-
-If you have a multifunction device designed to DMA to itself below a
-root port, it can. But determining this is on a device by device basis,
-just as determining whether a root complex can do peer to peer is on a
-per device basis. So I'd say we don't want to allow it by default and
-let someone who has such a device figure out what's necessary if and
-when one comes along.
-
-> You already have upstream_bridges_match(), which takes two pci_devs.
-> I think it should walk up the PCI hierarchy from the first device,
-> checking whether the bridge at each level is also a parent of the
-> second device.
-
-Yes, this is what I meant when I said walking the entire tree. I've been
-kicking the can down the road on implementing this as getting ref
-counting right and testing it is going to be quite tricky. The single
-switch approach we implemented now is just a simplification which works
-for a single switch. But I guess we can look at implementing it this way
-for v4.
-
-Logan
+PkkgYXNzdW1lIHlvdSB3YW50IHRvIGV4Y2x1ZGUgUm9vdCBQb3J0cyBiZWNhdXNlIG9mIG11bHRp
+LWZ1bmN0aW9uDQo+ICBkZXZpY2VzIGFuZCB0aGUgInJvdXRlIHRvIHNlbGYiIGVycm9yLiAgSSB3
+YXMgaG9waW5nIGZvciBhIHJlZmVyZW5jZQ0KPiAgdG8gdGhhdCBzbyBJIGNvdWxkIGxlYXJuIG1v
+cmUgYWJvdXQgaXQuDQoNCkFwb2xvZ2llcyBCam9ybi4gVGhpcyBzbGlwcGVkIHRocm91Z2ggbXkg
+bmV0LiBJIHdpbGwgdHJ5IGFuZCBnZXQgeW91IGEgcmVmZXJlbmNlIGZvciBSVFMgaW4gdGhlIG5l
+eHQgY291cGxlIG9mIGRheXMuDQogICAgDQo+IFdoaWxlIEkgd2FzIGxvb2tpbmcgZm9yIGl0LCBJ
+IGZvdW5kIHNlYyA2LjEyLjEuMiAoUENJZSByNC4wKSwgIkFDUw0KPiBGdW5jdGlvbnMgaW4gU1It
+SU9WIENhcGFibGUgYW5kIE11bHRpLUZ1bmN0aW9uIERldmljZXMiLCB3aGljaCBzZWVtcw0KPiBy
+ZWxldmFudC4gIEl0IHRhbGtzIGFib3V0ICJwZWVyLXRvLXBlZXIgUmVxdWVzdHMgKGJldHdlZW4g
+RnVuY3Rpb25zIG9mDQo+IHRoZSBkZXZpY2UpIi4gIFRoYXkgc2F5cyB0byBtZSB0aGF0IG11bHRp
+LWZ1bmN0aW9uIGRldmljZXMgY2FuIERNQQ0KPiBiZXR3ZWVuIHRoZW1zZWx2ZXMuDQogICAgDQpJ
+IHdpbGwgZ28gdGFrZSBhIGxvb2suIEFwcHJlY2lhdGUgdGhlIGxpbmsuDQoNClN0ZXBoZW4gDQoN
+Cg==
