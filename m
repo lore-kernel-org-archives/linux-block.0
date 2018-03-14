@@ -5,21 +5,25 @@ To: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
 	Jonathan Derrick <jonathan.derrick@intel.com>,
 	Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v2 10/11] block: sed-opal: get metadata about opal-sed tables
-Date: Mon, 19 Mar 2018 19:36:52 +0100
-Message-Id: <623d80cb07538e630a12a1c925e9c87b8e14dd6b.1521482296.git.jonas.rabenstein@studium.uni-erlangen.de>
-In-Reply-To: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-References: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-In-Reply-To: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de> <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 8.3/8.4] block: sed-opal: get metadata about opal-sed tables
+Date: Wed, 14 Mar 2018 07:15:44 +0100
+Message-Id: <2f3d01b1bf513a78a64e3b5dc6b7de59aaf2543d.1521006596.git.jonas.rabenstein@studium.uni-erlangen.de>
+In-Reply-To: <cover.1521006595.git.jonas.rabenstein@studium.uni-erlangen.de>
+References: <cover.1521006595.git.jonas.rabenstein@studium.uni-erlangen.de>
+In-Reply-To: <cover.1521006595.git.jonas.rabenstein@studium.uni-erlangen.de>
+References: <20180313154416.sgptuw7jcn7l76vn@sbauer-Z170X-UD5> <cover.1521006595.git.jonas.rabenstein@studium.uni-erlangen.de>
+References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de> <b0b34fc0132312c09629c868d33b74fe5a19854e.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de> <20180313154416.sgptuw7jcn7l76vn@sbauer-Z170X-UD5>
 List-ID: <linux-block@vger.kernel.org>
 
 Every opal-sed table is described in the OPAL_TABLE_TABLE. Provide a
-function to get desired metadata information out of that table.
+function to get desired information out of that table.
 
 Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+---
+ block/opal_proto.h | 16 ++++++++++++++++
+ block/sed-opal.c   | 25 +++++++++++++++++++++++++
+ 2 files changed, 41 insertions(+)
 
 diff --git a/block/opal_proto.h b/block/opal_proto.h
 index b6e352cfe982..5e8df3245eb0 100644
@@ -56,7 +60,7 @@ index b6e352cfe982..5e8df3245eb0 100644
  	OPAL_PIN = 0x03,
  	/* locking tokens */
 diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 5b7b23cb95a4..51f8034edbf7 100644
+index ebee06aaadd6..4d93a6097ec0 100644
 --- a/block/sed-opal.c
 +++ b/block/sed-opal.c
 @@ -136,6 +136,8 @@ static const u8 opaluid[][OPAL_UID_LENGTH] = {
@@ -68,7 +72,7 @@ index 5b7b23cb95a4..51f8034edbf7 100644
  	[OPAL_LOCKINGRANGE_GLOBAL] =
  		{ 0x00, 0x00, 0x08, 0x02, 0x00, 0x00, 0x00, 0x01 },
  	[OPAL_LOCKINGRANGE_ACE_RDLOCKED] =
-@@ -1107,6 +1109,29 @@ static int generic_get_column(struct opal_dev *dev, const u8 *table,
+@@ -1106,6 +1108,29 @@ static int generic_get_column(struct opal_dev *dev, const u8 *table,
  	return finalize_and_send(dev, parse_and_check_status);
  }
  
