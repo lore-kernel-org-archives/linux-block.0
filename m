@@ -1,26 +1,31 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Thu, 1 Mar 2018 09:42:50 +0100
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH 01/11] block: Reorder the queue flag manipulaton function
- definitions
-Message-ID: <20180301084250.bve7dusfv26xt5cx@linux-x5ow.site>
-References: <20180228192823.5191-1-bart.vanassche@wdc.com>
- <20180228192823.5191-2-bart.vanassche@wdc.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from verein.lst.de ([213.95.11.211]:34682 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751228AbeCNI6b (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 14 Mar 2018 04:58:31 -0400
+Date: Wed, 14 Mar 2018 09:58:30 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: James Bottomley <James.Bottomley@HansenPartnership.com>,
+        Jens Axboe <axboe@fb.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org, Meelis Roos <mroos@linux.ee>,
+        Don Brace <don.brace@microsemi.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Omar Sandoval <osandov@fb.com>, Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH V5 5/5] scsi: virtio_scsi: unify scsi_host_template
+Message-ID: <20180314085830.GD28983@lst.de>
+References: <20180313094243.8710-1-ming.lei@redhat.com> <20180313094243.8710-6-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20180228192823.5191-2-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180313094243.8710-6-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
 Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
--- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
