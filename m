@@ -1,23 +1,19 @@
-Return-Path: <sbates@raithlin.com>
-From: "Stephen  Bates" <sbates@raithlin.com>
-To: Dan Williams <dan.j.williams@intel.com>, Logan Gunthorpe
-	<logang@deltatee.com>
-CC: Bjorn Helgaas <helgaas@kernel.org>, Sinan Kaya <okaya@codeaurora.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "Christoph
- Hellwig" <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Keith Busch
-	<keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>, Bjorn Helgaas
-	<bhelgaas@google.com>, Jason Gunthorpe <jgg@mellanox.com>, Max Gurtovoy
-	<maxg@mellanox.com>, =?utf-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alex Williamson
-	<alex.williamson@redhat.com>
-Subject: Re: [PATCH v3 01/11] PCI/P2PDMA: Support peer-to-peer memory
-Date: Wed, 14 Mar 2018 19:34:53 +0000
-Message-ID: <AA646409-BB63-4757-A250-CE7118D4D3B8@raithlin.com>
+Return-Path: <logang@deltatee.com>
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Bjorn Helgaas <helgaas@kernel.org>, Stephen Bates <sbates@raithlin.com>,
+ Sinan Kaya <okaya@codeaurora.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+ Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+ Bjorn Helgaas <bhelgaas@google.com>, Jason Gunthorpe <jgg@mellanox.com>,
+ Max Gurtovoy <maxg@mellanox.com>, =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?=
+ <jglisse@redhat.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ Alex Williamson <alex.williamson@redhat.com>
 References: <a0af83f8-2cbc-862b-6f8b-231991527cfc@deltatee.com>
  <3ea80992-a0fc-08f2-d93d-ae0ec4e3f4ce@codeaurora.org>
  <4eb6850c-df1b-fd44-3ee0-d43a50270b53@deltatee.com>
@@ -31,21 +27,26 @@ References: <a0af83f8-2cbc-862b-6f8b-231991527cfc@deltatee.com>
  <20180314185159.GD179719@bhelgaas-glaptop.roam.corp.google.com>
  <b75e83ad-bb83-1f8d-1751-0989cc2493f1@deltatee.com>
  <CAPcyv4g-A6fqdTahxX=aONSCgp1eEvBb=ZVMzbZUWUDmqBbj7Q@mail.gmail.com>
-In-Reply-To: <CAPcyv4g-A6fqdTahxX=aONSCgp1eEvBb=ZVMzbZUWUDmqBbj7Q@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+From: Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <a9d7985d-09bb-2e23-c004-d14356a02830@deltatee.com>
+Date: Wed, 14 Mar 2018 13:30:59 -0600
 MIME-Version: 1.0
+In-Reply-To: <CAPcyv4g-A6fqdTahxX=aONSCgp1eEvBb=ZVMzbZUWUDmqBbj7Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Subject: Re: [PATCH v3 01/11] PCI/P2PDMA: Support peer-to-peer memory
 List-ID: <linux-block@vger.kernel.org>
 
-PiBQMlAgb3ZlciBQQ0kvUENJLVggaXMgcXVpdGUgY29tbW9uIGluIGRldmljZXMgbGlrZSByYWlk
-IGNvbnRyb2xsZXJzLg0KDQpIaSBEYW4gDQoNCkRvIHlvdSBtZWFuIGJldHdlZW4gUENJZSBkZXZp
-Y2VzIGJlbG93IHRoZSBSQUlEIGNvbnRyb2xsZXI/IElzbid0IGl0IHByZXR0eSBub3ZlbCB0byBi
-ZSBhYmxlIHRvIHN1cHBvcnQgUENJZSBFUHMgYmVsb3cgYSBSQUlEIGNvbnRyb2xsZXIgKGFzIG9w
-cG9zZWQgdG8gU0NTSSBiYXNlZCBkZXZpY2VzKT8NCg0KPiBJdCB3b3VsZCBiZSB1c2VmdWwgaWYg
-dGhvc2UgY29uZmlndXJhdGlvbnMgd2VyZSBub3QgbGVmdCBiZWhpbmQgc28NCj4gdGhhdCBMaW51
-eCBjb3VsZCBmZWFzaWJseSBkZXBsb3kgb2ZmbG9hZCBjb2RlIHRvIGEgY29udHJvbGxlciBpbiB0
-aGUNCj4gUENJIGRvbWFpbi4NCiAgIA0KQWdyZWVkLiBJIHRoaW5rIHRoaXMgd291bGQgYmUgZ3Jl
-YXQuIEtpbmQgb2YgbGlrZSB0aGUgWENPUFkgZnJhbWV3b3JrIHRoYXQgd2FzIHByb3Bvc2VkIGEg
-d2hpbGUgYmFjayBmb3IgU0NTSSBkZXZpY2VzIFsxXSBidXQgdXBkYXRlZCB0byBhbHNvIGluY2x1
-ZGUgTlZNZSBkZXZpY2VzLiBUaGF0IGlzIGRlZmluaXRlbHkgYSB1c2UgY2FzZSB3ZSB3b3VsZCBs
-aWtlIHRoaXMgZnJhbWV3b3JrIHRvIHN1cHBvcnQuDQoNClN0ZXBoZW4NCiANClsxXSBodHRwczov
-L2x3bi5uZXQvQXJ0aWNsZXMvNTkyMDk0Lw0KDQo=
+
+
+On 14/03/18 01:28 PM, Dan Williams wrote:
+> P2P over PCI/PCI-X is quite common in devices like raid controllers.
+> It would be useful if those configurations were not left behind so
+> that Linux could feasibly deploy offload code to a controller in the
+> PCI domain.
+
+Thanks for the note. Neat. In the end nothing is getting left behind
+it's just work for someone to add support. Even if I wasn't already
+going to make the change I mentioned it all fits in the architecture and
+APIs quite easily.
+
+Logan
