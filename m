@@ -1,57 +1,32 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:23307 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752815AbeCOPIa (ORCPT
+Received: from mail-pl0-f53.google.com ([209.85.160.53]:40829 "EHLO
+        mail-pl0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751348AbeCNTJi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Mar 2018 11:08:30 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Michael Lyle <mlyle@lyle.org>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Coly Li <colyli@suse.de>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH 12/16] bcache: Make it easier for static analyzers to analyze bch_allocator_thread()
-Date: Thu, 15 Mar 2018 08:08:10 -0700
-Message-Id: <20180315150814.9412-13-bart.vanassche@wdc.com>
-In-Reply-To: <20180315150814.9412-1-bart.vanassche@wdc.com>
-References: <20180315150814.9412-1-bart.vanassche@wdc.com>
+        Wed, 14 Mar 2018 15:09:38 -0400
+Received: by mail-pl0-f53.google.com with SMTP id ay1-v6so2242743plb.7
+        for <linux-block@vger.kernel.org>; Wed, 14 Mar 2018 12:09:38 -0700 (PDT)
+Subject: Re: [PATCH v7 8/9] bcache: add io_disable to struct cached_dev
+To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Junhui Tang <tang.junhui@zte.com.cn>
+References: <20180227165557.20442-1-colyli@suse.de>
+ <20180227165557.20442-9-colyli@suse.de>
+From: Michael Lyle <mlyle@lyle.org>
+Message-ID: <91ef62e7-1a59-8c5c-1347-ebb28a56f285@lyle.org>
+Date: Wed, 14 Mar 2018 12:09:36 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180227165557.20442-9-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This patch does not change any functionality but avoids that smatch
-reports the following:
+On 02/27/2018 08:55 AM, Coly Li wrote:
+> If a bcache device is configured to writeback mode, current code does not
+> handle write I/O errors on backing devices properly.
+> 
+> In writeback mode, write request is written to cache device, and
+> latter being flushed to backing device. If I/O failed when writing from
+> cache device to the backing device, bcache code just ignores the error and
+> upper layer code is NOT noticed that the backing device is broken.
 
-drivers/md/bcache/alloc.c:334: bch_allocator_thread() error: uninitialized symbol 'bucket'.
-
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
----
- drivers/md/bcache/alloc.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/md/bcache/alloc.c b/drivers/md/bcache/alloc.c
-index 458e1d38577d..6a98d48c5f5f 100644
---- a/drivers/md/bcache/alloc.c
-+++ b/drivers/md/bcache/alloc.c
-@@ -316,6 +316,7 @@ static int bch_allocator_push(struct cache *ca, long bucket)
- static int bch_allocator_thread(void *arg)
- {
- 	struct cache *ca = arg;
-+	long bucket;
- 
- 	mutex_lock(&ca->set->bucket_lock);
- 
-@@ -325,11 +326,7 @@ static int bch_allocator_thread(void *arg)
- 		 * possibly issue discards to them, then we add the bucket to
- 		 * the free list:
- 		 */
--		while (!fifo_empty(&ca->free_inc)) {
--			long bucket;
--
--			fifo_pop(&ca->free_inc, bucket);
--
-+		while (fifo_pop(&ca->free_inc, bucket)) {
- 			if (ca->discard) {
- 				mutex_unlock(&ca->set->bucket_lock);
- 				blkdev_issue_discard(ca->bdev,
--- 
-2.16.2
+lgtm, applied
