@@ -1,165 +1,101 @@
-Return-Path: <jonas.rabenstein@studium.uni-erlangen.de>
-From: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-To: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
+Return-Path: <fengguang.wu@intel.com>
+Date: Thu, 15 Mar 2018 03:39:50 +0800
+From: kbuild test robot <lkp@intel.com>
+To: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+Cc: kbuild-all@01.org,
+	Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
 	Scott Bauer <scott.bauer@intel.com>,
 	Jonathan Derrick <jonathan.derrick@intel.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v2 08/11] block: sed-opal: ioctl for writing to shadow mbr
-Date: Mon, 19 Mar 2018 19:36:50 +0100
-Message-Id: <9f94be9c32887aacdcba75bd6a3902d0350eb987.1521482296.git.jonas.rabenstein@studium.uni-erlangen.de>
-In-Reply-To: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-References: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-In-Reply-To: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de> <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 8/8] block: sed-opal: ioctl for writing to shadow mbr
+Message-ID: <201803150311.yGbwYKUS%fengguang.wu@intel.com>
+References: <b0b34fc0132312c09629c868d33b74fe5a19854e.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <b0b34fc0132312c09629c868d33b74fe5a19854e.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Allow modification of the shadow mbr. If the shadow mbr is not marked as
-done, this data will be presented read only as the device content. Only
-after marking the shadow mbr as done and unlocking a locking range the
-actual content is accessible.
+Hi Jonas,
 
-Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+Thank you for the patch! Perhaps something to improve:
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 2c8baff8bf67..4549fa164e98 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -1492,6 +1492,54 @@ static int set_mbr_enable_disable(struct opal_dev *dev, void *data)
- 	return finalize_and_send(dev, parse_and_check_status);
- }
- 
-+static int write_shadow_mbr(struct opal_dev *dev, void *data)
-+{
-+	struct opal_shadow_mbr *shadow = data;
-+	const u8 __user *src;
-+	u8 *dst;
-+	size_t off;
-+	u64 len;
-+	int err = 0;
-+
-+	/* FIXME: this is the maximum we can use for IO_BUFFER_LENGTH=2048.
-+	 *        Instead of having a constant value, it would be nice to
-+	 *        compute the actual value depending on IO_BUFFER_LENGTH
-+	 */
-+	len = 1950;
-+
-+	/* do the actual transmission(s) */
-+	src = (u8 *) shadow->data;
-+	for (off = 0 ; off < shadow->size; off += len) {
-+		len = min(len, shadow->size - off);
-+
-+		pr_debug("MBR: write bytes %zu+%llu/%llu\n",
-+			 off, len, shadow->size);
-+		err = start_opal_cmd(dev, opaluid[OPAL_MBR],
-+				     opalmethod[OPAL_SET]);
-+		add_token_u8(&err, dev, OPAL_STARTNAME);
-+		add_token_u8(&err, dev, OPAL_WHERE);
-+		add_token_u64(&err, dev, shadow->offset + off);
-+		add_token_u8(&err, dev, OPAL_ENDNAME);
-+
-+		add_token_u8(&err, dev, OPAL_STARTNAME);
-+		add_token_u8(&err, dev, OPAL_VALUES);
-+		dst = add_bytestring_header(&err, dev, len);
-+		if (!dst)
-+			break;
-+		if (copy_from_user(dst, src + off, len))
-+			err = -EFAULT;
-+
-+		add_token_u8(&err, dev, OPAL_ENDNAME);
-+		if (err)
-+			break;
-+
-+		err = finalize_and_send(dev, parse_and_check_status);
-+		if (err)
-+			break;
-+	}
-+	return err;
-+}
-+
- static int generic_pw_cmd(u8 *key, size_t key_len, u8 *cpin_uid,
- 			  struct opal_dev *dev)
- {
-@@ -2037,6 +2085,31 @@ static int opal_mbr_status(struct opal_dev *dev, struct opal_mbr_data *opal_mbr)
- 	return ret;
- }
- 
-+static int opal_write_shadow_mbr(struct opal_dev *dev,
-+				 struct opal_shadow_mbr *info)
-+{
-+	const struct opal_step mbr_steps[] = {
-+		{ opal_discovery0, },
-+		{ start_admin1LSP_opal_session, &info->key },
-+		{ write_shadow_mbr, info },
-+		{ end_opal_session, },
-+		{ NULL, }
-+	};
-+	int ret;
-+
-+	if (info->size == 0)
-+		return 0;
-+
-+	if (!access_ok(VERIFY_READ, info->data, info->size))
-+		return -EINVAL;
-+
-+	mutex_lock(&dev->dev_lock);
-+	setup_opal_dev(dev, mbr_steps);
-+	ret = next(dev);
-+	mutex_unlock(&dev->dev_lock);
-+	return ret;
-+}
-+
- static int opal_save(struct opal_dev *dev, struct opal_lock_unlock *lk_unlk)
- {
- 	struct opal_suspend_data *suspend;
-@@ -2369,6 +2442,9 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
- 	case IOC_OPAL_MBR_STATUS:
- 		ret = opal_mbr_status(dev, p);
- 		break;
-+	case IOC_OPAL_WRITE_SHADOW_MBR:
-+		ret = opal_write_shadow_mbr(dev, p);
-+		break;
- 	case IOC_OPAL_ERASE_LR:
- 		ret = opal_erase_locking_range(dev, p);
- 		break;
-diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
-index b38dc602cae3..cf08cdc13cbd 100644
---- a/include/linux/sed-opal.h
-+++ b/include/linux/sed-opal.h
-@@ -47,6 +47,7 @@ static inline bool is_sed_ioctl(unsigned int cmd)
- 	case IOC_OPAL_ENABLE_DISABLE_MBR:
- 	case IOC_OPAL_ERASE_LR:
- 	case IOC_OPAL_SECURE_ERASE_LR:
-+	case IOC_OPAL_WRITE_SHADOW_MBR:
- 	case IOC_OPAL_MBR_STATUS:
- 		return true;
- 	}
-diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
-index 0cb9890cdc04..8e84307f66d4 100644
---- a/include/uapi/linux/sed-opal.h
-+++ b/include/uapi/linux/sed-opal.h
-@@ -104,6 +104,13 @@ struct opal_mbr_data {
- 	__u8 __align[7];
- };
- 
-+struct opal_shadow_mbr {
-+	struct opal_key key;
-+	const __u64 data;
-+	__u64 offset;
-+	__u64 size;
-+};
-+
- #define IOC_OPAL_SAVE		    _IOW('p', 220, struct opal_lock_unlock)
- #define IOC_OPAL_LOCK_UNLOCK	    _IOW('p', 221, struct opal_lock_unlock)
- #define IOC_OPAL_TAKE_OWNERSHIP	    _IOW('p', 222, struct opal_key)
-@@ -117,5 +124,6 @@ struct opal_mbr_data {
- #define IOC_OPAL_ERASE_LR           _IOW('p', 230, struct opal_session_info)
- #define IOC_OPAL_SECURE_ERASE_LR    _IOW('p', 231, struct opal_session_info)
- #define IOC_OPAL_MBR_STATUS         _IOW('p', 232, struct opal_mbr_data)
-+#define IOC_OPAL_WRITE_SHADOW_MBR   _IOW('p', 233, struct opal_shadow_mbr)
- 
- #endif /* _UAPI_SED_OPAL_H */
--- 
-2.16.1
+[auto build test WARNING on next-20180309]
+[cannot apply to linus/master v4.16-rc4 v4.16-rc3 v4.16-rc2 v4.16-rc5]
+[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+
+url:    https://github.com/0day-ci/linux/commits/Jonas-Rabenstein/block-sed-opal-support-write-to-shadow-mbr/20180314-184749
+reproduce:
+        # apt-get install sparse
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF=-D__CHECK_ENDIAN__
+
+
+sparse warnings: (new ones prefixed by >>)
+
+   block/sed-opal.c:381:20: sparse: incorrect type in assignment (different base types) @@    expected unsigned long long [unsigned] [usertype] align @@    got ed long long [unsigned] [usertype] align @@
+   block/sed-opal.c:381:20:    expected unsigned long long [unsigned] [usertype] align
+   block/sed-opal.c:381:20:    got restricted __be64 const [usertype] alignment_granularity
+   block/sed-opal.c:382:25: sparse: incorrect type in assignment (different base types) @@    expected unsigned long long [unsigned] [usertype] lowest_lba @@    got ed long long [unsigned] [usertype] lowest_lba @@
+   block/sed-opal.c:382:25:    expected unsigned long long [unsigned] [usertype] lowest_lba
+   block/sed-opal.c:382:25:    got restricted __be64 const [usertype] lowest_aligned_lba
+>> block/sed-opal.c:1526:58: sparse: incorrect type in argument 2 (different address spaces) @@    expected void const [noderef] <asn:1>*from @@    got unsvoid const [noderef] <asn:1>*from @@
+   block/sed-opal.c:1526:58:    expected void const [noderef] <asn:1>*from
+   block/sed-opal.c:1526:58:    got unsigned char const [usertype] *
+>> block/sed-opal.c:2100:14: sparse: incorrect type in argument 1 (different address spaces) @@    expected void const volatile [noderef] <asn:1>*<noident> @@    got onst volatile [noderef] <asn:1>*<noident> @@
+   block/sed-opal.c:2100:14:    expected void const volatile [noderef] <asn:1>*<noident>
+   block/sed-opal.c:2100:14:    got unsigned char const [usertype] *data
+
+vim +1526 block/sed-opal.c
+
+  1493	
+  1494	static int write_shadow_mbr(struct opal_dev *dev, void *data)
+  1495	{
+  1496		struct opal_shadow_mbr *shadow = data;
+  1497		size_t off;
+  1498		u64 len;
+  1499		int err = 0;
+  1500		u8 *payload;
+  1501	
+  1502		/* FIXME: this is the maximum we can use for IO_BUFFER_LENGTH=2048.
+  1503		 *        Instead of having constant, it would be nice to compute the
+  1504		 *        actual value depending on IO_BUFFER_LENGTH
+  1505		 */
+  1506		len = 1950;
+  1507	
+  1508		/* do the actual transmission(s) */
+  1509		for (off = 0 ; off < shadow->size; off += len) {
+  1510			len = min(len, shadow->size - off);
+  1511	
+  1512			pr_debug("MBR: write bytes %zu+%llu/%llu\n",
+  1513				 off, len, shadow->size);
+  1514			err = start_opal_cmd(dev, opaluid[OPAL_MBR],
+  1515					     opalmethod[OPAL_SET]);
+  1516			add_token_u8(&err, dev, OPAL_STARTNAME);
+  1517			add_token_u8(&err, dev, OPAL_WHERE);
+  1518			add_token_u64(&err, dev, shadow->offset + off);
+  1519			add_token_u8(&err, dev, OPAL_ENDNAME);
+  1520	
+  1521			add_token_u8(&err, dev, OPAL_STARTNAME);
+  1522			add_token_u8(&err, dev, OPAL_VALUES);
+  1523			payload = add_bytestring_header(&err, dev, len);
+  1524			if (!payload)
+  1525				break;
+> 1526			if (copy_from_user(payload, shadow->data + off, len))
+  1527				err = -EFAULT;
+  1528	
+  1529			add_token_u8(&err, dev, OPAL_ENDNAME);
+  1530			if (err)
+  1531				break;
+  1532	
+  1533			err = finalize_and_send(dev, parse_and_check_status);
+  1534			if (err)
+  1535				break;
+  1536		}
+  1537		return err;
+  1538	}
+  1539	
+
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
