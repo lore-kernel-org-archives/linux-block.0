@@ -1,19 +1,18 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:58286 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:56464 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750745AbeCOQMD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Mar 2018 12:12:03 -0400
+        id S1752503AbeCOPwI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Mar 2018 11:52:08 -0400
 Subject: Re: [PATCH 05/16] bcache: Remove an unused variable
 To: Bart Van Assche <bart.vanassche@wdc.com>,
         Michael Lyle <mlyle@lyle.org>,
         Kent Overstreet <kent.overstreet@gmail.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        linux-bcache <linux-bcache@vger.kernel.org>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
 References: <20180315150814.9412-1-bart.vanassche@wdc.com>
  <20180315150814.9412-6-bart.vanassche@wdc.com>
 From: Coly Li <colyli@suse.de>
-Message-ID: <f91a53d3-f026-7e35-1c4e-f41afc52a565@suse.de>
-Date: Fri, 16 Mar 2018 00:11:16 +0800
+Message-ID: <a6a8975e-9a74-3f5c-c51f-57dcef7ce0e8@suse.de>
+Date: Thu, 15 Mar 2018 23:51:14 +0800
 MIME-Version: 1.0
 In-Reply-To: <20180315150814.9412-6-bart.vanassche@wdc.com>
 Content-Type: text/plain; charset=utf-8
@@ -25,8 +24,7 @@ On 15/03/2018 11:08 PM, Bart Van Assche wrote:
 
 Hi Bart,
 
-Could you please to add at least one line commit log ? Thanks in advance
-for this :-)
+I suggest to add at least one line commit log, thanks in advance for it :-)
 
 Coly Li
 
