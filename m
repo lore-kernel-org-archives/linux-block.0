@@ -1,79 +1,65 @@
-Return-Path: <axboe@kernel.dk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block IO bits for 4.16-rc5
-Message-ID: <e839cc6b-72d3-6606-a062-1261ac502669@kernel.dk>
-Date: Fri, 9 Mar 2018 22:21:47 -0700
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:4231 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752795AbeCOPIc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Mar 2018 11:08:32 -0400
+From: Bart Van Assche <bart.vanassche@wdc.com>
+To: Michael Lyle <mlyle@lyle.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Coly Li <colyli@suse.de>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [PATCH 10/16] bcache: Suppress a compiler warning in bch_##name##_h()
+Date: Thu, 15 Mar 2018 08:08:08 -0700
+Message-Id: <20180315150814.9412-11-bart.vanassche@wdc.com>
+In-Reply-To: <20180315150814.9412-1-bart.vanassche@wdc.com>
+References: <20180315150814.9412-1-bart.vanassche@wdc.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Linus,
+Avoid that building with W=1 triggers the following compiler warning:
 
-Here are a set of fixes for the current release. This pull request
-contains:
+drivers/md/bcache/util.c: In function 'bch_strtoull_h':
+drivers/md/bcache/util.c:70:10: warning: comparison of unsigned expression < 0 is always false [-Wtype-limits]
+       (i < 0 && -ANYSINT_MAX(type) / 1024 > i)) \
+          ^
 
-- Pull request from Konrad, with a single xen-blkfront fix from Bhavesh
-  with a multiqueue fix when detaching/re-attaching.
+The only functional change in this patch is that (type) ~0 is changed
+into ~(type)0. That makes a difference for unsigned types for which
+sizeof(type) > sizeof(int). I think this change is a bug fix.
 
-- Pull request from Keith for NVMe, with a few important fixes,
-  including a revert for a sysfs fix that caused some user space
-  confusion.
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+---
+ drivers/md/bcache/util.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-- Two bcache fixes by way of Michael Lyle.
-
-- A loop regression fix, fixing an issue with lost writes on DAX.
-
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git tags/for-linus-20180309
-
-
-----------------------------------------------------------------
-Bhavesh Davda (1):
-      xen-blkfront: move negotiate_mq to cover all cases of new VBDs
-
-Christoph Hellwig (1):
-      Revert "nvme: create 'slaves' and 'holders' entries for hidden controllers"
-
-James Smart (1):
-      nvme_fc: rework sqsize handling
-
-Jens Axboe (2):
-      Merge branch 'stable/for-jens-4.15' of git://git.kernel.org/.../konrad/xen into for-linus
-      Merge branch 'nvme-4.16-rc5' of git://git.infradead.org/nvme into for-linus
-
-Michael Lyle (1):
-      bcache: don't attach backing with duplicate UUID
-
-Ming Lei (1):
-      nvme: pci: pass max vectors as num_possible_cpus() to pci_alloc_irq_vectors
-
-Roland Dreier (1):
-      nvme-fabrics: Ignore nr_io_queues option for discovery controllers
-
-Ross Zwisler (1):
-      loop: Fix lost writes caused by missing flag
-
-Tang Junhui (1):
-      bcache: fix crashes in duplicate cache device register
-
-Wen Xiong (1):
-      nvme-pci: Fix EEH failure on ppc
-
- drivers/block/loop.c          |  2 +-
- drivers/block/xen-blkfront.c  | 17 ++++++++---------
- drivers/md/bcache/super.c     | 27 +++++++++++++++++++++------
- drivers/nvme/host/core.c      |  2 --
- drivers/nvme/host/fabrics.c   |  5 +++++
- drivers/nvme/host/fc.c        | 27 +++++++++++++++++----------
- drivers/nvme/host/multipath.c | 30 ------------------------------
- drivers/nvme/host/nvme.h      |  8 --------
- drivers/nvme/host/pci.c       | 15 ++++++++-------
- 9 files changed, 60 insertions(+), 73 deletions(-)
-
+diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
+index 74febd5230df..755523474649 100644
+--- a/drivers/md/bcache/util.c
++++ b/drivers/md/bcache/util.c
+@@ -25,6 +25,7 @@ int bch_ ## name ## _h(const char *cp, type *res)		\
+ 	int u = 0;						\
+ 	char *e;						\
+ 	type i = simple_ ## name(cp, &e, 10);			\
++	const type zero = 0;					\
+ 								\
+ 	switch (tolower(*e)) {					\
+ 	default:						\
+@@ -63,11 +64,10 @@ int bch_ ## name ## _h(const char *cp, type *res)		\
+ 		return -EINVAL;					\
+ 								\
+ 	while (u--) {						\
+-		if ((type) ~0 > 0 &&				\
+-		    (type) ~0 / 1024 <= i)			\
++		if (~zero > 0 && ~zero / 1024 <= i)		\
+ 			return -EINVAL;				\
+-		if ((i > 0 && ANYSINT_MAX(type) / 1024 < i) ||	\
+-		    (i < 0 && -ANYSINT_MAX(type) / 1024 > i))	\
++		if ((i > zero && ANYSINT_MAX(type) / 1024 < i) ||\
++		    (i < zero && -ANYSINT_MAX(type) / 1024 > i))\
+ 			return -EINVAL;				\
+ 		i *= 1024;					\
+ 	}							\
 -- 
-Jens Axboe
+2.16.2
