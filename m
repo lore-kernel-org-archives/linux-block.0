@@ -1,123 +1,55 @@
-Return-Path: <keith.busch@intel.com>
-From: Keith Busch <keith.busch@intel.com>
-To: Linux NVMe <linux-nvme@lists.infradead.org>,
-	Linux Block <linux-block@vger.kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Don Brace <don.brace@microsemi.com>,
-	qla2xxx-upstream@qlogic.com,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 1/3] blk-mq: Allow PCI vector offset for mapping queues
-Date: Tue, 27 Mar 2018 09:39:06 -0600
-Message-Id: <20180327153908.3732-1-keith.busch@intel.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:59401 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751542AbeCOQXK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Mar 2018 12:23:10 -0400
+Subject: Re: [PATCH 09/16] bcache: Remove a redundant assignment
+To: Bart Van Assche <bart.vanassche@wdc.com>,
+        Michael Lyle <mlyle@lyle.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Mike Christie <mchristi@redhat.com>,
+        Hannes Reinecke <hare@suse.com>
+References: <20180315150814.9412-1-bart.vanassche@wdc.com>
+ <20180315150814.9412-10-bart.vanassche@wdc.com>
+From: Coly Li <colyli@suse.de>
+Message-ID: <3e6a2256-891a-2e4e-1676-d692bc158ddb@suse.de>
+Date: Fri, 16 Mar 2018 00:22:28 +0800
+MIME-Version: 1.0
+In-Reply-To: <20180315150814.9412-10-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The PCI interrupt vectors intended to be associated with a queue may
-not start at 0; a driver may allocate pre_vectors for special use. This
-patch adds an offset parameter so blk-mq may find the intended affinity
-mask and updates all drivers using this API accordingly.
+On 15/03/2018 11:08 PM, Bart Van Assche wrote:
+> A bio_set_op_attrs() call a little further down overwrites bio->bi_opf.
+> That means that the bio->bi_opf assignment is redundant. Hence remove it.
+> See also commit ad0d9e76a412 ("bcache: use bio op accessors").
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Mike Christie <mchristi@redhat.com>
+> Cc: Hannes Reinecke <hare@suse.com>
 
-Cc: Don Brace <don.brace@microsemi.com>
-Cc: <qla2xxx-upstream@qlogic.com>
-Cc: <linux-scsi@vger.kernel.org>
-Signed-off-by: Keith Busch <keith.busch@intel.com>
----
-v1 -> v2:
+Reviewed-by: Coly Li <colyli@suse.de>
 
-  Update blk-mq API directly instead of chaining a default parameter to
-  a new API, and update all drivers accordingly.
+Thanks.
 
- block/blk-mq-pci.c                    | 6 ++++--
- drivers/nvme/host/pci.c               | 2 +-
- drivers/scsi/qla2xxx/qla_os.c         | 2 +-
- drivers/scsi/smartpqi/smartpqi_init.c | 2 +-
- include/linux/blk-mq-pci.h            | 3 ++-
- 5 files changed, 9 insertions(+), 6 deletions(-)
+Coly Li
 
-diff --git a/block/blk-mq-pci.c b/block/blk-mq-pci.c
-index 76944e3271bf..e233996bb76f 100644
---- a/block/blk-mq-pci.c
-+++ b/block/blk-mq-pci.c
-@@ -21,6 +21,7 @@
-  * blk_mq_pci_map_queues - provide a default queue mapping for PCI device
-  * @set:	tagset to provide the mapping for
-  * @pdev:	PCI device associated with @set.
-+ * @offset:	Offset to use for the pci irq vector
-  *
-  * This function assumes the PCI device @pdev has at least as many available
-  * interrupt vectors as @set has queues.  It will then query the vector
-@@ -28,13 +29,14 @@
-  * that maps a queue to the CPUs that have irq affinity for the corresponding
-  * vector.
-  */
--int blk_mq_pci_map_queues(struct blk_mq_tag_set *set, struct pci_dev *pdev)
-+int blk_mq_pci_map_queues(struct blk_mq_tag_set *set, struct pci_dev *pdev,
-+			    int offset)
- {
- 	const struct cpumask *mask;
- 	unsigned int queue, cpu;
- 
- 	for (queue = 0; queue < set->nr_hw_queues; queue++) {
--		mask = pci_irq_get_affinity(pdev, queue);
-+		mask = pci_irq_get_affinity(pdev, queue + offset);
- 		if (!mask)
- 			goto fallback;
- 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index cef5ce851a92..e3b9efca0571 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -414,7 +414,7 @@ static int nvme_pci_map_queues(struct blk_mq_tag_set *set)
- {
- 	struct nvme_dev *dev = set->driver_data;
- 
--	return blk_mq_pci_map_queues(set, to_pci_dev(dev->dev));
-+	return blk_mq_pci_map_queues(set, to_pci_dev(dev->dev), 0);
- }
- 
- /**
-diff --git a/drivers/scsi/qla2xxx/qla_os.c b/drivers/scsi/qla2xxx/qla_os.c
-index 12ee6e02d146..2c705f3dd265 100644
---- a/drivers/scsi/qla2xxx/qla_os.c
-+++ b/drivers/scsi/qla2xxx/qla_os.c
-@@ -6805,7 +6805,7 @@ static int qla2xxx_map_queues(struct Scsi_Host *shost)
- 	if (USER_CTRL_IRQ(vha->hw))
- 		rc = blk_mq_map_queues(&shost->tag_set);
- 	else
--		rc = blk_mq_pci_map_queues(&shost->tag_set, vha->hw->pdev);
-+		rc = blk_mq_pci_map_queues(&shost->tag_set, vha->hw->pdev, 0);
- 	return rc;
- }
- 
-diff --git a/drivers/scsi/smartpqi/smartpqi_init.c b/drivers/scsi/smartpqi/smartpqi_init.c
-index b2880c7709e6..10c94011c8a8 100644
---- a/drivers/scsi/smartpqi/smartpqi_init.c
-+++ b/drivers/scsi/smartpqi/smartpqi_init.c
-@@ -5348,7 +5348,7 @@ static int pqi_map_queues(struct Scsi_Host *shost)
- {
- 	struct pqi_ctrl_info *ctrl_info = shost_to_hba(shost);
- 
--	return blk_mq_pci_map_queues(&shost->tag_set, ctrl_info->pci_dev);
-+	return blk_mq_pci_map_queues(&shost->tag_set, ctrl_info->pci_dev, 0);
- }
- 
- static int pqi_getpciinfo_ioctl(struct pqi_ctrl_info *ctrl_info,
-diff --git a/include/linux/blk-mq-pci.h b/include/linux/blk-mq-pci.h
-index 6338551e0fb9..9f4c17f0d2d8 100644
---- a/include/linux/blk-mq-pci.h
-+++ b/include/linux/blk-mq-pci.h
-@@ -5,6 +5,7 @@
- struct blk_mq_tag_set;
- struct pci_dev;
- 
--int blk_mq_pci_map_queues(struct blk_mq_tag_set *set, struct pci_dev *pdev);
-+int blk_mq_pci_map_queues(struct blk_mq_tag_set *set, struct pci_dev *pdev,
-+			  int offset);
- 
- #endif /* _LINUX_BLK_MQ_PCI_H */
--- 
-2.14.3
+> ---
+>  drivers/md/bcache/super.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index 87c1f853bbb3..d19a44cd1fd7 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -353,7 +353,6 @@ static void uuid_io(struct cache_set *c, int op, unsigned long op_flags,
+>  	for (i = 0; i < KEY_PTRS(k); i++) {
+>  		struct bio *bio = bch_bbio_alloc(c);
+>  
+> -		bio->bi_opf = REQ_SYNC | REQ_META | op_flags;
+>  		bio->bi_iter.bi_size = KEY_SIZE(k) << 9;
+>  
+>  		bio->bi_end_io	= uuid_endio;
+> 
