@@ -1,52 +1,61 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:42612 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754737AbeCSAhD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Mar 2018 20:37:03 -0400
-Received: by mail-pg0-f67.google.com with SMTP id o14so2013975pgv.9
-        for <linux-block@vger.kernel.org>; Sun, 18 Mar 2018 17:37:03 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [for-4.17 19/20] bcache: Reduce the number of sparse complaints about lock imbalances
-Date: Sun, 18 Mar 2018 17:36:32 -0700
-Message-Id: <20180319003633.27225-20-mlyle@lyle.org>
-In-Reply-To: <20180319003633.27225-1-mlyle@lyle.org>
-References: <20180319003633.27225-1-mlyle@lyle.org>
+Received: from mx2.suse.de ([195.135.220.15]:33939 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750987AbeCOQ4O (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Mar 2018 12:56:14 -0400
+Subject: Re: [PATCH 06/16] bcache: Suppress more warnings about
+ set-but-not-used variables
+To: Bart Van Assche <Bart.VanAssche@wdc.com>,
+        "mlyle@lyle.org" <mlyle@lyle.org>,
+        "kent.overstreet@gmail.com" <kent.overstreet@gmail.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20180315150814.9412-1-bart.vanassche@wdc.com>
+ <20180315150814.9412-7-bart.vanassche@wdc.com>
+ <53cbda05-917f-cce3-91ff-73e363448773@suse.de>
+ <1521132616.2834.6.camel@wdc.com>
+From: Coly Li <colyli@suse.de>
+Message-ID: <23ade802-7774-ad61-0521-c7c0718a3f79@suse.de>
+Date: Fri, 16 Mar 2018 00:55:00 +0800
+MIME-Version: 1.0
+In-Reply-To: <1521132616.2834.6.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Bart Van Assche <bart.vanassche@wdc.com>
+On 16/03/2018 12:50 AM, Bart Van Assche wrote:
+> On Fri, 2018-03-16 at 00:20 +0800, Coly Li wrote:
+>> On 15/03/2018 11:08 PM, Bart Van Assche wrote:
+>>> This patch does not change any functionality.
+>>>
+>>> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+>>
+>> Hi Bart,
+>>
+>> This patch looks good to me. A question is, does GCC later than 4.3
+>> supports such annotation like '__maybe_unused' ?
+> 
+> Hello Coly,
+> 
+> You may want to have a look at the following commit:
+> 
+> commit 0d7ebbbc6eaa5539f78ab20ed6ff1725a4e332ef
+> Author: David Rientjes <rientjes@google.com>
+> Date:   Wed May 9 02:35:27 2007 -0700
+> 
+>     compiler: introduce __used and __maybe_unused
+> 
+>     __used is defined to be __attribute__((unused)) for all pre-3.3 gcc
+>     compilers to suppress warnings for unused functions because perhaps they
+>     are referenced only in inline assembly.  It is defined to be
+>     __attribute__((used)) for gcc 3.3 and later so that the code is still
+>     emitted for such functions.
+> 
+Hi Bart,
 
-Add more annotations for sparse to inform it about which functions do
-not have the same number of spin_lock() and spin_unlock() calls.
+Thanks for the hint, I don't need to worry about it.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/journal.c | 2 ++
- 1 file changed, 2 insertions(+)
+Reviewed-by: Coly Li <colyli@suse.de>
 
-diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
-index acd0e5c074dd..18f1b5239620 100644
---- a/drivers/md/bcache/journal.c
-+++ b/drivers/md/bcache/journal.c
-@@ -594,6 +594,7 @@ static void journal_write_done(struct closure *cl)
- }
- 
- static void journal_write_unlock(struct closure *cl)
-+	__releases(&c->journal.lock)
- {
- 	struct cache_set *c = container_of(cl, struct cache_set, journal.io);
- 
-@@ -705,6 +706,7 @@ static void journal_try_write(struct cache_set *c)
- 
- static struct journal_write *journal_wait_for_write(struct cache_set *c,
- 						    unsigned nkeys)
-+	__acquires(&c->journal.lock)
- {
- 	size_t sectors;
- 	struct closure cl;
--- 
-2.14.1
+Coly Li
