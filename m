@@ -1,26 +1,25 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:45134 "EHLO mx2.suse.de"
+Received: from verein.lst.de ([213.95.11.211]:41900 "EHLO newverein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750766AbeCPEvT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Mar 2018 00:51:19 -0400
+        id S1752503AbeCOP7H (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Mar 2018 11:59:07 -0400
+Date: Thu, 15 Mar 2018 16:59:06 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Michael Lyle <mlyle@lyle.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Coly Li <colyli@suse.de>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
 Subject: Re: [PATCH 16/16] bcache: Fix endianness annotations
-To: Bart Van Assche <bart.vanassche@wdc.com>,
-        Michael Lyle <mlyle@lyle.org>,
-        Kent Overstreet <kent.overstreet@gmail.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        linux-bcache <linux-bcache@vger.kernel.org>
-References: <20180315150814.9412-1-bart.vanassche@wdc.com>
- <20180315150814.9412-17-bart.vanassche@wdc.com>
-From: Coly Li <colyli@suse.de>
-Message-ID: <b3e0a652-52ac-f9cb-a865-12254112f9cb@suse.de>
-Date: Fri, 16 Mar 2018 12:51:07 +0800
+Message-ID: <20180315155906.GB20994@lst.de>
+References: <20180315150814.9412-1-bart.vanassche@wdc.com> <20180315150814.9412-17-bart.vanassche@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180315150814.9412-17-bart.vanassche@wdc.com>
-Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 15/03/2018 11:08 PM, Bart Van Assche wrote:
+On Thu, Mar 15, 2018 at 08:08:14AM -0700, Bart Van Assche wrote:
 > This patch avoids that sparse complains about using integer types
 > incorrectly (u32, __le32, __be32, ...) by splitting struct cache_sb
 > into two different structures:
@@ -28,225 +27,10 @@ On 15/03/2018 11:08 PM, Bart Van Assche wrote:
 >   CPU endianness.
 > - struct cache_sb_le in which all integer members except csum are
 >   declared as little endian.
-> 
-> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
 
-Reviewed-by: Coly Li <colyli@suse.de>
+Can you call this cache_sb_disk to name it after the purpose instead
+of the implementation?
 
-Hi Bart,
+Except for that this looks like the right fix:
 
-This patch is good, and I like the idea of STRUCT_CACHE_SB().
-
-How about letting me to pick this patch into my bcache s390x fixes? I
-will fix the structure name suggested by Christoph, and set you as the
-patch author.
-
-Thanks.
-
-Coly Li
-
-> ---
->  drivers/md/bcache/super.c   |  10 ++--
->  include/uapi/linux/bcache.h | 118 +++++++++++++++++++++++---------------------
->  2 files changed, 68 insertions(+), 60 deletions(-)
-> 
-> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-> index 31d700aecd56..ef659c7d72f9 100644
-> --- a/drivers/md/bcache/super.c
-> +++ b/drivers/md/bcache/super.c
-> @@ -63,20 +63,22 @@ struct workqueue_struct *bcache_wq;
->  /* limitation of bcache devices number on single system */
->  #define BCACHE_DEVICE_IDX_MAX	((1U << MINORBITS)/BCACHE_MINORS)
->  
-> +struct cache_sb_le STRUCT_CACHE_SB(le);
-> +
->  /* Superblock */
->  
->  static const char *read_super(struct cache_sb *sb, struct block_device *bdev,
->  			      struct page **res)
->  {
->  	const char *err;
-> -	struct cache_sb *s;
-> +	struct cache_sb_le *s;
->  	struct buffer_head *bh = __bread(bdev, 1, SB_SIZE);
->  	unsigned i;
->  
->  	if (!bh)
->  		return "IO error";
->  
-> -	s = (struct cache_sb *) bh->b_data;
-> +	s = (struct cache_sb_le *) bh->b_data;
->  
->  	sb->offset		= le64_to_cpu(s->offset);
->  	sb->version		= le64_to_cpu(s->version);
-> @@ -211,7 +213,7 @@ static void write_bdev_super_endio(struct bio *bio)
->  
->  static void __write_super(struct cache_sb *sb, struct bio *bio)
->  {
-> -	struct cache_sb *out = page_address(bio_first_page_all(bio));
-> +	struct cache_sb_le *out = page_address(bio_first_page_all(bio));
->  	unsigned i;
->  
->  	bio->bi_iter.bi_sector	= SB_SECTOR;
-> @@ -959,7 +961,7 @@ void bch_cached_dev_detach(struct cached_dev *dc)
->  int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
->  			  uint8_t *set_uuid)
->  {
-> -	uint32_t rtime = cpu_to_le32(get_seconds());
-> +	__le32 rtime = cpu_to_le32(get_seconds());
->  	struct uuid_entry *u;
->  	char buf[BDEVNAME_SIZE];
->  
-> diff --git a/include/uapi/linux/bcache.h b/include/uapi/linux/bcache.h
-> index 821f71a2e48f..772787c47772 100644
-> --- a/include/uapi/linux/bcache.h
-> +++ b/include/uapi/linux/bcache.h
-> @@ -154,57 +154,63 @@ static inline struct bkey *bkey_idx(const struct bkey *k, unsigned nr_keys)
->  
->  #define BDEV_DATA_START_DEFAULT		16	/* sectors */
->  
-> -struct cache_sb {
-> -	__u64			csum;
-> -	__u64			offset;	/* sector where this sb was written */
-> -	__u64			version;
-> -
-> -	__u8			magic[16];
-> -
-> -	__u8			uuid[16];
-> -	union {
-> -		__u8		set_uuid[16];
-> -		__u64		set_magic;
-> -	};
-> -	__u8			label[SB_LABEL_SIZE];
-> -
-> -	__u64			flags;
-> -	__u64			seq;
-> -	__u64			pad[8];
-> -
-> -	union {
-> -	struct {
-> -		/* Cache devices */
-> -		__u64		nbuckets;	/* device size */
-> -
-> -		__u16		block_size;	/* sectors */
-> -		__u16		bucket_size;	/* sectors */
-> -
-> -		__u16		nr_in_set;
-> -		__u16		nr_this_dev;
-> -	};
-> -	struct {
-> -		/* Backing devices */
-> -		__u64		data_offset;
-> -
-> -		/*
-> -		 * block_size from the cache device section is still used by
-> -		 * backing devices, so don't add anything here until we fix
-> -		 * things to not need it for backing devices anymore
-> -		 */
-> -	};
-> -	};
-> -
-> -	__u32			last_mount;	/* time_t */
-> -
-> -	__u16			first_bucket;
-> -	union {
-> -		__u16		njournal_buckets;
-> -		__u16		keys;
-> -	};
-> -	__u64			d[SB_JOURNAL_BUCKETS];	/* journal buckets */
-> +#define STRUCT_CACHE_SB(e)						\
-> +{									\
-> +	__u64			csum;					\
-> +	/* sector where this sb was written */				\
-> +	__##e##64		offset;					\
-> +	__##e##64		version;				\
-> +									\
-> +	__u8			magic[16];				\
-> +									\
-> +	__u8			uuid[16];				\
-> +	union {								\
-> +		__u8		set_uuid[16];				\
-> +		__##e##64	set_magic;				\
-> +	};								\
-> +	__u8			label[SB_LABEL_SIZE];			\
-> +									\
-> +	__##e##64		flags;					\
-> +	__##e##64		seq;					\
-> +	__##e##64		pad[8];					\
-> +									\
-> +	union {								\
-> +	struct {							\
-> +		/* Cache devices */					\
-> +		__##e##64	nbuckets;	/* device size */	\
-> +									\
-> +		__##e##16	block_size;	/* sectors */		\
-> +		__##e##16	bucket_size;	/* sectors */		\
-> +									\
-> +		__##e##16	nr_in_set;				\
-> +		__##e##16	nr_this_dev;				\
-> +	};								\
-> +	struct {							\
-> +		/* Backing devices */					\
-> +		__##e##64	data_offset;				\
-> +									\
-> +		/*							\
-> +		 * block_size from the cache device section is still	\
-> +		 * used by backing devices, so don't add anything here	\
-> +		 * until we fix things to not need it for backing	\
-> +		 * devices anymore					\
-> +		 */							\
-> +	};								\
-> +	};								\
-> +									\
-> +	__##e##32		last_mount;	/* time_t */		\
-> +									\
-> +	__##e##16		first_bucket;				\
-> +	union {								\
-> +		__##e##16	njournal_buckets;			\
-> +		__##e##16	keys;					\
-> +	};								\
-> +	/* journal buckets */						\
-> +	__##e##64		d[SB_JOURNAL_BUCKETS];			\
->  };
->  
-> +struct cache_sb STRUCT_CACHE_SB(u);
-> +
->  static inline _Bool SB_IS_BDEV(const struct cache_sb *sb)
->  {
->  	return sb->version == BCACHE_SB_VERSION_BDEV
-> @@ -306,7 +312,7 @@ struct prio_set {
->  	__u64			next_bucket;
->  
->  	struct bucket_disk {
-> -		__u16		prio;
-> +		__le16		prio;
->  		__u8		gen;
->  	} __attribute((packed)) data[];
->  };
-> @@ -318,9 +324,9 @@ struct uuid_entry {
->  		struct {
->  			__u8	uuid[16];
->  			__u8	label[32];
-> -			__u32	first_reg;
-> -			__u32	last_reg;
-> -			__u32	invalidated;
-> +			__le32	first_reg;
-> +			__le32	last_reg;
-> +			__le32	invalidated;
->  
->  			__u32	flags;
->  			/* Size of flash only volumes */
-> @@ -366,9 +372,9 @@ struct bset {
->  struct uuid_entry_v0 {
->  	__u8		uuid[16];
->  	__u8		label[32];
-> -	__u32		first_reg;
-> -	__u32		last_reg;
-> -	__u32		invalidated;
-> +	__le32		first_reg;
-> +	__le32		last_reg;
-> +	__le32		invalidated;
->  	__u32		pad;
->  };
->  
-> 
+Reviewed-by: Christoph Hellwig <hch@lst.de>
