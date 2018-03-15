@@ -2,91 +2,107 @@ Return-Path: <linux@rainbow-software.org>
 From: Ondrej Zary <linux@rainbow-software.org>
 To: Christoph Hellwig <hch@lst.de>
 Subject: Re: [PATCH, RFC] block: remove the paride drivers
-Date: Thu, 15 Mar 2018 23:17:19 +0100
+Date: Thu, 15 Mar 2018 23:04:40 +0100
 Cc: axboe@kernel.dk,
  linux-block@vger.kernel.org,
  linux-kernel@vger.kernel.org
-References: <20180315075256.25652-1-hch@lst.de> <20180315080455.GA12388@lst.de> <201803152304.40423.linux@rainbow-software.org>
-In-Reply-To: <201803152304.40423.linux@rainbow-software.org>
+References: <20180315075256.25652-1-hch@lst.de> <201803150904.25087.linux@rainbow-software.org> <20180315080455.GA12388@lst.de>
+In-Reply-To: <20180315080455.GA12388@lst.de>
 MIME-Version: 1.0
 Content-Type: Text/Plain;
   charset="iso-8859-1"
-Message-Id: <201803152317.20367.linux@rainbow-software.org>
+Message-Id: <201803152304.40423.linux@rainbow-software.org>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thursday 15 March 2018 23:04:40 Ondrej Zary wrote:
-> On Thursday 15 March 2018 09:04:55 Christoph Hellwig wrote:
-> > On Thu, Mar 15, 2018 at 09:04:24AM +0100, Ondrej Zary wrote:
-> > > On Thursday 15 March 2018, Christoph Hellwig wrote:
-> > > > The paride drivers are some of the cruftiest, grottiest block drivers
-> > > > (besides drivers/ide and floppy.c) and have seen one single targeted
-> > > > commit since the dawn of git in 2007.  Drop them to make block layer
-> > > > improvements easier.
-> > >
-> > > This will make my parallel port ZIP and LS-120 drives useless :(
+On Thursday 15 March 2018 09:04:55 Christoph Hellwig wrote:
+> On Thu, Mar 15, 2018 at 09:04:24AM +0100, Ondrej Zary wrote:
+> > On Thursday 15 March 2018, Christoph Hellwig wrote:
+> > > The paride drivers are some of the cruftiest, grottiest block drivers
+> > > (besides drivers/ide and floppy.c) and have seen one single targeted
+> > > commit since the dawn of git in 2007.  Drop them to make block layer
+> > > improvements easier.
 > >
-> > So you are still using them and the code actually works properly?
+> > This will make my parallel port ZIP and LS-120 drives useless :(
 >
-> I don't use them daily, only occasionally. Last time they worked.
-> Checked now and it seems to work:
+> So you are still using them and the code actually works properly?
 
-Also found an old CD-ROM drive mounted in a HP C4381A box instead of the long-dead CD
-Writer 7200. Not as good as the pf driver :)
+I don't use them daily, only occasionally. Last time they worked.
+Checked now and it seems to work:
+
+[    0.000000] Linux version 4.16.0-rc4+ (zary@gsql) (gcc version 6.3.0 20170516 (Debian 6.3.0-18+deb9u1)) #217 SMP Tue Mar 13 00:08:16 CET 2018
+
+...
 
 # modprobe epat
-[   50.446246] paride: epat registered as protocol 0
-# modprobe pcd drive0=0x378,0
-[   56.694140] pcd: pcd version 1.07, major 46, nice 0
-[   56.803399] pcd0: Sharing parport0 at 0x378
-[   56.804336] pcd0: epat 1.02, Shuttle EPAT chip c6 at 0x378,
-[   56.804339] mode 5 (EPP-32), delay 1
-[   56.837419] pcd0: Master: 8X CD-ROM   V1.0
-[   56.839420] pcd0: mode sense capabilities completion: alt=0x51 stat=0x51 err=0x60 loop=0 phase=3
-[   56.842259] pcd0: mode sense capabilities: Sense key: 6, ASC: 29, ASQ: 0
-[   56.843149] cdrom: Uniform CD-ROM driver Revision: 3.20
-[   56.843757] BUG: unable to handle kernel paging request at f0b6a334
-[   56.844371] IP: register_cdrom+0x85/0x185 [cdrom]
-[   56.844971] *pde = 2f564067 *pte = 2c343161
-[   56.845692] Oops: 0003 [#1] SMP
-[   56.846564] Modules linked in: pcd(+) cdrom epat paride i2c_dev nouveau sg parport_pc 8139cp wmi hwmon ttm parport intel_agp
-[   56.847467] CPU: 0 PID: 1790 Comm: modprobe Not tainted 4.16.0-rc4+ #217
-[   56.848340] Hardware name:  /848P-ICH5, BIOS 6.00 PG 02/03/2005
-[   56.849275] EIP: register_cdrom+0x85/0x185 [cdrom]
-[   56.850190] EFLAGS: 00010246 CPU: 0
-[   56.851104] EAX: f0b61155 EBX: f0b6a300 ECX: ef992164 EDX: ef98c9cc
-[   56.852029] ESI: f0b6bb80 EDI: ec351dfc EBP: ec351de4 ESP: ec351dd8
-[   56.852961]  DS: 007b ES: 007b FS: 00d8 GS: 0033 SS: 0068
-[   56.853895] CR0: 80050033 CR2: f0b6a334 CR3: 2c22d000 CR4: 00000690
-[   56.854832] Call Trace:
-[   56.855764]  pcd_init+0x37e/0x1000 [pcd]
-[   56.856692]  ? _raw_spin_trylock_bh+0x1d/0x3a
-[   56.857615]  ? __switch_to_asm+0x26/0x40
-[   56.858541]  ? __switch_to_asm+0x1a/0x40
-[   56.859442]  ? __switch_to_asm+0x26/0x40
-[   56.860334]  ? 0xf0b6e000
-[   56.861172]  do_one_initcall+0x84/0x111
-[   56.862074]  ? __schedule+0x38f/0x3dd
-[   56.862990]  ? virt_to_head_page+0x19/0x1b
-[   56.863883]  ? virt_to_head_page+0x19/0x1b
-[   56.864768]  ? _cond_resched+0x1e/0x22
-[   56.865626]  ? kmem_cache_alloc+0x86/0xa9
-[   56.866486]  ? do_init_module+0x17/0x1ad
-[   56.867333]  do_init_module+0x46/0x1ad
-[   56.868164]  load_module+0x1708/0x1b23
-[   56.868997]  ? kernel_read_file+0x116/0x143
-[   56.869820]  SyS_finit_module+0x62/0x67
-[   56.870648]  do_int80_syscall_32+0x50/0x62
-[   56.871477]  entry_INT80_32+0x2a/0x2a
-[   56.872308] EIP: 0xb7fd6a02
-[   56.873134] EFLAGS: 00000292 CPU: 0
-[   56.873951] EAX: ffffffda EBX: 00000004 ECX: 007aff18 EDX: 00000000
-[   56.874749] ESI: 007b0278 EDI: 007aff90 EBP: 00000000 ESP: bffbbac8
-[   56.875590]  DS: 007b ES: 007b FS: 0000 GS: 0033 SS: 007b
-[   56.876431] Code: 0c 00 75 0d 83 7b 10 00 75 07 c7 43 34 6f ff ff ff 83 7b 14 00 75 04 83 63 34 fc 83 7b 18 00 75 04 83 63 34 fb 83 7b 1c 00 75 04 <83> 63 34 f7 83 7b 24 00 75 04 83 63 34 df 83 7b 28 00 75 04 83
-[   56.878264] EIP: register_cdrom+0x85/0x185 [cdrom] SS:ESP: 0068:ec351dd8
-[   56.879220] CR2: 00000000f0b6a334
-[   56.880193] ---[ end trace 596e4157e238f0e3 ]---
-
+[   47.376762] paride: epat registered as protocol 0
+# modprobe pf drive0=0x378,0
+[   59.048408] pf: pf version 1.04, major 47, cluster 64, nice 0
+[   59.156038] pf0: Sharing parport0 at 0x378
+[   59.157017] pf0: epat 1.02, Shuttle EPAT chip c6 at 0x378,
+[   59.157020] mode 5 (EPP-32), delay 1
+[   59.187400] pf0: mode sense completion: alt=0x51 stat=0x51 err=0x64 loop=0 phase=3
+[   59.188080] pf0: mode sense data done: alt=0x51 stat=0x51 err=0x64 loop=0 phase=3
+[   59.190648] pf0: Sense key: 6, ASC: 29, ASQ: 0
+[   59.196326] pf0: get capacity completion: alt=0x51 stat=0x51 err=0x24 loop=0 phase=3
+[   59.197038] pf0: get capacity data done: alt=0x51 stat=0x51 err=0x24 loop=0 phase=3
+[   59.199499] pf0: Sense key: 2, ASC: 3a, ASQ: 0
+[   59.200108] pf0: MATSHITA LS-120 COSM 04, master LUN 0, type 0
+[   59.200109] , removable
+[   59.200745] , no media
+[   59.219353] pf0: get capacity completion: alt=0x51 stat=0x51 err=0x24 loop=0 phase=3
+[   59.220078] pf0: get capacity data done: alt=0x51 stat=0x51 err=0x24 loop=0 phase=3
+[   59.222777] pf0: Sense key: 2, ASC: 3a, ASQ: 0
+[   59.223419] pf0: MATSHITA LS-120 COSM 04, master LUN 0, type 0
+[   59.223420] , removable
+[   59.224042] , no media
+# mount /dev/pf0 /media/floppy
+[   89.255905] pf0: mode sense completion: alt=0x51 stat=0x51 err=0x64 loop=0 phase=3
+[   89.256657] pf0: mode sense data done: alt=0x51 stat=0x51 err=0x64 loop=0 phase=3
+[   89.259415] pf0: Sense key: 6, ASC: 28, ASQ: 0
+[   89.265571] pf0: MATSHITA LS-120 COSM 04, master LUN 0, type 0
+[   89.265573] , removable
+[   89.266228] , RO
+[   89.266871] , 246528 blocks
+[   96.871316] pf0: MATSHITA LS-120 COSM 04, master LUN 0, type 0
+[   96.871319] , removable
+[   96.871998] , RO
+[   96.872653] , 246528 blocks
+[   96.888131] pf0: MATSHITA LS-120 COSM 04, master LUN 0, type 0
+[   96.888134] , removable
+[   96.888808] , RO
+[   96.889479] , 246528 blocks
+mount: /dev/pf0 is write-protected, mounting read-only
+# ls -la /media/floppy/
+total 356
+drwxr-xr-x 9 root root   2048 Jun 11  2002 !!!!!!!!
+drwxr-xr-x 6 root root  16384 Jan  1  1970 .
+drwxr-xr-x 6 root root   4096 Sep 16  2015 ..
+-rwxr-xr-x 1 root root    750 Nov  8  2007 auditsc-move-name-to-end-of-record.patch
+-rwxr-xr-x 1 root root    638 Nov  8  2007 audit-send-netlink-sync.patch
+-rwxr-xr-x 1 root root   5557 Nov  8  2007 cdu31a_interrupt_handling_new.patch
+-rwxr-xr-x 1 root root   4317 Nov  8  2007 cdu31a_interrupt_handling.patch
+-rwxr-xr-x 1 root root  51440 Nov  8  2007 cdu31a-locking-dd.patch
+-rwxr-xr-x 1 root root  48769 Nov  8  2007 cdu31a-locking.patch
+-rwxr-xr-x 1 root root  19470 Nov  8  2007 cdu31a-make-working.patch
+-rwxr-xr-x 1 root root    899 Nov  8  2007 cdu31a-timeouts-fix.patch
+-rwxr-xr-x 1 root root  36067 Nov  8  2007 cdu31a_trivial_cleanups.patch
+-rwxr-xr-x 1 root root  19278 Nov  8  2007 cdu31a_use_semaphores.patch
+-rwxr-xr-x 1 root root    462 Nov  8  2007 cyrix-math-new.patch
+-rwxr-xr-x 1 root root    530 Nov  8  2007 cyrix-math.patch
+-rwxr-xr-x 1 root root    391 Nov  8  2007 cyrix-new.patch
+-rwxr-xr-x 1 root root   1468 Nov  8  2007 cyrix-test.patch
+drwxr-xr-x 2 root root   2048 Jun  5  2002 DEUTSCH
+drwxr-xr-x 2 root root   2048 Jun  5  2002 ENGLISH
+drwxr-xr-x 2 root root   2048 Jun  5  2002 FRAN?AIS
+-rwxr-xr-x 1 root root    490 Nov  8  2007 hz100.patch
+-rwxr-xr-x 1 root root    796 Nov  8  2007 ide-floppy-eject.patch
+-rwxr-xr-x 1 root root   1655 Nov  8  2007 pf-fix-excess-reconnects.patch
+-rwxr-xr-x 1 root root    561 Nov  8  2007 sata_via_pata_dma_fix.patch
+-rwxr-xr-x 1 root root 111104 Sep 26  1997 SETUP.EXE
+-rwxr-xr-x 1 root root    643 Nov  8  2007 uncompressed-kernel-boot.patch
+-rwxr-xr-x 1 root root    455 Nov  8  2007 uncompressed-kernel-make.patch
+-rwxr-xr-x 1 root root   1098 Nov  8  2007 uncompressed-kernel.patch
+-rwxr-xr-x 1 root root   1558 Nov  8  2007 usbtouchscreen-invert.patch
 
 -- 
 Ondrej Zary
