@@ -1,67 +1,44 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:37136 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754850AbeCSAhC (ORCPT
+Received: from userp2120.oracle.com ([156.151.31.85]:40280 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751781AbeCODgE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Mar 2018 20:37:02 -0400
-Received: by mail-pf0-f193.google.com with SMTP id h11so6370097pfn.4
-        for <linux-block@vger.kernel.org>; Sun, 18 Mar 2018 17:37:02 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [for-4.17 18/20] bcache: Suppress more warnings about set-but-not-used variables
-Date: Sun, 18 Mar 2018 17:36:31 -0700
-Message-Id: <20180319003633.27225-19-mlyle@lyle.org>
-In-Reply-To: <20180319003633.27225-1-mlyle@lyle.org>
-References: <20180319003633.27225-1-mlyle@lyle.org>
+        Wed, 14 Mar 2018 23:36:04 -0400
+To: Ming Lei <ming.lei@redhat.com>
+Cc: James Bottomley <James.Bottomley@HansenPartnership.com>,
+        Jens Axboe <axboe@fb.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org, Meelis Roos <mroos@linux.ee>,
+        Don Brace <don.brace@microsemi.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Laurence Oberman <loberman@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH V5 0/5] SCSI: fix selection of reply(hw) queue
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20180313094243.8710-1-ming.lei@redhat.com>
+Date: Wed, 14 Mar 2018 23:35:41 -0400
+In-Reply-To: <20180313094243.8710-1-ming.lei@redhat.com> (Ming Lei's message
+        of "Tue, 13 Mar 2018 17:42:38 +0800")
+Message-ID: <yq1sh929fjm.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Bart Van Assche <bart.vanassche@wdc.com>
 
-This patch does not change any functionality.
+Ming,
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/bset.c    | 4 ++--
- drivers/md/bcache/journal.c | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+> The patches fixes reply queue(virt-queue on virtio-scsi) selection on
+> hpsa, megaraid_sa and virtio-scsi, and IO hang can be caused easily by
+> this issue.
 
-diff --git a/drivers/md/bcache/bset.c b/drivers/md/bcache/bset.c
-index e56d3ecdbfcb..579c696a5fe0 100644
---- a/drivers/md/bcache/bset.c
-+++ b/drivers/md/bcache/bset.c
-@@ -1072,7 +1072,7 @@ EXPORT_SYMBOL(bch_btree_iter_init);
- static inline struct bkey *__bch_btree_iter_next(struct btree_iter *iter,
- 						 btree_iter_cmp_fn *cmp)
- {
--	struct btree_iter_set unused;
-+	struct btree_iter_set b __maybe_unused;
- 	struct bkey *ret = NULL;
- 
- 	if (!btree_iter_end(iter)) {
-@@ -1087,7 +1087,7 @@ static inline struct bkey *__bch_btree_iter_next(struct btree_iter *iter,
- 		}
- 
- 		if (iter->data->k == iter->data->end)
--			heap_pop(iter, unused, cmp);
-+			heap_pop(iter, b, cmp);
- 		else
- 			heap_sift(iter, 0, cmp);
- 	}
-diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
-index c94085f400a4..acd0e5c074dd 100644
---- a/drivers/md/bcache/journal.c
-+++ b/drivers/md/bcache/journal.c
-@@ -493,7 +493,7 @@ static void journal_reclaim(struct cache_set *c)
- 	struct cache *ca;
- 	uint64_t last_seq;
- 	unsigned iter, n = 0;
--	atomic_t p;
-+	atomic_t p __maybe_unused;
- 
- 	atomic_long_inc(&c->reclaim);
- 
+I clarified all the commit descriptions. There were also a bunch of
+duplicate review tags and other warnings. Please run checkpatch next
+time!
+
+Applied to 4.16/scsi-fixes. Thank you.
+
 -- 
-2.14.1
+Martin K. Petersen	Oracle Linux Engineering
