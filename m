@@ -1,56 +1,59 @@
-Return-Path: <prvs=5980fa318=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Mike Snitzer <snitzer@redhat.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 10/11] block: Complain if queue_flag_(set|clear)_unlocked() is abused
-Date: Wed,  7 Mar 2018 17:10:11 -0800
-Message-Id: <20180308011012.31522-11-bart.vanassche@wdc.com>
-In-Reply-To: <20180308011012.31522-1-bart.vanassche@wdc.com>
-References: <20180308011012.31522-1-bart.vanassche@wdc.com>
+Return-Path: <linux-ide-owner@vger.kernel.org>
+Message-ID: <1521134022.22221.38.camel@perches.com>
+Subject: Re: rfc: remove print_vma_addr ? (was Re: [PATCH 00/16] remove
+ eight obsolete architectures)
+From: Joe Perches <joe@perches.com>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
+        David Howells <dhowells@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Linux-Arch <linux-arch@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-input@vger.kernel.org,
+        netdev <netdev@vger.kernel.org>,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        Linux PWM List <linux-pwm@vger.kernel.org>,
+        linux-rtc@vger.kernel.org, linux-spi <linux-spi@vger.kernel.org>,
+        USB list <linux-usb@vger.kernel.org>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        Linux Fbdev development list <linux-fbdev@vger.kernel.org>,
+        Linux Watchdog Mailing List <linux-watchdog@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        Linux MM <linux-mm@kvack.org>
+Date: Thu, 15 Mar 2018 10:13:42 -0700
+In-Reply-To: <20180315170830.GA17574@bombadil.infradead.org>
+References: <20180314143529.1456168-1-arnd@arndb.de>
+         <2929.1521106970@warthog.procyon.org.uk>
+         <CAMuHMdXcxuzCOnFCNm4NXDv-wfYJDO5GQpB_ECu7j=2BjMhNpA@mail.gmail.com>
+         <1521133006.22221.35.camel@perches.com>
+         <20180315170830.GA17574@bombadil.infradead.org>
+Content-Type: text/plain; charset="ISO-8859-1"
+Mime-Version: 1.0
+Sender: linux-ide-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Since it is not safe to use queue_flag_(set|clear)_unlocked()
-without holding the queue lock after the sysfs entries for a
-queue have been created, complain if this happens.
+On Thu, 2018-03-15 at 10:08 -0700, Matthew Wilcox wrote:
+> On Thu, Mar 15, 2018 at 09:56:46AM -0700, Joe Perches wrote:
+> > I have a patchset that creates a vsprintf extension for
+> > print_vma_addr and removes all the uses similar to the
+> > print_symbol() removal.
+> > 
+> > This now avoids any possible printk interleaving.
+> > 
+> > Unfortunately, without some #ifdef in vsprintf, which
+> > I would like to avoid, it increases the nommu kernel
+> > size by ~500 bytes.
+> > 
+> > Anyone think this is acceptable?
+[]
+> This doesn't feel like a huge win since it's only called ~once per
+> architecture.  I'd be more excited if it made the printing of the whole
+> thing standardised; eg we have a print_fault() function in mm/memory.c
+> which takes a suitable set of arguments.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Ming Lei <ming.lei@redhat.com>
----
- include/linux/blkdev.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+Sure but perhaps that's not feasible as the surrounding output
+is per-arch specific.
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index eca31d0ef2df..1f3ec9a7fbc7 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -726,12 +726,18 @@ static inline void queue_lockdep_assert_held(struct request_queue *q)
- static inline void queue_flag_set_unlocked(unsigned int flag,
- 					   struct request_queue *q)
- {
-+	if (test_bit(QUEUE_FLAG_INIT_DONE, &q->queue_flags) &&
-+	    kref_read(&q->kobj.kref))
-+		lockdep_assert_held(q->queue_lock);
- 	__set_bit(flag, &q->queue_flags);
- }
- 
- static inline void queue_flag_clear_unlocked(unsigned int flag,
- 					     struct request_queue *q)
- {
-+	if (test_bit(QUEUE_FLAG_INIT_DONE, &q->queue_flags) &&
-+	    kref_read(&q->kobj.kref))
-+		lockdep_assert_held(q->queue_lock);
- 	__clear_bit(flag, &q->queue_flags);
- }
- 
--- 
-2.16.2
+What could be a standardized fault message here?
+
