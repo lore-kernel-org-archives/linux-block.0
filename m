@@ -1,78 +1,65 @@
-Return-Path: <linux-ide-owner@vger.kernel.org>
-Date: Fri, 30 Mar 2018 11:47:24 +0300 (EEST)
-From: Meelis Roos <mroos@linux.ee>
-To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Tejun Heo <tj@kernel.org>
-cc: Linux Kernel list <linux-kernel@vger.kernel.org>,
-        linux-ide@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: 4.16-rc2+git: pata_serverworks: hanging ata detection thread on
- HP DL380G3
-In-Reply-To: <1597679.yzYZqmDdA5@amdc3058>
-Message-ID: <alpine.LRH.2.21.1803301144380.11026@math.ut.ee>
-References: <alpine.LRH.2.21.1802261049140.4893@math.ut.ee> <alpine.LRH.2.21.1803291153070.12825@math.ut.ee> <CGME20180329101255epcas2p22aeb95d869cdd2954bb9183037dace5f@epcas2p2.samsung.com> <1597679.yzYZqmDdA5@amdc3058>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-ot0-f177.google.com ([74.125.82.177]:45711 "EHLO
+        mail-ot0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751873AbeCOUKe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Mar 2018 16:10:34 -0400
+Received: by mail-ot0-f177.google.com with SMTP id w12-v6so8133874ote.12
+        for <linux-block@vger.kernel.org>; Thu, 15 Mar 2018 13:10:33 -0700 (PDT)
+Subject: Re: Hangs in balance_dirty_pages with arm-32 LPAE + highmem
+To: Michal Hocko <mhocko@kernel.org>
+Cc: Linux-MM <linux-mm@kvack.org>, linux-block@vger.kernel.org,
+        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+References: <b77a6596-3b35-84fe-b65b-43d2e43950b3@redhat.com>
+ <20180226142839.GB16842@dhcp22.suse.cz>
+ <4ba43bef-37f0-c21c-23a7-bbf696c926fd@redhat.com>
+ <20180314090851.GG4811@dhcp22.suse.cz>
+From: Laura Abbott <labbott@redhat.com>
+Message-ID: <ba9181f3-505d-c4ed-5f8b-d57696432f21@redhat.com>
+Date: Thu, 15 Mar 2018 13:10:30 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-ide-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20180314090851.GG4811@dhcp22.suse.cz>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Added CC-s, start of the thread is at 
-https://lkml.org/lkml/2018/2/26/165
-
-> > > 4.16 git bootup on HP Proliant DL380 G3 pauses for a a minute or two and 
-> > > then continues with "blocked for more than 120 seconds" message with 
-> > > libata detection functions in ther stack - 
-> > > async_synchronize_cookie_domain() as the last. It seems to happen during 
-> > > IDE CD-ROM detection (detected before but registered as sr0 after the 
-> > > warning). After detection, the eject button on the drive did not work.
-> > > 
-> > > 
-> > > pata_serverworks is the libata driver in use.
+On 03/14/2018 02:08 AM, Michal Hocko wrote:
+> On Mon 05-03-18 13:04:24, Laura Abbott wrote:
+>> On 02/26/2018 06:28 AM, Michal Hocko wrote:
+>>> On Fri 23-02-18 11:51:41, Laura Abbott wrote:
+>>>> Hi,
+>>>>
+>>>> The Fedora arm-32 build VMs have a somewhat long standing problem
+>>>> of hanging when running mkfs.ext4 with a bunch of processes stuck
+>>>> in D state. This has been seen as far back as 4.13 but is still
+>>>> present on 4.14:
+>>>>
+>>> [...]
+>>>> This looks like everything is blocked on the writeback completing but
+>>>> the writeback has been throttled. According to the infra team, this problem
+>>>> is _not_ seen without LPAE (i.e. only 4G of RAM). I did see
+>>>> https://patchwork.kernel.org/patch/10201593/ but that doesn't seem to
+>>>> quite match since this seems to be completely stuck. Any suggestions to
+>>>> narrow the problem down?
+>>>
+>>> How much dirtyable memory does the system have? We do allow only lowmem
+>>> to be dirtyable by default on 32b highmem systems. Maybe you have the
+>>> lowmem mostly consumed by the kernel memory. Have you tried to enable
+>>> highmem_is_dirtyable?
+>>>
+>>
+>> Setting highmem_is_dirtyable did fix the problem. The infrastructure
+>> people seemed satisfied enough with this (and are happy to have the
+>> machines back). I'll see if they are willing to run a few more tests
+>> to get some more state information.
 > 
-> There were no changes to pata_serverworks since 2014 and libata changes
-> in v4.16 look obviously correct..
+> Please be aware that highmem_is_dirtyable is not for free. There are
+> some code paths which can only allocate from lowmem (e.g. block device
+> AFAIR) and those could fill up the whole lowmem without any throttling.
 > 
-> > This is still the same in 4.16.0-rc7-00062-g0b412605ef5f.
-> 
-> Any chance that you could bisect this issue?
 
-Bisected to the following commit:
+Good to note. This particular setup is one basically everyone dislikes
+so I think this is only encouragement to move to something else.
 
-358f70da49d77c43f2ca11b5da584213b2add29c is the first bad commit
-commit 358f70da49d77c43f2ca11b5da584213b2add29c
-Author: Tejun Heo <tj@kernel.org>
-Date:   Tue Jan 9 08:29:50 2018 -0800
-
-    blk-mq: make blk_abort_request() trigger timeout path
-    
-    With issue/complete and timeout paths now using the generation number
-    and state based synchronization, blk_abort_request() is the only one
-    which depends on REQ_ATOM_COMPLETE for arbitrating completion.
-    
-    There's no reason for blk_abort_request() to be a completely separate
-    path.  This patch makes blk_abort_request() piggyback on the timeout
-    path instead of trying to terminate the request directly.
-    
-    This removes the last dependency on REQ_ATOM_COMPLETE in blk-mq.
-    
-    Note that this makes blk_abort_request() asynchronous - it initiates
-    abortion but the actual termination will happen after a short while,
-    even when the caller owns the request.  AFAICS, SCSI and ATA should be
-    fine with that and I think mtip32xx and dasd should be safe but not
-    completely sure.  It'd be great if people who know the drivers take a
-    look.
-    
-    v2: - Add comment explaining the lack of synchronization around
-          ->deadline update as requested by Bart.
-    
-    Signed-off-by: Tejun Heo <tj@kernel.org>
-    Cc: Asai Thambi SP <asamymuthupa@micron.com>
-    Cc: Stefan Haberland <sth@linux.vnet.ibm.com>
-    Cc: Jan Hoeppner <hoeppner@linux.vnet.ibm.com>
-    Cc: Bart Van Assche <Bart.VanAssche@wdc.com>
-    Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
-:040000 040000 b5c8c2fd69850021865071f9641d54ab4fd20a15 e2dbd2a15a6baeec1332cc1416e51d537ff5040a M      block
-
-
--- 
-Meelis Roos (mroos@linux.ee)
+Thanks,
+Laura
