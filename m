@@ -1,131 +1,53 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:46695 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754685AbeCSAhA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Mar 2018 20:37:00 -0400
-Received: by mail-pg0-f68.google.com with SMTP id g8so3147503pgq.13
-        for <linux-block@vger.kernel.org>; Sun, 18 Mar 2018 17:37:00 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [for-4.17 16/20] bcache: Fix kernel-doc warnings
-Date: Sun, 18 Mar 2018 17:36:29 -0700
-Message-Id: <20180319003633.27225-17-mlyle@lyle.org>
-In-Reply-To: <20180319003633.27225-1-mlyle@lyle.org>
-References: <20180319003633.27225-1-mlyle@lyle.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux@rainbow-software.org>
+From: Ondrej Zary <linux@rainbow-software.org>
+To: Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH, RFC] block: remove the paride drivers
+Date: Thu, 15 Mar 2018 23:37:18 +0100
+Cc: axboe@kernel.dk,
+ linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20180315075256.25652-1-hch@lst.de> <20180315080455.GA12388@lst.de> <201803152304.40423.linux@rainbow-software.org>
+In-Reply-To: <201803152304.40423.linux@rainbow-software.org>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201803152337.18938.linux@rainbow-software.org>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Bart Van Assche <bart.vanassche@wdc.com>
+On Thursday 15 March 2018 23:04:40 Ondrej Zary wrote:
+> On Thursday 15 March 2018 09:04:55 Christoph Hellwig wrote:
+> > On Thu, Mar 15, 2018 at 09:04:24AM +0100, Ondrej Zary wrote:
+> > > On Thursday 15 March 2018, Christoph Hellwig wrote:
+> > > > The paride drivers are some of the cruftiest, grottiest block drivers
+> > > > (besides drivers/ide and floppy.c) and have seen one single targeted
+> > > > commit since the dawn of git in 2007.  Drop them to make block layer
+> > > > improvements easier.
+> > >
+> > > This will make my parallel port ZIP and LS-120 drives useless :(
+> >
+> > So you are still using them and the code actually works properly?
+>
+> I don't use them daily, only occasionally. Last time they worked.
+> Checked now and it seems to work:
 
-Avoid that building with W=1 triggers warnings about the kernel-doc
-headers.
+Forgot that my ZIP drive uses the PPA driver, which seems to work too:
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/btree.c   |  2 +-
- drivers/md/bcache/closure.c |  8 ++++----
- drivers/md/bcache/request.c |  1 +
- drivers/md/bcache/util.c    | 18 ++++++++----------
- 4 files changed, 14 insertions(+), 15 deletions(-)
+# modprobe ppa
+[  816.690602] ppa: Version 2.07 (for Linux 2.4.x)
+[  816.762167] ppa: Found device at ID 6, Attempting to use EPP 32 bit
+[  816.763037] ppa: Communication established with ID 6 using EPP 32 bit
+[  816.807658] scsi host4: Iomega VPI0 (ppa) interface
+[  816.926616] scsi 4:0:6:0: Direct-Access     IOMEGA   ZIP 100          D.08 PQ: 0 ANSI: 2
+[  816.987969] sd 4:0:6:0: Attached scsi generic sg1 type 0
+[  817.054564] sd 4:0:6:0: Power-on or device reset occurred
+[  817.158623] sd 4:0:6:0: [sdb] Attached SCSI removable disk
+[  817.742723] sd 4:0:6:0: [sdb] tag#0 FAILED Result: hostbyte=DID_ABORT driverbyte=DRIVER_OK
+[  817.745168] sd 4:0:6:0: [sdb] tag#0 CDB: ATA command pass through(16) 85 06 20 00 05 00 fe 00 00 00 00 00 00 40 ef 00
+[  839.268575] sd 4:0:6:0: [sdb] Spinning up disk...
+[  840.320383] ..ready
+[  841.596371] sd 4:0:6:0: [sdb] 196608 512-byte logical blocks: (101 MB/96.0 MiB)
+[  842.088415]  sdb: sdb4
 
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index 143ed5a758e7..17936b2dc7d6 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -962,7 +962,7 @@ static struct btree *mca_alloc(struct cache_set *c, struct btree_op *op,
- 	return b;
- }
- 
--/**
-+/*
-  * bch_btree_node_get - find a btree node in the cache and lock it, reading it
-  * in from disk if necessary.
-  *
-diff --git a/drivers/md/bcache/closure.c b/drivers/md/bcache/closure.c
-index c0949c9f843b..0e14969182c6 100644
---- a/drivers/md/bcache/closure.c
-+++ b/drivers/md/bcache/closure.c
-@@ -46,7 +46,7 @@ void closure_sub(struct closure *cl, int v)
- }
- EXPORT_SYMBOL(closure_sub);
- 
--/**
-+/*
-  * closure_put - decrement a closure's refcount
-  */
- void closure_put(struct closure *cl)
-@@ -55,7 +55,7 @@ void closure_put(struct closure *cl)
- }
- EXPORT_SYMBOL(closure_put);
- 
--/**
-+/*
-  * closure_wake_up - wake up all closures on a wait list, without memory barrier
-  */
- void __closure_wake_up(struct closure_waitlist *wait_list)
-@@ -79,9 +79,9 @@ EXPORT_SYMBOL(__closure_wake_up);
- 
- /**
-  * closure_wait - add a closure to a waitlist
-- *
-- * @waitlist will own a ref on @cl, which will be released when
-+ * @waitlist: will own a ref on @cl, which will be released when
-  * closure_wake_up() is called on @waitlist.
-+ * @cl: closure pointer.
-  *
-  */
- bool closure_wait(struct closure_waitlist *waitlist, struct closure *cl)
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 5a82237c7025..a65e3365eeb9 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -296,6 +296,7 @@ static void bch_data_insert_start(struct closure *cl)
- 
- /**
-  * bch_data_insert - stick some data in the cache
-+ * @cl: closure pointer.
-  *
-  * This is the starting point for any data to end up in a cache device; it could
-  * be from a normal write, or a writeback write, or a write to a flash only
-diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
-index 6198041f0ee2..74febd5230df 100644
---- a/drivers/md/bcache/util.c
-+++ b/drivers/md/bcache/util.c
-@@ -82,10 +82,9 @@ STRTO_H(strtoll, long long)
- STRTO_H(strtoull, unsigned long long)
- 
- /**
-- * bch_hprint() - formats @v to human readable string for sysfs.
-- *
-- * @v - signed 64 bit integer
-- * @buf - the (at least 8 byte) buffer to format the result into.
-+ * bch_hprint - formats @v to human readable string for sysfs.
-+ * @buf: the (at least 8 byte) buffer to format the result into.
-+ * @v: signed 64 bit integer
-  *
-  * Returns the number of bytes used by format.
-  */
-@@ -225,13 +224,12 @@ void bch_time_stats_update(struct time_stats *stats, uint64_t start_time)
- }
- 
- /**
-- * bch_next_delay() - increment @d by the amount of work done, and return how
-- * long to delay until the next time to do some work.
-+ * bch_next_delay() - update ratelimiting statistics and calculate next delay
-+ * @d: the struct bch_ratelimit to update
-+ * @done: the amount of work done, in arbitrary units
-  *
-- * @d - the struct bch_ratelimit to update
-- * @done - the amount of work done, in arbitrary units
-- *
-- * Returns the amount of time to delay by, in jiffies
-+ * Increment @d by the amount of work done, and return how long to delay in
-+ * jiffies until the next time to do some work.
-  */
- uint64_t bch_next_delay(struct bch_ratelimit *d, uint64_t done)
- {
+
 -- 
-2.14.1
+Ondrej Zary
