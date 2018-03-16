@@ -1,89 +1,92 @@
-Return-Path: <gustavo@embeddedor.com>
-Date: Fri, 30 Mar 2018 14:17:59 -0500
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To: Ilya Dryomov <idryomov@gmail.com>, Sage Weil <sage@redhat.com>,
-	Alex Elder <elder@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: ceph-devel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH] rbd: remove VLA usage
-Message-ID: <20180330191759.GA18176@embeddedgus>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+To: Christoph Hellwig <hch@lst.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Felipe Balbi <balbi@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mark Brown <broonie@kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Stefan Richter <stefanr@s5r6.in-berlin.de>,
+        Alan Tull <atull@kernel.org>, Moritz Fischer <mdf@kernel.org>,
+        Wolfram Sang <wsa@the-dreams.de>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Matias Bjorling <mb@lightnvm.io>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Brian Norris <computersforpeace@gmail.com>,
+        Marek Vasut <marek.vasut@gmail.com>,
+        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
+        Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Richard Weinberger <richard@nod.at>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Eric Anholt <eric@anholt.net>,
+        Stefan Wahren <stefan.wahren@i2se.com>
+Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
+        linux-scsi@vger.kernel.org, alsa-devel@alsa-project.org,
+        linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+        linux-fpga@vger.kernel.org, linux-i2c@vger.kernel.org,
+        linux-iio@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-serial@vger.kernel.org,
+        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org,
+        Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH v2 16/21] remoteproc: Remove depends on HAS_DMA in case of platform dependency
+Date: Fri, 16 Mar 2018 14:51:49 +0100
+Message-Id: <1521208314-4783-17-git-send-email-geert@linux-m68k.org>
+In-Reply-To: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
+References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-In preparation to enabling -Wvla, remove the use of stack VLA.
+Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
+symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
+In most cases this other symbol is an architecture or platform specific
+symbol, or PCI.
 
-In this particular case, variable buf_size is replaced with a constant
-expression that can be computed at preprocessing time. This avoids two
-VLA warnings. Also, as a consequence of the mentioned change, some code
-was slightly refactored.
+Generic symbols and drivers without platform dependencies keep their
+dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
+cannot work anyway.
 
-The use of stack Variable Length Arrays needs to be avoided, as they
-can be a vector for stack exhaustion, which can be both a runtime bug
-or a security flaw. Also, in general, as code evolves it is easy to
-lose track of how big a VLA can get. Thus, we can end up having runtime
-failures that are hard to debug.
+This simplifies the dependencies, and allows to improve compile-testing.
 
-Also, fixed as part of the directive to remove all VLAs from
-the kernel: https://lkml.org/lkml/2018/3/7/621
-
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Reviewed-by: Mark Brown <broonie@kernel.org>
+Acked-by: Robin Murphy <robin.murphy@arm.com>
 ---
- drivers/block/rbd.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+v2:
+  - Add Reviewed-by, Acked-by,
+  - Drop RFC state,
+  - Split per subsystem.
+---
+ drivers/remoteproc/Kconfig | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-index 1e03b04..5133122 100644
---- a/drivers/block/rbd.c
-+++ b/drivers/block/rbd.c
-@@ -3091,20 +3091,20 @@ static int __rbd_notify_op_lock(struct rbd_device *rbd_dev,
- {
- 	struct ceph_osd_client *osdc = &rbd_dev->rbd_client->client->osdc;
- 	struct rbd_client_id cid = rbd_get_cid(rbd_dev);
--	int buf_size = 4 + 8 + 8 + CEPH_ENCODING_START_BLK_LEN;
--	char buf[buf_size];
-+	char buf[4 + 8 + 8 + CEPH_ENCODING_START_BLK_LEN];
- 	void *p = buf;
+diff --git a/drivers/remoteproc/Kconfig b/drivers/remoteproc/Kconfig
+index b609e1d3654ba65f..b60d8132113de0f7 100644
+--- a/drivers/remoteproc/Kconfig
++++ b/drivers/remoteproc/Kconfig
+@@ -23,7 +23,6 @@ config IMX_REMOTEPROC
  
- 	dout("%s rbd_dev %p notify_op %d\n", __func__, rbd_dev, notify_op);
- 
- 	/* encode *LockPayload NotifyMessage (op + ClientId) */
--	ceph_start_encoding(&p, 2, 1, buf_size - CEPH_ENCODING_START_BLK_LEN);
-+	ceph_start_encoding(&p, 2, 1,
-+			    sizeof(buf) - CEPH_ENCODING_START_BLK_LEN);
- 	ceph_encode_32(&p, notify_op);
- 	ceph_encode_64(&p, cid.gid);
- 	ceph_encode_64(&p, cid.handle);
- 
- 	return ceph_osdc_notify(osdc, &rbd_dev->header_oid,
--				&rbd_dev->header_oloc, buf, buf_size,
-+				&rbd_dev->header_oloc, buf, sizeof(buf),
- 				RBD_NOTIFY_TIMEOUT, preply_pages, preply_len);
- }
- 
-@@ -3610,19 +3610,18 @@ static void __rbd_acknowledge_notify(struct rbd_device *rbd_dev,
- 				     u64 notify_id, u64 cookie, s32 *result)
- {
- 	struct ceph_osd_client *osdc = &rbd_dev->rbd_client->client->osdc;
--	int buf_size = 4 + CEPH_ENCODING_START_BLK_LEN;
--	char buf[buf_size];
-+	char buf[4 + CEPH_ENCODING_START_BLK_LEN];
-+	int buf_size = 0;
- 	int ret;
- 
- 	if (result) {
- 		void *p = buf;
- 
-+		buf_size = sizeof(buf);
- 		/* encode ResponseMessage */
- 		ceph_start_encoding(&p, 1, 1,
- 				    buf_size - CEPH_ENCODING_START_BLK_LEN);
- 		ceph_encode_32(&p, *result);
--	} else {
--		buf_size = 0;
- 	}
- 
- 	ret = ceph_osdc_notify_ack(osdc, &rbd_dev->header_oid,
+ config OMAP_REMOTEPROC
+ 	tristate "OMAP remoteproc support"
+-	depends on HAS_DMA
+ 	depends on ARCH_OMAP4 || SOC_OMAP5
+ 	depends on OMAP_IOMMU
+ 	select MAILBOX
 -- 
 2.7.4
