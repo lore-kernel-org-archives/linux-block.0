@@ -1,129 +1,252 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:4231 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752602AbeCOPI2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Mar 2018 11:08:28 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Michael Lyle <mlyle@lyle.org>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Coly Li <colyli@suse.de>
+Received: from mx2.suse.de ([195.135.220.15]:45134 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750766AbeCPEvT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Mar 2018 00:51:19 -0400
+Subject: Re: [PATCH 16/16] bcache: Fix endianness annotations
+To: Bart Van Assche <bart.vanassche@wdc.com>,
+        Michael Lyle <mlyle@lyle.org>,
+        Kent Overstreet <kent.overstreet@gmail.com>
 Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH 04/16] bcache: Fix kernel-doc warnings
-Date: Thu, 15 Mar 2018 08:08:02 -0700
-Message-Id: <20180315150814.9412-5-bart.vanassche@wdc.com>
-In-Reply-To: <20180315150814.9412-1-bart.vanassche@wdc.com>
+        linux-bcache <linux-bcache@vger.kernel.org>
 References: <20180315150814.9412-1-bart.vanassche@wdc.com>
+ <20180315150814.9412-17-bart.vanassche@wdc.com>
+From: Coly Li <colyli@suse.de>
+Message-ID: <b3e0a652-52ac-f9cb-a865-12254112f9cb@suse.de>
+Date: Fri, 16 Mar 2018 12:51:07 +0800
+MIME-Version: 1.0
+In-Reply-To: <20180315150814.9412-17-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Avoid that building with W=1 triggers warnings about the kernel-doc
-headers.
+On 15/03/2018 11:08 PM, Bart Van Assche wrote:
+> This patch avoids that sparse complains about using integer types
+> incorrectly (u32, __le32, __be32, ...) by splitting struct cache_sb
+> into two different structures:
+> - struct cache_sb in which all integer members except csum have
+>   CPU endianness.
+> - struct cache_sb_le in which all integer members except csum are
+>   declared as little endian.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
----
- drivers/md/bcache/btree.c   |  2 +-
- drivers/md/bcache/closure.c |  8 ++++----
- drivers/md/bcache/request.c |  1 +
- drivers/md/bcache/util.c    | 18 ++++++++----------
- 4 files changed, 14 insertions(+), 15 deletions(-)
+Reviewed-by: Coly Li <colyli@suse.de>
 
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index c30609c54c03..d20f963799b6 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -959,7 +959,7 @@ static struct btree *mca_alloc(struct cache_set *c, struct btree_op *op,
- 	return b;
- }
- 
--/**
-+/*
-  * bch_btree_node_get - find a btree node in the cache and lock it, reading it
-  * in from disk if necessary.
-  *
-diff --git a/drivers/md/bcache/closure.c b/drivers/md/bcache/closure.c
-index 7f12920c14f7..87c45dfa7c38 100644
---- a/drivers/md/bcache/closure.c
-+++ b/drivers/md/bcache/closure.c
-@@ -46,7 +46,7 @@ void closure_sub(struct closure *cl, int v)
- }
- EXPORT_SYMBOL(closure_sub);
- 
--/**
-+/*
-  * closure_put - decrement a closure's refcount
-  */
- void closure_put(struct closure *cl)
-@@ -55,7 +55,7 @@ void closure_put(struct closure *cl)
- }
- EXPORT_SYMBOL(closure_put);
- 
--/**
-+/*
-  * closure_wake_up - wake up all closures on a wait list, without memory barrier
-  */
- void __closure_wake_up(struct closure_waitlist *wait_list)
-@@ -79,9 +79,9 @@ EXPORT_SYMBOL(__closure_wake_up);
- 
- /**
-  * closure_wait - add a closure to a waitlist
-- *
-- * @waitlist will own a ref on @cl, which will be released when
-+ * @waitlist: will own a ref on @cl, which will be released when
-  * closure_wake_up() is called on @waitlist.
-+ * @cl: closure pointer.
-  *
-  */
- bool closure_wait(struct closure_waitlist *waitlist, struct closure *cl)
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 6422846b546e..ed129ba557a8 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -295,6 +295,7 @@ static void bch_data_insert_start(struct closure *cl)
- 
- /**
-  * bch_data_insert - stick some data in the cache
-+ * @cl: closure pointer.
-  *
-  * This is the starting point for any data to end up in a cache device; it could
-  * be from a normal write, or a writeback write, or a write to a flash only
-diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
-index 6198041f0ee2..74febd5230df 100644
---- a/drivers/md/bcache/util.c
-+++ b/drivers/md/bcache/util.c
-@@ -82,10 +82,9 @@ STRTO_H(strtoll, long long)
- STRTO_H(strtoull, unsigned long long)
- 
- /**
-- * bch_hprint() - formats @v to human readable string for sysfs.
-- *
-- * @v - signed 64 bit integer
-- * @buf - the (at least 8 byte) buffer to format the result into.
-+ * bch_hprint - formats @v to human readable string for sysfs.
-+ * @buf: the (at least 8 byte) buffer to format the result into.
-+ * @v: signed 64 bit integer
-  *
-  * Returns the number of bytes used by format.
-  */
-@@ -225,13 +224,12 @@ void bch_time_stats_update(struct time_stats *stats, uint64_t start_time)
- }
- 
- /**
-- * bch_next_delay() - increment @d by the amount of work done, and return how
-- * long to delay until the next time to do some work.
-- *
-- * @d - the struct bch_ratelimit to update
-- * @done - the amount of work done, in arbitrary units
-+ * bch_next_delay() - update ratelimiting statistics and calculate next delay
-+ * @d: the struct bch_ratelimit to update
-+ * @done: the amount of work done, in arbitrary units
-  *
-- * Returns the amount of time to delay by, in jiffies
-+ * Increment @d by the amount of work done, and return how long to delay in
-+ * jiffies until the next time to do some work.
-  */
- uint64_t bch_next_delay(struct bch_ratelimit *d, uint64_t done)
- {
--- 
-2.16.2
+Hi Bart,
+
+This patch is good, and I like the idea of STRUCT_CACHE_SB().
+
+How about letting me to pick this patch into my bcache s390x fixes? I
+will fix the structure name suggested by Christoph, and set you as the
+patch author.
+
+Thanks.
+
+Coly Li
+
+> ---
+>  drivers/md/bcache/super.c   |  10 ++--
+>  include/uapi/linux/bcache.h | 118 +++++++++++++++++++++++---------------------
+>  2 files changed, 68 insertions(+), 60 deletions(-)
+> 
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index 31d700aecd56..ef659c7d72f9 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -63,20 +63,22 @@ struct workqueue_struct *bcache_wq;
+>  /* limitation of bcache devices number on single system */
+>  #define BCACHE_DEVICE_IDX_MAX	((1U << MINORBITS)/BCACHE_MINORS)
+>  
+> +struct cache_sb_le STRUCT_CACHE_SB(le);
+> +
+>  /* Superblock */
+>  
+>  static const char *read_super(struct cache_sb *sb, struct block_device *bdev,
+>  			      struct page **res)
+>  {
+>  	const char *err;
+> -	struct cache_sb *s;
+> +	struct cache_sb_le *s;
+>  	struct buffer_head *bh = __bread(bdev, 1, SB_SIZE);
+>  	unsigned i;
+>  
+>  	if (!bh)
+>  		return "IO error";
+>  
+> -	s = (struct cache_sb *) bh->b_data;
+> +	s = (struct cache_sb_le *) bh->b_data;
+>  
+>  	sb->offset		= le64_to_cpu(s->offset);
+>  	sb->version		= le64_to_cpu(s->version);
+> @@ -211,7 +213,7 @@ static void write_bdev_super_endio(struct bio *bio)
+>  
+>  static void __write_super(struct cache_sb *sb, struct bio *bio)
+>  {
+> -	struct cache_sb *out = page_address(bio_first_page_all(bio));
+> +	struct cache_sb_le *out = page_address(bio_first_page_all(bio));
+>  	unsigned i;
+>  
+>  	bio->bi_iter.bi_sector	= SB_SECTOR;
+> @@ -959,7 +961,7 @@ void bch_cached_dev_detach(struct cached_dev *dc)
+>  int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
+>  			  uint8_t *set_uuid)
+>  {
+> -	uint32_t rtime = cpu_to_le32(get_seconds());
+> +	__le32 rtime = cpu_to_le32(get_seconds());
+>  	struct uuid_entry *u;
+>  	char buf[BDEVNAME_SIZE];
+>  
+> diff --git a/include/uapi/linux/bcache.h b/include/uapi/linux/bcache.h
+> index 821f71a2e48f..772787c47772 100644
+> --- a/include/uapi/linux/bcache.h
+> +++ b/include/uapi/linux/bcache.h
+> @@ -154,57 +154,63 @@ static inline struct bkey *bkey_idx(const struct bkey *k, unsigned nr_keys)
+>  
+>  #define BDEV_DATA_START_DEFAULT		16	/* sectors */
+>  
+> -struct cache_sb {
+> -	__u64			csum;
+> -	__u64			offset;	/* sector where this sb was written */
+> -	__u64			version;
+> -
+> -	__u8			magic[16];
+> -
+> -	__u8			uuid[16];
+> -	union {
+> -		__u8		set_uuid[16];
+> -		__u64		set_magic;
+> -	};
+> -	__u8			label[SB_LABEL_SIZE];
+> -
+> -	__u64			flags;
+> -	__u64			seq;
+> -	__u64			pad[8];
+> -
+> -	union {
+> -	struct {
+> -		/* Cache devices */
+> -		__u64		nbuckets;	/* device size */
+> -
+> -		__u16		block_size;	/* sectors */
+> -		__u16		bucket_size;	/* sectors */
+> -
+> -		__u16		nr_in_set;
+> -		__u16		nr_this_dev;
+> -	};
+> -	struct {
+> -		/* Backing devices */
+> -		__u64		data_offset;
+> -
+> -		/*
+> -		 * block_size from the cache device section is still used by
+> -		 * backing devices, so don't add anything here until we fix
+> -		 * things to not need it for backing devices anymore
+> -		 */
+> -	};
+> -	};
+> -
+> -	__u32			last_mount;	/* time_t */
+> -
+> -	__u16			first_bucket;
+> -	union {
+> -		__u16		njournal_buckets;
+> -		__u16		keys;
+> -	};
+> -	__u64			d[SB_JOURNAL_BUCKETS];	/* journal buckets */
+> +#define STRUCT_CACHE_SB(e)						\
+> +{									\
+> +	__u64			csum;					\
+> +	/* sector where this sb was written */				\
+> +	__##e##64		offset;					\
+> +	__##e##64		version;				\
+> +									\
+> +	__u8			magic[16];				\
+> +									\
+> +	__u8			uuid[16];				\
+> +	union {								\
+> +		__u8		set_uuid[16];				\
+> +		__##e##64	set_magic;				\
+> +	};								\
+> +	__u8			label[SB_LABEL_SIZE];			\
+> +									\
+> +	__##e##64		flags;					\
+> +	__##e##64		seq;					\
+> +	__##e##64		pad[8];					\
+> +									\
+> +	union {								\
+> +	struct {							\
+> +		/* Cache devices */					\
+> +		__##e##64	nbuckets;	/* device size */	\
+> +									\
+> +		__##e##16	block_size;	/* sectors */		\
+> +		__##e##16	bucket_size;	/* sectors */		\
+> +									\
+> +		__##e##16	nr_in_set;				\
+> +		__##e##16	nr_this_dev;				\
+> +	};								\
+> +	struct {							\
+> +		/* Backing devices */					\
+> +		__##e##64	data_offset;				\
+> +									\
+> +		/*							\
+> +		 * block_size from the cache device section is still	\
+> +		 * used by backing devices, so don't add anything here	\
+> +		 * until we fix things to not need it for backing	\
+> +		 * devices anymore					\
+> +		 */							\
+> +	};								\
+> +	};								\
+> +									\
+> +	__##e##32		last_mount;	/* time_t */		\
+> +									\
+> +	__##e##16		first_bucket;				\
+> +	union {								\
+> +		__##e##16	njournal_buckets;			\
+> +		__##e##16	keys;					\
+> +	};								\
+> +	/* journal buckets */						\
+> +	__##e##64		d[SB_JOURNAL_BUCKETS];			\
+>  };
+>  
+> +struct cache_sb STRUCT_CACHE_SB(u);
+> +
+>  static inline _Bool SB_IS_BDEV(const struct cache_sb *sb)
+>  {
+>  	return sb->version == BCACHE_SB_VERSION_BDEV
+> @@ -306,7 +312,7 @@ struct prio_set {
+>  	__u64			next_bucket;
+>  
+>  	struct bucket_disk {
+> -		__u16		prio;
+> +		__le16		prio;
+>  		__u8		gen;
+>  	} __attribute((packed)) data[];
+>  };
+> @@ -318,9 +324,9 @@ struct uuid_entry {
+>  		struct {
+>  			__u8	uuid[16];
+>  			__u8	label[32];
+> -			__u32	first_reg;
+> -			__u32	last_reg;
+> -			__u32	invalidated;
+> +			__le32	first_reg;
+> +			__le32	last_reg;
+> +			__le32	invalidated;
+>  
+>  			__u32	flags;
+>  			/* Size of flash only volumes */
+> @@ -366,9 +372,9 @@ struct bset {
+>  struct uuid_entry_v0 {
+>  	__u8		uuid[16];
+>  	__u8		label[32];
+> -	__u32		first_reg;
+> -	__u32		last_reg;
+> -	__u32		invalidated;
+> +	__le32		first_reg;
+> +	__le32		last_reg;
+> +	__le32		invalidated;
+>  	__u32		pad;
+>  };
+>  
+> 
