@@ -1,216 +1,303 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
-From: Ming Lei <ming.lei@redhat.com>
-To: James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Jens Axboe <axboe@fb.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, Meelis Roos <mroos@linux.ee>,
-        Don Brace <don.brace@microsemi.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>,
-        James Bottomley <james.bottomley@hansenpartnership.com>,
-        Artem Bityutskiy <artem.bityutskiy@intel.com>
-Subject: [PATCH V5 1/5] scsi: hpsa: fix selection of reply queue
-Date: Tue, 13 Mar 2018 17:42:39 +0800
-Message-Id: <20180313094243.8710-2-ming.lei@redhat.com>
-In-Reply-To: <20180313094243.8710-1-ming.lei@redhat.com>
-References: <20180313094243.8710-1-ming.lei@redhat.com>
-Sender: linux-scsi-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from albert.telenet-ops.be ([195.130.137.90]:46658 "EHLO
+        albert.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752625AbeCPNwr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Mar 2018 09:52:47 -0400
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+To: Christoph Hellwig <hch@lst.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Felipe Balbi <balbi@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mark Brown <broonie@kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Stefan Richter <stefanr@s5r6.in-berlin.de>,
+        Alan Tull <atull@kernel.org>, Moritz Fischer <mdf@kernel.org>,
+        Wolfram Sang <wsa@the-dreams.de>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Matias Bjorling <mb@lightnvm.io>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Brian Norris <computersforpeace@gmail.com>,
+        Marek Vasut <marek.vasut@gmail.com>,
+        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
+        Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Richard Weinberger <richard@nod.at>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Eric Anholt <eric@anholt.net>,
+        Stefan Wahren <stefan.wahren@i2se.com>
+Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
+        linux-scsi@vger.kernel.org, alsa-devel@alsa-project.org,
+        linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+        linux-fpga@vger.kernel.org, linux-i2c@vger.kernel.org,
+        linux-iio@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-serial@vger.kernel.org,
+        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org,
+        Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH v2 15/21] net: Remove depends on HAS_DMA in case of platform dependency
+Date: Fri, 16 Mar 2018 14:51:48 +0100
+Message-Id: <1521208314-4783-16-git-send-email-geert@linux-m68k.org>
+In-Reply-To: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
+References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
->From 84676c1f21 (genirq/affinity: assign vectors to all possible CPUs),
-one msix vector can be created without any online CPU mapped, then one
-command's completion may not be notified.
+Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
+symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
+In most cases this other symbol is an architecture or platform specific
+symbol, or PCI.
 
-This patch setups mapping between cpu and reply queue according to irq
-affinity info retrived by pci_irq_get_affinity(), and uses this mapping
-table to choose reply queue for queuing one command.
+Generic symbols and drivers without platform dependencies keep their
+dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
+cannot work anyway.
 
-Then the chosen reply queue has to be active, and fixes IO hang caused
-by using inactive reply queue which doesn't have any online CPU mapped.
+This simplifies the dependencies, and allows to improve compile-testing.
 
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-Cc: Christoph Hellwig <hch@lst.de>,
-Cc: Don Brace <don.brace@microsemi.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Laurence Oberman <loberman@redhat.com>
-Cc: Meelis Roos <mroos@linux.ee>
-Cc: Artem Bityutskiy <artem.bityutskiy@intel.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Tested-by: Laurence Oberman <loberman@redhat.com>
-Tested-by: Don Brace <don.brace@microsemi.com>
-Tested-by: Artem Bityutskiy <artem.bityutskiy@intel.com>
-Acked-by: Don Brace <don.brace@microsemi.com>
-Fixes: 84676c1f21e8 ("genirq/affinity: assign vectors to all possible CPUs")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Note:
+  - FSL_FMAN keeps its dependency on HAS_DMA, as it calls set_dma_ops().
+    set_dma_ops() does not exist if NO_DMA=y, and its use in this driver
+    is questionable.
+
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Reviewed-by: Mark Brown <broonie@kernel.org>
+Acked-by: Robin Murphy <robin.murphy@arm.com>
 ---
- drivers/scsi/hpsa.c | 73 +++++++++++++++++++++++++++++++++++++++--------------
- drivers/scsi/hpsa.h |  1 +
- 2 files changed, 55 insertions(+), 19 deletions(-)
+v2:
+  - Add Reviewed-by, Acked-by,
+  - Drop RFC state,
+  - Split per subsystem.
+---
+ drivers/net/ethernet/amd/Kconfig                | 2 +-
+ drivers/net/ethernet/apm/xgene-v2/Kconfig       | 1 -
+ drivers/net/ethernet/apm/xgene/Kconfig          | 1 -
+ drivers/net/ethernet/arc/Kconfig                | 6 ++++--
+ drivers/net/ethernet/broadcom/Kconfig           | 2 --
+ drivers/net/ethernet/calxeda/Kconfig            | 2 +-
+ drivers/net/ethernet/hisilicon/Kconfig          | 2 +-
+ drivers/net/ethernet/marvell/Kconfig            | 8 +++-----
+ drivers/net/ethernet/mellanox/mlxsw/Kconfig     | 2 +-
+ drivers/net/ethernet/renesas/Kconfig            | 2 --
+ drivers/net/wireless/broadcom/brcm80211/Kconfig | 1 -
+ drivers/net/wireless/quantenna/qtnfmac/Kconfig  | 2 +-
+ 12 files changed, 12 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/scsi/hpsa.c b/drivers/scsi/hpsa.c
-index 5293e6827ce5..3a9eca163db8 100644
---- a/drivers/scsi/hpsa.c
-+++ b/drivers/scsi/hpsa.c
-@@ -1045,11 +1045,7 @@ static void set_performant_mode(struct ctlr_info *h, struct CommandList *c,
- 		c->busaddr |= 1 | (h->blockFetchTable[c->Header.SGList] << 1);
- 		if (unlikely(!h->msix_vectors))
- 			return;
--		if (likely(reply_queue == DEFAULT_REPLY_QUEUE))
--			c->Header.ReplyQueue =
--				raw_smp_processor_id() % h->nreply_queues;
--		else
--			c->Header.ReplyQueue = reply_queue % h->nreply_queues;
-+		c->Header.ReplyQueue = reply_queue;
- 	}
- }
+diff --git a/drivers/net/ethernet/amd/Kconfig b/drivers/net/ethernet/amd/Kconfig
+index d5c15e8bb3de706b..f273af136fc7c995 100644
+--- a/drivers/net/ethernet/amd/Kconfig
++++ b/drivers/net/ethernet/amd/Kconfig
+@@ -173,7 +173,7 @@ config SUNLANCE
  
-@@ -1063,10 +1059,7 @@ static void set_ioaccel1_performant_mode(struct ctlr_info *h,
- 	 * Tell the controller to post the reply to the queue for this
- 	 * processor.  This seems to give the best I/O throughput.
- 	 */
--	if (likely(reply_queue == DEFAULT_REPLY_QUEUE))
--		cp->ReplyQueue = smp_processor_id() % h->nreply_queues;
--	else
--		cp->ReplyQueue = reply_queue % h->nreply_queues;
-+	cp->ReplyQueue = reply_queue;
- 	/*
- 	 * Set the bits in the address sent down to include:
- 	 *  - performant mode bit (bit 0)
-@@ -1087,10 +1080,7 @@ static void set_ioaccel2_tmf_performant_mode(struct ctlr_info *h,
- 	/* Tell the controller to post the reply to the queue for this
- 	 * processor.  This seems to give the best I/O throughput.
- 	 */
--	if (likely(reply_queue == DEFAULT_REPLY_QUEUE))
--		cp->reply_queue = smp_processor_id() % h->nreply_queues;
--	else
--		cp->reply_queue = reply_queue % h->nreply_queues;
-+	cp->reply_queue = reply_queue;
- 	/* Set the bits in the address sent down to include:
- 	 *  - performant mode bit not used in ioaccel mode 2
- 	 *  - pull count (bits 0-3)
-@@ -1109,10 +1099,7 @@ static void set_ioaccel2_performant_mode(struct ctlr_info *h,
- 	 * Tell the controller to post the reply to the queue for this
- 	 * processor.  This seems to give the best I/O throughput.
- 	 */
--	if (likely(reply_queue == DEFAULT_REPLY_QUEUE))
--		cp->reply_queue = smp_processor_id() % h->nreply_queues;
--	else
--		cp->reply_queue = reply_queue % h->nreply_queues;
-+	cp->reply_queue = reply_queue;
- 	/*
- 	 * Set the bits in the address sent down to include:
- 	 *  - performant mode bit not used in ioaccel mode 2
-@@ -1157,6 +1144,8 @@ static void __enqueue_cmd_and_start_io(struct ctlr_info *h,
- {
- 	dial_down_lockup_detection_during_fw_flash(h, c);
- 	atomic_inc(&h->commands_outstanding);
-+
-+	reply_queue = h->reply_map[raw_smp_processor_id()];
- 	switch (c->cmd_type) {
- 	case CMD_IOACCEL1:
- 		set_ioaccel1_performant_mode(h, c, reply_queue);
-@@ -7376,6 +7365,26 @@ static void hpsa_disable_interrupt_mode(struct ctlr_info *h)
- 	h->msix_vectors = 0;
- }
+ config AMD_XGBE
+ 	tristate "AMD 10GbE Ethernet driver"
+-	depends on ((OF_NET && OF_ADDRESS) || ACPI || PCI) && HAS_IOMEM && HAS_DMA
++	depends on ((OF_NET && OF_ADDRESS) || ACPI || PCI) && HAS_IOMEM
+ 	depends on X86 || ARM64 || COMPILE_TEST
+ 	select BITREVERSE
+ 	select CRC32
+diff --git a/drivers/net/ethernet/apm/xgene-v2/Kconfig b/drivers/net/ethernet/apm/xgene-v2/Kconfig
+index 1205861b631896a0..eedd3f3dd22e2201 100644
+--- a/drivers/net/ethernet/apm/xgene-v2/Kconfig
++++ b/drivers/net/ethernet/apm/xgene-v2/Kconfig
+@@ -1,6 +1,5 @@
+ config NET_XGENE_V2
+ 	tristate "APM X-Gene SoC Ethernet-v2 Driver"
+-	depends on HAS_DMA
+ 	depends on ARCH_XGENE || COMPILE_TEST
+ 	help
+ 	  This is the Ethernet driver for the on-chip ethernet interface
+diff --git a/drivers/net/ethernet/apm/xgene/Kconfig b/drivers/net/ethernet/apm/xgene/Kconfig
+index afccb033177b3923..e4e33c900b577161 100644
+--- a/drivers/net/ethernet/apm/xgene/Kconfig
++++ b/drivers/net/ethernet/apm/xgene/Kconfig
+@@ -1,6 +1,5 @@
+ config NET_XGENE
+ 	tristate "APM X-Gene SoC Ethernet Driver"
+-	depends on HAS_DMA
+ 	depends on ARCH_XGENE || COMPILE_TEST
+ 	select PHYLIB
+ 	select MDIO_XGENE
+diff --git a/drivers/net/ethernet/arc/Kconfig b/drivers/net/ethernet/arc/Kconfig
+index e743ddf46343302f..5d0ab8e74b680cc6 100644
+--- a/drivers/net/ethernet/arc/Kconfig
++++ b/drivers/net/ethernet/arc/Kconfig
+@@ -24,7 +24,8 @@ config ARC_EMAC_CORE
+ config ARC_EMAC
+ 	tristate "ARC EMAC support"
+ 	select ARC_EMAC_CORE
+-	depends on OF_IRQ && OF_NET && HAS_DMA && (ARC || COMPILE_TEST)
++	depends on OF_IRQ && OF_NET
++	depends on ARC || COMPILE_TEST
+ 	---help---
+ 	  On some legacy ARC (Synopsys) FPGA boards such as ARCAngel4/ML50x
+ 	  non-standard on-chip ethernet device ARC EMAC 10/100 is used.
+@@ -33,7 +34,8 @@ config ARC_EMAC
+ config EMAC_ROCKCHIP
+ 	tristate "Rockchip EMAC support"
+ 	select ARC_EMAC_CORE
+-	depends on OF_IRQ && OF_NET && REGULATOR && HAS_DMA && (ARCH_ROCKCHIP || COMPILE_TEST)
++	depends on OF_IRQ && OF_NET && REGULATOR
++	depends on ARCH_ROCKCHIP || COMPILE_TEST
+ 	---help---
+ 	  Support for Rockchip RK3036/RK3066/RK3188 EMAC ethernet controllers.
+ 	  This selects Rockchip SoC glue layer support for the
+diff --git a/drivers/net/ethernet/broadcom/Kconfig b/drivers/net/ethernet/broadcom/Kconfig
+index af75156919edfead..4c3bfde6e8de00f2 100644
+--- a/drivers/net/ethernet/broadcom/Kconfig
++++ b/drivers/net/ethernet/broadcom/Kconfig
+@@ -157,7 +157,6 @@ config BGMAC
+ config BGMAC_BCMA
+ 	tristate "Broadcom iProc GBit BCMA support"
+ 	depends on BCMA && BCMA_HOST_SOC
+-	depends on HAS_DMA
+ 	depends on BCM47XX || ARCH_BCM_5301X || COMPILE_TEST
+ 	select BGMAC
+ 	select PHYLIB
+@@ -170,7 +169,6 @@ config BGMAC_BCMA
  
-+static void hpsa_setup_reply_map(struct ctlr_info *h)
-+{
-+	const struct cpumask *mask;
-+	unsigned int queue, cpu;
-+
-+	for (queue = 0; queue < h->msix_vectors; queue++) {
-+		mask = pci_irq_get_affinity(h->pdev, queue);
-+		if (!mask)
-+			goto fallback;
-+
-+		for_each_cpu(cpu, mask)
-+			h->reply_map[cpu] = queue;
-+	}
-+	return;
-+
-+fallback:
-+	for_each_possible_cpu(cpu)
-+		h->reply_map[cpu] = 0;
-+}
-+
- /* If MSI/MSI-X is supported by the kernel we will try to enable it on
-  * controllers that are capable. If not, we use legacy INTx mode.
-  */
-@@ -7771,6 +7780,10 @@ static int hpsa_pci_init(struct ctlr_info *h)
- 	err = hpsa_interrupt_mode(h);
- 	if (err)
- 		goto clean1;
-+
-+	/* setup mapping between CPU and reply queue */
-+	hpsa_setup_reply_map(h);
-+
- 	err = hpsa_pci_find_memory_BAR(h->pdev, &h->paddr);
- 	if (err)
- 		goto clean2;	/* intmode+region, pci */
-@@ -8480,6 +8493,28 @@ static struct workqueue_struct *hpsa_create_controller_wq(struct ctlr_info *h,
- 	return wq;
- }
+ config BGMAC_PLATFORM
+ 	tristate "Broadcom iProc GBit platform support"
+-	depends on HAS_DMA
+ 	depends on ARCH_BCM_IPROC || COMPILE_TEST
+ 	depends on OF
+ 	select BGMAC
+diff --git a/drivers/net/ethernet/calxeda/Kconfig b/drivers/net/ethernet/calxeda/Kconfig
+index 07d2201530d26c85..9fdd496b90ff47cb 100644
+--- a/drivers/net/ethernet/calxeda/Kconfig
++++ b/drivers/net/ethernet/calxeda/Kconfig
+@@ -1,6 +1,6 @@
+ config NET_CALXEDA_XGMAC
+ 	tristate "Calxeda 1G/10G XGMAC Ethernet driver"
+-	depends on HAS_IOMEM && HAS_DMA
++	depends on HAS_IOMEM
+ 	depends on ARCH_HIGHBANK || COMPILE_TEST
+ 	select CRC32
+ 	help
+diff --git a/drivers/net/ethernet/hisilicon/Kconfig b/drivers/net/ethernet/hisilicon/Kconfig
+index 8bcf470ff5f38a4e..fb1a7251f45d3369 100644
+--- a/drivers/net/ethernet/hisilicon/Kconfig
++++ b/drivers/net/ethernet/hisilicon/Kconfig
+@@ -5,7 +5,7 @@
+ config NET_VENDOR_HISILICON
+ 	bool "Hisilicon devices"
+ 	default y
+-	depends on (OF || ACPI) && HAS_DMA
++	depends on OF || ACPI
+ 	depends on ARM || ARM64 || COMPILE_TEST
+ 	---help---
+ 	  If you have a network (Ethernet) card belonging to this class, say Y.
+diff --git a/drivers/net/ethernet/marvell/Kconfig b/drivers/net/ethernet/marvell/Kconfig
+index ebe5c91489355c9e..0704a1900bbca444 100644
+--- a/drivers/net/ethernet/marvell/Kconfig
++++ b/drivers/net/ethernet/marvell/Kconfig
+@@ -18,8 +18,8 @@ if NET_VENDOR_MARVELL
  
-+static void hpda_free_ctlr_info(struct ctlr_info *h)
-+{
-+	kfree(h->reply_map);
-+	kfree(h);
-+}
-+
-+static struct ctlr_info *hpda_alloc_ctlr_info(void)
-+{
-+	struct ctlr_info *h;
-+
-+	h = kzalloc(sizeof(*h), GFP_KERNEL);
-+	if (!h)
-+		return NULL;
-+
-+	h->reply_map = kzalloc(sizeof(*h->reply_map) * nr_cpu_ids, GFP_KERNEL);
-+	if (!h->reply_map) {
-+		kfree(h);
-+		return NULL;
-+	}
-+	return h;
-+}
-+
- static int hpsa_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- {
- 	int dac, rc;
-@@ -8517,7 +8552,7 @@ static int hpsa_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	 * the driver.  See comments in hpsa.h for more info.
- 	 */
- 	BUILD_BUG_ON(sizeof(struct CommandList) % COMMANDLIST_ALIGNMENT);
--	h = kzalloc(sizeof(*h), GFP_KERNEL);
-+	h = hpda_alloc_ctlr_info();
- 	if (!h) {
- 		dev_err(&pdev->dev, "Failed to allocate controller head\n");
- 		return -ENOMEM;
-@@ -8916,7 +8951,7 @@ static void hpsa_remove_one(struct pci_dev *pdev)
- 	h->lockup_detected = NULL;			/* init_one 2 */
- 	/* (void) pci_disable_pcie_error_reporting(pdev); */	/* init_one 1 */
+ config MV643XX_ETH
+ 	tristate "Marvell Discovery (643XX) and Orion ethernet support"
+-	depends on (MV64X60 || PPC32 || PLAT_ORION || COMPILE_TEST) && INET
+-	depends on HAS_DMA
++	depends on MV64X60 || PPC32 || PLAT_ORION || COMPILE_TEST
++	depends on INET
+ 	select PHYLIB
+ 	select MVMDIO
+ 	---help---
+@@ -58,7 +58,6 @@ config MVNETA_BM_ENABLE
+ config MVNETA
+ 	tristate "Marvell Armada 370/38x/XP/37xx network interface support"
+ 	depends on ARCH_MVEBU || COMPILE_TEST
+-	depends on HAS_DMA
+ 	select MVMDIO
+ 	select PHYLINK
+ 	---help---
+@@ -84,7 +83,6 @@ config MVNETA_BM
+ config MVPP2
+ 	tristate "Marvell Armada 375/7K/8K network interface support"
+ 	depends on ARCH_MVEBU || COMPILE_TEST
+-	depends on HAS_DMA
+ 	select MVMDIO
+ 	---help---
+ 	  This driver supports the network interface units in the
+@@ -92,7 +90,7 @@ config MVPP2
  
--	kfree(h);					/* init_one 1 */
-+	hpda_free_ctlr_info(h);				/* init_one 1 */
- }
+ config PXA168_ETH
+ 	tristate "Marvell pxa168 ethernet support"
+-	depends on HAS_IOMEM && HAS_DMA
++	depends on HAS_IOMEM
+ 	depends on CPU_PXA168 || ARCH_BERLIN || COMPILE_TEST
+ 	select PHYLIB
+ 	---help---
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/Kconfig b/drivers/net/ethernet/mellanox/mlxsw/Kconfig
+index d56eea3105090051..b591c8cc9896ccb7 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/Kconfig
++++ b/drivers/net/ethernet/mellanox/mlxsw/Kconfig
+@@ -30,7 +30,7 @@ config MLXSW_CORE_THERMAL
  
- static int hpsa_suspend(__attribute__((unused)) struct pci_dev *pdev,
-diff --git a/drivers/scsi/hpsa.h b/drivers/scsi/hpsa.h
-index 018f980a701c..fb9f5e7f8209 100644
---- a/drivers/scsi/hpsa.h
-+++ b/drivers/scsi/hpsa.h
-@@ -158,6 +158,7 @@ struct bmic_controller_parameters {
- #pragma pack()
+ config MLXSW_PCI
+ 	tristate "PCI bus implementation for Mellanox Technologies Switch ASICs"
+-	depends on PCI && HAS_DMA && HAS_IOMEM && MLXSW_CORE
++	depends on PCI && HAS_IOMEM && MLXSW_CORE
+ 	default m
+ 	---help---
+ 	  This is PCI bus implementation for Mellanox Technologies Switch ASICs.
+diff --git a/drivers/net/ethernet/renesas/Kconfig b/drivers/net/ethernet/renesas/Kconfig
+index 27be51f0a421b43e..f3f7477043ce1061 100644
+--- a/drivers/net/ethernet/renesas/Kconfig
++++ b/drivers/net/ethernet/renesas/Kconfig
+@@ -17,7 +17,6 @@ if NET_VENDOR_RENESAS
  
- struct ctlr_info {
-+	unsigned int *reply_map;
- 	int	ctlr;
- 	char	devname[8];
- 	char    *product_name;
+ config SH_ETH
+ 	tristate "Renesas SuperH Ethernet support"
+-	depends on HAS_DMA
+ 	depends on ARCH_RENESAS || SUPERH || COMPILE_TEST
+ 	select CRC32
+ 	select MII
+@@ -31,7 +30,6 @@ config SH_ETH
+ 
+ config RAVB
+ 	tristate "Renesas Ethernet AVB support"
+-	depends on HAS_DMA
+ 	depends on ARCH_RENESAS || COMPILE_TEST
+ 	select CRC32
+ 	select MII
+diff --git a/drivers/net/wireless/broadcom/brcm80211/Kconfig b/drivers/net/wireless/broadcom/brcm80211/Kconfig
+index 9d99eb42d9176f0f..6acba67bca07abd7 100644
+--- a/drivers/net/wireless/broadcom/brcm80211/Kconfig
++++ b/drivers/net/wireless/broadcom/brcm80211/Kconfig
+@@ -60,7 +60,6 @@ config BRCMFMAC_PCIE
+ 	bool "PCIE bus interface support for FullMAC driver"
+ 	depends on BRCMFMAC
+ 	depends on PCI
+-	depends on HAS_DMA
+ 	select BRCMFMAC_PROTO_MSGBUF
+ 	select FW_LOADER
+ 	---help---
+diff --git a/drivers/net/wireless/quantenna/qtnfmac/Kconfig b/drivers/net/wireless/quantenna/qtnfmac/Kconfig
+index 025fa6018550895a..8d1492a90bd135c0 100644
+--- a/drivers/net/wireless/quantenna/qtnfmac/Kconfig
++++ b/drivers/net/wireless/quantenna/qtnfmac/Kconfig
+@@ -7,7 +7,7 @@ config QTNFMAC
+ config QTNFMAC_PEARL_PCIE
+ 	tristate "Quantenna QSR10g PCIe support"
+ 	default n
+-	depends on HAS_DMA && PCI && CFG80211
++	depends on PCI && CFG80211
+ 	select QTNFMAC
+ 	select FW_LOADER
+ 	select CRC32
 -- 
-2.9.5
+2.7.4
