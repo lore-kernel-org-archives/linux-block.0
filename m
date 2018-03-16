@@ -1,36 +1,32 @@
-Return-Path: <hch@lst.de>
-Date: Thu, 8 Mar 2018 08:54:43 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Mike Snitzer <snitzer@redhat.com>, linux-scsi@vger.kernel.org,
-	Hannes Reinecke <hare@suse.de>, Arun Easi <arun.easi@cavium.com>,
-	Omar Sandoval <osandov@fb.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Christoph Hellwig <hch@lst.de>, Don Brace <don.brace@microsemi.com>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Peter Rivera <peter.rivera@broadcom.com>,
-	Laurence Oberman <loberman@redhat.com>
-Subject: Re: [PATCH V3 7/8] scsi: hpsa: improve scsi_mq performance via
-	.host_tagset
-Message-ID: <20180308075442.GH15748@lst.de>
-References: <20180227100750.32299-1-ming.lei@redhat.com> <20180227100750.32299-8-ming.lei@redhat.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pl0-f42.google.com ([209.85.160.42]:41548 "EHLO
+        mail-pl0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752370AbeCPSyA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Mar 2018 14:54:00 -0400
+Received: by mail-pl0-f42.google.com with SMTP id b7-v6so2362406plr.8
+        for <linux-block@vger.kernel.org>; Fri, 16 Mar 2018 11:54:00 -0700 (PDT)
+Subject: Re: [PATCH 07/16] bcache: Reduce the number of sparse complaints
+ about lock imbalances
+To: Bart Van Assche <bart.vanassche@wdc.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Coly Li <colyli@suse.de>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+References: <20180315150814.9412-1-bart.vanassche@wdc.com>
+ <20180315150814.9412-8-bart.vanassche@wdc.com>
+From: Michael Lyle <mlyle@lyle.org>
+Message-ID: <300ff76d-2772-045c-7488-a8afd48db36e@lyle.org>
+Date: Fri, 16 Mar 2018 11:53:58 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180227100750.32299-8-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20180315150814.9412-8-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-> +	/* 256 tags should be high enough to saturate device */
-> +	int max_queues = DIV_ROUND_UP(h->scsi_host->can_queue, 256);
-> +
-> +	/* per NUMA node hw queue */
-> +	h->scsi_host->nr_hw_queues = min_t(int, nr_node_ids, max_queues);
+On 03/15/2018 08:08 AM, Bart Van Assche wrote:
+> Add more annotations for sparse to inform it about which functions do
+> not have the same number of spin_lock() and spin_unlock() calls.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
 
-I don't think this magic should be in a driver.  The per-node hw_queue
-selection seems like something we'd better do in the core code.
-
-Also the whole idea to use nr_hw_queues for just partitioning tag
-space on hardware that doesn't really support multiple hardware queues
-seems more than odd.
+LGTM, applying.  -mpl
