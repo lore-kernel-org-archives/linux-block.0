@@ -1,222 +1,115 @@
-Return-Path: <joseph.qi@linux.alibaba.com>
-From: Joseph Qi <joseph.qi@linux.alibaba.com>
-To: Tejun Heo <tj@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Jiufei Xue <jiufei.xue@linux.alibaba.com>,
-	Caspar Zhang <caspar@linux.alibaba.com>,
-	linux-block@vger.kernel.org,
-	cgroups@vger.kernel.org
-Subject: [PATCH v6] blk-throttle: fix race between blkcg_bio_issue_check() and cgroup_rmdir()
-Date: Fri, 16 Mar 2018 14:51:27 +0800
-Message-Id: <1521183087-24988-1-git-send-email-joseph.qi@linux.alibaba.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from laurent.telenet-ops.be ([195.130.137.89]:45004 "EHLO
+        laurent.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752998AbeCPOUY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Mar 2018 10:20:24 -0400
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+To: Christoph Hellwig <hch@lst.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Felipe Balbi <balbi@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mark Brown <broonie@kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Stefan Richter <stefanr@s5r6.in-berlin.de>,
+        Alan Tull <atull@kernel.org>, Moritz Fischer <mdf@kernel.org>,
+        Wolfram Sang <wsa@the-dreams.de>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Matias Bjorling <mb@lightnvm.io>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Brian Norris <computersforpeace@gmail.com>,
+        Marek Vasut <marek.vasut@gmail.com>,
+        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
+        Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Richard Weinberger <richard@nod.at>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Eric Anholt <eric@anholt.net>,
+        Stefan Wahren <stefan.wahren@i2se.com>
+Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
+        linux-scsi@vger.kernel.org, alsa-devel@alsa-project.org,
+        linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+        linux-fpga@vger.kernel.org, linux-i2c@vger.kernel.org,
+        linux-iio@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-serial@vger.kernel.org,
+        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org,
+        Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH v2 09/21] iommu: Remove depends on HAS_DMA in case of platform dependency
+Date: Fri, 16 Mar 2018 14:51:42 +0100
+Message-Id: <1521208314-4783-10-git-send-email-geert@linux-m68k.org>
+In-Reply-To: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
+References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-We've triggered a WARNING in blk_throtl_bio() when throttling writeback
-io, which complains blkg->refcnt is already 0 when calling blkg_get(),
-and then kernel crashes with invalid page request.
-After investigating this issue, we've found it is caused by a race
-between blkcg_bio_issue_check() and cgroup_rmdir(), which is described
-below:
+Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
+symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
+In most cases this other symbol is an architecture or platform specific
+symbol, or PCI.
 
-writeback kworker               cgroup_rmdir
-                                  cgroup_destroy_locked
-                                    kill_css
-                                      css_killed_ref_fn
-                                        css_killed_work_fn
-                                          offline_css
-                                            blkcg_css_offline
-  blkcg_bio_issue_check
-    rcu_read_lock
-    blkg_lookup
-                                              spin_trylock(q->queue_lock)
-                                              blkg_destroy
-                                              spin_unlock(q->queue_lock)
-    blk_throtl_bio
-    spin_lock_irq(q->queue_lock)
-    ...
-    spin_unlock_irq(q->queue_lock)
-  rcu_read_unlock
+Generic symbols and drivers without platform dependencies keep their
+dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
+cannot work anyway.
 
-Since rcu can only prevent blkg from releasing when it is being used,
-the blkg->refcnt can be decreased to 0 during blkg_destroy() and schedule
-blkg release.
-Then trying to blkg_get() in blk_throtl_bio() will complains the WARNING.
-And then the corresponding blkg_put() will schedule blkg release again,
-which result in double free.
-This race is introduced by commit ae1188963611 ("blkcg: consolidate blkg
-creation in blkcg_bio_issue_check()"). Before this commit, it will
-lookup first and then try to lookup/create again with queue_lock. Since
-revive this logic is a bit drastic, so fix it by only offlining pd during
-blkcg_css_offline(), and move the rest destruction (especially
-blkg_put()) into blkcg_css_free(), which should be the right way as
-discussed.
+This simplifies the dependencies, and allows to improve compile-testing.
 
-Fixes: ae1188963611 ("blkcg: consolidate blkg creation in blkcg_bio_issue_check()")
-Reported-by: Jiufei Xue <jiufei.xue@linux.alibaba.com>
-Signed-off-by: Joseph Qi <joseph.qi@linux.alibaba.com>
-Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Reviewed-by: Mark Brown <broonie@kernel.org>
+Acked-by: Robin Murphy <robin.murphy@arm.com>
 ---
- block/blk-cgroup.c         | 78 ++++++++++++++++++++++++++++++++++++----------
- include/linux/blk-cgroup.h |  1 +
- 2 files changed, 63 insertions(+), 16 deletions(-)
+v2:
+  - Add Reviewed-by, Acked-by,
+  - Drop RFC state,
+  - Split per subsystem.
+---
+ drivers/iommu/Kconfig | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index c2033a2..1c16694 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -307,11 +307,28 @@ struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
- 	}
- }
- 
-+static void blkg_pd_offline(struct blkcg_gq *blkg)
-+{
-+	int i;
-+
-+	lockdep_assert_held(blkg->q->queue_lock);
-+	lockdep_assert_held(&blkg->blkcg->lock);
-+
-+	for (i = 0; i < BLKCG_MAX_POLS; i++) {
-+		struct blkcg_policy *pol = blkcg_policy[i];
-+
-+		if (blkg->pd[i] && !blkg->pd[i]->offline &&
-+		    pol->pd_offline_fn) {
-+			pol->pd_offline_fn(blkg->pd[i]);
-+			blkg->pd[i]->offline = true;
-+		}
-+	}
-+}
-+
- static void blkg_destroy(struct blkcg_gq *blkg)
- {
- 	struct blkcg *blkcg = blkg->blkcg;
- 	struct blkcg_gq *parent = blkg->parent;
--	int i;
- 
- 	lockdep_assert_held(blkg->q->queue_lock);
- 	lockdep_assert_held(&blkcg->lock);
-@@ -320,13 +337,6 @@ static void blkg_destroy(struct blkcg_gq *blkg)
- 	WARN_ON_ONCE(list_empty(&blkg->q_node));
- 	WARN_ON_ONCE(hlist_unhashed(&blkg->blkcg_node));
- 
--	for (i = 0; i < BLKCG_MAX_POLS; i++) {
--		struct blkcg_policy *pol = blkcg_policy[i];
--
--		if (blkg->pd[i] && pol->pd_offline_fn)
--			pol->pd_offline_fn(blkg->pd[i]);
--	}
--
- 	if (parent) {
- 		blkg_rwstat_add_aux(&parent->stat_bytes, &blkg->stat_bytes);
- 		blkg_rwstat_add_aux(&parent->stat_ios, &blkg->stat_ios);
-@@ -369,6 +379,7 @@ static void blkg_destroy_all(struct request_queue *q)
- 		struct blkcg *blkcg = blkg->blkcg;
- 
- 		spin_lock(&blkcg->lock);
-+		blkg_pd_offline(blkg);
- 		blkg_destroy(blkg);
- 		spin_unlock(&blkcg->lock);
- 	}
-@@ -995,25 +1006,25 @@ static int blkcg_print_stat(struct seq_file *sf, void *v)
-  * @css: css of interest
-  *
-  * This function is called when @css is about to go away and responsible
-- * for shooting down all blkgs associated with @css.  blkgs should be
-- * removed while holding both q and blkcg locks.  As blkcg lock is nested
-- * inside q lock, this function performs reverse double lock dancing.
-+ * for offlining all blkgs pd and killing all wbs associated with @css.
-+ * blkgs pd offline should be done while holding both q and blkcg locks.
-+ * As blkcg lock is nested inside q lock, this function performs reverse
-+ * double lock dancing.
-  *
-  * This is the blkcg counterpart of ioc_release_fn().
-  */
- static void blkcg_css_offline(struct cgroup_subsys_state *css)
- {
- 	struct blkcg *blkcg = css_to_blkcg(css);
-+	struct blkcg_gq *blkg;
- 
- 	spin_lock_irq(&blkcg->lock);
- 
--	while (!hlist_empty(&blkcg->blkg_list)) {
--		struct blkcg_gq *blkg = hlist_entry(blkcg->blkg_list.first,
--						struct blkcg_gq, blkcg_node);
-+	hlist_for_each_entry(blkg, &blkcg->blkg_list, blkcg_node) {
- 		struct request_queue *q = blkg->q;
- 
- 		if (spin_trylock(q->queue_lock)) {
--			blkg_destroy(blkg);
-+			blkg_pd_offline(blkg);
- 			spin_unlock(q->queue_lock);
- 		} else {
- 			spin_unlock_irq(&blkcg->lock);
-@@ -1027,11 +1038,43 @@ static void blkcg_css_offline(struct cgroup_subsys_state *css)
- 	wb_blkcg_offline(blkcg);
- }
- 
-+/**
-+ * blkcg_destroy_all_blkgs - destroy all blkgs associated with a blkcg
-+ * @blkcg: blkcg of interest
-+ *
-+ * This function is called when blkcg css is about to free and responsible for
-+ * destroying all blkgs associated with @blkcg.
-+ * blkgs should be removed while holding both q and blkcg locks. As blkcg lock
-+ * is nested inside q lock, this function performs reverse double lock dancing.
-+ */
-+static void blkcg_destroy_all_blkgs(struct blkcg *blkcg)
-+{
-+	spin_lock_irq(&blkcg->lock);
-+	while (!hlist_empty(&blkcg->blkg_list)) {
-+		struct blkcg_gq *blkg = hlist_entry(blkcg->blkg_list.first,
-+						    struct blkcg_gq,
-+						    blkcg_node);
-+		struct request_queue *q = blkg->q;
-+
-+		if (spin_trylock(q->queue_lock)) {
-+			blkg_destroy(blkg);
-+			spin_unlock(q->queue_lock);
-+		} else {
-+			spin_unlock_irq(&blkcg->lock);
-+			cpu_relax();
-+			spin_lock_irq(&blkcg->lock);
-+		}
-+	}
-+	spin_unlock_irq(&blkcg->lock);
-+}
-+
- static void blkcg_css_free(struct cgroup_subsys_state *css)
- {
- 	struct blkcg *blkcg = css_to_blkcg(css);
- 	int i;
- 
-+	blkcg_destroy_all_blkgs(blkcg);
-+
- 	mutex_lock(&blkcg_pol_mutex);
- 
- 	list_del(&blkcg->all_blkcgs_node);
-@@ -1371,8 +1414,11 @@ void blkcg_deactivate_policy(struct request_queue *q,
- 		spin_lock(&blkg->blkcg->lock);
- 
- 		if (blkg->pd[pol->plid]) {
--			if (pol->pd_offline_fn)
-+			if (!blkg->pd[pol->plid]->offline &&
-+			    pol->pd_offline_fn) {
- 				pol->pd_offline_fn(blkg->pd[pol->plid]);
-+				blkg->pd[pol->plid]->offline = true;
-+			}
- 			pol->pd_free_fn(blkg->pd[pol->plid]);
- 			blkg->pd[pol->plid] = NULL;
- 		}
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 69bea82..6c666fd 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -88,6 +88,7 @@ struct blkg_policy_data {
- 	/* the blkg and policy id this per-policy data belongs to */
- 	struct blkcg_gq			*blkg;
- 	int				plid;
-+	bool				offline;
- };
- 
- /*
+diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
+index f3a21343e636a8f2..32e91398c0555272 100644
+--- a/drivers/iommu/Kconfig
++++ b/drivers/iommu/Kconfig
+@@ -23,7 +23,7 @@ config IOMMU_IO_PGTABLE
+ config IOMMU_IO_PGTABLE_LPAE
+ 	bool "ARMv7/v8 Long Descriptor Format"
+ 	select IOMMU_IO_PGTABLE
+-	depends on HAS_DMA && (ARM || ARM64 || (COMPILE_TEST && !GENERIC_ATOMIC64))
++	depends on ARM || ARM64 || (COMPILE_TEST && !GENERIC_ATOMIC64)
+ 	help
+ 	  Enable support for the ARM long descriptor pagetable format.
+ 	  This allocator supports 4K/2M/1G, 16K/32M and 64K/512M page
+@@ -42,7 +42,7 @@ config IOMMU_IO_PGTABLE_LPAE_SELFTEST
+ config IOMMU_IO_PGTABLE_ARMV7S
+ 	bool "ARMv7/v8 Short Descriptor Format"
+ 	select IOMMU_IO_PGTABLE
+-	depends on HAS_DMA && (ARM || ARM64 || COMPILE_TEST)
++	depends on ARM || ARM64 || COMPILE_TEST
+ 	help
+ 	  Enable support for the ARM Short-descriptor pagetable format.
+ 	  This supports 32-bit virtual and physical addresses mapped using
+@@ -374,7 +374,6 @@ config QCOM_IOMMU
+ 	# Note: iommu drivers cannot (yet?) be built as modules
+ 	bool "Qualcomm IOMMU Support"
+ 	depends on ARCH_QCOM || (COMPILE_TEST && !GENERIC_ATOMIC64)
+-	depends on HAS_DMA
+ 	select IOMMU_API
+ 	select IOMMU_IO_PGTABLE_LPAE
+ 	select ARM_DMA_USE_IOMMU
 -- 
-1.8.3.1
+2.7.4
