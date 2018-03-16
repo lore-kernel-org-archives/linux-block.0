@@ -1,55 +1,43 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:38846 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752114AbeCQKGB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 17 Mar 2018 06:06:01 -0400
-Subject: Re: [PATCH 15/16] bcache: Fix an endianness bug
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:22478 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750915AbeCPPAe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Mar 2018 11:00:34 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "colyli@suse.de" <colyli@suse.de>,
         "mlyle@lyle.org" <mlyle@lyle.org>,
         "kent.overstreet@gmail.com" <kent.overstreet@gmail.com>
-Cc: "hch@lst.de" <hch@lst.de>,
+CC: "hch@lst.de" <hch@lst.de>,
         "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 15/16] bcache: Fix an endianness bug
+Date: Fri, 16 Mar 2018 15:00:32 +0000
+Message-ID: <1521212430.5384.1.camel@wdc.com>
 References: <20180315150814.9412-1-bart.vanassche@wdc.com>
- <20180315150814.9412-16-bart.vanassche@wdc.com>
- <6b2b29bb-f26b-2df9-3609-26100cc1c9a5@suse.de>
- <1521212430.5384.1.camel@wdc.com>
-From: Coly Li <colyli@suse.de>
-Message-ID: <35a7fcc6-0b94-5813-a27d-639a05fe2c89@suse.de>
-Date: Sat, 17 Mar 2018 18:05:53 +0800
+         <20180315150814.9412-16-bart.vanassche@wdc.com>
+         <6b2b29bb-f26b-2df9-3609-26100cc1c9a5@suse.de>
+In-Reply-To: <6b2b29bb-f26b-2df9-3609-26100cc1c9a5@suse.de>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1521212430.5384.1.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 16/03/2018 11:00 PM, Bart Van Assche wrote:
-> On Fri, 2018-03-16 at 12:47 +0800, Coly Li wrote:
->> The code still does not work with your patch on big endian machine (e.g.
->> s390x). When I fix the bcache s390x bug, I did something like this patch
->> in my first try. It turns out more things need to be fixed,
->> 1, some cache_sb members only swapped to cpu endianness when read in,
->> not swapped to little endian when write out. For example data_offset,
->> nbuckets, nr_in_set, nr_this_dev ...
->> 2, checksum is calculated in cpu endiannness, not explicitly in little
->> endian.
->>
->> Also user space tools need to update to support the endianness issue.
->>
->> How about leave the endianness problem to me? I will pick code piece
->> from your patch and set 'From: Bart Van Assche <bart.vanassche@wdc.com>'
->> on the patch(s), and continue my fix for bcache on s390x.
-> 
-> Hello Coly,
-> 
-> That sounds fine to me. Please let me know if you would like me to repost
-> this series and/or address the feedback that I received for this patch series.
-
-Hi Bart,
-
-I see Mike already picks some of your patches, repost an updated version
-for the rested patch should be a good idea.
-
-Thanks.
-
-Coly Li
+T24gRnJpLCAyMDE4LTAzLTE2IGF0IDEyOjQ3ICswODAwLCBDb2x5IExpIHdyb3RlOg0KPiBUaGUg
+Y29kZSBzdGlsbCBkb2VzIG5vdCB3b3JrIHdpdGggeW91ciBwYXRjaCBvbiBiaWcgZW5kaWFuIG1h
+Y2hpbmUgKGUuZy4NCj4gczM5MHgpLiBXaGVuIEkgZml4IHRoZSBiY2FjaGUgczM5MHggYnVnLCBJ
+IGRpZCBzb21ldGhpbmcgbGlrZSB0aGlzIHBhdGNoDQo+IGluIG15IGZpcnN0IHRyeS4gSXQgdHVy
+bnMgb3V0IG1vcmUgdGhpbmdzIG5lZWQgdG8gYmUgZml4ZWQsDQo+IDEsIHNvbWUgY2FjaGVfc2Ig
+bWVtYmVycyBvbmx5IHN3YXBwZWQgdG8gY3B1IGVuZGlhbm5lc3Mgd2hlbiByZWFkIGluLA0KPiBu
+b3Qgc3dhcHBlZCB0byBsaXR0bGUgZW5kaWFuIHdoZW4gd3JpdGUgb3V0LiBGb3IgZXhhbXBsZSBk
+YXRhX29mZnNldCwNCj4gbmJ1Y2tldHMsIG5yX2luX3NldCwgbnJfdGhpc19kZXYgLi4uDQo+IDIs
+IGNoZWNrc3VtIGlzIGNhbGN1bGF0ZWQgaW4gY3B1IGVuZGlhbm5uZXNzLCBub3QgZXhwbGljaXRs
+eSBpbiBsaXR0bGUNCj4gZW5kaWFuLg0KPiANCj4gQWxzbyB1c2VyIHNwYWNlIHRvb2xzIG5lZWQg
+dG8gdXBkYXRlIHRvIHN1cHBvcnQgdGhlIGVuZGlhbm5lc3MgaXNzdWUuDQo+IA0KPiBIb3cgYWJv
+dXQgbGVhdmUgdGhlIGVuZGlhbm5lc3MgcHJvYmxlbSB0byBtZT8gSSB3aWxsIHBpY2sgY29kZSBw
+aWVjZQ0KPiBmcm9tIHlvdXIgcGF0Y2ggYW5kIHNldCAnRnJvbTogQmFydCBWYW4gQXNzY2hlIDxi
+YXJ0LnZhbmFzc2NoZUB3ZGMuY29tPicNCj4gb24gdGhlIHBhdGNoKHMpLCBhbmQgY29udGludWUg
+bXkgZml4IGZvciBiY2FjaGUgb24gczM5MHguDQoNCkhlbGxvIENvbHksDQoNClRoYXQgc291bmRz
+IGZpbmUgdG8gbWUuIFBsZWFzZSBsZXQgbWUga25vdyBpZiB5b3Ugd291bGQgbGlrZSBtZSB0byBy
+ZXBvc3QNCnRoaXMgc2VyaWVzIGFuZC9vciBhZGRyZXNzIHRoZSBmZWVkYmFjayB0aGF0IEkgcmVj
+ZWl2ZWQgZm9yIHRoaXMgcGF0Y2ggc2VyaWVzLg0KDQpUaGFua3MsDQoNCkJhcnQuDQoNCg0K
