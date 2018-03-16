@@ -1,59 +1,55 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:45175 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754841AbeCSAhE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Mar 2018 20:37:04 -0400
-Received: by mail-pf0-f193.google.com with SMTP id l27so1841333pfk.12
-        for <linux-block@vger.kernel.org>; Sun, 18 Mar 2018 17:37:04 -0700 (PDT)
-From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [for-4.17 20/20] bcache: Fix a compiler warning in bcache_device_init()
-Date: Sun, 18 Mar 2018 17:36:33 -0700
-Message-Id: <20180319003633.27225-21-mlyle@lyle.org>
-In-Reply-To: <20180319003633.27225-1-mlyle@lyle.org>
-References: <20180319003633.27225-1-mlyle@lyle.org>
+Received: from mx2.suse.de ([195.135.220.15]:35586 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752763AbeCPBAw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Mar 2018 21:00:52 -0400
+Subject: Re: [PATCH 12/16] bcache: Make it easier for static analyzers to
+ analyze bch_allocator_thread()
+To: Bart Van Assche <Bart.VanAssche@wdc.com>,
+        "mlyle@lyle.org" <mlyle@lyle.org>,
+        "kent.overstreet@gmail.com" <kent.overstreet@gmail.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        linux-bcache <linux-bcache@vger.kernel.org>
+References: <20180315150814.9412-1-bart.vanassche@wdc.com>
+ <20180315150814.9412-13-bart.vanassche@wdc.com>
+ <bed0d218-75f8-2f6a-04f6-3e0c19563ef8@suse.de>
+ <1521132734.2834.8.camel@wdc.com>
+From: Coly Li <colyli@suse.de>
+Message-ID: <9c3e2a8e-d2bb-9dcd-6247-f151c12af2eb@suse.de>
+Date: Fri, 16 Mar 2018 08:59:47 +0800
+MIME-Version: 1.0
+In-Reply-To: <1521132734.2834.8.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Bart Van Assche <bart.vanassche@wdc.com>
+On 16/03/2018 12:52 AM, Bart Van Assche wrote:
+> On Fri, 2018-03-16 at 00:29 +0800, Coly Li wrote:
+>> On 15/03/2018 11:08 PM, Bart Van Assche wrote:
+>>> This patch does not change any functionality but avoids that smatch
+>>> reports the following:
+>>>
+>>> drivers/md/bcache/alloc.c:334: bch_allocator_thread() error: uninitialized symbol 'bucket'.
+>>>
+>>> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+>>
+>> Hi Bart,
+>>
+>> Your change is OK to me, but the original code seems OK too. Can I say
+>> this is a bug should be fixed from smatch ?
+> 
+> Hello Coly,
+> 
+> It would be great if smatch would be modified such that it does not complain
+> about this code. But I think that this patch does not only make the code
+> easier to analyze for static analyzers but also for humans. So please evaluate
+> this patch from that perspective.
 
-Avoid that building with W=1 triggers the following compiler warning:
+Hi Bart,
 
-drivers/md/bcache/super.c:776:20: warning: comparison is always false due to limited range of data type [-Wtype-limits]
-      d->nr_stripes > SIZE_MAX / sizeof(atomic_t)) {
-                    ^
+It's fair enough, I am convinced. Thanks.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/super.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Reviewed-by: Coly Li <colyli@suse.de>
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 640ff8072ed8..d90d9e59ca00 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -778,6 +778,8 @@ static int bcache_device_init(struct bcache_device *d, unsigned block_size,
- 			      sector_t sectors)
- {
- 	struct request_queue *q;
-+	const size_t max_stripes = min_t(size_t, INT_MAX,
-+					 SIZE_MAX / sizeof(atomic_t));
- 	size_t n;
- 	int idx;
- 
-@@ -786,9 +788,7 @@ static int bcache_device_init(struct bcache_device *d, unsigned block_size,
- 
- 	d->nr_stripes = DIV_ROUND_UP_ULL(sectors, d->stripe_size);
- 
--	if (!d->nr_stripes ||
--	    d->nr_stripes > INT_MAX ||
--	    d->nr_stripes > SIZE_MAX / sizeof(atomic_t)) {
-+	if (!d->nr_stripes || d->nr_stripes > max_stripes) {
- 		pr_err("nr_stripes too large or invalid: %u (start sector beyond end of disk?)",
- 			(unsigned)d->nr_stripes);
- 		return -ENOMEM;
--- 
-2.14.1
+Coly Li
