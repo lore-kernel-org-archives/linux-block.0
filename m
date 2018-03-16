@@ -1,15 +1,6 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:41757 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751635AbeCRSqQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Mar 2018 14:46:16 -0400
-Received: by mail-lf0-f68.google.com with SMTP id m69-v6so22201145lfe.8
-        for <linux-block@vger.kernel.org>; Sun, 18 Mar 2018 11:46:16 -0700 (PDT)
-Subject: Re: [PATCH v2 10/21] lightnvm: Remove depends on HAS_DMA in case of
- platform dependency
-To: Geert Uytterhoeven <geert@linux-m68k.org>,
-        Christoph Hellwig <hch@lst.de>,
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+To: Christoph Hellwig <hch@lst.de>,
         Marek Szyprowski <m.szyprowski@samsung.com>,
         Robin Murphy <robin.murphy@arm.com>,
         Felipe Balbi <balbi@kernel.org>,
@@ -27,6 +18,7 @@ To: Geert Uytterhoeven <geert@linux-m68k.org>,
         Wolfram Sang <wsa@the-dreams.de>,
         Jonathan Cameron <jic23@kernel.org>,
         Joerg Roedel <joro@8bytes.org>,
+        Matias Bjorling <mb@lightnvm.io>,
         Jassi Brar <jassisinghbrar@gmail.com>,
         Mauro Carvalho Chehab <mchehab@kernel.org>,
         Ulf Hansson <ulf.hansson@linaro.org>,
@@ -51,65 +43,59 @@ Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
         linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
         linux-remoteproc@vger.kernel.org, linux-serial@vger.kernel.org,
         linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org
+        linux-kernel@vger.kernel.org,
+        Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH v2 10/21] lightnvm: Remove depends on HAS_DMA in case of platform dependency
+Date: Fri, 16 Mar 2018 14:51:43 +0100
+Message-Id: <1521208314-4783-11-git-send-email-geert@linux-m68k.org>
+In-Reply-To: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
 References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
- <1521208314-4783-11-git-send-email-geert@linux-m68k.org>
-From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <319a2b17-f08e-7219-cf5d-08e2df81d55c@lightnvm.io>
-Date: Sun, 18 Mar 2018 19:46:11 +0100
-MIME-Version: 1.0
-In-Reply-To: <1521208314-4783-11-git-send-email-geert@linux-m68k.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-On 03/16/2018 02:51 PM, Geert Uytterhoeven wrote:
-> Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
-> symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
-> In most cases this other symbol is an architecture or platform specific
-> symbol, or PCI.
-> 
-> Generic symbols and drivers without platform dependencies keep their
-> dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
-> cannot work anyway.
-> 
-> This simplifies the dependencies, and allows to improve compile-testing.
-> 
-> Notes:
->    - FSL_FMAN keeps its dependency on HAS_DMA, as it calls set_dma_ops(),
->      which does not exist if HAS_DMA=n (Do we need a dummy? The use of
->      set_dma_ops() in this driver is questionable),
->    - SND_SOC_LPASS_IPQ806X and SND_SOC_LPASS_PLATFORM loose their
->      dependency on HAS_DMA, as they are selected from
->      SND_SOC_APQ8016_SBC.
-> 
-> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> Reviewed-by: Mark Brown <broonie@kernel.org>
-> Acked-by: Robin Murphy <robin.murphy@arm.com>
-> ---
-> v2:
->    - Add Reviewed-by, Acked-by,
->    - Drop RFC state,
->    - Split per subsystem.
-> ---
->   drivers/lightnvm/Kconfig | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/lightnvm/Kconfig b/drivers/lightnvm/Kconfig
-> index 10c08982185a572f..9c03f35d9df113c6 100644
-> --- a/drivers/lightnvm/Kconfig
-> +++ b/drivers/lightnvm/Kconfig
-> @@ -4,7 +4,7 @@
->   
->   menuconfig NVM
->   	bool "Open-Channel SSD target support"
-> -	depends on BLOCK && HAS_DMA && PCI
-> +	depends on BLOCK && PCI
->   	select BLK_DEV_NVME
->   	help
->   	  Say Y here to get to enable Open-channel SSDs.
-> 
+Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
+symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
+In most cases this other symbol is an architecture or platform specific
+symbol, or PCI.
 
-Looks good.
+Generic symbols and drivers without platform dependencies keep their
+dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
+cannot work anyway.
 
-Reviewed-by: Matias Bjørling <mb@lightnvm.io>
+This simplifies the dependencies, and allows to improve compile-testing.
+
+Notes:
+  - FSL_FMAN keeps its dependency on HAS_DMA, as it calls set_dma_ops(),
+    which does not exist if HAS_DMA=n (Do we need a dummy? The use of
+    set_dma_ops() in this driver is questionable),
+  - SND_SOC_LPASS_IPQ806X and SND_SOC_LPASS_PLATFORM loose their
+    dependency on HAS_DMA, as they are selected from
+    SND_SOC_APQ8016_SBC.
+
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Reviewed-by: Mark Brown <broonie@kernel.org>
+Acked-by: Robin Murphy <robin.murphy@arm.com>
+---
+v2:
+  - Add Reviewed-by, Acked-by,
+  - Drop RFC state,
+  - Split per subsystem.
+---
+ drivers/lightnvm/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/lightnvm/Kconfig b/drivers/lightnvm/Kconfig
+index 10c08982185a572f..9c03f35d9df113c6 100644
+--- a/drivers/lightnvm/Kconfig
++++ b/drivers/lightnvm/Kconfig
+@@ -4,7 +4,7 @@
+ 
+ menuconfig NVM
+ 	bool "Open-Channel SSD target support"
+-	depends on BLOCK && HAS_DMA && PCI
++	depends on BLOCK && PCI
+ 	select BLK_DEV_NVME
+ 	help
+ 	  Say Y here to get to enable Open-channel SSDs.
+-- 
+2.7.4
