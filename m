@@ -1,75 +1,29 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f66.google.com ([209.85.160.66]:37332 "EHLO
-        mail-pl0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754721AbeCSAgv (ORCPT
+Received: from mail-qt0-f196.google.com ([209.85.216.196]:34809 "EHLO
+        mail-qt0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752170AbeCPSpt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Mar 2018 20:36:51 -0400
-Received: by mail-pl0-f66.google.com with SMTP id w12-v6so9225161plp.4
-        for <linux-block@vger.kernel.org>; Sun, 18 Mar 2018 17:36:51 -0700 (PDT)
+        Fri, 16 Mar 2018 14:45:49 -0400
+Received: by mail-qt0-f196.google.com with SMTP id l25so11936071qtj.1
+        for <linux-block@vger.kernel.org>; Fri, 16 Mar 2018 11:45:49 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180315150814.9412-2-bart.vanassche@wdc.com>
+References: <20180315150814.9412-1-bart.vanassche@wdc.com> <20180315150814.9412-2-bart.vanassche@wdc.com>
 From: Michael Lyle <mlyle@lyle.org>
-To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Tang Junhui <tang.junhui@zte.com.cn>
-Subject: [for-4.17 09/20] bcache: fix using of loop variable in memory shrink
-Date: Sun, 18 Mar 2018 17:36:22 -0700
-Message-Id: <20180319003633.27225-10-mlyle@lyle.org>
-In-Reply-To: <20180319003633.27225-1-mlyle@lyle.org>
-References: <20180319003633.27225-1-mlyle@lyle.org>
+Date: Fri, 16 Mar 2018 11:45:48 -0700
+Message-ID: <CAJ+L6qfz-3_69UvAtdM3mqmZHKjODjt877m6ZSFv581q=_qjWA@mail.gmail.com>
+Subject: Re: [PATCH 01/16] bcache: Fix indentation
+To: Bart Van Assche <bart.vanassche@wdc.com>,
+        linux-bcache <linux-bcache@vger.kernel.org>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>,
+        Coly Li <colyli@suse.de>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
-
-In bch_mca_scan(), There are some confusion and logical error in the use of
-loop variables. In this patch, we clarify them as:
-1) nr: the number of btree nodes needs to scan, which will decrease after
-we scan a btree node, and should not be less than 0;
-2) i: the number of btree nodes have scanned, includes both
-btree_cache_freeable and btree_cache, which should not be bigger than
-btree_cache_used;
-3) freed: the number of btree nodes have freed.
-
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
----
- drivers/md/bcache/btree.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index b2d4899f48d5..d64aff0b8abc 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -665,6 +665,7 @@ static unsigned long bch_mca_scan(struct shrinker *shrink,
- 	struct btree *b, *t;
- 	unsigned long i, nr = sc->nr_to_scan;
- 	unsigned long freed = 0;
-+	unsigned int btree_cache_used;
- 
- 	if (c->shrinker_disabled)
- 		return SHRINK_STOP;
-@@ -689,9 +690,10 @@ static unsigned long bch_mca_scan(struct shrinker *shrink,
- 	nr = min_t(unsigned long, nr, mca_can_free(c));
- 
- 	i = 0;
-+	btree_cache_used = c->btree_cache_used;
- 	list_for_each_entry_safe(b, t, &c->btree_cache_freeable, list) {
--		if (freed >= nr)
--			break;
-+		if (nr <= 0)
-+			goto out;
- 
- 		if (++i > 3 &&
- 		    !mca_reap(b, 0, false)) {
-@@ -699,9 +701,10 @@ static unsigned long bch_mca_scan(struct shrinker *shrink,
- 			rw_unlock(true, b);
- 			freed++;
- 		}
-+		nr--;
- 	}
- 
--	for (i = 0; (nr--) && i < c->btree_cache_used; i++) {
-+	for (;  (nr--) && i < btree_cache_used; i++) {
- 		if (list_empty(&c->btree_cache))
- 			goto out;
- 
--- 
-2.14.1
+On Thu, Mar 15, 2018 at 8:07 AM, Bart Van Assche <bart.vanassche@wdc.com> wrote:
+> This patch avoids that smatch complains about inconsistent indentation.
+>
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+LGTM, applying
