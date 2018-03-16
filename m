@@ -1,44 +1,67 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:38051 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750888AbeCQJ66 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 17 Mar 2018 05:58:58 -0400
+Received: from mail-pl0-f65.google.com ([209.85.160.65]:42053 "EHLO
+        mail-pl0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750877AbeCPS2f (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Mar 2018 14:28:35 -0400
+Received: by mail-pl0-f65.google.com with SMTP id w15-v6so6406248plq.9
+        for <linux-block@vger.kernel.org>; Fri, 16 Mar 2018 11:28:35 -0700 (PDT)
 Subject: Re: [PATCH 0/4] bcache-tools: enable big endian support for s390x
-To: Michael Lyle <mlyle@lyle.org>, linux-bcache@vger.kernel.org
+To: Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org
 Cc: linux-block@vger.kernel.org,
         Kent Overstreet <kent.overstreet@gmail.com>
 References: <20180315104240.24647-1-colyli@suse.de>
- <45f74b66-91b6-d733-0f7f-7ef36402672a@lyle.org>
-From: Coly Li <colyli@suse.de>
-Message-ID: <f4f2bdfd-543b-e737-7e8c-f45ce3393a88@suse.de>
-Date: Sat, 17 Mar 2018 17:58:50 +0800
+From: Michael Lyle <mlyle@lyle.org>
+Message-ID: <45f74b66-91b6-d733-0f7f-7ef36402672a@lyle.org>
+Date: Fri, 16 Mar 2018 11:28:32 -0700
 MIME-Version: 1.0
-In-Reply-To: <45f74b66-91b6-d733-0f7f-7ef36402672a@lyle.org>
+In-Reply-To: <20180315104240.24647-1-colyli@suse.de>
 Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 17/03/2018 2:28 AM, Michael Lyle wrote:
-> Hmm.  I can review these, but I don't currently have rights to apply to
-> bcache-tools.  Who's been maintaining these?  I'm glad to take it on...
+Hmm.  I can review these, but I don't currently have rights to apply to
+bcache-tools.  Who's been maintaining these?  I'm glad to take it on...
+
+Mike
+
+On 03/15/2018 03:42 AM, Coly Li wrote:
+> Recently I recieve a bug report that bcache does not work on IBM s390x,
+> I find the problem is from endianness support and checksum calculation.
 > 
-
-Hi Mike,
-
-I guess that Kent maintains user space tools currently. Since bcachefs
-should have a different tools set, use bcache-tools specifically for
-Linux bcache might be a good idea.
-
-If you plan to maintain the user space tools, and have an agreement with
-Kent, maybe you can clone a tree on your own and modify the wiki page
-for your new tree address. At least I will poll new code for our
-products from your tree once you are ready.
-
-Back to this patch set, I will post a new one, which distinguish on-disk
-format from in-memory structure.
-
-Thanks.
-
-Coly
-
-[snip]
+> Both user space tools and Linux kernel code should be fixed, this patch
+> set is the modification to user space tools.
+> 
+> Ideas of this patch set are,
+> 1, super block members should be swapped to little endian before writting
+>    down to media.
+> 2, super block members should be explicitly swapped to little endian
+>    before calculate checksum.
+> 3, checksum also should be swapped to little endian before writiting down
+>    to media.
+> 4, checksum is checked before super block members being swapped into CPU
+>    byteorder.
+> 
+> The first 3 patches are preparation and the last patch does big endian
+> support.
+> 
+> NOTE: Linux kernel code also needs to be patched, this patch set just
+> makes new created bcache devices in a correct byte order.
+> 
+> Coly Li
+> ---
+> 
+> Coly Li (4):
+>   bcache-tools: change bcache.c:crc64() to non-inline function
+>   bcache-tools: only set/display sb.bucket_size for cache devices
+>   bcache-tools: print more super block information in bcache-super-show
+>   bcache-tools: add CPU endianness support
+> 
+>  bcache-super-show.c | 52 +++++++++++++++++++++-----------
+>  bcache.c            | 75 ++++++++++++++++++++++++++++++++++++++++++++-
+>  bcache.h            | 19 +++++++++---
+>  byteorder.h         | 87 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  make-bcache.c       |  5 +--
+>  5 files changed, 212 insertions(+), 26 deletions(-)
+>  create mode 100644 byteorder.h
+> 
