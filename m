@@ -1,57 +1,80 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:46680 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752780AbeCOPI3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Mar 2018 11:08:29 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Michael Lyle <mlyle@lyle.org>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Coly Li <colyli@suse.de>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH 08/16] bcache: Fix a compiler warning in bcache_device_init()
-Date: Thu, 15 Mar 2018 08:08:06 -0700
-Message-Id: <20180315150814.9412-9-bart.vanassche@wdc.com>
-In-Reply-To: <20180315150814.9412-1-bart.vanassche@wdc.com>
-References: <20180315150814.9412-1-bart.vanassche@wdc.com>
+Received: from szxga06-in.huawei.com ([45.249.212.32]:59882 "EHLO huawei.com"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751334AbeCPOhV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Mar 2018 10:37:21 -0400
+Subject: Re: [PATCH v2 17/21] scsi: hisi_sas: Remove depends on HAS_DMA in
+ case of platform dependency
+To: Geert Uytterhoeven <geert@linux-m68k.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Felipe Balbi <balbi@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Mark Brown" <broonie@kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Stefan Richter <stefanr@s5r6.in-berlin.de>,
+        Alan Tull <atull@kernel.org>, Moritz Fischer <mdf@kernel.org>,
+        Wolfram Sang <wsa@the-dreams.de>,
+        "Jonathan Cameron" <jic23@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Matias Bjorling <mb@lightnvm.io>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        "Mauro Carvalho Chehab" <mchehab@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        "David Woodhouse" <dwmw2@infradead.org>,
+        Brian Norris <computersforpeace@gmail.com>,
+        Marek Vasut <marek.vasut@gmail.com>,
+        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
+        Boris Brezillon <boris.brezillon@free-electrons.com>,
+        Richard Weinberger <richard@nod.at>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        "Bjorn Andersson" <bjorn.andersson@linaro.org>,
+        Eric Anholt <eric@anholt.net>,
+        "Stefan Wahren" <stefan.wahren@i2se.com>
+References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
+ <1521208314-4783-18-git-send-email-geert@linux-m68k.org>
+CC: <alsa-devel@alsa-project.org>, <linux-iio@vger.kernel.org>,
+        <linux-fpga@vger.kernel.org>, <linux-remoteproc@vger.kernel.org>,
+        <linux-fbdev@vger.kernel.org>, <linux-ide@vger.kernel.org>,
+        <linux-mtd@lists.infradead.org>, <linux-i2c@vger.kernel.org>,
+        <linux1394-devel@lists.sourceforge.net>,
+        <devel@driverdev.osuosl.org>, <linux-scsi@vger.kernel.org>,
+        <linux-serial@vger.kernel.org>, <linux-media@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-usb@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-spi@vger.kernel.org>,
+        <iommu@lists.linux-foundation.org>, <linux-crypto@vger.kernel.org>
+From: John Garry <john.garry@huawei.com>
+Message-ID: <0786b588-f165-6f71-7ede-7c26a27becbc@huawei.com>
+Date: Fri, 16 Mar 2018 14:36:46 +0000
+MIME-Version: 1.0
+In-Reply-To: <1521208314-4783-18-git-send-email-geert@linux-m68k.org>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Avoid that building with W=1 triggers the following compiler warning:
+On 16/03/2018 13:51, Geert Uytterhoeven wrote:
+> Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
+> symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
+> In most cases this other symbol is an architecture or platform specific
+> symbol, or PCI.
+>
+> Generic symbols and drivers without platform dependencies keep their
+> dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
+> cannot work anyway.
+>
+> This simplifies the dependencies, and allows to improve compile-testing.
+>
+> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Reviewed-by: Mark Brown <broonie@kernel.org>
+> Acked-by: Robin Murphy <robin.murphy@arm.com>
 
-drivers/md/bcache/super.c:776:20: warning: comparison is always false due to limited range of data type [-Wtype-limits]
-      d->nr_stripes > SIZE_MAX / sizeof(atomic_t)) {
-                    ^
-
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
----
- drivers/md/bcache/super.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index e8dfa804bd98..87c1f853bbb3 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -769,6 +769,8 @@ static int bcache_device_init(struct bcache_device *d, unsigned block_size,
- 			      sector_t sectors)
- {
- 	struct request_queue *q;
-+	const size_t max_stripes = min_t(size_t, INT_MAX,
-+					 SIZE_MAX / sizeof(atomic_t));
- 	size_t n;
- 	int idx;
- 
-@@ -777,9 +779,7 @@ static int bcache_device_init(struct bcache_device *d, unsigned block_size,
- 
- 	d->nr_stripes = DIV_ROUND_UP_ULL(sectors, d->stripe_size);
- 
--	if (!d->nr_stripes ||
--	    d->nr_stripes > INT_MAX ||
--	    d->nr_stripes > SIZE_MAX / sizeof(atomic_t)) {
-+	if (!d->nr_stripes || d->nr_stripes > max_stripes) {
- 		pr_err("nr_stripes too large or invalid: %u (start sector beyond end of disk?)",
- 			(unsigned)d->nr_stripes);
- 		return -ENOMEM;
--- 
-2.16.2
+Acked-by: John Garry <john.garry@huawei.com>
