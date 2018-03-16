@@ -1,98 +1,49 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from leibniz.telenet-ops.be ([195.130.137.77]:36752 "EHLO
-        leibniz.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752549AbeCPOB7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Mar 2018 10:01:59 -0400
-Received: from andre.telenet-ops.be (andre.telenet-ops.be [IPv6:2a02:1800:120:4::f00:15])
-        by leibniz.telenet-ops.be (Postfix) with ESMTPS id 402n393CBJzMqfXx
-        for <linux-block@vger.kernel.org>; Fri, 16 Mar 2018 14:52:53 +0100 (CET)
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-To: Christoph Hellwig <hch@lst.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Felipe Balbi <balbi@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mark Brown <broonie@kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Alan Tull <atull@kernel.org>, Moritz Fischer <mdf@kernel.org>,
-        Wolfram Sang <wsa@the-dreams.de>,
-        Jonathan Cameron <jic23@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Matias Bjorling <mb@lightnvm.io>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        Marek Vasut <marek.vasut@gmail.com>,
-        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Richard Weinberger <richard@nod.at>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Eric Anholt <eric@anholt.net>,
-        Stefan Wahren <stefan.wahren@i2se.com>
-Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
-        linux-scsi@vger.kernel.org, alsa-devel@alsa-project.org,
-        linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        linux-fpga@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-iio@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH v2 05/21] firewire: Remove depends on HAS_DMA in case of platform dependency
-Date: Fri, 16 Mar 2018 14:51:38 +0100
-Message-Id: <1521208314-4783-6-git-send-email-geert@linux-m68k.org>
-In-Reply-To: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
-References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] nbd: do not update block size if file system is mounted
+To: Michael Tretter <m.tretter@pengutronix.de>, linux-block@vger.kernel.org
+Cc: Josef Bacik <jbacik@fb.com>, kernel@pengutronix.de
+References: <20180228095456.31472-1-m.tretter@pengutronix.de>
+ <20180315110057.13eecda6@litschi.hi.pengutronix.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <6c862ddf-b352-6ef4-06f8-516680e9f19f@kernel.dk>
+Date: Fri, 16 Mar 2018 09:36:45 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180315110057.13eecda6@litschi.hi.pengutronix.de>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
-symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
-In most cases this other symbol is an architecture or platform specific
-symbol, or PCI.
+On 3/15/18 3:00 AM, Michael Tretter wrote:
+> On Wed, 28 Feb 2018 10:54:56 +0100, Michael Tretter wrote:
+>> If a file system is mounted on the nbd during a disconnect, resetting
+>> the size to 0, might change the block size and destroy the buffer_head
+>> mappings. This will cause a infinite loop when the file system looks for
+>> the buffer_heads for flushing.
+>>
+>> Only set the file size to 0, if we are the only opener of the nbd.
+>>
+>> Signed-off-by: Michael Tretter <m.tretter@pengutronix.de>
+>> ---
+>>  drivers/block/nbd.c | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+>> index 5f2a4240a204..0d1dbb60430b 100644
+>> --- a/drivers/block/nbd.c
+>> +++ b/drivers/block/nbd.c
+>> @@ -1118,7 +1118,8 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *b
+>>  	if (ret)
+>>  		sock_shutdown(nbd);
+>>  	mutex_lock(&nbd->config_lock);
+>> -	bd_set_size(bdev, 0);
+>> +	if (bdev->bd_openers <= 1)
+>> +		bd_set_size(bdev, 0);
+>>  	/* user requested, ignore socket errors */
+>>  	if (test_bit(NBD_DISCONNECT_REQUESTED, &config->runtime_flags))
+>>  		ret = 0;
+> 
+> Are there any comments on this patch?
 
-Generic symbols and drivers without platform dependencies keep their
-dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
-cannot work anyway.
+Josef?
 
-This simplifies the dependencies, and allows to improve compile-testing.
-
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Reviewed-by: Mark Brown <broonie@kernel.org>
-Acked-by: Robin Murphy <robin.murphy@arm.com>
----
-v2:
-  - Add Reviewed-by, Acked-by,
-  - Drop RFC state,
-  - Split per subsystem.
----
- drivers/firewire/Kconfig | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/drivers/firewire/Kconfig b/drivers/firewire/Kconfig
-index 145974f9662b63e6..4199849e37585181 100644
---- a/drivers/firewire/Kconfig
-+++ b/drivers/firewire/Kconfig
-@@ -1,5 +1,4 @@
- menu "IEEE 1394 (FireWire) support"
--	depends on HAS_DMA
- 	depends on PCI || COMPILE_TEST
- 	# firewire-core does not depend on PCI but is
- 	# not useful without PCI controller driver
 -- 
-2.7.4
+Jens Axboe
