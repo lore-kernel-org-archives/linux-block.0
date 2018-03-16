@@ -1,183 +1,61 @@
-Return-Path: <BATV+1231baeb55c0b05cfb44+5315+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: jiufei.xue@linux.alibaba.com,
-	linux-block@vger.kernel.org
-Subject: [PATCH v2] block: bio_check_eod() needs to consider partition
-Date: Tue, 13 Mar 2018 10:18:19 +0100
-Message-Id: <20180313091819.26881-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v6] blk-throttle: fix race between blkcg_bio_issue_check()
+ and cgroup_rmdir()
+To: Joseph Qi <joseph.qi@linux.alibaba.com>, Tejun Heo <tj@kernel.org>
+Cc: Jiufei Xue <jiufei.xue@linux.alibaba.com>,
+ Caspar Zhang <caspar@linux.alibaba.com>, linux-block@vger.kernel.org,
+ cgroups@vger.kernel.org
+References: <1521183087-24988-1-git-send-email-joseph.qi@linux.alibaba.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <2e926f84-63a5-182d-16ce-6da3b5f7487b@kernel.dk>
+Date: Fri, 16 Mar 2018 09:36:18 -0700
+MIME-Version: 1.0
+In-Reply-To: <1521183087-24988-1-git-send-email-joseph.qi@linux.alibaba.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-bio_check_eod() should check partiton size not the whole disk if
-bio->bi_partno is non-zero.  Does this by taking the call to bio_check_eod
-into blk_partition_remap.
+On 3/15/18 11:51 PM, Joseph Qi wrote:
+> We've triggered a WARNING in blk_throtl_bio() when throttling writeback
+> io, which complains blkg->refcnt is already 0 when calling blkg_get(),
+> and then kernel crashes with invalid page request.
+> After investigating this issue, we've found it is caused by a race
+> between blkcg_bio_issue_check() and cgroup_rmdir(), which is described
+> below:
+> 
+> writeback kworker               cgroup_rmdir
+>                                   cgroup_destroy_locked
+>                                     kill_css
+>                                       css_killed_ref_fn
+>                                         css_killed_work_fn
+>                                           offline_css
+>                                             blkcg_css_offline
+>   blkcg_bio_issue_check
+>     rcu_read_lock
+>     blkg_lookup
+>                                               spin_trylock(q->queue_lock)
+>                                               blkg_destroy
+>                                               spin_unlock(q->queue_lock)
+>     blk_throtl_bio
+>     spin_lock_irq(q->queue_lock)
+>     ...
+>     spin_unlock_irq(q->queue_lock)
+>   rcu_read_unlock
+> 
+> Since rcu can only prevent blkg from releasing when it is being used,
+> the blkg->refcnt can be decreased to 0 during blkg_destroy() and schedule
+> blkg release.
+> Then trying to blkg_get() in blk_throtl_bio() will complains the WARNING.
+> And then the corresponding blkg_put() will schedule blkg release again,
+> which result in double free.
+> This race is introduced by commit ae1188963611 ("blkcg: consolidate blkg
+> creation in blkcg_bio_issue_check()"). Before this commit, it will
+> lookup first and then try to lookup/create again with queue_lock. Since
+> revive this logic is a bit drastic, so fix it by only offlining pd during
+> blkcg_css_offline(), and move the rest destruction (especially
+> blkg_put()) into blkcg_css_free(), which should be the right way as
+> discussed.
 
-Based on an earlier patch from Jiufei Xue.
+Applied for 4.17, thanks.
 
-Fixes: 74d46992e0d9 ("block: replace bi_bdev with a gendisk pointer and partitions index")
-Reported-by: Jiufei Xue <jiufei.xue@linux.alibaba.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-core.c | 99 ++++++++++++++++++++++++--------------------------------
- 1 file changed, 43 insertions(+), 56 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 6d82c4f7fadd..5a78f5537087 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2023,7 +2023,7 @@ static blk_qc_t blk_queue_bio(struct request_queue *q, struct bio *bio)
- 	return BLK_QC_T_NONE;
- }
- 
--static void handle_bad_sector(struct bio *bio)
-+static void handle_bad_sector(struct bio *bio, sector_t maxsector)
- {
- 	char b[BDEVNAME_SIZE];
- 
-@@ -2031,7 +2031,7 @@ static void handle_bad_sector(struct bio *bio)
- 	printk(KERN_INFO "%s: rw=%d, want=%Lu, limit=%Lu\n",
- 			bio_devname(bio, b), bio->bi_opf,
- 			(unsigned long long)bio_end_sector(bio),
--			(long long)get_capacity(bio->bi_disk));
-+			(long long)maxsector);
- }
- 
- #ifdef CONFIG_FAIL_MAKE_REQUEST
-@@ -2092,66 +2092,57 @@ static noinline int should_fail_bio(struct bio *bio)
- }
- ALLOW_ERROR_INJECTION(should_fail_bio, ERRNO);
- 
-+/*
-+ * Check whether this bio extends beyond the end of the device or partition.
-+ * This may well happen - the kernel calls bread() without checking the size of
-+ * the device, e.g., when mounting a file system.
-+ */
-+static inline int bio_check_eod(struct bio *bio, sector_t maxsector)
-+{
-+	unsigned int nr_sectors = bio_sectors(bio);
-+
-+	if (nr_sectors && maxsector &&
-+	    (nr_sectors > maxsector ||
-+	     bio->bi_iter.bi_sector > maxsector - nr_sectors)) {
-+		handle_bad_sector(bio, maxsector);
-+		return -EIO;
-+	}
-+	return 0;
-+}
-+
- /*
-  * Remap block n of partition p to block n+start(p) of the disk.
-  */
- static inline int blk_partition_remap(struct bio *bio)
- {
- 	struct hd_struct *p;
--	int ret = 0;
-+	sector_t maxsector = 0;
- 
- 	rcu_read_lock();
- 	p = __disk_get_part(bio->bi_disk, bio->bi_partno);
--	if (unlikely(!p || should_fail_request(p, bio->bi_iter.bi_size) ||
--		     bio_check_ro(bio, p))) {
--		ret = -EIO;
--		goto out;
--	}
-+	if (unlikely(!p))
-+		goto out_unlock;
-+	if (unlikely(should_fail_request(p, bio->bi_iter.bi_size)))
-+		goto out_unlock;
-+	if (unlikely(bio_check_ro(bio, p)))
-+		goto out_unlock;
- 
- 	/*
- 	 * Zone reset does not include bi_size so bio_sectors() is always 0.
- 	 * Include a test for the reset op code and perform the remap if needed.
- 	 */
--	if (!bio_sectors(bio) && bio_op(bio) != REQ_OP_ZONE_RESET)
--		goto out;
--
--	bio->bi_iter.bi_sector += p->start_sect;
--	bio->bi_partno = 0;
--	trace_block_bio_remap(bio->bi_disk->queue, bio, part_devt(p),
--			      bio->bi_iter.bi_sector - p->start_sect);
--
--out:
--	rcu_read_unlock();
--	return ret;
--}
--
--/*
-- * Check whether this bio extends beyond the end of the device.
-- */
--static inline int bio_check_eod(struct bio *bio, unsigned int nr_sectors)
--{
--	sector_t maxsector;
--
--	if (!nr_sectors)
--		return 0;
--
--	/* Test device or partition size, when known. */
--	maxsector = get_capacity(bio->bi_disk);
--	if (maxsector) {
--		sector_t sector = bio->bi_iter.bi_sector;
--
--		if (maxsector < nr_sectors || maxsector - nr_sectors < sector) {
--			/*
--			 * This may well happen - the kernel calls bread()
--			 * without checking the size of the device, e.g., when
--			 * mounting a device.
--			 */
--			handle_bad_sector(bio);
--			return 1;
--		}
-+	if (bio_sectors(bio) || bio_op(bio) == REQ_OP_ZONE_RESET) {
-+		bio->bi_iter.bi_sector += p->start_sect;
-+		bio->bi_partno = 0;
-+		trace_block_bio_remap(bio->bi_disk->queue, bio, part_devt(p),
-+				      bio->bi_iter.bi_sector - p->start_sect);
-+		maxsector = part_nr_sects_read(p);
- 	}
--
--	return 0;
-+	rcu_read_unlock();
-+	return bio_check_eod(bio, maxsector);
-+out_unlock:
-+	rcu_read_unlock();
-+	return -EIO;
- }
- 
- static noinline_for_stack bool
-@@ -2164,9 +2155,6 @@ generic_make_request_checks(struct bio *bio)
- 
- 	might_sleep();
- 
--	if (bio_check_eod(bio, nr_sectors))
--		goto end_io;
--
- 	q = bio->bi_disk->queue;
- 	if (unlikely(!q)) {
- 		printk(KERN_ERR
-@@ -2186,17 +2174,16 @@ generic_make_request_checks(struct bio *bio)
- 	if (should_fail_bio(bio))
- 		goto end_io;
- 
--	if (!bio->bi_partno) {
--		if (unlikely(bio_check_ro(bio, &bio->bi_disk->part0)))
-+	if (bio->bi_partno) {
-+		if (unlikely(blk_partition_remap(bio)))
- 			goto end_io;
- 	} else {
--		if (blk_partition_remap(bio))
-+		if (unlikely(bio_check_ro(bio, &bio->bi_disk->part0)))
-+			goto end_io;
-+		if (unlikely(bio_check_eod(bio, get_capacity(bio->bi_disk))))
- 			goto end_io;
- 	}
- 
--	if (bio_check_eod(bio, nr_sectors))
--		goto end_io;
--
- 	/*
- 	 * Filter flush bio's early so that make_request based
- 	 * drivers without flush support don't have to worry
 -- 
-2.14.2
+Jens Axboe
