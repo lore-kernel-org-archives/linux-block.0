@@ -1,39 +1,39 @@
-Return-Path: <jonas.rabenstein@studium.uni-erlangen.de>
-From: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-To: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
-	Scott Bauer <scott.bauer@intel.com>,
-	Jonathan Derrick <jonathan.derrick@intel.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 8.0/8.4] block: sed-opal: check size of shadow mbr
-Date: Wed, 14 Mar 2018 07:15:41 +0100
-Message-Id: <cover.1521006595.git.jonas.rabenstein@studium.uni-erlangen.de>
-In-Reply-To: <20180313154416.sgptuw7jcn7l76vn@sbauer-Z170X-UD5>
-References: <20180313154416.sgptuw7jcn7l76vn@sbauer-Z170X-UD5>
-References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de> <b0b34fc0132312c09629c868d33b74fe5a19854e.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de> <20180313154416.sgptuw7jcn7l76vn@sbauer-Z170X-UD5>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH v3, resend] block: Move SECTOR_SIZE and SECTOR_SHIFT
+ definitions into <linux/blkdev.h>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Mike Snitzer <snitzer@redhat.com>,
+ Dan Williams <dan.j.williams@intel.com>, Minchan Kim <minchan@kernel.org>,
+ Nitin Gupta <ngupta@vflare.org>
+References: <20180314224806.22833-1-bart.vanassche@wdc.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <47ddf2ad-056f-3cfb-ac04-b4a11251b183@kernel.dk>
+Date: Sat, 17 Mar 2018 13:45:54 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180314224806.22833-1-bart.vanassche@wdc.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
-I managed to extract the usable shadow mbr size out of my 850Evos
-OPAL_TABLE_TABLE and added an appropriate check into the write function.
-As this involves more than just a few lines, I decided to split the v2
-of this subpatch into 4 separate patches. I am unsure what whould be the
-best practice for such an situation but hope it is okay like this.
+On 3/14/18 3:48 PM, Bart Van Assche wrote:
+> It happens often while I'm preparing a patch for a block driver that
+> I'm wondering: is a definition of SECTOR_SIZE and/or SECTOR_SHIFT
+> available for this driver? Do I have to introduce definitions of these
+> constants before I can use these constants? To avoid this confusion,
+> move the existing definitions of SECTOR_SIZE and SECTOR_SHIFT into the
+> <linux/blkdev.h> header file such that these become available for all
+> block drivers. Make the SECTOR_SIZE definition in the uapi msdos_fs.h
+> header file conditional to avoid that including that header file after
+> <linux/blkdev.h> causes the compiler to complain about a SECTOR_SIZE
+> redefinition.
+> 
+> Note: the SECTOR_SIZE / SECTOR_SHIFT / SECTOR_BITS definitions have
+> not been removed from uapi header files nor from NAND drivers in
+> which these constants are used for another purpose than converting
+> block layer offsets and sizes into a number of sectors.
 
-Also the userspace exported pointer is replaced with an u64 value.
-
-Jonas Rabenstein (4):
-  block: sed-opal: ioctl for writing to shadow mbr
-  block: sed-opal: unify retrieval of table columns
-  block: sed-opal: get metadata about opal-sed tables
-  block: sed-opal: check size of shadow mbr
-
- block/opal_proto.h            |  18 ++++
- block/sed-opal.c              | 245 ++++++++++++++++++++++++++++--------------
- include/linux/sed-opal.h      |   1 +
- include/uapi/linux/sed-opal.h |   8 ++
- 4 files changed, 189 insertions(+), 83 deletions(-)
+Applied, thanks Bart.
 
 -- 
-2.16.1
+Jens Axboe
