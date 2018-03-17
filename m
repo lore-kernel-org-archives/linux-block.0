@@ -1,97 +1,55 @@
-Return-Path: <steve@sk2.org>
-From: Stephen Kitt <steve@sk2.org>
-To: hare@suse.com,
-	axboe@kernel.dk,
-	jejb@linux.vnet.ibm.com,
-	martin.petersen@oracle.com
-Cc: linux-scsi@vger.kernel.org,
-	kernel-hardening@lists.openwall.com,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Stephen Kitt <steve@sk2.org>
-Subject: [PATCH] scsi: resolve COMMAND_SIZE at compile time
-Date: Fri,  9 Mar 2018 23:33:55 +0100
-Message-Id: <20180309223355.21222-1-steve@sk2.org>
-In-Reply-To: <20180309232933.14e39858@heffalump.sk2.org>
-References: <20180309232933.14e39858@heffalump.sk2.org>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:38846 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752114AbeCQKGB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 17 Mar 2018 06:06:01 -0400
+Subject: Re: [PATCH 15/16] bcache: Fix an endianness bug
+To: Bart Van Assche <Bart.VanAssche@wdc.com>,
+        "mlyle@lyle.org" <mlyle@lyle.org>,
+        "kent.overstreet@gmail.com" <kent.overstreet@gmail.com>
+Cc: "hch@lst.de" <hch@lst.de>,
+        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20180315150814.9412-1-bart.vanassche@wdc.com>
+ <20180315150814.9412-16-bart.vanassche@wdc.com>
+ <6b2b29bb-f26b-2df9-3609-26100cc1c9a5@suse.de>
+ <1521212430.5384.1.camel@wdc.com>
+From: Coly Li <colyli@suse.de>
+Message-ID: <35a7fcc6-0b94-5813-a27d-639a05fe2c89@suse.de>
+Date: Sat, 17 Mar 2018 18:05:53 +0800
+MIME-Version: 1.0
+In-Reply-To: <1521212430.5384.1.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-COMMAND_SIZE currently uses an array of values in block/scsi_ioctl.c.
-A number of device_handler functions use this to initialise arrays,
-and this is flagged by -Wvla.
+On 16/03/2018 11:00 PM, Bart Van Assche wrote:
+> On Fri, 2018-03-16 at 12:47 +0800, Coly Li wrote:
+>> The code still does not work with your patch on big endian machine (e.g.
+>> s390x). When I fix the bcache s390x bug, I did something like this patch
+>> in my first try. It turns out more things need to be fixed,
+>> 1, some cache_sb members only swapped to cpu endianness when read in,
+>> not swapped to little endian when write out. For example data_offset,
+>> nbuckets, nr_in_set, nr_this_dev ...
+>> 2, checksum is calculated in cpu endiannness, not explicitly in little
+>> endian.
+>>
+>> Also user space tools need to update to support the endianness issue.
+>>
+>> How about leave the endianness problem to me? I will pick code piece
+>> from your patch and set 'From: Bart Van Assche <bart.vanassche@wdc.com>'
+>> on the patch(s), and continue my fix for bcache on s390x.
+> 
+> Hello Coly,
+> 
+> That sounds fine to me. Please let me know if you would like me to repost
+> this series and/or address the feedback that I received for this patch series.
 
-This patch replaces COMMAND_SIZE with a variant using a formula which
-can be resolved at compile time in cases where the opcode is fixed,
-resolving the array size and avoiding the VLA. The downside is that
-the code is less maintainable and that some call sites end up having
-more complex generated code.
+Hi Bart,
 
-Since scsi_command_size_tbl is dropped, we can remove the dependency
-on BLK_SCSI_REQUEST from drivers/target/Kconfig.
+I see Mike already picks some of your patches, repost an updated version
+for the rested patch should be a good idea.
 
-This was prompted by https://lkml.org/lkml/2018/3/7/621
+Thanks.
 
-Signed-off-by: Stephen Kitt <steve@sk2.org>
----
- block/scsi_ioctl.c         |  8 --------
- drivers/target/Kconfig     |  1 -
- include/scsi/scsi_common.h | 13 +++++++++++--
- 3 files changed, 11 insertions(+), 11 deletions(-)
-
-diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
-index 60b471f8621b..b9e176e537be 100644
---- a/block/scsi_ioctl.c
-+++ b/block/scsi_ioctl.c
-@@ -41,14 +41,6 @@ struct blk_cmd_filter {
- 
- static struct blk_cmd_filter blk_default_cmd_filter;
- 
--/* Command group 3 is reserved and should never be used.  */
--const unsigned char scsi_command_size_tbl[8] =
--{
--	6, 10, 10, 12,
--	16, 12, 10, 10
--};
--EXPORT_SYMBOL(scsi_command_size_tbl);
--
- #include <scsi/sg.h>
- 
- static int sg_get_version(int __user *p)
-diff --git a/drivers/target/Kconfig b/drivers/target/Kconfig
-index 4c44d7bed01a..b5f05b60cf06 100644
---- a/drivers/target/Kconfig
-+++ b/drivers/target/Kconfig
-@@ -4,7 +4,6 @@ menuconfig TARGET_CORE
- 	depends on SCSI && BLOCK
- 	select CONFIGFS_FS
- 	select CRC_T10DIF
--	select BLK_SCSI_REQUEST # only for scsi_command_size_tbl..
- 	select SGL_ALLOC
- 	default n
- 	help
-diff --git a/include/scsi/scsi_common.h b/include/scsi/scsi_common.h
-index 731ac09ed231..48d950666376 100644
---- a/include/scsi/scsi_common.h
-+++ b/include/scsi/scsi_common.h
-@@ -15,8 +15,17 @@ scsi_varlen_cdb_length(const void *hdr)
- 	return ((struct scsi_varlen_cdb_hdr *)hdr)->additional_cdb_length + 8;
- }
- 
--extern const unsigned char scsi_command_size_tbl[8];
--#define COMMAND_SIZE(opcode) scsi_command_size_tbl[((opcode) >> 5) & 7]
-+/*
-+ * SCSI command sizes are as follows, in bytes, for fixed size commands, per
-+ * group: 6, 10, 10, 12, 16, 12, 10, 10. The top three bits of an opcode
-+ * determine its group.
-+ * The size table is encoded into a 32-bit value by subtracting each value
-+ * from 16, resulting in a value of 1715488362
-+ * (6 << 28 + 6 << 24 + 4 << 20 + 0 << 16 + 4 << 12 + 6 << 8 + 6 << 4 + 10).
-+ * Command group 3 is reserved and should never be used.
-+ */
-+#define COMMAND_SIZE(opcode) \
-+	(16 - (15 & (1715488362 >> (4 * (((opcode) >> 5) & 7)))))
- 
- static inline unsigned
- scsi_command_size(const unsigned char *cmnd)
--- 
-2.11.0
+Coly Li
