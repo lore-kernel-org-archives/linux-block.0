@@ -1,161 +1,55 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:37294 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1427200AbeCBPWF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Mar 2018 10:22:05 -0500
-Received: by mail-wm0-f68.google.com with SMTP id 139so3728162wmn.2
-        for <linux-block@vger.kernel.org>; Fri, 02 Mar 2018 07:22:05 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 10/12] lightnvm: pblk: rename ppaf* to addrf*
-Date: Fri,  2 Mar 2018 16:21:18 +0100
-Message-Id: <1520004080-27760-11-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1520004080-27760-1-git-send-email-javier@cnexlabs.com>
-References: <1520004080-27760-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Received: from mail-pl0-f65.google.com ([209.85.160.65]:40177 "EHLO
+        mail-pl0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754823AbeCSAg5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Mar 2018 20:36:57 -0400
+Received: by mail-pl0-f65.google.com with SMTP id x4-v6so274802pln.7
+        for <linux-block@vger.kernel.org>; Sun, 18 Mar 2018 17:36:57 -0700 (PDT)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [for-4.17 14/20] bcache: Add __printf annotation to __bch_check_keys()
+Date: Sun, 18 Mar 2018 17:36:27 -0700
+Message-Id: <20180319003633.27225-15-mlyle@lyle.org>
+In-Reply-To: <20180319003633.27225-1-mlyle@lyle.org>
+References: <20180319003633.27225-1-mlyle@lyle.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-In preparation for 2.0 support in pblk, rename variables referring to
-the address format to addrf and reserve ppaf for the 1.2 path.
+From: Bart Van Assche <bart.vanassche@wdc.com>
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
+Make it possible for the compiler to verify the consistency of the
+format string passed to __bch_check_keys() and the arguments that
+should be formatted according to that format string.
+
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
 ---
- drivers/lightnvm/pblk-init.c  |  8 ++++----
- drivers/lightnvm/pblk-sysfs.c |  4 ++--
- drivers/lightnvm/pblk.h       | 16 ++++++++--------
- 3 files changed, 14 insertions(+), 14 deletions(-)
+ drivers/md/bcache/bset.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 0ad06fa8c7c7..4df68a802551 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -80,7 +80,7 @@ static size_t pblk_trans_map_size(struct pblk *pblk)
- {
- 	int entry_size = 8;
+diff --git a/drivers/md/bcache/bset.h b/drivers/md/bcache/bset.h
+index fa506c1aa524..0c24280f3b98 100644
+--- a/drivers/md/bcache/bset.h
++++ b/drivers/md/bcache/bset.h
+@@ -531,14 +531,15 @@ int __bch_keylist_realloc(struct keylist *, unsigned);
+ #ifdef CONFIG_BCACHE_DEBUG
  
--	if (pblk->ppaf_bitsize < 32)
-+	if (pblk->addrf_len < 32)
- 		entry_size = 4;
+ int __bch_count_data(struct btree_keys *);
+-void __bch_check_keys(struct btree_keys *, const char *, ...);
++void __printf(2, 3) __bch_check_keys(struct btree_keys *, const char *, ...);
+ void bch_dump_bset(struct btree_keys *, struct bset *, unsigned);
+ void bch_dump_bucket(struct btree_keys *);
  
- 	return entry_size * pblk->rl.nr_secs;
-@@ -229,7 +229,7 @@ static int pblk_set_addrf_12(struct nvm_geo *geo, struct nvm_addrf_12 *dst)
- 	return dst->blk_offset + src->blk_len;
- }
+ #else
  
--static int pblk_set_ppaf(struct pblk *pblk)
-+static int pblk_set_addrf(struct pblk *pblk)
- {
- 	struct nvm_tgt_dev *dev = pblk->dev;
- 	struct nvm_geo *geo = &dev->geo;
-@@ -241,7 +241,7 @@ static int pblk_set_ppaf(struct pblk *pblk)
- 		return -EINVAL;
- 	}
+ static inline int __bch_count_data(struct btree_keys *b) { return -1; }
+-static inline void __bch_check_keys(struct btree_keys *b, const char *fmt, ...) {}
++static inline void __printf(2, 3)
++	__bch_check_keys(struct btree_keys *b, const char *fmt, ...) {}
+ static inline void bch_dump_bucket(struct btree_keys *b) {}
+ void bch_dump_bset(struct btree_keys *, struct bset *, unsigned);
  
--	pblk->ppaf_bitsize = pblk_set_addrf_12(geo, (void *)&pblk->ppaf);
-+	pblk->addrf_len = pblk_set_addrf_12(geo, (void *)&pblk->addrf);
- 
- 	return 0;
- }
-@@ -377,7 +377,7 @@ static int pblk_core_init(struct pblk *pblk)
- 	if (!pblk->r_end_wq)
- 		goto free_bb_wq;
- 
--	if (pblk_set_ppaf(pblk))
-+	if (pblk_set_addrf(pblk))
- 		goto free_r_end_wq;
- 
- 	INIT_LIST_HEAD(&pblk->compl_list);
-diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
-index a4b3c6ca45a3..87bf51d13f48 100644
---- a/drivers/lightnvm/pblk-sysfs.c
-+++ b/drivers/lightnvm/pblk-sysfs.c
-@@ -117,12 +117,12 @@ static ssize_t pblk_sysfs_ppaf(struct pblk *pblk, char *page)
- 	struct nvm_addrf_12 *geo_ppaf;
- 	ssize_t sz = 0;
- 
--	ppaf = (struct nvm_addrf_12 *)&pblk->ppaf;
-+	ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
- 	geo_ppaf = (struct nvm_addrf_12 *)&geo->addrf;
- 
- 	sz = snprintf(page, PAGE_SIZE,
- 		"g:(b:%d)blk:%d/%d,pg:%d/%d,lun:%d/%d,ch:%d/%d,pl:%d/%d,sec:%d/%d\n",
--			pblk->ppaf_bitsize,
-+			pblk->addrf_len,
- 			ppaf->blk_offset, ppaf->blk_len,
- 			ppaf->pg_offset, ppaf->pg_len,
- 			ppaf->lun_offset, ppaf->lun_len,
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 6607c41b23c0..40aee9e48af4 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -570,8 +570,8 @@ struct pblk {
- 	struct pblk_line_mgmt l_mg;		/* Line management */
- 	struct pblk_line_meta lm;		/* Line metadata */
- 
--	struct nvm_addrf ppaf;
--	int ppaf_bitsize;
-+	struct nvm_addrf addrf;
-+	int addrf_len;
- 
- 	struct pblk_rb rwb;
- 
-@@ -947,7 +947,7 @@ static inline int pblk_ppa_to_pos(struct nvm_geo *geo, struct ppa_addr p)
- static inline struct ppa_addr addr_to_gen_ppa(struct pblk *pblk, u64 paddr,
- 					      u64 line_id)
- {
--	struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->ppaf;
-+	struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
- 	struct ppa_addr ppa;
- 
- 	ppa.ppa = 0;
-@@ -964,7 +964,7 @@ static inline struct ppa_addr addr_to_gen_ppa(struct pblk *pblk, u64 paddr,
- static inline u64 pblk_dev_ppa_to_line_addr(struct pblk *pblk,
- 							struct ppa_addr p)
- {
--	struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->ppaf;
-+	struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
- 	u64 paddr;
- 
- 	paddr = (u64)p.g.ch << ppaf->ch_offset;
-@@ -988,7 +988,7 @@ static inline struct ppa_addr pblk_ppa32_to_ppa64(struct pblk *pblk, u32 ppa32)
- 		ppa64.c.line = ppa32 & ((~0U) >> 1);
- 		ppa64.c.is_cached = 1;
- 	} else {
--		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->ppaf;
-+		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
- 
- 		ppa64.g.ch = (ppa32 & ppaf->ch_mask) >> ppaf->ch_offset;
- 		ppa64.g.lun = (ppa32 & ppaf->lun_mask) >> ppaf->lun_offset;
-@@ -1011,7 +1011,7 @@ static inline u32 pblk_ppa64_to_ppa32(struct pblk *pblk, struct ppa_addr ppa64)
- 		ppa32 |= ppa64.c.line;
- 		ppa32 |= 1U << 31;
- 	} else {
--		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->ppaf;
-+		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
- 
- 		ppa32 |= ppa64.g.ch << ppaf->ch_offset;
- 		ppa32 |= ppa64.g.lun << ppaf->lun_offset;
-@@ -1029,7 +1029,7 @@ static inline struct ppa_addr pblk_trans_map_get(struct pblk *pblk,
- {
- 	struct ppa_addr ppa;
- 
--	if (pblk->ppaf_bitsize < 32) {
-+	if (pblk->addrf_len < 32) {
- 		u32 *map = (u32 *)pblk->trans_map;
- 
- 		ppa = pblk_ppa32_to_ppa64(pblk, map[lba]);
-@@ -1045,7 +1045,7 @@ static inline struct ppa_addr pblk_trans_map_get(struct pblk *pblk,
- static inline void pblk_trans_map_set(struct pblk *pblk, sector_t lba,
- 						struct ppa_addr ppa)
- {
--	if (pblk->ppaf_bitsize < 32) {
-+	if (pblk->addrf_len < 32) {
- 		u32 *map = (u32 *)pblk->trans_map;
- 
- 		map[lba] = pblk_ppa64_to_ppa32(pblk, ppa);
 -- 
-2.7.4
+2.14.1
