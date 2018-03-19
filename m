@@ -1,25 +1,164 @@
-Return-Path: <jthumshirn@suse.de>
-Date: Thu, 1 Mar 2018 09:52:12 +0100
-From: Johannes Thumshirn <jthumshirn@suse.de>
-To: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH 05/11] mtip32xx: Use the blk_queue_flag_*() functions
-Message-ID: <20180301085212.3wgjbmjzgkw23hxq@linux-x5ow.site>
-References: <20180228192823.5191-1-bart.vanassche@wdc.com>
- <20180228192823.5191-6-bart.vanassche@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20180228192823.5191-6-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pl0-f65.google.com ([209.85.160.65]:34164 "EHLO
+        mail-pl0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754801AbeCSAgw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Mar 2018 20:36:52 -0400
+Received: by mail-pl0-f65.google.com with SMTP id u11-v6so5561117plq.1
+        for <linux-block@vger.kernel.org>; Sun, 18 Mar 2018 17:36:52 -0700 (PDT)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Chengguang Xu <cgxu519@gmx.com>
+Subject: [for-4.17 10/20] bcache: move closure debug file into debug directory
+Date: Sun, 18 Mar 2018 17:36:23 -0700
+Message-Id: <20180319003633.27225-11-mlyle@lyle.org>
+In-Reply-To: <20180319003633.27225-1-mlyle@lyle.org>
+References: <20180319003633.27225-1-mlyle@lyle.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+From: Chengguang Xu <cgxu519@gmx.com>
+
+In current code closure debug file is outside of debug directory
+and when unloading module there is lack of removing operation
+for closure debug file, so it will cause creating error when trying
+to reload  module.
+
+This patch move closure debug file into "bcache" debug direcory
+so that the file can get deleted properly.
+
+Signed-off-by: Chengguang Xu <cgxu519@gmx.com>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
+Reviewed-by: Tang Junhui <tang.junhui@zte.com.cn>
+---
+ drivers/md/bcache/closure.c |  9 +++++----
+ drivers/md/bcache/closure.h |  5 +++--
+ drivers/md/bcache/debug.c   | 14 +++++++-------
+ drivers/md/bcache/super.c   |  3 +--
+ 4 files changed, 16 insertions(+), 15 deletions(-)
+
+diff --git a/drivers/md/bcache/closure.c b/drivers/md/bcache/closure.c
+index 7f12920c14f7..c0949c9f843b 100644
+--- a/drivers/md/bcache/closure.c
++++ b/drivers/md/bcache/closure.c
+@@ -157,7 +157,7 @@ void closure_debug_destroy(struct closure *cl)
+ }
+ EXPORT_SYMBOL(closure_debug_destroy);
+ 
+-static struct dentry *debug;
++static struct dentry *closure_debug;
+ 
+ static int debug_seq_show(struct seq_file *f, void *data)
+ {
+@@ -199,11 +199,12 @@ static const struct file_operations debug_ops = {
+ 	.release	= single_release
+ };
+ 
+-void __init closure_debug_init(void)
++int __init closure_debug_init(void)
+ {
+-	debug = debugfs_create_file("closures", 0400, NULL, NULL, &debug_ops);
++	closure_debug = debugfs_create_file("closures",
++				0400, bcache_debug, NULL, &debug_ops);
++	return IS_ERR_OR_NULL(closure_debug);
+ }
+-
+ #endif
+ 
+ MODULE_AUTHOR("Kent Overstreet <koverstreet@google.com>");
+diff --git a/drivers/md/bcache/closure.h b/drivers/md/bcache/closure.h
+index 3b9dfc9962ad..71427eb5fdae 100644
+--- a/drivers/md/bcache/closure.h
++++ b/drivers/md/bcache/closure.h
+@@ -105,6 +105,7 @@
+ struct closure;
+ struct closure_syncer;
+ typedef void (closure_fn) (struct closure *);
++extern struct dentry *bcache_debug;
+ 
+ struct closure_waitlist {
+ 	struct llist_head	list;
+@@ -185,13 +186,13 @@ static inline void closure_sync(struct closure *cl)
+ 
+ #ifdef CONFIG_BCACHE_CLOSURES_DEBUG
+ 
+-void closure_debug_init(void);
++int closure_debug_init(void);
+ void closure_debug_create(struct closure *cl);
+ void closure_debug_destroy(struct closure *cl);
+ 
+ #else
+ 
+-static inline void closure_debug_init(void) {}
++static inline int closure_debug_init(void) { return 0; }
+ static inline void closure_debug_create(struct closure *cl) {}
+ static inline void closure_debug_destroy(struct closure *cl) {}
+ 
+diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
+index af89408befe8..028f7b386e01 100644
+--- a/drivers/md/bcache/debug.c
++++ b/drivers/md/bcache/debug.c
+@@ -17,7 +17,7 @@
+ #include <linux/random.h>
+ #include <linux/seq_file.h>
+ 
+-static struct dentry *debug;
++struct dentry *bcache_debug;
+ 
+ #ifdef CONFIG_BCACHE_DEBUG
+ 
+@@ -232,11 +232,11 @@ static const struct file_operations cache_set_debug_ops = {
+ 
+ void bch_debug_init_cache_set(struct cache_set *c)
+ {
+-	if (!IS_ERR_OR_NULL(debug)) {
++	if (!IS_ERR_OR_NULL(bcache_debug)) {
+ 		char name[50];
+ 		snprintf(name, 50, "bcache-%pU", c->sb.set_uuid);
+ 
+-		c->debug = debugfs_create_file(name, 0400, debug, c,
++		c->debug = debugfs_create_file(name, 0400, bcache_debug, c,
+ 					       &cache_set_debug_ops);
+ 	}
+ }
+@@ -245,13 +245,13 @@ void bch_debug_init_cache_set(struct cache_set *c)
+ 
+ void bch_debug_exit(void)
+ {
+-	if (!IS_ERR_OR_NULL(debug))
+-		debugfs_remove_recursive(debug);
++	if (!IS_ERR_OR_NULL(bcache_debug))
++		debugfs_remove_recursive(bcache_debug);
+ }
+ 
+ int __init bch_debug_init(struct kobject *kobj)
+ {
+-	debug = debugfs_create_dir("bcache", NULL);
++	bcache_debug = debugfs_create_dir("bcache", NULL);
+ 
+-	return IS_ERR_OR_NULL(debug);
++	return IS_ERR_OR_NULL(bcache_debug);
+ }
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index dab9f59a1a2f..26b7a7d4df15 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -2239,7 +2239,6 @@ static int __init bcache_init(void)
+ 	mutex_init(&bch_register_lock);
+ 	init_waitqueue_head(&unregister_wait);
+ 	register_reboot_notifier(&reboot);
+-	closure_debug_init();
+ 
+ 	bcache_major = register_blkdev(0, "bcache");
+ 	if (bcache_major < 0) {
+@@ -2251,7 +2250,7 @@ static int __init bcache_init(void)
+ 	if (!(bcache_wq = alloc_workqueue("bcache", WQ_MEM_RECLAIM, 0)) ||
+ 	    !(bcache_kobj = kobject_create_and_add("bcache", fs_kobj)) ||
+ 	    bch_request_init() ||
+-	    bch_debug_init(bcache_kobj) ||
++	    bch_debug_init(bcache_kobj) || closure_debug_init() ||
+ 	    sysfs_create_files(bcache_kobj, files))
+ 		goto err;
+ 
 -- 
-Johannes Thumshirn                                          Storage
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
-GF: Felix Imend�rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N�rnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+2.14.1
