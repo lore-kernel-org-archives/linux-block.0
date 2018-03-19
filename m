@@ -1,54 +1,76 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:40321 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752590AbeC2WHV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Mar 2018 18:07:21 -0400
-Received: by mail-lf0-f68.google.com with SMTP id e5-v6so10343634lfb.7
-        for <linux-block@vger.kernel.org>; Thu, 29 Mar 2018 15:07:20 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        keith.busch@intel.com, javier@cnexlabs.com,
-        Heiner Litz <hlitz@ucsc.edu>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 21/37] lightnvm: Avoid validation of default op value
-Date: Fri, 30 Mar 2018 00:05:08 +0200
-Message-Id: <20180329220524.30363-22-mb@lightnvm.io>
-In-Reply-To: <20180329220524.30363-1-mb@lightnvm.io>
-References: <20180329220524.30363-1-mb@lightnvm.io>
+Received: from mx2.suse.de ([195.135.220.15]:46191 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754836AbeCSBed (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Mar 2018 21:34:33 -0400
+Subject: Re: [for-4.17 18/20] bcache: Suppress more warnings about
+ set-but-not-used variables
+To: Michael Lyle <mlyle@lyle.org>, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc: axboe@fb.com, Bart Van Assche <bart.vanassche@wdc.com>
+References: <20180319003633.27225-1-mlyle@lyle.org>
+ <20180319003633.27225-19-mlyle@lyle.org>
+From: Coly Li <colyli@suse.de>
+Message-ID: <63972ba2-c7d3-ad65-b081-98198efdd610@suse.de>
+Date: Mon, 19 Mar 2018 09:34:22 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20180319003633.27225-19-mlyle@lyle.org>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Heiner Litz <hlitz@ucsc.edu>
+On 19/03/2018 8:36 AM, Michael Lyle wrote:
+> From: Bart Van Assche <bart.vanassche@wdc.com>
+> 
+> This patch does not change any functionality.
+> 
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Reviewed-by: Michael Lyle <mlyle@lyle.org>
 
-Fixes: 38401d231de65 ("lightnvm: set target over-provision on create ioctl")
-Signed-off-by: Heiner Litz <hlitz@ucsc.edu>
-Reviewed-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
----
- drivers/lightnvm/core.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+There is a missing Reviewed-by: Coly Li <colyli@suse.de> from me :-)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 5b197d6bb6d9..c4f12b1ae8b8 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -304,11 +304,9 @@ static int __nvm_config_extended(struct nvm_dev *dev,
- 	}
- 
- 	/* op not set falls into target's default */
--	if (e->op == 0xFFFF)
-+	if (e->op == 0xFFFF) {
- 		e->op = NVM_TARGET_DEFAULT_OP;
--
--	if (e->op < NVM_TARGET_MIN_OP ||
--	    e->op > NVM_TARGET_MAX_OP) {
-+	} else if (e->op < NVM_TARGET_MIN_OP || e->op > NVM_TARGET_MAX_OP) {
- 		pr_err("nvm: invalid over provisioning value\n");
- 		return -EINVAL;
- 	}
--- 
-2.11.0
+Thanks.
+
+Coly Li
+
+> ---
+>  drivers/md/bcache/bset.c    | 4 ++--
+>  drivers/md/bcache/journal.c | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/md/bcache/bset.c b/drivers/md/bcache/bset.c
+> index e56d3ecdbfcb..579c696a5fe0 100644
+> --- a/drivers/md/bcache/bset.c
+> +++ b/drivers/md/bcache/bset.c
+> @@ -1072,7 +1072,7 @@ EXPORT_SYMBOL(bch_btree_iter_init);
+>  static inline struct bkey *__bch_btree_iter_next(struct btree_iter *iter,
+>  						 btree_iter_cmp_fn *cmp)
+>  {
+> -	struct btree_iter_set unused;
+> +	struct btree_iter_set b __maybe_unused;
+>  	struct bkey *ret = NULL;
+>  
+>  	if (!btree_iter_end(iter)) {
+> @@ -1087,7 +1087,7 @@ static inline struct bkey *__bch_btree_iter_next(struct btree_iter *iter,
+>  		}
+>  
+>  		if (iter->data->k == iter->data->end)
+> -			heap_pop(iter, unused, cmp);
+> +			heap_pop(iter, b, cmp);
+>  		else
+>  			heap_sift(iter, 0, cmp);
+>  	}
+> diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
+> index c94085f400a4..acd0e5c074dd 100644
+> --- a/drivers/md/bcache/journal.c
+> +++ b/drivers/md/bcache/journal.c
+> @@ -493,7 +493,7 @@ static void journal_reclaim(struct cache_set *c)
+>  	struct cache *ca;
+>  	uint64_t last_seq;
+>  	unsigned iter, n = 0;
+> -	atomic_t p;
+> +	atomic_t p __maybe_unused;
+>  
+>  	atomic_long_inc(&c->reclaim);
+>  
+> 
