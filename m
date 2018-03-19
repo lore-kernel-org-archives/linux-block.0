@@ -1,23 +1,40 @@
-Return-Path: <hch@lst.de>
-Date: Mon, 19 Mar 2018 20:58:50 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-Cc: Scott Bauer <scott.bauer@intel.com>,
+Return-Path: <jonas.rabenstein@studium.uni-erlangen.de>
+From: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+To: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
+	Scott Bauer <scott.bauer@intel.com>,
 	Jonathan Derrick <jonathan.derrick@intel.com>,
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v2 05/11] block: sed-opal: print failed function address
-Message-ID: <20180319195850.GG3380@lst.de>
-References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de> <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de> <9c333dc3b35cf9c43061567837de32bf154c2fe4.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <9c333dc3b35cf9c43061567837de32bf154c2fe4.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
+	Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v2 05/11] block: sed-opal: print failed function address
+Date: Mon, 19 Mar 2018 19:36:47 +0100
+Message-Id: <9c333dc3b35cf9c43061567837de32bf154c2fe4.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
+In-Reply-To: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
+References: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
+In-Reply-To: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
+References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de> <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Mar 19, 2018 at 07:36:47PM +0100, Jonas Rabenstein wrote:
-> Add function address (and if available its symbol) to the message if a
-> step function fails.
+Add function address (and if available its symbol) to the message if a
+step function fails.
 
-Looks good:
+Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index 30f6e46518a6..9b6f14e7aeb1 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -394,8 +394,8 @@ static int next(struct opal_dev *dev)
+ 
+ 		error = step->fn(dev, step->data);
+ 		if (error) {
+-			pr_debug("Error on step function: %d with error %d: %s\n",
+-				 state, error,
++			pr_debug("Step %d (%pS) failed wit error %d: %s\n",
++				 state, step->fn, error,
+ 				 opal_error_to_human(error));
+ 
+ 			/* For each OPAL command we do a discovery0 then we
+-- 
+2.16.1
