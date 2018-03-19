@@ -1,303 +1,118 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from albert.telenet-ops.be ([195.130.137.90]:46658 "EHLO
-        albert.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752625AbeCPNwr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Mar 2018 09:52:47 -0400
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-To: Christoph Hellwig <hch@lst.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Felipe Balbi <balbi@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mark Brown <broonie@kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Alan Tull <atull@kernel.org>, Moritz Fischer <mdf@kernel.org>,
-        Wolfram Sang <wsa@the-dreams.de>,
-        Jonathan Cameron <jic23@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Matias Bjorling <mb@lightnvm.io>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        Marek Vasut <marek.vasut@gmail.com>,
-        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Richard Weinberger <richard@nod.at>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Eric Anholt <eric@anholt.net>,
-        Stefan Wahren <stefan.wahren@i2se.com>
-Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
-        linux-scsi@vger.kernel.org, alsa-devel@alsa-project.org,
-        linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        linux-fpga@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-iio@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH v2 15/21] net: Remove depends on HAS_DMA in case of platform dependency
-Date: Fri, 16 Mar 2018 14:51:48 +0100
-Message-Id: <1521208314-4783-16-git-send-email-geert@linux-m68k.org>
-In-Reply-To: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
-References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
+Received: from mx2.suse.de ([195.135.220.15]:50812 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754375AbeCSDvW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Mar 2018 23:51:22 -0400
+Subject: Re: [PATCH] bache: put all the sorted bucket in heap into thefree_inc
+ queue
+To: tang.junhui@zte.com.cn
+Cc: mlyle@lyle.org, linux-block@vger.kernel.org,
+        linux-bcache@vger.kernel.org
+References: <1521427145-16511-1-git-send-email-tang.junhui@zte.com.cn>
+From: Coly Li <colyli@suse.de>
+Message-ID: <d91d1d86-c327-1723-47bc-4d3e1371298b@suse.de>
+Date: Mon, 19 Mar 2018 11:51:10 +0800
+MIME-Version: 1.0
+In-Reply-To: <1521427145-16511-1-git-send-email-tang.junhui@zte.com.cn>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
-symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
-In most cases this other symbol is an architecture or platform specific
-symbol, or PCI.
+On 19/03/2018 10:39 AM, tang.junhui@zte.com.cn wrote:
+> Hello Coly
+> 
 
-Generic symbols and drivers without platform dependencies keep their
-dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
-cannot work anyway.
+Hi Junhui,
 
-This simplifies the dependencies, and allows to improve compile-testing.
+> Thanks for your response. I modify this code because I find some times
+> buckets would run out of during GC. I need more buckets to be used.
+> 
 
-Note:
-  - FSL_FMAN keeps its dependency on HAS_DMA, as it calls set_dma_ops().
-    set_dma_ops() does not exist if NO_DMA=y, and its use in this driver
-    is questionable.
+Oh I see. Was if out of available buckets for journal? Or other meta
+data ...
 
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Reviewed-by: Mark Brown <broonie@kernel.org>
-Acked-by: Robin Murphy <robin.murphy@arm.com>
----
-v2:
-  - Add Reviewed-by, Acked-by,
-  - Drop RFC state,
-  - Split per subsystem.
----
- drivers/net/ethernet/amd/Kconfig                | 2 +-
- drivers/net/ethernet/apm/xgene-v2/Kconfig       | 1 -
- drivers/net/ethernet/apm/xgene/Kconfig          | 1 -
- drivers/net/ethernet/arc/Kconfig                | 6 ++++--
- drivers/net/ethernet/broadcom/Kconfig           | 2 --
- drivers/net/ethernet/calxeda/Kconfig            | 2 +-
- drivers/net/ethernet/hisilicon/Kconfig          | 2 +-
- drivers/net/ethernet/marvell/Kconfig            | 8 +++-----
- drivers/net/ethernet/mellanox/mlxsw/Kconfig     | 2 +-
- drivers/net/ethernet/renesas/Kconfig            | 2 --
- drivers/net/wireless/broadcom/brcm80211/Kconfig | 1 -
- drivers/net/wireless/quantenna/qtnfmac/Kconfig  | 2 +-
- 12 files changed, 12 insertions(+), 19 deletions(-)
+>> On 17/03/2018 4:58 PM, tang.junhui@zte.com.cn wrote:
+>>> From: Tang Junhui <tang.junhui@zte.com.cn>
+>>>
+>>> We make a lot of effort to sort buckets in heap, but we only pull
+>>> half of buckets into free_inc queue, it's too wasteful.
+>>>
+>>> And in incremental GC, we may run out of all buckets in free_inc
+>>> queue during GC, so it would be useful if we have more buckets
+>>> in free_inc queue.
+>>>
+>>> This patch enlarge the size of free_inc queue as much as the heap.
+>>>
+>>> Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+>>> ---
+>>>  drivers/md/bcache/super.c | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+>>> index b4d2892..6f428c0 100644
+>>> --- a/drivers/md/bcache/super.c
+>>> +++ b/drivers/md/bcache/super.c
+>>> @@ -1835,7 +1835,7 @@ static int cache_alloc(struct cache *ca)
+>>>          !init_fifo_exact(&ca->free[RESERVE_PRIO], prio_buckets(ca), GFP_KERNEL) ||
+>>>          !init_fifo(&ca->free[RESERVE_MOVINGGC], free, GFP_KERNEL) ||
+>>>          !init_fifo(&ca->free[RESERVE_NONE], free, GFP_KERNEL) ||
+>>> -        !init_fifo(&ca->free_inc,    free << 2, GFP_KERNEL) ||
+>>> +        !init_fifo(&ca->free_inc,    free << 3, GFP_KERNEL) ||
+>>>          !init_heap(&ca->heap,    free << 3, GFP_KERNEL) ||
+>>>          !(ca->buckets    = vzalloc(sizeof(struct bucket) *
+>>>                        ca->sb.nbuckets)) ||
+>>>
+>>
+>> Hi Junhui,
+>>
+>> I feel the original code might be better. ca->heap is not a strict
+>> ordered list, it just makes sure at some location in the heap list, all
+>> prios before this location are larger than all prios after this location.
+>>
 
-diff --git a/drivers/net/ethernet/amd/Kconfig b/drivers/net/ethernet/amd/Kconfig
-index d5c15e8bb3de706b..f273af136fc7c995 100644
---- a/drivers/net/ethernet/amd/Kconfig
-+++ b/drivers/net/ethernet/amd/Kconfig
-@@ -173,7 +173,7 @@ config SUNLANCE
- 
- config AMD_XGBE
- 	tristate "AMD 10GbE Ethernet driver"
--	depends on ((OF_NET && OF_ADDRESS) || ACPI || PCI) && HAS_IOMEM && HAS_DMA
-+	depends on ((OF_NET && OF_ADDRESS) || ACPI || PCI) && HAS_IOMEM
- 	depends on X86 || ARM64 || COMPILE_TEST
- 	select BITREVERSE
- 	select CRC32
-diff --git a/drivers/net/ethernet/apm/xgene-v2/Kconfig b/drivers/net/ethernet/apm/xgene-v2/Kconfig
-index 1205861b631896a0..eedd3f3dd22e2201 100644
---- a/drivers/net/ethernet/apm/xgene-v2/Kconfig
-+++ b/drivers/net/ethernet/apm/xgene-v2/Kconfig
-@@ -1,6 +1,5 @@
- config NET_XGENE_V2
- 	tristate "APM X-Gene SoC Ethernet-v2 Driver"
--	depends on HAS_DMA
- 	depends on ARCH_XGENE || COMPILE_TEST
- 	help
- 	  This is the Ethernet driver for the on-chip ethernet interface
-diff --git a/drivers/net/ethernet/apm/xgene/Kconfig b/drivers/net/ethernet/apm/xgene/Kconfig
-index afccb033177b3923..e4e33c900b577161 100644
---- a/drivers/net/ethernet/apm/xgene/Kconfig
-+++ b/drivers/net/ethernet/apm/xgene/Kconfig
-@@ -1,6 +1,5 @@
- config NET_XGENE
- 	tristate "APM X-Gene SoC Ethernet Driver"
--	depends on HAS_DMA
- 	depends on ARCH_XGENE || COMPILE_TEST
- 	select PHYLIB
- 	select MDIO_XGENE
-diff --git a/drivers/net/ethernet/arc/Kconfig b/drivers/net/ethernet/arc/Kconfig
-index e743ddf46343302f..5d0ab8e74b680cc6 100644
---- a/drivers/net/ethernet/arc/Kconfig
-+++ b/drivers/net/ethernet/arc/Kconfig
-@@ -24,7 +24,8 @@ config ARC_EMAC_CORE
- config ARC_EMAC
- 	tristate "ARC EMAC support"
- 	select ARC_EMAC_CORE
--	depends on OF_IRQ && OF_NET && HAS_DMA && (ARC || COMPILE_TEST)
-+	depends on OF_IRQ && OF_NET
-+	depends on ARC || COMPILE_TEST
- 	---help---
- 	  On some legacy ARC (Synopsys) FPGA boards such as ARCAngel4/ML50x
- 	  non-standard on-chip ethernet device ARC EMAC 10/100 is used.
-@@ -33,7 +34,8 @@ config ARC_EMAC
- config EMAC_ROCKCHIP
- 	tristate "Rockchip EMAC support"
- 	select ARC_EMAC_CORE
--	depends on OF_IRQ && OF_NET && REGULATOR && HAS_DMA && (ARCH_ROCKCHIP || COMPILE_TEST)
-+	depends on OF_IRQ && OF_NET && REGULATOR
-+	depends on ARCH_ROCKCHIP || COMPILE_TEST
- 	---help---
- 	  Support for Rockchip RK3036/RK3066/RK3188 EMAC ethernet controllers.
- 	  This selects Rockchip SoC glue layer support for the
-diff --git a/drivers/net/ethernet/broadcom/Kconfig b/drivers/net/ethernet/broadcom/Kconfig
-index af75156919edfead..4c3bfde6e8de00f2 100644
---- a/drivers/net/ethernet/broadcom/Kconfig
-+++ b/drivers/net/ethernet/broadcom/Kconfig
-@@ -157,7 +157,6 @@ config BGMAC
- config BGMAC_BCMA
- 	tristate "Broadcom iProc GBit BCMA support"
- 	depends on BCMA && BCMA_HOST_SOC
--	depends on HAS_DMA
- 	depends on BCM47XX || ARCH_BCM_5301X || COMPILE_TEST
- 	select BGMAC
- 	select PHYLIB
-@@ -170,7 +169,6 @@ config BGMAC_BCMA
- 
- config BGMAC_PLATFORM
- 	tristate "Broadcom iProc GBit platform support"
--	depends on HAS_DMA
- 	depends on ARCH_BCM_IPROC || COMPILE_TEST
- 	depends on OF
- 	select BGMAC
-diff --git a/drivers/net/ethernet/calxeda/Kconfig b/drivers/net/ethernet/calxeda/Kconfig
-index 07d2201530d26c85..9fdd496b90ff47cb 100644
---- a/drivers/net/ethernet/calxeda/Kconfig
-+++ b/drivers/net/ethernet/calxeda/Kconfig
-@@ -1,6 +1,6 @@
- config NET_CALXEDA_XGMAC
- 	tristate "Calxeda 1G/10G XGMAC Ethernet driver"
--	depends on HAS_IOMEM && HAS_DMA
-+	depends on HAS_IOMEM
- 	depends on ARCH_HIGHBANK || COMPILE_TEST
- 	select CRC32
- 	help
-diff --git a/drivers/net/ethernet/hisilicon/Kconfig b/drivers/net/ethernet/hisilicon/Kconfig
-index 8bcf470ff5f38a4e..fb1a7251f45d3369 100644
---- a/drivers/net/ethernet/hisilicon/Kconfig
-+++ b/drivers/net/ethernet/hisilicon/Kconfig
-@@ -5,7 +5,7 @@
- config NET_VENDOR_HISILICON
- 	bool "Hisilicon devices"
- 	default y
--	depends on (OF || ACPI) && HAS_DMA
-+	depends on OF || ACPI
- 	depends on ARM || ARM64 || COMPILE_TEST
- 	---help---
- 	  If you have a network (Ethernet) card belonging to this class, say Y.
-diff --git a/drivers/net/ethernet/marvell/Kconfig b/drivers/net/ethernet/marvell/Kconfig
-index ebe5c91489355c9e..0704a1900bbca444 100644
---- a/drivers/net/ethernet/marvell/Kconfig
-+++ b/drivers/net/ethernet/marvell/Kconfig
-@@ -18,8 +18,8 @@ if NET_VENDOR_MARVELL
- 
- config MV643XX_ETH
- 	tristate "Marvell Discovery (643XX) and Orion ethernet support"
--	depends on (MV64X60 || PPC32 || PLAT_ORION || COMPILE_TEST) && INET
--	depends on HAS_DMA
-+	depends on MV64X60 || PPC32 || PLAT_ORION || COMPILE_TEST
-+	depends on INET
- 	select PHYLIB
- 	select MVMDIO
- 	---help---
-@@ -58,7 +58,6 @@ config MVNETA_BM_ENABLE
- config MVNETA
- 	tristate "Marvell Armada 370/38x/XP/37xx network interface support"
- 	depends on ARCH_MVEBU || COMPILE_TEST
--	depends on HAS_DMA
- 	select MVMDIO
- 	select PHYLINK
- 	---help---
-@@ -84,7 +83,6 @@ config MVNETA_BM
- config MVPP2
- 	tristate "Marvell Armada 375/7K/8K network interface support"
- 	depends on ARCH_MVEBU || COMPILE_TEST
--	depends on HAS_DMA
- 	select MVMDIO
- 	---help---
- 	  This driver supports the network interface units in the
-@@ -92,7 +90,7 @@ config MVPP2
- 
- config PXA168_ETH
- 	tristate "Marvell pxa168 ethernet support"
--	depends on HAS_IOMEM && HAS_DMA
-+	depends on HAS_IOMEM
- 	depends on CPU_PXA168 || ARCH_BERLIN || COMPILE_TEST
- 	select PHYLIB
- 	---help---
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/Kconfig b/drivers/net/ethernet/mellanox/mlxsw/Kconfig
-index d56eea3105090051..b591c8cc9896ccb7 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/Kconfig
-+++ b/drivers/net/ethernet/mellanox/mlxsw/Kconfig
-@@ -30,7 +30,7 @@ config MLXSW_CORE_THERMAL
- 
- config MLXSW_PCI
- 	tristate "PCI bus implementation for Mellanox Technologies Switch ASICs"
--	depends on PCI && HAS_DMA && HAS_IOMEM && MLXSW_CORE
-+	depends on PCI && HAS_IOMEM && MLXSW_CORE
- 	default m
- 	---help---
- 	  This is PCI bus implementation for Mellanox Technologies Switch ASICs.
-diff --git a/drivers/net/ethernet/renesas/Kconfig b/drivers/net/ethernet/renesas/Kconfig
-index 27be51f0a421b43e..f3f7477043ce1061 100644
---- a/drivers/net/ethernet/renesas/Kconfig
-+++ b/drivers/net/ethernet/renesas/Kconfig
-@@ -17,7 +17,6 @@ if NET_VENDOR_RENESAS
- 
- config SH_ETH
- 	tristate "Renesas SuperH Ethernet support"
--	depends on HAS_DMA
- 	depends on ARCH_RENESAS || SUPERH || COMPILE_TEST
- 	select CRC32
- 	select MII
-@@ -31,7 +30,6 @@ config SH_ETH
- 
- config RAVB
- 	tristate "Renesas Ethernet AVB support"
--	depends on HAS_DMA
- 	depends on ARCH_RENESAS || COMPILE_TEST
- 	select CRC32
- 	select MII
-diff --git a/drivers/net/wireless/broadcom/brcm80211/Kconfig b/drivers/net/wireless/broadcom/brcm80211/Kconfig
-index 9d99eb42d9176f0f..6acba67bca07abd7 100644
---- a/drivers/net/wireless/broadcom/brcm80211/Kconfig
-+++ b/drivers/net/wireless/broadcom/brcm80211/Kconfig
-@@ -60,7 +60,6 @@ config BRCMFMAC_PCIE
- 	bool "PCIE bus interface support for FullMAC driver"
- 	depends on BRCMFMAC
- 	depends on PCI
--	depends on HAS_DMA
- 	select BRCMFMAC_PROTO_MSGBUF
- 	select FW_LOADER
- 	---help---
-diff --git a/drivers/net/wireless/quantenna/qtnfmac/Kconfig b/drivers/net/wireless/quantenna/qtnfmac/Kconfig
-index 025fa6018550895a..8d1492a90bd135c0 100644
---- a/drivers/net/wireless/quantenna/qtnfmac/Kconfig
-+++ b/drivers/net/wireless/quantenna/qtnfmac/Kconfig
-@@ -7,7 +7,7 @@ config QTNFMAC
- config QTNFMAC_PEARL_PCIE
- 	tristate "Quantenna QSR10g PCIe support"
- 	default n
--	depends on HAS_DMA && PCI && CFG80211
-+	depends on PCI && CFG80211
- 	select QTNFMAC
- 	select FW_LOADER
- 	select CRC32
--- 
-2.7.4
+> Can we make sure that all the prios of buckets in the heap are smaller 
+> than the rest of buckets? If so, I think we can reclaime those buckets. 
+> >> If ca->heap is x2 size of ca->free_inc, it means there is chance to
+>> invalidate 50% buckets of higher prios. And the buckets with lower prios
+>> can still stay in ca->heap until they have chance to be selected.
+>>
+> Yes, but why we sort them this time, but not the next time? since in 
+> the next time they would be sorted again
+> 
+
+I re-read invalidate_buckets_lru(), it seems I overlooked a for-loop here,
+199         for (i = ca->heap.used / 2 - 1; i >= 0; --i)
+200                 heap_sift(&ca->heap, i, bucket_min_cmp);
+
+Then the first half of all bucket prios in heap list are strict ordered,
+and the second half of all bucket prios are smaller than the first half.
+I feel your assumption is true.
+
+If you modify it to sort all the buckets in heap list, and make free_inc
+as same size as heap, it might work. But so far I cannot tell the
+advantage and disadvantage, I just see more CPU consumption and more
+memory pined to free_inc list.
+
+>> If ca->free_inc is set to same size as ca->heap, we need to know that
+>> not all buckets in ca->heap can be invalidated, so after iterating all
+>> buckets in ca->heap, maybe we can not make ca->free_inc to be full. In
+>> this case, gc thread needs to be waken up. This will be a bug because it
+>> is very probably that not all buckets from ca->heap can be pushed into
+>> ca->free_inc, then gc thread is just frequently waken up for nothing.
+> I don't think so. All buckets are sorted into heap can be invalidated,
+> because we check them first before putting them into heap, see code:
+> 	for_each_bucket(b, ca) {
+> 		if (!bch_can_invalidate_bucket(ca, b))
+> 			continue;
+> 
+> 		if (!heap_full(&ca->heap))
+> 			heap_add(&ca->heap, b, bucket_max_cmp);
+> 		else if (bucket_max_cmp(b, heap_peek(&ca->heap))) {
+> 			ca->heap.data[0] = b;
+> 			heap_sift(&ca->heap, 0, bucket_max_cmp);
+> 		}
+> 	}
+
+I messed them up ... Thank for correct me :-)
+
+Coly Li
