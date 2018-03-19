@@ -1,195 +1,131 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f66.google.com ([209.85.160.66]:45389 "EHLO
-        mail-pl0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754301AbeCSAgl (ORCPT
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:46695 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754685AbeCSAhA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Mar 2018 20:36:41 -0400
-Received: by mail-pl0-f66.google.com with SMTP id n15-v6so1481489plp.12
-        for <linux-block@vger.kernel.org>; Sun, 18 Mar 2018 17:36:41 -0700 (PDT)
+        Sun, 18 Mar 2018 20:37:00 -0400
+Received: by mail-pg0-f68.google.com with SMTP id g8so3147503pgq.13
+        for <linux-block@vger.kernel.org>; Sun, 18 Mar 2018 17:37:00 -0700 (PDT)
 From: Michael Lyle <mlyle@lyle.org>
 To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Coly Li <colyli@suse.de>,
-        Michael Lyle <mlyle@lyle.org>,
-        Junhui Tang <tang.junhui@zte.com.cn>
-Subject: [for-4.17 01/20] bcache: fix cached_dev->count usage for bch_cache_set_error()
-Date: Sun, 18 Mar 2018 17:36:14 -0700
-Message-Id: <20180319003633.27225-2-mlyle@lyle.org>
+Cc: axboe@fb.com, Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [for-4.17 16/20] bcache: Fix kernel-doc warnings
+Date: Sun, 18 Mar 2018 17:36:29 -0700
+Message-Id: <20180319003633.27225-17-mlyle@lyle.org>
 In-Reply-To: <20180319003633.27225-1-mlyle@lyle.org>
 References: <20180319003633.27225-1-mlyle@lyle.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Coly Li <colyli@suse.de>
+From: Bart Van Assche <bart.vanassche@wdc.com>
 
-When bcache metadata I/O fails, bcache will call bch_cache_set_error()
-to retire the whole cache set. The expected behavior to retire a cache
-set is to unregister the cache set, and unregister all backing device
-attached to this cache set, then remove sysfs entries of the cache set
-and all attached backing devices, finally release memory of structs
-cache_set, cache, cached_dev and bcache_device.
+Avoid that building with W=1 triggers warnings about the kernel-doc
+headers.
 
-In my testing when journal I/O failure triggered by disconnected cache
-device, sometimes the cache set cannot be retired, and its sysfs
-entry /sys/fs/bcache/<uuid> still exits and the backing device also
-references it. This is not expected behavior.
-
-When metadata I/O failes, the call senquence to retire whole cache set is,
-        bch_cache_set_error()
-        bch_cache_set_unregister()
-        bch_cache_set_stop()
-        __cache_set_unregister()     <- called as callback by calling
-                                        clousre_queue(&c->caching)
-        cache_set_flush()            <- called as a callback when refcount
-                                        of cache_set->caching is 0
-        cache_set_free()             <- called as a callback when refcount
-                                        of catch_set->cl is 0
-        bch_cache_set_release()      <- called as a callback when refcount
-                                        of catch_set->kobj is 0
-
-I find if kernel thread bch_writeback_thread() quits while-loop when
-kthread_should_stop() is true and searched_full_index is false, clousre
-callback cache_set_flush() set by continue_at() will never be called. The
-result is, bcache fails to retire whole cache set.
-
-cache_set_flush() will be called when refcount of closure c->caching is 0,
-and in function bcache_device_detach() refcount of closure c->caching is
-released to 0 by clousre_put(). In metadata error code path, function
-bcache_device_detach() is called by cached_dev_detach_finish(). This is a
-callback routine being called when cached_dev->count is 0. This refcount
-is decreased by cached_dev_put().
-
-The above dependence indicates, cache_set_flush() will be called when
-refcount of cache_set->cl is 0, and refcount of cache_set->cl to be 0
-when refcount of cache_dev->count is 0.
-
-The reason why sometimes cache_dev->count is not 0 (when metadata I/O fails
-and bch_cache_set_error() called) is, in bch_writeback_thread(), refcount
-of cache_dev is not decreased properly.
-
-In bch_writeback_thread(), cached_dev_put() is called only when
-searched_full_index is true and cached_dev->writeback_keys is empty, a.k.a
-there is no dirty data on cache. In most of run time it is correct, but
-when bch_writeback_thread() quits the while-loop while cache is still
-dirty, current code forget to call cached_dev_put() before this kernel
-thread exits. This is why sometimes cache_set_flush() is not executed and
-cache set fails to be retired.
-
-The reason to call cached_dev_put() in bch_writeback_rate() is, when the
-cache device changes from clean to dirty, cached_dev_get() is called, to
-make sure during writeback operatiions both backing and cache devices
-won't be released.
-
-Adding following code in bch_writeback_thread() does not work,
-   static int bch_writeback_thread(void *arg)
-        }
-
-+       if (atomic_read(&dc->has_dirty))
-+               cached_dev_put()
-+
-        return 0;
- }
-because writeback kernel thread can be waken up and start via sysfs entry:
-        echo 1 > /sys/block/bcache<N>/bcache/writeback_running
-It is difficult to check whether backing device is dirty without race and
-extra lock. So the above modification will introduce potential refcount
-underflow in some conditions.
-
-The correct fix is, to take cached dev refcount when creating the kernel
-thread, and put it before the kernel thread exits. Then bcache does not
-need to take a cached dev refcount when cache turns from clean to dirty,
-or to put a cached dev refcount when cache turns from ditry to clean. The
-writeback kernel thread is alwasy safe to reference data structure from
-cache set, cache and cached device (because a refcount of cache device is
-taken for it already), and no matter the kernel thread is stopped by I/O
-errors or system reboot, cached_dev->count can always be used correctly.
-
-The patch is simple, but understanding how it works is quite complicated.
-
-Changelog:
-v2: set dc->writeback_thread to NULL in this patch, as suggested by Hannes.
-v1: initial version for review.
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
 Reviewed-by: Michael Lyle <mlyle@lyle.org>
-Cc: Michael Lyle <mlyle@lyle.org>
-Cc: Junhui Tang <tang.junhui@zte.com.cn>
 ---
- drivers/md/bcache/super.c     |  1 -
- drivers/md/bcache/writeback.c | 11 ++++++++---
- drivers/md/bcache/writeback.h |  2 --
- 3 files changed, 8 insertions(+), 6 deletions(-)
+ drivers/md/bcache/btree.c   |  2 +-
+ drivers/md/bcache/closure.c |  8 ++++----
+ drivers/md/bcache/request.c |  1 +
+ drivers/md/bcache/util.c    | 18 ++++++++----------
+ 4 files changed, 14 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index f1729df9fb74..f4dea0209fce 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1065,7 +1065,6 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
- 	if (BDEV_STATE(&dc->sb) == BDEV_STATE_DIRTY) {
- 		bch_sectors_dirty_init(&dc->disk);
- 		atomic_set(&dc->has_dirty, 1);
--		refcount_inc(&dc->count);
- 		bch_writeback_queue(dc);
- 	}
- 
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index f1d2fc15abcc..b280c134dd4d 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -572,7 +572,7 @@ static int bch_writeback_thread(void *arg)
- 
- 			if (kthread_should_stop()) {
- 				set_current_state(TASK_RUNNING);
--				return 0;
-+				break;
- 			}
- 
- 			schedule();
-@@ -585,7 +585,6 @@ static int bch_writeback_thread(void *arg)
- 		if (searched_full_index &&
- 		    RB_EMPTY_ROOT(&dc->writeback_keys.keys)) {
- 			atomic_set(&dc->has_dirty, 0);
--			cached_dev_put(dc);
- 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_CLEAN);
- 			bch_write_bdev_super(dc, NULL);
- 		}
-@@ -606,6 +605,9 @@ static int bch_writeback_thread(void *arg)
- 		}
- 	}
- 
-+	dc->writeback_thread = NULL;
-+	cached_dev_put(dc);
-+
- 	return 0;
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index 143ed5a758e7..17936b2dc7d6 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -962,7 +962,7 @@ static struct btree *mca_alloc(struct cache_set *c, struct btree_op *op,
+ 	return b;
  }
  
-@@ -669,10 +671,13 @@ int bch_cached_dev_writeback_start(struct cached_dev *dc)
- 	if (!dc->writeback_write_wq)
- 		return -ENOMEM;
+-/**
++/*
+  * bch_btree_node_get - find a btree node in the cache and lock it, reading it
+  * in from disk if necessary.
+  *
+diff --git a/drivers/md/bcache/closure.c b/drivers/md/bcache/closure.c
+index c0949c9f843b..0e14969182c6 100644
+--- a/drivers/md/bcache/closure.c
++++ b/drivers/md/bcache/closure.c
+@@ -46,7 +46,7 @@ void closure_sub(struct closure *cl, int v)
+ }
+ EXPORT_SYMBOL(closure_sub);
  
-+	cached_dev_get(dc);
- 	dc->writeback_thread = kthread_create(bch_writeback_thread, dc,
- 					      "bcache_writeback");
--	if (IS_ERR(dc->writeback_thread))
-+	if (IS_ERR(dc->writeback_thread)) {
-+		cached_dev_put(dc);
- 		return PTR_ERR(dc->writeback_thread);
-+	}
+-/**
++/*
+  * closure_put - decrement a closure's refcount
+  */
+ void closure_put(struct closure *cl)
+@@ -55,7 +55,7 @@ void closure_put(struct closure *cl)
+ }
+ EXPORT_SYMBOL(closure_put);
  
- 	schedule_delayed_work(&dc->writeback_rate_update,
- 			      dc->writeback_rate_update_seconds * HZ);
-diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
-index 587b25599856..0bba8f1c6cdf 100644
---- a/drivers/md/bcache/writeback.h
-+++ b/drivers/md/bcache/writeback.h
-@@ -105,8 +105,6 @@ static inline void bch_writeback_add(struct cached_dev *dc)
+-/**
++/*
+  * closure_wake_up - wake up all closures on a wait list, without memory barrier
+  */
+ void __closure_wake_up(struct closure_waitlist *wait_list)
+@@ -79,9 +79,9 @@ EXPORT_SYMBOL(__closure_wake_up);
+ 
+ /**
+  * closure_wait - add a closure to a waitlist
+- *
+- * @waitlist will own a ref on @cl, which will be released when
++ * @waitlist: will own a ref on @cl, which will be released when
+  * closure_wake_up() is called on @waitlist.
++ * @cl: closure pointer.
+  *
+  */
+ bool closure_wait(struct closure_waitlist *waitlist, struct closure *cl)
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 5a82237c7025..a65e3365eeb9 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -296,6 +296,7 @@ static void bch_data_insert_start(struct closure *cl)
+ 
+ /**
+  * bch_data_insert - stick some data in the cache
++ * @cl: closure pointer.
+  *
+  * This is the starting point for any data to end up in a cache device; it could
+  * be from a normal write, or a writeback write, or a write to a flash only
+diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
+index 6198041f0ee2..74febd5230df 100644
+--- a/drivers/md/bcache/util.c
++++ b/drivers/md/bcache/util.c
+@@ -82,10 +82,9 @@ STRTO_H(strtoll, long long)
+ STRTO_H(strtoull, unsigned long long)
+ 
+ /**
+- * bch_hprint() - formats @v to human readable string for sysfs.
+- *
+- * @v - signed 64 bit integer
+- * @buf - the (at least 8 byte) buffer to format the result into.
++ * bch_hprint - formats @v to human readable string for sysfs.
++ * @buf: the (at least 8 byte) buffer to format the result into.
++ * @v: signed 64 bit integer
+  *
+  * Returns the number of bytes used by format.
+  */
+@@ -225,13 +224,12 @@ void bch_time_stats_update(struct time_stats *stats, uint64_t start_time)
+ }
+ 
+ /**
+- * bch_next_delay() - increment @d by the amount of work done, and return how
+- * long to delay until the next time to do some work.
++ * bch_next_delay() - update ratelimiting statistics and calculate next delay
++ * @d: the struct bch_ratelimit to update
++ * @done: the amount of work done, in arbitrary units
+  *
+- * @d - the struct bch_ratelimit to update
+- * @done - the amount of work done, in arbitrary units
+- *
+- * Returns the amount of time to delay by, in jiffies
++ * Increment @d by the amount of work done, and return how long to delay in
++ * jiffies until the next time to do some work.
+  */
+ uint64_t bch_next_delay(struct bch_ratelimit *d, uint64_t done)
  {
- 	if (!atomic_read(&dc->has_dirty) &&
- 	    !atomic_xchg(&dc->has_dirty, 1)) {
--		refcount_inc(&dc->count);
--
- 		if (BDEV_STATE(&dc->sb) != BDEV_STATE_DIRTY) {
- 			SET_BDEV_STATE(&dc->sb, BDEV_STATE_DIRTY);
- 			/* XXX: should do this synchronously */
 -- 
 2.14.1
