@@ -1,69 +1,47 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:41551 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754915AbeCWKsq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Mar 2018 06:48:46 -0400
-Received: by mail-lf0-f65.google.com with SMTP id o102-v6so17594483lfg.8
-        for <linux-block@vger.kernel.org>; Fri, 23 Mar 2018 03:48:46 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [PATCH] lightnvm: remove function name in strings
-Date: Fri, 23 Mar 2018 11:48:12 +0100
-Message-Id: <20180323104812.31180-1-mb@lightnvm.io>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Mon, 19 Mar 2018 11:22:37 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Johannes Thumshirn <jthumshirn@suse.de>,
+	Oleksandr Natalenko <oleksandr@natalenko.name>,
+	Martin Steigerwald <martin@lichtvoll.de>, stable@vger.kernel.org
+Subject: Re: [PATCH] block: Change a rcu_read_{lock,unlock}_sched() pair into
+ rcu_read_{lock,unlock}()
+Message-ID: <20180319182237.GF519464@devbig577.frc2.facebook.com>
+References: <20180319180100.7012-1-bart.vanassche@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180319180100.7012-1-bart.vanassche@wdc.com>
+List-ID: <linux-block@vger.kernel.org>
 
-For the sysfs functions, the function names are embedded into their
-error strings. If the function name later changes, the string may
-not be updated accordingly. Update the strings to use __func__
-to avoid this.
+On Mon, Mar 19, 2018 at 11:01:00AM -0700, Bart Van Assche wrote:
+> Since neither the RCU-protected code in blk_queue_enter() nor
+> blk_queue_usage_counter_release() sleeps, regular RCU protection
+> is sufficient. Note: scsi_device_quiesce() does not have to be
+> modified since it already uses synchronize_rcu().
+> 
+> Reported-by: Tejun Heo <tj@kernel.org>
+> Fixes: 3a0a529971ec ("block, scsi: Make SCSI quiesce and resume work reliably")
+> Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> Cc: Tejun Heo <tj@kernel.org>
+> Cc: Oleksandr Natalenko <oleksandr@natalenko.name>
+> Cc: Martin Steigerwald <martin@lichtvoll.de>
+> Cc: stable@vger.kernel.org # v4.15
 
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
----
- drivers/nvme/host/lightnvm.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Acked-by: Tejun Heo <tj@kernel.org>
 
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index ffd64a83c8c3..41279da799ed 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -1028,8 +1028,8 @@ static ssize_t nvm_dev_attr_show(struct device *dev,
- 	} else {
- 		return scnprintf(page,
- 				 PAGE_SIZE,
--				 "Unhandled attr(%s) in `nvm_dev_attr_show`\n",
--				 attr->name);
-+				 "Unhandled attr(%s) in `%s`\n",
-+				 attr->name, __func__);
- 	}
- }
- 
-@@ -1103,8 +1103,8 @@ static ssize_t nvm_dev_attr_show_12(struct device *dev,
- 		return scnprintf(page, PAGE_SIZE, "%u\n", NVM_MAX_VLBA);
- 	} else {
- 		return scnprintf(page, PAGE_SIZE,
--			"Unhandled attr(%s) in `nvm_dev_attr_show_12`\n",
--			attr->name);
-+			"Unhandled attr(%s) in `%s`\n",
-+			attr->name, __func__);
- 	}
- }
- 
-@@ -1149,8 +1149,8 @@ static ssize_t nvm_dev_attr_show_20(struct device *dev,
- 		return scnprintf(page, PAGE_SIZE, "%u\n", geo->tbem);
- 	} else {
- 		return scnprintf(page, PAGE_SIZE,
--			"Unhandled attr(%s) in `nvm_dev_attr_show_20`\n",
--			attr->name);
-+			"Unhandled attr(%s) in `%s`\n",
-+			attr->name, __func__);
- 	}
- }
- 
+It'd be great to add a comment to clarify the pairing.
+
+Thanks.
+
 -- 
-2.11.0
+tejun
