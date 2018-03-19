@@ -1,125 +1,138 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from leibniz.telenet-ops.be ([195.130.137.77]:36852 "EHLO
-        leibniz.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752550AbeCPOB7 (ORCPT
+Received: from mail-pl0-f67.google.com ([209.85.160.67]:36251 "EHLO
+        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754685AbeCSAgs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Mar 2018 10:01:59 -0400
-Received: from andre.telenet-ops.be (andre.telenet-ops.be [IPv6:2a02:1800:120:4::f00:15])
-        by leibniz.telenet-ops.be (Postfix) with ESMTPS id 402n392rhfzMqdkh
-        for <linux-block@vger.kernel.org>; Fri, 16 Mar 2018 14:52:53 +0100 (CET)
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-To: Christoph Hellwig <hch@lst.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Felipe Balbi <balbi@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mark Brown <broonie@kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Alan Tull <atull@kernel.org>, Moritz Fischer <mdf@kernel.org>,
-        Wolfram Sang <wsa@the-dreams.de>,
-        Jonathan Cameron <jic23@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Matias Bjorling <mb@lightnvm.io>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        Marek Vasut <marek.vasut@gmail.com>,
-        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Richard Weinberger <richard@nod.at>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Eric Anholt <eric@anholt.net>,
-        Stefan Wahren <stefan.wahren@i2se.com>
-Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
-        linux-scsi@vger.kernel.org, alsa-devel@alsa-project.org,
-        linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        linux-fpga@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-iio@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH v2 21/21] usb: Remove depends on HAS_DMA in case of platform dependency
-Date: Fri, 16 Mar 2018 14:51:54 +0100
-Message-Id: <1521208314-4783-22-git-send-email-geert@linux-m68k.org>
-In-Reply-To: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
-References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
+        Sun, 18 Mar 2018 20:36:48 -0400
+Received: by mail-pl0-f67.google.com with SMTP id 61-v6so9232746plf.3
+        for <linux-block@vger.kernel.org>; Sun, 18 Mar 2018 17:36:47 -0700 (PDT)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Tang Junhui <tang.junhui@zte.com.cn>
+Subject: [for-4.17 06/20] bcache: fix inaccurate io state for detached bcache devices
+Date: Sun, 18 Mar 2018 17:36:19 -0700
+Message-Id: <20180319003633.27225-7-mlyle@lyle.org>
+In-Reply-To: <20180319003633.27225-1-mlyle@lyle.org>
+References: <20180319003633.27225-1-mlyle@lyle.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
-symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
-In most cases this other symbol is an architecture or platform specific
-symbol, or PCI.
+From: Tang Junhui <tang.junhui@zte.com.cn>
 
-Generic symbols and drivers without platform dependencies keep their
-dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
-cannot work anyway.
+When we run IO in a detached device,  and run iostat to shows IO status,
+normally it will show like bellow (Omitted some fields):
+Device: ... avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
+sdd        ... 15.89     0.53    1.82    0.20    2.23   1.81  52.30
+bcache0    ... 15.89   115.42    0.00    0.00    0.00   2.40  69.60
+but after IO stopped, there are still very big avgqu-sz and %util
+values as bellow:
+Device: ... avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
+bcache0   ...      0   5326.32    0.00    0.00    0.00   0.00 100.10
 
-This simplifies the dependencies, and allows to improve compile-testing.
+The reason for this issue is that, only generic_start_io_acct() called
+and no generic_end_io_acct() called for detached device in
+cached_dev_make_request(). See the code:
+//start generic_start_io_acct()
+generic_start_io_acct(q, rw, bio_sectors(bio), &d->disk->part0);
+if (cached_dev_get(dc)) {
+	//will callback generic_end_io_acct()
+}
+else {
+	//will not call generic_end_io_acct()
+}
 
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Reviewed-by: Mark Brown <broonie@kernel.org>
-Acked-by: Robin Murphy <robin.murphy@arm.com>
-Acked-by: Felipe Balbi <felipe.balbi@linux.intel.com> [drivers/usb/gadget/]
+This patch calls generic_end_io_acct() in the end of IO for detached
+devices, so we can show IO state correctly.
+
+(Modified to use GFP_NOIO in kzalloc() by Coly Li)
+
+Changelog:
+v2: fix typo.
+v1: the initial version.
+
+Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+Reviewed-by: Coly Li <colyli@suse.de>
+Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
 ---
-v2:
-  - Add Reviewed-by, Acked-by,
-  - Drop RFC state,
-  - Split per subsystem.
----
- drivers/usb/gadget/udc/Kconfig | 4 ++--
- drivers/usb/mtu3/Kconfig       | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ drivers/md/bcache/request.c | 58 +++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 51 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/usb/gadget/udc/Kconfig b/drivers/usb/gadget/udc/Kconfig
-index 0875d38476ee9395..9c3b4f86965e80c7 100644
---- a/drivers/usb/gadget/udc/Kconfig
-+++ b/drivers/usb/gadget/udc/Kconfig
-@@ -179,7 +179,7 @@ config USB_R8A66597
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 7aca308bee5b..5c8ae69c8502 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -986,6 +986,55 @@ static void cached_dev_nodata(struct closure *cl)
+ 	continue_at(cl, cached_dev_bio_complete, NULL);
+ }
  
- config USB_RENESAS_USBHS_UDC
- 	tristate 'Renesas USBHS controller'
--	depends on USB_RENESAS_USBHS && HAS_DMA
-+	depends on USB_RENESAS_USBHS
- 	help
- 	   Renesas USBHS is a discrete USB host and peripheral controller chip
- 	   that supports both full and high speed USB 2.0 data transfers.
-@@ -192,7 +192,7 @@ config USB_RENESAS_USBHS_UDC
- config USB_RENESAS_USB3
- 	tristate 'Renesas USB3.0 Peripheral controller'
- 	depends on ARCH_RENESAS || COMPILE_TEST
--	depends on EXTCON && HAS_DMA
-+	depends on EXTCON
- 	help
- 	   Renesas USB3.0 Peripheral controller is a USB peripheral controller
- 	   that supports super, high, and full speed USB 3.0 data transfers.
-diff --git a/drivers/usb/mtu3/Kconfig b/drivers/usb/mtu3/Kconfig
-index 25cd61947beea51e..c0c0eb88e5eafc74 100644
---- a/drivers/usb/mtu3/Kconfig
-+++ b/drivers/usb/mtu3/Kconfig
-@@ -2,7 +2,7 @@
++struct detached_dev_io_private {
++	struct bcache_device	*d;
++	unsigned long		start_time;
++	bio_end_io_t		*bi_end_io;
++	void			*bi_private;
++};
++
++static void detached_dev_end_io(struct bio *bio)
++{
++	struct detached_dev_io_private *ddip;
++
++	ddip = bio->bi_private;
++	bio->bi_end_io = ddip->bi_end_io;
++	bio->bi_private = ddip->bi_private;
++
++	generic_end_io_acct(ddip->d->disk->queue,
++			    bio_data_dir(bio),
++			    &ddip->d->disk->part0, ddip->start_time);
++
++	kfree(ddip);
++
++	bio->bi_end_io(bio);
++}
++
++static void detached_dev_do_request(struct bcache_device *d, struct bio *bio)
++{
++	struct detached_dev_io_private *ddip;
++	struct cached_dev *dc = container_of(d, struct cached_dev, disk);
++
++	/*
++	 * no need to call closure_get(&dc->disk.cl),
++	 * because upper layer had already opened bcache device,
++	 * which would call closure_get(&dc->disk.cl)
++	 */
++	ddip = kzalloc(sizeof(struct detached_dev_io_private), GFP_NOIO);
++	ddip->d = d;
++	ddip->start_time = jiffies;
++	ddip->bi_end_io = bio->bi_end_io;
++	ddip->bi_private = bio->bi_private;
++	bio->bi_end_io = detached_dev_end_io;
++	bio->bi_private = ddip;
++
++	if ((bio_op(bio) == REQ_OP_DISCARD) &&
++	    !blk_queue_discard(bdev_get_queue(dc->bdev)))
++		bio->bi_end_io(bio);
++	else
++		generic_make_request(bio);
++}
++
+ /* Cached devices - read & write stuff */
  
- config USB_MTU3
- 	tristate "MediaTek USB3 Dual Role controller"
--	depends on EXTCON && (USB || USB_GADGET) && HAS_DMA
-+	depends on EXTCON && (USB || USB_GADGET)
- 	depends on ARCH_MEDIATEK || COMPILE_TEST
- 	select USB_XHCI_MTK if USB_SUPPORT && USB_XHCI_HCD
- 	help
+ static blk_qc_t cached_dev_make_request(struct request_queue *q,
+@@ -1028,13 +1077,8 @@ static blk_qc_t cached_dev_make_request(struct request_queue *q,
+ 			else
+ 				cached_dev_read(dc, s);
+ 		}
+-	} else {
+-		if ((bio_op(bio) == REQ_OP_DISCARD) &&
+-		    !blk_queue_discard(bdev_get_queue(dc->bdev)))
+-			bio_endio(bio);
+-		else
+-			generic_make_request(bio);
+-	}
++	} else
++		detached_dev_do_request(d, bio);
+ 
+ 	return BLK_QC_T_NONE;
+ }
 -- 
-2.7.4
+2.14.1
