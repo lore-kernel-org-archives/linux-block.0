@@ -1,45 +1,52 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f65.google.com ([209.85.160.65]:37958 "EHLO
-        mail-pl0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754301AbeCSAgu (ORCPT
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:42612 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754737AbeCSAhD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Mar 2018 20:36:50 -0400
-Received: by mail-pl0-f65.google.com with SMTP id m22-v6so9230686pls.5
-        for <linux-block@vger.kernel.org>; Sun, 18 Mar 2018 17:36:50 -0700 (PDT)
+        Sun, 18 Mar 2018 20:37:03 -0400
+Received: by mail-pg0-f67.google.com with SMTP id o14so2013975pgv.9
+        for <linux-block@vger.kernel.org>; Sun, 18 Mar 2018 17:37:03 -0700 (PDT)
 From: Michael Lyle <mlyle@lyle.org>
 To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-Cc: axboe@fb.com, Tang Junhui <tang.junhui@zte.com.cn>
-Subject: [for-4.17 08/20] bcache: fix error return value in memory shrink
-Date: Sun, 18 Mar 2018 17:36:21 -0700
-Message-Id: <20180319003633.27225-9-mlyle@lyle.org>
+Cc: axboe@fb.com, Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [for-4.17 19/20] bcache: Reduce the number of sparse complaints about lock imbalances
+Date: Sun, 18 Mar 2018 17:36:32 -0700
+Message-Id: <20180319003633.27225-20-mlyle@lyle.org>
 In-Reply-To: <20180319003633.27225-1-mlyle@lyle.org>
 References: <20180319003633.27225-1-mlyle@lyle.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+From: Bart Van Assche <bart.vanassche@wdc.com>
 
-In bch_mca_scan(), the return value should not be the number of freed btree
-nodes, but the number of pages of freed btree nodes.
+Add more annotations for sparse to inform it about which functions do
+not have the same number of spin_lock() and spin_unlock() calls.
 
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
 Reviewed-by: Michael Lyle <mlyle@lyle.org>
 ---
- drivers/md/bcache/btree.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/md/bcache/journal.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index 39cc8a549091..b2d4899f48d5 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -719,7 +719,7 @@ static unsigned long bch_mca_scan(struct shrinker *shrink,
- 	}
- out:
- 	mutex_unlock(&c->bucket_lock);
--	return freed;
-+	return freed * c->btree_pages;
+diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
+index acd0e5c074dd..18f1b5239620 100644
+--- a/drivers/md/bcache/journal.c
++++ b/drivers/md/bcache/journal.c
+@@ -594,6 +594,7 @@ static void journal_write_done(struct closure *cl)
  }
  
- static unsigned long bch_mca_count(struct shrinker *shrink,
+ static void journal_write_unlock(struct closure *cl)
++	__releases(&c->journal.lock)
+ {
+ 	struct cache_set *c = container_of(cl, struct cache_set, journal.io);
+ 
+@@ -705,6 +706,7 @@ static void journal_try_write(struct cache_set *c)
+ 
+ static struct journal_write *journal_wait_for_write(struct cache_set *c,
+ 						    unsigned nkeys)
++	__acquires(&c->journal.lock)
+ {
+ 	size_t sectors;
+ 	struct closure cl;
 -- 
 2.14.1
