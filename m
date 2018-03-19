@@ -1,76 +1,274 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43928 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750836AbeCIDdY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 8 Mar 2018 22:33:24 -0500
-From: Ming Lei <ming.lei@redhat.com>
-To: James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Jens Axboe <axboe@fb.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, Meelis Roos <mroos@linux.ee>,
-        Don Brace <don.brace@microsemi.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Laurence Oberman <loberman@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
-        James Bottomley <james.bottomley@hansenpartnership.com>
-Subject: [PATCH V4 3/4] scsi: introduce force_blk_mq
-Date: Fri,  9 Mar 2018 11:32:17 +0800
-Message-Id: <20180309033218.23042-4-ming.lei@redhat.com>
-In-Reply-To: <20180309033218.23042-1-ming.lei@redhat.com>
-References: <20180309033218.23042-1-ming.lei@redhat.com>
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:34138 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754721AbeCSAgq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Mar 2018 20:36:46 -0400
+Received: by mail-pf0-f193.google.com with SMTP id j20so6376607pfi.1
+        for <linux-block@vger.kernel.org>; Sun, 18 Mar 2018 17:36:46 -0700 (PDT)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Coly Li <colyli@suse.de>,
+        Michael Lyle <mlyle@lyle.org>, Nix <nix@esperi.org.uk>,
+        Pavel Goran <via-bcache@pvgoran.name>,
+        Junhui Tang <tang.junhui@zte.com.cn>,
+        Hannes Reinecke <hare@suse.com>
+Subject: [for-4.17 05/20] bcache: add stop_when_cache_set_failed option to backing device
+Date: Sun, 18 Mar 2018 17:36:18 -0700
+Message-Id: <20180319003633.27225-6-mlyle@lyle.org>
+In-Reply-To: <20180319003633.27225-1-mlyle@lyle.org>
+References: <20180319003633.27225-1-mlyle@lyle.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
->From scsi driver view, it is a bit troublesome to support both blk-mq
-and non-blk-mq at the same time, especially when drivers need to support
-multi hw-queue.
+From: Coly Li <colyli@suse.de>
 
-This patch introduces 'force_blk_mq' to scsi_host_template so that drivers
-can provide blk-mq only support, so driver code can avoid the trouble
-for supporting both.
+When there are too many I/O errors on cache device, current bcache code
+will retire the whole cache set, and detach all bcache devices. But the
+detached bcache devices are not stopped, which is problematic when bcache
+is in writeback mode.
 
-Cc: Omar Sandoval <osandov@fb.com>,
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-Cc: James Bottomley <james.bottomley@hansenpartnership.com>,
-Cc: Christoph Hellwig <hch@lst.de>,
-Cc: Don Brace <don.brace@microsemi.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Laurence Oberman <loberman@redhat.com>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+If the retired cache set has dirty data of backing devices, continue
+writing to bcache device will write to backing device directly. If the
+LBA of write request has a dirty version cached on cache device, next time
+when the cache device is re-registered and backing device re-attached to
+it again, the stale dirty data on cache device will be written to backing
+device, and overwrite latest directly written data. This situation causes
+a quite data corruption.
+
+But we cannot simply stop all attached bcache devices when the cache set is
+broken or disconnected. For example, use bcache to accelerate performance
+of an email service. In such workload, if cache device is broken but no
+dirty data lost, keep the bcache device alive and permit email service
+continue to access user data might be a better solution for the cache
+device failure.
+
+Nix <nix@esperi.org.uk> points out the issue and provides the above example
+to explain why it might be necessary to not stop bcache device for broken
+cache device. Pavel Goran <via-bcache@pvgoran.name> provides a brilliant
+suggestion to provide "always" and "auto" options to per-cached device
+sysfs file stop_when_cache_set_failed. If cache set is retiring and the
+backing device has no dirty data on cache, it should be safe to keep the
+bcache device alive. In this case, if stop_when_cache_set_failed is set to
+"auto", the device failure handling code will not stop this bcache device
+and permit application to access the backing device with a unattached
+bcache device.
+
+Changelog:
+[mlyle: edited to not break string constants across lines]
+v3: fix typos pointed out by Nix.
+v2: change option values of stop_when_cache_set_failed from 1/0 to
+    "auto"/"always".
+v1: initial version, stop_when_cache_set_failed can be 0 (not stop) or 1
+    (always stop).
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
+Signed-off-by: Michael Lyle <mlyle@lyle.org>
+Cc: Nix <nix@esperi.org.uk>
+Cc: Pavel Goran <via-bcache@pvgoran.name>
+Cc: Junhui Tang <tang.junhui@zte.com.cn>
+Cc: Hannes Reinecke <hare@suse.com>
 ---
- drivers/scsi/hosts.c     | 1 +
- include/scsi/scsi_host.h | 3 +++
- 2 files changed, 4 insertions(+)
+ drivers/md/bcache/bcache.h |  9 ++++++
+ drivers/md/bcache/super.c  | 78 ++++++++++++++++++++++++++++++++++++++++------
+ drivers/md/bcache/sysfs.c  | 17 ++++++++++
+ 3 files changed, 94 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
-index 57bf43e34863..10f04b089392 100644
---- a/drivers/scsi/hosts.c
-+++ b/drivers/scsi/hosts.c
-@@ -477,6 +477,7 @@ struct Scsi_Host *scsi_host_alloc(struct scsi_host_template *sht, int privsize)
- 		shost->dma_boundary = 0xffffffff;
+diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
+index 8a0327581d62..5e9f3610c6fd 100644
+--- a/drivers/md/bcache/bcache.h
++++ b/drivers/md/bcache/bcache.h
+@@ -288,6 +288,12 @@ struct io {
+ 	sector_t		last;
+ };
  
- 	shost->use_blk_mq = scsi_use_blk_mq;
-+	shost->use_blk_mq = scsi_use_blk_mq || !!shost->hostt->force_blk_mq;
- 
- 	device_initialize(&shost->shost_gendev);
- 	dev_set_name(&shost->shost_gendev, "host%d", shost->host_no);
-diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
-index 1a1df0d21ee3..6c6366f0bd15 100644
---- a/include/scsi/scsi_host.h
-+++ b/include/scsi/scsi_host.h
-@@ -452,6 +452,9 @@ struct scsi_host_template {
- 	/* True if the controller does not support WRITE SAME */
- 	unsigned no_write_same:1;
- 
-+	/* True if the low-level driver supports blk-mq only */
-+	unsigned force_blk_mq:1;
++enum stop_on_failure {
++	BCH_CACHED_DEV_STOP_AUTO = 0,
++	BCH_CACHED_DEV_STOP_ALWAYS,
++	BCH_CACHED_DEV_STOP_MODE_MAX,
++};
 +
- 	/*
- 	 * Countdown for host blocking with no commands outstanding.
- 	 */
+ struct cached_dev {
+ 	struct list_head	list;
+ 	struct bcache_device	disk;
+@@ -380,6 +386,8 @@ struct cached_dev {
+ 	unsigned		writeback_rate_i_term_inverse;
+ 	unsigned		writeback_rate_p_term_inverse;
+ 	unsigned		writeback_rate_minimum;
++
++	enum stop_on_failure	stop_when_cache_set_failed;
+ };
+ 
+ enum alloc_reserve {
+@@ -939,6 +947,7 @@ void bch_write_bdev_super(struct cached_dev *, struct closure *);
+ 
+ extern struct workqueue_struct *bcache_wq;
+ extern const char * const bch_cache_modes[];
++extern const char * const bch_stop_on_failure_modes[];
+ extern struct mutex bch_register_lock;
+ extern struct list_head bch_cache_sets;
+ 
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index fea283e6389e..dab9f59a1a2f 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -47,6 +47,14 @@ const char * const bch_cache_modes[] = {
+ 	NULL
+ };
+ 
++/* Default is -1; we skip past it for stop_when_cache_set_failed */
++const char * const bch_stop_on_failure_modes[] = {
++	"default",
++	"auto",
++	"always",
++	NULL
++};
++
+ static struct kobject *bcache_kobj;
+ struct mutex bch_register_lock;
+ LIST_HEAD(bch_cache_sets);
+@@ -1199,6 +1207,9 @@ static int cached_dev_init(struct cached_dev *dc, unsigned block_size)
+ 		max(dc->disk.disk->queue->backing_dev_info->ra_pages,
+ 		    q->backing_dev_info->ra_pages);
+ 
++	/* default to auto */
++	dc->stop_when_cache_set_failed = BCH_CACHED_DEV_STOP_AUTO;
++
+ 	bch_cached_dev_request_init(dc);
+ 	bch_cached_dev_writeback_init(dc);
+ 	return 0;
+@@ -1475,25 +1486,72 @@ static void cache_set_flush(struct closure *cl)
+ 	closure_return(cl);
+ }
+ 
++/*
++ * This function is only called when CACHE_SET_IO_DISABLE is set, which means
++ * cache set is unregistering due to too many I/O errors. In this condition,
++ * the bcache device might be stopped, it depends on stop_when_cache_set_failed
++ * value and whether the broken cache has dirty data:
++ *
++ * dc->stop_when_cache_set_failed    dc->has_dirty   stop bcache device
++ *  BCH_CACHED_STOP_AUTO               0               NO
++ *  BCH_CACHED_STOP_AUTO               1               YES
++ *  BCH_CACHED_DEV_STOP_ALWAYS         0               YES
++ *  BCH_CACHED_DEV_STOP_ALWAYS         1               YES
++ *
++ * The expected behavior is, if stop_when_cache_set_failed is configured to
++ * "auto" via sysfs interface, the bcache device will not be stopped if the
++ * backing device is clean on the broken cache device.
++ */
++static void conditional_stop_bcache_device(struct cache_set *c,
++					   struct bcache_device *d,
++					   struct cached_dev *dc)
++{
++	if (dc->stop_when_cache_set_failed == BCH_CACHED_DEV_STOP_ALWAYS) {
++		pr_warn("stop_when_cache_set_failed of %s is \"always\", stop it for failed cache set %pU.",
++			d->disk->disk_name, c->sb.set_uuid);
++		bcache_device_stop(d);
++	} else if (atomic_read(&dc->has_dirty)) {
++		/*
++		 * dc->stop_when_cache_set_failed == BCH_CACHED_STOP_AUTO
++		 * and dc->has_dirty == 1
++		 */
++		pr_warn("stop_when_cache_set_failed of %s is \"auto\" and cache is dirty, stop it to avoid potential data corruption.",
++			d->disk->disk_name);
++			bcache_device_stop(d);
++	} else {
++		/*
++		 * dc->stop_when_cache_set_failed == BCH_CACHED_STOP_AUTO
++		 * and dc->has_dirty == 0
++		 */
++		pr_warn("stop_when_cache_set_failed of %s is \"auto\" and cache is clean, keep it alive.",
++			d->disk->disk_name);
++	}
++}
++
+ static void __cache_set_unregister(struct closure *cl)
+ {
+ 	struct cache_set *c = container_of(cl, struct cache_set, caching);
+ 	struct cached_dev *dc;
++	struct bcache_device *d;
+ 	size_t i;
+ 
+ 	mutex_lock(&bch_register_lock);
+ 
+-	for (i = 0; i < c->devices_max_used; i++)
+-		if (c->devices[i]) {
+-			if (!UUID_FLASH_ONLY(&c->uuids[i]) &&
+-			    test_bit(CACHE_SET_UNREGISTERING, &c->flags)) {
+-				dc = container_of(c->devices[i],
+-						  struct cached_dev, disk);
+-				bch_cached_dev_detach(dc);
+-			} else {
+-				bcache_device_stop(c->devices[i]);
+-			}
++	for (i = 0; i < c->devices_max_used; i++) {
++		d = c->devices[i];
++		if (!d)
++			continue;
++
++		if (!UUID_FLASH_ONLY(&c->uuids[i]) &&
++		    test_bit(CACHE_SET_UNREGISTERING, &c->flags)) {
++			dc = container_of(d, struct cached_dev, disk);
++			bch_cached_dev_detach(dc);
++			if (test_bit(CACHE_SET_IO_DISABLE, &c->flags))
++				conditional_stop_bcache_device(c, d, dc);
++		} else {
++			bcache_device_stop(d);
+ 		}
++	}
+ 
+ 	mutex_unlock(&bch_register_lock);
+ 
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index a3a45de5626d..414129f7c49f 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -78,6 +78,7 @@ rw_attribute(congested_write_threshold_us);
+ rw_attribute(sequential_cutoff);
+ rw_attribute(data_csum);
+ rw_attribute(cache_mode);
++rw_attribute(stop_when_cache_set_failed);
+ rw_attribute(writeback_metadata);
+ rw_attribute(writeback_running);
+ rw_attribute(writeback_percent);
+@@ -126,6 +127,12 @@ SHOW(__bch_cached_dev)
+ 					       bch_cache_modes + 1,
+ 					       BDEV_CACHE_MODE(&dc->sb));
+ 
++	if (attr == &sysfs_stop_when_cache_set_failed)
++		return bch_snprint_string_list(buf, PAGE_SIZE,
++					       bch_stop_on_failure_modes + 1,
++					       dc->stop_when_cache_set_failed);
++
++
+ 	sysfs_printf(data_csum,		"%i", dc->disk.data_csum);
+ 	var_printf(verify,		"%i");
+ 	var_printf(bypass_torture_test,	"%i");
+@@ -247,6 +254,15 @@ STORE(__cached_dev)
+ 		}
+ 	}
+ 
++	if (attr == &sysfs_stop_when_cache_set_failed) {
++		v = bch_read_string_list(buf, bch_stop_on_failure_modes + 1);
++
++		if (v < 0)
++			return v;
++
++		dc->stop_when_cache_set_failed = v;
++	}
++
+ 	if (attr == &sysfs_label) {
+ 		if (size > SB_LABEL_SIZE)
+ 			return -EINVAL;
+@@ -326,6 +342,7 @@ static struct attribute *bch_cached_dev_files[] = {
+ 	&sysfs_data_csum,
+ #endif
+ 	&sysfs_cache_mode,
++	&sysfs_stop_when_cache_set_failed,
+ 	&sysfs_writeback_metadata,
+ 	&sysfs_writeback_running,
+ 	&sysfs_writeback_delay,
 -- 
-2.9.5
+2.14.1
