@@ -1,41 +1,37 @@
-Return-Path: <colin.king@canonical.com>
-From: Colin King <colin.king@canonical.com>
-To: Ilya Dryomov <idryomov@gmail.com>,
-	Sage Weil <sage@redhat.com>,
-	Alex Elder <elder@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	ceph-devel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
+Return-Path: <scott.bauer@intel.com>
+Date: Mon, 19 Mar 2018 13:41:26 -0600
+From: Scott Bauer <scott.bauer@intel.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
+	Jonathan Derrick <jonathan.derrick@intel.com>,
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] rbd: fix spelling mistake: "reregisteration" -> "re-registration"
-Date: Mon, 19 Mar 2018 13:33:10 +0000
-Message-Id: <20180319133310.4251-1-colin.king@canonical.com>
+Subject: Re: [PATCH v2 06/11] block: sed-opal: split generation of bytestring
+ header and content
+Message-ID: <20180319194126.ldamexpmw4ji7qi6@sbauer-Z170X-UD5>
+References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
+ <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
+ <0f5fe62576e70de12515e323ca5c0a45ef92832d.1521482296.git.jonas.rabenstein@studium.uni-erlangen.de>
+ <20180319195945.GH3380@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180319195945.GH3380@lst.de>
 List-ID: <linux-block@vger.kernel.org>
 
-From: Colin Ian King <colin.king@canonical.com>
+On Mon, Mar 19, 2018 at 08:59:45PM +0100, Christoph Hellwig wrote:
+> > +static u8 *add_bytestring_header(int *err, struct opal_dev *cmd, size_t len)
+> >  {
+> >  	size_t header_len = 1;
+> >  	bool is_short_atom = true;
+> > -
+> > -	if (*err)
+> > -		return;
+> > +	char *start;
+> 
+> Shouldn't this also return early if we have a pending error?
 
-Trivial fix to spelling mistake in rdb_warn message text
-
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- drivers/block/rbd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-index 1e03b04819c8..7b97240ff15e 100644
---- a/drivers/block/rbd.c
-+++ b/drivers/block/rbd.c
-@@ -3887,7 +3887,7 @@ static void rbd_reregister_watch(struct work_struct *work)
- 
- 	ret = rbd_dev_refresh(rbd_dev);
- 	if (ret)
--		rbd_warn(rbd_dev, "reregisteration refresh failed: %d", ret);
-+		rbd_warn(rbd_dev, "re-registration refresh failed: %d", ret);
- }
- 
- /*
--- 
-2.15.1
+It will short circuit and bail out via can_add failing. So even though
+you have to go dig to see if the following functions handle the erorr
+I think it's slightly cleaner to have a single if (*err) in the deeper functions.
+This lest the error back out the call chain instead of having multiple if (*err)
+checks earlier in the call chains.
