@@ -1,266 +1,220 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:33915 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1427186AbeCBPWE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Mar 2018 10:22:04 -0500
-Received: by mail-wm0-f68.google.com with SMTP id a20so3417936wmd.1
-        for <linux-block@vger.kernel.org>; Fri, 02 Mar 2018 07:22:03 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 08/12] lightnvm: implement get log report chunk helpers
-Date: Fri,  2 Mar 2018 16:21:16 +0100
-Message-Id: <1520004080-27760-9-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1520004080-27760-1-git-send-email-javier@cnexlabs.com>
-References: <1520004080-27760-1-git-send-email-javier@cnexlabs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jonas.rabenstein@studium.uni-erlangen.de>
+From: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+To: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
+	Scott Bauer <scott.bauer@intel.com>,
+	Jonathan Derrick <jonathan.derrick@intel.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v2 09/11] block: sed-opal: unify retrieval of table columns
+Date: Mon, 19 Mar 2018 19:36:51 +0100
+Message-Id: <0cb968f26381001513c188a13cbc92b76a305712.1521482296.git.jonas.rabenstein@studium.uni-erlangen.de>
+In-Reply-To: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
+References: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
+In-Reply-To: <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
+References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de> <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
+List-ID: <linux-block@vger.kernel.org>
 
-The 2.0 spec provides a report chunk log page that can be retrieved
-using the stangard nvme get log page. This replaces the dedicated
-get/put bad block table in 1.2.
+Instead of having multiple places defining the same argument list to get
+a specific column of a sed-opal table, provide a generic version and
+call it from those functions.
 
-This patch implements the helper functions to allow targets retrieve the
-chunk metadata using get log page. It makes nvme_get_log_ext available
-outside of nvme core so that we can use it form lightnvm.
+Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/core.c      | 11 +++++++
- drivers/nvme/host/core.c     |  6 ++--
- drivers/nvme/host/lightnvm.c | 74 ++++++++++++++++++++++++++++++++++++++++++++
- drivers/nvme/host/nvme.h     |  3 ++
- include/linux/lightnvm.h     | 24 ++++++++++++++
- 5 files changed, 115 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index ed33e0b11788..4141871f460d 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -712,6 +712,17 @@ static void nvm_free_rqd_ppalist(struct nvm_tgt_dev *tgt_dev,
- 	nvm_dev_dma_free(tgt_dev->parent, rqd->ppa_list, rqd->dma_ppa_list);
- }
- 
-+int nvm_get_chunk_meta(struct nvm_tgt_dev *tgt_dev, struct nvm_chk_meta *meta,
-+		struct ppa_addr ppa, int nchks)
-+{
-+	struct nvm_dev *dev = tgt_dev->parent;
-+
-+	nvm_ppa_tgt_to_dev(tgt_dev, &ppa, 1);
-+
-+	return dev->ops->get_chk_meta(tgt_dev->parent, meta,
-+						(sector_t)ppa.ppa, nchks);
-+}
-+EXPORT_SYMBOL(nvm_get_chunk_meta);
- 
- int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas,
- 		       int nr_ppas, int type)
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 2e9e9f973a75..af642ce6ba69 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2127,9 +2127,9 @@ static int nvme_init_subsystem(struct nvme_ctrl *ctrl, struct nvme_id_ctrl *id)
- 	return ret;
- }
- 
--static int nvme_get_log_ext(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
--			    u8 log_page, void *log,
--			    size_t size, size_t offset)
-+int nvme_get_log_ext(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
-+		     u8 log_page, void *log,
-+		     size_t size, size_t offset)
- {
- 	struct nvme_command c = { };
- 	unsigned long dwlen = size / 4 - 1;
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index 08f0f6b5bc06..ffd64a83c8c3 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -35,6 +35,10 @@ enum nvme_nvm_admin_opcode {
- 	nvme_nvm_admin_set_bb_tbl	= 0xf1,
- };
- 
-+enum nvme_nvm_log_page {
-+	NVME_NVM_LOG_REPORT_CHUNK	= 0xca,
-+};
-+
- struct nvme_nvm_ph_rw {
- 	__u8			opcode;
- 	__u8			flags;
-@@ -236,6 +240,16 @@ struct nvme_nvm_id20 {
- 	__u8			vs[1024];
- };
- 
-+struct nvme_nvm_chk_meta {
-+	__u8	state;
-+	__u8	type;
-+	__u8	wi;
-+	__u8	rsvd[5];
-+	__le64	slba;
-+	__le64	cnlb;
-+	__le64	wp;
-+};
-+
- /*
-  * Check we didn't inadvertently grow the command struct
-  */
-@@ -252,6 +266,9 @@ static inline void _nvme_nvm_check_size(void)
- 	BUILD_BUG_ON(sizeof(struct nvme_nvm_bb_tbl) != 64);
- 	BUILD_BUG_ON(sizeof(struct nvme_nvm_id20_addrf) != 8);
- 	BUILD_BUG_ON(sizeof(struct nvme_nvm_id20) != NVME_IDENTIFY_DATA_SIZE);
-+	BUILD_BUG_ON(sizeof(struct nvme_nvm_chk_meta) != 32);
-+	BUILD_BUG_ON(sizeof(struct nvme_nvm_chk_meta) !=
-+						sizeof(struct nvm_chk_meta));
- }
- 
- static void nvme_nvm_set_addr_12(struct nvm_addrf_12 *dst,
-@@ -552,6 +569,61 @@ static int nvme_nvm_set_bb_tbl(struct nvm_dev *nvmdev, struct ppa_addr *ppas,
- 	return ret;
+diff --git a/block/opal_proto.h b/block/opal_proto.h
+index e20be8258854..b6e352cfe982 100644
+--- a/block/opal_proto.h
++++ b/block/opal_proto.h
+@@ -170,6 +170,8 @@ enum opal_token {
+ 	OPAL_READLOCKED = 0x07,
+ 	OPAL_WRITELOCKED = 0x08,
+ 	OPAL_ACTIVEKEY = 0x0A,
++	/* lockingsp table */
++	OPAL_LIFECYCLE = 0x06,
+ 	/* locking info table */
+ 	OPAL_MAXRANGES = 0x04,
+ 	 /* mbr control */
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index 4549fa164e98..5b7b23cb95a4 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -1076,6 +1076,37 @@ static int finalize_and_send(struct opal_dev *dev, cont_fn cont)
+ 	return opal_send_recv(dev, cont);
  }
  
 +/*
-+ * Expect the lba in device format
++ * request @column from table @table on device @dev. On success, the column
++ * data will be available in dev->resp->tok[4]
 + */
-+static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
-+				 struct nvm_chk_meta *meta,
-+				 sector_t slba, int nchks)
++static int generic_get_column(struct opal_dev *dev, const u8 *table,
++			      u64 column)
 +{
-+	struct nvm_geo *geo = &ndev->geo;
-+	struct nvme_ns *ns = ndev->q->queuedata;
-+	struct nvme_ctrl *ctrl = ns->ctrl;
-+	struct nvme_nvm_chk_meta *dev_meta = (struct nvme_nvm_chk_meta *)meta;
-+	struct ppa_addr ppa;
-+	size_t left = nchks * sizeof(struct nvme_nvm_chk_meta);
-+	size_t log_pos, offset, len;
-+	int ret, i;
++	int err;
 +
-+	/* Normalize lba address space to obtain log offset */
-+	ppa.ppa = slba;
-+	ppa = dev_to_generic_addr(ndev, ppa);
++	err = start_opal_cmd(dev, table, opalmethod[OPAL_GET]);
 +
-+	log_pos = ppa.m.chk;
-+	log_pos += ppa.m.pu * geo->num_chk;
-+	log_pos += ppa.m.grp * geo->num_lun * geo->num_chk;
++	add_token_u8(&err, dev, OPAL_STARTLIST);
 +
-+	offset = log_pos * sizeof(struct nvme_nvm_chk_meta);
++	add_token_u8(&err, dev, OPAL_STARTNAME);
++	add_token_u8(&err, dev, OPAL_STARTCOLUMN);
++	add_token_u64(&err, dev, column);
++	add_token_u8(&err, dev, OPAL_ENDNAME);
 +
-+	while (left) {
-+		len = min_t(unsigned int, left, ctrl->max_hw_sectors << 9);
++	add_token_u8(&err, dev, OPAL_STARTNAME);
++	add_token_u8(&err, dev, OPAL_ENDCOLUMN);
++	add_token_u64(&err, dev, column);
++	add_token_u8(&err, dev, OPAL_ENDNAME);
 +
-+		ret = nvme_get_log_ext(ctrl, ns, NVME_NVM_LOG_REPORT_CHUNK,
-+				dev_meta, len, offset);
-+		if (ret) {
-+			dev_err(ctrl->device, "Get REPORT CHUNK log error\n");
-+			break;
-+		}
++	add_token_u8(&err, dev, OPAL_ENDLIST);
 +
-+		for (i = 0; i < len; i += sizeof(struct nvme_nvm_chk_meta)) {
-+			meta->state = dev_meta->state;
-+			meta->type = dev_meta->type;
-+			meta->wi = dev_meta->wi;
-+			meta->slba = le64_to_cpu(dev_meta->slba);
-+			meta->cnlb = le64_to_cpu(dev_meta->cnlb);
-+			meta->wp = le64_to_cpu(dev_meta->wp);
++	if (err)
++		return err;
 +
-+			meta++;
-+			dev_meta++;
-+		}
-+
-+		offset += len;
-+		left -= len;
-+	}
-+
-+	return ret;
++	return finalize_and_send(dev, parse_and_check_status);
 +}
 +
- static inline void nvme_nvm_rqtocmd(struct nvm_rq *rqd, struct nvme_ns *ns,
- 				    struct nvme_nvm_command *c)
+ static int gen_key(struct opal_dev *dev, void *data)
  {
-@@ -683,6 +755,8 @@ static struct nvm_dev_ops nvme_nvm_dev_ops = {
- 	.get_bb_tbl		= nvme_nvm_get_bb_tbl,
- 	.set_bb_tbl		= nvme_nvm_set_bb_tbl,
+ 	u8 uid[OPAL_UID_LENGTH];
+@@ -1130,23 +1161,11 @@ static int get_active_key(struct opal_dev *dev, void *data)
+ 	if (err)
+ 		return err;
  
-+	.get_chk_meta		= nvme_nvm_get_chk_meta,
-+
- 	.submit_io		= nvme_nvm_submit_io,
- 	.submit_io_sync		= nvme_nvm_submit_io_sync,
+-	err = start_opal_cmd(dev, uid, opalmethod[OPAL_GET]);
+-	add_token_u8(&err, dev, OPAL_STARTLIST);
+-	add_token_u8(&err, dev, OPAL_STARTNAME);
+-	add_token_u8(&err, dev, 3); /* startCloumn */
+-	add_token_u8(&err, dev, 10); /* ActiveKey */
+-	add_token_u8(&err, dev, OPAL_ENDNAME);
+-	add_token_u8(&err, dev, OPAL_STARTNAME);
+-	add_token_u8(&err, dev, 4); /* endColumn */
+-	add_token_u8(&err, dev, 10); /* ActiveKey */
+-	add_token_u8(&err, dev, OPAL_ENDNAME);
+-	add_token_u8(&err, dev, OPAL_ENDLIST);
+-	if (err) {
+-		pr_debug("Error building get active key command\n");
++	err = generic_get_column(dev, uid, OPAL_ACTIVEKEY);
++	if (err)
+ 		return err;
+-	}
  
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 1ca08f4993ba..505f797f8c6c 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -396,6 +396,9 @@ int nvme_reset_ctrl(struct nvme_ctrl *ctrl);
- int nvme_delete_ctrl(struct nvme_ctrl *ctrl);
- int nvme_delete_ctrl_sync(struct nvme_ctrl *ctrl);
+-	return finalize_and_send(dev, get_active_key_cont);
++	return get_active_key_cont(dev);
+ }
  
-+int nvme_get_log_ext(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
-+		     u8 log_page, void *log, size_t size, size_t offset);
-+
- extern const struct attribute_group nvme_ns_id_attr_group;
- extern const struct block_device_operations nvme_ns_head_ops;
+ static int generic_lr_enable_disable(struct opal_dev *dev,
+@@ -1801,14 +1820,16 @@ static int activate_lsp(struct opal_dev *dev, void *data)
+ 	return finalize_and_send(dev, parse_and_check_status);
+ }
  
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index f3b273e543c3..da45efa09bb2 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -81,10 +81,13 @@ struct nvm_rq;
- struct nvm_id;
- struct nvm_dev;
- struct nvm_tgt_dev;
-+struct nvm_chk_meta;
+-static int get_lsp_lifecycle_cont(struct opal_dev *dev)
++/* Determine if we're in the Manufactured Inactive or Active state */
++static int get_lsp_lifecycle(struct opal_dev *dev, void *data)
+ {
+ 	u8 lc_status;
+-	int error = 0;
++	int err;
  
- typedef int (nvm_id_fn)(struct nvm_dev *);
- typedef int (nvm_op_bb_tbl_fn)(struct nvm_dev *, struct ppa_addr, u8 *);
- typedef int (nvm_op_set_bb_fn)(struct nvm_dev *, struct ppa_addr *, int, int);
-+typedef int (nvm_get_chk_meta_fn)(struct nvm_dev *, struct nvm_chk_meta *,
-+								sector_t, int);
- typedef int (nvm_submit_io_fn)(struct nvm_dev *, struct nvm_rq *);
- typedef int (nvm_submit_io_sync_fn)(struct nvm_dev *, struct nvm_rq *);
- typedef void *(nvm_create_dma_pool_fn)(struct nvm_dev *, char *);
-@@ -98,6 +101,8 @@ struct nvm_dev_ops {
- 	nvm_op_bb_tbl_fn	*get_bb_tbl;
- 	nvm_op_set_bb_fn	*set_bb_tbl;
+-	error = parse_and_check_status(dev);
+-	if (error)
+-		return error;
++	err = generic_get_column(dev, opaluid[OPAL_LOCKINGSP_UID],
++				 OPAL_LIFECYCLE);
++	if (err)
++		return err;
  
-+	nvm_get_chk_meta_fn	*get_chk_meta;
-+
- 	nvm_submit_io_fn	*submit_io;
- 	nvm_submit_io_sync_fn	*submit_io_sync;
+ 	lc_status = response_get_u64(&dev->parsed, 4);
+ 	/* 0x08 is Manufacured Inactive */
+@@ -1821,49 +1842,19 @@ static int get_lsp_lifecycle_cont(struct opal_dev *dev)
+ 	return 0;
+ }
  
-@@ -227,6 +232,20 @@ struct nvm_addrf {
- 	u64	rsv_mask[2];
- };
+-/* Determine if we're in the Manufactured Inactive or Active state */
+-static int get_lsp_lifecycle(struct opal_dev *dev, void *data)
+-{
+-	int err;
+-
+-	err = start_opal_cmd(dev, opaluid[OPAL_LOCKINGSP_UID],
+-			     opalmethod[OPAL_GET]);
+-
+-	add_token_u8(&err, dev, OPAL_STARTLIST);
+-
+-	add_token_u8(&err, dev, OPAL_STARTNAME);
+-	add_token_u8(&err, dev, 3); /* Start Column */
+-	add_token_u8(&err, dev, 6); /* Lifecycle Column */
+-	add_token_u8(&err, dev, OPAL_ENDNAME);
+-
+-	add_token_u8(&err, dev, OPAL_STARTNAME);
+-	add_token_u8(&err, dev, 4); /* End Column */
+-	add_token_u8(&err, dev, 6); /* Lifecycle Column */
+-	add_token_u8(&err, dev, OPAL_ENDNAME);
+-
+-	add_token_u8(&err, dev, OPAL_ENDLIST);
+-
+-	if (err) {
+-		pr_debug("Error Building GET Lifecycle Status command\n");
+-		return err;
+-	}
+-
+-	return finalize_and_send(dev, get_lsp_lifecycle_cont);
+-}
+-
+-static int get_msid_cpin_pin_cont(struct opal_dev *dev)
++static int get_msid_cpin_pin(struct opal_dev *dev, void *data)
+ {
+ 	const char *msid_pin;
+ 	size_t strlen;
+-	int error = 0;
++	int err;
  
-+/*
-+ * Note: The structure size is linked to nvme_nvm_chk_meta such that the same
-+ * buffer can be used when converting from little endian to cpu addressing.
-+ */
-+struct nvm_chk_meta {
-+	u8	state;
-+	u8	type;
-+	u8	wi;
-+	u8	rsvd[5];
-+	u64	slba;
-+	u64	cnlb;
-+	u64	wp;
-+};
-+
- struct nvm_target {
- 	struct list_head list;
- 	struct nvm_tgt_dev *dev;
-@@ -492,6 +511,11 @@ extern struct nvm_dev *nvm_alloc_dev(int);
- extern int nvm_register(struct nvm_dev *);
- extern void nvm_unregister(struct nvm_dev *);
+-	error = parse_and_check_status(dev);
+-	if (error)
+-		return error;
++	err = generic_get_column(dev, opaluid[OPAL_C_PIN_MSID], OPAL_PIN);
++	if (err)
++		return err;
  
-+
-+extern int nvm_get_chunk_meta(struct nvm_tgt_dev *tgt_dev,
-+			      struct nvm_chk_meta *meta, struct ppa_addr ppa,
-+			      int nchks);
-+
- extern int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr *,
- 			      int, int);
- extern int nvm_submit_io(struct nvm_tgt_dev *, struct nvm_rq *);
+ 	strlen = response_get_string(&dev->parsed, 4, &msid_pin);
+ 	if (!msid_pin) {
+-		pr_debug("%s: Couldn't extract PIN from response\n", __func__);
++		pr_debug("Couldn't extract MSID_CPIN from response\n");
+ 		return OPAL_INVAL_PARAM;
+ 	}
+ 
+@@ -1876,33 +1867,6 @@ static int get_msid_cpin_pin_cont(struct opal_dev *dev)
+ 	return 0;
+ }
+ 
+-static int get_msid_cpin_pin(struct opal_dev *dev, void *data)
+-{
+-	int err;
+-
+-	err = start_opal_cmd(dev, opaluid[OPAL_C_PIN_MSID],
+-			     opalmethod[OPAL_GET]);
+-
+-	add_token_u8(&err, dev, OPAL_STARTLIST);
+-	add_token_u8(&err, dev, OPAL_STARTNAME);
+-	add_token_u8(&err, dev, 3); /* Start Column */
+-	add_token_u8(&err, dev, 3); /* PIN */
+-	add_token_u8(&err, dev, OPAL_ENDNAME);
+-
+-	add_token_u8(&err, dev, OPAL_STARTNAME);
+-	add_token_u8(&err, dev, 4); /* End Column */
+-	add_token_u8(&err, dev, 3); /* Lifecycle Column */
+-	add_token_u8(&err, dev, OPAL_ENDNAME);
+-	add_token_u8(&err, dev, OPAL_ENDLIST);
+-
+-	if (err) {
+-		pr_debug("Error building Get MSID CPIN PIN command.\n");
+-		return err;
+-	}
+-
+-	return finalize_and_send(dev, get_msid_cpin_pin_cont);
+-}
+-
+ static int end_opal_session(struct opal_dev *dev, void *data)
+ {
+ 	int err = 0;
 -- 
-2.7.4
+2.16.1
