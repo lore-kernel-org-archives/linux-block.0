@@ -1,97 +1,49 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from andre.telenet-ops.be ([195.130.132.53]:58594 "EHLO
-        andre.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753363AbeCPNxb (ORCPT
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:44108 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754845AbeCSAhB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Mar 2018 09:53:31 -0400
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-To: Christoph Hellwig <hch@lst.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Felipe Balbi <balbi@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mark Brown <broonie@kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Alan Tull <atull@kernel.org>, Moritz Fischer <mdf@kernel.org>,
-        Wolfram Sang <wsa@the-dreams.de>,
-        Jonathan Cameron <jic23@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Matias Bjorling <mb@lightnvm.io>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        Marek Vasut <marek.vasut@gmail.com>,
-        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Richard Weinberger <richard@nod.at>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Eric Anholt <eric@anholt.net>,
-        Stefan Wahren <stefan.wahren@i2se.com>
-Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
-        linux-scsi@vger.kernel.org, alsa-devel@alsa-project.org,
-        linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        linux-fpga@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-iio@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH v2 17/21] scsi: hisi_sas: Remove depends on HAS_DMA in case of platform dependency
-Date: Fri, 16 Mar 2018 14:51:50 +0100
-Message-Id: <1521208314-4783-18-git-send-email-geert@linux-m68k.org>
-In-Reply-To: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
-References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
+        Sun, 18 Mar 2018 20:37:01 -0400
+Received: by mail-pg0-f66.google.com with SMTP id l4so6251553pgp.11
+        for <linux-block@vger.kernel.org>; Sun, 18 Mar 2018 17:37:01 -0700 (PDT)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [for-4.17 17/20] bcache: Remove an unused variable
+Date: Sun, 18 Mar 2018 17:36:30 -0700
+Message-Id: <20180319003633.27225-18-mlyle@lyle.org>
+In-Reply-To: <20180319003633.27225-1-mlyle@lyle.org>
+References: <20180319003633.27225-1-mlyle@lyle.org>
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
-symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
-In most cases this other symbol is an architecture or platform specific
-symbol, or PCI.
+From: Bart Van Assche <bart.vanassche@wdc.com>
 
-Generic symbols and drivers without platform dependencies keep their
-dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
-cannot work anyway.
-
-This simplifies the dependencies, and allows to improve compile-testing.
-
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Reviewed-by: Mark Brown <broonie@kernel.org>
-Acked-by: Robin Murphy <robin.murphy@arm.com>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
 ---
-v2:
-  - Add Reviewed-by, Acked-by,
-  - Drop RFC state,
-  - Split per subsystem.
----
- drivers/scsi/hisi_sas/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/md/bcache/extents.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/drivers/scsi/hisi_sas/Kconfig b/drivers/scsi/hisi_sas/Kconfig
-index d42f29a5eb65046d..57183fce70fb6355 100644
---- a/drivers/scsi/hisi_sas/Kconfig
-+++ b/drivers/scsi/hisi_sas/Kconfig
-@@ -1,6 +1,6 @@
- config SCSI_HISI_SAS
- 	tristate "HiSilicon SAS"
--	depends on HAS_DMA && HAS_IOMEM
-+	depends on HAS_IOMEM
- 	depends on ARM64 || COMPILE_TEST
- 	select SCSI_SAS_LIBSAS
- 	select BLK_DEV_INTEGRITY
+diff --git a/drivers/md/bcache/extents.c b/drivers/md/bcache/extents.c
+index f9d391711595..c334e6666461 100644
+--- a/drivers/md/bcache/extents.c
++++ b/drivers/md/bcache/extents.c
+@@ -534,7 +534,6 @@ static bool bch_extent_bad_expensive(struct btree *b, const struct bkey *k,
+ static bool bch_extent_bad(struct btree_keys *bk, const struct bkey *k)
+ {
+ 	struct btree *b = container_of(bk, struct btree, keys);
+-	struct bucket *g;
+ 	unsigned i, stale;
+ 
+ 	if (!KEY_PTRS(k) ||
+@@ -549,7 +548,6 @@ static bool bch_extent_bad(struct btree_keys *bk, const struct bkey *k)
+ 		return false;
+ 
+ 	for (i = 0; i < KEY_PTRS(k); i++) {
+-		g = PTR_BUCKET(b->c, k, i);
+ 		stale = ptr_stale(b->c, k, i);
+ 
+ 		btree_bug_on(stale > 96, b,
 -- 
-2.7.4
+2.14.1
