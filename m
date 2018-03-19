@@ -1,117 +1,59 @@
-Return-Path: <gunthorp@deltatee.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvdimm@lists.01.org,
-	linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Logan Gunthorpe <logang@deltatee.com>
-Date: Mon, 12 Mar 2018 13:35:23 -0600
-Message-Id: <20180312193525.2855-10-logang@deltatee.com>
-In-Reply-To: <20180312193525.2855-1-logang@deltatee.com>
-References: <20180312193525.2855-1-logang@deltatee.com>
-Subject: [PATCH v3 09/11] nvme-pci: Add support for P2P memory in requests
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-pl0-f68.google.com ([209.85.160.68]:41169 "EHLO
+        mail-pl0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754301AbeCSAg4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Mar 2018 20:36:56 -0400
+Received: by mail-pl0-f68.google.com with SMTP id b7-v6so5143319plr.8
+        for <linux-block@vger.kernel.org>; Sun, 18 Mar 2018 17:36:56 -0700 (PDT)
+From: Michael Lyle <mlyle@lyle.org>
+To: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Cc: axboe@fb.com, Bart Van Assche <bart.vanassche@wdc.com>
+Subject: [for-4.17 13/20] bcache: Fix indentation
+Date: Sun, 18 Mar 2018 17:36:26 -0700
+Message-Id: <20180319003633.27225-14-mlyle@lyle.org>
+In-Reply-To: <20180319003633.27225-1-mlyle@lyle.org>
+References: <20180319003633.27225-1-mlyle@lyle.org>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-For P2P requests, we must use the pci_p2pmem_[un]map_sg() functions
-instead of the dma_map_sg functions.
+From: Bart Van Assche <bart.vanassche@wdc.com>
 
-With that, we can then indicate PCI_P2P support in the request queue.
-For this, we create an NVME_F_PCI_P2P flag which tells the core to
-set QUEUE_FLAG_PCI_P2P in the request queue.
+This patch avoids that smatch complains about inconsistent indentation.
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Reviewed-by: Michael Lyle <mlyle@lyle.org>
+Reviewed-by: Coly Li <colyli@suse.de>
 ---
- drivers/nvme/host/core.c |  4 ++++
- drivers/nvme/host/nvme.h |  1 +
- drivers/nvme/host/pci.c  | 19 +++++++++++++++----
- 3 files changed, 20 insertions(+), 4 deletions(-)
+ drivers/md/bcache/btree.c     | 2 +-
+ drivers/md/bcache/writeback.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 7aeca5db7916..c7c5de116720 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2949,7 +2949,11 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 	ns->queue = blk_mq_init_queue(ctrl->tagset);
- 	if (IS_ERR(ns->queue))
- 		goto out_free_ns;
-+
- 	queue_flag_set_unlocked(QUEUE_FLAG_NONROT, ns->queue);
-+	if (ctrl->ops->flags & NVME_F_PCI_P2PDMA)
-+		queue_flag_set_unlocked(QUEUE_FLAG_PCI_P2PDMA, ns->queue);
-+
- 	ns->queue->queuedata = ns;
- 	ns->ctrl = ctrl;
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index d64aff0b8abc..143ed5a758e7 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -2178,7 +2178,7 @@ int bch_btree_insert_check_key(struct btree *b, struct btree_op *op,
  
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index d733b14ede9d..1fb2b6603d49 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -290,6 +290,7 @@ struct nvme_ctrl_ops {
- 	unsigned int flags;
- #define NVME_F_FABRICS			(1 << 0)
- #define NVME_F_METADATA_SUPPORTED	(1 << 1)
-+#define NVME_F_PCI_P2PDMA		(1 << 2)
- 	int (*reg_read32)(struct nvme_ctrl *ctrl, u32 off, u32 *val);
- 	int (*reg_write32)(struct nvme_ctrl *ctrl, u32 off, u32 val);
- 	int (*reg_read64)(struct nvme_ctrl *ctrl, u32 off, u64 *val);
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 1fb57fa42dd0..0ebab7ab4d7e 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -796,8 +796,13 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
- 		goto out;
+ 		if (b->key.ptr[0] != btree_ptr ||
+                    b->seq != seq + 1) {
+-                       op->lock = b->level;
++			op->lock = b->level;
+ 			goto out;
+                }
+ 	}
+diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
+index 0bba8f1c6cdf..610fb01de629 100644
+--- a/drivers/md/bcache/writeback.h
++++ b/drivers/md/bcache/writeback.h
+@@ -39,7 +39,7 @@ static inline uint64_t  bcache_flash_devs_sectors_dirty(struct cache_set *c)
  
- 	ret = BLK_STS_RESOURCE;
--	nr_mapped = dma_map_sg_attrs(dev->dev, iod->sg, iod->nents, dma_dir,
--			DMA_ATTR_NO_WARN);
-+
-+	if (REQ_IS_PCI_P2PDMA(req))
-+		nr_mapped = pci_p2pdma_map_sg(dev->dev, iod->sg, iod->nents,
-+					  dma_dir);
-+	else
-+		nr_mapped = dma_map_sg_attrs(dev->dev, iod->sg, iod->nents,
-+					     dma_dir,  DMA_ATTR_NO_WARN);
- 	if (!nr_mapped)
- 		goto out;
+ 		if (!d || !UUID_FLASH_ONLY(&c->uuids[i]))
+ 			continue;
+-	   ret += bcache_dev_sectors_dirty(d);
++		ret += bcache_dev_sectors_dirty(d);
+ 	}
  
-@@ -842,7 +847,12 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
- 			DMA_TO_DEVICE : DMA_FROM_DEVICE;
- 
- 	if (iod->nents) {
--		dma_unmap_sg(dev->dev, iod->sg, iod->nents, dma_dir);
-+		if (REQ_IS_PCI_P2PDMA(req))
-+			pci_p2pdma_unmap_sg(dev->dev, iod->sg, iod->nents,
-+					    dma_dir);
-+		else
-+			dma_unmap_sg(dev->dev, iod->sg, iod->nents, dma_dir);
-+
- 		if (blk_integrity_rq(req)) {
- 			if (req_op(req) == REQ_OP_READ)
- 				nvme_dif_remap(req, nvme_dif_complete);
-@@ -2426,7 +2436,8 @@ static int nvme_pci_reg_read64(struct nvme_ctrl *ctrl, u32 off, u64 *val)
- static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
- 	.name			= "pcie",
- 	.module			= THIS_MODULE,
--	.flags			= NVME_F_METADATA_SUPPORTED,
-+	.flags			= NVME_F_METADATA_SUPPORTED |
-+				  NVME_F_PCI_P2PDMA,
- 	.reg_read32		= nvme_pci_reg_read32,
- 	.reg_write32		= nvme_pci_reg_write32,
- 	.reg_read64		= nvme_pci_reg_read64,
+ 	mutex_unlock(&bch_register_lock);
 -- 
-2.11.0
+2.14.1
