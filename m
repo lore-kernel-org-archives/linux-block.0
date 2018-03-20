@@ -1,109 +1,45 @@
-Return-Path: <linux-ide-owner@vger.kernel.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-To: Christoph Hellwig <hch@lst.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Felipe Balbi <balbi@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mark Brown <broonie@kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Alan Tull <atull@kernel.org>, Moritz Fischer <mdf@kernel.org>,
-        Wolfram Sang <wsa@the-dreams.de>,
-        Jonathan Cameron <jic23@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Matias Bjorling <mb@lightnvm.io>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        Marek Vasut <marek.vasut@gmail.com>,
-        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Richard Weinberger <richard@nod.at>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Eric Anholt <eric@anholt.net>,
-        Stefan Wahren <stefan.wahren@i2se.com>
-Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
-        linux-scsi@vger.kernel.org, alsa-devel@alsa-project.org,
-        linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        linux-fpga@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-iio@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH v2 11/21] mailbox: Remove depends on HAS_DMA in case of platform dependency
-Date: Fri, 16 Mar 2018 14:51:44 +0100
-Message-Id: <1521208314-4783-12-git-send-email-geert@linux-m68k.org>
-In-Reply-To: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
-References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
-Sender: linux-ide-owner@vger.kernel.org
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+To: "Bityutskiy\, Artem" <artem.bityutskiy@intel.com>
+Cc: "martin.petersen\@oracle.com" <martin.petersen@oracle.com>,
+        "James.Bottomley\@HansenPartnership.com"
+        <James.Bottomley@HansenPartnership.com>,
+        "axboe\@fb.com" <axboe@fb.com>,
+        "ming.lei\@redhat.com" <ming.lei@redhat.com>,
+        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "snitzer\@redhat.com" <snitzer@redhat.com>,
+        "hch\@lst.de" <hch@lst.de>, "hare\@suse.de" <hare@suse.de>,
+        "mroos\@linux.ee" <mroos@linux.ee>,
+        "linux-scsi\@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "don.brace\@microsemi.com" <don.brace@microsemi.com>,
+        "pbonzini\@redhat.com" <pbonzini@redhat.com>,
+        "loberman\@redhat.com" <loberman@redhat.com>,
+        "kashyap.desai\@broadcom.com" <kashyap.desai@broadcom.com>
+Subject: Re: [PATCH V5 1/5] scsi: hpsa: fix selection of reply queue
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20180313094243.8710-1-ming.lei@redhat.com>
+        <20180313094243.8710-2-ming.lei@redhat.com>
+        <1521460114.4592.29.camel@intel.com>
+Date: Mon, 19 Mar 2018 23:16:36 -0400
+In-Reply-To: <1521460114.4592.29.camel@intel.com> (Artem Bityutskiy's message
+        of "Mon, 19 Mar 2018 11:48:35 +0000")
+Message-ID: <yq1in9r1lnv.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-scsi-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
-symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
-In most cases this other symbol is an architecture or platform specific
-symbol, or PCI.
 
-Generic symbols and drivers without platform dependencies keep their
-dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
-cannot work anyway.
+Artem,
 
-This simplifies the dependencies, and allows to improve compile-testing.
+> we have this patch-set and it fixes megaraid regression in v4.16. Do
+> you plan to mege it to v4.16-rcX? I am worried - there seem to be no
+> sight that this is going to me merged. They are not in the linux-next.
 
-Notes:
-  - FSL_FMAN keeps its dependency on HAS_DMA, as it calls set_dma_ops(),
-    which does not exist if HAS_DMA=n (Do we need a dummy? The use of
-    set_dma_ops() in this driver is questionable),
-  - SND_SOC_LPASS_IPQ806X and SND_SOC_LPASS_PLATFORM loose their
-    dependency on HAS_DMA, as they are selected from
-    SND_SOC_APQ8016_SBC.
+I merged them into scsi-fixes last week.
 
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Reviewed-by: Mark Brown <broonie@kernel.org>
-Acked-by: Robin Murphy <robin.murphy@arm.com>
----
-v2:
-  - Add Reviewed-by, Acked-by,
-  - Drop RFC state,
-  - Split per subsystem.
----
- drivers/mailbox/Kconfig | 2 --
- 1 file changed, 2 deletions(-)
+It happens push a combined fixes+queue to linux-next to get more zeroday
+coverage. However, most of the time linux-next is one 4.x+1 material
+only.
 
-diff --git a/drivers/mailbox/Kconfig b/drivers/mailbox/Kconfig
-index ba2f1525f4eef454..f3c68fe15180d035 100644
---- a/drivers/mailbox/Kconfig
-+++ b/drivers/mailbox/Kconfig
-@@ -154,7 +154,6 @@ config XGENE_SLIMPRO_MBOX
- config BCM_PDC_MBOX
- 	tristate "Broadcom FlexSparx DMA Mailbox"
- 	depends on ARCH_BCM_IPROC || COMPILE_TEST
--	depends on HAS_DMA
- 	help
- 	  Mailbox implementation for the Broadcom FlexSparx DMA ring manager,
- 	  which provides access to various offload engines on Broadcom
-@@ -164,7 +163,6 @@ config BCM_FLEXRM_MBOX
- 	tristate "Broadcom FlexRM Mailbox"
- 	depends on ARM64
- 	depends on ARCH_BCM_IPROC || COMPILE_TEST
--	depends on HAS_DMA
- 	select GENERIC_MSI_IRQ_DOMAIN
- 	default m if ARCH_BCM_IPROC
- 	help
 -- 
-2.7.4
-
+Martin K. Petersen	Oracle Linux Engineering
