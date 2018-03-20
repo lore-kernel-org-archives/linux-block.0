@@ -1,37 +1,53 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:56444 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752154AbeC1NVU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Mar 2018 09:21:20 -0400
-Date: Wed, 28 Mar 2018 15:18:52 +0200
-From: David Sterba <dsterba@suse.cz>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Omar Sandoval <osandov@osandov.com>, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@fb.com>, kernel-team@fb.com,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 2/2] loop: use interruptible lock in ioctls
-Message-ID: <20180328131851.GG30422@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-References: <cover.1522106130.git.osandov@fb.com>
- <7ec1489d2ca54e886713efe5beb6dd379c2279b6.1522106130.git.osandov@fb.com>
- <20180327000421.GC10054@bombadil.infradead.org>
+Return-Path: <idryomov@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180327000421.GC10054@bombadil.infradead.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <6952f7b4-2ce8-670e-88b0-7951c4203f56@canonical.com>
+References: <20180319133310.4251-1-colin.king@canonical.com>
+ <5AB0E3D5.6090301@easystack.cn> <6952f7b4-2ce8-670e-88b0-7951c4203f56@canonical.com>
+From: Ilya Dryomov <idryomov@gmail.com>
+Date: Tue, 20 Mar 2018 15:49:45 +0100
+Message-ID: <CAOi1vP9RrbuWJHndAEfu5NyEZYLQAQZ-ew1pqkXwPDpvX2Ej8w@mail.gmail.com>
+Subject: Re: [PATCH] rbd: fix spelling mistake: "reregisteration" -> "re-registration"
+To: Colin Ian King <colin.king@canonical.com>
+Cc: Dongsheng Yang <dongsheng.yang@easystack.cn>, Sage Weil <sage@redhat.com>,
+	Alex Elder <elder@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Ceph Development <ceph-devel@vger.kernel.org>, linux-block <linux-block@vger.kernel.org>,
+	kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Mar 26, 2018 at 05:04:21PM -0700, Matthew Wilcox wrote:
-> On Mon, Mar 26, 2018 at 04:16:26PM -0700, Omar Sandoval wrote:
-> > Even after the previous patch to drop lo_ctl_mutex while calling
-> > vfs_getattr(), there are other cases where we can end up sleeping for a
-> > long time while holding lo_ctl_mutex. Let's avoid the uninterruptible
-> > sleep from the ioctls.
-> 
-> Umm ... you want these ioctls to return -EINTR just because you resized
-> an xterm?  I think you really meant mutex_lock_killable().
+On Tue, Mar 20, 2018 at 11:39 AM, Colin Ian King
+<colin.king@canonical.com> wrote:
+> On 20/03/18 10:35, Dongsheng Yang wrote:
+>> Hi Colin,
+>>
+>> On 03/19/2018 09:33 PM, Colin King wrote:
+>>> From: Colin Ian King <colin.king@canonical.com>
+>>>
+>>> Trivial fix to spelling mistake in rdb_warn message text
+>>>
+>>> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+>>> ---
+>>>   drivers/block/rbd.c | 2 +-
+>>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+>>> index 1e03b04819c8..7b97240ff15e 100644
+>>> --- a/drivers/block/rbd.c
+>>> +++ b/drivers/block/rbd.c
+>>> @@ -3887,7 +3887,7 @@ static void rbd_reregister_watch(struct
+>>> work_struct *work)
+>>>         ret = rbd_dev_refresh(rbd_dev);
+>>>       if (ret)
+>>> -        rbd_warn(rbd_dev, "reregisteration refresh failed: %d", ret);
+>>> +        rbd_warn(rbd_dev, "re-registrationrefresh failed: %d", ret);
+>>
+>> Hmmm, I am not sure is that a spelling mistake, because the function
+>> name is rbd_reregister_watch().
+>
+> OK, well reregisteration should be reregistration then.
 
-Does that really happen? In some cases (namely user called ioctls) I'd
-like to allow ctrl-c to interrupt a mutex_lock or other _interruptible
-actions. I'd be very surprised if resizing terminal stops the command
-I've just started.
+I went ahead and applied the change to "reregistration".
+
+Thanks,
+
+                Ilya
