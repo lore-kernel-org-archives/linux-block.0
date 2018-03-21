@@ -1,59 +1,93 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f66.google.com ([209.85.215.66]:35973 "EHLO
-        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752749AbeC2WHj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Mar 2018 18:07:39 -0400
-Received: by mail-lf0-f66.google.com with SMTP id z143-v6so10348970lff.3
-        for <linux-block@vger.kernel.org>; Thu, 29 Mar 2018 15:07:38 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        keith.busch@intel.com, javier@cnexlabs.com,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 31/37] lightnvm: pblk: check for supported version
-Date: Fri, 30 Mar 2018 00:05:18 +0200
-Message-Id: <20180329220524.30363-32-mb@lightnvm.io>
-In-Reply-To: <20180329220524.30363-1-mb@lightnvm.io>
-References: <20180329220524.30363-1-mb@lightnvm.io>
+Return-Path: <logang@deltatee.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org,
+ linux-nvdimm@lists.01.org, linux-block@vger.kernel.org,
+ Stephen Bates <sbates@raithlin.com>, Jens Axboe <axboe@kernel.dk>,
+ Keith Busch <keith.busch@intel.com>, Sagi Grimberg <sagi@grimberg.me>,
+ Bjorn Helgaas <bhelgaas@google.com>, Jason Gunthorpe <jgg@mellanox.com>,
+ Max Gurtovoy <maxg@mellanox.com>, Dan Williams <dan.j.williams@intel.com>,
+ =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+ Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Steve Wise <swise@opengridcomputing.com>
+References: <20180312193525.2855-1-logang@deltatee.com>
+ <20180312193525.2855-12-logang@deltatee.com> <20180321092702.GC7098@lst.de>
+From: Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <a75f5bce-8ab5-7d99-bb27-908d0cc7c6f6@deltatee.com>
+Date: Wed, 21 Mar 2018 10:52:25 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180321092702.GC7098@lst.de>
+Content-Type: text/plain; charset=utf-8
+Subject: Re: [PATCH v3 11/11] nvmet: Optionally use PCI P2P memory
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <javier@cnexlabs.com>
 
-At this point, only 1.2 spec is supported, thus check for it. Also,
-since device-side L2P is only supported in the 1.2 spec, make sure to
-only check its value under 1.2.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
----
- drivers/lightnvm/pblk-init.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+On 21/03/18 03:27 AM, Christoph Hellwig wrote:
+>> +				  const char *page, size_t count)
+>> +{
+>> +	struct nvmet_port *port = to_nvmet_port(item);
+>> +	struct device *dev;
+>> +	struct pci_dev *p2p_dev = NULL;
+>> +	bool use_p2pmem;
+>> +
+>> +	switch (page[0]) {
+>> +	case 'y':
+>> +	case 'Y':
+>> +	case 'a':
+>> +	case 'A':
+>> +		use_p2pmem = true;
+>> +		break;
+>> +	case 'n':
+>> +	case 'N':
+>> +		use_p2pmem = false;
+>> +		break;
+>> +	default:
+>> +		dev = bus_find_device_by_name(&pci_bus_type, NULL, page);
+>> +		if (!dev) {
+>> +			pr_err("No such PCI device: %s\n", page);
+>> +			return -ENODEV;
+>> +		}
+>> +
+>> +		use_p2pmem = true;
+>> +		p2p_dev = to_pci_dev(dev);
+>> +
+>> +		if (!pci_has_p2pmem(p2p_dev)) {
+>> +			pr_err("PCI device has no peer-to-peer memory: %s\n",
+>> +			       page);
+>> +			pci_dev_put(p2p_dev);
+>> +			return -ENODEV;
+>> +		}
+>> +	}
+> 
+> Yikes.  Shouldn't auto just be the normal yes case instead of this
+> string parsing mess?
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 4656d1ff81a6..34ff47705293 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -1016,9 +1016,15 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
- 	struct pblk *pblk;
- 	int ret;
- 
--	if (dev->geo.dom & NVM_RSP_L2P) {
-+	if (geo->version != NVM_OCSSD_SPEC_12) {
-+		pr_err("pblk: OCSSD version not supported (%u)\n",
-+							geo->version);
-+		return ERR_PTR(-EINVAL);
-+	}
-+
-+	if (geo->version == NVM_OCSSD_SPEC_12 && geo->dom & NVM_RSP_L2P) {
- 		pr_err("pblk: host-side L2P table not supported. (%x)\n",
--							dev->geo.dom);
-+							geo->dom);
- 		return ERR_PTR(-EINVAL);
- 	}
- 
--- 
-2.11.0
+Sorry, I don't follow. The code, as is, should automatically select the
+device if the user  sets it to "yes" or "auto" or "y" or similar.
+(Roughly similar to how kstrtobool() works, except '0' or '1' are not
+accepted seeing they could overlap with PCI device names). In other
+cases, it looks for the specific PCI device name to use exactly.
+
+Are you saying it shouldn't work this way or are you saying the code to
+implement it is too messy?
+
+>> +	if (rsp->req.sg != &rsp->cmd->inline_sg) {
+>> +		if (rsp->req.p2p_dev)
+>> +			pci_p2pmem_free_sgl(rsp->req.p2p_dev, rsp->req.sg,
+>> +					    rsp->req.sg_cnt);
+>> +		else
+>> +			sgl_free(rsp->req.sg);
+>> +	}
+> 
+> Can we factor this into a helper, as the other target drivers (fc for now,
+> tcp soon) using sgl allocatins should share the code?
+> 
+> (same for the alloc side)
+
+Sure. Would the helpers belong in core.c?
+
+Thanks,
+
+Logan
