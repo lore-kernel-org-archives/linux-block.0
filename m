@@ -1,81 +1,97 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-by2nam03on0043.outbound.protection.outlook.com ([104.47.42.43]:38183
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753006AbeCUUtt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Mar 2018 16:49:49 -0400
-From: Javier Gonzalez <javier@cnexlabs.com>
-To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
-CC: Keith Busch <keith.busch@intel.com>,
-        =?utf-8?B?SmF2aWVyIEdvbnrDoWxleg==?= <javier@javigon.com>,
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:34017 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753344AbeCUT15 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Mar 2018 15:27:57 -0400
+Received: by mail-lf0-f66.google.com with SMTP id c78-v6so4890686lfh.1
+        for <linux-block@vger.kernel.org>; Wed, 21 Mar 2018 12:27:56 -0700 (PDT)
+Subject: Re: [PATCH 08/12] lightnvm: implement get log report chunk helpers
+To: Keith Busch <keith.busch@intel.com>
+Cc: =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@cnexlabs.com>,
         Christoph Hellwig <hch@infradead.org>,
-        "Sagi Grimberg" <sagi@grimberg.me>
-Subject: Re: [PATCH 08/12] lightnvm: implement get log report chunk helpers
-Date: Wed, 21 Mar 2018 20:49:45 +0000
-Message-ID: <9478CAFD-0F68-4C18-A75A-6FD5551B554E@cnexlabs.com>
+        Sagi Grimberg <sagi@grimberg.me>
 References: <1520004080-27760-1-git-send-email-javier@cnexlabs.com>
  <1520004080-27760-9-git-send-email-javier@cnexlabs.com>
  <8a0a3bad-26a4-ca2f-4bd8-5c71858f6d00@lightnvm.io>
- <20180321143617.GD12909@localhost.localdomain>,<67b77f5d-fa35-1199-10c5-12fb8a324a64@lightnvm.io>
-In-Reply-To: <67b77f5d-fa35-1199-10c5-12fb8a324a64@lightnvm.io>
-Content-Type: text/plain; charset="utf-8"
+ <20180321143617.GD12909@localhost.localdomain>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <67b77f5d-fa35-1199-10c5-12fb8a324a64@lightnvm.io>
+Date: Wed, 21 Mar 2018 20:27:54 +0100
 MIME-Version: 1.0
+In-Reply-To: <20180321143617.GD12909@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-DQo+IE9uIDIxIE1hciAyMDE4LCBhdCAyMC4yNywgTWF0aWFzIEJqw7hybGluZyA8bWJAbGlnaHRu
-dm0uaW8+IHdyb3RlOg0KPiANCj4+IE9uIDAzLzIxLzIwMTggMDM6MzYgUE0sIEtlaXRoIEJ1c2No
-IHdyb3RlOg0KPj4gT24gV2VkLCBNYXIgMjEsIDIwMTggYXQgMDM6MDY6MDVBTSAtMDcwMCwgTWF0
-aWFzIEJqw7hybGluZyB3cm90ZToNCj4+Pj4gb3V0c2lkZSBvZiBudm1lIGNvcmUgc28gdGhhdCB3
-ZSBjYW4gdXNlIGl0IGZvcm0gbGlnaHRudm0uDQo+Pj4+IA0KPj4+PiBTaWduZWQtb2ZmLWJ5OiBK
-YXZpZXIgR29uesOhbGV6IDxqYXZpZXJAY25leGxhYnMuY29tPg0KPj4+PiAtLS0NCj4+Pj4gICBk
-cml2ZXJzL2xpZ2h0bnZtL2NvcmUuYyAgICAgIHwgMTEgKysrKysrKw0KPj4+PiAgIGRyaXZlcnMv
-bnZtZS9ob3N0L2NvcmUuYyAgICAgfCAgNiArKy0tDQo+Pj4+ICAgZHJpdmVycy9udm1lL2hvc3Qv
-bGlnaHRudm0uYyB8IDc0ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrDQo+Pj4+ICAgZHJpdmVycy9udm1lL2hvc3QvbnZtZS5oICAgICB8ICAzICsrDQo+Pj4+ICAg
-aW5jbHVkZS9saW51eC9saWdodG52bS5oICAgICB8IDI0ICsrKysrKysrKysrKysrDQo+Pj4+ICAg
-NSBmaWxlcyBjaGFuZ2VkLCAxMTUgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkNCj4+Pj4g
-DQo+Pj4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL252bWUvaG9zdC9jb3JlLmMgYi9kcml2ZXJzL252
-bWUvaG9zdC9jb3JlLmMNCj4+Pj4gaW5kZXggMmU5ZTlmOTczYTc1Li5hZjY0MmNlNmJhNjkgMTAw
-NjQ0DQo+Pj4+IC0tLSBhL2RyaXZlcnMvbnZtZS9ob3N0L2NvcmUuYw0KPj4+PiArKysgYi9kcml2
-ZXJzL252bWUvaG9zdC9jb3JlLmMNCj4+Pj4gQEAgLTIxMjcsOSArMjEyNyw5IEBAIHN0YXRpYyBp
-bnQgbnZtZV9pbml0X3N1YnN5c3RlbShzdHJ1Y3QgbnZtZV9jdHJsICpjdHJsLCBzdHJ1Y3QgbnZt
-ZV9pZF9jdHJsICppZCkNCj4+Pj4gICAgICAgcmV0dXJuIHJldDsNCj4+Pj4gICB9DQo+Pj4+ICAg
-LXN0YXRpYyBpbnQgbnZtZV9nZXRfbG9nX2V4dChzdHJ1Y3QgbnZtZV9jdHJsICpjdHJsLCBzdHJ1
-Y3QgbnZtZV9ucyAqbnMsDQo+Pj4+IC0gICAgICAgICAgICAgICAgdTggbG9nX3BhZ2UsIHZvaWQg
-KmxvZywNCj4+Pj4gLSAgICAgICAgICAgICAgICBzaXplX3Qgc2l6ZSwgc2l6ZV90IG9mZnNldCkN
-Cj4+Pj4gK2ludCBudm1lX2dldF9sb2dfZXh0KHN0cnVjdCBudm1lX2N0cmwgKmN0cmwsIHN0cnVj
-dCBudm1lX25zICpucywNCj4+Pj4gKyAgICAgICAgICAgICB1OCBsb2dfcGFnZSwgdm9pZCAqbG9n
-LA0KPj4+PiArICAgICAgICAgICAgIHNpemVfdCBzaXplLCBzaXplX3Qgb2Zmc2V0KQ0KPj4+PiAg
-IHsNCj4+Pj4gICAgICAgc3RydWN0IG52bWVfY29tbWFuZCBjID0geyB9Ow0KPj4+PiAgICAgICB1
-bnNpZ25lZCBsb25nIGR3bGVuID0gc2l6ZSAvIDQgLSAxOw0KPj4+PiBkaWZmIC0tZ2l0IGEvZHJp
-dmVycy9udm1lL2hvc3QvbGlnaHRudm0uYyBiL2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMN
-Cj4+Pj4gaW5kZXggMDhmMGY2YjViYzA2Li5mZmQ2NGE4M2M4YzMgMTAwNjQ0DQo+Pj4+IC0tLSBh
-L2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMNCj4+Pj4gKysrIGIvZHJpdmVycy9udm1lL2hv
-c3QvbGlnaHRudm0uYw0KPj4+PiBAQCAtMzUsNiArMzUsMTAgQEAgZW51bSBudm1lX252bV9hZG1p
-bl9vcGNvZGUgew0KPj4+PiAgICAgICBudm1lX252bV9hZG1pbl9zZXRfYmJfdGJsICAgID0gMHhm
-MSwNCj4+Pj4gICB9Ow0KPj4+PiAgIA0KPj4+IA0KPj4+IDxzbmlwPg0KPj4+IA0KPj4+PiAgIGRp
-ZmYgLS1naXQgYS9kcml2ZXJzL252bWUvaG9zdC9udm1lLmggYi9kcml2ZXJzL252bWUvaG9zdC9u
-dm1lLmgNCj4+Pj4gaW5kZXggMWNhMDhmNDk5M2JhLi41MDVmNzk3ZjhjNmMgMTAwNjQ0DQo+Pj4+
-IC0tLSBhL2RyaXZlcnMvbnZtZS9ob3N0L252bWUuaA0KPj4+PiArKysgYi9kcml2ZXJzL252bWUv
-aG9zdC9udm1lLmgNCj4+Pj4gQEAgLTM5Niw2ICszOTYsOSBAQCBpbnQgbnZtZV9yZXNldF9jdHJs
-KHN0cnVjdCBudm1lX2N0cmwgKmN0cmwpOw0KPj4+PiAgIGludCBudm1lX2RlbGV0ZV9jdHJsKHN0
-cnVjdCBudm1lX2N0cmwgKmN0cmwpOw0KPj4+PiAgIGludCBudm1lX2RlbGV0ZV9jdHJsX3N5bmMo
-c3RydWN0IG52bWVfY3RybCAqY3RybCk7DQo+Pj4+ICAgK2ludCBudm1lX2dldF9sb2dfZXh0KHN0
-cnVjdCBudm1lX2N0cmwgKmN0cmwsIHN0cnVjdCBudm1lX25zICpucywNCj4+Pj4gKyAgICAgICAg
-ICAgICB1OCBsb2dfcGFnZSwgdm9pZCAqbG9nLCBzaXplX3Qgc2l6ZSwgc2l6ZV90IG9mZnNldCk7
-DQo+Pj4+ICsNCj4+Pj4gICBleHRlcm4gY29uc3Qgc3RydWN0IGF0dHJpYnV0ZV9ncm91cCBudm1l
-X25zX2lkX2F0dHJfZ3JvdXA7DQo+Pj4+ICAgZXh0ZXJuIGNvbnN0IHN0cnVjdCBibG9ja19kZXZp
-Y2Vfb3BlcmF0aW9ucyBudm1lX25zX2hlYWRfb3BzOw0KPj4+PiAgIA0KPj4+IA0KPj4+IA0KPj4+
-IEtlaXRoLCBDaHJpc3RvcGgsIFNhZ2ksIElzIGl0IG9rYXkgdGhhdCB0aGVzZSB0d28gY2hhbmdl
-cyB0aGF0IGV4cG9zZXMNCj4+PiB0aGUgbnZtZV9nZXRfbG9nX2V4dCBmbiBhcmUgY2FycmllZCB0
-aHJvdWdoIEplbnMnIHRyZWUgYWZ0ZXIgdGhlIG52bWUNCj4+PiB0cmVlIGZvciA0LjE3IGhhcyBi
-ZWVuIHB1bGxlZD8NCj4+IFRoYXQncyBva2F5IHdpdGggbWUuIEFsdGVyYXRpdmVseSwgaWYgeW91
-IHdhbnQgdG8gc3BsaXQgdGhlIGdlbmVyaWMgbnZtZQ0KPj4gcGFydCBvdXQsIEkgY2FuIGFwcGx5
-IHRoYXQgaW1tZWRpYXRlbHkgYW5kIHRoZSBBUEkgd2lsbCBiZSBpbiB0aGUgZmlyc3QNCj4+IG52
-bWUtNC4xNyBwdWxsIHJlcXVlc3QuDQo+IA0KPiBXaWxsIGRvLiBJJ3ZlIHNlbnQgdGhlIHBhdGNo
-IGluIGFub3RoZXIgbWFpbC4gVGhhbmtzISA6KQ0KDQpJdOKAmXMgZmluZSB3aXRoIG1lLg0KDQpN
-YXRpYXM6IGRvIHlvdSB0YWtlIHRoYXQgcGFydCBvZiB0aGUgcGF0Y2ggb3V0IGRpcmVjdGx5IG9u
-IG91ciB0cmVlPw0KDQpKYXZpZXIuIA==
+On 03/21/2018 03:36 PM, Keith Busch wrote:
+> On Wed, Mar 21, 2018 at 03:06:05AM -0700, Matias Bjørling wrote:
+>>> outside of nvme core so that we can use it form lightnvm.
+>>>
+>>> Signed-off-by: Javier González <javier@cnexlabs.com>
+>>> ---
+>>>    drivers/lightnvm/core.c      | 11 +++++++
+>>>    drivers/nvme/host/core.c     |  6 ++--
+>>>    drivers/nvme/host/lightnvm.c | 74 ++++++++++++++++++++++++++++++++++++++++++++
+>>>    drivers/nvme/host/nvme.h     |  3 ++
+>>>    include/linux/lightnvm.h     | 24 ++++++++++++++
+>>>    5 files changed, 115 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+>>> index 2e9e9f973a75..af642ce6ba69 100644
+>>> --- a/drivers/nvme/host/core.c
+>>> +++ b/drivers/nvme/host/core.c
+>>> @@ -2127,9 +2127,9 @@ static int nvme_init_subsystem(struct nvme_ctrl *ctrl, struct nvme_id_ctrl *id)
+>>>    	return ret;
+>>>    }
+>>>    
+>>> -static int nvme_get_log_ext(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+>>> -			    u8 log_page, void *log,
+>>> -			    size_t size, size_t offset)
+>>> +int nvme_get_log_ext(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+>>> +		     u8 log_page, void *log,
+>>> +		     size_t size, size_t offset)
+>>>    {
+>>>    	struct nvme_command c = { };
+>>>    	unsigned long dwlen = size / 4 - 1;
+>>> diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+>>> index 08f0f6b5bc06..ffd64a83c8c3 100644
+>>> --- a/drivers/nvme/host/lightnvm.c
+>>> +++ b/drivers/nvme/host/lightnvm.c
+>>> @@ -35,6 +35,10 @@ enum nvme_nvm_admin_opcode {
+>>>    	nvme_nvm_admin_set_bb_tbl	= 0xf1,
+>>>    };
+>>>    
+>>
+>> <snip>
+>>
+>>>    
+>>> diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+>>> index 1ca08f4993ba..505f797f8c6c 100644
+>>> --- a/drivers/nvme/host/nvme.h
+>>> +++ b/drivers/nvme/host/nvme.h
+>>> @@ -396,6 +396,9 @@ int nvme_reset_ctrl(struct nvme_ctrl *ctrl);
+>>>    int nvme_delete_ctrl(struct nvme_ctrl *ctrl);
+>>>    int nvme_delete_ctrl_sync(struct nvme_ctrl *ctrl);
+>>>    
+>>> +int nvme_get_log_ext(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+>>> +		     u8 log_page, void *log, size_t size, size_t offset);
+>>> +
+>>>    extern const struct attribute_group nvme_ns_id_attr_group;
+>>>    extern const struct block_device_operations nvme_ns_head_ops;
+>>>    
+>>
+>>
+>> Keith, Christoph, Sagi, Is it okay that these two changes that exposes
+>> the nvme_get_log_ext fn are carried through Jens' tree after the nvme
+>> tree for 4.17 has been pulled?
+> 
+> That's okay with me. Alteratively, if you want to split the generic nvme
+> part out, I can apply that immediately and the API will be in the first
+> nvme-4.17 pull request.
+> 
+
+Will do. I've sent the patch in another mail. Thanks! :)
