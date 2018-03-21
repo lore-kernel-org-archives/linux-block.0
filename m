@@ -1,115 +1,68 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from laurent.telenet-ops.be ([195.130.137.89]:45004 "EHLO
-        laurent.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752998AbeCPOUY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Mar 2018 10:20:24 -0400
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-To: Christoph Hellwig <hch@lst.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Felipe Balbi <balbi@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mark Brown <broonie@kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Alan Tull <atull@kernel.org>, Moritz Fischer <mdf@kernel.org>,
-        Wolfram Sang <wsa@the-dreams.de>,
-        Jonathan Cameron <jic23@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Matias Bjorling <mb@lightnvm.io>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        Marek Vasut <marek.vasut@gmail.com>,
-        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Richard Weinberger <richard@nod.at>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Eric Anholt <eric@anholt.net>,
-        Stefan Wahren <stefan.wahren@i2se.com>
-Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
-        linux-scsi@vger.kernel.org, alsa-devel@alsa-project.org,
-        linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        linux-fpga@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-iio@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH v2 09/21] iommu: Remove depends on HAS_DMA in case of platform dependency
-Date: Fri, 16 Mar 2018 14:51:42 +0100
-Message-Id: <1521208314-4783-10-git-send-email-geert@linux-m68k.org>
-In-Reply-To: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
-References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] block: use 32-bit blk_status_t on Alpha
+To: Mikulas Patocka <mpatocka@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
+ <mattst88@gmail.com>, Mike Snitzer <msnitzer@redhat.com>,
+ linux-block@vger.kernel.org, dm-devel@redhat.com,
+ linux-alpha@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <alpine.LRH.2.02.1803211239490.23314@file01.intranet.prod.int.rdu2.redhat.com>
+ <502b7c1e-a95c-ff8d-64cd-9cbdd275fa1d@kernel.dk>
+ <alpine.LRH.2.02.1803211253410.26409@file01.intranet.prod.int.rdu2.redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <9cd0ef78-68e0-2c08-ca37-775c931fa159@kernel.dk>
+Date: Wed, 21 Mar 2018 11:02:06 -0600
+MIME-Version: 1.0
+In-Reply-To: <alpine.LRH.2.02.1803211253410.26409@file01.intranet.prod.int.rdu2.redhat.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
-symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
-In most cases this other symbol is an architecture or platform specific
-symbol, or PCI.
+On 3/21/18 11:00 AM, Mikulas Patocka wrote:
+> 
+> 
+> On Wed, 21 Mar 2018, Jens Axboe wrote:
+> 
+>> On 3/21/18 10:42 AM, Mikulas Patocka wrote:
+>>> Early alpha processors cannot write a single byte or word; they read 8
+>>> bytes, modify the value in registers and write back 8 bytes.
+>>>
+>>> The type blk_status_t is defined as one byte, it is often written
+>>> asynchronously by I/O completion routines, this asynchronous modification
+>>> can corrupt content of nearby bytes if these nearby bytes can be written
+>>> simultaneously by another CPU.
+>>>
+>>> - one example of such corruption is the structure dm_io where
+>>>   "blk_status_t status" is written by an asynchronous completion routine
+>>>   and "atomic_t io_count" is modified synchronously
+>>> - another example is the structure dm_buffer where "unsigned hold_count"
+>>>   is modified synchronously from process context and "blk_status_t
+>>>   write_error" is modified asynchronously from bio completion routine
+>>>
+>>> This patch fixes the bug by changing the type blk_status_t to 32 bits if
+>>> we are on Alpha and if we are compiling for a processor that doesn't have
+>>> the byte-word-extension.
+>>
+>> That's nasty. Is alpha the only problematic arch here?
+> 
+> Yes. All the other architectures supported by Linux have byte writes.
+> 
+>> As to the patch in question, normally I'd just say we should make it
+>> unconditionally u32. But we pack so nicely in the bio, and I don't think
+>> the bio itself has this issue as the rest of the members that share this
+>> word are all set before the bio is submitted. But callers embedding
+>> the status var in other structures don't necessarily have that
+>> guarantee, as your dm examples show.
+>>
+>> -- 
+>> Jens Axboe
+> 
+> Keeping blk_status_t 8-bit for most architectures will save a few bytes in 
+> some of device mapper structures.
 
-Generic symbols and drivers without platform dependencies keep their
-dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
-cannot work anyway.
+And more importantly, it won't screw up the bio layout, I'm somewhat more
+concerned about that than random driver structures.
 
-This simplifies the dependencies, and allows to improve compile-testing.
+If alpha is the odd one out here, then I think your patch is fine as-is.
 
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Reviewed-by: Mark Brown <broonie@kernel.org>
-Acked-by: Robin Murphy <robin.murphy@arm.com>
----
-v2:
-  - Add Reviewed-by, Acked-by,
-  - Drop RFC state,
-  - Split per subsystem.
----
- drivers/iommu/Kconfig | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
-index f3a21343e636a8f2..32e91398c0555272 100644
---- a/drivers/iommu/Kconfig
-+++ b/drivers/iommu/Kconfig
-@@ -23,7 +23,7 @@ config IOMMU_IO_PGTABLE
- config IOMMU_IO_PGTABLE_LPAE
- 	bool "ARMv7/v8 Long Descriptor Format"
- 	select IOMMU_IO_PGTABLE
--	depends on HAS_DMA && (ARM || ARM64 || (COMPILE_TEST && !GENERIC_ATOMIC64))
-+	depends on ARM || ARM64 || (COMPILE_TEST && !GENERIC_ATOMIC64)
- 	help
- 	  Enable support for the ARM long descriptor pagetable format.
- 	  This allocator supports 4K/2M/1G, 16K/32M and 64K/512M page
-@@ -42,7 +42,7 @@ config IOMMU_IO_PGTABLE_LPAE_SELFTEST
- config IOMMU_IO_PGTABLE_ARMV7S
- 	bool "ARMv7/v8 Short Descriptor Format"
- 	select IOMMU_IO_PGTABLE
--	depends on HAS_DMA && (ARM || ARM64 || COMPILE_TEST)
-+	depends on ARM || ARM64 || COMPILE_TEST
- 	help
- 	  Enable support for the ARM Short-descriptor pagetable format.
- 	  This supports 32-bit virtual and physical addresses mapped using
-@@ -374,7 +374,6 @@ config QCOM_IOMMU
- 	# Note: iommu drivers cannot (yet?) be built as modules
- 	bool "Qualcomm IOMMU Support"
- 	depends on ARCH_QCOM || (COMPILE_TEST && !GENERIC_ATOMIC64)
--	depends on HAS_DMA
- 	select IOMMU_API
- 	select IOMMU_IO_PGTABLE_LPAE
- 	select ARM_DMA_USE_IOMMU
 -- 
-2.7.4
+Jens Axboe
