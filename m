@@ -1,112 +1,81 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: Dave Chinner <david@fromorbit.com>
-To: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        hch@lst.de, rdorr@microsoft.com
-Subject: [PATCH 2/3] iomap: iomap_dio_rw() handles all sync writes
-Date: Tue, 27 Mar 2018 18:07:16 +1100
-Message-Id: <20180327070717.7107-3-david@fromorbit.com>
-In-Reply-To: <20180327070717.7107-1-david@fromorbit.com>
-References: <20180327070717.7107-1-david@fromorbit.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-by2nam03on0043.outbound.protection.outlook.com ([104.47.42.43]:38183
+        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753006AbeCUUtt (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Mar 2018 16:49:49 -0400
+From: Javier Gonzalez <javier@cnexlabs.com>
+To: =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
+CC: Keith Busch <keith.busch@intel.com>,
+        =?utf-8?B?SmF2aWVyIEdvbnrDoWxleg==?= <javier@javigon.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Sagi Grimberg" <sagi@grimberg.me>
+Subject: Re: [PATCH 08/12] lightnvm: implement get log report chunk helpers
+Date: Wed, 21 Mar 2018 20:49:45 +0000
+Message-ID: <9478CAFD-0F68-4C18-A75A-6FD5551B554E@cnexlabs.com>
+References: <1520004080-27760-1-git-send-email-javier@cnexlabs.com>
+ <1520004080-27760-9-git-send-email-javier@cnexlabs.com>
+ <8a0a3bad-26a4-ca2f-4bd8-5c71858f6d00@lightnvm.io>
+ <20180321143617.GD12909@localhost.localdomain>,<67b77f5d-fa35-1199-10c5-12fb8a324a64@lightnvm.io>
+In-Reply-To: <67b77f5d-fa35-1199-10c5-12fb8a324a64@lightnvm.io>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-From: Dave Chinner <dchinner@redhat.com>
-
-Currently iomap_dio_rw() only handles (data)sync write completions
-for AIO. This means we can't optimised non-AIO IO to minimise device
-flushes as we can't tell the caller whether a flush is required or
-not.
-
-To solve this problem and enable further optimisations, make
-iomap_dio_rw responsible for data sync behaviour for all IO, not
-just AIO.
-
-In doing so, the sync operation is now accounted as part of the DIO
-IO by inode_dio_end(), hence post-IO data stability updates will no
-long race against operations that serialise via inode_dio_wait()
-such as truncate or hole punch.
-
-Signed-Off-By: Dave Chinner <dchinner@redhat.com>
----
- fs/iomap.c        | 17 ++++++++++++++---
- fs/xfs/xfs_file.c |  5 -----
- 2 files changed, 14 insertions(+), 8 deletions(-)
-
-diff --git a/fs/iomap.c b/fs/iomap.c
-index afd163586aa0..f5d4e348bc9b 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -685,6 +685,7 @@ EXPORT_SYMBOL_GPL(iomap_seek_data);
-  * Private flags for iomap_dio, must not overlap with the public ones in
-  * iomap.h:
-  */
-+#define IOMAP_DIO_WRITE_SYNC	(1 << 29)
- #define IOMAP_DIO_WRITE		(1 << 30)
- #define IOMAP_DIO_DIRTY		(1 << 31)
- 
-@@ -759,6 +760,13 @@ static ssize_t iomap_dio_complete(struct iomap_dio *dio)
- 			dio_warn_stale_pagecache(iocb->ki_filp);
- 	}
- 
-+	/*
-+	 * If this is a DSYNC write, make sure we push it to stable storage now
-+	 * that we've written data.
-+	 */
-+	if (ret > 0 && (dio->flags & IOMAP_DIO_WRITE_SYNC))
-+		ret = generic_write_sync(iocb, ret);
-+
- 	inode_dio_end(file_inode(iocb->ki_filp));
- 	kfree(dio);
- 
-@@ -769,12 +777,9 @@ static void iomap_dio_complete_work(struct work_struct *work)
- {
- 	struct iomap_dio *dio = container_of(work, struct iomap_dio, aio.work);
- 	struct kiocb *iocb = dio->iocb;
--	bool is_write = (dio->flags & IOMAP_DIO_WRITE);
- 	ssize_t ret;
- 
- 	ret = iomap_dio_complete(dio);
--	if (is_write && ret > 0)
--		ret = generic_write_sync(iocb, ret);
- 	iocb->ki_complete(iocb, ret, 0);
- }
- 
-@@ -961,6 +966,10 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
- 	return copied;
- }
- 
-+/*
-+ * iomap_dio_rw() always completes O_[D]SYNC writes regardless of whether the IO
-+ * is being issued as AIO or not.
-+ */
- ssize_t
- iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
- 		const struct iomap_ops *ops, iomap_dio_end_io_t end_io)
-@@ -1006,6 +1015,8 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
- 			dio->flags |= IOMAP_DIO_DIRTY;
- 	} else {
- 		dio->flags |= IOMAP_DIO_WRITE;
-+		if (iocb->ki_flags & IOCB_DSYNC)
-+			dio->flags |= IOMAP_DIO_WRITE_SYNC;
- 		flags |= IOMAP_WRITE;
- 	}
- 
-diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-index 6c30f410ca0c..33b1e8b5dc5c 100644
---- a/fs/xfs/xfs_file.c
-+++ b/fs/xfs/xfs_file.c
-@@ -570,11 +570,6 @@ xfs_file_dio_aio_write(
- 	 * complete fully or fail.
- 	 */
- 	ASSERT(ret < 0 || ret == count);
--
--	if (ret > 0) {
--		/* Handle various SYNC-type writes */
--		ret = generic_write_sync(iocb, ret);
--	}
- 	return ret;
- }
- 
--- 
-2.16.1
+DQo+IE9uIDIxIE1hciAyMDE4LCBhdCAyMC4yNywgTWF0aWFzIEJqw7hybGluZyA8bWJAbGlnaHRu
+dm0uaW8+IHdyb3RlOg0KPiANCj4+IE9uIDAzLzIxLzIwMTggMDM6MzYgUE0sIEtlaXRoIEJ1c2No
+IHdyb3RlOg0KPj4gT24gV2VkLCBNYXIgMjEsIDIwMTggYXQgMDM6MDY6MDVBTSAtMDcwMCwgTWF0
+aWFzIEJqw7hybGluZyB3cm90ZToNCj4+Pj4gb3V0c2lkZSBvZiBudm1lIGNvcmUgc28gdGhhdCB3
+ZSBjYW4gdXNlIGl0IGZvcm0gbGlnaHRudm0uDQo+Pj4+IA0KPj4+PiBTaWduZWQtb2ZmLWJ5OiBK
+YXZpZXIgR29uesOhbGV6IDxqYXZpZXJAY25leGxhYnMuY29tPg0KPj4+PiAtLS0NCj4+Pj4gICBk
+cml2ZXJzL2xpZ2h0bnZtL2NvcmUuYyAgICAgIHwgMTEgKysrKysrKw0KPj4+PiAgIGRyaXZlcnMv
+bnZtZS9ob3N0L2NvcmUuYyAgICAgfCAgNiArKy0tDQo+Pj4+ICAgZHJpdmVycy9udm1lL2hvc3Qv
+bGlnaHRudm0uYyB8IDc0ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrDQo+Pj4+ICAgZHJpdmVycy9udm1lL2hvc3QvbnZtZS5oICAgICB8ICAzICsrDQo+Pj4+ICAg
+aW5jbHVkZS9saW51eC9saWdodG52bS5oICAgICB8IDI0ICsrKysrKysrKysrKysrDQo+Pj4+ICAg
+NSBmaWxlcyBjaGFuZ2VkLCAxMTUgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkNCj4+Pj4g
+DQo+Pj4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL252bWUvaG9zdC9jb3JlLmMgYi9kcml2ZXJzL252
+bWUvaG9zdC9jb3JlLmMNCj4+Pj4gaW5kZXggMmU5ZTlmOTczYTc1Li5hZjY0MmNlNmJhNjkgMTAw
+NjQ0DQo+Pj4+IC0tLSBhL2RyaXZlcnMvbnZtZS9ob3N0L2NvcmUuYw0KPj4+PiArKysgYi9kcml2
+ZXJzL252bWUvaG9zdC9jb3JlLmMNCj4+Pj4gQEAgLTIxMjcsOSArMjEyNyw5IEBAIHN0YXRpYyBp
+bnQgbnZtZV9pbml0X3N1YnN5c3RlbShzdHJ1Y3QgbnZtZV9jdHJsICpjdHJsLCBzdHJ1Y3QgbnZt
+ZV9pZF9jdHJsICppZCkNCj4+Pj4gICAgICAgcmV0dXJuIHJldDsNCj4+Pj4gICB9DQo+Pj4+ICAg
+LXN0YXRpYyBpbnQgbnZtZV9nZXRfbG9nX2V4dChzdHJ1Y3QgbnZtZV9jdHJsICpjdHJsLCBzdHJ1
+Y3QgbnZtZV9ucyAqbnMsDQo+Pj4+IC0gICAgICAgICAgICAgICAgdTggbG9nX3BhZ2UsIHZvaWQg
+KmxvZywNCj4+Pj4gLSAgICAgICAgICAgICAgICBzaXplX3Qgc2l6ZSwgc2l6ZV90IG9mZnNldCkN
+Cj4+Pj4gK2ludCBudm1lX2dldF9sb2dfZXh0KHN0cnVjdCBudm1lX2N0cmwgKmN0cmwsIHN0cnVj
+dCBudm1lX25zICpucywNCj4+Pj4gKyAgICAgICAgICAgICB1OCBsb2dfcGFnZSwgdm9pZCAqbG9n
+LA0KPj4+PiArICAgICAgICAgICAgIHNpemVfdCBzaXplLCBzaXplX3Qgb2Zmc2V0KQ0KPj4+PiAg
+IHsNCj4+Pj4gICAgICAgc3RydWN0IG52bWVfY29tbWFuZCBjID0geyB9Ow0KPj4+PiAgICAgICB1
+bnNpZ25lZCBsb25nIGR3bGVuID0gc2l6ZSAvIDQgLSAxOw0KPj4+PiBkaWZmIC0tZ2l0IGEvZHJp
+dmVycy9udm1lL2hvc3QvbGlnaHRudm0uYyBiL2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMN
+Cj4+Pj4gaW5kZXggMDhmMGY2YjViYzA2Li5mZmQ2NGE4M2M4YzMgMTAwNjQ0DQo+Pj4+IC0tLSBh
+L2RyaXZlcnMvbnZtZS9ob3N0L2xpZ2h0bnZtLmMNCj4+Pj4gKysrIGIvZHJpdmVycy9udm1lL2hv
+c3QvbGlnaHRudm0uYw0KPj4+PiBAQCAtMzUsNiArMzUsMTAgQEAgZW51bSBudm1lX252bV9hZG1p
+bl9vcGNvZGUgew0KPj4+PiAgICAgICBudm1lX252bV9hZG1pbl9zZXRfYmJfdGJsICAgID0gMHhm
+MSwNCj4+Pj4gICB9Ow0KPj4+PiAgIA0KPj4+IA0KPj4+IDxzbmlwPg0KPj4+IA0KPj4+PiAgIGRp
+ZmYgLS1naXQgYS9kcml2ZXJzL252bWUvaG9zdC9udm1lLmggYi9kcml2ZXJzL252bWUvaG9zdC9u
+dm1lLmgNCj4+Pj4gaW5kZXggMWNhMDhmNDk5M2JhLi41MDVmNzk3ZjhjNmMgMTAwNjQ0DQo+Pj4+
+IC0tLSBhL2RyaXZlcnMvbnZtZS9ob3N0L252bWUuaA0KPj4+PiArKysgYi9kcml2ZXJzL252bWUv
+aG9zdC9udm1lLmgNCj4+Pj4gQEAgLTM5Niw2ICszOTYsOSBAQCBpbnQgbnZtZV9yZXNldF9jdHJs
+KHN0cnVjdCBudm1lX2N0cmwgKmN0cmwpOw0KPj4+PiAgIGludCBudm1lX2RlbGV0ZV9jdHJsKHN0
+cnVjdCBudm1lX2N0cmwgKmN0cmwpOw0KPj4+PiAgIGludCBudm1lX2RlbGV0ZV9jdHJsX3N5bmMo
+c3RydWN0IG52bWVfY3RybCAqY3RybCk7DQo+Pj4+ICAgK2ludCBudm1lX2dldF9sb2dfZXh0KHN0
+cnVjdCBudm1lX2N0cmwgKmN0cmwsIHN0cnVjdCBudm1lX25zICpucywNCj4+Pj4gKyAgICAgICAg
+ICAgICB1OCBsb2dfcGFnZSwgdm9pZCAqbG9nLCBzaXplX3Qgc2l6ZSwgc2l6ZV90IG9mZnNldCk7
+DQo+Pj4+ICsNCj4+Pj4gICBleHRlcm4gY29uc3Qgc3RydWN0IGF0dHJpYnV0ZV9ncm91cCBudm1l
+X25zX2lkX2F0dHJfZ3JvdXA7DQo+Pj4+ICAgZXh0ZXJuIGNvbnN0IHN0cnVjdCBibG9ja19kZXZp
+Y2Vfb3BlcmF0aW9ucyBudm1lX25zX2hlYWRfb3BzOw0KPj4+PiAgIA0KPj4+IA0KPj4+IA0KPj4+
+IEtlaXRoLCBDaHJpc3RvcGgsIFNhZ2ksIElzIGl0IG9rYXkgdGhhdCB0aGVzZSB0d28gY2hhbmdl
+cyB0aGF0IGV4cG9zZXMNCj4+PiB0aGUgbnZtZV9nZXRfbG9nX2V4dCBmbiBhcmUgY2FycmllZCB0
+aHJvdWdoIEplbnMnIHRyZWUgYWZ0ZXIgdGhlIG52bWUNCj4+PiB0cmVlIGZvciA0LjE3IGhhcyBi
+ZWVuIHB1bGxlZD8NCj4+IFRoYXQncyBva2F5IHdpdGggbWUuIEFsdGVyYXRpdmVseSwgaWYgeW91
+IHdhbnQgdG8gc3BsaXQgdGhlIGdlbmVyaWMgbnZtZQ0KPj4gcGFydCBvdXQsIEkgY2FuIGFwcGx5
+IHRoYXQgaW1tZWRpYXRlbHkgYW5kIHRoZSBBUEkgd2lsbCBiZSBpbiB0aGUgZmlyc3QNCj4+IG52
+bWUtNC4xNyBwdWxsIHJlcXVlc3QuDQo+IA0KPiBXaWxsIGRvLiBJJ3ZlIHNlbnQgdGhlIHBhdGNo
+IGluIGFub3RoZXIgbWFpbC4gVGhhbmtzISA6KQ0KDQpJdOKAmXMgZmluZSB3aXRoIG1lLg0KDQpN
+YXRpYXM6IGRvIHlvdSB0YWtlIHRoYXQgcGFydCBvZiB0aGUgcGF0Y2ggb3V0IGRpcmVjdGx5IG9u
+IG91ciB0cmVlPw0KDQpKYXZpZXIuIA==
