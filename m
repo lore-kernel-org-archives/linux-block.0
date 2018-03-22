@@ -1,38 +1,30 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <prvs=6124e0dd9=Bart.VanAssche@wdc.com>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "shawn.lin@rock-chips.com" <shawn.lin@rock-chips.com>, "axboe@kernel.dk"
+	<axboe@kernel.dk>
+CC: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"adrian.hunter@intel.com" <adrian.hunter@intel.com>
 Subject: Re: [PATCH] mmc: block: Delete gendisk before cleaning up the request
  queue
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
- "shawn.lin@rock-chips.com" <shawn.lin@rock-chips.com>
-Cc: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
- "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "adrian.hunter@intel.com" <adrian.hunter@intel.com>
+Date: Thu, 22 Mar 2018 16:59:20 +0000
+Message-ID: <1521737959.2637.7.camel@wdc.com>
 References: <1521716176-20731-1-git-send-email-shawn.lin@rock-chips.com>
- <1521737959.2637.7.camel@wdc.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <56cad842-1236-ce35-78a4-599d9c956470@kernel.dk>
-Date: Thu, 22 Mar 2018 11:05:03 -0600
+In-Reply-To: <1521716176-20731-1-git-send-email-shawn.lin@rock-chips.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1521737959.2637.7.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 3/22/18 10:59 AM, Bart Van Assche wrote:
-> On Thu, 2018-03-22 at 18:56 +0800, Shawn Lin wrote:
->> dd if=/dev/urandom of=/dev/mmcblk1 bs=4k count=10000
->> with a SD card hotplug during transfer reports a warning below
->> introduced by commit a063057d7c73 ("block: Fix a race between
->> request queue removal and the block cgroup controller"). So we
->> should now remove the disk, partition and bdi sysfs attributes
->> before cleaning up the request queue associated with the disk.
-> 
-> Since del_gendisk() may submit I/O calling blk_cleanup_queue() before
-> del_gendisk() has never been safe so this requirement is not really new.
-> Anyway, thanks for this patch.
-
-Indeed, it has always been so. In any case, patch does look good,
-applied.
-
-
--- 
-Jens Axboe
+T24gVGh1LCAyMDE4LTAzLTIyIGF0IDE4OjU2ICswODAwLCBTaGF3biBMaW4gd3JvdGU6DQo+IGRk
+IGlmPS9kZXYvdXJhbmRvbSBvZj0vZGV2L21tY2JsazEgYnM9NGsgY291bnQ9MTAwMDANCj4gd2l0
+aCBhIFNEIGNhcmQgaG90cGx1ZyBkdXJpbmcgdHJhbnNmZXIgcmVwb3J0cyBhIHdhcm5pbmcgYmVs
+b3cNCj4gaW50cm9kdWNlZCBieSBjb21taXQgYTA2MzA1N2Q3YzczICgiYmxvY2s6IEZpeCBhIHJh
+Y2UgYmV0d2Vlbg0KPiByZXF1ZXN0IHF1ZXVlIHJlbW92YWwgYW5kIHRoZSBibG9jayBjZ3JvdXAg
+Y29udHJvbGxlciIpLiBTbyB3ZQ0KPiBzaG91bGQgbm93IHJlbW92ZSB0aGUgZGlzaywgcGFydGl0
+aW9uIGFuZCBiZGkgc3lzZnMgYXR0cmlidXRlcw0KPiBiZWZvcmUgY2xlYW5pbmcgdXAgdGhlIHJl
+cXVlc3QgcXVldWUgYXNzb2NpYXRlZCB3aXRoIHRoZSBkaXNrLg0KDQpTaW5jZSBkZWxfZ2VuZGlz
+aygpIG1heSBzdWJtaXQgSS9PIGNhbGxpbmcgYmxrX2NsZWFudXBfcXVldWUoKSBiZWZvcmUNCmRl
+bF9nZW5kaXNrKCkgaGFzIG5ldmVyIGJlZW4gc2FmZSBzbyB0aGlzIHJlcXVpcmVtZW50IGlzIG5v
+dCByZWFsbHkgbmV3Lg0KQW55d2F5LCB0aGFua3MgZm9yIHRoaXMgcGF0Y2guDQoNClJldmlld2Vk
+LWJ5OiBCYXJ0IFZhbiBBc3NjaGUgPGJhcnQudmFuYXNzY2hlQHdkYy5jb20+DQoNCg0K
