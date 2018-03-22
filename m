@@ -1,30 +1,95 @@
-Return-Path: <prvs=6124e0dd9=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "shawn.lin@rock-chips.com" <shawn.lin@rock-chips.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>
-CC: "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
-	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"adrian.hunter@intel.com" <adrian.hunter@intel.com>
-Subject: Re: [PATCH] mmc: block: Delete gendisk before cleaning up the request
- queue
-Date: Thu, 22 Mar 2018 16:59:20 +0000
-Message-ID: <1521737959.2637.7.camel@wdc.com>
-References: <1521716176-20731-1-git-send-email-shawn.lin@rock-chips.com>
-In-Reply-To: <1521716176-20731-1-git-send-email-shawn.lin@rock-chips.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Return-Path: <shawn.lin@rock-chips.com>
+From: Shawn Lin <shawn.lin@rock-chips.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Bart Van Assche <bart.vanassche@wdc.com>,
+	linux-mmc@vger.kernel.org,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Shawn Lin <shawn.lin@rock-chips.com>
+Subject: [PATCH] mmc: block: Delete gendisk before cleaning up the request queue
+Date: Thu, 22 Mar 2018 18:56:16 +0800
+Message-Id: <1521716176-20731-1-git-send-email-shawn.lin@rock-chips.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gVGh1LCAyMDE4LTAzLTIyIGF0IDE4OjU2ICswODAwLCBTaGF3biBMaW4gd3JvdGU6DQo+IGRk
-IGlmPS9kZXYvdXJhbmRvbSBvZj0vZGV2L21tY2JsazEgYnM9NGsgY291bnQ9MTAwMDANCj4gd2l0
-aCBhIFNEIGNhcmQgaG90cGx1ZyBkdXJpbmcgdHJhbnNmZXIgcmVwb3J0cyBhIHdhcm5pbmcgYmVs
-b3cNCj4gaW50cm9kdWNlZCBieSBjb21taXQgYTA2MzA1N2Q3YzczICgiYmxvY2s6IEZpeCBhIHJh
-Y2UgYmV0d2Vlbg0KPiByZXF1ZXN0IHF1ZXVlIHJlbW92YWwgYW5kIHRoZSBibG9jayBjZ3JvdXAg
-Y29udHJvbGxlciIpLiBTbyB3ZQ0KPiBzaG91bGQgbm93IHJlbW92ZSB0aGUgZGlzaywgcGFydGl0
-aW9uIGFuZCBiZGkgc3lzZnMgYXR0cmlidXRlcw0KPiBiZWZvcmUgY2xlYW5pbmcgdXAgdGhlIHJl
-cXVlc3QgcXVldWUgYXNzb2NpYXRlZCB3aXRoIHRoZSBkaXNrLg0KDQpTaW5jZSBkZWxfZ2VuZGlz
-aygpIG1heSBzdWJtaXQgSS9PIGNhbGxpbmcgYmxrX2NsZWFudXBfcXVldWUoKSBiZWZvcmUNCmRl
-bF9nZW5kaXNrKCkgaGFzIG5ldmVyIGJlZW4gc2FmZSBzbyB0aGlzIHJlcXVpcmVtZW50IGlzIG5v
-dCByZWFsbHkgbmV3Lg0KQW55d2F5LCB0aGFua3MgZm9yIHRoaXMgcGF0Y2guDQoNClJldmlld2Vk
-LWJ5OiBCYXJ0IFZhbiBBc3NjaGUgPGJhcnQudmFuYXNzY2hlQHdkYy5jb20+DQoNCg0K
+dd if=/dev/urandom of=/dev/mmcblk1 bs=4k count=10000
+with a SD card hotplug during transfer reports a warning below
+introduced by commit a063057d7c73 ("block: Fix a race between
+request queue removal and the block cgroup controller"). So we
+should now remove the disk, partition and bdi sysfs attributes
+before cleaning up the request queue associated with the disk.
+
+[  410.331226] mmc1: card 59b4 removed
+[  410.348583] WARNING: CPU: 0 PID: 5 at block/blk-core.c:785
+blk_cleanup_queue+0x138/0x140
+[  410.349294] Modules linked in:
+[  410.349570] CPU: 0 PID: 5 Comm: kworker/0:0 Not tainted
+4.16.0-rc6-next-20180321-00004-gc2ad6a7 #263
+[  410.350363] Hardware name: Excavator-RK3399 Board (DT)
+[  410.350819] Workqueue: events_freezable mmc_rescan
+[  410.351242] pstate: 60000005 (nZCv daif -PAN -UAO)
+[  410.351663] pc : blk_cleanup_queue+0x138/0x140
+[  410.352054] lr : blk_cleanup_queue+0xac/0x140
+[  410.352436] sp : ffff0000092cbb90
+[  410.352727] x29: ffff0000092cbb90 x28: 0000000000000000
+[  410.353195] x27: ffff8000f6f23030 x26: ffff00000904e610
+[  410.353662] x25: ffff8000f17cc808 x24: ffff8000f1038200
+[  410.354128] x23: 0000000000000060 x22: 0000000000000000
+[  410.354595] x21: ffff8000f11748d8 x20: ffff8000f1038200
+[  410.355061] x19: ffff8000f1174200 x18: 0000ffff936347d8
+[  410.355528] x17: 0000ffff935b93c0 x16: ffff0000081263f8
+[  410.355994] x15: 0000000000000000 x14: 0000000000000400
+[  410.356461] x13: 0000000000000001 x12: 0000000000000001
+[  410.356927] x11: 0000000000000040 x10: ffff8000f2400028
+[  410.357393] x9 : ffff8000f2400040 x8 : 0000000000000000
+[  410.357860] x7 : ffff8000f6f3a340 x6 : ffff8000f6f3a340
+[  410.358326] x5 : ffff8000f2400000 x4 : ffff8000f6f3a340
+[  410.358792] x3 : 0000000000000000 x2 : 39c1333e45670800
+[  410.359259] x1 : 0000000000000000 x0 : 0000000000000003
+[  410.359726] Call trace:
+[  410.359943]  blk_cleanup_queue+0x138/0x140
+[  410.360305]  mmc_cleanup_queue+0x2c/0x48
+[  410.360652]  mmc_blk_remove_req+0x1c/0x98
+[  410.361005]  mmc_blk_remove+0x180/0x1c0
+[  410.361343]  mmc_bus_remove+0x1c/0x28
+[  410.361670]  device_release_driver_internal+0x154/0x1f0
+[  410.362128]  device_release_driver+0x14/0x20
+[  410.362504]  bus_remove_device+0xc8/0x108
+[  410.362858]  device_del+0x120/0x350
+[  410.363167]  mmc_remove_card+0x5c/0xb8
+[  410.363498]  mmc_sd_detect+0x40/0x78
+[  410.363813]  mmc_rescan+0x19c/0x368
+[  410.364123]  process_one_work+0x1ac/0x318
+[  410.364477]  worker_thread+0x50/0x450
+[  410.364801]  kthread+0xf8/0x128
+[  410.365081]  ret_from_fork+0x10/0x18
+[  410.365395] ---[ end trace 268e87a46c28968c ]---
+
+Signed-off-by: Shawn Lin <shawn.lin@rock-chips.com>
+---
+
+ drivers/mmc/core/block.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index a2b9c25..02485e3 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -2659,7 +2659,6 @@ static void mmc_blk_remove_req(struct mmc_blk_data *md)
+ 		 * from being accepted.
+ 		 */
+ 		card = md->queue.card;
+-		mmc_cleanup_queue(&md->queue);
+ 		if (md->disk->flags & GENHD_FL_UP) {
+ 			device_remove_file(disk_to_dev(md->disk), &md->force_ro);
+ 			if ((md->area_type & MMC_BLK_DATA_AREA_BOOT) &&
+@@ -2669,6 +2668,7 @@ static void mmc_blk_remove_req(struct mmc_blk_data *md)
+ 
+ 			del_gendisk(md->disk);
+ 		}
++		mmc_cleanup_queue(&md->queue);
+ 		mmc_blk_put(md);
+ 	}
+ }
+-- 
+1.9.1
