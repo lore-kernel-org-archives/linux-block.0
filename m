@@ -1,74 +1,96 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:21834 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752044AbeCZW4Y (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Mar 2018 18:56:24 -0400
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "jaco@uls.co.za" <jaco@uls.co.za>
-CC: "pieterk@uls.co.za" <pieterk@uls.co.za>
+Received: from othala.iewc.co.za ([154.73.34.12]:39380 "EHLO othala.iewc.co.za"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753102AbeCXViZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 24 Mar 2018 17:38:25 -0400
 Subject: Re: disk-io lockup in 4.14.13 kernel
-Date: Mon, 26 Mar 2018 22:56:21 +0000
-Message-ID: <1522104980.3102.30.camel@wdc.com>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc: "pieterk@uls.co.za" <pieterk@uls.co.za>
 References: <16bae006-371f-1eea-56b6-8668249d870b@uls.co.za>
-         <828103f7-7550-16a3-d482-8953adc5a234@wdc.com>
-         <257ceeb7-f466-d13d-8818-829759eda587@uls.co.za>
-         <1520737695.8740.4.camel@wdc.com>
-         <6e2ef6eb-a610-8c52-52d8-a35e4d3f36c9@uls.co.za>
-         <1520744455.8740.9.camel@wdc.com>
-         <0d5c21c2-4fea-5870-e971-f90556fb4141@uls.co.za>
-         <1520950225.2921.0.camel@wdc.com>
-         <cca75546-a02e-bed3-fda0-0003ccc5d158@uls.co.za>
-         <1520953606.2638.5.camel@wdc.com>
-         <b9f2421d-6350-1136-86ea-bdb70a59b6d9@uls.co.za>
-         <1520961846.2638.25.camel@wdc.com>
-         <ee32fa2f-3470-0ba8-a1a6-a362877b2fcc@uls.co.za>
-In-Reply-To: <ee32fa2f-3470-0ba8-a1a6-a362877b2fcc@uls.co.za>
-Content-Type: text/plain; charset="utf-8"
+ <828103f7-7550-16a3-d482-8953adc5a234@wdc.com>
+ <257ceeb7-f466-d13d-8818-829759eda587@uls.co.za>
+ <1520737695.8740.4.camel@wdc.com>
+ <6e2ef6eb-a610-8c52-52d8-a35e4d3f36c9@uls.co.za>
+ <1520744455.8740.9.camel@wdc.com>
+ <0d5c21c2-4fea-5870-e971-f90556fb4141@uls.co.za>
+ <1520950225.2921.0.camel@wdc.com>
+ <cca75546-a02e-bed3-fda0-0003ccc5d158@uls.co.za>
+ <1520953606.2638.5.camel@wdc.com>
+ <b9f2421d-6350-1136-86ea-bdb70a59b6d9@uls.co.za>
+ <1520961846.2638.25.camel@wdc.com>
+From: Jaco Kroon <jaco@uls.co.za>
+Message-ID: <ee32fa2f-3470-0ba8-a1a6-a362877b2fcc@uls.co.za>
+Date: Sat, 24 Mar 2018 23:38:01 +0200
 MIME-Version: 1.0
+In-Reply-To: <1520961846.2638.25.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-T24gU2F0LCAyMDE4LTAzLTI0IGF0IDIzOjM4ICswMjAwLCBKYWNvIEtyb29uIHdyb3RlOg0KPiBE
-b2VzIHRoZSBmb2xsb3dpbmcgZ28gd2l0aCB5b3VyIHRoZW9yeToNCj4gDQo+IFs0NTI1NDUuOTQ1
-NTYxXSBzeXNycTogU3lzUnEgOiBTaG93IGJhY2t0cmFjZSBvZiBhbGwgYWN0aXZlIENQVXMNCj4g
-WzQ1MjU0NS45NDYxODJdIE5NSSBiYWNrdHJhY2UgZm9yIGNwdSA1DQo+IFs0NTI1NDUuOTQ2MTg1
-XSBDUFU6IDUgUElEOiAzMTkyMSBDb21tOiBiYXNoIFRhaW50ZWQ6IEcgICAgICAgICAgSSAgICAN
-Cj4gNC4xNC4xMy11bHMgIzINCj4gWzQ1MjU0NS45NDYxODZdIEhhcmR3YXJlIG5hbWU6IFN1cGVy
-bWljcm8NCj4gU1NHLTUwNDhSLUUxQ1IzNkwvWDEwU1JILUNMTjRGLCBCSU9TIFQyMDE0MDUyMDEw
-MzI0NyAwNS8yMC8yMDE0DQo+IFs0NTI1NDUuOTQ2MTg3XSBDYWxsIFRyYWNlOg0KPiBbNDUyNTQ1
-Ljk0NjE5Nl0gIGR1bXBfc3RhY2srMHg0Ni8weDVhDQo+IFs0NTI1NDUuOTQ2MjAwXSAgbm1pX2Nw
-dV9iYWNrdHJhY2UrMHhiMy8weGMwDQo+IFs0NTI1NDUuOTQ2MjA1XSAgPyBpcnFfZm9yY2VfY29t
-cGxldGVfbW92ZSsweGQwLzB4ZDANCj4gWzQ1MjU0NS45NDYyMDhdICBubWlfdHJpZ2dlcl9jcHVt
-YXNrX2JhY2t0cmFjZSsweDhmLzB4YzANCj4gWzQ1MjU0NS45NDYyMTJdICBfX2hhbmRsZV9zeXNy
-cSsweGVjLzB4MTQwDQo+IFs0NTI1NDUuOTQ2MjE2XSAgd3JpdGVfc3lzcnFfdHJpZ2dlcisweDI2
-LzB4MzANCj4gWzQ1MjU0NS45NDYyMTldICBwcm9jX3JlZ193cml0ZSsweDM4LzB4NjANCj4gWzQ1
-MjU0NS45NDYyMjJdICBfX3Zmc193cml0ZSsweDFlLzB4MTMwDQo+IFs0NTI1NDUuOTQ2MjI1XSAg
-dmZzX3dyaXRlKzB4YWIvMHgxOTANCj4gWzQ1MjU0NS45NDYyMjhdICBTeVNfd3JpdGUrMHgzZC8w
-eGEwDQo+IFs0NTI1NDUuOTQ2MjMzXSAgZW50cnlfU1lTQ0FMTF82NF9mYXN0cGF0aCsweDEzLzB4
-NmMNCj4gWzQ1MjU0NS45NDYyMzZdIFJJUDogMDAzMzoweDdmNmI4NWRiNTJkMA0KPiBbNDUyNTQ1
-Ljk0NjIzOF0gUlNQOiAwMDJiOjAwMDA3ZmZmNmY5NDc5ZTggRUZMQUdTOiAwMDAwMDI0Ng0KPiBb
-NDUyNTQ1Ljk0NjI0MV0gU2VuZGluZyBOTUkgZnJvbSBDUFUgNSB0byBDUFVzIDAtNDoNCj4gWzQ1
-MjU0NS45NDYyNzJdIE5NSSBiYWNrdHJhY2UgZm9yIGNwdSAwIHNraXBwZWQ6IGlkbGluZyBhdCBw
-Yw0KPiAweGZmZmZmZmZmODE2MmIwYTANCj4gWzQ1MjU0NS45NDYyNzVdIE5NSSBiYWNrdHJhY2Ug
-Zm9yIGNwdSAzIHNraXBwZWQ6IGlkbGluZyBhdCBwYw0KPiAweGZmZmZmZmZmODE2MmIwYTANCj4g
-WzQ1MjU0NS45NDYyNzldIE5NSSBiYWNrdHJhY2UgZm9yIGNwdSA0IHNraXBwZWQ6IGlkbGluZyBh
-dCBwYw0KPiAweGZmZmZmZmZmODE2MmIwYTANCj4gWzQ1MjU0NS45NDYyODNdIE5NSSBiYWNrdHJh
-Y2UgZm9yIGNwdSAyIHNraXBwZWQ6IGlkbGluZyBhdCBwYw0KPiAweGZmZmZmZmZmODE2MmIwYTAN
-Cj4gWzQ1MjU0NS45NDYyODddIE5NSSBiYWNrdHJhY2UgZm9yIGNwdSAxIHNraXBwZWQ6IGlkbGlu
-ZyBhdCBwYw0KPiAweGZmZmZmZmZmODE2MmIwYTANCj4gDQo+IEknbSBub3Qgc3VyZSBob3cgdG8g
-bGluayB0aGF0IGFkZHJlc3MgYmFjayB0byBzb21lIGZ1bmN0aW9uIG9yDQo+IHNvbWV0aGluZywg
-YW5kIGhhZCB0byByZWJvb3QsIHNvIG5vdCBzdXJlIGlmIHRoYXQgY2FuIGJlIGRvbmUgc3RpbGwu
-DQoNCkhlbGxvIEphY28sDQoNClRoZSBhYm92ZSBjYWxsIHRyYWNlIG1lYW5zIHRoYXQgU3lzUnEt
-bCB3YXMgdHJpZ2dlcmVkLCBlaXRoZXIgdmlhIHRoZSBrZXlib2FyZA0Kb3IgdGhyb3VnaCBwcm9j
-ZnMuIEkgZG9uJ3QgdGhpbmsgdGhhdCB0aGVyZSBpcyBhbnkgaW5mb3JtYXRpb24gaW4gdGhlIGFi
-b3ZlDQp0aGF0IHJldmVhbHMgdGhlIHJvb3QgY2F1c2Ugb2Ygd2h5IGEgcmVib290IHdhcyBuZWNl
-c3NhcnkuDQoNCldoYXQgSSBkbyBteXNlbGYgdG8gaWRlbnRpZnkgdGhlIHJvb3QgY2F1c2Ugb2Yg
-d2VpcmQga2VybmVsIGJlaGF2aW9yIGlzIHRvDQpyZWJ1aWxkIHRoZSBrZXJuZWwgd2l0aCBhIGJ1
-bmNoIG9mIGRlYnVnZ2luZyBvcHRpb25zIGVuYWJsZWQgYW5kIHRoYXQgSSB0cnkgdG8NCnJlcGVh
-dCB0aGUgdHJpZ2dlciB0aGF0IGNhdXNlZCB0aGUgd2VpcmQgYmVoYXZpb3IuIElmIHRoaXMgY2F1
-c2VzIHRoZSBrZXJuZWwNCmRlYnVnZ2luZyBjb2RlIHRvIHByb2R1Y2UgYWRkaXRpb25hbCBvdXRw
-dXQgdGhhdCBvdXRwdXQgY2FuIGJlIHZlcnkgaGVscGZ1bCBmb3INCmlkZW50aWZ5aW5nIHdoYXQg
-aXMgZ29pbmcgb24uIFRoaXMgYXBwcm9hY2ggZG9lcyBub3QgYWx3YXlzIHdvcmsgaG93ZXZlci4N
-Cg0KQmFydC4NCg0KDQoNCg==
+Hi Bart,
+
+Does the following go with your theory:
+
+[452545.945561] sysrq: SysRq : Show backtrace of all active CPUs
+[452545.946182] NMI backtrace for cpu 5
+[452545.946185] CPU: 5 PID: 31921 Comm: bash Tainted: G          I    
+4.14.13-uls #2
+[452545.946186] Hardware name: Supermicro
+SSG-5048R-E1CR36L/X10SRH-CLN4F, BIOS T20140520103247 05/20/2014
+[452545.946187] Call Trace:
+[452545.946196]  dump_stack+0x46/0x5a
+[452545.946200]  nmi_cpu_backtrace+0xb3/0xc0
+[452545.946205]  ? irq_force_complete_move+0xd0/0xd0
+[452545.946208]  nmi_trigger_cpumask_backtrace+0x8f/0xc0
+[452545.946212]  __handle_sysrq+0xec/0x140
+[452545.946216]  write_sysrq_trigger+0x26/0x30
+[452545.946219]  proc_reg_write+0x38/0x60
+[452545.946222]  __vfs_write+0x1e/0x130
+[452545.946225]  vfs_write+0xab/0x190
+[452545.946228]  SyS_write+0x3d/0xa0
+[452545.946233]  entry_SYSCALL_64_fastpath+0x13/0x6c
+[452545.946236] RIP: 0033:0x7f6b85db52d0
+[452545.946238] RSP: 002b:00007fff6f9479e8 EFLAGS: 00000246
+[452545.946241] Sending NMI from CPU 5 to CPUs 0-4:
+[452545.946272] NMI backtrace for cpu 0 skipped: idling at pc
+0xffffffff8162b0a0
+[452545.946275] NMI backtrace for cpu 3 skipped: idling at pc
+0xffffffff8162b0a0
+[452545.946279] NMI backtrace for cpu 4 skipped: idling at pc
+0xffffffff8162b0a0
+[452545.946283] NMI backtrace for cpu 2 skipped: idling at pc
+0xffffffff8162b0a0
+[452545.946287] NMI backtrace for cpu 1 skipped: idling at pc
+0xffffffff8162b0a0
+
+I'm not sure how to link that address back to some function or
+something, and had to reboot, so not sure if that can be done still.
+
+Kind Regards,
+Jaco
+
+On 13/03/2018 19:24, Bart Van Assche wrote:
+> On Tue, 2018-03-13 at 19:16 +0200, Jaco Kroon wrote:
+>> The server in question is the destination of  numerous rsync/ssh cases
+>> (used primarily for backups) and is not intended as a real-time system.
+>> I'm happy to enable the options below that you would indicate would be
+>> helpful in pinpointing the problem (assuming we're not looking at a 8x
+>> more CPU required type of degrading as I've recently seen with asterisk
+>> lock debugging enabled). I've marked in bold below what I assume would
+>> be helpful.  If you don't mind confirming for me I'll enable and
+>> schedule a reboot.
+> Hello Jaco,
+>
+> My recommendation is to wait until the mpt3sas maintainers post a fix
+> for what I reported yesterday on the linux-scsi mailing list. Enabling
+> CONFIG_DEBUG_ATOMIC_SLEEP has namely a very annoying consequence for the
+> mpt3sas driver: the first process that hits the "sleep in atomic context"
+> bug gets killed. I don't think that you want this kind of behavior on a
+> production setup.
+>
+> Bart.
+>
+>
+>
+>
