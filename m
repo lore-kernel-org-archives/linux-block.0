@@ -1,21 +1,24 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Mon, 26 Mar 2018 09:50:38 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Linux NVMe <linux-nvme@lists.infradead.org>,
-	Linux Block <linux-block@vger.kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Jianchao Wang <jianchao.w.wang@oracle.com>,
-	Jens Axboe <axboe@kernel.dk>
+Return-Path: <jianchao.w.wang@oracle.com>
 Subject: Re: [PATCH 1/3] blk-mq: Allow PCI vector offset for mapping queues
-Message-ID: <20180326015038.GD9828@ming.t460p>
+To: Keith Busch <keith.busch@intel.com>,
+        Linux NVMe <linux-nvme@lists.infradead.org>,
+        Linux Block <linux-block@vger.kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 References: <20180323221923.24545-1-keith.busch@intel.com>
+From: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <d818f023-01a5-0728-2cc9-7a0649b5df3c@oracle.com>
+Date: Sat, 24 Mar 2018 21:55:49 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180323221923.24545-1-keith.busch@intel.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Mar 23, 2018 at 04:19:21PM -0600, Keith Busch wrote:
+Hi Keith
+
+Thanks for your time and patch for this.
+
+On 03/24/2018 06:19 AM, Keith Busch wrote:
 > The PCI interrupt vectors intended to be associated with a queue may
 > not start at 0. This patch adds an offset parameter so blk-mq may find
 > the intended affinity mask. The default value is 0 so existing drivers
@@ -56,37 +59,9 @@ On Fri, Mar 23, 2018 at 04:19:21PM -0600, Keith Busch wrote:
 >  		if (!mask)
 >  			goto fallback;
 >  
-> @@ -50,4 +52,10 @@ int blk_mq_pci_map_queues(struct blk_mq_tag_set *set, struct pci_dev *pdev)
->  		set->mq_map[cpu] = 0;
->  	return 0;
->  }
-> +EXPORT_SYMBOL_GPL(__blk_mq_pci_map_queues);
-> +
-> +int blk_mq_pci_map_queues(struct blk_mq_tag_set *set, struct pci_dev *pdev)
-> +{
-> +	return __blk_mq_pci_map_queues(set, pdev, 0);
-> +}
->  EXPORT_SYMBOL_GPL(blk_mq_pci_map_queues);
-> diff --git a/include/linux/blk-mq-pci.h b/include/linux/blk-mq-pci.h
-> index 6338551e0fb9..5a92ecdbd78e 100644
-> --- a/include/linux/blk-mq-pci.h
-> +++ b/include/linux/blk-mq-pci.h
-> @@ -5,6 +5,8 @@
->  struct blk_mq_tag_set;
->  struct pci_dev;
->  
-> +int __blk_mq_pci_map_queues(struct blk_mq_tag_set *set, struct pci_dev *pdev,
-> +			    int offset);
->  int blk_mq_pci_map_queues(struct blk_mq_tag_set *set, struct pci_dev *pdev);
->  
->  #endif /* _LINUX_BLK_MQ_PCI_H */
-> -- 
-> 2.14.3
-> 
 
-Given no many callers of blk_mq_pci_map_queues(), I suggest to add the
-parameter of 'offset' to this API directly, then people may keep the 
-'.pre_vectors' stuff in mind, and avoid to misuse it.
+Maybe we could provide a callback parameter for __blk_mq_pci_map_queues which
+give the mapping from hctx queue num to device-relative interrupt vector index.
 
-Thanks,
-Ming
+Thanks
+Jianchao
