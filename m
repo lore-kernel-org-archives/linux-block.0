@@ -1,57 +1,74 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from othala.iewc.co.za ([154.73.34.12]:59570 "EHLO othala.iewc.co.za"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751121AbeC0I7O (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Mar 2018 04:59:14 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:21834 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752044AbeCZW4Y (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Mar 2018 18:56:24 -0400
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "jaco@uls.co.za" <jaco@uls.co.za>
+CC: "pieterk@uls.co.za" <pieterk@uls.co.za>
 Subject: Re: disk-io lockup in 4.14.13 kernel
-To: Bart Van Assche <Bart.VanAssche@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: "pieterk@uls.co.za" <pieterk@uls.co.za>
+Date: Mon, 26 Mar 2018 22:56:21 +0000
+Message-ID: <1522104980.3102.30.camel@wdc.com>
 References: <16bae006-371f-1eea-56b6-8668249d870b@uls.co.za>
- <828103f7-7550-16a3-d482-8953adc5a234@wdc.com>
- <257ceeb7-f466-d13d-8818-829759eda587@uls.co.za>
- <1520737695.8740.4.camel@wdc.com>
- <6e2ef6eb-a610-8c52-52d8-a35e4d3f36c9@uls.co.za>
- <1520744455.8740.9.camel@wdc.com>
- <0d5c21c2-4fea-5870-e971-f90556fb4141@uls.co.za>
- <1520950225.2921.0.camel@wdc.com>
- <cca75546-a02e-bed3-fda0-0003ccc5d158@uls.co.za>
- <1520953606.2638.5.camel@wdc.com>
- <b9f2421d-6350-1136-86ea-bdb70a59b6d9@uls.co.za>
- <1520961846.2638.25.camel@wdc.com>
- <ee32fa2f-3470-0ba8-a1a6-a362877b2fcc@uls.co.za>
- <1522104980.3102.30.camel@wdc.com>
-From: Jaco Kroon <jaco@uls.co.za>
-Message-ID: <098b139a-53b5-b243-dc3f-67fb7efa5ff1@uls.co.za>
-Date: Tue, 27 Mar 2018 10:59:00 +0200
+         <828103f7-7550-16a3-d482-8953adc5a234@wdc.com>
+         <257ceeb7-f466-d13d-8818-829759eda587@uls.co.za>
+         <1520737695.8740.4.camel@wdc.com>
+         <6e2ef6eb-a610-8c52-52d8-a35e4d3f36c9@uls.co.za>
+         <1520744455.8740.9.camel@wdc.com>
+         <0d5c21c2-4fea-5870-e971-f90556fb4141@uls.co.za>
+         <1520950225.2921.0.camel@wdc.com>
+         <cca75546-a02e-bed3-fda0-0003ccc5d158@uls.co.za>
+         <1520953606.2638.5.camel@wdc.com>
+         <b9f2421d-6350-1136-86ea-bdb70a59b6d9@uls.co.za>
+         <1520961846.2638.25.camel@wdc.com>
+         <ee32fa2f-3470-0ba8-a1a6-a362877b2fcc@uls.co.za>
+In-Reply-To: <ee32fa2f-3470-0ba8-a1a6-a362877b2fcc@uls.co.za>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1522104980.3102.30.camel@wdc.com>
-Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi Bart,
-> The above call trace means that SysRq-l was triggered, either via the keyboard
-> or through procfs. I don't think that there is any information in the above
-> that reveals the root cause of why a reboot was necessary.
-I triggered it hoping to get a stack trace of the process which is
-deadlocking finding where the lock is being taken that ends up blocking,
-but I then realized that you mentioned sleeping, which may end up not
-having a stack trace because there is no process actually running?  (I'm
-not that intimately familiar with kernel internals, mostly doing
-user-space development, so kernel is an interesting environment for me
-only, but not really part of my day-to-day activities.
->
-> What I do myself to identify the root cause of weird kernel behavior is to
-> rebuild the kernel with a bunch of debugging options enabled and that I try to
-> repeat the trigger that caused the weird behavior. If this causes the kernel
-> debugging code to produce additional output that output can be very helpful for
-> identifying what is going on. This approach does not always work however.
-Yea, I find debugging is often an art more than a science.  I saw a
-patch for the mpt3sas issue but the email was munged and I wasn't able
-to apply the patch from the email - I've emailed w.r.t. that but I've
-not received a response.  Have you managed to get anything more sensible
-from them?
-
-Kind Regards,
-Jaco
+T24gU2F0LCAyMDE4LTAzLTI0IGF0IDIzOjM4ICswMjAwLCBKYWNvIEtyb29uIHdyb3RlOg0KPiBE
+b2VzIHRoZSBmb2xsb3dpbmcgZ28gd2l0aCB5b3VyIHRoZW9yeToNCj4gDQo+IFs0NTI1NDUuOTQ1
+NTYxXSBzeXNycTogU3lzUnEgOiBTaG93IGJhY2t0cmFjZSBvZiBhbGwgYWN0aXZlIENQVXMNCj4g
+WzQ1MjU0NS45NDYxODJdIE5NSSBiYWNrdHJhY2UgZm9yIGNwdSA1DQo+IFs0NTI1NDUuOTQ2MTg1
+XSBDUFU6IDUgUElEOiAzMTkyMSBDb21tOiBiYXNoIFRhaW50ZWQ6IEcgICAgICAgICAgSSAgICAN
+Cj4gNC4xNC4xMy11bHMgIzINCj4gWzQ1MjU0NS45NDYxODZdIEhhcmR3YXJlIG5hbWU6IFN1cGVy
+bWljcm8NCj4gU1NHLTUwNDhSLUUxQ1IzNkwvWDEwU1JILUNMTjRGLCBCSU9TIFQyMDE0MDUyMDEw
+MzI0NyAwNS8yMC8yMDE0DQo+IFs0NTI1NDUuOTQ2MTg3XSBDYWxsIFRyYWNlOg0KPiBbNDUyNTQ1
+Ljk0NjE5Nl0gIGR1bXBfc3RhY2srMHg0Ni8weDVhDQo+IFs0NTI1NDUuOTQ2MjAwXSAgbm1pX2Nw
+dV9iYWNrdHJhY2UrMHhiMy8weGMwDQo+IFs0NTI1NDUuOTQ2MjA1XSAgPyBpcnFfZm9yY2VfY29t
+cGxldGVfbW92ZSsweGQwLzB4ZDANCj4gWzQ1MjU0NS45NDYyMDhdICBubWlfdHJpZ2dlcl9jcHVt
+YXNrX2JhY2t0cmFjZSsweDhmLzB4YzANCj4gWzQ1MjU0NS45NDYyMTJdICBfX2hhbmRsZV9zeXNy
+cSsweGVjLzB4MTQwDQo+IFs0NTI1NDUuOTQ2MjE2XSAgd3JpdGVfc3lzcnFfdHJpZ2dlcisweDI2
+LzB4MzANCj4gWzQ1MjU0NS45NDYyMTldICBwcm9jX3JlZ193cml0ZSsweDM4LzB4NjANCj4gWzQ1
+MjU0NS45NDYyMjJdICBfX3Zmc193cml0ZSsweDFlLzB4MTMwDQo+IFs0NTI1NDUuOTQ2MjI1XSAg
+dmZzX3dyaXRlKzB4YWIvMHgxOTANCj4gWzQ1MjU0NS45NDYyMjhdICBTeVNfd3JpdGUrMHgzZC8w
+eGEwDQo+IFs0NTI1NDUuOTQ2MjMzXSAgZW50cnlfU1lTQ0FMTF82NF9mYXN0cGF0aCsweDEzLzB4
+NmMNCj4gWzQ1MjU0NS45NDYyMzZdIFJJUDogMDAzMzoweDdmNmI4NWRiNTJkMA0KPiBbNDUyNTQ1
+Ljk0NjIzOF0gUlNQOiAwMDJiOjAwMDA3ZmZmNmY5NDc5ZTggRUZMQUdTOiAwMDAwMDI0Ng0KPiBb
+NDUyNTQ1Ljk0NjI0MV0gU2VuZGluZyBOTUkgZnJvbSBDUFUgNSB0byBDUFVzIDAtNDoNCj4gWzQ1
+MjU0NS45NDYyNzJdIE5NSSBiYWNrdHJhY2UgZm9yIGNwdSAwIHNraXBwZWQ6IGlkbGluZyBhdCBw
+Yw0KPiAweGZmZmZmZmZmODE2MmIwYTANCj4gWzQ1MjU0NS45NDYyNzVdIE5NSSBiYWNrdHJhY2Ug
+Zm9yIGNwdSAzIHNraXBwZWQ6IGlkbGluZyBhdCBwYw0KPiAweGZmZmZmZmZmODE2MmIwYTANCj4g
+WzQ1MjU0NS45NDYyNzldIE5NSSBiYWNrdHJhY2UgZm9yIGNwdSA0IHNraXBwZWQ6IGlkbGluZyBh
+dCBwYw0KPiAweGZmZmZmZmZmODE2MmIwYTANCj4gWzQ1MjU0NS45NDYyODNdIE5NSSBiYWNrdHJh
+Y2UgZm9yIGNwdSAyIHNraXBwZWQ6IGlkbGluZyBhdCBwYw0KPiAweGZmZmZmZmZmODE2MmIwYTAN
+Cj4gWzQ1MjU0NS45NDYyODddIE5NSSBiYWNrdHJhY2UgZm9yIGNwdSAxIHNraXBwZWQ6IGlkbGlu
+ZyBhdCBwYw0KPiAweGZmZmZmZmZmODE2MmIwYTANCj4gDQo+IEknbSBub3Qgc3VyZSBob3cgdG8g
+bGluayB0aGF0IGFkZHJlc3MgYmFjayB0byBzb21lIGZ1bmN0aW9uIG9yDQo+IHNvbWV0aGluZywg
+YW5kIGhhZCB0byByZWJvb3QsIHNvIG5vdCBzdXJlIGlmIHRoYXQgY2FuIGJlIGRvbmUgc3RpbGwu
+DQoNCkhlbGxvIEphY28sDQoNClRoZSBhYm92ZSBjYWxsIHRyYWNlIG1lYW5zIHRoYXQgU3lzUnEt
+bCB3YXMgdHJpZ2dlcmVkLCBlaXRoZXIgdmlhIHRoZSBrZXlib2FyZA0Kb3IgdGhyb3VnaCBwcm9j
+ZnMuIEkgZG9uJ3QgdGhpbmsgdGhhdCB0aGVyZSBpcyBhbnkgaW5mb3JtYXRpb24gaW4gdGhlIGFi
+b3ZlDQp0aGF0IHJldmVhbHMgdGhlIHJvb3QgY2F1c2Ugb2Ygd2h5IGEgcmVib290IHdhcyBuZWNl
+c3NhcnkuDQoNCldoYXQgSSBkbyBteXNlbGYgdG8gaWRlbnRpZnkgdGhlIHJvb3QgY2F1c2Ugb2Yg
+d2VpcmQga2VybmVsIGJlaGF2aW9yIGlzIHRvDQpyZWJ1aWxkIHRoZSBrZXJuZWwgd2l0aCBhIGJ1
+bmNoIG9mIGRlYnVnZ2luZyBvcHRpb25zIGVuYWJsZWQgYW5kIHRoYXQgSSB0cnkgdG8NCnJlcGVh
+dCB0aGUgdHJpZ2dlciB0aGF0IGNhdXNlZCB0aGUgd2VpcmQgYmVoYXZpb3IuIElmIHRoaXMgY2F1
+c2VzIHRoZSBrZXJuZWwNCmRlYnVnZ2luZyBjb2RlIHRvIHByb2R1Y2UgYWRkaXRpb25hbCBvdXRw
+dXQgdGhhdCBvdXRwdXQgY2FuIGJlIHZlcnkgaGVscGZ1bCBmb3INCmlkZW50aWZ5aW5nIHdoYXQg
+aXMgZ29pbmcgb24uIFRoaXMgYXBwcm9hY2ggZG9lcyBub3QgYWx3YXlzIHdvcmsgaG93ZXZlci4N
+Cg0KQmFydC4NCg0KDQoNCg==
