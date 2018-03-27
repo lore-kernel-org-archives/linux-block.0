@@ -1,11 +1,10 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:64396 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752610AbeC0Pgp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Mar 2018 11:36:45 -0400
+Received: from othala.iewc.co.za ([154.73.34.12]:59570 "EHLO othala.iewc.co.za"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751121AbeC0I7O (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Mar 2018 04:59:14 -0400
 Subject: Re: disk-io lockup in 4.14.13 kernel
-To: Jaco Kroon <jaco@uls.co.za>,
+To: Bart Van Assche <Bart.VanAssche@wdc.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Cc: "pieterk@uls.co.za" <pieterk@uls.co.za>
 References: <16bae006-371f-1eea-56b6-8668249d870b@uls.co.za>
@@ -22,47 +21,37 @@ References: <16bae006-371f-1eea-56b6-8668249d870b@uls.co.za>
  <1520961846.2638.25.camel@wdc.com>
  <ee32fa2f-3470-0ba8-a1a6-a362877b2fcc@uls.co.za>
  <1522104980.3102.30.camel@wdc.com>
- <098b139a-53b5-b243-dc3f-67fb7efa5ff1@uls.co.za>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-Message-ID: <77fd4247-e71f-6eac-c59a-dedb739453a6@wdc.com>
-Date: Tue, 27 Mar 2018 08:36:45 -0700
+From: Jaco Kroon <jaco@uls.co.za>
+Message-ID: <098b139a-53b5-b243-dc3f-67fb7efa5ff1@uls.co.za>
+Date: Tue, 27 Mar 2018 10:59:00 +0200
 MIME-Version: 1.0
-In-Reply-To: <098b139a-53b5-b243-dc3f-67fb7efa5ff1@uls.co.za>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1522104980.3102.30.camel@wdc.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-On 03/27/18 01:59, Jaco Kroon wrote:
-> I triggered it hoping to get a stack trace of the process which is
-> deadlocking finding where the lock is being taken that ends up blocking,
-> but I then realized that you mentioned sleeping, which may end up not
-> having a stack trace because there is no process actually running?  (I'm
-> not that intimately familiar with kernel internals, mostly doing
-> user-space development, so kernel is an interesting environment for me
-> only, but not really part of my day-to-day activities.
+Hi Bart,
+> The above call trace means that SysRq-l was triggered, either via the keyboard
+> or through procfs. I don't think that there is any information in the above
+> that reveals the root cause of why a reboot was necessary.
+I triggered it hoping to get a stack trace of the process which is
+deadlocking finding where the lock is being taken that ends up blocking,
+but I then realized that you mentioned sleeping, which may end up not
+having a stack trace because there is no process actually running?  (I'm
+not that intimately familiar with kernel internals, mostly doing
+user-space development, so kernel is an interesting environment for me
+only, but not really part of my day-to-day activities.
+>
+> What I do myself to identify the root cause of weird kernel behavior is to
+> rebuild the kernel with a bunch of debugging options enabled and that I try to
+> repeat the trigger that caused the weird behavior. If this causes the kernel
+> debugging code to produce additional output that output can be very helpful for
+> identifying what is going on. This approach does not always work however.
+Yea, I find debugging is often an art more than a science.  I saw a
+patch for the mpt3sas issue but the email was munged and I wasn't able
+to apply the patch from the email - I've emailed w.r.t. that but I've
+not received a response.  Have you managed to get anything more sensible
+from them?
 
-Usually I proceed as follows to obtain more information about a lockup:
-* Trigger SysRq-w (shows tasks that are in uninterruptible wait state).
-* If the output that appears does not provide enough information, 
-trigger SysRq-t (shows all tasks).
-* If it seems like a block layer request got stuck, also analyze the 
-output of the following command:
-
-find /sys/kernel/debug/block -type f |
-grep -vE \
-'/(poll_stat|write_hints|completed|merged|dispatched|run|queued)' | 
-xargs grep -a .
-
-> I saw a
-> patch for the mpt3sas issue but the email was munged and I wasn't able
-> to apply the patch from the email.
-
-That's weird. Saving that patch ("Save as mbox") and applying it with 
-"git am" works fine for me. See also 
-https://www.mail-archive.com/linux-scsi@vger.kernel.org/msg72175.html.
-
-Because I was too busy during the past two weeks I have not yet had the
-time to have a close look at that patch. But I hope to find some time 
-soon to have a closer look.
-
-Bart.
+Kind Regards,
+Jaco
