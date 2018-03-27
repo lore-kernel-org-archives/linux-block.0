@@ -1,81 +1,50 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:54820 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751805AbeCOKnC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Mar 2018 06:43:02 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 2/4] bcache-tools: only set/display sb.bucket_size for cache devices
-Date: Thu, 15 Mar 2018 18:42:38 +0800
-Message-Id: <20180315104240.24647-3-colyli@suse.de>
-In-Reply-To: <20180315104240.24647-1-colyli@suse.de>
-References: <20180315104240.24647-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <hch@lst.de>
+Date: Tue, 27 Mar 2018 16:17:18 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <keith.busch@intel.com>
+Cc: Linux NVMe <linux-nvme@lists.infradead.org>,
+	Linux Block <linux-block@vger.kernel.org>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Jianchao Wang <jianchao.w.wang@oracle.com>,
+	Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 1/3] blk-mq: Allow PCI vector offset for mapping queues
+Message-ID: <20180327141718.GA4724@lst.de>
+References: <20180323221923.24545-1-keith.busch@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180323221923.24545-1-keith.busch@intel.com>
+List-ID: <linux-block@vger.kernel.org>
 
-bucket_size of struct cached_dev is not shared between cache devices
-and backing devices. Currently make-bcache.c assigns bucket_size to
-backing devices, and bcache-super-show.c displays bucket_size for
-backing devices, all these are incorrect.
+On Fri, Mar 23, 2018 at 04:19:21PM -0600, Keith Busch wrote:
+> The PCI interrupt vectors intended to be associated with a queue may
+> not start at 0. This patch adds an offset parameter so blk-mq may find
+> the intended affinity mask. The default value is 0 so existing drivers
+> that don't care about this parameter don't need to change.
+> 
+> Signed-off-by: Keith Busch <keith.busch@intel.com>
+> ---
+>  block/blk-mq-pci.c         | 12 ++++++++++--
+>  include/linux/blk-mq-pci.h |  2 ++
+>  2 files changed, 12 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/blk-mq-pci.c b/block/blk-mq-pci.c
+> index 76944e3271bf..1040a7705c13 100644
+> --- a/block/blk-mq-pci.c
+> +++ b/block/blk-mq-pci.c
+> @@ -21,6 +21,7 @@
+>   * blk_mq_pci_map_queues - provide a default queue mapping for PCI device
+>   * @set:	tagset to provide the mapping for
+>   * @pdev:	PCI device associated with @set.
+> + * @offset:	PCI irq starting vector offset
+>   *
+>   * This function assumes the PCI device @pdev has at least as many available
+>   * interrupt vectors as @set has queues.  It will then query the vector
+> @@ -28,13 +29,14 @@
+>   * that maps a queue to the CPUs that have irq affinity for the corresponding
+>   * vector.
+>   */
+> -int blk_mq_pci_map_queues(struct blk_mq_tag_set *set, struct pci_dev *pdev)
+> +int __blk_mq_pci_map_queues(struct blk_mq_tag_set *set, struct pci_dev *pdev,
+> +			    int offset)
 
-This patch fixes it by only set and display sb.bucket_size for cache
-device super block.
-
-Signed-off-by: Coly Li <colyli@suse.de>
----
- bcache-super-show.c | 9 ++++-----
- make-bcache.c       | 2 +-
- 2 files changed, 5 insertions(+), 6 deletions(-)
-
-diff --git a/bcache-super-show.c b/bcache-super-show.c
-index 26cc40e..515c596 100644
---- a/bcache-super-show.c
-+++ b/bcache-super-show.c
-@@ -160,20 +160,19 @@ int main(int argc, char **argv)
- 	uuid_unparse(sb.uuid, uuid);
- 	printf("dev.uuid\t\t%s\n", uuid);
- 
--	printf("dev.sectors_per_block\t%u\n"
--	       "dev.sectors_per_bucket\t%u\n",
--	       sb.block_size,
--	       sb.bucket_size);
-+	printf("dev.sectors_per_block\t%u\n", sb.block_size);
- 
- 	if (!SB_IS_BDEV(&sb)) {
- 		// total_sectors includes the superblock;
--		printf("dev.cache.first_sector\t%u\n"
-+		printf("dev.sectors_per_block\t%u\n"
-+		       "dev.cache.first_sector\t%u\n"
- 		       "dev.cache.cache_sectors\t%ju\n"
- 		       "dev.cache.total_sectors\t%ju\n"
- 		       "dev.cache.ordered\t%s\n"
- 		       "dev.cache.discard\t%s\n"
- 		       "dev.cache.pos\t\t%u\n"
- 		       "dev.cache.replacement\t%ju",
-+		       sb.bucket_size,
- 		       sb.bucket_size * sb.first_bucket,
- 		       sb.bucket_size * (sb.nbuckets - sb.first_bucket),
- 		       sb.bucket_size * sb.nbuckets,
-diff --git a/make-bcache.c b/make-bcache.c
-index c626eae..14c605d 100644
---- a/make-bcache.c
-+++ b/make-bcache.c
-@@ -217,7 +217,6 @@ static void write_sb(char *dev, unsigned block_size, unsigned bucket_size,
- 	uuid_generate(sb.uuid);
- 	memcpy(sb.set_uuid, set_uuid, sizeof(sb.set_uuid));
- 
--	sb.bucket_size	= bucket_size;
- 	sb.block_size	= block_size;
- 
- 	uuid_unparse(sb.uuid, uuid_str);
-@@ -242,6 +241,7 @@ static void write_sb(char *dev, unsigned block_size, unsigned bucket_size,
- 		       sb.block_size,
- 		       data_offset);
- 	} else {
-+		sb.bucket_size		= bucket_size;
- 		sb.nbuckets		= getblocks(fd) / sb.bucket_size;
- 		sb.nr_in_set		= 1;
- 		sb.first_bucket		= (23 / sb.bucket_size) + 1;
--- 
-2.16.2
+Can you just change the blk_mq_pci_map_queues prototype instead?
