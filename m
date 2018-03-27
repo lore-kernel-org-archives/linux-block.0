@@ -1,38 +1,112 @@
 Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-Date: Wed, 28 Mar 2018 09:38:47 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Dave Chinner <david@fromorbit.com>
-Cc: linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, hch@lst.de, rdorr@microsoft.com
-Subject: Re: [PATCH 2/3] iomap: iomap_dio_rw() handles all sync writes
-Message-ID: <20180328073847.GC18726@lst.de>
-References: <20180327070717.7107-1-david@fromorbit.com> <20180327070717.7107-3-david@fromorbit.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180327070717.7107-3-david@fromorbit.com>
+From: Dave Chinner <david@fromorbit.com>
+To: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        hch@lst.de, rdorr@microsoft.com
+Subject: [PATCH 2/3] iomap: iomap_dio_rw() handles all sync writes
+Date: Tue, 27 Mar 2018 18:07:16 +1100
+Message-Id: <20180327070717.7107-3-david@fromorbit.com>
+In-Reply-To: <20180327070717.7107-1-david@fromorbit.com>
+References: <20180327070717.7107-1-david@fromorbit.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-> @@ -769,12 +777,9 @@ static void iomap_dio_complete_work(struct work_struct *work)
->  {
->  	struct iomap_dio *dio = container_of(work, struct iomap_dio, aio.work);
->  	struct kiocb *iocb = dio->iocb;
-> -	bool is_write = (dio->flags & IOMAP_DIO_WRITE);
->  	ssize_t ret;
->  
->  	ret = iomap_dio_complete(dio);
-> -	if (is_write && ret > 0)
-> -		ret = generic_write_sync(iocb, ret);
->  	iocb->ki_complete(iocb, ret, 0);
+From: Dave Chinner <dchinner@redhat.com>
 
-Could be simplified to:
+Currently iomap_dio_rw() only handles (data)sync write completions
+for AIO. This means we can't optimised non-AIO IO to minimise device
+flushes as we can't tell the caller whether a flush is required or
+not.
 
-{
+To solve this problem and enable further optimisations, make
+iomap_dio_rw responsible for data sync behaviour for all IO, not
+just AIO.
+
+In doing so, the sync operation is now accounted as part of the DIO
+IO by inode_dio_end(), hence post-IO data stability updates will no
+long race against operations that serialise via inode_dio_wait()
+such as truncate or hole punch.
+
+Signed-Off-By: Dave Chinner <dchinner@redhat.com>
+---
+ fs/iomap.c        | 17 ++++++++++++++---
+ fs/xfs/xfs_file.c |  5 -----
+ 2 files changed, 14 insertions(+), 8 deletions(-)
+
+diff --git a/fs/iomap.c b/fs/iomap.c
+index afd163586aa0..f5d4e348bc9b 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -685,6 +685,7 @@ EXPORT_SYMBOL_GPL(iomap_seek_data);
+  * Private flags for iomap_dio, must not overlap with the public ones in
+  * iomap.h:
+  */
++#define IOMAP_DIO_WRITE_SYNC	(1 << 29)
+ #define IOMAP_DIO_WRITE		(1 << 30)
+ #define IOMAP_DIO_DIRTY		(1 << 31)
+ 
+@@ -759,6 +760,13 @@ static ssize_t iomap_dio_complete(struct iomap_dio *dio)
+ 			dio_warn_stale_pagecache(iocb->ki_filp);
+ 	}
+ 
++	/*
++	 * If this is a DSYNC write, make sure we push it to stable storage now
++	 * that we've written data.
++	 */
++	if (ret > 0 && (dio->flags & IOMAP_DIO_WRITE_SYNC))
++		ret = generic_write_sync(iocb, ret);
++
+ 	inode_dio_end(file_inode(iocb->ki_filp));
+ 	kfree(dio);
+ 
+@@ -769,12 +777,9 @@ static void iomap_dio_complete_work(struct work_struct *work)
+ {
  	struct iomap_dio *dio = container_of(work, struct iomap_dio, aio.work);
-
- 	iocb->ki_complete(dio->iocb, iomap_dio_complete(dio); 0);
-}
-
-Otherwise looks good:
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+ 	struct kiocb *iocb = dio->iocb;
+-	bool is_write = (dio->flags & IOMAP_DIO_WRITE);
+ 	ssize_t ret;
+ 
+ 	ret = iomap_dio_complete(dio);
+-	if (is_write && ret > 0)
+-		ret = generic_write_sync(iocb, ret);
+ 	iocb->ki_complete(iocb, ret, 0);
+ }
+ 
+@@ -961,6 +966,10 @@ iomap_dio_actor(struct inode *inode, loff_t pos, loff_t length,
+ 	return copied;
+ }
+ 
++/*
++ * iomap_dio_rw() always completes O_[D]SYNC writes regardless of whether the IO
++ * is being issued as AIO or not.
++ */
+ ssize_t
+ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
+ 		const struct iomap_ops *ops, iomap_dio_end_io_t end_io)
+@@ -1006,6 +1015,8 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
+ 			dio->flags |= IOMAP_DIO_DIRTY;
+ 	} else {
+ 		dio->flags |= IOMAP_DIO_WRITE;
++		if (iocb->ki_flags & IOCB_DSYNC)
++			dio->flags |= IOMAP_DIO_WRITE_SYNC;
+ 		flags |= IOMAP_WRITE;
+ 	}
+ 
+diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+index 6c30f410ca0c..33b1e8b5dc5c 100644
+--- a/fs/xfs/xfs_file.c
++++ b/fs/xfs/xfs_file.c
+@@ -570,11 +570,6 @@ xfs_file_dio_aio_write(
+ 	 * complete fully or fail.
+ 	 */
+ 	ASSERT(ret < 0 || ret == count);
+-
+-	if (ret > 0) {
+-		/* Handle various SYNC-type writes */
+-		ret = generic_write_sync(iocb, ret);
+-	}
+ 	return ret;
+ }
+ 
+-- 
+2.16.1
