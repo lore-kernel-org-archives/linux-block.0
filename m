@@ -1,46 +1,34 @@
-Return-Path: <khlebnikov@yandex-team.ru>
-Subject: [PATCH] block, bfq: keep peak_rate estimation within range 1..2^32-1
-From: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- Paolo Valente <paolo.valente@linaro.org>, linux-kernel@vger.kernel.org
-Date: Mon, 05 Mar 2018 15:48:53 +0300
-Message-ID: <152025413365.161046.7757556276366364549.stgit@buzz>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from aserp2120.oracle.com ([141.146.126.78]:50460 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752180AbeC0C4I (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Mar 2018 22:56:08 -0400
+Subject: Re: blk-mq and CPU hotplug error
+To: joserz@linux.vnet.ibm.com, linux-block@vger.kernel.org
+Cc: hch@lst.de
+References: <20180326212550.GC4100@pacoca>
+From: "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <92fa5d9c-7ee5-337c-b22c-345d519eb1e9@oracle.com>
+Date: Tue, 27 Mar 2018 10:56:09 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-List-ID: <linux-block@vger.kernel.org>
+In-Reply-To: <20180326212550.GC4100@pacoca>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Rate should never overflow or become zero because it is used as divider.
-This patch accumulates it with saturation.
+Hi Jose
 
-Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
----
- block/bfq-iosched.c |    8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+On 03/27/2018 05:25 AM, joserz@linux.vnet.ibm.com wrote:
+> Hello everyone!
+> 
+> I'm running Ubuntu 18.04 (4.15.0-12-generic) in KVM/QEMU (powerpc64le).
+> Everything looks good until I try to hotplug CPUs in my VM. As soon as I
+> do that I get the following error in my VM dmesg:
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index aeca22d91101..a236c8d541b5 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -2546,7 +2546,8 @@ static void bfq_reset_rate_computation(struct bfq_data *bfqd,
- 
- static void bfq_update_rate_reset(struct bfq_data *bfqd, struct request *rq)
- {
--	u32 rate, weight, divisor;
-+	u32 weight, divisor;
-+	u64 rate;
- 
- 	/*
- 	 * For the convergence property to hold (see comments on
-@@ -2634,9 +2635,10 @@ static void bfq_update_rate_reset(struct bfq_data *bfqd, struct request *rq)
- 	 */
- 	bfqd->peak_rate *= divisor-1;
- 	bfqd->peak_rate /= divisor;
--	rate /= divisor; /* smoothing constant alpha = 1/divisor */
-+	do_div(rate, divisor);	/* smoothing constant alpha = 1/divisor */
- 
--	bfqd->peak_rate += rate;
-+	/* rate should never overlow or become zero */
-+	bfqd->peak_rate = clamp_t(u64, rate + bfqd->peak_rate, 1, U32_MAX);
- 	update_thr_responsiveness_params(bfqd);
- 
- reset_computation:
+Please refer to the following commit:
+20e4d813 blk-mq: simplify queue mapping & schedule with each possisble CPU
+84676c1 genirq/affinity: assign vectors to all possible CPUs
+
+Thanks
+Jianchao
