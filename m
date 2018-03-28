@@ -1,89 +1,119 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f66.google.com ([209.85.215.66]:34973 "EHLO
-        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752675AbeC2WHb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Mar 2018 18:07:31 -0400
-Received: by mail-lf0-f66.google.com with SMTP id t132-v6so10362462lfe.2
-        for <linux-block@vger.kernel.org>; Thu, 29 Mar 2018 15:07:30 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        keith.busch@intel.com, javier@cnexlabs.com,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 29/37] lightnvm: make address conversions depend on generic device
-Date: Fri, 30 Mar 2018 00:05:16 +0200
-Message-Id: <20180329220524.30363-30-mb@lightnvm.io>
-In-Reply-To: <20180329220524.30363-1-mb@lightnvm.io>
-References: <20180329220524.30363-1-mb@lightnvm.io>
+Return-Path: <mb@lightnvm.io>
+Return-Path: <mb@lightnvm.io>
+Subject: Re: [PATCH 4/4] nvme: lightnvm: add late setup of block size and
+ metadata
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+ javier@cnexlabs.com, Jens Axboe <axboe@kernel.dk>,
+ linux-kernel@vger.kernel.org,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+References: <20180205121505.27563-1-mb@lightnvm.io>
+ <20180205121505.27563-5-mb@lightnvm.io>
+ <343f19d9-0428-f255-6ed0-519035eef46d@lightnvm.io>
+ <20180328082825.GB31409@infradead.org>
+From: =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <742b1250-3c1d-2436-7aa8-85c3f0347419@lightnvm.io>
+Date: Wed, 28 Mar 2018 14:36:53 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+In-Reply-To: <20180328082825.GB31409@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+List-ID: <linux-block@vger.kernel.org>
 
-From: Javier González <javier@cnexlabs.com>
+On 28/03/2018 10.28, Christoph Hellwig wrote:
+> I really don't want more lightnvm cruft in the core.  We'll need
+> a proper abstraction.c
+> 
 
-On address conversions, use the generic device, instead of the target
-device. This allows to use conversions outside of the target's realm.
+I agree, we should get that moving, and make a proper abstraction for 
+it. Also with respect to how an SMR interface in general is integrated 
+into NVMe.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
----
- drivers/lightnvm/core.c  | 4 ++--
- include/linux/lightnvm.h | 8 ++++----
- 2 files changed, 6 insertions(+), 6 deletions(-)
+The patch is necessary due to the revalidate event for retrieving the 
+lba format from the nvme drive. It might not be available the first time 
+around, and we have to hook in when the drive is revalidated the second 
+time.
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 63d948cc6dec..77901bf17416 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -581,7 +581,7 @@ static void nvm_ppa_tgt_to_dev(struct nvm_tgt_dev *tgt_dev,
- 
- 	for (i = 0; i < nr_ppas; i++) {
- 		nvm_map_to_dev(tgt_dev, &ppa_list[i]);
--		ppa_list[i] = generic_to_dev_addr(tgt_dev, ppa_list[i]);
-+		ppa_list[i] = generic_to_dev_addr(tgt_dev->parent, ppa_list[i]);
- 	}
- }
- 
-@@ -591,7 +591,7 @@ static void nvm_ppa_dev_to_tgt(struct nvm_tgt_dev *tgt_dev,
- 	int i;
- 
- 	for (i = 0; i < nr_ppas; i++) {
--		ppa_list[i] = dev_to_generic_addr(tgt_dev, ppa_list[i]);
-+		ppa_list[i] = dev_to_generic_addr(tgt_dev->parent, ppa_list[i]);
- 		nvm_map_to_tgt(tgt_dev, &ppa_list[i]);
- 	}
- }
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index f2549b4b8626..f3b273e543c3 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -397,10 +397,10 @@ struct nvm_dev {
- 	struct list_head targets;
- };
- 
--static inline struct ppa_addr generic_to_dev_addr(struct nvm_tgt_dev *tgt_dev,
-+static inline struct ppa_addr generic_to_dev_addr(struct nvm_dev *dev,
- 						  struct ppa_addr r)
- {
--	struct nvm_geo *geo = &tgt_dev->geo;
-+	struct nvm_geo *geo = &dev->geo;
- 	struct ppa_addr l;
- 
- 	if (geo->version == NVM_OCSSD_SPEC_12) {
-@@ -424,10 +424,10 @@ static inline struct ppa_addr generic_to_dev_addr(struct nvm_tgt_dev *tgt_dev,
- 	return l;
- }
- 
--static inline struct ppa_addr dev_to_generic_addr(struct nvm_tgt_dev *tgt_dev,
-+static inline struct ppa_addr dev_to_generic_addr(struct nvm_dev *dev,
- 						  struct ppa_addr r)
- {
--	struct nvm_geo *geo = &tgt_dev->geo;
-+	struct nvm_geo *geo = &dev->geo;
- 	struct ppa_addr l;
- 
- 	l.ppa = 0;
--- 
-2.11.0
+> On Fri, Mar 23, 2018 at 12:00:08PM +0100, Matias Bjørling wrote:
+>> On 02/05/2018 01:15 PM, Matias Bjørling wrote:
+>>> The nvme driver sets up the size of the nvme namespace in two steps.
+>>> First it initializes the device with standard logical block and
+>>> metadata sizes, and then sets the correct logical block and metadata
+>>> size. Due to the OCSSD 2.0 specification relies on the namespace to
+>>> expose these sizes for correct initialization, let it be updated
+>>> appropriately on the LightNVM side as well.
+>>>
+>>> Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+>>> ---
+>>>    drivers/nvme/host/core.c     | 2 ++
+>>>    drivers/nvme/host/lightnvm.c | 8 ++++++++
+>>>    drivers/nvme/host/nvme.h     | 2 ++
+>>>    3 files changed, 12 insertions(+)
+>>>
+>>> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+>>> index f837d666cbd4..740ceb28067c 100644
+>>> --- a/drivers/nvme/host/core.c
+>>> +++ b/drivers/nvme/host/core.c
+>>> @@ -1379,6 +1379,8 @@ static void __nvme_revalidate_disk(struct gendisk *disk, struct nvme_id_ns *id)
+>>>    	if (ns->noiob)
+>>>    		nvme_set_chunk_size(ns);
+>>>    	nvme_update_disk_info(disk, ns, id);
+>>> +	if (ns->ndev)
+>>> +		nvme_nvm_update_nvm_info(ns);
+>>>    #ifdef CONFIG_NVME_MULTIPATH
+>>>    	if (ns->head->disk)
+>>>    		nvme_update_disk_info(ns->head->disk, ns, id);
+>>> diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+>>> index a9c010655ccc..8d4301854811 100644
+>>> --- a/drivers/nvme/host/lightnvm.c
+>>> +++ b/drivers/nvme/host/lightnvm.c
+>>> @@ -814,6 +814,14 @@ int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned int cmd, unsigned long arg)
+>>>    	}
+>>>    }
+>>> +void nvme_nvm_update_nvm_info(struct nvme_ns *ns)
+>>> +{
+>>> +	struct nvm_dev *ndev = ns->ndev;
+>>> +
+>>> +	ndev->identity.csecs = ndev->geo.sec_size = 1 << ns->lba_shift;
+>>> +	ndev->identity.sos = ndev->geo.oob_size = ns->ms;
+>>> +}
+>>> +
+>>>    int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node)
+>>>    {
+>>>    	struct request_queue *q = ns->queue;
+>>> diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+>>> index ea1aa5283e8e..1ca08f4993ba 100644
+>>> --- a/drivers/nvme/host/nvme.h
+>>> +++ b/drivers/nvme/host/nvme.h
+>>> @@ -451,12 +451,14 @@ static inline void nvme_mpath_clear_current_path(struct nvme_ns *ns)
+>>>    #endif /* CONFIG_NVME_MULTIPATH */
+>>>    #ifdef CONFIG_NVM
+>>> +void nvme_nvm_update_nvm_info(struct nvme_ns *ns);
+>>>    int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node);
+>>>    void nvme_nvm_unregister(struct nvme_ns *ns);
+>>>    int nvme_nvm_register_sysfs(struct nvme_ns *ns);
+>>>    void nvme_nvm_unregister_sysfs(struct nvme_ns *ns);
+>>>    int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned int cmd, unsigned long arg);
+>>>    #else
+>>> +static inline void nvme_nvm_update_nvm_info(struct nvme_ns *ns) {};
+>>>    static inline int nvme_nvm_register(struct nvme_ns *ns, char *disk_name,
+>>>    				    int node)
+>>>    {
+>>>
+>>
+>> Hi Keith,
+>>
+>> When going through the patches for 4.17, I forgot to run this patch by you.
+>> It is part of adding OCSSD2.0 support to the kernel, and slides in between a
+>> large refactoring, and the 2.0 part. May I add your reviewed by and let Jens
+>> pick it up after the nvme patches for 4.17 has gone up?
+>>
+>> Thanks!
+>>
+>> -Matias
+>>
+>> _______________________________________________
+>> Linux-nvme mailing list
+>> Linux-nvme@lists.infradead.org
+>> http://lists.infradead.org/mailman/listinfo/linux-nvme
+> ---end quoted text---
+> 
