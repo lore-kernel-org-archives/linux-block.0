@@ -1,28 +1,74 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out1.zte.com.cn ([202.103.147.172]:48664 "EHLO mxct.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751523AbeCOIZF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Mar 2018 04:25:05 -0400
-From: tang.junhui@zte.com.cn
-To: kent.overstreet@gmail.com, colyli@suse.de, mlyle@lyle.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        tang.junhui@zte.com.cn
-Subject: Ask a question about size of ca->heap in bcache
-Date: Thu, 15 Mar 2018 16:29:26 +0800
-Message-Id: <1521102566-27784-1-git-send-email-tang.junhui@zte.com.cn>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <don.brace@microsemi.com>
+From: Don Brace <don.brace@microsemi.com>
+To: Keith Busch <keith.busch@intel.com>, Linux NVMe
+	<linux-nvme@lists.infradead.org>, Linux Block <linux-block@vger.kernel.org>
+CC: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Jianchao
+ Wang <jianchao.w.wang@oracle.com>, Ming Lei <ming.lei@redhat.com>, Jens Axboe
+	<axboe@kernel.dk>, "qla2xxx-upstream@qlogic.com"
+	<qla2xxx-upstream@qlogic.com>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>
+Subject: RE: [PATCH 1/3] blk-mq: Allow PCI vector offset for mapping queues
+Date: Wed, 28 Mar 2018 14:48:46 +0000
+Message-ID: <d7482679138342c08e5efb5c461f7536@microsemi.com>
+References: <20180327153908.3732-1-keith.busch@intel.com>
+In-Reply-To: <20180327153908.3732-1-keith.busch@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Return-Path: don.brace@microsemi.com
+List-ID: <linux-block@vger.kernel.org>
 
-Hi Mike, Coly, Kent,
+> -----Original Message-----
+> From: linux-scsi-owner@vger.kernel.org [mailto:linux-scsi-
+> owner@vger.kernel.org] On Behalf Of Keith Busch
+> Sent: Tuesday, March 27, 2018 10:39 AM
+> To: Linux NVMe <linux-nvme@lists.infradead.org>; Linux Block <linux-
+> block@vger.kernel.org>
+> Cc: Christoph Hellwig <hch@lst.de>; Sagi Grimberg <sagi@grimberg.me>;
+> Jianchao Wang <jianchao.w.wang@oracle.com>; Ming Lei
+> <ming.lei@redhat.com>; Jens Axboe <axboe@kernel.dk>; Keith Busch
+> <keith.busch@intel.com>; Don Brace <don.brace@microsemi.com>; qla2xxx-
+> upstream@qlogic.com; linux-scsi@vger.kernel.org
+> Subject: [PATCH 1/3] blk-mq: Allow PCI vector offset for mapping queues
+>=20
+> EXTERNAL EMAIL
+>=20
+>=20
+> The PCI interrupt vectors intended to be associated with a queue may
+> not start at 0; a driver may allocate pre_vectors for special use. This
+> patch adds an offset parameter so blk-mq may find the intended affinity
+> mask and updates all drivers using this API accordingly.
+>=20
+> Cc: Don Brace <don.brace@microsemi.com>
+> Cc: <qla2xxx-upstream@qlogic.com>
+> Cc: <linux-scsi@vger.kernel.org>
+> Signed-off-by: Keith Busch <keith.busch@intel.com>
+> ---
+> v1 -> v2:
+>=20
+>   Update blk-mq API directly instead of chaining a default parameter to
+>   a new API, and update all drivers accordingly.
+>=20
+>  block/blk-mq-pci.c                    | 6 ++++--
+>  drivers/nvme/host/pci.c               | 2 +-
+>  drivers/scsi/qla2xxx/qla_os.c         | 2 +-
+>  drivers/scsi/smartpqi/smartpqi_init.c | 2 +-
+>  include/linux/blk-mq-pci.h            | 3 ++-
+>  5 files changed, 9 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/drivers/scsi/smartpqi/smartpqi_init.c
+> b/drivers/scsi/smartpqi/smartpqi_init.c
+> index b2880c7709e6..10c94011c8a8 100644
+> --- a/drivers/scsi/smartpqi/smartpqi_init.c
+> +++ b/drivers/scsi/smartpqi/smartpqi_init.c
+> @@ -5348,7 +5348,7 @@ static int pqi_map_queues(struct Scsi_Host *shost)
+>  {
+>         struct pqi_ctrl_info *ctrl_info =3D shost_to_hba(shost);
+>=20
+> -       return blk_mq_pci_map_queues(&shost->tag_set, ctrl_info->pci_dev)=
+;
+> +       return blk_mq_pci_map_queues(&shost->tag_set, ctrl_info->pci_dev,=
+ 0);
+>  }
+>=20
 
-As far as I known, ca->heap is used to sort buckets by bucket_prio,
-and it would be pushed into ca->free_inc queue after sorting.
-I find ca->heap is double the size of the ca->free_inc.
-	    !init_fifo(&ca->free_inc,	free << 2, GFP_KERNEL) ||
-	    !init_heap(&ca->heap,	free << 3, GFP_KERNEL) ||
-I am puzzled about, we only need the size of ca->free_inc buckets, 
-Why do we alloc ca->heap the double size of the ca->free_inc?
-
-
-Thanks,
-Tang Junhui
+Acked-by: Don Brace <don.brace@microsemi.com>
