@@ -1,69 +1,24 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Laurence Oberman <loberman@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 0/5] genirq/affinity: irq vector spread among online CPUs as far as possible
-Date: Mon,  5 Mar 2018 11:13:52 +0800
-Message-Id: <20180305031357.23950-1-ming.lei@redhat.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+Date: Wed, 28 Mar 2018 09:36:57 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Dave Chinner <david@fromorbit.com>
+Cc: linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, hch@lst.de, rdorr@microsoft.com
+Subject: Re: [PATCH 1/3] xfs: move generic_write_sync calls inwards
+Message-ID: <20180328073657.GB18726@lst.de>
+References: <20180327070717.7107-1-david@fromorbit.com> <20180327070717.7107-2-david@fromorbit.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180327070717.7107-2-david@fromorbit.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
+> +	/*
+> +	 * capture amount written on completion as we can't reliably account
+> +	 * for it on submission
 
-This patchset tries to spread among online CPUs as far as possible, so
-that we can avoid to allocate too less irq vectors with online CPUs
-mapped.
+Captialize the first c, and a . at the end of the sentence please.
 
-For example, in a 8cores system, 4 cpu cores(4~7) are offline/non present,
-on a device with 4 queues:
+Otherwise looks good:
 
-1) before this patchset
-	irq 39, cpu list 0-2
-	irq 40, cpu list 3-4,6
-	irq 41, cpu list 5
-	irq 42, cpu list 7
-
-2) after this patchset
-	irq 39, cpu list 0,4
-	irq 40, cpu list 1,6
-	irq 41, cpu list 2,5
-	irq 42, cpu list 3,7
-
-Without this patchset, only two vectors(39, 40) can be active, but there
-can be 4 active irq vectors after applying this patchset.
-
-One disadvantage is that CPUs from different NUMA node can be mapped to
-one same irq vector. Given generally one CPU should be enough to handle
-one irq vector, it shouldn't be a big deal. Especailly more vectors have
-to be allocated, otherwise performance can be hurt in current
-assignment.
-
-V2:
-	- address coments from Christoph
-	- mark irq_build_affinity_masks as static
-	- move constification of get_nodes_in_cpumask's parameter into one
-	  prep patch
-	- add Reviewed-by tag
-
-Thanks
-Ming
-
-Ming Lei (5):
-  genirq/affinity: rename *node_to_possible_cpumask as *node_to_cpumask
-  genirq/affinity: mark 'node_to_cpumask' as const for
-    get_nodes_in_cpumask()
-  genirq/affinity: move actual irq vector spread into one helper
-  genirq/affinity: support to do irq vectors spread starting from any
-    vector
-  genirq/affinity: irq vector spread among online CPUs as far as
-    possible
-
- kernel/irq/affinity.c | 145 ++++++++++++++++++++++++++++++++------------------
- 1 file changed, 94 insertions(+), 51 deletions(-)
-
--- 
-2.9.5
+Reviewed-by: Christoph Hellwig <hch@lst.de>
