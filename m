@@ -1,86 +1,106 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-oi0-f42.google.com ([209.85.218.42]:43230 "EHLO
-        mail-oi0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751368AbeCaVuE (ORCPT
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:33195 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752644AbeC2WH1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 31 Mar 2018 17:50:04 -0400
-Received: by mail-oi0-f42.google.com with SMTP id u84-v6so10230235oie.10
-        for <linux-block@vger.kernel.org>; Sat, 31 Mar 2018 14:50:04 -0700 (PDT)
+        Thu, 29 Mar 2018 18:07:27 -0400
+Received: by mail-lf0-f66.google.com with SMTP id x70-v6so3502188lfa.0
+        for <linux-block@vger.kernel.org>; Thu, 29 Mar 2018 15:07:27 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        keith.busch@intel.com, javier@cnexlabs.com,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 26/37] lightnvm: complete geo structure with maxoc*
+Date: Fri, 30 Mar 2018 00:05:13 +0200
+Message-Id: <20180329220524.30363-27-mb@lightnvm.io>
+In-Reply-To: <20180329220524.30363-1-mb@lightnvm.io>
+References: <20180329220524.30363-1-mb@lightnvm.io>
 MIME-Version: 1.0
-From: Chris Murphy <lists@colorremedies.com>
-Date: Sat, 31 Mar 2018 15:50:03 -0600
-Message-ID: <CAJCQCtTTerrYvXpof+jiShO1D8PmaPaFCA9W1PyFxaGs0PZaig@mail.gmail.com>
-Subject: dead or dying SDXC card fsck's OK but mount hangs indefinitely
-To: Btrfs BTRFS <linux-block@vger.kernel.org>
-Cc: Btrfs BTRFS <linux-btrfs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-This is perhaps a novelty problem report. And it's also a throw away
-card data wise, and is a $12 Samsung EVO+ SDXC card used in an Intel
-NUC.
+From: Javier González <javier@cnexlabs.com>
 
-Kernel is 4.15.14-300.fc27.x86_64
+Complete the generic geometry structure with the maxoc and maxocpu
+felds, present in the 2.0 spec. Also, expose them through sysfs.
 
-It contains FAT, ext4, and Btrfs file systems. They can all be fsck'd,
-but none can be mounted. Even if it use blockdev --setro on the entire
-mmc device and then mount -o ro it still fails. Kinda weird huh?
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+---
+ drivers/nvme/host/lightnvm.c | 17 +++++++++++++++++
+ include/linux/lightnvm.h     |  2 ++
+ 2 files changed, 19 insertions(+)
 
-[68498.521260] mmc0: new ultra high speed SDR104 SDHC card at address 59b4
-[68498.521990] mmcblk0: mmc0:59b4 EB2MW 29.8 GiB
-[68498.530899]  mmcblk0: p1 p2 p3 p4
-[68507.152842] BTRFS info (device mmcblk0p4): using free space tree
-[68507.152919] BTRFS info (device mmcblk0p4): has skinny extents
-[68507.165855] BTRFS info (device mmcblk0p4): bdev /dev/mmcblk0p4
-errs: wr 0, rd 0, flush 0, corrupt 10, gen 0
-[68507.192935] BTRFS info (device mmcblk0p4): enabling ssd optimizations
-[69107.488123] mmc0: Card stuck in programming state! mmcblk0 card_busy_detect
-[69107.539128] mmc0: Tuning timeout, falling back to fixed sampling clock
-
-
-The corrupt 10 was fixed with a scrub months ago, and I never reset
-the counter so that's not a current corruption. The most recent scrub
-was maybe a week ago. And even offline scrub works. So literally every
-single block related to this Btrfs file system is readable, and yet
-it's not mountable? Very weird.
-
-Anyway, that's it. No further errors. No timeouts. User space is hung
-on the mount command. mccqd/0 is using 7% CPU, the stack for that
-process is:
-
-[root@f27s ~]# cat /proc/2865/stack
-[<0>] mmc_wait_for_req_done+0x7b/0x130 [mmc_core]
-[<0>] mmc_wait_for_cmd+0x66/0x90 [mmc_core]
-[<0>] __mmc_send_status+0x70/0xa0 [mmc_core]
-[<0>] card_busy_detect+0x59/0x160 [mmc_block]
-[<0>] mmc_blk_err_check+0x170/0x640 [mmc_block]
-[<0>] mmc_start_areq+0xc6/0x3c0 [mmc_core]
-[<0>] mmc_blk_issue_rw_rq+0xcf/0x3b0 [mmc_block]
-[<0>] mmc_blk_issue_rq+0x298/0x7c0 [mmc_block]
-[<0>] mmc_queue_thread+0xce/0x160 [mmc_block]
-[<0>] kthread+0x113/0x130
-[<0>] ret_from_fork+0x35/0x40
-[<0>] 0xffffffffffffffff
-[root@f27s ~]#
-
-Basically the card is in some sort of state that the kernel code is
-not going to ever second guess. So there's no further error or reset
-attempt.
-
-# cat /sys/block/mmcblk0/queue/scheduler
-noop [deadline] cfq
-
-
-This part of the stack trace is interesting:
-
-mmc_blk_issue_rw_rq
-
-Something wants to write something, even though I'm using mount -o ro,
-and also blockdev --setro should prevent any writes from being
-attempted? Almost sounds like user error...
-
-
-
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index f7f7769e7588..41b38ebdb1f3 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -323,6 +323,13 @@ static int nvme_nvm_setup_12(struct nvme_nvm_id12 *id,
+ 	geo->ws_opt = sec_per_pg;
+ 	geo->mw_cunits = geo->ws_opt << 3;	/* default to MLC safe values */
+ 
++	/* Do not impose values for maximum number of open blocks as it is
++	 * unspecified in 1.2. Users of 1.2 must be aware of this and eventually
++	 * specify these values through a quirk if restrictions apply.
++	 */
++	geo->maxoc = geo->all_luns * geo->nr_chks;
++	geo->maxocpu = geo->nr_chks;
++
+ 	geo->mccap = le32_to_cpu(src->mccap);
+ 
+ 	geo->trdt = le32_to_cpu(src->trdt);
+@@ -409,6 +416,8 @@ static int nvme_nvm_setup_20(struct nvme_nvm_id20 *id,
+ 	geo->ws_min = le32_to_cpu(id->ws_min);
+ 	geo->ws_opt = le32_to_cpu(id->ws_opt);
+ 	geo->mw_cunits = le32_to_cpu(id->mw_cunits);
++	geo->maxoc = le32_to_cpu(id->maxoc);
++	geo->maxocpu = le32_to_cpu(id->maxocpu);
+ 
+ 	geo->trdt = le32_to_cpu(id->trdt);
+ 	geo->trdm = le32_to_cpu(id->trdm);
+@@ -1050,6 +1059,10 @@ static ssize_t nvm_dev_attr_show_20(struct device *dev,
+ 		return scnprintf(page, PAGE_SIZE, "%u\n", geo->ws_min);
+ 	} else if (strcmp(attr->name, "ws_opt") == 0) {
+ 		return scnprintf(page, PAGE_SIZE, "%u\n", geo->ws_opt);
++	} else if (strcmp(attr->name, "maxoc") == 0) {
++		return scnprintf(page, PAGE_SIZE, "%u\n", geo->maxoc);
++	} else if (strcmp(attr->name, "maxocpu") == 0) {
++		return scnprintf(page, PAGE_SIZE, "%u\n", geo->maxocpu);
+ 	} else if (strcmp(attr->name, "mw_cunits") == 0) {
+ 		return scnprintf(page, PAGE_SIZE, "%u\n", geo->mw_cunits);
+ 	} else if (strcmp(attr->name, "write_typ") == 0) {
+@@ -1147,6 +1160,8 @@ static NVM_DEV_ATTR_20_RO(chunks);
+ static NVM_DEV_ATTR_20_RO(clba);
+ static NVM_DEV_ATTR_20_RO(ws_min);
+ static NVM_DEV_ATTR_20_RO(ws_opt);
++static NVM_DEV_ATTR_20_RO(maxoc);
++static NVM_DEV_ATTR_20_RO(maxocpu);
+ static NVM_DEV_ATTR_20_RO(mw_cunits);
+ static NVM_DEV_ATTR_20_RO(write_typ);
+ static NVM_DEV_ATTR_20_RO(write_max);
+@@ -1163,6 +1178,8 @@ static struct attribute *nvm_dev_attrs_20[] = {
+ 	&dev_attr_clba.attr,
+ 	&dev_attr_ws_min.attr,
+ 	&dev_attr_ws_opt.attr,
++	&dev_attr_maxoc.attr,
++	&dev_attr_maxocpu.attr,
+ 	&dev_attr_mw_cunits.attr,
+ 
+ 	&dev_attr_read_typ.attr,
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index a073c0c76260..870959a58fef 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -296,6 +296,8 @@ struct nvm_geo {
+ 	u32	ws_min;		/* minimum write size */
+ 	u32	ws_opt;		/* optimal write size */
+ 	u32	mw_cunits;	/* distance required for successful read */
++	u32	maxoc;		/* maximum open chunks */
++	u32	maxocpu;	/* maximum open chunks per parallel unit */
+ 
+ 	/* device capabilities */
+ 	u32	mccap;
 -- 
-Chris Murphy
+2.11.0
