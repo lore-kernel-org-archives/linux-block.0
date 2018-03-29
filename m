@@ -1,14 +1,13 @@
-Return-Path: <ve92mose@stud.informatik.uni-erlangen.de>
-Date: Thu, 29 Mar 2018 20:27:30 +0200
-From: catchall@ghostav.ddnss.de
-To: Scott Bauer <scott.bauer@intel.com>
-Cc: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
-	Christoph Hellwig <hch@lst.de>,
+Return-Path: <scott.bauer@intel.com>
+Date: Thu, 29 Mar 2018 11:16:42 -0600
+From: Scott Bauer <scott.bauer@intel.com>
+To: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+Cc: Christoph Hellwig <hch@lst.de>,
 	Jonathan Derrick <jonathan.derrick@intel.com>,
 	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH v2 08/11] block: sed-opal: ioctl for writing to shadow mbr
-Message-ID: <20180329182730.nrdfgdye5jbark4g@ghostav.ddnss.de>
+Message-ID: <20180329171641.5cgnpldzq7j3ndhp@sbauer-Z170X-UD5>
 References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
  <cover.1521482295.git.jonas.rabenstein@studium.uni-erlangen.de>
  <9f94be9c32887aacdcba75bd6a3902d0350eb987.1521482296.git.jonas.rabenstein@studium.uni-erlangen.de>
@@ -17,53 +16,50 @@ References: <cover.1520946114.git.jonas.rabenstein@studium.uni-erlangen.de>
  <20180320220907.zdzf7baag6haaonm@sbauer-Z170X-UD5>
  <20180321014321.xlkcyvcyr6j3usix@studium.uni-erlangen.de>
  <20180329173002.5mmhnl4urj4wovyo@studium.uni-erlangen.de>
- <20180329171641.5cgnpldzq7j3ndhp@sbauer-Z170X-UD5>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180329171641.5cgnpldzq7j3ndhp@sbauer-Z170X-UD5>
+In-Reply-To: <20180329173002.5mmhnl4urj4wovyo@studium.uni-erlangen.de>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Mar 29, 2018 at 11:16:42AM -0600, Scott Bauer wrote:
-> Yeah, having to autheticate to write the MBR is a real bummer. Theoretically
-> you could dd a the pw struct + the shador MBR into sysfs. But that's
-> a pretty disgusting hack just to use sysfs. The other method I thought of
-> was to authenticate via ioctl then write via sysfs. We already save the PW
-> in-kernel for unlocks, so perhaps we can re-use the save-for-unlock to
-> do shadow MBR writes via sysfs?
+On Thu, Mar 29, 2018 at 07:30:02PM +0200, Jonas Rabenstein wrote:
+> Hi,
+> On Wed, Mar 21, 2018 at 02:43:21AM +0100, Jonas Rabenstein wrote:
+> > On Tue, Mar 20, 2018 at 04:09:08PM -0600, Scott Bauer wrote:
+> > > On Tue, Mar 20, 2018 at 10:36:04AM +0100, Jonas Rabenstein wrote:
+> > > > On Mon, Mar 19, 2018 at 08:52:24PM +0100, Christoph Hellwig wrote:
+> > > > > On Mon, Mar 19, 2018 at 07:36:50PM +0100, Jonas Rabenstein wrote:
+> > > > > I hate doing this as an ioctls.  Can we make this a sysfs binary file
+> > > > > so that people can use dd or cat to write the shadow mbr?
+> > > > I already thought about providing a sysfs interface for all that instead
+> > > > of using ioctls. But as I am pretty new to kernel programming I do not
+> > > > have all the required insight. Especially, as writing the mbr requires
+> > > > the sed-opal password I am unsure how a clean sysfs interface to provide
+> > > > the password together with a simple dd would look like.
+> Just wanted to ask, how to proceed with those patches/what I should do.
+> Using sysfs instead of an ioctl is probably easier to use from userspace
+> _if_ there is a good way to provide the password - which I do not know
+> of :(
+> If nobody else could think of a solution, shall writes to the shadow mbr
+> remain unsupported?
 > 
-> Re-using an already exposed ioctl for another purpose seems somewhat dangerous?
-> In the sense that what if the user wants to write the smbr but doesn't want to
-> unlock on suspends, or does not want their PW hanging around in the kernel.
-Well. If we would force the user to a two-step interaction, why not stay
-completely in sysfs? So instead of using the save-for-unlock ioctl, we
-could export each security provider( (AdminSP, UserSPX, ...) as a sysfs
-directory with appropriate files (e.g. mbr for AdminSP) as well as a
-'unlock' file to store a users password for the specific locking space
-and a 'lock' file to remove the stored password on write to it.
-Of course, while this will prevent from reuse of the ioctl and
-stays within the same configuration method, the PW will still hang
-around in the kernel between 'lock' and 'unlock'.
+> I'ld really appreciate feedback and possible solutions,
+>  Jonas
 
-Another idea I just came across while writing this down:
-Instead of storing/releasing the password permanently with the 'unlock' and
-'lock' files, those may be used to start/stop an authenticated session.
-To make it more clear what I mean: Each ioctl that requires
-authentication has a similar pattern:
-discovery0, start_session, <do_work>, end_session
-Instead of having the combination determined by the ioctl, the 'unlock'
-would do discovery0 and start_session while the 'lock' would do the
-end_session. The user is free to issue further commands with the
-appropriate write/reads to other files of the sysfs-directory.
-While this removes the requirement to store the key within kernel space,
-the open session handle may be used from everybody with permissions for
-read/write access to the sysfs-directory files. So this is not optimal
-as not only the user who provided the password will finally be able to use
-it.
-I already did some basic work to split of the session-information from
-the opal_dev struct (initially to reduce the memory-footprint of devices with
-currently no active opal-interaction). So I think, I could get a
-proof-of-concept of this approach within the next one or two weeks if
-there are no objections to the base idea.
+Yeah, having to autheticate to write the MBR is a real bummer. Theoretically
+you could dd a the pw struct + the shador MBR into sysfs. But that's
+a pretty disgusting hack just to use sysfs. The other method I thought of
+was to authenticate via ioctl then write via sysfs. We already save the PW
+in-kernel for unlocks, so perhaps we can re-use the save-for-unlock to
+do shadow MBR writes via sysfs?
 
-Thank you,
- Jonas
+Re-using an already exposed ioctl for another purpose seems somewhat dangerous?
+In the sense that what if the user wants to write the smbr but doesn't want to
+unlock on suspends, or does not want their PW hanging around in the kernel.
+
+Overall I think the ioctl is still the best path forward due to the authentication
+problem. But am still willing to hear others opinions if they do have an idea.
+
+I can say yes to the Ioctl, but we really need Jens and Christophs Okay on it.
+
+I have some free time tomorrow to work on this, so let me goof with it tomorrow and
+over the weekend and I'll see if there is a sane way to get sysfs to work.
