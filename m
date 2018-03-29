@@ -1,93 +1,75 @@
-Return-Path: <linux-ide-owner@vger.kernel.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-To: Christoph Hellwig <hch@lst.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Felipe Balbi <balbi@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mark Brown <broonie@kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Alan Tull <atull@kernel.org>, Moritz Fischer <mdf@kernel.org>,
-        Wolfram Sang <wsa@the-dreams.de>,
-        Jonathan Cameron <jic23@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Matias Bjorling <mb@lightnvm.io>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        Marek Vasut <marek.vasut@gmail.com>,
-        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Richard Weinberger <richard@nod.at>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Eric Anholt <eric@anholt.net>,
-        Stefan Wahren <stefan.wahren@i2se.com>
-Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
-        linux-scsi@vger.kernel.org, alsa-devel@alsa-project.org,
-        linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        linux-fpga@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-iio@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-spi@vger.kernel.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH v2 06/21] fpga: Remove depends on HAS_DMA in case of platform dependency
-Date: Fri, 16 Mar 2018 14:51:39 +0100
-Message-Id: <1521208314-4783-7-git-send-email-geert@linux-m68k.org>
-In-Reply-To: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
-References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
-Sender: linux-ide-owner@vger.kernel.org
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:33151 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752058AbeC2WG7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Mar 2018 18:06:59 -0400
+Received: by mail-lf0-f65.google.com with SMTP id x70-v6so3501071lfa.0
+        for <linux-block@vger.kernel.org>; Thu, 29 Mar 2018 15:06:58 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        keith.busch@intel.com, javier@cnexlabs.com,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 03/37] lightnvm: pblk: handle bad sectors in the emeta area correctly
+Date: Fri, 30 Mar 2018 00:04:50 +0200
+Message-Id: <20180329220524.30363-4-mb@lightnvm.io>
+In-Reply-To: <20180329220524.30363-1-mb@lightnvm.io>
+References: <20180329220524.30363-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
-symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
-In most cases this other symbol is an architecture or platform specific
-symbol, or PCI.
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-Generic symbols and drivers without platform dependencies keep their
-dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
-cannot work anyway.
+Unless we check if there are bad sectors in the entire emeta-area
+we risk ending up with valid bitmap / available sector count inconsistency.
+This results in lines with a bad chunk at the last LUN marked as bad,
+so go through the whole emeta area and mark up the invalid sectors.
 
-This simplifies the dependencies, and allows to improve compile-testing.
-
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Reviewed-by: Mark Brown <broonie@kernel.org>
-Acked-by: Robin Murphy <robin.murphy@arm.com>
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
-v2:
-  - Add Reviewed-by, Acked-by,
-  - Drop RFC state,
-  - Split per subsystem.
----
- drivers/fpga/Kconfig | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/lightnvm/pblk-core.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/fpga/Kconfig b/drivers/fpga/Kconfig
-index f47ef848bcd056d5..fd539132542e30ee 100644
---- a/drivers/fpga/Kconfig
-+++ b/drivers/fpga/Kconfig
-@@ -53,7 +53,6 @@ config FPGA_MGR_ALTERA_CVP
- config FPGA_MGR_ZYNQ_FPGA
- 	tristate "Xilinx Zynq FPGA"
- 	depends on ARCH_ZYNQ || COMPILE_TEST
--	depends on HAS_DMA
- 	help
- 	  FPGA manager driver support for Xilinx Zynq FPGAs.
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 0487b9340c1d..9027cf2ed1d8 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -1021,6 +1021,7 @@ static int pblk_line_init_bb(struct pblk *pblk, struct pblk_line *line,
+ 	int nr_bb = 0;
+ 	u64 off;
+ 	int bit = -1;
++	int emeta_secs;
  
+ 	line->sec_in_line = lm->sec_per_line;
+ 
+@@ -1055,18 +1056,18 @@ static int pblk_line_init_bb(struct pblk *pblk, struct pblk_line *line,
+ 	/* Mark emeta metadata sectors as bad sectors. We need to consider bad
+ 	 * blocks to make sure that there are enough sectors to store emeta
+ 	 */
+-	off = lm->sec_per_line - lm->emeta_sec[0];
+-	bitmap_set(line->invalid_bitmap, off, lm->emeta_sec[0]);
+-	while (nr_bb) {
++	emeta_secs = lm->emeta_sec[0];
++	off = lm->sec_per_line;
++	while (emeta_secs) {
+ 		off -= geo->sec_per_pl;
+ 		if (!test_bit(off, line->invalid_bitmap)) {
+ 			bitmap_set(line->invalid_bitmap, off, geo->sec_per_pl);
+-			nr_bb--;
++			emeta_secs -= geo->sec_per_pl;
+ 		}
+ 	}
+ 
+-	line->sec_in_line -= lm->emeta_sec[0];
+ 	line->emeta_ssec = off;
++	line->sec_in_line -= lm->emeta_sec[0];
+ 	line->nr_valid_lbas = 0;
+ 	line->left_msecs = line->sec_in_line;
+ 	*line->vsc = cpu_to_le32(line->sec_in_line);
 -- 
-2.7.4
-
+2.11.0
