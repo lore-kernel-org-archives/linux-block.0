@@ -1,95 +1,447 @@
-Return-Path: <shawn.lin@rock-chips.com>
-From: Shawn Lin <shawn.lin@rock-chips.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	linux-mmc@vger.kernel.org,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Shawn Lin <shawn.lin@rock-chips.com>
-Subject: [PATCH] mmc: block: Delete gendisk before cleaning up the request queue
-Date: Thu, 22 Mar 2018 18:56:16 +0800
-Message-Id: <1521716176-20731-1-git-send-email-shawn.lin@rock-chips.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:45452 "EHLO
+        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752219AbeC2WHC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Mar 2018 18:07:02 -0400
+Received: by mail-lf0-f68.google.com with SMTP id q5-v6so10319762lff.12
+        for <linux-block@vger.kernel.org>; Thu, 29 Mar 2018 15:07:01 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        keith.busch@intel.com, javier@cnexlabs.com,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 05/37] lightnvm: pblk: export write amplification counters to sysfs
+Date: Fri, 30 Mar 2018 00:04:52 +0200
+Message-Id: <20180329220524.30363-6-mb@lightnvm.io>
+In-Reply-To: <20180329220524.30363-1-mb@lightnvm.io>
+References: <20180329220524.30363-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-dd if=/dev/urandom of=/dev/mmcblk1 bs=4k count=10000
-with a SD card hotplug during transfer reports a warning below
-introduced by commit a063057d7c73 ("block: Fix a race between
-request queue removal and the block cgroup controller"). So we
-should now remove the disk, partition and bdi sysfs attributes
-before cleaning up the request queue associated with the disk.
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-[  410.331226] mmc1: card 59b4 removed
-[  410.348583] WARNING: CPU: 0 PID: 5 at block/blk-core.c:785
-blk_cleanup_queue+0x138/0x140
-[  410.349294] Modules linked in:
-[  410.349570] CPU: 0 PID: 5 Comm: kworker/0:0 Not tainted
-4.16.0-rc6-next-20180321-00004-gc2ad6a7 #263
-[  410.350363] Hardware name: Excavator-RK3399 Board (DT)
-[  410.350819] Workqueue: events_freezable mmc_rescan
-[  410.351242] pstate: 60000005 (nZCv daif -PAN -UAO)
-[  410.351663] pc : blk_cleanup_queue+0x138/0x140
-[  410.352054] lr : blk_cleanup_queue+0xac/0x140
-[  410.352436] sp : ffff0000092cbb90
-[  410.352727] x29: ffff0000092cbb90 x28: 0000000000000000
-[  410.353195] x27: ffff8000f6f23030 x26: ffff00000904e610
-[  410.353662] x25: ffff8000f17cc808 x24: ffff8000f1038200
-[  410.354128] x23: 0000000000000060 x22: 0000000000000000
-[  410.354595] x21: ffff8000f11748d8 x20: ffff8000f1038200
-[  410.355061] x19: ffff8000f1174200 x18: 0000ffff936347d8
-[  410.355528] x17: 0000ffff935b93c0 x16: ffff0000081263f8
-[  410.355994] x15: 0000000000000000 x14: 0000000000000400
-[  410.356461] x13: 0000000000000001 x12: 0000000000000001
-[  410.356927] x11: 0000000000000040 x10: ffff8000f2400028
-[  410.357393] x9 : ffff8000f2400040 x8 : 0000000000000000
-[  410.357860] x7 : ffff8000f6f3a340 x6 : ffff8000f6f3a340
-[  410.358326] x5 : ffff8000f2400000 x4 : ffff8000f6f3a340
-[  410.358792] x3 : 0000000000000000 x2 : 39c1333e45670800
-[  410.359259] x1 : 0000000000000000 x0 : 0000000000000003
-[  410.359726] Call trace:
-[  410.359943]  blk_cleanup_queue+0x138/0x140
-[  410.360305]  mmc_cleanup_queue+0x2c/0x48
-[  410.360652]  mmc_blk_remove_req+0x1c/0x98
-[  410.361005]  mmc_blk_remove+0x180/0x1c0
-[  410.361343]  mmc_bus_remove+0x1c/0x28
-[  410.361670]  device_release_driver_internal+0x154/0x1f0
-[  410.362128]  device_release_driver+0x14/0x20
-[  410.362504]  bus_remove_device+0xc8/0x108
-[  410.362858]  device_del+0x120/0x350
-[  410.363167]  mmc_remove_card+0x5c/0xb8
-[  410.363498]  mmc_sd_detect+0x40/0x78
-[  410.363813]  mmc_rescan+0x19c/0x368
-[  410.364123]  process_one_work+0x1ac/0x318
-[  410.364477]  worker_thread+0x50/0x450
-[  410.364801]  kthread+0xf8/0x128
-[  410.365081]  ret_from_fork+0x10/0x18
-[  410.365395] ---[ end trace 268e87a46c28968c ]---
+In a SSD, write amplification, WA, is defined as the average
+number of page writes per user page write. Write amplification
+negatively affects write performance and decreases the lifetime
+of the disk, so it's a useful metric to add to sysfs.
 
-Signed-off-by: Shawn Lin <shawn.lin@rock-chips.com>
+In plkb's case, the number of writes per user sector is the sum of:
+
+    (1) number of user writes
+    (2) number of sectors written by the garbage collector
+    (3) number of sectors padded (i.e. due to syncs)
+
+This patch adds persistent counters for 1-3 and two sysfs attributes
+to export these along with WA calculated with five decimals:
+
+    write_amp_mileage: the accumulated write amplification stats
+                      for the lifetime of the pblk instance
+
+    write_amp_trip: resetable stats to facilitate delta measurements,
+                    values reset at creation and if 0 is written
+                    to the attribute.
+
+64-bit counters are used as a 32 bit counter would wrap around
+already after about 17 TB worth of user data. It will take a
+long long time before the 64 bit sector counters wrap around.
+
+The counters are stored after the bad block bitmap in the first
+emeta sector of each written line. There is plenty of space in the
+first emeta sector, so we don't need to bump the major version of
+the line data format.
+
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
+ drivers/lightnvm/pblk-cache.c    |  4 ++
+ drivers/lightnvm/pblk-core.c     |  6 +++
+ drivers/lightnvm/pblk-init.c     | 11 +++++-
+ drivers/lightnvm/pblk-map.c      |  2 +
+ drivers/lightnvm/pblk-rb.c       |  3 ++
+ drivers/lightnvm/pblk-recovery.c | 25 ++++++++++++
+ drivers/lightnvm/pblk-sysfs.c    | 85 +++++++++++++++++++++++++++++++++++++++-
+ drivers/lightnvm/pblk.h          | 42 ++++++++++++++++----
+ 8 files changed, 168 insertions(+), 10 deletions(-)
 
- drivers/mmc/core/block.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index a2b9c25..02485e3 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -2659,7 +2659,6 @@ static void mmc_blk_remove_req(struct mmc_blk_data *md)
- 		 * from being accepted.
- 		 */
- 		card = md->queue.card;
--		mmc_cleanup_queue(&md->queue);
- 		if (md->disk->flags & GENHD_FL_UP) {
- 			device_remove_file(disk_to_dev(md->disk), &md->force_ro);
- 			if ((md->area_type & MMC_BLK_DATA_AREA_BOOT) &&
-@@ -2669,6 +2668,7 @@ static void mmc_blk_remove_req(struct mmc_blk_data *md)
- 
- 			del_gendisk(md->disk);
- 		}
-+		mmc_cleanup_queue(&md->queue);
- 		mmc_blk_put(md);
+diff --git a/drivers/lightnvm/pblk-cache.c b/drivers/lightnvm/pblk-cache.c
+index 000fcad38136..29a23111b31c 100644
+--- a/drivers/lightnvm/pblk-cache.c
++++ b/drivers/lightnvm/pblk-cache.c
+@@ -63,6 +63,8 @@ int pblk_write_to_cache(struct pblk *pblk, struct bio *bio, unsigned long flags)
+ 		bio_advance(bio, PBLK_EXPOSED_PAGE_SIZE);
  	}
+ 
++	atomic64_add(nr_entries, &pblk->user_wa);
++
+ #ifdef CONFIG_NVM_DEBUG
+ 	atomic_long_add(nr_entries, &pblk->inflight_writes);
+ 	atomic_long_add(nr_entries, &pblk->req_writes);
+@@ -117,6 +119,8 @@ int pblk_write_gc_to_cache(struct pblk *pblk, struct pblk_gc_rq *gc_rq)
+ 	WARN_ONCE(gc_rq->secs_to_gc != valid_entries,
+ 					"pblk: inconsistent GC write\n");
+ 
++	atomic64_add(valid_entries, &pblk->gc_wa);
++
+ #ifdef CONFIG_NVM_DEBUG
+ 	atomic_long_add(valid_entries, &pblk->inflight_writes);
+ 	atomic_long_add(valid_entries, &pblk->recov_gc_writes);
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 155e42a26293..22e61cd4f801 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -1630,11 +1630,16 @@ void pblk_line_close_meta(struct pblk *pblk, struct pblk_line *line)
+ 	struct pblk_line_meta *lm = &pblk->lm;
+ 	struct pblk_emeta *emeta = line->emeta;
+ 	struct line_emeta *emeta_buf = emeta->buf;
++	struct wa_counters *wa = emeta_to_wa(lm, emeta_buf);
+ 
+ 	/* No need for exact vsc value; avoid a big line lock and take aprox. */
+ 	memcpy(emeta_to_vsc(pblk, emeta_buf), l_mg->vsc_list, lm->vsc_list_len);
+ 	memcpy(emeta_to_bb(emeta_buf), line->blk_bitmap, lm->blk_bitmap_len);
+ 
++	wa->user = cpu_to_le64(atomic64_read(&pblk->user_wa));
++	wa->pad = cpu_to_le64(atomic64_read(&pblk->pad_wa));
++	wa->gc = cpu_to_le64(atomic64_read(&pblk->gc_wa));
++
+ 	emeta_buf->nr_valid_lbas = cpu_to_le64(line->nr_valid_lbas);
+ 	emeta_buf->crc = cpu_to_le32(pblk_calc_emeta_crc(pblk, emeta_buf));
+ 
+@@ -1837,6 +1842,7 @@ void pblk_update_map_dev(struct pblk *pblk, sector_t lba,
+ #endif
+ 	/* Invalidate and discard padded entries */
+ 	if (lba == ADDR_EMPTY) {
++		atomic64_inc(&pblk->pad_wa);
+ #ifdef CONFIG_NVM_DEBUG
+ 		atomic_long_inc(&pblk->padded_wb);
+ #endif
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 5b46924ac66c..0ffc17ccf1cc 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -559,8 +559,8 @@ static unsigned int calc_emeta_len(struct pblk *pblk)
+ 
+ 	/* Round to sector size so that lba_list starts on its own sector */
+ 	lm->emeta_sec[1] = DIV_ROUND_UP(
+-			sizeof(struct line_emeta) + lm->blk_bitmap_len,
+-			geo->sec_size);
++			sizeof(struct line_emeta) + lm->blk_bitmap_len +
++			sizeof(struct wa_counters), geo->sec_size);
+ 	lm->emeta_len[1] = lm->emeta_sec[1] * geo->sec_size;
+ 
+ 	/* Round to sector size so that vsc_list starts on its own sector */
+@@ -991,6 +991,13 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
+ 	if (flags & NVM_TARGET_FACTORY)
+ 		pblk_setup_uuid(pblk);
+ 
++	atomic64_set(&pblk->user_wa, 0);
++	atomic64_set(&pblk->pad_wa, 0);
++	atomic64_set(&pblk->gc_wa, 0);
++	pblk->user_rst_wa = 0;
++	pblk->pad_rst_wa = 0;
++	pblk->gc_rst_wa = 0;
++
+ #ifdef CONFIG_NVM_DEBUG
+ 	atomic_long_set(&pblk->inflight_writes, 0);
+ 	atomic_long_set(&pblk->padded_writes, 0);
+diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
+index 7445e6430c52..04e08d76ea5f 100644
+--- a/drivers/lightnvm/pblk-map.c
++++ b/drivers/lightnvm/pblk-map.c
+@@ -65,6 +65,8 @@ static void pblk_map_page_data(struct pblk *pblk, unsigned int sentry,
+ 			lba_list[paddr] = cpu_to_le64(w_ctx->lba);
+ 			if (lba_list[paddr] != addr_empty)
+ 				line->nr_valid_lbas++;
++			else
++				atomic64_inc(&pblk->pad_wa);
+ 		} else {
+ 			lba_list[paddr] = meta_list[i].lba = addr_empty;
+ 			__pblk_map_invalidate(pblk, line, paddr);
+diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
+index ec8fc314646b..7044b5599cc4 100644
+--- a/drivers/lightnvm/pblk-rb.c
++++ b/drivers/lightnvm/pblk-rb.c
+@@ -622,6 +622,9 @@ unsigned int pblk_rb_read_to_bio(struct pblk_rb *rb, struct nvm_rq *rqd,
+ 		}
+ 	}
+ 
++	atomic64_add(pad, &((struct pblk *)
++			(container_of(rb, struct pblk, rwb)))->pad_wa);
++
+ #ifdef CONFIG_NVM_DEBUG
+ 	atomic_long_add(pad, &((struct pblk *)
+ 			(container_of(rb, struct pblk, rwb)))->padded_writes);
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index a30fe203d454..e75a1af2eebe 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -845,6 +845,29 @@ static int pblk_recov_check_line_version(struct pblk *pblk,
+ 	return 0;
  }
+ 
++static void pblk_recov_wa_counters(struct pblk *pblk,
++				   struct line_emeta *emeta)
++{
++	struct pblk_line_meta *lm = &pblk->lm;
++	struct line_header *header = &emeta->header;
++	struct wa_counters *wa = emeta_to_wa(lm, emeta);
++
++	/* WA counters were introduced in emeta version 0.2 */
++	if (header->version_major > 0 || header->version_minor >= 2) {
++		u64 user = le64_to_cpu(wa->user);
++		u64 pad = le64_to_cpu(wa->pad);
++		u64 gc = le64_to_cpu(wa->gc);
++
++		atomic64_set(&pblk->user_wa, user);
++		atomic64_set(&pblk->pad_wa, pad);
++		atomic64_set(&pblk->gc_wa, gc);
++
++		pblk->user_rst_wa = user;
++		pblk->pad_rst_wa = pad;
++		pblk->gc_rst_wa = gc;
++	}
++}
++
+ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+ {
+ 	struct pblk_line_meta *lm = &pblk->lm;
+@@ -965,6 +988,8 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+ 		if (pblk_recov_check_line_version(pblk, line->emeta->buf))
+ 			return ERR_PTR(-EINVAL);
+ 
++		pblk_recov_wa_counters(pblk, line->emeta->buf);
++
+ 		if (pblk_recov_l2p_from_emeta(pblk, line))
+ 			pblk_recov_l2p_from_oob(pblk, line);
+ 
+diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
+index 620bab853579..beed99936c89 100644
+--- a/drivers/lightnvm/pblk-sysfs.c
++++ b/drivers/lightnvm/pblk-sysfs.c
+@@ -298,6 +298,48 @@ static ssize_t pblk_sysfs_get_sec_per_write(struct pblk *pblk, char *page)
+ 	return snprintf(page, PAGE_SIZE, "%d\n", pblk->sec_per_write);
+ }
+ 
++static ssize_t pblk_get_write_amp(u64 user, u64 gc, u64 pad,
++				  char *page)
++{
++	int sz;
++
++
++	sz = snprintf(page, PAGE_SIZE,
++			"user:%lld gc:%lld pad:%lld WA:",
++			user, gc, pad);
++
++	if (!user) {
++		sz += snprintf(page + sz, PAGE_SIZE - sz, "NaN\n");
++	} else {
++		u64 wa_int;
++		u32 wa_frac;
++
++		wa_int = (user + gc + pad) * 100000;
++		wa_int = div_u64(wa_int, user);
++		wa_int = div_u64_rem(wa_int, 100000, &wa_frac);
++
++		sz += snprintf(page + sz, PAGE_SIZE - sz, "%llu.%05u\n",
++							wa_int, wa_frac);
++	}
++
++	return sz;
++}
++
++static ssize_t pblk_sysfs_get_write_amp_mileage(struct pblk *pblk, char *page)
++{
++	return pblk_get_write_amp(atomic64_read(&pblk->user_wa),
++		atomic64_read(&pblk->gc_wa), atomic64_read(&pblk->pad_wa),
++		page);
++}
++
++static ssize_t pblk_sysfs_get_write_amp_trip(struct pblk *pblk, char *page)
++{
++	return pblk_get_write_amp(
++		atomic64_read(&pblk->user_wa) - pblk->user_rst_wa,
++		atomic64_read(&pblk->gc_wa) - pblk->gc_rst_wa,
++		atomic64_read(&pblk->pad_wa) - pblk->pad_rst_wa, page);
++}
++
+ #ifdef CONFIG_NVM_DEBUG
+ static ssize_t pblk_sysfs_stats_debug(struct pblk *pblk, char *page)
+ {
+@@ -360,6 +402,30 @@ static ssize_t pblk_sysfs_set_sec_per_write(struct pblk *pblk,
+ 	return len;
+ }
+ 
++static ssize_t pblk_sysfs_set_write_amp_trip(struct pblk *pblk,
++			const char *page, size_t len)
++{
++	size_t c_len;
++	int reset_value;
++
++	c_len = strcspn(page, "\n");
++	if (c_len >= len)
++		return -EINVAL;
++
++	if (kstrtouint(page, 0, &reset_value))
++		return -EINVAL;
++
++	if (reset_value !=  0)
++		return -EINVAL;
++
++	pblk->user_rst_wa = atomic64_read(&pblk->user_wa);
++	pblk->pad_rst_wa = atomic64_read(&pblk->pad_wa);
++	pblk->gc_rst_wa = atomic64_read(&pblk->gc_wa);
++
++	return len;
++}
++
++
+ static struct attribute sys_write_luns = {
+ 	.name = "write_luns",
+ 	.mode = 0444,
+@@ -410,6 +476,16 @@ static struct attribute sys_max_sec_per_write = {
+ 	.mode = 0644,
+ };
+ 
++static struct attribute sys_write_amp_mileage = {
++	.name = "write_amp_mileage",
++	.mode = 0444,
++};
++
++static struct attribute sys_write_amp_trip = {
++	.name = "write_amp_trip",
++	.mode = 0644,
++};
++
+ #ifdef CONFIG_NVM_DEBUG
+ static struct attribute sys_stats_debug_attr = {
+ 	.name = "stats",
+@@ -428,6 +504,8 @@ static struct attribute *pblk_attrs[] = {
+ 	&sys_stats_ppaf_attr,
+ 	&sys_lines_attr,
+ 	&sys_lines_info_attr,
++	&sys_write_amp_mileage,
++	&sys_write_amp_trip,
+ #ifdef CONFIG_NVM_DEBUG
+ 	&sys_stats_debug_attr,
+ #endif
+@@ -457,6 +535,10 @@ static ssize_t pblk_sysfs_show(struct kobject *kobj, struct attribute *attr,
+ 		return pblk_sysfs_lines_info(pblk, buf);
+ 	else if (strcmp(attr->name, "max_sec_per_write") == 0)
+ 		return pblk_sysfs_get_sec_per_write(pblk, buf);
++	else if (strcmp(attr->name, "write_amp_mileage") == 0)
++		return pblk_sysfs_get_write_amp_mileage(pblk, buf);
++	else if (strcmp(attr->name, "write_amp_trip") == 0)
++		return pblk_sysfs_get_write_amp_trip(pblk, buf);
+ #ifdef CONFIG_NVM_DEBUG
+ 	else if (strcmp(attr->name, "stats") == 0)
+ 		return pblk_sysfs_stats_debug(pblk, buf);
+@@ -473,7 +555,8 @@ static ssize_t pblk_sysfs_store(struct kobject *kobj, struct attribute *attr,
+ 		return pblk_sysfs_gc_force(pblk, buf, len);
+ 	else if (strcmp(attr->name, "max_sec_per_write") == 0)
+ 		return pblk_sysfs_set_sec_per_write(pblk, buf, len);
+-
++	else if (strcmp(attr->name, "write_amp_trip") == 0)
++		return pblk_sysfs_set_write_amp_trip(pblk, buf, len);
+ 	return 0;
+ }
+ 
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index fae2526f80b2..4b7d8618631f 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -331,7 +331,7 @@ enum {
+ #define SMETA_VERSION_MINOR (1)
+ 
+ #define EMETA_VERSION_MAJOR (0)
+-#define EMETA_VERSION_MINOR (1)
++#define EMETA_VERSION_MINOR (2)
+ 
+ struct line_header {
+ 	__le32 crc;
+@@ -361,11 +361,13 @@ struct line_smeta {
+ 	__le64 lun_bitmap[];
+ };
+ 
++
+ /*
+  * Metadata layout in media:
+  *	First sector:
+  *		1. struct line_emeta
+  *		2. bad block bitmap (u64 * window_wr_lun)
++ *		3. write amplification counters
+  *	Mid sectors (start at lbas_sector):
+  *		3. nr_lbas (u64) forming lba list
+  *	Last sectors (start at vsc_sector):
+@@ -389,7 +391,15 @@ struct line_emeta {
+ 	__le32 next_id;		/* Line id for next line */
+ 	__le64 nr_lbas;		/* Number of lbas mapped in line */
+ 	__le64 nr_valid_lbas;	/* Number of valid lbas mapped in line */
+-	__le64 bb_bitmap[];	/* Updated bad block bitmap for line */
++	__le64 bb_bitmap[];     /* Updated bad block bitmap for line */
++};
++
++
++/* Write amplification counters stored on media */
++struct wa_counters {
++	__le64 user;		/* Number of user written sectors */
++	__le64 gc;		/* Number of sectors written by GC*/
++	__le64 pad;		/* Number of padded sectors */
+ };
+ 
+ struct pblk_emeta {
+@@ -519,10 +529,11 @@ struct pblk_line_meta {
+ 	unsigned int smeta_sec;		/* Sectors needed for smeta */
+ 
+ 	unsigned int emeta_len[4];	/* Lengths for emeta:
+-					 *  [0]: Total length
+-					 *  [1]: struct line_emeta length
+-					 *  [2]: L2P portion length
+-					 *  [3]: vsc list length
++					 *  [0]: Total
++					 *  [1]: struct line_emeta +
++					 *       bb_bitmap + struct wa_counters
++					 *  [2]: L2P portion
++					 *  [3]: vsc
+ 					 */
+ 	unsigned int emeta_sec[4];	/* Sectors needed for emeta. Same layout
+ 					 * as emeta_len
+@@ -604,8 +615,19 @@ struct pblk {
+ 	int sec_per_write;
+ 
+ 	unsigned char instance_uuid[16];
++
++	/* Persistent write amplification counters, 4kb sector I/Os */
++	atomic64_t user_wa;		/* Sectors written by user */
++	atomic64_t gc_wa;		/* Sectors written by GC */
++	atomic64_t pad_wa;		/* Padded sectors written */
++
++	/* Reset values for delta write amplification measurements */
++	u64 user_rst_wa;
++	u64 gc_rst_wa;
++	u64 pad_rst_wa;
++
+ #ifdef CONFIG_NVM_DEBUG
+-	/* All debug counters apply to 4kb sector I/Os */
++	/* Non-persistent debug counters, 4kb sector I/Os */
+ 	atomic_long_t inflight_writes;	/* Inflight writes (user and gc) */
+ 	atomic_long_t padded_writes;	/* Sectors padded due to flush/fua */
+ 	atomic_long_t padded_wb;	/* Sectors padded in write buffer */
+@@ -900,6 +922,12 @@ static inline void *emeta_to_bb(struct line_emeta *emeta)
+ 	return emeta->bb_bitmap;
+ }
+ 
++static inline void *emeta_to_wa(struct pblk_line_meta *lm,
++				struct line_emeta *emeta)
++{
++	return emeta->bb_bitmap + lm->blk_bitmap_len;
++}
++
+ static inline void *emeta_to_lbas(struct pblk *pblk, struct line_emeta *emeta)
+ {
+ 	return ((void *)emeta + pblk->lm.emeta_len[1]);
 -- 
-1.9.1
+2.11.0
