@@ -1,81 +1,69 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-it0-f41.google.com ([209.85.214.41]:53530 "EHLO
-        mail-it0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751539AbeCVRnz (ORCPT
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:38990 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752236AbeC2WHD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Mar 2018 13:43:55 -0400
-Received: by mail-it0-f41.google.com with SMTP id b136-v6so12382052iti.3
-        for <linux-block@vger.kernel.org>; Thu, 22 Mar 2018 10:43:55 -0700 (PDT)
-From: Kashyap Desai <kashyap.desai@broadcom.com>
+        Thu, 29 Mar 2018 18:07:03 -0400
+Received: by mail-lf0-f66.google.com with SMTP id p142-v6so10344877lfd.6
+        for <linux-block@vger.kernel.org>; Thu, 29 Mar 2018 15:07:02 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        keith.busch@intel.com, javier@cnexlabs.com,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 06/37] lightnvm: remove mlc pairs structure
+Date: Fri, 30 Mar 2018 00:04:53 +0200
+Message-Id: <20180329220524.30363-7-mb@lightnvm.io>
+In-Reply-To: <20180329220524.30363-1-mb@lightnvm.io>
+References: <20180329220524.30363-1-mb@lightnvm.io>
 MIME-Version: 1.0
-Date: Thu, 22 Mar 2018 23:13:53 +0530
-Message-ID: <2521f708170ecd4bd607aa660d781751@mail.gmail.com>
-Subject: smp affinity and kworker io submission
-To: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Hi,
+From: Matias Bjørling <m@bjorling.me>
 
-I am running FIO script on Linux 4.15. This is generic behavior even on
-3.x kernels as well. I wanted to know if my observation is correct or not.
+The known implementations of the 1.2 specification, and upcoming 2.0
+implementation all expose a sequential list of pages to write.
+Remove the data structure, as it is no longer needed.
 
-Here is FIO command -
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+---
+ drivers/nvme/host/lightnvm.c | 14 +-------------
+ 1 file changed, 1 insertion(+), 13 deletions(-)
 
-numactl -C 0-2  fio single --bs=4k  --iodepth=64 --rw=randread
---ioscheduler=none --group_report --numjobs=2
-
-If driver is provides affinity_hint, kernel choose only kworker (0,1,2)
-(it looks like kworker binding is smartly handled by kernel because I am
-running FIO from cpu0,1,2)  for IO submission from delayed context.
-
-14140 root      15  -5  519296   1560    612 R  87.7  0.0   0:20.91 fio
-
- 14138 root      15  -5  519292   1556    608 R  76.1  0.0   0:21.79 fio
-
- 14142 root      15  -5  519308   1560    612 R  66.8  0.0   0:19.69 fio
-
- 14141 root      15  -5  519304   1564    616 R  54.5  0.0   0:20.51 fio
-
-   923 root       0 -20       0      0      0 S   6.3  0.0   0:09.73
-kworker/1:1H
-
-  1075 root       0 -20       0      0      0 S   5.3  0.0   0:08.69
-kworker/0:1H
-
-   924 root       0 -20       0      0      0 S   3.3  0.0   0:12.82
-kworker/2:1H
-
-If driver is not providing affinity_hint, kernel choose *any* kworker from
-local numa node for IO submission from delayed context. In below snippet,
-you can see kworke4, kworke5 and kworke3 was participating in IO
-submission.
-
-14281 root      15  -5  519308   1556    612 R  87.0  0.0   0:16.16 fio
-
- 14280 root      15  -5  519304   1560    616 R  74.1  0.0   0:14.62 fio
-
- 14279 root      15  -5  519296   1556    612 R  71.8  0.0   0:15.02 fio
-
- 14277 root      15  -5  519292   1552    608 R  66.8  0.0   0:15.06 fio
-
-  1887 root       0 -20       0      0      0 R  15.3  0.0   0:40.91
-kworker/4:1H
-
-  3856 root       0 -20       0      0      0 S  13.6  0.0   0:38.90
-kworker/5:1H
-
-  3646 root       0 -20       0      0      0 S  13.0  0.0   0:40.17
-kworker/3:1H
-
-Which kernel component is making this decision ? Is this behavior tied to
-block layer/irq subsystem  ?
-
-I am trying to see which behavior is most suitable for my test. I am
-seeing performance is not improving because it is CPU bound and If I
-choose not to do smp affinity hint in driver, it is helping as explained
-above.
-
-
-Thanks, Kashyap
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index f9c38a8d54e1..940c9b9a2a09 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -115,17 +115,6 @@ struct nvme_nvm_command {
+ 	};
+ };
+ 
+-#define NVME_NVM_LP_MLC_PAIRS 886
+-struct nvme_nvm_lp_mlc {
+-	__le16			num_pairs;
+-	__u8			pairs[NVME_NVM_LP_MLC_PAIRS];
+-};
+-
+-struct nvme_nvm_lp_tbl {
+-	__u8			id[8];
+-	struct nvme_nvm_lp_mlc	mlc;
+-};
+-
+ struct nvme_nvm_id_group {
+ 	__u8			mtype;
+ 	__u8			fmtype;
+@@ -149,8 +138,7 @@ struct nvme_nvm_id_group {
+ 	__le32			mpos;
+ 	__le32			mccap;
+ 	__le16			cpar;
+-	__u8			reserved[10];
+-	struct nvme_nvm_lp_tbl lptbl;
++	__u8			reserved[906];
+ } __packed;
+ 
+ struct nvme_nvm_addr_format {
+-- 
+2.11.0
