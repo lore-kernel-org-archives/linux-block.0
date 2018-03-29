@@ -1,66 +1,75 @@
-Return-Path: <prvs=606fe2c49=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Tejun Heo <tj@kernel.org>
-Subject: [PATCH v2] blk-mq-debugfs: Show more request state information
-Date: Fri, 16 Mar 2018 10:31:11 -0700
-Message-Id: <20180316173111.2221-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:41363 "EHLO
+        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752785AbeC2WHn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Mar 2018 18:07:43 -0400
+Received: by mail-lf0-f68.google.com with SMTP id o102-v6so10325236lfg.8
+        for <linux-block@vger.kernel.org>; Thu, 29 Mar 2018 15:07:43 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        keith.busch@intel.com, javier@cnexlabs.com,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 35/37] lightnvm: pblk: don't recover unwritten lines
+Date: Fri, 30 Mar 2018 00:05:22 +0200
+Message-Id: <20180329220524.30363-36-mb@lightnvm.io>
+In-Reply-To: <20180329220524.30363-1-mb@lightnvm.io>
+References: <20180329220524.30363-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Since commit 634f9e4631a8 ("blk-mq: remove REQ_ATOM_COMPLETE usages
-from blk-mq") blk_rq_is_complete() only reports whether or not a
-request has completed for legacy queues. Hence modify the
-blk-mq-debugfs code such that it shows the blk-mq request state
-again.
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-Fixes: 634f9e4631a8 ("blk-mq: remove REQ_ATOM_COMPLETE usages from blk-mq")
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: Tejun Heo <tj@kernel.org>
+If the line has not been written to, we should not
+try to recover any data from it, so check the state of the
+chunks in the line before attempting to read smeta.
+
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
+ drivers/lightnvm/pblk-recovery.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-Changes compared to v1:
-- Added an out-of-bounds check to the access of the request state name array
-  as requested by Jens.
-
- block/blk-mq-debugfs.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index bd21d5b9f65f..58b3b79cbe83 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -350,6 +350,20 @@ static const char *const rqf_name[] = {
- };
- #undef RQF_NAME
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index 26356429dc72..3e079c2afa6e 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -864,6 +864,21 @@ static void pblk_recov_wa_counters(struct pblk *pblk,
+ 	}
+ }
  
-+static const char *const blk_mq_rq_state_name_array[] = {
-+	[MQ_RQ_IDLE]		= "idle",
-+	[MQ_RQ_IN_FLIGHT]	= "in_flight",
-+	[MQ_RQ_COMPLETE]	= "complete",
-+};
-+
-+static const char *blk_mq_rq_state_name(enum mq_rq_state rq_state)
++static int pblk_line_was_written(struct pblk_line *line,
++			    struct pblk_line_meta *lm)
 +{
-+	if (WARN_ON_ONCE((unsigned int)rq_state >
-+			 ARRAY_SIZE(blk_mq_rq_state_name_array)))
-+		return "(?)";
-+	return blk_mq_rq_state_name_array[rq_state];
++
++	int i;
++	int state_mask = NVM_CHK_ST_OFFLINE | NVM_CHK_ST_FREE;
++
++	for (i = 0; i < lm->blk_per_line; i++) {
++		if (!(line->chks[i].state & state_mask))
++			return 1;
++	}
++
++	return 0;
 +}
 +
- int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq)
+ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
  {
- 	const struct blk_mq_ops *const mq_ops = rq->q->mq_ops;
-@@ -366,7 +380,7 @@ int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq)
- 	seq_puts(m, ", .rq_flags=");
- 	blk_flags_show(m, (__force unsigned int)rq->rq_flags, rqf_name,
- 		       ARRAY_SIZE(rqf_name));
--	seq_printf(m, ", complete=%d", blk_rq_is_complete(rq));
-+	seq_printf(m, ", .state=%s", blk_mq_rq_state_name(blk_mq_rq_state(rq)));
- 	seq_printf(m, ", .tag=%d, .internal_tag=%d", rq->tag,
- 		   rq->internal_tag);
- 	if (mq_ops->show_rq)
+ 	struct pblk_line_meta *lm = &pblk->lm;
+@@ -900,6 +915,9 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+ 		line->lun_bitmap = ((void *)(smeta_buf)) +
+ 						sizeof(struct line_smeta);
+ 
++		if (!pblk_line_was_written(line, lm))
++			continue;
++
+ 		/* Lines that cannot be read are assumed as not written here */
+ 		if (pblk_line_read_smeta(pblk, line))
+ 			continue;
 -- 
-2.16.2
+2.11.0
