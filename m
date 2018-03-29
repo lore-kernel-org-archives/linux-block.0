@@ -1,64 +1,114 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32798 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1750779AbeCNOdv (ORCPT
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:37885 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752638AbeC2WHZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Mar 2018 10:33:51 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id w2EEV2eX102431
-        for <linux-block@vger.kernel.org>; Wed, 14 Mar 2018 10:33:51 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2gq5awgxq9-1
-        (version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Wed, 14 Mar 2018 10:33:50 -0400
-Received: from localhost
-        by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <maier@linux.vnet.ibm.com>;
-        Wed, 14 Mar 2018 14:33:49 -0000
-From: Steffen Maier <maier@linux.vnet.ibm.com>
-To: dm-devel@redhat.com, Mikulas Patocka <mpatocka@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>
-Cc: linux-block@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Hannes Reinecke <hare@suse.com>, linux-s390@vger.kernel.org,
-        Martin Schwidefsky <schwidefsky@de.ibm.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Steffen Maier <maier@linux.vnet.ibm.com>,
-        Fedor Loshakov <loshakov@linux.vnet.ibm.com>
-Subject: [PATCH] dm mpath: fix passing integrity data
-Date: Wed, 14 Mar 2018 15:33:06 +0100
-Message-Id: <20180314143306.98405-1-maier@linux.vnet.ibm.com>
+        Thu, 29 Mar 2018 18:07:25 -0400
+Received: by mail-lf0-f65.google.com with SMTP id m200-v6so4581171lfm.4
+        for <linux-block@vger.kernel.org>; Thu, 29 Mar 2018 15:07:24 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        keith.busch@intel.com, javier@cnexlabs.com,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 20/37] lightnvm: centralize permission check for lightnvm ioctl
+Date: Fri, 30 Mar 2018 00:05:07 +0200
+Message-Id: <20180329220524.30363-21-mb@lightnvm.io>
+In-Reply-To: <20180329220524.30363-1-mb@lightnvm.io>
+References: <20180329220524.30363-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-After v4.12 commit e2460f2a4bc7 ("dm: mark targets that pass integrity
-data"), dm-multipath, e.g. on DIF+DIX SCSI disk paths, does not support
-block integrity any more. So add it to the whitelist.
+From: Johannes Thumshirn <jthumshirn@suse.de>
 
-This is also a pre-requisite to use block integrity with other dm layer(s)
-on top of multipath, such as kpartx partitions (dm-linear) or LVM.
+Currently all functions for handling the lightnvm core ioctl commands
+do a check for CAP_SYS_ADMIN.
 
-Signed-off-by: Steffen Maier <maier@linux.vnet.ibm.com>
-Bisected-by: Fedor Loshakov <loshakov@linux.vnet.ibm.com>
-Fixes: e2460f2a4bc7 ("dm: mark targets that pass integrity data")
-Cc: <stable@vger.kernel.org> #4.12+
+Change this to fail early in nvm_ctl_ioctl(), so we don't have to
+duplicate the permission checks all over.
+
+Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- drivers/md/dm-mpath.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/lightnvm/core.c | 21 +++------------------
+ 1 file changed, 3 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-index 3fde9e9faddd..c174f0c53dc9 100644
---- a/drivers/md/dm-mpath.c
-+++ b/drivers/md/dm-mpath.c
-@@ -2023,7 +2023,8 @@ static int multipath_busy(struct dm_target *ti)
- static struct target_type multipath_target = {
- 	.name = "multipath",
- 	.version = {1, 12, 0},
--	.features = DM_TARGET_SINGLETON | DM_TARGET_IMMUTABLE,
-+	.features = DM_TARGET_SINGLETON | DM_TARGET_IMMUTABLE |
-+		    DM_TARGET_PASSES_INTEGRITY,
- 	.module = THIS_MODULE,
- 	.ctr = multipath_ctr,
- 	.dtr = multipath_dtr,
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 3eec948d1b7e..5b197d6bb6d9 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -1019,9 +1019,6 @@ static long nvm_ioctl_info(struct file *file, void __user *arg)
+ 	struct nvm_tgt_type *tt;
+ 	int tgt_iter = 0;
+ 
+-	if (!capable(CAP_SYS_ADMIN))
+-		return -EPERM;
+-
+ 	info = memdup_user(arg, sizeof(struct nvm_ioctl_info));
+ 	if (IS_ERR(info))
+ 		return -EFAULT;
+@@ -1060,9 +1057,6 @@ static long nvm_ioctl_get_devices(struct file *file, void __user *arg)
+ 	struct nvm_dev *dev;
+ 	int i = 0;
+ 
+-	if (!capable(CAP_SYS_ADMIN))
+-		return -EPERM;
+-
+ 	devices = kzalloc(sizeof(struct nvm_ioctl_get_devices), GFP_KERNEL);
+ 	if (!devices)
+ 		return -ENOMEM;
+@@ -1103,9 +1097,6 @@ static long nvm_ioctl_dev_create(struct file *file, void __user *arg)
+ {
+ 	struct nvm_ioctl_create create;
+ 
+-	if (!capable(CAP_SYS_ADMIN))
+-		return -EPERM;
+-
+ 	if (copy_from_user(&create, arg, sizeof(struct nvm_ioctl_create)))
+ 		return -EFAULT;
+ 
+@@ -1141,9 +1132,6 @@ static long nvm_ioctl_dev_remove(struct file *file, void __user *arg)
+ 	struct nvm_dev *dev;
+ 	int ret = 0;
+ 
+-	if (!capable(CAP_SYS_ADMIN))
+-		return -EPERM;
+-
+ 	if (copy_from_user(&remove, arg, sizeof(struct nvm_ioctl_remove)))
+ 		return -EFAULT;
+ 
+@@ -1168,9 +1156,6 @@ static long nvm_ioctl_dev_init(struct file *file, void __user *arg)
+ {
+ 	struct nvm_ioctl_dev_init init;
+ 
+-	if (!capable(CAP_SYS_ADMIN))
+-		return -EPERM;
+-
+ 	if (copy_from_user(&init, arg, sizeof(struct nvm_ioctl_dev_init)))
+ 		return -EFAULT;
+ 
+@@ -1187,9 +1172,6 @@ static long nvm_ioctl_dev_factory(struct file *file, void __user *arg)
+ {
+ 	struct nvm_ioctl_dev_factory fact;
+ 
+-	if (!capable(CAP_SYS_ADMIN))
+-		return -EPERM;
+-
+ 	if (copy_from_user(&fact, arg, sizeof(struct nvm_ioctl_dev_factory)))
+ 		return -EFAULT;
+ 
+@@ -1205,6 +1187,9 @@ static long nvm_ctl_ioctl(struct file *file, uint cmd, unsigned long arg)
+ {
+ 	void __user *argp = (void __user *)arg;
+ 
++	if (!capable(CAP_SYS_ADMIN))
++		return -EPERM;
++
+ 	switch (cmd) {
+ 	case NVM_INFO:
+ 		return nvm_ioctl_info(file, argp);
 -- 
-2.13.5
+2.11.0
