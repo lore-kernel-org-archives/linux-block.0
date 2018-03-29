@@ -1,53 +1,58 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:4231 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752748AbeCOPI2 (ORCPT
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:46374 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752545AbeC2WHP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Mar 2018 11:08:28 -0400
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Michael Lyle <mlyle@lyle.org>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Coly Li <colyli@suse.de>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH 02/16] bcache: Add __printf annotation to __bch_check_keys()
-Date: Thu, 15 Mar 2018 08:08:00 -0700
-Message-Id: <20180315150814.9412-3-bart.vanassche@wdc.com>
-In-Reply-To: <20180315150814.9412-1-bart.vanassche@wdc.com>
-References: <20180315150814.9412-1-bart.vanassche@wdc.com>
+        Thu, 29 Mar 2018 18:07:15 -0400
+Received: by mail-lf0-f65.google.com with SMTP id j68-v6so10302467lfg.13
+        for <linux-block@vger.kernel.org>; Thu, 29 Mar 2018 15:07:15 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        keith.busch@intel.com, javier@cnexlabs.com,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 16/37] lightnvm: remove max_rq_size
+Date: Fri, 30 Mar 2018 00:05:03 +0200
+Message-Id: <20180329220524.30363-17-mb@lightnvm.io>
+In-Reply-To: <20180329220524.30363-1-mb@lightnvm.io>
+References: <20180329220524.30363-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Make it possible for the compiler to verify the consistency of the
-format string passed to __bch_check_keys() and the arguments that
-should be formatted according to that format string.
+The field is no longer used.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- drivers/md/bcache/bset.h | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/lightnvm/core.c  | 1 -
+ include/linux/lightnvm.h | 2 --
+ 2 files changed, 3 deletions(-)
 
-diff --git a/drivers/md/bcache/bset.h b/drivers/md/bcache/bset.h
-index fa506c1aa524..0c24280f3b98 100644
---- a/drivers/md/bcache/bset.h
-+++ b/drivers/md/bcache/bset.h
-@@ -531,14 +531,15 @@ int __bch_keylist_realloc(struct keylist *, unsigned);
- #ifdef CONFIG_BCACHE_DEBUG
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 521f520a1bb4..a59ad29600c3 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -874,7 +874,6 @@ static int nvm_core_init(struct nvm_dev *dev)
+ 	geo->sec_size = id->csecs;
+ 	geo->oob_size = id->sos;
+ 	geo->mccap = id->mccap;
+-	geo->max_rq_size = dev->ops->max_phys_sect * geo->sec_size;
  
- int __bch_count_data(struct btree_keys *);
--void __bch_check_keys(struct btree_keys *, const char *, ...);
-+void __printf(2, 3) __bch_check_keys(struct btree_keys *, const char *, ...);
- void bch_dump_bset(struct btree_keys *, struct bset *, unsigned);
- void bch_dump_bucket(struct btree_keys *);
+ 	geo->sec_per_chk = id->clba;
+ 	geo->sec_per_lun = geo->sec_per_chk * geo->nr_chks;
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index b717c000b712..67b4fa8e4906 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -295,8 +295,6 @@ struct nvm_geo {
+ 	int ws_seq;
+ 	int ws_per_chk;
  
- #else
+-	int max_rq_size;
+-
+ 	int op;
  
- static inline int __bch_count_data(struct btree_keys *b) { return -1; }
--static inline void __bch_check_keys(struct btree_keys *b, const char *fmt, ...) {}
-+static inline void __printf(2, 3)
-+	__bch_check_keys(struct btree_keys *b, const char *fmt, ...) {}
- static inline void bch_dump_bucket(struct btree_keys *b) {}
- void bch_dump_bset(struct btree_keys *, struct bset *, unsigned);
- 
+ 	struct nvm_addr_format ppaf;
 -- 
-2.16.2
+2.11.0
