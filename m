@@ -1,117 +1,166 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from eahe.aehallh.com ([50.116.20.20]:60768 "EHLO eahe.aehallh.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751059AbeC1XMG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Mar 2018 19:12:06 -0400
-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-From: "Zephaniah E. Loss-Cutler-Hull" <warp-spam_kernel@aehallh.com>
-Subject: General protection fault with use_blk_mq=1.
-Message-ID: <7d8a9c62-7d3e-879c-5b5b-30707f04553e@aehallh.com>
-Date: Wed, 28 Mar 2018 16:03:09 -0700
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:39043 "EHLO
+        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752712AbeC2WHf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Mar 2018 18:07:35 -0400
+Received: by mail-lf0-f68.google.com with SMTP id p142-v6so10346198lfd.6
+        for <linux-block@vger.kernel.org>; Thu, 29 Mar 2018 15:07:34 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        keith.busch@intel.com, javier@cnexlabs.com,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 32/37] lightnvm: pblk: rename ppaf* to addrf*
+Date: Fri, 30 Mar 2018 00:05:19 +0200
+Message-Id: <20180329220524.30363-33-mb@lightnvm.io>
+In-Reply-To: <20180329220524.30363-1-mb@lightnvm.io>
+References: <20180329220524.30363-1-mb@lightnvm.io>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-I am not subscribed to any of the lists on the To list here, please CC
-me on any replies.
+From: Javier González <javier@cnexlabs.com>
 
-I am encountering a fairly consistent crash anywhere from 15 minutes to
-12 hours after boot with scsi_mod.use_blk_mq=1 dm_mod.use_blk_mq=1
+In preparation for 2.0 support in pblk, rename variables referring to
+the address format to addrf and reserve ppaf for the 1.2 path.
 
-The crash looks like:
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+---
+ drivers/lightnvm/pblk-init.c  |  8 ++++----
+ drivers/lightnvm/pblk-sysfs.c |  4 ++--
+ drivers/lightnvm/pblk.h       | 16 ++++++++--------
+ 3 files changed, 14 insertions(+), 14 deletions(-)
 
-[ 5466.075993] general protection fault: 0000 [#1] PREEMPT SMP PTI
-[ 5466.075997] Modules linked in: esp4 xfrm4_mode_tunnel fuse usblp
-uvcvideo pci_stub vboxpci(O) vboxnetadp(O) vboxnetflt(O) vboxdrv(O)
-ip6table_filter ip6_tables xt_tcpudp nf_conntrack_ipv4 nf_defrag_ipv4
-xt_conntrack nf_conntrack iptable_filter ip_tables x_tables intel_rapl
-joydev serio_raw wmi_bmof iwldvm iwlwifi shpchp kvm_intel kvm irqbypass
-autofs4 algif_skcipher nls_iso8859_1 nls_cp437 crc32_pclmul
-ghash_clmulni_intel
-[ 5466.076022] CPU: 3 PID: 10573 Comm: pool Tainted: G           O    
-4.15.13-f1-dirty #148
-[ 5466.076024] Hardware name: Hewlett-Packard HP EliteBook Folio
-9470m/18DF, BIOS 68IBD Ver. F.44 05/22/2013
-[ 5466.076029] RIP: 0010:percpu_counter_add_batch+0x2b/0xb0
-[ 5466.076031] RSP: 0018:ffffa556c47afb58 EFLAGS: 00010002
-[ 5466.076033] RAX: ffff95cda87ce018 RBX: ffff95cda87cdb68 RCX:
-0000000000000000
-[ 5466.076034] RDX: 000000003fffffff RSI: ffffffff896495c4 RDI:
-ffffffff895b2bed
-[ 5466.076036] RBP: 000000003fffffff R08: 0000000000000000 R09:
-ffff95cb7d5f8148
-[ 5466.076037] R10: 0000000000000200 R11: 0000000000000000 R12:
-0000000000000001
-[ 5466.076038] R13: ffff95cda87ce088 R14: ffff95cda6ebd100 R15:
-ffffa556c47afc58
-[ 5466.076040] FS:  00007f25f5305700(0000) GS:ffff95cdbeac0000(0000)
-knlGS:0000000000000000
-[ 5466.076042] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[ 5466.076043] CR2: 00007f25e807e0a8 CR3: 00000003ed5a6001 CR4:
-00000000001606e0
-[ 5466.076044] Call Trace:
-[ 5466.076050]  bfqg_stats_update_io_add+0x58/0x100
-[ 5466.076055]  bfq_insert_requests+0xec/0xd80
-[ 5466.076059]  ? blk_rq_append_bio+0x8f/0xa0
-[ 5466.076061]  ? blk_rq_map_user_iov+0xc3/0x1d0
-[ 5466.076065]  blk_mq_sched_insert_request+0xa3/0x130
-[ 5466.076068]  blk_execute_rq+0x3a/0x50
-[ 5466.076070]  sg_io+0x197/0x3e0
-[ 5466.076073]  ? dput+0xca/0x210
-[ 5466.076077]  ? mntput_no_expire+0x11/0x1a0
-[ 5466.076079]  scsi_cmd_ioctl+0x289/0x400
-[ 5466.076082]  ? filename_lookup+0xe1/0x170
-[ 5466.076085]  sd_ioctl+0xc7/0x1a0
-[ 5466.076088]  blkdev_ioctl+0x4d4/0x8c0
-[ 5466.076091]  block_ioctl+0x39/0x40
-[ 5466.076094]  do_vfs_ioctl+0x92/0x5e0
-[ 5466.076097]  ? __fget+0x73/0xc0
-[ 5466.076099]  SyS_ioctl+0x74/0x80
-[ 5466.076102]  do_syscall_64+0x60/0x110
-[ 5466.076106]  entry_SYSCALL_64_after_hwframe+0x3d/0xa2
-[ 5466.076109] RIP: 0033:0x7f25f75fef47
-[ 5466.076110] RSP: 002b:00007f25f53049a8 EFLAGS: 00000246 ORIG_RAX:
-0000000000000010
-[ 5466.076112] RAX: ffffffffffffffda RBX: 000000000000000c RCX:
-00007f25f75fef47
-[ 5466.076114] RDX: 00007f25f53049b0 RSI: 0000000000002285 RDI:
-000000000000000c
-[ 5466.076115] RBP: 0000000000000010 R08: 00007f25e8007818 R09:
-0000000000000200
-[ 5466.076116] R10: 0000000000000001 R11: 0000000000000246 R12:
-0000000000000000
-[ 5466.076118] R13: 0000000000000000 R14: 00007f25f8a6b5e0 R15:
-00007f25e80173e0
-[ 5466.076120] Code: 41 55 49 89 fd bf 01 00 00 00 41 54 49 89 f4 55 89
-d5 53 e8 18 e1 bb ff 48 c7 c7 c4 95 64 89 e8 dc e9 fb ff 49 8b 45 20 48
-63 d5 <65> 8b 18 48 63 db 4c 01 e3 48 39 d3 7d 0a f7 dd 48 63 ed 48 39
-[ 5466.076147] RIP: percpu_counter_add_batch+0x2b/0xb0 RSP: ffffa556c47afb58
-[ 5466.076149] ---[ end trace 8d7eb80aafef4494 ]---
-[ 5466.670153] note: pool[10573] exited with preempt_count 2
-
-(I only have the one instance right this minute as a result of not
-having remote syslog setup before now.)
-
-This is clearly deep in the blk_mq code, and it goes away when I remove
-the use_blk_mq kernel command line parameters.
-
-My next obvious step is to try and disable the load of the vbox modules.
-
-I can include the full dmesg output if it would be helpful.
-
-The system is an older HP Ultrabook, and the root partition is, sda1 (a
-SSD) -> a LUKS encrypted partition -> LVM -> BTRFS.
-
-The kernel is a stock 4.15.11, however I only recently added the blk_mq
-options, so while I can state that I have seen this on multiple kernels
-in the 4.15.x series, I have not tested earlier kernels in this
-configuration.
-
-Looking through the code, I'd guess that this is dying inside
-blkg_rwstat_add, which calls percpu_counter_add_batch, which is what RIP
-is pointing at.
-
-Regards,
-Zephaniah E. Loss-Cutler-Hull.
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 34ff47705293..5b381700ef30 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -80,7 +80,7 @@ static size_t pblk_trans_map_size(struct pblk *pblk)
+ {
+ 	int entry_size = 8;
+ 
+-	if (pblk->ppaf_bitsize < 32)
++	if (pblk->addrf_len < 32)
+ 		entry_size = 4;
+ 
+ 	return entry_size * pblk->rl.nr_secs;
+@@ -229,7 +229,7 @@ static int pblk_set_addrf_12(struct nvm_geo *geo, struct nvm_addrf_12 *dst)
+ 	return dst->blk_offset + src->blk_len;
+ }
+ 
+-static int pblk_set_ppaf(struct pblk *pblk)
++static int pblk_set_addrf(struct pblk *pblk)
+ {
+ 	struct nvm_tgt_dev *dev = pblk->dev;
+ 	struct nvm_geo *geo = &dev->geo;
+@@ -241,7 +241,7 @@ static int pblk_set_ppaf(struct pblk *pblk)
+ 		return -EINVAL;
+ 	}
+ 
+-	pblk->ppaf_bitsize = pblk_set_addrf_12(geo, (void *)&pblk->ppaf);
++	pblk->addrf_len = pblk_set_addrf_12(geo, (void *)&pblk->addrf);
+ 
+ 	return 0;
+ }
+@@ -377,7 +377,7 @@ static int pblk_core_init(struct pblk *pblk)
+ 	if (!pblk->r_end_wq)
+ 		goto free_bb_wq;
+ 
+-	if (pblk_set_ppaf(pblk))
++	if (pblk_set_addrf(pblk))
+ 		goto free_r_end_wq;
+ 
+ 	INIT_LIST_HEAD(&pblk->compl_list);
+diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
+index 2489ea0edfa0..fd2caad39d49 100644
+--- a/drivers/lightnvm/pblk-sysfs.c
++++ b/drivers/lightnvm/pblk-sysfs.c
+@@ -117,12 +117,12 @@ static ssize_t pblk_sysfs_ppaf(struct pblk *pblk, char *page)
+ 	struct nvm_addrf_12 *geo_ppaf;
+ 	ssize_t sz = 0;
+ 
+-	ppaf = (struct nvm_addrf_12 *)&pblk->ppaf;
++	ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
+ 	geo_ppaf = (struct nvm_addrf_12 *)&geo->addrf;
+ 
+ 	sz = snprintf(page, PAGE_SIZE,
+ 		"g:(b:%d)blk:%d/%d,pg:%d/%d,lun:%d/%d,ch:%d/%d,pl:%d/%d,sec:%d/%d\n",
+-			pblk->ppaf_bitsize,
++			pblk->addrf_len,
+ 			ppaf->blk_offset, ppaf->blk_len,
+ 			ppaf->pg_offset, ppaf->pg_len,
+ 			ppaf->lun_offset, ppaf->lun_len,
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 6607c41b23c0..40aee9e48af4 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -570,8 +570,8 @@ struct pblk {
+ 	struct pblk_line_mgmt l_mg;		/* Line management */
+ 	struct pblk_line_meta lm;		/* Line metadata */
+ 
+-	struct nvm_addrf ppaf;
+-	int ppaf_bitsize;
++	struct nvm_addrf addrf;
++	int addrf_len;
+ 
+ 	struct pblk_rb rwb;
+ 
+@@ -947,7 +947,7 @@ static inline int pblk_ppa_to_pos(struct nvm_geo *geo, struct ppa_addr p)
+ static inline struct ppa_addr addr_to_gen_ppa(struct pblk *pblk, u64 paddr,
+ 					      u64 line_id)
+ {
+-	struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->ppaf;
++	struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
+ 	struct ppa_addr ppa;
+ 
+ 	ppa.ppa = 0;
+@@ -964,7 +964,7 @@ static inline struct ppa_addr addr_to_gen_ppa(struct pblk *pblk, u64 paddr,
+ static inline u64 pblk_dev_ppa_to_line_addr(struct pblk *pblk,
+ 							struct ppa_addr p)
+ {
+-	struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->ppaf;
++	struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
+ 	u64 paddr;
+ 
+ 	paddr = (u64)p.g.ch << ppaf->ch_offset;
+@@ -988,7 +988,7 @@ static inline struct ppa_addr pblk_ppa32_to_ppa64(struct pblk *pblk, u32 ppa32)
+ 		ppa64.c.line = ppa32 & ((~0U) >> 1);
+ 		ppa64.c.is_cached = 1;
+ 	} else {
+-		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->ppaf;
++		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
+ 
+ 		ppa64.g.ch = (ppa32 & ppaf->ch_mask) >> ppaf->ch_offset;
+ 		ppa64.g.lun = (ppa32 & ppaf->lun_mask) >> ppaf->lun_offset;
+@@ -1011,7 +1011,7 @@ static inline u32 pblk_ppa64_to_ppa32(struct pblk *pblk, struct ppa_addr ppa64)
+ 		ppa32 |= ppa64.c.line;
+ 		ppa32 |= 1U << 31;
+ 	} else {
+-		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->ppaf;
++		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
+ 
+ 		ppa32 |= ppa64.g.ch << ppaf->ch_offset;
+ 		ppa32 |= ppa64.g.lun << ppaf->lun_offset;
+@@ -1029,7 +1029,7 @@ static inline struct ppa_addr pblk_trans_map_get(struct pblk *pblk,
+ {
+ 	struct ppa_addr ppa;
+ 
+-	if (pblk->ppaf_bitsize < 32) {
++	if (pblk->addrf_len < 32) {
+ 		u32 *map = (u32 *)pblk->trans_map;
+ 
+ 		ppa = pblk_ppa32_to_ppa64(pblk, map[lba]);
+@@ -1045,7 +1045,7 @@ static inline struct ppa_addr pblk_trans_map_get(struct pblk *pblk,
+ static inline void pblk_trans_map_set(struct pblk *pblk, sector_t lba,
+ 						struct ppa_addr ppa)
+ {
+-	if (pblk->ppaf_bitsize < 32) {
++	if (pblk->addrf_len < 32) {
+ 		u32 *map = (u32 *)pblk->trans_map;
+ 
+ 		map[lba] = pblk_ppa64_to_ppa32(pblk, ppa);
+-- 
+2.11.0
