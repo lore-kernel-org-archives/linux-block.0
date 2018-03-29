@@ -1,81 +1,222 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:54049 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1423425AbeCBPV6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Mar 2018 10:21:58 -0500
-Received: by mail-wm0-f65.google.com with SMTP id t74so3840757wme.3
-        for <linux-block@vger.kernel.org>; Fri, 02 Mar 2018 07:21:58 -0800 (PST)
-From: "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-To: mb@lightnvm.io
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:33187 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752604AbeC2WHW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Mar 2018 18:07:22 -0400
+Received: by mail-lf0-f66.google.com with SMTP id x70-v6so3501969lfa.0
+        for <linux-block@vger.kernel.org>; Thu, 29 Mar 2018 15:07:21 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH 03/12] lightnvm: add shorten OCSSD version in geo
-Date: Fri,  2 Mar 2018 16:21:11 +0100
-Message-Id: <1520004080-27760-4-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1520004080-27760-1-git-send-email-javier@cnexlabs.com>
-References: <1520004080-27760-1-git-send-email-javier@cnexlabs.com>
+        keith.busch@intel.com, javier@cnexlabs.com,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 17/37] lightnvm: remove nvm_dev_ops->max_phys_sect
+Date: Fri, 30 Mar 2018 00:05:04 +0200
+Message-Id: <20180329220524.30363-18-mb@lightnvm.io>
+In-Reply-To: <20180329220524.30363-1-mb@lightnvm.io>
+References: <20180329220524.30363-1-mb@lightnvm.io>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-Create a shorten version to use in the generic geometry.
+The value of max_phys_sect is always static. Instead of
+defining it in the nvm_dev_ops structure, declare it as a global
+value.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- drivers/nvme/host/lightnvm.c | 6 ++++++
- include/linux/lightnvm.h     | 8 ++++++++
- 2 files changed, 14 insertions(+)
+ drivers/lightnvm/core.c          | 28 +++++++---------------------
+ drivers/lightnvm/pblk-init.c     |  9 ++++-----
+ drivers/lightnvm/pblk-recovery.c |  8 ++------
+ drivers/nvme/host/lightnvm.c     |  5 +----
+ include/linux/lightnvm.h         |  5 ++---
+ 5 files changed, 16 insertions(+), 39 deletions(-)
 
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index a59ad29600c3..9704db219866 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -407,7 +407,8 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
+ 	tdisk->private_data = targetdata;
+ 	tqueue->queuedata = targetdata;
+ 
+-	blk_queue_max_hw_sectors(tqueue, 8 * dev->ops->max_phys_sect);
++	blk_queue_max_hw_sectors(tqueue,
++			(dev->geo.sec_size >> 9) * NVM_MAX_VLBA);
+ 
+ 	set_capacity(tdisk, tt->capacity(targetdata));
+ 	add_disk(tdisk);
+@@ -719,7 +720,7 @@ int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas,
+ 	struct nvm_rq rqd;
+ 	int ret;
+ 
+-	if (nr_ppas > dev->ops->max_phys_sect) {
++	if (nr_ppas > NVM_MAX_VLBA) {
+ 		pr_err("nvm: unable to update all blocks atomically\n");
+ 		return -EINVAL;
+ 	}
+@@ -740,14 +741,6 @@ int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas,
+ }
+ EXPORT_SYMBOL(nvm_set_tgt_bb_tbl);
+ 
+-int nvm_max_phys_sects(struct nvm_tgt_dev *tgt_dev)
+-{
+-	struct nvm_dev *dev = tgt_dev->parent;
+-
+-	return dev->ops->max_phys_sect;
+-}
+-EXPORT_SYMBOL(nvm_max_phys_sects);
+-
+ int nvm_submit_io(struct nvm_tgt_dev *tgt_dev, struct nvm_rq *rqd)
+ {
+ 	struct nvm_dev *dev = tgt_dev->parent;
+@@ -965,17 +958,10 @@ int nvm_register(struct nvm_dev *dev)
+ 	if (!dev->q || !dev->ops)
+ 		return -EINVAL;
+ 
+-	if (dev->ops->max_phys_sect > 256) {
+-		pr_info("nvm: max sectors supported is 256.\n");
+-		return -EINVAL;
+-	}
+-
+-	if (dev->ops->max_phys_sect > 1) {
+-		dev->dma_pool = dev->ops->create_dma_pool(dev, "ppalist");
+-		if (!dev->dma_pool) {
+-			pr_err("nvm: could not create dma pool\n");
+-			return -ENOMEM;
+-		}
++	dev->dma_pool = dev->ops->create_dma_pool(dev, "ppalist");
++	if (!dev->dma_pool) {
++		pr_err("nvm: could not create dma pool\n");
++		return -ENOMEM;
+ 	}
+ 
+ 	ret = nvm_init(dev);
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 141036bd6afa..43b835678f48 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -260,8 +260,7 @@ static int pblk_core_init(struct pblk *pblk)
+ 		return -ENOMEM;
+ 
+ 	/* Internal bios can be at most the sectors signaled by the device. */
+-	pblk->page_bio_pool = mempool_create_page_pool(nvm_max_phys_sects(dev),
+-									0);
++	pblk->page_bio_pool = mempool_create_page_pool(NVM_MAX_VLBA, 0);
+ 	if (!pblk->page_bio_pool)
+ 		goto free_global_caches;
+ 
+@@ -716,12 +715,12 @@ static int pblk_lines_init(struct pblk *pblk)
+ 
+ 	pblk->min_write_pgs = geo->sec_per_pl * (geo->sec_size / PAGE_SIZE);
+ 	max_write_ppas = pblk->min_write_pgs * geo->all_luns;
+-	pblk->max_write_pgs = (max_write_ppas < nvm_max_phys_sects(dev)) ?
+-				max_write_ppas : nvm_max_phys_sects(dev);
++	pblk->max_write_pgs = min_t(int, max_write_ppas, NVM_MAX_VLBA);
+ 	pblk_set_sec_per_write(pblk, pblk->min_write_pgs);
+ 
+ 	if (pblk->max_write_pgs > PBLK_MAX_REQ_ADDRS) {
+-		pr_err("pblk: cannot support device max_phys_sect\n");
++		pr_err("pblk: vector list too big(%u > %u)\n",
++				pblk->max_write_pgs, PBLK_MAX_REQ_ADDRS);
+ 		return -EINVAL;
+ 	}
+ 
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index e75a1af2eebe..aaab9a5c17cc 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -21,17 +21,15 @@ void pblk_submit_rec(struct work_struct *work)
+ 	struct pblk_rec_ctx *recovery =
+ 			container_of(work, struct pblk_rec_ctx, ws_rec);
+ 	struct pblk *pblk = recovery->pblk;
+-	struct nvm_tgt_dev *dev = pblk->dev;
+ 	struct nvm_rq *rqd = recovery->rqd;
+ 	struct pblk_c_ctx *c_ctx = nvm_rq_to_pdu(rqd);
+-	int max_secs = nvm_max_phys_sects(dev);
+ 	struct bio *bio;
+ 	unsigned int nr_rec_secs;
+ 	unsigned int pgs_read;
+ 	int ret;
+ 
+ 	nr_rec_secs = bitmap_weight((unsigned long int *)&rqd->ppa_status,
+-								max_secs);
++								NVM_MAX_VLBA);
+ 
+ 	bio = bio_alloc(GFP_KERNEL, nr_rec_secs);
+ 
+@@ -74,8 +72,6 @@ int pblk_recov_setup_rq(struct pblk *pblk, struct pblk_c_ctx *c_ctx,
+ 			struct pblk_rec_ctx *recovery, u64 *comp_bits,
+ 			unsigned int comp)
+ {
+-	struct nvm_tgt_dev *dev = pblk->dev;
+-	int max_secs = nvm_max_phys_sects(dev);
+ 	struct nvm_rq *rec_rqd;
+ 	struct pblk_c_ctx *rec_ctx;
+ 	int nr_entries = c_ctx->nr_valid + c_ctx->nr_padded;
+@@ -86,7 +82,7 @@ int pblk_recov_setup_rq(struct pblk *pblk, struct pblk_c_ctx *c_ctx,
+ 	/* Copy completion bitmap, but exclude the first X completed entries */
+ 	bitmap_shift_right((unsigned long int *)&rec_rqd->ppa_status,
+ 				(unsigned long int *)comp_bits,
+-				comp, max_secs);
++				comp, NVM_MAX_VLBA);
+ 
+ 	/* Save the context for the entries that need to be re-written and
+ 	 * update current context with the completed entries.
 diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index de4105544956..f7f7769e7588 100644
+index 8b243af8a949..e38d835b15b5 100644
 --- a/drivers/nvme/host/lightnvm.c
 +++ b/drivers/nvme/host/lightnvm.c
-@@ -299,6 +299,9 @@ static int nvme_nvm_setup_12(struct nvme_nvm_id12 *id,
- 	geo->major_ver_id = id->ver_id;
- 	geo->minor_ver_id = 2;
+@@ -612,8 +612,6 @@ static struct nvm_dev_ops nvme_nvm_dev_ops = {
+ 	.destroy_dma_pool	= nvme_nvm_destroy_dma_pool,
+ 	.dev_dma_alloc		= nvme_nvm_dev_dma_alloc,
+ 	.dev_dma_free		= nvme_nvm_dev_dma_free,
+-
+-	.max_phys_sect		= 64,
+ };
  
-+	/* Set compacted version for upper layers */
-+	geo->version = NVM_OCSSD_SPEC_12;
-+
- 	geo->nr_chnls = src->num_ch;
- 	geo->nr_luns = src->num_lun;
- 	geo->all_luns = geo->nr_chnls * geo->nr_luns;
-@@ -384,6 +387,9 @@ static int nvme_nvm_setup_20(struct nvme_nvm_id20 *id,
- 	geo->major_ver_id = id->mjr;
- 	geo->minor_ver_id = id->mnr;
- 
-+	/* Set compacted version for upper layers */
-+	geo->version = NVM_OCSSD_SPEC_20;
-+
- 	if (!(geo->major_ver_id == 2 && geo->minor_ver_id == 0)) {
- 		pr_err("nvm: OCSSD version not supported (v%d.%d)\n",
- 				geo->major_ver_id, geo->minor_ver_id);
+ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
+@@ -932,8 +930,7 @@ static ssize_t nvm_dev_attr_show_12(struct device *dev,
+ 	} else if (strcmp(attr->name, "media_capabilities") == 0) {
+ 		return scnprintf(page, PAGE_SIZE, "0x%08x\n", id->mccap);
+ 	} else if (strcmp(attr->name, "max_phys_secs") == 0) {
+-		return scnprintf(page, PAGE_SIZE, "%u\n",
+-				ndev->ops->max_phys_sect);
++		return scnprintf(page, PAGE_SIZE, "%u\n", NVM_MAX_VLBA);
+ 	} else {
+ 		return scnprintf(page,
+ 				 PAGE_SIZE,
 diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 7ed8b92d6744..a073c0c76260 100644
+index 67b4fa8e4906..e55b10573c99 100644
 --- a/include/linux/lightnvm.h
 +++ b/include/linux/lightnvm.h
-@@ -23,6 +23,11 @@ enum {
- #define NVM_LUN_BITS (8)
- #define NVM_CH_BITS  (7)
+@@ -73,8 +73,6 @@ struct nvm_dev_ops {
+ 	nvm_destroy_dma_pool_fn	*destroy_dma_pool;
+ 	nvm_dev_dma_alloc_fn	*dev_dma_alloc;
+ 	nvm_dev_dma_free_fn	*dev_dma_free;
+-
+-	unsigned int		max_phys_sect;
+ };
  
-+enum {
-+	NVM_OCSSD_SPEC_12 = 12,
-+	NVM_OCSSD_SPEC_20 = 20,
-+};
-+
- struct ppa_addr {
- 	/* Generic structure for all addresses */
- 	union {
-@@ -266,6 +271,9 @@ struct nvm_geo {
- 	u8	major_ver_id;
- 	u8	minor_ver_id;
+ #ifdef CONFIG_NVM
+@@ -228,6 +226,8 @@ struct nvm_target {
+ #define NVM_VERSION_MINOR 0
+ #define NVM_VERSION_PATCH 0
  
-+	/* kernel short version */
-+	u8	version;
++#define NVM_MAX_VLBA (64) /* max logical blocks in a vector command */
 +
- 	/* instance specific geometry */
- 	int nr_chnls;
- 	int nr_luns;		/* per channel */
+ struct nvm_rq;
+ typedef void (nvm_end_io_fn)(struct nvm_rq *);
+ 
+@@ -436,7 +436,6 @@ extern void nvm_unregister(struct nvm_dev *);
+ 
+ extern int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr *,
+ 			      int, int);
+-extern int nvm_max_phys_sects(struct nvm_tgt_dev *);
+ extern int nvm_submit_io(struct nvm_tgt_dev *, struct nvm_rq *);
+ extern int nvm_submit_io_sync(struct nvm_tgt_dev *, struct nvm_rq *);
+ extern void nvm_end_io(struct nvm_rq *);
 -- 
-2.7.4
+2.11.0
