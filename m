@@ -1,103 +1,254 @@
-Return-Path: <prvs=5980fa318=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>
-Subject: [PATCH v2 00/11] Make all concurrent queue flag manipulations safe
-Date: Wed,  7 Mar 2018 17:10:01 -0800
-Message-Id: <20180308011012.31522-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:34980 "EHLO
+        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752738AbeC2WHh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Mar 2018 18:07:37 -0400
+Received: by mail-lf0-f68.google.com with SMTP id t132-v6so10362677lfe.2
+        for <linux-block@vger.kernel.org>; Thu, 29 Mar 2018 15:07:37 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        keith.busch@intel.com, javier@cnexlabs.com,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 30/37] lightnvm: implement get log report chunk helpers
+Date: Fri, 30 Mar 2018 00:05:17 +0200
+Message-Id: <20180329220524.30363-31-mb@lightnvm.io>
+In-Reply-To: <20180329220524.30363-1-mb@lightnvm.io>
+References: <20180329220524.30363-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hello Jens,
+From: Javier González <javier@cnexlabs.com>
 
-As you probably know there is considerable confusion in the block layer core
-and in block drivers about how to protect queue flag changes against
-concurrent modifications. Some code protects these changes with the queue
-lock, other code uses atomic operations and some code does not protect queue
-flag changes against concurrent changes at all. Hence this patch series that
-protects all queue flag changes consistently with the queue lock and that
-removes functions that are not safe in a concurrent context from the public
-block layer header files.
+The 2.0 spec provides a report chunk log page that can be retrieved
+using the stangard nvme get log page. This replaces the dedicated
+get/put bad block table in 1.2.
 
-Please consider these patches for kernel v4.17.
+This patch implements the helper functions to allow targets retrieve the
+chunk metadata using get log page. It makes nvme_get_log_ext available
+outside of nvme core so that we can use it form lightnvm.
 
-Note: it may be a good idea to postpone patch 11 until after the kernel v4.17
-merge window to avoid merge conflicts.
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+---
+ drivers/lightnvm/core.c      | 11 +++++++
+ drivers/nvme/host/core.c     |  4 +--
+ drivers/nvme/host/lightnvm.c | 74 ++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/lightnvm.h     | 24 ++++++++++++++
+ 4 files changed, 111 insertions(+), 2 deletions(-)
 
-Thanks,
-
-Bart.
-
-Changes compared to v1:
-- Restored one test_bit(QUEUE_FLAG_POLL_STATS, &q->queue_flags) call to
-  avoid introducing a slowdown in the polling hot path.
-
-Bart Van Assche (11):
-  block: Reorder the queue flag manipulation function definitions
-  block: Use the queue_flag_*() functions instead of open-coding these
-  block: Introduce blk_queue_flag_{set,clear,test_and_{set,clear}}()
-  block: Protect queue flag changes with the queue lock
-  mtip32xx: Use the blk_queue_flag_*() functions
-  bcache: Use the blk_queue_flag_{set,clear}() functions
-  iscsi: Use blk_queue_flag_set()
-  target/tcm_loop: Use blk_queue_flag_set()
-  block: Use blk_queue_flag_*() in drivers instead of queue_flag_*()
-  block: Complain if queue_flag_(set|clear)_unlocked() is abused
-  block: Move the queue_flag_*() functions from a public into a private
-    header file
-
- block/blk-core.c                            | 93 +++++++++++++++++++++++------
- block/blk-mq.c                              | 16 ++---
- block/blk-settings.c                        |  6 +-
- block/blk-stat.c                            |  6 +-
- block/blk-sysfs.c                           | 22 +++----
- block/blk-timeout.c                         |  6 +-
- block/blk.h                                 | 69 +++++++++++++++++++++
- block/bsg-lib.c                             |  4 +-
- drivers/block/drbd/drbd_nl.c                |  4 +-
- drivers/block/loop.c                        | 10 ++--
- drivers/block/mtip32xx/mtip32xx.c           |  8 +--
- drivers/block/nbd.c                         |  8 +--
- drivers/block/null_blk.c                    |  6 +-
- drivers/block/rbd.c                         |  4 +-
- drivers/block/rsxx/dev.c                    |  6 +-
- drivers/block/skd_main.c                    |  4 +-
- drivers/block/xen-blkfront.c                | 10 ++--
- drivers/block/zram/zram_drv.c               |  6 +-
- drivers/ide/ide-disk.c                      |  4 +-
- drivers/ide/ide-probe.c                     |  2 +-
- drivers/lightnvm/pblk-init.c                |  2 +-
- drivers/md/bcache/super.c                   |  6 +-
- drivers/md/dm-table.c                       | 16 ++---
- drivers/md/md-linear.c                      |  4 +-
- drivers/md/md.c                             |  4 +-
- drivers/md/raid0.c                          |  4 +-
- drivers/md/raid1.c                          |  6 +-
- drivers/md/raid10.c                         |  6 +-
- drivers/md/raid5.c                          |  4 +-
- drivers/mmc/core/queue.c                    |  8 +--
- drivers/mtd/mtd_blkdevs.c                   |  6 +-
- drivers/nvdimm/blk.c                        |  2 +-
- drivers/nvdimm/btt.c                        |  2 +-
- drivers/nvdimm/pmem.c                       |  4 +-
- drivers/nvme/host/core.c                    |  4 +-
- drivers/nvme/host/multipath.c               |  2 +-
- drivers/s390/block/dasd.c                   |  4 +-
- drivers/s390/block/dcssblk.c                |  2 +-
- drivers/s390/block/scm_blk.c                |  4 +-
- drivers/s390/block/xpram.c                  |  4 +-
- drivers/scsi/iscsi_tcp.c                    |  2 +-
- drivers/scsi/megaraid/megaraid_sas_base.c   |  2 +-
- drivers/scsi/megaraid/megaraid_sas_fusion.c |  2 +-
- drivers/scsi/mpt3sas/mpt3sas_scsih.c        |  2 +-
- drivers/scsi/scsi_debug.c                   |  2 +-
- drivers/scsi/scsi_lib.c                     |  2 +-
- drivers/scsi/scsi_transport_sas.c           |  4 +-
- drivers/scsi/sd.c                           |  8 +--
- drivers/target/loopback/tcm_loop.c          |  2 +-
- include/linux/blkdev.h                      | 76 +++--------------------
- 50 files changed, 270 insertions(+), 220 deletions(-)
-
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 77901bf17416..63171cdce270 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -712,6 +712,17 @@ static void nvm_free_rqd_ppalist(struct nvm_tgt_dev *tgt_dev,
+ 	nvm_dev_dma_free(tgt_dev->parent, rqd->ppa_list, rqd->dma_ppa_list);
+ }
+ 
++int nvm_get_chunk_meta(struct nvm_tgt_dev *tgt_dev, struct nvm_chk_meta *meta,
++		struct ppa_addr ppa, int nchks)
++{
++	struct nvm_dev *dev = tgt_dev->parent;
++
++	nvm_ppa_tgt_to_dev(tgt_dev, &ppa, 1);
++
++	return dev->ops->get_chk_meta(tgt_dev->parent, meta,
++						(sector_t)ppa.ppa, nchks);
++}
++EXPORT_SYMBOL(nvm_get_chunk_meta);
+ 
+ int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *tgt_dev, struct ppa_addr *ppas,
+ 		       int nr_ppas, int type)
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index e7ec2fb5c59a..f81e3b323366 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2219,8 +2219,8 @@ static int nvme_init_subsystem(struct nvme_ctrl *ctrl, struct nvme_id_ctrl *id)
+ }
+ 
+ int nvme_get_log_ext(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+-			    u8 log_page, void *log,
+-			    size_t size, size_t offset)
++		     u8 log_page, void *log,
++		     size_t size, size_t offset)
+ {
+ 	struct nvme_command c = { };
+ 	unsigned long dwlen = size / 4 - 1;
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index 08f0f6b5bc06..ffd64a83c8c3 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -35,6 +35,10 @@ enum nvme_nvm_admin_opcode {
+ 	nvme_nvm_admin_set_bb_tbl	= 0xf1,
+ };
+ 
++enum nvme_nvm_log_page {
++	NVME_NVM_LOG_REPORT_CHUNK	= 0xca,
++};
++
+ struct nvme_nvm_ph_rw {
+ 	__u8			opcode;
+ 	__u8			flags;
+@@ -236,6 +240,16 @@ struct nvme_nvm_id20 {
+ 	__u8			vs[1024];
+ };
+ 
++struct nvme_nvm_chk_meta {
++	__u8	state;
++	__u8	type;
++	__u8	wi;
++	__u8	rsvd[5];
++	__le64	slba;
++	__le64	cnlb;
++	__le64	wp;
++};
++
+ /*
+  * Check we didn't inadvertently grow the command struct
+  */
+@@ -252,6 +266,9 @@ static inline void _nvme_nvm_check_size(void)
+ 	BUILD_BUG_ON(sizeof(struct nvme_nvm_bb_tbl) != 64);
+ 	BUILD_BUG_ON(sizeof(struct nvme_nvm_id20_addrf) != 8);
+ 	BUILD_BUG_ON(sizeof(struct nvme_nvm_id20) != NVME_IDENTIFY_DATA_SIZE);
++	BUILD_BUG_ON(sizeof(struct nvme_nvm_chk_meta) != 32);
++	BUILD_BUG_ON(sizeof(struct nvme_nvm_chk_meta) !=
++						sizeof(struct nvm_chk_meta));
+ }
+ 
+ static void nvme_nvm_set_addr_12(struct nvm_addrf_12 *dst,
+@@ -552,6 +569,61 @@ static int nvme_nvm_set_bb_tbl(struct nvm_dev *nvmdev, struct ppa_addr *ppas,
+ 	return ret;
+ }
+ 
++/*
++ * Expect the lba in device format
++ */
++static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
++				 struct nvm_chk_meta *meta,
++				 sector_t slba, int nchks)
++{
++	struct nvm_geo *geo = &ndev->geo;
++	struct nvme_ns *ns = ndev->q->queuedata;
++	struct nvme_ctrl *ctrl = ns->ctrl;
++	struct nvme_nvm_chk_meta *dev_meta = (struct nvme_nvm_chk_meta *)meta;
++	struct ppa_addr ppa;
++	size_t left = nchks * sizeof(struct nvme_nvm_chk_meta);
++	size_t log_pos, offset, len;
++	int ret, i;
++
++	/* Normalize lba address space to obtain log offset */
++	ppa.ppa = slba;
++	ppa = dev_to_generic_addr(ndev, ppa);
++
++	log_pos = ppa.m.chk;
++	log_pos += ppa.m.pu * geo->num_chk;
++	log_pos += ppa.m.grp * geo->num_lun * geo->num_chk;
++
++	offset = log_pos * sizeof(struct nvme_nvm_chk_meta);
++
++	while (left) {
++		len = min_t(unsigned int, left, ctrl->max_hw_sectors << 9);
++
++		ret = nvme_get_log_ext(ctrl, ns, NVME_NVM_LOG_REPORT_CHUNK,
++				dev_meta, len, offset);
++		if (ret) {
++			dev_err(ctrl->device, "Get REPORT CHUNK log error\n");
++			break;
++		}
++
++		for (i = 0; i < len; i += sizeof(struct nvme_nvm_chk_meta)) {
++			meta->state = dev_meta->state;
++			meta->type = dev_meta->type;
++			meta->wi = dev_meta->wi;
++			meta->slba = le64_to_cpu(dev_meta->slba);
++			meta->cnlb = le64_to_cpu(dev_meta->cnlb);
++			meta->wp = le64_to_cpu(dev_meta->wp);
++
++			meta++;
++			dev_meta++;
++		}
++
++		offset += len;
++		left -= len;
++	}
++
++	return ret;
++}
++
+ static inline void nvme_nvm_rqtocmd(struct nvm_rq *rqd, struct nvme_ns *ns,
+ 				    struct nvme_nvm_command *c)
+ {
+@@ -683,6 +755,8 @@ static struct nvm_dev_ops nvme_nvm_dev_ops = {
+ 	.get_bb_tbl		= nvme_nvm_get_bb_tbl,
+ 	.set_bb_tbl		= nvme_nvm_set_bb_tbl,
+ 
++	.get_chk_meta		= nvme_nvm_get_chk_meta,
++
+ 	.submit_io		= nvme_nvm_submit_io,
+ 	.submit_io_sync		= nvme_nvm_submit_io_sync,
+ 
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index f3b273e543c3..da45efa09bb2 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -81,10 +81,13 @@ struct nvm_rq;
+ struct nvm_id;
+ struct nvm_dev;
+ struct nvm_tgt_dev;
++struct nvm_chk_meta;
+ 
+ typedef int (nvm_id_fn)(struct nvm_dev *);
+ typedef int (nvm_op_bb_tbl_fn)(struct nvm_dev *, struct ppa_addr, u8 *);
+ typedef int (nvm_op_set_bb_fn)(struct nvm_dev *, struct ppa_addr *, int, int);
++typedef int (nvm_get_chk_meta_fn)(struct nvm_dev *, struct nvm_chk_meta *,
++								sector_t, int);
+ typedef int (nvm_submit_io_fn)(struct nvm_dev *, struct nvm_rq *);
+ typedef int (nvm_submit_io_sync_fn)(struct nvm_dev *, struct nvm_rq *);
+ typedef void *(nvm_create_dma_pool_fn)(struct nvm_dev *, char *);
+@@ -98,6 +101,8 @@ struct nvm_dev_ops {
+ 	nvm_op_bb_tbl_fn	*get_bb_tbl;
+ 	nvm_op_set_bb_fn	*set_bb_tbl;
+ 
++	nvm_get_chk_meta_fn	*get_chk_meta;
++
+ 	nvm_submit_io_fn	*submit_io;
+ 	nvm_submit_io_sync_fn	*submit_io_sync;
+ 
+@@ -227,6 +232,20 @@ struct nvm_addrf {
+ 	u64	rsv_mask[2];
+ };
+ 
++/*
++ * Note: The structure size is linked to nvme_nvm_chk_meta such that the same
++ * buffer can be used when converting from little endian to cpu addressing.
++ */
++struct nvm_chk_meta {
++	u8	state;
++	u8	type;
++	u8	wi;
++	u8	rsvd[5];
++	u64	slba;
++	u64	cnlb;
++	u64	wp;
++};
++
+ struct nvm_target {
+ 	struct list_head list;
+ 	struct nvm_tgt_dev *dev;
+@@ -492,6 +511,11 @@ extern struct nvm_dev *nvm_alloc_dev(int);
+ extern int nvm_register(struct nvm_dev *);
+ extern void nvm_unregister(struct nvm_dev *);
+ 
++
++extern int nvm_get_chunk_meta(struct nvm_tgt_dev *tgt_dev,
++			      struct nvm_chk_meta *meta, struct ppa_addr ppa,
++			      int nchks);
++
+ extern int nvm_set_tgt_bb_tbl(struct nvm_tgt_dev *, struct ppa_addr *,
+ 			      int, int);
+ extern int nvm_submit_io(struct nvm_tgt_dev *, struct nvm_rq *);
 -- 
-2.16.2
+2.11.0
