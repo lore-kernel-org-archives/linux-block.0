@@ -1,50 +1,37 @@
-Return-Path: <prvs=5980fa318=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Kent Overstreet <kent.overstreet@gmail.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 06/11] bcache: Use the blk_queue_flag_{set,clear}() functions
-Date: Wed,  7 Mar 2018 17:10:07 -0800
-Message-Id: <20180308011012.31522-7-bart.vanassche@wdc.com>
-In-Reply-To: <20180308011012.31522-1-bart.vanassche@wdc.com>
-References: <20180308011012.31522-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-qk0-f180.google.com ([209.85.220.180]:33718 "EHLO
+        mail-qk0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750735AbeC2Kho (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Mar 2018 06:37:44 -0400
+Received: by mail-qk0-f180.google.com with SMTP id d206so5482281qkb.0
+        for <linux-block@vger.kernel.org>; Thu, 29 Mar 2018 03:37:43 -0700 (PDT)
+From: Muneendra Kumar M <muneendra.kumar@broadcom.com>
+References: 376fb4cd375ea3b71c67cbe9168c0199@mail.gmail.com
+In-Reply-To: 376fb4cd375ea3b71c67cbe9168c0199@mail.gmail.com
+MIME-Version: 1.0
+Date: Thu, 29 Mar 2018 16:07:42 +0530
+Message-ID: <4b4851a7c7b5c9587c620f69d4a51ae0@mail.gmail.com>
+Subject: RE: query on blk_rq_timed_out
+To: linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Use the blk_queue_flag_{set,clear}() functions instead of open-coding
-these.
+Hi ,
+If we call submit_bio/blk_execute_rq and due to some target issues we hit
+the blk_rq_timed_out.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Michael Lyle <mlyle@lyle.org>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Kent Overstreet <kent.overstreet@gmail.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Ming Lei <ming.lei@redhat.com>
----
- drivers/md/bcache/super.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+In blk_rq_timed_out=C2=A0=C2=A0 =C2=A0__blk_complete_request =C2=A0gets cal=
+led only in
+BLK_EH_HANDLED case and if q->rq_timed_out_fn doesn=E2=80=99t return
+BLK_EH_HANDLED
+and returns only BLK_EH_NOT_HANDLED/ BLK_EH_RESET_TIMER.
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 4d1d8dfb2d2a..e8dfa804bd98 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -833,9 +833,9 @@ static int bcache_device_init(struct bcache_device *d, unsigned block_size,
- 	q->limits.io_min		= block_size;
- 	q->limits.logical_block_size	= block_size;
- 	q->limits.physical_block_size	= block_size;
--	set_bit(QUEUE_FLAG_NONROT,	&d->disk->queue->queue_flags);
--	clear_bit(QUEUE_FLAG_ADD_RANDOM, &d->disk->queue->queue_flags);
--	set_bit(QUEUE_FLAG_DISCARD,	&d->disk->queue->queue_flags);
-+	blk_queue_flag_set(QUEUE_FLAG_NONROT, d->disk->queue);
-+	blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, d->disk->queue);
-+	blk_queue_flag_set(QUEUE_FLAG_DISCARD, d->disk->queue);
- 
- 	blk_queue_write_cache(q, true, true);
- 
--- 
-2.16.2
+How will the submit_bio/blk_execute_rq returns from it wait state ?
+Will we see the hungtask in this case?
+
+Any help regarding this will help me a lot .
+
+Regards,
+Muneendra.
