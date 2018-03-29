@@ -1,62 +1,56 @@
-Return-Path: <prvs=5980fa318=bart.vanassche@wdc.com>
-From: Bart Van Assche <bart.vanassche@wdc.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bart.vanassche@wdc.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 05/11] mtip32xx: Use the blk_queue_flag_*() functions
-Date: Wed,  7 Mar 2018 17:10:06 -0800
-Message-Id: <20180308011012.31522-6-bart.vanassche@wdc.com>
-In-Reply-To: <20180308011012.31522-1-bart.vanassche@wdc.com>
-References: <20180308011012.31522-1-bart.vanassche@wdc.com>
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:42610 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752297AbeC2WHE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Mar 2018 18:07:04 -0400
+Received: by mail-lf0-f65.google.com with SMTP id a22-v6so10327198lfg.9
+        for <linux-block@vger.kernel.org>; Thu, 29 Mar 2018 15:07:03 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        keith.busch@intel.com, javier@cnexlabs.com,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 07/37] lightnvm: remove multiple groups in 1.2 data structure
+Date: Fri, 30 Mar 2018 00:04:54 +0200
+Message-Id: <20180329220524.30363-8-mb@lightnvm.io>
+In-Reply-To: <20180329220524.30363-1-mb@lightnvm.io>
+References: <20180329220524.30363-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Use the blk_queue_flag_*() functions instead of open-coding these.
+Only one id group from the 1.2 specification is supported. Make
+sure that only the first group is accessible.
 
-Signed-off-by: Bart Van Assche <bart.vanassche@wdc.com>
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- drivers/block/mtip32xx/mtip32xx.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/nvme/host/lightnvm.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index b8af7352a18f..769c551e3d71 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -159,7 +159,7 @@ static bool mtip_check_surprise_removal(struct pci_dev *pdev)
- 	if (vendor_id == 0xFFFF) {
- 		dd->sr = true;
- 		if (dd->queue)
--			set_bit(QUEUE_FLAG_DEAD, &dd->queue->queue_flags);
-+			blk_queue_flag_set(QUEUE_FLAG_DEAD, dd->queue);
- 		else
- 			dev_warn(&dd->pdev->dev,
- 				"%s: dd->queue is NULL\n", __func__);
-@@ -3855,8 +3855,8 @@ static int mtip_block_initialize(struct driver_data *dd)
- 		goto start_service_thread;
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index 940c9b9a2a09..dc0b1335c7c6 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -166,7 +166,8 @@ struct nvme_nvm_id {
+ 	__le32			dom;
+ 	struct nvme_nvm_addr_format ppaf;
+ 	__u8			resv[228];
+-	struct nvme_nvm_id_group groups[4];
++	struct nvme_nvm_id_group group;
++	__u8			resv2[2880];
+ } __packed;
  
- 	/* Set device limits. */
--	set_bit(QUEUE_FLAG_NONROT, &dd->queue->queue_flags);
--	clear_bit(QUEUE_FLAG_ADD_RANDOM, &dd->queue->queue_flags);
-+	blk_queue_flag_set(QUEUE_FLAG_NONROT, dd->queue);
-+	blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, dd->queue);
- 	blk_queue_max_segments(dd->queue, MTIP_MAX_SG);
- 	blk_queue_physical_block_size(dd->queue, 4096);
- 	blk_queue_max_hw_sectors(dd->queue, 0xffff);
-@@ -3866,7 +3866,7 @@ static int mtip_block_initialize(struct driver_data *dd)
+ struct nvme_nvm_bb_tbl {
+@@ -208,7 +209,7 @@ static int init_grps(struct nvm_id *nvm_id, struct nvme_nvm_id *nvme_nvm_id)
+ 	if (nvme_nvm_id->cgrps != 1)
+ 		return -EINVAL;
  
- 	/* Signal trim support */
- 	if (dd->trim_supp == true) {
--		set_bit(QUEUE_FLAG_DISCARD, &dd->queue->queue_flags);
-+		blk_queue_flag_set(QUEUE_FLAG_DISCARD, dd->queue);
- 		dd->queue->limits.discard_granularity = 4096;
- 		blk_queue_max_discard_sectors(dd->queue,
- 			MTIP_MAX_TRIM_ENTRY_LEN * MTIP_MAX_TRIM_ENTRIES);
+-	src = &nvme_nvm_id->groups[0];
++	src = &nvme_nvm_id->group;
+ 	grp = &nvm_id->grp;
+ 
+ 	grp->mtype = src->mtype;
 -- 
-2.16.2
+2.11.0
