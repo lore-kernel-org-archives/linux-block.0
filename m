@@ -1,208 +1,132 @@
-Return-Path: <gunthorp@deltatee.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org,
-	linux-nvdimm@lists.01.org,
-	linux-block@vger.kernel.org
-Cc: Stephen Bates <sbates@raithlin.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jason Gunthorpe <jgg@mellanox.com>,
-	Max Gurtovoy <maxg@mellanox.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Logan Gunthorpe <logang@deltatee.com>
-Date: Mon, 12 Mar 2018 13:35:22 -0600
-Message-Id: <20180312193525.2855-9-logang@deltatee.com>
-In-Reply-To: <20180312193525.2855-1-logang@deltatee.com>
-References: <20180312193525.2855-1-logang@deltatee.com>
-Subject: [PATCH v3 08/11] nvme-pci: Use PCI p2pmem subsystem to manage the CMB
-List-ID: <linux-block@vger.kernel.org>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:34812 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752634AbeC2WHZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Mar 2018 18:07:25 -0400
+Received: by mail-lf0-f66.google.com with SMTP id c78-v6so10371398lfh.1
+        for <linux-block@vger.kernel.org>; Thu, 29 Mar 2018 15:07:24 -0700 (PDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+To: axboe@fb.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        keith.busch@intel.com, javier@cnexlabs.com,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
+Subject: [GIT PULL 24/37] lightnvm: add minor version to generic geometry
+Date: Fri, 30 Mar 2018 00:05:11 +0200
+Message-Id: <20180329220524.30363-25-mb@lightnvm.io>
+In-Reply-To: <20180329220524.30363-1-mb@lightnvm.io>
+References: <20180329220524.30363-1-mb@lightnvm.io>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Register the CMB buffer as p2pmem and use the appropriate allocation
-functions to create and destroy the IO SQ.
+From: Javier González <javier@cnexlabs.com>
 
-If the CMB supports WDS and RDS, publish it for use as P2P memory
-by other devices.
+Separate the version between major and minor on the generic geometry and
+represent it through sysfs in the 2.0 path. The 1.2 path only shows the
+major version to preserve the existing user space interface.
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Signed-off-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- drivers/nvme/host/pci.c | 75 +++++++++++++++++++++++++++----------------------
- 1 file changed, 41 insertions(+), 34 deletions(-)
+ drivers/lightnvm/core.c      |  4 ++--
+ drivers/nvme/host/lightnvm.c | 25 ++++++++++++++++++++-----
+ include/linux/lightnvm.h     |  3 ++-
+ 3 files changed, 24 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index b6f43b738f03..1fb57fa42dd0 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -29,6 +29,7 @@
- #include <linux/types.h>
- #include <linux/io-64-nonatomic-lo-hi.h>
- #include <linux/sed-opal.h>
-+#include <linux/pci-p2pdma.h>
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index 9dec936ac1dc..103e0ad9622c 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -890,8 +890,8 @@ static int nvm_init(struct nvm_dev *dev)
+ 		goto err;
+ 	}
  
- #include "nvme.h"
+-	pr_debug("nvm: ver:%u nvm_vendor:%x\n",
+-				geo->ver_id,
++	pr_debug("nvm: ver:%u.%u nvm_vendor:%x\n",
++				geo->major_ver_id, geo->minor_ver_id,
+ 				geo->vmnt);
  
-@@ -91,9 +92,8 @@ struct nvme_dev {
- 	struct work_struct remove_work;
- 	struct mutex shutdown_lock;
- 	bool subsystem;
--	void __iomem *cmb;
--	pci_bus_addr_t cmb_bus_addr;
- 	u64 cmb_size;
-+	bool cmb_use_sqes;
- 	u32 cmbsz;
- 	u32 cmbloc;
- 	struct nvme_ctrl ctrl;
-@@ -148,7 +148,7 @@ struct nvme_queue {
- 	struct nvme_dev *dev;
- 	spinlock_t q_lock;
- 	struct nvme_command *sq_cmds;
--	struct nvme_command __iomem *sq_cmds_io;
-+	bool sq_cmds_is_io;
- 	volatile struct nvme_completion *cqes;
- 	struct blk_mq_tags **tags;
- 	dma_addr_t sq_dma_addr;
-@@ -429,10 +429,7 @@ static void __nvme_submit_cmd(struct nvme_queue *nvmeq,
+ 	ret = nvm_core_init(dev);
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index 29c8f44eb25b..de4105544956 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -295,7 +295,9 @@ static int nvme_nvm_setup_12(struct nvme_nvm_id12 *id,
+ 		return -EINVAL;
+ 	}
+ 
+-	geo->ver_id = id->ver_id;
++	/* 1.2 spec. only reports a single version id - unfold */
++	geo->major_ver_id = id->ver_id;
++	geo->minor_ver_id = 2;
+ 
+ 	geo->nr_chnls = src->num_ch;
+ 	geo->nr_luns = src->num_lun;
+@@ -379,7 +381,14 @@ static void nvme_nvm_set_addr_20(struct nvm_addrf *dst,
+ static int nvme_nvm_setup_20(struct nvme_nvm_id20 *id,
+ 			     struct nvm_geo *geo)
  {
- 	u16 tail = nvmeq->sq_tail;
- 
--	if (nvmeq->sq_cmds_io)
--		memcpy_toio(&nvmeq->sq_cmds_io[tail], cmd, sizeof(*cmd));
--	else
--		memcpy(&nvmeq->sq_cmds[tail], cmd, sizeof(*cmd));
-+	memcpy(&nvmeq->sq_cmds[tail], cmd, sizeof(*cmd));
- 
- 	if (++tail == nvmeq->q_depth)
- 		tail = 0;
-@@ -1287,9 +1284,18 @@ static void nvme_free_queue(struct nvme_queue *nvmeq)
- {
- 	dma_free_coherent(nvmeq->q_dmadev, CQ_SIZE(nvmeq->q_depth),
- 				(void *)nvmeq->cqes, nvmeq->cq_dma_addr);
--	if (nvmeq->sq_cmds)
--		dma_free_coherent(nvmeq->q_dmadev, SQ_SIZE(nvmeq->q_depth),
--					nvmeq->sq_cmds, nvmeq->sq_dma_addr);
+-	geo->ver_id = id->mjr;
++	geo->major_ver_id = id->mjr;
++	geo->minor_ver_id = id->mnr;
 +
-+	if (nvmeq->sq_cmds) {
-+		if (nvmeq->sq_cmds_is_io)
-+			pci_free_p2pmem(to_pci_dev(nvmeq->q_dmadev),
-+					nvmeq->sq_cmds,
-+					SQ_SIZE(nvmeq->q_depth));
++	if (!(geo->major_ver_id == 2 && geo->minor_ver_id == 0)) {
++		pr_err("nvm: OCSSD version not supported (v%d.%d)\n",
++				geo->major_ver_id, geo->minor_ver_id);
++		return -EINVAL;
++	}
+ 
+ 	geo->nr_chnls = le16_to_cpu(id->num_grp);
+ 	geo->nr_luns = le16_to_cpu(id->num_pu);
+@@ -914,7 +923,13 @@ static ssize_t nvm_dev_attr_show(struct device *dev,
+ 	attr = &dattr->attr;
+ 
+ 	if (strcmp(attr->name, "version") == 0) {
+-		return scnprintf(page, PAGE_SIZE, "%u\n", geo->ver_id);
++		if (geo->major_ver_id == 1)
++			return scnprintf(page, PAGE_SIZE, "%u\n",
++						geo->major_ver_id);
 +		else
-+			dma_free_coherent(nvmeq->q_dmadev,
-+					  SQ_SIZE(nvmeq->q_depth),
-+					  nvmeq->sq_cmds,
-+					  nvmeq->sq_dma_addr);
-+	}
- }
++			return scnprintf(page, PAGE_SIZE, "%u.%u\n",
++						geo->major_ver_id,
++						geo->minor_ver_id);
+ 	} else if (strcmp(attr->name, "capabilities") == 0) {
+ 		return scnprintf(page, PAGE_SIZE, "%u\n", geo->cap);
+ 	} else if (strcmp(attr->name, "read_typ") == 0) {
+@@ -1167,7 +1182,7 @@ int nvme_nvm_register_sysfs(struct nvme_ns *ns)
+ 	if (!ndev)
+ 		return -EINVAL;
  
- static void nvme_free_queues(struct nvme_dev *dev, int lowest)
-@@ -1369,12 +1375,21 @@ static int nvme_cmb_qdepth(struct nvme_dev *dev, int nr_io_queues,
- static int nvme_alloc_sq_cmds(struct nvme_dev *dev, struct nvme_queue *nvmeq,
- 				int qid, int depth)
- {
--	/* CMB SQEs will be mapped before creation */
--	if (qid && dev->cmb && use_cmb_sqes && (dev->cmbsz & NVME_CMBSZ_SQS))
--		return 0;
-+	struct pci_dev *pdev = to_pci_dev(dev->dev);
-+
-+	if (qid && dev->cmb_use_sqes && (dev->cmbsz & NVME_CMBSZ_SQS)) {
-+		nvmeq->sq_cmds = pci_alloc_p2pmem(pdev, SQ_SIZE(depth));
-+		nvmeq->sq_dma_addr = pci_p2pmem_virt_to_bus(pdev,
-+						nvmeq->sq_cmds);
-+		nvmeq->sq_cmds_is_io = true;
-+	}
-+
-+	if (!nvmeq->sq_cmds) {
-+		nvmeq->sq_cmds = dma_alloc_coherent(dev->dev, SQ_SIZE(depth),
-+					&nvmeq->sq_dma_addr, GFP_KERNEL);
-+		nvmeq->sq_cmds_is_io = false;
-+	}
+-	switch (geo->ver_id) {
++	switch (geo->major_ver_id) {
+ 	case 1:
+ 		return sysfs_create_group(&disk_to_dev(ns->disk)->kobj,
+ 					&nvm_dev_attr_group_12);
+@@ -1184,7 +1199,7 @@ void nvme_nvm_unregister_sysfs(struct nvme_ns *ns)
+ 	struct nvm_dev *ndev = ns->ndev;
+ 	struct nvm_geo *geo = &ndev->geo;
  
--	nvmeq->sq_cmds = dma_alloc_coherent(dev->dev, SQ_SIZE(depth),
--					    &nvmeq->sq_dma_addr, GFP_KERNEL);
- 	if (!nvmeq->sq_cmds)
- 		return -ENOMEM;
- 	return 0;
-@@ -1450,13 +1465,6 @@ static int nvme_create_queue(struct nvme_queue *nvmeq, int qid)
- 	struct nvme_dev *dev = nvmeq->dev;
- 	int result;
+-	switch (geo->ver_id) {
++	switch (geo->major_ver_id) {
+ 	case 1:
+ 		sysfs_remove_group(&disk_to_dev(ns->disk)->kobj,
+ 					&nvm_dev_attr_group_12);
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 6e650563b379..7ed8b92d6744 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -263,7 +263,8 @@ enum {
+ /* Instance geometry */
+ struct nvm_geo {
+ 	/* device reported version */
+-	u8	ver_id;
++	u8	major_ver_id;
++	u8	minor_ver_id;
  
--	if (dev->cmb && use_cmb_sqes && (dev->cmbsz & NVME_CMBSZ_SQS)) {
--		unsigned offset = (qid - 1) * roundup(SQ_SIZE(nvmeq->q_depth),
--						      dev->ctrl.page_size);
--		nvmeq->sq_dma_addr = dev->cmb_bus_addr + offset;
--		nvmeq->sq_cmds_io = dev->cmb + offset;
--	}
--
- 	nvmeq->cq_vector = qid - 1;
- 	result = adapter_alloc_cq(dev, qid, nvmeq);
- 	if (result < 0)
-@@ -1689,9 +1697,6 @@ static void nvme_map_cmb(struct nvme_dev *dev)
- 		return;
- 	dev->cmbloc = readl(dev->bar + NVME_REG_CMBLOC);
- 
--	if (!use_cmb_sqes)
--		return;
--
- 	size = nvme_cmb_size_unit(dev) * nvme_cmb_size(dev);
- 	offset = nvme_cmb_size_unit(dev) * NVME_CMB_OFST(dev->cmbloc);
- 	bar = NVME_CMB_BIR(dev->cmbloc);
-@@ -1708,11 +1713,15 @@ static void nvme_map_cmb(struct nvme_dev *dev)
- 	if (size > bar_size - offset)
- 		size = bar_size - offset;
- 
--	dev->cmb = ioremap_wc(pci_resource_start(pdev, bar) + offset, size);
--	if (!dev->cmb)
-+	if (pci_p2pdma_add_resource(pdev, bar, size, offset))
- 		return;
--	dev->cmb_bus_addr = pci_bus_address(pdev, bar) + offset;
-+
- 	dev->cmb_size = size;
-+	dev->cmb_use_sqes = use_cmb_sqes && (dev->cmbsz & NVME_CMBSZ_SQS);
-+
-+	if ((dev->cmbsz & (NVME_CMBSZ_WDS | NVME_CMBSZ_RDS)) ==
-+			(NVME_CMBSZ_WDS | NVME_CMBSZ_RDS))
-+		pci_p2pmem_publish(pdev, true);
- 
- 	if (sysfs_add_file_to_group(&dev->ctrl.device->kobj,
- 				    &dev_attr_cmb.attr, NULL))
-@@ -1722,12 +1731,10 @@ static void nvme_map_cmb(struct nvme_dev *dev)
- 
- static inline void nvme_release_cmb(struct nvme_dev *dev)
- {
--	if (dev->cmb) {
--		iounmap(dev->cmb);
--		dev->cmb = NULL;
-+	if (dev->cmb_size) {
- 		sysfs_remove_file_from_group(&dev->ctrl.device->kobj,
- 					     &dev_attr_cmb.attr, NULL);
--		dev->cmbsz = 0;
-+		dev->cmb_size = 0;
- 	}
- }
- 
-@@ -1922,13 +1929,13 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
- 	if (nr_io_queues == 0)
- 		return 0;
- 
--	if (dev->cmb && (dev->cmbsz & NVME_CMBSZ_SQS)) {
-+	if (dev->cmb_use_sqes) {
- 		result = nvme_cmb_qdepth(dev, nr_io_queues,
- 				sizeof(struct nvme_command));
- 		if (result > 0)
- 			dev->q_depth = result;
- 		else
--			nvme_release_cmb(dev);
-+			dev->cmb_use_sqes = false;
- 	}
- 
- 	do {
+ 	/* instance specific geometry */
+ 	int nr_chnls;
 -- 
 2.11.0
