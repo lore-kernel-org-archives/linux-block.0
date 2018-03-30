@@ -1,136 +1,107 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	Laurence Oberman <loberman@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 1/5] genirq/affinity: rename *node_to_possible_cpumask as *node_to_cpumask
-Date: Mon,  5 Mar 2018 11:13:53 +0800
-Message-Id: <20180305031357.23950-2-ming.lei@redhat.com>
-In-Reply-To: <20180305031357.23950-1-ming.lei@redhat.com>
-References: <20180305031357.23950-1-ming.lei@redhat.com>
+Return-Path: <gustavo@embeddedor.com>
+Subject: Re: [PATCH] rbd: remove VLA usage
+To: Ilya Dryomov <idryomov@gmail.com>
+Cc: Sage Weil <sage@redhat.com>, Alex Elder <elder@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, Ceph Development <ceph-devel@vger.kernel.org>,
+ linux-block <linux-block@vger.kernel.org>, linux-kernel@vger.kernel.org
+References: <20180330191759.GA18176@embeddedgus>
+ <CAOi1vP8jzp9s4Qj9rBf90eU1TVY9C3W8ezThUXcSHUOX-B=pQg@mail.gmail.com>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Message-ID: <0e56a59e-6dbe-a4c9-f761-e7e7d63db297@embeddedor.com>
+Date: Fri, 30 Mar 2018 15:34:39 -0500
+MIME-Version: 1.0
+In-Reply-To: <CAOi1vP8jzp9s4Qj9rBf90eU1TVY9C3W8ezThUXcSHUOX-B=pQg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-The following patches will introduce two stage irq spread for improving
-irq spread on all possible CPUs.
 
-No funtional change.
 
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- kernel/irq/affinity.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+On 03/30/2018 03:29 PM, Ilya Dryomov wrote:
+> On Fri, Mar 30, 2018 at 9:17 PM, Gustavo A. R. Silva
+> <gustavo@embeddedor.com> wrote:
+>> In preparation to enabling -Wvla, remove the use of stack VLA.
+>>
+>> In this particular case, variable buf_size is replaced with a constant
+>> expression that can be computed at preprocessing time. This avoids two
+>> VLA warnings. Also, as a consequence of the mentioned change, some code
+>> was slightly refactored.
+>>
+>> The use of stack Variable Length Arrays needs to be avoided, as they
+>> can be a vector for stack exhaustion, which can be both a runtime bug
+>> or a security flaw. Also, in general, as code evolves it is easy to
+>> lose track of how big a VLA can get. Thus, we can end up having runtime
+>> failures that are hard to debug.
+>>
+>> Also, fixed as part of the directive to remove all VLAs from
+>> the kernel: https://lkml.org/lkml/2018/3/7/621
+>>
+>> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+>> ---
+>>   drivers/block/rbd.c | 15 +++++++--------
+>>   1 file changed, 7 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+>> index 1e03b04..5133122 100644
+>> --- a/drivers/block/rbd.c
+>> +++ b/drivers/block/rbd.c
+>> @@ -3091,20 +3091,20 @@ static int __rbd_notify_op_lock(struct rbd_device *rbd_dev,
+>>   {
+>>          struct ceph_osd_client *osdc = &rbd_dev->rbd_client->client->osdc;
+>>          struct rbd_client_id cid = rbd_get_cid(rbd_dev);
+>> -       int buf_size = 4 + 8 + 8 + CEPH_ENCODING_START_BLK_LEN;
+>> -       char buf[buf_size];
+>> +       char buf[4 + 8 + 8 + CEPH_ENCODING_START_BLK_LEN];
+>>          void *p = buf;
+>>
+>>          dout("%s rbd_dev %p notify_op %d\n", __func__, rbd_dev, notify_op);
+>>
+>>          /* encode *LockPayload NotifyMessage (op + ClientId) */
+>> -       ceph_start_encoding(&p, 2, 1, buf_size - CEPH_ENCODING_START_BLK_LEN);
+>> +       ceph_start_encoding(&p, 2, 1,
+>> +                           sizeof(buf) - CEPH_ENCODING_START_BLK_LEN);
+>>          ceph_encode_32(&p, notify_op);
+>>          ceph_encode_64(&p, cid.gid);
+>>          ceph_encode_64(&p, cid.handle);
+>>
+>>          return ceph_osdc_notify(osdc, &rbd_dev->header_oid,
+>> -                               &rbd_dev->header_oloc, buf, buf_size,
+>> +                               &rbd_dev->header_oloc, buf, sizeof(buf),
+>>                                  RBD_NOTIFY_TIMEOUT, preply_pages, preply_len);
+>>   }
+>>
+>> @@ -3610,19 +3610,18 @@ static void __rbd_acknowledge_notify(struct rbd_device *rbd_dev,
+>>                                       u64 notify_id, u64 cookie, s32 *result)
+>>   {
+>>          struct ceph_osd_client *osdc = &rbd_dev->rbd_client->client->osdc;
+>> -       int buf_size = 4 + CEPH_ENCODING_START_BLK_LEN;
+>> -       char buf[buf_size];
+>> +       char buf[4 + CEPH_ENCODING_START_BLK_LEN];
+>> +       int buf_size = 0;
+>>          int ret;
+>>
+>>          if (result) {
+>>                  void *p = buf;
+>>
+>> +               buf_size = sizeof(buf);
+>>                  /* encode ResponseMessage */
+>>                  ceph_start_encoding(&p, 1, 1,
+>>                                      buf_size - CEPH_ENCODING_START_BLK_LEN);
+>>                  ceph_encode_32(&p, *result);
+>> -       } else {
+>> -               buf_size = 0;
+>>          }
+>>
+>>          ret = ceph_osdc_notify_ack(osdc, &rbd_dev->header_oid,
+> 
+> Already fixed:
+> 
+>    https://github.com/ceph/ceph-client/commit/2474e77e75215a3cad3b652d2f55ba5b123cb119
+> 
 
-diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
-index a37a3b4b6342..4b1c4763212d 100644
---- a/kernel/irq/affinity.c
-+++ b/kernel/irq/affinity.c
-@@ -39,7 +39,7 @@ static void irq_spread_init_one(struct cpumask *irqmsk, struct cpumask *nmsk,
- 	}
- }
- 
--static cpumask_var_t *alloc_node_to_possible_cpumask(void)
-+static cpumask_var_t *alloc_node_to_cpumask(void)
- {
- 	cpumask_var_t *masks;
- 	int node;
-@@ -62,7 +62,7 @@ static cpumask_var_t *alloc_node_to_possible_cpumask(void)
- 	return NULL;
- }
- 
--static void free_node_to_possible_cpumask(cpumask_var_t *masks)
-+static void free_node_to_cpumask(cpumask_var_t *masks)
- {
- 	int node;
- 
-@@ -71,7 +71,7 @@ static void free_node_to_possible_cpumask(cpumask_var_t *masks)
- 	kfree(masks);
- }
- 
--static void build_node_to_possible_cpumask(cpumask_var_t *masks)
-+static void build_node_to_cpumask(cpumask_var_t *masks)
- {
- 	int cpu;
- 
-@@ -79,14 +79,14 @@ static void build_node_to_possible_cpumask(cpumask_var_t *masks)
- 		cpumask_set_cpu(cpu, masks[cpu_to_node(cpu)]);
- }
- 
--static int get_nodes_in_cpumask(cpumask_var_t *node_to_possible_cpumask,
-+static int get_nodes_in_cpumask(cpumask_var_t *node_to_cpumask,
- 				const struct cpumask *mask, nodemask_t *nodemsk)
- {
- 	int n, nodes = 0;
- 
- 	/* Calculate the number of nodes in the supplied affinity mask */
- 	for_each_node(n) {
--		if (cpumask_intersects(mask, node_to_possible_cpumask[n])) {
-+		if (cpumask_intersects(mask, node_to_cpumask[n])) {
- 			node_set(n, *nodemsk);
- 			nodes++;
- 		}
-@@ -109,7 +109,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 	int last_affv = affv + affd->pre_vectors;
- 	nodemask_t nodemsk = NODE_MASK_NONE;
- 	struct cpumask *masks;
--	cpumask_var_t nmsk, *node_to_possible_cpumask;
-+	cpumask_var_t nmsk, *node_to_cpumask;
- 
- 	/*
- 	 * If there aren't any vectors left after applying the pre/post
-@@ -125,8 +125,8 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 	if (!masks)
- 		goto out;
- 
--	node_to_possible_cpumask = alloc_node_to_possible_cpumask();
--	if (!node_to_possible_cpumask)
-+	node_to_cpumask = alloc_node_to_cpumask();
-+	if (!node_to_cpumask)
- 		goto out;
- 
- 	/* Fill out vectors at the beginning that don't need affinity */
-@@ -135,8 +135,8 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 
- 	/* Stabilize the cpumasks */
- 	get_online_cpus();
--	build_node_to_possible_cpumask(node_to_possible_cpumask);
--	nodes = get_nodes_in_cpumask(node_to_possible_cpumask, cpu_possible_mask,
-+	build_node_to_cpumask(node_to_cpumask);
-+	nodes = get_nodes_in_cpumask(node_to_cpumask, cpu_possible_mask,
- 				     &nodemsk);
- 
- 	/*
-@@ -146,7 +146,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 	if (affv <= nodes) {
- 		for_each_node_mask(n, nodemsk) {
- 			cpumask_copy(masks + curvec,
--				     node_to_possible_cpumask[n]);
-+				     node_to_cpumask[n]);
- 			if (++curvec == last_affv)
- 				break;
- 		}
-@@ -160,7 +160,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 		vecs_per_node = (affv - (curvec - affd->pre_vectors)) / nodes;
- 
- 		/* Get the cpus on this node which are in the mask */
--		cpumask_and(nmsk, cpu_possible_mask, node_to_possible_cpumask[n]);
-+		cpumask_and(nmsk, cpu_possible_mask, node_to_cpumask[n]);
- 
- 		/* Calculate the number of cpus per vector */
- 		ncpus = cpumask_weight(nmsk);
-@@ -192,7 +192,7 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 	/* Fill out vectors at the end that don't need affinity */
- 	for (; curvec < nvecs; curvec++)
- 		cpumask_copy(masks + curvec, irq_default_affinity);
--	free_node_to_possible_cpumask(node_to_possible_cpumask);
-+	free_node_to_cpumask(node_to_cpumask);
- out:
- 	free_cpumask_var(nmsk);
- 	return masks;
--- 
-2.9.5
+Oh, that's great.
+
+Good to know. :)
+
+Thanks
+--
+Gustavo
