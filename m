@@ -1,58 +1,91 @@
-Return-Path: <linux-scsi-owner@vger.kernel.org>
+Return-Path: <ming.lei@redhat.com>
+Date: Fri, 30 Mar 2018 11:15:56 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Artem Bityutskiy <dedekind1@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@infradead.org>, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, Laurence Oberman <loberman@redhat.com>
+Subject: Re: [PATCH V3 0/4] genirq/affinity: irq vector spread among online
+ CPUs as far as possible
+Message-ID: <20180330031554.GC12412@ming.t460p>
+References: <20180308105358.1506-1-ming.lei@redhat.com>
+ <1520515113.20980.31.camel@gmail.com>
+ <20180308133440.GA2713@ming.t460p>
+ <alpine.DEB.2.21.1803090011150.1454@nanos.tec.linutronix.de>
+ <20180309012458.GD5228@ming.t460p>
+ <alpine.DEB.2.21.1803091107520.1364@nanos.tec.linutronix.de>
+ <20180309120833.GB30257@ming.t460p>
+ <alpine.DEB.2.21.1803091531000.1364@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-From: Tim Walker <tim.t.walker@seagate.com>
-Date: Fri, 23 Mar 2018 08:57:12 -0600
-Message-ID: <CANo=J14FGXJO4O6pwRpKTceE6RgmiKn2Bp16UxP0SDCbJDiqnQ@mail.gmail.com>
-Subject: Multi-Actuator SAS HDD First Look
-To: linux-scsi <linux-scsi@vger.kernel.org>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-scsi-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <alpine.DEB.2.21.1803091531000.1364@nanos.tec.linutronix.de>
 List-ID: <linux-block@vger.kernel.org>
 
-Seagate announced their split actuator SAS drive, which will probably
-require some kernel changes for full support. It's targeted at cloud
-provider JBODs and RAID.
+Hi Thomas,
 
-Here are some of the drive's architectural points. Since the two LUNs
-share many common components (e.g. spindle) Seagate allocated some
-SCSI operations to be LUN specific and some to affect the entire
-device, that is, both LUNs.
+On Fri, Mar 09, 2018 at 04:08:19PM +0100, Thomas Gleixner wrote:
+> On Fri, 9 Mar 2018, Ming Lei wrote:
+> > On Fri, Mar 09, 2018 at 11:08:54AM +0100, Thomas Gleixner wrote:
+> > > > > So my understanding is that these irq patches are enhancements and not bug
+> > > > > fixes. I'll queue them for 4.17 then.
+> > > > 
+> > > > Wrt. this IO hang issue, these patches shouldn't be bug fix, but they may
+> > > > fix performance regression[1] for some systems caused by 84676c1f21 ("genirq/affinity:
+> > > > assign vectors to all possible CPUs").
+> > > > 
+> > > > [1] https://marc.info/?l=linux-block&m=152050347831149&w=2
+> > > 
+> > > Hmm. The patches are rather large for urgent and evtl. backporting. Is
+> > > there a simpler way to address that performance issue?
+> > 
+> > Not thought of a simpler solution. The problem is that number of active msix vector
+> > is decreased a lot by commit 84676c1f21.
+> 
+> It's reduced in cases where the number of possible CPUs is way larger than
+> the number of online CPUs.
+> 
+> Now, if you look at the number of present CPUs on such systems it's
+> probably the same as the number of online CPUs.
+> 
+> It only differs on machines which support physical hotplug, but that's not
+> the normal case. Those systems are more special and less wide spread.
+> 
+> So the obvious simple fix for this regression issue is to spread out the
+> vectors accross present CPUs and not accross possible CPUs.
+> 
+> I'm not sure if there is a clear indicator whether physcial hotplug is
+> supported or not, but the ACPI folks (x86) and architecture maintainers
+> should be able to answer that question. I have a machine which says:
+> 
+>    smpboot: Allowing 128 CPUs, 96 hotplug CPUs
+> 
+> There is definitely no way to hotplug anything on that machine and sure the
+> existing spread algorithm will waste vectors to no end.
 
-1. Two LUNs, 0 & 1, each with independent lba space, and each
-connected to an independent read channel, actuator, and set of heads.
-2. Each actuator addresses 1/2 of the media - no media is shared
-across the actuators. They seek independently.
-3. One World Wide Name (WWN) is assigned to the port for device
-address. Each Logical Unit has a separate World Wide Name for
-identification in VPD page.
-4. 128 deep command queue, shared across both LUNs
-5. Each LUN can pull commands from the queue independently, so they
-can implement their own sorting and optimization.
-6. Ordered tag attribute causes the command to be ordered across both
-Logical Units
-7. Head of Queue attribute causes the command to be ordered with
-respect to a single Logical Unit
-8. Mode pages are device-based (shared across both Logical Units)
-9. Log pages are device-based.
-10. Inquiry VPD pages (with minor exceptions) are device based.
-11. Device health features (SMART, etc) are device based
+percpu variable may waste space too if the possible cpu number is
+provided not accurately from ACPI.
 
-Seagate wants the multi-actuator design to integrate into the stack as
-painlessly as possible.The interface design is still in the early
-stages, so I am gathering requirements and recommendations, and also
-providing any information necessary to help scope integrating a
-multi-LUN device into the MQ stack. So, I am soliciting any pertinent
-feedback including:
+> 
+> Sure then there is virt, which can pretend to have a gazillion of possible
+> hotpluggable CPUs, but virt is an insanity on its own. Though someone might
+> come up with reasonable heuristics for that as well.
 
-1. Painful incompatibilities between the Seagate proposal and current
-MQ architecture
-2. Linux changes needed
-3. Drive interface changes needed
-4. Anything else I may have overlooked
+There are also IBM s390, in which physical CPU hotplug is one normal use
+case.
 
-Please feel free to send any questions or comments.
+Looks not see any other solution posted out for virt, and it may cause
+complicated queue dependency issue by re-introducing CPU hotplug
+handler for blk-mq.
 
-Tim Walker
-Product Design Systems Engineering, Seagate Technology
-(303) 775-3770
+> 
+> Thoughts?
+
+Given this patchset doesn't have effect on normal machines without
+supporting physical CPU hotplug, it can fix performance regression on
+machines which might support physical CPU hotplug(cpu_present_mask !=
+cpu_possible_mask) with some extra memory allocation cost.
+
+So is there any chance to make it in v4.17?
+
+Thanks,
+Ming
