@@ -1,166 +1,66 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:39043 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752712AbeC2WHf (ORCPT
+Received: from mail-oi0-f51.google.com ([209.85.218.51]:35766 "EHLO
+        mail-oi0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751806AbeCaWnz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Mar 2018 18:07:35 -0400
-Received: by mail-lf0-f68.google.com with SMTP id p142-v6so10346198lfd.6
-        for <linux-block@vger.kernel.org>; Thu, 29 Mar 2018 15:07:34 -0700 (PDT)
-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-To: axboe@fb.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        keith.busch@intel.com, javier@cnexlabs.com,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 32/37] lightnvm: pblk: rename ppaf* to addrf*
-Date: Fri, 30 Mar 2018 00:05:19 +0200
-Message-Id: <20180329220524.30363-33-mb@lightnvm.io>
-In-Reply-To: <20180329220524.30363-1-mb@lightnvm.io>
-References: <20180329220524.30363-1-mb@lightnvm.io>
+        Sat, 31 Mar 2018 18:43:55 -0400
+Received: by mail-oi0-f51.google.com with SMTP id z8-v6so10298268oix.2
+        for <linux-block@vger.kernel.org>; Sat, 31 Mar 2018 15:43:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20180331224006.llzkfni4tsuaaveg@angband.pl>
+References: <CAJCQCtTTerrYvXpof+jiShO1D8PmaPaFCA9W1PyFxaGs0PZaig@mail.gmail.com>
+ <20180331224006.llzkfni4tsuaaveg@angband.pl>
+From: Chris Murphy <lists@colorremedies.com>
+Date: Sat, 31 Mar 2018 16:43:54 -0600
+Message-ID: <CAJCQCtScwyQFHxQB=wiP3XAepYZ9pmA+LpK8F1yRBdZ0bbn2Jg@mail.gmail.com>
+Subject: Re: dead or dying SDXC card fsck's OK but mount hangs indefinitely
+To: Adam Borowski <kilobyte@angband.pl>,
+        Btrfs BTRFS <linux-btrfs@vger.kernel.org>
+Cc: Btrfs BTRFS <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 List-Id: linux-block@vger.kernel.org
 
-From: Javier González <javier@cnexlabs.com>
+On Sat, Mar 31, 2018 at 4:40 PM, Adam Borowski <kilobyte@angband.pl> wrote:
+> On Sat, Mar 31, 2018 at 03:50:03PM -0600, Chris Murphy wrote:
+>> This is perhaps a novelty problem report. And it's also a throw away
+>> card data wise, and is a $12 Samsung EVO+ SDXC card used in an Intel
+>> NUC.
+>>
+>> It contains FAT, ext4, and Btrfs file systems. They can all be fsck'd,
+>> but none can be mounted. Even if it use blockdev --setro on the entire
+>> mmc device and then mount -o ro it still fails. Kinda weird huh?
+>
+>> [69107.488123] mmc0: Card stuck in programming state! mmcblk0 card_busy_detect
+>> [69107.539128] mmc0: Tuning timeout, falling back to fixed sampling clock
+>
+>> The corrupt 10 was fixed with a scrub months ago, and I never reset
+>> the counter so that's not a current corruption. The most recent scrub
+>> was maybe a week ago. And even offline scrub works. So literally every
+>> single block related to this Btrfs file system is readable, and yet
+>> it's not mountable? Very weird.
+>
+>> Basically the card is in some sort of state that the kernel code is
+>> not going to ever second guess. So there's no further error or reset
+>> attempt.
+>
+> As the SD card is tiny compared to any hard disks (be they spinning or
+> solid), I'd dd it as an image as the first step.
+>
+> This in general is a wise step for any kind of recovery, but in your case
+> it's especially easy.  It also lets you separate hardware issues from
+> filesystem corruption.
 
-In preparation for 2.0 support in pblk, rename variables referring to
-the address format to addrf and reserve ppaf for the 1.2 path.
+It's definitely not file system corruption. The FAT and ext4 volumes
+have the same issue, they will not mount, presumably because they
+immediately want to update a superblock.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
-Signed-off-by: Matias Bjørling <mb@lightnvm.io>
----
- drivers/lightnvm/pblk-init.c  |  8 ++++----
- drivers/lightnvm/pblk-sysfs.c |  4 ++--
- drivers/lightnvm/pblk.h       | 16 ++++++++--------
- 3 files changed, 14 insertions(+), 14 deletions(-)
+Anyway, recovery not required. Just a spectacle that it fails in a
+readable state (it's completely totally readable once mounting
+ro,nologreplay) but not a single write can happen.
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 34ff47705293..5b381700ef30 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -80,7 +80,7 @@ static size_t pblk_trans_map_size(struct pblk *pblk)
- {
- 	int entry_size = 8;
- 
--	if (pblk->ppaf_bitsize < 32)
-+	if (pblk->addrf_len < 32)
- 		entry_size = 4;
- 
- 	return entry_size * pblk->rl.nr_secs;
-@@ -229,7 +229,7 @@ static int pblk_set_addrf_12(struct nvm_geo *geo, struct nvm_addrf_12 *dst)
- 	return dst->blk_offset + src->blk_len;
- }
- 
--static int pblk_set_ppaf(struct pblk *pblk)
-+static int pblk_set_addrf(struct pblk *pblk)
- {
- 	struct nvm_tgt_dev *dev = pblk->dev;
- 	struct nvm_geo *geo = &dev->geo;
-@@ -241,7 +241,7 @@ static int pblk_set_ppaf(struct pblk *pblk)
- 		return -EINVAL;
- 	}
- 
--	pblk->ppaf_bitsize = pblk_set_addrf_12(geo, (void *)&pblk->ppaf);
-+	pblk->addrf_len = pblk_set_addrf_12(geo, (void *)&pblk->addrf);
- 
- 	return 0;
- }
-@@ -377,7 +377,7 @@ static int pblk_core_init(struct pblk *pblk)
- 	if (!pblk->r_end_wq)
- 		goto free_bb_wq;
- 
--	if (pblk_set_ppaf(pblk))
-+	if (pblk_set_addrf(pblk))
- 		goto free_r_end_wq;
- 
- 	INIT_LIST_HEAD(&pblk->compl_list);
-diff --git a/drivers/lightnvm/pblk-sysfs.c b/drivers/lightnvm/pblk-sysfs.c
-index 2489ea0edfa0..fd2caad39d49 100644
---- a/drivers/lightnvm/pblk-sysfs.c
-+++ b/drivers/lightnvm/pblk-sysfs.c
-@@ -117,12 +117,12 @@ static ssize_t pblk_sysfs_ppaf(struct pblk *pblk, char *page)
- 	struct nvm_addrf_12 *geo_ppaf;
- 	ssize_t sz = 0;
- 
--	ppaf = (struct nvm_addrf_12 *)&pblk->ppaf;
-+	ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
- 	geo_ppaf = (struct nvm_addrf_12 *)&geo->addrf;
- 
- 	sz = snprintf(page, PAGE_SIZE,
- 		"g:(b:%d)blk:%d/%d,pg:%d/%d,lun:%d/%d,ch:%d/%d,pl:%d/%d,sec:%d/%d\n",
--			pblk->ppaf_bitsize,
-+			pblk->addrf_len,
- 			ppaf->blk_offset, ppaf->blk_len,
- 			ppaf->pg_offset, ppaf->pg_len,
- 			ppaf->lun_offset, ppaf->lun_len,
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 6607c41b23c0..40aee9e48af4 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -570,8 +570,8 @@ struct pblk {
- 	struct pblk_line_mgmt l_mg;		/* Line management */
- 	struct pblk_line_meta lm;		/* Line metadata */
- 
--	struct nvm_addrf ppaf;
--	int ppaf_bitsize;
-+	struct nvm_addrf addrf;
-+	int addrf_len;
- 
- 	struct pblk_rb rwb;
- 
-@@ -947,7 +947,7 @@ static inline int pblk_ppa_to_pos(struct nvm_geo *geo, struct ppa_addr p)
- static inline struct ppa_addr addr_to_gen_ppa(struct pblk *pblk, u64 paddr,
- 					      u64 line_id)
- {
--	struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->ppaf;
-+	struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
- 	struct ppa_addr ppa;
- 
- 	ppa.ppa = 0;
-@@ -964,7 +964,7 @@ static inline struct ppa_addr addr_to_gen_ppa(struct pblk *pblk, u64 paddr,
- static inline u64 pblk_dev_ppa_to_line_addr(struct pblk *pblk,
- 							struct ppa_addr p)
- {
--	struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->ppaf;
-+	struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
- 	u64 paddr;
- 
- 	paddr = (u64)p.g.ch << ppaf->ch_offset;
-@@ -988,7 +988,7 @@ static inline struct ppa_addr pblk_ppa32_to_ppa64(struct pblk *pblk, u32 ppa32)
- 		ppa64.c.line = ppa32 & ((~0U) >> 1);
- 		ppa64.c.is_cached = 1;
- 	} else {
--		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->ppaf;
-+		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
- 
- 		ppa64.g.ch = (ppa32 & ppaf->ch_mask) >> ppaf->ch_offset;
- 		ppa64.g.lun = (ppa32 & ppaf->lun_mask) >> ppaf->lun_offset;
-@@ -1011,7 +1011,7 @@ static inline u32 pblk_ppa64_to_ppa32(struct pblk *pblk, struct ppa_addr ppa64)
- 		ppa32 |= ppa64.c.line;
- 		ppa32 |= 1U << 31;
- 	} else {
--		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->ppaf;
-+		struct nvm_addrf_12 *ppaf = (struct nvm_addrf_12 *)&pblk->addrf;
- 
- 		ppa32 |= ppa64.g.ch << ppaf->ch_offset;
- 		ppa32 |= ppa64.g.lun << ppaf->lun_offset;
-@@ -1029,7 +1029,7 @@ static inline struct ppa_addr pblk_trans_map_get(struct pblk *pblk,
- {
- 	struct ppa_addr ppa;
- 
--	if (pblk->ppaf_bitsize < 32) {
-+	if (pblk->addrf_len < 32) {
- 		u32 *map = (u32 *)pblk->trans_map;
- 
- 		ppa = pblk_ppa32_to_ppa64(pblk, map[lba]);
-@@ -1045,7 +1045,7 @@ static inline struct ppa_addr pblk_trans_map_get(struct pblk *pblk,
- static inline void pblk_trans_map_set(struct pblk *pblk, sector_t lba,
- 						struct ppa_addr ppa)
- {
--	if (pblk->ppaf_bitsize < 32) {
-+	if (pblk->addrf_len < 32) {
- 		u32 *map = (u32 *)pblk->trans_map;
- 
- 		map[lba] = pblk_ppa64_to_ppa32(pblk, ppa);
+Also blkdiscard command succeeds, but does nothing. All the data is
+still present.
+
 -- 
-2.11.0
+Chris Murphy
