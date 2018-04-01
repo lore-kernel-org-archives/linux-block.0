@@ -1,47 +1,28 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pl0-f65.google.com ([209.85.160.65]:36589 "EHLO
-        mail-pl0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752719AbeCEVzq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Mar 2018 16:55:46 -0500
-Received: by mail-pl0-f65.google.com with SMTP id 61-v6so10551994plf.3
-        for <linux-block@vger.kernel.org>; Mon, 05 Mar 2018 13:55:46 -0800 (PST)
-Subject: Re: [PATCH] bcache: fix error return value in memory shrink
-To: tang.junhui@zte.com.cn, colyli@suse.de
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-References: <1517369453-28193-1-git-send-email-tang.junhui@zte.com.cn>
-From: Michael Lyle <mlyle@lyle.org>
-Message-ID: <af38bfef-eafb-c124-92cf-eede945815cd@lyle.org>
-Date: Mon, 5 Mar 2018 13:55:44 -0800
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "wakko@animx.eu.org" <wakko@animx.eu.org>,
+        "richard.weinberger@gmail.com" <richard.weinberger@gmail.com>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: 4.15.14 crash with iscsi target and dvd
+Date: Sun, 1 Apr 2018 03:40:56 +0000
+Message-ID: <b68bf187c9cde1c36489fc5ab2187ca8750a1292.camel@wdc.com>
+References: <20180331015903.GA29398@animx.eu.org>
+         <CAFLxGvzbA9XzXLsH56iyqYkitrSnBbOzD977u4266=w5zw0jNg@mail.gmail.com>
+         <20180331221252.GA25573@animx.eu.org>
+In-Reply-To: <20180331221252.GA25573@animx.eu.org>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1517369453-28193-1-git-send-email-tang.junhui@zte.com.cn>
-Content-Type: text/plain; charset=utf-8
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-LGTM, applied
-
-On 01/30/2018 07:30 PM, tang.junhui@zte.com.cn wrote:
-> From: Tang Junhui <tang.junhui@zte.com.cn>
-> 
-> In bch_mca_scan(), the return value should not be the number of freed btree
-> nodes, but the number of pages of freed btree nodes.
-> 
-> Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
-> ---
->  drivers/md/bcache/btree.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-> index 81e8dc3..a5fbccc 100644
-> --- a/drivers/md/bcache/btree.c
-> +++ b/drivers/md/bcache/btree.c
-> @@ -718,7 +718,7 @@ static unsigned long bch_mca_scan(struct shrinker *shrink,
->  	}
->  out:
->  	mutex_unlock(&c->bucket_lock);
-> -	return freed;
-> +	return freed * c->btree_pages;
->  }
->  
->  static unsigned long bch_mca_count(struct shrinker *shrink,
-> 
+T24gU2F0LCAyMDE4LTAzLTMxIGF0IDE4OjEyIC0wNDAwLCBXYWtrbyBXYXJuZXIgd3JvdGU6DQo+
+IFJpY2hhcmQgV2VpbmJlcmdlciB3cm90ZToNCj4gPiBPbiBTYXQsIE1hciAzMSwgMjAxOCBhdCAz
+OjU5IEFNLCBXYWtrbyBXYXJuZXIgPHdha2tvQGFuaW14LmV1Lm9yZz4gd3JvdGU6DQo+ID4gPiBJ
+IHJlcG9ydGVkIHRoaXMgYmVmb3JlIGJ1dCBub29uZSByZXNwb25kZWQuDQo+ID4gDQo+ID4gQmVj
+YXVzZSB5b3UncmUgc2VuZGluZyBvbmx5IHRvIExLTUwuDQo+ID4gQ0MnaW5nIHN0b3JhZ2UgZm9s
+a3MuDQo+IA0KPiBUaGFuayB5b3UuICBJIHdhc24ndCBzdXJlIHdobyBJIG5lZWRlZCB0byBzZW5k
+IGl0IHRvLg0KDQpIZWxsbyBXYWtrbywNCg0KQ2FuIHlvdSBzaGFyZSB0aGUgb3V0cHV0IG9mIGxz
+c2NzaT8gSSB3b3VsZCBsaWtlIHRvIGtub3cgd2hldGhlciBvciBub3QgeW91DQphcmUgdXNpbmcg
+YSAoUylBVEEgQ0RST00uDQoNClRoYW5rcywNCg0KQmFydC4NCg0KDQoNCg0K
