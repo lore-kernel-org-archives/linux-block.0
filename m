@@ -1,36 +1,52 @@
-Return-Path: <prvs=6236fbcb6=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "tj@kernel.org" <tj@kernel.org>
-CC: "kernel-team@fb.com" <kernel-team@fb.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Mon, 2 Apr 2018 15:16:57 -0700
+From: "tj@kernel.org" <tj@kernel.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "kernel-team@fb.com" <kernel-team@fb.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH 2/2] blk-mq: Fix request handover from timeout path to
  normal execution
-Date: Mon, 2 Apr 2018 22:49:43 +0000
-Message-ID: <e2b9b49876c9979cdadef1a04904b5899cf34b1a.camel@wdc.com>
+Message-ID: <20180402221657.GL388343@devbig577.frc2.facebook.com>
 References: <20180402190053.GC388343@devbig577.frc2.facebook.com>
-	 <20180402190120.GD388343@devbig577.frc2.facebook.com>
-	 <b52fa22c-c7fa-5ebd-35cb-527786e6d08e@wdc.com>
-	 <20180402211047.GF388343@devbig577.frc2.facebook.com>
-	 <afef8f4812b357deeadc0999f4c85d7b0049b738.camel@wdc.com>
-	 <20180402220136.GI388343@devbig577.frc2.facebook.com>
-	 <6d6985b8d95317aa5572809f1b987c45e932c5b2.camel@wdc.com>
-	 <20180402221657.GL388343@devbig577.frc2.facebook.com>
-In-Reply-To: <20180402221657.GL388343@devbig577.frc2.facebook.com>
-Content-Type: text/plain; charset="utf-8"
+ <20180402190120.GD388343@devbig577.frc2.facebook.com>
+ <b52fa22c-c7fa-5ebd-35cb-527786e6d08e@wdc.com>
+ <20180402211047.GF388343@devbig577.frc2.facebook.com>
+ <afef8f4812b357deeadc0999f4c85d7b0049b738.camel@wdc.com>
+ <20180402220136.GI388343@devbig577.frc2.facebook.com>
+ <6d6985b8d95317aa5572809f1b987c45e932c5b2.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <6d6985b8d95317aa5572809f1b987c45e932c5b2.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE4LTA0LTAyIGF0IDE1OjE2IC0wNzAwLCB0akBrZXJuZWwub3JnIHdyb3RlOg0K
-PiBBRkFJSywNCj4gdGhlcmUncyBvbmUgbm9uLWNyaXRpY2FsIHJhY2UgY29uZGl0aW9uIHdoaWNo
-IGhhcyBhbHdheXMgYmVlbiB0aGVyZS4NCj4gV2UgaGF2ZSBhIGxhcmdlciByYWNlIHdpbmRvdyBm
-b3IgdGhhdCBjYXNlIGJ1dCBkb24ndCB5ZXQga25vdyB3aGV0aGVyDQo+IHRoYXQncyBwcm9ibGVt
-YXRpYyBvciBub3QuICBJZiB0aGF0IGFjdHVhbGx5IGlzIHByb2JsZW1hdGljLCB3ZSBjYW4NCj4g
-ZmlndXJlIG91dCBhIHdheSB0byBzb2x2ZSB0aGF0IGJ1dCBzdWNoIGVmZm9ydCAvIGFkZGVkIGNv
-bXBsZXhpdHkNCj4gZG9lc24ndCBzZWVtIGp1c3RpZmllZCB5ZXQuICBObz8NCg0KSGVsbG8gVGVq
-dW4sDQoNClNvbWUgaW1wb3J0YW50IGJsb2NrIGRyaXZlcnMgc3lzdGVtYXRpY2FsbHkgcmV0dXJu
-IEJMS19FSF9SRVNFVF9USU1FUg0KZnJvbSB0aGVpciB0aW1lb3V0IGhhbmRsZXIsIGUuZy4gdGhl
-IHZpcnRpby1zY3NpIGluaXRpYXRvciBkcml2ZXIuIFdoYXQNCndpbGwgdGhlIGNvbnNlcXVlbmNl
-IGJlIGZvciB0aGVzZSBkcml2ZXJzIGlmIGEgYmxrX21xX2NvbXBsZXRlX3JlcXVlc3QoKQ0KY2Fs
-bCBpcyBpZ25vcmVkPyBXaWxsIHRoZSByZXF1ZXN0IGZvciB3aGljaCB0aGUgY29tcGxldGlvbiB3
-YXMgaWdub3JlZA0KZ2V0IHN0dWNrPw0KDQpUaGFua3MsDQoNCkJhcnQuDQoNCg0KDQo=
+Hello,
+
+On Mon, Apr 02, 2018 at 10:09:18PM +0000, Bart Van Assche wrote:
+> Please elaborate what your long-term goal is for the blk-mq timeout handler.
+
+Hmm... I don't really have any plans beyond what's been posted.
+
+> The legacy block layer suspends request state changes while a timeout is
+> being processed by holding the request queue lock while requests are being
+> processed, while processing a timeout and while calling q->rq_timed_out_fn(rq).
+> Do you think it is possible to make the blk-mq core suspend request processing
+> while processing a timeout without introducing locking in
+> blk_mq_complete_request()? If you do not plan to add locking in
+> blk_mq_complete_request(), do you think it is possible to fix all the races we
+> discussed in previous e-mails?
+
+I don't know of multiple race conditions.  What am I missing?  AFAIK,
+there's one non-critical race condition which has always been there.
+We have a larger race window for that case but don't yet know whether
+that's problematic or not.  If that actually is problematic, we can
+figure out a way to solve that but such effort / added complexity
+doesn't seem justified yet.  No?
+
+Thanks.
+
+-- 
+tejun
