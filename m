@@ -1,42 +1,38 @@
-Return-Path: <prvs=6236fbcb6=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "tj@kernel.org" <tj@kernel.org>
-CC: "kernel-team@fb.com" <kernel-team@fb.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Mon, 2 Apr 2018 15:01:36 -0700
+From: "tj@kernel.org" <tj@kernel.org>
+To: Bart Van Assche <Bart.VanAssche@wdc.com>
+Cc: "kernel-team@fb.com" <kernel-team@fb.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>
 Subject: Re: [PATCH 2/2] blk-mq: Fix request handover from timeout path to
  normal execution
-Date: Mon, 2 Apr 2018 22:09:18 +0000
-Message-ID: <6d6985b8d95317aa5572809f1b987c45e932c5b2.camel@wdc.com>
+Message-ID: <20180402220136.GI388343@devbig577.frc2.facebook.com>
 References: <20180402190053.GC388343@devbig577.frc2.facebook.com>
-	 <20180402190120.GD388343@devbig577.frc2.facebook.com>
-	 <b52fa22c-c7fa-5ebd-35cb-527786e6d08e@wdc.com>
-	 <20180402211047.GF388343@devbig577.frc2.facebook.com>
-	 <afef8f4812b357deeadc0999f4c85d7b0049b738.camel@wdc.com>
-	 <20180402220136.GI388343@devbig577.frc2.facebook.com>
-In-Reply-To: <20180402220136.GI388343@devbig577.frc2.facebook.com>
-Content-Type: text/plain; charset="utf-8"
+ <20180402190120.GD388343@devbig577.frc2.facebook.com>
+ <b52fa22c-c7fa-5ebd-35cb-527786e6d08e@wdc.com>
+ <20180402211047.GF388343@devbig577.frc2.facebook.com>
+ <afef8f4812b357deeadc0999f4c85d7b0049b738.camel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <afef8f4812b357deeadc0999f4c85d7b0049b738.camel@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE4LTA0LTAyIGF0IDE1OjAxIC0wNzAwLCB0akBrZXJuZWwub3JnIHdyb3RlOg0K
-PiBPbiBNb24sIEFwciAwMiwgMjAxOCBhdCAwOTo1Njo0MVBNICswMDAwLCBCYXJ0IFZhbiBBc3Nj
-aGUgd3JvdGU6DQo+ID4gVGhpcyBwYXRjaCBpbmNyZWFzZXMgdGhlIHRpbWUgZHVyaW5nIHdoaWNo
-IC5hYm9ydGVkX2dzdGF0ZSA9PSAuZ3N0YXRlIGlmIHRoZQ0KPiA+IHRpbWVvdXQgaXMgcmVzZXQu
-IERvZXMgdGhhdCBpbmNyZWFzZSB0aGUgY2hhbmNlIHRoYXQgYSBjb21wbGV0aW9uIHdpbGwgYmUg
-bWlzc2VkDQo+ID4gaWYgdGhlIHJlcXVlc3QgdGltZW91dCBpcyByZXNldD8NCj4gDQo+IEl0IHN1
-cmUgZG9lcywgYnV0IHdlJ3JlIGNvbXBhcmluZyBhbiBvdXRyaWdodCBrZXJuZWwgYnVnIHZzLiBh
-bg0KPiBpbmhlcmVudGx5IG9wcG9ydHVuaXN0aWMgbWVjaGFuaXNtIGJlaW5nIGEgYml0IG1vcmUg
-bG9zc3kuICBJIHRoaW5rDQo+IHRoZSBhbnN3ZXIgaXMgcHJldHR5IGNsZWFyLg0KDQpIZWxsbyBU
-ZWp1biwNCg0KUGxlYXNlIGVsYWJvcmF0ZSB3aGF0IHlvdXIgbG9uZy10ZXJtIGdvYWwgaXMgZm9y
-IHRoZSBibGstbXEgdGltZW91dCBoYW5kbGVyLg0KVGhlIGxlZ2FjeSBibG9jayBsYXllciBzdXNw
-ZW5kcyByZXF1ZXN0IHN0YXRlIGNoYW5nZXMgd2hpbGUgYSB0aW1lb3V0IGlzDQpiZWluZyBwcm9j
-ZXNzZWQgYnkgaG9sZGluZyB0aGUgcmVxdWVzdCBxdWV1ZSBsb2NrIHdoaWxlIHJlcXVlc3RzIGFy
-ZSBiZWluZw0KcHJvY2Vzc2VkLCB3aGlsZSBwcm9jZXNzaW5nIGEgdGltZW91dCBhbmQgd2hpbGUg
-Y2FsbGluZyBxLT5ycV90aW1lZF9vdXRfZm4ocnEpLg0KRG8geW91IHRoaW5rIGl0IGlzIHBvc3Np
-YmxlIHRvIG1ha2UgdGhlIGJsay1tcSBjb3JlIHN1c3BlbmQgcmVxdWVzdCBwcm9jZXNzaW5nDQp3
-aGlsZSBwcm9jZXNzaW5nIGEgdGltZW91dCB3aXRob3V0IGludHJvZHVjaW5nIGxvY2tpbmcgaW4N
-CmJsa19tcV9jb21wbGV0ZV9yZXF1ZXN0KCk/IElmIHlvdSBkbyBub3QgcGxhbiB0byBhZGQgbG9j
-a2luZyBpbg0KYmxrX21xX2NvbXBsZXRlX3JlcXVlc3QoKSwgZG8geW91IHRoaW5rIGl0IGlzIHBv
-c3NpYmxlIHRvIGZpeCBhbGwgdGhlIHJhY2VzIHdlDQpkaXNjdXNzZWQgaW4gcHJldmlvdXMgZS1t
-YWlscz8NCg0KVGhhbmtzLA0KDQpCYXJ0Lg0KDQoNCg==
+Hello,
+
+On Mon, Apr 02, 2018 at 09:56:41PM +0000, Bart Van Assche wrote:
+> This patch increases the time during which .aborted_gstate == .gstate if the
+> timeout is reset. Does that increase the chance that a completion will be missed
+> if the request timeout is reset?
+
+It sure does, but we're comparing an outright kernel bug vs. an
+inherently opportunistic mechanism being a bit more lossy.  I think
+the answer is pretty clear.
+
+Thanks.
+
+-- 
+tejun
