@@ -1,41 +1,40 @@
-Return-Path: <prvs=6236fbcb6=Bart.VanAssche@wdc.com>
-From: Bart Van Assche <Bart.VanAssche@wdc.com>
-To: "tj@kernel.org" <tj@kernel.org>
-CC: "kernel-team@fb.com" <kernel-team@fb.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>
+Return-Path: <htejun@gmail.com>
+Return-Path: <htejun@gmail.com>
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Mon, 2 Apr 2018 14:10:47 -0700
+From: Tejun Heo <tj@kernel.org>
+To: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-team@fb.com
 Subject: Re: [PATCH 2/2] blk-mq: Fix request handover from timeout path to
  normal execution
-Date: Mon, 2 Apr 2018 21:31:34 +0000
-Message-ID: <e23487ab30cfe5337a4321ad10ddbd6514be9ab9.camel@wdc.com>
+Message-ID: <20180402211047.GF388343@devbig577.frc2.facebook.com>
 References: <20180402190053.GC388343@devbig577.frc2.facebook.com>
-	 <20180402190120.GD388343@devbig577.frc2.facebook.com>
-	 <b52fa22c-c7fa-5ebd-35cb-527786e6d08e@wdc.com>
-	 <20180402211047.GF388343@devbig577.frc2.facebook.com>
-In-Reply-To: <20180402211047.GF388343@devbig577.frc2.facebook.com>
-Content-Type: text/plain; charset="utf-8"
+ <20180402190120.GD388343@devbig577.frc2.facebook.com>
+ <b52fa22c-c7fa-5ebd-35cb-527786e6d08e@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <b52fa22c-c7fa-5ebd-35cb-527786e6d08e@wdc.com>
 List-ID: <linux-block@vger.kernel.org>
 
-T24gTW9uLCAyMDE4LTA0LTAyIGF0IDE0OjEwIC0wNzAwLCBUZWp1biBIZW8gd3JvdGU6DQo+IE9u
-IE1vbiwgQXByIDAyLCAyMDE4IGF0IDAyOjA4OjM3UE0gLTA3MDAsIEJhcnQgVmFuIEFzc2NoZSB3
-cm90ZToNCj4gPiBPbiAwNC8wMi8xOCAxMjowMSwgVGVqdW4gSGVvIHdyb3RlOg0KPiA+ID4gKwkg
-KiBBcyBub3RoaW5nIHByZXZlbnRzIGZyb20gY29tcGxldGlvbiBoYXBwZW5pbmcgd2hpbGUNCj4g
-PiA+ICsJICogLT5hYm9ydGVkX2dzdGF0ZSBpcyBzZXQsIHRoaXMgbWF5IGxlYWQgdG8gaWdub3Jl
-ZCBjb21wbGV0aW9ucw0KPiA+ID4gKwkgKiBhbmQgZnVydGhlciBzcHVyaW91cyB0aW1lb3V0cy4N
-Cj4gPiA+ICsJICovDQo+ID4gPiArCWlmIChycS0+cnFfZmxhZ3MgJiBSUUZfTVFfVElNRU9VVF9S
-RVNFVCkNCj4gPiA+ICsJCWJsa19tcV9ycV91cGRhdGVfYWJvcnRlZF9nc3RhdGUocnEsIDApOw0K
-PiA+IA0KPiA+IEhlbGxvIFRlanVuLA0KPiA+IA0KPiA+IFNpbmNlIHRoaXMgcGF0Y2ggZml4ZXMg
-b25lIHJhY2UgYnV0IGludHJvZHVjZXMgYW5vdGhlciByYWNlLCBpcyB0aGlzDQo+ID4gcGF0Y2gg
-cmVhbGx5IGFuIGltcHJvdmVtZW50Pw0KPiANCj4gT2gsIHRoYXQncyBub3QgYSBuZXcgcmFjZS4g
-IFRoYXQncyB0aGUgc2FtZSBub24tY3JpdGljYWwgcmFjZSB3aGljaA0KPiBhbHdheXMgZXhpc3Rl
-ZC4gIEl0J3MganVzdCBiZWluZyBkb2N1bWVudGVkLg0KDQpIZWxsbyBUZWp1biwNCg0KSSB0aGlu
-ayBpdCBjYW4gaGFwcGVuIHRoYXQgdGhlIGFib3ZlIGNvZGUgc2VlcyB0aGF0IChycS0+cnFfZmxh
-Z3MgJg0KUlFGX01RX1RJTUVPVVRfUkVTRVQpICE9IDAsIHRoYXQgYmxrX21xX3N0YXJ0X3JlcXVl
-c3QoKSBleGVjdXRlcyB0aGUNCmZvbGxvd2luZyBjb2RlOg0KDQoJYmxrX21xX3JxX3VwZGF0ZV9z
-dGF0ZShycSwgTVFfUlFfSU5fRkxJR0hUKTsNCglibGtfYWRkX3RpbWVyKHJxKTsNCg0KYW5kIHRo
-YXQgc3Vic2VxdWVudGx5IGJsa19tcV9ycV91cGRhdGVfYWJvcnRlZF9nc3RhdGUocnEsIDApIGlz
-IGNhbGxlZCwNCndoaWNoIHdpbGwgY2F1c2UgdGhlIG5leHQgY29tcGxldGlvbiB0byBiZSBsb3N0
-LiBJcyBmaXhpbmcgb25lIG9jY3VycmVuY2UNCm9mIGEgcmFjZSBhbmQgcmVpbnRyb2R1Y2luZyBp
-dCBpbiBhbm90aGVyIGNvZGUgcGF0aCByZWFsbHkgYW4gaW1wcm92ZW1lbnQ/DQoNClRoYW5rcywN
-Cg0KQmFydC4NCg0KDQoNCg==
+On Mon, Apr 02, 2018 at 02:08:37PM -0700, Bart Van Assche wrote:
+> On 04/02/18 12:01, Tejun Heo wrote:
+> >+	 * As nothing prevents from completion happening while
+> >+	 * ->aborted_gstate is set, this may lead to ignored completions
+> >+	 * and further spurious timeouts.
+> >+	 */
+> >+	if (rq->rq_flags & RQF_MQ_TIMEOUT_RESET)
+> >+		blk_mq_rq_update_aborted_gstate(rq, 0);
+> 
+> Hello Tejun,
+> 
+> Since this patch fixes one race but introduces another race, is this
+> patch really an improvement?
+
+Oh, that's not a new race.  That's the same non-critical race which
+always existed.  It's just being documented.
+
+Thanks.
+
+-- 
+tejun
