@@ -1,39 +1,20 @@
-Return-Path: <mlyle@lyle.org>
-Return-Path: <mlyle@lyle.org>
-Subject: Re: bcache and hibernation
-To: Nikolaus Rath <nikolaus@rath.org>, Jens Axboe <axboe@kernel.dk>,
- linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-References: <1522782091.951690.1325310168.33572B11@webmail.messagingengine.com>
- <e9abd200-1718-7975-b3e5-d05473e7d2d4@kernel.dk>
- <1522918273.1829962.1327322736.4F60CFBA@webmail.messagingengine.com>
-From: Michael Lyle <mlyle@lyle.org>
-Message-ID: <70ea227e-ecb2-9047-0f8d-0864340dc870@lyle.org>
-Date: Thu, 5 Apr 2018 11:13:08 -0700
+Return-Path: <prvs=6236fbcb6=bart.vanassche@wdc.com>
+Subject: Re: [PATCH 1/2] blk-mq: Factor out [s]rcu synchronization
+To: Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-team@fb.com
+References: <20180402190053.GC388343@devbig577.frc2.facebook.com>
+From: Bart Van Assche <bart.vanassche@wdc.com>
+Message-ID: <f3ad5e36-11b8-2371-d634-a97280c4407e@wdc.com>
+Date: Mon, 2 Apr 2018 13:48:54 -0700
 MIME-Version: 1.0
-In-Reply-To: <1522918273.1829962.1327322736.4F60CFBA@webmail.messagingengine.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180402190053.GC388343@devbig577.frc2.facebook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Hi Nikolaus (and everyone else),
+On 04/02/18 12:00, Tejun Heo wrote:
+> Factor out [s]rcu synchronization in blk_mq_timeout_work() into
+> blk_mq_timeout_sync_rcu().  This is to add another user in the future
+> and doesn't cause any functional changes.
 
-Sorry I've been slow in responding.  I probably need to step down as
-bcache maintainer because so many other things have competed for my time
-lately and I've fallen behind on both patches and mailing list.
-
-On 04/05/2018 01:51 AM, Nikolaus Rath wrote:
-> Is there a way to prevent this from happening? Could eg the kernel detect that the swap devices is (indirectly) on bcache and refuse to hibernate? Or is there a way to do a "true" read-only mount of a bcache volume so that one can safely resume from it?
-
-I think you're correct.  If you're using bcache in writeback mode, it is
-not safe to hibernate there, because some of the blocks involved in the
-resume can end up in cache (and dependency issues, like you mention).
-There's similar cautions/problems with btrfs.
-
-I am unaware of a mechanism to prohibit this in the kernel-- to say that
-a given type of block provider can't be involved in a resume operation.
-Most documentation for hibernation explicitly cautions about the btrfs
-situation, but use of bcache is less common and as a result generally
-isn't covered.
-
-> Best,
-> -Nikolaus
-Mike
+Reviewed-by: Bart Van Assche <bart.vanassche@wdc.com>
