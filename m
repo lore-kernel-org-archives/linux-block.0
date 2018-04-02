@@ -1,17 +1,26 @@
-Return-Path: <martin@lichtvoll.de>
-From: Martin Steigerwald <martin@lichtvoll.de>
-To: Tejun Heo <tj@kernel.org>
-Cc: Sitsofe Wheeler <sitsofe@gmail.com>, Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, Stefan Haberland <sth@linux.vnet.ibm.com>, Jan Hoeppner <hoeppner@linux.vnet.ibm.com>, Bart Van Assche <Bart.VanAssche@wdc.com>
-Subject: Re: [PATCH] blk-mq: Directly schedule q->timeout_work when aborting a request
-Date: Tue, 10 Apr 2018 20:43:34 +0200
-Message-ID: <2699418.6CV4rbzP8d@merkaba>
-In-Reply-To: <20180402220458.GJ388343@devbig577.frc2.facebook.com>
-References: <CALjAwxh-PVYFnYFCJpGOja+m5SzZ8Sa4J7ohxdK=r8NyOF-EMA@mail.gmail.com> <CALjAwxj1urPPNadmkmhLngHvYcfhh8d+_vPstPDQHXLiGL0oTw@mail.gmail.com> <20180402220458.GJ388343@devbig577.frc2.facebook.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] blk-mq: Directly schedule q->timeout_work when aborting a
+ request
+To: Tejun Heo <tj@kernel.org>, Sitsofe Wheeler <sitsofe@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ Stefan Haberland <sth@linux.vnet.ibm.com>,
+ Jan Hoeppner <hoeppner@linux.vnet.ibm.com>,
+ Bart Van Assche <Bart.VanAssche@wdc.com>
+References: <CALjAwxh-PVYFnYFCJpGOja+m5SzZ8Sa4J7ohxdK=r8NyOF-EMA@mail.gmail.com>
+ <de102067-b589-af05-ae71-496e948000f0@kernel.dk>
+ <CALjAwxgtuEv=d1TfvH3EdXqZs=_6F7TinyVhbPdUmTsdK_5ghw@mail.gmail.com>
+ <20180402202951.GE388343@devbig577.frc2.facebook.com>
+ <CALjAwxj1urPPNadmkmhLngHvYcfhh8d+_vPstPDQHXLiGL0oTw@mail.gmail.com>
+ <20180402220458.GJ388343@devbig577.frc2.facebook.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <47e8098e-478e-542c-d447-8b8d03bda562@kernel.dk>
+Date: Mon, 2 Apr 2018 16:35:58 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <20180402220458.GJ388343@devbig577.frc2.facebook.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-Tejun Heo - 03.04.18, 00:04:
+On 4/2/18 4:04 PM, Tejun Heo wrote:
 > Request abortion is performed by overriding deadline to now and
 > scheduling timeout handling immediately.  For the latter part, the
 > code was using mod_timer(timeout, 0) which can't guarantee that the
@@ -21,26 +30,15 @@ Tejun Heo - 03.04.18, 00:04:
 > This fixes the hangs during probing reported by Sitsofe but it isn't
 > yet clear to me how the failure can happen reliably if it's just the
 > above described race condition.
-
-Compiling a 4.16.1 kernel with that patch to test whether this fixes the boot 
-hang I reported in:
-
-[Possible REGRESSION, 4.16-rc4] Error updating SMART data during runtime and 
-boot failures with blk_mq_terminate_expired in backtrace
-https://bugzilla.kernel.org/show_bug.cgi?id=199077
-
-The "Error updating SMART data during runtime" thing I reported there as well 
-may still be another (independent) issue.
-
+> 
 > Signed-off-by: Tejun Heo <tj@kernel.org>
 > Reported-by: Sitsofe Wheeler <sitsofe@gmail.com>
 > Reported-by: Meelis Roos <mroos@linux.ee>
-> Fixes: 358f70da49d7 ("blk-mq: make blk_abort_request() trigger timeout
-> path") Cc: stable@vger.kernel.org # v4.16
-> Link:
-> http://lkml.kernel.org/r/CALjAwxh-PVYFnYFCJpGOja+m5SzZ8Sa4J7ohxdK=r8NyOF-EM
-> A@mail.gmail.com Link:
-> http://lkml.kernel.org/r/alpine.LRH.2.21.1802261049140.4893@math.ut.ee ---
+> Fixes: 358f70da49d7 ("blk-mq: make blk_abort_request() trigger timeout path")
+> Cc: stable@vger.kernel.org # v4.16
+> Link: http://lkml.kernel.org/r/CALjAwxh-PVYFnYFCJpGOja+m5SzZ8Sa4J7ohxdK=r8NyOF-EMA@mail.gmail.com
+> Link: http://lkml.kernel.org/r/alpine.LRH.2.21.1802261049140.4893@math.ut.ee
+> ---
 > Hello,
 > 
 > I don't have the full explanation yet but here's a preliminary patch.
@@ -63,5 +61,13 @@ may still be another (independent) issue.
 >  	} else {
 >  		if (blk_mark_rq_complete(req))
 >  			return;
+
+In any case, it's cleaner than relying on mod_timer(.., 0). If that
+doesn't guarantee that the timer runs again, I can see how a race
+with the running timer could prevent us from seeing the timeout
+after an abort.
+
+I'll apply this, thanks.
+
 -- 
-Martin
+Jens Axboe
