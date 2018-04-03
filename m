@@ -1,54 +1,35 @@
 Return-Path: <tglx@linutronix.de>
-Date: Tue, 3 Apr 2018 15:32:21 +0200 (CEST)
+Date: Tue, 3 Apr 2018 14:55:07 +0200 (CEST)
 From: Thomas Gleixner <tglx@linutronix.de>
 To: Ming Lei <ming.lei@redhat.com>
-cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
-    linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-    Laurence Oberman <loberman@redhat.com>
-Subject: Re: [PATCH V3 4/4] genirq/affinity: irq vector spread among online
+cc: Artem Bityutskiy <dedekind1@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+    Christoph Hellwig <hch@infradead.org>, linux-kernel@vger.kernel.org,
+    linux-block@vger.kernel.org, Laurence Oberman <loberman@redhat.com>
+Subject: Re: [PATCH V3 0/4] genirq/affinity: irq vector spread among online
  CPUs as far as possible
-In-Reply-To: <20180308105358.1506-5-ming.lei@redhat.com>
-Message-ID: <alpine.DEB.2.21.1804031522480.2511@nanos.tec.linutronix.de>
-References: <20180308105358.1506-1-ming.lei@redhat.com> <20180308105358.1506-5-ming.lei@redhat.com>
+In-Reply-To: <20180330031554.GC12412@ming.t460p>
+Message-ID: <alpine.DEB.2.21.1804031435450.2511@nanos.tec.linutronix.de>
+References: <20180308105358.1506-1-ming.lei@redhat.com> <1520515113.20980.31.camel@gmail.com> <20180308133440.GA2713@ming.t460p> <alpine.DEB.2.21.1803090011150.1454@nanos.tec.linutronix.de> <20180309012458.GD5228@ming.t460p> <alpine.DEB.2.21.1803091107520.1364@nanos.tec.linutronix.de>
+ <20180309120833.GB30257@ming.t460p> <alpine.DEB.2.21.1803091531000.1364@nanos.tec.linutronix.de> <20180330031554.GC12412@ming.t460p>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, 8 Mar 2018, Ming Lei wrote:
-> 1) before 84676c1f21 ("genirq/affinity: assign vectors to all possible CPUs")
-> 	irq 39, cpu list 0
-> 	irq 40, cpu list 1
-> 	irq 41, cpu list 2
-> 	irq 42, cpu list 3
+Ming,
+
+On Fri, 30 Mar 2018, Ming Lei wrote:
+> On Fri, Mar 09, 2018 at 04:08:19PM +0100, Thomas Gleixner wrote:
+> > Thoughts?
 > 
-> 2) after 84676c1f21 ("genirq/affinity: assign vectors to all possible CPUs")
-> 	irq 39, cpu list 0-2
-> 	irq 40, cpu list 3-4,6
-> 	irq 41, cpu list 5
-> 	irq 42, cpu list 7
-> 
-> 3) after applying this patch against V4.15+:
-> 	irq 39, cpu list 0,4
-> 	irq 40, cpu list 1,6
-> 	irq 41, cpu list 2,5
-> 	irq 42, cpu list 3,7
+> Given this patchset doesn't have effect on normal machines without
+> supporting physical CPU hotplug, it can fix performance regression on
+> machines which might support physical CPU hotplug(cpu_present_mask !=
+> cpu_possible_mask) with some extra memory allocation cost.
+>
+> So is there any chance to make it in v4.17?
 
-That's more or less window dressing. If the device is already in use when
-the offline CPUs get hot plugged, then the interrupts still stay on cpu 0-3
-because the effective affinity of interrupts on X86 (and other
-architectures) is always a single CPU.
-
-So this only might move interrupts to the hotplugged CPUs when the device
-is initialized after CPU hotplug and the actual vector allocation moves an
-interrupt out to the higher numbered CPUs if they have less vectors
-allocated than the lower numbered ones.
-
-Probably not an issue for the majority of machines where ACPI stupidly
-claims that extra CPUs are possible while there is absolute no support for
-physical hotplug.
-
-Though in scenarios where "physical" hotplug is possible, e.g. virt, this
-might come surprising.
+Sorry, that thing fell through the cracks. I'll queue it now and try to do
+a pull request late in the merge window.
 
 Thanks,
 
