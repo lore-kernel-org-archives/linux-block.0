@@ -1,128 +1,41 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from out1.zte.com.cn ([202.103.147.172]:57896 "EHLO mxct.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751200AbeDPGds (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 Apr 2018 02:33:48 -0400
-From: tang.junhui@zte.com.cn
-To: kent.overstreet@gmail.com, colyli@suse.de, mlyle@lyle.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        tang.junhui@zte.com.cn
-Subject: [PATCH v2 1/4] bcache: finish incremental GC
-Date: Mon, 16 Apr 2018 14:33:47 +0800
-Message-Id: <1523860430-31331-2-git-send-email-tang.junhui@zte.com.cn>
-In-Reply-To: <1523860430-31331-1-git-send-email-tang.junhui@zte.com.cn>
-References: <1523860430-31331-1-git-send-email-tang.junhui@zte.com.cn>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <sitsofe@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <e3e148f3-672d-d383-76db-ef976e3335a9@kernel.dk>
+References: <CALjAwxgAijfiqHpiQQGY9MmqzFyU+pP2Q2UwwbsPg5u4N0Uzjw@mail.gmail.com>
+ <e3e148f3-672d-d383-76db-ef976e3335a9@kernel.dk>
+From: Sitsofe Wheeler <sitsofe@gmail.com>
+Date: Tue, 3 Apr 2018 16:05:48 +0100
+Message-ID: <CALjAwxgAzKNg7LNNEC0b97kOj3xDZXLpm3DVnxWVXT_zdDZQeQ@mail.gmail.com>
+Subject: Re: BFQ/Kyber as default I/O scheduler?
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Paolo Valente <paolo.valente@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+List-ID: <linux-block@vger.kernel.org>
 
-From: Tang Junhui <tang.junhui@zte.com.cn>
+On 3 April 2018 at 15:21, Jens Axboe <axboe@kernel.dk> wrote:
+> On 4/3/18 6:08 AM, Sitsofe Wheeler wrote:
+>>
+>> Is there any particular reason the new(ish) BFQ and Kyber I/O
+>> schedulers have not been added to the "Default I/O scheduler" choices
+>> in block/Kconfig.iosched ? Is it because they are multiqueue only?
+>
+> Yes, the default scheduler selection only applies to !mq schedulers.
+> If you search the git log for "Architected-by" you can see why,
+> there's some mailing archive goodness on the topic from the same
+> time, too.
 
-In GC thread, we record the latest GC key in gc_done, which is expected
-to be used for incremental GC, but in currently code, we didn't realize
-it. When GC runs, front side IO would be blocked until the GC over, it
-would be a long time if there is a lot of btree nodes.
+For those playing along at home the commit Jens is referring to is
+"block: get rid of blk-mq default scheduler choice Kconfig entries"
+(https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=b86dd815ff74ab9eda474d1c28428ac0db2c3032
+) and the mailing archive thread was
+https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1338302.html
+).
 
-This patch realizes incremental GC, the main ideal is that, when there
-are front side I/Os, after GC some nodes (100), we stop GC, release locker
-of the btree node, and go to process the front side I/Os for some times
-(100 ms), then go back to GC again.
+Sigh, OK got it - udev rules for selecting multiqueue I/O schedulers
+(at least until the day single queue block layer is ripped out).
 
-By this patch, when we doing GC, I/Os are not blocked all the time, and
-there is no obvious I/Os zero jump problem any more.
+(Finishing that thread made me feel like I'd been slapped in the face
+by a wet trout and I had nothing to do with it! :-)
 
-Patch v2: Rename some variables and macros name as Coly suggested.
-
-Signed-off-by: Tang Junhui <tang.junhui@zte.com.cn>
----
- drivers/md/bcache/bcache.h  |  5 +++++
- drivers/md/bcache/btree.c   | 15 ++++++++++++++-
- drivers/md/bcache/request.c |  3 +++
- 3 files changed, 22 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 843877e..5d52be8 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -445,6 +445,7 @@ struct cache {
- 
- struct gc_stat {
- 	size_t			nodes;
-+	size_t			nodes_pre;
- 	size_t			key_bytes;
- 
- 	size_t			nkeys;
-@@ -568,6 +569,10 @@ struct cache_set {
- 	 */
- 	atomic_t		rescale;
- 	/*
-+	 * used for GC, identify if any front side I/Os is inflight
-+	 */
-+	atomic_t		search_inflight;
-+	/*
- 	 * When we invalidate buckets, we use both the priority and the amount
- 	 * of good data to determine which buckets to reuse first - to weight
- 	 * those together consistently we keep track of the smallest nonzero
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index 81e8dc3..6edb00e 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -90,6 +90,9 @@
- 
- #define MAX_NEED_GC		64
- #define MAX_SAVE_PRIO		72
-+#define MIN_GC_NODES		100
-+#define GC_SLEEP_MS		100
-+
- 
- #define PTR_DIRTY_BIT		(((uint64_t) 1 << 36))
- 
-@@ -1581,6 +1584,13 @@ static int btree_gc_recurse(struct btree *b, struct btree_op *op,
- 		memmove(r + 1, r, sizeof(r[0]) * (GC_MERGE_NODES - 1));
- 		r->b = NULL;
- 
-+		if (atomic_read(&b->c->search_inflight) &&
-+		    gc->nodes >= gc->nodes_pre + MIN_GC_NODES) {
-+			gc->nodes_pre =  gc->nodes;
-+			ret = -EAGAIN;
-+			break;
-+		}
-+
- 		if (need_resched()) {
- 			ret = -EAGAIN;
- 			break;
-@@ -1748,7 +1758,10 @@ static void bch_btree_gc(struct cache_set *c)
- 		closure_sync(&writes);
- 		cond_resched();
- 
--		if (ret && ret != -EAGAIN)
-+		if (ret == -EAGAIN)
-+			schedule_timeout_interruptible(msecs_to_jiffies
-+						       (GC_SLEEP_MS));
-+		else if (ret)
- 			pr_warn("gc failed!");
- 	} while (ret);
- 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 643c3021..a12afbc 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -637,7 +637,9 @@ static void do_bio_hook(struct search *s, struct bio *orig_bio)
- static void search_free(struct closure *cl)
- {
- 	struct search *s = container_of(cl, struct search, cl);
-+
- 	bio_complete(s);
-+	atomic_dec(&s->d->c->search_inflight);
- 
- 	if (s->iop.bio)
- 		bio_put(s->iop.bio);
-@@ -655,6 +657,7 @@ static inline struct search *search_alloc(struct bio *bio,
- 
- 	closure_init(&s->cl, NULL);
- 	do_bio_hook(s, bio);
-+	atomic_inc(&d->c->search_inflight);
- 
- 	s->orig_bio		= bio;
- 	s->cache_miss		= NULL;
 -- 
-1.8.3.1
+Sitsofe | http://sucs.org/~sits/
