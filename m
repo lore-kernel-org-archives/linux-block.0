@@ -1,69 +1,68 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from tn-76-7-174-50.sta.embarqhsd.net ([76.7.174.50]:55339 "EHLO
-        animx.eu.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752582AbeDEAny (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 4 Apr 2018 20:43:54 -0400
-Date: Wed, 4 Apr 2018 20:26:05 -0400
-From: Wakko Warner <wakko@animx.eu.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+Return-Path: <linux-scsi-owner@vger.kernel.org>
+From: Bart Van Assche <Bart.VanAssche@wdc.com>
+To: "wakko@animx.eu.org" <wakko@animx.eu.org>
+CC: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "richard.weinberger@gmail.com" <richard.weinberger@gmail.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Subject: Re: 4.15.14 crash with iscsi target and dvd
-Message-ID: <20180405002605.GC10487@animx.eu.org>
+Date: Tue, 3 Apr 2018 17:03:24 +0000
+Message-ID: <595a10cfb387e6b2ab4d2053b84fed9b3da9e079.camel@wdc.com>
 References: <20180331015903.GA29398@animx.eu.org>
- <CAFLxGvzbA9XzXLsH56iyqYkitrSnBbOzD977u4266=w5zw0jNg@mail.gmail.com>
- <20180331221252.GA25573@animx.eu.org>
- <b68bf187c9cde1c36489fc5ab2187ca8750a1292.camel@wdc.com>
- <20180401113721.GA8471@animx.eu.org>
- <20180401163604.GB25011@animx.eu.org>
- <20180401182723.GA31755@animx.eu.org>
- <595a10cfb387e6b2ab4d2053b84fed9b3da9e079.camel@wdc.com>
+         <CAFLxGvzbA9XzXLsH56iyqYkitrSnBbOzD977u4266=w5zw0jNg@mail.gmail.com>
+         <20180331221252.GA25573@animx.eu.org>
+         <b68bf187c9cde1c36489fc5ab2187ca8750a1292.camel@wdc.com>
+         <20180401113721.GA8471@animx.eu.org> <20180401163604.GB25011@animx.eu.org>
+         <20180401182723.GA31755@animx.eu.org>
+In-Reply-To: <20180401182723.GA31755@animx.eu.org>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <595a10cfb387e6b2ab4d2053b84fed9b3da9e079.camel@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Sender: linux-scsi-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Bart Van Assche wrote:
-> On Sun, 2018-04-01 at 14:27 -0400, Wakko Warner wrote:
-> > Wakko Warner wrote:
-> > > Wakko Warner wrote:
-> > > > I tested 4.14.32 last night with the same oops.  4.9.91 works fine.
-> > > > From the initiator, if I do cat /dev/sr1 > /dev/null it works.  If I mount
-> > > > /dev/sr1 and then do find -type f | xargs cat > /dev/null the target
-> > > > crashes.  I'm using the builtin iscsi target with pscsi.  I can burn from
-> > > > the initiator with out problems.  I'll test other kernels between 4.9 and
-> > > > 4.14.
-> > > 
-> > > So I've tested 4.x.y where x one of 10 11 12 14 15 and y is the latest patch
-> > > (except for 4.15 which was 1 behind)
-> > > Each of these kernels crash within seconds or immediate of doing find -type
-> > > f | xargs cat > /dev/null from the initiator.
-> > 
-> > I tried 4.10.0.  It doesn't completely lockup the system, but the device
-> > that was used hangs.  So from the initiator, it's /dev/sr1 and from the
-> > target it's /dev/sr0.  Attempting to read /dev/sr0 after the oops causes the
-> > process to hang in D state.
-> 
-> Hello Wakko,
-> 
-> Thank you for having narrowed down this further. I think that you encountered
-> a regression either in the block layer core or in the SCSI core. Unfortunately
-> the number of changes between kernel versions v4.9 and v4.10 in these two
-> subsystems is huge. I see two possible ways forward:
-> - Either that you perform a bisect to identify the patch that introduced this
->   regression. However, I'm not sure whether you are familiar with the bisect
->   process.
-> - Or that you identify the command that triggers this crash such that others
->   can reproduce this issue without needing access to your setup.
-> 
-> How about reproducing this crash with the below patch applied on top of
-> kernel v4.15.x? The additional output sent by this patch to the system log
-> should allow us to reproduce this issue by submitting the same SCSI command
-> with sg_raw.
-
-Sorry for not getting back in touch.  My internet was down.  I haven't tried
-the patch yet.  I'll try to get to that tomorrow.  The system with the issue
-is busy and I can't reboot it right now.
+T24gU3VuLCAyMDE4LTA0LTAxIGF0IDE0OjI3IC0wNDAwLCBXYWtrbyBXYXJuZXIgd3JvdGU6DQo+
+IFdha2tvIFdhcm5lciB3cm90ZToNCj4gPiBXYWtrbyBXYXJuZXIgd3JvdGU6DQo+ID4gPiBJIHRl
+c3RlZCA0LjE0LjMyIGxhc3QgbmlnaHQgd2l0aCB0aGUgc2FtZSBvb3BzLiAgNC45LjkxIHdvcmtz
+IGZpbmUuDQo+ID4gPiBGcm9tIHRoZSBpbml0aWF0b3IsIGlmIEkgZG8gY2F0IC9kZXYvc3IxID4g
+L2Rldi9udWxsIGl0IHdvcmtzLiAgSWYgSSBtb3VudA0KPiA+ID4gL2Rldi9zcjEgYW5kIHRoZW4g
+ZG8gZmluZCAtdHlwZSBmIHwgeGFyZ3MgY2F0ID4gL2Rldi9udWxsIHRoZSB0YXJnZXQNCj4gPiA+
+IGNyYXNoZXMuICBJJ20gdXNpbmcgdGhlIGJ1aWx0aW4gaXNjc2kgdGFyZ2V0IHdpdGggcHNjc2ku
+ICBJIGNhbiBidXJuIGZyb20NCj4gPiA+IHRoZSBpbml0aWF0b3Igd2l0aCBvdXQgcHJvYmxlbXMu
+ICBJJ2xsIHRlc3Qgb3RoZXIga2VybmVscyBiZXR3ZWVuIDQuOSBhbmQNCj4gPiA+IDQuMTQuDQo+
+ID4gDQo+ID4gU28gSSd2ZSB0ZXN0ZWQgNC54Lnkgd2hlcmUgeCBvbmUgb2YgMTAgMTEgMTIgMTQg
+MTUgYW5kIHkgaXMgdGhlIGxhdGVzdCBwYXRjaA0KPiA+IChleGNlcHQgZm9yIDQuMTUgd2hpY2gg
+d2FzIDEgYmVoaW5kKQ0KPiA+IEVhY2ggb2YgdGhlc2Uga2VybmVscyBjcmFzaCB3aXRoaW4gc2Vj
+b25kcyBvciBpbW1lZGlhdGUgb2YgZG9pbmcgZmluZCAtdHlwZQ0KPiA+IGYgfCB4YXJncyBjYXQg
+PiAvZGV2L251bGwgZnJvbSB0aGUgaW5pdGlhdG9yLg0KPiANCj4gSSB0cmllZCA0LjEwLjAuICBJ
+dCBkb2Vzbid0IGNvbXBsZXRlbHkgbG9ja3VwIHRoZSBzeXN0ZW0sIGJ1dCB0aGUgZGV2aWNlDQo+
+IHRoYXQgd2FzIHVzZWQgaGFuZ3MuICBTbyBmcm9tIHRoZSBpbml0aWF0b3IsIGl0J3MgL2Rldi9z
+cjEgYW5kIGZyb20gdGhlDQo+IHRhcmdldCBpdCdzIC9kZXYvc3IwLiAgQXR0ZW1wdGluZyB0byBy
+ZWFkIC9kZXYvc3IwIGFmdGVyIHRoZSBvb3BzIGNhdXNlcyB0aGUNCj4gcHJvY2VzcyB0byBoYW5n
+IGluIEQgc3RhdGUuDQoNCkhlbGxvIFdha2tvLA0KDQpUaGFuayB5b3UgZm9yIGhhdmluZyBuYXJy
+b3dlZCBkb3duIHRoaXMgZnVydGhlci4gSSB0aGluayB0aGF0IHlvdSBlbmNvdW50ZXJlZA0KYSBy
+ZWdyZXNzaW9uIGVpdGhlciBpbiB0aGUgYmxvY2sgbGF5ZXIgY29yZSBvciBpbiB0aGUgU0NTSSBj
+b3JlLiBVbmZvcnR1bmF0ZWx5DQp0aGUgbnVtYmVyIG9mIGNoYW5nZXMgYmV0d2VlbiBrZXJuZWwg
+dmVyc2lvbnMgdjQuOSBhbmQgdjQuMTAgaW4gdGhlc2UgdHdvDQpzdWJzeXN0ZW1zIGlzIGh1Z2Uu
+IEkgc2VlIHR3byBwb3NzaWJsZSB3YXlzIGZvcndhcmQ6DQotIEVpdGhlciB0aGF0IHlvdSBwZXJm
+b3JtIGEgYmlzZWN0IHRvIGlkZW50aWZ5IHRoZSBwYXRjaCB0aGF0IGludHJvZHVjZWQgdGhpcw0K
+ICByZWdyZXNzaW9uLiBIb3dldmVyLCBJJ20gbm90IHN1cmUgd2hldGhlciB5b3UgYXJlIGZhbWls
+aWFyIHdpdGggdGhlIGJpc2VjdA0KICBwcm9jZXNzLg0KLSBPciB0aGF0IHlvdSBpZGVudGlmeSB0
+aGUgY29tbWFuZCB0aGF0IHRyaWdnZXJzIHRoaXMgY3Jhc2ggc3VjaCB0aGF0IG90aGVycw0KICBj
+YW4gcmVwcm9kdWNlIHRoaXMgaXNzdWUgd2l0aG91dCBuZWVkaW5nIGFjY2VzcyB0byB5b3VyIHNl
+dHVwLg0KDQpIb3cgYWJvdXQgcmVwcm9kdWNpbmcgdGhpcyBjcmFzaCB3aXRoIHRoZSBiZWxvdyBw
+YXRjaCBhcHBsaWVkIG9uIHRvcCBvZg0Ka2VybmVsIHY0LjE1Lng/IFRoZSBhZGRpdGlvbmFsIG91
+dHB1dCBzZW50IGJ5IHRoaXMgcGF0Y2ggdG8gdGhlIHN5c3RlbSBsb2cNCnNob3VsZCBhbGxvdyB1
+cyB0byByZXByb2R1Y2UgdGhpcyBpc3N1ZSBieSBzdWJtaXR0aW5nIHRoZSBzYW1lIFNDU0kgY29t
+bWFuZA0Kd2l0aCBzZ19yYXcuDQoNClRoYW5rcywNCg0KQmFydC4NCg0KDQpTdWJqZWN0OiBbUEFU
+Q0hdIFJlcG9ydCBjb21tYW5kcyB3aXRoIG5vIHBoeXNpY2FsIHNlZ21lbnRzIGluIHRoZSBzeXN0
+ZW0gbG9nDQoNCi0tLQ0KIGRyaXZlcnMvc2NzaS9zY3NpX2xpYi5jIHwgNCArKystDQogMSBmaWxl
+IGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KDQpkaWZmIC0tZ2l0IGEv
+ZHJpdmVycy9zY3NpL3Njc2lfbGliLmMgYi9kcml2ZXJzL3Njc2kvc2NzaV9saWIuYw0KaW5kZXgg
+NmI2YTY3MDVmNmU1Li43NGEzOWRiNTdkNDkgMTAwNjQ0DQotLS0gYS9kcml2ZXJzL3Njc2kvc2Nz
+aV9saWIuYw0KKysrIGIvZHJpdmVycy9zY3NpL3Njc2lfbGliLmMNCkBAIC0xMDkzLDggKzEwOTMs
+MTAgQEAgaW50IHNjc2lfaW5pdF9pbyhzdHJ1Y3Qgc2NzaV9jbW5kICpjbWQpDQogCWJvb2wgaXNf
+bXEgPSAocnEtPm1xX2N0eCAhPSBOVUxMKTsNCiAJaW50IGVycm9yID0gQkxLUFJFUF9LSUxMOw0K
+IA0KLQlpZiAoV0FSTl9PTl9PTkNFKCFibGtfcnFfbnJfcGh5c19zZWdtZW50cyhycSkpKQ0KKwlp
+ZiAoV0FSTl9PTl9PTkNFKCFibGtfcnFfbnJfcGh5c19zZWdtZW50cyhycSkpKSB7DQorCQlzY3Np
+X3ByaW50X2NvbW1hbmQoY21kKTsNCiAJCWdvdG8gZXJyX2V4aXQ7DQorCX0NCiANCiAJZXJyb3Ig
+PSBzY3NpX2luaXRfc2d0YWJsZShycSwgJmNtZC0+c2RiKTsNCiAJaWYgKGVycm9yKQ0K
