@@ -1,162 +1,400 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:39034 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932129AbeDWREh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Apr 2018 13:04:37 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        iommu@lists.linux-foundation.org
-Cc: x86@kernel.org, linux-block@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-mm@kvack.org,
-        linux-mips@linux-mips.org, sparclinux@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 01/12] iommu-common: move to arch/sparc
-Date: Mon, 23 Apr 2018 19:04:08 +0200
-Message-Id: <20180423170419.20330-2-hch@lst.de>
-In-Reply-To: <20180423170419.20330-1-hch@lst.de>
-References: <20180423170419.20330-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jglisse@redhat.com>
+From: jglisse@redhat.com
+To: linux-mm@kvack.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	Josef Bacik <jbacik@fb.com>,
+	Mel Gorman <mgorman@techsingularity.net>
+Subject: [RFC PATCH 52/79] fs/buffer: use _page_has_buffers() instead of page_has_buffers()
+Date: Wed,  4 Apr 2018 15:18:16 -0400
+Message-Id: <20180404191831.5378-27-jglisse@redhat.com>
+In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
+References: <20180404191831.5378-1-jglisse@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+List-ID: <linux-block@vger.kernel.org>
 
-This code is only used by sparc, and all new iommu drivers should use the
-drivers/iommu/ framework.  Also remove the unused exports.
+From: Jérôme Glisse <jglisse@redhat.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Anshuman Khandual <khandual@linux.vnet.ibm.com>
+The former need the address_space for which the buffer_head is being
+lookup.
+
+----------------------------------------------------------------------
+@exists@
+identifier M;
+expression E;
+@@
+struct address_space *M;
+...
+-page_buffers(E)
++_page_buffers(E, M)
+
+@exists@
+identifier M, F;
+expression E;
+@@
+F(..., struct address_space *M, ...) {...
+-page_buffers(E)
++_page_buffers(E, M)
+...}
+
+@exists@
+identifier M;
+expression E;
+@@
+struct address_space *M;
+...
+-page_has_buffers(E)
++_page_has_buffers(E, M)
+
+@exists@
+identifier M, F;
+expression E;
+@@
+F(..., struct address_space *M, ...) {...
+-page_has_buffers(E)
++_page_has_buffers(E, M)
+...}
+
+@exists@
+identifier I;
+expression E;
+@@
+struct inode *I;
+...
+-page_buffers(E)
++_page_buffers(E, I->i_mapping)
+
+@exists@
+identifier I, F;
+expression E;
+@@
+F(..., struct inode *I, ...) {...
+-page_buffers(E)
++_page_buffers(E, I->i_mapping)
+...}
+
+@exists@
+identifier I;
+expression E;
+@@
+struct inode *I;
+...
+-page_has_buffers(E)
++_page_has_buffers(E, I->i_mapping)
+
+@exists@
+identifier I, F;
+expression E;
+@@
+F(..., struct inode *I, ...) {...
+-page_has_buffers(E)
++_page_has_buffers(E, I->i_mapping)
+...}
+----------------------------------------------------------------------
+
+Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
+CC: Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-fsdevel@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Josef Bacik <jbacik@fb.com>
+Cc: Mel Gorman <mgorman@techsingularity.net>
 ---
- {include/linux => arch/sparc/include/asm}/iommu-common.h | 0
- arch/sparc/include/asm/iommu_64.h                        | 2 +-
- arch/sparc/kernel/Makefile                               | 2 +-
- {lib => arch/sparc/kernel}/iommu-common.c                | 5 +----
- arch/sparc/kernel/iommu.c                                | 2 +-
- arch/sparc/kernel/ldc.c                                  | 2 +-
- arch/sparc/kernel/pci_sun4v.c                            | 2 +-
- lib/Makefile                                             | 2 +-
- 8 files changed, 7 insertions(+), 10 deletions(-)
- rename {include/linux => arch/sparc/include/asm}/iommu-common.h (100%)
- rename {lib => arch/sparc/kernel}/iommu-common.c (98%)
+ fs/buffer.c | 60 ++++++++++++++++++++++++++++++------------------------------
+ fs/mpage.c  | 14 +++++++-------
+ 2 files changed, 37 insertions(+), 37 deletions(-)
 
-diff --git a/include/linux/iommu-common.h b/arch/sparc/include/asm/iommu-common.h
-similarity index 100%
-rename from include/linux/iommu-common.h
-rename to arch/sparc/include/asm/iommu-common.h
-diff --git a/arch/sparc/include/asm/iommu_64.h b/arch/sparc/include/asm/iommu_64.h
-index 9ed6b54caa4b..0ef6dedf747e 100644
---- a/arch/sparc/include/asm/iommu_64.h
-+++ b/arch/sparc/include/asm/iommu_64.h
-@@ -17,7 +17,7 @@
- #define IOPTE_WRITE   0x0000000000000002UL
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 3c424b7af5af..27b19c629308 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -89,13 +89,13 @@ void buffer_check_dirty_writeback(struct page *page,
  
- #define IOMMU_NUM_CTXS	4096
--#include <linux/iommu-common.h>
-+#include <asm/iommu-common.h>
+ 	BUG_ON(!PageLocked(page));
  
- struct iommu_arena {
- 	unsigned long	*map;
-diff --git a/arch/sparc/kernel/Makefile b/arch/sparc/kernel/Makefile
-index 76cb57750dda..a284662b0e4c 100644
---- a/arch/sparc/kernel/Makefile
-+++ b/arch/sparc/kernel/Makefile
-@@ -59,7 +59,7 @@ obj-$(CONFIG_SPARC32)   += leon_pmc.o
+-	if (!page_has_buffers(page))
++	if (!_page_has_buffers(page, mapping))
+ 		return;
  
- obj-$(CONFIG_SPARC64)   += reboot.o
- obj-$(CONFIG_SPARC64)   += sysfs.o
--obj-$(CONFIG_SPARC64)   += iommu.o
-+obj-$(CONFIG_SPARC64)   += iommu.o iommu-common.o
- obj-$(CONFIG_SPARC64)   += central.o
- obj-$(CONFIG_SPARC64)   += starfire.o
- obj-$(CONFIG_SPARC64)   += power.o
-diff --git a/lib/iommu-common.c b/arch/sparc/kernel/iommu-common.c
-similarity index 98%
-rename from lib/iommu-common.c
-rename to arch/sparc/kernel/iommu-common.c
-index 55b00de106b5..59cb16691322 100644
---- a/lib/iommu-common.c
-+++ b/arch/sparc/kernel/iommu-common.c
-@@ -8,9 +8,9 @@
- #include <linux/bitmap.h>
- #include <linux/bug.h>
- #include <linux/iommu-helper.h>
--#include <linux/iommu-common.h>
- #include <linux/dma-mapping.h>
- #include <linux/hash.h>
-+#include <asm/iommu-common.h>
+ 	if (PageWriteback(page))
+ 		*writeback = true;
  
- static unsigned long iommu_large_alloc = 15;
+-	head = page_buffers(page);
++	head = _page_buffers(page, mapping);
+ 	bh = head;
+ 	do {
+ 		if (buffer_locked(bh))
+@@ -211,9 +211,9 @@ __find_get_block_slow(struct block_device *bdev, sector_t block)
+ 		goto out;
  
-@@ -93,7 +93,6 @@ void iommu_tbl_pool_init(struct iommu_map_table *iommu,
- 	p->hint = p->start;
- 	p->end = num_entries;
+ 	spin_lock(&bd_mapping->private_lock);
+-	if (!page_has_buffers(page))
++	if (!_page_has_buffers(page, bd_mapping))
+ 		goto out_unlock;
+-	head = page_buffers(page);
++	head = _page_buffers(page, bd_mapping);
+ 	bh = head;
+ 	do {
+ 		if (!buffer_mapped(bh))
+@@ -648,8 +648,8 @@ int __set_page_dirty_buffers(struct address_space *mapping,
+ 		return !TestSetPageDirty(page);
+ 
+ 	spin_lock(&mapping->private_lock);
+-	if (page_has_buffers(page)) {
+-		struct buffer_head *head = page_buffers(page);
++	if (_page_has_buffers(page, mapping)) {
++		struct buffer_head *head = _page_buffers(page, mapping);
+ 		struct buffer_head *bh = head;
+ 
+ 		do {
+@@ -913,7 +913,7 @@ static sector_t
+ init_page_buffers(struct address_space *buffer, struct page *page,
+ 		  struct block_device *bdev, sector_t block, int size)
+ {
+-	struct buffer_head *head = page_buffers(page);
++	struct buffer_head *head = _page_buffers(page, buffer);
+ 	struct buffer_head *bh = head;
+ 	int uptodate = PageUptodate(page);
+ 	sector_t end_block = blkdev_max_block(I_BDEV(bdev->bd_inode), size);
+@@ -969,8 +969,8 @@ grow_dev_page(struct block_device *bdev, sector_t block,
+ 
+ 	BUG_ON(!PageLocked(page));
+ 
+-	if (page_has_buffers(page)) {
+-		bh = page_buffers(page);
++	if (_page_has_buffers(page, inode->i_mapping)) {
++		bh = _page_buffers(page, inode->i_mapping);
+ 		if (bh->b_size == size) {
+ 			end_block = init_page_buffers(inode->i_mapping, page,
+ 					bdev, (sector_t)index << sizebits,
+@@ -1490,7 +1490,7 @@ void block_invalidatepage(struct address_space *mapping, struct page *page,
+ 	unsigned int stop = length + offset;
+ 
+ 	BUG_ON(!PageLocked(page));
+-	if (!page_has_buffers(page))
++	if (!_page_has_buffers(page, mapping))
+ 		goto out;
+ 
+ 	/*
+@@ -1498,7 +1498,7 @@ void block_invalidatepage(struct address_space *mapping, struct page *page,
+ 	 */
+ 	BUG_ON(stop > PAGE_SIZE || stop < length);
+ 
+-	head = page_buffers(page);
++	head = _page_buffers(page, mapping);
+ 	bh = head;
+ 	do {
+ 		unsigned int next_off = curr_off + bh->b_size;
+@@ -1605,7 +1605,7 @@ void clean_bdev_aliases(struct block_device *bdev, sector_t block, sector_t len)
+ 		for (i = 0; i < count; i++) {
+ 			struct page *page = pvec.pages[i];
+ 
+-			if (!page_has_buffers(page))
++			if (!_page_has_buffers(page, bd_mapping))
+ 				continue;
+ 			/*
+ 			 * We use page lock instead of bd_mapping->private_lock
+@@ -1614,9 +1614,9 @@ void clean_bdev_aliases(struct block_device *bdev, sector_t block, sector_t len)
+ 			 */
+ 			lock_page(page);
+ 			/* Recheck when the page is locked which pins bhs */
+-			if (!page_has_buffers(page))
++			if (!_page_has_buffers(page, bd_inode->i_mapping))
+ 				goto unlock_page;
+-			head = page_buffers(page);
++			head = _page_buffers(page, bd_mapping);
+ 			bh = head;
+ 			do {
+ 				if (!buffer_mapped(bh) || (bh->b_blocknr < block))
+@@ -1658,11 +1658,11 @@ static struct buffer_head *create_page_buffers(struct page *page, struct inode *
+ {
+ 	BUG_ON(!PageLocked(page));
+ 
+-	if (!page_has_buffers(page))
++	if (!_page_has_buffers(page, inode->i_mapping))
+ 		create_empty_buffers(inode->i_mapping, page,
+ 				     1 << READ_ONCE(inode->i_blkbits),
+ 				     b_state);
+-	return page_buffers(page);
++	return _page_buffers(page, inode->i_mapping);
  }
--EXPORT_SYMBOL(iommu_tbl_pool_init);
  
- unsigned long iommu_tbl_range_alloc(struct device *dev,
- 				struct iommu_map_table *iommu,
-@@ -224,7 +223,6 @@ unsigned long iommu_tbl_range_alloc(struct device *dev,
+ /*
+@@ -1870,10 +1870,10 @@ void page_zero_new_buffers(struct address_space *buffer, struct page *page,
+ 	struct buffer_head *head, *bh;
  
- 	return n;
- }
--EXPORT_SYMBOL(iommu_tbl_range_alloc);
+ 	BUG_ON(!PageLocked(page));
+-	if (!page_has_buffers(page))
++	if (!_page_has_buffers(page, buffer))
+ 		return;
  
- static struct iommu_pool *get_pool(struct iommu_map_table *tbl,
- 				   unsigned long entry)
-@@ -264,4 +262,3 @@ void iommu_tbl_range_free(struct iommu_map_table *iommu, u64 dma_addr,
- 	bitmap_clear(iommu->map, entry, npages);
- 	spin_unlock_irqrestore(&(pool->lock), flags);
- }
--EXPORT_SYMBOL(iommu_tbl_range_free);
-diff --git a/arch/sparc/kernel/iommu.c b/arch/sparc/kernel/iommu.c
-index b08dc3416f06..40d008b0bd3e 100644
---- a/arch/sparc/kernel/iommu.c
-+++ b/arch/sparc/kernel/iommu.c
-@@ -14,7 +14,7 @@
- #include <linux/errno.h>
- #include <linux/iommu-helper.h>
- #include <linux/bitmap.h>
--#include <linux/iommu-common.h>
-+#include <asm/iommu-common.h>
+-	bh = head = page_buffers(page);
++	bh = head = _page_buffers(page, buffer);
+ 	block_start = 0;
+ 	do {
+ 		block_end = block_start + bh->b_size;
+@@ -2057,7 +2057,7 @@ static int __block_commit_write(struct inode *inode, struct page *page,
+ 	unsigned blocksize;
+ 	struct buffer_head *bh, *head;
  
- #ifdef CONFIG_PCI
- #include <linux/pci.h>
-diff --git a/arch/sparc/kernel/ldc.c b/arch/sparc/kernel/ldc.c
-index 86b625f9d8dc..c0fa3ef6cf01 100644
---- a/arch/sparc/kernel/ldc.c
-+++ b/arch/sparc/kernel/ldc.c
-@@ -16,7 +16,7 @@
- #include <linux/list.h>
- #include <linux/init.h>
- #include <linux/bitmap.h>
--#include <linux/iommu-common.h>
-+#include <asm/iommu-common.h>
+-	bh = head = page_buffers(page);
++	bh = head = _page_buffers(page, inode->i_mapping);
+ 	blocksize = bh->b_size;
  
- #include <asm/hypervisor.h>
- #include <asm/iommu.h>
-diff --git a/arch/sparc/kernel/pci_sun4v.c b/arch/sparc/kernel/pci_sun4v.c
-index 249367228c33..565d9ac883d0 100644
---- a/arch/sparc/kernel/pci_sun4v.c
-+++ b/arch/sparc/kernel/pci_sun4v.c
-@@ -16,7 +16,7 @@
- #include <linux/export.h>
- #include <linux/log2.h>
- #include <linux/of_device.h>
--#include <linux/iommu-common.h>
-+#include <asm/iommu-common.h>
+ 	block_start = 0;
+@@ -2209,10 +2209,10 @@ int block_is_partially_uptodate(struct page *page,
+ 	struct buffer_head *bh, *head;
+ 	int ret = 1;
  
- #include <asm/iommu.h>
- #include <asm/irq.h>
-diff --git a/lib/Makefile b/lib/Makefile
-index ce20696d5a92..94203b5eecd4 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -147,7 +147,7 @@ obj-$(CONFIG_AUDIT_GENERIC) += audit.o
- obj-$(CONFIG_AUDIT_COMPAT_GENERIC) += compat_audit.o
+-	if (!page_has_buffers(page))
++	if (!_page_has_buffers(page, mapping))
+ 		return 0;
  
- obj-$(CONFIG_SWIOTLB) += swiotlb.o
--obj-$(CONFIG_IOMMU_HELPER) += iommu-helper.o iommu-common.o
-+obj-$(CONFIG_IOMMU_HELPER) += iommu-helper.o
- obj-$(CONFIG_FAULT_INJECTION) += fault-inject.o
- obj-$(CONFIG_NOTIFIER_ERROR_INJECTION) += notifier-error-inject.o
- obj-$(CONFIG_PM_NOTIFIER_ERROR_INJECT) += pm-notifier-error-inject.o
+-	head = page_buffers(page);
++	head = _page_buffers(page, mapping);
+ 	blocksize = head->b_size;
+ 	to = min_t(unsigned, PAGE_SIZE - from, count);
+ 	to = from + to;
+@@ -2596,7 +2596,7 @@ int nobh_write_begin(struct address_space *mapping,
+ 	*pagep = page;
+ 	*fsdata = NULL;
+ 
+-	if (page_has_buffers(page)) {
++	if (_page_has_buffers(page, mapping)) {
+ 		ret = __block_write_begin(mapping, page, pos, len, get_block);
+ 		if (unlikely(ret))
+ 			goto out_release;
+@@ -2715,7 +2715,7 @@ int nobh_write_end(struct file *file, struct address_space *mapping,
+ 	struct inode *inode = mapping->host;
+ 	struct buffer_head *head = fsdata;
+ 	struct buffer_head *bh;
+-	BUG_ON(fsdata != NULL && page_has_buffers(page));
++	BUG_ON(fsdata != NULL && _page_has_buffers(page, inode->i_mapping));
+ 
+ 	if (unlikely(copied < len) && head)
+ 		attach_nobh_buffers(mapping, page, head);
+@@ -2822,7 +2822,7 @@ int nobh_truncate_page(struct address_space *mapping,
+ 	if (!page)
+ 		goto out;
+ 
+-	if (page_has_buffers(page)) {
++	if (_page_has_buffers(page, mapping)) {
+ has_buffers:
+ 		unlock_page(page);
+ 		put_page(page);
+@@ -2857,7 +2857,7 @@ int nobh_truncate_page(struct address_space *mapping,
+ 			err = -EIO;
+ 			goto unlock;
+ 		}
+-		if (page_has_buffers(page))
++		if (_page_has_buffers(page, inode->i_mapping))
+ 			goto has_buffers;
+ 	}
+ 	zero_user(page, offset, length);
+@@ -2900,11 +2900,11 @@ int block_truncate_page(struct address_space *mapping,
+ 	if (!page)
+ 		goto out;
+ 
+-	if (!page_has_buffers(page))
++	if (!_page_has_buffers(page, mapping))
+ 		create_empty_buffers(mapping, page, blocksize, 0);
+ 
+ 	/* Find the buffer that contains "offset" */
+-	bh = page_buffers(page);
++	bh = _page_buffers(page, mapping);
+ 	pos = blocksize;
+ 	while (offset >= pos) {
+ 		bh = bh->b_this_page;
+@@ -3260,7 +3260,7 @@ static int
+ drop_buffers(struct address_space *mapping, struct page *page,
+ 	     struct buffer_head **buffers_to_free)
+ {
+-	struct buffer_head *head = page_buffers(page);
++	struct buffer_head *head = _page_buffers(page, mapping);
+ 	struct buffer_head *bh;
+ 
+ 	bh = head;
+@@ -3491,7 +3491,7 @@ page_seek_hole_data(struct address_space *mapping, struct page *page,
+ 	if (lastoff < offset)
+ 		lastoff = offset;
+ 
+-	bh = head = page_buffers(page);
++	bh = head = _page_buffers(page, mapping);
+ 	do {
+ 		offset += bh->b_size;
+ 		if (lastoff >= offset)
+@@ -3563,7 +3563,7 @@ page_cache_seek_hole_data(struct inode *inode, loff_t offset, loff_t length,
+ 
+ 			lock_page(page);
+ 			if (likely(!page_is_truncated(page, inode->i_mapping)) &&
+-			    page_has_buffers(page)) {
++			    _page_has_buffers(page, inode->i_mapping)) {
+ 				lastoff = page_seek_hole_data(inode->i_mapping,
+ 							page, lastoff, whence);
+ 				if (lastoff >= 0) {
+diff --git a/fs/mpage.c b/fs/mpage.c
+index ecdef63f464e..8141010b9f4c 100644
+--- a/fs/mpage.c
++++ b/fs/mpage.c
+@@ -107,7 +107,7 @@ map_buffer_to_page(struct inode *inode, struct page *page,
+ 	struct buffer_head *page_bh, *head;
+ 	int block = 0;
+ 
+-	if (!page_has_buffers(page)) {
++	if (!_page_has_buffers(page, inode->i_mapping)) {
+ 		/*
+ 		 * don't make any buffers if there is only one buffer on
+ 		 * the page and the page just needs to be set up to date
+@@ -120,7 +120,7 @@ map_buffer_to_page(struct inode *inode, struct page *page,
+ 		create_empty_buffers(inode->i_mapping, page,
+ 				     i_blocksize(inode), 0);
+ 	}
+-	head = page_buffers(page);
++	head = _page_buffers(page, inode->i_mapping);
+ 	page_bh = head;
+ 	do {
+ 		if (block == page_block) {
+@@ -166,7 +166,7 @@ do_mpage_readpage(struct bio *bio, struct address_space *mapping,
+ 	unsigned nblocks;
+ 	unsigned relative_block;
+ 
+-	if (page_has_buffers(page))
++	if (_page_has_buffers(page, mapping))
+ 		goto confused;
+ 
+ 	block_in_file = (sector_t)page->index << (PAGE_SHIFT - blkbits);
+@@ -453,9 +453,9 @@ static void clean_buffers(struct address_space *mapping, struct page *page,
+ {
+ 	unsigned buffer_counter = 0;
+ 	struct buffer_head *bh, *head;
+-	if (!page_has_buffers(page))
++	if (!_page_has_buffers(page, mapping))
+ 		return;
+-	head = page_buffers(page);
++	head = _page_buffers(page, mapping);
+ 	bh = head;
+ 
+ 	do {
+@@ -508,8 +508,8 @@ static int __mpage_writepage(struct page *page, struct address_space *mapping,
+ 	int ret = 0;
+ 	int op_flags = wbc_to_write_flags(wbc);
+ 
+-	if (page_has_buffers(page)) {
+-		struct buffer_head *head = page_buffers(page);
++	if (_page_has_buffers(page, mapping)) {
++		struct buffer_head *head = _page_buffers(page, mapping);
+ 		struct buffer_head *bh = head;
+ 
+ 		/* If they're all mapped and dirty, do it */
 -- 
-2.17.0
+2.14.3
