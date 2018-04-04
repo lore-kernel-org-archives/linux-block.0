@@ -1,302 +1,317 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from newton.telenet-ops.be ([195.130.132.45]:59180 "EHLO
-        newton.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752684AbeDQRuM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 Apr 2018 13:50:12 -0400
-Received: from michel.telenet-ops.be (michel.telenet-ops.be [IPv6:2a02:1800:110:4::f00:18])
-        by newton.telenet-ops.be (Postfix) with ESMTPS id 40QXpB5SlGzMr6tb
-        for <linux-block@vger.kernel.org>; Tue, 17 Apr 2018 19:50:10 +0200 (CEST)
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-To: Christoph Hellwig <hch@lst.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Felipe Balbi <balbi@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mark Brown <broonie@kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Alan Tull <atull@kernel.org>, Moritz Fischer <mdf@kernel.org>,
-        Wolfram Sang <wsa@the-dreams.de>,
-        Jonathan Cameron <jic23@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Matias Bjorling <mb@lightnvm.io>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        Marek Vasut <marek.vasut@gmail.com>,
-        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
-        Boris Brezillon <boris.brezillon@free-electrons.com>,
-        Richard Weinberger <richard@nod.at>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Eric Anholt <eric@anholt.net>,
-        Stefan Wahren <stefan.wahren@i2se.com>
-Cc: iommu@lists.linux-foundation.org, linux-usb@vger.kernel.org,
-        alsa-devel@alsa-project.org, linux-ide@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux1394-devel@lists.sourceforge.net, linux-fpga@vger.kernel.org,
-        linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
-        netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
-        devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH v3 15/20] net: Remove depends on HAS_DMA in case of platform dependency
-Date: Tue, 17 Apr 2018 19:49:15 +0200
-Message-Id: <1523987360-18760-16-git-send-email-geert@linux-m68k.org>
-In-Reply-To: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
-References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: jglisse@redhat.com
+To: linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>
+Subject: [RFC PATCH 78/79] mm/ksm: rename PAGE_MAPPING_KSM to PAGE_MAPPING_RONLY
+Date: Wed,  4 Apr 2018 15:18:30 -0400
+Message-Id: <20180404191831.5378-41-jglisse@redhat.com>
+In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
+References: <20180404191831.5378-1-jglisse@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
-symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
-In most cases this other symbol is an architecture or platform specific
-symbol, or PCI.
+From: Jérôme Glisse <jglisse@redhat.com>
 
-Generic symbols and drivers without platform dependencies keep their
-dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
-cannot work anyway.
+This just rename all KSM specific helper to generic page read only
+name. No functional change.
 
-This simplifies the dependencies, and allows to improve compile-testing.
-
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Reviewed-by: Mark Brown <broonie@kernel.org>
-Acked-by: Robin Murphy <robin.murphy@arm.com>
+Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
+Cc: Andrea Arcangeli <aarcange@redhat.com>
 ---
-v3:
-  - Rebase to v4.17-rc1,
-  - Drop obsolete note about FSL_FMAN,
+ fs/proc/page.c             |  2 +-
+ include/linux/page-flags.h | 30 +++++++++++++++++-------------
+ mm/ksm.c                   | 12 ++++++------
+ mm/memory-failure.c        |  2 +-
+ mm/memory.c                |  2 +-
+ mm/migrate.c               |  6 +++---
+ mm/mprotect.c              |  2 +-
+ mm/page_idle.c             |  2 +-
+ mm/rmap.c                  | 10 +++++-----
+ mm/swapfile.c              |  2 +-
+ 10 files changed, 37 insertions(+), 33 deletions(-)
 
-v2:
-  - Add Reviewed-by, Acked-by,
-  - Drop RFC state,
-  - Split per subsystem.
----
- drivers/net/ethernet/amd/Kconfig                | 2 +-
- drivers/net/ethernet/apm/xgene-v2/Kconfig       | 1 -
- drivers/net/ethernet/apm/xgene/Kconfig          | 1 -
- drivers/net/ethernet/arc/Kconfig                | 6 ++++--
- drivers/net/ethernet/broadcom/Kconfig           | 2 --
- drivers/net/ethernet/calxeda/Kconfig            | 2 +-
- drivers/net/ethernet/hisilicon/Kconfig          | 2 +-
- drivers/net/ethernet/marvell/Kconfig            | 8 +++-----
- drivers/net/ethernet/mellanox/mlxsw/Kconfig     | 2 +-
- drivers/net/ethernet/renesas/Kconfig            | 2 --
- drivers/net/wireless/broadcom/brcm80211/Kconfig | 1 -
- drivers/net/wireless/quantenna/qtnfmac/Kconfig  | 2 +-
- 12 files changed, 12 insertions(+), 19 deletions(-)
-
-diff --git a/drivers/net/ethernet/amd/Kconfig b/drivers/net/ethernet/amd/Kconfig
-index d5c15e8bb3de706b..f273af136fc7c995 100644
---- a/drivers/net/ethernet/amd/Kconfig
-+++ b/drivers/net/ethernet/amd/Kconfig
-@@ -173,7 +173,7 @@ config SUNLANCE
+diff --git a/fs/proc/page.c b/fs/proc/page.c
+index 1491918a33c3..00cc037758ef 100644
+--- a/fs/proc/page.c
++++ b/fs/proc/page.c
+@@ -110,7 +110,7 @@ u64 stable_page_flags(struct page *page)
+ 		u |= 1 << KPF_MMAP;
+ 	if (PageAnon(page))
+ 		u |= 1 << KPF_ANON;
+-	if (PageKsm(page))
++	if (PageReadOnly(page))
+ 		u |= 1 << KPF_KSM;
  
- config AMD_XGBE
- 	tristate "AMD 10GbE Ethernet driver"
--	depends on ((OF_NET && OF_ADDRESS) || ACPI || PCI) && HAS_IOMEM && HAS_DMA
-+	depends on ((OF_NET && OF_ADDRESS) || ACPI || PCI) && HAS_IOMEM
- 	depends on X86 || ARM64 || COMPILE_TEST
- 	select BITREVERSE
- 	select CRC32
-diff --git a/drivers/net/ethernet/apm/xgene-v2/Kconfig b/drivers/net/ethernet/apm/xgene-v2/Kconfig
-index 1205861b631896a0..eedd3f3dd22e2201 100644
---- a/drivers/net/ethernet/apm/xgene-v2/Kconfig
-+++ b/drivers/net/ethernet/apm/xgene-v2/Kconfig
-@@ -1,6 +1,5 @@
- config NET_XGENE_V2
- 	tristate "APM X-Gene SoC Ethernet-v2 Driver"
--	depends on HAS_DMA
- 	depends on ARCH_XGENE || COMPILE_TEST
- 	help
- 	  This is the Ethernet driver for the on-chip ethernet interface
-diff --git a/drivers/net/ethernet/apm/xgene/Kconfig b/drivers/net/ethernet/apm/xgene/Kconfig
-index afccb033177b3923..e4e33c900b577161 100644
---- a/drivers/net/ethernet/apm/xgene/Kconfig
-+++ b/drivers/net/ethernet/apm/xgene/Kconfig
-@@ -1,6 +1,5 @@
- config NET_XGENE
- 	tristate "APM X-Gene SoC Ethernet Driver"
--	depends on HAS_DMA
- 	depends on ARCH_XGENE || COMPILE_TEST
- 	select PHYLIB
- 	select MDIO_XGENE
-diff --git a/drivers/net/ethernet/arc/Kconfig b/drivers/net/ethernet/arc/Kconfig
-index e743ddf46343302f..5d0ab8e74b680cc6 100644
---- a/drivers/net/ethernet/arc/Kconfig
-+++ b/drivers/net/ethernet/arc/Kconfig
-@@ -24,7 +24,8 @@ config ARC_EMAC_CORE
- config ARC_EMAC
- 	tristate "ARC EMAC support"
- 	select ARC_EMAC_CORE
--	depends on OF_IRQ && OF_NET && HAS_DMA && (ARC || COMPILE_TEST)
-+	depends on OF_IRQ && OF_NET
-+	depends on ARC || COMPILE_TEST
- 	---help---
- 	  On some legacy ARC (Synopsys) FPGA boards such as ARCAngel4/ML50x
- 	  non-standard on-chip ethernet device ARC EMAC 10/100 is used.
-@@ -33,7 +34,8 @@ config ARC_EMAC
- config EMAC_ROCKCHIP
- 	tristate "Rockchip EMAC support"
- 	select ARC_EMAC_CORE
--	depends on OF_IRQ && OF_NET && REGULATOR && HAS_DMA && (ARCH_ROCKCHIP || COMPILE_TEST)
-+	depends on OF_IRQ && OF_NET && REGULATOR
-+	depends on ARCH_ROCKCHIP || COMPILE_TEST
- 	---help---
- 	  Support for Rockchip RK3036/RK3066/RK3188 EMAC ethernet controllers.
- 	  This selects Rockchip SoC glue layer support for the
-diff --git a/drivers/net/ethernet/broadcom/Kconfig b/drivers/net/ethernet/broadcom/Kconfig
-index af75156919edfead..4c3bfde6e8de00f2 100644
---- a/drivers/net/ethernet/broadcom/Kconfig
-+++ b/drivers/net/ethernet/broadcom/Kconfig
-@@ -157,7 +157,6 @@ config BGMAC
- config BGMAC_BCMA
- 	tristate "Broadcom iProc GBit BCMA support"
- 	depends on BCMA && BCMA_HOST_SOC
--	depends on HAS_DMA
- 	depends on BCM47XX || ARCH_BCM_5301X || COMPILE_TEST
- 	select BGMAC
- 	select PHYLIB
-@@ -170,7 +169,6 @@ config BGMAC_BCMA
+ 	/*
+diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+index 50c2b8786831..0338fb5dde8d 100644
+--- a/include/linux/page-flags.h
++++ b/include/linux/page-flags.h
+@@ -374,12 +374,12 @@ PAGEFLAG(Idle, idle, PF_ANY)
+  * page->mapping points to its anon_vma, not to a struct address_space;
+  * with the PAGE_MAPPING_ANON bit set to distinguish it.  See rmap.h.
+  *
+- * On an anonymous page in a VM_MERGEABLE area, if CONFIG_KSM is enabled,
++ * On an anonymous page in a VM_MERGEABLE area, if CONFIG_RONLY is enabled,
+  * the PAGE_MAPPING_MOVABLE bit may be set along with the PAGE_MAPPING_ANON
+  * bit; and then page->mapping points, not to an anon_vma, but to a private
+- * structure which KSM associates with that merged page.  See ksm.h.
++ * structure which RONLY associates with that merged page.  See page-ronly.h.
+  *
+- * PAGE_MAPPING_KSM without PAGE_MAPPING_ANON is used for non-lru movable
++ * PAGE_MAPPING_RONLY without PAGE_MAPPING_ANON is used for non-lru movable
+  * page and then page->mapping points a struct address_space.
+  *
+  * Please note that, confusingly, "page_mapping" refers to the inode
+@@ -388,7 +388,7 @@ PAGEFLAG(Idle, idle, PF_ANY)
+  */
+ #define PAGE_MAPPING_ANON	0x1
+ #define PAGE_MAPPING_MOVABLE	0x2
+-#define PAGE_MAPPING_KSM	(PAGE_MAPPING_ANON | PAGE_MAPPING_MOVABLE)
++#define PAGE_MAPPING_RONLY	(PAGE_MAPPING_ANON | PAGE_MAPPING_MOVABLE)
+ #define PAGE_MAPPING_FLAGS	(PAGE_MAPPING_ANON | PAGE_MAPPING_MOVABLE)
  
- config BGMAC_PLATFORM
- 	tristate "Broadcom iProc GBit platform support"
--	depends on HAS_DMA
- 	depends on ARCH_BCM_IPROC || COMPILE_TEST
- 	depends on OF
- 	select BGMAC
-diff --git a/drivers/net/ethernet/calxeda/Kconfig b/drivers/net/ethernet/calxeda/Kconfig
-index 07d2201530d26c85..9fdd496b90ff47cb 100644
---- a/drivers/net/ethernet/calxeda/Kconfig
-+++ b/drivers/net/ethernet/calxeda/Kconfig
-@@ -1,6 +1,6 @@
- config NET_CALXEDA_XGMAC
- 	tristate "Calxeda 1G/10G XGMAC Ethernet driver"
--	depends on HAS_IOMEM && HAS_DMA
-+	depends on HAS_IOMEM
- 	depends on ARCH_HIGHBANK || COMPILE_TEST
- 	select CRC32
- 	help
-diff --git a/drivers/net/ethernet/hisilicon/Kconfig b/drivers/net/ethernet/hisilicon/Kconfig
-index 8bcf470ff5f38a4e..fb1a7251f45d3369 100644
---- a/drivers/net/ethernet/hisilicon/Kconfig
-+++ b/drivers/net/ethernet/hisilicon/Kconfig
-@@ -5,7 +5,7 @@
- config NET_VENDOR_HISILICON
- 	bool "Hisilicon devices"
- 	default y
--	depends on (OF || ACPI) && HAS_DMA
-+	depends on OF || ACPI
- 	depends on ARM || ARM64 || COMPILE_TEST
- 	---help---
- 	  If you have a network (Ethernet) card belonging to this class, say Y.
-diff --git a/drivers/net/ethernet/marvell/Kconfig b/drivers/net/ethernet/marvell/Kconfig
-index ebe5c91489355c9e..0704a1900bbca444 100644
---- a/drivers/net/ethernet/marvell/Kconfig
-+++ b/drivers/net/ethernet/marvell/Kconfig
-@@ -18,8 +18,8 @@ if NET_VENDOR_MARVELL
+ static __always_inline int PageMappingFlags(struct page *page)
+@@ -408,21 +408,25 @@ static __always_inline int __PageMovable(struct page *page)
+ 				PAGE_MAPPING_MOVABLE;
+ }
  
- config MV643XX_ETH
- 	tristate "Marvell Discovery (643XX) and Orion ethernet support"
--	depends on (MV64X60 || PPC32 || PLAT_ORION || COMPILE_TEST) && INET
--	depends on HAS_DMA
-+	depends on MV64X60 || PPC32 || PLAT_ORION || COMPILE_TEST
-+	depends on INET
- 	select PHYLIB
- 	select MVMDIO
- 	---help---
-@@ -58,7 +58,6 @@ config MVNETA_BM_ENABLE
- config MVNETA
- 	tristate "Marvell Armada 370/38x/XP/37xx network interface support"
- 	depends on ARCH_MVEBU || COMPILE_TEST
--	depends on HAS_DMA
- 	select MVMDIO
- 	select PHYLINK
- 	---help---
-@@ -84,7 +83,6 @@ config MVNETA_BM
- config MVPP2
- 	tristate "Marvell Armada 375/7K/8K network interface support"
- 	depends on ARCH_MVEBU || COMPILE_TEST
--	depends on HAS_DMA
- 	select MVMDIO
- 	---help---
- 	  This driver supports the network interface units in the
-@@ -92,7 +90,7 @@ config MVPP2
+-#ifdef CONFIG_KSM
+-/*
+- * A KSM page is one of those write-protected "shared pages" or "merged pages"
+- * which KSM maps into multiple mms, wherever identical anonymous page content
+- * is found in VM_MERGEABLE vmas.  It's a PageAnon page, pointing not to any
+- * anon_vma, but to that page's node of the stable tree.
++#ifdef CONFIG_PAGE_RONLY
++/* PageReadOnly() - Returns true if page is read only, false otherwise.
++ *
++ * @page: Page under test.
++ *
++ * A read only page is one of those write-protected. Currently only KSM does
++ * write protect a page as "shared pages" or "merged pages"  which KSM maps
++ * into multiple mms, wherever identical anonymous page content is found in
++ * VM_MERGEABLE vmas.  It's a PageAnon page, pointing not to any anon_vma,
++ * but to that page's node of the stable tree.
+  */
+-static __always_inline int PageKsm(struct page *page)
++static __always_inline int PageReadOnly(struct page *page)
+ {
+ 	page = compound_head(page);
+ 	return ((unsigned long)page->mapping & PAGE_MAPPING_FLAGS) ==
+-				PAGE_MAPPING_KSM;
++				PAGE_MAPPING_RONLY;
+ }
+ #else
+-TESTPAGEFLAG_FALSE(Ksm)
++TESTPAGEFLAG_FALSE(ReadOnly)
+ #endif
  
- config PXA168_ETH
- 	tristate "Marvell pxa168 ethernet support"
--	depends on HAS_IOMEM && HAS_DMA
-+	depends on HAS_IOMEM
- 	depends on CPU_PXA168 || ARCH_BERLIN || COMPILE_TEST
- 	select PHYLIB
- 	---help---
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/Kconfig b/drivers/net/ethernet/mellanox/mlxsw/Kconfig
-index f4d9c9975ac3d857..82827a8d3d67cac7 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/Kconfig
-+++ b/drivers/net/ethernet/mellanox/mlxsw/Kconfig
-@@ -30,7 +30,7 @@ config MLXSW_CORE_THERMAL
+ u64 stable_page_flags(struct page *page);
+diff --git a/mm/ksm.c b/mm/ksm.c
+index f9bd1251c288..6085068fb8b3 100644
+--- a/mm/ksm.c
++++ b/mm/ksm.c
+@@ -318,13 +318,13 @@ static void __init ksm_slab_free(void)
  
- config MLXSW_PCI
- 	tristate "PCI bus implementation for Mellanox Technologies Switch ASICs"
--	depends on PCI && HAS_DMA && HAS_IOMEM && MLXSW_CORE
-+	depends on PCI && HAS_IOMEM && MLXSW_CORE
- 	default m
- 	---help---
- 	  This is PCI bus implementation for Mellanox Technologies Switch ASICs.
-diff --git a/drivers/net/ethernet/renesas/Kconfig b/drivers/net/ethernet/renesas/Kconfig
-index 27be51f0a421b43e..f3f7477043ce1061 100644
---- a/drivers/net/ethernet/renesas/Kconfig
-+++ b/drivers/net/ethernet/renesas/Kconfig
-@@ -17,7 +17,6 @@ if NET_VENDOR_RENESAS
+ static inline struct stable_node *page_stable_node(struct page *page)
+ {
+-	return PageKsm(page) ? page_rmapping(page) : NULL;
++	return PageReadOnly(page) ? page_rmapping(page) : NULL;
+ }
  
- config SH_ETH
- 	tristate "Renesas SuperH Ethernet support"
--	depends on HAS_DMA
- 	depends on ARCH_RENESAS || SUPERH || COMPILE_TEST
- 	select CRC32
- 	select MII
-@@ -31,7 +30,6 @@ config SH_ETH
+ static inline void set_page_stable_node(struct page *page,
+ 					struct stable_node *stable_node)
+ {
+-	page->mapping = (void *)((unsigned long)stable_node | PAGE_MAPPING_KSM);
++	page->mapping = (void *)((unsigned long)stable_node | PAGE_MAPPING_RONLY);
+ }
  
- config RAVB
- 	tristate "Renesas Ethernet AVB support"
--	depends on HAS_DMA
- 	depends on ARCH_RENESAS || COMPILE_TEST
- 	select CRC32
- 	select MII
-diff --git a/drivers/net/wireless/broadcom/brcm80211/Kconfig b/drivers/net/wireless/broadcom/brcm80211/Kconfig
-index 9d99eb42d9176f0f..6acba67bca07abd7 100644
---- a/drivers/net/wireless/broadcom/brcm80211/Kconfig
-+++ b/drivers/net/wireless/broadcom/brcm80211/Kconfig
-@@ -60,7 +60,6 @@ config BRCMFMAC_PCIE
- 	bool "PCIE bus interface support for FullMAC driver"
- 	depends on BRCMFMAC
- 	depends on PCI
--	depends on HAS_DMA
- 	select BRCMFMAC_PROTO_MSGBUF
- 	select FW_LOADER
- 	---help---
-diff --git a/drivers/net/wireless/quantenna/qtnfmac/Kconfig b/drivers/net/wireless/quantenna/qtnfmac/Kconfig
-index 025fa6018550895a..8d1492a90bd135c0 100644
---- a/drivers/net/wireless/quantenna/qtnfmac/Kconfig
-+++ b/drivers/net/wireless/quantenna/qtnfmac/Kconfig
-@@ -7,7 +7,7 @@ config QTNFMAC
- config QTNFMAC_PEARL_PCIE
- 	tristate "Quantenna QSR10g PCIe support"
- 	default n
--	depends on HAS_DMA && PCI && CFG80211
-+	depends on PCI && CFG80211
- 	select QTNFMAC
- 	select FW_LOADER
- 	select CRC32
+ static __always_inline bool is_stable_node_chain(struct stable_node *chain)
+@@ -470,7 +470,7 @@ static int break_ksm(struct vm_area_struct *vma, unsigned long addr)
+ 				FOLL_GET | FOLL_MIGRATION | FOLL_REMOTE);
+ 		if (IS_ERR_OR_NULL(page))
+ 			break;
+-		if (PageKsm(page))
++		if (PageReadOnly(page))
+ 			ret = handle_mm_fault(vma, addr,
+ 					FAULT_FLAG_WRITE | FAULT_FLAG_REMOTE);
+ 		else
+@@ -684,7 +684,7 @@ static struct page *get_ksm_page(struct stable_node *stable_node, bool lock_it)
+ 	unsigned long kpfn;
+ 
+ 	expected_mapping = (void *)((unsigned long)stable_node |
+-					PAGE_MAPPING_KSM);
++					PAGE_MAPPING_RONLY);
+ again:
+ 	kpfn = READ_ONCE(stable_node->kpfn); /* Address dependency. */
+ 	page = pfn_to_page(kpfn);
+@@ -2490,7 +2490,7 @@ struct page *ksm_might_need_to_copy(struct page *page,
+ 	struct anon_vma *anon_vma = page_anon_vma(page);
+ 	struct page *new_page;
+ 
+-	if (PageKsm(page)) {
++	if (PageReadOnly(page)) {
+ 		if (page_stable_node(page) &&
+ 		    !(ksm_run & KSM_RUN_UNMERGE))
+ 			return page;	/* no need to copy it */
+@@ -2521,7 +2521,7 @@ void rmap_walk_ksm(struct page *page, struct rmap_walk_control *rwc)
+ 	struct rmap_item *rmap_item;
+ 	int search_new_forks = 0;
+ 
+-	VM_BUG_ON_PAGE(!PageKsm(page), page);
++	VM_BUG_ON_PAGE(!PageReadOnly(page), page);
+ 
+ 	/*
+ 	 * Rely on the page lock to protect against concurrent modifications
+diff --git a/mm/memory-failure.c b/mm/memory-failure.c
+index 8291b75f42c8..18efefc20e67 100644
+--- a/mm/memory-failure.c
++++ b/mm/memory-failure.c
+@@ -947,7 +947,7 @@ static bool hwpoison_user_mappings(struct page *p, unsigned long pfn,
+ 	if (!page_mapped(hpage))
+ 		return true;
+ 
+-	if (PageKsm(p)) {
++	if (PageReadOnly(p)) {
+ 		pr_err("Memory failure: %#lx: can't handle KSM pages.\n", pfn);
+ 		return false;
+ 	}
+diff --git a/mm/memory.c b/mm/memory.c
+index fbd80bb7a50a..b565db41400f 100644
+--- a/mm/memory.c
++++ b/mm/memory.c
+@@ -2733,7 +2733,7 @@ static int do_wp_page(struct vm_fault *vmf)
+ 	 * Take out anonymous pages first, anonymous shared vmas are
+ 	 * not dirty accountable.
+ 	 */
+-	if (PageAnon(vmf->page) && !PageKsm(vmf->page)) {
++	if (PageAnon(vmf->page) && !PageReadOnly(vmf->page)) {
+ 		int total_map_swapcount;
+ 		if (!trylock_page(vmf->page)) {
+ 			get_page(vmf->page);
+diff --git a/mm/migrate.c b/mm/migrate.c
+index e4b20ac6cf36..b73b31f6d2fd 100644
+--- a/mm/migrate.c
++++ b/mm/migrate.c
+@@ -214,7 +214,7 @@ static bool remove_migration_pte(struct page *page, struct vm_area_struct *vma,
+ 
+ 	VM_BUG_ON_PAGE(PageTail(page), page);
+ 	while (page_vma_mapped_walk(&pvmw)) {
+-		if (PageKsm(page))
++		if (PageReadOnly(page))
+ 			new = page;
+ 		else
+ 			new = page - pvmw.page->index +
+@@ -1038,7 +1038,7 @@ static int __unmap_and_move(struct page *page, struct page *newpage,
+ 	 * because that implies that the anon page is no longer mapped
+ 	 * (and cannot be remapped so long as we hold the page lock).
+ 	 */
+-	if (PageAnon(page) && !PageKsm(page))
++	if (PageAnon(page) && !PageReadOnly(page))
+ 		anon_vma = page_get_anon_vma(page);
+ 
+ 	/*
+@@ -1077,7 +1077,7 @@ static int __unmap_and_move(struct page *page, struct page *newpage,
+ 		}
+ 	} else if (page_mapped(page)) {
+ 		/* Establish migration ptes */
+-		VM_BUG_ON_PAGE(PageAnon(page) && !PageKsm(page) && !anon_vma,
++		VM_BUG_ON_PAGE(PageAnon(page) && !PageReadOnly(page) && !anon_vma,
+ 				page);
+ 		try_to_unmap(page,
+ 			TTU_MIGRATION|TTU_IGNORE_MLOCK|TTU_IGNORE_ACCESS);
+diff --git a/mm/mprotect.c b/mm/mprotect.c
+index e3309fcf586b..ab2f2e4961d8 100644
+--- a/mm/mprotect.c
++++ b/mm/mprotect.c
+@@ -81,7 +81,7 @@ static unsigned long change_pte_range(struct vm_area_struct *vma, pmd_t *pmd,
+ 				struct page *page;
+ 
+ 				page = vm_normal_page(vma, addr, oldpte);
+-				if (!page || PageKsm(page))
++				if (!page || PageReadOnly(page))
+ 					continue;
+ 
+ 				/* Also skip shared copy-on-write pages */
+diff --git a/mm/page_idle.c b/mm/page_idle.c
+index 0a49374e6931..7e5258e4d2ad 100644
+--- a/mm/page_idle.c
++++ b/mm/page_idle.c
+@@ -104,7 +104,7 @@ static void page_idle_clear_pte_refs(struct page *page)
+ 	    !page_rmapping(page))
+ 		return;
+ 
+-	need_lock = !PageAnon(page) || PageKsm(page);
++	need_lock = !PageAnon(page) || PageReadOnly(page);
+ 	if (need_lock && !trylock_page(page))
+ 		return;
+ 
+diff --git a/mm/rmap.c b/mm/rmap.c
+index 822a3a0cd51c..70d37f77e7a4 100644
+--- a/mm/rmap.c
++++ b/mm/rmap.c
+@@ -855,7 +855,7 @@ int page_referenced(struct page *page,
+ 	if (!page_rmapping(page))
+ 		return 0;
+ 
+-	if (!is_locked && (!PageAnon(page) || PageKsm(page))) {
++	if (!is_locked && (!PageAnon(page) || PageReadOnly(page))) {
+ 		we_locked = trylock_page(page);
+ 		if (!we_locked)
+ 			return 1;
+@@ -1122,7 +1122,7 @@ void do_page_add_anon_rmap(struct page *page,
+ 			__inc_node_page_state(page, NR_ANON_THPS);
+ 		__mod_node_page_state(page_pgdat(page), NR_ANON_MAPPED, nr);
+ 	}
+-	if (unlikely(PageKsm(page)))
++	if (unlikely(PageReadOnly(page)))
+ 		return;
+ 
+ 	VM_BUG_ON_PAGE(!PageLocked(page), page);
+@@ -1660,7 +1660,7 @@ bool try_to_unmap(struct page *page, enum ttu_flags flags)
+ 	 * temporary VMAs until after exec() completes.
+ 	 */
+ 	if ((flags & (TTU_MIGRATION|TTU_SPLIT_FREEZE))
+-	    && !PageKsm(page) && PageAnon(page))
++	    && !PageReadOnly(page) && PageAnon(page))
+ 		rwc.invalid_vma = invalid_migration_vma;
+ 
+ 	if (flags & TTU_RMAP_LOCKED)
+@@ -1842,7 +1842,7 @@ static void rmap_walk_file(struct page *page, struct rmap_walk_control *rwc,
+ 
+ void rmap_walk(struct page *page, struct rmap_walk_control *rwc)
+ {
+-	if (unlikely(PageKsm(page)))
++	if (unlikely(PageReadOnly(page)))
+ 		rmap_walk_ksm(page, rwc);
+ 	else if (PageAnon(page))
+ 		rmap_walk_anon(page, rwc, false);
+@@ -1854,7 +1854,7 @@ void rmap_walk(struct page *page, struct rmap_walk_control *rwc)
+ void rmap_walk_locked(struct page *page, struct rmap_walk_control *rwc)
+ {
+ 	/* no ksm support for now */
+-	VM_BUG_ON_PAGE(PageKsm(page), page);
++	VM_BUG_ON_PAGE(PageReadOnly(page), page);
+ 	if (PageAnon(page))
+ 		rmap_walk_anon(page, rwc, true);
+ 	else
+diff --git a/mm/swapfile.c b/mm/swapfile.c
+index c429c19e5d5d..83c73cca9e21 100644
+--- a/mm/swapfile.c
++++ b/mm/swapfile.c
+@@ -1552,7 +1552,7 @@ bool reuse_swap_page(struct page *page, int *total_map_swapcount)
+ 	int count, total_mapcount, total_swapcount;
+ 
+ 	VM_BUG_ON_PAGE(!PageLocked(page), page);
+-	if (unlikely(PageKsm(page)))
++	if (unlikely(PageReadOnly(page)))
+ 		return false;
+ 	count = page_trans_huge_map_swapcount(page, &total_mapcount,
+ 					      &total_swapcount);
 -- 
-2.7.4
+2.14.3
