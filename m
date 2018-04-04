@@ -1,84 +1,107 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:40236 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932257AbeDWRFW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Apr 2018 13:05:22 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        iommu@lists.linux-foundation.org
-Cc: x86@kernel.org, linux-block@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-mm@kvack.org,
-        linux-mips@linux-mips.org, sparclinux@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 09/12] PCI: remove CONFIG_PCI_BUS_ADDR_T_64BIT
-Date: Mon, 23 Apr 2018 19:04:16 +0200
-Message-Id: <20180423170419.20330-10-hch@lst.de>
-In-Reply-To: <20180423170419.20330-1-hch@lst.de>
-References: <20180423170419.20330-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <jglisse@redhat.com>
+From: jglisse@redhat.com
+To: linux-mm@kvack.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Tejun Heo <tj@kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	Josef Bacik <jbacik@fb.com>,
+	Mel Gorman <mgorman@techsingularity.net>
+Subject: [RFC PATCH 39/79] fs/buffer: add struct address_space to clean_page_buffers() arguments
+Date: Wed,  4 Apr 2018 15:18:13 -0400
+Message-Id: <20180404191831.5378-24-jglisse@redhat.com>
+In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
+References: <20180404191831.5378-1-jglisse@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+List-ID: <linux-block@vger.kernel.org>
 
-This symbol is now always identical to CONFIG_ARCH_DMA_ADDR_T_64BIT, so
-remove it.
+From: Jérôme Glisse <jglisse@redhat.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+Add struct address_space to clean_page_buffers() arguments.
+
+One step toward dropping reliance on page->mapping.
+
+Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+CC: Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-fsdevel@vger.kernel.org
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Josef Bacik <jbacik@fb.com>
+Cc: Mel Gorman <mgorman@techsingularity.net>
 ---
- drivers/pci/Kconfig | 4 ----
- drivers/pci/bus.c   | 4 ++--
- include/linux/pci.h | 2 +-
- 3 files changed, 3 insertions(+), 7 deletions(-)
+ fs/block_dev.c              | 2 +-
+ fs/mpage.c                  | 9 +++++----
+ include/linux/buffer_head.h | 2 +-
+ 3 files changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
-index 34b56a8f8480..29a487f31dae 100644
---- a/drivers/pci/Kconfig
-+++ b/drivers/pci/Kconfig
-@@ -5,10 +5,6 @@
- 
- source "drivers/pci/pcie/Kconfig"
- 
--config PCI_BUS_ADDR_T_64BIT
--	def_bool y if (ARCH_DMA_ADDR_T_64BIT || 64BIT)
--	depends on PCI
--
- config PCI_MSI
- 	bool "Message Signaled Interrupts (MSI and MSI-X)"
- 	depends on PCI
-diff --git a/drivers/pci/bus.c b/drivers/pci/bus.c
-index bc2ded4c451f..35b7fc87eac5 100644
---- a/drivers/pci/bus.c
-+++ b/drivers/pci/bus.c
-@@ -120,7 +120,7 @@ int devm_request_pci_bus_resources(struct device *dev,
- EXPORT_SYMBOL_GPL(devm_request_pci_bus_resources);
- 
- static struct pci_bus_region pci_32_bit = {0, 0xffffffffULL};
--#ifdef CONFIG_PCI_BUS_ADDR_T_64BIT
-+#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
- static struct pci_bus_region pci_64_bit = {0,
- 				(pci_bus_addr_t) 0xffffffffffffffffULL};
- static struct pci_bus_region pci_high = {(pci_bus_addr_t) 0x100000000ULL,
-@@ -230,7 +230,7 @@ int pci_bus_alloc_resource(struct pci_bus *bus, struct resource *res,
- 					  resource_size_t),
- 		void *alignf_data)
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index dd9da97615e3..b653cd8fd1e3 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -712,7 +712,7 @@ int bdev_write_page(struct block_device *bdev, sector_t sector,
+ 	if (result) {
+ 		end_page_writeback(page);
+ 	} else {
+-		clean_page_buffers(page);
++		clean_page_buffers(mapping, page);
+ 		unlock_page(page);
+ 	}
+ 	blk_queue_exit(bdev->bd_queue);
+diff --git a/fs/mpage.c b/fs/mpage.c
+index a75cea232f1a..624995c333e0 100644
+--- a/fs/mpage.c
++++ b/fs/mpage.c
+@@ -447,7 +447,8 @@ struct mpage_data {
+  * We have our BIO, so we can now mark the buffers clean.  Make
+  * sure to only clean buffers which we know we'll be writing.
+  */
+-static void clean_buffers(struct page *page, unsigned first_unmapped)
++static void clean_buffers(struct address_space *mapping, struct page *page,
++			  unsigned first_unmapped)
  {
--#ifdef CONFIG_PCI_BUS_ADDR_T_64BIT
-+#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
- 	int rc;
+ 	unsigned buffer_counter = 0;
+ 	struct buffer_head *bh, *head;
+@@ -477,9 +478,9 @@ static void clean_buffers(struct page *page, unsigned first_unmapped)
+  * We don't need to calculate how many buffers are attached to the page,
+  * we just need to specify a number larger than the maximum number of buffers.
+  */
+-void clean_page_buffers(struct page *page)
++void clean_page_buffers(struct address_space *mapping, struct page *page)
+ {
+-	clean_buffers(page, ~0U);
++	clean_buffers(mapping, page, ~0U);
+ }
  
- 	if (res->flags & IORESOURCE_MEM_64) {
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 73178a2fcee0..55371cb827ad 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -670,7 +670,7 @@ int raw_pci_read(unsigned int domain, unsigned int bus, unsigned int devfn,
- int raw_pci_write(unsigned int domain, unsigned int bus, unsigned int devfn,
- 		  int reg, int len, u32 val);
+ static int __mpage_writepage(struct page *page, struct address_space *_mapping,
+@@ -643,7 +644,7 @@ static int __mpage_writepage(struct page *page, struct address_space *_mapping,
+ 		goto alloc_new;
+ 	}
  
--#ifdef CONFIG_PCI_BUS_ADDR_T_64BIT
-+#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
- typedef u64 pci_bus_addr_t;
- #else
- typedef u32 pci_bus_addr_t;
+-	clean_buffers(page, first_unmapped);
++	clean_buffers(mapping, page, first_unmapped);
+ 
+ 	BUG_ON(PageWriteback(page));
+ 	set_page_writeback(page);
+diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
+index 22e79307c055..f3baf88a251b 100644
+--- a/include/linux/buffer_head.h
++++ b/include/linux/buffer_head.h
+@@ -248,7 +248,7 @@ int generic_write_end(struct file *, struct address_space *,
+ 				loff_t, unsigned, unsigned,
+ 				struct page *, void *);
+ void page_zero_new_buffers(struct page *page, unsigned from, unsigned to);
+-void clean_page_buffers(struct page *page);
++void clean_page_buffers(struct address_space *mapping, struct page *page);
+ int cont_write_begin(struct file *, struct address_space *, loff_t,
+ 			unsigned, unsigned, struct page **, void **,
+ 			get_block_t *, loff_t *);
 -- 
-2.17.0
+2.14.3
