@@ -1,85 +1,40 @@
-Return-Path: <linux-fsdevel-owner@vger.kernel.org>
-From: jglisse@redhat.com
-To: linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>
-Subject: [RFC PATCH 77/79] mm/ksm: hide set_page_stable_node() and page_stable_node()
-Date: Wed,  4 Apr 2018 15:18:29 -0400
-Message-Id: <20180404191831.5378-40-jglisse@redhat.com>
-In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
-References: <20180404191831.5378-1-jglisse@redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH] blk-mq: order getting budget and driver tag
+To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+ Christoph Hellwig <hch@infradead.org>
+Cc: stable@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Bart Van Assche <bart.vanassche@wdc.com>, Omar Sandoval <osandov@fb.com>
+References: <20180404163521.11346-1-ming.lei@redhat.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <cfbb9751-ce1b-6265-f259-983f403f8500@kernel.dk>
+Date: Wed, 4 Apr 2018 14:56:26 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-fsdevel-owner@vger.kernel.org
+In-Reply-To: <20180404163521.11346-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Jérôme Glisse <jglisse@redhat.com>
+On 4/4/18 10:35 AM, Ming Lei wrote:
+> This patch orders getting budget and driver tag by making sure to acquire
+> driver tag after budget is got, this way can help to avoid the following
+> race:
+> 
+> 1) before dispatch request from scheduler queue, get one budget first, then
+> dequeue a request, call it request A.
+> 
+> 2) in another IO path for dispatching request B which is from hctx->dispatch,
+> driver tag is got, then try to get budget in blk_mq_dispatch_rq_list(),
+> unfortunately the budget is held by request A.
+> 
+> 3) meantime blk_mq_dispatch_rq_list() is called for dispatching request
+> A, and try to get driver tag first, unfortunately no driver tag is
+> available because the driver tag is held by request B
+> 
+> 4) both two IO pathes can't move on, and IO stall is caused.
+> 
+> This issue can be observed when running dbench on USB storage.
 
-Hiding this 2 functions as preparatory step for generalizing ksm
-write protection to other users. Moreover those two helpers can
-not be use meaningfully outside ksm.c as the struct they deal with
-is defined inside ksm.c.
+Good catch, this can trigger on anything potentially, but of course more
+likely with limited budget and/or tag space. Classic ABBA deadlock.
 
-Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
-Cc: Andrea Arcangeli <aarcange@redhat.com>
----
- include/linux/ksm.h | 12 ------------
- mm/ksm.c            | 11 +++++++++++
- 2 files changed, 11 insertions(+), 12 deletions(-)
-
-diff --git a/include/linux/ksm.h b/include/linux/ksm.h
-index 44368b19b27e..83c664080798 100644
---- a/include/linux/ksm.h
-+++ b/include/linux/ksm.h
-@@ -15,7 +15,6 @@
- #include <linux/sched.h>
- #include <linux/sched/coredump.h>
- 
--struct stable_node;
- struct mem_cgroup;
- 
- #ifdef CONFIG_KSM
-@@ -37,17 +36,6 @@ static inline void ksm_exit(struct mm_struct *mm)
- 		__ksm_exit(mm);
- }
- 
--static inline struct stable_node *page_stable_node(struct page *page)
--{
--	return PageKsm(page) ? page_rmapping(page) : NULL;
--}
--
--static inline void set_page_stable_node(struct page *page,
--					struct stable_node *stable_node)
--{
--	page->mapping = (void *)((unsigned long)stable_node | PAGE_MAPPING_KSM);
--}
--
- /*
-  * When do_swap_page() first faults in from swap what used to be a KSM page,
-  * no problem, it will be assigned to this vma's anon_vma; but thereafter,
-diff --git a/mm/ksm.c b/mm/ksm.c
-index 1c16a4309c1d..f9bd1251c288 100644
---- a/mm/ksm.c
-+++ b/mm/ksm.c
-@@ -316,6 +316,17 @@ static void __init ksm_slab_free(void)
- 	mm_slot_cache = NULL;
- }
- 
-+static inline struct stable_node *page_stable_node(struct page *page)
-+{
-+	return PageKsm(page) ? page_rmapping(page) : NULL;
-+}
-+
-+static inline void set_page_stable_node(struct page *page,
-+					struct stable_node *stable_node)
-+{
-+	page->mapping = (void *)((unsigned long)stable_node | PAGE_MAPPING_KSM);
-+}
-+
- static __always_inline bool is_stable_node_chain(struct stable_node *chain)
- {
- 	return chain->rmap_hlist_len == STABLE_NODE_CHAIN;
 -- 
-2.14.3
+Jens Axboe
