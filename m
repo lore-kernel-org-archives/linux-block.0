@@ -1,72 +1,75 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-it0-f66.google.com ([209.85.214.66]:35288 "EHLO
-        mail-it0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752148AbeDZHWI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Apr 2018 03:22:08 -0400
-Received: by mail-it0-f66.google.com with SMTP id 186-v6so22538020itu.0
-        for <linux-block@vger.kernel.org>; Thu, 26 Apr 2018 00:22:08 -0700 (PDT)
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@fb.com>, kernel-team@fb.com
-Subject: [PATCH 1/2] blk-mq: count allocated but not started requests in iostats inflight
-Date: Thu, 26 Apr 2018 00:21:58 -0700
-Message-Id: <17d1ebc9d396ecc15bace2ed79a55ec754165979.1524727168.git.osandov@fb.com>
-In-Reply-To: <cover.1524727168.git.osandov@fb.com>
-References: <cover.1524727168.git.osandov@fb.com>
-In-Reply-To: <cover.1524727168.git.osandov@fb.com>
-References: <cover.1524727168.git.osandov@fb.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <idryomov@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20180404125345.4008862-1-arnd@arndb.de>
+References: <20180404125345.4008862-1-arnd@arndb.de>
+From: Ilya Dryomov <idryomov@gmail.com>
+Date: Wed, 4 Apr 2018 15:10:26 +0200
+Message-ID: <CAOi1vP8KMoSKuw87wBJkAe5ke8Vb0jQ4qeizdX5jrfaChxNCCg@mail.gmail.com>
+Subject: Re: [PATCH] [v2] rbd: avoid Wreturn-type warnings
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Sage Weil <sage@redhat.com>, Alex Elder <elder@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Jason Dillaman <dillaman@redhat.com>, Ceph Development <ceph-devel@vger.kernel.org>,
+	linux-block <linux-block@vger.kernel.org>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+On Wed, Apr 4, 2018 at 2:53 PM, Arnd Bergmann <arnd@arndb.de> wrote:
+> A new set of warnings appeared in next-20180403 in some configurations
+> when gcc cannot see that rbd_assert(0) leads to an unreachable code
+> path:
+>
+> drivers/block/rbd.c: In function 'rbd_img_is_write':
+> drivers/block/rbd.c:1397:1: error: control reaches end of non-void function [-Werror=return-type]
+> drivers/block/rbd.c: In function '__rbd_obj_handle_request':
+> drivers/block/rbd.c:2499:1: error: control reaches end of non-void function [-Werror=return-type]
+> drivers/block/rbd.c: In function 'rbd_obj_handle_write':
+> drivers/block/rbd.c:2471:1: error: control reaches end of non-void function [-Werror=return-type]
+>
+> As the rbd_assert() here shows has no extra information beyond the verbose
+> BUG(), we can simply use BUG() directly in its place.  This is reliably
+> detected as not returning on any architecture, since it doesn't depend
+> on the unlikely() comparison that confused gcc.
+>
+> Fixes: 3da691bf4366 ("rbd: new request handling code")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  drivers/block/rbd.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+> index 07dc5419bd63..5f7f4d4b78a8 100644
+> --- a/drivers/block/rbd.c
+> +++ b/drivers/block/rbd.c
+> @@ -1392,7 +1392,7 @@ static bool rbd_img_is_write(struct rbd_img_request *img_req)
+>         case OBJ_OP_DISCARD:
+>                 return true;
+>         default:
+> -               rbd_assert(0);
+> +               BUG();
+>         }
+>  }
+>
+> @@ -2466,7 +2466,7 @@ static bool rbd_obj_handle_write(struct rbd_obj_request *obj_req)
+>                 }
+>                 return false;
+>         default:
+> -               rbd_assert(0);
+> +               BUG();
+>         }
+>  }
+>
+> @@ -2494,7 +2494,7 @@ static bool __rbd_obj_handle_request(struct rbd_obj_request *obj_req)
+>                 }
+>                 return false;
+>         default:
+> -               rbd_assert(0);
+> +               BUG();
+>         }
+>  }
+>
 
-In the legacy block case, we increment the counter right after we
-allocate the request, not when the driver handles it. In both the legacy
-and blk-mq cases, part_inc_in_flight() is called from
-blk_account_io_start() right after we've allocated the request. blk-mq
-only considers requests started requests as inflight, but this is
-inconsistent with the legacy definition and the intention in the code.
-This removes the started condition and instead counts all allocated
-requests.
+Applied.
 
-Fixes: f299b7c7a9de ("blk-mq: provide internal in-flight variant")
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- block/blk-mq.c | 21 +++++++++------------
- 1 file changed, 9 insertions(+), 12 deletions(-)
+Thanks,
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c3621453ad87..5450cbc61f8d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -95,18 +95,15 @@ static void blk_mq_check_inflight(struct blk_mq_hw_ctx *hctx,
- {
- 	struct mq_inflight *mi = priv;
- 
--	if (blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT) {
--		/*
--		 * index[0] counts the specific partition that was asked
--		 * for. index[1] counts the ones that are active on the
--		 * whole device, so increment that if mi->part is indeed
--		 * a partition, and not a whole device.
--		 */
--		if (rq->part == mi->part)
--			mi->inflight[0]++;
--		if (mi->part->partno)
--			mi->inflight[1]++;
--	}
-+	/*
-+	 * index[0] counts the specific partition that was asked for. index[1]
-+	 * counts the ones that are active on the whole device, so increment
-+	 * that if mi->part is indeed a partition, and not a whole device.
-+	 */
-+	if (rq->part == mi->part)
-+		mi->inflight[0]++;
-+	if (mi->part->partno)
-+		mi->inflight[1]++;
- }
- 
- void blk_mq_in_flight(struct request_queue *q, struct hd_struct *part,
--- 
-2.17.0
+                Ilya
