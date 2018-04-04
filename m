@@ -1,83 +1,127 @@
-Return-Path: <fthain@telegraphics.com.au>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Jens Axboe <axboe@kernel.dk>,
-    Laurent Vivier <lvivier@redhat.com>,
-    linux-m68k@lists.linux-m68k.org,
-    linux-kernel@vger.kernel.org,
-    linux-block@vger.kernel.org,
-    stable@vger.kernel.org
-Message-Id: <8f7474079aab3a47a4534bec7463ed52d0e5a652.1523493475.git.fthain@telegraphics.com.au>
-In-Reply-To: <cover.1523493475.git.fthain@telegraphics.com.au>
-References: <cover.1523493475.git.fthain@telegraphics.com.au>
-From: Finn Thain <fthain@telegraphics.com.au>
-Subject: [PATCH v2 09/10] block/swim: Fix IO error at end of medium
-Date: Wed, 11 Apr 2018 20:50:14 -0400 (EDT)
+Return-Path: <jglisse@redhat.com>
+From: jglisse@redhat.com
+To: linux-mm@kvack.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Tejun Heo <tj@kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	Josef Bacik <jbacik@fb.com>,
+	Mel Gorman <mgorman@techsingularity.net>
+Subject: [RFC PATCH 29/79] fs/block: add struct address_space to bdev_write_page() arguments
+Date: Wed,  4 Apr 2018 15:18:03 -0400
+Message-Id: <20180404191831.5378-14-jglisse@redhat.com>
+In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
+References: <20180404191831.5378-1-jglisse@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-Reading to the end of a 720K disk results in an IO error instead of EOF
-because the block layer thinks the disk has 2880 sectors. (Partly this
-is a result of inverted logic of the ONEMEG_MEDIA bit that's now fixed.)
+From: Jérôme Glisse <jglisse@redhat.com>
 
-Initialize the density and head count in swim_add_floppy() to agree
-with the device size passed to set_capacity() during drive probe.
+Add struct address_space to bdev_write_page() arguments.
 
-Call set_capacity() again upon device open, after refreshing the density
-and head count values.
+One step toward dropping reliance on page->mapping.
 
-Cc: Laurent Vivier <lvivier@redhat.com>
+Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
 Cc: Jens Axboe <axboe@kernel.dk>
-Cc: stable@vger.kernel.org # v4.14+
-Tested-by: Stan Johnson <userm57@yahoo.com>
-Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
-Acked-by: Laurent Vivier <lvivier@redhat.com>
+CC: Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-fsdevel@vger.kernel.org
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Josef Bacik <jbacik@fb.com>
+Cc: Mel Gorman <mgorman@techsingularity.net>
 ---
- drivers/block/swim.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ fs/block_dev.c         | 4 +++-
+ fs/mpage.c             | 2 +-
+ include/linux/blkdev.h | 5 +++--
+ mm/page_io.c           | 7 ++++---
+ 4 files changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/block/swim.c b/drivers/block/swim.c
-index c8c8b9da3edd..2c75761b61e8 100644
---- a/drivers/block/swim.c
-+++ b/drivers/block/swim.c
-@@ -612,7 +612,6 @@ static void setup_medium(struct floppy_state *fs)
- 		struct floppy_struct *g;
- 		fs->disk_in = 1;
- 		fs->write_protected = swim_readbit(base, WRITE_PROT);
--		fs->type = swim_readbit(base, TWOMEG_MEDIA);
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 9ac6bf760272..502b6643bc74 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -678,6 +678,7 @@ EXPORT_SYMBOL_GPL(bdev_read_page);
+  * bdev_write_page() - Start writing a page to a block device
+  * @bdev: The device to write the page to
+  * @sector: The offset on the device to write the page to (need not be aligned)
++ * @mapping: The address space the page belongs to
+  * @page: The page to write
+  * @wbc: The writeback_control for the write
+  *
+@@ -694,7 +695,8 @@ EXPORT_SYMBOL_GPL(bdev_read_page);
+  * Return: negative errno if an error occurs, 0 if submission was successful.
+  */
+ int bdev_write_page(struct block_device *bdev, sector_t sector,
+-			struct page *page, struct writeback_control *wbc)
++			struct address_space *mapping, struct page *page,
++			struct writeback_control *wbc)
+ {
+ 	int result;
+ 	const struct block_device_operations *ops = bdev->bd_disk->fops;
+diff --git a/fs/mpage.c b/fs/mpage.c
+index 52a6028e2066..a75cea232f1a 100644
+--- a/fs/mpage.c
++++ b/fs/mpage.c
+@@ -619,7 +619,7 @@ static int __mpage_writepage(struct page *page, struct address_space *_mapping,
+ 	if (bio == NULL) {
+ 		if (first_unmapped == blocks_per_page) {
+ 			if (!bdev_write_page(bdev, blocks[0] << (blkbits - 9),
+-								page, wbc))
++						mapping, page, wbc))
+ 				goto out;
+ 		}
+ 		bio = mpage_alloc(bdev, blocks[0] << (blkbits - 9),
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index ed63f3b69c12..0cf66b6993f4 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -2053,8 +2053,9 @@ struct block_device_operations {
+ extern int __blkdev_driver_ioctl(struct block_device *, fmode_t, unsigned int,
+ 				 unsigned long);
+ extern int bdev_read_page(struct block_device *, sector_t, struct page *);
+-extern int bdev_write_page(struct block_device *, sector_t, struct page *,
+-						struct writeback_control *);
++extern int bdev_write_page(struct block_device *bdev, sector_t sector,
++			struct address_space *mapping, struct page *page,
++			struct writeback_control *wbc);
  
- 		if (swim_track00(base))
- 			printk(KERN_ERR
-@@ -620,6 +619,9 @@ static void setup_medium(struct floppy_state *fs)
+ #ifdef CONFIG_BLK_DEV_ZONED
+ bool blk_req_needs_zone_write_lock(struct request *rq);
+diff --git a/mm/page_io.c b/mm/page_io.c
+index 402231dd1286..6e548b588490 100644
+--- a/mm/page_io.c
++++ b/mm/page_io.c
+@@ -282,12 +282,12 @@ int __swap_writepage(struct page *page, struct writeback_control *wbc,
+ 	struct bio *bio;
+ 	int ret;
+ 	struct swap_info_struct *sis = page_swap_info(page);
++	struct file *swap_file = sis->swap_file;
++	struct address_space *mapping = swap_file->f_mapping;
  
- 		swim_track00(base);
- 
-+		fs->type = swim_readbit(base, TWOMEG_MEDIA) ?
-+			HD_MEDIA : DD_MEDIA;
-+		fs->head_number = swim_readbit(base, SINGLE_SIDED) ? 1 : 2;
- 		get_floppy_geometry(fs, 0, &g);
- 		fs->total_secs = g->size;
- 		fs->secpercyl = g->head * g->sect;
-@@ -656,6 +658,8 @@ static int floppy_open(struct block_device *bdev, fmode_t mode)
- 		goto out;
+ 	VM_BUG_ON_PAGE(!PageSwapCache(page), page);
+ 	if (sis->flags & SWP_FILE) {
+ 		struct kiocb kiocb;
+-		struct file *swap_file = sis->swap_file;
+-		struct address_space *mapping = swap_file->f_mapping;
+ 		struct bio_vec bv = {
+ 			.bv_page = page,
+ 			.bv_len  = PAGE_SIZE,
+@@ -325,7 +325,8 @@ int __swap_writepage(struct page *page, struct writeback_control *wbc,
+ 		return ret;
  	}
  
-+	set_capacity(fs->disk, fs->total_secs);
-+
- 	if (mode & FMODE_NDELAY)
+-	ret = bdev_write_page(sis->bdev, swap_page_sector(page), page, wbc);
++	ret = bdev_write_page(sis->bdev, swap_page_sector(page),
++			      mapping, page, wbc);
+ 	if (!ret) {
+ 		count_swpout_vm_event(page);
  		return 0;
- 
-@@ -808,10 +812,9 @@ static int swim_add_floppy(struct swim_priv *swd, enum drive_location location)
- 
- 	swim_motor(base, OFF);
- 
--	if (swim_readbit(base, SINGLE_SIDED))
--		fs->head_number = 1;
--	else
--		fs->head_number = 2;
-+	fs->type = HD_MEDIA;
-+	fs->head_number = 2;
-+
- 	fs->ref_count = 0;
- 	fs->ejected = 1;
- 
 -- 
-2.16.1
+2.14.3
