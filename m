@@ -1,55 +1,130 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from tn-76-7-162-187.sta.embarqhsd.net ([76.7.162.187]:54625 "EHLO
-        animx.eu.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753427AbeDALhY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 1 Apr 2018 07:37:24 -0400
-Date: Sun, 1 Apr 2018 07:37:21 -0400
-From: Wakko Warner <wakko@animx.eu.org>
-To: Bart Van Assche <Bart.VanAssche@wdc.com>
-Cc: "richard.weinberger@gmail.com" <richard.weinberger@gmail.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: 4.15.14 crash with iscsi target and dvd
-Message-ID: <20180401113721.GA8471@animx.eu.org>
-References: <20180331015903.GA29398@animx.eu.org>
- <CAFLxGvzbA9XzXLsH56iyqYkitrSnBbOzD977u4266=w5zw0jNg@mail.gmail.com>
- <20180331221252.GA25573@animx.eu.org>
- <b68bf187c9cde1c36489fc5ab2187ca8750a1292.camel@wdc.com>
+Return-Path: <jglisse@redhat.com>
+From: jglisse@redhat.com
+To: linux-mm@kvack.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	Josef Bacik <jbacik@fb.com>,
+	Mel Gorman <mgorman@techsingularity.net>
+Subject: [RFC PATCH 51/79] fs: stop relying on mapping field of struct page, get it from context
+Date: Wed,  4 Apr 2018 15:18:15 -0400
+Message-Id: <20180404191831.5378-26-jglisse@redhat.com>
+In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
+References: <20180404191831.5378-1-jglisse@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <b68bf187c9cde1c36489fc5ab2187ca8750a1292.camel@wdc.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+List-ID: <linux-block@vger.kernel.org>
 
-Bart Van Assche wrote:
-> On Sat, 2018-03-31 at 18:12 -0400, Wakko Warner wrote:
-> > Richard Weinberger wrote:
-> > > On Sat, Mar 31, 2018 at 3:59 AM, Wakko Warner <wakko@animx.eu.org> wrote:
-> > > > I reported this before but noone responded.
-> > > 
-> > > Because you're sending only to LKML.
-> > > CC'ing storage folks.
-> > 
-> > Thank you.  I wasn't sure who I needed to send it to.
-> 
-> Can you share the output of lsscsi? I would like to know whether or not you
-> are using a (S)ATA CDROM.
+From: Jérôme Glisse <jglisse@redhat.com>
 
->From the target:
-[4:0:0:0]    cd/dvd  ATAPI    iHAS224   B      GL05  /dev/sr0 
-[5:0:0:0]    cd/dvd  ATAPI    iHAS422   8      4L11  /dev/sr1 
-[6:0:0:0]    cd/dvd  PBDS     DVD+-RW DH-16W1S 2D14  /dev/sr2 
+Holy grail, remove all usage of mapping field of struct page inside
+common fs code. This is the manual conversion patch (so much can be
+done with coccinelle).
 
->From the initiator:
-[19:0:0:0]   cd/dvd  ATAPI    iHAS224   B      GL05  /dev/sr1
-[19:0:0:1]   cd/dvd  ATAPI    iHAS422   8      4L11  /dev/sr2
-[19:0:0:2]   cd/dvd  PBDS     DVD+-RW DH-16W1S 2D14  /dev/sr3
+Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-fsdevel@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Josef Bacik <jbacik@fb.com>
+Cc: Mel Gorman <mgorman@techsingularity.net>
+---
+ fs/buffer.c | 26 +++++++++++++++++---------
+ 1 file changed, 17 insertions(+), 9 deletions(-)
 
-
-I tested 4.14.32 last night with the same oops.  4.9.91 works fine.
->From the initiator, if I do cat /dev/sr1 > /dev/null it works.  If I mount
-/dev/sr1 and then do find -type f | xargs cat > /dev/null the target
-crashes.  I'm using the builtin iscsi target with pscsi.  I can burn from
-the initiator with out problems.  I'll test other kernels between 4.9 and
-4.14.
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 39d8c7315b55..3c424b7af5af 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -570,7 +570,9 @@ void write_boundary_block(struct block_device *bdev,
+ void mark_buffer_dirty_inode(struct buffer_head *bh, struct inode *inode)
+ {
+ 	struct address_space *mapping = inode->i_mapping;
+-	struct address_space *buffer_mapping = bh->b_page->mapping;
++	struct address_space *buffer_mapping;
++
++	buffer_mapping = fs_page_mapping_get_with_bh(bh->b_page, bh);
+ 
+ 	mark_buffer_dirty(bh);
+ 	if (!mapping->private_data) {
+@@ -1138,10 +1140,13 @@ EXPORT_SYMBOL(mark_buffer_dirty);
+ void mark_buffer_write_io_error(struct address_space *mapping,
+ 		struct page *page, struct buffer_head *bh)
+ {
++	BUG_ON(page != bh->b_page);
++	BUG_ON(mapping != bh->b_page->mapping);
++
+ 	set_buffer_write_io_error(bh);
+ 	/* FIXME: do we need to set this in both places? */
+-	if (bh->b_page && !page_is_truncated(bh->b_page, bh->b_page->mapping))
+-		mapping_set_error(bh->b_page->mapping, -EIO);
++	if (bh->b_page && !page_is_truncated(page, mapping))
++		mapping_set_error(mapping, -EIO);
+ 	if (bh->b_assoc_map)
+ 		mapping_set_error(bh->b_assoc_map, -EIO);
+ }
+@@ -1172,7 +1177,10 @@ void __bforget(struct super_block *sb, struct buffer_head *bh)
+ {
+ 	clear_buffer_dirty(bh);
+ 	if (bh->b_assoc_map) {
+-		struct address_space *buffer_mapping = bh->b_page->mapping;
++		struct address_space *buffer_mapping;
++
++		buffer_mapping = sb->s_bdev->bd_inode->i_mapping;
++		BUG_ON(buffer_mapping != bh->b_page->mapping);
+ 
+ 		spin_lock(&buffer_mapping->private_lock);
+ 		list_del_init(&bh->b_assoc_buffers);
+@@ -1543,7 +1551,7 @@ void create_empty_buffers(struct address_space *mapping, struct page *page,
+ 	} while (bh);
+ 	tail->b_this_page = head;
+ 
+-	spin_lock(&page->mapping->private_lock);
++	spin_lock(&mapping->private_lock);
+ 	if (PageUptodate(page) || PageDirty(page)) {
+ 		bh = head;
+ 		do {
+@@ -1555,7 +1563,7 @@ void create_empty_buffers(struct address_space *mapping, struct page *page,
+ 		} while (bh != head);
+ 	}
+ 	attach_page_buffers(page, head);
+-	spin_unlock(&page->mapping->private_lock);
++	spin_unlock(&mapping->private_lock);
+ }
+ EXPORT_SYMBOL(create_empty_buffers);
+ 
+@@ -1833,7 +1841,7 @@ int __block_write_full_page(struct inode *inode, struct page *page,
+ 	} while ((bh = bh->b_this_page) != head);
+ 	SetPageError(page);
+ 	BUG_ON(PageWriteback(page));
+-	mapping_set_error(page->mapping, err);
++	mapping_set_error(inode->i_mapping, err);
+ 	set_page_writeback(page);
+ 	do {
+ 		struct buffer_head *next = bh->b_this_page;
+@@ -2541,7 +2549,7 @@ static void attach_nobh_buffers(struct address_space *mapping,
+ 
+ 	BUG_ON(!PageLocked(page));
+ 
+-	spin_lock(&page->mapping->private_lock);
++	spin_lock(&mapping->private_lock);
+ 	bh = head;
+ 	do {
+ 		if (PageDirty(page))
+@@ -2551,7 +2559,7 @@ static void attach_nobh_buffers(struct address_space *mapping,
+ 		bh = bh->b_this_page;
+ 	} while (bh != head);
+ 	attach_page_buffers(page, head);
+-	spin_unlock(&page->mapping->private_lock);
++	spin_unlock(&mapping->private_lock);
+ }
+ 
+ /*
+-- 
+2.14.3
