@@ -1,141 +1,236 @@
-Return-Path: <marmarek@invisiblethingslab.com>
-From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>
-To: xen-devel@lists.xenproject.org
-Cc: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>,
-	stable@vger.kernel.org,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	Juergen Gross <jgross@suse.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org (open list:BLOCK LAYER),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH 5/6] xen-blkfront: make local copy of response before using it
-Date: Mon, 30 Apr 2018 23:01:49 +0200
-Message-Id: <4af6663fbb4b4a97e5c89096033064627367982d.1525122026.git-series.marmarek@invisiblethingslab.com>
-In-Reply-To: <cover.7ee732ab822b728ec486a3118ec12e9c06f0f325.1525122026.git-series.marmarek@invisiblethingslab.com>
-References: <cover.7ee732ab822b728ec486a3118ec12e9c06f0f325.1525122026.git-series.marmarek@invisiblethingslab.com>
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: jglisse@redhat.com
+To: linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        David Howells <dhowells@redhat.com>, linux-cachefs@redhat.com,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Tejun Heo <tj@kernel.org>, Jan Kara <jack@suse.cz>,
+        Josef Bacik <jbacik@fb.com>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Jeff Layton <jlayton@redhat.com>
+Subject: [RFC PATCH 27/79] fs: add struct address_space to fscache_read*() callback arguments
+Date: Wed,  4 Apr 2018 15:18:01 -0400
+Message-Id: <20180404191831.5378-12-jglisse@redhat.com>
+In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
+References: <20180404191831.5378-1-jglisse@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <cover.7ee732ab822b728ec486a3118ec12e9c06f0f325.1525122026.git-series.marmarek@invisiblethingslab.com>
-References: <cover.7ee732ab822b728ec486a3118ec12e9c06f0f325.1525122026.git-series.marmarek@invisiblethingslab.com>
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-ID: <linux-block@vger.kernel.org>
 
-Data on the shared page can be changed at any time by the backend. Make
-a local copy, which is no longer controlled by the backend. And only
-then access it.
+From: Jérôme Glisse <jglisse@redhat.com>
 
-This is complementary to XSA155.
+Add struct address_space to fscache_read*() callback argument. Note
+this patch only add arguments and modify call site conservatily using
+page->mapping and thus the end result is as before this patch.
 
-CC: stable@vger.kernel.org
-Signed-off-by: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+One step toward dropping reliance on page->mapping.
+
+Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
+Cc: David Howells <dhowells@redhat.com>
+Cc: linux-cachefs@redhat.com
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-fsdevel@vger.kernel.org
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Josef Bacik <jbacik@fb.com>
+Cc: Mel Gorman <mgorman@techsingularity.net>
+Cc: Jeff Layton <jlayton@redhat.com>
 ---
- drivers/block/xen-blkfront.c | 34 +++++++++++++++++-----------------
- 1 file changed, 17 insertions(+), 17 deletions(-)
+ fs/9p/cache.c                 |  4 +++-
+ fs/afs/file.c                 |  4 +++-
+ fs/ceph/cache.c               | 10 ++++++----
+ fs/cifs/fscache.c             |  6 ++++--
+ fs/fscache/page.c             |  1 +
+ fs/nfs/fscache.c              |  4 +++-
+ include/linux/fscache-cache.h |  2 +-
+ include/linux/fscache.h       |  9 ++++++---
+ 8 files changed, 27 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index 2a8e781..3926811 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -1549,7 +1549,7 @@ static bool blkif_completion(unsigned long *id,
- static irqreturn_t blkif_interrupt(int irq, void *dev_id)
+diff --git a/fs/9p/cache.c b/fs/9p/cache.c
+index 8185bfe4492f..3f122d35c54d 100644
+--- a/fs/9p/cache.c
++++ b/fs/9p/cache.c
+@@ -273,7 +273,8 @@ void __v9fs_fscache_invalidate_page(struct address_space *mapping,
+ 	}
+ }
+ 
+-static void v9fs_vfs_readpage_complete(struct page *page, void *data,
++static void v9fs_vfs_readpage_complete(struct address_space *mapping,
++				       struct page *page, void *data,
+ 				       int error)
  {
- 	struct request *req;
--	struct blkif_response *bret;
-+	struct blkif_response bret;
- 	RING_IDX i, rp;
- 	unsigned long flags;
- 	struct blkfront_ring_info *rinfo = (struct blkfront_ring_info *)dev_id;
-@@ -1566,8 +1566,8 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
- 	for (i = rinfo->ring.rsp_cons; i != rp; i++) {
- 		unsigned long id;
+ 	if (!error)
+@@ -299,6 +300,7 @@ int __v9fs_readpage_from_fscache(struct inode *inode, struct page *page)
+ 		return -ENOBUFS;
  
--		bret = RING_GET_RESPONSE(&rinfo->ring, i);
--		id   = bret->id;
-+		RING_COPY_RESPONSE(&rinfo->ring, i, &bret);
-+		id   = bret.id;
- 		/*
- 		 * The backend has messed up and given us an id that we would
- 		 * never have given to it (we stamp it up to BLK_RING_SIZE -
-@@ -1575,39 +1575,39 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
- 		 */
- 		if (id >= BLK_RING_SIZE(info)) {
- 			WARN(1, "%s: response to %s has incorrect id (%ld)\n",
--			     info->gd->disk_name, op_name(bret->operation), id);
-+			     info->gd->disk_name, op_name(bret.operation), id);
- 			/* We can't safely get the 'struct request' as
- 			 * the id is busted. */
- 			continue;
- 		}
- 		req  = rinfo->shadow[id].request;
+ 	ret = fscache_read_or_alloc_page(v9inode->fscache,
++					 page->mapping,
+ 					 page,
+ 					 v9fs_vfs_readpage_complete,
+ 					 NULL,
+diff --git a/fs/afs/file.c b/fs/afs/file.c
+index f87e997b9df9..23ff51343dd3 100644
+--- a/fs/afs/file.c
++++ b/fs/afs/file.c
+@@ -203,7 +203,8 @@ void afs_put_read(struct afs_read *req)
+ /*
+  * deal with notification that a page was read from the cache
+  */
+-static void afs_file_readpage_read_complete(struct page *page,
++static void afs_file_readpage_read_complete(struct address_space *mapping,
++					    struct page *page,
+ 					    void *data,
+ 					    int error)
+ {
+@@ -271,6 +272,7 @@ int afs_page_filler(void *data, struct address_space *mapping,
+ 	/* is it cached? */
+ #ifdef CONFIG_AFS_FSCACHE
+ 	ret = fscache_read_or_alloc_page(vnode->cache,
++					 page->mapping,
+ 					 page,
+ 					 afs_file_readpage_read_complete,
+ 					 NULL,
+diff --git a/fs/ceph/cache.c b/fs/ceph/cache.c
+index a3ab265d3215..14438f1ed7e0 100644
+--- a/fs/ceph/cache.c
++++ b/fs/ceph/cache.c
+@@ -266,7 +266,9 @@ void ceph_fscache_file_set_cookie(struct inode *inode, struct file *filp)
+ 	}
+ }
  
--		if (bret->operation != BLKIF_OP_DISCARD) {
-+		if (bret.operation != BLKIF_OP_DISCARD) {
- 			/*
- 			 * We may need to wait for an extra response if the
- 			 * I/O request is split in 2
- 			 */
--			if (!blkif_completion(&id, rinfo, bret))
-+			if (!blkif_completion(&id, rinfo, &bret))
- 				continue;
- 		}
+-static void ceph_readpage_from_fscache_complete(struct page *page, void *data, int error)
++static void ceph_readpage_from_fscache_complete(struct address_space *mapping,
++						struct page *page, void *data,
++						int error)
+ {
+ 	if (!error)
+ 		SetPageUptodate(page);
+@@ -293,9 +295,9 @@ int ceph_readpage_from_fscache(struct inode *inode, struct page *page)
+ 	if (!cache_valid(ci))
+ 		return -ENOBUFS;
  
- 		if (add_id_to_freelist(rinfo, id)) {
- 			WARN(1, "%s: response to %s (id %ld) couldn't be recycled!\n",
--			     info->gd->disk_name, op_name(bret->operation), id);
-+			     info->gd->disk_name, op_name(bret.operation), id);
- 			continue;
- 		}
+-	ret = fscache_read_or_alloc_page(ci->fscache, page,
+-					 ceph_readpage_from_fscache_complete, NULL,
+-					 GFP_KERNEL);
++	ret = fscache_read_or_alloc_page(ci->fscache, page->mapping, page,
++					 ceph_readpage_from_fscache_complete,
++					 NULL, GFP_KERNEL);
  
--		if (bret->status == BLKIF_RSP_OKAY)
-+		if (bret.status == BLKIF_RSP_OKAY)
- 			blkif_req(req)->error = BLK_STS_OK;
- 		else
- 			blkif_req(req)->error = BLK_STS_IOERR;
+ 	switch (ret) {
+ 		case 0: /* Page found */
+diff --git a/fs/cifs/fscache.c b/fs/cifs/fscache.c
+index 8d4b7bc8ae91..25f259a83fe0 100644
+--- a/fs/cifs/fscache.c
++++ b/fs/cifs/fscache.c
+@@ -140,7 +140,8 @@ int cifs_fscache_release_page(struct page *page, gfp_t gfp)
+ 	return 1;
+ }
  
--		switch (bret->operation) {
-+		switch (bret.operation) {
- 		case BLKIF_OP_DISCARD:
--			if (unlikely(bret->status == BLKIF_RSP_EOPNOTSUPP)) {
-+			if (unlikely(bret.status == BLKIF_RSP_EOPNOTSUPP)) {
- 				struct request_queue *rq = info->rq;
- 				printk(KERN_WARNING "blkfront: %s: %s op failed\n",
--					   info->gd->disk_name, op_name(bret->operation));
-+					   info->gd->disk_name, op_name(bret.operation));
- 				blkif_req(req)->error = BLK_STS_NOTSUPP;
- 				info->feature_discard = 0;
- 				info->feature_secdiscard = 0;
-@@ -1617,15 +1617,15 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
- 			break;
- 		case BLKIF_OP_FLUSH_DISKCACHE:
- 		case BLKIF_OP_WRITE_BARRIER:
--			if (unlikely(bret->status == BLKIF_RSP_EOPNOTSUPP)) {
-+			if (unlikely(bret.status == BLKIF_RSP_EOPNOTSUPP)) {
- 				printk(KERN_WARNING "blkfront: %s: %s op failed\n",
--				       info->gd->disk_name, op_name(bret->operation));
-+				       info->gd->disk_name, op_name(bret.operation));
- 				blkif_req(req)->error = BLK_STS_NOTSUPP;
- 			}
--			if (unlikely(bret->status == BLKIF_RSP_ERROR &&
-+			if (unlikely(bret.status == BLKIF_RSP_ERROR &&
- 				     rinfo->shadow[id].req.u.rw.nr_segments == 0)) {
- 				printk(KERN_WARNING "blkfront: %s: empty %s op failed\n",
--				       info->gd->disk_name, op_name(bret->operation));
-+				       info->gd->disk_name, op_name(bret.operation));
- 				blkif_req(req)->error = BLK_STS_NOTSUPP;
- 			}
- 			if (unlikely(blkif_req(req)->error)) {
-@@ -1638,9 +1638,9 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
- 			/* fall through */
- 		case BLKIF_OP_READ:
- 		case BLKIF_OP_WRITE:
--			if (unlikely(bret->status != BLKIF_RSP_OKAY))
-+			if (unlikely(bret.status != BLKIF_RSP_OKAY))
- 				dev_dbg(&info->xbdev->dev, "Bad return from blkdev data "
--					"request: %x\n", bret->status);
-+					"request: %x\n", bret.status);
+-static void cifs_readpage_from_fscache_complete(struct page *page, void *ctx,
++static void cifs_readpage_from_fscache_complete(struct address_space *mapping,
++						struct page *page, void *ctx,
+ 						int error)
+ {
+ 	cifs_dbg(FYI, "%s: (0x%p/%d)\n", __func__, page, error);
+@@ -158,7 +159,8 @@ int __cifs_readpage_from_fscache(struct inode *inode, struct page *page)
  
- 			break;
- 		default:
+ 	cifs_dbg(FYI, "%s: (fsc:%p, p:%p, i:0x%p\n",
+ 		 __func__, CIFS_I(inode)->fscache, page, inode);
+-	ret = fscache_read_or_alloc_page(CIFS_I(inode)->fscache, page,
++	ret = fscache_read_or_alloc_page(CIFS_I(inode)->fscache,
++					 page->mapping, page,
+ 					 cifs_readpage_from_fscache_complete,
+ 					 NULL,
+ 					 GFP_KERNEL);
+diff --git a/fs/fscache/page.c b/fs/fscache/page.c
+index 7112b42ad8c5..0c3d322a7b52 100644
+--- a/fs/fscache/page.c
++++ b/fs/fscache/page.c
+@@ -408,6 +408,7 @@ int fscache_wait_for_operation_activation(struct fscache_object *object,
+  *   0		- dispatched a read - it'll call end_io_func() when finished
+  */
+ int __fscache_read_or_alloc_page(struct fscache_cookie *cookie,
++				 struct address_space *mapping,
+ 				 struct page *page,
+ 				 fscache_rw_complete_t end_io_func,
+ 				 void *context,
+diff --git a/fs/nfs/fscache.c b/fs/nfs/fscache.c
+index d63bea8bbfbb..e1cf607f8959 100644
+--- a/fs/nfs/fscache.c
++++ b/fs/nfs/fscache.c
+@@ -301,7 +301,8 @@ void __nfs_fscache_invalidate_page(struct page *page, struct inode *inode)
+  * Handle completion of a page being read from the cache.
+  * - Called in process (keventd) context.
+  */
+-static void nfs_readpage_from_fscache_complete(struct page *page,
++static void nfs_readpage_from_fscache_complete(struct address_space *mapping,
++					       struct page *page,
+ 					       void *context,
+ 					       int error)
+ {
+@@ -334,6 +335,7 @@ int __nfs_readpage_from_fscache(struct nfs_open_context *ctx,
+ 		 nfs_i_fscache(inode), page, page->index, page->flags, inode);
+ 
+ 	ret = fscache_read_or_alloc_page(nfs_i_fscache(inode),
++					 page->mapping,
+ 					 page,
+ 					 nfs_readpage_from_fscache_complete,
+ 					 ctx,
+diff --git a/include/linux/fscache-cache.h b/include/linux/fscache-cache.h
+index 4c467ef50159..7ae49d0306d5 100644
+--- a/include/linux/fscache-cache.h
++++ b/include/linux/fscache-cache.h
+@@ -468,7 +468,7 @@ void fscache_set_store_limit(struct fscache_object *object, loff_t i_size)
+ static inline void fscache_end_io(struct fscache_retrieval *op,
+ 				  struct page *page, int error)
+ {
+-	op->end_io_func(page, op->context, error);
++	op->end_io_func(op->mapping, page, op->context, error);
+ }
+ 
+ static inline void __fscache_use_cookie(struct fscache_cookie *cookie)
+diff --git a/include/linux/fscache.h b/include/linux/fscache.h
+index 13db0098d3a9..f62df8c68e7a 100644
+--- a/include/linux/fscache.h
++++ b/include/linux/fscache.h
+@@ -50,7 +50,8 @@ struct fscache_cache_tag;
+ struct fscache_cookie;
+ struct fscache_netfs;
+ 
+-typedef void (*fscache_rw_complete_t)(struct page *page,
++typedef void (*fscache_rw_complete_t)(struct address_space *mapping,
++				      struct page *page,
+ 				      void *context,
+ 				      int error);
+ 
+@@ -216,6 +217,7 @@ extern int __fscache_attr_changed(struct fscache_cookie *);
+ extern void __fscache_invalidate(struct fscache_cookie *);
+ extern void __fscache_wait_on_invalidate(struct fscache_cookie *);
+ extern int __fscache_read_or_alloc_page(struct fscache_cookie *,
++					struct address_space *mapping,
+ 					struct page *,
+ 					fscache_rw_complete_t,
+ 					void *,
+@@ -530,14 +532,15 @@ int fscache_reserve_space(struct fscache_cookie *cookie, loff_t size)
+  */
+ static inline
+ int fscache_read_or_alloc_page(struct fscache_cookie *cookie,
++			       struct address_space *mapping,
+ 			       struct page *page,
+ 			       fscache_rw_complete_t end_io_func,
+ 			       void *context,
+ 			       gfp_t gfp)
+ {
+ 	if (fscache_cookie_valid(cookie) && fscache_cookie_enabled(cookie))
+-		return __fscache_read_or_alloc_page(cookie, page, end_io_func,
+-						    context, gfp);
++		return __fscache_read_or_alloc_page(cookie, mapping, page,
++						    end_io_func, context, gfp);
+ 	else
+ 		return -ENOBUFS;
+ }
 -- 
-git-series 0.9.1
+2.14.3
