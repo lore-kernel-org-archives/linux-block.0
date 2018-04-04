@@ -1,159 +1,64 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:49316 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751112AbeDLLv2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 Apr 2018 07:51:28 -0400
-From: Coly Li <colyli@suse.de>
-To: linux-bcache@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 2/2] bcache: add code comments for bset.c
-Date: Thu, 12 Apr 2018 19:50:53 +0800
-Message-Id: <20180412115053.125321-2-colyli@suse.de>
-In-Reply-To: <20180412115053.125321-1-colyli@suse.de>
-References: <20180412115053.125321-1-colyli@suse.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: jglisse@redhat.com
+To: linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Tejun Heo <tj@kernel.org>, Jan Kara <jack@suse.cz>,
+        Josef Bacik <jbacik@fb.com>,
+        Mel Gorman <mgorman@techsingularity.net>
+Subject: [RFC PATCH 07/79] mm/page: add helpers to find mapping give a page and buffer head
+Date: Wed,  4 Apr 2018 15:17:54 -0400
+Message-Id: <20180404191831.5378-5-jglisse@redhat.com>
+In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
+References: <20180404191831.5378-1-jglisse@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-This patch tries to add code comments in bset.c, to make some
-tricky code and designment to be more comprehensible. Most information
-of this patch comes from the discussion between Kent and I, he
-offers very informative details. If there is any mistake
-of the idea behind the code, no doubt that's from me misrepresentation.
+From: Jérôme Glisse <jglisse@redhat.com>
 
-Signed-off-by: Coly Li <colyli@suse.de>
+For now this simply use exist page_mapping() inline. Latter it will
+use buffer head pointer as a key to lookup mapping for write protected
+page.
+
+Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
+Cc: linux-mm@kvack.org
+CC: Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-fsdevel@vger.kernel.org
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Josef Bacik <jbacik@fb.com>
+Cc: Mel Gorman <mgorman@techsingularity.net>
 ---
- drivers/md/bcache/bset.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 63 insertions(+)
+ include/linux/mm-page.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/drivers/md/bcache/bset.c b/drivers/md/bcache/bset.c
-index 343f4e9428e0..057071f59d20 100644
---- a/drivers/md/bcache/bset.c
-+++ b/drivers/md/bcache/bset.c
-@@ -365,6 +365,10 @@ EXPORT_SYMBOL(bch_btree_keys_init);
- 
- /* Binary tree stuff for auxiliary search trees */
- 
-+/*
-+ * return array index next to j when does in-order traverse
-+ * of a binary tree which is stored in a linear array
-+ */
- static unsigned inorder_next(unsigned j, unsigned size)
- {
- 	if (j * 2 + 1 < size) {
-@@ -378,6 +382,10 @@ static unsigned inorder_next(unsigned j, unsigned size)
- 	return j;
+diff --git a/include/linux/mm-page.h b/include/linux/mm-page.h
+index 2981db45eeef..647a8a8cf9ba 100644
+--- a/include/linux/mm-page.h
++++ b/include/linux/mm-page.h
+@@ -132,5 +132,17 @@ static inline unsigned long _page_file_offset(struct page *page,
+ 	return page->index << PAGE_SHIFT;
  }
  
 +/*
-+ * return array index previous to j when does in-order traverse
-+ * of a binary tree which is stored in a linear array
++ * fs_page_mapping_get_with_bh() - page mapping knowing buffer_head
++ * @page: page struct pointer for which we want the mapping
++ * @bh: buffer_head associated with the page for the mapping
++ * Returns: page mapping for the given buffer head
 + */
- static unsigned inorder_prev(unsigned j, unsigned size)
- {
- 	if (j * 2 < size) {
-@@ -420,6 +428,10 @@ static unsigned __to_inorder(unsigned j, unsigned size, unsigned extra)
- 	return j;
- }
- 
-+/*
-+ * Return the cacheline index in bset_tree->data, where j is index
-+ * from a linear array which stores the auxiliar binary tree
-+ */
- static unsigned to_inorder(unsigned j, struct bset_tree *t)
- {
- 	return __to_inorder(j, t->size, t->extra);
-@@ -440,6 +452,10 @@ static unsigned __inorder_to_tree(unsigned j, unsigned size, unsigned extra)
- 	return j;
- }
- 
-+/*
-+ * Return an index from a linear array which stores the auxiliar binary
-+ * tree, j is the cacheline index of t->data.
-+ */
- static unsigned inorder_to_tree(unsigned j, struct bset_tree *t)
- {
- 	return __inorder_to_tree(j, t->size, t->extra);
-@@ -545,6 +561,20 @@ static inline uint64_t shrd128(uint64_t high, uint64_t low, uint8_t shift)
- 	return low;
- }
- 
-+/*
-+ * Calculate mantissa value for struct bkey_float.
-+ * If most significant bit of f->exponent is not set, then
-+ *  - f->exponent >> 6 is 0
-+ *  - p[0] points to bkey->low
-+ *  - p[-1] borrows bits from KEY_INODE() of bkey->high
-+ * if most isgnificant bits of f->exponent is set, then
-+ *  - f->exponent >> 6 is 1
-+ *  - p[0] points to bits from KEY_INODE() of bkey->high
-+ *  - p[-1] points to other bits from KEY_INODE() of
-+ *    bkey->high too.
-+ * See make_bfloat() to check when most significant bit of f->exponent
-+ * is set or not.
-+ */
- static inline unsigned bfloat_mantissa(const struct bkey *k,
- 				       struct bkey_float *f)
- {
-@@ -569,6 +599,16 @@ static void make_bfloat(struct bset_tree *t, unsigned j)
- 	BUG_ON(m < l || m > r);
- 	BUG_ON(bkey_next(p) != m);
- 
-+	/*
-+	 * If l and r have different KEY_INODE values (different backing
-+	 * device), f->exponent records how many least significant bits
-+	 * are different in KEY_INODE values and sets most significant
-+	 * bits to 1 (by +64).
-+	 * If l and r have same KEY_INODE value, f->exponent records
-+	 * how many different bits in least significant bits of bkey->low.
-+	 * See bfloat_mantiss() how the most significant bit of
-+	 * f->exponent is used to calculate bfloat mantissa value.
-+	 */
- 	if (KEY_INODE(l) != KEY_INODE(r))
- 		f->exponent = fls64(KEY_INODE(r) ^ KEY_INODE(l)) + 64;
- 	else
-@@ -632,6 +672,15 @@ void bch_bset_init_next(struct btree_keys *b, struct bset *i, uint64_t magic)
- }
- EXPORT_SYMBOL(bch_bset_init_next);
- 
-+/*
-+ * Build auxiliary binary tree 'struct bset_tree *t', this tree is used to
-+ * accelerate bkey search in a btree node (pointed by bset_tree->data in
-+ * memory). After search in the auxiliar tree by calling bset_search_tree(),
-+ * a struct bset_search_iter is returned which indicates range [l, r] from
-+ * bset_tree->data where the searching bkey might be inside. Then a followed
-+ * linear comparison does the exact search, see __bch_bset_search() for how
-+ * the auxiliary tree is used.
-+ */
- void bch_bset_build_written_tree(struct btree_keys *b)
- {
- 	struct bset_tree *t = bset_tree_last(b);
-@@ -897,6 +946,17 @@ static struct bset_search_iter bset_search_tree(struct bset_tree *t,
- 	unsigned inorder, j, n = 1;
- 
- 	do {
-+		/*
-+		 * A bit trick here.
-+		 * If p < t->size, (int)(p - t->size) is a minus value and
-+		 * the most significant bit is set, right shifting 31 bits
-+		 * gets 1. If p >= t->size, the most significant bit is
-+		 * not set, right shifting 31 bits gets 0.
-+		 * So the following 2 lines equals to
-+		 *	if (p >= t->size)
-+		 *		p = 0;
-+		 * but a branch instruction is avoided.
-+		 */
- 		unsigned p = n << 4;
- 		p &= ((int) (p - t->size)) >> 31;
- 
-@@ -906,6 +966,9 @@ static struct bset_search_iter bset_search_tree(struct bset_tree *t,
- 		f = &t->tree[j];
- 
- 		/*
-+		 * Similar bit trick, use subtract operation to avoid a branch
-+		 * instruction.
-+		 *
- 		 * n = (f->mantissa > bfloat_mantissa())
- 		 *	? j * 2
- 		 *	: j * 2 + 1;
++static inline struct address_space *fs_page_mapping_get_with_bh(
++		struct page *page, struct buffer_head *bh)
++{
++	return page_mapping(page);
++}
++
+ #endif /* MM_PAGE_H */
+ #endif /* DOT_NOT_INCLUDE___INSIDE_MM */
 -- 
-2.16.2
+2.14.3
