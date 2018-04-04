@@ -1,68 +1,21 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Wed, 4 Apr 2018 23:08:05 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	Laurence Oberman <loberman@redhat.com>
+Return-Path: <tglx@linutronix.de>
+Date: Wed, 4 Apr 2018 14:45:18 +0200 (CEST)
+From: Thomas Gleixner <tglx@linutronix.de>
+To: Ming Lei <ming.lei@redhat.com>
+cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+    linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+    Laurence Oberman <loberman@redhat.com>
 Subject: Re: [PATCH V3 4/4] genirq/affinity: irq vector spread among online
  CPUs as far as possible
-Message-ID: <20180404150759.GA24824@ming.t460p>
-References: <20180308105358.1506-1-ming.lei@redhat.com>
- <20180308105358.1506-5-ming.lei@redhat.com>
- <alpine.DEB.2.21.1804031522480.2511@nanos.tec.linutronix.de>
- <20180403160001.GA25255@ming.t460p>
+In-Reply-To: <alpine.DEB.2.21.1804041017530.2056@nanos.tec.linutronix.de>
+Message-ID: <alpine.DEB.2.21.1804041317550.2056@nanos.tec.linutronix.de>
+References: <20180308105358.1506-1-ming.lei@redhat.com> <20180308105358.1506-5-ming.lei@redhat.com> <alpine.DEB.2.21.1804031522480.2511@nanos.tec.linutronix.de> <20180403160001.GA25255@ming.t460p>
  <alpine.DEB.2.21.1804041017530.2056@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.DEB.2.21.1804041017530.2056@nanos.tec.linutronix.de>
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
-On Wed, Apr 04, 2018 at 10:25:16AM +0200, Thomas Gleixner wrote:
-> On Wed, 4 Apr 2018, Ming Lei wrote:
-> > On Tue, Apr 03, 2018 at 03:32:21PM +0200, Thomas Gleixner wrote:
-> > > On Thu, 8 Mar 2018, Ming Lei wrote:
-> > > > 1) before 84676c1f21 ("genirq/affinity: assign vectors to all possible CPUs")
-> > > > 	irq 39, cpu list 0
-> > > > 	irq 40, cpu list 1
-> > > > 	irq 41, cpu list 2
-> > > > 	irq 42, cpu list 3
-> > > > 
-> > > > 2) after 84676c1f21 ("genirq/affinity: assign vectors to all possible CPUs")
-> > > > 	irq 39, cpu list 0-2
-> > > > 	irq 40, cpu list 3-4,6
-> > > > 	irq 41, cpu list 5
-> > > > 	irq 42, cpu list 7
-> > > > 
-> > > > 3) after applying this patch against V4.15+:
-> > > > 	irq 39, cpu list 0,4
-> > > > 	irq 40, cpu list 1,6
-> > > > 	irq 41, cpu list 2,5
-> > > > 	irq 42, cpu list 3,7
-> > > 
-> > > That's more or less window dressing. If the device is already in use when
-> > > the offline CPUs get hot plugged, then the interrupts still stay on cpu 0-3
-> > > because the effective affinity of interrupts on X86 (and other
-> > > architectures) is always a single CPU.
-> > > 
-> > > So this only might move interrupts to the hotplugged CPUs when the device
-> > > is initialized after CPU hotplug and the actual vector allocation moves an
-> > > interrupt out to the higher numbered CPUs if they have less vectors
-> > > allocated than the lower numbered ones.
-> > 
-> > It works for blk-mq devices, such as NVMe.
-> > 
-> > Now NVMe driver creates num_possible_cpus() hw queues, and each
-> > hw queue is assigned one msix irq vector.
-> > 
-> > Storage is Client/Server model, that means the interrupt is only
-> > delivered to CPU after one IO request is submitted to hw queue and
-> > it is completed by this hw queue.
-> > 
-> > When CPUs is hotplugged, and there will be IO submitted from these
-> > CPUs, then finally IOs complete and irq events are generated from
-> > hw queues, and notify these submission CPU by IRQ finally.
-> 
+On Wed, 4 Apr 2018, Thomas Gleixner wrote:
 > I'm aware how that hw-queue stuff works. But that only works if the
 > spreading algorithm makes the interrupts affine to offline/not-present CPUs
 > when the block device is initialized.
@@ -76,15 +29,50 @@ On Wed, Apr 04, 2018 at 10:25:16AM +0200, Thomas Gleixner wrote:
 > 
 > and assumed that at driver init time only CPU 0-3 are online then the
 > hotplug of CPU 4-7 will not result in any interrupt delivered to CPU 4-7.
+> 
+> So the extra assignment to CPU 4-7 in the affinity mask has no effect
+> whatsoever and even if the spreading result is 'perfect' it just looks
+> perfect as it is not making any difference versus the original result:
+> 
+> > > >   irq 39, cpu list 0
+> > > >   irq 40, cpu list 1
+> > > >   irq 41, cpu list 2
+> > > >   irq 42, cpu list 3
 
-Indeed, and I just tested this case, and found that no interrupts are
-delivered to CPU 4-7.
+And looking deeper into the changes, I think that the first spreading step
+has to use cpu_present_mask and not cpu_online_mask.
 
-In theory, the affinity has been assigned to these irq vectors, and
-programmed to interrupt controller, I understand it should work.
+Assume the following scenario:
 
-Could you explain it a bit why interrupts aren't delivered to CPU 4-7?
+Machine with 8 present CPUs is booted, the 4 last CPUs are
+unplugged. Device with 4 queues is initialized.
 
+The resulting spread is going to be exactly your example:
+
+ 	irq 39, cpu list 0,4
+ 	irq 40, cpu list 1,6
+ 	irq 41, cpu list 2,5
+ 	irq 42, cpu list 3,7
+
+Now the 4 offline CPUs are plugged in again. These CPUs won't ever get an
+interrupt as all interrupts stay on CPU 0-3 unless one of these CPUs is
+unplugged. Using cpu_present_mask the spread would be:
+
+ 	irq 39, cpu list 0,1
+ 	irq 40, cpu list 2,3
+ 	irq 41, cpu list 4,5
+ 	irq 42, cpu list 6,7
+
+while on a machine where CPU 4-7 are NOT present, but advertised as
+possible the spread would be:
+
+ 	irq 39, cpu list 0,4
+ 	irq 40, cpu list 1,6
+ 	irq 41, cpu list 2,5
+ 	irq 42, cpu list 3,7
+
+Hmm?
 
 Thanks,
-Ming
+
+	tglx
