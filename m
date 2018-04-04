@@ -1,21 +1,21 @@
 Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54070 "EHLO mx1.redhat.com"
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35224 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752089AbeDDTT1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 4 Apr 2018 15:19:27 -0400
+        id S1751700AbeDDTTI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 4 Apr 2018 15:19:08 -0400
 From: jglisse@redhat.com
 To: linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
         =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
         Tejun Heo <tj@kernel.org>, Jan Kara <jack@suse.cz>,
         Josef Bacik <jbacik@fb.com>,
-        Mel Gorman <mgorman@techsingularity.net>
-Subject: [RFC PATCH 65/79] mm/swap: add struct swap_info_struct swap_readpage() arguments
-Date: Wed,  4 Apr 2018 15:18:19 -0400
-Message-Id: <20180404191831.5378-30-jglisse@redhat.com>
+        Mel Gorman <mgorman@techsingularity.net>,
+        Jeff Layton <jlayton@redhat.com>
+Subject: [RFC PATCH 26/79] fs: add struct address_space to mpage_readpage() arguments
+Date: Wed,  4 Apr 2018 15:18:00 -0400
+Message-Id: <20180404191831.5378-11-jglisse@redhat.com>
 In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
 References: <20180404191831.5378-1-jglisse@redhat.com>
 MIME-Version: 1.0
@@ -25,115 +25,229 @@ List-Id: linux-block@vger.kernel.org
 
 From: Jérôme Glisse <jglisse@redhat.com>
 
-Add struct swap_info_struct swap_readpage() arguments. One step toward
-dropping reliance on page->private during swap read back.
+Add struct address_space to mpage_readpage(). Note this patch only add
+arguments and modify call site conservatily using page->mapping and thus
+the end result is as before this patch.
+
+One step toward dropping reliance on page->mapping.
 
 Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
-CC: Andrew Morton <akpm@linux-foundation.org>
 Cc: Alexander Viro <viro@zeniv.linux.org.uk>
 Cc: linux-fsdevel@vger.kernel.org
 Cc: Tejun Heo <tj@kernel.org>
 Cc: Jan Kara <jack@suse.cz>
 Cc: Josef Bacik <jbacik@fb.com>
 Cc: Mel Gorman <mgorman@techsingularity.net>
+Cc: Jeff Layton <jlayton@redhat.com>
 ---
- include/linux/swap.h |  6 ++++--
- mm/memory.c          |  2 +-
- mm/page_io.c         |  4 ++--
- mm/swap_state.c      | 12 ++++++++----
- 4 files changed, 15 insertions(+), 9 deletions(-)
+ fs/ext2/inode.c       |  2 +-
+ fs/fat/inode.c        |  2 +-
+ fs/gfs2/aops.c        |  2 +-
+ fs/hpfs/file.c        |  2 +-
+ fs/isofs/inode.c      |  2 +-
+ fs/jfs/inode.c        |  2 +-
+ fs/mpage.c            | 14 ++++++++------
+ fs/nilfs2/inode.c     |  2 +-
+ fs/qnx6/inode.c       |  2 +-
+ fs/udf/inode.c        |  2 +-
+ fs/xfs/xfs_aops.c     |  2 +-
+ include/linux/mpage.h |  3 ++-
+ 12 files changed, 20 insertions(+), 17 deletions(-)
 
-diff --git a/include/linux/swap.h b/include/linux/swap.h
-index 2f6abe9652f6..90c26ec2997c 100644
---- a/include/linux/swap.h
-+++ b/include/linux/swap.h
-@@ -383,7 +383,8 @@ extern void kswapd_stop(int nid);
- #include <linux/blk_types.h> /* for bio_end_io_t */
- 
- /* linux/mm/page_io.c */
--extern int swap_readpage(struct page *page, bool do_poll);
-+extern int swap_readpage(struct swap_info_struct *sis, struct page *page,
-+			 bool do_poll);
- extern int swap_writepage(struct address_space *mapping, struct page *page,
- 			  struct writeback_control *wbc);
- extern void end_swap_bio_write(struct bio *bio);
-@@ -486,7 +487,8 @@ extern void exit_swap_address_space(unsigned int type);
- 
- #else /* CONFIG_SWAP */
- 
--static inline int swap_readpage(struct page *page, bool do_poll)
-+static inline int swap_readpage(struct swap_info_struct *sis, struct page *page,
-+				bool do_poll)
+diff --git a/fs/ext2/inode.c b/fs/ext2/inode.c
+index 11b3c3e7ea65..33873c0a4c14 100644
+--- a/fs/ext2/inode.c
++++ b/fs/ext2/inode.c
+@@ -872,7 +872,7 @@ static int ext2_writepage(struct address_space *mapping, struct page *page,
+ static int ext2_readpage(struct file *file, struct address_space *mapping,
+ 			 struct page *page)
  {
- 	return 0;
- }
-diff --git a/mm/memory.c b/mm/memory.c
-index 1311599a164b..6ffd76528e7b 100644
---- a/mm/memory.c
-+++ b/mm/memory.c
-@@ -2949,7 +2949,7 @@ int do_swap_page(struct vm_fault *vmf)
- 				__SetPageSwapBacked(page);
- 				set_page_private(page, entry.val);
- 				lru_cache_add_anon(page);
--				swap_readpage(page, true);
-+				swap_readpage(si, page, true);
- 			}
- 		} else {
- 			if (vma_readahead)
-diff --git a/mm/page_io.c b/mm/page_io.c
-index 6e548b588490..f4e05c90c87e 100644
---- a/mm/page_io.c
-+++ b/mm/page_io.c
-@@ -349,11 +349,11 @@ int __swap_writepage(struct page *page, struct writeback_control *wbc,
- 	return ret;
+-	return mpage_readpage(page, ext2_get_block);
++	return mpage_readpage(page->mapping, page, ext2_get_block);
  }
  
--int swap_readpage(struct page *page, bool synchronous)
-+int swap_readpage(struct swap_info_struct *sis, struct page *page,
-+		  bool synchronous)
+ static int
+diff --git a/fs/fat/inode.c b/fs/fat/inode.c
+index 4b70dcbcd192..9e6bc6364468 100644
+--- a/fs/fat/inode.c
++++ b/fs/fat/inode.c
+@@ -197,7 +197,7 @@ static int fat_writepages(struct address_space *mapping,
+ static int fat_readpage(struct file *file, struct address_space *mapping,
+ 			struct page *page)
  {
- 	struct bio *bio;
- 	int ret = 0;
--	struct swap_info_struct *sis = page_swap_info(page);
- 	blk_qc_t qc;
- 	struct gendisk *disk;
- 
-diff --git a/mm/swap_state.c b/mm/swap_state.c
-index 39ae7cfad90f..40a2437e3c34 100644
---- a/mm/swap_state.c
-+++ b/mm/swap_state.c
-@@ -466,8 +466,10 @@ struct page *read_swap_cache_async(swp_entry_t entry, gfp_t gfp_mask,
- 	struct page *retpage = __read_swap_cache_async(entry, gfp_mask,
- 			vma, addr, &page_was_allocated);
- 
--	if (page_was_allocated)
--		swap_readpage(retpage, do_poll);
-+	if (page_was_allocated) {
-+		struct swap_info_struct *sis = swp_swap_info(entry);
-+		swap_readpage(sis, retpage, do_poll);
-+	}
- 
- 	return retpage;
+-	return mpage_readpage(page, fat_get_block);
++	return mpage_readpage(page->mapping, page, fat_get_block);
  }
-@@ -585,7 +587,8 @@ struct page *swapin_readahead(swp_entry_t entry, gfp_t gfp_mask,
- 		if (!page)
- 			continue;
- 		if (page_allocated) {
--			swap_readpage(page, false);
-+			struct swap_info_struct *sis = swp_swap_info(entry);
-+			swap_readpage(sis, page, false);
- 			if (offset != entry_offset &&
- 			    likely(!PageTransCompound(page))) {
- 				SetPageReadahead(page);
-@@ -748,7 +751,8 @@ struct page *do_swap_page_readahead(swp_entry_t fentry, gfp_t gfp_mask,
- 		if (!page)
- 			continue;
- 		if (page_allocated) {
--			swap_readpage(page, false);
-+			struct swap_info_struct *sis = swp_swap_info(entry);
-+			swap_readpage(sis, page, false);
- 			if (i != swap_ra->offset &&
- 			    likely(!PageTransCompound(page))) {
- 				SetPageReadahead(page);
+ 
+ static int fat_readpages(struct file *file, struct address_space *mapping,
+diff --git a/fs/gfs2/aops.c b/fs/gfs2/aops.c
+index ff02313b86e6..b42775bba6a1 100644
+--- a/fs/gfs2/aops.c
++++ b/fs/gfs2/aops.c
+@@ -524,7 +524,7 @@ static int __gfs2_readpage(void *file, struct address_space *mapping,
+ 		error = stuffed_readpage(ip, page);
+ 		unlock_page(page);
+ 	} else {
+-		error = mpage_readpage(page, gfs2_block_map);
++		error = mpage_readpage(page->mapping, page, gfs2_block_map);
+ 	}
+ 
+ 	if (unlikely(test_bit(SDF_SHUTDOWN, &sdp->sd_flags)))
+diff --git a/fs/hpfs/file.c b/fs/hpfs/file.c
+index 3f2cc3fcee80..620dd9709a2c 100644
+--- a/fs/hpfs/file.c
++++ b/fs/hpfs/file.c
+@@ -118,7 +118,7 @@ static int hpfs_get_block(struct inode *inode, sector_t iblock, struct buffer_he
+ static int hpfs_readpage(struct file *file, struct address_space *mapping,
+ 			 struct page *page)
+ {
+-	return mpage_readpage(page, hpfs_get_block);
++	return mpage_readpage(page->mapping, page, hpfs_get_block);
+ }
+ 
+ static int hpfs_writepage(struct address_space *mapping, struct page *page,
+diff --git a/fs/isofs/inode.c b/fs/isofs/inode.c
+index 541d89e0621a..7d73b1036321 100644
+--- a/fs/isofs/inode.c
++++ b/fs/isofs/inode.c
+@@ -1171,7 +1171,7 @@ struct buffer_head *isofs_bread(struct inode *inode, sector_t block)
+ static int isofs_readpage(struct file *file, struct address_space *mapping,
+ 			  struct page *page)
+ {
+-	return mpage_readpage(page, isofs_get_block);
++	return mpage_readpage(page->mapping, page, isofs_get_block);
+ }
+ 
+ static int isofs_readpages(struct file *file, struct address_space *mapping,
+diff --git a/fs/jfs/inode.c b/fs/jfs/inode.c
+index be71214f4937..be6da161bc81 100644
+--- a/fs/jfs/inode.c
++++ b/fs/jfs/inode.c
+@@ -297,7 +297,7 @@ static int jfs_writepages(struct address_space *mapping,
+ static int jfs_readpage(struct file *file, struct address_space *mapping,
+ 			struct page *page)
+ {
+-	return mpage_readpage(page, jfs_get_block);
++	return mpage_readpage(page->mapping, page, jfs_get_block);
+ }
+ 
+ static int jfs_readpages(struct file *file, struct address_space *mapping,
+diff --git a/fs/mpage.c b/fs/mpage.c
+index 8800bcde5f4e..52a6028e2066 100644
+--- a/fs/mpage.c
++++ b/fs/mpage.c
+@@ -143,12 +143,13 @@ map_buffer_to_page(struct inode *inode, struct page *page,
+  * get_block() call.
+  */
+ static struct bio *
+-do_mpage_readpage(struct bio *bio, struct page *page, unsigned nr_pages,
++do_mpage_readpage(struct bio *bio, struct address_space *mapping,
++		struct page *page, unsigned nr_pages,
+ 		sector_t *last_block_in_bio, struct buffer_head *map_bh,
+ 		unsigned long *first_logical_block, get_block_t get_block,
+ 		gfp_t gfp)
+ {
+-	struct inode *inode = page->mapping->host;
++	struct inode *inode = mapping->host;
+ 	const unsigned blkbits = inode->i_blkbits;
+ 	const unsigned blocks_per_page = PAGE_SIZE >> blkbits;
+ 	const unsigned blocksize = 1 << blkbits;
+@@ -381,7 +382,7 @@ mpage_readpages(struct address_space *mapping, struct list_head *pages,
+ 		if (!add_to_page_cache_lru(page, mapping,
+ 					page->index,
+ 					gfp)) {
+-			bio = do_mpage_readpage(bio, page,
++			bio = do_mpage_readpage(bio, mapping, page,
+ 					nr_pages - page_idx,
+ 					&last_block_in_bio, &map_bh,
+ 					&first_logical_block,
+@@ -399,17 +400,18 @@ EXPORT_SYMBOL(mpage_readpages);
+ /*
+  * This isn't called much at all
+  */
+-int mpage_readpage(struct page *page, get_block_t get_block)
++int mpage_readpage(struct address_space *mapping, struct page *page,
++		   get_block_t get_block)
+ {
+ 	struct bio *bio = NULL;
+ 	sector_t last_block_in_bio = 0;
+ 	struct buffer_head map_bh;
+ 	unsigned long first_logical_block = 0;
+-	gfp_t gfp = mapping_gfp_constraint(page->mapping, GFP_KERNEL);
++	gfp_t gfp = mapping_gfp_constraint(mapping, GFP_KERNEL);
+ 
+ 	map_bh.b_state = 0;
+ 	map_bh.b_size = 0;
+-	bio = do_mpage_readpage(bio, page, 1, &last_block_in_bio,
++	bio = do_mpage_readpage(bio, mapping, page, 1, &last_block_in_bio,
+ 			&map_bh, &first_logical_block, get_block, gfp);
+ 	if (bio)
+ 		mpage_bio_submit(REQ_OP_READ, 0, bio);
+diff --git a/fs/nilfs2/inode.c b/fs/nilfs2/inode.c
+index 86d12a7822a9..7cc0268d68ce 100644
+--- a/fs/nilfs2/inode.c
++++ b/fs/nilfs2/inode.c
+@@ -152,7 +152,7 @@ int nilfs_get_block(struct inode *inode, sector_t blkoff,
+ static int nilfs_readpage(struct file *file, struct address_space *mapping,
+ 			  struct page *page)
+ {
+-	return mpage_readpage(page, nilfs_get_block);
++	return mpage_readpage(page->mapping, page, nilfs_get_block);
+ }
+ 
+ /**
+diff --git a/fs/qnx6/inode.c b/fs/qnx6/inode.c
+index 98cb4671405e..c7f3623fd5f4 100644
+--- a/fs/qnx6/inode.c
++++ b/fs/qnx6/inode.c
+@@ -96,7 +96,7 @@ static int qnx6_check_blockptr(__fs32 ptr)
+ static int qnx6_readpage(struct file *file, struct address_space *mapping,
+ 			 struct page *page)
+ {
+-	return mpage_readpage(page, qnx6_get_block);
++	return mpage_readpage(page->mapping, page, qnx6_get_block);
+ }
+ 
+ static int qnx6_readpages(struct file *file, struct address_space *mapping,
+diff --git a/fs/udf/inode.c b/fs/udf/inode.c
+index 63264d72999a..56cf8e70d298 100644
+--- a/fs/udf/inode.c
++++ b/fs/udf/inode.c
+@@ -188,7 +188,7 @@ static int udf_writepages(struct address_space *mapping,
+ static int udf_readpage(struct file *file, struct address_space *mapping,
+ 			struct page *page)
+ {
+-	return mpage_readpage(page, udf_get_block);
++	return mpage_readpage(page->mapping, page, udf_get_block);
+ }
+ 
+ static int udf_readpages(struct file *file, struct address_space *mapping,
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 00922a82ede6..bed27e59720a 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -1415,7 +1415,7 @@ xfs_vm_readpage(
+ 	struct page		*page)
+ {
+ 	trace_xfs_vm_readpage(page->mapping->host, 1);
+-	return mpage_readpage(page, xfs_get_blocks);
++	return mpage_readpage(page->mapping, page, xfs_get_blocks);
+ }
+ 
+ STATIC int
+diff --git a/include/linux/mpage.h b/include/linux/mpage.h
+index e7f489fc090c..1708caae2640 100644
+--- a/include/linux/mpage.h
++++ b/include/linux/mpage.h
+@@ -16,7 +16,8 @@ struct writeback_control;
+ 
+ int mpage_readpages(struct address_space *mapping, struct list_head *pages,
+ 				unsigned nr_pages, get_block_t get_block);
+-int mpage_readpage(struct page *page, get_block_t get_block);
++int mpage_readpage(struct address_space *mapping, struct page *page,
++		   get_block_t get_block);
+ int mpage_writepages(struct address_space *mapping,
+ 		struct writeback_control *wbc, get_block_t get_block);
+ int mpage_writepage(struct address_space *mapping, struct page *page,
 -- 
 2.14.3
