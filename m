@@ -1,30 +1,39 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:54464 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750943AbeDXSQd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Apr 2018 14:16:33 -0400
-From: Christoph Hellwig <hch@lst.de>
-To: iommu@lists.linux-foundation.org, linux-arch@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-scsi@vger.kernel.org, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org
-Subject: remove PCI_DMA_BUS_IS_PHYS V2
-Date: Tue, 24 Apr 2018 20:16:20 +0200
-Message-Id: <20180424181625.22410-1-hch@lst.de>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <linux-fsdevel-owner@vger.kernel.org>
+From: jglisse@redhat.com
+To: linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>
+Subject: [RFC PATCH 76/79] mm/ksm: have ksm select PAGE_RONLY config.
+Date: Wed,  4 Apr 2018 15:18:28 -0400
+Message-Id: <20180404191831.5378-39-jglisse@redhat.com>
+In-Reply-To: <20180404191831.5378-1-jglisse@redhat.com>
+References: <20180404191831.5378-1-jglisse@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-ID: <linux-block@vger.kernel.org>
 
-Hi all,
+From: Jérôme Glisse <jglisse@redhat.com>
 
-this series tries to get rid of the global and PCI_DMA_BUS_IS_PHYS flag,
-which causes the block layer and networking code to bounce buffer memory
-above the dma mask in some cases.  It is a leftover from i386 + highmem
-days and is obsolete now that we have swiotlb or iommus so that the
-dma ops implementations can always (minus the ISA DMA case which
-will require further attention) handle memory passed to them.
+Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
+Cc: Andrea Arcangeli <aarcange@redhat.com>
+---
+ mm/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-Changes since V1:
- - dropped all patches not strictly required to remove
-   PCI_DMA_BUS_IS_PHYS, those will be resent separately
+diff --git a/mm/Kconfig b/mm/Kconfig
+index aeffb6e8dd21..6994a1fdf847 100644
+--- a/mm/Kconfig
++++ b/mm/Kconfig
+@@ -308,6 +308,7 @@ config MMU_NOTIFIER
+ config KSM
+ 	bool "Enable KSM for page merging"
+ 	depends on MMU
++	select PAGE_RONLY
+ 	help
+ 	  Enable Kernel Samepage Merging: KSM periodically scans those areas
+ 	  of an application's address space that an app has advised may be
+-- 
+2.14.3
